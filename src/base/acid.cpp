@@ -48,7 +48,7 @@ int main(int argc, char** argv) {
             for (int i = 0; i < acid_num; i++) {
                 xercesc::DOMElement* element = doc->getElement("amino_acid", i);
                 proteomics::Acid* acid = new proteomics::Acid(element);
-                std::cout << acid->get_name() << "\n";
+                std::cout << acid->getName() << "\n";
                 delete acid;
             }
             delete doc;

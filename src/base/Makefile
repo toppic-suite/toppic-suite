@@ -21,7 +21,7 @@ SRCS = acid.cpp xml_dom.cpp xml_dom_document.cpp
 #
 
 OBJ_DIR = ../../obj
-OBJS = $(addprefix $(OBJ_DIR)/, acid.o xml_dom.o xml_dom_document.o )
+OBJS = $(addprefix $(OBJ_DIR)/, acid.o xml_dom.o xml_dom_document.o acid_vec.o )
 
 BIN_DIR = ../../bin
 

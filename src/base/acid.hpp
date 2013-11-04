@@ -19,22 +19,22 @@ class Acid {
     Acid (xercesc::DOMElement * element);
 
 	/* Get amino acid composition. */
-    std::string get_acid_composition() { return composition_;}
+    std::string getAcidComposition() { return composition_;}
 
 	/* Get average mass. */
-	double get_avg_mass() {return avg_mass_;}
+	double getAvgMass() {return avg_mass_;}
 
 	/* Get  monoisotopic mass. */
-	double get_mono_mass() {return mono_mass_;}
+	double getMonoMass() {return mono_mass_;}
 
 	/* Get amino acid name. */
-    std::string get_name() {return name_;}
+    std::string getName() {return name_;}
 
 	/* Get amino acid one letter representation. */
-    std::string get_one_letter() {return one_letter_;}
+    std::string getOneLetter() {return one_letter_;}
 
 	/* Get amino acid three letter representation. */
-    std::string get_three_letter() {return three_letter_;}
+    std::string getThreeLetter() {return three_letter_;}
 
     private:
 	/* Name of amino acid */
