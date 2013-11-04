@@ -7,8 +7,8 @@
 
 namespace proteomics {
 class AcidVec {
-    public:
-	static std::vector<Acid> getInstance();
+public:
+	static std::vector<Acid>* getInstance();
     
 	/**
 	 * Returns an amino acid based on the the name. Returns null if the amino
@@ -30,37 +30,25 @@ class AcidVec {
 	/**
 	 * Checks if the list contains an amino acid with the specific name.
 	 */
-	static bool containsName(std::vector<Acid> &acid_vec, const std::string &name) {
-		if (getAcidByName(acid_vec, name) == NULL) {
-            return false;
-        }
-        else {
-            return true;
-        }
-	}
+	static bool containsName(std::vector<Acid> &acid_vec, const std::string &name);
 
 	/**
 	 * Checks if the list contains an amino acid with the specific one letter
 	 * representation.
 	 */
-	static bool containsOneLetter(std::vector<Acid> &acid_vec, const std::string &one_letter) {
-	//	return getAcidByOneLetter(acid_vec, one_letter) != NULL;
-	}
+	static bool containsOneLetter(std::vector<Acid> &acid_vec, const std::string &one_letter);
 
 	/**
 	 * Checks if the list contains an amino acid with the specific three letter
 	 * representation.
 	 */
-	static bool containsThreeLetter(std::vector<Acid> &acid_vec, const std::string &three_letter) {
-	//	return getAcidByThreeLetter(acid_vec, three_letter) != NULL;
-	}
+	static bool containsThreeLetter(std::vector<Acid> &acid_vec, const std::string &three_letter);
 
 	/**
 	 * Converts a protein sequence (with one letter representation of amino
 	 * acids) to an amino acid array.
 	 */
 	static Acid** convert(std::vector<Acid> &acid_vec, const std::string &seq);
-	
 };
 }
 #endif
