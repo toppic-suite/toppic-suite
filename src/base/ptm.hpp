@@ -12,35 +12,40 @@
 #include "acid.hpp"
 
 namespace proteomics {
+
+class Ptm;
+typedef std::shared_ptr<Ptm> PtmPtr;
+
 class Ptm {
-    public:
-    Ptm(const std::string &abbr_name, 
-            const std::vector<Acid> &valid_acids, 
-            double mono_mass, 
-            bool is_empty); 
-    
-	/* Get amino acid composition. */
-    std::string getAbbrName() { return abbr_name_;}
+ public:
+  Ptm(const std::string &abbr_name, 
+      const std::vector<AcidPtr> &valid_acid_ptrs, 
+      double mono_mass);
 
-	/* Get  monoisotopic mass. */
-	double getMonoMass() {return mono_mass_;}
+  /* Get amino acid composition. */
+  std::string getAbbrName() { return abbr_name_;}
 
-	/* Get valid acid list. */
-    std::vector<Acid>& getValidAcids() {return valid_acids_;}
+  /* Get  monoisotopic mass. */
+  double getMonoMass() {return mono_mass_;}
 
-	/* Is it an empty PTM. */
-    bool isEmpty() {return is_empty_;}
+  /* Get valid acid list. */
+  std::vector<AcidPtr>& getValidAcids() {return valid_acid_ptrs_;}
 
-    private:
-	/* Abbreviation name of a PTM */
-    std::string abbr_name_;
-	/* Valid acids of the PTM */
-    std::vector<Acid> valid_acids_;
-    /* monoisotopic mass */
-    double mono_mass_;
-	/* Is it an empty PTM */
-    bool is_empty_;
+  /* Is it an empty PTM. */
+  bool isEmpty();
+
+  static PtmPtr getEmptyPtmPtr(std::vector<AcidPtr> &valid_acid_ptrs);
+
+ private:
+  /* Abbreviation name of a PTM */
+  std::string abbr_name_;
+  /* Valid acids of the PTM */
+  std::vector<AcidPtr> valid_acid_ptrs_;
+  /* monoisotopic mass */
+  double mono_mass_;
 };
+
+
 }
 #endif
 
