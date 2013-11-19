@@ -7,15 +7,17 @@
 #define PROTOMICS_PTM_H_
 
 #include <string>
+#include <vector>
+
+#include "acid.hpp"
 
 namespace proteomics {
 class Ptm {
     public:
     Ptm(const std::string &abbr_name, 
-            const Acid *valid_acids[], 
+            const std::vector<Acid> &valid_acids, 
             double mono_mass, 
             bool is_empty); 
-    ~Ptm();
     
 	/* Get amino acid composition. */
     std::string getAbbrName() { return abbr_name_;}
@@ -24,7 +26,7 @@ class Ptm {
 	double getMonoMass() {return mono_mass_;}
 
 	/* Get valid acid list. */
-    Acid* getValidAcids() {return valid_acids_;}
+    std::vector<Acid>& getValidAcids() {return valid_acids_;}
 
 	/* Is it an empty PTM. */
     bool isEmpty() {return is_empty_;}
@@ -33,7 +35,9 @@ class Ptm {
 	/* Abbreviation name of a PTM */
     std::string abbr_name_;
 	/* Valid acids of the PTM */
-    Acid valid_acids_[];
+    std::vector<Acid> valid_acids_;
+    /* monoisotopic mass */
+    double mono_mass_;
 	/* Is it an empty PTM */
     bool is_empty_;
 };
