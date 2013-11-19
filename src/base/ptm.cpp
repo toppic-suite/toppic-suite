@@ -14,6 +14,7 @@ Ptm::Ptm(const std::string &abbr_name,
             double mono_mass, 
             bool is_empty) {
     abbr_name_ = abbr_name;
+    valid_acids_ = new Acid*[sizeof(valid_acids)];
     one_letter_ = one_letter;
     three_letter_ = three_letter;
     composition_ = composition;
