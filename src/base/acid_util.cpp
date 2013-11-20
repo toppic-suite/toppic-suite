@@ -1,15 +1,18 @@
+
+#include <iostream>
+
 #include "acid_util.hpp"
 #include "xml_dom.hpp"
 #include "xml_dom_document.hpp"
 
-namespace proteomics {
+namespace prot {
 
 
 AcidPtrVec getAcidPtrVecInstance(const char* file_name) {
   AcidPtrVec acid_ptr_vec;
-  proteomics::XmlDOMParser* parser = proteomics::getXmlDOMInstance();
+  prot::XmlDOMParser* parser = prot::getXmlDOMInstance();
   if (parser) {
-    proteomics::XmlDOMDocument* doc = new proteomics::XmlDOMDocument(parser, file_name);
+    prot::XmlDOMDocument* doc = new prot::XmlDOMDocument(parser, file_name);
     if (doc) {
       int acid_num = doc->getChildCount("amino_acid_list", 0, "amino_acid");
       for (int i = 0; i < acid_num; i++) {
@@ -32,7 +35,7 @@ AcidPtr getAcidPtrByName(AcidPtrVec &acid_ptr_vec,
                          const std::string &name) {
   for (unsigned int i = 0; i < acid_ptr_vec.size(); i++) {
     std::string n = acid_ptr_vec[i]->getName();
-    if (n == name) {
+    if (n.compare(name) == 0) {
       return acid_ptr_vec[i];
     }
   }
@@ -47,7 +50,7 @@ AcidPtr getAcidPtrByOneLetter(AcidPtrVec &acid_ptr_vec,
                               const std::string &one_letter) {
   for (unsigned int i = 0; i < acid_ptr_vec.size(); i++) {
     std::string l = acid_ptr_vec[i]->getOneLetter();
-    if (l == one_letter) {
+    if (l.compare(one_letter) == 0) {
       return acid_ptr_vec[i];
     }
   }
@@ -63,7 +66,7 @@ AcidPtr getAcidPtrByThreeLetter(AcidPtrVec &acid_ptr_vec,
                                 const std::string &three_letter) {
   for (unsigned int i = 0; i < acid_ptr_vec.size(); i++) {
     std::string l = acid_ptr_vec[i]->getThreeLetter();
-    if (l == three_letter) {
+    if (l.compare(three_letter) == 0) {
       return acid_ptr_vec[i];
     }
   }
@@ -129,7 +132,17 @@ AcidPtrVec convertSeqToAcidPtrVec(AcidPtrVec &acid_ptr_vec,
     return acid_ptr_seq;
   }
 }
+
 	
 };
+
+int main(int argc, char** argv) {
+  prot::AcidPtrVec acid_ptr_vec = prot::getAcidPtrVecInstance("./acid.xml");
+  std::string letter("A");
+  std::cout << "A exist: " << prot::containsOneLetter(acid_ptr_vec, letter) << "\n";
+  letter = "X";
+  std::cout << "X exist: " << prot::containsOneLetter(acid_ptr_vec, letter) << "\n";
+  exit(0);
+}
 
 

@@ -3,14 +3,14 @@
  * date    2013-11-01
  */
 
-#ifndef PROTOMICS_COMPONENT_H_
-#define PROTOMICS_COMPONENT_H_
+#ifndef PROT_COMPONENT_H_
+#define PROT_COMPONENT_H_
 
 #include "acid.hpp"
 #include "ptm.hpp"
 #include "residue.hpp"
 
-namespace proteomics {
+namespace prot {
 
 class Component {
  public:

@@ -15,19 +15,19 @@ LFLAGS = -L/lib
 LIBS = -lxerces-c
 #
 # define the C++ source files
-SRCS = acid.cpp acid_util.cpp component.cpp ptm.cpp ptm_util.cpp residue.cpp residue_util.cpp xml_dom.cpp xml_dom_document.cpp
+SRCS = acid.cpp acid_util.cpp component.cpp ion_type.cpp ptm.cpp ptm_util.cpp residue.cpp residue_util.cpp xml_dom.cpp xml_dom_document.cpp
 #
 # define the C object files 
 #
 
 OBJ_DIR = ../../obj
-OBJS = $(addprefix $(OBJ_DIR)/, acid.o acid_util.o component.o ptm.o ptm_util.o residue.o residue_util.o xml_dom.o xml_dom_document.o)
+OBJS = $(addprefix $(OBJ_DIR)/, acid.o acid_util.o component.o ion_type.o ptm.o ptm_util.o residue.o residue_util.o xml_dom.o xml_dom_document.o)
 
 BIN_DIR = ../../bin
 
 #
 # define the executable file 
-MAIN = $(BIN_DIR)/acid
+MAIN = $(BIN_DIR)/acid_util
 #
 #
 # The following part of the makefile is generic; it can be used to 

@@ -1,5 +1,5 @@
-#ifndef PROTOMICS_XML_DOM_H_
-#define PROTOMICS_XML_DOM_H_
+#ifndef PROT_XML_DOM_H_
+#define PROT_XML_DOM_H_
 
 #include <string>
 
@@ -7,7 +7,7 @@
 #include <xercesc/dom/DOM.hpp>
 #include <xercesc/util/PlatformUtils.hpp>
 
-namespace proteomics {
+namespace prot {
 
 class XmlDOMParser {
 public:

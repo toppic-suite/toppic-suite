@@ -3,8 +3,8 @@
  * date    2013-11-01
  */
 
-#ifndef PROTOMICS_ACID_H_
-#define PROTOMICS_ACID_H_
+#ifndef PROT_ACID_H_
+#define PROT_ACID_H_
 
 #include <memory>
 #include <string>
@@ -12,7 +12,7 @@
 
 #include <xercesc/dom/DOM.hpp>
 
-namespace proteomics {
+namespace prot {
 
 
 class Acid {

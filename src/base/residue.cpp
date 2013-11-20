@@ -1,7 +1,7 @@
 	
 #include "residue.hpp"
 
-namespace proteomics {
+namespace prot {
 
 Residue::Residue(AcidPtr acid_ptr, PtmPtr ptm_ptr) {
   acid_ptr_ = acid_ptr;

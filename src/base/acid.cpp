@@ -2,13 +2,12 @@
  * author  Xiaowen Liu
  * date    2013-11-1
  */
-#include <iostream>
 
 #include "acid.hpp"
 #include "xml_dom.hpp"
 #include "xml_dom_document.hpp"
 
-namespace proteomics {
+namespace prot {
 
 Acid::Acid (std::string const &name, std::string const &one_letter, 
             std::string const &three_letter, std::string const &composition, 
@@ -34,24 +33,4 @@ Acid::Acid (xercesc::DOMElement *element) {
 
 }
 
-int main(int argc, char** argv) {
-  std::string value;
-  proteomics::XmlDOMParser* parser = proteomics::getXmlDOMInstance();
-  if (parser) {
-    proteomics::XmlDOMDocument* doc 
-        = new proteomics::XmlDOMDocument(parser, "./acid.xml");
-    if (doc) {
-      int acid_num = doc->getChildCount("amino_acid_list", 0, "amino_acid");
-      for (int i = 0; i < acid_num; i++) {
-        xercesc::DOMElement* element = doc->getElement("amino_acid", i);
-        proteomics::Acid* acid = new proteomics::Acid(element);
-        std::cout << acid->getName() << "\n";
-        delete acid;
-      }
-      delete doc;
-    }
-    delete parser;
-  }
-  exit(0);
-}
 

@@ -2,7 +2,7 @@
 
 #include "xml_dom_document.hpp"
  
-namespace proteomics {
+namespace prot {
 
 XmlDOMDocument::XmlDOMDocument(XmlDOMParser* parser, 
             const char* xml_file) : doc_(NULL) {

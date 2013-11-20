@@ -1,11 +1,11 @@
-#ifndef PROTOMICS_ACID_UTIL_H_
-#define PROTOMICS_ACID_UTIL_H_
+#ifndef PROT_ACID_UTIL_H_
+#define PROT_ACID_UTIL_H_
 
 #include <vector>
 
 #include "acid.hpp"
 
-namespace proteomics {
+namespace prot {
 
 
 AcidPtrVec getAcidPtrVecInstance(const char* file_name);

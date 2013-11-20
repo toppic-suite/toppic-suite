@@ -1,11 +1,11 @@
-#ifndef PROTOMICS_RESIDUE_UTIL_H_
-#define PROTOMICS_RESIDUE_UTIL_H_
+#ifndef PROT_RESIDUE_UTIL_H_
+#define PROT_RESIDUE_UTIL_H_
 
 #include <vector>
 
 #include "residue.hpp"
 
-namespace proteomics {
+namespace prot {
 
 /**
  * Returns the first residue based on the amino acid.

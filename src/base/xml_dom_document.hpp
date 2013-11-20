@@ -1,5 +1,5 @@
-#ifndef PROTOMICS_XML_DOM_DOCUMENT_H_
-#define PROTOMICS_XML_DOM_DOCUMENT_H_
+#ifndef PROT_XML_DOM_DOCUMENT_H_
+#define PROT_XML_DOM_DOCUMENT_H_
 
 #include <string>
 
@@ -11,7 +11,7 @@
 
 #include "xml_dom.hpp"
 
-namespace proteomics {
+namespace prot {
 
 class XmlDOMDocument {
        

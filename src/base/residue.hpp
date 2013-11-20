@@ -3,8 +3,8 @@
  * date    2013-11-01
  */
 
-#ifndef PROTOMICS_RESIDUE_H_
-#define PROTOMICS_RESIDUE_H_
+#ifndef PROT_RESIDUE_H_
+#define PROT_RESIDUE_H_
 
 #include <string>
 #include <memory>
@@ -12,7 +12,7 @@
 #include "acid_util.hpp"
 #include "ptm_util.hpp"
 
-namespace proteomics {
+namespace prot {
 
 class Residue {
  public:
@@ -34,7 +34,7 @@ class Residue {
 	 * Checks if the residue contains the same amino acid and ptm.
 	 */
 	bool isSame(AcidPtr acid_ptr, PtmPtr ptm_ptr) {
-		return acid_ptr_ == acid_ptr && ptm_ptr_ == ptm_ptr;
+		return acid_ptr_.get() == acid_ptr.get() && ptm_ptr_.get() == ptm_ptr.get();
 	}
 	
 	/** Get string representation */

@@ -7,15 +7,13 @@
 
 #include "ptm.hpp"
 
-namespace proteomics {
+namespace prot {
 
 static std::string empty_ptm_name_ = "NON PTM";
 
 Ptm::Ptm(const std::string &abbr_name, 
-            const AcidPtrVec &valid_acid_ptr_vec, 
             double mono_mass) {
     abbr_name_ = abbr_name;
-    valid_acid_ptr_vec_ = valid_acid_ptr_vec;
     mono_mass_ = mono_mass;
 }
 
@@ -28,8 +26,8 @@ bool Ptm::isEmpty() {
   }
 }
 
-PtmPtr Ptm::getEmptyPtmPtr(AcidPtrVec &valid_acid_ptr_vec) {
-  return PtmPtr(new Ptm(empty_ptm_name_, valid_acid_ptr_vec, 0));
+PtmPtr Ptm::getEmptyPtmPtr() {
+  return PtmPtr(new Ptm(empty_ptm_name_, 0));
 }
 
 }
