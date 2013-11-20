@@ -6,8 +6,9 @@
 #ifndef PROTOMICS_ACID_H_
 #define PROTOMICS_ACID_H_
 
-#include <string>
 #include <memory>
+#include <string>
+#include <vector>
 
 #include <xercesc/dom/DOM.hpp>
 
@@ -56,6 +57,7 @@ class Acid {
 };
 
 typedef std::shared_ptr<Acid> AcidPtr;
+typedef std::vector<AcidPtr> AcidPtrVec;
 
 }
 #endif
