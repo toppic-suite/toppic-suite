@@ -9,18 +9,16 @@
 #include <string>
 #include <memory>
 
-#include "acid.hpp"
-#include "ptm.hpp"
 #include "acid_util.hpp"
-#include "ptm_vec.hpp"
+#include "ptm_util.hpp"
 
 namespace proteomics {
 
 class Residue {
  public:
 	Residue(AcidPtr acid_ptr, PtmPtr ptm_ptr); 
-//  Residue(AcidPtrVec acid_vec, PtmVec ptm_vec,
-//          std::string one_letter, std::string abbr_name);
+  Residue(AcidPtrVec acid_ptr_vec, PtmPtrVec ptm_ptr_vec,
+          std::string one_letter, std::string abbr_name);
 
 	/** Get amino acid. */
 	AcidPtr getAcidPtr() {return acid_ptr_; }
@@ -51,6 +49,8 @@ class Residue {
 };
 
 typedef std::shared_ptr<Residue> ResiduePtr;
+typedef std::vector<ResiduePtr> ResiduePtrVec;
+
 
 }
 #endif
