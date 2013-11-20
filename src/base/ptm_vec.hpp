@@ -16,16 +16,17 @@ class PtmVec {
    * Returns a PTM based on the abbreviation name. Returns null if the
    * abbreviation name does not exist.
    */
-  static PtmPtr getPtmByAbbrName(std::vector<PtmPtr> &ptm_ptrs, const std::string &abbr_name);
+  static PtmPtr getPtmPtrByAbbrName(std::vector<PtmPtr> &ptm_ptrs, 
+                                    const std::string &abbr_name);
 
   /**
    * Checks if the list contains an amino acid with the specific name.
    */
   static bool containAbbrsName(std::vector<PtmPtr> &ptm_ptrs, const std::string &abbr_name);
 
-  static PtmPtr getEmptyPtm(std::vector<PtmPtr> &ptm_ptrs);
+  static PtmPtr getEmptyPtmPtr(std::vector<PtmPtr> &ptm_ptrs);
 
-  static std::vector<AcidPtr> getValidAcids(std::vector<PtmPtr> &ptm_ptrs);
+  static std::vector<AcidPtr> getValidAcidPtrs(std::vector<PtmPtr> &ptm_ptrs);
 };
 }
 #endif

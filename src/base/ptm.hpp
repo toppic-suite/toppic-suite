@@ -29,7 +29,7 @@ class Ptm {
   double getMonoMass() {return mono_mass_;}
 
   /* Get valid acid list. */
-  std::vector<AcidPtr>& getValidAcids() {return valid_acid_ptrs_;}
+  std::vector<AcidPtr> getValidAcidPtrs() {return valid_acid_ptrs_;}
 
   /* Is it an empty PTM. */
   bool isEmpty();

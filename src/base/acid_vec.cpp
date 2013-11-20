@@ -28,7 +28,8 @@ const std::vector<AcidPtr> AcidVec::getInstance(const char* file_name) {
  * Returns an amino acid based on the the name. Returns null if the amino
  * acid name does not exist.
  */
-AcidPtr AcidVec::getAcidByName(std::vector<AcidPtr> &acid_ptrs, const std::string &name) {
+AcidPtr AcidVec::getAcidPtrByName(std::vector<AcidPtr> &acid_ptrs, 
+                                  const std::string &name) {
     for (unsigned int i = 0; i < acid_ptrs.size(); i++) {
         std::string n = acid_ptrs[i]->getName();
         if (n == name) {
@@ -42,7 +43,8 @@ AcidPtr AcidVec::getAcidByName(std::vector<AcidPtr> &acid_ptrs, const std::strin
  * Returns an amino acid based on the one letter representation. Returns
  * null if the one letter representation does not exist.
  */
-AcidPtr AcidVec::getAcidByOneLetter(std::vector<AcidPtr> &acid_ptrs, const std::string &one_letter) {
+AcidPtr AcidVec::getAcidPtrByOneLetter(std::vector<AcidPtr> &acid_ptrs, 
+                                       const std::string &one_letter) {
     for (unsigned int i = 0; i < acid_ptrs.size(); i++) {
         std::string l = acid_ptrs[i]->getOneLetter();
         if (l == one_letter) {
@@ -57,7 +59,8 @@ AcidPtr AcidVec::getAcidByOneLetter(std::vector<AcidPtr> &acid_ptrs, const std::
  * Returns an amino acid based on the three letter representation. Returns
  * null if the three letter representation does not exist.
  */
-AcidPtr AcidVec::getAcidByThreeLetter(std::vector<AcidPtr> &acid_ptrs, const std::string &three_letter) {
+AcidPtr AcidVec::getAcidPtrByThreeLetter(std::vector<AcidPtr> &acid_ptrs, 
+                                         const std::string &three_letter) {
     for (unsigned int i = 0; i < acid_ptrs.size(); i++) {
         std::string l = acid_ptrs[i]->getThreeLetter();
         if (l == three_letter) {
@@ -71,8 +74,9 @@ AcidPtr AcidVec::getAcidByThreeLetter(std::vector<AcidPtr> &acid_ptrs, const std
 /**
  * Checks if the list contains an amino acid with the specific name.
  */
-bool AcidVec::containsName(std::vector<AcidPtr> &acid_ptrs, const std::string &name) {
-    if (getAcidByName(acid_ptrs, name).get() == nullptr) {
+bool AcidVec::containsName(std::vector<AcidPtr> &acid_ptrs, 
+                           const std::string &name) {
+    if (getAcidPtrByName(acid_ptrs, name).get() == nullptr) {
         return false;
     }
     else {
@@ -84,8 +88,9 @@ bool AcidVec::containsName(std::vector<AcidPtr> &acid_ptrs, const std::string &n
  * Checks if the list contains an amino acid with the specific one letter
  * representation.
  */
-bool AcidVec::containsOneLetter(std::vector<AcidPtr> &acid_ptrs, const std::string &one_letter) {
-    if (getAcidByOneLetter(acid_ptrs, one_letter).get() == nullptr) {
+bool AcidVec::containsOneLetter(std::vector<AcidPtr> &acid_ptrs, 
+                                const std::string &one_letter) {
+    if (getAcidPtrByOneLetter(acid_ptrs, one_letter).get() == nullptr) {
         return false;
     }
     else {
@@ -97,8 +102,9 @@ bool AcidVec::containsOneLetter(std::vector<AcidPtr> &acid_ptrs, const std::stri
  * Checks if the list contains an amino acid with the specific three letter
  * representation.
  */
-bool AcidVec::containsThreeLetter(std::vector<AcidPtr> &acid_vec, const std::string &three_letter) {
-    if (getAcidByThreeLetter(acid_vec, three_letter).get() == nullptr) {
+bool AcidVec::containsThreeLetter(std::vector<AcidPtr> &acid_vec, 
+                                  const std::string &three_letter) {
+    if (getAcidPtrByThreeLetter(acid_vec, three_letter).get() == nullptr) {
         return false;
     }
     else {
@@ -110,13 +116,15 @@ bool AcidVec::containsThreeLetter(std::vector<AcidPtr> &acid_vec, const std::str
  * Converts a protein sequence (with one letter representation of amino
  * acids) to an amino acid array.
  */
-std::vector<AcidPtr> AcidVec::convert(std::vector<AcidPtr> &acid_ptrs, const std::string &seq) {
+std::vector<AcidPtr> AcidVec::convert(std::vector<AcidPtr> &acid_ptrs, 
+                                      const std::string &seq) {
     std::vector<AcidPtr> acid_ptr_seq;
     if (seq.length() == 0) {
         return acid_ptr_seq;
     } else {
         for (unsigned int i = 0; i < seq.length(); i++) {
-            acid_ptr_seq.push_back(AcidVec::getAcidByOneLetter(acid_ptrs, seq.substr(i, 1)));
+            acid_ptr_seq.push_back(
+                AcidVec::getAcidPtrByOneLetter(acid_ptrs, seq.substr(i, 1)));
         }
         return acid_ptr_seq;
     }

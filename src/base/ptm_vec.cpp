@@ -33,7 +33,7 @@ const std::vector<PtmPtr> PtmVec::getInstance(std::vector<AcidPtr> &acid_ptrs,
  *   Returns a PTM based on the abbreviation name. Returns null if the
  *   abbreviation name does not exist.
  */
-PtmPtr PtmVec::getPtmByAbbrName(std::vector<PtmPtr> &ptm_ptrs, 
+PtmPtr PtmVec::getPtmPtrByAbbrName(std::vector<PtmPtr> &ptm_ptrs, 
                                const std::string &abbr_name) {
   for (unsigned int i = 0; i < ptm_ptrs.size(); i++) {
     std::string n = ptm_ptrs[i]->getAbbrName();
@@ -49,7 +49,7 @@ PtmPtr PtmVec::getPtmByAbbrName(std::vector<PtmPtr> &ptm_ptrs,
  */
 bool PtmVec::containAbbrsName(std::vector<PtmPtr> &ptm_ptrs, 
                       const std::string &abbr_name) {
-    if (getPtmByAbbrName(ptm_ptrs, abbr_name).get() == nullptr) {
+    if (getPtmPtrByAbbrName(ptm_ptrs, abbr_name).get() == nullptr) {
         return false;
     }
     else {
@@ -57,7 +57,7 @@ bool PtmVec::containAbbrsName(std::vector<PtmPtr> &ptm_ptrs,
     }
 }
 
-PtmPtr PtmVec::getEmptyPtm(std::vector<PtmPtr> &ptm_ptrs) {
+PtmPtr PtmVec::getEmptyPtmPtr(std::vector<PtmPtr> &ptm_ptrs) {
   for (unsigned int i = 0; i < ptm_ptrs.size(); i++) {
     if (ptm_ptrs[i]->isEmpty()) {
       return ptm_ptrs[i];
@@ -66,10 +66,10 @@ PtmPtr PtmVec::getEmptyPtm(std::vector<PtmPtr> &ptm_ptrs) {
   throw "Empty ptm does not exist!";
 }
 
-std::vector<AcidPtr> PtmVec::getValidAcids(std::vector<PtmPtr> &ptm_ptrs) {
+std::vector<AcidPtr> PtmVec::getValidAcidPtrs(std::vector<PtmPtr> &ptm_ptrs) {
   std::vector<AcidPtr> acid_ptrs;
   for (unsigned int i = 0; i < ptm_ptrs.size(); i++) {
-    std::vector<AcidPtr> cur_ptrs = ptm_ptrs[i]->getValidAcids();
+    std::vector<AcidPtr> cur_ptrs = ptm_ptrs[i]->getValidAcidPtrs();
     acid_ptrs.insert(acid_ptrs.end(), cur_ptrs.begin(), cur_ptrs.end());
   }
   return acid_ptrs;
