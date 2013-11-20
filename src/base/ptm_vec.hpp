@@ -24,6 +24,8 @@ class PtmVec {
   static bool containAbbrsName(std::vector<PtmPtr> &ptm_ptrs, const std::string &abbr_name);
 
   static PtmPtr getEmptyPtm(std::vector<PtmPtr> &ptm_ptrs);
+
+  static std::vector<AcidPtr> getValidAcids(std::vector<PtmPtr> &ptm_ptrs);
 };
 }
 #endif

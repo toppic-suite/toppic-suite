@@ -66,6 +66,15 @@ PtmPtr PtmVec::getEmptyPtm(std::vector<PtmPtr> &ptm_ptrs) {
   throw "Empty ptm does not exist!";
 }
 
+std::vector<AcidPtr> PtmVec::getValidAcids(std::vector<PtmPtr> &ptm_ptrs) {
+  std::vector<AcidPtr> acid_ptrs;
+  for (unsigned int i = 0; i < ptm_ptrs.size(); i++) {
+    std::vector<AcidPtr> cur_ptrs = ptm_ptrs[i]->getValidAcids();
+    acid_ptrs.insert(acid_ptrs.end(), cur_ptrs.begin(), cur_ptrs.end());
+  }
+  return acid_ptrs;
+}
+
 	
 };
 
