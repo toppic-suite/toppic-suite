@@ -1,5 +1,5 @@
-#ifndef PROTOMICS_ACID_VEC_H_
-#define PROTOMICS_ACID_VEC_H_
+#ifndef PROTOMICS_ACID_UTIL_H_
+#define PROTOMICS_ACID_UTIL_H_
 
 #include <vector>
 

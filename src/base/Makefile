@@ -15,13 +15,13 @@ LFLAGS = -L/lib
 LIBS = -lxerces-c
 #
 # define the C++ source files
-SRCS = acid.cpp acid_util.cpp ptm.cpp ptm_vec.cpp residue.cpp  xml_dom.cpp xml_dom_document.cpp
+SRCS = acid.cpp acid_util.cpp ptm.cpp ptm_util.cpp residue.cpp  xml_dom.cpp xml_dom_document.cpp
 #
 # define the C object files 
 #
 
 OBJ_DIR = ../../obj
-OBJS = $(addprefix $(OBJ_DIR)/, acid.o acid_util.o ptm.o ptm_vec.o residue.o xml_dom.o xml_dom_document.o)
+OBJS = $(addprefix $(OBJ_DIR)/, acid.o acid_util.o ptm.o ptm_util.o residue.o xml_dom.o xml_dom_document.o)
 
 BIN_DIR = ../../bin
 

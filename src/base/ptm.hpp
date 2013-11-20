@@ -15,11 +15,12 @@ namespace proteomics {
 
 class Ptm;
 typedef std::shared_ptr<Ptm> PtmPtr;
+typedef std::vector<PtmPtr> PtmPtrVec;
 
 class Ptm {
  public:
   Ptm(const std::string &abbr_name, 
-      const std::vector<AcidPtr> &valid_acid_ptrs, 
+      const AcidPtrVec &valid_acid_ptr_vec, 
       double mono_mass);
 
   /* Get amino acid composition. */
@@ -29,7 +30,7 @@ class Ptm {
   double getMonoMass() {return mono_mass_;}
 
   /* Get valid acid list. */
-  std::vector<AcidPtr> getValidAcidPtrs() {return valid_acid_ptrs_;}
+  AcidPtrVec getValidAcidPtrVec() {return valid_acid_ptr_vec_;}
 
   /* Is it an empty PTM. */
   bool isEmpty();
@@ -40,7 +41,7 @@ class Ptm {
   /* Abbreviation name of a PTM */
   std::string abbr_name_;
   /* Valid acids of the PTM */
-  std::vector<AcidPtr> valid_acid_ptrs_;
+  std::vector<AcidPtr> valid_acid_ptr_vec_;
   /* monoisotopic mass */
   double mono_mass_;
 };
