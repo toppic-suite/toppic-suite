@@ -17,8 +17,9 @@ namespace proteomics {
 class Residue {
  public:
 	Residue(AcidPtr acid_ptr, PtmPtr ptm_ptr); 
+
   Residue(AcidPtrVec acid_ptr_vec, PtmPtrVec ptm_ptr_vec,
-          std::string one_letter, std::string abbr_name);
+          std::string acid_name, std::string abbr_name);
 
 	/** Get amino acid. */
 	AcidPtr getAcidPtr() {return acid_ptr_; }

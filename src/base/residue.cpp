@@ -10,9 +10,9 @@ Residue::Residue(AcidPtr acid_ptr, PtmPtr ptm_ptr) {
 }
 
 Residue::Residue(AcidPtrVec acid_ptr_vec, PtmPtrVec ptm_ptr_vec,
-          std::string one_letter, std::string abbr_name) {
-  acid_ptr_ = getAcidPtrByOneLetter(acid_ptr_vec, one_letter);
-  ptm_ptr_ = getPtmPtrByAbbrName(ptm_ptr_vec, abbr_name);
+          std::string acid_name, std::string ptm_abbr_name) {
+  acid_ptr_ = getAcidPtrByName(acid_ptr_vec, acid_name);
+  ptm_ptr_ = getPtmPtrByAbbrName(ptm_ptr_vec, ptm_abbr_name);
   mass_ = acid_ptr_->getMonoMass() + ptm_ptr_->getMonoMass();
 }
 

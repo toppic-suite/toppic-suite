@@ -14,8 +14,8 @@ PtmPtrVec getPtmPtrVecInstance(AcidPtrVec &acid_ptr_vec,
   if (parser) {
     XmlDOMDocument* doc = new XmlDOMDocument(parser, file_name);
     if (doc) {
-      int acid_num = doc->getChildCount("ptm_list", 0, "ptm");
-      for (int i = 0; i < acid_num; i++) {
+      int ptm_num = doc->getChildCount("ptm_list", 0, "ptm");
+      for (int i = 0; i < ptm_num; i++) {
         xercesc::DOMElement* element = doc->getElement("ptm", i);
         std::string abbr_name = getChildValue(element, "abbreviation");
         AcidPtrVec valid_acid_ptr_vec;
