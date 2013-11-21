@@ -33,7 +33,6 @@ AcidPtrVec getAcidPtrVecInstance(const char* file_name) {
  */
 AcidPtr getAcidPtrByName(AcidPtrVec &acid_ptr_vec, 
                          const std::string &name) {
-  std::string x("x");
   for (unsigned int i = 0; i < acid_ptr_vec.size(); i++) {
     std::string n = acid_ptr_vec[i]->getName();
     if (n.compare(name) == 0) {
