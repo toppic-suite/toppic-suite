@@ -8,5 +8,4 @@ IonType::IonType(std::string name, bool n_term, double shift) {
   shift_ = shift;
 }
 
-
 }

@@ -23,6 +23,7 @@ bool containAbbrsName(PtmPtrVec &ptm_ptr_vec, const std::string &abbr_name);
 
 PtmPtr findEmptyPtmPtr(PtmPtrVec &ptm_ptr_vec);
 
-
+PtmPtr addPtm(PtmPtrVec &ptm_ptr_vec, std::string abbr_name,
+              double mono_mass);
 }
 #endif

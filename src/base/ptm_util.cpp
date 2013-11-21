@@ -66,6 +66,19 @@ PtmPtr findEmptyPtmPtr(PtmPtrVec &ptm_ptr_vec) {
   throw "Empty ptm does not exist!";
 }
 
+PtmPtr addPtm(PtmPtrVec &ptm_ptr_vec, std::string abbr_name,
+              double mono_mass) {
+  PtmPtr ptm_ptr = getPtmPtrByAbbrName(ptm_ptr_vec, abbr_name);
+  if (ptm_ptr.get() == nullptr) {
+    PtmPtr new_ptm(new Ptm(abbr_name, mono_mass));
+    ptm_ptr_vec.push_back(new_ptm);
+    return new_ptm;
+  }
+  else {
+    return ptm_ptr;
+  }
+}
+
 };
 
 
