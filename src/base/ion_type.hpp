@@ -13,11 +13,6 @@ typedef std::shared_ptr<IonType> IonTypePtr;
 
 class IonType {
  public: 
-  static const IonTypePtr B;
-  static const IonTypePtr Y;
-  static const IonTypePtr C;
-  static const IonTypePtr Z_DOT;
-
   IonType(std::string name, bool n_term, double shift);
 
   std::string getName() {return name_;}
@@ -25,9 +20,6 @@ class IonType {
   bool isNTerm() {return n_term_;}
 
   double getShift() {return shift_;}
-
-	/** Gets IonType by name */
-	static IonTypePtr getIonTypePtrByName(std::string name);
 
  private:
   /** ion name */
@@ -41,6 +33,8 @@ class IonType {
   double shift_;
 };
 
+typedef std::shared_ptr<IonType> IonTypePtr;
+typedef std::vector<IonTypePtr> IonTypePtrVec;
 
 }
 

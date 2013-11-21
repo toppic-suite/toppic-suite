@@ -39,7 +39,6 @@ class Ptm {
   double mono_mass_;
 };
 
-
 }
 #endif
 

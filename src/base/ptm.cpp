@@ -9,8 +9,6 @@
 
 namespace prot {
 
-static std::string empty_ptm_name_ = "NON PTM";
-
 Ptm::Ptm(const std::string &abbr_name, 
             double mono_mass) {
     abbr_name_ = abbr_name;
@@ -18,17 +16,12 @@ Ptm::Ptm(const std::string &abbr_name,
 }
 
 bool Ptm::isEmpty() {
-  if (abbr_name_ == empty_ptm_name_) {
+  if (mono_mass_ == 0.0) {
     return true;
   }
   else {
     return false;
   }
 }
-
-PtmPtr Ptm::getEmptyPtmPtr() {
-  return PtmPtr(new Ptm(empty_ptm_name_, 0));
-}
-
 }
 

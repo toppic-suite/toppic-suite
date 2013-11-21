@@ -9,7 +9,6 @@ namespace prot {
 
 PtmPtrVec getPtmPtrVecInstance(const char* file_name) {
   PtmPtrVec ptm_ptr_vec;
-  ptm_ptr_vec.push_back(Ptm::getEmptyPtmPtr());
   XmlDOMParser* parser = getXmlDOMInstance();
   if (parser) {
     XmlDOMDocument* doc = new XmlDOMDocument(parser, file_name);
