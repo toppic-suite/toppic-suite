@@ -1,14 +1,14 @@
 #include <iostream>
 
-#include "exp_trunc_util.hpp"
+#include "trunc_util.hpp"
 #include "xml_dom.hpp"
 #include "xml_dom_document.hpp"
 
 namespace prot {
 
-ExpTruncPtrVec getExpTruncPtrVecInstance(AcidPtrVec &acid_ptr_vec, 
+TruncPtrVec getTruncPtrVecInstance(AcidPtrVec &acid_ptr_vec, 
                                          const char* file_name) {
-  ExpTruncPtrVec exp_trunc_ptr_vec;
+  TruncPtrVec trunc_ptr_vec;
   prot::XmlDOMParser* parser = prot::getXmlDOMInstance();
   if (parser) {
     prot::XmlDOMDocument* doc = new prot::XmlDOMDocument(parser, file_name);
@@ -19,26 +19,26 @@ ExpTruncPtrVec getExpTruncPtrVecInstance(AcidPtrVec &acid_ptr_vec,
         std::string name = getChildValue(element, "name");
         int trunc_len = getIntChildValue(element, "trunc_len");
         std::string acid_str = getChildValue(element, "acid_str");
-        exp_trunc_ptr_vec.push_back(ExpTruncPtr(
-                new ExpTrunc(name, trunc_len, acid_ptr_vec, acid_str)));
+        trunc_ptr_vec.push_back(TruncPtr(
+                new Trunc(name, trunc_len, acid_ptr_vec, acid_str)));
 
       }
       delete doc;
     }
     delete parser;
   }
-  return exp_trunc_ptr_vec;
+  return trunc_ptr_vec;
 }
 
-ExpTruncPtr getExpTruncPtrByName(ExpTruncPtrVec &exp_trunc_ptr_vec, 
+TruncPtr getTruncPtrByName(TruncPtrVec &trunc_ptr_vec, 
                          const std::string &name) {
-  for (unsigned int i = 0; i < exp_trunc_ptr_vec.size(); i++) {
-    std::string n = exp_trunc_ptr_vec[i]->getName();
+  for (unsigned int i = 0; i < trunc_ptr_vec.size(); i++) {
+    std::string n = trunc_ptr_vec[i]->getName();
     if (n.compare(name) == 0) {
-      return exp_trunc_ptr_vec[i];
+      return trunc_ptr_vec[i];
     }
   }
-  return ExpTruncPtr(nullptr);
+  return TruncPtr(nullptr);
 }
 
 }
