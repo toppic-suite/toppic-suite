@@ -31,12 +31,12 @@ class ProtMod {
 typedef std::shared_ptr<ProtMod> ProtModPtr;
 typedef std::vector<ProtModPtr> ProtModPtrVec;
 
-ProtModPtrVec getProtModPtrVecInstance(AcidPtrVec &acid_ptr_vec, 
-                                       PtmPtrVec &ptm_ptr_vec,
-                                       TruncPtrVec &trunc_ptr_vec,
-                                       const char* file_name);
+ProtModPtrVec getProtModListInstance(AcidPtrVec &acid_list, 
+                                     PtmPtrVec &ptm_list,
+                                     TruncPtrVec &trunc_list,
+                                     const char* file_name);
 
-ProtModPtr getProtModPtrByName(ProtModPtrVec &prot_mod_ptr_vec, 
+ProtModPtr getProtModPtrByName(ProtModPtrVec &prot_mod_list, 
                          const std::string &name);
 }
 #endif

@@ -44,6 +44,9 @@ class ResidueSeq {
   double residue_mass_sum_;
 };
 
+typedef std::shared_ptr<ResidueSeq> RSPtr;
+typedef std::vector<RSPtr> RSPtrVec;
+
 ResidueSeq getEmptyResidueSeq();
 
 }

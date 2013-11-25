@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 
+#include "residue_seq.hpp"
+
 namespace prot {
 
 class FastaReader {
@@ -22,6 +24,8 @@ class FastaReader {
    **/                  
   std::vector<std::string> getNextSeq();
 
+  RSPtr getNextResidueSeq(AcidPtrVec acid_list, 
+                          ResiduePtrVec residue_list);
  private:
   std::ifstream input_;
   std::string ori_name_;

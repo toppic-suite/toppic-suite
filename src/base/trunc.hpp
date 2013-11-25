@@ -10,7 +10,7 @@ class Trunc {
 
  public:
   Trunc(std::string name, int trunc_len, 
-           AcidPtrVec &acid_ptr_vec, std::string acid_str);
+           AcidPtrVec &acid_list, std::string str);
   std::string getName() {return name_;}
 	int getTruncLen() {return trunc_len_;}
 	double getShift() {return shift_;}
@@ -18,18 +18,18 @@ class Trunc {
  private:
   std::string name_;
 	int trunc_len_;
-  AcidPtrVec acid_ptr_str_;
+  AcidPtrVec acid_str_;
 	double shift_;
 };
 
 typedef std::shared_ptr<Trunc> TruncPtr;
 typedef std::vector<TruncPtr> TruncPtrVec;
 
-TruncPtrVec getTruncPtrVecInstance(AcidPtrVec &acid_ptr_vec, 
-                                         const char* file_name);
+TruncPtrVec getTruncListInstance(AcidPtrVec &acid_list, 
+                                 const char* file_name);
 
-TruncPtr getTruncPtrByName(TruncPtrVec &trunc_ptr_vec, 
-                         const std::string &name);
+TruncPtr getTruncPtrByName(TruncPtrVec &trunc_list, 
+                           const std::string &name);
 }
 
 #endif

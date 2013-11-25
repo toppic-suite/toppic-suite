@@ -26,8 +26,8 @@ bool Ptm::isEmpty() {
   }
 }
 
-PtmPtrVec getPtmPtrVecInstance(const char* file_name) {
-  PtmPtrVec ptm_ptr_vec;
+PtmPtrVec getPtmListInstance(const char* file_name) {
+  PtmPtrVec ptm_list;
   XmlDOMParser* parser = getXmlDOMInstance();
   if (parser) {
     XmlDOMDocument* doc = new XmlDOMDocument(parser, file_name);
@@ -37,26 +37,26 @@ PtmPtrVec getPtmPtrVecInstance(const char* file_name) {
         xercesc::DOMElement* element = doc->getElement("ptm", i);
         std::string abbr_name = getChildValue(element, "abbreviation");
         double mono_mass = getDoubleChildValue(element, "mono_mass");
-        ptm_ptr_vec.push_back(PtmPtr(new Ptm(abbr_name, mono_mass)));
+        ptm_list.push_back(PtmPtr(new Ptm(abbr_name, mono_mass)));
 
       }
       delete doc;
     }
     delete parser;
   }
-  return ptm_ptr_vec;
+  return ptm_list;
 }
 
 /**
  *   Returns a PTM based on the abbreviation name. Returns null if the
  *   abbreviation name does not exist.
  */
-PtmPtr getPtmPtrByAbbrName(PtmPtrVec &ptm_ptr_vec, 
+PtmPtr getPtmPtrByAbbrName(PtmPtrVec &ptm_list, 
                            const std::string &abbr_name) {
-  for (unsigned int i = 0; i < ptm_ptr_vec.size(); i++) {
-    std::string n = ptm_ptr_vec[i]->getAbbrName();
-    if (n.compare(abbr_name) == 0) {
-      return ptm_ptr_vec[i];
+  for (unsigned int i = 0; i < ptm_list.size(); i++) {
+    std::string n = ptm_list[i]->getAbbrName();
+    if (n == abbr_name) {
+      return ptm_list[i];
     }
   }
   return PtmPtr(nullptr);
@@ -65,9 +65,9 @@ PtmPtr getPtmPtrByAbbrName(PtmPtrVec &ptm_ptr_vec,
 /**
  * Checks if the list contains an amino acid with the specific name.
  */
-bool containAbbrsName(PtmPtrVec &ptm_ptr_vec, 
+bool containAbbrsName(PtmPtrVec &ptm_list, 
                       const std::string &abbr_name) {
-    if (getPtmPtrByAbbrName(ptm_ptr_vec, abbr_name).get() == nullptr) {
+    if (getPtmPtrByAbbrName(ptm_list, abbr_name).get() == nullptr) {
         return false;
     }
     else {
@@ -75,21 +75,21 @@ bool containAbbrsName(PtmPtrVec &ptm_ptr_vec,
     }
 }
 
-PtmPtr findEmptyPtmPtr(PtmPtrVec &ptm_ptr_vec) {
-  for (unsigned int i = 0; i < ptm_ptr_vec.size(); i++) {
-    if (ptm_ptr_vec[i]->isEmpty()) {
-      return ptm_ptr_vec[i];
+PtmPtr findEmptyPtmPtr(PtmPtrVec &ptm_list) {
+  for (unsigned int i = 0; i < ptm_list.size(); i++) {
+    if (ptm_list[i]->isEmpty()) {
+      return ptm_list[i];
     }
   }
   throw "Empty ptm does not exist!";
 }
 
-PtmPtr addPtm(PtmPtrVec &ptm_ptr_vec, std::string abbr_name,
+PtmPtr addPtm(PtmPtrVec &ptm_list, std::string abbr_name,
               double mono_mass) {
-  PtmPtr ptm_ptr = getPtmPtrByAbbrName(ptm_ptr_vec, abbr_name);
+  PtmPtr ptm_ptr = getPtmPtrByAbbrName(ptm_list, abbr_name);
   if (ptm_ptr.get() == nullptr) {
     PtmPtr new_ptm(new Ptm(abbr_name, mono_mass));
-    ptm_ptr_vec.push_back(new_ptm);
+    ptm_list.push_back(new_ptm);
     return new_ptm;
   }
   else {

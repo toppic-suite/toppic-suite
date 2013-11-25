@@ -39,22 +39,22 @@ class Ptm {
   double mono_mass_;
 };
 
-PtmPtrVec getPtmPtrVecInstance(const char* file_name);
+PtmPtrVec getPtmListInstance(const char* file_name);
 /**
  * Returns a PTM based on the abbreviation name. Returns null if the
  * abbreviation name does not exist.
  */
-PtmPtr getPtmPtrByAbbrName(PtmPtrVec &ptm_ptr_vec, 
+PtmPtr getPtmPtrByAbbrName(PtmPtrVec &ptm_list, 
                            const std::string &abbr_name);
 
 /**
  * Checks if the list contains an amino acid with the specific name.
  */
-bool containAbbrsName(PtmPtrVec &ptm_ptr_vec, const std::string &abbr_name);
+bool containAbbrsName(PtmPtrVec &ptm_list, const std::string &abbr_name);
 
-PtmPtr findEmptyPtmPtr(PtmPtrVec &ptm_ptr_vec);
+PtmPtr findEmptyPtmPtr(PtmPtrVec &ptm_list);
 
-PtmPtr addPtm(PtmPtrVec &ptm_ptr_vec, std::string abbr_name,
+PtmPtr addPtm(PtmPtrVec &ptm_list, std::string abbr_name,
               double mono_mass);
 
 }
