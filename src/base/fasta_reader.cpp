@@ -1,7 +1,12 @@
 #include <boost/algorithm/string.hpp>
 #include "fasta_reader.hpp"
+#include "log4cxx/logger.h"
+#include "log4cxx/propertyconfigurator.h"
+#include "log4cxx/helpers/exception.h"
 
 namespace prot {
+
+log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("FastaReader"));
 
 FastaReader::FastaReader(const char* file_name) {
   input_.open(file_name, std::ios::in);
@@ -73,7 +78,7 @@ std::string rmChar(std::string str) {
 std::vector<std::string> fastaPreprocess(std::string name, std::string seq) {
   std::string new_seq = rmChar(seq);
   if (!(new_seq == seq)) {
-    std::cerr << "Reading sequence. Unknown letter occurred. " << seq;
+    LOG4CXX_INFO(logger, "Reading sequence. Unknown letter occurred. ");
   }
   std::vector<std::string> strs;
   strs.push_back(name);

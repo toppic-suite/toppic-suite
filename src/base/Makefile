@@ -12,7 +12,7 @@ INCLUDES = -I../../include/base
 LFLAGS = -L/lib
 #
 # define any libraries to link into executable:
-LIBS = -lxerces-c
+LIBS = -lxerces-c -llog4cxx
 #
 # define the C++ source files
 SRCS = fasta_reader.cpp residue_seq.cpp prot_mod.cpp acid.cpp component.cpp trunc.cpp ion_type.cpp ptm.cpp residue.cpp xml_dom.cpp xml_dom_document.cpp
@@ -27,7 +27,7 @@ BIN_DIR = ../../bin
 
 #
 # define the executable file 
-MAIN = $(BIN_DIR)/acid_util
+MAIN = $(BIN_DIR)/prot
 #
 #
 # The following part of the makefile is generic; it can be used to 
