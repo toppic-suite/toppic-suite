@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <xercesc/dom/DOM.hpp>
 
 namespace prot {
 
@@ -14,6 +15,8 @@ typedef std::shared_ptr<IonType> IonTypePtr;
 class IonType {
  public: 
   IonType(std::string name, bool n_term, double shift);
+
+  IonType(xercesc::DOMElement * element);
 
   std::string getName() {return name_;}
 
@@ -35,6 +38,9 @@ class IonType {
 
 typedef std::shared_ptr<IonType> IonTypePtr;
 typedef std::vector<IonTypePtr> IonTypePtrVec;
+
+IonTypePtrVec getIonTypePtrVecInstance(const char* file_name);
+IonTypePtr getAcidPtrByName(IonTypePtrVec &ionType_ptr_vec, const std::string &name);
 
 }
 
