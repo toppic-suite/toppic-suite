@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <boost/algorithm/string.hpp>
 
 #include "xml_dom_document.hpp"
  
@@ -107,6 +108,17 @@ int getIntChildValue(xercesc::DOMElement* parent,
         const char* child_tag) {
     std::string value = getChildValue(parent, child_tag);
     return atoi(value.c_str());
+}
+
+bool getBoolChildValue(xercesc::DOMElement* parent,
+        const char* child_tag) {
+	std::string value = getChildValue(parent, child_tag);
+	boost::to_lower(value);
+	if(value.compare("true")==0)
+	{
+		return true;
+	}
+	return false;
 }
 
 }

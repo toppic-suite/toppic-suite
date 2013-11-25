@@ -45,5 +45,8 @@ double getDoubleChildValue(xercesc::DOMElement* parent,
 
 int getIntChildValue(xercesc::DOMElement* parent,  
         const char* child_tag);
+
+bool getBoolChildValue(xercesc::DOMElement* parent,
+        const char* child_tag);
 }
 #endif
