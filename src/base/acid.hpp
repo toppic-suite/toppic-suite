@@ -57,7 +57,7 @@ class Acid {
 typedef std::shared_ptr<Acid> AcidPtr;
 typedef std::vector<AcidPtr> AcidPtrVec;
 
-AcidPtrVec getAcidListInstance(const char* file_name);
+AcidPtrVec getAcidPtrVecInstance(const char* file_name);
 
 /**
  * Returns an amino acid based on the the name. Returns null if the amino

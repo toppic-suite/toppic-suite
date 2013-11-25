@@ -39,7 +39,7 @@ class Ptm {
   double mono_mass_;
 };
 
-PtmPtrVec getPtmListInstance(const char* file_name);
+PtmPtrVec getPtmPtrVecInstance(const char* file_name);
 /**
  * Returns a PTM based on the abbreviation name. Returns null if the
  * abbreviation name does not exist.

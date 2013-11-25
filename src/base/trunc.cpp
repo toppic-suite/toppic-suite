@@ -17,7 +17,7 @@ Trunc::Trunc(std::string name, int trunc_len,
   }
 }
 
-TruncPtrVec getTruncListInstance(AcidPtrVec &acid_list, 
+TruncPtrVec getTruncPtrVecInstance(AcidPtrVec &acid_list, 
                                          const char* file_name) {
   TruncPtrVec trunc_list;
   prot::XmlDOMParser* parser = prot::getXmlDOMInstance();

@@ -60,7 +60,7 @@ ResiduePtr getResiduePtrByAcid(ResiduePtrVec &residue_list,
 ResiduePtr getResiduePtrByAcidPtm(ResiduePtrVec &residue_list,
                                   AcidPtr acid_ptr, PtmPtr ptm_ptr);
 
-ResiduePtrVec getResidueListInstance(AcidPtrVec &acid_list, 
+ResiduePtrVec getResiduePtrVecInstance(AcidPtrVec &acid_list, 
                                      PtmPtrVec &ptm_list,
                                      const char* file_name); 
 

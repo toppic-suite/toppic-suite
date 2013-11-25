@@ -26,7 +26,7 @@ bool Ptm::isEmpty() {
   }
 }
 
-PtmPtrVec getPtmListInstance(const char* file_name) {
+PtmPtrVec getPtmPtrVecInstance(const char* file_name) {
   PtmPtrVec ptm_list;
   XmlDOMParser* parser = getXmlDOMInstance();
   if (parser) {

@@ -4,7 +4,7 @@ namespace prot {
 
 ResidueSeq::ResidueSeq(std::string name, ResiduePtrVec residues) {
   name_ = name;
-  residues_ = residues_;
+  residues_ = residues;
   /* get residue mass sum */
   residue_mass_sum_ = 0;
   for (unsigned int i = 0; i < residues_.size(); i++) {

@@ -20,7 +20,7 @@ Acid::Acid (std::string const &name, std::string const &one_letter,
   avg_mass_ = avg_mass;
 }
 
-AcidPtrVec getAcidListInstance(const char* file_name) {
+AcidPtrVec getAcidPtrVecInstance(const char* file_name) {
   AcidPtrVec acid_list;
   prot::XmlDOMParser* parser = prot::getXmlDOMInstance();
   if (parser) {
