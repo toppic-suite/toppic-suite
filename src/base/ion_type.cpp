@@ -36,7 +36,7 @@ IonTypePtrVec getIonTypePtrVecInstance(const char* file_name){
 	return ionType_ptr_vec;
 }
 
-IonTypePtr getAcidPtrByName(IonTypePtrVec &ionType_ptr_vec, const std::string &name){
+IonTypePtr getIonTypePtrByName(IonTypePtrVec &ionType_ptr_vec, const std::string &name){
 	for (unsigned int i = 0; i < ionType_ptr_vec.size(); i++) {
 	    std::string n = ionType_ptr_vec[i]->getName();
 	    if (n.compare(name) == 0) {

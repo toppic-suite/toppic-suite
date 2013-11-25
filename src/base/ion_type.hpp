@@ -40,7 +40,7 @@ typedef std::shared_ptr<IonType> IonTypePtr;
 typedef std::vector<IonTypePtr> IonTypePtrVec;
 
 IonTypePtrVec getIonTypePtrVecInstance(const char* file_name);
-IonTypePtr getAcidPtrByName(IonTypePtrVec &ionType_ptr_vec, const std::string &name);
+IonTypePtr getIonTypePtrByName(IonTypePtrVec &ionType_ptr_vec, const std::string &name);
 
 }
 
