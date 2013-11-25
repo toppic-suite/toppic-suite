@@ -42,5 +42,8 @@ std::string getChildValue(xercesc::DOMElement* parent,
 
 double getDoubleChildValue(xercesc::DOMElement* parent,  
         const char* child_tag);
+
+int getIntChildValue(xercesc::DOMElement* parent,  
+        const char* child_tag);
 }
 #endif

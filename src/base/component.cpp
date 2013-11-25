@@ -4,7 +4,6 @@
  */
 
 #include "component.hpp"
-#include "residue_util.hpp"
 
 namespace prot {
 

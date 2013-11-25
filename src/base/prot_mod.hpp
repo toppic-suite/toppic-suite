@@ -28,5 +28,15 @@ class ProtMod {
   double pep_shift_;
 };
 
+typedef std::shared_ptr<ProtMod> ProtModPtr;
+typedef std::vector<ProtModPtr> ProtModPtrVec;
+
+ProtModPtrVec getProtModPtrVecInstance(AcidPtrVec &acid_ptr_vec, 
+                                       PtmPtrVec &ptm_ptr_vec,
+                                       TruncPtrVec &trunc_ptr_vec,
+                                       const char* file_name);
+
+ProtModPtr getProtModPtrByName(ProtModPtrVec &prot_mod_ptr_vec, 
+                         const std::string &name);
 }
 #endif

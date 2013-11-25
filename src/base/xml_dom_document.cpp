@@ -103,5 +103,10 @@ double getDoubleChildValue(xercesc::DOMElement* parent,
     return atof(value.c_str());
 }
 
+int getIntChildValue(xercesc::DOMElement* parent,  
+        const char* child_tag) {
+    std::string value = getChildValue(parent, child_tag);
+    return atoi(value.c_str());
+}
 
 }

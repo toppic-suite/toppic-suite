@@ -2,7 +2,7 @@
 CC = g++
 #
 # define any compile-time flags
-CPPFLAGS = -Wall -g -std=c++0x
+CPPFLAGS = -Wall -g -std=c++11
 #
 # define any directories containing header files other than /usr/include
 #
@@ -15,13 +15,13 @@ LFLAGS = -L/lib
 LIBS = -lxerces-c
 #
 # define the C++ source files
-SRCS = acid.cpp acid_util.cpp component.cpp ion_type.cpp ptm.cpp ptm_util.cpp residue.cpp residue_util.cpp xml_dom.cpp xml_dom_document.cpp
+SRCS = prot_mod.cpp acid.cpp component.cpp trunc.cpp ion_type.cpp ptm.cpp residue.cpp xml_dom.cpp xml_dom_document.cpp
 #
 # define the C object files 
 #
 
 OBJ_DIR = ../../obj
-OBJS = $(addprefix $(OBJ_DIR)/, acid.o acid_util.o component.o ion_type.o ptm.o ptm_util.o residue.o residue_util.o xml_dom.o xml_dom_document.o)
+OBJS = $(addprefix $(OBJ_DIR)/, prot_mod.o acid.o component.o trunc.o ion_type.o ptm.o residue.o xml_dom.o xml_dom_document.o)
 
 BIN_DIR = ../../bin
 

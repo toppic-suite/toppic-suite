@@ -9,8 +9,8 @@
 #include <string>
 #include <memory>
 
-#include "acid_util.hpp"
-#include "ptm_util.hpp"
+#include "acid.hpp"
+#include "ptm.hpp"
 
 namespace prot {
 
@@ -52,6 +52,17 @@ class Residue {
 typedef std::shared_ptr<Residue> ResiduePtr;
 typedef std::vector<ResiduePtr> ResiduePtrVec;
 
+/**
+ * Returns the first residue based on the acid and ptm. 
+ */
+ResiduePtr getResiduePtrByAcidPtm(ResiduePtrVec &residue_ptr_vec,
+                                  AcidPtr acid_ptr, PtmPtr ptm_ptr);
 
+ResiduePtrVec getResiduePtrVecInstance(AcidPtrVec &acid_ptr_vec, 
+                                       PtmPtrVec &ptm_ptr_vec,
+                                       const char* file_name); 
+
+ResiduePtr addResidue(ResiduePtrVec &residue_ptr_vec, AcidPtr acid_ptr,
+                      PtmPtr ptm_ptr);
 }
 #endif

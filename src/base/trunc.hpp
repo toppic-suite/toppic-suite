@@ -25,6 +25,11 @@ class Trunc {
 typedef std::shared_ptr<Trunc> TruncPtr;
 typedef std::vector<TruncPtr> TruncPtrVec;
 
+TruncPtrVec getTruncPtrVecInstance(AcidPtrVec &acid_ptr_vec, 
+                                         const char* file_name);
+
+TruncPtr getTruncPtrByName(TruncPtrVec &trunc_ptr_vec, 
+                         const std::string &name);
 }
 
 #endif
