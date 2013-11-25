@@ -11,17 +11,23 @@ ResidueSeq::ResidueSeq(std::string name, ResiduePtrVec residues) {
     residue_mass_sum_ += residues_[i]->getMass();
   }
 }
-ResidueSeq::getSubResidueSeq(int bgn, int end) {
+
+
+ResidueSeq ResidueSeq::getSubResidueSeq(int bgn, int end) {
   if (end - bgn < 0) {
     return getEmptyResidueSeq();
   } else {
     ResiduePtrVec sub_residues; 
-    std::copy ( v1.begin() + 4, v1.begin() + 8, std::back_inserter(subvector) );
-    for (int i = bgn; i <= end; i++) {
-      sub_residues.push_back(residues_[i]);
-    }
-    return ResidueSeq("", subResidues);
+    std::copy (residues_.begin() + bgn, residues_.begin() + end, 
+               std::back_inserter(sub_residues) );
+    return ResidueSeq("", sub_residues);
   }
+}
+
+ResidueSeq getEmptyResidueSeq() {
+  std::string empty_str;
+  ResiduePtrVec residues;
+  return ResidueSeq(empty_str, residues);
 }
 
 }

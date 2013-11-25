@@ -9,6 +9,7 @@ namespace prot {
 class ResidueSeq {
  public:
   ResidueSeq(std::string name, ResiduePtrVec residues);
+
   /**
    * Returns a sub-peptide of the original peptide.
    **/
@@ -41,7 +42,9 @@ class ResidueSeq {
   ResiduePtrVec residues_;
   /** the sum of residue mass */
   double residue_mass_sum_;
-}
+};
+
+ResidueSeq getEmptyResidueSeq();
 
 }
 #endif
