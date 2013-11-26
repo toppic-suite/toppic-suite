@@ -25,6 +25,7 @@ private:
 };
 
 typedef std::shared_ptr<BreakPoint> BreakPointPtr;
+typedef std::vector<BreakPointPtr> BreakPointPtrVec;
 
 } /* namespace prot */
 
