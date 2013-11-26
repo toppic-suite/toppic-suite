@@ -10,21 +10,17 @@
 #include "xml_dom_document.hpp"
 
 namespace prot {
-Activation::Activation(std::string name, double n_shift, double c_shift,
-		IonTypePtr n_ion_type_ptr, IonTypePtr c_ion_type_ptr) {
+Activation::Activation(std::string name, IonTypePtr n_ion_type_ptr, IonTypePtr c_ion_type_ptr) {
 	name_ = name;
-	n_shift_ = n_shift;
-	c_shift_ = c_shift;
 	n_ion_type_ = n_ion_type_ptr;
 	c_ion_type_ = c_ion_type_ptr;
 }
 Activation::Activation(IonTypePtrVec ion_type_list,
 		xercesc::DOMElement * element) {
 	name_ = getChildValue(element, "name");
-	n_shift_= getDoubleChildValue(element, "n_shift");
-	c_shift_ = getDoubleChildValue(element, "c_shift");
 	n_ion_type_ = getIonTypePtrByName(ion_type_list,getChildValue(element, "n_ion_type"));
 	c_ion_type_ = getIonTypePtrByName(ion_type_list,getChildValue(element, "c_ion_type"));
+
 }
 
 ActivationPtrVec getActivationPtrVectInst(IonTypePtrVec ion_type_list,const char* file_name){

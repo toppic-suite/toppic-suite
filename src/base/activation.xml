@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<activation_list>
+<activation>
+	<name>CID</name>
+	<n_ion_type>B</n_ion_type>
+	<c_ion_type>Y</c_ion_type>
+</activation>
+<activation>
+	<name>HCD</name>
+	<n_ion_type>B</n_ion_type>
+	<c_ion_type>Y</c_ion_type>
+</activation>
+<activation>
+	<name>ETD</name>
+	<n_ion_type>C</n_ion_type>
+	<c_ion_type>Z_DOT</c_ion_type>
+</activation>
+</activation_list>
