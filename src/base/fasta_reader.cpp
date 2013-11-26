@@ -1,8 +1,8 @@
 #include <boost/algorithm/string.hpp>
-#include "fasta_reader.hpp"
+
 #include "log4cxx/logger.h"
-#include "log4cxx/propertyconfigurator.h"
-#include "log4cxx/helpers/exception.h"
+
+#include "fasta_reader.hpp"
 
 namespace prot {
 
