@@ -1,0 +1,18 @@
+/*
+ * ion.cpp
+ *
+ *  Created on: Nov 25, 2013
+ *      Author: xunlikun
+ */
+
+#include "ion.hpp"
+
+namespace prot {
+Ion::Ion(int charge,int pos,int display,IonTypePtr ion_type_ptr,NeutralLossPtr neutral_loss_ptr){
+	charge_ = charge;
+	pos_=pos;
+	display_pos_=display;
+	ion_type_=ion_type_ptr;
+	neutral_loss_=neutral_loss_ptr;
+}
+} /* namespace prot */
