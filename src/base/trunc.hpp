@@ -1,5 +1,5 @@
-#ifndef PROT_TRUNC_H_
-#define PROT_TRUNC_H_
+#ifndef PROT_TRUNC_HPP_
+#define PROT_TRUNC_HPP_
 
 #include <string>
 #include "acid.hpp"

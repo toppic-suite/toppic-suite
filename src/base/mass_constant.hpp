@@ -1,5 +1,5 @@
-#ifndef PROT_MASS_CONSTANT_H_
-#define PROT_MASS_CONSTANT_H_
+#ifndef PROT_MASS_CONSTANT_HPP_
+#define PROT_MASS_CONSTANT_HPP_
 
 namespace prot {
 

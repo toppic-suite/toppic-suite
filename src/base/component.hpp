@@ -3,8 +3,8 @@
  * date    2013-11-01
  */
 
-#ifndef PROT_COMPONENT_H_
-#define PROT_COMPONENT_H_
+#ifndef PROT_COMPONENT_HPP_
+#define PROT_COMPONENT_HPP_
 
 #include "acid.hpp"
 #include "ptm.hpp"

@@ -5,8 +5,8 @@
  *      Author: xunlikun
  */
 
-#ifndef PROT_ACTIVATION_H_
-#define PROT_ACTIVATION_H_
+#ifndef PROT_ACTIVATION_HPP_
+#define PROT_ACTIVATION_HPP_
 
 #include <xercesc/dom/DOM.hpp>
 #include "ion_type.hpp"

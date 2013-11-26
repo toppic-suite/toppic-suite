@@ -5,8 +5,8 @@
  *      Author: xunlikun
  */
 
-#ifndef PROT_ION_H_
-#define PROT_ION_H_
+#ifndef PROT_ION_HPP_
+#define PROT_ION_HPP_
 
 #include <sstream>
 #include "ion_type.hpp"

@@ -1,5 +1,5 @@
-#ifndef PROT_FASTA_READER_H_
-#define PROT_FASTA_READER_H_
+#ifndef PROT_FASTA_READER_HPP_
+#define PROT_FASTA_READER_HPP_
 
 #include <iostream>
 #include <fstream>

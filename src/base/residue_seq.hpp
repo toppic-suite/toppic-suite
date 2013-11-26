@@ -1,5 +1,5 @@
-#ifndef PROT_RESIDUE_SEQ_H_
-#define PROT_RESIDUE_SEQ_H_
+#ifndef PROT_RESIDUE_SEQ_HPP_
+#define PROT_RESIDUE_SEQ_HPP_
 
 #include "mass_constant.hpp"
 #include "residue.hpp"

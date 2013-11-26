@@ -1,5 +1,5 @@
-#ifndef PROT_PROT_MOD_H_
-#define PROT_PROT_MOD_H_
+#ifndef PROT_PROT_MOD_HPP_
+#define PROT_PROT_MOD_HPP_
 
 #include "ptm.hpp"
 #include "trunc.hpp"

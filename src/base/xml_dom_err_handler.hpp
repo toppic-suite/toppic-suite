@@ -1,5 +1,5 @@
-#ifndef PROT_XML_DOM_ERR_HANDLER_H_
-#define PROT_XML_DOM_ERR_HANDLER_H_
+#ifndef PROT_XML_DOM_ERR_HANDLER_HPP_
+#define PROT_XML_DOM_ERR_HANDLER_HPP_
 
 #include <iostream>
 

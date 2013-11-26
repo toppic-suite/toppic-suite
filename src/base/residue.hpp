@@ -3,8 +3,8 @@
  * date    2013-11-01
  */
 
-#ifndef PROT_RESIDUE_H_
-#define PROT_RESIDUE_H_
+#ifndef PROT_RESIDUE_HPP_
+#define PROT_RESIDUE_HPP_
 
 #include <string>
 #include <memory>

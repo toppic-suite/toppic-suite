@@ -3,8 +3,8 @@
  * date    2013-11-17
  */
 
-#ifndef PROT_PTM_H_
-#define PROT_PTM_H_
+#ifndef PROT_PTM_HPP_
+#define PROT_PTM_HPP_
 
 #include <string>
 #include <vector>

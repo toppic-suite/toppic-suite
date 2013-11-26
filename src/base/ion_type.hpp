@@ -1,6 +1,6 @@
 
-#ifndef PROT_ION_TYPE_H_
-#define PROT_ION_TYPE_H_
+#ifndef PROT_ION_TYPE_HPP_
+#define PROT_ION_TYPE_HPP_
 
 #include <string>
 #include <vector>

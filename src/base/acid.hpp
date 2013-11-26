@@ -3,8 +3,8 @@
  * date    2013-11-01
  */
 
-#ifndef PROT_ACID_H_
-#define PROT_ACID_H_
+#ifndef PROT_ACID_HPP_
+#define PROT_ACID_HPP_
 
 #include <memory>
 #include <string>
