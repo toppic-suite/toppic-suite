@@ -5,8 +5,8 @@
  *      Author: xunlikun
  */
 
-#ifndef NEUTRALLOSS_HPP_
-#define NEUTRALLOSS_HPP_
+#ifndef PROT_NEUTRALLOSS_H_
+#define PROT_NEUTRALLOSS_H_
 
 #include <string>
 #include <vector>

@@ -5,8 +5,8 @@
  *      Author: xunlikun
  */
 
-#ifndef BREAKPOINT_HPP_
-#define BREAKPOINT_HPP_
+#ifndef PROT_BREAK_POINT_H_
+#define PROT_BREAK_POINT_H_
 
 #include "ion_type.hpp"
 

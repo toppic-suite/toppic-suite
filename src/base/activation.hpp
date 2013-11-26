@@ -5,8 +5,8 @@
  *      Author: xunlikun
  */
 
-#ifndef ACTIVATION_HPP_
-#define ACTIVATION_HPP_
+#ifndef PROT_ACTIVATION_H_
+#define PROT_ACTIVATION_H_
 
 #include <xercesc/dom/DOM.hpp>
 #import "ion_type.hpp"
@@ -15,17 +15,13 @@ namespace prot {
 
 class Activation {
 public:
-	Activation(std::string name,double n_shift,double c_shift,IonTypePtr n_ion_type_ptr,IonTypePtr c_ion_type_ptr);
+	Activation(std::string name,IonTypePtr n_ion_type_ptr,IonTypePtr c_ion_type_ptr);
 	Activation(IonTypePtrVec ion_type_list,xercesc::DOMElement * element);
 	std::string getName(){return name_;}
-	double getNShift(){return n_shift_;}
-	double getCShift(){return c_shift_;}
 	IonTypePtr getNIonType(){return n_ion_type_;}
 	IonTypePtr getCIonType(){return c_ion_type_;}
 private:
 	std::string name_;
-	double n_shift_;
-	double c_shift_;
 	IonTypePtr n_ion_type_;
 	IonTypePtr c_ion_type_;
 };
