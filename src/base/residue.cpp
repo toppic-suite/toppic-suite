@@ -47,8 +47,8 @@ ResiduePtr getResiduePtrByAcidPtm(ResiduePtrVec &residue_list,
 }
 
 ResiduePtrVec getResiduePtrVecInstance(AcidPtrVec &acid_list, 
-                                     PtmPtrVec &ptm_list,
-                                     const char* file_name) {
+                                       PtmPtrVec &ptm_list,
+                                       const char* file_name) {
   ResiduePtrVec residue_list;
   XmlDOMParser* parser = getXmlDOMInstance();
   if (parser) {

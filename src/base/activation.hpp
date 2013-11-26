@@ -9,7 +9,7 @@
 #define ACTIVATION_HPP_
 
 #include <xercesc/dom/DOM.hpp>
-#import "ion_type.hpp"
+#include "ion_type.hpp"
 
 namespace prot {
 
