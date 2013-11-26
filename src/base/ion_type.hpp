@@ -1,6 +1,6 @@
 
-#ifndef PROT_ION_TYPE_HPP_
-#define PROT_ION_TYPE_HPP_
+#ifndef PROT_ION_TYPE_H_
+#define PROT_ION_TYPE_H_
 
 #include <string>
 #include <vector>
@@ -24,6 +24,8 @@ class IonType {
 
   double getShift() {return shift_;}
 
+  double getBYShift() {return b_y_shift_;}
+
  private:
   /** ion name */
   std::string name_;
@@ -34,13 +36,15 @@ class IonType {
    * shift for B ion is 0, and the shift for Y ion is 18 (chrg 0);
    */
   double shift_;
+
+  double b_y_shift_;
 };
 
 typedef std::shared_ptr<IonType> IonTypePtr;
 typedef std::vector<IonTypePtr> IonTypePtrVec;
 
 IonTypePtrVec getIonTypePtrVecInstance(const char* file_name);
-IonTypePtr getIonTypePtrByName(IonTypePtrVec &ionType_ptr_vec, const std::string &name);
+IonTypePtr getIonTypePtrByName(IonTypePtrVec &ion_type_list, const std::string &name);
 
 }
 
