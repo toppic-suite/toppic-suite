@@ -15,7 +15,7 @@
 
 #include "bp_spec.hpp"
 #include "ion_type.hpp"
-#include "mass_comparator.hpp"
+#include "comparator.hpp"
 
 namespace prot {
 
@@ -56,7 +56,7 @@ std::vector<double> BpSpec::getBreakPointMasses(IonTypePtr ion_type){
 			bpmass_vec.push_back(break_point_ptr_vec_[i]->getCTermMass(ion_type));
 		}
 	}
-	std::sort(bpmass_vec.begin(),bpmass_vec.end(),MassComparator::up);
+	std::sort(bpmass_vec.begin(),bpmass_vec.end(),Comparator::mass_up);
 	return bpmass_vec;
 }
 
@@ -82,7 +82,7 @@ std::vector<double> BpSpec::getBreakPointMasses(double n_term_shift,double c_ter
 		addBreakPointMass(mass,new_seq_mass,min_mass,result);
 	}
 	result.push_back(new_seq_mass);
-	std::sort(result.begin(),result.end(),MassComparator::up);
+	std::sort(result.begin(),result.end(),Comparator::mass_up);
 
 	return result;
 }
