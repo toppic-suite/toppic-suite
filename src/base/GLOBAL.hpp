@@ -12,6 +12,7 @@ namespace prot {
 ProtModPtrVec _ProtModPtrVec;
 ResiduePtrVec _ResiduePtrVec;
 PtmPtrVec _PtmPtrVec;
+NeutralLossPtrVec _NeutralLossPtrVec;
 }
 
 #endif /* GLOBAL_HPP_ */
