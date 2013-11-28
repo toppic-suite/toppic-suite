@@ -7,9 +7,7 @@ namespace prot {
 
 class MsHeader {
  public:
-  MsHeader(int charge);
-
-  MsHeader(int scan_num, int level, int charge);
+  MsHeader() {}
 
   double getPrecMonoMass();
 
@@ -36,7 +34,7 @@ class MsHeader {
 
   double getPrecSpMz() {return prec_sp_mz_;}
 
-  int getPrecChrg() {return prec_chrg_;}
+  int getPrecCharge() {return prec_charge_;}
 
   double getPrecMonoMz() {return prec_mono_mz_;}
 
@@ -57,7 +55,7 @@ class MsHeader {
 
   void setPrecSpMz(double prec_sp_mz) {prec_sp_mz_ = prec_sp_mz;}
 
-  void setPrecChrg(int prec_chrg) {prec_chrg_ = prec_chrg;}
+  void setPrecCharge(int prec_charge) {prec_charge_ = prec_charge;}
 
   void setPrecMonoMz(double prec_mono_mz) {prec_mono_mz_ = prec_mono_mz;}
 
@@ -72,12 +70,14 @@ class MsHeader {
   void setPrecId(int prec_id) {prec_id_ = prec_id;}
 
  private:
+  /** data set name */
+  std::string file_name_;
+  /** A data set may contain several spectra with the same id, but different
+   * precursor id */
   int id_ = -1;
   /** one spectrum may have several possible precursor mass */
   int prec_id_ = -1;
-  /** data set name */
-  std::string file_name_;
-
+  
   std::string title_;
   /** a list of scans for merged spectra */
   std::vector<int> scans_;
@@ -91,8 +91,8 @@ class MsHeader {
   double prec_sp_mz_ = -1;
   /** computed monoisotopic precursor m/z value */
   double prec_mono_mz_ = -1;
-
-  int prec_chrg_ = -1;
+  /** precursor charge state */ 
+  int prec_charge_ = -1;
 };
 
 typedef std::shared_ptr<MsHeader> MsHeaderPtr;

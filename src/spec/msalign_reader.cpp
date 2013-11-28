@@ -10,6 +10,7 @@ static log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("MsAlignReader"));
 
 MsAlignReader::MsAlignReader (const char *spectrum_file, 
                               ActivationPtrVec activation_list) {
+  file_name_ = std::string(spectrum_file);
   input_.open(spectrum_file, std::ios::in);
   activation_list_ = activation_list;
 }
@@ -49,9 +50,11 @@ void MsAlignReader::readNext() {
   }
   std::vector<std::string> strs;
   int id = -1;
+  int prec_id = 0;
   std::string scans;
   std::string activation;
   std::string title;
+  int level = 2;
   double prec_mass = -1;
   int prec_charge = -1;
   for (unsigned int i = 1; i < spectrum_str_.size() - 1; i++) {
@@ -61,6 +64,9 @@ void MsAlignReader::readNext() {
       if (strs[0] == "ID") {
         id = atoi(strs[1].c_str());
       }
+      if (strs[0] == "PRECURSOR_ID") {
+        prec_id = atoi(strs[1].c_str());
+      }
       else if (strs[0] == "SCANS") {
         scans = strs[1];
       }
@@ -69,6 +75,9 @@ void MsAlignReader::readNext() {
       }
       else if (strs[0] == "TITLE") {
         title = strs[1];
+      }
+      else if (strs[0] == "LEVEL") {
+        title = atoi(strs[1].c_str());
       }
       else if (strs[0] == "PRECURSOR_MASS") {
         prec_mass = atof(strs[1].c_str());
@@ -85,8 +94,16 @@ void MsAlignReader::readNext() {
     std::exit(1);
   }
 
-  MsHeaderPtr header_ptr(new MsHeader(prec_charge));
+  MsHeaderPtr header_ptr(new MsHeader());
+  header_ptr->setFileName(file_name_);
   header_ptr->setId(id);
+  header_ptr->setPrecId(prec_id);
+  if (scans != "") {
+    header_ptr->setScans(scans);
+  }
+  else {
+    header_ptr->setScans("");
+  }
   if (title != "") {
     std::stringstream ss;
     ss << "sp_" << id;
@@ -94,20 +111,16 @@ void MsAlignReader::readNext() {
   } else {
     header_ptr->setTitle(title);
   }
-  if (scans != "") {
-    header_ptr->setScans(scans);
-  }
-  else {
-    header_ptr->setScans("");
-  }
-
   if (activation != "") {
     ActivationPtr activation_ptr = 
         getActivationPtrByName(activation_list_, activation);
     header_ptr->setActivationPtr(activation_ptr);
   }
+  header_ptr->setMsLevel(level);
+
   header_ptr->setPrecMonoMz(prec_mass /prec_charge
                        + MassConstant::getProtonMass());
+  header_ptr->setPrecCharge(prec_charge);
 
   std::vector<DeconvPeakPtr> peak_ptr_list;
   int idx = 0;

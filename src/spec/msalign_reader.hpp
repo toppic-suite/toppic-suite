@@ -28,6 +28,7 @@ class MsAlignReader {
   void close();
 
  private:
+  std::string file_name_;
   std::ifstream input_;
   ActivationPtrVec activation_list_;
   std::vector<std::string> spectrum_str_;
