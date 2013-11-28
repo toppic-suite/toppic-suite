@@ -1,5 +1,5 @@
-#ifndef PROT_DECONV_PEAK_H_
-#define PROT_DECONV_PEAK_H_
+#ifndef PROT_DECONV_PEAK_HPP_
+#define PROT_DECONV_PEAK_HPP_
 
 #include "peak.hpp"
 
@@ -15,7 +15,7 @@ class DeconvPeak : public Peak {
 
   double getMonoMass() {return getPosition();}
 
-  double getMonoMz() {return getMassMonoMz(getMonoMass(), charge_);}
+  double getMonoMz() {return compMonoMz(getMonoMass(), charge_);}
 
   double getScore() {return score_;}
 
@@ -24,8 +24,10 @@ class DeconvPeak : public Peak {
  private:
   int id_;
   int charge_;
-  double score_;
+  double score_ = 1.0;
 };
+
+typedef std::shared_ptr<DeconvPeak> DeconvPeakPtr;
 
 }
 #endif

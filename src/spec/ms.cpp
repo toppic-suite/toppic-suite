@@ -5,16 +5,6 @@
 
 namespace prot {
 
-template <class T>
-Ms<T>::Ms(MsHeaderPtr header_ptr) {
-  header_ptr_ = header_ptr;
-}
-
-template <class T>
-Ms<T>::Ms(MsHeaderPtr header_ptr, std::vector<T> peak_ptr_list) {
-  header_ptr_ = header_ptr;
-  peak_ptr_list_ = peak_ptr_list;
-}
 
 template <class T>
 void Ms<T>::rmPrec(double tolerance) {

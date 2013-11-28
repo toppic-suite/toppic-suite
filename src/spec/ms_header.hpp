@@ -93,6 +93,8 @@ class MsHeader {
   int prec_chrg_ = -1;
 };
 
+typedef std::shared_ptr<MsHeader> MsHeaderPtr;
+
 }
 
 #endif

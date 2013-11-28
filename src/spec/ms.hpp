@@ -8,9 +8,16 @@ namespace prot {
 template <class T>
 class Ms {
  public:
-	Ms(MsHeaderPtr header_ptr);
+  Ms() {};
 
-	Ms(MsHeaderPtr header_ptr, std::vector<T> peak_ptr_list);
+  Ms(MsHeaderPtr header_ptr) {
+    header_ptr_ = header_ptr;
+  }
+
+  Ms(MsHeaderPtr header_ptr, std::vector<T> peak_ptr_list) {
+    header_ptr_ = header_ptr;
+    peak_ptr_list_ = peak_ptr_list;
+  }
 
 	/**
 	 * Removes precursor mass. In ETD data, MSMS may contain a high precursor
@@ -25,6 +32,10 @@ class Ms {
 	MsHeaderPtr getHeaderPtr() {return header_ptr_;}
 
 	void setHeaderPtr(MsHeaderPtr header_ptr) {header_ptr = header_ptr_;}
+
+  unsigned int size() {return peak_ptr_list_.size();}
+
+  T getPeakPtr(int i) {return peak_ptr_list_[i];}
 
  private:
   MsHeaderPtr header_ptr_;

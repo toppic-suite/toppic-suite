@@ -15,13 +15,13 @@ LFLAGS = -L/lib
 LIBS = -lxerces-c -llog4cxx
 #
 # define the C++ source files
-SRCS = deconv_peak.cpp
+SRCS = deconv_ms.cpp ms.cpp peak_list.cpp ms_header.cpp deconv_peak.cpp
 #
 # define the C object files 
 #
 
 OBJ_DIR = ../../obj
-OBJS = $(addprefix $(OBJ_DIR)/, deconv_peak.o)
+OBJS = $(addprefix $(OBJ_DIR)/, deconv_ms.o ms.o peak_list.o ms_header.o deconv_peak.o)
 
 BIN_DIR = ../../bin
 

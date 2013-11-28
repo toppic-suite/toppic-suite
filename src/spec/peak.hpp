@@ -1,5 +1,5 @@
-#ifndef PROT_PEAK_H_
-#define PROT_PEAK_H_
+#ifndef PROT_PEAK_HPP_
+#define PROT_PEAK_HPP_
 
 #include <memory>
 
@@ -31,16 +31,13 @@ class Peak {
   double intensity_;
 };
 
-
-
-double getPeakMass(double mono_mz, int charge) {
+inline double compPeakMass(double mono_mz, int charge) {
   return mono_mz * charge - charge * MassConstant::getProtonMass();
 }
 
-double getMassMonoMz(double mono_mass, int charge) {
+inline double compMonoMz(double mono_mass, int charge) {
   return mono_mass / charge + MassConstant::getProtonMass();
 }
-
 
 }
 #endif

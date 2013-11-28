@@ -12,5 +12,3 @@ DeconvPeak::DeconvPeak (int id, double mono_mass,
     }
 }
 
-int main() {
-}
