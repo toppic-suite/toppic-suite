@@ -7,6 +7,8 @@ namespace prot {
 
 class MsHeader {
  public:
+  MsHeader(int charge);
+
   MsHeader(int scan_num, int level, int charge);
 
   double getPrecMonoMass();

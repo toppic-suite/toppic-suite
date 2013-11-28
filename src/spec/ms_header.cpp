@@ -9,7 +9,12 @@
 
 namespace prot {
 
-log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("MsHeader"));
+static log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("MsHeader"));
+
+MsHeader::MsHeader(int chrg) {
+  prec_chrg_ = chrg;
+}
+
 
 MsHeader::MsHeader(int scan_num, int level, int chrg) {
   scans_.push_back(scan_num);

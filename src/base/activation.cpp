@@ -38,13 +38,15 @@ ActivationPtrVec getActivationPtrVectInst(IonTypePtrVec ion_type_list,const char
 		delete parser;
 		return activationPtrVec;
 }
+
 ActivationPtr getActivationPtrByName(ActivationPtrVec activation_list,std::string name){
-	for (unsigned int i = 0; i < activation_list.size(); i++) {
-		    std::string n = activation_list[i]->getName();
-		    if (n.compare(name) == 0) {
-		      return activation_list[i];
-		    }
-		  }
-		  return ActivationPtr(nullptr);
+  for (unsigned int i = 0; i < activation_list.size(); i++) {
+    std::string n = activation_list[i]->getName();
+    if (n.compare(name) == 0) {
+      return activation_list[i];
+    }
+  }
+  return ActivationPtr(nullptr);
 }
+
 } /* namespace prot */

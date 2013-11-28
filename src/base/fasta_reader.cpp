@@ -6,7 +6,7 @@
 
 namespace prot {
 
-log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("FastaReader"));
+static log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("FastaReader"));
 
 FastaReader::FastaReader(const char* file_name) {
   input_.open(file_name, std::ios::in);
