@@ -5,16 +5,17 @@
  *      Author: xunlikun
  */
 
-#include <bp_spec.hpp>
-#include <ion_type.hpp>
-#include <mass_comparator.hpp>
-//#include "break_point.hpp"
-//#include "residue_seq.hpp"
+
 #include <algorithm>
 #include <memory>
 #include <string>
 #include <vector>
+
 #include "log4cxx/logger.h"
+
+#include "bp_spec.hpp"
+#include "ion_type.hpp"
+#include "mass_comparator.hpp"
 
 namespace prot {
 
@@ -43,16 +44,16 @@ void BpSpec::initBreakPoints(){
 	break_point_ptr_vec_.push_back(BreakPointPtr(new BreakPoint(res_seq_->getResMassSum(),0)));
 }
 
-std::vector<double> BpSpec::getBreakPointMasses(IonTypePtr iong_type){
+std::vector<double> BpSpec::getBreakPointMasses(IonTypePtr ion_type){
 	std::vector<double> bpmass_vec;
-	if (iong_type->getName().compare("B") == 0 || iong_type->getName().compare("C")) {
+	if (ion_type->isNTerm()) {
 		for (unsigned int i = 0; i < break_point_ptr_vec_.size(); i++) {
-			bpmass_vec.push_back(break_point_ptr_vec_[i]->getNTermMass(iong_type));
+			bpmass_vec.push_back(break_point_ptr_vec_[i]->getNTermMass(ion_type));
 		}
 	}
-	if (iong_type->getName().compare("Y") == 0 || iong_type->getName().compare("Z_DOT")) {
+  else {
 		for (unsigned int i = 0; i < break_point_ptr_vec_.size(); i++) {
-			bpmass_vec.push_back(break_point_ptr_vec_[i]->getCTermMass(iong_type));
+			bpmass_vec.push_back(break_point_ptr_vec_[i]->getCTermMass(ion_type));
 		}
 	}
 	std::sort(bpmass_vec.begin(),bpmass_vec.end(),MassComparator::up);
@@ -86,17 +87,17 @@ std::vector<double> BpSpec::getBreakPointMasses(double n_term_shift,double c_ter
 	return result;
 }
 
-std::vector<int> BpSpec::getScaledMass(double scale,IonTypePtr iong_type){
+std::vector<int> BpSpec::getScaledMass(double scale,IonTypePtr ion_type){
 	std::vector<int> result;
-	if (iong_type->getName().compare("B")==0 || iong_type->getName().compare("C")==0){
+	if (ion_type->getName().compare("B")==0 || ion_type->getName().compare("C")==0){
 		for(unsigned int i=0; i < break_point_ptr_vec_.size();i++){
-			double value = break_point_ptr_vec_[i]->getNTermMass(iong_type)*scale;
+			double value = break_point_ptr_vec_[i]->getNTermMass(ion_type)*scale;
 			result.push_back(std::floor(value+0.5));
 		}
 	}
-	if (iong_type->getName().compare("Y")==0 || iong_type->getName().compare("Z_DOT")==0){
+	if (ion_type->getName().compare("Y")==0 || ion_type->getName().compare("Z_DOT")==0){
 		for(unsigned int i=0; i < break_point_ptr_vec_.size();i++){
-			double value = break_point_ptr_vec_[i]->getCTermMass(iong_type)*scale;
+			double value = break_point_ptr_vec_[i]->getCTermMass(ion_type)*scale;
 			result.push_back(std::floor(value+0.5));
 		}
 	}
@@ -115,6 +116,7 @@ int getFirstResPos(double n_term_shift,std::vector<double> extbmasses){
 	}
 	return best_pos;
 }
+
 int getLastResPos(double c_term_shift,std::vector<double> extbmasses){
 	double trunc_len = -c_term_shift;
 	int best_pos = -1;
@@ -131,6 +133,14 @@ int getLastResPos(double c_term_shift,std::vector<double> extbmasses){
 		throw "get last residue position error!";
 	}
 	return best_pos - 1;
+}
+
+BpSpecPtrVec readBpspecDb(RSPtrVec rs_list){
+	BpSpecPtrVec bpspec_ptr_list;
+	for(unsigned int i =0; i<rs_list.size();i++){
+		bpspec_ptr_list.push_back(BpSpecPtr(new BpSpec(rs_list[i])));
+	}
+	return bpspec_ptr_list;
 }
 
 } /* namespace prot */

@@ -1,11 +1,9 @@
-
-#ifndef PROT_ION_TYPE_H_
-#define PROT_ION_TYPE_H_
+#ifndef PROT_ION_TYPE_HPP_
+#define PROT_ION_TYPE_HPP_
 
 #include <string>
 #include <vector>
 #include <memory>
-#include <xercesc/dom/DOM.hpp>
 
 namespace prot {
 
@@ -15,8 +13,6 @@ typedef std::shared_ptr<IonType> IonTypePtr;
 class IonType {
  public: 
   IonType(std::string name, bool n_term, double shift);
-
-  IonType(xercesc::DOMElement * element);
 
   std::string getName() {return name_;}
 

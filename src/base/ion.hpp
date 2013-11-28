@@ -16,11 +16,11 @@ namespace prot {
 
 class Ion {
 public:
-	Ion(int charge,int pos,int display,IonTypePtr ion_type_ptr,NeutralLossPtr neutral_loss_ptr);
+	Ion(int charge,int pos,int display,IonTypePtr ion_type_ptr, NeutralLossPtr neutral_loss_ptr);
 	int getCharge(){return charge_;}
 	int getPos(){return pos_;}
 	int getDisplayPos(){return display_pos_;}
-	IonTypePtr getIonType(){return ion_type_;}
+	IonTypePtr getIonTypePtr(){return ion_type_ptr_;}
 	std::string getDisplayName(){
 		std::stringstream s;
 		s<<display_pos_;
@@ -30,8 +30,8 @@ private:
 	int charge_;
 	int pos_;
 	int display_pos_;
-	IonTypePtr ion_type_;
-	NeutralLossPtr neutral_loss_;
+	IonTypePtr ion_type_ptr_;
+	NeutralLossPtr neutral_loss_ptr_;
 };
 
 typedef std::shared_ptr<Ion> IonPtr;

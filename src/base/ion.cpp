@@ -12,7 +12,7 @@ Ion::Ion(int charge,int pos,int display,IonTypePtr ion_type_ptr,NeutralLossPtr n
 	charge_ = charge;
 	pos_=pos;
 	display_pos_=display;
-	ion_type_=ion_type_ptr;
-	neutral_loss_=neutral_loss_ptr;
+	ion_type_ptr_=ion_type_ptr;
+	neutral_loss_ptr_=neutral_loss_ptr;
 }
 } /* namespace prot */

@@ -16,18 +16,6 @@ IonType::IonType(std::string name, bool n_term, double shift) {
   }
 }
 
-IonType::IonType(xercesc::DOMElement *element) {
-
-	name_ = getChildValue(element, "name");
-	n_term_ = getBoolChildValue(element, "n_term");
-	shift_ = getDoubleChildValue(element, "shift");
-	if (n_term_) {
-		b_y_shift_ = shift_;
-	} else {
-		b_y_shift_ = shift_ - MassConstant::getWaterMass();
-	}
-}
-
 IonTypePtrVec getIonTypePtrVecInstance(const char* file_name){
 	IonTypePtrVec ionType_ptr_vec;
 	prot::XmlDOMParser* parser = prot::getXmlDOMInstance();
@@ -37,7 +25,10 @@ IonTypePtrVec getIonTypePtrVecInstance(const char* file_name){
 	      int acid_num = doc->getChildCount("ion_type_list", 0, "ion_type");
 	      for (int i = 0; i < acid_num; i++) {
 	        xercesc::DOMElement* element = doc->getElement("ion_type", i);
-	        ionType_ptr_vec.push_back(IonTypePtr(new IonType(element)));
+	        std::string name = getChildValue(element, "name");
+	        bool n_term = getBoolChildValue(element, "n_term");
+	        double shift = getDoubleChildValue(element, "shift");
+	        ionType_ptr_vec.push_back(IonTypePtr(new IonType(name, n_term, shift)));
 
 	      }
 	      delete doc;
@@ -50,7 +41,7 @@ IonTypePtrVec getIonTypePtrVecInstance(const char* file_name){
 IonTypePtr getIonTypePtrByName(IonTypePtrVec &ion_type_list, const std::string &name){
 	for (unsigned int i = 0; i < ion_type_list.size(); i++) {
 	    std::string n = ion_type_list[i]->getName();
-	    if (n.compare(name) == 0) {
+	    if (n == name) {
 	      return ion_type_list[i];
 	    }
 	  }

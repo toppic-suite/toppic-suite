@@ -5,8 +5,8 @@
  *      Author: xunlikun
  */
 
-#ifndef PROT_NEUTRALLOSS_HPP_
-#define PROT_NEUTRALLOSS_HPP_
+#ifndef PROT_NEUTRAL_LOSS_HPP_
+#define PROT_NEUTRAL_LOSS_HPP_
 
 #include <string>
 #include <vector>
@@ -19,7 +19,6 @@ class NeutralLoss {
 
 public:
 	NeutralLoss(std::string name,double mass);
-	NeutralLoss(xercesc::DOMElement * element);
 	std::string getName(){return name_;}
 	double getMass(){return mass_;}
 private:
