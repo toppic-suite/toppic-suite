@@ -1,7 +1,10 @@
 #include <stdlib.h>
+#include <string>
+#include <sstream>
 #include <boost/algorithm/string.hpp>
 
 #include "xml_dom_document.hpp"
+
  
 namespace prot {
 
@@ -97,6 +100,20 @@ xercesc::DOMText* XmlDOMDocument::createTextNode(const char* text) {
   xercesc::XMLString::release(&temp);
   return text_node;
 }
+
+void addElement(XmlDOMDocument* doc, xercesc::DOMElement* element, 
+                const char* tag, const char* value) {
+
+  std::stringstream stream;
+  stream << value;
+  std::string str = stream.str();
+
+  xercesc::DOMElement* child = doc->createElement(tag);
+  element->appendChild(child);
+  xercesc::DOMText* text_node = doc->createTextNode(str.c_str());
+  child->appendChild(text_node);
+}
+
 
 std::string getChildValue(xercesc::DOMElement* parent,  
                           const char* child_tag) {
