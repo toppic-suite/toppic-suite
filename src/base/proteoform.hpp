@@ -5,15 +5,12 @@
  *      Author: xunlikun
  */
 
-#ifndef PROT_BP_SPEC_HPP_
-#define PROT_BP_SPEC_HPP_
-
-#include "residue_seq.hpp"
-#include "break_point.hpp"
+#ifndef PROT_PROTEOFORM_HPP_
+#define PROT_PROTEOFORM_HPP_
 
 namespace prot {
 
-class BpSpec {
+class proteoform {
 public:
 	BpSpec(){};
 	BpSpec(ResSeqPtr res_seq);
@@ -27,7 +24,9 @@ public:
 	/*implement the function getScaledBMass*/
 	std::vector<int> getScaledMass(double scale,IonTypePtr iong_type);
 private:
-	ResSeqPtr res_seq_;
+	ResSeqPtr res_seq_ptr_;
+  BpSpecPtr bp_spec_ptr_;
+
 	BreakPointPtrVec break_point_ptr_vec_;
 	void initBreakPoints();
 	/*implement the private function addMass() BpSpec*/

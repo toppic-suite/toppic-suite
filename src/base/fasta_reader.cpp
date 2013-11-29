@@ -38,17 +38,17 @@ std::vector<std::string> FastaReader::getNextSeq() {
 /**
  * Read FASTA file and return next protein as an ResSeq.
  **/
-RSPtr FastaReader::getNextResidueSeq(AcidPtrVec acid_list, 
+ResSeqPtr FastaReader::getNextResidueSeq(AcidPtrVec acid_list, 
                                      ResiduePtrVec residue_list) {
   std::vector<std::string> seq_info = getNextSeq();
   if (seq_info.size() == 0) {
-    return RSPtr(nullptr);
+    return ResSeqPtr(nullptr);
   }
   std::string name = seq_info[0];
   std::string seq = seq_info[1];
   AcidPtrVec acid_seq = convertSeqToAcidSeq(acid_list, seq); 
   ResiduePtrVec residue_seq = convertAcidToResidueSeq(residue_list, acid_seq);
-  return RSPtr(new ResidueSeq(name, residue_seq));
+  return ResSeqPtr(new ResidueSeq(name, residue_seq));
 }
 
 

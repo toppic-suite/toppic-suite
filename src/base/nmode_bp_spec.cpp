@@ -10,14 +10,14 @@
 #include "GLOBAL.hpp"
 
 namespace prot {
-NModeBpSpec::NModeBpSpec(std::string name,ResiduePtrVec residues,BpSpecPtr unmode_bpspec_ptr,ProtModPtr n_mode):BpSpec(RSPtr(new ResidueSeq(name,residues))){
+NModeBpSpec::NModeBpSpec(std::string name,ResiduePtrVec residues,BpSpecPtr unmode_bpspec_ptr,ProtModPtr n_mode):BpSpec(ResSeqPtr(new ResidueSeq(name,residues))){
 	unmode_bpspec_ptr_ = unmode_bpspec_ptr;
 	n_mode_ = n_mode;
 }
 
 NModeBpSpecPtr getInstance(BpSpecPtr bp_spec,ProtModPtr n_mod){
 	PtmPtr acetylation =prot::getPtmPtrByAbbrName(prot::_PtmPtrVec,"ptm_list");
-	RSPtr res_seq = bp_spec->getResSeq();
+	ResSeqPtr res_seq = bp_spec->getResSeq();
 	//TODO:
 	//if(!res_seq.allowMode(nMod)){
 	//	return nullptr;

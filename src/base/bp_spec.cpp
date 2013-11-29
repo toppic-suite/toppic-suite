@@ -21,7 +21,7 @@ namespace prot {
 
 log4cxx::LoggerPtr bs_logger(log4cxx::Logger::getLogger("FastaReader"));
 
-BpSpec::BpSpec(RSPtr res_seq){
+BpSpec::BpSpec(ResSeqPtr res_seq){
 	res_seq_=res_seq;
 	initBreakPoints();
 }
@@ -135,7 +135,7 @@ int getLastResPos(double c_term_shift,std::vector<double> extbmasses){
 	return best_pos - 1;
 }
 
-BpSpecPtrVec readBpspecDb(RSPtrVec rs_list){
+BpSpecPtrVec readBpspecDb(ResSeqPtrVec rs_list){
 	BpSpecPtrVec bpspec_ptr_list;
 	for(unsigned int i =0; i<rs_list.size();i++){
 		bpspec_ptr_list.push_back(BpSpecPtr(new BpSpec(rs_list[i])));

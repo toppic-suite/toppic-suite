@@ -32,7 +32,7 @@ class MsAlignReader {
   std::ifstream input_;
   ActivationPtrVec activation_list_;
   std::vector<std::string> spectrum_str_;
-  int current_ = 1;
+  int current_ = 0;
   DeconvMsPtr deconv_ms_ptr_ = DeconvMsPtr(nullptr);
 };
 

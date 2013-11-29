@@ -24,7 +24,7 @@ class FastaReader {
    **/                  
   std::vector<std::string> getNextSeq();
 
-  RSPtr getNextResidueSeq(AcidPtrVec acid_list, 
+  ResSeqPtr getNextResidueSeq(AcidPtrVec acid_list, 
                           ResiduePtrVec residue_list);
  private:
   std::ifstream input_;
