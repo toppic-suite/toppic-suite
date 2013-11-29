@@ -16,8 +16,8 @@ NModeBpSpec::NModeBpSpec(std::string name,ResiduePtrVec residues,BpSpecPtr unmod
 }
 
 NModeBpSpecPtr getInstance(BpSpecPtr bp_spec,ProtModPtr n_mod){
-	PtmPtr acetylation =prot::getPtmPtrByAbbrName(prot::_PtmPtrVec,"ptm_list");
-	ResSeqPtr res_seq = bp_spec->getResSeq();
+	PtmPtr acetylation =prot::getPtmPtrByAbbrName(prot::_G_PtmPtrVec,"ptm_list");
+	ReqSeqPtr res_seq = bp_spec->getResSeq();
 	//TODO:
 	//if(!res_seq.allowMode(nMod)){
 	//	return nullptr;
@@ -26,29 +26,29 @@ NModeBpSpecPtr getInstance(BpSpecPtr bp_spec,ProtModPtr n_mod){
 	ResiduePtrVec residues = bp_spec->getResSeq()->getResidues();
 
 	//todo:
-	if(n_mod == prot::getProtModPtrByName(prot::_ProtModPtrVec,"NONE")){
+	if(n_mod == prot::getProtModPtrByName(prot::_G_ProtModPtrVec,"NONE")){
 		return NModeBpSpecPtr(new NModeBpSpec(name,residues,bp_spec,n_mod));
 	}
-	else if (n_mod == prot::getProtModPtrByName(prot::_ProtModPtrVec,"NME")){
+	else if (n_mod == prot::getProtModPtrByName(prot::_G_ProtModPtrVec,"NME")){
 		ResiduePtrVec mod_res;
 		mod_res.assign(++residues.begin(),residues.end());
 		return NModeBpSpecPtr(new NModeBpSpec(name,mod_res,bp_spec,n_mod));
 	}
-	else if (n_mod == prot::getProtModPtrByName(prot::_ProtModPtrVec,"ACETYLATION")){
+	else if (n_mod == prot::getProtModPtrByName(prot::_G_ProtModPtrVec,"ACETYLATION")){
 		ResiduePtrVec mod_res;
 		mod_res.assign(residues.begin(),residues.end());
-		mod_res[0] = prot::getResiduePtrByAcidPtm(prot::_ResiduePtrVec,mod_res[0]->getAcidPtr(),acetylation);
+		mod_res[0] = prot::getResiduePtrByAcidPtm(prot::_G_ResiduePtrVec,mod_res[0]->getAcidPtr(),acetylation);
 		if (mod_res[0] != nullptr){
-			prot::addResidue(prot::_ResiduePtrVec,mod_res[0]->getAcidPtr(),acetylation);
+			prot::addResidue(prot::_G_ResiduePtrVec,mod_res[0]->getAcidPtr(),acetylation);
 		}
 		return NModeBpSpecPtr(new NModeBpSpec(name,mod_res,bp_spec,n_mod));
 	}
-	else if (n_mod == prot::getProtModPtrByName(prot::_ProtModPtrVec,"NME_ACETYLATION")){
+	else if (n_mod == prot::getProtModPtrByName(prot::_G_ProtModPtrVec,"NME_ACETYLATION")){
 		ResiduePtrVec mod_res;
 		mod_res.assign(++residues.begin(),residues.end());
-		mod_res[0] = prot::getResiduePtrByAcidPtm(prot::_ResiduePtrVec,mod_res[0]->getAcidPtr(),acetylation);
+		mod_res[0] = prot::getResiduePtrByAcidPtm(prot::_G_ResiduePtrVec,mod_res[0]->getAcidPtr(),acetylation);
 		if (mod_res[0] != nullptr){
-			prot::addResidue(prot::_ResiduePtrVec,mod_res[0]->getAcidPtr(),acetylation);
+			prot::addResidue(prot::_G_ResiduePtrVec,mod_res[0]->getAcidPtr(),acetylation);
 		}
 		return NModeBpSpecPtr(new NModeBpSpec(name,mod_res,bp_spec,n_mod));
 	}
