@@ -135,14 +135,4 @@ int getLastResPos(double c_term_shift,std::vector<double> extbmasses){
 	return best_pos - 1;
 }
 
-/*
-BpSpecPtrVec readBpspecDb(ResSeqPtrVec rs_list){
-	BpSpecPtrVec bpspec_ptr_list;
-	for(unsigned int i =0; i<rs_list.size();i++){
-		bpspec_ptr_list.push_back(BpSpecPtr(new BpSpec(rs_list[i])));
-	}
-	return bpspec_ptr_list;
-}
-*/
-
 } /* namespace prot */

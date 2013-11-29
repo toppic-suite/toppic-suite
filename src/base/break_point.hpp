@@ -17,8 +17,8 @@ public:
 	BreakPoint(double prm,double srm);
 	double getPrm(){return prm_;}
 	double getSrm(){return srm_;}
-	double getNTermMass(IonTypePtr ion_type){return prm_ + ion_type->getShift();}
-	double getCTermMass(IonTypePtr ion_type){return srm_ + ion_type->getShift();}
+	double getNTermMass(IonTypePtr ion_type) {return prm_ + ion_type->getShift();}
+	double getCTermMass(IonTypePtr ion_type) {return srm_ + ion_type->getShift();}
 private:
 	double prm_;
 	double srm_;

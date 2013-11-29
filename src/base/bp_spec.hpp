@@ -25,6 +25,7 @@ public:
 	std::vector<double> getBreakPointMasses(double n_term_shift,double c_term_shift,double min_mass,IonTypePtr ion_type_ptr_n,IonTypePtr ion_type_ptr_c);
 	/*implement the function getScaledBMass*/
 	std::vector<int> getScaledMass(double scale,IonTypePtr iong_type);
+  
 private:
   double seq_mass_;
 	BreakPointPtrVec break_point_ptr_vec_;
@@ -41,7 +42,6 @@ typedef std::vector<BpSpecPtr> BpSpecPtrVec;
 int getFirstResPos(double n_term_shift,std::vector<double> extbmasses);
 int getLastResPos(double c_term_shift,std::vector<double> extbmasses);
 
-//BpSpecPtrVec readDb(ResSeqPtrVec rs_list);
 
 } /* namespace prot */
 

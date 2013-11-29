@@ -2,12 +2,16 @@
  * author  Xiaowen Liu
  * date    2013-11-1
  */
+#include "log4cxx/logger.h"
 
 #include "acid.hpp"
 #include "xml_dom.hpp"
 #include "xml_dom_document.hpp"
 
+
 namespace prot {
+
+static log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("FastaReader"));
 
 Acid::Acid (std::string const &name, std::string const &one_letter, 
             std::string const &three_letter, std::string const &composition, 
@@ -73,7 +77,7 @@ AcidPtr getAcidPtrByOneLetter(AcidPtrVec &acid_list,
       return acid_list[i];
     }
   }
-  //logger.debug("Acid not found " + one_letter);
+  LOG4CXX_DEBUG(logger, "Acid not found " + one_letter);
   return AcidPtr(nullptr);
 }
 
@@ -89,7 +93,7 @@ AcidPtr getAcidPtrByThreeLetter(AcidPtrVec &acid_list,
       return acid_list[i];
     }
   }
-  //logger.debug("Acid not found " + three_letter);
+  LOG4CXX_DEBUG(logger, "Acid not found " + three_letter);
   return AcidPtr(nullptr);
 }
 
@@ -152,7 +156,7 @@ AcidPtrVec convertSeqToAcidSeq(AcidPtrVec &acid_list,
   }
 }
 
-}
+} /* end namespace */
 
 int main() {
   return 0;

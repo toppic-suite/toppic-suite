@@ -14,39 +14,44 @@
 namespace prot {
 
 class XmlDOMDocument {
-       
-public:
-    XmlDOMDocument(XmlDOMParser* parser, const char* xml_file);
-    ~XmlDOMDocument();
 
-    xercesc::DOMElement* getElement(const char* tag, int index);
+ public:
+  XmlDOMDocument(XmlDOMParser* parser, const char* xml_file);
+  ~XmlDOMDocument();
 
-    std::string getChildValue(const char* parent_tag, int parent_index, 
-            const char* child_tag);
-    
-    std::string getAttributeValue(const char* element_tag,  
-            int element_index, 
-            const char* attribute_tag);
+  xercesc::DOMElement* getElement(const char* tag, int index);
 
-    int getChildCount(const char* parent_tag, int parent_index, 
-            const char* child_tag);
+  std::string getChildValue(const char* parent_tag, int parent_index, 
+                            const char* child_tag);
 
-private:
-    xercesc::DOMDocument* doc_;
-    XmlDOMDocument();
-    XmlDOMDocument(const XmlDOMDocument&); 
+  std::string getAttributeValue(const char* element_tag,  
+                                int element_index, 
+                                const char* attribute_tag);
+
+  int getChildCount(const char* parent_tag, int parent_index, 
+                    const char* child_tag);
+
+  xercesc::DOMElement* createElement(const char* tag);
+
+  xercesc::DOMText* createTextNode(const char* text);
+
+ private:
+  xercesc::DOMDocument* doc_;
+  XmlDOMDocument();
+  XmlDOMDocument(const XmlDOMDocument&); 
 };
 
 std::string getChildValue(xercesc::DOMElement* parent,  
-        const char* child_tag);
+                          const char* child_tag);
 
 double getDoubleChildValue(xercesc::DOMElement* parent,  
-        const char* child_tag);
+                           const char* child_tag);
 
 int getIntChildValue(xercesc::DOMElement* parent,  
-        const char* child_tag);
+                     const char* child_tag);
 
 bool getBoolChildValue(xercesc::DOMElement* parent,
-        const char* child_tag);
+                       const char* child_tag);
+
 }
 #endif

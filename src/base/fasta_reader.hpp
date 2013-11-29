@@ -25,12 +25,6 @@ class FastaReader {
    **/                  
   std::vector<std::string> getNextSeq();
 
-  /*
-  ResSeqPtr getNextResidueSeq(AcidPtrVec acid_list, 
-                              PtmPtrVec  ptm_list,
-                              ResiduePtrVec residue_list);
-                              */
-
   ProteoformPtr getNextProteoform(AcidPtrVec acid_list, 
                                   PtmPtrVec  ptm_list,
                                   ResiduePtrVec residue_list);
