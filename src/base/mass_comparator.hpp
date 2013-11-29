@@ -11,12 +11,14 @@
 namespace prot {
 class MassComparator{
 public:
+ /*
 	static bool up(const double p, const double n){
 		return p<n;
 	}
 	static bool down(const double p, const double n){
 		return p>n;
 	}
+  */
 };
 }
 

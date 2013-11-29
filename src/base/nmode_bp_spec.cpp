@@ -5,8 +5,9 @@
  *      Author: xunlikun
  */
 
-#include <nmode_bp_spec.hpp>
+#include "residue_seq.hpp"
 #include "bp_spec.hpp"
+#include "nmode_bp_spec.hpp"
 #include "GLOBAL.hpp"
 
 namespace prot {
@@ -17,7 +18,7 @@ NModeBpSpec::NModeBpSpec(std::string name,ResiduePtrVec residues,BpSpecPtr unmod
 
 NModeBpSpecPtr getInstance(BpSpecPtr bp_spec,ProtModPtr n_mod){
 	PtmPtr acetylation =prot::getPtmPtrByAbbrName(prot::_G_PtmPtrVec,"ptm_list");
-	ReqSeqPtr res_seq = bp_spec->getResSeq();
+	ResSeqPtr res_seq = bp_spec->getResSeq();
 	//TODO:
 	//if(!res_seq.allowMode(nMod)){
 	//	return nullptr;

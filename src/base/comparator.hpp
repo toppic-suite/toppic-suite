@@ -17,12 +17,14 @@ public:
 	static bool mass_down(const double p, const double n){
 		return p>n;
 	}
+  /*
 	static bool theopeak_up(const TheoPeakPtr p,TheoPeakPtr n){
 		return p->getPosition() < n->getPosition();
 	}
 	static bool theopeak_down(const TheoPeakPtr p,TheoPeakPtr n){
 		return p->getPosition() > n->getPosition();
 	}
+  */
 };
 }
 
