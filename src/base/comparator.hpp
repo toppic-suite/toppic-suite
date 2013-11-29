@@ -11,12 +11,14 @@
 namespace prot {
 class Comparator{
 public:
+ /*
 	static bool mass_up(const double p, const double n){
 		return p<n;
 	}
 	static bool mass_down(const double p, const double n){
 		return p>n;
 	}
+  */
   /*
 	static bool theopeak_up(const TheoPeakPtr p,TheoPeakPtr n){
 		return p->getPosition() < n->getPosition();

@@ -9,7 +9,7 @@ namespace prot {
 
 class Proteoform {
 public:
-	Proteoform(ResSeqPtr res_seq_ptr);
+	Proteoform(std::string name, ResSeqPtr res_seq_ptr);
 
 	ResSeqPtr getResSeqPtr() {return res_seq_ptr_;}
 
@@ -22,6 +22,8 @@ public:
   std::vector<Change> getChangeList() {return change_list_;}
 
 private:
+  std::string name_;
+
 	ResSeqPtr res_seq_ptr_;
 
   BpSpecPtr bp_spec_ptr_;
@@ -32,6 +34,8 @@ private:
 
   std::vector<Change> change_list_;
 };
+
+typedef std::shared_ptr<Proteoform> ProteoformPtr;
 
 } /* namespace prot */
 

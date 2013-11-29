@@ -21,27 +21,27 @@ namespace prot {
 
 log4cxx::LoggerPtr bs_logger(log4cxx::Logger::getLogger("FastaReader"));
 
-BpSpec::BpSpec(ResSeqPtr res_seq){
-	res_seq_=res_seq;
-	initBreakPoints();
+BpSpec::BpSpec(ResSeqPtr res_seq_ptr){
+	initBreakPoints(res_seq_ptr);
 }
 
-void BpSpec::initBreakPoints(){
-	int ext_len= res_seq_->getLen()+1;
+void BpSpec::initBreakPoints(ResSeqPtr res_seq_ptr){
+  seq_mass_ = res_seq_ptr->getSeqMass();
+	int ext_len= res_seq_ptr->getLen()+1;
 	if(ext_len <= 1){
 		ext_len = 2;
 	}
-	break_point_ptr_vec_[0] = BreakPointPtr(new BreakPoint(0,res_seq_->getResMassSum()));
+	break_point_ptr_vec_[0] = BreakPointPtr(new BreakPoint(0,res_seq_ptr->getResMassSum()));
 	double prm = 0;
-	for(int i=0;i<res_seq_->getLen()-1;i++){
-		prm += res_seq_->getResiduePtr(i)->getMass();
-		double srm = res_seq_->getResMassSum()-prm;
+	for(int i=0;i<res_seq_ptr->getLen()-1;i++){
+		prm += res_seq_ptr->getResiduePtr(i)->getMass();
+		double srm = res_seq_ptr->getResMassSum()-prm;
 		if(srm <0){
 			LOG4CXX_WARN(bs_logger, "prms is larger than totle mass! ");
 		}
 		break_point_ptr_vec_.push_back(BreakPointPtr(new BreakPoint(prm,srm)));
 	}
-	break_point_ptr_vec_.push_back(BreakPointPtr(new BreakPoint(res_seq_->getResMassSum(),0)));
+	break_point_ptr_vec_.push_back(BreakPointPtr(new BreakPoint(res_seq_ptr->getResMassSum(),0)));
 }
 
 std::vector<double> BpSpec::getBreakPointMasses(IonTypePtr ion_type){
@@ -56,7 +56,7 @@ std::vector<double> BpSpec::getBreakPointMasses(IonTypePtr ion_type){
 			bpmass_vec.push_back(break_point_ptr_vec_[i]->getCTermMass(ion_type));
 		}
 	}
-	std::sort(bpmass_vec.begin(),bpmass_vec.end(),Comparator::mass_up);
+	std::sort(bpmass_vec.begin(),bpmass_vec.end(),std::less<double>());
 	return bpmass_vec;
 }
 
@@ -70,7 +70,7 @@ std::vector<double> BpSpec::getBreakPointMasses(double n_term_shift,double c_ter
 		IonTypePtr ion_type_ptr_n,IonTypePtr ion_type_ptr_c){
 	std::vector<double> result;
 	result.push_back(0.0);
-	double new_seq_mass = getResSeq()->getSeqMass()+n_term_shift+c_term_shift;
+	double new_seq_mass = seq_mass_ + n_term_shift + c_term_shift;
 	//n
 	for(unsigned int i=0; i < break_point_ptr_vec_.size();i++){
 		double mass = break_point_ptr_vec_[i]->getNTermMass(ion_type_ptr_n)+n_term_shift;
@@ -82,7 +82,7 @@ std::vector<double> BpSpec::getBreakPointMasses(double n_term_shift,double c_ter
 		addBreakPointMass(mass,new_seq_mass,min_mass,result);
 	}
 	result.push_back(new_seq_mass);
-	std::sort(result.begin(),result.end(),Comparator::mass_up);
+	std::sort(result.begin(),result.end(),std::less<double>());
 
 	return result;
 }
@@ -135,6 +135,7 @@ int getLastResPos(double c_term_shift,std::vector<double> extbmasses){
 	return best_pos - 1;
 }
 
+/*
 BpSpecPtrVec readBpspecDb(ResSeqPtrVec rs_list){
 	BpSpecPtrVec bpspec_ptr_list;
 	for(unsigned int i =0; i<rs_list.size();i++){
@@ -142,5 +143,6 @@ BpSpecPtrVec readBpspecDb(ResSeqPtrVec rs_list){
 	}
 	return bpspec_ptr_list;
 }
+*/
 
 } /* namespace prot */

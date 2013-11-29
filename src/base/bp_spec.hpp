@@ -16,8 +16,7 @@ namespace prot {
 class BpSpec {
 public:
 	BpSpec(){};
-	BpSpec(ResSeqPtr res_seq);
-	ResSeqPtr getResSeq(){return res_seq_;}
+	BpSpec(ResSeqPtr res_seq_ptr);
 	BreakPointPtrVec getBreakPointPtrVec(){return break_point_ptr_vec_;}
 	BreakPointPtr getBreakPointPtr(int i){return break_point_ptr_vec_[i];}
 	/*implement the function getExt[B\Y\C\Z_DOT]masses and getNTermMasses and getCTermMass*/
@@ -27,9 +26,10 @@ public:
 	/*implement the function getScaledBMass*/
 	std::vector<int> getScaledMass(double scale,IonTypePtr iong_type);
 private:
-	ResSeqPtr res_seq_;
+  double seq_mass_;
 	BreakPointPtrVec break_point_ptr_vec_;
-	void initBreakPoints();
+
+	void initBreakPoints(ResSeqPtr req_seq_ptr);
 	/*implement the private function addMass() BpSpec*/
 	void addBreakPointMass(double mass,double seq_mass,double min_mass,std::vector<double> mass_vec);
 };
@@ -41,7 +41,7 @@ typedef std::vector<BpSpecPtr> BpSpecPtrVec;
 int getFirstResPos(double n_term_shift,std::vector<double> extbmasses);
 int getLastResPos(double c_term_shift,std::vector<double> extbmasses);
 
-BpSpecPtrVec readDb(ResSeqPtrVec rs_list);
+//BpSpecPtrVec readDb(ResSeqPtrVec rs_list);
 
 } /* namespace prot */
 

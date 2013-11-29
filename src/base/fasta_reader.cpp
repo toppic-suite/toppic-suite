@@ -38,20 +38,38 @@ std::vector<std::string> FastaReader::getNextSeq() {
 /**
  * Read FASTA file and return next protein as an ResSeq.
  **/
+/*
 ResSeqPtr FastaReader::getNextResidueSeq(AcidPtrVec acid_list, 
-                                     ResiduePtrVec residue_list) {
+                                         PtmPtrVec ptm_list,
+                                         ResiduePtrVec residue_list) {
   std::vector<std::string> seq_info = getNextSeq();
   if (seq_info.size() == 0) {
     return ResSeqPtr(nullptr);
   }
-  std::string name = seq_info[0];
   std::string seq = seq_info[1];
   AcidPtrVec acid_seq = convertSeqToAcidSeq(acid_list, seq); 
   ResiduePtrVec residue_seq = convertAcidToResidueSeq(residue_list, acid_seq);
-  return ResSeqPtr(new ResidueSeq(name, residue_seq));
+  return ResSeqPtr(new ResidueSeq(residue_seq));
 }
+*/
 
-
+/**
+ * Read FASTA file and return next protein as an ResSeq.
+ **/
+ProteoformPtr FastaReader::getNextProteoform(AcidPtrVec acid_list, 
+                                             PtmPtrVec ptm_list,
+                                             ResiduePtrVec residue_list) {
+  std::vector<std::string> seq_info = getNextSeq();
+  if (seq_info.size() == 0) {
+    return ProteoformPtr(nullptr);
+  }
+  std::string name = seq_info[0];
+  std::string seq = seq_info[1];
+  AcidPtrVec acid_seq = convertSeqToAcidSeq(acid_list, seq); 
+  ResiduePtrVec residue_ptrs = convertAcidToResidueSeq(residue_list, acid_seq);
+  ResSeqPtr residue_seq_ptr = ResSeqPtr(new ResidueSeq(residue_ptrs)); 
+  return ProteoformPtr(new Proteoform(name, residue_seq_ptr));
+}
 
 /** process fasta string and remove unknown letters */
 std::string rmChar(std::string str) {
