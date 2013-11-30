@@ -25,6 +25,7 @@ public:
 	std::vector<double> getBreakPointMasses(double n_term_shift,double c_term_shift,double min_mass,IonTypePtr ion_type_ptr_n,IonTypePtr ion_type_ptr_c);
 	/*implement the function getScaledBMass*/
 	std::vector<int> getScaledMass(double scale,IonTypePtr iong_type);
+	double getRSMass(){return seq_mass_;}
   
 private:
   double seq_mass_;
