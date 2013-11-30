@@ -10,6 +10,8 @@
 
 #include "ion.hpp"
 #include "peak.hpp"
+#include "bp_spec.hpp"
+#include "activation.hpp"
 
 namespace prot {
 
@@ -25,7 +27,10 @@ private:
 
 	IonPtr ion_;
 };
+typedef std::shared_ptr<TheoPeak> TheoPeakPtr;
+typedef std::vector<TheoPeakPtr> TheoPeakPtrVec;
 
+TheoPeakPtrVec getTheoPeak(BpSpecPtr pep,ActivationPtr type,double n_term_shift,double c_term_shift,int bgn,int end,double min_mass);
 } /* namespace prot */
 
 #endif /* THEO_PEAK_HPP_ */
