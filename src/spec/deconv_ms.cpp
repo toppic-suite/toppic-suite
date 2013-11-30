@@ -21,7 +21,7 @@ DeconvMsPtr getRefineMs(DeconvMsPtr deconv_ms_ptr,
 MsHeaderPtr getHeaderPtr(DeconvMsPtr deconv_ms_ptr, double new_prec_mass) {
   MsHeaderPtr header_ptr = deconv_ms_ptr->getHeaderPtr();
   MsHeaderPtr new_header_ptr(new MsHeader(*header_ptr.get()));
-  double mono_mz = compMonoMz(new_prec_mass, header_ptr->getPrecChrg());
+  double mono_mz = compMonoMz(new_prec_mass, header_ptr->getPrecCharge());
   new_header_ptr->setPrecMonoMz(mono_mz);
   return new_header_ptr;
 }
@@ -30,7 +30,7 @@ MsHeaderPtr getDeltaHeaderPtr(DeconvMsPtr deconv_ms_ptr, double delta) {
   MsHeaderPtr header_ptr = deconv_ms_ptr->getHeaderPtr();
   MsHeaderPtr new_header_ptr(new MsHeader(*header_ptr.get()));
   double mono_mz = header_ptr->getPrecMonoMz() + delta
-        / header_ptr->getPrecChrg();
+        / header_ptr->getPrecCharge();
   new_header_ptr->setPrecMonoMz(mono_mz);
   return new_header_ptr;
 }
