@@ -101,19 +101,13 @@ xercesc::DOMText* XmlDOMDocument::createTextNode(const char* text) {
   return text_node;
 }
 
-void addElement(XmlDOMDocument* doc, xercesc::DOMElement* element, 
+void XmlDOMDocument::addElement(xercesc::DOMElement* element, 
                 const char* tag, const char* value) {
-
-  std::stringstream stream;
-  stream << value;
-  std::string str = stream.str();
-
-  xercesc::DOMElement* child = doc->createElement(tag);
+  xercesc::DOMElement* child = createElement(tag);
   element->appendChild(child);
-  xercesc::DOMText* text_node = doc->createTextNode(str.c_str());
+  xercesc::DOMText* text_node = createTextNode(value);
   child->appendChild(text_node);
 }
-
 
 std::string getChildValue(xercesc::DOMElement* parent,  
                           const char* child_tag) {
@@ -154,6 +148,16 @@ bool getBoolChildValue(xercesc::DOMElement* parent,
   return false;
 }
 
+std::string convertToString(double value) {
+  std::stringstream stream;
+  stream << value;
+  return stream.str();
+}
 
+std::string convertToString(bool value) {
+  std::stringstream stream;
+  stream << value;
+  return stream.str();
+}
 
 }

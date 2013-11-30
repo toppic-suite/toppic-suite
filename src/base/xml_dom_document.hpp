@@ -35,10 +35,11 @@ class XmlDOMDocument {
 
   xercesc::DOMText* createTextNode(const char* text);
 
+  void addElement(xercesc::DOMElement* element, 
+                  const char* tag, const char* value);
+
  private:
   xercesc::DOMDocument* doc_;
-  XmlDOMDocument();
-  XmlDOMDocument(const XmlDOMDocument&); 
 };
 
 std::string getChildValue(xercesc::DOMElement* parent,  
@@ -52,6 +53,10 @@ int getIntChildValue(xercesc::DOMElement* parent,
 
 bool getBoolChildValue(xercesc::DOMElement* parent,
                        const char* child_tag);
+
+std::string convertToString(double value);
+
+std::string convertToString(bool value);
 
 }
 #endif
