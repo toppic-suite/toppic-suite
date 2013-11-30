@@ -16,7 +16,7 @@ namespace prot {
 class BpSpec {
 public:
 	BpSpec(){};
-	BpSpec(ResSeqPtr res_seq_ptr);
+	BpSpec(RSPtr res_seq_ptr);
 	BreakPointPtrVec getBreakPointPtrVec(){return break_point_ptr_vec_;}
 	BreakPointPtr getBreakPointPtr(int i){return break_point_ptr_vec_[i];}
 	/*implement the function getExt[B\Y\C\Z_DOT]masses and getNTermMasses and getCTermMass*/
@@ -30,7 +30,7 @@ private:
   double seq_mass_;
 	BreakPointPtrVec break_point_ptr_vec_;
 
-	void initBreakPoints(ResSeqPtr req_seq_ptr);
+	void initBreakPoints(RSPtr req_seq_ptr);
 	/*implement the private function addMass() BpSpec*/
 	void addBreakPointMass(double mass,double seq_mass,double min_mass,std::vector<double> mass_vec);
 };
