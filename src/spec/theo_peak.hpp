@@ -20,7 +20,7 @@ public:
 	double getModMass(){return getPosition();}
 	double getShift(){return shift_;}
 private:
-	double unmode_mass_;
+	double unmod_mass_;
 	double shift_;
 
 	IonPtr ion_;

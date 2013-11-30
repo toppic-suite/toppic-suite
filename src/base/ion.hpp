@@ -24,7 +24,7 @@ public:
 	std::string getDisplayName(){
 		std::stringstream s;
 		s<<display_pos_;
-		return ion_type_ -> getName() + s.str();
+		return ion_type_ptr_ -> getName() + s.str();
 	}
 private:
 	int charge_;

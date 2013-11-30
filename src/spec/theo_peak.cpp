@@ -8,11 +8,10 @@
 #include "theo_peak.hpp"
 
 namespace prot {
-TheoPeak::TheoPeak(IonPtr ion,double unmode_mass,double shift){
+TheoPeak::TheoPeak(IonPtr ion,double unmod_mass,double shift):
+  Peak(unmod_mass + shift, 1.0) {
 	ion_ = ion;
-	unmode_mass_ = unmode_mass;
+	unmod_mass_ = unmod_mass;
 	shift_ = shift;
-	setIntensity(1.0);
-	setPosition(unmode_mass+shift);
 }
 } /* namespace prot */
