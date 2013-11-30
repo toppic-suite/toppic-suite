@@ -19,14 +19,14 @@ public:
 		return p>n;
 	}
   */
-  /*
+
 	static bool theopeak_up(const TheoPeakPtr p,TheoPeakPtr n){
 		return p->getPosition() < n->getPosition();
 	}
 	static bool theopeak_down(const TheoPeakPtr p,TheoPeakPtr n){
 		return p->getPosition() > n->getPosition();
 	}
-  */
+
 };
 }
 
