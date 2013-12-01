@@ -36,6 +36,7 @@ private:
 };
 
 typedef std::shared_ptr<Proteoform> ProteoformPtr;
+typedef std::vector<ProteoformPtr> ProteoformPtrVec;
 
 } /* namespace prot */
 
