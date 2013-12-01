@@ -7,8 +7,6 @@
 
 #include <algorithm>
 #include "theo_peak.hpp"
-#include "GLOBAL.hpp"
-#include "comparator.hpp"
 
 namespace prot {
 TheoPeak::TheoPeak(IonPtr ion,double unmod_mass,double shift):
@@ -18,7 +16,8 @@ TheoPeak::TheoPeak(IonPtr ion,double unmod_mass,double shift):
 	shift_ = shift;
 }
 
-TheoPeakPtrVec getTheoPeak(BpSpecPtr pep,ActivationPtr type,double n_term_shift,double c_term_shift,int bgn,int end,double min_mass){
+TheoPeakPtrVec getTheoPeak(BpSpecPtr pep,ActivationPtr type, NeutralLossPtr non_loss_ptr, 
+                           double n_term_shift,double c_term_shift,int bgn,int end,double min_mass){
 	TheoPeakPtrVec theo_peaks;
 	BreakPointPtrVec bps = pep->getBreakPointPtrVec();
 	double new_seq_mass = pep->getRSMass()+n_term_shift;
@@ -27,7 +26,7 @@ TheoPeakPtrVec getTheoPeak(BpSpecPtr pep,ActivationPtr type,double n_term_shift,
 		double n_mass = bps[i]->getNTermMass(n_ion_type);
 		double new_mass = n_mass + n_term_shift;
 		if(new_mass >= min_mass && new_mass <= new_seq_mass - min_mass){
-			IonPtr ion = IonPtr(new Ion(0,i,i,n_ion_type,prot::getNeutralLossPtrByName(prot::_G_NeutralLossPtrVec,"NONE")));
+			IonPtr ion = IonPtr(new Ion(0,i,i,n_ion_type, non_loss_ptr));
 			theo_peaks.push_back(TheoPeakPtr(new TheoPeak(ion,n_mass,n_term_shift)));
 		}
 	}
@@ -37,11 +36,11 @@ TheoPeakPtrVec getTheoPeak(BpSpecPtr pep,ActivationPtr type,double n_term_shift,
 		double c_mass = bps[i]->getCTermMass(c_ion_type);
 		double new_mass = c_mass + c_term_shift;
 		if(new_mass >= min_mass && new_mass <= new_seq_mass - min_mass){
-			IonPtr ion = IonPtr(new Ion(0,i,bps.size()-i-1,c_ion_type,prot::getNeutralLossPtrByName(prot::_G_NeutralLossPtrVec,"NONE")));
+			IonPtr ion = IonPtr(new Ion(0,i,bps.size()-i-1,c_ion_type,non_loss_ptr));
 			theo_peaks.push_back(TheoPeakPtr(new TheoPeak(ion,c_mass,c_term_shift)));
 		}
 	}
-	std::sort(theo_peaks.begin(),theo_peaks.end(),Comparator::theopeak_down);
+	std::sort(theo_peaks.begin(),theo_peaks.end(),theopeak_down);
 	return theo_peaks;
 }
 } /* namespace prot */

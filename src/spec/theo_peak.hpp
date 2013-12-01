@@ -30,6 +30,14 @@ private:
 typedef std::shared_ptr<TheoPeak> TheoPeakPtr;
 typedef std::vector<TheoPeakPtr> TheoPeakPtrVec;
 
+inline bool theopeak_up(const TheoPeakPtr p,TheoPeakPtr n){
+  return p->getPosition() < n->getPosition();
+}
+
+inline bool theopeak_down(const TheoPeakPtr p,TheoPeakPtr n){
+  return p->getPosition() > n->getPosition();
+}
+
 TheoPeakPtrVec getTheoPeak(BpSpecPtr pep,ActivationPtr type,double n_term_shift,double c_term_shift,int bgn,int end,double min_mass);
 } /* namespace prot */
 
