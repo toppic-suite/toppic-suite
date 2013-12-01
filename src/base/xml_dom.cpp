@@ -1,4 +1,3 @@
-
 #include "xml_dom.hpp"
 #include "xml_dom_err_handler.hpp"
  
@@ -29,6 +28,7 @@ XmlDOMParser::~XmlDOMParser() {
 }
 
 xercesc::DOMDocument* XmlDOMParser::parse(const char* xml_file) {
+  
     parser_->parse(xml_file);
     return parser_->adoptDocument();
 }

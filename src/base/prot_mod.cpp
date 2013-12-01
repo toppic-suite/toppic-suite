@@ -23,13 +23,15 @@ ProtModPtrVec getProtModPtrVecInstance(AcidPtrVec &acid_list,
   if (parser) {
     prot::XmlDOMDocument* doc = new prot::XmlDOMDocument(parser, file_name);
     if (doc) {
-      int mod_num = doc->getChildCount("mod_list", 0, "mod");
+      xercesc::DOMElement* root = doc->getDocumentElement();
+      xercesc::DOMElement* parent = getChildElement(root, "mod_list", 0);
+      int mod_num = getChildCount(parent, "mod");
       for (int i = 0; i < mod_num; i++) {
-        xercesc::DOMElement* element = doc->getElement("mod", i);
-        std::string name = getChildValue(element, "name");
-        std::string trunc_name = getChildValue(element, "trunc_name");
-        std::string ptm_name = getChildValue(element, "ptm_name");
-        std::string valid_acids = getChildValue(element, "valid_acid");
+        xercesc::DOMElement* element = getChildElement(parent, "mod", i);
+        std::string name = getChildValue(element, "name", 0);
+        std::string trunc_name = getChildValue(element, "trunc_name", 0);
+        std::string ptm_name = getChildValue(element, "ptm_name", 0);
+        std::string valid_acids = getChildValue(element, "valid_acid", 0);
         TruncPtr trunc_ptr = getTruncPtrByName(trunc_list, trunc_name);
         PtmPtr ptm_ptr = getPtmPtrByAbbrName(ptm_list, ptm_name);
         AcidPtrVec valid_acid_ptrs;

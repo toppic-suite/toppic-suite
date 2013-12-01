@@ -24,12 +24,14 @@ TruncPtrVec getTruncPtrVecInstance(AcidPtrVec &acid_list,
   if (parser) {
     prot::XmlDOMDocument* doc = new prot::XmlDOMDocument(parser, file_name);
     if (doc) {
-      int trunc_num = doc->getChildCount("trunc_list", 0, "trunc");
+      xercesc::DOMElement* root = doc->getDocumentElement();
+      xercesc::DOMElement* parent = getChildElement(root, "trunc_list", 0);
+      int trunc_num = getChildCount(parent, "trunc");
       for (int i = 0; i < trunc_num; i++) {
-        xercesc::DOMElement* element = doc->getElement("amino_acid", i);
-        std::string name = getChildValue(element, "name");
-        int trunc_len = getIntChildValue(element, "trunc_len");
-        std::string str = getChildValue(element, "acid_str");
+        xercesc::DOMElement* element = getChildElement(parent, "trunc", i);
+        std::string name = getChildValue(element, "name", 0);
+        int trunc_len = getIntChildValue(element, "trunc_len", 0);
+        std::string str = getChildValue(element, "acid_str", 0);
         trunc_list.push_back(TruncPtr(
                 new Trunc(name, trunc_len, acid_list, str)));
 

@@ -21,13 +21,15 @@ IonTypePtrVec getIonTypePtrVecInstance(const char* file_name){
 	prot::XmlDOMParser* parser = prot::getXmlDOMInstance();
 	if (parser) {
 	    prot::XmlDOMDocument* doc = new prot::XmlDOMDocument(parser, file_name);
+      xercesc::DOMElement* root = doc->getDocumentElement();
+      xercesc::DOMElement* parent = getChildElement(root, "ion_type_list", 0);
 	    if (doc) {
-	      int acid_num = doc->getChildCount("ion_type_list", 0, "ion_type");
-	      for (int i = 0; i < acid_num; i++) {
-	        xercesc::DOMElement* element = doc->getElement("ion_type", i);
-	        std::string name = getChildValue(element, "name");
-	        bool n_term = getBoolChildValue(element, "n_term");
-	        double shift = getDoubleChildValue(element, "shift");
+	      int ion_type_num = getChildCount(parent, "ion_type");
+	      for (int i = 0; i < ion_type_num; i++) {
+	        xercesc::DOMElement* element = getChildElement(parent, "ion_type", i);
+	        std::string name = getChildValue(element, "name", 0);
+	        bool n_term = getBoolChildValue(element, "n_term", 0);
+	        double shift = getDoubleChildValue(element, "shift", 0);
 	        ionType_ptr_vec.push_back(IonTypePtr(new IonType(name, n_term, shift)));
 
 	      }

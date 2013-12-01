@@ -3,9 +3,9 @@
 #include <sstream>
 #include <boost/algorithm/string.hpp>
 
+#include "xml_dom.hpp"
 #include "xml_dom_document.hpp"
 
- 
 namespace prot {
 
 XmlDOMDocument::XmlDOMDocument(XmlDOMParser* parser, 
@@ -19,34 +19,23 @@ XmlDOMDocument::~XmlDOMDocument() {
   }
 }
 
-xercesc::DOMElement* XmlDOMDocument::getElement(const char* tag, int index) { 
-  XMLCh* temp = xercesc::XMLString::transcode(tag);
-  xercesc::DOMNodeList* list = doc_->getElementsByTagName(temp);
-  xercesc::XMLString::release(&temp);
+xercesc::DOMElement* getChildElement(xercesc::DOMElement *parent, 
+                                const char* tag, int index) { 
+  xercesc::DOMNodeList* list = parent->getElementsByTagName(X(tag));
   xercesc::DOMElement* element = 
       dynamic_cast<xercesc::DOMElement*>(list->item(index));
   return element;
-
 }
 
-std::string XmlDOMDocument::getChildValue(const char* parent_tag, 
-                                          int parent_index, 
-                                          const char* child_tag) {
 
-  XMLCh* temp = xercesc::XMLString::transcode(parent_tag);
-  xercesc::DOMNodeList* list = doc_->getElementsByTagName(temp);
-  xercesc::XMLString::release(&temp);
-
-  xercesc::DOMElement* parent = 
-      dynamic_cast<xercesc::DOMElement*>(list->item(parent_index));
+std::string getChildValue(xercesc::DOMElement* parent,  
+                          const char* child_tag, int i) {
   xercesc::DOMElement* child = 
       dynamic_cast<xercesc::DOMElement*>(parent->getElementsByTagName(
-              xercesc::XMLString::transcode(child_tag))->item(0));
+              xercesc::XMLString::transcode(child_tag))->item(i));
   std::string value;
   if (child) {
-    char* temp2 = xercesc::XMLString::transcode(child->getTextContent());
-    value = temp2;
-    xercesc::XMLString::release(&temp2);
+    value = Y(child->getTextContent());
   }
   else {
     value = "";
@@ -54,50 +43,50 @@ std::string XmlDOMDocument::getChildValue(const char* parent_tag,
   return value;
 }
 
-std::string XmlDOMDocument::getAttributeValue(const char* element_tag, 
-                                              int element_index, 
-                                              const char* attribute_tag) {
-  XMLCh* temp = xercesc::XMLString::transcode(element_tag);
-  xercesc::DOMNodeList* list = doc_->getElementsByTagName(temp);
-  xercesc::XMLString::release(&temp);
+double getDoubleChildValue(xercesc::DOMElement* parent,  
+                           const char* child_tag, int i) {
+  std::string value = getChildValue(parent, child_tag, i);
+  return atof(value.c_str());
+}
 
-  xercesc::DOMElement* element = 
-      dynamic_cast<xercesc::DOMElement*>(list->item(element_index));
-  temp = xercesc::XMLString::transcode(attribute_tag);
-  char* temp2 = xercesc::XMLString::transcode(element->getAttribute(temp));
+int getIntChildValue(xercesc::DOMElement* parent,  
+                     const char* child_tag, int i) {
+  std::string value = getChildValue(parent, child_tag, i);
+  return atoi(value.c_str());
+}
 
-  std::string value = temp2;
-  xercesc::XMLString::release(&temp);
-  xercesc::XMLString::release(&temp2);
+bool getBoolChildValue(xercesc::DOMElement* parent,
+                       const char* child_tag, int i) {
+  std::string value = getChildValue(parent, child_tag, i);
+  boost::to_lower(value);
+  if(value == "true") {
+    return true;
+  }
+  return false;
+}
+
+int getChildCount(xercesc::DOMElement* parent, 
+                 const char* child_tag) {
+  xercesc::DOMNodeList* childList = parent->getElementsByTagName(X(child_tag));
+  return (int)childList->getLength();
+}
+
+std::string getAttributeValue(xercesc::DOMElement* element, const char* attribute_tag) {
+  std::string value = Y(element->getAttribute(X(attribute_tag)));
   return value;
 }
 
-int XmlDOMDocument::getChildCount(const char* parent_tag, 
-                                  int parent_index, 
-                                  const char* child_tag) {
-  XMLCh* temp = xercesc::XMLString::transcode(parent_tag);
-  xercesc::DOMNodeList* list = doc_->getElementsByTagName(temp);
-  xercesc::XMLString::release(&temp);
-
-  xercesc::DOMElement* parent = dynamic_cast<xercesc::DOMElement*>(list->item(parent_index));
-  xercesc::DOMNodeList* childList = parent->getElementsByTagName(xercesc::XMLString::transcode(child_tag));
-  return (int)childList->getLength();
-}
 
 /**
  * Add an element 
  **/
 xercesc::DOMElement* XmlDOMDocument::createElement(const char* tag) {
-  XMLCh* temp = xercesc::XMLString::transcode(tag);
-  xercesc::DOMElement* element = doc_->createElement(temp);
-  xercesc::XMLString::release(&temp);
+  xercesc::DOMElement* element = doc_->createElement(X(tag));
   return element;
 }
 
 xercesc::DOMText* XmlDOMDocument::createTextNode(const char* text) {
-  XMLCh* temp = xercesc::XMLString::transcode(text);
-  xercesc::DOMText* text_node = doc_->createTextNode(temp);
-  xercesc::XMLString::release(&temp);
+  xercesc::DOMText* text_node = doc_->createTextNode(X(text));
   return text_node;
 }
 
@@ -107,45 +96,6 @@ void XmlDOMDocument::addElement(xercesc::DOMElement* element,
   element->appendChild(child);
   xercesc::DOMText* text_node = createTextNode(value);
   child->appendChild(text_node);
-}
-
-std::string getChildValue(xercesc::DOMElement* parent,  
-                          const char* child_tag) {
-  xercesc::DOMElement* child = 
-      dynamic_cast<xercesc::DOMElement*>(parent->getElementsByTagName(
-              xercesc::XMLString::transcode(child_tag))->item(0));
-  std::string value;
-  if (child) {
-    char* temp2 = xercesc::XMLString::transcode(child->getTextContent());
-    value = temp2;
-    xercesc::XMLString::release(&temp2);
-  }
-  else {
-    value = "";
-  }
-  return value;
-}
-
-double getDoubleChildValue(xercesc::DOMElement* parent,  
-                           const char* child_tag) {
-  std::string value = getChildValue(parent, child_tag);
-  return atof(value.c_str());
-}
-
-int getIntChildValue(xercesc::DOMElement* parent,  
-                     const char* child_tag) {
-  std::string value = getChildValue(parent, child_tag);
-  return atoi(value.c_str());
-}
-
-bool getBoolChildValue(xercesc::DOMElement* parent,
-                       const char* child_tag) {
-  std::string value = getChildValue(parent, child_tag);
-  boost::to_lower(value);
-  if(value == "true") {
-    return true;
-  }
-  return false;
 }
 
 std::string convertToString(double value) {
@@ -161,3 +111,4 @@ std::string convertToString(bool value) {
 }
 
 }
+

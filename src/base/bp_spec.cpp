@@ -15,17 +15,16 @@
 
 #include "bp_spec.hpp"
 #include "ion_type.hpp"
-#include "comparator.hpp"
 
 namespace prot {
 
 log4cxx::LoggerPtr bs_logger(log4cxx::Logger::getLogger("FastaReader"));
 
-BpSpec::BpSpec(RSPtr res_seq_ptr){
+BpSpec::BpSpec(ResSeqPtr res_seq_ptr){
 	initBreakPoints(res_seq_ptr);
 }
 
-void BpSpec::initBreakPoints(RSPtr res_seq_ptr){
+void BpSpec::initBreakPoints(ResSeqPtr res_seq_ptr){
   seq_mass_ = res_seq_ptr->getSeqMass();
 	int ext_len= res_seq_ptr->getLen()+1;
 	if(ext_len <= 1){

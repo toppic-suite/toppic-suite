@@ -15,13 +15,14 @@ LFLAGS = -L/lib
 LIBS = -lxerces-c -llog4cxx
 #
 # define the C++ source files
-SRCS = base_data.cpp proteoform.cpp change.cpp bp_spec.cpp break_point.cpp activation.cpp neutral_loss.cpp fasta_reader.cpp residue_seq.cpp prot_mod.cpp acid.cpp trunc.cpp ion_type.cpp ptm.cpp residue.cpp xml_dom.cpp xml_dom_document.cpp
+SRCS = base_data.cpp fasta_reader.cpp proteoform.cpp bp_spec.cpp break_point.cpp residue_seq.cpp change.cpp acid.cpp ptm.cpp residue.cpp xml_dom.cpp xml_dom_document.cpp ion_type.cpp neutral_loss.cpp trunc.cpp prot_mod.cpp activation.cpp
 #
 # define the C object files 
 #
 
 OBJ_DIR = ../../obj
-OBJS = $(addprefix $(OBJ_DIR)/,base_data.o  proteoform.o change.o bp_spec.o break_point.o activation.o neutral_loss.o fasta_reader.o residue_seq.o prot_mod.o acid.o trunc.o ion_type.o ptm.o residue.o xml_dom.o xml_dom_document.o)
+
+OBJS = $(addprefix $(OBJ_DIR)/, base_data.o fasta_reader.o proteoform.o bp_spec.o break_point.o residue_seq.o change.o acid.o ptm.o residue.o xml_dom.o xml_dom_document.o ion_type.o neutral_loss.o trunc.o prot_mod.o activation.o)
 
 BIN_DIR = ../../bin
 

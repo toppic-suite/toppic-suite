@@ -19,18 +19,6 @@ class XmlDOMDocument {
   XmlDOMDocument(XmlDOMParser* parser, const char* xml_file);
   ~XmlDOMDocument();
 
-  xercesc::DOMElement* getElement(const char* tag, int index);
-
-  std::string getChildValue(const char* parent_tag, int parent_index, 
-                            const char* child_tag);
-
-  std::string getAttributeValue(const char* element_tag,  
-                                int element_index, 
-                                const char* attribute_tag);
-
-  int getChildCount(const char* parent_tag, int parent_index, 
-                    const char* child_tag);
-
   xercesc::DOMElement* createElement(const char* tag);
 
   xercesc::DOMText* createTextNode(const char* text);
@@ -38,21 +26,33 @@ class XmlDOMDocument {
   void addElement(xercesc::DOMElement* element, 
                   const char* tag, const char* value);
 
+  xercesc::DOMElement* getDocumentElement() {
+    return doc_->getDocumentElement();
+  }
+
  private:
   xercesc::DOMDocument* doc_;
 };
 
-std::string getChildValue(xercesc::DOMElement* parent,  
-                          const char* child_tag);
+xercesc::DOMElement* getChildElement(xercesc::DOMElement* parent, 
+                                const char* tag, int index);
 
-double getDoubleChildValue(xercesc::DOMElement* parent,  
-                           const char* child_tag);
+std::string getChildValue(xercesc::DOMElement* parent, 
+                          const char* child_tag, int index);
+
+double getDoubleChildValue(xercesc::DOMElement* parent, 
+                          const char* child_tag, int index);
 
 int getIntChildValue(xercesc::DOMElement* parent,  
-                     const char* child_tag);
+                     const char* child_tag, int index);
 
 bool getBoolChildValue(xercesc::DOMElement* parent,
-                       const char* child_tag);
+                       const char* child_tag, int index);
+
+int getChildCount(xercesc::DOMElement * parent, const char* child_tag);
+
+std::string getAttributeValue(xercesc::DOMElement * parent,
+                                const char* attribute_tag);
 
 std::string convertToString(double value);
 

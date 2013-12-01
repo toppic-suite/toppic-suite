@@ -6,6 +6,8 @@
 #include <xercesc/parsers/XercesDOMParser.hpp>
 #include <xercesc/dom/DOM.hpp>
 #include <xercesc/util/PlatformUtils.hpp>
+#include <xercesc/util/XMLString.hpp>
+#include <xercesc/sax/HandlerBase.hpp>
 
 namespace prot {
 
@@ -23,5 +25,42 @@ private:
 
 XmlDOMParser* getXmlDOMInstance();
  
+class XStr {
+ public:
+  XStr(const char*  str) {
+    // Call the private transcoding method
+    unicode_form_ = xercesc::XMLString::transcode(str);
+  }
+
+  ~XStr() {
+    xercesc::XMLString::release(&unicode_form_);
+  }
+
+  const XMLCh* unicodeForm() {return unicode_form_;}
+
+ private:
+  XMLCh* unicode_form_;
+};
+
+class YStr {
+ public:
+  YStr(const XMLCh* xml_ch) {
+    // Call the private transcoding method
+    ch_ = xercesc::XMLString::transcode(xml_ch);
+  }
+
+  ~YStr() {
+    xercesc::XMLString::release(&ch_);
+  }
+
+  const char * getString() {return ch_;}
+
+ private:
+  char * ch_;
+};
+
+#define X(str) XStr(str).unicodeForm()
+#define Y(str) YStr(str).getString()
+
 }
 #endif

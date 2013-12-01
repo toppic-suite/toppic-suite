@@ -17,25 +17,29 @@ Activation::Activation(std::string name, IonTypePtr n_ion_type_ptr, IonTypePtr c
 }
 Activation::Activation(IonTypePtrVec ion_type_list,
 		xercesc::DOMElement * element) {
-	name_ = getChildValue(element, "name");
-	n_ion_type_ = getIonTypePtrByName(ion_type_list,getChildValue(element, "n_ion_type"));
-	c_ion_type_ = getIonTypePtrByName(ion_type_list,getChildValue(element, "c_ion_type"));
+	name_ = getChildValue(element, "name", 0);
+	n_ion_type_ = getIonTypePtrByName(ion_type_list,getChildValue(element, "n_ion_type", 0));
+	c_ion_type_ = getIonTypePtrByName(ion_type_list,getChildValue(element, "c_ion_type", 0));
 
 }
 
 ActivationPtrVec getActivationPtrVectInst(IonTypePtrVec ion_type_list,const char* file_name){
 	ActivationPtrVec activationPtrVec;
 		prot::XmlDOMParser* parser = prot::getXmlDOMInstance();
-		if (parser) {
-			prot::XmlDOMDocument* doc = new prot::XmlDOMDocument(parser, file_name);
-			int acid_num = doc->getChildCount("activation_list", 0, "activation");
-			for (int i = 0; i < acid_num; i++) {
-				xercesc::DOMElement* element = doc->getElement("activation", i);
-				activationPtrVec.push_back(ActivationPtr(new Activation(ion_type_list,element)));
-			}
-			delete doc;
-		}
-		delete parser;
+    if (parser) {
+      prot::XmlDOMDocument* doc = new prot::XmlDOMDocument(parser, file_name);
+      if (doc) {
+        xercesc::DOMElement* root = doc->getDocumentElement();
+        xercesc::DOMElement* parent = getChildElement(root, "activation_list", 0);
+        int activation_num = getChildCount(parent, "activation");
+        for (int i = 0; i < activation_num; i++) {
+          xercesc::DOMElement* element = getChildElement(parent, "activation", i);
+          activationPtrVec.push_back(ActivationPtr(new Activation(ion_type_list,element)));
+        }
+        delete doc;
+      }
+      delete parser;
+    }
 		return activationPtrVec;
 }
 

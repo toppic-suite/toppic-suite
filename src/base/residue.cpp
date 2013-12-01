@@ -53,12 +53,14 @@ ResiduePtrVec getResiduePtrVecInstance(AcidPtrVec &acid_list,
   XmlDOMParser* parser = getXmlDOMInstance();
   if (parser) {
     XmlDOMDocument* doc = new XmlDOMDocument(parser, file_name);
+    xercesc::DOMElement* root = doc->getDocumentElement();
+    xercesc::DOMElement* parent = getChildElement(root, "residue_list", 0);
     if (doc) {
-      int residue_num = doc->getChildCount("residue_list", 0, "residue");
+      int residue_num = getChildCount(parent, "residue");
       for (int i = 0; i < residue_num; i++) {
-        xercesc::DOMElement* element = doc->getElement("residue", i);
-        std::string acid_name = getChildValue(element, "acid");
-        std::string ptm_abby_name = getChildValue(element, "ptm");
+        xercesc::DOMElement* element = getChildElement(parent, "residue", i);
+        std::string acid_name = getChildValue(element, "acid", 0);
+        std::string ptm_abby_name = getChildValue(element, "ptm", 0);
         residue_list.push_back(ResiduePtr(
                 new Residue(acid_list, ptm_list, acid_name, ptm_abby_name)));
       }
