@@ -2,7 +2,7 @@
  * author  Xiaowen Liu
  * date    2013-11-1
  */
-#include "log4cxx/logger.h"
+#include <log4cxx/logger.h>
 
 #include "base/base_data.hpp"
 #include "base/xml_dom.hpp"
@@ -58,6 +58,11 @@ BaseData::BaseData  (char const* config_file_name) {
       LOG4CXX_DEBUG(logger, "neutral loss file name: " << neutral_loss_file_name);
       neutral_loss_list_ = getNeutralLossPtrVecInstance(neutral_loss_file_name.c_str());
       LOG4CXX_DEBUG(logger, "neutral loss initialized ");
+
+      std::string activation_file_name = getChildValue(root, "activation_list_file_name", 0);
+      LOG4CXX_DEBUG(logger, "activation file name: " << activation_file_name);
+      activation_list_ = getActivationPtrVecInstance(ion_type_list_, activation_file_name.c_str());
+      LOG4CXX_DEBUG(logger, "activation initialized ");
 
     }
     delete doc;

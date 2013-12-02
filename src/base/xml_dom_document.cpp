@@ -5,8 +5,8 @@
 #include <boost/algorithm/string.hpp>
 
 
-#include "log4cxx/logger.h"
-#include "log4cxx/helpers/exception.h"
+#include <log4cxx/logger.h>
+#include <log4cxx/helpers/exception.h>
 
 #include "base/xml_dom.hpp"
 #include "base/xml_dom_document.hpp"

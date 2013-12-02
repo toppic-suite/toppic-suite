@@ -1,4 +1,4 @@
-#include "log4cxx/logger.h"
+#include <log4cxx/logger.h>
 
 #include "base/residue.hpp"
 #include "base/xml_dom.hpp"

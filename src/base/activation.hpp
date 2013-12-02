@@ -29,7 +29,7 @@ private:
 typedef std::shared_ptr<Activation> ActivationPtr;
 typedef std::vector<ActivationPtr> ActivationPtrVec;
 
-ActivationPtrVec getActivationPtrVectInst(const char* file_name);
+ActivationPtrVec getActivationPtrVecInstance(IonTypePtrVec ion_type_list, const char* file_name);
 ActivationPtr getActivationPtrByName(ActivationPtrVec activation_list,std::string name);
 
 } /* namespace prot */

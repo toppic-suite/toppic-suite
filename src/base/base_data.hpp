@@ -13,6 +13,7 @@
 #include "base/prot_mod.hpp"
 #include "base/ion_type.hpp"
 #include "base/neutral_loss.hpp"
+#include "base/activation.hpp"
 
 namespace prot {
 
@@ -27,6 +28,7 @@ class BaseData {
   ProtModPtrVec& getProtModPtrVec() {return prot_mod_list_;}
   IonTypePtrVec& getIonTypePtrVec() {return ion_type_list_;}
   NeutralLossPtrVec& getNeutralLossPtrVec() {return neutral_loss_list_;}
+  ActivationPtrVec& getActivationPtrVec() {return activation_list_;}
 
  private:
   AcidPtrVec acid_list_;
@@ -38,6 +40,8 @@ class BaseData {
 
   IonTypePtrVec ion_type_list_;
   NeutralLossPtrVec neutral_loss_list_;
+
+  ActivationPtrVec activation_list_;
 };
 
 typedef std::shared_ptr<BaseData> BaseDataPtr;
