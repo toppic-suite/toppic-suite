@@ -1,7 +1,7 @@
 #ifndef PROT_DECONV_PEAK_HPP_
 #define PROT_DECONV_PEAK_HPP_
 
-#include "peak.hpp"
+#include "spec/peak.hpp"
 
 namespace prot {
 

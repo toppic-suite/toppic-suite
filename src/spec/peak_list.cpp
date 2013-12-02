@@ -3,7 +3,7 @@
 #include <cmath>
 #include <algorithm>
 
-#include "deconv_peak.hpp"
+#include "spec/deconv_peak.hpp"
 
 namespace prot {
 

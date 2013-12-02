@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include "xml_dom_document.hpp"
+#include "base/xml_dom_document.hpp"
 
 namespace prot {
 

@@ -6,7 +6,7 @@
  */
 
 #include <algorithm>
-#include "theo_peak.hpp"
+#include "spec/theo_peak.hpp"
 
 namespace prot {
 TheoPeak::TheoPeak(IonPtr ion,double unmod_mass,double shift):

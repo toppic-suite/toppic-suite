@@ -2,10 +2,10 @@
 #include <stdlib.h>
 #include <boost/algorithm/string.hpp>
 
-#include "log4cxx/logger.h"
+#include <log4cxx/logger.h>
 
-#include "peak.hpp"
-#include "ms_header.hpp"
+#include "spec/peak.hpp"
+#include "spec/ms_header.hpp"
 
 namespace prot {
 

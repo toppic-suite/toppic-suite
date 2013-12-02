@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include "mass_constant.hpp"
+#include "base/mass_constant.hpp"
 
 namespace prot {
 

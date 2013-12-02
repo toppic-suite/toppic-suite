@@ -1,6 +1,6 @@
-#include "peak.hpp"
-#include "ms.hpp"
-#include "deconv_ms.hpp"
+#include "spec/peak.hpp"
+#include "spec/ms.hpp"
+#include "spec/deconv_ms.hpp"
 
 namespace prot {
 

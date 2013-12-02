@@ -1,8 +1,8 @@
 #include <boost/algorithm/string.hpp>
 
-#include "log4cxx/logger.h"
+#include <log4cxx/logger.h>
 
-#include "msalign_reader.hpp"
+#include "spec/msalign_reader.hpp"
 
 namespace prot {
 

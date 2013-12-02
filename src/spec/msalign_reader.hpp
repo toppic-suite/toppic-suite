@@ -7,7 +7,7 @@
 #include <fstream>
 #include <memory>
 
-#include "deconv_ms.hpp"
+#include "spec/deconv_ms.hpp"
 
 namespace prot {
 

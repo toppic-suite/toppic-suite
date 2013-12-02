@@ -1,7 +1,7 @@
 #ifndef PROT_MS_HEADER_HPP_
 #define PROT_MS_HEADER_HPP_
 
-#include "activation.hpp"
+#include "base/activation.hpp"
 
 namespace prot {
 

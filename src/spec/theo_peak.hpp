@@ -8,10 +8,10 @@
 #ifndef THEO_PEAK_HPP_
 #define THEO_PEAK_HPP_
 
-#include "ion.hpp"
-#include "peak.hpp"
-#include "bp_spec.hpp"
-#include "activation.hpp"
+#include "base/ion.hpp"
+#include "base/bp_spec.hpp"
+#include "base/activation.hpp"
+#include "spec/peak.hpp"
 
 namespace prot {
 

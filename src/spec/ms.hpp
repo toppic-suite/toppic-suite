@@ -1,7 +1,7 @@
 #ifndef PROT_MS_HPP_
 #define PROT_MS_HPP_
 
-#include "ms_header.hpp"
+#include "spec/ms_header.hpp"
 
 namespace prot {
 

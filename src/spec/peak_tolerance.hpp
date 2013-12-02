@@ -1,7 +1,7 @@
 #ifndef PROT_PEAK_TOLERANCE_HPP_
 #define PROT_PEAK_TOLERANCE_HPP_
 
-#include "xml_dom_document.hpp"
+#include "base/xml_dom_document.hpp"
 
 namespace prot {
 

@@ -1,7 +1,7 @@
 #include<string>
 #include<sstream>
 
-#include "ms.hpp"
+#include "spec/ms.hpp"
 
 namespace prot {
 

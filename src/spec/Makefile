@@ -6,7 +6,7 @@ CPPFLAGS = -Wall -g -std=c++11
 #
 # define any directories containing header files other than /usr/include
 #
-INCLUDES = -I../base
+INCLUDES = -I..
 #
 # define library paths in addition to /usr/lib
 LFLAGS = -L/lib

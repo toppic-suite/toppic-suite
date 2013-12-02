@@ -3,8 +3,8 @@
 
 #include <memory>
 
-#include "ms.hpp"
-#include "deconv_peak.hpp"
+#include "spec/ms.hpp"
+#include "spec/deconv_peak.hpp"
 
 namespace prot {
 

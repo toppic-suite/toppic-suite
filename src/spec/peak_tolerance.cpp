@@ -1,4 +1,4 @@
-#include "peak_tolerance.hpp"
+#include "spec/peak_tolerance.hpp"
 
 namespace prot {
 
