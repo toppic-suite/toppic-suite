@@ -5,8 +5,8 @@
  *      Author: xunlikun
  */
 
-#include "neutral_loss.hpp"
-#include "xml_dom_document.hpp"
+#include "base/neutral_loss.hpp"
+#include "base/xml_dom_document.hpp"
 
 namespace prot {
 

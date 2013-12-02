@@ -1,4 +1,4 @@
-#include "residue_seq.hpp"
+#include "base/residue_seq.hpp"
 
 namespace prot {
 

@@ -4,9 +4,9 @@
  */
 #include "log4cxx/logger.h"
 
-#include "acid.hpp"
-#include "xml_dom.hpp"
-#include "xml_dom_document.hpp"
+#include "base/acid.hpp"
+#include "base/xml_dom.hpp"
+#include "base/xml_dom_document.hpp"
 
 
 namespace prot {

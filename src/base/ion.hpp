@@ -9,8 +9,8 @@
 #define PROT_ION_HPP_
 
 #include <sstream>
-#include "ion_type.hpp"
-#include "neutral_loss.hpp"
+#include "base/ion_type.hpp"
+#include "base/neutral_loss.hpp"
 
 namespace prot {
 

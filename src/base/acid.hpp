@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 
-#include <xercesc/dom/DOM.hpp>
+#include "xercesc/dom/DOM.hpp"
 
 namespace prot {
 

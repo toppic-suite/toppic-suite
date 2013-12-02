@@ -8,7 +8,7 @@
 #ifndef PROT_BREAK_POINT_HPP_
 #define PROT_BREAK_POINT_HPP_
 
-#include "ion_type.hpp"
+#include "base/ion_type.hpp"
 
 namespace prot {
 

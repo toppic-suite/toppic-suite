@@ -8,8 +8,8 @@
 #ifndef PROT_GLOBAL_HPP_
 #define PROT_GLOBAL_HPP_
 
-#include "prot_mod.hpp"
-#include "neutral_loss.hpp"
+#include "base/prot_mod.hpp"
+#include "base/neutral_loss.hpp"
 
 namespace prot {
 ProtModPtrVec _G_ProtModPtrVec;

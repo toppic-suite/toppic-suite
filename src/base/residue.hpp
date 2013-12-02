@@ -9,8 +9,8 @@
 #include <string>
 #include <memory>
 
-#include "acid.hpp"
-#include "ptm.hpp"
+#include "base/acid.hpp"
+#include "base/ptm.hpp"
 
 namespace prot {
 

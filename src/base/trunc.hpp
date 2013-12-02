@@ -2,7 +2,7 @@
 #define PROT_TRUNC_HPP_
 
 #include <string>
-#include "acid.hpp"
+#include "base/acid.hpp"
 
 namespace prot {
 

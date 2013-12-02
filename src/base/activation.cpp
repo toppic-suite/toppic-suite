@@ -5,9 +5,9 @@
  *      Author: xunlikun
  */
 
-#include "activation.hpp"
-#include "ion_type.hpp"
-#include "xml_dom_document.hpp"
+#include "base/activation.hpp"
+#include "base/ion_type.hpp"
+#include "base/xml_dom_document.hpp"
 
 namespace prot {
 Activation::Activation(std::string name, IonTypePtr n_ion_type_ptr, IonTypePtr c_ion_type_ptr) {

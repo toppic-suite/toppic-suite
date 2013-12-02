@@ -8,8 +8,8 @@
 #include "log4cxx/logger.h"
 #include "log4cxx/helpers/exception.h"
 
-#include "xml_dom.hpp"
-#include "xml_dom_document.hpp"
+#include "base/xml_dom.hpp"
+#include "base/xml_dom_document.hpp"
 
 namespace prot {
 

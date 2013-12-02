@@ -5,7 +5,7 @@
  *      Author: xunlikun
  */
 
-#include "break_point.hpp"
+#include "base/break_point.hpp"
 
 namespace prot {
 BreakPoint::BreakPoint(double prm,double srm){

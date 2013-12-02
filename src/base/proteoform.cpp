@@ -1,4 +1,4 @@
-#include "proteoform.hpp"
+#include "base/proteoform.hpp"
 
 namespace prot {
 

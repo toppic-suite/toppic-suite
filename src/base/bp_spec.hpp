@@ -8,8 +8,8 @@
 #ifndef PROT_BP_SPEC_HPP_
 #define PROT_BP_SPEC_HPP_
 
-#include "residue_seq.hpp"
-#include "break_point.hpp"
+#include "base/residue_seq.hpp"
+#include "base/break_point.hpp"
 
 namespace prot {
 

@@ -1,8 +1,8 @@
-#include "residue.hpp"
-#include "xml_dom.hpp"
-#include "xml_dom_document.hpp"
-
 #include "log4cxx/logger.h"
+
+#include "base/residue.hpp"
+#include "base/xml_dom.hpp"
+#include "base/xml_dom_document.hpp"
 
 namespace prot {
 

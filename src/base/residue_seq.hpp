@@ -1,8 +1,8 @@
 #ifndef PROT_RESIDUE_SEQ_HPP_
 #define PROT_RESIDUE_SEQ_HPP_
 
-#include "mass_constant.hpp"
-#include "residue.hpp"
+#include "base/mass_constant.hpp"
+#include "base/residue.hpp"
 
 namespace prot {
 

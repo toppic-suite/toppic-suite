@@ -5,10 +5,10 @@
  *      Author: xunlikun
  */
 
-#include "residue_seq.hpp"
-#include "bp_spec.hpp"
-#include "nmode_bp_spec.hpp"
-#include "GLOBAL.hpp"
+#include "base/residue_seq.hpp"
+#include "base/bp_spec.hpp"
+#include "base/nmode_bp_spec.hpp"
+#include "base/GLOBAL.hpp"
 
 namespace prot {
 NModeBpSpec::NModeBpSpec(std::string name,ResiduePtrVec residues,BpSpecPtr unmode_bpspec_ptr,ProtModPtr n_mode):BpSpec(ResSeqPtr(new ResidueSeq(name,residues))){

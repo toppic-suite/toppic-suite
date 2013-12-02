@@ -1,6 +1,6 @@
-#include "mass_constant.hpp"
-#include "ion_type.hpp"
-#include "xml_dom_document.hpp"
+#include "base/mass_constant.hpp"
+#include "base/ion_type.hpp"
+#include "base/xml_dom_document.hpp"
 
 namespace prot {
 

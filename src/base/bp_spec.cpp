@@ -11,10 +11,10 @@
 #include <string>
 #include <vector>
 
-#include "log4cxx/logger.h"
+#include <log4cxx/logger.h>
 
-#include "bp_spec.hpp"
-#include "ion_type.hpp"
+#include "base/bp_spec.hpp"
+#include "base/ion_type.hpp"
 
 namespace prot {
 

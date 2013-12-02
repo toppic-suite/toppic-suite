@@ -8,7 +8,7 @@
 #ifndef PROT_MASS_COMPARATOR_HPP_
 #define PROT_MASS_COMPARATOR_HPP_
 
-#include "theo_peak.hpp"
+#include "base/theo_peak.hpp"
 
 namespace prot {
 class Comparator{

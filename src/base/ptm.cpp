@@ -5,9 +5,9 @@
 #include <stdlib.h>
 #include <iostream>
 
-#include "ptm.hpp"
-#include "xml_dom.hpp"
-#include "xml_dom_document.hpp"
+#include "base/ptm.hpp"
+#include "base/xml_dom.hpp"
+#include "base/xml_dom_document.hpp"
 
 namespace prot {
 

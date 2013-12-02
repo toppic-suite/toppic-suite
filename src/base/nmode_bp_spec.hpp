@@ -8,8 +8,8 @@
 #ifndef NMODE_BP_SPEC_HPP_
 #define NMODE_BP_SPEC_HPP_
 
-#include "bp_spec.hpp"
-#include "prot_mod.hpp"
+#include "base/bp_spec.hpp"
+#include "base/prot_mod.hpp"
 
 namespace prot {
 

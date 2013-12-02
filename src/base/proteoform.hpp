@@ -1,9 +1,9 @@
 #ifndef PROT_PROTEOFORM_HPP_
 #define PROT_PROTEOFORM_HPP_
 
-#include "residue_seq.hpp"
-#include "bp_spec.hpp"
-#include "change.hpp"
+#include "base/residue_seq.hpp"
+#include "base/bp_spec.hpp"
+#include "base/change.hpp"
 
 namespace prot {
 

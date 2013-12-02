@@ -5,7 +5,7 @@
  *      Author: xunlikun
  */
 
-#include "ion.hpp"
+#include "base/ion.hpp"
 
 namespace prot {
 Ion::Ion(int charge,int pos,int display,IonTypePtr ion_type_ptr,NeutralLossPtr neutral_loss_ptr){

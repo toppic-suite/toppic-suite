@@ -9,7 +9,7 @@
 #include <xercesc/util/XMLString.hpp>
 #include <xercesc/util/PlatformUtils.hpp>
 
-#include "xml_dom.hpp"
+#include "base/xml_dom.hpp"
 
 namespace prot {
 

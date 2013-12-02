@@ -6,13 +6,13 @@
 #ifndef PROT_BASE_DATA_HPP_
 #define PROT_BASE_DATA_HPP_
 
-#include "acid.hpp"
-#include "ptm.hpp"
-#include "residue.hpp"
-#include "trunc.hpp"
-#include "prot_mod.hpp"
-#include "ion_type.hpp"
-#include "neutral_loss.hpp"
+#include "base/acid.hpp"
+#include "base/ptm.hpp"
+#include "base/residue.hpp"
+#include "base/trunc.hpp"
+#include "base/prot_mod.hpp"
+#include "base/ion_type.hpp"
+#include "base/neutral_loss.hpp"
 
 namespace prot {
 

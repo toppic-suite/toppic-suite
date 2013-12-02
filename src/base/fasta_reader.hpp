@@ -6,8 +6,8 @@
 #include <string>
 #include <vector>
 
-#include "residue_seq.hpp"
-#include "proteoform.hpp"
+#include "base/residue_seq.hpp"
+#include "base/proteoform.hpp"
 
 namespace prot {
 

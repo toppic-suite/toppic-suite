@@ -1,8 +1,8 @@
 #ifndef PROT_PROT_MOD_HPP_
 #define PROT_PROT_MOD_HPP_
 
-#include "ptm.hpp"
-#include "trunc.hpp"
+#include "base/ptm.hpp"
+#include "base/trunc.hpp"
 
 namespace prot {
 

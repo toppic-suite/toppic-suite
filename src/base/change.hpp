@@ -1,7 +1,7 @@
 #ifndef PROT_CHANGE_HPP_
 #define PROT_CHANGE_HPP_
 
-#include "ptm.hpp"
+#include "base/ptm.hpp"
 
 namespace prot {
 

@@ -1,5 +1,5 @@
-#include "xml_dom.hpp"
-#include "xml_dom_err_handler.hpp"
+#include "base/xml_dom.hpp"
+#include "base/xml_dom_err_handler.hpp"
  
 namespace prot {
 
