@@ -5,4 +5,6 @@
 	<residue_list_file_name>conf/residue.xml</residue_list_file_name>
 	<trunc_list_file_name>conf/trunc.xml</trunc_list_file_name>
 	<prot_mod_list_file_name>conf/prot_mod.xml</prot_mod_list_file_name>
+	<ion_type_list_file_name>conf/ion_type.xml</ion_type_list_file_name>
+	<neutral_loss_list_file_name>conf/neutral_loss.xml</neutral_loss_list_file_name>
 </configuration>

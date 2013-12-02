@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 <neutral_loss_list>
 <neutral_loss>
-	<name></name>
+	<name>NONE</name>
 	<mass>0</mass>
 </neutral_loss>
 <neutral_loss>
