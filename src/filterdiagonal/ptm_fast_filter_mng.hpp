@@ -41,7 +41,7 @@ public:
 	ExtendSpPara extend_sp_para_ = ExtendSpPara(extend_min_mass_, ext_offsets_);
 	ActivationPtr activation__ptr_;
 
-	//todo:SpPara
+	//todo:SpPara waiting zero_ptm
 
 	std::string search_db_file_name_;
 	std::string res_file_name;

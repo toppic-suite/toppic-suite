@@ -21,7 +21,7 @@ SimplePrSM::SimplePrSM(MsHeaderPtr header,ProteoformPtr seq,int score){
 	precursor_id_ = header->getPrecId();
 	prec_mass_ = header->getPrecMonoMass();
 	seq_= seq;
-	//todo:seq_id and name should be delete?
+	//todo:seq_id and name should be delete? name
 //	seq_id_ = seq->getResSeqPtr()->getResiduePtr();
 //	seq_name_ = seq->getResSeqPtr();
 	score_ = score;
@@ -52,7 +52,7 @@ int SimplePrSM::compareTo(SimplePrSMPtr simple_prsm_ptr){
 void SimplePrSM::findSeq(std::vector<ProteoformPtr> seqs){
 //todo: didn't find id
 }
-//todo:should the element be shared_prt?
+//todo:should the element be shared_prt? peak_tolarance
 xercesc::DOMElement* toXml(){
 	//todo:implement toXml
 }

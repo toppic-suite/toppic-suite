@@ -20,7 +20,7 @@ public:
 	std::vector<std::vector<int>> compConvolution(std::vector<int> masses,std::vector<int> errors,int bgn_pos,int num);
 	std::vector<std::vector<int>> getShiftScores(std::vector<short> scores,int num);
 private:
-	//todo:static?
+
 	int shift_array_len_;
 	int scale_;
 	std::vector<int> seq_begins_;
