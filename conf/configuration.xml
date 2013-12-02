@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<configuration>
+	<acid_list_file_name>conf/acid.xml</acid_list_file_name>
+	<ptm_list_file_name>conf/ptm.xml</ptm_list_file_name>
+	<residue_list_file_name>conf/residue.xml</residue_list_file_name>
+	<trunc_list_file_name>conf/trunc.xml</trunc_list_file_name>
+	<prot_mod_list_file_name>conf/prot_mod.xml</prot_mod_list_file_name>
+</configuration>

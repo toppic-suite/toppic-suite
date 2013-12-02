@@ -11,7 +11,7 @@
 
 namespace prot {
 
-static log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("FastaReader"));
+static log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("Acid"));
 
 Acid::Acid (std::string const &name, std::string const &one_letter, 
             std::string const &three_letter, std::string const &composition, 
@@ -29,10 +29,11 @@ AcidPtrVec getAcidPtrVecInstance(const char* file_name) {
   XmlDOMParser* parser = getXmlDOMInstance();
   if (parser) {
     XmlDOMDocument* doc = new XmlDOMDocument(parser, file_name);
+    LOG4CXX_DEBUG(logger, "doc " << doc);
     if (doc) {
-      xercesc::DOMElement* root = doc->getDocumentElement();
-      xercesc::DOMElement* parent = getChildElement(root, "amino_acid_list", 0);
+      xercesc::DOMElement* parent = doc->getDocumentElement();
       int acid_num = getChildCount(parent, "amino_acid");
+      LOG4CXX_DEBUG(logger, "acid num " << acid_num);
       for (int i = 0; i < acid_num; i++) {
         xercesc::DOMElement* element = getChildElement(parent, "amino_acid", i);
         std::string name = getChildValue(element, "name", 0);
@@ -40,14 +41,14 @@ AcidPtrVec getAcidPtrVecInstance(const char* file_name) {
         std::string three_letter = getChildValue(element, "three_letter", 0);
         std::string composition = getChildValue(element, "composition", 0);
         double mono_mass = getDoubleChildValue(element, "mono_mass", 0);
-        double avg_mass = getDoubleChildValue(element, "avg_mass", 0);
+        double avg_mass = getDoubleChildValue(element, "average_mass", 0);
         acid_list.push_back(AcidPtr(
                 new Acid(name, one_letter, three_letter, composition, mono_mass, avg_mass)));
 
       }
       delete doc;
     }
-    delete parser;
+    // deleting parser is not necessary
   }
   return acid_list;
 }
@@ -159,8 +160,4 @@ AcidPtrVec convertSeqToAcidSeq(AcidPtrVec &acid_list,
 }
 
 } /* end namespace */
-
-int main() {
-  return 0;
-}
 

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<truncation_list>
+<truncation>
+	<name>NONE</name>
+	<trunc_len>0</trunc_len>
+	<acid_str></acid_str>
+</truncation>
+<truncation>
+	<name>NME</name>
+	<trunc_len>1</trunc_len>
+	<acid_str>M</acid_str>
+</truncation>
+</truncation_list>

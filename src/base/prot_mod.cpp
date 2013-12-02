@@ -1,8 +1,12 @@
+#include "log4cxx/logger.h"
+
 #include "prot_mod.hpp"
 #include "xml_dom.hpp"
 #include "xml_dom_document.hpp"
 
 namespace prot {
+
+static log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("ProtMod"));
 
 ProtMod::ProtMod(std::string name, TruncPtr trunc_ptr, PtmPtr ptm_ptr,
                  AcidPtrVec valid_acid_ptrs) {
@@ -23,17 +27,17 @@ ProtModPtrVec getProtModPtrVecInstance(AcidPtrVec &acid_list,
   if (parser) {
     prot::XmlDOMDocument* doc = new prot::XmlDOMDocument(parser, file_name);
     if (doc) {
-      xercesc::DOMElement* root = doc->getDocumentElement();
-      xercesc::DOMElement* parent = getChildElement(root, "mod_list", 0);
-      int mod_num = getChildCount(parent, "mod");
+      xercesc::DOMElement* parent = doc->getDocumentElement();
+      int mod_num = getChildCount(parent, "prot_mod");
       for (int i = 0; i < mod_num; i++) {
-        xercesc::DOMElement* element = getChildElement(parent, "mod", i);
+        xercesc::DOMElement* element = getChildElement(parent, "prot_mod", i);
         std::string name = getChildValue(element, "name", 0);
         std::string trunc_name = getChildValue(element, "trunc_name", 0);
         std::string ptm_name = getChildValue(element, "ptm_name", 0);
-        std::string valid_acids = getChildValue(element, "valid_acid", 0);
+        std::string valid_acids = getChildValue(element, "valid_acids", 0);
         TruncPtr trunc_ptr = getTruncPtrByName(trunc_list, trunc_name);
         PtmPtr ptm_ptr = getPtmPtrByAbbrName(ptm_list, ptm_name);
+        LOG4CXX_DEBUG(logger, "name " << name << " trunc_name " << trunc_name << " valid acids " << valid_acids);
         AcidPtrVec valid_acid_ptrs;
         for (unsigned int j = 0; j < valid_acids.length(); j++) {
           std::string letter = valid_acids.substr(j, 1);
@@ -46,7 +50,6 @@ ProtModPtrVec getProtModPtrVecInstance(AcidPtrVec &acid_list,
       }
       delete doc;
     }
-    delete parser;
   }
   return prot_mod_list;
 }

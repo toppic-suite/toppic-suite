@@ -2,7 +2,11 @@
 #include "xml_dom.hpp"
 #include "xml_dom_document.hpp"
 
+#include "log4cxx/logger.h"
+
 namespace prot {
+
+static log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("Residue"));
 
 Residue::Residue(AcidPtr acid_ptr, PtmPtr ptm_ptr) {
   acid_ptr_ = acid_ptr;
@@ -53,20 +57,21 @@ ResiduePtrVec getResiduePtrVecInstance(AcidPtrVec &acid_list,
   XmlDOMParser* parser = getXmlDOMInstance();
   if (parser) {
     XmlDOMDocument* doc = new XmlDOMDocument(parser, file_name);
-    xercesc::DOMElement* root = doc->getDocumentElement();
-    xercesc::DOMElement* parent = getChildElement(root, "residue_list", 0);
+    LOG4CXX_DEBUG(logger, "doc " << doc);
+    xercesc::DOMElement* parent = doc->getDocumentElement();
     if (doc) {
       int residue_num = getChildCount(parent, "residue");
+      LOG4CXX_DEBUG(logger, "residue num " << residue_num);
       for (int i = 0; i < residue_num; i++) {
         xercesc::DOMElement* element = getChildElement(parent, "residue", i);
         std::string acid_name = getChildValue(element, "acid", 0);
         std::string ptm_abby_name = getChildValue(element, "ptm", 0);
+        LOG4CXX_DEBUG(logger, "acid vec " << acid_list.size() << " ptm vec " << ptm_list.size() << " acid " << acid_name << " ptm " << ptm_abby_name);
         residue_list.push_back(ResiduePtr(
                 new Residue(acid_list, ptm_list, acid_name, ptm_abby_name)));
       }
       delete doc;
     }
-    delete parser;
   }
   return residue_list;
 }

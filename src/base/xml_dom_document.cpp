@@ -1,16 +1,28 @@
 #include <stdlib.h>
 #include <string>
 #include <sstream>
+#include <exception>
 #include <boost/algorithm/string.hpp>
+
+
+#include "log4cxx/logger.h"
+#include "log4cxx/helpers/exception.h"
 
 #include "xml_dom.hpp"
 #include "xml_dom_document.hpp"
 
 namespace prot {
 
+static log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("XmlDOMDocument"));
+
 XmlDOMDocument::XmlDOMDocument(XmlDOMParser* parser, 
                                const char* xml_file) : doc_(NULL) {
-  doc_ = parser->parse(xml_file);
+  try {
+    doc_ = parser->parse(xml_file);
+  }
+  catch (std::exception &e) {
+    std::cerr << "xml file " << xml_file << " contain errors" << std::endl;
+  }
 }
 
 XmlDOMDocument::~XmlDOMDocument() {
@@ -24,15 +36,40 @@ xercesc::DOMElement* getChildElement(xercesc::DOMElement *parent,
   xercesc::DOMNodeList* list = parent->getElementsByTagName(X(tag));
   xercesc::DOMElement* element = 
       dynamic_cast<xercesc::DOMElement*>(list->item(index));
+  if (element == nullptr) {
+    std::stringstream stream;
+    stream << "Get Child Element " << tag << " return null";
+    LOG4CXX_ERROR(logger, stream.str());
+    throw stream.str();
+  }
   return element;
 }
 
 
 std::string getChildValue(xercesc::DOMElement* parent,  
                           const char* child_tag, int i) {
+  xercesc::DOMNodeList* node_list;
+  try {
+    node_list= parent->getElementsByTagName(X(child_tag));
+  }
+  catch (log4cxx::helpers::Exception& e) {
+    std::cerr << "exception " << e.what() << std::endl;
+  }
+  if (node_list == nullptr) {
+    std::stringstream stream;
+    stream << "Get Child Element " << child_tag << " return null";
+    LOG4CXX_ERROR(logger, stream.str());
+    throw stream.str();
+  }
   xercesc::DOMElement* child = 
-      dynamic_cast<xercesc::DOMElement*>(parent->getElementsByTagName(
-              xercesc::XMLString::transcode(child_tag))->item(i));
+  dynamic_cast<xercesc::DOMElement*>(node_list->item(i));
+  if (child == nullptr) {
+    std::stringstream stream;
+    stream << "Get Child Element " << child_tag << " return null";
+    LOG4CXX_ERROR(logger, stream.str());
+    throw stream.str();
+  }
+
   std::string value;
   if (child) {
     value = Y(child->getTextContent());

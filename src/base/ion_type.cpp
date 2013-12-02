@@ -21,8 +21,7 @@ IonTypePtrVec getIonTypePtrVecInstance(const char* file_name){
 	prot::XmlDOMParser* parser = prot::getXmlDOMInstance();
 	if (parser) {
 	    prot::XmlDOMDocument* doc = new prot::XmlDOMDocument(parser, file_name);
-      xercesc::DOMElement* root = doc->getDocumentElement();
-      xercesc::DOMElement* parent = getChildElement(root, "ion_type_list", 0);
+      xercesc::DOMElement* parent = doc->getDocumentElement();
 	    if (doc) {
 	      int ion_type_num = getChildCount(parent, "ion_type");
 	      for (int i = 0; i < ion_type_num; i++) {
@@ -35,7 +34,6 @@ IonTypePtrVec getIonTypePtrVecInstance(const char* file_name){
 	      }
 	      delete doc;
 	    }
-	    delete parser;
 	  }
 	return ionType_ptr_vec;
 }

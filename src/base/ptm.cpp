@@ -32,11 +32,10 @@ PtmPtrVec getPtmPtrVecInstance(const char* file_name) {
   if (parser) {
     XmlDOMDocument* doc = new XmlDOMDocument(parser, file_name);
     if (doc) {
-      xercesc::DOMElement* root = doc->getDocumentElement();
-      xercesc::DOMElement* parent = getChildElement(root, "ptm_list", 0);
-      int ptm_num = getChildCount(parent, "ptm");
+      xercesc::DOMElement* parent = doc->getDocumentElement();
+      int ptm_num = getChildCount(parent, "modification");
       for (int i = 0; i < ptm_num; i++) {
-        xercesc::DOMElement* element = getChildElement(parent, "ptm", i);
+        xercesc::DOMElement* element = getChildElement(parent, "modification", i);
         std::string abbr_name = getChildValue(element, "abbreviation", 0);
         double mono_mass = getDoubleChildValue(element, "mono_mass", 0);
         ptm_list.push_back(PtmPtr(new Ptm(abbr_name, mono_mass)));
@@ -44,7 +43,6 @@ PtmPtrVec getPtmPtrVecInstance(const char* file_name) {
       }
       delete doc;
     }
-    delete parser;
   }
   return ptm_list;
 }
