@@ -25,8 +25,7 @@ class FastaReader {
    **/                  
   std::vector<std::string> getNextSeq();
 
-  ProteoformPtr getNextProteoform(AcidPtrVec acid_list, 
-                                  PtmPtrVec  ptm_list,
+  ProteoformPtr getNextProteoformPtr(AcidPtrVec acid_list, 
                                   ResiduePtrVec residue_list);
  private:
   std::ifstream input_;
@@ -35,6 +34,8 @@ class FastaReader {
 
 std::vector<std::string> fastaPreprocess(std::string name, std::string seq);
 
+ProteoformPtrVec readFastaToProteoform(std::string file_name, 
+                                       AcidPtrVec &acid_list, ResiduePtrVec &residue_list);
 }
 
 #endif

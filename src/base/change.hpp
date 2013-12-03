@@ -33,6 +33,9 @@ class Change {
   PtmPtr ptm_ptr_;
 };
 
+typedef std::shared_ptr<Change> ChangePtr;
+typedef std::vector<ChangePtr> ChangePtrVec;
+
 }
 #endif
 

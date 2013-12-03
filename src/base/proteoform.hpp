@@ -19,7 +19,7 @@ public:
 
   int getEndPos() {return end_pos_;}
 
-  std::vector<Change> getChangeList() {return change_list_;}
+  ChangePtrVec getChangePtrVec() {return change_list_;}
 
 private:
   std::string name_;
@@ -32,7 +32,7 @@ private:
 
   int end_pos_;
 
-  std::vector<Change> change_list_;
+  ChangePtrVec change_list_;
 };
 
 typedef std::shared_ptr<Proteoform> ProteoformPtr;

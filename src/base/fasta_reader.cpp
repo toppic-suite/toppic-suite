@@ -38,8 +38,7 @@ std::vector<std::string> FastaReader::getNextSeq() {
 /**
  * Read FASTA file and return next protein as an ResSeq.
  **/
-ProteoformPtr FastaReader::getNextProteoform(AcidPtrVec acid_list, 
-                                             PtmPtrVec ptm_list,
+ProteoformPtr FastaReader::getNextProteoformPtr(AcidPtrVec acid_list, 
                                              ResiduePtrVec residue_list) {
   std::vector<std::string> seq_info = getNextSeq();
   if (seq_info.size() == 0) {
@@ -86,6 +85,17 @@ std::vector<std::string> fastaPreprocess(std::string name, std::string seq) {
   return strs;
 }
 
+ProteoformPtrVec readFastaToProteoform(std::string file_name, 
+                                       AcidPtrVec &acid_list, ResiduePtrVec &residue_list) {
+
+  FastaReader reader(file_name.c_str());
+  ProteoformPtrVec list;
+  ProteoformPtr ptr;
+  while ((ptr = reader.getNextProteoformPtr(acid_list, residue_list)).get() != nullptr) {
+    list.push_back(ptr);
+  }
+  return list;
+}
 
 }
 
