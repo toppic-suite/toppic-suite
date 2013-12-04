@@ -1,6 +1,7 @@
 #ifndef PROT_PEAK_TOLERANCE_HPP_
 #define PROT_PEAK_TOLERANCE_HPP_
 
+#include <memory>
 #include "base/xml_dom_document.hpp"
 
 namespace prot {
@@ -41,6 +42,8 @@ class PeakTolerance {
 	bool use_min_tolerance_;
 	double min_tolerance_;
 };
+
+typedef std::shared_ptr<PeakTolerance> PeakTolerancePtr;
 
 } /* namespace prot */
 
