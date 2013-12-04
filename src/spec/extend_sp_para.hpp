@@ -2,6 +2,7 @@
 #define PROT_EXTEND_SP_PARA_HPP_
 
 #include <vector>
+#include <memory>
 
 #include "base/xml_dom_document.hpp"
 
@@ -20,6 +21,8 @@ class ExtendSpPara {
   std::vector<double> ext_offsets_;
 	
 };
+
+typedef std::shared_ptr<ExtendSpPara> ExtendSpParaPtr;
 
 } /* name_space */
 
