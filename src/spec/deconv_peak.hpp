@@ -1,6 +1,7 @@
 #ifndef PROT_DECONV_PEAK_HPP_
 #define PROT_DECONV_PEAK_HPP_
 
+#include <vector>
 #include "spec/peak.hpp"
 
 namespace prot {
@@ -28,6 +29,7 @@ class DeconvPeak : public Peak {
 };
 
 typedef std::shared_ptr<DeconvPeak> DeconvPeakPtr;
+typedef std::vector<DeconvPeakPtr> DeconvPeakPtrVec;
 
 }
 #endif
