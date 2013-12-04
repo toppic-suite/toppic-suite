@@ -10,6 +10,7 @@ class PeakTolerance {
  public:
 	PeakTolerance(double ppo, bool use_min_tolerance,
 			double min_tolerance);
+	PeakTolerance(xercesc::DOMElement* element);
 
 	double compStrictErrorTole(double mass);
 

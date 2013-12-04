@@ -8,6 +8,12 @@ PeakTolerance::PeakTolerance(double ppo, bool use_min_tolerance,
   use_min_tolerance_ = use_min_tolerance;
   min_tolerance_ = min_tolerance;
 }
+
+PeakTolerance::PeakTolerance(xercesc::DOMElement* element){
+	ppo_ = getDoubleChildValue(element,"ppo",0);
+	use_min_tolerance_ = getDoubleChildValue(element,"use_min_tolerance",0);
+	min_tolerance_ = getDoubleChildValue(element,"min_tolerance",0);
+}
 	
 double PeakTolerance::compStrictErrorTole(double mass) {
   double tolerance = mass * ppo_;
