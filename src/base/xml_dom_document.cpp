@@ -141,6 +141,12 @@ std::string convertToString(double value) {
   return stream.str();
 }
 
+std::string convertToString(int value){
+	std::stringstream stream;
+	stream << value;
+	return stream.str();
+}
+
 std::string convertToString(bool value) {
   std::stringstream stream;
   stream << value;
