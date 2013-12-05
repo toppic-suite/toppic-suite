@@ -68,6 +68,16 @@ BaseData::BaseData  (char const* config_file_name) {
       fix_mod_residue_list_ = getResiduePtrVecInstance(acid_list_, ptm_list_,
                                                        residue_list_, fix_mod_residue_file_name);
       LOG4CXX_DEBUG(logger, "fix mod residue initialized ");
+
+      LOG4CXX_DEBUG(logger, "allow prot mods initialization ");
+      xercesc::DOMElement* parent = getChildElement(root, "allow_prot_mod_list", 0);
+      int prot_mod_num = getChildCount(parent, "prot_mod");
+      for (int i = 0; i < prot_mod_num; i++) {
+        std::string mod_name = getChildValue(parent, "prot_mod", i);
+        ProtModPtr ptr = getProtModPtrByName(prot_mod_list_, mod_name);
+        allow_prot_mod_list_.push_back(ptr);
+      }
+      LOG4CXX_DEBUG(logger, "allow prot mods initialized ");
     }
     delete doc;
   }
