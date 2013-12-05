@@ -40,6 +40,8 @@ class Residue {
 	/** Get string representation */
   std::string toString(std::string delim_bgn, std::string delim_end);
 
+  std::string toString() {return toString("[", "]");}
+
  private:
 	/** amino acid */
 	AcidPtr acid_ptr_;
@@ -60,9 +62,11 @@ ResiduePtr getResiduePtrByAcid(ResiduePtrVec &residue_list,
 ResiduePtr getResiduePtrByAcidPtm(ResiduePtrVec &residue_list,
                                   AcidPtr acid_ptr, PtmPtr ptm_ptr);
 
-ResiduePtrVec getResiduePtrVecInstance(AcidPtrVec &acid_list, 
-                                     PtmPtrVec &ptm_list,
-                                     const char* file_name); 
+ResiduePtrVec getResiduePtrVecInstance(AcidPtrVec &acid_list, PtmPtrVec &ptm_list,
+                                       std::string file_name); 
+
+ResiduePtrVec getResiduePtrVecInstance(AcidPtrVec &acid_list, PtmPtrVec &ptm_list,
+                                       ResiduePtrVec &residue_list, std::string file_name); 
 
 ResiduePtr addResidue(ResiduePtrVec &residue_list, AcidPtr acid_ptr,
                       PtmPtr ptm_ptr);

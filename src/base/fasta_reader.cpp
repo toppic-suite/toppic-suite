@@ -8,8 +8,8 @@ namespace prot {
 
 static log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("FastaReader"));
 
-FastaReader::FastaReader(const char* file_name) {
-  input_.open(file_name, std::ios::in);
+FastaReader::FastaReader(std::string file_name) {
+  input_.open(file_name.c_str(), std::ios::in);
   std::getline(input_, ori_name_);
 }
 
@@ -46,6 +46,7 @@ ProteoformPtr FastaReader::getNextProteoformPtr(AcidPtrVec acid_list,
   }
   std::string name = seq_info[0];
   std::string seq = seq_info[1];
+  LOG4CXX_TRACE(logger, "name " << seq_info[0] << " seq " << seq_info[1]);
   AcidPtrVec acid_seq = convertSeqToAcidSeq(acid_list, seq); 
   ResiduePtrVec residue_ptrs = convertAcidToResidueSeq(residue_list, acid_seq);
   ResSeqPtr residue_seq_ptr = ResSeqPtr(new ResidueSeq(residue_ptrs)); 
@@ -88,7 +89,9 @@ std::vector<std::string> fastaPreprocess(std::string name, std::string seq) {
 ProteoformPtrVec readFastaToProteoform(std::string file_name, 
                                        AcidPtrVec &acid_list, ResiduePtrVec &residue_list) {
 
-  FastaReader reader(file_name.c_str());
+  LOG4CXX_DEBUG(logger, "start open file " << file_name);
+  FastaReader reader(file_name);
+  LOG4CXX_DEBUG(logger, "open file done " << file_name);
   ProteoformPtrVec list;
   ProteoformPtr ptr;
   while ((ptr = reader.getNextProteoformPtr(acid_list, residue_list)).get() != nullptr) {

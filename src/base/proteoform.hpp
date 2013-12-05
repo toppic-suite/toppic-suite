@@ -11,6 +11,8 @@ class Proteoform {
 public:
 	Proteoform(std::string name, ResSeqPtr res_seq_ptr);
 
+  std::string getName() {return name_;}
+
 	ResSeqPtr getResSeqPtr() {return res_seq_ptr_;}
 
 	BpSpecPtr getBpSpecPtr() {return bp_spec_ptr_;}
@@ -20,6 +22,8 @@ public:
   int getEndPos() {return end_pos_;}
 
   ChangePtrVec getChangePtrVec() {return change_list_;}
+
+  std::string toString();
 
 private:
   std::string name_;

@@ -21,7 +21,7 @@ class BaseData {
  public:
   BaseData (char const* config_file_name);
 
-  const AcidPtrVec& getAcidPtrVec() {return acid_list_;}
+  AcidPtrVec& getAcidPtrVec() {return acid_list_;}
   PtmPtrVec& getPtmPtrVec() {return ptm_list_;}
   ResiduePtrVec& getResiduePtrVec() {return residue_list_;}
   TruncPtrVec& getTruncPtrVec() {return trunc_list_;}
@@ -29,6 +29,7 @@ class BaseData {
   IonTypePtrVec& getIonTypePtrVec() {return ion_type_list_;}
   NeutralLossPtrVec& getNeutralLossPtrVec() {return neutral_loss_list_;}
   ActivationPtrVec& getActivationPtrVec() {return activation_list_;}
+  ResiduePtrVec& getFixModResiduePtrVec() {return fix_mod_residue_list_;}
 
  private:
   AcidPtrVec acid_list_;
@@ -42,6 +43,8 @@ class BaseData {
   NeutralLossPtrVec neutral_loss_list_;
 
   ActivationPtrVec activation_list_;
+
+  ResiduePtrVec fix_mod_residue_list_;
 };
 
 typedef std::shared_ptr<BaseData> BaseDataPtr;

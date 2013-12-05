@@ -5,18 +5,21 @@
 #include <array>
 #include <map>
 
-#include "mass_constant.hpp"
-#include "residue.hpp"
-#include "prot_mod.hpp"
-#include "activation.hpp"
-#include "peak_tolerance.hpp"
-#include "extend_sp_para.hpp"
+#include "base/mass_constant.hpp"
+#include "base/residue.hpp"
+#include "base/base_data.hpp"
+#include "base/prot_mod.hpp"
+#include "base/activation.hpp"
+#include "spec/peak_tolerance.hpp"
+#include "spec/extend_sp_para.hpp"
 
 namespace prot {
 
 class ZeroPtmMng {
  public:
   ZeroPtmMng(const char* conf_file_name);
+
+  BaseDataPtr base_data_ptr_;
 
   /** zero ptm fast filtering */
   int zero_ptm_filter_result_num_ = 20;
@@ -57,6 +60,10 @@ class ZeroPtmMng {
   std::string spectrum_file_name_;
   std::string output_file_ext_;
 };
+
+typedef std::shared_ptr<ZeroPtmMng> ZeroPtmMngPtr;
+
+void zeroPtmSearchProcess(ZeroPtmMngPtr);
 
 } /* namespace_prot */
 

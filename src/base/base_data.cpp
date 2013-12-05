@@ -34,9 +34,8 @@ BaseData::BaseData  (char const* config_file_name) {
 
       std::string residue_file_name = getChildValue(root, "residue_list_file_name", 0);
       LOG4CXX_DEBUG(logger, "residue file name: " << residue_file_name);
-      residue_list_ = getResiduePtrVecInstance(acid_list_,
-                                               ptm_list_,
-                                               residue_file_name.c_str());
+      residue_list_ = getResiduePtrVecInstance(acid_list_, ptm_list_,
+                                               residue_file_name);
       LOG4CXX_DEBUG(logger, "residue initialized");
 
       std::string trunc_file_name = getChildValue(root, "trunc_list_file_name", 0);
@@ -64,6 +63,11 @@ BaseData::BaseData  (char const* config_file_name) {
       activation_list_ = getActivationPtrVecInstance(ion_type_list_, activation_file_name.c_str());
       LOG4CXX_DEBUG(logger, "activation initialized ");
 
+      std::string fix_mod_residue_file_name = getChildValue(root, "fix_mod_residue_file_name", 0);
+      LOG4CXX_DEBUG(logger, "fix mod residue file name: " << fix_mod_residue_file_name);
+      fix_mod_residue_list_ = getResiduePtrVecInstance(acid_list_, ptm_list_,
+                                                       residue_list_, fix_mod_residue_file_name);
+      LOG4CXX_DEBUG(logger, "fix mod residue initialized ");
     }
     delete doc;
   }

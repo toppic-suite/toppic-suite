@@ -1,6 +1,8 @@
 #ifndef PROT_RESIDUE_SEQ_HPP_
 #define PROT_RESIDUE_SEQ_HPP_
 
+#include <string>
+
 #include "base/mass_constant.hpp"
 #include "base/residue.hpp"
 
@@ -31,6 +33,8 @@ class ResidueSeq {
 
   /** Gets the sum of residue masses */
   double getResMassSum() {return residue_mass_sum_;}
+
+  std::string toString();
 
  private:
   /** residue list */

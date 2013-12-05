@@ -30,7 +30,7 @@ void BpSpec::initBreakPoints(ResSeqPtr res_seq_ptr){
 	if(ext_len <= 1){
 		ext_len = 2;
 	}
-	break_point_ptr_vec_[0] = BreakPointPtr(new BreakPoint(0,res_seq_ptr->getResMassSum()));
+	break_point_ptr_vec_.push_back(BreakPointPtr(new BreakPoint(0,res_seq_ptr->getResMassSum())));
 	double prm = 0;
 	for(int i=0;i<res_seq_ptr->getLen()-1;i++){
 		prm += res_seq_ptr->getResiduePtr(i)->getMass();

@@ -16,7 +16,7 @@ class FastaReader {
   /**
    * Constructs an instance with a File.
    **/
-  FastaReader(const char* file_name);
+  FastaReader(std::string);
 
   /**
    * Read FASTA file and return next protein
