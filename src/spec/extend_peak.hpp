@@ -40,12 +40,13 @@ private:
 
 typedef std::shared_ptr<ExtendPeak> ExtendPeakPtr;
 typedef std::vector<ExtendPeakPtr> ExtendPeakPtrVec;
+typedef std::shared_ptr<Ms<ExtendPeak>> ExtendPeakMs;
 
 inline bool extendpeak_up(const ExtendPeakPtr p,ExtendPeakPtr n){
   return p->getPosition() < n->getPosition();
 }
 
-Ms<ExtendPeakPtr> getMsThree(DeconvMsPtr deconv_ms,double delta,SpParaPtr sp_para);
+ExtendPeakMs getMsThree(DeconvMsPtr deconv_ms,double delta,SpParaPtr sp_para);
 
 } /* namespace prot */
 

@@ -18,7 +18,7 @@ ExtendPeak::ExtendPeak(DeconvPeakPtr base_peak,double mono_mass,double score):Pe
 }
 
 //must deleted the ms after finished using
-Ms<ExtendPeakPtr> getMsThree(DeconvMsPtr deconv_ms,double delta,SpParaPtr sp_para){
+ExtendPeakMs getMsThree(DeconvMsPtr deconv_ms,double delta,SpParaPtr sp_para){
 	MsHeaderPtr header = prot::getDeltaHeaderPtr(deconv_ms,delta);
 
 	//private function getSpThreeExtendPeak in factory
@@ -61,7 +61,7 @@ Ms<ExtendPeakPtr> getMsThree(DeconvMsPtr deconv_ms,double delta,SpParaPtr sp_par
 						list_filtered[i]->getBasePeak()->getMonoMass(),pre_mono_mass));
 	}
 	//end msThreeSetTolerance and result = list_filtered
-	 return *(new Ms<ExtendPeakPtr>(header,list_filtered));
+	 return ExtendPeakMs(new Ms<ExtendPeakPtr>(header,list_filtered));
 
 }
 } /* namespace prot */
