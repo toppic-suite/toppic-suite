@@ -40,7 +40,7 @@ private:
 
 typedef std::shared_ptr<ExtendPeak> ExtendPeakPtr;
 typedef std::vector<ExtendPeakPtr> ExtendPeakPtrVec;
-typedef std::shared_ptr<Ms<ExtendPeak>> ExtendPeakMs;
+typedef std::shared_ptr<Ms<ExtendPeakPtr>> ExtendPeakMs;
 
 inline bool extendpeak_up(const ExtendPeakPtr p,ExtendPeakPtr n){
   return p->getPosition() < n->getPosition();
