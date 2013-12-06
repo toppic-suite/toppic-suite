@@ -15,12 +15,15 @@ namespace prot {
 
 class SpecData {
 public :
-	static PrmPeakTypePtrVec& getPrmPeakTypePtrVec(){return prm_peak_type_list_;}
-	static SupportPeakTypePtrVec& getSupportPeakTypePtrVec(){return support_peak_type_list_;}
+	SpecData(char const* config_file_name);
+	PrmPeakTypePtrVec& getPrmPeakTypePtrVec(){return prm_peak_type_list_;}
+	SupportPeakTypePtrVec& getSupportPeakTypePtrVec(){return support_peak_type_list_;}
 private:
-	static PrmPeakTypePtrVec prm_peak_type_list_;
-	static SupportPeakTypePtrVec support_peak_type_list_;
+	PrmPeakTypePtrVec prm_peak_type_list_;
+	SupportPeakTypePtrVec support_peak_type_list_;
 };
+
+typedef std::shared_ptr<SpecData> SpecDataPtr;
 
 } /* namespace prot */
 
