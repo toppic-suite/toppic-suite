@@ -8,8 +8,8 @@
 #include <log4cxx/logger.h>
 
 #include "simple_prsm.hpp"
-#include "proteoform.hpp"
-#include "xml_dom_document.hpp"
+#include "base/proteoform.hpp"
+#include "base/xml_dom_document.hpp"
 
 namespace prot {
 

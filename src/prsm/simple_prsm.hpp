@@ -11,8 +11,8 @@
 #include <string>
 #include <xercesc/dom/DOM.hpp>
 
-#include "proteoform.hpp"
-#include "ms_header.hpp"
+#include "base/proteoform.hpp"
+#include "spec/ms_header.hpp"
 
 namespace prot {
 class SimplePrSM;
