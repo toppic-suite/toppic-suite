@@ -206,4 +206,59 @@ PrmPeakMS getShiftSpSix(DeconvMsPtr deconv_ms,double delta,double shift,SpParaPt
 	}
 	return PrmPeakMS(new Ms<PrmPeakPtr>(ms->getHeaderPtr(),prm_peaks));
 }
+
+std::vector<std::vector<int>> getIntMassErrorList(PrmPeakMS ms,double scale,bool n_strict,bool c_strict){
+	std::vector<int> masses;
+	std::vector<int> errors;
+	int last_mass = -1;
+	int last_error = 0;
+	for(int i=0;i<ms->size();i++){
+		int m = (int)std::round(ms->getPeakPtr(i)->getPosition()*scale);
+		int e = 0;
+		if(n_strict && c_strict){
+			e = (int) std::ceil(ms->getPeakPtr(i)->getStrictTolerance()*scale);
+		}
+		else if(n_strict && !c_strict){
+			e = (int) std::ceil(ms->getPeakPtr(i)->getNStrictCRelacTolerance()*scale);
+		}
+		else if(!n_strict && c_strict){
+			e = (int) std::ceil(ms->getPeakPtr(i)->getNRelaxCStrictTolerance()*scale);
+		}
+		if(m != last_mass){
+			masses.push_back(m);
+			errors.push_back(e);
+			last_mass = m;
+			last_error = e;
+		}
+		else if(e>last_error){
+			errors.pop_back();
+			errors.push_back(e);
+			last_error = e;
+		}
+	}
+	std::vector<int> mass_temp;
+	std::vector<int> error_temp;
+	std::vector<std::vector<int>> results;
+	for(unsigned int i=0;i<masses.size();i++){
+		mass_temp.push_back(masses[i]);
+		error_temp.push_back(errors[i]);
+	}
+	results.push_back(mass_temp);
+	results.push_back(error_temp);
+	return results;
+}
+std::vector<double> getMassList(PrmPeakMS ms){
+	std::vector<double> results;
+	for(int i=0;i<ms->size();i++){
+		results.push_back(ms->getPeakPtr(i)->getPosition());
+	}
+	return results;
+}
+std::vector<double> getScoreList(PrmPeakMS ms){
+	std::vector<double> results;
+	for(int i=0;i<ms->size();i++){
+		results.push_back(ms->getPeakPtr(i)->getScr());
+	}
+	return results;
+}
 } /* namespace prot */

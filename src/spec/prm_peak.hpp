@@ -61,6 +61,10 @@ PrmPeakMS getMsTwo(DeconvMsPtr deconv_ms,double delta,SpParaPtr sp_para);
 PrmPeakMS getSpSix(DeconvMsPtr deconv_ms,double delta,SpParaPtr sp_para);
 PrmPeakMS getShiftSpSix(DeconvMsPtr deconv_ms,double delta,double shift,SpParaPtr sp_para);
 
+std::vector<std::vector<int>> getIntMassErrorList(PrmPeakMS ms,double scale,bool n_strict,bool c_strict);
+std::vector<double> getMassList(PrmPeakMS ms);
+std::vector<double> getScoreList(PrmPeakMS ms);
+
 } /* namespace prot */
 
 #endif /* PRM_PEAK_HPP_ */
