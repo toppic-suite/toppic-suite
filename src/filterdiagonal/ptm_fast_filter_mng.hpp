@@ -11,10 +11,10 @@
 #include <vector>
 #include <memory>
 
-#include "peak_tolerance.hpp"
-#include "mass_constant.hpp"
-#include "extend_sp_para.hpp"
-#include "activation.hpp"
+#include "spec/peak_tolerance.hpp"
+#include "base/mass_constant.hpp"
+#include "spec/extend_sp_para.hpp"
+#include "base/activation.hpp"
 
 namespace prot {
 
@@ -39,7 +39,7 @@ public:
 	std::vector<double> ext_offsets_ {{0, -IM_, IM_}};
 	double extend_min_mass_ = 5000;
 	ExtendSpPara extend_sp_para_ = ExtendSpPara(extend_min_mass_, ext_offsets_);
-	ActivationPtr activation__ptr_;
+	Activation activation_ptr_;
 
 	//todo:SpPara waiting zero_ptm
 

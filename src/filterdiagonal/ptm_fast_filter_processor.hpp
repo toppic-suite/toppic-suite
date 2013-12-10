@@ -10,7 +10,7 @@
 
 #include "ptm_fast_filter_mng.hpp"
 #include "ptm_fast_filter_block.hpp"
-#include "simple_prsm.hpp"
+#include "prsm/simple_prsm.hpp"
 
 namespace prot {
 
