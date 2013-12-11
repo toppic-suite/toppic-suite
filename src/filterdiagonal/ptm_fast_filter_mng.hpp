@@ -15,6 +15,7 @@
 #include "base/mass_constant.hpp"
 #include "spec/extend_sp_para.hpp"
 #include "base/activation.hpp"
+#include "spec/sp_para.hpp";
 
 namespace prot {
 
@@ -28,7 +29,7 @@ public:
 	double ppo_ = 0.000015;
 	bool use_min_tolerance_ = true;
 	double min_tolerance_ = 0.01;
-	PeakTolerance peak_tolerance_ = PeakTolerance(ppo_,use_min_tolerance_,min_tolerance_);
+	PeakTolerancePtr peak_tolerance_ = PeakTolerancePtr(new PeakTolerance(ppo_,use_min_tolerance_,min_tolerance_));
 
 	int min_peak_num = 10;
 	double min_mass =50.0;
@@ -38,10 +39,10 @@ public:
 	// the set of offsets used to expand the monoisotopic mass list
 	std::vector<double> ext_offsets_ {{0, -IM_, IM_}};
 	double extend_min_mass_ = 5000;
-	ExtendSpPara extend_sp_para_ = ExtendSpPara(extend_min_mass_, ext_offsets_);
-	Activation activation_ptr_;
+	ExtendSpParaPtr extend_sp_para_ = ExtendSpParaPtr(new ExtendSpPara(extend_min_mass_, ext_offsets_));
+	ActivationPtr activation_ptr_;
 
-	//todo:SpPara waiting zero_ptm
+	SpParaPtr sp_para_ = SpParaPtr(new SpPara(min_peak_num,min_mass,peak_tolerance_,extend_sp_para_,activation_ptr_));
 
 	std::string search_db_file_name_;
 	std::string res_file_name;
