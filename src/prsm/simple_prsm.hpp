@@ -51,6 +51,7 @@ private:
 };
 
 SimplePrSMPtrVec findSimplePrsms(SimplePrSMPtrVec simple_prsm,MsHeaderPtr header);
+SimplePrSMPtrVec readSimplePrSM(const char * filename);
 
 } /* namespace prot */
 

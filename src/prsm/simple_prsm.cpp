@@ -73,4 +73,23 @@ bool SimplePrSM::isMatch(MsHeaderPtr header){
 	}
 }
 
+SimplePrSMPtrVec readSimplePrSM(const char * filename){
+	SimplePrSMPtrVec results;
+	XmlDOMParser* parser = getXmlDOMInstance();
+	if(parser){
+		XmlDOMDocument* doc = new XmlDOMDocument(parser, filename);
+		if (doc) {
+			xercesc::DOMElement* root = doc->getDocumentElement();
+			xercesc::DOMElement* parent = getChildElement(root, "simple_prsm_list", 0);
+			int simple_prsm_num = prot::getChildCount(parent, "simple_prsm");
+			for (int i = 0; i < simple_prsm_num; i++) {
+				xercesc::DOMElement* simple_prsm = getChildElement(parent, "simple_prsm", i);
+				results.push_back(SimplePrSMPtr(new SimplePrSM(simple_prsm)));
+			}
+		}
+		delete doc;
+	}
+	return results;
+}
+
 } /* namespace prot */
