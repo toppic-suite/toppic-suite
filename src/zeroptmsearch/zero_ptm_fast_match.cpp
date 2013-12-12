@@ -1,11 +1,55 @@
-#include "zeroptmsearch/zero_ptm_fast_match.hpp"
 
 #include <log4cxx/logger.h>
 
+#include "base/base_data.hpp"
+#include "zeroptmsearch/zero_ptm_fast_match.hpp"
 
 namespace prot {
 
 static log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("ComputeMatch"));
+
+std::vector<ZeroPtmFastMatch> zeroPtmFastFilter(int semi_align_type,
+                                                ExtendMsPtr ms_ptr,
+                                                ProteoformPtrVec &form_ptr_vec,
+                                                int report_num) {
+  std::vector<ZeroPtmFastMatch> match_vec;
+  for (unsigned int i = 0; i < form_ptr_vec.size(); i++) {
+    switch (semi_align_type) {
+      case SEMI_ALIGN_TYPE_COMPLETE: 
+        match_vec.push_back(computeCompMatch(ms_ptr, form_ptr_vec[i]));
+        break;
+      case SEMI_ALIGN_TYPE_PREFIX:
+        //matches[i] = CompMatch
+        //    .computePrefixMatch(msThree, sequences[i]);
+        break;
+      case SEMI_ALIGN_TYPE_SUFFIX:
+        //matches[i] = CompMatch
+        //    .computeSuffixMatch(msThree, sequences[i]);
+        break;
+      case SEMI_ALIGN_TYPE_INTERNAL:
+        //matches[i] = CompMatch.computeInternalMatch(msThree,
+        //                                            sequences[i]);
+        break;
+    }
+  }
+
+  /* sort */
+  std::sort(match_vec.begin(), match_vec.end(), compareZeroPtmFastMatchDown);
+
+  unsigned int num = report_num;
+  if (num > form_ptr_vec.size()) {
+    num = form_ptr_vec.size();
+  }
+  std::vector<ZeroPtmFastMatch> report_vec;
+  for (unsigned int i = 0; i < num; i++) {
+    if (match_vec[i].getScore() > 0) {
+      report_vec.push_back(match_vec[i]);
+    } else {
+      break;
+    }
+  }
+  return report_vec;
+}
 
 ZeroPtmFastMatch computeCompMatch(
     ExtendMsPtr ms_ptr, ProteoformPtr form_ptr) {
