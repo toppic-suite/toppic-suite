@@ -13,6 +13,7 @@ class Trunc {
            AcidPtrVec &acid_list, std::string str);
   std::string getName() {return name_;}
 	int getTruncLen() {return trunc_len_;}
+  AcidPtrVec getAcidPtrVec() {return acid_str_;}
 	double getShift() {return shift_;}
 
  private:

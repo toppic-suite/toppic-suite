@@ -19,7 +19,7 @@ namespace prot {
 
 class BaseData {
  public:
-  BaseData (char const* config_file_name);
+  BaseData (std::string config_file_name);
 
   AcidPtrVec& getAcidPtrVec() {return acid_list_;}
   PtmPtrVec& getPtmPtrVec() {return ptm_list_;}
@@ -32,6 +32,7 @@ class BaseData {
 
   ResiduePtrVec& getFixModResiduePtrVec() {return fix_mod_residue_list_;}
   ProtModPtrVec& getAllowProtModPtrVec() {return allow_prot_mod_list_;}
+  ActivationPtr& getActivationPtr() {return activation_ptr_;}
 
  private:
   AcidPtrVec acid_list_;
@@ -49,6 +50,8 @@ class BaseData {
   /* configuration */
   ResiduePtrVec fix_mod_residue_list_;
   ProtModPtrVec allow_prot_mod_list_;
+  /* if activation ptr is null, activation types in file are used */
+  ActivationPtr activation_ptr_;
 };
 
 typedef std::shared_ptr<BaseData> BaseDataPtr;

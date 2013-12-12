@@ -12,12 +12,12 @@ namespace prot {
 
 static log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("BaseData"));
 
-BaseData::BaseData  (char const* config_file_name) {
+BaseData::BaseData  (std::string  config_file_name) {
 
   XmlDOMParser* parser = getXmlDOMInstance();
   if (parser) {
     LOG4CXX_DEBUG(logger, "config_file_name: " << config_file_name);
-    XmlDOMDocument* doc = new XmlDOMDocument(parser, config_file_name);
+    XmlDOMDocument* doc = new XmlDOMDocument(parser, config_file_name.c_str());
     LOG4CXX_DEBUG(logger, "doc " << doc);
     if (doc) {
       xercesc::DOMElement* root = doc->getDocumentElement();
@@ -78,6 +78,10 @@ BaseData::BaseData  (char const* config_file_name) {
         allow_prot_mod_list_.push_back(ptr);
       }
       LOG4CXX_DEBUG(logger, "allow prot mods initialized ");
+
+      std::string activation_type = getChildValue(root, "activation_type", 0);
+      LOG4CXX_DEBUG(logger, "acitivation type: " << activation_type);
+      activation_ptr_ = getActivationPtrByName(activation_list_, activation_type);
     }
     delete doc;
   }

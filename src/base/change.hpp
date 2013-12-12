@@ -7,8 +7,9 @@ namespace prot {
 
 #define INPUT_CHANGE      0
 #define FIXED_CHANGE      1
-#define VARIABLE_CHANGE   2
-#define UNEXPECTED_CHANGE 3
+#define PROTEIN_VARIABLE_CHANGE   2
+#define VARIABLE_CHANGE   3
+#define UNEXPECTED_CHANGE 4
 
 class Change {
  public:

@@ -10,6 +10,10 @@ static log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("FastaReader"));
 
 FastaReader::FastaReader(std::string file_name) {
   input_.open(file_name.c_str(), std::ios::in);
+  if (!input_.is_open()) {
+    LOG4CXX_ERROR(logger, "fasta file  " << file_name << " does not exist.");
+    throw "fasta file does not exist.";
+  }
   std::getline(input_, ori_name_);
 }
 
@@ -50,7 +54,7 @@ ProteoformPtr FastaReader::getNextProteoformPtr(AcidPtrVec acid_list,
   AcidPtrVec acid_seq = convertSeqToAcidSeq(acid_list, seq); 
   ResiduePtrVec residue_ptrs = convertAcidToResidueSeq(residue_list, acid_seq);
   ResSeqPtr residue_seq_ptr = ResSeqPtr(new ResidueSeq(residue_ptrs)); 
-  return ProteoformPtr(new Proteoform(name, residue_seq_ptr));
+  return getOriProteoformPtr(name, residue_seq_ptr);
 }
 
 /** process fasta string and remove unknown letters */

@@ -17,9 +17,12 @@ namespace prot {
 
 class ZeroPtmMng {
  public:
-  ZeroPtmMng(const char* conf_file_name);
+  ZeroPtmMng(std::string conf_file_name);
 
   BaseDataPtr base_data_ptr_;
+
+  std::string search_db_file_name_;
+  std::string spectrum_file_name_;
 
   /** zero ptm fast filtering */
   int zero_ptm_filter_result_num_ = 20;
@@ -52,12 +55,8 @@ class ZeroPtmMng {
   bool   ms_one_ms_two_same_recal_ = true;
 
   /** allowed N-terminal modifications */
-  std::vector<ProtMod> allow_prot_mods_;
-  std::map<std::string, ResiduePtr> fixed_ptms_;
   std::map<std::string, ResiduePtrVec> var_ptms_;
 
-  std::string search_db_file_name_;
-  std::string spectrum_file_name_;
   std::string output_file_ext_;
 };
 

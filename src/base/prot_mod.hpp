@@ -15,6 +15,8 @@ class ProtMod {
 
   TruncPtr getTruncPtr() {return trunc_ptr_;}
 
+  PtmPtr getPtmPtr() {return ptm_ptr_;}
+
   double getProtShift() {return prot_shift_;}
 
   double getPepShift() {return pep_shift_;}
@@ -37,6 +39,6 @@ ProtModPtrVec getProtModPtrVecInstance(AcidPtrVec &acid_list,
                                        const char* file_name);
 
 ProtModPtr getProtModPtrByName(ProtModPtrVec &prot_mod_list, 
-                         const std::string &name);
+                               const std::string &name);
 }
 #endif

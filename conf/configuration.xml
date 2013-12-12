@@ -10,4 +10,11 @@
 	<activation_list_file_name>conf/activation.xml</activation_list_file_name>
 
 	<fix_mod_residue_file_name>conf/fix_mod_residue.xml</fix_mod_residue_file_name>
+	<allow_prot_mod_list>
+		<prot_mod>NONE</prot_mod>
+		<prot_mod>NME</prot_mod>
+		<prot_mod>ACETYLATION</prot_mod>
+		<prot_mod>NME_ACETYLATION</prot_mod>
+	</allow_prot_mod_list>
+  <activation_type>CID</activation_type>
 </configuration>
