@@ -127,7 +127,7 @@ void MsAlignReader::readNext() {
   for (unsigned int i = 1; i < spectrum_str_.size() - 1; i++) {
     std::string letter = spectrum_str_[i].substr(0,1);
     if (letter >= "0" && letter <= "9") {
-      boost::split(strs, spectrum_str_[i], boost::is_any_of("="));
+      boost::split(strs, spectrum_str_[i], boost::is_any_of("\t"));
       double mass = atof(strs[0].c_str());
       double inte = atof(strs[1].c_str());
       int charge = atoi(strs[2].c_str());
@@ -137,6 +137,7 @@ void MsAlignReader::readNext() {
     }
   }
   deconv_ms_ptr_ = DeconvMsPtr(new Ms<DeconvPeakPtr>(header_ptr, peak_ptr_list));
+
   current_++;
 }
 
