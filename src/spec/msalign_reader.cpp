@@ -137,6 +137,7 @@ void MsAlignReader::readNext() {
     }
   }
   deconv_ms_ptr_ = DeconvMsPtr(new Ms<DeconvPeakPtr>(header_ptr, peak_ptr_list));
+
   current_++;
 }
 
