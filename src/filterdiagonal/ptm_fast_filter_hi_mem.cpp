@@ -55,6 +55,7 @@ SimplePrSMPtrVec PtmFastFilterHiMem::sort(SimplePrSMPtrVec2D matches){
 		}
 	}
 	//todo:xunlikun@ sort simplePrSM
+
 	SimplePrSMPtrVec unique_match;
 	for(unsigned int i=0;i< sorted_match.size();i++){
 		bool found = false;
