@@ -10,7 +10,7 @@
 
 namespace prot {
 
-SpectrumSet::SpectrumSet(DeconvMsPtr sp,double delta,SpParaPtr sp_para){
+SpectrumSet::SpectrumSet(DeconvMsPtr sp,double delta,SpParaPtr sp_para,double shift){
 	//todo:xunlikun@config file name;
 	BaseDataPtr base_data = BaseDataPtr(new BaseData(""));
 	deconv_sp_ = sp;
@@ -18,9 +18,9 @@ SpectrumSet::SpectrumSet(DeconvMsPtr sp,double delta,SpParaPtr sp_para){
 	prm_ms_two_ = prot::getMsTwo(sp,delta,sp_para);
 	extend_ms_three_ = prot::getMsThree(sp,delta,sp_para);
 	prm_ms_six_=prot::getSpSix(sp,delta,sp_para);
-	prm_ms_shift_six_=prot::getShiftSpSix(sp,delta,-prot::getProtModPtrByName(base_data->getProtModPtrVec(),"ACETYLATION")->getPepShift(),sp_para);
+	prm_ms_shift_six_=prot::getShiftSpSix(sp,delta,-shift,sp_para);
 }
-SpectrumSetPtr getSpectrumSet(DeconvMsPtr spectrum,double delta,SpParaPtr sp_para){
+SpectrumSetPtr getSpectrumSet(DeconvMsPtr spectrum,double delta,SpParaPtr sp_para,double shift){
 	if(spectrum->size() < sp_para->getMinPeakNum() || spectrum->getHeaderPtr()->getPrecMonoMass() < sp_para->getMinMass()){
 		//logger
 		return nullptr;
@@ -35,7 +35,7 @@ SpectrumSetPtr getSpectrumSet(DeconvMsPtr spectrum,double delta,SpParaPtr sp_par
 		}
 	}
 
-	return SpectrumSetPtr(new SpectrumSet(spectrum,delta,sp_para));
+	return SpectrumSetPtr(new SpectrumSet(spectrum,delta,sp_para,shift));
 }
 
 } /* namespace prot */
