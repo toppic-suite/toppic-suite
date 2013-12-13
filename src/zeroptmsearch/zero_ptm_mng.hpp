@@ -12,6 +12,7 @@
 #include "base/activation.hpp"
 #include "spec/peak_tolerance.hpp"
 #include "spec/extend_sp_para.hpp"
+#include "spec/sp_para.hpp"
 
 namespace prot {
 
@@ -33,21 +34,19 @@ class ZeroPtmMng {
   double ppo_ = 0.000015;
   bool use_min_tolerance_ = true;
   double min_tolerance_ = 0.01;
-  PeakTolerance peak_tolerance_ = PeakTolerance (ppo_, use_min_tolerance_, min_tolerance_);
+  PeakTolerancePtr peak_tolerance_ptr_;
 
   /** extend sp parameter */
   double IM_ = MassConstant::getIsotopeMass();
   /** the set of offsets used to expand the monoisotopic mass list */
   std::vector<double> ext_offsets_ {{0, -IM_, IM_}};
   double extend_min_mass_ = 5000;
-  ExtendSpPara extend_sp_para_ = ExtendSpPara(extend_min_mass_, ext_offsets_);
+  ExtendSpParaPtr extend_sp_para_ptr_;
 
   int min_peak_num_ = 10;
   double min_mass_ = 50.0;
 
-  ActivationPtr activation__ptr_;
-
-  //SpPara spPara = new SpPara(minPeakNum, minMass, peakTolerance, extendSpPara, activationType);
+  SpParaPtr sp_para_ptr_;
 
   /** recalibration is used in ZeroPtmSlowMatch */
   bool   do_recalibration_ = true;

@@ -6,6 +6,7 @@
 
 namespace prot {
 
+
 static log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("ProtMod"));
 
 ProtMod::ProtMod(std::string name, TruncPtr trunc_ptr, PtmPtr ptm_ptr,
@@ -63,6 +64,11 @@ ProtModPtr getProtModPtrByName(ProtModPtrVec &prot_mod_list,
     }
   }
   return ProtModPtr(nullptr);
+}
+
+double getProtModAcetylationShift(ProtModPtrVec &prot_mod_list) {
+  ProtModPtr prot = getProtModPtrByName(prot_mod_list, PROTEIN_MOD_ACETYLATION);
+  return prot->getProtShift();
 }
 
 }

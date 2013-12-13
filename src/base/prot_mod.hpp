@@ -6,6 +6,8 @@
 
 namespace prot {
 
+#define PROTEIN_MOD_ACETYLATION "ACETYLATION"
+
 class ProtMod {
  public:
   ProtMod(std::string name, TruncPtr trunc_ptr, PtmPtr ptm_ptr,
@@ -40,5 +42,8 @@ ProtModPtrVec getProtModPtrVecInstance(AcidPtrVec &acid_list,
 
 ProtModPtr getProtModPtrByName(ProtModPtrVec &prot_mod_list, 
                                const std::string &name);
+
+double getProtModAcetylationShift(ProtModPtrVec &prot_mod_list);
+
 }
 #endif
