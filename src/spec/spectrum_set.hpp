@@ -21,7 +21,7 @@ class SpectrumSet {
 public:
 	SpectrumSet(DeconvMsPtr sp,double delta,SpParaPtr sp_para,double shift);
 	DeconvMsPtr getDeconvMs(){return deconv_sp_;}
-	ExtendPeakMs getSpThree(){return extend_ms_three_;}
+	ExtendMsPtr getSpThree(){return extend_ms_three_;}
 	PrmPeakMS getSpTwo(){return prm_ms_two_;}
 	PrmPeakMS getSpSix(){return prm_ms_six_;}
 	PrmPeakMS getSpShiftSix(){return prm_ms_shift_six_;}
@@ -30,7 +30,7 @@ private:
 	DeconvMsPtr deconv_sp_;
 	double delta_;
 	PrmPeakMS prm_ms_two_;
-	ExtendPeakMs extend_ms_three_;
+	ExtendMsPtr extend_ms_three_;
 	PrmPeakMS prm_ms_six_;
 	PrmPeakMS prm_ms_shift_six_;
 };

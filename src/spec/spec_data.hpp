@@ -15,9 +15,13 @@ namespace prot {
 
 class SpecData {
 public:
-	static std::string prm_peak_type_original = "ORIGINAL";
-	static std::string prm_peak_type_reversed = "REVERSED";
+	SpecData(){};
+	static std::string prm_peak_type_original ;
+	static std::string prm_peak_type_reversed ;
 };
+
+std::string SpecData::prm_peak_type_original = "ORIGINAL";
+std::string SpecData::prm_peak_type_reversed = "REVERSED";
 
 typedef std::shared_ptr<SpecData> SpecDataPtr;
 
