@@ -5,13 +5,13 @@
  *      Author: xunlikun
  */
 
-#include <log4cxx/logger.h>
+//#include <log4cxx/logger.h>
+//
+//#include "base/xml_dom.hpp"
+//#include "base/xml_dom_document.hpp"
+//#include "spec/spec_data.hpp"
 
-#include "base/xml_dom.hpp"
-#include "base/xml_dom_document.hpp"
-#include "spec/spec_data.hpp"
-
-namespace prot {
+//namespace prot {
 
 //static log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("SpecData"));
 //
@@ -38,4 +38,4 @@ namespace prot {
 //	  }
 //	  // deleting parser is not necessary
 //}
-} /* namespace prot */
+//} /* namespace prot */

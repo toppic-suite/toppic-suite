@@ -15,7 +15,8 @@
 #include "base/mass_constant.hpp"
 #include "spec/extend_sp_para.hpp"
 #include "base/activation.hpp"
-#include "spec/sp_para.hpp";
+#include "base/base_data.hpp"
+#include "spec/sp_para.hpp"
 
 namespace prot {
 
