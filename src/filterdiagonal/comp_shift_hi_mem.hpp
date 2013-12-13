@@ -16,7 +16,7 @@ namespace prot {
 
 class CompShiftHiMem {
 public:
-	CompShiftHiMem(ProteoformPtrVec seqs,PtmFastFilterMngPtr mng,IonTypePtrVec ion_type_ptr_vec);
+	CompShiftHiMem(ProteoformPtrVec seqs,PtmFastFilterMngPtr mng);
 	~CompShiftHiMem();
 	std::vector<std::vector<int>> compConvolution(std::vector<int> masses,int bgn_pos,int num);
 	std::vector<std::vector<int>> compConvolution(std::vector<int> masses,std::vector<int> errors,int bgn_pos,int num);

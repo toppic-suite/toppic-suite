@@ -48,6 +48,8 @@ public:
 	std::string res_file_name;
 	std::string spectrum_file_name_;
 	std::string output_file_ext_;
+
+	BaseDataPtr base_data = BaseDataPtr(new BaseData("conf/configuration.xml"));
 };
 
 typedef std::shared_ptr<PtmFastFilterMng> PtmFastFilterMngPtr;
