@@ -14,7 +14,7 @@ PtmFastFilterHiMem::PtmFastFilterHiMem(ProteoformPtrVec seqs,PtmFastFilterMngPtr
 	seqs_ = seqs;
 	index_ = CompShiftHiMemPtr(new CompShiftHiMem(seqs,mng));
 }
-SimplePrSMPtrVec PtmFastFilterHiMem::getBestMatch(PrmPeakMS ms){
+SimplePrSMPtrVec PtmFastFilterHiMem::getBestMatch(PrmMsPtr ms){
 	SimplePrSMPtrVec2D matches = compute(ms);
 	SimplePrSMPtrVec unique_match = sort(matches);
 	unsigned int num = mng_->ptm_fast_filter_result_num_;
@@ -33,7 +33,7 @@ SimplePrSMPtrVec PtmFastFilterHiMem::getBestMatch(PrmPeakMS ms){
 	}
 	return result;
 }
-SimplePrSMPtrVec2D PtmFastFilterHiMem::compute(PrmPeakMS ms){
+SimplePrSMPtrVec2D PtmFastFilterHiMem::compute(PrmMsPtr ms){
 	std::vector<std::vector<int>> masses = prot::getIntMassErrorList(ms,mng_->ptm_fast_filter_scale_,true,false);
 	//logger
 	SimplePrSMPtrVec2D match;
@@ -55,6 +55,7 @@ SimplePrSMPtrVec PtmFastFilterHiMem::sort(SimplePrSMPtrVec2D matches){
 		}
 	}
 	//todo:xunlikun@ sort simplePrSM
+
 	SimplePrSMPtrVec unique_match;
 	for(unsigned int i=0;i< sorted_match.size();i++){
 		bool found = false;

@@ -51,19 +51,22 @@ private:
 
 typedef std::shared_ptr<PrmPeak> PrmPeakPtr;
 typedef std::vector<PrmPeakPtr> PrmPeakPtrVec;
-typedef std::shared_ptr<Ms<PrmPeakPtr>> PrmPeakMS;
+typedef std::shared_ptr<Ms<PrmPeakPtr>> PrmMsPtr;
 
 inline bool prmpeak_up(const PrmPeakPtr p,PrmPeakPtr n){
   return p->getPosition() < n->getPosition();
 }
 
-PrmPeakMS getMsTwo(DeconvMsPtr deconv_ms,double delta,SpParaPtr sp_para);
-PrmPeakMS getSpSix(DeconvMsPtr deconv_ms,double delta,SpParaPtr sp_para);
-PrmPeakMS getShiftSpSix(DeconvMsPtr deconv_ms,double delta,double shift,SpParaPtr sp_para);
+PrmMsPtr getMsTwo(DeconvMsPtr deconv_ms,double delta,SpParaPtr sp_para,IonTypePtrVec ion_type_ptr_vec);
+PrmMsPtr getSpSix(DeconvMsPtr deconv_ms,double delta,SpParaPtr sp_para,IonTypePtrVec ion_type_ptr_vec);
+PrmMsPtr getShiftSpSix(DeconvMsPtr deconv_ms,double delta,double shift,SpParaPtr sp_para,IonTypePtrVec ion_type_ptr_vec);
 
-std::vector<std::vector<int>> getIntMassErrorList(PrmPeakMS ms,double scale,bool n_strict,bool c_strict);
-std::vector<double> getMassList(PrmPeakMS ms);
-std::vector<double> getScoreList(PrmPeakMS ms);
+std::vector<std::vector<int>> getIntMassErrorList(PrmMsPtr ms,double scale,bool n_strict,bool c_strict);
+std::vector<double> getMassList(PrmMsPtr ms);
+std::vector<double> getScoreList(PrmMsPtr ms);
+
+std::string const PRM_PEAK_TYPE_ORIGINAL = "ORIGINAL";
+std::string const PRM_PEAK_TYPE_REVERSED = "REVERSED";
 
 } /* namespace prot */
 

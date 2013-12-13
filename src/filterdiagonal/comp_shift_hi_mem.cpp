@@ -14,13 +14,13 @@ namespace prot {
 
 log4cxx::LoggerPtr compShiftHiMem_logger(log4cxx::Logger::getLogger("CompShiftHiMem"));
 
-CompShiftHiMem::CompShiftHiMem(ProteoformPtrVec seqs,PtmFastFilterMngPtr mng,IonTypePtrVec ion_type_ptr_vec){
+CompShiftHiMem::CompShiftHiMem(ProteoformPtrVec seqs,PtmFastFilterMngPtr mng){
 	scale_ = mng->ptm_fast_filter_scale_;
 	LOG4CXX_DEBUG(compShiftHiMem_logger, "Scale"+scale_);
 	LOG4CXX_DEBUG(compShiftHiMem_logger, "Sequence number"+seqs.size());
 	shift_array_len_ = 20000 * scale_ + 2;
 	initSeqBeginEnds(seqs);
-	initIndexes(seqs,ion_type_ptr_vec);
+	initIndexes(seqs,mng->base_data->getIonTypePtrVec());
 	LOG4CXX_DEBUG(compShiftHiMem_logger, "shift_array_len_ ="+shift_array_len_);
 	LOG4CXX_DEBUG(compShiftHiMem_logger, "seq_total_len_"+seq_total_len_);
 	LOG4CXX_DEBUG(compShiftHiMem_logger, "indexes.length"+indexes_.size());

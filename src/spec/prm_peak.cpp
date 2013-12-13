@@ -51,11 +51,11 @@ int PrmPeak::getBreakType(SupportPeakTypePtrVec support_peak_type_list){
 
 void addTwoMasses(PrmPeakPtrVec list,DeconvPeakPtr peak,double prec_mono_mass,ActivationPtr active_type){
 	double orig_mass = peak->getMonoMass()-active_type->getNIonType()->getShift();
-	PrmPeakPtr new_peak = PrmPeakPtr(new PrmPeak(peak,SpecData::prm_peak_type_original,orig_mass,1));
+	PrmPeakPtr new_peak = PrmPeakPtr(new PrmPeak(peak,prot::PRM_PEAK_TYPE_ORIGINAL,orig_mass,1));
 	list.push_back(new_peak);
 	double reverse_mass = prec_mono_mass - (peak->getMonoMass()-active_type->getCIonType()->getShift());
 	list.push_back(PrmPeakPtr(
-			new PrmPeak(peak,SpecData::prm_peak_type_reversed,reverse_mass,1)
+			new PrmPeak(peak,prot::PRM_PEAK_TYPE_REVERSED,reverse_mass,1)
 	));
 }
 
@@ -63,19 +63,19 @@ void addSixMasses(PrmPeakPtrVec list,DeconvPeakPtr peak,double prec_mono_mass,Ac
 	for(unsigned int i = 0;i<offsets.size();i++){
 		double mass = peak->getMonoMass()-active_type->getNIonType()->getShift()+offsets[i];
 		list.push_back(PrmPeakPtr(
-				new PrmPeak(peak,SpecData::prm_peak_type_original,mass,1)
+				new PrmPeak(peak,prot::PRM_PEAK_TYPE_ORIGINAL,mass,1)
 		));
 	}
 	for(unsigned int i = 0;i<offsets.size();i++){
 		double mass = peak->getMonoMass()-active_type->getCIonType()->getShift()+offsets[i];
 		list.push_back(PrmPeakPtr(
-				new PrmPeak(peak,SpecData::prm_peak_type_reversed,mass,1)
+				new PrmPeak(peak,prot::PRM_PEAK_TYPE_REVERSED,mass,1)
 		));
 	}
 }
 
 
-PrmPeakMS getMsTwo(DeconvMsPtr deconv_ms,double delta,SpParaPtr sp_para,IonTypePtrVec ion_type_ptr_vec){
+PrmMsPtr getMsTwo(DeconvMsPtr deconv_ms,double delta,SpParaPtr sp_para,IonTypePtrVec ion_type_ptr_vec){
 
 	MsHeaderPtr header = prot::getDeltaHeaderPtr(deconv_ms,delta);
 
@@ -96,9 +96,9 @@ PrmPeakMS getMsTwo(DeconvMsPtr deconv_ms,double delta,SpParaPtr sp_para,IonTypeP
 	}
 	//end filterPrmPeak
 	DeconvPeakPtr zero_peak = DeconvPeakPtr(new DeconvPeak(-1,0,0,0));
-	list_filtered.push_back(PrmPeakPtr(new PrmPeak(zero_peak,SpecData::prm_peak_type_original,0,1)));
+	list_filtered.push_back(PrmPeakPtr(new PrmPeak(zero_peak,prot::PRM_PEAK_TYPE_ORIGINAL,0,1)));
 	DeconvPeakPtr prec_peak = DeconvPeakPtr(new DeconvPeak(-1,prec_mono_mass-prot::getIonTypePtrByName(ion_type_ptr_vec,"PREC")->getShift(),0,0));
-	list_filtered.push_back(PrmPeakPtr(new PrmPeak(prec_peak,SpecData::prm_peak_type_original,
+	list_filtered.push_back(PrmPeakPtr(new PrmPeak(prec_peak,prot::PRM_PEAK_TYPE_ORIGINAL,
 			prec_mono_mass-prot::getIonTypePtrByName(ion_type_ptr_vec,"PREC")->getShift(),1)));
 	std::sort(list_filtered.begin(),list_filtered.end(),prmpeak_up);
 	//end getSpPrmPeak
@@ -114,7 +114,7 @@ PrmPeakMS getMsTwo(DeconvMsPtr deconv_ms,double delta,SpParaPtr sp_para,IonTypeP
 
 	for(unsigned int i=1;i< list_filtered.size()-1;i++){
 		list_filtered[i]->setStrictTolerance(sp_para->getPeakTolerance()->compStrictErrorTole(list_filtered[i]->getBasePeak()->getMonoMass()));
-		if(list_filtered[i]->getBaseType()==SpecData::prm_peak_type_original){
+		if(list_filtered[i]->getBaseType()==prot::PRM_PEAK_TYPE_ORIGINAL){
 			list_filtered[i]->setNStrictCRelacTolerance(sp_para->getPeakTolerance()->compStrictErrorTole(list_filtered[i]->getBasePeak()->getMonoMass()));
 			list_filtered[i]->setNRelaxCStrictTolerance(sp_para->getPeakTolerance()->compRelaxErrorTole(list_filtered[i]->getBasePeak()->getMonoMass(),prec_mono_mass));
 		}
@@ -126,9 +126,9 @@ PrmPeakMS getMsTwo(DeconvMsPtr deconv_ms,double delta,SpParaPtr sp_para,IonTypeP
 	}
 	//end settolerance
 
-	return PrmPeakMS(new Ms<PrmPeakPtr>(header,list_filtered)) ;
+	return PrmMsPtr(new Ms<PrmPeakPtr>(header,list_filtered)) ;
 }
-PrmPeakMS getSpSix(DeconvMsPtr deconv_ms,double delta,SpParaPtr sp_para,IonTypePtrVec ion_type_ptr_vec){
+PrmMsPtr getSpSix(DeconvMsPtr deconv_ms,double delta,SpParaPtr sp_para,IonTypePtrVec ion_type_ptr_vec){
 
 
 	MsHeaderPtr header = prot::getDeltaHeaderPtr(deconv_ms,delta);
@@ -156,9 +156,9 @@ PrmPeakMS getSpSix(DeconvMsPtr deconv_ms,double delta,SpParaPtr sp_para,IonTypeP
 	}
 	//end filterPrmPeak
 	DeconvPeakPtr zero_peak = DeconvPeakPtr(new DeconvPeak(-1,0,0,0));
-	list_filtered.push_back(PrmPeakPtr(new PrmPeak(zero_peak,SpecData::prm_peak_type_original,0,1)));
+	list_filtered.push_back(PrmPeakPtr(new PrmPeak(zero_peak,prot::PRM_PEAK_TYPE_ORIGINAL,0,1)));
 	DeconvPeakPtr prec_peak = DeconvPeakPtr(new DeconvPeak(-1,prec_mono_mass-prot::getIonTypePtrByName(ion_type_ptr_vec,"PREC")->getShift(),0,0));
-	list_filtered.push_back(PrmPeakPtr(new PrmPeak(prec_peak,SpecData::prm_peak_type_original,
+	list_filtered.push_back(PrmPeakPtr(new PrmPeak(prec_peak,prot::PRM_PEAK_TYPE_ORIGINAL,
 			prec_mono_mass-prot::getIonTypePtrByName(ion_type_ptr_vec,"PREC")->getShift(),1)));
 	std::sort(list_filtered.begin(),list_filtered.end(),prmpeak_up);
 
@@ -171,7 +171,7 @@ PrmPeakMS getSpSix(DeconvMsPtr deconv_ms,double delta,SpParaPtr sp_para,IonTypeP
 	list_filtered[list_filtered.size()-1]->setNRelaxCStrictTolerance(sp_para->getPeakTolerance()->compStrictErrorTole(0));
 	for(unsigned int i=1;i< list_filtered.size()-1;i++){
 		list_filtered[i]->setStrictTolerance(sp_para->getPeakTolerance()->compStrictErrorTole(list_filtered[i]->getBasePeak()->getMonoMass()));
-		if(list_filtered[i]->getBaseType()==SpecData::prm_peak_type_original){
+		if(list_filtered[i]->getBaseType()==prot::PRM_PEAK_TYPE_ORIGINAL){
 			list_filtered[i]->setNStrictCRelacTolerance(sp_para->getPeakTolerance()->compStrictErrorTole(list_filtered[i]->getBasePeak()->getMonoMass()));
 			list_filtered[i]->setNRelaxCStrictTolerance(sp_para->getPeakTolerance()->compRelaxErrorTole(list_filtered[i]->getBasePeak()->getMonoMass(),prec_mono_mass));
 		}
@@ -183,11 +183,11 @@ PrmPeakMS getSpSix(DeconvMsPtr deconv_ms,double delta,SpParaPtr sp_para,IonTypeP
 	}
 	//end settolerance
 
-	return PrmPeakMS(new Ms<PrmPeakPtr>(header,list_filtered)) ;
+	return PrmMsPtr(new Ms<PrmPeakPtr>(header,list_filtered)) ;
 }
 
-PrmPeakMS getShiftSpSix(DeconvMsPtr deconv_ms,double delta,double shift,SpParaPtr sp_para){
-	PrmPeakMS ms = getSpSix(deconv_ms,delta,sp_para);
+PrmMsPtr getShiftSpSix(DeconvMsPtr deconv_ms,double delta,double shift,SpParaPtr sp_para,IonTypePtrVec ion_type_ptr_vec){
+	PrmMsPtr ms = getSpSix(deconv_ms,delta,sp_para,ion_type_ptr_vec);
 	double mono_mz = (ms->getHeaderPtr()->getPrecMonoMass()+shift)/ms->getHeaderPtr()->getPrecCharge();
 	ms->getHeaderPtr()->setPrecMonoMz(mono_mz);
 	PrmPeakPtrVec prm_peaks ;
@@ -198,15 +198,15 @@ PrmPeakMS getShiftSpSix(DeconvMsPtr deconv_ms,double delta,double shift,SpParaPt
 			 prm_peaks.push_back(ms->getPeakPtr(i));
 		}
 	}
-	return PrmPeakMS(new Ms<PrmPeakPtr>(ms->getHeaderPtr(),prm_peaks));
+	return PrmMsPtr(new Ms<PrmPeakPtr>(ms->getHeaderPtr(),prm_peaks));
 }
 
-std::vector<std::vector<int>> getIntMassErrorList(PrmPeakMS ms,double scale,bool n_strict,bool c_strict){
+std::vector<std::vector<int>> getIntMassErrorList(PrmMsPtr ms,double scale,bool n_strict,bool c_strict){
 	std::vector<int> masses;
 	std::vector<int> errors;
 	int last_mass = -1;
 	int last_error = 0;
-	for(int i=0;i<ms->size();i++){
+	for(unsigned int i=0;i<ms->size();i++){
 		int m = (int)std::round(ms->getPeakPtr(i)->getPosition()*scale);
 		int e = 0;
 		if(n_strict && c_strict){
@@ -241,16 +241,16 @@ std::vector<std::vector<int>> getIntMassErrorList(PrmPeakMS ms,double scale,bool
 	results.push_back(error_temp);
 	return results;
 }
-std::vector<double> getMassList(PrmPeakMS ms){
+std::vector<double> getMassList(PrmMsPtr ms){
 	std::vector<double> results;
-	for(int i=0;i<ms->size();i++){
+	for(unsigned int i=0;i<ms->size();i++){
 		results.push_back(ms->getPeakPtr(i)->getPosition());
 	}
 	return results;
 }
-std::vector<double> getScoreList(PrmPeakMS ms){
+std::vector<double> getScoreList(PrmMsPtr ms){
 	std::vector<double> results;
-	for(int i=0;i<ms->size();i++){
+	for(unsigned int i=0;i<ms->size();i++){
 		results.push_back(ms->getPeakPtr(i)->getScr());
 	}
 	return results;

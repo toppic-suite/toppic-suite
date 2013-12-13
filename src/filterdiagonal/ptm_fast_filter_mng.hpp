@@ -15,7 +15,8 @@
 #include "base/mass_constant.hpp"
 #include "spec/extend_sp_para.hpp"
 #include "base/activation.hpp"
-#include "spec/sp_para.hpp";
+#include "base/base_data.hpp"
+#include "spec/sp_para.hpp"
 
 namespace prot {
 
@@ -48,6 +49,8 @@ public:
 	std::string res_file_name;
 	std::string spectrum_file_name_;
 	std::string output_file_ext_;
+
+	BaseDataPtr base_data = BaseDataPtr(new BaseData("conf/configuration.xml"));
 };
 
 typedef std::shared_ptr<PtmFastFilterMng> PtmFastFilterMngPtr;
