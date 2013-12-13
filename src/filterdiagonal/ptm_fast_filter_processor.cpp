@@ -51,7 +51,7 @@ void PtmFastFilterProcessor::processBlock(int block,std::string sp_file_name,int
 	while((deconv_sp = reader.getNextMs()) != nullptr){
 		cnt++;
 //		for(unsigned int i =0;i<deconv_sp->size();i++){
-			SpectrumSetPtr spectrum_set = prot::getSpectrumSet(deconv_sp,0,mng_->sp_para_);
+			SpectrumSetPtr spectrum_set = prot::getSpectrumSet(deconv_sp,0,mng_->sp_para_,prot::getProtModPtrByName(base_data->getProtModPtrVec(),"ACETYLATION")->getPepShift());
 			if(spectrum_set != nullptr){
 				std::string scan = deconv_sp->getHeaderPtr()->getScansString();
 				SimplePrSMPtrVec matches = filter_->getBestMathBatch(spectrum_set);
