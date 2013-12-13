@@ -14,13 +14,13 @@ namespace prot {
 
 log4cxx::LoggerPtr compShiftHiMem_logger(log4cxx::Logger::getLogger("CompShiftHiMem"));
 
-CompShiftHiMem::CompShiftHiMem(ProteoformPtrVec seqs,PtmFastFilterMngPtr mng){
+CompShiftHiMem::CompShiftHiMem(ProteoformPtrVec seqs,PtmFastFilterMngPtr mng,IonTypePtrVec ion_type_ptr_vec){
 	scale_ = mng->ptm_fast_filter_scale_;
 	LOG4CXX_DEBUG(compShiftHiMem_logger, "Scale"+scale_);
 	LOG4CXX_DEBUG(compShiftHiMem_logger, "Sequence number"+seqs.size());
 	shift_array_len_ = 20000 * scale_ + 2;
 	initSeqBeginEnds(seqs);
-	initIndexes(seqs);
+	initIndexes(seqs,ion_type_ptr_vec);
 	LOG4CXX_DEBUG(compShiftHiMem_logger, "shift_array_len_ ="+shift_array_len_);
 	LOG4CXX_DEBUG(compShiftHiMem_logger, "seq_total_len_"+seq_total_len_);
 	LOG4CXX_DEBUG(compShiftHiMem_logger, "indexes.length"+indexes_.size());
@@ -162,9 +162,7 @@ void CompShiftHiMem::initSeqBeginEnds(ProteoformPtrVec seqs){
 		}
 	}
 }
-void CompShiftHiMem::initIndexes(ProteoformPtrVec seqs){
-	//todo:xunlikun@config file name;
-	BaseDataPtr base_data = BaseDataPtr(new BaseData("configfile name"));
+void CompShiftHiMem::initIndexes(ProteoformPtrVec seqs,IonTypePtrVec ion_type_ptr_vec){
 
 	std::vector<int> cnt;
 	std::vector<int> index_pnt;
@@ -176,7 +174,7 @@ void CompShiftHiMem::initIndexes(ProteoformPtrVec seqs){
 	}
 
 	for(unsigned int i =0;i<seqs.size();i++){
-		CompShiftHiMem::updateCnt(seqs[i],cnt,base_data);
+		CompShiftHiMem::updateCnt(seqs[i],cnt,ion_type_ptr_vec);
 	}
 	int pnt = 0;
 	for(unsigned int i=0;i<cnt.size();i++){
@@ -194,7 +192,7 @@ void CompShiftHiMem::initIndexes(ProteoformPtrVec seqs){
 		if(i/10000*1000 == i){
 			LOG4CXX_DEBUG(compShiftHiMem_logger, "preprocessing seq "+i);
 		}
-		std::vector<int> mass = seqs[i]->getBpSpecPtr()->getScaledMass(scale_,prot::getIonTypePtrByName(base_data->getIonTypePtrVec(),"B"));
+		std::vector<int> mass = seqs[i]->getBpSpecPtr()->getScaledMass(scale_,prot::getIonTypePtrByName(ion_type_ptr_vec,"B"));
 		unsigned int bgn = 0;
 		unsigned int end =0;
 		unsigned int diff =0;
@@ -214,9 +212,9 @@ void CompShiftHiMem::initIndexes(ProteoformPtrVec seqs){
 		}
 	}
 }
-void CompShiftHiMem::updateCnt(ProteoformPtr seq,std::vector<int> cnt,BaseDataPtr base_data){
+void CompShiftHiMem::updateCnt(ProteoformPtr seq,std::vector<int> cnt,IonTypePtrVec ion_type_ptr_vec){
 
-	std::vector<int> mass = seq->getBpSpecPtr()->getScaledMass(scale_,prot::getIonTypePtrByName(base_data->getIonTypePtrVec(),"B"));
+	std::vector<int> mass = seq->getBpSpecPtr()->getScaledMass(scale_,prot::getIonTypePtrByName(ion_type_ptr_vec,"B"));
 	unsigned int bgn =0;
 	unsigned int end =0;
 	unsigned int diff=0;

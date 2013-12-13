@@ -16,7 +16,7 @@ namespace prot {
 
 class CompShiftHiMem {
 public:
-	CompShiftHiMem(ProteoformPtrVec seqs,PtmFastFilterMngPtr mng);
+	CompShiftHiMem(ProteoformPtrVec seqs,PtmFastFilterMngPtr mng,IonTypePtrVec ion_type_ptr_vec);
 	~CompShiftHiMem();
 	std::vector<std::vector<int>> compConvolution(std::vector<int> masses,int bgn_pos,int num);
 	std::vector<std::vector<int>> compConvolution(std::vector<int> masses,std::vector<int> errors,int bgn_pos,int num);
@@ -33,8 +33,8 @@ private:
 	std::vector<int> indexes_;
 
 	void initSeqBeginEnds(ProteoformPtrVec seqs);
-	void initIndexes(ProteoformPtrVec seqs);
-	void updateCnt(ProteoformPtr seq,std::vector<int> cnt,BaseDataPtr base_data);
+	void initIndexes(ProteoformPtrVec seqs,IonTypePtrVec ion_type_ptr_vec);
+	void updateCnt(ProteoformPtr seq,std::vector<int> cnt,IonTypePtrVec ion_type_ptr_vec);
 
 };
 
