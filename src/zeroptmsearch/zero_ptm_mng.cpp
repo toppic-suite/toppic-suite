@@ -2,6 +2,7 @@
 #include "base/fasta_reader.hpp"
 #include "spec/msalign_reader.hpp"
 #include "zeroptmsearch/zero_ptm_mng.hpp"
+#include "zeroptmsearch/zero_ptm_fast_match.hpp"
 
 #include <log4cxx/logger.h>
 

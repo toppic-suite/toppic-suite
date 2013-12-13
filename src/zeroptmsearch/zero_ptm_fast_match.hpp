@@ -21,6 +21,11 @@ class ZeroPtmFastMatch {
   double score_;
 };
 
+inline double compareZeroPtmFastMatchDown(ZeroPtmFastMatch m1, ZeroPtmFastMatch m2) {
+  return m2.getScore() - m1.getScore();
+}
+
+
 ZeroPtmFastMatch computeCompMatch(
     ExtendMsPtr ms_ptr, ProteoformPtr form_ptr);
 
