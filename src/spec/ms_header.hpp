@@ -44,6 +44,8 @@ class MsHeader {
 
   int getPrecId() {return prec_id_;}
 
+  double getErrorTolerance() {return error_tolerance_;}
+
   /* set function */
   void setActivationPtr(ActivationPtr acti_ptr) {activation_ptr_ = acti_ptr;}
 
@@ -69,6 +71,8 @@ class MsHeader {
 
   void setPrecId(int prec_id) {prec_id_ = prec_id;}
 
+  void setErrorTolerance(double ppo) {error_tolerance_ = getPrecMonoMass() * ppo;}
+
  private:
   /** data set name */
   std::string file_name_;
@@ -93,6 +97,8 @@ class MsHeader {
   double prec_mono_mz_ = -1;
   /** precursor charge state */ 
   int prec_charge_ = -1;
+  /** precursor mass error tolerance */
+  double error_tolerance_;
 };
 
 typedef std::shared_ptr<MsHeader> MsHeaderPtr;
