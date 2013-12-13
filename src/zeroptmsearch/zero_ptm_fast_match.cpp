@@ -19,8 +19,7 @@ std::vector<ZeroPtmFastMatch> zeroPtmFastFilter(int semi_align_type,
         match_vec.push_back(computeCompMatch(ms_ptr, form_ptr_vec[i]));
         break;
       case SEMI_ALIGN_TYPE_PREFIX:
-        //matches[i] = CompMatch
-        //    .computePrefixMatch(msThree, sequences[i]);
+        match_vec.push_back(computePrefixMatch(ms_ptr, form_ptr_vec[i]));
         break;
       case SEMI_ALIGN_TYPE_SUFFIX:
         //matches[i] = CompMatch
@@ -74,7 +73,44 @@ ZeroPtmFastMatch computeCompMatch(
     masses = form_ptr->getBpSpecPtr()->getBreakPointMasses(c_ion_type);
     score += compDiagScr(ms_ptr, masses, 0);
   }
-  return ZeroPtmFastMatch(form_ptr, score);
+  return ZeroPtmFastMatch(form_ptr, score, 0, form_ptr->getResSeqPtr()->getLen() - 1);
+}
+
+ZeroPtmFastMatch computePrefixMatch(
+    ExtendMsPtr ms_ptr, ProteoformPtr form_ptr) {
+  /* check if there is a matched prefix */
+  bool is_prefix = false;
+  std::vector<double> prms = form_ptr->getBpSpecPtr()->getPrmMasses();
+  MsHeaderPtr header_ptr = ms_ptr->getHeaderPtr();
+  // to do double maxError = msThree.getHeader().getErrorTolerance();
+  double max_error = 0.01;
+  double prec_mass = header_ptr->getPrecMonoMassMinusWater();
+  int seq_end = 0;
+  double c_term_shift = 0;
+  for (unsigned int i = 0; i < prms.size() - 1; i++) {
+    if (abs(prec_mass - prms[i]) <= max_error) {
+      is_prefix = true;
+      seq_end = i - 1;
+      c_term_shift = prms[i] - prms[prms.size() -1];
+      break;
+    } else {
+      if (prms[i] > prec_mass) {
+        break;
+      }
+    }
+  }
+  double score = 0;
+  if (is_prefix) {
+    ActivationPtr activation = header_ptr->getActivationPtr();
+    IonTypePtr n_ion_type = activation->getNIonType();
+    std::vector<double> masses = form_ptr->getBpSpecPtr()->getBreakPointMasses(n_ion_type);
+    score = compDiagScr(ms_ptr, masses, 0);
+
+    IonTypePtr c_ion_type = activation->getCIonType();
+    masses = form_ptr->getBpSpecPtr()->getBreakPointMasses(c_ion_type);
+    score += compDiagScr(ms_ptr, masses, c_term_shift);
+  }
+  return ZeroPtmFastMatch(form_ptr, score, 0, seq_end);
 }
 
 
