@@ -17,6 +17,11 @@
 
 namespace prot {
 
+#define SEMI_ALIGN_TYPE_COMPLETE 0
+#define SEMI_ALIGN_TYPE_PREFIX   1
+#define SEMI_ALIGN_TYPE_SUFFIX   2
+#define SEMI_ALIGN_TYPE_INTERNAL 3
+
 class BaseData {
  public:
   BaseData (std::string config_file_name);

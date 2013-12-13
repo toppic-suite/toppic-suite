@@ -1,6 +1,7 @@
 #include "base/proteoform.hpp"
 #include "base/fasta_reader.hpp"
 #include "spec/msalign_reader.hpp"
+#include "spec/spectrum_set.hpp"
 #include "zeroptmsearch/zero_ptm_mng.hpp"
 #include "zeroptmsearch/zero_ptm_fast_match.hpp"
 
@@ -10,9 +11,13 @@ namespace prot {
 
 static log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("ZeroPtmMng"));
 
-ZeroPtmMng::ZeroPtmMng(std::string conf_file_name) {
-  base_data_ptr_ = BaseDataPtr(new BaseData(conf_file_name));
-}
+ZeroPtmMng::ZeroPtmMng(std::string conf_file_name): 
+    base_data_ptr_ (new BaseData(conf_file_name)),
+    peak_tolerance_ptr_ (new PeakTolerance(ppo_, use_min_tolerance_, min_tolerance_)),
+    extend_sp_para_ptr_ (new ExtendSpPara(extend_min_mass_, ext_offsets_)),
+    sp_para_ptr_(new SpPara(min_peak_num_, min_mass_, peak_tolerance_ptr_, 
+                           extend_sp_para_ptr_, base_data_ptr_->getActivationPtr())) 
+  {}
 
 void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
   /*
@@ -22,7 +27,6 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
   for (unsigned int i = 0; i < 10; i++) {
     std::cout << ori_forms[i]->toString();
   }
-
   ProteoformPtrVec prot_mod_forms = generateProtModProteoform(ori_forms, 
                                                               mng_ptr->base_data_ptr_->getResiduePtrVec(),
                                                               mng_ptr->base_data_ptr_->getAllowProtModPtrVec());
@@ -33,16 +37,29 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
 
   int spectra_num = countSpNum (mng_ptr->spectrum_file_name_.c_str(), 
                                 mng_ptr->base_data_ptr_->getActivationPtrVec());
-
   LOG4CXX_DEBUG(logger, "spectra_number  " << spectra_num);
 
+  MsAlignReader reader(mng_ptr->spectrum_file_name_.c_str(), 
+                       mng_ptr->base_data_ptr_->getActivationPtrVec());
+  LOG4CXX_DEBUG(logger, "start reading");
+
+  int n = 0;
+  DeconvMsPtr ms_ptr = reader.getNextMs();
+  ProtModPtrVec prot_mod_ptr_list = mng_ptr->base_data_ptr_->getProtModPtrVec();
+  double shift = getProtModAcetylationShift(prot_mod_ptr_list);
+
+  while (ms_ptr.get() != nullptr) {
+    n++;
+    //SpectrumSetPtr spec_set_ptr = getSpectrumSet(ms_ptr, 0, mng_ptr->sp_para_ptr_, shift);
+    
+    ms_ptr = reader.getNextMs();
+  }
 
   /*
   searcher = new ZeroPtmSearcher(seqs, mng);
 
   String outputFileName = BioIo.getBaseName(mng.spectrumFileName) + "." + mng.outputFileExt;
-  File spFile = new File(mng.spectrumFileName);
-  int nSpectra = MsAlignReader.countSpNum(spFile);
+
   MsAlignReader spReader = new MsAlignReader(spFile);
   PrSMXmlWriter writers[] = new PrSMXmlWriter[4];
   for (int i = 0; i < 4; i++) {
