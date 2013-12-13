@@ -65,8 +65,8 @@ std::vector<std::vector<int>> getIntMassErrorList(PrmMsPtr ms,double scale,bool 
 std::vector<double> getMassList(PrmMsPtr ms);
 std::vector<double> getScoreList(PrmMsPtr ms);
 
-std::string PRM_PEAK_TYPE_ORIGINAL = "ORIGINAL";
-std::string PRM_PEAK_TYPE_REVERSED = "REVERSED";
+std::string const PRM_PEAK_TYPE_ORIGINAL = "ORIGINAL";
+std::string const PRM_PEAK_TYPE_REVERSED = "REVERSED";
 
 } /* namespace prot */
 
