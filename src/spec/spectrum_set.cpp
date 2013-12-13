@@ -11,8 +11,6 @@
 namespace prot {
 
 SpectrumSet::SpectrumSet(DeconvMsPtr sp,double delta,SpParaPtr sp_para,double shift){
-	//todo:xunlikun@config file name;
-//	BaseDataPtr base_data = BaseDataPtr(new BaseData(""));
 	deconv_sp_ = sp;
 	delta_=delta;
 	prm_ms_two_ = prot::getMsTwo(sp,delta,sp_para);

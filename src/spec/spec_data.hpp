@@ -14,13 +14,9 @@
 namespace prot {
 
 class SpecData {
-public :
-	SpecData(char const* config_file_name);
-	PrmPeakTypePtrVec& getPrmPeakTypePtrVec(){return prm_peak_type_list_;}
-	SupportPeakTypePtrVec& getSupportPeakTypePtrVec(){return support_peak_type_list_;}
-private:
-	PrmPeakTypePtrVec prm_peak_type_list_;
-	SupportPeakTypePtrVec support_peak_type_list_;
+public:
+	static std::string prm_peak_type_original = "ORIGINAL";
+	static std::string prm_peak_type_reversed = "REVERSED";
 };
 
 typedef std::shared_ptr<SpecData> SpecDataPtr;

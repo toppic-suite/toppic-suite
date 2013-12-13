@@ -23,14 +23,14 @@ namespace prot {
 
 class PrmPeak : public Peak {
 public:
-	PrmPeak(DeconvPeakPtr base_peak,PrmPeakTypePtr base_type,double mono_mass,double score);
+	PrmPeak(DeconvPeakPtr base_peak,std::string base_type,double mono_mass,double score);
 	void addNghbEdge(DeconvPeakPtr peak,double offset,SupportPeakTypePtr peak_type,double score);
 	int getNeighborSize(){return neighbor_list_.size();}
 	DeconvPeakPtr getBasePeak(){return base_peak_;}
 	double getMonoMass(){return mono_mass_;}
 	double getScr(){return score_;}
 	double getStrictTolerance(){return strict_tolerance_;}
-	PrmPeakTypePtr getBaseType(){return base_type_;}
+	std::string getBaseType(){return base_type_;}
 	double getNStrictCRelacTolerance(){return n_strict_c_relax_tolerance_;}
 	double getNRelaxCStrictTolerance(){return n_relax_c_strict_tolerance_;}
 	int getBreakType(SupportPeakTypePtrVec support_peak_type_list);
@@ -42,7 +42,7 @@ private:
 	DeconvPeakPtr base_peak_;
 	double mono_mass_;
 	double score_;
-	PrmPeakTypePtr base_type_;
+	std::string base_type_;
 	double strict_tolerance_;
 	double n_strict_c_relax_tolerance_;
 	double n_relax_c_strict_tolerance_;
