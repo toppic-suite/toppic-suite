@@ -41,6 +41,11 @@ ZeroPtmFastMatch computeCompMatch(
 ZeroPtmFastMatch computePrefixMatch(
     ExtendMsPtr ms_ptr, ProteoformPtr form_ptr);
 
+ZeroPtmFastMatch computeSuffixMatch(
+    ExtendMsPtr ms_ptr, ProteoformPtr form_ptr);
+
+ZeroPtmFastMatch computeInternalMatch(
+    ExtendMsPtr ms_ptr, ProteoformPtr form_ptr);
 /*
  * in the computing of diagonal score in fast filtering, we allow to use n
  * terminal large error tolerance
