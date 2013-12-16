@@ -62,12 +62,12 @@ xercesc::DOMElement* SimplePrSM::toXml(XmlDOMDocument* xml_doc){
 	str = convertToString(precursor_id_);
 	xml_doc->addElement(element, "precursor_id", str.c_str());
 	str = convertToString(prec_mass_);
-	xml_doc->addElement(element, "prec_mass", str.c_str());
+	xml_doc->addElement(element, "precursor_mass", str.c_str());
 	str = convertToString(seq_id_);
-	xml_doc->addElement(element, "seq_id", str.c_str());
+	xml_doc->addElement(element, "sequence_id", str.c_str());
 	str = convertToString(score_);
 	xml_doc->addElement(element, "score", str.c_str());
-	xml_doc->addElement(element, "seq_name", seq_name_.c_str());
+	xml_doc->addElement(element, "sequence_name", seq_name_.c_str());
 	return element;
 }
 bool SimplePrSM::isMatch(MsHeaderPtr header){
@@ -75,8 +75,25 @@ bool SimplePrSM::isMatch(MsHeaderPtr header){
 	std::string header_spectrum_scan = header->getScansString();
 	int header_precursor_id = header->getPrecId();
 	double header_precursor_mass = header->getPrecMonoMass();
+//	std::cout<<header_spectrum_id<<std::endl;
+//	std::cout<<spectrum_id_<<std::endl;
+//	std::cout<<header_precursor_id<<std::endl;
+//	std::cout<<precursor_id_<<std::endl;
 	if(header_spectrum_id == spectrum_id_ && header_precursor_id == precursor_id_){
-		if(header_precursor_mass != prec_mass_ ||
+//			std::cout<<std::fixed;
+//			std::cout<<header_precursor_mass<<std::endl;
+//			std::cout<<prec_mass_<<std::endl;
+//			std::cout<<header_spectrum_scan<<std::endl;
+//			std::cout<<spectrum_scan_<<std::endl;
+//		double a =1754.1;
+//		double b =1754.1;
+//		std::cout<< (a != b) <<std::endl;
+//			std::cout<< (header_precursor_mass != prec_mass_) <<std::endl;
+//			std::cout<< (header_spectrum_scan.compare(spectrum_scan_)!=0) <<std::endl;
+//			std::string a = "a";
+//			std::string b = "a";
+//			std::cout<< (a.compare(b)) <<std::endl;
+		if(header_precursor_mass!=prec_mass_ ||
 				header_spectrum_scan.compare(spectrum_scan_)!=0){
 			LOG4CXX_ERROR(sPrsm_logger, "Error in combine simple PrSMs! ");
 		}
@@ -95,10 +112,9 @@ SimplePrSMPtrVec readSimplePrSM(const char * filename){
 		XmlDOMDocument* doc = new XmlDOMDocument(parser, filename);
 		if (doc) {
 			xercesc::DOMElement* root = doc->getDocumentElement();
-			xercesc::DOMElement* parent = getChildElement(root, "simple_prsm_list", 0);
-			int simple_prsm_num = prot::getChildCount(parent, "simple_prsm");
+			int simple_prsm_num = prot::getChildCount(root, "simple_prsm");
 			for (int i = 0; i < simple_prsm_num; i++) {
-				xercesc::DOMElement* simple_prsm = getChildElement(parent, "simple_prsm", i);
+				xercesc::DOMElement* simple_prsm = getChildElement(root, "simple_prsm", i);
 				results.push_back(SimplePrSMPtr(new SimplePrSM(simple_prsm)));
 			}
 		}

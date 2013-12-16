@@ -13,6 +13,7 @@
 
 #include "base/proteoform.hpp"
 #include "spec/ms_header.hpp"
+#include "base/xml_dom_document.hpp"
 
 namespace prot {
 class SimplePrSM;
@@ -34,7 +35,6 @@ public:
 	int getPrecursorId(){return precursor_id_;}
 	int compareTo(SimplePrSMPtr simple_prsm_ptr);
 	void findSeq(std::vector<ProteoformPtr> seqs);
-	//todo:should the element be shared_prt?
 	xercesc::DOMElement* toXml(XmlDOMDocument* xml_doc);
 	bool isMatch(MsHeaderPtr header);
 
