@@ -38,7 +38,7 @@ void PtmFastFilterProcessor::processBlock(int block,std::string sp_file_name,int
 	std::stringstream block_s;
 	block_s<<block;
 	std::string output_file_name = mng_->spectrum_file_name_ + "." + mng_->output_file_ext_+"_"+block_s.str();
-//	SimplePrSMWriter prsm_writer(sp_file_name.c_str());
+	SimplePrSMWriter writer;
 	DeconvMsPtr deconv_sp;
 	int cnt = 0;
 	while((deconv_sp = reader.getNextMs()) != nullptr){
@@ -48,12 +48,13 @@ void PtmFastFilterProcessor::processBlock(int block,std::string sp_file_name,int
 			if(spectrum_set != nullptr){
 				std::string scan = deconv_sp->getHeaderPtr()->getScansString();
 				SimplePrSMPtrVec matches = filter_->getBestMathBatch(spectrum_set);
-				//writer.write(matches);
+				writer.addSimplePrSM(matches);
 			}
 //		}
 	}
+	writer.write(output_file_name.c_str());
 	reader.close();
-	//writer.close();
+//	writer.close();
 	//system.out
 }
 
@@ -66,26 +67,27 @@ void PtmFastFilterProcessor::combineBlock(std::string sp_file_name){
 		std::stringstream block_s;
 		block_s<<i;
 		std::string block_file_name = mng_->spectrum_file_name_+ "." + mng_->output_file_ext_+"_"+block_s.str();
+		std::cout<< block_file_name<<std::endl;
 		matches.push_back(prot::readSimplePrSM(block_file_name.c_str()));
 	}
 
 	MsAlignReader reader(sp_file_name.c_str(), mng_->base_data->getActivationPtrVec());
 	std::string output_file_name = mng_->spectrum_file_name_ + "." + mng_->output_file_ext_+"_COMBINED";
-	//writer
+	SimplePrSMWriter writer;
 	DeconvMsPtr deconv_sp;
 	while((deconv_sp = reader.getNextMs()) != nullptr){
 		//private getBestMatch
 		SimplePrSMPtrVec selected_matche;
 		for(unsigned int i=0;i<matches.size();i++){
-			for(unsigned int j=0;i<matches[i].size();j++){
+			for(unsigned int j=0;j<matches[i].size();j++){
 				if(matches[i][j]->isMatch(deconv_sp->getHeaderPtr())){
 					selected_matche.push_back(matches[i][j]);
 				}
 			}
 		}
-		//writer;
+		writer.addSimplePrSM(selected_matche);
 	}
-
+	writer.write(output_file_name.c_str());
 	reader.close();
 	//writer.close
 	//system.out
