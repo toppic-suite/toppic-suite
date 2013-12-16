@@ -15,13 +15,13 @@ LFLAGS = -L/lib
 LIBS = -lxerces-c -llog4cxx
 #
 # define the C++ source files
-SRCS = theo_peak.cpp extend_sp_para.cpp peak_tolerance.cpp msalign_reader.cpp deconv_ms.cpp ms.cpp peak_list.cpp ms_header.cpp deconv_peak.cpp
+SRCS = support_peak_type.cpp theo_peak.cpp extend_sp_para.cpp peak_tolerance.cpp msalign_reader.cpp deconv_ms.cpp ms.cpp peak_list.cpp ms_header.cpp deconv_peak.cpp
 #
 # define the C object files 
 #
 
 OBJ_DIR = ../../obj
-OBJS = $(addprefix $(OBJ_DIR)/, theo_peak.o extend_sp_para.o peak_tolerance.o ion.o ion_type.o xml_dom.o xml_dom_document.o activation.o msalign_reader.o deconv_ms.o ms.o peak_list.o ms_header.o deconv_peak.o)
+OBJS = $(addprefix $(OBJ_DIR)/, extend_peak.o support_peak.o support_peak_type.o prm_peak.o spectrum_set.o sp_para.o theo_peak.o extend_sp_para.o peak_tolerance.o ion.o ion_type.o xml_dom.o xml_dom_document.o activation.o msalign_reader.o deconv_ms.o ms.o peak_list.o ms_header.o deconv_peak.o)
 
 BIN_DIR = ../../bin
 

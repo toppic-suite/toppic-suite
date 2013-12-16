@@ -8,17 +8,26 @@ namespace prot {
 
 class ZeroPtmFastMatch {
  public:
-  ZeroPtmFastMatch (ProteoformPtr proteoform_ptr, double score) {
+  ZeroPtmFastMatch (ProteoformPtr proteoform_ptr, double score, 
+                    int begin, int end) {
     proteoform_ptr_ = proteoform_ptr;
-    score_ = score_;
+    score_ = score;
+    begin_ = begin;
+    end_ = end;
   }
   double getScore() {return score_;}
 
   ProteoformPtr getFormPtr() {return proteoform_ptr_;}
 
+  int getBegin() {return begin_;}
+
+  int getEnd() {return end_;}
+
  private:
   ProteoformPtr proteoform_ptr_;
   double score_;
+  int begin_;
+  int end_;
 };
 
 inline double compareZeroPtmFastMatchDown(ZeroPtmFastMatch m1, ZeroPtmFastMatch m2) {
@@ -29,6 +38,14 @@ inline double compareZeroPtmFastMatchDown(ZeroPtmFastMatch m1, ZeroPtmFastMatch 
 ZeroPtmFastMatch computeCompMatch(
     ExtendMsPtr ms_ptr, ProteoformPtr form_ptr);
 
+ZeroPtmFastMatch computePrefixMatch(
+    ExtendMsPtr ms_ptr, ProteoformPtr form_ptr);
+
+ZeroPtmFastMatch computeSuffixMatch(
+    ExtendMsPtr ms_ptr, ProteoformPtr form_ptr);
+
+ZeroPtmFastMatch computeInternalMatch(
+    ExtendMsPtr ms_ptr, ProteoformPtr form_ptr);
 /*
  * in the computing of diagonal score in fast filtering, we allow to use n
  * terminal large error tolerance

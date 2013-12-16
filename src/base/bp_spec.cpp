@@ -43,6 +43,7 @@ void BpSpec::initBreakPoints(ResSeqPtr res_seq_ptr){
 	break_point_ptr_vec_.push_back(BreakPointPtr(new BreakPoint(res_seq_ptr->getResMassSum(),0)));
 }
 
+//
 std::vector<double> BpSpec::getBreakPointMasses(IonTypePtr ion_type){
 	std::vector<double> bpmass_vec;
 	if (ion_type->isNTerm()) {
@@ -59,7 +60,19 @@ std::vector<double> BpSpec::getBreakPointMasses(IonTypePtr ion_type){
 	return bpmass_vec;
 }
 
-void BpSpec::addBreakPointMass(double mass,double seq_mass,double min_mass,std::vector<double> mass_vec){
+//
+std::vector<double> BpSpec::getPrmMasses() {
+  std::vector<double> mass_vec;
+  for (unsigned int i = 0; i < break_point_ptr_vec_.size(); i++) {
+    mass_vec.push_back(break_point_ptr_vec_[i]->getPrm());
+  }
+  std::sort(mass_vec.begin(),mass_vec.end(),std::less<double>());
+  return mass_vec;
+}
+
+
+void BpSpec::addBreakPointMass(double mass,double seq_mass,double min_mass,
+                               std::vector<double> &mass_vec){
 	if (mass >= min_mass &&  mass <= seq_mass - min_mass){
 		mass_vec.push_back(mass);
 	}
