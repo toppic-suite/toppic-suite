@@ -25,10 +25,26 @@ XmlDOMDocument::XmlDOMDocument(XmlDOMParser* parser,
   }
 }
 
+XmlDOMDocument::XmlDOMDocument(xercesc::DOMDocument* doc){
+	doc_=doc;
+}
+
 XmlDOMDocument::~XmlDOMDocument() {
   if (doc_) {
     doc_->release();
   }
+}
+
+void XmlDOMDocument::addElement(xercesc::DOMElement* element){
+	doc_->appendChild(element);
+}
+
+void XmlDOMDocument::addElement(xercesc::DOMElement* parent,xercesc::DOMElement* child){
+	parent->appendChild(child);
+}
+
+int XmlDOMDocument::writeXmlDOMDocument(const char * filename){
+	return prot::writeXmlFile(doc_,filename);
 }
 
 xercesc::DOMElement* getChildElement(xercesc::DOMElement *parent, 
