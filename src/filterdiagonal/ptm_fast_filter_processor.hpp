@@ -29,6 +29,8 @@ private:
 	SimplePrSMPtrVec2D getBestMatch(SimplePrSMPtrVec2D matches,MsHeaderPtr header);
 };
 
+typedef std::shared_ptr<PtmFastFilterProcessor> PtmFastFilterProcessorPtr;
+
 } /* namespace prot */
 
 #endif /* PTM_FAST_FILTER_PROCESSOR_HPP_ */

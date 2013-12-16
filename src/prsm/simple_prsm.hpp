@@ -35,7 +35,7 @@ public:
 	int compareTo(SimplePrSMPtr simple_prsm_ptr);
 	void findSeq(std::vector<ProteoformPtr> seqs);
 	//todo:should the element be shared_prt?
-	xercesc::DOMElement* toXml();
+	xercesc::DOMElement* toXml(XmlDOMDocument* xml_doc);
 	bool isMatch(MsHeaderPtr header);
 
 private:

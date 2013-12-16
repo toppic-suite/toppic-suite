@@ -6,6 +6,7 @@
  */
 
 #include <log4cxx/logger.h>
+#include <iostream>
 
 #include "simple_prsm.hpp"
 #include "base/proteoform.hpp"
@@ -52,9 +53,22 @@ int SimplePrSM::compareTo(SimplePrSMPtr simple_prsm_ptr){
 void SimplePrSM::findSeq(std::vector<ProteoformPtr> seqs){
 //todo: didn't find id
 }
-//todo:should the element be shared_prt? peak_tolarance
-xercesc::DOMElement* toXml(){
-	//todo:implement toXml
+
+xercesc::DOMElement* SimplePrSM::toXml(XmlDOMDocument* xml_doc){
+	xercesc::DOMElement* element = xml_doc->createElement("simple_prsm");
+	std::string str = convertToString(spectrum_id_);
+	xml_doc->addElement(element, "spectrum_id", str.c_str());
+	xml_doc->addElement(element, "spectrum_scan", spectrum_scan_.c_str());
+	str = convertToString(precursor_id_);
+	xml_doc->addElement(element, "precursor_id", str.c_str());
+	str = convertToString(prec_mass_);
+	xml_doc->addElement(element, "prec_mass", str.c_str());
+	str = convertToString(seq_id_);
+	xml_doc->addElement(element, "seq_id", str.c_str());
+	str = convertToString(score_);
+	xml_doc->addElement(element, "score", str.c_str());
+	xml_doc->addElement(element, "seq_name", seq_name_.c_str());
+	return element;
 }
 bool SimplePrSM::isMatch(MsHeaderPtr header){
 	int header_spectrum_id = header->getId();
@@ -77,6 +91,7 @@ SimplePrSMPtrVec readSimplePrSM(const char * filename){
 	SimplePrSMPtrVec results;
 	XmlDOMParser* parser = getXmlDOMInstance();
 	if(parser){
+		std::cout<< filename << std::endl;
 		XmlDOMDocument* doc = new XmlDOMDocument(parser, filename);
 		if (doc) {
 			xercesc::DOMElement* root = doc->getDocumentElement();

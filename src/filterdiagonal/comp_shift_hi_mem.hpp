@@ -34,7 +34,7 @@ private:
 
 	void initSeqBeginEnds(ProteoformPtrVec seqs);
 	void initIndexes(ProteoformPtrVec seqs,IonTypePtrVec ion_type_ptr_vec);
-	void updateCnt(ProteoformPtr seq,std::vector<int> cnt,IonTypePtrVec ion_type_ptr_vec);
+	void updateCnt(ProteoformPtr seq,std::vector<int>& cnt,IonTypePtrVec ion_type_ptr_vec);
 
 };
 
