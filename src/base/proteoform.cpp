@@ -2,11 +2,9 @@
 
 #include "base/proteoform.hpp"
 
-#include <log4cxx/logger.h>
+#include <base/logger.hpp>
 
 namespace prot {
-
-static log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("Proteofom"));
 
 Proteoform::Proteoform(ProteoformPtr ori_form_ptr, std::string name, ResSeqPtr res_seq_ptr, 
              int start_pos, int end_pos, ChangePtrVec change_list) {
@@ -15,7 +13,7 @@ Proteoform::Proteoform(ProteoformPtr ori_form_ptr, std::string name, ResSeqPtr r
   residue_seq_ptr_ = res_seq_ptr;
   start_pos_ = start_pos;
   end_pos_ = end_pos;
-  LOG4CXX_TRACE(logger, "start bp spec generation");
+  LOG_TRACE( "start bp spec generation");
   bp_spec_ptr_ = BpSpecPtr(new BpSpec(res_seq_ptr));
   change_list_ = change_list;
 }
@@ -54,7 +52,7 @@ ProteoformPtr Proteoform::getProtModProteoform(ProteoformPtr ori_form_ptr,
     AcidPtr acid = residue->getAcidPtr();
     ResiduePtr mut_residue = getResiduePtrByAcidPtm(residue_list, acid, ptm);
     if (mut_residue.get() == nullptr) {
-      LOG4CXX_ERROR(logger, "Proteoform:: residue not found");
+      LOG_ERROR( "Proteoform:: residue not found");
       throw("Residue not found");
     }
     residues.push_back(mut_residue);

@@ -1,3 +1,4 @@
+#include <base/logger.hpp>
 #include "base/proteoform.hpp"
 #include "base/fasta_reader.hpp"
 #include "spec/msalign_reader.hpp"
@@ -5,11 +6,7 @@
 #include "zeroptmsearch/zero_ptm_mng.hpp"
 #include "zeroptmsearch/zero_ptm_fast_match.hpp"
 
-#include <log4cxx/logger.h>
-
 namespace prot {
-
-static log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("ZeroPtmMng"));
 
 ZeroPtmMng::ZeroPtmMng(std::string conf_file_name): 
     base_data_ptr_ (new BaseData(conf_file_name)),
@@ -34,14 +31,15 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
     std::cout << prot_mod_forms[i]->toString();
   }
   */
+  LOG_DEBUG("start reading spectra.");
 
   int spectra_num = countSpNum (mng_ptr->spectrum_file_name_.c_str(), 
                                 mng_ptr->base_data_ptr_->getActivationPtrVec());
-  LOG4CXX_DEBUG(logger, "spectra_number  " << spectra_num);
+  LOG_DEBUG("spectra_number  " << spectra_num);
 
   MsAlignReader reader(mng_ptr->spectrum_file_name_.c_str(), 
                        mng_ptr->base_data_ptr_->getActivationPtrVec());
-  LOG4CXX_DEBUG(logger, "start reading");
+  LOG_DEBUG("start reading");
 
   int n = 0;
   DeconvMsPtr ms_ptr = reader.getNextMs();

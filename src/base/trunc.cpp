@@ -1,12 +1,10 @@
-#include <log4cxx/logger.h>
+#include <base/logger.hpp>
 
 #include "base/trunc.hpp"
 #include "base/xml_dom.hpp"
 #include "base/xml_dom_document.hpp"
 
 namespace prot {
-
-static log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("Trunc"));
 
 Trunc::Trunc(std::string name, int trunc_len, 
                    AcidPtrVec &acid_list, std::string str) {
@@ -36,7 +34,7 @@ TruncPtrVec getTruncPtrVecInstance(AcidPtrVec &acid_list,
         std::string name = getChildValue(element, "name", 0);
         int trunc_len = getIntChildValue(element, "trunc_len", 0);
         std::string str = getChildValue(element, "acid_str", 0);
-        LOG4CXX_DEBUG(logger, "name " << name << " str " << str << " trunc len " << trunc_len);
+        LOG_DEBUG( "name " << name << " str " << str << " trunc len " << trunc_len);
         trunc_list.push_back(TruncPtr(
                 new Trunc(name, trunc_len, acid_list, str)));
 

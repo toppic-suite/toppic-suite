@@ -2,18 +2,13 @@
 #include <string>
 #include <sstream>
 #include <exception>
-#include <boost/algorithm/string.hpp>
+#include <algorithm>
 
-
-#include <log4cxx/logger.h>
-#include <log4cxx/helpers/exception.h>
-
+#include "base/logger.hpp"
 #include "base/xml_dom.hpp"
 #include "base/xml_dom_document.hpp"
 
 namespace prot {
-
-static log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("XmlDOMDocument"));
 
 XmlDOMDocument::XmlDOMDocument(XmlDOMParser* parser, 
                                const char* xml_file) : doc_(NULL) {
@@ -55,7 +50,7 @@ xercesc::DOMElement* getChildElement(xercesc::DOMElement *parent,
   if (element == nullptr) {
     std::stringstream stream;
     stream << "Get Child Element " << tag << " return null";
-    LOG4CXX_ERROR(logger, stream.str());
+    LOG_ERROR(stream.str());
     throw stream.str();
   }
   return element;
@@ -65,16 +60,11 @@ xercesc::DOMElement* getChildElement(xercesc::DOMElement *parent,
 std::string getChildValue(xercesc::DOMElement* parent,  
                           const char* child_tag, int i) {
   xercesc::DOMNodeList* node_list;
-  try {
-    node_list= parent->getElementsByTagName(X(child_tag));
-  }
-  catch (log4cxx::helpers::Exception& e) {
-    std::cerr << "exception " << e.what() << std::endl;
-  }
+  node_list= parent->getElementsByTagName(X(child_tag));
   if (node_list == nullptr) {
     std::stringstream stream;
     stream << "Get Child Element " << child_tag << " return null";
-    LOG4CXX_ERROR(logger, stream.str());
+    LOG_ERROR( stream.str());
     throw stream.str();
   }
   xercesc::DOMElement* child = 
@@ -82,7 +72,7 @@ std::string getChildValue(xercesc::DOMElement* parent,
   if (child == nullptr) {
     std::stringstream stream;
     stream << "Get Child Element " << child_tag << " return null";
-    LOG4CXX_ERROR(logger, stream.str());
+    LOG_ERROR( stream.str());
     throw stream.str();
   }
 
@@ -111,7 +101,7 @@ int getIntChildValue(xercesc::DOMElement* parent,
 bool getBoolChildValue(xercesc::DOMElement* parent,
                        const char* child_tag, int i) {
   std::string value = getChildValue(parent, child_tag, i);
-  boost::to_lower(value);
+  std::transform(value.begin(), value.end(), value.begin(), ::tolower);
   if(value == "true") {
     return true;
   }

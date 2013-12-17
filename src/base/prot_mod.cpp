@@ -1,13 +1,10 @@
-#include <log4cxx/logger.h>
+#include <base/logger.hpp>
 
 #include "base/prot_mod.hpp"
 #include "base/xml_dom.hpp"
 #include "base/xml_dom_document.hpp"
 
 namespace prot {
-
-
-static log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("ProtMod"));
 
 ProtMod::ProtMod(std::string name, TruncPtr trunc_ptr, PtmPtr ptm_ptr,
                  AcidPtrVec valid_acid_ptrs) {
@@ -38,7 +35,7 @@ ProtModPtrVec getProtModPtrVecInstance(AcidPtrVec &acid_list,
         std::string valid_acids = getChildValue(element, "valid_acids", 0);
         TruncPtr trunc_ptr = getTruncPtrByName(trunc_list, trunc_name);
         PtmPtr ptm_ptr = getPtmPtrByAbbrName(ptm_list, ptm_name);
-        LOG4CXX_DEBUG(logger, "name " << name << " trunc_name " << trunc_name << " valid acids " << valid_acids);
+        LOG_DEBUG( "name " << name << " trunc_name " << trunc_name << " valid acids " << valid_acids);
         AcidPtrVec valid_acid_ptrs;
         for (unsigned int j = 0; j < valid_acids.length(); j++) {
           std::string letter = valid_acids.substr(j, 1);

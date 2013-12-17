@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 
+#include "base/string_util.hpp"
 #include "base/residue_seq.hpp"
 #include "base/proteoform.hpp"
 
@@ -36,6 +37,7 @@ std::vector<std::string> fastaPreprocess(std::string name, std::string seq);
 
 ProteoformPtrVec readFastaToProteoform(std::string file_name, 
                                        AcidPtrVec &acid_list, ResiduePtrVec &residue_list);
+
 }
 
 #endif

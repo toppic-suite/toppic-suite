@@ -1,12 +1,10 @@
-#include <boost/algorithm/string.hpp>
+#include <sstream>
 
-#include <log4cxx/logger.h>
-
+#include "base/logger.hpp"
+#include "base/string_util.hpp"
 #include "spec/msalign_reader.hpp"
 
 namespace prot {
-
-static log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("MsAlignReader"));
 
 MsAlignReader::MsAlignReader (const char *spectrum_file, 
                               ActivationPtrVec activation_list) {
@@ -19,7 +17,7 @@ std::vector<std::string> MsAlignReader::readOneSpectrum() {
   std::string line;
   std::vector<std::string> line_list;
   while (std::getline(input_, line)) {
-    boost::algorithm::trim(line);
+    line = trim(line);
     if (line ==  "BEGIN IONS") {
       line_list.push_back(line);
     }
@@ -48,7 +46,6 @@ void MsAlignReader::readNext() {
     input_.close();
     return;
   }
-  std::vector<std::string> strs;
   int id = -1;
   int prec_id = 0;
   std::string scans;
@@ -57,10 +54,11 @@ void MsAlignReader::readNext() {
   int level = 2;
   double prec_mass = -1;
   int prec_charge = -1;
+  std::vector<std::string> strs;
   for (unsigned int i = 1; i < spectrum_str_.size() - 1; i++) {
     std::string letter = spectrum_str_[i].substr(0,1);
     if (letter >= "A" && letter <= "Z") {
-      boost::split(strs, spectrum_str_[i], boost::is_any_of("="));
+      strs = split(spectrum_str_[i], '=');
       if (strs[0] == "ID") {
         id = atoi(strs[1].c_str());
       }
@@ -88,9 +86,8 @@ void MsAlignReader::readNext() {
     }
   }
   if (id < 0 || prec_charge < 0 || prec_mass < 0) {
-    LOG4CXX_ERROR(logger, 
-                  "Input file format error: sp id " << id << " prec_chrg "
-                  << prec_charge << " prec mass " << prec_mass);
+    LOG_ERROR("Input file format error: sp id " << id << " prec_chrg "
+              << prec_charge << " prec mass " << prec_mass);
     std::exit(1);
   }
 
@@ -127,7 +124,7 @@ void MsAlignReader::readNext() {
   for (unsigned int i = 1; i < spectrum_str_.size() - 1; i++) {
     std::string letter = spectrum_str_[i].substr(0,1);
     if (letter >= "0" && letter <= "9") {
-      boost::split(strs, spectrum_str_[i], boost::is_any_of("\t"));
+      strs = split(spectrum_str_[i], '\t');
       double mass = atof(strs[0].c_str());
       double inte = atof(strs[1].c_str());
       int charge = atoi(strs[2].c_str());
