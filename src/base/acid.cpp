@@ -2,7 +2,7 @@
  * author  Xiaowen Liu
  * date    2013-11-1
  */
-#include <log4cxx/logger.h>
+#include <base/logger.hpp>
 
 #include "base/acid.hpp"
 #include "base/xml_dom.hpp"
@@ -10,8 +10,6 @@
 
 
 namespace prot {
-
-static log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("Acid"));
 
 Acid::Acid (std::string const &name, std::string const &one_letter, 
             std::string const &three_letter, std::string const &composition, 
@@ -29,11 +27,11 @@ AcidPtrVec getAcidPtrVecInstance(const char* file_name) {
   XmlDOMParser* parser = getXmlDOMInstance();
   if (parser) {
     XmlDOMDocument* doc = new XmlDOMDocument(parser, file_name);
-    LOG4CXX_DEBUG(logger, "doc " << doc);
+    LOG_DEBUG( "doc " << doc);
     if (doc) {
       xercesc::DOMElement* parent = doc->getDocumentElement();
       int acid_num = getChildCount(parent, "amino_acid");
-      LOG4CXX_DEBUG(logger, "acid num " << acid_num);
+      LOG_DEBUG( "acid num " << acid_num);
       for (int i = 0; i < acid_num; i++) {
         xercesc::DOMElement* element = getChildElement(parent, "amino_acid", i);
         std::string name = getChildValue(element, "name", 0);
@@ -80,7 +78,7 @@ AcidPtr getAcidPtrByOneLetter(AcidPtrVec &acid_list,
       return acid_list[i];
     }
   }
-  LOG4CXX_DEBUG(logger, "Acid not found " + one_letter);
+  LOG_DEBUG( "Acid not found " + one_letter);
   return AcidPtr(nullptr);
 }
 
@@ -96,7 +94,7 @@ AcidPtr getAcidPtrByThreeLetter(AcidPtrVec &acid_list,
       return acid_list[i];
     }
   }
-  LOG4CXX_DEBUG(logger, "Acid not found " + three_letter);
+  LOG_DEBUG( "Acid not found " + three_letter);
   return AcidPtr(nullptr);
 }
 

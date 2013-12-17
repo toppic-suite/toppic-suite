@@ -5,6 +5,10 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <algorithm> 
+#include <functional> 
+#include <cctype>
+#include <locale>
 
 #include "base/residue_seq.hpp"
 #include "base/proteoform.hpp"
@@ -36,6 +40,17 @@ std::vector<std::string> fastaPreprocess(std::string name, std::string seq);
 
 ProteoformPtrVec readFastaToProteoform(std::string file_name, 
                                        AcidPtrVec &acid_list, ResiduePtrVec &residue_list);
+
+inline std::string &trim(std::string &s) {
+  s.erase(s.begin(), 
+          std::find_if(s.begin(), s.end(), 
+                       std::not1(std::ptr_fun<int, int>(std::isspace))));
+  s.erase(std::find_if(s.rbegin(), s.rend(),
+                       std::not1(std::ptr_fun<int, int>(std::isspace))).base(), 
+          s.end());
+  return s;
+}
+
 }
 
 #endif

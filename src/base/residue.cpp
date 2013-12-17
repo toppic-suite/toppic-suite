@@ -1,12 +1,10 @@
-#include <log4cxx/logger.h>
+#include <base/logger.hpp>
 
 #include "base/residue.hpp"
 #include "base/xml_dom.hpp"
 #include "base/xml_dom_document.hpp"
 
 namespace prot {
-
-static log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("Residue"));
 
 Residue::Residue(AcidPtr acid_ptr, PtmPtr ptm_ptr) {
   acid_ptr_ = acid_ptr;
@@ -57,16 +55,16 @@ ResiduePtrVec getResiduePtrVecInstance(AcidPtrVec &acid_list,
   XmlDOMParser* parser = getXmlDOMInstance();
   if (parser) {
     XmlDOMDocument* doc = new XmlDOMDocument(parser, file_name.c_str());
-    LOG4CXX_DEBUG(logger, "doc " << doc);
+    LOG_DEBUG( "doc " << doc);
     xercesc::DOMElement* parent = doc->getDocumentElement();
     if (doc) {
       int residue_num = getChildCount(parent, "residue");
-      LOG4CXX_DEBUG(logger, "residue num " << residue_num);
+      LOG_DEBUG( "residue num " << residue_num);
       for (int i = 0; i < residue_num; i++) {
         xercesc::DOMElement* element = getChildElement(parent, "residue", i);
         std::string acid_name = getChildValue(element, "acid", 0);
         std::string ptm_abbr_name = getChildValue(element, "ptm", 0);
-        LOG4CXX_DEBUG(logger, "acid vec " << acid_list.size() << " ptm vec " 
+        LOG_DEBUG( "acid vec " << acid_list.size() << " ptm vec " 
                       << ptm_list.size() << " acid " << acid_name << " ptm " << ptm_abbr_name);
         residue_list.push_back(ResiduePtr(
                 new Residue(acid_list, ptm_list, acid_name, ptm_abbr_name)));
@@ -85,25 +83,25 @@ ResiduePtrVec getResiduePtrVecInstance(AcidPtrVec &acid_list,
   XmlDOMParser* parser = getXmlDOMInstance();
   if (parser) {
     XmlDOMDocument* doc = new XmlDOMDocument(parser, file_name.c_str());
-    LOG4CXX_DEBUG(logger, "doc " << doc);
+    LOG_DEBUG( "doc " << doc);
     xercesc::DOMElement* parent = doc->getDocumentElement();
     if (doc) {
       int residue_num = getChildCount(parent, "residue");
-      LOG4CXX_DEBUG(logger, "residue num " << residue_num);
+      LOG_DEBUG( "residue num " << residue_num);
       for (int i = 0; i < residue_num; i++) {
         xercesc::DOMElement* element = getChildElement(parent, "residue", i);
         std::string acid_name = getChildValue(element, "acid", 0);
         std::string ptm_abbr_name = getChildValue(element, "ptm", 0);
-        LOG4CXX_DEBUG(logger, "acid vec " << acid_list.size() << " ptm vec " << ptm_list.size() 
+        LOG_DEBUG( "acid vec " << acid_list.size() << " ptm vec " << ptm_list.size() 
                       << " acid " << acid_name << " ptm " << ptm_abbr_name);
         AcidPtr acid_ptr = getAcidPtrByName(acid_list, acid_name);
         if (acid_ptr.get() == nullptr) {
-          LOG4CXX_ERROR(logger, "acid " << acid_name  << " not found ");
+          LOG_ERROR( "acid " << acid_name  << " not found ");
           throw("acid not found");
         }
         PtmPtr ptm_ptr = getPtmPtrByAbbrName(ptm_list, ptm_abbr_name);
         if (ptm_ptr.get() == nullptr) {
-          LOG4CXX_ERROR(logger, "ptm " << ptm_abbr_name  << " not found ");
+          LOG_ERROR( "ptm " << ptm_abbr_name  << " not found ");
           throw("ptm not found");
         }
         ResiduePtr residue_ptr = getResiduePtrByAcidPtm(residue_list, acid_ptr, ptm_ptr);

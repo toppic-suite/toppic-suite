@@ -9,10 +9,10 @@ CPPFLAGS = -Wall -g -std=c++11
 INCLUDES = -I../
 #
 # define library paths in addition to /usr/lib
-LFLAGS = -L/lib
+LFLAGS = -L/lib -L/opt/local/lib
 #
 # define any libraries to link into executable:
-LIBS = -lxerces-c -llog4cxx
+LIBS = -lxerces-c 
 #
 # define the C++ source files
 SRCS = main.cpp ion.cpp base_data.cpp fasta_reader.cpp proteoform.cpp bp_spec.cpp break_point.cpp residue_seq.cpp change.cpp acid.cpp ptm.cpp residue.cpp xml_dom.cpp xml_dom_document.cpp ion_type.cpp neutral_loss.cpp trunc.cpp prot_mod.cpp activation.cpp

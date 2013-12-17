@@ -11,14 +11,12 @@
 #include <string>
 #include <vector>
 
-#include <log4cxx/logger.h>
+#include <base/logger.hpp>
 
 #include "base/bp_spec.hpp"
 #include "base/ion_type.hpp"
 
 namespace prot {
-
-log4cxx::LoggerPtr bs_logger(log4cxx::Logger::getLogger("FastaReader"));
 
 BpSpec::BpSpec(ResSeqPtr res_seq_ptr){
 	initBreakPoints(res_seq_ptr);
@@ -36,7 +34,7 @@ void BpSpec::initBreakPoints(ResSeqPtr res_seq_ptr){
 		prm += res_seq_ptr->getResiduePtr(i)->getMass();
 		double srm = res_seq_ptr->getResMassSum()-prm;
 		if(srm <0){
-			LOG4CXX_WARN(bs_logger, "prms is larger than totle mass! ");
+			LOG_WARN("prms is larger than totle mass! ");
 		}
 		break_point_ptr_vec_.push_back(BreakPointPtr(new BreakPoint(prm,srm)));
 	}
@@ -141,7 +139,7 @@ int getLastResPos(double c_term_shift,std::vector<double> extbmasses){
 		}
 	}
 	if(best_pos < 0){
-		LOG4CXX_ERROR(bs_logger, "get last residue position error! ");
+		LOG_ERROR("get last residue position error! ");
 		throw "get last residue position error!";
 	}
 	return best_pos - 1;
