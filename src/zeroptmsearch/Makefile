@@ -9,10 +9,10 @@ CPPFLAGS = -Wall -g -std=c++11
 INCLUDES = -I..
 #
 # define library paths in addition to /usr/lib
-LFLAGS = -L/lib
+LFLAGS = -L/lib -L/opt/local/lib
 #
 # define any libraries to link into executable:
-LIBS = -lxerces-c -llog4cxx
+LIBS = -lxerces-c 
 #
 # define the C++ source files
 SRCS = zero_ptm_mng.cpp zero_ptm_console.cpp zero_ptm_fast_match.cpp 

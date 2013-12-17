@@ -1,12 +1,9 @@
 
-#include <log4cxx/logger.h>
-
+#include <base/logger.hpp>
 #include "base/base_data.hpp"
 #include "zeroptmsearch/zero_ptm_fast_match.hpp"
 
 namespace prot {
-
-static log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("ComputeMatch"));
 
 std::vector<ZeroPtmFastMatch> zeroPtmFastFilter(int semi_align_type,
                                                 ExtendMsPtr ms_ptr,
@@ -55,10 +52,10 @@ ZeroPtmFastMatch computeCompMatch(
   double res_sum_mass = header_ptr->getPrecMonoMassMinusWater();
   double prot_mass = form_ptr->getResSeqPtr()->getResMassSum();
   double error = abs(res_sum_mass - prot_mass);
-  LOG4CXX_TRACE(logger, "Protein mass " << prot_mass 
-                << " precursor mass " << res_sum_mass 
-                << " proteoform name " << form_ptr->getName()
-                << " error " << error << " error tolerance " << max_error);
+  LOG_TRACE("Protein mass " << prot_mass 
+            << " precursor mass " << res_sum_mass 
+            << " proteoform name " << form_ptr->getName()
+            << " error " << error << " error tolerance " << max_error);
   double score = 0;
   if (error <= max_error) {
     ActivationPtr activation = header_ptr->getActivationPtr();

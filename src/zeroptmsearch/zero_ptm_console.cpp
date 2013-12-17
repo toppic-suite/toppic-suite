@@ -1,21 +1,13 @@
 #include <iostream>
 
-#include <log4cxx/logger.h>
-#include <log4cxx/basicconfigurator.h>
-#include <log4cxx/helpers/exception.h>
-
 #include "base/base_data.hpp"
 #include "base/xml_dom.hpp"
 #include "base/xml_dom_document.hpp"
 
 #include "zeroptmsearch/zero_ptm_mng.hpp"
 
-static log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("ZeroPtmConsole"));
-
 int main(int argc, char* argv[]) {
   try {
-    log4cxx::BasicConfigurator::configure();
-    logger->setLevel(log4cxx::Level::getDebug());
     std::cout << "ZeroPtmConsole 0.1 " << std::endl;
     prot::ZeroPtmMngPtr mng_ptr = prot::ZeroPtmMngPtr(new prot::ZeroPtmMng (std::string(argv[1])));
     mng_ptr->search_db_file_name_ = argv[2];
