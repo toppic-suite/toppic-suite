@@ -9,10 +9,10 @@ CPPFLAGS = -Wall -g -std=c++11
 INCLUDES = -I..
 #
 # define library paths in addition to /usr/lib
-LFLAGS = -L/lib
+LFLAGS = -L/lib -L/opt/local/lib
 #
 # define any libraries to link into executable:
-LIBS = -lxerces-c -llog4cxx
+LIBS = -lxerces-c 
 #
 # define the C++ source files
 SRCS = support_peak_type.cpp theo_peak.cpp extend_sp_para.cpp peak_tolerance.cpp msalign_reader.cpp deconv_ms.cpp ms.cpp peak_list.cpp ms_header.cpp deconv_peak.cpp

@@ -19,7 +19,7 @@ SpectrumSet::SpectrumSet(DeconvMsPtr sp,double delta,SpParaPtr sp_para,double sh
 	prm_ms_shift_six_=prot::getShiftSpSix(sp,delta,-shift,sp_para,ion_type_ptr_vec);
 }
 SpectrumSetPtr getSpectrumSet(DeconvMsPtr spectrum,double delta,SpParaPtr sp_para,double shift,IonTypePtrVec ion_type_ptr_vec){
-	if(spectrum->size() < sp_para->getMinPeakNum() || spectrum->getHeaderPtr()->getPrecMonoMass() < sp_para->getMinMass()){
+	if((int)spectrum->size() < sp_para->getMinPeakNum() || spectrum->getHeaderPtr()->getPrecMonoMass() < sp_para->getMinMass()){
 		//logger
 		return nullptr;
 	}

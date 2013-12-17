@@ -1,19 +1,17 @@
 #include <sstream>
 #include <stdlib.h>
-#include <boost/algorithm/string.hpp>
 
-#include <log4cxx/logger.h>
-
+#include <base/logger.hpp>
+#include <base/string_util.hpp>
 #include "spec/peak.hpp"
 #include "spec/ms_header.hpp"
 
 namespace prot {
 
-static log4cxx::LoggerPtr logger(log4cxx::Logger::getLogger("MsHeader"));
 
 double MsHeader::getPrecMonoMass() {
   if (prec_mono_mz_ < 0) {
-    LOG4CXX_WARN(logger, "monoisotopic mass is not initialized");
+    LOG_WARN("monoisotopic mass is not initialized")
     return 0.0;
   } 
   else {
@@ -23,7 +21,7 @@ double MsHeader::getPrecMonoMass() {
 
 double MsHeader::getPrecSpMass() {
   if (prec_sp_mz_ < 0) {
-    LOG4CXX_WARN(logger, "precursor spectrum mass is not initialized");
+    LOG_WARN("precursor spectrum mass is not initialized");
     return 0.0;
   } else {
     return compPeakMass(prec_sp_mz_, prec_charge_);
@@ -32,7 +30,7 @@ double MsHeader::getPrecSpMass() {
 
 double MsHeader::getPrecMonoMassMinusWater() {
   if (prec_mono_mz_ < 0) {
-    LOG4CXX_WARN(logger, "monoisotopic mass is not initialized");
+    LOG_WARN("monoisotopic mass is not initialized");
     return 0.0;
   } else {
     return compPeakMass(prec_mono_mz_, prec_charge_)
@@ -72,7 +70,7 @@ void MsHeader::setScans(std::string s) {
     return;
   }
   std::vector<std::string> strs;
-  boost::split(strs,s,boost::is_any_of(" "));
+  split(s,' ', strs); 
   for (unsigned int i = 0; i < strs.size(); i++) {
     scans_.push_back(atoi(strs[i].c_str()));
   }
