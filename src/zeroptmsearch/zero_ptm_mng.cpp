@@ -31,6 +31,7 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
     std::cout << prot_mod_forms[i]->toString();
   }
   */
+  LOG_DEBUG("start reading spectra.");
 
   int spectra_num = countSpNum (mng_ptr->spectrum_file_name_.c_str(), 
                                 mng_ptr->base_data_ptr_->getActivationPtrVec());

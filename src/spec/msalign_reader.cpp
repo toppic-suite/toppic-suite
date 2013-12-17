@@ -46,7 +46,6 @@ void MsAlignReader::readNext() {
     input_.close();
     return;
   }
-  std::vector<std::string> strs;
   int id = -1;
   int prec_id = 0;
   std::string scans;
@@ -55,10 +54,11 @@ void MsAlignReader::readNext() {
   int level = 2;
   double prec_mass = -1;
   int prec_charge = -1;
+  std::vector<std::string> strs;
   for (unsigned int i = 1; i < spectrum_str_.size() - 1; i++) {
     std::string letter = spectrum_str_[i].substr(0,1);
     if (letter >= "A" && letter <= "Z") {
-      split(spectrum_str_[i], '=', strs);
+      strs = split(spectrum_str_[i], '=');
       if (strs[0] == "ID") {
         id = atoi(strs[1].c_str());
       }
@@ -124,7 +124,7 @@ void MsAlignReader::readNext() {
   for (unsigned int i = 1; i < spectrum_str_.size() - 1; i++) {
     std::string letter = spectrum_str_[i].substr(0,1);
     if (letter >= "0" && letter <= "9") {
-      split(spectrum_str_[i], '\t', strs);
+      strs = split(spectrum_str_[i], '\t');
       double mass = atof(strs[0].c_str());
       double inte = atof(strs[1].c_str());
       int charge = atoi(strs[2].c_str());
