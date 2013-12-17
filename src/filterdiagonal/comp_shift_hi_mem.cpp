@@ -58,13 +58,14 @@ std::vector<std::vector<int>> CompShiftHiMem::compConvolution(std::vector<int> m
 		end_index = index_ends_[m+1];
 		//logger
 		for(int j = begin_index;j<end_index;j++){
-			scores[indexes_[j]];
+			scores[indexes_[j]]++;
 		}
 	}
 	//logger
 	return getShiftScores(scores,num);
 }
 std::vector<std::vector<int>> CompShiftHiMem::compConvolution(std::vector<int> masses,std::vector<int> errors,int bgn_pos,int num){
+
 	std::vector<short> scores;
 	for(int i=0;i<seq_total_len_ ;i++){
 		scores.push_back(0);
@@ -77,11 +78,11 @@ std::vector<std::vector<int>> CompShiftHiMem::compConvolution(std::vector<int> m
 
 //	time_t time_s = time(NULL);
 //	long time = (long)time_s;
-	std::cout << bgn_pos+1 << std::endl;
-	std::cout << masses.size() << std::endl;
+//	std::cout << bgn_pos+1 << std::endl;
+//	std::cout << masses.size() << std::endl;
 	for(unsigned int i =bgn_pos+1;i<masses.size();i++){
 
-		std::cout << i << std::endl;
+//		std::cout << i << std::endl;
 
 		m = masses[i]-masses[bgn_pos];
 		int left = m-errors[i]-e;
@@ -94,11 +95,13 @@ std::vector<std::vector<int>> CompShiftHiMem::compConvolution(std::vector<int> m
 		}
 		begin_index = index_begins_[left];
 		end_index= index_ends_[right];
-		std::cout << begin_index << std::endl;
-		std::cout << end_index << std::endl;
+//		std::cout << begin_index << std::endl;
+//		std::cout << end_index << std::endl;
 		for(int j=begin_index;j<=end_index;j++){
 
 			scores[indexes_[j]]++;
+//			std::cout << indexes_[j] << std::endl;
+//			std::cout << scores[indexes_[j]] << std::endl;
 		}
 	}
 	//logger
@@ -206,6 +209,7 @@ void CompShiftHiMem::initIndexes(ProteoformPtrVec seqs,IonTypePtrVec ion_type_pt
 		unsigned int end =0;
 		unsigned int diff =0;
 		while(bgn <mass.size()){
+			end = bgn+1;
 			while(end < mass.size()){
 				diff = mass[end] - mass[bgn];
 				if(diff >= shift_array_len_){
