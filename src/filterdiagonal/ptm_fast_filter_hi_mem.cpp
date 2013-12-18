@@ -5,6 +5,7 @@
  *      Author: xunlikun
  */
 
+#include <algorithm>
 #include "ptm_fast_filter_hi_mem.hpp"
 
 namespace prot {
@@ -54,7 +55,8 @@ SimplePrSMPtrVec PtmFastFilterHiMem::sort(SimplePrSMPtrVec2D matches){
 			sorted_match.push_back(matches[i][j]);
 		}
 	}
-	//todo:xunlikun@ sort simplePrSM
+
+	std::sort(sorted_match.begin(),sorted_match.end(),simple_prsm_up);
 
 	SimplePrSMPtrVec unique_match;
 	for(unsigned int i=0;i< sorted_match.size();i++){
