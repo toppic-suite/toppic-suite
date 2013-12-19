@@ -2,19 +2,9 @@
 #include "base/proteoform.hpp"
 #include "base/fasta_reader.hpp"
 #include "spec/msalign_reader.hpp"
-#include "spec/spectrum_set.hpp"
-#include "zeroptmsearch/zero_ptm_mng.hpp"
-#include "zeroptmsearch/zero_ptm_fast_match.hpp"
+#include "zeroptmsearch/zero_ptm_search.hpp"
 
 namespace prot {
-
-ZeroPtmMng::ZeroPtmMng(std::string conf_file_name): 
-    base_data_ptr_ (new BaseData(conf_file_name)),
-    peak_tolerance_ptr_ (new PeakTolerance(ppo_, use_min_tolerance_, min_tolerance_)),
-    extend_sp_para_ptr_ (new ExtendSpPara(extend_min_mass_, ext_offsets_)),
-    sp_para_ptr_(new SpPara(min_peak_num_, min_mass_, peak_tolerance_ptr_, 
-                           extend_sp_para_ptr_, base_data_ptr_->getActivationPtr())) 
-  {}
 
 void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
   /*
@@ -31,8 +21,6 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
     std::cout << prot_mod_forms[i]->toString();
   }
   */
-  LOG_DEBUG("start reading spectra.");
-
   int spectra_num = countSpNum (mng_ptr->spectrum_file_name_.c_str(), 
                                 mng_ptr->base_data_ptr_->getActivationPtrVec());
   LOG_DEBUG("spectra_number  " << spectra_num);
@@ -45,12 +33,21 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
   DeconvMsPtr ms_ptr = reader.getNextMs();
   ProtModPtrVec prot_mod_ptr_list = mng_ptr->base_data_ptr_->getProtModPtrVec();
   double shift = getProtModAcetylationShift(prot_mod_ptr_list);
+  IonTypePtrVec ion_type_ptr_list = mng_ptr->base_data_ptr_->getIonTypePtrVec();
 
   while (ms_ptr.get() != nullptr) {
     n++;
-    //SpectrumSetPtr spec_set_ptr = getSpectrumSet(ms_ptr, 0, mng_ptr->sp_para_ptr_, shift);
-    
+    SpectrumSetPtr spec_set_ptr = getSpectrumSet(ms_ptr, 0, mng_ptr->sp_para_ptr_, shift, 
+                                                 ion_type_ptr_list);
+
+    SimplePrSMPtrVec comp_prsms;
+    zeroPtmSearch(spec_set_ptr, SEMI_ALIGN_TYPE_COMPLETE, comp_prsms);
+    //zeroPtmSearch(spectrum_set_ptr, SEMI_ALIGN_TYPE_PREFIX, prsms[1]);
+    //zeroPtmSearch(spectrum_set_ptr, SEMI_ALIGN_TYPE_SUFFIX, prsms[2]);
+    //zeroPtmSearch(spectrum_set_ptr, SEMI_ALIGN_TYPE_SUFFIX, prsms[3]);
+   
     ms_ptr = reader.getNextMs();
+    LOG_DEBUG("spectrum " << n);
   }
 
   /*
@@ -97,5 +94,41 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
   */
 }
 
-} /* namespace prot */
+void zeroPtmSearch(SpectrumSetPtr spec_set_ptr, int type,
+                   SimplePrSMPtrVec &prsms) {
+  ExtendMsPtr ms_three = spec_set_ptr->getSpThree();
 
+  /*
+
+  ZeroPtmFastMatch fastMatches[] = fastFilter.getBestMatch();
+  if (fastMatches.length > 0) {
+    logger.debug(type.getName() + " fast match best score "
+                 + fastMatches[0].getScore());
+  } 
+  logger.debug(type.getName() + " fast match length "
+               + fastMatches.length);
+
+  ZeroPtmSlowFilter slowFilter = new ZeroPtmSlowFilter(spectrumSet
+                                                       .getDeconvMs(), fastMatches, type, mng);
+  ZeroPtmSlowMatch slowMatches[] = slowFilter.getBestMatch();
+  ArrayList<PrSM> prsmList = new ArrayList<PrSM>();
+  if (slowMatches != null) {
+    for (int i = 0; i < slowMatches.length; i++) {
+      prsmList.add(slowMatches[i].geneResult());
+    }
+  }
+  Collections.sort(prsmList, new MatchFragComparator());
+  for (int i = 0; i < mng.nReport; i++) {
+    prsms[type.getCode()][i] = null;
+  }
+  for (int i = 0; i < mng.nReport; i++) {
+    if (i >= prsmList.size()) {
+      break;
+    }
+    logger.trace("slow match score " + slowMatches[i].getScore());
+    prsms[type.getCode()][i] = prsmList.get(i);
+  }
+  */
+}
+
+} // end namespace

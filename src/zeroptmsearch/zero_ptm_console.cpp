@@ -5,6 +5,7 @@
 #include "base/xml_dom_document.hpp"
 
 #include "zeroptmsearch/zero_ptm_mng.hpp"
+#include "zeroptmsearch/zero_ptm_search.hpp"
 
 int main(int argc, char* argv[]) {
   try {
