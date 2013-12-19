@@ -24,7 +24,7 @@ SimplePrSM::SimplePrSM(MsHeaderPtr header,ProteoformPtr seq,int score){
 	seq_= seq;
 	//todo:seq_id and name should be delete? name
 //	seq_id_ = seq->getResSeqPtr()->getResiduePtr();
-//	seq_name_ = seq->getResSeqPtr();
+	seq_name_ = seq->getName();
 	score_ = score;
 }
 
@@ -108,7 +108,7 @@ SimplePrSMPtrVec readSimplePrSM(const char * filename){
 	SimplePrSMPtrVec results;
 	XmlDOMParser* parser = getXmlDOMInstance();
 	if(parser){
-		std::cout<< filename << std::endl;
+//		std::cout<< filename << std::endl;
 		XmlDOMDocument* doc = new XmlDOMDocument(parser, filename);
 		if (doc) {
 			xercesc::DOMElement* root = doc->getDocumentElement();

@@ -53,8 +53,8 @@ private:
 SimplePrSMPtrVec findSimplePrsms(SimplePrSMPtrVec simple_prsm,MsHeaderPtr header);
 SimplePrSMPtrVec readSimplePrSM(const char * filename);
 
-inline bool simple_prsm_up(const SimplePrSMPtr p,SimplePrSMPtr n){
-  return p->getScore() < n->getScore();
+inline bool simple_prsm_down(const SimplePrSMPtr p,SimplePrSMPtr n){
+  return p->getScore() > n->getScore();
 }
 
 } /* namespace prot */
