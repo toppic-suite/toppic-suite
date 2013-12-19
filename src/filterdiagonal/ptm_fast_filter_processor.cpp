@@ -48,6 +48,7 @@ void PtmFastFilterProcessor::processBlock(int block,std::string sp_file_name,int
 			if(spectrum_set != nullptr){
 				std::string scan = deconv_sp->getHeaderPtr()->getScansString();
 				SimplePrSMPtrVec matches = filter_->getBestMathBatch(spectrum_set);
+//				std::cout<< matches.size()<<std::endl;
 				writer.addSimplePrSM(matches);
 			}
 //		}
@@ -67,7 +68,7 @@ void PtmFastFilterProcessor::combineBlock(std::string sp_file_name){
 		std::stringstream block_s;
 		block_s<<i;
 		std::string block_file_name = mng_->spectrum_file_name_+ "." + mng_->output_file_ext_+"_"+block_s.str();
-		std::cout<< block_file_name<<std::endl;
+//		std::cout<< block_file_name<<std::endl;
 		matches.push_back(prot::readSimplePrSM(block_file_name.c_str()));
 	}
 
