@@ -6,6 +6,7 @@
  */
 
 #include <algorithm>
+#include <iostream>
 #include "spec/prm_peak.hpp"
 #include "spec/spec_data.hpp"
 #include "base/base_data.hpp"
@@ -49,25 +50,29 @@ int PrmPeak::getBreakType(SupportPeakTypePtrVec support_peak_type_list){
 	return break_type;
 }
 
-void addTwoMasses(PrmPeakPtrVec list,DeconvPeakPtr peak,double prec_mono_mass,ActivationPtr active_type){
-	double orig_mass = peak->getMonoMass()-active_type->getNIonType()->getShift();
+void addTwoMasses(PrmPeakPtrVec& list,DeconvPeakPtr peak,double prec_mono_mass,ActivationPtr active_type){
+	double orig_mass = peak->getMonoMass()-active_type->getNShit();
 	PrmPeakPtr new_peak = PrmPeakPtr(new PrmPeak(peak,prot::PRM_PEAK_TYPE_ORIGINAL,orig_mass,1));
 	list.push_back(new_peak);
-	double reverse_mass = prec_mono_mass - (peak->getMonoMass()-active_type->getCIonType()->getShift());
-	list.push_back(PrmPeakPtr(
-			new PrmPeak(peak,prot::PRM_PEAK_TYPE_REVERSED,reverse_mass,1)
-	));
+//	std::cout<<new_peak->getPosition()<<std::endl;
+//	std::cout<<prec_mono_mass<<std::endl;
+//	std::cout<<peak->getMonoMass()<<std::endl;
+//	std::cout<<active_type->getCIonType()->getShift()<<std::endl;
+	double reverse_mass = prec_mono_mass - (peak->getMonoMass()-active_type->getCShit());
+	PrmPeakPtr reverse_peak = PrmPeakPtr(new PrmPeak(peak,prot::PRM_PEAK_TYPE_REVERSED,reverse_mass,1));
+	list.push_back(reverse_peak);
+//	std::cout<<reverse_peak->getPosition()<<std::endl;
 }
 
 void addSixMasses(PrmPeakPtrVec list,DeconvPeakPtr peak,double prec_mono_mass,ActivationPtr active_type,std::vector<double> offsets){
 	for(unsigned int i = 0;i<offsets.size();i++){
-		double mass = peak->getMonoMass()-active_type->getNIonType()->getShift()+offsets[i];
+		double mass = peak->getMonoMass()-active_type->getNShit()+offsets[i];
 		list.push_back(PrmPeakPtr(
 				new PrmPeak(peak,prot::PRM_PEAK_TYPE_ORIGINAL,mass,1)
 		));
 	}
 	for(unsigned int i = 0;i<offsets.size();i++){
-		double mass = peak->getMonoMass()-active_type->getCIonType()->getShift()+offsets[i];
+		double mass = peak->getMonoMass()-active_type->getCShit()+offsets[i];
 		list.push_back(PrmPeakPtr(
 				new PrmPeak(peak,prot::PRM_PEAK_TYPE_REVERSED,mass,1)
 		));
@@ -83,9 +88,19 @@ PrmMsPtr getMsTwo(DeconvMsPtr deconv_ms,double delta,SpParaPtr sp_para,IonTypePt
 	double prec_mono_mass = header->getPrecMonoMass();
 	ActivationPtr active_type = header->getActivationPtr();
 	PrmPeakPtrVec list;
+//	std::cout<<deconv_ms->size()<<std::endl;
+//	for(int i=0;i<deconv_ms->size();i++){
+//		std::cout<<deconv_ms->getPeakPtr(i)->getPosition()<<std::endl;
+//	}
+//	std::cout<<active_type->getName()<<std::endl;
+//	std::cout<<active_type->getCIonType()->getShift()<<std::endl;
+//	std::cout<<active_type->getCIonType()->getBYShift()<<std::endl;
+//	std::cout<<active_type->getNIonType()->getShift()<<std::endl;
+//	std::cout<<active_type->getNIonType()->getBYShift()<<std::endl;
 	for(unsigned int i = 0;i<deconv_ms->size();i++){
 		addTwoMasses(list,deconv_ms->getPeakPtr(i),prec_mono_mass,active_type);
 	}
+//	std::cout<<list.size()<<std::endl;
 	//filterPrmPeak
 	PrmPeakPtrVec list_filtered;
 	for(unsigned int i =0;i<list.size();i++){
@@ -94,6 +109,7 @@ PrmMsPtr getMsTwo(DeconvMsPtr deconv_ms,double delta,SpParaPtr sp_para,IonTypePt
 			list_filtered.push_back(list[i]);
 		}
 	}
+//	std::cout<<list_filtered.size()<<std::endl;
 	//end filterPrmPeak
 	DeconvPeakPtr zero_peak = DeconvPeakPtr(new DeconvPeak(-1,0,0,0));
 	list_filtered.push_back(PrmPeakPtr(new PrmPeak(zero_peak,prot::PRM_PEAK_TYPE_ORIGINAL,0,1)));
@@ -206,8 +222,15 @@ std::vector<std::vector<int>> getIntMassErrorList(PrmMsPtr ms,double scale,bool 
 	std::vector<int> errors;
 	int last_mass = -1;
 	int last_error = 0;
+//	std::cout<<std::fixed;
+//	std::cout<< scale << std::endl;
 	for(unsigned int i=0;i<ms->size();i++){
 		int m = (int)std::round(ms->getPeakPtr(i)->getPosition()*scale);
+//		std::cout<< m << std::endl;
+//		std::cout<< ms->getPeakPtr(i)->getPosition()*scale << std::endl;
+		if(m==79987){
+			int l =0;
+		}
 		int e = 0;
 		if(n_strict && c_strict){
 			e = (int) std::ceil(ms->getPeakPtr(i)->getStrictTolerance()*scale);
