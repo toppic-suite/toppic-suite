@@ -16,10 +16,12 @@
 #include "base/xml_dom_document.hpp"
 
 namespace prot {
+
 class SimplePrSM;
 typedef std::shared_ptr<SimplePrSM> SimplePrSMPtr;
 typedef std::vector<SimplePrSMPtr> SimplePrSMPtrVec;
 typedef std::vector<SimplePrSMPtrVec> SimplePrSMPtrVec2D;
+
 class SimplePrSM {
 public:
 	SimplePrSM(MsHeaderPtr header,ProteoformPtr seq,int score);
