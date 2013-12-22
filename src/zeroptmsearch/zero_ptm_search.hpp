@@ -12,7 +12,9 @@ namespace prot {
 
 //void zeroPtmSearchAll(SpectrumSetPtr spectrum_set_ptr,  std::array<SimplePrSMPtrVec> &prsms);
 
-void zeroPtmSearch(SpectrumSetPtr spectrum_set_ptr, int type, SimplePrSMPtrVec &prsms);
+void zeroPtmSearch(SpectrumSetPtr spec_set_ptr, int type,
+                   ProteoformPtrVec &form_ptr_vec, int report_num,
+                   SimplePrSMPtrVec &prsms);
 
 void zeroPtmSearchProcess(ZeroPtmMngPtr);
 

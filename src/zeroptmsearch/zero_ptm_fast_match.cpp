@@ -5,11 +5,11 @@
 
 namespace prot {
 
-std::vector<ZeroPtmFastMatch> zeroPtmFastFilter(int semi_align_type,
-                                                ExtendMsPtr ms_ptr,
-                                                ProteoformPtrVec &form_ptr_vec,
-                                                int report_num) {
-  std::vector<ZeroPtmFastMatch> match_vec;
+ZpFastMatchPtrVec zeroPtmFastFilter(int semi_align_type,
+                                    ExtendMsPtr ms_ptr,
+                                    ProteoformPtrVec &form_ptr_vec,
+                                    int report_num) {
+  ZpFastMatchPtrVec match_vec;
   for (unsigned int i = 0; i < form_ptr_vec.size(); i++) {
     switch (semi_align_type) {
       case SEMI_ALIGN_TYPE_COMPLETE: 
@@ -34,9 +34,9 @@ std::vector<ZeroPtmFastMatch> zeroPtmFastFilter(int semi_align_type,
   if (num > form_ptr_vec.size()) {
     num = form_ptr_vec.size();
   }
-  std::vector<ZeroPtmFastMatch> report_vec;
+  ZpFastMatchPtrVec report_vec;
   for (unsigned int i = 0; i < num; i++) {
-    if (match_vec[i].getScore() > 0) {
+    if (match_vec[i]->getScore() > 0) {
       report_vec.push_back(match_vec[i]);
     } else {
       break;
@@ -45,8 +45,7 @@ std::vector<ZeroPtmFastMatch> zeroPtmFastFilter(int semi_align_type,
   return report_vec;
 }
 
-ZeroPtmFastMatch computeCompMatch(
-    ExtendMsPtr ms_ptr, ProteoformPtr form_ptr) {
+ZpFastMatchPtr computeCompMatch(ExtendMsPtr ms_ptr, ProteoformPtr form_ptr) {
   MsHeaderPtr header_ptr = ms_ptr->getHeaderPtr();
   double max_error = header_ptr->getErrorTolerance();
   double res_sum_mass = header_ptr->getPrecMonoMassMinusWater();
@@ -67,10 +66,11 @@ ZeroPtmFastMatch computeCompMatch(
     masses = form_ptr->getBpSpecPtr()->getBreakPointMasses(c_ion_type);
     score += compDiagScr(ms_ptr, masses, 0);
   }
-  return ZeroPtmFastMatch(form_ptr, score, 0, form_ptr->getResSeqPtr()->getLen() - 1);
+  return ZpFastMatchPtr(
+      new ZeroPtmFastMatch(form_ptr, score, 0, form_ptr->getResSeqPtr()->getLen() - 1));
 }
 
-ZeroPtmFastMatch computePrefixMatch(
+ZpFastMatchPtr computePrefixMatch(
     ExtendMsPtr ms_ptr, ProteoformPtr form_ptr) {
   /* check if there is a matched prefix */
   std::vector<double> prms = form_ptr->getBpSpecPtr()->getPrmMasses();
@@ -103,10 +103,10 @@ ZeroPtmFastMatch computePrefixMatch(
     masses = form_ptr->getBpSpecPtr()->getBreakPointMasses(c_ion_type);
     score += compDiagScr(ms_ptr, masses, c_term_shift);
   }
-  return ZeroPtmFastMatch(form_ptr, score, 0, seq_end);
+  return ZpFastMatchPtr(new ZeroPtmFastMatch(form_ptr, score, 0, seq_end));
 }
 
-ZeroPtmFastMatch computeSuffixMatch(
+ZpFastMatchPtr computeSuffixMatch(
     ExtendMsPtr ms_ptr, ProteoformPtr form_ptr) {
   std::vector<double> prms = form_ptr->getBpSpecPtr()->getPrmMasses();
   MsHeaderPtr header_ptr = ms_ptr->getHeaderPtr();
@@ -139,10 +139,11 @@ ZeroPtmFastMatch computeSuffixMatch(
     masses = form_ptr->getBpSpecPtr()->getBreakPointMasses(c_ion_type);
     score += compDiagScr(ms_ptr, masses, 0);
   }
-  return ZeroPtmFastMatch(form_ptr, score, seq_bgn, form_ptr->getResSeqPtr()->getLen() - 1);
+  return ZpFastMatchPtr(
+      new ZeroPtmFastMatch(form_ptr, score, seq_bgn, form_ptr->getResSeqPtr()->getLen() - 1));
 }
 
-ZeroPtmFastMatch computeInternalMatch(
+ZpFastMatchPtr computeInternalMatch(
     ExtendMsPtr ms_ptr, ProteoformPtr form_ptr) {
   std::vector<double> prms = form_ptr->getBpSpecPtr()->getPrmMasses();
   MsHeaderPtr header_ptr = ms_ptr->getHeaderPtr();
@@ -181,7 +182,7 @@ ZeroPtmFastMatch computeInternalMatch(
       mass_bgn++;
     }
   }
-  return ZeroPtmFastMatch(form_ptr, best_score, best_bgn, best_end-1);
+  return ZpFastMatchPtr(new ZeroPtmFastMatch(form_ptr, best_score, best_bgn, best_end-1));
 }
 
 

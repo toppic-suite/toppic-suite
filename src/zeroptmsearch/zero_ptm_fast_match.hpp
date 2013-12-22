@@ -30,21 +30,31 @@ class ZeroPtmFastMatch {
   int end_;
 };
 
-inline double compareZeroPtmFastMatchDown(ZeroPtmFastMatch m1, ZeroPtmFastMatch m2) {
-  return m2.getScore() - m1.getScore();
+typedef std::shared_ptr<ZeroPtmFastMatch> ZpFastMatchPtr;
+typedef std::vector<ZpFastMatchPtr> ZpFastMatchPtrVec;
+
+
+inline double compareZeroPtmFastMatchDown(ZpFastMatchPtr m1, ZpFastMatchPtr m2) {
+  return m2->getScore() - m1->getScore();
 }
 
 
-ZeroPtmFastMatch computeCompMatch(
+ZpFastMatchPtrVec zeroPtmFastFilter(int semi_align_type,
+                                    ExtendMsPtr ms_ptr,
+                                    ProteoformPtrVec &form_ptr_vec,
+                                    int report_num);
+
+
+ZpFastMatchPtr computeCompMatch(
     ExtendMsPtr ms_ptr, ProteoformPtr form_ptr);
 
-ZeroPtmFastMatch computePrefixMatch(
+ZpFastMatchPtr computePrefixMatch(
     ExtendMsPtr ms_ptr, ProteoformPtr form_ptr);
 
-ZeroPtmFastMatch computeSuffixMatch(
+ZpFastMatchPtr computeSuffixMatch(
     ExtendMsPtr ms_ptr, ProteoformPtr form_ptr);
 
-ZeroPtmFastMatch computeInternalMatch(
+ZpFastMatchPtr computeInternalMatch(
     ExtendMsPtr ms_ptr, ProteoformPtr form_ptr);
 /*
  * in the computing of diagonal score in fast filtering, we allow to use n
