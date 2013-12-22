@@ -5,6 +5,8 @@
  *      Author: xunlikun
  */
 
+#include <algorithm>
+#include <iostream>
 #include "ptm_fast_filter_hi_mem.hpp"
 
 namespace prot {
@@ -35,7 +37,6 @@ SimplePrSMPtrVec PtmFastFilterHiMem::getBestMatch(PrmMsPtr ms){
 }
 SimplePrSMPtrVec2D PtmFastFilterHiMem::compute(PrmMsPtr ms){
 	std::vector<std::vector<int>> masses = prot::getIntMassErrorList(ms,mng_->ptm_fast_filter_scale_,true,false);
-	//logger
 	SimplePrSMPtrVec2D match;
 	for(unsigned int i=0;i<masses[0].size();i++){
 		std::vector<std::vector<int>> results =index_->compConvolution(masses[0],masses[1],i,mng_->ptm_fast_filter_result_num_);
@@ -49,12 +50,21 @@ SimplePrSMPtrVec2D PtmFastFilterHiMem::compute(PrmMsPtr ms){
 }
 SimplePrSMPtrVec PtmFastFilterHiMem::sort(SimplePrSMPtrVec2D matches){
 	SimplePrSMPtrVec sorted_match;
+
 	for(unsigned int i=0;i<matches.size();i++){
 		for(unsigned int j =0;j< matches[i].size();j++){
 			sorted_match.push_back(matches[i][j]);
+			std::cout<<matches[i][j]->getSeqName()+"->"+prot::convertToString(matches[i][j]->getScore())+" "<<std::endl;
 		}
 	}
-	//todo:xunlikun@ sort simplePrSM
+
+
+	//todo:sort method is not the same with java so that the result is different;
+	std::sort(sorted_match.begin(),sorted_match.end(),simple_prsm_down);
+	std::cout<<"========================================================"<<std::endl;
+	for(int i=0;i<sorted_match.size();i++){
+		std::cout<<sorted_match[i]->getSeqName()+"->"+prot::convertToString(sorted_match[i]->getScore())+" "<<std::endl;
+	}
 
 	SimplePrSMPtrVec unique_match;
 	for(unsigned int i=0;i< sorted_match.size();i++){

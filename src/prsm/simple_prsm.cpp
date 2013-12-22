@@ -24,7 +24,7 @@ SimplePrSM::SimplePrSM(MsHeaderPtr header,ProteoformPtr seq,int score){
 	seq_= seq;
 	//todo:seq_id and name should be delete? name
 //	seq_id_ = seq->getResSeqPtr()->getResiduePtr();
-//	seq_name_ = seq->getResSeqPtr();
+	seq_name_ = seq->getName();
 	score_ = score;
 }
 
@@ -75,24 +75,7 @@ bool SimplePrSM::isMatch(MsHeaderPtr header){
 	std::string header_spectrum_scan = header->getScansString();
 	int header_precursor_id = header->getPrecId();
 	double header_precursor_mass = header->getPrecMonoMass();
-//	std::cout<<header_spectrum_id<<std::endl;
-//	std::cout<<spectrum_id_<<std::endl;
-//	std::cout<<header_precursor_id<<std::endl;
-//	std::cout<<precursor_id_<<std::endl;
 	if(header_spectrum_id == spectrum_id_ && header_precursor_id == precursor_id_){
-//			std::cout<<std::fixed;
-//			std::cout<<header_precursor_mass<<std::endl;
-//			std::cout<<prec_mass_<<std::endl;
-//			std::cout<<header_spectrum_scan<<std::endl;
-//			std::cout<<spectrum_scan_<<std::endl;
-//		double a =1754.1;
-//		double b =1754.1;
-//		std::cout<< (a != b) <<std::endl;
-//			std::cout<< (header_precursor_mass != prec_mass_) <<std::endl;
-//			std::cout<< (header_spectrum_scan.compare(spectrum_scan_)!=0) <<std::endl;
-//			std::string a = "a";
-//			std::string b = "a";
-//			std::cout<< (a.compare(b)) <<std::endl;
 		if(header_precursor_mass!=prec_mass_ ||
 				header_spectrum_scan.compare(spectrum_scan_)!=0){
 			LOG4CXX_ERROR(sPrsm_logger, "Error in combine simple PrSMs! ");
@@ -108,7 +91,6 @@ SimplePrSMPtrVec readSimplePrSM(const char * filename){
 	SimplePrSMPtrVec results;
 	XmlDOMParser* parser = getXmlDOMInstance();
 	if(parser){
-		std::cout<< filename << std::endl;
 		XmlDOMDocument* doc = new XmlDOMDocument(parser, filename);
 		if (doc) {
 			xercesc::DOMElement* root = doc->getDocumentElement();

@@ -5,6 +5,7 @@
  *      Author: xunlikun
  */
 
+#include <iostream>
 #include "ptm_fast_filter_block.hpp"
 
 namespace prot {
