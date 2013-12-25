@@ -3,6 +3,7 @@
 #include "base/fasta_reader.hpp"
 #include "spec/msalign_reader.hpp"
 #include "zeroptmsearch/zero_ptm_fast_match.hpp"
+#include "zeroptmsearch/zero_ptm_slow_match.hpp"
 #include "zeroptmsearch/zero_ptm_search.hpp"
 
 namespace prot {
@@ -42,16 +43,16 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
     if (spec_set_ptr.get() != nullptr) {
       SimplePrSMPtrVec comp_prsms;
       zeroPtmSearch(spec_set_ptr, SEMI_ALIGN_TYPE_COMPLETE, prot_mod_forms, 
-                    mng_ptr->zero_ptm_filter_result_num_, comp_prsms);
+                    mng_ptr, comp_prsms);
       SimplePrSMPtrVec pref_prsms;
       zeroPtmSearch(spec_set_ptr, SEMI_ALIGN_TYPE_PREFIX, prot_mod_forms, 
-                    mng_ptr->zero_ptm_filter_result_num_, pref_prsms);
+                    mng_ptr, pref_prsms);
       SimplePrSMPtrVec suff_prsms;
       zeroPtmSearch(spec_set_ptr, SEMI_ALIGN_TYPE_SUFFIX, prot_mod_none_forms, 
-                    mng_ptr->zero_ptm_filter_result_num_, suff_prsms);
+                    mng_ptr, suff_prsms);
       SimplePrSMPtrVec internal_prsms;
       zeroPtmSearch(spec_set_ptr, SEMI_ALIGN_TYPE_SUFFIX, prot_mod_none_forms, 
-                    mng_ptr->zero_ptm_filter_result_num_, internal_prsms);
+                    mng_ptr, internal_prsms);
       LOG_DEBUG("zero ptm search complete " << n);
     }
     ms_ptr = reader.getNextMs();
@@ -101,18 +102,17 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
 }
 
 void zeroPtmSearch(SpectrumSetPtr spec_set_ptr, int type,
-                   ProteoformPtrVec &form_ptr_vec, int report_num,
+                   ProteoformPtrVec &form_ptr_vec, ZeroPtmMngPtr mng_ptr, 
                    SimplePrSMPtrVec &prsms) {
   ExtendMsPtr ms_three = spec_set_ptr->getSpThree();
 
   ZpFastMatchPtrVec fast_matches = zeroPtmFastFilter(type, ms_three,
-                                                     form_ptr_vec, report_num);
+                                                     form_ptr_vec, mng_ptr->zero_ptm_filter_result_num_);
+
+  DeconvMsPtr deconv_ms = spec_set_ptr->getDeconvMs();
+  ZpSlowMatchPtrVec slow_matches = zeroPtmSlowFilter(type, deconv_ms, fast_matches, mng_ptr ); 
 
   /*
-  ZeroPtmSlowFilter slowFilter = new ZeroPtmSlowFilter(spectrumSet
-                                                       .getDeconvMs(), fastMatches, type, mng);
-  ZeroPtmSlowMatch slowMatches[] = slowFilter.getBestMatch();
-  ArrayList<PrSM> prsmList = new ArrayList<PrSM>();
   if (slowMatches != null) {
     for (int i = 0; i < slowMatches.length; i++) {
       prsmList.add(slowMatches[i].geneResult());

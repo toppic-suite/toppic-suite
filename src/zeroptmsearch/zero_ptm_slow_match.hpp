@@ -2,6 +2,7 @@
 #define ZERO_PTM_SLOW_MATCH_HPP_
 
 #include "spec/deconv_peak.hpp"
+#include "spec/theo_peak.hpp"
 #include "zeroptmsearch/zero_ptm_mng.hpp"
 #include "zeroptmsearch/zero_ptm_fast_match.hpp"
 

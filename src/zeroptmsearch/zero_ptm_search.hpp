@@ -12,7 +12,7 @@ namespace prot {
 void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr);
 
 void zeroPtmSearch(SpectrumSetPtr spec_set_ptr, int type,
-                   ProteoformPtrVec &form_ptr_vec, int report_num,
+                   ProteoformPtrVec &form_ptr_vec, ZeroPtmMngPtr mng_ptr,
                    SimplePrSMPtrVec &prsms);
 
 } /* namespace_prot */
