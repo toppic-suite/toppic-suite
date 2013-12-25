@@ -6,9 +6,9 @@
 
 namespace prot {
 
-ZeroPtmSlowMatch::ZeroPtmSlowMatch(DeconvMsPtr deconv_ms_ptr, 
+ZeroPtmSlowMatch::ZeroPtmSlowMatch(int search_type,
+                                   DeconvMsPtr deconv_ms_ptr, 
                                    ZpFastMatchPtr fast_match_ptr,
-                                   int search_type, 
                                    ZeroPtmMngPtr mng_ptr) {
   mng_ptr_ = mng_ptr;
   deconv_ms_ptr_ = deconv_ms_ptr;
@@ -90,6 +90,23 @@ void ZeroPtmSlowMatch::compScore (ExtendMsPtr refine_ms_ptr, TheoPeakPtrVec theo
     ms_masses[i] = ms_masses[i] * (1 + recal);
   }
   score = compUniqueScore(ms_masses, theo_masses, ppo);
+}
+
+ZpSlowMatchPtrVec zeroPtmSlowFilter(int semi_align_type,
+                                    DeconvMsPtr deconv_ms_ptr,
+                                    ZpFastMatchPtrVec fast_matches,
+                                    ZeroPtmMngPtr mng_ptr) {
+
+  ZpSlowMatchPtrVec slow_matches;
+  for (unsigned int i = 0; i < fast_matches.size(); i++) {
+    ZpSlowMatchPtr slow_match = ZpSlowMatchPtr(
+        new ZeroPtmSlowMatch(semi_align_type, deconv_ms_ptr, fast_matches[i], mng_ptr));
+    slow_matches.push_back(slow_match);
+  }
+  /* sort */
+  std::sort(slow_matches.begin(), slow_matches.end(), compareZeroPtmSlowMatchDown);
+
+  return slow_matches;
 }
 
 }

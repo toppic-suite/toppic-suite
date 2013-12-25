@@ -9,8 +9,8 @@ namespace prot {
 
 class ZeroPtmSlowMatch {
  public:
-  ZeroPtmSlowMatch(DeconvMsPtr deconv_ms_ptr, ZpFastMatchPtr fast_match_ptr,
-                   int search_type, ZeroPtmMngPtr mng_ptr);
+  ZeroPtmSlowMatch(int search_type, DeconvMsPtr deconv_ms_ptr, ZpFastMatchPtr fast_match_ptr,
+                   ZeroPtmMngPtr mng_ptr);
 	double getScore() {return score;}
 
  private:
@@ -40,6 +40,11 @@ inline bool compareZeroPtmSlowMatchDown(ZpSlowMatchPtr m1, ZpSlowMatchPtr m2) {
     return 0;
   }
 }
+
+ZpSlowMatchPtrVec zeroPtmSlowFilter(int semi_align_type,
+                                    DeconvMsPtr deconv_ms_ptr,
+                                    ZpFastMatchPtrVec fast_matches,
+                                    ZeroPtmMngPtr mng_ptr); 
 
 }
 
