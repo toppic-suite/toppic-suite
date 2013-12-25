@@ -38,6 +38,13 @@ inline bool theopeak_down(const TheoPeakPtr p,TheoPeakPtr n){
   return p->getPosition() > n->getPosition();
 }
 
+inline void getTheoMassVec (TheoPeakPtrVec &theo_peaks,
+                            std::vector<double> &masses) {
+  for (unsigned int i = 0; i < theo_peaks.size(); i++) {
+    masses.push_back(theo_peaks[i]->getModMass());
+  }
+}
+
 TheoPeakPtrVec getTheoPeak(BpSpecPtr pep,ActivationPtr type,
                            double n_term_shift,double c_term_shift,
                            int bgn,int end,double min_mass);

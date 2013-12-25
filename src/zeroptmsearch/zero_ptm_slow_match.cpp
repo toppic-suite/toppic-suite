@@ -1,5 +1,6 @@
 #include "base/proteoform.hpp"
 #include "base/activation.hpp"
+#include "base/algorithm.hpp"
 #include "spec/theo_peak.hpp"
 #include "zeroptmsearch/zero_ptm_slow_match.hpp"
 
@@ -26,9 +27,69 @@ ZeroPtmSlowMatch::ZeroPtmSlowMatch(DeconvMsPtr deconv_ms_ptr,
   TheoPeakPtrVec theo_peaks = getProteoformTheoPeak(proteoform_ptr_, 
                                                     activation_ptr, neu_loss_ptr, min_mass);
 
-  /*
-  compScore(refineMsThree, theoPeaks);
-  */
+  compScore(refine_ms_ptr_, theo_peaks, mng_ptr_->sp_para_ptr_->getPeakTolerance()->getPpo());
+}
+
+// compute the average ppo
+double compAvg(std::vector<double> ppos, double recal_ppo) {
+  int cnt = 0;
+  double sum = 0;
+  for (unsigned int i = 0; i < ppos.size(); i++) {
+    if (abs(ppos[i]) <= recal_ppo) {
+      cnt++;
+      sum += ppos[i];
+    }
+  }
+  if (cnt == 0) {
+    return 0;
+  } else {
+    return sum / cnt;
+  }
+}
+
+/**
+ * compute the validation of the candidates based on the different of
+ * precursor mass
+ */
+
+bool ZeroPtmSlowMatch::isValid (double recal, double ppo) {
+  if (!mng_ptr_->ms_one_ms_two_same_recal_) {
+    return true;
+  } else {
+    // here we assume that precursor mass has same recal to MS2
+    double prec_mass = deconv_ms_ptr_->getHeaderPtr()->getPrecMonoMass();
+    double prec_ppo = (prec_mass  * (1 + recal) - refine_prec_mass_) / prec_mass;
+    if (abs(prec_ppo) <= ppo) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+}
+
+// input is refineMsThree, result is score and recal and recalMass 
+void ZeroPtmSlowMatch::compScore (ExtendMsPtr refine_ms_ptr, TheoPeakPtrVec theo_peaks,
+                                  double ppo) {
+  std::vector<double> ms_masses;
+  getExtendMassVec(refine_ms_ptr, ms_masses);
+  std::vector<double> theo_masses; 
+  getTheoMassVec(theo_peaks, theo_masses);
+  std::vector<double> result_ppos;
+  compMsMassPpos(ms_masses, theo_masses, ppo, result_ppos);
+
+  if (!mng_ptr_->do_recalibration_) {
+    recal = 0;
+  } else {
+    // minus is important 
+    recal = -compAvg(result_ppos, mng_ptr_->recal_ppo_);
+    if (!isValid(recal, ppo)) {
+      recal = 0;
+    }
+  }
+  for (unsigned int i = 0; i < ms_masses.size(); i++) {
+    ms_masses[i] = ms_masses[i] * (1 + recal);
+  }
+  score = compUniqueScore(ms_masses, theo_masses, ppo);
 }
 
 }
@@ -39,72 +100,5 @@ ZeroPtmSlowMatch::ZeroPtmSlowMatch(DeconvMsPtr deconv_ms_ptr,
 		return new PrSM(annoProtein, deconvMs, refinePrecMass, recal, mng.spPara);
 	}
 
-	public int compareTo(ZeroPtmSlowMatch y) {
-		double y_scr = y.getScore();
-		if (y_scr - getScore() < 0) {
-			return -1;
-		} else if (y_scr - getScore() > 0) {
-			return 1;
-		} else {
-			return 0;
-		}
-	}
 
-	// private functions for recalibration
-
-  // input is refineMsThree, result is score and recal and recalMass 
-	private void compScore(Ms<ExtendPeak> refineMsThree, TheoPeak ions[])
-			throws Exception {
-		double ppoDeviation[] = Pair.compPpoDeviation(refineMsThree, ions,
-				mng.spPara.getPeakTolerance().getPpo());
-		if (!mng.doRecalibration) {
-			recal = 0;
-		} else {
-			// minus is important 
-			recal = -compAvg(ppoDeviation, mng.recalPpo);
-			if (!isValid(recal)) {
-				recal = 0;
-			}
-		}
-		score = Pair.compIonScore(refineMsThree, ions, recal, mng.spPara.getPeakTolerance().getPpo());
-		// logger.debug("Recalibration " + recal + " score " + score);
-	}
-
-	private double compAvg(double d[], double recal_shift_width) {
-		int cnt = 0;
-		double sum = 0;
-		for (int i = 0; i < d.length; i++) {
-			if (Math.abs(d[i]) <= recal_shift_width) {
-				cnt++;
-				sum += d[i];
-			}
-		}
-		if (cnt == 0) {
-			return 0;
-		} else {
-			return sum / cnt;
-		}
-	}
-*/
-	/**
-	 * compute the validation of the candidates based on the different of
-	 * precursor mass
-	 */
-
-/*
-	private boolean isValid(double recal) {
-		if (!mng.isMs1Ms2SameRecal) {
-			return true;
-		} else {
-			// here we assume that precursor mass has same recal to MS2
-			double spMass = deconvMs.getHeader().getPrecMonoMass();
-			double ppo = (spMass * (1 + recal) - refinePrecMass) / spMass;
-			if (Math.abs(ppo) <= mng.spPara.getPeakTolerance().getPpo()) {
-				return true;
-			} else {
-				return false;
-			}
-		}
-	}
-}
 */

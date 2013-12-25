@@ -59,9 +59,6 @@ class ZeroPtmMng {
   double recal_ppo_ = 0.000015; // 15 ppm
   bool   ms_one_ms_two_same_recal_ = true;
 
-  /** allowed N-terminal modifications */
-  std::map<std::string, ResiduePtrVec> var_ptms_;
-
   std::string output_file_ext_;
 };
 

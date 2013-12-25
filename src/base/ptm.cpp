@@ -2,7 +2,6 @@
  * author  Xiaowen Liu
  * date    2013-11-1
  */
-#include <stdlib.h>
 #include <iostream>
 
 #include "base/ptm.hpp"

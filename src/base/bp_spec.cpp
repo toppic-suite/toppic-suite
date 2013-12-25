@@ -14,7 +14,6 @@
 #include <base/logger.hpp>
 
 #include "base/bp_spec.hpp"
-#include "base/ion_type.hpp"
 
 namespace prot {
 

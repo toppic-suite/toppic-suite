@@ -46,6 +46,13 @@ inline bool extendpeak_up(const ExtendPeakPtr p,ExtendPeakPtr n){
   return p->getPosition() < n->getPosition();
 }
 
+inline void getExtendMassVec (ExtendMsPtr &refine_ms_ptr, std::vector<double> &masses) {
+  ExtendPeakPtrVec peak_ptr_list = refine_ms_ptr->getPeakPtrVec();
+  for (unsigned int i = 0; i < peak_ptr_list.size(); i++) {
+    masses.push_back(peak_ptr_list[i]->getPosition());
+  }
+}
+
 ExtendMsPtr getMsThree(DeconvMsPtr deconv_ms,double delta,SpParaPtr sp_para);
 
 } /* namespace prot */

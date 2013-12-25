@@ -36,6 +36,8 @@ class Ms {
   unsigned int size() {return peak_ptr_list_.size();}
 
   T getPeakPtr(int i) {return peak_ptr_list_[i];}
+  
+  std::vector<T> getPeakPtrVec() {return peak_ptr_list_;}
 
  private:
   MsHeaderPtr header_ptr_;
