@@ -1,4 +1,3 @@
-
 #include <base/logger.hpp>
 #include "base/base_data.hpp"
 #include "zeroptmsearch/zero_ptm_fast_match.hpp"
@@ -29,6 +28,7 @@ ZpFastMatchPtrVec zeroPtmFastFilter(int semi_align_type,
 
   /* sort */
   std::sort(match_vec.begin(), match_vec.end(), compareZeroPtmFastMatchDown);
+  LOG_DEBUG("sort  finished BEST SCORE " << match_vec[0]->getScore());
 
   unsigned int num = report_num;
   if (num > form_ptr_vec.size()) {
@@ -65,6 +65,7 @@ ZpFastMatchPtr computeCompMatch(ExtendMsPtr ms_ptr, ProteoformPtr form_ptr) {
     IonTypePtr c_ion_type = activation->getCIonType();
     masses = form_ptr->getBpSpecPtr()->getBreakPointMasses(c_ion_type);
     score += compDiagScr(ms_ptr, masses, 0);
+    LOG_TRACE("score " << score);
   }
   return ZpFastMatchPtr(
       new ZeroPtmFastMatch(form_ptr, score, 0, form_ptr->getResSeqPtr()->getLen() - 1));
@@ -194,6 +195,7 @@ double compDiagScr(ExtendMsPtr ms_ptr,
   while (i < ms_ptr->size() && j < masses.size()) {
     ExtendPeakPtr peak_ptr = ms_ptr->getPeakPtr(i);
     double distance = peak_ptr->getMonoMass() - masses[j];
+    //LOG_DEBUG("peak " << peak_ptr->getMonoMass() << " score " << peak_ptr->getScore());
     if (abs(center - distance) <= peak_ptr->getOrigTolerance()) {
       s += peak_ptr->getScore();
       i++;

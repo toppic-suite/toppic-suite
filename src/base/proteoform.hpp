@@ -4,6 +4,7 @@
 #include "base/residue_seq.hpp"
 #include "base/bp_spec.hpp"
 #include "base/change.hpp"
+#include "base/segment.hpp"
 #include "base/prot_mod.hpp"
 
 namespace prot {
@@ -13,10 +14,12 @@ typedef std::shared_ptr<Proteoform> ProteoformPtr;
 
 class Proteoform {
 public:
-	Proteoform(ProteoformPtr ori_form_ptr, std::string name, ResSeqPtr res_seq_ptr, 
-             int start_pos, int end_pos, ChangePtrVec change_list);
+	Proteoform(ProteoformPtr ori_form_ptr, ProtModPtr prot_mod_ptr, std::string name, 
+             ResSeqPtr res_seq_ptr, int start_pos, int end_pos, ChangePtrVec change_list);
 
-  ProteoformPtr getOriFormPtr() {return ori_form_ptr_;}
+  ProteoformPtr getRawFormPtr() {return raw_form_ptr_;}
+
+  ProtModPtr getProtModPtr() {return prot_mod_ptr_;}
 
   std::string getName() {return name_;}
 
@@ -30,14 +33,16 @@ public:
 
   ChangePtrVec getChangePtrVec() {return change_list_;}
 
+  SegmentPtrVec getSegmentPtrVec();
+
   std::string toString();
 
-  ProteoformPtr getProtModProteoform(ProteoformPtr ori_form_ptr, 
-                                     ResiduePtrVec &residue_list, ProtModPtr prot_mod_ptr); 
 
 private:
   
-  ProteoformPtr ori_form_ptr_;
+  ProteoformPtr raw_form_ptr_;
+
+  ProtModPtr prot_mod_ptr_;
   
   std::string name_;
 
@@ -54,9 +59,19 @@ private:
 
 typedef std::vector<ProteoformPtr> ProteoformPtrVec;
 
-ProteoformPtr getOriProteoformPtr(std::string name, ResSeqPtr res_seq_ptr);
+ProteoformPtr getRawProteoformPtr(std::string name, ResSeqPtr res_seq_ptr);
 
-ProteoformPtrVec generateProtModProteoform(ProteoformPtrVec &ori_forms, ResiduePtrVec &residue_list, ProtModPtrVec &prot_mods);
+ProteoformPtr getProtModProteoform(ProteoformPtr raw_form_ptr, 
+                                   ResiduePtrVec &residue_list, ProtModPtr prot_mod_ptr); 
+
+ProteoformPtr getSubProteoform(ProteoformPtr proteoform_ptr, int start, int end);
+
+ProteoformPtrVec generateProtModProteoform(ProteoformPtrVec &ori_forms,
+                                           ResiduePtrVec &residue_list,
+                                           ProtModPtrVec &prot_mods);
+
+ProteoformPtrVec getProtModNoneProteoform(ProteoformPtrVec &all_forms); 
+
 
 } /* namespace prot */
 

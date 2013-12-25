@@ -11,5 +11,14 @@ Change::Change(int left_bp_pos, int right_bp_pos, int change_type,
   ptm_ptr_ = ptm_ptr;
 }
 
+Change::Change(Change ori, int start) {
+  left_bp_pos_ = ori.left_bp_pos_ - start;
+  right_bp_pos_ = ori.right_bp_pos_ - start;
+  change_type_ = ori.change_type_;
+  mass_shift_ = ori.mass_shift_;
+  ptm_ptr_ = ori.ptm_ptr_;
+}
+
+
 }
 

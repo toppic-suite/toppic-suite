@@ -38,7 +38,14 @@ inline bool theopeak_down(const TheoPeakPtr p,TheoPeakPtr n){
   return p->getPosition() > n->getPosition();
 }
 
-TheoPeakPtrVec getTheoPeak(BpSpecPtr pep,ActivationPtr type,double n_term_shift,double c_term_shift,int bgn,int end,double min_mass);
+TheoPeakPtrVec getTheoPeak(BpSpecPtr pep,ActivationPtr type,
+                           double n_term_shift,double c_term_shift,
+                           int bgn,int end,double min_mass);
+
+TheoPeakPtrVec getProteoformTheoPeak(ProteoformPtr proteoform_ptr, 
+                                     ActivationPtr activation_ptr,
+                                     NeutralLossPtr neu_loss_ptr,
+                                     double min_mass);
 } /* namespace prot */
 
 #endif /* THEO_PEAK_HPP_ */

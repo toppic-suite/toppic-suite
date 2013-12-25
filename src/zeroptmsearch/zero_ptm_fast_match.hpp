@@ -17,7 +17,7 @@ class ZeroPtmFastMatch {
   }
   double getScore() {return score_;}
 
-  ProteoformPtr getFormPtr() {return proteoform_ptr_;}
+  ProteoformPtr getProteoformPtr() {return proteoform_ptr_;}
 
   int getBegin() {return begin_;}
 
@@ -34,8 +34,13 @@ typedef std::shared_ptr<ZeroPtmFastMatch> ZpFastMatchPtr;
 typedef std::vector<ZpFastMatchPtr> ZpFastMatchPtrVec;
 
 
-inline double compareZeroPtmFastMatchDown(ZpFastMatchPtr m1, ZpFastMatchPtr m2) {
-  return m2->getScore() - m1->getScore();
+inline bool compareZeroPtmFastMatchDown(ZpFastMatchPtr m1, ZpFastMatchPtr m2) {
+  if  (m1->getScore() > m2->getScore()) {
+    return 1;
+  }
+  else {
+    return 0;
+  }
 }
 
 

@@ -22,6 +22,8 @@ namespace prot {
 #define SEMI_ALIGN_TYPE_SUFFIX   2
 #define SEMI_ALIGN_TYPE_INTERNAL 3
 
+#define NEUTRAL_LOSS_NONE "NONE"
+
 class BaseData {
  public:
   BaseData (std::string config_file_name);
@@ -33,6 +35,9 @@ class BaseData {
   ProtModPtrVec& getProtModPtrVec() {return prot_mod_list_;}
   IonTypePtrVec& getIonTypePtrVec() {return ion_type_list_;}
   NeutralLossPtrVec& getNeutralLossPtrVec() {return neutral_loss_list_;}
+  NeutralLossPtr getNeutralLossNonePtr() {
+    return getNeutralLossPtrByName(neutral_loss_list_, NEUTRAL_LOSS_NONE);
+  }
   ActivationPtrVec& getActivationPtrVec() {return activation_list_;}
 
   ResiduePtrVec& getFixModResiduePtrVec() {return fix_mod_residue_list_;}

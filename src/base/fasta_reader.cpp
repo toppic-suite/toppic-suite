@@ -50,7 +50,7 @@ ProteoformPtr FastaReader::getNextProteoformPtr(AcidPtrVec acid_list,
   AcidPtrVec acid_seq = convertSeqToAcidSeq(acid_list, seq); 
   ResiduePtrVec residue_ptrs = convertAcidToResidueSeq(residue_list, acid_seq);
   ResSeqPtr residue_seq_ptr = ResSeqPtr(new ResidueSeq(residue_ptrs)); 
-  return getOriProteoformPtr(name, residue_seq_ptr);
+  return getRawProteoformPtr(name, residue_seq_ptr);
 }
 
 /** process fasta string and remove unknown letters */

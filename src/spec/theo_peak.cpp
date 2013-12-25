@@ -6,9 +6,11 @@
  */
 
 #include <algorithm>
+#include "base/proteoform.hpp"
 #include "spec/theo_peak.hpp"
 
 namespace prot {
+
 TheoPeak::TheoPeak(IonPtr ion,double unmod_mass,double shift):
   Peak(unmod_mass + shift, 1.0) {
 	ion_ = ion;
@@ -43,4 +45,23 @@ TheoPeakPtrVec getTheoPeak(BpSpecPtr pep,ActivationPtr type, NeutralLossPtr non_
 	std::sort(theo_peaks.begin(),theo_peaks.end(),theopeak_down);
 	return theo_peaks;
 }
+
+TheoPeakPtrVec getProteoformTheoPeak(ProteoformPtr proteoform_ptr, 
+                                     ActivationPtr activation_ptr,
+                                     NeutralLossPtr neu_loss_ptr,
+                                     double min_mass) {
+
+  BpSpecPtr bp_ptr = proteoform_ptr->getBpSpecPtr();
+  TheoPeakPtrVec all_peaks;
+  SegmentPtrVec segments = proteoform_ptr->getSegmentPtrVec();
+  for (unsigned int i = 0; i < segments.size(); i++) {
+    TheoPeakPtrVec  peaks = getTheoPeak(bp_ptr, activation_ptr, neu_loss_ptr, 
+                                        segments[i]->getPepNTermShift(),
+                                        segments[i]->getPepCTermShift(), segments[i]->getLeftBpPos(),
+                                        segments[i]->getRightBpPos(), min_mass);
+     all_peaks.insert(all_peaks.end(), peaks.begin(), peaks.end());
+  }
+  return all_peaks;
+}
+
 } /* namespace prot */

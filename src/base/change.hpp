@@ -15,6 +15,8 @@ class Change {
  public:
   Change(int left_bp_pos, int right_bp_pos, int change_type,
          double mass_shift, PtmPtr ptm_ptr);
+
+  Change(Change ori_change, int shift);
   
   int getLeftBpPos() {return left_bp_pos_;}
 
@@ -27,6 +29,7 @@ class Change {
   PtmPtr getPtmPtr() {return ptm_ptr_;}
 
  private:
+  // left and right positions are based on break point positions 
   int left_bp_pos_;
   int right_bp_pos_;
   int change_type_;
@@ -36,6 +39,16 @@ class Change {
 
 typedef std::shared_ptr<Change> ChangePtr;
 typedef std::vector<ChangePtr> ChangePtrVec;
+
+inline bool compareChangeUp(ChangePtr c1, ChangePtr c2) {
+  if  (c1->getLeftBpPos() < c2->getLeftBpPos()) {
+    return 1;
+  }
+  else {
+    return 0;
+  }
+}
+
 
 }
 #endif

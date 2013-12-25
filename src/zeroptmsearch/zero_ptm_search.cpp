@@ -9,13 +9,16 @@ namespace prot {
 
 void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
   
-  ProteoformPtrVec ori_forms = readFastaToProteoform(mng_ptr->search_db_file_name_,
+  ProteoformPtrVec raw_forms = readFastaToProteoform(mng_ptr->search_db_file_name_,
                                                      mng_ptr->base_data_ptr_->getAcidPtrVec(),
                                                      mng_ptr->base_data_ptr_->getFixModResiduePtrVec());
   ProteoformPtrVec prot_mod_forms 
-      = generateProtModProteoform(ori_forms, 
+      = generateProtModProteoform(raw_forms, 
                                   mng_ptr->base_data_ptr_->getResiduePtrVec(),
                                   mng_ptr->base_data_ptr_->getAllowProtModPtrVec());
+
+  ProteoformPtrVec prot_mod_none_forms = getProtModNoneProteoform(prot_mod_forms);
+
   int spectra_num = countSpNum (mng_ptr->spectrum_file_name_.c_str(), 
                                 mng_ptr->base_data_ptr_->getActivationPtrVec());
   LOG_DEBUG("spectra_number  " << spectra_num);
@@ -40,10 +43,16 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
       SimplePrSMPtrVec comp_prsms;
       zeroPtmSearch(spec_set_ptr, SEMI_ALIGN_TYPE_COMPLETE, prot_mod_forms, 
                     mng_ptr->zero_ptm_filter_result_num_, comp_prsms);
-      LOG_DEBUG("zero ptm search complete" << n);
-      //zeroPtmSearch(spectrum_set_ptr, SEMI_ALIGN_TYPE_PREFIX, prsms[1]);
-      //zeroPtmSearch(spectrum_set_ptr, SEMI_ALIGN_TYPE_SUFFIX, prsms[2]);
-      //zeroPtmSearch(spectrum_set_ptr, SEMI_ALIGN_TYPE_SUFFIX, prsms[3]);
+      SimplePrSMPtrVec pref_prsms;
+      zeroPtmSearch(spec_set_ptr, SEMI_ALIGN_TYPE_PREFIX, prot_mod_forms, 
+                    mng_ptr->zero_ptm_filter_result_num_, pref_prsms);
+      SimplePrSMPtrVec suff_prsms;
+      zeroPtmSearch(spec_set_ptr, SEMI_ALIGN_TYPE_SUFFIX, prot_mod_none_forms, 
+                    mng_ptr->zero_ptm_filter_result_num_, suff_prsms);
+      SimplePrSMPtrVec internal_prsms;
+      zeroPtmSearch(spec_set_ptr, SEMI_ALIGN_TYPE_SUFFIX, prot_mod_none_forms, 
+                    mng_ptr->zero_ptm_filter_result_num_, internal_prsms);
+      LOG_DEBUG("zero ptm search complete " << n);
     }
     ms_ptr = reader.getNextMs();
     LOG_DEBUG("spectrum " << n);
@@ -95,20 +104,11 @@ void zeroPtmSearch(SpectrumSetPtr spec_set_ptr, int type,
                    ProteoformPtrVec &form_ptr_vec, int report_num,
                    SimplePrSMPtrVec &prsms) {
   ExtendMsPtr ms_three = spec_set_ptr->getSpThree();
-  /*
+
   ZpFastMatchPtrVec fast_matches = zeroPtmFastFilter(type, ms_three,
-                                    form_ptr_vec, report_num);
-  */
+                                                     form_ptr_vec, report_num);
+
   /*
-
-  ZeroPtmFastMatch fastMatches[] = fastFilter.getBestMatch();
-  if (fastMatches.length > 0) {
-    logger.debug(type.getName() + " fast match best score "
-                 + fastMatches[0].getScore());
-  } 
-  logger.debug(type.getName() + " fast match length "
-               + fastMatches.length);
-
   ZeroPtmSlowFilter slowFilter = new ZeroPtmSlowFilter(spectrumSet
                                                        .getDeconvMs(), fastMatches, type, mng);
   ZeroPtmSlowMatch slowMatches[] = slowFilter.getBestMatch();

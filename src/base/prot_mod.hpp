@@ -6,6 +6,7 @@
 
 namespace prot {
 
+#define PROTEIN_MOD_NONE "NONE"
 #define PROTEIN_MOD_ACETYLATION "ACETYLATION"
 
 class ProtMod {
@@ -22,6 +23,15 @@ class ProtMod {
   double getProtShift() {return prot_shift_;}
 
   double getPepShift() {return pep_shift_;}
+
+  bool isNone() {
+    if (name_ == PROTEIN_MOD_NONE) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
 
  private:
   std::string name_;
