@@ -5,16 +5,14 @@
  *      Author: xunlikun
  */
 
-#include <log4cxx/logger.h>
 #include <iostream>
 
 #include "simple_prsm.hpp"
+#include "base/logger.hpp"
 #include "base/proteoform.hpp"
 #include "base/xml_dom_document.hpp"
 
 namespace prot {
-
-log4cxx::LoggerPtr sPrsm_logger(log4cxx::Logger::getLogger("SimplePrSM"));
 
 SimplePrSM::SimplePrSM(MsHeaderPtr header,ProteoformPtr seq,int score){
 	spectrum_id_ = header->getId();
@@ -78,7 +76,7 @@ bool SimplePrSM::isMatch(MsHeaderPtr header){
 	if(header_spectrum_id == spectrum_id_ && header_precursor_id == precursor_id_){
 		if(header_precursor_mass!=prec_mass_ ||
 				header_spectrum_scan.compare(spectrum_scan_)!=0){
-			LOG4CXX_ERROR(sPrsm_logger, "Error in combine simple PrSMs! ");
+			LOG_ERROR("Error in combine simple PrSMs! ");
 		}
 		return true;
 	}

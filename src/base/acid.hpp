@@ -10,10 +10,7 @@
 #include <string>
 #include <vector>
 
-#include "xercesc/dom/DOM.hpp"
-
 namespace prot {
-
 
 class Acid {
  public:

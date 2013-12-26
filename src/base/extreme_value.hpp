@@ -1,6 +1,7 @@
 #ifndef PROT_EXTREME_VALUE_HPP_
 #define PROT_EXTREME_VALUE_HPP_
 
+#include <memory>
 #include "base/xml_dom_document.hpp"
 
 namespace prot {
@@ -33,6 +34,8 @@ class ExtremeValue {
 
   void init();
 };
+
+typedef std::shared_ptr<ExtremeValue> ExtremeValuePtr;
 
 }
 

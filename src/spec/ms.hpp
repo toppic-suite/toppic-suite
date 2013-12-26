@@ -1,6 +1,8 @@
 #ifndef PROT_MS_HPP_
 #define PROT_MS_HPP_
 
+#include <sstream>
+
 #include "spec/ms_header.hpp"
 
 namespace prot {
@@ -23,11 +25,25 @@ class Ms {
 	 * Removes precursor mass. In ETD data, MSMS may contain a high precursor
 	 * mass peak. So we use the following to remove it.
 	 */
-  void rmPrec(double tolerance);
+  void rmPrec(double tolerance) {
+    peak_ptr_list_ = rmPeaks(peak_ptr_list_, header_ptr_->getPrecSpMz(), tolerance);
+  }
 
-	void recalibrate(double recal);
+  void recalibrate(double recal) {
+    for (unsigned int i = 0; i < peak_ptr_list_.size(); i++) {
+      double new_mass = (1 + recal) * peak_ptr_list_[i]->getPosition();
+      peak_ptr_list_[i]->setPosition(new_mass);
+    }
+  }
 
-  std::string toString();
+  std::string toString() {
+    std::string header_str = header_ptr_->toString();
+    std::stringstream tmp;
+    for (unsigned int i = 0; i < peak_ptr_list_.size(); i++) {
+      tmp << i << " " << peak_ptr_list_[i]->getPosition() << " " << peak_ptr_list_[i]->getIntensity() << "\n";
+    }
+    return header_str + tmp.str();
+  }
 
 	MsHeaderPtr getHeaderPtr() {return header_ptr_;}
 

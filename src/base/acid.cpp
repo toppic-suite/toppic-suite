@@ -8,7 +8,6 @@
 #include "base/xml_dom.hpp"
 #include "base/xml_dom_document.hpp"
 
-
 namespace prot {
 
 Acid::Acid (std::string const &name, std::string const &one_letter, 
