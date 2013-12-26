@@ -23,7 +23,7 @@ double PeakTolerance::compStrictErrorTole(double mass) {
   return tolerance;
 }
 
-xercesc::DOMElement* PeakTolerance::toXml(XmlDOMDocument* xml_doc) {
+void PeakTolerance::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   xercesc::DOMElement* element = xml_doc->createElement("peak_tolerance");
   std::string str = convertToString(ppo_);
   xml_doc->addElement(element, "ppo", str.c_str());
@@ -31,7 +31,7 @@ xercesc::DOMElement* PeakTolerance::toXml(XmlDOMDocument* xml_doc) {
   xml_doc->addElement(element, "use_min_tolerance", str.c_str());
   str = convertToString(min_tolerance_);
   xml_doc->addElement(element, "min_tolerance", str.c_str());
-  return element;
+	parent->appendChild(element);
 }
 
 } /* namespace prot */

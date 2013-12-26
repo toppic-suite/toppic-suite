@@ -24,12 +24,12 @@ SpPara::SpPara(xercesc::DOMElement* element){
 	peak_tolerance_ = PeakTolerancePtr(new PeakTolerance(getChildElement(element,"peak_tolerance",0)));
 }
 
-xercesc::DOMElement* SpPara::toXml(XmlDOMDocument* xml_doc){
+void SpPara::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
 	xercesc::DOMElement* element = xml_doc->createElement("sp_para");
 	xml_doc->addElement(element, "min_peak_num", prot::convertToString(min_peak_num_).c_str());
 	xml_doc->addElement(element, "min_mass", prot::convertToString(min_mass_).c_str());
-	element->appendChild(extend_sp_para_->toXml(xml_doc));
-	element->appendChild(peak_tolerance_->toXml(xml_doc));
-	return element;
+  extend_sp_para_->appendXml(xml_doc, element);
+  peak_tolerance_->appendXml(xml_doc, element);
+  parent->appendChild(element); 
 }
 } /* namespace prot */

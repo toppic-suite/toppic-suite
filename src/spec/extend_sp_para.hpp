@@ -14,7 +14,7 @@ class ExtendSpPara {
 
 	ExtendSpPara(xercesc::DOMElement* element);
 
-  xercesc::DOMElement* toXml(XmlDOMDocument* xml_doc);
+  void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* element);
 
 	// if the mass is smaller than extendMinMass, the peak is not extended 
 	double extend_min_mass_;

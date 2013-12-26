@@ -30,7 +30,7 @@ public:
 	void setMinPeakNum(int min_peak_num){min_peak_num_=min_peak_num;}
 	double getMinMass(){return min_mass_;}
 	void setMinMass(double min_mass){min_mass_=min_mass;}
-	xercesc::DOMElement* toXml(XmlDOMDocument* xml_doc);
+	void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 private:
 	int min_peak_num_;
 	double min_mass_;

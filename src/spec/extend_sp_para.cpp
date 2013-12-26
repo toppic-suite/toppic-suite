@@ -17,7 +17,7 @@ ExtendSpPara::ExtendSpPara(xercesc::DOMElement* element) {
   }
 }
 
-xercesc::DOMElement* ExtendSpPara::toXml(XmlDOMDocument* xml_doc) {
+void ExtendSpPara::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   xercesc::DOMElement* element = xml_doc->createElement("extend_sp_para");
   std::string str = convertToString(extend_min_mass_);
   xml_doc->addElement(element, "extend_min_mass", str.c_str());
@@ -27,7 +27,7 @@ xercesc::DOMElement* ExtendSpPara::toXml(XmlDOMDocument* xml_doc) {
     str = convertToString(ext_offsets_[i]);
     xml_doc->addElement(list_element, "extend_offset", str.c_str());
   }
-  return element;
+  parent->appendChild(element);
 }
 
 }

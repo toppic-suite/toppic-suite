@@ -35,7 +35,7 @@ class PeakTolerance {
 		min_tolerance_ = min_tolerance;
 	}
 
-  xercesc::DOMElement* toXml(XmlDOMDocument* xml_doc);
+  void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
  private:
   double ppo_;
