@@ -3,6 +3,7 @@
 
 #include "spec/deconv_peak.hpp"
 #include "spec/theo_peak.hpp"
+#include "prsm/prsm.hpp"
 #include "zeroptmsearch/zero_ptm_mng.hpp"
 #include "zeroptmsearch/zero_ptm_fast_match.hpp"
 
@@ -12,7 +13,8 @@ class ZeroPtmSlowMatch {
  public:
   ZeroPtmSlowMatch(int search_type, DeconvMsPtr deconv_ms_ptr, ZpFastMatchPtr fast_match_ptr,
                    ZeroPtmMngPtr mng_ptr);
-	double getScore() {return score;}
+	double getScore() {return score_;}
+  PrSMPtr geneResult();
 
  private:
 	ZeroPtmMngPtr mng_ptr_;
@@ -23,8 +25,8 @@ class ZeroPtmSlowMatch {
 	double refine_prec_mass_;
 	ExtendMsPtr refine_ms_ptr_;
 
-	double score = 0;
-	double recal = 0;
+	double score_ = 0;
+	double recal_ = 0;
 
   void compScore (ExtendMsPtr refine_ms_ptr, TheoPeakPtrVec theo_peaks, double ppo);
   bool isValid (double recal, double ppo);

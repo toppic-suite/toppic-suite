@@ -35,12 +35,8 @@ typedef std::vector<ZpFastMatchPtr> ZpFastMatchPtrVec;
 
 
 inline bool compareZeroPtmFastMatchDown(ZpFastMatchPtr m1, ZpFastMatchPtr m2) {
-  if  (m1->getScore() > m2->getScore()) {
-    return 1;
-  }
-  else {
-    return 0;
-  }
+  if  (m1->getScore() > m2->getScore()) {return 1;}
+  else {return 0;}
 }
 
 

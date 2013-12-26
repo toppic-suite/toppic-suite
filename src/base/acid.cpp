@@ -25,25 +25,21 @@ AcidPtrVec getAcidPtrVecInstance(const char* file_name) {
   AcidPtrVec acid_list;
   XmlDOMParser* parser = getXmlDOMInstance();
   if (parser) {
-    XmlDOMDocument* doc = new XmlDOMDocument(parser, file_name);
-    LOG_DEBUG( "doc " << doc);
-    if (doc) {
-      xercesc::DOMElement* parent = doc->getDocumentElement();
-      int acid_num = getChildCount(parent, "amino_acid");
-      LOG_DEBUG( "acid num " << acid_num);
-      for (int i = 0; i < acid_num; i++) {
-        xercesc::DOMElement* element = getChildElement(parent, "amino_acid", i);
-        std::string name = getChildValue(element, "name", 0);
-        std::string one_letter = getChildValue(element, "one_letter", 0);
-        std::string three_letter = getChildValue(element, "three_letter", 0);
-        std::string composition = getChildValue(element, "composition", 0);
-        double mono_mass = getDoubleChildValue(element, "mono_mass", 0);
-        double avg_mass = getDoubleChildValue(element, "average_mass", 0);
-        acid_list.push_back(AcidPtr(
-                new Acid(name, one_letter, three_letter, composition, mono_mass, avg_mass)));
+    XmlDOMDocument doc(parser, file_name);
+    xercesc::DOMElement* parent = doc.getDocumentElement();
+    int acid_num = getChildCount(parent, "amino_acid");
+    LOG_DEBUG( "acid num " << acid_num);
+    for (int i = 0; i < acid_num; i++) {
+      xercesc::DOMElement* element = getChildElement(parent, "amino_acid", i);
+      std::string name = getChildValue(element, "name", 0);
+      std::string one_letter = getChildValue(element, "one_letter", 0);
+      std::string three_letter = getChildValue(element, "three_letter", 0);
+      std::string composition = getChildValue(element, "composition", 0);
+      double mono_mass = getDoubleChildValue(element, "mono_mass", 0);
+      double avg_mass = getDoubleChildValue(element, "average_mass", 0);
+      acid_list.push_back(AcidPtr(
+              new Acid(name, one_letter, three_letter, composition, mono_mass, avg_mass)));
 
-      }
-      delete doc;
     }
     // deleting parser is not necessary
   }

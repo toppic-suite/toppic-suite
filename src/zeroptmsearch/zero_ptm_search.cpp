@@ -41,16 +41,16 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
                                                  ion_type_ptr_list);
 
     if (spec_set_ptr.get() != nullptr) {
-      SimplePrSMPtrVec comp_prsms;
+      PrSMPtrVec comp_prsms;
       zeroPtmSearch(spec_set_ptr, SEMI_ALIGN_TYPE_COMPLETE, prot_mod_forms, 
                     mng_ptr, comp_prsms);
-      SimplePrSMPtrVec pref_prsms;
+      PrSMPtrVec pref_prsms;
       zeroPtmSearch(spec_set_ptr, SEMI_ALIGN_TYPE_PREFIX, prot_mod_forms, 
                     mng_ptr, pref_prsms);
-      SimplePrSMPtrVec suff_prsms;
+      PrSMPtrVec suff_prsms;
       zeroPtmSearch(spec_set_ptr, SEMI_ALIGN_TYPE_SUFFIX, prot_mod_none_forms, 
                     mng_ptr, suff_prsms);
-      SimplePrSMPtrVec internal_prsms;
+      PrSMPtrVec internal_prsms;
       zeroPtmSearch(spec_set_ptr, SEMI_ALIGN_TYPE_SUFFIX, prot_mod_none_forms, 
                     mng_ptr, internal_prsms);
       LOG_DEBUG("zero ptm search complete " << n);
@@ -103,7 +103,7 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
 
 void zeroPtmSearch(SpectrumSetPtr spec_set_ptr, int type,
                    ProteoformPtrVec &form_ptr_vec, ZeroPtmMngPtr mng_ptr, 
-                   SimplePrSMPtrVec &prsms) {
+                   PrSMPtrVec &prsms) {
   ExtendMsPtr ms_three = spec_set_ptr->getSpThree();
 
   ZpFastMatchPtrVec fast_matches = zeroPtmFastFilter(type, ms_three,
@@ -112,24 +112,12 @@ void zeroPtmSearch(SpectrumSetPtr spec_set_ptr, int type,
   DeconvMsPtr deconv_ms = spec_set_ptr->getDeconvMs();
   ZpSlowMatchPtrVec slow_matches = zeroPtmSlowFilter(type, deconv_ms, fast_matches, mng_ptr ); 
 
-  /*
-  if (slowMatches != null) {
-    for (int i = 0; i < slowMatches.length; i++) {
-      prsmList.add(slowMatches[i].geneResult());
-    }
+  for (unsigned int i = 0; i < slow_matches.size(); i++) {
+      prsms.push_back(slow_matches[i]->geneResult());
   }
-  Collections.sort(prsmList, new MatchFragComparator());
-  for (int i = 0; i < mng.nReport; i++) {
-    prsms[type.getCode()][i] = null;
-  }
-  for (int i = 0; i < mng.nReport; i++) {
-    if (i >= prsmList.size()) {
-      break;
-    }
-    logger.trace("slow match score " + slowMatches[i].getScore());
-    prsms[type.getCode()][i] = prsmList.get(i);
-  }
-  */
+
+  std::sort(prsms.begin(), prsms.end(), prsm_match_fragment_down);
+  prsms.erase(prsms.begin() + 1, prsms.end());
 }
 
 } // end namespace
