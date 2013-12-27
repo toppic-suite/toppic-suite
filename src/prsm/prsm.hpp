@@ -92,6 +92,14 @@ class PrSM {
   void init(SpParaPtr sp_para_ptr);
 };
 
+typedef std::shared_ptr<PrSM> PrSMPtr;
+typedef std::vector<PrSMPtr> PrSMPtrVec;
+
+inline bool prsm_match_fragment_down(const PrSMPtr p1, PrSMPtr p2) {
+  if  (p1->getMatchFragNum() > p2->getMatchFragNum()) {return 1;}
+  else {return 0;}
+}
+
 }
 
 #endif
