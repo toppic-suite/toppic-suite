@@ -11,6 +11,7 @@
 #include "base/ion.hpp"
 #include "base/bp_spec.hpp"
 #include "base/activation.hpp"
+#include "base/proteoform.hpp"
 #include "spec/peak.hpp"
 
 namespace prot {
@@ -18,7 +19,7 @@ namespace prot {
 class TheoPeak : public Peak {
 public:
 	TheoPeak(IonPtr ion,double unmode_mass,double shift);
-	IonPtr getIon(){return ion_;}
+	IonPtr getIonPtr(){return ion_;}
 	double getModMass(){return getPosition();}
 	double getShift(){return shift_;}
 private:
@@ -30,11 +31,11 @@ private:
 typedef std::shared_ptr<TheoPeak> TheoPeakPtr;
 typedef std::vector<TheoPeakPtr> TheoPeakPtrVec;
 
-inline bool theopeak_up(const TheoPeakPtr p,TheoPeakPtr n){
+inline bool theo_peak_up(const TheoPeakPtr p,TheoPeakPtr n){
   return p->getPosition() < n->getPosition();
 }
 
-inline bool theopeak_down(const TheoPeakPtr p,TheoPeakPtr n){
+inline bool theo_peak_down(const TheoPeakPtr p,TheoPeakPtr n){
   return p->getPosition() > n->getPosition();
 }
 
@@ -51,7 +52,6 @@ TheoPeakPtrVec getTheoPeak(BpSpecPtr pep,ActivationPtr type,
 
 TheoPeakPtrVec getProteoformTheoPeak(ProteoformPtr proteoform_ptr, 
                                      ActivationPtr activation_ptr,
-                                     NeutralLossPtr neu_loss_ptr,
                                      double min_mass);
 } /* namespace prot */
 

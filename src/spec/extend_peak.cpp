@@ -56,10 +56,11 @@ ExtendMsPtr getMsThree(DeconvMsPtr deconv_ms,double delta,SpParaPtr sp_para){
 	//function msThreeSetTolerance
 	for (unsigned int i = 0; i < list_filtered.size();i++){
 		list_filtered[i]->setOrigTolerance(
-				sp_para->getPeakTolerance()->compStrictErrorTole(list_filtered[i]->getBasePeak()->getMonoMass()));
+				sp_para->getPeakTolerance()->
+        compStrictErrorTole(list_filtered[i]->getBasePeakPtr()->getMonoMass()));
 		list_filtered[i]->setReverseTolerance(
 				sp_para->getPeakTolerance()->compRelaxErrorTole(
-						list_filtered[i]->getBasePeak()->getMonoMass(),pre_mono_mass));
+						list_filtered[i]->getBasePeakPtr()->getMonoMass(),pre_mono_mass));
 	}
 	//end msThreeSetTolerance and result = list_filtered
 	 return ExtendMsPtr(new Ms<ExtendPeakPtr>(header,list_filtered));

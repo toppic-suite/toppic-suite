@@ -212,9 +212,6 @@ std::vector<std::vector<int>> getIntMassErrorList(PrmMsPtr ms,double scale,bool 
 		int m = (int)std::round(ms->getPeakPtr(i)->getPosition()*scale);
 //		std::cout<< m << std::endl;
 //		std::cout<< ms->getPeakPtr(i)->getPosition()*scale << std::endl;
-		if(m==79987){
-			int l =0;
-		}
 		int e = 0;
 		if(n_strict && c_strict){
 			e = (int) std::ceil(ms->getPeakPtr(i)->getStrictTolerance()*scale);

@@ -22,10 +22,9 @@ ZeroPtmSlowMatch::ZeroPtmSlowMatch(int search_type,
   refine_ms_ptr_ = getMsThree(deconv_ms_ptr_, delta, mng_ptr_->sp_para_ptr_);
 
   ActivationPtr activation_ptr = deconv_ms_ptr_->getHeaderPtr()->getActivationPtr();
-  NeutralLossPtr neu_loss_ptr = mng_ptr->base_data_ptr_->getNeutralLossNonePtr();
   double min_mass = mng_ptr_->sp_para_ptr_->getMinMass();
   TheoPeakPtrVec theo_peaks = getProteoformTheoPeak(proteoform_ptr_, 
-                                                    activation_ptr, neu_loss_ptr, min_mass);
+                                                    activation_ptr, min_mass);
 
   compScore(refine_ms_ptr_, theo_peaks, mng_ptr_->sp_para_ptr_->getPeakTolerance()->getPpo());
 }
@@ -78,18 +77,24 @@ void ZeroPtmSlowMatch::compScore (ExtendMsPtr refine_ms_ptr, TheoPeakPtrVec theo
   compMsMassPpos(ms_masses, theo_masses, ppo, result_ppos);
 
   if (!mng_ptr_->do_recalibration_) {
-    recal = 0;
+    recal_ = 0;
   } else {
     // minus is important 
-    recal = -compAvg(result_ppos, mng_ptr_->recal_ppo_);
-    if (!isValid(recal, ppo)) {
-      recal = 0;
+    recal_ = -compAvg(result_ppos, mng_ptr_->recal_ppo_);
+    if (!isValid(recal_, ppo)) {
+      recal_ = 0;
     }
   }
   for (unsigned int i = 0; i < ms_masses.size(); i++) {
-    ms_masses[i] = ms_masses[i] * (1 + recal);
+    ms_masses[i] = ms_masses[i] * (1 + recal_);
   }
-  score = compUniqueScore(ms_masses, theo_masses, ppo);
+  score_ = compUniqueScore(ms_masses, theo_masses, ppo);
+}
+
+
+PrSMPtr ZeroPtmSlowMatch::geneResult() {
+  return PrSMPtr(new PrSM(proteoform_ptr_, deconv_ms_ptr_, refine_prec_mass_, 
+                          recal_, mng_ptr_->sp_para_ptr_));
 }
 
 ZpSlowMatchPtrVec zeroPtmSlowFilter(int semi_align_type,
@@ -109,13 +114,9 @@ ZpSlowMatchPtrVec zeroPtmSlowFilter(int semi_align_type,
   return slow_matches;
 }
 
+
+
 }
 
-/*
-	public PrSM geneResult() throws Exception {
-		// logger.debug(" gene result recal " + recal);
-		return new PrSM(annoProtein, deconvMs, refinePrecMass, recal, mng.spPara);
-	}
 
 
-*/

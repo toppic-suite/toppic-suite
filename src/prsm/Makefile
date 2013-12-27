@@ -15,13 +15,13 @@ LFLAGS = -L/lib -L/opt/local/lib
 LIBS = -lxerces-c 
 #
 # define the C++ source files
-SRCS = prsm.cpp simple_prsm.cpp main.cpp
+SRCS = peak_ion_pair.cpp prsm.cpp simple_prsm.cpp main.cpp
 #
 # define the C object files 
 #
 
 OBJ_DIR = ../../obj
-OBJS = $(addprefix $(OBJ_DIR)/, main.o prsm.o simple_prsm.o deconv_peak.o deconv_ms.o peak_tolerance.o extend_peak.o ms_header.o xml_dom_document.o xml_dom.o)
+OBJS = $(addprefix $(OBJ_DIR)/, main.o algorithm.o break_point.o bp_spec.o ion.o change.o ptm.o acid.o residue.o residue_seq.o proteoform.o theo_peak.o peak_ion_pair.o prsm.o simple_prsm.o deconv_peak.o deconv_ms.o peak_tolerance.o extend_peak.o ms_header.o xml_dom_document.o xml_dom.o)
 
 BIN_DIR = ../../bin
 

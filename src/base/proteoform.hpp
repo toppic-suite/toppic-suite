@@ -31,6 +31,8 @@ public:
 
   int getEndPos() {return end_pos_;}
 
+  int getLen() {return end_pos_ - start_pos_ + 1;}
+
   ChangePtrVec getChangePtrVec() {return change_list_;}
 
   SegmentPtrVec getSegmentPtrVec();
