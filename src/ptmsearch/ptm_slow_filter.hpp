@@ -9,10 +9,18 @@
 #define PTM_SLOW_FILTER_HPP_
 
 #include <memory>
+#include "ptmsearch/comp_shift_low_mem.hpp"
+#include "ptmsearch/ptm_slow_match.hpp"
+#include "spec/spectrum_set.hpp"
+#include "prsm/simple_prsm.hpp"
+#include "ptmsearch/ptm_mng.hpp"
 
 namespace prot {
 
 class PtmSlowFilter {
+public:
+	PtmSlowFilter(SpectrumSetPtr spectrum_set,SimplePrSMPtrVec fast_Matches,CompShiftLowMemPtr comp_shift,PtmMngPtr mng);
+	PtmSlowMatchPtrVec getBestMatch(int nshift,int type);
 };
 
 typedef std::shared_ptr<PtmSlowFilter> PtmSlowFilterPtr;
