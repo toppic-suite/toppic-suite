@@ -1,0 +1,48 @@
+#include "peak_ion_pair.hpp"
+
+namespace prot {
+
+void PeakIonPair::appendPeakToXml(XmlDOMDocument* xml_doc, 
+                                  xercesc::DOMElement* parent) {
+
+  xercesc::DOMElement* element = xml_doc->createElement("matched_peak");
+  std::string str = theo_peak_ptr_->getIonPtr()->getIonTypePtr()->getName();
+  xml_doc->addElement(element, "ion_name", str.c_str());
+  str = convertToString(real_peak_ptr_->getBasePeakPtr()->getId());
+  xml_doc->addElement(element, "peak_id", str.c_str());
+  str = convertToString(real_peak_ptr_->getBasePeakPtr()->getCharge());
+  xml_doc->addElement(element, "peak_charge", str.c_str());
+  parent->appendChild(element);
+}
+
+void PeakIonPair::appendIonToXml(XmlDOMDocument* xml_doc, 
+                                 xercesc::DOMElement* parent) {
+  xercesc::DOMElement* element = xml_doc->createElement("matched_ion");
+  std::string str = theo_peak_ptr_->getIonPtr()->getIonTypePtr()->getName().substr(0,1);
+  xml_doc->addElement(element, "type", str.c_str());
+  str = convertToString(theo_peak_ptr_->getShift());
+  xml_doc->addElement(element, "match_shift", str.c_str()); 
+  str = convertToString(real_peak_ptr_->getMonoMass());
+  xml_doc->addElement(element, "adjusted_mass", str.c_str()); 
+  str = convertToString(theo_peak_ptr_->getIonPtr()->getDisplayPos());
+  xml_doc->addElement(element, "ion_display_posistion", str.c_str()); 
+  str = convertToString(theo_peak_ptr_->getIonPtr()->getPos());
+  xml_doc->addElement(element, "ion_left_posistion", str.c_str()); 
+  double error = real_peak_ptr_->getMonoMass() - theo_peak_ptr_->getModMass();
+  str = convertToString(error);
+  xml_doc->addElement(element, "mass_error", str.c_str()); 
+  str = convertToString(error * 1000000 / real_peak_ptr_->getMonoMass());
+  xml_doc->addElement(element, "ppm", str.c_str()); 
+  parent->appendChild(element);
+}
+
+void getMatchedPairs(PeakIonPairPtrVec &pairs, int peak_id, 
+                     PeakIonPairPtrVec &selected_pairs) {
+  for (unsigned int i = 0; i < pairs.size(); i++) {
+    if (pairs[i]->getRealPeakPtr()->getBasePeakPtr()->getId() == peak_id) {
+      selected_pairs.push_back(pairs[i]);
+    }
+  }
+}
+
+}
