@@ -52,7 +52,7 @@ ResiduePtrVec getResiduePtrVecInstance(AcidPtrVec &acid_list,
                                        PtmPtrVec &ptm_list,
                                        std::string file_name) {
   ResiduePtrVec residue_list;
-  XmlDOMParser* parser = getXmlDOMInstance();
+  XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMInstance();
   if (parser) {
     XmlDOMDocument* doc = new XmlDOMDocument(parser, file_name.c_str());
     LOG_DEBUG( "doc " << doc);
@@ -80,7 +80,7 @@ ResiduePtrVec getResiduePtrVecInstance(AcidPtrVec &acid_list,
                                        ResiduePtrVec &residue_list,
                                        std::string file_name) {
   ResiduePtrVec new_list;
-  XmlDOMParser* parser = getXmlDOMInstance();
+  XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMInstance();
   if (parser) {
     XmlDOMDocument* doc = new XmlDOMDocument(parser, file_name.c_str());
     LOG_DEBUG( "doc " << doc);

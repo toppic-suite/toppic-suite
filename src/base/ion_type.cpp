@@ -18,7 +18,7 @@ IonType::IonType(std::string name, bool n_term, double shift) {
 
 IonTypePtrVec getIonTypePtrVecInstance(const char* file_name){
 	IonTypePtrVec ionType_ptr_vec;
-	prot::XmlDOMParser* parser = prot::getXmlDOMInstance();
+	prot::XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMInstance();
 	if (parser) {
 	    prot::XmlDOMDocument* doc = new prot::XmlDOMDocument(parser, file_name);
       xercesc::DOMElement* parent = doc->getDocumentElement();

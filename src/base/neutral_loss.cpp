@@ -17,7 +17,7 @@ NeutralLoss::NeutralLoss(std::string name,double mass){
 
 NeutralLossPtrVec getNeutralLossPtrVecInstance(const char* file_name){
 	NeutralLossPtrVec neutralLossPtrVec;
-	prot::XmlDOMParser* parser = prot::getXmlDOMInstance();
+	prot::XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMInstance();
   if (parser) {
     prot::XmlDOMDocument* doc = new prot::XmlDOMDocument(parser, file_name);
     if (doc) {

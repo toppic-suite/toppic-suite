@@ -11,7 +11,6 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include <xercesc/dom/DOM.hpp>
 
 namespace prot {
 
