@@ -1,12 +1,12 @@
 /*
- * sem_align_type.cpp
+ * anno_cleavage.cpp
  *
  *  Created on: Dec 27, 2013
  *      Author: xunlikun
  */
 
-#include <prsm/sem_align_type.hpp>
+#include <prsm/anno_cleavage.hpp>
 
 namespace prot {
 
-}
+} /* namespace prot */

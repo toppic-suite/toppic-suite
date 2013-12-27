@@ -8,7 +8,10 @@
 #ifndef SEM_ALIGN_TYPE_HPP_
 #define SEM_ALIGN_TYPE_HPP_
 
-class SemAlignType {
+#include <memory>
+namespace prot {
+class SemiAlignType {
 };
-
+typedef std::shared_ptr<SemiAlignType> SemiAlignTypePtr;
+}
 #endif /* SEM_ALIGN_TYPE_HPP_ */
