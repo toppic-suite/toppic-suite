@@ -33,6 +33,8 @@ public:
 
   int getLen() {return end_pos_ - start_pos_ + 1;}
 
+  int getSeqId(){return seq_id_;}
+
   ChangePtrVec getChangePtrVec() {return change_list_;}
 
   SegmentPtrVec getSegmentPtrVec();
@@ -48,7 +50,9 @@ private:
   
   std::string name_;
 
-	ResSeqPtr residue_seq_ptr_;
+  int seq_id_;
+
+  ResSeqPtr residue_seq_ptr_;
 
   BpSpecPtr bp_spec_ptr_;
 
