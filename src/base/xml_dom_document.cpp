@@ -19,6 +19,11 @@ XmlDOMDocument::XmlDOMDocument(XmlDOMParser* parser,
   }
 }
 
+XmlDOMDocument::XmlDOMDocument(xercesc::DOMImplementation* implementation,std::string root){
+	xercesc::DOMDocument* doc = implementation->createDocument(0,X(root),0);
+	doc_=doc;
+}
+
 XmlDOMDocument::XmlDOMDocument(xercesc::DOMDocument* doc){
 	doc_=doc;
 }
@@ -39,6 +44,11 @@ void XmlDOMDocument::addElement(xercesc::DOMElement* parent,xercesc::DOMElement*
 
 int XmlDOMDocument::writeXmlDOMDocument(const char * filename){
 	return prot::writeXmlFile(doc_,filename);
+}
+
+xercesc::DOMNodeList* getChildElements(xercesc::DOMElement *parent,
+                                const char* tag) {
+  return parent->getElementsByTagName(X(tag));
 }
 
 xercesc::DOMElement* getChildElement(xercesc::DOMElement *parent, 

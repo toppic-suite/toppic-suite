@@ -18,6 +18,7 @@ class XmlDOMDocument {
  public:
   XmlDOMDocument(XmlDOMParser* parser, const char* xml_file);
   XmlDOMDocument(xercesc::DOMDocument* doc);
+  XmlDOMDocument(xercesc::DOMImplementation* implementation,std::string root);
   ~XmlDOMDocument();
 
   xercesc::DOMElement* createElement(const char* tag);
@@ -39,6 +40,9 @@ class XmlDOMDocument {
  private:
   xercesc::DOMDocument* doc_;
 };
+
+xercesc::DOMNodeList* getChildElements(xercesc::DOMElement *parent,
+                                const char* tag);
 
 xercesc::DOMElement* getChildElement(xercesc::DOMElement* parent, 
                                 const char* tag, int index);
