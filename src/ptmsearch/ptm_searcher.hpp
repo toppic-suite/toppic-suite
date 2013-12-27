@@ -11,15 +11,22 @@
 #include <memory>
 #include <vector>
 #include "ptmsearch/ptm_mng.hpp"
+#include "spec/spectrum_set.hpp"
+#include "prsm/simple_prsm.hpp"
+#include "prsm/prsm.hpp"
+#include "ptmsearch/ptm_slow_filter.hpp"
+#include "ptmsearch/comp_shift_low_mem.hpp"
 
 namespace prot {
 
 class PtmSearcher {
 public:
 	PtmSearcher(PtmMngPtr mng);
+	void search(SpectrumSetPtr spectrum_set,SimplePrSMPtrVec matches,PrSMPtrVec3D prms);
+	void search(SpectrumSetPtr spectrum_set,SimplePrSMPtrVec matches,PrSMPtrVec3D prms,PtmSlowFilterPtr slow_filter);
 private:
 	PtmMngPtr mng_;
-//	CompShiftLowMemPtr
+	CompShiftLowMemPtr comp_shift_;
 };
 
 typedef std::shared_ptr<PtmSearcher> PtmSearcherPtr;

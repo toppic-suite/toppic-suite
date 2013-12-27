@@ -9,6 +9,9 @@
 #include "prsm/simple_prsm.hpp"
 #include "base/fasta_reader.hpp"
 #include "spec/deconv_ms.hpp"
+#include "prsm/prsm.hpp"
+#include "spec/spectrum_set.hpp"
+#include "spec/msalign_reader.hpp"
 
 namespace prot {
 
@@ -42,6 +45,8 @@ void PtmProcessor::processDatabase(PtmSearcherPtr searcher){
 
 	//reader & writer
 
+	MsAlignReader spReader(sp_file_name.c_str(), mng_->base_data->getActivationPtrVec());
+
 //	SimplePrSMPtrVec2D prsms;
 //
 //	for(unsigned int i =0;i<mng_->n_unknown_shift_;i++){
@@ -51,7 +56,27 @@ void PtmProcessor::processDatabase(PtmSearcherPtr searcher){
 //	}
 
 	DeconvMsPtr deconv_sp;
+	PrSMPtrVec3D prsms;
+	int cnt = 0;
+	while((deconv_sp = spReader.getNextMs())!= nullptr){
+		cnt++;
+		for(int i=0;i<deconv_sp->size();i++){
+			SpectrumSetPtr spectrumset = prot::getSpectrumSet(deconv_sp,0,mng_->sp_para_,0,mng_->base_data->getIonTypePtrVec());
+			if(spectrumset != nullptr){
+				std::string scan = deconv_sp->getHeaderPtr()->getScansString();
+				//update message;
+				SimplePrSMPtrVec slectedPrsms = prot::findSimplePrsms(simplePrsms_,deconv_sp->getHeaderPtr());
+				//todo::searcher.search(spectrumset,slectedPrsms.prsms);
+				//write
+				for(int j=0;j<mng_->n_unknown_shift_;j++){
+					for(int k=0;k<4;k++){
 
+
+					}
+				}
+			}
+		}
+	}
 }
 
 } /* namespace prot */
