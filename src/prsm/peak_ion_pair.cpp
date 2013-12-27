@@ -1,5 +1,5 @@
-
 #include "base/algorithm.hpp"
+#include "spec/theo_peak.hpp"
 #include "prsm/peak_ion_pair.hpp"
 
 namespace prot {
@@ -78,6 +78,7 @@ void findPairs(ExtendMsPtr ms_three_ptr, TheoPeakPtrVec &theo_peaks,
 void getPeakIonPairs (ProteoformPtr proteoform_ptr, ExtendMsPtr ms_three_ptr, 
                       double min_mass, PeakIonPairPtrVec &pairs) {
   ActivationPtr activation_ptr = ms_three_ptr->getHeaderPtr()->getActivationPtr();
+
   TheoPeakPtrVec theo_peaks = getProteoformTheoPeak(proteoform_ptr, 
                                                     activation_ptr, 
                                                     min_mass);

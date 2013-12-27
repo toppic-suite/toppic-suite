@@ -20,7 +20,7 @@ XmlDOMDocument::XmlDOMDocument(XmlDOMParser* parser,
 }
 
 XmlDOMDocument::XmlDOMDocument(xercesc::DOMImplementation* implementation,std::string root){
-	xercesc::DOMDocument* doc = implementation->createDocument(0,X(root),0);
+	xercesc::DOMDocument* doc = implementation->createDocument(0,X(root.c_str()),0);
 	doc_=doc;
 }
 
