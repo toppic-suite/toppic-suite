@@ -20,8 +20,7 @@ SimplePrSM::SimplePrSM(MsHeaderPtr header,ProteoformPtr seq,int score){
 	precursor_id_ = header->getPrecId();
 	prec_mass_ = header->getPrecMonoMass();
 	seq_= seq;
-	//todo:seq_id and name should be delete? name
-//	seq_id_ = seq->getResSeqPtr()->getResiduePtr();
+	seq_id_ = seq->getSeqId();
 	seq_name_ = seq->getName();
 	score_ = score;
 }
@@ -49,7 +48,11 @@ int SimplePrSM::compareTo(SimplePrSMPtr simple_prsm_ptr){
 	}
 }
 void SimplePrSM::findSeq(std::vector<ProteoformPtr> seqs){
-//todo: didn't find id
+	seq_ = seqs[seq_id_];
+	if(seq_->getSeqId() != seq_id_ || seq_->getName().compare(seq_name_)!=0){
+		std::cout<< "Sequence ID and/or name is not consistent!" << std::endl;
+		std::exit(0);
+	}
 }
 
 xercesc::DOMElement* SimplePrSM::toXml(XmlDOMDocument* xml_doc){

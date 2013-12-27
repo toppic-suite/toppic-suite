@@ -3,9 +3,9 @@
 
 #include "spec/deconv_peak.hpp"
 #include "spec/theo_peak.hpp"
-#include "prsm/prsm.hpp"
 #include "zeroptmsearch/zero_ptm_mng.hpp"
 #include "zeroptmsearch/zero_ptm_fast_match.hpp"
+#include "prsm/prsm.hpp"
 
 namespace prot {
 
@@ -36,12 +36,7 @@ typedef std::shared_ptr<ZeroPtmSlowMatch> ZpSlowMatchPtr;
 typedef std::vector<ZpSlowMatchPtr> ZpSlowMatchPtrVec;
 
 inline bool compareZeroPtmSlowMatchDown(ZpSlowMatchPtr m1, ZpSlowMatchPtr m2) {
-  if  (m1->getScore() > m2->getScore()) {
-    return 1;
-  }
-  else {
-    return 0;
-  }
+  return m1->getScore() > m2->getScore();
 }
 
 ZpSlowMatchPtrVec zeroPtmSlowFilter(int semi_align_type,
