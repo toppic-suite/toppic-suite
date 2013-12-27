@@ -1,6 +1,6 @@
 #include "spec/ms.hpp"
-
 #include "prsm/prsm.hpp"
+#include "prsm/peak_ion_pair.hpp"
 
 namespace prot {
 
@@ -22,28 +22,29 @@ void PrSM::init(SpParaPtr sp_para_ptr) {
   double delta = adjusted_prec_mass_ = ori_prec_mass_;
   refine_ms_three_ = getMsThree(deconv_ms_ptr_, delta, sp_para_ptr);
   refine_ms_three_->recalibrate(calibration_);
-  //initScores();
+  initScores(sp_para_ptr);
+}
+
+void PrSM::initScores(SpParaPtr sp_para_ptr) {
+  // refined one 
+  PeakIonPairPtrVec pairs;
+  getPeakIonPairs (proteoform_ptr_, refine_ms_three_, 
+                   sp_para_ptr->getMinMass(), pairs);
+  match_peak_num_ = 0;
+  match_fragment_num_ = 0;
+  TheoPeakPtr prev_ion(nullptr);;
+  for (unsigned int i = 0; i < pairs.size(); i++) {
+    match_peak_num_ += pairs[i]->getRealPeakPtr()->getScore();
+    if (pairs[i]->getTheoPeakPtr() != prev_ion) {
+      prev_ion = pairs[i]->getTheoPeakPtr();
+      match_fragment_num_ += pairs[i]->getRealPeakPtr()->getScore();
+    }
+  }
 }
 
 }
 
 /*
-	void PrSM::initScores() {
-		// refined one 
-		PeakIonPair pairs[] = annoProtein.getMatchPeak(refineMsThree,
-				spPara.getMinMass());
-		nMatchPeak = 0;
-		nMatchFragment = 0;
-		TheoPeak prevIon = null;
-		for (int j = 0; j < pairs.length; j++) {
-			nMatchPeak += pairs[j].getRealPeak().getScore();
-			if (pairs[j].getTheoPeak() != prevIon) {
-				prevIon = pairs[j].getTheoPeak();
-				nMatchFragment += pairs[j].getRealPeak().getScore();
-			}
-		}
-	}
-
 	public PrSM(Element element) throws Exception {
 		prsmId = Integer.parseInt(element.getChildText("prsm_id"));
 		spectrumId = Integer.parseInt(element.getChildText("spectrum_id"));

@@ -23,7 +23,7 @@ class ExtendPeak : public Peak{
 public:
 	ExtendPeak();
 	ExtendPeak(DeconvPeakPtr base_peak,double mono_mass,double score);
-	DeconvPeakPtr getBasePeak(){return base_peak_;}
+	DeconvPeakPtr getBasePeakPtr(){return base_peak_;}
 	double getMonoMass(){return mono_mass_;}
 	double getScore(){return score_;}
 	double getOrigTolerance(){return orig_tolerance_;}

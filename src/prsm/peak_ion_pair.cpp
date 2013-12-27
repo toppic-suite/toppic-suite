@@ -1,4 +1,6 @@
-#include "peak_ion_pair.hpp"
+
+#include "base/algorithm.hpp"
+#include "prsm/peak_ion_pair.hpp"
 
 namespace prot {
 
@@ -43,6 +45,44 @@ void getMatchedPairs(PeakIonPairPtrVec &pairs, int peak_id,
       selected_pairs.push_back(pairs[i]);
     }
   }
+}
+
+void findPairs(ExtendMsPtr ms_three_ptr, TheoPeakPtrVec &theo_peaks, 
+               int bgn, int end, PeakIonPairPtrVec &pairs) {
+  std::sort(theo_peaks.begin(), theo_peaks.end(), theo_peak_up);
+  std::vector<double> ms_masses;
+  getExtendMassVec(ms_three_ptr, ms_masses);
+  std::vector<double> theo_masses; 
+  getTheoMassVec(theo_peaks, theo_masses);
+
+  unsigned int i = 0;
+  unsigned int j = 0;
+  while (i < ms_masses.size() && j < theo_masses.size()) {
+    double deviation = ms_masses[i] - theo_masses[j];
+    IonPtr ion_ptr = theo_peaks[j]->getIonPtr();
+    double err = ms_three_ptr->getPeakPtr(i)->getOrigTolerance();
+    if (ion_ptr->getPos() >= bgn && ion_ptr->getPos() <= end) {
+      if (abs(deviation) <= err) {
+        PeakIonPairPtr pair_ptr 
+            = PeakIonPairPtr(new PeakIonPair(ms_three_ptr->getPeakPtr(i), theo_peaks[j]));
+      }
+    }
+    if (increaseIJ(i, j, deviation, err, ms_masses, theo_masses)) {
+      i++;
+    } else {
+      j++;
+    }
+  }
+}
+
+void getPeakIonPairs (ProteoformPtr proteoform_ptr, ExtendMsPtr ms_three_ptr, 
+                      double min_mass, PeakIonPairPtrVec &pairs) {
+  ActivationPtr activation_ptr = ms_three_ptr->getHeaderPtr()->getActivationPtr();
+  TheoPeakPtrVec theo_peaks = getProteoformTheoPeak(proteoform_ptr, 
+                                                    activation_ptr, 
+                                                    min_mass);
+
+  findPairs(ms_three_ptr, theo_peaks, 0, proteoform_ptr->getLen(), pairs);
 }
 
 }

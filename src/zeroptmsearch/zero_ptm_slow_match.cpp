@@ -22,10 +22,9 @@ ZeroPtmSlowMatch::ZeroPtmSlowMatch(int search_type,
   refine_ms_ptr_ = getMsThree(deconv_ms_ptr_, delta, mng_ptr_->sp_para_ptr_);
 
   ActivationPtr activation_ptr = deconv_ms_ptr_->getHeaderPtr()->getActivationPtr();
-  NeutralLossPtr neu_loss_ptr = mng_ptr->base_data_ptr_->getNeutralLossNonePtr();
   double min_mass = mng_ptr_->sp_para_ptr_->getMinMass();
   TheoPeakPtrVec theo_peaks = getProteoformTheoPeak(proteoform_ptr_, 
-                                                    activation_ptr, neu_loss_ptr, min_mass);
+                                                    activation_ptr, min_mass);
 
   compScore(refine_ms_ptr_, theo_peaks, mng_ptr_->sp_para_ptr_->getPeakTolerance()->getPpo());
 }

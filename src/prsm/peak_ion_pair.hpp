@@ -38,6 +38,9 @@ typedef std::vector<PeakIonPairPtr> PeakIonPairPtrVec;
 void getMatchedPairs(PeakIonPairPtrVec &pairs, int peak_id, 
                      PeakIonPairPtrVec &selected_pairs);
 
+void getPeakIonPairs(ProteoformPtr proteoform_ptr, ExtendMsPtr ms_three_ptr, 
+                     double min_mass, PeakIonPairPtrVec &pairs);
+
 }
 
 #endif

@@ -4,7 +4,7 @@
 #include <array>
 
 #include "spec/spectrum_set.hpp"
-#include "prsm/simple_prsm.hpp"
+#include "prsm/prsm.hpp"
 #include "zeroptmsearch/zero_ptm_mng.hpp"
 
 namespace prot {
