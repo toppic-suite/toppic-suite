@@ -13,7 +13,7 @@ namespace prot {
 class PrSMWriter {
 public:
 	int write(const char *prm_file_name);
-	void addSimplePrSM(PrSMPtr matches);
+	void addSimplePrSM(PrSMPtr matche);
 	void addSimplePrSM(PrSMPtrVec matches);
 
 private:
