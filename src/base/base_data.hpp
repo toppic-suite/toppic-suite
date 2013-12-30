@@ -22,7 +22,8 @@ namespace prot {
 #define SEMI_ALIGN_TYPE_SUFFIX   2
 #define SEMI_ALIGN_TYPE_INTERNAL 3
 
-#define NEUTRAL_LOSS_NONE "NONE"
+#define DEFAULT_TYPE_NAME "NONE"
+#define ACETYLATION_NAME "ACETYLATION"
 
 class BaseData {
  public:
@@ -33,10 +34,16 @@ class BaseData {
   ResiduePtrVec& getResiduePtrVec() {return residue_list_;}
   TruncPtrVec& getTruncPtrVec() {return trunc_list_;}
   ProtModPtrVec& getProtModPtrVec() {return prot_mod_list_;}
+  ProtModPtr getDefaultProtModPtr() {
+    return getProtModPtrByName(prot_mod_list_, DEFAULT_TYPE_NAME);
+  }
+  ProtModPtr getAcetylationProtModPtr() {
+    return getProtModPtrByName(prot_mod_list_, ACETYLATION_NAME);
+  }
   IonTypePtrVec& getIonTypePtrVec() {return ion_type_list_;}
   NeutralLossPtrVec& getNeutralLossPtrVec() {return neutral_loss_list_;}
-  NeutralLossPtr getNeutralLossNonePtr() {
-    return getNeutralLossPtrByName(neutral_loss_list_, NEUTRAL_LOSS_NONE);
+  NeutralLossPtr getDefaultNeutralLossPtr() {
+    return getNeutralLossPtrByName(neutral_loss_list_, DEFAULT_TYPE_NAME);
   }
   ActivationPtrVec& getActivationPtrVec() {return activation_list_;}
 

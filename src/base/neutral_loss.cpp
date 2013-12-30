@@ -10,31 +10,30 @@
 
 namespace prot {
 
-NeutralLoss::NeutralLoss(std::string name,double mass){
+NeutralLoss::NeutralLoss(std::string name, double mass){
 	name_ = name;
 	mass_ = mass;
 }
 
-NeutralLossPtrVec getNeutralLossPtrVecInstance(const char* file_name){
-	NeutralLossPtrVec neutralLossPtrVec;
-	prot::XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMInstance();
+NeutralLossPtrVec getNeutralLossPtrVecInstance(const std::string &file_name){
+  NeutralLossPtrVec neutralLossPtrVec;
+  prot::XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMInstance();
   if (parser) {
-    prot::XmlDOMDocument* doc = new prot::XmlDOMDocument(parser, file_name);
-    if (doc) {
-      xercesc::DOMElement* parent = doc->getDocumentElement();
-      int neutral_loss_num = getChildCount(parent, "neutral_loss");
-      for (int i = 0; i < neutral_loss_num; i++) {
-        xercesc::DOMElement* element = getChildElement(parent, "neutral_loss", i);
-        std::string name = getChildValue(element,"name", 0);
-        double mass = getDoubleChildValue(element,"mass", 0);
-        neutralLossPtrVec.push_back(NeutralLossPtr(new NeutralLoss(name, mass)));
-      }
-      delete doc;
+    prot::XmlDOMDocument doc(parser, file_name.c_str());
+    xercesc::DOMElement* parent = doc.getDocumentElement();
+    int neutral_loss_num = getChildCount(parent, "neutral_loss");
+    for (int i = 0; i < neutral_loss_num; i++) {
+      xercesc::DOMElement* element = getChildElement(parent, "neutral_loss", i);
+      std::string name = getChildValue(element,"name", 0);
+      double mass = getDoubleChildValue(element,"mass", 0);
+      neutralLossPtrVec.push_back(NeutralLossPtr(new NeutralLoss(name, mass)));
     }
   }
   return neutralLossPtrVec;
 }
-NeutralLossPtr getNeutralLossPtrByName(NeutralLossPtrVec &neutralLoss_ptr_vec, const std::string &name){
+
+NeutralLossPtr getNeutralLossPtrByName(NeutralLossPtrVec &neutralLoss_ptr_vec, 
+                                       const std::string &name){
 	for (unsigned int i = 0; i < neutralLoss_ptr_vec.size(); i++) {
 	    std::string n = neutralLoss_ptr_vec[i]->getName();
 	    if (n == name) {

@@ -9,6 +9,7 @@
 #define PROT_ION_HPP_
 
 #include <sstream>
+
 #include "base/ion_type.hpp"
 #include "base/neutral_loss.hpp"
 
@@ -16,7 +17,9 @@ namespace prot {
 
 class Ion {
 public:
-	Ion(int charge,int pos,int display,IonTypePtr ion_type_ptr, NeutralLossPtr neutral_loss_ptr);
+	Ion(int charge,int pos,int display,IonTypePtr ion_type_ptr, 
+      NeutralLossPtr neutral_loss_ptr);
+
 	int getCharge(){return charge_;}
 	int getPos(){return pos_;}
 	int getDisplayPos(){return display_pos_;}

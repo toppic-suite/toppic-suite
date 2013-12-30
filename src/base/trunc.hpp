@@ -27,7 +27,7 @@ typedef std::shared_ptr<Trunc> TruncPtr;
 typedef std::vector<TruncPtr> TruncPtrVec;
 
 TruncPtrVec getTruncPtrVecInstance(AcidPtrVec &acid_list, 
-                                   const char* file_name);
+                                   const std::string &file_name);
 
 TruncPtr getTruncPtrByName(TruncPtrVec &trunc_list, 
                            const std::string &name);

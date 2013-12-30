@@ -6,11 +6,11 @@
 
 namespace prot {
 
-Proteoform::Proteoform(ProteoformPtr raw_form_ptr, ProtModPtr prot_mod_ptr, std::string name, 
-                       ResSeqPtr res_seq_ptr, int start_pos, int end_pos, ChangePtrVec change_list) {
-  raw_form_ptr_ = raw_form_ptr;
+Proteoform::Proteoform(DbResSeqPtr db_res_seq_ptr, ProtModPtr prot_mod_ptr,  
+                       ResSeqPtr res_seq_ptr, int start_pos, int end_pos, 
+                       ChangePtrVec change_list) {
+  db_residue_seq_ptr_ = db_res_seq_ptr;
   prot_mod_ptr_ = prot_mod_ptr;
-  name_ = name;
   residue_seq_ptr_ = res_seq_ptr;
   start_pos_ = start_pos;
   end_pos_ = end_pos;
@@ -49,11 +49,37 @@ SegmentPtrVec Proteoform::getSegmentPtrVec() {
   return segments;
 }
 
+std::string Proteoform::toString() {
+  std::stringstream s;
+  s<< "Begin pos: " << start_pos_ << std::endl;
+  s<< "End pos: " << end_pos_ << std::endl;
+  s<< "String: " << residue_seq_ptr_->toString();
+  return s.str();
+}
+
+ProteoformPtr getDbProteoformPtr(DbResSeqPtr db_res_seq_ptr, 
+                                 ProtModPtr prot_mod_ptr) {
+  int start_pos = 0;
+  int end_pos = db_res_seq_ptr->getLen() - 1;
+  ChangePtrVec change_list;  
+  for (int i = 0; i < db_res_seq_ptr->getLen(); i++) {
+    PtmPtr ptm_ptr = db_res_seq_ptr->getResiduePtr(i)->getPtmPtr();
+    if (!ptm_ptr->isEmpty()) {
+      ChangePtr change_ptr = ChangePtr(
+          new Change(i, i+1, FIXED_CHANGE, ptm_ptr->getMonoMass(), ptm_ptr));
+      change_list.push_back(change_ptr);
+    }
+  }
+  return ProteoformPtr(new Proteoform(db_res_seq_ptr, prot_mod_ptr,  
+                                      db_res_seq_ptr, start_pos, end_pos, 
+                                      change_list));
+}
+
 bool isValidTrunc(ProteoformPtr raw_form_ptr, ProtModPtr prot_mod_ptr) {
   TruncPtr trunc_ptr = prot_mod_ptr->getTruncPtr();
   int trunc_len = trunc_ptr->getTruncLen();
   AcidPtrVec trunc_acids = trunc_ptr->getAcidPtrVec();
-  ResSeqPtr res_seq_ptr = raw_form_ptr->getResSeqPtr();  
+  DbResSeqPtr res_seq_ptr = raw_form_ptr->getDbResSeqPtr();  
   //check if trunc acids match N-terminal acids of the protein 
   if (trunc_len >= res_seq_ptr->getLen()) {
     return false; ;
@@ -77,10 +103,10 @@ ProteoformPtr getProtModProteoform(ProteoformPtr raw_form_ptr,
     return ProteoformPtr(nullptr);
   }
   // first residue might be acetylated 
-  ResSeqPtr res_seq_ptr = raw_form_ptr->getResSeqPtr();  
+  DbResSeqPtr db_res_seq_ptr = raw_form_ptr->getDbResSeqPtr();  
   int start = prot_mod_ptr->getTruncPtr()->getTruncLen();
   ResiduePtrVec residues;
-  ResiduePtr residue = res_seq_ptr->getResiduePtr(start);
+  ResiduePtr residue = db_res_seq_ptr->getResiduePtr(start);
   PtmPtr ori_ptm = residue->getPtmPtr();
   PtmPtr ptm = prot_mod_ptr->getPtmPtr();
   ChangePtrVec change_list;
@@ -99,8 +125,8 @@ ProteoformPtr getProtModProteoform(ProteoformPtr raw_form_ptr,
                                                ptm->getMonoMass(), ptm)));
   }
   // add all other residues
-  for (int i = start + 1; i < res_seq_ptr->getLen(); i++) {
-    residues.push_back(res_seq_ptr->getResiduePtr(i));
+  for (int i = start + 1; i < db_res_seq_ptr->getLen(); i++) {
+    residues.push_back(db_res_seq_ptr->getResiduePtr(i));
   }
   ResSeqPtr seq_ptr = ResSeqPtr(new ResidueSeq(residues));
   for (int i = 0; i < seq_ptr->getLen(); i++) {
@@ -111,10 +137,9 @@ ProteoformPtr getProtModProteoform(ProteoformPtr raw_form_ptr,
       change_list.push_back(change_ptr);
     }
   }
-  std::string name = raw_form_ptr->getName() + " " + prot_mod_ptr->getName();
   return ProteoformPtr(
-      new Proteoform(raw_form_ptr, prot_mod_ptr, name, seq_ptr, start, 
-                     res_seq_ptr->getLen()-1, change_list));
+      new Proteoform(db_res_seq_ptr, prot_mod_ptr, seq_ptr, start, 
+                     db_res_seq_ptr->getLen()-1, change_list));
 }
 
 ProteoformPtr getSubProteoform(ProteoformPtr proteoform_ptr, int start, int end) {
@@ -133,41 +158,14 @@ ProteoformPtr getSubProteoform(ProteoformPtr proteoform_ptr, int start, int end)
       change_list.push_back(change_ptr);
     }
   }
-  ProteoformPtr raw_form_ptr = proteoform_ptr->getRawFormPtr();
+  DbResSeqPtr db_res_seq_ptr = proteoform_ptr->getDbResSeqPtr();
   ProtModPtr prot_mod_ptr = proteoform_ptr->getProtModPtr();
-  std::string name = proteoform_ptr->getName();
-
   return ProteoformPtr(
-      new Proteoform(raw_form_ptr, prot_mod_ptr, name, seq_ptr, start + proteoform_ptr->getStartPos(), 
+      new Proteoform(db_res_seq_ptr, prot_mod_ptr, seq_ptr, 
+                     start + proteoform_ptr->getStartPos(), 
                      end + proteoform_ptr->getEndPos(), change_list));
 }
 
-std::string Proteoform::toString() {
-  std::stringstream s;
-  s<< "Name: " << name_ << std::endl;
-  s<< "Begin pos: " << start_pos_ << std::endl;
-  s<< "End pos: " << end_pos_ << std::endl;
-  s<< "String: " << residue_seq_ptr_->toString();
-  return s.str();
-}
-
-ProteoformPtr getRawProteoformPtr(std::string name, ResSeqPtr res_seq_ptr) {
-  int start_pos = 0;
-  int end_pos = res_seq_ptr->getLen() - 1;
-  ChangePtrVec change_list;  
-  for (int i = 0; i < res_seq_ptr->getLen(); i++) {
-    PtmPtr ptm_ptr = res_seq_ptr->getResiduePtr(i)->getPtmPtr();
-    if (!ptm_ptr->isEmpty()) {
-      ChangePtr change_ptr = ChangePtr(
-          new Change(i, i+1, FIXED_CHANGE, ptm_ptr->getMonoMass(), ptm_ptr));
-      change_list.push_back(change_ptr);
-    }
-  }
-  ProteoformPtr proteoform_ptr = ProteoformPtr(nullptr);
-  ProtModPtr prot_mod_ptr = ProtModPtr(nullptr);
-  return ProteoformPtr(new Proteoform(proteoform_ptr, prot_mod_ptr, name, 
-                                      res_seq_ptr, start_pos, end_pos, change_list));
-}
 
 ProteoformPtrVec generateProtModProteoform(ProteoformPtrVec &ori_forms, 
                                            ResiduePtrVec &residue_list,
@@ -183,18 +181,6 @@ ProteoformPtrVec generateProtModProteoform(ProteoformPtrVec &ori_forms,
   }
   return new_forms;
 }
-
-ProteoformPtrVec getProtModNoneProteoform(ProteoformPtrVec &all_forms) {
-  ProteoformPtrVec new_forms;
-  for (unsigned int i = 0; i < all_forms.size(); i++) {
-    ProtModPtr prot_mod_ptr = all_forms[i]->getProtModPtr();
-    if (prot_mod_ptr.get() != nullptr && prot_mod_ptr->isNone()) {
-      new_forms.push_back(all_forms[i]);
-    }
-  }
-  return new_forms;
-}
-
 
 } /* namespace prot */
 

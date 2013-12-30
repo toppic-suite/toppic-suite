@@ -39,5 +39,4 @@ ResidueSeq getEmptyResidueSeq() {
   return ResidueSeq(residues);
 }
 
-
 }

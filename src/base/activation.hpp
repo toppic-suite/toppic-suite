@@ -8,7 +8,7 @@
 #ifndef PROT_ACTIVATION_HPP_
 #define PROT_ACTIVATION_HPP_
 
-#include <xercesc/dom/DOM.hpp>
+#include "xercesc/dom/DOM.hpp"
 #include "base/ion_type.hpp"
 
 namespace prot {
@@ -22,6 +22,7 @@ public:
 	double getCShit(){return c_ion_type_->getShift()-y_ion_shift_;}
 	IonTypePtr getNIonType(){return n_ion_type_;}
 	IonTypePtr getCIonType(){return c_ion_type_;}
+
 private:
 	std::string name_;
 	double b_ion_shift_ = 0;
@@ -33,7 +34,7 @@ private:
 typedef std::shared_ptr<Activation> ActivationPtr;
 typedef std::vector<ActivationPtr> ActivationPtrVec;
 
-ActivationPtrVec getActivationPtrVecInstance(IonTypePtrVec ion_type_list, const char* file_name);
+ActivationPtrVec getActivationPtrVecInstance(IonTypePtrVec ion_type_list, std::string file_name);
 ActivationPtr getActivationPtrByName(ActivationPtrVec activation_list,std::string name);
 
 } /* namespace prot */

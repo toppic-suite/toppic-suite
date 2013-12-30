@@ -1,7 +1,7 @@
 #ifndef PROT_PROTEOFORM_HPP_
 #define PROT_PROTEOFORM_HPP_
 
-#include "base/residue_seq.hpp"
+#include "base/db_residue_seq.hpp"
 #include "base/bp_spec.hpp"
 #include "base/change.hpp"
 #include "base/segment.hpp"
@@ -14,14 +14,13 @@ typedef std::shared_ptr<Proteoform> ProteoformPtr;
 
 class Proteoform {
 public:
-	Proteoform(ProteoformPtr ori_form_ptr, ProtModPtr prot_mod_ptr, std::string name, 
-             ResSeqPtr res_seq_ptr, int start_pos, int end_pos, ChangePtrVec change_list);
+	Proteoform(DbResSeqPtr db_res_seq_ptr, ProtModPtr prot_mod_ptr,  
+             ResSeqPtr res_seq_ptr, int start_pos, int end_pos, 
+             ChangePtrVec change_list);
 
-  ProteoformPtr getRawFormPtr() {return raw_form_ptr_;}
+  DbResSeqPtr getDbResSeqPtr() {return db_residue_seq_ptr_;}
 
   ProtModPtr getProtModPtr() {return prot_mod_ptr_;}
-
-  std::string getName() {return name_;}
 
 	ResSeqPtr getResSeqPtr() {return residue_seq_ptr_;}
 
@@ -33,7 +32,9 @@ public:
 
   int getLen() {return end_pos_ - start_pos_ + 1;}
 
-  int getSeqId(){return seq_id_;}
+  int getSeqId() {return db_residue_seq_ptr_->getId();}
+
+  std::string getName() {return db_residue_seq_ptr_->getName();}
 
   ChangePtrVec getChangePtrVec() {return change_list_;}
 
@@ -44,14 +45,10 @@ public:
 
 private:
   
-  ProteoformPtr raw_form_ptr_;
+  DbResSeqPtr db_residue_seq_ptr_;
 
   ProtModPtr prot_mod_ptr_;
   
-  std::string name_;
-
-  int seq_id_;
-
   ResSeqPtr residue_seq_ptr_;
 
   BpSpecPtr bp_spec_ptr_;
@@ -65,19 +62,18 @@ private:
 
 typedef std::vector<ProteoformPtr> ProteoformPtrVec;
 
-ProteoformPtr getRawProteoformPtr(std::string name, ResSeqPtr res_seq_ptr);
+ProteoformPtr getDbProteoformPtr(DbResSeqPtr db_res_seq_ptr, 
+                                 ProtModPtr prot_mod_ptr);
 
 ProteoformPtr getProtModProteoform(ProteoformPtr raw_form_ptr, 
-                                   ResiduePtrVec &residue_list, ProtModPtr prot_mod_ptr); 
+                                   ResiduePtrVec &residue_list, 
+                                   ProtModPtr prot_mod_ptr); 
 
 ProteoformPtr getSubProteoform(ProteoformPtr proteoform_ptr, int start, int end);
 
 ProteoformPtrVec generateProtModProteoform(ProteoformPtrVec &ori_forms,
                                            ResiduePtrVec &residue_list,
                                            ProtModPtrVec &prot_mods);
-
-ProteoformPtrVec getProtModNoneProteoform(ProteoformPtrVec &all_forms); 
-
 
 } /* namespace prot */
 

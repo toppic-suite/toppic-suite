@@ -21,25 +21,21 @@ Trunc::Trunc(std::string name, int trunc_len,
 
 
 TruncPtrVec getTruncPtrVecInstance(AcidPtrVec &acid_list, 
-                                   const char* file_name) {
+                                   const std::string &file_name) {
   TruncPtrVec trunc_list;
   prot::XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMInstance();
   if (parser) {
-    prot::XmlDOMDocument* doc = new prot::XmlDOMDocument(parser, file_name);
-    if (doc) {
-      xercesc::DOMElement* parent = doc->getDocumentElement();
-      int trunc_num = getChildCount(parent, "truncation");
-      for (int i = 0; i < trunc_num; i++) {
-        xercesc::DOMElement* element = getChildElement(parent, "truncation", i);
-        std::string name = getChildValue(element, "name", 0);
-        int trunc_len = getIntChildValue(element, "trunc_len", 0);
-        std::string str = getChildValue(element, "acid_str", 0);
-        LOG_DEBUG( "name " << name << " str " << str << " trunc len " << trunc_len);
-        trunc_list.push_back(TruncPtr(
-                new Trunc(name, trunc_len, acid_list, str)));
-
-      }
-      delete doc;
+    prot::XmlDOMDocument doc(parser, file_name.c_str());
+    xercesc::DOMElement* parent = doc.getDocumentElement();
+    int trunc_num = getChildCount(parent, "truncation");
+    for (int i = 0; i < trunc_num; i++) {
+      xercesc::DOMElement* element = getChildElement(parent, "truncation", i);
+      std::string name = getChildValue(element, "name", 0);
+      int trunc_len = getIntChildValue(element, "trunc_len", 0);
+      std::string str = getChildValue(element, "acid_str", 0);
+      LOG_DEBUG( "name " << name << " str " << str << " trunc len " << trunc_len);
+      trunc_list.push_back(TruncPtr(
+              new Trunc(name, trunc_len, acid_list, str)));
     }
   }
   return trunc_list;

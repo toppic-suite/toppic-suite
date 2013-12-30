@@ -8,11 +8,11 @@
 namespace prot {
 
 class XmlDOMErrorHandler : public xercesc::HandlerBase {
-    public:
-    void fatalError(const xercesc::SAXParseException &ex) {
-        std::cerr << "Fatal parsing error at line" << (int)ex.getLineNumber() << "\n"; 
-        exit(-1);
-    }
+ public:
+  void fatalError(const xercesc::SAXParseException &ex) {
+    std::cerr << "Fatal parsing error at line" << (int)ex.getLineNumber() << "\n"; 
+    exit(-1);
+  }
 };
  
 }

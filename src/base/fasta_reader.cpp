@@ -38,8 +38,9 @@ std::vector<std::string> FastaReader::getNextSeq() {
 /**
  * Read FASTA file and return next protein as an ResSeq.
  **/
-ProteoformPtr FastaReader::getNextProteoformPtr(AcidPtrVec acid_list, 
-                                             ResiduePtrVec residue_list) {
+ProteoformPtr FastaReader::getNextProteoformPtr(AcidPtrVec acid_list,
+                                                ResiduePtrVec residue_list,
+                                                ProtModPtr none_prot_mod) {
   std::vector<std::string> seq_info = getNextSeq();
   if (seq_info.size() == 0) {
     return ProteoformPtr(nullptr);
@@ -49,8 +50,9 @@ ProteoformPtr FastaReader::getNextProteoformPtr(AcidPtrVec acid_list,
   LOG_TRACE( "name " << seq_info[0] << " seq " << seq_info[1]);
   AcidPtrVec acid_seq = convertSeqToAcidSeq(acid_list, seq); 
   ResiduePtrVec residue_ptrs = convertAcidToResidueSeq(residue_list, acid_seq);
-  ResSeqPtr residue_seq_ptr = ResSeqPtr(new ResidueSeq(residue_ptrs)); 
-  return getRawProteoformPtr(name, residue_seq_ptr);
+  DbResSeqPtr db_residue_seq_ptr = DbResSeqPtr(new DbResidueSeq(residue_ptrs, id_, name)); 
+  id_++;
+  return getDbProteoformPtr(db_residue_seq_ptr, none_prot_mod);
 }
 
 /** process fasta string and remove unknown letters */
@@ -87,14 +89,17 @@ std::vector<std::string> fastaPreprocess(std::string name, std::string seq) {
 }
 
 ProteoformPtrVec readFastaToProteoform(std::string file_name, 
-                                       AcidPtrVec &acid_list, ResiduePtrVec &residue_list) {
+                                       AcidPtrVec &acid_list, 
+                                       ResiduePtrVec &residue_list,
+                                       ProtModPtr none_prot_mod) {
 
   LOG_DEBUG( "start open file " << file_name);
   FastaReader reader(file_name);
   LOG_DEBUG( "open file done " << file_name);
   ProteoformPtrVec list;
   ProteoformPtr ptr;
-  while ((ptr = reader.getNextProteoformPtr(acid_list, residue_list)).get() != nullptr) {
+  while ((ptr = reader.getNextProteoformPtr(acid_list, residue_list, none_prot_mod)).get() 
+         != nullptr) {
     list.push_back(ptr);
   }
   return list;

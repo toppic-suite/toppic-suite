@@ -25,11 +25,11 @@ Activation::Activation(IonTypePtrVec ion_type_list,
 
 }
 
-ActivationPtrVec getActivationPtrVecInstance(IonTypePtrVec ion_type_list,const char* file_name){
+ActivationPtrVec getActivationPtrVecInstance(IonTypePtrVec ion_type_list, std::string file_name){
   ActivationPtrVec activationPtrVec;
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMInstance();
   if (parser) {
-    XmlDOMDocument doc(parser, file_name);
+    XmlDOMDocument doc(parser, file_name.c_str());
     xercesc::DOMElement* parent = doc.getDocumentElement();
     int activation_num = getChildCount(parent, "activation");
     for (int i = 0; i < activation_num; i++) {
@@ -43,7 +43,7 @@ ActivationPtrVec getActivationPtrVecInstance(IonTypePtrVec ion_type_list,const c
 ActivationPtr getActivationPtrByName(ActivationPtrVec activation_list,std::string name){
   for (unsigned int i = 0; i < activation_list.size(); i++) {
     std::string n = activation_list[i]->getName();
-    if (n.compare(name) == 0) {
+    if (n == name) {
       return activation_list[i];
     }
   }

@@ -21,11 +21,11 @@ Acid::Acid (std::string const &name, std::string const &one_letter,
   avg_mass_ = avg_mass;
 }
 
-AcidPtrVec getAcidPtrVecInstance(const char* file_name) {
+AcidPtrVec getAcidPtrVecInstance(std::string file_name) {
   AcidPtrVec acid_list;
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMInstance();
   if (parser) {
-    XmlDOMDocument doc(parser, file_name);
+    XmlDOMDocument doc(parser, file_name.c_str());
     xercesc::DOMElement* parent = doc.getDocumentElement();
     int acid_num = getChildCount(parent, "amino_acid");
     LOG_DEBUG( "acid num " << acid_num);
@@ -98,12 +98,7 @@ AcidPtr getAcidPtrByThreeLetter(AcidPtrVec &acid_list,
  */
 bool containsName(AcidPtrVec &acid_list, 
                   const std::string &name) {
-  if (getAcidPtrByName(acid_list, name).get() == nullptr) {
-    return false;
-  }
-  else {
-    return true;
-  }
+  return getAcidPtrByName(acid_list, name).get() != nullptr;
 }
 
 /**
@@ -112,12 +107,7 @@ bool containsName(AcidPtrVec &acid_list,
  */
 bool containsOneLetter(AcidPtrVec &acid_list, 
                        const std::string &one_letter) {
-  if (getAcidPtrByOneLetter(acid_list, one_letter).get() == nullptr) {
-    return false;
-  }
-  else {
-    return true;
-  }
+  return getAcidPtrByOneLetter(acid_list, one_letter).get() != nullptr;
 }
 
 /**
@@ -126,12 +116,7 @@ bool containsOneLetter(AcidPtrVec &acid_list,
  */
 bool containsThreeLetter(AcidPtrVec &acid_vec, 
                          const std::string &three_letter) {
-  if (getAcidPtrByThreeLetter(acid_vec, three_letter).get() == nullptr) {
-    return false;
-  }
-  else {
-    return true;
-  }
+  return getAcidPtrByThreeLetter(acid_vec, three_letter).get() != nullptr;
 }
 
 /**

@@ -9,27 +9,27 @@
 namespace prot {
 
 void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
+  BaseDataPtr base_data_ptr = mng_ptr->base_data_ptr_;
   
   ProteoformPtrVec raw_forms = readFastaToProteoform(mng_ptr->search_db_file_name_,
-                                                     mng_ptr->base_data_ptr_->getAcidPtrVec(),
-                                                     mng_ptr->base_data_ptr_->getFixModResiduePtrVec());
+                                                     base_data_ptr->getAcidPtrVec(),
+                                                     base_data_ptr->getFixModResiduePtrVec(),
+                                                     base_data_ptr->getDefaultProtModPtr());
   ProteoformPtrVec prot_mod_forms 
       = generateProtModProteoform(raw_forms, 
-                                  mng_ptr->base_data_ptr_->getResiduePtrVec(),
-                                  mng_ptr->base_data_ptr_->getAllowProtModPtrVec());
-
-  ProteoformPtrVec prot_mod_none_forms = getProtModNoneProteoform(prot_mod_forms);
+                                  base_data_ptr->getResiduePtrVec(),
+                                  base_data_ptr->getAllowProtModPtrVec());
 
   int spectra_num = countSpNum (mng_ptr->spectrum_file_name_.c_str(), 
-                                mng_ptr->base_data_ptr_->getActivationPtrVec());
+                                base_data_ptr->getActivationPtrVec());
   LOG_DEBUG("spectra_number  " << spectra_num);
 
   MsAlignReader reader(mng_ptr->spectrum_file_name_.c_str(), 
-                       mng_ptr->base_data_ptr_->getActivationPtrVec());
+                       base_data_ptr->getActivationPtrVec());
 
-  ProtModPtrVec prot_mod_ptr_list = mng_ptr->base_data_ptr_->getProtModPtrVec();
-  double shift = getProtModAcetylationShift(prot_mod_ptr_list);
-  IonTypePtrVec ion_type_ptr_list = mng_ptr->base_data_ptr_->getIonTypePtrVec();
+  ProtModPtrVec prot_mod_ptr_list = base_data_ptr->getProtModPtrVec();
+  double shift = base_data_ptr->getAcetylationProtModPtr()->getProtShift();
+  IonTypePtrVec ion_type_ptr_list = base_data_ptr->getIonTypePtrVec();
   LOG_DEBUG("start reading");
   int n = 0;
   DeconvMsPtr ms_ptr = reader.getNextMs();
@@ -48,10 +48,10 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
       zeroPtmSearch(spec_set_ptr, SEMI_ALIGN_TYPE_PREFIX, prot_mod_forms, 
                     mng_ptr, pref_prsms);
       PrSMPtrVec suff_prsms;
-      zeroPtmSearch(spec_set_ptr, SEMI_ALIGN_TYPE_SUFFIX, prot_mod_none_forms, 
+      zeroPtmSearch(spec_set_ptr, SEMI_ALIGN_TYPE_SUFFIX, raw_forms, 
                     mng_ptr, suff_prsms);
       PrSMPtrVec internal_prsms;
-      zeroPtmSearch(spec_set_ptr, SEMI_ALIGN_TYPE_SUFFIX, prot_mod_none_forms, 
+      zeroPtmSearch(spec_set_ptr, SEMI_ALIGN_TYPE_SUFFIX, raw_forms, 
                     mng_ptr, internal_prsms);
       LOG_DEBUG("zero ptm search complete " << n);
     }

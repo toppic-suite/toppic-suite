@@ -25,22 +25,19 @@ bool Ptm::isEmpty() {
   }
 }
 
-PtmPtrVec getPtmPtrVecInstance(const char* file_name) {
+PtmPtrVec getPtmPtrVecInstance(const std::string &file_name) {
   PtmPtrVec ptm_list;
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMInstance();
   if (parser) {
-    XmlDOMDocument* doc = new XmlDOMDocument(parser, file_name);
-    if (doc) {
-      xercesc::DOMElement* parent = doc->getDocumentElement();
-      int ptm_num = getChildCount(parent, "modification");
-      for (int i = 0; i < ptm_num; i++) {
-        xercesc::DOMElement* element = getChildElement(parent, "modification", i);
-        std::string abbr_name = getChildValue(element, "abbreviation", 0);
-        double mono_mass = getDoubleChildValue(element, "mono_mass", 0);
-        ptm_list.push_back(PtmPtr(new Ptm(abbr_name, mono_mass)));
+    XmlDOMDocument doc(parser, file_name.c_str());
+    xercesc::DOMElement* parent = doc.getDocumentElement();
+    int ptm_num = getChildCount(parent, "modification");
+    for (int i = 0; i < ptm_num; i++) {
+      xercesc::DOMElement* element = getChildElement(parent, "modification", i);
+      std::string abbr_name = getChildValue(element, "abbreviation", 0);
+      double mono_mass = getDoubleChildValue(element, "mono_mass", 0);
+      ptm_list.push_back(PtmPtr(new Ptm(abbr_name, mono_mass)));
 
-      }
-      delete doc;
     }
   }
   return ptm_list;
@@ -66,12 +63,7 @@ PtmPtr getPtmPtrByAbbrName(PtmPtrVec &ptm_list,
  */
 bool containAbbrsName(PtmPtrVec &ptm_list, 
                       const std::string &abbr_name) {
-    if (getPtmPtrByAbbrName(ptm_list, abbr_name).get() == nullptr) {
-        return false;
-    }
-    else {
-        return true;
-    }
+   return getPtmPtrByAbbrName(ptm_list, abbr_name).get() != nullptr;
 }
 
 PtmPtr findEmptyPtmPtr(PtmPtrVec &ptm_list) {

@@ -6,9 +6,6 @@
 
 namespace prot {
 
-#define PROTEIN_MOD_NONE "NONE"
-#define PROTEIN_MOD_ACETYLATION "ACETYLATION"
-
 class ProtMod {
  public:
   ProtMod(std::string name, TruncPtr trunc_ptr, PtmPtr ptm_ptr,
@@ -23,15 +20,6 @@ class ProtMod {
   double getProtShift() {return prot_shift_;}
 
   double getPepShift() {return pep_shift_;}
-
-  bool isNone() {
-    if (name_ == PROTEIN_MOD_NONE) {
-      return true;
-    }
-    else {
-      return false;
-    }
-  }
 
  private:
   std::string name_;
@@ -48,7 +36,7 @@ typedef std::vector<ProtModPtr> ProtModPtrVec;
 ProtModPtrVec getProtModPtrVecInstance(AcidPtrVec &acid_list,
                                        PtmPtrVec &ptm_list,
                                        TruncPtrVec &trunc_list,
-                                       const char* file_name);
+                                       const std::string &file_name);
 
 ProtModPtr getProtModPtrByName(ProtModPtrVec &prot_mod_list, 
                                const std::string &name);

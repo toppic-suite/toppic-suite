@@ -54,22 +54,18 @@ ResiduePtrVec getResiduePtrVecInstance(AcidPtrVec &acid_list,
   ResiduePtrVec residue_list;
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMInstance();
   if (parser) {
-    XmlDOMDocument* doc = new XmlDOMDocument(parser, file_name.c_str());
-    LOG_DEBUG( "doc " << doc);
-    xercesc::DOMElement* parent = doc->getDocumentElement();
-    if (doc) {
-      int residue_num = getChildCount(parent, "residue");
-      LOG_DEBUG( "residue num " << residue_num);
-      for (int i = 0; i < residue_num; i++) {
-        xercesc::DOMElement* element = getChildElement(parent, "residue", i);
-        std::string acid_name = getChildValue(element, "acid", 0);
-        std::string ptm_abbr_name = getChildValue(element, "ptm", 0);
-        LOG_DEBUG( "acid vec " << acid_list.size() << " ptm vec " 
-                      << ptm_list.size() << " acid " << acid_name << " ptm " << ptm_abbr_name);
-        residue_list.push_back(ResiduePtr(
-                new Residue(acid_list, ptm_list, acid_name, ptm_abbr_name)));
-      }
-      delete doc;
+    XmlDOMDocument doc(parser, file_name.c_str());
+    xercesc::DOMElement* parent = doc.getDocumentElement();
+    int residue_num = getChildCount(parent, "residue");
+    LOG_DEBUG( "residue num " << residue_num);
+    for (int i = 0; i < residue_num; i++) {
+      xercesc::DOMElement* element = getChildElement(parent, "residue", i);
+      std::string acid_name = getChildValue(element, "acid", 0);
+      std::string ptm_abbr_name = getChildValue(element, "ptm", 0);
+      LOG_DEBUG( "acid vec " << acid_list.size() << " ptm vec " 
+                << ptm_list.size() << " acid " << acid_name << " ptm " << ptm_abbr_name);
+      residue_list.push_back(ResiduePtr(
+              new Residue(acid_list, ptm_list, acid_name, ptm_abbr_name)));
     }
   }
   return residue_list;
@@ -82,35 +78,31 @@ ResiduePtrVec getResiduePtrVecInstance(AcidPtrVec &acid_list,
   ResiduePtrVec new_list;
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMInstance();
   if (parser) {
-    XmlDOMDocument* doc = new XmlDOMDocument(parser, file_name.c_str());
-    LOG_DEBUG( "doc " << doc);
-    xercesc::DOMElement* parent = doc->getDocumentElement();
-    if (doc) {
-      int residue_num = getChildCount(parent, "residue");
-      LOG_DEBUG( "residue num " << residue_num);
-      for (int i = 0; i < residue_num; i++) {
-        xercesc::DOMElement* element = getChildElement(parent, "residue", i);
-        std::string acid_name = getChildValue(element, "acid", 0);
-        std::string ptm_abbr_name = getChildValue(element, "ptm", 0);
-        LOG_DEBUG( "acid vec " << acid_list.size() << " ptm vec " << ptm_list.size() 
-                      << " acid " << acid_name << " ptm " << ptm_abbr_name);
-        AcidPtr acid_ptr = getAcidPtrByName(acid_list, acid_name);
-        if (acid_ptr.get() == nullptr) {
-          LOG_ERROR( "acid " << acid_name  << " not found ");
-          throw("acid not found");
-        }
-        PtmPtr ptm_ptr = getPtmPtrByAbbrName(ptm_list, ptm_abbr_name);
-        if (ptm_ptr.get() == nullptr) {
-          LOG_ERROR( "ptm " << ptm_abbr_name  << " not found ");
-          throw("ptm not found");
-        }
-        ResiduePtr residue_ptr = getResiduePtrByAcidPtm(residue_list, acid_ptr, ptm_ptr);
-        if (residue_ptr.get() == nullptr) {
-          residue_ptr = addResidue(residue_list, acid_ptr, ptm_ptr);
-        }
-        new_list.push_back(residue_ptr);
+    XmlDOMDocument doc(parser, file_name.c_str());
+    xercesc::DOMElement* parent = doc.getDocumentElement();
+    int residue_num = getChildCount(parent, "residue");
+    LOG_DEBUG( "residue num " << residue_num);
+    for (int i = 0; i < residue_num; i++) {
+      xercesc::DOMElement* element = getChildElement(parent, "residue", i);
+      std::string acid_name = getChildValue(element, "acid", 0);
+      std::string ptm_abbr_name = getChildValue(element, "ptm", 0);
+      LOG_DEBUG( "acid vec " << acid_list.size() << " ptm vec " << ptm_list.size() 
+                << " acid " << acid_name << " ptm " << ptm_abbr_name);
+      AcidPtr acid_ptr = getAcidPtrByName(acid_list, acid_name);
+      if (acid_ptr.get() == nullptr) {
+        LOG_ERROR( "acid " << acid_name  << " not found ");
+        throw("acid not found");
       }
-      delete doc;
+      PtmPtr ptm_ptr = getPtmPtrByAbbrName(ptm_list, ptm_abbr_name);
+      if (ptm_ptr.get() == nullptr) {
+        LOG_ERROR( "ptm " << ptm_abbr_name  << " not found ");
+        throw("ptm not found");
+      }
+      ResiduePtr residue_ptr = getResiduePtrByAcidPtm(residue_list, acid_ptr, ptm_ptr);
+      if (residue_ptr.get() == nullptr) {
+        residue_ptr = addResidue(residue_list, acid_ptr, ptm_ptr);
+      }
+      new_list.push_back(residue_ptr);
     }
   }
   return new_list;

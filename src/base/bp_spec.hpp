@@ -19,16 +19,19 @@ public:
   BpSpec(ResSeqPtr res_seq_ptr);
 	BreakPointPtrVec getBreakPointPtrVec(){return break_point_ptr_vec_;}
 	BreakPointPtr getBreakPointPtr(int i){return break_point_ptr_vec_[i];}
+
 	/*implement the function getExt[B\Y\C\Z_DOT]masses and getNTermMasses and getCTermMass*/
 	std::vector<double> getBreakPointMasses(IonTypePtr ion_type_ptr);
 
   std::vector<double> getPrmMasses();
 	/*implement the function getExt[BY\CZ]masses*/
 	std::vector<double> getBreakPointMasses(double n_term_shift,double c_term_shift,
-                                          double min_mass,IonTypePtr ion_type_ptr_n,IonTypePtr ion_type_ptr_c);
+                                          double min_mass,IonTypePtr ion_type_ptr_n,
+                                          IonTypePtr ion_type_ptr_c);
+
 	/*implement the function getScaledBMass*/
 	std::vector<int> getScaledMass(double scale,IonTypePtr iong_type);
-	double getRSMass(){return seq_mass_;}
+	double getResSeqMass(){return seq_mass_;}
   
 private:
   double seq_mass_;
@@ -36,7 +39,8 @@ private:
 
 	void initBreakPoints(ResSeqPtr req_seq_ptr);
 	/*implement the private function addMass() BpSpec*/
-	void addBreakPointMass(double mass,double seq_mass,double min_mass,std::vector<double> &mass_vec);
+	void addBreakPointMass(double mass,double seq_mass,double min_mass,
+                         std::vector<double> &mass_vec);
 };
 
 typedef std::shared_ptr<BpSpec> BpSpecPtr;

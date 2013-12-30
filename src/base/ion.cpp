@@ -8,7 +8,9 @@
 #include "base/ion.hpp"
 
 namespace prot {
-Ion::Ion(int charge,int pos,int display,IonTypePtr ion_type_ptr,NeutralLossPtr neutral_loss_ptr){
+
+Ion::Ion(int charge,int pos,int display,IonTypePtr ion_type_ptr,
+         NeutralLossPtr neutral_loss_ptr){
 	charge_ = charge;
 	pos_=pos;
 	display_pos_=display;

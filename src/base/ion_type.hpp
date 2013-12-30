@@ -39,7 +39,7 @@ class IonType {
 typedef std::shared_ptr<IonType> IonTypePtr;
 typedef std::vector<IonTypePtr> IonTypePtrVec;
 
-IonTypePtrVec getIonTypePtrVecInstance(const char* file_name);
+IonTypePtrVec getIonTypePtrVecInstance(const std::string file_name);
 IonTypePtr getIonTypePtrByName(IonTypePtrVec &ion_type_list, const std::string &name);
 
 }

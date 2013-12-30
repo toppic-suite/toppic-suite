@@ -19,6 +19,5 @@ Change::Change(Change ori, int start) {
   ptm_ptr_ = ori.ptm_ptr_;
 }
 
-
 }
 

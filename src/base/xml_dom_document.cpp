@@ -169,4 +169,3 @@ std::string convertToString(bool value) {
 }
 
 }
-

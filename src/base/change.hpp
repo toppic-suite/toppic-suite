@@ -41,14 +41,8 @@ typedef std::shared_ptr<Change> ChangePtr;
 typedef std::vector<ChangePtr> ChangePtrVec;
 
 inline bool compareChangeUp(ChangePtr c1, ChangePtr c2) {
-  if  (c1->getLeftBpPos() < c2->getLeftBpPos()) {
-    return 1;
-  }
-  else {
-    return 0;
-  }
+  return c1->getLeftBpPos() < c2->getLeftBpPos();
 }
-
 
 }
 #endif

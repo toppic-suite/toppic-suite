@@ -23,12 +23,12 @@ BaseData::BaseData  (std::string  config_file_name) {
       LOG_DEBUG( "root " << root);
       std::string acid_file_name = getChildValue(root, "acid_list_file_name", 0);
       LOG_DEBUG( "acid file name: " << acid_file_name);
-      acid_list_ = getAcidPtrVecInstance(acid_file_name.c_str());
+      acid_list_ = getAcidPtrVecInstance(acid_file_name);
       LOG_DEBUG( "acid initialized ");
 
       std::string ptm_file_name = getChildValue(root, "ptm_list_file_name", 0);
       LOG_DEBUG( "ptm file name: " << ptm_file_name);
-      ptm_list_ = getPtmPtrVecInstance(ptm_file_name.c_str());
+      ptm_list_ = getPtmPtrVecInstance(ptm_file_name);
       LOG_DEBUG( "ptm initialized");
 
       std::string residue_file_name = getChildValue(root, "residue_list_file_name", 0);
@@ -39,27 +39,28 @@ BaseData::BaseData  (std::string  config_file_name) {
 
       std::string trunc_file_name = getChildValue(root, "trunc_list_file_name", 0);
       LOG_DEBUG( "trunc file name: " << trunc_file_name);
-      trunc_list_ = getTruncPtrVecInstance(acid_list_, trunc_file_name.c_str());
+      trunc_list_ = getTruncPtrVecInstance(acid_list_, trunc_file_name);
       LOG_DEBUG( "trunc initialized ");
 
       std::string prot_mod_file_name = getChildValue(root, "prot_mod_list_file_name", 0);
       LOG_DEBUG( "prot mod file name: " << prot_mod_file_name);
-      prot_mod_list_ = getProtModPtrVecInstance(acid_list_, ptm_list_, trunc_list_, prot_mod_file_name.c_str());
+      prot_mod_list_ = getProtModPtrVecInstance(acid_list_, ptm_list_, trunc_list_, 
+                                                prot_mod_file_name);
       LOG_DEBUG( "prot mod initialized ");
 
       std::string ion_type_file_name = getChildValue(root, "ion_type_list_file_name", 0);
       LOG_DEBUG( "ion type file name: " << ion_type_file_name);
-      ion_type_list_ = getIonTypePtrVecInstance(ion_type_file_name.c_str());
+      ion_type_list_ = getIonTypePtrVecInstance(ion_type_file_name);
       LOG_DEBUG( "ion type initialized ");
 
       std::string neutral_loss_file_name = getChildValue(root, "neutral_loss_list_file_name", 0);
       LOG_DEBUG( "neutral loss file name: " << neutral_loss_file_name);
-      neutral_loss_list_ = getNeutralLossPtrVecInstance(neutral_loss_file_name.c_str());
+      neutral_loss_list_ = getNeutralLossPtrVecInstance(neutral_loss_file_name);
       LOG_DEBUG( "neutral loss initialized ");
 
       std::string activation_file_name = getChildValue(root, "activation_list_file_name", 0);
       LOG_DEBUG( "activation file name: " << activation_file_name);
-      activation_list_ = getActivationPtrVecInstance(ion_type_list_, activation_file_name.c_str());
+      activation_list_ = getActivationPtrVecInstance(ion_type_list_, activation_file_name);
       LOG_DEBUG( "activation initialized ");
 
       std::string fix_mod_residue_file_name = getChildValue(root, "fix_mod_residue_file_name", 0);
