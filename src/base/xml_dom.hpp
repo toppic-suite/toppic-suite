@@ -12,18 +12,30 @@
 namespace prot {
 
 class XmlDOMParser {
-public:
-    XmlDOMParser();
-    ~XmlDOMParser();
+ public:
+  XmlDOMParser();
+  ~XmlDOMParser();
 
-    xercesc::DOMDocument* parse(const char* xml_file);
+  xercesc::DOMDocument* parse(const char* xml_file);
 
-private:
-    xercesc::XercesDOMParser* parser_;
-    xercesc::ErrorHandler*    err_handler_;
+ private:
+  xercesc::XercesDOMParser* parser_;
+  xercesc::ErrorHandler*    err_handler_;
+
 };
 
-XmlDOMParser* getXmlDOMInstance();
+class XmlDOMParserFactory {
+ private:
+  static XmlDOMParser* dom_parser;
+ public:
+  static XmlDOMParser* getXmlDOMInstance() {
+    if (dom_parser == nullptr) {
+      dom_parser = new XmlDOMParser();
+    }
+    return dom_parser;
+  }
+};
+
  
 class XStr {
  public:

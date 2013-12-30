@@ -27,7 +27,7 @@ Activation::Activation(IonTypePtrVec ion_type_list,
 
 ActivationPtrVec getActivationPtrVecInstance(IonTypePtrVec ion_type_list,const char* file_name){
   ActivationPtrVec activationPtrVec;
-  XmlDOMParser* parser = prot::getXmlDOMInstance();
+  XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMInstance();
   if (parser) {
     XmlDOMDocument doc(parser, file_name);
     xercesc::DOMElement* parent = doc.getDocumentElement();

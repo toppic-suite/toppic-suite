@@ -21,7 +21,7 @@ ProtModPtrVec getProtModPtrVecInstance(AcidPtrVec &acid_list,
                                        TruncPtrVec &trunc_list,
                                        const char* file_name) {
   ProtModPtrVec prot_mod_list;
-  prot::XmlDOMParser* parser = prot::getXmlDOMInstance();
+  prot::XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMInstance();
   if (parser) {
     prot::XmlDOMDocument* doc = new prot::XmlDOMDocument(parser, file_name);
     if (doc) {

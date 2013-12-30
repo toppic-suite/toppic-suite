@@ -13,7 +13,7 @@ namespace prot {
 
 BaseData::BaseData  (std::string  config_file_name) {
 
-  XmlDOMParser* parser = getXmlDOMInstance();
+  XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMInstance();
   if (parser) {
     LOG_DEBUG( "config_file_name: " << config_file_name);
     XmlDOMDocument* doc = new XmlDOMDocument(parser, config_file_name.c_str());

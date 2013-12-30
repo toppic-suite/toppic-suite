@@ -23,7 +23,7 @@ Acid::Acid (std::string const &name, std::string const &one_letter,
 
 AcidPtrVec getAcidPtrVecInstance(const char* file_name) {
   AcidPtrVec acid_list;
-  XmlDOMParser* parser = getXmlDOMInstance();
+  XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMInstance();
   if (parser) {
     XmlDOMDocument doc(parser, file_name);
     xercesc::DOMElement* parent = doc.getDocumentElement();
