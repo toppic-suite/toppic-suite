@@ -42,6 +42,36 @@ void PrSM::initScores(SpParaPtr sp_para_ptr) {
   }
 }
 
+void PrSM::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
+	xercesc::DOMElement* element = xml_doc->createElement("prsm");
+	std::string str = convertToString(prsm_id_);
+	xml_doc->addElement(element, "prsm_id", str.c_str());
+	str = convertToString(spectrum_id_);
+	xml_doc->addElement(element, "spectrum_id", str.c_str());
+	xml_doc->addElement(element, "spectrum_scan", spectrum_scan_.c_str());
+	str = convertToString(precursor_id_);
+	xml_doc->addElement(element, "precursor_id", str.c_str());
+	str = convertToString(ori_prec_mass_);
+	xml_doc->addElement(element, "ori_prec_mass", str.c_str());
+	str = convertToString(adjusted_prec_mass_);
+	xml_doc->addElement(element, "adjusted_prec_mass", str.c_str());
+	str = convertToString(calibration_);
+	xml_doc->addElement(element, "calibration", str.c_str());
+	proteoform_ptr_->appendXml(xml_doc,element);
+	prob_ptr_->appendXml(xml_doc,element);
+	str = convertToString(fdr_);
+	xml_doc->addElement(element, "fdr", str.c_str());
+	deconv_ms_ptr_->appendXml(xml_doc,element);
+	refine_ms_three_->appendXml(xml_doc,element);
+	//deconv_ms_ptr_
+	//refine_ms_three_
+	str = convertToString(match_peak_num_);
+	xml_doc->addElement(element, "match_peak_num", str.c_str());
+	str = convertToString(match_fragment_num_);
+	xml_doc->addElement(element, "match_fragment_num", str.c_str());
+	parent->appendChild(element);
+}
+
 }
 
 /*
