@@ -22,11 +22,11 @@ class ResidueFreq: public Residue {
   double freq_;
 };
 
-typedef std::shared_ptr<ResidueFreq> ResidueFreqPtr;
-typedef std::vector<ResidueFreqPtr> ResidueFreqPtrVec;
+typedef std::shared_ptr<ResidueFreq> ResFreqPtr;
+typedef std::vector<ResFreqPtr> ResFreqPtrVec;
 
-ResidueFreqPtrVec getResidueFreqPtrVecInstance(AcidPtrVec &acid_list, PtmPtrVec &ptm_list,
-                                               std::string &file_name); 
+ResFreqPtrVec getResidueFreqPtrVecInstance(AcidPtrVec &acid_list, PtmPtrVec &ptm_list,
+                                           std::string &file_name); 
 
 }
 #endif
