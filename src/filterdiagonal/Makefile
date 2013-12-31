@@ -15,19 +15,19 @@ LFLAGS = -L/lib -L/opt/local/lib
 LIBS = -lxerces-c 
 #
 # define the C++ source files
-SRCS = peak_ion_pair.cpp prsm.cpp simple_prsm_writer.cpp simple_prsm.cpp main.cpp
+SRCS = comp_shift_hi_mem.cpp ptm_fast_filter_block.cpp ptm_fast_filter_hi_mem.cpp ptm_fast_filter_processor.cpp
 #
 # define the C object files 
 #
 
 OBJ_DIR = ../../obj
-OBJS = $(addprefix $(OBJ_DIR)/, main.o simple_prsm_writer.o algorithm.o break_point.o bp_spec.o ion.o change.o ptm.o acid.o residue.o residue_seq.o proteoform.o theo_peak.o peak_ion_pair.o prsm.o simple_prsm.o deconv_peak.o deconv_ms.o peak_tolerance.o extend_peak.o ms_header.o xml_dom_document.o xml_dom.o)
+OBJS = $(addprefix $(OBJ_DIR)/, comp_shift_hi_mem.o ptm_fast_filter_block.o ptm_fast_filter_hi_mem.o ptm_fast_filter_processor.o simple_prsm.o simple_prsm_writer.o spectrum_set.o support_peak.o support_peak_type.o deconv_peak.o deconv_ms.o extend_peak.o prm_peak.o msalign_reader.o ms_header.o peak_tolerance.o extend_sp_para.o sp_para.o residue_seq.o fasta_reader.o change.o break_point.o bp_spec.o proteoform.o base_data.o activation.o ion_type.o neutral_loss.o trunc.o prot_mod.o acid.o ptm.o residue.o xml_dom.o xml_dom_document.o)
 
 BIN_DIR = ../../bin
 
 #
 # define the executable file 
-MAIN = $(BIN_DIR)/prsm
+MAIN = $(BIN_DIR)/fast_filter
 #
 #
 # The following part of the makefile is generic; it can be used to 

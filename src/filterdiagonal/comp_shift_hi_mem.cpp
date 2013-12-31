@@ -6,27 +6,25 @@
  */
 
 #include <time.h>
-#include <log4cxx/logger.h>
 #include <iostream>
 
+#include "base/logger.hpp"
 #include "comp_shift_hi_mem.hpp"
 
 namespace prot {
 
-log4cxx::LoggerPtr compShiftHiMem_logger(log4cxx::Logger::getLogger("CompShiftHiMem"));
-
 CompShiftHiMem::CompShiftHiMem(ProteoformPtrVec seqs,PtmFastFilterMngPtr mng){
 	scale_ = mng->ptm_fast_filter_scale_;
-	LOG4CXX_DEBUG(compShiftHiMem_logger, "Scale"+scale_);
-	LOG4CXX_DEBUG(compShiftHiMem_logger, "Sequence number"+seqs.size());
+	LOG_DEBUG("Scale"+scale_);
+	LOG_DEBUG("Sequence number"+seqs.size());
 	shift_array_len_ = 20000 * scale_ + 2;
 	initSeqBeginEnds(seqs);
 	initIndexes(seqs,mng->base_data->getIonTypePtrVec());
 	int debug_info_shift_array_len = shift_array_len_;
-	LOG4CXX_DEBUG(compShiftHiMem_logger, "shift_array_len_ ="+prot::convertToString(debug_info_shift_array_len));
-	LOG4CXX_DEBUG(compShiftHiMem_logger, "seq_total_len_"+prot::convertToString(seq_total_len_));
+	LOG_DEBUG("shift_array_len_ ="+prot::convertToString(debug_info_shift_array_len));
+	LOG_DEBUG("seq_total_len_"+prot::convertToString(seq_total_len_));
 	int indexes_size = indexes_.size();
-	LOG4CXX_DEBUG(compShiftHiMem_logger, "indexes.length"+prot::convertToString(indexes_size));
+	LOG_DEBUG("indexes.length"+prot::convertToString(indexes_size));
 }
 CompShiftHiMem::~CompShiftHiMem(){
 	delete pos_seq_ids_;
@@ -189,7 +187,7 @@ void CompShiftHiMem::initIndexes(ProteoformPtrVec seqs,IonTypePtrVec ion_type_pt
 	for(unsigned int i=0;i<seqs.size();i++){
 		if(i/1000*1000 == i){
 			int m = i;
-			LOG4CXX_DEBUG(compShiftHiMem_logger, "preprocessing seq "+convertToString(m));
+			LOG_DEBUG("preprocessing seq "+convertToString(m));
 		}
 		std::vector<int> mass = seqs[i]->getBpSpecPtr()->getScaledMass(scale_,prot::getIonTypePtrByName(ion_type_ptr_vec,"B"));
 		unsigned int bgn = 0;
@@ -234,6 +232,5 @@ void CompShiftHiMem::updateCnt(ProteoformPtr seq,std::vector<int>& cnt,IonTypePt
 		bgn++;
 	}
 }
-
 
 } /* namespace prot */

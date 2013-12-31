@@ -1,11 +1,7 @@
-#ifndef PROT_ZERO_PTM_MNG_HPP_
-#define PROT_ZERO_PTM_MNG_HPP_
-
-#include <string>
-#include <array>
+#ifndef PROT_TDGF_MNG_HPP_
+#define PROT_TDGF_MNG_HPP_
 
 #include "base/mass_constant.hpp"
-#include "base/residue.hpp"
 #include "base/base_data.hpp"
 #include "base/prot_mod.hpp"
 #include "base/activation.hpp"
@@ -15,9 +11,9 @@
 
 namespace prot {
 
-class ZeroPtmMng {
+class TdgfMng {
  public:
-  ZeroPtmMng(std::string conf_file_name): 
+  TdgfMng(std::string conf_file_name): 
       base_data_ptr_ (new BaseData(conf_file_name)),
       peak_tolerance_ptr_ (new PeakTolerance(ppo_, use_min_tolerance_, min_tolerance_)),
       extend_sp_para_ptr_ (new ExtendSpPara(extend_min_mass_, ext_offsets_)),
@@ -30,12 +26,7 @@ class ZeroPtmMng {
   std::string search_db_file_name_;
   std::string spectrum_file_name_;
 
-  /** zero ptm fast filtering */
-  int zero_ptm_filter_result_num_ = 20;
-  /** number of reported PrSMs for each spectrum */
-  int report_num_ = 1;
-
-  /** spectrum parameters */
+	/** spectrum parameters */
   double ppo_ = 0.000015;
   bool use_min_tolerance_ = true;
   double min_tolerance_ = 0.01;
@@ -53,16 +44,35 @@ class ZeroPtmMng {
 
   SpParaPtr sp_para_ptr_;
 
-  /** recalibration is used in ZeroPtmSlowMatch */
-  bool   do_recalibration_ = true;
-  double recal_ppo_ = 0.000015; // 15 ppm
-  bool   ms_one_ms_two_same_recal_ = true;
+	/** PrSM filter */
+	int comp_evalue_min_peak_num_ = 4;
 
+	/** dp table */
+	// number of mass shift
+	int unexpected_shift_num_ = 2;
+	double double_to_int_constant_ = 274.335215;
+	double max_sp_prec_mass_ = 51000;
+	int max_table_height_ = 128;
+	int min_height_ = 10;
+
+  /* Semi alignment type determination */
+  /* a prsm with a shift < 300 at n-terminus is treated as a prefix */
+  double prefix_suffix_shift_thresh_ = 300;
+	
+  /**
+   * Postprocessing: adjustment makes it more conservative to identify PrSMs
+   * with multiple shifts
+   */
+  // the following three values should be adjusted
+  double multiple_shift_adjustment_ = 4;
+  double multiple_shfit_adjustment_base_ = 10;
+  double min_adjustment_ = 100;
+
+  std::string input_file_ext_;
   std::string output_file_ext_;
 };
 
-typedef std::shared_ptr<ZeroPtmMng> ZeroPtmMngPtr;
+typedef std::shared_ptr<TdgfMng> TdgfMngPtr;
 
-} /* namespace_prot */
-
+}
 #endif

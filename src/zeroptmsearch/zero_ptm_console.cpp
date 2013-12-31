@@ -1,8 +1,6 @@
 #include <iostream>
 
 #include "base/base_data.hpp"
-#include "base/xml_dom.hpp"
-#include "base/xml_dom_document.hpp"
 
 #include "zeroptmsearch/zero_ptm_mng.hpp"
 #include "zeroptmsearch/zero_ptm_search.hpp"
@@ -19,7 +17,5 @@ int main(int argc, char* argv[]) {
   } catch (const char* e) {
     std::cout << "Exception " << e << std::endl;
   } 
-
   return 0;
 }
-

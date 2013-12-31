@@ -20,14 +20,14 @@ void PtmFastFilterBlock::initSeqBlocks(){
 	int pos =0;
 	int len=0;
 //	seq_blocks_
-	while(start < seqs_.size()){
-		if(pos <seqs_.size() && len+seqs_[pos]->getResSeqPtr()->getLen() < mng_->db_block_size_){
+	while(start < (int)seqs_.size()){
+		if(pos < (int)seqs_.size() && len+seqs_[pos]->getResSeqPtr()->getLen() < mng_->db_block_size_){
 			len = len+seqs_[pos]->getResSeqPtr()->getLen();
 			pos++;
 		}
 		else{
 			int end = pos;
-			if(end == seqs_.size()){
+			if(end == (int)seqs_.size()){
 				end --;
 			}
 			ProteoformPtrVec seqs_in_block;
@@ -47,7 +47,7 @@ SimplePrSMPtrVec PtmFastFilterBlock::getBestMathBatch(SpectrumSetPtr spectrum_se
 	PrmMsPtr ms = spectrum_set->getSpTwo();
 	SimplePrSMPtrVec fast_match_list = filter_->getBestMatch(ms);
 	for(unsigned int i=0;i<fast_match_list.size();i++){
-		if(i>= mng_->ptm_fast_filter_result_num_){
+		if((int)i >= mng_->ptm_fast_filter_result_num_){
 			break;
 		}
 		result.push_back(fast_match_list[i]);
