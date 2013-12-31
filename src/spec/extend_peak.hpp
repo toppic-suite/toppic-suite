@@ -30,6 +30,7 @@ public:
 	double getReverseTolerance(){return reverse_tolerance_;}
 	void setOrigTolerance(double orig_tolerance){orig_tolerance_ = orig_tolerance;}
 	void setReverseTolerance(double reverse_tolerance){reverse_tolerance_ = reverse_tolerance;}
+	void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 private:
 	DeconvPeakPtr base_peak_;
 	double mono_mass_;

@@ -73,6 +73,8 @@ class MsHeader {
 
   void setErrorTolerance(double ppo) {error_tolerance_ = getPrecMonoMass() * ppo;}
 
+  void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+
  private:
   /** data set name */
   std::string file_name_;
