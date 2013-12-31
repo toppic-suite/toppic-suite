@@ -7,12 +7,14 @@
 
 #include <algorithm>
 #include <iostream>
-#include "spec/prm_peak.hpp"
-#include "spec/spec_data.hpp"
+
 #include "base/base_data.hpp"
+#include "spec/prm_peak.hpp"
 
 namespace prot {
-PrmPeak::PrmPeak(DeconvPeakPtr base_peak,std::string base_type,double mono_mass,double score):Peak(mono_mass,base_peak->getIntensity()){
+PrmPeak::PrmPeak(DeconvPeakPtr base_peak,std::string base_type,
+                 double mono_mass,double score)
+    :Peak(mono_mass,base_peak->getIntensity()){
 	base_peak_=base_peak;
 	base_type_=base_type;
 	mono_mass_=mono_mass;
@@ -22,7 +24,8 @@ PrmPeak::PrmPeak(DeconvPeakPtr base_peak,std::string base_type,double mono_mass,
 	n_relax_c_strict_tolerance_=0;
 }
 
-void PrmPeak::addNghbEdge(DeconvPeakPtr peak,double offset,SupportPeakTypePtr peak_type,double score){
+void PrmPeak::addNghbEdge(DeconvPeakPtr peak,double offset,
+                          SupportPeakTypePtr peak_type,double score){
 	score_ +=score;
 	neighbor_list_.push_back(SupportPeakPtr(new SupportPeak(peak,offset,score,peak_type)));
 }
@@ -30,7 +33,8 @@ void PrmPeak::addNghbEdge(DeconvPeakPtr peak,double offset,SupportPeakTypePtr pe
 int PrmPeak::getBreakType(SupportPeakTypePtrVec support_peak_type_list){
 	int break_type = 0;
 	for(unsigned int i=0;i<neighbor_list_.size();i++){
-		if(neighbor_list_[i]->getPeakType() == prot::getSupportPeakTypePtrByName(support_peak_type_list,"N_TERM")){
+		if(neighbor_list_[i]->getPeakType() == 
+       getSupportPeakTypePtrByName(support_peak_type_list,"N_TERM")){
 			if(break_type == 0){
 				break_type = 1;
 			}
@@ -50,7 +54,8 @@ int PrmPeak::getBreakType(SupportPeakTypePtrVec support_peak_type_list){
 	return break_type;
 }
 
-void addTwoMasses(PrmPeakPtrVec& list,DeconvPeakPtr peak,double prec_mono_mass,ActivationPtr active_type){
+void addTwoMasses(PrmPeakPtrVec& list,DeconvPeakPtr peak,
+                  double prec_mono_mass,ActivationPtr active_type){
 	double orig_mass = peak->getMonoMass()-active_type->getNShit();
 	PrmPeakPtr new_peak = PrmPeakPtr(new PrmPeak(peak,prot::PRM_PEAK_TYPE_ORIGINAL,orig_mass,1));
 	list.push_back(new_peak);
@@ -59,7 +64,9 @@ void addTwoMasses(PrmPeakPtrVec& list,DeconvPeakPtr peak,double prec_mono_mass,A
 	list.push_back(reverse_peak);
 }
 
-void addSixMasses(PrmPeakPtrVec list,DeconvPeakPtr peak,double prec_mono_mass,ActivationPtr active_type,std::vector<double> offsets){
+void addSixMasses(PrmPeakPtrVec list,DeconvPeakPtr peak,
+                  double prec_mono_mass,ActivationPtr active_type,
+                  std::vector<double> offsets){
 	for(unsigned int i = 0;i<offsets.size();i++){
 		double mass = peak->getMonoMass()-active_type->getNShit()+offsets[i];
 		list.push_back(PrmPeakPtr(
@@ -75,7 +82,8 @@ void addSixMasses(PrmPeakPtrVec list,DeconvPeakPtr peak,double prec_mono_mass,Ac
 }
 
 
-PrmMsPtr getMsTwo(DeconvMsPtr deconv_ms,double delta,SpParaPtr sp_para,IonTypePtrVec ion_type_ptr_vec){
+PrmMsPtr getMsTwo(DeconvMsPtr deconv_ms,double delta,
+                  SpParaPtr sp_para,IonTypePtrVec ion_type_ptr_vec){
 
 	MsHeaderPtr header = prot::getDeltaHeaderPtr(deconv_ms,delta);
 
@@ -129,7 +137,6 @@ PrmMsPtr getMsTwo(DeconvMsPtr deconv_ms,double delta,SpParaPtr sp_para,IonTypePt
 	return PrmMsPtr(new Ms<PrmPeakPtr>(header,list_filtered)) ;
 }
 PrmMsPtr getSpSix(DeconvMsPtr deconv_ms,double delta,SpParaPtr sp_para,IonTypePtrVec ion_type_ptr_vec){
-
 
 	MsHeaderPtr header = prot::getDeltaHeaderPtr(deconv_ms,delta);
 
@@ -186,7 +193,8 @@ PrmMsPtr getSpSix(DeconvMsPtr deconv_ms,double delta,SpParaPtr sp_para,IonTypePt
 	return PrmMsPtr(new Ms<PrmPeakPtr>(header,list_filtered)) ;
 }
 
-PrmMsPtr getShiftSpSix(DeconvMsPtr deconv_ms,double delta,double shift,SpParaPtr sp_para,IonTypePtrVec ion_type_ptr_vec){
+PrmMsPtr getShiftSpSix(DeconvMsPtr deconv_ms,double delta,double shift,
+                       SpParaPtr sp_para,IonTypePtrVec ion_type_ptr_vec){
 	PrmMsPtr ms = getSpSix(deconv_ms,delta,sp_para,ion_type_ptr_vec);
 	double mono_mz = (ms->getHeaderPtr()->getPrecMonoMass()+shift)/ms->getHeaderPtr()->getPrecCharge();
 	ms->getHeaderPtr()->setPrecMonoMz(mono_mz);
@@ -259,4 +267,5 @@ std::vector<double> getScoreList(PrmMsPtr ms){
 	}
 	return results;
 }
+
 } /* namespace prot */

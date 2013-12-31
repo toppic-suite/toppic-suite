@@ -9,7 +9,10 @@
 
 namespace prot {
 
-SpPara::SpPara(int min_peak_num,double min_mass,PeakTolerancePtr peak_tolerance,ExtendSpParaPtr extend_sp_para,ActivationPtr activation){
+SpPara::SpPara(int min_peak_num,double min_mass,
+               PeakTolerancePtr peak_tolerance,
+               ExtendSpParaPtr extend_sp_para,
+               ActivationPtr activation){
 	activation_ = activation;
 	min_peak_num_ = min_peak_num;
 	min_mass_ = min_mass;

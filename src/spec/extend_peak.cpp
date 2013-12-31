@@ -64,6 +64,6 @@ ExtendMsPtr getMsThree(DeconvMsPtr deconv_ms,double delta,SpParaPtr sp_para){
 	}
 	//end msThreeSetTolerance and result = list_filtered
 	 return ExtendMsPtr(new Ms<ExtendPeakPtr>(header,list_filtered));
-
 }
+
 } /* namespace prot */

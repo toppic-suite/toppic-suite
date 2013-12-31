@@ -11,7 +11,7 @@ namespace prot {
 typedef std::shared_ptr<Ms<DeconvPeakPtr>> DeconvMsPtr;
 
 DeconvMsPtr  getRefineMs(DeconvMsPtr deconv_ms_ptr,
-                              double calibration, double newPrecMass);
+                         double calibration, double newPrecMass);
 
 MsHeaderPtr getHeaderPtr(DeconvMsPtr deconv_ms_ptr,
                          double new_prec_mass);

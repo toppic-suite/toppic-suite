@@ -18,7 +18,8 @@ namespace prot {
 
 class SpPara {
 public:
-	SpPara(int min_peak_num,double min_mass,PeakTolerancePtr peak_tolerance,ExtendSpParaPtr extend_sp_para,ActivationPtr activation);
+	SpPara(int min_peak_num,double min_mass,PeakTolerancePtr peak_tolerance,
+         ExtendSpParaPtr extend_sp_para,ActivationPtr activation);
 	SpPara(xercesc::DOMElement* element);
 	PeakTolerancePtr getPeakTolerance(){return peak_tolerance_;}
 	void setPeakTolerance(PeakTolerancePtr peak_tolerance){peak_tolerance_ = peak_tolerance;}

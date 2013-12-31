@@ -14,7 +14,6 @@
 #include "spec/deconv_peak.hpp"
 #include "spec/support_peak.hpp"
 #include "spec/support_peak_type.hpp"
-#include "spec/prm_peak_type.hpp"
 #include "spec/ms.hpp"
 #include "spec/sp_para.hpp"
 #include "deconv_ms.hpp"
@@ -59,7 +58,8 @@ inline bool prmpeak_up(const PrmPeakPtr p,PrmPeakPtr n){
 
 PrmMsPtr getMsTwo(DeconvMsPtr deconv_ms,double delta,SpParaPtr sp_para,IonTypePtrVec ion_type_ptr_vec);
 PrmMsPtr getSpSix(DeconvMsPtr deconv_ms,double delta,SpParaPtr sp_para,IonTypePtrVec ion_type_ptr_vec);
-PrmMsPtr getShiftSpSix(DeconvMsPtr deconv_ms,double delta,double shift,SpParaPtr sp_para,IonTypePtrVec ion_type_ptr_vec);
+PrmMsPtr getShiftSpSix(DeconvMsPtr deconv_ms,double delta,double shift,SpParaPtr sp_para,
+                       IonTypePtrVec ion_type_ptr_vec);
 
 std::vector<std::vector<int>> getIntMassErrorList(PrmMsPtr ms,double scale,bool n_strict,bool c_strict);
 std::vector<double> getMassList(PrmMsPtr ms);

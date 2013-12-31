@@ -19,7 +19,6 @@ class ExtendSpPara {
 	// if the mass is smaller than extendMinMass, the peak is not extended 
 	double extend_min_mass_;
   std::vector<double> ext_offsets_;
-	
 };
 
 typedef std::shared_ptr<ExtendSpPara> ExtendSpParaPtr;

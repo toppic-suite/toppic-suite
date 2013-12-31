@@ -8,8 +8,9 @@ namespace prot {
 
 class PeakTolerance {
  public:
-	PeakTolerance(double ppo, bool use_min_tolerance,
-			double min_tolerance);
+  PeakTolerance(double ppo, bool use_min_tolerance,
+                double min_tolerance);
+
 	PeakTolerance(xercesc::DOMElement* element);
 
 	double compStrictErrorTole(double mass);
@@ -39,9 +40,9 @@ class PeakTolerance {
 
  private:
   double ppo_;
-    /* whether or not use minimum tolerance */
-	bool use_min_tolerance_;
-	double min_tolerance_;
+  /* whether or not use minimum tolerance */
+  bool use_min_tolerance_;
+  double min_tolerance_;
 };
 
 typedef std::shared_ptr<PeakTolerance> PeakTolerancePtr;

@@ -40,7 +40,8 @@ class Ms {
     std::string header_str = header_ptr_->toString();
     std::stringstream tmp;
     for (unsigned int i = 0; i < peak_ptr_list_.size(); i++) {
-      tmp << i << " " << peak_ptr_list_[i]->getPosition() << " " << peak_ptr_list_[i]->getIntensity() << "\n";
+      tmp << i << " " << peak_ptr_list_[i]->getPosition() 
+          << " " << peak_ptr_list_[i]->getIntensity() << "\n";
     }
     return header_str + tmp.str();
   }

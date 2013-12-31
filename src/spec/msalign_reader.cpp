@@ -159,4 +159,3 @@ int countSpNum(const char *spectrum_file, ActivationPtrVec activation_list) {
 }
 
 }
-

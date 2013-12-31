@@ -102,7 +102,6 @@ class MsHeader {
 };
 
 typedef std::shared_ptr<MsHeader> MsHeaderPtr;
-
 }
 
 #endif
