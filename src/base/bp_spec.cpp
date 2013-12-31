@@ -113,6 +113,18 @@ std::vector<int> BpSpec::getScaledMass(double scale,IonTypePtr ion_type){
 	return result;
 }
 
+void BpSpec::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
+	xercesc::DOMElement* element = xml_doc->createElement("bp_spec");
+	std::string str = convertToString(seq_mass_);
+	xml_doc->addElement(element, "seq_mass", str.c_str());
+	xercesc::DOMElement* bplist = xml_doc->createElement("breakpoint_list");
+	for(int i=0;i<break_point_ptr_vec_.size();i++){
+		break_point_ptr_vec_[i]->appendXml(xml_doc,bplist);
+	}
+	element->appendChild(bplist);
+	parent->appendChild(element);
+}
+
 int getFirstResPos(double n_term_shift,std::vector<double> extbmasses){
 	double trunc_len = - n_term_shift;
 	int best_pos = -1;

@@ -36,6 +36,8 @@ class ResidueSeq {
 
   std::string toString();
 
+  void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+
  private:
   /** residue list */
   ResiduePtrVec residues_;

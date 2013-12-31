@@ -7,6 +7,7 @@
 #include "base/segment.hpp"
 #include "base/prot_mod.hpp"
 
+
 namespace prot {
 
 class Proteoform;
@@ -42,6 +43,7 @@ public:
 
   std::string toString();
 
+  void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
 private:
   

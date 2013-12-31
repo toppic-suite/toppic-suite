@@ -28,6 +28,8 @@ class Change {
 
   PtmPtr getPtmPtr() {return ptm_ptr_;}
 
+  void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+
  private:
   // left and right positions are based on break point positions 
   int left_bp_pos_;

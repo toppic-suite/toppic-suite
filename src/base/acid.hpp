@@ -9,6 +9,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include "base/xml_dom_document.hpp"
 
 namespace prot {
 
@@ -35,6 +36,8 @@ class Acid {
 
   /* Get amino acid three letter representation. */
   std::string getThreeLetter() {return three_letter_;}
+
+  void appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
  private:
   /* Name of amino acid */

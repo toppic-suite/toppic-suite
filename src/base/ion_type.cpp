@@ -16,6 +16,18 @@ IonType::IonType(std::string name, bool n_term, double shift) {
   }
 }
 
+void IonType::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
+	xercesc::DOMElement* element = xml_doc->createElement("ion_type");
+	xml_doc->addElement(element, "name", name_.c_str());
+	std::string str = convertToString(n_term_);
+	xml_doc->addElement(element, "n_term", str.c_str());
+	str = convertToString(shift_);
+	xml_doc->addElement(element, "shift", str.c_str());
+	str = convertToString(b_y_shift_);
+	xml_doc->addElement(element, "b_y_shift_", str.c_str());
+	parent->appendChild(element);
+}
+
 IonTypePtrVec getIonTypePtrVecInstance(const std::string file_name){
 	IonTypePtrVec ion_type_ptr_vec;
 	prot::XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMInstance();

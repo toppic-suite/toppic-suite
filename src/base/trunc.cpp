@@ -19,6 +19,21 @@ Trunc::Trunc(std::string name, int trunc_len,
   }
 }
 
+void Trunc::appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
+	xercesc::DOMElement* element = xml_doc->createElement("truncation");
+	xml_doc->addElement(element, "name", name_.c_str());
+	std::string str = convertToString(trunc_len_);
+	xml_doc->addElement(element, "trunc_len", str.c_str());
+	str = convertToString(shift_);
+	xml_doc->addElement(element, "shift", str.c_str());
+	//todo::acidlist add str?
+	xercesc::DOMElement* acid_list = xml_doc->createElement("amino_acid_list");
+	for(int i=0;i<acid_str_.size();i++){
+		acid_str_[i]->appendxml(xml_doc,acid_list);
+	}
+	element->appendChild(acid_list);
+	parent->appendChild(element);
+}
 
 TruncPtrVec getTruncPtrVecInstance(AcidPtrVec &acid_list, 
                                    const std::string &file_name) {

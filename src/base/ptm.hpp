@@ -9,6 +9,8 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include "base/xml_dom.hpp"
+#include "base/xml_dom_document.hpp"
 
 namespace prot {
 
@@ -31,6 +33,8 @@ class Ptm {
   bool isEmpty();
 
   static PtmPtr getEmptyPtmPtr();
+
+  void appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
  private:
   /* Abbreviation name of a PTM */

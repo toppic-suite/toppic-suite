@@ -25,6 +25,14 @@ bool Ptm::isEmpty() {
   }
 }
 
+void Ptm::appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
+	xercesc::DOMElement* element = xml_doc->createElement("modification");
+	xml_doc->addElement(element, "abbr_name", abbr_name_.c_str());
+	std::string str = convertToString(mono_mass_);
+	xml_doc->addElement(element, "mono_mass", str.c_str());
+	parent->appendChild(element);
+}
+
 PtmPtrVec getPtmPtrVecInstance(const std::string &file_name) {
   PtmPtrVec ptm_list;
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMInstance();
