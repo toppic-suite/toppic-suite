@@ -11,10 +11,6 @@ namespace prot {
 
 void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr);
 
-void zeroPtmSearch(SpectrumSetPtr spec_set_ptr, int type,
-                   ProteoformPtrVec &form_ptr_vec, ZeroPtmMngPtr mng_ptr,
-                   PrSMPtrVec &prsms);
-
 } /* namespace_prot */
 
 #endif

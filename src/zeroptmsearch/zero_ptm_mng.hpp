@@ -64,7 +64,6 @@ class ZeroPtmMng {
 
 typedef std::shared_ptr<ZeroPtmMng> ZeroPtmMngPtr;
 
-
 } /* namespace_prot */
 
 #endif

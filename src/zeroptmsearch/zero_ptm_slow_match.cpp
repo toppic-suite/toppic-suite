@@ -17,6 +17,7 @@ ZeroPtmSlowMatch::ZeroPtmSlowMatch(int search_type,
   proteoform_ptr_ = getSubProteoform(fast_match_ptr->getProteoformPtr(), 
                                      fast_match_ptr->getBegin(), 
                                      fast_match_ptr->getEnd());
+
   refine_prec_mass_ = proteoform_ptr_->getResSeqPtr()->getSeqMass();
   double delta = refine_prec_mass_ - deconv_ms_ptr->getHeaderPtr()->getPrecMonoMass();
   refine_ms_ptr_ = getMsThree(deconv_ms_ptr_, delta, mng_ptr_->sp_para_ptr_);
@@ -50,7 +51,6 @@ double compAvg(std::vector<double> ppos, double recal_ppo) {
  * compute the validation of the candidates based on the different of
  * precursor mass
  */
-
 bool ZeroPtmSlowMatch::isValid (double recal, double ppo) {
   if (!mng_ptr_->ms_one_ms_two_same_recal_) {
     return true;
@@ -58,11 +58,7 @@ bool ZeroPtmSlowMatch::isValid (double recal, double ppo) {
     // here we assume that precursor mass has same recal to MS2
     double prec_mass = deconv_ms_ptr_->getHeaderPtr()->getPrecMonoMass();
     double prec_ppo = (prec_mass  * (1 + recal) - refine_prec_mass_) / prec_mass;
-    if (abs(prec_ppo) <= ppo) {
-      return true;
-    } else {
-      return false;
-    }
+    return abs(prec_ppo) <= ppo;
   }
 }
 
@@ -91,7 +87,6 @@ void ZeroPtmSlowMatch::compScore (ExtendMsPtr refine_ms_ptr, TheoPeakPtrVec theo
   score_ = compUniqueScore(ms_masses, theo_masses, ppo);
 }
 
-
 PrSMPtr ZeroPtmSlowMatch::geneResult() {
   return PrSMPtr(new PrSM(proteoform_ptr_, deconv_ms_ptr_, refine_prec_mass_, 
                           recal_, mng_ptr_->sp_para_ptr_));
@@ -114,9 +109,4 @@ ZpSlowMatchPtrVec zeroPtmSlowFilter(int semi_align_type,
   return slow_matches;
 }
 
-
-
 }
-
-
-

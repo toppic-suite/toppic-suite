@@ -16,10 +16,6 @@ int main(int argc, char* argv[]) {
     mng_ptr->output_file_ext_ = argv[4];
     std::cout << "protein database " << argv[2] << " spectrum dataset " << argv[3] << std::endl;
     prot::zeroPtmSearchProcess(mng_ptr);
-    //mng.resFileName = args[1];
-    //mng.spPara.setActivationType(EnumActivation.getActivationType(args[4]));
-    //ZeroPtmProcessor processor = new ZeroPtmProcessor(mng);
-    //processor.process();
   } catch (const char* e) {
     std::cout << "Exception " << e << std::endl;
   } 
