@@ -1,8 +1,6 @@
 #include <base/logger.hpp>
 
 #include "base/prot_mod.hpp"
-#include "base/xml_dom.hpp"
-#include "base/xml_dom_document.hpp"
 
 namespace prot {
 
@@ -14,6 +12,22 @@ ProtMod::ProtMod(std::string name, TruncPtr trunc_ptr, PtmPtr ptm_ptr,
   valid_acid_ptrs_ = valid_acid_ptrs;
   prot_shift_ = trunc_ptr_->getShift() + ptm_ptr_->getMonoMass();
   pep_shift_ = ptm_ptr_->getMonoMass();
+}
+void ProtMod::appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
+	xercesc::DOMElement* element = xml_doc->createElement("prot_mod");
+	xml_doc->addElement(element, "name_", name_.c_str());
+	std::string str = prot::convertToString(prot_shift_);
+	xml_doc->addElement(element, "prot_shift_", str.c_str());
+	str = prot::convertToString(pep_shift_);
+	xml_doc->addElement(element, "pep_shift_", str.c_str());
+	trunc_ptr_->appendxml(xml_doc,element);
+	ptm_ptr_->appendxml(xml_doc,element);
+	xercesc::DOMElement* acidlist = xml_doc->createElement("amino_acid_list");
+	for(int i =0;i<valid_acid_ptrs_.size();i++){
+		valid_acid_ptrs_[i]->appendxml(xml_doc,acidlist);
+	}
+	element->appendChild(acidlist);
+	parent->appendChild(element);
 }
 
 ProtModPtrVec getProtModPtrVecInstance(AcidPtrVec &acid_list,

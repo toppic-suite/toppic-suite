@@ -22,6 +22,7 @@ public:
 	double getCShit(){return c_ion_type_->getShift()-y_ion_shift_;}
 	IonTypePtr getNIonType(){return n_ion_type_;}
 	IonTypePtr getCIonType(){return c_ion_type_;}
+	void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
 private:
 	std::string name_;

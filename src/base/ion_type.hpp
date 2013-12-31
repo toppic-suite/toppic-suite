@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include "base/xml_dom_document.hpp"
 
 namespace prot {
 
@@ -22,6 +23,7 @@ class IonType {
 
   double getBYShift() {return b_y_shift_;}
 
+  void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
  private:
   /** ion name */
   std::string name_;

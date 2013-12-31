@@ -32,7 +32,7 @@ public:
 	/*implement the function getScaledBMass*/
 	std::vector<int> getScaledMass(double scale,IonTypePtr iong_type);
 	double getResSeqMass(){return seq_mass_;}
-  
+	void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 private:
   double seq_mass_;
 	BreakPointPtrVec break_point_ptr_vec_;

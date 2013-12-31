@@ -19,6 +19,7 @@ public:
 	double getSrm(){return srm_;}
 	double getNTermMass(IonTypePtr ion_type) {return prm_ + ion_type->getShift();}
 	double getCTermMass(IonTypePtr ion_type) {return srm_ + ion_type->getShift();}
+	void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 private:
 	double prm_;
 	double srm_;

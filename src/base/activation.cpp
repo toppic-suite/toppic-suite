@@ -25,6 +25,22 @@ Activation::Activation(IonTypePtrVec ion_type_list,
 
 }
 
+void Activation::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
+	xercesc::DOMElement* element = xml_doc->createElement("activation");
+	xml_doc->addElement(element, "name", name_.c_str());
+	std::string str = convertToString(b_ion_shift_);
+	xml_doc->addElement(element, "b_ion_shift", str.c_str());
+	str = convertToString(y_ion_shift_);
+	xml_doc->addElement(element, "y_ion_shift", str.c_str());
+	xercesc::DOMElement* nit = xml_doc->createElement("n_ion_type_");
+	n_ion_type_->appendXml(xml_doc,nit);
+	xercesc::DOMElement* cit = xml_doc->createElement("n_ion_type_");
+	c_ion_type_->appendXml(xml_doc,cit);
+	element->appendChild(nit);
+	element->appendChild(cit);
+	parent->appendChild(element);
+}
+
 ActivationPtrVec getActivationPtrVecInstance(IonTypePtrVec ion_type_list, std::string file_name){
   ActivationPtrVec activationPtrVec;
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMInstance();

@@ -22,6 +22,8 @@ class DeconvPeak : public Peak {
 
   void setId(int id) {id_ = id;}
 
+  void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+
  private:
   int id_;
   int charge_;

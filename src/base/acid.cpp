@@ -21,6 +21,19 @@ Acid::Acid (std::string const &name, std::string const &one_letter,
   avg_mass_ = avg_mass;
 }
 
+void Acid::appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
+	xercesc::DOMElement* element = xml_doc->createElement("amino_acid");
+	xml_doc->addElement(element, "name", name_.c_str());
+	xml_doc->addElement(element, "one_letter", one_letter_.c_str());
+	xml_doc->addElement(element, "three_letter", three_letter_.c_str());
+	xml_doc->addElement(element, "composition", composition_.c_str());
+	std::string str = convertToString(mono_mass_);
+	xml_doc->addElement(element, "mono_mass", str.c_str());
+	str = convertToString(avg_mass_);
+	xml_doc->addElement(element, "average_mass", str.c_str());
+	parent->appendChild(element);
+}
+
 AcidPtrVec getAcidPtrVecInstance(std::string file_name) {
   AcidPtrVec acid_list;
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMInstance();

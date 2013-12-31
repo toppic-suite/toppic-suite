@@ -12,13 +12,14 @@
 namespace prot {
 int PrSMWriter::write(const char *prm_file_name){
 	xercesc::DOMImplementation* implementation =  xercesc::DOMImplementationRegistry::getDOMImplementation(X("Core"));
-	XmlDOMDocument* xml (implementation,"prsm_list");
+	XmlDOMDocument* xml = new XmlDOMDocument(implementation,"prsm_list");
 	xercesc::DOMElement* root = xml->getDocumentElement();
 	for(unsigned int i = 0;i<prsms_.size();i++){
-		//todo::xunlikun prsm to xml
+		prsms_[i]->appendXml(xml,root);
 	}
 	xml->writeXmlDOMDocument(prm_file_name);
 	delete xml;
+	return 0;
 }
 
 void PrSMWriter::addSimplePrSM(PrSMPtr matche){

@@ -74,4 +74,33 @@ void MsHeader::setScans(std::string s) {
   }
 }
 
+void MsHeader::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
+	xercesc::DOMElement* element = xml_doc->createElement("ms_header");
+	xml_doc->addElement(element, "file_name", file_name_.c_str());
+	std::string str = convertToString(id_);
+	xml_doc->addElement(element, "id_", str.c_str());
+	str = convertToString(prec_id_);
+	xml_doc->addElement(element, "prec_id", str.c_str());
+	xml_doc->addElement(element, "title", title_.c_str());
+	str = convertToString(level_);
+	xml_doc->addElement(element, "level", str.c_str());
+	xercesc::DOMElement* scans = xml_doc->createElement("scan_list");
+	for(unsigned int i=0;i< scans_.size();i++){
+		str = convertToString(scans_[i]);
+		xml_doc->addElement(element, "scan", str.c_str());
+	}
+	str = convertToString(retention_time_);
+	xml_doc->addElement(element, "retention_time", str.c_str());
+	str = convertToString(prec_sp_mz_);
+	xml_doc->addElement(element, "prec_sp_mz", str.c_str());
+	str = convertToString(prec_mono_mz_);
+	xml_doc->addElement(element, "prec_mono_mz_", str.c_str());
+	str = convertToString(prec_charge_);
+	xml_doc->addElement(element, "prec_charge_", str.c_str());
+	str = convertToString(error_tolerance_);
+	xml_doc->addElement(element, "error_tolerance_", str.c_str());
+	activation_ptr_->appendXml(xml_doc,element);
+	parent->appendChild(element);
+}
+
 }

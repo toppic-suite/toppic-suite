@@ -16,7 +16,12 @@ class DbResidueSeq: public ResidueSeq {
 
   int getId() {return id_;}
   std::string getName() {return name_;}
-
+  void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
+	  xercesc::DOMElement* element = xml_doc->createElement("db_residue_seq");
+	  std::string str = convertToString(id_);
+	  xml_doc->addElement(element, "id", str.c_str());
+	  xml_doc->addElement(element, "name", name_.c_str());
+  }
  private:
   int id_;
   std::string name_;

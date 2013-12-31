@@ -3,6 +3,8 @@
 
 #include "base/ptm.hpp"
 #include "base/trunc.hpp"
+#include "base/xml_dom.hpp"
+#include "base/xml_dom_document.hpp"
 
 namespace prot {
 
@@ -20,6 +22,8 @@ class ProtMod {
   double getProtShift() {return prot_shift_;}
 
   double getPepShift() {return pep_shift_;}
+
+  void appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
  private:
   std::string name_;

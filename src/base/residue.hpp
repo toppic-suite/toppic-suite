@@ -42,6 +42,8 @@ class Residue {
 
   std::string toString() {return toString("[", "]");}
 
+  void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+
  private:
 	/** amino acid */
 	AcidPtr acid_ptr_;

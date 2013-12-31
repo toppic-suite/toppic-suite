@@ -8,6 +8,8 @@
 #ifndef PRSM_WRITER_HPP_
 #define PRSM_WRITER_HPP_
 
+#include "prsm/prsm.hpp"
+
 namespace prot {
 
 class PrSMWriter {

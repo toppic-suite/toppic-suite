@@ -34,6 +34,18 @@ std::string ResidueSeq::toString() {
   return s.str();
 }
 
+void ResidueSeq::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
+	xercesc::DOMElement* element = xml_doc->createElement("residue_seq");
+	std::string str = convertToString(residue_mass_sum_);
+	xml_doc->addElement(element, "residue_mass_sum", str.c_str());
+	xercesc::DOMElement* residuelist = xml_doc->createElement("residue_list");
+	for(int i=0;i<residues_.size();i++){
+		residues_[i]->appendXml(xml_doc,residuelist);
+	}
+	element->appendChild(residuelist);
+	parent->appendChild(element);
+}
+
 ResidueSeq getEmptyResidueSeq() {
   ResiduePtrVec residues;
   return ResidueSeq(residues);
