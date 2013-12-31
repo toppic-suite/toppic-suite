@@ -16,9 +16,9 @@ ProtMod::ProtMod(std::string name, TruncPtr trunc_ptr, PtmPtr ptm_ptr,
 void ProtMod::appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
 	xercesc::DOMElement* element = xml_doc->createElement("prot_mod");
 	xml_doc->addElement(element, "name_", name_.c_str());
-	std::string str = convertToString(prot_shift_);
+	std::string str = prot::convertToString(prot_shift_);
 	xml_doc->addElement(element, "prot_shift_", str.c_str());
-	std::string str = convertToString(pep_shift_);
+	str = prot::convertToString(pep_shift_);
 	xml_doc->addElement(element, "pep_shift_", str.c_str());
 	trunc_ptr_->appendxml(xml_doc,element);
 	ptm_ptr_->appendxml(xml_doc,element);
