@@ -8,6 +8,10 @@
 #ifndef PAIR_HPP_
 #define PAIR_HPP_
 
+#include "spec/extend_peak.hpp"
+#include "spec/theo_peak.hpp"
+#include "prsm/peak_ion_pair.hpp"
+
 namespace prot {
 
 class Pair;
