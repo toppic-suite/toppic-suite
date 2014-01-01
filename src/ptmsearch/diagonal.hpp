@@ -14,7 +14,7 @@
 namespace prot {
 
 template <class T>
-class Diagonal {
+class Diagonal{
 public:
 	Diagonal(){};
 	Diagonal(DiagonalHeaderPtr header){
@@ -23,6 +23,9 @@ public:
 	Diagonal(DiagonalHeaderPtr header,std::vector<T> pair_ptr_list){
 		header_ = header;
 		pair_ptr_list_ = pair_ptr_list;
+		for(int i=0;i<pair_ptr_list.size();i++){
+			pair_ptr_list[i].setDiagonal(this);
+		}
 	};
 
 	unsigned int size(){
