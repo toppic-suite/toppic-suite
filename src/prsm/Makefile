@@ -21,7 +21,14 @@ SRCS = peak_ion_pair.cpp prsm.cpp simple_prsm_writer.cpp simple_prsm.cpp main.cp
 #
 
 OBJ_DIR = ../../obj
-OBJS = $(addprefix $(OBJ_DIR)/, main.o simple_prsm_writer.o algorithm.o break_point.o bp_spec.o ion.o change.o ptm.o acid.o residue.o residue_seq.o proteoform.o theo_peak.o peak_ion_pair.o prsm.o simple_prsm.o deconv_peak.o deconv_ms.o peak_tolerance.o extend_peak.o ms_header.o xml_dom_document.o xml_dom.o)
+
+BASE_OBJS = $(addprefix $(OBJ_DIR)/, prot_mod.o trunc.o activation.o extreme_value.o algorithm.o break_point.o bp_spec.o ion.o ion_type.o change.o ptm.o acid.o residue.o residue_seq.o proteoform.o xml_dom_document.o xml_dom.o)
+
+SPEC_OBJS = $(addprefix $(OBJ_DIR)/, theo_peak.o deconv_peak.o deconv_ms.o peak_tolerance.o extend_peak.o ms_header.o)
+
+PRSM_OBJS = $(addprefix $(OBJ_DIR)/, main.o simple_prsm_writer.o peak_ion_pair.o prsm.o simple_prsm.o)
+
+OBJS = $(BASE_OBJS) $(SPEC_OBJS) $(PRSM_OBJS)
 
 BIN_DIR = ../../bin
 

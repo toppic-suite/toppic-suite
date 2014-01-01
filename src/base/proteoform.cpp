@@ -68,7 +68,7 @@ void Proteoform::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
 	residue_seq_ptr_->appendXml(xml_doc,element);
 	bp_spec_ptr_->appendXml(xml_doc,element);
 	xercesc::DOMElement* cl = xml_doc->createElement("change_list");
-	for(int i=0;i<change_list_.size();i++){
+	for(unsigned int i=0;i<change_list_.size();i++){
 		change_list_[i]->appendXml(xml_doc,cl);
 	}
 	element->appendChild(cl);

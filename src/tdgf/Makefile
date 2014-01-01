@@ -22,7 +22,11 @@ SRCS = evalue_console.cpp comp_prob_value.cpp
 
 OBJ_DIR = ../../obj
 BASE_OBJS = $(addprefix $(OBJ_DIR)/, residue_seq.o fasta_reader.o change.o break_point.o bp_spec.o proteoform.o base_data.o activation.o ion_type.o neutral_loss.o trunc.o prot_mod.o acid.o ptm.o residue.o xml_dom.o xml_dom_document.o)
-OBJS = $(BASE_OBJS) $(addprefix $(OBJ_DIR)/, comp_prob_value.o evalue_console.o peak_tolerance.o extend_sp_para.o sp_para.o) 
+SPEC_OBJS = $(addprefix $(OBJ_DIR)/, sp_para.o extend_sp_para.o peak_tolerance.o) 
+
+TDGF_OBJS = $(addprefix $(OBJ_DIR)/, comp_prob_value.o evalue_console.o) 
+
+OBJS = $(BASE_OBJS) $(SPEC_OBJS) $(TDGF_OBJS)
 
 BIN_DIR = ../../bin
 
@@ -47,6 +51,6 @@ $(OBJ_DIR)/%.o: %.cpp
 	$(CC) -c $(CPPFLAGS) $(INCLUDES) $< -o $@
 
 clean:
-	$(RM) *~ $(MAIN) $(OBJS)
+	$(RM) *~ $(MAIN) $(TDGF_OBJS)
 
 depend: $(SRCS)

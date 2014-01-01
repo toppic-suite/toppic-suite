@@ -21,7 +21,11 @@ SRCS = support_peak_type.cpp theo_peak.cpp extend_sp_para.cpp peak_tolerance.cpp
 #
 
 OBJ_DIR = ../../obj
-OBJS = $(addprefix $(OBJ_DIR)/, change.o break_point.o bp_spec.o acid.o ptm.o residue.o residue_seq.o proteoform.o extend_peak.o support_peak.o support_peak_type.o prm_peak.o spectrum_set.o sp_para.o theo_peak.o extend_sp_para.o peak_tolerance.o ion.o ion_type.o xml_dom.o xml_dom_document.o activation.o msalign_reader.o deconv_ms.o peak_list.o ms_header.o deconv_peak.o)
+BASE_OBJS = $(addprefix $(OBJ_DIR)/, prot_mod.o trunc.o change.o break_point.o bp_spec.o acid.o ptm.o residue.o residue_seq.o proteoform.o ion.o ion_type.o xml_dom.o xml_dom_document.o activation.o)
+
+SPEC_OBJS = $(addprefix $(OBJ_DIR)/, extend_peak.o support_peak.o support_peak_type.o prm_peak.o spectrum_set.o sp_para.o theo_peak.o extend_sp_para.o peak_tolerance.o msalign_reader.o deconv_ms.o peak_list.o ms_header.o deconv_peak.o)
+
+OBJS = $(BASE_OBJS) $(SPEC_OBJS)
 
 BIN_DIR = ../../bin
 
@@ -46,6 +50,6 @@ $(OBJ_DIR)/%.o: %.cpp
 	$(CC) -c $(CPPFLAGS) $(INCLUDES) $< -o $@
 
 clean:
-	$(RM) *~ $(MAIN) $(OBJS)
+	$(RM) *~ $(MAIN) $(SPEC_OBJS)
 
 depend: $(SRCS)

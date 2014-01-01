@@ -23,7 +23,7 @@ void ProtMod::appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
 	trunc_ptr_->appendxml(xml_doc,element);
 	ptm_ptr_->appendxml(xml_doc,element);
 	xercesc::DOMElement* acidlist = xml_doc->createElement("amino_acid_list");
-	for(int i =0;i<valid_acid_ptrs_.size();i++){
+	for(unsigned int i =0;i<valid_acid_ptrs_.size();i++){
 		valid_acid_ptrs_[i]->appendxml(xml_doc,acidlist);
 	}
 	element->appendChild(acidlist);
