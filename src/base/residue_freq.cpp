@@ -14,10 +14,10 @@ ResidueFreq::ResidueFreq(AcidPtrVec acid_list, PtmPtrVec ptm_list,
   freq_ = freq;
 }
 
-ResidueFreqPtrVec getResiduePtrVecInstance(AcidPtrVec &acid_list, 
+ResFreqPtrVec getResiduePtrVecInstance(AcidPtrVec &acid_list, 
                                            PtmPtrVec &ptm_list,
                                            std::string &file_name) {
-  ResidueFreqPtrVec residue_list;
+  ResFreqPtrVec residue_list;
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMInstance();
   if (parser) {
     XmlDOMDocument doc(parser, file_name.c_str());
@@ -31,7 +31,7 @@ ResidueFreqPtrVec getResiduePtrVecInstance(AcidPtrVec &acid_list,
       double freq = getDoubleChildValue(element, "frequency", 0);
       LOG_DEBUG( "acid vec " << acid_list.size() << " ptm vec " 
                 << ptm_list.size() << " acid " << acid_name << " ptm " << ptm_abbr_name);
-      residue_list.push_back(ResidueFreqPtr(
+      residue_list.push_back(ResFreqPtr(
               new ResidueFreq(acid_list, ptm_list, acid_name, ptm_abbr_name, freq)));
     }
   }

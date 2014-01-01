@@ -15,14 +15,14 @@ LFLAGS = -L/lib -L/opt/local/lib
 LIBS = -lxerces-c 
 #
 # define the C++ source files
-SRCS = evalue_console.cpp  
+SRCS = evalue_console.cpp comp_prob_value.cpp 
 #
 # define the C object files 
 #
 
 OBJ_DIR = ../../obj
 BASE_OBJS = $(addprefix $(OBJ_DIR)/, residue_seq.o fasta_reader.o change.o break_point.o bp_spec.o proteoform.o base_data.o activation.o ion_type.o neutral_loss.o trunc.o prot_mod.o acid.o ptm.o residue.o xml_dom.o xml_dom_document.o)
-OBJS = $(BASE_OBJS) $(addprefix $(OBJ_DIR)/, evalue_console.o peak_tolerance.o extend_sp_para.o sp_para.o) 
+OBJS = $(BASE_OBJS) $(addprefix $(OBJ_DIR)/, comp_prob_value.o evalue_console.o peak_tolerance.o extend_sp_para.o sp_para.o) 
 
 BIN_DIR = ../../bin
 
