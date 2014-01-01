@@ -38,6 +38,7 @@ class ResidueSeq {
 
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
+  bool allowsMod(ProtModPtr mod);
  private:
   /** residue list */
   ResiduePtrVec residues_;
