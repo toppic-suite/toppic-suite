@@ -7,7 +7,7 @@
 
 #include "ptm_searcher.hpp"
 #include "ptm_slow_match.hpp"
-#include "ptm_slow_filter.hpp"
+#include "ptmsearch/ptm_slow_filter.hpp"
 
 namespace prot {
 PtmSearcher::PtmSearcher(PtmMngPtr mng){

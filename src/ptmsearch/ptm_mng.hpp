@@ -20,7 +20,7 @@ namespace prot {
 class PtmMng {
 public :
 	PtmMng();
-	BaseDataPtr base_data = BaseDataPtr(new BaseData(""));
+	BaseDataPtr base_data_ = BaseDataPtr(new BaseData(""));
 
 	double ppo_ = 0.000015;
 	bool use_min_tolerance_ = true;
@@ -39,10 +39,10 @@ public :
 	//todo::need be inited;
 	ProtModPtrVec allow_prot_N_mods_;
 	ProtModPtrVec allow_prot_C_mods_;
-	TruncPtr allow_prot_N_truncs_;
-	TruncPtr allow_prot_C_truncs_;
-	PtmPtr allow_pep_N_mods;
-	PtmPtr allow_pep_C_mods;
+	TruncPtrVec allow_prot_N_truncs_;
+	TruncPtrVec allow_prot_C_truncs_;
+	PtmPtrVec allow_pep_N_mods_;
+	PtmPtrVec allow_pep_C_mods_;
 
 	int n_report_ = 1;
 	int n_unknown_shift_ =2;

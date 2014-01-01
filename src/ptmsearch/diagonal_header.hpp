@@ -209,6 +209,11 @@ private:
 
 	bool is_align_suffix_=false;
 };
+
+DiagonalHeaderPtrVec getNTermShiftListCommon(std::vector<double> best_shifts);
+DiagonalHeaderPtrVec getNTermShiftListCompLeft(ProteoformPtr seq,PtmMngPtr mng);
+DiagonalHeaderPtrVec getNTermShiftListCompRight(ProteoformPtr seq,PtmMngPtr mng);
+
 } /* namespace prot */
 
 #endif /* DIAGONAL_HEADER_HPP_ */

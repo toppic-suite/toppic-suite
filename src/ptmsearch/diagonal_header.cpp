@@ -43,4 +43,32 @@ DiagonalHeaderPtr DiagonalHeader::getShift(DiagonalHeaderPtr shift,int bgn,int e
 	return new_shift;
 }
 
+DiagonalHeaderPtrVec getNTermShiftListCommon(std::vector<double> best_shifts){
+	DiagonalHeaderPtrVec headers;
+	for(int i =0;i<best_shifts.size();i++){
+		headers.push_back(DiagonalHeaderPtr(new DiagonalHeader(best_shifts[i],true,false,false,false)));
+	}
+	return headers;
+}
+
+DiagonalHeaderPtrVec getNTermShiftListCompLeft(ProteoformPtr seq,PtmMngPtr mng){
+	DiagonalHeaderPtrVec extend_n_term_shifts;
+	double shift;
+	for(int i=0;i<mng->allow_prot_N_mods_.size();i++){
+		if(seq->getResSeqPtr()->allowsMod(mng->allow_prot_N_mods_[i]) && mng->allow_prot_N_mods_[i]->getPepShift()==0){
+			shift = mng->allow_prot_N_mods_[i]->getProtShift();
+			extend_n_term_shifts.push_back(DiagonalHeaderPtr(new DiagonalHeader(shift,true,false,true,false)));
+		}
+	}
+	return extend_n_term_shifts;
+}
+DiagonalHeaderPtrVec getNTermShiftListCompRight(ProteoformPtr seq,PrmMsPtr ms_six){
+	DiagonalHeaderPtrVec extend_n_term_shifts;
+	std::vector<double> ms_masses = prot::getMassList(ms_six);
+	std::vector<double> seq_masses = seq->getBpSpecPtr()->getBreakPointMasses(IonTypePtr(new IonType("B",true,0)));
+	double shift = ms_masses[ms_masses.size()-1] - seq_masses[seq_masses.size()-1];
+	extend_n_term_shifts.push_back(DiagonalHeaderPtr(new DiagonalHeader(shift,true,false,true,false)));
+	return extend_n_term_shifts;
+}
+
 } /* namespace prot */

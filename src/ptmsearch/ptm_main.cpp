@@ -5,8 +5,8 @@
  *      Author: xunlikun
  */
 
-#include "ptm_mng.hpp"
-#include "ptm_processor.hpp"
+#include "ptmsearch/ptm_mng.hpp"
+#include "ptmsearch/ptm_processor.hpp"
 
 namespace prot{
 int main(){
