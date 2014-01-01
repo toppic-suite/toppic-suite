@@ -13,6 +13,7 @@
 #include "base/ptm.hpp"
 #include "ptmsearch/ptm_mng.hpp"
 #include "base/proteoform.hpp"
+#include "spec/prm_peak.hpp"
 
 namespace prot {
 class DiagonalHeader;
