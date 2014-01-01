@@ -5,6 +5,7 @@
 
 #include "base/mass_constant.hpp"
 #include "base/residue.hpp"
+#include "base/prot_mod.hpp"
 
 namespace prot {
 
