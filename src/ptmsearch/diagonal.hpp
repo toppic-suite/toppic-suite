@@ -8,6 +8,9 @@
 #ifndef DIAGONAL_HPP_
 #define DIAGONAL_HPP_
 
+#include <memory>
+#include "ptmsearch/diagonal_header.hpp"
+
 namespace prot {
 
 template <class T>

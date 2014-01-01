@@ -11,6 +11,8 @@
 #include "base/trunc.hpp"
 #include "base/prot_mod.hpp"
 #include "base/ptm.hpp"
+#include "ptmsearch/ptm_mng.hpp"
+#include "base/proteoform.hpp"
 
 namespace prot {
 class DiagonalHeader;

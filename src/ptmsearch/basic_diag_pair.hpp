@@ -10,6 +10,11 @@
 
 #include <memory>
 #include <vector>
+#include "ptmsearch/basic_diag_pair.hpp"
+#include "ptmsearch/diagonal.hpp"
+#include "ptmsearch/diagonal_header.hpp"
+#include "prsm/pair.hpp"
+#include "spec/prm_peak.hpp"
 
 namespace prot {
 class BasicDiagPair;
