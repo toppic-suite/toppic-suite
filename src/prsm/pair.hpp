@@ -56,7 +56,10 @@ protected:
 
 //bool increaseIJ(int i,int j,double deviation,double tolerace,std::vector<double> ms_masses,std::vector<double> seq_masses);
 //std::vector<double> compPpoDeviation(std::vector<double> ms_masses,std::vector<double> theo_masses,double ppo);
-
+std::vector<double> compPpoDeviation(ExtendMsPtr ms,TheoPeakPtrVec ions,double ppo);
+double compIonScore(ExtendMsPtr ms,TheoPeakPtrVec ions,double recal,double ppo);
+PeakIonPairPtrVec findPairs(ExtendMsPtr ms,TheoPeakPtrVec ions,int bgn,int end);
+std::vector<double> getNCScore(ExtendMsPtr ms,TheoPeakPtrVec ions,int bgn,int end,double delta,double ppo);
 } /* namespace prot */
 
 #endif /* PAIR_HPP_ */
