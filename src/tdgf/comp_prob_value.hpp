@@ -5,6 +5,7 @@
 
 #include "base/residue_freq.hpp"
 #include "spec/prm_peak.hpp"
+#include "prsm/prsm.hpp"
 
 namespace prot {
 
@@ -108,6 +109,9 @@ class CompProbValue {
                     std::vector<std::vector<double>> &cur_results, 
                     std::vector<std::vector<double>> &cur_priors);
 };
+
+void compProbArray(CompProbValue &comp_prob, PrmPeakPtrVec &peaks, 
+                   PrSMPtrVec &prsms, bool strict, std::vector<double> &results);
 
 }
 #endif

@@ -1,5 +1,4 @@
 #include <cmath>
-
 #include <cstring>
 
 #include "base/logger.hpp"
@@ -432,6 +431,39 @@ double CompProbValue::getOneValueProb(int shift, int value) {
   int last_peak_index = peak_masses_.size() - 1;
   double prob = results_[shift][last_peak_index][value] * factors_[shift];
   return prob * n_term_acid_freq_sum_;
+}
+
+int getMaxScore(PrSMPtrVec prsms) {
+  int score = 0;
+  for (unsigned int i = 0; i < prsms.size(); i++) {
+    if (prsms[i]->getMatchFragNum() > score) {
+      score = (int) prsms[i]->getMatchFragNum();
+    }
+  }
+  return score;
+}
+
+int getMaxShift(PrSMPtrVec prsms) {
+  int shift = 0;
+  for (unsigned int i = 0; i < prsms.size(); i++) {
+    if (prsms[i]->getProteoformPtr()->getUnexpectedChangeNum() > shift) {
+      shift = prsms[i]->getProteoformPtr()->getUnexpectedChangeNum();
+    }
+  }
+  return shift;
+}
+
+void compProbArray(CompProbValue &comp_prob, PrmPeakPtrVec &peaks, 
+                   PrSMPtrVec &prsms, bool strict, std::vector<double> &results) {
+  int max_score = getMaxScore(prsms);
+  int max_shift = getMaxShift(prsms);
+  comp_prob.compute(peaks, max_score, max_shift, strict);
+  results.clear();
+  for (unsigned int i = 0; i < prsms.size(); i++) {
+    int shift_num = prsms[i]->getProteoformPtr()->getUnexpectedChangeNum();
+    int score = (int)prsms[i]->getMatchFragNum();
+    results.push_back(comp_prob.getProb(shift_num, score));
+  }
 }
 
 }
