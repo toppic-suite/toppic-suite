@@ -223,7 +223,7 @@ void CompProbValue::compFactors() {
     // i ptm
     double factor = 1.0 /prior_sum * i;
     factor = factor / pow(peak_width, i);
-    factor = factor * K;
+    factor = factor * K();
     factors_.push_back(factor);
   }
 }

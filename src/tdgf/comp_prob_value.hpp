@@ -9,11 +9,6 @@
 
 namespace prot {
 
-#define ORI_PAGE_LEN 5000
-#define ORI_BLOCK_LEN 50
-#define K  0.55
-//#define K2 0.55
-
 class CompProbValue {
  public:
   CompProbValue(double convert_ratio, ResFreqPtrVec n_term_residues,
@@ -29,6 +24,11 @@ class CompProbValue {
   double getOneValueProb(int shift, int value);
 
  private:
+  static int const ORI_PAGE_LEN = 5000;
+  static int const ORI_BLOCK_LEN = 50;
+  static double K() {return 0.55;}
+//static double const K2 = 0.55;
+
   /* double to integer convert ratio */
   double convert_ratio_;
 
