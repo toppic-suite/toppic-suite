@@ -1,5 +1,7 @@
 #include <cmath>
 
+#include <cstring>
+
 #include "base/logger.hpp"
 #include "tdgf/comp_prob_value.hpp"
 
@@ -48,34 +50,32 @@ CompProbValue::~CompProbValue() {
 }
 
 void CompProbValue::compute(PrmPeakPtrVec peaks, int thresh, int shift_num, bool strict) {
-  /*
-  results = null; 
+  results_.clear(); 
   // if score is less than 1, we do not compute p-value 
   if (thresh < 1) {
     return;
   }
   setMassErr(peaks, strict);
-  setPosScores(peakMasses, peakTolerances, baseTypes);
-  int lastPeakIndex = peakMasses.length - 1;
-  int maxPeakMass = peakMasses[lastPeakIndex]
-      + peakTolerances[lastPeakIndex];
-  setHeight(thresh, maxPeakMass);
-  setPeakBgnEnd(peakMasses, peakTolerances);
-  if (spLen + residueAvgLen >= maxSpLen) {
-    logger.error("Spectral precursor mass is too large"
-                 + peaks[peaks.length - 1].getMonoMass());
+  setPosScores(peak_masses_, peak_tolerances_, base_types_);
+  int last_peak_index = peak_masses_.size() - 1;
+  int max_peak_mass = peak_masses_[last_peak_index]
+      + peak_tolerances_[last_peak_index];
+  setHeight(thresh, max_peak_mass);
+  setPeakBgnEnd(peak_masses_, peak_tolerances_);
+  if (sp_len_ + residue_avg_len_ >= max_sp_len_) {
+    LOG_ERROR("Spectral precursor mass is too large "
+              << peaks[peaks.size() - 1]->getMonoMass());
     return;
   }
-  if (nShift + 1 > maxLayerNum) {
-    logger.error("Number of unexpected PTMs is too large" + nShift);
+  if (shift_num + 1 > max_layer_num_) {
+    LOG_ERROR("Number of unexpected PTMs is too large " << shift_num);
     return;
   }
-  this.nShift = nShift;
+  shift_num_ = shift_num;
   comp();
-  */
 }
 
-void CompProbValue::setMassErr(PrmPeakPtrVec peaks, bool strict) {
+void CompProbValue::setMassErr(PrmPeakPtrVec &peaks, bool strict) {
   LOG_DEBUG("MAX MASS " << peaks[peaks.size() - 1]->getMonoMass());
   for (unsigned int i = 0; i < peaks.size(); i++) {
     peak_masses_.push_back((int) std::round(peaks[i]->getMonoMass()
@@ -164,305 +164,274 @@ void CompProbValue::setHeight(int thresh, int max_peak_mass) {
   }
 }
 
+void CompProbValue::setPeakBgnEnd(std::vector<int> &peak_masses, 
+                                  std::vector<int> &peak_tolerances) {
+  peak_mass_bgns_.clear();
+  peak_mass_ends_.clear();
+  peak_table_bgns_.clear();
+  peak_table_ends_.clear();
+  for (unsigned int i = 0; i < peak_masses.size(); i++) {
+    peak_mass_bgns_.push_back(peak_masses[i] - peak_tolerances[i]);
+    peak_mass_ends_.push_back(peak_masses[i] + peak_tolerances[i]);
+    peak_table_bgns_.push_back(peak_mass_bgns_[i] * height_);
+    peak_table_ends_.push_back(peak_mass_ends_[i] * height_ + (height_ -1));
+  }
 }
 
-/*
-	 void setPeakBgnEnd(int peakMasses[], int peakTolerances[]) {
-		peakMassBgns = new int[peakMasses.length];
-		peakMassEnds = new int[peakMasses.length];
-		peakTableBgns = new int[peakMasses.length];
-		peakTableEnds = new int[peakMasses.length];
-		for (int i = 0; i < peakMasses.length; i++) {
-			peakMassBgns[i] = peakMasses[i] - peakTolerances[i];
-			peakMassEnds[i] = peakMasses[i] + peakTolerances[i];
-			peakTableBgns[i] = peakMassBgns[i] * height;
-			peakTableEnds[i] = peakMassEnds[i] * height + (height - 1);
-		}
-	}
+void CompProbValue::comp() {
+  results_.clear();
+  priors_.clear();
+  std::vector<std::vector<double>> one_layer_results;
+  std::vector<std::vector<double>> one_layer_priors;
+  LOG_DEBUG("Start computation");
+  std::vector<std::vector<double>> empty_vec;
+  compOneLayer(empty_vec, true, one_layer_results, one_layer_priors);
+  // score probability for each peak
+  results_.push_back(one_layer_results);
+  // prior probability for next layer
+  priors_.push_back(one_layer_priors);
+  for (int i = 1; i < shift_num_ + 1; i++) {
+    one_layer_results.clear();
+    one_layer_priors.clear();
+    compOneLayer(results_[i - 1], false, one_layer_results, one_layer_priors);
+    results_.push_back(one_layer_results);
+    priors_.push_back(one_layer_priors);
+  }
+  compFactors();
+}
 
-	 void comp() {
-		results = new double[nShift + 1][][];
-		priors = new double[nShift + 1][][];
-		double oneLayerResults[][][];
-        logger.debug("Start computation");
-		oneLayerResults = compOneLayer(null, null, true);
-		// one layer results [0] is score probability for each peak
-		results[0] = oneLayerResults[0]; 
-		// one layer results [1] is prior probability for next layer
-		priors[0] = oneLayerResults[1]; 
-		for (int i = 1; i < nShift + 1; i++) {
-			oneLayerResults = compOneLayer(results[i - 1], priors[i - 1], false);
-			results[i] = oneLayerResults[0];
-			priors[i] = oneLayerResults[1];
-		}
-		factors = compFactors();
-	}
-	
-	 double[] compFactors() {
-		double factors[] = new double[nShift + 1];
-		// zero ptm
-		int lastPeakIndex = peakMasses.length - 1;
-		double hitSum = 0;
-		for (int i = 0; i < height; i++) {
-			hitSum += results[0][lastPeakIndex][i];
-		}
-		if (hitSum == 0) {
-			hitSum = 1;
-		}
-		factors[0] = 1 /hitSum;
+void CompProbValue::compFactors() {
+  factors_.clear();
+  // zero ptm
+  int last_peak_index = peak_masses_.size() - 1;
+  double hit_sum = 0;
+  for (int i = 0; i < height_; i++) {
+    hit_sum += results_[0][last_peak_index][i];
+  }
+  if (hit_sum == 0) {
+    hit_sum = 1;
+  }
+  double zero_factor = 1.0 / hit_sum;
+  factors_.push_back(zero_factor);
 
-//		if (nShift >= 1) {
-//			double priorSum = 0;
-//			for (int i = 0; i < height; i++) {
-//				priorSum += priors[0][lastPeakIndex][i];
-//			}
-//			// one ptm
-//			factors[1] = 1/priorSum;
-//			// divided by the last peakEnd - last peakBegin
-//			double peakWidth = peakMassEnds[lastPeakIndex] - peakMassBgns[lastPeakIndex] + 1;
-//			factors[1] = factors[1] / peakWidth;
-//			factors[1] = factors[1] * K;
-//			// two ptm
-//			for (int i = 2; i < nShift+1; i++) {
-//				factors[i] = 1 / (priorSum * i);
-//				// the reason is that peakWidth is used once for each mass shift 
-//				factors[i] = factors[i] / Math.pow(peakWidth, i);
-//				if (i == 2) {
-//					factors[i] = factors[i] * K2;
-//				}
-//				else {
-//					factors[i] = factors[i] * Math.pow(K,i);
-//				}
-//			}
-//		}
-		
-		double priorSum = 0;
-		for (int i = 0; i < height; i++) {
-			priorSum += priors[0][lastPeakIndex][i];
-		}
-		double peakWidth = peakMassEnds[lastPeakIndex] - peakMassBgns[lastPeakIndex] + 1;
-		if (nShift == 1) {
-			// one ptm
-			factors[1] = 1/priorSum;
-			// divided by the last peakEnd - last peakBegin
-			factors[1] = factors[1] / peakWidth;
-			factors[1] = factors[1] * K;
-		}
-		if (nShift == 2) {
-			// two ptm
-			factors[2] = 1/ (priorSum * 2);
-			// the reason is that peakWidth is used once for each mass shift 
-			factors[2] = factors[2] / Math.pow(peakWidth, 2);
-			factors[2] = factors[2] * K2;
-		}
-		return factors;
-	}
+  double prior_sum = 0;
+  for (int i = 0; i < height_; i++) {
+    prior_sum += priors_[0][last_peak_index][i];
+  }
+  double peak_width = peak_mass_ends_[last_peak_index] 
+      - peak_mass_bgns_[last_peak_index] + 1;
+  for (int i = 1; i <= shift_num_; i++) {
+    // i ptm
+    double factor = 1.0 /prior_sum * i;
+    factor = factor / pow(peak_width, i);
+    factor = factor * K;
+    factors_.push_back(factor);
+  }
+}
 
-	 double[][][] compOneLayer(double[][] results, double[][] priors,
-			boolean isFirstLayer) {
-		double probs[][][] = new double[2][peakMasses.length][height];
-		Arrays.fill(pageTable, 0);
-		int peakIndex = 0;
-		for (int winTableBgn = 0; winTableBgn < spTableSize; winTableBgn = winTableBgn
-				+ blockTableSize) {
-			// clear result block
-			int WinTableEnd = winTableBgn + blockTableSize - 1;
-			int pagePos = winTableBgn % pageTableSize;
-			runClear(pagePos);
-			if (isFirstLayer) {
-				runFirstLayerInit(winTableBgn, WinTableEnd);
-			} else {
-				runInit(results, priors, winTableBgn, WinTableEnd, peakIndex);
-			}
-			for (int i = 0; i < acidDists.length; i++) {
-				if (residueFrequencies[i] <= 0) {
-					continue;
-				}
-				int prevBlockBgn = pagePos - acidDists[i];
-				if (prevBlockBgn < 0) {
-					prevBlockBgn += pageTableSize;
-				}
-				int prevBlockEnd = prevBlockBgn + blockTableSize;
-				if (prevBlockEnd < pageTableSize) {
-					runAddProb(pagePos, prevBlockBgn, blockTableSize,
-							residueFrequencies[i]);
-				} else {
-					int firstPartSize = pageTableSize - prevBlockBgn;
-					runAddProb(pagePos, prevBlockBgn, firstPartSize,
-							residueFrequencies[i]);
-					runAddProb(pagePos + firstPartSize, 0, blockTableSize
-							- firstPartSize, residueFrequencies[i]);
-				}
-			}
-			int spBgn = winTableBgn / height;
-			int spEnd = winTableBgn / height + blockLen - 1;
-			runUpdate(pagePos + blockTableSize - 1, spBgn, spEnd);
-			// update peakPnt and get probs 
-			while (peakIndex < peakMasses.length
-					&& peakTableEnds[peakIndex] <= WinTableEnd) {
-				for (int i = peakMassBgns[peakIndex]; i <= peakMassEnds[peakIndex]; i++) {
-					for (int j = 0; j < height; j++) {
-						int pos = (i * height + j) % pageTableSize;
-						probs[0][peakIndex][j] += pageTable[pos];
-					}
-				}
+void CompProbValue::runClear(int page_pos) {
+  std::memset(page_table_ + page_pos, 0, block_table_size_ * sizeof(double));
+}
 
-				int priorMassBgn = peakMassBgns[peakIndex] - residueAvgLen;
-				int priorMassEnd = peakMassBgns[peakIndex] - 1;
-				// double sum = 0;
-				for (int i = priorMassBgn; i <= priorMassEnd; i++) {
-					for (int j = 0; j < height; j++) {
-						int pos = (i * height + j) % pageTableSize;
-						if (pos < 0) {
-							pos = pos + pageTableSize;
-						}
-						probs[1][peakIndex][j] += pageTable[pos];
-					}
-				}
-				peakIndex++;
-			}
-		}
-		return probs;
-	}
+void CompProbValue::runFirstLayerInit(int win_table_bgn, int win_table_end) {
+  double base_prob = 1.0;
+  for (unsigned int i = 0; i < n_term_acid_masses_.size(); i++) {
+    if (n_term_acid_frequencies_[i] <= 0) {
+      continue;
+    }
+    //logger.debug("nTermAcidMass " + nTermAcidMasses[i] + " freq " +
+    // nTermAcidFrequences[i]);
+    int pos = n_term_acid_masses_[i];
+    int k = pos * height_;
+    // logger.debug("k " + k + " end " + blockTableSize);
+    if (k >= win_table_bgn && k <= win_table_end) {
+      page_table_[k % page_table_size_] += base_prob
+          * n_term_acid_frequencies_[i];
+      // logger.debug("pageTable value " + pageTable[k %
+      // pageTableSize]);
+    }
+  }
+}
 
-	 void runClear(int pagePos) {
-		for (int i = pagePos; i < pagePos + blockTableSize; i++) {
-			pageTable[i] = 0f;
-		}
-	}
+void CompProbValue::runInit(std::vector<std::vector<double>> &results, 
+                            int win_table_bgn, int win_table_end) {
+  // zero
+  double base_prob = 1.0;
+  for (unsigned int i = 0; i < n_term_acid_masses_.size(); i++) {
+    if (n_term_acid_frequencies_[i] <= 0) {
+      continue;
+    }
+    int pos = n_term_acid_masses_[i];
+    for (int k = pos * height_; k < pos * height_ + residue_avg_len_ * height_;
+         k += height_) {
+      if (k >= win_table_bgn && k <= win_table_end) {
+        page_table_[k % page_table_size_] += base_prob * n_term_acid_frequencies_[i];
+      }
+      if (k > win_table_end) {
+        break;
+      }
+    }
+  }
 
-	 void runFirstLayerInit(int winTableBgn, int winTableEnd) {
-		double baseProb = 1.0;
-		for (int i = 0; i < nTermAcidMasses.length; i++) {
-			if (nTermAcidFrequences[i] <= 0) {
-				continue;
-			}
-			//logger.debug("nTermAcidMass " + nTermAcidMasses[i] + " freq " +
-			// nTermAcidFrequences[i]);
-			int pos = nTermAcidMasses[i];
-			int k = pos * height;
-			// logger.debug("k " + k + " end " + blockTableSize);
-			if (k >= winTableBgn && k <= winTableEnd) {
-				pageTable[k % pageTableSize] += baseProb
-						* nTermAcidFrequences[i];
-				// logger.debug("pageTable value " + pageTable[k %
-				// pageTableSize]);
-			}
-		}
-	}
-
-	 void runInit(double results[][], double priors[][],
-			int winTableBgn, int winTableEnd, int peakIndex) {
-		// zero
-		double baseProb = 1.0;
-		for (int i = 0; i < nTermAcidMasses.length; i++) {
-			if (nTermAcidFrequences[i] <= 0) {
-				continue;
-			}
-			int pos = nTermAcidMasses[i];
-			for (int k = pos * height; k < pos * height + residueAvgLen
-					* height; k += height) {
-				if (k >= winTableBgn && k <= winTableEnd) {
-					pageTable[k % pageTableSize] += baseProb
-							* nTermAcidFrequences[i];
-				}
-				if (k > winTableEnd) {
-					break;
-				}
-			}
-		}
-
-		// results
-		for (int i = 0; i < peakMasses.length; i++) {
-			if (peakTableEnds[i] >= winTableEnd) {
-				break;
-			}
-			if (peakTableEnds[i] + residueAvgLen * height > winTableBgn) {
-				for (int k = peakTableEnds[i] + 1; k < peakTableEnds[i]
-						+ residueAvgLen * height; k += height) {
-					if (k >= winTableBgn && k <= winTableEnd) {
-						for (int h = 0; h < height; h++) {
-							pageTable[(k + h) % pageTableSize] += results[i][h];
-						}
-					}
-					if (k > winTableEnd) {
-						break;
-					}
-				}
-			}
-		}
-	}
-
-	 void runAddProb(int pagePos, int prevBlockBgn, int size, double f) {
-		int prev_pos = prevBlockBgn;
-		for (int i = pagePos; i < pagePos + size; i++) {
-			pageTable[i] = pageTable[i] + pageTable[prev_pos] * f;
-			prev_pos++;
-		}
-	}
-
-	 void updateCol(int colEnd, int scr) {
-		int colBgn = colEnd - height + 1;
-		int j, pre;
-		for (j = 1; j <= scr; j++) {
-			pre = colEnd - j;
-			if (pre >= colBgn) {
-				pageTable[colEnd] += pageTable[pre];
-			}
-		}
-		for (j = colEnd - scr - 1; j >= colBgn; j--) {
-			pageTable[j + scr] = pageTable[j];
-		}
-		for (j = colBgn; j < colBgn + scr; j++) {
-			if (j <= colEnd) {
-				pageTable[j] = 0;
-			}
-		}
-	}
-
-	 void runUpdate(int pageEnd, int scrBgn, int scrEnd) {
-		int colEnd = pageEnd;
-		logger.trace("scr bgn " + scrBgn + " end " + scrEnd);
-		for (int i = scrEnd; i >= scrBgn; i--) {
-			int scr = posScores[i];
-			if (scr > 0) {
-				updateCol(colEnd, scr);
-			}
-			colEnd = colEnd - height;
-		}
-	}
-
-	
-	 double getRawProb(int shift, int thresh) {
-		double probSum = 0;
-		if (results == null) {
-			return 1.0;
-		}
-        int lastPeakIndex = peakMasses.length - 1;
-        for (int score = thresh; score < height; score++) {
-            probSum = probSum + results[shift][lastPeakIndex][score];
+  // results
+  for (unsigned int i = 0; i < peak_masses_.size(); i++) {
+    if (peak_table_ends_[i] >= win_table_end) {
+      break;
+    }
+    if (peak_table_ends_[i] + residue_avg_len_ * height_ > win_table_bgn) {
+      for (int k = peak_table_ends_[i] + 1; k < peak_table_ends_[i]
+           + residue_avg_len_ * height_; k += height_) {
+        if (k >= win_table_bgn && k <= win_table_end) {
+          for (int h = 0; h < height_; h++) {
+            page_table_[(k + h) % page_table_size_] += results[i][h];
+          }
         }
-        //System.out.println("Shift " + shift + " thresh " + thresh + " probSum " + probSum + " factor " + factors[shift] + " prob " + (probSum * factors[shift]));
-        return probSum * factors[shift];
-	}
-	
-	// The difference between getProb and getRawProb is nTermAcidFreqSum
-	 double getProb(int shift, int thresh) {
-        System.out.println("get prob");
-		if (results == null) {
-			return 1;
-		}
-		double rawProb = getRawProb(shift, thresh);
-		return rawProb * nTermAcidFreqSum;
-	}
-
-	 double getOneValueProb(int shift, int value) {
-		if (results == null) {
-			return 1.0;
-		}
-		int lastPeakIndex = peakMasses.length - 1;
-		double prob = results[shift][lastPeakIndex][value] * factors[shift];
-		return prob * nTermAcidFreqSum;
-	}
+        if (k > win_table_end) {
+          break;
+        }
+      }
+    }
+  }
 }
-*/
+
+void CompProbValue::runAddProb(int page_pos, int prev_pos, int size, double f) {
+  for (int i = page_pos; i < page_pos + size; i++) {
+    page_table_[i] = page_table_[i] + page_table_[prev_pos] * f;
+    prev_pos++;
+  }
+}
+
+void CompProbValue::updateCol(int col_end, int scr) {
+  int col_bgn = col_end - height_ + 1;
+  int j, pre;
+  for (j = 1; j <= scr; j++) {
+    pre = col_end - j;
+    if (pre >= col_bgn) {
+      page_table_[col_end] += page_table_[pre];
+    }
+  }
+  for (j = col_end - scr - 1; j >= col_bgn; j--) {
+    page_table_[j + scr] = page_table_[j];
+  }
+  for (j = col_bgn; j < col_bgn + scr; j++) {
+    if (j <= col_end) {
+      page_table_[j] = 0;
+    }
+  }
+}
+
+void CompProbValue::runUpdate(int page_end, int scr_bgn, int scr_end) {
+  int col_end = page_end;
+  for (int i = scr_end; i >= scr_bgn; i--) {
+    int scr = pos_scores_[i];
+    if (scr > 0) {
+      updateCol(col_end, scr);
+    }
+    col_end = col_end - height_;
+  }
+}
+
+void CompProbValue::compOneLayer(std::vector<std::vector<double>> &prev_results, 
+                                 bool is_first_layer,  
+                                 std::vector<std::vector<double>> &cur_results, 
+                                 std::vector<std::vector<double>> &cur_priors) {
+  cur_results.clear();
+  cur_priors.clear();
+  for (unsigned int i = 0; i < peak_masses_.size(); i++) {
+    std::vector<double> tmp(height_, 0.0);
+    cur_results.push_back(tmp);
+    cur_priors.push_back(tmp);
+  }
+  unsigned int peak_index = 0;
+  for (int win_table_bgn = 0; win_table_bgn < sp_table_size_; 
+       win_table_bgn = win_table_bgn + block_table_size_) {
+    // clear result block
+    int win_table_end = win_table_bgn + block_table_size_ - 1;
+    int page_pos = win_table_bgn % page_table_size_;
+    runClear(page_pos);
+    if (is_first_layer) {
+      runFirstLayerInit(win_table_bgn, win_table_end);
+    } else {
+      runInit(prev_results, win_table_bgn, win_table_end);
+    }
+    for (unsigned int i = 0; i < acid_dists_.size(); i++) {
+      if (residue_frequencies_[i] <= 0) {
+        continue;
+      }
+      int prev_block_bgn = page_pos - acid_dists_[i];
+      if (prev_block_bgn < 0) {
+        prev_block_bgn += page_table_size_;
+      }
+      int prev_block_end = prev_block_bgn + block_table_size_;
+      if (prev_block_end < page_table_size_) {
+        runAddProb(page_pos, prev_block_bgn, block_table_size_,
+                   residue_frequencies_[i]);
+      } else {
+        int first_part_size = page_table_size_ - prev_block_bgn;
+        runAddProb(page_pos, prev_block_bgn, first_part_size, 
+                   residue_frequencies_[i]);
+        runAddProb(page_pos + first_part_size, 0, block_table_size_
+                   - first_part_size, residue_frequencies_[i]);
+      }
+    }
+    int sp_bgn = win_table_bgn / height_;
+    int sp_end = win_table_bgn / height_ + block_len_ - 1;
+    runUpdate(page_pos + block_table_size_ - 1, sp_bgn, sp_end);
+    // update peakPnt and get probs 
+    while (peak_index < peak_masses_.size()
+           && peak_table_ends_[peak_index] <= win_table_end) {
+      for (int i = peak_mass_bgns_[peak_index]; i <= peak_mass_ends_[peak_index]; i++) {
+        for (int j = 0; j < height_; j++) {
+          int pos = (i * height_ + j) % page_table_size_;
+          cur_results[peak_index][j] += page_table_[pos];
+        }
+      }
+
+      int prior_mass_bgn = peak_mass_bgns_[peak_index] - residue_avg_len_;
+      int prior_mass_end = peak_mass_bgns_[peak_index] - 1;
+      // double sum = 0;
+      for (int i = prior_mass_bgn; i <= prior_mass_end; i++) {
+        for (int j = 0; j < height_; j++) {
+          int pos = (i * height_ + j) % page_table_size_;
+          if (pos < 0) {
+            pos = pos + page_table_size_;
+          }
+          cur_priors[peak_index][j] += page_table_[pos];
+        }
+      }
+      peak_index++;
+    }
+  }
+}
+
+double CompProbValue::getRawProb(int shift, int thresh) {
+  double prob_sum = 0;
+  if (results_.size() == 0) {
+    return 1.0;
+  }
+  int last_peak_index = peak_masses_.size() - 1;
+  for (int score = thresh; score < height_; score++) {
+    prob_sum = prob_sum + results_[shift][last_peak_index][score];
+  }
+  return prob_sum * factors_[shift];
+}
+
+// The difference between getProb and getRawProb is nTermAcidFreqSum
+double CompProbValue::getProb(int shift, int thresh) {
+  if (results_.size() == 0) {
+    return 1.0;
+  }
+  double raw_prob = getRawProb(shift, thresh);
+  return raw_prob * n_term_acid_freq_sum_;
+}
+
+double CompProbValue::getOneValueProb(int shift, int value) {
+  if (results_.size() == 0) {
+    return 1.0;
+  }
+  int last_peak_index = peak_masses_.size() - 1;
+  double prob = results_[shift][last_peak_index][value] * factors_[shift];
+  return prob * n_term_acid_freq_sum_;
+}
+
+}
