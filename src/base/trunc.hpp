@@ -16,6 +16,7 @@ class Trunc {
   AcidPtrVec getAcidPtrVec() {return acid_str_;}
   double getShift() {return shift_;}
   void appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+  bool isSameTrunc(int len,ResSeqPtr resseq);
  private:
   std::string name_;
 	int trunc_len_;
@@ -31,6 +32,7 @@ TruncPtrVec getTruncPtrVecInstance(AcidPtrVec &acid_list,
 
 TruncPtr getTruncPtrByName(TruncPtrVec &trunc_list, 
                            const std::string &name);
+
 }
 
 #endif
