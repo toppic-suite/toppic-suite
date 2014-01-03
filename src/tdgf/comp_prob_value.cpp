@@ -460,16 +460,16 @@ int getMaxShift(PrSMPtrVec prsms) {
   return shift;
 }
 
-void compProbArray(CompProbValue &comp_prob, PrmPeakPtrVec &peaks, 
+void compProbArray(CompProbValuePtr comp_prob_ptr, PrmPeakPtrVec &peaks, 
                    PrSMPtrVec &prsms, bool strict, std::vector<double> &results) {
   int max_score = getMaxScore(prsms);
   int max_shift = getMaxShift(prsms);
-  comp_prob.compute(peaks, max_score, max_shift, strict);
+  comp_prob_ptr->compute(peaks, max_score, max_shift, strict);
   results.clear();
   for (unsigned int i = 0; i < prsms.size(); i++) {
     int shift_num = prsms[i]->getProteoformPtr()->getUnexpectedChangeNum();
     int score = (int)prsms[i]->getMatchFragNum();
-    results.push_back(comp_prob.getProb(shift_num, score));
+    results.push_back(comp_prob_ptr->getProb(shift_num, score));
   }
 }
 

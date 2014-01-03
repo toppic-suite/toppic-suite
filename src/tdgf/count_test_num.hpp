@@ -48,6 +48,8 @@ class CountTestNum {
   double compMassNum(double *cnts, int low, int high);
 };
 
+typedef std::shared_ptr<CountTestNum> CountTestNumPtr;
+
 double getAvgProportion(double mass, double ppo, 
                         double convert_ratio, double residue_avg_len);
 
