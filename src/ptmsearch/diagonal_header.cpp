@@ -71,4 +71,11 @@ DiagonalHeaderPtrVec getNTermShiftListCompRight(ProteoformPtr seq,PrmMsPtr ms_si
 	return extend_n_term_shifts;
 }
 
+void setPrefixSuffix(DiagonalHeaderPtr header,double c_shift,ProteoformPtr seq,PtmMngPtr mng){
+	header->setProtCTermShift(c_shift);
+	std::vector<double> seq_b_masses = seq->getBpSpecPtr()->getBreakPointMasses(IonTypePtr(new IonType("B",true,0)));
+	double prot_n_term_shift = header->getProtNTermShift();
+
+}
+
 } /* namespace prot */

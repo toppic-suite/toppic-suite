@@ -47,6 +47,8 @@ private:
 	std::vector<T> pair_ptr_list_;
 };
 
+
+
 } /* namespace prot */
 
 #endif /* DIAGONAL_HPP_ */

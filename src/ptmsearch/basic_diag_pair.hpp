@@ -21,6 +21,8 @@ class BasicDiagPair;
 typedef std::shared_ptr<BasicDiagPair> BasicDiagPairPtr;
 typedef std::vector<BasicDiagPairPtr> BasicDiagPairPtrVec;
 typedef std::shared_ptr<Diagonal<BasicDiagPairPtr>> BasicDiagPairDiagPtr;
+typedef std::vector<BasicDiagPairDiagPtr> BasicDiagPairDiagPtrVec;
+
 class BasicDiagPair:public Pair {
 public:
 	BasicDiagPair(int x,int y,double score,int diag_order,double diff,int prm_peak_type);
@@ -69,6 +71,9 @@ bool contains(BasicDiagPairPtrVec pairs,int y){
 	}
 	return false;
 }
+
+BasicDiagPairDiagPtrVec getDiagonals(DiagonalHeaderPtrVec headers,PrmMsPtr ms_six,ProteoformPtr seq,PtmMngPtr mng);
+BasicDiagPairDiagPtr getDiagonal(int cnt,DiagonalHeaderPtr header,PrmMsPtr ms_six,ProteoformPtr seq,PtmMngPtr mng);
 } /* namespace prot */
 
 #endif /* BASIC_DIAG_PAIR_HPP_ */
