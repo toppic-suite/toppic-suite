@@ -216,7 +216,7 @@ private:
 DiagonalHeaderPtrVec getNTermShiftListCommon(std::vector<double> best_shifts);
 DiagonalHeaderPtrVec getNTermShiftListCompLeft(ProteoformPtr seq,PtmMngPtr mng);
 DiagonalHeaderPtrVec getNTermShiftListCompRight(ProteoformPtr seq,PtmMngPtr mng);
-
+void setPrefixSuffix(DiagonalHeader header,double c_shift,ProteoformPtr seq,PtmMngPtr mng);
 } /* namespace prot */
 
 #endif /* DIAGONAL_HEADER_HPP_ */
