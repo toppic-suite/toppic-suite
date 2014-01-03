@@ -17,16 +17,13 @@ CompProbValue::CompProbValue(double convert_ratio, ResFreqPtrVec n_term_residues
     n_term_acid_frequencies_.push_back(n_term_residues[i]->getFreq());
     n_term_acid_freq_sum_ += n_term_residues[i]->getFreq();
   }
-  double mass_sum = 0;
-  double freq_sum = 0;
+
+  residue_avg_len_ = computeAvgLength(residues, convert_ratio);
   for (unsigned int i = 0; i < residues.size(); i++) {
     int int_mass = (int)std::round(residues[i]->getMass() * convert_ratio);
     residue_masses_.push_back(int_mass);
     residue_frequencies_.push_back(residues[i]->getFreq());
-    freq_sum = freq_sum + residues[i]->getFreq();
-    mass_sum = mass_sum + residues[i]->getFreq() * residues[i]->getMass();
   }
-  residue_avg_len_ = (int)std::round(mass_sum/freq_sum * convert_ratio);
 
   max_layer_num_ = max_layer_num;
   max_table_height_ = max_table_height;
@@ -46,6 +43,16 @@ CompProbValue::~CompProbValue() {
   if (pos_scores_ != nullptr) {
     delete pos_scores_;
   }
+}
+
+int computeAvgLength(ResFreqPtrVec &residues, double convert_ratio) {
+  double mass_sum = 0;
+  double freq_sum = 0;
+  for (unsigned int i = 0; i < residues.size(); i++) {
+    freq_sum = freq_sum + residues[i]->getFreq();
+    mass_sum = mass_sum + residues[i]->getFreq() * residues[i]->getMass();
+  }
+  return (int)std::round(mass_sum/freq_sum * convert_ratio);
 }
 
 void CompProbValue::compute(PrmPeakPtrVec peaks, int thresh, int shift_num, bool strict) {

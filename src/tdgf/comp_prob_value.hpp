@@ -110,6 +110,8 @@ class CompProbValue {
                     std::vector<std::vector<double>> &cur_priors);
 };
 
+int computeAvgLength(ResFreqPtrVec &residues, double convert_ratio);
+
 void compProbArray(CompProbValue &comp_prob, PrmPeakPtrVec &peaks, 
                    PrSMPtrVec &prsms, bool strict, std::vector<double> &results);
 

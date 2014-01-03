@@ -68,8 +68,11 @@ class PrSM {
   int prsm_id_;
   /* spectrum information */
   int spectrum_id_;
+
   std::string spectrum_scan_;
+
   int precursor_id_;
+
   double ori_prec_mass_;
   /* adjusted precursor mass */
   double adjusted_prec_mass_;

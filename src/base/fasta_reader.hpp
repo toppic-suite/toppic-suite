@@ -41,7 +41,6 @@ ProteoformPtrVec readFastaToProteoform(std::string file_name,
                                        AcidPtrVec &acid_list, 
                                        ResiduePtrVec &residue_list,
                                        ProtModPtr none_prot_mod);
-
 }
 
 #endif
