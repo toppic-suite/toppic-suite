@@ -23,7 +23,7 @@ void PtmSlowMatch::comp(CompShiftLowMemPtr comp_shift){
 	std::vector<std::vector<int>> sp_masses = prot::getIntMassErrorList(ms_six_,scale,true,false);
 	std::vector<double> best_shift= comp_shift->findBestShift(sp_masses[0],sp_masses[1],seq_->getBpSpecPtr()->getScaledMass(scale,IonTypePtr(new IonType("B",true,0))),mng_->n_top_diagonals_,mng_->min_diagonal_gap_,scale);
 	DiagonalHeaderPtrVec n_term_shifts =getNTermShiftList(best_shift,ms_six_,seq_,mng_);
-
+	BasicDiagPairDiagPtrVec diagonals =
 }
 
 DiagonalHeaderPtrVec PtmSlowMatch::getNTermShiftList(std::vector<double> best_shift,PrmMsPtr ms_six,ProteoformPtr seq,PtmMngPtr mng){

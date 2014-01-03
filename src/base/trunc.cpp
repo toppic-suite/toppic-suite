@@ -35,6 +35,18 @@ void Trunc::appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
 	parent->appendChild(element);
 }
 
+bool Trunc::isSameTrunc(int len,ResSeqPtr resseq){
+	if(trunc_len_ != len){
+		return false;
+	}
+	for(int i=0;i<trunc_len_;i++){
+		if(acid_str_[i]->getName().compare(resseq->getResiduePtr(i)->getAcidPtr()->getName())!=0){
+			return false;
+		}
+	}
+	return true;
+}
+
 TruncPtrVec getTruncPtrVecInstance(AcidPtrVec &acid_list, 
                                    const std::string &file_name) {
   TruncPtrVec trunc_list;
