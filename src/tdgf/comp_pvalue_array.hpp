@@ -26,6 +26,8 @@ class CompPValueArray {
   CountTestNumPtr test_num_ptr_;
 };
 
+typedef std::shared_ptr<CompPValueArray> CompPValueArrayPtr;
+
 }
 
 #endif

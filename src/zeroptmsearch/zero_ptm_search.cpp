@@ -46,7 +46,8 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
 
   MsAlignReader reader(mng_ptr->spectrum_file_name_.c_str(), 
                        base_data_ptr->getActivationPtrVec());
-  //String outputFileName = BioIo.getBaseName(mng.spectrumFileName) + "." + mng.outputFileExt;
+  //std::string output_file_name = basename(mng_ptr->spectrum_file_name_ 
+  //                                        + "." + mng_ptr->output_file_ext_);
   //PrSMWriter comp_writer;
   //PrSMWriter pref_writer;
   //PrSMWriter suff_writer;

@@ -5,7 +5,6 @@
 
 #include "base/mass_constant.hpp"
 #include "base/residue.hpp"
-#include "base/prot_mod.hpp"
 
 namespace prot {
 
@@ -39,7 +38,6 @@ class ResidueSeq {
 
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
-  bool allowsMod(ProtModPtr mod);
  private:
   /** residue list */
   ResiduePtrVec residues_;

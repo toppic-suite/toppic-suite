@@ -75,4 +75,27 @@ ProtModPtr getProtModPtrByName(ProtModPtrVec &prot_mod_list,
   return ProtModPtr(nullptr);
 }
 
+bool allowsMod(ProtModPtr mod, ResiduePtrVec &residues){
+	if(mod->getName().compare("NONE")==0){
+		return true;
+	}
+	else if(mod->getName().compare("NME")==0){
+		if(residues.size()>=2 && residues[0]->getAcidPtr()->getOneLetter().compare("M")==0){
+			return true;
+		}
+		return false;
+	}
+	else if(mod->getName().compare("ACETYLATION")==0){
+		return true;
+	}
+	else if(mod->getName().compare("NME_ACETYLATION")==0){
+		if(residues.size()>=2 && residues[0]->getAcidPtr()->getOneLetter().compare("M")==0){
+			return true;
+		}
+		return false;
+	}
+  return false;
+}
+
+
 }

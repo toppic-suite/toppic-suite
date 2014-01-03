@@ -3,6 +3,7 @@
 
 #include <string>
 #include "base/acid.hpp"
+#include "base/residue_seq.hpp"
 
 namespace prot {
 
@@ -16,7 +17,7 @@ class Trunc {
   AcidPtrVec getAcidPtrVec() {return acid_str_;}
   double getShift() {return shift_;}
   void appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
-  bool isSameTrunc(int len,ResSeqPtr resseq);
+  bool isSameTrunc(int len, ResSeqPtr resseq);
  private:
   std::string name_;
 	int trunc_len_;
