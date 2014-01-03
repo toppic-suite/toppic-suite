@@ -43,6 +43,8 @@ public:
 
   std::string toString();
 
+  int getUnexpectedChangeNum();
+
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
 private:

@@ -38,5 +38,13 @@ inline std::vector<std::string> split(const std::string &s, char delim) {
   return elems;
 }
 
+inline std::string basename(std::string& s) {
+  unsigned int dot_pos = s.find(".");
+  if (dot_pos < s.length()) {
+    return s.substr(0, dot_pos);
+  }
+  return s;
+}
+
 }
 #endif

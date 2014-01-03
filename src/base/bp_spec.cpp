@@ -5,7 +5,6 @@
  *      Author: xunlikun
  */
 
-
 #include <algorithm>
 #include <memory>
 #include <string>
@@ -118,7 +117,7 @@ void BpSpec::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
 	std::string str = convertToString(seq_mass_);
 	xml_doc->addElement(element, "seq_mass", str.c_str());
 	xercesc::DOMElement* bplist = xml_doc->createElement("breakpoint_list");
-	for(int i=0;i<break_point_ptr_vec_.size();i++){
+	for(unsigned int i=0;i<break_point_ptr_vec_.size();i++){
 		break_point_ptr_vec_[i]->appendXml(xml_doc,bplist);
 	}
 	element->appendChild(bplist);

@@ -57,6 +57,16 @@ std::string Proteoform::toString() {
   return s.str();
 }
 
+int Proteoform::getUnexpectedChangeNum() {
+  int n = 0;
+  for (unsigned int i = 0; i < change_list_.size(); i++) {
+    if (change_list_[i]->getChangeType() == UNEXPECTED_CHANGE) {
+      n++;
+    }
+  }
+  return n;
+}
+
 void Proteoform::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
 	xercesc::DOMElement* element = xml_doc->createElement("proteoform");
 	std::string str = convertToString(start_pos_);
@@ -68,7 +78,7 @@ void Proteoform::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
 	residue_seq_ptr_->appendXml(xml_doc,element);
 	bp_spec_ptr_->appendXml(xml_doc,element);
 	xercesc::DOMElement* cl = xml_doc->createElement("change_list");
-	for(int i=0;i<change_list_.size();i++){
+	for(unsigned int i=0;i<change_list_.size();i++){
 		change_list_[i]->appendXml(xml_doc,cl);
 	}
 	element->appendChild(cl);

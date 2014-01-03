@@ -87,7 +87,7 @@ void MsHeader::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
 	xercesc::DOMElement* scans = xml_doc->createElement("scan_list");
 	for(unsigned int i=0;i< scans_.size();i++){
 		str = convertToString(scans_[i]);
-		xml_doc->addElement(element, "scan", str.c_str());
+		xml_doc->addElement(scans, "scan", str.c_str());
 	}
 	str = convertToString(retention_time_);
 	xml_doc->addElement(element, "retention_time", str.c_str());

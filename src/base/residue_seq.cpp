@@ -39,7 +39,7 @@ void ResidueSeq::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
 	std::string str = convertToString(residue_mass_sum_);
 	xml_doc->addElement(element, "residue_mass_sum", str.c_str());
 	xercesc::DOMElement* residuelist = xml_doc->createElement("residue_list");
-	for(int i=0;i<residues_.size();i++){
+	for(unsigned int i=0;i<residues_.size();i++){
 		residues_[i]->appendXml(xml_doc,residuelist);
 	}
 	element->appendChild(residuelist);
@@ -65,7 +65,7 @@ bool ResidueSeq::allowsMod(ProtModPtr mod){
 		}
 		return false;
 	}
-
+  return false;
 }
 
 ResidueSeq getEmptyResidueSeq() {
