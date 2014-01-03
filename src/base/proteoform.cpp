@@ -57,6 +57,16 @@ std::string Proteoform::toString() {
   return s.str();
 }
 
+int Proteoform::getUnexpectedChangeNum() {
+  int n = 0;
+  for (unsigned int i = 0; i < change_list_.size(); i++) {
+    if (change_list_[i]->getChangeType() == UNEXPECTED_CHANGE) {
+      n++;
+    }
+  }
+  return n;
+}
+
 void Proteoform::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
 	xercesc::DOMElement* element = xml_doc->createElement("proteoform");
 	std::string str = convertToString(start_pos_);
