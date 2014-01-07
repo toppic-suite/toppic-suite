@@ -42,7 +42,7 @@ void PrSM::initScores(SpParaPtr sp_para_ptr) {
   }
 }
 
-void PrSM::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
+xercesc::DOMElement* PrSM::toXmlElement(XmlDOMDocument* xml_doc){
 	xercesc::DOMElement* element = xml_doc->createElement("prsm");
 	std::string str = convertToString(prsm_id_);
 	xml_doc->addElement(element, "prsm_id", str.c_str());
@@ -69,6 +69,11 @@ void PrSM::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
 	xml_doc->addElement(element, "match_peak_num", str.c_str());
 	str = convertToString(match_fragment_num_);
 	xml_doc->addElement(element, "match_fragment_num", str.c_str());
+  return element;
+}
+
+void PrSM::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
+	xercesc::DOMElement* element = toXmlElement(xml_doc);
 	parent->appendChild(element);
 }
 

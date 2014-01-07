@@ -62,6 +62,8 @@ class PrSM {
 
   void setPrecurorId(int precursor_id) {precursor_id_ = precursor_id;}
 
+  xercesc::DOMElement* toXmlElement(XmlDOMDocument* xml_doc);
+
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
  private:

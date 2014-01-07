@@ -8,18 +8,24 @@
 #ifndef PRSM_WRITER_HPP_
 #define PRSM_WRITER_HPP_
 
+#include <iostream>
+#include <fstream>
+
+#include "base/xml_dom_document.hpp"
 #include "prsm/prsm.hpp"
 
 namespace prot {
 
 class PrSMWriter {
 public:
-	int write(const char *prm_file_name);
-	void addSimplePrSM(PrSMPtr matche);
-	void addSimplePrSM(PrSMPtrVec matches);
+ PrSMWriter(std::string file_name);
+ ~PrSMWriter();
+ void write(PrSM &prsm);
 
 private:
-	PrSMPtrVec prsms_;
+  xercesc::DOMLSSerializer* serializer_;
+  XmlDOMDocument* doc_;
+  std::ofstream file_;
 };
 
 } /* namespace prot */
