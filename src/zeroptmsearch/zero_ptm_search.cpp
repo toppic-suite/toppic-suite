@@ -18,15 +18,20 @@ void zeroPtmSearch(SpectrumSetPtr spec_set_ptr, int type,
                                                      proteoform_ptr_vec, 
                                                      mng_ptr->zero_ptm_filter_result_num_);
 
+  LOG_DEBUG("fast_match ended size " << fast_matches.size());
   DeconvMsPtr deconv_ms = spec_set_ptr->getDeconvMs();
   ZpSlowMatchPtrVec slow_matches = zeroPtmSlowFilter(type, deconv_ms, fast_matches, mng_ptr ); 
 
+  LOG_DEBUG("slow_match ended size " << slow_matches.size());
   for (unsigned int i = 0; i < slow_matches.size(); i++) {
       prsms.push_back(slow_matches[i]->geneResult());
   }
+  LOG_DEBUG("prsm generation ended size " << prsms.size());
 
   std::sort(prsms.begin(), prsms.end(), prsm_match_fragment_down);
-  prsms.erase(prsms.begin() + 1, prsms.end());
+  if (prsms.size() > 0) {
+    prsms.erase(prsms.begin() + 1, prsms.end());
+  }
 }
 
 void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
