@@ -20,7 +20,8 @@ class PrSMWriter {
 public:
  PrSMWriter(std::string file_name);
  ~PrSMWriter();
- void write(PrSM &prsm);
+ void write(PrSMPtr prsm_ptr);
+ void writeVector(PrSMPtrVec &prsms);
 
 private:
   xercesc::DOMLSSerializer* serializer_;

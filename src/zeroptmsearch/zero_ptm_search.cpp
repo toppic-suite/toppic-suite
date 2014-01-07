@@ -1,7 +1,8 @@
-#include <base/logger.hpp>
+#include "base/logger.hpp"
 #include "base/proteoform.hpp"
 #include "base/fasta_reader.hpp"
 #include "spec/msalign_reader.hpp"
+#include "prsm/prsm_writer.hpp"
 #include "zeroptmsearch/zero_ptm_fast_match.hpp"
 #include "zeroptmsearch/zero_ptm_slow_match.hpp"
 #include "zeroptmsearch/zero_ptm_search.hpp"
@@ -46,13 +47,13 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
 
   MsAlignReader reader(mng_ptr->spectrum_file_name_.c_str(), 
                        base_data_ptr->getActivationPtrVec());
-  //std::string output_file_name = basename(mng_ptr->spectrum_file_name_ 
-  //                                        + "." + mng_ptr->output_file_ext_);
-  //PrSMWriter comp_writer;
-  //PrSMWriter pref_writer;
-  //PrSMWriter suff_writer;
-  //PrSMWriter internal_writer;
-  //PrSMWriter all_writer;
+  std::string output_file_name = basename(mng_ptr->spectrum_file_name_) 
+                                          + "." + mng_ptr->output_file_ext_;
+  PrSMWriter comp_writer(output_file_name + "_COMPLETE");
+  PrSMWriter pref_writer(output_file_name + "_PREFIX");
+  PrSMWriter suff_writer(output_file_name + "_SUFFIX");
+  PrSMWriter internal_writer(output_file_name + "_INTERNAL");
+  PrSMWriter all_writer(output_file_name);
 
   ProtModPtrVec prot_mod_ptr_list = base_data_ptr->getProtModPtrVec();
   double shift = base_data_ptr->getAcetylationProtModPtr()->getProtShift();
@@ -70,23 +71,23 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
       PrSMPtrVec comp_prsms;
       zeroPtmSearch(spec_set_ptr, SEMI_ALIGN_TYPE_COMPLETE, prot_mod_forms, 
                     mng_ptr, comp_prsms);
-      //comp_writer.write(comp_prsms);
-      //all_write.write(comp_prsms);
+      comp_writer.writeVector(comp_prsms);
+      all_writer.writeVector(comp_prsms);
       PrSMPtrVec pref_prsms;
       zeroPtmSearch(spec_set_ptr, SEMI_ALIGN_TYPE_PREFIX, prot_mod_forms, 
                     mng_ptr, pref_prsms);
-      //pref_writer.write(pref_prsms);
-      //all_write.write(pref_prsms);
+      pref_writer.writeVector(pref_prsms);
+      all_writer.writeVector(pref_prsms);
       PrSMPtrVec suff_prsms;
       zeroPtmSearch(spec_set_ptr, SEMI_ALIGN_TYPE_SUFFIX, raw_forms, 
                     mng_ptr, suff_prsms);
-      //suff_writer.write(suff_prsms);
-      //all_write.write(suff_prsms);
+      suff_writer.writeVector(suff_prsms);
+      all_writer.writeVector(suff_prsms);
       PrSMPtrVec internal_prsms;
       zeroPtmSearch(spec_set_ptr, SEMI_ALIGN_TYPE_SUFFIX, raw_forms, 
                     mng_ptr, internal_prsms);
-      //internal_writer.write(internal_prsms);
-      //all_write.write(internal_prsms);
+      internal_writer.writeVector(internal_prsms);
+      all_writer.writeVector(internal_prsms);
       LOG_DEBUG("zero ptm search complete " << n);
     }
     ms_ptr = reader.getNextMs();
@@ -94,10 +95,6 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
   }
 
   reader.close();
-  //comp_writer.close();
-  //prec_writer.close();
-  //suff_writer.close();
-  //internal_writer.close();
   std::cout << "Non-ptm search finished." << std::endl;
 }
 

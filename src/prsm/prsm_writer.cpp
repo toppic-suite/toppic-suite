@@ -25,11 +25,17 @@ PrSMWriter::~PrSMWriter() {
   delete doc_;
 }
 
-void PrSMWriter::write(PrSM &prsm) {
-  xercesc::DOMElement* element = prsm.toXmlElement(doc_);
+void PrSMWriter::write(PrSMPtr prsm_ptr) {
+  xercesc::DOMElement* element = prsm_ptr->toXmlElement(doc_);
   std::string str = writeToString(serializer_, element);
   file_ << str << std::endl;
   element->release();
+}
+
+void PrSMWriter::writeVector(PrSMPtrVec &prsms) {
+  for (unsigned i = 0; i < prsms.size(); i++) {
+    write(prsms[i]);
+  }
 }
 
 } /* namespace prot */
