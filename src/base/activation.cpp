@@ -43,7 +43,7 @@ void Activation::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
 
 ActivationPtrVec getActivationPtrVecInstance(IonTypePtrVec ion_type_list, std::string file_name){
   ActivationPtrVec activationPtrVec;
-  XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMInstance();
+  XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
     XmlDOMDocument doc(parser, file_name.c_str());
     xercesc::DOMElement* parent = doc.getDocumentElement();

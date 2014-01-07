@@ -35,7 +35,7 @@ ProtModPtrVec getProtModPtrVecInstance(AcidPtrVec &acid_list,
                                        TruncPtrVec &trunc_list,
                                        const std::string &file_name) {
   ProtModPtrVec prot_mod_list;
-  prot::XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMInstance();
+  prot::XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
     prot::XmlDOMDocument doc(parser, file_name.c_str());
     xercesc::DOMElement* parent = doc.getDocumentElement();

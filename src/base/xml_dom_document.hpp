@@ -70,5 +70,7 @@ std::string convertToString(int value);
 
 std::string convertToString(bool value);
 
+std::string writeToString(xercesc::DOMLSSerializer* serializer, xercesc::DOMNode *node);
+
 }
 #endif

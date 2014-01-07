@@ -90,7 +90,7 @@ bool SimplePrSM::isMatch(MsHeaderPtr header){
 
 SimplePrSMPtrVec readSimplePrSM(const char * filename){
 	SimplePrSMPtrVec results;
-	XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMInstance();
+	XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
 	if(parser){
 		XmlDOMDocument* doc = new XmlDOMDocument(parser, filename);
 		if (doc) {

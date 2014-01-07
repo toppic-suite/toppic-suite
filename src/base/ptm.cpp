@@ -35,7 +35,7 @@ void Ptm::appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
 
 PtmPtrVec getPtmPtrVecInstance(const std::string &file_name) {
   PtmPtrVec ptm_list;
-  XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMInstance();
+  XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
     XmlDOMDocument doc(parser, file_name.c_str());
     xercesc::DOMElement* parent = doc.getDocumentElement();

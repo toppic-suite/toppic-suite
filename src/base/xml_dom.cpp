@@ -1,6 +1,4 @@
-
 #include <iostream>
-#include <string>
 #include <xercesc/util/PlatformUtils.hpp>
 #include <xercesc/util/XMLString.hpp>
 #include <xercesc/dom/DOM.hpp>
@@ -18,8 +16,9 @@
  
 namespace prot {
 
-XmlDOMParser* XmlDOMParserFactory::dom_parser = nullptr;
+XmlDOMParser* XmlDOMParserFactory::dom_parser_ = nullptr;
 
+/* XmlDOMParser */
 XmlDOMParser::XmlDOMParser() : parser_(nullptr), err_handler_(nullptr) {
   xercesc::XMLPlatformUtils::Initialize();
   parser_ = new xercesc::XercesDOMParser();
@@ -28,15 +27,38 @@ XmlDOMParser::XmlDOMParser() : parser_(nullptr), err_handler_(nullptr) {
 }
 
 XmlDOMParser::~XmlDOMParser() {
-  if (parser_) {
+  if (parser_ != nullptr) {
     delete parser_;
     xercesc::XMLPlatformUtils::Terminate();
   }
 }
 
-xercesc::DOMDocument* XmlDOMParser::parse(const char* xml_file) {
-  parser_->parse(xml_file);
+xercesc::DOMDocument* XmlDOMParser::parse(std::string xml_file) {
+  parser_->parse(xml_file.c_str());
   return parser_->adoptDocument();
+}
+
+/* XmlDOMImplenmation */
+XmlDOMImpl* XmlDOMImplFactory::dom_impl_ = nullptr;
+
+XmlDOMImpl::XmlDOMImpl() {
+  impl_ = xercesc::DOMImplementationRegistry::getDOMImplementation(X("Core"));
+}
+
+XmlDOMImpl::~XmlDOMImpl() {
+  if (impl_ != nullptr) {
+    delete impl_;
+  }
+}
+
+xercesc::DOMDocument* XmlDOMImpl::createDoc(std::string root) {
+  xercesc::DOMDocument* doc = impl_->createDocument(0, X(root.c_str()), 0);
+  return doc;
+}
+
+xercesc::DOMLSSerializer* XmlDOMImpl::createSerializer() {
+  xercesc::DOMLSSerializer* writer = impl_->createLSSerializer();
+  return writer;
 }
 
 int writeXmlFile(xercesc::DOMDocument* doc, const char *filename){

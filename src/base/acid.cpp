@@ -36,7 +36,7 @@ void Acid::appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
 
 AcidPtrVec getAcidPtrVecInstance(std::string file_name) {
   AcidPtrVec acid_list;
-  XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMInstance();
+  XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
     XmlDOMDocument doc(parser, file_name.c_str());
     xercesc::DOMElement* parent = doc.getDocumentElement();
