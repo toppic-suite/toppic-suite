@@ -133,8 +133,8 @@ PrmMsPtr getMsTwo(DeconvMsPtr deconv_ms,double delta,
 		}
 	}
 	//end settolerance
-
-	return PrmMsPtr(new Ms<PrmPeakPtr>(header,list_filtered)) ;
+  double ppo = sp_para->getPeakTolerance()->getPpo();
+	return PrmMsPtr(new Ms<PrmPeakPtr>(header,list_filtered, ppo)) ;
 }
 PrmMsPtr getSpSix(DeconvMsPtr deconv_ms,double delta,SpParaPtr sp_para,IonTypePtrVec ion_type_ptr_vec){
 
@@ -189,8 +189,8 @@ PrmMsPtr getSpSix(DeconvMsPtr deconv_ms,double delta,SpParaPtr sp_para,IonTypePt
 		}
 	}
 	//end settolerance
-
-	return PrmMsPtr(new Ms<PrmPeakPtr>(header,list_filtered)) ;
+  double ppo = sp_para->getPeakTolerance()->getPpo();
+	return PrmMsPtr(new Ms<PrmPeakPtr>(header,list_filtered, ppo)) ;
 }
 
 PrmMsPtr getShiftSpSix(DeconvMsPtr deconv_ms,double delta,double shift,
@@ -206,7 +206,8 @@ PrmMsPtr getShiftSpSix(DeconvMsPtr deconv_ms,double delta,double shift,
 			 prm_peaks.push_back(ms->getPeakPtr(i));
 		}
 	}
-	return PrmMsPtr(new Ms<PrmPeakPtr>(ms->getHeaderPtr(),prm_peaks));
+  double ppo = sp_para->getPeakTolerance()->getPpo();
+	return PrmMsPtr(new Ms<PrmPeakPtr>(ms->getHeaderPtr(),prm_peaks, ppo));
 }
 
 std::vector<std::vector<int>> getIntMassErrorList(PrmMsPtr ms,double scale,bool n_strict,bool c_strict){

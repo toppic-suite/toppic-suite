@@ -1,3 +1,4 @@
+#include "base/logger.hpp"
 #include "spec/ms.hpp"
 #include "prsm/prsm.hpp"
 #include "prsm/peak_ion_pair.hpp"
@@ -44,6 +45,7 @@ void PrSM::initScores(SpParaPtr sp_para_ptr) {
 
 xercesc::DOMElement* PrSM::toXmlElement(XmlDOMDocument* xml_doc){
 	xercesc::DOMElement* element = xml_doc->createElement("prsm");
+  LOG_DEBUG("Element created");
 	std::string str = convertToString(prsm_id_);
 	xml_doc->addElement(element, "prsm_id", str.c_str());
 	str = convertToString(spectrum_id_);
@@ -57,14 +59,12 @@ xercesc::DOMElement* PrSM::toXmlElement(XmlDOMDocument* xml_doc){
 	xml_doc->addElement(element, "adjusted_prec_mass", str.c_str());
 	str = convertToString(calibration_);
 	xml_doc->addElement(element, "calibration", str.c_str());
-	proteoform_ptr_->appendXml(xml_doc,element);
-	prob_ptr_->appendXml(xml_doc,element);
+	//proteoform_ptr_->appendXml(xml_doc,element);
+	//prob_ptr_->appendXml(xml_doc,element);
 	str = convertToString(fdr_);
 	xml_doc->addElement(element, "fdr", str.c_str());
-	deconv_ms_ptr_->appendXml(xml_doc,element);
-	refine_ms_three_->appendXml(xml_doc,element);
-	//deconv_ms_ptr_
-	//refine_ms_three_
+	//deconv_ms_ptr_->appendXml(xml_doc,element);
+	//refine_ms_three_->appendXml(xml_doc,element);
 	str = convertToString(match_peak_num_);
 	xml_doc->addElement(element, "match_peak_num", str.c_str());
 	str = convertToString(match_fragment_num_);

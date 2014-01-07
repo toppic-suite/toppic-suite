@@ -58,6 +58,9 @@ xercesc::DOMDocument* XmlDOMImpl::createDoc(std::string root) {
 
 xercesc::DOMLSSerializer* XmlDOMImpl::createSerializer() {
   xercesc::DOMLSSerializer* writer = impl_->createLSSerializer();
+  writer->getDomConfig()->setParameter(xercesc::XMLUni::fgDOMWRTFormatPrettyPrint, true);
+  writer->getDomConfig()->setParameter(xercesc::XMLUni::fgDOMWRTDiscardDefaultContent, true);
+  writer->setNewLine(X("\n"));
   return writer;
 }
 
@@ -67,7 +70,7 @@ int writeXmlFile(xercesc::DOMDocument* doc, const char *filename){
   }
   catch(const xercesc::XMLException& e) {
     char* message = xercesc::XMLString::transcode(e.getMessage());
-    std::cout << "Error Message: " << message << "\n";
+    std::cout << "Error Message: " << message << std::endl;
     xercesc::XMLString::release(&message);
     return 1;
   }

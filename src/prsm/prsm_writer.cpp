@@ -4,7 +4,7 @@
  *  Created on: Dec 30, 2013
  *      Author: xunlikun
  */
-
+#include "base/logger.hpp"
 #include "prsm/prsm_writer.hpp"
 
 namespace prot {
@@ -26,8 +26,11 @@ PrSMWriter::~PrSMWriter() {
 }
 
 void PrSMWriter::write(PrSMPtr prsm_ptr) {
+  LOG_DEBUG("start writing");
   xercesc::DOMElement* element = prsm_ptr->toXmlElement(doc_);
+  LOG_DEBUG("Element generated");
   std::string str = writeToString(serializer_, element);
+  LOG_DEBUG("String generated");
   file_ << str << std::endl;
   element->release();
 }

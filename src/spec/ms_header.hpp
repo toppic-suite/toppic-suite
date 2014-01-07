@@ -71,7 +71,7 @@ class MsHeader {
 
   void setPrecId(int prec_id) {prec_id_ = prec_id;}
 
-  void setErrorTolerance(double ppo) {error_tolerance_ = getPrecMonoMass() * ppo;}
+  void setErrorToleranceByPpo(double ppo) {error_tolerance_ = getPrecMonoMass() * ppo;}
 
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 

@@ -129,9 +129,9 @@ int getFirstResPos(double n_term_shift,std::vector<double> extbmasses){
 	int best_pos = -1;
 	double best_shift = 2139095040.0;
 	for(unsigned int i = 0; i < extbmasses.size();i++){
-		if(abs(extbmasses[i] - trunc_len) < best_shift){
+		if(std::abs(extbmasses[i] - trunc_len) < best_shift){
 			best_pos = i;
-			best_shift = abs(extbmasses[i] - trunc_len);
+			best_shift = std::abs(extbmasses[i] - trunc_len);
 		}
 	}
 	return best_pos;
@@ -143,9 +143,9 @@ int getLastResPos(double c_term_shift,std::vector<double> extbmasses){
 	double best_shift = 2139095040.0;
 	double pep_mass = extbmasses[extbmasses.size()-1];
 	for(unsigned int i=0;i<extbmasses.size();i++){
-		if (abs(pep_mass-extbmasses[i]-trunc_len)<best_shift){
+		if (std::abs(pep_mass-extbmasses[i]-trunc_len)<best_shift){
 			best_pos=i;
-			best_shift = abs(pep_mass-extbmasses[i]-trunc_len);
+			best_shift = std::abs(pep_mass-extbmasses[i]-trunc_len);
 		}
 	}
 	if(best_pos < 0){
