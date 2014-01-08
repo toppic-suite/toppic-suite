@@ -15,6 +15,7 @@
 #include "ptmsearch/diagonal_header.hpp"
 #include "prsm/pair.hpp"
 #include "spec/prm_peak.hpp"
+#include "base/algorithm.hpp"
 
 namespace prot {
 class BasicDiagPair;

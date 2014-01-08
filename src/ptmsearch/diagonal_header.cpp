@@ -36,7 +36,7 @@ DiagonalHeaderPtr DiagonalHeader::clone(){
 	cloned->setPepCTermAllowMod(pep_C_term_allow_mod_);
 	return cloned;
 }
-DiagonalHeaderPtr DiagonalHeader::getShift(DiagonalHeaderPtr shift,int bgn,int end){
+DiagonalHeaderPtr getShift(DiagonalHeaderPtr shift,int bgn,int end){
 	DiagonalHeaderPtr new_shift = shift->clone();
 	new_shift->setMatchFirstResPos(bgn);
 	new_shift->setMatchLastResPos(end);
@@ -55,7 +55,7 @@ DiagonalHeaderPtrVec getNTermShiftListCompLeft(ProteoformPtr seq,PtmMngPtr mng){
 	DiagonalHeaderPtrVec extend_n_term_shifts;
 	double shift;
 	for(int i=0;i<mng->allow_prot_N_mods_.size();i++){
-		if(seq->getResSeqPtr()->allowsMod(mng->allow_prot_N_mods_[i]) && mng->allow_prot_N_mods_[i]->getPepShift()==0){
+		if(prot::allowsMod(mng->allow_prot_N_mods_[i],mng->base_data_->getResiduePtrVec()) && mng->allow_prot_N_mods_[i]->getPepShift()==0){
 			shift = mng->allow_prot_N_mods_[i]->getProtShift();
 			extend_n_term_shifts.push_back(DiagonalHeaderPtr(new DiagonalHeader(shift,true,false,true,false)));
 		}
