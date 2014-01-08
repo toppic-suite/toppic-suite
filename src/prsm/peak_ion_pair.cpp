@@ -1,3 +1,4 @@
+#include "base/logger.hpp"
 #include "base/algorithm.hpp"
 #include "spec/theo_peak.hpp"
 #include "prsm/peak_ion_pair.hpp"
@@ -62,9 +63,10 @@ void findPairs(ExtendMsPtr ms_three_ptr, TheoPeakPtrVec &theo_peaks,
     IonPtr ion_ptr = theo_peaks[j]->getIonPtr();
     double err = ms_three_ptr->getPeakPtr(i)->getOrigTolerance();
     if (ion_ptr->getPos() >= bgn && ion_ptr->getPos() <= end) {
-      if (abs(deviation) <= err) {
+      if (std::abs(deviation) <= err) {
         PeakIonPairPtr pair_ptr 
             = PeakIonPairPtr(new PeakIonPair(ms_three_ptr->getPeakPtr(i), theo_peaks[j]));
+        pairs.push_back(pair_ptr);
       }
     }
     if (increaseIJ(i, j, deviation, err, ms_masses, theo_masses)) {
