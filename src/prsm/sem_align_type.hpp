@@ -8,7 +8,6 @@
 #ifndef SEM_ALIGN_TYPE_HPP_
 #define SEM_ALIGN_TYPE_HPP_
 
-#include <memory>
 namespace prot {
 
 #define SEMI_ALIGN_TYPE_COMPLETE 0
