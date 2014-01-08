@@ -9,6 +9,7 @@
 #define PS_ALIGN_HPP_
 
 #include "dp_pair.hpp"
+#include "ptmsearch/basic_diag_pair.hpp"
 
 namespace prot {
 

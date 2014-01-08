@@ -36,7 +36,7 @@ void PSAlign::initDPPair(){
 			dp_2d_pairs_[i].push_back(DPPairPtr(new DPPair(x,y,score,diff,j,mng_->n_unknown_shift_,diagonals_[i]->getHeader())));
 		}
 		segment_bgn_pairs_[i] = dp_2d_pairs_[i][0];
-		segment_end_pairs_ = dp_2d_pairs_[i][diagonals_[i]->size()-1];
+		segment_end_pairs_[i] = dp_2d_pairs_[i][diagonals_[i]->size()-1];
 	}
 
 	first_pair_ =DPPairPtr( new DPPair(-1,-1,0,0,-1,mng_->n_unknown_shift_,nullptr));

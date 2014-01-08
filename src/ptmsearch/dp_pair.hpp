@@ -8,6 +8,9 @@
 #ifndef DP_PAIR_HPP_
 #define DP_PAIR_HPP_
 
+#include "ptmsearch/diagonal_header.hpp"
+#include "prsm/pair.hpp"
+
 namespace prot {
 
 #define PATH_TYPE_NULL -1
@@ -18,7 +21,8 @@ namespace prot {
 class DPPair;
 typedef std::shared_ptr<DPPair>  DPPairPtr;
 typedef std::vector<DPPairPtr> DPPairPtrVec;
-class DPPair :public Pair{
+
+class DPPair : public Pair{
 public:
 	DPPair(int x,int y,double pair_score,double diff,int order,int n_shift,DiagonalHeaderPtr header);
 
