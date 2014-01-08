@@ -2,6 +2,7 @@
 #define PROT_EXTREME_VALUE_HPP_
 
 #include <memory>
+#include <vector>
 #include "base/xml_dom_document.hpp"
 
 namespace prot {
@@ -36,6 +37,7 @@ class ExtremeValue {
 };
 
 typedef std::shared_ptr<ExtremeValue> ExtremeValuePtr;
+typedef std::vector<ExtremeValuePtr> ExtremeValuePtrVec;
 
 }
 

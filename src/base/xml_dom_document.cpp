@@ -65,7 +65,6 @@ xercesc::DOMElement* getChildElement(xercesc::DOMElement *parent,
   return element;
 }
 
-
 std::string getChildValue(xercesc::DOMElement* parent,  
                           const char* child_tag, int i) {
   xercesc::DOMNodeList* node_list;
@@ -166,6 +165,28 @@ std::string convertToString(bool value) {
   std::stringstream stream;
   stream << value;
   return stream.str();
+}
+
+std::string writeToString(xercesc::DOMLSSerializer* serializer, xercesc::DOMNode *node) {
+  XMLCh* ch = serializer->writeToString(node, 0);
+  std::string result = Y(ch);
+  xercesc::XMLString::release(&ch);
+  return result;
+}
+
+void writeToStreamByRemovingDoubleLF(std::ofstream &file, std::string &str) {
+  int pos = 0;
+  std::size_t found = str.find("\n\n", pos);
+  while (found != std::string::npos) {
+    std::string sub = str.substr(pos, found - pos);
+    file << sub << std::endl;
+    pos = found + 2;
+    found = str.find("\n\n", pos);
+  }
+  if (pos < str.length()) {
+    std::string sub = str.substr(pos);
+    file << sub << std::endl; 
+  }
 }
 
 }

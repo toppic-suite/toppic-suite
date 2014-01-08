@@ -4,25 +4,42 @@
  *  Created on: Dec 30, 2013
  *      Author: xunlikun
  */
-
-#include <prsm/prsm_writer.hpp>
-#include "base/xml_dom_document.hpp"
-#include "base/xml_dom.hpp"
+#include "base/logger.hpp"
+#include "prsm/prsm_writer.hpp"
 
 namespace prot {
-int PrSMWriter::write(const char *prm_file_name){
-	xercesc::DOMImplementation* implementation =  xercesc::DOMImplementationRegistry::getDOMImplementation(X("Core"));
-	XmlDOMDocument* xml = new XmlDOMDocument(implementation,"prsm_list");
-	xercesc::DOMElement* root = xml->getDocumentElement();
-	for(unsigned int i = 0;i<prsms_.size();i++){
-		prsms_[i]->appendXml(xml,root);
-	}
-	xml->writeXmlDOMDocument(prm_file_name);
-	delete xml;
-	return 0;
+
+PrSMWriter::PrSMWriter(std::string file_name) {
+  file_.open(file_name.c_str());
+  file_ << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << std::endl;
+  file_ << "<prsm_list>" << std::endl;
+  XmlDOMImpl* impl = XmlDOMImplFactory::getXmlDOMImplInstance();
+  doc_ = new XmlDOMDocument(impl->createDoc("prsm_list"));
+  serializer_ = impl->createSerializer();
 }
 
-void PrSMWriter::addSimplePrSM(PrSMPtr matche){
-	prsms_.push_back(matche);
+PrSMWriter::~PrSMWriter() {
+  file_ << "</prsm_list>" << std::endl;
+  file_.close();
+  serializer_->release();
+  delete doc_;
 }
+
+void PrSMWriter::write(PrSMPtr prsm_ptr) {
+  LOG_DEBUG("start writing");
+  xercesc::DOMElement* element = prsm_ptr->toXmlElement(doc_);
+  LOG_DEBUG("Element generated");
+  std::string str = writeToString(serializer_, element);
+  LOG_DEBUG("String generated");
+  writeToStreamByRemovingDoubleLF(file_, str);
+  //file_ << str << std::endl;
+  element->release();
+}
+
+void PrSMWriter::writeVector(PrSMPtrVec &prsms) {
+  for (unsigned i = 0; i < prsms.size(); i++) {
+    write(prsms[i]);
+  }
+}
+
 } /* namespace prot */

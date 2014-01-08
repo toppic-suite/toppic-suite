@@ -18,7 +18,7 @@ ResFreqPtrVec getResiduePtrVecInstance(AcidPtrVec &acid_list,
                                            PtmPtrVec &ptm_list,
                                            std::string &file_name) {
   ResFreqPtrVec residue_list;
-  XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMInstance();
+  XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
     XmlDOMDocument doc(parser, file_name.c_str());
     xercesc::DOMElement* parent = doc.getDocumentElement();

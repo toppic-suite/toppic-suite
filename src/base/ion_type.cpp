@@ -30,7 +30,7 @@ void IonType::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
 
 IonTypePtrVec getIonTypePtrVecInstance(const std::string file_name){
 	IonTypePtrVec ion_type_ptr_vec;
-	prot::XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMInstance();
+	prot::XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
     prot::XmlDOMDocument doc(parser, file_name.c_str());
     xercesc::DOMElement* parent = doc.getDocumentElement();

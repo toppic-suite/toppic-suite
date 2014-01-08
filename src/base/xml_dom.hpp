@@ -11,12 +11,13 @@
 
 namespace prot {
 
+/* DOM parser */
 class XmlDOMParser {
  public:
   XmlDOMParser();
   ~XmlDOMParser();
 
-  xercesc::DOMDocument* parse(const char* xml_file);
+  xercesc::DOMDocument* parse(std::string xml_file);
 
  private:
   xercesc::XercesDOMParser* parser_;
@@ -26,13 +27,37 @@ class XmlDOMParser {
 
 class XmlDOMParserFactory {
  private:
-  static XmlDOMParser* dom_parser;
+  static XmlDOMParser* dom_parser_;
  public:
-  static XmlDOMParser* getXmlDOMInstance() {
-    if (dom_parser == nullptr) {
-      dom_parser = new XmlDOMParser();
+  static XmlDOMParser* getXmlDOMParserInstance() {
+    if (dom_parser_ == nullptr) {
+      dom_parser_ = new XmlDOMParser();
     }
-    return dom_parser;
+    return dom_parser_;
+  }
+};
+
+/* DOM Implementation */
+class XmlDOMImpl{
+ public:
+  XmlDOMImpl();
+  ~XmlDOMImpl();
+  xercesc::DOMDocument* createDoc(std::string root);
+  xercesc::DOMLSSerializer* createSerializer();
+
+ private:
+  xercesc::DOMImplementation* impl_;
+};
+
+class XmlDOMImplFactory {
+ private:
+  static XmlDOMImpl* dom_impl_;
+ public:
+  static XmlDOMImpl* getXmlDOMImplInstance() {
+    if (dom_impl_ == nullptr) {
+      dom_impl_ = new XmlDOMImpl();
+    }
+    return dom_impl_;
   }
 };
 
@@ -62,13 +87,13 @@ class YStr {
   }
 
   ~YStr() {
-    xercesc::XMLString::release(&ch_);
+    delete ch_;
   }
 
-  const char * getString() {return ch_;}
+  std::string  getString() {return std::string(ch_);}
 
  private:
-  char * ch_;
+  char* ch_;
 };
 
 #define X(str) XStr(str).unicodeForm()

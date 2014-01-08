@@ -3,6 +3,7 @@
 
 #include "base/ptm.hpp"
 #include "base/trunc.hpp"
+#include "base/residue.hpp"
 #include "base/xml_dom.hpp"
 #include "base/xml_dom_document.hpp"
 
@@ -46,6 +47,8 @@ ProtModPtr getProtModPtrByName(ProtModPtrVec &prot_mod_list,
                                const std::string &name);
 
 double getProtModAcetylationShift(ProtModPtrVec &prot_mod_list);
+
+bool allowMod(ProtModPtr prot_mod_ptr, ResiduePtrVec &residues);
 
 }
 #endif

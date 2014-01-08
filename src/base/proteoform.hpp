@@ -10,6 +10,12 @@
 
 namespace prot {
 
+#define SEMI_ALIGN_TYPE_COMPLETE 0
+#define SEMI_ALIGN_TYPE_PREFIX   1
+#define SEMI_ALIGN_TYPE_SUFFIX   2
+#define SEMI_ALIGN_TYPE_INTERNAL 3
+
+
 class Proteoform;
 typedef std::shared_ptr<Proteoform> ProteoformPtr;
 
@@ -44,6 +50,8 @@ public:
   std::string toString();
 
   int getUnexpectedChangeNum();
+  
+  int getSemiAlignType();
 
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 

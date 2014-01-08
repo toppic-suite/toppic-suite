@@ -46,28 +46,6 @@ void ResidueSeq::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
 	parent->appendChild(element);
 }
 
-bool ResidueSeq::allowsMod(ProtModPtr mod){
-	if(mod->getName().compare("NONE")==0){
-		return true;
-	}
-	else if(mod->getName().compare("NME")==0){
-		if(residues_.size()>=2 && residues_[0]->getAcidPtr()->getOneLetter().compare("M")==0){
-			return true;
-		}
-		return false;
-	}
-	else if(mod->getName().compare("ACETYLATION")==0){
-		return true;
-	}
-	else if(mod->getName().compare("NME_ACETYLATION")==0){
-		if(residues_.size()>=2 && residues_[0]->getAcidPtr()->getOneLetter().compare("M")==0){
-			return true;
-		}
-		return false;
-	}
-  return false;
-}
-
 ResidueSeq getEmptyResidueSeq() {
   ResiduePtrVec residues;
   return ResidueSeq(residues);

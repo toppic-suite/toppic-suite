@@ -35,7 +35,7 @@ double compAvg(std::vector<double> ppos, double recal_ppo) {
   int cnt = 0;
   double sum = 0;
   for (unsigned int i = 0; i < ppos.size(); i++) {
-    if (abs(ppos[i]) <= recal_ppo) {
+    if (std::abs(ppos[i]) <= recal_ppo) {
       cnt++;
       sum += ppos[i];
     }
@@ -58,7 +58,7 @@ bool ZeroPtmSlowMatch::isValid (double recal, double ppo) {
     // here we assume that precursor mass has same recal to MS2
     double prec_mass = deconv_ms_ptr_->getHeaderPtr()->getPrecMonoMass();
     double prec_ppo = (prec_mass  * (1 + recal) - refine_prec_mass_) / prec_mass;
-    return abs(prec_ppo) <= ppo;
+    return std::abs(prec_ppo) <= ppo;
   }
 }
 

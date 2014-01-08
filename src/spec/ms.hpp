@@ -21,6 +21,12 @@ class Ms {
     peak_ptr_list_ = peak_ptr_list;
   }
 
+  Ms(MsHeaderPtr header_ptr, std::vector<T> peak_ptr_list, double ppo) {
+    header_ptr_ = header_ptr;
+    peak_ptr_list_ = peak_ptr_list;
+    header_ptr_->setErrorToleranceByPpo(ppo);
+  }
+
 	/**
 	 * Removes precursor mass. In ETD data, MSMS may contain a high precursor
 	 * mass peak. So we use the following to remove it.
@@ -60,7 +66,7 @@ class Ms {
   	  xercesc::DOMElement* element = xml_doc->createElement("ms");
   	  header_ptr_->appendXml(xml_doc,element);
   	  xercesc::DOMElement* peaks = xml_doc->createElement("peaks");
-  	  for(int i=0;i<peak_ptr_list_.size();i++){
+  	  for(unsigned int i=0;i<peak_ptr_list_.size();i++){
   		  peak_ptr_list_[i]->appendXml(xml_doc,peaks);
   	  }
   	  element->appendChild(peaks);

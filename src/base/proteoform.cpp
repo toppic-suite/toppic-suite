@@ -67,6 +67,33 @@ int Proteoform::getUnexpectedChangeNum() {
   return n;
 }
 
+int Proteoform::getSemiAlignType() {
+  int trunc_len = prot_mod_ptr_->getTruncPtr()->getTruncLen();
+  bool is_prefix = false;
+  if (start_pos_ == trunc_len) {
+    is_prefix = true;
+  }
+
+  bool is_suffix = false;
+  if (end_pos_ == db_residue_seq_ptr_->getLen() - 1) {
+    is_suffix = true;
+  }
+
+  if (is_prefix) {
+    if (is_suffix) {
+      return SEMI_ALIGN_TYPE_COMPLETE;
+    } else {
+      return SEMI_ALIGN_TYPE_PREFIX;
+    }
+  } else {
+    if (is_suffix) {
+      return SEMI_ALIGN_TYPE_SUFFIX;
+    } else {
+      return SEMI_ALIGN_TYPE_INTERNAL;
+    }
+  }
+}
+
 void Proteoform::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
 	xercesc::DOMElement* element = xml_doc->createElement("proteoform");
 	std::string str = convertToString(start_pos_);

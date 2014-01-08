@@ -13,7 +13,7 @@ namespace prot {
 
 SupportPeakTypePtrVec getSupportPeakTypePtrVecInstance(const char* file_name){
 	SupportPeakTypePtrVec support_peak_type_list;
-		  XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMInstance();
+		  XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
 		  if (parser) {
 		    XmlDOMDocument* doc = new XmlDOMDocument(parser, file_name);
 		    if (doc) {

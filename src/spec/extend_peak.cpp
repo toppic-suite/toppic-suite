@@ -38,7 +38,7 @@ void ExtendPeak::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
 //must deleted the ms after finished using
 //ExtendMsPtr getMsThree(DeconvMsPtr deconv_ms,double delta,SpParaPtr sp_para);
 ExtendMsPtr getMsThree(DeconvMsPtr deconv_ms,double delta,SpParaPtr sp_para){
-	MsHeaderPtr header = prot::getDeltaHeaderPtr(deconv_ms,delta);
+	MsHeaderPtr header = getDeltaHeaderPtr(deconv_ms,delta);
 
 	//private function getSpThreeExtendPeak in factory
 	ExtendPeakPtrVec list;
@@ -81,7 +81,8 @@ ExtendMsPtr getMsThree(DeconvMsPtr deconv_ms,double delta,SpParaPtr sp_para){
 						list_filtered[i]->getBasePeakPtr()->getMonoMass(),pre_mono_mass));
 	}
 	//end msThreeSetTolerance and result = list_filtered
-	 return ExtendMsPtr(new Ms<ExtendPeakPtr>(header,list_filtered));
+  double ppo = sp_para->getPeakTolerance()->getPpo();
+	 return ExtendMsPtr(new Ms<ExtendPeakPtr>(header,list_filtered, ppo));
 }
 
 } /* namespace prot */
