@@ -58,6 +58,13 @@ protected:
 	int y_=0;
 };
 
+inline bool comparePairUp(PairPtr c1, PairPtr c2) {
+  if(c1->getY()!= c2->getY()){
+	  return c1->getY()<c2->getY();
+  }
+  return c1->getX() < c2->getX();
+}
+
 //bool increaseIJ(int i,int j,double deviation,double tolerace,std::vector<double> ms_masses,std::vector<double> seq_masses);
 //std::vector<double> compPpoDeviation(std::vector<double> ms_masses,std::vector<double> theo_masses,double ppo);
 std::vector<double> compPpoDeviation(ExtendMsPtr ms,TheoPeakPtrVec ions,double ppo);
