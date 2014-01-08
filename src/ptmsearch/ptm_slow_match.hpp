@@ -33,10 +33,10 @@ protected:
 	ProteoformPtr seq_;
 	DeconvMsPtr deconv_ms_;
 	PrmMsPtr ms_six_;
-	ExtendMsPtr ms_three;
+	ExtendMsPtr ms_three_;
 	DiagonalHeaderPtrVec3D result_headers_;
-	std::vector<std::vector<double>> result_deltas;
-	std::vector<std::vector<double>> result_scores;
+	std::vector<std::vector<double>> result_deltas_;
+	std::vector<std::vector<double>> result_scores_;
 
 	void comp(CompShiftLowMemPtr comp_shift);
 	DiagonalHeaderPtrVec getNTermShiftList(std::vector<double> best_shift,PrmMsPtr ms_six,ProteoformPtr seq,PtmMngPtr mng);
