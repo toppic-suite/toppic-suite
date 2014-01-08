@@ -25,7 +25,7 @@ namespace prot {
 class PtmSlowMatch {
 public:
 	PtmSlowMatch(ProteoformPtr seq,SpectrumSetPtr spectrum_set,CompShiftLowMemPtr comp_shift,PtmMngPtr mng);
-
+	ProteoformPtr getSeq(){return seq_;};
 	double getScr(int shiftnum,int type);
 	PrSMPtr geneResult(int shift_num,int type);
 protected:

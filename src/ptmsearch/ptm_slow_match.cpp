@@ -46,6 +46,26 @@ void PtmSlowMatch::comp(CompShiftLowMemPtr comp_shift){
 		result_deltas_.push_back(temp);
 	}
 }
+double PtmSlowMatch::getScr(int shiftnum,int type){
+	return result_scores_[type][shiftnum];
+}
+
+PrSMPtr PtmSlowMatch::geneResult(int shift_num,int type){
+	DiagonalHeaderPtrVec headers=result_headers_[type][shift_num];
+	double refine_prec_mass = ms_three_->getHeaderPtr()->getPrecMonoMass()+result_deltas_[type][shift_num];
+	int first_pos = headers[0]->getTruncFirstResPos();
+	int last_pos = headers[headers.size()-1]->getTruncLastResPos();
+	DiagonalHeaderPtrVec refined_headers = prot::refineHeadersBgnEnd(first_pos,seq_,deconv_ms_,ms_three_,mng_,headers);
+	if(refined_headers.size()==0){
+		return nullptr;
+	}
+//	Proteoform(DbResSeqPtr db_res_seq_ptr, ProtModPtr prot_mod_ptr,
+//	             ResSeqPtr res_seq_ptr, int start_pos, int end_pos,
+//	             ChangePtrVec change_list);
+	//todo::have some trouble on note book
+	ProteoformPtr protein = ProteoformPtr(new ProteoformPtr(seq_->getDbResSeqPtr(),seq_->getProtModPtr(),seq_->getResSeqPtr(),first_pos,last_pos,seq_->getChangePtrVec()) );
+	return PrSMPtr(new PrSM(protein,deconv_ms_,refine_prec_mass,0,mng_->sp_para_));
+}
 
 DiagonalHeaderPtrVec PtmSlowMatch::getNTermShiftList(std::vector<double> best_shift,PrmMsPtr ms_six,ProteoformPtr seq,PtmMngPtr mng){
 	DiagonalHeaderPtrVec headers = prot::getNTermShiftListCommon(best_shift);
