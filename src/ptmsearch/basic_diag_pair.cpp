@@ -87,7 +87,11 @@ BasicDiagPairDiagPtr getDiagonal(int cnt,DiagonalHeaderPtr header,PrmMsPtr ms_si
 	BasicDiagPairPtrVec diag_pair_list = prot::compDiagPair(ms_six,seq->getBpSpecPtr()->getBreakPointMasses(IonTypePtr(new IonType("B",true,0))),header);
 	if(diag_pair_list.size()>0){
 		header->setId(cnt);
-		return BasicDiagPairDiagPtr(new Diagonal<BasicDiagPairPtr>(header,diag_pair_list));
+		BasicDiagPairDiagPtr temp = BasicDiagPairDiagPtr(new Diagonal<BasicDiagPairPtr>(header,diag_pair_list));
+		for(int i=0;i<diag_pair_list.size();i++){
+			diag_pair_list[i]->setDiagonal(temp);
+		}
+		return temp;
 	}
 	return nullptr;
 }
