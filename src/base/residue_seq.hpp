@@ -7,7 +7,9 @@
 #include "base/residue.hpp"
 
 namespace prot {
-
+class ResidueSeq;
+typedef std::shared_ptr<ResidueSeq> ResSeqPtr;
+typedef std::vector<ResSeqPtr> ResSeqPtrVec;
 class ResidueSeq {
  public:
   ResidueSeq(ResiduePtrVec residues);
@@ -15,7 +17,7 @@ class ResidueSeq {
   /**
    * Returns a sub-peptide of the original peptide.
    **/
-  ResidueSeq getSubResidueSeq(int bgn, int end);
+  ResSeqPtr getSubResidueSeq(int bgn, int end);
 
   /** Gets length */
   int getLen() {return residues_.size();}
@@ -44,9 +46,6 @@ class ResidueSeq {
   /** the sum of residue mass */
   double residue_mass_sum_;
 };
-
-typedef std::shared_ptr<ResidueSeq> ResSeqPtr;
-typedef std::vector<ResSeqPtr> ResSeqPtrVec;
 
 ResidueSeq getEmptyResidueSeq();
 
