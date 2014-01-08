@@ -1,6 +1,8 @@
 #ifndef PROT_XML_DOM_DOCUMENT_HPP_
 #define PROT_XML_DOM_DOCUMENT_HPP_
 
+#include <iostream>
+#include <fstream>
 #include <string>
 
 #include <xercesc/parsers/XercesDOMParser.hpp>
@@ -71,6 +73,8 @@ std::string convertToString(int value);
 std::string convertToString(bool value);
 
 std::string writeToString(xercesc::DOMLSSerializer* serializer, xercesc::DOMNode *node);
+
+void writeToStreamByRemovingDoubleLF(std::ofstream &file, std::string &str);
 
 }
 #endif
