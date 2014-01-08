@@ -31,7 +31,8 @@ void PrSMWriter::write(PrSMPtr prsm_ptr) {
   LOG_DEBUG("Element generated");
   std::string str = writeToString(serializer_, element);
   LOG_DEBUG("String generated");
-  file_ << str << std::endl;
+  writeToStreamByRemovingDoubleLF(file_, str);
+  //file_ << str << std::endl;
   element->release();
 }
 

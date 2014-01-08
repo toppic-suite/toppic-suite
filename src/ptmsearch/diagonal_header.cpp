@@ -6,6 +6,7 @@
  */
 
 #include <ptmsearch/diagonal_header.hpp>
+#include "base/prot_mod.hpp"
 
 namespace prot {
 
@@ -36,7 +37,7 @@ DiagonalHeaderPtr DiagonalHeader::clone(){
 	cloned->setPepCTermAllowMod(pep_C_term_allow_mod_);
 	return cloned;
 }
-DiagonalHeaderPtr DiagonalHeader::getShift(DiagonalHeaderPtr shift,int bgn,int end){
+DiagonalHeaderPtr getShift(DiagonalHeaderPtr shift,int bgn,int end){
 	DiagonalHeaderPtr new_shift = shift->clone();
 	new_shift->setMatchFirstResPos(bgn);
 	new_shift->setMatchLastResPos(end);
@@ -55,7 +56,7 @@ DiagonalHeaderPtrVec getNTermShiftListCompLeft(ProteoformPtr seq,PtmMngPtr mng){
 	DiagonalHeaderPtrVec extend_n_term_shifts;
 	double shift;
 	for(int i=0;i<mng->allow_prot_N_mods_.size();i++){
-		if(seq->getResSeqPtr()->allowsMod(mng->allow_prot_N_mods_[i]) && mng->allow_prot_N_mods_[i]->getPepShift()==0){
+		if(prot::allowMod(mng->allow_prot_N_mods_[i],mng->base_data_->getResiduePtrVec()) && mng->allow_prot_N_mods_[i]->getPepShift()==0){
 			shift = mng->allow_prot_N_mods_[i]->getProtShift();
 			extend_n_term_shifts.push_back(DiagonalHeaderPtr(new DiagonalHeader(shift,true,false,true,false)));
 		}
@@ -100,7 +101,7 @@ void setProtTermMod(DiagonalHeaderPtr &header,ProteoformPtr seq,PtmMngPtr mng){
 	}
 	header->setProtNTermAllowMod(mod);
 	trunc_len = seq->getResSeqPtr()->getLen()-1 -header->getTruncLastResPos();
-	resseq=resseq->getSubResidueSeq(header->getTruncLastResPos()+1,resseq->getLen()-1);
+	resseq = resseq->getSubResidueSeq(header->getTruncLastResPos()+1,resseq->getLen()-1);
 	mod = nullptr;
 	if(header->isCTrunc()){
 		mod = findProtTermMod(mng->allow_prot_C_mods_,trunc_len,resseq,header->getPepCTermShift(),mng->test_term_mod_error_toerance_);
@@ -109,9 +110,9 @@ void setProtTermMod(DiagonalHeaderPtr &header,ProteoformPtr seq,PtmMngPtr mng){
 }
 
 void setProtTermTrunc(DiagonalHeaderPtr &header,ProteoformPtr seq,PtmMngPtr mng){
-	TruncPtr trunc = prot::findProtNTermTrunc(seq,header->getTruncFirstTesPos(),mng->allow_prot_N_truncs_);
+	TruncPtr trunc = prot::findProtNTermTrunc(seq->getResSeqPtr(),header->getTruncFirstTesPos(),mng->allow_prot_N_truncs_);
 	header->setProtNTermAllowTrunc(trunc);
-	trunc = prot::findProtCTermTrunc(seq,header->getTruncLastResPos(),mng->allow_prot_C_truncs_);
+	trunc = prot::findProtCTermTrunc(seq->getResSeqPtr(),header->getTruncLastResPos(),mng->allow_prot_C_truncs_);
 	header->setProtCTermAllowTrunc(trunc);
 }
 
@@ -138,7 +139,13 @@ ProtModPtr findProtTermMod(ProtModPtrVec mods,int trunc_len,ResSeqPtr res_seq,do
 
 PtmPtr findPepTermMod(PtmPtrVec mods,double shift,double tolerance){
 	for(int i=0;i<mods.size();i++){
-		if(std::abs(shift-mods[i]->getMonoMass())<= tolerance){
+//		if(std::abs(shift-mods[i]->getMonoMass())<= tolerance){
+//			return mods[i];
+//		}
+		if(shift>=mods[i]->getMonoMass() && shift-mods[i]->getMonoMass()<= tolerance){
+			return mods[i];
+		}
+		if(shift<mods[i]->getMonoMass() && mods[i]->getMonoMass()-shift<= tolerance){
 			return mods[i];
 		}
 	}
@@ -170,7 +177,7 @@ DiagonalHeaderPtrVec getNTermShiftListTruncsuffix(PrmMsPtr ms,ProteoformPtr seq)
 	std::vector<double> seq_masses = seq->getBpSpecPtr()->getBreakPointMasses(IonTypePtr(new IonType("B",true,0)));
 	double shift;
 
-	for(int i=1;i<seq_masses.size;i++){
+	for(int i=1;i<seq_masses.size();i++){
 		shift = ms_masses[ms_masses.size() - 1]-seq_masses[i];
 		extend_n_term_shift.push_back(DiagonalHeaderPtr(new DiagonalHeader(shift,true,false,true,false)));
 	}
@@ -178,13 +185,13 @@ DiagonalHeaderPtrVec getNTermShiftListTruncsuffix(PrmMsPtr ms,ProteoformPtr seq)
 }
 DiagonalHeaderPtrVec get1dHeaders(DiagonalHeaderPtrVec2D headers){
 	DiagonalHeaderPtrVec header_list;
-	if(headers != nullptr){
-		for(int i =0;i<headers.size;i++){
+//	if(headers != nullptr){
+		for(int i =0;i<headers.size();i++){
 			for(int j=0;j<headers[i].size();j++){
 				header_list.push_back(headers[i][j]);
 			}
 		}
-	}
+//	}
 	return header_list;
 }
 } /* namespace prot */

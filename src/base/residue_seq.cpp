@@ -14,14 +14,14 @@ ResidueSeq::ResidueSeq(ResiduePtrVec residues) {
 }
 
 
-ResidueSeq ResidueSeq::getSubResidueSeq(int bgn, int end) {
+ResSeqPtr ResidueSeq::getSubResidueSeq(int bgn, int end) {
   if (end - bgn < 0) {
     return getEmptyResidueSeq();
   } else {
     ResiduePtrVec sub_residues; 
     std::copy (residues_.begin() + bgn, residues_.begin() + end, 
                std::back_inserter(sub_residues) );
-    return ResidueSeq(sub_residues);
+    return ResSeqPtr(ResidueSeq(sub_residues));
   }
 }
 

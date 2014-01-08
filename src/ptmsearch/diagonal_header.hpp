@@ -26,7 +26,6 @@ class DiagonalHeader {
 public:
 	DiagonalHeader(double n_term_shift,bool n_strict,bool c_strict,bool n_trunc,bool c_trunc);
 	DiagonalHeaderPtr clone();
-	DiagonalHeaderPtr getShift(DiagonalHeaderPtr shift,int bgn,int end);
 	void changeNTermShift(double s){
 		prot_N_term_shift_ -= s;
 		pep_N_term_shift_ -= s;
@@ -212,7 +211,7 @@ private:
 
 	bool is_align_suffix_=false;
 };
-
+DiagonalHeaderPtr getShift(DiagonalHeaderPtr shift,int bgn,int end);
 DiagonalHeaderPtrVec getNTermShiftListCommon(std::vector<double> best_shifts);
 DiagonalHeaderPtrVec getNTermShiftListCompLeft(ProteoformPtr seq,PtmMngPtr mng);
 DiagonalHeaderPtrVec getNTermShiftListCompRight(ProteoformPtr seq,PtmMngPtr mng);

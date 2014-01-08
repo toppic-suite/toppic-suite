@@ -10,25 +10,25 @@
 #include <float.h>
 
 namespace prot {
-bool increaseIJ(int i,int j,double deviation,double tolerace,std::vector<double> ms_masses,std::vector<double> seq_masses){
-	if(deviation <=0){
-		return true;
-	}
-
-	if(i>=ms_masses.size()-1){
-		return false;
-	}
-
-	double next_pos = ms_masses[i+1];
-
-	if(std::abs(next_pos-seq_masses[j])<= tolerace
-			&& (j == seq_masses.size()-1||std::abs(next_pos - seq_masses[j]) < std::abs(next_pos - seq_masses[j+1]))){
-		return true;
-	}
-	else{
-		return false;
-	}
-}
+//bool increaseIJ(int i,int j,double deviation,double tolerace,std::vector<double> ms_masses,std::vector<double> seq_masses){
+//	if(deviation <=0){
+//		return true;
+//	}
+//
+//	if(i>=ms_masses.size()-1){
+//		return false;
+//	}
+//
+//	double next_pos = ms_masses[i+1];
+//
+//	if(std::abs(next_pos-seq_masses[j])<= tolerace
+//			&& (j == seq_masses.size()-1||std::abs(next_pos - seq_masses[j]) < std::abs(next_pos - seq_masses[j+1]))){
+//		return true;
+//	}
+//	else{
+//		return false;
+//	}
+//}
 
 std::vector<double> compPpoDeviation(std::vector<double> ms_masses,std::vector<double> theo_masses,double ppo){
 	std::vector<double> min_distances;

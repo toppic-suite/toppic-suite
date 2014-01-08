@@ -174,4 +174,19 @@ std::string writeToString(xercesc::DOMLSSerializer* serializer, xercesc::DOMNode
   return result;
 }
 
+void writeToStreamByRemovingDoubleLF(std::ofstream &file, std::string &str) {
+  int pos = 0;
+  std::size_t found = str.find("\n\n", pos);
+  while (found != std::string::npos) {
+    std::string sub = str.substr(pos, found - pos);
+    file << sub << std::endl;
+    pos = found + 2;
+    found = str.find("\n\n", pos);
+  }
+  if (pos < str.length()) {
+    std::string sub = str.substr(pos);
+    file << sub << std::endl; 
+  }
+}
+
 }

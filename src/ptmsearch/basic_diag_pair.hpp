@@ -15,6 +15,7 @@
 #include "ptmsearch/diagonal_header.hpp"
 #include "prsm/pair.hpp"
 #include "spec/prm_peak.hpp"
+#include "base/algorithm.hpp"
 
 namespace prot {
 class BasicDiagPair;
@@ -62,7 +63,6 @@ protected:
 
 };
 
-BasicDiagPairPtrVec compDiagPair(PrmMsPtr sp,std::vector<double> seq_masses,DiagonalHeaderPtr header);
 bool contains(BasicDiagPairPtrVec pairs,int y){
 	for(int i=0;i<pairs.size();i++){
 		if(y==pairs[i]->getY()){
@@ -72,6 +72,7 @@ bool contains(BasicDiagPairPtrVec pairs,int y){
 	return false;
 }
 
+BasicDiagPairPtrVec compDiagPair(PrmMsPtr sp,std::vector<double> seq_masses,DiagonalHeaderPtr header);
 BasicDiagPairDiagPtrVec getDiagonals(DiagonalHeaderPtrVec headers,PrmMsPtr ms_six,ProteoformPtr seq,PtmMngPtr mng);
 BasicDiagPairDiagPtr getDiagonal(int cnt,DiagonalHeaderPtr header,PrmMsPtr ms_six,ProteoformPtr seq,PtmMngPtr mng);
 } /* namespace prot */
