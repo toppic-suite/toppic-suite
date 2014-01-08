@@ -93,7 +93,7 @@ void setPrefixSuffix(DiagonalHeaderPtr &header,double c_shift,ProteoformPtr seq,
 }
 
 void setProtTermMod(DiagonalHeaderPtr &header,ProteoformPtr seq,PtmMngPtr mng){
-	int trunc_len = header->getTruncFirstTesPos();
+	int trunc_len = header->getTruncFirstResPos();
 	ResSeqPtr resseq= seq->getResSeqPtr();
 	ProtModPtr mod;
 	if(header->isNTrunc()){
@@ -110,7 +110,7 @@ void setProtTermMod(DiagonalHeaderPtr &header,ProteoformPtr seq,PtmMngPtr mng){
 }
 
 void setProtTermTrunc(DiagonalHeaderPtr &header,ProteoformPtr seq,PtmMngPtr mng){
-	TruncPtr trunc = prot::findProtNTermTrunc(seq->getResSeqPtr(),header->getTruncFirstTesPos(),mng->allow_prot_N_truncs_);
+	TruncPtr trunc = prot::findProtNTermTrunc(seq->getResSeqPtr(),header->getTruncFirstResPos(),mng->allow_prot_N_truncs_);
 	header->setProtNTermAllowTrunc(trunc);
 	trunc = prot::findProtCTermTrunc(seq->getResSeqPtr(),header->getTruncLastResPos(),mng->allow_prot_C_truncs_);
 	header->setProtCTermAllowTrunc(trunc);

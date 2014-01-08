@@ -33,7 +33,7 @@ public:
 		pep_C_term_shift_+=s;
 	}
 
-	int getTruncFirstTesPos(){return trunc_first_res_pos_;}
+	int getTruncFirstResPos(){return trunc_first_res_pos_;}
 
 	int getMatchFirstResPos() const {
 		return match_first_res_pos_;

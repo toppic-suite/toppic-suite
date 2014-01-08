@@ -47,6 +47,8 @@ protected:
 	DPPairPtr getShiftPre(DPPairPtr cur_pair,int p,int s,int type);
 };
 
+typedef std::shared_ptr<PSAlign> PSAlignPtr;
+typedef std::vector<PSAlignPtr> PSAlignPtrVec;
 } /* namespace prot */
 
 #endif /* PS_ALIGN_HPP_ */
