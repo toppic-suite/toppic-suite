@@ -56,6 +56,10 @@ public :
 	double test_term_mod_error_toerance_ = 0.0001;
 	double prefix_suffix_shift_thesh_ = 300;
 
+	double align_min_gap = 0.5;
+	double large_shift_thresh = 300;
+	double large_shift_panelty = 0;
+
 	double adjust_prec_step_width_ = 0.005;
 
 	std::string search_db_file_name_;
