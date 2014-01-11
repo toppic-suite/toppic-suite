@@ -14,6 +14,7 @@
 #include "ptmsearch/ptm_mng.hpp"
 #include "base/proteoform.hpp"
 #include "spec/prm_peak.hpp"
+#include "base/change.hpp"
 
 namespace prot {
 class DiagonalHeader;
@@ -225,6 +226,8 @@ void setAlignPrefSuffic(DiagonalHeaderPtr &header,PtmMngPtr mng);
 DiagonalHeaderPtrVec getNTermShiftListTruncPrefix(ProteoformPtr seq);
 DiagonalHeaderPtrVec getNTermShiftListTruncsuffix(PrmMsPtr ms,ProteoformPtr seq);
 DiagonalHeaderPtrVec get1dHeaders(DiagonalHeaderPtrVec2D headers);
+ChangePtrVec getChanges(DiagonalHeaderPtrVec headers,int first,int last);
+bool getNAcetylation(DiagonalHeaderPtrVec headers);
 } /* namespace prot */
 
 #endif /* DIAGONAL_HEADER_HPP_ */

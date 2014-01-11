@@ -59,11 +59,14 @@ PrSMPtr PtmSlowMatch::geneResult(int shift_num,int type){
 	if(refined_headers.size()==0){
 		return nullptr;
 	}
+
+	ChangePtrVec changes = prot::getChanges(headers,first_pos,last_pos);
 //	Proteoform(DbResSeqPtr db_res_seq_ptr, ProtModPtr prot_mod_ptr,
 //	             ResSeqPtr res_seq_ptr, int start_pos, int end_pos,
 //	             ChangePtrVec change_list);
-	//todo::have some trouble on note book
-	ProteoformPtr protein = ProteoformPtr(new ProteoformPtr(seq_->getDbResSeqPtr(),seq_->getProtModPtr(),seq_->getResSeqPtr(),first_pos,last_pos,seq_->getChangePtrVec()) );
+
+
+	ProteoformPtr protein = ProteoformPtr(new ProteoformPtr(seq_->getDbResSeqPtr(),seq_->getProtModPtr(),seq_->getResSeqPtr(),first_pos,last_pos,changes) );
 	return PrSMPtr(new PrSM(protein,deconv_ms_,refine_prec_mass,0,mng_->sp_para_));
 }
 

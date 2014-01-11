@@ -7,6 +7,7 @@
 
 #include <ptmsearch/diagonal_header.hpp>
 #include "base/prot_mod.hpp"
+#include "base/change.hpp"
 
 namespace prot {
 
@@ -194,4 +195,37 @@ DiagonalHeaderPtrVec get1dHeaders(DiagonalHeaderPtrVec2D headers){
 //	}
 	return header_list;
 }
+
+bool getNAcetylation(DiagonalHeaderPtrVec headers){
+	if(headers.size()==0){
+		return false;
+	}
+	ProtModPtr mod = headers[0]->getProtNTermAllowMod();
+	if(mod->getName().compare("ACETYLATION")==0||mod->getName().compare("NME_ACETYLATION")==0){
+		return true;
+	}
+	return false;
+}
+
+ChangePtrVec getChanges(DiagonalHeaderPtrVec headers,int first,int last){
+	ChangePtrVec change_list;
+	if(headers[0]->getPepNTermAllowMod() != Ptm::getEmptyPtmPtr()){
+		if(getNAcetylation(headers)){
+			change_list.push_back(ChangePtr(new Change(first,headers[0]->getMatchFirstResPos(),PROTEIN_VARIABLE_CHANGE,headers[0]->getPepNTermShift(),headers[0]->getProtNTermAllowMod()->getPtmPtr())));
+		}
+		else{
+			change_list.push_back(ChangePtr(new Change(first,headers[0]->getMatchFirstResPos(),UNEXPECTED_CHANGE,headers[0]->getPepNTermShift(),nullptr)));
+		}
+	}
+	for(int i =0;i<headers.size()-1;i++){
+		change_list.push_back(ChangePtr(new Change(first,headers[0]->getMatchFirstResPos(),UNEXPECTED_CHANGE,headers[0]->getPepNTermShift(),nullptr)));
+	}
+	DiagonalHeaderPtr lastHeader = headers[headers.size()-1];
+	if(lastHeader->getPepCTermAllowMod() != Ptm::getEmptyPtmPtr()){
+		change_list.push_back(ChangePtr(new Change(lastHeader->getMatchLastResPos()+1,last+1,UNEXPECTED_CHANGE,lastHeader->getPepCTermShift(),nullptr)));
+	}
+
+	return change_list;
+}
+
 } /* namespace prot */
