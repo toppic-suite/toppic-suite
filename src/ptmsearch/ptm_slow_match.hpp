@@ -19,6 +19,9 @@
 #include "spec/spectrum_set.hpp"
 #include "ptmsearch/comp_shift_low_mem.hpp"
 #include "ptmsearch/ptm_mng.hpp"
+#include "ptmsearch/diagonal.hpp"
+#include "ptmsearch/basic_diag_pair.hpp"
+#include "ptmsearch/ps_align.hpp"
 
 namespace prot {
 

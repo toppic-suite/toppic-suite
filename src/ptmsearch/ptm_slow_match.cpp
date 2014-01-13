@@ -66,7 +66,7 @@ PrSMPtr PtmSlowMatch::geneResult(int shift_num,int type){
 //	             ChangePtrVec change_list);
 
 
-	ProteoformPtr protein = ProteoformPtr(new ProteoformPtr(seq_->getDbResSeqPtr(),seq_->getProtModPtr(),seq_->getResSeqPtr(),first_pos,last_pos,changes) );
+	ProteoformPtr protein = ProteoformPtr(new Proteoform(seq_->getDbResSeqPtr(),seq_->getProtModPtr(),seq_->getResSeqPtr(),first_pos,last_pos,changes) );
 	return PrSMPtr(new PrSM(protein,deconv_ms_,refine_prec_mass,0,mng_->sp_para_));
 }
 
