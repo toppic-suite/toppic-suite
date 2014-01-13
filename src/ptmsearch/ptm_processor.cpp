@@ -12,6 +12,7 @@
 #include "prsm/prsm.hpp"
 #include "spec/spectrum_set.hpp"
 #include "spec/msalign_reader.hpp"
+#include "prsm/prsm_writer.hpp"
 
 namespace prot {
 
@@ -47,8 +48,8 @@ void PtmProcessor::processDatabase(PtmSearcherPtr searcher){
 
 	MsAlignReader spReader(sp_file_name.c_str(), mng_->base_data_->getActivationPtrVec());
 
-	std::string output_file_name = sp_file_name+"."+mng_->output_file_ext_;
-	PrSMWriter all_writer(output_file_name);
+//	std::string output_file_name = sp_file_name+"."+mng_->output_file_ext_;
+	PrSMWriterPtr all_writer= PrSMWriterPtr(new PrSMWriter(output_file_name));
 
 	std::vector<std::vector<PrSMWriterPtr>> writers;
 	for(int i=0;i<mng_->n_unknown_shift_;i++){
@@ -73,7 +74,7 @@ void PtmProcessor::processDatabase(PtmSearcherPtr searcher){
 				SimplePrSMPtrVec slectedPrsms = prot::findSimplePrsms(simplePrsms_,deconv_sp->getHeaderPtr());
 				//may have adddress;
 				searcher->search(spectrumset,slectedPrsms,prsms);
-				all_writer.writeVector3D(prsms);
+				all_writer->writeVector3D(prsms);
 				for(int j=0;j<mng_->n_unknown_shift_;j++){
 					for(int k=0;k<4;k++){
 						writers[j][k]->writeVector(prsms[j][k]);
