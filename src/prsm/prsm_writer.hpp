@@ -22,12 +22,16 @@ public:
  ~PrSMWriter();
  void write(PrSMPtr prsm_ptr);
  void writeVector(PrSMPtrVec &prsms);
-
+ void writeVector2D(PrSMPtrVec2D &prsms);
+ void writeVector3D(PrSMPtrVec3D &prsms);
 private:
   xercesc::DOMLSSerializer* serializer_;
   XmlDOMDocument* doc_;
   std::ofstream file_;
 };
+
+typedef std::shared_ptr<PrSMWriter> PrSMWriterPtr;
+typedef std::vector<PrSMWriterPtr> PrSMWriterPtrVec;
 
 } /* namespace prot */
 
