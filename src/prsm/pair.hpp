@@ -11,6 +11,7 @@
 #include "spec/extend_peak.hpp"
 #include "spec/theo_peak.hpp"
 #include "prsm/peak_ion_pair.hpp"
+#include "base/algorithm.hpp"
 
 namespace prot {
 
