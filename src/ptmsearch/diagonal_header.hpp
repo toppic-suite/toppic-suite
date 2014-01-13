@@ -215,7 +215,7 @@ private:
 DiagonalHeaderPtr getShift(DiagonalHeaderPtr shift,int bgn,int end);
 DiagonalHeaderPtrVec getNTermShiftListCommon(std::vector<double> best_shifts);
 DiagonalHeaderPtrVec getNTermShiftListCompLeft(ProteoformPtr seq,PtmMngPtr mng);
-DiagonalHeaderPtrVec getNTermShiftListCompRight(ProteoformPtr seq,PtmMngPtr mng);
+DiagonalHeaderPtrVec getNTermShiftListCompRight(ProteoformPtr seq,PrmMsPtr ms_six);
 void setPrefixSuffix(DiagonalHeaderPtr &header,double c_shift,ProteoformPtr seq,PtmMngPtr mng);
 void setProtTermMod(DiagonalHeaderPtr &header,ProteoformPtr seq,PtmMngPtr mng);
 void setProtTermTrunc(DiagonalHeaderPtr &header,ProteoformPtr seq,PtmMngPtr mng);
