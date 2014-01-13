@@ -43,17 +43,22 @@ void PtmProcessor::processDatabase(PtmSearcherPtr searcher){
 	std::string sp_file_name = mng_->spectrum_file_name_;
 	std::string output_file_name = sp_file_name+"."+mng_->output_file_ext_;
 
-	//reader & writer
+	int n_spectra = prot::countSpNum(sp_file_name.c_str(),mng_->base_data_->getActivationPtrVec());
 
 	MsAlignReader spReader(sp_file_name.c_str(), mng_->base_data_->getActivationPtrVec());
 
-//	SimplePrSMPtrVec2D prsms;
-//
-//	for(unsigned int i =0;i<mng_->n_unknown_shift_;i++){
-//		for(unsigned int j=0;j<4;j++){
-//
-//		}
-//	}
+	std::string output_file_name = sp_file_name+"."+mng_->output_file_ext_;
+	PrSMWriter all_writer(output_file_name);
+
+	std::vector<std::vector<PrSMWriterPtr>> writers;
+	for(int i=0;i<mng_->n_unknown_shift_;i++){
+		std::vector<PrSMWriterPtr> temp;
+		for(int j=0;j<4;j++){
+			std::string file_name = output_file_name+"_"+prot::convertToString(i)+"_"+convertSemiAlignmentTypeToString(j);
+			temp.push_back(PrSMWriterPtr(new PrSMWriter(file_name)));
+		}
+		writers.push_back(temp);
+	}
 
 	DeconvMsPtr deconv_sp;
 	PrSMPtrVec3D prsms;
@@ -66,16 +71,18 @@ void PtmProcessor::processDatabase(PtmSearcherPtr searcher){
 				std::string scan = deconv_sp->getHeaderPtr()->getScansString();
 				//update message;
 				SimplePrSMPtrVec slectedPrsms = prot::findSimplePrsms(simplePrsms_,deconv_sp->getHeaderPtr());
-				//todo::searcher.search(spectrumset,slectedPrsms.prsms);
-				//write
+				//may have adddress;
+				searcher->search(spectrumset,slectedPrsms,prsms);
+				all_writer.writeVector3D(prsms);
 				for(int j=0;j<mng_->n_unknown_shift_;j++){
 					for(int k=0;k<4;k++){
-						//write
+						writers[j][k]->writeVector(prsms[j][k]);
 					}
 				}
 			}
 		}
 	}
+	spReader.close();
 }
 
 } /* namespace prot */
