@@ -31,6 +31,23 @@ public:
 	ProteoformPtr getSeq(){return seq_;};
 	double getScr(int shiftnum,int type);
 	PrSMPtr geneResult(int shift_num,int type);
+
+	int getShift() const {
+		return shift_;
+	}
+
+	void setShift(int shift) {
+		shift_ = shift;
+	}
+
+	int getType() const {
+		return type_;
+	}
+
+	void setType(int type) {
+		type_ = type;
+	}
+
 protected:
 	PtmMngPtr mng_;
 	ProteoformPtr seq_;
@@ -40,6 +57,9 @@ protected:
 	DiagonalHeaderPtrVec3D result_headers_;
 	std::vector<std::vector<double>> result_deltas_;
 	std::vector<std::vector<double>> result_scores_;
+private:
+	int shift_;
+	int type_;
 
 	void comp(CompShiftLowMemPtr comp_shift);
 	DiagonalHeaderPtrVec getNTermShiftList(std::vector<double> best_shift,PrmMsPtr ms_six,ProteoformPtr seq,PtmMngPtr mng);
@@ -49,6 +69,9 @@ protected:
 typedef std::shared_ptr<PtmSlowMatch> PtmSlowMatchPtr;
 typedef std::vector<PtmSlowMatchPtr> PtmSlowMatchPtrVec;
 
+bool inline psm_up(PtmSlowMatchPtr f,PtmSlowMatchPtr n){
+	return f->getScr(f->getShift(),f->getType())<n->getScr(n->getShift(),n->getType());
+}
 } /* namespace prot */
 
 #endif /* PTM_SLOW_MATCH_HPP_ */
