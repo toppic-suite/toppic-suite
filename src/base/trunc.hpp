@@ -34,6 +34,13 @@ TruncPtrVec getTruncPtrVecInstance(AcidPtrVec &acid_list,
 TruncPtr getTruncPtrByName(TruncPtrVec &trunc_list, 
                            const std::string &name);
 
+TruncPtr findProtNTermTrunc(ResSeqPtr seq,int trunc_len,TruncPtrVec allowed_trunc);
+
+TruncPtr findProtCTermTrunc(ResSeqPtr seq,int last_res_pos,TruncPtrVec allowed_trunc);
+
+bool isAlignPrefix(TruncPtr n_trunc,double pep_n_term_shift,double threshold);
+
+bool isAlignSuffix(TruncPtr c_trunc,double pep_c_term_shift,double threshold);
 }
 
 #endif

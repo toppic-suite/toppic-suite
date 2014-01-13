@@ -237,5 +237,18 @@ ProteoformPtrVec generateProtModProteoform(ProteoformPtrVec &ori_forms,
   return new_forms;
 }
 
+std::string convertSemiAlignmentTypeToString(int i){
+	if (i==1){
+		return "PREFIX";
+	}
+	if (i==2){
+		return "SUFFIX";
+	}
+	if(i==3){
+		return "INTERNAL";
+	}
+	return "COMPLETE";
+}
+
 } /* namespace prot */
 
