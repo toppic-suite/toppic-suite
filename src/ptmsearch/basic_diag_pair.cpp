@@ -115,4 +115,13 @@ BasicDiagPairDiagPtr getDiagonal(int cnt,DiagonalHeaderPtr header,PrmMsPtr ms_si
 	}
 	return nullptr;
 }
+
+bool contains(BasicDiagPairPtrVec pairs,int y){
+	for(int i=0;i<pairs.size();i++){
+		if(y==pairs[i]->getY()){
+			return true;
+		}
+	}
+	return false;
+}
 } /* namespace prot */

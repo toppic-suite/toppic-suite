@@ -63,14 +63,7 @@ protected:
 
 };
 
-bool contains(BasicDiagPairPtrVec pairs,int y){
-	for(int i=0;i<pairs.size();i++){
-		if(y==pairs[i]->getY()){
-			return true;
-		}
-	}
-	return false;
-}
+bool contains(BasicDiagPairPtrVec pairs,int y);
 
 BasicDiagPairPtrVec compDiagPair(PrmMsPtr sp,std::vector<double> seq_masses,DiagonalHeaderPtr header);
 BasicDiagPairDiagPtrVec getDiagonals(DiagonalHeaderPtrVec headers,PrmMsPtr ms_six,ProteoformPtr seq,PtmMngPtr mng);
