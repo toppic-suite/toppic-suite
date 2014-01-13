@@ -86,7 +86,18 @@ ProteoformPtr getSubProteoform(ProteoformPtr proteoform_ptr, int start, int end)
 ProteoformPtrVec generateProtModProteoform(ProteoformPtrVec &ori_forms,
                                            ResiduePtrVec &residue_list,
                                            ProtModPtrVec &prot_mods);
-
+std::string convertSemiAlignmentTypeToString(int i){
+	if (i==1){
+		return "PREFIX";
+	}
+	if (i==2){
+		return "SUFFIX";
+	}
+	if(i==3){
+		return "INTERNAL";
+	}
+	return "COMPLETE";
+}
 } /* namespace prot */
 
 #endif /* PROTEOFORM_HPP_ */
