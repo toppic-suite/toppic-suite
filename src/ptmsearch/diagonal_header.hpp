@@ -226,7 +226,7 @@ void setAlignPrefSuffic(DiagonalHeaderPtr &header,PtmMngPtr mng);
 DiagonalHeaderPtrVec getNTermShiftListTruncPrefix(ProteoformPtr seq);
 DiagonalHeaderPtrVec getNTermShiftListTruncsuffix(PrmMsPtr ms,ProteoformPtr seq);
 DiagonalHeaderPtrVec get1dHeaders(DiagonalHeaderPtrVec2D headers);
-ChangePtrVec getChanges(DiagonalHeaderPtrVec headers,int first,int last);
+ChangePtrVec getChanges(DiagonalHeaderPtrVec headers,int first,int last,PtmPtrVec ptm_list);
 bool getNAcetylation(DiagonalHeaderPtrVec headers);
 } /* namespace prot */
 

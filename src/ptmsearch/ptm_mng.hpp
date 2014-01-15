@@ -19,8 +19,8 @@ namespace prot {
 
 class PtmMng {
 public :
-	PtmMng();
-	BaseDataPtr base_data_ = BaseDataPtr(new BaseData(""));
+	PtmMng(std::string config_file_name);
+	BaseDataPtr base_data_ ;
 
 	double ppo_ = 0.000015;
 	bool use_min_tolerance_ = true;

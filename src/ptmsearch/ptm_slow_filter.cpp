@@ -16,12 +16,13 @@ PtmSlowFilter::PtmSlowFilter(SpectrumSetPtr spectrum_set,SimplePrSMPtrVec fast_M
 }
 PtmSlowMatchPtrVec PtmSlowFilter::getBestMatch(int nshift,int type){
 	PtmSlowMatchPtrVec matches;
-	for(int i=0;i<slow_matches_.size();i++){
+	for(unsigned int i=0;i<slow_matches_.size();i++){
 		slow_matches_[i]->setShift(nshift);
 		slow_matches_[i]->setType(type);
 		matches.push_back(slow_matches_[i]);
 	}
 
 	std::sort(matches.begin(),matches.end(),prot::psm_up);
+	return matches;
 }
 } /* namespace prot */

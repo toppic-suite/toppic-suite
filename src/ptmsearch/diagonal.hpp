@@ -12,6 +12,7 @@
 #include "ptmsearch/diagonal_header.hpp"
 #include "prsm/peak_ion_pair.hpp"
 #include "prsm/pair.hpp"
+#include "spec/theo_peak.hpp"
 
 namespace prot {
 
@@ -53,7 +54,7 @@ private:
 };
 
 DiagonalHeaderPtrVec refineHeadersBgnEnd(int first_pos,ProteoformPtr seq,DeconvMsPtr deconv_ms,ExtendMsPtr ms_three,PtmMngPtr mng,DiagonalHeaderPtrVec headers);
-TheoPeakPtrVec getTheoPeak(ProteoformPtr seq,ActivationPtr type,DiagonalHeaderPtrVec headers,int i,double min_mass);
+//TheoPeakPtrVec getTheoPeak(ProteoformPtr seq,ActivationPtr type,DiagonalHeaderPtrVec headers,int i,double min_mass);
 int getNewBgn(PeakIonPairPtrVec pairs);
 int getNewEnd(PeakIonPairPtrVec pairs);
 } /* namespace prot */

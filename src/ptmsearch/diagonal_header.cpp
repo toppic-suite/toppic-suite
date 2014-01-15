@@ -207,9 +207,10 @@ bool getNAcetylation(DiagonalHeaderPtrVec headers){
 	return false;
 }
 
-ChangePtrVec getChanges(DiagonalHeaderPtrVec headers,int first,int last){
+ChangePtrVec getChanges(DiagonalHeaderPtrVec headers,int first,int last,PtmPtrVec ptm_list){
+
 	ChangePtrVec change_list;
-	if(headers[0]->getPepNTermAllowMod() != Ptm::getEmptyPtmPtr()){
+	if(headers[0]->getPepNTermAllowMod() != prot::findEmptyPtmPtr(ptm_list)){
 		if(getNAcetylation(headers)){
 			change_list.push_back(ChangePtr(new Change(first,headers[0]->getMatchFirstResPos(),PROTEIN_VARIABLE_CHANGE,headers[0]->getPepNTermShift(),headers[0]->getProtNTermAllowMod()->getPtmPtr())));
 		}
@@ -217,11 +218,11 @@ ChangePtrVec getChanges(DiagonalHeaderPtrVec headers,int first,int last){
 			change_list.push_back(ChangePtr(new Change(first,headers[0]->getMatchFirstResPos(),UNEXPECTED_CHANGE,headers[0]->getPepNTermShift(),nullptr)));
 		}
 	}
-	for(int i =0;i<headers.size()-1;i++){
+	for(unsigned int i =0;i<headers.size()-1;i++){
 		change_list.push_back(ChangePtr(new Change(first,headers[0]->getMatchFirstResPos(),UNEXPECTED_CHANGE,headers[0]->getPepNTermShift(),nullptr)));
 	}
 	DiagonalHeaderPtr lastHeader = headers[headers.size()-1];
-	if(lastHeader->getPepCTermAllowMod() != Ptm::getEmptyPtmPtr()){
+	if(lastHeader->getPepCTermAllowMod() != prot::findEmptyPtmPtr(ptm_list)){
 		change_list.push_back(ChangePtr(new Change(lastHeader->getMatchLastResPos()+1,last+1,UNEXPECTED_CHANGE,lastHeader->getPepCTermShift(),nullptr)));
 	}
 

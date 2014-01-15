@@ -26,7 +26,12 @@ void PtmProcessor::init(){
 	std::string sp_file_name = mng_->spectrum_file_name_;
 	std::string simplePrsmFileName = mng_->spectrum_file_name_ + "." + mng_->input_file_ext_;
 	simplePrsms_  = prot::readSimplePrSM(simplePrsmFileName.c_str());
-	prsmFindSeq(simplePrsms_,seqs_);
+	//todo::
+//	std::cout<< simplePrsms_.size() << std::endl;
+//	for(int i=0;i<simplePrsms_.size();i++){
+//		std::cout<< simplePrsms_[i]->getSeqId() << std::endl;
+//	}
+//	prsmFindSeq(simplePrsms_,seqs_);
 }
 
 void PtmProcessor::prsmFindSeq(SimplePrSMPtrVec simple_prsms,ProteoformPtrVec seqs){
@@ -72,6 +77,7 @@ void PtmProcessor::processDatabase(PtmSearcherPtr searcher){
 				std::string scan = deconv_sp->getHeaderPtr()->getScansString();
 				//update message;
 				SimplePrSMPtrVec slectedPrsms = prot::findSimplePrsms(simplePrsms_,deconv_sp->getHeaderPtr());
+//				std::cout<< slectedPrsms.size() << std::endl;
 				//may have adddress;
 				searcher->search(spectrumset,slectedPrsms,prsms);
 				all_writer->writeVector3D(prsms);

@@ -18,7 +18,7 @@ TheoPeak::TheoPeak(IonPtr ion,double unmod_mass,double shift):
 	shift_ = shift;
 }
 
-TheoPeakPtrVec getTheoPeak(BpSpecPtr pep,ActivationPtr type, NeutralLossPtr neutral_loss_ptr, 
+TheoPeakPtrVec getTheoPeak(BpSpecPtr pep,ActivationPtr type, NeutralLossPtr neutral_loss_ptr,
                            double n_term_shift,double c_term_shift,int bgn,int end,double min_mass){
 	TheoPeakPtrVec theo_peaks;
 	BreakPointPtrVec bps = pep->getBreakPointPtrVec();
@@ -54,7 +54,7 @@ TheoPeakPtrVec getProteoformTheoPeak(ProteoformPtr proteoform_ptr,
   TheoPeakPtrVec all_peaks;
   SegmentPtrVec segments = proteoform_ptr->getSegmentPtrVec();
   for (unsigned int i = 0; i < segments.size(); i++) {
-    TheoPeakPtrVec  peaks = getTheoPeak(bp_ptr, activation_ptr, NeutralLossPtr(nullptr), 
+    TheoPeakPtrVec  peaks = getTheoPeak(bp_ptr, activation_ptr, NeutralLossPtr(nullptr),
                                         segments[i]->getPepNTermShift(),
                                         segments[i]->getPepCTermShift(), segments[i]->getLeftBpPos(),
                                         segments[i]->getRightBpPos(), min_mass);

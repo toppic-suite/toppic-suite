@@ -60,7 +60,7 @@ PrSMPtr PtmSlowMatch::geneResult(int shift_num,int type){
 		return nullptr;
 	}
 
-	ChangePtrVec changes = prot::getChanges(headers,first_pos,last_pos);
+	ChangePtrVec changes = prot::getChanges(headers,first_pos,last_pos,mng_->base_data_->getPtmPtrVec());
 //	Proteoform(DbResSeqPtr db_res_seq_ptr, ProtModPtr prot_mod_ptr,
 //	             ResSeqPtr res_seq_ptr, int start_pos, int end_pos,
 //	             ChangePtrVec change_list);
