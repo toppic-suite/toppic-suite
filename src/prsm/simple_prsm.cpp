@@ -49,6 +49,7 @@ int SimplePrSM::compareTo(SimplePrSMPtr simple_prsm_ptr){
 }
 void SimplePrSM::findSeq(std::vector<ProteoformPtr> seqs){
 	seq_ = seqs[seq_id_];
+
 	if(seq_->getSeqId() != seq_id_ || seq_->getName().compare(seq_name_)!=0){
 		std::cout<< "Sequence ID and/or name is not consistent!" << std::endl;
 		std::exit(0);
@@ -104,6 +105,17 @@ SimplePrSMPtrVec readSimplePrSM(const char * filename){
 		delete doc;
 	}
 	return results;
+}
+
+SimplePrSMPtrVec findSimplePrsms(SimplePrSMPtrVec simple_prsm,MsHeaderPtr header){
+	SimplePrSMPtrVec prsms ;
+	for(int i=0;i<simple_prsm.size();i++){
+		SimplePrSMPtr prsm = simple_prsm[i];
+		if(prsm->isMatch(header)){
+			prsms.push_back(prsm);
+		}
+	}
+	return prsms;
 }
 
 } /* namespace prot */

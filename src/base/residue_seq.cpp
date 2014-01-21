@@ -46,9 +46,9 @@ void ResidueSeq::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
 	parent->appendChild(element);
 }
 
-ResidueSeq getEmptyResidueSeq() {
+ResSeqPtr getEmptyResidueSeq() {
   ResiduePtrVec residues;
-  return ResidueSeq(residues);
+  return ResSeqPtr(ResidueSeq(residues));
 }
 
 }

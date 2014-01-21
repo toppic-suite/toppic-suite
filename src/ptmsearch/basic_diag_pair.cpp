@@ -8,6 +8,26 @@
 #include <ptmsearch/basic_diag_pair.hpp>
 
 namespace prot {
+BasicDiagPair::BasicDiagPair(int x,int y,double score,int diag_order,double diff,int prm_peak_type):Pair(x,y){
+	score_ = score;
+	diag_order_= diag_order;
+	diff_=diff;
+	base_type_ = prm_peak_type;
+}
+BasicDiagPair::BasicDiagPair(int x,int y,double score,int diag_order,double diff,int prm_peak_type,BasicDiagPairDiagPtr diagonal):Pair(x,y){
+	score_=0.0;
+	diag_order_= diag_order;
+	diff_=diff;
+	base_type_ = prm_peak_type;
+	diagonal_=diagonal;
+}
+BasicDiagPair::BasicDiagPair(BasicDiagPairPtr pair):Pair(pair->getX(),pair->getY()){
+	score_=0.0;
+	//can be null in java;
+	base_type_=-1;
+	diag_order_= pair->getDiagOrder();
+	diff_=pair->getDiff();
+}
 BasicDiagPairPtrVec compDiagPair(PrmMsPtr sp,std::vector<double> seq_masses,DiagonalHeaderPtr header){
 	int i=1;
 	int j=0;
@@ -94,5 +114,14 @@ BasicDiagPairDiagPtr getDiagonal(int cnt,DiagonalHeaderPtr header,PrmMsPtr ms_si
 		return temp;
 	}
 	return nullptr;
+}
+
+bool contains(BasicDiagPairPtrVec pairs,int y){
+	for(int i=0;i<pairs.size();i++){
+		if(y==pairs[i]->getY()){
+			return true;
+		}
+	}
+	return false;
 }
 } /* namespace prot */

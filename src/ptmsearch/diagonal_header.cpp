@@ -7,6 +7,7 @@
 
 #include <ptmsearch/diagonal_header.hpp>
 #include "base/prot_mod.hpp"
+#include "base/change.hpp"
 
 namespace prot {
 
@@ -93,7 +94,7 @@ void setPrefixSuffix(DiagonalHeaderPtr &header,double c_shift,ProteoformPtr seq,
 }
 
 void setProtTermMod(DiagonalHeaderPtr &header,ProteoformPtr seq,PtmMngPtr mng){
-	int trunc_len = header->getTruncFirstTesPos();
+	int trunc_len = header->getTruncFirstResPos();
 	ResSeqPtr resseq= seq->getResSeqPtr();
 	ProtModPtr mod;
 	if(header->isNTrunc()){
@@ -110,7 +111,7 @@ void setProtTermMod(DiagonalHeaderPtr &header,ProteoformPtr seq,PtmMngPtr mng){
 }
 
 void setProtTermTrunc(DiagonalHeaderPtr &header,ProteoformPtr seq,PtmMngPtr mng){
-	TruncPtr trunc = prot::findProtNTermTrunc(seq->getResSeqPtr(),header->getTruncFirstTesPos(),mng->allow_prot_N_truncs_);
+	TruncPtr trunc = prot::findProtNTermTrunc(seq->getResSeqPtr(),header->getTruncFirstResPos(),mng->allow_prot_N_truncs_);
 	header->setProtNTermAllowTrunc(trunc);
 	trunc = prot::findProtCTermTrunc(seq->getResSeqPtr(),header->getTruncLastResPos(),mng->allow_prot_C_truncs_);
 	header->setProtCTermAllowTrunc(trunc);
@@ -194,4 +195,38 @@ DiagonalHeaderPtrVec get1dHeaders(DiagonalHeaderPtrVec2D headers){
 //	}
 	return header_list;
 }
+
+bool getNAcetylation(DiagonalHeaderPtrVec headers){
+	if(headers.size()==0){
+		return false;
+	}
+	ProtModPtr mod = headers[0]->getProtNTermAllowMod();
+	if(mod->getName().compare("ACETYLATION")==0||mod->getName().compare("NME_ACETYLATION")==0){
+		return true;
+	}
+	return false;
+}
+
+ChangePtrVec getChanges(DiagonalHeaderPtrVec headers,int first,int last,PtmPtrVec ptm_list){
+
+	ChangePtrVec change_list;
+	if(headers[0]->getPepNTermAllowMod() != prot::findEmptyPtmPtr(ptm_list)){
+		if(getNAcetylation(headers)){
+			change_list.push_back(ChangePtr(new Change(first,headers[0]->getMatchFirstResPos(),PROTEIN_VARIABLE_CHANGE,headers[0]->getPepNTermShift(),headers[0]->getProtNTermAllowMod()->getPtmPtr())));
+		}
+		else{
+			change_list.push_back(ChangePtr(new Change(first,headers[0]->getMatchFirstResPos(),UNEXPECTED_CHANGE,headers[0]->getPepNTermShift(),nullptr)));
+		}
+	}
+	for(unsigned int i =0;i<headers.size()-1;i++){
+		change_list.push_back(ChangePtr(new Change(first,headers[0]->getMatchFirstResPos(),UNEXPECTED_CHANGE,headers[0]->getPepNTermShift(),nullptr)));
+	}
+	DiagonalHeaderPtr lastHeader = headers[headers.size()-1];
+	if(lastHeader->getPepCTermAllowMod() != prot::findEmptyPtmPtr(ptm_list)){
+		change_list.push_back(ChangePtr(new Change(lastHeader->getMatchLastResPos()+1,last+1,UNEXPECTED_CHANGE,lastHeader->getPepCTermShift(),nullptr)));
+	}
+
+	return change_list;
+}
+
 } /* namespace prot */

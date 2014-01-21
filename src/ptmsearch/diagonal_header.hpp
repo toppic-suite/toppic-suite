@@ -14,6 +14,7 @@
 #include "ptmsearch/ptm_mng.hpp"
 #include "base/proteoform.hpp"
 #include "spec/prm_peak.hpp"
+#include "base/change.hpp"
 
 namespace prot {
 class DiagonalHeader;
@@ -33,7 +34,7 @@ public:
 		pep_C_term_shift_+=s;
 	}
 
-	int getTruncFirstTesPos(){return trunc_first_res_pos_;}
+	int getTruncFirstResPos(){return trunc_first_res_pos_;}
 
 	int getMatchFirstResPos() const {
 		return match_first_res_pos_;
@@ -214,7 +215,7 @@ private:
 DiagonalHeaderPtr getShift(DiagonalHeaderPtr shift,int bgn,int end);
 DiagonalHeaderPtrVec getNTermShiftListCommon(std::vector<double> best_shifts);
 DiagonalHeaderPtrVec getNTermShiftListCompLeft(ProteoformPtr seq,PtmMngPtr mng);
-DiagonalHeaderPtrVec getNTermShiftListCompRight(ProteoformPtr seq,PtmMngPtr mng);
+DiagonalHeaderPtrVec getNTermShiftListCompRight(ProteoformPtr seq,PrmMsPtr ms_six);
 void setPrefixSuffix(DiagonalHeaderPtr &header,double c_shift,ProteoformPtr seq,PtmMngPtr mng);
 void setProtTermMod(DiagonalHeaderPtr &header,ProteoformPtr seq,PtmMngPtr mng);
 void setProtTermTrunc(DiagonalHeaderPtr &header,ProteoformPtr seq,PtmMngPtr mng);
@@ -225,6 +226,8 @@ void setAlignPrefSuffic(DiagonalHeaderPtr &header,PtmMngPtr mng);
 DiagonalHeaderPtrVec getNTermShiftListTruncPrefix(ProteoformPtr seq);
 DiagonalHeaderPtrVec getNTermShiftListTruncsuffix(PrmMsPtr ms,ProteoformPtr seq);
 DiagonalHeaderPtrVec get1dHeaders(DiagonalHeaderPtrVec2D headers);
+ChangePtrVec getChanges(DiagonalHeaderPtrVec headers,int first,int last,PtmPtrVec ptm_list);
+bool getNAcetylation(DiagonalHeaderPtrVec headers);
 } /* namespace prot */
 
 #endif /* DIAGONAL_HEADER_HPP_ */

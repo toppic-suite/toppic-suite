@@ -8,7 +8,8 @@
 #include "ptm_mng.hpp"
 
 namespace prot {
-PtmMng::PtmMng(){
+PtmMng::PtmMng(std::string config_file_name){
+	base_data_=BaseDataPtr(new BaseData(config_file_name));
 	allow_prot_N_mods_.push_back(prot::getProtModPtrByName(base_data_->getProtModPtrVec(),"NONE"));
 	allow_prot_N_mods_.push_back(prot::getProtModPtrByName(base_data_->getProtModPtrVec(),"ACETYLATION"));
 	allow_prot_N_mods_.push_back(prot::getProtModPtrByName(base_data_->getProtModPtrVec(),"NME"));

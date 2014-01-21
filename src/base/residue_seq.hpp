@@ -47,7 +47,7 @@ class ResidueSeq {
   double residue_mass_sum_;
 };
 
-ResidueSeq getEmptyResidueSeq();
+ResSeqPtr getEmptyResidueSeq();
 
 }
 #endif
