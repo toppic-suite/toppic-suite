@@ -75,7 +75,13 @@ ProtModPtr getProtModPtrByName(ProtModPtrVec &prot_mod_list,
   return ProtModPtr(nullptr);
 }
 
-bool allowMod(ProtModPtr mod, ResiduePtrVec &residues){
+//todo:: problems NME_ACETYLATION? protshif?
+double getProtModAcetylationShift(ProtModPtrVec &prot_mod_list){
+	ProtModPtr ace = getProtModPtrByName(prot_mod_list,"ACETYLATION");
+	return ace->getPtmPtr()->getMonoMass();
+}
+
+bool allowMod(ProtModPtr mod, ResiduePtrVec residues){
 	if(mod->getName().compare("NONE")==0){
 		return true;
 	}

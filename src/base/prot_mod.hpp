@@ -20,6 +20,8 @@ class ProtMod {
 
   PtmPtr getPtmPtr() {return ptm_ptr_;}
 
+  AcidPtrVec getAcidPtrVec(){return valid_acid_ptrs_;}
+
   double getProtShift() {return prot_shift_;}
 
   double getPepShift() {return pep_shift_;}
@@ -48,7 +50,7 @@ ProtModPtr getProtModPtrByName(ProtModPtrVec &prot_mod_list,
 
 double getProtModAcetylationShift(ProtModPtrVec &prot_mod_list);
 
-bool allowMod(ProtModPtr prot_mod_ptr, ResiduePtrVec &residues);
+bool allowMod(ProtModPtr prot_mod_ptr, ResiduePtrVec residues);
 
 }
 #endif
