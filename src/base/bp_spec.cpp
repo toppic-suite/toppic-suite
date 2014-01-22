@@ -10,8 +10,7 @@
 #include <string>
 #include <vector>
 
-#include <base/logger.hpp>
-
+#include "base/logger.hpp"
 #include "base/bp_spec.hpp"
 
 namespace prot {
@@ -26,9 +25,11 @@ void BpSpec::initBreakPoints(ResSeqPtr res_seq_ptr){
 	if(ext_len <= 1){
 		ext_len = 2;
 	}
-	break_point_ptr_vec_.push_back(BreakPointPtr(new BreakPoint(0,res_seq_ptr->getResMassSum())));
+  BreakPointPtr first_ptr(new BreakPoint(0,res_seq_ptr->getResMassSum()));
+	break_point_ptr_vec_.push_back(first_ptr);
+
 	double prm = 0;
-	for(int i=0;i<res_seq_ptr->getLen()-1;i++){
+	for(int i=0; i<res_seq_ptr->getLen()-1; i++){
 		prm += res_seq_ptr->getResiduePtr(i)->getMass();
 		double srm = res_seq_ptr->getResMassSum()-prm;
 		if(srm <0){
@@ -36,24 +37,25 @@ void BpSpec::initBreakPoints(ResSeqPtr res_seq_ptr){
 		}
 		break_point_ptr_vec_.push_back(BreakPointPtr(new BreakPoint(prm,srm)));
 	}
-	break_point_ptr_vec_.push_back(BreakPointPtr(new BreakPoint(res_seq_ptr->getResMassSum(),0)));
+  BreakPointPtr last_ptr((new BreakPoint(res_seq_ptr->getResMassSum(),0)));
+	break_point_ptr_vec_.push_back(last_ptr);
 }
 
 //
 std::vector<double> BpSpec::getBreakPointMasses(IonTypePtr ion_type){
-	std::vector<double> bpmass_vec;
+	std::vector<double> bp_mass_vec;
 	if (ion_type->isNTerm()) {
 		for (unsigned int i = 0; i < break_point_ptr_vec_.size(); i++) {
-			bpmass_vec.push_back(break_point_ptr_vec_[i]->getNTermMass(ion_type));
+			bp_mass_vec.push_back(break_point_ptr_vec_[i]->getNTermMass(ion_type));
 		}
 	}
   else {
 		for (unsigned int i = 0; i < break_point_ptr_vec_.size(); i++) {
-			bpmass_vec.push_back(break_point_ptr_vec_[i]->getCTermMass(ion_type));
+			bp_mass_vec.push_back(break_point_ptr_vec_[i]->getCTermMass(ion_type));
 		}
 	}
-	std::sort(bpmass_vec.begin(),bpmass_vec.end(),std::less<double>());
-	return bpmass_vec;
+	std::sort(bp_mass_vec.begin(),bp_mass_vec.end(),std::less<double>());
+	return bp_mass_vec;
 }
 
 //
@@ -69,13 +71,16 @@ std::vector<double> BpSpec::getPrmMasses() {
 
 void BpSpec::addBreakPointMass(double mass,double seq_mass,double min_mass,
                                std::vector<double> &mass_vec){
-	if (mass >= min_mass &&  mass <= seq_mass - min_mass){
+	if (mass >= min_mass && mass <= seq_mass - min_mass){
 		mass_vec.push_back(mass);
 	}
 }
 
-std::vector<double> BpSpec::getBreakPointMasses(double n_term_shift,double c_term_shift,double min_mass,
-		IonTypePtr ion_type_ptr_n,IonTypePtr ion_type_ptr_c){
+std::vector<double> BpSpec::getBreakPointMasses(double n_term_shift,
+                                                double c_term_shift,
+                                                double min_mass,
+		                                            IonTypePtr ion_type_ptr_n,
+                                                IonTypePtr ion_type_ptr_c){
 	std::vector<double> result;
 	result.push_back(0.0);
 	double new_seq_mass = seq_mass_ + n_term_shift + c_term_shift;
@@ -91,19 +96,18 @@ std::vector<double> BpSpec::getBreakPointMasses(double n_term_shift,double c_ter
 	}
 	result.push_back(new_seq_mass);
 	std::sort(result.begin(),result.end(),std::less<double>());
-
 	return result;
 }
 
 std::vector<int> BpSpec::getScaledMass(double scale,IonTypePtr ion_type){
 	std::vector<int> result;
-	if (ion_type->getName().compare("B")==0 || ion_type->getName().compare("C")==0){
+	if (ion_type->isNTerm()) {
 		for(unsigned int i=0; i < break_point_ptr_vec_.size();i++){
 			double value = break_point_ptr_vec_[i]->getNTermMass(ion_type)*scale;
 			result.push_back(std::floor(value+0.5));
 		}
 	}
-	if (ion_type->getName().compare("Y")==0 || ion_type->getName().compare("Z_DOT")==0){
+  else {
 		for(unsigned int i=0; i < break_point_ptr_vec_.size();i++){
 			double value = break_point_ptr_vec_[i]->getCTermMass(ion_type)*scale;
 			result.push_back(std::floor(value+0.5));
@@ -116,7 +120,7 @@ void BpSpec::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
 	xercesc::DOMElement* element = xml_doc->createElement("bp_spec");
 	std::string str = convertToString(seq_mass_);
 	xml_doc->addElement(element, "seq_mass", str.c_str());
-	xercesc::DOMElement* bplist = xml_doc->createElement("breakpoint_list");
+	xercesc::DOMElement* bplist = xml_doc->createElement("break_point_list");
 	for(unsigned int i=0;i<break_point_ptr_vec_.size();i++){
 		break_point_ptr_vec_[i]->appendXml(xml_doc,bplist);
 	}
@@ -124,28 +128,28 @@ void BpSpec::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
 	parent->appendChild(element);
 }
 
-int getFirstResPos(double n_term_shift,std::vector<double> extbmasses){
+int getFirstResPos(double n_term_shift,std::vector<double> ext_b_masses){
 	double trunc_len = - n_term_shift;
 	int best_pos = -1;
-	double best_shift = 2139095040.0;
-	for(unsigned int i = 0; i < extbmasses.size();i++){
-		if(std::abs(extbmasses[i] - trunc_len) < best_shift){
+	double best_shift = std::numeric_limits<double>::infinity();
+	for(unsigned int i = 0; i < ext_b_masses.size();i++){
+		if(std::abs(ext_b_masses[i] - trunc_len) < best_shift){
 			best_pos = i;
-			best_shift = std::abs(extbmasses[i] - trunc_len);
+			best_shift = std::abs(ext_b_masses[i] - trunc_len);
 		}
 	}
 	return best_pos;
 }
 
-int getLastResPos(double c_term_shift,std::vector<double> extbmasses){
+int getLastResPos(double c_term_shift,std::vector<double> ext_b_masses){
 	double trunc_len = -c_term_shift;
 	int best_pos = -1;
-	double best_shift = 2139095040.0;
-	double pep_mass = extbmasses[extbmasses.size()-1];
-	for(unsigned int i=0;i<extbmasses.size();i++){
-		if (std::abs(pep_mass-extbmasses[i]-trunc_len)<best_shift){
+	double best_shift = std::numeric_limits<double>::infinity();
+	double pep_mass = ext_b_masses[ext_b_masses.size()-1];
+	for(unsigned int i=0;i<ext_b_masses.size();i++){
+		if (std::abs(pep_mass-ext_b_masses[i]-trunc_len)<best_shift){
 			best_pos=i;
-			best_shift = std::abs(pep_mass-extbmasses[i]-trunc_len);
+			best_shift = std::abs(pep_mass-ext_b_masses[i]-trunc_len);
 		}
 	}
 	if(best_pos < 0){

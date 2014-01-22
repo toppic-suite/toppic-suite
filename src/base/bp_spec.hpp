@@ -15,10 +15,10 @@ namespace prot {
 
 class BpSpec {
 public:
-	BpSpec(){};
+	BpSpec() {};
   BpSpec(ResSeqPtr res_seq_ptr);
-	BreakPointPtrVec getBreakPointPtrVec(){return break_point_ptr_vec_;}
-	BreakPointPtr getBreakPointPtr(int i){return break_point_ptr_vec_[i];}
+	BreakPointPtrVec getBreakPointPtrVec() {return break_point_ptr_vec_;}
+	BreakPointPtr getBreakPointPtr(int i) {return break_point_ptr_vec_[i];}
 
 	/*implement the function getExt[B\Y\C\Z_DOT]masses and getNTermMasses and getCTermMass*/
 	std::vector<double> getBreakPointMasses(IonTypePtr ion_type_ptr);
@@ -31,7 +31,7 @@ public:
 
 	/*implement the function getScaledBMass*/
 	std::vector<int> getScaledMass(double scale,IonTypePtr iong_type);
-	double getResSeqMass(){return seq_mass_;}
+	double getResSeqMass() {return seq_mass_;}
 	void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
 private:
@@ -48,9 +48,8 @@ typedef std::shared_ptr<BpSpec> BpSpecPtr;
 typedef std::vector<BpSpecPtr> BpSpecPtrVec;
 
 /*come from BpSpec Util*/
-int getFirstResPos(double n_term_shift,std::vector<double> extbmasses);
-int getLastResPos(double c_term_shift,std::vector<double> extbmasses);
-
+int getFirstResPos(double n_term_shift,std::vector<double> ext_b_masses);
+int getLastResPos(double c_term_shift,std::vector<double> ext_b_masses);
 
 } /* namespace prot */
 
