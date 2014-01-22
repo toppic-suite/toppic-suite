@@ -85,19 +85,19 @@ public:
 	}
 
 	bool isAllowPepNMod(){
-		return pep_N_term_allow_mod_ == nullptr;
+		return pep_N_term_allow_mod_ != nullptr;
 	}
 
 	bool isAllowPepCMod(){
-		return pep_C_term_allow_mod_ == nullptr;
+		return pep_C_term_allow_mod_ != nullptr;
 	}
 
 	bool isAllowProtNMod(){
-		return prot_N_term_allow_mod_ ==nullptr;
+		return prot_N_term_allow_mod_ !=nullptr;
 	}
 
 	bool isAllowProtCMod(){
-		return prot_C_term_allow_mod_ ==nullptr;
+		return prot_C_term_allow_mod_ !=nullptr;
 	}
 
 	const TruncPtr& getProtCTermAllowTrunc() const {
@@ -191,7 +191,7 @@ private:
 	bool n_strict_ = false;
 	int trunc_first_res_pos_=0;
 	int match_first_res_pos_=0;
-	double prot_N_term_shift_;
+	double prot_N_term_shift_=0;
 	double pep_N_term_shift_=0.0;
 
 	TruncPtr prot_N_term_allow_trunc_;

@@ -22,7 +22,7 @@ PtmSlowMatchPtrVec PtmSlowFilter::getBestMatch(int nshift,int type){
 		matches.push_back(slow_matches_[i]);
 	}
 
-	std::sort(matches.begin(),matches.end(),prot::psm_up);
+	std::sort(matches.begin(),matches.end(),prot::psm_down);
 	return matches;
 }
 } /* namespace prot */

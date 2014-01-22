@@ -22,7 +22,7 @@ DiagonalHeaderPtrVec refineHeadersBgnEnd(int first_pos,ProteoformPtr seq,DeconvM
 
 		if(pairs.size()<1){
 			int pair_size = pairs.size();
-			LOG_WARN("Empty Segment is found "+prot::convertToString(pair_size));
+//			LOG_WARN("Empty Segment is found "+prot::convertToString(pair_size));
 		}
 		else{
 			int new_bgn = first_pos + getNewBgn(pairs);

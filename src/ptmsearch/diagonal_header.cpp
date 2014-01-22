@@ -57,7 +57,7 @@ DiagonalHeaderPtrVec getNTermShiftListCompLeft(ProteoformPtr seq,PtmMngPtr mng){
 	DiagonalHeaderPtrVec extend_n_term_shifts;
 	double shift;
 	for(int i=0;i<mng->allow_prot_N_mods_.size();i++){
-		if(prot::allowMod(mng->allow_prot_N_mods_[i],mng->base_data_->getResiduePtrVec()) && mng->allow_prot_N_mods_[i]->getPepShift()==0){
+		if(prot::allowMod(mng->allow_prot_N_mods_[i],seq->getResSeqPtr()->getResidues()) && mng->allow_prot_N_mods_[i]->getPepShift()==0){
 			shift = mng->allow_prot_N_mods_[i]->getProtShift();
 			extend_n_term_shifts.push_back(DiagonalHeaderPtr(new DiagonalHeader(shift,true,false,true,false)));
 		}
@@ -70,23 +70,27 @@ DiagonalHeaderPtrVec getNTermShiftListCompRight(ProteoformPtr seq,PrmMsPtr ms_si
 	std::vector<double> ms_masses = prot::getMassList(ms_six);
 	std::vector<double> seq_masses = seq->getBpSpecPtr()->getBreakPointMasses(IonTypePtr(new IonType("B",true,0)));
 	double shift = ms_masses[ms_masses.size()-1] - seq_masses[seq_masses.size()-1];
-	extend_n_term_shifts.push_back(DiagonalHeaderPtr(new DiagonalHeader(shift,true,false,true,false)));
+	extend_n_term_shifts.push_back(DiagonalHeaderPtr(new DiagonalHeader(shift,false,true,false,true)));
 	return extend_n_term_shifts;
 }
 
 void setPrefixSuffix(DiagonalHeaderPtr &header,double c_shift,ProteoformPtr seq,PtmMngPtr mng){
 	header->setProtCTermShift(c_shift);
+
 	std::vector<double> seq_b_masses = seq->getBpSpecPtr()->getBreakPointMasses(IonTypePtr(new IonType("B",true,0)));
 	double prot_n_term_shift = header->getProtNTermShift();
 	double prot_c_term_shift = header->getProtCTermShift();
 	int trunc_first_res_pos = prot::getFirstResPos(prot_n_term_shift,seq_b_masses);
+
 	header->setTruncFirstResPos(trunc_first_res_pos);
-	int trunc_last_res_pos = prot::getLastResPos(prot_n_term_shift,seq_b_masses);
+	int trunc_last_res_pos = prot::getLastResPos(prot_c_term_shift,seq_b_masses);
+//	std::cout<<trunc_last_res_pos<<std::endl;
 	header->setTruncLastResPos(trunc_last_res_pos);
 	double pep_n_term_shift = prot_n_term_shift + seq_b_masses[trunc_first_res_pos];
 	header->setPepNTermShift(pep_n_term_shift);
 	double pep_c_term_shift = prot_c_term_shift + seq_b_masses[seq_b_masses.size()-1]-seq_b_masses[trunc_last_res_pos+1];
 	header->setPepCTermShift(pep_c_term_shift);
+
 	prot::setProtTermMod(header,seq,mng);
 	prot::setProtTermTrunc(header,seq,mng);
 	prot::setAlignPrefSuffic(header,mng);
@@ -95,16 +99,20 @@ void setPrefixSuffix(DiagonalHeaderPtr &header,double c_shift,ProteoformPtr seq,
 
 void setProtTermMod(DiagonalHeaderPtr &header,ProteoformPtr seq,PtmMngPtr mng){
 	int trunc_len = header->getTruncFirstResPos();
+
 	ResSeqPtr resseq= seq->getResSeqPtr();
+
 	ProtModPtr mod;
 	if(header->isNTrunc()){
 		mod = findProtTermMod(mng->allow_prot_N_mods_,trunc_len,resseq,header->getPepNTermShift(),mng->test_term_mod_error_toerance_);
 	}
 	header->setProtNTermAllowMod(mod);
 	trunc_len = seq->getResSeqPtr()->getLen()-1 -header->getTruncLastResPos();
+//	std::cout<<header->getTruncLastResPos()<<std::endl;
 	resseq = resseq->getSubResidueSeq(header->getTruncLastResPos()+1,resseq->getLen()-1);
 	mod = nullptr;
 	if(header->isCTrunc()){
+//		std::cout<<":"<<trunc_len<<":"<<header->getTruncLastResPos()+1<<":"<<(resseq->getLen()-1)<<":"<<header->getPepCTermShift()<<std::endl;
 		mod = findProtTermMod(mng->allow_prot_C_mods_,trunc_len,resseq,header->getPepCTermShift(),mng->test_term_mod_error_toerance_);
 	}
 	header->setProtCTermAllowMod(mod);
@@ -201,7 +209,8 @@ bool getNAcetylation(DiagonalHeaderPtrVec headers){
 		return false;
 	}
 	ProtModPtr mod = headers[0]->getProtNTermAllowMod();
-	if(mod->getName().compare("ACETYLATION")==0||mod->getName().compare("NME_ACETYLATION")==0){
+//	std::cout<<mod<<std::endl;
+	if(mod==nullptr||mod->getName().compare("ACETYLATION")==0||mod->getName().compare("NME_ACETYLATION")==0){
 		return true;
 	}
 	return false;
@@ -212,7 +221,8 @@ ChangePtrVec getChanges(DiagonalHeaderPtrVec headers,int first,int last,PtmPtrVe
 	ChangePtrVec change_list;
 	if(headers[0]->getPepNTermAllowMod() != prot::findEmptyPtmPtr(ptm_list)){
 		if(getNAcetylation(headers)){
-			change_list.push_back(ChangePtr(new Change(first,headers[0]->getMatchFirstResPos(),PROTEIN_VARIABLE_CHANGE,headers[0]->getPepNTermShift(),headers[0]->getProtNTermAllowMod()->getPtmPtr())));
+			ProtModPtr aptm = headers[0]->getProtNTermAllowMod();
+			change_list.push_back(ChangePtr(new Change(first,headers[0]->getMatchFirstResPos(),PROTEIN_VARIABLE_CHANGE,headers[0]->getPepNTermShift(),aptm==nullptr?nullptr:aptm->getPtmPtr())));
 		}
 		else{
 			change_list.push_back(ChangePtr(new Change(first,headers[0]->getMatchFirstResPos(),UNEXPECTED_CHANGE,headers[0]->getPepNTermShift(),nullptr)));
