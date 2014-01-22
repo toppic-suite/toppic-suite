@@ -64,7 +64,7 @@ public:
 
 	int getUnKnowShiftNum();
 	double getTRuncSeqMass();
-	SemiAlignTypePtr getAlignType(TruncPtrVec allowedNTruncs, TruncPtrVec allowedCTruncs,double thresh);
+//	SemiAlignTypePtr getAlignType(TruncPtrVec allowedNTruncs, TruncPtrVec allowedCTruncs,double thresh);
 	void process();
 	void findSeq(ProteoformPtrVec seqs);
 	std::string getAnnoMatchSeq();
