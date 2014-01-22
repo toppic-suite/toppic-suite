@@ -26,6 +26,7 @@ PrSMWriter::~PrSMWriter() {
 }
 
 void PrSMWriter::write(PrSMPtr prsm_ptr) {
+	if(prsm_ptr!=nullptr){
   LOG_DEBUG("start writing");
   xercesc::DOMElement* element = prsm_ptr->toXmlElement(doc_);
   LOG_DEBUG("Element generated");
@@ -34,6 +35,7 @@ void PrSMWriter::write(PrSMPtr prsm_ptr) {
   writeToStreamByRemovingDoubleLF(file_, str);
   //file_ << str << std::endl;
   element->release();
+	}
 }
 
 void PrSMWriter::writeVector(PrSMPtrVec &prsms) {

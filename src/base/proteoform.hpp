@@ -31,10 +31,7 @@ public:
 
 	ResSeqPtr getResSeqPtr() {return residue_seq_ptr_;}
 
-	BpSpecPtr getBpSpecPtr() {
-		std::cout<<bp_spec_ptr_<<std::endl;
-		return bp_spec_ptr_;
-	}
+	BpSpecPtr getBpSpecPtr() {return bp_spec_ptr_;}
 
   int getStartPos() {return start_pos_;}
 

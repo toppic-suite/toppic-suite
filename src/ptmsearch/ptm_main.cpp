@@ -7,9 +7,17 @@
 
 #include "ptmsearch/ptm_mng.hpp"
 #include "ptmsearch/ptm_processor.hpp"
+#include "filterdiagonal/ptm_fast_filter_mng.hpp"
+#include "filterdiagonal/ptm_fast_filter_processor.hpp"
 
 using namespace prot;
 int main(){
+
+//	PtmFastFilterMngPtr mngb = PtmFastFilterMngPtr(new PtmFastFilterMng());
+//	mngb->search_db_file_name_ = "in/prot.fasta";
+//	mngb->spectrum_file_name_ = "in/sp.msalign";
+//	PtmFastFilterProcessorPtr processorb = PtmFastFilterProcessorPtr(new PtmFastFilterProcessor(mngb));
+//	processorb->process();
 
 	PtmMngPtr mng = PtmMngPtr(new PtmMng("conf/configuration.xml"));
 	mng->search_db_file_name_ = "in/prot.fasta";

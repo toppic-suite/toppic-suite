@@ -42,7 +42,7 @@ BasicDiagPairPtrVec compDiagPair(PrmMsPtr sp,std::vector<double> seq_masses,Diag
 	double n_term_shift = header->getProtNTermShift();
 	std::vector<double> real_masses;
 	for(int k =0;k<sp->size();k++){
-		real_masses.push_back(sp->getPeakPtr(i)->getPosition());
+		real_masses.push_back(sp->getPeakPtr(k)->getPosition());
 	}
 	while(i<sp->size()-1 && j<seq_masses.size()){
 		PrmPeakPtr peak = sp->getPeakPtr(i);
@@ -92,6 +92,7 @@ BasicDiagPairDiagPtrVec getDiagonals(DiagonalHeaderPtrVec headers,PrmMsPtr ms_si
 	int cnt =0;
 	for(int i=0;i<headers.size();i++){
 		BasicDiagPairDiagPtr diagonal = getDiagonal(cnt,headers[i],ms_six,seq,mng);
+//		std::cout<<headers[i]->getProtNTermAllowMod()<<std::endl;
 		if(diagonal!=nullptr){
 			diagonal_list.push_back(diagonal);
 			cnt++;

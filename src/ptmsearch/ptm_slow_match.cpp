@@ -6,6 +6,7 @@
  */
 
 #include <ptmsearch/ptm_slow_match.hpp>
+#include <iostream>
 
 namespace prot {
 
@@ -21,21 +22,31 @@ PtmSlowMatch::PtmSlowMatch(ProteoformPtr seq,SpectrumSetPtr spectrum_set,CompShi
 void PtmSlowMatch::comp(CompShiftLowMemPtr comp_shift){
 	double scale = mng_->ptm_fast_filter_scale_;
 	std::vector<std::vector<int>> sp_masses = prot::getIntMassErrorList(ms_six_,scale,true,false);
+
 	std::vector<double> best_shift= comp_shift->findBestShift(sp_masses[0],sp_masses[1],seq_->getBpSpecPtr()->getScaledMass(scale,IonTypePtr(new IonType("B",true,0))),mng_->n_top_diagonals_,mng_->min_diagonal_gap_,scale);
 	DiagonalHeaderPtrVec n_term_shifts =getNTermShiftList(best_shift,ms_six_,seq_,mng_);
+//	for(int i=0;i<n_term_shifts.size();i++){
+//		std::cout<<n_term_shifts[i]->getProtCTermAllowMod()<<std::endl;
+//	}
 	BasicDiagPairDiagPtrVec diagonals = prot::getDiagonals(n_term_shifts,ms_six_,seq_,mng_);
+//	std::cout<<diagonals.size()<<std::endl;
 	std::vector<double> ms_masses = prot::getMassList(ms_six_);
 	std::vector<double> seq_masses = seq_->getBpSpecPtr()->getBreakPointMasses(IonTypePtr(new IonType("B",true,0)));
 	PSAlignPtr align = PSAlignPtr(new PSAlign(ms_masses,seq_masses,diagonals,mng_));
 	std::vector<int> types = {SEMI_ALIGN_TYPE_COMPLETE,SEMI_ALIGN_TYPE_PREFIX,SEMI_ALIGN_TYPE_SUFFIX,SEMI_ALIGN_TYPE_INTERNAL};
 
-//	std::vector<std::vector<double>> result_scores;
-//	DiagonalHeaderPtrVec3D result_headers;
 
 	for(int i=0;i<types.size();i++){
 		align->compute(types[i]);
+//		for(int i=0;i<align->getAlignScr().size();i++){
+//			std::cout<<align->getAlignScr()[i]<<std::endl;
+//		}
 		result_scores_.push_back(align->getAlignScr());
 		result_headers_.push_back(align->getResult());
+//		for(int i=0;i<align->getResult().size();i++){
+//			for(int j=0;j<align->getResult()[i].size();j++)
+//					std::cout<<align->getResult()[i][j]<<std::endl;
+//				}
 	}
 
 	for(int i=0;i<4;i++){
@@ -45,6 +56,8 @@ void PtmSlowMatch::comp(CompShiftLowMemPtr comp_shift){
 		}
 		result_deltas_.push_back(temp);
 	}
+
+	//todo::should corrected?
 }
 double PtmSlowMatch::getScr(int shiftnum,int type){
 	return result_scores_[type][shiftnum];
@@ -60,10 +73,13 @@ PrSMPtr PtmSlowMatch::geneResult(int shift_num,int type){
 		return nullptr;
 	}
 
-	ChangePtrVec changes = prot::getChanges(headers,first_pos,last_pos,mng_->base_data_->getPtmPtrVec());
-//	Proteoform(DbResSeqPtr db_res_seq_ptr, ProtModPtr prot_mod_ptr,
-//	             ResSeqPtr res_seq_ptr, int start_pos, int end_pos,
-//	             ChangePtrVec change_list);
+//	std::cout<<headers.size()<<std::endl;
+//	std::cout<<refine_prec_mass<<std::endl;
+//	std::cout<<first_pos<<std::endl;
+//	std::cout<<last_pos<<std::endl;
+//	std::cout<<refined_headers.size()<<std::endl;
+
+	ChangePtrVec changes = prot::getChanges(refined_headers,first_pos,last_pos,mng_->base_data_->getPtmPtrVec());
 
 
 	ProteoformPtr protein = ProteoformPtr(new Proteoform(seq_->getDbResSeqPtr(),seq_->getProtModPtr(),seq_->getResSeqPtr(),first_pos,last_pos,changes) );
@@ -75,6 +91,12 @@ DiagonalHeaderPtrVec PtmSlowMatch::getNTermShiftList(std::vector<double> best_sh
 	DiagonalHeaderPtrVec n_term_shifts_comp_left = prot::getNTermShiftListCompLeft(seq,mng);
 	DiagonalHeaderPtrVec n_term_shifts_comp_right = prot::getNTermShiftListCompRight(seq,ms_six);
 	DiagonalHeaderPtrVec extend_n_term_shifts;
+	for(int i=0;i<n_term_shifts_comp_left.size();i++){
+		headers.push_back(n_term_shifts_comp_left[i]);
+	}
+	for(int i=0;i<n_term_shifts_comp_right.size();i++){
+		headers.push_back(n_term_shifts_comp_right[i]);
+	}
 	std::vector<double> ms_masses = prot::getMassList(ms_six);
 	std::vector<double> seq_masses = seq->getBpSpecPtr()->getBreakPointMasses(IonTypePtr(new IonType("B",true,0)));
 	double shift;
@@ -89,7 +111,7 @@ DiagonalHeaderPtrVec PtmSlowMatch::getNTermShiftList(std::vector<double> best_sh
 	for(int i=1;i<seq_masses.size();i++){
 		shift = ms_masses[ms_masses.size()-1] - seq_masses[i];
 		if(found(shift,headers,mng)){
-			extend_n_term_shifts.push_back(DiagonalHeaderPtr(new DiagonalHeader(shift,true,false,true,false)));
+			extend_n_term_shifts.push_back(DiagonalHeaderPtr(new DiagonalHeader(shift,false,true,false,true)));
 		}
 	}
 

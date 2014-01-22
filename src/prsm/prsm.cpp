@@ -60,7 +60,7 @@ xercesc::DOMElement* PrSM::toXmlElement(XmlDOMDocument* xml_doc){
 	xml_doc->addElement(element, "adjusted_prec_mass", str.c_str());
 	str = convertToString(calibration_);
 	xml_doc->addElement(element, "calibration", str.c_str());
-	//proteoform_ptr_->appendXml(xml_doc,element);
+	proteoform_ptr_->appendXml(xml_doc,element);
 	//prob_ptr_->appendXml(xml_doc,element);
 	str = convertToString(fdr_);
 	xml_doc->addElement(element, "fdr", str.c_str());

@@ -21,7 +21,7 @@ ResSeqPtr ResidueSeq::getSubResidueSeq(int bgn, int end) {
     ResiduePtrVec sub_residues; 
     std::copy (residues_.begin() + bgn, residues_.begin() + end, 
                std::back_inserter(sub_residues) );
-    return ResSeqPtr(ResidueSeq(sub_residues));
+    return ResSeqPtr( new ResidueSeq(sub_residues));
   }
 }
 
@@ -48,7 +48,7 @@ void ResidueSeq::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
 
 ResSeqPtr getEmptyResidueSeq() {
   ResiduePtrVec residues;
-  return ResSeqPtr(ResidueSeq(residues));
+  return ResSeqPtr(new ResidueSeq(residues));
 }
 
 }

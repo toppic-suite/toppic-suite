@@ -6,6 +6,7 @@
  */
 
 #include <ptmsearch/comp_shift_low_mem.hpp>
+#include <iostream>;
 
 namespace prot {
 
@@ -27,8 +28,8 @@ std::vector<double> CompShiftLowMem::findBestShift(std::vector<int> a,std::vecto
 	return result;
 }
 std::vector<std::vector<int>> CompShiftLowMem::findBestShift(std::vector<int> a,std::vector<int> errors,std::vector<int> b,int total,int minimum_gap){
-	const int a_length = a.size();
-	const int b_length = b.size();
+	int a_length = a.size();
+	int b_length = b.size();
 	std::vector<std::vector<int>> ans;
 	if(b_length == 0){
 		std::vector<int> temp;
@@ -37,9 +38,9 @@ std::vector<std::vector<int>> CompShiftLowMem::findBestShift(std::vector<int> a,
 		ans.push_back(temp);
 		return ans;
 	}
-	const int delta = a[0]-b[b_length-1];
-	const int minD = delta-1;
-	const int maxD = a[a_length-1]-b[0]+1+errors[a_length-1];
+	int delta = a[0]-b[b_length-1];
+	int minD = delta-1;
+	int maxD = a[a_length-1]-b[0]+1+errors[a_length-1];
 	if(maxD-minD>num_.size()){
 		int required_length = maxD-minD+1;
 		num_.clear();
@@ -47,7 +48,6 @@ std::vector<std::vector<int>> CompShiftLowMem::findBestShift(std::vector<int> a,
 			num_.push_back(0);
 		}
 	}
-
 	for(int i=0;i<a_length;i++){
 		int a_value = a[i];
 		for(int j =0;j <b_length;j++){
@@ -142,12 +142,12 @@ int CompShiftLowMem::checkD(std::vector<std::vector<int>> &ans,int d,int current
 	if(new_value < currentMinimum){
 		return currentMinimum;
 	}
-
 	for(unsigned int i =0;i<ans.size();i++){
 		std::vector<int>  cur = ans[i];
-		if(std::abs(cur[0]-d)<= currentMinimum){
+		if(std::abs(cur[0]-d)<= minimumu_gap){
 			if(cur[1]<new_value){
-				ans.erase(ans.begin()+i,ans.begin()+i+1);
+				ans.erase(ans.begin()+i);
+				i--;
 			}
 			else {
 				return currentMinimum;
@@ -161,10 +161,11 @@ int CompShiftLowMem::checkD(std::vector<std::vector<int>> &ans,int d,int current
 		insert_pos--;
 	}
 	std::vector<int> insert_temp = {d,new_value};
-	ans.insert(ans.begin()+insert_pos, insert_temp);
+	ans.insert(ans.begin()+insert_pos+1, insert_temp);
 	if(ans.size()>total){
 		ans.pop_back();
 	}
+
 	return ans.size()==total?ans[ans.size()-1][1]+1:1;
 }
 

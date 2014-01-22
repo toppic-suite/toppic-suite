@@ -13,6 +13,7 @@
 #include "spec/spectrum_set.hpp"
 #include "spec/msalign_reader.hpp"
 #include "prsm/prsm_writer.hpp"
+#include "base/prot_mod.hpp"
 
 namespace prot {
 
@@ -27,11 +28,7 @@ void PtmProcessor::init(){
 	std::string simplePrsmFileName = mng_->spectrum_file_name_ + "." + mng_->input_file_ext_;
 	simplePrsms_  = prot::readSimplePrSM(simplePrsmFileName.c_str());
 	//todo::
-//	std::cout<< simplePrsms_.size() << std::endl;
-//	for(int i=0;i<simplePrsms_.size();i++){
-//		std::cout<< simplePrsms_[i]->getSeqId() << std::endl;
-//	}
-//	prsmFindSeq(simplePrsms_,seqs_);
+	prsmFindSeq(simplePrsms_,seqs_);
 }
 
 void PtmProcessor::prsmFindSeq(SimplePrSMPtrVec simple_prsms,ProteoformPtrVec seqs){
@@ -68,17 +65,27 @@ void PtmProcessor::processDatabase(PtmSearcherPtr searcher){
 
 	DeconvMsPtr deconv_sp;
 	PrSMPtrVec3D prsms;
+	for(int i=0;i<mng_->n_unknown_shift_;i++){
+		PrSMPtrVec2D temp_2d;
+		for(int j=0;j<4;j++){
+			PrSMPtrVec temp_vec;
+			for(int k=0;k<mng_->n_report_;k++){
+				temp_vec.push_back(nullptr);
+			}
+			temp_2d.push_back(temp_vec);
+		}
+		prsms.push_back(temp_2d);
+	}
 	int cnt = 0;
 	while((deconv_sp = spReader.getNextMs())!= nullptr){
 		cnt++;
-		for(int i=0;i<deconv_sp->size();i++){
-			SpectrumSetPtr spectrumset = prot::getSpectrumSet(deconv_sp,0,mng_->sp_para_,0,mng_->base_data_->getIonTypePtrVec());
+//		for(int i=0;i<deconv_sp->size();i++){
+			double shift = prot::getProtModAcetylationShift(mng_->base_data_->getProtModPtrVec());
+			SpectrumSetPtr spectrumset = prot::getSpectrumSet(deconv_sp,0,mng_->sp_para_,shift,mng_->base_data_->getIonTypePtrVec());
 			if(spectrumset != nullptr){
-				std::string scan = deconv_sp->getHeaderPtr()->getScansString();
+//				std::string scan = deconv_sp->getHeaderPtr()->getScansString();
 				//update message;
 				SimplePrSMPtrVec slectedPrsms = prot::findSimplePrsms(simplePrsms_,deconv_sp->getHeaderPtr());
-//				std::cout<< slectedPrsms.size() << std::endl;
-				//may have adddress;
 				searcher->search(spectrumset,slectedPrsms,prsms);
 				all_writer->writeVector3D(prsms);
 				for(int j=0;j<mng_->n_unknown_shift_;j++){
@@ -87,7 +94,7 @@ void PtmProcessor::processDatabase(PtmSearcherPtr searcher){
 					}
 				}
 			}
-		}
+//		}
 	}
 	spReader.close();
 }

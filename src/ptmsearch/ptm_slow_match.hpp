@@ -69,8 +69,8 @@ private:
 typedef std::shared_ptr<PtmSlowMatch> PtmSlowMatchPtr;
 typedef std::vector<PtmSlowMatchPtr> PtmSlowMatchPtrVec;
 
-bool inline psm_up(PtmSlowMatchPtr f,PtmSlowMatchPtr n){
-	return f->getScr(f->getShift(),f->getType())<n->getScr(n->getShift(),n->getType());
+bool inline psm_down(PtmSlowMatchPtr f,PtmSlowMatchPtr n){
+	return f->getScr(f->getShift(),f->getType())>n->getScr(n->getShift(),n->getType());
 }
 } /* namespace prot */
 

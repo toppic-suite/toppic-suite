@@ -21,6 +21,7 @@ class DbResidueSeq: public ResidueSeq {
 	  std::string str = convertToString(id_);
 	  xml_doc->addElement(element, "id", str.c_str());
 	  xml_doc->addElement(element, "name", name_.c_str());
+	  parent->appendChild(element);
   }
  private:
   int id_;

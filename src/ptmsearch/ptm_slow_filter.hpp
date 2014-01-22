@@ -21,6 +21,7 @@ class PtmSlowFilter {
 public:
 	PtmSlowFilter(SpectrumSetPtr spectrum_set,SimplePrSMPtrVec fast_Matches,CompShiftLowMemPtr comp_shift,PtmMngPtr mng);
 	PtmSlowMatchPtrVec getBestMatch(int nshift,int type);
+	PtmSlowMatchPtrVec getMatches(){return slow_matches_;};
 private:
 	PtmSlowMatchPtrVec slow_matches_;
 };

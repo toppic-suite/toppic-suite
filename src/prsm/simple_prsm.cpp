@@ -20,8 +20,10 @@ SimplePrSM::SimplePrSM(MsHeaderPtr header,ProteoformPtr seq,int score){
 	precursor_id_ = header->getPrecId();
 	prec_mass_ = header->getPrecMonoMass();
 	seq_= seq;
-	seq_id_ = seq->getSeqId();
-	seq_name_ = seq->getName();
+//	seq_id_ = seq->getSeqId();
+//	seq_name_ = seq->getName();
+	seq_id_ = seq->getDbResSeqPtr()->getId();
+	seq_name_ = seq->getDbResSeqPtr()->getName();
 	score_ = score;
 }
 
