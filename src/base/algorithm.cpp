@@ -5,6 +5,7 @@
 
 namespace prot {
 
+/* if we need to increase i, return true, otherwise, return false. */
 bool increaseIJ(unsigned int i, unsigned int j, double deviation, 
                 double tolerance, std::vector<double> ms_masses, 
                 std::vector<double> theo_masses) {
@@ -21,18 +22,20 @@ bool increaseIJ(unsigned int i, unsigned int j, double deviation,
 		}
 
 		double next_pos = ms_masses[i+1];
-		if (std::abs(next_pos - theo_masses[j]) <= tolerance 
-				&& (j == theo_masses.size() - 1 
-            || std::abs(next_pos - theo_masses[j]) < std::abs(next_pos - theo_masses[j+1]))) {
+    bool j_is_near
+        = std::abs(next_pos - theo_masses[j]) < std::abs(next_pos - theo_masses[j+1]);
+    if (std::abs(next_pos - theo_masses[j]) <= tolerance  
+        && (j == theo_masses.size() - 1 || j_is_near)) { 
 			return true;
 		} else {
 			return false;
 		}
 }
 
-/** compute deviation for each peak */
-void  compMsMassPpos(std::vector<double> &ms_masses, std::vector<double> &theo_masses, 
-                       double ppo, std::vector<double> &result_ppos) {
+/* compute deviation for each peak */
+void  compMsMassPpos(std::vector<double> &ms_masses, 
+                     std::vector<double> &theo_masses, 
+                     double ppo, std::vector<double> &result_ppos) {
   // extendMsThree do not have 0 and precursor mass 
   std::vector<double> min_distances;
   for (unsigned p = 0; p < ms_masses.size(); p++) {
@@ -63,8 +66,8 @@ void  compMsMassPpos(std::vector<double> &ms_masses, std::vector<double> &theo_m
   }
 }
 
-
-void compTheoMassPpo(std::vector<double> &ms_masses, std::vector<double> &theo_masses,
+void compTheoMassPpo(std::vector<double> &ms_masses, 
+                     std::vector<double> &theo_masses,
                      double ppo, std::vector<double> &result_ppos) {
 
   std::vector<double> min_distances;
@@ -98,7 +101,8 @@ void compTheoMassPpo(std::vector<double> &ms_masses, std::vector<double> &theo_m
 }
 
 /** compute unique score */
-double compUniqueScore (std::vector<double> &ms_masses, std::vector<double> &theo_masses, 
+double compUniqueScore (std::vector<double> &ms_masses, 
+                        std::vector<double> &theo_masses, 
                         double ppo) {
   std::vector<double> theo_mass_ppos;
   compTheoMassPpo(ms_masses, theo_masses, ppo, theo_mass_ppos);
@@ -112,4 +116,3 @@ double compUniqueScore (std::vector<double> &ms_masses, std::vector<double> &the
 }
 
 }
-
