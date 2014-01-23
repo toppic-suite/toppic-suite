@@ -15,13 +15,13 @@ LFLAGS = -L/lib -L/opt/local/lib
 LIBS = -lxerces-c 
 #
 # define the C++ source files
-SRCS = comp_shift_hi_mem.cpp ptm_fast_filter_block.cpp ptm_fast_filter_hi_mem.cpp ptm_fast_filter_processor.cpp ptm_fast_filter_mng.cpp
+SRCS = basic_diag_pair.cpp diagonal.cpp dp_pair.cpp ptm_main.cpp ptm_processor.cpp ptm_slow_filter.cpp comp_shift_low_mem.cpp diagonal_header.cpp ps_align.cpp ptm_mng.cpp ptm_searcher.cpp ptm_slow_match.cpp
 #
 # define the C object files 
 #
 
 OBJ_DIR = ../../obj
-OBJS = $(addprefix $(OBJ_DIR)/, comp_shift_hi_mem.o ptm_fast_filter_block.o ptm_fast_filter_hi_mem.o ptm_fast_filter_processor.o ptm_fast_filter_mng.o) 
+OBJS = $(addprefix $(OBJ_DIR)/, basic_diag_pair.o diagonal.o dp_pair.o ptm_main.o ptm_processor.o ptm_slow_filter.o comp_shift_low_mem.o diagonal_header.o ps_align.o ptm_mng.o ptm_searcher.o ptm_slow_match.o)
 
 BIN_DIR = ../../bin
 

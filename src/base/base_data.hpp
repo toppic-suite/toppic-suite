@@ -35,7 +35,7 @@ class BaseData {
   ProtModPtr getAcetylationProtModPtr() {
     return getProtModPtrByName(prot_mod_list_, ACETYLATION_NAME);
   }
-  IonTypePtrVec& getIonTypePtrVec() {return ion_type_list_;}
+  //IonTypePtrVec& getIonTypePtrVec() {return ion_type_list_;}
   NeutralLossPtrVec& getNeutralLossPtrVec() {return neutral_loss_list_;}
   NeutralLossPtr getDefaultNeutralLossPtr() {
     return getNeutralLossPtrByName(neutral_loss_list_, DEFAULT_TYPE_NAME);
@@ -54,7 +54,7 @@ class BaseData {
   TruncPtrVec trunc_list_;
   ProtModPtrVec prot_mod_list_;
 
-  IonTypePtrVec ion_type_list_;
+  //IonTypePtrVec ion_type_list_;
   NeutralLossPtrVec neutral_loss_list_;
 
   ActivationPtrVec activation_list_;

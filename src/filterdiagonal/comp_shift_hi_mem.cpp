@@ -19,7 +19,7 @@ CompShiftHiMem::CompShiftHiMem(ProteoformPtrVec seqs,PtmFastFilterMngPtr mng){
 	LOG_DEBUG("Sequence number"+seqs.size());
 	shift_array_len_ = 20000 * scale_ + 2;
 	initSeqBeginEnds(seqs);
-	initIndexes(seqs,mng->base_data->getIonTypePtrVec());
+	initIndexes(seqs,IonTypeFactory::getIonTypePtrVec());
 	int debug_info_shift_array_len = shift_array_len_;
 	LOG_DEBUG("shift_array_len_ ="+prot::convertToString(debug_info_shift_array_len));
 	LOG_DEBUG("seq_total_len_"+prot::convertToString(seq_total_len_));

@@ -10,7 +10,6 @@
 
 namespace prot {
 
-
 BaseData::BaseData  (std::string  config_file_name) {
 
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
@@ -50,7 +49,7 @@ BaseData::BaseData  (std::string  config_file_name) {
 
       std::string ion_type_file_name = getChildValue(root, "ion_type_list_file_name", 0);
       LOG_DEBUG( "ion type file name: " << ion_type_file_name);
-      ion_type_list_ = getIonTypePtrVecInstance(ion_type_file_name);
+      IonTypeFactory::initFactory(ion_type_file_name);
       LOG_DEBUG( "ion type initialized ");
 
       std::string neutral_loss_file_name = getChildValue(root, 
@@ -64,7 +63,7 @@ BaseData::BaseData  (std::string  config_file_name) {
                                                        "activation_list_file_name", 
                                                        0);
       LOG_DEBUG( "activation file name: " << activation_file_name);
-      activation_list_ = getActivationPtrVecInstance(ion_type_list_, 
+      activation_list_ = getActivationPtrVecInstance(IonTypeFactory::getIonTypePtrVec(), 
                                                      activation_file_name);
       LOG_DEBUG( "activation initialized ");
 

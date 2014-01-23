@@ -8,9 +8,6 @@
 
 namespace prot {
 
-class IonType;
-typedef std::shared_ptr<IonType> IonTypePtr;
-
 class IonType {
  public: 
   IonType(std::string name, bool n_term, double shift);
@@ -42,8 +39,16 @@ class IonType {
 typedef std::shared_ptr<IonType> IonTypePtr;
 typedef std::vector<IonTypePtr> IonTypePtrVec;
 
-IonTypePtrVec getIonTypePtrVecInstance(const std::string file_name);
 IonTypePtr getIonTypePtrByName(IonTypePtrVec &ion_type_list, const std::string &name);
+
+class IonTypeFactory {
+ private:
+  static IonTypePtrVec ion_type_ptr_vec_;
+
+ public:
+  static void initFactory(const std::string file_name);
+  static IonTypePtrVec& getIonTypePtrVec() {return ion_type_ptr_vec_;}
+};
 
 }
 
