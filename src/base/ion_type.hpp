@@ -25,9 +25,9 @@ class IonType {
 
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
  private:
-  /** ion name */
+  // ion name
   std::string name_;
-  /** A B C are n-terminal ions and X Y Z are non-n-terminal ions */
+  // A B C are n-terminal ions and X Y Z are non-n-terminal ions 
   bool n_term_;
   /**
    * Shift stands for the shift of the ion compared to M. For example, the
@@ -35,6 +35,7 @@ class IonType {
    */
   double shift_;
 
+  // shifts compared to b or y-ions
   double b_y_shift_;
 };
 

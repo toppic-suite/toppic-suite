@@ -50,8 +50,9 @@ AcidPtrVec getAcidPtrVecInstance(std::string file_name) {
       std::string composition = getChildValue(element, "composition", 0);
       double mono_mass = getDoubleChildValue(element, "mono_mass", 0);
       double avg_mass = getDoubleChildValue(element, "average_mass", 0);
-      acid_list.push_back(AcidPtr(
-              new Acid(name, one_letter, three_letter, composition, mono_mass, avg_mass)));
+      AcidPtr ptr(new Acid(name, one_letter, three_letter, 
+                           composition, mono_mass, avg_mass));
+      acid_list.push_back(ptr);
 
     }
     // deleting parser is not necessary

@@ -9,20 +9,13 @@ namespace prot {
 
 class DbResidueSeq: public ResidueSeq {
  public:
-  DbResidueSeq(ResiduePtrVec residues, int id, std::string name): ResidueSeq(residues) {
-    id_ = id;
-    name_ = name;
-  }
+  DbResidueSeq(ResiduePtrVec residues, int id, std::string name);
 
   int getId() {return id_;}
   std::string getName() {return name_;}
-  void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
-	  xercesc::DOMElement* element = xml_doc->createElement("db_residue_seq");
-	  std::string str = convertToString(id_);
-	  xml_doc->addElement(element, "id", str.c_str());
-	  xml_doc->addElement(element, "name", name_.c_str());
-	  parent->appendChild(element);
-  }
+
+  void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+
  private:
   int id_;
   std::string name_;
