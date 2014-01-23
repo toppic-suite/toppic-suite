@@ -40,7 +40,7 @@ void PtmFastFilterProcessor::processBlock(int block,std::string sp_file_name,int
 	MsAlignReader reader(sp_file_name.c_str(), mng_->base_data->getActivationPtrVec());
 	std::stringstream block_s;
 	block_s<<block;
-	std::string output_file_name = mng_->spectrum_file_name_ + "." + mng_->output_file_ext_+"_"+block_s.str();
+	std::string output_file_name = mng_->spectrum_file_name_ + ".FILTER_" + mng_->output_file_ext_+"_"+block_s.str();
 	SimplePrSMWriter writer(output_file_name.c_str());
 	DeconvMsPtr deconv_sp;
 	int cnt = 0;
@@ -69,12 +69,12 @@ void PtmFastFilterProcessor::combineBlock(std::string sp_file_name){
 	for(int i=0;i<filter_->getBlockSize();i++){
 		std::stringstream block_s;
 		block_s<<i;
-		std::string block_file_name = mng_->spectrum_file_name_+ "." + mng_->output_file_ext_+"_"+block_s.str();
+		std::string block_file_name = mng_->spectrum_file_name_+ ".FILTER_" + mng_->output_file_ext_+"_"+block_s.str();
 		matches.push_back(prot::readSimplePrSM(block_file_name.c_str()));
 	}
 
 	MsAlignReader reader(sp_file_name.c_str(), mng_->base_data->getActivationPtrVec());
-	std::string output_file_name = mng_->spectrum_file_name_ + "." + mng_->output_file_ext_+"_COMBINED";
+	std::string output_file_name = mng_->spectrum_file_name_ + ".FILTER_" + mng_->output_file_ext_+"_COMBINED";
 	SimplePrSMWriter writer(output_file_name.c_str());
 	DeconvMsPtr deconv_sp;
 	while((deconv_sp = reader.getNextMs()) != nullptr){

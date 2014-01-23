@@ -22,6 +22,7 @@ namespace prot {
 
 class PtmFastFilterMng {
 public:
+	PtmFastFilterMng(std::string config_file_name);
 	//Candidate protein number for each spectrum
 	int ptm_fast_filter_result_num_ = 20;
 	int db_block_size_ = 5000000;
@@ -50,7 +51,7 @@ public:
 	std::string spectrum_file_name_;
 	std::string output_file_ext_;
 
-	BaseDataPtr base_data = BaseDataPtr(new BaseData("conf/configuration.xml"));
+	BaseDataPtr base_data ;
 };
 
 typedef std::shared_ptr<PtmFastFilterMng> PtmFastFilterMngPtr;
