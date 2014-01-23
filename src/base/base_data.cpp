@@ -22,7 +22,7 @@ BaseData::BaseData  (std::string  config_file_name) {
       LOG_DEBUG( "root " << root);
       std::string acid_file_name = getChildValue(root, "acid_list_file_name", 0);
       LOG_DEBUG( "acid file name: " << acid_file_name);
-      acid_list_ = getAcidPtrVecInstance(acid_file_name);
+      AcidFactory::initFactory(acid_file_name);
       LOG_DEBUG( "acid initialized ");
 
       std::string ptm_file_name = getChildValue(root, "ptm_list_file_name", 0);
@@ -32,18 +32,21 @@ BaseData::BaseData  (std::string  config_file_name) {
 
       std::string residue_file_name = getChildValue(root, "residue_list_file_name", 0);
       LOG_DEBUG( "residue file name: " << residue_file_name);
-      residue_list_ = getResiduePtrVecInstance(acid_list_, ptm_list_,
+      residue_list_ = getResiduePtrVecInstance(AcidFactory::getAcidPtrVec(), 
+                                               ptm_list_,
                                                residue_file_name);
       LOG_DEBUG( "residue initialized");
 
       std::string trunc_file_name = getChildValue(root, "trunc_list_file_name", 0);
       LOG_DEBUG( "trunc file name: " << trunc_file_name);
-      trunc_list_ = getTruncPtrVecInstance(acid_list_, trunc_file_name);
+      trunc_list_ = getTruncPtrVecInstance(AcidFactory::getAcidPtrVec(), 
+                                           trunc_file_name);
       LOG_DEBUG( "trunc initialized ");
 
       std::string prot_mod_file_name = getChildValue(root, "prot_mod_list_file_name", 0);
       LOG_DEBUG( "prot mod file name: " << prot_mod_file_name);
-      prot_mod_list_ = getProtModPtrVecInstance(acid_list_, ptm_list_, trunc_list_, 
+      prot_mod_list_ = getProtModPtrVecInstance(AcidFactory::getAcidPtrVec(), 
+                                                ptm_list_, trunc_list_, 
                                                 prot_mod_file_name);
       LOG_DEBUG( "prot mod initialized ");
 
@@ -71,7 +74,7 @@ BaseData::BaseData  (std::string  config_file_name) {
                                                             "fix_mod_residue_file_name", 
                                                             0);
       LOG_DEBUG( "fix mod residue file name: " << fix_mod_residue_file_name);
-      fix_mod_residue_list_ = getResiduePtrVecInstance(acid_list_, ptm_list_,
+      fix_mod_residue_list_ = getResiduePtrVecInstance(AcidFactory::getAcidPtrVec(), ptm_list_,
                                                        residue_list_, 
                                                        fix_mod_residue_file_name);
       LOG_DEBUG( "fix mod residue initialized ");

@@ -38,7 +38,7 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
   BaseDataPtr base_data_ptr = mng_ptr->base_data_ptr_;
   
   ProteoformPtrVec raw_forms = readFastaToProteoform(mng_ptr->search_db_file_name_,
-                                                     base_data_ptr->getAcidPtrVec(),
+                                                     AcidFactory::getAcidPtrVec(),
                                                      base_data_ptr->getFixModResiduePtrVec(),
                                                      base_data_ptr->getDefaultProtModPtr());
   ProteoformPtrVec prot_mod_forms 

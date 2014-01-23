@@ -10,6 +10,8 @@
 
 namespace prot {
 
+AcidPtrVec AcidFactory::acid_ptr_vec_; 
+
 Acid::Acid (std::string const &name, std::string const &one_letter, 
             std::string const &three_letter, std::string const &composition, 
             double mono_mass, double avg_mass) {
@@ -34,31 +36,6 @@ void Acid::appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
 	parent->appendChild(element);
 }
 
-AcidPtrVec getAcidPtrVecInstance(std::string file_name) {
-  AcidPtrVec acid_list;
-  XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
-  if (parser) {
-    XmlDOMDocument doc(parser, file_name.c_str());
-    xercesc::DOMElement* parent = doc.getDocumentElement();
-    int acid_num = getChildCount(parent, "amino_acid");
-    LOG_DEBUG( "acid num " << acid_num);
-    for (int i = 0; i < acid_num; i++) {
-      xercesc::DOMElement* element = getChildElement(parent, "amino_acid", i);
-      std::string name = getChildValue(element, "name", 0);
-      std::string one_letter = getChildValue(element, "one_letter", 0);
-      std::string three_letter = getChildValue(element, "three_letter", 0);
-      std::string composition = getChildValue(element, "composition", 0);
-      double mono_mass = getDoubleChildValue(element, "mono_mass", 0);
-      double avg_mass = getDoubleChildValue(element, "average_mass", 0);
-      AcidPtr ptr(new Acid(name, one_letter, three_letter, 
-                           composition, mono_mass, avg_mass));
-      acid_list.push_back(ptr);
-
-    }
-    // deleting parser is not necessary
-  }
-  return acid_list;
-}
 
 /**
  * Returns an amino acid based on the the name. Returns null if the amino
@@ -148,6 +125,30 @@ AcidPtrVec convertSeqToAcidSeq(AcidPtrVec &acid_list,
           getAcidPtrByOneLetter(acid_list, seq.substr(i, 1)));
     }
     return acid_seq;
+  }
+}
+
+void AcidFactory::initFactory(std::string file_name) {
+  XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
+  if (parser) {
+    XmlDOMDocument doc(parser, file_name.c_str());
+    xercesc::DOMElement* parent = doc.getDocumentElement();
+    int acid_num = getChildCount(parent, "amino_acid");
+    LOG_DEBUG( "acid num " << acid_num);
+    for (int i = 0; i < acid_num; i++) {
+      xercesc::DOMElement* element = getChildElement(parent, "amino_acid", i);
+      std::string name = getChildValue(element, "name", 0);
+      std::string one_letter = getChildValue(element, "one_letter", 0);
+      std::string three_letter = getChildValue(element, "three_letter", 0);
+      std::string composition = getChildValue(element, "composition", 0);
+      double mono_mass = getDoubleChildValue(element, "mono_mass", 0);
+      double avg_mass = getDoubleChildValue(element, "average_mass", 0);
+      AcidPtr ptr(new Acid(name, one_letter, three_letter, 
+                           composition, mono_mass, avg_mass));
+      acid_ptr_vec_.push_back(ptr);
+
+    }
+    // deleting parser is not necessary
   }
 }
 

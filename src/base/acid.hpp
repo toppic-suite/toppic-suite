@@ -57,8 +57,6 @@ class Acid {
 typedef std::shared_ptr<Acid> AcidPtr;
 typedef std::vector<AcidPtr> AcidPtrVec;
 
-AcidPtrVec getAcidPtrVecInstance(std::string file_name);
-
 /**
  * Returns an amino acid based on the the name. Returns null if the amino
  * acid name does not exist.
@@ -101,6 +99,17 @@ bool containsThreeLetter(AcidPtrVec &acid_list, const std::string &three_letter)
  */
 AcidPtrVec convertSeqToAcidSeq(AcidPtrVec &acid_list, 
                                const std::string &seq);
+
+/* acid factory */
+class AcidFactory {
+ private:
+  static AcidPtrVec acid_ptr_vec_;
+
+ public:
+  static void initFactory(const std::string file_name);
+  static AcidPtrVec& getAcidPtrVec() {return acid_ptr_vec_;}
+};
+
 }
 #endif
 

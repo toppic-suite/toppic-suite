@@ -24,7 +24,7 @@ class BaseData {
  public:
   BaseData (std::string config_file_name);
 
-  AcidPtrVec& getAcidPtrVec() {return acid_list_;}
+  //AcidPtrVec& getAcidPtrVec() {return acid_list_;}
   PtmPtrVec& getPtmPtrVec() {return ptm_list_;}
   ResiduePtrVec& getResiduePtrVec() {return residue_list_;}
   TruncPtrVec& getTruncPtrVec() {return trunc_list_;}
@@ -47,7 +47,7 @@ class BaseData {
   ActivationPtr& getActivationPtr() {return activation_ptr_;}
 
  private:
-  AcidPtrVec acid_list_;
+  //AcidPtrVec acid_list_;
   PtmPtrVec ptm_list_;
   ResiduePtrVec residue_list_;
 
