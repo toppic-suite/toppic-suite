@@ -46,12 +46,10 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
                                   base_data_ptr->getResiduePtrVec(),
                                   base_data_ptr->getAllowProtModPtrVec());
 
-  int spectra_num = countSpNum (mng_ptr->spectrum_file_name_.c_str(), 
-                                base_data_ptr->getActivationPtrVec());
+  int spectra_num = countSpNum (mng_ptr->spectrum_file_name_.c_str());
   LOG_DEBUG("spectra_number  " << spectra_num);
 
-  MsAlignReader reader(mng_ptr->spectrum_file_name_.c_str(), 
-                       base_data_ptr->getActivationPtrVec());
+  MsAlignReader reader(mng_ptr->spectrum_file_name_.c_str());
   std::string output_file_name = basename(mng_ptr->spectrum_file_name_) 
                                           + "." + mng_ptr->output_file_ext_;
   PrSMWriter comp_writer(output_file_name + "_COMPLETE");

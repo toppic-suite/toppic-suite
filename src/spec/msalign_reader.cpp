@@ -6,11 +6,9 @@
 
 namespace prot {
 
-MsAlignReader::MsAlignReader (const char *spectrum_file, 
-                              ActivationPtrVec activation_list) {
+MsAlignReader::MsAlignReader (const char *spectrum_file) {
   file_name_ = std::string(spectrum_file);
   input_.open(spectrum_file, std::ios::in);
-  activation_list_ = activation_list;
 }
 
 std::vector<std::string> MsAlignReader::readOneSpectrum() {
@@ -110,7 +108,7 @@ void MsAlignReader::readNext() {
   }
   if (activation != "") {
     ActivationPtr activation_ptr = 
-        getActivationPtrByName(activation_list_, activation);
+        ActivationFactory::getActivationPtrByName(activation);
     header_ptr->setActivationPtr(activation_ptr);
   }
   header_ptr->setMsLevel(level);
@@ -147,8 +145,8 @@ void MsAlignReader::close() {
   input_.close();
 }
 
-int countSpNum(const char *spectrum_file, ActivationPtrVec activation_list) {
-  MsAlignReader reader(spectrum_file, activation_list);
+int countSpNum(const char *spectrum_file) {
+  MsAlignReader reader(spectrum_file);
   int cnt = 0;
   DeconvMsPtr deconv_ms_ptr;
   while ((deconv_ms_ptr = reader.getNextMs()).get() != nullptr) {

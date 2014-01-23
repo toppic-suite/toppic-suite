@@ -11,6 +11,8 @@
 
 namespace prot {
 
+ActivationPtrVec ActivationFactory::activation_ptr_vec_;
+
 Activation::Activation(std::string name, IonTypePtr n_ion_type_ptr, 
                        IonTypePtr c_ion_type_ptr) {
   name_ = name;
@@ -44,9 +46,8 @@ void Activation::appendXml(XmlDOMDocument* xml_doc,
 	parent->appendChild(element);
 }
 
-ActivationPtrVec getActivationPtrVecInstance(IonTypePtrVec ion_type_list, 
-                                             std::string file_name){
-  ActivationPtrVec activationPtrVec;
+void ActivationFactory::initFactory(std::string file_name){
+  IonTypePtrVec ion_type_list = IonTypeFactory::getIonTypePtrVec();
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
     XmlDOMDocument doc(parser, file_name.c_str());
@@ -56,18 +57,16 @@ ActivationPtrVec getActivationPtrVecInstance(IonTypePtrVec ion_type_list,
       xercesc::DOMElement* element 
           = getChildElement(parent, "activation", i);
       ActivationPtr ptr(new Activation(ion_type_list, element));
-      activationPtrVec.push_back(ptr);
+      activation_ptr_vec_.push_back(ptr);
     }
   }
-  return activationPtrVec;
 }
 
-ActivationPtr getActivationPtrByName(ActivationPtrVec activation_list,
-                                     std::string name){
-  for (unsigned int i = 0; i < activation_list.size(); i++) {
-    std::string n = activation_list[i]->getName();
+ActivationPtr ActivationFactory::getActivationPtrByName(std::string name){
+  for (unsigned int i = 0; i < activation_ptr_vec_.size(); i++) {
+    std::string n = activation_ptr_vec_[i]->getName();
     if (n == name) {
-      return activation_list[i];
+      return activation_ptr_vec_[i];
     }
   }
   return ActivationPtr(nullptr);

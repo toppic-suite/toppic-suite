@@ -45,11 +45,18 @@ class Activation {
 typedef std::shared_ptr<Activation> ActivationPtr;
 typedef std::vector<ActivationPtr> ActivationPtrVec;
 
-ActivationPtrVec getActivationPtrVecInstance(IonTypePtrVec ion_type_list, 
-                                             std::string file_name);
+/* activation factory */
+class ActivationFactory {
+ private:
+  static ActivationPtrVec activation_ptr_vec_;
 
-ActivationPtr getActivationPtrByName(ActivationPtrVec activation_list,
-                                     std::string name);
+ public:
+  static void initFactory(const std::string file_name);
+
+  static ActivationPtrVec& getActivationPtrVec() {return activation_ptr_vec_;}
+
+  static ActivationPtr getActivationPtrByName(std::string name);
+};
 
 } /* namespace prot */
 

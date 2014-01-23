@@ -40,7 +40,7 @@ class BaseData {
   NeutralLossPtr getDefaultNeutralLossPtr() {
     return getNeutralLossPtrByName(neutral_loss_list_, DEFAULT_TYPE_NAME);
   }
-  ActivationPtrVec& getActivationPtrVec() {return activation_list_;}
+  //ActivationPtrVec& getActivationPtrVec() {return activation_list_;}
 
   ResiduePtrVec& getFixModResiduePtrVec() {return fix_mod_residue_list_;}
   ProtModPtrVec& getAllowProtModPtrVec() {return allow_prot_mod_list_;}
@@ -57,7 +57,7 @@ class BaseData {
   //IonTypePtrVec ion_type_list_;
   NeutralLossPtrVec neutral_loss_list_;
 
-  ActivationPtrVec activation_list_;
+  //ActivationPtrVec activation_list_;
 
   /* configuration */
   ResiduePtrVec fix_mod_residue_list_;

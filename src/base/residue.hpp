@@ -75,6 +75,5 @@ ResiduePtr addResidue(ResiduePtrVec &residue_list, AcidPtr acid_ptr,
 
 ResiduePtrVec convertAcidToResidueSeq(ResiduePtrVec residue_list,
                                       AcidPtrVec acid_list);
-
 }
 #endif

@@ -66,8 +66,7 @@ BaseData::BaseData  (std::string  config_file_name) {
                                                        "activation_list_file_name", 
                                                        0);
       LOG_DEBUG( "activation file name: " << activation_file_name);
-      activation_list_ = getActivationPtrVecInstance(IonTypeFactory::getIonTypePtrVec(), 
-                                                     activation_file_name);
+      ActivationFactory::initFactory(activation_file_name);
       LOG_DEBUG( "activation initialized ");
 
       std::string fix_mod_residue_file_name = getChildValue(root, 
@@ -91,7 +90,7 @@ BaseData::BaseData  (std::string  config_file_name) {
 
       std::string activation_type = getChildValue(root, "activation_type", 0);
       LOG_DEBUG( "acitivation type: " << activation_type);
-      activation_ptr_ = getActivationPtrByName(activation_list_, activation_type);
+      activation_ptr_ = ActivationFactory::getActivationPtrByName(activation_type);
     }
     delete doc;
   }
