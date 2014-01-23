@@ -48,7 +48,7 @@ ProteoformPtr FastaReader::getNextProteoformPtr(AcidPtrVec acid_list,
   std::string name = seq_info[0];
   std::string seq = seq_info[1];
   LOG_TRACE( "name " << seq_info[0] << " seq " << seq_info[1]);
-  AcidPtrVec acid_seq = convertSeqToAcidSeq(acid_list, seq); 
+  AcidPtrVec acid_seq = AcidFactory::convertSeqToAcidSeq(seq); 
   ResiduePtrVec residue_ptrs = convertAcidToResidueSeq(residue_list, acid_seq);
   DbResSeqPtr db_residue_seq_ptr(new DbResidueSeq(residue_ptrs, id_, name)); 
   id_++;

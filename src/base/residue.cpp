@@ -14,7 +14,7 @@ Residue::Residue(AcidPtr acid_ptr, PtmPtr ptm_ptr) {
 
 Residue::Residue(AcidPtrVec acid_list, PtmPtrVec ptm_list,
           std::string acid_name, std::string ptm_abbr_name) {
-  acid_ptr_ = getAcidPtrByName(acid_list, acid_name);
+  acid_ptr_ = AcidFactory::getAcidPtrByName(acid_name);
   ptm_ptr_ = getPtmPtrByAbbrName(ptm_list, ptm_abbr_name);
   mass_ = acid_ptr_->getMonoMass() + ptm_ptr_->getMonoMass();
 }
@@ -97,7 +97,7 @@ ResiduePtrVec getResiduePtrVecInstance(AcidPtrVec &acid_list,
       std::string ptm_abbr_name = getChildValue(element, "ptm", 0);
       LOG_DEBUG( "acid vec " << acid_list.size() << " ptm vec " << ptm_list.size() 
                 << " acid " << acid_name << " ptm " << ptm_abbr_name);
-      AcidPtr acid_ptr = getAcidPtrByName(acid_list, acid_name);
+      AcidPtr acid_ptr = AcidFactory::getAcidPtrByName(acid_name);
       if (acid_ptr.get() == nullptr) {
         LOG_ERROR( "acid " << acid_name  << " not found ");
         throw("acid not found");
