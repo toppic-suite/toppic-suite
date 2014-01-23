@@ -50,7 +50,7 @@ ProteoformPtr FastaReader::getNextProteoformPtr(AcidPtrVec acid_list,
   LOG_TRACE( "name " << seq_info[0] << " seq " << seq_info[1]);
   AcidPtrVec acid_seq = convertSeqToAcidSeq(acid_list, seq); 
   ResiduePtrVec residue_ptrs = convertAcidToResidueSeq(residue_list, acid_seq);
-  DbResSeqPtr db_residue_seq_ptr = DbResSeqPtr(new DbResidueSeq(residue_ptrs, id_, name)); 
+  DbResSeqPtr db_residue_seq_ptr(new DbResidueSeq(residue_ptrs, id_, name)); 
   id_++;
   return getDbProteoformPtr(db_residue_seq_ptr, none_prot_mod);
 }
@@ -97,10 +97,10 @@ ProteoformPtrVec readFastaToProteoform(std::string file_name,
   FastaReader reader(file_name);
   LOG_DEBUG( "open file done " << file_name);
   ProteoformPtrVec list;
-  ProteoformPtr ptr;
-  while ((ptr = reader.getNextProteoformPtr(acid_list, residue_list, none_prot_mod)).get() 
-         != nullptr) {
+  ProteoformPtr ptr = reader.getNextProteoformPtr(acid_list, residue_list, none_prot_mod);
+  while (ptr.get() != nullptr) {
     list.push_back(ptr);
+    ptr = reader.getNextProteoformPtr(acid_list, residue_list, none_prot_mod);
   }
   return list;
 }

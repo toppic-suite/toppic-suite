@@ -4,7 +4,8 @@
 
 namespace prot {
 
-ExtremeValue::ExtremeValue (double one_match_prob, double test_num, double adjust_factor) {
+ExtremeValue::ExtremeValue (double one_match_prob, double test_num, 
+                            double adjust_factor) {
   one_match_prob_ = one_match_prob;
   test_num_ = test_num;
   adjust_factor_ = adjust_factor;
@@ -27,7 +28,8 @@ void ExtremeValue::init() {
     double n = test_num_ * adjust_factor_;
     // approximation of 1 - (1- one_match_prob)^test_num
     // pValue = 1 - Math.pow(1.0 - oneMatchProb, nTests * adjustMul);
-    p_value_ =  n * one_match_prob_ - (n * (n-1))/2 * one_match_prob_ * one_match_prob_
+    p_value_ =  n * one_match_prob_ 
+        - (n * (n-1))/2 * one_match_prob_ * one_match_prob_
         + (n*(n-1) * (n-2))/6 * std::pow(one_match_prob_,3);
     if (p_value_ > 1.0) {
       p_value_ = 1.0;
