@@ -57,7 +57,6 @@ void PtmSlowMatch::comp(CompShiftLowMemPtr comp_shift){
 		result_deltas_.push_back(temp);
 	}
 
-	//todo::should corrected?
 }
 double PtmSlowMatch::getScr(int shiftnum,int type){
 	return result_scores_[type][shiftnum];

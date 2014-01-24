@@ -28,7 +28,6 @@ void PtmProcessor::init(){
 	std::string sp_file_name = mng_->spectrum_file_name_;
 	std::string simplePrsmFileName = mng_->spectrum_file_name_ + ".FILTER" + mng_->input_file_ext_;
 	simplePrsms_  = prot::readSimplePrSM(simplePrsmFileName.c_str());
-	//todo::
 	prsmFindSeq(simplePrsms_,seqs_);
 }
 
