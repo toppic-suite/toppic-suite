@@ -54,28 +54,22 @@ BaseData::BaseData  (std::string  config_file_name) {
       IonTypeFactory::initFactory(ion_type_file_name);
       LOG_DEBUG( "ion type initialized ");
 
-      std::string neutral_loss_file_name = getChildValue(root, 
-                                                         "neutral_loss_list_file_name", 
-                                                         0);
+      std::string neutral_loss_file_name 
+          = getChildValue(root, "neutral_loss_list_file_name", 0);
       LOG_DEBUG( "neutral loss file name: " << neutral_loss_file_name);
       neutral_loss_list_ = getNeutralLossPtrVecInstance(neutral_loss_file_name);
       LOG_DEBUG( "neutral loss initialized ");
 
-      std::string activation_file_name = getChildValue(root, 
-                                                       "activation_list_file_name", 
-                                                       0);
+      std::string activation_file_name 
+          = getChildValue(root, "activation_list_file_name", 0);
       LOG_DEBUG( "activation file name: " << activation_file_name);
       ActivationFactory::initFactory(activation_file_name);
       LOG_DEBUG( "activation initialized ");
 
-      std::string fix_mod_residue_file_name = getChildValue(root, 
-                                                            "fix_mod_residue_file_name", 
-                                                            0);
+      std::string fix_mod_residue_file_name 
+          = getChildValue(root, "fix_mod_residue_file_name", 0);
       LOG_DEBUG( "fix mod residue file name: " << fix_mod_residue_file_name);
-      fix_mod_residue_list_ = getResiduePtrVecInstance(AcidFactory::getBaseAcidPtrVec(), 
-                                                       PtmFactory::getBasePtmPtrVec(),
-                                                       ResidueFactory::getBaseResiduePtrVec(), 
-                                                       fix_mod_residue_file_name);
+      fix_mod_residue_list_ = ResidueFactory::getResiduePtrVecInstance(fix_mod_residue_file_name);
       LOG_DEBUG( "fix mod residue initialized ");
 
       LOG_DEBUG( "allow prot mods initialization ");

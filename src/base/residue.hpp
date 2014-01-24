@@ -63,16 +63,7 @@ ResiduePtr getResiduePtrByAcid(ResiduePtrVec &residue_list,
 ResiduePtr getResiduePtrByAcidPtm(ResiduePtrVec &residue_list,
                                   AcidPtr acid_ptr, PtmPtr ptm_ptr);
 
-ResiduePtrVec getResiduePtrVecInstance(AcidPtrVec &acid_list, PtmPtrVec &ptm_list,
-                                       std::string file_name); 
-
-ResiduePtrVec getResiduePtrVecInstance(AcidPtrVec &acid_list, PtmPtrVec &ptm_list,
-                                       ResiduePtrVec &residue_list, std::string file_name); 
-
-ResiduePtr addResidue(ResiduePtrVec &residue_list, AcidPtr acid_ptr,
-                      PtmPtr ptm_ptr);
-
-ResiduePtrVec convertAcidToResidueSeq(ResiduePtrVec residue_list,
+ResiduePtrVec convertAcidToResidueSeq(ResiduePtrVec &residue_list,
                                       AcidPtrVec acid_list);
 /* residue factory */
 class ResidueFactory {
@@ -81,7 +72,16 @@ class ResidueFactory {
 
  public:
   static void initFactory(const std::string &file_name);
+
   static ResiduePtrVec& getBaseResiduePtrVec() {return residue_ptr_vec_;}
+  
+  static ResiduePtr getBaseResiduePtrByAcidPtm (AcidPtr acid_ptr, PtmPtr ptm_ptr) {
+    return getResiduePtrByAcidPtm(residue_ptr_vec_, acid_ptr, ptm_ptr);
+  }
+  
+  static ResiduePtr addBaseResidue(AcidPtr acid_ptr, PtmPtr ptm_ptr);
+  
+  static ResiduePtrVec getResiduePtrVecInstance(const std::string &file_name);
 };
 
 }
