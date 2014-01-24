@@ -39,7 +39,8 @@ Proteoform::Proteoform(xercesc::DOMElement* element,ProteoformPtrVec proteoforms
 	std::string mod_name = getChildValue(mod_element, "name", 0);
 //	double mod_prot_shift = getDoubleChildValue(mod_element, "prot_shift", 0);
 //	double mod_pep_shift = getDoubleChildValue(mod_element, "pep_shift", 0);
-	prot_mod_ptr_ = getProtModPtrByName(basedata->getProtModPtrVec(),mod_name);
+//	prot_mod_ptr_ = getProtModPtrByName(basedata->getProtModPtrVec(),mod_name);
+	prot_mod_ptr_ = ProtModFactory::getBaseProtModPtrByName(mod_name);
 
 	xercesc::DOMElement* res_seq_element= prot::getChildElement(element,"residue_seq",0);
 	int res_len = getChildCount(res_seq_element,"residue");
@@ -48,7 +49,7 @@ Proteoform::Proteoform(xercesc::DOMElement* element,ProteoformPtrVec proteoforms
 		xercesc::DOMElement* res_element= prot::getChildElement(res_seq_element,"residue",i);
 		std::string acid_name = getChildValue(getChildElement(res_element,"amino_acid",0),"name",0);
 		std::string ptm_name = getChildValue(getChildElement(res_element,"modification",0),"abbr_name",0);
-		residues.push_back(ResiduePtr(new Residue(AcidFactory::getAcidPtrVec(),basedata->getPtmPtrVec(),acid_name,ptm_name)));
+		residues.push_back(ResiduePtr(new Residue(acid_name,ptm_name)));
 	}
 	residue_seq_ptr_ = ResSeqPtr(new ResidueSeq(residues));
 
@@ -66,7 +67,7 @@ Proteoform::Proteoform(xercesc::DOMElement* element,ProteoformPtrVec proteoforms
 		PtmPtr change_ptm = nullptr;
 		if(ptm_count!=0){
 			xercesc::DOMElement* ptm_element= prot::getChildElement(change_list_element,"modification",i);
-			change_ptm = getPtmPtrByAbbrName(basedata->getPtmPtrVec(),getChildValue(ptm_element,"abbr_name",0));
+			change_ptm = PtmFactory::getBasePtmPtrByAbbrName(getChildValue(ptm_element,"abbr_name",0));
 		}
 		change_list_.push_back(ChangePtr(new Change(left_bp_pos,right_bp_pos,change_type,mass_shift,change_ptm)));
 	}
