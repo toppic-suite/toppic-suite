@@ -6,8 +6,7 @@
 
 namespace prot {
 
-ZeroPtmSlowMatch::ZeroPtmSlowMatch(int search_type,
-                                   DeconvMsPtr deconv_ms_ptr, 
+ZeroPtmSlowMatch::ZeroPtmSlowMatch(DeconvMsPtr deconv_ms_ptr, 
                                    ZpFastMatchPtr fast_match_ptr,
                                    ZeroPtmMngPtr mng_ptr) {
   mng_ptr_ = mng_ptr;
@@ -92,15 +91,14 @@ PrSMPtr ZeroPtmSlowMatch::geneResult() {
                           recal_, mng_ptr_->sp_para_ptr_));
 }
 
-ZpSlowMatchPtrVec zeroPtmSlowFilter(int semi_align_type,
-                                    DeconvMsPtr deconv_ms_ptr,
+ZpSlowMatchPtrVec zeroPtmSlowFilter(DeconvMsPtr deconv_ms_ptr,
                                     ZpFastMatchPtrVec fast_matches,
                                     ZeroPtmMngPtr mng_ptr) {
 
   ZpSlowMatchPtrVec slow_matches;
   for (unsigned int i = 0; i < fast_matches.size(); i++) {
     ZpSlowMatchPtr slow_match = ZpSlowMatchPtr(
-        new ZeroPtmSlowMatch(semi_align_type, deconv_ms_ptr, fast_matches[i], mng_ptr));
+        new ZeroPtmSlowMatch(deconv_ms_ptr, fast_matches[i], mng_ptr));
     slow_matches.push_back(slow_match);
   }
   /* sort */

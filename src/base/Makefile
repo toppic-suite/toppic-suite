@@ -15,14 +15,14 @@ LFLAGS = -L/lib -L/opt/local/lib
 LIBS = -lxerces-c 
 #
 # define the C++ source files
-SRCS = main.cpp db_residue_seq.cpp extreme_value.cpp algorithm.cpp ion.cpp base_data.cpp fasta_reader.cpp proteoform.cpp bp_spec.cpp break_point.cpp residue_seq.cpp change.cpp acid.cpp ptm.cpp residue_freq.cpp residue.cpp xml_dom.cpp xml_dom_document.cpp ion_type.cpp neutral_loss.cpp trunc.cpp prot_mod.cpp activation.cpp
+SRCS = main.cpp semi_align_type.cpp db_residue_seq.cpp extreme_value.cpp algorithm.cpp ion.cpp base_data.cpp fasta_reader.cpp proteoform.cpp bp_spec.cpp break_point.cpp residue_seq.cpp change.cpp acid.cpp ptm.cpp residue_freq.cpp residue.cpp xml_dom.cpp xml_dom_document.cpp ion_type.cpp neutral_loss.cpp trunc.cpp prot_mod.cpp activation.cpp
 #
 # define the C object files 
 #
 
 OBJ_DIR = ../../obj
 
-OBJS = $(addprefix $(OBJ_DIR)/, main.o db_residue_seq.o extreme_value.o algorithm.o ion.o base_data.o fasta_reader.o proteoform.o bp_spec.o break_point.o residue_seq.o change.o acid.o ptm.o residue_freq.o residue.o xml_dom.o xml_dom_document.o ion_type.o neutral_loss.o trunc.o prot_mod.o activation.o)
+OBJS = $(addprefix $(OBJ_DIR)/, main.o semi_align_type.o db_residue_seq.o extreme_value.o algorithm.o ion.o base_data.o fasta_reader.o proteoform.o bp_spec.o break_point.o residue_seq.o change.o acid.o ptm.o residue_freq.o residue.o xml_dom.o xml_dom_document.o ion_type.o neutral_loss.o trunc.o prot_mod.o activation.o)
 
 BIN_DIR = ../../bin
 

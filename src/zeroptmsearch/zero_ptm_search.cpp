@@ -9,7 +9,7 @@
 
 namespace prot {
 
-void zeroPtmSearch(SpectrumSetPtr spec_set_ptr, int type,
+void zeroPtmSearch(SpectrumSetPtr spec_set_ptr, SemiAlignTypePtr type,
                    ProteoformPtrVec &proteoform_ptr_vec, ZeroPtmMngPtr mng_ptr, 
                    PrSMPtrVec &prsms) {
   ExtendMsPtr ms_three = spec_set_ptr->getSpThree();
@@ -20,7 +20,7 @@ void zeroPtmSearch(SpectrumSetPtr spec_set_ptr, int type,
 
   LOG_DEBUG("fast_match ended size " << fast_matches.size());
   DeconvMsPtr deconv_ms = spec_set_ptr->getDeconvMs();
-  ZpSlowMatchPtrVec slow_matches = zeroPtmSlowFilter(type, deconv_ms, fast_matches, mng_ptr ); 
+  ZpSlowMatchPtrVec slow_matches = zeroPtmSlowFilter(deconv_ms, fast_matches, mng_ptr); 
 
   LOG_DEBUG("slow_match ended size " << slow_matches.size());
   for (unsigned int i = 0; i < slow_matches.size(); i++) {
@@ -70,23 +70,23 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
                                                  shift, ion_type_ptr_list);
     if (spec_set_ptr.get() != nullptr) {
       PrSMPtrVec comp_prsms;
-      zeroPtmSearch(spec_set_ptr, SEMI_ALIGN_TYPE_COMPLETE, prot_mod_forms, 
-                    mng_ptr, comp_prsms);
+      zeroPtmSearch(spec_set_ptr, SemiAlignTypeFactory::getCompletePtr(), 
+                    prot_mod_forms, mng_ptr, comp_prsms);
       comp_writer.writeVector(comp_prsms);
       all_writer.writeVector(comp_prsms);
       PrSMPtrVec pref_prsms;
-      zeroPtmSearch(spec_set_ptr, SEMI_ALIGN_TYPE_PREFIX, prot_mod_forms, 
-                    mng_ptr, pref_prsms);
+      zeroPtmSearch(spec_set_ptr, SemiAlignTypeFactory::getPrefixPtr(), 
+                    prot_mod_forms, mng_ptr, pref_prsms);
       pref_writer.writeVector(pref_prsms);
       all_writer.writeVector(pref_prsms);
       PrSMPtrVec suff_prsms;
-      zeroPtmSearch(spec_set_ptr, SEMI_ALIGN_TYPE_SUFFIX, raw_forms, 
-                    mng_ptr, suff_prsms);
+      zeroPtmSearch(spec_set_ptr, SemiAlignTypeFactory::getSuffixPtr(), 
+                    raw_forms, mng_ptr, suff_prsms);
       suff_writer.writeVector(suff_prsms);
       all_writer.writeVector(suff_prsms);
       PrSMPtrVec internal_prsms;
-      zeroPtmSearch(spec_set_ptr, SEMI_ALIGN_TYPE_SUFFIX, raw_forms, 
-                    mng_ptr, internal_prsms);
+      zeroPtmSearch(spec_set_ptr, SemiAlignTypeFactory::getInternalPtr(), 
+                    raw_forms, mng_ptr, internal_prsms);
       internal_writer.writeVector(internal_prsms);
       all_writer.writeVector(internal_prsms);
       LOG_DEBUG("zero ptm search complete " << n);

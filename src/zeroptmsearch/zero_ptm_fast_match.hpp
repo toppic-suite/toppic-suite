@@ -37,7 +37,7 @@ inline bool compareZeroPtmFastMatchDown(ZpFastMatchPtr m1, ZpFastMatchPtr m2) {
   return m1->getScore() > m2->getScore();
 }
 
-ZpFastMatchPtrVec zeroPtmFastFilter(int semi_align_type,
+ZpFastMatchPtrVec zeroPtmFastFilter(SemiAlignTypePtr semi_align_type,
                                     ExtendMsPtr ms_ptr,
                                     ProteoformPtrVec &form_ptr_vec,
                                     int report_num);

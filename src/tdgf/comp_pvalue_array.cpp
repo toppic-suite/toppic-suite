@@ -38,14 +38,15 @@ ExtremeValuePtrVec CompPValueArray::compExtremeValue(PrmMsPtr ms_six,
   ExtremeValuePtrVec ev_probs; 
   for (unsigned int i = 0; i < prsms.size(); i++) {
     int inter_shift_num = prsms[i]->getProteoformPtr()->getUnexpectedChangeNum();
-    int t = prsms[i]->getProteoformPtr()->getSemiAlignType();
+    SemiAlignTypePtr t = prsms[i]->getProteoformPtr()->getSemiAlignType();
     double cand_num = test_num_ptr_->compCandNum(t, inter_shift_num, 
                                                  prec_mass, tolerance);
     if (cand_num == 0.0) {
       LOG_WARN("Zero candidate number");
       cand_num = std::numeric_limits<double>::infinity();
     }
-    if (t == SEMI_ALIGN_TYPE_COMPLETE || t == SEMI_ALIGN_TYPE_PREFIX) {
+    if (t == SemiAlignTypeFactory::getCompletePtr() 
+        || t == SemiAlignTypeFactory::getPrefixPtr()) {
       ev_probs.push_back(ExtremeValuePtr(new ExtremeValue(prot_probs[i], cand_num, 1)));
       /*
       logger.debug("AlignType " + t + " shift "

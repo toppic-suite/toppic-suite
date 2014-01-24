@@ -14,7 +14,7 @@ class CountTestNum {
 
   ~CountTestNum();
 
-  double compCandNum(int type, int shift_num, double ori_mass, double ori_tolerance);
+  double compCandNum(SemiAlignTypePtr type, int shift_num, double ori_mass, double ori_tolerance);
 
  private:
   static double PREFIX_SUFFIX_ADJUST() {return 0.693;}
@@ -40,11 +40,11 @@ class CountTestNum {
   void initPrefMassCnt(ProteoformPtrVec &prot_mod_forms);
   void initSuffMassCnt(ProteoformPtrVec &raw_forms);
   void initInternalMassCnt();
-  double compNormNonPtmCandNum(int type, int shift_num, 
+  double compNormNonPtmCandNum(SemiAlignTypePtr type, int shift_num, 
                                double ori_mass, double ori_tolerance);
-  double compOnePtmCandNum (int type, int shift_num, double ori_mass);
-  double compMultiplePtmCandNum (int type, int shift_num, double ori_mass);
-  double compSeqNum(int type, int low, int high);
+  double compOnePtmCandNum (SemiAlignTypePtr type, int shift_num, double ori_mass);
+  double compMultiplePtmCandNum (SemiAlignTypePtr type, int shift_num, double ori_mass);
+  double compSeqNum(SemiAlignTypePtr type, int low, int high);
   double compMassNum(double *cnts, int low, int high);
 };
 

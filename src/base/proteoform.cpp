@@ -20,7 +20,8 @@ Proteoform::Proteoform(DbResSeqPtr db_res_seq_ptr, ProtModPtr prot_mod_ptr,
   std::sort(change_list.begin(), change_list.end(), compareChangeUp);
 }
 
-Proteoform::Proteoform(xercesc::DOMElement* element,ProteoformPtrVec proteoforms,BaseDataPtr basedata){
+Proteoform::Proteoform(xercesc::DOMElement* element,ProteoformPtrVec proteoforms,
+                       BaseDataPtr basedata){
 
 	start_pos_ = getIntChildValue(element, "start_pos", 0);
 	end_pos_ = getIntChildValue(element, "end_pos", 0);
@@ -120,7 +121,7 @@ int Proteoform::getUnexpectedChangeNum() {
   return n;
 }
 
-int Proteoform::getSemiAlignType() {
+SemiAlignTypePtr Proteoform::getSemiAlignType() {
   int trunc_len = prot_mod_ptr_->getTruncPtr()->getTruncLen();
   bool is_prefix = false;
   if (start_pos_ == trunc_len) {
@@ -134,15 +135,15 @@ int Proteoform::getSemiAlignType() {
 
   if (is_prefix) {
     if (is_suffix) {
-      return SEMI_ALIGN_TYPE_COMPLETE;
+      return SemiAlignTypeFactory::getCompletePtr();
     } else {
-      return SEMI_ALIGN_TYPE_PREFIX;
+      return SemiAlignTypeFactory::getPrefixPtr();
     }
   } else {
     if (is_suffix) {
-      return SEMI_ALIGN_TYPE_SUFFIX;
+      return SemiAlignTypeFactory::getSuffixPtr();
     } else {
-      return SEMI_ALIGN_TYPE_INTERNAL;
+      return SemiAlignTypeFactory::getInternalPtr();
     }
   }
 }
@@ -183,35 +184,17 @@ ProteoformPtr getDbProteoformPtr(DbResSeqPtr db_res_seq_ptr,
                                       change_list));
 }
 
-bool isValidTrunc(ProteoformPtr raw_form_ptr, ProtModPtr prot_mod_ptr) {
-  TruncPtr trunc_ptr = prot_mod_ptr->getTruncPtr();
-  int trunc_len = trunc_ptr->getTruncLen();
-  AcidPtrVec trunc_acids = trunc_ptr->getAcidPtrVec();
-  DbResSeqPtr res_seq_ptr = raw_form_ptr->getDbResSeqPtr();  
-  //check if trunc acids match N-terminal acids of the protein 
-  if (trunc_len >= res_seq_ptr->getLen()) {
-    return false; ;
-  }
-  bool match = true;
-  for (int i = 0; i < trunc_len; i++) {
-    AcidPtr acid = res_seq_ptr->getResiduePtr(i)->getAcidPtr();
-    if (acid.get() != trunc_acids[i].get()) {
-      match = false;
-      break;
-    }
-  }
-  return match;
-}
-
 ProteoformPtr getProtModProteoform(ProteoformPtr raw_form_ptr,
                                    ProtModPtr prot_mod_ptr) {
-  bool valid_trunc = isValidTrunc(raw_form_ptr, prot_mod_ptr);
+  // check if the proteoform can be truncated
+  TruncPtr trunc_ptr = prot_mod_ptr->getTruncPtr();
+  DbResSeqPtr db_res_seq_ptr = raw_form_ptr->getDbResSeqPtr();  
+  bool valid_trunc = trunc_ptr->isValidTrunc(db_res_seq_ptr);
   if (!valid_trunc) {
     return ProteoformPtr(nullptr);
   }
   // first residue might be acetylated 
-  DbResSeqPtr db_res_seq_ptr = raw_form_ptr->getDbResSeqPtr();  
-  int start = prot_mod_ptr->getTruncPtr()->getTruncLen();
+  int start = trunc_ptr->getTruncLen();
   ResiduePtrVec residues;
   ResiduePtr residue = db_res_seq_ptr->getResiduePtr(start);
   PtmPtr ori_ptm = residue->getPtmPtr();
@@ -288,18 +271,6 @@ ProteoformPtrVec generateProtModProteoform(ProteoformPtrVec &ori_forms,
   return new_forms;
 }
 
-std::string convertSemiAlignmentTypeToString(int i){
-	if (i==1){
-		return "PREFIX";
-	}
-	if (i==2){
-		return "SUFFIX";
-	}
-	if(i==3){
-		return "INTERNAL";
-	}
-	return "COMPLETE";
-}
 
 } /* namespace prot */
 

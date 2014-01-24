@@ -22,13 +22,16 @@ class Trunc {
 
   void appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
-  bool isSameTrunc(int len, ResSeqPtr resseq);
+  bool isSameTrunc(int len, ResSeqPtr res_seq_ptr);
+
+  bool isValidTrunc(ResSeqPtr res_seq_ptr);
 
  private:
   std::string name_;
 	int trunc_len_;
   AcidPtrVec acid_str_;
 	double shift_;
+
 };
 
 typedef std::shared_ptr<Trunc> TruncPtr;

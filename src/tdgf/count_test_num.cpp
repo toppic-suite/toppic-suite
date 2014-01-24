@@ -100,7 +100,7 @@ void CountTestNum::initInternalMassCnt() {
   }
 }
 
-double CountTestNum::compCandNum(int type, int shift_num, double ori_mass, 
+double CountTestNum::compCandNum(SemiAlignTypePtr type, int shift_num, double ori_mass, 
                                  double ori_tolerance) {
   double cand_num = 0;
   if (shift_num == 0) {
@@ -117,41 +117,43 @@ double CountTestNum::compCandNum(int type, int shift_num, double ori_mass,
   if (cand_num == 0.0) {
     LOG_WARN("candidate number is ZERO");
   }
-  if (type == SEMI_ALIGN_TYPE_PREFIX || type == SEMI_ALIGN_TYPE_SUFFIX) {
+  if (type == SemiAlignTypeFactory::getPrefixPtr() 
+      || type == SemiAlignTypeFactory::getSuffixPtr()) {
     cand_num = cand_num * PREFIX_SUFFIX_ADJUST();
   }
-  else if (type == SEMI_ALIGN_TYPE_INTERNAL) {
+  else if (type == SemiAlignTypeFactory::getInternalPtr()) {
     cand_num = cand_num * INTERNAL_ADJUST();
   }
   return cand_num;
 }
 
-double CountTestNum::compNormNonPtmCandNum(int type, int shift_num, 
+double CountTestNum::compNormNonPtmCandNum(SemiAlignTypePtr type, int shift_num, 
                                            double ori_mass, double ori_tolerance) {
   int low = std::floor((ori_mass - ori_tolerance) * convert_ratio_);
   int high = std::ceil((ori_mass + ori_tolerance) * convert_ratio_);
   double cand_num = compSeqNum(type, low, high);
   // normalization: the reason is that we a residue list with frequency sum > 1 in CompProbValue 
-  if (type == SEMI_ALIGN_TYPE_COMPLETE || type == SEMI_ALIGN_TYPE_PREFIX) {
+  if (type == SemiAlignTypeFactory::getCompletePtr() 
+      || type == SemiAlignTypeFactory::getPrefixPtr()) {
     cand_num = cand_num / norm_factor_;
     //System.out.println("nCandidate " + nCandidates + " normFactor " + normFactor);
   } 
   return cand_num;
 }
 
-double CountTestNum::compOnePtmCandNum (int type, int shift_num, double ori_mass) {
+double CountTestNum::compOnePtmCandNum (SemiAlignTypePtr type, int shift_num, double ori_mass) {
   double cand_num = 0;
-  if (type == SEMI_ALIGN_TYPE_COMPLETE) {
+  if (type == SemiAlignTypeFactory::getCompletePtr()) {
     cand_num = raw_forms_.size();
-  } else if (type == SEMI_ALIGN_TYPE_PREFIX) {
+  } else if (type == SemiAlignTypeFactory::getPrefixPtr()) {
     for (unsigned int i = 0; i < raw_forms_.size(); i++) {
       cand_num += raw_forms_[i]->getResSeqPtr()->getLen();
     }
-  } else if (type == SEMI_ALIGN_TYPE_SUFFIX) {
+  } else if (type == SemiAlignTypeFactory::getSuffixPtr()) {
     for (unsigned int i = 0; i < raw_forms_.size(); i++) {
       cand_num += raw_forms_[i]->getResSeqPtr()->getLen();
     }
-  } else if (type == SEMI_ALIGN_TYPE_INTERNAL) {
+  } else if (type == SemiAlignTypeFactory::getInternalPtr()) {
     for (unsigned int i = 0; i < raw_forms_.size(); i++) {
       cand_num = cand_num + raw_forms_[i]->getResSeqPtr()->getLen() 
           * raw_forms_[i]->getResSeqPtr()->getLen();
@@ -160,15 +162,15 @@ double CountTestNum::compOnePtmCandNum (int type, int shift_num, double ori_mass
   return cand_num;
 }
 
-double CountTestNum::compSeqNum(int type, int low, int high) {
+double CountTestNum::compSeqNum(SemiAlignTypePtr type, int low, int high) {
   double candNum = 0;
-  if (type == SEMI_ALIGN_TYPE_COMPLETE) {
+  if (type == SemiAlignTypeFactory::getCompletePtr()) {
     candNum = compMassNum(comp_mass_cnts_, low, high);
-  } else if (type == SEMI_ALIGN_TYPE_PREFIX) {
+  } else if (type == SemiAlignTypeFactory::getPrefixPtr()) {
     candNum = compMassNum(pref_mass_cnts_, low, high);
-  } else if (type == SEMI_ALIGN_TYPE_SUFFIX) {
+  } else if (type == SemiAlignTypeFactory::getSuffixPtr()) {
     candNum = compMassNum(suff_mass_cnts_, low, high);
-  } else if (type == SEMI_ALIGN_TYPE_INTERNAL) {
+  } else if (type == SemiAlignTypeFactory::getInternalPtr()) {
     candNum = compMassNum(internal_mass_cnts_, low, high);
   }
   return candNum;
@@ -191,22 +193,22 @@ double CountTestNum::compMassNum(double *cnts, int low, int high) {
   return cnt;
 }
 
-double CountTestNum::compMultiplePtmCandNum (int type, int shift_num, 
+double CountTestNum::compMultiplePtmCandNum (SemiAlignTypePtr type, int shift_num, 
                                              double ori_mass) {
   double cand_num = 0;
-  if (type == SEMI_ALIGN_TYPE_COMPLETE) {
+  if (type == SemiAlignTypeFactory::getCompletePtr()) {
     for (unsigned int i = 0; i < raw_forms_.size(); i++) {
       cand_num += std::pow(raw_forms_[i]->getResSeqPtr()->getLen(), shift_num - 1);
     }
-  } else if (type == SEMI_ALIGN_TYPE_PREFIX) {
+  } else if (type == SemiAlignTypeFactory::getPrefixPtr()) {
     for (unsigned int i = 0; i < raw_forms_.size(); i++) {
       cand_num += std::pow(raw_forms_[i]->getResSeqPtr()->getLen(), shift_num);
     }
-  } else if (type == SEMI_ALIGN_TYPE_SUFFIX) {
+  } else if (type == SemiAlignTypeFactory::getSuffixPtr()) {
     for (unsigned int i = 0; i < raw_forms_.size(); i++) {
       cand_num += std::pow(raw_forms_[i]->getResSeqPtr()->getLen(), shift_num);
     }
-  } else if (type == SEMI_ALIGN_TYPE_INTERNAL) {
+  } else if (type == SemiAlignTypeFactory::getInternalPtr()) {
     for (unsigned int i = 0; i < raw_forms_.size(); i++) {
       cand_num += std::pow(raw_forms_[i]->getResSeqPtr()->getLen(), shift_num + 1);
     }

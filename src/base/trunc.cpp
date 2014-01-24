@@ -35,19 +35,26 @@ void Trunc::appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
 	parent->appendChild(element);
 }
 
-bool Trunc::isSameTrunc(int len,ResSeqPtr resseq){
+bool Trunc::isSameTrunc(int len, ResSeqPtr res_seq_ptr) {
 	if(trunc_len_ != len){
 		return false;
 	}
 	for(int i=0;i<trunc_len_;i++){
-		if(acid_str_[i]->getName().compare(resseq->getResiduePtr(i)->getAcidPtr()->getName())!=0){
+		if(acid_str_[i].get() == res_seq_ptr->getResiduePtr(i)->getAcidPtr().get()){
 			return false;
 		}
 	}
 	return true;
 }
 
+bool Trunc::isValidTrunc(ResSeqPtr res_seq_ptr) {
+  //check if trunc acids match N-terminal acids of the protein 
+  if (trunc_len_ >= res_seq_ptr->getLen()) {
+    return false; ;
+  }
 
+  return isSameTrunc(trunc_len_, res_seq_ptr);
+}
 
 TruncPtr findProtTermTrunc(TruncPtrVec truncs,int trunc_len,ResSeqPtr resseq){
 	for(unsigned int i=0;i<truncs.size();i++){
@@ -59,12 +66,10 @@ TruncPtr findProtTermTrunc(TruncPtrVec truncs,int trunc_len,ResSeqPtr resseq){
 };
 
 TruncPtr findProtNTermTrunc(ResSeqPtr seq,int trunc_len,TruncPtrVec allowed_trunc){
-//	ResSeqPtr resseq = seq->getResSeqPtr();
 	return findProtTermTrunc(allowed_trunc,trunc_len,seq);
 };
+
 TruncPtr findProtCTermTrunc(ResSeqPtr seq,int last_res_pos,TruncPtrVec allowed_trunc){
-//	int trunc_len = seq->getResSeqPtr()->getLen()-1-last_res_pos;
-//	ResSeqPtr resseq = seq->getResSeqPtr();
 	int trunc_len = seq->getLen()-1-last_res_pos;
 	return  findProtTermTrunc(allowed_trunc,trunc_len,seq);
 };

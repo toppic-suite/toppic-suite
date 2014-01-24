@@ -57,7 +57,8 @@ void PtmProcessor::processDatabase(PtmSearcherPtr searcher){
 	for(int i=0;i<mng_->n_unknown_shift_;i++){
 		std::vector<PrSMWriterPtr> temp;
 		for(int j=0;j<4;j++){
-			std::string file_name = output_file_name+"_"+prot::convertToString(i)+"_"+convertSemiAlignmentTypeToString(j);
+			std::string file_name = output_file_name+"_"+ convertToString(i)
+          +"_"+ SemiAlignTypeFactory::convertSemiAlignTypeToString(j);
 			temp.push_back(PrSMWriterPtr(new PrSMWriter(file_name)));
 		}
 		writers.push_back(temp);

@@ -6,16 +6,11 @@
 #include "base/change.hpp"
 #include "base/segment.hpp"
 #include "base/prot_mod.hpp"
+#include "base/semi_align_type.hpp"
 #include "base/base_data.hpp"
 
 
 namespace prot {
-
-#define SEMI_ALIGN_TYPE_COMPLETE 0
-#define SEMI_ALIGN_TYPE_PREFIX   1
-#define SEMI_ALIGN_TYPE_SUFFIX   2
-#define SEMI_ALIGN_TYPE_INTERNAL 3
-
 
 class Proteoform;
 typedef std::shared_ptr<Proteoform> ProteoformPtr;
@@ -54,7 +49,7 @@ public:
 
   int getUnexpectedChangeNum();
   
-  int getSemiAlignType();
+  SemiAlignTypePtr getSemiAlignType();
 
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
@@ -88,7 +83,7 @@ ProteoformPtr getSubProteoform(ProteoformPtr proteoform_ptr, int start, int end)
 ProteoformPtrVec generateProtModProteoform(ProteoformPtrVec &ori_forms,
                                            ProtModPtrVec &prot_mods);
 
-std::string convertSemiAlignmentTypeToString(int i);
+//std::string convertSemiAlignmentTypeToString(int i);
 
 } /* namespace prot */
 

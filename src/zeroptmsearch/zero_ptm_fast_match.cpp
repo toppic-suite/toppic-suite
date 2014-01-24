@@ -189,25 +189,23 @@ ZpFastMatchPtr computeInternalMatch(
   return ZpFastMatchPtr(new ZeroPtmFastMatch(form_ptr, best_score, best_bgn, best_end-1));
 }
 
-ZpFastMatchPtrVec zeroPtmFastFilter(int semi_align_type,
+ZpFastMatchPtrVec zeroPtmFastFilter(SemiAlignTypePtr semi_align_type_ptr,
                                     ExtendMsPtr ms_ptr,
                                     ProteoformPtrVec &form_ptr_vec,
                                     int report_num) {
   ZpFastMatchPtrVec match_vec;
   for (unsigned int i = 0; i < form_ptr_vec.size(); i++) {
-    switch (semi_align_type) {
-      case SEMI_ALIGN_TYPE_COMPLETE: 
+    if (semi_align_type_ptr == SemiAlignTypeFactory::getCompletePtr()) { 
         match_vec.push_back(computeCompMatch(ms_ptr, form_ptr_vec[i]));
-        break;
-      case SEMI_ALIGN_TYPE_PREFIX:
+    }
+    else if (semi_align_type_ptr == SemiAlignTypeFactory::getPrefixPtr()) { 
         match_vec.push_back(computePrefixMatch(ms_ptr, form_ptr_vec[i]));
-        break;
-      case SEMI_ALIGN_TYPE_SUFFIX:
+    }
+    else if (semi_align_type_ptr == SemiAlignTypeFactory::getSuffixPtr()) { 
         match_vec.push_back(computeSuffixMatch(ms_ptr, form_ptr_vec[i]));
-        break;
-      case SEMI_ALIGN_TYPE_INTERNAL:
+    }
+    else if (semi_align_type_ptr == SemiAlignTypeFactory::getInternalPtr()) { 
         match_vec.push_back(computeInternalMatch(ms_ptr, form_ptr_vec[i]));
-        break;
     }
   }
 
