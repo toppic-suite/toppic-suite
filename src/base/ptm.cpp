@@ -36,43 +36,6 @@ void Ptm::appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
 }
 
 
-/**
- *   Returns a PTM based on the abbreviation name. Returns null if the
- *   abbreviation name does not exist.
- */
-PtmPtr getPtmPtrByAbbrName(PtmPtrVec &ptm_list, 
-                           const std::string &abbr_name) {
-  for (unsigned int i = 0; i < ptm_list.size(); i++) {
-    std::string n = ptm_list[i]->getAbbrName();
-    if (n == abbr_name) {
-      return ptm_list[i];
-    }
-  }
-  return PtmPtr(nullptr);
-}
-
-/**
- * Checks if the list contains an amino acid with the specific name.
- */
-bool containAbbrName(PtmPtrVec &ptm_list, 
-                     const std::string &abbr_name) {
-   return getPtmPtrByAbbrName(ptm_list, abbr_name).get() != nullptr;
-}
-
-
-PtmPtr addPtm(PtmPtrVec &ptm_list, std::string abbr_name,
-              double mono_mass) {
-  PtmPtr ptm_ptr = getPtmPtrByAbbrName(ptm_list, abbr_name);
-  if (ptm_ptr.get() == nullptr) {
-    PtmPtr new_ptm(new Ptm(abbr_name, mono_mass));
-    ptm_list.push_back(new_ptm);
-    return new_ptm;
-  }
-  else {
-    return ptm_ptr;
-  }
-}
-
 void PtmFactory::initFactory(const std::string &file_name) {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
@@ -96,6 +59,39 @@ PtmPtr PtmFactory::findEmptyPtmPtr() {
     }
   }
   throw "Empty ptm does not exist!";
+}
+
+/**
+ *   Returns a PTM based on the abbreviation name. Returns null if the
+ *   abbreviation name does not exist.
+ */
+PtmPtr PtmFactory::getBasePtmPtrByAbbrName(const std::string &abbr_name) {
+  for (unsigned int i = 0; i < ptm_ptr_vec_.size(); i++) {
+    std::string n = ptm_ptr_vec_[i]->getAbbrName();
+    if (n == abbr_name) {
+      return ptm_ptr_vec_[i];
+    }
+  }
+  return PtmPtr(nullptr);
+}
+
+/**
+ * Checks if the list contains an amino acid with the specific name.
+ */
+bool PtmFactory::baseContainAbbrName(const std::string &abbr_name) {
+   return getBasePtmPtrByAbbrName(abbr_name).get() != nullptr;
+}
+
+PtmPtr PtmFactory::addBasePtm(std::string abbr_name, double mono_mass) {
+  PtmPtr ptm_ptr = getBasePtmPtrByAbbrName(abbr_name);
+  if (ptm_ptr.get() == nullptr) {
+    PtmPtr new_ptm(new Ptm(abbr_name, mono_mass));
+    ptm_ptr_vec_.push_back(new_ptm);
+    return new_ptm;
+  }
+  else {
+    return ptm_ptr;
+  }
 }
 
 }
