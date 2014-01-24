@@ -6,6 +6,7 @@
 #include "base/change.hpp"
 #include "base/segment.hpp"
 #include "base/prot_mod.hpp"
+#include "base/base_data.hpp"
 
 
 namespace prot {
@@ -18,12 +19,14 @@ namespace prot {
 
 class Proteoform;
 typedef std::shared_ptr<Proteoform> ProteoformPtr;
-
+typedef std::vector<ProteoformPtr> ProteoformPtrVec;
 class Proteoform {
 public:
 	Proteoform(DbResSeqPtr db_res_seq_ptr, ProtModPtr prot_mod_ptr,  
              ResSeqPtr res_seq_ptr, int start_pos, int end_pos, 
              ChangePtrVec change_list);
+
+	Proteoform(xercesc::DOMElement* element,ProteoformPtrVec proteoforms,BaseDataPtr basedata);
 
   DbResSeqPtr getDbResSeqPtr() {return db_residue_seq_ptr_;}
 
@@ -72,7 +75,6 @@ private:
   ChangePtrVec change_list_;
 };
 
-typedef std::vector<ProteoformPtr> ProteoformPtrVec;
 
 ProteoformPtr getDbProteoformPtr(DbResSeqPtr db_res_seq_ptr, 
                                  ProtModPtr prot_mod_ptr);
