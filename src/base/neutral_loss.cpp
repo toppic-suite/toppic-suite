@@ -10,13 +10,14 @@
 
 namespace prot {
 
+NeutralLossPtrVec NeutralLossFactory::neutral_loss_ptr_vec_;
+
 NeutralLoss::NeutralLoss(std::string name, double mass){
 	name_ = name;
 	mass_ = mass;
 }
 
-NeutralLossPtrVec getNeutralLossPtrVecInstance(const std::string &file_name){
-  NeutralLossPtrVec neutralLossPtrVec;
+void NeutralLossFactory::initFactory(const std::string &file_name){
   prot::XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
     prot::XmlDOMDocument doc(parser, file_name.c_str());
@@ -26,20 +27,19 @@ NeutralLossPtrVec getNeutralLossPtrVecInstance(const std::string &file_name){
       xercesc::DOMElement* element = getChildElement(parent, "neutral_loss", i);
       std::string name = getChildValue(element,"name", 0);
       double mass = getDoubleChildValue(element,"mass", 0);
-      neutralLossPtrVec.push_back(NeutralLossPtr(new NeutralLoss(name, mass)));
+      neutral_loss_ptr_vec_.push_back(NeutralLossPtr(new NeutralLoss(name, mass)));
     }
   }
-  return neutralLossPtrVec;
 }
 
-NeutralLossPtr getNeutralLossPtrByName(NeutralLossPtrVec &neutralLoss_ptr_vec, 
-                                       const std::string &name){
-	for (unsigned int i = 0; i < neutralLoss_ptr_vec.size(); i++) {
-	    std::string n = neutralLoss_ptr_vec[i]->getName();
+NeutralLossPtr NeutralLossFactory::getBaseNeutralLossPtrByName(const std::string &name){
+	for (unsigned int i = 0; i < neutral_loss_ptr_vec_.size(); i++) {
+	    std::string n = neutral_loss_ptr_vec_[i]->getName();
 	    if (n == name) {
-	      return neutralLoss_ptr_vec[i];
+	      return neutral_loss_ptr_vec_[i];
 	    }
 	  }
 	  return NeutralLossPtr(nullptr);
 }
+
 } /* namespace prot */

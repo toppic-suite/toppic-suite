@@ -38,12 +38,12 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
   BaseDataPtr base_data_ptr = mng_ptr->base_data_ptr_;
   
   ProteoformPtrVec raw_forms = readFastaToProteoform(mng_ptr->search_db_file_name_,
-                                                     AcidFactory::getAcidPtrVec(),
+                                                     AcidFactory::getBaseAcidPtrVec(),
                                                      base_data_ptr->getFixModResiduePtrVec(),
-                                                     base_data_ptr->getDefaultProtModPtr());
+                                                     ProtModFactory::getProtModPtr_NONE());
   ProteoformPtrVec prot_mod_forms 
       = generateProtModProteoform(raw_forms, 
-                                  base_data_ptr->getResiduePtrVec(),
+                                  ResidueFactory::getBaseResiduePtrVec(),
                                   base_data_ptr->getAllowProtModPtrVec());
 
   int spectra_num = countSpNum (mng_ptr->spectrum_file_name_.c_str());
@@ -58,9 +58,9 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
   PrSMWriter internal_writer(output_file_name + "_INTERNAL");
   PrSMWriter all_writer(output_file_name);
 
-  ProtModPtrVec prot_mod_ptr_list = base_data_ptr->getProtModPtrVec();
-  double shift = base_data_ptr->getAcetylationProtModPtr()->getProtShift();
-  IonTypePtrVec ion_type_ptr_list = IonTypeFactory::getIonTypePtrVec();
+  ProtModPtrVec prot_mod_ptr_list = ProtModFactory::getBaseProtModPtrVec();
+  double shift = ProtModFactory::getProtModPtr_ACETYLATION()->getProtShift();
+  IonTypePtrVec ion_type_ptr_list = IonTypeFactory::getBaseIonTypePtrVec();
   LOG_DEBUG("start reading");
   int n = 0;
   DeconvMsPtr ms_ptr = reader.getNextMs();

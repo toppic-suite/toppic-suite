@@ -219,7 +219,7 @@ bool getNAcetylation(DiagonalHeaderPtrVec headers){
 ChangePtrVec getChanges(DiagonalHeaderPtrVec headers,int first,int last,PtmPtrVec ptm_list){
 
 	ChangePtrVec change_list;
-	if(headers[0]->getPepNTermAllowMod() != prot::findEmptyPtmPtr(ptm_list)){
+	if(headers[0]->getPepNTermAllowMod() != PtmFactory::findEmptyPtmPtr()){
 		if(getNAcetylation(headers)){
 			ProtModPtr aptm = headers[0]->getProtNTermAllowMod();
 			change_list.push_back(ChangePtr(new Change(first,headers[0]->getMatchFirstResPos(),PROTEIN_VARIABLE_CHANGE,headers[0]->getPepNTermShift(),aptm==nullptr?nullptr:aptm->getPtmPtr())));
@@ -232,7 +232,7 @@ ChangePtrVec getChanges(DiagonalHeaderPtrVec headers,int first,int last,PtmPtrVe
 		change_list.push_back(ChangePtr(new Change(first,headers[0]->getMatchFirstResPos(),UNEXPECTED_CHANGE,headers[0]->getPepNTermShift(),nullptr)));
 	}
 	DiagonalHeaderPtr lastHeader = headers[headers.size()-1];
-	if(lastHeader->getPepCTermAllowMod() != prot::findEmptyPtmPtr(ptm_list)){
+	if(lastHeader->getPepCTermAllowMod() != PtmFactory::findEmptyPtmPtr()){
 		change_list.push_back(ChangePtr(new Change(lastHeader->getMatchLastResPos()+1,last+1,UNEXPECTED_CHANGE,lastHeader->getPepCTermShift(),nullptr)));
 	}
 

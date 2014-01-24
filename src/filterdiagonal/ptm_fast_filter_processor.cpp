@@ -19,9 +19,9 @@ namespace prot {
 PtmFastFilterProcessor::PtmFastFilterProcessor(PtmFastFilterMngPtr mng){
   mng_ = mng;
   ProteoformPtrVec proteoforms = readFastaToProteoform(mng_->search_db_file_name_,
-                                                       AcidFactory::getAcidPtrVec(),
-                                                       mng->base_data->getResiduePtrVec(),
-                                                       mng->base_data->getDefaultProtModPtr());
+                                                       AcidFactory::getBaseAcidPtrVec(),
+                                                       ResidueFactory::getBaseResiduePtrVec(),
+                                                       ProtModFactory::getProtModPtr_NONE());
 	filter_ = PtmFastFilterBlockPtr(new PtmFastFilterBlock(proteoforms,mng_));
 }
 
@@ -47,7 +47,7 @@ void PtmFastFilterProcessor::processBlock(int block,std::string sp_file_name,int
 	while((deconv_sp = reader.getNextMs()) != nullptr){
 		cnt++;
 //		for(unsigned int i =0;i<deconv_sp->size();i++){
-			SpectrumSetPtr spectrum_set = prot::getSpectrumSet(deconv_sp,0,mng_->sp_para_,prot::getProtModPtrByName(mng_->base_data->getProtModPtrVec(),"ACETYLATION")->getPepShift(),IonTypeFactory::getIonTypePtrVec());
+			SpectrumSetPtr spectrum_set = prot::getSpectrumSet(deconv_sp,0,mng_->sp_para_,ProtModFactory::getProtModPtr_ACETYLATION()->getPepShift(),IonTypeFactory::getBaseIonTypePtrVec());
 			if(spectrum_set != nullptr){
 				std::string scan = deconv_sp->getHeaderPtr()->getScansString();
 				SimplePrSMPtrVec matches = filter_->getBestMathBatch(spectrum_set);

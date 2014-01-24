@@ -24,7 +24,9 @@ PtmProcessor::PtmProcessor(PtmMngPtr mng){
 
 void PtmProcessor::init(){
 	seqs_ = prot::readFastaToProteoform(mng_->search_db_file_name_,
-                                      AcidFactory::getAcidPtrVec(),mng_->base_data_->getResiduePtrVec(),mng_->base_data_->getDefaultProtModPtr());
+                                      AcidFactory::getBaseAcidPtrVec(),
+                                      ResidueFactory::getBaseResiduePtrVec(),
+                                      ProtModFactory::getProtModPtr_NONE());
 	std::string sp_file_name = mng_->spectrum_file_name_;
 	std::string simplePrsmFileName = mng_->spectrum_file_name_ + ".FILTER" + mng_->input_file_ext_;
 	simplePrsms_  = prot::readSimplePrSM(simplePrsmFileName.c_str());
@@ -80,8 +82,8 @@ void PtmProcessor::processDatabase(PtmSearcherPtr searcher){
 	while((deconv_sp = spReader.getNextMs())!= nullptr){
 		cnt++;
 //		for(int i=0;i<deconv_sp->size();i++){
-			double shift = prot::getProtModAcetylationShift(mng_->base_data_->getProtModPtrVec());
-			SpectrumSetPtr spectrumset = prot::getSpectrumSet(deconv_sp,0,mng_->sp_para_,shift,IonTypeFactory::getIonTypePtrVec());
+			double shift = prot::getProtModAcetylationShift(ProtModFactory::getBaseProtModPtrVec());
+			SpectrumSetPtr spectrumset = prot::getSpectrumSet(deconv_sp,0,mng_->sp_para_,shift,IonTypeFactory::getBaseIonTypePtrVec());
 			if(spectrumset != nullptr){
 //				std::string scan = deconv_sp->getHeaderPtr()->getScansString();
 				//update message;

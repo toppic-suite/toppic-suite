@@ -64,7 +64,7 @@ void AcidFactory::initFactory(std::string file_name) {
  * Returns an amino acid based on the the name. Returns null if the amino
  * acid name does not exist.
  */
-AcidPtr AcidFactory::getAcidPtrByName(const std::string &name) {
+AcidPtr AcidFactory::getBaseAcidPtrByName(const std::string &name) {
   for (unsigned int i = 0; i < acid_ptr_vec_.size(); i++) {
     std::string n = acid_ptr_vec_[i]->getName();
     if (n == name) {
@@ -78,7 +78,7 @@ AcidPtr AcidFactory::getAcidPtrByName(const std::string &name) {
  * Returns an amino acid based on the one letter representation. Returns
  * null if the one letter representation does not exist.
  */
-AcidPtr AcidFactory::getAcidPtrByOneLetter(const std::string &one_letter) {
+AcidPtr AcidFactory::getBaseAcidPtrByOneLetter(const std::string &one_letter) {
   for (unsigned int i = 0; i < acid_ptr_vec_.size(); i++) {
     std::string l = acid_ptr_vec_[i]->getOneLetter();
     if (l == one_letter)  {
@@ -93,7 +93,7 @@ AcidPtr AcidFactory::getAcidPtrByOneLetter(const std::string &one_letter) {
  * Returns an amino acid based on the three letter representation. Returns
  * null if the three letter representation does not exist.
  */
-AcidPtr AcidFactory::getAcidPtrByThreeLetter(const std::string &three_letter) {
+AcidPtr AcidFactory::getBaseAcidPtrByThreeLetter(const std::string &three_letter) {
   for (unsigned int i = 0; i < acid_ptr_vec_.size(); i++) {
     std::string l = acid_ptr_vec_[i]->getThreeLetter();
     if (l == three_letter) {
@@ -107,24 +107,24 @@ AcidPtr AcidFactory::getAcidPtrByThreeLetter(const std::string &three_letter) {
 /**
  * Checks if the list contains an amino acid with the specific name.
  */
-bool AcidFactory::containsName(const std::string &name) {
-  return getAcidPtrByName(name).get() != nullptr;
+bool AcidFactory::baseContainsName(const std::string &name) {
+  return getBaseAcidPtrByName(name).get() != nullptr;
 }
 
 /**
  * Checks if the list contains an amino acid with the specific one letter
  * representation.
  */
-bool AcidFactory::containsOneLetter(const std::string &one_letter) {
-  return getAcidPtrByOneLetter(one_letter).get() != nullptr;
+bool AcidFactory::baseContainsOneLetter(const std::string &one_letter) {
+  return getBaseAcidPtrByOneLetter(one_letter).get() != nullptr;
 }
 
 /**
  * Checks if the list contains an amino acid with the specific three letter
  * representation.
  */
-bool AcidFactory::containsThreeLetter(const std::string &three_letter) {
-  return getAcidPtrByThreeLetter(three_letter).get() != nullptr;
+bool AcidFactory::baseContainsThreeLetter(const std::string &three_letter) {
+  return getBaseAcidPtrByThreeLetter(three_letter).get() != nullptr;
 }
 
 /**
@@ -137,7 +137,7 @@ AcidPtrVec AcidFactory::convertSeqToAcidSeq(const std::string &seq) {
     return acid_seq;
   } else {
     for (unsigned int i = 0; i < seq.length(); i++) {
-      acid_seq.push_back(getAcidPtrByOneLetter(seq.substr(i, 1)));
+      acid_seq.push_back(getBaseAcidPtrByOneLetter(seq.substr(i, 1)));
     }
     return acid_seq;
   }

@@ -4,6 +4,8 @@
 
 namespace prot {
 
+ProtModPtrVec ProtModFactory::prot_mod_ptr_vec_;
+
 ProtMod::ProtMod(std::string name, TruncPtr trunc_ptr, PtmPtr ptm_ptr,
                  AcidPtrVec valid_acid_ptrs) {
   name_ = name;
@@ -30,53 +32,10 @@ void ProtMod::appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
 	parent->appendChild(element);
 }
 
-ProtModPtrVec getProtModPtrVecInstance(AcidPtrVec &acid_list,
-                                       PtmPtrVec &ptm_list,
-                                       TruncPtrVec &trunc_list,
-                                       const std::string &file_name) {
-  ProtModPtrVec prot_mod_list;
-  prot::XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
-  if (parser) {
-    prot::XmlDOMDocument doc(parser, file_name.c_str());
-    xercesc::DOMElement* parent = doc.getDocumentElement();
-    int mod_num = getChildCount(parent, "prot_mod");
-    for (int i = 0; i < mod_num; i++) {
-      xercesc::DOMElement* element = getChildElement(parent, "prot_mod", i);
-      std::string name = getChildValue(element, "name", 0);
-      std::string trunc_name = getChildValue(element, "trunc_name", 0);
-      std::string ptm_name = getChildValue(element, "ptm_name", 0);
-      std::string valid_acids = getChildValue(element, "valid_acids", 0);
-      TruncPtr trunc_ptr = getTruncPtrByName(trunc_list, trunc_name);
-      PtmPtr ptm_ptr = getPtmPtrByAbbrName(ptm_list, ptm_name);
-      LOG_DEBUG( "name " << name << " trunc_name " 
-                << trunc_name << " valid acids " << valid_acids);
-      AcidPtrVec valid_acid_ptrs;
-      for (unsigned int j = 0; j < valid_acids.length(); j++) {
-        std::string letter = valid_acids.substr(j, 1);
-        AcidPtr acid_ptr = AcidFactory::getAcidPtrByOneLetter(letter);
-        valid_acid_ptrs.push_back(acid_ptr);
-      }
-      prot_mod_list.push_back(ProtModPtr(
-              new ProtMod(name, trunc_ptr, ptm_ptr, valid_acid_ptrs)));
 
-    }
-  }
-  return prot_mod_list;
-}
-
-ProtModPtr getProtModPtrByName(ProtModPtrVec &prot_mod_list, 
-                         const std::string &name) {
-  for (unsigned int i = 0; i < prot_mod_list.size(); i++) {
-    std::string n = prot_mod_list[i]->getName();
-    if (n == name) {
-      return prot_mod_list[i];
-    }
-  }
-  return ProtModPtr(nullptr);
-}
 
 double getProtModAcetylationShift(ProtModPtrVec &prot_mod_list){
-	ProtModPtr ace = getProtModPtrByName(prot_mod_list,"ACETYLATION");
+	ProtModPtr ace = ProtModFactory::getBaseProtModPtrByName("ACETYLATION");
 	return ace->getPtmPtr()->getMonoMass();
 }
 
@@ -102,5 +61,43 @@ bool allowMod(ProtModPtr mod, ResiduePtrVec residues){
   return false;
 }
 
+void ProtModFactory::initFactory(const std::string &file_name) {
+  prot::XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
+  if (parser) {
+    prot::XmlDOMDocument doc(parser, file_name.c_str());
+    xercesc::DOMElement* parent = doc.getDocumentElement();
+    int mod_num = getChildCount(parent, "prot_mod");
+    for (int i = 0; i < mod_num; i++) {
+      xercesc::DOMElement* element = getChildElement(parent, "prot_mod", i);
+      std::string name = getChildValue(element, "name", 0);
+      std::string trunc_name = getChildValue(element, "trunc_name", 0);
+      std::string ptm_name = getChildValue(element, "ptm_name", 0);
+      std::string valid_acids = getChildValue(element, "valid_acids", 0);
+      TruncPtr trunc_ptr = TruncFactory::getBaseTruncPtrByName(trunc_name);
+      PtmPtr ptm_ptr = PtmFactory::getBasePtmPtrByAbbrName(ptm_name);
+      LOG_DEBUG( "name " << name << " trunc_name " 
+                << trunc_name << " valid acids " << valid_acids);
+      AcidPtrVec valid_acid_ptrs;
+      for (unsigned int j = 0; j < valid_acids.length(); j++) {
+        std::string letter = valid_acids.substr(j, 1);
+        AcidPtr acid_ptr = AcidFactory::getBaseAcidPtrByOneLetter(letter);
+        valid_acid_ptrs.push_back(acid_ptr);
+      }
+      prot_mod_ptr_vec_.push_back(ProtModPtr(
+              new ProtMod(name, trunc_ptr, ptm_ptr, valid_acid_ptrs)));
+
+    }
+  }
+}
+
+ProtModPtr ProtModFactory::getBaseProtModPtrByName(const std::string &name) {
+  for (unsigned int i = 0; i < prot_mod_ptr_vec_.size(); i++) {
+    std::string n = prot_mod_ptr_vec_[i]->getName();
+    if (n == name) {
+      return prot_mod_ptr_vec_[i];
+    }
+  }
+  return ProtModPtr(nullptr);
+}
 
 }

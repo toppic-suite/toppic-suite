@@ -24,41 +24,11 @@ class BaseData {
  public:
   BaseData (std::string config_file_name);
 
-  //AcidPtrVec& getAcidPtrVec() {return acid_list_;}
-  PtmPtrVec& getPtmPtrVec() {return ptm_list_;}
-  ResiduePtrVec& getResiduePtrVec() {return residue_list_;}
-  TruncPtrVec& getTruncPtrVec() {return trunc_list_;}
-  ProtModPtrVec& getProtModPtrVec() {return prot_mod_list_;}
-  ProtModPtr getDefaultProtModPtr() {
-    return getProtModPtrByName(prot_mod_list_, DEFAULT_TYPE_NAME);
-  }
-  ProtModPtr getAcetylationProtModPtr() {
-    return getProtModPtrByName(prot_mod_list_, ACETYLATION_NAME);
-  }
-  //IonTypePtrVec& getIonTypePtrVec() {return ion_type_list_;}
-  NeutralLossPtrVec& getNeutralLossPtrVec() {return neutral_loss_list_;}
-  NeutralLossPtr getDefaultNeutralLossPtr() {
-    return getNeutralLossPtrByName(neutral_loss_list_, DEFAULT_TYPE_NAME);
-  }
-  //ActivationPtrVec& getActivationPtrVec() {return activation_list_;}
-
   ResiduePtrVec& getFixModResiduePtrVec() {return fix_mod_residue_list_;}
   ProtModPtrVec& getAllowProtModPtrVec() {return allow_prot_mod_list_;}
   ActivationPtr& getActivationPtr() {return activation_ptr_;}
 
  private:
-  //AcidPtrVec acid_list_;
-  PtmPtrVec ptm_list_;
-  ResiduePtrVec residue_list_;
-
-  TruncPtrVec trunc_list_;
-  ProtModPtrVec prot_mod_list_;
-
-  //IonTypePtrVec ion_type_list_;
-  NeutralLossPtrVec neutral_loss_list_;
-
-  //ActivationPtrVec activation_list_;
-
   /* configuration */
   ResiduePtrVec fix_mod_residue_list_;
   ProtModPtrVec allow_prot_mod_list_;

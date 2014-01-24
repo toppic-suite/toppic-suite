@@ -19,7 +19,7 @@ CompShiftHiMem::CompShiftHiMem(ProteoformPtrVec seqs,PtmFastFilterMngPtr mng){
 	LOG_DEBUG("Sequence number"+seqs.size());
 	shift_array_len_ = 20000 * scale_ + 2;
 	initSeqBeginEnds(seqs);
-	initIndexes(seqs,IonTypeFactory::getIonTypePtrVec());
+	initIndexes(seqs,IonTypeFactory::getBaseIonTypePtrVec());
 	int debug_info_shift_array_len = shift_array_len_;
 	LOG_DEBUG("shift_array_len_ ="+prot::convertToString(debug_info_shift_array_len));
 	LOG_DEBUG("seq_total_len_"+prot::convertToString(seq_total_len_));
@@ -189,7 +189,7 @@ void CompShiftHiMem::initIndexes(ProteoformPtrVec seqs,IonTypePtrVec ion_type_pt
 			int m = i;
 			LOG_DEBUG("preprocessing seq "+convertToString(m));
 		}
-		std::vector<int> mass = seqs[i]->getBpSpecPtr()->getScaledMass(scale_,prot::getIonTypePtrByName(ion_type_ptr_vec,"B"));
+		std::vector<int> mass = seqs[i]->getBpSpecPtr()->getScaledMass(scale_,IonTypeFactory::getBaseIonTypePtrByName("B"));
 		unsigned int bgn = 0;
 		unsigned int end =0;
 		unsigned int diff =0;
@@ -213,7 +213,7 @@ void CompShiftHiMem::initIndexes(ProteoformPtrVec seqs,IonTypePtrVec ion_type_pt
 }
 void CompShiftHiMem::updateCnt(ProteoformPtr seq,std::vector<int>& cnt,IonTypePtrVec ion_type_ptr_vec){
 
-	std::vector<int> mass = seq->getBpSpecPtr()->getScaledMass(scale_,prot::getIonTypePtrByName(ion_type_ptr_vec,"B"));
+	std::vector<int> mass = seq->getBpSpecPtr()->getScaledMass(scale_,IonTypeFactory::getBaseIonTypePtrByName("B"));
 	unsigned int bgn =0;
 	unsigned int end =0;
 	unsigned int diff=0;

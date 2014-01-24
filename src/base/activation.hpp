@@ -18,7 +18,7 @@ class Activation {
   Activation(std::string name, IonTypePtr n_ion_type_ptr, 
              IonTypePtr c_ion_type_ptr);
 
-  Activation(IonTypePtrVec ion_type_list, xercesc::DOMElement * element);
+  Activation(xercesc::DOMElement * element);
 
   std::string getName(){return name_;}
 
@@ -53,9 +53,9 @@ class ActivationFactory {
  public:
   static void initFactory(const std::string file_name);
 
-  static ActivationPtrVec& getActivationPtrVec() {return activation_ptr_vec_;}
+  static ActivationPtrVec& getBaseActivationPtrVec() {return activation_ptr_vec_;}
 
-  static ActivationPtr getActivationPtrByName(std::string name);
+  static ActivationPtr getBaseActivationPtrByName(std::string name);
 };
 
 } /* namespace prot */

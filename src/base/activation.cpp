@@ -20,13 +20,12 @@ Activation::Activation(std::string name, IonTypePtr n_ion_type_ptr,
   c_ion_type_ = c_ion_type_ptr;
 }
 
-Activation::Activation(IonTypePtrVec ion_type_list,
-                       xercesc::DOMElement * element) {
+Activation::Activation(xercesc::DOMElement * element) {
   name_ = getChildValue(element, "name", 0);
   std::string ion_type_name = getChildValue(element, "n_ion_type",0);
-  n_ion_type_ = getIonTypePtrByName(ion_type_list, ion_type_name);
+  n_ion_type_ = IonTypeFactory::getBaseIonTypePtrByName(ion_type_name);
   ion_type_name = getChildValue(element, "c_ion_type", 0);
-  c_ion_type_ = getIonTypePtrByName(ion_type_list, ion_type_name);
+  c_ion_type_ = IonTypeFactory::getBaseIonTypePtrByName(ion_type_name);
 }
 
 void Activation::appendXml(XmlDOMDocument* xml_doc,
@@ -47,7 +46,6 @@ void Activation::appendXml(XmlDOMDocument* xml_doc,
 }
 
 void ActivationFactory::initFactory(std::string file_name){
-  IonTypePtrVec ion_type_list = IonTypeFactory::getIonTypePtrVec();
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
     XmlDOMDocument doc(parser, file_name.c_str());
@@ -56,13 +54,13 @@ void ActivationFactory::initFactory(std::string file_name){
     for (int i = 0; i < activation_num; i++) {
       xercesc::DOMElement* element 
           = getChildElement(parent, "activation", i);
-      ActivationPtr ptr(new Activation(ion_type_list, element));
+      ActivationPtr ptr(new Activation(element));
       activation_ptr_vec_.push_back(ptr);
     }
   }
 }
 
-ActivationPtr ActivationFactory::getActivationPtrByName(std::string name){
+ActivationPtr ActivationFactory::getBaseActivationPtrByName(std::string name){
   for (unsigned int i = 0; i < activation_ptr_vec_.size(); i++) {
     std::string n = activation_ptr_vec_[i]->getName();
     if (n == name) {

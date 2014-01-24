@@ -27,27 +27,22 @@ BaseData::BaseData  (std::string  config_file_name) {
 
       std::string ptm_file_name = getChildValue(root, "ptm_list_file_name", 0);
       LOG_DEBUG( "ptm file name: " << ptm_file_name);
-      ptm_list_ = getPtmPtrVecInstance(ptm_file_name);
+      PtmFactory::initFactory(ptm_file_name);
       LOG_DEBUG( "ptm initialized");
 
       std::string residue_file_name = getChildValue(root, "residue_list_file_name", 0);
       LOG_DEBUG( "residue file name: " << residue_file_name);
-      residue_list_ = getResiduePtrVecInstance(AcidFactory::getAcidPtrVec(), 
-                                               ptm_list_,
-                                               residue_file_name);
+      ResidueFactory::initFactory(residue_file_name);
       LOG_DEBUG( "residue initialized");
 
       std::string trunc_file_name = getChildValue(root, "trunc_list_file_name", 0);
       LOG_DEBUG( "trunc file name: " << trunc_file_name);
-      trunc_list_ = getTruncPtrVecInstance(AcidFactory::getAcidPtrVec(), 
-                                           trunc_file_name);
+      TruncFactory::initFactory(trunc_file_name);
       LOG_DEBUG( "trunc initialized ");
 
       std::string prot_mod_file_name = getChildValue(root, "prot_mod_list_file_name", 0);
       LOG_DEBUG( "prot mod file name: " << prot_mod_file_name);
-      prot_mod_list_ = getProtModPtrVecInstance(AcidFactory::getAcidPtrVec(), 
-                                                ptm_list_, trunc_list_, 
-                                                prot_mod_file_name);
+      ProtModFactory::initFactory(prot_mod_file_name);
       LOG_DEBUG( "prot mod initialized ");
 
       std::string ion_type_file_name = getChildValue(root, "ion_type_list_file_name", 0);
@@ -55,27 +50,22 @@ BaseData::BaseData  (std::string  config_file_name) {
       IonTypeFactory::initFactory(ion_type_file_name);
       LOG_DEBUG( "ion type initialized ");
 
-      std::string neutral_loss_file_name = getChildValue(root, 
-                                                         "neutral_loss_list_file_name", 
-                                                         0);
+      std::string neutral_loss_file_name 
+          = getChildValue(root, "neutral_loss_list_file_name", 0);
       LOG_DEBUG( "neutral loss file name: " << neutral_loss_file_name);
-      neutral_loss_list_ = getNeutralLossPtrVecInstance(neutral_loss_file_name);
+      NeutralLossFactory::initFactory(neutral_loss_file_name);
       LOG_DEBUG( "neutral loss initialized ");
 
-      std::string activation_file_name = getChildValue(root, 
-                                                       "activation_list_file_name", 
-                                                       0);
+      std::string activation_file_name 
+          = getChildValue(root, "activation_list_file_name", 0);
       LOG_DEBUG( "activation file name: " << activation_file_name);
       ActivationFactory::initFactory(activation_file_name);
       LOG_DEBUG( "activation initialized ");
 
-      std::string fix_mod_residue_file_name = getChildValue(root, 
-                                                            "fix_mod_residue_file_name", 
-                                                            0);
+      std::string fix_mod_residue_file_name 
+          = getChildValue(root, "fix_mod_residue_file_name", 0);
       LOG_DEBUG( "fix mod residue file name: " << fix_mod_residue_file_name);
-      fix_mod_residue_list_ = getResiduePtrVecInstance(AcidFactory::getAcidPtrVec(), ptm_list_,
-                                                       residue_list_, 
-                                                       fix_mod_residue_file_name);
+      fix_mod_residue_list_ = ResidueFactory::getResiduePtrVecInstance(fix_mod_residue_file_name);
       LOG_DEBUG( "fix mod residue initialized ");
 
       LOG_DEBUG( "allow prot mods initialization ");
@@ -83,14 +73,14 @@ BaseData::BaseData  (std::string  config_file_name) {
       int prot_mod_num = getChildCount(parent, "prot_mod");
       for (int i = 0; i < prot_mod_num; i++) {
         std::string mod_name = getChildValue(parent, "prot_mod", i);
-        ProtModPtr ptr = getProtModPtrByName(prot_mod_list_, mod_name);
+        ProtModPtr ptr = ProtModFactory::getBaseProtModPtrByName(mod_name);
         allow_prot_mod_list_.push_back(ptr);
       }
       LOG_DEBUG( "allow prot mods initialized ");
 
       std::string activation_type = getChildValue(root, "activation_type", 0);
       LOG_DEBUG( "acitivation type: " << activation_type);
-      activation_ptr_ = ActivationFactory::getActivationPtrByName(activation_type);
+      activation_ptr_ = ActivationFactory::getBaseActivationPtrByName(activation_type);
     }
     delete doc;
   }

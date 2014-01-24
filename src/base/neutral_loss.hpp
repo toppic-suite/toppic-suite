@@ -28,9 +28,16 @@ private:
 typedef std::shared_ptr<NeutralLoss> NeutralLossPtr;
 typedef std::vector<NeutralLossPtr> NeutralLossPtrVec;
 
-NeutralLossPtrVec getNeutralLossPtrVecInstance(const std::string &file_name);
-NeutralLossPtr getNeutralLossPtrByName(NeutralLossPtrVec &neutralLoss_ptr_vec, 
-                                       const std::string &name);
+/* neutral loss factory */
+class NeutralLossFactory {
+ public:
+  static void initFactory(const std::string &file_name);
+  static NeutralLossPtrVec& getBaseNeutralLossPtrVec() {return neutral_loss_ptr_vec_;}
+  static NeutralLossPtr getBaseNeutralLossPtrByName(const std::string &name);
+
+ private:
+  static NeutralLossPtrVec neutral_loss_ptr_vec_;
+};
 
 } /* namespace prot */
 

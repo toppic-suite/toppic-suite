@@ -6,11 +6,8 @@
 
 namespace prot {
 
-ResidueFreq::ResidueFreq(AcidPtrVec acid_list, PtmPtrVec ptm_list,
-                         std::string acid_name, std::string ptm_abbr_name, 
-                         double freq)
-:Residue (acid_list, ptm_list, acid_name, ptm_abbr_name) {
-
+ResidueFreq::ResidueFreq(std::string acid_name, std::string ptm_abbr_name, 
+                         double freq): Residue (acid_name, ptm_abbr_name) {
   freq_ = freq;
 }
 
@@ -31,8 +28,7 @@ ResFreqPtrVec getResiduePtrVecInstance(AcidPtrVec &acid_list,
       double freq = getDoubleChildValue(element, "frequency", 0);
       LOG_DEBUG( "acid vec " << acid_list.size() << " ptm vec " 
                 << ptm_list.size() << " acid " << acid_name << " ptm " << ptm_abbr_name);
-      residue_list.push_back(ResFreqPtr(
-              new ResidueFreq(acid_list, ptm_list, acid_name, ptm_abbr_name, freq)));
+      residue_list.push_back(ResFreqPtr(new ResidueFreq(acid_name, ptm_abbr_name, freq)));
     }
   }
   return residue_list;
