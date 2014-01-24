@@ -36,7 +36,6 @@ public :
 	ActivationPtr activation_ = nullptr;
 	SpParaPtr sp_para_ = SpParaPtr(new SpPara(min_peak_num_,min_mass_,peank_tolerance_,extend_sp_para_,activation_));
 
-	//todo::need be inited;
 	ProtModPtrVec allow_prot_N_mods_;
 	ProtModPtrVec allow_prot_C_mods_;
 	TruncPtrVec allow_prot_N_truncs_;

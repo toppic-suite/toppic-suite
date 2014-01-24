@@ -45,7 +45,6 @@ private:
 	std::string spectrum_scan_;
 	int precursor_id_;
 	double prec_mass_;
-	//todo:should the follow be residue?
 	ProteoformPtr seq_;
 	int seq_id_;
 	std::string seq_name_;

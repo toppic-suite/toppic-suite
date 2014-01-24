@@ -20,6 +20,59 @@ Proteoform::Proteoform(DbResSeqPtr db_res_seq_ptr, ProtModPtr prot_mod_ptr,
   std::sort(change_list.begin(), change_list.end(), compareChangeUp);
 }
 
+Proteoform::Proteoform(xercesc::DOMElement* element,ProteoformPtrVec proteoforms,BaseDataPtr basedata){
+
+	start_pos_ = getIntChildValue(element, "start_pos", 0);
+	end_pos_ = getIntChildValue(element, "end_pos", 0);
+
+	xercesc::DOMElement* db_element= prot::getChildElement(element,"db_residue_seq",0);
+	int db_seq_id = getIntChildValue(db_element, "id", 0);
+	std::string db_seq_name = getChildValue(db_element, "name", 0);
+	ProteoformPtr seq = proteoforms[db_seq_id];
+	if(seq->getSeqId() != db_seq_id || seq->getName().compare(db_seq_name)!=0){
+		std::cout<< "Sequence ID and/or name is not consistent!" << std::endl;
+		std::exit(0);
+	}
+	db_residue_seq_ptr_ = seq->getDbResSeqPtr();
+
+	xercesc::DOMElement* mod_element= prot::getChildElement(element,"prot_mod",0);
+	std::string mod_name = getChildValue(mod_element, "name", 0);
+//	double mod_prot_shift = getDoubleChildValue(mod_element, "prot_shift", 0);
+//	double mod_pep_shift = getDoubleChildValue(mod_element, "pep_shift", 0);
+//	prot_mod_ptr_ = getProtModPtrByName(basedata->getProtModPtrVec(),mod_name);
+	prot_mod_ptr_ = ProtModFactory::getBaseProtModPtrByName(mod_name);
+
+	xercesc::DOMElement* res_seq_element= prot::getChildElement(element,"residue_seq",0);
+	int res_len = getChildCount(res_seq_element,"residue");
+	ResiduePtrVec residues;
+	for(int i=0;i<res_len;i++){
+		xercesc::DOMElement* res_element= prot::getChildElement(res_seq_element,"residue",i);
+		std::string acid_name = getChildValue(getChildElement(res_element,"amino_acid",0),"name",0);
+		std::string ptm_name = getChildValue(getChildElement(res_element,"modification",0),"abbr_name",0);
+		residues.push_back(ResiduePtr(new Residue(acid_name,ptm_name)));
+	}
+	residue_seq_ptr_ = ResSeqPtr(new ResidueSeq(residues));
+
+	bp_spec_ptr_= BpSpecPtr(new BpSpec(residue_seq_ptr_));
+
+	xercesc::DOMElement* change_list_element= prot::getChildElement(element,"change_list",0);
+	int change_len = getChildCount(res_seq_element,"change");
+	for(int i=0;i<change_len;i++){
+		xercesc::DOMElement* change_element= prot::getChildElement(change_list_element,"change",i);
+		int left_bp_pos = getIntChildValue(change_element,"left_bp_pos",0);
+		int right_bp_pos = getIntChildValue(change_element,"right_bp_pos",0);
+		int change_type = getIntChildValue(change_element,"change_type",0);
+		double mass_shift = getDoubleChildValue(change_element,"mass_shift",0);
+		int ptm_count = getChildCount(change_list_element,"modification");
+		PtmPtr change_ptm = nullptr;
+		if(ptm_count!=0){
+			xercesc::DOMElement* ptm_element= prot::getChildElement(change_list_element,"modification",i);
+			change_ptm = PtmFactory::getBasePtmPtrByAbbrName(getChildValue(ptm_element,"abbr_name",0));
+		}
+		change_list_.push_back(ChangePtr(new Change(left_bp_pos,right_bp_pos,change_type,mass_shift,change_ptm)));
+	}
+}
+
 SegmentPtrVec Proteoform::getSegmentPtrVec() {
   ChangePtrVec unexpected_changes;
   double mass_shift_sum = 0;

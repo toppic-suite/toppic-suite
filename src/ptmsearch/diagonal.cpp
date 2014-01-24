@@ -40,7 +40,6 @@ DiagonalHeaderPtrVec refineHeadersBgnEnd(int first_pos,ProteoformPtr seq,DeconvM
 //	DiagonalHeaderPtr last_header = headers[headers.size()-1];
 //	int first_res_pos = first_header->getTruncFirstResPos();
 //	int last_res_pos = last_header->getTruncLastResPos();
-//	//todo:: may be improved proteoform's sub;
 //	ResSeqPtr subseq = seq->getResSeqPtr()->getSubResidueSeq(first_res_pos,last_res_pos);
 ////	ProteoformPtr pep = ProteoformPtr(new Proteoform(seq->getDbResSeqPtr(),seq->getProtModPtr(),subseq,first_res_pos,last_res_pos,seq->getChangePtrVec()));
 //	BpSpecPtr pep = BpSpecPtr(new BpSpec(subseq));
