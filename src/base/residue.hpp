@@ -67,9 +67,6 @@ ResiduePtrVec convertAcidToResidueSeq(ResiduePtrVec &residue_list,
                                       AcidPtrVec acid_list);
 /* residue factory */
 class ResidueFactory {
- private:
-  static ResiduePtrVec residue_ptr_vec_;
-
  public:
   static void initFactory(const std::string &file_name);
 
@@ -82,6 +79,9 @@ class ResidueFactory {
   static ResiduePtr addBaseResidue(AcidPtr acid_ptr, PtmPtr ptm_ptr);
   
   static ResiduePtrVec getResiduePtrVecInstance(const std::string &file_name);
+
+ private:
+  static ResiduePtrVec residue_ptr_vec_;
 };
 
 }

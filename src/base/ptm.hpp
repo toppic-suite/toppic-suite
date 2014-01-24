@@ -59,9 +59,6 @@ PtmPtr addPtm(PtmPtrVec &ptm_list, std::string abbr_name,
 
 /* ptm factory */
 class PtmFactory {
- private:
-  static PtmPtrVec ptm_ptr_vec_;
-
  public:
   static void initFactory(const std::string &file_name);
   static PtmPtrVec& getBasePtmPtrVec() {return ptm_ptr_vec_;}
@@ -72,6 +69,9 @@ class PtmFactory {
   static bool baseContainAbbrName(const std::string &abbr_name) {
     return containAbbrName(ptm_ptr_vec_, abbr_name);
   }
+
+ private:
+  static PtmPtrVec ptm_ptr_vec_;
 };
 
 }

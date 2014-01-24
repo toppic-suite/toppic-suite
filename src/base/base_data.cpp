@@ -37,15 +37,14 @@ BaseData::BaseData  (std::string  config_file_name) {
 
       std::string trunc_file_name = getChildValue(root, "trunc_list_file_name", 0);
       LOG_DEBUG( "trunc file name: " << trunc_file_name);
-      trunc_list_ = getTruncPtrVecInstance(AcidFactory::getBaseAcidPtrVec(), 
-                                           trunc_file_name);
+      TruncFactory::initFactory(trunc_file_name);
       LOG_DEBUG( "trunc initialized ");
 
       std::string prot_mod_file_name = getChildValue(root, "prot_mod_list_file_name", 0);
       LOG_DEBUG( "prot mod file name: " << prot_mod_file_name);
       prot_mod_list_ = getProtModPtrVecInstance(AcidFactory::getBaseAcidPtrVec(), 
                                                 PtmFactory::getBasePtmPtrVec(), 
-                                                trunc_list_, 
+                                                TruncFactory::getBaseTruncPtrVec(), 
                                                 prot_mod_file_name);
       LOG_DEBUG( "prot mod initialized ");
 

@@ -17,10 +17,10 @@ PtmMng::PtmMng(std::string config_file_name){
 
 	allow_prot_C_mods_.push_back(prot::getProtModPtrByName(base_data_->getProtModPtrVec(),"NONE"));
 
-	allow_prot_N_truncs_.push_back(prot::getTruncPtrByName(base_data_->getTruncPtrVec(),"NONE"));
-	allow_prot_N_truncs_.push_back(prot::getTruncPtrByName(base_data_->getTruncPtrVec(),"NME"));
+	allow_prot_N_truncs_.push_back(TruncFactory::getBaseTruncPtrByName("NONE"));
+	allow_prot_N_truncs_.push_back(TruncFactory::getBaseTruncPtrByName("NME"));
 
-	allow_prot_C_truncs_.push_back(prot::getTruncPtrByName(base_data_->getTruncPtrVec(),"NONE"));
+	allow_prot_C_truncs_.push_back(TruncFactory::getBaseTruncPtrByName("NONE"));
 
 	allow_pep_N_mods_.push_back(PtmFactory::findEmptyPtmPtr());
 

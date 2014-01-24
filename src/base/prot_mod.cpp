@@ -46,7 +46,7 @@ ProtModPtrVec getProtModPtrVecInstance(AcidPtrVec &acid_list,
       std::string trunc_name = getChildValue(element, "trunc_name", 0);
       std::string ptm_name = getChildValue(element, "ptm_name", 0);
       std::string valid_acids = getChildValue(element, "valid_acids", 0);
-      TruncPtr trunc_ptr = getTruncPtrByName(trunc_list, trunc_name);
+      TruncPtr trunc_ptr = TruncFactory::getBaseTruncPtrByName(trunc_name);
       PtmPtr ptm_ptr = getPtmPtrByAbbrName(ptm_list, ptm_name);
       LOG_DEBUG( "name " << name << " trunc_name " 
                 << trunc_name << " valid acids " << valid_acids);

@@ -59,9 +59,6 @@ typedef std::vector<AcidPtr> AcidPtrVec;
 
 /* acid factory */
 class AcidFactory {
- private:
-  static AcidPtrVec acid_ptr_vec_;
-
  public:
   static void initFactory(const std::string file_name);
   static AcidPtrVec& getBaseAcidPtrVec() {return acid_ptr_vec_;}
@@ -103,6 +100,9 @@ class AcidFactory {
    * acids) to an amino acid array.
    */
   static AcidPtrVec convertSeqToAcidSeq(const std::string &seq);
+
+ private:
+  static AcidPtrVec acid_ptr_vec_;
 };
 
 }
