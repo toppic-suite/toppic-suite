@@ -26,7 +26,6 @@ void Trunc::appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
 	xml_doc->addElement(element, "trunc_len", str.c_str());
 	str = convertToString(shift_);
 	xml_doc->addElement(element, "shift", str.c_str());
-	//todo::acidlist add str?
 	xercesc::DOMElement* acid_list = xml_doc->createElement("amino_acid_list");
 	for(unsigned int i=0;i<acid_str_.size();i++){
 		acid_str_[i]->appendxml(xml_doc,acid_list);
