@@ -32,14 +32,6 @@ void ProtMod::appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
 	parent->appendChild(element);
 }
 
-
-
-//todo:: problems NME_ACETYLATION? protshif?
-double getProtModAcetylationShift(ProtModPtrVec &prot_mod_list){
-	ProtModPtr ace = ProtModFactory::getBaseProtModPtrByName("ACETYLATION");
-	return ace->getPtmPtr()->getMonoMass();
-}
-
 bool allowMod(ProtModPtr mod, ResiduePtrVec residues){
 	if(mod->getName().compare("NONE")==0){
 		return true;

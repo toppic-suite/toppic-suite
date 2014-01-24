@@ -14,6 +14,8 @@
 
 namespace prot {
 
+#define PTM_ACETYLATION "Acetylation"
+
 class Ptm;
 typedef std::shared_ptr<Ptm> PtmPtr;
 typedef std::vector<PtmPtr> PtmPtrVec;
@@ -69,6 +71,10 @@ class PtmFactory {
   static bool baseContainAbbrName(const std::string &abbr_name) {
     return containAbbrName(ptm_ptr_vec_, abbr_name);
   }
+  static PtmPtr getPtmPtr_Acetylation() {
+    return getPtmPtrByAbbrName(ptm_ptr_vec_, PTM_ACETYLATION);
+  }
+
 
  private:
   static PtmPtrVec ptm_ptr_vec_;

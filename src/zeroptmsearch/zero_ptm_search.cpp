@@ -59,7 +59,7 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
   PrSMWriter all_writer(output_file_name);
 
   ProtModPtrVec prot_mod_ptr_list = ProtModFactory::getBaseProtModPtrVec();
-  double shift = ProtModFactory::getProtModPtr_ACETYLATION()->getProtShift();
+  double shift = PtmFactory::getPtmPtr_Acetylation()->getMonoMass();
   IonTypePtrVec ion_type_ptr_list = IonTypeFactory::getBaseIonTypePtrVec();
   LOG_DEBUG("start reading");
   int n = 0;

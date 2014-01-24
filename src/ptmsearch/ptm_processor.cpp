@@ -83,7 +83,7 @@ void PtmProcessor::processDatabase(PtmSearcherPtr searcher){
 	while((deconv_sp = spReader.getNextMs())!= nullptr){
 		cnt++;
 //		for(int i=0;i<deconv_sp->size();i++){
-			double shift = prot::getProtModAcetylationShift(ProtModFactory::getBaseProtModPtrVec());
+      double shift = PtmFactory::getPtmPtr_Acetylation()->getMonoMass(); 
 			SpectrumSetPtr spectrumset = prot::getSpectrumSet(deconv_sp,0,mng_->sp_para_,shift,IonTypeFactory::getBaseIonTypePtrVec());
 			if(spectrumset != nullptr){
 //				std::string scan = deconv_sp->getHeaderPtr()->getScansString();

@@ -10,7 +10,6 @@
 namespace prot {
 
 #define PROT_MOD_NONE "NONE"
-#define PROT_MOD_ACETYLATION "ACETYLATION"
 
 class ProtMod {
  public:
@@ -43,9 +42,6 @@ class ProtMod {
 typedef std::shared_ptr<ProtMod> ProtModPtr;
 typedef std::vector<ProtModPtr> ProtModPtrVec;
 
-
-double getProtModAcetylationShift(ProtModPtrVec &prot_mod_list);
-
 bool allowMod(ProtModPtr prot_mod_ptr, ResiduePtrVec residues);
 
 /* prot mod factory */
@@ -61,10 +57,6 @@ class ProtModFactory {
     return getBaseProtModPtrByName(PROT_MOD_NONE);
   }
 
-  static ProtModPtr getProtModPtr_ACETYLATION () {
-    return getBaseProtModPtrByName(PROT_MOD_ACETYLATION);
-  }
-  
  private:
   static ProtModPtrVec prot_mod_ptr_vec_;
 };
