@@ -13,7 +13,7 @@ Trunc::Trunc(std::string name, int trunc_len,
   shift_ = 0;
   for (unsigned int i = 0; i < str.length(); i++) {
     std::string letter = str.substr(i, 1);
-    AcidPtr acid_ptr = AcidFactory::getAcidPtrByOneLetter(letter);
+    AcidPtr acid_ptr = AcidFactory::getBaseAcidPtrByOneLetter(letter);
     acid_str_.push_back(acid_ptr);
     shift_ = shift_ - acid_ptr->getMonoMass();
   }

@@ -6,16 +6,17 @@
 
 namespace prot {
 
+ResiduePtrVec ResidueFactory::residue_ptr_vec_;
+
 Residue::Residue(AcidPtr acid_ptr, PtmPtr ptm_ptr) {
   acid_ptr_ = acid_ptr;
   ptm_ptr_ = ptm_ptr;
   mass_ = acid_ptr->getMonoMass() + ptm_ptr->getMonoMass();
 }
 
-Residue::Residue(AcidPtrVec acid_list, PtmPtrVec ptm_list,
-          std::string acid_name, std::string ptm_abbr_name) {
-  acid_ptr_ = AcidFactory::getAcidPtrByName(acid_name);
-  ptm_ptr_ = getPtmPtrByAbbrName(ptm_list, ptm_abbr_name);
+Residue::Residue(std::string acid_name, std::string ptm_abbr_name) {
+  acid_ptr_ = AcidFactory::getBaseAcidPtrByName(acid_name);
+  ptm_ptr_ = PtmFactory::getBasePtmPtrByAbbrName(ptm_abbr_name);
   mass_ = acid_ptr_->getMonoMass() + ptm_ptr_->getMonoMass();
 }
 
@@ -57,28 +58,6 @@ ResiduePtr getResiduePtrByAcidPtm(ResiduePtrVec &residue_list,
   return ResiduePtr(nullptr);
 }
 
-ResiduePtrVec getResiduePtrVecInstance(AcidPtrVec &acid_list, 
-                                       PtmPtrVec &ptm_list,
-                                       std::string file_name) {
-  ResiduePtrVec residue_list;
-  XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
-  if (parser) {
-    XmlDOMDocument doc(parser, file_name.c_str());
-    xercesc::DOMElement* parent = doc.getDocumentElement();
-    int residue_num = getChildCount(parent, "residue");
-    LOG_DEBUG( "residue num " << residue_num);
-    for (int i = 0; i < residue_num; i++) {
-      xercesc::DOMElement* element = getChildElement(parent, "residue", i);
-      std::string acid_name = getChildValue(element, "acid", 0);
-      std::string ptm_abbr_name = getChildValue(element, "ptm", 0);
-      LOG_DEBUG( "acid vec " << acid_list.size() << " ptm vec " 
-                << ptm_list.size() << " acid " << acid_name << " ptm " << ptm_abbr_name);
-      residue_list.push_back(ResiduePtr(
-              new Residue(acid_list, ptm_list, acid_name, ptm_abbr_name)));
-    }
-  }
-  return residue_list;
-}
 
 ResiduePtrVec getResiduePtrVecInstance(AcidPtrVec &acid_list, 
                                        PtmPtrVec &ptm_list,
@@ -97,7 +76,7 @@ ResiduePtrVec getResiduePtrVecInstance(AcidPtrVec &acid_list,
       std::string ptm_abbr_name = getChildValue(element, "ptm", 0);
       LOG_DEBUG( "acid vec " << acid_list.size() << " ptm vec " << ptm_list.size() 
                 << " acid " << acid_name << " ptm " << ptm_abbr_name);
-      AcidPtr acid_ptr = AcidFactory::getAcidPtrByName(acid_name);
+      AcidPtr acid_ptr = AcidFactory::getBaseAcidPtrByName(acid_name);
       if (acid_ptr.get() == nullptr) {
         LOG_ERROR( "acid " << acid_name  << " not found ");
         throw("acid not found");
@@ -139,6 +118,22 @@ ResiduePtrVec convertAcidToResidueSeq(ResiduePtrVec residue_list,
     result_seq.push_back(residue_ptr);
   }
   return result_seq;
+}
+
+void ResidueFactory::initFactory(const std::string &file_name) {
+  XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
+  if (parser) {
+    XmlDOMDocument doc(parser, file_name.c_str());
+    xercesc::DOMElement* parent = doc.getDocumentElement();
+    int residue_num = getChildCount(parent, "residue");
+    LOG_DEBUG( "residue num " << residue_num);
+    for (int i = 0; i < residue_num; i++) {
+      xercesc::DOMElement* element = getChildElement(parent, "residue", i);
+      std::string acid_name = getChildValue(element, "acid", 0);
+      std::string ptm_abbr_name = getChildValue(element, "ptm", 0);
+      residue_ptr_vec_.push_back(ResiduePtr(new Residue(acid_name, ptm_abbr_name)));
+    }
+  }
 }
 
 }

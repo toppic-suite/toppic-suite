@@ -51,7 +51,7 @@ PtmPtr getPtmPtrByAbbrName(PtmPtrVec &ptm_list,
 /**
  * Checks if the list contains an amino acid with the specific name.
  */
-bool containAbbrsName(PtmPtrVec &ptm_list, const std::string &abbr_name);
+bool containAbbrName(PtmPtrVec &ptm_list, const std::string &abbr_name);
 
 
 PtmPtr addPtm(PtmPtrVec &ptm_list, std::string abbr_name,
@@ -66,6 +66,12 @@ class PtmFactory {
   static void initFactory(const std::string &file_name);
   static PtmPtrVec& getBasePtmPtrVec() {return ptm_ptr_vec_;}
   static PtmPtr findEmptyPtmPtr();
+  static PtmPtr getBasePtmPtrByAbbrName(const std::string &abbr_name) {
+    return getPtmPtrByAbbrName(ptm_ptr_vec_, abbr_name);
+  }
+  static bool baseContainAbbrName(const std::string &abbr_name) {
+    return containAbbrName(ptm_ptr_vec_, abbr_name);
+  }
 };
 
 }

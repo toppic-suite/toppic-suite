@@ -24,8 +24,7 @@ class BaseData {
  public:
   BaseData (std::string config_file_name);
 
-  //PtmPtrVec& getPtmPtrVec() {return ptm_list_;}
-  ResiduePtrVec& getResiduePtrVec() {return residue_list_;}
+  //ResiduePtrVec& getResiduePtrVec() {return residue_list_;}
   TruncPtrVec& getTruncPtrVec() {return trunc_list_;}
   ProtModPtrVec& getProtModPtrVec() {return prot_mod_list_;}
   ProtModPtr getDefaultProtModPtr() {
@@ -46,8 +45,7 @@ class BaseData {
   ActivationPtr& getActivationPtr() {return activation_ptr_;}
 
  private:
-  //PtmPtrVec ptm_list_;
-  ResiduePtrVec residue_list_;
+  //ResiduePtrVec residue_list_;
 
   TruncPtrVec trunc_list_;
   ProtModPtrVec prot_mod_list_;

@@ -53,7 +53,7 @@ ProtModPtrVec getProtModPtrVecInstance(AcidPtrVec &acid_list,
       AcidPtrVec valid_acid_ptrs;
       for (unsigned int j = 0; j < valid_acids.length(); j++) {
         std::string letter = valid_acids.substr(j, 1);
-        AcidPtr acid_ptr = AcidFactory::getAcidPtrByOneLetter(letter);
+        AcidPtr acid_ptr = AcidFactory::getBaseAcidPtrByOneLetter(letter);
         valid_acid_ptrs.push_back(acid_ptr);
       }
       prot_mod_list.push_back(ProtModPtr(

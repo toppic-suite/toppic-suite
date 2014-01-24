@@ -69,34 +69,34 @@ class AcidFactory {
    * Returns an amino acid based on the the name. Returns null if the amino
    * acid name does not exist.
    */
-  static AcidPtr getAcidPtrByName(const std::string &name);
+  static AcidPtr getBaseAcidPtrByName(const std::string &name);
   /**
    * Returns an amino acid based on the one letter representation. Returns
    * null if the one letter representation does not exist.
    */
-  static AcidPtr getAcidPtrByOneLetter(const std::string &one_letter);
+  static AcidPtr getBaseAcidPtrByOneLetter(const std::string &one_letter);
   /**
    * Returns an amino acid based on the three letter representation. Returns
    * null if the three letter representation does not exist.
    */
-  static AcidPtr getAcidPtrByThreeLetter(const std::string &three_letter);
+  static AcidPtr getBaseAcidPtrByThreeLetter(const std::string &three_letter);
 
   /**
    * Checks if the list contains an amino acid with the specific name.
    */
-  static bool containsName(const std::string &name);
+  static bool baseContainsName(const std::string &name);
 
   /**
    * Checks if the list contains an amino acid with the specific one letter
    * representation.
    */
-  static bool containsOneLetter(const std::string &one_letter);
+  static bool baseContainsOneLetter(const std::string &one_letter);
 
   /**
    * Checks if the list contains an amino acid with the specific three letter
    * representation.
    */
-  static bool containsThreeLetter(const std::string &three_letter);
+  static bool baseContainsThreeLetter(const std::string &three_letter);
 
   /**
    * Converts a protein sequence (with one letter representation of amino

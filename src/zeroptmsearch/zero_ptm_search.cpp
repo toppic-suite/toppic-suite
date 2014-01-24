@@ -43,7 +43,7 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
                                                      base_data_ptr->getDefaultProtModPtr());
   ProteoformPtrVec prot_mod_forms 
       = generateProtModProteoform(raw_forms, 
-                                  base_data_ptr->getResiduePtrVec(),
+                                  ResidueFactory::getBaseResiduePtrVec(),
                                   base_data_ptr->getAllowProtModPtrVec());
 
   int spectra_num = countSpNum (mng_ptr->spectrum_file_name_.c_str());

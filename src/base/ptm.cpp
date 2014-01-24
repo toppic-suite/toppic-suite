@@ -54,8 +54,8 @@ PtmPtr getPtmPtrByAbbrName(PtmPtrVec &ptm_list,
 /**
  * Checks if the list contains an amino acid with the specific name.
  */
-bool containAbbrsName(PtmPtrVec &ptm_list, 
-                      const std::string &abbr_name) {
+bool containAbbrName(PtmPtrVec &ptm_list, 
+                     const std::string &abbr_name) {
    return getPtmPtrByAbbrName(ptm_list, abbr_name).get() != nullptr;
 }
 

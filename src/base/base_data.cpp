@@ -32,9 +32,7 @@ BaseData::BaseData  (std::string  config_file_name) {
 
       std::string residue_file_name = getChildValue(root, "residue_list_file_name", 0);
       LOG_DEBUG( "residue file name: " << residue_file_name);
-      residue_list_ = getResiduePtrVecInstance(AcidFactory::getBaseAcidPtrVec(), 
-                                               PtmFactory::getBasePtmPtrVec(),
-                                               residue_file_name);
+      ResidueFactory::initFactory(residue_file_name);
       LOG_DEBUG( "residue initialized");
 
       std::string trunc_file_name = getChildValue(root, "trunc_list_file_name", 0);
@@ -76,7 +74,7 @@ BaseData::BaseData  (std::string  config_file_name) {
       LOG_DEBUG( "fix mod residue file name: " << fix_mod_residue_file_name);
       fix_mod_residue_list_ = getResiduePtrVecInstance(AcidFactory::getBaseAcidPtrVec(), 
                                                        PtmFactory::getBasePtmPtrVec(),
-                                                       residue_list_, 
+                                                       ResidueFactory::getBaseResiduePtrVec(), 
                                                        fix_mod_residue_file_name);
       LOG_DEBUG( "fix mod residue initialized ");
 

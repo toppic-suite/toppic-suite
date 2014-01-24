@@ -20,7 +20,7 @@ PtmFastFilterProcessor::PtmFastFilterProcessor(PtmFastFilterMngPtr mng){
   mng_ = mng;
   ProteoformPtrVec proteoforms = readFastaToProteoform(mng_->search_db_file_name_,
                                                        AcidFactory::getBaseAcidPtrVec(),
-                                                       mng->base_data->getResiduePtrVec(),
+                                                       ResidueFactory::getBaseResiduePtrVec(),
                                                        mng->base_data->getDefaultProtModPtr());
 	filter_ = PtmFastFilterBlockPtr(new PtmFastFilterBlock(proteoforms,mng_));
 }

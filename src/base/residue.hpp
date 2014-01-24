@@ -18,8 +18,7 @@ class Residue {
  public:
 	Residue(AcidPtr acid_ptr, PtmPtr ptm_ptr); 
 
-  Residue(AcidPtrVec acid_list, PtmPtrVec ptm_list,
-          std::string acid_name, std::string abbr_name);
+  Residue(std::string acid_name, std::string abbr_name);
 
 	/** Get amino acid. */
 	AcidPtr getAcidPtr() {return acid_ptr_; }
@@ -57,7 +56,7 @@ typedef std::shared_ptr<Residue> ResiduePtr;
 typedef std::vector<ResiduePtr> ResiduePtrVec;
 
 ResiduePtr getResiduePtrByAcid(ResiduePtrVec &residue_list,
-                                  AcidPtr acid_ptr);
+                               AcidPtr acid_ptr);
 /**
  * Returns the first residue based on the acid and ptm. 
  */
@@ -75,5 +74,15 @@ ResiduePtr addResidue(ResiduePtrVec &residue_list, AcidPtr acid_ptr,
 
 ResiduePtrVec convertAcidToResidueSeq(ResiduePtrVec residue_list,
                                       AcidPtrVec acid_list);
+/* residue factory */
+class ResidueFactory {
+ private:
+  static ResiduePtrVec residue_ptr_vec_;
+
+ public:
+  static void initFactory(const std::string &file_name);
+  static ResiduePtrVec& getBaseResiduePtrVec() {return residue_ptr_vec_;}
+};
+
 }
 #endif
