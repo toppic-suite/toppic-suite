@@ -35,23 +35,6 @@ void Ptm::appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
 	parent->appendChild(element);
 }
 
-PtmPtrVec getPtmPtrVecInstance(const std::string &file_name) {
-  PtmPtrVec ptm_list;
-  XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
-  if (parser) {
-    XmlDOMDocument doc(parser, file_name.c_str());
-    xercesc::DOMElement* parent = doc.getDocumentElement();
-    int ptm_num = getChildCount(parent, "modification");
-    for (int i = 0; i < ptm_num; i++) {
-      xercesc::DOMElement* element = getChildElement(parent, "modification", i);
-      std::string abbr_name = getChildValue(element, "abbreviation", 0);
-      double mono_mass = getDoubleChildValue(element, "mono_mass", 0);
-      ptm_list.push_back(PtmPtr(new Ptm(abbr_name, mono_mass)));
-
-    }
-  }
-  return ptm_list;
-}
 
 /**
  *   Returns a PTM based on the abbreviation name. Returns null if the
@@ -95,6 +78,22 @@ PtmPtr addPtm(PtmPtrVec &ptm_list, std::string abbr_name,
   }
   else {
     return ptm_ptr;
+  }
+}
+
+void PtmFactory::initFactory(const std::string &file_name) {
+  XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
+  if (parser) {
+    XmlDOMDocument doc(parser, file_name.c_str());
+    xercesc::DOMElement* parent = doc.getDocumentElement();
+    int ptm_num = getChildCount(parent, "modification");
+    for (int i = 0; i < ptm_num; i++) {
+      xercesc::DOMElement* element = getChildElement(parent, "modification", i);
+      std::string abbr_name = getChildValue(element, "abbreviation", 0);
+      double mono_mass = getDoubleChildValue(element, "mono_mass", 0);
+      ptm_ptr_vec_.push_back(PtmPtr(new Ptm(abbr_name, mono_mass)));
+
+    }
   }
 }
 

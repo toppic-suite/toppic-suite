@@ -79,7 +79,7 @@ PrSMPtr PtmSlowMatch::geneResult(int shift_num,int type){
 //	std::cout<<last_pos<<std::endl;
 //	std::cout<<refined_headers.size()<<std::endl;
 
-	ChangePtrVec changes = prot::getChanges(refined_headers,first_pos,last_pos,mng_->base_data_->getPtmPtrVec());
+	ChangePtrVec changes = prot::getChanges(refined_headers,first_pos,last_pos,PtmFactory::getBasePtmPtrVec());
 
 
 	ProteoformPtr protein = ProteoformPtr(new Proteoform(seq_->getDbResSeqPtr(),seq_->getProtModPtr(),seq_->getResSeqPtr(),first_pos,last_pos,changes) );

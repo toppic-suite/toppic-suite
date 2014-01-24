@@ -64,7 +64,7 @@ class AcidFactory {
 
  public:
   static void initFactory(const std::string file_name);
-  static AcidPtrVec& getAcidPtrVec() {return acid_ptr_vec_;}
+  static AcidPtrVec& getBaseAcidPtrVec() {return acid_ptr_vec_;}
   /**
    * Returns an amino acid based on the the name. Returns null if the amino
    * acid name does not exist.

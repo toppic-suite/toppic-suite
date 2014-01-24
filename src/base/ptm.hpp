@@ -43,7 +43,6 @@ class Ptm {
   double mono_mass_;
 };
 
-PtmPtrVec getPtmPtrVecInstance(const std::string &file_name);
 /**
  * Returns a PTM based on the abbreviation name. Returns null if the
  * abbreviation name does not exist.
@@ -67,10 +66,8 @@ class PtmFactory {
   static PtmPtrVec ptm_ptr_vec_;
 
  public:
-  static void initFactory(const std::string &file_name) {
-    ptm_ptr_vec_ = getPtmPtrVecInstance(file_name);
-  }
-  static PtmPtrVec& getPtmPtrVec() {return ptm_ptr_vec_;}
+  static void initFactory(const std::string &file_name);
+  static PtmPtrVec& getBasePtmPtrVec() {return ptm_ptr_vec_;}
 };
 
 }
