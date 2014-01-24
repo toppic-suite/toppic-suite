@@ -16,6 +16,7 @@ PrSM::PrSM(ProteoformPtr proteoform_ptr, DeconvMsPtr deconv_ms_ptr,
   ori_prec_mass_ = header_ptr->getPrecMonoMass();
   adjusted_prec_mass_ = adjusted_prec_mass;
   calibration_ = calibration;
+  sp_para_ptr_=sp_para_ptr;
   init(sp_para_ptr);
 }
 
@@ -61,10 +62,13 @@ xercesc::DOMElement* PrSM::toXmlElement(XmlDOMDocument* xml_doc){
 	str = convertToString(calibration_);
 	xml_doc->addElement(element, "calibration", str.c_str());
 	proteoform_ptr_->appendXml(xml_doc,element);
-	//prob_ptr_->appendXml(xml_doc,element);
+	sp_para_ptr_->appendXml(xml_doc,element);
+	if(prob_ptr_!=nullptr){
+	    prob_ptr_->appendXml(xml_doc,element);
+	}
 	str = convertToString(fdr_);
 	xml_doc->addElement(element, "fdr", str.c_str());
-	//deconv_ms_ptr_->appendXml(xml_doc,element);
+	deconv_ms_ptr_->appendXml(xml_doc,element);
 	//refine_ms_three_->appendXml(xml_doc,element);
 	str = convertToString(match_peak_num_);
 	xml_doc->addElement(element, "match_peak_num", str.c_str());
@@ -76,6 +80,39 @@ xercesc::DOMElement* PrSM::toXmlElement(XmlDOMDocument* xml_doc){
 void PrSM::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
 	xercesc::DOMElement* element = toXmlElement(xml_doc);
 	parent->appendChild(element);
+}
+
+PrSM::PrSM(xercesc::DOMElement* element,ProteoformPtrVec proteoforms,BaseDataPtr basedata){
+	prsm_id_=getIntChildValue(element, "prsm_id", 0);
+	spectrum_id_=getIntChildValue(element, "spectrum_id", 0);
+	spectrum_scan_=getChildValue(element, "spectrum_scan", 0);
+	precursor_id_=getIntChildValue(element, "precursor_id", 0);
+	ori_prec_mass_=getDoubleChildValue(element, "ori_prec_mass", 0);
+	adjusted_prec_mass_=getDoubleChildValue(element, "adjusted_prec_mass", 0);
+	calibration_=getDoubleChildValue(element, "calibration", 0);
+	fdr_=getDoubleChildValue(element, "fdr", 0);
+	match_peak_num_=getDoubleChildValue(element, "match_peak_num", 0);
+	match_fragment_num_=getDoubleChildValue(element, "match_fragment_num", 0);
+
+	xercesc::DOMElement* proteoform_element= prot::getChildElement(element,"proteoform",0);
+	ProteoformPtr proteoform_ptr_ = ProteoformPtr(new Proteoform(proteoform_element,proteoforms,basedata));
+
+	int prob_count = getChildCount(element,"extreme_value");
+	if(prob_count!=0){
+		xercesc::DOMElement* prob_element= prot::getChildElement(element,"extreme_value",0);
+		prob_ptr_ = ExtremeValuePtr(new ExtremeValue(prob_element));
+	}
+
+	xercesc::DOMElement* sp_para_element= prot::getChildElement(element,"sp_para",0);
+
+	xercesc::DOMElement* deconv_ms_element= prot::getChildElement(element,"proteoform",0);
+
+
+	ExtremeValuePtr prob_ptr_= ExtremeValuePtr();
+	sp_para_ptr_;
+//	DeconvMsPtr deconv_ms_ptr_;
+//	ExtendMsPtr refine_ms_three_;
+
 }
 
 }

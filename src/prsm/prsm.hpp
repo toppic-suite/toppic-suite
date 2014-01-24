@@ -15,7 +15,7 @@ class PrSM {
  public:
   PrSM(ProteoformPtr proteoform_ptr, DeconvMsPtr deconv_ms_ptr, 
        double adjusted_prec_mass, double calibration, SpParaPtr sp_para_ptr);
-
+  PrSM(xercesc::DOMElement* element,ProteoformPtrVec proteoforms,BaseDataPtr basedata);
 	double getAdjustedPrecMass() {return adjusted_prec_mass_;}
 
 	ProteoformPtr getProteoformPtr() {return proteoform_ptr_;}
@@ -96,6 +96,8 @@ class PrSM {
   double match_peak_num_ = 0;
   double match_fragment_num_ = 0;
 
+  SpParaPtr sp_para_ptr_;
+
   void init(SpParaPtr sp_para_ptr);
   void initScores(SpParaPtr sp_para_ptr);
 };
@@ -108,6 +110,8 @@ typedef std::vector<PrSMPtrVec2D> PrSMPtrVec3D;
 inline bool prsm_match_fragment_down(PrSMPtr p1, PrSMPtr p2) {
   return p1->getMatchFragNum() > p2->getMatchFragNum();
 }
+
+PrSMPtrVec readPrsm(std::string file_name);
 
 }
 #endif
