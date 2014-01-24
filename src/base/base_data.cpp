@@ -56,7 +56,7 @@ BaseData::BaseData  (std::string  config_file_name) {
       std::string neutral_loss_file_name 
           = getChildValue(root, "neutral_loss_list_file_name", 0);
       LOG_DEBUG( "neutral loss file name: " << neutral_loss_file_name);
-      neutral_loss_list_ = getNeutralLossPtrVecInstance(neutral_loss_file_name);
+      NeutralLossFactory::initFactory(neutral_loss_file_name);
       LOG_DEBUG( "neutral loss initialized ");
 
       std::string activation_file_name 
