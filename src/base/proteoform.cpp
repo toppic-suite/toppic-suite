@@ -223,7 +223,7 @@ ProteoformPtr getProtModProteoform(ProteoformPtr raw_form_ptr,
   }
   else {
     AcidPtr acid = residue->getAcidPtr();
-    ResiduePtr mut_residue = getResiduePtrByAcidPtm(residue_list, acid, ptm);
+    ResiduePtr mut_residue = ResidueFactory::getBaseResiduePtrByAcidPtm(acid, ptm);
     if (mut_residue.get() == nullptr) {
       LOG_ERROR( "Proteoform:: residue not found");
       throw("Residue not found");

@@ -57,11 +57,6 @@ typedef std::vector<ResiduePtr> ResiduePtrVec;
 
 ResiduePtr getResiduePtrByAcid(ResiduePtrVec &residue_list,
                                AcidPtr acid_ptr);
-/**
- * Returns the first residue based on the acid and ptm. 
- */
-ResiduePtr getResiduePtrByAcidPtm(ResiduePtrVec &residue_list,
-                                  AcidPtr acid_ptr, PtmPtr ptm_ptr);
 
 ResiduePtrVec convertAcidToResidueSeq(ResiduePtrVec &residue_list,
                                       AcidPtrVec acid_list);
@@ -72,9 +67,7 @@ class ResidueFactory {
 
   static ResiduePtrVec& getBaseResiduePtrVec() {return residue_ptr_vec_;}
   
-  static ResiduePtr getBaseResiduePtrByAcidPtm (AcidPtr acid_ptr, PtmPtr ptm_ptr) {
-    return getResiduePtrByAcidPtm(residue_ptr_vec_, acid_ptr, ptm_ptr);
-  }
+  static ResiduePtr getBaseResiduePtrByAcidPtm(AcidPtr acid_ptr, PtmPtr ptm_ptr);
   
   static ResiduePtr addBaseResidue(AcidPtr acid_ptr, PtmPtr ptm_ptr);
   

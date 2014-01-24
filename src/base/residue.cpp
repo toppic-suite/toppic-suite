@@ -48,15 +48,6 @@ ResiduePtr getResiduePtrByAcid(ResiduePtrVec &residue_ptrs,
   return ResiduePtr(nullptr);
 }
 
-ResiduePtr getResiduePtrByAcidPtm(ResiduePtrVec &residue_list,
-                                  AcidPtr acid_ptr, PtmPtr ptm_ptr) {
-  for (unsigned int i = 0; i < residue_list.size(); i++) {
-    if (residue_list[i]->isSame(acid_ptr, ptm_ptr)) {
-      return residue_list[i];
-    }
-  }
-  return ResiduePtr(nullptr);
-}
 
 ResiduePtrVec convertAcidToResidueSeq(ResiduePtrVec &residue_list,
                                       AcidPtrVec acid_ptrs) {
@@ -82,6 +73,15 @@ void ResidueFactory::initFactory(const std::string &file_name) {
       residue_ptr_vec_.push_back(ResiduePtr(new Residue(acid_name, ptm_abbr_name)));
     }
   }
+}
+
+ResiduePtr ResidueFactory::getBaseResiduePtrByAcidPtm(AcidPtr acid_ptr, PtmPtr ptm_ptr) {
+  for (unsigned int i = 0; i < residue_ptr_vec_.size(); i++) {
+    if (residue_ptr_vec_[i]->isSame(acid_ptr, ptm_ptr)) {
+      return residue_ptr_vec_[i];
+    }
+  }
+  return ResiduePtr(nullptr);
 }
 
 ResiduePtr ResidueFactory::addBaseResidue(AcidPtr acid_ptr, PtmPtr ptm_ptr) {
