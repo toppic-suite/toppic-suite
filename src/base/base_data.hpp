@@ -24,21 +24,11 @@ class BaseData {
  public:
   BaseData (std::string config_file_name);
 
-  ProtModPtrVec& getProtModPtrVec() {return prot_mod_list_;}
-  ProtModPtr getDefaultProtModPtr() {
-    return getProtModPtrByName(prot_mod_list_, DEFAULT_TYPE_NAME);
-  }
-  ProtModPtr getAcetylationProtModPtr() {
-    return getProtModPtrByName(prot_mod_list_, ACETYLATION_NAME);
-  }
-
   ResiduePtrVec& getFixModResiduePtrVec() {return fix_mod_residue_list_;}
   ProtModPtrVec& getAllowProtModPtrVec() {return allow_prot_mod_list_;}
   ActivationPtr& getActivationPtr() {return activation_ptr_;}
 
  private:
-  ProtModPtrVec prot_mod_list_;
-
   /* configuration */
   ResiduePtrVec fix_mod_residue_list_;
   ProtModPtrVec allow_prot_mod_list_;

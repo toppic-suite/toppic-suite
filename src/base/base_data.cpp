@@ -42,10 +42,7 @@ BaseData::BaseData  (std::string  config_file_name) {
 
       std::string prot_mod_file_name = getChildValue(root, "prot_mod_list_file_name", 0);
       LOG_DEBUG( "prot mod file name: " << prot_mod_file_name);
-      prot_mod_list_ = getProtModPtrVecInstance(AcidFactory::getBaseAcidPtrVec(), 
-                                                PtmFactory::getBasePtmPtrVec(), 
-                                                TruncFactory::getBaseTruncPtrVec(), 
-                                                prot_mod_file_name);
+      ProtModFactory::initFactory(prot_mod_file_name);
       LOG_DEBUG( "prot mod initialized ");
 
       std::string ion_type_file_name = getChildValue(root, "ion_type_list_file_name", 0);
@@ -76,7 +73,7 @@ BaseData::BaseData  (std::string  config_file_name) {
       int prot_mod_num = getChildCount(parent, "prot_mod");
       for (int i = 0; i < prot_mod_num; i++) {
         std::string mod_name = getChildValue(parent, "prot_mod", i);
-        ProtModPtr ptr = getProtModPtrByName(prot_mod_list_, mod_name);
+        ProtModPtr ptr = ProtModFactory::getBaseProtModPtrByName(mod_name);
         allow_prot_mod_list_.push_back(ptr);
       }
       LOG_DEBUG( "allow prot mods initialized ");

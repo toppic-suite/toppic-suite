@@ -9,6 +9,9 @@
 
 namespace prot {
 
+#define PROT_MOD_NONE "NONE"
+#define PROT_MOD_ACETYLATION "ACETYLATION"
+
 class ProtMod {
  public:
   ProtMod(std::string name, TruncPtr trunc_ptr, PtmPtr ptm_ptr,
@@ -40,17 +43,32 @@ class ProtMod {
 typedef std::shared_ptr<ProtMod> ProtModPtr;
 typedef std::vector<ProtModPtr> ProtModPtrVec;
 
-ProtModPtrVec getProtModPtrVecInstance(AcidPtrVec &acid_list,
-                                       PtmPtrVec &ptm_list,
-                                       TruncPtrVec &trunc_list,
-                                       const std::string &file_name);
-
-ProtModPtr getProtModPtrByName(ProtModPtrVec &prot_mod_list, 
-                               const std::string &name);
 
 double getProtModAcetylationShift(ProtModPtrVec &prot_mod_list);
 
 bool allowMod(ProtModPtr prot_mod_ptr, ResiduePtrVec residues);
+
+/* prot mod factory */
+class ProtModFactory {
+ public:
+  static void initFactory(const std::string &file_name);
+
+  static ProtModPtrVec& getBaseProtModPtrVec() {return prot_mod_ptr_vec_;}
+  
+  static ProtModPtr getBaseProtModPtrByName (const std::string &name);
+
+  static ProtModPtr getProtModPtr_NONE () {
+    return getBaseProtModPtrByName(PROT_MOD_NONE);
+  }
+
+  static ProtModPtr getProtModPtr_ACETYLATION () {
+    return getBaseProtModPtrByName(PROT_MOD_ACETYLATION);
+  }
+  
+ private:
+  static ProtModPtrVec prot_mod_ptr_vec_;
+};
+
 
 }
 #endif
