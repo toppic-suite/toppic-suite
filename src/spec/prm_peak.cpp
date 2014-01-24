@@ -105,9 +105,9 @@ PrmMsPtr getMsTwo(DeconvMsPtr deconv_ms,double delta,
 	//end filterPrmPeak
 	DeconvPeakPtr zero_peak = DeconvPeakPtr(new DeconvPeak(-1,0,0,0));
 	list_filtered.push_back(PrmPeakPtr(new PrmPeak(zero_peak,PRM_PEAK_TYPE_ORIGINAL,0,1)));
-	DeconvPeakPtr prec_peak = DeconvPeakPtr(new DeconvPeak(-1,prec_mono_mass-prot::getIonTypePtrByName(ion_type_ptr_vec,"PREC")->getShift(),0,0));
+	DeconvPeakPtr prec_peak = DeconvPeakPtr(new DeconvPeak(-1,prec_mono_mass-IonTypeFactory::getBaseIonTypePtrByName("PREC")->getShift(),0,0));
 	list_filtered.push_back(PrmPeakPtr(new PrmPeak(prec_peak,PRM_PEAK_TYPE_ORIGINAL,
-			prec_mono_mass-prot::getIonTypePtrByName(ion_type_ptr_vec,"PREC")->getShift(),1)));
+			prec_mono_mass-IonTypeFactory::getBaseIonTypePtrByName("PREC")->getShift(),1)));
 	std::sort(list_filtered.begin(),list_filtered.end(),prmpeak_up);
 	//end getSpPrmPeak
 
@@ -164,9 +164,9 @@ PrmMsPtr getSpSix(DeconvMsPtr deconv_ms,double delta,SpParaPtr sp_para,IonTypePt
 	//end filterPrmPeak
 	DeconvPeakPtr zero_peak = DeconvPeakPtr(new DeconvPeak(-1,0,0,0));
 	list_filtered.push_back(PrmPeakPtr(new PrmPeak(zero_peak,PRM_PEAK_TYPE_ORIGINAL,0,1)));
-	DeconvPeakPtr prec_peak = DeconvPeakPtr(new DeconvPeak(-1,prec_mono_mass-prot::getIonTypePtrByName(ion_type_ptr_vec,"PREC")->getShift(),0,0));
+	DeconvPeakPtr prec_peak = DeconvPeakPtr(new DeconvPeak(-1,prec_mono_mass-IonTypeFactory::getBaseIonTypePtrByName("PREC")->getShift(),0,0));
 	list_filtered.push_back(PrmPeakPtr(new PrmPeak(prec_peak,PRM_PEAK_TYPE_ORIGINAL,
-			prec_mono_mass-prot::getIonTypePtrByName(ion_type_ptr_vec,"PREC")->getShift(),1)));
+			prec_mono_mass-IonTypeFactory::getBaseIonTypePtrByName("PREC")->getShift(),1)));
 	std::sort(list_filtered.begin(),list_filtered.end(),prmpeak_up);
 
 	//setTolerance

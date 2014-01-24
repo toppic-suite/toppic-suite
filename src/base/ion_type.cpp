@@ -30,16 +30,6 @@ void IonType::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
 	parent->appendChild(element);
 }
 
-IonTypePtr getIonTypePtrByName(IonTypePtrVec &ion_type_list, const std::string &name){
-	for (unsigned int i = 0; i < ion_type_list.size(); i++) {
-	    std::string n = ion_type_list[i]->getName();
-	    if (n == name) {
-	      return ion_type_list[i];
-	    }
-	  }
-	  return IonTypePtr(nullptr);
-}
-
 void IonTypeFactory::initFactory(const std::string file_name){
 	prot::XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
@@ -55,5 +45,16 @@ void IonTypeFactory::initFactory(const std::string file_name){
     }
   }
 }
+
+IonTypePtr IonTypeFactory::getBaseIonTypePtrByName(const std::string &name){
+	for (unsigned int i = 0; i < ion_type_ptr_vec_.size(); i++) {
+	    std::string n = ion_type_ptr_vec_[i]->getName();
+	    if (n == name) {
+	      return ion_type_ptr_vec_[i];
+	    }
+	  }
+	  return IonTypePtr(nullptr);
+}
+
 
 }

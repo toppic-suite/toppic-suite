@@ -83,7 +83,7 @@ BaseData::BaseData  (std::string  config_file_name) {
 
       std::string activation_type = getChildValue(root, "activation_type", 0);
       LOG_DEBUG( "acitivation type: " << activation_type);
-      activation_ptr_ = ActivationFactory::getActivationPtrByName(activation_type);
+      activation_ptr_ = ActivationFactory::getBaseActivationPtrByName(activation_type);
     }
     delete doc;
   }

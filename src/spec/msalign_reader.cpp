@@ -108,7 +108,7 @@ void MsAlignReader::readNext() {
   }
   if (activation != "") {
     ActivationPtr activation_ptr = 
-        ActivationFactory::getActivationPtrByName(activation);
+        ActivationFactory::getBaseActivationPtrByName(activation);
     header_ptr->setActivationPtr(activation_ptr);
   }
   header_ptr->setMsLevel(level);

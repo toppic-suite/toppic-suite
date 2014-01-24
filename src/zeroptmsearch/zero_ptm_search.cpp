@@ -60,7 +60,7 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
 
   ProtModPtrVec prot_mod_ptr_list = base_data_ptr->getProtModPtrVec();
   double shift = base_data_ptr->getAcetylationProtModPtr()->getProtShift();
-  IonTypePtrVec ion_type_ptr_list = IonTypeFactory::getIonTypePtrVec();
+  IonTypePtrVec ion_type_ptr_list = IonTypeFactory::getBaseIonTypePtrVec();
   LOG_DEBUG("start reading");
   int n = 0;
   DeconvMsPtr ms_ptr = reader.getNextMs();
