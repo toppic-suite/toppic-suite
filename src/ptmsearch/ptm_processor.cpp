@@ -24,9 +24,7 @@ PtmProcessor::PtmProcessor(PtmMngPtr mng){
 
 void PtmProcessor::init(){
 	seqs_ = prot::readFastaToProteoform(mng_->search_db_file_name_,
-                                      AcidFactory::getBaseAcidPtrVec(),
-                                      ResidueFactory::getBaseResiduePtrVec(),
-                                      ProtModFactory::getProtModPtr_NONE());
+                                      mng_->base_data_->getFixModResiduePtrVec());
 	std::string sp_file_name = mng_->spectrum_file_name_;
 	std::string simplePrsmFileName = mng_->spectrum_file_name_ + ".FILTER" + mng_->input_file_ext_;
 	simplePrsms_  = prot::readSimplePrSM(simplePrsmFileName.c_str());

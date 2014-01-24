@@ -37,10 +37,9 @@ std::vector<std::string> FastaReader::getNextSeq() {
 
 /**
  * Read FASTA file and return next protein as an ResSeq.
+ * residue_list determine fixed PTMs
  **/
-ProteoformPtr FastaReader::getNextProteoformPtr(AcidPtrVec acid_list,
-                                                ResiduePtrVec residue_list,
-                                                ProtModPtr none_prot_mod) {
+ProteoformPtr FastaReader::getNextProteoformPtr(ResiduePtrVec &residue_list) {
   std::vector<std::string> seq_info = getNextSeq();
   if (seq_info.size() == 0) {
     return ProteoformPtr(nullptr);
@@ -52,6 +51,7 @@ ProteoformPtr FastaReader::getNextProteoformPtr(AcidPtrVec acid_list,
   ResiduePtrVec residue_ptrs = convertAcidToResidueSeq(residue_list, acid_seq);
   DbResSeqPtr db_residue_seq_ptr(new DbResidueSeq(residue_ptrs, id_, name)); 
   id_++;
+  ProtModPtr none_prot_mod = ProtModFactory::getProtModPtr_NONE();
   return getDbProteoformPtr(db_residue_seq_ptr, none_prot_mod);
 }
 
@@ -89,18 +89,16 @@ std::vector<std::string> fastaPreprocess(std::string name, std::string seq) {
 }
 
 ProteoformPtrVec readFastaToProteoform(std::string file_name, 
-                                       AcidPtrVec &acid_list, 
-                                       ResiduePtrVec &residue_list,
-                                       ProtModPtr none_prot_mod) {
+                                       ResiduePtrVec &residue_list) {
 
   LOG_DEBUG( "start open file " << file_name);
   FastaReader reader(file_name);
   LOG_DEBUG( "open file done " << file_name);
   ProteoformPtrVec list;
-  ProteoformPtr ptr = reader.getNextProteoformPtr(acid_list, residue_list, none_prot_mod);
+  ProteoformPtr ptr = reader.getNextProteoformPtr(residue_list);
   while (ptr.get() != nullptr) {
     list.push_back(ptr);
-    ptr = reader.getNextProteoformPtr(acid_list, residue_list, none_prot_mod);
+    ptr = reader.getNextProteoformPtr(residue_list);
   }
   return list;
 }

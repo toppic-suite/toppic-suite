@@ -18,10 +18,9 @@ namespace prot {
 
 PtmFastFilterProcessor::PtmFastFilterProcessor(PtmFastFilterMngPtr mng){
   mng_ = mng;
-  ProteoformPtrVec proteoforms = readFastaToProteoform(mng_->search_db_file_name_,
-                                                       AcidFactory::getBaseAcidPtrVec(),
-                                                       ResidueFactory::getBaseResiduePtrVec(),
-                                                       ProtModFactory::getProtModPtr_NONE());
+  ProteoformPtrVec proteoforms 
+      = readFastaToProteoform(mng_->search_db_file_name_,
+                              mng_->base_data->getFixModResiduePtrVec());
 	filter_ = PtmFastFilterBlockPtr(new PtmFastFilterBlock(proteoforms,mng_));
 }
 
