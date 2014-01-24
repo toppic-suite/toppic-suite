@@ -32,8 +32,6 @@ class Ptm {
   /* Is it an empty PTM. */
   bool isEmpty();
 
-  static PtmPtr getEmptyPtmPtr();
-
   void appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
  private:
@@ -55,7 +53,6 @@ PtmPtr getPtmPtrByAbbrName(PtmPtrVec &ptm_list,
  */
 bool containAbbrsName(PtmPtrVec &ptm_list, const std::string &abbr_name);
 
-PtmPtr findEmptyPtmPtr(PtmPtrVec &ptm_list);
 
 PtmPtr addPtm(PtmPtrVec &ptm_list, std::string abbr_name,
               double mono_mass);
@@ -68,6 +65,7 @@ class PtmFactory {
  public:
   static void initFactory(const std::string &file_name);
   static PtmPtrVec& getBasePtmPtrVec() {return ptm_ptr_vec_;}
+  static PtmPtr findEmptyPtmPtr();
 };
 
 }

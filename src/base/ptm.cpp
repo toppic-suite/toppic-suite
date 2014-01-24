@@ -59,14 +59,6 @@ bool containAbbrsName(PtmPtrVec &ptm_list,
    return getPtmPtrByAbbrName(ptm_list, abbr_name).get() != nullptr;
 }
 
-PtmPtr findEmptyPtmPtr(PtmPtrVec &ptm_list) {
-  for (unsigned int i = 0; i < ptm_list.size(); i++) {
-    if (ptm_list[i]->isEmpty()) {
-      return ptm_list[i];
-    }
-  }
-  throw "Empty ptm does not exist!";
-}
 
 PtmPtr addPtm(PtmPtrVec &ptm_list, std::string abbr_name,
               double mono_mass) {
@@ -95,6 +87,15 @@ void PtmFactory::initFactory(const std::string &file_name) {
 
     }
   }
+}
+
+PtmPtr PtmFactory::findEmptyPtmPtr() {
+  for (unsigned int i = 0; i < ptm_ptr_vec_.size(); i++) {
+    if (ptm_ptr_vec_[i]->isEmpty()) {
+      return ptm_ptr_vec_[i];
+    }
+  }
+  throw "Empty ptm does not exist!";
 }
 
 }

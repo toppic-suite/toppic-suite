@@ -22,8 +22,8 @@ PtmMng::PtmMng(std::string config_file_name){
 
 	allow_prot_C_truncs_.push_back(prot::getTruncPtrByName(base_data_->getTruncPtrVec(),"NONE"));
 
-	allow_pep_N_mods_.push_back(prot::findEmptyPtmPtr(PtmFactory::getBasePtmPtrVec()));
+	allow_pep_N_mods_.push_back(PtmFactory::findEmptyPtmPtr());
 
-	allow_pep_C_mods_.push_back(prot::findEmptyPtmPtr(PtmFactory::getBasePtmPtrVec()));
+	allow_pep_C_mods_.push_back(PtmFactory::findEmptyPtmPtr());
 }
 } /* namespace prot */
