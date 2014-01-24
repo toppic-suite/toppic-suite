@@ -59,7 +59,6 @@ SimplePrSMPtrVec PtmFastFilterHiMem::sort(SimplePrSMPtrVec2D matches){
 	}
 
 
-	//todo:sort method is not the same with java so that the result is different;
 	std::sort(sorted_match.begin(),sorted_match.end(),simple_prsm_down);
 
 	SimplePrSMPtrVec unique_match;
