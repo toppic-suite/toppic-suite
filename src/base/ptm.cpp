@@ -10,6 +10,8 @@
 
 namespace prot {
 
+PtmPtrVec PtmFactory::ptm_ptr_vec_;
+
 Ptm::Ptm(const std::string &abbr_name, 
             double mono_mass) {
     abbr_name_ = abbr_name;

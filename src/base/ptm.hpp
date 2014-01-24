@@ -61,6 +61,18 @@ PtmPtr findEmptyPtmPtr(PtmPtrVec &ptm_list);
 PtmPtr addPtm(PtmPtrVec &ptm_list, std::string abbr_name,
               double mono_mass);
 
+/* ptm factory */
+class PtmFactory {
+ private:
+  static PtmPtrVec ptm_ptr_vec_;
+
+ public:
+  static void initFactory(const std::string &file_name) {
+    ptm_ptr_vec_ = getPtmPtrVecInstance(file_name);
+  }
+  static PtmPtrVec& getPtmPtrVec() {return ptm_ptr_vec_;}
+};
+
 }
 #endif
 
