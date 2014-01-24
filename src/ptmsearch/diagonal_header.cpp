@@ -47,7 +47,7 @@ DiagonalHeaderPtr getShift(DiagonalHeaderPtr shift,int bgn,int end){
 
 DiagonalHeaderPtrVec getNTermShiftListCommon(std::vector<double> best_shifts){
 	DiagonalHeaderPtrVec headers;
-	for(int i =0;i<best_shifts.size();i++){
+	for(unsigned int i =0;i<best_shifts.size();i++){
 		headers.push_back(DiagonalHeaderPtr(new DiagonalHeader(best_shifts[i],true,false,false,false)));
 	}
 	return headers;
@@ -56,8 +56,8 @@ DiagonalHeaderPtrVec getNTermShiftListCommon(std::vector<double> best_shifts){
 DiagonalHeaderPtrVec getNTermShiftListCompLeft(ProteoformPtr seq,PtmMngPtr mng){
 	DiagonalHeaderPtrVec extend_n_term_shifts;
 	double shift;
-	for(int i=0;i<mng->allow_prot_N_mods_.size();i++){
-		if(prot::allowMod(mng->allow_prot_N_mods_[i],seq->getResSeqPtr()->getResidues()) && mng->allow_prot_N_mods_[i]->getPepShift()==0){
+	for(unsigned int i=0;i<mng->allow_prot_N_mods_.size();i++){
+		if(mng->allow_prot_N_mods_[i]->allowMod(seq->getResSeqPtr()->getResidues()) && mng->allow_prot_N_mods_[i]->getPepShift()==0){
 			shift = mng->allow_prot_N_mods_[i]->getProtShift();
 			extend_n_term_shifts.push_back(DiagonalHeaderPtr(new DiagonalHeader(shift,true,false,true,false)));
 		}

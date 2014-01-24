@@ -28,6 +28,8 @@ class ProtMod {
 
   double getPepShift() {return pep_shift_;}
 
+  bool allowMod(ResiduePtrVec residues);
+
   void appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
  private:
@@ -42,7 +44,6 @@ class ProtMod {
 typedef std::shared_ptr<ProtMod> ProtModPtr;
 typedef std::vector<ProtModPtr> ProtModPtrVec;
 
-bool allowMod(ProtModPtr prot_mod_ptr, ResiduePtrVec residues);
 
 /* prot mod factory */
 class ProtModFactory {
@@ -60,7 +61,6 @@ class ProtModFactory {
  private:
   static ProtModPtrVec prot_mod_ptr_vec_;
 };
-
 
 }
 #endif

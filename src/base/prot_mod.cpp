@@ -15,6 +15,7 @@ ProtMod::ProtMod(std::string name, TruncPtr trunc_ptr, PtmPtr ptm_ptr,
   prot_shift_ = trunc_ptr_->getShift() + ptm_ptr_->getMonoMass();
   pep_shift_ = ptm_ptr_->getMonoMass();
 }
+
 void ProtMod::appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
 	xercesc::DOMElement* element = xml_doc->createElement("prot_mod");
 	xml_doc->addElement(element, "name", name_.c_str());
@@ -32,21 +33,21 @@ void ProtMod::appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
 	parent->appendChild(element);
 }
 
-bool allowMod(ProtModPtr mod, ResiduePtrVec residues){
-	if(mod->getName().compare("NONE")==0){
+bool ProtMod::allowMod(ResiduePtrVec residues){
+	if (name_ == "NONE") {
 		return true;
 	}
-	else if(mod->getName().compare("NME")==0){
-		if(residues.size()>=2 && residues[0]->getAcidPtr()->getOneLetter().compare("M")==0){
+	else if (name_ == "NME") {
+		if(residues.size()>=2 && residues[0]->getAcidPtr()->getOneLetter() == "M"){
 			return true;
 		}
 		return false;
 	}
-	else if(mod->getName().compare("ACETYLATION")==0){
+	else if (name_ == "ACETYLATION") {
 		return true;
 	}
-	else if(mod->getName().compare("NME_ACETYLATION")==0){
-		if(residues.size()>=2 && residues[0]->getAcidPtr()->getOneLetter().compare("M")==0){
+	else if (name_ == "NME_ACETYLATION"){
+		if(residues.size()>=2 && residues[0]->getAcidPtr()->getOneLetter() == "M"){
 			return true;
 		}
 		return false;
