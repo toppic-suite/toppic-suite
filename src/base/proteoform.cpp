@@ -204,7 +204,6 @@ bool isValidTrunc(ProteoformPtr raw_form_ptr, ProtModPtr prot_mod_ptr) {
 }
 
 ProteoformPtr getProtModProteoform(ProteoformPtr raw_form_ptr,
-                                   ResiduePtrVec &residue_list, 
                                    ProtModPtr prot_mod_ptr) {
   bool valid_trunc = isValidTrunc(raw_form_ptr, prot_mod_ptr);
   if (!valid_trunc) {
@@ -276,12 +275,11 @@ ProteoformPtr getSubProteoform(ProteoformPtr proteoform_ptr, int start, int end)
 
 
 ProteoformPtrVec generateProtModProteoform(ProteoformPtrVec &ori_forms, 
-                                           ResiduePtrVec &residue_list,
                                            ProtModPtrVec &prot_mods) {
   ProteoformPtrVec new_forms;
   for (unsigned int i = 0; i < ori_forms.size(); i++) {
     for (unsigned int j = 0; j < prot_mods.size(); j++) {
-      ProteoformPtr ptr = getProtModProteoform(ori_forms[i], residue_list, prot_mods[j]);
+      ProteoformPtr ptr = getProtModProteoform(ori_forms[i], prot_mods[j]);
       if (ptr.get() != nullptr) {
         new_forms.push_back(ptr);
       }

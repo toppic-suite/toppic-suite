@@ -75,19 +75,19 @@ private:
   ChangePtrVec change_list_;
 };
 
-
+/* get db proteoform */
 ProteoformPtr getDbProteoformPtr(DbResSeqPtr db_res_seq_ptr, 
                                  ProtModPtr prot_mod_ptr);
-
+/* generate a proteoform with protein mod */ 
 ProteoformPtr getProtModProteoform(ProteoformPtr raw_form_ptr, 
-                                   ResiduePtrVec &residue_list, 
                                    ProtModPtr prot_mod_ptr); 
 
 ProteoformPtr getSubProteoform(ProteoformPtr proteoform_ptr, int start, int end);
 
+/* generate a proteoform vector with protein mod */ 
 ProteoformPtrVec generateProtModProteoform(ProteoformPtrVec &ori_forms,
-                                           ResiduePtrVec &residue_list,
                                            ProtModPtrVec &prot_mods);
+
 std::string convertSemiAlignmentTypeToString(int i);
 
 } /* namespace prot */
