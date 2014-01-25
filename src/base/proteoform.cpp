@@ -56,7 +56,8 @@ Proteoform::Proteoform(xercesc::DOMElement* element,ProteoformPtrVec proteoforms
 	bp_spec_ptr_= BpSpecPtr(new BpSpec(residue_seq_ptr_));
 
 	xercesc::DOMElement* change_list_element= prot::getChildElement(element,"change_list",0);
-	int change_len = getChildCount(res_seq_element,"change");
+	int change_len = getChildCount(change_list_element,"change");
+
 	for(int i=0;i<change_len;i++){
 		xercesc::DOMElement* change_element= prot::getChildElement(change_list_element,"change",i);
 		int left_bp_pos = getIntChildValue(change_element,"left_bp_pos",0);
