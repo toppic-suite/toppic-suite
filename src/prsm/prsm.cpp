@@ -68,7 +68,9 @@ xercesc::DOMElement* PrSM::toXmlElement(XmlDOMDocument* xml_doc){
 	}
 	str = convertToString(fdr_);
 	xml_doc->addElement(element, "fdr", str.c_str());
-	deconv_ms_ptr_->appendXml(xml_doc,element);
+	if(deconv_ms_ptr_!=nullptr){
+	    deconv_ms_ptr_->appendXml(xml_doc,element);
+	}
 	//refine_ms_three_->appendXml(xml_doc,element);
 	str = convertToString(match_peak_num_);
 	xml_doc->addElement(element, "match_peak_num", str.c_str());
@@ -82,7 +84,7 @@ void PrSM::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
 	parent->appendChild(element);
 }
 
-PrSM::PrSM(xercesc::DOMElement* element,ProteoformPtrVec proteoforms,BaseDataPtr basedata){
+PrSM::PrSM(xercesc::DOMElement* element,ProteoformPtrVec proteoforms){
 	prsm_id_=getIntChildValue(element, "prsm_id", 0);
 	spectrum_id_=getIntChildValue(element, "spectrum_id", 0);
 	spectrum_scan_=getChildValue(element, "spectrum_scan", 0);
@@ -95,7 +97,7 @@ PrSM::PrSM(xercesc::DOMElement* element,ProteoformPtrVec proteoforms,BaseDataPtr
 	match_fragment_num_=getDoubleChildValue(element, "match_fragment_num", 0);
 
 	xercesc::DOMElement* proteoform_element= prot::getChildElement(element,"proteoform",0);
-	ProteoformPtr proteoform_ptr_ = ProteoformPtr(new Proteoform(proteoform_element,proteoforms,basedata));
+	proteoform_ptr_ = ProteoformPtr(new Proteoform(proteoform_element,proteoforms));
 
 	int prob_count = getChildCount(element,"extreme_value");
 	if(prob_count!=0){
@@ -104,15 +106,41 @@ PrSM::PrSM(xercesc::DOMElement* element,ProteoformPtrVec proteoforms,BaseDataPtr
 	}
 
 	xercesc::DOMElement* sp_para_element= prot::getChildElement(element,"sp_para",0);
+	sp_para_ptr_ = SpParaPtr(new SpPara(sp_para_element));
 
-	xercesc::DOMElement* deconv_ms_element= prot::getChildElement(element,"proteoform",0);
+	xercesc::DOMElement* deconv_ms_element= prot::getChildElement(element,"ms",0);
+	xercesc::DOMElement* header_element= prot::getChildElement(deconv_ms_element,"ms_header",0);
+	MsHeaderPtr header_ptr  = MsHeaderPtr (new MsHeader(header_element));
+	xercesc::DOMElement* peak_element= prot::getChildElement(deconv_ms_element,"peaks",0);
+	DeconvPeakPtrVec peaks;
+	int peak_num = getChildCount(peak_element,"deconv_peak");
+	for(int i=0;i<peak_num;i++){
+		peaks.push_back(DeconvPeakPtr(new DeconvPeak(getChildElement(deconv_ms_element,"deconv_peak",i))));
+	}
+	deconv_ms_ptr_ = DeconvMsPtr(new Ms<DeconvPeakPtr>(header_ptr,peaks));
 
-
-	ExtremeValuePtr prob_ptr_= ExtremeValuePtr();
-	sp_para_ptr_;
-//	DeconvMsPtr deconv_ms_ptr_;
 //	ExtendMsPtr refine_ms_three_;
 
+}
+
+PrSMPtrVec readPrsm(std::string file_name,ProteoformPtrVec proteoforms){
+
+	PrSMPtrVec results;
+	XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
+	if(parser){
+		XmlDOMDocument* doc = new XmlDOMDocument(parser, file_name.c_str());
+		if (doc) {
+			xercesc::DOMElement* root = doc->getDocumentElement();
+			int simple_prsm_num = prot::getChildCount(root, "prsm");
+			for (int i = 0; i < simple_prsm_num; i++) {
+				xercesc::DOMElement* prsm_element = getChildElement(root, "prsm", i);
+				results.push_back(PrSMPtr(new PrSM(prsm_element,proteoforms)));
+
+			}
+		}
+		delete doc;
+	}
+	return results;
 }
 
 }
