@@ -33,7 +33,8 @@ void PtmSlowMatch::comp(CompShiftLowMemPtr comp_shift){
 	std::vector<double> ms_masses = prot::getMassList(ms_six_);
 	std::vector<double> seq_masses = seq_->getBpSpecPtr()->getBreakPointMasses(IonTypePtr(new IonType("B",true,0)));
 	PSAlignPtr align = PSAlignPtr(new PSAlign(ms_masses,seq_masses,diagonals,mng_));
-	std::vector<int> types = {SEMI_ALIGN_TYPE_COMPLETE,SEMI_ALIGN_TYPE_PREFIX,SEMI_ALIGN_TYPE_SUFFIX,SEMI_ALIGN_TYPE_INTERNAL};
+	std::vector<SemiAlignTypePtr> types = {SemiAlignTypeFactory::getCompletePtr(),SemiAlignTypeFactory::getPrefixPtr(),
+			SemiAlignTypeFactory::getSuffixPtr(),SemiAlignTypeFactory::getInternalPtr()};
 
 
 	for(int i=0;i<types.size();i++){
