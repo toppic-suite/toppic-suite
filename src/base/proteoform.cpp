@@ -20,8 +20,7 @@ Proteoform::Proteoform(DbResSeqPtr db_res_seq_ptr, ProtModPtr prot_mod_ptr,
   std::sort(change_list.begin(), change_list.end(), compareChangeUp);
 }
 
-Proteoform::Proteoform(xercesc::DOMElement* element,ProteoformPtrVec proteoforms,
-                       BaseDataPtr basedata){
+Proteoform::Proteoform(xercesc::DOMElement* element,ProteoformPtrVec proteoforms){
 
 	start_pos_ = getIntChildValue(element, "start_pos", 0);
 	end_pos_ = getIntChildValue(element, "end_pos", 0);

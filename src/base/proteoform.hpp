@@ -21,7 +21,7 @@ public:
              ResSeqPtr res_seq_ptr, int start_pos, int end_pos, 
              ChangePtrVec change_list);
 
-	Proteoform(xercesc::DOMElement* element,ProteoformPtrVec proteoforms,BaseDataPtr basedata);
+	Proteoform(xercesc::DOMElement* element,ProteoformPtrVec proteoforms);
 
   DbResSeqPtr getDbResSeqPtr() {return db_residue_seq_ptr_;}
 
