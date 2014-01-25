@@ -10,6 +10,8 @@ class DeconvPeak : public Peak {
  public:
   DeconvPeak (int id, double mono_mass, double intensity, int charge);
 
+  DeconvPeak(xercesc::DOMElement* element);
+
   int getCharge() {return charge_;}
 
   int getId() {return id_;}

@@ -9,6 +9,8 @@ class MsHeader {
  public:
   MsHeader() {}
 
+  MsHeader(xercesc::DOMElement* element);
+
   double getPrecMonoMass();
 
   double getPrecSpMass();

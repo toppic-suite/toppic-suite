@@ -8,6 +8,27 @@
 
 namespace prot {
 
+MsHeader::MsHeader(xercesc::DOMElement* element){
+	file_name_ = getChildValue(element,"file_name",0);
+	id_ = getIntChildValue(element,"id",0);
+	prec_id_ = getIntChildValue(element,"prec_id",0);
+	title_= getChildValue(element,"title",0);
+	level_ = getIntChildValue(element,"level",0);
+
+	xercesc::DOMElement* scan_element = prot::getChildElement(element,"scan_list",0);
+	int scans = getChildCount(scan_element,"scan");
+	for(int i=0;i<scans;i++){
+		scans_.push_back(getIntChildValue(scan_element,"scan",i));
+	}
+	retention_time_ = getDoubleChildValue(element,"retention_time",0);
+	prec_sp_mz_ = getDoubleChildValue(element,"prec_sp_mz",0);
+	prec_mono_mz_ = getDoubleChildValue(element,"prec_mono_mz",0);
+	prec_charge_ = getIntChildValue(element,"prec_charge",0);
+	error_tolerance_ = getDoubleChildValue(element,"error_tolerance",0);
+	xercesc::DOMElement* act_element = prot::getChildElement(element,"activation",0);
+	std::string act_name = getChildValue(act_element,"name",0);
+	activation_ptr_= ActivationFactory::getBaseActivationPtrByName(act_name);
+}
 
 double MsHeader::getPrecMonoMass() {
   if (prec_mono_mz_ < 0) {
@@ -78,7 +99,7 @@ void MsHeader::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
 	xercesc::DOMElement* element = xml_doc->createElement("ms_header");
 	xml_doc->addElement(element, "file_name", file_name_.c_str());
 	std::string str = convertToString(id_);
-	xml_doc->addElement(element, "id_", str.c_str());
+	xml_doc->addElement(element, "id", str.c_str());
 	str = convertToString(prec_id_);
 	xml_doc->addElement(element, "prec_id", str.c_str());
 	xml_doc->addElement(element, "title", title_.c_str());
@@ -89,16 +110,17 @@ void MsHeader::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
 		str = convertToString(scans_[i]);
 		xml_doc->addElement(scans, "scan", str.c_str());
 	}
+	element->appendChild(scans);
 	str = convertToString(retention_time_);
 	xml_doc->addElement(element, "retention_time", str.c_str());
 	str = convertToString(prec_sp_mz_);
 	xml_doc->addElement(element, "prec_sp_mz", str.c_str());
 	str = convertToString(prec_mono_mz_);
-	xml_doc->addElement(element, "prec_mono_mz_", str.c_str());
+	xml_doc->addElement(element, "prec_mono_mz", str.c_str());
 	str = convertToString(prec_charge_);
-	xml_doc->addElement(element, "prec_charge_", str.c_str());
+	xml_doc->addElement(element, "prec_charge", str.c_str());
 	str = convertToString(error_tolerance_);
-	xml_doc->addElement(element, "error_tolerance_", str.c_str());
+	xml_doc->addElement(element, "error_tolerance", str.c_str());
 	activation_ptr_->appendXml(xml_doc,element);
 	parent->appendChild(element);
 }
