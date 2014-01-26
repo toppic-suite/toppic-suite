@@ -69,6 +69,11 @@ BaseData::BaseData  (std::string  config_file_name) {
       ActivationFactory::initFactory(activation_file_name);
       LOG_DEBUG( "activation initialized ");
 
+      std::string sp_type_file_name 
+          = getChildValue(root, "support_peak_type_file_name", 0);
+      SPTypeFactory::initFactory(sp_type_file_name);
+      LOG_DEBUG( "support peak type initialized ");
+
       std::string fix_mod_residue_file_name 
           = getChildValue(root, "fix_mod_residue_file_name", 0);
       LOG_DEBUG( "fix mod residue file name: " << fix_mod_residue_file_name);

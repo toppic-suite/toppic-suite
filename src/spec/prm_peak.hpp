@@ -13,7 +13,6 @@
 
 #include "spec/deconv_peak.hpp"
 #include "spec/support_peak.hpp"
-#include "spec/support_peak_type.hpp"
 #include "spec/ms.hpp"
 #include "spec/sp_para.hpp"
 #include "deconv_ms.hpp"
@@ -37,7 +36,7 @@ public:
 	int getBaseType(){return base_type_;}
 	double getNStrictCRelaxTolerance(){return n_strict_c_relax_tolerance_;}
 	double getNRelaxCStrictTolerance(){return n_relax_c_strict_tolerance_;}
-	int getBreakType(SPTypePtrVec support_peak_type_list);
+	int getBreakType();
 	void setStrictTolerance(double tolerance){strict_tolerance_ = tolerance;}
 
 	void setNStrictCRelacTolerance(double tolerance){
@@ -61,19 +60,16 @@ typedef std::shared_ptr<PrmPeak> PrmPeakPtr;
 typedef std::vector<PrmPeakPtr> PrmPeakPtrVec;
 typedef std::shared_ptr<Ms<PrmPeakPtr>> PrmMsPtr;
 
-inline bool prmpeak_up(const PrmPeakPtr p,PrmPeakPtr n){
+inline bool prmPeakUp(const PrmPeakPtr p,PrmPeakPtr n){
   return p->getPosition() < n->getPosition();
 }
 
-PrmMsPtr getMsTwo(DeconvMsPtr deconv_ms,double delta,SpParaPtr 
-                  sp_para,IonTypePtrVec ion_type_ptr_vec);
+PrmMsPtr getMsTwo(DeconvMsPtr deconv_ms,double delta, SpParaPtr sp_para);
 
-PrmMsPtr getSpSix(DeconvMsPtr deconv_ms,double delta,
-                  SpParaPtr sp_para,IonTypePtrVec ion_type_ptr_vec);
+PrmMsPtr getSpSix(DeconvMsPtr deconv_ms,double delta, SpParaPtr sp_para); 
 
 PrmMsPtr getShiftSpSix(DeconvMsPtr deconv_ms,double delta,double shift,
-                       SpParaPtr sp_para,
-                       IonTypePtrVec ion_type_ptr_vec);
+                       SpParaPtr sp_para);
 
 std::vector<std::vector<int>> getIntMassErrorList(PrmMsPtr ms,double scale,
                                                   bool n_strict,

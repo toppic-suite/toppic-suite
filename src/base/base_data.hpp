@@ -14,6 +14,7 @@
 #include "base/ion_type.hpp"
 #include "base/neutral_loss.hpp"
 #include "base/activation.hpp"
+#include "base/support_peak_type.hpp"
 
 namespace prot {
 

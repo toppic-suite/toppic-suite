@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<support_peak_type_list>
+        <support_peak_type>
+                <id>0</id>
+                <name>N_TERM</name>
+        </support_peak_type>
+        <support_peak_type>
+                <id>1</id>
+                <name>C_TERM</name>
+        </support_peak_type>
+</support_peak_type_list>

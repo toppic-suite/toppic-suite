@@ -5,7 +5,7 @@
  *      Author: xunlikun
  */
 
-#include "spec/support_peak_type.hpp"
+#include "base/support_peak_type.hpp"
 #include "base/xml_dom.hpp"
 #include "base/xml_dom_document.hpp"
 
@@ -25,8 +25,8 @@ void SPTypeFactory::initFactory(const std::string &file_name){
       for (int i = 0; i < prm_peak_type_num; i++) {
         xercesc::DOMElement* element 
             = getChildElement(parent, "support_peak_type", i);
-        std::string name = getChildValue(element, "name", 0);
         int id = getIntChildValue(element, "id", 0);
+        std::string name = getChildValue(element, "name", 0);
         sp_type_ptr_vec_.push_back(SPTypePtr(new SupportPeakType(id,name)));
       }
       delete doc;

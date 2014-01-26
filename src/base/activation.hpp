@@ -22,9 +22,9 @@ class Activation {
 
   std::string getName(){return name_;}
 
-  double getNShit(){return n_ion_type_->getShift()-getBIonShift();}
+  double getNShift(){return n_ion_type_->getShift()-getBIonShift();}
 
-  double getCShit(){return c_ion_type_->getShift()-getYIonShift();}
+  double getCShift(){return c_ion_type_->getShift()-getYIonShift();}
 
   IonTypePtr getNIonType(){return n_ion_type_;}
 

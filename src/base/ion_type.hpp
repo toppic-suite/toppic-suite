@@ -8,6 +8,8 @@
 
 namespace prot {
 
+#define ION_TYPE_PREC "PREC"
+
 class IonType {
  public: 
   IonType(std::string name, bool n_term, double shift);
@@ -47,6 +49,9 @@ class IonTypeFactory {
   static void initFactory(const std::string file_name);
   static IonTypePtrVec& getBaseIonTypePtrVec() {return ion_type_ptr_vec_;}
   static IonTypePtr getBaseIonTypePtrByName(const std::string &name);
+  static IonTypePtr getIonTypePtr_PREC() {
+    return getBaseIonTypePtrByName(ION_TYPE_PREC);
+  }
 };
 
 }

@@ -58,9 +58,7 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
   PrSMWriter internal_writer(output_file_name + "_INTERNAL");
   PrSMWriter all_writer(output_file_name);
 
-  ProtModPtrVec prot_mod_ptr_list = ProtModFactory::getBaseProtModPtrVec();
   double shift = PtmFactory::getPtmPtr_Acetylation()->getMonoMass();
-  IonTypePtrVec ion_type_ptr_list = IonTypeFactory::getBaseIonTypePtrVec();
   LOG_DEBUG("start reading");
   int n = 0;
   DeconvMsPtr ms_ptr = reader.getNextMs();
@@ -68,8 +66,9 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
 
   while (ms_ptr.get() != nullptr) {
     n++;
-    SpectrumSetPtr spec_set_ptr = getSpectrumSet(ms_ptr, 0, mng_ptr->sp_para_ptr_, 
-                                                 shift, ion_type_ptr_list);
+    SpectrumSetPtr spec_set_ptr = getSpectrumSet(ms_ptr, 0, 
+                                                 mng_ptr->sp_para_ptr_, 
+                                                 shift);
     if (spec_set_ptr.get() != nullptr) {
       PrSMPtrVec comp_prsms;
       zeroPtmSearch(spec_set_ptr, SemiAlignTypeFactory::getCompletePtr(), 

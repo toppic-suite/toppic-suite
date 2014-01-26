@@ -16,6 +16,8 @@
 
 namespace prot {
 
+#define SP_TYPE_N_TERM "N_TERM"
+
 class SupportPeakType {
  public:
   SupportPeakType(int id,std::string name){
@@ -42,6 +44,9 @@ class SPTypeFactory {
   static SPTypePtr getBaseSPTypePtrByName(const std::string &name);
   static SPTypePtr getBaseSPTypePtrById(const int id);
 
+  static SPTypePtr getSPTypePtr_N_TERM() {
+    return getBaseSPTypePtrByName(SP_TYPE_N_TERM);
+  }
  private:
   static SPTypePtrVec sp_type_ptr_vec_;
 };

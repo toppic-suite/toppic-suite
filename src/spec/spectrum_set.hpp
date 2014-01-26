@@ -19,8 +19,7 @@
 namespace prot {
 class SpectrumSet {
 public:
-	SpectrumSet(DeconvMsPtr sp,double delta,SpParaPtr sp_para,
-              double shift,IonTypePtrVec ion_type_ptr_vec);
+	SpectrumSet(DeconvMsPtr sp,double delta,SpParaPtr sp_para, double shift);
 	DeconvMsPtr getDeconvMs(){return deconv_sp_;}
 	ExtendMsPtr getSpThree(){return extend_ms_three_;}
 	PrmMsPtr getSpTwo(){return prm_ms_two_;}
@@ -39,8 +38,7 @@ private:
 typedef std::shared_ptr<SpectrumSet> SpectrumSetPtr;
 
 SpectrumSetPtr getSpectrumSet(DeconvMsPtr spectrum,double delta,
-                              SpParaPtr sp_para,double shift,
-                              IonTypePtrVec ion_type_ptr_vec);
+                              SpParaPtr sp_para,double shift);
 
 } /* namespace prot */
 
