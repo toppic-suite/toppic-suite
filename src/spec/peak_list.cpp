@@ -26,7 +26,8 @@ template <class T>
 int findHighestPeakIdx(std::vector<T> ptr_list) {
   int idx = -1;
   for (unsigned int i = 0; i < ptr_list.size(); i++) {
-    if (idx < 0 || ptr_list[i]->getIntensity() > ptr_list[idx]->getIntensity()) {
+    if (idx < 0 
+        || ptr_list[i]->getIntensity() > ptr_list[idx]->getIntensity()) {
       idx = i;
     }
   }
@@ -113,7 +114,8 @@ int getHighPeakIdx(std::vector<T> &ptr_list, double pos, double tolerance) {
   int best_idx = -1;
   /* extend to left */
   int i = idx - 1;
-  while (i >= 0 && std::abs(ptr_list[i].getPosition() - pos) <= tolerance) {
+  while (i >= 0 
+         && std::abs(ptr_list[i].getPosition() - pos) <= tolerance) {
     if (best_idx < 0
         || ptr_list[i].getIntensity() > ptr_list[best_idx].getIntensity()) {
       best_idx = i;
@@ -122,7 +124,8 @@ int getHighPeakIdx(std::vector<T> &ptr_list, double pos, double tolerance) {
   }
   /* extend to right */
   i = idx;
-  while (i < ptr_list.size() && std::abs(ptr_list[i].getPosition() - pos) <= tolerance) {
+  while (i < ptr_list.size() 
+         && std::abs(ptr_list[i].getPosition() - pos) <= tolerance) {
     if (best_idx < 0
         || ptr_list[i].getIntensity() > ptr_list[best_idx].getIntensity()) {
       best_idx = i;
@@ -151,7 +154,8 @@ int getNearPeakIdx(std::vector<T> &ptr_list, double pos, double tolerance) {
  * Removes all peaks in [center-interval, center+interval]
  */
 template <class T>
-std::vector<T> rmPeaks(std::vector<T> &ptr_list, double center, double interval) {
+std::vector<T> rmPeaks(std::vector<T> &ptr_list, double center, 
+                       double interval) {
   std::vector<T> new_list;
   for (unsigned int i = 0; i < ptr_list.size(); i++) {
     if (std::abs(ptr_list[i].getPosition() - center) > interval) {

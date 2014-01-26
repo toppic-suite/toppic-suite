@@ -17,28 +17,34 @@
 namespace prot {
 
 class SupportPeakType {
-public:
-	SupportPeakType(int id,std::string name){
-		id_=id;
-		name_=name;
-	}
-	int getId(){return id_;}
-	std::string getName(){return name_;}
-private:
-	int id_;
-	std::string name_;
+ public:
+  SupportPeakType(int id,std::string name){
+    id_=id;
+    name_=name;
+  }
+  int getId(){return id_;}
+  std::string getName(){return name_;}
+ private:
+  int id_;
+  std::string name_;
 };
 
-typedef std::shared_ptr<SupportPeakType> SupportPeakTypePtr;
-typedef std::vector<SupportPeakTypePtr> SupportPeakTypePtrVec;
+typedef std::shared_ptr<SupportPeakType> SPTypePtr;
+typedef std::vector<SPTypePtr> SPTypePtrVec;
 
-SupportPeakTypePtrVec getSupportPeakTypePtrVecInstance(const char* file_name);
+/* support peak type factory */
+class SPTypeFactory {
+ public:
+  static void initFactory(const std::string &file_name);
+  static SPTypePtrVec& getBaseSPTypePtrVec() {
+    return sp_type_ptr_vec_;}
 
-SupportPeakTypePtr getSupportPeakTypePtrByName(SupportPeakTypePtrVec &support_peak_type_list,
-                         const std::string &name);
+  static SPTypePtr getBaseSPTypePtrByName(const std::string &name);
+  static SPTypePtr getBaseSPTypePtrById(const int id);
 
-SupportPeakTypePtr getSupportPeakTypePtrById(SupportPeakTypePtrVec &support_peak_type_list,
-                         const int id);
+ private:
+  static SPTypePtrVec sp_type_ptr_vec_;
+};
 
 } /* namespace prot */
 

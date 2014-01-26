@@ -15,8 +15,9 @@ namespace prot {
 
 class SupportPeak {
  public:
-  SupportPeak(DeconvPeakPtr peak,double offset,double score,SupportPeakTypePtr peak_type);
-  SupportPeakTypePtr getPeakType(){return peak_type_;}
+  SupportPeak(DeconvPeakPtr peak,double offset,double score,
+              SPTypePtr peak_type);
+  SPTypePtr getPeakType(){return peak_type_;}
   double getOffset(){return offset_;}
   double getScore(){return score_;}
   DeconvPeakPtr getPeak(){return peak_;}
@@ -25,7 +26,7 @@ class SupportPeak {
   DeconvPeakPtr peak_;
   double offset_;
   double score_;
-  SupportPeakTypePtr peak_type_;
+  SPTypePtr peak_type_;
 };
 typedef std::shared_ptr<SupportPeak> SupportPeakPtr;
 typedef std::vector<SupportPeakPtr> SupportPeakPtrVec;

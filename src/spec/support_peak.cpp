@@ -8,7 +8,8 @@
 #include <spec/support_peak.hpp>
 
 namespace prot {
-SupportPeak::SupportPeak(DeconvPeakPtr peak,double offset,double score,SupportPeakTypePtr peak_type){
+SupportPeak::SupportPeak(DeconvPeakPtr peak,double offset,
+                         double score,SPTypePtr peak_type){
 	peak_=peak;
 	offset_=offset;
 	score_=score;

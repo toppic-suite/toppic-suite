@@ -40,7 +40,8 @@ int getNearPeakIdx(std::vector<T> &ptr_list, double pos, double tolerance);
  * Removes all peaks in [center-interval, center+interval]
  */
 template <class T>
-std::vector<T> rmPeaks(std::vector<T> &ptr_list, double center, double interval);
+std::vector<T> rmPeaks(std::vector<T> &ptr_list, double center, 
+                       double interval);
 
 template <class T>
 std::vector<T> rmZeroPeaks(std::vector<T> &ptr_list);

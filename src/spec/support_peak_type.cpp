@@ -11,50 +11,47 @@
 
 namespace prot {
 
-SupportPeakTypePtrVec getSupportPeakTypePtrVecInstance(const char* file_name){
-	SupportPeakTypePtrVec support_peak_type_list;
-		  XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
-		  if (parser) {
-		    XmlDOMDocument* doc = new XmlDOMDocument(parser, file_name);
-		    if (doc) {
-		      xercesc::DOMElement* root = doc->getDocumentElement();
-		      xercesc::DOMElement* parent = getChildElement(root, "support_peak_type_list", 0);
-		      int prm_peak_type_num = getChildCount(parent, "support_peak_type");
-		      for (int i = 0; i < prm_peak_type_num; i++) {
-		        xercesc::DOMElement* element = getChildElement(parent, "support_peak_type", i);
-		        std::string name = getChildValue(element, "name", 0);
-		        int id = getIntChildValue(element, "id", 0);
-		        support_peak_type_list.push_back(SupportPeakTypePtr(
-		                new SupportPeakType(id,name)));
+SPTypePtrVec SPTypeFactory::sp_type_ptr_vec_;
 
-		      }
-		      delete doc;
-		    }
-		    delete parser;
-		  }
-		  return support_peak_type_list;
+void SPTypeFactory::initFactory(const std::string &file_name){
+  XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
+  if (parser) {
+    XmlDOMDocument* doc = new XmlDOMDocument(parser, file_name.c_str());
+    if (doc) {
+      xercesc::DOMElement* root = doc->getDocumentElement();
+      xercesc::DOMElement* parent 
+          = getChildElement(root, "support_peak_type_list", 0);
+      int prm_peak_type_num = getChildCount(parent, "support_peak_type");
+      for (int i = 0; i < prm_peak_type_num; i++) {
+        xercesc::DOMElement* element 
+            = getChildElement(parent, "support_peak_type", i);
+        std::string name = getChildValue(element, "name", 0);
+        int id = getIntChildValue(element, "id", 0);
+        sp_type_ptr_vec_.push_back(SPTypePtr(new SupportPeakType(id,name)));
+      }
+      delete doc;
+    }
+  }
 }
 
-SupportPeakTypePtr getSupportPeakTypePtrByName(SupportPeakTypePtrVec &support_peak_type_list,
-                         const std::string &name){
-	for (unsigned int i = 0; i < support_peak_type_list.size(); i++) {
-	    std::string n = support_peak_type_list[i]->getName();
+SPTypePtr SPTypeFactory::getBaseSPTypePtrByName(const std::string &name){
+	for (unsigned int i = 0; i < sp_type_ptr_vec_.size(); i++) {
+	    std::string n = sp_type_ptr_vec_[i]->getName();
 	    if (n == name) {
-	      return support_peak_type_list[i];
+	      return sp_type_ptr_vec_[i];
 	    }
 	  }
-	return SupportPeakTypePtr(nullptr);
+	return SPTypePtr(nullptr);
 }
 
-SupportPeakTypePtr getSupportPeakTypePtrById(SupportPeakTypePtrVec &support_peak_type_list,
-                         const int id){
-	for (unsigned int i = 0; i < support_peak_type_list.size(); i++) {
-	    int n = support_peak_type_list[i]->getId();
+SPTypePtr SPTypeFactory::getBaseSPTypePtrById(const int id){
+	for (unsigned int i = 0; i < sp_type_ptr_vec_.size(); i++) {
+	    int n = sp_type_ptr_vec_[i]->getId();
 	    if (n == id) {
-	      return support_peak_type_list[i];
+	      return sp_type_ptr_vec_[i];
 	    }
 	}
-	return SupportPeakTypePtr(nullptr);
+	return SPTypePtr(nullptr);
 }
 
 } /* namespace prot */

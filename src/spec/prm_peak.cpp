@@ -25,16 +25,18 @@ PrmPeak::PrmPeak(DeconvPeakPtr base_peak,int base_type,
 }
 
 void PrmPeak::addNghbEdge(DeconvPeakPtr peak,double offset,
-                          SupportPeakTypePtr peak_type,double score){
+                          SPTypePtr peak_type,double score){
 	score_ +=score;
-	neighbor_list_.push_back(SupportPeakPtr(new SupportPeak(peak,offset,score,peak_type)));
+  SupportPeakPtr support_peak_ptr 
+      = SupportPeakPtr(new SupportPeak(peak,offset,score,peak_type));
+	neighbor_list_.push_back(support_peak_ptr);
 }
 
-int PrmPeak::getBreakType(SupportPeakTypePtrVec support_peak_type_list){
+int PrmPeak::getBreakType(SPTypePtrVec support_peak_type_list){
 	int break_type = 0;
 	for(unsigned int i=0;i<neighbor_list_.size();i++){
 		if(neighbor_list_[i]->getPeakType() == 
-       getSupportPeakTypePtrByName(support_peak_type_list,"N_TERM")){
+       SPTypeFactory::getBaseSPTypePtrByName("N_TERM")){
 			if(break_type == 0){
 				break_type = 1;
 			}

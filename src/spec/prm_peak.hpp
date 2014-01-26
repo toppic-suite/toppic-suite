@@ -25,8 +25,10 @@ namespace prot {
 
 class PrmPeak : public Peak {
 public:
-	PrmPeak(DeconvPeakPtr base_peak,int base_type,double mono_mass,double score);
-	void addNghbEdge(DeconvPeakPtr peak,double offset,SupportPeakTypePtr peak_type,double score);
+	PrmPeak(DeconvPeakPtr base_peak,int base_type,double mono_mass,
+          double score);
+	void addNghbEdge(DeconvPeakPtr peak,double offset,
+                   SPTypePtr peak_type,double score);
 	int getNeighborSize(){return neighbor_list_.size();}
 	DeconvPeakPtr getBasePeak(){return base_peak_;}
 	double getMonoMass(){return mono_mass_;}
@@ -35,10 +37,14 @@ public:
 	int getBaseType(){return base_type_;}
 	double getNStrictCRelaxTolerance(){return n_strict_c_relax_tolerance_;}
 	double getNRelaxCStrictTolerance(){return n_relax_c_strict_tolerance_;}
-	int getBreakType(SupportPeakTypePtrVec support_peak_type_list);
+	int getBreakType(SPTypePtrVec support_peak_type_list);
 	void setStrictTolerance(double tolerance){strict_tolerance_ = tolerance;}
-	void setNStrictCRelacTolerance(double tolerance){n_strict_c_relax_tolerance_ = tolerance;}
-	void setNRelaxCStrictTolerance(double tolerance){n_relax_c_strict_tolerance_ = tolerance;}
+
+	void setNStrictCRelacTolerance(double tolerance){
+    n_strict_c_relax_tolerance_ = tolerance;}
+
+	void setNRelaxCStrictTolerance(double tolerance){
+    n_relax_c_strict_tolerance_ = tolerance;}
 
 private:
 	DeconvPeakPtr base_peak_;
@@ -65,11 +71,13 @@ PrmMsPtr getMsTwo(DeconvMsPtr deconv_ms,double delta,SpParaPtr
 PrmMsPtr getSpSix(DeconvMsPtr deconv_ms,double delta,
                   SpParaPtr sp_para,IonTypePtrVec ion_type_ptr_vec);
 
-PrmMsPtr getShiftSpSix(DeconvMsPtr deconv_ms,double delta,double shift,SpParaPtr sp_para,
+PrmMsPtr getShiftSpSix(DeconvMsPtr deconv_ms,double delta,double shift,
+                       SpParaPtr sp_para,
                        IonTypePtrVec ion_type_ptr_vec);
 
 std::vector<std::vector<int>> getIntMassErrorList(PrmMsPtr ms,double scale,
-                                                  bool n_strict,bool c_strict);
+                                                  bool n_strict,
+                                                  bool c_strict);
 std::vector<double> getMassList(PrmMsPtr ms);
 std::vector<double> getScoreList(PrmMsPtr ms);
 
