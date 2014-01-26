@@ -18,7 +18,8 @@ NeutralLoss::NeutralLoss(std::string name, double mass){
 }
 
 void NeutralLossFactory::initFactory(const std::string &file_name){
-  prot::XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
+  prot::XmlDOMParser* parser 
+      = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
     prot::XmlDOMDocument doc(parser, file_name.c_str());
     xercesc::DOMElement* parent = doc.getDocumentElement();
@@ -27,12 +28,14 @@ void NeutralLossFactory::initFactory(const std::string &file_name){
       xercesc::DOMElement* element = getChildElement(parent, "neutral_loss", i);
       std::string name = getChildValue(element,"name", 0);
       double mass = getDoubleChildValue(element,"mass", 0);
-      neutral_loss_ptr_vec_.push_back(NeutralLossPtr(new NeutralLoss(name, mass)));
+      neutral_loss_ptr_vec_.push_back(
+          NeutralLossPtr(new NeutralLoss(name, mass)));
     }
   }
 }
 
-NeutralLossPtr NeutralLossFactory::getBaseNeutralLossPtrByName(const std::string &name){
+NeutralLossPtr NeutralLossFactory::getBaseNeutralLossPtrByName(
+    const std::string &name){
 	for (unsigned int i = 0; i < neutral_loss_ptr_vec_.size(); i++) {
 	    std::string n = neutral_loss_ptr_vec_[i]->getName();
 	    if (n == name) {

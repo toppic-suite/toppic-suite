@@ -16,7 +16,7 @@ ExtendSpPara::ExtendSpPara(xercesc::DOMElement* element) {
   int offset_num =  getChildCount(list_element, "extend_offset");
   for (int i = 0; i < offset_num; i++) {
     double offset = getDoubleChildValue(list_element, "extend_offset", i);
-    ext_offsets_.push_back(i);
+    ext_offsets_.push_back(offset);
   }
 }
 

@@ -15,37 +15,44 @@ BaseData::BaseData  (std::string  config_file_name) {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
     LOG_DEBUG( "config_file_name: " << config_file_name);
-    XmlDOMDocument* doc = new XmlDOMDocument(parser, config_file_name.c_str());
+    XmlDOMDocument* doc 
+        = new XmlDOMDocument(parser, config_file_name.c_str());
     LOG_DEBUG( "doc " << doc);
     if (doc) {
       xercesc::DOMElement* root = doc->getDocumentElement();
       LOG_DEBUG( "root " << root);
-      std::string acid_file_name = getChildValue(root, "acid_list_file_name", 0);
+      std::string acid_file_name 
+          = getChildValue(root, "acid_list_file_name", 0);
       LOG_DEBUG( "acid file name: " << acid_file_name);
       AcidFactory::initFactory(acid_file_name);
       LOG_DEBUG( "acid initialized ");
 
-      std::string ptm_file_name = getChildValue(root, "ptm_list_file_name", 0);
+      std::string ptm_file_name 
+          = getChildValue(root, "ptm_list_file_name", 0);
       LOG_DEBUG( "ptm file name: " << ptm_file_name);
       PtmFactory::initFactory(ptm_file_name);
       LOG_DEBUG( "ptm initialized");
 
-      std::string residue_file_name = getChildValue(root, "residue_list_file_name", 0);
+      std::string residue_file_name 
+          = getChildValue(root, "residue_list_file_name", 0);
       LOG_DEBUG( "residue file name: " << residue_file_name);
       ResidueFactory::initFactory(residue_file_name);
       LOG_DEBUG( "residue initialized");
 
-      std::string trunc_file_name = getChildValue(root, "trunc_list_file_name", 0);
+      std::string trunc_file_name 
+          = getChildValue(root, "trunc_list_file_name", 0);
       LOG_DEBUG( "trunc file name: " << trunc_file_name);
       TruncFactory::initFactory(trunc_file_name);
       LOG_DEBUG( "trunc initialized ");
 
-      std::string prot_mod_file_name = getChildValue(root, "prot_mod_list_file_name", 0);
+      std::string prot_mod_file_name 
+          = getChildValue(root, "prot_mod_list_file_name", 0);
       LOG_DEBUG( "prot mod file name: " << prot_mod_file_name);
       ProtModFactory::initFactory(prot_mod_file_name);
       LOG_DEBUG( "prot mod initialized ");
 
-      std::string ion_type_file_name = getChildValue(root, "ion_type_list_file_name", 0);
+      std::string ion_type_file_name 
+          = getChildValue(root, "ion_type_list_file_name", 0);
       LOG_DEBUG( "ion type file name: " << ion_type_file_name);
       IonTypeFactory::initFactory(ion_type_file_name);
       LOG_DEBUG( "ion type initialized ");
@@ -69,7 +76,8 @@ BaseData::BaseData  (std::string  config_file_name) {
       LOG_DEBUG( "fix mod residue initialized ");
 
       LOG_DEBUG( "allow prot mods initialization ");
-      xercesc::DOMElement* parent = getChildElement(root, "allow_prot_mod_list", 0);
+      xercesc::DOMElement* parent 
+          = getChildElement(root, "allow_prot_mod_list", 0);
       int prot_mod_num = getChildCount(parent, "prot_mod");
       for (int i = 0; i < prot_mod_num; i++) {
         std::string mod_name = getChildValue(parent, "prot_mod", i);
@@ -78,13 +86,14 @@ BaseData::BaseData  (std::string  config_file_name) {
       }
       LOG_DEBUG( "allow prot mods initialized ");
 
-      std::string activation_type = getChildValue(root, "activation_type", 0);
+      std::string activation_type 
+          = getChildValue(root, "activation_type", 0);
       LOG_DEBUG( "acitivation type: " << activation_type);
-      activation_ptr_ = ActivationFactory::getBaseActivationPtrByName(activation_type);
+      activation_ptr_ 
+          = ActivationFactory::getBaseActivationPtrByName(activation_type);
     }
     delete doc;
   }
-  // deleting parser is not necessary
 }
 
 }

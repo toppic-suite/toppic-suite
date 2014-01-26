@@ -14,6 +14,8 @@
 
 namespace prot {
 
+#define NEUTRAL_LOSS_NONE "NONE"
+
 class NeutralLoss {
 
 public:
@@ -32,8 +34,13 @@ typedef std::vector<NeutralLossPtr> NeutralLossPtrVec;
 class NeutralLossFactory {
  public:
   static void initFactory(const std::string &file_name);
-  static NeutralLossPtrVec& getBaseNeutralLossPtrVec() {return neutral_loss_ptr_vec_;}
+  static NeutralLossPtrVec& getBaseNeutralLossPtrVec() {
+    return neutral_loss_ptr_vec_;}
   static NeutralLossPtr getBaseNeutralLossPtrByName(const std::string &name);
+
+  static NeutralLossPtr getNeutralLossPtr_NONE () {
+    return getBaseNeutralLossPtrByName(NEUTRAL_LOSS_NONE);
+  }
 
  private:
   static NeutralLossPtrVec neutral_loss_ptr_vec_;
