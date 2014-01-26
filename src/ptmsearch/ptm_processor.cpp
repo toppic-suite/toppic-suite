@@ -48,7 +48,7 @@ void PtmProcessor::processDatabase(PtmSearcherPtr searcher){
 
 	int n_spectra = prot::countSpNum(sp_file_name.c_str());
 
-	MsAlignReader spReader(sp_file_name.c_str());
+	MsAlignReader spReader(sp_file_name);
 
 //	std::string output_file_name = sp_file_name+"."+mng_->output_file_ext_;
 	PrSMWriterPtr all_writer= PrSMWriterPtr(new PrSMWriter(output_file_name));

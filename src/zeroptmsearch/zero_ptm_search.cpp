@@ -9,8 +9,10 @@
 
 namespace prot {
 
-void zeroPtmSearch(SpectrumSetPtr spec_set_ptr, SemiAlignTypePtr type,
-                   ProteoformPtrVec &proteoform_ptr_vec, ZeroPtmMngPtr mng_ptr, 
+void zeroPtmSearch(SpectrumSetPtr spec_set_ptr, 
+                   SemiAlignTypePtr type,
+                   ProteoformPtrVec &proteoform_ptr_vec, 
+                   ZeroPtmMngPtr mng_ptr, 
                    PrSMPtrVec &prsms) {
   ExtendMsPtr ms_three = spec_set_ptr->getSpThree();
 
@@ -47,7 +49,7 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
   int spectra_num = countSpNum (mng_ptr->spectrum_file_name_.c_str());
   LOG_DEBUG("spectra_number  " << spectra_num);
 
-  MsAlignReader reader(mng_ptr->spectrum_file_name_.c_str());
+  MsAlignReader reader(mng_ptr->spectrum_file_name_);
   std::string output_file_name = basename(mng_ptr->spectrum_file_name_) 
                                           + "." + mng_ptr->output_file_ext_;
   PrSMWriter comp_writer(output_file_name + "_COMPLETE");

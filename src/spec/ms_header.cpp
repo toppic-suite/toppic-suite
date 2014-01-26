@@ -15,7 +15,8 @@ MsHeader::MsHeader(xercesc::DOMElement* element){
 	title_= getChildValue(element,"title",0);
 	level_ = getIntChildValue(element,"level",0);
 
-	xercesc::DOMElement* scan_element = prot::getChildElement(element,"scan_list",0);
+	xercesc::DOMElement* scan_element 
+      = prot::getChildElement(element,"scan_list",0);
 	int scans = getChildCount(scan_element,"scan");
 	for(int i=0;i<scans;i++){
 		scans_.push_back(getIntChildValue(scan_element,"scan",i));
@@ -25,7 +26,8 @@ MsHeader::MsHeader(xercesc::DOMElement* element){
 	prec_mono_mz_ = getDoubleChildValue(element,"prec_mono_mz",0);
 	prec_charge_ = getIntChildValue(element,"prec_charge",0);
 	error_tolerance_ = getDoubleChildValue(element,"error_tolerance",0);
-	xercesc::DOMElement* act_element = prot::getChildElement(element,"activation",0);
+	xercesc::DOMElement* act_element 
+      = prot::getChildElement(element,"activation",0);
 	std::string act_name = getChildValue(act_element,"name",0);
 	activation_ptr_= ActivationFactory::getBaseActivationPtrByName(act_name);
 }

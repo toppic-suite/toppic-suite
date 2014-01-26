@@ -63,7 +63,8 @@ class MsHeader {
 
   void setPrecMonoMz(double prec_mono_mz) {prec_mono_mz_ = prec_mono_mz;}
 
-  void setRetentionTime(double retention_time) {retention_time_ = retention_time;}
+  void setRetentionTime(double retention_time) {
+    retention_time_ = retention_time;}
 
   void setScan(int scan_num) {scans_.push_back(scan_num);}
 
@@ -73,7 +74,8 @@ class MsHeader {
 
   void setPrecId(int prec_id) {prec_id_ = prec_id;}
 
-  void setErrorToleranceByPpo(double ppo) {error_tolerance_ = getPrecMonoMass() * ppo;}
+  void setErrorToleranceByPpo(double ppo) {
+    error_tolerance_ = getPrecMonoMass() * ppo;}
 
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 

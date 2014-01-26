@@ -6,9 +6,9 @@
 
 namespace prot {
 
-MsAlignReader::MsAlignReader (const char *spectrum_file) {
-  file_name_ = std::string(spectrum_file);
-  input_.open(spectrum_file, std::ios::in);
+MsAlignReader::MsAlignReader (std::string file_name) {
+  file_name_ = file_name;
+  input_.open(file_name.c_str(), std::ios::in);
 }
 
 std::vector<std::string> MsAlignReader::readOneSpectrum() {
@@ -131,7 +131,8 @@ void MsAlignReader::readNext() {
       idx++;
     }
   }
-  deconv_ms_ptr_ = DeconvMsPtr(new Ms<DeconvPeakPtr>(header_ptr, peak_ptr_list));
+  deconv_ms_ptr_ 
+      = DeconvMsPtr(new Ms<DeconvPeakPtr>(header_ptr, peak_ptr_list));
 
   current_++;
 }

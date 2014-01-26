@@ -36,7 +36,7 @@ void PtmFastFilterProcessor::process(){
 void PtmFastFilterProcessor::processBlock(int block,std::string sp_file_name,int n_spectra){
 	//system.out
 	filter_->initBlock(block);
-	MsAlignReader reader(sp_file_name.c_str());
+	MsAlignReader reader(sp_file_name);
 	std::stringstream block_s;
 	block_s<<block;
 	std::string output_file_name = mng_->spectrum_file_name_ + ".FILTER" + mng_->output_file_ext_+"_"+block_s.str();

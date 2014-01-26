@@ -13,7 +13,7 @@ namespace prot {
 
 class MsAlignReader {
  public:
-  MsAlignReader(const char *spectrum_file);
+  MsAlignReader(std::string file_name);
 
   std::vector<std::string> readOneSpectrum();
 
