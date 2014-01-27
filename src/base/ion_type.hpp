@@ -9,6 +9,7 @@
 namespace prot {
 
 #define ION_TYPE_PREC "PREC"
+#define ION_TYPE_B "B"
 
 class IonType {
  public: 
@@ -51,6 +52,10 @@ class IonTypeFactory {
   static IonTypePtr getBaseIonTypePtrByName(const std::string &name);
   static IonTypePtr getIonTypePtr_PREC() {
     return getBaseIonTypePtrByName(ION_TYPE_PREC);
+  }
+
+  static IonTypePtr getIonTypePtr_B() {
+    return getBaseIonTypePtrByName(ION_TYPE_B);
   }
 };
 

@@ -9,61 +9,64 @@
 #include <iostream>
 
 #include "base/logger.hpp"
-#include "comp_shift_hi_mem.hpp"
+#include "filterdiagonal/comp_shift_hi_mem.hpp"
 
 namespace prot {
 
-CompShiftHiMem::CompShiftHiMem(ProteoformPtrVec seqs,PtmFastFilterMngPtr mng){
+CompShiftHiMem::CompShiftHiMem(ProteoformPtrVec seqs,
+                               PtmFastFilterMngPtr mng){
 	scale_ = mng->ptm_fast_filter_scale_;
 	LOG_DEBUG("Scale"+scale_);
 	LOG_DEBUG("Sequence number"+seqs.size());
 	shift_array_len_ = 20000 * scale_ + 2;
 	initSeqBeginEnds(seqs);
-	initIndexes(seqs,IonTypeFactory::getBaseIonTypePtrVec());
+	initIndexes(seqs);
 	int debug_info_shift_array_len = shift_array_len_;
-	LOG_DEBUG("shift_array_len_ ="+prot::convertToString(debug_info_shift_array_len));
-	LOG_DEBUG("seq_total_len_"+prot::convertToString(seq_total_len_));
+	LOG_DEBUG("shift_array_len_ ="+convertToString(debug_info_shift_array_len));
+	LOG_DEBUG("seq_total_len_"+convertToString(seq_total_len_));
 	int indexes_size = indexes_.size();
-	LOG_DEBUG("indexes.length"+prot::convertToString(indexes_size));
+	LOG_DEBUG("indexes.length"+convertToString(indexes_size));
 }
+
 CompShiftHiMem::~CompShiftHiMem(){
 	delete pos_seq_ids_;
 }
-std::vector<std::vector<int>> CompShiftHiMem::compConvolution(std::vector<int> masses,int bgn_pos,int num){
-	std::vector<short> scores;
-	for(int i=0;i<seq_total_len_ ;i++){
-		scores.push_back(0);
-	}
 
-	int begin_index =0;
-	int end_index = 0;
-	unsigned int m =0;
+std::vector<std::vector<int>> CompShiftHiMem::compConvolution(
+    std::vector<int> masses,int bgn_pos,int num){
 
-//	time_t time_s = time(NULL);
-//	long time = (long)time_s;
+  std::vector<short> scores;
+  for(int i=0;i<seq_total_len_ ;i++){
+    scores.push_back(0);
+  }
 
-	for(unsigned int i =bgn_pos+1;i<masses.size();i++){
-		m = masses[i]-masses[bgn_pos];
-		if(m>=shift_array_len_){
-			break;
-		}
-		if(m>0){
-			begin_index = index_begins_[m-1];
-		}
-		else{
-			// if m<0?
-			begin_index = index_begins_[m];
-		}
-		end_index = index_ends_[m+1];
-		//logger
-		for(int j = begin_index;j<end_index;j++){
-			scores[indexes_[j]]++;
-		}
-	}
-	//logger
-	return getShiftScores(scores,num);
+  int begin_index =0;
+  int end_index = 0;
+  unsigned int m =0;
+
+  for(unsigned int i =bgn_pos+1;i<masses.size();i++){
+    m = masses[i]-masses[bgn_pos];
+    if(m>=shift_array_len_){
+      break;
+    }
+    if(m>0){
+      begin_index = index_begins_[m-1];
+    }
+    else{
+      begin_index = index_begins_[m];
+    }
+    end_index = index_ends_[m+1];
+    //logger
+    for(int j = begin_index;j<end_index;j++){
+      scores[indexes_[j]]++;
+    }
+  }
+  //logger
+  return getShiftScores(scores,num);
 }
-std::vector<std::vector<int>> CompShiftHiMem::compConvolution(std::vector<int> masses,std::vector<int> errors,int bgn_pos,int num){
+
+std::vector<std::vector<int>> CompShiftHiMem::compConvolution(
+    std::vector<int> masses,std::vector<int> errors,int bgn_pos,int num){
 
 	std::vector<short> scores;
 	for(int i=0;i<seq_total_len_ ;i++){
@@ -94,7 +97,9 @@ std::vector<std::vector<int>> CompShiftHiMem::compConvolution(std::vector<int> m
 	}
 	return getShiftScores(scores,num);
 }
-std::vector<std::vector<int>> CompShiftHiMem::getShiftScores(std::vector<short> scores,int num){
+
+std::vector<std::vector<int>> CompShiftHiMem::getShiftScores(
+    std::vector<short> scores,int num){
 	std::vector<short> top_scores;
 	std::vector<int> top_position;
 	for(int i =0; i<num;i++){
@@ -156,8 +161,7 @@ void CompShiftHiMem::initSeqBeginEnds(ProteoformPtrVec seqs){
 		}
 	}
 }
-void CompShiftHiMem::initIndexes(ProteoformPtrVec seqs,IonTypePtrVec ion_type_ptr_vec){
-
+void CompShiftHiMem::initIndexes(ProteoformPtrVec seqs){
 	std::vector<int> cnt;
 	std::vector<int> index_pnt;
 	for(unsigned int i =0;i< shift_array_len_;i++){
@@ -168,11 +172,10 @@ void CompShiftHiMem::initIndexes(ProteoformPtrVec seqs,IonTypePtrVec ion_type_pt
 	}
 
 	for(unsigned int i =0;i<seqs.size();i++){
-		CompShiftHiMem::updateCnt(seqs[i],cnt,ion_type_ptr_vec);
+		updateCnt(seqs[i],cnt);
 	}
 
 	int pnt = 0;
-
 	for(unsigned int i=0;i<cnt.size();i++){
 		index_begins_[i] = pnt;
 		index_pnt[i] = pnt;
@@ -189,7 +192,9 @@ void CompShiftHiMem::initIndexes(ProteoformPtrVec seqs,IonTypePtrVec ion_type_pt
 			int m = i;
 			LOG_DEBUG("preprocessing seq "+convertToString(m));
 		}
-		std::vector<int> mass = seqs[i]->getBpSpecPtr()->getScaledMass(scale_,IonTypeFactory::getBaseIonTypePtrByName("B"));
+    IonTypePtr b_ptr = IonTypeFactory::getIonTypePtr_B();
+		std::vector<int> mass 
+        = seqs[i]->getBpSpecPtr()->getScaledMass(scale_,b_ptr);
 		unsigned int bgn = 0;
 		unsigned int end =0;
 		unsigned int diff =0;
@@ -211,9 +216,9 @@ void CompShiftHiMem::initIndexes(ProteoformPtrVec seqs,IonTypePtrVec ion_type_pt
 	}
 
 }
-void CompShiftHiMem::updateCnt(ProteoformPtr seq,std::vector<int>& cnt,IonTypePtrVec ion_type_ptr_vec){
-
-	std::vector<int> mass = seq->getBpSpecPtr()->getScaledMass(scale_,IonTypeFactory::getBaseIonTypePtrByName("B"));
+void CompShiftHiMem::updateCnt(ProteoformPtr seq,std::vector<int>& cnt){
+  IonTypePtr b_ptr = IonTypeFactory::getIonTypePtr_B();
+  std::vector<int> mass = seq->getBpSpecPtr()->getScaledMass(scale_,b_ptr);
 	unsigned int bgn =0;
 	unsigned int end =0;
 	unsigned int diff=0;

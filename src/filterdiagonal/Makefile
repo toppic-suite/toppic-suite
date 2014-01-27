@@ -15,13 +15,13 @@ LFLAGS = -L/lib -L/opt/local/lib
 LIBS = -lxerces-c 
 #
 # define the C++ source files
-SRCS = comp_shift_hi_mem.cpp ptm_fast_filter_block.cpp ptm_fast_filter_hi_mem.cpp ptm_fast_filter_processor.cpp ptm_fast_filter_mng.cpp
+SRCS = comp_shift_hi_mem.cpp ptm_fast_filter_block.cpp ptm_fast_filter_hi_mem.cpp ptm_fast_filter_processor.cpp 
 #
 # define the C object files 
 #
 
 OBJ_DIR = ../../obj
-OBJS = $(addprefix $(OBJ_DIR)/, comp_shift_hi_mem.o ptm_fast_filter_block.o ptm_fast_filter_hi_mem.o ptm_fast_filter_processor.o ptm_fast_filter_mng.o) 
+OBJS = $(addprefix $(OBJ_DIR)/, comp_shift_hi_mem.o ptm_fast_filter_block.o ptm_fast_filter_hi_mem.o ptm_fast_filter_processor.o) 
 
 BIN_DIR = ../../bin
 

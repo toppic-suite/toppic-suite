@@ -10,7 +10,8 @@
 
 namespace prot {
 
-PtmFastFilterBlock::PtmFastFilterBlock(ProteoformPtrVec seqs,PtmFastFilterMngPtr mng){
+PtmFastFilterBlock::PtmFastFilterBlock(ProteoformPtrVec seqs,
+                                       PtmFastFilterMngPtr mng){
 	mng_= mng;
 	seqs_=seqs;
 	initSeqBlocks();
@@ -21,7 +22,8 @@ void PtmFastFilterBlock::initSeqBlocks(){
 	int len=0;
 //	seq_blocks_
 	while(start < (int)seqs_.size()){
-		if(pos < (int)seqs_.size() && len+seqs_[pos]->getResSeqPtr()->getLen() < mng_->db_block_size_){
+		if(pos < (int)seqs_.size() 
+       && len+seqs_[pos]->getResSeqPtr()->getLen() < mng_->db_block_size_){
 			len = len+seqs_[pos]->getResSeqPtr()->getLen();
 			pos++;
 		}
@@ -42,7 +44,8 @@ void PtmFastFilterBlock::initSeqBlocks(){
 	}
 }
 
-SimplePrSMPtrVec PtmFastFilterBlock::getBestMathBatch(SpectrumSetPtr spectrum_set){
+SimplePrSMPtrVec PtmFastFilterBlock::getBestMathBatch(
+    SpectrumSetPtr spectrum_set){
 	SimplePrSMPtrVec result;
 	PrmMsPtr ms = spectrum_set->getSpTwo();
 	SimplePrSMPtrVec fast_match_list = filter_->getBestMatch(ms);
