@@ -19,10 +19,12 @@ class ZeroPtmMng {
  public:
   ZeroPtmMng(std::string conf_file_name): 
       base_data_ptr_ (new BaseData(conf_file_name)),
-      peak_tolerance_ptr_ (new PeakTolerance(ppo_, use_min_tolerance_, min_tolerance_)),
+      peak_tolerance_ptr_ (
+          new PeakTolerance(ppo_, use_min_tolerance_, min_tolerance_)),
       extend_sp_para_ptr_ (new ExtendSpPara(extend_min_mass_, ext_offsets_)),
       sp_para_ptr_(new SpPara(min_peak_num_, min_mass_, peak_tolerance_ptr_, 
-                              extend_sp_para_ptr_, base_data_ptr_->getActivationPtr())) 
+                              extend_sp_para_ptr_, 
+                              base_data_ptr_->getActivationPtr())) 
   {}
 
   BaseDataPtr base_data_ptr_;

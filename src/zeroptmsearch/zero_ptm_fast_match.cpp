@@ -16,7 +16,6 @@ double compDiagScr(ExtendMsPtr ms_ptr,
   while (i < ms_ptr->size() && j < masses.size()) {
     ExtendPeakPtr peak_ptr = ms_ptr->getPeakPtr(i);
     double distance = peak_ptr->getMonoMass() - masses[j];
-    //LOG_DEBUG("peak " << peak_ptr->getMonoMass() << " score " << peak_ptr->getScore());
     if (std::abs(center - distance) <= peak_ptr->getOrigTolerance()) {
       s += peak_ptr->getScore();
       i++;
@@ -59,11 +58,9 @@ ZpFastMatchPtr computeCompMatch(ExtendMsPtr ms_ptr, ProteoformPtr form_ptr) {
     score += compDiagScr(ms_ptr, masses, 0);
     LOG_TRACE("score " << score);
   }
-  if (score > 0) {
-    LOG_TRACE("complete " << form_ptr->getDbResSeqPtr()->getName() << " " << score);
-  }
+  int end = form_ptr->getResSeqPtr()->getLen() - 1;
   return ZpFastMatchPtr(
-      new ZeroPtmFastMatch(form_ptr, score, 0, form_ptr->getResSeqPtr()->getLen() - 1));
+      new ZeroPtmFastMatch(form_ptr, score, 0, end));
 }
 
 ZpFastMatchPtr computePrefixMatch(
@@ -104,9 +101,6 @@ ZpFastMatchPtr computePrefixMatch(
     masses = form_ptr->getBpSpecPtr()->getBreakPointMasses(c_ion_type);
     score += compDiagScr(ms_ptr, masses, c_term_shift);
   }
-  if (score > 0) {
-    LOG_DEBUG(form_ptr->getDbResSeqPtr()->getName() << " " << score);
-  }
   return ZpFastMatchPtr(new ZeroPtmFastMatch(form_ptr, score, 0, seq_end));
 }
 
@@ -136,15 +130,17 @@ ZpFastMatchPtr computeSuffixMatch(
     double n_term_shift = - prms[seq_bgn];
     ActivationPtr activation = header_ptr->getActivationPtr();
     IonTypePtr n_ion_type = activation->getNIonType();
-    std::vector<double> masses = form_ptr->getBpSpecPtr()->getBreakPointMasses(n_ion_type);
+    std::vector<double> masses 
+        = form_ptr->getBpSpecPtr()->getBreakPointMasses(n_ion_type);
     score = compDiagScr(ms_ptr, masses, n_term_shift);
 
     IonTypePtr c_ion_type = activation->getCIonType();
     masses = form_ptr->getBpSpecPtr()->getBreakPointMasses(c_ion_type);
     score += compDiagScr(ms_ptr, masses, 0);
   }
+  int seq_end = form_ptr->getResSeqPtr()->getLen() - 1;
   return ZpFastMatchPtr(
-      new ZeroPtmFastMatch(form_ptr, score, seq_bgn, form_ptr->getResSeqPtr()->getLen() - 1));
+      new ZeroPtmFastMatch(form_ptr, score, seq_bgn, seq_end));
 }
 
 ZpFastMatchPtr computeInternalMatch(
@@ -156,9 +152,11 @@ ZpFastMatchPtr computeInternalMatch(
 
   ActivationPtr activation = header_ptr->getActivationPtr();
   IonTypePtr n_ion_type = activation->getNIonType();
-  std::vector<double> n_masses = form_ptr->getBpSpecPtr()->getBreakPointMasses(n_ion_type);
+  std::vector<double> n_masses 
+      = form_ptr->getBpSpecPtr()->getBreakPointMasses(n_ion_type);
   IonTypePtr c_ion_type = activation->getCIonType();
-  std::vector<double> c_masses = form_ptr->getBpSpecPtr()->getBreakPointMasses(c_ion_type);
+  std::vector<double> c_masses 
+      = form_ptr->getBpSpecPtr()->getBreakPointMasses(c_ion_type);
 
   double best_score = 0;
   int best_bgn = -1;
@@ -186,7 +184,8 @@ ZpFastMatchPtr computeInternalMatch(
       mass_bgn++;
     }
   }
-  return ZpFastMatchPtr(new ZeroPtmFastMatch(form_ptr, best_score, best_bgn, best_end-1));
+  return ZpFastMatchPtr(new ZeroPtmFastMatch(form_ptr, best_score, 
+                                             best_bgn, best_end-1));
 }
 
 ZpFastMatchPtrVec zeroPtmFastFilter(SemiAlignTypePtr semi_align_type_ptr,

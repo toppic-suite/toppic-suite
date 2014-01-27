@@ -16,13 +16,14 @@ void zeroPtmSearch(SpectrumSetPtr spec_set_ptr,
                    PrSMPtrVec &prsms) {
   ExtendMsPtr ms_three = spec_set_ptr->getSpThree();
 
-  ZpFastMatchPtrVec fast_matches = zeroPtmFastFilter(type, ms_three,
-                                                     proteoform_ptr_vec, 
-                                                     mng_ptr->zero_ptm_filter_result_num_);
+  ZpFastMatchPtrVec fast_matches 
+      = zeroPtmFastFilter(type, ms_three, proteoform_ptr_vec, 
+                          mng_ptr->zero_ptm_filter_result_num_);
 
   LOG_DEBUG("fast_match ended size " << fast_matches.size());
   DeconvMsPtr deconv_ms = spec_set_ptr->getDeconvMs();
-  ZpSlowMatchPtrVec slow_matches = zeroPtmSlowFilter(deconv_ms, fast_matches, mng_ptr); 
+  ZpSlowMatchPtrVec slow_matches 
+      = zeroPtmSlowFilter(deconv_ms, fast_matches, mng_ptr); 
 
   LOG_DEBUG("slow_match ended size " << slow_matches.size());
   for (unsigned int i = 0; i < slow_matches.size(); i++) {
@@ -39,8 +40,9 @@ void zeroPtmSearch(SpectrumSetPtr spec_set_ptr,
 void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
   BaseDataPtr base_data_ptr = mng_ptr->base_data_ptr_;
   
-  ProteoformPtrVec raw_forms = readFastaToProteoform(mng_ptr->search_db_file_name_,
-                                                     base_data_ptr->getFixModResiduePtrVec());
+  ProteoformPtrVec raw_forms 
+      = readFastaToProteoform(mng_ptr->search_db_file_name_,
+                              base_data_ptr->getFixModResiduePtrVec());
 
   ProteoformPtrVec prot_mod_forms 
       = generateProtModProteoform(raw_forms, 
@@ -52,10 +54,15 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
   MsAlignReader reader(mng_ptr->spectrum_file_name_);
   std::string output_file_name = basename(mng_ptr->spectrum_file_name_) 
                                           + "." + mng_ptr->output_file_ext_;
-  PrSMWriter comp_writer(output_file_name + "_COMPLETE");
-  PrSMWriter pref_writer(output_file_name + "_PREFIX");
-  PrSMWriter suff_writer(output_file_name + "_SUFFIX");
-  PrSMWriter internal_writer(output_file_name + "_INTERNAL");
+  PrSMWriter comp_writer(output_file_name + "_" 
+                         + SemiAlignTypeFactory::getCompletePtr()->getName());
+  PrSMWriter pref_writer(output_file_name + "_"
+                         + SemiAlignTypeFactory::getPrefixPtr()->getName());
+  PrSMWriter suff_writer(output_file_name + "_"
+                         + SemiAlignTypeFactory::getSuffixPtr()->getName());
+  PrSMWriter internal_writer(
+      output_file_name + "_"
+      + SemiAlignTypeFactory::getInternalPtr()->getName());
   PrSMWriter all_writer(output_file_name);
 
   double shift = PtmFactory::getPtmPtr_Acetylation()->getMonoMass();
@@ -66,9 +73,8 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
 
   while (ms_ptr.get() != nullptr) {
     n++;
-    SpectrumSetPtr spec_set_ptr = getSpectrumSet(ms_ptr, 0, 
-                                                 mng_ptr->sp_para_ptr_, 
-                                                 shift);
+    SpectrumSetPtr spec_set_ptr 
+        = getSpectrumSet(ms_ptr, 0, mng_ptr->sp_para_ptr_, shift);
     if (spec_set_ptr.get() != nullptr) {
       PrSMPtrVec comp_prsms;
       zeroPtmSearch(spec_set_ptr, SemiAlignTypeFactory::getCompletePtr(), 

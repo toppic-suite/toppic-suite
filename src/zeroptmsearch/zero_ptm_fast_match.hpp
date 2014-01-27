@@ -33,7 +33,8 @@ class ZeroPtmFastMatch {
 typedef std::shared_ptr<ZeroPtmFastMatch> ZpFastMatchPtr;
 typedef std::vector<ZpFastMatchPtr> ZpFastMatchPtrVec;
 
-inline bool compareZeroPtmFastMatchDown(ZpFastMatchPtr m1, ZpFastMatchPtr m2) {
+inline bool compareZeroPtmFastMatchDown(ZpFastMatchPtr m1, 
+                                        ZpFastMatchPtr m2) {
   return m1->getScore() > m2->getScore();
 }
 
