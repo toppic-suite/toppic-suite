@@ -99,7 +99,5 @@ class YStr {
 #define X(str) XStr(str).unicodeForm()
 #define Y(str) YStr(str).getString()
 
-int writeXmlFile(xercesc::DOMDocument* doc, const char * filename);
-
 }
 #endif

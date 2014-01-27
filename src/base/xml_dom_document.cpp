@@ -42,10 +42,6 @@ void XmlDOMDocument::addElement(xercesc::DOMElement* parent,xercesc::DOMElement*
 	parent->appendChild(child);
 }
 
-int XmlDOMDocument::writeXmlDOMDocument(const char * filename){
-	return prot::writeXmlFile(doc_,filename);
-}
-
 xercesc::DOMNodeList* getChildElements(xercesc::DOMElement *parent,
                                 const char* tag) {
   return parent->getElementsByTagName(X(tag));

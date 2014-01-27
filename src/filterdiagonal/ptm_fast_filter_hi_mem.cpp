@@ -59,7 +59,7 @@ SimplePrSMPtrVec PtmFastFilterHiMem::sort(SimplePrSMPtrVec2D matches){
 	}
 
 
-	std::sort(sorted_match.begin(),sorted_match.end(),simple_prsm_down);
+	std::sort(sorted_match.begin(),sorted_match.end(),simplePrSMDown);
 
 	SimplePrSMPtrVec unique_match;
 	for(unsigned int i=0;i< sorted_match.size();i++){

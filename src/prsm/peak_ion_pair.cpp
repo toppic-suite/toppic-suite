@@ -21,7 +21,8 @@ void PeakIonPair::appendPeakToXml(XmlDOMDocument* xml_doc,
 void PeakIonPair::appendIonToXml(XmlDOMDocument* xml_doc, 
                                  xercesc::DOMElement* parent) {
   xercesc::DOMElement* element = xml_doc->createElement("matched_ion");
-  std::string str = theo_peak_ptr_->getIonPtr()->getIonTypePtr()->getName().substr(0,1);
+  std::string str 
+      = theo_peak_ptr_->getIonPtr()->getIonTypePtr()->getName().substr(0,1);
   xml_doc->addElement(element, "type", str.c_str());
   str = convertToString(theo_peak_ptr_->getShift());
   xml_doc->addElement(element, "match_shift", str.c_str()); 
@@ -65,7 +66,8 @@ void findPairs(ExtendMsPtr ms_three_ptr, TheoPeakPtrVec &theo_peaks,
     if (ion_ptr->getPos() >= bgn && ion_ptr->getPos() <= end) {
       if (std::abs(deviation) <= err) {
         PeakIonPairPtr pair_ptr 
-            = PeakIonPairPtr(new PeakIonPair(ms_three_ptr->getPeakPtr(i), theo_peaks[j]));
+            = PeakIonPairPtr(new PeakIonPair(ms_three_ptr->getPeakPtr(i), 
+                                             theo_peaks[j]));
         pairs.push_back(pair_ptr);
       }
     }
@@ -79,7 +81,8 @@ void findPairs(ExtendMsPtr ms_three_ptr, TheoPeakPtrVec &theo_peaks,
 
 void getPeakIonPairs (ProteoformPtr proteoform_ptr, ExtendMsPtr ms_three_ptr, 
                       double min_mass, PeakIonPairPtrVec &pairs) {
-  ActivationPtr activation_ptr = ms_three_ptr->getHeaderPtr()->getActivationPtr();
+  ActivationPtr activation_ptr 
+      = ms_three_ptr->getHeaderPtr()->getActivationPtr();
 
   TheoPeakPtrVec theo_peaks = getProteoformTheoPeak(proteoform_ptr, 
                                                     activation_ptr, 

@@ -4,11 +4,10 @@
  *  Created on: Jan 8, 2014
  *      Author: xunlikun
  */
-
-#include <ptmsearch/ps_align.hpp>
 #include <float.h>
-#include "prsm/sem_align_type.hpp"
+
 #include "base/semi_align_type.hpp"
+#include "ptmsearch/ps_align.hpp"
 
 namespace prot {
 PSAlign::PSAlign(){};

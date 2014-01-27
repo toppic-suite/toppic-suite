@@ -51,10 +51,12 @@ private:
 	double score_;
 };
 
-SimplePrSMPtrVec findSimplePrsms(SimplePrSMPtrVec simple_prsm,MsHeaderPtr header);
-SimplePrSMPtrVec readSimplePrSM(const char * filename);
+SimplePrSMPtrVec findSimplePrsms(SimplePrSMPtrVec simple_prsm,
+                                 MsHeaderPtr header);
 
-inline bool simple_prsm_down(const SimplePrSMPtr p,SimplePrSMPtr n){
+SimplePrSMPtrVec readSimplePrSM(std::string filename);
+
+inline bool simplePrSMDown(const SimplePrSMPtr p,SimplePrSMPtr n){
   return p->getScore() > n->getScore();
 }
 

@@ -13,18 +13,16 @@
 namespace prot {
 
 class SimplePrSMWriter {
-public:
-	SimplePrSMWriter();
-	SimplePrSMWriter(std::string file_name);
-	~SimplePrSMWriter();
-	void write(SimplePrSMPtrVec simple_prsms);
-	int write(const char *spectrum_file);
-	void addSimplePrSM(SimplePrSMPtrVec matches);
-private:
-	SimplePrSMPtrVec matches_;
-	xercesc::DOMLSSerializer* serializer_;
-	XmlDOMDocument* doc_;
-	std::ofstream file_;
+ public:
+  SimplePrSMWriter();
+  SimplePrSMWriter(std::string file_name);
+  ~SimplePrSMWriter();
+  void write(SimplePrSMPtrVec simple_prsms);
+
+ private:
+  xercesc::DOMLSSerializer* serializer_;
+  XmlDOMDocument* doc_;
+  std::ofstream file_;
 };
 
 } /* namespace prot */

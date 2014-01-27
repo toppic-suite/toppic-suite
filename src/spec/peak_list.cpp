@@ -228,6 +228,7 @@ int main() {
   double p = prot::findMaxPos(ptr_list);
   std::cout << "max pos " << p << "\n";
   for (unsigned int i = 0; i < ptr_list.size(); i++) {
-    std::cout << ptr_list[i]->getPosition() << " " << ptr_list[i]->getIntensity() << "\n";
+    std::cout << ptr_list[i]->getPosition() << " " 
+        << ptr_list[i]->getIntensity() << "\n";
   }
 }

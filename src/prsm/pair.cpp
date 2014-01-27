@@ -4,40 +4,23 @@
  *  Created on: Jan 1, 2014
  *      Author: xunlikun
  */
+//#include <algorithm>
+#include <limits>
 
-#include <prsm/pair.hpp>
-#include <algorithm>
-#include <float.h>
+#include "prsm/pair.hpp"
 
 namespace prot {
-//bool increaseIJ(int i,int j,double deviation,double tolerace,std::vector<double> ms_masses,std::vector<double> seq_masses){
-//	if(deviation <=0){
-//		return true;
-//	}
-//
-//	if(i>=ms_masses.size()-1){
-//		return false;
-//	}
-//
-//	double next_pos = ms_masses[i+1];
-//
-//	if(std::abs(next_pos-seq_masses[j])<= tolerace
-//			&& (j == seq_masses.size()-1||std::abs(next_pos - seq_masses[j]) < std::abs(next_pos - seq_masses[j+1]))){
-//		return true;
-//	}
-//	else{
-//		return false;
-//	}
-//}
 
-std::vector<double> compPpoDeviation(std::vector<double> ms_masses,std::vector<double> theo_masses,double ppo){
+std::vector<double> compPpoDeviation(std::vector<double> ms_masses,
+                                     std::vector<double> theo_masses,
+                                     double ppo){
 	std::vector<double> min_distances;
-	for(int i =0;i< ms_masses.size();i++){
-		min_distances.push_back(DBL_MAX);
+	for(unsigned int i =0;i< ms_masses.size();i++){
+		min_distances.push_back(std::numeric_limits<double>::infinity());
 	}
-	int i=0;
-	int j=0;
-	while(i<ms_masses.size()&& j < theo_masses.size()){
+	unsigned int i=0;
+	unsigned int j=0;
+	while(i<ms_masses.size() && j < theo_masses.size()){
 		double d = ms_masses[i] - theo_masses[j];
 		if(std::abs(d) < std::abs(min_distances[i])){
 			min_distances[i] = d;
@@ -53,8 +36,8 @@ std::vector<double> compPpoDeviation(std::vector<double> ms_masses,std::vector<d
 
 	std::vector<double> min_ppos;
 
-	for(int i=0;i<ms_masses.size();i++){
-		min_ppos.push_back(DBL_MAX);
+	for(unsigned int i=0;i<ms_masses.size();i++){
+		min_ppos.push_back(std::numeric_limits<double>::infinity());
 		if(ms_masses[i]>0){
 			min_ppos[i] = min_distances[i]/ms_masses[i];
 		}
@@ -62,13 +45,14 @@ std::vector<double> compPpoDeviation(std::vector<double> ms_masses,std::vector<d
 	return min_ppos;
 }
 
-double compUniqScore(std::vector<double> ms_masses,std::vector<double> theo_masses,double ppo){
+double compUniqScore(std::vector<double> ms_masses,
+                     std::vector<double> theo_masses,double ppo){
 	std::vector<double> min_distances;
-	for(int i =0;i< ms_masses.size();i++){
-		min_distances.push_back(DBL_MAX);
+	for(unsigned int i =0;i< ms_masses.size();i++){
+		min_distances.push_back(std::numeric_limits<double>::infinity());
 	}
-	int i=0;
-	int j=0;
+	unsigned int i=0;
+	unsigned int j=0;
 	while(i<ms_masses.size()&& j < theo_masses.size()){
 		double d = ms_masses[i] - theo_masses[j];
 		if(std::abs(d) < std::abs(min_distances[i])){
@@ -84,7 +68,7 @@ double compUniqScore(std::vector<double> ms_masses,std::vector<double> theo_mass
 
 	double score =0;
 
-	for(int i=0;i<theo_masses.size();i++){
+	for(unsigned int i=0;i<theo_masses.size();i++){
 		if(theo_masses[i]>0){
 			double error = min_distances[i]/theo_masses[i];
 			if(std::abs(error)<=ppo){
@@ -96,52 +80,57 @@ double compUniqScore(std::vector<double> ms_masses,std::vector<double> theo_mass
 	return score;
 }
 
-std::vector<double> compPpoDeviation(ExtendMsPtr ms,TheoPeakPtrVec ions,double ppo){
+std::vector<double> compPpoDeviation(ExtendMsPtr ms,
+                                     TheoPeakPtrVec ions,double ppo){
 	std::vector<double> ion_masses;
-	for(int i=0;i<ions.size();i++){
+	for(unsigned int i=0;i<ions.size();i++){
 		ion_masses.push_back(ions[i]->getModMass());
 	}
 	std::vector<double> ms_masses;
-	for(int i=0;i<ms->size();i++){
+	for(unsigned int i=0;i<ms->size();i++){
 		ion_masses.push_back(ms->getPeakPtr(i)->getPosition());
 	}
 	return compPpoDeviation(ms_masses,ion_masses,ppo);
 }
 
-double compIonScore(ExtendMsPtr ms,TheoPeakPtrVec ions,double recal,double ppo){
+double compIonScore(ExtendMsPtr ms,TheoPeakPtrVec ions,
+                    double recal,double ppo){
 	std::vector<double> ion_masses;
-	for(int i=0;i<ions.size();i++){
+	for(unsigned int i=0;i<ions.size();i++){
 		ion_masses.push_back(ions[i]->getModMass());
 	}
 	std::vector<double> ms_masses;
-	for(int i=0;i<ms->size();i++){
+	for(unsigned int i=0;i<ms->size();i++){
 		ms_masses.push_back(ms->getPeakPtr(i)->getPosition()*(1+recal));
 	}
 	return compUniqScore(ms_masses,ion_masses,ppo);
 }
 
-PeakIonPairPtrVec findPairs(ExtendMsPtr ms,TheoPeakPtrVec ions,int bgn,int end){
+PeakIonPairPtrVec findPairs(ExtendMsPtr ms,TheoPeakPtrVec ions,
+                            int bgn,int end){
 	PeakIonPairPtrVec pair_list;
 	std::sort(ions.begin(),ions.end(),theo_peak_up);
 	std::vector<double> ion_masses;
-	for(int i=0;i<ions.size();i++){
+	for(unsigned int i=0;i<ions.size();i++){
 		ion_masses.push_back(ions[i]->getModMass());
 	}
 
 	std::vector<double> real_masses;
-	for(int i=0;i<ms->size();i++){
+	for(unsigned int i=0;i<ms->size();i++){
 		real_masses.push_back(ms->getPeakPtr(i)->getPosition());
 	}
 
-	int i=0;
-	int j=0;
+	unsigned int i=0;
+	unsigned int j=0;
 	while(i<ms->size()&& j < ions.size()){
-		double deviation = ms->getPeakPtr(i)->getPosition() - ions[j]->getModMass();
+		double deviation = ms->getPeakPtr(i)->getPosition() 
+        - ions[j]->getModMass();
 		IonPtr ion = ions[j]->getIonPtr();
 		double err = ms->getPeakPtr(i)->getOrigTolerance();
 		if(ion->getPos()>=bgn && ion->getPos()<=end){
 			if(std::abs(deviation)<=err){
-				pair_list.push_back(PeakIonPairPtr(new PeakIonPair(ms->getPeakPtr(i),ions[j])));
+				pair_list.push_back(
+            PeakIonPairPtr(new PeakIonPair(ms->getPeakPtr(i),ions[j])));
 			}
 		}
 		if(increaseIJ(i,j,deviation,err,real_masses,ion_masses)){
@@ -156,15 +145,16 @@ PeakIonPairPtrVec findPairs(ExtendMsPtr ms,TheoPeakPtrVec ions,int bgn,int end){
 }
 
 
-std::vector<double> getNCScore(ExtendMsPtr ms,TheoPeakPtrVec ions,int bgn,int end,double delta,double ppo){
+std::vector<double> getNCScore(ExtendMsPtr ms,TheoPeakPtrVec ions,
+                               int bgn,int end,double delta,double ppo){
 	std::vector<double> ms_masses;
-	for(int i=0;i<ms->size();i++){
+	for(unsigned int i=0;i<ms->size();i++){
 		ms_masses.push_back(ms->getPeakPtr(i)->getPosition());
 	}
 
 	std::vector<double> theo_n_mass_list;
 
-	for(int i=0;i<ions.size();i++){
+	for(unsigned int i=0;i<ions.size();i++){
 		IonPtr ion = ions[i]->getIonPtr();
 		int pos = ion->getPos();
 		if(ion->getIonTypePtr()->isNTerm() && pos>=bgn && pos <= end){
@@ -176,7 +166,7 @@ std::vector<double> getNCScore(ExtendMsPtr ms,TheoPeakPtrVec ions,int bgn,int en
 
 	std::vector<double> theo_c_mass_list;
 
-	for(int i=0;i<ions.size();i++){
+	for(unsigned int i=0;i<ions.size();i++){
 		IonPtr ion = ions[i]->getIonPtr();
 		int pos = ion->getPos();
 		if(!ion->getIonTypePtr()->isNTerm() && pos>=bgn && pos <= end){

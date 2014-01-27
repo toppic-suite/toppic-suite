@@ -8,10 +8,10 @@
 #ifndef PAIR_HPP_
 #define PAIR_HPP_
 
+#include "base/algorithm.hpp"
 #include "spec/extend_peak.hpp"
 #include "spec/theo_peak.hpp"
 #include "prsm/peak_ion_pair.hpp"
-#include "base/algorithm.hpp"
 
 namespace prot {
 
@@ -66,12 +66,14 @@ inline bool comparePairUp(PairPtr c1, PairPtr c2) {
   return c1->getX() < c2->getX();
 }
 
-//bool increaseIJ(int i,int j,double deviation,double tolerace,std::vector<double> ms_masses,std::vector<double> seq_masses);
-//std::vector<double> compPpoDeviation(std::vector<double> ms_masses,std::vector<double> theo_masses,double ppo);
-std::vector<double> compPpoDeviation(ExtendMsPtr ms,TheoPeakPtrVec ions,double ppo);
-double compIonScore(ExtendMsPtr ms,TheoPeakPtrVec ions,double recal,double ppo);
-PeakIonPairPtrVec findPairs(ExtendMsPtr ms,TheoPeakPtrVec ions,int bgn,int end);
-std::vector<double> getNCScore(ExtendMsPtr ms,TheoPeakPtrVec ions,int bgn,int end,double delta,double ppo);
+std::vector<double> compPpoDeviation(ExtendMsPtr ms,TheoPeakPtrVec ions,
+                                     double ppo);
+double compIonScore(ExtendMsPtr ms,TheoPeakPtrVec ions,double recal,
+                    double ppo);
+PeakIonPairPtrVec findPairs(ExtendMsPtr ms,TheoPeakPtrVec ions,int bgn,
+                            int end);
+std::vector<double> getNCScore(ExtendMsPtr ms,TheoPeakPtrVec ions,
+                               int bgn,int end,double delta,double ppo);
 } /* namespace prot */
 
 #endif /* PAIR_HPP_ */

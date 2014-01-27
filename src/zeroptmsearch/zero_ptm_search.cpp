@@ -30,7 +30,7 @@ void zeroPtmSearch(SpectrumSetPtr spec_set_ptr,
   }
   LOG_DEBUG("prsm generation ended size " << prsms.size());
 
-  std::sort(prsms.begin(), prsms.end(), prsm_match_fragment_down);
+  std::sort(prsms.begin(), prsms.end(), prsmMatchFragmentDown);
   if (prsms.size() > 0) {
     prsms.erase(prsms.begin() + 1, prsms.end());
   }

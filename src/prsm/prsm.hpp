@@ -107,7 +107,7 @@ typedef std::vector<PrSMPtr> PrSMPtrVec;
 typedef std::vector<PrSMPtrVec> PrSMPtrVec2D;
 typedef std::vector<PrSMPtrVec2D> PrSMPtrVec3D;
 
-inline bool prsm_match_fragment_down(PrSMPtr p1, PrSMPtr p2) {
+inline bool prsmMatchFragmentDown(PrSMPtr p1, PrSMPtr p2) {
   return p1->getMatchFragNum() > p2->getMatchFragNum();
 }
 

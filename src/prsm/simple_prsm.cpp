@@ -20,8 +20,6 @@ SimplePrSM::SimplePrSM(MsHeaderPtr header,ProteoformPtr seq,int score){
 	precursor_id_ = header->getPrecId();
 	prec_mass_ = header->getPrecMonoMass();
 	seq_= seq;
-//	seq_id_ = seq->getSeqId();
-//	seq_name_ = seq->getName();
 	seq_id_ = seq->getDbResSeqPtr()->getId();
 	seq_name_ = seq->getDbResSeqPtr()->getName();
 	score_ = score;
@@ -32,7 +30,6 @@ SimplePrSM::SimplePrSM(xercesc::DOMElement* element){
 	spectrum_scan_ = getChildValue(element, "spectrum_scan", 0);
 	precursor_id_ = getIntChildValue(element, "precursor_id", 0);
 	prec_mass_ = getDoubleChildValue(element, "precursor_mass", 0);
-//	seq_= getIntChildValue(element, "spectrum_id_", 0);
 	seq_id_ = getIntChildValue(element, "sequence_id", 0);
 	seq_name_ = getChildValue(element, "sequence_name", 0);
 	score_ = getDoubleChildValue(element, "score", 0);
@@ -79,9 +76,10 @@ bool SimplePrSM::isMatch(MsHeaderPtr header){
 	std::string header_spectrum_scan = header->getScansString();
 	int header_precursor_id = header->getPrecId();
 	double header_precursor_mass = header->getPrecMonoMass();
-	if(header_spectrum_id == spectrum_id_ && header_precursor_id == precursor_id_){
+	if(header_spectrum_id == spectrum_id_ 
+     && header_precursor_id == precursor_id_){
 		if(header_precursor_mass!=prec_mass_ ||
-				header_spectrum_scan.compare(spectrum_scan_)!=0){
+				header_spectrum_scan != spectrum_scan_){
 			LOG_ERROR("Error in combine simple PrSMs! ");
 		}
 		return true;
@@ -91,16 +89,17 @@ bool SimplePrSM::isMatch(MsHeaderPtr header){
 	}
 }
 
-SimplePrSMPtrVec readSimplePrSM(const char * filename){
+SimplePrSMPtrVec readSimplePrSM(std::string filename){
 	SimplePrSMPtrVec results;
 	XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
 	if(parser){
-		XmlDOMDocument* doc = new XmlDOMDocument(parser, filename);
+		XmlDOMDocument* doc = new XmlDOMDocument(parser, filename.c_str());
 		if (doc) {
 			xercesc::DOMElement* root = doc->getDocumentElement();
 			int simple_prsm_num = prot::getChildCount(root, "simple_prsm");
 			for (int i = 0; i < simple_prsm_num; i++) {
-				xercesc::DOMElement* simple_prsm = getChildElement(root, "simple_prsm", i);
+				xercesc::DOMElement* simple_prsm 
+            = getChildElement(root, "simple_prsm", i);
 				results.push_back(SimplePrSMPtr(new SimplePrSM(simple_prsm)));
 			}
 		}
@@ -109,9 +108,10 @@ SimplePrSMPtrVec readSimplePrSM(const char * filename){
 	return results;
 }
 
-SimplePrSMPtrVec findSimplePrsms(SimplePrSMPtrVec simple_prsm,MsHeaderPtr header){
+SimplePrSMPtrVec findSimplePrsms(SimplePrSMPtrVec simple_prsm,
+                                 MsHeaderPtr header){
 	SimplePrSMPtrVec prsms ;
-	for(int i=0;i<simple_prsm.size();i++){
+	for(unsigned int i=0;i<simple_prsm.size();i++){
 		SimplePrSMPtr prsm = simple_prsm[i];
 		if(prsm->isMatch(header)){
 			prsms.push_back(prsm);
