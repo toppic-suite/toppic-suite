@@ -7,7 +7,7 @@ namespace prot {
 
 class MsHeader {
  public:
-  MsHeader() {}
+  MsHeader() {};
 
   MsHeader(xercesc::DOMElement* element);
 
@@ -92,11 +92,11 @@ class MsHeader {
   /** a list of scans for merged spectra */
   std::vector<int> scans_;
   /** ms level */
-  int level_;
+  int level_=0;
   /** activation type */
   ActivationPtr activation_ptr_;
   /** retention time */
-  double retention_time_;
+  double retention_time_=0.0;
   /** precursor m/z value in the MS1 spectrum */
   double prec_sp_mz_ = -1;
   /** computed monoisotopic precursor m/z value */
@@ -104,7 +104,7 @@ class MsHeader {
   /** precursor charge state */ 
   int prec_charge_ = -1;
   /** precursor mass error tolerance */
-  double error_tolerance_;
+  double error_tolerance_=0.0;
 };
 
 typedef std::shared_ptr<MsHeader> MsHeaderPtr;
