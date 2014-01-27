@@ -25,48 +25,54 @@ typedef std::shared_ptr<Diagonal<BasicDiagPairPtr>> BasicDiagPairDiagPtr;
 typedef std::vector<BasicDiagPairDiagPtr> BasicDiagPairDiagPtrVec;
 
 class BasicDiagPair:public Pair {
-public:
-	BasicDiagPair(int x,int y,double score,int diag_order,double diff,int prm_peak_type);
-	BasicDiagPair(int x,int y,double score,int diag_order,double diff,int prm_peak_type,BasicDiagPairDiagPtr diagonal);
-	BasicDiagPair(BasicDiagPairPtr pair);
+ public:
+  BasicDiagPair(int x,int y,double score,int diag_order,
+                double diff,int prm_peak_type);
+  BasicDiagPair(int x,int y,double score,int diag_order,
+                double diff,int prm_peak_type,BasicDiagPairDiagPtr diagonal);
+  BasicDiagPair(BasicDiagPairPtr pair);
 
-	int getBaseType() const {
-		return base_type_;
-	}
+  int getBaseType() const {
+    return base_type_;
+  }
 
-	int getDiagOrder() const {
-		return diag_order_;
-	}
+  int getDiagOrder() const {
+    return diag_order_;
+  }
 
-	const BasicDiagPairDiagPtr& getDiagonal() const {
-		return diagonal_;
-	}
+  const BasicDiagPairDiagPtr& getDiagonal() const {
+    return diagonal_;
+  }
 
-	void setDiagonal(const BasicDiagPairDiagPtr& diagonal) {
-		diagonal_ = diagonal;
-	}
+  void setDiagonal(const BasicDiagPairDiagPtr& diagonal) {
+    diagonal_ = diagonal;
+  }
 
-	double getDiff() const {
-		return diff_;
-	}
+  double getDiff() const {
+    return diff_;
+  }
 
-	double getScore() const {
-		return score_;
-	}
+  double getScore() const {
+    return score_;
+  }
 
-protected:
-	int diag_order_;
-	double diff_;
-	BasicDiagPairDiagPtr diagonal_;
-	double score_;
-	int base_type_;
+ protected:
+  int diag_order_;
+  double diff_;
+  BasicDiagPairDiagPtr diagonal_;
+  double score_;
+  int base_type_;
 
 };
 
 bool contains(BasicDiagPairPtrVec pairs,int y);
 
-BasicDiagPairPtrVec compDiagPair(PrmMsPtr sp,std::vector<double> seq_masses,DiagonalHeaderPtr header);
-BasicDiagPairDiagPtrVec getDiagonals(DiagonalHeaderPtrVec headers,PrmMsPtr ms_six,ProteoformPtr seq,PtmMngPtr mng);
+BasicDiagPairPtrVec compDiagPair(PrmMsPtr sp,std::vector<double> seq_masses,
+                                 DiagonalHeaderPtr header);
+
+BasicDiagPairDiagPtrVec getDiagonals(DiagonalHeaderPtrVec headers,
+                                     PrmMsPtr ms_six,ProteoformPtr seq,
+                                     PtmMngPtr mng);
 BasicDiagPairDiagPtr getDiagonal(int cnt,DiagonalHeaderPtr header,PrmMsPtr ms_six,ProteoformPtr seq,PtmMngPtr mng);
 } /* namespace prot */
 
