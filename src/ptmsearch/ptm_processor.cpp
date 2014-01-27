@@ -46,7 +46,7 @@ void PtmProcessor::processDatabase(PtmSearcherPtr searcher){
 	std::string sp_file_name = mng_->spectrum_file_name_;
 	std::string output_file_name = sp_file_name+"."+mng_->output_file_ext_;
 
-	int n_spectra = prot::countSpNum(sp_file_name.c_str());
+//	int n_spectra = prot::countSpNum(sp_file_name.c_str());
 
 	MsAlignReader spReader(sp_file_name);
 

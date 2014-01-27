@@ -37,7 +37,7 @@ void PtmSlowMatch::comp(CompShiftLowMemPtr comp_shift){
 			SemiAlignTypeFactory::getSuffixPtr(),SemiAlignTypeFactory::getInternalPtr()};
 
 
-	for(int i=0;i<types.size();i++){
+	for(unsigned int i=0;i<types.size();i++){
 		align->compute(types[i]);
 //		for(int i=0;i<align->getAlignScr().size();i++){
 //			std::cout<<align->getAlignScr()[i]<<std::endl;
@@ -91,31 +91,31 @@ DiagonalHeaderPtrVec PtmSlowMatch::getNTermShiftList(std::vector<double> best_sh
 	DiagonalHeaderPtrVec n_term_shifts_comp_left = prot::getNTermShiftListCompLeft(seq,mng);
 	DiagonalHeaderPtrVec n_term_shifts_comp_right = prot::getNTermShiftListCompRight(seq,ms_six);
 	DiagonalHeaderPtrVec extend_n_term_shifts;
-	for(int i=0;i<n_term_shifts_comp_left.size();i++){
+	for(unsigned int i=0;i<n_term_shifts_comp_left.size();i++){
 		headers.push_back(n_term_shifts_comp_left[i]);
 	}
-	for(int i=0;i<n_term_shifts_comp_right.size();i++){
+	for(unsigned int i=0;i<n_term_shifts_comp_right.size();i++){
 		headers.push_back(n_term_shifts_comp_right[i]);
 	}
 	std::vector<double> ms_masses = prot::getMassList(ms_six);
 	std::vector<double> seq_masses = seq->getBpSpecPtr()->getBreakPointMasses(IonTypePtr(new IonType("B",true,0)));
 	double shift;
 
-	for(int i=1;i<seq_masses.size();i++){
+	for(unsigned int i=1;i<seq_masses.size();i++){
 		shift = - seq_masses[i];
 		if(found(shift,headers,mng)){
 			extend_n_term_shifts.push_back(DiagonalHeaderPtr(new DiagonalHeader(shift,true,false,true,false)));
 		}
 	}
 
-	for(int i=1;i<seq_masses.size();i++){
+	for(unsigned int i=1;i<seq_masses.size();i++){
 		shift = ms_masses[ms_masses.size()-1] - seq_masses[i];
 		if(found(shift,headers,mng)){
 			extend_n_term_shifts.push_back(DiagonalHeaderPtr(new DiagonalHeader(shift,false,true,false,true)));
 		}
 	}
 
-	for(int i=0;i<extend_n_term_shifts.size();i++){
+	for(unsigned int i=0;i<extend_n_term_shifts.size();i++){
 		headers.push_back(extend_n_term_shifts[i]);
 	}
 
@@ -123,7 +123,7 @@ DiagonalHeaderPtrVec PtmSlowMatch::getNTermShiftList(std::vector<double> best_sh
 }
 
 bool PtmSlowMatch::found(double shift,DiagonalHeaderPtrVec headerlist,PtmMngPtr mng){
-	for(int i=0;i<headerlist.size();i++){
+	for(unsigned int i=0;i<headerlist.size();i++){
 		if(std::abs(shift-headerlist[i]->getProtNTermShift())<= mng->extend_diagonal_error_tolerance_){
 			return true;
 		}

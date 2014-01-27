@@ -33,7 +33,8 @@ void PtmSearcher::search(SpectrumSetPtr spectrum_set,SimplePrSMPtrVec matches,Pr
 			}
 			if(slow_match.size()!=0){
 				for(int r=0;r<mng_->n_report_;r++){
-					if(r >= slow_match.size()){
+					int match_size = slow_match.size();
+					if(r >= match_size){
 						break;
 					}
 					if(slow_match[r]->getScr(s,t)>0){

@@ -138,7 +138,7 @@ void setPepTermMode(DiagonalHeaderPtr &header,PtmMngPtr mng){
 	header->setPepCTermAllowMod(mod);
 }
 ProtModPtr findProtTermMod(ProtModPtrVec mods,int trunc_len,ResSeqPtr res_seq,double pep_term_shift,double tolerance){
-	for(int i=0;i<mods.size();i++){
+	for(unsigned int i=0;i<mods.size();i++){
 		if(mods[i]->getTruncPtr()->isSameTrunc(trunc_len,res_seq) && std::abs(mods[i]->getPepShift()-pep_term_shift<=tolerance)){
 			return mods[i];
 		}
@@ -147,7 +147,7 @@ ProtModPtr findProtTermMod(ProtModPtrVec mods,int trunc_len,ResSeqPtr res_seq,do
 }
 
 PtmPtr findPepTermMod(PtmPtrVec mods,double shift,double tolerance){
-	for(int i=0;i<mods.size();i++){
+	for(unsigned int i=0;i<mods.size();i++){
 //		if(std::abs(shift-mods[i]->getMonoMass())<= tolerance){
 //			return mods[i];
 //		}
@@ -173,7 +173,7 @@ DiagonalHeaderPtrVec getNTermShiftListTruncPrefix(ProteoformPtr seq){
 	std::vector<double> seq_masses = seq->getBpSpecPtr()->getBreakPointMasses(IonTypePtr(new IonType("B",true,0)));
 	double shift;
 
-	for(int i=1;i<seq_masses.size();i++){
+	for(unsigned int i=1;i<seq_masses.size();i++){
 		shift = - seq_masses[i];
 		extend_n_term_shift.push_back(DiagonalHeaderPtr(new DiagonalHeader(shift,true,false,true,false)));
 	}
@@ -186,7 +186,7 @@ DiagonalHeaderPtrVec getNTermShiftListTruncsuffix(PrmMsPtr ms,ProteoformPtr seq)
 	std::vector<double> seq_masses = seq->getBpSpecPtr()->getBreakPointMasses(IonTypePtr(new IonType("B",true,0)));
 	double shift;
 
-	for(int i=1;i<seq_masses.size();i++){
+	for(unsigned int i=1;i<seq_masses.size();i++){
 		shift = ms_masses[ms_masses.size() - 1]-seq_masses[i];
 		extend_n_term_shift.push_back(DiagonalHeaderPtr(new DiagonalHeader(shift,true,false,true,false)));
 	}
@@ -195,8 +195,8 @@ DiagonalHeaderPtrVec getNTermShiftListTruncsuffix(PrmMsPtr ms,ProteoformPtr seq)
 DiagonalHeaderPtrVec get1dHeaders(DiagonalHeaderPtrVec2D headers){
 	DiagonalHeaderPtrVec header_list;
 //	if(headers != nullptr){
-		for(int i =0;i<headers.size();i++){
-			for(int j=0;j<headers[i].size();j++){
+		for(unsigned int i =0;i<headers.size();i++){
+			for(unsigned int j=0;j<headers[i].size();j++){
 				header_list.push_back(headers[i][j]);
 			}
 		}

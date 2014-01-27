@@ -27,12 +27,12 @@ void PSAlign::initDPPair(){
 	dp_2d_pairs_.clear();
 	segment_bgn_pairs_.clear();
 	segment_end_pairs_.clear();
-	for(int i=0;i<diagonals_.size();i++){
+	for(unsigned int i=0;i<diagonals_.size();i++){
 		segment_bgn_pairs_.push_back(nullptr);
 		segment_end_pairs_.push_back(nullptr);
 		DPPairPtrVec temp_dppair;
 		dp_2d_pairs_.push_back(temp_dppair);
-		for(int j =0;j<diagonals_[i]->size();j++){
+		for(unsigned int j =0;j<diagonals_[i]->size();j++){
 			int x = diagonals_[i]->getDiagPair(j)->getX();
 			int y = diagonals_[i]->getDiagPair(j)->getY();
 			double score = diagonals_[i]->getDiagPair(j)->getScore();
@@ -49,8 +49,8 @@ void PSAlign::initDPPair(){
 	first_pair_ =DPPairPtr( new DPPair(-1,-1,0,0,-1,mng_->n_unknown_shift_,nullptr));
 	first_pair_->setDiagPrev(nullptr);
 	dp_pairs_.push_back(first_pair_);
-	for(int i=0;i<dp_2d_pairs_.size();i++){
-		for(int j=0;j<dp_2d_pairs_[i].size();j++){
+	for(unsigned int i=0;i<dp_2d_pairs_.size();i++){
+		for(unsigned int j=0;j<dp_2d_pairs_[i].size();j++){
 			dp_pairs_.push_back(dp_2d_pairs_[i][j]);
 			if(j>0){
 				dp_2d_pairs_[i][j]->setDiagPrev(dp_2d_pairs_[i][j-1]);
@@ -82,7 +82,7 @@ DPPairPtr PSAlign::getTruncPre(DPPairPtr cur_pair,int s,SemiAlignTypePtr type){
 	if(cur_pair == last_pair_){
 		double trunc_score = -DBL_MAX;
 //		std::cout<<s<<std::endl;
-		for(int i=0;i<segment_end_pairs_.size();i++){
+		for(unsigned int i=0;i<segment_end_pairs_.size();i++){
 			DPPairPtr prev_pair = segment_end_pairs_[i];
 //			if(type == SemiAlignTypeFactory::getCompletePtr() || type == SEMI_ALIGN_TYPE_SUFFIX){
 			if(type == SemiAlignTypeFactory::getCompletePtr() || type == SemiAlignTypeFactory::getSuffixPtr()){
@@ -183,11 +183,11 @@ DPPairPtr PSAlign::getShiftPre(DPPairPtr cur_pair,int p,int s,SemiAlignTypePtr t
 void PSAlign::dp(SemiAlignTypePtr align_type){
 	dpPrep();
 //	std::cout<<dp_pairs_.size()<<std::endl;
-	for(int p =1;p<dp_pairs_.size();p++){
+	for(unsigned int p =1;p<dp_pairs_.size();p++){
 		for(int s =0;s<=mng_->n_unknown_shift_;s++){
-			if(p==dp_pairs_.size()-1){
-				int m=0;
-			}
+//			if(p==dp_pairs_.size()-1){
+//				int m=0;
+//			}
 			DPPairPtr trunc_prev = getTruncPre(dp_pairs_[p],s,align_type);
 			double trunc_score;
 			if(trunc_prev == nullptr){
@@ -231,11 +231,11 @@ void PSAlign::dp(SemiAlignTypePtr align_type){
 //						std::cout<<last_pair_->getSrc(j)<<std::endl;
 //						}}
 			double new_score = dp_pairs_[p]->getPairScore();
-			if(p==dp_pairs_.size()-1){
+//			if(p==dp_pairs_.size()-1){
 //				std::cout<<dp_pairs_.size()<<"->"<<last_pair_->getSrc(1)<<std::endl;
 //				std::cout<<trunc_score<<"+"<<new_score<<"="<<trunc_score+new_score<<std::endl;
 //				std::cout<<(trunc_score >= diag_score && trunc_score >= shift_score)<<std::endl;
-			}
+//			}
 
 			if(trunc_score >= diag_score && trunc_score >= shift_score ){
 				if(trunc_score == -DBL_MAX){
@@ -310,7 +310,7 @@ DiagonalHeaderPtrVec PSAlign::backtrace(int s){
 		p=pre;
 	}
 	DiagonalHeaderPtrVec sub_seg;
-	for(int i=0;i<list.size();i++){
+	for(unsigned int i=0;i<list.size();i++){
 		sub_seg.push_back(list[list.size()-1-i]);
 	}
 	return sub_seg;

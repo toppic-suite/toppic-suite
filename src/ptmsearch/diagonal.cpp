@@ -13,7 +13,7 @@
 namespace prot {
 DiagonalHeaderPtrVec refineHeadersBgnEnd(int first_pos,ProteoformPtr seq,DeconvMsPtr deconv_ms,ExtendMsPtr ms_three,PtmMngPtr mng,DiagonalHeaderPtrVec headers){
 	DiagonalHeaderPtrVec result_list;
-	for(int i=0;i<headers.size();i++){
+	for(unsigned int i=0;i<headers.size();i++){
 //		TheoPeakPtrVec ions = getTheoPeak(seq,deconv_ms->getHeaderPtr()->getActivationPtr(),headers,i,mng->sp_para_->getMinMass());
 		TheoPeakPtrVec ions = prot::getProteoformTheoPeak(seq,deconv_ms->getHeaderPtr()->getActivationPtr(),mng->sp_para_->getMinMass());
 		int bgn = headers[i]->getMatchFirstResPos()-first_pos;
@@ -22,7 +22,7 @@ DiagonalHeaderPtrVec refineHeadersBgnEnd(int first_pos,ProteoformPtr seq,DeconvM
 
 		if(pairs.size()<1){
 			int pair_size = pairs.size();
-//			LOG_WARN("Empty Segment is found "+prot::convertToString(pair_size));
+			LOG_WARN("Empty Segment is found "+prot::convertToString(pair_size));
 		}
 		else{
 			int new_bgn = first_pos + getNewBgn(pairs);
@@ -56,7 +56,7 @@ DiagonalHeaderPtrVec refineHeadersBgnEnd(int first_pos,ProteoformPtr seq,DeconvM
 
 int getNewBgn(PeakIonPairPtrVec pairs){
 	int newBgn = INT_MAX;
-	for(int i=0;i<pairs.size();i++)
+	for(unsigned int i=0;i<pairs.size();i++)
 	{
 		if(pairs[i]->getTheoPeakPtr()->getIonPtr()->getPos() < newBgn){
 			newBgn = pairs[i]->getTheoPeakPtr()->getIonPtr()->getPos();
@@ -66,7 +66,7 @@ int getNewBgn(PeakIonPairPtrVec pairs){
 }
 int getNewEnd(PeakIonPairPtrVec pairs){
 	int newEnd = 0;
-	for(int i=0;i<pairs.size();i++)
+	for(unsigned int i=0;i<pairs.size();i++)
 	{
 		if(pairs[i]->getTheoPeakPtr()->getIonPtr()->getPos() > newEnd){
 			newEnd = pairs[i]->getTheoPeakPtr()->getIonPtr()->getPos();
