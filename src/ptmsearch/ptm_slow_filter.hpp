@@ -19,11 +19,11 @@ namespace prot {
 
 class PtmSlowFilter {
 public:
-	PtmSlowFilter(SpectrumSetPtr spectrum_set,SimplePrSMPtrVec fast_Matches,CompShiftLowMemPtr comp_shift,PtmMngPtr mng);
-	PtmSlowMatchPtrVec getBestMatch(int nshift,int type);
-	PtmSlowMatchPtrVec getMatches(){return slow_matches_;};
+    PtmSlowFilter(SpectrumSetPtr spectrum_set,SimplePrSMPtrVec fast_Matches,CompShiftLowMemPtr comp_shift,PtmMngPtr mng);
+    PtmSlowMatchPtrVec getBestMatch(int nshift,int type);
+    PtmSlowMatchPtrVec getMatches(){return slow_matches_;};
 private:
-	PtmSlowMatchPtrVec slow_matches_;
+    PtmSlowMatchPtrVec slow_matches_;
 };
 
 typedef std::shared_ptr<PtmSlowFilter> PtmSlowFilterPtr;

@@ -17,16 +17,16 @@ namespace prot {
 
 class PtmProcessor {
 public:
-	PtmProcessor(PtmMngPtr mng);
-	void process();
-	void processDatabase(PtmSearcherPtr searcher);
+    PtmProcessor(PtmMngPtr mng);
+    void process();
+    void processDatabase(PtmSearcherPtr searcher);
 
-	PtmMngPtr mng_;
-	ProteoformPtrVec seqs_;
-	SimplePrSMPtrVec simplePrsms_;
+    PtmMngPtr mng_;
+    ProteoformPtrVec seqs_;
+    SimplePrSMPtrVec simplePrsms_;
 private:
-	void init();
-	void prsmFindSeq(SimplePrSMPtrVec simple_prsms,ProteoformPtrVec seqs);
+    void init();
+    void prsmFindSeq(SimplePrSMPtrVec simple_prsms,ProteoformPtrVec seqs);
 
 };
 

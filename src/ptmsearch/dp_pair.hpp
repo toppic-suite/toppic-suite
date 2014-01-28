@@ -24,66 +24,66 @@ typedef std::vector<DPPairPtr> DPPairPtrVec;
 
 class DPPair : public Pair{
 public:
-	DPPair(int x,int y,double pair_score,double diff,int order,int n_shift,DiagonalHeaderPtr header);
+    DPPair(int x,int y,double pair_score,double diff,int order,int n_shift,DiagonalHeaderPtr header);
 
-	const DPPairPtr& getDiagPrev() const {
-		return diag_prev_;
-	}
+    const DPPairPtr& getDiagPrev() const {
+        return diag_prev_;
+    }
 
-	void setDiagPrev(const DPPairPtr& diagPrev) {
-		diag_prev_ = diagPrev;
-	}
+    void setDiagPrev(const DPPairPtr& diagPrev) {
+        diag_prev_ = diagPrev;
+    }
 
-	double getDiff() const {
-		return diff_;
-	}
+    double getDiff() const {
+        return diff_;
+    }
 
-	const DiagonalHeaderPtr& getDiagonalHeader() const {
-		return header_;
-	}
+    const DiagonalHeaderPtr& getDiagonalHeader() const {
+        return header_;
+    }
 
-	int getDiagOrder() const {
-		return order_;
-	}
+    int getDiagOrder() const {
+        return order_;
+    }
 
-	double getPairScore() const {
-		return pair_score_;
-	}
+    double getPairScore() const {
+        return pair_score_;
+    }
 
-	double getSrc(int s) {
-		return scores_[s];
-	}
+    double getSrc(int s) {
+        return scores_[s];
+    }
 
-	DPPairPtr getPre(int s){
-		return prevs_[s];
-	}
+    DPPairPtr getPre(int s){
+        return prevs_[s];
+    }
 
-//	const std::vector<int>& getTypes() const {
-//		return types_;
-//	}
+//    const std::vector<int>& getTypes() const {
+//        return types_;
+//    }
 
-	int getType(int s){
-		return types_[s];
-	}
+    int getType(int s){
+        return types_[s];
+    }
 
-	bool isAssisting(){
-		if(pair_score_==0.0){
-			return true;
-		}
-		return false;
-	}
+    bool isAssisting(){
+        if(pair_score_==0.0){
+            return true;
+        }
+        return false;
+    }
 
-	void updateTable(int s,double score,int path_type,DPPairPtr prev_pair);
+    void updateTable(int s,double score,int path_type,DPPairPtr prev_pair);
 
 private:
-	DiagonalHeaderPtr header_;
-	double diff_;
-	double pair_score_;
-	int order_;
-	DPPairPtr diag_prev_;
-	DPPairPtrVec prevs_;
-	std::vector<double> scores_;
-	std::vector<int> types_;
+    DiagonalHeaderPtr header_;
+    double diff_;
+    double pair_score_;
+    int order_;
+    DPPairPtr diag_prev_;
+    DPPairPtrVec prevs_;
+    std::vector<double> scores_;
+    std::vector<int> types_;
 };
 
 } /* namespace prot */

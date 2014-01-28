@@ -21,12 +21,12 @@ namespace prot {
 
 class PtmSearcher {
 public:
-	PtmSearcher(PtmMngPtr mng);
-	void search(SpectrumSetPtr spectrum_set,SimplePrSMPtrVec matches,PrSMPtrVec3D &prsms);
-	void search(SpectrumSetPtr spectrum_set,SimplePrSMPtrVec matches,PrSMPtrVec3D &prsms,PtmSlowFilterPtr slow_filter);
+    PtmSearcher(PtmMngPtr mng);
+    void search(SpectrumSetPtr spectrum_set,SimplePrSMPtrVec matches,PrSMPtrVec3D &prsms);
+    void search(SpectrumSetPtr spectrum_set,SimplePrSMPtrVec matches,PrSMPtrVec3D &prsms,PtmSlowFilterPtr slow_filter);
 private:
-	PtmMngPtr mng_;
-	CompShiftLowMemPtr comp_shift_;
+    PtmMngPtr mng_;
+    CompShiftLowMemPtr comp_shift_;
 };
 
 typedef std::shared_ptr<PtmSearcher> PtmSearcherPtr;

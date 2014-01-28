@@ -27,50 +27,50 @@ namespace prot {
 
 class PtmSlowMatch {
 public:
-	PtmSlowMatch(ProteoformPtr seq,SpectrumSetPtr spectrum_set,CompShiftLowMemPtr comp_shift,PtmMngPtr mng);
-	ProteoformPtr getSeq(){return seq_;};
-	double getScr(int shiftnum,int type);
-	PrSMPtr geneResult(int shift_num,int type);
+    PtmSlowMatch(ProteoformPtr seq,SpectrumSetPtr spectrum_set,CompShiftLowMemPtr comp_shift,PtmMngPtr mng);
+    ProteoformPtr getSeq(){return seq_;};
+    double getScr(int shiftnum,int type);
+    PrSMPtr geneResult(int shift_num,int type);
 
-	int getShift() const {
-		return shift_;
-	}
+    int getShift() const {
+    return shift_;
+    }
 
-	void setShift(int shift) {
-		shift_ = shift;
-	}
+    void setShift(int shift) {
+    shift_ = shift;
+    }
 
-	int getType() const {
-		return type_;
-	}
+    int getType() const {
+    return type_;
+    }
 
-	void setType(int type) {
-		type_ = type;
-	}
+    void setType(int type) {
+    type_ = type;
+    }
 
 protected:
-	PtmMngPtr mng_;
-	ProteoformPtr seq_;
-	DeconvMsPtr deconv_ms_;
-	PrmMsPtr ms_six_;
-	ExtendMsPtr ms_three_;
-	DiagonalHeaderPtrVec3D result_headers_;
-	std::vector<std::vector<double>> result_deltas_;
-	std::vector<std::vector<double>> result_scores_;
+    PtmMngPtr mng_;
+    ProteoformPtr seq_;
+    DeconvMsPtr deconv_ms_;
+    PrmMsPtr ms_six_;
+    ExtendMsPtr ms_three_;
+    DiagonalHeaderPtrVec3D result_headers_;
+    std::vector<std::vector<double>> result_deltas_;
+    std::vector<std::vector<double>> result_scores_;
 private:
-	int shift_;
-	int type_;
+    int shift_;
+    int type_;
 
-	void comp(CompShiftLowMemPtr comp_shift);
-	DiagonalHeaderPtrVec getNTermShiftList(std::vector<double> best_shift,PrmMsPtr ms_six,ProteoformPtr seq,PtmMngPtr mng);
-	bool found(double shift,DiagonalHeaderPtrVec headerlist,PtmMngPtr mng);
+    void comp(CompShiftLowMemPtr comp_shift);
+    DiagonalHeaderPtrVec getNTermShiftList(std::vector<double> best_shift,PrmMsPtr ms_six,ProteoformPtr seq,PtmMngPtr mng);
+    bool found(double shift,DiagonalHeaderPtrVec headerlist,PtmMngPtr mng);
 };
 
 typedef std::shared_ptr<PtmSlowMatch> PtmSlowMatchPtr;
 typedef std::vector<PtmSlowMatchPtr> PtmSlowMatchPtrVec;
 
 bool inline psm_down(PtmSlowMatchPtr f,PtmSlowMatchPtr n){
-	return f->getScr(f->getShift(),f->getType())>n->getScr(n->getShift(),n->getType());
+    return f->getScr(f->getShift(),f->getType())>n->getScr(n->getShift(),n->getType());
 }
 } /* namespace prot */
 
