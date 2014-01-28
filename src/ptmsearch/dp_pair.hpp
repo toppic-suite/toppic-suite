@@ -5,8 +5,8 @@
  *      Author: xunlikun
  */
 
-#ifndef DP_PAIR_HPP_
-#define DP_PAIR_HPP_
+#ifndef PROT_DP_PAIR_HPP_
+#define PROT_DP_PAIR_HPP_
 
 #include "ptmsearch/diagonal_header.hpp"
 #include "prsm/pair.hpp"

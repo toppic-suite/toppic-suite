@@ -5,8 +5,8 @@
  *      Author: xunlikun
  */
 
-#include <ptmsearch/dp_pair.hpp>
-#include <float.h>
+#include "ptmsearch/dp_pair.hpp"
+#include "float.h"
 
 namespace prot {
 DPPair::DPPair(int x,int y,double pair_score,double diff,

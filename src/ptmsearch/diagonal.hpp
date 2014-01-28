@@ -5,8 +5,8 @@
  *      Author: xunlikun
  */
 
-#ifndef DIAGONAL_HPP_
-#define DIAGONAL_HPP_
+#ifndef PROT_DIAGONAL_HPP_
+#define PROT_DIAGONAL_HPP_
 
 #include <memory>
 #include "ptmsearch/diagonal_header.hpp"
