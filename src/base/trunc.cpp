@@ -21,30 +21,30 @@ Trunc::Trunc(std::string name, int trunc_len, std::string str) {
 }
 
 void Trunc::appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
-	xercesc::DOMElement* element = xml_doc->createElement("truncation");
-	xml_doc->addElement(element, "name", name_.c_str());
-	std::string str = convertToString(trunc_len_);
-	xml_doc->addElement(element, "trunc_len", str.c_str());
-	str = convertToString(shift_);
-	xml_doc->addElement(element, "shift", str.c_str());
-	xercesc::DOMElement* acid_list = xml_doc->createElement("amino_acid_list");
-	for(unsigned int i=0;i<acid_str_.size();i++){
-		acid_str_[i]->appendxml(xml_doc,acid_list);
-	}
-	element->appendChild(acid_list);
-	parent->appendChild(element);
+    xercesc::DOMElement* element = xml_doc->createElement("truncation");
+    xml_doc->addElement(element, "name", name_.c_str());
+    std::string str = convertToString(trunc_len_);
+    xml_doc->addElement(element, "trunc_len", str.c_str());
+    str = convertToString(shift_);
+    xml_doc->addElement(element, "shift", str.c_str());
+    xercesc::DOMElement* acid_list = xml_doc->createElement("amino_acid_list");
+    for(unsigned int i=0;i<acid_str_.size();i++){
+        acid_str_[i]->appendxml(xml_doc,acid_list);
+    }
+    element->appendChild(acid_list);
+    parent->appendChild(element);
 }
 
 bool Trunc::isSameTrunc(int len, ResSeqPtr res_seq_ptr) {
-	if(trunc_len_ != len){
-		return false;
-	}
-	for(int i=0;i<trunc_len_;i++){
-		if(acid_str_[i].get() == res_seq_ptr->getResiduePtr(i)->getAcidPtr().get()){
-			return false;
-		}
-	}
-	return true;
+    if(trunc_len_ != len){
+        return false;
+    }
+    for(int i=0;i<trunc_len_;i++){
+        if(acid_str_[i].get() == res_seq_ptr->getResiduePtr(i)->getAcidPtr().get()){
+            return false;
+        }
+    }
+    return true;
 }
 
 bool Trunc::isValidTrunc(ResSeqPtr res_seq_ptr) {
@@ -57,35 +57,35 @@ bool Trunc::isValidTrunc(ResSeqPtr res_seq_ptr) {
 }
 
 TruncPtr findProtTermTrunc(TruncPtrVec truncs,int trunc_len,ResSeqPtr resseq){
-	for(unsigned int i=0;i<truncs.size();i++){
-		if(truncs[i]->isSameTrunc(trunc_len,resseq)){
-			return truncs[i];
-		}
-	}
-	return nullptr;
+    for(unsigned int i=0;i<truncs.size();i++){
+        if(truncs[i]->isSameTrunc(trunc_len,resseq)){
+            return truncs[i];
+        }
+    }
+    return nullptr;
 };
 
 TruncPtr findProtNTermTrunc(ResSeqPtr seq,int trunc_len,TruncPtrVec allowed_trunc){
-	return findProtTermTrunc(allowed_trunc,trunc_len,seq);
+    return findProtTermTrunc(allowed_trunc,trunc_len,seq);
 };
 
 TruncPtr findProtCTermTrunc(ResSeqPtr seq,int last_res_pos,TruncPtrVec allowed_trunc){
-	int trunc_len = seq->getLen()-1-last_res_pos;
-	return  findProtTermTrunc(allowed_trunc,trunc_len,seq);
+    int trunc_len = seq->getLen()-1-last_res_pos;
+    return  findProtTermTrunc(allowed_trunc,trunc_len,seq);
 };
 
 bool isAlignPrefix(TruncPtr n_trunc,double pep_n_term_shift,double threshold){
-	if(n_trunc != nullptr && pep_n_term_shift <= threshold){
-		return true;
-	}
-	return false;
+    if(n_trunc != nullptr && pep_n_term_shift <= threshold){
+        return true;
+    }
+    return false;
 };
 
 bool isAlignSuffix(TruncPtr c_trunc,double pep_c_term_shift,double threshold){
-	if(c_trunc != nullptr && pep_c_term_shift <= threshold){
-		return true;
-	}
-	return false;
+    if(c_trunc != nullptr && pep_c_term_shift <= threshold){
+        return true;
+    }
+    return false;
 }
 
 void TruncFactory::initFactory(const std::string &file_name) {

@@ -30,12 +30,12 @@ std::string Residue::toString(std::string delim_bgn, std::string delim_end) {
 }
 
 void Residue::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
-	xercesc::DOMElement* element = xml_doc->createElement("residue");
-	std::string str = convertToString(mass_);
-	xml_doc->addElement(element, "mass", str.c_str());
-	acid_ptr_->appendxml(xml_doc,element);
-	ptm_ptr_->appendxml(xml_doc,element);
-	parent->appendChild(element);
+    xercesc::DOMElement* element = xml_doc->createElement("residue");
+    std::string str = convertToString(mass_);
+    xml_doc->addElement(element, "mass", str.c_str());
+    acid_ptr_->appendxml(xml_doc,element);
+    ptm_ptr_->appendxml(xml_doc,element);
+    parent->appendChild(element);
 }
 
 ResiduePtr getResiduePtrByAcid(ResiduePtrVec &residue_ptrs,

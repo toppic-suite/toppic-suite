@@ -20,19 +20,19 @@ Change::Change(Change ori, int start) {
 }
 
 void Change::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
-	xercesc::DOMElement* element = xml_doc->createElement("change");
-	std::string str = convertToString(left_bp_pos_);
-	xml_doc->addElement(element, "left_bp_pos", str.c_str());
-	str = convertToString(right_bp_pos_);
-	xml_doc->addElement(element, "right_bp_pos", str.c_str());
-	str = convertToString(change_type_);
-	xml_doc->addElement(element, "change_type", str.c_str());
-	str = convertToString(mass_shift_);
-	xml_doc->addElement(element, "mass_shift", str.c_str());
-	if(ptm_ptr_!=nullptr){
-		ptm_ptr_->appendxml(xml_doc,element);
-	}
-	parent->appendChild(element);
+    xercesc::DOMElement* element = xml_doc->createElement("change");
+    std::string str = convertToString(left_bp_pos_);
+    xml_doc->addElement(element, "left_bp_pos", str.c_str());
+    str = convertToString(right_bp_pos_);
+    xml_doc->addElement(element, "right_bp_pos", str.c_str());
+    str = convertToString(change_type_);
+    xml_doc->addElement(element, "change_type", str.c_str());
+    str = convertToString(mass_shift_);
+    xml_doc->addElement(element, "mass_shift", str.c_str());
+    if(ptm_ptr_!=nullptr){
+        ptm_ptr_->appendxml(xml_doc,element);
+    }
+    parent->appendChild(element);
 }
 
 }

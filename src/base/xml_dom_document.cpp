@@ -20,12 +20,12 @@ XmlDOMDocument::XmlDOMDocument(XmlDOMParser* parser,
 }
 
 XmlDOMDocument::XmlDOMDocument(xercesc::DOMImplementation* implementation,std::string root){
-	xercesc::DOMDocument* doc = implementation->createDocument(0,X(root.c_str()),0);
-	doc_=doc;
+    xercesc::DOMDocument* doc = implementation->createDocument(0,X(root.c_str()),0);
+    doc_=doc;
 }
 
 XmlDOMDocument::XmlDOMDocument(xercesc::DOMDocument* doc){
-	doc_=doc;
+    doc_=doc;
 }
 
 XmlDOMDocument::~XmlDOMDocument() {
@@ -35,11 +35,11 @@ XmlDOMDocument::~XmlDOMDocument() {
 }
 
 void XmlDOMDocument::addElement(xercesc::DOMElement* element){
-	doc_->appendChild(element);
+    doc_->appendChild(element);
 }
 
 void XmlDOMDocument::addElement(xercesc::DOMElement* parent,xercesc::DOMElement* child){
-	parent->appendChild(child);
+    parent->appendChild(child);
 }
 
 xercesc::DOMNodeList* getChildElements(xercesc::DOMElement *parent,
@@ -152,9 +152,9 @@ std::string convertToString(double value) {
 }
 
 std::string convertToString(int value){
-	std::stringstream stream;
-	stream << value;
-	return stream.str();
+    std::stringstream stream;
+    stream << value;
+    return stream.str();
 }
 
 std::string convertToString(bool value) {
