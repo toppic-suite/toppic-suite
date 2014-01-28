@@ -5,8 +5,8 @@
  *      Author: xunlikun
  */
 
-#ifndef PS_ALIGN_HPP_
-#define PS_ALIGN_HPP_
+#ifndef PROT_PS_ALIGN_HPP_
+#define PROT_PS_ALIGN_HPP_
 
 #include "dp_pair.hpp"
 #include "ptmsearch/basic_diag_pair.hpp"

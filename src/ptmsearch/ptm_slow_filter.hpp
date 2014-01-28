@@ -5,8 +5,8 @@
  *      Author: xunlikun
  */
 
-#ifndef PTM_SLOW_FILTER_HPP_
-#define PTM_SLOW_FILTER_HPP_
+#ifndef PROT_PTM_SLOW_FILTER_HPP_
+#define PROT_PTM_SLOW_FILTER_HPP_
 
 #include <memory>
 #include "ptmsearch/comp_shift_low_mem.hpp"
@@ -19,7 +19,11 @@ namespace prot {
 
 class PtmSlowFilter {
 public:
-    PtmSlowFilter(SpectrumSetPtr spectrum_set,SimplePrSMPtrVec fast_Matches,CompShiftLowMemPtr comp_shift,PtmMngPtr mng);
+    PtmSlowFilter(
+    		SpectrumSetPtr spectrum_set,
+    		SimplePrSMPtrVec fast_Matches,
+    		CompShiftLowMemPtr comp_shift,
+    		PtmMngPtr mng);
     PtmSlowMatchPtrVec getBestMatch(int nshift,int type);
     PtmSlowMatchPtrVec getMatches(){return slow_matches_;};
 private:

@@ -23,10 +23,12 @@ PtmProcessor::PtmProcessor(PtmMngPtr mng){
 }
 
 void PtmProcessor::init(){
-	seqs_ = prot::readFastaToProteoform(mng_->search_db_file_name_,
-                                      mng_->base_data_->getFixModResiduePtrVec());
+	seqs_ = prot::readFastaToProteoform(
+			mng_->search_db_file_name_,
+			mng_->base_data_->getFixModResiduePtrVec());
 	std::string sp_file_name = mng_->spectrum_file_name_;
-	std::string simplePrsmFileName = mng_->spectrum_file_name_ + ".FILTER" + mng_->input_file_ext_;
+	std::string simplePrsmFileName = mng_->spectrum_file_name_
+			+ ".FILTER" + mng_->input_file_ext_;
 	simplePrsms_  = prot::readSimplePrSM(simplePrsmFileName.c_str());
 	prsmFindSeq(simplePrsms_,seqs_);
 }
@@ -80,23 +82,19 @@ void PtmProcessor::processDatabase(PtmSearcherPtr searcher){
 	int cnt = 0;
 	while((deconv_sp = spReader.getNextMs())!= nullptr){
 		cnt++;
-//		for(int i=0;i<deconv_sp->size();i++){
-      double shift = PtmFactory::getPtmPtr_Acetylation()->getMonoMass(); 
-			SpectrumSetPtr spectrumset = getSpectrumSet(deconv_sp,0,
+        double shift = PtmFactory::getPtmPtr_Acetylation()->getMonoMass();
+        SpectrumSetPtr spectrumset = getSpectrumSet(deconv_sp,0,
                                                   mng_->sp_para_,shift);
-			if(spectrumset != nullptr){
-//				std::string scan = deconv_sp->getHeaderPtr()->getScansString();
-				//update message;
-				SimplePrSMPtrVec slectedPrsms = prot::findSimplePrsms(simplePrsms_,deconv_sp->getHeaderPtr());
-				searcher->search(spectrumset,slectedPrsms,prsms);
-				all_writer->writeVector3D(prsms);
-				for(int j=0;j<mng_->n_unknown_shift_;j++){
-					for(int k=0;k<4;k++){
-						writers[j][k]->writeVector(prsms[j][k]);
-					}
+		if(spectrumset != nullptr){
+			SimplePrSMPtrVec slectedPrsms = prot::findSimplePrsms(simplePrsms_,deconv_sp->getHeaderPtr());
+			searcher->search(spectrumset,slectedPrsms,prsms);
+			all_writer->writeVector3D(prsms);
+			for(int j=0;j<mng_->n_unknown_shift_;j++){
+				for(int k=0;k<4;k++){
+					writers[j][k]->writeVector(prsms[j][k]);
 				}
 			}
-//		}
+		}
 	}
 	spReader.close();
 }

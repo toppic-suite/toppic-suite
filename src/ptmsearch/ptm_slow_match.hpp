@@ -5,8 +5,8 @@
  *      Author: xunlikun
  */
 
-#ifndef PTM_SLOW_MATCH_HPP_
-#define PTM_SLOW_MATCH_HPP_
+#ifndef PROT_PTM_SLOW_MATCH_HPP_
+#define PROT_PTM_SLOW_MATCH_HPP_
 
 #include <memory>
 #include <vector>
@@ -27,7 +27,11 @@ namespace prot {
 
 class PtmSlowMatch {
 public:
-    PtmSlowMatch(ProteoformPtr seq,SpectrumSetPtr spectrum_set,CompShiftLowMemPtr comp_shift,PtmMngPtr mng);
+    PtmSlowMatch(
+    		ProteoformPtr seq,
+    		SpectrumSetPtr spectrum_set,
+    		CompShiftLowMemPtr comp_shift,
+    		PtmMngPtr mng);
     ProteoformPtr getSeq(){return seq_;};
     double getScr(int shiftnum,int type);
     PrSMPtr geneResult(int shift_num,int type);
@@ -62,8 +66,15 @@ private:
     int type_;
 
     void comp(CompShiftLowMemPtr comp_shift);
-    DiagonalHeaderPtrVec getNTermShiftList(std::vector<double> best_shift,PrmMsPtr ms_six,ProteoformPtr seq,PtmMngPtr mng);
-    bool found(double shift,DiagonalHeaderPtrVec headerlist,PtmMngPtr mng);
+    DiagonalHeaderPtrVec getNTermShiftList(
+    		std::vector<double> best_shift,
+    		PrmMsPtr ms_six,
+    		ProteoformPtr seq,
+    		PtmMngPtr mng);
+    bool found(
+    		double shift,
+    		DiagonalHeaderPtrVec headerlist,
+    		PtmMngPtr mng);
 };
 
 typedef std::shared_ptr<PtmSlowMatch> PtmSlowMatchPtr;

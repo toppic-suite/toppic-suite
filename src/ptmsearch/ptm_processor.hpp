@@ -5,8 +5,8 @@
  *      Author: xunlikun
  */
 
-#ifndef PTM_PROCESSOR_HPP_
-#define PTM_PROCESSOR_HPP_
+#ifndef PROT_PTM_PROCESSOR_HPP_
+#define PROT_PTM_PROCESSOR_HPP_
 
 #include "ptmsearch/ptm_mng.hpp"
 #include "ptmsearch/ptm_searcher.hpp"

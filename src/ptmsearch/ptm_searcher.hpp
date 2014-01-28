@@ -5,8 +5,8 @@
  *      Author: xunlikun
  */
 
-#ifndef PTM_SEARCHER_HPP_
-#define PTM_SEARCHER_HPP_
+#ifndef PROT_PTM_SEARCHER_HPP_
+#define PROT_PTM_SEARCHER_HPP_
 
 #include <memory>
 #include <vector>
@@ -22,8 +22,13 @@ namespace prot {
 class PtmSearcher {
 public:
     PtmSearcher(PtmMngPtr mng);
-    void search(SpectrumSetPtr spectrum_set,SimplePrSMPtrVec matches,PrSMPtrVec3D &prsms);
-    void search(SpectrumSetPtr spectrum_set,SimplePrSMPtrVec matches,PrSMPtrVec3D &prsms,PtmSlowFilterPtr slow_filter);
+    void search(SpectrumSetPtr spectrum_set,
+    		SimplePrSMPtrVec matches,
+    		PrSMPtrVec3D &prsms);
+    void search(SpectrumSetPtr spectrum_set,
+    		SimplePrSMPtrVec matches,
+    		PrSMPtrVec3D &prsms,
+    		PtmSlowFilterPtr slow_filter);
 private:
     PtmMngPtr mng_;
     CompShiftLowMemPtr comp_shift_;
