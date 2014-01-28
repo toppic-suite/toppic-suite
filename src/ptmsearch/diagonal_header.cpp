@@ -5,9 +5,9 @@
  *      Author: xunlikun
  */
 
-#include <ptmsearch/diagonal_header.hpp>
 #include "base/prot_mod.hpp"
 #include "base/change.hpp"
+#include "ptmsearch/diagonal_header.hpp"
 
 namespace prot {
 

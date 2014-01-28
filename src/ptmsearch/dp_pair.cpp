@@ -9,7 +9,8 @@
 #include <float.h>
 
 namespace prot {
-DPPair::DPPair(int x,int y,double pair_score,double diff,int order,int n_shift,DiagonalHeaderPtr header):Pair(x,y){
+DPPair::DPPair(int x,int y,double pair_score,double diff,
+		int order,int n_shift,DiagonalHeaderPtr header):Pair(x,y){
 	diff_ = diff;
 	pair_score_ = pair_score;
 	order_= order;

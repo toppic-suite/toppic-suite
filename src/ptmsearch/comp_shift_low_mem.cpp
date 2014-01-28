@@ -6,7 +6,6 @@
  */
 
 #include <iostream>
-
 #include "ptmsearch/comp_shift_low_mem.hpp"
 
 namespace prot {

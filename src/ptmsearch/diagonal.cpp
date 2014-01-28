@@ -5,7 +5,7 @@
  *      Author: xunlikun
  */
 
-#include <ptmsearch/diagonal.hpp>
+#include "ptmsearch/diagonal.hpp"
 #include "base/logger.hpp"
 #include "float.h"
 #include "limits.h"

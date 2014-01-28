@@ -5,8 +5,8 @@
  *      Author: xunlikun
  */
 
-#ifndef COMP_SHIFT_LOW_MEM_HPP_
-#define COMP_SHIFT_LOW_MEM_HPP_
+#ifndef PROT_COMP_SHIFT_LOW_MEM_HPP_
+#define PROT_COMP_SHIFT_LOW_MEM_HPP_
 
 #include <memory>
 #include <vector>

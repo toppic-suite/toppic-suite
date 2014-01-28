@@ -24,7 +24,8 @@ typedef std::vector<DPPairPtr> DPPairPtrVec;
 
 class DPPair : public Pair{
 public:
-    DPPair(int x,int y,double pair_score,double diff,int order,int n_shift,DiagonalHeaderPtr header);
+    DPPair(int x,int y,double pair_score,double diff,
+    		int order,int n_shift,DiagonalHeaderPtr header);
 
     const DPPairPtr& getDiagPrev() const {
         return diag_prev_;
@@ -58,9 +59,6 @@ public:
         return prevs_[s];
     }
 
-//    const std::vector<int>& getTypes() const {
-//        return types_;
-//    }
 
     int getType(int s){
         return types_[s];

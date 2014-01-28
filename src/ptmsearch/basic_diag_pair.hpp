@@ -5,8 +5,8 @@
  *      Author: xunlikun
  */
 
-#ifndef BASIC_DIAG_PAIR_HPP_
-#define BASIC_DIAG_PAIR_HPP_
+#ifndef PROT_BASIC_DIAG_PAIR_HPP_
+#define PROT_BASIC_DIAG_PAIR_HPP_
 
 #include <memory>
 #include <vector>

@@ -5,8 +5,8 @@
  *      Author: xunlikun
  */
 
-#ifndef DIAGONAL_HEADER_HPP_
-#define DIAGONAL_HEADER_HPP_
+#ifndef PROT_DIAGONAL_HEADER_HPP_
+#define PROT_DIAGONAL_HEADER_HPP_
 
 #include "base/trunc.hpp"
 #include "base/prot_mod.hpp"
