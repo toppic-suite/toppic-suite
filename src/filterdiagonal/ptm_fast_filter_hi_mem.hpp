@@ -18,16 +18,16 @@ namespace prot {
 
 class PtmFastFilterHiMem {
 public:
-	PtmFastFilterHiMem(ProteoformPtrVec seqs,PtmFastFilterMngPtr mng);
-	SimplePrSMPtrVec getBestMatch(PrmMsPtr ms);
+    PtmFastFilterHiMem(ProteoformPtrVec seqs,PtmFastFilterMngPtr mng);
+    SimplePrSMPtrVec getBestMatch(PrmMsPtr ms);
 
 private:
-	PtmFastFilterMngPtr mng_;
-	ProteoformPtrVec seqs_;
-	CompShiftHiMemPtr index_;
+    PtmFastFilterMngPtr mng_;
+    ProteoformPtrVec seqs_;
+    CompShiftHiMemPtr index_;
 
-	SimplePrSMPtrVec2D compute(PrmMsPtr ms);
-	SimplePrSMPtrVec sort(SimplePrSMPtrVec2D matches);
+    SimplePrSMPtrVec2D compute(PrmMsPtr ms);
+    SimplePrSMPtrVec sort(SimplePrSMPtrVec2D matches);
 };
 
 typedef std::shared_ptr<PtmFastFilterHiMem> PtmFastFilterHiMemPtr;
