@@ -13,20 +13,20 @@ class ZeroPtmSlowMatch {
  public:
   ZeroPtmSlowMatch(DeconvMsPtr deconv_ms_ptr, ZpFastMatchPtr fast_match_ptr,
                    ZeroPtmMngPtr mng_ptr);
-	double getScore() {return score_;}
+    double getScore() {return score_;}
   PrSMPtr geneResult();
 
  private:
-	ZeroPtmMngPtr mng_ptr_;
+    ZeroPtmMngPtr mng_ptr_;
   ZpFastMatchPtr fast_match_ptr_;
   DeconvMsPtr deconv_ms_ptr_;
   ProteoformPtr proteoform_ptr_;
 
-	double refine_prec_mass_;
-	ExtendMsPtr refine_ms_ptr_;
+    double refine_prec_mass_;
+    ExtendMsPtr refine_ms_ptr_;
 
-	double score_ = 0;
-	double recal_ = 0;
+    double score_ = 0;
+    double recal_ = 0;
 
   void compScore (ExtendMsPtr refine_ms_ptr, TheoPeakPtrVec theo_peaks, double ppo);
   bool isValid (double recal, double ppo);
