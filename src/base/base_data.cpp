@@ -71,13 +71,16 @@ BaseData::BaseData  (std::string  config_file_name) {
 
       std::string sp_type_file_name 
           = getChildValue(root, "support_peak_type_file_name", 0);
+      LOG_DEBUG( "support_peak_type_file_name: " << sp_type_file_name);
       SPTypeFactory::initFactory(sp_type_file_name);
       LOG_DEBUG( "support peak type initialized ");
 
       std::string fix_mod_residue_file_name 
           = getChildValue(root, "fix_mod_residue_file_name", 0);
-      LOG_DEBUG( "fix mod residue file name: " << fix_mod_residue_file_name);
-      fix_mod_residue_list_ = ResidueFactory::getResiduePtrVecInstance(fix_mod_residue_file_name);
+      LOG_DEBUG( "fix mod residue file name: " 
+                << fix_mod_residue_file_name);
+      fix_mod_residue_list_ = ResidueFactory::getResiduePtrVecInstance(
+          fix_mod_residue_file_name);
       LOG_DEBUG( "fix mod residue initialized ");
 
       LOG_DEBUG( "allow prot mods initialization ");

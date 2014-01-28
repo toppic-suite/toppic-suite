@@ -19,12 +19,10 @@ void SPTypeFactory::initFactory(const std::string &file_name){
     XmlDOMDocument* doc = new XmlDOMDocument(parser, file_name.c_str());
     if (doc) {
       xercesc::DOMElement* root = doc->getDocumentElement();
-      xercesc::DOMElement* parent 
-          = getChildElement(root, "support_peak_type_list", 0);
-      int prm_peak_type_num = getChildCount(parent, "support_peak_type");
+      int prm_peak_type_num = getChildCount(root, "support_peak_type");
       for (int i = 0; i < prm_peak_type_num; i++) {
         xercesc::DOMElement* element 
-            = getChildElement(parent, "support_peak_type", i);
+            = getChildElement(root, "support_peak_type", i);
         int id = getIntChildValue(element, "id", 0);
         std::string name = getChildValue(element, "name", 0);
         sp_type_ptr_vec_.push_back(SPTypePtr(new SupportPeakType(id,name)));

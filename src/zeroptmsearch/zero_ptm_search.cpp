@@ -52,6 +52,8 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
   LOG_DEBUG("spectra_number  " << spectra_num);
 
   MsAlignReader reader(mng_ptr->spectrum_file_name_);
+  LOG_DEBUG("file name " << mng_ptr->spectrum_file_name_ 
+            << " output " << mng_ptr->output_file_ext_);
   std::string output_file_name = basename(mng_ptr->spectrum_file_name_) 
                                           + "." + mng_ptr->output_file_ext_;
   PrSMWriter comp_writer(output_file_name + "_" 

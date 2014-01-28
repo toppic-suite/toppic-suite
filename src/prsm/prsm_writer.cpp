@@ -11,6 +11,7 @@ namespace prot {
 
 PrSMWriter::PrSMWriter(std::string file_name) {
   file_.open(file_name.c_str());
+  LOG_DEBUG("file_name " << file_name);
   file_ << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << std::endl;
   file_ << "<prsm_list>" << std::endl;
   XmlDOMImpl* impl = XmlDOMImplFactory::getXmlDOMImplInstance();
@@ -27,11 +28,11 @@ PrSMWriter::~PrSMWriter() {
 
 void PrSMWriter::write(PrSMPtr prsm_ptr) {
 	if(prsm_ptr!=nullptr){
-  LOG_DEBUG("start writing");
+  //LOG_DEBUG("start writing");
   xercesc::DOMElement* element = prsm_ptr->toXmlElement(doc_);
-  LOG_DEBUG("Element generated");
+  //LOG_DEBUG("Element generated");
   std::string str = writeToString(serializer_, element);
-  LOG_DEBUG("String generated");
+  //LOG_DEBUG("String generated");
   writeToStreamByRemovingDoubleLF(file_, str);
   element->release();
 	}

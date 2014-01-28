@@ -33,7 +33,7 @@ void PrSM::initScores(SpParaPtr sp_para_ptr) {
   PeakIonPairPtrVec pairs;
   getPeakIonPairs (proteoform_ptr_, refine_ms_three_, 
                    sp_para_ptr->getMinMass(), pairs);
-  LOG_DEBUG("peak ion pair size " << pairs.size());
+  //LOG_DEBUG("peak ion pair size " << pairs.size());
   match_peak_num_ = 0;
   match_fragment_num_ = 0;
   TheoPeakPtr prev_ion(nullptr);;
@@ -48,7 +48,7 @@ void PrSM::initScores(SpParaPtr sp_para_ptr) {
 
 xercesc::DOMElement* PrSM::toXmlElement(XmlDOMDocument* xml_doc){
 	xercesc::DOMElement* element = xml_doc->createElement("prsm");
-  LOG_DEBUG("Element created");
+  //LOG_DEBUG("Element created");
 	std::string str = convertToString(prsm_id_);
 	xml_doc->addElement(element, "prsm_id", str.c_str());
 	str = convertToString(spectrum_id_);

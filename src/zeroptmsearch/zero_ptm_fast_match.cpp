@@ -77,7 +77,7 @@ ZpFastMatchPtr computePrefixMatch(
     if (std::abs(res_sum_mass - prms[i]) <= max_error) {
       is_prefix = true;
       seq_end = i - 1;
-      LOG_DEBUG("residue sum mass " << res_sum_mass << " prsm  " << prms[i] 
+      LOG_TRACE("residue sum mass " << res_sum_mass << " prsm  " << prms[i] 
                 << " error " << std::abs(res_sum_mass - prms[i])
                 << " max error " << max_error << " "
                 << form_ptr->getDbResSeqPtr()->getName());
