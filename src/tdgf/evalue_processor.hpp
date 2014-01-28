@@ -13,10 +13,10 @@ class EValueProcessor {
   EValueProcessor(TdgfMngPtr mng_ptr);
 
  private:
-	TdgfMngPtr mng_ptr_;
-	CompPValueArrayPtr comp_pvalue_ptr_;
-	ProteoformPtrVec proteoforms_;
-	PrSMPtrVec prsms_;
+    TdgfMngPtr mng_ptr_;
+    CompPValueArrayPtr comp_pvalue_ptr_;
+    ProteoformPtrVec proteoforms_;
+    PrSMPtrVec prsms_;
 };
 
 }

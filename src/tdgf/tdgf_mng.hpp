@@ -26,7 +26,7 @@ class TdgfMng {
   std::string search_db_file_name_;
   std::string spectrum_file_name_;
 
-	/** spectrum parameters */
+    /** spectrum parameters */
   double ppo_ = 0.000015;
   bool use_min_tolerance_ = true;
   double min_tolerance_ = 0.01;
@@ -44,21 +44,21 @@ class TdgfMng {
 
   SpParaPtr sp_para_ptr_;
 
-	/** PrSM filter */
-	int comp_evalue_min_peak_num_ = 4;
+    /** PrSM filter */
+    int comp_evalue_min_peak_num_ = 4;
 
-	/** dp table */
-	// number of mass shift
-	int unexpected_shift_num_ = 2;
-	double double_to_int_constant_ = 274.335215;
-	double max_sp_prec_mass_ = 51000;
-	int max_table_height_ = 128;
-	int min_height_ = 10;
+    /** dp table */
+    // number of mass shift
+    int unexpected_shift_num_ = 2;
+    double double_to_int_constant_ = 274.335215;
+    double max_sp_prec_mass_ = 51000;
+    int max_table_height_ = 128;
+    int min_height_ = 10;
 
   /* Semi alignment type determination */
   /* a prsm with a shift < 300 at n-terminus is treated as a prefix */
   double prefix_suffix_shift_thresh_ = 300;
-	
+    
   /**
    * Postprocessing: adjustment makes it more conservative to identify PrSMs
    * with multiple shifts

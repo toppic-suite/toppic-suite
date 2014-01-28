@@ -19,21 +19,21 @@ class CountTestNum {
  private:
   static double PREFIX_SUFFIX_ADJUST() {return 0.693;}
   static double INTERNAL_ADJUST() {return 0.508;}
-	
-	TdgfMngPtr mng_ptr_;
+    
+    TdgfMngPtr mng_ptr_;
 
   ProteoformPtrVec raw_forms_;
   ProteoformPtrVec prot_mod_forms_;
-	
-	double *comp_mass_cnts_;
-	double *pref_mass_cnts_;
-	double *suff_mass_cnts_;
-	double *internal_mass_cnts_;
+    
+    double *comp_mass_cnts_;
+    double *pref_mass_cnts_;
+    double *suff_mass_cnts_;
+    double *internal_mass_cnts_;
 
-	double convert_ratio_;
-	int max_sp_len_;
-	int residue_avg_len_;
-	double norm_factor_;
+    double convert_ratio_;
+    int max_sp_len_;
+    int residue_avg_len_;
+    double norm_factor_;
 
   int convertMass(double m);
   void initCompMassCnt(ProteoformPtrVec &prot_mod_forms);
