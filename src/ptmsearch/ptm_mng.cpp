@@ -9,21 +9,21 @@
 
 namespace prot {
 PtmMng::PtmMng(std::string config_file_name){
-	base_data_=BaseDataPtr(new BaseData(config_file_name));
-	allow_prot_N_mods_.push_back(ProtModFactory::getBaseProtModPtrByName("NONE"));
-	allow_prot_N_mods_.push_back(ProtModFactory::getBaseProtModPtrByName("ACETYLATION"));
-	allow_prot_N_mods_.push_back(ProtModFactory::getBaseProtModPtrByName("NME"));
-	allow_prot_N_mods_.push_back(ProtModFactory::getBaseProtModPtrByName("NME_ACETYLATION"));
+    base_data_=BaseDataPtr(new BaseData(config_file_name));
+    allow_prot_N_mods_.push_back(ProtModFactory::getBaseProtModPtrByName("NONE"));
+    allow_prot_N_mods_.push_back(ProtModFactory::getBaseProtModPtrByName("ACETYLATION"));
+    allow_prot_N_mods_.push_back(ProtModFactory::getBaseProtModPtrByName("NME"));
+    allow_prot_N_mods_.push_back(ProtModFactory::getBaseProtModPtrByName("NME_ACETYLATION"));
 
-	allow_prot_C_mods_.push_back(ProtModFactory::getBaseProtModPtrByName("NONE"));
+    allow_prot_C_mods_.push_back(ProtModFactory::getBaseProtModPtrByName("NONE"));
 
-	allow_prot_N_truncs_.push_back(TruncFactory::getBaseTruncPtrByName("NONE"));
-	allow_prot_N_truncs_.push_back(TruncFactory::getBaseTruncPtrByName("NME"));
+    allow_prot_N_truncs_.push_back(TruncFactory::getBaseTruncPtrByName("NONE"));
+    allow_prot_N_truncs_.push_back(TruncFactory::getBaseTruncPtrByName("NME"));
 
-	allow_prot_C_truncs_.push_back(TruncFactory::getBaseTruncPtrByName("NONE"));
+    allow_prot_C_truncs_.push_back(TruncFactory::getBaseTruncPtrByName("NONE"));
 
-	allow_pep_N_mods_.push_back(PtmFactory::findEmptyPtmPtr());
+    allow_pep_N_mods_.push_back(PtmFactory::findEmptyPtmPtr());
 
-	allow_pep_C_mods_.push_back(PtmFactory::findEmptyPtmPtr());
+    allow_pep_C_mods_.push_back(PtmFactory::findEmptyPtmPtr());
 }
 } /* namespace prot */
