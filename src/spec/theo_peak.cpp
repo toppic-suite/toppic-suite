@@ -13,9 +13,9 @@ namespace prot {
 
 TheoPeak::TheoPeak(IonPtr ion,double unmod_mass,double shift):
   Peak(unmod_mass + shift, 1.0) {
-	ion_ = ion;
-	unmod_mass_ = unmod_mass;
-	shift_ = shift;
+    ion_ = ion;
+    unmod_mass_ = unmod_mass;
+    shift_ = shift;
 }
 
 TheoPeakPtrVec getTheoPeak(BpSpecPtr pep,
@@ -26,33 +26,33 @@ TheoPeakPtrVec getTheoPeak(BpSpecPtr pep,
                            int bgn,
                            int end,
                            double min_mass){
-	TheoPeakPtrVec theo_peaks;
-	BreakPointPtrVec bps = pep->getBreakPointPtrVec();
-	double new_seq_mass = pep->getResSeqMass()+n_term_shift;
-	IonTypePtr n_ion_type = type->getNIonType();
-	for(int i =bgn;i<=end;i++){
-		double n_mass = bps[i]->getNTermMass(n_ion_type);
-		double new_mass = n_mass + n_term_shift;
-		if(new_mass >= min_mass && new_mass <= new_seq_mass - min_mass){
-			IonPtr ion = IonPtr(new Ion(0,i,i,n_ion_type, neutral_loss_ptr));
+    TheoPeakPtrVec theo_peaks;
+    BreakPointPtrVec bps = pep->getBreakPointPtrVec();
+    double new_seq_mass = pep->getResSeqMass()+n_term_shift;
+    IonTypePtr n_ion_type = type->getNIonType();
+    for(int i =bgn;i<=end;i++){
+        double n_mass = bps[i]->getNTermMass(n_ion_type);
+        double new_mass = n_mass + n_term_shift;
+        if(new_mass >= min_mass && new_mass <= new_seq_mass - min_mass){
+            IonPtr ion = IonPtr(new Ion(0,i,i,n_ion_type, neutral_loss_ptr));
       TheoPeakPtr theo_peak 
           = TheoPeakPtr(new TheoPeak(ion,n_mass,n_term_shift));
-			theo_peaks.push_back(theo_peak);
-		}
-	}
+            theo_peaks.push_back(theo_peak);
+        }
+    }
 
-	IonTypePtr c_ion_type = type->getCIonType();
-	for(int i =bgn;i<=end;i++){
-		double c_mass = bps[i]->getCTermMass(c_ion_type);
-		double new_mass = c_mass + c_term_shift;
-		if(new_mass >= min_mass && new_mass <= new_seq_mass - min_mass){
-			IonPtr ion 
+    IonTypePtr c_ion_type = type->getCIonType();
+    for(int i =bgn;i<=end;i++){
+        double c_mass = bps[i]->getCTermMass(c_ion_type);
+        double new_mass = c_mass + c_term_shift;
+        if(new_mass >= min_mass && new_mass <= new_seq_mass - min_mass){
+            IonPtr ion 
           = IonPtr(new Ion(0,i,bps.size()-i-1,c_ion_type,neutral_loss_ptr));
-			theo_peaks.push_back(TheoPeakPtr(new TheoPeak(ion,c_mass,c_term_shift)));
-		}
-	}
-	std::sort(theo_peaks.begin(),theo_peaks.end(),theo_peak_down);
-	return theo_peaks;
+            theo_peaks.push_back(TheoPeakPtr(new TheoPeak(ion,c_mass,c_term_shift)));
+        }
+    }
+    std::sort(theo_peaks.begin(),theo_peaks.end(),theo_peak_down);
+    return theo_peaks;
 }
 
 TheoPeakPtrVec getProteoformTheoPeak(ProteoformPtr proteoform_ptr, 
