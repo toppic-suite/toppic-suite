@@ -24,31 +24,31 @@ typedef std::vector<SimplePrSMPtrVec> SimplePrSMPtrVec2D;
 
 class SimplePrSM {
 public:
-	SimplePrSM(MsHeaderPtr header,ProteoformPtr seq,int score);
-	SimplePrSM(xercesc::DOMElement* element);
-	std::string getSeqName(){return seq_name_;}
-	ProteoformPtr getSeq(){return seq_;}
-	int getSeqId(){return seq_id_;}
-	double getScore(){return score_;}
-	int getSpectrumId(){return spectrum_id_;}
-	std::string getSpectrumScan(){return spectrum_scan_;}
-	double getPrecMass(){return prec_mass_;}
-	void setPrecursorId(int precursorId){precursor_id_ = precursorId;}
-	int getPrecursorId(){return precursor_id_;}
-	int compareTo(SimplePrSMPtr simple_prsm_ptr);
-	void findSeq(std::vector<ProteoformPtr> seqs);
-	xercesc::DOMElement* toXml(XmlDOMDocument* xml_doc);
-	bool isMatch(MsHeaderPtr header);
+    SimplePrSM(MsHeaderPtr header,ProteoformPtr seq,int score);
+    SimplePrSM(xercesc::DOMElement* element);
+    std::string getSeqName(){return seq_name_;}
+    ProteoformPtr getSeq(){return seq_;}
+    int getSeqId(){return seq_id_;}
+    double getScore(){return score_;}
+    int getSpectrumId(){return spectrum_id_;}
+    std::string getSpectrumScan(){return spectrum_scan_;}
+    double getPrecMass(){return prec_mass_;}
+    void setPrecursorId(int precursorId){precursor_id_ = precursorId;}
+    int getPrecursorId(){return precursor_id_;}
+    int compareTo(SimplePrSMPtr simple_prsm_ptr);
+    void findSeq(std::vector<ProteoformPtr> seqs);
+    xercesc::DOMElement* toXml(XmlDOMDocument* xml_doc);
+    bool isMatch(MsHeaderPtr header);
 
 private:
-	int spectrum_id_;
-	std::string spectrum_scan_;
-	int precursor_id_;
-	double prec_mass_;
-	ProteoformPtr seq_;
-	int seq_id_;
-	std::string seq_name_;
-	double score_;
+    int spectrum_id_;
+    std::string spectrum_scan_;
+    int precursor_id_;
+    double prec_mass_;
+    ProteoformPtr seq_;
+    int seq_id_;
+    std::string seq_name_;
+    double score_;
 };
 
 SimplePrSMPtrVec findSimplePrsms(SimplePrSMPtrVec simple_prsm,
