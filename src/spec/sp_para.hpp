@@ -18,26 +18,26 @@ namespace prot {
 
 class SpPara {
 public:
-	SpPara(int min_peak_num,double min_mass,PeakTolerancePtr peak_tolerance,
+    SpPara(int min_peak_num,double min_mass,PeakTolerancePtr peak_tolerance,
          ExtendSpParaPtr extend_sp_para,ActivationPtr activation);
-	SpPara(xercesc::DOMElement* element);
-	PeakTolerancePtr getPeakTolerance(){return peak_tolerance_;}
-	void setPeakTolerance(PeakTolerancePtr peak_tolerance){peak_tolerance_ = peak_tolerance;}
-	ExtendSpParaPtr getExtendSpPara(){return extend_sp_para_;}
-	void setExtendSpPara(ExtendSpParaPtr extend_sp_para){extend_sp_para_ = extend_sp_para;}
-	ActivationPtr getActivation(){return activation_;}
-	void setActivation(ActivationPtr activation){activation_ = activation;}
-	int getMinPeakNum(){return min_peak_num_;}
-	void setMinPeakNum(int min_peak_num){min_peak_num_=min_peak_num;}
-	double getMinMass(){return min_mass_;}
-	void setMinMass(double min_mass){min_mass_=min_mass;}
-	void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
+    SpPara(xercesc::DOMElement* element);
+    PeakTolerancePtr getPeakTolerance(){return peak_tolerance_;}
+    void setPeakTolerance(PeakTolerancePtr peak_tolerance){peak_tolerance_ = peak_tolerance;}
+    ExtendSpParaPtr getExtendSpPara(){return extend_sp_para_;}
+    void setExtendSpPara(ExtendSpParaPtr extend_sp_para){extend_sp_para_ = extend_sp_para;}
+    ActivationPtr getActivation(){return activation_;}
+    void setActivation(ActivationPtr activation){activation_ = activation;}
+    int getMinPeakNum(){return min_peak_num_;}
+    void setMinPeakNum(int min_peak_num){min_peak_num_=min_peak_num;}
+    double getMinMass(){return min_mass_;}
+    void setMinMass(double min_mass){min_mass_=min_mass;}
+    void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 private:
-	int min_peak_num_;
-	double min_mass_;
-	PeakTolerancePtr peak_tolerance_;
-	ExtendSpParaPtr extend_sp_para_;
-	ActivationPtr activation_;
+    int min_peak_num_;
+    double min_mass_;
+    PeakTolerancePtr peak_tolerance_;
+    ExtendSpParaPtr extend_sp_para_;
+    ActivationPtr activation_;
 };
 
 typedef std::shared_ptr<SpPara> SpParaPtr;

@@ -217,18 +217,18 @@ std::vector<T> rmClosePeaks(std::vector<T> &ptr_list, double tolerance) {
 
 }
 
-int main() {
-  std::vector<prot::DeconvPeakPtr> ptr_list;
-  ptr_list.push_back(prot::DeconvPeakPtr(new prot::DeconvPeak(0, 1, 1, 1)));
-  ptr_list.push_back(prot::DeconvPeakPtr(new prot::DeconvPeak(1, 2, 2, 1)));
-  ptr_list.push_back(prot::DeconvPeakPtr(new prot::DeconvPeak(3, 1.5, 2, 1)));
-  std::cout << "start \n";
-  int i = prot::findHighestPeakIdx(ptr_list);
-  std::cout << "high " << i << "\n";
-  double p = prot::findMaxPos(ptr_list);
-  std::cout << "max pos " << p << "\n";
-  for (unsigned int i = 0; i < ptr_list.size(); i++) {
-    std::cout << ptr_list[i]->getPosition() << " " 
-        << ptr_list[i]->getIntensity() << "\n";
-  }
-}
+//int main() {
+//  std::vector<prot::DeconvPeakPtr> ptr_list;
+//  ptr_list.push_back(prot::DeconvPeakPtr(new prot::DeconvPeak(0, 1, 1, 1)));
+//  ptr_list.push_back(prot::DeconvPeakPtr(new prot::DeconvPeak(1, 2, 2, 1)));
+//  ptr_list.push_back(prot::DeconvPeakPtr(new prot::DeconvPeak(3, 1.5, 2, 1)));
+//  std::cout << "start \n";
+//  int i = prot::findHighestPeakIdx(ptr_list);
+//  std::cout << "high " << i << "\n";
+//  double p = prot::findMaxPos(ptr_list);
+//  std::cout << "max pos " << p << "\n";
+//  for (unsigned int i = 0; i < ptr_list.size(); i++) {
+//    std::cout << ptr_list[i]->getPosition() << " "
+//        << ptr_list[i]->getIntensity() << "\n";
+//  }
+//}

@@ -18,15 +18,15 @@ namespace prot {
 
 class TheoPeak : public Peak {
 public:
-	TheoPeak(IonPtr ion,double unmode_mass,double shift);
-	IonPtr getIonPtr(){return ion_;}
-	double getModMass(){return getPosition();}
-	double getShift(){return shift_;}
+    TheoPeak(IonPtr ion,double unmode_mass,double shift);
+    IonPtr getIonPtr(){return ion_;}
+    double getModMass(){return getPosition();}
+    double getShift(){return shift_;}
 private:
-	double unmod_mass_;
-	double shift_;
+    double unmod_mass_;
+    double shift_;
 
-	IonPtr ion_;
+    IonPtr ion_;
 };
 typedef std::shared_ptr<TheoPeak> TheoPeakPtr;
 typedef std::vector<TheoPeakPtr> TheoPeakPtrVec;

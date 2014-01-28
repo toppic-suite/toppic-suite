@@ -27,10 +27,10 @@ class Ms {
     header_ptr_->setErrorToleranceByPpo(ppo);
   }
 
-	/**
-	 * Removes precursor mass. In ETD data, MSMS may contain a high precursor
-	 * mass peak. So we use the following to remove it.
-	 */
+    /**
+     * Removes precursor mass. In ETD data, MSMS may contain a high precursor
+     * mass peak. So we use the following to remove it.
+     */
   void rmPrec(double tolerance) {
     peak_ptr_list_ = rmPeaks(peak_ptr_list_, header_ptr_->getPrecSpMz(), 
                              tolerance);
@@ -53,9 +53,9 @@ class Ms {
     return header_str + tmp.str();
   }
 
-	MsHeaderPtr getHeaderPtr() {return header_ptr_;}
+    MsHeaderPtr getHeaderPtr() {return header_ptr_;}
 
-	void setHeaderPtr(MsHeaderPtr header_ptr) {header_ptr = header_ptr_;}
+    void setHeaderPtr(MsHeaderPtr header_ptr) {header_ptr = header_ptr_;}
 
   unsigned int size() {return peak_ptr_list_.size();}
 
@@ -64,14 +64,14 @@ class Ms {
   std::vector<T> getPeakPtrVec() {return peak_ptr_list_;}
 
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
-  	  xercesc::DOMElement* element = xml_doc->createElement("ms");
-  	  header_ptr_->appendXml(xml_doc,element);
-  	  xercesc::DOMElement* peaks = xml_doc->createElement("peaks");
-  	  for(unsigned int i=0;i < peak_ptr_list_.size();i++){
-  		  peak_ptr_list_[i]->appendXml(xml_doc,peaks);
-  	  }
-  	  element->appendChild(peaks);
-  	  parent->appendChild(element);
+        xercesc::DOMElement* element = xml_doc->createElement("ms");
+        header_ptr_->appendXml(xml_doc,element);
+        xercesc::DOMElement* peaks = xml_doc->createElement("peaks");
+        for(unsigned int i=0;i < peak_ptr_list_.size();i++){
+            peak_ptr_list_[i]->appendXml(xml_doc,peaks);
+        }
+        element->appendChild(peaks);
+        parent->appendChild(element);
   }
 
  private:

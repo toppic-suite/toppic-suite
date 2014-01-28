@@ -19,20 +19,20 @@
 namespace prot {
 class SpectrumSet {
 public:
-	SpectrumSet(DeconvMsPtr sp,double delta,SpParaPtr sp_para, double shift);
-	DeconvMsPtr getDeconvMs(){return deconv_sp_;}
-	ExtendMsPtr getSpThree(){return extend_ms_three_;}
-	PrmMsPtr getSpTwo(){return prm_ms_two_;}
-	PrmMsPtr getSpSix(){return prm_ms_six_;}
-	PrmMsPtr getSpShiftSix(){return prm_ms_shift_six_;}
-	double getDelta(){return delta_;}
+    SpectrumSet(DeconvMsPtr sp,double delta,SpParaPtr sp_para, double shift);
+    DeconvMsPtr getDeconvMs(){return deconv_sp_;}
+    ExtendMsPtr getSpThree(){return extend_ms_three_;}
+    PrmMsPtr getSpTwo(){return prm_ms_two_;}
+    PrmMsPtr getSpSix(){return prm_ms_six_;}
+    PrmMsPtr getSpShiftSix(){return prm_ms_shift_six_;}
+    double getDelta(){return delta_;}
 private:
-	DeconvMsPtr deconv_sp_;
-	double delta_;
-	PrmMsPtr prm_ms_two_;
-	ExtendMsPtr extend_ms_three_;
-	PrmMsPtr prm_ms_six_;
-	PrmMsPtr prm_ms_shift_six_;
+    DeconvMsPtr deconv_sp_;
+    double delta_;
+    PrmMsPtr prm_ms_two_;
+    ExtendMsPtr extend_ms_three_;
+    PrmMsPtr prm_ms_six_;
+    PrmMsPtr prm_ms_shift_six_;
 };
 
 typedef std::shared_ptr<SpectrumSet> SpectrumSetPtr;
