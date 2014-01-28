@@ -28,9 +28,9 @@ class Trunc {
 
  private:
   std::string name_;
-	int trunc_len_;
+    int trunc_len_;
   AcidPtrVec acid_str_;
-	double shift_;
+    double shift_;
 
 };
 

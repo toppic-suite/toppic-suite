@@ -19,12 +19,12 @@ namespace prot {
 class NeutralLoss {
 
 public:
-	NeutralLoss(std::string name,double mass);
-	std::string getName(){return name_;}
-	double getMass(){return mass_;}
+    NeutralLoss(std::string name,double mass);
+    std::string getName(){return name_;}
+    double getMass(){return mass_;}
 private:
-	std::string name_;
-	double mass_;
+    std::string name_;
+    double mass_;
 };
 
 typedef std::shared_ptr<NeutralLoss> NeutralLossPtr;
