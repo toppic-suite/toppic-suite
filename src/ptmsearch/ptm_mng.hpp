@@ -26,7 +26,7 @@ public :
     bool use_min_tolerance_ = true;
     double min_tolerance_ = 0.01;
     PeakTolerancePtr peank_tolerance_ = PeakTolerancePtr(
-    		new PeakTolerance(ppo_,use_min_tolerance_,min_tolerance_));
+            new PeakTolerance(ppo_,use_min_tolerance_,min_tolerance_));
 
     int min_peak_num_ = 10;
     double min_mass_ = 50.0;
@@ -34,14 +34,14 @@ public :
     std::vector<double> extoffsets = {0.0,-IM_,IM_};
     double extend_thresh_ = 5000;
     ExtendSpParaPtr extend_sp_para_ = ExtendSpParaPtr(
-    		new ExtendSpPara(extend_thresh_,extoffsets));
+            new ExtendSpPara(extend_thresh_,extoffsets));
     ActivationPtr activation_ = nullptr;
     SpParaPtr sp_para_ = SpParaPtr(
-    		new SpPara(min_peak_num_,
-    				min_mass_,
-    				peank_tolerance_,
-    				extend_sp_para_,
-    				activation_));
+            new SpPara(min_peak_num_,
+                    min_mass_,
+                    peank_tolerance_,
+                    extend_sp_para_,
+                    activation_));
 
     ProtModPtrVec allow_prot_N_mods_;
     ProtModPtrVec allow_prot_C_mods_;
