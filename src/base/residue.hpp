@@ -16,27 +16,27 @@ namespace prot {
 
 class Residue {
  public:
-	Residue(AcidPtr acid_ptr, PtmPtr ptm_ptr); 
+    Residue(AcidPtr acid_ptr, PtmPtr ptm_ptr); 
 
   Residue(std::string acid_name, std::string abbr_name);
 
-	/** Get amino acid. */
-	AcidPtr getAcidPtr() {return acid_ptr_; }
-	
-	/** Get residue mass. */
-	double getMass() { return mass_; }
+    /** Get amino acid. */
+    AcidPtr getAcidPtr() {return acid_ptr_; }
+    
+    /** Get residue mass. */
+    double getMass() { return mass_; }
 
-	/** Get post-translational modification. */
-	PtmPtr getPtmPtr() { return ptm_ptr_; }
+    /** Get post-translational modification. */
+    PtmPtr getPtmPtr() { return ptm_ptr_; }
 
-	/**
-	 * Checks if the residue contains the same amino acid and ptm.
-	 */
-	bool isSame(AcidPtr acid_ptr, PtmPtr ptm_ptr) {
-		return acid_ptr_.get() == acid_ptr.get() && ptm_ptr_.get() == ptm_ptr.get();
-	}
-	
-	/** Get string representation */
+    /**
+     * Checks if the residue contains the same amino acid and ptm.
+     */
+    bool isSame(AcidPtr acid_ptr, PtmPtr ptm_ptr) {
+    return acid_ptr_.get() == acid_ptr.get() && ptm_ptr_.get() == ptm_ptr.get();
+    }
+    
+    /** Get string representation */
   std::string toString(std::string delim_bgn, std::string delim_end);
 
   std::string toString() {return toString("[", "]");}
@@ -44,12 +44,12 @@ class Residue {
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
  private:
-	/** amino acid */
-	AcidPtr acid_ptr_;
-	/** post-translational modification */
-	PtmPtr ptm_ptr_;
-	/** residue mass */
-	double mass_;
+    /** amino acid */
+    AcidPtr acid_ptr_;
+    /** post-translational modification */
+    PtmPtr ptm_ptr_;
+    /** residue mass */
+    double mass_;
 };
 
 typedef std::shared_ptr<Residue> ResiduePtr;
