@@ -16,7 +16,8 @@ namespace prot {
 class PSAlign {
 public:
     PSAlign();
-    PSAlign(std::vector<double> sp_masses,std::vector<double> seq_masses,BasicDiagPairDiagPtrVec diagonals,PtmMngPtr mng);
+    PSAlign(std::vector<double> sp_masses,std::vector<double> seq_masses,
+    		BasicDiagPairDiagPtrVec diagonals,PtmMngPtr mng);
     void compute(SemiAlignTypePtr align_type);
     void initDPPair();
     void dp(SemiAlignTypePtr align_type);

@@ -5,13 +5,13 @@
  *      Author: xunlikun
  */
 #include <float.h>
-
 #include "base/semi_align_type.hpp"
 #include "ptmsearch/ps_align.hpp"
 
 namespace prot {
 PSAlign::PSAlign(){};
-PSAlign::PSAlign(std::vector<double> sp_masses,std::vector<double> seq_masses,BasicDiagPairDiagPtrVec diagonals,PtmMngPtr mng){
+PSAlign::PSAlign(std::vector<double> sp_masses,std::vector<double> seq_masses,
+		BasicDiagPairDiagPtrVec diagonals,PtmMngPtr mng){
 	mng_ =mng;
 	sp_masses_=sp_masses;
 	seq_masses_=seq_masses;
@@ -37,7 +37,8 @@ void PSAlign::initDPPair(){
 			int y = diagonals_[i]->getDiagPair(j)->getY();
 			double score = diagonals_[i]->getDiagPair(j)->getScore();
 			double diff = diagonals_[i]->getDiagPair(j)->getDiff();
-			dp_2d_pairs_[i].push_back(DPPairPtr(new DPPair(x,y,score,diff,j,mng_->n_unknown_shift_,diagonals_[i]->getHeader())));
+			dp_2d_pairs_[i].push_back(DPPairPtr(
+					new DPPair(x,y,score,diff,j,mng_->n_unknown_shift_,diagonals_[i]->getHeader())));
 		}
 		segment_bgn_pairs_[i] = dp_2d_pairs_[i][0];
 		segment_end_pairs_[i] = dp_2d_pairs_[i][diagonals_[i]->size()-1];
@@ -56,7 +57,8 @@ void PSAlign::initDPPair(){
 	}
 
 	double diff = sp_masses_[sp_masses_.size()-1]-seq_masses_[seq_masses_.size()-1];
-	last_pair_ = DPPairPtr( new DPPair(sp_masses_.size(),seq_masses_.size(),0,diff,-1,mng_->n_unknown_shift_,nullptr));
+	last_pair_ = DPPairPtr(
+			new DPPair(sp_masses_.size(),seq_masses_.size(),0,diff,-1,mng_->n_unknown_shift_,nullptr));
 	last_pair_ ->setDiagPrev(nullptr);
 	dp_pairs_.push_back(last_pair_);
 }
