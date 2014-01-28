@@ -220,7 +220,11 @@ void setPrefixSuffix(DiagonalHeaderPtr &header,double c_shift,ProteoformPtr seq,
 void setProtTermMod(DiagonalHeaderPtr &header,ProteoformPtr seq,PtmMngPtr mng);
 void setProtTermTrunc(DiagonalHeaderPtr &header,ProteoformPtr seq,PtmMngPtr mng);
 void setPepTermMode(DiagonalHeaderPtr &header,PtmMngPtr mng);
-ProtModPtr findProtTermMod(ProtModPtrVec mods,int trunc_len,ResSeqPtr res_seq,double pep_term_shift,double tolerance);
+ProtModPtr findProtTermMod(ProtModPtrVec mods,
+		int trunc_len,
+		ResSeqPtr res_seq,
+		double pep_term_shift,
+		double tolerance);
 PtmPtr findPepTermMod(PtmPtrVec mods,double shift,double tolerance);
 void setAlignPrefSuffic(DiagonalHeaderPtr &header,PtmMngPtr mng);
 DiagonalHeaderPtrVec getNTermShiftListTruncPrefix(ProteoformPtr seq);

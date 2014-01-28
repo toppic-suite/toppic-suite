@@ -93,7 +93,6 @@ void setPrefixSuffix(DiagonalHeaderPtr &header,double c_shift,ProteoformPtr seq,
 
     header->setTruncFirstResPos(trunc_first_res_pos);
     int trunc_last_res_pos = prot::getLastResPos(prot_c_term_shift,seq_b_masses);
-//    std::cout<<trunc_last_res_pos<<std::endl;
     header->setTruncLastResPos(trunc_last_res_pos);
     double pep_n_term_shift = prot_n_term_shift + seq_b_masses[trunc_first_res_pos];
     header->setPepNTermShift(pep_n_term_shift);
@@ -237,7 +236,6 @@ bool getNAcetylation(DiagonalHeaderPtrVec headers){
         return false;
     }
     ProtModPtr mod = headers[0]->getProtNTermAllowMod();
-//    std::cout<<mod<<std::endl;
     if(mod==nullptr||mod->getName().compare("ACETYLATION")==0
             ||mod->getName().compare("NME_ACETYLATION")==0){
         return true;
