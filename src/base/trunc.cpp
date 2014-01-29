@@ -21,39 +21,44 @@ Trunc::Trunc(std::string name, int trunc_len, std::string str) {
 }
 
 void Trunc::appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
-    xercesc::DOMElement* element = xml_doc->createElement("truncation");
-    xml_doc->addElement(element, "name", name_.c_str());
-    std::string str = convertToString(trunc_len_);
-    xml_doc->addElement(element, "trunc_len", str.c_str());
-    str = convertToString(shift_);
-    xml_doc->addElement(element, "shift", str.c_str());
-    xercesc::DOMElement* acid_list = xml_doc->createElement("amino_acid_list");
-    for(unsigned int i=0;i<acid_str_.size();i++){
-        acid_str_[i]->appendxml(xml_doc,acid_list);
-    }
-    element->appendChild(acid_list);
-    parent->appendChild(element);
+  xercesc::DOMElement* element = xml_doc->createElement("truncation");
+  xml_doc->addElement(element, "name", name_.c_str());
+  std::string str = convertToString(trunc_len_);
+  xml_doc->addElement(element, "trunc_len", str.c_str());
+  str = convertToString(shift_);
+  xml_doc->addElement(element, "shift", str.c_str());
+  xercesc::DOMElement* acid_list = xml_doc->createElement("amino_acid_list");
+  for(unsigned int i=0;i<acid_str_.size();i++){
+    acid_str_[i]->appendxml(xml_doc,acid_list);
+  }
+  element->appendChild(acid_list);
+  parent->appendChild(element);
 }
 
 bool Trunc::isSameTrunc(int len, ResSeqPtr res_seq_ptr) {
-    if(trunc_len_ != len){
-        return false;
+  if(trunc_len_ != len){
+    return false;
+  }
+  for(int i=0;i<trunc_len_;i++){
+    if(acid_str_[i].get() != res_seq_ptr->getResiduePtr(i)->getAcidPtr().get()){
+      return false;
     }
-    for(int i=0;i<trunc_len_;i++){
-        if(acid_str_[i].get() == res_seq_ptr->getResiduePtr(i)->getAcidPtr().get()){
-            return false;
-        }
-    }
-    return true;
+  }
+  return true;
 }
 
 bool Trunc::isValidTrunc(ResSeqPtr res_seq_ptr) {
   //check if trunc acids match N-terminal acids of the protein 
+  bool result = true;
   if (trunc_len_ >= res_seq_ptr->getLen()) {
-    return false; ;
+    result = false; 
   }
-
-  return isSameTrunc(trunc_len_, res_seq_ptr);
+  else {
+    result = isSameTrunc(trunc_len_, res_seq_ptr);
+  }
+  //LOG_DEBUG("Valid trunc " << result << " trunc len " << trunc_len_ 
+  //          << " seq len " << res_seq_ptr->getLen());
+  return result;
 }
 
 TruncPtr findProtTermTrunc(TruncPtrVec truncs,int trunc_len,ResSeqPtr resseq){

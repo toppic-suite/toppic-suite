@@ -15,21 +15,22 @@ namespace prot {
 class Proteoform;
 typedef std::shared_ptr<Proteoform> ProteoformPtr;
 typedef std::vector<ProteoformPtr> ProteoformPtrVec;
+
 class Proteoform {
-public:
-    Proteoform(DbResSeqPtr db_res_seq_ptr, ProtModPtr prot_mod_ptr,  
+ public:
+  Proteoform(DbResSeqPtr db_res_seq_ptr, ProtModPtr prot_mod_ptr,  
              ResSeqPtr res_seq_ptr, int start_pos, int end_pos, 
              ChangePtrVec change_list);
 
-    Proteoform(xercesc::DOMElement* element,ProteoformPtrVec proteoforms);
+  Proteoform(xercesc::DOMElement* element,ProteoformPtrVec proteoforms);
 
   DbResSeqPtr getDbResSeqPtr() {return db_residue_seq_ptr_;}
 
   ProtModPtr getProtModPtr() {return prot_mod_ptr_;}
 
-    ResSeqPtr getResSeqPtr() {return residue_seq_ptr_;}
+  ResSeqPtr getResSeqPtr() {return residue_seq_ptr_;}
 
-    BpSpecPtr getBpSpecPtr() {return bp_spec_ptr_;}
+  BpSpecPtr getBpSpecPtr() {return bp_spec_ptr_;}
 
   int getStartPos() {return start_pos_;}
 
@@ -48,17 +49,17 @@ public:
   std::string toString();
 
   int getUnexpectedChangeNum();
-  
+
   SemiAlignTypePtr getSemiAlignType();
 
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
-private:
-  
+ private:
+
   DbResSeqPtr db_residue_seq_ptr_;
 
   ProtModPtr prot_mod_ptr_;
-  
+
   ResSeqPtr residue_seq_ptr_;
 
   BpSpecPtr bp_spec_ptr_;
