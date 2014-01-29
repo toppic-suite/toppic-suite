@@ -147,6 +147,7 @@ void XmlDOMDocument::addElement(xercesc::DOMElement* element,
 
 std::string convertToString(double value) {
   std::stringstream stream;
+  stream << std::fixed;
   stream << value;
   return stream.str();
 }

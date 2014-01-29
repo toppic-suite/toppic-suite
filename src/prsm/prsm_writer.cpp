@@ -27,15 +27,16 @@ PrSMWriter::~PrSMWriter() {
 }
 
 void PrSMWriter::write(PrSMPtr prsm_ptr) {
-	if(prsm_ptr!=nullptr){
-  //LOG_DEBUG("start writing");
-  xercesc::DOMElement* element = prsm_ptr->toXmlElement(doc_);
-  //LOG_DEBUG("Element generated");
-  std::string str = writeToString(serializer_, element);
-  //LOG_DEBUG("String generated");
-  writeToStreamByRemovingDoubleLF(file_, str);
-  element->release();
-    }
+  if(prsm_ptr!=nullptr){
+    std::cout << std::fixed;
+    LOG_DEBUG("prec mass " << prsm_ptr->getDeconvMsPtr()->getHeaderPtr()->getPrecMonoMass());
+    xercesc::DOMElement* element = prsm_ptr->toXmlElement(doc_);
+    //LOG_DEBUG("Element generated");
+    std::string str = writeToString(serializer_, element);
+    //LOG_DEBUG("String generated");
+    writeToStreamByRemovingDoubleLF(file_, str);
+    element->release();
+  }
 }
 
 void PrSMWriter::writeVector(PrSMPtrVec &prsms) {
