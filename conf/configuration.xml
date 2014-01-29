@@ -8,6 +8,7 @@
 	<ion_type_list_file_name>conf/ion_type.xml</ion_type_list_file_name>
 	<neutral_loss_list_file_name>conf/neutral_loss.xml</neutral_loss_list_file_name>
 	<activation_list_file_name>conf/activation.xml</activation_list_file_name>
+  <support_peak_type_file_name>conf/support_peak_type.xml</support_peak_type_file_name>
 
 	<fix_mod_residue_file_name>conf/fix_mod_residue.xml</fix_mod_residue_file_name>
 	<allow_prot_mod_list>
