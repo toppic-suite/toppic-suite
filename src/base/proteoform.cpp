@@ -176,8 +176,8 @@ ProteoformPtr getDbProteoformPtr(DbResSeqPtr db_res_seq_ptr,
                                  ProtModPtr prot_mod_ptr) {
   int start_pos = 0;
   int end_pos = db_res_seq_ptr->getLen() - 1;
-  LOG_DEBUG("raw protein sequence name " << db_res_seq_ptr->getName() 
-  << " len " << db_res_seq_ptr->getLen());
+  //LOG_DEBUG("raw protein sequence name " << db_res_seq_ptr->getName() 
+  //<< " len " << db_res_seq_ptr->getLen());
   ChangePtrVec change_list;  
   for (int i = 0; i < db_res_seq_ptr->getLen(); i++) {
     PtmPtr ptm_ptr = db_res_seq_ptr->getResiduePtr(i)->getPtmPtr();
@@ -195,12 +195,12 @@ ProteoformPtr getDbProteoformPtr(DbResSeqPtr db_res_seq_ptr,
 ProteoformPtr getProtModProteoform(ProteoformPtr raw_form_ptr,
                                    ProtModPtr prot_mod_ptr) {
   // check if the proteoform can be truncated
-  LOG_DEBUG("Prot mod " << prot_mod_ptr->getName());
+  //LOG_DEBUG("Prot mod " << prot_mod_ptr->getName());
   TruncPtr trunc_ptr = prot_mod_ptr->getTruncPtr();
   DbResSeqPtr db_res_seq_ptr = raw_form_ptr->getDbResSeqPtr();  
   bool valid_trunc = trunc_ptr->isValidTrunc(db_res_seq_ptr);
   if (!valid_trunc) {
-    LOG_DEBUG("NO valid trunc");
+    //LOG_DEBUG("NO valid trunc");
     return ProteoformPtr(nullptr);
   }
   // first residue might be acetylated 
@@ -237,8 +237,8 @@ ProteoformPtr getProtModProteoform(ProteoformPtr raw_form_ptr,
       change_list.push_back(change_ptr);
     }
   }
-  LOG_DEBUG("mod protein sequence name " << db_res_seq_ptr->getName() 
-  << " len " << db_res_seq_ptr->getLen());
+  //LOG_DEBUG("mod protein sequence name " << db_res_seq_ptr->getName() 
+  //<< " len " << db_res_seq_ptr->getLen());
   return ProteoformPtr(
       new Proteoform(db_res_seq_ptr, prot_mod_ptr, seq_ptr, start, 
                      db_res_seq_ptr->getLen()-1, change_list));
@@ -265,7 +265,7 @@ ProteoformPtr getSubProteoform(ProteoformPtr proteoform_ptr, int start, int end)
   return ProteoformPtr(
       new Proteoform(db_res_seq_ptr, prot_mod_ptr, seq_ptr, 
                      start + proteoform_ptr->getStartPos(), 
-                     end + proteoform_ptr->getEndPos(), change_list));
+                     start + proteoform_ptr->getEndPos(), change_list));
 }
 
 

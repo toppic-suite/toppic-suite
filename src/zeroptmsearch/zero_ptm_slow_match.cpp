@@ -1,3 +1,4 @@
+#include "base/logger.hpp"
 #include "base/proteoform.hpp"
 #include "base/activation.hpp"
 #include "base/algorithm.hpp"
@@ -12,6 +13,9 @@ ZeroPtmSlowMatch::ZeroPtmSlowMatch(DeconvMsPtr deconv_ms_ptr,
   mng_ptr_ = mng_ptr;
   deconv_ms_ptr_ = deconv_ms_ptr;
   fast_match_ptr_ = fast_match_ptr;
+  //LOG_DEBUG("proteoform " << fast_match_ptr->getProteoformPtr()->getDbResSeqPtr()->getName()
+  //          << " begin " << fast_match_ptr->getBegin()
+  //          << " end " << fast_match_ptr->getEnd());
 
   proteoform_ptr_ = getSubProteoform(fast_match_ptr->getProteoformPtr(), 
                                      fast_match_ptr->getBegin(), 
@@ -26,7 +30,7 @@ ZeroPtmSlowMatch::ZeroPtmSlowMatch(DeconvMsPtr deconv_ms_ptr,
   TheoPeakPtrVec theo_peaks = getProteoformTheoPeak(proteoform_ptr_, 
                                                     activation_ptr, min_mass);
 
-  compScore(refine_ms_ptr_, theo_peaks, mng_ptr_->sp_para_ptr_->getPeakTolerance()->getPpo());
+  compScore(refine_ms_ptr_,theo_peaks, mng_ptr_->sp_para_ptr_->getPeakTolerance()->getPpo());
 }
 
 // compute the average ppo

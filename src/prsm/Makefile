@@ -15,7 +15,7 @@ LFLAGS = -L/lib -L/opt/local/lib
 LIBS = -lxerces-c 
 #
 # define the C++ source files
-SRCS = pair.o prsm_writer.cpp peak_ion_pair.cpp prsm.cpp simple_prsm_writer.cpp simple_prsm.cpp main.cpp
+SRCS = pair.cpp prsm_writer.cpp peak_ion_pair.cpp prsm.cpp simple_prsm_writer.cpp simple_prsm.cpp main.cpp
 #
 # define the C object files 
 #
