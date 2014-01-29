@@ -28,8 +28,6 @@ PrSMWriter::~PrSMWriter() {
 
 void PrSMWriter::write(PrSMPtr prsm_ptr) {
   if(prsm_ptr!=nullptr){
-    std::cout << std::fixed;
-    LOG_DEBUG("prec mass " << prsm_ptr->getDeconvMsPtr()->getHeaderPtr()->getPrecMonoMass());
     xercesc::DOMElement* element = prsm_ptr->toXmlElement(doc_);
     //LOG_DEBUG("Element generated");
     std::string str = writeToString(serializer_, element);
