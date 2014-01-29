@@ -74,35 +74,35 @@ ExtremeValuePtrVec CompPValueArray::compExtremeValue(PrmMsPtr ms_six,
 
 /*
 
-	private ExtremeValueProb compExtremeValueProb(Ms<PrmPeak> msSix, PrSM prsm) {
-		PrSM prsms[] = new PrSM[1];
-		prsms[0] = prsm;
-		ExtremeValueProb evProbs[] = compExtremeValue(msSix, prsms, true);
-		return evProbs[0];
-	}
+    private ExtremeValueProb compExtremeValueProb(Ms<PrmPeak> msSix, PrSM prsm) {
+        PrSM prsms[] = new PrSM[1];
+        prsms[0] = prsm;
+        ExtremeValueProb evProbs[] = compExtremeValue(msSix, prsms, true);
+        return evProbs[0];
+    }
 
-	public void setPValue(Ms<DeconvPeak> deconvMs, PrSM prsm) throws Exception {
-		double refinePrecMass = prsm.getAdjustedPrecMass();
-		Ms<DeconvPeak> refineDeconvSp = DeconvSpFactory.getRefineMs(deconvMs,
-				prsm.getCalibration(), refinePrecMass);
+    public void setPValue(Ms<DeconvPeak> deconvMs, PrSM prsm) throws Exception {
+        double refinePrecMass = prsm.getAdjustedPrecMass();
+        Ms<DeconvPeak> refineDeconvSp = DeconvSpFactory.getRefineMs(deconvMs,
+                prsm.getCalibration(), refinePrecMass);
 
-		logger.debug("recalibration " + prsm.getCalibration()
-				+ " original precursor "
-				+ deconvMs.getHeader().getPrecMonoMass() + " precursor "
-				+ refinePrecMass);
-		// Delta = 0 is important 
-		Ms<PrmPeak> prmSpSix = PrmSpFactory.getSpSix(refineDeconvSp, 0, mng.spPara);
-		// AlignMs<PrmPeak> prmSpSix = AlignMsFactory.getSpSix(deconvMs, 0,
-		// mng);
-		ExtremeValueProb prob = compExtremeValueProb(prmSpSix, prsm);
-		prsm.setProb(prob);
-	}
+        logger.debug("recalibration " + prsm.getCalibration()
+                + " original precursor "
+                + deconvMs.getHeader().getPrecMonoMass() + " precursor "
+                + refinePrecMass);
+        // Delta = 0 is important 
+        Ms<PrmPeak> prmSpSix = PrmSpFactory.getSpSix(refineDeconvSp, 0, mng.spPara);
+        // AlignMs<PrmPeak> prmSpSix = AlignMsFactory.getSpSix(deconvMs, 0,
+        // mng);
+        ExtremeValueProb prob = compExtremeValueProb(prmSpSix, prsm);
+        prsm.setProb(prob);
+    }
 
-	public void setPValueArray(Ms<PrmPeak> msSix, PrSM prsms[]) {
-		ExtremeValueProb eVProbs[] = compExtremeValue(msSix, prsms, false);
-		for (int i = 0; i < prsms.length; i++) {
-			prsms[i].setProb(eVProbs[i]);
-		}
-	}
+    public void setPValueArray(Ms<PrmPeak> msSix, PrSM prsms[]) {
+        ExtremeValueProb eVProbs[] = compExtremeValue(msSix, prsms, false);
+        for (int i = 0; i < prsms.length; i++) {
+            prsms[i].setProb(eVProbs[i]);
+        }
+    }
 }
 */

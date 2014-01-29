@@ -13,8 +13,8 @@ namespace prot {
 NeutralLossPtrVec NeutralLossFactory::neutral_loss_ptr_vec_;
 
 NeutralLoss::NeutralLoss(std::string name, double mass){
-	name_ = name;
-	mass_ = mass;
+    name_ = name;
+    mass_ = mass;
 }
 
 void NeutralLossFactory::initFactory(const std::string &file_name){
@@ -36,13 +36,13 @@ void NeutralLossFactory::initFactory(const std::string &file_name){
 
 NeutralLossPtr NeutralLossFactory::getBaseNeutralLossPtrByName(
     const std::string &name){
-	for (unsigned int i = 0; i < neutral_loss_ptr_vec_.size(); i++) {
-	    std::string n = neutral_loss_ptr_vec_[i]->getName();
-	    if (n == name) {
-	      return neutral_loss_ptr_vec_[i];
-	    }
-	  }
-	  return NeutralLossPtr(nullptr);
+    for (unsigned int i = 0; i < neutral_loss_ptr_vec_.size(); i++) {
+        std::string n = neutral_loss_ptr_vec_[i]->getName();
+        if (n == name) {
+          return neutral_loss_ptr_vec_[i];
+        }
+      }
+      return NeutralLossPtr(nullptr);
 }
 
 } /* namespace prot */

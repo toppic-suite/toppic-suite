@@ -10,10 +10,10 @@
 namespace prot {
 SupportPeak::SupportPeak(DeconvPeakPtr peak,double offset,
                          double score,SPTypePtr peak_type){
-	peak_=peak;
-	offset_=offset;
-	score_=score;
-	peak_type_ = peak_type;
+    peak_=peak;
+    offset_=offset;
+    score_=score;
+    peak_type_ = peak_type;
 }
 
 } /* namespace prot */

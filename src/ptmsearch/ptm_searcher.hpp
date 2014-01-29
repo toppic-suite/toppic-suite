@@ -23,12 +23,12 @@ class PtmSearcher {
 public:
     PtmSearcher(PtmMngPtr mng);
     void search(SpectrumSetPtr spectrum_set,
-    		SimplePrSMPtrVec matches,
-    		PrSMPtrVec3D &prsms);
+            SimplePrSMPtrVec matches,
+            PrSMPtrVec3D &prsms);
     void search(SpectrumSetPtr spectrum_set,
-    		SimplePrSMPtrVec matches,
-    		PrSMPtrVec3D &prsms,
-    		PtmSlowFilterPtr slow_filter);
+            SimplePrSMPtrVec matches,
+            PrSMPtrVec3D &prsms,
+            PtmSlowFilterPtr slow_filter);
 private:
     PtmMngPtr mng_;
     CompShiftLowMemPtr comp_shift_;

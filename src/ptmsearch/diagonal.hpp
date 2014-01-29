@@ -51,12 +51,12 @@ private:
 };
 
 DiagonalHeaderPtrVec refineHeadersBgnEnd(
-		int first_pos,
-		ProteoformPtr seq,
-		DeconvMsPtr deconv_ms,
-		ExtendMsPtr ms_three,
-		PtmMngPtr mng,
-		DiagonalHeaderPtrVec headers);
+        int first_pos,
+        ProteoformPtr seq,
+        DeconvMsPtr deconv_ms,
+        ExtendMsPtr ms_three,
+        PtmMngPtr mng,
+        DiagonalHeaderPtrVec headers);
 int getNewBgn(PeakIonPairPtrVec pairs);
 int getNewEnd(PeakIonPairPtrVec pairs);
 } /* namespace prot */

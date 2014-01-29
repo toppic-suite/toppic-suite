@@ -18,7 +18,7 @@ ExtremeValue::ExtremeValue (xercesc::DOMElement* element){
   adjust_factor_ = getDoubleChildValue(element, "adjust_factor", 0);
   init();
 }
-	
+    
 void ExtremeValue::init() {
   e_value_ = one_match_prob_ * test_num_ * adjust_factor_;
   if (one_match_prob_ > 1) {
@@ -36,7 +36,7 @@ void ExtremeValue::init() {
     }
   }
 }
-	
+    
 void ExtremeValue::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   xercesc::DOMElement* element = xml_doc->createElement("extreme_value");
   std::string str = convertToString(one_match_prob_);
@@ -49,7 +49,7 @@ void ExtremeValue::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* paren
   xml_doc->addElement(element, "p_value", str.c_str());
   str = convertToString(e_value_);
   xml_doc->addElement(element, "e_value", str.c_str());
-	parent->appendChild(element);
+    parent->appendChild(element);
 }
 
 }

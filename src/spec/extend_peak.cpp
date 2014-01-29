@@ -10,30 +10,30 @@
 namespace prot {
 
 ExtendPeak::ExtendPeak(DeconvPeakPtr base_peak,double mono_mass,double score):Peak(mono_mass,1.0){
-	base_peak_ = base_peak;
-	mono_mass_ = mono_mass;
-	score_ = score;
-	orig_tolerance_ = 0.0;
-	reverse_tolerance_ = 0.0;
+    base_peak_ = base_peak;
+    mono_mass_ = mono_mass;
+    score_ = score;
+    orig_tolerance_ = 0.0;
+    reverse_tolerance_ = 0.0;
 }
 
 void ExtendPeak::appendXml(XmlDOMDocument* xml_doc,
                            xercesc::DOMElement* parent) {
-	xercesc::DOMElement* element = xml_doc->createElement("extend_peak");
-	std::string str = convertToString(getPosition());
-	xml_doc->addElement(element, "position", str.c_str());
-	str = convertToString(getIntensity());
-	xml_doc->addElement(element, "intensity", str.c_str());
-	str = convertToString(mono_mass_);
-	xml_doc->addElement(element, "mono_mass", str.c_str());
-	str = convertToString(score_);
-	xml_doc->addElement(element, "score", str.c_str());
-	str = convertToString(orig_tolerance_);
-	xml_doc->addElement(element, "orig_tolerance", str.c_str());
-	str = convertToString(reverse_tolerance_);
-	xml_doc->addElement(element, "reverse_tolerance_", str.c_str());
-	base_peak_->appendXml(xml_doc,element);
-	parent->appendChild(element);
+    xercesc::DOMElement* element = xml_doc->createElement("extend_peak");
+    std::string str = convertToString(getPosition());
+    xml_doc->addElement(element, "position", str.c_str());
+    str = convertToString(getIntensity());
+    xml_doc->addElement(element, "intensity", str.c_str());
+    str = convertToString(mono_mass_);
+    xml_doc->addElement(element, "mono_mass", str.c_str());
+    str = convertToString(score_);
+    xml_doc->addElement(element, "score", str.c_str());
+    str = convertToString(orig_tolerance_);
+    xml_doc->addElement(element, "orig_tolerance", str.c_str());
+    str = convertToString(reverse_tolerance_);
+    xml_doc->addElement(element, "reverse_tolerance_", str.c_str());
+    base_peak_->appendXml(xml_doc,element);
+    parent->appendChild(element);
 }
 
 //must deleted the ms after finished using

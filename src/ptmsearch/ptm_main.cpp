@@ -13,21 +13,21 @@
 //using namespace prot;
 //int main(){
 //
-////	PtmFastFilterMngPtr mngb = PtmFastFilterMngPtr(new PtmFastFilterMng());
-////	mngb->search_db_file_name_ = "in/prot.fasta";
-////	mngb->spectrum_file_name_ = "in/sp.msalign";
-////	PtmFastFilterProcessorPtr processorb = PtmFastFilterProcessorPtr(new PtmFastFilterProcessor(mngb));
-////	processorb->process();
+////    PtmFastFilterMngPtr mngb = PtmFastFilterMngPtr(new PtmFastFilterMng());
+////    mngb->search_db_file_name_ = "in/prot.fasta";
+////    mngb->spectrum_file_name_ = "in/sp.msalign";
+////    PtmFastFilterProcessorPtr processorb = PtmFastFilterProcessorPtr(new PtmFastFilterProcessor(mngb));
+////    processorb->process();
 //
-//	PtmMngPtr mng = PtmMngPtr(new PtmMng("conf/configuration.xml"));
-//	mng->search_db_file_name_ = "in/prot.fasta";
-//	mng->spectrum_file_name_ = "in/sp.msalign";
-////	mng->res_file_name_ ="";
-//	mng->input_file_ext_ ="_COMBINED";
-//	mng->output_file_ext_="PTM_SEARCH_RESULT";
+//    PtmMngPtr mng = PtmMngPtr(new PtmMng("conf/configuration.xml"));
+//    mng->search_db_file_name_ = "in/prot.fasta";
+//    mng->spectrum_file_name_ = "in/sp.msalign";
+////    mng->res_file_name_ ="";
+//    mng->input_file_ext_ ="_COMBINED";
+//    mng->output_file_ext_="PTM_SEARCH_RESULT";
 //
-////	mng->sp_para_->setActivation(prot::getActivationPtrByName(mng->base_data->getActivationPtrVec(),""));
+////    mng->sp_para_->setActivation(prot::getActivationPtrByName(mng->base_data->getActivationPtrVec(),""));
 //
-//	PtmProcessorPtr processor = PtmProcessorPtr(new PtmProcessor(mng));
-//	processor->process();
+//    PtmProcessorPtr processor = PtmProcessorPtr(new PtmProcessor(mng));
+//    processor->process();
 //}

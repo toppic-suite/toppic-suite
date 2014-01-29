@@ -35,7 +35,7 @@ void PrSMWriter::write(PrSMPtr prsm_ptr) {
   //LOG_DEBUG("String generated");
   writeToStreamByRemovingDoubleLF(file_, str);
   element->release();
-	}
+    }
 }
 
 void PrSMWriter::writeVector(PrSMPtrVec &prsms) {
@@ -45,14 +45,14 @@ void PrSMWriter::writeVector(PrSMPtrVec &prsms) {
 }
 
 void PrSMWriter::writeVector2D(PrSMPtrVec2D &prsms){
-	for (unsigned i = 0; i < prsms.size(); i++) {
-		writeVector(prsms[i]);
-	}
+    for (unsigned i = 0; i < prsms.size(); i++) {
+        writeVector(prsms[i]);
+    }
 }
 void PrSMWriter::writeVector3D(PrSMPtrVec3D &prsms){
-	for (unsigned i = 0; i < prsms.size(); i++) {
-		writeVector2D(prsms[i]);
-	}
+    for (unsigned i = 0; i < prsms.size(); i++) {
+        writeVector2D(prsms[i]);
+    }
 }
 
 } /* namespace prot */
