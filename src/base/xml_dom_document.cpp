@@ -182,6 +182,7 @@ void writeToStreamByRemovingDoubleLF(std::ofstream &file, std::string &str) {
   }
   if (pos < (int)str.length()) {
     std::string sub = str.substr(pos);
+    file << std::fixed;
     file << sub << std::endl; 
   }
 }
