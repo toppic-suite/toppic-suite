@@ -42,19 +42,19 @@ Proteoform::Proteoform(xercesc::DOMElement* element,ProteoformPtrVec proteoforms
   //    prot_mod_ptr_ = getProtModPtrByName(basedata->getProtModPtrVec(),mod_name);
   prot_mod_ptr_ = ProtModFactory::getBaseProtModPtrByName(mod_name);
 
-  xercesc::DOMElement* res_seq_element= getChildElement(element,"residue_seq",0);
-  int res_len = getChildCount(res_seq_element,"residue");
-  ResiduePtrVec residues;
-  for(int i=0;i<res_len;i++){
-    xercesc::DOMElement* res_element= getChildElement(res_seq_element,"residue",i);
-    std::string acid_name 
-        = getChildValue(getChildElement(res_element,"amino_acid",0),"name",0);
-    std::string ptm_name 
-        = getChildValue(getChildElement(res_element,"modification",0),"abbr_name",0);
-    residues.push_back(ResiduePtr(new Residue(acid_name,ptm_name)));
-  }
-  residue_seq_ptr_ = ResSeqPtr(new ResidueSeq(residues));
-
+//  xercesc::DOMElement* res_seq_element= getChildElement(element,"residue_seq",0);
+//  int res_len = getChildCount(res_seq_element,"residue");
+//  ResiduePtrVec residues;
+//  for(int i=0;i<res_len;i++){
+//    xercesc::DOMElement* res_element= getChildElement(res_seq_element,"residue",i);
+//    std::string acid_name
+//        = getChildValue(getChildElement(res_element,"amino_acid",0),"name",0);
+//    std::string ptm_name
+//        = getChildValue(getChildElement(res_element,"modification",0),"abbr_name",0);
+//    residues.push_back(ResiduePtr(new Residue(acid_name,ptm_name)));
+//  }
+//  residue_seq_ptr_ = ResSeqPtr(new ResidueSeq(residues));
+  residue_seq_ptr_ = proteoforms[db_residue_seq_ptr_->getId()]->getResSeqPtr();
   bp_spec_ptr_= BpSpecPtr(new BpSpec(residue_seq_ptr_));
 
   xercesc::DOMElement* change_list_element= prot::getChildElement(element,"change_list",0);
@@ -162,8 +162,8 @@ void Proteoform::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
     xml_doc->addElement(element, "end_pos", str.c_str());
     db_residue_seq_ptr_->appendXml(xml_doc,element);
     prot_mod_ptr_->appendxml(xml_doc,element);
-    residue_seq_ptr_->appendXml(xml_doc,element);
-    bp_spec_ptr_->appendXml(xml_doc,element);
+//    residue_seq_ptr_->appendXml(xml_doc,element);
+//    bp_spec_ptr_->appendXml(xml_doc,element);
     xercesc::DOMElement* cl = xml_doc->createElement("change_list");
     for(unsigned int i=0;i<change_list_.size();i++){
         change_list_[i]->appendXml(xml_doc,cl);
