@@ -175,12 +175,14 @@ void writeToStreamByRemovingDoubleLF(std::ofstream &file, std::string &str) {
   std::size_t found = str.find("\n\n", pos);
   while (found != std::string::npos) {
     std::string sub = str.substr(pos, found - pos);
+    file << std::fixed;
     file << sub << std::endl;
     pos = found + 2;
     found = str.find("\n\n", pos);
   }
   if (pos < (int)str.length()) {
     std::string sub = str.substr(pos);
+    file << std::fixed;
     file << sub << std::endl; 
   }
 }

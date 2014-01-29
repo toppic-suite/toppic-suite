@@ -66,11 +66,11 @@ class Ms {
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
         xercesc::DOMElement* element = xml_doc->createElement("ms");
         header_ptr_->appendXml(xml_doc,element);
-        xercesc::DOMElement* peaks = xml_doc->createElement("peaks");
-        for(unsigned int i=0;i < peak_ptr_list_.size();i++){
-            peak_ptr_list_[i]->appendXml(xml_doc,peaks);
-        }
-        element->appendChild(peaks);
+//        xercesc::DOMElement* peaks = xml_doc->createElement("peaks");
+//        for(unsigned int i=0;i < peak_ptr_list_.size();i++){
+//            peak_ptr_list_[i]->appendXml(xml_doc,peaks);
+//        }
+//        element->appendChild(peaks);
         parent->appendChild(element);
   }
 

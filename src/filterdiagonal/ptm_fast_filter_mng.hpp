@@ -10,6 +10,7 @@
 
 #include <vector>
 #include <memory>
+#include <map>
 
 #include "base/mass_constant.hpp"
 #include "base/activation.hpp"
@@ -24,6 +25,10 @@ class PtmFastFilterMng {
  public:
   PtmFastFilterMng(std::string config_file_name) {
     base_data = BaseDataPtr(new BaseData(config_file_name));
+  }
+  void applyMap(std::map<std::string,std::string> conf){
+	  spectrum_file_name_ = conf["spectrumFileName"];
+	  search_db_file_name_ = conf["databaseFileName"];
   }
 
   //Candidate protein number for each spectrum

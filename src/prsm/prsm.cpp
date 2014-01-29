@@ -63,7 +63,7 @@ xercesc::DOMElement* PrSM::toXmlElement(XmlDOMDocument* xml_doc){
 	str = convertToString(calibration_);
 	xml_doc->addElement(element, "calibration", str.c_str());
 	proteoform_ptr_->appendXml(xml_doc,element);
-	sp_para_ptr_->appendXml(xml_doc,element);
+//	sp_para_ptr_->appendXml(xml_doc,element);
 	if(prob_ptr_!=nullptr){
 	    prob_ptr_->appendXml(xml_doc,element);
 	}
@@ -109,22 +109,22 @@ PrSM::PrSM(xercesc::DOMElement* element,ProteoformPtrVec proteoforms){
     prob_ptr_ = ExtremeValuePtr(new ExtremeValue(prob_element));
   }
 
-  xercesc::DOMElement* sp_para_element = getChildElement(element,"sp_para",0);
-  sp_para_ptr_ = SpParaPtr(new SpPara(sp_para_element));
+//  xercesc::DOMElement* sp_para_element = getChildElement(element,"sp_para",0);
+//  sp_para_ptr_ = SpParaPtr(new SpPara(sp_para_element));
 
   xercesc::DOMElement* deconv_ms_element = getChildElement(element,"ms",0);
   xercesc::DOMElement* header_element
       = getChildElement(deconv_ms_element,"ms_header",0);
   MsHeaderPtr header_ptr  = MsHeaderPtr (new MsHeader(header_element));
-  xercesc::DOMElement* peak_element
-      = getChildElement(deconv_ms_element,"peaks",0);
+//  xercesc::DOMElement* peak_element
+//      = getChildElement(deconv_ms_element,"peaks",0);
   DeconvPeakPtrVec peaks;
-  int peak_num = getChildCount(peak_element,"deconv_peak");
-  for(int i=0;i<peak_num;i++){
-    xercesc::DOMElement* cur_ms_element 
-        = getChildElement(deconv_ms_element,"deconv_peak",i);
-    peaks.push_back(DeconvPeakPtr(new DeconvPeak(cur_ms_element)));
-  }
+//  int peak_num = getChildCount(peak_element,"deconv_peak");
+//  for(int i=0;i<peak_num;i++){
+//    xercesc::DOMElement* cur_ms_element
+//        = getChildElement(deconv_ms_element,"deconv_peak",i);
+//    peaks.push_back(DeconvPeakPtr(new DeconvPeak(cur_ms_element)));
+//  }
   deconv_ms_ptr_ = DeconvMsPtr(new Ms<DeconvPeakPtr>(header_ptr,peaks));
   //    ExtendMsPtr refine_ms_three_;
 }
