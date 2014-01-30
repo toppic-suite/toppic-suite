@@ -21,7 +21,7 @@
 <prot_mod>
 	<name>NME_ACETYLATION</name>
 	<trunc_name>NME</trunc_name>
-  	<ptm_name>Acetylation</ptm_name>
+ 	<ptm_name>Acetylation</ptm_name>
 	<valid_acids></valid_acids>
 </prot_mod>
 </prot_mod_list>

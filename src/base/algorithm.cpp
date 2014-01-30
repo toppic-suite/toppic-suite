@@ -38,7 +38,7 @@ void  compMsMassPpos(std::vector<double> &ms_masses,
                      double ppo, std::vector<double> &result_ppos) {
   // extendMsThree do not have 0 and precursor mass 
   std::vector<double> min_distances;
-  for (unsigned p = 0; p < ms_masses.size(); p++) {
+  for (unsigned i = 0; i < ms_masses.size(); i++) {
     min_distances.push_back(std::numeric_limits<double>::infinity());
   }
   unsigned int i = 0;

@@ -56,7 +56,7 @@ class ZeroPtmMng {
   SpParaPtr sp_para_ptr_;
 
   /** recalibration is used in ZeroPtmSlowMatch */
-  bool   do_recalibration_ = true;
+  bool   do_recalibration_ = false;
   double recal_ppo_ = 0.000015; // 15 ppm
   bool   ms_one_ms_two_same_recal_ = true;
 

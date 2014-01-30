@@ -13,7 +13,7 @@ PrSMWriter::PrSMWriter(std::string file_name) {
   file_.open(file_name.c_str());
   LOG_DEBUG("file_name " << file_name);
   file_ << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << std::endl;
-  file_ << "<prsm_list>" << std::endl;
+  file_ << "<prsm_list>";
   XmlDOMImpl* impl = XmlDOMImplFactory::getXmlDOMImplInstance();
   doc_ = new XmlDOMDocument(impl->createDoc("prsm_list"));
   serializer_ = impl->createSerializer();

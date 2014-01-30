@@ -31,12 +31,8 @@ private:
 typedef std::shared_ptr<TheoPeak> TheoPeakPtr;
 typedef std::vector<TheoPeakPtr> TheoPeakPtrVec;
 
-inline bool theo_peak_up(const TheoPeakPtr p,TheoPeakPtr n){
+inline bool theoPeakUp(const TheoPeakPtr p,TheoPeakPtr n){
   return p->getPosition() < n->getPosition();
-}
-
-inline bool theo_peak_down(const TheoPeakPtr p,TheoPeakPtr n){
-  return p->getPosition() > n->getPosition();
 }
 
 inline void getTheoMassVec (TheoPeakPtrVec &theo_peaks,

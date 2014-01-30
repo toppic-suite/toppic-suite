@@ -14,7 +14,7 @@ IonType::IonType(std::string name, bool n_term, double shift) {
       b_y_shift_ = shift_;
   }
   else {
-      b_y_shift_ = shift_ - MassConstant::getWaterMass();
+      b_y_shift_ = shift_ - Y_ION_SHIFT;
   }
 }
 

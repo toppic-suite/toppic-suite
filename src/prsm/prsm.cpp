@@ -22,9 +22,9 @@ PrSM::PrSM(ProteoformPtr proteoform_ptr, DeconvMsPtr deconv_ms_ptr,
 }
 
 void PrSM::init(SpParaPtr sp_para_ptr) {
-  double delta = adjusted_prec_mass_ = ori_prec_mass_;
+  double delta = adjusted_prec_mass_ - ori_prec_mass_;
   refine_ms_three_ = getMsThree(deconv_ms_ptr_, delta, sp_para_ptr);
-  refine_ms_three_->recalibrate(calibration_);
+  refine_ms_three_-> recalibrate(calibration_);
   initScores(sp_para_ptr);
 }
 
@@ -63,7 +63,6 @@ xercesc::DOMElement* PrSM::toXmlElement(XmlDOMDocument* xml_doc){
 	str = convertToString(calibration_);
 	xml_doc->addElement(element, "calibration", str.c_str());
 	proteoform_ptr_->appendXml(xml_doc,element);
-//	sp_para_ptr_->appendXml(xml_doc,element);
 	if(prob_ptr_!=nullptr){
 	    prob_ptr_->appendXml(xml_doc,element);
 	}
@@ -72,7 +71,6 @@ xercesc::DOMElement* PrSM::toXmlElement(XmlDOMDocument* xml_doc){
 	if(deconv_ms_ptr_!=nullptr){
 	    deconv_ms_ptr_->appendXml(xml_doc,element);
 	}
-	//refine_ms_three_->appendXml(xml_doc,element);
 	str = convertToString(match_peak_num_);
 	xml_doc->addElement(element, "match_peak_num", str.c_str());
 	str = convertToString(match_fragment_num_);

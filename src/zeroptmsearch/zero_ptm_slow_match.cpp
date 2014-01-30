@@ -13,9 +13,6 @@ ZeroPtmSlowMatch::ZeroPtmSlowMatch(DeconvMsPtr deconv_ms_ptr,
   mng_ptr_ = mng_ptr;
   deconv_ms_ptr_ = deconv_ms_ptr;
   fast_match_ptr_ = fast_match_ptr;
-  //LOG_DEBUG("proteoform " << fast_match_ptr->getProteoformPtr()->getDbResSeqPtr()->getName()
-  //          << " begin " << fast_match_ptr->getBegin()
-  //          << " end " << fast_match_ptr->getEnd());
 
   proteoform_ptr_ = getSubProteoform(fast_match_ptr->getProteoformPtr(), 
                                      fast_match_ptr->getBegin(), 
@@ -90,6 +87,7 @@ void ZeroPtmSlowMatch::compScore (ExtendMsPtr refine_ms_ptr, TheoPeakPtrVec theo
   score_ = compUniqueScore(ms_masses, theo_masses, ppo);
 }
 
+// get result 
 PrSMPtr ZeroPtmSlowMatch::geneResult() {
   return PrSMPtr(new PrSM(proteoform_ptr_, deconv_ms_ptr_, refine_prec_mass_, 
                           recal_, mng_ptr_->sp_para_ptr_));

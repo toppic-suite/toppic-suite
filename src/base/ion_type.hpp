@@ -10,6 +10,7 @@ namespace prot {
 
 #define ION_TYPE_PREC "PREC"
 #define ION_TYPE_B "B"
+#define Y_ION_SHIFT 18.0106
 
 class IonType {
  public: 

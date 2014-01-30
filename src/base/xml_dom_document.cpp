@@ -148,11 +148,12 @@ void XmlDOMDocument::addElement(xercesc::DOMElement* element,
 
 std::string convertToString(double value) {
   std::stringstream stream;
+
   if(value < 1 && value > -1 && value !=0){
-	  stream << std::scientific;
+    stream << std::scientific << std::setprecision(10);
   }
   else{
-	  stream << std::fixed<<std::setprecision(16);
+    stream << std::fixed<<std::setprecision(10);
   }
   stream << value;
   return stream.str();

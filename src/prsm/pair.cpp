@@ -109,7 +109,7 @@ double compIonScore(ExtendMsPtr ms,TheoPeakPtrVec ions,
 PeakIonPairPtrVec findPairs(ExtendMsPtr ms,TheoPeakPtrVec ions,
                             int bgn,int end){
     PeakIonPairPtrVec pair_list;
-    std::sort(ions.begin(),ions.end(),theo_peak_up);
+    std::sort(ions.begin(),ions.end(),theoPeakUp);
     std::vector<double> ion_masses;
     for(unsigned int i=0;i<ions.size();i++){
         ion_masses.push_back(ions[i]->getModMass());

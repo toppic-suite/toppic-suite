@@ -51,7 +51,7 @@ void getMatchedPairs(PeakIonPairPtrVec &pairs, int peak_id,
 
 void findPairs(ExtendMsPtr ms_three_ptr, TheoPeakPtrVec &theo_peaks, 
                int bgn, int end, PeakIonPairPtrVec &pairs) {
-  std::sort(theo_peaks.begin(), theo_peaks.end(), theo_peak_up);
+  std::sort(theo_peaks.begin(), theo_peaks.end(), theoPeakUp);
   std::vector<double> ms_masses;
   getExtendMassVec(ms_three_ptr, ms_masses);
   std::vector<double> theo_masses; 

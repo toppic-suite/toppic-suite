@@ -14,7 +14,6 @@
 	<allow_prot_mod_list>
 		<prot_mod>NONE</prot_mod>
 		<prot_mod>NME</prot_mod>
-		<prot_mod>ACETYLATION</prot_mod>
 		<prot_mod>NME_ACETYLATION</prot_mod>
 	</allow_prot_mod_list>
   <activation_type>CID</activation_type>
