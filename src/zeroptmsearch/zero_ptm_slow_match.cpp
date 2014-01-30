@@ -17,6 +17,11 @@ ZeroPtmSlowMatch::ZeroPtmSlowMatch(DeconvMsPtr deconv_ms_ptr,
   proteoform_ptr_ = getSubProteoform(fast_match_ptr->getProteoformPtr(), 
                                      fast_match_ptr->getBegin(), 
                                      fast_match_ptr->getEnd());
+  /*
+  LOG_DEBUG("name " << fast_match_ptr->getProteoformPtr()->getDbResSeqPtr()->getName()
+            << " begin " << fast_match_ptr->getBegin()
+            << " end " << fast_match_ptr->getEnd());
+            */
 
   refine_prec_mass_ = proteoform_ptr_->getResSeqPtr()->getSeqMass();
   double delta = refine_prec_mass_ - deconv_ms_ptr->getHeaderPtr()->getPrecMonoMass();

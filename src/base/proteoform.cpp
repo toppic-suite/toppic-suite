@@ -212,6 +212,11 @@ ProteoformPtr getProtModProteoform(ProteoformPtr raw_form_ptr,
   ChangePtrVec change_list;
   if (ptm->isEmpty() || !ori_ptm->isEmpty()) {
     residues.push_back(residue);
+    if (!ori_ptm->isEmpty()) {
+      ChangePtr change_ptr = ChangePtr(
+          new Change(0, 1, FIXED_CHANGE, ori_ptm->getMonoMass(), ori_ptm));
+      change_list.push_back(change_ptr);
+    }
   }
   else {
     AcidPtr acid = residue->getAcidPtr();
@@ -229,7 +234,9 @@ ProteoformPtr getProtModProteoform(ProteoformPtr raw_form_ptr,
     residues.push_back(db_res_seq_ptr->getResiduePtr(i));
   }
   ResSeqPtr seq_ptr = ResSeqPtr(new ResidueSeq(residues));
-  for (int i = 0; i < seq_ptr->getLen(); i++) {
+  // start from 1 since ptm on the first residue has been added to the change
+  // list
+  for (int i = 1; i < seq_ptr->getLen(); i++) {
     PtmPtr ptm_ptr = seq_ptr->getResiduePtr(i)->getPtmPtr();
     if (!ptm_ptr->isEmpty()) {
       ChangePtr change_ptr = ChangePtr(
@@ -244,19 +251,20 @@ ProteoformPtr getProtModProteoform(ProteoformPtr raw_form_ptr,
                      db_res_seq_ptr->getLen()-1, change_list));
 }
 
-ProteoformPtr getSubProteoform(ProteoformPtr proteoform_ptr, int start, int end) {
+ProteoformPtr getSubProteoform(ProteoformPtr proteoform_ptr, int local_start, 
+                               int local_end) {
   ResiduePtrVec residues;
   ResSeqPtr res_seq_ptr = proteoform_ptr->getResSeqPtr();  
-  for (int i = start; i <= end; i++) {
+  for (int i = local_start; i <= local_end; i++) {
     residues.push_back(res_seq_ptr->getResiduePtr(i));
   }
   ResSeqPtr seq_ptr = ResSeqPtr(new ResidueSeq(residues));
   ChangePtrVec change_list;
   ChangePtrVec ori_change_list = proteoform_ptr->getChangePtrVec();
   for (unsigned int i = 0; i < ori_change_list.size(); i++) {
-    if (ori_change_list[i]->getLeftBpPos() >= start 
-        && ori_change_list[i]->getRightBpPos() <= end + 1) {
-      ChangePtr change_ptr = ChangePtr(new Change(*ori_change_list[i], start));
+    if (ori_change_list[i]->getLeftBpPos() >= local_start 
+        && ori_change_list[i]->getRightBpPos() <= local_end + 1) {
+      ChangePtr change_ptr = ChangePtr(new Change(*ori_change_list[i], local_start));
       change_list.push_back(change_ptr);
     }
   }
@@ -264,8 +272,8 @@ ProteoformPtr getSubProteoform(ProteoformPtr proteoform_ptr, int start, int end)
   ProtModPtr prot_mod_ptr = proteoform_ptr->getProtModPtr();
   return ProteoformPtr(
       new Proteoform(db_res_seq_ptr, prot_mod_ptr, seq_ptr, 
-                     start + proteoform_ptr->getStartPos(), 
-                     start + proteoform_ptr->getEndPos(), change_list));
+                     local_start + proteoform_ptr->getStartPos(), 
+                     local_end + proteoform_ptr->getStartPos(), change_list));
 }
 
 
