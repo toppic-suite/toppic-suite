@@ -11,6 +11,7 @@ namespace prot {
 class EValueProcessor {
  public:
   EValueProcessor(TdgfMngPtr mng_ptr);
+  void init();
 
  private:
     TdgfMngPtr mng_ptr_;

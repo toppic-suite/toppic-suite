@@ -1,3 +1,5 @@
+#include "base/proteoform.hpp"
+#include "base/fasta_reader.hpp"
 #include "tdgf/evalue_processor.hpp"
 
 namespace prot {
@@ -6,26 +8,28 @@ EValueProcessor::EValueProcessor(TdgfMngPtr mng_ptr) {
   mng_ptr_ = mng_ptr;
 }
 
+void EValueProcessor::init() {
+  BaseDataPtr base_data_ptr = mng_ptr_->base_data_ptr_;
+  ProteoformPtrVec raw_forms 
+      = readFastaToProteoform(mng_ptr_->search_db_file_name_,
+                              base_data_ptr->getFixModResiduePtrVec());
+  ProteoformPtrVec prot_mod_forms 
+      = generateProtModProteoform(raw_forms, 
+                                  base_data_ptr->getAllowProtModPtrVec());
+  
+  /*
+  ResFreq resFreqs[] = ResFreqArrayUtil.getResFreqArray(resList
+                                                        .getResidues(20));
+  ResFreq nResFreqs[] = resFreqs;
+  compP = new CompPValueArray(seqs, nModSeqs, nResFreqs, resFreqs, resFreqs, mng);
+  String spFileName = mng.spectrumFileName;
+  String inputFileName = BioIo.getBaseName(spFileName) + "."
+      + mng.inputFileExt;
+  prsms = PrSMReader.readPrSM(inputFileName);
+  */
 }
 
-/*
-    public void init() throws Exception {
-        ResList resList = ResListFactory.getSystemInstance(mng.resFileName);
-        File dbFile = new File(mng.searchDbFileName);
-        ResReader reader = new ResReader(dbFile, resList);
-        seqs = BpSpecReader.readDb(reader);
-        NModBpSpec nModSeqs[] = NModBpSpecFactory.getInstances(seqs,
-                mng.allowProtNTermMods);
-        ResFreq resFreqs[] = ResFreqArrayUtil.getResFreqArray(resList
-                .getResidues(20));
-        ResFreq nResFreqs[] = resFreqs;
-        compP = new CompPValueArray(seqs, nModSeqs, nResFreqs, resFreqs, resFreqs, mng);
-        String spFileName = mng.spectrumFileName;
-        String inputFileName = BioIo.getBaseName(spFileName) + "."
-                + mng.inputFileExt;
-        prsms = PrSMReader.readPrSM(inputFileName);
-    }
-  */
+}
 
     /* compute E-value. Separate: compute E-value separately or not */
 /*

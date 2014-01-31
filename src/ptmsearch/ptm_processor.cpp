@@ -82,9 +82,8 @@ void PtmProcessor::processDatabase(PtmSearcherPtr searcher){
     int cnt = 0;
     while((deconv_sp = spReader.getNextMs())!= nullptr){
         cnt++;
-        double shift = PtmFactory::getPtmPtr_Acetylation()->getMonoMass();
         SpectrumSetPtr spectrumset = getSpectrumSet(deconv_sp,0,
-                                                  mng_->sp_para_,shift);
+                                                  mng_->sp_para_);
         if(spectrumset != nullptr){
             SimplePrSMPtrVec slectedPrsms = prot::findSimplePrsms(simplePrsms_,deconv_sp->getHeaderPtr());
             searcher->search(spectrumset,slectedPrsms,prsms);

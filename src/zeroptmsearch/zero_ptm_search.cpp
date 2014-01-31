@@ -69,21 +69,19 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
                          + SemiAlignTypeFactory::getPrefixPtr()->getName());
   PrSMWriter suff_writer(output_file_name + "_"
                          + SemiAlignTypeFactory::getSuffixPtr()->getName());
-  PrSMWriter internal_writer(
-      output_file_name + "_"
+  PrSMWriter internal_writer(output_file_name + "_"
       + SemiAlignTypeFactory::getInternalPtr()->getName());
   PrSMWriter all_writer(output_file_name);
 
-  double shift = PtmFactory::getPtmPtr_Acetylation()->getMonoMass();
   LOG_DEBUG("start reading");
   int n = 0;
   DeconvMsPtr ms_ptr = reader.getNextMs();
   LOG_DEBUG("init ms_ptr");
-
+  double delta = 0;
   while (ms_ptr.get() != nullptr) {
     n++;
     SpectrumSetPtr spec_set_ptr 
-        = getSpectrumSet(ms_ptr, 0, mng_ptr->sp_para_ptr_, shift);
+        = getSpectrumSet(ms_ptr, delta, mng_ptr->sp_para_ptr_);
     if (spec_set_ptr.get() != nullptr) {
       PrSMPtrVec comp_prsms;
       zeroPtmSearch(spec_set_ptr, SemiAlignTypeFactory::getCompletePtr(), 

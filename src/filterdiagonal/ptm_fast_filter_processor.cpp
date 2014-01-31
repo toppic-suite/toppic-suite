@@ -47,9 +47,8 @@ void PtmFastFilterProcessor::processBlock(int block,std::string sp_file_name,
     int cnt = 0;
   while((deconv_sp = reader.getNextMs()) != nullptr){
     cnt++;
-    double shift = PtmFactory::getPtmPtr_Acetylation()->getMonoMass();
     SpectrumSetPtr spectrum_set = getSpectrumSet(deconv_sp,0,
-                                                 mng_->sp_para_,shift);
+                                                 mng_->sp_para_);
     if(spectrum_set != nullptr){
       std::string scan = deconv_sp->getHeaderPtr()->getScansString();
       SimplePrSMPtrVec matches = filter_->getBestMathBatch(spectrum_set);
