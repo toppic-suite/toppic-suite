@@ -5,7 +5,7 @@
  *      Author: xunlikun
  */
 
-#include <spec/spectrum_set.hpp>
+#include "spec/spectrum_set.hpp"
 #include "base/base_data.hpp"
 
 namespace prot {
@@ -16,6 +16,7 @@ SpectrumSet::SpectrumSet(DeconvMsPtr sp,double delta,SpParaPtr sp_para){
   delta_=delta;
   prm_ms_two_ = getMsTwo(sp,delta,sp_para);
   extend_ms_three_ = getMsThree(sp,delta,sp_para);
+  prm_ms_six_ = getMsSix(sp,delta,sp_para);
 }
 
 SpectrumSetPtr getSpectrumSet(DeconvMsPtr spectrum,double delta,

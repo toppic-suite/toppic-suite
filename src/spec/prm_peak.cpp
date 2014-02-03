@@ -173,7 +173,7 @@ PrmMsPtr getMsTwo(DeconvMsPtr deconv_ms,double delta, SpParaPtr sp_para){
     return PrmMsPtr(new Ms<PrmPeakPtr>(header,list_filtered, ppo)) ;
 }
 
-PrmMsPtr getSpSix(DeconvMsPtr deconv_ms,double delta, SpParaPtr sp_para){
+PrmMsPtr getMsSix(DeconvMsPtr deconv_ms,double delta, SpParaPtr sp_para){
 
     MsHeaderPtr header = prot::getDeltaHeaderPtr(deconv_ms,delta);
     //getSpSixPrmPeak
@@ -205,9 +205,9 @@ PrmMsPtr getSpSix(DeconvMsPtr deconv_ms,double delta, SpParaPtr sp_para){
     return PrmMsPtr(new Ms<PrmPeakPtr>(header,list_filtered, ppo)) ;
 }
 
-PrmMsPtr getShiftSpSix(DeconvMsPtr deconv_ms,double delta,double shift,
+PrmMsPtr getShiftMsSix(DeconvMsPtr deconv_ms,double delta,double shift,
                        SpParaPtr sp_para){
-    PrmMsPtr ms = getSpSix(deconv_ms,delta,sp_para);
+    PrmMsPtr ms = getMsSix(deconv_ms,delta,sp_para);
   MsHeaderPtr header_ptr = ms->getHeaderPtr();
     double mono_mz = (header_ptr->getPrecMonoMass()+shift)
       /header_ptr->getPrecCharge();

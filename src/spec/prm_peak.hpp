@@ -66,9 +66,9 @@ inline bool prmPeakUp(const PrmPeakPtr p,PrmPeakPtr n){
 
 PrmMsPtr getMsTwo(DeconvMsPtr deconv_ms,double delta, SpParaPtr sp_para);
 
-PrmMsPtr getSpSix(DeconvMsPtr deconv_ms,double delta, SpParaPtr sp_para); 
+PrmMsPtr getMsSix(DeconvMsPtr deconv_ms,double delta, SpParaPtr sp_para); 
 
-PrmMsPtr getShiftSpSix(DeconvMsPtr deconv_ms,double delta,double shift,
+PrmMsPtr getShiftMsSix(DeconvMsPtr deconv_ms,double delta,double shift,
                        SpParaPtr sp_para);
 
 std::vector<std::vector<int>> getIntMassErrorList(PrmMsPtr ms,double scale,

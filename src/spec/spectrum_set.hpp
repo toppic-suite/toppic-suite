@@ -26,7 +26,7 @@ class SpectrumSet {
   PrmMsPtr getSpTwo(){return prm_ms_two_;}
   PrmMsPtr getSpSix(){return prm_ms_six_;}
   PrmMsPtr getSpShiftSix(double shift){
-    return getShiftSpSix(deconv_sp_,delta_,-shift,sp_para_ptr_);
+    return getShiftMsSix(deconv_sp_,delta_,-shift,sp_para_ptr_);
   }
   double getDelta(){return delta_;}
  private:
