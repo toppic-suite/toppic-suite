@@ -8,7 +8,6 @@ namespace prot {
 
 CountTestNum::CountTestNum(ProteoformPtrVec &raw_forms, 
                            ProteoformPtrVec &prot_mod_forms,
-                           ResFreqPtrVec &n_term_residues,
                            ResFreqPtrVec &residues,
                            TdgfMngPtr mng_ptr) {
   mng_ptr_ = mng_ptr;
@@ -17,10 +16,6 @@ CountTestNum::CountTestNum(ProteoformPtrVec &raw_forms,
   convert_ratio_ = mng_ptr_->double_to_int_constant_;
   max_sp_len_ = (int)std::round(mng_ptr_->max_sp_prec_mass_ * convert_ratio_);
   residue_avg_len_ = computeAvgLength(residues, convert_ratio_);
-  norm_factor_ = 0;
-  for (unsigned int i = 0; i < n_term_residues.size(); i++) {
-    norm_factor_ += n_term_residues[i]->getFreq();
-  }
   initCompMassCnt(prot_mod_forms);
   initPrefMassCnt(prot_mod_forms);
   initSuffMassCnt(raw_forms);
@@ -104,19 +99,17 @@ double CountTestNum::compCandNum(SemiAlignTypePtr type, int shift_num, double or
                                  double ori_tolerance) {
   double cand_num = 0;
   if (shift_num == 0) {
-    cand_num = compNormNonPtmCandNum(type, shift_num, ori_mass, ori_tolerance);
+    cand_num = compNonPtmCandNum(type, shift_num, ori_mass, ori_tolerance);
   }
   // with shifts 
-  else if (shift_num == 1){
-    cand_num = compOnePtmCandNum(type, shift_num, ori_mass);
-  }
-  else {
-    cand_num = compMultiplePtmCandNum(type, shift_num, ori_mass);
+  else if (shift_num >= 1){
+    cand_num = compPtmCandNum(type, shift_num, ori_mass);
   }
 
   if (cand_num == 0.0) {
     LOG_WARN("candidate number is ZERO");
   }
+  // multiple adjustment 
   if (type == SemiAlignTypeFactory::getPrefixPtr() 
       || type == SemiAlignTypeFactory::getSuffixPtr()) {
     cand_num = cand_num * PREFIX_SUFFIX_ADJUST();
@@ -127,22 +120,19 @@ double CountTestNum::compCandNum(SemiAlignTypePtr type, int shift_num, double or
   return cand_num;
 }
 
-double CountTestNum::compNormNonPtmCandNum(SemiAlignTypePtr type, int shift_num, 
-                                           double ori_mass, double ori_tolerance) {
+double CountTestNum::compNonPtmCandNum(SemiAlignTypePtr type, int shift_num, 
+                                       double ori_mass, double ori_tolerance) {
   int low = std::floor((ori_mass - ori_tolerance) * convert_ratio_);
   int high = std::ceil((ori_mass + ori_tolerance) * convert_ratio_);
   double cand_num = compSeqNum(type, low, high);
-  // normalization: the reason is that we a residue list with frequency sum > 1 in CompProbValue 
-  if (type == SemiAlignTypeFactory::getCompletePtr() 
-      || type == SemiAlignTypeFactory::getPrefixPtr()) {
-    cand_num = cand_num / norm_factor_;
-    //System.out.println("nCandidate " + nCandidates + " normFactor " + normFactor);
-  } 
   return cand_num;
 }
 
-double CountTestNum::compOnePtmCandNum (SemiAlignTypePtr type, int shift_num, double ori_mass) {
+double CountTestNum::compPtmCandNum (SemiAlignTypePtr type, int shift_num, double ori_mass) {
   double cand_num = 0;
+  // we use raw forms, not prot mod forms, for complete and prefix alignments
+  // because the prot mod forms generated from one raw form are almost the same
+  // to each other
   if (type == SemiAlignTypeFactory::getCompletePtr()) {
     cand_num = raw_forms_.size();
   } else if (type == SemiAlignTypeFactory::getPrefixPtr()) {
@@ -191,42 +181,6 @@ double CountTestNum::compMassNum(double *cnts, int low, int high) {
     cnt += cnts[i];
   }
   return cnt;
-}
-
-double CountTestNum::compMultiplePtmCandNum (SemiAlignTypePtr type, int shift_num, 
-                                             double ori_mass) {
-  double cand_num = 0;
-  if (type == SemiAlignTypeFactory::getCompletePtr()) {
-    for (unsigned int i = 0; i < raw_forms_.size(); i++) {
-      cand_num += std::pow(raw_forms_[i]->getResSeqPtr()->getLen(), shift_num - 1);
-    }
-  } else if (type == SemiAlignTypeFactory::getPrefixPtr()) {
-    for (unsigned int i = 0; i < raw_forms_.size(); i++) {
-      cand_num += std::pow(raw_forms_[i]->getResSeqPtr()->getLen(), shift_num);
-    }
-  } else if (type == SemiAlignTypeFactory::getSuffixPtr()) {
-    for (unsigned int i = 0; i < raw_forms_.size(); i++) {
-      cand_num += std::pow(raw_forms_[i]->getResSeqPtr()->getLen(), shift_num);
-    }
-  } else if (type == SemiAlignTypeFactory::getInternalPtr()) {
-    for (unsigned int i = 0; i < raw_forms_.size(); i++) {
-      cand_num += std::pow(raw_forms_[i]->getResSeqPtr()->getLen(), shift_num + 1);
-    }
-  }
-  // use average proportion to estimate the number of matched substring. 
-  cand_num = cand_num * getAvgProportion(ori_mass, 
-                                         mng_ptr_->sp_para_ptr_->getPeakTolerance()->getPpo(),
-                                         convert_ratio_, residue_avg_len_);
-  return cand_num;
-}
-
-double getAvgProportion(double mass, double ppo, 
-                        double convert_ratio, double residue_avg_len) {
-  double proportion = mass * ppo * 2  * convert_ratio/ residue_avg_len;
-  if (proportion == 0) {
-    LOG_ERROR("Error in computing proportion = 0");
-  }
-  return proportion;
 }
 
 }

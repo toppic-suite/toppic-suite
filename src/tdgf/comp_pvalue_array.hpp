@@ -11,8 +11,6 @@ class CompPValueArray {
  public:
   CompPValueArray(ProteoformPtrVec &raw_forms, 
                   ProteoformPtrVec &prot_mod_forms,
-                  ResFreqPtrVec &prot_n_term_residues,
-                  ResFreqPtrVec &pep_n_term_residues,
                   ResFreqPtrVec &residues,
                   TdgfMngPtr mng_ptr);
 
@@ -21,12 +19,12 @@ class CompPValueArray {
 
  private:
   TdgfMngPtr mng_ptr_;
-  CompProbValuePtr prot_comp_prob_ptr_;
-  CompProbValuePtr pep_comp_prob_ptr_;
+  CompProbValuePtr comp_prob_ptr_;
   CountTestNumPtr test_num_ptr_;
+  ResFreqPtrVec pep_n_term_residues_;
+  ResFreqPtrVec prot_n_term_residues_;
 };
 
-typedef std::shared_ptr<CompPValueArray> CompPValueArrayPtr;
 
 }
 

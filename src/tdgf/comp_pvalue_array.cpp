@@ -5,24 +5,20 @@ namespace prot {
 
 CompPValueArray::CompPValueArray(ProteoformPtrVec &raw_forms, 
                                  ProteoformPtrVec &prot_mod_forms,
-                                 ResFreqPtrVec &prot_n_term_residues,
-                                 ResFreqPtrVec &pep_n_term_residues,
                                  ResFreqPtrVec &residues,
                                  TdgfMngPtr mng_ptr) {
   mng_ptr_ = mng_ptr;
-  prot_comp_prob_ptr_ = CompProbValuePtr(
+  pep_n_term_residues_ = residues;
+  // to do add getProbModResidueFreq to proteoform.cpp
+  //prot_n_term_residues_ = getProtModResidueFreq(prot_mod_forms);
+  comp_prob_ptr_ = CompProbValuePtr(
       new CompProbValue(mng_ptr_->double_to_int_constant_,
-                        prot_n_term_residues, residues, 
-                        mng_ptr_->unexpected_shift_num_ + 1, 
-                        mng_ptr_->max_table_height_, mng_ptr_->max_sp_prec_mass_));
-  pep_comp_prob_ptr_ = CompProbValuePtr(
-      new CompProbValue(mng_ptr_->double_to_int_constant_,
-                        pep_n_term_residues, residues, 
-                        mng_ptr_->unexpected_shift_num_ + 1,
-                        mng_ptr_->max_table_height_, mng_ptr_->max_sp_prec_mass_));
+                        residues, mng_ptr_->unexpected_shift_num_ + 1, 
+                        mng_ptr_->max_table_height_, 
+                        mng_ptr_->max_sp_prec_mass_));
                         
   test_num_ptr_ = CountTestNumPtr(new CountTestNum(raw_forms, prot_mod_forms,
-                                                   prot_n_term_residues, residues, mng_ptr));
+                                                   residues, mng_ptr));
 }
 
 /* set alignment */
@@ -30,16 +26,18 @@ ExtremeValuePtrVec CompPValueArray::compExtremeValue(PrmMsPtr ms_six,
                                                      PrSMPtrVec &prsms, bool strict) {
   PrmPeakPtrVec prm_peaks = ms_six->getPeakPtrVec();
   std::vector<double> prot_probs; 
-  compProbArray(prot_comp_prob_ptr_, prm_peaks, prsms, strict, prot_probs);
+  compProbArray(comp_prob_ptr_, prot_n_term_residues_, 
+                prm_peaks, prsms, strict, prot_probs);
   std::vector<double> pep_probs;
-  compProbArray(pep_comp_prob_ptr_, prm_peaks, prsms, strict, pep_probs);
+  compProbArray(comp_prob_ptr_, pep_n_term_residues_, 
+                prm_peaks, prsms, strict, pep_probs);
   double prec_mass = ms_six->getHeaderPtr()->getPrecMonoMassMinusWater();
   double tolerance = ms_six->getHeaderPtr()->getErrorTolerance();
   ExtremeValuePtrVec ev_probs; 
   for (unsigned int i = 0; i < prsms.size(); i++) {
-    int inter_shift_num = prsms[i]->getProteoformPtr()->getUnexpectedChangeNum();
+    int unexpect_shift_num = prsms[i]->getProteoformPtr()->getUnexpectedChangeNum();
     SemiAlignTypePtr t = prsms[i]->getProteoformPtr()->getSemiAlignType();
-    double cand_num = test_num_ptr_->compCandNum(t, inter_shift_num, 
+    double cand_num = test_num_ptr_->compCandNum(t, unexpect_shift_num, 
                                                  prec_mass, tolerance);
     if (cand_num == 0.0) {
       LOG_WARN("Zero candidate number");

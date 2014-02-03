@@ -11,23 +11,22 @@ namespace prot {
 
 class CompProbValue {
  public:
-  CompProbValue(double convert_ratio, ResFreqPtrVec n_term_residues,
-                ResFreqPtrVec residues, int max_layer_num, 
-                int max_table_height, double max_sp_prec_mass);
+  CompProbValue(double convert_ratio, ResFreqPtrVec residues, 
+                int max_layer_num, int max_table_height, 
+                double max_sp_prec_mass);
 
   ~CompProbValue();
 
-  void compute(PrmPeakPtrVec peaks, int thresh, int shift_num, bool strict);
-  double getRawProb(int shift, int thresh);
+  void compute(ResFreqPtrVec n_term_residues, PrmPeakPtrVec peaks, 
+               int thresh, int shift_num, bool strict);
   // main function to get probabilities
-  double getProb(int shift, int thresh);
-  double getOneValueProb(int shift, int value);
+  double getCondProb(int shift, int thresh);
+  double getCondProbOneValue(int shift, int value);
 
  private:
   static int const ORI_PAGE_LEN = 5000;
   static int const ORI_BLOCK_LEN = 50;
   static double K() {return 0.55;}
-//static double const K2 = 0.55;
 
   /* double to integer convert ratio */
   double convert_ratio_;
@@ -37,7 +36,6 @@ class CompProbValue {
    **********************************************************/
   std::vector<int> n_term_acid_masses_;
   std::vector<double> n_term_acid_frequencies_;
-  double n_term_acid_freq_sum_;
   std::vector<int> residue_masses_;
   std::vector<double> residue_frequencies_;
   int residue_avg_len_ = 0;
@@ -70,6 +68,7 @@ class CompProbValue {
   int block_table_size_;   // blockLen * height
 
   std::vector<int> acid_dists_;   // acidMass * height;
+  std::vector<double> factors_; //normalization factors;
 
   std::vector<int> peak_mass_bgns_;
   std::vector<int> peak_mass_ends_;
@@ -81,11 +80,15 @@ class CompProbValue {
   std::vector<std::vector<std::vector<double>>> results_; // nLayer peak number, height;
   std::vector<std::vector<std::vector<double>>> priors_;  // peak number, height
 
-  std::vector<double> factors_; //normalization factors;
+  // the prob that a randam protein has the same precursor to the spectrum 
+  std::vector<double> prec_probs_; 
 
   double* page_table_;
   short* pos_scores_;
 
+  void setFactors();
+
+  // computation
   void setMassErr(PrmPeakPtrVec &peaks, bool strict);
 
   void setPosScores(std::vector<int> &peak_masses, 
@@ -96,7 +99,7 @@ class CompProbValue {
   void setPeakBgnEnd(std::vector<int> &peak_masses, 
                      std::vector<int> &peak_tolerances);
   void comp();
-  void compFactors();
+  void compPrecProbs();
   void runClear(int page_pos);
   void runFirstLayerInit(int win_table_bgn, int win_table_end);
   void runInit(std::vector<std::vector<double>> &results, 
@@ -114,8 +117,9 @@ typedef std::shared_ptr<CompProbValue> CompProbValuePtr;
 
 int computeAvgLength(ResFreqPtrVec &residues, double convert_ratio);
 
-void compProbArray(CompProbValuePtr comp_prob_ptr, PrmPeakPtrVec &peaks, 
-                   PrSMPtrVec &prsms, bool strict, std::vector<double> &results);
+void compProbArray(CompProbValuePtr comp_prob_ptr, ResFreqPtrVec &n_term_residues, 
+                   PrmPeakPtrVec &peaks, PrSMPtrVec &prsms, bool strict, 
+                   std::vector<double> &results);
 
 }
 #endif

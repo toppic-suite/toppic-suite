@@ -24,7 +24,8 @@ OBJ_DIR = ../../obj
 BASE_OBJS = $(addprefix $(OBJ_DIR)/, support_peak_type.o semi_align_type.o db_residue_seq.o extreme_value.o residue_seq.o fasta_reader.o change.o break_point.o bp_spec.o proteoform.o base_data.o activation.o ion_type.o neutral_loss.o trunc.o prot_mod.o acid.o ptm.o residue.o xml_dom.o xml_dom_document.o)
 SPEC_OBJS = $(addprefix $(OBJ_DIR)/, ms_header.o sp_para.o extend_sp_para.o peak_tolerance.o) 
 
-TDGF_OBJS = $(addprefix $(OBJ_DIR)/, evalue_processor.o comp_pvalue_array.o count_test_num.o comp_prob_value.o evalue_console.o) 
+#TDGF_OBJS = $(addprefix $(OBJ_DIR)/, evalue_processor.o comp_pvalue_array.o count_test_num.o comp_prob_value.o evalue_console.o) 
+TDGF_OBJS = $(addprefix $(OBJ_DIR)/, comp_prob_value.o count_test_num.o comp_pvalue_array.o) 
 
 OBJS = $(BASE_OBJS) $(SPEC_OBJS) $(TDGF_OBJS)
 
@@ -45,7 +46,7 @@ MAIN = $(BIN_DIR)/evalue
 all:    $(MAIN)
 
 $(MAIN): $(OBJS) 
-	$(CC) $(CPPFLAGS) $(INCLUDES) -o $(MAIN) $(OBJS) $(LFLAGS) $(LIBS)
+#	$(CC) $(CPPFLAGS) $(INCLUDES) -o $(MAIN) $(OBJS) $(LFLAGS) $(LIBS)
 
 $(OBJ_DIR)/%.o: %.cpp
 	$(CC) -c $(CPPFLAGS) $(INCLUDES) $< -o $@

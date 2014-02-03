@@ -6,18 +6,10 @@
 
 namespace prot {
 
-CompProbValue::CompProbValue(double convert_ratio, ResFreqPtrVec n_term_residues,
-                             ResFreqPtrVec residues, int max_layer_num, 
-                             int max_table_height, double max_sp_prec_mass) {
+CompProbValue::CompProbValue(double convert_ratio, ResFreqPtrVec residues, 
+                             int max_layer_num, int max_table_height, 
+                             double max_sp_prec_mass) {
   convert_ratio_ = convert_ratio;
-  n_term_acid_freq_sum_ = 0;
-  for (unsigned int i = 0; i < n_term_residues.size(); i++) {
-    int int_mass = (int)std::round(n_term_residues[i]->getMass() * convert_ratio);
-    n_term_acid_masses_.push_back(int_mass);
-    n_term_acid_frequencies_.push_back(n_term_residues[i]->getFreq());
-    n_term_acid_freq_sum_ += n_term_residues[i]->getFreq();
-  }
-
   residue_avg_len_ = computeAvgLength(residues, convert_ratio);
   for (unsigned int i = 0; i < residues.size(); i++) {
     int int_mass = (int)std::round(residues[i]->getMass() * convert_ratio);
@@ -34,6 +26,7 @@ CompProbValue::CompProbValue(double convert_ratio, ResFreqPtrVec n_term_residues
 
   max_sp_len_ = (int) std::round(max_sp_prec_mass * convert_ratio_);
   pos_scores_ = new short[max_sp_len_ + block_len_];
+  setFactors();
 }
 
 CompProbValue::~CompProbValue() {
@@ -55,7 +48,29 @@ int computeAvgLength(ResFreqPtrVec &residues, double convert_ratio) {
   return (int)std::round(mass_sum/freq_sum * convert_ratio);
 }
 
-void CompProbValue::compute(PrmPeakPtrVec peaks, int thresh, int shift_num, bool strict) {
+void CompProbValue::setFactors () {
+  factors_.clear();
+  //zero ptm 
+  factors_.push_back(1);
+  //one ptm
+  factors_.push_back(K());
+  //i>=2 ptms based on experience: divide K by i^2
+  int max_shift_num = max_layer_num_ - 1;
+  for (int i = 2; i <= max_shift_num; i++) {
+    double factor = K() / (i * i);
+    factors_.push_back(factor);
+  }
+}
+
+void CompProbValue::compute(ResFreqPtrVec n_residues, PrmPeakPtrVec peaks, 
+                            int thresh, int shift_num, bool strict) {
+  n_term_acid_masses_.clear();
+  n_term_acid_frequencies_.clear();
+  for (unsigned int i = 0; i < n_residues.size(); i++) {
+    int int_mass = (int)std::round(n_residues[i]->getMass() * convert_ratio_);
+    n_term_acid_masses_.push_back(int_mass);
+    n_term_acid_frequencies_.push_back(n_residues[i]->getFreq());
+  }
   results_.clear(); 
   // if score is less than 1, we do not compute p-value 
   if (thresh < 1) {
@@ -203,35 +218,47 @@ void CompProbValue::comp() {
     results_.push_back(one_layer_results);
     priors_.push_back(one_layer_priors);
   }
-  compFactors();
+  compPrecProbs();
 }
 
-void CompProbValue::compFactors() {
-  factors_.clear();
+void CompProbValue::compPrecProbs() {
+  prec_probs_.clear();
   // zero ptm
   int last_peak_index = peak_masses_.size() - 1;
-  double hit_sum = 0;
+  double prob = 0;
   for (int i = 0; i < height_; i++) {
-    hit_sum += results_[0][last_peak_index][i];
+    prob += results_[0][last_peak_index][i];
   }
-  if (hit_sum == 0) {
-    hit_sum = 1;
+  if (prob == 0) {
+    LOG_ERROR("Precursor probability is zero!"); 
+    prob = 1;
   }
-  double zero_factor = 1.0 / hit_sum;
-  factors_.push_back(zero_factor);
+  prec_probs_.push_back(prob);
 
-  double prior_sum = 0;
+  // one ptm
+  prob = 0;
   for (int i = 0; i < height_; i++) {
-    prior_sum += priors_[0][last_peak_index][i];
+    // all randam proteins with an error < avg_residue_len 
+    // are counted. 
+    prob += priors_[0][last_peak_index][i];
   }
   double peak_width = peak_mass_ends_[last_peak_index] 
       - peak_mass_bgns_[last_peak_index] + 1;
-  for (int i = 1; i <= shift_num_; i++) {
-    // i ptm
-    double factor = 1.0 /prior_sum * i;
-    factor = factor / pow(peak_width, i);
-    factor = factor * K();
-    factors_.push_back(factor);
+  // because in results[], all probabilities are calculated 
+  // with an error tolerance and all proteins are counted 
+  // several times. In the prec_probability also needs to 
+  // to be normalized by the error tolerance. 
+  double one_ptm_prec_prob = prob * peak_width;
+  prec_probs_.push_back(one_ptm_prec_prob);
+
+  // i >=2 ptms 
+  for (int i = 2; i <= shift_num_; i++) {
+    // for i ptms, all random proteins with an error 
+    // < i * avg_residue_len are counted.
+    double prec_prob = prob * i;
+    // also, we need to normalize by peak_width ^ i;
+    prec_prob = prec_prob * pow(peak_width, i);
+    prec_probs_.push_back(prec_prob);
   }
 }
 
@@ -410,7 +437,7 @@ void CompProbValue::compOneLayer(std::vector<std::vector<double>> &prev_results,
   }
 }
 
-double CompProbValue::getRawProb(int shift, int thresh) {
+double CompProbValue::getCondProb(int shift, int thresh) {
   double prob_sum = 0;
   if (results_.size() == 0) {
     return 1.0;
@@ -419,25 +446,24 @@ double CompProbValue::getRawProb(int shift, int thresh) {
   for (int score = thresh; score < height_; score++) {
     prob_sum = prob_sum + results_[shift][last_peak_index][score];
   }
-  return prob_sum * factors_[shift];
+  //compute conditional probability
+  double cond_prob = prob_sum / prec_probs_[shift];
+  //normalization
+  double norm_cond_prob = cond_prob * factors_[shift];
+  return norm_cond_prob;
 }
 
-// The difference between getProb and getRawProb is nTermAcidFreqSum
-double CompProbValue::getProb(int shift, int thresh) {
-  if (results_.size() == 0) {
-    return 1.0;
-  }
-  double raw_prob = getRawProb(shift, thresh);
-  return raw_prob * n_term_acid_freq_sum_;
-}
-
-double CompProbValue::getOneValueProb(int shift, int value) {
+double CompProbValue::getCondProbOneValue(int shift, int value) {
   if (results_.size() == 0) {
     return 1.0;
   }
   int last_peak_index = peak_masses_.size() - 1;
-  double prob = results_[shift][last_peak_index][value] * factors_[shift];
-  return prob * n_term_acid_freq_sum_;
+  double prob = results_[shift][last_peak_index][value];
+  //compute conditional probability
+  double cond_prob = prob / prec_probs_[shift];
+  //normalization
+  double norm_cond_prob = cond_prob * factors_[shift];
+  return norm_cond_prob;
 }
 
 int getMaxScore(PrSMPtrVec prsms) {
@@ -460,16 +486,17 @@ int getMaxShift(PrSMPtrVec prsms) {
   return shift;
 }
 
-void compProbArray(CompProbValuePtr comp_prob_ptr, PrmPeakPtrVec &peaks, 
-                   PrSMPtrVec &prsms, bool strict, std::vector<double> &results) {
+void compProbArray(CompProbValuePtr comp_prob_ptr, ResFreqPtrVec n_term_residues, 
+                   PrmPeakPtrVec &peaks, PrSMPtrVec &prsms, bool strict, 
+                   std::vector<double> &results) {
   int max_score = getMaxScore(prsms);
   int max_shift = getMaxShift(prsms);
-  comp_prob_ptr->compute(peaks, max_score, max_shift, strict);
+  comp_prob_ptr->compute(n_term_residues, peaks, max_score, max_shift, strict);
   results.clear();
   for (unsigned int i = 0; i < prsms.size(); i++) {
     int shift_num = prsms[i]->getProteoformPtr()->getUnexpectedChangeNum();
     int score = (int)prsms[i]->getMatchFragNum();
-    results.push_back(comp_prob_ptr->getProb(shift_num, score));
+    results.push_back(comp_prob_ptr->getCondProb(shift_num, score));
   }
 }
 
