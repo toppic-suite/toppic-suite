@@ -15,6 +15,8 @@ class ResidueFreq: public Residue {
   ResidueFreq(std::string acid_name, std::string abbr_name, 
               double freq);
 
+  ResidueFreq(AcidPtr acid_ptr, PtmPtr ptm_ptr, double freq);
+
   double getFreq() {return freq_;}
 
  private:

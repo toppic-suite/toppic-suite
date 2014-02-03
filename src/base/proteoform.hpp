@@ -1,6 +1,7 @@
 #ifndef PROT_PROTEOFORM_HPP_
 #define PROT_PROTEOFORM_HPP_
 
+#include "base/residue_freq.hpp"
 #include "base/db_residue_seq.hpp"
 #include "base/bp_spec.hpp"
 #include "base/change.hpp"
@@ -84,7 +85,8 @@ ProteoformPtr getSubProteoform(ProteoformPtr proteoform_ptr, int start, int end)
 ProteoformPtrVec generateProtModProteoform(ProteoformPtrVec &ori_forms,
                                            ProtModPtrVec &prot_mods);
 
-//std::string convertSemiAlignmentTypeToString(int i);
+/* calculate frequencies and n_terminal_residues */
+ResFreqPtrVec compNTermResFreq(ProteoformPtrVec &prot_mod_forms);
 
 } /* namespace prot */
 

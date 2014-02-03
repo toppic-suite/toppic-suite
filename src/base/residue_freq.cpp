@@ -11,6 +11,11 @@ ResidueFreq::ResidueFreq(std::string acid_name, std::string ptm_abbr_name,
   freq_ = freq;
 }
 
+ResidueFreq::ResidueFreq(AcidPtr acid_ptr, PtmPtr ptm_ptr, 
+                         double freq): Residue (acid_ptr, ptm_ptr) {
+  freq_ = freq;
+}
+
 ResFreqPtrVec getResiduePtrVecInstance(AcidPtrVec &acid_list, 
                                            PtmPtrVec &ptm_list,
                                            std::string &file_name) {

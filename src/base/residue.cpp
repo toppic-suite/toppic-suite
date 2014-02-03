@@ -48,6 +48,15 @@ ResiduePtr getResiduePtrByAcid(ResiduePtrVec &residue_ptrs,
   return ResiduePtr(nullptr);
 }
 
+int findResidue(ResiduePtrVec &residue_list, ResiduePtr residue_ptr) {
+  for (unsigned int i = 0; i < residue_list.size(); i++) {
+    if (residue_list[i] == residue_ptr) {
+      return i;
+    }
+  }
+  return -1;
+}
+
 
 ResiduePtrVec convertAcidToResidueSeq(ResiduePtrVec &residue_list,
                                       AcidPtrVec acid_ptrs) {
