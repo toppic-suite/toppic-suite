@@ -62,19 +62,23 @@ xercesc::DOMElement* PrSM::toXmlElement(XmlDOMDocument* xml_doc){
 	xml_doc->addElement(element, "adjusted_prec_mass", str.c_str());
 	str = convertToString(calibration_);
 	xml_doc->addElement(element, "calibration", str.c_str());
-	proteoform_ptr_->appendXml(xml_doc,element);
-	if(prob_ptr_!=nullptr){
-	    prob_ptr_->appendXml(xml_doc,element);
-	}
 	str = convertToString(fdr_);
 	xml_doc->addElement(element, "fdr", str.c_str());
-	if(deconv_ms_ptr_!=nullptr){
-	    deconv_ms_ptr_->appendXml(xml_doc,element);
-	}
 	str = convertToString(match_peak_num_);
 	xml_doc->addElement(element, "match_peak_num", str.c_str());
 	str = convertToString(match_fragment_num_);
 	xml_doc->addElement(element, "match_fragment_num", str.c_str());
+	proteoform_ptr_->appendXml(xml_doc,element);
+	if(prob_ptr_!=nullptr){
+	  prob_ptr_->appendXml(xml_doc,element);
+	}
+//	proteoform_ptr_->appendXml(xml_doc,element);
+//	if(prob_ptr_!=nullptr){
+//	  prob_ptr_->appendXml(xml_doc,element);
+//  }
+	if(deconv_ms_ptr_!=nullptr){
+	  deconv_ms_ptr_->appendXml(xml_doc,element);
+	}
   return element;
 }
 
