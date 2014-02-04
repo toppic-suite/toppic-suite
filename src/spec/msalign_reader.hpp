@@ -35,7 +35,7 @@ class MsAlignReader {
   DeconvMsPtr deconv_ms_ptr_ = DeconvMsPtr(nullptr);
 };
 
-int countSpNum(const char *spectrum_file);
+int countSpNum(std::string spectrum_file);
 
 }
 #endif

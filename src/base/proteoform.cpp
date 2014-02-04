@@ -291,7 +291,7 @@ ProteoformPtrVec generateProtModProteoform(ProteoformPtrVec &ori_forms,
   return new_forms;
 }
 
-ResFreqPtrVec compNTermResFreq(ProteoformPtrVec &prot_mod_forms) {
+ResFreqPtrVec compNTermResidueFreq(ProteoformPtrVec &prot_mod_forms) {
   std::vector<double> counts;
   ResiduePtrVec residue_list;
   for (unsigned int i = 0; i < prot_mod_forms.size(); i++) {
@@ -323,6 +323,37 @@ ResFreqPtrVec compNTermResFreq(ProteoformPtrVec &prot_mod_forms) {
   }
   return res_freq_list;
 }
+
+
+ResFreqPtrVec compResidueFreq(ResiduePtrVec &residue_list, 
+                              ProteoformPtrVec &prot_mod_forms) {
+  std::vector<double> counts(residue_list.size(), 0.0);
+  for (unsigned int i = 0; i < prot_mod_forms.size(); i++) {
+    ResSeqPtr seq_ptr = prot_mod_forms[i]->getResSeqPtr();    
+    for (int j = 0; j < seq_ptr->getLen(); j++) {
+      ResiduePtr res_ptr = seq_ptr->getResiduePtr(j);
+      int pos = findResidue(residue_list, res_ptr);
+      if (pos >= 0) {
+        // found 
+        counts[pos] = counts[pos]+1;
+      }
+    }
+  }
+
+  double sum = 0;
+  for (unsigned int i = 0; i < counts.size(); i++) {
+    sum = sum + counts[i];
+  }
+  ResFreqPtrVec res_freq_list;
+  for (unsigned int i = 0; i < residue_list.size(); i++) {
+    ResFreqPtr res_freq_ptr(new ResidueFreq(residue_list[i]->getAcidPtr(), 
+                                            residue_list[i]->getPtmPtr(),
+                                            counts[i]/sum));
+    res_freq_list.push_back(res_freq_ptr);
+  }
+  return res_freq_list;
+}
+
 
 } /* namespace prot */
 

@@ -128,6 +128,8 @@ inline bool prsm_comp(PrSMPtr p1, PrSMPtr p2){
 
 PrSMPtrVec readPrsm(std::string file_name,ProteoformPtrVec proteoforms);
 
+void filterPrsms(PrSMPtrVec &prsms, MsHeader header_ptr, PrSMPtrVec &sele_prsms); 
+
 }
 #endif
 

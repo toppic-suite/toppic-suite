@@ -146,8 +146,8 @@ void MsAlignReader::close() {
   input_.close();
 }
 
-int countSpNum(const char *spectrum_file) {
-  MsAlignReader reader(spectrum_file);
+int countSpNum(std::string spectrum_file_name) {
+  MsAlignReader reader(spectrum_file_name);
   int cnt = 0;
   DeconvMsPtr deconv_ms_ptr;
   while ((deconv_ms_ptr = reader.getNextMs()).get() != nullptr) {

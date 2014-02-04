@@ -25,6 +25,7 @@ class CompPValueArray {
   ResFreqPtrVec prot_n_term_residues_;
 };
 
+typedef std::shared_ptr<CompPValueArray> CompPValueArrayPtr;
 
 }
 

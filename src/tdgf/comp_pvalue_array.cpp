@@ -9,8 +9,7 @@ CompPValueArray::CompPValueArray(ProteoformPtrVec &raw_forms,
                                  TdgfMngPtr mng_ptr) {
   mng_ptr_ = mng_ptr;
   pep_n_term_residues_ = residues;
-  // to do add getProbModResidueFreq to proteoform.cpp
-  //prot_n_term_residues_ = getProtModResidueFreq(prot_mod_forms);
+  prot_n_term_residues_ = compNTermResidueFreq(prot_mod_forms);
   comp_prob_ptr_ = CompProbValuePtr(
       new CompProbValue(mng_ptr_->double_to_int_constant_,
                         residues, mng_ptr_->unexpected_shift_num_ + 1, 

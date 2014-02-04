@@ -48,14 +48,7 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
       = generateProtModProteoform(raw_forms, 
                                   base_data_ptr->getAllowProtModPtrVec());
 
-  /*
-  for (unsigned int i = 0; i < prot_mod_forms.size(); i++) {
-    LOG_DEBUG("mod seq end name " << prot_mod_forms[i]->getDbResSeqPtr()->getName()
-              << " end " << prot_mod_forms[i]->getEndPos());
-  }
-  */
-
-  int spectra_num = countSpNum (mng_ptr->spectrum_file_name_.c_str());
+  int spectra_num = countSpNum (mng_ptr->spectrum_file_name_);
   LOG_DEBUG("spectra_number  " << spectra_num);
 
   MsAlignReader reader(mng_ptr->spectrum_file_name_);

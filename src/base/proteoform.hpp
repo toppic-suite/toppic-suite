@@ -85,8 +85,12 @@ ProteoformPtr getSubProteoform(ProteoformPtr proteoform_ptr, int start, int end)
 ProteoformPtrVec generateProtModProteoform(ProteoformPtrVec &ori_forms,
                                            ProtModPtrVec &prot_mods);
 
-/* calculate frequencies and n_terminal_residues */
-ResFreqPtrVec compNTermResFreq(ProteoformPtrVec &prot_mod_forms);
+/* calculate frequencies for n_terminal_residues */
+ResFreqPtrVec compNTermResidueFreq(ProteoformPtrVec &prot_mod_forms);
+
+/* calculater frequences for all residues */
+ResFreqPtrVec compResidueFreq(ResiduePtrVec &residue_list, 
+                              ProteoformPtrVec &raw_mods);
 
 } /* namespace prot */
 

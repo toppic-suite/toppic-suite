@@ -146,6 +146,31 @@ PrSMPtrVec readPrsm(std::string file_name,ProteoformPtrVec proteoforms){
   return results;
 }
 
+bool isMatch(PrSMPtr prsm_ptr, MsHeaderPtr header_ptr) {
+  int id = header_ptr->getId();
+  std::string scan = header_ptr->getScansString();
+  int prec_id = header_ptr->getPrecId();
+  double prec_mass = header_ptr->getPrecMonoMass();
+  if (id == prsm_ptr->getSpectrumId() && prec_id == prsm_ptr->getPrecurorId()) {
+    if (scan != prsm_ptr->getSpectrumScan()
+        || prec_mass != prsm_ptr->getOriPrecMass()) {
+      LOG_ERROR("Error in PrSM.");
+    }
+    return true;
+  } else {
+    return false;
+  }
+}
+
+void filterPrsms(PrSMPtrVec &prsms, MsHeaderPtr header_ptr, 
+                 PrSMPtrVec &sele_prsms) {
+  for (unsigned int i = 0; i < prsms.size(); i++) {
+    if (isMatch(prsms[i], header_ptr)) {
+      sele_prsms.push_back(prsms[i]);
+    }
+  }
+}
+
 }
 
 /*
