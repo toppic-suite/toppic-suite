@@ -111,6 +111,10 @@ inline bool prsmMatchFragmentDown(PrSMPtr p1, PrSMPtr p2) {
   return p1->getMatchFragNum() > p2->getMatchFragNum();
 }
 
+inline bool prsmEValueUp(PrSMPtr p1, PrSMPtr p2) {
+  return p1->getEValue() < p2->getEValue();
+}
+
 inline bool prsm_comp(PrSMPtr p1, PrSMPtr p2){
     if(p1->getSpectrumId() < p2->getSpectrumId()){
         return false;
@@ -128,7 +132,7 @@ inline bool prsm_comp(PrSMPtr p1, PrSMPtr p2){
 
 PrSMPtrVec readPrsm(std::string file_name,ProteoformPtrVec proteoforms);
 
-void filterPrsms(PrSMPtrVec &prsms, MsHeader header_ptr, PrSMPtrVec &sele_prsms); 
+void filterPrsms(PrSMPtrVec &prsms, MsHeaderPtr header_ptr, PrSMPtrVec &sele_prsms); 
 
 }
 #endif
