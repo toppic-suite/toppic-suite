@@ -81,7 +81,6 @@ SimplePrSMPtrVec PtmFastFilterHiMem::sort(SimplePrSMPtrVec2D matches){
             unique_match.push_back(sorted_match[i]);
         }
     }
-    //system.print?
     return unique_match;
 }
 

@@ -84,6 +84,8 @@ void PtmProcessor::processDatabase(PtmSearcherPtr searcher){
         cnt++;
         SpectrumSetPtr spectrumset = getSpectrumSet(deconv_sp,0,
                                                   mng_->sp_para_);
+        //set deconvMsPtr errorTolerance
+        deconv_sp->getHeaderPtr()->setErrorToleranceByPpo(mng_->ppo_);
         if(spectrumset != nullptr){
             SimplePrSMPtrVec slectedPrsms = prot::findSimplePrsms(simplePrsms_,deconv_sp->getHeaderPtr());
             searcher->search(spectrumset,slectedPrsms,prsms);
