@@ -21,14 +21,20 @@ void EValueProcessor::init() {
   ProteoformPtrVec prot_mod_forms 
       = generateProtModProteoform(raw_forms, 
                                   base_data_ptr->getAllowProtModPtrVec());
+  LOG_DEBUG("protein data set loaded");
   
   ResFreqPtrVec residue_freqs 
       = compResidueFreq(base_data_ptr->getFixModResiduePtrVec(), raw_forms); 
+  LOG_DEBUG("residue frequency initialized");
+
   comp_pvalue_ptr_ = CompPValueArrayPtr(
       new CompPValueArray(raw_forms, prot_mod_forms, residue_freqs, mng_ptr_));
+  LOG_DEBUG("comp pvalue array initialized");
+
   std::string input_file_name = basename(mng_ptr_->spectrum_file_name_)
       + "." + mng_ptr_->input_file_ext_;
   prsms_ = readPrsm(input_file_name, raw_forms);
+  LOG_DEBUG("prsms loaded");
 }
 
 

@@ -16,10 +16,15 @@ CountTestNum::CountTestNum(ProteoformPtrVec &raw_forms,
   convert_ratio_ = mng_ptr_->double_to_int_constant_;
   max_sp_len_ = (int)std::round(mng_ptr_->max_sp_prec_mass_ * convert_ratio_);
   residue_avg_len_ = computeAvgLength(residues, convert_ratio_);
+  LOG_DEBUG("get residue average length");
   initCompMassCnt(prot_mod_forms);
+  LOG_DEBUG("complete mass count initialized");
   initPrefMassCnt(prot_mod_forms);
+  LOG_DEBUG("prefix mass count initialized");
   initSuffMassCnt(raw_forms);
+  LOG_DEBUG("suffix mass count initialized");
   initInternalMassCnt();
+  LOG_DEBUG("internal mass count initialized");
 }
 
 CountTestNum::~CountTestNum() {
@@ -79,7 +84,7 @@ void CountTestNum::initSuffMassCnt(ProteoformPtrVec &raw_forms) {
     BreakPointPtrVec break_points = raw_forms[i]->getBpSpecPtr()->getBreakPointPtrVec();
     // suffix
     for (unsigned int j = 1; j < break_points.size() - 1; j++) {
-      suff_mass_cnts_[convertMass(break_points[i]->getSrm())] += 1.0;
+      suff_mass_cnts_[convertMass(break_points[j]->getSrm())] += 1.0;
     }
   }
 }
