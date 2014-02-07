@@ -486,7 +486,7 @@ int getMaxShift(PrSMPtrVec prsms) {
   return shift;
 }
 
-void compProbArray(CompProbValuePtr comp_prob_ptr, ResFreqPtrVec n_term_residues, 
+void compProbArray(CompProbValuePtr comp_prob_ptr, ResFreqPtrVec &n_term_residues, 
                    PrmPeakPtrVec &peaks, PrSMPtrVec &prsms, bool strict, 
                    std::vector<double> &results) {
   int max_score = getMaxScore(prsms);
