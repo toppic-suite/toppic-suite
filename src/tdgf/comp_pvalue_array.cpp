@@ -21,8 +21,8 @@ CompPValueArray::CompPValueArray(ProteoformPtrVec &raw_forms,
 }
 
 /* set alignment */
-ExtremeValuePtrVec CompPValueArray::compExtremeValue(PrmMsPtr ms_six, 
-                                                     PrSMPtrVec &prsms, bool strict) {
+ExtremeValuePtrVec CompPValueArray::compExtremeValues(PrmMsPtr ms_six, 
+                                                      PrSMPtrVec &prsms, bool strict) {
   PrmPeakPtrVec prm_peaks = ms_six->getPeakPtrVec();
   std::vector<double> prot_probs; 
   compProbArray(comp_prob_ptr_, prot_n_term_residues_, 
@@ -67,39 +67,34 @@ ExtremeValuePtrVec CompPValueArray::compExtremeValue(PrmMsPtr ms_six,
   return ev_probs;
 }
 
+ExtremeValuePtr CompPValueArray::compExtremeValue(PrmMsPtr prm_ms_ptr, 
+                                                  PrSMPtr prsm_ptr) {
+  PrSMPtrVec prsms;
+  prsms.push_back(prsm_ptr);
+  ExtremeValuePtrVec extreme_values = compExtremeValues(prm_ms_ptr, prsms, true);
+  return extreme_values[0];
 }
 
-/*
+void CompPValueArray::setPValue(DeconvMsPtr ms_ptr, PrSMPtr prsm_ptr) {
+  double refine_prec_mass = prsm_ptr->getAdjustedPrecMass();
+  DeconvMsPtr refine_ms_ptr = getRefineMs(ms_ptr, prsm_ptr->getCalibration(),
+                                          refine_prec_mass);
 
-    private ExtremeValueProb compExtremeValueProb(Ms<PrmPeak> msSix, PrSM prsm) {
-        PrSM prsms[] = new PrSM[1];
-        prsms[0] = prsm;
-        ExtremeValueProb evProbs[] = compExtremeValue(msSix, prsms, true);
-        return evProbs[0];
-    }
-
-    public void setPValue(Ms<DeconvPeak> deconvMs, PrSM prsm) throws Exception {
-        double refinePrecMass = prsm.getAdjustedPrecMass();
-        Ms<DeconvPeak> refineDeconvSp = DeconvSpFactory.getRefineMs(deconvMs,
-                prsm.getCalibration(), refinePrecMass);
-
-        logger.debug("recalibration " + prsm.getCalibration()
-                + " original precursor "
-                + deconvMs.getHeader().getPrecMonoMass() + " precursor "
-                + refinePrecMass);
-        // Delta = 0 is important 
-        Ms<PrmPeak> prmSpSix = PrmSpFactory.getSpSix(refineDeconvSp, 0, mng.spPara);
-        // AlignMs<PrmPeak> prmSpSix = AlignMsFactory.getSpSix(deconvMs, 0,
-        // mng);
-        ExtremeValueProb prob = compExtremeValueProb(prmSpSix, prsm);
-        prsm.setProb(prob);
-    }
-
-    public void setPValueArray(Ms<PrmPeak> msSix, PrSM prsms[]) {
-        ExtremeValueProb eVProbs[] = compExtremeValue(msSix, prsms, false);
-        for (int i = 0; i < prsms.length; i++) {
-            prsms[i].setProb(eVProbs[i]);
-        }
-    }
+  LOG_DEBUG("recalibration " << prsm_ptr->getCalibration()
+               << " original precursor "
+               << ms_ptr->getHeaderPtr()->getPrecMonoMass()
+               << " precursor " << refine_prec_mass);
+  // Delta = 0 is important 
+  PrmMsPtr prm_ms_ptr = getMsSix(refine_ms_ptr, 0, mng_ptr_->sp_para_ptr_);
+  ExtremeValuePtr prob_ptr = compExtremeValue(prm_ms_ptr, prsm_ptr);
+  prsm_ptr->setProbPtr(prob_ptr);
 }
-*/
+
+void CompPValueArray::setPValueArray(PrmMsPtr prm_ms_ptr, PrSMPtrVec prsms) {
+  ExtremeValuePtrVec extreme_values = compExtremeValues(prm_ms_ptr, prsms, false);
+  for (unsigned int i = 0; i < prsms.size(); i++) {
+    prsms[i]->setProbPtr(extreme_values[i]);
+  }
+}
+
+}

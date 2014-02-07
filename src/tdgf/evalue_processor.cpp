@@ -62,12 +62,12 @@ void EValueProcessor::processOneSpectrum(DeconvMsPtr ms_ptr, bool is_separate,
     
     if (is_separate) {
       for (unsigned i = 0; i < sele_prsms.size(); i++) {
-        //compP.setPValue(deconvSp, selectedPrsms[j]);
+        comp_pvalue_ptr_->setPValue(ms_ptr, sele_prsms[i]);
       }
     } 
     else {
-      //compP.setPValueArray(spectrumSet.getSpSix(),
-      //                     selectedPrsms);
+      comp_pvalue_ptr_->setPValueArray(spec_set_ptr->getSpSix(), 
+                                       sele_prsms);
     }
     std::sort(sele_prsms.begin(), sele_prsms.end(), prsmEValueUp);
     writer.writeVector(sele_prsms);
