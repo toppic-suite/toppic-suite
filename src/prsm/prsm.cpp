@@ -158,10 +158,12 @@ bool isMatch(PrSMPtr prsm_ptr, MsHeaderPtr header_ptr) {
   if (id == prsm_ptr->getSpectrumId() && prec_id == prsm_ptr->getPrecurorId()) {
     LOG_DEBUG("scan " << scan << " prsm scan " << prsm_ptr->getSpectrumScan()
               << " prec mass " << prec_mass << " prsm mass " << prsm_ptr->getOriPrecMass());
+    /*
     if (scan != prsm_ptr->getSpectrumScan()
         || prec_mass != prsm_ptr->getOriPrecMass()) {
       LOG_ERROR("Error in PrSM.");
     }
+    */
     return true;
   } else {
     return false;

@@ -1,4 +1,5 @@
 #include <cmath>
+
 #include <cstring>
 
 #include "base/logger.hpp"
@@ -122,9 +123,10 @@ void CompProbValue::setMassErr(PrmPeakPtrVec &peaks, bool strict) {
 void CompProbValue::setPosScores(std::vector<int> &peak_masses, 
                                  std::vector<int> &peak_tolerances,
                                  std::vector<int> &base_types) {
-  int len = sizeof(pos_scores_)/sizeof(short); 
+  int len = max_sp_len_ + block_len_;
+  int mem_len = len * sizeof(short); 
   LOG_DEBUG("pos scr length " << len);
-  memset(pos_scores_, 0, sizeof(pos_scores_));
+  memset(pos_scores_, 0, mem_len);
   // mass 0 and residue sum mass are not used for scoring 
   for (unsigned int i = 1; i < peak_masses.size() - 1; i++) {
     // here we use ceil/floor not round since each unit is very accurate
@@ -136,6 +138,7 @@ void CompProbValue::setPosScores(std::vector<int> &peak_masses,
     if (end >= len) {
       end = len - 1;
     }
+    //LOG_DEBUG("peak " << i << " bgn " << bgn << " end " << end);
     if (base_types[i] == PRM_PEAK_TYPE_ORIGINAL) {
       // the peak is m
       for (int p = bgn; p <= end; p++) {
@@ -268,15 +271,17 @@ void CompProbValue::runClear(int page_pos) {
 
 void CompProbValue::runFirstLayerInit(int win_table_bgn, int win_table_end) {
   double base_prob = 1.0;
+  //LOG_DEBUG("N terminal acid masses number " << n_term_acid_masses_.size());
   for (unsigned int i = 0; i < n_term_acid_masses_.size(); i++) {
     if (n_term_acid_frequencies_[i] <= 0) {
       continue;
     }
-    //logger.debug("nTermAcidMass " + nTermAcidMasses[i] + " freq " +
-    // nTermAcidFrequences[i]);
+    //LOG_DEBUG("nTermAcidMass " << n_term_acid_masses_[i]
+    //          << " freq " << n_term_acid_frequencies_[i]);
     int pos = n_term_acid_masses_[i];
-    int k = pos * height_;
-    // logger.debug("k " + k + " end " + blockTableSize);
+    int score = pos_scores_[pos];
+    int k = pos * height_ + score;
+    //LOG_DEBUG("k " << k << " end " << block_table_size_);
     if (k >= win_table_bgn && k <= win_table_end) {
       page_table_[k % page_table_size_] += base_prob
           * n_term_acid_frequencies_[i];
@@ -417,6 +422,12 @@ void CompProbValue::compOneLayer(std::vector<std::vector<double>> &prev_results,
         for (int j = 0; j < height_; j++) {
           int pos = (i * height_ + j) % page_table_size_;
           cur_results[peak_index][j] += page_table_[pos];
+          /*
+          if (peak_index <=1) {
+            LOG_DEBUG("position " << i << " score  " << j 
+                      << " prob " << page_table_[pos]);
+          }
+          */
         }
       }
 
@@ -435,6 +446,14 @@ void CompProbValue::compOneLayer(std::vector<std::vector<double>> &prev_results,
       peak_index++;
     }
   }
+  /*
+  for (unsigned int i = 0; i < peak_masses_.size(); i++) {
+    for (int j = 0; j < height_; j++) {
+      LOG_DEBUG("cur result " << i << " " << j << " " << cur_results[i][j]);
+      LOG_DEBUG("cur prior " << i << " " << j << " " << cur_priors[i][j]);
+    }
+  }
+  */
 }
 
 double CompProbValue::getCondProb(int shift, int thresh) {
