@@ -19,7 +19,8 @@ ResSeqPtr ResidueSeq::getSubResidueSeq(int bgn, int end) {
     return getEmptyResidueSeq();
   } else {
     ResiduePtrVec sub_residues; 
-    std::copy (residues_.begin() + bgn, residues_.begin() + end, 
+    //from bgn to end,the sum of residues shoule be end - bgn + 1
+    std::copy (residues_.begin() + bgn, residues_.begin() + end + 1,
                std::back_inserter(sub_residues) );
     return ResSeqPtr( new ResidueSeq(sub_residues));
   }
