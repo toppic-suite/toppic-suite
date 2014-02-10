@@ -276,10 +276,11 @@ ChangePtrVec getChanges(DiagonalHeaderPtrVec headers, int first, int last,
     }
   }
   for (unsigned int i = 0; i < headers.size() - 1; i++) {
+//    std::cout<<headers[i]->getMatchFirstResPos()<<"|"<<headers[i]->getMatchLastResPos()<<std::endl;
     change_list.push_back(
         ChangePtr(
             new Change(
-                first,
+                headers[i]->getMatchLastResPos(),
                 headers[i + 1]->getMatchFirstResPos(),
                 UNEXPECTED_CHANGE,
                 headers[i + 1]->getProtNTermShift()

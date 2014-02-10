@@ -88,9 +88,9 @@ PrSMPtr PtmSlowMatch::geneResult(int shift_num,int type){
             first_pos,
             last_pos,
             PtmFactory::getBasePtmPtrVec());
-    for(int i=0;i<changes.size();i++){
-      std::cout<<changes[i]->getMassShift()<<std::endl;
-    }
+//    for(int i=0;i<changes.size();i++){
+//      std::cout<<changes[i]->getMassShift()<<std::endl;
+//    }
     ProteoformPtr protein = ProteoformPtr(
             new Proteoform(
                     seq_->getDbResSeqPtr(),
