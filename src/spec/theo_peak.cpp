@@ -28,7 +28,7 @@ TheoPeakPtrVec getTheoPeak(BpSpecPtr pep,
                            double min_mass){
   TheoPeakPtrVec theo_peaks;
   BreakPointPtrVec bps = pep->getBreakPointPtrVec();
-  double new_seq_mass = pep->getResSeqMass()+n_term_shift;
+  double new_seq_mass = pep->getResSeqMass()+n_term_shift+c_term_shift;
   IonTypePtr n_ion_type = type->getNIonType();
   for(int i =bgn;i<=end;i++){
     double n_mass = bps[i]->getNTermMass(n_ion_type);

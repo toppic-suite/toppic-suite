@@ -42,7 +42,7 @@ inline void getTheoMassVec (TheoPeakPtrVec &theo_peaks,
   }
 }
 
-TheoPeakPtrVec getTheoPeak(BpSpecPtr pep,ActivationPtr type,
+TheoPeakPtrVec getTheoPeak(BpSpecPtr pep,ActivationPtr type,NeutralLossPtr neutral_loss_ptr,
                            double n_term_shift,double c_term_shift,
                            int bgn,int end,double min_mass);
 
