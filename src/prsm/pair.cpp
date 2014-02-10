@@ -120,6 +120,10 @@ PeakIonPairPtrVec findPairs(ExtendMsPtr ms,TheoPeakPtrVec ions,
         real_masses.push_back(ms->getPeakPtr(i)->getPosition());
     }
 
+//    for(int i=0;i<ion_masses.size();i++){
+//      std::cout<<std::fixed<<"--------------->"<<ion_masses[i]<<std::endl;
+//    }
+
     unsigned int i=0;
     unsigned int j=0;
     while(i<ms->size()&& j < ions.size()){
