@@ -64,6 +64,7 @@ double PtmSlowMatch::getScr(int shiftnum,int type){
 
 PrSMPtr PtmSlowMatch::geneResult(int shift_num,int type){
     DiagonalHeaderPtrVec headers=result_headers_[type][shift_num];
+//    std::cout<<headers.size()<<std::endl;
     double refine_prec_mass = ms_three_->getHeaderPtr()->getPrecMonoMass()
             +result_deltas_[type][shift_num];
     int first_pos = headers[0]->getTruncFirstResPos();
@@ -77,12 +78,19 @@ PrSMPtr PtmSlowMatch::geneResult(int shift_num,int type){
     if(refined_headers.size()==0){
         return nullptr;
     }
+//    std::cout<<refined_headers.size()<<std::endl;
+//    for(unsigned int i=0;i<refined_headers.size();i++){
+//          std::cout<<refined_headers[i]->getPepNTermShift()<<"|"<<refined_headers[i]->getProtNTermShift()<<std::endl;
+//       }
 
     ChangePtrVec changes = prot::getChanges(
             refined_headers,
             first_pos,
             last_pos,
             PtmFactory::getBasePtmPtrVec());
+    for(int i=0;i<changes.size();i++){
+      std::cout<<changes[i]->getMassShift()<<std::endl;
+    }
     ProteoformPtr protein = ProteoformPtr(
             new Proteoform(
                     seq_->getDbResSeqPtr(),
