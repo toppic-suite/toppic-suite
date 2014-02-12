@@ -260,11 +260,6 @@ ChangePtrVec getChanges(DiagonalHeaderPtrVec headers, int first, int last,
     if (getNAcetylation(headers)) {
       ProtModPtr aptm = headers[0]->getProtNTermAllowMod();
       change_list.push_back(
-//          ChangePtr(
-//              new Change(first, headers[0]->getMatchFirstResPos(),
-//              PROTEIN_VARIABLE_CHANGE,
-//                         headers[0]->getPepNTermShift(),
-//                         aptm == nullptr ? nullptr : aptm->getPtmPtr())));
           ChangePtr(
               new Change(0, headers[0]->getMatchFirstResPos() - first,
               PROTEIN_VARIABLE_CHANGE,
