@@ -95,7 +95,7 @@ PrSMPtr PtmSlowMatch::geneResult(int shift_num,int type){
             new Proteoform(
                     seq_->getDbResSeqPtr(),
                     seq_->getProtModPtr(),
-                    seq_->getResSeqPtr(),
+                    seq_->getResSeqPtr()->getSubResidueSeq(first_pos,last_pos),
                     first_pos,last_pos,changes) );
     return PrSMPtr(
             new PrSM(
