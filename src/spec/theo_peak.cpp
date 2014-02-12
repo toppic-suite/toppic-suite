@@ -70,7 +70,7 @@ TheoPeakPtrVec getProteoformTheoPeak(ProteoformPtr proteoform_ptr,
                                         segments[i]->getPepNTermShift(),
                                         segments[i]->getPepCTermShift(), 
                                         segments[i]->getLeftBpPos(),
-                                        segments[i]->getRightBpPos(), 
+                                        segments[i]->getRightBpPos(),
                                         min_mass);
     all_peaks.insert(all_peaks.end(), peaks.begin(), peaks.end());
   }
