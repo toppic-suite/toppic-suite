@@ -70,7 +70,7 @@ void addTwoMasses(PrmPeakPtrVec& list,DeconvPeakPtr peak,
     list.push_back(reverse_peak);
 }
 
-void addSixMasses(PrmPeakPtrVec list,DeconvPeakPtr peak,
+void addSixMasses(PrmPeakPtrVec& list,DeconvPeakPtr peak,
                   double prec_mono_mass,ActivationPtr active_type,
                   std::vector<double> offsets){
     for(unsigned int i = 0;i<offsets.size();i++){
@@ -80,7 +80,7 @@ void addSixMasses(PrmPeakPtrVec list,DeconvPeakPtr peak,
         ));
     }
     for(unsigned int i = 0;i<offsets.size();i++){
-        double mass = peak->getMonoMass()-active_type->getCShift()+offsets[i];
+        double mass = prec_mono_mass-(peak->getMonoMass()-active_type->getCShift()+offsets[i]);
         list.push_back(PrmPeakPtr(
                 new PrmPeak(peak,PRM_PEAK_TYPE_REVERSED,mass,1)
         ));
@@ -181,6 +181,7 @@ PrmMsPtr getMsSix(DeconvMsPtr deconv_ms,double delta, SpParaPtr sp_para){
     ActivationPtr active_type = header->getActivationPtr();
   double extend_min_mass = sp_para->getExtendSpPara()->extend_min_mass_;
     PrmPeakPtrVec list;
+//    std::cout<<deconv_ms->size()<<std::endl;
     for(unsigned int i=0;i< deconv_ms->size();i++){
         if(deconv_ms->getPeakPtr(i)->getMonoMass() <= extend_min_mass) {
             addTwoMasses(list,deconv_ms->getPeakPtr(i),prec_mono_mass,active_type);
@@ -191,9 +192,11 @@ PrmMsPtr getMsSix(DeconvMsPtr deconv_ms,double delta, SpParaPtr sp_para){
         }
     }
 
+
     //filterPrmPeak
     PrmPeakPtrVec list_filtered;
   filterPeaks(list, list_filtered, prec_mono_mass, sp_para->getMinMass());
+
 
   addZeroPrecPeak(list_filtered, prec_mono_mass);
 
@@ -202,6 +205,10 @@ PrmMsPtr getMsSix(DeconvMsPtr deconv_ms,double delta, SpParaPtr sp_para){
 
     //end settolerance
   double ppo = sp_para->getPeakTolerance()->getPpo();
+//  std::cout<<list_filtered.size()<<std::endl;
+//  for(int i=0;i<list.size();i++){
+//            std::cout<<std::fixed<<list[i]->getPosition()<<std::endl;
+//          }
     return PrmMsPtr(new Ms<PrmPeakPtr>(header,list_filtered, ppo)) ;
 }
 
