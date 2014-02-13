@@ -43,7 +43,7 @@ DiagonalHeaderPtr DiagonalHeader::clone() {
   return cloned;
 }
 
-DiagonalHeaderPtr getDiaganolHeaderPtr(DiagonalHeaderPtr header, int bgn, int end) {
+DiagonalHeaderPtr getDiagonalHeaderPtr(DiagonalHeaderPtr header, int bgn, int end) {
   DiagonalHeaderPtr new_header = header->clone();
   new_header->setMatchFirstResPos(bgn);
   new_header->setMatchLastResPos(end);
