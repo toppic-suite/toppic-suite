@@ -105,12 +105,33 @@ void PtmProcessor::search(SpectrumSetPtr spectrum_set_ptr,
   PtmSlowFilterPtr slow_filter = PtmSlowFilterPtr(
       new PtmSlowFilter(spectrum_set_ptr,matches,comp_shift_,mng_));
   for (int s = 1; s <= mng_->n_unknown_shift_; s++) {
-    PrSMPtrVec complete_prsms = slow_filter->getPrSMs(s, 
-        SemiAlignTypeFactory::getCompletePtr());
+    PrSMPtrVec complete_prsms = slow_filter->getPrSMs(
+        s, SemiAlignTypeFactory::getCompletePtr());
     PrSMPtrVec sele_complete_prsms;
     choosePrsms(complete_prsms, sele_complete_prsms);
     complete_writers_[s-1]->writeVector(sele_complete_prsms);
     all_writer_->writeVector(sele_complete_prsms);
+
+    PrSMPtrVec prefix_prsms = slow_filter->getPrSMs(
+        s, SemiAlignTypeFactory::getPrefixPtr());
+    PrSMPtrVec sele_prefix_prsms;
+    choosePrsms(prefix_prsms, sele_prefix_prsms);
+    complete_writers_[s - 1]->writeVector(sele_prefix_prsms);
+    all_writer_->writeVector(sele_prefix_prsms);
+
+    PrSMPtrVec suffix_prsms = slow_filter->getPrSMs(
+        s, SemiAlignTypeFactory::getSuffixPtr());
+    PrSMPtrVec sele_suffix_prsms;
+    choosePrsms(suffix_prsms, sele_suffix_prsms);
+    complete_writers_[s - 1]->writeVector(sele_suffix_prsms);
+    all_writer_->writeVector(sele_suffix_prsms);
+
+    PrSMPtrVec internal_prsms = slow_filter->getPrSMs(
+        s, SemiAlignTypeFactory::getInternalPtr());
+    PrSMPtrVec sele_internal_prsms;
+    choosePrsms(internal_prsms, sele_internal_prsms);
+    complete_writers_[s - 1]->writeVector(sele_internal_prsms);
+    all_writer_->writeVector(sele_internal_prsms);
 
     /* to do
     PrSMPtrVec prefix_prsms = slow_filter->getBestMatch(s, 

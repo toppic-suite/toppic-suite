@@ -249,9 +249,9 @@ void PSAlign::backtrace() {
     backtrack_diagonals_.push_back(temp);
     backtrack_diagonals_[s] = backtrace(s);
   }
-  //  std::cout << backtrack_diagonals_[0].size() << "|"
-  //            << backtrack_diagonals_[1].size() << "|"
-  //            << backtrack_diagonals_[2].size() << std::endl;
+//    std::cout << backtrack_diagonals_[0].size() << "|"
+//              << backtrack_diagonals_[1].size() << "|"
+//              << backtrack_diagonals_[2].size() << std::endl;
 }
 
 DiagonalHeaderPtrVec PSAlign::backtrace(int s) {

@@ -9,7 +9,9 @@
 #define PROT_PTM_PROCESSOR_HPP_
 
 #include "base/proteoform.hpp"
+#include "spec/spectrum_set.hpp"
 #include "prsm/simple_prsm.hpp"
+#include "prsm/prsm_writer.hpp"
 #include "ptmsearch/comp_shift_low_mem.hpp"
 #include "ptmsearch/ptm_mng.hpp"
 //#include "ptmsearch/ptm_searcher.hpp"

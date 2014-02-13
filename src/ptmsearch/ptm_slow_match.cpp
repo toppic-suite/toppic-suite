@@ -42,7 +42,7 @@ void PtmSlowMatch::compute(SemiAlignTypePtr type, PrSMPtrVec &prsms) {
   ps_align_->compute(type);
   scores_ = ps_align_->getAlignScr();
   headers_ = ps_align_->getResult();
-  for (int s = 0; s <= mng_->n_unknown_shift_; s++) {
+  for (int s = 1; s <= mng_->n_unknown_shift_; s++) {
     PrSMPtr prsm_ptr = geneResult(s);
     prsms.push_back(prsm_ptr);
   }
@@ -51,6 +51,7 @@ void PtmSlowMatch::compute(SemiAlignTypePtr type, PrSMPtrVec &prsms) {
 
 PrSMPtr PtmSlowMatch::geneResult(int shift_num){
   DiagonalHeaderPtrVec headers=headers_[shift_num];
+//  std::cout<<shift_num<<":"<<(headers[0].get())<<std::endl;
   //double refine_prec_mass = ms_three_->getHeaderPtr()->getPrecMonoMass()
   //    +result_deltas_[shift_num];
   //    result_deltas are not used any more 

@@ -30,6 +30,7 @@ PtmSlowFilter::PtmSlowFilter(
   for(unsigned int i=0; i<complete_prefix_slow_matches_.size();i++){
     ProtModPtr prot_mod = complete_prefix_slow_matches_[i]->getSeq()->getProtModPtr();
     if (prot_mod == ProtModFactory::getProtModPtr_NONE()) {
+//      std::cout<<i<<std::endl;
       suffix_internal_slow_matches_.push_back(complete_prefix_slow_matches_[i]);
     }
   }
@@ -37,9 +38,11 @@ PtmSlowFilter::PtmSlowFilter(
   // compute complete and prefix prsms 
   for(unsigned int i=0; i<complete_prefix_slow_matches_.size();i++){
     PrSMPtrVec comps;
+    std::cout<<"complete:"<<i<<std::endl;
     complete_prefix_slow_matches_[i]->compute(SemiAlignTypeFactory::getCompletePtr(), comps);
     complete_prsms_.push_back(comps);
     PrSMPtrVec prefixs;
+    std::cout<<"prefix:"<<i<<std::endl;
     complete_prefix_slow_matches_[i]->compute(SemiAlignTypeFactory::getPrefixPtr(), prefixs);
     prefix_prsms_.push_back(prefixs);
   }
