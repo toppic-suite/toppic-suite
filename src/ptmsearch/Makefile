@@ -15,19 +15,21 @@ LFLAGS = -L/lib -L/opt/local/lib
 LIBS = -lxerces-c 
 #
 # define the C++ source files
-SRCS = basic_diag_pair.cpp diagonal.cpp dp_pair.cpp ptm_main.cpp ptm_processor.cpp ptm_slow_filter.cpp comp_shift_low_mem.cpp diagonal_header.cpp ps_align.cpp ptm_mng.cpp ptm_searcher.cpp ptm_slow_match.cpp
+SRCS = main.cpp basic_diag_pair.cpp diagonal.cpp dp_pair.cpp ptm_main.cpp ptm_processor.cpp ptm_slow_filter.cpp comp_shift_low_mem.cpp diagonal_header.cpp ps_align.cpp ptm_mng.cpp ptm_searcher.cpp ptm_slow_match.cpp
 #
 # define the C object files 
 #
 
 OBJ_DIR = ../../obj
-OBJS = $(addprefix $(OBJ_DIR)/, basic_diag_pair.o diagonal.o dp_pair.o ptm_main.o ptm_processor.o ptm_slow_filter.o comp_shift_low_mem.o diagonal_header.o ps_align.o ptm_mng.o ptm_searcher.o ptm_slow_match.o)
+#OBJS = $(addprefix $(OBJ_DIR)/, basic_diag_pair.o diagonal.o dp_pair.o ptm_main.o ptm_processor.o ptm_slow_filter.o comp_shift_low_mem.o diagonal_header.o ps_align.o ptm_mng.o ptm_searcher.o ptm_slow_match.o)
+
+OBJS = $(addprefix $(OBJ_DIR)/, ptm_processor.o ptm_slow_filter.o ptm_slow_match.o ps_align.o basic_diag_pair.o dp_pair.o diagonal.o diagonal_header.o ptm_mng.o comp_shift_low_mem.o )
 
 BIN_DIR = ../../bin
 
 #
 # define the executable file 
-MAIN = $(BIN_DIR)/fast_filter
+MAIN = $(BIN_DIR)/ptm_search
 #
 #
 # The following part of the makefile is generic; it can be used to 

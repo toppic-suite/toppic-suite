@@ -8,25 +8,37 @@
 #ifndef PROT_PTM_PROCESSOR_HPP_
 #define PROT_PTM_PROCESSOR_HPP_
 
-#include "ptmsearch/ptm_mng.hpp"
-#include "ptmsearch/ptm_searcher.hpp"
 #include "base/proteoform.hpp"
 #include "prsm/simple_prsm.hpp"
+#include "ptmsearch/comp_shift_low_mem.hpp"
+#include "ptmsearch/ptm_mng.hpp"
+//#include "ptmsearch/ptm_searcher.hpp"
 
 namespace prot {
 
 class PtmProcessor {
-public:
-    PtmProcessor(PtmMngPtr mng);
-    void process();
-    void processDatabase(PtmSearcherPtr searcher);
+ public:
+  PtmProcessor(PtmMngPtr mng);
+  void process();
 
-    PtmMngPtr mng_;
-    ProteoformPtrVec seqs_;
-    SimplePrSMPtrVec simplePrsms_;
-private:
-    void init();
-    void prsmFindSeq(SimplePrSMPtrVec simple_prsms,ProteoformPtrVec seqs);
+  PtmMngPtr mng_;
+  ProteoformPtrVec seqs_;
+  SimplePrSMPtrVec simplePrsms_;
+  CompShiftLowMemPtr comp_shift_;
+  std::vector<PrSMWriterPtr> complete_writers_;
+  std::vector<PrSMWriterPtr> prefix_writers_;
+  std::vector<PrSMWriterPtr> suffix_writers_;
+  std::vector<PrSMWriterPtr> internal_writers_;
+  PrSMWriterPtr all_writer_;
+
+ private:
+  void init();
+  void prsmFindSeq(SimplePrSMPtrVec simple_prsms,ProteoformPtrVec seqs);
+  void choosePrsms(PrSMPtrVec &all_prsms,
+                   PrSMPtrVec &prsms);
+
+  void search(SpectrumSetPtr spectrum_set_ptr, 
+              SimplePrSMPtrVec matches);
 
 };
 

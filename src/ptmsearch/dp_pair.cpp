@@ -6,7 +6,6 @@
  */
 
 #include "ptmsearch/dp_pair.hpp"
-#include "float.h"
 
 namespace prot {
 DPPair::DPPair(int x,int y,double pair_score,double diff,
@@ -17,7 +16,7 @@ DPPair::DPPair(int x,int y,double pair_score,double diff,
     header_ = header;
     for(int i=0;i<n_shift+1;i++){
         prevs_.push_back(nullptr);
-        scores_.push_back(-DBL_MAX);
+        scores_.push_back(-std::numeric_limits<double>::max());
         types_.push_back(PATH_TYPE_NULL);
     }
 }

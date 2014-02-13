@@ -11,9 +11,10 @@
 #include "limits.h"
 
 namespace prot {
+
 TheoPeakPtrVec getDiagonalTheoPeak(ProteoformPtr seq,ActivationPtr type,
-                           DiagonalHeaderPtrVec headers,int i,
-                           double minMass){
+                                   DiagonalHeaderPtrVec headers,int i,
+                                   double minMass){
   DiagonalHeaderPtr first_header = headers[0];
   DiagonalHeaderPtr last_header = headers[headers.size()-1];
   int first_res_pos = first_header->getTruncFirstResPos();
@@ -26,65 +27,64 @@ TheoPeakPtrVec getDiagonalTheoPeak(ProteoformPtr seq,ActivationPtr type,
   double pep_c_term_shift = headers[i]->getProtCTermShift()
       -last_header->getProtCTermShift()
       +last_header->getPepCTermShift();
-//  std::cout<<std::fixed<<pep->getResSeqMass()<<"|"<<pep_n_term_shift<<"|"<<pep_c_term_shift<<std::endl;
-  return prot::getTheoPeak(pep,type,NeutralLossFactory::getNeutralLossPtr_NONE(),
-                           pep_n_term_shift,pep_c_term_shift,
-                           headers[i]->getMatchFirstResPos()-first_res_pos,
-                           headers[i]->getMatchLastResPos()-first_res_pos+1,
-                           minMass);
+  //  std::cout<<std::fixed<<pep->getResSeqMass()<<"|"<<pep_n_term_shift<<"|"<<pep_c_term_shift<<std::endl;
+  return getTheoPeak(pep,type,NeutralLossFactory::getNeutralLossPtr_NONE(),
+                     pep_n_term_shift,pep_c_term_shift,
+                     headers[i]->getMatchFirstResPos()-first_res_pos,
+                     headers[i]->getMatchLastResPos()-first_res_pos+1,
+                     minMass);
 }
+
 DiagonalHeaderPtrVec refineHeadersBgnEnd(
-        int first_pos,
-        ProteoformPtr seq,
-        DeconvMsPtr deconv_ms,
-        ExtendMsPtr ms_three,
-        PtmMngPtr mng,
-        DiagonalHeaderPtrVec headers){
-    DiagonalHeaderPtrVec result_list;
-//    std::cout<<headers.size()<<std::endl;
-    for(unsigned int i=0;i<headers.size();i++){
-        TheoPeakPtrVec ions = prot::getDiagonalTheoPeak(
-                seq,
-                deconv_ms->getHeaderPtr()->getActivationPtr(),
-                headers,
-                i,
-                mng->sp_para_->getMinMass());
-        int bgn = headers[i]->getMatchFirstResPos()-first_pos;
-        int end = headers[i]->getMatchLastResPos()+1-first_pos;
-        PeakIonPairPtrVec pairs = prot::findPairs(ms_three,ions,bgn,end);
-        if(pairs.size()<1){
-            int pair_size = pairs.size();
-            LOG_WARN("Empty Segment is found "+prot::convertToString(pair_size));
-        }
-        else{
-            int new_bgn = first_pos + getNewBgn(pairs);
-            int new_end = first_pos + getNewEnd(pairs);
-            headers[i]->setMatchFirstResPos(new_bgn);
-            headers[i]->setMatchLastResPos(new_end);
-            result_list.push_back(headers[i]);
-        }
+    int first_pos,
+    ProteoformPtr seq,
+    DeconvMsPtr deconv_ms,
+    ExtendMsPtr ms_three,
+    PtmMngPtr mng,
+    DiagonalHeaderPtrVec headers){
+  DiagonalHeaderPtrVec result_list;
+  //    std::cout<<headers.size()<<std::endl;
+  for(unsigned int i=0;i<headers.size();i++){
+    TheoPeakPtrVec ions = prot::getDiagonalTheoPeak(
+        seq,
+        deconv_ms->getHeaderPtr()->getActivationPtr(),
+        headers,
+        i,
+        mng->sp_para_->getMinMass());
+    int bgn = headers[i]->getMatchFirstResPos()-first_pos;
+    int end = headers[i]->getMatchLastResPos()+1-first_pos;
+    PeakIonPairPtrVec pairs = findPairs(ms_three,ions,bgn,end);
+    if(pairs.size()<1){
+      int pair_size = pairs.size();
+      LOG_WARN("Empty Segment is found "+prot::convertToString(pair_size));
     }
-    return result_list;
+    else{
+      int new_bgn = first_pos + getNewBgn(pairs);
+      int new_end = first_pos + getNewEnd(pairs);
+      headers[i]->setMatchFirstResPos(new_bgn);
+      headers[i]->setMatchLastResPos(new_end);
+      result_list.push_back(headers[i]);
+    }
+  }
+  return result_list;
 }
 
 int getNewBgn(PeakIonPairPtrVec pairs){
-    int newBgn = INT_MAX;
-    for(unsigned int i=0;i<pairs.size();i++)
-    {
-        if(pairs[i]->getTheoPeakPtr()->getIonPtr()->getPos() < newBgn){
-            newBgn = pairs[i]->getTheoPeakPtr()->getIonPtr()->getPos();
-        }
+  int new_bgn = std::numeric_limits<int>::max();
+  for(unsigned int i=0;i<pairs.size();i++) {
+    if(pairs[i]->getTheoPeakPtr()->getIonPtr()->getPos() < new_bgn){
+      new_bgn = pairs[i]->getTheoPeakPtr()->getIonPtr()->getPos();
     }
-    return newBgn;
+  }
+  return new_bgn;
 }
 int getNewEnd(PeakIonPairPtrVec pairs){
-    int newEnd = 0;
-    for(unsigned int i=0;i<pairs.size();i++)
-    {
-        if(pairs[i]->getTheoPeakPtr()->getIonPtr()->getPos() > newEnd){
-            newEnd = pairs[i]->getTheoPeakPtr()->getIonPtr()->getPos();
-        }
+  int new_end = 0;
+  for(unsigned int i=0;i<pairs.size();i++) {
+    if(pairs[i]->getTheoPeakPtr()->getIonPtr()->getPos() > new_end){
+      new_end = pairs[i]->getTheoPeakPtr()->getIonPtr()->getPos();
     }
-    return newEnd;
+  }
+  return new_end;
 }
 } /* namespace prot */

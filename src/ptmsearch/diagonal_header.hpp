@@ -11,227 +11,151 @@
 #include "base/trunc.hpp"
 #include "base/prot_mod.hpp"
 #include "base/ptm.hpp"
-#include "ptmsearch/ptm_mng.hpp"
+#include "base/change.hpp"
 #include "base/proteoform.hpp"
 #include "spec/prm_peak.hpp"
-#include "base/change.hpp"
+#include "ptmsearch/ptm_mng.hpp"
 
 namespace prot {
+
 class DiagonalHeader;
+
 typedef std::shared_ptr<DiagonalHeader> DiagonalHeaderPtr;
 typedef std::vector<DiagonalHeaderPtr> DiagonalHeaderPtrVec;
 typedef std::vector<DiagonalHeaderPtrVec> DiagonalHeaderPtrVec2D;
 typedef std::vector<DiagonalHeaderPtrVec2D> DiagonalHeaderPtrVec3D;
 
 class DiagonalHeader {
-public:
-    DiagonalHeader(double n_term_shift,bool n_strict,bool c_strict,bool n_trunc,bool c_trunc);
-    DiagonalHeaderPtr clone();
-    void changeNTermShift(double s){
-        prot_N_term_shift_ -= s;
-        pep_N_term_shift_ -= s;
-        prot_C_term_shift_ +=s;
-        pep_C_term_shift_+=s;
-    }
+ public:
+  DiagonalHeader(double n_term_shift,bool n_strict,bool c_strict,bool n_trunc,bool c_trunc);
 
-    int getTruncFirstResPos(){return trunc_first_res_pos_;}
+  DiagonalHeaderPtr clone();
 
-    int getMatchFirstResPos() const {
-        return match_first_res_pos_;
-    }
+  void changeNTermShift(double s){
+    prot_N_term_shift_ -= s;
+    pep_N_term_shift_ -= s;
+    prot_C_term_shift_ +=s;
+    pep_C_term_shift_+=s;
+  }
 
-    int getMatchLastResPos() const {
-        return match_last_res_pos_;
-    }
+  int getTruncFirstResPos() {return trunc_first_res_pos_;}
 
-    double getPepCTermShift() const {
-        return pep_C_term_shift_;
-    }
+  int getMatchFirstResPos() {return match_first_res_pos_;}
 
-    const PtmPtr& getPepNTermAllowMod() const {
-        return pep_N_term_allow_mod_;
-    }
+  int getMatchLastResPos() {return match_last_res_pos_;}
 
-    void setPepNTermAllowMod(const PtmPtr& pepNTermAllowMod) {
-        pep_N_term_allow_mod_ = pepNTermAllowMod;
-    }
+  double getPepCTermShift() {return pep_C_term_shift_;}
 
-    double getPepNTermShift() const {
-        return pep_N_term_shift_;
-    }
+  double getPepNTermShift() { return pep_N_term_shift_;}
 
-    double getProtCTermShift() const {
-        return prot_C_term_shift_;
-    }
+  double getProtCTermShift() {return prot_C_term_shift_;}
 
-    double getProtNTermShift() const {
-        return prot_N_term_shift_;
-    }
+  double getProtNTermShift() {return prot_N_term_shift_;}
 
-    int getTruncLastResPos() const {
-        return trunc_last_res_pos_;
-    }
+  int getTruncLastResPos() {return trunc_last_res_pos_;}
 
-    const PtmPtr& getPepCTermAllowMod() const {
-        return pep_C_term_allow_mod_;
-    }
+  bool isNTrunc(){ return n_trunc_; }
 
-    const ProtModPtr& getProtCTermAllowMod() const {
-        return prot_C_term_allow_mod_;
-    }
+  bool isCTrunc(){ return c_trunc_; }
 
-    const ProtModPtr& getProtNTermAllowMod() const {
-        return prot_N_term_allow_mod_;
-    }
+  void setPepCTermShift(double pepCTermShift) {
+    pep_C_term_shift_ = pepCTermShift;
+  }
 
-    bool isAllowPepNMod(){
-        return pep_N_term_allow_mod_ != nullptr;
-    }
+  void setPepNTermShift(double pepNTermShift) {
+    pep_N_term_shift_ = pepNTermShift;
+  }
 
-    bool isAllowPepCMod(){
-        return pep_C_term_allow_mod_ != nullptr;
-    }
+  void setProtCTermShift(double protCTermShift) {
+    prot_C_term_shift_ = protCTermShift;
+  }
 
-    bool isAllowProtNMod(){
-        return prot_N_term_allow_mod_ !=nullptr;
-    }
+  void setProtNTermShift(double protNTermShift) {
+    prot_N_term_shift_ = protNTermShift;
+  }
 
-    bool isAllowProtCMod(){
-        return prot_C_term_allow_mod_ !=nullptr;
-    }
+  void setTruncFirstResPos(int truncFirstResPos) {
+    trunc_first_res_pos_ = truncFirstResPos;
+  }
 
-    const TruncPtr& getProtCTermAllowTrunc() const {
-        return prot_C_term_allow_trunc_;
-    }
+  void setTruncLastResPos(int truncLastResPos) {
+    trunc_last_res_pos_ = truncLastResPos;
+  }
 
-    const TruncPtr& getProtNTermAllowTrunc() const {
-        return prot_N_term_allow_trunc_;
-    }
+  void setMatchFirstResPos(int matchFirstResPos) {
+    match_first_res_pos_ = matchFirstResPos;
+  }
 
-    bool isNTrunc(){
-        return n_trunc_;
-    }
+  void setMatchLastResPos(int matchLastResPos) {
+    match_last_res_pos_ = matchLastResPos;
+  }
 
-    bool isCTrunc(){
-        return c_trunc_;
-    }
+  void setNTrunc(bool n_trunc){n_trunc_ = n_trunc;}
+  void setCTrunc(bool c_trunc){c_trunc_ = c_trunc;}
+  bool isNStrict(){return n_strict_;}
+  bool isCStrict(){return c_strict_;}
 
-    void setPepCTermShift(double pepCTermShift) {
-        pep_C_term_shift_ = pepCTermShift;
-    }
+  void setAlignPrefix(bool is_prefix){is_align_prefix_ = is_prefix;}
+  void setAlignSuffix(bool is_suffix){is_align_suffix_ = is_suffix;}
+  bool isAlignPrefix(){return is_align_prefix_;}
+  bool isAlignSuffix(){return is_align_suffix_;}
 
-    void setPepNTermShift(double pepNTermShift) {
-        pep_N_term_shift_ = pepNTermShift;
-    }
+  int getId() { return id_; }
+  void setId(int id) { id_ = id; }
+  void setProtNTermMatch(bool match) {prot_N_term_match_ = match;}
+  void setProtCTermMatch(bool match) {prot_C_term_match_ = match;}
+  void setPepNTermMatch(bool match) {pep_N_term_match_ = match;}
+  void setPepCTermMatch(bool match) {pep_C_term_match_ = match;}
 
-    void setProtCTermShift(double protCTermShift) {
-        prot_C_term_shift_ = protCTermShift;
-    }
+  bool isProtNTermMatch() {return prot_N_term_match_;}
+  bool isProtCTermMatch() {return prot_C_term_match_;}
+  bool isPepNTermMatch() {return pep_N_term_match_;}
+  bool isPepCTermMatch() {return pep_C_term_match_;}
 
-    void setProtNTermShift(double protNTermShift) {
-        prot_N_term_shift_ = protNTermShift;
-    }
+  void setProtTermMatch(double error_tolerance);
+  void setPepTermMatch(double error_tolearance);
+  void setAlignPrefixSuffix(double error_tolerance);
 
-    void setTruncFirstResPos(int truncFirstResPos) {
-        trunc_first_res_pos_ = truncFirstResPos;
-    }
+ private:
+  int id_=0;
+  // if it is generated by n_trunc shift 
+  bool n_trunc_ = false;
+  bool n_strict_ = false;
+  int trunc_first_res_pos_=0;
+  int match_first_res_pos_=0;
+  double prot_N_term_shift_=0;
+  bool prot_N_term_match_ = false;
+  double pep_N_term_shift_=0.0;
+  bool pep_N_term_match_ = false;
 
-    void setTruncLastResPos(int truncLastResPos) {
-        trunc_last_res_pos_ = truncLastResPos;
-    }
+  // if protNTermShift is not large 
+  bool is_align_prefix_ = false;
 
-    void setMatchFirstResPos(int matchFirstResPos) {
-        match_first_res_pos_ = matchFirstResPos;
-    }
+  bool c_trunc_ = false;
+  bool c_strict_ = false;
+  int trunc_last_res_pos_=0;
+  int match_last_res_pos_=0;
+  double prot_C_term_shift_=0.0;
+  bool prot_C_term_match_ = false;
+  double pep_C_term_shift_=0.0;
+  bool pep_C_term_match_ = false;
 
-    void setMatchLastResPos(int matchLastResPos) {
-        match_last_res_pos_ = matchLastResPos;
-    }
-
-    void setPepCTermAllowMod(const PtmPtr& pepCTermAllowMod) {
-        pep_C_term_allow_mod_ = pepCTermAllowMod;
-    }
-
-    void setProtCTermAllowMod(const ProtModPtr& protCTermAllowMod) {
-        prot_C_term_allow_mod_ = protCTermAllowMod;
-    }
-
-    void setProtCTermAllowTrunc(const TruncPtr& protCTermAllowTrunc) {
-        prot_C_term_allow_trunc_ = protCTermAllowTrunc;
-    }
-
-    void setProtNTermAllowMod(const ProtModPtr& protNTermAllowMod) {
-        prot_N_term_allow_mod_ = protNTermAllowMod;
-    }
-
-    void setProtNTermAllowTrunc(const TruncPtr& protNTermAllowTrunc) {
-        prot_N_term_allow_trunc_ = protNTermAllowTrunc;
-    }
-
-    void setNTrunc(bool n_trunc){n_trunc_ = n_trunc;}
-    void setCTrunc(bool c_trunc){c_trunc_ = c_trunc;}
-    bool isNStrict(){return n_strict_;}
-    bool isCStrict(){return c_strict_;}
-    void setAlignPrefix(bool is_prefix){is_align_prefix_ = is_prefix;}
-    void setAlignsuffix(bool is_suffix){is_align_suffix_ = is_suffix;}
-    bool isAlignPrefix(){return is_align_prefix_;}
-    bool isAlignSuffix(){return is_align_suffix_;}
-
-    int getId() const {
-        return id_;
-    }
-
-    void setId(int id) {
-        id_ = id;
-    }
-
-private:
-    int id_=0;
-    bool n_trunc_ = false;
-    bool n_strict_ = false;
-    int trunc_first_res_pos_=0;
-    int match_first_res_pos_=0;
-    double prot_N_term_shift_=0;
-    double pep_N_term_shift_=0.0;
-
-    TruncPtr prot_N_term_allow_trunc_;
-    ProtModPtr prot_N_term_allow_mod_;
-    PtmPtr pep_N_term_allow_mod_;
-
-    bool is_align_prefix_ = false;
-    bool c_trunc_ = false;
-    bool c_strict_ = false;
-    int trunc_last_res_pos_=0;
-    int match_last_res_pos_=0;
-    double prot_C_term_shift_=0.0;
-    double pep_C_term_shift_=0.0;
-
-    TruncPtr prot_C_term_allow_trunc_;
-    ProtModPtr prot_C_term_allow_mod_;
-    PtmPtr pep_C_term_allow_mod_;
-
-    bool is_align_suffix_=false;
+  // if protCTermShift is not large 
+  bool is_align_suffix_=false;
 };
-DiagonalHeaderPtr getShift(DiagonalHeaderPtr shift,int bgn,int end);
+
+DiagonalHeaderPtr getDiagonalHeaderPtr(DiagonalHeaderPtr shift,int bgn,int end);
 DiagonalHeaderPtrVec getNTermShiftListCommon(std::vector<double> best_shifts);
 DiagonalHeaderPtrVec getNTermShiftListCompLeft(ProteoformPtr seq,PtmMngPtr mng);
 DiagonalHeaderPtrVec getNTermShiftListCompRight(ProteoformPtr seq,PrmMsPtr ms_six);
 void setPrefixSuffix(DiagonalHeaderPtr &header,double c_shift,ProteoformPtr seq,PtmMngPtr mng);
-void setProtTermMod(DiagonalHeaderPtr &header,ProteoformPtr seq,PtmMngPtr mng);
-void setProtTermTrunc(DiagonalHeaderPtr &header,ProteoformPtr seq,PtmMngPtr mng);
-void setPepTermMode(DiagonalHeaderPtr &header,PtmMngPtr mng);
-ProtModPtr findProtTermMod(ProtModPtrVec mods,
-        int trunc_len,
-        ResSeqPtr res_seq,
-        double pep_term_shift,
-        double tolerance);
-PtmPtr findPepTermMod(PtmPtrVec mods,double shift,double tolerance);
 void setAlignPrefSuffic(DiagonalHeaderPtr &header,PtmMngPtr mng);
 DiagonalHeaderPtrVec getNTermShiftListTruncPrefix(ProteoformPtr seq);
 DiagonalHeaderPtrVec getNTermShiftListTruncsuffix(PrmMsPtr ms,ProteoformPtr seq);
 DiagonalHeaderPtrVec get1dHeaders(DiagonalHeaderPtrVec2D headers);
-ChangePtrVec getChanges(DiagonalHeaderPtrVec headers,int first,int last,PtmPtrVec ptm_list);
-bool getNAcetylation(DiagonalHeaderPtrVec headers);
+ChangePtrVec getUnexpectedChanges(DiagonalHeaderPtrVec headers,int first,int last);
+
+
 } /* namespace prot */
 
 #endif /* DIAGONAL_HEADER_HPP_ */
