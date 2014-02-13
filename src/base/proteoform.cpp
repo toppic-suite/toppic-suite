@@ -354,6 +354,11 @@ ResFreqPtrVec compResidueFreq(ResiduePtrVec &residue_list,
   return res_freq_list;
 }
 
+void Proteoform::addUnexpectedChangePtrVec(ChangePtrVec &changes) {
+  for (unsigned int i = 0; i < changes.size(); i++) {
+    change_list_.push_back(changes[i]);
+  }
+}
 
 } /* namespace prot */
 

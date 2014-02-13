@@ -45,6 +45,8 @@ class Proteoform {
 
   ChangePtrVec getChangePtrVec() {return change_list_;}
 
+  void addUnexpectedChangePtrVec(ChangePtrVec &changes);
+
   SegmentPtrVec getSegmentPtrVec();
 
   std::string toString();

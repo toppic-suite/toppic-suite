@@ -116,6 +116,15 @@ std::vector<int> BpSpec::getScaledMass(double scale,IonTypePtr ion_type){
     return result;
 }
 
+std::vector<int> BpSpec::getScaledPrmMasses(double scale){
+  std::vector<int> result;
+  for(unsigned int i=0; i < break_point_ptr_vec_.size();i++){
+    double value = break_point_ptr_vec_[i]->getPrm()*scale;
+    result.push_back(std::floor(value+0.5));
+  }
+  return result;
+}
+
 void BpSpec::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
     xercesc::DOMElement* element = xml_doc->createElement("bp_spec");
     std::string str = convertToString(seq_mass_);
