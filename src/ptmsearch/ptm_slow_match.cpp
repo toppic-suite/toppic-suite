@@ -51,7 +51,10 @@ void PtmSlowMatch::compute(SemiAlignTypePtr type, PrSMPtrVec &prsms) {
 
 PrSMPtr PtmSlowMatch::geneResult(int shift_num){
   DiagonalHeaderPtrVec headers=headers_[shift_num];
-//  std::cout<<shift_num<<":"<<(headers[0].get())<<std::endl;
+  if(headers.size()==0)
+  {
+    return nullptr;
+  }
   //double refine_prec_mass = ms_three_->getHeaderPtr()->getPrecMonoMass()
   //    +result_deltas_[shift_num];
   //    result_deltas are not used any more 
@@ -67,6 +70,7 @@ PrSMPtr PtmSlowMatch::geneResult(int shift_num){
 
   ProteoformPtr proteoform  = getSubProteoform(seq_, first_pos, last_pos);
 
+//  std::cout<<refined_headers.size()<<std::endl;
   ChangePtrVec changes = getUnexpectedChanges(
       refined_headers, first_pos, last_pos);
   proteoform->addUnexpectedChangePtrVec(changes);

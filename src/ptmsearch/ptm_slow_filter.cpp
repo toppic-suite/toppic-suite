@@ -60,26 +60,34 @@ PtmSlowFilter::PtmSlowFilter(
 
 PrSMPtrVec PtmSlowFilter::getPrSMs(int nshift, SemiAlignTypePtr type){
     PrSMPtrVec matches;
-    if (type == SemiAlignTypeFactory::getCompletePtr()) {
-      for(unsigned int i=0;i< complete_prsms_.size();i++){
+  if (type == SemiAlignTypeFactory::getCompletePtr()) {
+    for (unsigned int i = 0; i < complete_prsms_.size(); i++) {
+      if (complete_prsms_[i][nshift] != nullptr) {
         matches.push_back(complete_prsms_[i][nshift]);
       }
     }
-    else if (type == SemiAlignTypeFactory::getPrefixPtr()) {
-      for(unsigned int i=0;i< prefix_prsms_.size();i++){
+  }
+  else if (type == SemiAlignTypeFactory::getPrefixPtr()) {
+    for (unsigned int i = 0; i < prefix_prsms_.size(); i++) {
+      if (prefix_prsms_[i][nshift] != nullptr) {
         matches.push_back(prefix_prsms_[i][nshift]);
       }
     }
-    else if (type == SemiAlignTypeFactory::getSuffixPtr()) {
-      for(unsigned int i=0;i< suffix_prsms_.size();i++){
+  }
+  else if (type == SemiAlignTypeFactory::getSuffixPtr()) {
+    for (unsigned int i = 0; i < suffix_prsms_.size(); i++) {
+      if (suffix_prsms_[i][nshift] != nullptr) {
         matches.push_back(suffix_prsms_[i][nshift]);
       }
     }
-    else if (type == SemiAlignTypeFactory::getInternalPtr()) {
-      for(unsigned int i=0;i< internal_prsms_.size();i++){
+  }
+  else if (type == SemiAlignTypeFactory::getInternalPtr()) {
+    for (unsigned int i = 0; i < internal_prsms_.size(); i++) {
+      if (internal_prsms_[i][nshift] != nullptr) {
         matches.push_back(internal_prsms_[i][nshift]);
       }
     }
+  }
     return matches;
 }
 
