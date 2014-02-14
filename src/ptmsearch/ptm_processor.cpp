@@ -134,30 +134,11 @@ void PtmProcessor::search(SpectrumSetPtr spectrum_set_ptr,
     all_writer_->writeVector(sele_internal_prsms);
 
 
-    PrSMWriterPtr all_writer_plus= PrSMWriterPtr(new PrSMWriter("in/sp_bak.msalign_ALL_RESULT"));
-    all_writer_plus->writeVector(complete_prsms);
-    all_writer_plus->writeVector(prefix_prsms);
-    all_writer_plus->writeVector(suffix_prsms);
-    all_writer_plus->writeVector(internal_prsms);
-    /* to do
-    PrSMPtrVec prefix_prsms = slow_filter->getBestMatch(s, 
-        SemiAlignTypeFactory::getPrefixPtr());
-    choosePrsms(prefix_slow_matches, prefix_prsms, s, 1);
-    prefix_writes[s-1]->writeVector(prefix_prsms);
-    all_writers->writeVector(prefix_prsms);
-
-    PrSMPtrVec suffix_prsms;
-    PtmSlowMatchPtrVec suffix_slow_matches = slow_filter->getBestMatch(s, 2);
-    choosePrsms(suffix_slow_matches, suffix_prsms, s, 2);
-    suffix_writes[s-1]->writeVector(suffix_prsms);
-    all_writers->writeVector(suffix_prsms);
-
-    PrSMPtrVec internal_prsms;
-    PtmSlowMatchPtrVec internal_slow_matches = slow_filter->getBestMatch(s, 3);
-    choosePrsms(internal_slow_matches, internal_prsms, s, 3);
-    internal_writes[s-1]->writeVector(internal_prsms);
-    all_writers->writeVector(internal_prsms);
-    */
+//    PrSMWriterPtr all_writer_plus= PrSMWriterPtr(new PrSMWriter("in/sp_bak.msalign_ALL_RESULT"));
+//    all_writer_plus->writeVector(complete_prsms);
+//    all_writer_plus->writeVector(prefix_prsms);
+//    all_writer_plus->writeVector(suffix_prsms);
+//    all_writer_plus->writeVector(internal_prsms);
   }
 }
 
