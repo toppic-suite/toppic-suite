@@ -107,6 +107,11 @@ typedef std::vector<PrSMPtr> PrSMPtrVec;
 typedef std::vector<PrSMPtrVec> PrSMPtrVec2D;
 typedef std::vector<PrSMPtrVec2D> PrSMPtrVec3D;
 
+inline bool prsmFroteoformIdUp(PrSMPtr p1, PrSMPtr p2) {
+  return p1->getProteoformPtr()->getDbResSeqPtr()->getId()
+      < p2->getProteoformPtr()->getDbResSeqPtr()->getId();
+}
+
 inline bool prsmMatchFragmentDown(PrSMPtr p1, PrSMPtr p2) {
   return p1->getMatchFragNum() > p2->getMatchFragNum();
 }
