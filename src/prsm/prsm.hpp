@@ -120,6 +120,10 @@ inline bool prsmEValueUp(PrSMPtr p1, PrSMPtr p2) {
   return p1->getEValue() < p2->getEValue();
 }
 
+inline bool prsmEValueDown(PrSMPtr p1, PrSMPtr p2) {
+  return p1->getEValue() > p2->getEValue();
+}
+
 inline bool prsm_comp(PrSMPtr p1, PrSMPtr p2){
     if(p1->getSpectrumId() < p2->getSpectrumId()){
         return false;
@@ -129,6 +133,21 @@ inline bool prsm_comp(PrSMPtr p1, PrSMPtr p2){
     }
     else{
         if(p1->getPrecurorId()>p2->getPrecurorId()){
+            return true;
+        }
+        return false;
+    }
+}
+
+inline bool prsm_spectrum(PrSMPtr p1, PrSMPtr p2){
+    if(p1->getSpectrumId() < p2->getSpectrumId()){
+        return true;
+    }
+    else if(p1->getSpectrumId() > p2->getSpectrumId()){
+        return false;
+    }
+    else{
+        if(p1->getMatchFragNum()>p2->getMatchFragNum()){
             return true;
         }
         return false;
