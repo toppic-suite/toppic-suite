@@ -8,6 +8,7 @@
 #ifndef PROT_PTM_MNG_HPP_
 #define PROT_PTM_MNG_HPP_
 
+#include <map>
 #include "spec/peak_tolerance.hpp"
 #include "base/mass_constant.hpp"
 #include "base/trunc.hpp"
@@ -20,6 +21,14 @@ namespace prot {
 class PtmMng {
  public :
   PtmMng(std::string config_file_name);
+  PtmMng(std::string config_file_name,
+         std::map<std::string, std::string> conf){
+    base_data_ = BaseDataPtr(new BaseData(config_file_name));
+    spectrum_file_name_ = conf["spectrumFileName"];
+    search_db_file_name_ = conf["databaseFileName"];
+
+  }
+
   BaseDataPtr base_data_ ;
 
   double ppo_ = 0.000015;
