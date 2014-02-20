@@ -18,6 +18,7 @@ Proteoform::Proteoform(DbResSeqPtr db_res_seq_ptr, ProtModPtr prot_mod_ptr,
   bp_spec_ptr_ = BpSpecPtr(new BpSpec(res_seq_ptr));
   change_list_ = change_list;
   std::sort(change_list.begin(), change_list.end(), compareChangeUp);
+  species_id_=0;
 }
 
 Proteoform::Proteoform(xercesc::DOMElement* element,ProteoformPtrVec proteoforms){
@@ -67,17 +68,18 @@ Proteoform::Proteoform(xercesc::DOMElement* element,ProteoformPtrVec proteoforms
     int right_bp_pos = getIntChildValue(change_element,"right_bp_pos",0);
     int change_type = getIntChildValue(change_element,"change_type",0);
     double mass_shift = getDoubleChildValue(change_element,"mass_shift",0);
-    int ptm_count = getChildCount(change_list_element,"modification");
+    int ptm_count = getChildCount(change_element,"modification");
     PtmPtr change_ptm = nullptr;
     if(ptm_count!=0){
       xercesc::DOMElement* ptm_element
-          = getChildElement(change_list_element,"modification",i);
+          = getChildElement(change_element,"modification",i);
       change_ptm 
           = PtmFactory::getBasePtmPtrByAbbrName(getChildValue(ptm_element,"abbr_name",0));
     }
     change_list_.push_back(
         ChangePtr(new Change(left_bp_pos,right_bp_pos,change_type,mass_shift,change_ptm)));
   }
+  species_id_=0;
 }
 
 SegmentPtrVec Proteoform::getSegmentPtrVec() {
@@ -358,6 +360,45 @@ void Proteoform::addUnexpectedChangePtrVec(ChangePtrVec &changes) {
   for (unsigned int i = 0; i < changes.size(); i++) {
     change_list_.push_back(changes[i]);
   }
+}
+
+bool isSamePeptideAndMass(ProteoformPtr proteoform,ProteoformPtr another_proteoform,double ppo){
+  double thresh = proteoform->getBpSpecPtr()->getResSeqMass()*ppo;
+  if(proteoform->getDbResSeqPtr()->getId() != another_proteoform->getDbResSeqPtr()->getId()){
+    return false;
+  }
+  if(proteoform->getStartPos() != another_proteoform->getStartPos()){
+    return false;
+  }
+  if(proteoform->getEndPos() != another_proteoform->getEndPos()){
+    return false;
+  }
+  if(std::abs(proteoform->getBpSpecPtr()->getResSeqMass()
+              -another_proteoform->getBpSpecPtr()->getResSeqMass())> thresh){
+    return false;
+  }
+  return true;
+}
+
+bool isStrictCompatiablePtmSpecies(ProteoformPtr a,ProteoformPtr b,double ppo){
+  if(!isSamePeptideAndMass(a,b,ppo)){
+    return false;
+  }
+  if(a->getChangePtrVec().size() != b->getChangePtrVec().size()){
+    return false;
+  }
+  double shift_tolerance = a->getBpSpecPtr()->getResSeqMass()*ppo;
+  for(unsigned int i=0;i< a->getChangePtrVec().size();i++){
+    ChangePtr ac = a->getChangePtrVec()[i];
+    ChangePtr bc = b->getChangePtrVec()[i];
+    if(ac->getRightBpPos() <= bc->getLeftBpPos() || bc->getRightBpPos() <= ac->getLeftBpPos()){
+      return false;
+    }
+    if(abs(ac->getMassShift()-bc->getMassShift() > shift_tolerance)){
+      return false;
+    }
+  }
+  return true;
 }
 
 } /* namespace prot */

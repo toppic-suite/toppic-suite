@@ -16,6 +16,7 @@ namespace prot {
 class Proteoform;
 typedef std::shared_ptr<Proteoform> ProteoformPtr;
 typedef std::vector<ProteoformPtr> ProteoformPtrVec;
+typedef std::vector<ProteoformPtrVec> ProteoformPtrVec2D;
 
 class Proteoform {
  public:
@@ -57,6 +58,10 @@ class Proteoform {
 
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
+  int getSpeciesId(){return species_id_;}
+
+  void setSpeciesId(int id){species_id_ = id;}
+
  private:
 
   DbResSeqPtr db_residue_seq_ptr_;
@@ -70,6 +75,8 @@ class Proteoform {
   int start_pos_;
 
   int end_pos_;
+
+  int species_id_;
 
   ChangePtrVec change_list_;
 };
@@ -94,6 +101,8 @@ ResFreqPtrVec compNTermResidueFreq(ProteoformPtrVec &prot_mod_forms);
 ResFreqPtrVec compResidueFreq(ResiduePtrVec &residue_list, 
                               ProteoformPtrVec &raw_mods);
 
+bool isSamePeptideAndMass(ProteoformPtr proteoform,ProteoformPtr another_proteoform,double ppo);
+bool isStrictCompatiablePtmSpecies(ProteoformPtr a,ProteoformPtr b,double ppo);
 } /* namespace prot */
 
 #endif /* PROTEOFORM_HPP_ */
