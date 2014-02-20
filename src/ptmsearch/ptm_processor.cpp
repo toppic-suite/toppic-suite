@@ -28,7 +28,7 @@ void PtmProcessor::init(){
       mng_->search_db_file_name_,
       mng_->base_data_->getFixModResiduePtrVec());
   std::string sp_file_name = mng_->spectrum_file_name_;
-  std::string simplePrsmFileName = mng_->spectrum_file_name_
+  std::string simplePrsmFileName = basename(mng_->spectrum_file_name_)
       + ".FILTER" + mng_->input_file_ext_;
   simplePrsms_  = prot::readSimplePrSM(simplePrsmFileName.c_str());
   prsmFindSeq(simplePrsms_,seqs_);
@@ -43,7 +43,7 @@ void PtmProcessor::prsmFindSeq(SimplePrSMPtrVec simple_prsms,ProteoformPtrVec se
 
 void PtmProcessor::process(){
   std::string sp_file_name = mng_->spectrum_file_name_;
-  std::string output_file_name = sp_file_name+"."+mng_->output_file_ext_;
+  std::string output_file_name = basename(sp_file_name)+"."+mng_->output_file_ext_;
 
   MsAlignReader spReader(sp_file_name);
 
@@ -80,6 +80,7 @@ void PtmProcessor::process(){
     }
   }
   spReader.close();
+  all_writer_->~PrSMWriter();
 }
 
 void PtmProcessor::choosePrsms(PrSMPtrVec &all_prsms, PrSMPtrVec &sele_prsms) {
