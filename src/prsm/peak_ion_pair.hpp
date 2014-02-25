@@ -34,6 +34,7 @@ class PeakIonPair {
 
 typedef std::shared_ptr<PeakIonPair> PeakIonPairPtr;
 typedef std::vector<PeakIonPairPtr> PeakIonPairPtrVec;
+typedef std::vector<PeakIonPairPtrVec> PeakIonPairPtrVec2D;
 
 void getMatchedPairs(PeakIonPairPtrVec &pairs, int peak_id, 
                      PeakIonPairPtrVec &selected_pairs);
