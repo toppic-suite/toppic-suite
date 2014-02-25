@@ -62,6 +62,10 @@ class Proteoform {
 
   void setSpeciesId(int id){species_id_ = id;}
 
+  double getMass();
+
+  bool isAcetylation();
+
  private:
 
   DbResSeqPtr db_residue_seq_ptr_;

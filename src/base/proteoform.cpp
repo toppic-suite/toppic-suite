@@ -156,6 +156,24 @@ SemiAlignTypePtr Proteoform::getSemiAlignType() {
   }
 }
 
+double Proteoform::getMass(){
+  std::vector<double> ext_b_mass = bp_spec_ptr_->getBreakPointMasses(IonTypeFactory::getIonTypePtr_B());
+  double mass = ext_b_mass[end_pos_]-ext_b_mass[start_pos_]+ MassConstant::getWaterMass();
+  for(unsigned int i = 0;i<change_list_.size();i++){
+    mass += change_list_[i]->getMassShift();
+  }
+  return mass;
+}
+
+bool Proteoform::isAcetylation(){
+  if(prot_mod_ptr_->getPtmPtr()->getAbbrName().compare("Acetylation") == 0){
+    return true;
+  }
+  else{
+    return false;
+  }
+}
+
 void Proteoform::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
     xercesc::DOMElement* element = xml_doc->createElement("proteoform");
     std::string str = convertToString(start_pos_);
