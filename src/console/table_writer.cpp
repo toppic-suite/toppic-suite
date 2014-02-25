@@ -16,9 +16,6 @@ TableWriter::TableWriter(std::string spec_file,std::string db_file,std::string i
     db_file_=db_file;
     ppo_=ppo;
 }
-TableWriter::~TableWriter(){
-
-}
 
 void TableWriter::write(){
   std::string output_file_name = basename(spec_file_) + "." + output_file_;
@@ -50,8 +47,8 @@ void TableWriter::write(){
       << std::endl;
   //write spectrum
   std::string input_file_name = basename(spec_file_)+"."+input_file_;
-  ProteoformPtrVec proteoforms = prot::readFastaToProteoform(db_file_,ResidueFactory::getBaseResiduePtrVec());
-  PrSMPtrVec prsms = readPrsm(input_file_name,proteoforms);
+  ProteoformPtrVec proteoforms_ = prot::readFastaToProteoform(db_file_,ResidueFactory::getBaseResiduePtrVec());
+  PrSMPtrVec prsms = readPrsm(input_file_name,proteoforms_);
   sort(prsms.begin(),prsms.end(),prsm_spectrum);
   setSpeciesId(prsms,ppo_);
   for(unsigned int i=0;i<prsms.size();i++){
@@ -70,7 +67,7 @@ void TableWriter::write(){
         << prsms[i]->getProteoformPtr()->getDbResSeqPtr()->getSeqMass() << "\t"
         << prsms[i]->getProteoformPtr()->getStartPos() << "\t"
         << prsms[i]->getProteoformPtr()->getEndPos() << "\t"
-        << prsms[i]->getProteoformPtr()->getResSeqPtr()->getResidues().size() << "\t"
+        << prsms[i]->getProteoformPtr()->getProteinMatchSeq() << "\t"
         << prsms[i]->getProteoformPtr()->getUnexpectedChangeNum() << "\t"
         << prsms[i]->getMatchPeakNum() << "\t"
         << prsms[i]->getMatchFragNum() << "\t"
@@ -79,6 +76,8 @@ void TableWriter::write(){
         << prsms[i]->getProbPtr()->getOneProtProb()<< "\t"
         << prsms[i]->getFdr() << "\t"
         << std::endl;
+//    std::cout<<prsms[i]->getSpectrumId()<<std::endl;
+//    std::cout<<prsms[i]->getProteoformPtr()->getProteinMatchSeq()<<std::endl;
   }
   //write end;
   file_.close();
