@@ -61,7 +61,6 @@ void OutputSelector::process(){
   std::string output_file_name = base_name +"."+output_file_;
   PrSMWriter writer(output_file_name);
   writer.writeVector(selected_prsm);
-  writer.~PrSMWriter();
 
 }
 } /* namespace prot */
