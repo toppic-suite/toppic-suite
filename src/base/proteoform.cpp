@@ -174,6 +174,37 @@ bool Proteoform::isAcetylation(){
   }
 }
 
+std::string Proteoform::getProteinMatchSeq(){
+  std::string result="";
+  std::string protein_string = residue_seq_ptr_->toString();
+  std::string mid_string = protein_string.substr(start_pos_,end_pos_);
+  std::cout<< protein_string<<std::endl;
+  int mid_start=0;
+  std::sort(change_list_.begin(),change_list_.end(),compareChangeUp);
+  for(unsigned int i=0;i<change_list_.size();i++){
+    result += mid_string.substr(mid_start,change_list_[i]->getLeftBpPos()-mid_start);
+    mid_start=change_list_[i]->getLeftBpPos();
+    result += "(";
+    result += mid_string.substr(mid_start,change_list_[i]->getRightBpPos()-mid_start);
+    result += ")";
+    result += "["+convertToString(change_list_[i]->getMassShift(),5)+"]";
+    mid_start = change_list_[i]->getRightBpPos();
+  }
+  result += mid_string.substr(mid_start,end_pos_);
+
+  std::string prefix = "";
+  if(start_pos_>0){
+    prefix = protein_string.substr(start_pos_-1,1);
+  }
+  std::string suffix = "";
+
+  if(end_pos_<protein_string.length()-2){
+    suffix = protein_string.substr(end_pos_,1);
+  }
+
+  return prefix+"."+result+"."+suffix;
+}
+
 void Proteoform::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
     xercesc::DOMElement* element = xml_doc->createElement("proteoform");
     std::string str = convertToString(start_pos_);

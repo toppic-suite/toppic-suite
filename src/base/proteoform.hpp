@@ -66,6 +66,8 @@ class Proteoform {
 
   bool isAcetylation();
 
+  std::string getProteinMatchSeq();
+
  private:
 
   DbResSeqPtr db_residue_seq_ptr_;
@@ -107,6 +109,7 @@ ResFreqPtrVec compResidueFreq(ResiduePtrVec &residue_list,
 
 bool isSamePeptideAndMass(ProteoformPtr proteoform,ProteoformPtr another_proteoform,double ppo);
 bool isStrictCompatiablePtmSpecies(ProteoformPtr a,ProteoformPtr b,double ppo);
+
 } /* namespace prot */
 
 #endif /* PROTEOFORM_HPP_ */
