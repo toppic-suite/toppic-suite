@@ -178,7 +178,6 @@ std::string Proteoform::getProteinMatchSeq(){
   std::string result="";
   std::string protein_string = residue_seq_ptr_->toString();
   std::string mid_string = protein_string.substr(start_pos_,end_pos_);
-  std::cout<< protein_string<<std::endl;
   int mid_start=0;
   std::sort(change_list_.begin(),change_list_.end(),compareChangeUp);
   for(unsigned int i=0;i<change_list_.size();i++){
