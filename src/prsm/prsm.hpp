@@ -8,6 +8,7 @@
 #include "spec/deconv_peak.hpp"
 #include "spec/extend_peak.hpp"
 #include "spec/sp_para.hpp"
+#include "prsm/cleavage.hpp"
 
 namespace prot {
 
@@ -61,6 +62,8 @@ class PrSM {
     void setOriPrecMass(double prec_mass) {ori_prec_mass_ = prec_mass;}
 
   void setPrecurorId(int precursor_id) {precursor_id_ = precursor_id;}
+
+  int getMinMass(){return sp_para_ptr_->getMinMass();}
 
   xercesc::DOMElement* toXmlElement(XmlDOMDocument* xml_doc);
 
@@ -157,6 +160,11 @@ inline bool prsm_spectrum(PrSMPtr p1, PrSMPtr p2){
 PrSMPtrVec readPrsm(std::string file_name,ProteoformPtrVec proteoforms);
 
 void filterPrsms(PrSMPtrVec &prsms, MsHeaderPtr header_ptr, PrSMPtrVec &sele_prsms); 
+
+xercesc::DOMElement* genePrSMView(XmlDOMDocument* xml_doc,PrSMPtr prsm);
+xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,ProteoformPtr proteoform,
+                                     ExtendMsPtr refine_ms_three,
+                                     double min_mass);
 
 }
 #endif
