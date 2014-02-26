@@ -1,4 +1,5 @@
 Problem:
+spectrum:428
 search result :
 1:
 <match_fragment_num>22.0000000000</match_fragment_num>
@@ -29,3 +30,4 @@ search result :
  in version 0.8
  comput evalue #1 > #2,the output result is #2
  but in current version #1 < #2 the output result is #1
+
