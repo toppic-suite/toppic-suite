@@ -159,6 +159,12 @@ std::string convertToString(double value) {
   return stream.str();
 }
 
+std::string convertToString(double value,int number) {
+  std::stringstream stream;
+  stream << std::fixed<<std::setprecision(number)<< value;
+  return stream.str();
+}
+
 std::string convertToString(int value){
     std::stringstream stream;
     stream << value;

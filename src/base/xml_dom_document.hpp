@@ -68,6 +68,8 @@ std::string getAttributeValue(xercesc::DOMElement * parent,
 
 std::string convertToString(double value);
 
+std::string convertToString(double value,int number);
+
 std::string convertToString(int value);
 
 std::string convertToString(bool value);
