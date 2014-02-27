@@ -31,3 +31,5 @@ search result :
  comput evalue #1 > #2,the output result is #2
  but in current version #1 < #2 the output result is #1
 
+rsult:
+maybe because using new method to comput the e-value.
