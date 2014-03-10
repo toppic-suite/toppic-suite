@@ -15,7 +15,7 @@ LFLAGS = -L/lib -L/opt/local/lib
 LIBS = -lxerces-c 
 #
 # define the C++ source files
-SRCS = pair.cpp prsm_writer.cpp peak_ion_pair.cpp prsm.cpp simple_prsm_writer.cpp simple_prsm.cpp main.cpp
+SRCS = cleavage.cpp pair.cpp prsm_writer.cpp peak_ion_pair.cpp prsm.cpp simple_prsm_writer.cpp simple_prsm.cpp main.cpp
 #
 # define the C object files 
 #
@@ -26,7 +26,7 @@ BASE_OBJS = $(addprefix $(OBJ_DIR)/, neutral_loss.o semi_align_type.o db_residue
 
 SPEC_OBJS = $(addprefix $(OBJ_DIR)/, theo_peak.o deconv_peak.o extend_sp_para.o  sp_para.o deconv_ms.o peak_tolerance.o extend_peak.o ms_header.o)
 
-PRSM_OBJS = $(addprefix $(OBJ_DIR)/, main.o pair.o prsm_writer.o simple_prsm_writer.o peak_ion_pair.o prsm.o simple_prsm.o)
+PRSM_OBJS = $(addprefix $(OBJ_DIR)/, main.o cleavage.o pair.o prsm_writer.o simple_prsm_writer.o peak_ion_pair.o prsm.o simple_prsm.o)
 
 OBJS = $(BASE_OBJS) $(SPEC_OBJS) $(PRSM_OBJS)
 

@@ -40,7 +40,7 @@ CleavagePtrVec getProteoCleavage(ProteoformPtr prot,
   PeakIonPairPtrVec2D peak_list;
   std::vector<bool> n_ion;
   std::vector<bool> c_ion;
-  for(unsigned int i=0;i<prot->getResSeqPtr()->getLen()+1;i++){
+  for(int i=0;i<prot->getResSeqPtr()->getLen()+1;i++){
     PeakIonPairPtrVec temp;
     peak_list.push_back(temp);
     n_ion.push_back(false);
@@ -57,7 +57,7 @@ CleavagePtrVec getProteoCleavage(ProteoformPtr prot,
     }
   }
 
-  for(unsigned int i=0;i<prot->getResSeqPtr()->getLen()+1;i++){
+  for(int i=0;i< (int)prot->getResSeqPtr()->getLen()+1;i++){
     CleavagePtr cleavage = CleavagePtr(new Cleavage(i));
     cleavage->setPairs(peak_list[i]);
     cleavage->setExistCIon(c_ion[i]);

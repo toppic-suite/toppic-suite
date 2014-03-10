@@ -157,7 +157,8 @@ SemiAlignTypePtr Proteoform::getSemiAlignType() {
 }
 
 double Proteoform::getMass(){
-  std::vector<double> ext_b_mass = bp_spec_ptr_->getBreakPointMasses(IonTypeFactory::getIonTypePtr_B());
+  std::vector<double> ext_b_mass 
+      = bp_spec_ptr_->getBreakPointMasses(IonTypeFactory::getIonTypePtr_B());
   double mass = ext_b_mass[end_pos_]-ext_b_mass[start_pos_]+ MassConstant::getWaterMass();
   for(unsigned int i = 0;i<change_list_.size();i++){
     mass += change_list_[i]->getMassShift();
@@ -186,7 +187,7 @@ std::string Proteoform::getProteinMatchSeq(){
     result += "(";
     result += mid_string.substr(mid_start,change_list_[i]->getRightBpPos()-mid_start);
     result += ")";
-    result += "["+convertToString(change_list_[i]->getMassShift(),5)+"]";
+    // to check result += "["+convertToString(change_list_[i]->getMassShift(),5)+"]";
     mid_start = change_list_[i]->getRightBpPos();
   }
   result += mid_string.substr(mid_start,end_pos_);

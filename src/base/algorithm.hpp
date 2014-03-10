@@ -9,6 +9,7 @@ bool increaseIJ(unsigned int i, unsigned int j, double deviation,
                 double tolerance, std::vector<double> ms_masses, 
                 std::vector<double> theo_masses);
 
+/* compute ppos for ms_masses */
 void compMsMassPpos(std::vector<double> &ms_masses, 
                     std::vector<double> &theo_masses, 
                     double ppo, std::vector<double> &result_ppos);

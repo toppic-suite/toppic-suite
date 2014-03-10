@@ -25,7 +25,7 @@ BASE_OBJS = $(addprefix $(OBJ_DIR)/, residue_freq.o support_peak_type.o semi_ali
 
 SPEC_OBJS = $(addprefix $(OBJ_DIR)/, theo_peak.o  support_peak.o extend_peak.o prm_peak.o spectrum_set.o sp_para.o deconv_ms.o ms_header.o deconv_peak.o msalign_reader.o extend_sp_para.o peak_tolerance.o)
 
-PRSM_OBJS = $(addprefix $(OBJ_DIR)/, peak_ion_pair.o prsm.o prsm_writer.o)
+PRSM_OBJS = $(addprefix $(OBJ_DIR)/, cleavage.o peak_ion_pair.o prsm.o prsm_writer.o)
 
 ZERO_PTM_OBJS = $(addprefix $(OBJ_DIR)/, zero_ptm_slow_match.o zero_ptm_fast_match.o zero_ptm_search.o zero_ptm_console.o)
 

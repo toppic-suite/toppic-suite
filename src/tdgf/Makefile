@@ -25,7 +25,7 @@ BASE_OBJS = $(addprefix $(OBJ_DIR)/, ion.o algorithm.o residue_freq.o support_pe
 
 SPEC_OBJS = $(addprefix $(OBJ_DIR)/, theo_peak.o spectrum_set.o msalign_reader.o deconv_ms.o support_peak.o deconv_peak.o extend_peak.o prm_peak.o ms_header.o sp_para.o extend_sp_para.o peak_tolerance.o) 
 
-PRSM_OBJS = $(addprefix $(OBJ_DIR)/, peak_ion_pair.o pair.o prsm.o prsm_writer.o)
+PRSM_OBJS = $(addprefix $(OBJ_DIR)/, cleavage.o peak_ion_pair.o pair.o prsm.o prsm_writer.o)
 
 TDGF_OBJS = $(addprefix $(OBJ_DIR)/, evalue_console.o evalue_processor.o comp_prob_value.o count_test_num.o comp_pvalue_array.o) 
 

@@ -32,14 +32,14 @@ class Activation {
 
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
-//  void appendNameXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
-
  private:
   static double getBIonShift() {return 0;}
   static double getYIonShift() {return 18.0106;}
 
   std::string name_;
+  // n terminal ion type 
   IonTypePtr n_ion_type_;
+  // c terminal ion type
   IonTypePtr c_ion_type_;
 };
 
