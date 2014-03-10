@@ -190,7 +190,7 @@ std::string Proteoform::getProteinMatchSeq(){
     // to check result += "["+convertToString(change_list_[i]->getMassShift(),5)+"]";
     mid_start = change_list_[i]->getRightBpPos();
   }
-  result += mid_string.substr(mid_start,end_pos_);
+  result += mid_string.substr(mid_start,end_pos_-start_pos_-mid_start);
 
   std::string prefix = "";
   if(start_pos_>0){

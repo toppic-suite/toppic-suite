@@ -50,13 +50,17 @@ ProteoformPtrVec2D groupProteins(PrSMPtrVec& prsms){
 SpeciesPtrVec getZeroPtmList(ProteoformPtrVec& proteoforms,double ppo){
   SpeciesPtrVec list;
   for(unsigned int i=0;i<proteoforms.size();i++){
+    bool is_break = false;
     for(unsigned int j=0;j<list.size();j++){
       if(isSamePeptideAndMass(proteoforms[i],list[j]->getFistProteoform(),ppo)){
         list[j]->addProteoform(proteoforms[i]);
+        is_break = true;
         break;
       }
     }
-    list.push_back(SpeciesPtr(new Species(proteoforms[i])));
+    if(!is_break){
+      list.push_back(SpeciesPtr(new Species(proteoforms[i])));
+    }
   }
   return list;
 }
@@ -68,13 +72,17 @@ SpeciesPtrVec setSpeciesId(PrSMPtrVec& prsms,double ppo){
 
   for(unsigned int i=1;i<proteogroups.size();i++){
     for(unsigned int j=0;j<proteogroups[i].size();j++){
+      bool is_break = false;
       for(unsigned int m = 0; m<list.size();m++){
         if(isStrictCompatiablePtmSpecies(proteogroups[i][j],list[m]->getFistProteoform(),ppo)){
           list[m]->addProteoform(proteogroups[i][j]);
+          is_break = true;
           break;
         }
       }
-      list.push_back(SpeciesPtr(new Species(proteogroups[i][j])));
+      if(!is_break){
+        list.push_back(SpeciesPtr(new Species(proteogroups[i][j])));
+      }
     }
   }
 

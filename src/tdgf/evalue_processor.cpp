@@ -33,6 +33,7 @@ void EValueProcessor::init() {
 
   std::string input_file_name = basename(mng_ptr_->spectrum_file_name_)
       + "." + mng_ptr_->input_file_ext_;
+  std::cout<<input_file_name<<std::endl;
   prsms_ = readPrsm(input_file_name, raw_forms);
   LOG_DEBUG("prsms loaded");
 }
