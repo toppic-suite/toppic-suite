@@ -64,8 +64,6 @@ class Proteoform {
 
   double getMass();
 
-  bool isAcetylation();
-
   std::string getProteinMatchSeq();
 
  private:
@@ -78,6 +76,8 @@ class Proteoform {
 
   BpSpecPtr bp_spec_ptr_;
 
+  // start and end positions are relative to the 
+  // database residue sequence
   int start_pos_;
 
   int end_pos_;

@@ -13,9 +13,9 @@ namespace prot {
 PtmPtrVec PtmFactory::ptm_ptr_vec_;
 
 Ptm::Ptm(const std::string &abbr_name, 
-            double mono_mass) {
-    abbr_name_ = abbr_name;
-    mono_mass_ = mono_mass;
+         double mono_mass) {
+  abbr_name_ = abbr_name;
+  mono_mass_ = mono_mass;
 }
 
 bool Ptm::isEmpty() {
@@ -27,12 +27,21 @@ bool Ptm::isEmpty() {
   }
 }
 
+bool Ptm::isAcetylation() {
+  if (abbr_name_ == PTM_ACETYLATION) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
 void Ptm::appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
-    xercesc::DOMElement* element = xml_doc->createElement("modification");
-    xml_doc->addElement(element, "abbr_name", abbr_name_.c_str());
-    std::string str = convertToString(mono_mass_);
-    xml_doc->addElement(element, "mono_mass", str.c_str());
-    parent->appendChild(element);
+  xercesc::DOMElement* element = xml_doc->createElement("modification");
+  xml_doc->addElement(element, "abbr_name", abbr_name_.c_str());
+  std::string str = convertToString(mono_mass_);
+  xml_doc->addElement(element, "mono_mass", str.c_str());
+  parent->appendChild(element);
 }
 
 
@@ -79,7 +88,7 @@ PtmPtr PtmFactory::getBasePtmPtrByAbbrName(const std::string &abbr_name) {
  * Checks if the list contains an amino acid with the specific name.
  */
 bool PtmFactory::baseContainAbbrName(const std::string &abbr_name) {
-   return getBasePtmPtrByAbbrName(abbr_name).get() != nullptr;
+  return getBasePtmPtrByAbbrName(abbr_name).get() != nullptr;
 }
 
 PtmPtr PtmFactory::addBasePtm(std::string abbr_name, double mono_mass) {

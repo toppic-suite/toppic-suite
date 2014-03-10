@@ -9,29 +9,32 @@ namespace prot {
 
 class ExtremeValue {
  public:
-  ExtremeValue (double one_match_prob, double test_num, double adjust_factor);
+  ExtremeValue (double one_prot_prob, double test_num, double adjust_factor);
 
   ExtremeValue (xercesc::DOMElement* element);
 
-    double getPValue() {return p_value_;}
-    
-    double getEValue() {return e_value_;}
+  double getPValue() {return p_value_;}
 
-    double getOneProtProb() {return one_match_prob_;}
+  double getEValue() {return e_value_;}
 
-    double getTestNum() {return test_num_;}
+  double getOneProtProb() {return one_prot_prob_;}
 
-    double getAdjustFactor() { return adjust_factor_;}
+  double getTestNum() {return test_num_;}
+
+  double getAdjustFactor() { return adjust_factor_;}
 
   void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
  private:
-    /* oneMatchProb considers expected PTMs, but not unexpected PTMs */
-    double one_match_prob_;
-    double test_num_;
-    double adjust_factor_;
-    double p_value_;
-    double e_value_;
+  /** 
+   * one_prot_prob is the probability that the spectrum and a randem problem 
+   * have a protein-spectrum-match with a score no less than the threshold 
+   **/
+  double one_prot_prob_;
+  double test_num_;
+  double adjust_factor_;
+  double p_value_;
+  double e_value_;
 
   void init();
 };

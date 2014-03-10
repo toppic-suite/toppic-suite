@@ -7,6 +7,7 @@
 
 namespace prot {
 
+/* database residue sequence contains protein name and id */
 class DbResidueSeq: public ResidueSeq {
  public:
   DbResidueSeq(ResiduePtrVec residues, int id, std::string name);

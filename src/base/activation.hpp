@@ -22,13 +22,13 @@ class Activation {
 
   std::string getName(){return name_;}
 
-  double getNShift(){return n_ion_type_->getShift()-getBIonShift();}
+  double getNShift(){return n_ion_type_ptr_->getShift()-getBIonShift();}
 
-  double getCShift(){return c_ion_type_->getShift()-getYIonShift();}
+  double getCShift(){return c_ion_type_ptr_->getShift()-getYIonShift();}
 
-  IonTypePtr getNIonType(){return n_ion_type_;}
+  IonTypePtr getNIonTypePtr(){return n_ion_type_ptr_;}
 
-  IonTypePtr getCIonType(){return c_ion_type_;}
+  IonTypePtr getCIonTypePtr(){return c_ion_type_ptr_;}
 
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
@@ -38,9 +38,9 @@ class Activation {
 
   std::string name_;
   // n terminal ion type 
-  IonTypePtr n_ion_type_;
+  IonTypePtr n_ion_type_ptr_;
   // c terminal ion type
-  IonTypePtr c_ion_type_;
+  IonTypePtr c_ion_type_ptr_;
 };
 
 

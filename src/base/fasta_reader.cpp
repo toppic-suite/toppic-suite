@@ -76,7 +76,7 @@ std::string rmChar(std::string str) {
   return seq;
 }
 
-/** Process the string */
+/* Process the string */
 std::vector<std::string> fastaPreprocess(std::string name, std::string seq) {
   std::string new_seq = rmChar(seq);
   if (!(new_seq == seq)) {
@@ -90,7 +90,6 @@ std::vector<std::string> fastaPreprocess(std::string name, std::string seq) {
 
 ProteoformPtrVec readFastaToProteoform(std::string file_name, 
                                        ResiduePtrVec &residue_list) {
-
   LOG_DEBUG( "start open file " << file_name);
   FastaReader reader(file_name);
   LOG_DEBUG( "open file done " << file_name);

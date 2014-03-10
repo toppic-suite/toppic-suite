@@ -34,6 +34,9 @@ class Ptm {
   /* Is it an empty PTM. */
   bool isEmpty();
 
+  /* Is it the PTM acetylation */
+  bool isAcetylation();
+
   void appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
  private:

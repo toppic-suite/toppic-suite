@@ -2,6 +2,7 @@
 #define PROT_CHANGE_HPP_
 
 #include "base/ptm.hpp"
+#include "base/xml_dom_document.hpp"
 
 namespace prot {
 
@@ -15,6 +16,8 @@ class Change {
  public:
   Change(int left_bp_pos, int right_bp_pos, int change_type,
          double mass_shift, PtmPtr ptm_ptr);
+
+  Change(xercesc::DOMElement* change_element);
 
   Change(Change ori_change, int shift);
   
@@ -43,7 +46,15 @@ typedef std::shared_ptr<Change> ChangePtr;
 typedef std::vector<ChangePtr> ChangePtrVec;
 
 inline bool compareChangeUp(ChangePtr c1, ChangePtr c2) {
-  return c1->getLeftBpPos() < c2->getLeftBpPos();
+  if (c1->getLeftBpPos() < c2->getLeftBpPos()) {
+    return true;
+  }
+  else if (c1->getLeftBpPos() > c2->getLeftBpPos()) {
+    return false;
+  }
+  else {
+    return c1->getRightBpPos() < c2->getRightBpPos();
+  }
 }
 
 }

@@ -26,11 +26,11 @@ class BpSpec {
   std::vector<double> getPrmMasses();
   /*implement the function getExt[BY\CZ]masses*/
   std::vector<double> getBreakPointMasses(double n_term_shift,double c_term_shift,
-                                          double min_mass,IonTypePtr ion_type_ptr_n,
-                                          IonTypePtr ion_type_ptr_c);
+                                          double min_mass,IonTypePtr n_ion_type_ptr,
+                                          IonTypePtr c_ion_type_ptr);
 
   /*implement the function getScaledBMass*/
-  std::vector<int> getScaledMass(double scale,IonTypePtr ion_type);
+  std::vector<int> getScaledMass(double scale,IonTypePtr ion_type_ptr);
   std::vector<int> getScaledPrmMasses(double scale);
   double getResSeqMass() {return seq_mass_;}
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);

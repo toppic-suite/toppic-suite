@@ -43,18 +43,18 @@ Proteoform::Proteoform(xercesc::DOMElement* element,ProteoformPtrVec proteoforms
   //    prot_mod_ptr_ = getProtModPtrByName(basedata->getProtModPtrVec(),mod_name);
   prot_mod_ptr_ = ProtModFactory::getBaseProtModPtrByName(mod_name);
 
-//  xercesc::DOMElement* res_seq_element= getChildElement(element,"residue_seq",0);
-//  int res_len = getChildCount(res_seq_element,"residue");
-//  ResiduePtrVec residues;
-//  for(int i=0;i<res_len;i++){
-//    xercesc::DOMElement* res_element= getChildElement(res_seq_element,"residue",i);
-//    std::string acid_name
-//        = getChildValue(getChildElement(res_element,"amino_acid",0),"name",0);
-//    std::string ptm_name
-//        = getChildValue(getChildElement(res_element,"modification",0),"abbr_name",0);
-//    residues.push_back(ResiduePtr(new Residue(acid_name,ptm_name)));
-//  }
-//  residue_seq_ptr_ = ResSeqPtr(new ResidueSeq(residues));
+  //  xercesc::DOMElement* res_seq_element= getChildElement(element,"residue_seq",0);
+  //  int res_len = getChildCount(res_seq_element,"residue");
+  //  ResiduePtrVec residues;
+  //  for(int i=0;i<res_len;i++){
+  //    xercesc::DOMElement* res_element= getChildElement(res_seq_element,"residue",i);
+  //    std::string acid_name
+  //        = getChildValue(getChildElement(res_element,"amino_acid",0),"name",0);
+  //    std::string ptm_name
+  //        = getChildValue(getChildElement(res_element,"modification",0),"abbr_name",0);
+  //    residues.push_back(ResiduePtr(new Residue(acid_name,ptm_name)));
+  //  }
+  //  residue_seq_ptr_ = ResSeqPtr(new ResidueSeq(residues));
   residue_seq_ptr_ = proteoforms[db_residue_seq_ptr_->getId()]->getResSeqPtr();
   bp_spec_ptr_= BpSpecPtr(new BpSpec(residue_seq_ptr_));
 
@@ -62,26 +62,13 @@ Proteoform::Proteoform(xercesc::DOMElement* element,ProteoformPtrVec proteoforms
   int change_len = getChildCount(change_list_element,"change");
 
   for(int i=0;i<change_len;i++){
-    xercesc::DOMElement* change_element
-        = prot::getChildElement(change_list_element,"change",i);
-    int left_bp_pos = getIntChildValue(change_element,"left_bp_pos",0);
-    int right_bp_pos = getIntChildValue(change_element,"right_bp_pos",0);
-    int change_type = getIntChildValue(change_element,"change_type",0);
-    double mass_shift = getDoubleChildValue(change_element,"mass_shift",0);
-    int ptm_count = getChildCount(change_element,"modification");
-    PtmPtr change_ptm = nullptr;
-    if(ptm_count!=0){
-      xercesc::DOMElement* ptm_element
-          = getChildElement(change_element,"modification",i);
-      change_ptm 
-          = PtmFactory::getBasePtmPtrByAbbrName(getChildValue(ptm_element,"abbr_name",0));
-    }
-    change_list_.push_back(
-        ChangePtr(new Change(left_bp_pos,right_bp_pos,change_type,mass_shift,change_ptm)));
+    xercesc::DOMElement* change_element = getChildElement(change_list_element,"change",i);
+    change_list_.push_back(ChangePtr(new Change(change_element)));
   }
   species_id_=0;
 }
 
+/* get several segments without unexpected PTMs from a proteoform */
 SegmentPtrVec Proteoform::getSegmentPtrVec() {
   ChangePtrVec unexpected_changes;
   double mass_shift_sum = 0;
@@ -157,22 +144,14 @@ SemiAlignTypePtr Proteoform::getSemiAlignType() {
 }
 
 double Proteoform::getMass(){
-  std::vector<double> ext_b_mass 
-      = bp_spec_ptr_->getBreakPointMasses(IonTypeFactory::getIonTypePtr_B());
-  double mass = ext_b_mass[end_pos_]-ext_b_mass[start_pos_]+ MassConstant::getWaterMass();
+  double mass = getResSeqPtr()->getSeqMass();
   for(unsigned int i = 0;i<change_list_.size();i++){
-    mass += change_list_[i]->getMassShift();
+    // only unexpected changes need to to added 
+    if (change_list_[i]->getChangeType() == UNEXPECTED_CHANGE) {
+      mass += change_list_[i]->getMassShift();
+    }
   }
   return mass;
-}
-
-bool Proteoform::isAcetylation(){
-  if(prot_mod_ptr_->getPtmPtr()->getAbbrName().compare("Acetylation") == 0){
-    return true;
-  }
-  else{
-    return false;
-  }
 }
 
 std::string Proteoform::getProteinMatchSeq(){
@@ -197,7 +176,6 @@ std::string Proteoform::getProteinMatchSeq(){
     prefix = protein_string.substr(start_pos_-1,1);
   }
   std::string suffix = "";
-
   if(end_pos_< (int)protein_string.length()-2){
     suffix = protein_string.substr(end_pos_,1);
   }
@@ -407,7 +385,9 @@ ResFreqPtrVec compResidueFreq(ResiduePtrVec &residue_list,
 
 void Proteoform::addUnexpectedChangePtrVec(ChangePtrVec &changes) {
   for (unsigned int i = 0; i < changes.size(); i++) {
-    change_list_.push_back(changes[i]);
+    if (change_list_[i]->getChangeType() == UNEXPECTED_CHANGE) {
+      change_list_.push_back(changes[i]);
+    }
   }
 }
 
@@ -437,9 +417,14 @@ bool isStrictCompatiablePtmSpecies(ProteoformPtr a,ProteoformPtr b,double ppo){
     return false;
   }
   double shift_tolerance = a->getBpSpecPtr()->getResSeqMass()*ppo;
+  // sort changes 
+  ChangePtrVec a_change_vec = a->getChangePtrVec();
+  ChangePtrVec b_change_vec = b->getChangePtrVec();
+  std::sort(a_change_vec.begin(),a_change_vec.end(),compareChangeUp);
+  std::sort(b_change_vec.begin(),b_change_vec.end(),compareChangeUp);
   for(unsigned int i=0;i< a->getChangePtrVec().size();i++){
-    ChangePtr ac = a->getChangePtrVec()[i];
-    ChangePtr bc = b->getChangePtrVec()[i];
+    ChangePtr ac = a_change_vec[i];
+    ChangePtr bc = b_change_vec[i];
     if(ac->getRightBpPos() <= bc->getLeftBpPos() || bc->getRightBpPos() <= ac->getLeftBpPos()){
       return false;
     }

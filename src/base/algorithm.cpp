@@ -9,27 +9,27 @@ namespace prot {
 bool increaseIJ(unsigned int i, unsigned int j, double deviation, 
                 double tolerance, std::vector<double> ms_masses, 
                 std::vector<double> theo_masses) {
-        /*
-         * we assume that each real peak is matched to at most one theoretical
-         * peak, so we do not check i and j+1
-         */
-        if (deviation <= 0) {
-            return true;
-        }
-        /* severl real peak can be matched to the same theoretical peak */
-        if (i >= ms_masses[ms_masses.size() - 1] ) {
-            return false;
-        }
+  /*
+   * we assume that each real peak is matched to at most one theoretical
+   * peak, so we do not check i and j+1
+   */
+  if (deviation <= 0) {
+    return true;
+  }
+  /* severl real peak can be matched to the same theoretical peak */
+  if (i >= ms_masses[ms_masses.size() - 1] ) {
+    return false;
+  }
 
-        double next_pos = ms_masses[i+1];
-    bool j_is_near
-        = std::abs(next_pos - theo_masses[j]) < std::abs(next_pos - theo_masses[j+1]);
-    if (std::abs(next_pos - theo_masses[j]) <= tolerance  
-        && (j == theo_masses.size() - 1 || j_is_near)) { 
-            return true;
-        } else {
-            return false;
-        }
+  double next_pos = ms_masses[i+1];
+  bool j_is_closer
+      = std::abs(next_pos - theo_masses[j]) < std::abs(next_pos - theo_masses[j+1]);
+  if (std::abs(next_pos - theo_masses[j]) <= tolerance  
+      && (j == theo_masses.size() - 1 || j_is_closer)) { 
+    return true;
+  } else {
+    return false;
+  }
 }
 
 /* compute deviation for each peak */
