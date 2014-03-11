@@ -53,6 +53,6 @@ $(OBJ_DIR)/%.o: %.cpp
 	$(CC) -c $(CPPFLAGS) $(INCLUDES) $< -o $@
 
 clean:
-	$(RM) *~ $(MAIN) $(OBJS)
+	$(RM) *~ $(MAIN) $(PRSM_OBJS)
 
 depend: $(SRCS)

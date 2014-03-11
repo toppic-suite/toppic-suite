@@ -48,13 +48,13 @@ ZpFastMatchPtr computeCompMatch(ExtendMsPtr ms_ptr, ProteoformPtr form_ptr) {
   double score = 0;
   if (error <= max_error) {
     ActivationPtr activation = header_ptr->getActivationPtr();
-    IonTypePtr n_ion_type = activation->getNIonType();
+    IonTypePtr n_ion_type_ptr = activation->getNIonTypePtr();
     std::vector<double> masses 
-        = form_ptr->getBpSpecPtr()->getBreakPointMasses(n_ion_type);
+        = form_ptr->getBpSpecPtr()->getBreakPointMasses(n_ion_type_ptr);
     score = compDiagScr(ms_ptr, masses, 0);
 
-    IonTypePtr c_ion_type = activation->getCIonType();
-    masses = form_ptr->getBpSpecPtr()->getBreakPointMasses(c_ion_type);
+    IonTypePtr c_ion_type_ptr = activation->getCIonTypePtr();
+    masses = form_ptr->getBpSpecPtr()->getBreakPointMasses(c_ion_type_ptr);
     score += compDiagScr(ms_ptr, masses, 0);
     LOG_TRACE("score " << score);
   }
@@ -92,13 +92,13 @@ ZpFastMatchPtr computePrefixMatch(
   if (is_prefix) {
     double c_term_shift = prms[seq_end+1] - prms[prms.size()-1];
     ActivationPtr activation = header_ptr->getActivationPtr();
-    IonTypePtr n_ion_type = activation->getNIonType();
+    IonTypePtr n_ion_type_ptr = activation->getNIonTypePtr();
     std::vector<double> masses 
-        = form_ptr->getBpSpecPtr()->getBreakPointMasses(n_ion_type);
+        = form_ptr->getBpSpecPtr()->getBreakPointMasses(n_ion_type_ptr);
     score = compDiagScr(ms_ptr, masses, 0);
 
-    IonTypePtr c_ion_type = activation->getCIonType();
-    masses = form_ptr->getBpSpecPtr()->getBreakPointMasses(c_ion_type);
+    IonTypePtr c_ion_type_ptr = activation->getCIonTypePtr();
+    masses = form_ptr->getBpSpecPtr()->getBreakPointMasses(c_ion_type_ptr);
     score += compDiagScr(ms_ptr, masses, c_term_shift);
   }
   return ZpFastMatchPtr(new ZeroPtmFastMatch(form_ptr, score, 0, seq_end));
@@ -129,13 +129,13 @@ ZpFastMatchPtr computeSuffixMatch(
   if (is_suffix) {
     double n_term_shift = - prms[seq_bgn];
     ActivationPtr activation = header_ptr->getActivationPtr();
-    IonTypePtr n_ion_type = activation->getNIonType();
+    IonTypePtr n_ion_type_ptr = activation->getNIonTypePtr();
     std::vector<double> masses 
-        = form_ptr->getBpSpecPtr()->getBreakPointMasses(n_ion_type);
+        = form_ptr->getBpSpecPtr()->getBreakPointMasses(n_ion_type_ptr);
     score = compDiagScr(ms_ptr, masses, n_term_shift);
 
-    IonTypePtr c_ion_type = activation->getCIonType();
-    masses = form_ptr->getBpSpecPtr()->getBreakPointMasses(c_ion_type);
+    IonTypePtr c_ion_type_ptr = activation->getCIonTypePtr();
+    masses = form_ptr->getBpSpecPtr()->getBreakPointMasses(c_ion_type_ptr);
     score += compDiagScr(ms_ptr, masses, 0);
   }
   int seq_end = form_ptr->getResSeqPtr()->getLen() - 1;
@@ -151,12 +151,12 @@ ZpFastMatchPtr computeInternalMatch(
   double res_sum_mass = header_ptr->getPrecMonoMassMinusWater();
 
   ActivationPtr activation = header_ptr->getActivationPtr();
-  IonTypePtr n_ion_type = activation->getNIonType();
+  IonTypePtr n_ion_type_ptr = activation->getNIonTypePtr();
   std::vector<double> n_masses 
-      = form_ptr->getBpSpecPtr()->getBreakPointMasses(n_ion_type);
-  IonTypePtr c_ion_type = activation->getCIonType();
+      = form_ptr->getBpSpecPtr()->getBreakPointMasses(n_ion_type_ptr);
+  IonTypePtr c_ion_type_ptr = activation->getCIonTypePtr();
   std::vector<double> c_masses 
-      = form_ptr->getBpSpecPtr()->getBreakPointMasses(c_ion_type);
+      = form_ptr->getBpSpecPtr()->getBreakPointMasses(c_ion_type_ptr);
 
   double best_score = 0;
   int best_bgn = -1;

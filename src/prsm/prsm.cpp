@@ -226,7 +226,7 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
   xml_doc->addElement(prot_element, "first_residue_position", str.c_str());
   str=convertToString(proteoform_ptr->getEndPos());
   xml_doc->addElement(prot_element, "last_residue_position", str.c_str());
-  str=convertToString(proteoform_ptr->isAcetylation());
+  str=convertToString(proteoform_ptr->getProtModPtr()->getPtmPtr()->isAcetylation());
   xml_doc->addElement(prot_element, "protein_mass", str.c_str());
   int know_shift_number = proteoform_ptr->getChangePtrVec().size()-proteoform_ptr->getUnexpectedChangeNum();
   str=convertToString(know_shift_number);

@@ -29,25 +29,25 @@ TheoPeakPtrVec getTheoPeak(BpSpecPtr pep,
   TheoPeakPtrVec theo_peaks;
   BreakPointPtrVec bps = pep->getBreakPointPtrVec();
   double new_seq_mass = pep->getResSeqMass()+n_term_shift+c_term_shift;
-  IonTypePtr n_ion_type = type->getNIonType();
+  IonTypePtr n_ion_type_ptr = type->getNIonTypePtr();
   for(int i =bgn;i<=end;i++){
-    double n_mass = bps[i]->getNTermMass(n_ion_type);
+    double n_mass = bps[i]->getNTermMass(n_ion_type_ptr);
     double new_mass = n_mass + n_term_shift;
     if(new_mass >= min_mass && new_mass <= new_seq_mass - min_mass){
-      IonPtr ion = IonPtr(new Ion(0,i,i,n_ion_type, neutral_loss_ptr));
+      IonPtr ion = IonPtr(new Ion(0,i,i,n_ion_type_ptr, neutral_loss_ptr));
       TheoPeakPtr theo_peak 
           = TheoPeakPtr(new TheoPeak(ion,n_mass,n_term_shift));
       theo_peaks.push_back(theo_peak);
     }
   }
 
-  IonTypePtr c_ion_type = type->getCIonType();
+  IonTypePtr c_ion_type_ptr = type->getCIonTypePtr();
   for(int i =bgn;i<=end;i++){
-    double c_mass = bps[i]->getCTermMass(c_ion_type);
+    double c_mass = bps[i]->getCTermMass(c_ion_type_ptr);
     double new_mass = c_mass + c_term_shift;
     if(new_mass >= min_mass && new_mass <= new_seq_mass - min_mass){
       IonPtr ion 
-          = IonPtr(new Ion(0,i,bps.size()-i-1,c_ion_type,neutral_loss_ptr));
+          = IonPtr(new Ion(0,i,bps.size()-i-1,c_ion_type_ptr,neutral_loss_ptr));
       theo_peaks.push_back(TheoPeakPtr(new TheoPeak(ion,c_mass,c_term_shift)));
     }
   }
