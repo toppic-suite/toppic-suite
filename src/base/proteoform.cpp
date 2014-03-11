@@ -184,21 +184,21 @@ std::string Proteoform::getProteinMatchSeq(){
 }
 
 void Proteoform::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
-    xercesc::DOMElement* element = xml_doc->createElement("proteoform");
-    std::string str = convertToString(start_pos_);
-    xml_doc->addElement(element, "start_pos", str.c_str());
-    str = convertToString(end_pos_);
-    xml_doc->addElement(element, "end_pos", str.c_str());
-    db_residue_seq_ptr_->appendXml(xml_doc,element);
-    prot_mod_ptr_->appendxml(xml_doc,element);
-//    residue_seq_ptr_->appendXml(xml_doc,element);
-//    bp_spec_ptr_->appendXml(xml_doc,element);
-    xercesc::DOMElement* cl = xml_doc->createElement("change_list");
-    for(unsigned int i=0;i<change_list_.size();i++){
-        change_list_[i]->appendXml(xml_doc,cl);
-    }
-    element->appendChild(cl);
-    parent->appendChild(element);
+  xercesc::DOMElement* element = xml_doc->createElement("proteoform");
+  std::string str = convertToString(start_pos_);
+  xml_doc->addElement(element, "start_pos", str.c_str());
+  str = convertToString(end_pos_);
+  xml_doc->addElement(element, "end_pos", str.c_str());
+  db_residue_seq_ptr_->appendXml(xml_doc,element);
+  prot_mod_ptr_->appendxml(xml_doc,element);
+  //    residue_seq_ptr_->appendXml(xml_doc,element);
+  //    bp_spec_ptr_->appendXml(xml_doc,element);
+  xercesc::DOMElement* cl = xml_doc->createElement("change_list");
+  for(unsigned int i=0;i<change_list_.size();i++){
+    change_list_[i]->appendXml(xml_doc,cl);
+  }
+  element->appendChild(cl);
+  parent->appendChild(element);
 }
 
 ProteoformPtr getDbProteoformPtr(DbResSeqPtr db_res_seq_ptr, 
