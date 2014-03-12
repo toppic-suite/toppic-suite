@@ -385,7 +385,7 @@ ResFreqPtrVec compResidueFreq(ResiduePtrVec &residue_list,
 
 void Proteoform::addUnexpectedChangePtrVec(ChangePtrVec &changes) {
   for (unsigned int i = 0; i < changes.size(); i++) {
-    if (change_list_[i]->getChangeType() == UNEXPECTED_CHANGE) {
+    if (changes[i]->getChangeType() == UNEXPECTED_CHANGE) {
       change_list_.push_back(changes[i]);
     }
   }
