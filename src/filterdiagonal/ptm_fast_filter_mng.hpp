@@ -26,6 +26,7 @@ class PtmFastFilterMng {
   PtmFastFilterMng(std::string config_file_name) {
     base_data = BaseDataPtr(new BaseData(config_file_name));
   }
+
   PtmFastFilterMng(std::string config_file_name,
                    std::map<std::string, std::string> conf) {
     base_data = BaseDataPtr(new BaseData(config_file_name));

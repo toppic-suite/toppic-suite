@@ -29,7 +29,7 @@ void PtmProcessor::init(){
       mng_->base_data_->getFixModResiduePtrVec());
   std::string sp_file_name = mng_->spectrum_file_name_;
   std::string simplePrsmFileName = basename(mng_->spectrum_file_name_)
-      + ".FILTER" + mng_->input_file_ext_;
+      + "." + mng_->input_file_ext_;
   simplePrsms_  = prot::readSimplePrSM(simplePrsmFileName.c_str());
   prsmFindSeq(simplePrsms_,seqs_);
   comp_shift_ = CompShiftLowMemPtr(new CompShiftLowMem());
