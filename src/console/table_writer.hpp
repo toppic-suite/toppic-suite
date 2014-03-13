@@ -12,6 +12,7 @@
 #include <fstream>
 #include <memory>
 #include <string>
+
 #include "base/string_util.hpp"
 #include "base/proteoform.hpp"
 #include "base/fasta_reader.hpp"

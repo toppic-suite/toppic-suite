@@ -21,11 +21,11 @@ SRCS = test_console.cpp
 #
 
 OBJ_DIR = ../../obj
-BASE_OBJS = $(addprefix $(OBJ_DIR)/, ion.o algorithm.o residue_freq.o support_peak_type.o semi_align_type.o db_residue_seq.o extreme_value.o residue_seq.o fasta_reader.o change.o break_point.o bp_spec.o proteoform.o base_data.o activation.o ion_type.o neutral_loss.o trunc.o prot_mod.o acid.o ptm.o residue.o xml_dom.o xml_dom_document.o)
+BASE_OBJS = $(addprefix $(OBJ_DIR)/, species.o ion.o algorithm.o residue_freq.o support_peak_type.o semi_align_type.o db_residue_seq.o extreme_value.o residue_seq.o fasta_reader.o change.o break_point.o bp_spec.o proteoform.o base_data.o activation.o ion_type.o neutral_loss.o trunc.o prot_mod.o acid.o ptm.o residue.o xml_dom.o xml_dom_document.o)
 
 SPEC_OBJS = $(addprefix $(OBJ_DIR)/, theo_peak.o spectrum_set.o msalign_reader.o deconv_ms.o support_peak.o deconv_peak.o extend_peak.o prm_peak.o ms_header.o sp_para.o extend_sp_para.o peak_tolerance.o) 
 
-PRSM_OBJS = $(addprefix $(OBJ_DIR)/, prsm_combine.o simple_prsm_writer.o simple_prsm.o cleavage.o peak_ion_pair.o pair.o prsm.o prsm_writer.o)
+PRSM_OBJS = $(addprefix $(OBJ_DIR)/, output_selector.o table_writer.o prsm_selector.o prsm_combine.o simple_prsm_writer.o simple_prsm.o cleavage.o peak_ion_pair.o pair.o prsm.o prsm_writer.o)
 
 ZERO_PTM_OBJS = $(addprefix $(OBJ_DIR)/, zero_ptm_slow_match.o zero_ptm_fast_match.o zero_ptm_search.o)
 

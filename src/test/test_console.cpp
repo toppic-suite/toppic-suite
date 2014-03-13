@@ -3,6 +3,7 @@
 #include "base/base_data.hpp"
 
 #include "prsm/prsm_combine.hpp"
+#include "prsm/prsm_selector.hpp"
 
 #include "zeroptmsearch/zero_ptm_mng.hpp"
 #include "zeroptmsearch/zero_ptm_search.hpp"
@@ -15,6 +16,9 @@
 
 #include "tdgf/evalue_processor.hpp"
 #include "tdgf/tdgf_mng.hpp"
+
+#include "console/output_selector.hpp"
+#include "console/table_writer.hpp"
 
 int main(int argc, char* argv[]) {
   try {
@@ -63,6 +67,22 @@ int main(int argc, char* argv[]) {
     processor.init();
     /* compute E-value for a set of prsms each run */
     processor.process(false);
+
+
+    std::cout << "Top selector 0.1 " << std::endl;
+    prot::PrSMSelector selector(argv[2], argv[3], "EVALUE", "TOP", 1, "e");
+		selector.process();
+
+    std::cout << "Cutoff selector 0.1 " << std::endl;
+    prot::OutputSelector output_selector(argv[2], argv[3], "TOP", "OUTPUT_RESULT", 
+                                   "EVALUE", 0.01, 0.01, zero_mng_ptr->ppo_);
+		output_selector.process();
+
+    std::cout << "Table output 0.1" << std::endl;
+    prot::TableWriter table_out(argv[2], argv[3], "OUTPUT_RESULT",
+                          "OUTPUT_TABLE", zero_mng_ptr->ppo_);
+		table_out.write();
+
   } catch (const char* e) {
     std::cout << "Exception " << e << std::endl;
   }

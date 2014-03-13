@@ -22,7 +22,7 @@ SRCS = main.cpp support_peak_type.cpp semi_align_type.cpp db_residue_seq.cpp ext
 
 OBJ_DIR = ../../obj
 
-OBJS = $(addprefix $(OBJ_DIR)/, xml_writer.o support_peak_type.o semi_align_type.o db_residue_seq.o extreme_value.o algorithm.o ion.o base_data.o fasta_reader.o proteoform.o bp_spec.o break_point.o residue_seq.o change.o acid.o ptm.o residue_freq.o residue.o xml_dom.o xml_dom_document.o ion_type.o neutral_loss.o trunc.o prot_mod.o activation.o)
+OBJS = $(addprefix $(OBJ_DIR)/, species.o xml_writer.o support_peak_type.o semi_align_type.o db_residue_seq.o extreme_value.o algorithm.o ion.o base_data.o fasta_reader.o proteoform.o bp_spec.o break_point.o residue_seq.o change.o acid.o ptm.o residue_freq.o residue.o xml_dom.o xml_dom_document.o ion_type.o neutral_loss.o trunc.o prot_mod.o activation.o)
 
 BIN_DIR = ../../bin
 
