@@ -79,7 +79,7 @@ int main(int argc, char* argv[]) {
 		output_selector.process();
 
     std::cout << "Table output 0.1" << std::endl;
-    prot::TableWriter table_out(argv[2], argv[3], "OUTPUT_RESULT",
+    prot::TableWriter table_out(argv[3], argv[2], "OUTPUT_RESULT",
                           "OUTPUT_TABLE", zero_mng_ptr->ppo_);
 		table_out.write();
 
