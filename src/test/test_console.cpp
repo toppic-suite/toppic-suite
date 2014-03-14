@@ -24,9 +24,10 @@ int main(int argc, char* argv[]) {
   try {
     std::cout << "Test msalign+ 0.1 " << std::endl;
 
-    std::cout << "Zero ptm search " << std::endl;
+    std::cout << "Zero ptm search 0.1 " << std::endl;
     prot::ZeroPtmMngPtr zero_mng_ptr
         = prot::ZeroPtmMngPtr(new prot::ZeroPtmMng (std::string(argv[1])));
+    /*
     zero_mng_ptr->search_db_file_name_ = argv[2];
     zero_mng_ptr->spectrum_file_name_ = argv[3];
     zero_mng_ptr->output_file_ext_ = "ZERO";
@@ -56,6 +57,7 @@ int main(int argc, char* argv[]) {
 		input_exts.push_back("PTM");
     prot::PrSMCombine combine_processor(argv[2], argv[3], input_exts, "RAW_RESULT");
 		combine_processor.process();
+    */
 
     std::cout << "EValueConsole 0.1 " << std::endl;
     prot::TdgfMngPtr tdgf_mng_ptr = prot::TdgfMngPtr(new prot::TdgfMng (std::string(argv[1])));
@@ -65,7 +67,7 @@ int main(int argc, char* argv[]) {
     tdgf_mng_ptr->output_file_ext_ = "EVALUE";
     prot::EValueProcessor processor(tdgf_mng_ptr);
     processor.init();
-    /* compute E-value for a set of prsms each run */
+    // compute E-value for a set of prsms each run 
     processor.process(false);
 
 

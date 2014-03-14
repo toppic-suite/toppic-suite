@@ -25,7 +25,8 @@ CompPValueArray::CompPValueArray(ProteoformPtrVec &raw_forms,
 
 /* set alignment */
 ExtremeValuePtrVec CompPValueArray::compExtremeValues(PrmMsPtr ms_six, 
-                                                      PrSMPtrVec &prsms, bool strict) {
+                                                      PrSMPtrVec &prsms, 
+                                                      bool strict) {
   PrmPeakPtrVec prm_peaks = ms_six->getPeakPtrVec();
   std::vector<double> prot_probs; 
   compProbArray(comp_prob_ptr_, prot_n_term_residues_, 
@@ -33,14 +34,17 @@ ExtremeValuePtrVec CompPValueArray::compExtremeValues(PrmMsPtr ms_six,
   std::vector<double> pep_probs;
   compProbArray(comp_prob_ptr_, pep_n_term_residues_, 
                 prm_peaks, prsms, strict, pep_probs);
+  //LOG_DEBUG("probability computation complete");
   double prec_mass = ms_six->getHeaderPtr()->getPrecMonoMassMinusWater();
   double tolerance = ms_six->getHeaderPtr()->getErrorTolerance();
   ExtremeValuePtrVec ev_probs; 
   for (unsigned int i = 0; i < prsms.size(); i++) {
+    //LOG_DEBUG("prsm " << i << " prsm size " << prsms.size());
     int unexpect_shift_num = prsms[i]->getProteoformPtr()->getUnexpectedChangeNum();
     SemiAlignTypePtr t = prsms[i]->getProteoformPtr()->getSemiAlignType();
     double cand_num = test_num_ptr_->compCandNum(t, unexpect_shift_num, 
                                                  prec_mass, tolerance);
+    //LOG_DEBUG("candidate number " << cand_num);
     if (cand_num == 0.0) {
       LOG_WARN("Zero candidate number");
       cand_num = std::numeric_limits<double>::infinity();
@@ -66,6 +70,7 @@ ExtremeValuePtrVec CompPValueArray::compExtremeValues(PrmMsPtr ms_six,
                    + nCandidates + " p value " + eVProbs[i].getPValue());
                    */
     }
+    //LOG_DEBUG("assignment complete");
   }
   return ev_probs;
 }
@@ -98,6 +103,7 @@ void CompPValueArray::setPValueArray(PrmMsPtr prm_ms_ptr, PrSMPtrVec prsms) {
   for (unsigned int i = 0; i < prsms.size(); i++) {
     prsms[i]->setProbPtr(extreme_values[i]);
   }
+  //LOG_DEBUG("Set value complete");
 }
 
 }

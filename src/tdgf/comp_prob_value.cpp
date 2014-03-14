@@ -50,7 +50,6 @@ int computeAvgLength(ResFreqPtrVec &residues, double convert_ratio) {
 }
 
 void CompProbValue::setFactors () {
-  factors_.clear();
   //zero ptm 
   factors_.push_back(1);
   //one ptm
@@ -63,16 +62,43 @@ void CompProbValue::setFactors () {
   }
 }
 
-void CompProbValue::compute(ResFreqPtrVec n_residues, PrmPeakPtrVec peaks, 
-                            int thresh, int shift_num, bool strict) {
+void CompProbValue::clearVar() {
   n_term_acid_masses_.clear();
   n_term_acid_frequencies_.clear();
+  // we do not need to clear residue_masses and residue_frequencies
+
+  peak_masses_.clear();
+  peak_tolerances_.clear();
+  base_types_.clear();
+
+  acid_dists_.clear();   // acidMass * height;
+  // factors_.clear(); //normalization factors;
+
+  peak_mass_bgns_.clear();
+  peak_mass_ends_.clear();
+  peak_table_bgns_.clear();
+  peak_table_ends_.clear();
+
+  results_.clear(); // nLayer peak number, height;
+  priors_.clear();  // peak number, height
+
+  // the prob that a randam protein has the same precursor to the spectrum 
+  prec_probs_.clear(); 
+
+  //page_table_ = new double[page_len_ * max_table_height_];
+  memset(pos_scores_, 0, (max_sp_len_ + block_len_) * sizeof(short));
+  memset(page_table_, 0, page_len_ * max_table_height_ * sizeof(double));
+}
+
+void CompProbValue::compute(ResFreqPtrVec n_residues, PrmPeakPtrVec peaks, 
+                            int thresh, int shift_num, bool strict) {
+  //clear variables
+  clearVar();
   for (unsigned int i = 0; i < n_residues.size(); i++) {
     int int_mass = (int)std::round(n_residues[i]->getMass() * convert_ratio_);
     n_term_acid_masses_.push_back(int_mass);
     n_term_acid_frequencies_.push_back(n_residues[i]->getFreq());
   }
-  results_.clear(); 
   // if score is less than 1, we do not compute p-value 
   if (thresh < 1) {
     return;
@@ -124,9 +150,8 @@ void CompProbValue::setPosScores(std::vector<int> &peak_masses,
                                  std::vector<int> &peak_tolerances,
                                  std::vector<int> &base_types) {
   int len = max_sp_len_ + block_len_;
-  int mem_len = len * sizeof(short); 
+  //int mem_len = len * sizeof(short); 
   LOG_DEBUG("pos scr length " << len);
-  memset(pos_scores_, 0, mem_len);
   // mass 0 and residue sum mass are not used for scoring 
   for (unsigned int i = 1; i < peak_masses.size() - 1; i++) {
     // here we use ceil/floor not round since each unit is very accurate
@@ -182,7 +207,6 @@ void CompProbValue::setHeight(int thresh, int max_peak_mass) {
   LOG_DEBUG("max mass " << max_peak_mass << " sp len " << sp_len_
             << " blk size " << block_table_size_ << " page size " << page_table_size_);
   LOG_DEBUG("height " << height_);
-  acid_dists_.clear();
   for (unsigned int i = 0; i < residue_masses_.size(); i++) {
     acid_dists_.push_back(residue_masses_[i] * height_);
   }
@@ -190,10 +214,6 @@ void CompProbValue::setHeight(int thresh, int max_peak_mass) {
 
 void CompProbValue::setPeakBgnEnd(std::vector<int> &peak_masses, 
                                   std::vector<int> &peak_tolerances) {
-  peak_mass_bgns_.clear();
-  peak_mass_ends_.clear();
-  peak_table_bgns_.clear();
-  peak_table_ends_.clear();
   for (unsigned int i = 0; i < peak_masses.size(); i++) {
     peak_mass_bgns_.push_back(peak_masses[i] - peak_tolerances[i]);
     peak_mass_ends_.push_back(peak_masses[i] + peak_tolerances[i]);
@@ -203,13 +223,12 @@ void CompProbValue::setPeakBgnEnd(std::vector<int> &peak_masses,
 }
 
 void CompProbValue::comp() {
-  results_.clear();
-  priors_.clear();
   std::vector<std::vector<double>> one_layer_results;
   std::vector<std::vector<double>> one_layer_priors;
   LOG_DEBUG("Start computation");
   std::vector<std::vector<double>> empty_vec;
   compOneLayer(empty_vec, true, one_layer_results, one_layer_priors);
+  LOG_DEBUG("First level completed!");
   // score probability for each peak
   results_.push_back(one_layer_results);
   // prior probability for next layer
@@ -220,12 +239,13 @@ void CompProbValue::comp() {
     compOneLayer(results_[i - 1], false, one_layer_results, one_layer_priors);
     results_.push_back(one_layer_results);
     priors_.push_back(one_layer_priors);
+    LOG_DEBUG("The " << i << " level completed!");
   }
   compPrecProbs();
+  LOG_DEBUG("compute precursor probabilities complete.");
 }
 
 void CompProbValue::compPrecProbs() {
-  prec_probs_.clear();
   // zero ptm
   int last_peak_index = peak_masses_.size() - 1;
   double prob = 0;
@@ -266,7 +286,7 @@ void CompProbValue::compPrecProbs() {
 }
 
 void CompProbValue::runClear(int page_pos) {
-  std::memset(page_table_ + page_pos, 0, block_table_size_ * sizeof(double));
+  std::memset(&page_table_[page_pos], 0, block_table_size_ * sizeof(double));
 }
 
 void CompProbValue::runFirstLayerInit(int win_table_bgn, int win_table_end) {
@@ -380,18 +400,26 @@ void CompProbValue::compOneLayer(std::vector<std::vector<double>> &prev_results,
     cur_results.push_back(tmp);
     cur_priors.push_back(tmp);
   }
+  //LOG_DEBUG("start for loop ");
   unsigned int peak_index = 0;
   for (int win_table_bgn = 0; win_table_bgn < sp_table_size_; 
        win_table_bgn = win_table_bgn + block_table_size_) {
     // clear result block
     int win_table_end = win_table_bgn + block_table_size_ - 1;
     int page_pos = win_table_bgn % page_table_size_;
+    /*
+    LOG_DEBUG("win table bgn " << win_table_bgn 
+              << " page table size " << page_table_size_
+              << " page position " << page_pos);
+              */
     runClear(page_pos);
+    //LOG_DEBUG("clear page complete ");
     if (is_first_layer) {
       runFirstLayerInit(win_table_bgn, win_table_end);
     } else {
       runInit(prev_results, win_table_bgn, win_table_end);
     }
+    //LOG_DEBUG("init page complete ");
     for (unsigned int i = 0; i < acid_dists_.size(); i++) {
       if (residue_frequencies_[i] <= 0) {
         continue;
@@ -412,9 +440,11 @@ void CompProbValue::compOneLayer(std::vector<std::vector<double>> &prev_results,
                    - first_part_size, residue_frequencies_[i]);
       }
     }
+    //LOG_DEBUG("add prob complete ");
     int sp_bgn = win_table_bgn / height_;
     int sp_end = win_table_bgn / height_ + block_len_ - 1;
     runUpdate(page_pos + block_table_size_ - 1, sp_bgn, sp_end);
+    //LOG_DEBUG("update complete ");
     // update peakPnt and get probs 
     while (peak_index < peak_masses_.size()
            && peak_table_ends_[peak_index] <= win_table_end) {
@@ -422,12 +452,6 @@ void CompProbValue::compOneLayer(std::vector<std::vector<double>> &prev_results,
         for (int j = 0; j < height_; j++) {
           int pos = (i * height_ + j) % page_table_size_;
           cur_results[peak_index][j] += page_table_[pos];
-          /*
-          if (peak_index <=1) {
-            LOG_DEBUG("position " << i << " score  " << j 
-                      << " prob " << page_table_[pos]);
-          }
-          */
         }
       }
 
@@ -445,6 +469,7 @@ void CompProbValue::compOneLayer(std::vector<std::vector<double>> &prev_results,
       }
       peak_index++;
     }
+    //LOG_DEBUG("get prob complete ");
   }
   /*
   for (unsigned int i = 0; i < peak_masses_.size(); i++) {

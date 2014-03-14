@@ -53,9 +53,9 @@ class Ms {
     return header_str + tmp.str();
   }
 
-    MsHeaderPtr getHeaderPtr() {return header_ptr_;}
+  MsHeaderPtr getHeaderPtr() {return header_ptr_;}
 
-    void setHeaderPtr(MsHeaderPtr header_ptr) {header_ptr = header_ptr_;}
+  void setHeaderPtr(MsHeaderPtr header_ptr) {header_ptr = header_ptr_;}
 
   unsigned int size() {return peak_ptr_list_.size();}
 

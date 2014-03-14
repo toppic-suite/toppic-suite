@@ -96,14 +96,14 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
                     raw_forms, mng_ptr, internal_prsms);
       internal_writer.writeVector(internal_prsms);
       all_writer.writeVector(internal_prsms);
-      LOG_DEBUG("zero ptm search complete " << n);
+      std::cout << std::flush << "Zero ptm search complete " << n << " of " << spectra_num << "\r";
     }
     ms_ptr = reader.getNextMs();
     LOG_DEBUG("spectrum " << n);
   }
 
   reader.close();
-  std::cout << "Non-ptm search finished." << std::endl;
+  std::cout << "Zero ptm search finished." << std::endl;
 }
 
 } // end namespace

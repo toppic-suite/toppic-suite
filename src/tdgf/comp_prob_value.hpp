@@ -89,6 +89,7 @@ class CompProbValue {
   void setFactors();
 
   // computation
+  void clearVar();
   void setMassErr(PrmPeakPtrVec &peaks, bool strict);
 
   void setPosScores(std::vector<int> &peak_masses, 

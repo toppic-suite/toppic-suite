@@ -53,7 +53,10 @@ void EValueProcessor::process(bool is_separate) {
     cnt++;
     processOneSpectrum(ms_ptr, is_separate, writer);
     ms_ptr = reader.getNextMs();
-    LOG_DEBUG("process spectrum " << cnt << " total num " << spectrum_num);
+    if (ms_ptr.get() != nullptr) {
+      std::cout << std::flush << "Evalue computation complete " << cnt << " of " 
+          << spectrum_num << " scan number " << ms_ptr->getHeaderPtr()->getScansString() << std::endl;
+    }
   }
   reader.close();
 }
@@ -76,8 +79,11 @@ void EValueProcessor::processOneSpectrum(DeconvMsPtr ms_ptr, bool is_separate,
       comp_pvalue_ptr_->setPValueArray(spec_set_ptr->getSpSix(), 
                                        sele_prsms);
     }
+    LOG_DEBUG("start sort");
     std::sort(sele_prsms.begin(), sele_prsms.end(), prsmEValueUp);
+    LOG_DEBUG("start writing");
     writer.writeVector(sele_prsms);
+    LOG_DEBUG("writing complete");
   }
 }
 
