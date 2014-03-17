@@ -23,7 +23,7 @@ namespace prot {
 
 class TableWriter {
  public:
-  TableWriter(std::string spec_file,std::string db_file,std::string input_file,std::string output_file,double ppo);
+  TableWriter(std::string db_file,std::string spec_file,std::string input_file,std::string output_file,double ppo);
   void write();
  private:
   std::string spec_file_;

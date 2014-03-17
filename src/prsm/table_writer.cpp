@@ -9,7 +9,7 @@
 
 namespace prot {
 
-TableWriter::TableWriter(std::string spec_file,std::string db_file,std::string input_file,std::string output_file,double ppo){
+TableWriter::TableWriter(std::string db_file,std::string spec_file,std::string input_file,std::string output_file,double ppo){
     spec_file_ = spec_file;
     input_file_ = input_file;
     output_file_ = output_file;
