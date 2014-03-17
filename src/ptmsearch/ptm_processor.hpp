@@ -40,7 +40,13 @@ class PtmProcessor {
                    PrSMPtrVec &prsms);
 
   void search(SpectrumSetPtr spectrum_set_ptr, 
-              SimplePrSMPtrVec matches);
+              SimplePrSMPtrVec matches,
+              PrSMWriterPtr all,
+              std::vector<PrSMWriterPtr> complete_writers,
+              std::vector<PrSMWriterPtr> prefix_writers,
+              std::vector<PrSMWriterPtr> suffix_writers,
+              std::vector<PrSMWriterPtr> internal_writers
+              );
 
 };
 
