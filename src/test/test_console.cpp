@@ -4,6 +4,8 @@
 
 #include "prsm/prsm_combine.hpp"
 #include "prsm/prsm_selector.hpp"
+#include "prsm/output_selector.hpp"
+#include "prsm/table_writer.hpp"
 
 #include "zeroptmsearch/zero_ptm_mng.hpp"
 #include "zeroptmsearch/zero_ptm_search.hpp"
@@ -17,8 +19,6 @@
 #include "tdgf/evalue_processor.hpp"
 #include "tdgf/tdgf_mng.hpp"
 
-#include "console/output_selector.hpp"
-#include "console/table_writer.hpp"
 
 int main(int argc, char* argv[]) {
   try {
@@ -27,7 +27,6 @@ int main(int argc, char* argv[]) {
     std::cout << "Zero ptm search 0.1 " << std::endl;
     prot::ZeroPtmMngPtr zero_mng_ptr
         = prot::ZeroPtmMngPtr(new prot::ZeroPtmMng (std::string(argv[1])));
-    /*
     zero_mng_ptr->search_db_file_name_ = argv[2];
     zero_mng_ptr->spectrum_file_name_ = argv[3];
     zero_mng_ptr->output_file_ext_ = "ZERO";
@@ -57,7 +56,6 @@ int main(int argc, char* argv[]) {
 		input_exts.push_back("PTM");
     prot::PrSMCombine combine_processor(argv[2], argv[3], input_exts, "RAW_RESULT");
 		combine_processor.process();
-    */
 
     std::cout << "EValueConsole 0.1 " << std::endl;
     prot::TdgfMngPtr tdgf_mng_ptr = prot::TdgfMngPtr(new prot::TdgfMng (std::string(argv[1])));
@@ -81,7 +79,7 @@ int main(int argc, char* argv[]) {
 		output_selector.process();
 
     std::cout << "Table output 0.1" << std::endl;
-    prot::TableWriter table_out(argv[3], argv[2], "OUTPUT_RESULT",
+    prot::TableWriter table_out(argv[2], argv[3], "OUTPUT_RESULT",
                           "OUTPUT_TABLE", zero_mng_ptr->ppo_);
 		table_out.write();
 
