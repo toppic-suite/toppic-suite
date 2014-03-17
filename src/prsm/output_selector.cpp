@@ -5,7 +5,7 @@
  *      Author: xunlikun
  */
 
-#include <console/output_selector.hpp>
+#include <prsm/output_selector.hpp>
 
 namespace prot {
 OutputSelector::OutputSelector(std::string db_file,
