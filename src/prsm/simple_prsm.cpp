@@ -6,6 +6,7 @@
  */
 
 #include <iostream>
+#include <cmath>
 
 #include "simple_prsm.hpp"
 #include "base/logger.hpp"
@@ -78,7 +79,7 @@ bool SimplePrSM::isMatch(MsHeaderPtr header){
     double header_precursor_mass = header->getPrecMonoMass();
     if(header_spectrum_id == spectrum_id_ 
      && header_precursor_id == precursor_id_){
-        if(header_precursor_mass!=prec_mass_ ||
+        if(std::abs(header_precursor_mass-prec_mass_) > 0.00001 ||
                 header_spectrum_scan != spectrum_scan_){
             LOG_ERROR("Error in combine simple PrSMs! ");
         }
