@@ -20,6 +20,7 @@ class PrSMWriter {
 public:
  PrSMWriter(std::string file_name);
  ~PrSMWriter();
+ void close();
  void write(PrSMPtr prsm_ptr);
  void writeVector(PrSMPtrVec &prsms);
  void writeVector2D(PrSMPtrVec2D &prsms);

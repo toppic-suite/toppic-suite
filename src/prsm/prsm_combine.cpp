@@ -35,6 +35,9 @@ void PrSMCombine::process() {
   std::sort(prsms.begin(),prsms.end(),prsm_spectrum);
   PrSMWriter all_writer(basename(spec_file_)+"."+output_files_);
   all_writer.writeVector(prsms);
+
+  //because the prsm_writer ~PrSMWriter changed and the fileclosing is an independant function
+  all_writer.close();
 }
 
 } /* namespace prot */

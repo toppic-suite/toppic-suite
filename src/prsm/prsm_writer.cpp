@@ -19,9 +19,14 @@ PrSMWriter::PrSMWriter(std::string file_name) {
   serializer_ = impl->createSerializer();
 }
 
-PrSMWriter::~PrSMWriter() {
+void PrSMWriter::close(){
   file_ << "</prsm_list>" << std::endl;
   file_.close();
+}
+
+PrSMWriter::~PrSMWriter() {
+//  file_ << "</prsm_list>" << std::endl;
+//  file_.close();
   serializer_->release();
   delete doc_;
 }

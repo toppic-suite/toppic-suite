@@ -103,6 +103,14 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
   }
 
   reader.close();
+
+  //because the prsm_writer ~PrSMWriter changed and the fileclosing is an independant function
+  comp_writer.close();
+  pref_writer.close();
+  suff_writer.close();
+  internal_writer.close();
+  all_writer.close();
+
   std::cout << "Zero ptm search finished." << std::endl;
 }
 

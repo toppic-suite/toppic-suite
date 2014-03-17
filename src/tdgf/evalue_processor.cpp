@@ -59,6 +59,9 @@ void EValueProcessor::process(bool is_separate) {
     }
   }
   reader.close();
+
+  //because the prsm_writer ~PrSMWriter changed and the fileclosing is an independant function
+  writer.close();
 }
 
 void EValueProcessor::processOneSpectrum(DeconvMsPtr ms_ptr, bool is_separate,

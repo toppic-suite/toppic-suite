@@ -58,6 +58,8 @@ void PrSMSelector::process(){
     PrSMPtrVec result = getTopPrsms(selected_prsms,n_top_);
     writer.writeVector(result);
   }
+  //because the prsm_writer ~PrSMWriter changed and the fileclosing is an independant function
+  writer.close();
 }
 
 } /* namespace prot */

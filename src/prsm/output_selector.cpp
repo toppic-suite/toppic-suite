@@ -62,5 +62,7 @@ void OutputSelector::process(){
   PrSMWriter writer(output_file_name);
   writer.writeVector(selected_prsm);
 
+  //because the prsm_writer ~PrSMWriter changed and the fileclosing is an independant function
+  writer.close();
 }
 } /* namespace prot */
