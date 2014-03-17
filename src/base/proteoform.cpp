@@ -157,7 +157,7 @@ double Proteoform::getMass(){
 std::string Proteoform::getProteinMatchSeq(){
   std::string result="";
   std::string protein_string = residue_seq_ptr_->toString();
-  std::string mid_string = protein_string.substr(start_pos_,end_pos_);
+  std::string mid_string = protein_string.substr(start_pos_,end_pos_+1);
   int mid_start=0;
   std::sort(change_list_.begin(),change_list_.end(),compareChangeUp);
   for(unsigned int i=0;i<change_list_.size();i++){
@@ -169,14 +169,14 @@ std::string Proteoform::getProteinMatchSeq(){
     result += "["+convertToString(change_list_[i]->getMassShift(),5)+"]";
     mid_start = change_list_[i]->getRightBpPos();
   }
-  result += mid_string.substr(mid_start,end_pos_-start_pos_-mid_start);
+  result += mid_string.substr(mid_start,end_pos_-start_pos_-mid_start+1);
 
   std::string prefix = "";
   if(start_pos_>0){
     prefix = protein_string.substr(start_pos_-1,1);
   }
   std::string suffix = "";
-  if(end_pos_< (int)protein_string.length()-2){
+  if(end_pos_< (int)protein_string.length()-3){
     suffix = protein_string.substr(end_pos_,1);
   }
 
