@@ -56,6 +56,7 @@ void PtmFastFilterProcessor::processBlock(int block,std::string sp_file_name,
     }
   }
     reader.close();
+    writer.close();
 }
 
 void PtmFastFilterProcessor::combineBlock(std::string sp_file_name){
@@ -88,6 +89,7 @@ void PtmFastFilterProcessor::combineBlock(std::string sp_file_name){
         writer.write(selected_matches);
     }
     reader.close();
+    writer.close();
     //system.out
 }
 

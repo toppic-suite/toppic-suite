@@ -17,6 +17,7 @@ class SimplePrSMWriter {
   SimplePrSMWriter();
   SimplePrSMWriter(std::string file_name);
   ~SimplePrSMWriter();
+  void close();
   void write(SimplePrSMPtrVec simple_prsms);
 
  private:

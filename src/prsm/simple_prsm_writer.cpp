@@ -22,10 +22,13 @@ SimplePrSMWriter::SimplePrSMWriter(std::string file_name){
 }
 
 SimplePrSMWriter::~SimplePrSMWriter(){
-    file_ << "</simple_prsm_list>" << std::endl;
-    file_.close();
     serializer_->release();
     delete doc_;
+}
+
+void SimplePrSMWriter::close(){
+  file_ << "</simple_prsm_list>" << std::endl;
+  file_.close();
 }
 
 void SimplePrSMWriter::write(SimplePrSMPtrVec simple_prsms){
