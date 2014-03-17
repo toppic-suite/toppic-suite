@@ -29,37 +29,38 @@ int main(){
 
 		std::string config_file_name = "conf/configuration.xml";
 		std::string search_db_file_name = "in/prot.fasta";
-		std::string spectrum_file_name_ = "in/spectra.msalign";
+		std::string spectrum_file_name_ = "in/spectra_one.msalign";
+//		std::string spectrum_file_name_ = "in/spectra.msalign";
 
 		prot::ZeroPtmMngPtr mng_ptr = prot::ZeroPtmMngPtr(new prot::ZeroPtmMng (std::string(config_file_name)));
-//
-//		mng_ptr->search_db_file_name_ = search_db_file_name;
-//		mng_ptr->spectrum_file_name_ = spectrum_file_name_;
-//		mng_ptr->output_file_ext_ = "ZERO_PTM_SEARCH";
-//		prot::zeroPtmSearchProcess(mng_ptr);
-//
-//		PtmFastFilterMngPtr fast_filter_mng = PtmFastFilterMngPtr(new PtmFastFilterMng(config_file_name));
-//		fast_filter_mng->search_db_file_name_ = search_db_file_name;
-//		fast_filter_mng->spectrum_file_name_ = spectrum_file_name_;
-//		PtmFastFilterProcessorPtr processorb = PtmFastFilterProcessorPtr(new PtmFastFilterProcessor(fast_filter_mng));
-//		processorb->process();
-//
-//		PtmMngPtr ptm_search_mng = PtmMngPtr(new PtmMng(config_file_name));
-//		ptm_search_mng->search_db_file_name_ = search_db_file_name;
-//		ptm_search_mng->spectrum_file_name_ = spectrum_file_name_;
-//		ptm_search_mng->input_file_ext_ ="_COMBINED";
-//		ptm_search_mng->output_file_ext_="PTM_SEARCH_RESULT";
-//		PtmProcessorPtr processor = PtmProcessorPtr(new PtmProcessor(ptm_search_mng));
-//		processor->process();
-//
-//		std::vector<std::string> input_exts ;
-//		input_exts.push_back("PTM_SEARCH_RESULT");
-//		input_exts.push_back("ZERO_PTM_SEARCH");
-//		PrSMCombinePtr combine = PrSMCombinePtr(new PrSMCombine(search_db_file_name,
-//		                                                        spectrum_file_name_,
-//		                                                        input_exts,
-//		                                                        "RAW_SEARCH_RESULT"));
-//		combine->process();
+
+		mng_ptr->search_db_file_name_ = search_db_file_name;
+		mng_ptr->spectrum_file_name_ = spectrum_file_name_;
+		mng_ptr->output_file_ext_ = "ZERO_PTM_SEARCH";
+		prot::zeroPtmSearchProcess(mng_ptr);
+
+		PtmFastFilterMngPtr fast_filter_mng = PtmFastFilterMngPtr(new PtmFastFilterMng(config_file_name));
+		fast_filter_mng->search_db_file_name_ = search_db_file_name;
+		fast_filter_mng->spectrum_file_name_ = spectrum_file_name_;
+		PtmFastFilterProcessorPtr processorb = PtmFastFilterProcessorPtr(new PtmFastFilterProcessor(fast_filter_mng));
+		processorb->process();
+
+		PtmMngPtr ptm_search_mng = PtmMngPtr(new PtmMng(config_file_name));
+		ptm_search_mng->search_db_file_name_ = search_db_file_name;
+		ptm_search_mng->spectrum_file_name_ = spectrum_file_name_;
+		ptm_search_mng->input_file_ext_ ="_COMBINED";
+		ptm_search_mng->output_file_ext_="PTM_SEARCH_RESULT";
+		PtmProcessorPtr processor = PtmProcessorPtr(new PtmProcessor(ptm_search_mng));
+		processor->process();
+
+		std::vector<std::string> input_exts ;
+		input_exts.push_back("PTM_SEARCH_RESULT");
+		input_exts.push_back("ZERO_PTM_SEARCH");
+		PrSMCombinePtr combine = PrSMCombinePtr(new PrSMCombine(search_db_file_name,
+		                                                        spectrum_file_name_,
+		                                                        input_exts,
+		                                                        "RAW_SEARCH_RESULT"));
+		combine->process();
 
 
 		prot::TdgfMngPtr tdgf_mng = prot::TdgfMngPtr(new prot::TdgfMng (std::string(config_file_name)));
