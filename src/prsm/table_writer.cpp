@@ -55,7 +55,7 @@ void TableWriter::write(){
     file_ << spec_file_ << "\t"
         << prsms[i]->getId() << "\t"
         << prsms[i]->getSpectrumId()<< "\t"
-        << prsms[i]->getDeconvMsPtr()->getHeaderPtr()->getActivationPtr()<< "\t"
+        << prsms[i]->getDeconvMsPtr()->getHeaderPtr()->getActivationPtr()->getName()<< "\t"
         << prsms[i]->getSpectrumScan() << "\t"
         << prsms[i]->getDeconvMsPtr()->size()<< "\t"
         << prsms[i]->getDeconvMsPtr()->getHeaderPtr()->getPrecCharge() << "\t"
