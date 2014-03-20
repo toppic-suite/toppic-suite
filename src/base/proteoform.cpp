@@ -160,17 +160,41 @@ std::string Proteoform::getProteinMatchSeq(){
   std::string mid_string = protein_string.substr(start_pos_,end_pos_+1);
   int mid_start=0;
   std::sort(change_list_.begin(),change_list_.end(),compareChangeUp);
+  ChangePtrVec change_stack;
   for(unsigned int i=0;i<change_list_.size();i++){
-    result += mid_string.substr(mid_start,change_list_[i]->getLeftBpPos()-mid_start);
-    mid_start=change_list_[i]->getLeftBpPos();
-    result += "(";
-    result += mid_string.substr(mid_start,change_list_[i]->getRightBpPos()-mid_start);
-    result += ")";
-    result += "["+convertToString(change_list_[i]->getMassShift(),5)+"]";
-    mid_start = change_list_[i]->getRightBpPos();
+    while(change_stack.size()>0){
+      if(change_list_[i]->getLeftBpPos() < change_stack[change_stack.size()-1]->getRightBpPos()){
+        result += mid_string.substr(mid_start,change_list_[i]->getLeftBpPos()-mid_start);
+        result +="(";
+        mid_start = change_list_[i]->getLeftBpPos();
+        change_stack.push_back(change_list_[i]);
+        break;
+      }
+      else{
+        result += mid_string.substr(mid_start,change_stack[change_stack.size()-1]->getRightBpPos()-mid_start);
+        mid_start = change_stack[change_stack.size()-1]->getRightBpPos();
+        result +=")";
+        result += "["+convertToString(change_stack[change_stack.size()-1]->getMassShift(),5)+"]";
+        change_stack.pop_back();
+      }
+    }
+    if(change_stack.size()==0){
+      change_stack.push_back(change_list_[i]);
+      result += mid_string.substr(mid_start,change_list_[i]->getLeftBpPos()-mid_start);
+      result += "(";
+      mid_start = change_list_[i]->getLeftBpPos();
+    }
   }
-  result += mid_string.substr(mid_start,end_pos_-start_pos_-mid_start+1);
 
+  while(change_stack.size()>0){
+    result += mid_string.substr(mid_start,change_stack[change_stack.size()-1]->getRightBpPos()-mid_start);
+    mid_start = change_stack[change_stack.size()-1]->getRightBpPos();
+    result +=")";
+    result += "["+convertToString(change_stack[change_stack.size()-1]->getMassShift(),5)+"]";
+    change_stack.pop_back();
+  }
+
+  result += mid_string.substr(mid_start,end_pos_-start_pos_-mid_start+1);
   std::string prefix = "";
   if(start_pos_>0){
     prefix = protein_string.substr(start_pos_-1,1);
