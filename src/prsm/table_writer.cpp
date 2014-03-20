@@ -17,6 +17,16 @@ TableWriter::TableWriter(std::string db_file,std::string spec_file,std::string i
     ppo_=ppo;
 }
 
+TableWriter::TableWriter(std::map<std::string,std::string> arguments,
+                         std::string input_file,
+                         std::string output_file){
+    spec_file_ = arguments["spectrumFileName"];
+    input_file_ = input_file;
+    output_file_ = output_file;
+    db_file_=arguments["databaseFileName"];
+    ppo_=atoi(arguments["errorTolerance"].c_str())*0.000001;
+}
+
 void TableWriter::write(){
   std::string output_file_name = basename(spec_file_) + "." + output_file_;
   file_.open(output_file_name.c_str());

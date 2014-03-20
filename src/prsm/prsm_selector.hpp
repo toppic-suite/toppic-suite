@@ -8,6 +8,8 @@
 #ifndef PRSM_SELECTOR_HPP_
 #define PRSM_SELECTOR_HPP_
 
+#include <map>
+
 #include "base/string_util.hpp"
 #include "base/proteoform.hpp"
 #include "base/fasta_reader.hpp"
@@ -19,6 +21,7 @@ namespace prot {
 class PrSMSelector {
  public:
   PrSMSelector(std::string db_file,std::string spec_file,std::string in_file,std::string out_file,int n_top,std::string type);
+  PrSMSelector(std::map<std::string,std::string> arguments,std::string in_file,std::string out_file,int n_top,std::string type);
   void process();
  private:
   std::string spec_file_;

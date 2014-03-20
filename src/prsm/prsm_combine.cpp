@@ -19,6 +19,15 @@ PrSMCombine::PrSMCombine(std::string db_file,
   db_file_ = db_file;
 }
 
+PrSMCombine::PrSMCombine(std::map<std::string, std::string> arguments,
+                         std::vector<std::string> &in_file_exts,
+                         std::string out_file) {
+  input_file_exts_ = in_file_exts;
+  output_files_ = out_file;
+  spec_file_ = arguments["spectrumFileName"];
+  db_file_ = arguments["databaseFileName"];
+}
+
 PrSMCombine::~PrSMCombine() {
 }
 

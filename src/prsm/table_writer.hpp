@@ -12,6 +12,7 @@
 #include <fstream>
 #include <memory>
 #include <string>
+#include <map>
 
 #include "base/string_util.hpp"
 #include "base/proteoform.hpp"
@@ -24,6 +25,9 @@ namespace prot {
 class TableWriter {
  public:
   TableWriter(std::string db_file,std::string spec_file,std::string input_file,std::string output_file,double ppo);
+  TableWriter(std::map<std::string,std::string> arguments,
+                           std::string input_file,
+                           std::string output_file);
   void write();
  private:
   std::string spec_file_;

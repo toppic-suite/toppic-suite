@@ -21,12 +21,13 @@ namespace prot {
 class PtmMng {
  public :
   PtmMng(std::string config_file_name);
-  PtmMng(std::string config_file_name,
-         std::map<std::string, std::string> conf){
-    base_data_ = BaseDataPtr(new BaseData(config_file_name));
-    spectrum_file_name_ = conf["spectrumFileName"];
-    search_db_file_name_ = conf["databaseFileName"];
-
+  PtmMng(std::map<std::string, std::string> arguments){
+    base_data_ = BaseDataPtr(new BaseData(arguments["configuration"]));
+    spectrum_file_name_ = arguments["spectrumFileName"];
+    search_db_file_name_ = arguments["databaseFileName"];
+    n_unknown_shift_=atoi(arguments["shiftNumber"].c_str());
+    ppo_=atoi(arguments["errorTolerance"].c_str())*0.000001;
+    peank_tolerance_->setPpo(ppo_);
   }
 
   BaseDataPtr base_data_ ;

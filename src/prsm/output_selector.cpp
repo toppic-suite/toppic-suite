@@ -26,6 +26,20 @@ OutputSelector::OutputSelector(std::string db_file,
   ppo_ = ppo;
 }
 
+OutputSelector::OutputSelector(std::map<std::string,std::string> arguments,
+                 std::string input_file,
+                 std::string output_file
+                 ){
+  db_file_= arguments["databaseFileName"];
+  spec_file_ = arguments["spectrumFileName"];
+  input_file_=input_file;
+  output_file_ = output_file;
+  cutoff_type_ = arguments["cutoffType"];
+  evalue_thresh_ = atof(arguments["cutoff"].c_str());
+  fdr_thresh_= atof(arguments["cutoff"].c_str());
+  ppo_ = atoi(arguments["errorTolerance"].c_str())*0.000001;
+}
+
 void OutputSelector::process(){
   std::string base_name = basename(spec_file_);
   std::string input_file_name = base_name + "." + input_file_;

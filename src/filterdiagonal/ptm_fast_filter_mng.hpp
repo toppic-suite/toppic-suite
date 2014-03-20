@@ -27,13 +27,14 @@ class PtmFastFilterMng {
     base_data = BaseDataPtr(new BaseData(config_file_name));
   }
 
-  PtmFastFilterMng(std::string config_file_name,
-                   std::map<std::string, std::string> conf) {
-    base_data = BaseDataPtr(new BaseData(config_file_name));
-    spectrum_file_name_ = conf["spectrumFileName"];
-    search_db_file_name_ = conf["databaseFileName"];
+  PtmFastFilterMng(std::map<std::string, std::string> arguments) {
+    base_data = BaseDataPtr(new BaseData(arguments["configuration"]));
+    spectrum_file_name_ = arguments["spectrumFileName"];
+    search_db_file_name_ = arguments["databaseFileName"];
     activation_ptr_ = ActivationFactory::getBaseActivationPtrByName(
-        conf["activation"]);
+        arguments["activation"]);
+    ppo_=atoi(arguments["errorTolerance"].c_str())*0.000001;
+    peak_tolerance_->setPpo(ppo_);
   }
   //Candidate protein number for each spectrum
   int ptm_fast_filter_result_num_ = 20;

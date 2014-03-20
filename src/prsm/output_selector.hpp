@@ -8,6 +8,8 @@
 #ifndef OUTPUT_SELECTOR_HPP_
 #define OUTPUT_SELECTOR_HPP_
 
+#include <map>
+
 #include "base/proteoform.hpp"
 #include "base/fasta_reader.hpp"
 #include "prsm/prsm.hpp"
@@ -25,6 +27,10 @@ class OutputSelector {
                  double evalue_thresh,
                  double fdr_thresh,
                  double ppo);
+  OutputSelector(std::map<std::string,std::string> arguments,
+                   std::string input_file,
+                   std::string output_file
+                   );
   void process();
  private:
   std::string db_file_;
