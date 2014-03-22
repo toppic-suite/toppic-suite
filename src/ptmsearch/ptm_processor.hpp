@@ -36,9 +36,10 @@ class PtmProcessor {
  private:
   void init();
   void prsmFindSeq(SimplePrSMPtrVec simple_prsms,ProteoformPtrVec seqs);
-  void choosePrsms(PrSMPtrVec &all_prsms,
+  void chooseCompPrePrsms(PrSMPtrVec &all_prsms,
                    PrSMPtrVec &prsms);
-
+  void chooseSuffIntPrsms(PrSMPtrVec &all_prsms,
+                     PrSMPtrVec &prsms);
   void search(SpectrumSetPtr spectrum_set_ptr, 
               SimplePrSMPtrVec matches
               );
