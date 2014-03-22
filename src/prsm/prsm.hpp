@@ -119,6 +119,16 @@ inline bool prsmMatchFragmentDown(PrSMPtr p1, PrSMPtr p2) {
   return p1->getMatchFragNum() > p2->getMatchFragNum();
 }
 
+inline bool prsmCompPreMatchFragmentDown(PrSMPtr p1, PrSMPtr p2) {
+ if(p1->getMatchFragNum() > p2->getMatchFragNum()){
+   return true;
+ }
+ else if(p1->getMatchFragNum() == p2->getMatchFragNum()){
+   return p1->getProteoformPtr()->getStartPos()<p2->getProteoformPtr()->getStartPos();
+ }
+ return false;
+}
+
 inline bool prsmEValueUp(PrSMPtr p1, PrSMPtr p2) {
   return p1->getEValue() < p2->getEValue();
 }

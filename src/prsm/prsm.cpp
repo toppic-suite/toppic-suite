@@ -212,7 +212,7 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
                                      ProteoformPtr proteoform_ptr,
                                      ExtendMsPtr refine_ms_three,
                                      double min_mass){
-  xercesc::DOMElement* prot_element = xml_doc->createElement("annotated_protein");
+  xercesc::DOMElement* prot_element = xml_doc->createElement("protein");
   std::string str=convertToString(proteoform_ptr->getDbResSeqPtr()->getId());
   xml_doc->addElement(prot_element, "sequence_id", str.c_str());
   str=convertToString(proteoform_ptr->getSpeciesId());
