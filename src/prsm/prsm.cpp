@@ -136,6 +136,9 @@ xercesc::DOMElement* genePrSMView(XmlDOMDocument* xml_doc,PrSMPtr prsm){
   xercesc::DOMElement* element = xml_doc->createElement("prsm");
   std::string str = convertToString(prsm->getId());
   xml_doc->addElement(element, "prsm_id", str.c_str());
+//  str = convertToString(prsm->getSpectrumId());
+//  xml_doc->addElement(element, "spectrum_id", str.c_str());
+//  xml_doc->addElement(element, "spectrum_scan", prsm->getSpectrumScan().c_str());
   if(prsm->getProbPtr()->getPValue() != -std::numeric_limits<double>::max()){
     str=convertToString(prsm->getProbPtr()->getPValue());
     xml_doc->addElement(element, "p_value", str.c_str());
@@ -156,6 +159,8 @@ xercesc::DOMElement* genePrSMView(XmlDOMDocument* xml_doc,PrSMPtr prsm){
   xml_doc->addElement(element, "matched_fragment_number", str.c_str());
   str=convertToString(prsm->getMatchPeakNum());
   xml_doc->addElement(element, "matched_peak_number", str.c_str());
+//  str=convertToString(prsm->getOriPrecMass());
+//  xml_doc->addElement(element, "precursor_mass", str.c_str());
   str=convertToString(prsm->getAdjustedPrecMass());
   xml_doc->addElement(element, "adjusted_precursor_mass", str.c_str());
   str=convertToString(prsm->getCalibration());
@@ -167,7 +172,7 @@ xercesc::DOMElement* genePrSMView(XmlDOMDocument* xml_doc,PrSMPtr prsm){
                    prsm->getMinMass(), pairs);
   //peaks to view
   xercesc::DOMElement* ms_element = xml_doc->createElement("ms");
-  prsm->getDeconvMsPtr()->getHeaderPtr()->appendXml(xml_doc,ms_element);//attention
+  prsm->getDeconvMsPtr()->getHeaderPtr()->appendViewXml(xml_doc,ms_element);//attention
   xercesc::DOMElement* peaks = xml_doc->createElement("peaks");
   ms_element->appendChild(peaks);
   for(unsigned int i=0;i<prsm->getDeconvMsPtr()->size();i++){
@@ -208,16 +213,148 @@ xercesc::DOMElement* genePrSMView(XmlDOMDocument* xml_doc,PrSMPtr prsm){
   return element;
 }
 
+//xercesc::DOMElement* genePrSMViewAS7(XmlDOMDocument* xml_doc,PrSMPtr prsm){
+//  xercesc::DOMElement* element = xml_doc->createElement("prsm");
+//  std::string str = convertToString(prsm->getId());
+//  xml_doc->addElement(element, "prsm-id", str.c_str());
+//
+//  str=convertToString(prsm->getProteoformPtr()->getDbResSeqPtr()->getId());
+//  xml_doc->addElement(element, "spectrum-id", str.c_str());
+//  str=convertToString(prsm->getAdjustedPrecMass());
+//  xml_doc->addElement(element, "spectrum-adjusted-mass", str.c_str());
+//  str=prsm->getProteoformPtr()->getDbResSeqPtr()->getName();
+//  xml_doc->addElement(element, "sequence-name", str.c_str());
+//  str=convertToString(prsm->getProteoformPtr()->getSeqId());
+//  xml_doc->addElement(element, "peptide-id", str.c_str());
+//  //duplicate-score,used by peptides.xsl
+//  //unique-score
+//  if(prsm->getProbPtr()->getPValue() != -std::numeric_limits<double>::max()){
+//    str=convertToString(prsm->getProbPtr()->getPValue());
+//    xml_doc->addElement(element, "p_value", str.c_str());
+//  }
+//  else{
+//    xml_doc->addElement(element, "p_value", "-1");
+//  }
+//  if(prsm->getProbPtr()->getEValue() != -std::numeric_limits<double>::max()){
+//    str=convertToString(prsm->getProbPtr()->getEValue());
+//    xml_doc->addElement(element, "e_value", str.c_str());
+//  }
+//  else{
+//    xml_doc->addElement(element, "e_value", "-1");
+//  }
+//  str=convertToString(prsm->getFdr());
+//  xml_doc->addElement(element, "fdr", str.c_str());
+//  str=convertToString(prsm->getProteoformPtr()->getMass());
+//  xml_doc->addElement(element, "sequence-mass", str.c_str());
+//  //alignment type ,used by peptides.xsl
+//
+//  //tags
+//  //sequence-name
+//  //peakBreaks
+//  str=convertToString(prsm->getMatchFragNum());
+//  xml_doc->addElement(element, "matched_fragment_number", str.c_str());
+//  str=convertToString(prsm->getMatchPeakNum());
+//  xml_doc->addElement(element, "matched_peak_number", str.c_str());
+//
+//  str=convertToString(prsm->getCalibration());
+//  xml_doc->addElement(element, "calibration", str.c_str());
+//
+//  //get ion_pair
+//  PeakIonPairPtrVec pairs;
+//  getPeakIonPairs (prsm->getProteoformPtr(), prsm->getRefineMs(),
+//                   prsm->getMinMass(), pairs);
+//  //peaks to view
+//  xercesc::DOMElement* ms_element = xml_doc->createElement("ms");
+//  prsm->getDeconvMsPtr()->getHeaderPtr()->appendXml(xml_doc,ms_element);//attention
+//  xercesc::DOMElement* peaks = xml_doc->createElement("peaks");
+//  ms_element->appendChild(peaks);
+//  for(unsigned int i=0;i<prsm->getDeconvMsPtr()->size();i++){
+//    xercesc::DOMElement* peak = xml_doc->createElement("peak");
+//    peaks->appendChild(peak);
+//    DeconvPeakPtr dp = prsm->getDeconvMsPtr()->getPeakPtr(i);
+//    str=convertToString(dp->getId());
+//    xml_doc->addElement(peak, "id", str.c_str());
+//    double mass = dp->getPosition();
+//    int charge = dp->getCharge();
+//    str=convertToString(mass);
+//    xml_doc->addElement(peak, "monoisotopic_mass", str.c_str());
+//    str=convertToString(mass/charge+MassConstant::getProtonMass());
+//    xml_doc->addElement(peak, "monoisotopic_mz", str.c_str());
+//    str=convertToString(dp->getIntensity());
+//    xml_doc->addElement(peak, "intensity", str.c_str());
+//    str=convertToString(charge);
+//    xml_doc->addElement(peak, "charge", str.c_str());
+//    PeakIonPairPtrVec selected_pairs;
+//    getMatchedPairs(pairs,dp->getId(),selected_pairs);
+//    if(selected_pairs.size()>0){
+//      xercesc::DOMElement* mi_element = xml_doc->createElement("matched_ions");
+//      peak->appendChild(mi_element);
+//      for(unsigned int j=0;j< selected_pairs.size();j++){
+//        selected_pairs[j]->appendIonToXml(xml_doc,mi_element);
+//      }
+//    }
+//  }
+//  element->appendChild(ms_element);
+//
+//  //proteoform to view
+//  xercesc::DOMElement* prot_element = geneProteinView(xml_doc,
+//                                                      prsm->getProteoformPtr(),
+//                                                      prsm->getRefineMs(),
+//                                                      prsm->getMinMass());
+//  element->appendChild(prot_element);
+//
+//  return element;
+//}
+//
+//xercesc::DOMElement* geneProteinViewAS7(XmlDOMDocument* xml_doc,
+//                                     ProteoformPtr proteoform_ptr,
+//                                     ExtendMsPtr refine_ms_three,
+//                                     double min_mass){
+//  xercesc::DOMElement* prot_element = xml_doc->createElement("protein");
+//  std::string str=convertToString(proteoform_ptr->getDbResSeqPtr()->getId());
+//  str=proteoform_ptr->getDbResSeqPtr()->getName();
+//  xml_doc->addElement(prot_element, "protein-name", str.c_str());
+//
+//  xml_doc->addElement(prot_element, "protein-id", str.c_str());
+//  str=convertToString(proteoform_ptr->getSpeciesId());
+//  xml_doc->addElement(prot_element, "species_id", str.c_str());
+//
+//  double mass = proteoform_ptr->getMass();
+//  str=convertToString(mass);
+//  xml_doc->addElement(prot_element, "protein_mass", str.c_str());
+//  str=convertToString(proteoform_ptr->getStartPos());
+//  xml_doc->addElement(prot_element, "first_residue_position", str.c_str());
+//  str=convertToString(proteoform_ptr->getEndPos());
+//  xml_doc->addElement(prot_element, "last_residue_position", str.c_str());
+//  str=convertToString(proteoform_ptr->getProtModPtr()->getPtmPtr()->isAcetylation());
+//  xml_doc->addElement(prot_element, "protein_mass", str.c_str());
+//  int know_shift_number = proteoform_ptr->getChangePtrVec().size()-proteoform_ptr->getUnexpectedChangeNum();
+//  str=convertToString(know_shift_number);
+//  xml_doc->addElement(prot_element, "know_shift_number", str.c_str());
+//  for(unsigned int i=0;i<proteoform_ptr->getChangePtrVec().size();i++){
+//    proteoform_ptr->getChangePtrVec()[i]->appendXml(xml_doc,prot_element);//attention
+//  }
+//  xercesc::DOMElement* annotation_element = xml_doc->createElement("annotation");
+//  prot_element->appendChild(annotation_element);
+//  CleavagePtrVec cleavages = getProteoCleavage(proteoform_ptr,refine_ms_three,min_mass);
+//  for(int i=0;i<proteoform_ptr->getResSeqPtr()->getLen();i++){
+//    cleavages[i]->appendXml(xml_doc,annotation_element);
+//    proteoform_ptr->getResSeqPtr()->getResiduePtr(i)->appendXml(xml_doc,annotation_element);
+//  }
+//  cleavages[cleavages.size()-1]->appendXml(xml_doc,annotation_element);
+//  return prot_element;
+//}
+
 xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
                                      ProteoformPtr proteoform_ptr,
                                      ExtendMsPtr refine_ms_three,
                                      double min_mass){
-  xercesc::DOMElement* prot_element = xml_doc->createElement("protein");
-  std::string str=convertToString(proteoform_ptr->getDbResSeqPtr()->getId());
+  xercesc::DOMElement* prot_element = xml_doc->createElement("annotated_protein");
+  std::string str=convertToString(proteoform_ptr->getSeqId());
   xml_doc->addElement(prot_element, "sequence_id", str.c_str());
   str=convertToString(proteoform_ptr->getSpeciesId());
   xml_doc->addElement(prot_element, "species_id", str.c_str());
-  str=proteoform_ptr->getDbResSeqPtr()->getName();
+  str=proteoform_ptr->getName();
   xml_doc->addElement(prot_element, "sequence_name", str.c_str());
   double mass = proteoform_ptr->getMass();
   str=convertToString(mass);
@@ -227,19 +364,51 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
   str=convertToString(proteoform_ptr->getEndPos());
   xml_doc->addElement(prot_element, "last_residue_position", str.c_str());
   str=convertToString(proteoform_ptr->getProtModPtr()->getPtmPtr()->isAcetylation());
-  xml_doc->addElement(prot_element, "protein_mass", str.c_str());
+  xml_doc->addElement(prot_element, "n_acetylation", str.c_str());
   int know_shift_number = proteoform_ptr->getChangePtrVec().size()-proteoform_ptr->getUnexpectedChangeNum();
   str=convertToString(know_shift_number);
   xml_doc->addElement(prot_element, "know_shift_number", str.c_str());
   for(unsigned int i=0;i<proteoform_ptr->getChangePtrVec().size();i++){
-    proteoform_ptr->getChangePtrVec()[i]->appendXml(xml_doc,prot_element);//attention
+    proteoform_ptr->getChangePtrVec()[i]->appendViewXml(xml_doc,prot_element);//attention
   }
   xercesc::DOMElement* annotation_element = xml_doc->createElement("annotation");
   prot_element->appendChild(annotation_element);
   CleavagePtrVec cleavages = getProteoCleavage(proteoform_ptr,refine_ms_three,min_mass);
+  int display =0;
   for(int i=0;i<proteoform_ptr->getResSeqPtr()->getLen();i++){
     cleavages[i]->appendXml(xml_doc,annotation_element);
-    proteoform_ptr->getResSeqPtr()->getResiduePtr(i)->appendXml(xml_doc,annotation_element);
+    ResiduePtr cur_res = proteoform_ptr->getResSeqPtr()->getResiduePtr(i);//->appendXml(xml_doc,annotation_element);
+    cur_res->setPos(i);
+    if(i<proteoform_ptr->getStartPos()){
+      cur_res->setType("n_trunc");
+    }
+    if(i>proteoform_ptr->getEndPos()){
+      cur_res->setType("c_trunc");
+    }
+    ChangePtrVec change_list = proteoform_ptr->getChangePtrVec();
+    for(int j=0;j<change_list.size();j++){
+      if(change_list[j]->getLeftBpPos()<i&& i<change_list[j]->getRightBpPos())
+      {
+        if(change_list[j]->getChangeType()==UNEXPECTED_CHANGE){
+          cur_res->setType("unexpected_shift");
+        }
+        else{
+          cur_res->setType("expected_type_shift");
+        }
+        if(i==change_list[j]->getLeftBpPos()+1){
+          cur_res->setIsModifyed(true);
+          cur_res->setShift(change_list[j]->getMassShift());
+          if(j>0&&change_list[j]->getLeftBpPos()-change_list[j-1]->getLeftBpPos()<=5){
+            display=1-display;
+          }
+          else{
+            display=0;
+          }
+          cur_res->setDisplayPos(display);
+        }
+      }
+    }
+    cur_res->appendViewXml(xml_doc,annotation_element);
   }
   cleavages[cleavages.size()-1]->appendXml(xml_doc,annotation_element);
   return prot_element;

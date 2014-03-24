@@ -172,6 +172,7 @@ PrSMPtrVec readPrsm(std::string file_name,ProteoformPtrVec proteoforms);
 void filterPrsms(PrSMPtrVec &prsms, MsHeaderPtr header_ptr, PrSMPtrVec &sele_prsms); 
 
 xercesc::DOMElement* genePrSMView(XmlDOMDocument* xml_doc,PrSMPtr prsm);
+xercesc::DOMElement* genePrSMViewAS7(XmlDOMDocument* xml_doc,PrSMPtr prsm);
 xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,ProteoformPtr proteoform,
                                      ExtendMsPtr refine_ms_three,
                                      double min_mass);
