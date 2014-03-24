@@ -51,5 +51,42 @@ void Change::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
   parent->appendChild(element);
 }
 
+std::string getChangeTypeName(int change_type){
+  if(change_type==0){
+    return "INPUT_CHANGE";
+  }
+  if(change_type==1){
+    return "FIXED_CHANGE";
+  }
+  if(change_type==2){
+    return "PROTEIN_VARIABLE_CHANGE";
+  }
+  if(change_type==3){
+    return "VARIABLE_CHANGE";
+  }
+  if(change_type==4){
+    return "UNEXPECTED_CHANGE";
+  }
+  return "UNEXPECTED_CHANGE";
+}
+
+void Change::appendViewXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
+  xercesc::DOMElement* element = xml_doc->createElement("mass_shift");
+  std::string str = convertToString(left_bp_pos_+1);//+1
+  xml_doc->addElement(element, "shift_begin", str.c_str());
+  str = convertToString(right_bp_pos_);
+  xml_doc->addElement(element, "shift_end", str.c_str());
+  str = convertToString(mass_shift_);
+  xml_doc->addElement(element, "shift_mass", str.c_str());
+  str = getChangeTypeName(change_type_);//need change to name
+  xml_doc->addElement(element, "shift_type", str.c_str());
+  if(ptm_ptr_!=nullptr){
+    ptm_ptr_->appendxml(xml_doc,element);
+    str = ptm_ptr_->getAbbrName();
+    xml_doc->addElement(element, "ptm_abbr_name", str.c_str());
+  }
+  parent->appendChild(element);
+}
+
 }
 
