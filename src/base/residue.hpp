@@ -29,6 +29,18 @@ class Residue {
   /** Get post-translational modification. */
   PtmPtr getPtmPtr() { return ptm_ptr_; }
 
+  void setPos(int pos) { pos_=pos; }
+
+  void setDisplayPos(int pos) {display_pos_=pos;}
+
+  void setType(std::string type) {type_=type;}
+
+  void setIsModifyed(bool isMod) {is_modified_ = isMod;}
+
+  void setShift(double shift) {shift_ = shift;}
+
+  double getShift(){return shift_;}
+
   /**
    * Checks if the residue contains the same amino acid and ptm.
    */
@@ -43,6 +55,7 @@ class Residue {
 
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
+  void appendViewXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
  private:
   /** amino acid */
   AcidPtr acid_ptr_;
@@ -50,6 +63,17 @@ class Residue {
   PtmPtr ptm_ptr_;
   /** residue mass */
   double mass_;
+
+  //residues pos
+  int pos_=0;
+  //residues type
+  std::string type_="normal";
+  //display pos shown in match seq
+  int display_pos_=0;
+  //is modified
+  bool is_modified_ = false;
+  //modify mass
+  double shift_=0;
 };
 
 typedef std::shared_ptr<Residue> ResiduePtr;

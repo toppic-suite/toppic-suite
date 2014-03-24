@@ -38,6 +38,24 @@ void Residue::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
     parent->appendChild(element);
 }
 
+void Residue::appendViewXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
+    xercesc::DOMElement* element = xml_doc->createElement("character");
+    xml_doc->addElement(element, "type", "residue");
+    std::string str = convertToString(pos_);
+    xml_doc->addElement(element, "position", str.c_str());
+    str = acid_ptr_->getOneLetter();
+    xml_doc->addElement(element, "acid", str.c_str());
+    str = type_;
+    xml_doc->addElement(element, "residue_type", str.c_str());
+    str = convertToString(is_modified_);
+    xml_doc->addElement(element, "is_modification", str.c_str());
+    str = convertToString(shift_);
+    xml_doc->addElement(element, "shift", str.c_str());
+    str = convertToString(display_pos_);
+    xml_doc->addElement(element, "display_position", str.c_str());
+    parent->appendChild(element);
+}
+
 ResiduePtr getResiduePtrByAcid(ResiduePtrVec &residue_ptrs,
                                   AcidPtr acid_ptr) {
   for (unsigned int i = 0; i < residue_ptrs.size(); i++) {
