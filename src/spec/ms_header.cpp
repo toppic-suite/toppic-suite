@@ -127,4 +127,29 @@ void MsHeader::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
     parent->appendChild(element);
 }
 
+void MsHeader::appendViewXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
+  xercesc::DOMElement* element = xml_doc->createElement("ms_header");
+  std::string str = convertToString(id_);
+  xml_doc->addElement(element, "id", str.c_str());
+  if (scans_.size() > 0) {
+    str = scans_[0];
+    for (unsigned int i = 1; i < scans_.size(); i++) {
+      str += " " + scans_[i];
+    }
+    xml_doc->addElement(element, "scans", str.c_str());
+  }
+  str = convertToString(prec_mono_mz_);
+  xml_doc->addElement(element, "precursor_mz", str.c_str());
+  str = convertToString(prec_charge_);
+  xml_doc->addElement(element, "precursor_charge", str.c_str());
+  if(prec_mono_mz_<0){
+    std::cout<<"monoisotopic mass is not initialized!"<<std::endl;
+  }
+  else{
+    str = convertToString(prec_mono_mz_*prec_charge_-prec_charge_*prot::MassConstant::getProtonMass());
+    xml_doc->addElement(element, "precursor_mass", str.c_str());
+  }
+  parent->appendChild(element);
+}
+
 }

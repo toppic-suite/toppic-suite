@@ -79,6 +79,8 @@ class MsHeader {
 
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
+  void appendViewXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+
  private:
   /** data set name */
   std::string file_name_;
