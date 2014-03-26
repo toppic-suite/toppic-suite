@@ -32,6 +32,8 @@ class Proteoform {
 
   ResSeqPtr getResSeqPtr() {return residue_seq_ptr_;}
 
+  void setResSeqPtr(ResSeqPtr residue_seq_ptr){ residue_seq_ptr_ =residue_seq_ptr;}
+
   BpSpecPtr getBpSpecPtr() {return bp_spec_ptr_;}
 
   int getStartPos() {return start_pos_;}
@@ -53,6 +55,8 @@ class Proteoform {
   std::string toString();
 
   int getUnexpectedChangeNum();
+
+  ChangePtrVec getUnexpectedChangePtrVec() ;
 
   SemiAlignTypePtr getSemiAlignType();
 

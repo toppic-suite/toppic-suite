@@ -116,6 +116,16 @@ int Proteoform::getUnexpectedChangeNum() {
   return n;
 }
 
+ChangePtrVec Proteoform::getUnexpectedChangePtrVec(){
+  ChangePtrVec un_change;
+  for (unsigned int i = 0; i < change_list_.size(); i++) {
+    if (change_list_[i]->getChangeType() == UNEXPECTED_CHANGE) {
+      un_change.push_back(change_list_[i]);
+    }
+  }
+  return un_change;
+}
+
 SemiAlignTypePtr Proteoform::getSemiAlignType() {
   int trunc_len = prot_mod_ptr_->getTruncPtr()->getTruncLen();
   bool is_prefix = false;
