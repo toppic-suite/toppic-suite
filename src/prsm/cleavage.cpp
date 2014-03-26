@@ -15,7 +15,9 @@ Cleavage::Cleavage(int pos){
 }
 void Cleavage::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
   xercesc::DOMElement* element = xml_doc->createElement("character");
-      std::string str = convertToString(pos_);
+      std::string str = "cleavage";
+      xml_doc->addElement(element, "type", str.c_str());
+      str = convertToString(pos_);
       xml_doc->addElement(element, "position", str.c_str());
       str = convertToString(exist_n_ion_);
       xml_doc->addElement(element, "exist_n_ion", str.c_str());
@@ -40,14 +42,18 @@ CleavagePtrVec getProteoCleavage(ProteoformPtr prot,
   PeakIonPairPtrVec2D peak_list;
   std::vector<bool> n_ion;
   std::vector<bool> c_ion;
-  for(int i=0;i<prot->getResSeqPtr()->getLen()+1;i++){
+//  for(int i=0;i<prot->getResSeqPtr()->getLen()+1;i++){
+  for(int i=0;i<prot->getDbResSeqPtr()->getResidues().size()+1;i++){
     PeakIonPairPtrVec temp;
     peak_list.push_back(temp);
     n_ion.push_back(false);
     c_ion.push_back(false);
   }
+//  std::cout<<prot->getStartPos()<<"->"<<prot->getEndPos()<<std::endl;
+//  std::cout<<"S"<<peak_list.size()<<std::endl;
   for(unsigned int i=0;i<pairs.size();i++){
     int pos = pairs[i]->getTheoPeakPtr()->getIonPtr()->getPos()+prot->getStartPos();
+//    std::cout<<pairs[i]->getTheoPeakPtr()->getIonPtr()->getPos()<<"+"<<prot->getStartPos()<<std::endl;
     peak_list[pos].push_back(pairs[i]);
     if(pairs[i]->getTheoPeakPtr()->getIonPtr()->getIonTypePtr()->isNTerm()){
       n_ion[pos] = true;
@@ -57,7 +63,7 @@ CleavagePtrVec getProteoCleavage(ProteoformPtr prot,
     }
   }
 
-  for(int i=0;i< (int)prot->getResSeqPtr()->getLen()+1;i++){
+  for(int i=0;i< (int)prot->getDbResSeqPtr()->getResidues().size()+1;i++){
     CleavagePtr cleavage = CleavagePtr(new Cleavage(i));
     cleavage->setPairs(peak_list[i]);
     cleavage->setExistCIon(c_ion[i]);
