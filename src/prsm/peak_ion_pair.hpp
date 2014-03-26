@@ -36,6 +36,10 @@ typedef std::shared_ptr<PeakIonPair> PeakIonPairPtr;
 typedef std::vector<PeakIonPairPtr> PeakIonPairPtrVec;
 typedef std::vector<PeakIonPairPtrVec> PeakIonPairPtrVec2D;
 
+inline bool peakIonPairUp(PeakIonPairPtr p1, PeakIonPairPtr p2) {
+  return p1->getRealPeakPtr()->getBasePeakPtr()->getPosition() < p2->getRealPeakPtr()->getBasePeakPtr()->getPosition();
+}
+
 void getMatchedPairs(PeakIonPairPtrVec &pairs, int peak_id, 
                      PeakIonPairPtrVec &selected_pairs);
 

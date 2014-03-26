@@ -38,10 +38,18 @@ void PrSM::initScores(SpParaPtr sp_para_ptr) {
   match_fragment_num_ = 0;
   TheoPeakPtr prev_ion(nullptr);;
   for (unsigned int i = 0; i < pairs.size(); i++) {
-    match_peak_num_ += pairs[i]->getRealPeakPtr()->getScore();
+//    match_peak_num_ += pairs[i]->getRealPeakPtr()->getScore();
     if (pairs[i]->getTheoPeakPtr() != prev_ion) {
       prev_ion = pairs[i]->getTheoPeakPtr();
       match_fragment_num_ += pairs[i]->getRealPeakPtr()->getScore();
+    }
+  }
+  std::sort(pairs.begin(),pairs.end(),peakIonPairUp);
+  DeconvPeakPtr prev_deconv_peak(nullptr);
+  for (unsigned int i = 0; i < pairs.size(); i++) {
+    if (pairs[i]->getRealPeakPtr()->getBasePeakPtr() != prev_deconv_peak) {
+      prev_deconv_peak = pairs[i]->getRealPeakPtr()->getBasePeakPtr();
+      match_peak_num_ += pairs[i]->getRealPeakPtr()->getScore();
     }
   }
 }
