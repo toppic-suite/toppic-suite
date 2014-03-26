@@ -21,9 +21,13 @@ class PrSM {
 
     ProteoformPtr getProteoformPtr() {return proteoform_ptr_;}
 
+    void setProteoformPtr(ProteoformPtr proteoform) {proteoform_ptr_=proteoform;}
+
     double getCalibration() {return calibration_;}
 
     DeconvMsPtr getDeconvMsPtr() {return deconv_ms_ptr_;}
+
+    void setDeconvMsPtr(DeconvMsPtr ms) {deconv_ms_ptr_=ms;}
 
     double getMatchPeakNum() {return match_peak_num_;}
 
@@ -46,6 +50,8 @@ class PrSM {
     int getPrecurorId() {return precursor_id_;}
 
     ExtendMsPtr getRefineMs() {return refine_ms_three_;}
+
+    void setRefineMs(ExtendMsPtr refine_ms_three){refine_ms_three_ = refine_ms_three;}
 
     ExtremeValuePtr getProbPtr() {return prob_ptr_;} 
 
@@ -169,6 +175,7 @@ inline bool prsm_spectrum(PrSMPtr p1, PrSMPtr p2){
 
 PrSMPtrVec readPrsm(std::string file_name,ProteoformPtrVec proteoforms);
 
+bool isMatch(PrSMPtr prsm_ptr, MsHeaderPtr header_ptr);
 void filterPrsms(PrSMPtrVec &prsms, MsHeaderPtr header_ptr, PrSMPtrVec &sele_prsms); 
 
 xercesc::DOMElement* genePrSMView(XmlDOMDocument* xml_doc,PrSMPtr prsm);

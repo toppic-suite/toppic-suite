@@ -133,6 +133,7 @@ PrSM::PrSM(xercesc::DOMElement* element,ProteoformPtrVec proteoforms){
 }
 
 xercesc::DOMElement* genePrSMView(XmlDOMDocument* xml_doc,PrSMPtr prsm){
+  int pos = 4;
   xercesc::DOMElement* element = xml_doc->createElement("prsm");
   std::string str = convertToString(prsm->getId());
   xml_doc->addElement(element, "prsm_id", str.c_str());
@@ -155,13 +156,13 @@ xercesc::DOMElement* genePrSMView(XmlDOMDocument* xml_doc,PrSMPtr prsm){
   }
   str=convertToString(prsm->getFdr());
   xml_doc->addElement(element, "fdr", str.c_str());
-  str=convertToString(prsm->getMatchFragNum());
+  str=convertToString(prsm->getMatchFragNum(),pos);
   xml_doc->addElement(element, "matched_fragment_number", str.c_str());
-  str=convertToString(prsm->getMatchPeakNum());
+  str=convertToString(prsm->getMatchPeakNum(),pos);
   xml_doc->addElement(element, "matched_peak_number", str.c_str());
 //  str=convertToString(prsm->getOriPrecMass());
 //  xml_doc->addElement(element, "precursor_mass", str.c_str());
-  str=convertToString(prsm->getAdjustedPrecMass());
+  str=convertToString(prsm->getAdjustedPrecMass(),pos);
   xml_doc->addElement(element, "adjusted_precursor_mass", str.c_str());
   str=convertToString(prsm->getCalibration());
   xml_doc->addElement(element, "calibration", str.c_str());
@@ -183,17 +184,20 @@ xercesc::DOMElement* genePrSMView(XmlDOMDocument* xml_doc,PrSMPtr prsm){
     xml_doc->addElement(peak, "id", str.c_str());
     double mass = dp->getPosition();
     int charge = dp->getCharge();
-    str=convertToString(mass);
+    str=convertToString(mass,pos);
     xml_doc->addElement(peak, "monoisotopic_mass", str.c_str());
-    str=convertToString(mass/charge+MassConstant::getProtonMass());
+    str=convertToString(mass/charge+MassConstant::getProtonMass(),pos);
     xml_doc->addElement(peak, "monoisotopic_mz", str.c_str());
-    str=convertToString(dp->getIntensity());
+    str=convertToString(dp->getIntensity(),pos-2);
     xml_doc->addElement(peak, "intensity", str.c_str());
     str=convertToString(charge);
     xml_doc->addElement(peak, "charge", str.c_str());
     PeakIonPairPtrVec selected_pairs;
     getMatchedPairs(pairs,dp->getId(),selected_pairs);
     if(selected_pairs.size()>0){
+      int match_ions_number = selected_pairs.size();
+      str=convertToString(match_ions_number);
+      xml_doc->addElement(peak, "matched_ions_num", str.c_str());
       xercesc::DOMElement* mi_element = xml_doc->createElement("matched_ions");
       peak->appendChild(mi_element);
       for(unsigned int j=0;j< selected_pairs.size();j++){
@@ -374,10 +378,13 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
   xercesc::DOMElement* annotation_element = xml_doc->createElement("annotation");
   prot_element->appendChild(annotation_element);
   CleavagePtrVec cleavages = getProteoCleavage(proteoform_ptr,refine_ms_three,min_mass);
+//  std::cout<<cleavages.size()<<std::endl;
   int display =0;
-  for(int i=0;i<proteoform_ptr->getResSeqPtr()->getLen();i++){
+//  for(int i=0;i<proteoform_ptr->getResSeqPtr()->getLen();i++){
+  for(int i=0;i<proteoform_ptr->getDbResSeqPtr()->getLen();i++){
     cleavages[i]->appendXml(xml_doc,annotation_element);
-    ResiduePtr cur_res = proteoform_ptr->getResSeqPtr()->getResiduePtr(i);//->appendXml(xml_doc,annotation_element);
+//    ResiduePtr cur_res = proteoform_ptr->getResSeqPtr()->getResiduePtr(i);//->appendXml(xml_doc,annotation_element);
+    ResiduePtr cur_res = proteoform_ptr->getDbResSeqPtr()->getResiduePtr(i);
     cur_res->setPos(i);
     if(i<proteoform_ptr->getStartPos()){
       cur_res->setType("n_trunc");
