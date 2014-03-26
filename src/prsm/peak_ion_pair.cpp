@@ -20,22 +20,23 @@ void PeakIonPair::appendPeakToXml(XmlDOMDocument* xml_doc,
 
 void PeakIonPair::appendIonToXml(XmlDOMDocument* xml_doc, 
                                  xercesc::DOMElement* parent) {
+  int pos=4;
   xercesc::DOMElement* element = xml_doc->createElement("matched_ion");
   std::string str 
       = theo_peak_ptr_->getIonPtr()->getIonTypePtr()->getName().substr(0,1);
   xml_doc->addElement(element, "type", str.c_str());
   str = convertToString(theo_peak_ptr_->getShift());
   xml_doc->addElement(element, "match_shift", str.c_str()); 
-  str = convertToString(real_peak_ptr_->getMonoMass());
+  str = convertToString(real_peak_ptr_->getMonoMass(),pos);
   xml_doc->addElement(element, "adjusted_mass", str.c_str()); 
   str = convertToString(theo_peak_ptr_->getIonPtr()->getDisplayPos());
-  xml_doc->addElement(element, "ion_display_posistion", str.c_str()); 
+  xml_doc->addElement(element, "ion_display_position", str.c_str());
   str = convertToString(theo_peak_ptr_->getIonPtr()->getPos());
-  xml_doc->addElement(element, "ion_left_posistion", str.c_str()); 
+  xml_doc->addElement(element, "ion_left_position", str.c_str());
   double error = real_peak_ptr_->getMonoMass() - theo_peak_ptr_->getModMass();
-  str = convertToString(error);
+  str = convertToString(error,pos);
   xml_doc->addElement(element, "mass_error", str.c_str()); 
-  str = convertToString(error * 1000000 / real_peak_ptr_->getMonoMass());
+  str = convertToString(error * 1000000 / real_peak_ptr_->getMonoMass(),pos-2);
   xml_doc->addElement(element, "ppm", str.c_str()); 
   parent->appendChild(element);
 }
@@ -56,6 +57,13 @@ void findPairs(ExtendMsPtr ms_three_ptr, TheoPeakPtrVec &theo_peaks,
   getExtendMassVec(ms_three_ptr, ms_masses);
   std::vector<double> theo_masses; 
   getTheoMassVec(theo_peaks, theo_masses);
+
+//  for(int i=0;i<ms_masses.size();i++){
+//        std::cout<<ms_masses[i]<<std::endl;
+//      }
+//    for(int i=0;i<theo_masses.size();i++){
+//        std::cout<<theo_masses[i]<<std::endl;
+//      }
 
   unsigned int i = 0;
   unsigned int j = 0;
@@ -87,8 +95,14 @@ void getPeakIonPairs (ProteoformPtr proteoform_ptr, ExtendMsPtr ms_three_ptr,
   TheoPeakPtrVec theo_peaks = getProteoformTheoPeak(proteoform_ptr, 
                                                     activation_ptr, 
                                                     min_mass);
+//  std::cout<<proteoform_ptr->getStartPos()<<proteoform_ptr->getEndPos()<<std::endl;
 
   findPairs(ms_three_ptr, theo_peaks, 0, proteoform_ptr->getLen(), pairs);
+
+//  std::cout<<"size:"<<proteoform_ptr->getLen()<<"|"<<ms_three_ptr->size()<<"|"<<theo_peaks.size()<<"|"<<pairs.size()<<std::endl;
+//    for(unsigned int i=0;i<proteoform_ptr->getChangePtrVec().size();i++){
+//      std::cout<<proteoform_ptr->getChangePtrVec()[i]->getChangeType()<<std::endl;
+//    }
 }
 
 }
