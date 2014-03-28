@@ -426,7 +426,7 @@ void Proteoform::addUnexpectedChangePtrVec(ChangePtrVec &changes) {
 }
 
 bool isSamePeptideAndMass(ProteoformPtr proteoform,ProteoformPtr another_proteoform,double ppo){
-  double thresh = proteoform->getBpSpecPtr()->getResSeqMass()*ppo;
+  double thresh = proteoform->getResSeqPtr()->getSeqMass()*ppo;
   if(proteoform->getDbResSeqPtr()->getId() != another_proteoform->getDbResSeqPtr()->getId()){
     return false;
   }
@@ -436,8 +436,8 @@ bool isSamePeptideAndMass(ProteoformPtr proteoform,ProteoformPtr another_proteof
   if(proteoform->getEndPos() != another_proteoform->getEndPos()){
     return false;
   }
-  if(std::abs(proteoform->getBpSpecPtr()->getResSeqMass()
-              -another_proteoform->getBpSpecPtr()->getResSeqMass())> thresh){
+  if(std::abs(proteoform->getResSeqPtr()->getSeqMass()
+              -another_proteoform->getResSeqPtr()->getSeqMass())> thresh){
     return false;
   }
   return true;
@@ -450,7 +450,7 @@ bool isStrictCompatiablePtmSpecies(ProteoformPtr a,ProteoformPtr b,double ppo){
   if(a->getChangePtrVec().size() != b->getChangePtrVec().size()){
     return false;
   }
-  double shift_tolerance = a->getBpSpecPtr()->getResSeqMass()*ppo;
+  double shift_tolerance = a->getResSeqPtr()->getSeqMass()*ppo;
   // sort changes 
   ChangePtrVec a_change_vec = a->getChangePtrVec();
   ChangePtrVec b_change_vec = b->getChangePtrVec();

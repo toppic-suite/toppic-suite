@@ -17,11 +17,15 @@ class BreakPoint {
   BreakPoint(double prm,double srm);
 
   double getPrm(){return prm_;}
+
   double getSrm(){return srm_;}
+
   double getNTermMass(IonTypePtr ion_type_ptr) {
     return prm_ + ion_type_ptr->getShift();}
+
   double getCTermMass(IonTypePtr ion_type_ptr) {
     return srm_ + ion_type_ptr->getShift();}
+
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
  private:

@@ -401,7 +401,7 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
       cur_res->setType("c_trunc");
     }
     ChangePtrVec change_list = proteoform_ptr->getChangePtrVec();
-    for(int j=0;j<change_list.size();j++){
+    for(unsigned int j=0;j<change_list.size();j++){
       if(change_list[j]->getLeftBpPos()<i&& i<change_list[j]->getRightBpPos())
       {
         if(change_list[j]->getChangeType()==UNEXPECTED_CHANGE){

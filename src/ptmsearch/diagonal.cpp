@@ -27,12 +27,15 @@ TheoPeakPtrVec getDiagonalTheoPeak(ProteoformPtr seq,ActivationPtr type,
   double pep_c_term_shift = headers[i]->getProtCTermShift()
       -last_header->getProtCTermShift()
       +last_header->getPepCTermShift();
+  double maxMass = subseq->getSeqMass() + 
+      pep_n_term_shift + pep_c_term_shift - minMass;
   //  std::cout<<std::fixed<<pep->getResSeqMass()<<"|"<<pep_n_term_shift<<"|"<<pep_c_term_shift<<std::endl;
   return getTheoPeak(pep,type,NeutralLossFactory::getNeutralLossPtr_NONE(),
                      pep_n_term_shift,pep_c_term_shift,
                      headers[i]->getMatchFirstResPos()-first_res_pos,
                      headers[i]->getMatchLastResPos()-first_res_pos+1,
-                     minMass);
+                     minMass, 
+                     maxMass);
 }
 
 DiagonalHeaderPtrVec refineHeadersBgnEnd(

@@ -89,7 +89,7 @@ void ZeroPtmSlowMatch::compScore (ExtendMsPtr refine_ms_ptr, TheoPeakPtrVec theo
   for (unsigned int i = 0; i < ms_masses.size(); i++) {
     ms_masses[i] = ms_masses[i] * (1 + recal_);
   }
-  score_ = compUniqueScore(ms_masses, theo_masses, ppo);
+  score_ = compNumMatchedTheoMasses(ms_masses, theo_masses, ppo);
 }
 
 // get result 

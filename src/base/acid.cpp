@@ -56,7 +56,6 @@ void AcidFactory::initFactory(std::string file_name) {
       acid_ptr_vec_.push_back(ptr);
 
     }
-    // deleting parser is not necessary
   }
 }
 
@@ -133,14 +132,12 @@ bool AcidFactory::baseContainsThreeLetter(const std::string &three_letter) {
  */
 AcidPtrVec AcidFactory::convertSeqToAcidSeq(const std::string &seq) {
   AcidPtrVec acid_seq;
-  if (seq.length() == 0) {
-    return acid_seq;
-  } else {
+  if (seq.length() > 0) {
     for (unsigned int i = 0; i < seq.length(); i++) {
       acid_seq.push_back(getBaseAcidPtrByOneLetter(seq.substr(i, 1)));
     }
-    return acid_seq;
   }
+  return acid_seq;
 }
 
 } /* end namespace */

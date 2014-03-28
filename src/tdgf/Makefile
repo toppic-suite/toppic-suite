@@ -6,10 +6,10 @@ CPPFLAGS = -Wall -g -std=c++11
 #
 # define any directories containing header files other than /usr/include
 #
-INCLUDES = -I..
+INCLUDES = -I../ -I../../lib/xerces-c/include
 #
 # define library paths in addition to /usr/lib
-LFLAGS = -L/lib -L/opt/local/lib
+LFLAGS = -L/lib -L/opt/local/lib -L../../lib/xerces-c/lib
 #
 # define any libraries to link into executable:
 LIBS = -lxerces-c 

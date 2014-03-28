@@ -6,7 +6,7 @@ CPPFLAGS = -Wall -g -std=c++11
 #
 # define any directories containing header files other than /usr/include
 #
-INCLUDES = -I../ -I../../lib/xerces-c/include
+INCLUDES = -I../ -I../../lib/xerces-c/include -I../../lib/xalan-c/c/src -I../../lib/xalan-c/c/nls/include
 #
 # define library paths in addition to /usr/lib
 LFLAGS = -L/lib -L/opt/local/lib
@@ -15,19 +15,22 @@ LFLAGS = -L/lib -L/opt/local/lib
 LIBS = -lxerces-c 
 #
 # define the C++ source files
-SRCS = comp_shift_hi_mem.cpp ptm_fast_filter_block.cpp ptm_fast_filter_hi_mem.cpp ptm_fast_filter_processor.cpp 
+SRCS = xml_generator.cpp transformer.cpp 
 #
 # define the C object files 
 #
 
 OBJ_DIR = ../../obj
-OBJS = $(addprefix $(OBJ_DIR)/, comp_shift_hi_mem.o ptm_fast_filter_block.o ptm_fast_filter_hi_mem.o ptm_fast_filter_processor.o) 
+
+XPP_OBJS = $(addprefix $(OBJ_DIR)/, xml_generator.o transformer.o) 
+
+OBJS = $(XPP_OBJS)
 
 BIN_DIR = ../../bin
 
+
 #
 # define the executable file 
-MAIN = $(BIN_DIR)/fast_filter
 #
 #
 # The following part of the makefile is generic; it can be used to 
@@ -37,15 +40,12 @@ MAIN = $(BIN_DIR)/fast_filter
 #
 .PHONY: depend clean
 #
-all:    $(MAIN)
-
-$(MAIN): $(OBJS) 
-#	$(CC) $(CPPFLAGS) $(INCLUDES) -o $(MAIN) $(OBJS) $(LFLAGS) $(LIBS)
+all:    $(OBJS)
 
 $(OBJ_DIR)/%.o: %.cpp
 	$(CC) -c $(CPPFLAGS) $(INCLUDES) $< -o $@
 
 clean:
-	$(RM) *~ $(MAIN) $(OBJS)
+	$(RM) *~ $(MAIN) $(XPP_OBJS)
 
 depend: $(SRCS)

@@ -35,6 +35,7 @@ void Activation::appendXml(XmlDOMDocument* xml_doc,
     parent->appendChild(element);
 }
 
+/* Methods for ActivationFactory */
 void ActivationFactory::initFactory(std::string file_name){
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {

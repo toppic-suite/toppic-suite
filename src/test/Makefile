@@ -6,13 +6,14 @@ CPPFLAGS = -Wall -g -std=c++11
 #
 # define any directories containing header files other than /usr/include
 #
-INCLUDES = -I..
+INCLUDES = -I../ -I../../lib/xerces-c/include -I../../lib/xalan-c/c/src -I../../lib/xalan-c/c/nls/include
 #
 # define library paths in addition to /usr/lib
-LFLAGS = -L/lib -L/opt/local/lib
+LFLAGS = -L/lib -L/opt/local/lib  -L/usr/lib
 #
 # define any libraries to link into executable:
-LIBS = -lxerces-c 
+LIBS = -lxerces-c-3.1  
+#-lxalan-c -lxalanMsg
 #
 # define the C++ source files
 SRCS = test_console.cpp 
@@ -21,7 +22,7 @@ SRCS = test_console.cpp
 #
 
 OBJ_DIR = ../../obj
-BASE_OBJS = $(addprefix $(OBJ_DIR)/, species.o ion.o algorithm.o residue_freq.o support_peak_type.o semi_align_type.o db_residue_seq.o extreme_value.o residue_seq.o fasta_reader.o change.o break_point.o bp_spec.o proteoform.o base_data.o activation.o ion_type.o neutral_loss.o trunc.o prot_mod.o acid.o ptm.o residue.o xml_dom.o xml_dom_document.o)
+BASE_OBJS = $(addprefix $(OBJ_DIR)/, xml_writer.o species.o ion.o algorithm.o residue_freq.o support_peak_type.o semi_align_type.o db_residue_seq.o extreme_value.o residue_seq.o fasta_reader.o change.o break_point.o bp_spec.o proteoform.o base_data.o activation.o ion_type.o neutral_loss.o trunc.o prot_mod.o acid.o ptm.o residue.o xml_dom.o xml_dom_document.o)
 
 SPEC_OBJS = $(addprefix $(OBJ_DIR)/, theo_peak.o spectrum_set.o msalign_reader.o deconv_ms.o support_peak.o deconv_peak.o extend_peak.o prm_peak.o ms_header.o sp_para.o extend_sp_para.o peak_tolerance.o) 
 
@@ -35,9 +36,11 @@ PTM_OBJS = $(addprefix $(OBJ_DIR)/, ptm_processor.o ptm_slow_filter.o ptm_slow_m
 
 TDGF_OBJS = $(addprefix $(OBJ_DIR)/, evalue_processor.o comp_prob_value.o count_test_num.o comp_pvalue_array.o) 
 
+XPP_OBJS = $(addprefix $(OBJ_DIR)/, xml_generator.o) 
+
 TEST_OBJS = $(addprefix $(OBJ_DIR)/, test_console.o)
 
-OBJS = $(BASE_OBJS) $(SPEC_OBJS) $(PRSM_OBJS) $(ZERO_PTM_OBJS) $(FILTER_OBJS) $(PTM_OBJS) $(TDGF_OBJS) $(TEST_OBJS)
+OBJS = $(BASE_OBJS) $(SPEC_OBJS) $(PRSM_OBJS) $(ZERO_PTM_OBJS) $(FILTER_OBJS) $(PTM_OBJS) $(TDGF_OBJS) $(XPP_OBJS) $(TEST_OBJS)
 
 BIN_DIR = ../../bin
 
@@ -62,6 +65,6 @@ $(OBJ_DIR)/%.o: %.cpp
 	$(CC) -c $(CPPFLAGS) $(INCLUDES) $< -o $@
 
 clean:
-	$(RM) *~ $(MAIN) $(TDGF_OBJS)
+	$(RM) *~ $(MAIN) $(TEST_OBJS)
 
 depend: $(SRCS)

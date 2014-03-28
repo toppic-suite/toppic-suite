@@ -26,7 +26,7 @@ Change::Change(xercesc::DOMElement* change_element) {
   }
 }
 
-
+/* Generate a new change instance with a new start position */
 Change::Change(Change ori, int start) {
   left_bp_pos_ = ori.left_bp_pos_ - start;
   right_bp_pos_ = ori.right_bp_pos_ - start;
@@ -89,4 +89,3 @@ void Change::appendViewXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
 }
 
 }
-

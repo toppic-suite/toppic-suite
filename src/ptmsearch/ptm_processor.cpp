@@ -111,7 +111,7 @@ void PtmProcessor::chooseCompPrePrsms(PrSMPtrVec &all_prsms, PrSMPtrVec &sele_pr
       }
     }
   }
-  std::sort(sele_prsms.begin(), sele_prsms.end(), prsmFroteoformIdUp);
+  std::sort(sele_prsms.begin(), sele_prsms.end(), prsmProteoformIdUp);
 }
 
 void PtmProcessor::chooseSuffIntPrsms(PrSMPtrVec &all_prsms, PrSMPtrVec &sele_prsms) {
@@ -127,7 +127,7 @@ void PtmProcessor::chooseSuffIntPrsms(PrSMPtrVec &all_prsms, PrSMPtrVec &sele_pr
       }
     }
   }
-  std::sort(sele_prsms.begin(), sele_prsms.end(), prsmFroteoformIdUp);
+  std::sort(sele_prsms.begin(), sele_prsms.end(), prsmProteoformIdUp);
 }
 
 

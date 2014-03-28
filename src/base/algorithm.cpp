@@ -2,6 +2,7 @@
 #include <limits>
 
 #include "base/algorithm.hpp"
+#include "base/logger.hpp"
 
 namespace prot {
 
@@ -66,9 +67,9 @@ void  compMsMassPpos(std::vector<double> &ms_masses,
   }
 }
 
-void compTheoMassPpo(std::vector<double> &ms_masses, 
-                     std::vector<double> &theo_masses,
-                     double ppo, std::vector<double> &result_ppos) {
+void compTheoMassPpos(std::vector<double> &ms_masses, 
+                      std::vector<double> &theo_masses,
+                      double ppo, std::vector<double> &result_ppos) {
 
   std::vector<double> min_distances;
   for (unsigned p = 0; p < theo_masses.size(); p++) {
@@ -100,12 +101,12 @@ void compTheoMassPpo(std::vector<double> &ms_masses,
   }
 }
 
-/** compute unique score */
-double compUniqueScore (std::vector<double> &ms_masses, 
-                        std::vector<double> &theo_masses, 
-                        double ppo) {
+/* compute the number of matched theoretical masses (fragment ions) */
+double compNumMatchedTheoMasses (std::vector<double> &ms_masses, 
+                                 std::vector<double> &theo_masses, 
+                                 double ppo) {
   std::vector<double> theo_mass_ppos;
-  compTheoMassPpo(ms_masses, theo_masses, ppo, theo_mass_ppos);
+  compTheoMassPpos(ms_masses, theo_masses, ppo, theo_mass_ppos);
   double score = 0;
   for (unsigned i = 0; i < theo_mass_ppos.size(); i++) {
     if (std::abs(theo_mass_ppos[i]) <= ppo) {
@@ -113,6 +114,41 @@ double compUniqueScore (std::vector<double> &ms_masses,
     }
   }
   return score;
+}
+
+/* compute the position of the last residue of a proteoform based 
+ * on its n term shift */
+int getFirstResPos(double n_term_shift,std::vector<double> prm_masses){
+  double trunc_mass = - n_term_shift;
+  int best_pos = -1;
+  double best_shift = std::numeric_limits<double>::infinity();
+  for(unsigned int i = 0; i < prm_masses.size();i++){
+    if(std::abs(prm_masses[i] - trunc_mass) < best_shift){
+      best_pos = i;
+      best_shift = std::abs(prm_masses[i] - trunc_mass);
+    }
+  }
+  return best_pos;
+}
+
+/* compute the position of the last residue of a proteoform based on 
+ * its c term shift */
+int getLastResPos(double c_term_shift,std::vector<double> prm_masses){
+  double trunc_mass = -c_term_shift;
+  int best_pos = -1;
+  double best_shift = std::numeric_limits<double>::infinity();
+  double residue_mass_sum = prm_masses[prm_masses.size()-1];
+  for(unsigned int i=0;i<prm_masses.size();i++){
+    if (std::abs(residue_mass_sum-prm_masses[i]-trunc_mass)<best_shift){
+      best_pos=i;
+      best_shift = std::abs(residue_mass_sum-prm_masses[i]-trunc_mass);
+    }
+  }
+  if(best_pos < 0){
+    LOG_ERROR("get last residue position error! ");
+    throw "get last residue position error!";
+  }
+  return best_pos - 1;
 }
 
 }

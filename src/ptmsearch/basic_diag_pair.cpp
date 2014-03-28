@@ -128,7 +128,7 @@ BasicDiagPairDiagPtr getDiagonal(int cnt,DiagonalHeaderPtr header,
   BpSpecPtr bp_spec_ptr = seq->getBpSpecPtr();
     double n_shift = header->getProtNTermShift();
     double c_shift = ms_six->getHeaderPtr()->getPrecMonoMass()
-      -bp_spec_ptr->getResSeqMass()-n_shift;
+      -seq->getResSeqPtr()->getSeqMass()-n_shift;
     setPrefixSuffix(header,c_shift,seq,mng);
   IonTypePtr b_ion = IonTypeFactory::getIonTypePtr_B();
   std::vector<double> b_masses = bp_spec_ptr->getBreakPointMasses(b_ion);

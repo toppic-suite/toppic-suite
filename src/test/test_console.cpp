@@ -19,6 +19,8 @@
 #include "tdgf/evalue_processor.hpp"
 #include "tdgf/tdgf_mng.hpp"
 
+#include "xpp/xml_generator.hpp"
+
 
 int main(int argc, char* argv[]) {
   try {
@@ -82,6 +84,12 @@ int main(int argc, char* argv[]) {
     prot::TableWriter table_out(argv[2], argv[3], "OUTPUT_RESULT",
                           "OUTPUT_TABLE", zero_mng_ptr->ppo_);
 		table_out.write();
+
+//    prot::XmlGenerator xml_gene = prot::XmlGenerator(argv[2],argv[3],"OUTPUT_RESULT");
+//		xml_gene.process();
+
+//		TransformerPtr trans = TransformerPtr(new Transformer());
+//		trans->trans();
 
   } catch (const char* e) {
     std::cout << "Exception " << e << std::endl;

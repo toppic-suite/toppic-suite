@@ -9,6 +9,7 @@
 
 #include "base/prot_mod.hpp"
 #include "base/change.hpp"
+#include "base/algorithm.hpp"
 #include "ptmsearch/diagonal_header.hpp"
 
 namespace prot {

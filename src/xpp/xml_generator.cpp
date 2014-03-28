@@ -99,6 +99,7 @@ void XmlGenerator::processPrSMs(PrSMPtrVec & prsms,ProteoformPtrVec proteoforms)
     }
   }
 }
+
 void XmlGenerator::process(){
   ProteoformPtrVec raw_forms
         = readFastaToProteoform(db_file_,
