@@ -150,24 +150,24 @@ xercesc::DOMElement* genePrSMView(XmlDOMDocument* xml_doc,PrSMPtr prsm){
 //  xml_doc->addElement(element, "spectrum_id", str.c_str());
 //  xml_doc->addElement(element, "spectrum_scan", prsm->getSpectrumScan().c_str());
   if(prsm->getProbPtr()->getPValue() != -std::numeric_limits<double>::max()){
-    str=convertToString(prsm->getProbPtr()->getPValue());
+    str=convertToString(prsm->getProbPtr()->getPValue(),pos);
     xml_doc->addElement(element, "p_value", str.c_str());
   }
   else{
     xml_doc->addElement(element, "p_value", "-1");
   }
   if(prsm->getProbPtr()->getEValue() != -std::numeric_limits<double>::max()){
-    str=convertToString(prsm->getProbPtr()->getEValue());
+    str=convertToString(prsm->getProbPtr()->getEValue(),pos);
     xml_doc->addElement(element, "e_value", str.c_str());
   }
   else{
     xml_doc->addElement(element, "e_value", "-1");
   }
-  str=convertToString(prsm->getFdr());
+  str=convertToString(prsm->getFdr(),pos);
   xml_doc->addElement(element, "fdr", str.c_str());
-  str=convertToString(prsm->getMatchFragNum(),pos);
+  str=convertToString(prsm->getMatchFragNum(),pos-4);
   xml_doc->addElement(element, "matched_fragment_number", str.c_str());
-  str=convertToString(prsm->getMatchPeakNum(),pos);
+  str=convertToString(prsm->getMatchPeakNum(),pos-4);
   xml_doc->addElement(element, "matched_peak_number", str.c_str());
 //  str=convertToString(prsm->getOriPrecMass());
 //  xml_doc->addElement(element, "precursor_mass", str.c_str());
