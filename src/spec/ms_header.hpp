@@ -19,7 +19,7 @@ class MsHeader {
 
   std::string getScansString();
 
-  void setScans(std::string s);
+  void setScans(const std::string &s);
 
   std::string toString();
 

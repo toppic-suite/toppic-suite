@@ -23,7 +23,7 @@ SRCS = theo_peak.cpp extend_sp_para.cpp peak_tolerance.cpp msalign_reader.cpp de
 OBJ_DIR = ../../obj
 BASE_OBJS = $(addprefix $(OBJ_DIR)/, support_peak_type.o neutral_loss.o semi_align_type.o prot_mod.o db_residue_seq.o trunc.o change.o break_point.o bp_spec.o acid.o ptm.o residue.o residue_seq.o proteoform.o ion.o ion_type.o xml_dom.o xml_dom_document.o activation.o)
 
-SPEC_OBJS = $(addprefix $(OBJ_DIR)/, extend_peak.o support_peak.o prm_peak.o spectrum_set.o sp_para.o theo_peak.o extend_sp_para.o peak_tolerance.o msalign_reader.o deconv_ms.o peak_list.o ms_header.o deconv_peak.o)
+SPEC_OBJS = $(addprefix $(OBJ_DIR)/, peak.o extend_peak.o support_peak.o prm_peak.o spectrum_set.o sp_para.o theo_peak.o extend_sp_para.o peak_tolerance.o msalign_reader.o deconv_ms.o peak_list.o ms_header.o deconv_peak.o)
 
 OBJS = $(BASE_OBJS) $(SPEC_OBJS)
 

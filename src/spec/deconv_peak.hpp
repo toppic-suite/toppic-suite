@@ -1,6 +1,7 @@
 #ifndef PROT_DECONV_PEAK_HPP_
 #define PROT_DECONV_PEAK_HPP_
 
+#include <memory>
 #include <vector>
 #include "spec/peak.hpp"
 

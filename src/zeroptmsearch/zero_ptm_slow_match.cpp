@@ -70,10 +70,8 @@ bool ZeroPtmSlowMatch::isValid (double recal, double ppo) {
 // input is refineMsThree, result is score and recal and recalMass 
 void ZeroPtmSlowMatch::compScore (ExtendMsPtr refine_ms_ptr, TheoPeakPtrVec theo_peaks,
                                   double ppo) {
-  std::vector<double> ms_masses;
-  getExtendMassVec(refine_ms_ptr, ms_masses);
-  std::vector<double> theo_masses; 
-  getTheoMassVec(theo_peaks, theo_masses);
+  std::vector<double> ms_masses = getExtendMassVec(refine_ms_ptr);
+  std::vector<double> theo_masses = getTheoMassVec(theo_peaks);
   std::vector<double> result_ppos = compMsMassPpos(ms_masses, theo_masses, ppo);
 
   if (!mng_ptr_->do_recalibration_) {

@@ -6,7 +6,7 @@
 
 namespace prot {
 
-MsAlignReader::MsAlignReader (std::string file_name) {
+MsAlignReader::MsAlignReader (const std::string &file_name) {
   file_name_ = file_name;
   input_.open(file_name.c_str(), std::ios::in);
 }
@@ -146,7 +146,7 @@ void MsAlignReader::close() {
   input_.close();
 }
 
-int countSpNum(std::string spectrum_file_name) {
+int countSpNum(const std::string &spectrum_file_name) {
   MsAlignReader reader(spectrum_file_name);
   int cnt = 0;
   DeconvMsPtr deconv_ms_ptr;
