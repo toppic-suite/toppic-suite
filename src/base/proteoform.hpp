@@ -32,8 +32,6 @@ class Proteoform {
 
   ResSeqPtr getResSeqPtr() {return residue_seq_ptr_;}
 
-  void setResSeqPtr(ResSeqPtr residue_seq_ptr){ residue_seq_ptr_ =residue_seq_ptr;}
-
   BpSpecPtr getBpSpecPtr() {return bp_spec_ptr_;}
 
   int getStartPos() {return start_pos_;}
@@ -44,15 +42,17 @@ class Proteoform {
 
   int getSeqId() {return db_residue_seq_ptr_->getId();}
 
-  std::string getName() {return db_residue_seq_ptr_->getName();}
+  std::string getSeqName() {return db_residue_seq_ptr_->getName();}
 
   ChangePtrVec getChangePtrVec() {return change_list_;}
 
-  void addUnexpectedChangePtrVec(ChangePtrVec &changes);
+  int getSpeciesId(){return species_id_;}
+
+  void setSpeciesId(int id){species_id_ = id;}
+
+  void setResSeqPtr(ResSeqPtr residue_seq_ptr) {residue_seq_ptr_ =residue_seq_ptr;}
 
   SegmentPtrVec getSegmentPtrVec();
-
-  std::string toString();
 
   int getUnexpectedChangeNum();
 
@@ -60,24 +60,28 @@ class Proteoform {
 
   SemiAlignTypePtr getSemiAlignType();
 
-  void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
-
-  int getSpeciesId(){return species_id_;}
-
-  void setSpeciesId(int id){species_id_ = id;}
-
   double getMass();
 
   std::string getProteinMatchSeq();
 
+  std::string toString();
+
+  void addUnexpectedChangePtrVec(const ChangePtrVec &changes);
+
+  void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+
  private:
 
+  /* db_residue_seq contains fixed modifications */
   DbResSeqPtr db_residue_seq_ptr_;
 
   ProtModPtr prot_mod_ptr_;
 
+  /* residue_seq starts from start_pos_ and ends at end_pos_, and contains
+   * fixed and variable modifications */
   ResSeqPtr residue_seq_ptr_;
 
+  /* bp_spec is generated from residue_seq */
   BpSpecPtr bp_spec_ptr_;
 
   // start and end positions are relative to the 
@@ -92,13 +96,18 @@ class Proteoform {
 };
 
 /* get db proteoform */
-ProteoformPtr getDbProteoformPtr(DbResSeqPtr db_res_seq_ptr, 
-                                 ProtModPtr prot_mod_ptr);
-/* generate a proteoform with protein mod */ 
-ProteoformPtr getProtModProteoform(ProteoformPtr raw_form_ptr, 
-                                   ProtModPtr prot_mod_ptr); 
+ProteoformPtr getDbProteoformPtr(const DbResSeqPtr &db_res_seq_ptr);
 
-ProteoformPtr getSubProteoform(ProteoformPtr proteoform_ptr, int start, int end);
+/* generate a proteoform with protein mod */ 
+ProteoformPtr getProtModProteoform(const ProteoformPtr &db_form_ptr, 
+                                   const ProtModPtr &prot_mod_ptr); 
+
+/* 
+ * get subproteoform. local_start and local_end are relatively to 
+ * the start position in the original proteoform
+ */
+ProteoformPtr getSubProteoform(const ProteoformPtr &proteoform_ptr, 
+                               int local_start, int local_end);
 
 /* generate a proteoform vector with protein mod */ 
 ProteoformPtrVec generateProtModProteoform(const ProteoformPtrVec &ori_forms,
@@ -111,8 +120,13 @@ ResFreqPtrVec compNTermResidueFreq(const ProteoformPtrVec &prot_mod_forms);
 ResFreqPtrVec compResidueFreq(const ResiduePtrVec &residue_list, 
                               const ProteoformPtrVec &raw_mods);
 
-bool isSamePeptideAndMass(ProteoformPtr proteoform,ProteoformPtr another_proteoform,double ppo);
-bool isStrictCompatiablePtmSpecies(ProteoformPtr a,ProteoformPtr b,double ppo);
+bool isSamePeptideAndMass(const ProteoformPtr &proteoform, 
+                          const ProteoformPtr &another_proteoform,
+                          double ppo);
+
+bool isStrictCompatiablePtmSpecies(const ProteoformPtr &a,
+                                   const ProteoformPtr &b,
+                                   double ppo);
 
 } /* namespace prot */
 

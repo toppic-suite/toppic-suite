@@ -73,8 +73,7 @@ ProteoformPtr FastaReader::getNextProteoformPtr(const ResiduePtrVec &residue_lis
   DbResSeqPtr db_residue_seq_ptr(
       new DbResidueSeq(residue_ptrs, id_, seq_ptr->getName())); 
   id_++;
-  ProtModPtr none_prot_mod = ProtModFactory::getProtModPtr_NONE();
-  return getDbProteoformPtr(db_residue_seq_ptr, none_prot_mod);
+  return getDbProteoformPtr(db_residue_seq_ptr);
 }
 
 ProteoformPtrVec readFastaToProteoform(const std::string &file_name, 

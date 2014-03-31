@@ -43,7 +43,7 @@ ZpFastMatchPtr computeCompMatch(ExtendMsPtr ms_ptr, ProteoformPtr form_ptr) {
   double error = std::abs(res_sum_mass - prot_mass);
   LOG_TRACE("complete protein mass " << prot_mass 
             << " precursor mass " << res_sum_mass 
-            << " proteoform name " << form_ptr->getName()
+            << " proteoform name " << form_ptr->getSeqName()
             << " error " << error << " error tolerance " << max_error);
   double score = 0;
   if (error <= max_error) {

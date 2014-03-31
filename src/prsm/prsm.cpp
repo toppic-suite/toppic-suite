@@ -366,7 +366,7 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
   xml_doc->addElement(prot_element, "sequence_id", str.c_str());
   str=convertToString(proteoform_ptr->getSpeciesId());
   xml_doc->addElement(prot_element, "species_id", str.c_str());
-  str=proteoform_ptr->getName();
+  str=proteoform_ptr->getSeqName();
   xml_doc->addElement(prot_element, "sequence_name", str.c_str());
   double mass = proteoform_ptr->getMass();
   str=convertToString(mass);

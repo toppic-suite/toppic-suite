@@ -33,7 +33,7 @@ Proteoform::Proteoform(xercesc::DOMElement* element,
   std::string db_seq_name = getChildValue(db_element, "name", 0);
   ProteoformPtr db_proteoform = db_proteoforms[db_seq_id];
   if(db_proteoform->getSeqId() != db_seq_id 
-     || db_proteoform->getName() != db_seq_name){
+     || db_proteoform->getSeqName() != db_seq_name){
     LOG_ERROR("Sequence ID and/or name is not consistent!");
     std::exit(0);
   }
@@ -222,12 +222,9 @@ void Proteoform::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
   parent->appendChild(element);
 }
 
-ProteoformPtr getDbProteoformPtr(DbResSeqPtr db_res_seq_ptr, 
-                                 ProtModPtr prot_mod_ptr) {
+ProteoformPtr getDbProteoformPtr(const DbResSeqPtr &db_res_seq_ptr) {
   int start_pos = 0;
   int end_pos = db_res_seq_ptr->getLen() - 1;
-  //LOG_DEBUG("raw protein sequence name " << db_res_seq_ptr->getName() 
-  //<< " len " << db_res_seq_ptr->getLen());
   ChangePtrVec change_list;  
   for (int i = 0; i < db_res_seq_ptr->getLen(); i++) {
     PtmPtr ptm_ptr = db_res_seq_ptr->getResiduePtr(i)->getPtmPtr();
@@ -237,17 +234,17 @@ ProteoformPtr getDbProteoformPtr(DbResSeqPtr db_res_seq_ptr,
       change_list.push_back(change_ptr);
     }
   }
-  return ProteoformPtr(new Proteoform(db_res_seq_ptr, prot_mod_ptr,  
+  ProtModPtr none_prot_mod_ptr = ProtModFactory::getProtModPtr_NONE();
+  return ProteoformPtr(new Proteoform(db_res_seq_ptr, none_prot_mod_ptr,  
                                       db_res_seq_ptr, start_pos, end_pos, 
                                       change_list));
 }
 
-ProteoformPtr getProtModProteoform(ProteoformPtr raw_form_ptr,
-                                   ProtModPtr prot_mod_ptr) {
+ProteoformPtr getProtModProteoform(const ProteoformPtr &db_form_ptr,
+                                   const ProtModPtr &prot_mod_ptr) {
   // check if the proteoform can be truncated
-  //LOG_DEBUG("Prot mod " << prot_mod_ptr->getName());
   TruncPtr trunc_ptr = prot_mod_ptr->getTruncPtr();
-  DbResSeqPtr db_res_seq_ptr = raw_form_ptr->getDbResSeqPtr();  
+  DbResSeqPtr db_res_seq_ptr = db_form_ptr->getDbResSeqPtr();  
   bool valid_trunc = trunc_ptr->isValidTrunc(db_res_seq_ptr);
   if (!valid_trunc) {
     //LOG_DEBUG("NO valid trunc");
@@ -301,8 +298,8 @@ ProteoformPtr getProtModProteoform(ProteoformPtr raw_form_ptr,
                      db_res_seq_ptr->getLen()-1, change_list));
 }
 
-ProteoformPtr getSubProteoform(ProteoformPtr proteoform_ptr, int local_start, 
-                               int local_end) {
+ProteoformPtr getSubProteoform(const ProteoformPtr &proteoform_ptr, 
+                               int local_start, int local_end) {
   ResiduePtrVec residues;
   ResSeqPtr res_seq_ptr = proteoform_ptr->getResSeqPtr();  
   for (int i = local_start; i <= local_end; i++) {
@@ -404,7 +401,7 @@ ResFreqPtrVec compResidueFreq(const ResiduePtrVec &residue_list,
   return res_freq_list;
 }
 
-void Proteoform::addUnexpectedChangePtrVec(ChangePtrVec &changes) {
+void Proteoform::addUnexpectedChangePtrVec(const ChangePtrVec &changes) {
   for (unsigned int i = 0; i < changes.size(); i++) {
     if (changes[i]->getChangeType() == UNEXPECTED_CHANGE) {
       change_list_.push_back(changes[i]);
@@ -412,7 +409,9 @@ void Proteoform::addUnexpectedChangePtrVec(ChangePtrVec &changes) {
   }
 }
 
-bool isSamePeptideAndMass(ProteoformPtr proteoform,ProteoformPtr another_proteoform,double ppo){
+bool isSamePeptideAndMass(const ProteoformPtr &proteoform,
+                          const ProteoformPtr &another_proteoform,
+                          double ppo){
   double thresh = proteoform->getResSeqPtr()->getSeqMass()*ppo;
   if(proteoform->getDbResSeqPtr()->getId() != another_proteoform->getDbResSeqPtr()->getId()){
     return false;
@@ -430,7 +429,9 @@ bool isSamePeptideAndMass(ProteoformPtr proteoform,ProteoformPtr another_proteof
   return true;
 }
 
-bool isStrictCompatiablePtmSpecies(ProteoformPtr a,ProteoformPtr b,double ppo){
+bool isStrictCompatiablePtmSpecies(const ProteoformPtr &a,
+                                   const ProteoformPtr &b,
+                                   double ppo){
   if(!isSamePeptideAndMass(a,b,ppo)){
     return false;
   }

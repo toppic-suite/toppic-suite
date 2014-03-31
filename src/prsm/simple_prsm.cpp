@@ -50,7 +50,7 @@ int SimplePrSM::compareTo(SimplePrSMPtr simple_prsm_ptr){
 void SimplePrSM::findSeq(std::vector<ProteoformPtr> seqs){
     seq_ = seqs[seq_id_];
 
-    if(seq_->getSeqId() != seq_id_ || seq_->getName().compare(seq_name_)!=0){
+    if(seq_->getSeqId() != seq_id_ || seq_->getSeqName() != seq_name_){
         std::cout<< "Sequence ID and/or name is not consistent!" << std::endl;
         std::exit(0);
     }
