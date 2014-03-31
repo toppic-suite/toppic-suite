@@ -9,7 +9,8 @@
 
 namespace prot {
 
-XmlWriter::XmlWriter(std::string file_name,std::string root){
+XmlWriter::XmlWriter(const std::string &file_name,
+                     const std::string &root){
   file_.open(file_name.c_str());
   root_ = root;
   LOG_DEBUG("file_name " << file_name);

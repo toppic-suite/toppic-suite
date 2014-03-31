@@ -20,7 +20,8 @@ class XmlDOMDocument {
  public:
   XmlDOMDocument(XmlDOMParser* parser, const char* xml_file);
   XmlDOMDocument(xercesc::DOMDocument* doc);
-  XmlDOMDocument(xercesc::DOMImplementation* implementation,std::string root);
+  XmlDOMDocument(xercesc::DOMImplementation* implementation, 
+                 const std::string &root);
   ~XmlDOMDocument();
 
   xercesc::DOMElement* createElement(const char* tag);

@@ -13,8 +13,10 @@ namespace prot {
 
 class ProtMod {
  public:
-  ProtMod(std::string name, TruncPtr trunc_ptr, PtmPtr ptm_ptr,
-          AcidPtrVec valid_acid_ptrs);
+  ProtMod(const std::string &name, 
+          const TruncPtr &trunc_ptr, 
+          const PtmPtr &ptm_ptr,
+          const AcidPtrVec &valid_acid_ptr_vec);
 
   std::string getName() {return name_;};
 
@@ -22,13 +24,13 @@ class ProtMod {
 
   PtmPtr getPtmPtr() {return ptm_ptr_;}
 
-  AcidPtrVec getAcidPtrVec(){return valid_acid_ptrs_;}
+  AcidPtrVec getAcidPtrVec(){return valid_acid_ptr_vec_;}
 
   double getProtShift() {return prot_shift_;}
 
   double getPepShift() {return pep_shift_;}
 
-  bool allowMod(ResiduePtrVec residues);
+  bool allowMod(const ResiduePtrVec &residues);
 
   void appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
@@ -36,7 +38,7 @@ class ProtMod {
   std::string name_;
   TruncPtr trunc_ptr_;
   PtmPtr ptm_ptr_;
-  AcidPtrVec valid_acid_ptrs_;
+  AcidPtrVec valid_acid_ptr_vec_;
   double prot_shift_;
   double pep_shift_;
 };

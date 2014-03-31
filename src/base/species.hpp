@@ -15,8 +15,8 @@ namespace prot {
 
 class Species {
  public:
-  Species(ProteoformPtr proteoform);
-  void addProteoform(ProteoformPtr proteoform);
+  Species(const ProteoformPtr &proteoform);
+  void addProteoform(const ProteoformPtr &proteoform);
   void setSpeciesId(int id);
   ProteoformPtr getFistProteoform();
  private:
@@ -27,7 +27,7 @@ class Species {
 typedef std::shared_ptr<Species> SpeciesPtr;
 typedef std::vector<SpeciesPtr> SpeciesPtrVec;
 
-SpeciesPtrVec setSpeciesId(PrSMPtrVec& prsms,double ppo);
+SpeciesPtrVec setSpeciesId(const PrSMPtrVec &prsms,double ppo);
 } /* namespace prot */
 
 #endif /* SPECIES_HPP_ */

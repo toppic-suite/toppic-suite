@@ -91,7 +91,7 @@ bool PtmFactory::baseContainAbbrName(const std::string &abbr_name) {
   return getBasePtmPtrByAbbrName(abbr_name).get() != nullptr;
 }
 
-PtmPtr PtmFactory::addBasePtm(std::string abbr_name, double mono_mass) {
+PtmPtr PtmFactory::addBasePtm(const std::string &abbr_name, double mono_mass) {
   PtmPtr ptm_ptr = getBasePtmPtrByAbbrName(abbr_name);
   if (ptm_ptr.get() == nullptr) {
     PtmPtr new_ptm(new Ptm(abbr_name, mono_mass));

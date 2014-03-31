@@ -8,7 +8,7 @@ namespace prot {
 
 class SemiAlignType {
  public: 
-  SemiAlignType(std::string name, int id) {
+  SemiAlignType(const std::string &name, int id) {
     name_ = name;
     id_ = id;
   }

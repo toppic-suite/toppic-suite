@@ -6,19 +6,19 @@
 
 namespace prot {
 
-ResidueFreq::ResidueFreq(std::string acid_name, std::string ptm_abbr_name, 
+ResidueFreq::ResidueFreq(const std::string &acid_name, const std::string &ptm_abbr_name, 
                          double freq): Residue (acid_name, ptm_abbr_name) {
   freq_ = freq;
 }
 
-ResidueFreq::ResidueFreq(AcidPtr acid_ptr, PtmPtr ptm_ptr, 
+ResidueFreq::ResidueFreq(const AcidPtr &acid_ptr, const PtmPtr &ptm_ptr, 
                          double freq): Residue (acid_ptr, ptm_ptr) {
   freq_ = freq;
 }
 
 ResFreqPtrVec getResiduePtrVecInstance(AcidPtrVec &acid_list, 
-                                           PtmPtrVec &ptm_list,
-                                           std::string &file_name) {
+                                       PtmPtrVec &ptm_list,
+                                       std::string &file_name) {
   ResFreqPtrVec residue_list;
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {

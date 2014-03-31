@@ -12,10 +12,11 @@ namespace prot {
 
 class ResidueFreq: public Residue {
  public:
-  ResidueFreq(std::string acid_name, std::string abbr_name, 
+  ResidueFreq(const std::string &acid_name, const std::string &abbr_name, 
               double freq);
 
-  ResidueFreq(AcidPtr acid_ptr, PtmPtr ptm_ptr, double freq);
+  ResidueFreq(const AcidPtr &acid_ptr, const PtmPtr &ptm_ptr, 
+              double freq);
 
   double getFreq() {return freq_;}
 

@@ -18,7 +18,8 @@ namespace prot {
 
 class XmlWriter {
  public:
-  XmlWriter(std::string file_name,std::string root);
+  XmlWriter(const std::string &file_name,
+            const std::string &root);
   ~XmlWriter();
   XmlDOMDocument* getDoc(){return doc_;}
   void write(xercesc::DOMElement* element);

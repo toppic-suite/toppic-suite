@@ -9,12 +9,12 @@
 
 namespace prot {
 
-Species::Species(ProteoformPtr proteoform){
+Species::Species(const ProteoformPtr &proteoform){
   id_=0;
   addProteoform(proteoform);
 }
 
-void Species::addProteoform(ProteoformPtr proteoform){
+void Species::addProteoform(const ProteoformPtr &proteoform){
   proteoforms_.push_back(proteoform);
 }
 
@@ -29,7 +29,7 @@ ProteoformPtr Species::getFistProteoform(){
   return proteoforms_[0];
 }
 
-ProteoformPtrVec2D groupProteins(PrSMPtrVec& prsms){
+ProteoformPtrVec2D groupProteins(const PrSMPtrVec &prsms){
   //get max shift number
   unsigned int max_shift_number = 0;
   for(unsigned int i=0;i<prsms.size();i++){
@@ -51,7 +51,7 @@ ProteoformPtrVec2D groupProteins(PrSMPtrVec& prsms){
   return proteogroups;
 }
 
-SpeciesPtrVec getZeroPtmList(ProteoformPtrVec& proteoforms,double ppo){
+SpeciesPtrVec getZeroPtmList(const ProteoformPtrVec& proteoforms, double ppo){
   SpeciesPtrVec list;
   for(unsigned int i=0;i<proteoforms.size();i++){
     bool is_break = false;
@@ -69,7 +69,7 @@ SpeciesPtrVec getZeroPtmList(ProteoformPtrVec& proteoforms,double ppo){
   return list;
 }
 
-SpeciesPtrVec setSpeciesId(PrSMPtrVec& prsms,double ppo){
+SpeciesPtrVec setSpeciesId(const PrSMPtrVec& prsms,double ppo){
   ProteoformPtrVec2D proteogroups = groupProteins(prsms);
 
   SpeciesPtrVec list = getZeroPtmList(proteogroups[0],ppo);

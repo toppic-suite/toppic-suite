@@ -63,7 +63,7 @@ class PtmFactory {
    */
   static bool baseContainAbbrName(const std::string &abbr_name);
 
-  static PtmPtr addBasePtm(std::string abbr_name, double mono_mass);
+  static PtmPtr addBasePtm(const std::string &abbr_name, double mono_mass);
 
   static PtmPtr getPtmPtr_Acetylation() {
     return getBasePtmPtrByAbbrName(PTM_ACETYLATION);

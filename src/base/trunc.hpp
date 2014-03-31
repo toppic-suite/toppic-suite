@@ -10,7 +10,8 @@ namespace prot {
 class Trunc {
 
  public:
-  Trunc(std::string name, int trunc_len, std::string str);
+  Trunc(const std::string &name, int trunc_len, 
+        const std::string &str);
 
   std::string getName() {return name_;}
 
@@ -22,28 +23,20 @@ class Trunc {
 
   void appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
-  bool isSameTrunc(int len, ResSeqPtr res_seq_ptr);
+  bool isSameTrunc(int len, const ResSeqPtr &res_seq_ptr);
 
-  bool isValidTrunc(ResSeqPtr res_seq_ptr);
+  bool isValidTrunc(const ResSeqPtr &res_seq_ptr);
 
  private:
   std::string name_;
-    int trunc_len_;
+  int trunc_len_;
   AcidPtrVec acid_str_;
-    double shift_;
+  double shift_;
 
 };
 
 typedef std::shared_ptr<Trunc> TruncPtr;
 typedef std::vector<TruncPtr> TruncPtrVec;
-
-TruncPtr findProtNTermTrunc(ResSeqPtr seq,int trunc_len,TruncPtrVec allowed_trunc);
-
-TruncPtr findProtCTermTrunc(ResSeqPtr seq,int last_res_pos,TruncPtrVec allowed_trunc);
-
-bool isAlignPrefix(TruncPtr n_trunc,double pep_n_term_shift,double threshold);
-
-bool isAlignSuffix(TruncPtr c_trunc,double pep_c_term_shift,double threshold);
 
 /* trunc factory */
 class TruncFactory {

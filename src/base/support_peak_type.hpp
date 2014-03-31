@@ -20,7 +20,7 @@ namespace prot {
 
 class SupportPeakType {
  public:
-  SupportPeakType(int id,std::string name){
+  SupportPeakType(int id, const std::string &name){
     id_=id;
     name_=name;
   }

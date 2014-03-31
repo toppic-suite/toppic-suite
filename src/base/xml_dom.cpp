@@ -33,7 +33,7 @@ XmlDOMParser::~XmlDOMParser() {
   }
 }
 
-xercesc::DOMDocument* XmlDOMParser::parse(std::string xml_file) {
+xercesc::DOMDocument* XmlDOMParser::parse(const std::string &xml_file) {
   parser_->parse(xml_file.c_str());
   return parser_->adoptDocument();
 }
@@ -51,7 +51,7 @@ XmlDOMImpl::~XmlDOMImpl() {
   }
 }
 
-xercesc::DOMDocument* XmlDOMImpl::createDoc(std::string root) {
+xercesc::DOMDocument* XmlDOMImpl::createDoc(const std::string &root) {
   xercesc::DOMDocument* doc = impl_->createDocument(0, X(root.c_str()), 0);
   return doc;
 }

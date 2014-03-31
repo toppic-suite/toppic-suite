@@ -11,7 +11,7 @@
 
 namespace prot {
 
-inline std::string& trim(std::string& s) {
+inline std::string& trim(std::string &s) {
   s.erase(s.begin(), 
           std::find_if(s.begin(), s.end(), 
                        std::not1(std::ptr_fun<int, int>(std::isspace))));
@@ -38,7 +38,7 @@ inline std::vector<std::string> split(const std::string &s, char delim) {
   return elems;
 }
 
-inline std::string basename(std::string& s) {
+inline std::string basename(const std::string &s) {
   unsigned int dot_pos = s.find_last_of(".");
   if (dot_pos < s.length()) {
     return s.substr(0, dot_pos);

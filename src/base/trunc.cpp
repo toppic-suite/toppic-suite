@@ -8,7 +8,8 @@ namespace prot {
 
 TruncPtrVec TruncFactory::trunc_ptr_vec_;
 
-Trunc::Trunc(std::string name, int trunc_len, std::string str) {
+Trunc::Trunc(const std::string &name, int trunc_len, 
+             const std::string &str) {
   name_ = name;
   trunc_len_ = trunc_len;
   shift_ = 0;
@@ -35,7 +36,7 @@ void Trunc::appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
   parent->appendChild(element);
 }
 
-bool Trunc::isSameTrunc(int len, ResSeqPtr res_seq_ptr) {
+bool Trunc::isSameTrunc(int len, const ResSeqPtr &res_seq_ptr) {
   if(trunc_len_ != len){
     return false;
   }
@@ -47,7 +48,7 @@ bool Trunc::isSameTrunc(int len, ResSeqPtr res_seq_ptr) {
   return true;
 }
 
-bool Trunc::isValidTrunc(ResSeqPtr res_seq_ptr) {
+bool Trunc::isValidTrunc(const ResSeqPtr &res_seq_ptr) {
   //check if trunc acids match N-terminal acids of the protein 
   bool result = true;
   if (trunc_len_ >= res_seq_ptr->getLen()) {
@@ -59,38 +60,6 @@ bool Trunc::isValidTrunc(ResSeqPtr res_seq_ptr) {
   //LOG_DEBUG("Valid trunc " << result << " trunc len " << trunc_len_ 
   //          << " seq len " << res_seq_ptr->getLen());
   return result;
-}
-
-TruncPtr findProtTermTrunc(TruncPtrVec truncs,int trunc_len,ResSeqPtr resseq){
-    for(unsigned int i=0;i<truncs.size();i++){
-        if(truncs[i]->isSameTrunc(trunc_len,resseq)){
-            return truncs[i];
-        }
-    }
-    return nullptr;
-};
-
-TruncPtr findProtNTermTrunc(ResSeqPtr seq,int trunc_len,TruncPtrVec allowed_trunc){
-    return findProtTermTrunc(allowed_trunc,trunc_len,seq);
-};
-
-TruncPtr findProtCTermTrunc(ResSeqPtr seq,int last_res_pos,TruncPtrVec allowed_trunc){
-    int trunc_len = seq->getLen()-1-last_res_pos;
-    return  findProtTermTrunc(allowed_trunc,trunc_len,seq);
-};
-
-bool isAlignPrefix(TruncPtr n_trunc,double pep_n_term_shift,double threshold){
-    if(n_trunc != nullptr && pep_n_term_shift <= threshold){
-        return true;
-    }
-    return false;
-};
-
-bool isAlignSuffix(TruncPtr c_trunc,double pep_c_term_shift,double threshold){
-    if(c_trunc != nullptr && pep_c_term_shift <= threshold){
-        return true;
-    }
-    return false;
 }
 
 void TruncFactory::initFactory(const std::string &file_name) {

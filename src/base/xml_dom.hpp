@@ -17,7 +17,7 @@ class XmlDOMParser {
   XmlDOMParser();
   ~XmlDOMParser();
 
-  xercesc::DOMDocument* parse(std::string xml_file);
+  xercesc::DOMDocument* parse(const std::string &xml_file);
 
  private:
   xercesc::XercesDOMParser* parser_;
@@ -42,7 +42,7 @@ class XmlDOMImpl{
  public:
   XmlDOMImpl();
   ~XmlDOMImpl();
-  xercesc::DOMDocument* createDoc(std::string root);
+  xercesc::DOMDocument* createDoc(const std::string &root);
   xercesc::DOMLSSerializer* createSerializer();
 
  private:

@@ -16,9 +16,9 @@ namespace prot {
 
 class Residue {
  public:
-  Residue(AcidPtr acid_ptr, PtmPtr ptm_ptr); 
+  Residue(const AcidPtr &acid_ptr, const PtmPtr &ptm_ptr); 
 
-  Residue(std::string acid_name, std::string abbr_name);
+  Residue(const std::string &acid_name, const std::string &abbr_name);
 
   /** Get amino acid. */
   AcidPtr getAcidPtr() {return acid_ptr_; }
@@ -29,11 +29,11 @@ class Residue {
   /** Get post-translational modification. */
   PtmPtr getPtmPtr() { return ptm_ptr_; }
 
-  void setPos(int pos) { pos_=pos; }
+  void setPos(int pos) { pos_ = pos; }
 
-  void setDisplayPos(int pos) {display_pos_=pos;}
+  void setDisplayPos(int pos) {display_pos_ = pos;}
 
-  void setType(std::string type) {type_=type;}
+  void setType(std::string type) {type_ = type;}
 
   void setIsModifyed(bool isMod) {is_modified_ = isMod;}
 
@@ -44,12 +44,14 @@ class Residue {
   /**
    * Checks if the residue contains the same amino acid and ptm.
    */
-  bool isSame(AcidPtr acid_ptr, PtmPtr ptm_ptr) {
+  bool isSame(const AcidPtr &acid_ptr, 
+              const PtmPtr &ptm_ptr) {
     return acid_ptr_.get() == acid_ptr.get() && ptm_ptr_.get() == ptm_ptr.get();
   }
 
   /** Get string representation */
-  std::string toString(std::string delim_bgn, std::string delim_end);
+  std::string toString(const std::string &delim_bgn, 
+                       const std::string &delim_end);
 
   std::string toString() {return toString("[", "]");}
 
@@ -81,12 +83,12 @@ typedef std::shared_ptr<Residue> ResiduePtr;
 typedef std::vector<ResiduePtr> ResiduePtrVec;
 
 ResiduePtr getResiduePtrByAcid(const ResiduePtrVec &residue_list,
-                               AcidPtr acid_ptr);
+                               const AcidPtr &acid_ptr);
 
-int findResidue(const ResiduePtrVec &residue_list, ResiduePtr residue_ptr);
+int findResidue(const ResiduePtrVec &residue_list, const ResiduePtr &residue_ptr);
 
 ResiduePtrVec convertAcidToResidueSeq(const ResiduePtrVec &residue_list,
-                                      AcidPtrVec acid_list);
+                                      const AcidPtrVec &acid_list);
 /* residue factory */
 class ResidueFactory {
  public:
@@ -94,9 +96,11 @@ class ResidueFactory {
 
   static ResiduePtrVec& getBaseResiduePtrVec() {return residue_ptr_vec_;}
   
-  static ResiduePtr getBaseResiduePtrByAcidPtm(AcidPtr acid_ptr, PtmPtr ptm_ptr);
+  static ResiduePtr getBaseResiduePtrByAcidPtm(const AcidPtr &acid_ptr, 
+                                               const PtmPtr &ptm_ptr);
   
-  static ResiduePtr addBaseResidue(AcidPtr acid_ptr, PtmPtr ptm_ptr);
+  static ResiduePtr addBaseResidue(const AcidPtr &acid_ptr, 
+                                   const PtmPtr &ptm_ptr);
   
   static ResiduePtrVec getResiduePtrVecInstance(const std::string &file_name);
 
