@@ -35,8 +35,6 @@ class Residue {
 
   void setType(std::string type) {type_ = type;}
 
-  void setType(std::string type) {type_=type;}
-
   void setShiftStyle(std::string shift_type) {shift_style_=shift_type;}
 
   std::string getType(){return type_;}
