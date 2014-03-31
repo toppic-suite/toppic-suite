@@ -160,9 +160,14 @@ std::string convertToString(double value) {
   return stream.str();
 }
 
-std::string convertToString(double value,int number) {
+std::string convertToString(double value, int number) {
   std::stringstream stream;
-  stream << std::fixed<<std::setprecision(number)<< value;
+  if (value < 1 && value > -1 && value != 0) {
+    stream << std::scientific << std::setprecision(number);
+  } else {
+    stream << std::fixed << std::setprecision(number);
+  }
+  stream << value;
   return stream.str();
 }
 
