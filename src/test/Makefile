@@ -36,7 +36,7 @@ PTM_OBJS = $(addprefix $(OBJ_DIR)/, ptm_processor.o ptm_slow_filter.o ptm_slow_m
 
 TDGF_OBJS = $(addprefix $(OBJ_DIR)/, evalue_processor.o comp_prob_value.o count_test_num.o comp_pvalue_array.o) 
 
-XPP_OBJS = $(addprefix $(OBJ_DIR)/, xml_generator.o) 
+#XPP_OBJS = $(addprefix $(OBJ_DIR)/, xml_generator.o) 
 
 TEST_OBJS = $(addprefix $(OBJ_DIR)/, test_console.o)
 

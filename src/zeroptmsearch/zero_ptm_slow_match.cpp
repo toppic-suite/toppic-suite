@@ -74,8 +74,7 @@ void ZeroPtmSlowMatch::compScore (ExtendMsPtr refine_ms_ptr, TheoPeakPtrVec theo
   getExtendMassVec(refine_ms_ptr, ms_masses);
   std::vector<double> theo_masses; 
   getTheoMassVec(theo_peaks, theo_masses);
-  std::vector<double> result_ppos;
-  compMsMassPpos(ms_masses, theo_masses, ppo, result_ppos);
+  std::vector<double> result_ppos = compMsMassPpos(ms_masses, theo_masses, ppo);
 
   if (!mng_ptr_->do_recalibration_) {
     recal_ = 0;

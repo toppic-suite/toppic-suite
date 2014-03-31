@@ -56,6 +56,7 @@ class Residue {
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
   void appendViewXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+
  private:
   /** amino acid */
   AcidPtr acid_ptr_;
@@ -79,12 +80,12 @@ class Residue {
 typedef std::shared_ptr<Residue> ResiduePtr;
 typedef std::vector<ResiduePtr> ResiduePtrVec;
 
-ResiduePtr getResiduePtrByAcid(ResiduePtrVec &residue_list,
+ResiduePtr getResiduePtrByAcid(const ResiduePtrVec &residue_list,
                                AcidPtr acid_ptr);
 
-int findResidue(ResiduePtrVec &residue_list, ResiduePtr residue_ptr);
+int findResidue(const ResiduePtrVec &residue_list, ResiduePtr residue_ptr);
 
-ResiduePtrVec convertAcidToResidueSeq(ResiduePtrVec &residue_list,
+ResiduePtrVec convertAcidToResidueSeq(const ResiduePtrVec &residue_list,
                                       AcidPtrVec acid_list);
 /* residue factory */
 class ResidueFactory {

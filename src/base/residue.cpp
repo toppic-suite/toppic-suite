@@ -56,7 +56,7 @@ void Residue::appendViewXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent)
     parent->appendChild(element);
 }
 
-ResiduePtr getResiduePtrByAcid(ResiduePtrVec &residue_ptrs,
+ResiduePtr getResiduePtrByAcid(const ResiduePtrVec &residue_ptrs,
                                   AcidPtr acid_ptr) {
   for (unsigned int i = 0; i < residue_ptrs.size(); i++) {
     if (residue_ptrs[i]->getAcidPtr().get() == acid_ptr.get()) {
@@ -66,7 +66,7 @@ ResiduePtr getResiduePtrByAcid(ResiduePtrVec &residue_ptrs,
   return ResiduePtr(nullptr);
 }
 
-int findResidue(ResiduePtrVec &residue_list, ResiduePtr residue_ptr) {
+int findResidue(const ResiduePtrVec &residue_list, ResiduePtr residue_ptr) {
   for (unsigned int i = 0; i < residue_list.size(); i++) {
     if (residue_list[i] == residue_ptr) {
       return i;
@@ -76,7 +76,7 @@ int findResidue(ResiduePtrVec &residue_list, ResiduePtr residue_ptr) {
 }
 
 
-ResiduePtrVec convertAcidToResidueSeq(ResiduePtrVec &residue_list,
+ResiduePtrVec convertAcidToResidueSeq(const ResiduePtrVec &residue_list,
                                       AcidPtrVec acid_ptrs) {
   ResiduePtrVec result_seq;
   for (unsigned int i = 0; i < acid_ptrs.size(); i++) {

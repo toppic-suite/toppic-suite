@@ -60,18 +60,22 @@ typedef std::vector<AcidPtr> AcidPtrVec;
 /* acid factory */
 class AcidFactory {
  public:
-  static void initFactory(const std::string file_name);
+  static void initFactory(const std::string &file_name);
+
   static AcidPtrVec& getBaseAcidPtrVec() {return acid_ptr_vec_;}
+
   /**
    * Returns an amino acid based on the the name. Returns null if the amino
    * acid name does not exist.
    */
   static AcidPtr getBaseAcidPtrByName(const std::string &name);
+
   /**
    * Returns an amino acid based on the one letter representation. Returns
    * null if the one letter representation does not exist.
    */
   static AcidPtr getBaseAcidPtrByOneLetter(const std::string &one_letter);
+
   /**
    * Returns an amino acid based on the three letter representation. Returns
    * null if the three letter representation does not exist.

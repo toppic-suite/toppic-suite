@@ -15,11 +15,11 @@
 
 namespace prot {
 
-BpSpec::BpSpec(ResSeqPtr res_seq_ptr){
+BpSpec::BpSpec(const ResSeqPtr &res_seq_ptr){
   initBreakPoints(res_seq_ptr);
 }
 
-void BpSpec::initBreakPoints(ResSeqPtr res_seq_ptr){
+void BpSpec::initBreakPoints(const ResSeqPtr &res_seq_ptr){
   int ext_len= res_seq_ptr->getLen()+1;
   if(ext_len <= 1){
     ext_len = 2;
@@ -43,7 +43,7 @@ void BpSpec::initBreakPoints(ResSeqPtr res_seq_ptr){
 }
 
 /* Get neutral ion masses for a specific ion type */
-std::vector<double> BpSpec::getBreakPointMasses(IonTypePtr ion_type_ptr){
+std::vector<double> BpSpec::getBreakPointMasses(const IonTypePtr &ion_type_ptr){
   std::vector<double> bp_mass_vec;
   if (ion_type_ptr->isNTerm()) {
     for (unsigned int i = 0; i < break_point_ptr_vec_.size(); i++) {
@@ -69,7 +69,7 @@ std::vector<double> BpSpec::getPrmMasses() {
 }
 
 /* Get rounded scaled neutral ion masses */ 
-std::vector<int> BpSpec::getScaledMass(double scale, IonTypePtr ion_type_ptr){
+std::vector<int> BpSpec::getScaledMass(double scale, const IonTypePtr &ion_type_ptr){
   std::vector<int> result;
   if (ion_type_ptr->isNTerm()) {
     for(unsigned int i=0; i < break_point_ptr_vec_.size();i++){

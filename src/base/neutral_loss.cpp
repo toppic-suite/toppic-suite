@@ -12,7 +12,7 @@ namespace prot {
 
 NeutralLossPtrVec NeutralLossFactory::neutral_loss_ptr_vec_;
 
-NeutralLoss::NeutralLoss(std::string name, double mass){
+NeutralLoss::NeutralLoss(const std::string &name, double mass){
   name_ = name;
   mass_ = mass;
 }

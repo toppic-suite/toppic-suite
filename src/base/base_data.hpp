@@ -19,9 +19,9 @@ class BaseData {
  public:
   BaseData (std::string config_file_name);
 
-  ResiduePtrVec& getFixModResiduePtrVec() {return fix_mod_residue_list_;}
-  ProtModPtrVec& getAllowProtModPtrVec() {return allow_prot_mod_list_;}
-  ActivationPtr& getActivationPtr() {return activation_ptr_;}
+  ResiduePtrVec getFixModResiduePtrVec() {return fix_mod_residue_list_;}
+  ProtModPtrVec getAllowProtModPtrVec() {return allow_prot_mod_list_;}
+  ActivationPtr getActivationPtr() {return activation_ptr_;}
 
  private:
   ResiduePtrVec fix_mod_residue_list_;

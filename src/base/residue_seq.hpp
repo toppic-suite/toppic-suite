@@ -7,12 +7,15 @@
 #include "base/residue.hpp"
 
 namespace prot {
+
 class ResidueSeq;
+
 typedef std::shared_ptr<ResidueSeq> ResSeqPtr;
 typedef std::vector<ResSeqPtr> ResSeqPtrVec;
+
 class ResidueSeq {
  public:
-  ResidueSeq(ResiduePtrVec residues);
+  ResidueSeq(const ResiduePtrVec &residues);
 
   /**
    * Returns a sub-peptide of the original peptide.

@@ -4,7 +4,7 @@
 
 namespace prot {
 
-ResidueSeq::ResidueSeq(ResiduePtrVec residues) {
+ResidueSeq::ResidueSeq(const ResiduePtrVec &residues) {
   residues_ = residues;
   /* get residue mass sum */
   residue_mass_sum_ = 0;

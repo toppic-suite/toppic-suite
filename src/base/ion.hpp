@@ -17,18 +17,22 @@ namespace prot {
 
 class Ion {
  public:
-  Ion(int charge,int pos,int display,IonTypePtr ion_type_ptr, 
-      NeutralLossPtr neutral_loss_ptr);
+  Ion(int charge, int pos, int display, 
+      const IonTypePtr &ion_type_ptr, 
+      const NeutralLossPtr &neutral_loss_ptr);
 
   int getCharge(){return charge_;}
   int getPos(){return pos_;}
   int getDisplayPos(){return display_pos_;}
+
   IonTypePtr getIonTypePtr(){return ion_type_ptr_;}
+
   std::string getDisplayName(){
     std::stringstream s;
-    s<<display_pos_;
+    s << display_pos_;
     return ion_type_ptr_ -> getName() + s.str();
   }
+
  private:
   int charge_;
   int pos_;

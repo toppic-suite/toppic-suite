@@ -10,11 +10,10 @@ namespace prot {
 
 #define ION_TYPE_PREC "PREC"
 #define ION_TYPE_B "B"
-#define Y_ION_SHIFT 18.0106
 
 class IonType {
  public: 
-  IonType(std::string name, bool n_term, double shift);
+  IonType(const std::string &name, bool n_term, double shift);
 
   std::string getName() {return name_;}
 
@@ -25,6 +24,7 @@ class IonType {
   double getBYShift() {return b_y_shift_;}
 
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+
  private:
   // ion name
   std::string name_;
@@ -48,8 +48,8 @@ class IonTypeFactory {
   static IonTypePtrVec ion_type_ptr_vec_;
 
  public:
-  static void initFactory(const std::string file_name);
-  static IonTypePtrVec& getBaseIonTypePtrVec() {return ion_type_ptr_vec_;}
+  static void initFactory(const std::string &file_name);
+  static IonTypePtrVec getBaseIonTypePtrVec() {return ion_type_ptr_vec_;}
   static IonTypePtr getBaseIonTypePtrByName(const std::string &name);
   static IonTypePtr getIonTypePtr_PREC() {
     return getBaseIonTypePtrByName(ION_TYPE_PREC);

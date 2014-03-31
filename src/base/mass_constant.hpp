@@ -18,17 +18,23 @@ class MassConstant {
     /**
      * Returns the mass of an oxygen molecular.
      */
-    static double getOxygenMass() { return 15.9949; }
+    static double getOxygenMass() {return 15.9949; }
 
     /**
      * Returns the mass of a proton. 
      */
-    static double getProtonMass() { return 1.007276; }
+    static double getProtonMass() {return 1.007276; }
 
     /**
      * Returns the mass of a water molecule (H2O).
      */
-    static double getWaterMass() { return 18.010565; }
+    static double getWaterMass() {return 18.010565; }
+
+    /**
+     * Returns the shift between the mass of a neutral y ion 
+     * and its corresponding suffix residue mass. 
+     */
+    static double getYIonShift() {return 18.010565; }
 };
 
 }

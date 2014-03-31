@@ -12,21 +12,38 @@
 
 namespace prot {
 
+class FastaSeq {
+ public:
+  FastaSeq(const std::string &name, const std::string &ori_seq) {
+    name_ = name;
+    seq_ = rmChar(ori_seq);
+  }
+  std::string getName() {return name_;}
+  std::string getSeq() {return seq_;}
+
+ private:
+  std::string name_;
+  std::string seq_;
+  /* remove incorrect charaters in sequence */
+  std::string rmChar(const std::string &ori_seq);
+}; 
+
+typedef std::shared_ptr<FastaSeq> FastaSeqPtr;
+
 class FastaReader {
  public:
   /**
    * Constructs an instance with a File.
    **/
-  FastaReader(std::string);
+  FastaReader(const std::string &file_name);
 
   /**
    * Read FASTA file and return next protein
-   * name and sequence. result[0] is
-   * protein name and result[1] is sequence.
+   * name and sequence. 
    **/                  
-  std::vector<std::string> getNextSeq();
+  FastaSeqPtr getNextSeq();
 
-  ProteoformPtr getNextProteoformPtr(ResiduePtrVec &residue_list);
+  ProteoformPtr getNextProteoformPtr(const ResiduePtrVec &residue_list);
 
  private:
   std::ifstream input_;
@@ -34,10 +51,8 @@ class FastaReader {
   int id_ = 0;
 };
 
-std::vector<std::string> fastaPreprocess(std::string name, std::string seq);
-
-ProteoformPtrVec readFastaToProteoform(std::string file_name, 
-                                       ResiduePtrVec &residue_list);
+ProteoformPtrVec readFastaToProteoform(const std::string &file_name, 
+                                       const ResiduePtrVec &residue_list);
 }
 
 #endif

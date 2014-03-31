@@ -36,7 +36,7 @@ void Acid::appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
   parent->appendChild(element);
 }
 
-void AcidFactory::initFactory(std::string file_name) {
+void AcidFactory::initFactory(const std::string &file_name) {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
     XmlDOMDocument doc(parser, file_name.c_str());

@@ -13,8 +13,9 @@ namespace prot {
 
 ActivationPtrVec ActivationFactory::activation_ptr_vec_;
 
-Activation::Activation(std::string name, IonTypePtr n_ion_type_ptr, 
-                       IonTypePtr c_ion_type_ptr) {
+Activation::Activation(const std::string &name, 
+                       const IonTypePtr &n_ion_type_ptr, 
+                       const IonTypePtr &c_ion_type_ptr) {
   name_ = name;
   n_ion_type_ptr_ = n_ion_type_ptr;
   c_ion_type_ptr_ = c_ion_type_ptr;
@@ -36,7 +37,7 @@ void Activation::appendXml(XmlDOMDocument* xml_doc,
 }
 
 /* Methods for ActivationFactory */
-void ActivationFactory::initFactory(std::string file_name){
+void ActivationFactory::initFactory(const std::string &file_name){
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
     XmlDOMDocument doc(parser, file_name.c_str());
@@ -51,7 +52,8 @@ void ActivationFactory::initFactory(std::string file_name){
   }
 }
 
-ActivationPtr ActivationFactory::getBaseActivationPtrByName(std::string name){
+ActivationPtr ActivationFactory::getBaseActivationPtrByName(
+    const std::string &name){
   for (unsigned int i = 0; i < activation_ptr_vec_.size(); i++) {
     std::string n = activation_ptr_vec_[i]->getName();
     if (n == name) {

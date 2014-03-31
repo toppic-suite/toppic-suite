@@ -2,7 +2,8 @@
 
 namespace prot {
 
-DbResidueSeq::DbResidueSeq(ResiduePtrVec residues, int id, std::string name)
+DbResidueSeq::DbResidueSeq(const ResiduePtrVec &residues, int id, 
+                           const std::string &name)
     : ResidueSeq(residues) {
       id_ = id;
       name_ = name;

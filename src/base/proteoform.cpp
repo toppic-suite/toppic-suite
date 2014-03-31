@@ -6,56 +6,44 @@
 
 namespace prot {
 
-Proteoform::Proteoform(DbResSeqPtr db_res_seq_ptr, ProtModPtr prot_mod_ptr,  
-                       ResSeqPtr res_seq_ptr, int start_pos, int end_pos, 
-                       ChangePtrVec change_list) {
+Proteoform::Proteoform(const DbResSeqPtr &db_res_seq_ptr, 
+                       const ProtModPtr &prot_mod_ptr,  
+                       const ResSeqPtr &res_seq_ptr, 
+                       int start_pos, int end_pos, 
+                       const ChangePtrVec &change_ptr_vec) {
   db_residue_seq_ptr_ = db_res_seq_ptr;
   prot_mod_ptr_ = prot_mod_ptr;
   residue_seq_ptr_ = res_seq_ptr;
   start_pos_ = start_pos;
   end_pos_ = end_pos;
-  LOG_TRACE( "start bp spec generation");
   bp_spec_ptr_ = BpSpecPtr(new BpSpec(res_seq_ptr));
-  change_list_ = change_list;
-  std::sort(change_list.begin(), change_list.end(), compareChangeUp);
+  change_list_ = change_ptr_vec;
+  std::sort(change_list_.begin(), change_list_.end(), compareChangeUp);
   species_id_=0;
 }
 
-Proteoform::Proteoform(xercesc::DOMElement* element,ProteoformPtrVec proteoforms){
+Proteoform::Proteoform(xercesc::DOMElement* element, 
+                       const ProteoformPtrVec &db_proteoforms){
 
   start_pos_ = getIntChildValue(element, "start_pos", 0);
   end_pos_ = getIntChildValue(element, "end_pos", 0);
 
-  xercesc::DOMElement* db_element= prot::getChildElement(element,"db_residue_seq",0);
+  xercesc::DOMElement* db_element= getChildElement(element,"db_residue_seq",0);
   int db_seq_id = getIntChildValue(db_element, "id", 0);
   std::string db_seq_name = getChildValue(db_element, "name", 0);
-  ProteoformPtr seq = proteoforms[db_seq_id];
-  if(seq->getSeqId() != db_seq_id || seq->getName().compare(db_seq_name)!=0){
-    std::cout<< "Sequence ID and/or name is not consistent!" << std::endl;
+  ProteoformPtr db_proteoform = db_proteoforms[db_seq_id];
+  if(db_proteoform->getSeqId() != db_seq_id 
+     || db_proteoform->getName() != db_seq_name){
+    LOG_ERROR("Sequence ID and/or name is not consistent!");
     std::exit(0);
   }
-  db_residue_seq_ptr_ = seq->getDbResSeqPtr();
+  db_residue_seq_ptr_ = db_proteoform->getDbResSeqPtr();
 
-  xercesc::DOMElement* mod_element= prot::getChildElement(element,"prot_mod",0);
+  xercesc::DOMElement* mod_element= getChildElement(element,"prot_mod",0);
   std::string mod_name = getChildValue(mod_element, "name", 0);
-  //    double mod_prot_shift = getDoubleChildValue(mod_element, "prot_shift", 0);
-  //    double mod_pep_shift = getDoubleChildValue(mod_element, "pep_shift", 0);
-  //    prot_mod_ptr_ = getProtModPtrByName(basedata->getProtModPtrVec(),mod_name);
   prot_mod_ptr_ = ProtModFactory::getBaseProtModPtrByName(mod_name);
 
-  //  xercesc::DOMElement* res_seq_element= getChildElement(element,"residue_seq",0);
-  //  int res_len = getChildCount(res_seq_element,"residue");
-  //  ResiduePtrVec residues;
-  //  for(int i=0;i<res_len;i++){
-  //    xercesc::DOMElement* res_element= getChildElement(res_seq_element,"residue",i);
-  //    std::string acid_name
-  //        = getChildValue(getChildElement(res_element,"amino_acid",0),"name",0);
-  //    std::string ptm_name
-  //        = getChildValue(getChildElement(res_element,"modification",0),"abbr_name",0);
-  //    residues.push_back(ResiduePtr(new Residue(acid_name,ptm_name)));
-  //  }
-  //  residue_seq_ptr_ = ResSeqPtr(new ResidueSeq(residues));
-  residue_seq_ptr_ = proteoforms[db_residue_seq_ptr_->getId()]->getResSeqPtr();
+  residue_seq_ptr_ = db_proteoform->getResSeqPtr();
   bp_spec_ptr_= BpSpecPtr(new BpSpec(residue_seq_ptr_));
 
   xercesc::DOMElement* change_list_element= prot::getChildElement(element,"change_list",0);
@@ -65,7 +53,6 @@ Proteoform::Proteoform(xercesc::DOMElement* element,ProteoformPtrVec proteoforms
     xercesc::DOMElement* change_element = getChildElement(change_list_element,"change",i);
     change_list_.push_back(ChangePtr(new Change(change_element)));
   }
-  species_id_=0;
 }
 
 /* get several segments without unexpected PTMs from a proteoform */
@@ -340,8 +327,8 @@ ProteoformPtr getSubProteoform(ProteoformPtr proteoform_ptr, int local_start,
 }
 
 
-ProteoformPtrVec generateProtModProteoform(ProteoformPtrVec &ori_forms, 
-                                           ProtModPtrVec &prot_mods) {
+ProteoformPtrVec generateProtModProteoform(const ProteoformPtrVec &ori_forms, 
+                                           const ProtModPtrVec &prot_mods) {
   ProteoformPtrVec new_forms;
   for (unsigned int i = 0; i < ori_forms.size(); i++) {
     for (unsigned int j = 0; j < prot_mods.size(); j++) {
@@ -354,7 +341,7 @@ ProteoformPtrVec generateProtModProteoform(ProteoformPtrVec &ori_forms,
   return new_forms;
 }
 
-ResFreqPtrVec compNTermResidueFreq(ProteoformPtrVec &prot_mod_forms) {
+ResFreqPtrVec compNTermResidueFreq(const ProteoformPtrVec &prot_mod_forms) {
   std::vector<double> counts;
   ResiduePtrVec residue_list;
   for (unsigned int i = 0; i < prot_mod_forms.size(); i++) {
@@ -388,8 +375,8 @@ ResFreqPtrVec compNTermResidueFreq(ProteoformPtrVec &prot_mod_forms) {
 }
 
 
-ResFreqPtrVec compResidueFreq(ResiduePtrVec &residue_list, 
-                              ProteoformPtrVec &prot_mod_forms) {
+ResFreqPtrVec compResidueFreq(const ResiduePtrVec &residue_list, 
+                              const ProteoformPtrVec &prot_mod_forms) {
   std::vector<double> counts(residue_list.size(), 0.0);
   for (unsigned int i = 0; i < prot_mod_forms.size(); i++) {
     ResSeqPtr seq_ptr = prot_mod_forms[i]->getResSeqPtr();    

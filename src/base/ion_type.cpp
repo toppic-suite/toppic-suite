@@ -6,7 +6,7 @@ namespace prot {
 
 IonTypePtrVec IonTypeFactory::ion_type_ptr_vec_; 
 
-IonType::IonType(std::string name, bool n_term, double shift) {
+IonType::IonType(const std::string &name, bool n_term, double shift) {
   name_ = name;
   n_term_ = n_term;
   shift_ = shift;
@@ -14,7 +14,7 @@ IonType::IonType(std::string name, bool n_term, double shift) {
     b_y_shift_ = shift_;
   }
   else {
-    b_y_shift_ = shift_ - Y_ION_SHIFT;
+    b_y_shift_ = shift_ - MassConstant::getYIonShift();
   }
 }
 
@@ -30,7 +30,7 @@ void IonType::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
   parent->appendChild(element);
 }
 
-void IonTypeFactory::initFactory(const std::string file_name){
+void IonTypeFactory::initFactory(const std::string &file_name){
   prot::XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
     prot::XmlDOMDocument doc(parser, file_name.c_str());

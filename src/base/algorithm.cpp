@@ -8,8 +8,8 @@ namespace prot {
 
 /* if we need to increase i, return true, otherwise, return false. */
 bool increaseIJ(unsigned int i, unsigned int j, double deviation, 
-                double tolerance, std::vector<double> ms_masses, 
-                std::vector<double> theo_masses) {
+                double tolerance, const std::vector<double> &ms_masses, 
+                const std::vector<double> &theo_masses) {
   /*
    * we assume that each real peak is matched to at most one theoretical
    * peak, so we do not check i and j+1
@@ -34,9 +34,9 @@ bool increaseIJ(unsigned int i, unsigned int j, double deviation,
 }
 
 /* compute deviation for each peak */
-void  compMsMassPpos(std::vector<double> &ms_masses, 
-                     std::vector<double> &theo_masses, 
-                     double ppo, std::vector<double> &result_ppos) {
+std::vector<double> compMsMassPpos(const std::vector<double> &ms_masses, 
+                                   const std::vector<double> &theo_masses, 
+                                   double ppo) {
   // extendMsThree do not have 0 and precursor mass 
   std::vector<double> min_distances;
   for (unsigned i = 0; i < ms_masses.size(); i++) {
@@ -57,6 +57,7 @@ void  compMsMassPpos(std::vector<double> &ms_masses,
     }
   }
   // change distance to ppo
+  std::vector<double> result_ppos;
   for (i = 0; i < ms_masses.size(); i++) {
     if (ms_masses[i] > 0) {
       result_ppos.push_back (min_distances[i]/ ms_masses[i]); 
@@ -65,11 +66,12 @@ void  compMsMassPpos(std::vector<double> &ms_masses,
       result_ppos.push_back(std::numeric_limits<double>::infinity());
     }
   }
+  return result_ppos;
 }
 
-void compTheoMassPpos(std::vector<double> &ms_masses, 
-                      std::vector<double> &theo_masses,
-                      double ppo, std::vector<double> &result_ppos) {
+std::vector<double> compTheoMassPpos(const std::vector<double> &ms_masses, 
+                                     const std::vector<double> &theo_masses,
+                                     double ppo) {
 
   std::vector<double> min_distances;
   for (unsigned p = 0; p < theo_masses.size(); p++) {
@@ -91,6 +93,7 @@ void compTheoMassPpos(std::vector<double> &ms_masses,
     }
   }
   // change distance to ppo
+  std::vector<double> result_ppos;
   for (i = 0; i < theo_masses.size(); i++) {
     if (theo_masses[i] > 0) {
       result_ppos.push_back (min_distances[i]/ theo_masses[i]); 
@@ -99,14 +102,15 @@ void compTheoMassPpos(std::vector<double> &ms_masses,
       result_ppos.push_back(std::numeric_limits<double>::infinity());
     }
   }
+  return result_ppos;
 }
 
 /* compute the number of matched theoretical masses (fragment ions) */
-double compNumMatchedTheoMasses (std::vector<double> &ms_masses, 
-                                 std::vector<double> &theo_masses, 
+double compNumMatchedTheoMasses (const std::vector<double> &ms_masses, 
+                                 const std::vector<double> &theo_masses, 
                                  double ppo) {
-  std::vector<double> theo_mass_ppos;
-  compTheoMassPpos(ms_masses, theo_masses, ppo, theo_mass_ppos);
+  std::vector<double> theo_mass_ppos 
+      = compTheoMassPpos(ms_masses, theo_masses, ppo);
   double score = 0;
   for (unsigned i = 0; i < theo_mass_ppos.size(); i++) {
     if (std::abs(theo_mass_ppos[i]) <= ppo) {
@@ -118,7 +122,7 @@ double compNumMatchedTheoMasses (std::vector<double> &ms_masses,
 
 /* compute the position of the last residue of a proteoform based 
  * on its n term shift */
-int getFirstResPos(double n_term_shift,std::vector<double> prm_masses){
+int getFirstResPos(double n_term_shift, const std::vector<double> &prm_masses){
   double trunc_mass = - n_term_shift;
   int best_pos = -1;
   double best_shift = std::numeric_limits<double>::infinity();
@@ -133,7 +137,7 @@ int getFirstResPos(double n_term_shift,std::vector<double> prm_masses){
 
 /* compute the position of the last residue of a proteoform based on 
  * its c term shift */
-int getLastResPos(double c_term_shift,std::vector<double> prm_masses){
+int getLastResPos(double c_term_shift, const std::vector<double> &prm_masses){
   double trunc_mass = -c_term_shift;
   int best_pos = -1;
   double best_shift = std::numeric_limits<double>::infinity();

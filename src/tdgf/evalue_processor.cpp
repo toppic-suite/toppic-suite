@@ -18,11 +18,13 @@ void EValueProcessor::init() {
   ProteoformPtrVec raw_forms 
       = readFastaToProteoform(mng_ptr_->search_db_file_name_,
                               base_data_ptr->getFixModResiduePtrVec());
+
   ProteoformPtrVec prot_mod_forms 
       = generateProtModProteoform(raw_forms, 
                                   base_data_ptr->getAllowProtModPtrVec());
+
   LOG_DEBUG("protein data set loaded");
-  
+
   ResFreqPtrVec residue_freqs 
       = compResidueFreq(base_data_ptr->getFixModResiduePtrVec(), raw_forms); 
   LOG_DEBUG("residue frequency initialized");

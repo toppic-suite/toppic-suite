@@ -39,7 +39,7 @@ void zeroPtmSearch(SpectrumSetPtr spec_set_ptr,
 
 void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
   BaseDataPtr base_data_ptr = mng_ptr->base_data_ptr_;
-  
+
   ProteoformPtrVec raw_forms 
       = readFastaToProteoform(mng_ptr->search_db_file_name_,
                               base_data_ptr->getFixModResiduePtrVec());

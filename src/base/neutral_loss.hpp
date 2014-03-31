@@ -19,9 +19,10 @@ namespace prot {
 class NeutralLoss {
 
  public:
-  NeutralLoss(std::string name,double mass);
+  NeutralLoss(const std::string &name, double mass);
   std::string getName(){return name_;}
   double getMass(){return mass_;}
+
  private:
   std::string name_;
   double mass_;
@@ -34,7 +35,7 @@ typedef std::vector<NeutralLossPtr> NeutralLossPtrVec;
 class NeutralLossFactory {
  public:
   static void initFactory(const std::string &file_name);
-  static NeutralLossPtrVec& getBaseNeutralLossPtrVec() {
+  static NeutralLossPtrVec getBaseNeutralLossPtrVec() {
     return neutral_loss_ptr_vec_;}
   static NeutralLossPtr getBaseNeutralLossPtrByName(const std::string &name);
 

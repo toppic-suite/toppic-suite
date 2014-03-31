@@ -20,11 +20,11 @@ typedef std::vector<ProteoformPtrVec> ProteoformPtrVec2D;
 
 class Proteoform {
  public:
-  Proteoform(DbResSeqPtr db_res_seq_ptr, ProtModPtr prot_mod_ptr,  
-             ResSeqPtr res_seq_ptr, int start_pos, int end_pos, 
-             ChangePtrVec change_list);
+  Proteoform(const DbResSeqPtr &db_res_seq_ptr, const ProtModPtr &prot_mod_ptr,  
+             const ResSeqPtr &res_seq_ptr, int start_pos, int end_pos, 
+             const ChangePtrVec &change_ptr_vec);
 
-  Proteoform(xercesc::DOMElement* element,ProteoformPtrVec proteoforms);
+  Proteoform(xercesc::DOMElement* element, const ProteoformPtrVec &db_proteoforms);
 
   DbResSeqPtr getDbResSeqPtr() {return db_residue_seq_ptr_;}
 
@@ -86,7 +86,7 @@ class Proteoform {
 
   int end_pos_;
 
-  int species_id_;
+  int species_id_ = 0;
 
   ChangePtrVec change_list_;
 };
@@ -101,15 +101,15 @@ ProteoformPtr getProtModProteoform(ProteoformPtr raw_form_ptr,
 ProteoformPtr getSubProteoform(ProteoformPtr proteoform_ptr, int start, int end);
 
 /* generate a proteoform vector with protein mod */ 
-ProteoformPtrVec generateProtModProteoform(ProteoformPtrVec &ori_forms,
-                                           ProtModPtrVec &prot_mods);
+ProteoformPtrVec generateProtModProteoform(const ProteoformPtrVec &ori_forms,
+                                           const ProtModPtrVec &prot_mods);
 
 /* calculate frequencies for n_terminal_residues */
-ResFreqPtrVec compNTermResidueFreq(ProteoformPtrVec &prot_mod_forms);
+ResFreqPtrVec compNTermResidueFreq(const ProteoformPtrVec &prot_mod_forms);
 
 /* calculater frequences for all residues */
-ResFreqPtrVec compResidueFreq(ResiduePtrVec &residue_list, 
-                              ProteoformPtrVec &raw_mods);
+ResFreqPtrVec compResidueFreq(const ResiduePtrVec &residue_list, 
+                              const ProteoformPtrVec &raw_mods);
 
 bool isSamePeptideAndMass(ProteoformPtr proteoform,ProteoformPtr another_proteoform,double ppo);
 bool isStrictCompatiablePtmSpecies(ProteoformPtr a,ProteoformPtr b,double ppo);
