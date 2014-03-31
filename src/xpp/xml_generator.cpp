@@ -23,7 +23,7 @@ XmlGenerator::XmlGenerator(std::map<std::string,std::string> arguments,std::stri
 }
 void XmlGenerator::outputPrsms(PrSMPtrVec prsms){
   for(unsigned int i=0;i<prsms.size();i++){
-    std::string file_name = output_file_+"prsm"+convertToString(prsms[i]->getId())+".xml";
+    std::string file_name = output_file_+"prsms/prsm"+convertToString(prsms[i]->getId())+".xml";
     XmlWriter writer(file_name,"");
     writer.write(prot::genePrSMView(writer.getDoc(),prsms[i]));
   }
@@ -35,39 +35,31 @@ void XmlGenerator::outputAllPrsms(PrSMPtrVec prsms){
     writer.write(prot::genePrSMView(writer.getDoc(),prsms[i]));
   }
 }
+
 void XmlGenerator::outputProteins(PrSMPtrVec prsms){
-  for(unsigned int i=0;i<prsms.size();i++){
-    std::string file_name = output_file_+"protein"+convertToString(prsms[i]
-                                                                         ->getProteoformPtr()
-                                                                         ->getDbResSeqPtr()
-                                                                         ->getId())+".xml";
-    XmlWriter writer(file_name,"");
-    writer.write(geneProteinView(writer.getDoc(),prsms[i]->getProteoformPtr(),
-                                 prsms[i]->getRefineMs(),prsms[i]->getMinMass()));
+  for(unsigned int i=0;i<seq_.size();i++){
+//    writer.write(geneProteinView(writer.getDoc(),prsms[i]->getProteoformPtr(),
+//                                 prsms[i]->getRefineMs(),prsms[i]->getMinMass()));
+    std::vector<int> species = getSpeciesIds(prsms,seq_[i]->getDbResSeqPtr()->getId());
+    if(species.size()>0){
+      std::string file_name = output_file_+"proteins/protein"+convertToString(seq_[i]
+                                                                               ->getDbResSeqPtr()
+                                                                               ->getId())+".xml";
+      XmlWriter writer(file_name,"");
+      writer.write(proteinToXml(writer.getDoc(),prsms,seq_[i],species));
+    }
   }
 }
 void XmlGenerator::outputAllProteins(PrSMPtrVec prsms){
   std::string file_name = output_file_+"proteins.xml";
   XmlWriter writer(file_name,"protein_list");
-  for(unsigned int i=0;i<prsms.size();i++){
-    writer.write(geneProteinView(writer.getDoc(),prsms[i]->getProteoformPtr(),
-                                 prsms[i]->getRefineMs(),prsms[i]->getMinMass()));
-  }
+//  for(unsigned int i=0;i<seq_.size();i++){
+//    writer.write(geneProteinView(writer.getDoc(),prsms[i]->getProteoformPtr(),
+//                                 prsms[i]->getRefineMs(),prsms[i]->getMinMass()));
+  writer.write(allProteinToXml(writer.getDoc(),prsms,seq_));
+//  }
 }
 
-//bool isMatch(PrSMPtr & prsm,MsHeaderPtr header){
-//  int id = header->getId();
-//  std::string scan = header->getScansString();
-//  int prec_id = header->getPrecId();
-//  double prec_mass = header->getPrecMonoMass();
-//  if(id==prsm->getSpectrumId() && prec_id==prsm->getPrecurorId()){
-//    if(scan.compare(prsm->getSpectrumScan())!=0 ||prec_mass != prsm->getOriPrecMass()){
-//      std::cout<<"Error in Prsm"<<std::endl;
-//    }
-//    return true;
-//  }
-//  return false;
-//}
 void XmlGenerator::processPrSMs(PrSMPtrVec & prsms,ProteoformPtrVec proteoforms){
   MsAlignReader reader(spec_file_);
   DeconvMsPtr deconv_sp;
@@ -107,6 +99,7 @@ void XmlGenerator::process(){
   ProteoformPtrVec proteoforms
         = generateProtModProteoform(raw_forms,
                                     mng_->base_data_ptr_->getAllowProtModPtrVec());
+  seq_ = raw_forms;
   PrSMPtrVec prsms = readPrsm(basename(spec_file_)+"."+input_file_,raw_forms);
   processPrSMs(prsms,raw_forms);
   setSpeciesId(prsms,ppo_);

@@ -9,6 +9,9 @@
 #define XML_GENERATOR_HPP_
 
 #include <map>
+#include <xalanc/Include/PlatformDefinitions.hpp>
+#include <xercesc/util/PlatformUtils.hpp>
+#include <xalanc/XalanTransformer/XalanTransformer.hpp>
 
 #include "base/proteoform.hpp"
 #include "base/fasta_reader.hpp"
@@ -29,6 +32,8 @@ class XmlGenerator {
   void outputAllPrsms(PrSMPtrVec prsms);
   void outputProteins(PrSMPtrVec prsms);
   void outputAllProteins(PrSMPtrVec prsms);
+
+  void trans();
  private:
   std::string spec_file_;
   std::string db_file_;
@@ -37,6 +42,7 @@ class XmlGenerator {
   double ppo_;
   ViewMngPtr mng_;
   SpParaPtr sp_para_ptr_;
+  ProteoformPtrVec seq_;
   std::map<std::string,std::string> arguments_;
 };
 
