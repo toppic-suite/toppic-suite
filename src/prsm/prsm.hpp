@@ -183,7 +183,14 @@ xercesc::DOMElement* genePrSMViewAS7(XmlDOMDocument* xml_doc,PrSMPtr prsm);
 xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,ProteoformPtr proteoform,
                                      ExtendMsPtr refine_ms_three,
                                      double min_mass);
-
+xercesc::DOMElement* proteinToXml(XmlDOMDocument* xml_doc,
+                                  PrSMPtrVec prsms,
+                                  ProteoformPtr protein,
+                                  std::vector<int> species);
+std::vector<int> getSpeciesIds(PrSMPtrVec prsms,int seq_id);
+xercesc::DOMElement* allProteinToXml(XmlDOMDocument* xml_doc,
+                                  PrSMPtrVec prsms,
+                                  ProteoformPtrVec proteins);
 }
 #endif
 
