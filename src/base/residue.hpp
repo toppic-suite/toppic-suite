@@ -35,11 +35,21 @@ class Residue {
 
   void setType(std::string type) {type_ = type;}
 
+  void setType(std::string type) {type_=type;}
+
+  void setShiftStyle(std::string shift_type) {shift_style_=shift_type;}
+
+  std::string getType(){return type_;}
+
   void setIsModifyed(bool isMod) {is_modified_ = isMod;}
+
+  bool isModified() {return is_modified_;}
 
   void setShift(double shift) {shift_ = shift;}
 
   double getShift(){return shift_;}
+
+  void setExpected(bool e) { is_expected_ = e;}
 
   /**
    * Checks if the residue contains the same amino acid and ptm.
@@ -75,6 +85,10 @@ class Residue {
   int display_pos_=0;
   //is modified
   bool is_modified_ = false;
+  //is expected
+  bool is_expected_ = false;
+  //expected shift type
+  std::string shift_style_;
   //modify mass
   double shift_=0;
 };

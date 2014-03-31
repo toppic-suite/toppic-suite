@@ -28,14 +28,15 @@ void Transformer::trans(){
 //  xalanc::XSLTInputSource xml_in = "xml/proteins.xml";
 //  xalanc::XSLTInputSource xsl_in = "xsl/proteins.xsl";
 //  xalanc::XSLTResultTarget xml_out = "html/foo-out.html";
-  const char* xml_in = "xml/prsm0.xml";
-  const char* xsl_in = "xsl/prsm.xsl";
+  const char* xml_in = "xml/proteins.xml";
+//  const char* xml_in = "xml/prsms/prsm0.xml";
+  const char* xsl_in = "xsl/proteins.xsl";
   const char* xml_out = "html/foo-out.html";
 
 //  theXanlanTransformer.parseSource(theXMLInputSource,parsedXml);
 //  theXanlanTransformer.compileStylesheet(theXSLTInputSource,compliedStyleSheet);
 
-  theXanlanTransformer.transform(xml_in,xsl_in,xml_out);
+   theXanlanTransformer.transform(xml_in,xsl_in,xml_out);
 
   xalanc::XalanTransformer::terminate();
   xercesc::XMLPlatformUtils::Terminate();

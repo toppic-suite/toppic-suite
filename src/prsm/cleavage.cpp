@@ -17,6 +17,10 @@ void Cleavage::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
   xercesc::DOMElement* element = xml_doc->createElement("character");
       std::string str = "cleavage";
       xml_doc->addElement(element, "type", str.c_str());
+      str = type_;
+      xml_doc->addElement(element, "cleavage_type", str.c_str());
+      str = trunc_;
+      xml_doc->addElement(element, "cleavage_trunc", str.c_str());
       str = convertToString(pos_);
       xml_doc->addElement(element, "position", str.c_str());
       str = convertToString(exist_n_ion_);
