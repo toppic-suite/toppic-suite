@@ -20,7 +20,8 @@ namespace prot {
 
 class MultiSpectrumSet {
  public:
-  MultiSpectrumSet(DeconvMsPtr sp, double delta,SpParaPtr sp_para);
+  MultiSpectrumSet(const DeconvMsPtr &sp, double delta,
+                   const SpParaPtr &sp_para);
   DeconvMsPtrVec getDeconvMsPtrVec(){return deconv_sp_vec_;}
   ExtendMsPtr getSpThree(){return extend_ms_three_;}
   PrmMsPtr getSpTwo(){return prm_ms_two_;}
@@ -29,6 +30,7 @@ class MultiSpectrumSet {
     return getShiftMsSix(deconv_sp_,delta_,-shift,sp_para_ptr_);
   }
   double getDelta(){return delta_;}
+
  private:
   DeconvMsPtrVec deconv_sp_vec_;
   double adjusted_prec_mass;
@@ -40,8 +42,9 @@ class MultiSpectrumSet {
 
 typedef std::shared_ptr<SpectrumSet> SpectrumSetPtr;
 
-SpectrumSetPtr getSpectrumSet(DeconvMsPtr spectrum,double delta,
-                              SpParaPtr sp_para);
+SpectrumSetPtr getSpectrumSet(const DeconvMsPtr &spectrum,
+                              double delta,
+                              const SpParaPtr &sp_para);
 
 } /* namespace prot */
 

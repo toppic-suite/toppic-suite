@@ -9,7 +9,9 @@
 
 namespace prot {
 
-ExtendPeak::ExtendPeak(DeconvPeakPtr base_peak,double mono_mass,double score):Peak(mono_mass,1.0){
+ExtendPeak::ExtendPeak(const DeconvPeakPtr &base_peak, 
+                       double mono_mass,double score)
+    :Peak(mono_mass,1.0){
   base_peak_ = base_peak;
   mono_mass_ = mono_mass;
   score_ = score;
@@ -38,8 +40,8 @@ void ExtendPeak::appendXml(XmlDOMDocument* xml_doc,
 
 //must deleted the ms after finished using
 //ExtendMsPtr getMsThree(DeconvMsPtr deconv_ms,double delta,SpParaPtr sp_para);
-ExtendMsPtr getMsThree(DeconvMsPtr deconv_ms, double delta,
-                       SpParaPtr sp_para){
+ExtendMsPtr getMsThree(const DeconvMsPtr &deconv_ms, double delta,
+                       const SpParaPtr &sp_para){
   MsHeaderPtr header = getDeltaHeaderPtr(deconv_ms, delta);
 
   //private function getSpThreeExtendPeak in factory

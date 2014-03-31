@@ -15,8 +15,8 @@ namespace prot {
 
 class SupportPeak {
  public:
-  SupportPeak(DeconvPeakPtr peak,double offset,double score,
-              SPTypePtr peak_type);
+  SupportPeak(const DeconvPeakPtr &peak,double offset,double score,
+              const SPTypePtr &peak_type);
   SPTypePtr getPeakType(){return peak_type_;}
   double getOffset(){return offset_;}
   double getScore(){return score_;}

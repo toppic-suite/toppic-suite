@@ -22,7 +22,7 @@ namespace prot {
 class ExtendPeak : public Peak{
  public:
   ExtendPeak();
-  ExtendPeak(DeconvPeakPtr base_peak,double mono_mass,double score);
+  ExtendPeak(const DeconvPeakPtr &base_peak,double mono_mass,double score);
   DeconvPeakPtr getBasePeakPtr(){return base_peak_;}
   double getMonoMass(){return mono_mass_;}
   double getScore(){return score_;}
@@ -46,19 +46,22 @@ typedef std::shared_ptr<ExtendPeak> ExtendPeakPtr;
 typedef std::vector<ExtendPeakPtr> ExtendPeakPtrVec;
 typedef std::shared_ptr<Ms<ExtendPeakPtr>> ExtendMsPtr;
 
-inline bool extendPeakUp(const ExtendPeakPtr p,ExtendPeakPtr n){
-  return p->getPosition() < n->getPosition();
+inline bool extendPeakUp(const ExtendPeakPtr &a,const ExtendPeakPtr &b){
+  return a->getPosition() < b->getPosition();
 }
 
-inline void getExtendMassVec (ExtendMsPtr &refine_ms_ptr, 
-                              std::vector<double> &masses) {
+inline std::vector<double> getExtendMassVec (
+    const ExtendMsPtr &refine_ms_ptr) {
+  std::vector<double> masses;
   ExtendPeakPtrVec peak_ptr_list = refine_ms_ptr->getPeakPtrVec();
   for (unsigned int i = 0; i < peak_ptr_list.size(); i++) {
     masses.push_back(peak_ptr_list[i]->getPosition());
   }
+  return masses;
 }
 
-ExtendMsPtr getMsThree(DeconvMsPtr deconv_ms,double delta,SpParaPtr sp_para);
+ExtendMsPtr getMsThree(const DeconvMsPtr &deconv_ms, double delta, 
+                       const SpParaPtr &sp_para);
 
 } /* namespace prot */
 

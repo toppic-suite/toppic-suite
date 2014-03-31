@@ -10,7 +10,8 @@
 
 namespace prot {
 
-SpectrumSet::SpectrumSet(DeconvMsPtr sp,double delta,SpParaPtr sp_para){
+SpectrumSet::SpectrumSet(const DeconvMsPtr &sp, double delta,
+                         const SpParaPtr &sp_para){
   deconv_sp_ = sp;
   sp_para_ptr_ = sp_para;
   delta_=delta;
@@ -19,12 +20,11 @@ SpectrumSet::SpectrumSet(DeconvMsPtr sp,double delta,SpParaPtr sp_para){
   prm_ms_six_ = getMsSix(sp,delta,sp_para);
 }
 
-SpectrumSetPtr getSpectrumSet(DeconvMsPtr spectrum,double delta,
-                              SpParaPtr sp_para){
+SpectrumSetPtr getSpectrumSet(const DeconvMsPtr &spectrum, double delta,
+                              const SpParaPtr &sp_para){
   if((int)spectrum->size() < sp_para->getMinPeakNum() 
      || spectrum->getHeaderPtr()->getPrecMonoMass() < sp_para->getMinMass()){
-    //logger
-    return nullptr;
+    return SpectrumSetPtr(nullptr);
   }
   if(spectrum->getHeaderPtr()->getActivationPtr() == nullptr){
     if(sp_para->getActivation()!=nullptr){
@@ -32,7 +32,7 @@ SpectrumSetPtr getSpectrumSet(DeconvMsPtr spectrum,double delta,
     }
     else{
       //logger
-      return nullptr;
+      return SpectrumSetPtr(nullptr);
     }
   }
 

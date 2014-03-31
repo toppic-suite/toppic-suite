@@ -84,7 +84,7 @@ std::string MsHeader::getScansString() {
   return scan_list.str();
 }
 
-void MsHeader::setScans(std::string s) {
+void MsHeader::setScans(const std::string &s) {
   if (s == "") {
     scans_.clear();
     scans_.push_back(-1);

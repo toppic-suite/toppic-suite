@@ -8,7 +8,7 @@
 namespace prot {
 
 template <class T>
-bool comparePos(DeconvPeakPtr a, DeconvPeakPtr b) {
+bool comparePos(const DeconvPeakPtr &a, const DeconvPeakPtr &b) {
   return (a->getPosition() < b->getPosition()); 
 }
 
@@ -23,7 +23,7 @@ T findHighestPeak(std::vector<T> ptr_list) {
 }
 
 template <class T>
-int findHighestPeakIdx(std::vector<T> ptr_list) {
+int findHighestPeakIdx(const std::vector<T> &ptr_list) {
   int idx = -1;
   for (unsigned int i = 0; i < ptr_list.size(); i++) {
     if (idx < 0 
@@ -48,7 +48,7 @@ void sortOnPos(std::vector<T> &ptr_list) {
 }
 
 template <class T>
-double findMaxPos(std::vector<T> &ptr_list) {
+double findMaxPos(const std::vector<T> &ptr_list) {
   sortOnPos(ptr_list);
   return ptr_list[ptr_list.size() -1]->getPosition();
 }
@@ -67,7 +67,7 @@ void sortOnIntensity(std::vector<T> &ptr_list) {
 }
 
 template <class T>
-int searchPos(std::vector<T> &ptr_list, double pos) {
+int searchPos(const std::vector<T> &ptr_list, double pos) {
   int idx = -1;
   int min = 0;
   int max = ptr_list.size() - 1;
@@ -109,7 +109,7 @@ int searchPos(std::vector<T> &ptr_list, double pos) {
  * Finds the highest peak for a specific position with error tolerance.
  */
 template <class T>
-int getHighPeakIdx(std::vector<T> &ptr_list, double pos, double tolerance) {
+int getHighPeakIdx(const std::vector<T> &ptr_list, double pos, double tolerance) {
   int idx = searchPos(ptr_list, pos);
   int best_idx = -1;
   /* extend to left */
@@ -139,7 +139,7 @@ int getHighPeakIdx(std::vector<T> &ptr_list, double pos, double tolerance) {
  * Finds the nearest peak for a specific position with error tolerance.
  */
 template <class T>
-int getNearPeakIdx(std::vector<T> &ptr_list, double pos, double tolerance) {
+int getNearPeakIdx(const std::vector<T> &ptr_list, double pos, double tolerance) {
   /* find the peak nearest to pos */
   int idx = searchPos(ptr_list, pos);
   if (idx < 0 || std::abs(ptr_list[idx]->getPosition - pos) > tolerance) {
@@ -217,18 +217,3 @@ std::vector<T> rmClosePeaks(std::vector<T> &ptr_list, double tolerance) {
 
 }
 
-//int main() {
-//  std::vector<prot::DeconvPeakPtr> ptr_list;
-//  ptr_list.push_back(prot::DeconvPeakPtr(new prot::DeconvPeak(0, 1, 1, 1)));
-//  ptr_list.push_back(prot::DeconvPeakPtr(new prot::DeconvPeak(1, 2, 2, 1)));
-//  ptr_list.push_back(prot::DeconvPeakPtr(new prot::DeconvPeak(3, 1.5, 2, 1)));
-//  std::cout << "start \n";
-//  int i = prot::findHighestPeakIdx(ptr_list);
-//  std::cout << "high " << i << "\n";
-//  double p = prot::findMaxPos(ptr_list);
-//  std::cout << "max pos " << p << "\n";
-//  for (unsigned int i = 0; i < ptr_list.size(); i++) {
-//    std::cout << ptr_list[i]->getPosition() << " "
-//        << ptr_list[i]->getIntensity() << "\n";
-//  }
-//}
