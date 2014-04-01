@@ -12,13 +12,6 @@ Residue::Residue(const AcidPtr &acid_ptr, const PtmPtr &ptm_ptr) {
   acid_ptr_ = acid_ptr;
   ptm_ptr_ = ptm_ptr;
   mass_ = acid_ptr->getMonoMass() + ptm_ptr->getMonoMass();
-
-  pos_=0;
-  type_="normal";
-  display_pos_=0;
-  is_modified_ = false;
-  shift_=0;
-  is_expected_= false;
 }
 
 Residue::Residue(const std::string &acid_name, 
@@ -26,13 +19,6 @@ Residue::Residue(const std::string &acid_name,
   acid_ptr_ = AcidFactory::getBaseAcidPtrByName(acid_name);
   ptm_ptr_ = PtmFactory::getBasePtmPtrByAbbrName(ptm_abbr_name);
   mass_ = acid_ptr_->getMonoMass() + ptm_ptr_->getMonoMass();
-
-  pos_=0;
-  type_="normal";
-  display_pos_=0;
-  is_modified_ = false;
-  shift_=0;
-  is_expected_ = false;
 }
 
 std::string Residue::toString(const std::string &delim_bgn, 
@@ -51,28 +37,6 @@ void Residue::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
     xml_doc->addElement(element, "mass", str.c_str());
     acid_ptr_->appendxml(xml_doc,element);
     ptm_ptr_->appendxml(xml_doc,element);
-    parent->appendChild(element);
-}
-
-void Residue::appendViewXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
-    xercesc::DOMElement* element = xml_doc->createElement("character");
-    xml_doc->addElement(element, "type", "residue");
-    std::string str = convertToString(pos_);
-    xml_doc->addElement(element, "position", str.c_str());
-    str = acid_ptr_->getOneLetter();
-    xml_doc->addElement(element, "acid", str.c_str());
-    str = type_;
-    xml_doc->addElement(element, "residue_type", str.c_str());
-    str = shift_style_;
-    xml_doc->addElement(element, "shift_style", str.c_str());
-    str = convertToString(is_expected_);
-    xml_doc->addElement(element, "is_expected", str.c_str());
-    str = convertToString(is_modified_);
-    xml_doc->addElement(element, "is_modification", str.c_str());
-    str = convertToString(shift_,2);
-    xml_doc->addElement(element, "shift", str.c_str());
-    str = convertToString(display_pos_);
-    xml_doc->addElement(element, "display_position", str.c_str());
     parent->appendChild(element);
 }
 
