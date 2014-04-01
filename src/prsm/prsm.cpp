@@ -412,11 +412,12 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
   prot_element->appendChild(annotation_element);
   CleavagePtrVec cleavages = getProteoCleavage(proteoform_ptr,refine_ms_three,min_mass);
   int display =0;
+  int display_bg =0;
 //  for(int i=0;i<proteoform_ptr->getResSeqPtr()->getLen();i++){
   for(int i=0;i<proteoform_ptr->getDbResSeqPtr()->getLen();i++){
     cleavages[i]->setType("species");
     cleavages[i]->setTrunc("");
-    ResiduePtr cur_res = proteoform_ptr->getDbResSeqPtr()->getResiduePtr(i);
+    AnnoResiduePtr cur_res = AnnoResiduePtr(new AnnoResidue(proteoform_ptr->getDbResSeqPtr()->getResiduePtr(i)));
     cur_res->setPos(i);
     cur_res->setType("normal");
     cur_res->setDisplayPos(0);
@@ -446,6 +447,7 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
         if(change_list[j]->getChangeType()==UNEXPECTED_CHANGE){
           cur_res->setType("unexpected_shift");
           cleavages[i]->setType("unexpected_shift");
+          cur_res->setDisplayBg(display_bg);
         }
         else{
           cur_res->setExpected(true);
@@ -470,6 +472,7 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
           cur_res->setDisplayPos(display);
         }
       }
+      display_bg = 1-display_bg;
     }
     cleavages[i]->appendXml(xml_doc,annotation_element);
     cur_res->appendViewXml(xml_doc,annotation_element);
