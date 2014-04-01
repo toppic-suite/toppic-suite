@@ -23,6 +23,7 @@ class XmlWriter {
   ~XmlWriter();
   XmlDOMDocument* getDoc(){return doc_;}
   void write(xercesc::DOMElement* element);
+  void close();
  private:
   xercesc::DOMLSSerializer* serializer_;
   XmlDOMDocument* doc_;

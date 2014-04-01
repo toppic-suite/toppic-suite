@@ -24,10 +24,6 @@ XmlWriter::XmlWriter(const std::string &file_name,
 }
 
 XmlWriter::~XmlWriter(){
-  if(root_.compare("")!=0){
-  file_ << "</"+root_+">" << std::endl;
-  }
-  file_.close();
   serializer_->release();
   delete doc_;
 }
@@ -36,6 +32,13 @@ void XmlWriter::write(xercesc::DOMElement* element){
   std::string str = writeToString(serializer_, element);
   writeToStreamByRemovingDoubleLF(file_, str);
   element->release();
+}
+
+void XmlWriter::close(){
+  if(root_.compare("")!=0){
+    file_ << "</"+root_+">" << std::endl;
+  }
+  file_.close();
 }
 
 } /* namespace prot */
