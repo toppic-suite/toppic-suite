@@ -43,7 +43,16 @@ Proteoform::Proteoform(xercesc::DOMElement* element,
   std::string mod_name = getChildValue(mod_element, "name", 0);
   prot_mod_ptr_ = ProtModFactory::getBaseProtModPtrByName(mod_name);
 
-  residue_seq_ptr_ = db_proteoform->getResSeqPtr();
+  residue_seq_ptr_ = db_proteoform->getResSeqPtr()->getSubResidueSeq(start_pos_,end_pos_);
+
+  if(!prot_mod_ptr_->getPtmPtr()->isEmpty()
+      &&residue_seq_ptr_->getResiduePtr(0)->getPtmPtr()->isEmpty()){
+    ResiduePtr mut_residue = ResidueFactory::getBaseResiduePtrByAcidPtm(residue_seq_ptr_->getResiduePtr(0)->getAcidPtr(),prot_mod_ptr_->getPtmPtr());
+    ResiduePtrVec new_residue = residue_seq_ptr_->getResidues();
+    new_residue[0]=mut_residue;
+    residue_seq_ptr_ = ResSeqPtr(new ResidueSeq(new_residue));
+  }
+
   bp_spec_ptr_= BpSpecPtr(new BpSpec(residue_seq_ptr_));
 
   xercesc::DOMElement* change_list_element= prot::getChildElement(element,"change_list",0);
