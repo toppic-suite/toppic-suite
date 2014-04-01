@@ -178,20 +178,6 @@ PrSMPtrVec readPrsm(std::string file_name,ProteoformPtrVec proteoforms);
 
 bool isMatch(PrSMPtr prsm_ptr, MsHeaderPtr header_ptr);
 void filterPrsms(PrSMPtrVec &prsms, MsHeaderPtr header_ptr, PrSMPtrVec &sele_prsms); 
-
-xercesc::DOMElement* genePrSMView(XmlDOMDocument* xml_doc,PrSMPtr prsm);
-xercesc::DOMElement* genePrSMViewAS7(XmlDOMDocument* xml_doc,PrSMPtr prsm);
-xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,ProteoformPtr proteoform,
-                                     ExtendMsPtr refine_ms_three,
-                                     double min_mass);
-xercesc::DOMElement* proteinToXml(XmlDOMDocument* xml_doc,
-                                  PrSMPtrVec prsms,
-                                  ProteoformPtr protein,
-                                  std::vector<int> species);
-std::vector<int> getSpeciesIds(PrSMPtrVec prsms,int seq_id);
-xercesc::DOMElement* allProteinToXml(XmlDOMDocument* xml_doc,
-                                  PrSMPtrVec prsms,
-                                  ProteoformPtrVec proteins);
 }
 #endif
 
