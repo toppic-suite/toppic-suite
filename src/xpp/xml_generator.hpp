@@ -20,6 +20,7 @@
 #include "prsm/prsm.hpp"
 #include "ptmsearch/ptm_mng.hpp"
 #include "xpp/view_mng.hpp"
+#include "xpp/anno_view.hpp"
 
 namespace prot {
 
@@ -30,19 +31,21 @@ class XmlGenerator {
   void processPrSMs(PrSMPtrVec & prsms,ProteoformPtrVec proteoforms);
   void outputPrsms(PrSMPtrVec prsms);
   void outputAllPrsms(PrSMPtrVec prsms);
+  void outputSpecies(PrSMPtrVec prsms);
   void outputProteins(PrSMPtrVec prsms);
   void outputAllProteins(PrSMPtrVec prsms);
-
-  void trans();
+  void outputFileList();
  private:
   std::string spec_file_;
   std::string db_file_;
   std::string input_file_;
   std::string output_file_;
+  std::string html_path_;
   double ppo_;
   ViewMngPtr mng_;
   SpParaPtr sp_para_ptr_;
   ProteoformPtrVec seq_;
+  AnnoViewPtr anno_view_;
   std::map<std::string,std::string> arguments_;
 };
 

@@ -6,6 +6,7 @@
  */
 
 #include <xpp/transformer.hpp>
+#include <xpp/anno_view.hpp>
 
 Transformer::Transformer() {
   // TODO Auto-generated constructor stub
@@ -21,22 +22,16 @@ void Transformer::trans(){
   xercesc::XMLPlatformUtils::Initialize();
   xalanc::XalanTransformer::initialize();
   xalanc::XalanTransformer theXanlanTransformer;
-//  const xalanc::XalanParsedSource * parsedXml=0;
-//  const xalanc::XalanCompiledStylesheet * compliedStyleSheet =0;
-//  const xalanc::XSLTInputSource theXSLTInputSource("xsl/proteins.xsl");
-//  const xalanc::XSLTInputSource theXMLInputSource("xsl/proteins.xml");
-//  xalanc::XSLTInputSource xml_in = "xml/proteins.xml";
-//  xalanc::XSLTInputSource xsl_in = "xsl/proteins.xsl";
-//  xalanc::XSLTResultTarget xml_out = "html/foo-out.html";
-  const char* xml_in = "xml/proteins.xml";
-//  const char* xml_in = "xml/prsms/prsm0.xml";
-  const char* xsl_in = "xsl/proteins.xsl";
-  const char* xml_out = "html/foo-out.html";
 
-//  theXanlanTransformer.parseSource(theXMLInputSource,parsedXml);
-//  theXanlanTransformer.compileStylesheet(theXSLTInputSource,compliedStyleSheet);
+  std::vector<std::vector<std::string>> anno_view = prot::readFiles("xml/files.xml");
+  for(unsigned int i=0;i<anno_view.size();i++){
 
-   theXanlanTransformer.transform(xml_in,xsl_in,xml_out);
+    const char* xml_in = anno_view[i][0].c_str();
+    const char* xsl_in = anno_view[i][1].c_str();
+    const char* xml_out = anno_view[i][2].c_str();
+
+    theXanlanTransformer.transform(xml_in,xsl_in,xml_out);
+  }
 
   xalanc::XalanTransformer::terminate();
   xercesc::XMLPlatformUtils::Terminate();
