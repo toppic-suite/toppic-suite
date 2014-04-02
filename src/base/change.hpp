@@ -55,7 +55,7 @@ inline bool compareChangeUp(ChangePtr c1, ChangePtr c2) {
     return false;
   }
   else {
-    return c1->getRightBpPos() < c2->getRightBpPos();
+    return c1->getRightBpPos() > c2->getRightBpPos();
   }
 }
 
