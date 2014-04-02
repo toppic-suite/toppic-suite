@@ -24,10 +24,6 @@ XmlGenerator::XmlGenerator(std::map<std::string,std::string> arguments,std::stri
   anno_view_ = AnnoViewPtr(new AnnoView());
 }
 void XmlGenerator::outputPrsms(PrSMPtrVec prsms){
-//  xercesc::XMLPlatformUtils::Initialize();
-//  xalanc::XalanTransformer::initialize();
-//  xalanc::XalanTransformer theXanlanTransformer;
-
   for(unsigned int i=0;i<prsms.size();i++){
     std::string file_name = output_file_+"prsms/prsm"+convertToString(prsms[i]->getId())+".xml";
     XmlWriter writer(file_name,"");
@@ -40,15 +36,8 @@ void XmlGenerator::outputPrsms(PrSMPtrVec prsms){
     file_info.push_back(html_path_+"prsms/prsm"+convertToString(prsms[i]->getId())+".html");
     anno_view_->file_list_.push_back(file_info);
 
-//    const char* xml_in = file_name.c_str();
-//    const char* xsl_in = "xsl/prsm.xsl";
-//    const char* xml_out = (html_path_+"prsms/prsm"+convertToString(prsms[i]->getId())+".html").c_str();
-//    theXanlanTransformer.transform(xml_in,xsl_in,xml_out);
   }
 
-//  xalanc::XalanTransformer::terminate();
-//  xercesc::XMLPlatformUtils::Terminate();
-//  xalanc::XalanTransformer::ICUCleanUp();
 }
 void XmlGenerator::outputAllPrsms(PrSMPtrVec prsms){
   std::string file_name = output_file_+"prsms.xml";
@@ -60,9 +49,6 @@ void XmlGenerator::outputAllPrsms(PrSMPtrVec prsms){
 }
 
 void XmlGenerator::outputProteins(PrSMPtrVec prsms){
-//  xercesc::XMLPlatformUtils::Initialize();
-//  xalanc::XalanTransformer::initialize();
-//  xalanc::XalanTransformer theXanlanTransformer;
 
   for(unsigned int i=0;i<seq_.size();i++){
     std::vector<int> species = getSpeciesIds(prsms,seq_[i]->getDbResSeqPtr()->getId());
@@ -79,22 +65,10 @@ void XmlGenerator::outputProteins(PrSMPtrVec prsms){
       file_info.push_back(html_path_+"proteins/protein"+convertToString(seq_[i]->getDbResSeqPtr()->getId())+".html");
       anno_view_->file_list_.push_back(file_info);
 
-//      const char* xml_in = file_name.c_str();
-//      const char* xsl_in = "xsl/protein.xsl";
-//      const char* xml_out = (html_path_+"proteins/protein"+convertToString(seq_[i]
-//                                                                               ->getDbResSeqPtr()
-//                                                                               ->getId())+".html").c_str();
-//      theXanlanTransformer.transform(xml_in,xsl_in,xml_out);
     }
   }
-//  xalanc::XalanTransformer::terminate();
-//  xercesc::XMLPlatformUtils::Terminate();
-//  xalanc::XalanTransformer::ICUCleanUp();
 }
 void XmlGenerator::outputAllProteins(PrSMPtrVec prsms){
-//  xercesc::XMLPlatformUtils::Initialize();
-//  xalanc::XalanTransformer::initialize();
-//  xalanc::XalanTransformer theXanlanTransformer;
 
   std::string file_name = output_file_+"proteins.xml";
   XmlWriter writer(file_name,"protein_list");
@@ -105,15 +79,6 @@ void XmlGenerator::outputAllProteins(PrSMPtrVec prsms){
   file_info.push_back("xsl/proteins.xsl");
   file_info.push_back(html_path_+"proteins.html");
   anno_view_->file_list_.push_back(file_info);
-
-//  const char* xml_in = file_name.c_str();
-//  const char* xsl_in = "xsl/proteins.xsl";
-//  const char* xml_out = (html_path_+"proteins.html").c_str();
-//  theXanlanTransformer.transform(xml_in,xsl_in,xml_out);
-//
-//  xalanc::XalanTransformer::terminate();
-//  xercesc::XMLPlatformUtils::Terminate();
-//  xalanc::XalanTransformer::ICUCleanUp();
 }
 
 void XmlGenerator::processPrSMs(PrSMPtrVec & prsms,ProteoformPtrVec proteoforms){
@@ -128,12 +93,12 @@ void XmlGenerator::processPrSMs(PrSMPtrVec & prsms,ProteoformPtrVec proteoforms)
         //process ,deconv_sp,bpsepc
         //findseq :check proteoform's id and name
 
-        ProteoformPtr temp = prsms[i]->getProteoformPtr();
-        ProteoformPtr new_seq = prot::getSubProteoform(proteoforms[temp->getDbResSeqPtr()->getId()],
-                                                       temp->getStartPos(),temp->getEndPos());
-        ChangePtrVec unexpect_change_list = temp->getUnexpectedChangePtrVec();
-        new_seq->addUnexpectedChangePtrVec(unexpect_change_list);
-        prsms[i]->setProteoformPtr(new_seq);
+//        ProteoformPtr temp = prsms[i]->getProteoformPtr();
+//        ProteoformPtr new_seq = prot::getSubProteoform(proteoforms[temp->getDbResSeqPtr()->getId()],
+//                                                       temp->getStartPos(),temp->getEndPos());
+//        ChangePtrVec unexpect_change_list = temp->getUnexpectedChangePtrVec();
+//        new_seq->addUnexpectedChangePtrVec(unexpect_change_list);
+//        prsms[i]->setProteoformPtr(new_seq);
 
         //initsegment:proteoform getSegmentPtrVec
         //check prsm's spectrum_scan and oriprecmass
@@ -148,9 +113,6 @@ void XmlGenerator::processPrSMs(PrSMPtrVec & prsms,ProteoformPtrVec proteoforms)
   }
 }
 void XmlGenerator::outputSpecies(PrSMPtrVec prsms){
-//  xercesc::XMLPlatformUtils::Initialize();
-//  xalanc::XalanTransformer::initialize();
-//  xalanc::XalanTransformer theXanlanTransformer;
 
   std::vector<int> species = getSpeciesIds(prsms);
   for(unsigned int i=0;i<species.size();i++){
@@ -167,17 +129,8 @@ void XmlGenerator::outputSpecies(PrSMPtrVec prsms){
       file_info.push_back("xsl/species.xsl");
       file_info.push_back(html_path_+"species/species"+convertToString(species[i])+".html");
       anno_view_->file_list_.push_back(file_info);
-
-//      const char* xml_in = file_name.c_str();
-//      const char* xsl_in = "xsl/species.xsl";
-//      const char* xml_out = (html_path_+"species/species"+convertToString(species[i])+".html").c_str();
-//      theXanlanTransformer.transform(xml_in,xsl_in,xml_out);
     }
   }
-
-//  xalanc::XalanTransformer::terminate();
-//  xercesc::XMLPlatformUtils::Terminate();
-//  xalanc::XalanTransformer::ICUCleanUp();
 }
 void XmlGenerator::outputFileList(){
   std::string file_name = output_file_+"files.xml";
@@ -190,18 +143,17 @@ void XmlGenerator::process(){
   ProteoformPtrVec raw_forms
         = readFastaToProteoform(db_file_,
                                 mng_->base_data_ptr_->getFixModResiduePtrVec());
-  ProteoformPtrVec proteoforms
-        = generateProtModProteoform(raw_forms,
-                                    mng_->base_data_ptr_->getAllowProtModPtrVec());
   seq_ = raw_forms;
   PrSMPtrVec prsms = readPrsm(basename(spec_file_)+"."+input_file_,raw_forms);
+//  std::cout<<prsms[0]->getProteoformPtr()->getResSeqPtr()->toString()<<std::endl;
+
   processPrSMs(prsms,raw_forms);
   setSpeciesId(prsms,ppo_);
   outputPrsms(prsms);
-  outputAllPrsms(prsms);
-  outputSpecies(prsms);
-  outputProteins(prsms);
-  outputAllProteins(prsms);
+//  outputAllPrsms(prsms);
+//  outputSpecies(prsms);
+//  outputProteins(prsms);
+//  outputAllProteins(prsms);
   outputFileList();
 
 }

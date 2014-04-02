@@ -55,14 +55,14 @@ xercesc::DOMElement* genePrSMView(XmlDOMDocument* xml_doc,PrSMPtr prsm){
 //  str = convertToString(prsm->getSpectrumId());
 //  xml_doc->addElement(element, "spectrum_id", str.c_str());
 //  xml_doc->addElement(element, "spectrum_scan", prsm->getSpectrumScan().c_str());
-  if(prsm->getProbPtr()->getPValue() != -std::numeric_limits<double>::max()){
+  if(prsm->getProbPtr().get()!=nullptr && prsm->getProbPtr()->getPValue() != -std::numeric_limits<double>::max()){
     str=convertToString(prsm->getProbPtr()->getPValue(),pos);
     xml_doc->addElement(element, "p_value", str.c_str());
   }
   else{
     xml_doc->addElement(element, "p_value", "-1");
   }
-  if(prsm->getProbPtr()->getEValue() != -std::numeric_limits<double>::max()){
+  if(prsm->getProbPtr().get()!=nullptr && prsm->getProbPtr()->getEValue() != -std::numeric_limits<double>::max()){
     str=convertToString(prsm->getProbPtr()->getEValue(),pos);
     xml_doc->addElement(element, "e_value", str.c_str());
   }
@@ -288,9 +288,9 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
   int know_shift_number = proteoform_ptr->getChangePtrVec().size()-proteoform_ptr->getUnexpectedChangeNum();
   str=convertToString(know_shift_number);
   xml_doc->addElement(prot_element, "know_shift_number", str.c_str());
-  for(unsigned int i=0;i<proteoform_ptr->getChangePtrVec().size();i++){
-    proteoform_ptr->getChangePtrVec()[i]->appendViewXml(xml_doc,prot_element);//attention
-  }
+//  for(unsigned int i=0;i<proteoform_ptr->getChangePtrVec().size();i++){
+//    proteoform_ptr->getChangePtrVec()[i]->appendViewXml(xml_doc,prot_element);//attention
+//  }
   xercesc::DOMElement* shift_list = xml_doc->createElement("shift_list");
   prot_element->appendChild(shift_list);
   std::vector<std::string> colors;
