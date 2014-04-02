@@ -81,10 +81,6 @@ xercesc::DOMElement* PrSM::toXmlElement(XmlDOMDocument* xml_doc){
 	if(prob_ptr_!=nullptr){
 	  prob_ptr_->appendXml(xml_doc,element);
 	}
-//	proteoform_ptr_->appendXml(xml_doc,element);
-//	if(prob_ptr_!=nullptr){
-//	  prob_ptr_->appendXml(xml_doc,element);
-//  }
 	if(deconv_ms_ptr_!=nullptr){
 	  deconv_ms_ptr_->appendXml(xml_doc,element);
 	}
