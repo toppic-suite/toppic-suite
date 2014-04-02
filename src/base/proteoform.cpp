@@ -162,7 +162,7 @@ double Proteoform::getMass(){
 
 std::string Proteoform::getProteinMatchSeq(){
   std::string result="";
-  std::string protein_string = residue_seq_ptr_->toString();
+  std::string protein_string = db_residue_seq_ptr_->toString();
   std::string mid_string = protein_string.substr(start_pos_,end_pos_+1);
   int mid_start=0;
   std::sort(change_list_.begin(),change_list_.end(),compareChangeUp);
@@ -193,6 +193,7 @@ std::string Proteoform::getProteinMatchSeq(){
   }
 
   while(change_stack.size()>0){
+//    std::cout<<mid_string<<"|"<<mid_start<<","<<(change_stack[change_stack.size()-1]->getRightBpPos()-mid_start)<<std::endl;
     result += mid_string.substr(mid_start,change_stack[change_stack.size()-1]->getRightBpPos()-mid_start);
     mid_start = change_stack[change_stack.size()-1]->getRightBpPos();
     result +=")";
