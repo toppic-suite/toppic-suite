@@ -24,6 +24,7 @@ MsHeader::MsHeader(xercesc::DOMElement* element){
     retention_time_ = getDoubleChildValue(element,"retention_time",0);
     prec_sp_mz_ = getDoubleChildValue(element,"prec_sp_mz",0);
     prec_mono_mz_ = getDoubleChildValue(element,"prec_mono_mz",0);
+//    prec_charge_ = getIntChildValue(element,"precursor_charge",0);
     prec_charge_ = getIntChildValue(element,"prec_charge",0);
     error_tolerance_ = getDoubleChildValue(element,"error_tolerance",0);
     xercesc::DOMElement* act_element 
@@ -97,62 +98,53 @@ void MsHeader::setScans(const std::string &s) {
   }
 }
 
-void MsHeader::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
-    xercesc::DOMElement* element = xml_doc->createElement("ms_header");
-    xml_doc->addElement(element, "file_name", file_name_.c_str());
-    std::string str = convertToString(id_);
-    xml_doc->addElement(element, "id", str.c_str());
-    str = convertToString(prec_id_);
-    xml_doc->addElement(element, "prec_id", str.c_str());
-    xml_doc->addElement(element, "title", title_.c_str());
-    str = convertToString(level_);
-    xml_doc->addElement(element, "level", str.c_str());
-    xercesc::DOMElement* scans = xml_doc->createElement("scan_list");
-    for(unsigned int i=0;i< scans_.size();i++){
-        str = convertToString(scans_[i]);
-        xml_doc->addElement(scans, "scan", str.c_str());
-    }
-    element->appendChild(scans);
-    str = convertToString(retention_time_);
-    xml_doc->addElement(element, "retention_time", str.c_str());
-    str = convertToString(prec_sp_mz_);
-    xml_doc->addElement(element, "prec_sp_mz", str.c_str());
-    str = convertToString(prec_mono_mz_);
-    xml_doc->addElement(element, "prec_mono_mz", str.c_str());
-    str = convertToString(prec_charge_);
-    xml_doc->addElement(element, "prec_charge", str.c_str());
-    str = convertToString(error_tolerance_);
-    xml_doc->addElement(element, "error_tolerance", str.c_str());
-    activation_ptr_->appendXml(xml_doc,element);
-    parent->appendChild(element);
-}
-
-void MsHeader::appendViewXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
-  int pos=4;
+xercesc::DOMElement* MsHeader::getHeaderXml(XmlDOMDocument* xml_doc) {
+  int pos = 4;
   xercesc::DOMElement* element = xml_doc->createElement("ms_header");
+  xml_doc->addElement(element, "file_name", file_name_.c_str());
   std::string str = convertToString(id_);
   xml_doc->addElement(element, "id", str.c_str());
-//  if (scans_.size() > 0) {
-//    str = scans_[0];
-//    for (unsigned int i = 1; i < scans_.size(); i++) {
-//      str += " " + scans_[i];
-//    }
-//    xml_doc->addElement(element, "scans", str.c_str());
-//  }
-  str=getScansString();
+  str = convertToString(prec_id_);
+  xml_doc->addElement(element, "prec_id", str.c_str());
+  xml_doc->addElement(element, "title", title_.c_str());
+  str = convertToString(level_);
+  xml_doc->addElement(element, "level", str.c_str());
+  str = getScansString();
   xml_doc->addElement(element, "scans", str.c_str());
-  str = convertToString(prec_mono_mz_,pos);
-  xml_doc->addElement(element, "precursor_mz", str.c_str());
+  xercesc::DOMElement* scans = xml_doc->createElement("scan_list");
+  for (unsigned int i = 0; i < scans_.size(); i++) {
+    str = convertToString(scans_[i]);
+    xml_doc->addElement(scans, "scan", str.c_str());
+  }
+  element->appendChild(scans);
+  str = convertToString(retention_time_);
+  xml_doc->addElement(element, "retention_time", str.c_str());
+  str = convertToString(prec_sp_mz_);
+  xml_doc->addElement(element, "prec_sp_mz", str.c_str());
+  str = convertToString(prec_mono_mz_);
+  xml_doc->addElement(element, "prec_mono_mz", str.c_str());
   str = convertToString(prec_charge_);
   xml_doc->addElement(element, "precursor_charge", str.c_str());
-  if(prec_mono_mz_<0){
-    std::cout<<"monoisotopic mass is not initialized!"<<std::endl;
-  }
-  else{
-    str = convertToString(prec_mono_mz_*prec_charge_-prec_charge_*prot::MassConstant::getProtonMass(),pos);
+  xml_doc->addElement(element, "prec_charge", str.c_str());
+  str = convertToString(error_tolerance_);
+  xml_doc->addElement(element, "error_tolerance", str.c_str());
+  activation_ptr_->appendXml(xml_doc, element);
+  str = convertToString(prec_mono_mz_, pos);
+  xml_doc->addElement(element, "precursor_mz", str.c_str());
+  if (prec_mono_mz_ < 0) {
+    std::cout << "monoisotopic mass is not initialized!" << std::endl;
+  } else {
+    str = convertToString(
+        prec_mono_mz_ * prec_charge_
+            - prec_charge_ * prot::MassConstant::getProtonMass(),
+        pos);
     xml_doc->addElement(element, "precursor_mass", str.c_str());
   }
-  parent->appendChild(element);
+  return element;
+}
+
+void MsHeader::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
+    parent->appendChild(getHeaderXml(xml_doc));
 }
 
 }

@@ -77,9 +77,9 @@ class MsHeader {
   void setErrorToleranceByPpo(double ppo) {
     error_tolerance_ = getPrecMonoMass() * ppo;}
 
-  void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+  xercesc::DOMElement* getHeaderXml(XmlDOMDocument* xml_doc);
 
-  void appendViewXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+  void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
  private:
   /** data set name */
