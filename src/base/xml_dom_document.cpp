@@ -167,7 +167,12 @@ std::string convertToString(double value, int number) {
     stream << std::fixed << std::setprecision(0);
   }
   else if (value < 0.001 && value > -0.001 && value != 0) {
-    stream << std::scientific << std::setprecision(number);
+    if(number>2){
+      stream << std::scientific << std::setprecision(2);
+    }
+    else{
+      stream << std::scientific << std::setprecision(number);
+    }
   } else {
     stream << std::fixed << std::setprecision(number);
   }
