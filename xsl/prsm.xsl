@@ -39,6 +39,19 @@
                         }
                     }
 
+                    function showIonPeaks(ids) {
+                        for (i = 0; peaksCount>i; i++) {
+                            document.getElementById('peak' + i).style.display  = "none";
+                            document.getElementById('peak' + i).style.background  =  "#FFFFFF";
+                        }
+                        var s = ids.split(",");
+                        for (i = 0; s.length>i; i++) {
+                            
+                            document.getElementById('peak' + s[i]).style.display  =  "";
+                            document.getElementById('peak' + s[i]).style.background  =  "yellow";
+                        }
+                    }
+
                 </script>
                 <style>
                     td.sortableHeader{text-decoration:underline;}
@@ -201,15 +214,18 @@
         </div>
     </xsl:template>
 
+<xsl:template match="matched_peaks" mode="prsm">
+    <xsl:for-each select="matched_peak">
+      <xsl:value-of select="peak_id"/><xsl:text>,</xsl:text>
+    </xsl:for-each>
+</xsl:template>
     <xsl:template match="character" mode="prsm">
         <xsl:if test="type = 'cleavage'">
             <xsl:choose>
                 <xsl:when test="cleavage_type = 'species'">
                     <a style="text-decoration:none" href="#">
-                        <xsl:attribute name="title">
-                            <xsl:value-of select="n_ion_name"/>
-                            <xsl:text> </xsl:text>
-                            <xsl:value-of select="c_ion_name"/>
+                        <xsl:attribute name="onclick">
+                            showIonPeaks('<xsl:apply-templates select="matched_peaks" mode="prsm"/>')
                         </xsl:attribute>
                         <span style ="color:black;">
                             <xsl:choose>
@@ -248,10 +264,8 @@
                         <xsl:text> </xsl:text>
                     </span-->
                     <a style="text-decoration:none" href="#">
-                        <xsl:attribute name="title">
-                            <xsl:value-of select="n_ion_name"/>
-                            <xsl:text> </xsl:text>
-                            <xsl:value-of select="c_ion_name"/>
+                         <xsl:attribute name="onclick">
+                            showIonPeaks('<xsl:apply-templates select="matched_peaks" mode="prsm"/>')
                         </xsl:attribute>
                         
                             <xsl:choose>
@@ -294,9 +308,52 @@
                     </a>
                 </xsl:when>
                 <xsl:when test="cleavage_type = 'expected_shift'">
-                    <span style ="color:black;">
+                    <!--span style ="color:black;">
                         <xsl:text> </xsl:text>
-                    </span>
+                    </span-->
+                    <a style="text-decoration:none" href="#">
+                         <xsl:attribute name="onclick">
+                            showIonPeaks('<xsl:apply-templates select="matched_peaks" mode="prsm"/>')
+                        </xsl:attribute>
+                        
+                            <xsl:choose>
+                                <xsl:when test="exist_n_ion = '0' and exist_c_ion = '0'">
+                                    <xsl:choose>
+                                      <xsl:when test="cleavage_trunc = ']'">
+                                        <span style ="color:red;">
+                                        <xsl:text>]</xsl:text>
+                                        </span>
+                                      </xsl:when>
+                                      <xsl:when test="cleavage_trunc = '['">
+                                        <span style ="color:red;">
+                                        <xsl:text>[</xsl:text>
+                                        </span>
+                                      </xsl:when>
+                                      <xsl:otherwise>
+                                       <span style ="color:black;">
+                                        <xsl:text> </xsl:text>
+                                       </span>
+                                      </xsl:otherwise>
+                                    </xsl:choose>
+                                </xsl:when>
+                                <xsl:when test="exist_n_ion = '1' and exist_c_ion = '0'">
+                                  <span style ="color:black;">
+                                    <xsl:text disable-output-escaping="yes">&amp;#x23AB;</xsl:text>
+                                  </span>
+                                </xsl:when>
+                                <xsl:when test="exist_n_ion = '0' and exist_c_ion = '1'">
+                                   <span style ="color:black; ">
+                                    <xsl:text disable-output-escaping="yes">&amp;#x23A9;</xsl:text>
+                                   </span>
+                                </xsl:when>
+                                <xsl:when test="exist_n_ion = '1' and exist_c_ion = '1'">
+                                   <span style ="color:black;">
+                                    <xsl:text disable-output-escaping="yes">&amp;#x23B1;</xsl:text>
+                                   </span>
+                                </xsl:when>
+                            </xsl:choose>
+                        
+                    </a>
                 </xsl:when>
                 <xsl:when test="cleavage_type = 'n_truncation' or cleavage_type = 'c_truncation'">
                         <xsl:text> </xsl:text>
@@ -502,7 +559,7 @@
             </td>
             <td  width="70" align="center" sorttable_customkey="{ion_left_position}">
                 <!--xsl:value-of select="ion_display_position"/-->
-                <xsl:value-of select="ion_left_position+24"/>
+                <xsl:value-of select="ion_display_position"/>
             </td>
 
             <td  width="70" align="center">
