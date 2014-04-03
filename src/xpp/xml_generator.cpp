@@ -115,6 +115,9 @@ void XmlGenerator::processPrSMs(PrSMPtrVec & prsms,ProteoformPtrVec proteoforms)
 void XmlGenerator::outputSpecies(PrSMPtrVec prsms){
 
   std::vector<int> species = getSpeciesIds(prsms);
+//  for(unsigned int i=0;i<species.size();i++){
+//    std::cout<<species[i]<<std::endl;
+//  }
   for(unsigned int i=0;i<species.size();i++){
     PrSMPtrVec select_prsms = selectSpeciesPrsms(prsms,species[i]);
     if(select_prsms.size()>0){
@@ -150,10 +153,10 @@ void XmlGenerator::process(){
   processPrSMs(prsms,raw_forms);
   setSpeciesId(prsms,ppo_);
   outputPrsms(prsms);
-//  outputAllPrsms(prsms);
-//  outputSpecies(prsms);
-//  outputProteins(prsms);
-//  outputAllProteins(prsms);
+  outputAllPrsms(prsms);
+  outputSpecies(prsms);
+  outputProteins(prsms);
+  outputAllProteins(prsms);
   outputFileList();
 
 }

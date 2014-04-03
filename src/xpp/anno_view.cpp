@@ -56,20 +56,20 @@ xercesc::DOMElement* genePrSMView(XmlDOMDocument* xml_doc,PrSMPtr prsm){
 //  xml_doc->addElement(element, "spectrum_id", str.c_str());
 //  xml_doc->addElement(element, "spectrum_scan", prsm->getSpectrumScan().c_str());
   if(prsm->getProbPtr().get()!=nullptr && prsm->getProbPtr()->getPValue() != -std::numeric_limits<double>::max()){
-    str=convertToString(prsm->getProbPtr()->getPValue(),pos);
+    str=convertToString(prsm->getProbPtr()->getPValue(),pos-2);
     xml_doc->addElement(element, "p_value", str.c_str());
   }
   else{
     xml_doc->addElement(element, "p_value", "-1");
   }
   if(prsm->getProbPtr().get()!=nullptr && prsm->getProbPtr()->getEValue() != -std::numeric_limits<double>::max()){
-    str=convertToString(prsm->getProbPtr()->getEValue(),pos);
+    str=convertToString(prsm->getProbPtr()->getEValue(),pos-2);
     xml_doc->addElement(element, "e_value", str.c_str());
   }
   else{
     xml_doc->addElement(element, "e_value", "-1");
   }
-  str=convertToString(prsm->getFdr(),pos);
+  str=convertToString(prsm->getFdr(),pos-2);
   xml_doc->addElement(element, "fdr", str.c_str());
   str=convertToString(prsm->getMatchFragNum(),pos-4);
   xml_doc->addElement(element, "matched_fragment_number", str.c_str());
@@ -88,7 +88,7 @@ xercesc::DOMElement* genePrSMView(XmlDOMDocument* xml_doc,PrSMPtr prsm){
                    prsm->getMinMass(), pairs);
   //peaks to view
   xercesc::DOMElement* ms_element = xml_doc->createElement("ms");
-  prsm->getDeconvMsPtr()->getHeaderPtr()->appendViewXml(xml_doc,ms_element);//attention
+  prsm->getDeconvMsPtr()->getHeaderPtr()->appendXml(xml_doc,ms_element);//attention
   xercesc::DOMElement* peaks = xml_doc->createElement("peaks");
   ms_element->appendChild(peaks);
   for(unsigned int i=0;i<prsm->getDeconvMsPtr()->size();i++){
@@ -353,7 +353,7 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
         if(change_list[j]->getChangeType()==UNEXPECTED_CHANGE){
           cur_res->setType("unexpected_shift");
           cleavages[i]->setType("unexpected_shift");
-          cur_res->setDisplayBg(display_bg);
+          cur_res->setDisplayBg(j%2);
         }
         else{
           cur_res->setExpected(true);
@@ -378,7 +378,7 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
           cur_res->setDisplayPos(display);
         }
       }
-      display_bg = 1-display_bg;
+//      display_bg = 1-display_bg;
     }
     cleavages[i]->appendXml(xml_doc,annotation_element);
     cur_res->appendViewXml(xml_doc,annotation_element);
@@ -409,18 +409,18 @@ std::vector<int> getSpeciesIds(PrSMPtrVec prsms,int seq_id){
 std::vector<int> getSpeciesIds(PrSMPtrVec prsms){
 //  std::cout<<prsms.size()<<std::endl;
   std::vector<int> species;
-  std::map<int,int> species_map;
-  if(prsms.size()>0){
-    species_map[prsms[0]->getProteoformPtr()->getSpeciesId()]=prsms[0]->getProteoformPtr()->getSpeciesId();
-    species.push_back(prsms[0]->getProteoformPtr()->getSpeciesId());
-  }
-  for(unsigned int i=1;i<prsms.size();i++){
-    int id = prsms[i]->getProteoformPtr()->getSpeciesId();
-    if(species_map.find(id)!=species_map.end()){
-      species_map[id] = id;
-      species.push_back(id);
+  for(unsigned int i=0;i<prsms.size();i++){
+    bool find = false;
+    for(unsigned int j=0;j<species.size();j++){
+      if(species[j]==prsms[i]->getProteoformPtr()->getSpeciesId()){
+        find = true;
+      }
+    }
+    if(!find){
+      species.push_back(prsms[i]->getProteoformPtr()->getSpeciesId());
     }
   }
+
   return species;
 }
 
