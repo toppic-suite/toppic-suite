@@ -222,6 +222,38 @@
     <xsl:template match="character" mode="prsm">
         <xsl:if test="type = 'cleavage'">
             <xsl:choose>
+                <xsl:when test="position mod 30 = 0 and position = 0">
+                    <xsl:if test="position = 0">
+                    <br/>
+	            <xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;]]></xsl:text>
+                    <xsl:text>1 </xsl:text>
+                    </xsl:if>
+                    <!--xsl:if test="position > 0">
+                    <xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;]]></xsl:text>
+                    <xsl:value-of select="position"/>
+                    <xsl:text disable-output-escaping="yes"><![CDATA[<br/>]]></xsl:text>
+                    <br/>
+                    <xsl:choose>
+                    <xsl:when test="position > 10000">
+                    <xsl:value-of select="position + 1"/><xsl:text> </xsl:text>
+                    </xsl:when>
+                    <xsl:when test="position > 1000">
+                    <xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;]]></xsl:text>
+                    <xsl:value-of select="position + 1"/><xsl:text> </xsl:text>
+                    </xsl:when>
+                    <xsl:when test="position > 100">
+                    <xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;&nbsp;]]></xsl:text>
+                    <xsl:value-of select="position + 1"/><xsl:text> </xsl:text>
+                    </xsl:when>
+                    <xsl:when test="position > 10">
+                    <xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;&nbsp;&nbsp;]]></xsl:text>
+                    <xsl:value-of select="position + 1"/><xsl:text> </xsl:text>
+                    </xsl:when>
+                    </xsl:choose>
+                    </xsl:if-->
+                </xsl:when>
+            </xsl:choose>
+            <xsl:choose>
                 <xsl:when test="cleavage_type = 'species'">
                     <a style="text-decoration:none" href="#">
                         <xsl:attribute name="onclick">
@@ -361,12 +393,12 @@
 
             </xsl:choose>
             <xsl:choose>
-                <xsl:when test="position mod 30 = 0">
-                    <xsl:if test="position = 0">
+                <xsl:when test="position mod 30 = 0 and (exist_n_ion = '1' or exist_c_ion = '1')">
+                    <!--xsl:if test="position = 0">
                     <br/>
 	            <xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;]]></xsl:text>
                     <xsl:text>1 </xsl:text>
-                    </xsl:if>
+                    </xsl:if-->
                     <xsl:if test="position > 0">
                     <xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;]]></xsl:text>
                     <xsl:value-of select="position"/>
@@ -402,7 +434,7 @@
                     </span>
                 </xsl:when>
                 <xsl:when test="position > 0 and position mod 10 = 0 and cleavage_type != 'unexpected_shift'">
-                    <span style ="color:black; background:#F6CECE">
+                    <span style ="color:black;">
                     <xsl:text disable-output-escaping="yes">&amp;nbsp;&amp;nbsp;</xsl:text>
                     </span>
                 </xsl:when>
