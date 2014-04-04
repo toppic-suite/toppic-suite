@@ -12,6 +12,8 @@ Cleavage::Cleavage(int pos){
   pos_=pos;
   exist_n_ion_ = false;
   exist_c_ion_ = false;
+  shift_= 0.0;
+  display_pos_ = 0;
 }
 void Cleavage::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
   xercesc::DOMElement* element = xml_doc->createElement("character");
@@ -23,11 +25,14 @@ void Cleavage::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
       xml_doc->addElement(element, "cleavage_trunc", str.c_str());
       str = convertToString(pos_);
       xml_doc->addElement(element, "position", str.c_str());
+      str = convertToString(display_pos_);
+      xml_doc->addElement(element, "display_position", str.c_str());
       str = convertToString(exist_n_ion_);
       xml_doc->addElement(element, "exist_n_ion", str.c_str());
       str = convertToString(exist_c_ion_);
       xml_doc->addElement(element, "exist_c_ion", str.c_str());
-
+      str = convertToString(shift_,2);
+      xml_doc->addElement(element, "shift_no_letter", str.c_str());
       xercesc::DOMElement* peaks = xml_doc->createElement("matched_peaks");
       for(unsigned int i=0;i<pairs_.size();i++){
         pairs_[i]->appendPeakToXml(xml_doc,peaks);

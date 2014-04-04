@@ -22,16 +22,20 @@ class Cleavage {
   }
   void setExistNIon(bool n){exist_n_ion_ = n;};
   void setExistCIon(bool c){exist_c_ion_ = c;};
+  void setShift(double shift) {shift_=shift;}
   void setType(std::string type){type_=type;}
+  void setDisplayPos(int i){display_pos_=i;}
   std::string getType(){return type_;}
   void setTrunc(std::string term) {trunc_=term;}
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
  private:
   int pos_;
+  int display_pos_;
   bool exist_n_ion_;
   bool exist_c_ion_;
   std::string type_;
   std::string trunc_;
+  double shift_;
   PeakIonPairPtrVec pairs_;
 };
 
