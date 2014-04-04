@@ -23,7 +23,14 @@ namespace prot {
 
 class PtmFastFilterMng {
  public:
-  PtmFastFilterMng(std::string config_file_name) {
+  PtmFastFilterMng(const std::string &config_file_name,
+                   const std::string &search_db_file_name,
+                   const std::string &spectrum_file_name,
+                   const std::string &output_file_ext) {
+    search_db_file_name_ = search_db_file_name;
+    spectrum_file_name_ = spectrum_file_name;
+    output_file_ext_ = output_file_ext;
+
     base_data = BaseDataPtr(new BaseData(config_file_name));
     peak_tolerance_ = PeakTolerancePtr(
         new PeakTolerance(ppo_, use_min_tolerance_, min_tolerance_));
@@ -51,6 +58,9 @@ class PtmFastFilterMng {
         new SpPara(min_peak_num, min_mass, peak_tolerance_, 
                    extend_sp_para_, activation_ptr_));
   }
+
+  BaseDataPtr base_data;
+
   //Candidate protein number for each spectrum
   int ptm_fast_filter_result_num_ = 20;
   int db_block_size_ = 5000000;
@@ -75,11 +85,9 @@ class PtmFastFilterMng {
   SpParaPtr sp_para_;
 
   std::string search_db_file_name_;
-  std::string res_file_name;
   std::string spectrum_file_name_;
   std::string output_file_ext_;
 
-  BaseDataPtr base_data;
 };
 
 typedef std::shared_ptr<PtmFastFilterMng> PtmFastFilterMngPtr;

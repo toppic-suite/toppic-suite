@@ -15,13 +15,22 @@ namespace prot {
 
 class TdgfMng {
  public:
-  TdgfMng(std::string conf_file_name) {
+  TdgfMng(const std::string &conf_file_name, 
+          const std::string &search_db_file_name, 
+          const std::string &spectrum_file_name,
+          const std::string &input_file_ext,
+          const std::string &output_file_ext) {
+    search_db_file_name_ = search_db_file_name;
+    spectrum_file_name_ = spectrum_file_name;
+    input_file_ext_ = input_file_ext;
+    output_file_ext_ = output_file_ext;
+
     base_data_ptr_  = BaseDataPtr (new BaseData(conf_file_name));
     peak_tolerance_ptr_ = PeakTolerancePtr(
         new PeakTolerance(ppo_, use_min_tolerance_, min_tolerance_));
     extend_sp_para_ptr_ = ExtendSpParaPtr(new ExtendSpPara(extend_min_mass_, ext_offsets_));
     sp_para_ptr_ = SpParaPtr(new SpPara(min_peak_num_, min_mass_, peak_tolerance_ptr_, 
-                              extend_sp_para_ptr_, base_data_ptr_->getActivationPtr())); 
+                                        extend_sp_para_ptr_, base_data_ptr_->getActivationPtr())); 
   }
 
   TdgfMng(std::map<std::string,std::string> arguments) {

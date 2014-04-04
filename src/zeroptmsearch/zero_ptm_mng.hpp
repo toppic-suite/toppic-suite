@@ -19,7 +19,14 @@ namespace prot {
 
 class ZeroPtmMng {
  public:
-  ZeroPtmMng(std::string conf_file_name) {
+  ZeroPtmMng(const std::string &conf_file_name, 
+             const std::string &search_db_file_name, 
+             const std::string &spectrum_file_name,
+             const std::string &output_file_ext) {
+    search_db_file_name_ = search_db_file_name;
+    spectrum_file_name_ = spectrum_file_name;
+    output_file_ext_ = output_file_ext;
+
     base_data_ptr_  = BaseDataPtr (new BaseData(conf_file_name));
     peak_tolerance_ptr_ = PeakTolerancePtr(
         new PeakTolerance(ppo_, use_min_tolerance_, min_tolerance_));
@@ -43,9 +50,6 @@ class ZeroPtmMng {
   }
 
   BaseDataPtr base_data_ptr_;
-
-  std::string search_db_file_name_;
-  std::string spectrum_file_name_;
 
   /** zero ptm fast filtering */
   int zero_ptm_filter_result_num_ = 20;
@@ -74,6 +78,9 @@ class ZeroPtmMng {
   bool   do_recalibration_ = false;
   double recal_ppo_ = 0.000015; // 15 ppm
   bool   ms_one_ms_two_same_recal_ = true;
+
+  std::string search_db_file_name_;
+  std::string spectrum_file_name_;
 
   std::string output_file_ext_;
 };
