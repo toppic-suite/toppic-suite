@@ -321,21 +321,60 @@
                                     </xsl:choose>
                                 </xsl:when>
                                 <xsl:when test="exist_n_ion = '1' and exist_c_ion = '0'">
+                                  <xsl:if test="shift_no_letter = 0">
                                   <span style ="color:black;">
                                     <xsl:text disable-output-escaping="yes">&amp;#x23AB;</xsl:text>
                                   </span>
+                                  </xsl:if>
+                                  <xsl:if test="shift_no_letter != 0">
+                                  <span style ="color:black;background:#F6CECE">
+                                    <xsl:text disable-output-escaping="yes">&amp;#x23AB;</xsl:text>
+                                  </span>
+                                  </xsl:if>
                                 </xsl:when>
                                 <xsl:when test="exist_n_ion = '0' and exist_c_ion = '1'">
+                                  <xsl:if test="shift_no_letter = 0">
                                    <span style ="color:black; ">
                                     <xsl:text disable-output-escaping="yes">&amp;#x23A9;</xsl:text>
                                    </span>
+                                  </xsl:if>
+                                  <xsl:if test="shift_no_letter != 0">
+                                   <span style ="color:black; background:#F6CECE">
+                                    <xsl:text disable-output-escaping="yes">&amp;#x23A9;</xsl:text>
+                                   </span>
+                                  </xsl:if>
                                 </xsl:when>
                                 <xsl:when test="exist_n_ion = '1' and exist_c_ion = '1'">
+                                  <xsl:if test="shift_no_letter = 0">
                                    <span style ="color:black;">
                                     <xsl:text disable-output-escaping="yes">&amp;#x23B1;</xsl:text>
                                    </span>
+                                  </xsl:if>
+                                  <xsl:if test="shift_no_letter != 0">
+                                   <span style ="color:black;background:#F6CECE">
+                                    <xsl:text disable-output-escaping="yes">&amp;#x23B1;</xsl:text>
+                                   </span>
+                                  </xsl:if>
                                 </xsl:when>
                             </xsl:choose>
+                            <xsl:if test="shift_no_letter != 0">
+                            <xsl:choose>
+                            <xsl:when  test="display_position = '0'">
+                                <span  style="position: relative;">
+                                    <span style="position: absolute; left:-6pt; top:-24pt; font-size: 8pt; color:red; text-decoration:none;">
+                                        <xsl:value-of select="shift_no_letter"/>
+                                    </span>
+                                </span>
+                            </xsl:when>
+                            <xsl:when  test="display_position = '1'">
+                                <span  style="position: relative;">
+                                    <span style="position: absolute; left:-6pt; top:-32pt; font-size: 8pt; color:red; text-decoration:none;">
+                                        <xsl:value-of select="shift_no_letter"/>
+                                    </span>
+                                </span>
+                            </xsl:when>
+                            </xsl:choose>
+                            </xsl:if>
                         
                     </a>
                 </xsl:when>
