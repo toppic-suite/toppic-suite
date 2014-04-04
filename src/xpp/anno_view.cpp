@@ -377,6 +377,16 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
           cur_res->setDisplayPos(display);
         }
       }
+      if(change_list[j]->getLeftBpPos()==change_list[j]->getRightBpPos() and change_list[j]->getLeftBpPos()==i){
+        cleavages[i]->setType("unexpected_shift");
+        cleavages[i]->setShift(change_list[j]->getMassShift());
+        if (j > 0 && change_list[j]->getLeftBpPos() - change_list[j - 1]->getLeftBpPos() <= 5) {
+          display = 1 - display;
+        } else {
+          display = 0;
+        }
+        cleavages[i]->setDisplayPos(display);
+      }
 //      display_bg = 1-display_bg;
     }
     cleavages[i]->appendXml(xml_doc,annotation_element);
