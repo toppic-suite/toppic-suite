@@ -20,14 +20,31 @@ namespace prot {
 
 class PtmMng {
  public :
-  PtmMng(std::string config_file_name);
+  PtmMng(std::string config_file_name) {
+    base_data_=BaseDataPtr(new BaseData(config_file_name));
+    peak_tolerance_ = PeakTolerancePtr(
+        new PeakTolerance(ppo_,use_min_tolerance_,min_tolerance_));
+
+    extend_sp_para_ = ExtendSpParaPtr(
+        new ExtendSpPara(extend_thresh_,extoffsets));
+    sp_para_ = SpParaPtr( new SpPara(min_peak_num_, min_mass_, 
+                   peak_tolerance_, extend_sp_para_, activation_));
+  }
+
   PtmMng(std::map<std::string, std::string> arguments){
-    base_data_ = BaseDataPtr(new BaseData(arguments["configuration"]));
     spectrum_file_name_ = arguments["spectrumFileName"];
     search_db_file_name_ = arguments["databaseFileName"];
     n_unknown_shift_=atoi(arguments["shiftNumber"].c_str());
     ppo_=atoi(arguments["errorTolerance"].c_str())*0.000001;
-    peank_tolerance_->setPpo(ppo_);
+
+    base_data_ = BaseDataPtr(new BaseData(arguments["configuration"]));
+    peak_tolerance_ = PeakTolerancePtr(
+        new PeakTolerance(ppo_,use_min_tolerance_,min_tolerance_));
+
+    extend_sp_para_ = ExtendSpParaPtr(
+        new ExtendSpPara(extend_thresh_,extoffsets));
+    sp_para_ = SpParaPtr( new SpPara(min_peak_num_, min_mass_, 
+                   peak_tolerance_, extend_sp_para_, activation_));
   }
 
   BaseDataPtr base_data_ ;
@@ -35,23 +52,16 @@ class PtmMng {
   double ppo_ = 0.000015;
   bool use_min_tolerance_ = true;
   double min_tolerance_ = 0.01;
-  PeakTolerancePtr peank_tolerance_ = PeakTolerancePtr(
-      new PeakTolerance(ppo_,use_min_tolerance_,min_tolerance_));
+  PeakTolerancePtr peak_tolerance_;
 
   int min_peak_num_ = 10;
   double min_mass_ = 50.0;
   double IM_ = MassConstant::getIsotopeMass();
   std::vector<double> extoffsets = {0.0,-IM_,IM_};
   double extend_thresh_ = 5000;
-  ExtendSpParaPtr extend_sp_para_ = ExtendSpParaPtr(
-      new ExtendSpPara(extend_thresh_,extoffsets));
+  ExtendSpParaPtr extend_sp_para_;
   ActivationPtr activation_ = nullptr;
-  SpParaPtr sp_para_ = SpParaPtr(
-      new SpPara(min_peak_num_,
-                 min_mass_,
-                 peank_tolerance_,
-                 extend_sp_para_,
-                 activation_));
+  SpParaPtr sp_para_;
 
   int n_report_ = 1;
   int n_unknown_shift_ =2;
@@ -72,7 +82,6 @@ class PtmMng {
   double adjust_prec_step_width_ = 0.005;
 
   std::string search_db_file_name_;
-  std::string res_file_name_;
   std::string spectrum_file_name_;
   std::string input_file_ext_;
   std::string output_file_ext_;

@@ -85,11 +85,11 @@ int main(int argc, char* argv[]) {
                           "OUTPUT_TABLE", zero_mng_ptr->ppo_);
 		table_out.write();
 
-//    prot::XmlGenerator xml_gene = prot::XmlGenerator(argv[2],argv[3],"OUTPUT_RESULT");
-//		xml_gene.process();
+    prot::XmlGenerator xml_gene = prot::XmlGenerator(argv[2],argv[3],"OUTPUT_RESULT");
+		xml_gene.process();
 
-//		TransformerPtr trans = TransformerPtr(new Transformer());
-//		trans->trans();
+		TransformerPtr trans = TransformerPtr(new Transformer());
+		trans->trans();
 
   } catch (const char* e) {
     std::cout << "Exception " << e << std::endl;

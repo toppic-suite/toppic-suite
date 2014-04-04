@@ -318,8 +318,7 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
   prot_element->appendChild(annotation_element);
   CleavagePtrVec cleavages = getProteoCleavage(proteoform_ptr,refine_ms_three,min_mass);
   int display =0;
-  int display_bg =0;
-//  for(int i=0;i<proteoform_ptr->getResSeqPtr()->getLen();i++){
+  //int display_bg =0;
   for(int i=0;i<proteoform_ptr->getDbResSeqPtr()->getLen();i++){
     cleavages[i]->setType("species");
     cleavages[i]->setTrunc("");

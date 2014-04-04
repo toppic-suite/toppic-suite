@@ -19,30 +19,29 @@ namespace prot {
 
 class ZeroPtmMng {
  public:
-  ZeroPtmMng(std::string conf_file_name): 
-      base_data_ptr_ (new BaseData(conf_file_name)),
-      peak_tolerance_ptr_ (
-          new PeakTolerance(ppo_, use_min_tolerance_, min_tolerance_)),
-      extend_sp_para_ptr_ (new ExtendSpPara(extend_min_mass_, ext_offsets_)),
-      sp_para_ptr_(new SpPara(min_peak_num_, min_mass_, peak_tolerance_ptr_, 
-                              extend_sp_para_ptr_, 
-                              base_data_ptr_->getActivationPtr())) 
-  {}
+  ZeroPtmMng(std::string conf_file_name) {
+    base_data_ptr_  = BaseDataPtr (new BaseData(conf_file_name));
+    peak_tolerance_ptr_ = PeakTolerancePtr(
+        new PeakTolerance(ppo_, use_min_tolerance_, min_tolerance_));
+    extend_sp_para_ptr_ = ExtendSpParaPtr(new ExtendSpPara(extend_min_mass_, ext_offsets_));
+    sp_para_ptr_ = SpParaPtr(new SpPara(min_peak_num_, min_mass_, peak_tolerance_ptr_, 
+                              extend_sp_para_ptr_, base_data_ptr_->getActivationPtr())); 
+  }
 
-  ZeroPtmMng(std::map<std::string,std::string> arguments):
-    base_data_ptr_ (new BaseData(arguments["configuration"])),
-    peak_tolerance_ptr_ (
-              new PeakTolerance(ppo_, use_min_tolerance_, min_tolerance_)),
-          extend_sp_para_ptr_ (new ExtendSpPara(extend_min_mass_, ext_offsets_)),
-          sp_para_ptr_(new SpPara(min_peak_num_, min_mass_, peak_tolerance_ptr_,
-                                  extend_sp_para_ptr_,
-                                  base_data_ptr_->getActivationPtr()))
-  {
+  ZeroPtmMng(std::map<std::string,std::string> arguments) {
     search_db_file_name_ = arguments["databaseFileName"];
     spectrum_file_name_ = arguments["spectrumFileName"];
-    ppo_=atoi(arguments["errorTolerance"].c_str())*0.000001;
-    peak_tolerance_ptr_->setPpo(ppo_);
+    ppo_ = atoi(arguments["errorTolerance"].c_str())*0.000001;
+
+    base_data_ptr_ = BaseDataPtr(new BaseData(arguments["configuration"]));
+    peak_tolerance_ptr_ = PeakTolerancePtr(
+        new PeakTolerance(ppo_, use_min_tolerance_, min_tolerance_));
+
+    extend_sp_para_ptr_ = ExtendSpParaPtr(new ExtendSpPara(extend_min_mass_, ext_offsets_));
+    sp_para_ptr_ = SpParaPtr(new SpPara(min_peak_num_, min_mass_, peak_tolerance_ptr_,
+                                        extend_sp_para_ptr_, base_data_ptr_->getActivationPtr()));
   }
+
   BaseDataPtr base_data_ptr_;
 
   std::string search_db_file_name_;
