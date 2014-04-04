@@ -28,27 +28,19 @@ int main(int argc, char* argv[]) {
 
     std::cout << "Zero ptm search 0.1 " << std::endl;
     prot::ZeroPtmMngPtr zero_mng_ptr
-        = prot::ZeroPtmMngPtr(new prot::ZeroPtmMng (std::string(argv[1])));
-    zero_mng_ptr->search_db_file_name_ = argv[2];
-    zero_mng_ptr->spectrum_file_name_ = argv[3];
-    zero_mng_ptr->output_file_ext_ = "ZERO";
+        = prot::ZeroPtmMngPtr(new prot::ZeroPtmMng (argv[1], argv[2], argv[3], "ZERO"));
     prot::zeroPtmSearchProcess(zero_mng_ptr);
 
     std::cout << "Fast filter 0.1 " << std::endl;
-    prot::PtmFastFilterMngPtr filter_mng_ptr = prot::PtmFastFilterMngPtr(new prot::PtmFastFilterMng(std::string(argv[1])));
-		filter_mng_ptr->search_db_file_name_ = argv[2];
-		filter_mng_ptr->spectrum_file_name_ = argv[3];
-    filter_mng_ptr->output_file_ext_ = "FILTER";
+    prot::PtmFastFilterMngPtr filter_mng_ptr 
+        = prot::PtmFastFilterMngPtr(new prot::PtmFastFilterMng(argv[1], argv[2], argv[3], "FILTER"));
     prot::PtmFastFilterProcessor filter_processor(filter_mng_ptr);
     filter_processor.process();
 
 
     std::cout << "Ptm alignment 0.1 " << std::endl;
-		prot::PtmMngPtr ptm_mng_ptr = prot::PtmMngPtr(new prot::PtmMng(std::string(argv[1])));
-		ptm_mng_ptr->search_db_file_name_ = argv[2];
-		ptm_mng_ptr->spectrum_file_name_ = argv[3];
-		ptm_mng_ptr->input_file_ext_ ="FILTER_COMBINED";
-		ptm_mng_ptr->output_file_ext_="PTM";
+		prot::PtmMngPtr ptm_mng_ptr 
+        = prot::PtmMngPtr(new prot::PtmMng(argv[1], argv[2], argv[3], "FILTER_COMBINED", "PTM"));
     prot::PtmProcessor ptm_processor(ptm_mng_ptr);
 		ptm_processor.process();
 
@@ -60,11 +52,8 @@ int main(int argc, char* argv[]) {
 		combine_processor.process();
 
     std::cout << "EValueConsole 0.1 " << std::endl;
-    prot::TdgfMngPtr tdgf_mng_ptr = prot::TdgfMngPtr(new prot::TdgfMng (std::string(argv[1])));
-    tdgf_mng_ptr->search_db_file_name_ = argv[2];
-    tdgf_mng_ptr->spectrum_file_name_ = argv[3];
-    tdgf_mng_ptr->input_file_ext_ = "RAW_RESULT";
-    tdgf_mng_ptr->output_file_ext_ = "EVALUE";
+    prot::TdgfMngPtr tdgf_mng_ptr = 
+        prot::TdgfMngPtr(new prot::TdgfMng (argv[1], argv[2], argv[3], "RAW_RESULT", "EVALUE"));
     prot::EValueProcessor processor(tdgf_mng_ptr);
     processor.init();
     // compute E-value for a set of prsms each run 
@@ -85,11 +74,15 @@ int main(int argc, char* argv[]) {
                           "OUTPUT_TABLE", zero_mng_ptr->ppo_);
 		table_out.write();
 
-//    prot::XmlGenerator xml_gene = prot::XmlGenerator(argv[2],argv[3],"OUTPUT_RESULT");
-//		xml_gene.process();
+    /*
+    prot::XmlGenerator xml_gene = prot::XmlGenerator(argv[2],argv[3],"OUTPUT_RESULT");
+		xml_gene.process();
+    */
 
-//		TransformerPtr trans = TransformerPtr(new Transformer());
-//		trans->trans();
+    /*
+		TransformerPtr trans = TransformerPtr(new Transformer());
+		trans->trans();
+    */
 
   } catch (const char* e) {
     std::cout << "Exception " << e << std::endl;

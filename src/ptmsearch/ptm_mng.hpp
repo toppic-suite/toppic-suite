@@ -20,14 +20,38 @@ namespace prot {
 
 class PtmMng {
  public :
-  PtmMng(std::string config_file_name);
+  PtmMng(const std::string &conf_file_name, 
+         const std::string &search_db_file_name, 
+         const std::string &spectrum_file_name,
+         const std::string &input_file_ext,
+         const std::string &output_file_ext) {
+    search_db_file_name_ = search_db_file_name;
+    spectrum_file_name_ = spectrum_file_name;
+    input_file_ext_ = input_file_ext;
+    output_file_ext_ = output_file_ext;
+
+    base_data_  = BaseDataPtr (new BaseData(conf_file_name));
+    peak_tolerance_ = PeakTolerancePtr(
+        new PeakTolerance(ppo_, use_min_tolerance_, min_tolerance_));
+    extend_sp_para_ = ExtendSpParaPtr(new ExtendSpPara(extend_min_mass_, ext_offsets_));
+    sp_para_ = SpParaPtr(new SpPara(min_peak_num_, min_mass_, peak_tolerance_, 
+                                    extend_sp_para_, base_data_->getActivationPtr())); 
+  }
+
   PtmMng(std::map<std::string, std::string> arguments){
-    base_data_ = BaseDataPtr(new BaseData(arguments["configuration"]));
     spectrum_file_name_ = arguments["spectrumFileName"];
     search_db_file_name_ = arguments["databaseFileName"];
     n_unknown_shift_=atoi(arguments["shiftNumber"].c_str());
     ppo_=atoi(arguments["errorTolerance"].c_str())*0.000001;
-    peank_tolerance_->setPpo(ppo_);
+
+    base_data_ = BaseDataPtr(new BaseData(arguments["configuration"]));
+    peak_tolerance_ = PeakTolerancePtr(
+        new PeakTolerance(ppo_,use_min_tolerance_,min_tolerance_));
+
+    extend_sp_para_ = ExtendSpParaPtr(
+        new ExtendSpPara(extend_min_mass_,ext_offsets_));
+    sp_para_ = SpParaPtr( new SpPara(min_peak_num_, min_mass_, 
+                   peak_tolerance_, extend_sp_para_, activation_));
   }
 
   BaseDataPtr base_data_ ;
@@ -35,23 +59,16 @@ class PtmMng {
   double ppo_ = 0.000015;
   bool use_min_tolerance_ = true;
   double min_tolerance_ = 0.01;
-  PeakTolerancePtr peank_tolerance_ = PeakTolerancePtr(
-      new PeakTolerance(ppo_,use_min_tolerance_,min_tolerance_));
+  PeakTolerancePtr peak_tolerance_;
 
   int min_peak_num_ = 10;
   double min_mass_ = 50.0;
   double IM_ = MassConstant::getIsotopeMass();
-  std::vector<double> extoffsets = {0.0,-IM_,IM_};
-  double extend_thresh_ = 5000;
-  ExtendSpParaPtr extend_sp_para_ = ExtendSpParaPtr(
-      new ExtendSpPara(extend_thresh_,extoffsets));
+  std::vector<double> ext_offsets_ = {0.0,-IM_,IM_};
+  double extend_min_mass_ = 5000;
+  ExtendSpParaPtr extend_sp_para_;
   ActivationPtr activation_ = nullptr;
-  SpParaPtr sp_para_ = SpParaPtr(
-      new SpPara(min_peak_num_,
-                 min_mass_,
-                 peank_tolerance_,
-                 extend_sp_para_,
-                 activation_));
+  SpParaPtr sp_para_;
 
   int n_report_ = 1;
   int n_unknown_shift_ =2;
@@ -72,7 +89,6 @@ class PtmMng {
   double adjust_prec_step_width_ = 0.005;
 
   std::string search_db_file_name_;
-  std::string res_file_name_;
   std::string spectrum_file_name_;
   std::string input_file_ext_;
   std::string output_file_ext_;

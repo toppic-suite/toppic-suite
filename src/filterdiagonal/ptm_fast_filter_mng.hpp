@@ -23,19 +23,44 @@ namespace prot {
 
 class PtmFastFilterMng {
  public:
-  PtmFastFilterMng(std::string config_file_name) {
+  PtmFastFilterMng(const std::string &config_file_name,
+                   const std::string &search_db_file_name,
+                   const std::string &spectrum_file_name,
+                   const std::string &output_file_ext) {
+    search_db_file_name_ = search_db_file_name;
+    spectrum_file_name_ = spectrum_file_name;
+    output_file_ext_ = output_file_ext;
+
     base_data = BaseDataPtr(new BaseData(config_file_name));
+    peak_tolerance_ = PeakTolerancePtr(
+        new PeakTolerance(ppo_, use_min_tolerance_, min_tolerance_));
+    extend_sp_para_ = ExtendSpParaPtr(
+        new ExtendSpPara(extend_min_mass_, ext_offsets_));
+    sp_para_ = SpParaPtr(
+        new SpPara(min_peak_num, min_mass, peak_tolerance_, 
+                   extend_sp_para_, activation_ptr_));
   }
 
   PtmFastFilterMng(std::map<std::string, std::string> arguments) {
     base_data = BaseDataPtr(new BaseData(arguments["configuration"]));
     spectrum_file_name_ = arguments["spectrumFileName"];
     search_db_file_name_ = arguments["databaseFileName"];
+
     activation_ptr_ = ActivationFactory::getBaseActivationPtrByName(
         arguments["activation"]);
     ppo_=atoi(arguments["errorTolerance"].c_str())*0.000001;
-    peak_tolerance_->setPpo(ppo_);
+
+    peak_tolerance_ = PeakTolerancePtr(
+        new PeakTolerance(ppo_, use_min_tolerance_, min_tolerance_));
+    extend_sp_para_ = ExtendSpParaPtr(
+        new ExtendSpPara(extend_min_mass_, ext_offsets_));
+    sp_para_ = SpParaPtr(
+        new SpPara(min_peak_num, min_mass, peak_tolerance_, 
+                   extend_sp_para_, activation_ptr_));
   }
+
+  BaseDataPtr base_data;
+
   //Candidate protein number for each spectrum
   int ptm_fast_filter_result_num_ = 20;
   int db_block_size_ = 5000000;
@@ -44,8 +69,7 @@ class PtmFastFilterMng {
   double ppo_ = 0.000015;
   bool use_min_tolerance_ = true;
   double min_tolerance_ = 0.01;
-  PeakTolerancePtr peak_tolerance_ = PeakTolerancePtr(
-      new PeakTolerance(ppo_, use_min_tolerance_, min_tolerance_));
+  PeakTolerancePtr peak_tolerance_;
 
   int min_peak_num = 10;
   double min_mass = 50.0;
@@ -55,20 +79,15 @@ class PtmFastFilterMng {
   // the set of offsets used to expand the monoisotopic mass list
   std::vector<double> ext_offsets_ { { 0, -IM_, IM_ } };
   double extend_min_mass_ = 5000;
-  ExtendSpParaPtr extend_sp_para_ = ExtendSpParaPtr(
-      new ExtendSpPara(extend_min_mass_, ext_offsets_));
+  ExtendSpParaPtr extend_sp_para_;
   ActivationPtr activation_ptr_;
 
-  SpParaPtr sp_para_ = SpParaPtr(
-      new SpPara(min_peak_num, min_mass, peak_tolerance_, extend_sp_para_,
-                 activation_ptr_));
+  SpParaPtr sp_para_;
 
   std::string search_db_file_name_;
-  std::string res_file_name;
   std::string spectrum_file_name_;
   std::string output_file_ext_;
 
-  BaseDataPtr base_data;
 };
 
 typedef std::shared_ptr<PtmFastFilterMng> PtmFastFilterMngPtr;
