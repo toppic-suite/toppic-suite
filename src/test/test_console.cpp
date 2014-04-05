@@ -20,7 +20,29 @@
 #include "tdgf/tdgf_mng.hpp"
 
 #include "xpp/xml_generator.hpp"
+#include "xpp/transformer.hpp"
 
+
+std::map<std::string, std::string> getArgumentMap(std::string conf_file_name,
+                                                  std::string search_db_file_name,
+                                                  std::string spectrum_file_name){
+  std::map<std::string, std::string> arguments;
+	arguments["databaseFileName"]=search_db_file_name;
+	arguments["spectrumFileName"]=spectrum_file_name;
+	arguments["activation"]="FILE";
+	arguments["searchType"]="TARGET";
+	arguments["cysteineProtection"]="C0";
+	arguments["shiftNumber"]="2";
+	arguments["errorTolerance"]="15";
+	arguments["cutoffType"]="EVALUE";
+	arguments["cutoff"]="0.01";
+	arguments["doOneDaltonCorrection"]="false";
+	arguments["doChargeCorrection"]="false";
+	arguments["tableOutputFileName"]="result_table.txt";
+	arguments["detailOutputFileName"]="result_detail.txt";
+	arguments["configuration"]=conf_file_name;
+	return arguments;
+}
 
 int main(int argc, char* argv[]) {
   try {
@@ -74,15 +96,13 @@ int main(int argc, char* argv[]) {
                           "OUTPUT_TABLE", zero_mng_ptr->ppo_);
 		table_out.write();
 
-    /*
-    prot::XmlGenerator xml_gene = prot::XmlGenerator(argv[2],argv[3],"OUTPUT_RESULT");
-		xml_gene.process();
-    */
+    std::map<std::string, std::string> arguments = getArgumentMap(argv[1], argv[2], argv[3]);
 
-    /*
+    prot::XmlGenerator xml_gene = prot::XmlGenerator(arguments, "OUTPUT_RESULT");
+		xml_gene.process();
+
 		TransformerPtr trans = TransformerPtr(new Transformer());
 		trans->trans();
-    */
 
   } catch (const char* e) {
     std::cout << "Exception " << e << std::endl;

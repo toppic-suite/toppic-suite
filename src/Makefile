@@ -56,7 +56,7 @@ all:
 	cd filterdiagonal; make
 	cd ptmsearch; make
 	cd console; make
-#	cd xpp; make	
+	cd xpp; make	
 	cd test; make
 
 clean:
