@@ -8,19 +8,32 @@
 #ifndef VIEW_MNG_HPP_
 #define VIEW_MNG_HPP_
 
+#include <string>
+#include <algorithm>
+#include <map>
+
 namespace prot {
 
 class ViewMng {
  public:
-  ViewMng(std::string conf_file_name):
-        base_data_ptr_ (new BaseData(conf_file_name)),
-        peak_tolerance_ptr_ (
-            new PeakTolerance(ppo_, use_min_tolerance_, min_tolerance_)),
-        extend_sp_para_ptr_ (new ExtendSpPara(extend_min_mass_, ext_offsets_)),
-        sp_para_ptr_(new SpPara(min_peak_num_, min_mass_, peak_tolerance_ptr_,
-                                extend_sp_para_ptr_,
-                                base_data_ptr_->getActivationPtr()))
-    {}
+  ViewMng(std::map<std::string,std::string> arguments)
+    {
+      ppo_ = atoi(arguments["errorTolerance"].c_str())*0.000001;
+      arguments_ = arguments;
+      spectrum_file_ = arguments["spectrumFileName"];
+      database_file_=arguments["databaseFileName"];
+
+      base_data_ptr_ = BaseDataPtr(new BaseData(arguments["configuration"]));
+      peak_tolerance_ptr_ = PeakTolerancePtr(new PeakTolerance(ppo_,use_min_tolerance_, min_tolerance_));
+      extend_sp_para_ptr_=ExtendSpParaPtr(new ExtendSpPara(extend_min_mass_, ext_offsets_));
+      sp_para_ptr_= SpParaPtr(new SpPara(min_peak_num_, min_mass_, peak_tolerance_ptr_,
+                   extend_sp_para_ptr_, base_data_ptr_->getActivationPtr()));
+    }
+  std::map<std::string,std::string> arguments_;
+  std::string html_path_="html/";
+  std::string xml_path_="xml/";
+  std::string spectrum_file_;
+  std::string database_file_;
 
   BaseDataPtr base_data_ptr_;
 

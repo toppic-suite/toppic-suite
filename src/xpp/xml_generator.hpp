@@ -41,7 +41,6 @@ class XmlGenerator {
   std::string input_file_;
   std::string output_file_;
   std::string html_path_;
-  double ppo_;
   ViewMngPtr mng_;
   SpParaPtr sp_para_ptr_;
   ProteoformPtrVec seq_;
