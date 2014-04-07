@@ -26,7 +26,7 @@ BASE_OBJS = $(addprefix $(OBJ_DIR)/, neutral_loss.o semi_align_type.o db_residue
 
 SPEC_OBJS = $(addprefix $(OBJ_DIR)/, theo_peak.o deconv_peak.o extend_sp_para.o  sp_para.o deconv_ms.o peak_tolerance.o extend_peak.o ms_header.o)
 
-PRSM_OBJS = $(addprefix $(OBJ_DIR)/, main.o output_selector.o table_writer.o prsm_selector.o cleavage.o pair.o prsm_combine.o prsm_writer.o simple_prsm_writer.o peak_ion_pair.o prsm.o simple_prsm.o)
+PRSM_OBJS = $(addprefix $(OBJ_DIR)/, main.o prsm_fdr.o prsm_species.o output_selector.o table_writer.o prsm_selector.o cleavage.o pair.o prsm_combine.o prsm_writer.o simple_prsm_writer.o peak_ion_pair.o prsm.o simple_prsm.o)
 
 OBJS = $(BASE_OBJS) $(SPEC_OBJS) $(PRSM_OBJS)
 

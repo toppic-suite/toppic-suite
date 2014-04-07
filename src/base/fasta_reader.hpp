@@ -53,6 +53,10 @@ class FastaReader {
 
 ProteoformPtrVec readFastaToProteoform(const std::string &file_name, 
                                        const ResiduePtrVec &residue_list);
+
+void generateShuffleDb(const std::string &file_name, 
+                       const std::string &target_decoy_file_name);
+
 }
 
 #endif

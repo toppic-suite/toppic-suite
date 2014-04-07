@@ -125,7 +125,7 @@ inline bool prsmProteoformIdUp(PrSMPtr p1, PrSMPtr p2) {
 inline bool prsmMatchFragmentDown(PrSMPtr p1, PrSMPtr p2) {
   return p1->getMatchFragNum() > p2->getMatchFragNum();
 }
-
+//compare two complete prsm, first match fragment number, second start pos 
 inline bool prsmCompPreMatchFragmentDown(PrSMPtr p1, PrSMPtr p2) {
  if(p1->getMatchFragNum() > p2->getMatchFragNum()){
    return true;
@@ -144,7 +144,7 @@ inline bool prsmEValueDown(PrSMPtr p1, PrSMPtr p2) {
   return p1->getEValue() > p2->getEValue();
 }
 
-inline bool prsm_comp(PrSMPtr p1, PrSMPtr p2){
+inline bool prsmSpectrumIdUpPrecursorIdUp(PrSMPtr p1, PrSMPtr p2){
     if(p1->getSpectrumId() < p2->getSpectrumId()){
         return false;
     }
@@ -159,7 +159,7 @@ inline bool prsm_comp(PrSMPtr p1, PrSMPtr p2){
     }
 }
 
-inline bool prsm_spectrum(PrSMPtr p1, PrSMPtr p2){
+inline bool prsmSpectrumIdUpMatchFragUp(PrSMPtr p1, PrSMPtr p2){
     if(p1->getSpectrumId() < p2->getSpectrumId()){
         return true;
     }

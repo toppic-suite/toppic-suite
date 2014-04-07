@@ -5,9 +5,16 @@
  *      Author: xunlikun
  */
 
-#include <prsm/prsmfdr.hpp>
+#include <prsm/prsm_fdr.hpp>
 
 namespace prot {
+PrSMFdr::PrSMFdr(std::string db_file_name, std::string spec_file_name,
+                 std::string input_ext,std::string output_ext){
+  db_file_ = db_file_name;
+  spec_file_= spec_file_name;
+  input_file_=input_ext;
+  output_file_=output_ext;
+}
 PrSMFdr::PrSMFdr(std::map<std::string,std::string> arguments,std::string input_ext,std::string output_ext){
   db_file_ = arguments["databaseFileName"];
   spec_file_=arguments["spectrumFileName"];
@@ -34,7 +41,7 @@ void PrSMFdr::process(){
   }
   compute(target,decoy);
   PrSMWriter writer(output_file_name);
-  std::sort(target.begin(),target.end(),prsm_spectrum);
+  std::sort(target.begin(),target.end(),prsmSpectrumIdUpMatchFragUp);
   writer.writeVector(target);
   writer.close();
 }

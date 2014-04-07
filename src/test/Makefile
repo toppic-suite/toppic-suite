@@ -12,7 +12,8 @@ INCLUDES = -I../ -I../../lib/xalan-c/c/src -I../../lib/xalan-c/c/nls/include
 LFLAGS = -L/lib -L/opt/local/lib -L../../lib/xalan-c/c/lib
 #
 # define any libraries to link into executable:
-LIBS = -lxerces-c-3.1 -lxalan-c -lxalanMsg 
+LIBS = -lxerces-c-3.1 
+#-lxalan-c -lxalanMsg 
 #
 # define the C++ source files
 SRCS = test_console.cpp 
@@ -25,7 +26,7 @@ BASE_OBJS = $(addprefix $(OBJ_DIR)/, anno_residue.o xml_writer.o species.o ion.o
 
 SPEC_OBJS = $(addprefix $(OBJ_DIR)/, theo_peak.o spectrum_set.o msalign_reader.o deconv_ms.o support_peak.o deconv_peak.o extend_peak.o prm_peak.o ms_header.o sp_para.o extend_sp_para.o peak_tolerance.o) 
 
-PRSM_OBJS = $(addprefix $(OBJ_DIR)/, output_selector.o table_writer.o prsm_selector.o prsm_combine.o simple_prsm_writer.o simple_prsm.o cleavage.o peak_ion_pair.o pair.o prsm.o prsm_writer.o)
+PRSM_OBJS = $(addprefix $(OBJ_DIR)/, prsm_fdr.o prsm_species.o output_selector.o table_writer.o prsm_selector.o prsm_combine.o simple_prsm_writer.o simple_prsm.o cleavage.o peak_ion_pair.o pair.o prsm.o prsm_writer.o)
 
 ZERO_PTM_OBJS = $(addprefix $(OBJ_DIR)/, zero_ptm_slow_match.o zero_ptm_fast_match.o zero_ptm_search.o)
 
@@ -35,7 +36,7 @@ PTM_OBJS = $(addprefix $(OBJ_DIR)/, ptm_processor.o ptm_slow_filter.o ptm_slow_m
 
 TDGF_OBJS = $(addprefix $(OBJ_DIR)/, evalue_processor.o comp_prob_value.o count_test_num.o comp_pvalue_array.o) 
 
-XPP_OBJS = $(addprefix $(OBJ_DIR)/, anno_view.o xml_generator.o transformer.o) 
+#XPP_OBJS = $(addprefix $(OBJ_DIR)/, anno_view.o xml_generator.o transformer.o) 
 
 TEST_OBJS = $(addprefix $(OBJ_DIR)/, test_console.o)
 

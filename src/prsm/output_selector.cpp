@@ -13,31 +13,24 @@ OutputSelector::OutputSelector(std::string db_file,
                  std::string input_file,
                  std::string output_file,
                  std::string cutoff_type,
-                 double evalue_thresh,
-                 double fdr_thresh,
-                 double ppo){
+                 double cutoff_value) {
   db_file_= db_file;
   spec_file_ = spec_file;
   input_file_=input_file;
   output_file_ = output_file;
   cutoff_type_ = cutoff_type;
-  evalue_thresh_ = evalue_thresh;
-  fdr_thresh_= fdr_thresh;
-  ppo_ = ppo;
+  cutoff_value_ = cutoff_value;
 }
 
 OutputSelector::OutputSelector(std::map<std::string,std::string> arguments,
                  std::string input_file,
-                 std::string output_file
-                 ){
+                 std::string output_file) {
   db_file_= arguments["databaseFileName"];
   spec_file_ = arguments["spectrumFileName"];
   input_file_=input_file;
   output_file_ = output_file;
   cutoff_type_ = arguments["cutoffType"];
-  evalue_thresh_ = atof(arguments["cutoff"].c_str());
-  fdr_thresh_= atof(arguments["cutoff"].c_str());
-  ppo_ = atoi(arguments["errorTolerance"].c_str())*0.000001;
+  cutoff_value_ = atof(arguments["cutoff"].c_str());
 }
 
 void OutputSelector::process(){
@@ -46,22 +39,21 @@ void OutputSelector::process(){
   ProteoformPtrVec proteoforms = readFastaToProteoform(db_file_,ResidueFactory::getBaseResiduePtrVec());
   PrSMPtrVec prsms = readPrsm(input_file_name,proteoforms);
   // it's no need to process prsm
-
   //select
-  sort(prsms.begin(),prsms.end(),prsm_spectrum);
-  bool evalue_cutoff = (cutoff_type_.compare("EVALUE")==0);
+  sort(prsms.begin(),prsms.end(),prsmSpectrumIdUpMatchFragUp);
+  bool evalue_cutoff = (cutoff_type_ == "EVALUE");
 
   PrSMPtrVec selected_prsm ;
   ProteoformPtrVec selected_protein;
   int id =0;
   for(unsigned int i=0;i<prsms.size();i++){
-    if(evalue_cutoff && prsms[i]->getEValue() <= evalue_thresh_){
+    if(evalue_cutoff && prsms[i]->getEValue() <= cutoff_value_){
       prsms[i]->setId(id);
       selected_prsm.push_back(prsms[i]);
       selected_protein.push_back(prsms[i]->getProteoformPtr());
       id++;
     }
-    else if(!evalue_cutoff && prsms[i]->getFdr() <= fdr_thresh_){
+    else if(!evalue_cutoff && prsms[i]->getFdr() <= cutoff_value_){
       prsms[i]->setId(id);
       selected_prsm.push_back(prsms[i]);
       selected_protein.push_back(prsms[i]->getProteoformPtr());

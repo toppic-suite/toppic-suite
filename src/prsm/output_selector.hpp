@@ -24,9 +24,8 @@ class OutputSelector {
                  std::string input_file,
                  std::string output_file,
                  std::string cutoff_type,
-                 double evalue_thresh,
-                 double fdr_thresh,
-                 double ppo);
+                 double cutoff_value);
+
   OutputSelector(std::map<std::string,std::string> arguments,
                    std::string input_file,
                    std::string output_file
@@ -38,9 +37,7 @@ class OutputSelector {
   std::string input_file_;
   std::string output_file_;
   std::string cutoff_type_;
-  double evalue_thresh_;
-  double fdr_thresh_;
-  double ppo_;
+  double cutoff_value_;
 };
 
 } /* namespace prot */

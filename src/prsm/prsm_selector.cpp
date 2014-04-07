@@ -9,21 +9,20 @@
 
 namespace prot {
 
-PrSMSelector::PrSMSelector(std::string db_file,std::string spec_file,std::string in_file,std::string out_file,int n_top,std::string type){
+PrSMSelector::PrSMSelector(std::string db_file,std::string spec_file,std::string in_file,std::string out_file,int n_top){
   spec_file_ = spec_file;
   db_file_ = db_file;
   input_file_ = in_file;
   output_file_ = out_file;
   n_top_ = n_top;
-  type_ = type;
 }
-PrSMSelector::PrSMSelector(std::map<std::string,std::string> arguments,std::string in_file,std::string out_file,int n_top,std::string type){
+
+PrSMSelector::PrSMSelector(std::map<std::string,std::string> arguments,std::string in_file,std::string out_file,int n_top){
   spec_file_ = arguments["spectrumFileName"];
   db_file_ = arguments["databaseFileName"];
   input_file_ = in_file;
   output_file_ = out_file;
   n_top_ = n_top;
-  type_ = type;
 }
 bool PrSMSelector::findPrsm(PrSMPtrVec result,PrSMPtr prsm){
   for(unsigned int i=0;i< result.size();i++){
@@ -52,7 +51,7 @@ void PrSMSelector::process(){
   ProteoformPtrVec proteoforms = prot::readFastaToProteoform(db_file_,ResidueFactory::getBaseResiduePtrVec());
   PrSMPtrVec prsms = readPrsm(input_file_name,proteoforms);
   std::string output_file_name = base_name+"."+output_file_;
-  sort(prsms.begin(),prsms.end(),prsm_spectrum);
+  sort(prsms.begin(),prsms.end(),prsmSpectrumIdUpMatchFragUp);
   int max_id = prsms[prsms.size()-1]->getSpectrumId();
   PrSMWriter writer(output_file_name);
   for(int i=0;i<= max_id;i++){

@@ -23,9 +23,10 @@ class PrSMCombine {
  public:
   PrSMCombine(std::string db_file, std::string spec_file,
               std::vector<std::string> &in_file_exts, std::string out_file);
+
   PrSMCombine(std::map<std::string, std::string> arguments,
-                           std::vector<std::string> &in_file_exts,
-                           std::string out_file);
+              std::vector<std::string> &in_file_exts,
+              std::string out_file);
   virtual ~PrSMCombine();
   void process();
  private:

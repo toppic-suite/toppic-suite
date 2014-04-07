@@ -24,7 +24,7 @@ namespace prot {
 
 class TableWriter {
  public:
-  TableWriter(std::string db_file,std::string spec_file,std::string input_file,std::string output_file,double ppo);
+  TableWriter(std::string db_file,std::string spec_file,std::string input_file,std::string output_file);
   TableWriter(std::map<std::string,std::string> arguments,
                            std::string input_file,
                            std::string output_file);
@@ -34,8 +34,6 @@ class TableWriter {
   std::string db_file_;
   std::string input_file_;
   std::string output_file_;
-  std::ofstream file_;
-  double ppo_;
 };
 
 typedef std::shared_ptr<TableWriter> TableWriterPtr;

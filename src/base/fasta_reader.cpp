@@ -57,7 +57,6 @@ FastaSeqPtr FastaReader::getNextSeq() {
   input_.close();
   return FastaSeqPtr(new FastaSeq(prot_name, ori_seq));
 }
-
 /**
  * Read FASTA file and return next protein as an ResSeq.
  * residue_list determine fixed PTMs
@@ -88,6 +87,32 @@ ProteoformPtrVec readFastaToProteoform(const std::string &file_name,
     ptr = reader.getNextProteoformPtr(residue_list);
   }
   return list;
+}
+
+/** initialize sequence list */
+void generateShuffleDb(const std::string &file_name, 
+                       const std::string &target_decoy_file_name) {
+
+  std::ofstream output;
+  output.open(target_decoy_file_name.c_str(), std::ios::out);
+  FastaReader reader(file_name);
+
+  FastaSeqPtr seq_info = reader.getNextSeq();
+  while (seq_info!=nullptr) {
+    std::string name = seq_info->getName();
+    std::string seq = seq_info->getSeq();
+    std::string decoy_name = "DECOY_" + name;
+    std::string temp = seq.substr(2, seq.length() - 2);
+    std::random_shuffle(temp.begin(), temp.end());
+    std::string decoy_seq = seq.substr(0,2) + temp;
+    output << decoy_name << std::endl;
+    output << decoy_seq << std::endl;
+    output << name << std::endl;
+    output << seq << std::endl;
+
+    seq_info = reader.getNextSeq();
+  }
+  output.close();
 }
 
 }

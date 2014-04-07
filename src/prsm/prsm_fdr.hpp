@@ -20,6 +20,8 @@ namespace prot {
 
 class PrSMFdr {
  public:
+  PrSMFdr(std::string db_file_name, std::string spec_file_name, 
+          std::string input_ext,std::string output_ext);
   PrSMFdr(std::map<std::string,std::string> arguments,std::string input_ext,std::string output_ext);
   void process();
  private:
@@ -28,7 +30,7 @@ class PrSMFdr {
   std::string input_file_;
   std::string output_file_;
 
-  void compute(PrSMPtrVec & target,PrSMPtrVec decoy);
+  void compute(PrSMPtrVec &target,PrSMPtrVec decoy);
 };
 
 } /* namespace prot */

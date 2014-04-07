@@ -41,7 +41,7 @@ void PrSMCombine::process() {
       prsms.push_back(temps[j]);
     }
   }
-  std::sort(prsms.begin(),prsms.end(),prsm_spectrum);
+  std::sort(prsms.begin(),prsms.end(),prsmSpectrumIdUpMatchFragUp);
   PrSMWriter all_writer(basename(spec_file_)+"."+output_files_);
   all_writer.writeVector(prsms);
 
