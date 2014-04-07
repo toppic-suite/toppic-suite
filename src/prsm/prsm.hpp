@@ -77,7 +77,7 @@ class PrSM {
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
  private:
-  int prsm_id_;
+  int prsm_id_ = -1;
   /* spectrum information */
   int spectrum_id_;
 
@@ -96,7 +96,7 @@ class PrSM {
 
   ExtremeValuePtr prob_ptr_;
 
-  double fdr_;
+  double fdr_ = -1;
 
   /* The following are not saved in xml */
   DeconvMsPtr deconv_ms_ptr_;

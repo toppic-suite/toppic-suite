@@ -61,7 +61,7 @@ void PrSMFdr::compute(PrSMPtrVec & target,PrSMPtrVec decoy){
         break;
       }
     }
-    double fdr = n_decoy/n_target;
+    double fdr = (double)n_decoy/(double)n_target;
     if(fdr>1){
       fdr=1.0;
     }

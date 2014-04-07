@@ -48,7 +48,7 @@ std::map<std::string, std::string> getArgumentMap(const std::string &conf_file_n
 	arguments["errorTolerance"]="15";
 	arguments["cutoffType"]="EVALUE";
 	arguments["cutoff"]="0.01";
-  arguments["numOfTopPrsms"]=1;
+  arguments["numOfTopPrsms"]="1";
 	return arguments;
 }
 
@@ -68,6 +68,7 @@ int main(int argc, char* argv[]) {
     std::cout << "Zero ptm search 0.1 " << std::endl;
     prot::ZeroPtmMngPtr zero_mng_ptr
         = prot::ZeroPtmMngPtr(new prot::ZeroPtmMng (arguments));
+    /*
     zero_mng_ptr->output_file_ext_ = "ZERO";
     prot::zeroPtmSearchProcess(zero_mng_ptr);
 
@@ -104,6 +105,7 @@ int main(int argc, char* argv[]) {
     processor.init();
     // compute E-value for a set of prsms each run 
     processor.process(false);
+    */
 
     if (arguments["searchType"]=="TARGET") { 
       std::cout << "Top selector 0.1 " << std::endl;
@@ -116,6 +118,7 @@ int main(int argc, char* argv[]) {
       std::cout << "Top selector 0.1 " << std::endl;
       int n_top;
       std::istringstream (arguments["numOfTopPrsms"]) >> n_top;
+      std::cout << "argument " << arguments["numOfTopPrsms"] << " n top " << n_top << std::endl;
       prot::PrSMSelector selector(db_file_name, sp_file_name, "EVALUE", "TOP_PRE", n_top);
       selector.process();
 
