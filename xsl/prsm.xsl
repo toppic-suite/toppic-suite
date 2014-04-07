@@ -149,9 +149,9 @@
                         <td>
                             <xsl:value-of select="fdr"/>
                         </td>
-                        <td>Protein mass:</td>
+                        <td>Proteoform mass:</td>
                         <td>
-                            <xsl:value-of select="annotated_protein/protein_mass"/>
+                            <xsl:value-of select="adjusted_precursor_mass"/>
                         </td>
 
                     </tr>
@@ -219,15 +219,53 @@
       <xsl:value-of select="peak_id"/><xsl:text>,</xsl:text>
     </xsl:for-each>
 </xsl:template>
+
+
     <xsl:template match="character" mode="prsm">
-        <xsl:if test="type = 'cleavage'">
+        <xsl:variable name="seq_shown_start" select="floor(../../first_residue_position div 30)*30"/>
+        <xsl:variable name="seq_shown_end" select="floor(../../last_residue_position div 30)*30+30"/>
+
+        <xsl:if test="type = 'cleavage' and position > $seq_shown_start and $seq_shown_end > position">
             <xsl:choose>
-                <xsl:when test="position mod 30 = 0 and position = 0">
-                    <xsl:if test="position = 0">
+                <xsl:when test="position mod 30 = 1 and position =  $seq_shown_start+1">
+                    <xsl:if test="position = $seq_shown_start+1">
+
                     <br/>
-	            <xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;]]></xsl:text>
-                    <xsl:text>1 </xsl:text>
+	            <xsl:choose>
+                    <xsl:when test="position > 10000">
+                    <xsl:value-of select="position"/><xsl:text> </xsl:text>
+                    </xsl:when>
+                    <xsl:when test="position > 1000">
+                    <xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;]]></xsl:text>
+                    <xsl:value-of select="position"/><xsl:text> </xsl:text>
+                    </xsl:when>
+                    <xsl:when test="position > 100">
+                    <xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;&nbsp;]]></xsl:text>
+                    <xsl:value-of select="position"/><xsl:text> </xsl:text>
+                    </xsl:when>
+                    <xsl:when test="position > 10">
+                    <xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;&nbsp;&nbsp;]]></xsl:text>
+                    <xsl:value-of select="position"/><xsl:text> </xsl:text>
+                    </xsl:when>
+                    <xsl:when test="position > 0">
+                    <xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;]]></xsl:text>
+                    <xsl:value-of select="position"/><xsl:text> </xsl:text>
+                    </xsl:when>
+                    </xsl:choose>
                     </xsl:if>
+
+                    <!--xsl:if test="shift_no_letter = 0">
+                    <span style ="color:black;background:#F6CECE">
+                    <xsl:text disable-output-escaping="yes">&amp;#x23B1;</xsl:text>
+                    </span>
+                    </xsl:if>
+
+                    <xsl:if test="shift_no_letter != 0">
+                    <span style ="color:black;background:#F6CECE">
+                    <xsl:text disable-output-escaping="yes">&amp;#x23B1;</xsl:text>
+                    </span>
+                    </xsl:if-->
+                    
                     <!--xsl:if test="position > 0">
                     <xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;]]></xsl:text>
                     <xsl:value-of select="position"/>
@@ -432,13 +470,13 @@
 
             </xsl:choose>
             <xsl:choose>
-                <xsl:when test="position mod 30 = 0 and (exist_n_ion = '1' or exist_c_ion = '1')">
+                <xsl:when test="position mod 30 = 0 "><!--and (exist_n_ion = '1' or exist_c_ion = '1')-->
                     <!--xsl:if test="position = 0">
                     <br/>
 	            <xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;]]></xsl:text>
                     <xsl:text>1 </xsl:text>
                     </xsl:if-->
-                    <xsl:if test="position > 0">
+                    <xsl:if test="position > $seq_shown_start+1">
                     <xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;]]></xsl:text>
                     <xsl:value-of select="position"/>
                     <xsl:text disable-output-escaping="yes"><![CDATA[<br/>]]></xsl:text>
@@ -484,7 +522,7 @@
                 </xsl:when>
             </xsl:choose>
         </xsl:if>
-        <xsl:if test="type = 'residue'">
+        <xsl:if test="type = 'residue' and position > $seq_shown_start and $seq_shown_end > position">
             <xsl:choose>
                 <xsl:when test="residue_type = 'n_trunc'">
                     <span style ="color:gray">
