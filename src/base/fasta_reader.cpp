@@ -105,9 +105,9 @@ void generateShuffleDb(const std::string &file_name,
     std::string temp = seq.substr(2, seq.length() - 2);
     std::random_shuffle(temp.begin(), temp.end());
     std::string decoy_seq = seq.substr(0,2) + temp;
-    output << decoy_name << std::endl;
+    output << ">" << decoy_name << std::endl;
     output << decoy_seq << std::endl;
-    output << name << std::endl;
+    output << ">" << name << std::endl;
     output << seq << std::endl;
 
     seq_info = reader.getNextSeq();
