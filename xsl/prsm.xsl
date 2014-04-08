@@ -238,23 +238,23 @@
                     <br/>
 	            <xsl:choose>
                     <xsl:when test="position > 10000">
-                    <xsl:value-of select="position"/><xsl:text> </xsl:text>
+                    <xsl:value-of select="position+1"/><xsl:text> </xsl:text>
                     </xsl:when>
                     <xsl:when test="position > 1000">
                     <xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;]]></xsl:text>
-                    <xsl:value-of select="position"/><xsl:text> </xsl:text>
+                    <xsl:value-of select="position+1"/><xsl:text> </xsl:text>
                     </xsl:when>
                     <xsl:when test="position > 100">
                     <xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;&nbsp;]]></xsl:text>
-                    <xsl:value-of select="position"/><xsl:text> </xsl:text>
+                    <xsl:value-of select="position+1"/><xsl:text> </xsl:text>
                     </xsl:when>
                     <xsl:when test="position > 10">
                     <xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;&nbsp;&nbsp;]]></xsl:text>
-                    <xsl:value-of select="position"/><xsl:text> </xsl:text>
+                    <xsl:value-of select="position+1"/><xsl:text> </xsl:text>
                     </xsl:when>
                     <xsl:when test="position >= 0">
                     <xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;]]></xsl:text>
-                    <xsl:value-of select="position"/><xsl:text> </xsl:text>
+                    <xsl:value-of select="position+1"/><xsl:text> </xsl:text>
                     </xsl:when>
                     </xsl:choose>
                     </xsl:if>
@@ -404,14 +404,14 @@
                             <xsl:choose>
                             <xsl:when  test="display_position = '0'">
                                 <span  style="position: relative;">
-                                    <span style="position: absolute; left:-6pt; top:-24pt; font-size: 8pt; color:red; text-decoration:none;">
+                                    <span style="position: absolute; left:-6pt; top:-24px; font-size: 8pt; color:red; text-decoration:none;">
                                         <xsl:value-of select="shift_no_letter"/>
                                     </span>
                                 </span>
                             </xsl:when>
                             <xsl:when  test="display_position = '1'">
                                 <span  style="position: relative;">
-                                    <span style="position: absolute; left:-6pt; top:-32pt; font-size: 8pt; color:red; text-decoration:none;">
+                                    <span style="position: absolute; left:-6pt; top:-32px; font-size: 8pt; color:red; text-decoration:none;">
                                         <xsl:value-of select="shift_no_letter"/>
                                     </span>
                                 </span>
@@ -470,7 +470,27 @@
                     </a>
                 </xsl:when>
                 <xsl:when test="cleavage_type = 'n_truncation' or cleavage_type = 'c_truncation'">
-                        <xsl:text> </xsl:text>
+                            <xsl:choose>
+                                <xsl:when test="exist_n_ion = '0' and exist_c_ion = '0'">
+                                    <xsl:choose>
+                                      <xsl:when test="cleavage_trunc = ']'">
+                                        <span style ="color:red;">
+                                        <xsl:text>]</xsl:text>
+                                        </span>
+                                      </xsl:when>
+                                      <xsl:when test="cleavage_trunc = '['">
+                                        <span style ="color:red;">
+                                        <xsl:text>[</xsl:text>
+                                        </span>
+                                      </xsl:when>
+                                      <xsl:otherwise>
+                                       <span style ="color:black;">
+                                        <xsl:text> </xsl:text>
+                                       </span>
+                                      </xsl:otherwise>
+                                    </xsl:choose>
+                                </xsl:when>
+                            </xsl:choose>
                 </xsl:when>
 
             </xsl:choose>
@@ -527,7 +547,7 @@
                 </xsl:when>
             </xsl:choose>
         </xsl:if>
-        <xsl:if test="type = 'residue' and position >= $seq_shown_start and $seq_shown_end >= position">
+        <xsl:if test="type = 'residue' and position >= $seq_shown_start and $seq_shown_end > position">
             <xsl:choose>
                 <xsl:when test="residue_type = 'n_trunc'">
                     <span style ="color:gray">
@@ -544,14 +564,14 @@
                         <xsl:choose>
                             <xsl:when  test="display_position = '0'">
                                 <span  style="position: relative;">
-                                    <span style="position: absolute; top:-24pt; font-size: 8pt; color:red; text-decoration:none;">
+                                    <span style="position: absolute; top:-32px; font-size: 8pt; color:red; text-decoration:none;">
                                         <xsl:value-of select="shift"/>
                                     </span>
                                 </span>
                             </xsl:when>
                             <xsl:when  test="display_position = '1'">
                                 <span  style="position: relative;">
-                                    <span style="position: absolute; top:-32pt; font-size: 8pt; color:red; text-decoration:none;">
+                                    <span style="position: absolute; top:-48px; font-size: 8pt; color:red; text-decoration:none;">
                                         <xsl:value-of select="shift"/>
                                     </span>
                                 </span>
