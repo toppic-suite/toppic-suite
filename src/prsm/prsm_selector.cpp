@@ -51,7 +51,7 @@ void PrSMSelector::process(){
   ProteoformPtrVec proteoforms = prot::readFastaToProteoform(db_file_,ResidueFactory::getBaseResiduePtrVec());
   PrSMPtrVec prsms = readPrsm(input_file_name,proteoforms);
   std::string output_file_name = base_name+"."+output_file_;
-  sort(prsms.begin(),prsms.end(),prsmSpectrumIdUpMatchFragUp);
+//  sort(prsms.begin(),prsms.end(),prsmSpectrumIdUpMatchFragUp);
   int max_id = prsms[prsms.size()-1]->getSpectrumId();
   PrSMWriter writer(output_file_name);
   for(int i=0;i<= max_id;i++){
