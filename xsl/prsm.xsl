@@ -484,7 +484,7 @@
                                         </span>
                                       </xsl:when>
                                       <xsl:otherwise>
-                                       <span style ="color:black;">
+                                       <span style ="color:black;"> 
                                         <xsl:text> </xsl:text>
                                        </span>
                                       </xsl:otherwise>
