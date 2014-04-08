@@ -309,6 +309,8 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
         shift_list->appendChild(shift_element);
         xml_doc->addElement(shift_element, "type", abb_name.c_str());
         xml_doc->addElement(shift_element, "color", style[abb_name].c_str());
+        str=convertToString(proteoform_ptr->getChangePtrVec()[i]->getChangeType());
+        xml_doc->addElement(shift_element, "known_type", str.c_str());
       }
       m++;
     }
