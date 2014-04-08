@@ -68,7 +68,7 @@ int main(int argc, char* argv[]) {
     std::cout << "Zero ptm search 0.1 " << std::endl;
     prot::ZeroPtmMngPtr zero_mng_ptr
         = prot::ZeroPtmMngPtr(new prot::ZeroPtmMng (arguments));
-    /*
+
     zero_mng_ptr->output_file_ext_ = "ZERO";
     prot::zeroPtmSearchProcess(zero_mng_ptr);
 
@@ -105,7 +105,6 @@ int main(int argc, char* argv[]) {
     processor.init();
     // compute E-value for a set of prsms each run 
     processor.process(false);
-    */
 
     if (arguments["searchType"]=="TARGET") { 
       std::cout << "Top selector 0.1 " << std::endl;

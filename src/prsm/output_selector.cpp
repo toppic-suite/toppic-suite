@@ -40,7 +40,7 @@ void OutputSelector::process(){
   PrSMPtrVec prsms = readPrsm(input_file_name,proteoforms);
   // it's no need to process prsm
   //select
-  sort(prsms.begin(),prsms.end(),prsmSpectrumIdUpMatchFragUp);
+  sort(prsms.begin(),prsms.end(),prsmSpectrumIdUpFragMatchUp);
   bool evalue_cutoff = (cutoff_type_ == "EVALUE");
 
   PrSMPtrVec selected_prsm ;
