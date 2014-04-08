@@ -174,6 +174,21 @@ inline bool prsmSpectrumIdUpMatchFragUp(PrSMPtr p1, PrSMPtr p2){
     }
 }
 
+inline bool prsmSpectrumIdUpEvalueUp(PrSMPtr p1, PrSMPtr p2){
+    if(p1->getSpectrumId() < p2->getSpectrumId()){
+        return true;
+    }
+    else if(p1->getSpectrumId() > p2->getSpectrumId()){
+        return false;
+    }
+    else{
+        if(p1->getEValue() < p2->getEValue()){
+            return true;
+        }
+        return false;
+    }
+}
+
 PrSMPtrVec readPrsm(std::string file_name,ProteoformPtrVec proteoforms);
 
 bool isMatch(PrSMPtr prsm_ptr, MsHeaderPtr header_ptr);
