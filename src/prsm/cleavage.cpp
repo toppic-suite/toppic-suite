@@ -45,8 +45,7 @@ CleavagePtrVec getProteoCleavage(ProteoformPtr prot,
                                  ExtendMsPtr ms_three,
                                  double min_mass){
   CleavagePtrVec cleavages;
-  PeakIonPairPtrVec pairs;
-  getPeakIonPairs (prot, ms_three,min_mass, pairs);
+  PeakIonPairPtrVec pairs = getPeakIonPairs (prot, ms_three,min_mass);
 
   PeakIonPairPtrVec2D peak_list;
   std::vector<bool> n_ion;

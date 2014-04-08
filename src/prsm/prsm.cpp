@@ -31,9 +31,8 @@ void PrSM::init(SpParaPtr sp_para_ptr) {
 
 void PrSM::initScores(SpParaPtr sp_para_ptr) {
   // refined one 
-  PeakIonPairPtrVec pairs;
-  getPeakIonPairs (proteoform_ptr_, refine_ms_three_, 
-                   sp_para_ptr->getMinMass(), pairs);
+  PeakIonPairPtrVec pairs = getPeakIonPairs (proteoform_ptr_, refine_ms_three_, 
+                                             sp_para_ptr->getMinMass());
   //LOG_DEBUG("peak ion pair size " << pairs.size());
   match_peak_num_ = 0;
   match_fragment_num_ = 0;

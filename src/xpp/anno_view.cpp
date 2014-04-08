@@ -83,9 +83,9 @@ xercesc::DOMElement* genePrSMView(XmlDOMDocument* xml_doc,PrSMPtr prsm){
   xml_doc->addElement(element, "calibration", str.c_str());
 
   //get ion_pair
-  PeakIonPairPtrVec pairs;
-  getPeakIonPairs (prsm->getProteoformPtr(), prsm->getRefineMs(),
-                   prsm->getMinMass(), pairs);
+  PeakIonPairPtrVec pairs =  getPeakIonPairs (prsm->getProteoformPtr(), 
+                                              prsm->getRefineMs(),
+                                              prsm->getMinMass());
   //peaks to view
   xercesc::DOMElement* ms_element = xml_doc->createElement("ms");
   prsm->getDeconvMsPtr()->getHeaderPtr()->appendXml(xml_doc,ms_element);//attention
@@ -107,8 +107,7 @@ xercesc::DOMElement* genePrSMView(XmlDOMDocument* xml_doc,PrSMPtr prsm){
     xml_doc->addElement(peak, "intensity", str.c_str());
     str=convertToString(charge);
     xml_doc->addElement(peak, "charge", str.c_str());
-    PeakIonPairPtrVec selected_pairs;
-    getMatchedPairs(pairs,dp->getId(),selected_pairs);
+    PeakIonPairPtrVec selected_pairs = getMatchedPairs(pairs,dp->getId());
     if(selected_pairs.size()>0){
       int match_ions_number = selected_pairs.size();
       str=convertToString(match_ions_number);
