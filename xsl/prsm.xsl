@@ -147,7 +147,13 @@
                         </td>
                         <td>Spectral FDR:</td>
                         <td>
+                           <xsl:if test="fdr >= 0">
                             <xsl:value-of select="fdr"/>
+                           </xsl:if>
+                           <xsl:if test="0 > fdr">
+                            N/A
+                           </xsl:if>
+
                         </td>
                         <td>Proteoform mass:</td>
                         <td>
@@ -225,11 +231,10 @@
         <xsl:variable name="seq_shown_start" select="floor(../../first_residue_position div 30)*30"/>
         <xsl:variable name="seq_shown_end" select="floor(../../last_residue_position div 30)*30+30"/>
 
-        <xsl:if test="type = 'cleavage' and position > $seq_shown_start and $seq_shown_end > position">
+        <xsl:if test="type = 'cleavage' and position >= $seq_shown_start and $seq_shown_end >= position">
             <xsl:choose>
-                <xsl:when test="position mod 30 = 1 and position =  $seq_shown_start+1">
-                    <xsl:if test="position = $seq_shown_start+1">
-
+                <xsl:when test="position mod 30 = 0 and position =  $seq_shown_start">
+                    <xsl:if test="position = $seq_shown_start">
                     <br/>
 	            <xsl:choose>
                     <xsl:when test="position > 10000">
@@ -247,7 +252,7 @@
                     <xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;&nbsp;&nbsp;]]></xsl:text>
                     <xsl:value-of select="position"/><xsl:text> </xsl:text>
                     </xsl:when>
-                    <xsl:when test="position > 0">
+                    <xsl:when test="position >= 0">
                     <xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;&nbsp;&nbsp;&nbsp;]]></xsl:text>
                     <xsl:value-of select="position"/><xsl:text> </xsl:text>
                     </xsl:when>
@@ -522,7 +527,7 @@
                 </xsl:when>
             </xsl:choose>
         </xsl:if>
-        <xsl:if test="type = 'residue' and position > $seq_shown_start and $seq_shown_end > position">
+        <xsl:if test="type = 'residue' and position >= $seq_shown_start and $seq_shown_end >= position">
             <xsl:choose>
                 <xsl:when test="residue_type = 'n_trunc'">
                     <span style ="color:gray">
@@ -605,10 +610,24 @@
 <br/>
 <xsl:text disable-output-escaping="yes">Fixed PTM:&amp;nbsp;</xsl:text>
 <xsl:for-each select="shift" >
+   <xsl:if test="known_type = 1">
     <span style ="color:{color};">
        <xsl:value-of select="type"/>
        <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
     </span>
+   </xsl:if>
+</xsl:for-each>
+</div>
+<div>
+<br/>
+<xsl:text disable-output-escaping="yes">Variable PTM:&amp;nbsp;</xsl:text>
+<xsl:for-each select="shift" >
+   <xsl:if test="known_type = 2">
+    <span style ="color:{color};">
+       <xsl:value-of select="type"/>
+       <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+    </span>
+   </xsl:if>
 </xsl:for-each>
 </div>
 </xsl:template>

@@ -41,13 +41,14 @@ void PeakIonPair::appendIonToXml(XmlDOMDocument* xml_doc,
   parent->appendChild(element);
 }
 
-void getMatchedPairs(PeakIonPairPtrVec &pairs, int peak_id, 
-                     PeakIonPairPtrVec &selected_pairs) {
+PeakIonPairPtrVec getMatchedPairs(const PeakIonPairPtrVec &pairs, int peak_id) {
+  PeakIonPairPtrVec selected_pairs;
   for (unsigned int i = 0; i < pairs.size(); i++) {
     if (pairs[i]->getRealPeakPtr()->getBasePeakPtr()->getId() == peak_id) {
       selected_pairs.push_back(pairs[i]);
     }
   }
+  return selected_pairs;
 }
 
 void findPairs(ExtendMsPtr ms_three_ptr, TheoPeakPtrVec &theo_peaks, 
@@ -78,22 +79,20 @@ void findPairs(ExtendMsPtr ms_three_ptr, TheoPeakPtrVec &theo_peaks,
   }
 }
 
-void getPeakIonPairs (ProteoformPtr proteoform_ptr, ExtendMsPtr ms_three_ptr, 
-                      double min_mass, PeakIonPairPtrVec &pairs) {
+PeakIonPairPtrVec getPeakIonPairs (const ProteoformPtr &proteoform_ptr, 
+                                   const ExtendMsPtr &ms_three_ptr, 
+                                   double min_mass) {
   ActivationPtr activation_ptr 
       = ms_three_ptr->getHeaderPtr()->getActivationPtr();
 
   TheoPeakPtrVec theo_peaks = getProteoformTheoPeak(proteoform_ptr, 
                                                     activation_ptr, 
                                                     min_mass);
-//  std::cout<<proteoform_ptr->getStartPos()<<proteoform_ptr->getEndPos()<<std::endl;
 
+  PeakIonPairPtrVec pairs;
   findPairs(ms_three_ptr, theo_peaks, 0, proteoform_ptr->getLen(), pairs);
+  return pairs;
 
-//  std::cout<<"size:"<<proteoform_ptr->getLen()<<"|"<<ms_three_ptr->size()<<"|"<<theo_peaks.size()<<"|"<<pairs.size()<<std::endl;
-//    for(unsigned int i=0;i<proteoform_ptr->getChangePtrVec().size();i++){
-//      std::cout<<proteoform_ptr->getChangePtrVec()[i]->getChangeType()<<std::endl;
-//    }
 }
 
 }

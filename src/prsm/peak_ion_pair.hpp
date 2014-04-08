@@ -37,15 +37,16 @@ typedef std::vector<PeakIonPairPtr> PeakIonPairPtrVec;
 typedef std::vector<PeakIonPairPtrVec> PeakIonPairPtrVec2D;
 
 inline bool peakIonPairUp(PeakIonPairPtr p1, PeakIonPairPtr p2) {
-  return p1->getRealPeakPtr()->getBasePeakPtr()->getPosition() < p2->getRealPeakPtr()->getBasePeakPtr()->getPosition();
+  return p1->getRealPeakPtr()->getBasePeakPtr()->getPosition() 
+      < p2->getRealPeakPtr()->getBasePeakPtr()->getPosition();
 }
 
-void getMatchedPairs(PeakIonPairPtrVec &pairs, int peak_id, 
-                     PeakIonPairPtrVec &selected_pairs);
+PeakIonPairPtrVec getMatchedPairs(const PeakIonPairPtrVec &pairs, 
+                                  int peak_id);
 
-void getPeakIonPairs(ProteoformPtr proteoform_ptr, ExtendMsPtr ms_three_ptr, 
-                     double min_mass, PeakIonPairPtrVec &pairs);
-
+PeakIonPairPtrVec getPeakIonPairs(const ProteoformPtr &proteoform_ptr, 
+                                  const ExtendMsPtr &ms_three_ptr, 
+                                  double min_mass);
 }
 
 #endif

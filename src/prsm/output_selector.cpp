@@ -5,15 +5,16 @@
  *      Author: xunlikun
  */
 
-#include <prsm/output_selector.hpp>
+#include "prsm/output_selector.hpp"
 
 namespace prot {
-OutputSelector::OutputSelector(std::string db_file,
-                 std::string spec_file,
-                 std::string input_file,
-                 std::string output_file,
-                 std::string cutoff_type,
-                 double cutoff_value) {
+
+OutputSelector::OutputSelector(const std::string &db_file,
+                               const std::string &spec_file,
+                               const std::string &input_file,
+                               const std::string &output_file,
+                               const std::string &cutoff_type,
+                               double cutoff_value) {
   db_file_= db_file;
   spec_file_ = spec_file;
   input_file_=input_file;
@@ -22,9 +23,9 @@ OutputSelector::OutputSelector(std::string db_file,
   cutoff_value_ = cutoff_value;
 }
 
-OutputSelector::OutputSelector(std::map<std::string,std::string> arguments,
-                 std::string input_file,
-                 std::string output_file) {
+OutputSelector::OutputSelector(std::map<std::string,std::string> &arguments,
+                               const std::string &input_file,
+                               const std::string &output_file) {
   db_file_= arguments["databaseFileName"];
   spec_file_ = arguments["spectrumFileName"];
   input_file_=input_file;

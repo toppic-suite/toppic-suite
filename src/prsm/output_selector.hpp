@@ -19,17 +19,16 @@ namespace prot {
 
 class OutputSelector {
  public:
-  OutputSelector(std::string db_file,
-                 std::string spec_file,
-                 std::string input_file,
-                 std::string output_file,
-                 std::string cutoff_type,
+  OutputSelector(const std::string &db_file,
+                 const std::string &spec_file,
+                 const std::string &input_file,
+                 const std::string &output_file,
+                 const std::string &cutoff_type,
                  double cutoff_value);
 
-  OutputSelector(std::map<std::string,std::string> arguments,
-                   std::string input_file,
-                   std::string output_file
-                   );
+  OutputSelector(std::map<std::string,std::string> &arguments,
+                 const std::string &input_file,
+                 const std::string &output_file);
   void process();
  private:
   std::string db_file_;
