@@ -342,9 +342,13 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
     if(i>0 && cleavages[i]->getType().compare("n_truncation")!=0 && cleavages[i-1]->getType().compare("n_truncation")==0){
       cleavages[i]->setTrunc("]");
     }
+
+//    if(i>0)
+//    std::cout<<(cleavages[i]->getType().compare("c_truncation")==0)<<(cleavages[i-1]->getType().compare("c_truncation")!=0)<<std::endl;
     if(i>0 && cleavages[i]->getType().compare("c_truncation")==0 && cleavages[i-1]->getType().compare("c_truncation")!=0){
-      cleavages[i-1]->setTrunc("[");
+      cleavages[i]->setTrunc("[");
     }
+//    std::cout<<cleavages[i]->getTrunc()<<std::endl;
 
     ChangePtrVec change_list = proteoform_ptr->getChangePtrVec();
     for(unsigned int j=0;j<change_list.size();j++){
