@@ -35,17 +35,10 @@ class XmlGenerator {
   void outputProteins(PrSMPtrVec prsms);
   void outputAllProteins(PrSMPtrVec prsms);
   void outputFileList();
- private:
-  std::string spec_file_;
-  std::string db_file_;
   std::string input_file_;
-  std::string output_file_;
-  std::string html_path_;
   ViewMngPtr mng_;
-  SpParaPtr sp_para_ptr_;
   ProteoformPtrVec seq_;
   AnnoViewPtr anno_view_;
-  std::map<std::string,std::string> arguments_;
 };
 
 } /* namespace prot */
