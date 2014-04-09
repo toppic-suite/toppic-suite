@@ -31,6 +31,26 @@
     </xsl:template>
 
     <xsl:template match="character" mode="basic">
+        <xsl:if test="type = 'cleavage'">
+                   <xsl:if test="cleavage_type = 'unexpected_shift' and shift_no_letter != 0">
+                        <xsl:choose>
+                            <xsl:when  test="display_position = '0' ">
+                                <span  style="position: relative;">
+                                    <span style="position: absolute; top:-24pt; font-size: 8pt; color:red; text-decoration:none;">
+                                        <xsl:value-of select="shift_no_letter"/>
+                                    </span>
+                                </span>
+                            </xsl:when>
+                            <xsl:when  test="display_position = '1' ">
+                                <span  style="position: relative;">
+                                    <span style="position: absolute; top:-32pt; font-size: 8pt; color:blue; text-decoration:none;">
+                                        <xsl:value-of select="shift_no_letter"/>
+                                    </span>
+                                </span>
+                            </xsl:when>
+                        </xsl:choose>
+                    </xsl:if>
+        </xsl:if>
         <xsl:if test="type = 'residue'">
             <xsl:if test="position  mod $alignWidth = 0 and position != 0">
                 <br/>
@@ -78,16 +98,30 @@
                 <xsl:when test="residue_type = 'unexpected_shift'">
                     <xsl:if test="is_modification = '1'">
                         <xsl:choose>
-                            <xsl:when  test="display_position = '0'">
+                            <xsl:when  test="display_position = '0' and display_background = '0'">
                                 <span  style="position: relative;">
                                     <span style="position: absolute; top:-24pt; font-size: 8pt; color:red; text-decoration:none;">
                                         <xsl:value-of select="shift"/>
                                     </span>
                                 </span>
                             </xsl:when>
-                            <xsl:when  test="display_position = '1'">
+                            <xsl:when  test="display_position = '0' and display_background = '1'">
+                                <span  style="position: relative;">
+                                    <span style="position: absolute; top:-24pt; font-size: 8pt; color:blue; text-decoration:none;">
+                                        <xsl:value-of select="shift"/>
+                                    </span>
+                                </span>
+                            </xsl:when>
+                            <xsl:when  test="display_position = '1' and display_background = '0'">
                                 <span  style="position: relative;">
                                     <span style="position: absolute; top:-32pt; font-size: 8pt; color:red; text-decoration:none;">
+                                        <xsl:value-of select="shift"/>
+                                    </span>
+                                </span>
+                            </xsl:when>
+                            <xsl:when  test="display_position = '1' and display_background = '1'">
+                                <span  style="position: relative;">
+                                    <span style="position: absolute; top:-32pt; font-size: 8pt; color:blue; text-decoration:none;">
                                         <xsl:value-of select="shift"/>
                                     </span>
                                 </span>
