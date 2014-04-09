@@ -7,6 +7,10 @@
     <xsl:template match="prsm" mode="basic">
         <p style="font-family:monospace;font-size:16;line-height:2.5; ">
         <xsl:apply-templates select="annotated_protein/annotation/character" mode="basic"/>
+        <xsl:if test="annotated_protein/db_acid_number > annotated_protein/last_residue_position">
+          <br/>
+          ignore acids first:<xsl:value-of select="floor(annotated_protein/first_residue_position div $alignWidth)*$alignWidth"/>; end:<xsl:value-of select="annotated_protein/db_acid_number - annotated_protein/last_residue_position"/>
+        </xsl:if>
         </p>
     </xsl:template>
 
@@ -31,7 +35,27 @@
     </xsl:template>
 
     <xsl:template match="character" mode="basic">
-        <xsl:if test="type = 'residue'">
+        <xsl:if test="type = 'cleavage'">
+                   <xsl:if test="cleavage_type = 'unexpected_shift' and shift_no_letter != 0">
+                        <xsl:choose>
+                            <xsl:when  test="display_position = '0' ">
+                                <span  style="position: relative;">
+                                    <span style="position: absolute; top:-24pt; font-size: 8pt; color:red; text-decoration:none;">
+                                        <xsl:value-of select="shift_no_letter"/>
+                                    </span>
+                                </span>
+                            </xsl:when>
+                            <xsl:when  test="display_position = '1' ">
+                                <span  style="position: relative;">
+                                    <span style="position: absolute; top:-32pt; font-size: 8pt; color:blue; text-decoration:none;">
+                                        <xsl:value-of select="shift_no_letter"/>
+                                    </span>
+                                </span>
+                            </xsl:when>
+                        </xsl:choose>
+                    </xsl:if>
+        </xsl:if>
+        <xsl:if test="type = 'residue' and position >= floor(../../first_residue_position div $alignWidth)*$alignWidth and (floor(../../last_residue_position div $alignWidth)*$alignWidth+$alignWidth)>position">
             <xsl:if test="position  mod $alignWidth = 0 and position != 0">
                 <br/>
             </xsl:if>
@@ -78,16 +102,30 @@
                 <xsl:when test="residue_type = 'unexpected_shift'">
                     <xsl:if test="is_modification = '1'">
                         <xsl:choose>
-                            <xsl:when  test="display_position = '0'">
+                            <xsl:when  test="display_position = '0' and display_background = '0'">
                                 <span  style="position: relative;">
                                     <span style="position: absolute; top:-24pt; font-size: 8pt; color:red; text-decoration:none;">
                                         <xsl:value-of select="shift"/>
                                     </span>
                                 </span>
                             </xsl:when>
-                            <xsl:when  test="display_position = '1'">
+                            <xsl:when  test="display_position = '0' and display_background = '1'">
+                                <span  style="position: relative;">
+                                    <span style="position: absolute; top:-24pt; font-size: 8pt; color:blue; text-decoration:none;">
+                                        <xsl:value-of select="shift"/>
+                                    </span>
+                                </span>
+                            </xsl:when>
+                            <xsl:when  test="display_position = '1' and display_background = '0'">
                                 <span  style="position: relative;">
                                     <span style="position: absolute; top:-32pt; font-size: 8pt; color:red; text-decoration:none;">
+                                        <xsl:value-of select="shift"/>
+                                    </span>
+                                </span>
+                            </xsl:when>
+                            <xsl:when  test="display_position = '1' and display_background = '1'">
+                                <span  style="position: relative;">
+                                    <span style="position: absolute; top:-32pt; font-size: 8pt; color:blue; text-decoration:none;">
                                         <xsl:value-of select="shift"/>
                                     </span>
                                 </span>
@@ -153,6 +191,7 @@
 
             </xsl:choose>
         </xsl:if>
+
     </xsl:template>
 
 

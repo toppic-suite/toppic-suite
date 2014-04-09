@@ -287,6 +287,8 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
   int know_shift_number = proteoform_ptr->getChangePtrVec().size()-proteoform_ptr->getUnexpectedChangeNum();
   str=convertToString(know_shift_number);
   xml_doc->addElement(prot_element, "know_shift_number", str.c_str());
+  str=convertToString(proteoform_ptr->getDbResSeqPtr()->getLen());
+  xml_doc->addElement(prot_element, "db_acid_number", str.c_str());
 //  for(unsigned int i=0;i<proteoform_ptr->getChangePtrVec().size();i++){
 //    proteoform_ptr->getChangePtrVec()[i]->appendViewXml(xml_doc,prot_element);//attention
 //  }
@@ -342,9 +344,13 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
     if(i>0 && cleavages[i]->getType().compare("n_truncation")!=0 && cleavages[i-1]->getType().compare("n_truncation")==0){
       cleavages[i]->setTrunc("]");
     }
+
+//    if(i>0)
+//    std::cout<<(cleavages[i]->getType().compare("c_truncation")==0)<<(cleavages[i-1]->getType().compare("c_truncation")!=0)<<std::endl;
     if(i>0 && cleavages[i]->getType().compare("c_truncation")==0 && cleavages[i-1]->getType().compare("c_truncation")!=0){
-      cleavages[i-1]->setTrunc("[");
+      cleavages[i]->setTrunc("[");
     }
+//    std::cout<<cleavages[i]->getTrunc()<<std::endl;
 
     ChangePtrVec change_list = proteoform_ptr->getChangePtrVec();
     for(unsigned int j=0;j<change_list.size();j++){

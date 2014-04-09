@@ -27,6 +27,7 @@ class Cleavage {
   void setDisplayPos(int i){display_pos_=i;}
   std::string getType(){return type_;}
   void setTrunc(std::string term) {trunc_=term;}
+  std::string getTrunc() {return trunc_;}
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
  private:
   int pos_;
