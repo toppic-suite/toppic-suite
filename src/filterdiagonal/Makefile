@@ -1,27 +1,7 @@
-# define the g++ compiler to use
-CC = g++
-#
-# define any compile-time flags
-CPPFLAGS = -Wall -g -std=c++11
-#
-# define any directories containing header files other than /usr/include
-#
-INCLUDES = -I../ -I../../lib/xerces-c/include
-#
-# define library paths in addition to /usr/lib
-LFLAGS = -L/lib -L/opt/local/lib
-#
-# define any libraries to link into executable:
-LIBS = -lxerces-c 
-#
-# define the C++ source files
-SRCS = comp_shift_hi_mem.cpp ptm_fast_filter_block.cpp ptm_fast_filter_hi_mem.cpp ptm_fast_filter_processor.cpp 
-#
-# define the C object files 
-#
+include ../var.mk
 
-OBJ_DIR = ../../obj
-OBJS = $(addprefix $(OBJ_DIR)/, comp_shift_hi_mem.o ptm_fast_filter_block.o ptm_fast_filter_hi_mem.o ptm_fast_filter_processor.o) 
+
+OBJS = $(FILTER_OBJS)
 
 BIN_DIR = ../../bin
 

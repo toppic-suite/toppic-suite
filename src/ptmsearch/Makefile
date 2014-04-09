@@ -1,29 +1,6 @@
-# define the g++ compiler to use
-CC = g++
-#
-# define any compile-time flags
-CPPFLAGS = -Wall -g -std=c++11
-#
-# define any directories containing header files other than /usr/include
-#
-INCLUDES = -I../ -I../../lib/xerces-c/include
-#
-# define library paths in addition to /usr/lib
-LFLAGS = -L/lib -L/opt/local/lib
-#
-# define any libraries to link into executable:
-LIBS = -lxerces-c 
-#
-# define the C++ source files
-SRCS = main.cpp basic_diag_pair.cpp diagonal.cpp dp_pair.cpp ptm_main.cpp ptm_processor.cpp ptm_slow_filter.cpp comp_shift_low_mem.cpp diagonal_header.cpp ps_align.cpp ptm_searcher.cpp ptm_slow_match.cpp
-#
-# define the C object files 
-#
+include ../var.mk
 
-OBJ_DIR = ../../obj
-#OBJS = $(addprefix $(OBJ_DIR)/, basic_diag_pair.o diagonal.o dp_pair.o ptm_main.o ptm_processor.o ptm_slow_filter.o comp_shift_low_mem.o diagonal_header.o ps_align.o ptm_searcher.o ptm_slow_match.o)
-
-OBJS = $(addprefix $(OBJ_DIR)/, ptm_processor.o ptm_slow_filter.o ptm_slow_match.o ps_align.o basic_diag_pair.o dp_pair.o diagonal.o diagonal_header.o comp_shift_low_mem.o )
+OBJS = $(PTM_OBJS)
 
 BIN_DIR = ../../bin
 

@@ -30,7 +30,6 @@ PtmSlowFilter::PtmSlowFilter(
   for(unsigned int i=0; i<complete_prefix_slow_matches_.size();i++){
     ProtModPtr prot_mod = complete_prefix_slow_matches_[i]->getSeq()->getProtModPtr();
     if (prot_mod == ProtModFactory::getProtModPtr_NONE()) {
-//      std::cout<<i<<std::endl;
       suffix_internal_slow_matches_.push_back(complete_prefix_slow_matches_[i]);
     }
   }

@@ -34,7 +34,8 @@ Proteoform::Proteoform(xercesc::DOMElement* element,
   ProteoformPtr db_proteoform = db_proteoforms[db_seq_id];
   if(db_proteoform->getSeqId() != db_seq_id 
      || db_proteoform->getSeqName() != db_seq_name){
-    LOG_ERROR("Sequence ID and/or name is not consistent!");
+    LOG_ERROR("Sequence ID and/or name is not consistent!" << " name " 
+              << db_proteoform->getSeqName() << " xml name " << db_seq_name);
     std::exit(0);
   }
   db_residue_seq_ptr_ = db_proteoform->getDbResSeqPtr();

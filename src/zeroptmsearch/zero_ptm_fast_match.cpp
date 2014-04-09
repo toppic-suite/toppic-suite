@@ -1,4 +1,4 @@
-#include <base/logger.hpp>
+#include "base/logger.hpp"
 #include "base/base_data.hpp"
 #include "zeroptmsearch/zero_ptm_fast_match.hpp"
 
@@ -192,6 +192,7 @@ ZpFastMatchPtrVec zeroPtmFastFilter(SemiAlignTypePtr semi_align_type_ptr,
                                     ExtendMsPtr ms_ptr,
                                     ProteoformPtrVec &form_ptr_vec,
                                     int report_num) {
+  
   ZpFastMatchPtrVec match_vec;
   for (unsigned int i = 0; i < form_ptr_vec.size(); i++) {
     if (semi_align_type_ptr == SemiAlignTypeFactory::getCompletePtr()) { 
