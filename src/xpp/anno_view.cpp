@@ -287,6 +287,8 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
   int know_shift_number = proteoform_ptr->getChangePtrVec().size()-proteoform_ptr->getUnexpectedChangeNum();
   str=convertToString(know_shift_number);
   xml_doc->addElement(prot_element, "know_shift_number", str.c_str());
+  str=convertToString(proteoform_ptr->getDbResSeqPtr()->getLen());
+  xml_doc->addElement(prot_element, "db_acid_number", str.c_str());
 //  for(unsigned int i=0;i<proteoform_ptr->getChangePtrVec().size();i++){
 //    proteoform_ptr->getChangePtrVec()[i]->appendViewXml(xml_doc,prot_element);//attention
 //  }

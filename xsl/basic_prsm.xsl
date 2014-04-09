@@ -7,6 +7,10 @@
     <xsl:template match="prsm" mode="basic">
         <p style="font-family:monospace;font-size:16;line-height:2.5; ">
         <xsl:apply-templates select="annotated_protein/annotation/character" mode="basic"/>
+        <xsl:if test="annotated_protein/db_acid_number > annotated_protein/last_residue_position">
+          <br/>
+          ignore acids first:<xsl:value-of select="floor(annotated_protein/first_residue_position div $alignWidth)*$alignWidth"/>; end:<xsl:value-of select="annotated_protein/db_acid_number - annotated_protein/last_residue_position"/>
+        </xsl:if>
         </p>
     </xsl:template>
 
@@ -51,7 +55,7 @@
                         </xsl:choose>
                     </xsl:if>
         </xsl:if>
-        <xsl:if test="type = 'residue'">
+        <xsl:if test="type = 'residue' and position >= floor(../../first_residue_position div $alignWidth)*$alignWidth and (floor(../../last_residue_position div $alignWidth)*$alignWidth+$alignWidth)>position">
             <xsl:if test="position  mod $alignWidth = 0 and position != 0">
                 <br/>
             </xsl:if>
@@ -187,6 +191,7 @@
 
             </xsl:choose>
         </xsl:if>
+
     </xsl:template>
 
 

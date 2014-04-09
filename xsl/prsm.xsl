@@ -217,6 +217,11 @@
     <xsl:template match="annotated_protein/annotation" mode="prsm">
         <div id="alignment" style="font-family: 'FreeMono', Miltonian, monospace; font-size:16;line-height:2.5;background-color:#FFF">
             <xsl:apply-templates select="character" mode="prsm"/>
+            
+            <xsl:if test="../db_acid_number > ../last_residue_position">
+              <br/>
+              ignore acids first:<xsl:value-of select="floor(../first_residue_position div 30)*30"/>; end:<xsl:value-of select="../db_acid_number - ../last_residue_position"/>
+            </xsl:if>
         </div>
     </xsl:template>
 
@@ -505,24 +510,26 @@
                     <xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;]]></xsl:text>
                     <xsl:value-of select="position"/>
                     <xsl:text disable-output-escaping="yes"><![CDATA[<br/>]]></xsl:text>
-                    <br/>
-                    <xsl:choose>
-                    <xsl:when test="position > 10000">
-                    <xsl:value-of select="position + 1"/><xsl:text> </xsl:text>
-                    </xsl:when>
-                    <xsl:when test="position > 1000">
-                    <xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;]]></xsl:text>
-                    <xsl:value-of select="position + 1"/><xsl:text> </xsl:text>
-                    </xsl:when>
-                    <xsl:when test="position > 100">
-                    <xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;&nbsp;]]></xsl:text>
-                    <xsl:value-of select="position + 1"/><xsl:text> </xsl:text>
-                    </xsl:when>
-                    <xsl:when test="position > 10">
-                    <xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;&nbsp;&nbsp;]]></xsl:text>
-                    <xsl:value-of select="position + 1"/><xsl:text> </xsl:text>
-                    </xsl:when>
-                    </xsl:choose>
+		          <xsl:if test="$seq_shown_end != position">
+		            <br/>
+		            <xsl:choose>
+		            <xsl:when test="position > 10000">
+		            <xsl:value-of select="position + 1"/><xsl:text> </xsl:text>
+		            </xsl:when>
+		            <xsl:when test="position > 1000">
+		            <xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;]]></xsl:text>
+		            <xsl:value-of select="position + 1"/><xsl:text> </xsl:text>
+		            </xsl:when>
+		            <xsl:when test="position > 100">
+		            <xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;&nbsp;]]></xsl:text>
+		            <xsl:value-of select="position + 1"/><xsl:text> </xsl:text>
+		            </xsl:when>
+		            <xsl:when test="position > 10">
+		            <xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;&nbsp;&nbsp;]]></xsl:text>
+		            <xsl:value-of select="position + 1"/><xsl:text> </xsl:text>
+		            </xsl:when>
+		            </xsl:choose>
+		          </xsl:if>
                     </xsl:if>
                 </xsl:when>
                 <xsl:when test="position > 0 and position mod 10 = 0 and cleavage_type = 'truncation'">
