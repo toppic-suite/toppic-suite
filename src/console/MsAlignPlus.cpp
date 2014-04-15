@@ -138,62 +138,61 @@ void MsAlignPipeline(map<string,string> arguments){
   preProcess(arguments);
 
   prot::ZeroPtmMngPtr mng_ptr = prot::ZeroPtmMngPtr(new prot::ZeroPtmMng (arguments));
-//  mng_ptr->output_file_ext_ = "ZERO_PTM_SEARCH";
-//  prot::zeroPtmSearchProcess(mng_ptr);
-//
-//  PtmFastFilterMngPtr fast_filter_mng = PtmFastFilterMngPtr(new PtmFastFilterMng(arguments));
-//  PtmFastFilterProcessorPtr processorb = PtmFastFilterProcessorPtr(new PtmFastFilterProcessor(fast_filter_mng));
-//  processorb->process();
-//
-//  PtmMngPtr ptm_search_mng = PtmMngPtr(new PtmMng(arguments));
-//  ptm_search_mng->input_file_ext_ ="_COMBINED";
-//  ptm_search_mng->output_file_ext_="PTM_SEARCH_RESULT";
-//  PtmProcessorPtr processor = PtmProcessorPtr(new PtmProcessor(ptm_search_mng));
-//  processor->process();
-//
-//  std::vector<std::string> input_exts ;
-//  input_exts.push_back("PTM_SEARCH_RESULT");
-//  input_exts.push_back("ZERO_PTM_SEARCH");
-//  PrSMCombinePtr combine = PrSMCombinePtr(new PrSMCombine(arguments,
-//                                                          input_exts,
-//                                                          "RAW_SEARCH_RESULT"));
-//  combine->process();
-//
-//
-//  prot::TdgfMngPtr tdgf_mng = prot::TdgfMngPtr(new prot::TdgfMng (arguments));
-//  tdgf_mng->input_file_ext_ = "RAW_SEARCH_RESULT";
-//  tdgf_mng->output_file_ext_ = "EVALUED_RESULT";
-//  EValueProcessor evalue_processor(tdgf_mng);
-//  evalue_processor.init();
-//  /* compute E-value for a set of prsms each run */
-//  evalue_processor.process(false);
-//
-//  PrSMSelector selector = PrSMSelector(arguments,
-//                                       "EVALUED_RESULT",
-//                                       "TOP_RESULT",
-//                                       1,
-//                                       "e");
-//  selector.process();
-//
-//  if(arguments["searchType"].compare("TARGET+DECOY")==0){
-//
-//  }
-//
-//  OutputSelector output_selector = OutputSelector(arguments,
-//                                                  "TOP_RESULT",
-//                                                  "OUTPUT_RESULT");
-//  output_selector.process();
-//
-//  TableWriterPtr table_out = TableWriterPtr(new TableWriter(arguments,"OUTPUT_RESULT","OUTPUT_TABLE"));
-//  table_out->write();
+  mng_ptr->output_file_ext_ = "ZERO_PTM_SEARCH";
+  prot::zeroPtmSearchProcess(mng_ptr);
+
+  PtmFastFilterMngPtr fast_filter_mng = PtmFastFilterMngPtr(new PtmFastFilterMng(arguments));
+  PtmFastFilterProcessorPtr processorb = PtmFastFilterProcessorPtr(new PtmFastFilterProcessor(fast_filter_mng));
+  processorb->process();
+
+  PtmMngPtr ptm_search_mng = PtmMngPtr(new PtmMng(arguments));
+  ptm_search_mng->input_file_ext_ ="_COMBINED";
+  ptm_search_mng->output_file_ext_="PTM_SEARCH_RESULT";
+  PtmProcessorPtr processor = PtmProcessorPtr(new PtmProcessor(ptm_search_mng));
+  processor->process();
+
+  std::vector<std::string> input_exts ;
+  input_exts.push_back("PTM_SEARCH_RESULT");
+  input_exts.push_back("ZERO_PTM_SEARCH");
+  PrSMCombinePtr combine = PrSMCombinePtr(new PrSMCombine(arguments,
+                                                          input_exts,
+                                                          "RAW_SEARCH_RESULT"));
+  combine->process();
+
+
+  prot::TdgfMngPtr tdgf_mng = prot::TdgfMngPtr(new prot::TdgfMng (arguments));
+  tdgf_mng->input_file_ext_ = "RAW_SEARCH_RESULT";
+  tdgf_mng->output_file_ext_ = "EVALUED_RESULT";
+  EValueProcessor evalue_processor(tdgf_mng);
+  evalue_processor.init();
+  /* compute E-value for a set of prsms each run */
+  evalue_processor.process(false);
+
+  PrSMSelector selector = PrSMSelector(arguments,
+                                       "EVALUED_RESULT",
+                                       "TOP_RESULT",
+                                       1);
+  selector.process();
+
+  if(arguments["searchType"].compare("TARGET+DECOY")==0){
+
+  }
+
+  OutputSelector output_selector = OutputSelector(arguments,
+                                                  "TOP_RESULT",
+                                                  "OUTPUT_RESULT");
+  output_selector.process();
+
+  TableWriterPtr table_out = TableWriterPtr(new TableWriter(arguments,"OUTPUT_RESULT","OUTPUT_TABLE"));
+  table_out->write();
 
 
 
     XmlGenerator xml_gene = XmlGenerator(arguments,"OUTPUT_RESULT");
     xml_gene.process();
 
-    TransformerPtr trans = TransformerPtr(new Transformer());
-    trans->trans();
+//    TransformerPtr trans = TransformerPtr(new Transformer());
+//    trans->trans();
 
 }
 
