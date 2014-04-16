@@ -14,6 +14,9 @@
 #include "prsm/prsm_writer.hpp"
 #include "prsm/prsm_combine.hpp"
 #include "prsm/prsm_selector.hpp"
+#include "prsm/table_writer.hpp"
+#include "prsm/output_selector.hpp"
+#include "prsm/prsm_fdr.hpp"
 #include "zeroptmsearch/zero_ptm_mng.hpp"
 #include "zeroptmsearch/zero_ptm_search.hpp"
 #include "filterdiagonal/ptm_fast_filter_mng.hpp"
@@ -22,11 +25,10 @@
 #include "ptmsearch/ptm_processor.hpp"
 #include "tdgf/tdgf_mng.hpp"
 #include "tdgf/evalue_processor.hpp"
-#include "prsm/table_writer.hpp"
-#include "prsm/output_selector.hpp"
 #include "xpp/xml_generator.hpp"
 #include "xpp/transformer.hpp"
 #include "xpp/view_mng.hpp"
+#include "xpp/folder_file.hpp"
 
 using namespace prot;
 using namespace std;
