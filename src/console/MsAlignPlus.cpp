@@ -168,14 +168,22 @@ void MsAlignPipeline(map<string,string> arguments){
   /* compute E-value for a set of prsms each run */
   evalue_processor.process(false);
 
-  PrSMSelector selector = PrSMSelector(arguments,
+  if(arguments["searchType"].compare("TARGET+DECOY")==0){
+	PrSMSelector selector = PrSMSelector(arguments,
+	                                     "EVALUED_RESULT",
+	                                     "TOP",
+	                                     1);
+	selector.process();
+
+    prot::PrSMFdr fdr(arguments, "TOP", "TOP_RESULT");
+    fdr.process();
+  }
+  else{
+    PrSMSelector selector = PrSMSelector(arguments,
                                        "EVALUED_RESULT",
                                        "TOP_RESULT",
                                        1);
-  selector.process();
-
-  if(arguments["searchType"].compare("TARGET+DECOY")==0){
-
+    selector.process();
   }
 
   OutputSelector output_selector = OutputSelector(arguments,
