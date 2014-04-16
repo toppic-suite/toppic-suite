@@ -187,9 +187,17 @@ void MsAlignPipeline(map<string,string> arguments){
   table_out->write();
 
 
+  createFolder("xml/species");
+  createFolder("xml/prsms");
+  createFolder("xml/proteins");
+  XmlGenerator xml_gene = XmlGenerator(arguments,"OUTPUT_RESULT");
+  xml_gene.process();
 
-    XmlGenerator xml_gene = XmlGenerator(arguments,"OUTPUT_RESULT");
-    xml_gene.process();
+  createFolder("html/species");
+  createFolder("html/prsms");
+  createFolder("html/proteins");
+  copyFile("resource/etc/FreeMono.ttf","html/FreeMono.ttf",true);
+  copyFile("resource/etc/sorttable.js","html/sorttable.js",true);
 
 //    TransformerPtr trans = TransformerPtr(new Transformer());
 //    trans->trans();
