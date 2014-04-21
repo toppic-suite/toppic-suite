@@ -5,6 +5,7 @@
 #include <base/logger.hpp>
 
 #include "base/base_data.hpp"
+#include "string_util.hpp"
 #include "base/xml_dom.hpp"
 #include "base/xml_dom_document.hpp"
 
@@ -177,9 +178,9 @@ BaseData::BaseData(std::map<std::string, std::string> arguments) {
 
       LOG_DEBUG("allow prot mods initialization ");
       std::string allowed_ptm_args = arguments["n-terminal_variable_ptm"];
-      if (nullptr != allowed_ptm_args && allowed_ptm_args.length() > 0) {
+      if (allowed_ptm_args.length() > 0) {
         char spliter = '=';
-        std::vector<std::string> allowed_ptms = split(allowed_ptm_args,
+        std::vector<std::string> allowed_ptms = prot::split(allowed_ptm_args,
                                                       spliter);
         for (unsigned int i = 0; i < allowed_ptms.size(); i++) {
           std::string mod_name = allowed_ptms[i];
