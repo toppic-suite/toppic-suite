@@ -66,6 +66,37 @@ void showCommondList(){
 	cout <<"tableOutputFileName=result_table.txt"<<endl;
 	cout <<"detailOutputFileName=result_detail.txt"<<endl;
 }
+
+void split(std::string& s, std::string& delim,std::vector< std::string >& ret)
+{
+	size_t last = 0;
+	size_t index=s.find_first_of(delim,last);
+	while (index!=std::string::npos){
+		ret.push_back(s.substr(last,index-last));
+		last=index+1;
+		index=s.find_first_of(delim,last);
+	}
+	if (index-last>0)
+	{
+		ret.push_back(s.substr(last,index-last));
+	}
+}
+
+void setArgumentsWithConfigFile(std::string filename,map<string,string> arguments){
+	std::ifstream file;
+	file.open(filename.c_str(), std::ios::in);
+	std::string line;
+	string spliter = "=";
+	while (std::getline(file, line)) {
+		line = trim(line);
+		vector<string> commond_arr;
+		std::string temp = line;
+		split(temp,spliter,commond_arr);
+		std::cout<<commond_arr[0]<<"|"<<commond_arr[1]<<std::endl;
+		arguments[commond_arr[0]]=commond_arr[1];
+	}
+}
+
 map<string,string> getArugmentMap(){
 	map<string,string> arguments;
 	arguments["databaseFileName"]="in/prot.fasta";
@@ -82,6 +113,7 @@ map<string,string> getArugmentMap(){
 	arguments["tableOutputFileName"]="result_table.txt";
 	arguments["detailOutputFileName"]="result_detail.txt";
 	arguments["configuration"]="conf/configuration.xml";
+	setArgumentsWithConfigFile("in/config.txt",arguments);
 	return arguments;
 }
 bool findArgument(map<string,string> &arguments,string name){
@@ -89,20 +121,6 @@ bool findArgument(map<string,string> &arguments,string name){
 		return true;
 	}
 	return false;
-}
-void split(std::string& s, std::string& delim,std::vector< std::string >& ret)
-{
-	size_t last = 0;
-	size_t index=s.find_first_of(delim,last);
-	while (index!=std::string::npos){
-		ret.push_back(s.substr(last,index-last));
-		last=index+1;
-		index=s.find_first_of(delim,last);
-	}
-	if (index-last>0)
-	{
-		ret.push_back(s.substr(last,index-last));
-	}
 }
 
 void preProcess(map<string,string> arguments){
@@ -247,7 +265,7 @@ int main(int argc, char* argv[]){
         }
     }
 
-    MsAlignPipeline(arguments);
+//    MsAlignPipeline(arguments);
 
     return 1;
 }
