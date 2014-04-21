@@ -40,7 +40,7 @@ class ZeroPtmMng {
     spectrum_file_name_ = arguments["spectrumFileName"];
     ppo_ = atoi(arguments["errorTolerance"].c_str())*0.000001;
 
-    base_data_ptr_ = BaseDataPtr(new BaseData(arguments["configuration"]));
+    base_data_ptr_ = BaseDataPtr(new BaseData(arguments));
     peak_tolerance_ptr_ = PeakTolerancePtr(
         new PeakTolerance(ppo_, use_min_tolerance_, min_tolerance_));
 

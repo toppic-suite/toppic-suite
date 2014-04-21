@@ -42,7 +42,7 @@ class PtmFastFilterMng {
   }
 
   PtmFastFilterMng(std::map<std::string, std::string> arguments) {
-    base_data = BaseDataPtr(new BaseData(arguments["configuration"]));
+    base_data = BaseDataPtr(new BaseData(arguments));
     spectrum_file_name_ = arguments["spectrumFileName"];
     search_db_file_name_ = arguments["databaseFileName"];
 

@@ -44,7 +44,7 @@ class PtmMng {
     n_unknown_shift_=atoi(arguments["shiftNumber"].c_str());
     ppo_=atoi(arguments["errorTolerance"].c_str())*0.000001;
 
-    base_data_ = BaseDataPtr(new BaseData(arguments["configuration"]));
+    base_data_ = BaseDataPtr(new BaseData(arguments));
     peak_tolerance_ = PeakTolerancePtr(
         new PeakTolerance(ppo_,use_min_tolerance_,min_tolerance_));
 

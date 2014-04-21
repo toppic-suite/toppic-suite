@@ -23,7 +23,7 @@ class ViewMng {
       spectrum_file_ = arguments["spectrumFileName"];
       database_file_=arguments["databaseFileName"];
 
-      base_data_ptr_ = BaseDataPtr(new BaseData(arguments["configuration"]));
+      base_data_ptr_ = BaseDataPtr(new BaseData(arguments));
       peak_tolerance_ptr_ = PeakTolerancePtr(new PeakTolerance(ppo_,use_min_tolerance_, min_tolerance_));
       extend_sp_para_ptr_=ExtendSpParaPtr(new ExtendSpPara(extend_min_mass_, ext_offsets_));
       sp_para_ptr_= SpParaPtr(new SpPara(min_peak_num_, min_mass_, peak_tolerance_ptr_,

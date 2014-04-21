@@ -38,7 +38,7 @@ class TdgfMng {
     spectrum_file_name_=arguments["spectrumFileName"];
     ppo_=atoi(arguments["errorTolerance"].c_str())*0.000001;
 
-    base_data_ptr_ = BaseDataPtr (new BaseData(arguments["configuration"])),
+    base_data_ptr_ = BaseDataPtr (new BaseData(arguments)),
     peak_tolerance_ptr_ = PeakTolerancePtr(
         new PeakTolerance(ppo_, use_min_tolerance_, min_tolerance_));
     extend_sp_para_ptr_ = ExtendSpParaPtr(new ExtendSpPara(extend_min_mass_, ext_offsets_));
