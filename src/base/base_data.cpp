@@ -103,12 +103,11 @@ BaseData::BaseData(std::string config_file_name) {
   }
 }
 
-BaseData::BaseData(std::string config_file_name,
-                   std::map<std::string, std::string> arguments) {
+BaseData::BaseData(std::map<std::string, std::string> arguments) {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
-    LOG_DEBUG("config_file_name: " << config_file_name);
-    XmlDOMDocument* doc = new XmlDOMDocument(parser, config_file_name.c_str());
+    LOG_DEBUG("config_file_name: " << arguments["configuration"]);
+    XmlDOMDocument* doc = new XmlDOMDocument(parser, arguments["configuration"].c_str());
     LOG_DEBUG("doc " << doc);
     if (doc) {
       xercesc::DOMElement* root = doc->getDocumentElement();

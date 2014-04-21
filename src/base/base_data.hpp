@@ -20,7 +20,7 @@ namespace prot {
 class BaseData {
  public:
   BaseData (std::string config_file_name);
-  BaseData (std::string config_file_name,std::map<std::string,std::string> arguments);
+  BaseData (std::map<std::string,std::string> arguments);
 
   ResiduePtrVec getFixModResiduePtrVec() {return fix_mod_residue_list_;}
   ProtModPtrVec getAllowProtModPtrVec() {return allow_prot_mod_list_;}
