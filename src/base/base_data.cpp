@@ -177,9 +177,9 @@ BaseData::BaseData(std::map<std::string, std::string> arguments) {
       LOG_DEBUG("fix mod residue initialized ");
 
       LOG_DEBUG("allow prot mods initialization ");
-      std::string allowed_ptm_args = arguments["n-terminal_variable_ptm"];
+      std::string allowed_ptm_args = arguments["allProtMode"];
       if (allowed_ptm_args.length() > 0) {
-        char spliter = '=';
+        char spliter = ',';
         std::vector<std::string> allowed_ptms = prot::split(allowed_ptm_args,
                                                       spliter);
         for (unsigned int i = 0; i < allowed_ptms.size(); i++) {
