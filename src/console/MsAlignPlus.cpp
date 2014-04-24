@@ -33,39 +33,78 @@
 using namespace prot;
 using namespace std;
 void showCommondList(){
-  cout <<"************************************************"<<endl;
-    cout <<"**                  arguments                 **"<<endl;
-    cout <<"************************************************"<<endl;
-    cout <<"-argumentsFileName conf/arguments.xml or --argumentsFileName=conf/arguments.xml"<<endl;
-    cout <<"-configuration conf/configuration.xml or --configuration=conf/configuration.xml"<<endl;
-    cout <<"-databaseFileName in/prot.fasta or --databaseFileName=in/prot.fasta"<<endl;
-    cout <<"-spectrumFileName in/spectra.msalign or --spectrumFileName=in/spectra.msalign"<<endl;
-    cout <<"# Activation can be CID, HCD, ETD or FILE (FILE means that the "
-        "activation type is given in the spectral data file)."<<endl;
-    cout <<"-activation FILE or --activation=FILE"<<endl;
-    cout <<"# SearchType can be TARGET or TARGET+DECOY. When TARGET+DECOY is "
-        "used, MS-Align+ will generate a scramble database from the protein "
-        "database, and search spectra against the TARGET+DECOY database."<<endl;
-    cout <<"-searchType TARGET or --searchType=TARGET"<<endl;
-    cout <<"#Cysteine protection group can be C0, C57 or C58. C0: no modification, "
-        "C57: Carbamidoemetylation or C58:Carboxymethylation"<<endl;
-    cout <<"-cysteineProtection C0 or --cysteineProtection=C0"<<endl;
-    cout <<"# Maximum number of modifications"<<endl;
-    cout <<"-shiftNumber 2 or --shiftNumber=2"<<endl;
-    cout <<"# Error tolerance in PPM"<<endl;
-    cout <<"-errorTolerance 15 or --errorTolerance=15"<<endl;
-    cout <<"#CutoffType can be EVALUE or FDR. 'FDR' can be used only if "
-        "searchtype=TARGET+DECOY. "<<endl;
-    cout <<"-cutoffType EVALUE or --cutoffType=EVALUE"<<endl;
-    cout <<"# cutoff value. When cutoffType = EValue, this cutoff value "
-        "is for EVALUE. When cutoff = FDR, this cutoff value is for FDR."<<endl;
-    cout <<"-cutoff 0.01 or --cutoff=0.01"<<endl;
-    cout <<"# Correct +/-1 Da errors introduced in the deconvolution of precursor ions."<<endl;
-    cout <<"-doOneDaltonCorrection false or --doOneDaltonCorrection=false"<<endl;
-    cout <<"# Correct charget state errors introduced in the deconvolution of precursor ions."<<endl;
-    cout <<"-doChargeCorrection false or --doChargeCorrection=false"<<endl;
-    cout <<"-tableOutputFileName result_table.txt or --tableOutputFileName=result_table.txt"<<endl;
-    cout <<"-detailOutputFileName result_detail.txt or --detailOutputFileName=result_detail.txt"<<endl;
+//    cout <<"************************************************"<<endl;
+//    cout <<"**                   usage                    **"<<endl;
+//    cout <<"************************************************"<<endl;
+    cout<<"USAGE:"<<endl;
+    cout <<"-i, --arguments-filename <xml file name with path>"<<endl;
+    cout <<"                         Deauft arguments file in which set the "<<
+                                     "running arguments value"<<endl;
+    cout <<"                         default value: conf/arguments.xml"<<endl;
+    cout <<"-o, --configuration      <xml file name with path>"<<endl;
+    cout <<"                         Deauft configuration file in which set the "<<
+                                     "configuration file list"<<endl;
+    cout <<"                         default value: conf/configuration.xml"<<endl;
+//    cout <<"-o conf/configuration.xml or --configuration=conf/configuration.xml"<<endl;
+    cout <<"-D, --database-filename  <fasta file name with path>"<<endl;
+    cout <<"                         The database file that record unknown proteins"<<endl;
+    cout <<"                         default value: in/prot.fasta"<<endl;
+//    cout <<"-D in/prot.fasta or --databaseFileName=in/prot.fasta"<<endl;
+    cout <<"-S, --spectra-filename   <msalign file name with path>"<<endl;
+    cout <<"                         The spectrum file that record the spectral data"<<
+                                     " we want to search"<<endl;
+    cout <<"                         default value: in/spectra.msalign"<<endl;
+//    cout <<"-S in/spectra.msalign or --spectrumFileName=in/spectra.msalign"<<endl;
+    cout <<"-a, --activation         <CID|HCD|ETD|FILE>"<<endl;
+    cout <<"                         The activation type and FILE means the activation "<<
+                                     "type is given in spectral data file"<<endl;
+    cout <<"                         default value: FILE"<<endl;
+//    cout <<"# Activation can be CID, HCD, ETD or FILE (FILE means that the "
+//        "activation type is given in the spectral data file)."<<endl;
+//    cout <<"-a FILE or --activation=FILE"<<endl;
+    cout <<"-s, --search-type        <TARGET|TARGET+DECOY>"<<endl;
+    cout <<"                         When TARGET+DECOY is used, MS-Align+ will generate a "<<
+                                     "scramble database from the protein database, and search"<<
+                                     " spectra against the TARGET+DECOY database."<<endl;
+    cout <<"                         default value: TARGET"<<endl;
+//    cout <<"# SearchType can be TARGET or TARGET+DECOY. When TARGET+DECOY is "
+//        "used, MS-Align+ will generate a scramble database from the protein "
+//        "database, and search spectra against the TARGET+DECOY database."<<endl;
+//    cout <<"-s TARGET or --searchType=TARGET"<<endl;
+    cout <<"-c, --cysteineprotection <C0|C57|C58>"<<endl;
+    cout <<"                         Cysteine protection group C0: no modification "<<
+                                     "C57: Carbamidoemetylation or C58:Carboxymethylation"<<endl;
+    cout <<"                         default value: C0"<<endl;
+//    cout <<"#Cysteine protection group can be C0, C57 or C58. C0: no modification, "
+//        "C57: Carbamidoemetylation or C58:Carboxymethylation"<<endl;
+//    cout <<"-c C0 or --cysteineProtection=C0"<<endl;
+    cout <<"-n, --shift-number       <int value>"<<endl;
+    cout <<"                         Maximum number of unknown modifications "<<
+                                     "configuration file list"<<endl;
+    cout <<"                         default value: 2"<<endl;
+//    cout <<"# Maximum number of modifications"<<endl;
+//    cout <<"-n 2 or --shiftNumber=2"<<endl;
+    cout <<"-e, --error-tolerance    <int value>"<<endl;
+    cout <<"                         "<<
+                                     "Error tolerance in PPM."<<endl;
+    cout <<"                         default value: 15"<<endl;
+//    cout <<"# Error tolerance in PPM"<<endl;
+//    cout <<"-e 15 or --errorTolerance=15"<<endl;
+    cout <<"-t, --cutoff-type        <EVALUE|FDR>"<<endl;
+    cout <<"                         'FDR' can be used only "<<
+                                     "if searchtype=TARGET+DECOY."<<endl;
+    cout <<"                         default value: EVALUE"<<endl;
+//    cout <<"#CutoffType can be EVALUE or FDR. 'FDR' can be used only if "
+//        "searchtype=TARGET+DECOY. "<<endl;
+//    cout <<"-u EVALUE or --cutoffType=EVALUE"<<endl;
+    cout <<"-v, --cutoff-value       <EVALUE|FDR>"<<endl;
+    cout <<"                         'When cutoffType = EValue, this cutoff value is for EVALUE."<<
+                                     "When cutoff = FDR, this cutoff value is for FDR."<<endl;
+    cout <<"                         default value: EVALUE"<<endl;
+//    cout <<"# cutoff value. When cutoffType = EValue, this cutoff value "
+//        "is for EVALUE. When cutoff = FDR, this cutoff value is for FDR."<<endl;
+//    cout <<"-v 0.01 or --cutoff=0.01"<<endl;
+
 }
 
 void split(std::string& s, std::string& delim,std::vector< std::string >& ret)
@@ -152,11 +191,6 @@ map<string,string> getArugmentMap(){
 	arguments["cutoff"]="0.01";
 	arguments["doOneDaltonCorrection"]="false";
 	arguments["doChargeCorrection"]="false";
-	arguments["tableOutputFileName"]="result_table.txt";
-	arguments["detailOutputFileName"]="result_detail.txt";
-	arguments["configuration"]="conf/configuration.xml";
-	arguments["argumentsFileName"]="conf/arguments.xml";
-//	setArgumentsWithConfigFile(arguments["argumentsFileName"],arguments);
 	return arguments;
 }
 bool findArgument(map<string,string> &arguments,string name){
@@ -275,7 +309,106 @@ void MsAlignPipeline(map<string,string> arguments){
 
 }
 
+bool checkFile(std::string filename){
+  fstream file;
+    file.open(filename, ios::in);
+    if (!file) {
+      file.close();
+      return false;
+    }
+    else{
+      file.close();
+      return true;
+    }
+}
+
+bool checkPath(std::string path){
+  std::vector<std::string> file_to_check;
+  file_to_check.push_back("conf/acid.xml");
+  file_to_check.push_back("conf/activation.xml");
+  file_to_check.push_back("conf/arguments.xml");
+  file_to_check.push_back("conf/configuration.xml");
+  file_to_check.push_back("conf/fix_mod_residue.xml");
+  file_to_check.push_back("conf/ion_type.xml");
+  file_to_check.push_back("conf/neutral_loss.xml");
+  file_to_check.push_back("conf/prot_mod.xml");
+  file_to_check.push_back("conf/ptm.xml");
+  file_to_check.push_back("conf/residue.xml");
+  file_to_check.push_back("conf/support_peak_type.xml");
+  file_to_check.push_back("conf/trunc.xml");
+  bool flag = true;
+  for(unsigned int i=0;i<file_to_check.size();i++){
+    if(!checkFile(path+file_to_check[i])){
+      LOG_DEBUG("Can not find "<<file_to_check[i]<<" in path "<<path);
+      flag=false;
+    }
+  }
+  return flag;
+}
+
+std::string getExePath(std::string & command_path) {
+  std::string run_path = "";
+  size_t pos = command_path.find_last_of("/");
+  if (pos == std::string::npos) {
+    command_path = "";
+  } else {
+    command_path = command_path.substr(0, pos + 1);
+  }
+  std::cout << command_path << std::endl;
+  fstream file;
+  file.open(command_path + "conf/acid.xml", ios::in);
+  if (!file) {
+    std::string os_path = std::getenv("PATH");
+    size_t pos = os_path.find(";", 0);
+    if (pos == std::string::npos) {
+      //it's unix
+      std::vector<std::string> paths = prot::split(os_path, ':');
+      for (unsigned int i = 0; i < paths.size(); i++) {
+        if (paths[i].find_last_of('/')==paths[i].length()-1) {
+          paths[i] = paths[i].substr(0, paths[i].length() - 1);
+        }
+        std::cout<<paths[i]<<std::endl;
+        file.close();
+        file.open(paths[i] + "conf/acid.xml", ios::in);
+        if (file) {
+          if(checkPath(paths[i])){
+            run_path = paths[i];
+            break;
+          }
+        }
+        file.close();
+      }
+    } else {
+      //it's windows
+      std::vector<std::string> paths = prot::split(os_path, ';');
+      for (unsigned int i = 0; i < paths.size(); i++) {
+        if (paths[i].find_last_of('/')==paths[i].length()-1) {
+          paths[i] = paths[i].substr(0, paths[i].length() - 1);
+        }
+        if (paths[i].find_last_of('\\') == paths[i].length() - 1) {
+          paths[i] = paths[i].substr(0, paths[i].length() - 1);
+        }
+        file.open(paths[i] + "conf/acid.xml", ios::in);
+        if (file) {
+          if (checkPath(paths[i])) {
+            run_path = paths[i];
+            break;
+          }
+        }
+        file.close();
+      }
+    }
+  }
+  return run_path;
+}
+
 int main(int argc, char* argv[]){
+//  std::cout<<argv[0]<<std::endl;
+  std::string command_path = argv[0];
+  std::string run_path = getExePath(command_path);
+  if(run_path.compare("")==0){
+    LOG_ERROR("Can't find the configuration folder: conf or "+command_path+"conf or &PATH/conf;Please check if the folder exist!");
+  }
 
   map<string,string> arguments = getArugmentMap();
   for(int i=1;i<argc;i++){
