@@ -19,42 +19,45 @@ namespace prot {
 
 class ZeroPtmMng {
  public:
-  ZeroPtmMng(const std::string &conf_file_name, 
-             const std::string &search_db_file_name, 
-             const std::string &spectrum_file_name,
-             const std::string &output_file_ext) {
-    search_db_file_name_ = search_db_file_name;
-    spectrum_file_name_ = spectrum_file_name;
-    output_file_ext_ = output_file_ext;
-
-    base_data_ptr_  = BaseDataPtr (new BaseData(conf_file_name));
-    peak_tolerance_ptr_ = PeakTolerancePtr(
-        new PeakTolerance(ppo_, use_min_tolerance_, min_tolerance_));
-    extend_sp_para_ptr_ = ExtendSpParaPtr(new ExtendSpPara(extend_min_mass_, ext_offsets_));
-    sp_para_ptr_ = SpParaPtr(new SpPara(min_peak_num_, min_mass_, peak_tolerance_ptr_, 
-                              extend_sp_para_ptr_, base_data_ptr_->getActivationPtr())); 
-  }
 
   ZeroPtmMng(std::map<std::string,std::string> arguments) {
     search_db_file_name_ = arguments["databaseFileName"];
     spectrum_file_name_ = arguments["spectrumFileName"];
+
+    fix_mod_residue_list_ = FixResidueFactory::getFixResiduePtrVec(arguments["cysteineProtection"]);
+
+    ProtModPtr ptr = ProtModFactory::getBaseProtModPtrByName("NONE");
+    allow_prot_mod_list_.push_back(ptr);
+    ptr = ProtModFactory::getBaseProtModPtrByName("NME");
+    allow_prot_mod_list_.push_back(ptr);
+    ptr = ProtModFactory::getBaseProtModPtrByName("NME_ACETYLATION");
+    allow_prot_mod_list_.push_back(ptr);
+
+    std::string activation_type = arguments["activation"];
+    activation_ptr_ = ActivationFactory::getBaseActivationPtrByName(
+        activation_type);
+
+
     ppo_ = atoi(arguments["errorTolerance"].c_str())*0.000001;
 
-    base_data_ptr_ = BaseDataPtr(new BaseData(arguments));
     peak_tolerance_ptr_ = PeakTolerancePtr(
         new PeakTolerance(ppo_, use_min_tolerance_, min_tolerance_));
 
+
     extend_sp_para_ptr_ = ExtendSpParaPtr(new ExtendSpPara(extend_min_mass_, ext_offsets_));
     sp_para_ptr_ = SpParaPtr(new SpPara(min_peak_num_, min_mass_, peak_tolerance_ptr_,
-                                        extend_sp_para_ptr_, base_data_ptr_->getActivationPtr()));
+                                        extend_sp_para_ptr_, activation_ptr_));
+
   }
 
-  BaseDataPtr base_data_ptr_;
 
-  /** zero ptm fast filtering */
-  int zero_ptm_filter_result_num_ = 20;
-  /** number of reported PrSMs for each spectrum */
-  int report_num_ = 1;
+  std::string search_db_file_name_;
+  std::string spectrum_file_name_;
+
+  ResiduePtrVec fix_mod_residue_list_;
+  ProtModPtrVec allow_prot_mod_list_;
+  // if activation ptr is null, activation types in file are used 
+  ActivationPtr activation_ptr_;
 
   /** spectrum parameters */
   double ppo_ = 0.000015;
@@ -74,13 +77,17 @@ class ZeroPtmMng {
 
   SpParaPtr sp_para_ptr_;
 
+  /** parameters for zero ptm search */
+
+  /** zero ptm fast filtering */
+  int zero_ptm_filter_result_num_ = 20;
+  /** number of reported PrSMs for each spectrum */
+  int report_num_ = 1;
+
   /** recalibration is used in ZeroPtmSlowMatch */
   bool   do_recalibration_ = false;
   double recal_ppo_ = 0.000015; // 15 ppm
   bool   ms_one_ms_two_same_recal_ = true;
-
-  std::string search_db_file_name_;
-  std::string spectrum_file_name_;
 
   std::string output_file_ext_;
 };

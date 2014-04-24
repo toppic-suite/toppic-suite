@@ -23,16 +23,14 @@
 #include "tdgf/tdgf_mng.hpp"
 
 #include "xpp/xml_generator.hpp"
-#include "xpp/transformer.hpp"
+//#include "xpp/transformer.hpp"
 
 
-std::map<std::string, std::string> getArgumentMap(const std::string &conf_file_name,
-                                                  const std::string &search_db_file_name,
+std::map<std::string, std::string> getArgumentMap(const std::string &search_db_file_name,
                                                   const std::string &spectrum_file_name,
                                                   const std::string &search_type,
                                                   const std::string &cutoff_type){
   std::map<std::string, std::string> arguments;
-  arguments["configuration"]=conf_file_name;
   arguments["oriDatabaseFileName"]=search_db_file_name;
   if (search_type == "TARGET") {
     arguments["databaseFileName"]=search_db_file_name;
@@ -54,9 +52,10 @@ std::map<std::string, std::string> getArgumentMap(const std::string &conf_file_n
 
 int main(int argc, char* argv[]) {
   try {
+    prot::initBaseData();
     std::cout << "Test msalign+ 0.1 " << std::endl;
 
-    std::map<std::string, std::string> arguments = getArgumentMap(argv[1], argv[2], argv[3], argv[4], argv[5]);
+    std::map<std::string, std::string> arguments = getArgumentMap(argv[1], argv[2], argv[3], argv[4]);
     std::string db_file_name = arguments["databaseFileName"];
     std::string sp_file_name = arguments["spectrumFileName"];
 

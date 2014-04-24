@@ -8,9 +8,11 @@
 
 #include <string>
 #include <memory>
+#include <map>
 
 #include "base/acid.hpp"
 #include "base/ptm.hpp"
+#include "base/logger.hpp"
 
 namespace prot {
 
@@ -69,7 +71,7 @@ class ResidueFactory {
  public:
   static void initFactory(const std::string &file_name);
 
-  static ResiduePtrVec& getBaseResiduePtrVec() {return residue_ptr_vec_;}
+  static ResiduePtrVec getBaseResiduePtrVec() {return residue_ptr_vec_;}
   
   static ResiduePtr getBaseResiduePtrByAcidPtm(const AcidPtr &acid_ptr, 
                                                const PtmPtr &ptm_ptr);
@@ -81,6 +83,26 @@ class ResidueFactory {
 
  private:
   static ResiduePtrVec residue_ptr_vec_;
+};
+
+/* residue list factory */
+class FixResidueFactory {
+ public:
+  static void initFactory(const std::string &file_name);
+
+  static ResiduePtrVec getFixResiduePtrVec(const std::string &id) {
+    if (fix_res_list_map_.find(id) != fix_res_list_map_.end()) {
+      return fix_res_list_map_.find(id)->second;
+    }
+    else {
+      LOG_ERROR("Incorrect id for fix mod residue list.");
+      ResiduePtrVec empty_list;
+      return empty_list;
+    }
+  }
+  
+ private:
+  static std::map<std::string,ResiduePtrVec> fix_res_list_map_;
 };
 
 }

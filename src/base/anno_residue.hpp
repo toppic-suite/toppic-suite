@@ -12,7 +12,7 @@
 
 namespace prot {
 
-class AnnoResidue : public prot::Residue {
+class AnnoResidue : public Residue {
  public:
   AnnoResidue(ResiduePtr residue_ptr);
   void setPos(int pos) {

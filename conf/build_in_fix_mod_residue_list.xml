@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<build_in_fix_mod_residue_lists>
+<fix_mod_residue_list>
+	<id>C0</id>
+	<fix_mod_residue_file_name>fix_mod_list_C0.xml</fix_mod_residue_file_name>
+</fix_mod_residue_list>
+<fix_mod_residue_list>
+	<id>C57</id>
+	<fix_mod_residue_file_name>fix_mod_list_C57.xml</fix_mod_residue_file_name>
+</fix_mod_residue_list>
+<fix_mod_residue_list>
+	<id>C58</id>
+	<fix_mod_residue_file_name>fix_mod_list_C58.xml</fix_mod_residue_file_name>
+</fix_mod_residue_list>
+</build_in_fix_mod_residue_lists>

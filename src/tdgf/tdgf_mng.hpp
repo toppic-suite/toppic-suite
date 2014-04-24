@@ -15,41 +15,39 @@ namespace prot {
 
 class TdgfMng {
  public:
-  TdgfMng(const std::string &conf_file_name, 
-          const std::string &search_db_file_name, 
-          const std::string &spectrum_file_name,
-          const std::string &input_file_ext,
-          const std::string &output_file_ext) {
-    search_db_file_name_ = search_db_file_name;
-    spectrum_file_name_ = spectrum_file_name;
-    input_file_ext_ = input_file_ext;
-    output_file_ext_ = output_file_ext;
-
-    base_data_ptr_  = BaseDataPtr (new BaseData(conf_file_name));
-    peak_tolerance_ptr_ = PeakTolerancePtr(
-        new PeakTolerance(ppo_, use_min_tolerance_, min_tolerance_));
-    extend_sp_para_ptr_ = ExtendSpParaPtr(new ExtendSpPara(extend_min_mass_, ext_offsets_));
-    sp_para_ptr_ = SpParaPtr(new SpPara(min_peak_num_, min_mass_, peak_tolerance_ptr_, 
-                                        extend_sp_para_ptr_, base_data_ptr_->getActivationPtr())); 
-  }
-
   TdgfMng(std::map<std::string,std::string> arguments) {
     search_db_file_name_=arguments["databaseFileName"];
     spectrum_file_name_=arguments["spectrumFileName"];
+
+    fix_mod_residue_list_ = FixResidueFactory::getFixResiduePtrVec(arguments["cysteineProtection"]);
+
+    ProtModPtr ptr = ProtModFactory::getBaseProtModPtrByName("NONE");
+    allow_prot_mod_list_.push_back(ptr);
+    ptr = ProtModFactory::getBaseProtModPtrByName("NME");
+    allow_prot_mod_list_.push_back(ptr);
+    ptr = ProtModFactory::getBaseProtModPtrByName("NME_ACETYLATION");
+    allow_prot_mod_list_.push_back(ptr);
+
+    std::string activation_type = arguments["activation"];
+    activation_ptr_ = ActivationFactory::getBaseActivationPtrByName(
+        activation_type);
+
     ppo_=atoi(arguments["errorTolerance"].c_str())*0.000001;
 
-    base_data_ptr_ = BaseDataPtr (new BaseData(arguments)),
     peak_tolerance_ptr_ = PeakTolerancePtr(
         new PeakTolerance(ppo_, use_min_tolerance_, min_tolerance_));
     extend_sp_para_ptr_ = ExtendSpParaPtr(new ExtendSpPara(extend_min_mass_, ext_offsets_));
     sp_para_ptr_ = SpParaPtr(new SpPara(min_peak_num_, min_mass_, peak_tolerance_ptr_, 
-                              extend_sp_para_ptr_, base_data_ptr_->getActivationPtr())); 
+                              extend_sp_para_ptr_, activation_ptr_)); 
   }
-
-  BaseDataPtr base_data_ptr_;
 
   std::string search_db_file_name_;
   std::string spectrum_file_name_;
+
+  ResiduePtrVec fix_mod_residue_list_;
+  ProtModPtrVec allow_prot_mod_list_;
+  // if activation ptr is null, activation types in file are used 
+  ActivationPtr activation_ptr_;
 
   /** spectrum parameters */
   double ppo_ = 0.000015;
@@ -68,6 +66,8 @@ class TdgfMng {
   double min_mass_ = 50.0;
 
   SpParaPtr sp_para_ptr_;
+
+  /** parameters for tdmg */
 
   /** PrSM filter */
   int comp_evalue_min_peak_num_ = 4;

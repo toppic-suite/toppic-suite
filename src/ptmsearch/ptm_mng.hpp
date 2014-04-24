@@ -20,41 +20,43 @@ namespace prot {
 
 class PtmMng {
  public :
-  PtmMng(const std::string &conf_file_name, 
-         const std::string &search_db_file_name, 
-         const std::string &spectrum_file_name,
-         const std::string &input_file_ext,
-         const std::string &output_file_ext) {
-    search_db_file_name_ = search_db_file_name;
-    spectrum_file_name_ = spectrum_file_name;
-    input_file_ext_ = input_file_ext;
-    output_file_ext_ = output_file_ext;
-
-    base_data_  = BaseDataPtr (new BaseData(conf_file_name));
-    peak_tolerance_ = PeakTolerancePtr(
-        new PeakTolerance(ppo_, use_min_tolerance_, min_tolerance_));
-    extend_sp_para_ = ExtendSpParaPtr(new ExtendSpPara(extend_min_mass_, ext_offsets_));
-    sp_para_ = SpParaPtr(new SpPara(min_peak_num_, min_mass_, peak_tolerance_, 
-                                    extend_sp_para_, base_data_->getActivationPtr())); 
-  }
-
   PtmMng(std::map<std::string, std::string> arguments){
     spectrum_file_name_ = arguments["spectrumFileName"];
     search_db_file_name_ = arguments["databaseFileName"];
-    n_unknown_shift_=atoi(arguments["shiftNumber"].c_str());
+
+    fix_mod_residue_list_ = FixResidueFactory::getFixResiduePtrVec(arguments["cysteineProtection"]);
+
+    ProtModPtr ptr = ProtModFactory::getBaseProtModPtrByName("NONE");
+    allow_prot_mod_list_.push_back(ptr);
+    ptr = ProtModFactory::getBaseProtModPtrByName("NME");
+    allow_prot_mod_list_.push_back(ptr);
+    ptr = ProtModFactory::getBaseProtModPtrByName("NME_ACETYLATION");
+    allow_prot_mod_list_.push_back(ptr);
+
+    std::string activation_type = arguments["activation"];
+    activation_ptr_ = ActivationFactory::getBaseActivationPtrByName(
+        activation_type);
+
     ppo_=atoi(arguments["errorTolerance"].c_str())*0.000001;
 
-    base_data_ = BaseDataPtr(new BaseData(arguments));
     peak_tolerance_ = PeakTolerancePtr(
         new PeakTolerance(ppo_,use_min_tolerance_,min_tolerance_));
 
     extend_sp_para_ = ExtendSpParaPtr(
         new ExtendSpPara(extend_min_mass_,ext_offsets_));
     sp_para_ = SpParaPtr( new SpPara(min_peak_num_, min_mass_, 
-                   peak_tolerance_, extend_sp_para_, activation_));
+                   peak_tolerance_, extend_sp_para_, activation_ptr_));
+
+    n_unknown_shift_=atoi(arguments["shiftNumber"].c_str());
   }
 
-  BaseDataPtr base_data_ ;
+  std::string search_db_file_name_;
+  std::string spectrum_file_name_;
+
+  ResiduePtrVec fix_mod_residue_list_;
+  ProtModPtrVec allow_prot_mod_list_;
+
+  ActivationPtr activation_ptr_ = nullptr;
 
   double ppo_ = 0.000015;
   bool use_min_tolerance_ = true;
@@ -67,9 +69,10 @@ class PtmMng {
   std::vector<double> ext_offsets_ = {0.0,-IM_,IM_};
   double extend_min_mass_ = 5000;
   ExtendSpParaPtr extend_sp_para_;
-  ActivationPtr activation_ = nullptr;
+
   SpParaPtr sp_para_;
 
+  /* parameters for ptm search */
   int n_report_ = 1;
   int n_unknown_shift_ =2;
   int n_known_shift_ = 0;
@@ -88,8 +91,6 @@ class PtmMng {
 
   double adjust_prec_step_width_ = 0.005;
 
-  std::string search_db_file_name_;
-  std::string spectrum_file_name_;
   std::string input_file_ext_;
   std::string output_file_ext_;
 };

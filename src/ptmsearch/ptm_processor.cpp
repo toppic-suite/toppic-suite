@@ -49,8 +49,7 @@ PtmProcessor::PtmProcessor(PtmMngPtr mng){
 
 void PtmProcessor::init(){
   seqs_ = prot::readFastaToProteoform(
-      mng_->search_db_file_name_,
-      mng_->base_data_->getFixModResiduePtrVec());
+      mng_->search_db_file_name_, mng_->fix_mod_residue_list_);
   std::string sp_file_name = mng_->spectrum_file_name_;
   std::string simplePrsmFileName = basename(mng_->spectrum_file_name_)
       + "." + mng_->input_file_ext_;

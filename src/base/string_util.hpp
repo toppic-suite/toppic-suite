@@ -9,6 +9,8 @@
 #include <cctype>
 #include <locale>
 
+#include "base/logger.hpp"
+
 namespace prot {
 
 inline std::string& trim(std::string &s) {
@@ -43,6 +45,19 @@ inline std::string basename(const std::string &s) {
   if (dot_pos < s.length()) {
     return s.substr(0, dot_pos);
   }
+  return s;
+}
+
+inline std::string directory(const std::string &s) {
+  unsigned int slash_pos = s.find_last_of("/");
+  if (slash_pos < s.length()) {
+    return s.substr(0, slash_pos + 1);
+  }
+  unsigned int rev_slash_pos = s.find_last_of("\\");
+  if (rev_slash_pos < s.length()) {
+    return s.substr(0, rev_slash_pos + 1);
+  }
+  LOG_ERROR("Error in parse directory.")    
   return s;
 }
 

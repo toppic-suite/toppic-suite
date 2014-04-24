@@ -1,6 +1,7 @@
 #include <base/logger.hpp>
 
 #include "base/residue.hpp"
+#include "base/string_util.hpp"
 #include "base/xml_dom.hpp"
 #include "base/xml_dom_document.hpp"
 
@@ -141,6 +142,31 @@ ResiduePtrVec ResidueFactory::getResiduePtrVecInstance(const std::string &file_n
     }
   }
   return new_list;
+}
+
+/** FixResidueFactory */
+
+std::map<std::string,ResiduePtrVec> FixResidueFactory::fix_res_list_map_;
+
+void FixResidueFactory::initFactory(const std::string &file_name) {
+  XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
+  std::string file_dir = directory(file_name);
+  if (parser) {
+    XmlDOMDocument doc(parser, file_name.c_str());
+    xercesc::DOMElement* parent = doc.getDocumentElement();
+    int residue_list_num = getChildCount(parent, "fix_mod_residue_list");
+    LOG_DEBUG( "residue list num " << residue_list_num);
+    for (int i = 0; i < residue_list_num; i++) {
+      xercesc::DOMElement* element = getChildElement(parent, "fix_mod_residue_list", i);
+      std::string id = getChildValue(element, "id", 0);
+      std::string fix_mod_residue_file_name = getChildValue(element, "fix_mod_residue_file_name", 0);
+      fix_mod_residue_file_name = file_dir + fix_mod_residue_file_name;
+      ResiduePtrVec residue_ptr_vec = 
+          ResidueFactory::getResiduePtrVecInstance(fix_mod_residue_file_name);
+      std::pair<std::string,ResiduePtrVec> pair(id, residue_ptr_vec);
+      fix_res_list_map_.insert(pair);
+    }
+  }
 }
 
 }

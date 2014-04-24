@@ -38,15 +38,13 @@ void zeroPtmSearch(SpectrumSetPtr spec_set_ptr,
 }
 
 void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
-  BaseDataPtr base_data_ptr = mng_ptr->base_data_ptr_;
 
   ProteoformPtrVec raw_forms 
       = readFastaToProteoform(mng_ptr->search_db_file_name_,
-                              base_data_ptr->getFixModResiduePtrVec());
+                              mng_ptr->fix_mod_residue_list_);
 
   ProteoformPtrVec prot_mod_forms 
-      = generateProtModProteoform(raw_forms, 
-                                  base_data_ptr->getAllowProtModPtrVec());
+      = generateProtModProteoform(raw_forms, mng_ptr->allow_prot_mod_list_);
 
   int spectra_num = countSpNum (mng_ptr->spectrum_file_name_);
   LOG_DEBUG("spectra_number  " << spectra_num);

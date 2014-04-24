@@ -14,19 +14,17 @@ EValueProcessor::EValueProcessor(TdgfMngPtr mng_ptr) {
 }
 
 void EValueProcessor::init() {
-  BaseDataPtr base_data_ptr = mng_ptr_->base_data_ptr_;
   ProteoformPtrVec raw_forms 
       = readFastaToProteoform(mng_ptr_->search_db_file_name_,
-                              base_data_ptr->getFixModResiduePtrVec());
+                              mng_ptr_->fix_mod_residue_list_);
 
   ProteoformPtrVec prot_mod_forms 
-      = generateProtModProteoform(raw_forms, 
-                                  base_data_ptr->getAllowProtModPtrVec());
+      = generateProtModProteoform(raw_forms, mng_ptr_->allow_prot_mod_list_); 
 
   LOG_DEBUG("protein data set loaded");
 
   ResFreqPtrVec residue_freqs 
-      = compResidueFreq(base_data_ptr->getFixModResiduePtrVec(), raw_forms); 
+      = compResidueFreq(mng_ptr_->fix_mod_residue_list_, raw_forms); 
   LOG_DEBUG("residue frequency initialized");
 
   comp_pvalue_ptr_ = CompPValueArrayPtr(

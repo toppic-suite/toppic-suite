@@ -155,4 +155,17 @@ int getLastResPos(double c_term_shift, const std::vector<double> &prm_masses){
   return best_pos - 1;
 }
 
+/*
+std::string get_selfpath() {
+  char buff[1024];
+  ssize_t len = readlink("/proc/self/exe", buff, sizeof(buff)-1);
+  if (len != -1) {
+    buff[len] = '\0';
+    return std::string(buff);
+  } else {
+    exit(1);
+  }
+}
+*/
+
 }

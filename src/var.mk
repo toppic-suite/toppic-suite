@@ -6,13 +6,13 @@ CPPFLAGS = -Wall -std=c++11 -O3 -pg
 #
 # define any directories containing header files other than /usr/include
 #
-INCLUDES = -I../ -I../../lib/xalan-c/c/src -I../../lib/xalan-c/c/nls/include
+INCLUDES = -I../ 
 #
 # define library paths in addition to /usr/lib
 LFLAGS = -L/lib -L/opt/local/lib
 #
 # define any libraries to link into executable:
-LIBS = -lxerces-c-3.1 -lxalan-c -lxalanMsg 
+LIBS = -lxerces-c-3.1  
 
 OBJ_DIR = ../../obj
 
@@ -32,4 +32,4 @@ PTM_OBJS = $(addprefix $(OBJ_DIR)/, ptm_processor.o ptm_slow_filter.o ptm_slow_m
 
 TDGF_OBJS = $(addprefix $(OBJ_DIR)/, evalue_processor.o comp_prob_value.o count_test_num.o comp_pvalue_array.o) 
 
-XPP_OBJS = $(addprefix $(OBJ_DIR)/, anno_view.o xml_generator.o transformer.o) 
+XPP_OBJS = $(addprefix $(OBJ_DIR)/, anno_view.o xml_generator.o ) 

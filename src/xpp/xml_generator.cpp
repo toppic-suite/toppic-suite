@@ -136,8 +136,7 @@ void XmlGenerator::outputFileList(){
 void XmlGenerator::process(){
 
   ProteoformPtrVec raw_forms
-        = readFastaToProteoform(mng_->database_file_,
-                                mng_->base_data_ptr_->getFixModResiduePtrVec());
+        = readFastaToProteoform(mng_->database_file_, mng_->fix_mod_residue_list_);
   seq_ = raw_forms;
   std::string input_name = basename(mng_->spectrum_file_)+"."+input_file_;
   std::cout << "input file " << input_name;

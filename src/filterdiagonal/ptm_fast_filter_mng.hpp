@@ -14,7 +14,7 @@
 
 #include "base/mass_constant.hpp"
 #include "base/activation.hpp"
-#include "base/base_data.hpp"
+#include "base/residue.hpp"
 #include "spec/peak_tolerance.hpp"
 #include "spec/extend_sp_para.hpp"
 #include "spec/sp_para.hpp"
@@ -23,28 +23,12 @@ namespace prot {
 
 class PtmFastFilterMng {
  public:
-  PtmFastFilterMng(const std::string &config_file_name,
-                   const std::string &search_db_file_name,
-                   const std::string &spectrum_file_name,
-                   const std::string &output_file_ext) {
-    search_db_file_name_ = search_db_file_name;
-    spectrum_file_name_ = spectrum_file_name;
-    output_file_ext_ = output_file_ext;
-
-    base_data = BaseDataPtr(new BaseData(config_file_name));
-    peak_tolerance_ = PeakTolerancePtr(
-        new PeakTolerance(ppo_, use_min_tolerance_, min_tolerance_));
-    extend_sp_para_ = ExtendSpParaPtr(
-        new ExtendSpPara(extend_min_mass_, ext_offsets_));
-    sp_para_ = SpParaPtr(
-        new SpPara(min_peak_num, min_mass, peak_tolerance_, 
-                   extend_sp_para_, activation_ptr_));
-  }
 
   PtmFastFilterMng(std::map<std::string, std::string> arguments) {
-    base_data = BaseDataPtr(new BaseData(arguments));
     spectrum_file_name_ = arguments["spectrumFileName"];
     search_db_file_name_ = arguments["databaseFileName"];
+
+    fix_mod_residue_list_ = FixResidueFactory::getFixResiduePtrVec(arguments["cysteineProtection"]);
 
     activation_ptr_ = ActivationFactory::getBaseActivationPtrByName(
         arguments["activation"]);
@@ -59,12 +43,13 @@ class PtmFastFilterMng {
                    extend_sp_para_, activation_ptr_));
   }
 
-  BaseDataPtr base_data;
+  std::string search_db_file_name_;
+  std::string spectrum_file_name_;
 
-  //Candidate protein number for each spectrum
-  int ptm_fast_filter_result_num_ = 20;
-  int db_block_size_ = 5000000;
-  int ptm_fast_filter_scale_ = 100;
+  ResiduePtrVec fix_mod_residue_list_;
+  // if activation ptr is null, activation types in file are used 
+  ActivationPtr activation_ptr_;
+
   //spectrum parameters
   double ppo_ = 0.000015;
   bool use_min_tolerance_ = true;
@@ -80,12 +65,16 @@ class PtmFastFilterMng {
   std::vector<double> ext_offsets_ { { 0, -IM_, IM_ } };
   double extend_min_mass_ = 5000;
   ExtendSpParaPtr extend_sp_para_;
-  ActivationPtr activation_ptr_;
 
   SpParaPtr sp_para_;
 
-  std::string search_db_file_name_;
-  std::string spectrum_file_name_;
+  /** parameters for fast filteration */
+
+  //Candidate protein number for each spectrum
+  int ptm_fast_filter_result_num_ = 20;
+  int db_block_size_ = 5000000;
+  int ptm_fast_filter_scale_ = 100;
+
   std::string output_file_ext_;
 
 };

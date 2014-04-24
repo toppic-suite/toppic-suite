@@ -9,9 +9,7 @@
 #define XML_GENERATOR_HPP_
 
 #include <map>
-#include <xalanc/Include/PlatformDefinitions.hpp>
 #include <xercesc/util/PlatformUtils.hpp>
-#include <xalanc/XalanTransformer/XalanTransformer.hpp>
 
 #include "base/proteoform.hpp"
 #include "base/fasta_reader.hpp"
