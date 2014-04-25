@@ -52,7 +52,7 @@ class SystemInfo{
  public:
   static void initSystemInfo(std::string argument_zero);
   static std::string getExeFilePath(){return exe_path_;};
-  static std::string getOS(){return os_;};
+  static std::string getOSString(){return os_;};
  private:
   static std::string exe_path_;
   static std::string os_;
