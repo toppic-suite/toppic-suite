@@ -7,6 +7,7 @@
 
 #include <xpp/transformer.hpp>
 #include <xpp/anno_view.hpp>
+#include "base/command.hpp"
 
 Transformer::Transformer() {
   // TODO Auto-generated constructor stub
@@ -23,7 +24,8 @@ void Transformer::trans(){
   xalanc::XalanTransformer::initialize();
   xalanc::XalanTransformer theXanlanTransformer;
 
-  std::vector<std::vector<std::string>> anno_view = prot::readFiles("xml/files.xml");
+  std::string xml_file_list = prot::SystemInfo::getXmlPath()+"files.xml";
+  std::vector<std::vector<std::string>> anno_view = prot::readFiles(xml_file_list);
   for(unsigned int i=0;i<anno_view.size();i++){
 
     const char* xml_in = anno_view[i][0].c_str();

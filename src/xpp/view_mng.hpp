@@ -11,6 +11,7 @@
 #include <string>
 #include <algorithm>
 #include <map>
+#include "base/command.hpp"
 
 namespace prot {
 
@@ -65,8 +66,8 @@ class ViewMng {
   double min_mass_ = 50.0;
   SpParaPtr sp_para_ptr_;
 
-  std::string html_path_="html/";
-  std::string xml_path_="xml/";
+  std::string html_path_=SystemInfo::getHtmlPath();
+  std::string xml_path_=SystemInfo::getXmlPath();
 
 };
 

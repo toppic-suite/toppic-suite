@@ -53,8 +53,14 @@ class SystemInfo{
   static void initSystemInfo(std::string argument_zero);
   static std::string getExeFilePath(){return exe_path_;};
   static std::string getOSString(){return os_;};
+  static void setXmlPath(std::string xml_path){xml_path_=xml_path;};
+  static void setHtmlPath(std::string html_path){html_path_=html_path;};
+  static std::string getXmlPath(){return xml_path_;};
+  static std::string getHtmlPath(){return html_path_;};
  private:
   static std::string exe_path_;
+  static std::string xml_path_;
+  static std::string html_path_;
   static std::string os_;
 };
 } /* namespace prot */

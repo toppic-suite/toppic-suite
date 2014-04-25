@@ -214,18 +214,21 @@ int main(int argc, char* argv[]){
         std::string xml_path=SystemInfo::getExeFilePath()+"/xml/";
         std::string html_path=directory(cmd->getArgument()["spectrumFileName"])+"html/";
 
-        std::cout<<"cp "+SystemInfo::getExeFilePath()+"/etc/*.* "+html_path<<std::endl;
+        SystemInfo::setXmlPath(xml_path);
+        SystemInfo::setHtmlPath(html_path);
+
+        std::cout<<"cp "+SystemInfo::getXmlPath()<<std::endl;
 
         if(SystemInfo::getOSString().compare("uni")==0){
-          runCommand("mkdir "+xml_path);
-          runCommand("mkdir "+xml_path+"species");
-          runCommand("mkdir "+xml_path+"prsms");
-          runCommand("mkdir "+xml_path+"proteins");
+          runCommand("mkdir -p "+xml_path);
+          runCommand("mkdir -p "+xml_path+"species");
+          runCommand("mkdir -p "+xml_path+"prsms");
+          runCommand("mkdir -p "+xml_path+"proteins");
 
-          runCommand("mkdir "+html_path);
-          runCommand("mkdir "+html_path+"species");
-          runCommand("mkdir "+html_path+"prsms");
-          runCommand("mkdir "+html_path+"proteins");
+          runCommand("mkdir -p "+html_path);
+          runCommand("mkdir -p "+html_path+"species");
+          runCommand("mkdir -p "+html_path+"prsms");
+          runCommand("mkdir -p "+html_path+"proteins");
 
           runCommand("cp "+SystemInfo::getExeFilePath()+"/etc/*.* "+html_path);
         }
@@ -244,7 +247,9 @@ int main(int argc, char* argv[]){
         }
 
 
-      MsAlignPipeline(cmd->getArgument());
+
+
+//      MsAlignPipeline(cmd->getArgument());
 
       return 0;
 }

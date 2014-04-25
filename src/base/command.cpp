@@ -379,6 +379,8 @@ int runCommand(std::string cmd,std::string mod){
 
 std::string SystemInfo::exe_path_;
 std::string SystemInfo::os_;
+std::string SystemInfo::html_path_;
+std::string SystemInfo::xml_path_;
 
 void SystemInfo::initSystemInfo(std::string argument_zero){
   std::string command_path = argument_zero;
