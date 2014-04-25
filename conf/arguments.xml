@@ -1,1 +1,18 @@
-<?xml version="1.0" encoding="UTF-8"?><Arguments><Title>asdfasd</Title><Fragmentation_Method>FILE</Fragmentation_Method><Spectrum_File>spectra.msalign</Spectrum_File><Database_File>prot.fasta</Database_File><Protein_N_Terminal_Variable_PTM_List><Protein_N_Terminal_Variable_PTM>NONE</Protein_N_Terminal_Variable_PTM></Protein_N_Terminal_Variable_PTM_List><Parent_and_Fragment_Mass_Error_Tolerance>15</Parent_and_Fragment_Mass_Error_Tolerance><Cysteine_Protecting_Group>NONE</Cysteine_Protecting_Group><Decoy>TARGET</Decoy><Cutoff_Type>EVALUE</Cutoff_Type><Cutoff_Value>0.01</Cutoff_Value><Number_of_Unexpected_PTMs>2</Number_of_Unexpected_PTMs></Arguments>
+<?xml version="1.0" encoding="UTF-8"?>
+<Arguments>
+<Title>task</Title>
+<Fragmentation_Method>CID</Fragmentation_Method>
+<Spectrum_File>in/spectra.msalign</Spectrum_File>
+<Database_File>in/prot.fasta</Database_File>
+<Protein_N_Terminal_Variable_PTM_List>
+<Protein_N_Terminal_Variable_PTM>NONE</Protein_N_Terminal_Variable_PTM>
+<Protein_N_Terminal_Variable_PTM>NME</Protein_N_Terminal_Variable_PTM>
+<Protein_N_Terminal_Variable_PTM>NME_ACETYLATION</Protein_N_Terminal_Variable_PTM>
+</Protein_N_Terminal_Variable_PTM_List>
+<Parent_and_Fragment_Mass_Error_Tolerance>15</Parent_and_Fragment_Mass_Error_Tolerance>
+<Cysteine_Protecting_Group>C0</Cysteine_Protecting_Group>
+<Decoy>TARGET</Decoy>
+<Cutoff_Type>EVALUE</Cutoff_Type>
+<Cutoff_Value>0.01</Cutoff_Value>
+<Number_of_Unexpected_PTMs>2</Number_of_Unexpected_PTMs>
+</Arguments>
