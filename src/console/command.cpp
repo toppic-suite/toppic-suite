@@ -140,7 +140,7 @@ bool command::validateCommandValue(std::string command,std::string value){
 }
 
 void command::initOption() {
-  options_["i"] = "argumentFileName";
+  options_["-i"] = "argumentFileName";
   options_["--arguments-filename"] = "argumentFileName";
   options_["-o"] = "configuration";
   options_["--configuration"] = "configuration";
@@ -176,18 +176,19 @@ void command::initArguments() {
   arguments_["errorTolerance"] = "15";
   arguments_["cutoffType"] = "EVALUE";
   arguments_["cutoff"] = "0.01";
+  arguments_["allProtMode"] = "NONE";
 }
 
 void showCommondList(){
     std::cout<<"USAGE:"<<std::endl;
-    std::cout<<"-i, --arguments-filename <xml file name with path>"<<std::endl;
-    std::cout<<"                         Deauft arguments file in which set the "<<
-                                     "running arguments value"<<std::endl;
-    std::cout<<"                         default value: conf/arguments.xml"<<std::endl;
-    std::cout<<"-o, --configuration      <xml file name with path>"<<std::endl;
-    std::cout<<"                         Deauft configuration file in which set the "<<
-                                     "configuration file list"<<std::endl;
-    std::cout<<"                         default value: conf/configuration.xml"<<std::endl;
+//    std::cout<<"-i, --arguments-filename <xml file name with path>"<<std::endl;
+//    std::cout<<"                         Deauft arguments file in which set the "<<
+//                                     "running arguments value"<<std::endl;
+//    std::cout<<"                         default value: conf/arguments.xml"<<std::endl;
+//    std::cout<<"-o, --configuration      <xml file name with path>"<<std::endl;
+//    std::cout<<"                         Deauft configuration file in which set the "<<
+//                                     "configuration file list"<<std::endl;
+//    std::cout<<"                         default value: conf/configuration.xml"<<std::endl;
     std::cout<<"-D, --database-filename  <fasta file name with path>"<<std::endl;
     std::cout<<"                         The database file that record unknown proteins"<<std::endl;
     std::cout<<"                         default value: in/prot.fasta"<<std::endl;
@@ -244,7 +245,6 @@ bool checkPath(std::string path){
   std::vector<std::string> file_to_check;
   file_to_check.push_back("/conf/acid.xml");
   file_to_check.push_back("/conf/activation.xml");
-  file_to_check.push_back("/conf/arguments.xml");
   file_to_check.push_back("/conf/configuration.xml");
   file_to_check.push_back("/conf/ion_type.xml");
   file_to_check.push_back("/conf/neutral_loss.xml");
@@ -271,7 +271,6 @@ std::string getExePath(std::string command_path) {
   } else {
     command_path = command_path.substr(0, pos + 1);
   }
-//  std::cout << command_path << std::endl;
   std::fstream file;
   file.open(command_path + "conf/acid.xml", std::ios::in);
   if (!file) {
@@ -289,12 +288,10 @@ std::string getExePath(std::string command_path) {
         if (file) {
           if (checkPath(paths[i])) {
             run_path = paths[i];
-//            return run_path;
             break;
           }
         }
         file.close();
-//        std::cout<<(paths[i] + "/conf/acid.xml")<<std::endl;
       }
 
     } else {
@@ -320,8 +317,37 @@ std::string getExePath(std::string command_path) {
   } else {
     run_path = command_path;
   }
-//  std::cout<<run_path<<std::endl;
   return run_path;
 }
+
+int getOS(){
+  std::string os_path = std::getenv("PATH");
+  std::cout<<os_path<<std::endl;
+  size_t pos_win_symbol = os_path.find(";", 0);
+  size_t pos_win_home = os_path.find("\\Windows\\System32\\", 0);
+
+  size_t pos_uni_symbol = os_path.find(";", 0);
+  size_t pos_uni_home = os_path.find("/usr/", 0);
+
+  if(pos_win_symbol != std::string::npos && pos_win_home!= std::string::npos){
+    return 1;
+  }
+  if(pos_uni_symbol != std::string::npos && pos_uni_home!= std::string::npos){
+    return 2;
+  }
+  return 0;
+}
+
+int runCommand(std::string cmd,std::string mod){
+  char psBuffer[128];
+  FILE *pPipe;
+  if( (pPipe = popen( cmd.c_str(), mod.c_str() )) == NULL )
+  return 0;
+  while(fgets(psBuffer, 128, pPipe))
+  printf("%s",psBuffer);
+  int rc = pclose(pPipe);
+  return rc;
+}
+
 
 } /* namespace prot */
