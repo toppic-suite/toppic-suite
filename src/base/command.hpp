@@ -47,6 +47,16 @@ int getOS();
 int runCommand(std::string cmd);
 int runCommand(std::string cmd,std::string mod);
 
+
+class SystemInfo{
+ public:
+  static void initSystemInfo(std::string argument_zero);
+  static std::string getExeFilePath(){return exe_path_;};
+  static std::string getOS(){return os_;};
+ private:
+  static std::string exe_path_;
+  static std::string os_;
+};
 } /* namespace prot */
 
 #endif /* COMMAND_HPP_ */

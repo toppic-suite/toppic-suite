@@ -378,4 +378,21 @@ int runCommand(std::string cmd,std::string mod){
 }
 
 
+void SystemInfo::initSystemInfo(std::string argument_zero){
+  std::string command_path = argument_zero;
+    std::string run_path = getExePath(command_path);
+    if(run_path.compare("########")==0){
+      LOG_ERROR("Can't find the configuration folder: conf or "+command_path+"conf or &PATH/conf;Please check if the folder exist!");
+      return;
+    }
+    exe_path_=run_path;
+    int type = getOS();
+    if(type==1){
+      os_="win";
+    }
+    else if(type==2){
+      os_="uni";
+    }
+}
+
 } /* namespace prot */

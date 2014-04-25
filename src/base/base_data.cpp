@@ -20,8 +20,8 @@
 
 namespace prot {
 
-void initBaseData(std::string exe_path) {
-  std::string exe_dir = exe_path;//".";
+void initBaseData() {
+  std::string exe_dir = SystemInfo::getExeFilePath();//".";
   std::string conf_dir = exe_dir + FILE_SEPARATOR + CONFIG_DIR;
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
