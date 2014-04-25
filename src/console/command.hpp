@@ -42,7 +42,7 @@ typedef std::shared_ptr<command> cmdPtr;
 
 void showCommondList();
 bool existFile(std::string filename);
-std::string getExePath(std::string command_path);
+std::string getExePath(std::string & command_path);
 
 int getOS();
 int runCommand(std::string cmd);

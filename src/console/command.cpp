@@ -263,7 +263,7 @@ bool checkPath(std::string path){
   return flag;
 }
 
-std::string getExePath(std::string command_path) {
+std::string getExePath(std::string & command_path) {
   std::string run_path = "########";
   size_t pos = command_path.find_last_of("/");
   if (pos == std::string::npos) {
