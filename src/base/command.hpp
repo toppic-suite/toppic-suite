@@ -27,7 +27,6 @@ class command {
   int setCommandValue(std::string command,std::string value);
   bool validateCommandValue(std::string command,std::string value);
   std::map<std::string,std::string> getArgument(){return arguments_;}
-
   void setArgumentsWithConfigFile(std::string filename);
 
  private:

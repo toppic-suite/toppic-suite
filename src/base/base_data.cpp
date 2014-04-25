@@ -16,11 +16,12 @@
 #include "base/string_util.hpp"
 #include "base/xml_dom.hpp"
 #include "base/xml_dom_document.hpp"
+#include "base/command.hpp"
 
 namespace prot {
 
-void initBaseData() {
-  std::string exe_dir = ".";
+void initBaseData(std::string exe_path) {
+  std::string exe_dir = exe_path;//".";
   std::string conf_dir = exe_dir + FILE_SEPARATOR + CONFIG_DIR;
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {

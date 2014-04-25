@@ -14,7 +14,7 @@
 namespace prot {
 
 
-void initBaseData();
+void initBaseData(std::string exe_path);
 
 }
 #endif

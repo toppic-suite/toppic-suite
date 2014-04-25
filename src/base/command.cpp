@@ -269,10 +269,10 @@ std::string getExePath(std::string & command_path) {
   if (pos == std::string::npos) {
     command_path = "";
   } else {
-    command_path = command_path.substr(0, pos + 1);
+    command_path = command_path.substr(0, pos);
   }
   std::fstream file;
-  file.open(command_path + "conf/acid.xml", std::ios::in);
+  file.open(command_path + "/conf/acid.xml", std::ios::in);
   if (!file) {
     std::string os_path = std::getenv("PATH");
     size_t pos = os_path.find(";", 0);
@@ -320,17 +320,17 @@ std::string getExePath(std::string & command_path) {
   //Debug in eclipse
   if(command_path.compare("")!=0)
   {
-    std::string up_path = command_path.substr(0, pos);
-    size_t pos = up_path.find_last_of("/");
-    if (pos == std::string::npos) {
+    std::string up_path = command_path;
+    size_t up_pos = up_path.find_last_of("/");
+    if (up_pos == std::string::npos) {
       up_path = "";
     } else {
-      up_path = up_path.substr(0, pos + 1);
+      up_path = up_path.substr(0, up_pos);
     }
 //    std::cout<<command_path<<std::endl;
 //    std::cout<<up_path<<std::endl;
-//    std::cout<<up_path<<"conf/acid.xml"<<std::endl;
-    if(existFile(up_path+"conf/acid.xml")){
+//    std::cout<<up_path<<"/conf/acid.xml"<<std::endl;
+    if(existFile(up_path+"/conf/acid.xml")){
       run_path=up_path;
     }
   }
@@ -339,7 +339,7 @@ std::string getExePath(std::string & command_path) {
 
 int getOS(){
   std::string os_path = std::getenv("PATH");
-  std::cout<<os_path<<std::endl;
+//  std::cout<<os_path<<std::endl;
   size_t pos_win_symbol = os_path.find(";", 0);
   size_t pos_win_home = os_path.find("\\Windows\\System32\\", 0);
 
