@@ -46,6 +46,7 @@ std::string getExePath(std::string & command_path);
 
 int getOS();
 int runCommand(std::string cmd);
+int runCommand(std::string cmd,std::string mod);
 
 } /* namespace prot */
 

@@ -317,6 +317,23 @@ std::string getExePath(std::string & command_path) {
   } else {
     run_path = command_path;
   }
+  //Debug in eclipse
+  if(command_path.compare("")!=0)
+  {
+    std::string up_path = command_path.substr(0, pos);
+    size_t pos = up_path.find_last_of("/");
+    if (pos == std::string::npos) {
+      up_path = "";
+    } else {
+      up_path = up_path.substr(0, pos + 1);
+    }
+//    std::cout<<command_path<<std::endl;
+//    std::cout<<up_path<<std::endl;
+//    std::cout<<up_path<<"conf/acid.xml"<<std::endl;
+    if(existFile(up_path+"conf/acid.xml")){
+      run_path=up_path;
+    }
+  }
   return run_path;
 }
 
@@ -332,10 +349,21 @@ int getOS(){
   if(pos_win_symbol != std::string::npos && pos_win_home!= std::string::npos){
     return 1;
   }
-  if(pos_uni_symbol != std::string::npos && pos_uni_home!= std::string::npos){
+  if(pos_uni_symbol == std::string::npos && pos_uni_home!= std::string::npos){
     return 2;
   }
   return 0;
+}
+
+int runCommand(std::string cmd){
+  char psBuffer[128];
+  FILE *pPipe;
+  if( (pPipe = popen( cmd.c_str(),"r" )) == NULL )
+  return 0;
+  while(fgets(psBuffer, 128, pPipe))
+  printf("%s",psBuffer);
+  int rc = pclose(pPipe);
+  return rc;
 }
 
 int runCommand(std::string cmd,std::string mod){
