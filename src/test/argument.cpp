@@ -1,7 +1,6 @@
 /*
  *  Created on: Apr 24, 2014
  */
-//#include "boost/filesystem.hpp" 
 #include "test/argument.hpp"
 
 namespace prot {
@@ -38,25 +37,25 @@ void Argument::setArgumentsByConfigFile(const std::string &filename){
       arguments_["oriDatabaseFileName"]=getChildValue(root,"database_file_name",0);
       arguments_["spectrumFileName"]=getChildValue(root,"spectrum_file_name",0);
       arguments_["activation"]=getChildValue(root,"fragmentation_method",0);
-      arguments_["cysteineProtection"]=getChildValue(root,"cystem_protection_group",0);
+      arguments_["cysteineProtection"]=getChildValue(root,"cysteine_protecting_group",0);
       arguments_["searchType"]=getChildValue(root,"search_type",0);
       arguments_["shiftNumber"]=getChildValue(root,"shift_number",0);
       arguments_["errorTolerance"]=getChildValue(root,"error_tolerance",0);
       arguments_["cutoffType"]=getChildValue(root,"cutoff_type",0);
-      arguments_["cutoff"]=getChildValue(root,"cutoff_value",0);
+      arguments_["cutoffValue"]=getChildValue(root,"cutoff_value",0);
 
-      xercesc::DOMElement* allow_prot_mod_list = getChildElement(root,"protein_variable_ptm_list",0);
-      int allow_prot_node_number = getChildCount(allow_prot_mod_list,"protein_variable_ptm_list");
-      std::string allow_mode="";
+      xercesc::DOMElement* prot_mod_list = getChildElement(root,"protein_variable_ptm_list",0);
+      int allow_prot_node_number = getChildCount(prot_mod_list,"protein_variable_ptm");
+      std::string allow_mod="";
       for(int i=0;i<allow_prot_node_number;i++){
         if(i==0){
-          allow_mode = getChildValue(allow_prot_mod_list,"protein_variable_ptm",i);
+          allow_mod = getChildValue(prot_mod_list,"protein_variable_ptm",i);
         }
         else{
-          allow_mode = allow_mode+","+getChildValue(allow_prot_mod_list,"protein_variable_ptm",i);
+          allow_mod = allow_mod+","+getChildValue(prot_mod_list,"protein_variable_ptm",i);
         }
       }
-      arguments_["allowProtMod"]=allow_mode;
+      arguments_["allowProtMod"]=allow_mod;
     }
     delete doc;
   }
@@ -65,9 +64,9 @@ void Argument::setArgumentsByConfigFile(const std::string &filename){
 bool Argument::parse(int argc, char* argv[]) {
   std::string database_file_name = "";
   std::string spectrum_file_name = "";
+  std::string argument_file_name = "";
   std::string activation = "";
   std::string protection = "";
-  std::string search_type = "";
   std::string shift_num = "";
   std::string error_tole = "";
   std::string cutoff_type = "";
@@ -83,7 +82,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("activation,a", po::value<std::string>(&activation),
          "<CID|HCD|ETD|FILE>. Designate the activation type of tandem mass spectra. FILE means the activation type is given in spectral data file. Default value: FILE.")
         ("cysteine-protection,c", po::value<std::string> (&protection), 
-         "<C0|C57|C58>. Cysteine protection group C0: no modification,C57: Carbamidoemetylation, or C58:Carboxymethylation. Default value: C0.")
+         "<C0|C57|C58>. Cysteine protecting group C0: no modification,C57: Carbamidoemetylation, or C58:Carboxymethylation. Default value: C0.")
         ("decoy,d", "Use decoy protein database to estimate false discovery rates.")
         ("shift-number,s", po::value<std::string> (&shift_num), "<int value>. Maximum number of unexpected PTMs. Default value: 2.")
         ("error-tolerance,e", po::value<std::string> (&error_tole), "<int value>. Error tolerance in PPM. Default value: 15.")
@@ -94,6 +93,7 @@ bool Argument::parse(int argc, char* argv[]) {
 
     desc.add_options() 
         ("help,h", "Print help messages") 
+        ("argument-file,f",po::value<std::string>(&argument_file_name),"Argument file name.")
         ("activation,a", po::value<std::string>(&activation),
          "<CID|HCD|ETD|FILE>. Designate the activation type of tandem mass spectra. FILE means the activation type is given in spectral data file. Default value: FILE.")
         ("cysteine-protection,c", po::value<std::string> (&protection), 
@@ -133,6 +133,9 @@ bool Argument::parse(int argc, char* argv[]) {
       return false;
     }
 
+    if (vm.count("argument-file")) {
+      setArgumentsByConfigFile(argument_file_name);
+    }
     arguments_["oriDatabaseFileName"] = database_file_name;
     arguments_["spectrumFileName"] = spectrum_file_name;
     if (vm.count("activation")) {
@@ -140,6 +143,8 @@ bool Argument::parse(int argc, char* argv[]) {
     }
     if (vm.count("decoy")) {
       arguments_["searchType"] = "TARGET+DECOY";
+    }
+    if (arguments_["searchType"] == "TARGET+DECOY") {
       arguments_["databaseFileName"]=arguments_["oriDatabaseFileName"] + "_target_decoy";
     }
     else {
