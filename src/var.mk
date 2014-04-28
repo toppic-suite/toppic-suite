@@ -3,6 +3,7 @@ CC = g++
 #
 # define any compile-time flags
 CPPFLAGS = -Wall -std=c++11 -O3 -pg
+FILECPPFLAGS = -Wall -O3 -pg
 #
 # define any directories containing header files other than /usr/include
 #
@@ -12,13 +13,15 @@ INCLUDES = -I../
 LFLAGS = -L/lib -L/opt/local/lib
 #
 # define any libraries to link into executable:
-LIBS = -lxerces-c-3.1  
+LIBS = -lxerces-c-3.1 -lboost_program_options -lboost_filesystem -lboost_system 
 
 OBJ_DIR = ../../obj
 
 BIN_DIR = ../../bin
 
-BASE_OBJS = $(addprefix $(OBJ_DIR)/, anno_residue.o species.o xml_writer.o support_peak_type.o semi_align_type.o db_residue_seq.o extreme_value.o algorithm.o ion.o base_data.o fasta_reader.o proteoform.o bp_spec.o break_point.o residue_seq.o change.o acid.o ptm.o residue_freq.o residue.o xml_dom.o xml_dom_document.o ion_type.o neutral_loss.o trunc.o prot_mod.o activation.o)
+BASE_OBJS = $(addprefix $(OBJ_DIR)/, command.o anno_residue.o species.o xml_writer.o support_peak_type.o semi_align_type.o db_residue_seq.o extreme_value.o algorithm.o ion.o base_data.o fasta_reader.o proteoform.o bp_spec.o break_point.o residue_seq.o change.o acid.o ptm.o residue_freq.o residue.o xml_dom.o xml_dom_document.o ion_type.o neutral_loss.o trunc.o prot_mod.o activation.o)
+
+FILE_OBJS = $(addprefix $(OBJ_DIR)/, file_util.o)
 
 SPEC_OBJS = $(addprefix $(OBJ_DIR)/, peak.o extend_peak.o support_peak.o prm_peak.o spectrum_set.o sp_para.o theo_peak.o extend_sp_para.o peak_tolerance.o msalign_reader.o deconv_ms.o peak_list.o ms_header.o deconv_peak.o)
 

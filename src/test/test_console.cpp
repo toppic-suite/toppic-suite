@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "base/base_data.hpp"
+#include "base/file_util.hpp"
 #include "base/fasta_reader.hpp"
 
 #include "prsm/prsm_combine.hpp"
@@ -23,43 +24,28 @@
 #include "tdgf/tdgf_mng.hpp"
 
 #include "xpp/xml_generator.hpp"
+#include "test/argument.hpp"
 //#include "xpp/transformer.hpp"
-
-
-std::map<std::string, std::string> getArgumentMap(const std::string &search_db_file_name,
-                                                  const std::string &spectrum_file_name,
-                                                  const std::string &search_type,
-                                                  const std::string &cutoff_type){
-  std::map<std::string, std::string> arguments;
-  arguments["oriDatabaseFileName"]=search_db_file_name;
-  if (search_type == "TARGET") {
-    arguments["databaseFileName"]=search_db_file_name;
-  }
-  else if (search_type == "TARGET+DECOY") {
-    arguments["databaseFileName"]=search_db_file_name + "_target_decoy";
-  }
-  arguments["spectrumFileName"]=spectrum_file_name;
-  arguments["activation"]="FILE";
-  arguments["searchType"]=search_type;
-  arguments["cysteineProtection"]="C0";
-  arguments["shiftNumber"]="2";
-  arguments["errorTolerance"]="15";
-  arguments["cutoffType"]="EVALUE";
-  arguments["cutoff"]="0.01";
-  arguments["numOfTopPrsms"]="1";
-  return arguments;
-}
 
 int main(int argc, char* argv[]) {
   try {
-    prot::initBaseData();
+    prot::Argument argu_processor;
+    bool success = argu_processor.parse(argc, argv);
+    if (!success) {
+      return 1;
+    }
+    std::map<std::string, std::string> arguments = argu_processor.getArguments();
     std::cout << "Test msalign+ 0.1 " << std::endl;
 
-    std::map<std::string, std::string> arguments = getArgumentMap(argv[1], argv[2], argv[3], argv[4]);
+    //std::string exe_dir = prot::SystemInfo::getExeFilePath();//".";
+    std::string exe_dir = prot::getExeDir(argv[0]);
+    std::cout << "Exectutive directory is: " << exe_dir << std::endl;
+    prot::initBaseData(exe_dir);
+
     std::string db_file_name = arguments["databaseFileName"];
     std::string sp_file_name = arguments["spectrumFileName"];
 
-    std::string ori_db_file_name = argv[2];
+    std::string ori_db_file_name = arguments["oriDatabaseFileName"];
     if (arguments["searchType"] == "TARGET+DECOY") {
       prot::generateShuffleDb(ori_db_file_name, db_file_name);
     }

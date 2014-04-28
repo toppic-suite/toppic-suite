@@ -15,11 +15,15 @@ MAIN = $(BIN_DIR)/base
 #
 all:    $(MAIN)
 
-$(MAIN): $(OBJS) 
+$(MAIN): $(FILE_OBJS) $(OBJS)
 # $(CC) $(CPPFLAGS) $(INCLUDES) -o $(MAIN) $(OBJS) $(LFLAGS) $(LIBS)
+#
+$(FILE_OBJS): file_util.cpp
+	$(CC) -c $(FILECPPFLAGS) $(INCLUDES) file_util.cpp -o $@
 
 $(OBJ_DIR)/%.o: %.cpp
 	$(CC) -c $(CPPFLAGS) $(INCLUDES) $< -o $@
+
 
 clean:
 	$(RM) *~ $(MAIN) $(OBJS)

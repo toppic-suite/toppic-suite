@@ -1,8 +1,8 @@
 include ../var.mk
 
-TEST_OBJS = $(addprefix $(OBJ_DIR)/, test_console.o)
+TEST_OBJS = $(addprefix $(OBJ_DIR)/, argument.o test_console.o)
 
-OBJS = $(BASE_OBJS) $(SPEC_OBJS) $(PRSM_OBJS) $(ZERO_PTM_OBJS) $(FILTER_OBJS) $(PTM_OBJS) $(TDGF_OBJS) $(XPP_OBJS) $(TEST_OBJS)
+OBJS = $(BASE_OBJS) $(FILE_OBJS) $(SPEC_OBJS) $(PRSM_OBJS) $(ZERO_PTM_OBJS) $(FILTER_OBJS) $(PTM_OBJS) $(TDGF_OBJS) $(XPP_OBJS) $(TEST_OBJS)
 
 BIN_DIR = ../../bin
 
