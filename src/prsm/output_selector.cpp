@@ -31,7 +31,7 @@ OutputSelector::OutputSelector(std::map<std::string,std::string> &arguments,
   input_file_=input_file;
   output_file_ = output_file;
   cutoff_type_ = arguments["cutoffType"];
-  cutoff_value_ = atof(arguments["cutoff"].c_str());
+  cutoff_value_ = atof(arguments["cutoffValue"].c_str());
 }
 
 void OutputSelector::process(){
