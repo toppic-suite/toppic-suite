@@ -139,7 +139,6 @@ void XmlGenerator::process(){
         = readFastaToProteoform(mng_->database_file_, mng_->fix_mod_residue_list_);
   seq_ = raw_forms;
   std::string input_name = basename(mng_->spectrum_file_)+"."+input_file_;
-  std::cout << "input file " << input_name;
   PrSMPtrVec prsms = readPrsm(basename(mng_->spectrum_file_)+"."+input_file_,raw_forms);
 //  std::cout<<prsms[0]->getProteoformPtr()->getResSeqPtr()->toString()<<std::endl;
 

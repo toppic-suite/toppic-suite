@@ -40,6 +40,9 @@ class ViewMng {
     extend_sp_para_ptr_=ExtendSpParaPtr(new ExtendSpPara(extend_min_mass_, ext_offsets_));
     sp_para_ptr_= SpParaPtr(new SpPara(min_peak_num_, min_mass_, peak_tolerance_ptr_,
                                        extend_sp_para_ptr_, activation_ptr_));
+
+    html_path_ = prot::directory(arguments["spectrumFileName"])+"html/";
+    std::cout<<html_path_<<std::endl;
   }
   //std::map<std::string,std::string> arguments_;
   std::string spectrum_file_;
@@ -66,8 +69,8 @@ class ViewMng {
   double min_mass_ = 50.0;
   SpParaPtr sp_para_ptr_;
 
-  std::string html_path_=SystemInfo::getHtmlPath();
-  std::string xml_path_=SystemInfo::getXmlPath();
+  std::string html_path_="html/";
+  std::string xml_path_="xml/";
 
 };
 

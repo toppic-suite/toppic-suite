@@ -18,7 +18,7 @@ class Transformer {
  public:
   Transformer();
   virtual ~Transformer();
-  void trans();
+  void translate();
 };
 
 typedef std::shared_ptr<Transformer> TransformerPtr;

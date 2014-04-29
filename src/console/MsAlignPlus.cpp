@@ -12,6 +12,7 @@
 
 #include "base/command.hpp"
 #include "base/fasta_reader.hpp"
+#include "base/file_util.hpp"
 #include "prsm/prsm_writer.hpp"
 #include "prsm/prsm_combine.hpp"
 #include "prsm/prsm_selector.hpp"
@@ -30,6 +31,7 @@
 #include "xpp/transformer.hpp"
 #include "xpp/view_mng.hpp"
 #include "xpp/folder_file.hpp"
+#include "test/argument.hpp"
 
 using namespace prot;
 using namespace std;
@@ -65,191 +67,106 @@ void preProcess(map<string,string> arguments){
 
 void MsAlignPipeline(map<string,string> arguments){
 
-//  pre_process
-  preProcess(arguments);
-
-  prot::ZeroPtmMngPtr mng_ptr = prot::ZeroPtmMngPtr(new prot::ZeroPtmMng (arguments));
-  mng_ptr->output_file_ext_ = "ZERO_PTM_SEARCH";
-  prot::zeroPtmSearchProcess(mng_ptr);
-
-  PtmFastFilterMngPtr fast_filter_mng = PtmFastFilterMngPtr(new PtmFastFilterMng(arguments));
-  PtmFastFilterProcessorPtr processorb = PtmFastFilterProcessorPtr(new PtmFastFilterProcessor(fast_filter_mng));
-  processorb->process();
-
-  PtmMngPtr ptm_search_mng = PtmMngPtr(new PtmMng(arguments));
-  ptm_search_mng->input_file_ext_ ="_COMBINED";
-  ptm_search_mng->output_file_ext_="PTM_SEARCH_RESULT";
-  PtmProcessorPtr processor = PtmProcessorPtr(new PtmProcessor(ptm_search_mng));
-  processor->process();
-
-  std::vector<std::string> input_exts ;
-  input_exts.push_back("PTM_SEARCH_RESULT");
-  input_exts.push_back("ZERO_PTM_SEARCH");
-  PrSMCombinePtr combine = PrSMCombinePtr(new PrSMCombine(arguments,
-                                                          input_exts,
-                                                          "RAW_SEARCH_RESULT"));
-  combine->process();
-
-
-  prot::TdgfMngPtr tdgf_mng = prot::TdgfMngPtr(new prot::TdgfMng (arguments));
-  tdgf_mng->input_file_ext_ = "RAW_SEARCH_RESULT";
-  tdgf_mng->output_file_ext_ = "EVALUED_RESULT";
-  EValueProcessor evalue_processor(tdgf_mng);
-  evalue_processor.init();
-  /* compute E-value for a set of prsms each run */
-  evalue_processor.process(false);
-
-  if(arguments["searchType"].compare("TARGET+DECOY")==0){
-	PrSMSelector selector = PrSMSelector(arguments,
-	                                     "EVALUED_RESULT",
-	                                     "TOP",
-	                                     1);
-	selector.process();
-
-    prot::PrSMFdr fdr(arguments, "TOP", "TOP_RESULT");
-    fdr.process();
-  }
-  else{
-    PrSMSelector selector = PrSMSelector(arguments,
-                                       "EVALUED_RESULT",
-                                       "TOP_RESULT",
-                                       1);
-    selector.process();
-  }
-
-  OutputSelector output_selector = OutputSelector(arguments,
-                                                  "TOP_RESULT",
-                                                  "OUTPUT_RESULT");
-  output_selector.process();
-
-  TableWriterPtr table_out = TableWriterPtr(new TableWriter(arguments,"OUTPUT_RESULT","OUTPUT_TABLE"));
-  table_out->write();
+//  prot::ZeroPtmMngPtr mng_ptr = prot::ZeroPtmMngPtr(new prot::ZeroPtmMng (arguments));
+//  mng_ptr->output_file_ext_ = "ZERO_PTM_SEARCH";
+//  prot::zeroPtmSearchProcess(mng_ptr);
+//
+//  PtmFastFilterMngPtr fast_filter_mng = PtmFastFilterMngPtr(new PtmFastFilterMng(arguments));
+//  PtmFastFilterProcessorPtr processorb = PtmFastFilterProcessorPtr(new PtmFastFilterProcessor(fast_filter_mng));
+//  processorb->process();
+//
+//  PtmMngPtr ptm_search_mng = PtmMngPtr(new PtmMng(arguments));
+//  ptm_search_mng->input_file_ext_ ="_COMBINED";
+//  ptm_search_mng->output_file_ext_="PTM_SEARCH_RESULT";
+//  PtmProcessorPtr processor = PtmProcessorPtr(new PtmProcessor(ptm_search_mng));
+//  processor->process();
+//
+//  std::vector<std::string> input_exts ;
+//  input_exts.push_back("PTM_SEARCH_RESULT");
+//  input_exts.push_back("ZERO_PTM_SEARCH");
+//  PrSMCombinePtr combine = PrSMCombinePtr(new PrSMCombine(arguments,
+//                                                          input_exts,
+//                                                          "RAW_SEARCH_RESULT"));
+//  combine->process();
+//
+//
+//  prot::TdgfMngPtr tdgf_mng = prot::TdgfMngPtr(new prot::TdgfMng (arguments));
+//  tdgf_mng->input_file_ext_ = "RAW_SEARCH_RESULT";
+//  tdgf_mng->output_file_ext_ = "EVALUED_RESULT";
+//  EValueProcessor evalue_processor(tdgf_mng);
+//  evalue_processor.init();
+//  /* compute E-value for a set of prsms each run */
+//  evalue_processor.process(false);
+//
+//  if(arguments["searchType"].compare("TARGET+DECOY")==0){
+//	PrSMSelector selector = PrSMSelector(arguments,
+//	                                     "EVALUED_RESULT",
+//	                                     "TOP",
+//	                                     1);
+//	selector.process();
+//
+//    prot::PrSMFdr fdr(arguments, "TOP", "TOP_RESULT");
+//    fdr.process();
+//  }
+//  else{
+//    PrSMSelector selector = PrSMSelector(arguments,
+//                                       "EVALUED_RESULT",
+//                                       "TOP_RESULT",
+//                                       1);
+//    selector.process();
+//  }
+//
+//  OutputSelector output_selector = OutputSelector(arguments,
+//                                                  "TOP_RESULT",
+//                                                  "OUTPUT_RESULT");
+//  output_selector.process();
+//
+//  TableWriterPtr table_out = TableWriterPtr(new TableWriter(arguments,"OUTPUT_RESULT","OUTPUT_TABLE"));
+//  table_out->write();
 
 
-//  createFolder("xml/species");
-//  createFolder("xml/prsms");
-//  createFolder("xml/proteins");
+  createFolder("xml/species");
+  createFolder("xml/prsms");
+  createFolder("xml/proteins");
   XmlGenerator xml_gene = XmlGenerator(arguments,"OUTPUT_RESULT");
   xml_gene.process();
 
-//  createFolder("html/species");
-//  createFolder("html/prsms");
-//  createFolder("html/proteins");
-//  copyFile("etc/FreeMono.ttf","html/FreeMono.ttf",true);
-//  copyFile("etc/sorttable.js","html/sorttable.js",true);
+  createFolder(prot::directory(arguments["spectrumFileName"])+"html/species");
+  createFolder(prot::directory(arguments["spectrumFileName"])+"html/prsms");
+  createFolder(prot::directory(arguments["spectrumFileName"])+"html/proteins");
+  copyFile("etc/FreeMono.ttf",prot::directory(arguments["spectrumFileName"])+"html/FreeMono.ttf",true);
+  copyFile("etc/sorttable.js",prot::directory(arguments["spectrumFileName"])+"html/sorttable.js",true);
 
-    TransformerPtr trans = TransformerPtr(new Transformer());
-    trans->trans();
+  TransformerPtr trans = TransformerPtr(new Transformer());
+  trans->translate();
 
 }
 
 int main(int argc, char* argv[]){
-//  std::cout<<argv[0]<<std::endl;
-  cmdPtr cmd = cmdPtr(new command());
-  SystemInfo::initSystemInfo(argv[0]);
+	prot::Argument argu_processor;
+	bool success = argu_processor.parse(argc, argv);
+	if (!success) {
+		return 1;
+	}
+	std::map<std::string, std::string> arguments =
+			argu_processor.getArguments();
 
-  initBaseData();
+	std::string exe_dir = prot::getExeDir(argv[0]);
+	std::cout << "Exectutive directory is: " << exe_dir << std::endl;
+	prot::initBaseData(exe_dir);
 
-  cmd->setArgumentsWithConfigFile(SystemInfo::getExeFilePath()+"/conf/arguments.xml");
+	std::string ori_db_file_name = arguments["oriDatabaseFileName"];
+	std::string db_file_name= arguments["databaseFileName"];
+	if (arguments["searchType"] == "TARGET+DECOY") {
+	  prot::generateShuffleDb(ori_db_file_name, db_file_name);
+	}
 
-  for(int i=1;i<argc;i++){
-    int flag=0;
-    std::string command = argv[i];
-    std::vector<std::string> command_array = prot::split(command,'=');
-    if(command_array[0].compare("-i")==0){
-      flag = cmd->setCommandValue(command_array[0],argv[i+1]);
-      cmd->setArgumentsWithConfigFile(argv[i+1]);
-    }
-    if(command_array[0].compare("--arguments-filename")==0){
-      flag = cmd->setCommandValue(command_array[0],command_array[1]);
-      cmd->setArgumentsWithConfigFile(command_array[1]);
-    }
-    if(flag==-1){
-      return -1;
-    }
-  }
-    string spliter_cpp = "=";
-      for(int i=1;i<argc;i++){
-          string command = argv[i];
-          if (i == 1  && (command.compare("--help") == 0 || command.compare("-h") == 0)) {
-              showCommondList();
-          }
-          else if(command.length()==2){
-            cmd->setCommandValue(command,argv[i+1]);
-            i++;
-          }
-          else{
-            std::vector<std::string> command_array = prot::split(command,'=');
-            if(command_array.size()>2){
-              LOG_ERROR("argument error,may be it contains too much '='");
-              return -1;
-            }
-            if(command_array.size()==2){
-              int reuslt = cmd->setCommandValue(command_array[0],command_array[1]);
-              if(reuslt == -1){
-                return -1;
-              }
-            }
-          }
-      }
+	std::cout<<arguments["databaseFileName"]<<std::endl;
 
-//        std::cout<<cmd->getArgument()["argumentFileName"]<<endl;
-//        std::cout<<cmd->getArgument()["configuration"]<<endl;
-//        std::cout<<cmd->getArgument()["databaseFileName"] <<endl;
-//        std::cout<<cmd->getArgument()["spectrumFileName"]<<endl;
-//        std::cout<<cmd->getArgument()["activation"] <<endl;
-//        std::cout<<cmd->getArgument()["searchType"] <<endl;
-//        std::cout<<cmd->getArgument()["cysteineProtection"]<<endl;
-//        std::cout<<cmd->getArgument()["shiftNumber"] <<endl;
-//        std::cout<<cmd->getArgument()["errorTolerance"] <<endl;
-//        std::cout<<cmd->getArgument()["cutoffType"] <<endl;
-//        std::cout<<cmd->getArgument()["cutoff"]<<endl;
-//        std::cout<<cmd->getArgument()["allProtMode"] <<endl;
+	arguments["databaseFileName"]="in/prot.fasta";
+	arguments["spectrumFileName"]="in/spectra.msalign";
 
-
-        std::cout<<SystemInfo::getExeFilePath()<<std::endl;
-
-        std::cout<<directory(cmd->getArgument()["spectrumFileName"])<<std::endl;
-
-        std::string xml_path=SystemInfo::getExeFilePath()+"/xml/";
-        std::string html_path=directory(cmd->getArgument()["spectrumFileName"])+"html/";
-
-        SystemInfo::setXmlPath(xml_path);
-        SystemInfo::setHtmlPath(html_path);
-
-        std::cout<<"cp "+SystemInfo::getXmlPath()<<std::endl;
-
-        if(SystemInfo::getOSString().compare("uni")==0){
-          runCommand("mkdir -p "+xml_path);
-          runCommand("mkdir -p "+xml_path+"species");
-          runCommand("mkdir -p "+xml_path+"prsms");
-          runCommand("mkdir -p "+xml_path+"proteins");
-
-          runCommand("mkdir -p "+html_path);
-          runCommand("mkdir -p "+html_path+"species");
-          runCommand("mkdir -p "+html_path+"prsms");
-          runCommand("mkdir -p "+html_path+"proteins");
-
-          runCommand("cp "+SystemInfo::getExeFilePath()+"/etc/*.* "+html_path);
-        }
-        else{
-          runCommand("md " + xml_path);
-          runCommand("md " + xml_path + "species");
-          runCommand("md " + xml_path + "prsms");
-          runCommand("md " + xml_path + "proteins");
-
-          runCommand("md " + html_path);
-          runCommand("md " + html_path + "species");
-          runCommand("md " + html_path + "prsms");
-          runCommand("md " + html_path + "proteins");
-
-          runCommand("copy " + SystemInfo::getExeFilePath() + "/etc/*.* " + html_path);
-        }
-
-
-
-
-//      MsAlignPipeline(cmd->getArgument());
+     MsAlignPipeline(arguments);
 
       return 0;
 }

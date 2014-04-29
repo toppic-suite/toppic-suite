@@ -19,15 +19,18 @@ Transformer::~Transformer() {
 }
 
 
-void Transformer::trans(){
+void Transformer::translate(){
+	std::cout<<"trans start!"<<std::endl;
   xercesc::XMLPlatformUtils::Initialize();
+  std::cout<<"trans start 0!"<<std::endl;
   xalanc::XalanTransformer::initialize();
+  std::cout<<"trans start 1!"<<std::endl;
   xalanc::XalanTransformer theXanlanTransformer;
 
-  std::string xml_file_list = prot::SystemInfo::getXmlPath()+"files.xml";
+  std::string xml_file_list = "xml/files.xml";
   std::vector<std::vector<std::string>> anno_view = prot::readFiles(xml_file_list);
   for(unsigned int i=0;i<anno_view.size();i++){
-
+	  std::cout<<anno_view[i][0]<<std::endl;
     const char* xml_in = anno_view[i][0].c_str();
     const char* xsl_in = anno_view[i][1].c_str();
     const char* xml_out = anno_view[i][2].c_str();
