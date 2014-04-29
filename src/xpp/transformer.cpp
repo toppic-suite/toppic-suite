@@ -20,11 +20,11 @@ Transformer::~Transformer() {
 
 
 void Transformer::translate(){
-	std::cout<<"trans start!"<<std::endl;
+	std::cout<<"trans start!XMLPlatformUtils::Initialize()"<<std::endl;
   xercesc::XMLPlatformUtils::Initialize();
-  std::cout<<"trans start 0!"<<std::endl;
+  std::cout<<"trans start! XalanTransformer::initialize()"<<std::endl;
   xalanc::XalanTransformer::initialize();
-  std::cout<<"trans start 1!"<<std::endl;
+  std::cout<<"trans start ! XalanTransformer"<<std::endl;
   xalanc::XalanTransformer theXanlanTransformer;
 
   std::string xml_file_list = "xml/files.xml";

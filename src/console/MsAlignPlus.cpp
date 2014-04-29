@@ -152,7 +152,6 @@ int main(int argc, char* argv[]){
 			argu_processor.getArguments();
 
 	std::string exe_dir = prot::getExeDir(argv[0]);
-	std::cout << "Exectutive directory is: " << exe_dir << std::endl;
 	prot::initBaseData(exe_dir);
 
 	std::string ori_db_file_name = arguments["oriDatabaseFileName"];
