@@ -51,6 +51,12 @@
                             document.getElementById('peak' + s[i]).style.background  =  "yellow";
                         }
                     }
+		    function changePosition(){
+                     var s = document.getElementsByName("0")
+
+		     
+
+                    }
 
                 </script>
                 <style>
@@ -89,7 +95,7 @@
                     }
                 </style>
             </head>
-            <body>
+            <body onload="changePosition()">
                 <xsl:call-template name="navigation"/>
 
                 <h2>Protein-Spectrum-Match for Spectrum #<xsl:value-of select="ms/ms_header/id"/>
@@ -216,8 +222,10 @@
 
     <xsl:template match="annotated_protein/annotation" mode="prsm">
         <div id="alignment" style="font-family: 'FreeMono', Miltonian, monospace; font-size:16;line-height:2.5;background-color:#FFF">
+<!--table width="750" bolder="1px" bodercolor="red" cellspacing="1px" cellpadding="1px"-->
+<table border="0"  cellspacing="0px" cellpadding="0px">
             <xsl:apply-templates select="character" mode="prsm"/>
-            
+</table>            
             <xsl:if test="../db_acid_number > ../last_residue_position">
               <br/>
               ignore acids first:<xsl:value-of select="floor(../first_residue_position div 30)*30"/>; end:<xsl:value-of select="../db_acid_number - ../last_residue_position"/>
@@ -235,12 +243,12 @@
     <xsl:template match="character" mode="prsm">
         <xsl:variable name="seq_shown_start" select="floor(../../first_residue_position div 30)*30"/>
         <xsl:variable name="seq_shown_end" select="floor(../../last_residue_position div 30)*30+30"/>
-
+        
         <xsl:if test="type = 'cleavage' and position >= $seq_shown_start and $seq_shown_end >= position">
             <xsl:choose>
                 <xsl:when test="position mod 30 = 0 and position =  $seq_shown_start">
                     <xsl:if test="position = $seq_shown_start">
-                    <br/>
+                    <xsl:text disable-output-escaping="yes"><![CDATA[<tr><td colspan="65" height="20px">&nbsp;<td></tr><tr><td colspan="65" height="20px">&nbsp;<td></tr><tr height="20px"><td width="40px">]]></xsl:text>
 	            <xsl:choose>
                     <xsl:when test="position > 10000">
                     <xsl:value-of select="position+1"/><xsl:text> </xsl:text>
@@ -262,6 +270,7 @@
                     <xsl:value-of select="position+1"/><xsl:text> </xsl:text>
                     </xsl:when>
                     </xsl:choose>
+                    <xsl:text disable-output-escaping="yes"><![CDATA[</td>]]></xsl:text>
                     </xsl:if>
 
                     <!--xsl:if test="shift_no_letter = 0">
@@ -303,6 +312,7 @@
             </xsl:choose>
             <xsl:choose>
                 <xsl:when test="cleavage_type = 'species'">
+<xsl:text disable-output-escaping="yes"><![CDATA[<td width="8px"  >]]></xsl:text>
                     <a style="text-decoration:none" href="#">
                         <xsl:attribute name="onclick">
                             showIonPeaks('<xsl:apply-templates select="matched_peaks" mode="prsm"/>')
@@ -338,11 +348,13 @@
                             </xsl:choose>
                         </span>
                     </a>
+<xsl:text disable-output-escaping="yes"><![CDATA[</td>]]></xsl:text>
                 </xsl:when>
                 <xsl:when test="cleavage_type = 'unexpected_shift'">
                     <!--span style ="color:black; background:#F6CECE">
                         <xsl:text> </xsl:text>
                     </span-->
+<!--xsl:text disable-output-escaping="yes"><![CDATA[<td width="8px"  >]]></xsl:text-->
                     <a style="text-decoration:none" href="#">
                          <xsl:attribute name="onclick">
                             showIonPeaks('<xsl:apply-templates select="matched_peaks" mode="prsm"/>')
@@ -352,16 +364,20 @@
                                 <xsl:when test="exist_n_ion = '0' and exist_c_ion = '0'">
                                     <xsl:choose>
                                       <xsl:when test="cleavage_trunc = ']'">
+<xsl:text disable-output-escaping="yes"><![CDATA[<td width="8px"  >]]></xsl:text>
                                         <span style ="color:red;">
                                         <xsl:text>]</xsl:text>
                                         </span>
+<!--xsl:text disable-output-escaping="yes"><![CDATA[</td>]]></xsl:text-->
                                       </xsl:when>
                                       <xsl:when test="cleavage_trunc = '['">
+<xsl:text disable-output-escaping="yes"><![CDATA[<td width="8px"  >]]></xsl:text>
                                         <span style ="color:red;">
                                         <xsl:text>[</xsl:text>
                                         </span>
                                       </xsl:when>
                                       <xsl:otherwise>
+<xsl:text disable-output-escaping="yes"><![CDATA[<td width="8px"  bgcolor="#F6CECE">]]></xsl:text>
                                        <span style ="color:black; background:#F6CECE">
                                         <xsl:text> </xsl:text>
                                        </span>
@@ -370,11 +386,13 @@
                                 </xsl:when>
                                 <xsl:when test="exist_n_ion = '1' and exist_c_ion = '0'">
                                   <xsl:if test="shift_no_letter = 0">
+<xsl:text disable-output-escaping="yes"><![CDATA[<td width="8px">]]></xsl:text>
                                   <span style ="color:black;">
                                     <xsl:text disable-output-escaping="yes">&amp;#x23AB;</xsl:text>
                                   </span>
                                   </xsl:if>
                                   <xsl:if test="shift_no_letter != 0">
+<xsl:text disable-output-escaping="yes"><![CDATA[<td width="8px" bgcolor="#F6CECE">]]></xsl:text>
                                   <span style ="color:black;background:#F6CECE">
                                     <xsl:text disable-output-escaping="yes">&amp;#x23AB;</xsl:text>
                                   </span>
@@ -382,11 +400,13 @@
                                 </xsl:when>
                                 <xsl:when test="exist_n_ion = '0' and exist_c_ion = '1'">
                                   <xsl:if test="shift_no_letter = 0">
+<xsl:text disable-output-escaping="yes"><![CDATA[<td width="8px">]]></xsl:text>
                                    <span style ="color:black; ">
                                     <xsl:text disable-output-escaping="yes">&amp;#x23A9;</xsl:text>
                                    </span>
                                   </xsl:if>
                                   <xsl:if test="shift_no_letter != 0">
+<xsl:text disable-output-escaping="yes"><![CDATA[<td width="8px" bgcolor="#F6CECE">]]></xsl:text>
                                    <span style ="color:black; background:#F6CECE">
                                     <xsl:text disable-output-escaping="yes">&amp;#x23A9;</xsl:text>
                                    </span>
@@ -394,11 +414,13 @@
                                 </xsl:when>
                                 <xsl:when test="exist_n_ion = '1' and exist_c_ion = '1'">
                                   <xsl:if test="shift_no_letter = 0">
+<xsl:text disable-output-escaping="yes"><![CDATA[<td width="8px">]]></xsl:text>
                                    <span style ="color:black;">
                                     <xsl:text disable-output-escaping="yes">&amp;#x23B1;</xsl:text>
                                    </span>
                                   </xsl:if>
                                   <xsl:if test="shift_no_letter != 0">
+<xsl:text disable-output-escaping="yes"><![CDATA[<td width="8px" bgcolor="#F6CECE">]]></xsl:text>
                                    <span style ="color:black;background:#F6CECE">
                                     <xsl:text disable-output-escaping="yes">&amp;#x23B1;</xsl:text>
                                    </span>
@@ -408,28 +430,29 @@
                             <xsl:if test="shift_no_letter != 0">
                             <xsl:choose>
                             <xsl:when  test="display_position = '0'">
-                                <span  style="position: relative;">
-                                    <span style="position: absolute; left:-6pt; top:-24px; font-size: 8pt; color:red; text-decoration:none;">
+<div style="position: relative;">
+                                    <div style="position: absolute; top:-25px; font-size: 8pt; color:red; text-decoration:none;">
                                         <xsl:value-of select="shift_no_letter"/>
-                                    </span>
-                                </span>
+                                    </div>
+</div>
                             </xsl:when>
                             <xsl:when  test="display_position = '1'">
-                                <span  style="position: relative;">
-                                    <span style="position: absolute; left:-6pt; top:-32px; font-size: 8pt; color:red; text-decoration:none;">
+<div style="position: relative;">
+                                    <div style="position: absolute; top:-45px; font-size: 8pt; color:red; text-decoration:none;">
                                         <xsl:value-of select="shift_no_letter"/>
-                                    </span>
-                                </span>
+                                    </div>
+</div>
                             </xsl:when>
                             </xsl:choose>
                             </xsl:if>
-                        
+<xsl:text disable-output-escaping="yes"><![CDATA[</td>]]></xsl:text>
                     </a>
                 </xsl:when>
                 <xsl:when test="cleavage_type = 'expected_shift'">
                     <!--span style ="color:black;">
                         <xsl:text> </xsl:text>
                     </span-->
+<xsl:text disable-output-escaping="yes"><![CDATA[<td width="8px"  >]]></xsl:text>
                     <a style="text-decoration:none" href="#">
                          <xsl:attribute name="onclick">
                             showIonPeaks('<xsl:apply-templates select="matched_peaks" mode="prsm"/>')
@@ -473,8 +496,10 @@
                             </xsl:choose>
                         
                     </a>
+<xsl:text disable-output-escaping="yes"><![CDATA[</td>]]></xsl:text>
                 </xsl:when>
                 <xsl:when test="cleavage_type = 'n_truncation' or cleavage_type = 'c_truncation'">
+<xsl:text disable-output-escaping="yes"><![CDATA[<td width="8px"  >]]></xsl:text>
                             <xsl:choose>
                                 <xsl:when test="exist_n_ion = '0' and exist_c_ion = '0'">
                                     <xsl:choose>
@@ -496,6 +521,7 @@
                                     </xsl:choose>
                                 </xsl:when>
                             </xsl:choose>
+<xsl:text disable-output-escaping="yes"><![CDATA[</td>]]></xsl:text>
                 </xsl:when>
 
             </xsl:choose>
@@ -507,11 +533,11 @@
                     <xsl:text>1 </xsl:text>
                     </xsl:if-->
                     <xsl:if test="position > $seq_shown_start+1">
-                    <xsl:text disable-output-escaping="yes"><![CDATA[&nbsp;]]></xsl:text>
+                    <xsl:text disable-output-escaping="yes"><![CDATA[<td>&nbsp;]]></xsl:text>
                     <xsl:value-of select="position"/>
-                    <xsl:text disable-output-escaping="yes"><![CDATA[<br/>]]></xsl:text>
+                    <xsl:text disable-output-escaping="yes"><![CDATA[</td></tr>]]></xsl:text>
 		          <xsl:if test="$seq_shown_end != position">
-		            <br/>
+		            <xsl:text disable-output-escaping="yes"><![CDATA[<tr><td colspan="65" height="20px">&nbsp;</td></tr><tr><td colspan="65" height="20px">&nbsp;</td></tr><tr height="20px"><td width="40px">]]></xsl:text>
 		            <xsl:choose>
 		            <xsl:when test="position > 10000">
 		            <xsl:value-of select="position + 1"/><xsl:text> </xsl:text>
@@ -529,74 +555,91 @@
 		            <xsl:value-of select="position + 1"/><xsl:text> </xsl:text>
 		            </xsl:when>
 		            </xsl:choose>
+                            <xsl:text disable-output-escaping="yes"><![CDATA[</td><td widht="8px" >&nbsp;</td>]]></xsl:text>
 		          </xsl:if>
                     </xsl:if>
                 </xsl:when>
                 <xsl:when test="position > 0 and position mod 10 = 0 and cleavage_type = 'truncation'">
+<xsl:text disable-output-escaping="yes"><![CDATA[<td width="16px" >]]></xsl:text>
                     <span style ="color:black">
                     <xsl:text disable-output-escaping="yes">&amp;nbsp;&amp;nbsp;</xsl:text>
                     </span>
+<xsl:text disable-output-escaping="yes"><![CDATA[</td>]]></xsl:text>
                 </xsl:when>
                 <xsl:when test="position > 0 and position mod 10 = 0 and cleavage_type != 'unexpected_shift' and cleavage_type != 'expected_shift'">
+<xsl:text disable-output-escaping="yes"><![CDATA[<td width="16px" >]]></xsl:text>
                     <span style ="color:black;">
                     <xsl:text disable-output-escaping="yes">&amp;nbsp;&amp;nbsp;</xsl:text>
                     </span>
+<xsl:text disable-output-escaping="yes"><![CDATA[</td>]]></xsl:text>
                 </xsl:when>
                 <xsl:when test="position > 0 and position mod 10 = 0 and cleavage_type != 'unexpected_shift'">
+<xsl:text disable-output-escaping="yes"><![CDATA[<td width="16px" >]]></xsl:text>
                     <span style ="color:black;">
                     <xsl:text disable-output-escaping="yes">&amp;nbsp;&amp;nbsp;</xsl:text>
                     </span>
+<xsl:text disable-output-escaping="yes"><![CDATA[</td>]]></xsl:text>
                 </xsl:when>
                 <xsl:when test="position > 0 and position mod 10 = 0 and cleavage_type != 'expected_shift'">
+<xsl:text disable-output-escaping="yes"><![CDATA[<td width="16px" bgcolor="#F6CECE">]]></xsl:text>
                     <span style ="color:black; background:#F6CECE">
                     <xsl:text disable-output-escaping="yes">&amp;nbsp;&amp;nbsp;</xsl:text>
                     </span>
+<xsl:text disable-output-escaping="yes"><![CDATA[</td>]]></xsl:text>
                 </xsl:when>
             </xsl:choose>
         </xsl:if>
         <xsl:if test="type = 'residue' and position >= $seq_shown_start and $seq_shown_end > position">
             <xsl:choose>
                 <xsl:when test="residue_type = 'n_trunc'">
+<xsl:text disable-output-escaping="yes"><![CDATA[<td width="8px" >]]></xsl:text>
                     <span style ="color:gray">
                         <xsl:value-of select="acid"/>
                     </span>
+<xsl:text disable-output-escaping="yes"><![CDATA[</td>]]></xsl:text>
                 </xsl:when>
                 <xsl:when test="residue_type = 'c_trunc'">
+<xsl:text disable-output-escaping="yes"><![CDATA[<td width="8px" >]]></xsl:text>
                     <span style ="color:gray">
                         <xsl:value-of select="acid"/>
                     </span>
+<xsl:text disable-output-escaping="yes"><![CDATA[</td>]]></xsl:text>
                 </xsl:when>
                 <xsl:when test="residue_type = 'unexpected_shift'">
-                    <xsl:if test="is_modification = '1'">
-                        <xsl:choose>
-                            <xsl:when  test="display_position = '0'">
-                                <span  style="position: relative;">
-                                    <span style="position: absolute; top:-32px; font-size: 8pt; color:red; text-decoration:none;">
-                                        <xsl:value-of select="shift"/>
-                                    </span>
-                                </span>
-                            </xsl:when>
-                            <xsl:when  test="display_position = '1'">
-                                <span  style="position: relative;">
-                                    <span style="position: absolute; top:-48px; font-size: 8pt; color:red; text-decoration:none;">
-                                        <xsl:value-of select="shift"/>
-                                    </span>
-                                </span>
-                            </xsl:when>
-                        </xsl:choose>
-                    </xsl:if>
+<xsl:text disable-output-escaping="yes"><![CDATA[<td width="8px" bgcolor="#F6CECE" >]]></xsl:text>
+                    
                     <xsl:choose>
                         <xsl:when  test="is_expected = '0'">
-                        <span style ="color:black; background:#F6CECE">
+                        <span style ="color:black; background:#F6CECE; position: relative;">
                             <xsl:value-of select="acid"/>
                         </span>
                         </xsl:when>
                         <xsl:when  test="is_expected = '1'">
-                        <span style ="color:{shift_style}; background:#F6CECE">
+                        <span style ="color:{shift_style}; background:#F6CECE; position: relative;">
                             <xsl:value-of select="acid"/>
                         </span>
                         </xsl:when>
                     </xsl:choose>
+
+                    <xsl:if test="is_modification = '1'">
+                        <xsl:choose>
+                            <xsl:when  test="display_position = '0'">
+<div style="position: relative;">
+                                    <div style="position: absolute; top:-36px;left:-8px; font-size: 8pt; color:red; text-decoration:none;">
+                                        <xsl:value-of select="shift"/>
+                                    </div>
+</div>
+                            </xsl:when>
+                            <xsl:when  test="display_position = '1'">
+<div style="position: relative;">
+                                    <div id="{floor(position div 30)}" shift="{display_position}" style="position: absolute; top:-56px; font-size: 8pt; color:red; text-decoration:none;">
+                                        <xsl:value-of select="shift"/>
+                                    </div>
+</div>
+                            </xsl:when>
+                        </xsl:choose>
+                    </xsl:if>
+<xsl:text disable-output-escaping="yes"><![CDATA[</td>]]></xsl:text>
                 </xsl:when>
                 <xsl:when test="residue_type = 'expected_shift' or is_expected = '1'">
                     <!--xsl:if test="is_modification = '2'">
@@ -617,19 +660,22 @@
                             </xsl:when>
                         </xsl:choose>
                     </xsl:if-->
+<xsl:text disable-output-escaping="yes"><![CDATA[<td width="8px" >]]></xsl:text>
                     <span style ="color:{shift_style};">
                         <xsl:value-of select="acid"/>
                     </span>
-                </xsl:when>
+<xsl:text disable-output-escaping="yes"><![CDATA[</td>]]></xsl:text>
+               </xsl:when>
                 <xsl:when test="residue_type = 'normal'">
+<xsl:text disable-output-escaping="yes"><![CDATA[<td width="8px" >]]></xsl:text>
                     <span style ="color:black; ">
                         <xsl:value-of select="acid"/>
                     </span>
-                </xsl:when>
+<xsl:text disable-output-escaping="yes"><![CDATA[</td>]]></xsl:text>
+               </xsl:when>
 
             </xsl:choose>
         </xsl:if>
-
     </xsl:template>
 
 <xsl:template match="shift_list" mode="prsm">
@@ -728,3 +774,4 @@
         </tr>
     </xsl:template>
 </xsl:stylesheet>
+
