@@ -41,7 +41,7 @@ namespace prot {
 #else 
 
 //windows
-  std::string getExeDir(const std::string &argv_0) {
+  std::string getExecutiveDir(const std::string &argv_0) {
     fs::path full_path;
     full_path = fs::system_complete( fs::path(argv_0));
 
