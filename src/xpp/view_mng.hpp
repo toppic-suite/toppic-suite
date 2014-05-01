@@ -12,14 +12,15 @@
 #include <algorithm>
 #include <map>
 #include "base/command.hpp"
+#include "base/file_util.hpp"
 
 namespace prot {
 
 class ViewMng {
  public:
   ViewMng(std::map<std::string,std::string> arguments) {
-    spectrum_file_ = arguments["spectrumFileName"];
-    database_file_=arguments["databaseFileName"];
+    spectrum_file_name_ = arguments["spectrumFileName"];
+    database_file_name_ =arguments["databaseFileName"];
 
     fix_mod_residue_list_ = FixResidueFactory::getFixResiduePtrVec(arguments["cysteineProtection"]);
 
@@ -41,12 +42,14 @@ class ViewMng {
     sp_para_ptr_= SpParaPtr(new SpPara(min_peak_num_, min_mass_, peak_tolerance_ptr_,
                                        extend_sp_para_ptr_, activation_ptr_));
 
-    html_path_ = prot::directory(arguments["spectrumFileName"])+"html/";
-    std::cout<<html_path_<<std::endl;
+    xml_path_ = basename(spectrum_file_name_) + "_xml";
+    html_path_ = basename(spectrum_file_name_) + "_html";
+    executive_dir_ = arguments["executiveDir"];
   }
+
   //std::map<std::string,std::string> arguments_;
-  std::string spectrum_file_;
-  std::string database_file_;
+  std::string spectrum_file_name_;
+  std::string database_file_name_;
 
   ResiduePtrVec fix_mod_residue_list_;
   ProtModPtrVec allow_prot_mod_list_;
@@ -69,9 +72,9 @@ class ViewMng {
   double min_mass_ = 50.0;
   SpParaPtr sp_para_ptr_;
 
-  std::string html_path_="html/";
-  std::string xml_path_="xml/";
-
+  std::string html_path_;
+  std::string xml_path_;
+  std::string executive_dir_;
 };
 
 typedef std::shared_ptr<ViewMng> ViewMngPtr;

@@ -9,18 +9,16 @@
 #define TRANSFORMER_HPP_
 
 #include <memory>
+#include <map>
+#include <string>
 #include <xalanc/Include/PlatformDefinitions.hpp>
 #include <xercesc/util/PlatformUtils.hpp>
 #include <xalanc/XalanTransformer/XalanTransformer.hpp>
 
+namespace prot {
 
-class Transformer {
- public:
-  Transformer();
-  virtual ~Transformer();
-  void translate();
-};
+void translate(std::map<std::string,std::string> arguments);
 
-typedef std::shared_ptr<Transformer> TransformerPtr;
+}
 
 #endif /* TRANSFORMER_HPP_ */

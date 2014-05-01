@@ -1,4 +1,3 @@
-
 #include "spec/deconv_peak.hpp"
 
 namespace prot {

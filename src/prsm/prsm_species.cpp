@@ -3,6 +3,7 @@
  */
 
 #include "base/species.hpp"
+#include "base/file_util.hpp"
 #include "prsm/prsm_species.hpp"
 
 namespace prot {

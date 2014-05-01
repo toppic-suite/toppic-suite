@@ -40,6 +40,7 @@ inline std::vector<std::string> split(const std::string &s, char delim) {
   return elems;
 }
 
+/*
 inline std::string basename(const std::string &s) {
   unsigned int dot_pos = s.find_last_of(".");
   if (dot_pos < s.length()) {
@@ -60,6 +61,7 @@ inline std::string directory(const std::string &s) {
   LOG_ERROR("Error in parse directory.")    
   return s;
 }
+*/
 
 }
 #endif

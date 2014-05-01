@@ -1,7 +1,6 @@
 #include <iostream>
 
 #include "base/base_data.hpp"
-#include "base/file_util.hpp"
 #include "base/fasta_reader.hpp"
 
 #include "prsm/prsm_combine.hpp"
@@ -24,8 +23,8 @@
 #include "tdgf/tdgf_mng.hpp"
 
 #include "xpp/xml_generator.hpp"
+#include "xpp/transformer.hpp"
 #include "test/argument.hpp"
-//#include "xpp/transformer.hpp"
 
 int main(int argc, char* argv[]) {
   try {
@@ -35,10 +34,9 @@ int main(int argc, char* argv[]) {
       return 1;
     }
     std::map<std::string, std::string> arguments = argu_processor.getArguments();
-    std::cout << "Test msalign+ 0.1 " << std::endl;
+    std::cout << "TopId 0.5 " << std::endl;
 
-    //std::string exe_dir = prot::SystemInfo::getExeFilePath();//".";
-    std::string exe_dir = prot::getExeDir(argv[0]);
+    std::string exe_dir = arguments["executiveDir"];
     std::cout << "Exectutive directory is: " << exe_dir << std::endl;
     prot::initBaseData(exe_dir);
 
@@ -50,14 +48,14 @@ int main(int argc, char* argv[]) {
       prot::generateShuffleDb(ori_db_file_name, db_file_name);
     }
 
-    std::cout << "Zero ptm search 0.1 " << std::endl;
+    std::cout << "Zero ptm search " << std::endl;
     prot::ZeroPtmMngPtr zero_mng_ptr
         = prot::ZeroPtmMngPtr(new prot::ZeroPtmMng (arguments));
     zero_mng_ptr->output_file_ext_ = "ZERO";
     prot::zeroPtmSearchProcess(zero_mng_ptr);
 
 
-    std::cout << "Fast filter 0.1 " << std::endl;
+    std::cout << "Fast filter " << std::endl;
     prot::PtmFastFilterMngPtr filter_mng_ptr 
         = prot::PtmFastFilterMngPtr(new prot::PtmFastFilterMng(arguments));
     filter_mng_ptr->output_file_ext_ = "FILTER";
@@ -65,7 +63,7 @@ int main(int argc, char* argv[]) {
     filter_processor.process();
 
 
-    std::cout << "Ptm alignment 0.1 " << std::endl;
+    std::cout << "Ptm alignment " << std::endl;
     prot::PtmMngPtr ptm_mng_ptr 
         = prot::PtmMngPtr(new prot::PtmMng(arguments));
     ptm_mng_ptr->input_file_ext_ = "FILTER_COMBINED";
@@ -81,7 +79,7 @@ int main(int argc, char* argv[]) {
                                         input_exts, "RAW_RESULT");
     combine_processor.process();
 
-    std::cout << "EValueConsole 0.1 " << std::endl;
+    std::cout << "E-value computation " << std::endl;
     prot::TdgfMngPtr tdgf_mng_ptr = 
         prot::TdgfMngPtr(new prot::TdgfMng (arguments));
     tdgf_mng_ptr->input_file_ext_="RAW_RESULT";
@@ -92,26 +90,26 @@ int main(int argc, char* argv[]) {
     processor.process(false);
 
     if (arguments["searchType"]=="TARGET") { 
-      std::cout << "Top selector 0.1 " << std::endl;
+      std::cout << "Top selector " << std::endl;
       int n_top;
       std::istringstream (arguments["numOfTopPrsms"]) >> n_top;
       prot::PrSMSelector selector(db_file_name, sp_file_name, "EVALUE", "TOP", n_top);
       selector.process();
     }
     else {
-      std::cout << "Top selector 0.1 " << std::endl;
+      std::cout << "Top selector " << std::endl;
       int n_top;
       std::istringstream (arguments["numOfTopPrsms"]) >> n_top;
-      std::cout << "argument " << arguments["numOfTopPrsms"] << " n top " << n_top << std::endl;
+      //std::cout << "argument " << arguments["numOfTopPrsms"] << " n top " << n_top << std::endl;
       prot::PrSMSelector selector(db_file_name, sp_file_name, "EVALUE", "TOP_PRE", n_top);
       selector.process();
 
-      std::cout << "FDR selector 0.1 " << std::endl;
+      std::cout << "FDR computation " << std::endl;
       prot::PrSMFdr fdr(db_file_name, sp_file_name, "TOP_PRE", "TOP");
       fdr.process();
     }
 
-    std::cout << "Cutoff selector 0.1 " << std::endl;
+    std::cout << "Cutoff selector " << std::endl;
     std::string cutoff_type = arguments["cutoffValue"];
     double cutoff_value;
     std::istringstream (arguments["cutoffValue"]) >> cutoff_value;
@@ -119,7 +117,7 @@ int main(int argc, char* argv[]) {
                                          cutoff_type, cutoff_value);
     output_selector.process();
 
-    std::cout << "Set species 0.1 " << std::endl;
+    std::cout << "Find species " << std::endl;
     double ppo;
     std::istringstream (arguments["error_tolerance"]) >> ppo;
     ppo = ppo /1000000.0;
@@ -127,19 +125,18 @@ int main(int argc, char* argv[]) {
                                    "OUTPUT_RESULT", ppo);
     prsm_species.process();
 
-    std::cout << "Table output 0.1" << std::endl;
+    std::cout << "Table output " << std::endl;
     prot::TableWriter table_out(db_file_name, sp_file_name, "OUTPUT_RESULT",
                                 "OUTPUT_TABLE");
     table_out.write();
 
-    /*
-    std::cout << "dbfilename " << arguments["databaseFileName"] << std::endl;
-    prot::XmlGenerator xml_gene = prot::XmlGenerator(arguments, "OUTPUT_RESULT");
+    std::cout << "Generate view xml files " << std::endl;
+    prot::XmlGenerator xml_gene = prot::XmlGenerator(arguments,"OUTPUT_RESULT");
     xml_gene.process();
 
-    TransformerPtr trans = TransformerPtr(new Transformer());
-    trans->trans();
-    */
+    std::cout << "Convert view xml files to html files " << std::endl;
+    prot::translate(arguments);
+
   } catch (const char* e) {
     std::cout << "Exception " << e << std::endl;
   }

@@ -29,7 +29,7 @@ class AnnoView {
 };
 
 typedef std::shared_ptr<AnnoView> AnnoViewPtr;
-std::vector<std::vector<std::string>> readFiles(std::string file_name);
+std::vector<std::vector<std::string>> readViewXmlFiles(const std::string &file_name);
 xercesc::DOMElement* genePrSMView(XmlDOMDocument* xml_doc,PrSMPtr prsm);
 xercesc::DOMElement* genePrSMViewAS7(XmlDOMDocument* xml_doc,PrSMPtr prsm);
 xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,ProteoformPtr proteoform,

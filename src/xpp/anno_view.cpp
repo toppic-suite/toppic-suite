@@ -25,7 +25,7 @@ xercesc::DOMElement* AnnoView::geneFileList(XmlDOMDocument* xml_doc){
   return element;
 }
 
-std::vector<std::vector<std::string>> readFiles(std::string file_name){
+std::vector<std::vector<std::string>> readViewXmlFiles(const std::string &file_name){
   std::vector<std::vector<std::string>> file_list;
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if(parser){

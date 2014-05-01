@@ -7,12 +7,13 @@
 
 #include <sstream>
 
-#include "ptm_fast_filter_processor.hpp"
 #include "base/proteoform.hpp"
 #include "base/base_data.hpp"
 #include "base/fasta_reader.hpp"
+#include "base/file_util.hpp"
 #include "spec/msalign_reader.hpp"
 #include "prsm/simple_prsm_writer.hpp"
+#include "filterdiagonal/ptm_fast_filter_processor.hpp"
 
 namespace prot {
 

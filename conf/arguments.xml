@@ -9,7 +9,7 @@
 <shift_number>1</shift_number>
 <error_tolerance>50</error_tolerance>
 <cutoff_type>FDR</cutoff_type>
-<cutoff_value>0.1</cutoff_value>
+<cutoff_value>0.01</cutoff_value>
 
 <protein_variable_ptm_list>
 <protein_variable_ptm>NONE</protein_variable_ptm>

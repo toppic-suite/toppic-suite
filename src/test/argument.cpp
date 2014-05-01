@@ -1,6 +1,7 @@
 /*
  *  Created on: Apr 24, 2014
  */
+#include "base/file_util.hpp"
 #include "test/argument.hpp"
 
 namespace prot {
@@ -21,6 +22,8 @@ void Argument::initArguments() {
   arguments_["cutoffType"] = "EVALUE";
   arguments_["cutoffValue"] = "0.01";
   arguments_["allowProtMod"] = "NONE,NME,NME_ACETYLATION";
+  arguments_["numOfTopPrsms"] = "1";
+  arguments_["executiveDir"] = ".";
 }
 
 void Argument::showUsage(boost::program_options::options_description &desc) {
@@ -133,6 +136,7 @@ bool Argument::parse(int argc, char* argv[]) {
       return false;
     }
 
+    arguments_["executiveDir"] = getExecutiveDir(argv[0]);
     if (vm.count("argument-file")) {
       setArgumentsByConfigFile(argument_file_name);
     }

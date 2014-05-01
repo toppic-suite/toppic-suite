@@ -3,9 +3,22 @@
 
 #include <string>
 
+#define LINUX
+
 namespace prot {
 
-std::string getExeDir(const std::string &argv_0);
+#define FILE_SEPARATOR "/"
+
+std::string getExecutiveDir(const std::string &argv_0);
+
+std::string basename(const std::string &s);
+
+std::string directory(const std::string &s);
+
+void createFolder(const std::string &folder_name);
+
+void copyFile(const std::string &file_name, const std::string &path, 
+              bool over_write);
 
 }
 

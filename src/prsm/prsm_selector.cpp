@@ -5,6 +5,7 @@
  *      Author: xunlikun
  */
 
+#include "base/file_util.hpp"
 #include "prsm/prsm_selector.hpp"
 
 namespace prot {

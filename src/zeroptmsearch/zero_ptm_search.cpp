@@ -1,4 +1,5 @@
 #include "base/logger.hpp"
+#include "base/file_util.hpp"
 #include "base/proteoform.hpp"
 #include "base/fasta_reader.hpp"
 #include "spec/msalign_reader.hpp"

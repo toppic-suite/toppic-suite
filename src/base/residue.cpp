@@ -1,7 +1,7 @@
 #include <base/logger.hpp>
 
 #include "base/residue.hpp"
-#include "base/string_util.hpp"
+#include "base/file_util.hpp"
 #include "base/xml_dom.hpp"
 #include "base/xml_dom_document.hpp"
 
@@ -160,7 +160,7 @@ void FixResidueFactory::initFactory(const std::string &file_name) {
       xercesc::DOMElement* element = getChildElement(parent, "fix_mod_residue_list", i);
       std::string id = getChildValue(element, "id", 0);
       std::string fix_mod_residue_file_name = getChildValue(element, "fix_mod_residue_file_name", 0);
-      fix_mod_residue_file_name = file_dir + fix_mod_residue_file_name;
+      fix_mod_residue_file_name = file_dir + FILE_SEPARATOR + fix_mod_residue_file_name;
       ResiduePtrVec residue_ptr_vec = 
           ResidueFactory::getResiduePtrVecInstance(fix_mod_residue_file_name);
       std::pair<std::string,ResiduePtrVec> pair(id, residue_ptr_vec);
