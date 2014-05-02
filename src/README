@@ -1,10 +1,9 @@
 Linux 
 
-1. cp linux_var.mk var.mk
+1. ln -s Makefile_linux.in Makefile.in 
 2. make all
 
 Windows
 
-1. edit base/os.hpp to comment the line #define LINUX
-2. cp win_var.mk var.mk
-3. make all
+1. cp Makefile_win.in Makefile.in
+2. make all

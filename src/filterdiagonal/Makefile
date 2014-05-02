@@ -1,5 +1,4 @@
-include ../var.mk
-
+include ../Makefile.in
 
 OBJS = $(FILTER_OBJS)
 

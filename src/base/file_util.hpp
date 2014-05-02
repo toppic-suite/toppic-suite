@@ -3,8 +3,6 @@
 
 #include <string>
 
-#include "base/os.hpp"
-
 namespace prot {
 
 #define FILE_SEPARATOR "/"

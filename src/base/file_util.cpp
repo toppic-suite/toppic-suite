@@ -6,7 +6,7 @@
 #include "base/logger.hpp"
 #include "base/file_util.hpp"
 
-#ifdef LINUX
+#ifdef PROT_LINUX
 
 #include <unistd.h>
 
@@ -17,7 +17,7 @@ namespace fs = boost::filesystem;
 
 namespace prot {
 
-#ifdef LINUX
+#ifdef PROT_LINUX
 
   std::string getExecutiveDir(const std::string &argv_0) {
     int buffer_size = 1024;

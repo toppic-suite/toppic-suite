@@ -1,4 +1,4 @@
-include ../var.mk
+include ../Makefile.in
 
 TEST_OBJS = $(addprefix $(OBJ_DIR)/, argument.o test_console.o)
 
@@ -21,6 +21,7 @@ MAIN = $(BIN_DIR)/test_console
 all:    $(MAIN)
 
 $(MAIN): $(OBJS) 
+	$(CC) $(CPPFLAGS) $(INCLUDES) -o $(MAIN) $(OBJS) $(LFLAGS) $(LIBS)
 	$(CC) $(CPPFLAGS) $(INCLUDES) -o $(MAIN) $(OBJS) $(LFLAGS) $(LIBS)
 
 $(OBJ_DIR)/%.o: %.cpp

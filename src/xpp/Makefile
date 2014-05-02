@@ -1,4 +1,4 @@
-include ../var.mk
+include ../Makefile.in
 
 OBJS = $(BASE_OBJS) $(SPEC_OBJS) $(PRSM_OBJS) $(XPP_OBJS)
 

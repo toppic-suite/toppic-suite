@@ -32,12 +32,17 @@ void PrSMFdr::process(){
   PrSMPtrVec target;
   PrSMPtrVec decoy;
   for(unsigned int i=0;i<prsms.size();i++){
-    std::string prsm_name  = prsms[i]->getProteoformPtr()->getDbResSeqPtr()->getName();
-    if(prsm_name.find("DECOY_")==0){
-      decoy.push_back(prsms[i]);
+    if (prsms[i]->getEValue() == 0.0) {
+      LOG_ERROR("prot::PRSMFdr zero E value is reported");
     }
-    else{
-      target.push_back(prsms[i]);
+    else {
+      std::string prsm_name  = prsms[i]->getProteoformPtr()->getDbResSeqPtr()->getName();
+      if(prsm_name.find("DECOY_")==0){
+        decoy.push_back(prsms[i]);
+      }
+      else{
+        target.push_back(prsms[i]);
+      }
     }
   }
   compute(target,decoy);
@@ -50,6 +55,15 @@ void PrSMFdr::process(){
 void PrSMFdr::compute(PrSMPtrVec & target,PrSMPtrVec decoy){
   std::sort(target.begin(),target.end(),prsmEValueUp);
   std::sort(decoy.begin(),decoy.end(),prsmEValueUp);
+
+  for (unsigned int i=0; i<target.size(); i++){
+    std::cout << "Target " << i << " e value " << target[i]->getEValue() << std::endl;
+  }
+
+  for (unsigned int i = 0; i < decoy.size(); i++) {
+    std::cout << "Decoy " << i << " e value " << decoy[i]->getEValue() << std::endl;
+  }
+  
   for(unsigned int i=0;i<target.size();i++){
     int n_target=i+1;
     double target_evalue = target[i]->getEValue();
@@ -62,6 +76,7 @@ void PrSMFdr::compute(PrSMPtrVec & target,PrSMPtrVec decoy){
         break;
       }
     }
+    std::cout << "Target " << i << " e value " << target[i]->getEValue() << " target number " << n_target << " decoy number " << n_decoy << std::endl;
     double fdr = (double)n_decoy/(double)n_target;
     if(fdr>1){
       fdr=1.0;

@@ -254,7 +254,6 @@ void CompProbValue::compPrecProbs() {
   }
   if (prob == 0) {
     LOG_ERROR("Precursor probability is zero!"); 
-    prob = 1;
   }
   prec_probs_.push_back(prob);
 
@@ -491,7 +490,13 @@ double CompProbValue::getCondProb(int shift, int thresh) {
     prob_sum = prob_sum + results_[shift][last_peak_index][score];
   }
   //compute conditional probability
-  double cond_prob = prob_sum / prec_probs_[shift];
+  double cond_prob;
+  if (prec_probs_[shift] > 0) {
+    cond_prob = prob_sum / prec_probs_[shift];
+  }
+  else {
+    cond_prob = 1000000;
+  }
   //normalization
   double norm_cond_prob = cond_prob * factors_[shift];
   return norm_cond_prob;
@@ -504,7 +509,13 @@ double CompProbValue::getCondProbOneValue(int shift, int value) {
   int last_peak_index = peak_masses_.size() - 1;
   double prob = results_[shift][last_peak_index][value];
   //compute conditional probability
-  double cond_prob = prob / prec_probs_[shift];
+  double cond_prob;
+  if (prec_probs_[shift] > 0) {
+    cond_prob = prob / prec_probs_[shift];
+  }
+  else {
+    cond_prob = 1000000;
+  }
   //normalization
   double norm_cond_prob = cond_prob * factors_[shift];
   return norm_cond_prob;
