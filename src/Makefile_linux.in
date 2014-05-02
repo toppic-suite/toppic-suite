@@ -2,7 +2,7 @@
 CC = g++
 #
 # define any compile-time flags
-CPPFLAGS = -Wall -std=c++11 -O3 -pg
+CPPFLAGS = -Wall -std=c++11 -O3 -pg -DPROT_LINUX
 FILECPPFLAGS = -Wall -O3 -pg
 #
 # define any directories containing header files other than /usr/include
