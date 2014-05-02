@@ -3,7 +3,7 @@
 
 #include <string>
 
-//#define LINUX
+#include "base/os.hpp"
 
 namespace prot {
 
