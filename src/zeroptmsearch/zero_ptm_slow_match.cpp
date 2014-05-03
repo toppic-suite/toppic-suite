@@ -32,7 +32,7 @@ ZeroPtmSlowMatch::ZeroPtmSlowMatch(DeconvMsPtr deconv_ms_ptr,
   TheoPeakPtrVec theo_peaks = getProteoformTheoPeak(proteoform_ptr_, 
                                                     activation_ptr, min_mass);
 
-  compScore(refine_ms_ptr_,theo_peaks, mng_ptr_->sp_para_ptr_->getPeakTolerance()->getPpo());
+  compScore(refine_ms_ptr_,theo_peaks, mng_ptr_->sp_para_ptr_->getPeakTolerancePtr()->getPpo());
 }
 
 // compute the average ppo

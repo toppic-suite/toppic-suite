@@ -1,10 +1,6 @@
-/*
- * output_selector.hpp
- *
- *  Created on: Feb 19, 2014
- *      Author: xunlikun
- */
 
+#include "base/species.hpp"
+#include "prsm/prsm.hpp"
 #ifndef PRSM_SPECIES_HPP_
 #define PRSM_SPECIES_HPP_
 
@@ -36,6 +32,8 @@ class PrsmSpecies {
   std::string output_file_;
   double ppo_;
 };
+
+SpeciesPtrVec setSpeciesId(const PrSMPtrVec &prsms,double ppo);
 
 } /* namespace prot */
 

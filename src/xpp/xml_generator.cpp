@@ -8,7 +8,7 @@
 #include <map>
 
 #include "base/file_util.hpp"
-#include "base/species.hpp"
+#include "prsm/prsm_species.hpp"
 #include "xpp/xml_generator.hpp"
 
 namespace prot {

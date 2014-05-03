@@ -8,7 +8,7 @@ BIN_DIR = ../../bin
 
 #
 # define the executable file 
-MAIN = $(BIN_DIR)/test_console
+MAIN = $(BIN_DIR)/topid
 #
 #
 # The following part of the makefile is generic; it can be used to 

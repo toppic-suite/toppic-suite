@@ -9,7 +9,6 @@
 #define SPECIES_HPP_
 
 #include "base/proteoform.hpp"
-#include "prsm/prsm.hpp"
 
 namespace prot {
 
@@ -27,7 +26,6 @@ class Species {
 typedef std::shared_ptr<Species> SpeciesPtr;
 typedef std::vector<SpeciesPtr> SpeciesPtrVec;
 
-SpeciesPtrVec setSpeciesId(const PrSMPtrVec &prsms,double ppo);
 } /* namespace prot */
 
 #endif /* SPECIES_HPP_ */

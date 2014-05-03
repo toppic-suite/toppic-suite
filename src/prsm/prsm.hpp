@@ -193,6 +193,7 @@ PrSMPtrVec readPrsm(std::string file_name,ProteoformPtrVec proteoforms);
 
 bool isMatch(PrSMPtr prsm_ptr, MsHeaderPtr header_ptr);
 void filterPrsms(PrSMPtrVec &prsms, MsHeaderPtr header_ptr, PrSMPtrVec &sele_prsms); 
+
 }
 #endif
 

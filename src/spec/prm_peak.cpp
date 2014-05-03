@@ -172,9 +172,9 @@ PrmMsPtr getMsTwo(const DeconvMsPtr &deconv_ms,double delta, const SpParaPtr &sp
   addZeroPrecPeak(list_filtered, prec_mono_mass);
 
   //setTolerance
-  setTolerance(list_filtered, sp_para->getPeakTolerance(), prec_mono_mass);
+  setTolerance(list_filtered, sp_para->getPeakTolerancePtr(), prec_mono_mass);
 
-  double ppo = sp_para->getPeakTolerance()->getPpo();
+  double ppo = sp_para->getPeakTolerancePtr()->getPpo();
   return PrmMsPtr(new Ms<PrmPeakPtr>(header,list_filtered, ppo)) ;
 }
 
@@ -185,7 +185,7 @@ PrmMsPtr getMsSix(const DeconvMsPtr &deconv_ms,double delta,
   //getSpSixPrmPeak
   double prec_mono_mass = header->getPrecMonoMass();
   ActivationPtr active_type = header->getActivationPtr();
-  double extend_min_mass = sp_para->getExtendSpPara()->extend_min_mass_;
+  double extend_min_mass = sp_para->getExtendSpPara()->getExtendMinMass();
   PrmPeakPtrVec list;
   //    std::cout<<deconv_ms->size()<<std::endl;
   for(unsigned int i=0;i< deconv_ms->size();i++){
@@ -194,7 +194,7 @@ PrmMsPtr getMsSix(const DeconvMsPtr &deconv_ms,double delta,
     }
     else{
       addSixMasses(list,deconv_ms->getPeakPtr(i),prec_mono_mass,active_type,
-                   sp_para->getExtendSpPara()->ext_offsets_);
+                   sp_para->getExtendSpPara()->getExtendOffsets());
     }
   }
 
@@ -207,10 +207,10 @@ PrmMsPtr getMsSix(const DeconvMsPtr &deconv_ms,double delta,
   addZeroPrecPeak(list_filtered, prec_mono_mass);
 
   //setTolerance
-  setTolerance(list_filtered, sp_para->getPeakTolerance(), prec_mono_mass);
+  setTolerance(list_filtered, sp_para->getPeakTolerancePtr(), prec_mono_mass);
 
   //end settolerance
-  double ppo = sp_para->getPeakTolerance()->getPpo();
+  double ppo = sp_para->getPeakTolerancePtr()->getPpo();
   return PrmMsPtr(new Ms<PrmPeakPtr>(header,list_filtered, ppo)) ;
 }
 
@@ -229,7 +229,7 @@ PrmMsPtr getShiftMsSix(const DeconvMsPtr &deconv_ms,double delta,double shift,
       prm_peaks.push_back(ms->getPeakPtr(i));
     }
   }
-  double ppo = sp_para->getPeakTolerance()->getPpo();
+  double ppo = sp_para->getPeakTolerancePtr()->getPpo();
   return PrmMsPtr(new Ms<PrmPeakPtr>(ms->getHeaderPtr(),prm_peaks, ppo));
 }
 

@@ -25,10 +25,10 @@ class SpPara {
 
   SpPara(xercesc::DOMElement* element);
 
-  PeakTolerancePtr getPeakTolerance(){return peak_tolerance_;}
+  PeakTolerancePtr getPeakTolerancePtr(){return peak_tolerance_ptr_;}
 
-  void setPeakTolerance(PeakTolerancePtr peak_tolerance){
-    peak_tolerance_ = peak_tolerance;}
+  void setPeakTolerance(PeakTolerancePtr peak_tolerance_ptr){
+    peak_tolerance_ptr_ = peak_tolerance_ptr;}
 
   ExtendSpParaPtr getExtendSpPara(){return extend_sp_para_;}
 
@@ -53,7 +53,7 @@ class SpPara {
  private:
   int min_peak_num_;
   double min_mass_;
-  PeakTolerancePtr peak_tolerance_;
+  PeakTolerancePtr peak_tolerance_ptr_;
   ExtendSpParaPtr extend_sp_para_;
   ActivationPtr activation_;
 };

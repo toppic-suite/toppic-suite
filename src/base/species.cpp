@@ -5,7 +5,7 @@
  *      Author: xunlikun
  */
 
-#include <base/species.hpp>
+#include "base/species.hpp"
 
 namespace prot {
 
@@ -29,72 +29,4 @@ ProteoformPtr Species::getFistProteoform(){
   return proteoforms_[0];
 }
 
-ProteoformPtrVec2D groupProteins(const PrSMPtrVec &prsms){
-  //get max shift number
-  unsigned int max_shift_number = 0;
-  for(unsigned int i=0;i<prsms.size();i++){
-    if(max_shift_number < prsms[i]->getProteoformPtr()->getChangePtrVec().size()){
-      max_shift_number = prsms[i]->getProteoformPtr()->getChangePtrVec().size();
-    }
-  }
-  //get proteoform groups
-  ProteoformPtrVec2D proteogroups;
-  for(unsigned int shift =0;shift<=max_shift_number;shift++){
-    ProteoformPtrVec proteoforms;
-    for(unsigned int i=0;i<prsms.size();i++ ){
-      if(shift == prsms[i]->getProteoformPtr()->getChangePtrVec().size()){
-        proteoforms.push_back(prsms[i]->getProteoformPtr());
-      }
-    }
-    proteogroups.push_back(proteoforms);
-  }
-  return proteogroups;
-}
-
-SpeciesPtrVec getZeroPtmList(const ProteoformPtrVec& proteoforms, double ppo){
-  SpeciesPtrVec list;
-  for(unsigned int i=0;i<proteoforms.size();i++){
-    bool is_break = false;
-    for(unsigned int j=0;j<list.size();j++){
-      if(isSamePeptideAndMass(proteoforms[i],list[j]->getFistProteoform(),ppo)){
-        list[j]->addProteoform(proteoforms[i]);
-        is_break = true;
-        break;
-      }
-    }
-    if(!is_break){
-      list.push_back(SpeciesPtr(new Species(proteoforms[i])));
-    }
-  }
-  return list;
-}
-
-SpeciesPtrVec setSpeciesId(const PrSMPtrVec& prsms,double ppo){
-  ProteoformPtrVec2D proteogroups = groupProteins(prsms);
-
-  SpeciesPtrVec list = getZeroPtmList(proteogroups[0],ppo);
-
-  for(unsigned int i=1;i<proteogroups.size();i++){
-    for(unsigned int j=0;j<proteogroups[i].size();j++){
-      bool is_break = false;
-      for(unsigned int m = 0; m<list.size();m++){
-        if(isStrictCompatiablePtmSpecies(proteogroups[i][j],
-                                         list[m]->getFistProteoform(),
-                                         ppo)){
-          list[m]->addProteoform(proteogroups[i][j]);
-          is_break = true;
-          break;
-        }
-      }
-      if(!is_break){
-        list.push_back(SpeciesPtr(new Species(proteogroups[i][j])));
-      }
-    }
-  }
-
-  for(unsigned int i=0;i<list.size();i++){
-    list[i]->setSpeciesId(i);
-  }
-  return list;
-}
 } /* namespace prot */
