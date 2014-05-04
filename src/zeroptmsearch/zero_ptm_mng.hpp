@@ -12,7 +12,6 @@
 #include "base/prot_mod.hpp"
 #include "base/activation.hpp"
 #include "spec/peak_tolerance.hpp"
-#include "spec/extend_sp_para.hpp"
 #include "spec/sp_para.hpp"
 
 namespace prot {
@@ -44,9 +43,8 @@ class ZeroPtmMng {
         new PeakTolerance(ppo_, use_min_tolerance_, min_tolerance_));
 
 
-    extend_sp_para_ptr_ = ExtendSpParaPtr(new ExtendSpPara(extend_min_mass_, ext_offsets_));
-    sp_para_ptr_ = SpParaPtr(new SpPara(min_peak_num_, min_mass_, peak_tolerance_ptr_,
-                                        extend_sp_para_ptr_, activation_ptr_));
+    sp_para_ptr_ = SpParaPtr(new SpPara(min_peak_num_, min_mass_, extend_min_mass_,
+                                        ext_offsets_, peak_tolerance_ptr_, activation_ptr_));
 
   }
 
@@ -70,7 +68,6 @@ class ZeroPtmMng {
   /** the set of offsets used to expand the monoisotopic mass list */
   std::vector<double> ext_offsets_ {{0, -IM_, IM_}};
   double extend_min_mass_ = 5000;
-  ExtendSpParaPtr extend_sp_para_ptr_;
 
   int min_peak_num_ = 10;
   double min_mass_ = 50.0;

@@ -13,7 +13,6 @@
 #include "base/mass_constant.hpp"
 #include "base/trunc.hpp"
 #include "base/base_data.hpp"
-#include "spec/extend_sp_para.hpp"
 #include "spec/sp_para.hpp"
 
 namespace prot {
@@ -42,10 +41,9 @@ class PtmMng {
     peak_tolerance_ = PeakTolerancePtr(
         new PeakTolerance(ppo_,use_min_tolerance_,min_tolerance_));
 
-    extend_sp_para_ = ExtendSpParaPtr(
-        new ExtendSpPara(extend_min_mass_,ext_offsets_));
-    sp_para_ = SpParaPtr( new SpPara(min_peak_num_, min_mass_, 
-                   peak_tolerance_, extend_sp_para_, activation_ptr_));
+    sp_para_ = SpParaPtr(
+        new SpPara(min_peak_num_, min_mass_, extend_min_mass_,
+                   ext_offsets_, peak_tolerance_, activation_ptr_));
 
     n_unknown_shift_=atoi(arguments["shiftNumber"].c_str());
   }
@@ -68,7 +66,6 @@ class PtmMng {
   double IM_ = MassConstant::getIsotopeMass();
   std::vector<double> ext_offsets_ = {0.0,-IM_,IM_};
   double extend_min_mass_ = 5000;
-  ExtendSpParaPtr extend_sp_para_;
 
   SpParaPtr sp_para_;
 

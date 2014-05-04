@@ -16,7 +16,6 @@
 #include "base/activation.hpp"
 #include "base/residue.hpp"
 #include "spec/peak_tolerance.hpp"
-#include "spec/extend_sp_para.hpp"
 #include "spec/sp_para.hpp"
 
 namespace prot {
@@ -36,11 +35,10 @@ class PtmFastFilterMng {
 
     peak_tolerance_ = PeakTolerancePtr(
         new PeakTolerance(ppo_, use_min_tolerance_, min_tolerance_));
-    extend_sp_para_ = ExtendSpParaPtr(
-        new ExtendSpPara(extend_min_mass_, ext_offsets_));
+
     sp_para_ = SpParaPtr(
-        new SpPara(min_peak_num, min_mass, peak_tolerance_, 
-                   extend_sp_para_, activation_ptr_));
+        new SpPara(min_peak_num, min_mass, extend_min_mass_,
+                   ext_offsets_, peak_tolerance_, activation_ptr_));
   }
 
   std::string search_db_file_name_;
@@ -64,7 +62,6 @@ class PtmFastFilterMng {
   // the set of offsets used to expand the monoisotopic mass list
   std::vector<double> ext_offsets_ { { 0, -IM_, IM_ } };
   double extend_min_mass_ = 5000;
-  ExtendSpParaPtr extend_sp_para_;
 
   SpParaPtr sp_para_;
 

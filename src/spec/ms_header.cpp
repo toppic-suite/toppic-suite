@@ -24,7 +24,6 @@ MsHeader::MsHeader(xercesc::DOMElement* element){
     retention_time_ = getDoubleChildValue(element,"retention_time",0);
     prec_sp_mz_ = getDoubleChildValue(element,"prec_sp_mz",0);
     prec_mono_mz_ = getDoubleChildValue(element,"prec_mono_mz",0);
-//    prec_charge_ = getIntChildValue(element,"precursor_charge",0);
     prec_charge_ = getIntChildValue(element,"prec_charge",0);
     error_tolerance_ = getDoubleChildValue(element,"error_tolerance",0);
     xercesc::DOMElement* act_element 

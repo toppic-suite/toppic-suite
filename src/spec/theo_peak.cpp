@@ -11,10 +11,10 @@
 
 namespace prot {
 
-TheoPeak::TheoPeak(const IonPtr &ion,double unmod_mass,
+TheoPeak::TheoPeak(const IonPtr &ion_ptr,double unmod_mass,
                    double shift):
     Peak(unmod_mass + shift, 1.0) {
-      ion_ = ion;
+      ion_ptr_ = ion_ptr;
       unmod_mass_ = unmod_mass;
       shift_ = shift;
     }

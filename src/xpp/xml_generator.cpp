@@ -24,7 +24,7 @@ void XmlGenerator::outputPrsms(PrSMPtrVec prsms){
     std::string file_name = mng_->xml_path_+ FILE_SEPARATOR + 
         "prsms" + FILE_SEPARATOR + "prsm"+convertToString(prsms[i]->getId())+".xml";
     XmlWriter writer(file_name,"");
-    writer.write(prot::genePrSMView(writer.getDoc(),prsms[i]));
+    writer.write(genePrSMView(writer.getDoc(),prsms[i], mng_->sp_para_ptr_->getMinMass()));
     writer.close();
 
     std::vector<std::string> file_info;
@@ -41,7 +41,7 @@ void XmlGenerator::outputAllPrsms(PrSMPtrVec prsms){
   std::string file_name = mng_->xml_path_+ FILE_SEPARATOR + "prsms.xml";
   XmlWriter writer(file_name,"prsm_list");
   for(unsigned int i=0;i<prsms.size();i++){
-    writer.write(prot::genePrSMView(writer.getDoc(),prsms[i]));
+    writer.write(genePrSMView(writer.getDoc(),prsms[i], mng_->sp_para_ptr_->getMinMass()));
     writer.close();
   }
 }
@@ -54,7 +54,7 @@ void XmlGenerator::outputProteins(PrSMPtrVec prsms){
       std::string file_name = mng_->xml_path_ + FILE_SEPARATOR +"proteins" 
           +FILE_SEPARATOR+ "protein"+convertToString(seq_[i]->getDbResSeqPtr()->getId())+".xml";
       XmlWriter writer(file_name,"");
-      writer.write(proteinToXml(writer.getDoc(),prsms,seq_[i],species));
+      writer.write(proteinToXml(writer.getDoc(),prsms,seq_[i],species, mng_->sp_para_ptr_->getMinMass()));
       writer.close();
       std::vector<std::string> file_info;
       file_info.push_back(file_name);
@@ -62,7 +62,6 @@ void XmlGenerator::outputProteins(PrSMPtrVec prsms){
       file_info.push_back(mng_->html_path_+ FILE_SEPARATOR + "proteins" + FILE_SEPARATOR 
                           + "protein"+convertToString(seq_[i]->getDbResSeqPtr()->getId())+".html");
       anno_view_->file_list_.push_back(file_info);
-
     }
   }
 }
@@ -70,7 +69,7 @@ void XmlGenerator::outputAllProteins(PrSMPtrVec prsms){
 
   std::string file_name = mng_->xml_path_+ FILE_SEPARATOR +"proteins.xml";
   XmlWriter writer(file_name,"protein_list");
-  writer.write(allProteinToXml(writer.getDoc(),prsms,seq_));
+  writer.write(allProteinToXml(writer.getDoc(),prsms,seq_, mng_->sp_para_ptr_->getMinMass()));
   writer.close();
   std::vector<std::string> file_info;
   file_info.push_back(file_name);
@@ -120,7 +119,7 @@ void XmlGenerator::outputSpecies(PrSMPtrVec prsms){
           + FILE_SEPARATOR + "species"+convertToString(species[i])+".xml";
       XmlWriter writer(file_name,"");
       std::sort(select_prsms.begin(),select_prsms.end(),prsmEValueUp);
-      writer.write(speciesToXml(writer.getDoc(),select_prsms));
+      writer.write(speciesToXml(writer.getDoc(),select_prsms, mng_->sp_para_ptr_->getMinMass()));
       writer.close();
 
       std::vector<std::string> file_info;

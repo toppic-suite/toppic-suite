@@ -15,18 +15,18 @@ namespace prot {
 
 class SupportPeak {
  public:
-  SupportPeak(const DeconvPeakPtr &peak,double offset,double score,
-              const SPTypePtr &peak_type);
-  SPTypePtr getPeakType(){return peak_type_;}
+  SupportPeak(const DeconvPeakPtr &deconv_peak_ptr, double offset,
+              double score, const SPTypePtr &peak_type_ptr);
+  SPTypePtr getPeakTypePtr(){return peak_type_ptr_;}
   double getOffset(){return offset_;}
   double getScore(){return score_;}
-  DeconvPeakPtr getPeak(){return peak_;}
+  DeconvPeakPtr getDeconvPeakPtr(){return deconv_peak_ptr_;}
 
  private:
-  DeconvPeakPtr peak_;
+  DeconvPeakPtr deconv_peak_ptr_;
   double offset_;
   double score_;
-  SPTypePtr peak_type_;
+  SPTypePtr peak_type_ptr_;
 };
 typedef std::shared_ptr<SupportPeak> SupportPeakPtr;
 typedef std::vector<SupportPeakPtr> SupportPeakPtrVec;

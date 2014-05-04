@@ -70,7 +70,7 @@ class PrSM {
 
   void setPrecurorId(int precursor_id) {precursor_id_ = precursor_id;}
 
-  int getMinMass(){return sp_para_ptr_->getMinMass();}
+  //int getMinMass(){return sp_para_ptr_->getMinMass();}
 
   xercesc::DOMElement* toXmlElement(XmlDOMDocument* xml_doc);
 
@@ -106,7 +106,7 @@ class PrSM {
   double match_peak_num_ = 0;
   double match_fragment_num_ = 0;
 
-  SpParaPtr sp_para_ptr_;
+  //SpParaPtr sp_para_ptr_;
 
   void init(SpParaPtr sp_para_ptr);
   void initScores(SpParaPtr sp_para_ptr);

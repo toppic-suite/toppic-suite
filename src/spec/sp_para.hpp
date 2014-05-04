@@ -10,7 +10,6 @@
 
 #include <memory>
 #include "spec/peak_tolerance.hpp"
-#include "spec/extend_sp_para.hpp"
 #include "base/activation.hpp"
 #include "base/xml_dom_document.hpp"
 
@@ -18,44 +17,46 @@ namespace prot {
 
 class SpPara {
  public:
-  SpPara(int min_peak_num,double min_mass, 
-         const PeakTolerancePtr &peak_tolerance,
-         const ExtendSpParaPtr &extend_sp_para,
-         const ActivationPtr &activation);
+  SpPara(int min_peak_num, double min_mass_, double min_extend_mass, 
+         const std::vector<double> &ext_offsets,
+         const PeakTolerancePtr &peak_tolerance_ptr,
+         const ActivationPtr &activation_ptr);
 
   SpPara(xercesc::DOMElement* element);
 
+  double getMinMass() {return min_mass_;}
+
+  double getExtendMinMass() {return extend_min_mass_;}
+
+  std::vector<double> getExtendOffsets() {return ext_offsets_;}
+
   PeakTolerancePtr getPeakTolerancePtr(){return peak_tolerance_ptr_;}
 
-  void setPeakTolerance(PeakTolerancePtr peak_tolerance_ptr){
+  void setPeakTolerancePtr(PeakTolerancePtr peak_tolerance_ptr){
     peak_tolerance_ptr_ = peak_tolerance_ptr;}
 
-  ExtendSpParaPtr getExtendSpPara(){return extend_sp_para_;}
+  ActivationPtr getActivationPtr(){return activation_ptr_;}
 
-  void setExtendSpPara(const ExtendSpParaPtr &extend_sp_para){
-    extend_sp_para_ = extend_sp_para;}
-
-  ActivationPtr getActivation(){return activation_;}
-
-  void setActivation(const ActivationPtr &activation){
-    activation_ = activation;}
+  void setActivationPtr(const ActivationPtr &activation_ptr){
+    activation_ptr_ = activation_ptr;}
 
   int getMinPeakNum(){return min_peak_num_;}
 
   void setMinPeakNum(int min_peak_num){min_peak_num_=min_peak_num;}
 
-  double getMinMass(){return min_mass_;}
-
-  void setMinMass(double min_mass){min_mass_=min_mass;}
-
   void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
  private:
   int min_peak_num_;
+
+  // if the mass if smaller than min_mass, the mass is removed. 
   double min_mass_;
+  // if the mass is smaller than extend_min_mass, the peak is not extended 
+  double extend_min_mass_;
+  std::vector<double> ext_offsets_;
+
   PeakTolerancePtr peak_tolerance_ptr_;
-  ExtendSpParaPtr extend_sp_para_;
-  ActivationPtr activation_;
+  ActivationPtr activation_ptr_;
 };
 
 typedef std::shared_ptr<SpPara> SpParaPtr;

@@ -27,10 +27,10 @@ class Ms {
     header_ptr_->setErrorToleranceByPpo(ppo);
   }
 
-    /**
-     * Removes precursor mass. In ETD data, MSMS may contain a high precursor
-     * mass peak. So we use the following to remove it.
-     */
+  /**
+   * Removes precursor mass. In ETD data, MSMS may contain a high precursor
+   * mass peak. So we use the following to remove it.
+   */
   void rmPrec(double tolerance) {
     peak_ptr_list_ = rmPeaks(peak_ptr_list_, header_ptr_->getPrecSpMz(), 
                              tolerance);

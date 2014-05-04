@@ -14,8 +14,8 @@
 
 #include "spec/deconv_peak.hpp"
 #include "spec/ms.hpp"
-#include "spec/sp_para.hpp"
 #include "spec/deconv_ms.hpp"
+#include "spec/sp_para.hpp"
 
 namespace prot {
 
@@ -23,7 +23,7 @@ class ExtendPeak : public Peak{
  public:
   ExtendPeak();
   ExtendPeak(const DeconvPeakPtr &base_peak,double mono_mass,double score);
-  DeconvPeakPtr getBasePeakPtr(){return base_peak_;}
+  DeconvPeakPtr getBasePeakPtr(){return base_peak_ptr_;}
   double getMonoMass(){return mono_mass_;}
   double getScore(){return score_;}
   double getOrigTolerance(){return orig_tolerance_;}
@@ -35,7 +35,7 @@ class ExtendPeak : public Peak{
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
  private:
-  DeconvPeakPtr base_peak_;
+  DeconvPeakPtr base_peak_ptr_;
   double mono_mass_;
   double score_;
   double orig_tolerance_;
@@ -61,7 +61,7 @@ inline std::vector<double> getExtendMassVec (
 }
 
 ExtendMsPtr getMsThree(const DeconvMsPtr &deconv_ms, double delta, 
-                       const SpParaPtr &sp_para);
+                       const SpParaPtr &sp_para_ptr);
 
 } /* namespace prot */
 

@@ -36,7 +36,7 @@ void PrmPeak::addNghbEdge(const DeconvPeakPtr &peak,double offset,
 int PrmPeak::getBreakType() {
   int break_type = 0;
   for(unsigned int i=0;i<neighbor_list_.size();i++){
-    if(neighbor_list_[i]->getPeakType() == 
+    if(neighbor_list_[i]->getPeakTypePtr() == 
        SPTypeFactory::getSPTypePtr_N_TERM()){
       if(break_type == 0){
         break_type = 1;
@@ -185,7 +185,7 @@ PrmMsPtr getMsSix(const DeconvMsPtr &deconv_ms,double delta,
   //getSpSixPrmPeak
   double prec_mono_mass = header->getPrecMonoMass();
   ActivationPtr active_type = header->getActivationPtr();
-  double extend_min_mass = sp_para->getExtendSpPara()->getExtendMinMass();
+  double extend_min_mass = sp_para->getExtendMinMass();
   PrmPeakPtrVec list;
   //    std::cout<<deconv_ms->size()<<std::endl;
   for(unsigned int i=0;i< deconv_ms->size();i++){
@@ -194,7 +194,7 @@ PrmMsPtr getMsSix(const DeconvMsPtr &deconv_ms,double delta,
     }
     else{
       addSixMasses(list,deconv_ms->getPeakPtr(i),prec_mono_mass,active_type,
-                   sp_para->getExtendSpPara()->getExtendOffsets());
+                   sp_para->getExtendOffsets());
     }
   }
 

@@ -21,10 +21,6 @@ class MsAlignReader {
 
   DeconvMsPtr getNextMs();
 
-  std::vector<std::string> getSpectrumStr() {
-    return spectrum_str_;
-  }
-
   void close();
 
  private:

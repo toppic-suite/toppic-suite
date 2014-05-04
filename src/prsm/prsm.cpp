@@ -18,7 +18,7 @@ PrSM::PrSM(ProteoformPtr proteoform_ptr, DeconvMsPtr deconv_ms_ptr,
   ori_prec_mass_ = header_ptr->getPrecMonoMass();
   adjusted_prec_mass_ = adjusted_prec_mass;
   calibration_ = calibration;
-  sp_para_ptr_=sp_para_ptr;
+  //sp_para_ptr_=sp_para_ptr;
   init(sp_para_ptr);
 }
 
@@ -114,10 +114,6 @@ PrSM::PrSM(xercesc::DOMElement* element,ProteoformPtrVec proteoforms){
         = getChildElement(element,"extreme_value",0);
     prob_ptr_ = ExtremeValuePtr(new ExtremeValue(prob_element));
   }
-
-//  xercesc::DOMElement* sp_para_element = getChildElement(element,"sp_para",0);
-//  sp_para_ptr_ = SpParaPtr(new SpPara(sp_para_element));
-  sp_para_ptr_ = SpParaPtr(new SpPara(10,50,nullptr,nullptr,nullptr));
 
   xercesc::DOMElement* deconv_ms_element = getChildElement(element,"ms",0);
   xercesc::DOMElement* header_element
