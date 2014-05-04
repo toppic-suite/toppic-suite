@@ -15,24 +15,25 @@ EValueProcessor::EValueProcessor(TdgfMngPtr mng_ptr) {
 }
 
 void EValueProcessor::init() {
+  PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   ProteoformPtrVec raw_forms 
-      = readFastaToProteoform(mng_ptr_->search_db_file_name_,
-                              mng_ptr_->fix_mod_residue_list_);
+      = readFastaToProteoform(prsm_para_ptr->getSearchDbFileName(), 
+                              prsm_para_ptr->getFixModResiduePtrVec());
 
   ProteoformPtrVec prot_mod_forms 
-      = generateProtModProteoform(raw_forms, mng_ptr_->allow_prot_mod_list_); 
+      = generateProtModProteoform(raw_forms, prsm_para_ptr->getAllowProtModPtrVec());
 
   LOG_DEBUG("protein data set loaded");
 
   ResFreqPtrVec residue_freqs 
-      = compResidueFreq(mng_ptr_->fix_mod_residue_list_, raw_forms); 
+      = compResidueFreq(prsm_para_ptr->getFixModResiduePtrVec(), raw_forms); 
   LOG_DEBUG("residue frequency initialized");
 
   comp_pvalue_ptr_ = CompPValueArrayPtr(
       new CompPValueArray(raw_forms, prot_mod_forms, residue_freqs, mng_ptr_));
   LOG_DEBUG("comp pvalue array initialized");
 
-  std::string input_file_name = basename(mng_ptr_->spectrum_file_name_)
+  std::string input_file_name = basename(prsm_para_ptr->getSpectrumFileName())
       + "." + mng_ptr_->input_file_ext_;
   std::cout<<input_file_name<<std::endl;
   prsms_ = readPrsm(input_file_name, raw_forms);
@@ -43,9 +44,10 @@ void EValueProcessor::init() {
 /* compute E-value. Separate: compute E-value separately or not */
 
 void EValueProcessor::process(bool is_separate) {
-  int spectrum_num = countSpNum(mng_ptr_->spectrum_file_name_);
-  MsAlignReader reader (mng_ptr_->spectrum_file_name_);
-  std::string output_file_name = basename(mng_ptr_->spectrum_file_name_)
+  std::string spectrum_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
+  int spectrum_num = countSpNum(spectrum_file_name);
+  MsAlignReader reader (spectrum_file_name);
+  std::string output_file_name = basename(spectrum_file_name)
        + "." + mng_ptr_->output_file_ext_;
   PrSMWriter writer(output_file_name);
   int cnt = 0;
@@ -68,7 +70,7 @@ void EValueProcessor::process(bool is_separate) {
 void EValueProcessor::processOneSpectrum(DeconvMsPtr ms_ptr, bool is_separate,
                                          PrSMWriter &writer) {
   SpectrumSetPtr spec_set_ptr 
-      = getSpectrumSet(ms_ptr, 0, mng_ptr_->sp_para_ptr_);
+      = getSpectrumSet(ms_ptr, 0, mng_ptr_->prsm_para_ptr_->getSpParaPtr());
   if (spec_set_ptr.get() != nullptr) {
     PrSMPtrVec sele_prsms;
     filterPrsms(prsms_, ms_ptr->getHeaderPtr(), sele_prsms);

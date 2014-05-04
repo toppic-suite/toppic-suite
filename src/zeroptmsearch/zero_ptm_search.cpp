@@ -39,21 +39,19 @@ void zeroPtmSearch(SpectrumSetPtr spec_set_ptr,
 }
 
 void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
-
+  PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
   ProteoformPtrVec raw_forms 
-      = readFastaToProteoform(mng_ptr->search_db_file_name_,
-                              mng_ptr->fix_mod_residue_list_);
+      = readFastaToProteoform(prsm_para_ptr->getSearchDbFileName(), 
+                              prsm_para_ptr->getFixModResiduePtrVec());
 
   ProteoformPtrVec prot_mod_forms 
-      = generateProtModProteoform(raw_forms, mng_ptr->allow_prot_mod_list_);
+      = generateProtModProteoform(raw_forms, prsm_para_ptr->getAllowProtModPtrVec());
 
-  int spectra_num = countSpNum (mng_ptr->spectrum_file_name_);
+  int spectra_num = countSpNum (prsm_para_ptr->getSpectrumFileName());
   LOG_DEBUG("spectra_number  " << spectra_num);
 
-  MsAlignReader reader(mng_ptr->spectrum_file_name_);
-  LOG_DEBUG("file name " << mng_ptr->spectrum_file_name_ 
-            << " output " << mng_ptr->output_file_ext_);
-  std::string output_file_name = basename(mng_ptr->spectrum_file_name_) 
+  MsAlignReader reader(prsm_para_ptr->getSpectrumFileName());
+  std::string output_file_name = basename(prsm_para_ptr->getSpectrumFileName())
                                           + "." + mng_ptr->output_file_ext_;
   PrSMWriter comp_writer(output_file_name + "_" 
                          + SemiAlignTypeFactory::getCompletePtr()->getName());
@@ -73,7 +71,7 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
   while (ms_ptr.get() != nullptr) {
     n++;
     SpectrumSetPtr spec_set_ptr 
-        = getSpectrumSet(ms_ptr, delta, mng_ptr->sp_para_ptr_);
+        = getSpectrumSet(ms_ptr, delta, prsm_para_ptr->getSpParaPtr());
     if (spec_set_ptr.get() != nullptr) {
       PrSMPtrVec comp_prsms;
       zeroPtmSearch(spec_set_ptr, SemiAlignTypeFactory::getCompletePtr(), 

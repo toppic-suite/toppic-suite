@@ -23,8 +23,8 @@ class PtmProcessor {
   PtmProcessor(PtmMngPtr mng);
   void process();
 
-  PtmMngPtr mng_;
-  ProteoformPtrVec seqs_;
+  PtmMngPtr mng_ptr_;
+  ProteoformPtrVec proteoforms_;
   SimplePrSMPtrVec simplePrsms_;
   CompShiftLowMemPtr comp_shift_;
   std::vector<PrSMWriterPtr> complete_writers_;

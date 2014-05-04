@@ -53,7 +53,7 @@ DiagonalHeaderPtrVec refineHeadersBgnEnd(
         deconv_ms->getHeaderPtr()->getActivationPtr(),
         headers,
         i,
-        mng->sp_para_->getMinMass());
+        mng->prsm_para_ptr_->getSpParaPtr()->getMinMass());
     int bgn = headers[i]->getMatchFirstResPos()-first_pos;
     int end = headers[i]->getMatchLastResPos()+1-first_pos;
     PeakIonPairPtrVec pairs = findPairs(ms_three,ions,bgn,end);

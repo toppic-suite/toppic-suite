@@ -20,8 +20,8 @@ public:
     void process();
 
 private:
-    PtmFastFilterMngPtr mng_;
-    PtmFastFilterBlockPtr filter_;
+    PtmFastFilterMngPtr mng_ptr_;
+    PtmFastFilterBlockPtr filter_ptr_;
 
     void processBlock(int block,std::string sp_file_name,int n_spectra);
     void combineBlock(std::string sp_file_name);

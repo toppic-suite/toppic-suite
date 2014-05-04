@@ -19,14 +19,14 @@
 
 namespace prot {
 
-PtmProcessor::PtmProcessor(PtmMngPtr mng){
-  mng_ = mng;
+PtmProcessor::PtmProcessor(PtmMngPtr mng_ptr){
+  mng_ptr_ = mng_ptr;
 
-  std::string sp_file_name = mng_->spectrum_file_name_;
-  std::string output_file_name = basename(sp_file_name)+"."+mng_->output_file_ext_;
+  std::string sp_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
+  std::string output_file_name = basename(sp_file_name)+"."+mng_ptr_->output_file_ext_;
 
   all_writer_ = PrSMWriterPtr (new PrSMWriter (output_file_name));
-  for (int s = 1; s <= mng_->n_unknown_shift_; s++) {
+  for (int s = 1; s <= mng_ptr_->n_unknown_shift_; s++) {
     std::string file_name = output_file_name+"_"+ convertToString(s)
               +"_"+ SemiAlignTypeFactory::getCompletePtr()->getName();
     PrSMWriterPtr complete_writer= PrSMWriterPtr (new PrSMWriter (file_name));
@@ -49,13 +49,15 @@ PtmProcessor::PtmProcessor(PtmMngPtr mng){
 }
 
 void PtmProcessor::init(){
-  seqs_ = prot::readFastaToProteoform(
-      mng_->search_db_file_name_, mng_->fix_mod_residue_list_);
-  std::string sp_file_name = mng_->spectrum_file_name_;
-  std::string simplePrsmFileName = basename(mng_->spectrum_file_name_)
-      + "." + mng_->input_file_ext_;
+  PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
+  proteoforms_ = prot::readFastaToProteoform(
+      prsm_para_ptr->getSearchDbFileName(), 
+      prsm_para_ptr->getFixModResiduePtrVec());
+  std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
+  std::string simplePrsmFileName = basename(sp_file_name)
+      + "." + mng_ptr_->input_file_ext_;
   simplePrsms_  = prot::readSimplePrSM(simplePrsmFileName.c_str());
-  prsmFindSeq(simplePrsms_,seqs_);
+  prsmFindSeq(simplePrsms_,proteoforms_);
   comp_shift_ = CompShiftLowMemPtr(new CompShiftLowMem());
 }
 
@@ -66,8 +68,8 @@ void PtmProcessor::prsmFindSeq(SimplePrSMPtrVec simple_prsms,ProteoformPtrVec se
 }
 
 void PtmProcessor::process(){
-  std::string sp_file_name = mng_->spectrum_file_name_;
-  std::string output_file_name = basename(sp_file_name)+"."+mng_->output_file_ext_;
+  std::string sp_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
+  std::string output_file_name = basename(sp_file_name)+"."+mng_ptr_->output_file_ext_;
 
   MsAlignReader spReader(sp_file_name);
   DeconvMsPtr deconv_sp;
@@ -76,21 +78,17 @@ void PtmProcessor::process(){
   while((deconv_sp = spReader.getNextMs())!= nullptr){
     cnt++;
     SpectrumSetPtr spectrum_set_ptr = getSpectrumSet(deconv_sp,0,
-                                                mng_->sp_para_);
-    //set deconvMsPtr errorTolerance
-    deconv_sp->getHeaderPtr()->setErrorToleranceByPpo(mng_->ppo_);
+                                                mng_ptr_->prsm_para_ptr_->getSpParaPtr());
     if(spectrum_set_ptr != nullptr){
       SimplePrSMPtrVec selected_prsms 
           = prot::findSimplePrsms(simplePrsms_,deconv_sp->getHeaderPtr());
-      search(spectrum_set_ptr,
-             selected_prsms
-             );
+      search(spectrum_set_ptr, selected_prsms);
     }
     std::cout << std::flush << "Ptm search complete " << cnt << " of " << spectra_num << std::endl;
   }
   spReader.close();
   all_writer_->close();
-  for (int s = 1; s <= mng_->n_unknown_shift_; s++) {
+  for (int s = 1; s <= mng_ptr_->n_unknown_shift_; s++) {
       complete_writers_[s-1]->close();
       prefix_writers_[s-1]->close();
       suffix_writers_[s-1]->close();
@@ -102,7 +100,7 @@ void PtmProcessor::chooseCompPrePrsms(PrSMPtrVec &all_prsms, PrSMPtrVec &sele_pr
   int match_size = all_prsms.size();
   std::sort(all_prsms.begin(), all_prsms.end(), prsmCompPreMatchFragmentDown);
   if(all_prsms.size()!=0){
-    for(int r=0;r<mng_->n_report_;r++){
+    for(int r=0;r<mng_ptr_->n_report_;r++){
       if(r >= match_size){
         break;
       }
@@ -118,7 +116,7 @@ void PtmProcessor::chooseSuffIntPrsms(PrSMPtrVec &all_prsms, PrSMPtrVec &sele_pr
   int match_size = all_prsms.size();
   std::sort(all_prsms.begin(), all_prsms.end(), prsmMatchFragmentDown);
   if(all_prsms.size()!=0){
-    for(int r=0;r<mng_->n_report_;r++){
+    for(int r=0;r<mng_ptr_->n_report_;r++){
       if(r >= match_size){
         break;
       }
@@ -132,14 +130,13 @@ void PtmProcessor::chooseSuffIntPrsms(PrSMPtrVec &all_prsms, PrSMPtrVec &sele_pr
 
 
 void PtmProcessor::search(SpectrumSetPtr spectrum_set_ptr, 
-                          SimplePrSMPtrVec matches
-                          ) {
-  std::string sp_file_name = mng_->spectrum_file_name_;
-  std::string output_file_name = basename(sp_file_name)+"."+mng_->output_file_ext_;
+                          SimplePrSMPtrVec matches) {
+  std::string sp_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
+  std::string output_file_name = basename(sp_file_name)+"."+mng_ptr_->output_file_ext_;
 
   PtmSlowFilterPtr slow_filter = PtmSlowFilterPtr(
-      new PtmSlowFilter(spectrum_set_ptr,matches,comp_shift_,mng_));
-  for (int s = 1; s <= mng_->n_unknown_shift_; s++) {
+      new PtmSlowFilter(spectrum_set_ptr,matches,comp_shift_,mng_ptr_));
+  for (int s = 1; s <= mng_ptr_->n_unknown_shift_; s++) {
     PrSMPtrVec complete_prsms = slow_filter->getPrSMs(
         s-1, SemiAlignTypeFactory::getCompletePtr());
     PrSMPtrVec sele_complete_prsms;

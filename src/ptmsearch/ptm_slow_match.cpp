@@ -77,7 +77,7 @@ PrSMPtr PtmSlowMatch::geneResult(int shift_num){
 
   return PrSMPtr(
       new PrSM(proteoform, deconv_ms_, refine_prec_mass,
-          0, mng_->sp_para_));
+          0, mng_->prsm_para_ptr_->getSpParaPtr()));
 }
 
 DiagonalHeaderPtrVec PtmSlowMatch::getNTermShiftList(

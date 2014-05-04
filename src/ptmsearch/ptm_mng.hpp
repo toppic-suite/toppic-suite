@@ -8,66 +8,22 @@
 #ifndef PROT_PTM_MNG_HPP_
 #define PROT_PTM_MNG_HPP_
 
-#include <map>
-#include "spec/peak_tolerance.hpp"
-#include "base/mass_constant.hpp"
-#include "base/trunc.hpp"
-#include "base/base_data.hpp"
-#include "spec/sp_para.hpp"
+#include "prsm/prsm_para.hpp"
 
 namespace prot {
 
 class PtmMng {
  public :
-  PtmMng(std::map<std::string, std::string> arguments){
-    spectrum_file_name_ = arguments["spectrumFileName"];
-    search_db_file_name_ = arguments["databaseFileName"];
-
-    fix_mod_residue_list_ = FixResidueFactory::getFixResiduePtrVec(arguments["cysteineProtection"]);
-
-    ProtModPtr ptr = ProtModFactory::getBaseProtModPtrByName("NONE");
-    allow_prot_mod_list_.push_back(ptr);
-    ptr = ProtModFactory::getBaseProtModPtrByName("NME");
-    allow_prot_mod_list_.push_back(ptr);
-    ptr = ProtModFactory::getBaseProtModPtrByName("NME_ACETYLATION");
-    allow_prot_mod_list_.push_back(ptr);
-
-    std::string activation_type = arguments["activation"];
-    activation_ptr_ = ActivationFactory::getBaseActivationPtrByName(
-        activation_type);
-
-    ppo_=atoi(arguments["errorTolerance"].c_str())*0.000001;
-
-    peak_tolerance_ = PeakTolerancePtr(
-        new PeakTolerance(ppo_,use_min_tolerance_,min_tolerance_));
-
-    sp_para_ = SpParaPtr(
-        new SpPara(min_peak_num_, min_mass_, extend_min_mass_,
-                   ext_offsets_, peak_tolerance_, activation_ptr_));
-
-    n_unknown_shift_=atoi(arguments["shiftNumber"].c_str());
+  PtmMng(PrsmParaPtr prsm_para_ptr, int n_report, int shift_num,
+         std::string input_file_ext, std::string output_file_ext) {
+    prsm_para_ptr_ = prsm_para_ptr;
+    n_report_ = n_report;
+    n_unknown_shift_ = shift_num;
+    input_file_ext_ = input_file_ext;
+    output_file_ext_ = output_file_ext;
   }
-
-  std::string search_db_file_name_;
-  std::string spectrum_file_name_;
-
-  ResiduePtrVec fix_mod_residue_list_;
-  ProtModPtrVec allow_prot_mod_list_;
-
-  ActivationPtr activation_ptr_ = nullptr;
-
-  double ppo_ = 0.000015;
-  bool use_min_tolerance_ = true;
-  double min_tolerance_ = 0.01;
-  PeakTolerancePtr peak_tolerance_;
-
-  int min_peak_num_ = 10;
-  double min_mass_ = 50.0;
-  double IM_ = MassConstant::getIsotopeMass();
-  std::vector<double> ext_offsets_ = {0.0,-IM_,IM_};
-  double extend_min_mass_ = 5000;
-
-  SpParaPtr sp_para_;
+  
+  PrsmParaPtr prsm_para_ptr_;
 
   /* parameters for ptm search */
   int n_report_ = 1;

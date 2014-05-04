@@ -93,7 +93,7 @@ void CompPValueArray::setPValue(DeconvMsPtr ms_ptr, PrSMPtr prsm_ptr) {
                << ms_ptr->getHeaderPtr()->getPrecMonoMass()
                << " precursor " << refine_prec_mass);
   // Delta = 0 is important 
-  PrmMsPtr prm_ms_ptr = getMsSix(refine_ms_ptr, 0, mng_ptr_->sp_para_ptr_);
+  PrmMsPtr prm_ms_ptr = getMsSix(refine_ms_ptr, 0, mng_ptr_->prsm_para_ptr_->getSpParaPtr());
   ExtremeValuePtr prob_ptr = compExtremeValue(prm_ms_ptr, prsm_ptr);
   prsm_ptr->setProbPtr(prob_ptr);
 }

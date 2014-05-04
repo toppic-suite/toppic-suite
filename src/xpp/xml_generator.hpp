@@ -24,7 +24,8 @@ namespace prot {
 
 class XmlGenerator {
  public:
-  XmlGenerator(std::map<std::string,std::string> arguments,std::string input_file);
+  XmlGenerator(PrsmParaPtr prsm_para_ptr, std::string exec_dir, 
+               std::string input_file);
   void process();
   void processPrSMs(PrSMPtrVec & prsms,ProteoformPtrVec proteoforms);
   void outputPrsms(PrSMPtrVec prsms);
@@ -33,9 +34,11 @@ class XmlGenerator {
   void outputProteins(PrSMPtrVec prsms);
   void outputAllProteins(PrSMPtrVec prsms);
   void outputFileList();
+
+ private:
   std::string input_file_;
   ViewMngPtr mng_;
-  ProteoformPtrVec seq_;
+  ProteoformPtrVec raw_forms_;
   AnnoViewPtr anno_view_;
 };
 

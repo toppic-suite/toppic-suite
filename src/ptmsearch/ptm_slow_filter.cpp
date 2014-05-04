@@ -19,7 +19,7 @@ PtmSlowFilter::PtmSlowFilter(
     ProteoformPtrVec raw_forms;
     raw_forms.push_back(fast_Matches[i]->getSeq());
     ProteoformPtrVec prot_mod_forms 
-        = generateProtModProteoform(raw_forms, mng->allow_prot_mod_list_);
+        = generateProtModProteoform(raw_forms, mng->prsm_para_ptr_->getAllowProtModPtrVec());
     for (unsigned int j = 0; j < prot_mod_forms.size(); j++) {
       complete_prefix_slow_matches_.push_back(PtmSlowMatchPtr(
             new PtmSlowMatch(prot_mod_forms[j],spectrum_set,comp_shift,mng)));

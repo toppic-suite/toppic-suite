@@ -17,22 +17,18 @@ ZeroPtmSlowMatch::ZeroPtmSlowMatch(DeconvMsPtr deconv_ms_ptr,
   proteoform_ptr_ = getSubProteoform(fast_match_ptr->getProteoformPtr(), 
                                      fast_match_ptr->getBegin(), 
                                      fast_match_ptr->getEnd());
-  /*
-  LOG_DEBUG("name " << fast_match_ptr->getProteoformPtr()->getDbResSeqPtr()->getName()
-            << " begin " << fast_match_ptr->getBegin()
-            << " end " << fast_match_ptr->getEnd());
-            */
 
+  SpParaPtr sp_para_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr();
   refine_prec_mass_ = proteoform_ptr_->getResSeqPtr()->getSeqMass();
   double delta = refine_prec_mass_ - deconv_ms_ptr->getHeaderPtr()->getPrecMonoMass();
-  refine_ms_ptr_ = getMsThree(deconv_ms_ptr_, delta, mng_ptr_->sp_para_ptr_);
+  refine_ms_ptr_ = getMsThree(deconv_ms_ptr_, delta, sp_para_ptr);
 
   ActivationPtr activation_ptr = deconv_ms_ptr_->getHeaderPtr()->getActivationPtr();
-  double min_mass = mng_ptr_->sp_para_ptr_->getMinMass();
+  double min_mass = sp_para_ptr->getMinMass();
   TheoPeakPtrVec theo_peaks = getProteoformTheoPeak(proteoform_ptr_, 
                                                     activation_ptr, min_mass);
 
-  compScore(refine_ms_ptr_,theo_peaks, mng_ptr_->sp_para_ptr_->getPeakTolerancePtr()->getPpo());
+  compScore(refine_ms_ptr_,theo_peaks, sp_para_ptr->getPeakTolerancePtr()->getPpo());
 }
 
 // compute the average ppo
@@ -91,8 +87,9 @@ void ZeroPtmSlowMatch::compScore (ExtendMsPtr refine_ms_ptr, TheoPeakPtrVec theo
 
 // get result 
 PrSMPtr ZeroPtmSlowMatch::geneResult() {
+  SpParaPtr sp_para_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr();
   return PrSMPtr(new PrSM(proteoform_ptr_, deconv_ms_ptr_, refine_prec_mass_, 
-                          recal_, mng_ptr_->sp_para_ptr_));
+                          recal_, sp_para_ptr));
 }
 
 ZpSlowMatchPtrVec zeroPtmSlowFilter(DeconvMsPtr deconv_ms_ptr,

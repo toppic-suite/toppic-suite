@@ -17,18 +17,19 @@
 
 namespace prot {
 
-PtmFastFilterProcessor::PtmFastFilterProcessor(PtmFastFilterMngPtr mng){
-  mng_ = mng;
+PtmFastFilterProcessor::PtmFastFilterProcessor(PtmFastFilterMngPtr mng_ptr){
+  mng_ptr_ = mng_ptr;
+  PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   ProteoformPtrVec proteoforms 
-      = readFastaToProteoform(mng_->search_db_file_name_,
-                              mng_->fix_mod_residue_list_);
-    filter_ = PtmFastFilterBlockPtr(new PtmFastFilterBlock(proteoforms,mng_));
+      = readFastaToProteoform(prsm_para_ptr->getSearchDbFileName(),
+                              prsm_para_ptr->getFixModResiduePtrVec());
+    filter_ptr_ = PtmFastFilterBlockPtr(new PtmFastFilterBlock(proteoforms,mng_ptr_));
 }
 
 void PtmFastFilterProcessor::process(){
-    std::string sp_file_name = mng_->spectrum_file_name_;
+    std::string sp_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
     int n_spectrum = prot::countSpNum(sp_file_name.c_str());
-    for(int i=0;i<filter_->getBlockSize();i++){
+    for(int i=0;i< filter_ptr_->getBlockSize();i++){
         processBlock(i,sp_file_name,n_spectrum);
     }
     combineBlock(sp_file_name);
@@ -37,25 +38,26 @@ void PtmFastFilterProcessor::process(){
 void PtmFastFilterProcessor::processBlock(int block,std::string sp_file_name,
                                           int n_spectra){
     //system.out
-    filter_->initBlock(block);
+    filter_ptr_->initBlock(block);
     MsAlignReader reader(sp_file_name);
     std::stringstream block_s;
     block_s<<block;
-    std::string output_file_name = basename(mng_->spectrum_file_name_) 
-      + "." + mng_->output_file_ext_+"_"+block_s.str();
+    PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
+    std::string output_file_name = basename(prsm_para_ptr->getSpectrumFileName())
+      + "." + mng_ptr_->output_file_ext_+"_"+block_s.str();
     SimplePrSMWriter writer(output_file_name.c_str());
     DeconvMsPtr deconv_sp;
     int cnt = 0;
-  while((deconv_sp = reader.getNextMs()) != nullptr){
-    cnt++;
-    SpectrumSetPtr spectrum_set = getSpectrumSet(deconv_sp,0,
-                                                 mng_->sp_para_);
-    if(spectrum_set != nullptr){
-      std::string scan = deconv_sp->getHeaderPtr()->getScansString();
-      SimplePrSMPtrVec matches = filter_->getBestMathBatch(spectrum_set);
-      writer.write(matches);
+    while((deconv_sp = reader.getNextMs()) != nullptr){
+      cnt++;
+      SpectrumSetPtr spectrum_set = getSpectrumSet(deconv_sp,0,
+                                                   prsm_para_ptr->getSpParaPtr());
+      if(spectrum_set != nullptr){
+        std::string scan = deconv_sp->getHeaderPtr()->getScansString();
+        SimplePrSMPtrVec matches = filter_ptr_->getBestMathBatch(spectrum_set);
+        writer.write(matches);
+      }
     }
-  }
     reader.close();
     writer.close();
 }
@@ -65,17 +67,17 @@ void PtmFastFilterProcessor::combineBlock(std::string sp_file_name){
     SimplePrSMPtrVec2D matches;
 
     //pravate readsimplePrsm
-    for(int i=0;i<filter_->getBlockSize();i++){
+    for(int i=0;i<filter_ptr_->getBlockSize();i++){
         std::stringstream block_s;
         block_s<<i;
-        std::string block_file_name = basename(mng_->spectrum_file_name_) 
-        + "." + mng_->output_file_ext_+"_"+block_s.str();
+        std::string block_file_name = basename(mng_ptr_->prsm_para_ptr_->getSpectrumFileName()) 
+        + "." + mng_ptr_->output_file_ext_+"_"+block_s.str();
         matches.push_back(prot::readSimplePrSM(block_file_name.c_str()));
     }
 
     MsAlignReader reader(sp_file_name.c_str());
-    std::string output_file_name = basename(mng_->spectrum_file_name_) 
-      + "." + mng_->output_file_ext_+"_COMBINED";
+    std::string output_file_name = basename(mng_ptr_->prsm_para_ptr_->getSpectrumFileName()) 
+      + "." + mng_ptr_->output_file_ext_+"_COMBINED";
     SimplePrSMWriter writer(output_file_name.c_str());
     DeconvMsPtr deconv_sp;
     while((deconv_sp = reader.getNextMs()) != nullptr){

@@ -15,6 +15,8 @@ SpectrumSet::SpectrumSet(const DeconvMsPtr &sp, double delta,
                          const SpParaPtr &sp_para_ptr){
   deconv_sp_ = sp;
   sp_para_ptr_ = sp_para_ptr;
+  deconv_sp_->getHeaderPtr()->setErrorToleranceByPpo(
+      sp_para_ptr_->getPeakTolerancePtr()->getPpo());
   delta_=delta;
   prm_ms_two_ = getMsTwo(sp, delta, sp_para_ptr);
   extend_ms_three_ = getMsThree(sp,delta,sp_para_ptr);
