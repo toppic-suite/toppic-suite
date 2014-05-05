@@ -129,8 +129,8 @@ int process(int argc, char* argv[]) {
                                 "OUTPUT_TABLE");
     table_out.write();
 */
-    PrsmCoverage prsm_coverage(prsm_para, "OUTPUT_RESULT", "COVERAGE");
-    prsm_coverage.prcess();
+    PrsmCoverage prsm_coverage(prsm_para_ptr, "OUTPUT_RESULT", "COVERAGE");
+    prsm_coverage.process();
 
     /*
 

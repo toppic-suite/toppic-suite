@@ -49,7 +49,7 @@ class Prsm {
 
   double getOriPrecMass() {return ori_prec_mass_;}
 
-  int getPrecurorId() {return precursor_id_;}
+  int getPrecursorId() {return precursor_id_;}
 
   ExtendMsPtr getRefineMs() {return refine_ms_three_;}
 
@@ -155,7 +155,7 @@ inline bool prsmSpectrumIdUpPrecursorIdUp(PrsmPtr p1, PrsmPtr p2){
         return true;
     }
     else{
-        if(p1->getPrecurorId()>p2->getPrecurorId()){
+        if(p1->getPrecursorId()>p2->getPrecursorId()){
             return true;
         }
         return false;

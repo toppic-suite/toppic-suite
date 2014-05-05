@@ -8,15 +8,15 @@
 
 namespace prot {
 
-PrsmConverage::PrsmConverage(PrsmParaPtr prsm_para_ptr,
-                             std::string input_file_ext,
-                             std::string output_file_ext) {
+PrsmCoverage::PrsmCoverage(PrsmParaPtr prsm_para_ptr,
+                           std::string input_file_ext,
+                           std::string output_file_ext) {
   prsm_para_ptr_ = prsm_para_ptr;
   input_file_ext_ = input_file_ext;
   output_file_ext_ = output_file_ext;
 }
 
-void PrsmConverage::process(){
+void PrsmCoverage::process(){
 
   ProteoformPtrVec raw_forms 
       = readFastaToProteoform(prsm_para_ptr_->getSearchDbFileName(), 
@@ -26,6 +26,7 @@ void PrsmConverage::process(){
   std::string base_name = basename(prsm_para_ptr_->getSpectrumFileName());
   std::string input_file_name = base_name + "." + input_file_ext_;
   PrsmPtrVec prsms = readPrsm(input_file_name, raw_forms);
+  LOG_DEBUG("read prsm complete ");
   addSpectrumPtrsToPrsms(prsms, prsm_para_ptr_);
   LOG_DEBUG("prsms loaded");
 
@@ -73,10 +74,13 @@ void PrsmConverage::process(){
 
   double min_mass = prsm_para_ptr_->getSpParaPtr()->getMinMass();
   for(unsigned int i=0;i<prsms.size();i++){
+    //std::cout << "proteom ptr " << prsms[i]->getProteoformPtr() << std::endl;
+    //std::cout << "ms ptr " << prsms[i]->getRefineMs() << std::endl;
 
     PeakIonPairPtrVec pairs =  getPeakIonPairs (prsms[i]->getProteoformPtr(), 
                                                 prsms[i]->getRefineMs(),
                                                 min_mass);
+    //std::cout << "get pair complete " << i  << std::endl;
     int len = prsms[i]->getProteoformPtr()->getResSeqPtr()->getLen() - 1;
     int begin = 1;
     int end = len - 1;
@@ -137,6 +141,7 @@ void PrsmConverage::process(){
         << right_c_full_coverage << "\t"
         << right_both_full_coverage << "\t"
         << std::endl;
+    //std::cout << "print coverage complete " << std::endl;
   }
   file.close();
 }

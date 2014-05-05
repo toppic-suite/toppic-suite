@@ -155,19 +155,30 @@ void addSpectrumPtrsToPrsms(PrsmPtrVec &prsms, PrsmParaPtr prsm_para_ptr){
   MsAlignReader reader(prsm_para_ptr->getSpectrumFileName());
   DeconvMsPtr ms_ptr = reader.getNextMs();
   double delta = 0;
-  while (ms_ptr.get() != nullptr) {
+  //use prsm order information (ordered by spectrum id then prec id)
+  int start_prsm = 0;
+  while (ms_ptr != nullptr) {
     SpectrumSetPtr spec_set_ptr 
         = getSpectrumSet(ms_ptr, delta, prsm_para_ptr->getSpParaPtr());
     if (spec_set_ptr.get() != nullptr) {
       DeconvMsPtr deconv_ms_ptr = spec_set_ptr->getDeconvMs();
-      for(unsigned int i=0;i<prsms.size();i++){
+      int spectrum_id = deconv_ms_ptr->getHeaderPtr()->getId();
+      int prec_id = deconv_ms_ptr->getHeaderPtr()->getPrecId();
+      //std::cout << "spectrum id " << spectrum_id << std::endl;
+      for(unsigned int i = start_prsm; i<prsms.size(); i++){
         if(prsms[i]->isMatchMs(deconv_ms_ptr->getHeaderPtr())){
           prsms[i]->setDeconvMsPtr(deconv_ms_ptr);
           double delta = prsms[i]->getAdjustedPrecMass() - prsms[i]->getOriPrecMass();
           prsms[i]->setRefineMs(getMsThree(deconv_ms_ptr, delta, prsm_para_ptr->getSpParaPtr()));
         }
+        if ((spectrum_id == prsms[i]->getSpectrumId() && prec_id < prsms[i]->getPrecursorId()) ||
+            spectrum_id < prsms[i]->getSpectrumId()) {
+          start_prsm = i;
+          break;
+        }
       }
     }
+    ms_ptr = reader.getNextMs();
   }
 }
 

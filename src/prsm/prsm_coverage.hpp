@@ -8,9 +8,9 @@
 
 namespace prot {
 
-class PrsmConverage {
+class PrsmCoverage {
  public:
-  PrsmConverage(PrsmParaPtr prsm_para_ptr, std::string input_file_ext,
+  PrsmCoverage(PrsmParaPtr prsm_para_ptr, std::string input_file_ext,
                 std::string output_file_ext);
   void process();
 
