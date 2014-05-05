@@ -10,7 +10,7 @@
 namespace prot {
 PtmSlowFilter::PtmSlowFilter(
     SpectrumSetPtr spectrum_set,
-    SimplePrSMPtrVec fast_Matches,
+    SimplePrsmPtrVec fast_Matches,
     CompShiftLowMemPtr comp_shift,
     PtmMngPtr mng){
 
@@ -35,27 +35,27 @@ PtmSlowFilter::PtmSlowFilter(
 
   // compute complete and prefix prsms 
   for(unsigned int i=0; i<complete_prefix_slow_matches_.size();i++){
-    PrSMPtrVec comps;
+    PrsmPtrVec comps;
     complete_prefix_slow_matches_[i]->compute(SemiAlignTypeFactory::getCompletePtr(), comps);
     complete_prsms_.push_back(comps);
-    PrSMPtrVec prefixs;
+    PrsmPtrVec prefixs;
     complete_prefix_slow_matches_[i]->compute(SemiAlignTypeFactory::getPrefixPtr(), prefixs);
     prefix_prsms_.push_back(prefixs);
   }
 
   // compute suffix and internal prsms 
   for(unsigned int i=0; i< suffix_internal_slow_matches_.size();i++){
-    PrSMPtrVec suffixs;
+    PrsmPtrVec suffixs;
     suffix_internal_slow_matches_[i]->compute(SemiAlignTypeFactory::getSuffixPtr(), suffixs);
     suffix_prsms_.push_back(suffixs);
-    PrSMPtrVec internals;
+    PrsmPtrVec internals;
     suffix_internal_slow_matches_[i]->compute(SemiAlignTypeFactory::getInternalPtr(), internals);
     internal_prsms_.push_back(internals);
   }
 }
 
-PrSMPtrVec PtmSlowFilter::getPrSMs(int nshift, SemiAlignTypePtr type){
-  PrSMPtrVec matches;
+PrsmPtrVec PtmSlowFilter::getPrsms(int nshift, SemiAlignTypePtr type){
+  PrsmPtrVec matches;
   if (type == SemiAlignTypeFactory::getCompletePtr()) {
     for (unsigned int i = 0; i < complete_prsms_.size(); i++) {
       if (complete_prsms_[i][nshift] != nullptr) {

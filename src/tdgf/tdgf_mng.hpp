@@ -19,7 +19,7 @@ class TdgfMng {
 
   /** parameters for tdmg */
 
-  /** PrSM filter */
+  /** Prsm filter */
   int comp_evalue_min_peak_num_ = 4;
 
   /** dp table */
@@ -35,7 +35,7 @@ class TdgfMng {
   double prefix_suffix_shift_thresh_ = 300;
 
   /**
-   * Postprocessing: adjustment makes it more conservative to identify PrSMs
+   * Postprocessing: adjustment makes it more conservative to identify Prsms
    * with multiple shifts
    */
   // the following three values should be adjusted

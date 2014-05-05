@@ -12,13 +12,13 @@
 
 namespace prot {
 
-class SimplePrSMWriter {
+class SimplePrsmWriter {
  public:
-  SimplePrSMWriter();
-  SimplePrSMWriter(std::string file_name);
-  ~SimplePrSMWriter();
+  SimplePrsmWriter();
+  SimplePrsmWriter(std::string file_name);
+  ~SimplePrsmWriter();
   void close();
-  void write(SimplePrSMPtrVec simple_prsms);
+  void write(SimplePrsmPtrVec simple_prsms);
 
  private:
   xercesc::DOMLSSerializer* serializer_;

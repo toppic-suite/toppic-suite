@@ -28,21 +28,21 @@ class AnnoView {
 
 typedef std::shared_ptr<AnnoView> AnnoViewPtr;
 std::vector<std::vector<std::string>> readViewXmlFiles(const std::string &file_name);
-xercesc::DOMElement* genePrSMView(XmlDOMDocument* xml_doc,PrSMPtr prsm, double min_mass);
-xercesc::DOMElement* genePrSMViewAS7(XmlDOMDocument* xml_doc,PrSMPtr prsm);
+xercesc::DOMElement* genePrsmView(XmlDOMDocument* xml_doc,PrsmPtr prsm, double min_mass);
+xercesc::DOMElement* genePrsmViewAS7(XmlDOMDocument* xml_doc,PrsmPtr prsm);
 xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,ProteoformPtr proteoform,
                                      ExtendMsPtr refine_ms_three, double min_mass);
 xercesc::DOMElement* proteinToXml(XmlDOMDocument* xml_doc,
-                                  PrSMPtrVec prsms,
+                                  PrsmPtrVec prsms,
                                   ProteoformPtr protein,
                                   std::vector<int> species,
                                   double min_mass);
-xercesc::DOMElement* speciesToXml(XmlDOMDocument* xml_doc,PrSMPtrVec prsms, double min_mass);
-PrSMPtrVec selectSpeciesPrsms(PrSMPtrVec prsms,int species_id);
-std::vector<int> getSpeciesIds(PrSMPtrVec prsms,int seq_id);
-std::vector<int> getSpeciesIds(PrSMPtrVec prsms);
+xercesc::DOMElement* speciesToXml(XmlDOMDocument* xml_doc,PrsmPtrVec prsms, double min_mass);
+PrsmPtrVec selectSpeciesPrsms(PrsmPtrVec prsms,int species_id);
+std::vector<int> getSpeciesIds(PrsmPtrVec prsms,int seq_id);
+std::vector<int> getSpeciesIds(PrsmPtrVec prsms);
 xercesc::DOMElement* allProteinToXml(XmlDOMDocument* xml_doc,
-                                  PrSMPtrVec prsms,
+                                  PrsmPtrVec prsms,
                                   ProteoformPtrVec proteins,
                                   double min_mass);
 }

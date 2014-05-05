@@ -28,7 +28,7 @@ class PtmFastFilterBlock {
     filter_ = PtmFastFilterHiMemPtr(
         new PtmFastFilterHiMem(seq_blocks_[i],mng_));
   }
-  SimplePrSMPtrVec getBestMathBatch(SpectrumSetPtr specttum_set);
+  SimplePrsmPtrVec getBestMathBatch(SpectrumSetPtr specttum_set);
  private:
   PtmFastFilterMngPtr mng_;
   ProteoformPtrVec seqs_;

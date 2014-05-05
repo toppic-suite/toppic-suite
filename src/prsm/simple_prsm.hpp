@@ -17,15 +17,15 @@
 
 namespace prot {
 
-class SimplePrSM;
-typedef std::shared_ptr<SimplePrSM> SimplePrSMPtr;
-typedef std::vector<SimplePrSMPtr> SimplePrSMPtrVec;
-typedef std::vector<SimplePrSMPtrVec> SimplePrSMPtrVec2D;
+class SimplePrsm;
+typedef std::shared_ptr<SimplePrsm> SimplePrsmPtr;
+typedef std::vector<SimplePrsmPtr> SimplePrsmPtrVec;
+typedef std::vector<SimplePrsmPtrVec> SimplePrsmPtrVec2D;
 
-class SimplePrSM {
+class SimplePrsm {
 public:
-    SimplePrSM(MsHeaderPtr header,ProteoformPtr seq,int score);
-    SimplePrSM(xercesc::DOMElement* element);
+    SimplePrsm(MsHeaderPtr header,ProteoformPtr seq,int score);
+    SimplePrsm(xercesc::DOMElement* element);
     std::string getSeqName(){return seq_name_;}
     ProteoformPtr getSeq(){return seq_;}
     int getSeqId(){return seq_id_;}
@@ -35,7 +35,7 @@ public:
     double getPrecMass(){return prec_mass_;}
     void setPrecursorId(int precursorId){precursor_id_ = precursorId;}
     int getPrecursorId(){return precursor_id_;}
-    int compareTo(SimplePrSMPtr simple_prsm_ptr);
+    int compareTo(SimplePrsmPtr simple_prsm_ptr);
     void findSeq(std::vector<ProteoformPtr> seqs);
     xercesc::DOMElement* toXml(XmlDOMDocument* xml_doc);
     bool isMatch(MsHeaderPtr header);
@@ -51,12 +51,12 @@ private:
     double score_;
 };
 
-SimplePrSMPtrVec findSimplePrsms(SimplePrSMPtrVec simple_prsm,
+SimplePrsmPtrVec findSimplePrsms(SimplePrsmPtrVec simple_prsm,
                                  MsHeaderPtr header);
 
-SimplePrSMPtrVec readSimplePrSM(std::string filename);
+SimplePrsmPtrVec readSimplePrsm(std::string filename);
 
-inline bool simplePrSMDown(const SimplePrSMPtr p,SimplePrSMPtr n){
+inline bool simplePrsmDown(const SimplePrsmPtr p,SimplePrsmPtr n){
   return p->getScore() > n->getScore();
 }
 

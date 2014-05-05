@@ -39,13 +39,13 @@ void OutputSelector::process(){
   std::string base_name = basename(spec_file_);
   std::string input_file_name = base_name + "." + input_file_;
   ProteoformPtrVec proteoforms = readFastaToProteoform(db_file_,ResidueFactory::getBaseResiduePtrVec());
-  PrSMPtrVec prsms = readPrsm(input_file_name,proteoforms);
+  PrsmPtrVec prsms = readPrsm(input_file_name,proteoforms);
   // it's no need to process prsm
   //select
   sort(prsms.begin(),prsms.end(),prsmSpectrumIdUpEvalueUp);
   bool evalue_cutoff = (cutoff_type_ == "EVALUE");
 
-  PrSMPtrVec selected_prsm ;
+  PrsmPtrVec selected_prsm ;
   ProteoformPtrVec selected_protein;
   int id =0;
   for(unsigned int i=0;i<prsms.size();i++){
@@ -67,10 +67,10 @@ void OutputSelector::process(){
 
   //output
   std::string output_file_name = base_name +"."+output_file_;
-  PrSMWriter writer(output_file_name);
+  PrsmWriter writer(output_file_name);
   writer.writeVector(selected_prsm);
 
-  //because the prsm_writer ~PrSMWriter changed and the fileclosing is an independant function
+  //because the prsm_writer ~PrsmWriter changed and the fileclosing is an independant function
   writer.close();
 }
 } /* namespace prot */

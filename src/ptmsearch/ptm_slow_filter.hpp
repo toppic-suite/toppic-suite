@@ -21,17 +21,17 @@ class PtmSlowFilter {
  public:
   PtmSlowFilter(
       SpectrumSetPtr spectrum_set,
-      SimplePrSMPtrVec fast_Matches,
+      SimplePrsmPtrVec fast_Matches,
       CompShiftLowMemPtr comp_shift,
       PtmMngPtr mng);
-  PrSMPtrVec getPrSMs(int nshift, SemiAlignTypePtr type);
+  PrsmPtrVec getPrsms(int nshift, SemiAlignTypePtr type);
  private:
   PtmSlowMatchPtrVec complete_prefix_slow_matches_;
   PtmSlowMatchPtrVec suffix_internal_slow_matches_;
-  PrSMPtrVec2D complete_prsms_;
-  PrSMPtrVec2D prefix_prsms_;
-  PrSMPtrVec2D suffix_prsms_;
-  PrSMPtrVec2D internal_prsms_;
+  PrsmPtrVec2D complete_prsms_;
+  PrsmPtrVec2D prefix_prsms_;
+  PrsmPtrVec2D suffix_prsms_;
+  PrsmPtrVec2D internal_prsms_;
 };
 
 typedef std::shared_ptr<PtmSlowFilter> PtmSlowFilterPtr;

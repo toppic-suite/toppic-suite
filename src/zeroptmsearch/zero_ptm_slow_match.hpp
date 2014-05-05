@@ -14,7 +14,7 @@ class ZeroPtmSlowMatch {
   ZeroPtmSlowMatch(DeconvMsPtr deconv_ms_ptr, ZpFastMatchPtr fast_match_ptr,
                    ZeroPtmMngPtr mng_ptr);
     double getScore() {return score_;}
-  PrSMPtr geneResult();
+  PrsmPtr geneResult();
 
  private:
     ZeroPtmMngPtr mng_ptr_;

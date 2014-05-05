@@ -14,7 +14,7 @@ void zeroPtmSearch(SpectrumSetPtr spec_set_ptr,
                    SemiAlignTypePtr type,
                    ProteoformPtrVec &proteoform_ptr_vec, 
                    ZeroPtmMngPtr mng_ptr, 
-                   PrSMPtrVec &prsms) {
+                   PrsmPtrVec &prsms) {
   ExtendMsPtr ms_three = spec_set_ptr->getSpThree();
 
   ZpFastMatchPtrVec fast_matches 
@@ -53,15 +53,15 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
   MsAlignReader reader(prsm_para_ptr->getSpectrumFileName());
   std::string output_file_name = basename(prsm_para_ptr->getSpectrumFileName())
                                           + "." + mng_ptr->output_file_ext_;
-  PrSMWriter comp_writer(output_file_name + "_" 
+  PrsmWriter comp_writer(output_file_name + "_" 
                          + SemiAlignTypeFactory::getCompletePtr()->getName());
-  PrSMWriter pref_writer(output_file_name + "_"
+  PrsmWriter pref_writer(output_file_name + "_"
                          + SemiAlignTypeFactory::getPrefixPtr()->getName());
-  PrSMWriter suff_writer(output_file_name + "_"
+  PrsmWriter suff_writer(output_file_name + "_"
                          + SemiAlignTypeFactory::getSuffixPtr()->getName());
-  PrSMWriter internal_writer(output_file_name + "_"
+  PrsmWriter internal_writer(output_file_name + "_"
       + SemiAlignTypeFactory::getInternalPtr()->getName());
-  PrSMWriter all_writer(output_file_name);
+  PrsmWriter all_writer(output_file_name);
 
   LOG_DEBUG("start reading");
   int n = 0;
@@ -73,22 +73,22 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
     SpectrumSetPtr spec_set_ptr 
         = getSpectrumSet(ms_ptr, delta, prsm_para_ptr->getSpParaPtr());
     if (spec_set_ptr.get() != nullptr) {
-      PrSMPtrVec comp_prsms;
+      PrsmPtrVec comp_prsms;
       zeroPtmSearch(spec_set_ptr, SemiAlignTypeFactory::getCompletePtr(), 
                     prot_mod_forms, mng_ptr, comp_prsms);
       comp_writer.writeVector(comp_prsms);
       all_writer.writeVector(comp_prsms);
-      PrSMPtrVec pref_prsms;
+      PrsmPtrVec pref_prsms;
       zeroPtmSearch(spec_set_ptr, SemiAlignTypeFactory::getPrefixPtr(), 
                     prot_mod_forms, mng_ptr, pref_prsms);
       pref_writer.writeVector(pref_prsms);
       all_writer.writeVector(pref_prsms);
-      PrSMPtrVec suff_prsms;
+      PrsmPtrVec suff_prsms;
       zeroPtmSearch(spec_set_ptr, SemiAlignTypeFactory::getSuffixPtr(), 
                     raw_forms, mng_ptr, suff_prsms);
       suff_writer.writeVector(suff_prsms);
       all_writer.writeVector(suff_prsms);
-      PrSMPtrVec internal_prsms;
+      PrsmPtrVec internal_prsms;
       zeroPtmSearch(spec_set_ptr, SemiAlignTypeFactory::getInternalPtr(), 
                     raw_forms, mng_ptr, internal_prsms);
       internal_writer.writeVector(internal_prsms);
@@ -101,7 +101,7 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
 
   reader.close();
 
-  //because the prsm_writer ~PrSMWriter changed and the fileclosing is an independant function
+  //because the prsm_writer ~PrsmWriter changed and the fileclosing is an independant function
   comp_writer.close();
   pref_writer.close();
   suff_writer.close();

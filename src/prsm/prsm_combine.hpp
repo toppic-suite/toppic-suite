@@ -19,15 +19,15 @@
 
 namespace prot {
 
-class PrSMCombine {
+class PrsmCombine {
  public:
-  PrSMCombine(std::string db_file, std::string spec_file,
+  PrsmCombine(std::string db_file, std::string spec_file,
               std::vector<std::string> &in_file_exts, std::string out_file);
 
-  PrSMCombine(std::map<std::string, std::string> arguments,
+  PrsmCombine(std::map<std::string, std::string> arguments,
               std::vector<std::string> &in_file_exts,
               std::string out_file);
-  virtual ~PrSMCombine();
+  virtual ~PrsmCombine();
   void process();
  private:
   std::string spec_file_;
@@ -35,7 +35,7 @@ class PrSMCombine {
   std::vector<std::string> input_file_exts_;
   std::string output_files_;
 };
-typedef std::shared_ptr<PrSMCombine> PrSMCombinePtr;
+typedef std::shared_ptr<PrsmCombine> PrsmCombinePtr;
 } /* namespace prot */
 
 #endif /* PRSM_COMBINE_HPP_ */

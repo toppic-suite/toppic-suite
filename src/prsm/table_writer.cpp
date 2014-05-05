@@ -58,7 +58,7 @@ void TableWriter::write(){
   //write spectrum
   std::string input_file_name = basename(spec_file_)+"."+input_file_;
   ProteoformPtrVec proteoforms_ = prot::readFastaToProteoform(db_file_,ResidueFactory::getBaseResiduePtrVec());
-  PrSMPtrVec prsms = readPrsm(input_file_name,proteoforms_);
+  PrsmPtrVec prsms = readPrsm(input_file_name,proteoforms_);
   sort(prsms.begin(),prsms.end(),prsmSpectrumIdUpMatchFragUp);
   for(unsigned int i=0;i<prsms.size();i++){
     file_ << spec_file_ << "\t"

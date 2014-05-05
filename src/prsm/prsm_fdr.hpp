@@ -5,8 +5,8 @@
  *      Author: xunlikun
  */
 
-#ifndef PRSMFDR_HPP_
-#define PRSMFDR_HPP_
+#ifndef PROT_PRSM_FDR_HPP_
+#define PROT_PRSM_FDR_HPP_
 
 #include <map>
 #include <string>
@@ -18,11 +18,11 @@
 
 namespace prot {
 
-class PrSMFdr {
+class PrsmFdr {
  public:
-  PrSMFdr(std::string db_file_name, std::string spec_file_name, 
+  PrsmFdr(std::string db_file_name, std::string spec_file_name, 
           std::string input_ext,std::string output_ext);
-  PrSMFdr(std::map<std::string,std::string> arguments,std::string input_ext,std::string output_ext);
+  PrsmFdr(std::map<std::string,std::string> arguments,std::string input_ext,std::string output_ext);
   void process();
  private:
   std::string db_file_;
@@ -30,7 +30,7 @@ class PrSMFdr {
   std::string input_file_;
   std::string output_file_;
 
-  void compute(PrSMPtrVec &target,PrSMPtrVec decoy);
+  void compute(PrsmPtrVec &target,PrsmPtrVec decoy);
 };
 
 } /* namespace prot */

@@ -16,23 +16,23 @@
 
 namespace prot {
 
-class PrSMWriter {
+class PrsmWriter {
 public:
- PrSMWriter(std::string file_name);
- ~PrSMWriter();
+ PrsmWriter(std::string file_name);
+ ~PrsmWriter();
  void close();
- void write(PrSMPtr prsm_ptr);
- void writeVector(PrSMPtrVec &prsms);
- void writeVector2D(PrSMPtrVec2D &prsms);
- void writeVector3D(PrSMPtrVec3D &prsms);
+ void write(PrsmPtr prsm_ptr);
+ void writeVector(PrsmPtrVec &prsms);
+ void writeVector2D(PrsmPtrVec2D &prsms);
+ void writeVector3D(PrsmPtrVec3D &prsms);
 private:
   xercesc::DOMLSSerializer* serializer_;
   XmlDOMDocument* doc_;
   std::ofstream file_;
 };
 
-typedef std::shared_ptr<PrSMWriter> PrSMWriterPtr;
-typedef std::vector<PrSMWriterPtr> PrSMWriterPtrVec;
+typedef std::shared_ptr<PrsmWriter> PrsmWriterPtr;
+typedef std::vector<PrsmWriterPtr> PrsmWriterPtrVec;
 
 } /* namespace prot */
 

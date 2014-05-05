@@ -15,10 +15,10 @@ class CompPValueArray {
                   TdgfMngPtr mng_ptr);
 
   ExtremeValuePtrVec compExtremeValues(PrmMsPtr ms_six, 
-                                       PrSMPtrVec &prsms, bool strict);
+                                       PrsmPtrVec &prsms, bool strict);
 
-  void setPValue(DeconvMsPtr ms_ptr, PrSMPtr prsm_ptr);
-  void setPValueArray(PrmMsPtr prm_ms_ptr, PrSMPtrVec prsms);
+  void setPValue(DeconvMsPtr ms_ptr, PrsmPtr prsm_ptr);
+  void setPValueArray(PrmMsPtr prm_ms_ptr, PrsmPtrVec prsms);
 
  private:
   TdgfMngPtr mng_ptr_;
@@ -27,7 +27,7 @@ class CompPValueArray {
   ResFreqPtrVec pep_n_term_residues_;
   ResFreqPtrVec prot_n_term_residues_;
 
-  ExtremeValuePtr compExtremeValue(PrmMsPtr ms_ptr, PrSMPtr prsm_ptr);
+  ExtremeValuePtr compExtremeValue(PrmMsPtr ms_ptr, PrsmPtr prsm_ptr);
 };
 
 typedef std::shared_ptr<CompPValueArray> CompPValueArrayPtr;

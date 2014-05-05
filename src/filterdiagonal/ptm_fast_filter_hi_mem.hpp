@@ -19,15 +19,15 @@ namespace prot {
 class PtmFastFilterHiMem {
 public:
     PtmFastFilterHiMem(ProteoformPtrVec seqs,PtmFastFilterMngPtr mng);
-    SimplePrSMPtrVec getBestMatch(PrmMsPtr ms);
+    SimplePrsmPtrVec getBestMatch(PrmMsPtr ms);
 
 private:
     PtmFastFilterMngPtr mng_;
     ProteoformPtrVec seqs_;
     CompShiftHiMemPtr index_;
 
-    SimplePrSMPtrVec2D compute(PrmMsPtr ms);
-    SimplePrSMPtrVec sort(SimplePrSMPtrVec2D matches);
+    SimplePrsmPtrVec2D compute(PrmMsPtr ms);
+    SimplePrsmPtrVec sort(SimplePrsmPtrVec2D matches);
 };
 
 typedef std::shared_ptr<PtmFastFilterHiMem> PtmFastFilterHiMemPtr;

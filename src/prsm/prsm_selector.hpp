@@ -18,10 +18,10 @@
 
 namespace prot {
 
-class PrSMSelector {
+class PrsmSelector {
  public:
-  PrSMSelector(std::string db_file,std::string spec_file,std::string in_file,std::string out_file,int n_top);
-  PrSMSelector(std::map<std::string,std::string> arguments,std::string in_file,std::string out_file,int n_top);
+  PrsmSelector(std::string db_file,std::string spec_file,std::string in_file,std::string out_file,int n_top);
+  PrsmSelector(std::map<std::string,std::string> arguments,std::string in_file,std::string out_file,int n_top);
   void process();
  private:
   std::string spec_file_;
@@ -30,8 +30,8 @@ class PrSMSelector {
   std::string output_file_;
   int n_top_;
 
-  PrSMPtrVec getTopPrsms(PrSMPtrVec selected_prsm,int n_top);
-  bool findPrsm(PrSMPtrVec result,PrSMPtr prsm);
+  PrsmPtrVec getTopPrsms(PrsmPtrVec selected_prsm,int n_top);
+  bool findPrsm(PrsmPtrVec result,PrsmPtr prsm);
 };
 
 } /* namespace prot */

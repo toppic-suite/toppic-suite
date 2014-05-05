@@ -38,18 +38,18 @@ void PtmSlowMatch::init(CompShiftLowMemPtr comp_shift){
   ps_align_ = PSAlignPtr(new PSAlign(ms_masses,seq_masses,diagonals,mng_));
 }
 
-void PtmSlowMatch::compute(SemiAlignTypePtr type, PrSMPtrVec &prsms) {
+void PtmSlowMatch::compute(SemiAlignTypePtr type, PrsmPtrVec &prsms) {
   ps_align_->compute(type);
   scores_ = ps_align_->getAlignScr();
   headers_ = ps_align_->getResult();
   for (int s = 1; s <= mng_->n_unknown_shift_; s++) {
-    PrSMPtr prsm_ptr = geneResult(s);
+    PrsmPtr prsm_ptr = geneResult(s);
     prsms.push_back(prsm_ptr);
   }
 }
 
 
-PrSMPtr PtmSlowMatch::geneResult(int shift_num){
+PrsmPtr PtmSlowMatch::geneResult(int shift_num){
   DiagonalHeaderPtrVec headers=headers_[shift_num];
   if(headers.size()==0)
   {
@@ -75,8 +75,8 @@ PrSMPtr PtmSlowMatch::geneResult(int shift_num){
       refined_headers, first_pos, last_pos);
   proteoform->addUnexpectedChangePtrVec(changes);
 
-  return PrSMPtr(
-      new PrSM(proteoform, deconv_ms_, refine_prec_mass,
+  return PrsmPtr(
+      new Prsm(proteoform, deconv_ms_, refine_prec_mass,
           0, mng_->prsm_para_ptr_->getSpParaPtr()));
 }
 

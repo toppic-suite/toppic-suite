@@ -25,23 +25,23 @@ class PtmProcessor {
 
   PtmMngPtr mng_ptr_;
   ProteoformPtrVec proteoforms_;
-  SimplePrSMPtrVec simplePrsms_;
+  SimplePrsmPtrVec simplePrsms_;
   CompShiftLowMemPtr comp_shift_;
-  std::vector<PrSMWriterPtr> complete_writers_;
-  std::vector<PrSMWriterPtr> prefix_writers_;
-  std::vector<PrSMWriterPtr> suffix_writers_;
-  std::vector<PrSMWriterPtr> internal_writers_;
-  PrSMWriterPtr all_writer_;
+  std::vector<PrsmWriterPtr> complete_writers_;
+  std::vector<PrsmWriterPtr> prefix_writers_;
+  std::vector<PrsmWriterPtr> suffix_writers_;
+  std::vector<PrsmWriterPtr> internal_writers_;
+  PrsmWriterPtr all_writer_;
 
  private:
   void init();
-  void prsmFindSeq(SimplePrSMPtrVec simple_prsms,ProteoformPtrVec seqs);
-  void chooseCompPrePrsms(PrSMPtrVec &all_prsms,
-                   PrSMPtrVec &prsms);
-  void chooseSuffIntPrsms(PrSMPtrVec &all_prsms,
-                     PrSMPtrVec &prsms);
+  void prsmFindSeq(SimplePrsmPtrVec simple_prsms,ProteoformPtrVec seqs);
+  void chooseCompPrePrsms(PrsmPtrVec &all_prsms,
+                   PrsmPtrVec &prsms);
+  void chooseSuffIntPrsms(PrsmPtrVec &all_prsms,
+                     PrsmPtrVec &prsms);
   void search(SpectrumSetPtr spectrum_set_ptr, 
-              SimplePrSMPtrVec matches
+              SimplePrsmPtrVec matches
               );
 
 };

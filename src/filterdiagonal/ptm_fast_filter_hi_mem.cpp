@@ -18,16 +18,16 @@ PtmFastFilterHiMem::PtmFastFilterHiMem(ProteoformPtrVec seqs,
     index_ = CompShiftHiMemPtr(new CompShiftHiMem(seqs,mng));
 }
 
-SimplePrSMPtrVec PtmFastFilterHiMem::getBestMatch(PrmMsPtr ms){
-    SimplePrSMPtrVec2D matches = compute(ms);
-    SimplePrSMPtrVec unique_match = sort(matches);
+SimplePrsmPtrVec PtmFastFilterHiMem::getBestMatch(PrmMsPtr ms){
+    SimplePrsmPtrVec2D matches = compute(ms);
+    SimplePrsmPtrVec unique_match = sort(matches);
     unsigned int num = mng_->ptm_fast_filter_result_num_;
     if(num > unique_match.size()){
         num = unique_match.size();
     }
-    SimplePrSMPtrVec result;
+    SimplePrsmPtrVec result;
     for(unsigned int i=0;i<num;i++){
-        SimplePrSMPtr match = unique_match[i];
+        SimplePrsmPtr match = unique_match[i];
         if(match->getScore() > 0.0){
             result.push_back(match);
         }
@@ -37,18 +37,18 @@ SimplePrSMPtrVec PtmFastFilterHiMem::getBestMatch(PrmMsPtr ms){
     }
     return result;
 }
-SimplePrSMPtrVec2D PtmFastFilterHiMem::compute(PrmMsPtr ms){
+SimplePrsmPtrVec2D PtmFastFilterHiMem::compute(PrmMsPtr ms){
     std::vector<std::vector<int>> masses 
       = prot::getIntMassErrorList(ms,mng_->ptm_fast_filter_scale_,true,false);
-    SimplePrSMPtrVec2D match;
+    SimplePrsmPtrVec2D match;
     for(unsigned int i=0;i<masses[0].size();i++){
         std::vector<std::vector<int>> results 
         =index_->compConvolution(masses[0],masses[1],i,
                                  mng_->ptm_fast_filter_result_num_);
-        SimplePrSMPtrVec temp_match;
+        SimplePrsmPtrVec temp_match;
         for(unsigned int j =0;j <results.size();j++){
             temp_match.push_back(
-          SimplePrSMPtr(new SimplePrSM(ms->getHeaderPtr(),
+          SimplePrsmPtr(new SimplePrsm(ms->getHeaderPtr(),
                                        seqs_[results[j][0]],
                                        results[j][1])));
         }
@@ -56,8 +56,8 @@ SimplePrSMPtrVec2D PtmFastFilterHiMem::compute(PrmMsPtr ms){
     }
     return match;
 }
-SimplePrSMPtrVec PtmFastFilterHiMem::sort(SimplePrSMPtrVec2D matches){
-    SimplePrSMPtrVec sorted_match;
+SimplePrsmPtrVec PtmFastFilterHiMem::sort(SimplePrsmPtrVec2D matches){
+    SimplePrsmPtrVec sorted_match;
 
     for(unsigned int i=0;i<matches.size();i++){
         for(unsigned int j =0;j< matches[i].size();j++){
@@ -65,9 +65,9 @@ SimplePrSMPtrVec PtmFastFilterHiMem::sort(SimplePrSMPtrVec2D matches){
         }
     }
 
-    std::sort(sorted_match.begin(),sorted_match.end(),simplePrSMDown);
+    std::sort(sorted_match.begin(),sorted_match.end(),simplePrsmDown);
 
-    SimplePrSMPtrVec unique_match;
+    SimplePrsmPtrVec unique_match;
     for(unsigned int i=0;i< sorted_match.size();i++){
         bool found = false;
         std::string seq_name = sorted_match[i]->getSeqName();

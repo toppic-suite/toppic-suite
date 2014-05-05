@@ -9,7 +9,7 @@
 
 namespace prot {
 
-PrSMWriter::PrSMWriter(std::string file_name) {
+PrsmWriter::PrsmWriter(std::string file_name) {
   file_.open(file_name.c_str());
   LOG_DEBUG("file_name " << file_name);
   file_ << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << std::endl;
@@ -19,19 +19,19 @@ PrSMWriter::PrSMWriter(std::string file_name) {
   serializer_ = impl->createSerializer();
 }
 
-void PrSMWriter::close(){
+void PrsmWriter::close(){
   file_ << "</prsm_list>" << std::endl;
   file_.close();
 }
 
-PrSMWriter::~PrSMWriter() {
+PrsmWriter::~PrsmWriter() {
 //  file_ << "</prsm_list>" << std::endl;
 //  file_.close();
   serializer_->release();
   delete doc_;
 }
 
-void PrSMWriter::write(PrSMPtr prsm_ptr) {
+void PrsmWriter::write(PrsmPtr prsm_ptr) {
   if(prsm_ptr!=nullptr){
     xercesc::DOMElement* element = prsm_ptr->toXmlElement(doc_);
     //LOG_DEBUG("Element generated");
@@ -42,18 +42,18 @@ void PrSMWriter::write(PrSMPtr prsm_ptr) {
   }
 }
 
-void PrSMWriter::writeVector(PrSMPtrVec &prsms) {
+void PrsmWriter::writeVector(PrsmPtrVec &prsms) {
   for (unsigned i = 0; i < prsms.size(); i++) {
     write(prsms[i]);
   }
 }
 
-void PrSMWriter::writeVector2D(PrSMPtrVec2D &prsms){
+void PrsmWriter::writeVector2D(PrsmPtrVec2D &prsms){
     for (unsigned i = 0; i < prsms.size(); i++) {
         writeVector(prsms[i]);
     }
 }
-void PrSMWriter::writeVector3D(PrSMPtrVec3D &prsms){
+void PrsmWriter::writeVector3D(PrsmPtrVec3D &prsms){
     for (unsigned i = 0; i < prsms.size(); i++) {
         writeVector2D(prsms[i]);
     }

@@ -34,20 +34,20 @@ void PrsmSpecies::process(){
   std::string base_name = basename(spec_file_);
   std::string input_file_name = base_name+"."+input_file_;
   ProteoformPtrVec proteoforms_ = prot::readFastaToProteoform(db_file_,ResidueFactory::getBaseResiduePtrVec());
-  PrSMPtrVec prsms = readPrsm(input_file_name,proteoforms_);
+  PrsmPtrVec prsms = readPrsm(input_file_name,proteoforms_);
   sort(prsms.begin(),prsms.end(),prsmSpectrumIdUpMatchFragUp);
   setSpeciesId(prsms,ppo_);
 
   //output
   std::string output_file_name = base_name +"."+output_file_;
-  PrSMWriter writer(output_file_name);
+  PrsmWriter writer(output_file_name);
   writer.writeVector(prsms);
-  //because the prsm_writer ~PrSMWriter changed and the
+  //because the prsm_writer ~PrsmWriter changed and the
   // fileclosing is an independant function
   writer.close();
 }
 
-ProteoformPtrVec2D groupProteins(const PrSMPtrVec &prsms){
+ProteoformPtrVec2D groupProteins(const PrsmPtrVec &prsms){
   //get max shift number
   unsigned int max_shift_number = 0;
   for(unsigned int i=0;i<prsms.size();i++){
@@ -87,7 +87,7 @@ SpeciesPtrVec getZeroPtmList(const ProteoformPtrVec& proteoforms, double ppo){
   return list;
 }
 
-SpeciesPtrVec setSpeciesId(const PrSMPtrVec& prsms,double ppo){
+SpeciesPtrVec setSpeciesId(const PrsmPtrVec& prsms,double ppo){
   ProteoformPtrVec2D proteogroups = groupProteins(prsms);
 
   SpeciesPtrVec list = getZeroPtmList(proteogroups[0],ppo);

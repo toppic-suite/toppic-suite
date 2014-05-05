@@ -34,8 +34,8 @@ class PtmSlowMatch {
       PtmMngPtr mng);
   ProteoformPtr getSeq(){return seq_;};
   double getScr(int shiftnum,int type);
-  PrSMPtr geneResult(int shift_num);
-  void compute(SemiAlignTypePtr type, PrSMPtrVec &prsms);
+  PrsmPtr geneResult(int shift_num);
+  void compute(SemiAlignTypePtr type, PrsmPtrVec &prsms);
 
  private:
   PtmMngPtr mng_;

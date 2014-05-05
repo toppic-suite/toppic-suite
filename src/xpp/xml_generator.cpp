@@ -20,12 +20,12 @@ XmlGenerator::XmlGenerator(PrsmParaPtr prsm_para_ptr,
   anno_view_ = AnnoViewPtr(new AnnoView());
 }
 
-void XmlGenerator::outputPrsms(PrSMPtrVec prsms){
+void XmlGenerator::outputPrsms(PrsmPtrVec prsms){
   for(unsigned int i=0;i<prsms.size();i++){
     std::string file_name = mng_->xml_path_+ FILE_SEPARATOR + 
         "prsms" + FILE_SEPARATOR + "prsm"+convertToString(prsms[i]->getId())+".xml";
     XmlWriter writer(file_name,"");
-    writer.write(genePrSMView(writer.getDoc(),prsms[i], mng_->prsm_para_ptr_->getSpParaPtr()->getMinMass()));
+    writer.write(genePrsmView(writer.getDoc(),prsms[i], mng_->prsm_para_ptr_->getSpParaPtr()->getMinMass()));
     writer.close();
 
     std::vector<std::string> file_info;
@@ -38,17 +38,17 @@ void XmlGenerator::outputPrsms(PrSMPtrVec prsms){
   }
 
 }
-void XmlGenerator::outputAllPrsms(PrSMPtrVec prsms){
+void XmlGenerator::outputAllPrsms(PrsmPtrVec prsms){
   std::string file_name = mng_->xml_path_+ FILE_SEPARATOR + "prsms.xml";
   XmlWriter writer(file_name,"prsm_list");
   for(unsigned int i=0;i<prsms.size();i++){
-    writer.write(genePrSMView(writer.getDoc(),prsms[i], 
+    writer.write(genePrsmView(writer.getDoc(),prsms[i], 
                               mng_->prsm_para_ptr_->getSpParaPtr()->getMinMass()));
     writer.close();
   }
 }
 
-void XmlGenerator::outputProteins(PrSMPtrVec prsms){
+void XmlGenerator::outputProteins(PrsmPtrVec prsms){
 
   for(unsigned int i=0;i<raw_forms_.size();i++){
     std::vector<int> species = getSpeciesIds(prsms,raw_forms_[i]->getDbResSeqPtr()->getId());
@@ -68,7 +68,7 @@ void XmlGenerator::outputProteins(PrSMPtrVec prsms){
     }
   }
 }
-void XmlGenerator::outputAllProteins(PrSMPtrVec prsms){
+void XmlGenerator::outputAllProteins(PrsmPtrVec prsms){
 
   std::string file_name = mng_->xml_path_+ FILE_SEPARATOR +"proteins.xml";
   XmlWriter writer(file_name,"protein_list");
@@ -82,11 +82,11 @@ void XmlGenerator::outputAllProteins(PrSMPtrVec prsms){
   anno_view_->file_list_.push_back(file_info);
 }
 
-void XmlGenerator::outputSpecies(PrSMPtrVec prsms){
+void XmlGenerator::outputSpecies(PrsmPtrVec prsms){
 
   std::vector<int> species = getSpeciesIds(prsms);
   for(unsigned int i=0;i<species.size();i++){
-    PrSMPtrVec select_prsms = selectSpeciesPrsms(prsms,species[i]);
+    PrsmPtrVec select_prsms = selectSpeciesPrsms(prsms,species[i]);
     if(select_prsms.size()>0){
       std::string file_name = mng_->xml_path_+ FILE_SEPARATOR + "species" 
           + FILE_SEPARATOR + "species"+convertToString(species[i])+".xml";
@@ -121,7 +121,7 @@ void XmlGenerator::process(){
   raw_forms_ = readFastaToProteoform(prsm_para_ptr->getSearchDbFileName(),
                                      prsm_para_ptr->getFixModResiduePtrVec());
   std::string input_name = basename(spectrum_file_name)+"."+input_file_;
-  PrSMPtrVec prsms = readPrsm(basename(spectrum_file_name)+"."+input_file_,raw_forms_);
+  PrsmPtrVec prsms = readPrsm(basename(spectrum_file_name)+"."+input_file_,raw_forms_);
 
   addSpectrumPtrsToPrsms(prsms, prsm_para_ptr);
   setSpeciesId(prsms,prsm_para_ptr->getSpParaPtr()->getPeakTolerancePtr()->getPpo());

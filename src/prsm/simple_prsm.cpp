@@ -15,7 +15,7 @@
 
 namespace prot {
 
-SimplePrSM::SimplePrSM(MsHeaderPtr header,ProteoformPtr seq,int score){
+SimplePrsm::SimplePrsm(MsHeaderPtr header,ProteoformPtr seq,int score){
     spectrum_id_ = header->getId();
     spectrum_scan_ = header->getScansString();
     precursor_id_ = header->getPrecId();
@@ -26,7 +26,7 @@ SimplePrSM::SimplePrSM(MsHeaderPtr header,ProteoformPtr seq,int score){
     score_ = score;
 }
 
-SimplePrSM::SimplePrSM(xercesc::DOMElement* element){
+SimplePrsm::SimplePrsm(xercesc::DOMElement* element){
     spectrum_id_ = getIntChildValue(element, "spectrum_id", 0);
     spectrum_scan_ = getChildValue(element, "spectrum_scan", 0);
     precursor_id_ = getIntChildValue(element, "precursor_id", 0);
@@ -36,7 +36,7 @@ SimplePrSM::SimplePrSM(xercesc::DOMElement* element){
     score_ = getDoubleChildValue(element, "score", 0);
 }
 
-int SimplePrSM::compareTo(SimplePrSMPtr simple_prsm_ptr){
+int SimplePrsm::compareTo(SimplePrsmPtr simple_prsm_ptr){
     if (simple_prsm_ptr->getScore()>getScore()){
         return 1;
     }
@@ -47,7 +47,7 @@ int SimplePrSM::compareTo(SimplePrSMPtr simple_prsm_ptr){
         return 0;
     }
 }
-void SimplePrSM::findSeq(std::vector<ProteoformPtr> seqs){
+void SimplePrsm::findSeq(std::vector<ProteoformPtr> seqs){
     seq_ = seqs[seq_id_];
 
     if(seq_->getSeqId() != seq_id_ || seq_->getSeqName() != seq_name_){
@@ -56,7 +56,7 @@ void SimplePrSM::findSeq(std::vector<ProteoformPtr> seqs){
     }
 }
 
-xercesc::DOMElement* SimplePrSM::toXml(XmlDOMDocument* xml_doc){
+xercesc::DOMElement* SimplePrsm::toXml(XmlDOMDocument* xml_doc){
     xercesc::DOMElement* element = xml_doc->createElement("simple_prsm");
     std::string str = convertToString(spectrum_id_);
     xml_doc->addElement(element, "spectrum_id", str.c_str());
@@ -72,7 +72,7 @@ xercesc::DOMElement* SimplePrSM::toXml(XmlDOMDocument* xml_doc){
     xml_doc->addElement(element, "sequence_name", seq_name_.c_str());
     return element;
 }
-bool SimplePrSM::isMatch(MsHeaderPtr header){
+bool SimplePrsm::isMatch(MsHeaderPtr header){
     int header_spectrum_id = header->getId();
     std::string header_spectrum_scan = header->getScansString();
     int header_precursor_id = header->getPrecId();
@@ -81,7 +81,7 @@ bool SimplePrSM::isMatch(MsHeaderPtr header){
      && header_precursor_id == precursor_id_){
         if(std::abs(header_precursor_mass-prec_mass_) > 0.00001 ||
                 header_spectrum_scan != spectrum_scan_){
-            LOG_ERROR("Error in combine simple PrSMs! ");
+            LOG_ERROR("Error in combine simple Prsms! ");
         }
         return true;
     }
@@ -90,8 +90,8 @@ bool SimplePrSM::isMatch(MsHeaderPtr header){
     }
 }
 
-SimplePrSMPtrVec readSimplePrSM(std::string filename){
-    SimplePrSMPtrVec results;
+SimplePrsmPtrVec readSimplePrsm(std::string filename){
+    SimplePrsmPtrVec results;
     XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
     if(parser){
         XmlDOMDocument* doc = new XmlDOMDocument(parser, filename.c_str());
@@ -101,7 +101,7 @@ SimplePrSMPtrVec readSimplePrSM(std::string filename){
             for (int i = 0; i < simple_prsm_num; i++) {
                 xercesc::DOMElement* simple_prsm 
             = getChildElement(root, "simple_prsm", i);
-                results.push_back(SimplePrSMPtr(new SimplePrSM(simple_prsm)));
+                results.push_back(SimplePrsmPtr(new SimplePrsm(simple_prsm)));
             }
         }
         delete doc;
@@ -109,11 +109,11 @@ SimplePrSMPtrVec readSimplePrSM(std::string filename){
     return results;
 }
 
-SimplePrSMPtrVec findSimplePrsms(SimplePrSMPtrVec simple_prsm,
+SimplePrsmPtrVec findSimplePrsms(SimplePrsmPtrVec simple_prsm,
                                  MsHeaderPtr header){
-    SimplePrSMPtrVec prsms ;
+    SimplePrsmPtrVec prsms ;
     for(unsigned int i=0;i<simple_prsm.size();i++){
-        SimplePrSMPtr prsm = simple_prsm[i];
+        SimplePrsmPtr prsm = simple_prsm[i];
         if(prsm->isMatch(header)){
             prsms.push_back(prsm);
         }

@@ -49,7 +49,7 @@ void EValueProcessor::process(bool is_separate) {
   MsAlignReader reader (spectrum_file_name);
   std::string output_file_name = basename(spectrum_file_name)
        + "." + mng_ptr_->output_file_ext_;
-  PrSMWriter writer(output_file_name);
+  PrsmWriter writer(output_file_name);
   int cnt = 0;
   DeconvMsPtr ms_ptr = reader.getNextMs();
   while (ms_ptr.get() != nullptr) {
@@ -63,18 +63,18 @@ void EValueProcessor::process(bool is_separate) {
   }
   reader.close();
 
-  //because the prsm_writer ~PrSMWriter changed and the fileclosing is an independant function
+  //because the prsm_writer ~PrsmWriter changed and the fileclosing is an independant function
   writer.close();
 }
 
 void EValueProcessor::processOneSpectrum(DeconvMsPtr ms_ptr, bool is_separate,
-                                         PrSMWriter &writer) {
+                                         PrsmWriter &writer) {
   SpectrumSetPtr spec_set_ptr 
       = getSpectrumSet(ms_ptr, 0, mng_ptr_->prsm_para_ptr_->getSpParaPtr());
   if (spec_set_ptr.get() != nullptr) {
-    PrSMPtrVec sele_prsms;
+    PrsmPtrVec sele_prsms;
     filterPrsms(prsms_, ms_ptr->getHeaderPtr(), sele_prsms);
-    //PrSMUtil.processPrSM(selectedPrsms, deconvSp, seqs);
+    //PrsmUtil.processPrsm(selectedPrsms, deconvSp, seqs);
     
     if (is_separate) {
       for (unsigned i = 0; i < sele_prsms.size(); i++) {

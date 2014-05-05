@@ -33,7 +33,7 @@ class PrsmSpecies {
   double ppo_;
 };
 
-SpeciesPtrVec setSpeciesId(const PrSMPtrVec &prsms,double ppo);
+SpeciesPtrVec setSpeciesId(const PrsmPtrVec &prsms,double ppo);
 
 } /* namespace prot */
 

@@ -119,7 +119,7 @@ typedef std::shared_ptr<CompProbValue> CompProbValuePtr;
 int computeAvgLength(ResFreqPtrVec &residues, double convert_ratio);
 
 void compProbArray(CompProbValuePtr comp_prob_ptr, ResFreqPtrVec &n_term_residues, 
-                   PrmPeakPtrVec &peaks, PrSMPtrVec &prsms, bool strict, 
+                   PrmPeakPtrVec &peaks, PrsmPtrVec &prsms, bool strict, 
                    std::vector<double> &results);
 
 }

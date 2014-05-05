@@ -79,7 +79,7 @@ int process(int argc, char* argv[]) {
     std::vector<std::string> input_exts ;
     input_exts.push_back("ZERO");
     input_exts.push_back("PTM");
-    PrSMCombine combine_processor(db_file_name, sp_file_name, 
+    PrsmCombine combine_processor(db_file_name, sp_file_name, 
                                   input_exts, "RAW_RESULT");
     combine_processor.process();
 
@@ -93,16 +93,16 @@ int process(int argc, char* argv[]) {
 
     if (arguments["searchType"]=="TARGET") { 
       std::cout << "Top selector " << std::endl;
-      PrSMSelector selector(db_file_name, sp_file_name, "EVALUE", "TOP", n_top);
+      PrsmSelector selector(db_file_name, sp_file_name, "EVALUE", "TOP", n_top);
       selector.process();
     }
     else {
       std::cout << "Top selector " << std::endl;
-      PrSMSelector selector(db_file_name, sp_file_name, "EVALUE", "TOP_PRE", n_top);
+      PrsmSelector selector(db_file_name, sp_file_name, "EVALUE", "TOP_PRE", n_top);
       selector.process();
 
       std::cout << "FDR computation " << std::endl;
-      PrSMFdr fdr(db_file_name, sp_file_name, "TOP_PRE", "TOP");
+      PrsmFdr fdr(db_file_name, sp_file_name, "TOP_PRE", "TOP");
       fdr.process();
     }
 

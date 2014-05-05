@@ -15,12 +15,12 @@ class EValueProcessor {
   void init();
   void process(bool is_separate);
   void processOneSpectrum(DeconvMsPtr ms_ptr, bool is_separate,
-                          PrSMWriter &writer);
+                          PrsmWriter &writer);
  private:
     TdgfMngPtr mng_ptr_;
     CompPValueArrayPtr comp_pvalue_ptr_;
     ProteoformPtrVec proteoforms_;
-    PrSMPtrVec prsms_;
+    PrsmPtrVec prsms_;
 };
 
 }

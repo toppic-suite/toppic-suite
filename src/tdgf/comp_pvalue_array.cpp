@@ -25,7 +25,7 @@ CompPValueArray::CompPValueArray(ProteoformPtrVec &raw_forms,
 
 /* set alignment */
 ExtremeValuePtrVec CompPValueArray::compExtremeValues(PrmMsPtr ms_six, 
-                                                      PrSMPtrVec &prsms, 
+                                                      PrsmPtrVec &prsms, 
                                                       bool strict) {
   PrmPeakPtrVec prm_peaks = ms_six->getPeakPtrVec();
   std::vector<double> prot_probs; 
@@ -76,14 +76,14 @@ ExtremeValuePtrVec CompPValueArray::compExtremeValues(PrmMsPtr ms_six,
 }
 
 ExtremeValuePtr CompPValueArray::compExtremeValue(PrmMsPtr prm_ms_ptr, 
-                                                  PrSMPtr prsm_ptr) {
-  PrSMPtrVec prsms;
+                                                  PrsmPtr prsm_ptr) {
+  PrsmPtrVec prsms;
   prsms.push_back(prsm_ptr);
   ExtremeValuePtrVec extreme_values = compExtremeValues(prm_ms_ptr, prsms, true);
   return extreme_values[0];
 }
 
-void CompPValueArray::setPValue(DeconvMsPtr ms_ptr, PrSMPtr prsm_ptr) {
+void CompPValueArray::setPValue(DeconvMsPtr ms_ptr, PrsmPtr prsm_ptr) {
   double refine_prec_mass = prsm_ptr->getAdjustedPrecMass();
   DeconvMsPtr refine_ms_ptr = getRefineMs(ms_ptr, prsm_ptr->getCalibration(),
                                           refine_prec_mass);
@@ -98,7 +98,7 @@ void CompPValueArray::setPValue(DeconvMsPtr ms_ptr, PrSMPtr prsm_ptr) {
   prsm_ptr->setProbPtr(prob_ptr);
 }
 
-void CompPValueArray::setPValueArray(PrmMsPtr prm_ms_ptr, PrSMPtrVec prsms) {
+void CompPValueArray::setPValueArray(PrmMsPtr prm_ms_ptr, PrsmPtrVec prsms) {
   ExtremeValuePtrVec extreme_values = compExtremeValues(prm_ms_ptr, prsms, false);
   for (unsigned int i = 0; i < prsms.size(); i++) {
     prsms[i]->setProbPtr(extreme_values[i]);

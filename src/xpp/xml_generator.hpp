@@ -27,11 +27,11 @@ class XmlGenerator {
   XmlGenerator(PrsmParaPtr prsm_para_ptr, std::string exec_dir, 
                std::string input_file);
   void process();
-  void outputPrsms(PrSMPtrVec prsms);
-  void outputAllPrsms(PrSMPtrVec prsms);
-  void outputSpecies(PrSMPtrVec prsms);
-  void outputProteins(PrSMPtrVec prsms);
-  void outputAllProteins(PrSMPtrVec prsms);
+  void outputPrsms(PrsmPtrVec prsms);
+  void outputAllPrsms(PrsmPtrVec prsms);
+  void outputSpecies(PrsmPtrVec prsms);
+  void outputProteins(PrsmPtrVec prsms);
+  void outputAllProteins(PrsmPtrVec prsms);
   void outputFileList();
 
  private:

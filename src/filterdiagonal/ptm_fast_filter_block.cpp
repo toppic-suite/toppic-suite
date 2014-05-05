@@ -44,11 +44,11 @@ void PtmFastFilterBlock::initSeqBlocks(){
     }
 }
 
-SimplePrSMPtrVec PtmFastFilterBlock::getBestMathBatch(
+SimplePrsmPtrVec PtmFastFilterBlock::getBestMathBatch(
     SpectrumSetPtr spectrum_set){
-    SimplePrSMPtrVec result;
+    SimplePrsmPtrVec result;
     PrmMsPtr ms = spectrum_set->getSpTwo();
-    SimplePrSMPtrVec fast_match_list = filter_->getBestMatch(ms);
+    SimplePrsmPtrVec fast_match_list = filter_->getBestMatch(ms);
     for(unsigned int i=0;i<fast_match_list.size();i++){
         if((int)i >= mng_->ptm_fast_filter_result_num_){
             break;

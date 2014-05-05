@@ -45,7 +45,7 @@ void PtmFastFilterProcessor::processBlock(int block,std::string sp_file_name,
     PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
     std::string output_file_name = basename(prsm_para_ptr->getSpectrumFileName())
       + "." + mng_ptr_->output_file_ext_+"_"+block_s.str();
-    SimplePrSMWriter writer(output_file_name.c_str());
+    SimplePrsmWriter writer(output_file_name.c_str());
     DeconvMsPtr deconv_sp;
     int cnt = 0;
     while((deconv_sp = reader.getNextMs()) != nullptr){
@@ -54,7 +54,7 @@ void PtmFastFilterProcessor::processBlock(int block,std::string sp_file_name,
                                                    prsm_para_ptr->getSpParaPtr());
       if(spectrum_set != nullptr){
         std::string scan = deconv_sp->getHeaderPtr()->getScansString();
-        SimplePrSMPtrVec matches = filter_ptr_->getBestMathBatch(spectrum_set);
+        SimplePrsmPtrVec matches = filter_ptr_->getBestMathBatch(spectrum_set);
         writer.write(matches);
       }
     }
@@ -64,7 +64,7 @@ void PtmFastFilterProcessor::processBlock(int block,std::string sp_file_name,
 
 void PtmFastFilterProcessor::combineBlock(std::string sp_file_name){
     //system.out
-    SimplePrSMPtrVec2D matches;
+    SimplePrsmPtrVec2D matches;
 
     //pravate readsimplePrsm
     for(int i=0;i<filter_ptr_->getBlockSize();i++){
@@ -72,16 +72,16 @@ void PtmFastFilterProcessor::combineBlock(std::string sp_file_name){
         block_s<<i;
         std::string block_file_name = basename(mng_ptr_->prsm_para_ptr_->getSpectrumFileName()) 
         + "." + mng_ptr_->output_file_ext_+"_"+block_s.str();
-        matches.push_back(prot::readSimplePrSM(block_file_name.c_str()));
+        matches.push_back(prot::readSimplePrsm(block_file_name.c_str()));
     }
 
     MsAlignReader reader(sp_file_name.c_str());
     std::string output_file_name = basename(mng_ptr_->prsm_para_ptr_->getSpectrumFileName()) 
       + "." + mng_ptr_->output_file_ext_+"_COMBINED";
-    SimplePrSMWriter writer(output_file_name.c_str());
+    SimplePrsmWriter writer(output_file_name.c_str());
     DeconvMsPtr deconv_sp;
     while((deconv_sp = reader.getNextMs()) != nullptr){
-        SimplePrSMPtrVec selected_matches;
+        SimplePrsmPtrVec selected_matches;
         for(unsigned int i=0;i<matches.size();i++){
             for(unsigned int j=0;j<matches[i].size();j++){
                 if(matches[i][j]->isMatch(deconv_sp->getHeaderPtr())){

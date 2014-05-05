@@ -43,7 +43,7 @@ std::vector<std::vector<std::string>> readViewXmlFiles(const std::string &file_n
   return file_list;
 }
 
-xercesc::DOMElement* genePrSMView(XmlDOMDocument* xml_doc,PrSMPtr prsm, double min_mass){
+xercesc::DOMElement* genePrsmView(XmlDOMDocument* xml_doc,PrsmPtr prsm, double min_mass){
   int pos = 4;
   xercesc::DOMElement* element = xml_doc->createElement("prsm");
   std::string str = convertToString(prsm->getId());
@@ -127,7 +127,7 @@ xercesc::DOMElement* genePrSMView(XmlDOMDocument* xml_doc,PrSMPtr prsm, double m
   return element;
 }
 
-//xercesc::DOMElement* genePrSMViewAS7(XmlDOMDocument* xml_doc,PrSMPtr prsm){
+//xercesc::DOMElement* genePrsmViewAS7(XmlDOMDocument* xml_doc,PrsmPtr prsm){
 //  xercesc::DOMElement* element = xml_doc->createElement("prsm");
 //  std::string str = convertToString(prsm->getId());
 //  xml_doc->addElement(element, "prsm-id", str.c_str());
@@ -399,7 +399,7 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
   return prot_element;
 }
 
-std::vector<int> getSpeciesIds(PrSMPtrVec prsms,int seq_id){
+std::vector<int> getSpeciesIds(PrsmPtrVec prsms,int seq_id){
   std::vector<int> species;
   for(unsigned int i=0;i<prsms.size();i++){
     int new_id = prsms[i]->getProteoformPtr()->getSpeciesId();
@@ -418,7 +418,7 @@ std::vector<int> getSpeciesIds(PrSMPtrVec prsms,int seq_id){
   return species;
 }
 
-std::vector<int> getSpeciesIds(PrSMPtrVec prsms){
+std::vector<int> getSpeciesIds(PrsmPtrVec prsms){
 //  std::cout<<prsms.size()<<std::endl;
   std::vector<int> species;
   for(unsigned int i=0;i<prsms.size();i++){
@@ -436,8 +436,8 @@ std::vector<int> getSpeciesIds(PrSMPtrVec prsms){
   return species;
 }
 
-PrSMPtrVec selectSpeciesPrsms(PrSMPtrVec prsms,int species_id){
-  PrSMPtrVec select_prsms;
+PrsmPtrVec selectSpeciesPrsms(PrsmPtrVec prsms,int species_id){
+  PrsmPtrVec select_prsms;
   for(unsigned int i=0;i<prsms.size();i++){
     if(species_id == prsms[i]->getProteoformPtr()->getSpeciesId()){
       select_prsms.push_back(prsms[i]);
@@ -446,7 +446,7 @@ PrSMPtrVec selectSpeciesPrsms(PrSMPtrVec prsms,int species_id){
   return select_prsms;
 }
 
-xercesc::DOMElement* speciesToXml(XmlDOMDocument* xml_doc,PrSMPtrVec prsms, double min_mass){
+xercesc::DOMElement* speciesToXml(XmlDOMDocument* xml_doc,PrsmPtrVec prsms, double min_mass){
   xercesc::DOMElement* species_element = xml_doc->createElement("species");
   std::string str=convertToString(prsms[0]->getProteoformPtr()->getSeqId());
   xml_doc->addElement(species_element, "sequence_id", str.c_str());
@@ -458,13 +458,13 @@ xercesc::DOMElement* speciesToXml(XmlDOMDocument* xml_doc,PrSMPtrVec prsms, doub
   str=convertToString(count);
   xml_doc->addElement(species_element, "prsm_number", str.c_str());
   for(unsigned int i=0;i<prsms.size();i++){
-    species_element->appendChild(genePrSMView(xml_doc,prsms[i], min_mass));
+    species_element->appendChild(genePrsmView(xml_doc,prsms[i], min_mass));
   }
   return species_element;
 }
 
 xercesc::DOMElement* proteinToXml(XmlDOMDocument* xml_doc,
-                                  PrSMPtrVec prsms,
+                                  PrsmPtrVec prsms,
                                   ProteoformPtr protein,
                                   std::vector<int> species,
                                   double min_mass){
@@ -477,7 +477,7 @@ xercesc::DOMElement* proteinToXml(XmlDOMDocument* xml_doc,
   str=convertToString(count);
   xml_doc->addElement(prot_element, "species_number", str.c_str());
   for(unsigned int i=0;i<species.size();i++){
-    PrSMPtrVec select_prsms = selectSpeciesPrsms(prsms,species[i]);
+    PrsmPtrVec select_prsms = selectSpeciesPrsms(prsms,species[i]);
     std::sort(select_prsms.begin(),select_prsms.end(),prsmEValueUp);
     prot_element->appendChild(speciesToXml(xml_doc,select_prsms, min_mass));
   }
@@ -485,7 +485,7 @@ xercesc::DOMElement* proteinToXml(XmlDOMDocument* xml_doc,
 }
 
 xercesc::DOMElement* allProteinToXml(XmlDOMDocument* xml_doc,
-                                  PrSMPtrVec prsms,
+                                  PrsmPtrVec prsms,
                                   ProteoformPtrVec proteins,
                                   double min_mass){
   xercesc::DOMElement* prot_elements = xml_doc->createElement("proteins");
@@ -503,7 +503,7 @@ xercesc::DOMElement* allProteinToXml(XmlDOMDocument* xml_doc,
 //  str=convertToString(count);
 //  xml_doc->addElement(prot_element, "species_number", str.c_str());
 //  for(unsigned int i=0;i<species.size();i++){
-//    PrSMPtrVec select_prsms = selectSpeciesPrsms(prsms,species[i]);
+//    PrsmPtrVec select_prsms = selectSpeciesPrsms(prsms,species[i]);
 //    std::sort(select_prsms.begin(),select_prsms.end(),prsmEValueDown);
 //    prot_element->appendChild(speciesToXml(xml_doc,select_prsms));
 //  }

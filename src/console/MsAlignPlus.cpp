@@ -84,7 +84,7 @@ void MsAlignPipeline(map<string,string> arguments){
 //  std::vector<std::string> input_exts ;
 //  input_exts.push_back("PTM_SEARCH_RESULT");
 //  input_exts.push_back("ZERO_PTM_SEARCH");
-//  PrSMCombinePtr combine = PrSMCombinePtr(new PrSMCombine(arguments,
+//  PrsmCombinePtr combine = PrsmCombinePtr(new PrsmCombine(arguments,
 //                                                          input_exts,
 //                                                          "RAW_SEARCH_RESULT"));
 //  combine->process();
@@ -99,17 +99,17 @@ void MsAlignPipeline(map<string,string> arguments){
 //  evalue_processor.process(false);
 //
 //  if(arguments["searchType"].compare("TARGET+DECOY")==0){
-//	PrSMSelector selector = PrSMSelector(arguments,
+//	PrsmSelector selector = PrsmSelector(arguments,
 //	                                     "EVALUED_RESULT",
 //	                                     "TOP",
 //	                                     1);
 //	selector.process();
 //
-//    prot::PrSMFdr fdr(arguments, "TOP", "TOP_RESULT");
+//    prot::PrsmFdr fdr(arguments, "TOP", "TOP_RESULT");
 //    fdr.process();
 //  }
 //  else{
-//    PrSMSelector selector = PrSMSelector(arguments,
+//    PrsmSelector selector = PrsmSelector(arguments,
 //                                       "EVALUED_RESULT",
 //                                       "TOP_RESULT",
 //                                       1);

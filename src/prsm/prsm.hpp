@@ -14,11 +14,11 @@
 
 namespace prot {
 
-class PrSM {
+class Prsm {
  public:
-  PrSM(ProteoformPtr proteoform_ptr, DeconvMsPtr deconv_ms_ptr, 
+  Prsm(ProteoformPtr proteoform_ptr, DeconvMsPtr deconv_ms_ptr, 
        double adjusted_prec_mass, double calibration, SpParaPtr sp_para_ptr);
-  PrSM(xercesc::DOMElement* element,ProteoformPtrVec proteoforms);
+  Prsm(xercesc::DOMElement* element,ProteoformPtrVec proteoforms);
   double getAdjustedPrecMass() {return adjusted_prec_mass_;}
 
   ProteoformPtr getProteoformPtr() {return proteoform_ptr_;}
@@ -115,21 +115,21 @@ class PrSM {
   void initScores(SpParaPtr sp_para_ptr);
 };
 
-typedef std::shared_ptr<PrSM> PrSMPtr;
-typedef std::vector<PrSMPtr> PrSMPtrVec;
-typedef std::vector<PrSMPtrVec> PrSMPtrVec2D;
-typedef std::vector<PrSMPtrVec2D> PrSMPtrVec3D;
+typedef std::shared_ptr<Prsm> PrsmPtr;
+typedef std::vector<PrsmPtr> PrsmPtrVec;
+typedef std::vector<PrsmPtrVec> PrsmPtrVec2D;
+typedef std::vector<PrsmPtrVec2D> PrsmPtrVec3D;
 
-inline bool prsmProteoformIdUp(PrSMPtr p1, PrSMPtr p2) {
+inline bool prsmProteoformIdUp(PrsmPtr p1, PrsmPtr p2) {
   return p1->getProteoformPtr()->getDbResSeqPtr()->getId()
       < p2->getProteoformPtr()->getDbResSeqPtr()->getId();
 }
 
-inline bool prsmMatchFragmentDown(PrSMPtr p1, PrSMPtr p2) {
+inline bool prsmMatchFragmentDown(PrsmPtr p1, PrsmPtr p2) {
   return p1->getMatchFragNum() > p2->getMatchFragNum();
 }
 //compare two complete prsm, first match fragment number, second start pos 
-inline bool prsmCompPreMatchFragmentDown(PrSMPtr p1, PrSMPtr p2) {
+inline bool prsmCompPreMatchFragmentDown(PrsmPtr p1, PrsmPtr p2) {
  if(p1->getMatchFragNum() > p2->getMatchFragNum()){
    return true;
  }
@@ -139,15 +139,15 @@ inline bool prsmCompPreMatchFragmentDown(PrSMPtr p1, PrSMPtr p2) {
  return false;
 }
 
-inline bool prsmEValueUp(PrSMPtr p1, PrSMPtr p2) {
+inline bool prsmEValueUp(PrsmPtr p1, PrsmPtr p2) {
   return p1->getEValue() < p2->getEValue();
 }
 
-inline bool prsmEValueDown(PrSMPtr p1, PrSMPtr p2) {
+inline bool prsmEValueDown(PrsmPtr p1, PrsmPtr p2) {
   return p1->getEValue() > p2->getEValue();
 }
 
-inline bool prsmSpectrumIdUpPrecursorIdUp(PrSMPtr p1, PrSMPtr p2){
+inline bool prsmSpectrumIdUpPrecursorIdUp(PrsmPtr p1, PrsmPtr p2){
     if(p1->getSpectrumId() < p2->getSpectrumId()){
         return false;
     }
@@ -162,7 +162,7 @@ inline bool prsmSpectrumIdUpPrecursorIdUp(PrSMPtr p1, PrSMPtr p2){
     }
 }
 
-inline bool prsmSpectrumIdUpMatchFragUp(PrSMPtr p1, PrSMPtr p2){
+inline bool prsmSpectrumIdUpMatchFragUp(PrsmPtr p1, PrsmPtr p2){
     if(p1->getSpectrumId() < p2->getSpectrumId()){
         return true;
     }
@@ -177,7 +177,7 @@ inline bool prsmSpectrumIdUpMatchFragUp(PrSMPtr p1, PrSMPtr p2){
     }
 }
 
-inline bool prsmSpectrumIdUpEvalueUp(PrSMPtr p1, PrSMPtr p2){
+inline bool prsmSpectrumIdUpEvalueUp(PrsmPtr p1, PrsmPtr p2){
     if(p1->getSpectrumId() < p2->getSpectrumId()){
         return true;
     }
@@ -192,11 +192,11 @@ inline bool prsmSpectrumIdUpEvalueUp(PrSMPtr p1, PrSMPtr p2){
     }
 }
 
-PrSMPtrVec readPrsm(std::string file_name,ProteoformPtrVec proteoforms);
+PrsmPtrVec readPrsm(std::string file_name,ProteoformPtrVec proteoforms);
 
-void filterPrsms(PrSMPtrVec &prsms, MsHeaderPtr header_ptr, PrSMPtrVec &sele_prsms); 
+void filterPrsms(PrsmPtrVec &prsms, MsHeaderPtr header_ptr, PrsmPtrVec &sele_prsms); 
 
-void addSpectrumPtrsToPrsms(PrSMPtrVec &prsms, PrsmParaPtr prsm_para_ptr);
+void addSpectrumPtrsToPrsms(PrsmPtrVec &prsms, PrsmParaPtr prsm_para_ptr);
 
 }
 #endif

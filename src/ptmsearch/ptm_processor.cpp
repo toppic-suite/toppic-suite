@@ -25,23 +25,23 @@ PtmProcessor::PtmProcessor(PtmMngPtr mng_ptr){
   std::string sp_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
   std::string output_file_name = basename(sp_file_name)+"."+mng_ptr_->output_file_ext_;
 
-  all_writer_ = PrSMWriterPtr (new PrSMWriter (output_file_name));
+  all_writer_ = PrsmWriterPtr (new PrsmWriter (output_file_name));
   for (int s = 1; s <= mng_ptr_->n_unknown_shift_; s++) {
     std::string file_name = output_file_name+"_"+ convertToString(s)
               +"_"+ SemiAlignTypeFactory::getCompletePtr()->getName();
-    PrSMWriterPtr complete_writer= PrSMWriterPtr (new PrSMWriter (file_name));
+    PrsmWriterPtr complete_writer= PrsmWriterPtr (new PrsmWriter (file_name));
     complete_writers_.push_back(complete_writer);
     file_name = output_file_name+"_"+ convertToString(s)
               +"_"+ SemiAlignTypeFactory::getPrefixPtr()->getName();
-    PrSMWriterPtr prefix_writer= PrSMWriterPtr (new PrSMWriter (file_name));
+    PrsmWriterPtr prefix_writer= PrsmWriterPtr (new PrsmWriter (file_name));
     prefix_writers_.push_back(prefix_writer);
     file_name = output_file_name+"_"+ convertToString(s)
               +"_"+ SemiAlignTypeFactory::getSuffixPtr()->getName();
-    PrSMWriterPtr suffix_writer= PrSMWriterPtr (new PrSMWriter (file_name));
+    PrsmWriterPtr suffix_writer= PrsmWriterPtr (new PrsmWriter (file_name));
     suffix_writers_.push_back(suffix_writer);
     file_name = output_file_name+"_"+ convertToString(s)
               +"_"+ SemiAlignTypeFactory::getInternalPtr()->getName();
-    PrSMWriterPtr internal_writer= PrSMWriterPtr (new PrSMWriter (file_name));
+    PrsmWriterPtr internal_writer= PrsmWriterPtr (new PrsmWriter (file_name));
     internal_writers_.push_back(internal_writer);
  }
 
@@ -56,12 +56,12 @@ void PtmProcessor::init(){
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
   std::string simplePrsmFileName = basename(sp_file_name)
       + "." + mng_ptr_->input_file_ext_;
-  simplePrsms_  = prot::readSimplePrSM(simplePrsmFileName.c_str());
+  simplePrsms_  = prot::readSimplePrsm(simplePrsmFileName.c_str());
   prsmFindSeq(simplePrsms_,proteoforms_);
   comp_shift_ = CompShiftLowMemPtr(new CompShiftLowMem());
 }
 
-void PtmProcessor::prsmFindSeq(SimplePrSMPtrVec simple_prsms,ProteoformPtrVec seqs){
+void PtmProcessor::prsmFindSeq(SimplePrsmPtrVec simple_prsms,ProteoformPtrVec seqs){
   for(unsigned int i =0;i<simple_prsms.size();i++){
     simple_prsms[i]->findSeq(seqs);
   }
@@ -80,7 +80,7 @@ void PtmProcessor::process(){
     SpectrumSetPtr spectrum_set_ptr = getSpectrumSet(deconv_sp,0,
                                                 mng_ptr_->prsm_para_ptr_->getSpParaPtr());
     if(spectrum_set_ptr != nullptr){
-      SimplePrSMPtrVec selected_prsms 
+      SimplePrsmPtrVec selected_prsms 
           = findSimplePrsms(simplePrsms_,deconv_sp->getHeaderPtr());
       search(spectrum_set_ptr, selected_prsms);
     }
@@ -96,7 +96,7 @@ void PtmProcessor::process(){
   }
 }
 
-void PtmProcessor::chooseCompPrePrsms(PrSMPtrVec &all_prsms, PrSMPtrVec &sele_prsms) {
+void PtmProcessor::chooseCompPrePrsms(PrsmPtrVec &all_prsms, PrsmPtrVec &sele_prsms) {
   int match_size = all_prsms.size();
   std::sort(all_prsms.begin(), all_prsms.end(), prsmCompPreMatchFragmentDown);
   if(all_prsms.size()!=0){
@@ -112,7 +112,7 @@ void PtmProcessor::chooseCompPrePrsms(PrSMPtrVec &all_prsms, PrSMPtrVec &sele_pr
   std::sort(sele_prsms.begin(), sele_prsms.end(), prsmProteoformIdUp);
 }
 
-void PtmProcessor::chooseSuffIntPrsms(PrSMPtrVec &all_prsms, PrSMPtrVec &sele_prsms) {
+void PtmProcessor::chooseSuffIntPrsms(PrsmPtrVec &all_prsms, PrsmPtrVec &sele_prsms) {
   int match_size = all_prsms.size();
   std::sort(all_prsms.begin(), all_prsms.end(), prsmMatchFragmentDown);
   if(all_prsms.size()!=0){
@@ -130,43 +130,43 @@ void PtmProcessor::chooseSuffIntPrsms(PrSMPtrVec &all_prsms, PrSMPtrVec &sele_pr
 
 
 void PtmProcessor::search(SpectrumSetPtr spectrum_set_ptr, 
-                          SimplePrSMPtrVec matches) {
+                          SimplePrsmPtrVec matches) {
   std::string sp_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
   std::string output_file_name = basename(sp_file_name)+"."+mng_ptr_->output_file_ext_;
 
   PtmSlowFilterPtr slow_filter = PtmSlowFilterPtr(
       new PtmSlowFilter(spectrum_set_ptr,matches,comp_shift_,mng_ptr_));
   for (int s = 1; s <= mng_ptr_->n_unknown_shift_; s++) {
-    PrSMPtrVec complete_prsms = slow_filter->getPrSMs(
+    PrsmPtrVec complete_prsms = slow_filter->getPrsms(
         s-1, SemiAlignTypeFactory::getCompletePtr());
-    PrSMPtrVec sele_complete_prsms;
+    PrsmPtrVec sele_complete_prsms;
     chooseCompPrePrsms(complete_prsms, sele_complete_prsms);
     complete_writers_[s-1]->writeVector(sele_complete_prsms);
     all_writer_->writeVector(sele_complete_prsms);
 
-    PrSMPtrVec prefix_prsms = slow_filter->getPrSMs(
+    PrsmPtrVec prefix_prsms = slow_filter->getPrsms(
         s-1, SemiAlignTypeFactory::getPrefixPtr());
-    PrSMPtrVec sele_prefix_prsms;
+    PrsmPtrVec sele_prefix_prsms;
     chooseCompPrePrsms(prefix_prsms, sele_prefix_prsms);
     prefix_writers_[s-1]->writeVector(sele_prefix_prsms);
     all_writer_->writeVector(sele_prefix_prsms);
 
-    PrSMPtrVec suffix_prsms = slow_filter->getPrSMs(
+    PrsmPtrVec suffix_prsms = slow_filter->getPrsms(
         s-1, SemiAlignTypeFactory::getSuffixPtr());
-    PrSMPtrVec sele_suffix_prsms;
+    PrsmPtrVec sele_suffix_prsms;
     chooseSuffIntPrsms(suffix_prsms, sele_suffix_prsms);
     suffix_writers_[s-1]->writeVector(sele_suffix_prsms);
     all_writer_->writeVector(sele_suffix_prsms);
 
-    PrSMPtrVec internal_prsms = slow_filter->getPrSMs(
+    PrsmPtrVec internal_prsms = slow_filter->getPrsms(
         s-1, SemiAlignTypeFactory::getInternalPtr());
-    PrSMPtrVec sele_internal_prsms;
+    PrsmPtrVec sele_internal_prsms;
     chooseSuffIntPrsms(internal_prsms, sele_internal_prsms);
     internal_writers_[s-1]->writeVector(sele_internal_prsms);
     all_writer_->writeVector(sele_internal_prsms);
 
 
-//    PrSMWriterPtr all_writer_plus= PrSMWriterPtr(new PrSMWriter("in/sp_bak.msalign_ALL_RESULT"));
+//    PrsmWriterPtr all_writer_plus= PrsmWriterPtr(new PrsmWriter("in/sp_bak.msalign_ALL_RESULT"));
 //    all_writer_plus->writeVector(complete_prsms);
 //    all_writer_plus->writeVector(prefix_prsms);
 //    all_writer_plus->writeVector(suffix_prsms);

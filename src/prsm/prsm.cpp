@@ -7,7 +7,7 @@
 
 namespace prot {
 
-PrSM::PrSM(ProteoformPtr proteoform_ptr, DeconvMsPtr deconv_ms_ptr, 
+Prsm::Prsm(ProteoformPtr proteoform_ptr, DeconvMsPtr deconv_ms_ptr, 
            double adjusted_prec_mass, double calibration, 
            SpParaPtr sp_para_ptr) {
   proteoform_ptr_ = proteoform_ptr;
@@ -22,14 +22,14 @@ PrSM::PrSM(ProteoformPtr proteoform_ptr, DeconvMsPtr deconv_ms_ptr,
   init(sp_para_ptr);
 }
 
-void PrSM::init(SpParaPtr sp_para_ptr) {
+void Prsm::init(SpParaPtr sp_para_ptr) {
   double delta = adjusted_prec_mass_ - ori_prec_mass_;
   refine_ms_three_ = getMsThree(deconv_ms_ptr_, delta, sp_para_ptr);
   refine_ms_three_-> recalibrate(calibration_);
   initScores(sp_para_ptr);
 }
 
-void PrSM::initScores(SpParaPtr sp_para_ptr) {
+void Prsm::initScores(SpParaPtr sp_para_ptr) {
   // refined one 
   PeakIonPairPtrVec pairs = getPeakIonPairs (proteoform_ptr_, refine_ms_three_, 
                                              sp_para_ptr->getMinMass());
@@ -53,7 +53,7 @@ void PrSM::initScores(SpParaPtr sp_para_ptr) {
   }
 }
 
-xercesc::DOMElement* PrSM::toXmlElement(XmlDOMDocument* xml_doc){
+xercesc::DOMElement* Prsm::toXmlElement(XmlDOMDocument* xml_doc){
 	xercesc::DOMElement* element = xml_doc->createElement("prsm");
   //LOG_DEBUG("Element created");
 	std::string str = convertToString(prsm_id_);
@@ -82,12 +82,12 @@ xercesc::DOMElement* PrSM::toXmlElement(XmlDOMDocument* xml_doc){
   return element;
 }
 
-void PrSM::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
+void Prsm::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
   xercesc::DOMElement* element = toXmlElement(xml_doc);
   parent->appendChild(element);
 }
 
-PrSM::PrSM(xercesc::DOMElement* element,ProteoformPtrVec proteoforms){
+Prsm::Prsm(xercesc::DOMElement* element,ProteoformPtrVec proteoforms){
   prsm_id_=getIntChildValue(element, "prsm_id", 0);
   spectrum_id_=getIntChildValue(element, "spectrum_id", 0);
   spectrum_scan_=getChildValue(element, "spectrum_scan", 0);
@@ -115,7 +115,7 @@ PrSM::PrSM(xercesc::DOMElement* element,ProteoformPtrVec proteoforms){
   refine_ms_three_ = ExtendMsPtr(nullptr);
 }
 
-bool PrSM::isMatchMs(MsHeaderPtr header_ptr) {
+bool Prsm::isMatchMs(MsHeaderPtr header_ptr) {
   int id = header_ptr->getId();
   std::string scan = header_ptr->getScansString();
   int prec_id = header_ptr->getPrecId();
@@ -124,7 +124,7 @@ bool PrSM::isMatchMs(MsHeaderPtr header_ptr) {
     LOG_DEBUG("scan " << scan << " prsm scan " << spectrum_scan_
               << " prec mass " << prec_mass << " prsm mass " << ori_prec_mass_);
     if (scan != spectrum_scan_) {
-      LOG_ERROR("Error in PrSM.");
+      LOG_ERROR("Error in Prsm.");
     }
     return true;
   } else {
@@ -132,8 +132,8 @@ bool PrSM::isMatchMs(MsHeaderPtr header_ptr) {
   }
 }
 
-PrSMPtrVec readPrsm(std::string file_name,ProteoformPtrVec proteoforms){
-  PrSMPtrVec results;
+PrsmPtrVec readPrsm(std::string file_name,ProteoformPtrVec proteoforms){
+  PrsmPtrVec results;
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if(parser){
     XmlDOMDocument* doc = new XmlDOMDocument(parser, file_name.c_str());
@@ -142,7 +142,7 @@ PrSMPtrVec readPrsm(std::string file_name,ProteoformPtrVec proteoforms){
       int simple_prsm_num = getChildCount(root, "prsm");
       for (int i = 0; i < simple_prsm_num; i++) {
         xercesc::DOMElement* prsm_element = getChildElement(root, "prsm", i);
-        results.push_back(PrSMPtr(new PrSM(prsm_element,proteoforms)));
+        results.push_back(PrsmPtr(new Prsm(prsm_element,proteoforms)));
 
       }
     }
@@ -151,7 +151,7 @@ PrSMPtrVec readPrsm(std::string file_name,ProteoformPtrVec proteoforms){
   return results;
 }
 
-void addSpectrumPtrsToPrsms(PrSMPtrVec &prsms, PrsmParaPtr prsm_para_ptr){
+void addSpectrumPtrsToPrsms(PrsmPtrVec &prsms, PrsmParaPtr prsm_para_ptr){
   MsAlignReader reader(prsm_para_ptr->getSpectrumFileName());
   DeconvMsPtr ms_ptr = reader.getNextMs();
   double delta = 0;
@@ -171,8 +171,8 @@ void addSpectrumPtrsToPrsms(PrSMPtrVec &prsms, PrsmParaPtr prsm_para_ptr){
   }
 }
 
-void filterPrsms(PrSMPtrVec &prsms, MsHeaderPtr header_ptr, 
-                 PrSMPtrVec &sele_prsms) {
+void filterPrsms(PrsmPtrVec &prsms, MsHeaderPtr header_ptr, 
+                 PrsmPtrVec &sele_prsms) {
   for (unsigned int i = 0; i < prsms.size(); i++) {
     if (prsms[i]->isMatchMs(header_ptr)) {
       sele_prsms.push_back(prsms[i]);

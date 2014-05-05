@@ -12,7 +12,7 @@
 
 namespace prot {
 
-SimplePrSMWriter::SimplePrSMWriter(std::string file_name){
+SimplePrsmWriter::SimplePrsmWriter(std::string file_name){
     file_.open(file_name.c_str());
     file_ << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << std::endl;
     file_ << "<simple_prsm_list>" << std::endl;
@@ -21,17 +21,17 @@ SimplePrSMWriter::SimplePrSMWriter(std::string file_name){
     serializer_ = impl->createSerializer();
 }
 
-SimplePrSMWriter::~SimplePrSMWriter(){
+SimplePrsmWriter::~SimplePrsmWriter(){
     serializer_->release();
     delete doc_;
 }
 
-void SimplePrSMWriter::close(){
+void SimplePrsmWriter::close(){
   file_ << "</simple_prsm_list>" << std::endl;
   file_.close();
 }
 
-void SimplePrSMWriter::write(SimplePrSMPtrVec simple_prsms){
+void SimplePrsmWriter::write(SimplePrsmPtrVec simple_prsms){
     for(unsigned int i=0;i<simple_prsms.size();i++){
       xercesc::DOMElement* element = simple_prsms[i]->toXml(doc_);
       std::string str = writeToString(serializer_, element);

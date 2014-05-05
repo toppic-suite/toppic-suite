@@ -20,7 +20,7 @@ class ZeroPtmMng {
 
   /** zero ptm fast filtering */
   int zero_ptm_filter_result_num_ = 20;
-  /** number of reported PrSMs for each spectrum */
+  /** number of reported Prsms for each spectrum */
   int report_num_ = 1;
 
   /** recalibration is used in ZeroPtmSlowMatch */

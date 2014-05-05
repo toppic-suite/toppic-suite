@@ -86,9 +86,9 @@ void ZeroPtmSlowMatch::compScore (ExtendMsPtr refine_ms_ptr, TheoPeakPtrVec theo
 }
 
 // get result 
-PrSMPtr ZeroPtmSlowMatch::geneResult() {
+PrsmPtr ZeroPtmSlowMatch::geneResult() {
   SpParaPtr sp_para_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr();
-  return PrSMPtr(new PrSM(proteoform_ptr_, deconv_ms_ptr_, refine_prec_mass_, 
+  return PrsmPtr(new Prsm(proteoform_ptr_, deconv_ms_ptr_, refine_prec_mass_, 
                           recal_, sp_para_ptr));
 }
 

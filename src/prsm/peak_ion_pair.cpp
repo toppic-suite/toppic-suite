@@ -96,4 +96,44 @@ PeakIonPairPtrVec getPeakIonPairs (const ProteoformPtr &proteoform_ptr,
 
 }
 
+double computePairConverage(const PeakIonPairPtrVec &pairs, int begin, 
+                            int end, int coverage_type) {
+  int total_num = end - begin  + 1;
+  if (total_num <= 0) {
+    return 0.0;
+  }
+  std::vector<bool> is_cov(total_num);
+  for (unsigned int i  = 0; i < pairs.size(); i++) {
+    IonPtr ion_ptr = pairs[i]->getTheoPeakPtr()->getIonPtr();
+    bool cov = false;
+    if (coverage_type == N_TERM_COVERAGE) {
+      if (ion_ptr->getIonTypePtr()->isNTerm()) {
+        cov = true;
+      }
+    }
+    else if (coverage_type == C_TERM_COVERAGE) {
+      if (!ion_ptr->getIonTypePtr()->isNTerm()) {
+        cov = true;
+      }
+    }
+    else if (coverage_type = BOTH_TERM_COVERAGE) {
+      cov = true;
+    }
+    if (cov) {
+      int pos = ion_ptr->getPos();
+      if (pos >= begin && pos <= end) {
+        is_cov[pos - begin] = true;
+      }
+    }
+  }
+  int cov_num = 0;
+  for (unsigned int i = 0; i < is_cov.size(); i++) {
+    if (is_cov[i]) {
+      cov_num++;
+    }
+  }
+  return cov_num/(double)total_num;
+
+}
+
 }

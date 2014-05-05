@@ -7,6 +7,10 @@
 
 namespace prot {
 
+#define N_TERM_COVERAGE 0
+#define C_TERM_COVERAGE 1
+#define BOTH_TERM_COVERAGE 2
+
 class PeakIonPair {
  public:
   PeakIonPair(ExtendPeakPtr real_peak_ptr, TheoPeakPtr theo_peak_ptr) {
@@ -47,6 +51,10 @@ PeakIonPairPtrVec getMatchedPairs(const PeakIonPairPtrVec &pairs,
 PeakIonPairPtrVec getPeakIonPairs(const ProteoformPtr &proteoform_ptr, 
                                   const ExtendMsPtr &ms_three_ptr, 
                                   double min_mass);
+
+double computePairConverage(const PeakIonPairPtrVec &pairs, int begin, 
+                            int end, int coverage_type);
+
 }
 
 #endif

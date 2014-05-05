@@ -521,7 +521,7 @@ double CompProbValue::getCondProbOneValue(int shift, int value) {
   return norm_cond_prob;
 }
 
-int getMaxScore(PrSMPtrVec prsms) {
+int getMaxScore(PrsmPtrVec prsms) {
   int score = 0;
   for (unsigned int i = 0; i < prsms.size(); i++) {
     if (prsms[i]->getMatchFragNum() > score) {
@@ -531,7 +531,7 @@ int getMaxScore(PrSMPtrVec prsms) {
   return score;
 }
 
-int getMaxShift(PrSMPtrVec prsms) {
+int getMaxShift(PrsmPtrVec prsms) {
   int shift = 0;
   for (unsigned int i = 0; i < prsms.size(); i++) {
     if (prsms[i]->getProteoformPtr()->getUnexpectedChangeNum() > shift) {
@@ -542,7 +542,7 @@ int getMaxShift(PrSMPtrVec prsms) {
 }
 
 void compProbArray(CompProbValuePtr comp_prob_ptr, ResFreqPtrVec &n_term_residues, 
-                   PrmPeakPtrVec &peaks, PrSMPtrVec &prsms, bool strict, 
+                   PrmPeakPtrVec &peaks, PrsmPtrVec &prsms, bool strict, 
                    std::vector<double> &results) {
   int max_score = getMaxScore(prsms);
   int max_shift = getMaxShift(prsms);
