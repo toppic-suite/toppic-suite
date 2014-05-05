@@ -15,6 +15,7 @@ SpectrumSet::SpectrumSet(const DeconvMsPtr &sp, double delta,
                          const SpParaPtr &sp_para_ptr){
   deconv_sp_ = sp;
   sp_para_ptr_ = sp_para_ptr;
+  // add error tolerance for precursor mass 
   deconv_sp_->getHeaderPtr()->setErrorToleranceByPpo(
       sp_para_ptr_->getPeakTolerancePtr()->getPpo());
   delta_=delta;

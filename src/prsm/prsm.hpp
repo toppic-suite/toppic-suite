@@ -10,6 +10,7 @@
 #include "spec/extend_peak.hpp"
 #include "spec/sp_para.hpp"
 #include "prsm/cleavage.hpp"
+#include "prsm/prsm_para.hpp"
 
 namespace prot {
 
@@ -18,55 +19,57 @@ class PrSM {
   PrSM(ProteoformPtr proteoform_ptr, DeconvMsPtr deconv_ms_ptr, 
        double adjusted_prec_mass, double calibration, SpParaPtr sp_para_ptr);
   PrSM(xercesc::DOMElement* element,ProteoformPtrVec proteoforms);
-    double getAdjustedPrecMass() {return adjusted_prec_mass_;}
+  double getAdjustedPrecMass() {return adjusted_prec_mass_;}
 
-    ProteoformPtr getProteoformPtr() {return proteoform_ptr_;}
+  ProteoformPtr getProteoformPtr() {return proteoform_ptr_;}
 
-    void setProteoformPtr(ProteoformPtr proteoform) {proteoform_ptr_=proteoform;}
+  void setProteoformPtr(ProteoformPtr proteoform) {proteoform_ptr_=proteoform;}
 
-    double getCalibration() {return calibration_;}
+  double getCalibration() {return calibration_;}
 
-    DeconvMsPtr getDeconvMsPtr() {return deconv_ms_ptr_;}
+  DeconvMsPtr getDeconvMsPtr() {return deconv_ms_ptr_;}
 
-    void setDeconvMsPtr(DeconvMsPtr ms) {deconv_ms_ptr_=ms;}
+  void setDeconvMsPtr(DeconvMsPtr ms) {deconv_ms_ptr_=ms;}
 
-    double getMatchPeakNum() {return match_peak_num_;}
+  double getMatchPeakNum() {return match_peak_num_;}
 
-    double getEValue() {return prob_ptr_->getEValue();}
+  double getEValue() {return prob_ptr_->getEValue();}
 
-    double getFdr() {return fdr_;}
+  double getFdr() {return fdr_;}
 
-    int getId() {return prsm_id_;}
+  int getId() {return prsm_id_;}
 
-    double getPValue() {return prob_ptr_->getPValue();}
+  double getPValue() {return prob_ptr_->getPValue();}
 
-    double getMatchFragNum() {return match_fragment_num_;}
+  double getMatchFragNum() {return match_fragment_num_;}
 
-    int getSpectrumId() {return spectrum_id_;}
+  int getSpectrumId() {return spectrum_id_;}
 
   std::string getSpectrumScan() {return spectrum_scan_;}
 
-    double getOriPrecMass() {return ori_prec_mass_;}
+  double getOriPrecMass() {return ori_prec_mass_;}
 
-    int getPrecurorId() {return precursor_id_;}
+  int getPrecurorId() {return precursor_id_;}
 
-    ExtendMsPtr getRefineMs() {return refine_ms_three_;}
+  ExtendMsPtr getRefineMs() {return refine_ms_three_;}
 
-    void setRefineMs(ExtendMsPtr refine_ms_three){refine_ms_three_ = refine_ms_three;}
+  bool isMatchMs(MsHeaderPtr header_ptr);
 
-    ExtremeValuePtr getProbPtr() {return prob_ptr_;} 
+  void setRefineMs(ExtendMsPtr refine_ms_three){refine_ms_three_ = refine_ms_three;}
 
-    void setProbPtr(ExtremeValuePtr prob_ptr) {prob_ptr_ = prob_ptr;}
+  ExtremeValuePtr getProbPtr() {return prob_ptr_;} 
 
-    void setFdr(double fdr) {fdr_ = fdr;}
+  void setProbPtr(ExtremeValuePtr prob_ptr) {prob_ptr_ = prob_ptr;}
 
-    void setId(int id) {prsm_id_ = id;}
+  void setFdr(double fdr) {fdr_ = fdr;}
 
-    void setSpectrumId(int spectrum_id) {spectrum_id_ = spectrum_id;}
+  void setId(int id) {prsm_id_ = id;}
 
-    void setSpectrumScan(std::string spectrum_scan) {spectrum_scan_ = spectrum_scan;}
+  void setSpectrumId(int spectrum_id) {spectrum_id_ = spectrum_id;}
 
-    void setOriPrecMass(double prec_mass) {ori_prec_mass_ = prec_mass;}
+  void setSpectrumScan(std::string spectrum_scan) {spectrum_scan_ = spectrum_scan;}
+
+  void setOriPrecMass(double prec_mass) {ori_prec_mass_ = prec_mass;}
 
   void setPrecurorId(int precursor_id) {precursor_id_ = precursor_id;}
 
@@ -191,8 +194,9 @@ inline bool prsmSpectrumIdUpEvalueUp(PrSMPtr p1, PrSMPtr p2){
 
 PrSMPtrVec readPrsm(std::string file_name,ProteoformPtrVec proteoforms);
 
-bool isMatch(PrSMPtr prsm_ptr, MsHeaderPtr header_ptr);
 void filterPrsms(PrSMPtrVec &prsms, MsHeaderPtr header_ptr, PrSMPtrVec &sele_prsms); 
+
+void addSpectrumPtrsToPrsms(PrSMPtrVec &prsms, PrsmParaPtr prsm_para_ptr);
 
 }
 #endif

@@ -31,11 +31,12 @@ TheoPeakPtrVec getTheoPeak(const BpSpecPtr &bp_spec,
   TheoPeakPtrVec theo_peaks;
   BreakPointPtrVec bps = bp_spec->getBreakPointPtrVec();
   IonTypePtr n_ion_type_ptr = type->getNIonTypePtr();
+  int charge = 0;
   for(int i =bgn;i<=end;i++){
     double n_mass = bps[i]->getNTermMass(n_ion_type_ptr);
     double new_mass = n_mass + n_term_shift;
     if(new_mass >= min_mass && new_mass <= max_mass){
-      IonPtr ion = IonPtr(new Ion(0,i,i,n_ion_type_ptr, neutral_loss_ptr));
+      IonPtr ion = IonPtr(new Ion(charge,i,i,n_ion_type_ptr, neutral_loss_ptr));
       TheoPeakPtr theo_peak 
           = TheoPeakPtr(new TheoPeak(ion,n_mass,n_term_shift));
       theo_peaks.push_back(theo_peak);
@@ -48,7 +49,7 @@ TheoPeakPtrVec getTheoPeak(const BpSpecPtr &bp_spec,
     double new_mass = c_mass + c_term_shift;
     if(new_mass >= min_mass && new_mass <= max_mass){
       IonPtr ion 
-          = IonPtr(new Ion(0,i,bps.size()-i-1,c_ion_type_ptr,neutral_loss_ptr));
+          = IonPtr(new Ion(charge,i,bps.size()-i-1,c_ion_type_ptr,neutral_loss_ptr));
       theo_peaks.push_back(TheoPeakPtr(new TheoPeak(ion,c_mass,c_term_shift)));
     }
   }

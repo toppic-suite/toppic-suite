@@ -82,37 +82,6 @@ void XmlGenerator::outputAllProteins(PrSMPtrVec prsms){
   anno_view_->file_list_.push_back(file_info);
 }
 
-void XmlGenerator::processPrSMs(PrSMPtrVec & prsms,ProteoformPtrVec proteoforms){
-  MsAlignReader reader(mng_->prsm_para_ptr_->getSpectrumFileName());
-  DeconvMsPtr deconv_sp;
-  int cnt = 0;
-  while((deconv_sp = reader.getNextMs()) != nullptr){
-    cnt++;
-    for(unsigned int i=0;i<prsms.size();i++){
-      if(isMatch(prsms[i],deconv_sp->getHeaderPtr())){
-
-        //process ,deconv_sp,bpsepc
-        //findseq :check proteoform's id and name
-
-//        ProteoformPtr temp = prsms[i]->getProteoformPtr();
-//        ProteoformPtr new_seq = prot::getSubProteoform(proteoforms[temp->getDbResSeqPtr()->getId()],
-//                                                       temp->getStartPos(),temp->getEndPos());
-//        ChangePtrVec unexpect_change_list = temp->getUnexpectedChangePtrVec();
-//        new_seq->addUnexpectedChangePtrVec(unexpect_change_list);
-//        prsms[i]->setProteoformPtr(new_seq);
-
-        //initsegment:proteoform getSegmentPtrVec
-        //check prsm's spectrum_scan and oriprecmass
-        //refine_ms_three_ ;have read it form prsm.xml
-        //initscore:have read it form prsm.xml
-
-        prsms[i]->setDeconvMsPtr(deconv_sp);
-        double delta = prsms[i]->getAdjustedPrecMass() - prsms[i]->getOriPrecMass();
-        prsms[i]->setRefineMs(getMsThree(deconv_sp, delta, mng_->prsm_para_ptr_->getSpParaPtr()));
-      }
-    }
-  }
-}
 void XmlGenerator::outputSpecies(PrSMPtrVec prsms){
 
   std::vector<int> species = getSpeciesIds(prsms);
@@ -154,7 +123,7 @@ void XmlGenerator::process(){
   std::string input_name = basename(spectrum_file_name)+"."+input_file_;
   PrSMPtrVec prsms = readPrsm(basename(spectrum_file_name)+"."+input_file_,raw_forms_);
 
-  processPrSMs(prsms,raw_forms_);
+  addSpectrumPtrsToPrsms(prsms, prsm_para_ptr);
   setSpeciesId(prsms,prsm_para_ptr->getSpParaPtr()->getPeakTolerancePtr()->getPpo());
   outputPrsms(prsms);
   outputAllPrsms(prsms);

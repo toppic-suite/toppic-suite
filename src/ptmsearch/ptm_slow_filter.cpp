@@ -55,7 +55,7 @@ PtmSlowFilter::PtmSlowFilter(
 }
 
 PrSMPtrVec PtmSlowFilter::getPrSMs(int nshift, SemiAlignTypePtr type){
-    PrSMPtrVec matches;
+  PrSMPtrVec matches;
   if (type == SemiAlignTypeFactory::getCompletePtr()) {
     for (unsigned int i = 0; i < complete_prsms_.size(); i++) {
       if (complete_prsms_[i][nshift] != nullptr) {

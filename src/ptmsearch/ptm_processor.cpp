@@ -81,7 +81,7 @@ void PtmProcessor::process(){
                                                 mng_ptr_->prsm_para_ptr_->getSpParaPtr());
     if(spectrum_set_ptr != nullptr){
       SimplePrSMPtrVec selected_prsms 
-          = prot::findSimplePrsms(simplePrsms_,deconv_sp->getHeaderPtr());
+          = findSimplePrsms(simplePrsms_,deconv_sp->getHeaderPtr());
       search(spectrum_set_ptr, selected_prsms);
     }
     std::cout << std::flush << "Ptm search complete " << cnt << " of " << spectra_num << std::endl;

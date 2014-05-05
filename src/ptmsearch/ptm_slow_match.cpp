@@ -97,8 +97,7 @@ DiagonalHeaderPtrVec PtmSlowMatch::getNTermShiftList(
     headers.push_back(n_term_shifts_comp_right[i]);
   }
   std::vector<double> ms_masses = prot::getMassList(ms_six);
-  std::vector<double> seq_masses = seq->getBpSpecPtr()->getBreakPointMasses(
-      IonTypePtr(new IonType("B",true,0)));
+  std::vector<double> seq_masses = seq->getBpSpecPtr()->getPrmMasses();
   double shift;
 
   for(unsigned int i=1;i<seq_masses.size();i++){

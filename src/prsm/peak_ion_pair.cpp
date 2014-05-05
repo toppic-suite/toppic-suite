@@ -79,6 +79,7 @@ void findPairs(ExtendMsPtr ms_three_ptr, TheoPeakPtrVec &theo_peaks,
   }
 }
 
+/* parameter min_mass is necessary */
 PeakIonPairPtrVec getPeakIonPairs (const ProteoformPtr &proteoform_ptr, 
                                    const ExtendMsPtr &ms_three_ptr, 
                                    double min_mass) {

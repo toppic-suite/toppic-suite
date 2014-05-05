@@ -1,6 +1,7 @@
-#include <map>
 #include "base/logger.hpp"
 #include "spec/ms.hpp"
+#include "spec/msalign_reader.hpp"
+#include "spec/spectrum_set.hpp"
 #include "prsm/prsm.hpp"
 #include "prsm/peak_ion_pair.hpp"
 
@@ -18,7 +19,6 @@ PrSM::PrSM(ProteoformPtr proteoform_ptr, DeconvMsPtr deconv_ms_ptr,
   ori_prec_mass_ = header_ptr->getPrecMonoMass();
   adjusted_prec_mass_ = adjusted_prec_mass;
   calibration_ = calibration;
-  //sp_para_ptr_=sp_para_ptr;
   init(sp_para_ptr);
 }
 
@@ -38,7 +38,6 @@ void PrSM::initScores(SpParaPtr sp_para_ptr) {
   match_fragment_num_ = 0;
   TheoPeakPtr prev_ion(nullptr);;
   for (unsigned int i = 0; i < pairs.size(); i++) {
-//    match_peak_num_ += pairs[i]->getRealPeakPtr()->getScore();
     if (pairs[i]->getTheoPeakPtr() != prev_ion) {
       prev_ion = pairs[i]->getTheoPeakPtr();
       match_fragment_num_ += pairs[i]->getRealPeakPtr()->getScore();
@@ -80,9 +79,6 @@ xercesc::DOMElement* PrSM::toXmlElement(XmlDOMDocument* xml_doc){
 	if(prob_ptr_!=nullptr){
 	  prob_ptr_->appendXml(xml_doc,element);
 	}
-	if(deconv_ms_ptr_!=nullptr){
-	  deconv_ms_ptr_->appendXml(xml_doc,element);
-	}
   return element;
 }
 
@@ -115,21 +111,25 @@ PrSM::PrSM(xercesc::DOMElement* element,ProteoformPtrVec proteoforms){
     prob_ptr_ = ExtremeValuePtr(new ExtremeValue(prob_element));
   }
 
-  xercesc::DOMElement* deconv_ms_element = getChildElement(element,"ms",0);
-  xercesc::DOMElement* header_element
-      = getChildElement(deconv_ms_element,"ms_header",0);
-  MsHeaderPtr header_ptr  = MsHeaderPtr (new MsHeader(header_element));
-//  xercesc::DOMElement* peak_element
-//      = getChildElement(deconv_ms_element,"peaks",0);
-  DeconvPeakPtrVec peaks;
-//  int peak_num = getChildCount(peak_element,"deconv_peak");
-//  for(int i=0;i<peak_num;i++){
-//    xercesc::DOMElement* cur_ms_element
-//        = getChildElement(deconv_ms_element,"deconv_peak",i);
-//    peaks.push_back(DeconvPeakPtr(new DeconvPeak(cur_ms_element)));
-//  }
-  deconv_ms_ptr_ = DeconvMsPtr(new Ms<DeconvPeakPtr>(header_ptr,peaks));
-  refine_ms_three_ = ExtendMsPtr(new Ms<ExtendPeakPtr>(header_ptr));
+  deconv_ms_ptr_ = DeconvMsPtr(nullptr);
+  refine_ms_three_ = ExtendMsPtr(nullptr);
+}
+
+bool PrSM::isMatchMs(MsHeaderPtr header_ptr) {
+  int id = header_ptr->getId();
+  std::string scan = header_ptr->getScansString();
+  int prec_id = header_ptr->getPrecId();
+  double prec_mass = header_ptr->getPrecMonoMass();
+  if (id == spectrum_id_ && prec_id == precursor_id_) {
+    LOG_DEBUG("scan " << scan << " prsm scan " << spectrum_scan_
+              << " prec mass " << prec_mass << " prsm mass " << ori_prec_mass_);
+    if (scan != spectrum_scan_) {
+      LOG_ERROR("Error in PrSM.");
+    }
+    return true;
+  } else {
+    return false;
+  }
 }
 
 PrSMPtrVec readPrsm(std::string file_name,ProteoformPtrVec proteoforms){
@@ -151,104 +151,33 @@ PrSMPtrVec readPrsm(std::string file_name,ProteoformPtrVec proteoforms){
   return results;
 }
 
-bool isMatch(PrSMPtr prsm_ptr, MsHeaderPtr header_ptr) {
-  int id = header_ptr->getId();
-  std::string scan = header_ptr->getScansString();
-  int prec_id = header_ptr->getPrecId();
-  double prec_mass = header_ptr->getPrecMonoMass();
-  if (id == prsm_ptr->getSpectrumId() && prec_id == prsm_ptr->getPrecurorId()) {
-    LOG_DEBUG("scan " << scan << " prsm scan " << prsm_ptr->getSpectrumScan()
-              << " prec mass " << prec_mass << " prsm mass " << prsm_ptr->getOriPrecMass());
-    /*
-    if (scan != prsm_ptr->getSpectrumScan()
-        || prec_mass != prsm_ptr->getOriPrecMass()) {
-      LOG_ERROR("Error in PrSM.");
+void addSpectrumPtrsToPrsms(PrSMPtrVec &prsms, PrsmParaPtr prsm_para_ptr){
+  MsAlignReader reader(prsm_para_ptr->getSpectrumFileName());
+  DeconvMsPtr ms_ptr = reader.getNextMs();
+  double delta = 0;
+  while (ms_ptr.get() != nullptr) {
+    SpectrumSetPtr spec_set_ptr 
+        = getSpectrumSet(ms_ptr, delta, prsm_para_ptr->getSpParaPtr());
+    if (spec_set_ptr.get() != nullptr) {
+      DeconvMsPtr deconv_ms_ptr = spec_set_ptr->getDeconvMs();
+      for(unsigned int i=0;i<prsms.size();i++){
+        if(prsms[i]->isMatchMs(deconv_ms_ptr->getHeaderPtr())){
+          prsms[i]->setDeconvMsPtr(deconv_ms_ptr);
+          double delta = prsms[i]->getAdjustedPrecMass() - prsms[i]->getOriPrecMass();
+          prsms[i]->setRefineMs(getMsThree(deconv_ms_ptr, delta, prsm_para_ptr->getSpParaPtr()));
+        }
+      }
     }
-    */
-    return true;
-  } else {
-    return false;
   }
 }
 
 void filterPrsms(PrSMPtrVec &prsms, MsHeaderPtr header_ptr, 
                  PrSMPtrVec &sele_prsms) {
   for (unsigned int i = 0; i < prsms.size(); i++) {
-    if (isMatch(prsms[i], header_ptr)) {
+    if (prsms[i]->isMatchMs(header_ptr)) {
       sele_prsms.push_back(prsms[i]);
     }
   }
 }
 
 }
-
-/*
-    public PrSM(Element element) throws Exception {
-        prsmId = Integer.parseInt(element.getChildText("prsm_id"));
-        spectrumId = Integer.parseInt(element.getChildText("spectrum_id"));
-        spectrumScan = element.getChildText("spectrum_scan");
-        precursorId = Integer.parseInt(element.getChildText("precursor_id"));
-        OriPrecMass = Double.parseDouble(element
-                .getChildText("original_precursor_mass"));
-        adjustedPrecMass = Double.parseDouble(element
-                .getChildText("adjusted_precursor_mass"));
-        calibration = Double.parseDouble(element.getChildText("calibration"));
-        Element probElement = element.getChild("probability");
-        prob = new ExtremeValueProb(probElement);
-        fdr = Double.parseDouble(element.getChildText("fdr"));
-        Element protElement = element.getChild("annotated_protein");
-        annoProtein = new AnnoProtein(protElement);
-        Element spParaElement = element.getChild("sp_para");
-        spPara = new SpPara(spParaElement);
-        
-    }
-
-    public void process(Ms<DeconvPeak> ms, BpSpec seqs[])
-            throws Exception {
-        annoProtein.process(seqs);
-        this.deconvMs = ms;
-        if (!ms.getHeader().getScansString().equals(spectrumScan)
-                || ms.getHeader().getPrecMonoMass() != OriPrecMass) {
-            logger.error("Incorrect spectrum.");
-            System.exit(1);
-        }
-        init();
-    }
-
-    public PeakIonPair[] getMatchedPairs() throws Exception {
-        return annoProtein.getMatchPeak(refineMsThree, spPara.getMinMass());
-    }
-
-
-    public void outputMatchFragmentIon(PrintWriter writer) throws Exception {
-        PeakIonPair pairs[] = annoProtein.getMatchPeak(refineMsThree,
-                spPara.getMinMass());
-        TheoPeak prevIon = null;
-        int bp[] = new int[annoProtein.getSeq().getResSeq().getLen() - 1];
-        for (int j = 0; j < pairs.length; j++) {
-            nMatchPeak += pairs[j].getRealPeak().getScore();
-            if (pairs[j].getTheoPeak() != prevIon) {
-                prevIon = pairs[j].getTheoPeak();
-                int pos = prevIon.getIon().getPos();
-                if (prevIon.getIon().getIonType().isNTerm()) {
-                    if (bp[pos] == 0) {
-                        bp[pos] = 1;
-                    } else if (bp[pos] == 2) {
-                        bp[pos] = 3;
-                    }
-                } else {
-                    if (bp[pos] == 0) {
-                        bp[pos] = 2;
-                    } else if (bp[pos] == 1) {
-                        bp[pos] = 3;
-                    }
-                }
-            }
-
-        }
-        for (int i = 0; i < bp.length; i++) {
-            writer.print(bp[i]);
-        }
-    }
-
-*/

@@ -27,7 +27,6 @@ class XmlGenerator {
   XmlGenerator(PrsmParaPtr prsm_para_ptr, std::string exec_dir, 
                std::string input_file);
   void process();
-  void processPrSMs(PrSMPtrVec & prsms,ProteoformPtrVec proteoforms);
   void outputPrsms(PrSMPtrVec prsms);
   void outputAllPrsms(PrSMPtrVec prsms);
   void outputSpecies(PrSMPtrVec prsms);
