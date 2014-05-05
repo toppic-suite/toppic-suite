@@ -38,6 +38,7 @@ file(GLOB XPP_SCRS   ${CMAKE_CURRENT_SOURCE_DIR}/src/xpp/*.cpp)
 file(GLOB TEST_SCRS   ${CMAKE_CURRENT_SOURCE_DIR}/src/test/argument.cpp)
 file(GLOB MAIN_SCRS   ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_console.cpp) 
 file(GLOB MULTIPLE_SCRS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_multiple.cpp) 
+file(GLOB TEST_EVALUE_SCRS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_evalue.cpp) 
 
 link_directories(${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/linux_lib/)
 
@@ -51,10 +52,15 @@ add_executable(test_multiple ${BASE_SCRS} ${SPEC_SCRS} ${PRSM_SCRS}
         ${ZERO_PTM_SCRS} ${FILTER_SCRS} ${PTM_SCRS} ${TDGF_SCRS} ${XPP_SCRS}
         ${TEST_SCRS} ${MULTIPLE_SCRS})
 
+add_executable(test_evalue ${BASE_SCRS} ${SPEC_SCRS} ${PRSM_SCRS}
+        ${ZERO_PTM_SCRS} ${FILTER_SCRS} ${PTM_SCRS} ${TDGF_SCRS} ${XPP_SCRS}
+        ${TEST_SCRS} ${TEST_EVALUE_SCRS})
+
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   # Linux specific code
   target_link_libraries(topid xalan-c xalanMsg xerces-c boost_program_options boost_filesystem boost_system pthread)
   target_link_libraries(test_multiple xalan-c xalanMsg xerces-c boost_program_options boost_filesystem boost_system pthread)
+  target_link_libraries(test_evalue xalan-c xalanMsg xerces-c boost_program_options boost_filesystem boost_system pthread)
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Mingw")
