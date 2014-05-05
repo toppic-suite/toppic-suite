@@ -53,6 +53,10 @@ FastaSeqPtr FastaReader::getNextSeq() {
     }
     line = trim(line);
     ori_seq = ori_seq + line;
+    if (ori_seq.size() >= 1000000) {
+      LOG_ERROR("Protein sequences are too long! Incorrect fasta file!");
+      throw("fasta file error");
+    }
   }
   input_.close();
   return FastaSeqPtr(new FastaSeq(prot_name, ori_seq));

@@ -48,39 +48,10 @@ int process(int argc, char* argv[]) {
     std::string sp_file_name = arguments["spectrumFileName"];
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
     PrsmParaPtr prsm_para_ptr = PrsmParaPtr(new PrsmPara(arguments));
-    if (arguments["searchType"] == "TARGET+DECOY") {
-      generateShuffleDb(ori_db_file_name, db_file_name);
-    }
-
-    std::cout << "Zero ptm search " << std::endl;
-    ZeroPtmMngPtr zero_mng_ptr = ZeroPtmMngPtr(new ZeroPtmMng (prsm_para_ptr, "ZERO"));
-    zeroPtmSearchProcess(zero_mng_ptr);
-
-
-    std::cout << "Fast filter " << std::endl;
-    PtmFastFilterMngPtr filter_mng_ptr 
-        = PtmFastFilterMngPtr(new PtmFastFilterMng(prsm_para_ptr, "FILTER"));
-    PtmFastFilterProcessor filter_processor(filter_mng_ptr);
-    filter_processor.process();
-
     int n_top;
     std::istringstream (arguments["numOfTopPrsms"]) >> n_top;
     int shift_num;
     std::istringstream (arguments["shiftNumber"]) >> shift_num;
-
-    std::cout << "Ptm alignment " << std::endl;
-    PtmMngPtr ptm_mng_ptr = PtmMngPtr(new PtmMng(prsm_para_ptr, n_top, shift_num,
-                                                 "FILTER_COMBINED", "PTM"));
-    prot::PtmProcessor ptm_processor(ptm_mng_ptr);
-    ptm_processor.process();
-
-    std::cout << "Combine prsms " << std::endl;
-    std::vector<std::string> input_exts ;
-    input_exts.push_back("ZERO");
-    input_exts.push_back("PTM");
-    PrsmCombine combine_processor(db_file_name, sp_file_name, 
-                                  input_exts, "RAW_RESULT");
-    combine_processor.process();
 
     std::cout << "E-value computation " << std::endl;
     TdgfMngPtr tdgf_mng_ptr = TdgfMngPtr(new TdgfMng (prsm_para_ptr, shift_num,
