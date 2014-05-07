@@ -48,13 +48,11 @@ int process(int argc, char* argv[]) {
     std::string db_file_name = arguments["databaseFileName"];
     std::string sp_file_name = arguments["spectrumFileName"];
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
-    
     PrsmParaPtr prsm_para_ptr = PrsmParaPtr(new PrsmPara(arguments));
-
-    /*
     if (arguments["searchType"] == "TARGET+DECOY") {
       generateShuffleDb(ori_db_file_name, db_file_name);
     }
+
     std::cout << "Zero ptm search " << std::endl;
     ZeroPtmMngPtr zero_mng_ptr = ZeroPtmMngPtr(new ZeroPtmMng (prsm_para_ptr, "ZERO"));
     zeroPtmSearchProcess(zero_mng_ptr);
@@ -70,10 +68,12 @@ int process(int argc, char* argv[]) {
     std::istringstream (arguments["numOfTopPrsms"]) >> n_top;
     int shift_num;
     std::istringstream (arguments["shiftNumber"]) >> shift_num;
+    double max_ptm_mass;
+    std::istringstream (arguments["maxPtmMass"]) >> max_ptm_mass;
 
     std::cout << "Ptm alignment " << std::endl;
     PtmMngPtr ptm_mng_ptr = PtmMngPtr(new PtmMng(prsm_para_ptr, n_top, shift_num,
-                                                 "FILTER_COMBINED", "PTM"));
+                                                 max_ptm_mass, "FILTER_COMBINED", "PTM"));
     prot::PtmProcessor ptm_processor(ptm_mng_ptr);
     ptm_processor.process();
 
@@ -123,7 +123,6 @@ int process(int argc, char* argv[]) {
     PrsmSpecies prsm_species(db_file_name, sp_file_name, "CUTOFF_RESULT", 
                                    "OUTPUT_RESULT", ppo);
     prsm_species.process();
-    */
 
     std::cout << "Table output " << std::endl;
     TableWriter table_out(prsm_para_ptr, "OUTPUT_RESULT", "OUTPUT_TABLE");
@@ -132,15 +131,12 @@ int process(int argc, char* argv[]) {
     PrsmCoverage prsm_coverage(prsm_para_ptr, "OUTPUT_RESULT", "COVERAGE");
     prsm_coverage.process();
 
-    /*
-
     std::cout << "Generate view xml files " << std::endl;
     XmlGenerator xml_gene = XmlGenerator(prsm_para_ptr, exe_dir,"OUTPUT_RESULT");
     xml_gene.process();
 
     std::cout << "Convert view xml files to html files " << std::endl;
     prot::translate(arguments);
-    */
 
   } catch (const char* e) {
     std::cout << "Exception " << e << std::endl;

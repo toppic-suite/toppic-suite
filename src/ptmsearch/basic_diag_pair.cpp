@@ -126,24 +126,25 @@ BasicDiagPairDiagPtr getDiagonal(int cnt,DiagonalHeaderPtr header,
                                  ProteoformPtr seq,
                                  PtmMngPtr mng){
   BpSpecPtr bp_spec_ptr = seq->getBpSpecPtr();
-    double n_shift = header->getProtNTermShift();
-    double c_shift = ms_six->getHeaderPtr()->getPrecMonoMass()
+  double n_shift = header->getProtNTermShift();
+  double c_shift = ms_six->getHeaderPtr()->getPrecMonoMass()
       -seq->getResSeqPtr()->getSeqMass()-n_shift;
-    setPrefixSuffix(header,c_shift,seq,mng);
+  double term_error_tolerance = mng->term_match_error_tolerance;
+  setPrefixSuffix(header,c_shift,seq, term_error_tolerance, mng);
   IonTypePtr b_ion = IonTypeFactory::getIonTypePtr_B();
   std::vector<double> b_masses = bp_spec_ptr->getBreakPointMasses(b_ion);
-    BasicDiagPairPtrVec diag_pair_list = compDiagPair(ms_six, b_masses, header);
+  BasicDiagPairPtrVec diag_pair_list = compDiagPair(ms_six, b_masses, header);
   if (diag_pair_list.size() > 0) {
-        header->setId(cnt);
-        BasicDiagPairDiagPtr temp 
+    header->setId(cnt);
+    BasicDiagPairDiagPtr temp 
         = BasicDiagPairDiagPtr(
             new Diagonal<BasicDiagPairPtr>(header,diag_pair_list));
-        for(unsigned int i=0;i<diag_pair_list.size();i++){
-            diag_pair_list[i]->setDiagonal(temp);
-        }
-        return temp;
+    for(unsigned int i=0;i<diag_pair_list.size();i++){
+      diag_pair_list[i]->setDiagonal(temp);
     }
-    return nullptr;
+    return temp;
+  }
+  return nullptr;
 }
 
 bool contains(BasicDiagPairPtrVec pairs,int y){

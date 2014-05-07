@@ -27,7 +27,8 @@ typedef std::vector<DiagonalHeaderPtrVec2D> DiagonalHeaderPtrVec3D;
 
 class DiagonalHeader {
  public:
-  DiagonalHeader(double n_term_shift,bool n_strict,bool c_strict,bool n_trunc,bool c_trunc);
+  DiagonalHeader(double n_term_shift,bool n_strict,
+                 bool c_strict,bool n_trunc,bool c_trunc);
 
   DiagonalHeaderPtr clone();
 
@@ -148,7 +149,8 @@ DiagonalHeaderPtr getDiagonalHeaderPtr(DiagonalHeaderPtr shift,int bgn,int end);
 DiagonalHeaderPtrVec getNTermShiftListCommon(std::vector<double> best_shifts);
 DiagonalHeaderPtrVec getNTermShiftListCompLeft(ProteoformPtr seq,PtmMngPtr mng);
 DiagonalHeaderPtrVec getNTermShiftListCompRight(ProteoformPtr seq,PrmMsPtr ms_six);
-void setPrefixSuffix(DiagonalHeaderPtr &header,double c_shift,ProteoformPtr seq,PtmMngPtr mng);
+void setPrefixSuffix(DiagonalHeaderPtr &header,double c_shift,ProteoformPtr seq, 
+                     double term_error_tolerance, PtmMngPtr mng);
 void setAlignPrefSuffic(DiagonalHeaderPtr &header,PtmMngPtr mng);
 DiagonalHeaderPtrVec getNTermShiftListTruncPrefix(ProteoformPtr seq);
 DiagonalHeaderPtrVec getNTermShiftListTruncsuffix(PrmMsPtr ms,ProteoformPtr seq);

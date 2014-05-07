@@ -83,7 +83,8 @@ DiagonalHeaderPtrVec getNTermShiftListCompRight(ProteoformPtr seq,
 }
 
 void setPrefixSuffix(DiagonalHeaderPtr &header, double c_shift,
-                     ProteoformPtr seq, PtmMngPtr mng) {
+                     ProteoformPtr seq, double term_error_tolerance,
+                     PtmMngPtr mng) {
   header->setProtCTermShift(c_shift);
 
   std::vector<double> seq_b_masses = seq->getBpSpecPtr()->getPrmMasses();
@@ -103,9 +104,9 @@ void setPrefixSuffix(DiagonalHeaderPtr &header, double c_shift,
       - seq_b_masses[trunc_last_res_pos + 1];
   header->setPepCTermShift(pep_c_term_shift);
   
-  header->setProtTermMatch(mng->test_term_match_error_tolerance_);
+  header->setProtTermMatch(term_error_tolerance);
 
-  header->setPepTermMatch(mng->test_term_match_error_tolerance_);
+  header->setPepTermMatch(term_error_tolerance);
 
   header->setAlignPrefixSuffix(mng->align_prefix_suffix_shift_thresh_);
 }

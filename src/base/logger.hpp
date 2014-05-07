@@ -11,7 +11,7 @@
 
 namespace prot {
 
-#define LOG_LEVEL 2
+#define LOG_LEVEL 4
 
 #define LOG_LEVEL_TRACE 1
 #define LOG_LEVEL_DEBUG 2

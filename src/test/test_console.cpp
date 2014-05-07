@@ -67,10 +67,12 @@ int process(int argc, char* argv[]) {
     std::istringstream (arguments["numOfTopPrsms"]) >> n_top;
     int shift_num;
     std::istringstream (arguments["shiftNumber"]) >> shift_num;
+    double max_ptm_mass;
+    std::istringstream (arguments["maxPtmMass"]) >> max_ptm_mass;
 
     std::cout << "Ptm alignment " << std::endl;
     PtmMngPtr ptm_mng_ptr = PtmMngPtr(new PtmMng(prsm_para_ptr, n_top, shift_num,
-                                                 "FILTER_COMBINED", "PTM"));
+                                                 max_ptm_mass, "FILTER_COMBINED", "PTM"));
     prot::PtmProcessor ptm_processor(ptm_mng_ptr);
     ptm_processor.process();
 

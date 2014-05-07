@@ -122,72 +122,106 @@ DPPairPtr PSAlign::getTruncPre(DPPairPtr cur_pair, int s,
 
 DPPairPtr PSAlign::getShiftPre(DPPairPtr cur_pair, int p, int s,
                                SemiAlignTypePtr type) {
+  if (s < 1) {
+    return nullptr;
+  }
   int cur_x = cur_pair->getX();
   int cur_y = cur_pair->getY();
   DPPairPtr shift_prev = nullptr;
   double shift_score = -std::numeric_limits<double>::max();
-  if (s >= 1) {
-    if (cur_pair == last_pair_) {
-      for (int q = 0; q < p; q++) {
-        DPPairPtr prev_pair = dp_pairs_[q];
-        int prev_x = prev_pair->getX();
-        int prev_y = prev_pair->getY();
-        if (prev_x >= cur_x || prev_y >= cur_y
-            || prev_pair->getDiagonalHeader()
-            == cur_pair->getDiagonalHeader()) {
+  // last pair
+  if (cur_pair == last_pair_) {
+    double prev_pair_min_n_term_shift = last_pair_->getDiff() - mng_->align_max_shift_;
+    double prev_pair_max_n_term_shift = sp_masses_[sp_masses_.size() - 1];
+    for (int q = 0; q < p; q++) {
+      DPPairPtr prev_pair = dp_pairs_[q];
+      int prev_x = prev_pair->getX();
+      int prev_y = prev_pair->getY();
+      if (prev_x >= cur_x || prev_y >= cur_y
+          || prev_pair->getDiagonalHeader()
+          == cur_pair->getDiagonalHeader()) {
+        continue;
+      }
+      if ((type == SemiAlignTypeFactory::getCompletePtr()
+           || type == SemiAlignTypeFactory::getSuffixPtr())
+          && !prev_pair->getDiagonalHeader()->isAlignSuffix()) {
+        continue;
+      }
+      if (type == SemiAlignTypeFactory::getPrefixPtr()
+           || type == SemiAlignTypeFactory::getInternalPtr()) {
+        double prev_pair_n_term_shift = prev_pair->getDiagonalHeader()
+          ->getProtNTermShift();
+        if (prev_pair_n_term_shift < prev_pair_min_n_term_shift ||
+            prev_pair_n_term_shift > prev_pair_max_n_term_shift) {
           continue;
         }
-        if (type == SemiAlignTypeFactory::getCompletePtr()
-            || (type == SemiAlignTypeFactory::getSuffixPtr()
-                && !prev_pair->getDiagonalHeader()->isAlignSuffix())) {
+        double abs_shift = std::abs(prev_pair_n_term_shift - last_pair_->getDiff()); 
+        if (abs_shift < mng_->align_min_shift_) {
           continue;
         }
-        if (prev_pair->getSrc(s - 1) > shift_score) {
-          shift_prev = prev_pair;
-          shift_score = dp_pairs_[q]->getSrc(s - 1);
-        }
+      }
+      if (s == 2 && type == SemiAlignTypeFactory::getSuffixPtr()) {
+        std::cout << "prev pair " << " align suffix " << prev_pair->getDiagonalHeader()->isAlignSuffix()
+            << " prev n term shift " << prev_pair->getDiagonalHeader()->getProtNTermShift()
+            << " last shift " << last_pair_->getDiff()
+            << " score " << prev_pair->getSrc(s-1) 
+            << std::endl;
+      }
+
+      if (prev_pair->getSrc(s - 1) > shift_score) {
+        shift_prev = prev_pair;
+        shift_score = dp_pairs_[q]->getSrc(s - 1);
+      }
+    }
+  } 
+  // not last pair
+  else {
+    // if complete or prefix alignment, consider first pair only if 
+    // isAlignPrefix is true
+    if (type == SemiAlignTypeFactory::getCompletePtr()
+        || type == SemiAlignTypeFactory::getPrefixPtr()) {
+      if (first_pair_->getSrc(s - 1) > shift_score
+          && cur_pair->getDiagonalHeader()->isAlignPrefix()) {
+        shift_prev = first_pair_;
+        shift_score = first_pair_->getSrc(s - 1);
       }
     } 
     else {
-      // if complete or prefix alignment, consider first pair only if 
-      // isAlignPrefix is true
-      if (type == SemiAlignTypeFactory::getCompletePtr()
-          || type == SemiAlignTypeFactory::getPrefixPtr()) {
-        if (first_pair_->getSrc(s - 1) > shift_score
-            && cur_pair->getDiagonalHeader()->isAlignPrefix()) {
-          shift_prev = first_pair_;
-          shift_score = first_pair_->getSrc(s - 1);
-        }
-      } 
-      else {
+      double cur_pair_min_n_term_shift = - seq_masses_[seq_masses_.size()-1];
+      double cur_pair_max_n_term_shift = mng_->align_max_shift_;
+      double cur_pair_n_term_shift = cur_pair->getDiagonalHeader()
+          ->getProtNTermShift();
+      if (cur_pair_n_term_shift >= cur_pair_min_n_term_shift 
+          && cur_pair_n_term_shift <= cur_pair_max_n_term_shift) {
         if (first_pair_->getSrc(s - 1) > shift_score) {
           shift_prev = first_pair_;
           shift_score = first_pair_->getSrc(s - 1);
         }
       }
+    }
 
-      for (int q = 1; q < p; q++) {
-        DPPairPtr prev_pair = dp_pairs_[q];
-        int prev_x = prev_pair->getX();
-        int prev_y = prev_pair->getY();
-        double prev_pair_nterm_shift = prev_pair->getDiagonalHeader()
-            ->getProtNTermShift();
-        double cur_pair_nterm_shift = cur_pair->getDiagonalHeader()
-            ->getProtNTermShift();
-        double gap = std::abs(prev_pair_nterm_shift - cur_pair_nterm_shift);
-        if (prev_x >= cur_x || prev_y >= cur_y
-            || prev_pair->getDiagonalHeader() == cur_pair->getDiagonalHeader()
-            || gap <= mng_->align_min_gap) {
-          continue;
-        }
-        double prev_score = prev_pair->getSrc(s - 1);
-        if (gap > mng_->large_shift_thresh) {
-          prev_score = prev_score - mng_->large_shift_panelty;
-        }
-        if (prev_score > shift_score) {
-          shift_prev = prev_pair;
-          shift_score = prev_score;
-        }
+    for (int q = 1; q < p; q++) {
+      DPPairPtr prev_pair = dp_pairs_[q];
+      int prev_x = prev_pair->getX();
+      int prev_y = prev_pair->getY();
+      double prev_pair_nterm_shift = prev_pair->getDiagonalHeader()
+          ->getProtNTermShift();
+      double cur_pair_nterm_shift = cur_pair->getDiagonalHeader()
+          ->getProtNTermShift();
+      double abs_shift = std::abs(prev_pair_nterm_shift - cur_pair_nterm_shift);
+      if (prev_x >= cur_x || prev_y >= cur_y
+          || prev_pair->getDiagonalHeader() == cur_pair->getDiagonalHeader()
+          || abs_shift < mng_->align_min_shift_
+          || abs_shift > mng_->align_max_shift_) {
+        continue;
+      }
+      double prev_score = prev_pair->getSrc(s - 1);
+      if (abs_shift > mng_-> align_large_shift_thresh_) {
+        prev_score = prev_score - mng_-> align_large_shift_panelty_;
+      }
+      if (prev_score > shift_score) {
+        shift_prev = prev_pair;
+        shift_score = prev_score;
       }
     }
   }
@@ -249,9 +283,6 @@ void PSAlign::backtrace() {
     backtrack_diagonals_.push_back(temp);
     backtrack_diagonals_[s] = backtrace(s);
   }
-//    std::cout << backtrack_diagonals_[0].size() << "|"
-//              << backtrack_diagonals_[1].size() << "|"
-//              << backtrack_diagonals_[2].size() << std::endl;
 }
 
 DiagonalHeaderPtrVec PSAlign::backtrace(int s) {

@@ -51,8 +51,7 @@ void PtmSlowMatch::compute(SemiAlignTypePtr type, PrsmPtrVec &prsms) {
 
 PrsmPtr PtmSlowMatch::geneResult(int shift_num){
   DiagonalHeaderPtrVec headers=headers_[shift_num];
-  if(headers.size()==0)
-  {
+  if(headers.size()==0) {
     return nullptr;
   }
   //double refine_prec_mass = ms_three_->getHeaderPtr()->getPrecMonoMass()
@@ -86,23 +85,27 @@ DiagonalHeaderPtrVec PtmSlowMatch::getNTermShiftList(
     ProteoformPtr seq,
     PtmMngPtr mng){
 
-  DiagonalHeaderPtrVec headers = prot::getNTermShiftListCommon(best_shift);
-  DiagonalHeaderPtrVec n_term_shifts_comp_left = prot::getNTermShiftListCompLeft(seq,mng);
-  DiagonalHeaderPtrVec n_term_shifts_comp_right = prot::getNTermShiftListCompRight(seq,ms_six);
+  DiagonalHeaderPtrVec headers = getNTermShiftListCommon(best_shift);
+  // get protein N term shift 
+  DiagonalHeaderPtrVec n_term_shifts_comp_left = getNTermShiftListCompLeft(seq,mng);
+  // get protein C term shift 
+  DiagonalHeaderPtrVec n_term_shifts_comp_right = getNTermShiftListCompRight(seq,ms_six);
   DiagonalHeaderPtrVec extend_n_term_shifts;
+
   for(unsigned int i=0;i<n_term_shifts_comp_left.size();i++){
     headers.push_back(n_term_shifts_comp_left[i]);
   }
   for(unsigned int i=0;i<n_term_shifts_comp_right.size();i++){
     headers.push_back(n_term_shifts_comp_right[i]);
   }
-  std::vector<double> ms_masses = prot::getMassList(ms_six);
+  std::vector<double> ms_masses = getMassList(ms_six);
   std::vector<double> seq_masses = seq->getBpSpecPtr()->getPrmMasses();
   double shift;
-
+  // if a diagonal has a similar shift to a trunc diagonal, then trunc diagonal
+  // is added to the list.
   for(unsigned int i=1;i<seq_masses.size();i++){
     shift = - seq_masses[i];
-    if(found(shift,headers,mng)){
+    if(found(shift,headers,mng_->extend_trunc_error_tolerance_)){
       extend_n_term_shifts.push_back(DiagonalHeaderPtr(
               new DiagonalHeader(shift,true,false,true,false)));
     }
@@ -110,7 +113,7 @@ DiagonalHeaderPtrVec PtmSlowMatch::getNTermShiftList(
 
   for(unsigned int i=1;i<seq_masses.size();i++){
     shift = ms_masses[ms_masses.size()-1] - seq_masses[i];
-    if(found(shift,headers,mng)){
+    if(found(shift,headers,mng_->extend_trunc_error_tolerance_)){
       extend_n_term_shifts.push_back(DiagonalHeaderPtr(
               new DiagonalHeader(shift,false,true,false,true)));
     }
@@ -123,9 +126,11 @@ DiagonalHeaderPtrVec PtmSlowMatch::getNTermShiftList(
   return headers;
 }
 
-bool PtmSlowMatch::found(double shift,DiagonalHeaderPtrVec headerlist,PtmMngPtr mng){
+bool PtmSlowMatch::found(double shift, DiagonalHeaderPtrVec headerlist, 
+                         double trunc_error_tolerance){
   for(unsigned int i=0;i<headerlist.size();i++){
-    if(std::abs(shift-headerlist[i]->getProtNTermShift())<= mng->extend_diagonal_error_tolerance_){
+    if(std::abs(shift-headerlist[i]->getProtNTermShift())
+       <= trunc_error_tolerance){
       return true;
     }
   }

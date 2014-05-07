@@ -23,6 +23,7 @@ void Argument::initArguments() {
   arguments_["cutoffValue"] = "0.01";
   arguments_["allowProtMod"] = "NONE,NME,NME_ACETYLATION";
   arguments_["numOfTopPrsms"] = "1";
+  arguments_["maxPtmMass"] = "1000000";
   arguments_["executiveDir"] = ".";
 }
 
@@ -72,6 +73,7 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string protection = "";
   std::string shift_num = "";
   std::string error_tole = "";
+  std::string max_ptm_mass = "";
   std::string cutoff_type = "";
   std::string cutoff_value = "";
 
@@ -87,8 +89,9 @@ bool Argument::parse(int argc, char* argv[]) {
         ("cysteine-protection,c", po::value<std::string> (&protection), 
          "<C0|C57|C58>. Cysteine protecting group C0: no modification,C57: Carbamidoemetylation, or C58:Carboxymethylation. Default value: C0.")
         ("decoy,d", "Use decoy protein database to estimate false discovery rates.")
-        ("shift-number,s", po::value<std::string> (&shift_num), "<int value>. Maximum number of unexpected PTMs. Default value: 2.")
         ("error-tolerance,e", po::value<std::string> (&error_tole), "<int value>. Error tolerance in PPM. Default value: 15.")
+        ("max-ptm,m", po::value<std::string> (&max_ptm_mass), "<positive double value>. Maximum absolute value of the PTM masses in the identified proteoform. Default value: 1000000.")
+        ("shift-number,s", po::value<std::string> (&shift_num), "<int value>. Maximum number of unexpected PTMs. Default value: 2.")
         ("cutoff-type,t", po::value<std::string> (&cutoff_type), "<EVALUE|FDR>. Cutoff value type for reporting protein-spectrum-matches. Default value: EVALUE.")
         ("cutoff-value,v", po::value<std::string> (&cutoff_value), "Cutoff value for reporting protein-spectrum-matches. Default value: 0.01.");
 
@@ -104,6 +107,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("decoy,d", "Use decoy protein database to estimate false discovery rates.")
         ("shift-number,s", po::value<std::string> (&shift_num), "<int value>. Maximum number of unexpected PTMs. Default value: 2.")
         ("error-tolerance,e", po::value<std::string> (&error_tole), "<int value>. Error tolerance in PPM. Default value: 15.")
+        ("max-ptm,m", po::value<std::string> (&max_ptm_mass), "<positive double value>. Maximum absolute value of the PTM masses in the identified proteoform. Default value: 1000000.")
         ("cutoff-type,t", po::value<std::string> (&cutoff_type), "<EVALUE|FDR>. Cutoff value type for reporting protein-spectrum-matches. Default value: EVALUE.")
         ("cutoff-value,v", po::value<std::string> (&cutoff_value), "Cutoff value for reporting protein-spectrum-matches. Default value: 0.01.")
         ("database-file-name", po::value<std::string>(&database_file_name)->required(), "database file name with path")
@@ -162,6 +166,9 @@ bool Argument::parse(int argc, char* argv[]) {
     }
     if (vm.count("error-tolerance")) {
       arguments_["errorTolerance"] = error_tole;
+    }
+    if (vm.count("max-ptm")) {
+      arguments_["maxPtmMass"] = max_ptm_mass;
     }
     if (vm.count("cutoff-type")) {
       arguments_["cutoffType"] = cutoff_type;
@@ -224,6 +231,20 @@ bool Argument::validateArguments() {
     LOG_ERROR("Cutoff type "<< cutoff_type << " error! FDR cutoff can not be used when the search type is TARGET!");
     return false;
   }
+
+  std::string max_ptm_mass = arguments_["maxPtmMass"];
+  try {
+    double mass = atof(max_ptm_mass.c_str());
+    if(mass <= 0.0){
+      LOG_ERROR("Max ptm mass " << max_ptm_mass << " error! The value should be positive");
+      return false;
+    }
+  }
+  catch (int e) {
+    LOG_ERROR("Max ptm mass " << max_ptm_mass << " should be a number");
+    return false;
+  }
+  return true;
 
   std::string cutoff_value = arguments_["cutoffValue"];
   try {

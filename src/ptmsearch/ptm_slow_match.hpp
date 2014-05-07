@@ -68,7 +68,7 @@ class PtmSlowMatch {
   bool found(
       double shift,
       DiagonalHeaderPtrVec headerlist,
-      PtmMngPtr mng);
+      double trunc_error_tolerance);
 };
 
 typedef std::shared_ptr<PtmSlowMatch> PtmSlowMatchPtr;
