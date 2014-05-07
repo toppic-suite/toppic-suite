@@ -10,24 +10,18 @@
 
 namespace prot {
 
-TableWriter::TableWriter(std::string db_file,std::string spec_file,std::string input_file,std::string output_file){
-    spec_file_ = spec_file;
-    input_file_ = input_file;
-    output_file_ = output_file;
-    db_file_=db_file;
+TableWriter::TableWriter(PrsmParaPtr prsm_para_ptr, 
+                         std::string input_file_ext, std::string output_file_ext) {
+  prsm_para_ptr_ = prsm_para_ptr;
+  input_file_ext_ = input_file_ext;
+  output_file_ext_ = output_file_ext;
 }
 
-TableWriter::TableWriter(std::map<std::string,std::string> arguments,
-                         std::string input_file,
-                         std::string output_file){
-    spec_file_ = arguments["spectrumFileName"];
-    db_file_=arguments["databaseFileName"];
-    input_file_ = input_file;
-    output_file_ = output_file;
-}
 
 void TableWriter::write(){
-  std::string output_file_name = basename(spec_file_) + "." + output_file_;
+  std::string spectrum_file_name  = prsm_para_ptr_->getSpectrumFileName(); 
+  std::string base_name = basename(spectrum_file_name);
+  std::string output_file_name = base_name + "." + output_file_ext_;
   std::ofstream file_; 
   file_.open(output_file_name.c_str());
   //write title
@@ -55,13 +49,22 @@ void TableWriter::write(){
       << "One_Protein_probabilty"<< "\t"
       << "FDR" << "\t"
       << std::endl;
-  //write spectrum
-  std::string input_file_name = basename(spec_file_)+"."+input_file_;
-  ProteoformPtrVec proteoforms_ = prot::readFastaToProteoform(db_file_,ResidueFactory::getBaseResiduePtrVec());
-  PrsmPtrVec prsms = readPrsm(input_file_name,proteoforms_);
+
+  ProteoformPtrVec raw_forms 
+      = readFastaToProteoform(prsm_para_ptr_->getSearchDbFileName(), 
+                              prsm_para_ptr_->getFixModResiduePtrVec());
+
+  LOG_DEBUG("protein data set loaded");
+  std::string input_file_name = base_name + "." + input_file_ext_;
+  LOG_DEBUG("input file_name " << input_file_name);
+  PrsmPtrVec prsms = readPrsm(input_file_name, raw_forms);
   sort(prsms.begin(),prsms.end(),prsmSpectrumIdUpMatchFragUp);
+  LOG_DEBUG("read prsm complete ");
+  addSpectrumPtrsToPrsms(prsms, prsm_para_ptr_);
+  LOG_DEBUG("prsms loaded");
+
   for(unsigned int i=0;i<prsms.size();i++){
-    file_ << spec_file_ << "\t"
+    file_ << spectrum_file_name << "\t"
         << prsms[i]->getId() << "\t"
         << prsms[i]->getSpectrumId()<< "\t"
         << prsms[i]->getDeconvMsPtr()->getHeaderPtr()->getActivationPtr()->getName()<< "\t"

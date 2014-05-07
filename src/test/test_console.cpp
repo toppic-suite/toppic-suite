@@ -122,8 +122,7 @@ int process(int argc, char* argv[]) {
     prsm_species.process();
 
     std::cout << "Table output " << std::endl;
-    TableWriter table_out(db_file_name, sp_file_name, "OUTPUT_RESULT",
-                                "OUTPUT_TABLE");
+    TableWriter table_out(prsm_para_ptr, "OUTPUT_RESULT", "OUTPUT_TABLE");
     table_out.write();
 
     std::cout << "Generate view xml files " << std::endl;

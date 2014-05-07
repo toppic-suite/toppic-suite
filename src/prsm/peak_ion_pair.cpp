@@ -116,7 +116,7 @@ double computePairConverage(const PeakIonPairPtrVec &pairs, int begin,
         cov = true;
       }
     }
-    else if (coverage_type = BOTH_TERM_COVERAGE) {
+    else if (coverage_type == BOTH_TERM_COVERAGE) {
       cov = true;
     }
     if (cov) {

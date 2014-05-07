@@ -18,22 +18,20 @@
 #include "base/proteoform.hpp"
 #include "base/fasta_reader.hpp"
 #include "base/species.hpp"
+#include "prsm/prsm_para.hpp"
 #include "prsm/prsm.hpp"
 
 namespace prot {
 
 class TableWriter {
  public:
-  TableWriter(std::string db_file,std::string spec_file,std::string input_file,std::string output_file);
-  TableWriter(std::map<std::string,std::string> arguments,
-                           std::string input_file,
-                           std::string output_file);
+  TableWriter(PrsmParaPtr prsm_para_ptr, 
+              std::string input_file, std::string output_file);
   void write();
  private:
-  std::string spec_file_;
-  std::string db_file_;
-  std::string input_file_;
-  std::string output_file_;
+  PrsmParaPtr prsm_para_ptr_;
+  std::string input_file_ext_;
+  std::string output_file_ext_;
 };
 
 typedef std::shared_ptr<TableWriter> TableWriterPtr;

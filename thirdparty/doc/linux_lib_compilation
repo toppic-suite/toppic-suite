@@ -13,11 +13,11 @@ Boost:
 5.  ./b2 --prefix=<destination path> threading=single
 
 Xalan
-  export XERCESCROOT=<path>/proteomics_cpp/thirdparty/xerces-c-3.1.1/
-  export XALANCROOT=<path>/proteomics_cpp/thirdparty/xalan-c-1.11/c/
-  ./runConfigure 
-  edit src/xalanc/Makefile 
-  edit src/xalanc/Utils/XalanMsgLib/Makefile. 
-  see the Makefile in the directory
-  make 
-  make install
+1. export XERCESCROOT=<path>/proteomics_cpp/thirdparty/xerces-c-3.1.1/
+2. export XALANCROOT=<path>/proteomics_cpp/thirdparty/xalan-c-1.11/c/
+3. ./runConfigure 
+4. edit src/xalanc/Makefile 
+5. edit src/xalanc/Utils/XalanMsgLib/Makefile. 
+6. see the Makefile in the directory
+7. make 
+8. make install

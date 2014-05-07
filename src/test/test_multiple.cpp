@@ -123,12 +123,12 @@ int process(int argc, char* argv[]) {
     PrsmSpecies prsm_species(db_file_name, sp_file_name, "CUTOFF_RESULT", 
                                    "OUTPUT_RESULT", ppo);
     prsm_species.process();
+    */
 
     std::cout << "Table output " << std::endl;
-    TableWriter table_out(db_file_name, sp_file_name, "OUTPUT_RESULT",
-                                "OUTPUT_TABLE");
+    TableWriter table_out(prsm_para_ptr, "OUTPUT_RESULT", "OUTPUT_TABLE");
     table_out.write();
-*/
+
     PrsmCoverage prsm_coverage(prsm_para_ptr, "OUTPUT_RESULT", "COVERAGE");
     prsm_coverage.process();
 
