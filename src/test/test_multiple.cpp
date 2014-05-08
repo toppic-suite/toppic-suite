@@ -49,6 +49,8 @@ int process(int argc, char* argv[]) {
     std::string sp_file_name = arguments["spectrumFileName"];
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
     PrsmParaPtr prsm_para_ptr = PrsmParaPtr(new PrsmPara(arguments));
+
+    /*
     if (arguments["searchType"] == "TARGET+DECOY") {
       generateShuffleDb(ori_db_file_name, db_file_name);
     }
@@ -63,6 +65,7 @@ int process(int argc, char* argv[]) {
         = PtmFastFilterMngPtr(new PtmFastFilterMng(prsm_para_ptr, "FILTER"));
     PtmFastFilterProcessor filter_processor(filter_mng_ptr);
     filter_processor.process();
+    */
 
     int n_top;
     std::istringstream (arguments["numOfTopPrsms"]) >> n_top;

@@ -160,6 +160,7 @@ DPPairPtr PSAlign::getShiftPre(DPPairPtr cur_pair, int p, int s,
           continue;
         }
       }
+      /*
       if (s == 2 && type == SemiAlignTypeFactory::getSuffixPtr()) {
         std::cout << "prev pair " << " align suffix " << prev_pair->getDiagonalHeader()->isAlignSuffix()
             << " prev n term shift " << prev_pair->getDiagonalHeader()->getProtNTermShift()
@@ -167,6 +168,7 @@ DPPairPtr PSAlign::getShiftPre(DPPairPtr cur_pair, int p, int s,
             << " score " << prev_pair->getSrc(s-1) 
             << std::endl;
       }
+      */
 
       if (prev_pair->getSrc(s - 1) > shift_score) {
         shift_prev = prev_pair;
