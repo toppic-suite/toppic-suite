@@ -134,8 +134,11 @@ int process(int argc, char* argv[]) {
     std::cout << "Convert view xml files to html files " << std::endl;
     prot::translate(arguments);
 
+    std::cout << "Identification End!" << std::endl;
+
   } catch (const char* e) {
-    std::cout << "Exception " << e << std::endl;
+    std::cout << "[Exception]" << std::endl;
+    std::cout << e << std::endl;
   }
   return 0;
 }
