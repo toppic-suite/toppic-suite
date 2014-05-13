@@ -47,6 +47,7 @@ void Argument::setArgumentsByConfigFile(const std::string &filename){
       arguments_["errorTolerance"]=getChildValue(root,"error_tolerance",0);
       arguments_["cutoffType"]=getChildValue(root,"cutoff_type",0);
       arguments_["cutoffValue"]=getChildValue(root,"cutoff_value",0);
+      arguments_["maxPtmMass"]=getChildValue(root,"max_ptm_mass",0);
 
       xercesc::DOMElement* prot_mod_list = getChildElement(root,"protein_variable_ptm_list",0);
       int allow_prot_node_number = getChildCount(prot_mod_list,"protein_variable_ptm");

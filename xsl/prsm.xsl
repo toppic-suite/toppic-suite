@@ -153,12 +153,20 @@
                         </td>
                         <td>Spectral FDR:</td>
                         <td>
-                           <xsl:if test="fdr >= 0">
+                           <!-- xsl:if test="fdr >= 0">
                             <xsl:value-of select="fdr"/>
                            </xsl:if>
                            <xsl:if test="0 > fdr">
                             N/A
-                           </xsl:if>
+                           </xsl:if> -->
+                           <xsl:choose>
+                               <xsl:when test="contains(fdr,'-')">
+                               N/A
+                               </xsl:when>
+                               <xsl:otherwise>
+                               <xsl:value-of select="fdr"/>
+                               </xsl:otherwise>
+                           </xsl:choose>
 
                         </td>
                         <td>Proteoform mass:</td>

@@ -10,6 +10,7 @@
 <error_tolerance>50</error_tolerance>
 <cutoff_type>FDR</cutoff_type>
 <cutoff_value>0.01</cutoff_value>
+<max_ptm_mass>1000000</max_ptm_mass>
 
 <protein_variable_ptm_list>
 <protein_variable_ptm>NONE</protein_variable_ptm>
