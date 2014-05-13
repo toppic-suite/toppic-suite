@@ -143,8 +143,11 @@ int process(int argc, char* argv[]) {
     prot::translate(arguments);
     std::cout << "Converting xml files to html files finished." << std::endl;
 
+    std::cout << "Identification End!" << std::endl;
+
   } catch (const char* e) {
-    std::cout << "Exception " << e << std::endl;
+    std::cout << "[Exception]" << std::endl;
+    std::cout << e << std::endl;
   }
   std::cout << "Topid finished." << std::endl;
   return 0;
