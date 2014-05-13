@@ -35,7 +35,7 @@ void EValueProcessor::init() {
 
   std::string input_file_name = basename(prsm_para_ptr->getSpectrumFileName())
       + "." + mng_ptr_->input_file_ext_;
-  std::cout<<input_file_name<<std::endl;
+  //std::cout<<input_file_name<<std::endl;
   prsms_ = readPrsm(input_file_name, raw_forms);
   LOG_DEBUG("prsms loaded");
 }
@@ -57,14 +57,15 @@ void EValueProcessor::process(bool is_separate) {
     processOneSpectrum(ms_ptr, is_separate, writer);
     ms_ptr = reader.getNextMs();
     if (ms_ptr.get() != nullptr) {
-      std::cout << std::flush << "Evalue computation complete " << cnt << " of " 
-          << spectrum_num << " scan number " << ms_ptr->getHeaderPtr()->getScansString() << std::endl;
+      std::cout << std::flush << "E-value computation is processing " << cnt << " of " 
+          << spectrum_num << " spectra.\r";
     }
   }
   reader.close();
 
   //because the prsm_writer ~PrsmWriter changed and the fileclosing is an independant function
   writer.close();
+  std::cout << std::endl << "E-value computation finished." << std::endl;
 }
 
 void EValueProcessor::processOneSpectrum(DeconvMsPtr ms_ptr, bool is_separate,
@@ -85,6 +86,17 @@ void EValueProcessor::processOneSpectrum(DeconvMsPtr ms_ptr, bool is_separate,
       comp_pvalue_ptr_->setPValueArray(spec_set_ptr->getSpSix(), 
                                        sele_prsms);
     }
+    // if matched peak number is too small or E-value is 0, replace it
+    // with a max evalue.
+    for (unsigned i = 0; i < sele_prsms.size(); i++) {
+      if (sele_prsms[i]->getMatchFragNum() < mng_ptr_->comp_evalue_min_match_frag_num_
+          || sele_prsms[i]->getEValue() == 0.0) {
+        LOG_WARN("Invalid e value!");
+        sele_prsms[i]->setProbPtr(getMaxEvaluePtr());
+      }
+    }
+    
+
     LOG_DEBUG("start sort");
     std::sort(sele_prsms.begin(), sele_prsms.end(), prsmEValueUp);
     LOG_DEBUG("start writing");

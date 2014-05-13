@@ -12,6 +12,12 @@ ExtremeValue::ExtremeValue (double one_prot_prob, double test_num,
   init();
 }
 
+ExtremeValuePtr getMaxEvaluePtr() {
+  ExtremeValuePtr evalue_ptr = ExtremeValuePtr(new ExtremeValue(1.0, 1.0, 1.0));
+  return evalue_ptr;
+}
+
+
 ExtremeValue::ExtremeValue (xercesc::DOMElement* element){
   one_prot_prob_ = getDoubleChildValue(element, "one_protein_probability", 0);
   test_num_ = getDoubleChildValue(element, "test_number", 0);

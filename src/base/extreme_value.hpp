@@ -42,6 +42,8 @@ class ExtremeValue {
 typedef std::shared_ptr<ExtremeValue> ExtremeValuePtr;
 typedef std::vector<ExtremeValuePtr> ExtremeValuePtrVec;
 
+ExtremeValuePtr getMaxEvaluePtr();
+
 }
 
 #endif

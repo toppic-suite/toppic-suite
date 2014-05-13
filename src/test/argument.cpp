@@ -181,11 +181,12 @@ bool Argument::parse(int argc, char* argv[]) {
     std::cerr << "Unhandled Exception in parsing command line"<<e.what()<<", application will now exit"<<std::endl;
     return false;
   }
+  std::cout <<"*** Parameters begin ***" << std::endl;
   for(std::map<std::string, std::string>::const_iterator it = arguments_.begin();
-          it != arguments_.end(); ++it)
-  {
+      it != arguments_.end(); ++it) {
         std::cout << it->first << " " << it->second << std::endl;
   }
+  std::cout <<"*** Parameters end ***" << std::endl;
   return validateArguments();
 }
 

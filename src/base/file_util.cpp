@@ -67,7 +67,7 @@ std::string directory(const std::string &s) {
 }
 
 void createFolder(const std::string &folder_name){
-  std::cout<<"create folder "<<folder_name<<std::endl;
+  //std::cout<<"create folder "<<folder_name<<std::endl;
   boost::filesystem::path path(folder_name);
   boost::filesystem::create_directories(path);
 }

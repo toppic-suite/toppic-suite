@@ -84,7 +84,7 @@ void PtmProcessor::process(){
           = findSimplePrsms(simplePrsms_,deconv_sp->getHeaderPtr());
       search(spectrum_set_ptr, selected_prsms);
     }
-    std::cout << std::flush << "Ptm search complete " << cnt << " of " << spectra_num << std::endl;
+    std::cout << std::flush << "Ptm searching is processing " << cnt << " of " << spectra_num << " spectra.\r";
   }
   spReader.close();
   all_writer_->close();
@@ -94,6 +94,7 @@ void PtmProcessor::process(){
       suffix_writers_[s-1]->close();
       internal_writers_[s-1]->close();
   }
+  std::cout << std::endl << "Ptm searching finished." << std::endl;
 }
 
 void PtmProcessor::chooseCompPrePrsms(PrsmPtrVec &all_prsms, PrsmPtrVec &sele_prsms) {

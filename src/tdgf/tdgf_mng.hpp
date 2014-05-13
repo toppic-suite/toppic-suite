@@ -20,7 +20,7 @@ class TdgfMng {
   /** parameters for tdmg */
 
   /** Prsm filter */
-  int comp_evalue_min_peak_num_ = 4;
+  int comp_evalue_min_match_frag_num_ = 4;
 
   /** dp table */
   // number of mass shift
