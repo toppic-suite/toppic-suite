@@ -236,7 +236,7 @@
 </table>            
             <xsl:if test="../db_acid_number > ../last_residue_position">
               <br/>
-              ignore acids first:<xsl:value-of select="floor(../first_residue_position div 30)*30"/>; end:<xsl:value-of select="../db_acid_number - ../last_residue_position"/>
+              display seq start:<xsl:value-of select="floor(../first_residue_position div 30)*30+1"/>; end:<xsl:value-of select="floor(../last_residue_position div 30)*30 + 30"/>
             </xsl:if>
         </div>
     </xsl:template>
@@ -439,14 +439,14 @@
                             <xsl:choose>
                             <xsl:when  test="display_position = '0'">
 <div style="position: relative;">
-                                    <div style="position: absolute; top:-25px; font-size: 8pt; color:red; text-decoration:none;">
+                                    <div style="position: absolute; top:-36px; width:100px; font-size: 8pt; color:red; text-decoration:none;">
                                         <xsl:value-of select="shift_no_letter"/>
                                     </div>
 </div>
                             </xsl:when>
                             <xsl:when  test="display_position = '1'">
 <div style="position: relative;">
-                                    <div style="position: absolute; top:-45px; font-size: 8pt; color:red; text-decoration:none;">
+                                    <div style="position: absolute; top:-56px; width:100px; font-size: 8pt; color:red; text-decoration:none;">
                                         <xsl:value-of select="shift_no_letter"/>
                                     </div>
 </div>
@@ -633,14 +633,14 @@
                         <xsl:choose>
                             <xsl:when  test="display_position = '0'">
 <div style="position: relative;">
-                                    <div style="position: absolute; top:-36px;left:-8px; font-size: 8pt; color:red; text-decoration:none;">
+                                    <div style="position: absolute; top:-36px; width:100px; font-size: 8pt; color:red; text-decoration:none;">
                                         <xsl:value-of select="shift"/>
                                     </div>
 </div>
                             </xsl:when>
                             <xsl:when  test="display_position = '1'">
 <div style="position: relative;">
-                                    <div id="{floor(position div 30)}" shift="{display_position}" style="position: absolute; top:-56px; font-size: 8pt; color:red; text-decoration:none;">
+                                    <div id="{floor(position div 30)}" shift="{display_position}" style="position: absolute; top:-56px; width:100px; font-size: 8pt; color:red; text-decoration:none;">
                                         <xsl:value-of select="shift"/>
                                     </div>
 </div>
@@ -694,7 +694,14 @@
    <xsl:if test="known_type = 1">
     <span style ="color:{color};">
        <xsl:value-of select="type"/>
-       <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+       <xsl:variable name="vptmColor" select="color"/>
+       <xsl:for-each select="../../annotation/character" >
+         <xsl:if test="shift_style = $vptmColor">
+         <xsl:text disable-output-escaping="yes"> [</xsl:text>
+         <xsl:value-of select="acid"/><xsl:value-of select="position"/>
+         <xsl:text disable-output-escaping="yes">]&amp;nbsp;</xsl:text>
+         </xsl:if>
+       </xsl:for-each>
     </span>
    </xsl:if>
 </xsl:for-each>
@@ -706,7 +713,14 @@
    <xsl:if test="known_type = 2">
     <span style ="color:{color};">
        <xsl:value-of select="type"/>
-       <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+       <xsl:variable name="vptmColor" select="color"/>
+       <xsl:for-each select="../../annotation/character" >
+         <xsl:if test="shift_style = $vptmColor">
+         <xsl:text disable-output-escaping="yes"> [</xsl:text>
+         <xsl:value-of select="acid"/><xsl:value-of select="position"/>
+         <xsl:text disable-output-escaping="yes">]&amp;nbsp;</xsl:text>
+         </xsl:if>
+       </xsl:for-each>
     </span>
    </xsl:if>
 </xsl:for-each>

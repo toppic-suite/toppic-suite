@@ -9,7 +9,8 @@
         <xsl:apply-templates select="annotated_protein/annotation/character" mode="basic"/>
         <xsl:if test="annotated_protein/db_acid_number > annotated_protein/last_residue_position">
           <br/>
-          ignore acids first:<xsl:value-of select="floor(annotated_protein/first_residue_position div $alignWidth)*$alignWidth"/>; end:<xsl:value-of select="annotated_protein/db_acid_number - annotated_protein/last_residue_position"/>
+          <!--ignore acids first:<xsl:value-of select="floor(annotated_protein/first_residue_position div $alignWidth)*$alignWidth"/>; end:<xsl:value-of select="annotated_protein/db_acid_number - annotated_protein/last_residue_position"/>-->
+          display seq start:<xsl:value-of select="floor(annotated_protein/first_residue_position div $alignWidth)*$alignWidth+1"/>; end:<xsl:value-of select="floor(annotated_protein/last_residue_position div $alignWidth)*$alignWidth + $alignWidth"/>
         </xsl:if>
         </p>
     </xsl:template>
@@ -28,13 +29,16 @@
                 </xsl:otherwise>
             </xsl:choose>
             </p>
-
+            <table border="0"  cellspacing="0px" cellpadding="0px">
+            <xsl:text disable-output-escaping="yes"><![CDATA[<tr><td height='16px' colspan='44'></td></tr><tr><td height='16px' colspan='44'></td></tr><tr>]]></xsl:text><!--  -->
             <xsl:apply-templates select="." mode="basic"/>
+            <xsl:text disable-output-escaping="yes"><![CDATA[</tr>]]></xsl:text></table>
 
         </xsl:if>
     </xsl:template>
 
     <xsl:template match="character" mode="basic">
+        
         <xsl:if test="type = 'cleavage'">
                    <xsl:if test="cleavage_type = 'unexpected_shift' and shift_no_letter != 0">
                         <xsl:choose>
@@ -56,24 +60,31 @@
                     </xsl:if>
         </xsl:if>
         <xsl:if test="type = 'residue' and position >= floor(../../first_residue_position div $alignWidth)*$alignWidth and (floor(../../last_residue_position div $alignWidth)*$alignWidth+$alignWidth)>position">
-            <xsl:if test="position  mod $alignWidth = 0 and position != 0">
-                <br/>
+            <xsl:if test="position  mod $alignWidth = 0 and position != 0"><!--  -->
+                <xsl:text disable-output-escaping="yes"><![CDATA[</tr><tr><td height='16px' colspan='44'></td></tr><tr><td height='16px' colspan='44'></td></tr><tr>]]></xsl:text>
+                
             </xsl:if>
-            <xsl:if test="position  mod 10 = 0 and position != 0">
+            <xsl:if test="position  mod 10 = 0 "><!-- and position != 0 -->
                 <xsl:if test="residue_type = 'unexpected_shift' and display_background = '0'">
+                <td width='8px' height='16px' bgcolor="#F6CECE">
                     <span style ="color:gray; background:#F6CECE">
                     <xsl:text> </xsl:text>
                     </span>
+                    </td>
                 </xsl:if>
                 <xsl:if test="residue_type = 'unexpected_shift' and display_background = '1'">
+                <td width='8px' height='16px' bgcolor="#CECEF6">
                     <span style ="color:gray; background:#CECEF6">
                     <xsl:text> </xsl:text>
                     </span>
+                    </td>
                 </xsl:if>
                 <xsl:if test="residue_type != 'unexpected_shift'">
+                <td width='8px' height='16px' style=''>
                     <span style ="color:gray;">
                     <xsl:text> </xsl:text>
                     </span>
+                    </td>
                 </xsl:if>
 <!--
                 <xsl:if test="../character[postion()-1]/residue_type = 'unexpected_shift'">
@@ -90,75 +101,153 @@
             </xsl:if>
             <xsl:choose>
                 <xsl:when test="residue_type = 'n_trunc'">
+                <td width='8px' height='16px' style=''>
                     <span style ="color:gray">
                         <xsl:value-of select="acid"/>
                     </span>
+                </td>
                 </xsl:when>
                 <xsl:when test="residue_type = 'c_trunc'">
+                <td width='8px' height='16px' style=''>
                     <span style ="color:gray">
                         <xsl:value-of select="acid"/>
                     </span>
+                </td>
                 </xsl:when>
                 <xsl:when test="residue_type = 'unexpected_shift'">
-                    <xsl:if test="is_modification = '1'">
+                    <!--<xsl:if test="is_modification = '1'">
                         <xsl:choose>
                             <xsl:when  test="display_position = '0' and display_background = '0'">
-                                <span  style="position: relative;">
-                                    <span style="position: absolute; top:-24pt; font-size: 8pt; color:red; text-decoration:none;">
+                                <div style="position: relative;">
+                                    <div style="position: absolute; top:-36px;left:-8px; width:45px; font-size: 8pt; color:red; text-decoration:none;">
                                         <xsl:value-of select="shift"/>
-                                    </span>
-                                </span>
+                                    </div>
+                                </div>
                             </xsl:when>
                             <xsl:when  test="display_position = '0' and display_background = '1'">
-                                <span  style="position: relative;">
-                                    <span style="position: absolute; top:-24pt; font-size: 8pt; color:blue; text-decoration:none;">
+                                <div style="position: relative;">
+                                    <div style="position: absolute; top:-36px;left:-8px; width:45px; font-size: 8pt; color:blue; text-decoration:none;">
                                         <xsl:value-of select="shift"/>
-                                    </span>
-                                </span>
+                                    </div>
+                                </div>
                             </xsl:when>
                             <xsl:when  test="display_position = '1' and display_background = '0'">
-                                <span  style="position: relative;">
-                                    <span style="position: absolute; top:-32pt; font-size: 8pt; color:red; text-decoration:none;">
+                                <div style="position: relative;">
+                                    <div id="{floor(position div 30)}" shift="{display_position}" style="position: absolute; top:-56px; width:45px; font-size: 8pt; color:blue; text-decoration:none;">
                                         <xsl:value-of select="shift"/>
-                                    </span>
-                                </span>
+                                    </div>
+                                </div>
                             </xsl:when>
                             <xsl:when  test="display_position = '1' and display_background = '1'">
-                                <span  style="position: relative;">
-                                    <span style="position: absolute; top:-32pt; font-size: 8pt; color:blue; text-decoration:none;">
+                                <div style="position: relative;">
+                                    <div id="{floor(position div 30)}" shift="{display_position}" style="position: absolute; top:-56px; width:45px; font-size: 8pt; color:red; text-decoration:none;">
                                         <xsl:value-of select="shift"/>
-                                    </span>
-                                </span>
+                                    </div>
+                                </div>
                             </xsl:when>
                         </xsl:choose>
-                    </xsl:if>
+                    </xsl:if>-->
                     <xsl:choose>
                         <xsl:when  test="display_background = '0' and is_expected = '0'">
+                        <td width='8px' height='16px' bgcolor="#F6CECE">
                         <span style ="color:black; background:#F6CECE">
                             <xsl:value-of select="acid"/>
                         </span>
+                        <xsl:choose>
+                            <xsl:when  test="is_modification = '1' and display_position = '0' and display_background = '0'">
+                                <div style="position: relative;">
+                                    <div style="position: absolute; top:-36px; width:100px; font-size: 8pt; color:red; text-decoration:none;">
+                                        <xsl:value-of select="shift"/>
+                                    </div>
+                                </div>
+                            </xsl:when>
+                            <xsl:when  test="is_modification = '1' and display_position = '1' and display_background = '0'">
+                                <div style="position: relative;">
+                                    <div id="{floor(position div 30)}" shift="{display_position}" style="position: absolute; top:-56px; width:100px; font-size: 8pt; color:red; text-decoration:none;">
+                                        <xsl:value-of select="shift"/>
+                                    </div>
+                                </div>
+                            </xsl:when>
+                        </xsl:choose>
+                        </td>
                         </xsl:when>
                         <xsl:when  test="display_background = '1' and is_expected = '0'">
+                        <td width='8px' height='16px' bgcolor="#CECEF6">
                         <span style ="color:black; background:#CECEF6">
                             <xsl:value-of select="acid"/>
                         </span>
+                        <xsl:choose>
+                            <xsl:when  test="is_modification = '1' and display_position = '0' and display_background = '1'">
+                                <div style="position: relative;">
+                                    <div style="position: absolute; top:-36px; width:100px; font-size: 8pt; color:blue; text-decoration:none;">
+                                        <xsl:value-of select="shift"/>
+                                    </div>
+                                </div>
+                            </xsl:when>
+                            <xsl:when  test="is_modification = '1' and display_position = '1' and display_background = '1'">
+                                <div style="position: relative;">
+                                    <div id="{floor(position div 30)}" shift="{display_position}" style="position: absolute; top:-56px; width:100px; font-size: 8pt; color:blue; text-decoration:none;">
+                                        <xsl:value-of select="shift"/>
+                                    </div>
+                                </div>
+                            </xsl:when>
+                        </xsl:choose>
+                        </td>
                         </xsl:when>
                         <xsl:when  test="display_background = '0' and is_expected = '1'">
+                        <td width='8px' height='16px' bgcolor="#F6CECE">
                         <span style ="color:{shift_style}; background:#F6CECE">
                             <xsl:value-of select="acid"/>
                         </span>
+                        <xsl:choose>
+                            <xsl:when  test="is_modification = '1' and display_position = '0' and display_background = '0'">
+                                <div style="position: relative;">
+                                    <div style="position: absolute; top:-36px; width:100px; font-size: 8pt; color:red; text-decoration:none;">
+                                        <xsl:value-of select="shift"/>
+                                    </div>
+                                </div>
+                            </xsl:when>
+                            <xsl:when  test="is_modification = '1' and display_position = '1' and display_background = '0'">
+                                <div style="position: relative;">
+                                    <div id="{floor(position div 30)}" shift="{display_position}" style="position: absolute; top:-56px; width:100px; font-size: 8pt; color:red; text-decoration:none;">
+                                        <xsl:value-of select="shift"/>
+                                    </div>
+                                </div>
+                            </xsl:when>
+                        </xsl:choose>
+                        </td>
                         </xsl:when>
                         <xsl:when  test="display_background = '1' and is_expected = '1'">
+                        <td width='8px' height='16px' bgcolor="#CECEF6">
                         <span style ="color:{shift_style}; background:#CECEF6">
                             <xsl:value-of select="acid"/>
                         </span>
+                        <xsl:choose>
+                            <xsl:when  test="is_modification = '1' and display_position = '0' and display_background = '1'">
+                                <div style="position: relative;">
+                                    <div style="position: absolute; top:-36px; width:100px; font-size: 8pt; color:blue; text-decoration:none;">
+                                        <xsl:value-of select="shift"/>
+                                    </div>
+                                </div>
+                            </xsl:when>
+                            <xsl:when  test="is_modification = '1' and display_position = '1' and display_background = '1'">
+                                <div style="position: relative;">
+                                    <div id="{floor(position div 30)}" shift="{display_position}" style="position: absolute; top:-56px; width:100px; font-size: 8pt; color:blue; text-decoration:none;">
+                                        <xsl:value-of select="shift"/>
+                                    </div>
+                                </div>
+                            </xsl:when>
+                        </xsl:choose>
+                        </td>
                         </xsl:when>
                     </xsl:choose>
                 </xsl:when>
                 <xsl:when test="is_expected = '1'">
+                    <td width='8px' height='16px' bgcolor="#DFFFFF">
                     <span style ="color:{shift_style}; background:#DFFFFF">
                         <xsl:value-of select="acid"/>
                     </span>
+                    </td>
 <!--
                     <xsl:if test="is_modification = '2'">
                         <xsl:choose>
@@ -184,14 +273,15 @@
 -->
                 </xsl:when>
                 <xsl:when test="residue_type = 'normal'">
+                    <td width='8px' height='16px' bgcolor="#DFFFFF">
                     <span style ="color:black; background:#DFFFFF">
                         <xsl:value-of select="acid"/>
                     </span>
+                    </td>
                 </xsl:when>
 
             </xsl:choose>
         </xsl:if>
-
     </xsl:template>
 
 

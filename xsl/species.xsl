@@ -20,7 +20,7 @@
                     for this protein species </h3>
 
                 <xsl:apply-templates select="prsm[position()=1]/tag/value"/>
-                <xsl:apply-templates select="prsm[position()=1]" mode="basic"/>
+                <xsl:apply-templates select="prsm[position()=1]" mode="species"/>
                 <table border="1">
                     <tr>
                         <th>E-value</th>
