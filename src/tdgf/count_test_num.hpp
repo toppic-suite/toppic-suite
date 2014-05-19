@@ -10,7 +10,8 @@ namespace prot {
 class CountTestNum {
  public:
   CountTestNum(ProteoformPtrVec &raw_forms, ProteoformPtrVec &prot_mod_forms,
-               ResFreqPtrVec &residues, TdgfMngPtr mng_ptr);
+               ResFreqPtrVec &residues, double convert_ratio, double max_prec_mass,
+               double max_ptm_mass);
 
   ~CountTestNum();
 
@@ -21,7 +22,6 @@ class CountTestNum {
   static double PREFIX_SUFFIX_ADJUST() {return 0.693;}
   static double INTERNAL_ADJUST() {return 0.508;}
 
-  TdgfMngPtr mng_ptr_;
 
   ProteoformPtrVec raw_forms_;
   ProteoformPtrVec prot_mod_forms_;
@@ -34,6 +34,7 @@ class CountTestNum {
   double convert_ratio_;
   int max_sp_len_;
   int residue_avg_len_;
+  double max_ptm_mass_;
   double norm_factor_;
 
   int convertMass(double m);

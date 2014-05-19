@@ -33,4 +33,6 @@ PTM_OBJS = $(addprefix $(OBJ_DIR)/, ptm_processor.o ptm_slow_filter.o ptm_slow_m
 
 TDGF_OBJS = $(addprefix $(OBJ_DIR)/, evalue_processor.o comp_prob_value.o count_test_num.o comp_pvalue_array.o) 
 
+POSSION_OBJS = $(addprefix $(OBJ_DIR)/, possion_processor.o possion_comp_pvalue.o) 
+
 XPP_OBJS = $(addprefix $(OBJ_DIR)/, anno_view.o xml_generator.o transformer.o) 

@@ -9,12 +9,14 @@ namespace prot {
 CountTestNum::CountTestNum(ProteoformPtrVec &raw_forms, 
                            ProteoformPtrVec &prot_mod_forms,
                            ResFreqPtrVec &residues,
-                           TdgfMngPtr mng_ptr) {
-  mng_ptr_ = mng_ptr;
+                           double convert_ratio,
+                           double max_prec_mass,
+                           double max_ptm_mass) {
   raw_forms_ = raw_forms;
   prot_mod_forms_ = prot_mod_forms;
-  convert_ratio_ = mng_ptr_->double_to_int_constant_;
-  max_sp_len_ = (int)std::round(mng_ptr_->max_sp_prec_mass_ * convert_ratio_);
+  convert_ratio_ = convert_ratio;
+  max_ptm_mass_ = max_ptm_mass;
+  max_sp_len_ = (int)std::round(max_prec_mass * convert_ratio_);
   residue_avg_len_ = computeAvgLength(residues, convert_ratio_);
   LOG_DEBUG("get residue average length");
   initCompMassCnt(prot_mod_forms);
@@ -108,7 +110,7 @@ double CountTestNum::compCandNum(SemiAlignTypePtr type, int shift_num, double or
   }
   // with shifts 
   else if (shift_num >= 1){
-    if (mng_ptr_->max_shift_value_ >=10000) {
+    if (max_ptm_mass_ >=10000) {
       // max shift mass is larger than 10k, we treat it as no limitation 
       cand_num = compPtmCandNum(type, shift_num, ori_mass);
     }
@@ -163,7 +165,7 @@ double CountTestNum::compPtmCandNum (SemiAlignTypePtr type,
 
 double CountTestNum::compPtmRestrictCandNum (SemiAlignTypePtr type, 
                                              int shift_num, double ori_mass) {
-  double shift = mng_ptr_->max_shift_value_ * shift_num;
+  double shift = max_ptm_mass_ * shift_num;
   int low = std::floor((ori_mass - shift) * convert_ratio_);
   int high = std::ceil((ori_mass + shift) * convert_ratio_);
   double cand_num = compSeqNum(type, low, high);

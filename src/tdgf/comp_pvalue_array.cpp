@@ -12,14 +12,16 @@ CompPValueArray::CompPValueArray(ProteoformPtrVec &raw_forms,
   prot_n_term_residues_ = compNTermResidueFreq(prot_mod_forms);
   LOG_DEBUG("n term residues initialized")
   comp_prob_ptr_ = CompProbValuePtr(
-      new CompProbValue(mng_ptr_->double_to_int_constant_,
+      new CompProbValue(mng_ptr_->convert_ratio_,
                         residues, mng_ptr_->unexpected_shift_num_ + 1, 
                         mng_ptr_->max_table_height_, 
-                        mng_ptr_->max_sp_prec_mass_));
+                        mng_ptr_->max_prec_mass_));
   LOG_DEBUG("comp prob value initialized")
                         
   test_num_ptr_ = CountTestNumPtr(new CountTestNum(raw_forms, prot_mod_forms,
-                                                   residues, mng_ptr));
+                                                   residues, mng_ptr->convert_ratio_,
+                                                   mng_ptr->max_prec_mass_,
+                                                   mng_ptr->max_ptm_mass_));
   LOG_DEBUG("test number initialized")
 }
 
