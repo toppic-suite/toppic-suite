@@ -8,6 +8,8 @@
 #include "prsm/prsm_writer.hpp"
 #include "tdgf/evalue_processor.hpp"
 
+#include <sys/time.h>
+
 namespace prot {
 
 EValueProcessor::EValueProcessor(TdgfMngPtr mng_ptr) {
@@ -51,6 +53,12 @@ void EValueProcessor::process(bool is_separate) {
        + "." + mng_ptr_->output_file_ext_;
   PrsmWriter writer(output_file_name);
   int cnt = 0;
+
+  struct timeval start_time; 
+  struct timeval end_time; 
+           
+  gettimeofday(&start_time, NULL);
+
   DeconvMsPtr ms_ptr = reader.getNextMs();
   while (ms_ptr.get() != nullptr) {
     cnt++;
@@ -60,6 +68,10 @@ void EValueProcessor::process(bool is_separate) {
       std::cout << std::flush << "E-value computation is processing " << cnt << " of " 
           << spectrum_num << " spectra.\r";
     }
+    
+    gettimeofday(&end_time, NULL); 
+    float duration = end_time.tv_sec - start_time.tv_sec;
+    std::cout << std::endl << "Duration: " << duration << " seconds." << std::endl;
   }
   reader.close();
 

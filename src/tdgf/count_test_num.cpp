@@ -108,19 +108,25 @@ double CountTestNum::compCandNum(SemiAlignTypePtr type, int shift_num, double or
   }
   // with shifts 
   else if (shift_num >= 1){
-    cand_num = compPtmCandNum(type, shift_num, ori_mass);
+    if (mng_ptr_->max_shift_value_ >=10000) {
+      // max shift mass is larger than 10k, we treat it as no limitation 
+      cand_num = compPtmCandNum(type, shift_num, ori_mass);
+    }
+    else {
+      cand_num = compPtmRestrictCandNum(type, shift_num, ori_mass);
+    }
+    // multiple adjustment 
+    if (type == SemiAlignTypeFactory::getPrefixPtr() 
+        || type == SemiAlignTypeFactory::getSuffixPtr()) {
+      cand_num = cand_num * PREFIX_SUFFIX_ADJUST();
+    }
+    else if (type == SemiAlignTypeFactory::getInternalPtr()) {
+      cand_num = cand_num * INTERNAL_ADJUST();
+    }
   }
 
   if (cand_num == 0.0) {
     LOG_WARN("candidate number is ZERO");
-  }
-  // multiple adjustment 
-  if (type == SemiAlignTypeFactory::getPrefixPtr() 
-      || type == SemiAlignTypeFactory::getSuffixPtr()) {
-    cand_num = cand_num * PREFIX_SUFFIX_ADJUST();
-  }
-  else if (type == SemiAlignTypeFactory::getInternalPtr()) {
-    cand_num = cand_num * INTERNAL_ADJUST();
   }
   return cand_num;
 }
@@ -133,16 +139,14 @@ double CountTestNum::compNonPtmCandNum(SemiAlignTypePtr type, int shift_num,
   return cand_num;
 }
 
-double CountTestNum::compPtmCandNum (SemiAlignTypePtr type, int shift_num, double ori_mass) {
+double CountTestNum::compPtmCandNum (SemiAlignTypePtr type, 
+                                     int shift_num, double ori_mass) {
   double cand_num = 0;
-  // we use raw forms, not prot mod forms, for complete and prefix alignments
-  // because the prot mod forms generated from one raw form are almost the same
-  // to each other
   if (type == SemiAlignTypeFactory::getCompletePtr()) {
-    cand_num = raw_forms_.size();
+    cand_num = prot_mod_forms_.size();
   } else if (type == SemiAlignTypeFactory::getPrefixPtr()) {
     for (unsigned int i = 0; i < raw_forms_.size(); i++) {
-      cand_num += raw_forms_[i]->getResSeqPtr()->getLen();
+      cand_num += prot_mod_forms_[i]->getResSeqPtr()->getLen();
     }
   } else if (type == SemiAlignTypeFactory::getSuffixPtr()) {
     for (unsigned int i = 0; i < raw_forms_.size(); i++) {
@@ -154,6 +158,15 @@ double CountTestNum::compPtmCandNum (SemiAlignTypePtr type, int shift_num, doubl
           * raw_forms_[i]->getResSeqPtr()->getLen();
     }
   }
+  return cand_num;
+}
+
+double CountTestNum::compPtmRestrictCandNum (SemiAlignTypePtr type, 
+                                             int shift_num, double ori_mass) {
+  double shift = mng_ptr_->max_shift_value_ * shift_num;
+  int low = std::floor((ori_mass - shift) * convert_ratio_);
+  int high = std::ceil((ori_mass + shift) * convert_ratio_);
+  double cand_num = compSeqNum(type, low, high);
   return cand_num;
 }
 
