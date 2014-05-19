@@ -17,10 +17,11 @@ class EValueProcessor {
   void processOneSpectrum(DeconvMsPtr ms_ptr, bool is_separate,
                           PrsmWriter &writer);
  private:
-    TdgfMngPtr mng_ptr_;
-    CompPValueArrayPtr comp_pvalue_ptr_;
-    ProteoformPtrVec proteoforms_;
-    PrsmPtrVec prsms_;
+  TdgfMngPtr mng_ptr_;
+  CompPValueArrayPtr comp_pvalue_ptr_;
+  ProteoformPtrVec proteoforms_;
+  PrsmPtrVec prsms_;
+  bool checkPrsms(PrsmPtrVec &prsms);
 };
 
 }

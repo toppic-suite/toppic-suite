@@ -21,6 +21,9 @@
 #include "ptmsearch/ptm_mng.hpp"
 #include "ptmsearch/ptm_processor.hpp"
 
+#include "poisson/poisson_processor.hpp"
+#include "poisson/poisson_mng.hpp"
+
 #include "tdgf/evalue_processor.hpp"
 #include "tdgf/tdgf_mng.hpp"
 
@@ -85,9 +88,16 @@ int process(int argc, char* argv[]) {
     combine_processor.process();
     std::cout << "Combining prsms finished." << std::endl;
 
+    std::cout << "Poisson computation starts" << std::endl;
+    PoissonMngPtr poisson_mng_ptr = PoissonMngPtr(new PoissonMng (prsm_para_ptr, shift_num, max_ptm_mass, 
+                                                      "RAW_RESULT", "POISSON_EVALUE"));
+    prot::PoissonProcessor poisson(poisson_mng_ptr);
+    poisson.init();
+    poisson.process();
+
     std::cout << "E-value computation starts" << std::endl;
     TdgfMngPtr tdgf_mng_ptr = TdgfMngPtr(new TdgfMng (prsm_para_ptr, shift_num, max_ptm_mass,
-                                                      "RAW_RESULT", "EVALUE"));
+                                                      "POISSON_EVALUE", "EVALUE"));
     prot::EValueProcessor processor(tdgf_mng_ptr);
     processor.init();
     // compute E-value for a set of prsms each run 
