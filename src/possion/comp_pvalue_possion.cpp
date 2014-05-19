@@ -1,39 +1,24 @@
 #include "base/logger.hpp"
-#include "tdgf/comp_pvalue_array.hpp"
+#include "tdgf/comp_pvalue_poission.hpp"
 
 namespace prot {
 
-CompPValueArray::CompPValueArray(ProteoformPtrVec &raw_forms, 
-                                 ProteoformPtrVec &prot_mod_forms,
-                                 ResFreqPtrVec &residues,
-                                 TdgfMngPtr mng_ptr) {
+CompPValuePoission::CompPValuePoission(ProteoformPtrVec &raw_forms, 
+                                       ProteoformPtrVec &prot_mod_forms,
+                                       TdgfMngPtr mng_ptr) {
   mng_ptr_ = mng_ptr;
-  pep_n_term_residues_ = residues;
-  prot_n_term_residues_ = compNTermResidueFreq(prot_mod_forms);
-  LOG_DEBUG("n term residues initialized")
-  comp_prob_ptr_ = CompProbValuePtr(
-      new CompProbValue(mng_ptr_->double_to_int_constant_,
-                        residues, mng_ptr_->unexpected_shift_num_ + 1, 
-                        mng_ptr_->max_table_height_, 
-                        mng_ptr_->max_sp_prec_mass_));
-  LOG_DEBUG("comp prob value initialized")
-                        
   test_num_ptr_ = CountTestNumPtr(new CountTestNum(raw_forms, prot_mod_forms,
                                                    residues, mng_ptr));
   LOG_DEBUG("test number initialized")
 }
 
 /* set alignment */
-ExtremeValuePtrVec CompPValueArray::compExtremeValues(PrmMsPtr ms_six, 
-                                                      PrsmPtrVec &prsms, 
-                                                      bool strict) {
+ExtremeValuePtrVec CompPValuePossion::compExtremeValues(PrmMsPtr ms_six, 
+                                                        PrsmPtrVec &prsms) {
   PrmPeakPtrVec prm_peaks = ms_six->getPeakPtrVec();
   std::vector<double> prot_probs; 
   compProbArray(comp_prob_ptr_, prot_n_term_residues_, 
                 prm_peaks, prsms, strict, prot_probs);
-  std::vector<double> pep_probs;
-  compProbArray(comp_prob_ptr_, pep_n_term_residues_, 
-                prm_peaks, prsms, strict, pep_probs);
   //LOG_DEBUG("probability computation complete");
   double prec_mass = ms_six->getHeaderPtr()->getPrecMonoMassMinusWater();
   double tolerance = ms_six->getHeaderPtr()->getErrorTolerance();

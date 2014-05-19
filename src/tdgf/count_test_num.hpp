@@ -14,7 +14,8 @@ class CountTestNum {
 
   ~CountTestNum();
 
-  double compCandNum(SemiAlignTypePtr type, int shift_num, double ori_mass, double ori_tolerance);
+  double compCandNum(SemiAlignTypePtr type, int shift_num, 
+                     double ori_mass, double ori_tolerance);
 
  private:
   static double PREFIX_SUFFIX_ADJUST() {return 0.693;}
@@ -43,6 +44,7 @@ class CountTestNum {
   double compNonPtmCandNum(SemiAlignTypePtr type, int shift_num, 
                            double ori_mass, double ori_tolerance);
   double compPtmCandNum (SemiAlignTypePtr type, int shift_num, double ori_mass);
+  double compPtmRestrictCandNum (SemiAlignTypePtr type, int shift_num, double ori_mass);
   double compSeqNum(SemiAlignTypePtr type, int low, int high);
   double compMassNum(double *cnts, int low, int high);
 };

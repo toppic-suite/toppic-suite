@@ -86,7 +86,7 @@ int process(int argc, char* argv[]) {
     std::cout << "Combining prsms finished." << std::endl;
 
     std::cout << "E-value computation starts" << std::endl;
-    TdgfMngPtr tdgf_mng_ptr = TdgfMngPtr(new TdgfMng (prsm_para_ptr, shift_num,
+    TdgfMngPtr tdgf_mng_ptr = TdgfMngPtr(new TdgfMng (prsm_para_ptr, shift_num, max_ptm_mass,
                                                       "RAW_RESULT", "EVALUE"));
     prot::EValueProcessor processor(tdgf_mng_ptr);
     processor.init();

@@ -52,9 +52,11 @@ int process(int argc, char* argv[]) {
     std::istringstream (arguments["numOfTopPrsms"]) >> n_top;
     int shift_num;
     std::istringstream (arguments["shiftNumber"]) >> shift_num;
+    double max_ptm_mass;
+    std::istringstream (arguments["maxPtmMass"]) >> max_ptm_mass;
 
     std::cout << "E-value computation " << std::endl;
-    TdgfMngPtr tdgf_mng_ptr = TdgfMngPtr(new TdgfMng (prsm_para_ptr, shift_num,
+    TdgfMngPtr tdgf_mng_ptr = TdgfMngPtr(new TdgfMng (prsm_para_ptr, shift_num, max_ptm_mass, 
                                                       "RAW_RESULT", "EVALUE"));
     prot::EValueProcessor processor(tdgf_mng_ptr);
     processor.init();

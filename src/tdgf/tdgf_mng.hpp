@@ -7,9 +7,10 @@ namespace prot {
 
 class TdgfMng {
  public:
-  TdgfMng(PrsmParaPtr prsm_para_ptr, int shift_num, 
+  TdgfMng(PrsmParaPtr prsm_para_ptr, int shift_num, double max_shift_value, 
           std::string input_file_ext, std::string output_file_ext) {
     prsm_para_ptr_ = prsm_para_ptr,
+    max_shift_value_ = max_shift_value;
     unexpected_shift_num_ = shift_num;
     input_file_ext_ = input_file_ext;
     output_file_ext_ = output_file_ext;
@@ -18,6 +19,7 @@ class TdgfMng {
   PrsmParaPtr prsm_para_ptr_;
 
   /** parameters for tdmg */
+  double max_shift_value_ = 1000000;
 
   /** Prsm filter */
   int comp_evalue_min_match_frag_num_ = 4;
