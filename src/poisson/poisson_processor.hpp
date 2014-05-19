@@ -4,22 +4,22 @@
 #include "base/proteoform.hpp"
 #include "prsm/prsm.hpp"
 #include "prsm/prsm_writer.hpp"
-#include "possion/possion_mng.hpp"
-#include "possion/possion_comp_pvalue.hpp"
+#include "poisson/poisson_mng.hpp"
+#include "poisson/poisson_comp_pvalue.hpp"
 
 namespace prot {
 
-class PossionProcessor {
+class PoissonProcessor {
  public:
-  PossionProcessor(PossionMngPtr mng_ptr);
+  PoissonProcessor(PoissonMngPtr mng_ptr);
   void init();
   void process();
   void processOneSpectrum(DeconvMsPtr ms_ptr, PrsmWriter &writer);
  private:
-    PossionMngPtr mng_ptr_;
+    PoissonMngPtr mng_ptr_;
     ProteoformPtrVec proteoforms_;
     PrsmPtrVec prsms_;
-    PossionCompPValuePtr comp_ptr_;
+    PoissonCompPValuePtr comp_ptr_;
 };
 
 }

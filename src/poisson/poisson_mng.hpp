@@ -5,9 +5,9 @@
 
 namespace prot {
 
-class PossionMng {
+class PoissonMng {
  public:
-  PossionMng(PrsmParaPtr prsm_para_ptr, int shift_num, double max_ptm_mass,
+  PoissonMng(PrsmParaPtr prsm_para_ptr, int shift_num, double max_ptm_mass,
              std::string input_file_ext, std::string output_file_ext) {
     prsm_para_ptr_ = prsm_para_ptr,
     max_ptm_mass_ = max_ptm_mass;
@@ -34,7 +34,7 @@ class PossionMng {
   std::string output_file_ext_;
 };
 
-typedef std::shared_ptr<PossionMng> PossionMngPtr;
+typedef std::shared_ptr<PoissonMng> PoissonMngPtr;
 
 }
 #endif

@@ -6,17 +6,17 @@
 #include "spec/spectrum_set.hpp"
 #include "prsm/prsm.hpp"
 #include "prsm/prsm_writer.hpp"
-#include "possion/possion_processor.hpp"
+#include "poisson/poisson_processor.hpp"
 
 #include <sys/time.h>
 
 namespace prot {
 
-PossionProcessor::PossionProcessor(PossionMngPtr mng_ptr) {
+PoissonProcessor::PoissonProcessor(PoissonMngPtr mng_ptr) {
   mng_ptr_ = mng_ptr;
 }
 
-void PossionProcessor::init() {
+void PoissonProcessor::init() {
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   ProteoformPtrVec raw_forms 
       = readFastaToProteoform(prsm_para_ptr->getSearchDbFileName(), 
@@ -31,8 +31,8 @@ void PossionProcessor::init() {
       = compResidueFreq(prsm_para_ptr->getFixModResiduePtrVec(), raw_forms); 
   LOG_DEBUG("residue frequency initialized");
 
-  comp_ptr_ = PossionCompPValuePtr(
-      new PossionCompPValue(raw_forms, prot_mod_forms, mng_ptr_));
+  comp_ptr_ = PoissonCompPValuePtr(
+      new PoissonCompPValue(raw_forms, prot_mod_forms, mng_ptr_));
   LOG_DEBUG("comp pvalue array initialized");
  
 
@@ -45,7 +45,7 @@ void PossionProcessor::init() {
 
 /* compute E-value. */
 
-void PossionProcessor::process() {
+void PoissonProcessor::process() {
   std::string spectrum_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
   int spectrum_num = countSpNum(spectrum_file_name);
   MsAlignReader reader (spectrum_file_name);
@@ -65,22 +65,22 @@ void PossionProcessor::process() {
     processOneSpectrum(ms_ptr, writer);
     ms_ptr = reader.getNextMs();
     if (ms_ptr.get() != nullptr) {
-      std::cout << std::flush << "E-value computation is processing " << cnt << " of " 
+      std::cout << std::flush << "Poisson computation is processing " << cnt << " of " 
           << spectrum_num << " spectra.\r";
     }
     
     gettimeofday(&end_time, NULL); 
     float duration = end_time.tv_sec - start_time.tv_sec;
-    std::cout << std::endl << "Duration: " << duration << " seconds." << std::endl;
+    LOG_DEBUG("Duration: " << duration << " seconds.");
   }
   reader.close();
 
   //because the prsm_writer ~PrsmWriter changed and the fileclosing is an independant function
   writer.close();
-  std::cout << std::endl << "E-value computation finished." << std::endl;
+  std::cout << std::endl << "Poisson computation finished." << std::endl;
 }
 
-void PossionProcessor::processOneSpectrum(DeconvMsPtr ms_ptr, PrsmWriter &writer) {
+void PoissonProcessor::processOneSpectrum(DeconvMsPtr ms_ptr, PrsmWriter &writer) {
   SpectrumSetPtr spec_set_ptr 
       = getSpectrumSet(ms_ptr, 0, mng_ptr_->prsm_para_ptr_->getSpParaPtr());
   if (spec_set_ptr.get() != nullptr) {

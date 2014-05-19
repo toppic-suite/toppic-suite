@@ -1,12 +1,12 @@
 #include "base/logger.hpp"
 #include "tdgf/comp_prob_value.hpp"
-#include "possion/possion_comp_pvalue.hpp"
+#include "poisson/poisson_comp_pvalue.hpp"
 
 namespace prot {
 
-PossionCompPValue::PossionCompPValue(ProteoformPtrVec &raw_forms, 
+PoissonCompPValue::PoissonCompPValue(ProteoformPtrVec &raw_forms, 
                                      ProteoformPtrVec &prot_mod_forms,
-                                     PossionMngPtr mng_ptr) {
+                                     PoissonMngPtr mng_ptr) {
   mng_ptr_ = mng_ptr;
   ResFreqPtrVec residue_freqs 
       = compResidueFreq(mng_ptr_->prsm_para_ptr_->getFixModResiduePtrVec(), raw_forms); 
@@ -20,7 +20,7 @@ PossionCompPValue::PossionCompPValue(ProteoformPtrVec &raw_forms,
   LOG_DEBUG("test number initialized")
 }
 
-double PossionCompPValue::compRandMatchProb(double prec_mass, bool is_strict) {
+double PoissonCompPValue::compRandMatchProb(double prec_mass, bool is_strict) {
   double avg_mass = prec_mass / 2.0;
   PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
   // error tolerance for N-term + error tolerance for C -term
@@ -33,11 +33,11 @@ double PossionCompPValue::compRandMatchProb(double prec_mass, bool is_strict) {
   }
   coverage = coverage * mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getExtendOffsets().size();
   double prob = coverage / residue_avg_len_;
-  std::cout << " Random match prob " << prob << std::endl;
+  LOG_DEBUG(" Random match prob " << prob);
   return prob;
 }
 
-double PossionCompPValue::compConditionProb(double rand_match_prob, PrmMsPtr ms_six, PrsmPtr prsm) {
+double PoissonCompPValue::compConditionProb(double rand_match_prob, PrmMsPtr ms_six, PrsmPtr prsm) {
   double f = ms_six->size();
   double x = rand_match_prob;
   double n = prsm->getMatchFragNum();
@@ -45,21 +45,29 @@ double PossionCompPValue::compConditionProb(double rand_match_prob, PrmMsPtr ms_
   if (f <= 0.0 || x <= 0.0 || n <= 0.0) {
     return 1;
   }
+  double mu = x*f;
+  if (n <= mu) {
+    return 1;
+  }
+  // approximation of poisson tail distribution
+  double log_value = (n-mu) + n * std::log(mu/n) + std::log(n+1) - 0.5 * std::log(2*3.14 * n) - std::log(n+1-mu);
+  double prob = std::exp(log_value);
+
+  /*
   double xf = x*f;
   double sum = 0;
-  double xf_power = 1;
-  double factorial = 1;
+  double log_value = -xf;
   for (int i = 0; i < n; i++) {
-    sum = sum + std::exp(-xf) * xf_power / factorial;
-    xf_power = xf_power * xf;
-    factorial = factorial * (i+1);
+    sum = sum + std::exp(log_value);
+    log_value = log_value + std::log(xf) - std::log(i+1);
   }
   double prob = 1 - sum;
-  std::cout << " f " << f << " x " << x  << " n " << n << " prob " << prob  << std::endl;
+  */
+  LOG_DEBUG(" f " << f << " x " << x  << " n " << n << " prob " << prob);
   return prob;
 }
 
-ExtremeValuePtrVec PossionCompPValue::compExtremeValues(PrmMsPtr ms_six, 
+ExtremeValuePtrVec PoissonCompPValue::compExtremeValues(PrmMsPtr ms_six, 
                                                         PrsmPtrVec &prsms,
                                                         bool is_strict) {
   double prec_mass = ms_six->getHeaderPtr()->getPrecMonoMassMinusWater();
@@ -90,7 +98,7 @@ ExtremeValuePtrVec PossionCompPValue::compExtremeValues(PrmMsPtr ms_six,
   return ev_probs;
 }
 
-void PossionCompPValue::setPValueArray(PrmMsPtr prm_ms_ptr, PrsmPtrVec &prsms) {
+void PoissonCompPValue::setPValueArray(PrmMsPtr prm_ms_ptr, PrsmPtrVec &prsms) {
   ExtremeValuePtrVec extreme_values = compExtremeValues(prm_ms_ptr, prsms, false);
   for (unsigned int i = 0; i < prsms.size(); i++) {
     prsms[i]->setProbPtr(extreme_values[i]);
