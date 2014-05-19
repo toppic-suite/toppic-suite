@@ -2,22 +2,22 @@
 #define PROT_POSSION_COMP_PVALUE_HPP_
 
 #include "tdgf/count_test_num.hpp"
-#include "possion/possion_mng.hpp"
+#include "poisson/poisson_mng.hpp"
 
 namespace prot {
 
-class PossionCompPValue {
+class PoissonCompPValue {
  public:
-  PossionCompPValue(ProteoformPtrVec &raw_forms, 
+  PoissonCompPValue(ProteoformPtrVec &raw_forms, 
                     ProteoformPtrVec &prot_mod_forms,
-                    PossionMngPtr mng_ptr);
+                    PoissonMngPtr mng_ptr);
 
   ExtremeValuePtrVec compExtremeValues(PrmMsPtr ms_six, 
                                        PrsmPtrVec &prsms, bool strict);
   void setPValueArray(PrmMsPtr prm_ms_ptr, PrsmPtrVec &prsms);
 
  private:
-  PossionMngPtr mng_ptr_;
+  PoissonMngPtr mng_ptr_;
   CountTestNumPtr test_num_ptr_;
   double residue_avg_len_;
 
@@ -25,7 +25,7 @@ class PossionCompPValue {
   double compConditionProb(double rand_match_prob, PrmMsPtr ms_six, PrsmPtr prsm);
 };
 
-typedef std::shared_ptr<PossionCompPValue> PossionCompPValuePtr;
+typedef std::shared_ptr<PoissonCompPValue> PoissonCompPValuePtr;
 
 }
 

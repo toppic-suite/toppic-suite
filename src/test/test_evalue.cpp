@@ -21,6 +21,9 @@
 #include "ptmsearch/ptm_mng.hpp"
 #include "ptmsearch/ptm_processor.hpp"
 
+#include "poisson/poisson_processor.hpp"
+#include "poisson/poisson_mng.hpp"
+
 #include "tdgf/evalue_processor.hpp"
 #include "tdgf/tdgf_mng.hpp"
 
@@ -55,6 +58,15 @@ int process(int argc, char* argv[]) {
     double max_ptm_mass;
     std::istringstream (arguments["maxPtmMass"]) >> max_ptm_mass;
 
+    std::cout << "Poisson computation " << std::endl;
+    PoissonMngPtr poisson_mng_ptr = PoissonMngPtr(new PoissonMng (prsm_para_ptr, shift_num, max_ptm_mass, 
+                                                      "RAW_RESULT", "POISSON_EVALUE"));
+    prot::PoissonProcessor poisson(poisson_mng_ptr);
+    poisson.init();
+    poisson.process();
+
+
+    /*
     std::cout << "E-value computation " << std::endl;
     TdgfMngPtr tdgf_mng_ptr = TdgfMngPtr(new TdgfMng (prsm_para_ptr, shift_num, max_ptm_mass, 
                                                       "RAW_RESULT", "EVALUE"));
@@ -104,6 +116,7 @@ int process(int argc, char* argv[]) {
 
     std::cout << "Convert view xml files to html files " << std::endl;
     prot::translate(arguments);
+    */
 
   } catch (const char* e) {
     std::cout << "Exception " << e << std::endl;

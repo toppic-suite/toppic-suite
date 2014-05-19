@@ -1,6 +1,6 @@
 include ../Makefile.in
 
-OBJS = $(BASE_OBJS) $(SPEC_OBJS) $(PRSM_OBJS) $(POSSION_OBJS)
+OBJS = $(BASE_OBJS) $(SPEC_OBJS) $(PRSM_OBJS) $(POISSON_OBJS)
 
 BIN_DIR = ../../bin
 
