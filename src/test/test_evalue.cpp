@@ -58,23 +58,25 @@ int process(int argc, char* argv[]) {
     double max_ptm_mass;
     std::istringstream (arguments["maxPtmMass"]) >> max_ptm_mass;
 
+    /*
     std::cout << "Poisson computation " << std::endl;
     PoissonMngPtr poisson_mng_ptr = PoissonMngPtr(new PoissonMng (prsm_para_ptr, shift_num, max_ptm_mass, 
                                                       "RAW_RESULT", "POISSON_EVALUE"));
     prot::PoissonProcessor poisson(poisson_mng_ptr);
     poisson.init();
     poisson.process();
+    */
 
 
-    /*
     std::cout << "E-value computation " << std::endl;
     TdgfMngPtr tdgf_mng_ptr = TdgfMngPtr(new TdgfMng (prsm_para_ptr, shift_num, max_ptm_mass, 
-                                                      "RAW_RESULT", "EVALUE"));
+                                                      "POISSON_EVALUE", "EVALUE"));
     prot::EValueProcessor processor(tdgf_mng_ptr);
     processor.init();
     // compute E-value for a set of prsms each run 
     processor.process(false);
 
+    /*
     if (arguments["searchType"]=="TARGET") { 
       std::cout << "Top selector " << std::endl;
       PrsmSelector selector(db_file_name, sp_file_name, "EVALUE", "TOP", n_top);

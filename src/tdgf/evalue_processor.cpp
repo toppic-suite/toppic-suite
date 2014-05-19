@@ -80,6 +80,21 @@ void EValueProcessor::process(bool is_separate) {
   std::cout << std::endl << "E-value computation finished." << std::endl;
 }
 
+bool EValueProcessor::checkPrsms(PrsmPtrVec &prsms) {
+  for (unsigned int i = 0; i < prsms.size(); i++) {
+    ExtremeValuePtr extreme_value_ptr = prsms[i]->getProbPtr();
+    if (extreme_value_ptr != nullptr) {
+      double evalue = extreme_value_ptr->getEValue();
+      double frag_num = prsms[i]->getMatchFragNum();
+      if (evalue <= mng_ptr_->computation_evalue_cutoff 
+          && frag_num >= mng_ptr_->computation_frag_num_cutoff) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
 void EValueProcessor::processOneSpectrum(DeconvMsPtr ms_ptr, bool is_separate,
                                          PrsmWriter &writer) {
   SpectrumSetPtr spec_set_ptr 
@@ -87,28 +102,31 @@ void EValueProcessor::processOneSpectrum(DeconvMsPtr ms_ptr, bool is_separate,
   if (spec_set_ptr.get() != nullptr) {
     PrsmPtrVec sele_prsms;
     filterPrsms(prsms_, ms_ptr->getHeaderPtr(), sele_prsms);
-    //PrsmUtil.processPrsm(selectedPrsms, deconvSp, seqs);
-    
-    if (is_separate) {
-      for (unsigned i = 0; i < sele_prsms.size(); i++) {
-        comp_pvalue_ptr_->setPValue(ms_ptr, sele_prsms[i]);
-      }
-    } 
-    else {
-      comp_pvalue_ptr_->setPValueArray(spec_set_ptr->getSpSix(), 
-                                       sele_prsms);
-    }
-    // if matched peak number is too small or E-value is 0, replace it
-    // with a max evalue.
-    for (unsigned i = 0; i < sele_prsms.size(); i++) {
-      if (sele_prsms[i]->getMatchFragNum() < mng_ptr_->comp_evalue_min_match_frag_num_
-          || sele_prsms[i]->getEValue() == 0.0) {
-        LOG_WARN("Invalid e value!");
-        sele_prsms[i]->setProbPtr(getMaxEvaluePtr());
-      }
-    }
-    
 
+    bool need_comp = checkPrsms(sele_prsms);
+    std::cout << "Need computation: " << need_comp <<  std::endl;
+  
+    if (need_comp) {
+      if (is_separate) {
+        for (unsigned i = 0; i < sele_prsms.size(); i++) {
+          comp_pvalue_ptr_->setPValue(ms_ptr, sele_prsms[i]);
+        }
+      } 
+      else {
+        comp_pvalue_ptr_->setPValueArray(spec_set_ptr->getSpSix(), 
+                                         sele_prsms);
+      }
+      // if matched peak number is too small or E-value is 0, replace it
+      // with a max evalue.
+      for (unsigned i = 0; i < sele_prsms.size(); i++) {
+        if (sele_prsms[i]->getMatchFragNum() < mng_ptr_->comp_evalue_min_match_frag_num_
+            || sele_prsms[i]->getEValue() == 0.0) {
+          LOG_WARN("Invalid e value!");
+          sele_prsms[i]->setProbPtr(getMaxEvaluePtr());
+        }
+      }
+    }
+    
     LOG_DEBUG("start sort");
     std::sort(sele_prsms.begin(), sele_prsms.end(), prsmEValueUp);
     LOG_DEBUG("start writing");

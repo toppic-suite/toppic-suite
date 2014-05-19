@@ -24,6 +24,11 @@ class TdgfMng {
   /** Prsm filter */
   int comp_evalue_min_match_frag_num_ = 4;
 
+  /** do tdgf computation if poisson report evalue > 10^-8 
+   * or match frag num < 25 */
+  double computation_evalue_cutoff = 0.00000001;
+  int computation_frag_num_cutoff = 25;
+
   /** dp table */
   // number of mass shift
   int unexpected_shift_num_ = 2;
