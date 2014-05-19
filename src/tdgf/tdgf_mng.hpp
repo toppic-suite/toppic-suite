@@ -7,10 +7,10 @@ namespace prot {
 
 class TdgfMng {
  public:
-  TdgfMng(PrsmParaPtr prsm_para_ptr, int shift_num, double max_shift_value, 
+  TdgfMng(PrsmParaPtr prsm_para_ptr, int shift_num, double max_ptm_mass, 
           std::string input_file_ext, std::string output_file_ext) {
     prsm_para_ptr_ = prsm_para_ptr,
-    max_shift_value_ = max_shift_value;
+    max_ptm_mass_ = max_ptm_mass;
     unexpected_shift_num_ = shift_num;
     input_file_ext_ = input_file_ext;
     output_file_ext_ = output_file_ext;
@@ -19,7 +19,7 @@ class TdgfMng {
   PrsmParaPtr prsm_para_ptr_;
 
   /** parameters for tdmg */
-  double max_shift_value_ = 1000000;
+  double max_ptm_mass_ = 1000000;
 
   /** Prsm filter */
   int comp_evalue_min_match_frag_num_ = 4;
@@ -27,8 +27,8 @@ class TdgfMng {
   /** dp table */
   // number of mass shift
   int unexpected_shift_num_ = 2;
-  double double_to_int_constant_ = 274.335215;
-  double max_sp_prec_mass_ = 51000;
+  double convert_ratio_ = 274.335215;
+  double max_prec_mass_ = 51000;
   int max_table_height_ = 128;
   int min_height_ = 10;
 
