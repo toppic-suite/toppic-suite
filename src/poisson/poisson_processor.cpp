@@ -8,7 +8,7 @@
 #include "prsm/prsm_writer.hpp"
 #include "poisson/poisson_processor.hpp"
 
-#include <sys/time.h>
+//#include <sys/time.h>
 
 namespace prot {
 
@@ -54,11 +54,11 @@ void PoissonProcessor::process() {
   PrsmWriter writer(output_file_name);
   int cnt = 0;
 
+  /*
   struct timeval start_time; 
   struct timeval end_time; 
-           
   gettimeofday(&start_time, NULL);
-
+  */
   DeconvMsPtr ms_ptr = reader.getNextMs();
   while (ms_ptr.get() != nullptr) {
     cnt++;
@@ -69,9 +69,11 @@ void PoissonProcessor::process() {
           << spectrum_num << " spectra.\r";
     }
     
+    /*
     gettimeofday(&end_time, NULL); 
     float duration = end_time.tv_sec - start_time.tv_sec;
     LOG_DEBUG("Duration: " << duration << " seconds.");
+    */
   }
   reader.close();
 
@@ -86,8 +88,8 @@ void PoissonProcessor::processOneSpectrum(DeconvMsPtr ms_ptr, PrsmWriter &writer
   if (spec_set_ptr.get() != nullptr) {
     PrsmPtrVec sele_prsms;
     filterPrsms(prsms_, ms_ptr->getHeaderPtr(), sele_prsms);
-    PrmMsPtr prm_ms_ptr = spec_set_ptr->getSpSix();
-    comp_ptr_->setPValueArray(prm_ms_ptr, sele_prsms);
+    ExtendMsPtr extend_ms_ptr = spec_set_ptr->getSpThree();
+    comp_ptr_->setPValueArray(extend_ms_ptr, sele_prsms);
     // if matched peak number is too small or E-value is 0, replace it
     // with a max evalue.
     for (unsigned i = 0; i < sele_prsms.size(); i++) {

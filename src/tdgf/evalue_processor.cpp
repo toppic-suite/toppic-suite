@@ -1,3 +1,5 @@
+//#include <sys/time.h>
+
 #include "base/logger.hpp"
 #include "base/file_util.hpp"
 #include "base/proteoform.hpp"
@@ -8,7 +10,6 @@
 #include "prsm/prsm_writer.hpp"
 #include "tdgf/evalue_processor.hpp"
 
-#include <sys/time.h>
 
 namespace prot {
 
@@ -54,10 +55,10 @@ void EValueProcessor::process(bool is_separate) {
   PrsmWriter writer(output_file_name);
   int cnt = 0;
 
-  struct timeval start_time; 
-  struct timeval end_time; 
+  //struct timeval start_time; 
+  //struct timeval end_time; 
            
-  gettimeofday(&start_time, NULL);
+  //gettimeofday(&start_time, NULL);
 
   DeconvMsPtr ms_ptr = reader.getNextMs();
   while (ms_ptr.get() != nullptr) {
@@ -69,9 +70,9 @@ void EValueProcessor::process(bool is_separate) {
           << spectrum_num << " spectra.\r";
     }
     
-    gettimeofday(&end_time, NULL); 
-    float duration = end_time.tv_sec - start_time.tv_sec;
-    std::cout << std::endl << "Duration: " << duration << " seconds." << std::endl;
+    //gettimeofday(&end_time, NULL); 
+    //float duration = end_time.tv_sec - start_time.tv_sec;
+    //std::cout << std::endl << "Duration: " << duration << " seconds." << std::endl;
   }
   reader.close();
 
@@ -104,7 +105,7 @@ void EValueProcessor::processOneSpectrum(DeconvMsPtr ms_ptr, bool is_separate,
     filterPrsms(prsms_, ms_ptr->getHeaderPtr(), sele_prsms);
 
     bool need_comp = checkPrsms(sele_prsms);
-    std::cout << "Need computation: " << need_comp <<  std::endl;
+    LOG_DEBUG("Need computation: " << need_comp );
   
     if (need_comp) {
       if (is_separate) {
