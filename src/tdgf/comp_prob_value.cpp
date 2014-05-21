@@ -546,7 +546,7 @@ void compProbArray(CompProbValuePtr comp_prob_ptr, ResFreqPtrVec &n_term_residue
                    std::vector<double> &results) {
   int max_score = getMaxScore(prsms);
   int max_shift = getMaxShift(prsms);
-  std::cout << std::endl << "max score " << max_score << " max shift " << max_shift << std::endl;
+  //std::cout << std::endl << "max score " << max_score << " max shift " << max_shift << std::endl;
   comp_prob_ptr->compute(n_term_residues, peaks, max_score, max_shift, strict);
   results.clear();
   for (unsigned int i = 0; i < prsms.size(); i++) {

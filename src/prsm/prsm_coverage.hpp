@@ -12,12 +12,21 @@ class PrsmCoverage {
  public:
   PrsmCoverage(PrsmParaPtr prsm_para_ptr, std::string input_file_ext,
                 std::string output_file_ext);
-  void process();
+  void processSingleCoverage();
+  void processCombineCoverage();
 
  private:
   PrsmParaPtr prsm_para_ptr_;
   std::string input_file_ext_;
   std::string output_file_ext_;
+
+  void printTitle(std::ofstream &file);
+  void compCoverage(std::ofstream &file, PrsmPtr prsm, 
+                    PeakIonPairPtrVec &pairs, PrsmParaPtr prsm_para_ptr);
+  void processOnePrsm(std::ofstream &file, PrsmPtr prsm, 
+                      PrsmParaPtr prsm_para_ptr);
+  void processTwoPrsms(std::ofstream &file, PrsmPtr prsm_1, 
+                       PrsmPtr prsm_2, PrsmParaPtr prsm_para_ptr);
 
 };
 

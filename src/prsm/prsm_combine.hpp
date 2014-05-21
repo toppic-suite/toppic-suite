@@ -34,6 +34,7 @@ class PrsmCombine {
   std::string db_file_;
   std::vector<std::string> input_file_exts_;
   std::string output_files_;
+
 };
 typedef std::shared_ptr<PrsmCombine> PrsmCombinePtr;
 } /* namespace prot */
