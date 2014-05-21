@@ -233,11 +233,13 @@
 <!--table width="750" bolder="1px" bodercolor="red" cellspacing="1px" cellpadding="1px"-->
 <table border="0"  cellspacing="0px" cellpadding="0px">
             <xsl:apply-templates select="character" mode="prsm"/>
-</table>            
+</table>         
+            <!-- 
             <xsl:if test="../db_acid_number > ../last_residue_position">
               <br/>
               display seq start:<xsl:value-of select="floor(../first_residue_position div 30)*30+1"/>; end:<xsl:value-of select="floor(../last_residue_position div 30)*30 + 30"/>
-            </xsl:if>
+            </xsl:if> 
+            -->   
         </div>
     </xsl:template>
 
@@ -446,7 +448,7 @@
                             </xsl:when>
                             <xsl:when  test="display_position = '1'">
 <div style="position: relative;">
-                                    <div style="position: absolute; top:-56px; width:100px; font-size: 8pt; color:red; text-decoration:none;">
+                                    <div style="position: absolute; top:-36px; width:100px; font-size: 8pt; color:red; text-decoration:none;">
                                         <xsl:value-of select="shift_no_letter"/>
                                     </div>
 </div>
