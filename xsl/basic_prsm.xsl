@@ -5,14 +5,9 @@
     <xsl:variable name="alignWidth">40</xsl:variable>
 
     <xsl:template match="prsm" mode="basic">
-        <p style="font-family:monospace;font-size:16;line-height:2.5; ">
+<!--         <p style="font-family:monospace;font-size:16;line-height:2.5; "> -->
         <xsl:apply-templates select="annotated_protein/annotation/character" mode="basic"/>
-        <xsl:if test="annotated_protein/db_acid_number > annotated_protein/last_residue_position">
-          <br/>
-          <!--ignore acids first:<xsl:value-of select="floor(annotated_protein/first_residue_position div $alignWidth)*$alignWidth"/>; end:<xsl:value-of select="annotated_protein/db_acid_number - annotated_protein/last_residue_position"/>-->
-          display seq start:<xsl:value-of select="floor(annotated_protein/first_residue_position div $alignWidth)*$alignWidth+1"/>; end:<xsl:value-of select="floor(annotated_protein/last_residue_position div $alignWidth)*$alignWidth + $alignWidth"/>
-        </xsl:if>
-        </p>
+        
     </xsl:template>
 
     <xsl:template match="prsm" mode="species">
@@ -25,21 +20,36 @@
                     there are <a href="../species/species{../species_id}.html"><xsl:value-of select="count(../prsm)"/> PrSMs</a>.</xsl:when>
                 <xsl:otherwise>
                    There is only <a href="../prsms/prsm{prsm_id}.html">1 PrSM</a>
-                    with E-value <xsl:value-of select="e_value"/> and precursor mass <xsl:value-of select="precursor_mass"/>.
+                    with E-value <xsl:value-of select="e_value"/> and precursor mass <xsl:value-of select="adjusted_precursor_mass"/>.
                 </xsl:otherwise>
             </xsl:choose>
-            </p>
+<!--             <xsl:if test="annotated_protein/first_residue_position > 0 or annotated_protein/db_acid_number > annotated_protein/last_residue_position"> -->
+            <br/>
+            The sequence shown below starts from residue 
+            <xsl:value-of select="floor(annotated_protein/first_residue_position div $alignWidth)*$alignWidth+1"/>
+             and ends at residue 
+            <xsl:if test="annotated_protein/db_acid_number > (floor(annotated_protein/last_residue_position div $alignWidth)*$alignWidth + $alignWidth)">
+            <xsl:value-of select="floor(annotated_protein/last_residue_position div $alignWidth)*$alignWidth + $alignWidth"/>
+            </xsl:if>
+            <xsl:if test="(floor(annotated_protein/last_residue_position div $alignWidth)*$alignWidth + $alignWidth) >= annotated_protein/db_acid_number">
+            <xsl:value-of select="annotated_protein/db_acid_number"/>
+            </xsl:if>
+<!--             </xsl:if> -->
+            .</p>
+            <div id="alignment" style="font-family: 'FreeMono', Miltonian, monospace; font-size:16;line-height:2.5;background-color:#FFF">
             <table border="0"  cellspacing="0px" cellpadding="0px">
-            <xsl:text disable-output-escaping="yes"><![CDATA[<tr><td height='16px' colspan='44'></td></tr><tr><td height='16px' colspan='44'></td></tr><tr>]]></xsl:text><!--  -->
+            <xsl:text disable-output-escaping="yes"><![CDATA[<tr>]]></xsl:text><!--  -->
             <xsl:apply-templates select="." mode="basic"/>
-            <xsl:text disable-output-escaping="yes"><![CDATA[</tr>]]></xsl:text></table>
-
+            <xsl:text disable-output-escaping="yes"><![CDATA[</tr>]]></xsl:text>
+            </table>
+            </div>
+            
         </xsl:if>
     </xsl:template>
 
     <xsl:template match="character" mode="basic">
-        
-        <xsl:if test="type = 'cleavage'">
+        <!-- 
+                <xsl:if test="type = 'cleavage'">
                    <xsl:if test="cleavage_type = 'unexpected_shift' and shift_no_letter != 0">
                         <xsl:choose>
                             <xsl:when  test="display_position = '0' ">
@@ -59,10 +69,14 @@
                         </xsl:choose>
                     </xsl:if>
         </xsl:if>
+        -->
         <xsl:if test="type = 'residue' and position >= floor(../../first_residue_position div $alignWidth)*$alignWidth and (floor(../../last_residue_position div $alignWidth)*$alignWidth+$alignWidth)>position">
+        <!--  -->
+            <xsl:if test="position = 0"><!--  -->
+                <xsl:text disable-output-escaping="yes"><![CDATA[<td height='16px' colspan='44'></td></tr><tr><td height='16px' colspan='44'></td></tr><tr>]]></xsl:text>
+            </xsl:if>
             <xsl:if test="position  mod $alignWidth = 0 and position != 0"><!--  -->
                 <xsl:text disable-output-escaping="yes"><![CDATA[</tr><tr><td height='16px' colspan='44'></td></tr><tr><td height='16px' colspan='44'></td></tr><tr>]]></xsl:text>
-                
             </xsl:if>
             <xsl:if test="position  mod 10 = 0 "><!-- and position != 0 -->
                 <xsl:if test="residue_type = 'unexpected_shift' and display_background = '0'">
@@ -80,10 +94,30 @@
                     </td>
                 </xsl:if>
                 <xsl:if test="residue_type != 'unexpected_shift'">
-                <td width='8px' height='16px' style=''>
+                    <td width='8px' height='16px' style=''>
                     <span style ="color:gray;">
                     <xsl:text> </xsl:text>
                     </span>
+                    <xsl:if test="position = 0 and ../character[1]/type = 'cleavage'">
+                    <xsl:if test="../character[1]/cleavage_type = 'unexpected_shift' and ../character[1]/shift_no_letter != 0">
+                        <xsl:choose>
+                            <xsl:when  test="../character[1]/display_position = '0' or ../character[1]/display_position = '1'">
+                                <div style="position: relative;">
+                                    <div style="position: absolute; top:-36px;left:-8px; width:150px; font-size: 8pt; color:red; text-decoration:none;">
+                                        <xsl:value-of select="../character[1]/shift_no_letter"/>
+                                    </div>
+                                </div>
+                            </xsl:when>
+                            <!-- <xsl:when  test="../character[1]/display_position = '1' ">
+                                <div style="position: relative;">
+                                    <div style="position: absolute; top:-45px;left:-8px; width:150px; font-size: 8pt; color:blue; text-decoration:none;">
+                                        <xsl:value-of select="../character[1]/shift_no_letter"/>
+                                    </div>
+                                </div>
+                            </xsl:when> -->
+                        </xsl:choose>
+                    </xsl:if>
+                    </xsl:if>
                     </td>
                 </xsl:if>
 <!--
