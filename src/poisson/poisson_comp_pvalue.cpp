@@ -31,16 +31,17 @@ double PoissonCompPValue::compRandMatchProb(double prec_mass, bool is_strict) {
   else {
     coverage = tole_ptr->compStrictErrorTole(avg_mass) * 2 + tole_ptr->compRelaxErrorTole(prec_mass, avg_mass) * 2;
   }
-  coverage = coverage * mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getExtendOffsets().size();
   double prob = coverage / residue_avg_len_;
   LOG_DEBUG(" Random match prob " << prob);
   return prob;
 }
 
-double PoissonCompPValue::compConditionProb(double rand_match_prob, PrmMsPtr ms_six, PrsmPtr prsm) {
-  double f = ms_six->size();
+double PoissonCompPValue::compConditionProb(double rand_match_prob, ExtendMsPtr extend_ms, PrsmPtr prsm) {
+  double f = extend_ms->size();
   double x = rand_match_prob;
-  double n = prsm->getMatchFragNum();
+  // use peak number is the same to the formula in prosightpc
+  double n = prsm->getMatchPeakNum();
+  LOG_DEBUG(" f " << f << " x " << x << " n " << n);
   n = n - prsm->getProteoformPtr()->getUnexpectedChangeNum() * mng_ptr_->shift_penalty;
   if (f <= 0.0 || x <= 0.0 || n <= 0.0) {
     return 1;
@@ -67,16 +68,16 @@ double PoissonCompPValue::compConditionProb(double rand_match_prob, PrmMsPtr ms_
   return prob;
 }
 
-ExtremeValuePtrVec PoissonCompPValue::compExtremeValues(PrmMsPtr ms_six, 
+ExtremeValuePtrVec PoissonCompPValue::compExtremeValues(ExtendMsPtr extend_ms, 
                                                         PrsmPtrVec &prsms,
                                                         bool is_strict) {
-  double prec_mass = ms_six->getHeaderPtr()->getPrecMonoMassMinusWater();
-  double tolerance = ms_six->getHeaderPtr()->getErrorTolerance();
+  double prec_mass = extend_ms->getHeaderPtr()->getPrecMonoMassMinusWater();
+  double tolerance = extend_ms->getHeaderPtr()->getErrorTolerance();
   double rand_match_prob = compRandMatchProb(prec_mass, is_strict); 
 
   ExtremeValuePtrVec ev_probs; 
   for (unsigned int i = 0; i < prsms.size(); i++) {
-    double cond_prob = compConditionProb(rand_match_prob, ms_six, prsms[i]);
+    double cond_prob = compConditionProb(rand_match_prob, extend_ms, prsms[i]);
     //LOG_DEBUG("prsm " << i << " prsm size " << prsms.size());
     int unexpect_shift_num = prsms[i]->getProteoformPtr()->getUnexpectedChangeNum();
     SemiAlignTypePtr t = prsms[i]->getProteoformPtr()->getSemiAlignType();
@@ -98,8 +99,8 @@ ExtremeValuePtrVec PoissonCompPValue::compExtremeValues(PrmMsPtr ms_six,
   return ev_probs;
 }
 
-void PoissonCompPValue::setPValueArray(PrmMsPtr prm_ms_ptr, PrsmPtrVec &prsms) {
-  ExtremeValuePtrVec extreme_values = compExtremeValues(prm_ms_ptr, prsms, false);
+void PoissonCompPValue::setPValueArray(ExtendMsPtr extend_ms_ptr, PrsmPtrVec &prsms) {
+  ExtremeValuePtrVec extreme_values = compExtremeValues(extend_ms_ptr, prsms, false);
   for (unsigned int i = 0; i < prsms.size(); i++) {
     prsms[i]->setProbPtr(extreme_values[i]);
   }
