@@ -54,7 +54,12 @@ int process(int argc, char* argv[]) {
     if (arguments["searchType"] == "TARGET+DECOY") {
       generateShuffleDb(ori_db_file_name, db_file_name);
     }
-
+    /*
+    struct timeval start_time; 
+    struct timeval end_time; 
+    float duration;
+    gettimeofday(&start_time, NULL);
+    */
     std::cout << "Zero ptm searching starts " << std::endl;
     ZeroPtmMngPtr zero_mng_ptr = ZeroPtmMngPtr(new ZeroPtmMng (prsm_para_ptr, "ZERO"));
     zeroPtmSearchProcess(zero_mng_ptr);

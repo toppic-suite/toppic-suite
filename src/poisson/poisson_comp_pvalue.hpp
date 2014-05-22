@@ -12,9 +12,9 @@ class PoissonCompPValue {
                     ProteoformPtrVec &prot_mod_forms,
                     PoissonMngPtr mng_ptr);
 
-  ExtremeValuePtrVec compExtremeValues(PrmMsPtr ms_six, 
+  ExtremeValuePtrVec compExtremeValues(ExtendMsPtr extend_ms, 
                                        PrsmPtrVec &prsms, bool strict);
-  void setPValueArray(PrmMsPtr prm_ms_ptr, PrsmPtrVec &prsms);
+  void setPValueArray(ExtendMsPtr extend_ms_ptr, PrsmPtrVec &prsms);
 
  private:
   PoissonMngPtr mng_ptr_;
@@ -22,7 +22,7 @@ class PoissonCompPValue {
   double residue_avg_len_;
 
   double compRandMatchProb(double prec_mass, bool is_strict);
-  double compConditionProb(double rand_match_prob, PrmMsPtr ms_six, PrsmPtr prsm);
+  double compConditionProb(double rand_match_prob, ExtendMsPtr extend_ms, PrsmPtr prsm);
 };
 
 typedef std::shared_ptr<PoissonCompPValue> PoissonCompPValuePtr;
