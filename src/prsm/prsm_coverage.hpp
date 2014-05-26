@@ -30,6 +30,8 @@ class PrsmCoverage {
 
 };
 
+typedef std::shared_ptr<PrsmCoverage> PrsmCoveragePtr;
+
 } /* namespace prot */
 
 #endif /* PROT_PRSM_COVERAGE_HPP_ */

@@ -32,6 +32,7 @@ class PrsmFdr {
 
   void compute(PrsmPtrVec &target,PrsmPtrVec decoy);
 };
+typedef std::shared_ptr<PrsmFdr> PrsmFdrPtr;
 
 } /* namespace prot */
 

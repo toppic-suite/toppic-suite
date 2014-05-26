@@ -24,6 +24,8 @@ class EValueProcessor {
   bool checkPrsms(PrsmPtrVec &prsms);
 };
 
+typedef std::shared_ptr<EValueProcessor> EValueProcessorPtr;
+
 }
 
 #endif

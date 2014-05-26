@@ -33,6 +33,8 @@ class PrsmSpecies {
   double ppo_;
 };
 
+typedef std::shared_ptr<PrsmSpecies> PrsmSpeciesPtr;
+
 SpeciesPtrVec setSpeciesId(const PrsmPtrVec &prsms,double ppo);
 
 } /* namespace prot */
