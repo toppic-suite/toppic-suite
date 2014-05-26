@@ -22,6 +22,8 @@ class PoissonProcessor {
     PoissonCompPValuePtr comp_ptr_;
 };
 
+typedef std::shared_ptr<PoissonProcessor> PoissonProcessorPtr;
+
 }
 
 #endif

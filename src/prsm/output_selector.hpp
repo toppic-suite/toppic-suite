@@ -39,6 +39,8 @@ class OutputSelector {
   double cutoff_value_;
 };
 
+typedef std::shared_ptr<OutputSelector> OutputSelectorPtr;
+
 } /* namespace prot */
 
 #endif /* OUTPUT_SELECTOR_HPP_ */

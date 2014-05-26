@@ -52,10 +52,11 @@ int process(int argc, char* argv[]) {
     std::string sp_file_name = arguments["spectrumFileName"];
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
     PrsmParaPtr prsm_para_ptr = PrsmParaPtr(new PrsmPara(arguments));
+    /*
     if (arguments["searchType"] == "TARGET+DECOY") {
       generateShuffleDb(ori_db_file_name, db_file_name);
     }
-
+    
     std::cout << "Zero ptm searching starts " << std::endl;
     ZeroPtmMngPtr zero_mng_ptr = ZeroPtmMngPtr(new ZeroPtmMng (prsm_para_ptr, "ZERO"));
     zeroPtmSearchProcess(zero_mng_ptr);
@@ -64,8 +65,9 @@ int process(int argc, char* argv[]) {
     std::cout << "Fast filtering starts " << std::endl;
     PtmFastFilterMngPtr filter_mng_ptr 
         = PtmFastFilterMngPtr(new PtmFastFilterMng(prsm_para_ptr, "FILTER"));
-    PtmFastFilterProcessor filter_processor(filter_mng_ptr);
-    filter_processor.process();
+    PtmFastFilterProcessorPtr filter_processor = PtmFastFilterProcessorPtr(new PtmFastFilterProcessor(filter_mng_ptr));
+    filter_processor->process();
+    filter_processor = nullptr;
 
     int n_top;
     std::istringstream (arguments["numOfTopPrsms"]) >> n_top;
@@ -77,88 +79,93 @@ int process(int argc, char* argv[]) {
     std::cout << "Ptm searching starts" << std::endl;
     PtmMngPtr ptm_mng_ptr = PtmMngPtr(new PtmMng(prsm_para_ptr, n_top, shift_num,
                                                  max_ptm_mass, "FILTER_COMBINED", "PTM"));
-    prot::PtmProcessor ptm_processor(ptm_mng_ptr);
-    ptm_processor.process();
+    PtmProcessorPtr ptm_processor = PtmProcessorPtr(new PtmProcessor(ptm_mng_ptr));
+    ptm_processor->process();
+    ptm_processor = nullptr;
 
     std::cout << "Combining prsms starts" << std::endl;
     std::vector<std::string> input_exts ;
     input_exts.push_back("ZERO");
     input_exts.push_back("PTM");
-    PrsmCombine combine_processor(db_file_name, sp_file_name, 
-                                  input_exts, "RAW_RESULT");
-    combine_processor.process();
+    PrsmCombinePtr combine_processor = PrsmCombinePtr(new PrsmCombine(db_file_name, sp_file_name, 
+                                                                    input_exts, "RAW_RESULT"));
+    combine_processor->process();
+    combine_processor = nullptr;
     std::cout << "Combining prsms finished." << std::endl;
 
     std::cout << "Poisson computation starts" << std::endl;
     PoissonMngPtr poisson_mng_ptr = PoissonMngPtr(new PoissonMng (prsm_para_ptr, shift_num, max_ptm_mass, 
                                                       "RAW_RESULT", "POISSON_EVALUE"));
-    prot::PoissonProcessor poisson(poisson_mng_ptr);
-    poisson.init();
-    poisson.process();
+    PoissonProcessorPtr poisson = PoissonProcessorPtr(new PoissonProcessor(poisson_mng_ptr));
+    poisson->init();
+    poisson->process();
+    poisson = nullptr;
 
     std::cout << "E-value computation starts" << std::endl;
     TdgfMngPtr tdgf_mng_ptr = TdgfMngPtr(new TdgfMng (prsm_para_ptr, shift_num, max_ptm_mass,
                                                       "POISSON_EVALUE", "EVALUE"));
-    prot::EValueProcessor processor(tdgf_mng_ptr);
-    processor.init();
+    EValueProcessorPtr processor = EValueProcessorPtr(new EValueProcessor(tdgf_mng_ptr));
+    processor->init();
     // compute E-value for a set of prsms each run 
-    processor.process(false);
+    processor->process(false);
+    processor = nullptr;
 
     if (arguments["searchType"]=="TARGET") { 
       std::cout << "Top prsm selecting starts" << std::endl;
-      PrsmSelector selector(db_file_name, sp_file_name, "EVALUE", "TOP", n_top);
-      selector.process();
+      PrsmSelectorPtr selector = PrsmSelectorPtr(new PrsmSelector(db_file_name, sp_file_name, "EVALUE", "TOP", n_top));
+      selector->process();
+      selector = nullptr;
       std::cout << "Top prsm selecting finished." << std::endl;
     }
     else {
       std::cout << "Top prsm selecting starts " << std::endl;
-      PrsmSelector selector(db_file_name, sp_file_name, "EVALUE", "TOP_PRE", n_top);
-      selector.process();
+      PrsmSelectorPtr selector = PrsmSelectorPtr(new PrsmSelector(db_file_name, sp_file_name, "EVALUE", "TOP_PRE", n_top));
+      selector->process();
+      selector = nullptr;
       std::cout << "Top prsm selecting finished." << std::endl;
 
       std::cout << "FDR computation starts " << std::endl;
-      PrsmFdr fdr(db_file_name, sp_file_name, "TOP_PRE", "TOP");
-      fdr.process();
+      PrsmFdrPtr fdr = PrsmFdrPtr(new PrsmFdr(db_file_name, sp_file_name, "TOP_PRE", "TOP"));
+      fdr->process();
+      fdr = nullptr;
       std::cout << "FDR computation finished." << std::endl;
     }
-
-    std::cout << "Prsm cutoff selecting starts " << std::endl;
-    std::string cutoff_type = arguments["cutoffValue"];
-    double cutoff_value;
-    std::istringstream (arguments["cutoffValue"]) >> cutoff_value;
-    OutputSelector output_selector(db_file_name, sp_file_name, "TOP", "CUTOFF_RESULT", 
-                                         cutoff_type, cutoff_value);
-    output_selector.process();
-    std::cout << "Prsm cutoff selecting finished." << std::endl;
-
+    */
     std::cout << "Finding species starts " << std::endl;
     double ppo;
     std::istringstream (arguments["error_tolerance"]) >> ppo;
     ppo = ppo /1000000.0;
-    PrsmSpecies prsm_species(db_file_name, sp_file_name, "CUTOFF_RESULT", 
-                                   "OUTPUT_RESULT", ppo);
-    prsm_species.process();
+    PrsmSpeciesPtr prsm_species = PrsmSpeciesPtr(new PrsmSpecies(db_file_name, sp_file_name, 
+                                                                 "TOP", "OUTPUT_RESULT", ppo));
+    prsm_species->process();
+    prsm_species = nullptr;
     std::cout << "Finding species finished." << std::endl;
 
     std::cout << "Outputting table starts " << std::endl;
-    TableWriter table_out(prsm_para_ptr, "OUTPUT_RESULT", "OUTPUT_TABLE");
-    table_out.write();
+    TableWriterPtr table_out = TableWriterPtr(new TableWriter(prsm_para_ptr, "OUTPUT_RESULT", "OUTPUT_TABLE"));
+    table_out->write();
+    table_out = nullptr;
     std::cout << "Outputting table finished." << std::endl;
-
-    PrsmCoverage prsm_coverage(prsm_para_ptr, "OUTPUT_RESULT", "COVERAGE");
-    prsm_coverage.processSingleCoverage();
-    prsm_coverage.processCombineCoverage();
-
+    /*
     std::cout << "Generating view xml files starts " << std::endl;
-    XmlGenerator xml_gene = XmlGenerator(prsm_para_ptr, exe_dir,"OUTPUT_RESULT");
-    xml_gene.process();
+    XmlGeneratorPtr xml_gene = XmlGeneratorPtr(new XmlGenerator(prsm_para_ptr, exe_dir,"OUTPUT_RESULT"));
+    xml_gene->process();
+    xml_gene = nullptr;
     std::cout << "Generating view xml files finished." << std::endl;
 
     std::cout << "Converting xml files to html files starts " << std::endl;
-    prot::translate(arguments);
+    translate(arguments);
     std::cout << "Converting xml files to html files finished." << std::endl;
+    */
 
     std::cout << "Identification End!" << std::endl;
+
+
+    PrsmCoveragePtr prsm_coverage = PrsmCoveragePtr(new PrsmCoverage(prsm_para_ptr, "OUTPUT_RESULT", "COVERAGE"));
+    prsm_coverage->processSingleCoverage();
+    prsm_coverage->processCombineCoverage();
+    prsm_coverage = nullptr;
+
 
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;

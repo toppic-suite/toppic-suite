@@ -34,6 +34,8 @@ class PrsmSelector {
   bool findPrsm(PrsmPtrVec result,PrsmPtr prsm);
 };
 
+typedef std::shared_ptr<PrsmSelector> PrsmSelectorPtr;
+
 } /* namespace prot */
 
 #endif /* PRSM_SELECTOR_HPP_ */

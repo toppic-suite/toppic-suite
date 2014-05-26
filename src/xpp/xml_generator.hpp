@@ -41,6 +41,8 @@ class XmlGenerator {
   AnnoViewPtr anno_view_;
 };
 
+typedef std::shared_ptr<XmlGenerator> XmlGeneratorPtr;
+
 } /* namespace prot */
 
 #endif /* XML_GENERATOR_HPP_ */
