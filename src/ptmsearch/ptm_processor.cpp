@@ -44,21 +44,24 @@ PtmProcessor::PtmProcessor(PtmMngPtr mng_ptr){
     PrsmWriterPtr internal_writer= PrsmWriterPtr (new PrsmWriter (file_name));
     internal_writers_.push_back(internal_writer);
  }
-
   init();
 }
 
 void PtmProcessor::init(){
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
-  proteoforms_ = prot::readFastaToProteoform(
+  proteoforms_ = readFastaToProteoform(
       prsm_para_ptr->getSearchDbFileName(), 
       prsm_para_ptr->getFixModResiduePtrVec());
+  //std::cout << "proteoform read complete." << std::endl;
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
   std::string simplePrsmFileName = basename(sp_file_name)
       + "." + mng_ptr_->input_file_ext_;
-  simplePrsms_  = prot::readSimplePrsm(simplePrsmFileName.c_str());
+  simplePrsms_  = readSimplePrsm(simplePrsmFileName.c_str());
+  //std::cout << "simple prsm read complete." << std::endl;
   prsmFindSeq(simplePrsms_,proteoforms_);
+  //std::cout << "simple prsm find sequence complete." << std::endl;
   comp_shift_ = CompShiftLowMemPtr(new CompShiftLowMem());
+  //std::cout << "Compute shift inited." << std::endl;
 }
 
 void PtmProcessor::prsmFindSeq(SimplePrsmPtrVec simple_prsms,ProteoformPtrVec seqs){

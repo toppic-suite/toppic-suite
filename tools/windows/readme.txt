@@ -5,9 +5,12 @@ Windows:
 Xcerces
 3?	download xerces-c-3.1.1
 4?	unzip xerces to msys64 and get into the path xerces-c-3.1.1
-5?	run ./configure –host=x86_64-w64-mingw64 –build=x86_64-w64-mingw64 CFLAGS=-O3 CXXFLAGS=-O3 --prefix=<the path you want to save the include and lib of xerces>
+5?	run ./configure --disable-sse2 –host=x86_64-w64-mingw64 –build=x86_64-w64-mingw64 CFLAGS=-O3 CXXFLAGS=-O3 --prefix=<the path you want to save the include and lib of xerces>
 6?	enter src and run “make clean” “make”
 7?	copy the result to mingw64 
+
+Linux
+./configure --disable-sse2
 
 Boost: 
 1.  download boost 1.55.0
@@ -17,7 +20,14 @@ Boost:
 5.  tools/build/v2/b2.exe --prefix=<destination path> --toolset=gcc target-os=windows link=static runtime-link=static architecture=x86 address-model=64 threading=single
 
 Xalan
-1.
+  export XERCESCROOT=~/git_cpp/proteomics_cpp/thirdparty/xerces-c-3.1.1/
+  export XALANCROOT=~/git_cpp/proteomics_cpp/thirdparty/xalan-c-1.11/c/
+  ./runConfigure -p mingw-msys -c gcc -x g++ -r none -z -march=athlon64 -z -m64
+  edit src/xalanc/Makefile: all extra line for TestXPath 
+  edit Makefile.incl and remove "/" in prefix
+  see the Makefile in the directory
+  make 
+  make install
 
 8?	copy src of proteomics_cpp and Release into msys and enter Release and run “make clean” “make” and it will build proteomics_cpp.exe and copy it to /MsAlignPlus/WebContent/tool
 9?	download tomcat and create MsAlignPlus folder in \webapps and copy the files in /MsAlignPlus/WebContent/ to \webapps\ MsAlignPlus

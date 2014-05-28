@@ -86,9 +86,11 @@ ProteoformPtrVec readFastaToProteoform(const std::string &file_name,
   LOG_DEBUG( "open file done " << file_name);
   ProteoformPtrVec list;
   ProteoformPtr ptr = reader.getNextProteoformPtr(residue_list);
+  int count = 0;
   while (ptr.get() != nullptr) {
     list.push_back(ptr);
     ptr = reader.getNextProteoformPtr(residue_list);
+    count++;
   }
   return list;
 }

@@ -26,8 +26,7 @@ public:
  void writeVector2D(PrsmPtrVec2D &prsms);
  void writeVector3D(PrsmPtrVec3D &prsms);
 private:
-  xercesc::DOMLSSerializer* serializer_;
-  XmlDOMDocument* doc_;
+  //XmlDOMDocument* doc_;
   std::ofstream file_;
 };
 
