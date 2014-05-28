@@ -41,8 +41,7 @@ class PtmProcessor {
   void chooseSuffIntPrsms(PrsmPtrVec &all_prsms,
                      PrsmPtrVec &prsms);
   void search(SpectrumSetPtr spectrum_set_ptr, 
-              SimplePrsmPtrVec matches
-              );
+              SimplePrsmPtrVec matches);
 
 };
 

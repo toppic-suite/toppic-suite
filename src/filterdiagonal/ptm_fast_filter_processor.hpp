@@ -18,13 +18,13 @@ class PtmFastFilterProcessor {
 public:
     PtmFastFilterProcessor(PtmFastFilterMngPtr mng);
     void process();
+    void combineBlock();
 
 private:
     PtmFastFilterMngPtr mng_ptr_;
     PtmFastFilterBlockPtr filter_ptr_;
 
     void processBlock(int block,std::string sp_file_name,int n_spectra);
-    void combineBlock(std::string sp_file_name);
     SimplePrsmPtrVec2D readSimplePrsm(std::string sp_file_name);
     SimplePrsmPtrVec2D getBestMatch(SimplePrsmPtrVec2D matches,
                                   MsHeaderPtr header);

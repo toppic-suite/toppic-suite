@@ -36,9 +36,10 @@ public:
     void setPrecursorId(int precursorId){precursor_id_ = precursorId;}
     int getPrecursorId(){return precursor_id_;}
     int compareTo(SimplePrsmPtr simple_prsm_ptr);
-    void findSeq(std::vector<ProteoformPtr> seqs);
+    void findSeq(std::vector<ProteoformPtr> &seqs);
     xercesc::DOMElement* toXml(XmlDOMDocument* xml_doc);
     bool isMatch(MsHeaderPtr header);
+    bool isPass(MsHeaderPtr header);
 
 private:
     int spectrum_id_;
@@ -51,7 +52,7 @@ private:
     double score_;
 };
 
-SimplePrsmPtrVec findSimplePrsms(SimplePrsmPtrVec simple_prsm,
+SimplePrsmPtrVec findSimplePrsms(SimplePrsmPtrVec &simple_prsm,
                                  MsHeaderPtr header);
 
 SimplePrsmPtrVec readSimplePrsm(std::string filename);

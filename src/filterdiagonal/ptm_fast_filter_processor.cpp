@@ -31,71 +31,87 @@ void PtmFastFilterProcessor::process(){
   int n_spectrum = prot::countSpNum(sp_file_name.c_str());
   for(int i=0;i< filter_ptr_->getBlockSize();i++){
     std::cout << "Fast filtering block " << (i+1) << " out of " << filter_ptr_->getBlockSize() << " starts" << std::endl; 
-        processBlock(i,sp_file_name,n_spectrum);
+    processBlock(i,sp_file_name,n_spectrum);
   }
-  combineBlock(sp_file_name);
+  combineBlock();
 }
 
 void PtmFastFilterProcessor::processBlock(int block, std::string sp_file_name,
                                           int n_spectra){
-    filter_ptr_->initBlock(block);
-    MsAlignReader reader(sp_file_name);
-    std::stringstream block_s;
-    block_s << block;
-    PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
-    std::string output_file_name = basename(prsm_para_ptr->getSpectrumFileName())
+  filter_ptr_->initBlock(block);
+  MsAlignReader reader(sp_file_name);
+  std::stringstream block_s;
+  block_s << block;
+  PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
+  std::string output_file_name = basename(prsm_para_ptr->getSpectrumFileName())
       + "." + mng_ptr_->output_file_ext_+"_"+block_s.str();
-    SimplePrsmWriter writer(output_file_name.c_str());
-    DeconvMsPtr deconv_sp;
-    int cnt = 0;
-    while((deconv_sp = reader.getNextMs()) != nullptr){
-      cnt++;
-      SpectrumSetPtr spectrum_set = getSpectrumSet(deconv_sp,0,
-                                                   prsm_para_ptr->getSpParaPtr());
-      if(spectrum_set != nullptr){
-        std::string scan = deconv_sp->getHeaderPtr()->getScansString();
-        SimplePrsmPtrVec matches = filter_ptr_->getBestMathBatch(spectrum_set);
-        writer.write(matches);
-      }
-      std::cout << std::flush << "Fast filtering block " << (block +1) << " is processing " << cnt << " of " << n_spectra << " spectra.\r";
+  SimplePrsmWriter writer(output_file_name.c_str());
+  DeconvMsPtr deconv_sp;
+  int cnt = 0;
+  while((deconv_sp = reader.getNextMs()) != nullptr){
+    cnt++;
+    SpectrumSetPtr spectrum_set = getSpectrumSet(deconv_sp,0,
+                                                 prsm_para_ptr->getSpParaPtr());
+    if(spectrum_set != nullptr){
+      std::string scan = deconv_sp->getHeaderPtr()->getScansString();
+      SimplePrsmPtrVec matches = filter_ptr_->getBestMathBatch(spectrum_set);
+      writer.write(matches);
     }
-    reader.close();
-    writer.close();
-    std::cout << std::endl << "Fast filtering block " << (block +1) << " finished. " << std::endl;
+    std::cout << std::flush << "Fast filtering block " << (block +1) << " is processing " << cnt << " of " << n_spectra << " spectra.\r";
+  }
+  reader.close();
+  writer.close();
+  std::cout << std::endl << "Fast filtering block " << (block +1) << " finished. " << std::endl;
 }
 
-void PtmFastFilterProcessor::combineBlock(std::string sp_file_name){
-    //system.out
-    SimplePrsmPtrVec2D matches;
+void PtmFastFilterProcessor::combineBlock(){
+  SimplePrsmPtrVec2D matches;
 
-    //pravate readsimplePrsm
-    for(int i=0;i<filter_ptr_->getBlockSize();i++){
-        std::stringstream block_s;
-        block_s<<i;
-        std::string block_file_name = basename(mng_ptr_->prsm_para_ptr_->getSpectrumFileName()) 
-        + "." + mng_ptr_->output_file_ext_+"_"+block_s.str();
-        matches.push_back(prot::readSimplePrsm(block_file_name.c_str()));
-    }
+  std::string sp_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
 
-    MsAlignReader reader(sp_file_name.c_str());
-    std::string output_file_name = basename(mng_ptr_->prsm_para_ptr_->getSpectrumFileName()) 
+  std::vector<int> pointers;
+  for(int i=0;i<filter_ptr_->getBlockSize();i++){
+    std::stringstream block_s;
+    block_s<<i;
+    std::string block_file_name = basename(sp_file_name) + 
+        "." + mng_ptr_->output_file_ext_+"_"+block_s.str();
+    matches.push_back(prot::readSimplePrsm(block_file_name.c_str()));
+    pointers.push_back(0);
+  }
+
+
+  MsAlignReader reader(sp_file_name.c_str());
+  std::string output_file_name = basename(sp_file_name) 
       + "." + mng_ptr_->output_file_ext_+"_COMBINED";
-    SimplePrsmWriter writer(output_file_name.c_str());
-    DeconvMsPtr deconv_sp;
-    while((deconv_sp = reader.getNextMs()) != nullptr){
-        SimplePrsmPtrVec selected_matches;
-        for(unsigned int i=0;i<matches.size();i++){
-            for(unsigned int j=0;j<matches[i].size();j++){
-                if(matches[i][j]->isMatch(deconv_sp->getHeaderPtr())){
-                    selected_matches.push_back(matches[i][j]);
-                }
-            }
+  SimplePrsmWriter writer(output_file_name.c_str());
+  DeconvMsPtr deconv_sp;
+  while((deconv_sp = reader.getNextMs()) != nullptr){
+    SimplePrsmPtrVec selected_matches;
+    for(unsigned int i = 0;i<matches.size();i++){
+      for(unsigned int j = pointers[i]; j<matches[i].size(); j++){
+        if(matches[i][j]->isMatch(deconv_sp->getHeaderPtr())){
+          selected_matches.push_back(matches[i][j]);
         }
-        writer.write(selected_matches);
+        if (matches[i][j]->isPass(deconv_sp->getHeaderPtr())) {
+          pointers[i] = j;
+          break;
+        }
+      }
     }
-    reader.close();
-    writer.close();
-    //system.out
+    std::sort(selected_matches.begin(),selected_matches.end(),simplePrsmDown);
+    SimplePrsmPtrVec result_matches;
+    for(unsigned int i=0; i < selected_matches.size(); i++){
+      if( (int)i >= mng_ptr_-> ptm_fast_filter_result_num_){
+        break;
+      }
+      result_matches.push_back(selected_matches[i]);
+    }
+
+    writer.write(result_matches);
+  }
+  reader.close();
+  writer.close();
+  //system.out
 }
 
 } /* namespace prot */

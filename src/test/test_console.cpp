@@ -59,6 +59,7 @@ int process(int argc, char* argv[]) {
     std::istringstream (arguments["maxPtmMass"]) >> max_ptm_mass;
 
     PrsmParaPtr prsm_para_ptr = PrsmParaPtr(new PrsmPara(arguments));
+
     if (arguments["searchType"] == "TARGET+DECOY") {
       generateShuffleDb(ori_db_file_name, db_file_name);
     }
@@ -67,12 +68,12 @@ int process(int argc, char* argv[]) {
     ZeroPtmMngPtr zero_mng_ptr = ZeroPtmMngPtr(new ZeroPtmMng (prsm_para_ptr, "ZERO"));
     zeroPtmSearchProcess(zero_mng_ptr);
 
-
     std::cout << "Fast filtering starts " << std::endl;
     PtmFastFilterMngPtr filter_mng_ptr 
         = PtmFastFilterMngPtr(new PtmFastFilterMng(prsm_para_ptr, "FILTER"));
     PtmFastFilterProcessorPtr filter_processor = PtmFastFilterProcessorPtr(new PtmFastFilterProcessor(filter_mng_ptr));
-    filter_processor->process();
+    //filter_processor->process();
+    filter_processor->combineBlock();
     filter_processor = nullptr;
 
     std::cout << "Ptm searching starts" << std::endl;

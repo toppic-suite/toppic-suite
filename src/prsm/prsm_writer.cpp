@@ -14,9 +14,6 @@ PrsmWriter::PrsmWriter(std::string file_name) {
   LOG_DEBUG("file_name " << file_name);
   file_ << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << std::endl;
   file_ << "<prsm_list>";
-  XmlDOMImpl* impl = XmlDOMImplFactory::getXmlDOMImplInstance();
-  doc_ = new XmlDOMDocument(impl->createDoc("prsm_list"));
-  serializer_ = impl->createSerializer();
 }
 
 void PrsmWriter::close(){
@@ -25,20 +22,21 @@ void PrsmWriter::close(){
 }
 
 PrsmWriter::~PrsmWriter() {
-//  file_ << "</prsm_list>" << std::endl;
-//  file_.close();
-  serializer_->release();
-  delete doc_;
 }
 
 void PrsmWriter::write(PrsmPtr prsm_ptr) {
   if(prsm_ptr!=nullptr){
-    xercesc::DOMElement* element = prsm_ptr->toXmlElement(doc_);
+    XmlDOMImpl* impl = XmlDOMImplFactory::getXmlDOMImplInstance();
+    xercesc::DOMLSSerializer* serializer = impl->createSerializer();
+    XmlDOMDocument* doc = new XmlDOMDocument(impl->createDoc("prsm_list"));
+    xercesc::DOMElement* element = prsm_ptr->toXmlElement(doc);
     //LOG_DEBUG("Element generated");
-    std::string str = writeToString(serializer_, element);
+    std::string str = writeToString(serializer, element);
     //LOG_DEBUG("String generated");
     writeToStreamByRemovingDoubleLF(file_, str);
     element->release();
+    serializer->release();
+    delete doc;
   }
 }
 
