@@ -51,7 +51,8 @@ class Diagonal{
 };
 
 DiagonalHeaderPtrVec refineHeadersBgnEnd(
-    int first_pos,
+    int first_res_pos,
+    int last_res_pos,
     ProteoformPtr seq,
     DeconvMsPtr deconv_ms,
     ExtendMsPtr ms_three,

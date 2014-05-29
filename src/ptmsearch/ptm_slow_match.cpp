@@ -61,7 +61,7 @@ PrsmPtr PtmSlowMatch::geneResult(int shift_num){
   int first_pos = headers[0]->getTruncFirstResPos();
   int last_pos = headers[headers.size()-1]->getTruncLastResPos();
   DiagonalHeaderPtrVec refined_headers = refineHeadersBgnEnd(
-      first_pos, seq_, deconv_ms_, ms_three_,mng_, headers);
+      first_pos, last_pos, seq_, deconv_ms_, ms_three_,mng_, headers);
 
   if(refined_headers.size()==0){
     return nullptr;

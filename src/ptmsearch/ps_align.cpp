@@ -303,16 +303,16 @@ DiagonalHeaderPtrVec PSAlign::backtrace(int s) {
     DPPairPtr pre = p->getPre(s);
     if (p == last_pair_) {
       cur_header = pre->getDiagonalHeader();
-      cur_end = pre->getY() - 1;
+      cur_end = pre->getY();
     } else if (pre == first_pair_) {
       cur_bgn = p->getY();
-      list.push_back(getDiagonalHeaderPtr(cur_header, cur_bgn, cur_end));
+      list.push_back(getDiagonalHeaderPtr(cur_bgn, cur_end, cur_header));
     } else {
       if (p->getType(s) == PATH_TYPE_SHIFT) {
         cur_bgn = p->getY();
-        list.push_back(prot::getDiagonalHeaderPtr(cur_header, cur_bgn, cur_end));
+        list.push_back(prot::getDiagonalHeaderPtr(cur_bgn, cur_end, cur_header));
         cur_header = pre->getDiagonalHeader();
-        cur_end = pre->getY() - 1;
+        cur_end = pre->getY();
       }
     }
     if (p->getType(s) == PATH_TYPE_SHIFT) {
