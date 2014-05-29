@@ -41,9 +41,9 @@ class DiagonalHeader {
 
   int getTruncFirstResPos() {return trunc_first_res_pos_;}
 
-  int getMatchFirstResPos() {return match_first_res_pos_;}
+  int getMatchFirstBpPos() {return match_first_bp_pos_;}
 
-  int getMatchLastResPos() {return match_last_res_pos_;}
+  int getMatchLastBpPos() {return match_last_bp_pos_;}
 
   double getPepCTermShift() {return pep_C_term_shift_;}
 
@@ -83,12 +83,12 @@ class DiagonalHeader {
     trunc_last_res_pos_ = truncLastResPos;
   }
 
-  void setMatchFirstResPos(int matchFirstResPos) {
-    match_first_res_pos_ = matchFirstResPos;
+  void setMatchFirstBpPos(int match_first_bp_pos) {
+    match_first_bp_pos_ = match_first_bp_pos;
   }
 
-  void setMatchLastResPos(int matchLastResPos) {
-    match_last_res_pos_ = matchLastResPos;
+  void setMatchLastBpPos(int match_last_bp_pos) {
+    match_last_bp_pos_ = match_last_bp_pos;
   }
 
   void setNTrunc(bool n_trunc){n_trunc_ = n_trunc;}
@@ -123,7 +123,7 @@ class DiagonalHeader {
   bool n_trunc_ = false;
   bool n_strict_ = false;
   int trunc_first_res_pos_=0;
-  int match_first_res_pos_=0;
+  int match_first_bp_pos_=0;
   double prot_N_term_shift_=0;
   bool prot_N_term_match_ = false;
   double pep_N_term_shift_=0.0;
@@ -135,7 +135,7 @@ class DiagonalHeader {
   bool c_trunc_ = false;
   bool c_strict_ = false;
   int trunc_last_res_pos_=0;
-  int match_last_res_pos_=0;
+  int match_last_bp_pos_=0;
   double prot_C_term_shift_=0.0;
   bool prot_C_term_match_ = false;
   double pep_C_term_shift_=0.0;
@@ -145,7 +145,7 @@ class DiagonalHeader {
   bool is_align_suffix_=false;
 };
 
-DiagonalHeaderPtr getDiagonalHeaderPtr(DiagonalHeaderPtr shift,int bgn,int end);
+DiagonalHeaderPtr getDiagonalHeaderPtr(int bgn, int end, DiagonalHeaderPtr shift);
 DiagonalHeaderPtrVec getNTermShiftListCommon(std::vector<double> best_shifts);
 DiagonalHeaderPtrVec getNTermShiftListCompLeft(ProteoformPtr seq,PtmMngPtr mng);
 DiagonalHeaderPtrVec getNTermShiftListCompRight(ProteoformPtr seq,PrmMsPtr ms_six);

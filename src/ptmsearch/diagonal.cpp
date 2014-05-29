@@ -32,14 +32,15 @@ TheoPeakPtrVec getDiagonalTheoPeak(ProteoformPtr seq,ActivationPtr type,
   //  std::cout<<std::fixed<<pep->getResSeqMass()<<"|"<<pep_n_term_shift<<"|"<<pep_c_term_shift<<std::endl;
   return getTheoPeak(pep,type,NeutralLossFactory::getNeutralLossPtr_NONE(),
                      pep_n_term_shift,pep_c_term_shift,
-                     headers[i]->getMatchFirstResPos()-first_res_pos,
-                     headers[i]->getMatchLastResPos()-first_res_pos+1,
+                     headers[i]->getMatchFirstBpPos()-first_res_pos,
+                     headers[i]->getMatchLastBpPos()-first_res_pos,
                      minMass, 
                      maxMass);
 }
 
 DiagonalHeaderPtrVec refineHeadersBgnEnd(
-    int first_pos,
+    int first_res_pos,
+    int last_res_pos,
     ProteoformPtr seq,
     DeconvMsPtr deconv_ms,
     ExtendMsPtr ms_three,
@@ -54,18 +55,32 @@ DiagonalHeaderPtrVec refineHeadersBgnEnd(
         headers,
         i,
         mng->prsm_para_ptr_->getSpParaPtr()->getMinMass());
-    int bgn = headers[i]->getMatchFirstResPos()-first_pos;
-    int end = headers[i]->getMatchLastResPos()+1-first_pos;
+    int bgn = headers[i]->getMatchFirstBpPos()-first_res_pos;
+    int end = headers[i]->getMatchLastBpPos()-first_res_pos;
     PeakIonPairPtrVec pairs = findPairs(ms_three,ions,bgn,end);
     if(pairs.size()<1){
       int pair_size = pairs.size();
       LOG_WARN("Empty Segment is found "+prot::convertToString(pair_size));
+      if (i == 0 ) {
+        int new_bgn = first_res_pos;
+        int new_end = first_res_pos;
+        headers[i]->setMatchFirstBpPos(new_bgn);
+        headers[i]->setMatchLastBpPos(new_end);
+        result_list.push_back(headers[i]);
+      }
+      else if (i == headers.size() - 1) {
+        int new_bgn = last_res_pos + 1;
+        int new_end = last_res_pos + 1;
+        headers[i]->setMatchFirstBpPos(new_bgn);
+        headers[i]->setMatchLastBpPos(new_end);
+        result_list.push_back(headers[i]);
+      }
     }
     else{
-      int new_bgn = first_pos + getNewBgn(pairs);
-      int new_end = first_pos + getNewEnd(pairs);
-      headers[i]->setMatchFirstResPos(new_bgn);
-      headers[i]->setMatchLastResPos(new_end);
+      int new_bgn = first_res_pos + getNewBgn(pairs);
+      int new_end = first_res_pos + getNewEnd(pairs);
+      headers[i]->setMatchFirstBpPos(new_bgn);
+      headers[i]->setMatchLastBpPos(new_end);
       result_list.push_back(headers[i]);
     }
   }
