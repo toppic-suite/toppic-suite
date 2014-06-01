@@ -33,10 +33,9 @@ TheoPeakPtrVec getDiagonalTheoPeak(ProteoformPtr seq,ActivationPtr type,
                      pep_n_term_shift,pep_c_term_shift,
                      headers[i]->getMatchFirstBpPos()-first_res_pos,
                      headers[i]->getMatchLastBpPos()-first_res_pos,
-                     min_mass, 
-                     max_mass);
+                     minMass, 
+                     maxMass);
 }
-
 
 DiagonalHeaderPtrVec refineHeadersBgnEnd(
     int first_res_pos,
@@ -46,17 +45,15 @@ DiagonalHeaderPtrVec refineHeadersBgnEnd(
     ExtendMsPtr ms_three,
     PtmMngPtr mng,
     DiagonalHeaderPtrVec headers){
-
   DiagonalHeaderPtrVec result_list;
+  //    std::cout<<headers.size()<<std::endl;
   for(unsigned int i=0;i<headers.size();i++){
-
     TheoPeakPtrVec ions = prot::getDiagonalTheoPeak(
         seq,
         deconv_ms->getHeaderPtr()->getActivationPtr(),
         headers,
         i,
         mng->prsm_para_ptr_->getSpParaPtr()->getMinMass());
-
     int bgn = headers[i]->getMatchFirstBpPos()-first_res_pos;
     int end = headers[i]->getMatchLastBpPos()-first_res_pos;
     PeakIonPairPtrVec pairs = findPairs(ms_three,ions,bgn,end);
@@ -107,5 +104,4 @@ int getNewEnd(PeakIonPairPtrVec pairs){
   }
   return new_end;
 }
-
 } /* namespace prot */

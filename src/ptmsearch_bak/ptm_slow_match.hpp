@@ -10,7 +10,6 @@
 
 #include <memory>
 #include <vector>
-
 #include "base/proteoform.hpp"
 #include "spec/prm_peak.hpp"
 #include "spec/deconv_ms.hpp"
@@ -20,37 +19,56 @@
 #include "ptmsearch/ptm_mng.hpp"
 #include "ptmsearch/comp_shift_low_mem.hpp"
 #include "ptmsearch/ptm_mng.hpp"
+#include "ptmsearch/diagonal.hpp"
 #include "ptmsearch/basic_diag_pair.hpp"
 #include "ptmsearch/ps_align.hpp"
-//#include "ptmsearch/diagonal.hpp"
 
 namespace prot {
 
 class PtmSlowMatch {
  public:
-  PtmSlowMatch(ProteoformPtr seq,
+  PtmSlowMatch(
+      ProteoformPtr seq,
       SpectrumSetPtr spectrum_set,
       CompShiftLowMemPtr comp_shift,
       PtmMngPtr mng);
-
-  ProteoformPtr getProteoform(){return proteoform_;};
+  ProteoformPtr getSeq(){return seq_;};
+  double getScr(int shiftnum,int type);
+  PrsmPtr geneResult(int shift_num);
   void compute(SemiAlignTypePtr type, PrsmPtrVec &prsms);
 
  private:
   PtmMngPtr mng_;
-  ProteoformPtr proteoform_;
+  ProteoformPtr seq_;
   DeconvMsPtr deconv_ms_;
   PrmMsPtr ms_six_;
   ExtendMsPtr ms_three_;
   PSAlignPtr ps_align_;
 
-  void initPsAlign(CompShiftLowMemPtr comp_shift);
+  std::vector<double> scores_;
 
-  DiagonalHeaderPtrVec getNTermShiftHeaders(
-      std::vector<double> best_shifts, PrmMsPtr ms_six, 
-      ProteoformPtr proteoform, PtmMngPtr mng);
+  DiagonalHeaderPtrVec2D headers_;
 
-  PrsmPtr geneResult(int shift_num);
+  DiagonalHeaderPtrVec2D prefix_headers_;
+  DiagonalHeaderPtrVec2D suffix_headers_;
+  DiagonalHeaderPtrVec2D internal_headers_;
+  std::vector<double> complete_deltas_;
+  std::vector<double> prefix_deltas_;
+  std::vector<double> suffix_deltas_;
+  std::vector<double> internal_deltas_;
+
+  void init(CompShiftLowMemPtr comp_shift);
+
+  DiagonalHeaderPtrVec getNTermShiftList(
+      std::vector<double> best_shift,
+      PrmMsPtr ms_six,
+      ProteoformPtr seq,
+      PtmMngPtr mng);
+
+  bool found(
+      double shift,
+      DiagonalHeaderPtrVec headerlist,
+      double trunc_error_tolerance);
 };
 
 typedef std::shared_ptr<PtmSlowMatch> PtmSlowMatchPtr;

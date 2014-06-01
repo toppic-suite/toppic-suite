@@ -24,8 +24,8 @@ class PSAlign {
   void backtrace();
   DiagonalHeaderPtrVec backtrace(int s);
 
-  double getAlignScr(int s){return align_scores_[s];};
-  DiagonalHeaderPtrVec getResult(int s){return backtrack_diagonals_[s];};
+  std::vector<double> getAlignScr(){return align_scores_;};
+  DiagonalHeaderPtrVec2D getResult(){return backtrack_diagonals_;};
 
  protected:
   PtmMngPtr mng_;

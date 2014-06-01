@@ -9,7 +9,6 @@
 #define PROT_PTM_SLOW_FILTER_HPP_
 
 #include <memory>
-
 #include "spec/spectrum_set.hpp"
 #include "prsm/simple_prsm.hpp"
 #include "ptmsearch/ptm_mng.hpp"
@@ -26,7 +25,6 @@ class PtmSlowFilter {
       CompShiftLowMemPtr comp_shift,
       PtmMngPtr mng);
   PrsmPtrVec getPrsms(int nshift, SemiAlignTypePtr type);
-
  private:
   PtmSlowMatchPtrVec complete_prefix_slow_matches_;
   PtmSlowMatchPtrVec suffix_internal_slow_matches_;

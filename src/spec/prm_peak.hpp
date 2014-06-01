@@ -77,10 +77,9 @@ PrmMsPtr getMsSix(const DeconvMsPtr &deconv_ms, double delta,
 PrmMsPtr getShiftMsSix(const DeconvMsPtr &deconv_ms, double delta, 
                        double shift, const SpParaPtr &sp_para);
 
-std::vector<std::vector<int>> getIntMassErrorList(const PrmMsPtr &ms,
-                                                  double scale,
-                                                  bool n_strict,
-                                                  bool c_strict);
+std::vector<std::vector<int>> getIntMassErrorList(const PrmMsPtr &ms, double scale,
+                                                  bool n_strict, bool c_strict);
+
 std::vector<double> getMassList(const PrmMsPtr &ms);
 std::vector<double> getScoreList(const PrmMsPtr &ms);
 
