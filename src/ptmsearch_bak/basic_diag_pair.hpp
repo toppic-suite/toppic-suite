@@ -62,7 +62,7 @@ class BasicDiagPair:public Pair {
 
 };
 
-//bool contains(BasicDiagPairPtrVec pairs,int y);
+bool contains(BasicDiagPairPtrVec pairs,int y);
 
 BasicDiagPairPtrVec compDiagPair(PrmMsPtr sp,std::vector<double> seq_masses,
                                  DiagonalHeaderPtr header);

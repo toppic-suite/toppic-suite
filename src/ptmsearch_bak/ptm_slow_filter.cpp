@@ -8,7 +8,6 @@
 #include "ptmsearch/ptm_slow_filter.hpp"
 
 namespace prot {
-
 PtmSlowFilter::PtmSlowFilter(
     SpectrumSetPtr spectrum_set,
     SimplePrsmPtrVec fast_Matches,
@@ -28,7 +27,7 @@ PtmSlowFilter::PtmSlowFilter(
   }
   // init suffix_internal_slow_matches
   for(unsigned int i=0; i<complete_prefix_slow_matches_.size();i++){
-    ProtModPtr prot_mod = complete_prefix_slow_matches_[i]->getProteoform()->getProtModPtr();
+    ProtModPtr prot_mod = complete_prefix_slow_matches_[i]->getSeq()->getProtModPtr();
     if (prot_mod == ProtModFactory::getProtModPtr_NONE()) {
       suffix_internal_slow_matches_.push_back(complete_prefix_slow_matches_[i]);
     }
@@ -85,7 +84,7 @@ PrsmPtrVec PtmSlowFilter::getPrsms(int nshift, SemiAlignTypePtr type){
       }
     }
   }
-  return matches;
+    return matches;
 }
 
 } /* namespace prot */
