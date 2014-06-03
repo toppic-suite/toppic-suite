@@ -161,9 +161,18 @@ double Proteoform::getMass(){
   return mass;
 }
 
+std::string getDbResSeqString(DbResSeqPtr seq) {
+  std::stringstream s;
+  for (unsigned int i = 0; i < seq->getResidues().size(); i++) {
+    s << seq->getResidues()[i]->getAcidPtr()->getOneLetter();
+  }
+  s << std::endl;
+  return s.str();
+}
+
 std::string Proteoform::getProteinMatchSeq(){
   std::string result="";
-  std::string protein_string = db_residue_seq_ptr_->toString();
+  std::string protein_string = getDbResSeqString(db_residue_seq_ptr_);
   std::string mid_string = protein_string.substr(start_pos_,end_pos_+1);
   int mid_start=0;
   std::sort(change_list_.begin(),change_list_.end(),compareChangeUp);
