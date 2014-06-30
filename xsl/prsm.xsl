@@ -711,21 +711,55 @@
 <div>
 <br/>
 <xsl:text disable-output-escaping="yes">Variable PTM:&amp;nbsp;</xsl:text>
+<br/>
+<br/>
+
+<xsl:if test="../know_ptm_number != 0">
+<table border="1" style="margin-left: 50" >
+<tr>
+	<td width="120">Name</td>
+    <td width="130">Monoisotopic mass</td>
+    <td width="80">Position</td>
+    <td width="80">Score</td>
+</tr>
 <xsl:for-each select="shift" >
-   <xsl:if test="known_type = 2">
-    <span style ="color:{color};">
-       <xsl:value-of select="type"/>
-       <xsl:variable name="vptmColor" select="color"/>
-       <xsl:for-each select="../../annotation/character" >
-         <xsl:if test="shift_style = $vptmColor">
-         <xsl:text disable-output-escaping="yes"> [</xsl:text>
-         <xsl:value-of select="acid"/><xsl:value-of select="position"/>
-         <xsl:text disable-output-escaping="yes">]&amp;nbsp;</xsl:text>
-         </xsl:if>
-       </xsl:for-each>
-    </span>
+   <xsl:if test="known_type = 3">
+		<tr>
+		<th rowspan="{possible_pos}" align="center"><a href="{link}"><xsl:value-of select="type"/></a></th>
+		<td rowspan="{possible_pos}" align="center"><xsl:value-of select="mass"/></td>
+		</tr>
+		<xsl:for-each select="pos_score">
+			<tr>
+			  <td><xsl:value-of select="@pos"/></td>
+			  <td><xsl:value-of select="."/></td>
+			 </tr>
+		</xsl:for-each>
+		
    </xsl:if>
 </xsl:for-each>
+</table>
+<br/>
+</xsl:if>
+
+<xsl:text disable-output-escaping="yes">Unknown PTM:&amp;nbsp;</xsl:text>
+<br/><br/>
+<xsl:if test="../unknow_ptm_number != 0">
+<table border="1" style="margin-left: 50" >
+<tr>
+    <td width="140">Monoisotopic mass</td>
+</tr>
+<xsl:for-each select="shift" >
+   <xsl:if test="known_type = 4">
+	<tr>
+	<td align="center"><xsl:value-of select="mass"/></td>
+	</tr>
+   </xsl:if>
+</xsl:for-each>
+</table>
+</xsl:if>
+
+
+
 </div>
 </xsl:template>
 
