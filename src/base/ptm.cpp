@@ -62,7 +62,7 @@ void PtmFactory::initFactory(const std::string &file_name) {
 }
 
 PtmPtr PtmFactory::findEmptyPtmPtr() {
-  for (unsigned int i = 0; i < ptm_ptr_vec_.size(); i++) {
+  for (size_t i = 0; i < ptm_ptr_vec_.size(); i++) {
     if (ptm_ptr_vec_[i]->isEmpty()) {
       return ptm_ptr_vec_[i];
     }
@@ -75,7 +75,7 @@ PtmPtr PtmFactory::findEmptyPtmPtr() {
  *   abbreviation name does not exist.
  */
 PtmPtr PtmFactory::getBasePtmPtrByAbbrName(const std::string &abbr_name) {
-  for (unsigned int i = 0; i < ptm_ptr_vec_.size(); i++) {
+  for (size_t i = 0; i < ptm_ptr_vec_.size(); i++) {
     std::string n = ptm_ptr_vec_[i]->getAbbrName();
     if (n == abbr_name) {
       return ptm_ptr_vec_[i];

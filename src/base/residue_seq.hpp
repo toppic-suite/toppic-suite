@@ -29,7 +29,7 @@ class ResidueSeq {
   ResiduePtr getResiduePtr(int i) {return residues_[i];}
 
   /** Gets all residues */
-  ResiduePtrVec getResidues() {return residues_;}
+  const ResiduePtrVec& getResidues() {return residues_;}
 
   /** Gets sequence molecular mass */
   double getSeqMass() {
@@ -40,6 +40,8 @@ class ResidueSeq {
   double getResMassSum() {return residue_mass_sum_;}
 
   std::string toString();
+
+  std::string toAcidString();
 
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 

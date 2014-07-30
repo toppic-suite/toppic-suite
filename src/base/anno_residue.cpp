@@ -1,11 +1,6 @@
-/*
- * anno_residue.cpp
- *
- *  Created on: Apr 1, 2014
- *      Author: xunlikun
- */
 
 #include "base/anno_residue.hpp"
+
 namespace prot {
 
 AnnoResidue::AnnoResidue(ResiduePtr residue_ptr):

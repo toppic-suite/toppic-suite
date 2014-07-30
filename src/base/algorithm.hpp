@@ -1,13 +1,14 @@
 #ifndef PROT_ALGORITHM_HPP_
 #define PROT_ALGORITHM_HPP_
 
+#include <cstddef>
 #include <vector>
 
 namespace prot {
 
 /* used in find matched mass pairs */
-bool increaseIJ(unsigned int i, unsigned int j, double deviation, 
-                double tolerance, const std::vector<double> &ms_masses, 
+bool increaseIJ(size_t i, size_t j, double deviation, double tolerance, 
+                const std::vector<double> &ms_masses, 
                 const std::vector<double> &theo_masses);
 
 /* compute ppos for ms_masses */

@@ -1,9 +1,3 @@
-/*
- * BreakPoint.hpp
- *
- *  Created on: Nov 26, 2013
- *      Author: xunlikun
- */
 
 #ifndef PROT_BREAK_POINT_HPP_
 #define PROT_BREAK_POINT_HPP_

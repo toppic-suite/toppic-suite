@@ -14,17 +14,17 @@ namespace prot {
 class ProtMod {
  public:
   ProtMod(const std::string &name, 
-          const TruncPtr &trunc_ptr, 
-          const PtmPtr &ptm_ptr,
+          TruncPtr trunc_ptr, 
+          PtmPtr ptm_ptr,
           const AcidPtrVec &valid_acid_ptr_vec);
 
-  std::string getName() {return name_;};
+  const std::string& getName() {return name_;};
 
   TruncPtr getTruncPtr() {return trunc_ptr_;}
 
   PtmPtr getPtmPtr() {return ptm_ptr_;}
 
-  AcidPtrVec getAcidPtrVec(){return valid_acid_ptr_vec_;}
+  const AcidPtrVec& getAcidPtrVec(){return valid_acid_ptr_vec_;}
 
   double getProtShift() {return prot_shift_;}
 
@@ -52,7 +52,7 @@ class ProtModFactory {
  public:
   static void initFactory(const std::string &file_name);
 
-  static ProtModPtrVec& getBaseProtModPtrVec() {return prot_mod_ptr_vec_;}
+  static const ProtModPtrVec& getBaseProtModPtrVec() {return prot_mod_ptr_vec_;}
   
   static ProtModPtr getBaseProtModPtrByName (const std::string &name);
 

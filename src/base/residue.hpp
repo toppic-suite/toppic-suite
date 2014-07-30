@@ -18,7 +18,7 @@ namespace prot {
 
 class Residue {
  public:
-  Residue(const AcidPtr &acid_ptr, const PtmPtr &ptm_ptr); 
+  Residue(AcidPtr acid_ptr, PtmPtr ptm_ptr); 
 
   Residue(const std::string &acid_name, const std::string &abbr_name);
 
@@ -34,8 +34,7 @@ class Residue {
   /**
    * Checks if the residue contains the same amino acid and ptm.
    */
-  bool isSame(const AcidPtr &acid_ptr, 
-              const PtmPtr &ptm_ptr) {
+  bool isSame(AcidPtr acid_ptr, PtmPtr ptm_ptr) {
     return acid_ptr_.get() == acid_ptr.get() && ptm_ptr_.get() == ptm_ptr.get();
   }
 
@@ -60,9 +59,9 @@ typedef std::shared_ptr<Residue> ResiduePtr;
 typedef std::vector<ResiduePtr> ResiduePtrVec;
 
 ResiduePtr getResiduePtrByAcid(const ResiduePtrVec &residue_list,
-                               const AcidPtr &acid_ptr);
+                               AcidPtr acid_ptr);
 
-int findResidue(const ResiduePtrVec &residue_list, const ResiduePtr &residue_ptr);
+int findResidue(const ResiduePtrVec &residue_list, ResiduePtr residue_ptr);
 
 ResiduePtrVec convertAcidToResidueSeq(const ResiduePtrVec &residue_list,
                                       const AcidPtrVec &acid_list);
@@ -71,13 +70,11 @@ class ResidueFactory {
  public:
   static void initFactory(const std::string &file_name);
 
-  static ResiduePtrVec getBaseResiduePtrVec() {return residue_ptr_vec_;}
+  static const ResiduePtrVec& getBaseResiduePtrVec() {return residue_ptr_vec_;}
   
-  static ResiduePtr getBaseResiduePtrByAcidPtm(const AcidPtr &acid_ptr, 
-                                               const PtmPtr &ptm_ptr);
+  static ResiduePtr getBaseResiduePtrByAcidPtm(AcidPtr acid_ptr, PtmPtr ptm_ptr);
   
-  static ResiduePtr addBaseResidue(const AcidPtr &acid_ptr, 
-                                   const PtmPtr &ptm_ptr);
+  static ResiduePtr addBaseResidue(AcidPtr acid_ptr, PtmPtr ptm_ptr);
   
   static ResiduePtrVec getResiduePtrVecInstance(const std::string &file_name);
 

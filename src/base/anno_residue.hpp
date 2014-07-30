@@ -1,10 +1,3 @@
-/*
- * anno_residue.hpp
- *
- *  Created on: Apr 1, 2014
- *      Author: xunlikun
- */
-
 #ifndef ANNO_RESIDUE_HPP_
 #define ANNO_RESIDUE_HPP_
 
@@ -15,51 +8,30 @@ namespace prot {
 class AnnoResidue : public Residue {
  public:
   AnnoResidue(ResiduePtr residue_ptr);
-  void setPos(int pos) {
-    pos_ = pos;
-  }
 
-  void setDisplayPos(int pos) {
-    display_pos_ = pos;
-  }
+  void setPos(int pos) {pos_ = pos; }
 
-  void setType(std::string type) {
-    type_ = type;
-  }
+  void setDisplayPos(int display_pos) {display_pos_ = display_pos;}
 
-  void setShiftStyle(std::string shift_type) {
-    shift_style_ = shift_type;
-  }
+  void setType(const std::string &type) {type_ = type;}
 
-  std::string getType() {
-    return type_;
-  }
+  void setShiftStyle(const std::string &shift_type) {shift_style_ = shift_type;}
 
-  void setIsModifyed(bool isMod) {
-    is_modified_ = isMod;
-  }
+  std::string getType() {return type_;}
 
-  bool isModified() {
-    return is_modified_;
-  }
+  void setIsModifyed(bool is_modified) {is_modified_ = is_modified;}
 
-  void setShift(double shift) {
-    shift_ = shift;
-  }
+  bool isModified() {return is_modified_;}
 
-  double getShift() {
-    return shift_;
-  }
+  void setShift(double shift) {shift_ = shift;}
 
-  void setExpected(bool e) {
-    is_expected_ = e;
-  }
+  double getShift() {return shift_;}
 
-  void setDisplayBg(int bg){
-    display_bg_ = bg;
-  }
+  void setExpected(bool e) {is_expected_ = e;}
 
-  void appendViewXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+  void setDisplayBg(int bg){display_bg_ = bg;}
+
+  void appendViewXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
  private:
   //residues pos
@@ -68,7 +40,7 @@ class AnnoResidue : public Residue {
   std::string type_ = "normal";
   //display pos shown in match seq
   int display_pos_ = 0;
-  //display in protein html
+  //display background color in html file
   int display_bg_ = -1;
   //is modified
   bool is_modified_ = false;

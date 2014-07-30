@@ -13,19 +13,19 @@ class Trunc {
   Trunc(const std::string &name, int trunc_len, 
         const std::string &str);
 
-  std::string getName() {return name_;}
+  const std::string& getName() {return name_;}
 
   int getTruncLen() {return trunc_len_;}
 
-  AcidPtrVec getAcidPtrVec() {return acid_str_;}
+  const AcidPtrVec& getAcidPtrVec() {return acid_str_;}
 
   double getShift() {return shift_;}
 
   void appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
-  bool isSameTrunc(int len, const ResSeqPtr &res_seq_ptr);
+  bool isSameTrunc(int len, ResSeqPtr res_seq_ptr);
 
-  bool isValidTrunc(const ResSeqPtr &res_seq_ptr);
+  bool isValidTrunc(ResSeqPtr res_seq_ptr);
 
  private:
   std::string name_;
@@ -42,7 +42,7 @@ typedef std::vector<TruncPtr> TruncPtrVec;
 class TruncFactory {
  public:
   static void initFactory(const std::string &file_name);
-  static TruncPtrVec& getBaseTruncPtrVec() {return trunc_ptr_vec_;}
+  static const TruncPtrVec& getBaseTruncPtrVec() {return trunc_ptr_vec_;}
   static TruncPtr getBaseTruncPtrByName(const std::string &name);
 
  private:

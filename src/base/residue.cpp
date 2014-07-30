@@ -9,7 +9,7 @@ namespace prot {
 
 ResiduePtrVec ResidueFactory::residue_ptr_vec_;
 
-Residue::Residue(const AcidPtr &acid_ptr, const PtmPtr &ptm_ptr) {
+Residue::Residue(AcidPtr acid_ptr, PtmPtr ptm_ptr) {
   acid_ptr_ = acid_ptr;
   ptm_ptr_ = ptm_ptr;
   mass_ = acid_ptr->getMonoMass() + ptm_ptr->getMonoMass();
@@ -41,19 +41,18 @@ void Residue::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
     parent->appendChild(element);
 }
 
-ResiduePtr getResiduePtrByAcid(const ResiduePtrVec &residue_ptrs,
-                               const AcidPtr &acid_ptr) {
-  for (unsigned int i = 0; i < residue_ptrs.size(); i++) {
-    if (residue_ptrs[i]->getAcidPtr().get() == acid_ptr.get()) {
-      return residue_ptrs[i];
+ResiduePtr getResiduePtrByAcid(const ResiduePtrVec &residue_ptr_vec,
+                               AcidPtr acid_ptr) {
+  for (size_t i = 0; i < residue_ptr_vec.size(); i++) {
+    if (residue_ptr_vec[i]->getAcidPtr() == acid_ptr) {
+      return residue_ptr_vec[i];
     }
   }
   return ResiduePtr(nullptr);
 }
 
-int findResidue(const ResiduePtrVec &residue_list, 
-                const ResiduePtr &residue_ptr) {
-  for (unsigned int i = 0; i < residue_list.size(); i++) {
+int findResidue(const ResiduePtrVec &residue_list, ResiduePtr residue_ptr) {
+  for (size_t i = 0; i < residue_list.size(); i++) {
     if (residue_list[i] == residue_ptr) {
       return i;
     }
@@ -65,7 +64,7 @@ int findResidue(const ResiduePtrVec &residue_list,
 ResiduePtrVec convertAcidToResidueSeq(const ResiduePtrVec &residue_list,
                                       const AcidPtrVec &acid_ptrs) {
   ResiduePtrVec result_seq;
-  for (unsigned int i = 0; i < acid_ptrs.size(); i++) {
+  for (size_t i = 0; i < acid_ptrs.size(); i++) {
     ResiduePtr residue_ptr = getResiduePtrByAcid(residue_list, acid_ptrs[i]);
     result_seq.push_back(residue_ptr);
   }
@@ -88,9 +87,9 @@ void ResidueFactory::initFactory(const std::string &file_name) {
   }
 }
 
-ResiduePtr ResidueFactory::getBaseResiduePtrByAcidPtm(const AcidPtr &acid_ptr, 
-                                                      const PtmPtr &ptm_ptr) {
-  for (unsigned int i = 0; i < residue_ptr_vec_.size(); i++) {
+ResiduePtr ResidueFactory::getBaseResiduePtrByAcidPtm(AcidPtr acid_ptr, 
+                                                      PtmPtr ptm_ptr) {
+  for (size_t i = 0; i < residue_ptr_vec_.size(); i++) {
     if (residue_ptr_vec_[i]->isSame(acid_ptr, ptm_ptr)) {
       return residue_ptr_vec_[i];
     }
@@ -98,8 +97,8 @@ ResiduePtr ResidueFactory::getBaseResiduePtrByAcidPtm(const AcidPtr &acid_ptr,
   return ResiduePtr(nullptr);
 }
 
-ResiduePtr ResidueFactory::addBaseResidue(const AcidPtr &acid_ptr, 
-                                          const PtmPtr &ptm_ptr) {
+ResiduePtr ResidueFactory::addBaseResidue(AcidPtr acid_ptr, 
+                                          PtmPtr ptm_ptr) {
   ResiduePtr residue_ptr = getBaseResiduePtrByAcidPtm(acid_ptr, ptm_ptr);
   if (residue_ptr.get() == nullptr) {
     ResiduePtr new_ptr(new Residue(acid_ptr, ptm_ptr));

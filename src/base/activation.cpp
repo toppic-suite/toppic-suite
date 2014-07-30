@@ -1,9 +1,3 @@
-/*
- * Activation.cpp
- *
- *  Created on: Nov 25, 2013
- *      Author: xunlikun
- */
 
 #include "base/activation.hpp"
 #include "base/ion_type.hpp"
@@ -14,8 +8,8 @@ namespace prot {
 ActivationPtrVec ActivationFactory::activation_ptr_vec_;
 
 Activation::Activation(const std::string &name, 
-                       const IonTypePtr &n_ion_type_ptr, 
-                       const IonTypePtr &c_ion_type_ptr) {
+                       IonTypePtr n_ion_type_ptr, 
+                       IonTypePtr c_ion_type_ptr) {
   name_ = name;
   n_ion_type_ptr_ = n_ion_type_ptr;
   c_ion_type_ptr_ = c_ion_type_ptr;
@@ -54,7 +48,7 @@ void ActivationFactory::initFactory(const std::string &file_name){
 
 ActivationPtr ActivationFactory::getBaseActivationPtrByName(
     const std::string &name){
-  for (unsigned int i = 0; i < activation_ptr_vec_.size(); i++) {
+  for (size_t i = 0; i < activation_ptr_vec_.size(); i++) {
     std::string n = activation_ptr_vec_[i]->getName();
     if (n == name) {
       return activation_ptr_vec_[i];

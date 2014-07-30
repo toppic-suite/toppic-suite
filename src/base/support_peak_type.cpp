@@ -1,9 +1,3 @@
-/*
- * support_peak_type.cpp
- *
- *  Created on: Dec 4, 2013
- *      Author: xunlikun
- */
 
 #include "base/support_peak_type.hpp"
 #include "base/xml_dom.hpp"
@@ -33,23 +27,23 @@ void SPTypeFactory::initFactory(const std::string &file_name){
 }
 
 SPTypePtr SPTypeFactory::getBaseSPTypePtrByName(const std::string &name){
-    for (unsigned int i = 0; i < sp_type_ptr_vec_.size(); i++) {
-        std::string n = sp_type_ptr_vec_[i]->getName();
-        if (n == name) {
-          return sp_type_ptr_vec_[i];
-        }
-      }
-    return SPTypePtr(nullptr);
+  for (size_t i = 0; i < sp_type_ptr_vec_.size(); i++) {
+    std::string n = sp_type_ptr_vec_[i]->getName();
+    if (n == name) {
+      return sp_type_ptr_vec_[i];
+    }
+  }
+  return SPTypePtr(nullptr);
 }
 
-SPTypePtr SPTypeFactory::getBaseSPTypePtrById(const int id){
-    for (unsigned int i = 0; i < sp_type_ptr_vec_.size(); i++) {
-        int n = sp_type_ptr_vec_[i]->getId();
-        if (n == id) {
-          return sp_type_ptr_vec_[i];
-        }
+SPTypePtr SPTypeFactory::getBaseSPTypePtrById(int id){
+  for (size_t i = 0; i < sp_type_ptr_vec_.size(); i++) {
+    int n = sp_type_ptr_vec_[i]->getId();
+    if (n == id) {
+      return sp_type_ptr_vec_[i];
     }
-    return SPTypePtr(nullptr);
+  }
+  return SPTypePtr(nullptr);
 }
 
 } /* namespace prot */

@@ -26,7 +26,7 @@ class Ptm {
       double mono_mass);
 
   /* Get amino acid composition. */
-  std::string getAbbrName() { return abbr_name_;}
+  const std::string& getAbbrName() { return abbr_name_;}
 
   /* Get  monoisotopic mass. */
   double getMonoMass() {return mono_mass_;}
@@ -51,7 +51,7 @@ class Ptm {
 class PtmFactory {
  public:
   static void initFactory(const std::string &file_name);
-  static PtmPtrVec& getBasePtmPtrVec() {return ptm_ptr_vec_;}
+  static const PtmPtrVec& getBasePtmPtrVec() {return ptm_ptr_vec_;}
   static PtmPtr findEmptyPtmPtr();
   /**
    * Returns a PTM based on the abbreviation name. Returns null if the

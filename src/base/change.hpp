@@ -15,7 +15,7 @@ namespace prot {
 class Change {
  public:
   Change(int left_bp_pos, int right_bp_pos, int change_type,
-         double mass_shift, const PtmPtr &ptm_ptr);
+         double mass_shift, PtmPtr ptm_ptr);
 
   Change(xercesc::DOMElement* change_element);
 

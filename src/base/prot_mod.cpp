@@ -6,8 +6,8 @@ namespace prot {
 
 ProtModPtrVec ProtModFactory::prot_mod_ptr_vec_;
 
-ProtMod::ProtMod(const std::string &name, const TruncPtr &trunc_ptr, 
-                 const PtmPtr &ptm_ptr, const AcidPtrVec &valid_acid_ptr_vec) {
+ProtMod::ProtMod(const std::string &name, TruncPtr trunc_ptr, 
+                 PtmPtr ptm_ptr, const AcidPtrVec &valid_acid_ptr_vec) {
   name_ = name;
   trunc_ptr_ = trunc_ptr;
   ptm_ptr_ = ptm_ptr;
@@ -61,7 +61,7 @@ void ProtModFactory::initFactory(const std::string &file_name) {
       LOG_DEBUG( "name " << name << " trunc_name " 
                 << trunc_name << " valid acids " << valid_acids);
       AcidPtrVec valid_acid_ptrs;
-      for (unsigned int j = 0; j < valid_acids.length(); j++) {
+      for (size_t j = 0; j < valid_acids.length(); j++) {
         std::string letter = valid_acids.substr(j, 1);
         AcidPtr acid_ptr = AcidFactory::getBaseAcidPtrByOneLetter(letter);
         valid_acid_ptrs.push_back(acid_ptr);
@@ -74,7 +74,7 @@ void ProtModFactory::initFactory(const std::string &file_name) {
 }
 
 ProtModPtr ProtModFactory::getBaseProtModPtrByName(const std::string &name) {
-  for (unsigned int i = 0; i < prot_mod_ptr_vec_.size(); i++) {
+  for (size_t i = 0; i < prot_mod_ptr_vec_.size(); i++) {
     std::string n = prot_mod_ptr_vec_[i]->getName();
     if (n == name) {
       return prot_mod_ptr_vec_[i];

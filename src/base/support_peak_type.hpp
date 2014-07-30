@@ -1,9 +1,3 @@
-/*
- * support_peak_type.hpp
- *
- *  Created on: Dec 4, 2013
- *      Author: xunlikun
- */
 
 #ifndef SUPPORT_PEAK_TYPE_HPP_
 #define SUPPORT_PEAK_TYPE_HPP_
@@ -38,11 +32,11 @@ typedef std::vector<SPTypePtr> SPTypePtrVec;
 class SPTypeFactory {
  public:
   static void initFactory(const std::string &file_name);
-  static SPTypePtrVec& getBaseSPTypePtrVec() {
+  static const SPTypePtrVec& getBaseSPTypePtrVec() {
     return sp_type_ptr_vec_;}
 
   static SPTypePtr getBaseSPTypePtrByName(const std::string &name);
-  static SPTypePtr getBaseSPTypePtrById(const int id);
+  static SPTypePtr getBaseSPTypePtrById(int id);
 
   static SPTypePtr getSPTypePtr_N_TERM() {
     return getBaseSPTypePtrByName(SP_TYPE_N_TERM);

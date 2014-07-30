@@ -6,9 +6,9 @@
 
 namespace prot {
 
-Proteoform::Proteoform(const DbResSeqPtr &db_res_seq_ptr, 
-                       const ProtModPtr &prot_mod_ptr,  
-                       const ResSeqPtr &res_seq_ptr, 
+Proteoform::Proteoform(DbResSeqPtr db_res_seq_ptr, 
+                       ProtModPtr prot_mod_ptr,  
+                       ResSeqPtr res_seq_ptr, 
                        int start_pos, int end_pos, 
                        const ChangePtrVec &change_ptr_vec) {
   db_residue_seq_ptr_ = db_res_seq_ptr;
@@ -69,7 +69,7 @@ Proteoform::Proteoform(xercesc::DOMElement* element,
 SegmentPtrVec Proteoform::getSegmentPtrVec() {
   ChangePtrVec unexpected_changes;
   double mass_shift_sum = 0;
-  for (unsigned int i = 0; i < change_list_.size(); i++) {
+  for (size_t i = 0; i < change_list_.size(); i++) {
     if (change_list_[i]->getChangeType() == UNEXPECTED_CHANGE) {
       unexpected_changes.push_back(change_list_[i]);
       mass_shift_sum += change_list_[i]->getMassShift();
@@ -79,7 +79,7 @@ SegmentPtrVec Proteoform::getSegmentPtrVec() {
   double n_shift = 0;
   double c_shift = mass_shift_sum;
   int left = 0;
-  for (unsigned int i = 0; i < unexpected_changes.size(); i++) {
+  for (size_t i = 0; i < unexpected_changes.size(); i++) {
     int right = unexpected_changes[i]->getLeftBpPos();
     SegmentPtr segment_ptr = SegmentPtr(
         new Segment(left, right, n_shift, c_shift)); 
@@ -105,7 +105,7 @@ std::string Proteoform::toString() {
 
 int Proteoform::getUnexpectedChangeNum() {
   int n = 0;
-  for (unsigned int i = 0; i < change_list_.size(); i++) {
+  for (size_t i = 0; i < change_list_.size(); i++) {
     if (change_list_[i]->getChangeType() == UNEXPECTED_CHANGE) {
       n++;
     }
@@ -115,7 +115,7 @@ int Proteoform::getUnexpectedChangeNum() {
 
 ChangePtrVec Proteoform::getUnexpectedChangePtrVec(){
   ChangePtrVec un_change;
-  for (unsigned int i = 0; i < change_list_.size(); i++) {
+  for (size_t i = 0; i < change_list_.size(); i++) {
     if (change_list_[i]->getChangeType() == UNEXPECTED_CHANGE) {
       un_change.push_back(change_list_[i]);
     }
@@ -152,7 +152,7 @@ SemiAlignTypePtr Proteoform::getSemiAlignType() {
 
 double Proteoform::getMass(){
   double mass = getResSeqPtr()->getSeqMass();
-  for(unsigned int i = 0;i<change_list_.size();i++){
+  for(size_t i = 0;i<change_list_.size();i++){
     // only unexpected changes need to to added 
     if (change_list_[i]->getChangeType() == UNEXPECTED_CHANGE) {
       mass += change_list_[i]->getMassShift();
@@ -161,23 +161,14 @@ double Proteoform::getMass(){
   return mass;
 }
 
-std::string getDbResSeqString(DbResSeqPtr seq) {
-  std::stringstream s;
-  for (unsigned int i = 0; i < seq->getResidues().size(); i++) {
-    s << seq->getResidues()[i]->getAcidPtr()->getOneLetter();
-  }
-  s << std::endl;
-  return s.str();
-}
-
 std::string Proteoform::getProteinMatchSeq(){
   std::string result="";
-  std::string protein_string = getDbResSeqString(db_residue_seq_ptr_);
+  std::string protein_string = db_residue_seq_ptr_->toAcidString();
   std::string mid_string = protein_string.substr(start_pos_,end_pos_+1);
   int mid_start=0;
   std::sort(change_list_.begin(),change_list_.end(),compareChangeUp);
   ChangePtrVec change_stack;
-  for(unsigned int i=0;i<change_list_.size();i++){
+  for(size_t i=0;i<change_list_.size();i++){
     while(change_stack.size()>0){
       if(change_list_[i]->getLeftBpPos() < change_stack[change_stack.size()-1]->getRightBpPos()){
         result += mid_string.substr(mid_start,change_list_[i]->getLeftBpPos()-mid_start);
@@ -235,14 +226,14 @@ void Proteoform::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
   //    residue_seq_ptr_->appendXml(xml_doc,element);
   //    bp_spec_ptr_->appendXml(xml_doc,element);
   xercesc::DOMElement* cl = xml_doc->createElement("change_list");
-  for(unsigned int i=0;i<change_list_.size();i++){
+  for(size_t i=0;i<change_list_.size();i++){
     change_list_[i]->appendXml(xml_doc,cl);
   }
   element->appendChild(cl);
   parent->appendChild(element);
 }
 
-ProteoformPtr getDbProteoformPtr(const DbResSeqPtr &db_res_seq_ptr) {
+ProteoformPtr getDbProteoformPtr(DbResSeqPtr db_res_seq_ptr) {
   int start_pos = 0;
   int end_pos = db_res_seq_ptr->getLen() - 1;
   ChangePtrVec change_list;  
@@ -260,8 +251,8 @@ ProteoformPtr getDbProteoformPtr(const DbResSeqPtr &db_res_seq_ptr) {
                                       change_list));
 }
 
-ProteoformPtr getProtModProteoform(const ProteoformPtr &db_form_ptr,
-                                   const ProtModPtr &prot_mod_ptr) {
+ProteoformPtr getProtModProteoform(ProteoformPtr db_form_ptr,
+                                   ProtModPtr prot_mod_ptr) {
   // check if the proteoform can be truncated
   TruncPtr trunc_ptr = prot_mod_ptr->getTruncPtr();
   DbResSeqPtr db_res_seq_ptr = db_form_ptr->getDbResSeqPtr();  
@@ -318,7 +309,7 @@ ProteoformPtr getProtModProteoform(const ProteoformPtr &db_form_ptr,
                      db_res_seq_ptr->getLen()-1, change_list));
 }
 
-ProteoformPtr getSubProteoform(const ProteoformPtr &proteoform_ptr, 
+ProteoformPtr getSubProteoform(ProteoformPtr proteoform_ptr, 
                                int local_start, int local_end) {
   ResiduePtrVec residues;
   ResSeqPtr res_seq_ptr = proteoform_ptr->getResSeqPtr();  
@@ -328,7 +319,7 @@ ProteoformPtr getSubProteoform(const ProteoformPtr &proteoform_ptr,
   ResSeqPtr seq_ptr = ResSeqPtr(new ResidueSeq(residues));
   ChangePtrVec change_list;
   ChangePtrVec ori_change_list = proteoform_ptr->getChangePtrVec();
-  for (unsigned int i = 0; i < ori_change_list.size(); i++) {
+  for (size_t i = 0; i < ori_change_list.size(); i++) {
     if (ori_change_list[i]->getLeftBpPos() >= local_start 
         && ori_change_list[i]->getRightBpPos() <= local_end + 1) {
       ChangePtr change_ptr = ChangePtr(new Change(*ori_change_list[i], local_start));
@@ -347,8 +338,8 @@ ProteoformPtr getSubProteoform(const ProteoformPtr &proteoform_ptr,
 ProteoformPtrVec generateProtModProteoform(const ProteoformPtrVec &ori_forms, 
                                            const ProtModPtrVec &prot_mods) {
   ProteoformPtrVec new_forms;
-  for (unsigned int i = 0; i < ori_forms.size(); i++) {
-    for (unsigned int j = 0; j < prot_mods.size(); j++) {
+  for (size_t i = 0; i < ori_forms.size(); i++) {
+    for (size_t j = 0; j < prot_mods.size(); j++) {
       ProteoformPtr ptr = getProtModProteoform(ori_forms[i], prot_mods[j]);
       if (ptr.get() != nullptr) {
         new_forms.push_back(ptr);
@@ -361,7 +352,7 @@ ProteoformPtrVec generateProtModProteoform(const ProteoformPtrVec &ori_forms,
 ResFreqPtrVec compNTermResidueFreq(const ProteoformPtrVec &prot_mod_forms) {
   std::vector<double> counts;
   ResiduePtrVec residue_list;
-  for (unsigned int i = 0; i < prot_mod_forms.size(); i++) {
+  for (size_t i = 0; i < prot_mod_forms.size(); i++) {
     ResSeqPtr seq_ptr = prot_mod_forms[i]->getResSeqPtr();    
     if (seq_ptr->getLen() >= 1) {
       ResiduePtr res_ptr = seq_ptr->getResiduePtr(0);
@@ -378,11 +369,11 @@ ResFreqPtrVec compNTermResidueFreq(const ProteoformPtrVec &prot_mod_forms) {
   }
 
   double sum = 0;
-  for (unsigned int i = 0; i < counts.size(); i++) {
+  for (size_t i = 0; i < counts.size(); i++) {
     sum = sum + counts[i];
   }
   ResFreqPtrVec res_freq_list;
-  for (unsigned int i = 0; i < residue_list.size(); i++) {
+  for (size_t i = 0; i < residue_list.size(); i++) {
     ResFreqPtr res_freq_ptr(new ResidueFreq(residue_list[i]->getAcidPtr(), 
                                             residue_list[i]->getPtmPtr(),
                                             counts[i]/sum));
@@ -395,7 +386,7 @@ ResFreqPtrVec compNTermResidueFreq(const ProteoformPtrVec &prot_mod_forms) {
 ResFreqPtrVec compResidueFreq(const ResiduePtrVec &residue_list, 
                               const ProteoformPtrVec &prot_mod_forms) {
   std::vector<double> counts(residue_list.size(), 0.0);
-  for (unsigned int i = 0; i < prot_mod_forms.size(); i++) {
+  for (size_t i = 0; i < prot_mod_forms.size(); i++) {
     ResSeqPtr seq_ptr = prot_mod_forms[i]->getResSeqPtr();    
     for (int j = 0; j < seq_ptr->getLen(); j++) {
       ResiduePtr res_ptr = seq_ptr->getResiduePtr(j);
@@ -408,11 +399,11 @@ ResFreqPtrVec compResidueFreq(const ResiduePtrVec &residue_list,
   }
 
   double sum = 0;
-  for (unsigned int i = 0; i < counts.size(); i++) {
+  for (size_t i = 0; i < counts.size(); i++) {
     sum = sum + counts[i];
   }
   ResFreqPtrVec res_freq_list;
-  for (unsigned int i = 0; i < residue_list.size(); i++) {
+  for (size_t i = 0; i < residue_list.size(); i++) {
     ResFreqPtr res_freq_ptr(new ResidueFreq(residue_list[i]->getAcidPtr(), 
                                             residue_list[i]->getPtmPtr(),
                                             counts[i]/sum));
@@ -422,35 +413,32 @@ ResFreqPtrVec compResidueFreq(const ResiduePtrVec &residue_list,
 }
 
 void Proteoform::addUnexpectedChangePtrVec(const ChangePtrVec &changes) {
-  for (unsigned int i = 0; i < changes.size(); i++) {
+  for (size_t i = 0; i < changes.size(); i++) {
     if (changes[i]->getChangeType() == UNEXPECTED_CHANGE) {
       change_list_.push_back(changes[i]);
     }
   }
 }
 
-bool isSamePeptideAndMass(const ProteoformPtr &proteoform,
-                          const ProteoformPtr &another_proteoform,
-                          double ppo){
-  double thresh = proteoform->getResSeqPtr()->getSeqMass()*ppo;
-  if(proteoform->getDbResSeqPtr()->getId() != another_proteoform->getDbResSeqPtr()->getId()){
+bool isSamePeptideAndMass(ProteoformPtr a, ProteoformPtr b, double ppo) {  
+  if(a->getDbResSeqPtr()->getId() != b->getDbResSeqPtr()->getId()){
     return false;
   }
-  if(proteoform->getStartPos() != another_proteoform->getStartPos()){
+  if(a->getStartPos() != b->getStartPos()){
     return false;
   }
-  if(proteoform->getEndPos() != another_proteoform->getEndPos()){
+  if(a->getEndPos() != b->getEndPos()){
     return false;
   }
-  if(std::abs(proteoform->getResSeqPtr()->getSeqMass()
-              -another_proteoform->getResSeqPtr()->getSeqMass())> thresh){
+  double thresh = a->getResSeqPtr()->getSeqMass() * ppo;
+  if(std::abs(a->getResSeqPtr()->getSeqMass()
+              -b->getResSeqPtr()->getSeqMass())> thresh){
     return false;
   }
   return true;
 }
 
-bool isStrictCompatiablePtmSpecies(const ProteoformPtr &a,
-                                   const ProteoformPtr &b,
+bool isStrictCompatiablePtmSpecies(ProteoformPtr a, ProteoformPtr b,
                                    double ppo){
   if(!isSamePeptideAndMass(a,b,ppo)){
     return false;
@@ -464,7 +452,7 @@ bool isStrictCompatiablePtmSpecies(const ProteoformPtr &a,
   ChangePtrVec b_change_vec = b->getChangePtrVec();
   std::sort(a_change_vec.begin(),a_change_vec.end(),compareChangeUp);
   std::sort(b_change_vec.begin(),b_change_vec.end(),compareChangeUp);
-  for(unsigned int i=0;i< a->getChangePtrVec().size();i++){
+  for(size_t i=0;i< a->getChangePtrVec().size();i++){
     ChangePtr ac = a_change_vec[i];
     ChangePtr bc = b_change_vec[i];
     if(ac->getRightBpPos() <= bc->getLeftBpPos() || bc->getRightBpPos() <= ac->getLeftBpPos()){
