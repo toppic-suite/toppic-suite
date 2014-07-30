@@ -52,7 +52,7 @@ namespace prot {
 #endif
 
 std::string basename(const std::string &s) {
-  unsigned int dot_pos = s.find_last_of(".");
+  size_t dot_pos = s.find_last_of(".");
   if (dot_pos < s.length()) {
     return s.substr(0, dot_pos);
   }
@@ -89,7 +89,6 @@ void copyFile(const std::string &file_name,
       return;
     }
   }
-
 
   boost::filesystem::copy(from_path,to_path);
 }

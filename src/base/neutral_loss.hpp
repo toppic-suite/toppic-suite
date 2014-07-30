@@ -1,9 +1,3 @@
-/*
- * NeutralLoss.hpp
- *
- *  Created on: Nov 25, 2013
- *      Author: xunlikun
- */
 
 #ifndef PROT_NEUTRAL_LOSS_HPP_
 #define PROT_NEUTRAL_LOSS_HPP_

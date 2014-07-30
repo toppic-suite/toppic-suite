@@ -12,8 +12,8 @@ namespace prot {
 
 AcidPtrVec AcidFactory::acid_ptr_vec_; 
 
-Acid::Acid (std::string const &name, std::string const &one_letter, 
-            std::string const &three_letter, std::string const &composition, 
+Acid::Acid (const std::string &name, const std::string &one_letter, 
+            const std::string &three_letter, const std::string &composition, 
             double mono_mass, double avg_mass) {
   name_ = name;
   one_letter_ = one_letter;
@@ -64,7 +64,7 @@ void AcidFactory::initFactory(const std::string &file_name) {
  * acid name does not exist.
  */
 AcidPtr AcidFactory::getBaseAcidPtrByName(const std::string &name) {
-  for (unsigned int i = 0; i < acid_ptr_vec_.size(); i++) {
+  for (size_t i = 0; i < acid_ptr_vec_.size(); i++) {
     std::string n = acid_ptr_vec_[i]->getName();
     if (n == name) {
       return acid_ptr_vec_[i];
@@ -78,7 +78,7 @@ AcidPtr AcidFactory::getBaseAcidPtrByName(const std::string &name) {
  * null if the one letter representation does not exist.
  */
 AcidPtr AcidFactory::getBaseAcidPtrByOneLetter(const std::string &one_letter) {
-  for (unsigned int i = 0; i < acid_ptr_vec_.size(); i++) {
+  for (size_t i = 0; i < acid_ptr_vec_.size(); i++) {
     std::string l = acid_ptr_vec_[i]->getOneLetter();
     if (l == one_letter)  {
       return acid_ptr_vec_[i];
@@ -93,7 +93,7 @@ AcidPtr AcidFactory::getBaseAcidPtrByOneLetter(const std::string &one_letter) {
  * null if the three letter representation does not exist.
  */
 AcidPtr AcidFactory::getBaseAcidPtrByThreeLetter(const std::string &three_letter) {
-  for (unsigned int i = 0; i < acid_ptr_vec_.size(); i++) {
+  for (size_t i = 0; i < acid_ptr_vec_.size(); i++) {
     std::string l = acid_ptr_vec_[i]->getThreeLetter();
     if (l == three_letter) {
       return acid_ptr_vec_[i];
@@ -133,7 +133,7 @@ bool AcidFactory::baseContainsThreeLetter(const std::string &three_letter) {
 AcidPtrVec AcidFactory::convertSeqToAcidSeq(const std::string &seq) {
   AcidPtrVec acid_seq;
   if (seq.length() > 0) {
-    for (unsigned int i = 0; i < seq.length(); i++) {
+    for (size_t i = 0; i < seq.length(); i++) {
       acid_seq.push_back(getBaseAcidPtrByOneLetter(seq.substr(i, 1)));
     }
   }

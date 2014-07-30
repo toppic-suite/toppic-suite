@@ -1,9 +1,3 @@
-/*
- * NeutralLoss.cpp
- *
- *  Created on: Nov 25, 2013
- *      Author: xunlikun
- */
 
 #include "base/neutral_loss.hpp"
 #include "base/xml_dom_document.hpp"
@@ -36,7 +30,7 @@ void NeutralLossFactory::initFactory(const std::string &file_name){
 
 NeutralLossPtr NeutralLossFactory::getBaseNeutralLossPtrByName(
     const std::string &name){
-  for (unsigned int i = 0; i < neutral_loss_ptr_vec_.size(); i++) {
+  for (size_t i = 0; i < neutral_loss_ptr_vec_.size(); i++) {
     std::string n = neutral_loss_ptr_vec_[i]->getName();
     if (n == name) {
       return neutral_loss_ptr_vec_[i];

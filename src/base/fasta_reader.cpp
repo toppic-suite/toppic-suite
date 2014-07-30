@@ -1,5 +1,5 @@
-#include <base/logger.hpp>
 
+#include "base/logger.hpp"
 #include "base/fasta_reader.hpp"
 
 namespace prot {
@@ -7,7 +7,7 @@ namespace prot {
 /** process fasta string and remove unknown letters */
 std::string FastaSeq::rmChar(const std::string &ori_seq) {
   std::string seq = "";
-  for (unsigned int i = 0; i < ori_seq.length(); i++) {
+  for (size_t i = 0; i < ori_seq.length(); i++) {
     char c = ori_seq.at(i);
     if (c < 'A' || c > 'Z') {
       continue;

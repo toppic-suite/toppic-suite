@@ -1,9 +1,3 @@
-/*
- * command.cpp
- *
- *  Created on: Apr 24, 2014
- *      Author: xunlikun
- */
 
 #include "base/command.hpp"
 
@@ -254,7 +248,7 @@ bool checkPath(std::string path){
   file_to_check.push_back("/conf/support_peak_type.xml");
   file_to_check.push_back("/conf/trunc.xml");
   bool flag = true;
-  for(unsigned int i=0;i<file_to_check.size();i++){
+  for(size_t i=0;i<file_to_check.size();i++){
     if(!existFile(path+file_to_check[i])){
       LOG_ERROR("Can not find "<<file_to_check[i]<<" in path "<<path);
       flag=false;
@@ -279,7 +273,7 @@ std::string getExePath(std::string & command_path) {
     if (pos == std::string::npos) {
       //it's unix
       std::vector<std::string> paths = prot::split(os_path, ':');
-      for (unsigned int i = 0; i < paths.size(); i++) {
+      for (size_t i = 0; i < paths.size(); i++) {
         if (paths[i].find_last_of('/') == paths[i].length() - 1) {
           paths[i] = paths[i].substr(0, paths[i].length() - 1);
         }
@@ -297,7 +291,7 @@ std::string getExePath(std::string & command_path) {
     } else {
       //it's windows
       std::vector<std::string> paths = prot::split(os_path, ';');
-      for (unsigned int i = 0; i < paths.size(); i++) {
+      for (size_t i = 0; i < paths.size(); i++) {
         if (paths[i].find_last_of('/') == paths[i].length() - 1) {
           paths[i] = paths[i].substr(0, paths[i].length() - 1);
         }

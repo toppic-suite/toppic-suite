@@ -20,8 +20,8 @@ typedef std::vector<ProteoformPtrVec> ProteoformPtrVec2D;
 
 class Proteoform {
  public:
-  Proteoform(const DbResSeqPtr &db_res_seq_ptr, const ProtModPtr &prot_mod_ptr,  
-             const ResSeqPtr &res_seq_ptr, int start_pos, int end_pos, 
+  Proteoform(DbResSeqPtr db_res_seq_ptr, ProtModPtr prot_mod_ptr,  
+             ResSeqPtr res_seq_ptr, int start_pos, int end_pos, 
              const ChangePtrVec &change_ptr_vec);
 
   Proteoform(xercesc::DOMElement* element, const ProteoformPtrVec &db_proteoforms);
@@ -42,25 +42,25 @@ class Proteoform {
 
   int getSeqId() {return db_residue_seq_ptr_->getId();}
 
-  std::string getSeqName() {return db_residue_seq_ptr_->getName();}
+  const std::string& getSeqName() {return db_residue_seq_ptr_->getName();}
 
-  ChangePtrVec getChangePtrVec() {return change_list_;}
+  const ChangePtrVec& getChangePtrVec() {return change_list_;}
 
-  int getSpeciesId(){return species_id_;}
+  int getSpeciesId() {return species_id_;}
 
-  void setSpeciesId(int id){species_id_ = id;}
+  void setSpeciesId(int id) {species_id_ = id;}
 
   void setResSeqPtr(ResSeqPtr residue_seq_ptr) {residue_seq_ptr_ =residue_seq_ptr;}
 
-  SegmentPtrVec getSegmentPtrVec();
-
   int getUnexpectedChangeNum();
-
-  ChangePtrVec getUnexpectedChangePtrVec() ;
 
   SemiAlignTypePtr getSemiAlignType();
 
   double getMass();
+
+  ChangePtrVec getUnexpectedChangePtrVec() ;
+
+  SegmentPtrVec getSegmentPtrVec();
 
   std::string getProteinMatchSeq();
 
@@ -96,17 +96,17 @@ class Proteoform {
 };
 
 /* get db proteoform */
-ProteoformPtr getDbProteoformPtr(const DbResSeqPtr &db_res_seq_ptr);
+ProteoformPtr getDbProteoformPtr(DbResSeqPtr db_res_seq_ptr);
 
 /* generate a proteoform with protein mod */ 
-ProteoformPtr getProtModProteoform(const ProteoformPtr &db_form_ptr, 
-                                   const ProtModPtr &prot_mod_ptr); 
+ProteoformPtr getProtModProteoform(ProteoformPtr db_form_ptr, 
+                                   ProtModPtr prot_mod_ptr); 
 
 /* 
  * get subproteoform. local_start and local_end are relatively to 
  * the start position in the original proteoform
  */
-ProteoformPtr getSubProteoform(const ProteoformPtr &proteoform_ptr, 
+ProteoformPtr getSubProteoform(ProteoformPtr proteoform_ptr, 
                                int local_start, int local_end);
 
 /* generate a proteoform vector with protein mod */ 
@@ -120,13 +120,9 @@ ResFreqPtrVec compNTermResidueFreq(const ProteoformPtrVec &prot_mod_forms);
 ResFreqPtrVec compResidueFreq(const ResiduePtrVec &residue_list, 
                               const ProteoformPtrVec &raw_mods);
 
-bool isSamePeptideAndMass(const ProteoformPtr &proteoform, 
-                          const ProteoformPtr &another_proteoform,
-                          double ppo);
+bool isSamePeptideAndMass(ProteoformPtr a, ProteoformPtr b, double ppo);
 
-bool isStrictCompatiablePtmSpecies(const ProteoformPtr &a,
-                                   const ProteoformPtr &b,
-                                   double ppo);
+bool isStrictCompatiablePtmSpecies(ProteoformPtr a, ProteoformPtr b, double ppo);
 
 } /* namespace prot */
 

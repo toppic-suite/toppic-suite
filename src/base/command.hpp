@@ -1,10 +1,3 @@
-/*
- * command.hpp
- *
- *  Created on: Apr 24, 2014
- *      Author: xunlikun
- */
-
 #ifndef COMMAND_HPP_
 #define COMMAND_HPP_
 
@@ -45,7 +38,7 @@ std::string getExePath(std::string & command_path);
 
 int getOS();
 int runCommand(std::string cmd);
-int runCommand(std::string cmd,std::string mod);
+int runCommand(std::string cmd, std::string mod);
 
 
 class SystemInfo{
@@ -63,6 +56,7 @@ class SystemInfo{
   static std::string html_path_;
   static std::string os_;
 };
+
 } /* namespace prot */
 
 #endif /* COMMAND_HPP_ */

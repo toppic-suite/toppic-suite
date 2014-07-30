@@ -14,7 +14,7 @@ class DbResidueSeq: public ResidueSeq {
                const std::string &name);
 
   int getId() {return id_;}
-  std::string getName() {return name_;}
+  const std::string& getName() {return name_;}
 
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 

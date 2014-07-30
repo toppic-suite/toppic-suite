@@ -1,9 +1,3 @@
-/*
- * species.hpp
- *
- *  Created on: Feb 20, 2014
- *      Author: xunlikun
- */
 
 #ifndef SPECIES_HPP_
 #define SPECIES_HPP_
@@ -14,13 +8,13 @@ namespace prot {
 
 class Species {
  public:
-  Species(const ProteoformPtr &proteoform);
-  void addProteoform(const ProteoformPtr &proteoform);
+  Species(ProteoformPtr proteoform_ptr);
+  void addProteoform(ProteoformPtr proteoform_ptr);
   void setSpeciesId(int id);
-  ProteoformPtr getFistProteoform();
+  ProteoformPtr getFirstProteoform();
  private:
   int id_;
-  ProteoformPtrVec proteoforms_;
+  ProteoformPtrVec proteoform_ptr_vec_;
 };
 
 typedef std::shared_ptr<Species> SpeciesPtr;

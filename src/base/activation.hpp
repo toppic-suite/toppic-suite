@@ -2,7 +2,7 @@
  * Activation.hpp
  *
  *  Created on: Nov 25, 2013
- *      Author: xunlikun
+ *  Author: Xiaowen Liu
  */
 
 #ifndef PROT_ACTIVATION_HPP_
@@ -15,20 +15,20 @@ namespace prot {
 
 class Activation {
  public:
-  Activation(const std::string &name, const IonTypePtr &n_ion_type_ptr, 
-             const IonTypePtr &c_ion_type_ptr);
+  Activation(const std::string &name, IonTypePtr n_ion_type_ptr, 
+             IonTypePtr c_ion_type_ptr);
 
   Activation(xercesc::DOMElement * element);
 
-  std::string getName(){return name_;}
+  std::string getName() {return name_;}
 
-  double getNShift(){return n_ion_type_ptr_->getShift()-getBIonShift();}
+  double getNShift() {return n_ion_type_ptr_->getShift()-getBIonShift();}
 
-  double getCShift(){return c_ion_type_ptr_->getShift()-getYIonShift();}
+  double getCShift() {return c_ion_type_ptr_->getShift()-getYIonShift();}
 
-  IonTypePtr getNIonTypePtr(){return n_ion_type_ptr_;}
+  IonTypePtr getNIonTypePtr() {return n_ion_type_ptr_;}
 
-  IonTypePtr getCIonTypePtr(){return c_ion_type_ptr_;}
+  IonTypePtr getCIonTypePtr() {return c_ion_type_ptr_;}
 
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
@@ -55,7 +55,7 @@ class ActivationFactory {
  public:
   static void initFactory(const std::string &file_name);
 
-  static ActivationPtrVec& getBaseActivationPtrVec() {return activation_ptr_vec_;}
+  static const ActivationPtrVec& getBaseActivationPtrVec() {return activation_ptr_vec_;}
 
   static ActivationPtr getBaseActivationPtrByName(const std::string &name);
 };

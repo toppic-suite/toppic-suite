@@ -13,7 +13,7 @@ Trunc::Trunc(const std::string &name, int trunc_len,
   name_ = name;
   trunc_len_ = trunc_len;
   shift_ = 0;
-  for (unsigned int i = 0; i < str.length(); i++) {
+  for (size_t i = 0; i < str.length(); i++) {
     std::string letter = str.substr(i, 1);
     AcidPtr acid_ptr = AcidFactory::getBaseAcidPtrByOneLetter(letter);
     acid_str_.push_back(acid_ptr);
@@ -29,26 +29,26 @@ void Trunc::appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
   str = convertToString(shift_);
   xml_doc->addElement(element, "shift", str.c_str());
   xercesc::DOMElement* acid_list = xml_doc->createElement("amino_acid_list");
-  for(unsigned int i=0;i<acid_str_.size();i++){
+  for(size_t i=0;i<acid_str_.size();i++){
     acid_str_[i]->appendxml(xml_doc,acid_list);
   }
   element->appendChild(acid_list);
   parent->appendChild(element);
 }
 
-bool Trunc::isSameTrunc(int len, const ResSeqPtr &res_seq_ptr) {
+bool Trunc::isSameTrunc(int len, ResSeqPtr res_seq_ptr) {
   if(trunc_len_ != len){
     return false;
   }
   for(int i=0;i<trunc_len_;i++){
-    if(acid_str_[i].get() != res_seq_ptr->getResiduePtr(i)->getAcidPtr().get()){
+    if(acid_str_[i] != res_seq_ptr->getResiduePtr(i)->getAcidPtr()){
       return false;
     }
   }
   return true;
 }
 
-bool Trunc::isValidTrunc(const ResSeqPtr &res_seq_ptr) {
+bool Trunc::isValidTrunc(ResSeqPtr res_seq_ptr) {
   //check if trunc acids match N-terminal acids of the protein 
   bool result = true;
   if (trunc_len_ >= res_seq_ptr->getLen()) {
@@ -80,7 +80,7 @@ void TruncFactory::initFactory(const std::string &file_name) {
 }
 
 TruncPtr TruncFactory::getBaseTruncPtrByName(const std::string &name) {
-  for (unsigned int i = 0; i < trunc_ptr_vec_.size(); i++) {
+  for (size_t i = 0; i < trunc_ptr_vec_.size(); i++) {
     std::string n = trunc_ptr_vec_[i]->getName();
     if (n == name) {
       return trunc_ptr_vec_[i];

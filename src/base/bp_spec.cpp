@@ -1,9 +1,3 @@
-/*
- * bp_spec.cpp
- *
- *  Created on: Nov 26, 2013
- *      Author: xunlikun
- */
 
 #include <algorithm>
 #include <memory>
@@ -43,15 +37,15 @@ void BpSpec::initBreakPoints(const ResSeqPtr &res_seq_ptr){
 }
 
 /* Get neutral ion masses for a specific ion type */
-std::vector<double> BpSpec::getBreakPointMasses(const IonTypePtr &ion_type_ptr){
+std::vector<double> BpSpec::getBreakPointMasses(IonTypePtr ion_type_ptr){
   std::vector<double> bp_mass_vec;
   if (ion_type_ptr->isNTerm()) {
-    for (unsigned int i = 0; i < break_point_ptr_vec_.size(); i++) {
+    for (size_t i = 0; i < break_point_ptr_vec_.size(); i++) {
       bp_mass_vec.push_back(break_point_ptr_vec_[i]->getNTermMass(ion_type_ptr));
     }
   }
   else {
-    for (unsigned int i = 0; i < break_point_ptr_vec_.size(); i++) {
+    for (size_t i = 0; i < break_point_ptr_vec_.size(); i++) {
       bp_mass_vec.push_back(break_point_ptr_vec_[i]->getCTermMass(ion_type_ptr));
     }
   }
@@ -61,7 +55,7 @@ std::vector<double> BpSpec::getBreakPointMasses(const IonTypePtr &ion_type_ptr){
 
 std::vector<double> BpSpec::getPrmMasses() {
   std::vector<double> mass_vec;
-  for (unsigned int i = 0; i < break_point_ptr_vec_.size(); i++) {
+  for (size_t i = 0; i < break_point_ptr_vec_.size(); i++) {
     mass_vec.push_back(break_point_ptr_vec_[i]->getPrm());
   }
   std::sort(mass_vec.begin(),mass_vec.end(),std::less<double>());
@@ -69,16 +63,16 @@ std::vector<double> BpSpec::getPrmMasses() {
 }
 
 /* Get rounded scaled neutral ion masses */ 
-std::vector<int> BpSpec::getScaledMass(double scale, const IonTypePtr &ion_type_ptr){
+std::vector<int> BpSpec::getScaledMass(double scale, IonTypePtr ion_type_ptr){
   std::vector<int> result;
   if (ion_type_ptr->isNTerm()) {
-    for(unsigned int i=0; i < break_point_ptr_vec_.size();i++){
+    for(size_t i=0; i < break_point_ptr_vec_.size();i++){
       double value = break_point_ptr_vec_[i]->getNTermMass(ion_type_ptr)*scale;
       result.push_back(std::floor(value+0.5));
     }
   }
   else {
-    for(unsigned int i=0; i < break_point_ptr_vec_.size();i++){
+    for(size_t i=0; i < break_point_ptr_vec_.size();i++){
       double value = break_point_ptr_vec_[i]->getCTermMass(ion_type_ptr)*scale;
       result.push_back(std::floor(value+0.5));
     }
@@ -88,7 +82,7 @@ std::vector<int> BpSpec::getScaledMass(double scale, const IonTypePtr &ion_type_
 
 std::vector<int> BpSpec::getScaledPrmMasses(double scale){
   std::vector<int> result;
-  for(unsigned int i=0; i < break_point_ptr_vec_.size();i++){
+  for(size_t i=0; i < break_point_ptr_vec_.size();i++){
     double value = break_point_ptr_vec_[i]->getPrm()*scale;
     result.push_back(std::floor(value+0.5));
   }
@@ -98,7 +92,7 @@ std::vector<int> BpSpec::getScaledPrmMasses(double scale){
 void BpSpec::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
   xercesc::DOMElement* element = xml_doc->createElement("bp_spec");
   xercesc::DOMElement* bplist = xml_doc->createElement("break_point_list");
-  for(unsigned int i=0;i<break_point_ptr_vec_.size();i++){
+  for(size_t i=0;i<break_point_ptr_vec_.size();i++){
     break_point_ptr_vec_[i]->appendXml(xml_doc,bplist);
   }
   element->appendChild(bplist);

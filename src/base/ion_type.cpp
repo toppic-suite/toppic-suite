@@ -47,7 +47,7 @@ void IonTypeFactory::initFactory(const std::string &file_name){
 }
 
 IonTypePtr IonTypeFactory::getBaseIonTypePtrByName(const std::string &name){
-  for (unsigned int i = 0; i < ion_type_ptr_vec_.size(); i++) {
+  for (size_t i = 0; i < ion_type_ptr_vec_.size(); i++) {
     std::string n = ion_type_ptr_vec_[i]->getName();
     if (n == name) {
       return ion_type_ptr_vec_[i];

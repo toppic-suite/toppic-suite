@@ -7,7 +7,7 @@
 namespace prot {
 
 /* if we need to increase i, return true, otherwise, return false. */
-bool increaseIJ(unsigned int i, unsigned int j, double deviation, 
+bool increaseIJ(size_t i, size_t j, double deviation, 
                 double tolerance, const std::vector<double> &ms_masses, 
                 const std::vector<double> &theo_masses) {
   /*
@@ -39,11 +39,11 @@ std::vector<double> compMsMassPpos(const std::vector<double> &ms_masses,
                                    double ppo) {
   // extendMsThree do not have 0 and precursor mass 
   std::vector<double> min_distances;
-  for (unsigned i = 0; i < ms_masses.size(); i++) {
+  for (size_t i = 0; i < ms_masses.size(); i++) {
     min_distances.push_back(std::numeric_limits<double>::infinity());
   }
-  unsigned int i = 0;
-  unsigned int j = 0;
+  size_t i = 0;
+  size_t j = 0;
   while (i < ms_masses.size() && j < theo_masses.size()) {
     double d = ms_masses[i] - theo_masses[j];
     if (std::abs(d) <= std::abs(min_distances[i])) {
@@ -74,12 +74,12 @@ std::vector<double> compTheoMassPpos(const std::vector<double> &ms_masses,
                                      double ppo) {
 
   std::vector<double> min_distances;
-  for (unsigned p = 0; p < theo_masses.size(); p++) {
+  for (size_t p = 0; p < theo_masses.size(); p++) {
     min_distances.push_back(std::numeric_limits<double>::infinity());
   }
   /* extendMsThree do not have 0 and precursor mass */
-  unsigned int i = 0;
-  unsigned int j = 0;
+  size_t i = 0;
+  size_t j = 0;
   while (i < ms_masses.size() && j < theo_masses.size()) {
     double d = ms_masses[i] - theo_masses[j];
     if (std::abs(d) <= std::abs(min_distances[j])) {
@@ -112,7 +112,7 @@ double compNumMatchedTheoMasses (const std::vector<double> &ms_masses,
   std::vector<double> theo_mass_ppos 
       = compTheoMassPpos(ms_masses, theo_masses, ppo);
   double score = 0;
-  for (unsigned i = 0; i < theo_mass_ppos.size(); i++) {
+  for (size_t i = 0; i < theo_mass_ppos.size(); i++) {
     if (std::abs(theo_mass_ppos[i]) <= ppo) {
       score += 1.0;
     }
@@ -126,7 +126,7 @@ int getFirstResPos(double n_term_shift, const std::vector<double> &prm_masses){
   double trunc_mass = - n_term_shift;
   int best_pos = -1;
   double best_shift = std::numeric_limits<double>::infinity();
-  for(unsigned int i = 0; i < prm_masses.size();i++){
+  for(size_t i = 0; i < prm_masses.size();i++){
     if(std::abs(prm_masses[i] - trunc_mass) < best_shift){
       best_pos = i;
       best_shift = std::abs(prm_masses[i] - trunc_mass);
@@ -142,7 +142,7 @@ int getLastResPos(double c_term_shift, const std::vector<double> &prm_masses){
   int best_pos = -1;
   double best_shift = std::numeric_limits<double>::infinity();
   double residue_mass_sum = prm_masses[prm_masses.size()-1];
-  for(unsigned int i=0;i<prm_masses.size();i++){
+  for(size_t i=0;i<prm_masses.size();i++){
     if (std::abs(residue_mass_sum-prm_masses[i]-trunc_mass)<best_shift){
       best_pos=i;
       best_shift = std::abs(residue_mass_sum-prm_masses[i]-trunc_mass);
@@ -154,18 +154,5 @@ int getLastResPos(double c_term_shift, const std::vector<double> &prm_masses){
   }
   return best_pos - 1;
 }
-
-/*
-std::string get_selfpath() {
-  char buff[1024];
-  ssize_t len = readlink("/proc/self/exe", buff, sizeof(buff)-1);
-  if (len != -1) {
-    buff[len] = '\0';
-    return std::string(buff);
-  } else {
-    exit(1);
-  }
-}
-*/
 
 }
