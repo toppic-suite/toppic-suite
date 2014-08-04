@@ -1,4 +1,3 @@
-
 #include "base/logger.hpp"
 #include "base/fasta_reader.hpp"
 
@@ -48,7 +47,7 @@ FastaSeqPtr FastaReader::getNextSeq() {
   std::string line;
   while (std::getline(input_, line)) {
     if (line.length() >= 1 && line.substr(0, 1) == ">") {
-      ori_name_ = line;
+      ori_name_ = trim(line);
       return FastaSeqPtr(new FastaSeq(prot_name, ori_seq));
     }
     line = trim(line);
