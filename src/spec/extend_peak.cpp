@@ -1,15 +1,8 @@
-/*
- * extend_peak.cpp
- *
- *  Created on: Dec 4, 2013
- *      Author: xunlikun
- */
-
 #include "spec/extend_peak.hpp"
 
 namespace prot {
 
-ExtendPeak::ExtendPeak(const DeconvPeakPtr &base_peak_ptr, 
+ExtendPeak::ExtendPeak(DeconvPeakPtr base_peak_ptr, 
                        double mono_mass,double score)
     :Peak(mono_mass,1.0){
   base_peak_ptr_ = base_peak_ptr;
@@ -38,51 +31,57 @@ void ExtendPeak::appendXml(XmlDOMDocument* xml_doc,
   parent->appendChild(element);
 }
 
-//must deleted the ms after finished using
-//ExtendMsPtr getMsThree(DeconvMsPtr deconv_ms,double delta,SpParaPtr sp_para);
-ExtendMsPtr getMsThree(const DeconvMsPtr &deconv_ms, double delta,
-                       const SpParaPtr &sp_para_ptr) {
-  MsHeaderPtr header = getDeltaHeaderPtr(deconv_ms, delta);
+std::vector<double> getExtendMassVec (ExtendMsPtr extend_ms_ptr) {
+  std::vector<double> masses;
+  ExtendPeakPtrVec peak_ptr_list = extend_ms_ptr->getPeakPtrVec();
+  for (size_t i = 0; i < peak_ptr_list.size(); i++) {
+    masses.push_back(peak_ptr_list[i]->getPosition());
+  }
+  return masses;
+}
 
-  //private function getSpThreeExtendPeak in factory
+ExtendMsPtr createMsThreePtr(DeconvMsPtr deconv_ms_ptr, double delta, 
+                             SpParaPtr sp_para_ptr) {
+  MsHeaderPtr header_ptr = getDeltaHeaderPtr(deconv_ms_ptr, delta);
+
   ExtendPeakPtrVec list;
   double ext_min_mass = sp_para_ptr->getExtendMinMass();
   std::vector<double> ext_offsets = sp_para_ptr->getExtendOffsets();
-  for(unsigned int i =0; i<deconv_ms->size();i++){
-    DeconvPeakPtr peak_ptr = deconv_ms->getPeakPtr(i);
-    if(peak_ptr->getMonoMass() <= ext_min_mass) {
-      double orig_mass = peak_ptr->getMonoMass();
-      ExtendPeakPtr new_peak 
-          = ExtendPeakPtr(new ExtendPeak(peak_ptr,orig_mass,1.0));
-      list.push_back(new_peak);
+  for(size_t i =0; i < deconv_ms_ptr->size(); i++){
+    DeconvPeakPtr deconv_peak_ptr = deconv_ms_ptr->getPeakPtr(i);
+    if(deconv_peak_ptr->getMonoMass() <= ext_min_mass) {
+      double orig_mass = deconv_peak_ptr->getMonoMass();
+      ExtendPeakPtr extend_peak_ptr 
+          = ExtendPeakPtr(new ExtendPeak(deconv_peak_ptr,orig_mass, 1.0));
+      list.push_back(extend_peak_ptr);
     }
     else{
-      for(unsigned int j=0;j < ext_offsets.size();j++){
-        double mass = peak_ptr->getMonoMass() + ext_offsets[j];
-        ExtendPeakPtr new_peak 
-            = ExtendPeakPtr(new ExtendPeak(peak_ptr, mass,1.0));
-        list.push_back(new_peak);
+      for(size_t j=0;j < ext_offsets.size();j++){
+        double mass = deconv_peak_ptr->getMonoMass() + ext_offsets[j];
+        ExtendPeakPtr extend_peak_ptr 
+            = ExtendPeakPtr(new ExtendPeak(deconv_peak_ptr, mass, 1.0));
+        list.push_back(extend_peak_ptr);
       }
     }
   }
+
   //filter extend_peak
   ExtendPeakPtrVec list_filtered;
   double min_mass = sp_para_ptr->getMinMass();
-  double prec_mono_mass = header->getPrecMonoMass();
-  for(unsigned int i =0; i < list.size();i++){
+  double prec_mono_mass = header_ptr->getPrecMonoMass();
+  for(size_t i =0; i < list.size();i++){
     double mass = list[i]->getPosition();
     if(mass >= min_mass && mass <= prec_mono_mass - min_mass){
       list_filtered.push_back(list[i]);
     }
   }
-  //end filter extend_peak function and result = list_filtered
 
+  // sort 
   std::sort(list_filtered.begin(),list_filtered.end(),extendPeakUp);
-  //end getSpThreeExtendPeak and result = list_filtered;
 
-  //function msThreeSetTolerance
+  //set error tolerance
   PeakTolerancePtr peak_tole_ptr = sp_para_ptr->getPeakTolerancePtr();
-  for (unsigned int i = 0; i < list_filtered.size();i++){
+  for (size_t i = 0; i < list_filtered.size();i++){
     double mass = list_filtered[i]->getBasePeakPtr()->getMonoMass();
     double ori_tole = peak_tole_ptr->compStrictErrorTole(mass);
     list_filtered[i]->setOrigTolerance(ori_tole);
@@ -90,9 +89,8 @@ ExtendMsPtr getMsThree(const DeconvMsPtr &deconv_ms, double delta,
         = peak_tole_ptr->compRelaxErrorTole(mass, prec_mono_mass);
     list_filtered[i]->setReverseTolerance(reve_tole);
   }
-  //end msThreeSetTolerance and result = list_filtered
   double ppo = peak_tole_ptr->getPpo();
-  return ExtendMsPtr(new Ms<ExtendPeakPtr>(header,list_filtered, ppo));
+  return ExtendMsPtr(new Ms<ExtendPeakPtr>(header_ptr,list_filtered, ppo));
 }
 
 } /* namespace prot */

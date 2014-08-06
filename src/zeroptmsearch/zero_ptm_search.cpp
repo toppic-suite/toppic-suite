@@ -15,14 +15,14 @@ void zeroPtmSearch(SpectrumSetPtr spec_set_ptr,
                    ProteoformPtrVec &proteoform_ptr_vec, 
                    ZeroPtmMngPtr mng_ptr, 
                    PrsmPtrVec &prsms) {
-  ExtendMsPtr ms_three = spec_set_ptr->getSpThree();
+  ExtendMsPtr ms_three = spec_set_ptr->getMsThreePtr();
 
   ZpFastMatchPtrVec fast_matches 
       = zeroPtmFastFilter(type, ms_three, proteoform_ptr_vec, 
                           mng_ptr->zero_ptm_filter_result_num_);
 
   LOG_DEBUG("fast_match ended size " << fast_matches.size());
-  DeconvMsPtr deconv_ms = spec_set_ptr->getDeconvMs();
+  DeconvMsPtr deconv_ms = spec_set_ptr->getDeconvMsPtr();
   ZpSlowMatchPtrVec slow_matches 
       = zeroPtmSlowFilter(deconv_ms, fast_matches, mng_ptr); 
 

@@ -74,7 +74,7 @@ SpeciesPtrVec getZeroPtmList(const ProteoformPtrVec& proteoforms, double ppo){
   for(unsigned int i=0;i<proteoforms.size();i++){
     bool is_break = false;
     for(unsigned int j=0;j<list.size();j++){
-      if(isSamePeptideAndMass(proteoforms[i],list[j]->getFistProteoform(),ppo)){
+      if(isSamePeptideAndMass(proteoforms[i],list[j]->getFirstProteoform(),ppo)){
         list[j]->addProteoform(proteoforms[i]);
         is_break = true;
         break;
@@ -97,7 +97,7 @@ SpeciesPtrVec setSpeciesId(const PrsmPtrVec& prsms,double ppo){
       bool is_break = false;
       for(unsigned int m = 0; m<list.size();m++){
         if(isStrictCompatiablePtmSpecies(proteogroups[i][j],
-                                         list[m]->getFistProteoform(),
+                                         list[m]->getFirstProteoform(),
                                          ppo)){
           list[m]->addProteoform(proteogroups[i][j]);
           is_break = true;

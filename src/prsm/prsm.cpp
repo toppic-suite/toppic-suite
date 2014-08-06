@@ -24,7 +24,7 @@ Prsm::Prsm(ProteoformPtr proteoform_ptr, DeconvMsPtr deconv_ms_ptr,
 
 void Prsm::init(SpParaPtr sp_para_ptr) {
   double delta = adjusted_prec_mass_ - ori_prec_mass_;
-  refine_ms_three_ = getMsThree(deconv_ms_ptr_, delta, sp_para_ptr);
+  refine_ms_three_ = createMsThreePtr(deconv_ms_ptr_, delta, sp_para_ptr);
   refine_ms_three_-> recalibrate(calibration_);
   initScores(sp_para_ptr);
 }
@@ -161,7 +161,7 @@ void addSpectrumPtrsToPrsms(PrsmPtrVec &prsms, PrsmParaPtr prsm_para_ptr){
     SpectrumSetPtr spec_set_ptr 
         = getSpectrumSet(ms_ptr, delta, prsm_para_ptr->getSpParaPtr());
     if (spec_set_ptr.get() != nullptr) {
-      DeconvMsPtr deconv_ms_ptr = spec_set_ptr->getDeconvMs();
+      DeconvMsPtr deconv_ms_ptr = spec_set_ptr->getDeconvMsPtr();
       int spectrum_id = deconv_ms_ptr->getHeaderPtr()->getId();
       int prec_id = deconv_ms_ptr->getHeaderPtr()->getPrecId();
       //std::cout << "spectrum id " << spectrum_id << std::endl;
@@ -169,7 +169,7 @@ void addSpectrumPtrsToPrsms(PrsmPtrVec &prsms, PrsmParaPtr prsm_para_ptr){
         if(prsms[i]->isMatchMs(deconv_ms_ptr->getHeaderPtr())){
           prsms[i]->setDeconvMsPtr(deconv_ms_ptr);
           double delta = prsms[i]->getAdjustedPrecMass() - prsms[i]->getOriPrecMass();
-          prsms[i]->setRefineMs(getMsThree(deconv_ms_ptr, delta, prsm_para_ptr->getSpParaPtr()));
+          prsms[i]->setRefineMs(createMsThreePtr(deconv_ms_ptr, delta, prsm_para_ptr->getSpParaPtr()));
         }
         if ((spectrum_id == prsms[i]->getSpectrumId() && prec_id < prsms[i]->getPrecursorId()) ||
             spectrum_id < prsms[i]->getSpectrumId()) {

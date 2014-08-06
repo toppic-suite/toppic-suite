@@ -78,7 +78,7 @@ std::string MsHeader::toString() {
 std::string MsHeader::getScansString() {
   std::stringstream scan_list;
   scan_list << scans_[0];
-  for (unsigned int i = 1; i < scans_.size(); i++) {
+  for (size_t i = 1; i < scans_.size(); i++) {
     scan_list <<  " " << scans_[i];
   }
   return scan_list.str();
@@ -92,8 +92,8 @@ void MsHeader::setScans(const std::string &s) {
   }
   std::vector<std::string> strs;
   split(s,' ', strs); 
-  for (unsigned int i = 0; i < strs.size(); i++) {
-    scans_.push_back(atoi(strs[i].c_str()));
+  for (size_t i = 0; i < strs.size(); i++) {
+    scans_.push_back(std::stoi(strs[i]));
   }
 }
 
@@ -111,7 +111,7 @@ xercesc::DOMElement* MsHeader::getHeaderXml(XmlDOMDocument* xml_doc) {
   str = getScansString();
   xml_doc->addElement(element, "scans", str.c_str());
   xercesc::DOMElement* scans = xml_doc->createElement("scan_list");
-  for (unsigned int i = 0; i < scans_.size(); i++) {
+  for (size_t i = 0; i < scans_.size(); i++) {
     str = convertToString(scans_[i]);
     xml_doc->addElement(scans, "scan", str.c_str());
   }
@@ -133,10 +133,9 @@ xercesc::DOMElement* MsHeader::getHeaderXml(XmlDOMDocument* xml_doc) {
   if (prec_mono_mz_ < 0) {
     std::cout << "monoisotopic mass is not initialized!" << std::endl;
   } else {
-    str = convertToString(
-        prec_mono_mz_ * prec_charge_
-            - prec_charge_ * prot::MassConstant::getProtonMass(),
-        pos);
+    double prec_mass = prec_mono_mz_ * prec_charge_
+        - prec_charge_ * prot::MassConstant::getProtonMass();
+    str = convertToString(prec_mass, pos);
     xml_doc->addElement(element, "precursor_mass", str.c_str());
   }
   return element;

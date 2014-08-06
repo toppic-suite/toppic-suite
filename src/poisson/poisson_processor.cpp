@@ -88,7 +88,7 @@ void PoissonProcessor::processOneSpectrum(DeconvMsPtr ms_ptr, PrsmWriter &writer
   if (spec_set_ptr.get() != nullptr) {
     PrsmPtrVec sele_prsms;
     filterPrsms(prsms_, ms_ptr->getHeaderPtr(), sele_prsms);
-    ExtendMsPtr extend_ms_ptr = spec_set_ptr->getSpThree();
+    ExtendMsPtr extend_ms_ptr = spec_set_ptr->getMsThreePtr();
     comp_ptr_->setPValueArray(extend_ms_ptr, sele_prsms);
     // if matched peak number is too small or E-value is 0, replace it
     // with a max evalue.

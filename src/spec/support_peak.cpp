@@ -1,15 +1,10 @@
-/*
- * support_peak.cpp
- *
- *  Created on: Dec 4, 2013
- *      Author: xunlikun
- */
 
 #include <spec/support_peak.hpp>
 
 namespace prot {
-SupportPeak::SupportPeak(const DeconvPeakPtr &deconv_peak_ptr,double offset,
-                         double score, const SPTypePtr &peak_type_ptr){
+
+SupportPeak::SupportPeak(DeconvPeakPtr deconv_peak_ptr, double offset,
+                         double score, SPTypePtr peak_type_ptr){
   deconv_peak_ptr_ = deconv_peak_ptr;
   offset_=offset;
   score_=score;

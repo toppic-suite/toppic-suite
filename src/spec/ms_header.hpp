@@ -51,11 +51,11 @@ class MsHeader {
   /* set function */
   void setActivationPtr(ActivationPtr acti_ptr) {activation_ptr_ = acti_ptr;}
 
-  void setFileName(std::string file_name) {file_name_ = file_name;}
+  void setFileName(const std::string &file_name) {file_name_ = file_name;}
 
   void setId(int id) {id_ = id;}
 
-  void setTitle(std::string title) {title_ = title;}
+  void setTitle(const std::string &title) {title_ = title;}
 
   void setPrecSpMz(double prec_sp_mz) {prec_sp_mz_ = prec_sp_mz;}
 
@@ -68,7 +68,7 @@ class MsHeader {
 
   void setScan(int scan_num) {scans_.push_back(scan_num);}
 
-  void setScans(std::vector<int> scans) {scans_ = scans;}
+  void setScans(const std::vector<int> &scans) {scans_ = scans;}
 
   void setMsLevel(int level) {level_ = level;}
 

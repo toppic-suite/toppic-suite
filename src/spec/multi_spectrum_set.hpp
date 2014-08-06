@@ -1,10 +1,3 @@
-/*
- * spectrum_set.hpp
- *
- *  Created on: Dec 9, 2013
- *      Author: xunlikun
- */
-
 #ifndef PROT_MULTI_SPECTRUM_SET_HPP_
 #define PROT_MULTI_SPECTRUM_SET_HPP_
 
@@ -20,31 +13,34 @@ namespace prot {
 
 class MultiSpectrumSet {
  public:
-  MultiSpectrumSet(const DeconvMsPtr &sp, double delta,
-                   const SpParaPtr &sp_para);
+  MultiSpectrumSet(DeconvMsPtr deconv_ms_ptr, double delta, SpParaPtr sp_para_ptr);
+
   DeconvMsPtrVec getDeconvMsPtrVec(){return deconv_sp_vec_;}
-  ExtendMsPtr getSpThree(){return extend_ms_three_;}
-  PrmMsPtr getSpTwo(){return prm_ms_two_;}
-  PrmMsPtr getSpSix(){return prm_ms_six_;}
-  PrmMsPtr getSpShiftSix(double shift){
-    return getShiftMsSix(deconv_sp_,delta_,-shift,sp_para_ptr_);
+
+  ExtendMsPtr getSpThreePtr(){return extend_ms_three_ptr_;}
+
+  PrmMsPtr getSpTwoPtr(){return prm_ms_two_ptr_;}
+
+  PrmMsPtr getSpSixPtr(){return prm_ms_six_ptr_;}
+
+  PrmMsPtr getSpShiftSixPtr(double shift){
+    return getShiftMsSixPtr(deconv_ms_ptr_, delta_, -shift, sp_para_ptr_);
   }
   double getDelta(){return delta_;}
 
  private:
-  DeconvMsPtrVec deconv_sp_vec_;
-  double adjusted_prec_mass;
+  DeconvMsPtrVec deconv_ms_ptr_vec_;
+  double adjusted_prec_mass_;
   SpParaPtr sp_para_ptr_;
-  PrmMsPtr prm_ms_two_;
-  ExtendMsPtr extend_ms_three_;
-  PrmMsPtr prm_ms_six_;
+  PrmMsPtr prm_ms_two_ptr_;
+  ExtendMsPtr extend_ms_three_ptr_;
+  PrmMsPtr prm_ms_six_ptr_;
 };
 
 typedef std::shared_ptr<SpectrumSet> SpectrumSetPtr;
 
-SpectrumSetPtr getSpectrumSet(const DeconvMsPtr &spectrum,
-                              double delta,
-                              const SpParaPtr &sp_para);
+SpectrumSetPtr getSpectrumSet(DeconvMsPtr deconv_ms_ptr, double delta,
+                              SpParaPtr sp_para_ptr);
 
 } /* namespace prot */
 

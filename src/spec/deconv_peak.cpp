@@ -11,7 +11,8 @@ DeconvPeak::DeconvPeak (int id, double mono_mass,
     }
 
 DeconvPeak::DeconvPeak(xercesc::DOMElement* element):
-    Peak (getDoubleChildValue(element,"position",0), getDoubleChildValue(element,"intensity",0)) {
+    Peak (getDoubleChildValue(element,"position",0), 
+          getDoubleChildValue(element,"intensity",0)) {
       id_ = getIntChildValue(element,"id",0);
       charge_ = getIntChildValue(element,"charge",0);
       score_ = getDoubleChildValue(element,"score",0);

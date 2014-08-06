@@ -21,8 +21,14 @@ class PrsmCoverage {
   std::string output_file_ext_;
 
   void printTitle(std::ofstream &file);
-  void compCoverage(std::ofstream &file, PrsmPtr prsm, 
-                    PeakIonPairPtrVec &pairs, PrsmParaPtr prsm_para_ptr);
+  void printTwoTitle(std::ofstream &file);
+  void computeCoverage(std::ofstream &file, PrsmPtr prsm, 
+                       PeakIonPairPtrVec &pairs, PrsmParaPtr prsm_para_ptr);
+  void compOneCoverage(std::ofstream &file, PrsmPtr prsm, 
+                       PeakIonPairPtrVec &pairs, PrsmParaPtr prsm_para_ptr);
+  void compTwoCoverage(std::ofstream &file, PrsmPtr prsm, 
+                    PeakIonPairPtrVec &pairs_1, PeakIonPairPtrVec &pairs_2,
+                    PeakIonPairPtrVec &pairs_3, PrsmParaPtr prsm_para_ptr);
   void processOnePrsm(std::ofstream &file, PrsmPtr prsm, 
                       PrsmParaPtr prsm_para_ptr);
   void processTwoPrsms(std::ofstream &file, PrsmPtr prsm_1, 
