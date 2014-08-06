@@ -12,16 +12,16 @@ class Ms {
  public:
   Ms() {};
 
-  Ms(const MsHeaderPtr &header_ptr) {
+  Ms(MsHeaderPtr header_ptr) {
     header_ptr_ = header_ptr;
   }
 
-  Ms(const MsHeaderPtr &header_ptr, const std::vector<T> &peak_ptr_list) {
+  Ms(MsHeaderPtr header_ptr, const std::vector<T> &peak_ptr_list) {
     header_ptr_ = header_ptr;
     peak_ptr_list_ = peak_ptr_list;
   }
 
-  Ms(const MsHeaderPtr &header_ptr, const std::vector<T> &peak_ptr_list, double ppo) {
+  Ms(MsHeaderPtr header_ptr, const std::vector<T> &peak_ptr_list, double ppo) {
     header_ptr_ = header_ptr;
     peak_ptr_list_ = peak_ptr_list;
     header_ptr_->setErrorToleranceByPpo(ppo);
@@ -37,7 +37,7 @@ class Ms {
   }
 
   void recalibrate(double recal) {
-    for (unsigned int i = 0; i < peak_ptr_list_.size(); i++) {
+    for (size_t i = 0; i < peak_ptr_list_.size(); i++) {
       double new_mass = (1 + recal) * peak_ptr_list_[i]->getPosition();
       peak_ptr_list_[i]->setPosition(new_mass);
     }
@@ -46,7 +46,7 @@ class Ms {
   std::string toString() {
     std::string header_str = header_ptr_->toString();
     std::stringstream tmp;
-    for (unsigned int i = 0; i < peak_ptr_list_.size(); i++) {
+    for (size_t i = 0; i < peak_ptr_list_.size(); i++) {
       tmp << i << " " << peak_ptr_list_[i]->getPosition() 
           << " " << peak_ptr_list_[i]->getIntensity() << "\n";
     }
@@ -57,7 +57,7 @@ class Ms {
 
   void setHeaderPtr(MsHeaderPtr header_ptr) {header_ptr = header_ptr_;}
 
-  unsigned int size() {return peak_ptr_list_.size();}
+  size_t size() {return peak_ptr_list_.size();}
 
   T getPeakPtr(int i) {return peak_ptr_list_[i];}
   

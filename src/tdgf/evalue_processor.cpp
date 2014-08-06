@@ -114,7 +114,7 @@ void EValueProcessor::processOneSpectrum(DeconvMsPtr ms_ptr, bool is_separate,
         }
       } 
       else {
-        comp_pvalue_ptr_->setPValueArray(spec_set_ptr->getSpSix(), 
+        comp_pvalue_ptr_->setPValueArray(spec_set_ptr->getMsSixPtr(), 
                                          sele_prsms);
       }
       // if matched peak number is too small or E-value is 0, replace it

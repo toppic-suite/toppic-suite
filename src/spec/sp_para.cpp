@@ -1,19 +1,12 @@
-/*
- * sp_para.cpp
- *
- *  Created on: Dec 4, 2013
- *      Author: xunlikun
- */
-
-#include <spec/sp_para.hpp>
+#include "spec/sp_para.hpp"
 
 namespace prot {
 
 SpPara::SpPara(int min_peak_num,double min_mass,
                double min_extend_mass, 
                const std::vector<double> &ext_offsets,
-               const PeakTolerancePtr &peak_tolerance_ptr,
-               const ActivationPtr &activation_ptr){
+               PeakTolerancePtr peak_tolerance_ptr,
+               ActivationPtr activation_ptr){
   min_peak_num_ = min_peak_num;
   min_mass_ = min_mass;
   extend_min_mass_ = min_extend_mass;
@@ -46,7 +39,7 @@ void SpPara::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   xercesc::DOMElement* list_element 
       = xml_doc->createElement("extend_offset_list");
   element->appendChild(list_element);
-  for (unsigned int i = 0; i < ext_offsets_.size(); i++) {
+  for (size_t i = 0; i < ext_offsets_.size(); i++) {
     std::string str = convertToString(ext_offsets_[i]);
     xml_doc->addElement(list_element, "extend_offset", str.c_str());
   }
@@ -55,4 +48,5 @@ void SpPara::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   xml_doc->addElement(element, "activation", activation_ptr_->getName().c_str());
   parent->appendChild(element); 
 }
+
 } /* namespace prot */

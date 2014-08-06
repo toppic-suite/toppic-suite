@@ -65,7 +65,6 @@ int process(int argc, char* argv[]) {
     prot::PoissonProcessor poisson(poisson_mng_ptr);
     poisson.init();
     poisson.process();
-    */
 
 
     std::cout << "E-value computation " << std::endl;
@@ -76,7 +75,6 @@ int process(int argc, char* argv[]) {
     // compute E-value for a set of prsms each run 
     processor.process(false);
 
-    /*
     if (arguments["searchType"]=="TARGET") { 
       std::cout << "Top selector " << std::endl;
       PrsmSelector selector(db_file_name, sp_file_name, "EVALUE", "TOP", n_top);
@@ -92,6 +90,7 @@ int process(int argc, char* argv[]) {
       fdr.process();
     }
 
+    */
     std::cout << "Cutoff selector " << std::endl;
     std::string cutoff_type = arguments["cutoffValue"];
     double cutoff_value;
@@ -118,7 +117,6 @@ int process(int argc, char* argv[]) {
 
     std::cout << "Convert view xml files to html files " << std::endl;
     prot::translate(arguments);
-    */
 
   } catch (const char* e) {
     std::cout << "Exception " << e << std::endl;

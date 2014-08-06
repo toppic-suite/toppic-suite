@@ -26,7 +26,7 @@ class MsAlignReader {
  private:
   std::string file_name_;
   std::ifstream input_;
-  std::vector<std::string> spectrum_str_;
+  std::vector<std::string> spectrum_str_vec_;
   int current_ = 0;
   DeconvMsPtr deconv_ms_ptr_ = DeconvMsPtr(nullptr);
 };

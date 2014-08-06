@@ -11,7 +11,7 @@
 
 namespace prot {
 
-TheoPeak::TheoPeak(const IonPtr &ion_ptr,double unmod_mass,
+TheoPeak::TheoPeak(IonPtr ion_ptr,double unmod_mass,
                    double shift):
     Peak(unmod_mass + shift, 1.0) {
       ion_ptr_ = ion_ptr;
@@ -19,20 +19,24 @@ TheoPeak::TheoPeak(const IonPtr &ion_ptr,double unmod_mass,
       shift_ = shift;
     }
 
-TheoPeakPtrVec getTheoPeak(const BpSpecPtr &bp_spec,
-                           const ActivationPtr &type, 
-                           const NeutralLossPtr &neutral_loss_ptr,
-                           double n_term_shift,
-                           double c_term_shift,
-                           int bgn,
-                           int end,
-                           double min_mass,
-                           double max_mass){
+std::vector<double> getTheoMassVec (const TheoPeakPtrVec &theo_peak_list) {
+  std::vector<double> masses;
+  for (size_t i = 0; i < theo_peak_list.size(); i++) {
+    masses.push_back(theo_peak_list[i]->getModMass());
+  }
+  return masses;
+}
+
+
+TheoPeakPtrVec getTheoPeak(BpSpecPtr bp_spec_ptr, ActivationPtr activation_ptr, 
+                           NeutralLossPtr neutral_loss_ptr,
+                           double n_term_shift, double c_term_shift,
+                           int bgn, int end, double min_mass, double max_mass){
   TheoPeakPtrVec theo_peaks;
-  BreakPointPtrVec bps = bp_spec->getBreakPointPtrVec();
-  IonTypePtr n_ion_type_ptr = type->getNIonTypePtr();
+  BreakPointPtrVec bps = bp_spec_ptr->getBreakPointPtrVec();
+  IonTypePtr n_ion_type_ptr = activation_ptr->getNIonTypePtr();
   int charge = 0;
-  for(int i =bgn;i<=end;i++){
+  for(int i =bgn; i<=end;i++){
     double n_mass = bps[i]->getNTermMass(n_ion_type_ptr);
     double new_mass = n_mass + n_term_shift;
     if(new_mass >= min_mass && new_mass <= max_mass){
@@ -43,7 +47,7 @@ TheoPeakPtrVec getTheoPeak(const BpSpecPtr &bp_spec,
     }
   }
 
-  IonTypePtr c_ion_type_ptr = type->getCIonTypePtr();
+  IonTypePtr c_ion_type_ptr = activation_ptr->getCIonTypePtr();
   for(int i =bgn;i<=end;i++){
     double c_mass = bps[i]->getCTermMass(c_ion_type_ptr);
     double new_mass = c_mass + c_term_shift;
@@ -57,14 +61,14 @@ TheoPeakPtrVec getTheoPeak(const BpSpecPtr &bp_spec,
   return theo_peaks;
 }
 
-TheoPeakPtrVec getProteoformTheoPeak(const ProteoformPtr &proteoform_ptr, 
-                                     const ActivationPtr &activation_ptr,
+TheoPeakPtrVec getProteoformTheoPeak(ProteoformPtr proteoform_ptr, 
+                                     ActivationPtr activation_ptr,
                                      double min_mass) {
   BpSpecPtr bp_ptr = proteoform_ptr->getBpSpecPtr();
 
   TheoPeakPtrVec all_peaks;
   SegmentPtrVec segments = proteoform_ptr->getSegmentPtrVec();
-  for (unsigned int i = 0; i < segments.size(); i++) {
+  for (size_t i = 0; i < segments.size(); i++) {
     NeutralLossPtr neutral_loss_ptr 
         = NeutralLossFactory::getNeutralLossPtr_NONE();
     double max_mass = proteoform_ptr->getResSeqPtr()->getSeqMass() 

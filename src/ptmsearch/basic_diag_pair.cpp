@@ -50,8 +50,8 @@ BasicDiagPairPtrVec compDiagPair(PrmMsPtr sp,std::vector<double> seq_masses,
     }
     double deviation = peak->getPosition()-seq_masses[j] - n_term_shift;
     if(std::abs(deviation) <= error){
-      if(scores[j][type]<peak->getScr()){
-        scores[j][type] = peak->getScr();
+      if(scores[j][type]<peak->getScore()){
+        scores[j][type] = peak->getScore();
         positions[j][type]=i;
       }
     }

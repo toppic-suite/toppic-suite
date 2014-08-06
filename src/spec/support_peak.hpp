@@ -1,10 +1,3 @@
-/*
- * support_peak.hpp
- *
- *  Created on: Dec 4, 2013
- *      Author: xunlikun
- */
-
 #ifndef PROT_SUPPORT_PEAK_HPP_
 #define PROT_SUPPORT_PEAK_HPP_
 
@@ -15,11 +8,15 @@ namespace prot {
 
 class SupportPeak {
  public:
-  SupportPeak(const DeconvPeakPtr &deconv_peak_ptr, double offset,
-              double score, const SPTypePtr &peak_type_ptr);
+  SupportPeak(DeconvPeakPtr deconv_peak_ptr, double offset,
+              double score, SPTypePtr peak_type_ptr);
+
   SPTypePtr getPeakTypePtr(){return peak_type_ptr_;}
+
   double getOffset(){return offset_;}
+
   double getScore(){return score_;}
+
   DeconvPeakPtr getDeconvPeakPtr(){return deconv_peak_ptr_;}
 
  private:

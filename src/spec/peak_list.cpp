@@ -3,14 +3,7 @@
 #include <cmath>
 #include <algorithm>
 
-#include "spec/deconv_peak.hpp"
-
 namespace prot {
-
-template <class T>
-bool comparePos(const DeconvPeakPtr &a, const DeconvPeakPtr &b) {
-  return (a->getPosition() < b->getPosition()); 
-}
 
 template <class T>
 T findHighestPeak(std::vector<T> ptr_list) {
@@ -25,7 +18,7 @@ T findHighestPeak(std::vector<T> ptr_list) {
 template <class T>
 int findHighestPeakIdx(const std::vector<T> &ptr_list) {
   int idx = -1;
-  for (unsigned int i = 0; i < ptr_list.size(); i++) {
+  for (size_t i = 0; i < ptr_list.size(); i++) {
     if (idx < 0 
         || ptr_list[i]->getIntensity() > ptr_list[idx]->getIntensity()) {
       idx = i;
@@ -36,8 +29,8 @@ int findHighestPeakIdx(const std::vector<T> &ptr_list) {
 
 template <class T>
 void sortOnPos(std::vector<T> &ptr_list) {
-  for (unsigned int i = 0; i < ptr_list.size(); i++) {
-    for (unsigned int j = i + 1; j < ptr_list.size(); j++) {
+  for (size_t i = 0; i < ptr_list.size(); i++) {
+    for (size_t j = i + 1; j < ptr_list.size(); j++) {
       if (ptr_list[i]->getPosition() > ptr_list[j]->getPosition()) {
         T tmp = ptr_list[i];
         ptr_list[i] = ptr_list[j];
@@ -55,8 +48,8 @@ double findMaxPos(const std::vector<T> &ptr_list) {
 
 template <class T>
 void sortOnIntensity(std::vector<T> &ptr_list) {
-  for (unsigned int i = 0; i < ptr_list.size(); i++) {
-    for (unsigned int j = i + 1; j < ptr_list.size(); j++) {
+  for (size_t i = 0; i < ptr_list.size(); i++) {
+    for (size_t j = i + 1; j < ptr_list.size(); j++) {
       if (ptr_list[i]->getIntensity() < ptr_list[j]->getIntensity()) {
         T tmp = ptr_list[i];
         ptr_list[i] = ptr_list[j];
@@ -157,7 +150,7 @@ template <class T>
 std::vector<T> rmPeaks(std::vector<T> &ptr_list, double center, 
                        double interval) {
   std::vector<T> new_list;
-  for (unsigned int i = 0; i < ptr_list.size(); i++) {
+  for (size_t i = 0; i < ptr_list.size(); i++) {
     if (std::abs(ptr_list[i].getPosition() - center) > interval) {
       new_list.push_back(ptr_list[i]);
     }
@@ -168,7 +161,7 @@ std::vector<T> rmPeaks(std::vector<T> &ptr_list, double center,
 template <class T>
 std::vector<T> rmZeroPeaks(std::vector<T> &ptr_list) {
   std::vector<T> new_list;
-  for (unsigned int i = 0; i < ptr_list.size(); i++) {
+  for (size_t i = 0; i < ptr_list.size(); i++) {
     if (ptr_list[i].getIntensity() != 0) {
       new_list.push_back(ptr_list[i]);
     }
@@ -182,7 +175,7 @@ std::vector<T> rmZeroPeaks(std::vector<T> &ptr_list) {
 template <class T>
 std::vector<T> rmPeaks(std::vector<T> &ptr_list, std::vector<bool> keep) {
   std::vector<T> new_list;
-  for (unsigned int i = 0; i < ptr_list.size(); i++) {
+  for (size_t i = 0; i < ptr_list.size(); i++) {
     if (keep[i]) {
       new_list.push_back(ptr_list[i]);
     }
@@ -197,7 +190,7 @@ std::vector<T> rmPeaks(std::vector<T> &ptr_list, std::vector<bool> keep) {
 template <class T>
 std::vector<T> rmClosePeaks(std::vector<T> &ptr_list, double tolerance) {
   sortOnPos(ptr_list);
-  for (unsigned int i = 0; i < ptr_list.size() - 1; i++) {
+  for (size_t i = 0; i < ptr_list.size() - 1; i++) {
     T pA = ptr_list[i];
     T pB = ptr_list[i + 1];
     if (std::abs(pA->getPosition() - pB->getPosition()) <= tolerance) {

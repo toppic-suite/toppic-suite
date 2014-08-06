@@ -1,38 +1,31 @@
-/*
- * spectrum_set.cpp
- *
- *  Created on: Dec 9, 2013
- *      Author: xunlikun
- */
-
 #include "base/base_data.hpp"
 #include "spec/extend_peak.hpp"
 #include "spec/spectrum_set.hpp"
 
 namespace prot {
 
-SpectrumSet::SpectrumSet(const DeconvMsPtr &sp, double delta,
-                         const SpParaPtr &sp_para_ptr){
-  deconv_sp_ = sp;
+SpectrumSet::SpectrumSet(DeconvMsPtr deconv_ms_ptr, double delta, 
+                         SpParaPtr sp_para_ptr) {
+  deconv_ms_ptr_ = deconv_ms_ptr;
   sp_para_ptr_ = sp_para_ptr;
   // add error tolerance for precursor mass 
-  deconv_sp_->getHeaderPtr()->setErrorToleranceByPpo(
+  deconv_ms_ptr_->getHeaderPtr()->setErrorToleranceByPpo(
       sp_para_ptr_->getPeakTolerancePtr()->getPpo());
-  delta_=delta;
-  prm_ms_two_ = getMsTwo(sp, delta, sp_para_ptr);
-  extend_ms_three_ = getMsThree(sp,delta,sp_para_ptr);
-  prm_ms_six_ = getMsSix(sp,delta,sp_para_ptr);
+  delta_ = delta;
+  prm_ms_two_ptr_ = createMsTwoPtr(deconv_ms_ptr, delta, sp_para_ptr);
+  extend_ms_three_ptr_ = createMsThreePtr(deconv_ms_ptr,delta,sp_para_ptr);
+  prm_ms_six_ptr_ = createMsSixPtr(deconv_ms_ptr,delta,sp_para_ptr);
 }
 
-SpectrumSetPtr getSpectrumSet(const DeconvMsPtr &spectrum, double delta,
-                              const SpParaPtr &sp_para_ptr){
-  if((int)spectrum->size() < sp_para_ptr->getMinPeakNum() 
-     || spectrum->getHeaderPtr()->getPrecMonoMass() < sp_para_ptr->getMinMass()){
+SpectrumSetPtr getSpectrumSet(DeconvMsPtr deconv_ms_ptr, double delta,
+                              SpParaPtr sp_para_ptr){
+  if((int)deconv_ms_ptr->size() < sp_para_ptr->getMinPeakNum() 
+     || deconv_ms_ptr->getHeaderPtr()->getPrecMonoMass() < sp_para_ptr->getMinMass()){
     return SpectrumSetPtr(nullptr);
   }
-  if(spectrum->getHeaderPtr()->getActivationPtr() == nullptr){
+  if(deconv_ms_ptr->getHeaderPtr()->getActivationPtr() == nullptr){
     if(sp_para_ptr->getActivationPtr()!=nullptr){
-      spectrum->getHeaderPtr()->setActivationPtr(sp_para_ptr->getActivationPtr());
+      deconv_ms_ptr->getHeaderPtr()->setActivationPtr(sp_para_ptr->getActivationPtr());
     }
     else{
       //logger
@@ -40,7 +33,7 @@ SpectrumSetPtr getSpectrumSet(const DeconvMsPtr &spectrum, double delta,
     }
   }
 
-  return SpectrumSetPtr(new SpectrumSet(spectrum,delta,sp_para_ptr));
+  return SpectrumSetPtr(new SpectrumSet(deconv_ms_ptr,delta,sp_para_ptr));
 }
 
 } /* namespace prot */

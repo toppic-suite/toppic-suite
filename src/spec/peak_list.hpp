@@ -4,10 +4,6 @@
 namespace prot {
 
 template <class T>
-bool comparePos(const DeconvPeakPtr &a, 
-                const DeconvPeakPtr &b);
-
-template <class T>
 T findHighestPeak(const std::vector<T> &ptr_list);
 
 template <class T>

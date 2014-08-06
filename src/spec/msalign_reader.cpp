@@ -1,5 +1,3 @@
-#include <sstream>
-
 #include "base/logger.hpp"
 #include "base/string_util.hpp"
 #include "spec/msalign_reader.hpp"
@@ -39,8 +37,8 @@ std::vector<std::string> MsAlignReader::readOneSpectrum() {
 
 void MsAlignReader::readNext() {
   deconv_ms_ptr_ = DeconvMsPtr(nullptr);
-  spectrum_str_ = readOneSpectrum();
-  if (spectrum_str_.size() == 0) {
+  spectrum_str_vec_ = readOneSpectrum();
+  if (spectrum_str_vec_.size() == 0) {
     input_.close();
     return;
   }
@@ -53,15 +51,15 @@ void MsAlignReader::readNext() {
   double prec_mass = -1;
   int prec_charge = -1;
   std::vector<std::string> strs;
-  for (unsigned int i = 1; i < spectrum_str_.size() - 1; i++) {
-    std::string letter = spectrum_str_[i].substr(0,1);
+  for (size_t i = 1; i < spectrum_str_vec_.size() - 1; i++) {
+    std::string letter = spectrum_str_vec_[i].substr(0,1);
     if (letter >= "A" && letter <= "Z") {
-      strs = split(spectrum_str_[i], '=');
+      strs = split(spectrum_str_vec_[i], '=');
       if (strs[0] == "ID") {
-        id = atoi(strs[1].c_str());
+        id = std::stoi(strs[1]);
       }
       if (strs[0] == "PRECURSOR_ID") {
-        prec_id = atoi(strs[1].c_str());
+        prec_id = std::stoi(strs[1]);
       }
       else if (strs[0] == "SCANS") {
         scans = strs[1];
@@ -73,13 +71,13 @@ void MsAlignReader::readNext() {
         title = strs[1];
       }
       else if (strs[0] == "LEVEL") {
-        title = atoi(strs[1].c_str());
+        level = std::stoi(strs[1]);
       }
       else if (strs[0] == "PRECURSOR_MASS") {
-        prec_mass = atof(strs[1].c_str());
+        prec_mass = std::stod(strs[1]);
       }
       else if (strs[0] == "PRECURSOR_CHARGE") {
-        prec_charge = atoi(strs[1].c_str());
+        prec_charge = std::stoi(strs[1]);
       }
     }
   }
@@ -119,13 +117,13 @@ void MsAlignReader::readNext() {
 
   std::vector<DeconvPeakPtr> peak_ptr_list;
   int idx = 0;
-  for (unsigned int i = 1; i < spectrum_str_.size() - 1; i++) {
-    std::string letter = spectrum_str_[i].substr(0,1);
+  for (size_t i = 1; i < spectrum_str_vec_.size() - 1; i++) {
+    std::string letter = spectrum_str_vec_[i].substr(0,1);
     if (letter >= "0" && letter <= "9") {
-      strs = split(spectrum_str_[i], '\t');
-      double mass = atof(strs[0].c_str());
-      double inte = atof(strs[1].c_str());
-      int charge = atoi(strs[2].c_str());
+      strs = split(spectrum_str_vec_[i], '\t');
+      double mass = std::stod(strs[0]);
+      double inte = std::stod(strs[1]);
+      int charge = std::stoi(strs[2]);
       DeconvPeakPtr peak_ptr(new DeconvPeak(idx, mass, inte, charge));
       peak_ptr_list.push_back(peak_ptr);
       idx++;
@@ -150,7 +148,7 @@ int countSpNum(const std::string &spectrum_file_name) {
   MsAlignReader reader(spectrum_file_name);
   int cnt = 0;
   DeconvMsPtr deconv_ms_ptr;
-  while ((deconv_ms_ptr = reader.getNextMs()).get() != nullptr) {
+  while ((deconv_ms_ptr = reader.getNextMs()) != nullptr) {
     cnt++;
   }
   reader.close();

@@ -95,13 +95,13 @@ std::string getChildValue(xercesc::DOMElement* parent,
 double getDoubleChildValue(xercesc::DOMElement* parent,  
                            const char* child_tag, int i) {
   std::string value = getChildValue(parent, child_tag, i);
-  return atof(value.c_str());
+  return std::stod(value);
 }
 
 int getIntChildValue(xercesc::DOMElement* parent,  
                      const char* child_tag, int i) {
   std::string value = getChildValue(parent, child_tag, i);
-  return atoi(value.c_str());
+  return std::stoi(value);
 }
 
 bool getBoolChildValue(xercesc::DOMElement* parent,

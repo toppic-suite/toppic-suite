@@ -12,9 +12,9 @@ namespace prot {
 PtmSlowMatch::PtmSlowMatch(ProteoformPtr proteoform, SpectrumSetPtr spectrum_set,
                            CompShiftLowMemPtr comp_shift, PtmMngPtr mng){
   mng_=mng;
-  deconv_ms_ = spectrum_set->getDeconvMs();
-  ms_six_=spectrum_set->getSpSix();
-  ms_three_ = spectrum_set->getSpThree();
+  deconv_ms_ = spectrum_set->getDeconvMsPtr();
+  ms_six_=spectrum_set->getMsSixPtr();
+  ms_three_ = spectrum_set->getMsThreePtr();
   proteoform_ = proteoform;
   initPsAlign(comp_shift);
 }

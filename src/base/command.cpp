@@ -107,7 +107,7 @@ bool command::validateCommandValue(std::string command,std::string value){
     }
   }
   else if(argument.compare("errorTolerance") == 0){
-    int ppm = atoi(value.c_str());
+    int ppm = std::stoi(value);
     if (ppm < 0 || ppm > 100) {
       LOG_ERROR("Argument "<<command<<" error! The value :"<<value<<" should be [0,100]");
       return false;
@@ -119,7 +119,7 @@ bool command::validateCommandValue(std::string command,std::string value){
     }
   }
   else if(argument.compare("cutoff") == 0){
-    double th = atof(value.c_str());
+    double th = std::stod(value);
     if(th<0){
       LOG_ERROR("Argument "<<command<<" error! The value :"<<value<<" should be positive");
       return false;

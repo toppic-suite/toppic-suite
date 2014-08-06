@@ -36,5 +36,10 @@ class DeconvPeak : public Peak {
 typedef std::shared_ptr<DeconvPeak> DeconvPeakPtr;
 typedef std::vector<DeconvPeakPtr> DeconvPeakPtrVec;
 
+inline bool deconvPeakUp(const DeconvPeakPtr &a, const DeconvPeakPtr &b){
+  return a->getPosition() < b->getPosition();
+}
+
+
 }
 #endif
