@@ -8,22 +8,15 @@ namespace prot {
 
 class Peak {
  public:
-  Peak(double position, double intensity) {
-    position_ = position;
-    intensity_ = intensity;
-  }
+  Peak(double position, double intensity);
 
   double getIntensity() {return intensity_;}
 
   double getPosition() {return position_;}
 
-  void setIntensity(double intensity) {
-    intensity_ = intensity;
-  }
+  void setIntensity(double intensity) {intensity_ = intensity;}
 
-  void setPosition(double position) {
-    position_ = position;
-  }
+  void setPosition(double position) {position_ = position;}
 
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 

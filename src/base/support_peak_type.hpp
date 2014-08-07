@@ -14,11 +14,10 @@ namespace prot {
 
 class SupportPeakType {
  public:
-  SupportPeakType(int id, const std::string &name){
-    id_=id;
-    name_=name;
-  }
+  SupportPeakType(int id, const std::string &name);
+
   int getId(){return id_;}
+
   std::string getName(){return name_;}
  private:
   int id_;

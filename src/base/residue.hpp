@@ -87,16 +87,7 @@ class FixResidueFactory {
  public:
   static void initFactory(const std::string &file_name);
 
-  static ResiduePtrVec getFixResiduePtrVec(const std::string &id) {
-    if (fix_res_list_map_.find(id) != fix_res_list_map_.end()) {
-      return fix_res_list_map_.find(id)->second;
-    }
-    else {
-      LOG_ERROR("Incorrect id for fix mod residue list.");
-      ResiduePtrVec empty_list;
-      return empty_list;
-    }
-  }
+  static ResiduePtrVec getFixResiduePtrVec(const std::string &id);
   
  private:
   static std::map<std::string,ResiduePtrVec> fix_res_list_map_;

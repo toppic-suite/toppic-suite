@@ -2,6 +2,11 @@
 
 namespace prot {
 
+SemiAlignType::SemiAlignType(const std::string &name, int id) {
+  name_ = name;
+  id_ = id;
+}
+
 SemiAlignTypePtr SemiAlignTypeFactory::semi_align_type_complete_ 
     = SemiAlignTypePtr(new SemiAlignType("COMPLETE", 0));
 SemiAlignTypePtr SemiAlignTypeFactory::semi_align_type_prefix_

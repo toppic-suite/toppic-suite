@@ -19,15 +19,6 @@ TheoPeak::TheoPeak(IonPtr ion_ptr,double unmod_mass,
       shift_ = shift;
     }
 
-std::vector<double> getTheoMassVec (const TheoPeakPtrVec &theo_peak_list) {
-  std::vector<double> masses;
-  for (size_t i = 0; i < theo_peak_list.size(); i++) {
-    masses.push_back(theo_peak_list[i]->getModMass());
-  }
-  return masses;
-}
-
-
 TheoPeakPtrVec getTheoPeak(BpSpecPtr bp_spec_ptr, ActivationPtr activation_ptr, 
                            NeutralLossPtr neutral_loss_ptr,
                            double n_term_shift, double c_term_shift,

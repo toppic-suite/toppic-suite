@@ -1,11 +1,10 @@
 #include <iostream>
 
 #include "base/fasta_reader.hpp"
-#include "base/species.hpp"
 #include "base/base_data.hpp"
 
 #include "prsm/prsm_para.hpp"
-#include "prsm/prsm_combine.hpp"
+//#include "prsm/prsm_combine.hpp"
 #include "prsm/prsm_selector.hpp"
 #include "prsm/output_selector.hpp"
 #include "prsm/prsm_species.hpp"
@@ -90,7 +89,6 @@ int process(int argc, char* argv[]) {
       fdr.process();
     }
 
-    */
     std::cout << "Cutoff selector " << std::endl;
     std::string cutoff_type = arguments["cutoffValue"];
     double cutoff_value;
@@ -117,6 +115,7 @@ int process(int argc, char* argv[]) {
 
     std::cout << "Convert view xml files to html files " << std::endl;
     prot::translate(arguments);
+    */
 
   } catch (const char* e) {
     std::cout << "Exception " << e << std::endl;

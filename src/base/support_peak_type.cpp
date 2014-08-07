@@ -7,6 +7,11 @@ namespace prot {
 
 SPTypePtrVec SPTypeFactory::sp_type_ptr_vec_;
 
+SupportPeakType::SupportPeakType(int id, const std::string &name) {
+  id_=id;
+  name_=name;
+}
+
 void SPTypeFactory::initFactory(const std::string &file_name){
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {

@@ -1,13 +1,7 @@
-/*
- * cleavage.cpp
- *
- *  Created on: Feb 24, 2014
- *      Author: xunlikun
- */
-
-#include <prsm/cleavage.hpp>
+#include "prsm/cleavage.hpp"
 
 namespace prot {
+
 Cleavage::Cleavage(int pos){
   pos_=pos;
   exist_n_ion_ = false;
@@ -15,6 +9,7 @@ Cleavage::Cleavage(int pos){
   shift_= 0.0;
   display_pos_ = 0;
 }
+
 void Cleavage::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
   xercesc::DOMElement* element = xml_doc->createElement("character");
       std::string str = "cleavage";
@@ -34,34 +29,31 @@ void Cleavage::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
       str = convertToString(shift_,2);
       xml_doc->addElement(element, "shift_no_letter", str.c_str());
       xercesc::DOMElement* peaks = xml_doc->createElement("matched_peaks");
-      for(unsigned int i=0;i<pairs_.size();i++){
-        pairs_[i]->appendPeakToXml(xml_doc,peaks);
+      for(size_t i=0;i<pairs_.size();i++){
+        pairs_[i]->appendRealPeakToXml(xml_doc,peaks);
       }
       element->appendChild(peaks);
       parent->appendChild(element);
 }
 
-CleavagePtrVec getProteoCleavage(ProteoformPtr prot,
-                                 ExtendMsPtr ms_three,
+CleavagePtrVec getProteoCleavage(ProteoformPtr prot_ptr,
+                                 ExtendMsPtr ms_three_ptr,
                                  double min_mass){
   CleavagePtrVec cleavages;
-  PeakIonPairPtrVec pairs = getPeakIonPairs (prot, ms_three,min_mass);
+  PeakIonPairPtrVec pairs = getPeakIonPairs (prot_ptr, ms_three_ptr, min_mass);
 
   PeakIonPairPtrVec2D peak_list;
   std::vector<bool> n_ion;
   std::vector<bool> c_ion;
-//  for(int i=0;i<prot->getResSeqPtr()->getLen()+1;i++){
-  for(unsigned int i=0;i<prot->getDbResSeqPtr()->getResidues().size()+1;i++){
+  for(size_t i=0; i<prot_ptr->getDbResSeqPtr()->getResidues().size()+1; i++){
     PeakIonPairPtrVec temp;
     peak_list.push_back(temp);
     n_ion.push_back(false);
     c_ion.push_back(false);
   }
-//  std::cout<<prot->getStartPos()<<"->"<<prot->getEndPos()<<std::endl;
-//  std::cout<<"S"<<peak_list.size()<<std::endl;
-  for(unsigned int i=0;i<pairs.size();i++){
-    int pos = pairs[i]->getTheoPeakPtr()->getIonPtr()->getPos()+prot->getStartPos();
-//    std::cout<<pairs[i]->getTheoPeakPtr()->getIonPtr()->getPos()<<"+"<<prot->getStartPos()<<std::endl;
+
+  for(size_t i=0;i<pairs.size();i++){
+    int pos = pairs[i]->getTheoPeakPtr()->getIonPtr()->getPos()+prot_ptr->getStartPos();
     peak_list[pos].push_back(pairs[i]);
     if(pairs[i]->getTheoPeakPtr()->getIonPtr()->getIonTypePtr()->isNTerm()){
       n_ion[pos] = true;
@@ -71,7 +63,7 @@ CleavagePtrVec getProteoCleavage(ProteoformPtr prot,
     }
   }
 
-  for(int i=0;i< (int)prot->getDbResSeqPtr()->getResidues().size()+1;i++){
+  for(size_t i=0;i< prot_ptr->getDbResSeqPtr()->getResidues().size()+1;i++){
     CleavagePtr cleavage = CleavagePtr(new Cleavage(i));
     cleavage->setPairs(peak_list[i]);
     cleavage->setExistCIon(c_ion[i]);

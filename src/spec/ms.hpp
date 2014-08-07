@@ -12,9 +12,7 @@ class Ms {
  public:
   Ms() {};
 
-  Ms(MsHeaderPtr header_ptr) {
-    header_ptr_ = header_ptr;
-  }
+  Ms(MsHeaderPtr header_ptr) {header_ptr_ = header_ptr;}
 
   Ms(MsHeaderPtr header_ptr, const std::vector<T> &peak_ptr_list) {
     header_ptr_ = header_ptr;
@@ -62,12 +60,6 @@ class Ms {
   T getPeakPtr(int i) {return peak_ptr_list_[i];}
   
   std::vector<T> getPeakPtrVec() {return peak_ptr_list_;}
-
-  void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
-        xercesc::DOMElement* element = xml_doc->createElement("ms");
-        header_ptr_->appendXml(xml_doc,element);
-        parent->appendChild(element);
-  }
 
  private:
   MsHeaderPtr header_ptr_;

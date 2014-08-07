@@ -10,8 +10,8 @@ namespace prot {
 
 class PrsmCoverage {
  public:
-  PrsmCoverage(PrsmParaPtr prsm_para_ptr, std::string input_file_ext,
-                std::string output_file_ext);
+  PrsmCoverage(PrsmParaPtr prsm_para_ptr, const std::string &input_file_ext,
+               const std::string &output_file_ext);
   void processSingleCoverage();
   void processCombineCoverage();
 
@@ -22,17 +22,17 @@ class PrsmCoverage {
 
   void printTitle(std::ofstream &file);
   void printTwoTitle(std::ofstream &file);
-  void computeCoverage(std::ofstream &file, PrsmPtr prsm, 
-                       PeakIonPairPtrVec &pairs, PrsmParaPtr prsm_para_ptr);
+  void computeCoverage(std::ofstream &file, PrsmPtr prsm_ptr, 
+                       PeakIonPairPtrVec &pair_ptrs, PrsmParaPtr prsm_para_ptr);
   void compOneCoverage(std::ofstream &file, PrsmPtr prsm, 
-                       PeakIonPairPtrVec &pairs, PrsmParaPtr prsm_para_ptr);
-  void compTwoCoverage(std::ofstream &file, PrsmPtr prsm, 
-                    PeakIonPairPtrVec &pairs_1, PeakIonPairPtrVec &pairs_2,
-                    PeakIonPairPtrVec &pairs_3, PrsmParaPtr prsm_para_ptr);
-  void processOnePrsm(std::ofstream &file, PrsmPtr prsm, 
+                       PeakIonPairPtrVec &pair_ptrs, PrsmParaPtr prsm_para_ptr);
+  void compTwoCoverage(std::ofstream &file, PrsmPtr prsm_ptr, 
+                    PeakIonPairPtrVec &pair_ptrs_1, PeakIonPairPtrVec &pair_ptrs_2,
+                    PeakIonPairPtrVec &pair_ptrs_3, PrsmParaPtr prsm_para_ptr);
+  void processOnePrsm(std::ofstream &file, PrsmPtr prsm_ptr, 
                       PrsmParaPtr prsm_para_ptr);
-  void processTwoPrsms(std::ofstream &file, PrsmPtr prsm_1, 
-                       PrsmPtr prsm_2, PrsmParaPtr prsm_para_ptr);
+  void processTwoPrsms(std::ofstream &file, PrsmPtr prsm_ptr_1, 
+                       PrsmPtr prsm_ptr_2, PrsmParaPtr prsm_para_ptr);
 
 };
 

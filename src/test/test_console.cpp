@@ -1,7 +1,6 @@
 #include <iostream>
 
 #include "base/fasta_reader.hpp"
-#include "base/species.hpp"
 #include "base/base_data.hpp"
 
 #include "prsm/prsm_para.hpp"
@@ -87,7 +86,7 @@ int process(int argc, char* argv[]) {
     std::vector<std::string> input_exts ;
     input_exts.push_back("ZERO");
     input_exts.push_back("PTM");
-    PrsmCombinePtr combine_processor = PrsmCombinePtr(new PrsmCombine(db_file_name, sp_file_name, 
+    PrsmCombinePtr combine_processor = PrsmCombinePtr(new PrsmCombine(db_file_name, sp_file_name,
                                                                     input_exts, "RAW_RESULT"));
     combine_processor->process();
     combine_processor = nullptr;

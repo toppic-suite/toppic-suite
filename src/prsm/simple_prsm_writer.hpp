@@ -1,10 +1,3 @@
-/*
- * simple_prsm_writer.hpp
- *
- *  Created on: Dec 9, 2013
- *      Author: xunlikun
- */
-
 #ifndef PROT_SIMPLE_PRSM_WRITER_HPP_
 #define PROT_SIMPLE_PRSM_WRITER_HPP_
 
@@ -15,10 +8,10 @@ namespace prot {
 class SimplePrsmWriter {
  public:
   SimplePrsmWriter();
-  SimplePrsmWriter(std::string file_name);
+  SimplePrsmWriter(const std::string &file_name);
   ~SimplePrsmWriter();
   void close();
-  void write(SimplePrsmPtrVec simple_prsms);
+  void write(const SimplePrsmPtrVec &simple_prsm_ptrs);
 
  private:
   xercesc::DOMLSSerializer* serializer_;

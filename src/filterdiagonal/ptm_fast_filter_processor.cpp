@@ -75,7 +75,7 @@ void PtmFastFilterProcessor::combineBlock(){
     block_s<<i;
     std::string block_file_name = basename(sp_file_name) + 
         "." + mng_ptr_->output_file_ext_+"_"+block_s.str();
-    matches.push_back(prot::readSimplePrsm(block_file_name.c_str()));
+    matches.push_back(readSimplePrsms(block_file_name.c_str()));
     pointers.push_back(0);
   }
 
@@ -89,10 +89,10 @@ void PtmFastFilterProcessor::combineBlock(){
     SimplePrsmPtrVec selected_matches;
     for(unsigned int i = 0;i<matches.size();i++){
       for(unsigned int j = pointers[i]; j<matches[i].size(); j++){
-        if(matches[i][j]->isMatch(deconv_sp->getHeaderPtr())){
+        if(matches[i][j]->isSameSpectrum(deconv_sp->getHeaderPtr())){
           selected_matches.push_back(matches[i][j]);
         }
-        if (matches[i][j]->isPass(deconv_sp->getHeaderPtr())) {
+        if (matches[i][j]->isLargerSpectrumId(deconv_sp->getHeaderPtr())) {
           pointers[i] = j;
           break;
         }

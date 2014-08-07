@@ -44,9 +44,6 @@ typedef std::shared_ptr<IonType> IonTypePtr;
 typedef std::vector<IonTypePtr> IonTypePtrVec;
 
 class IonTypeFactory {
- private:
-  static IonTypePtrVec ion_type_ptr_vec_;
-
  public:
   static void initFactory(const std::string &file_name);
   static IonTypePtrVec getBaseIonTypePtrVec() {return ion_type_ptr_vec_;}
@@ -58,6 +55,9 @@ class IonTypeFactory {
   static IonTypePtr getIonTypePtr_B() {
     return getBaseIonTypePtrByName(ION_TYPE_B);
   }
+
+ private:
+  static IonTypePtrVec ion_type_ptr_vec_;
 };
 
 }

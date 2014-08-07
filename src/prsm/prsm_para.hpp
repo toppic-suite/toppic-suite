@@ -14,16 +14,16 @@ namespace prot {
 
 class PrsmPara {
  public:
-  PrsmPara(std::map<std::string,std::string> arguments);
+  PrsmPara(std::map<std::string,std::string> &arguments);
   std::string getSearchDbFileName() {return search_db_file_name_;}
-  std::string getSpectrumFileName() {return spectrum_file_name_;}
-  ResiduePtrVec getFixModResiduePtrVec() {return fix_mod_residue_list_;}
-  ProtModPtrVec getAllowProtModPtrVec() {return allow_prot_mod_list_;}
+  std::string getSpectrumFileName() {return spec_file_name_;}
+  const ResiduePtrVec& getFixModResiduePtrVec() {return fix_mod_residue_list_;}
+  const ProtModPtrVec& getAllowProtModPtrVec() {return allow_prot_mod_list_;}
   SpParaPtr getSpParaPtr() {return sp_para_ptr_;}
 
  private:
   std::string search_db_file_name_;
-  std::string spectrum_file_name_;
+  std::string spec_file_name_;
 
   ResiduePtrVec fix_mod_residue_list_;
   ProtModPtrVec allow_prot_mod_list_;

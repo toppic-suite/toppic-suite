@@ -29,12 +29,7 @@ class XmlDOMParserFactory {
  private:
   static XmlDOMParser* dom_parser_;
  public:
-  static XmlDOMParser* getXmlDOMParserInstance() {
-    if (dom_parser_ == nullptr) {
-      dom_parser_ = new XmlDOMParser();
-    }
-    return dom_parser_;
-  }
+  static XmlDOMParser* getXmlDOMParserInstance(); 
 };
 
 /* DOM Implementation */
@@ -53,12 +48,7 @@ class XmlDOMImplFactory {
  private:
   static XmlDOMImpl* dom_impl_;
  public:
-  static XmlDOMImpl* getXmlDOMImplInstance() {
-    if (dom_impl_ == nullptr) {
-      dom_impl_ = new XmlDOMImpl();
-    }
-    return dom_impl_;
-  }
+  static XmlDOMImpl* getXmlDOMImplInstance();
 };
 
  

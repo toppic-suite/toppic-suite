@@ -29,12 +29,6 @@ class TheoPeak : public Peak {
 typedef std::shared_ptr<TheoPeak> TheoPeakPtr;
 typedef std::vector<TheoPeakPtr> TheoPeakPtrVec;
 
-inline bool theoPeakUp(const TheoPeakPtr &a, const TheoPeakPtr &b){
-  return a->getPosition() < b->getPosition();
-}
-
-std::vector<double> getTheoMassVec (const TheoPeakPtrVec &theo_peaks);
-
 /* called by diagonal.cpp */
 TheoPeakPtrVec getTheoPeak(BpSpecPtr bp_spec_ptr, ActivationPtr activation_ptr,
                            NeutralLossPtr neutral_loss_ptr,
@@ -44,6 +38,20 @@ TheoPeakPtrVec getTheoPeak(BpSpecPtr bp_spec_ptr, ActivationPtr activation_ptr,
 TheoPeakPtrVec getProteoformTheoPeak(ProteoformPtr proteoform_ptr, 
                                      ActivationPtr activation_ptr,
                                      double min_mass);
+
+inline bool theoPeakUp(const TheoPeakPtr &a, const TheoPeakPtr &b){
+  return a->getPosition() < b->getPosition();
+}
+
+/* use inline to speedup */
+inline std::vector<double> getTheoMassVec (const TheoPeakPtrVec &theo_peak_list) {
+  std::vector<double> masses;
+  for (size_t i = 0; i < theo_peak_list.size(); i++) {
+    masses.push_back(theo_peak_list[i]->getModMass());
+  }
+  return masses;
+}
+
 } /* namespace prot */
 
 #endif /* THEO_PEAK_HPP_ */

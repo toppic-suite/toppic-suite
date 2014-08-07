@@ -1,74 +1,55 @@
-/*
- * output_selector.cpp
- *
- *  Created on: Feb 19, 2014
- *      Author: xunlikun
- */
-
 #include "base/file_util.hpp"
 #include "prsm/output_selector.hpp"
 
 namespace prot {
 
-OutputSelector::OutputSelector(const std::string &db_file,
-                               const std::string &spec_file,
-                               const std::string &input_file,
-                               const std::string &output_file,
+OutputSelector::OutputSelector(const std::string &db_file_name,
+                               const std::string &spec_file_name,
+                               const std::string &input_file_ext,
+                               const std::string &output_file_ext,
                                const std::string &cutoff_type,
                                double cutoff_value) {
-  db_file_= db_file;
-  spec_file_ = spec_file;
-  input_file_=input_file;
-  output_file_ = output_file;
+  db_file_name_= db_file_name;
+  spec_file_name_ = spec_file_name;
   cutoff_type_ = cutoff_type;
   cutoff_value_ = cutoff_value;
-}
-
-OutputSelector::OutputSelector(std::map<std::string,std::string> &arguments,
-                               const std::string &input_file,
-                               const std::string &output_file) {
-  db_file_= arguments["databaseFileName"];
-  spec_file_ = arguments["spectrumFileName"];
-  input_file_=input_file;
-  output_file_ = output_file;
-  cutoff_type_ = arguments["cutoffType"];
-  cutoff_value_ = atof(arguments["cutoffValue"].c_str());
+  input_file_ext_= input_file_ext;
+  output_file_ext_ = output_file_ext;
 }
 
 void OutputSelector::process(){
-  std::string base_name = basename(spec_file_);
-  std::string input_file_name = base_name + "." + input_file_;
-  ProteoformPtrVec proteoforms = readFastaToProteoform(db_file_,ResidueFactory::getBaseResiduePtrVec());
+  std::string base_name = basename(spec_file_name_);
+  std::string input_file_name = base_name + "." + input_file_ext_;
+  ProteoformPtrVec proteoforms 
+      = readFastaToProteoform(db_file_name_,ResidueFactory::getBaseResiduePtrVec());
   PrsmPtrVec prsms = readPrsm(input_file_name,proteoforms);
   // it's no need to process prsm
   //select
   sort(prsms.begin(),prsms.end(),prsmSpectrumIdUpEvalueUp);
   bool evalue_cutoff = (cutoff_type_ == "EVALUE");
 
-  PrsmPtrVec selected_prsm ;
-  ProteoformPtrVec selected_protein;
+  PrsmPtrVec selected_prsms;
+  ProteoformPtrVec selected_prots;
   int id =0;
-  for(unsigned int i=0;i<prsms.size();i++){
+  for(size_t i=0; i<prsms.size(); i++){
     if(evalue_cutoff && prsms[i]->getEValue() <= cutoff_value_){
       prsms[i]->setId(id);
-      selected_prsm.push_back(prsms[i]);
-      selected_protein.push_back(prsms[i]->getProteoformPtr());
+      selected_prsms.push_back(prsms[i]);
+      selected_prots.push_back(prsms[i]->getProteoformPtr());
       id++;
     }
     else if(!evalue_cutoff && prsms[i]->getFdr() <= cutoff_value_){
       prsms[i]->setId(id);
-      selected_prsm.push_back(prsms[i]);
-      selected_protein.push_back(prsms[i]->getProteoformPtr());
+      selected_prsms.push_back(prsms[i]);
+      selected_prots.push_back(prsms[i]->getProteoformPtr());
       id++;
     }
   }
 
-  //species id
-
   //output
-  std::string output_file_name = base_name +"."+output_file_;
+  std::string output_file_name = base_name + "." + output_file_ext_;
   PrsmWriter writer(output_file_name);
-  writer.writeVector(selected_prsm);
+  writer.writeVector(selected_prsms);
 
   //because the prsm_writer ~PrsmWriter changed and the fileclosing is an independant function
   writer.close();

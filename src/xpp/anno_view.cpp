@@ -111,7 +111,7 @@ xercesc::DOMElement* genePrsmView(XmlDOMDocument* xml_doc,PrsmPtr prsm, double m
       xercesc::DOMElement* mi_element = xml_doc->createElement("matched_ions");
       peak->appendChild(mi_element);
       for(unsigned int j=0;j< selected_pairs.size();j++){
-        selected_pairs[j]->appendIonToXml(xml_doc,mi_element);
+        selected_pairs[j]->appendTheoPeakToXml(xml_doc,mi_element);
       }
     }
   }

@@ -22,8 +22,7 @@ class Ion {
   IonTypePtr getIonTypePtr() {return ion_type_ptr_;}
 
   std::string getDisplayName(){
-    std::string pos_str = std::to_string(display_pos_);
-    return ion_type_ptr_ -> getName() + pos_str;
+    return ion_type_ptr_->getName() + std::to_string(display_pos_);
   }
 
  private:

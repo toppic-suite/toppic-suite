@@ -31,14 +31,6 @@ void ExtendPeak::appendXml(XmlDOMDocument* xml_doc,
   parent->appendChild(element);
 }
 
-std::vector<double> getExtendMassVec (ExtendMsPtr extend_ms_ptr) {
-  std::vector<double> masses;
-  ExtendPeakPtrVec peak_ptr_list = extend_ms_ptr->getPeakPtrVec();
-  for (size_t i = 0; i < peak_ptr_list.size(); i++) {
-    masses.push_back(peak_ptr_list[i]->getPosition());
-  }
-  return masses;
-}
 
 ExtendMsPtr createMsThreePtr(DeconvMsPtr deconv_ms_ptr, double delta, 
                              SpParaPtr sp_para_ptr) {

@@ -1,6 +1,3 @@
-/*
- *  Created on: Apr 24, 2014
- */
 #include "base/file_util.hpp"
 #include "test/argument.hpp"
 

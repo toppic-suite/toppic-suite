@@ -1,10 +1,3 @@
-/*
- * simple_prsm.hpp
- *
- *  Created on: Dec 1, 2013
- *      Author: xunlikun
- */
-
 #ifndef PROT_SIMPLE_PRSM_HPP_
 #define PROT_SIMPLE_PRSM_HPP_
 
@@ -24,41 +17,43 @@ typedef std::vector<SimplePrsmPtrVec> SimplePrsmPtrVec2D;
 
 class SimplePrsm {
 public:
-    SimplePrsm(MsHeaderPtr header,ProteoformPtr seq,int score);
+    SimplePrsm(MsHeaderPtr header_ptr,ProteoformPtr proteo_ptr, int score);
     SimplePrsm(xercesc::DOMElement* element);
     std::string getSeqName(){return seq_name_;}
-    ProteoformPtr getSeq(){return seq_;}
+    ProteoformPtr getProteoformPtr(){return proteo_ptr_;}
     int getSeqId(){return seq_id_;}
     double getScore(){return score_;}
     int getSpectrumId(){return spectrum_id_;}
-    std::string getSpectrumScan(){return spectrum_scan_;}
+    const std::string& getSpectrumScan(){return spectrum_scan_;}
     double getPrecMass(){return prec_mass_;}
-    void setPrecursorId(int precursorId){precursor_id_ = precursorId;}
+    void setPrecursorId(int precursorId) {precursor_id_ = precursorId;}
     int getPrecursorId(){return precursor_id_;}
-    int compareTo(SimplePrsmPtr simple_prsm_ptr);
-    void findSeq(std::vector<ProteoformPtr> &seqs);
     xercesc::DOMElement* toXml(XmlDOMDocument* xml_doc);
-    bool isMatch(MsHeaderPtr header);
-    bool isPass(MsHeaderPtr header);
+
+    //to study
+    bool isSameSpectrum(MsHeaderPtr header_ptr);
+    bool isLargerSpectrumId(MsHeaderPtr header_ptr);
+    void assignProteoformPtr(const std::vector<ProteoformPtr> &proteo_ptrs);
 
 private:
     int spectrum_id_;
     std::string spectrum_scan_;
     int precursor_id_;
     double prec_mass_;
-    ProteoformPtr seq_;
+
+    ProteoformPtr proteo_ptr_;
     int seq_id_;
     std::string seq_name_;
     double score_;
 };
 
-SimplePrsmPtrVec findSimplePrsms(SimplePrsmPtrVec &simple_prsm,
-                                 MsHeaderPtr header);
+SimplePrsmPtrVec getMatchedSimplePrsms(const SimplePrsmPtrVec &simple_prsm_ptrs,
+                                       MsHeaderPtr header);
 
-SimplePrsmPtrVec readSimplePrsm(std::string filename);
+SimplePrsmPtrVec readSimplePrsms(const std::string &filename);
 
-inline bool simplePrsmDown(const SimplePrsmPtr p,SimplePrsmPtr n){
-  return p->getScore() > n->getScore();
+inline bool simplePrsmDown(const SimplePrsmPtr a,SimplePrsmPtr b) {
+  return a->getScore() > b->getScore();
 }
 
 } /* namespace prot */

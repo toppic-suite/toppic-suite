@@ -3,16 +3,16 @@
 
 namespace prot {
 
-PrsmPara::PrsmPara(std::map<std::string, std::string> arguments) {
+PrsmPara::PrsmPara(std::map<std::string, std::string> &arguments) {
   search_db_file_name_ = arguments["databaseFileName"];
-  spectrum_file_name_ = arguments["spectrumFileName"];
+  spec_file_name_ = arguments["spectrumFileName"];
 
   fix_mod_residue_list_ = FixResidueFactory::getFixResiduePtrVec(arguments["cysteineProtection"]);
 
   std::string prot_mod_str = arguments["allowProtMod"];
   std::vector<std::string> strs;
   boost::split(strs, prot_mod_str, boost::is_any_of(","));
-  for (unsigned int i = 0; i < strs.size(); i++) {
+  for (size_t i = 0; i < strs.size(); i++) {
     ProtModPtr ptr = ProtModFactory::getBaseProtModPtrByName(strs[i]);
     allow_prot_mod_list_.push_back(ptr);
   }

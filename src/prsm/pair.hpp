@@ -1,10 +1,3 @@
-/*
- * pair.hpp
- *
- *  Created on: Jan 1, 2014
- *      Author: xunlikun
- */
-
 #ifndef PAIR_HPP_
 #define PAIR_HPP_
 
@@ -21,9 +14,7 @@ typedef std::shared_ptr<Pair> PairPtr;
 
 class Pair {
  public:
-  Pair(int x,int y){
-    x_=x; y_=y;
-  }
+  Pair(int x,int y);
 
   int getX(){return x_;}
 
@@ -38,22 +29,24 @@ class Pair {
   int y_=0;
 };
 
-inline bool comparePairUp(PairPtr c1, PairPtr c2) {
-  if(c1->getY()!= c2->getY()){
-    return c1->getY()<c2->getY();
+inline bool comparePairUp(const PairPtr &a, const PairPtr &b) {
+  if(a->getY() != b->getY()){
+    return a->getY() < b->getY();
   }
-  return c1->getX() < c2->getX();
+  return a->getX() < b->getX();
 }
 
-std::vector<double> compPpoDeviation(ExtendMsPtr ms,TheoPeakPtrVec ions,
+std::vector<double> compPpoDeviation(ExtendMsPtr ms_ptr, const TheoPeakPtrVec &peak_ptrs,
                                      double ppo);
-double compIonScore(ExtendMsPtr ms,TheoPeakPtrVec ions,double recal,
+
+double compIonScore(ExtendMsPtr ms_ptr, const TheoPeakPtrVec &peak_ptrs,double recal,
                     double ppo);
 
-PeakIonPairPtrVec findPairs(ExtendMsPtr ms,TheoPeakPtrVec ions,int bgn,
-                            int end);
+// peak_ptrs are sorted with masses
+PeakIonPairPtrVec findPairs(ExtendMsPtr ms_ptr, TheoPeakPtrVec peak_ptrs,
+                            int bgn, int end);
 
-std::vector<double> getNCScore(ExtendMsPtr ms,TheoPeakPtrVec ions,
+std::vector<double> getNCScore(ExtendMsPtr ms_ptr, const TheoPeakPtrVec &peak_ptrs,
                                int bgn,int end,double delta,double ppo);
 } /* namespace prot */
 

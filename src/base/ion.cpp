@@ -1,10 +1,3 @@
-/*
- * ion.cpp
- *
- *  Created on: Nov 25, 2013
- *      Author: xunlikun
- */
-
 #include "base/ion.hpp"
 
 namespace prot {

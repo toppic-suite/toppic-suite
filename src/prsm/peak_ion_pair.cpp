@@ -5,12 +5,17 @@
 
 namespace prot {
 
-void PeakIonPair::appendPeakToXml(XmlDOMDocument* xml_doc, 
-                                  xercesc::DOMElement* parent) {
+PeakIonPair::PeakIonPair(ExtendPeakPtr real_peak_ptr, TheoPeakPtr theo_peak_ptr) {
+  real_peak_ptr_ = real_peak_ptr;
+  theo_peak_ptr_ = theo_peak_ptr;
+}
+
+void PeakIonPair::appendRealPeakToXml(XmlDOMDocument* xml_doc, 
+                                      xercesc::DOMElement* parent) {
 
   xercesc::DOMElement* element = xml_doc->createElement("matched_peak");
   std::string str = theo_peak_ptr_->getIonPtr()->getIonTypePtr()->getName();
-  xml_doc->addElement(element, "ion_name", str.c_str());
+  xml_doc->addElement(element, "real_peak_ion_name", str.c_str());
   str = convertToString(real_peak_ptr_->getBasePeakPtr()->getId());
   xml_doc->addElement(element, "peak_id", str.c_str());
   str = convertToString(real_peak_ptr_->getBasePeakPtr()->getCharge());
@@ -18,8 +23,8 @@ void PeakIonPair::appendPeakToXml(XmlDOMDocument* xml_doc,
   parent->appendChild(element);
 }
 
-void PeakIonPair::appendIonToXml(XmlDOMDocument* xml_doc, 
-                                 xercesc::DOMElement* parent) {
+void PeakIonPair::appendTheoPeakToXml(XmlDOMDocument* xml_doc, 
+                                      xercesc::DOMElement* parent) {
   int pos=4;
   xercesc::DOMElement* element = xml_doc->createElement("matched_ion");
   std::string str 
@@ -41,34 +46,34 @@ void PeakIonPair::appendIonToXml(XmlDOMDocument* xml_doc,
   parent->appendChild(element);
 }
 
-PeakIonPairPtrVec getMatchedPairs(const PeakIonPairPtrVec &pairs, int peak_id) {
-  PeakIonPairPtrVec selected_pairs;
-  for (unsigned int i = 0; i < pairs.size(); i++) {
-    if (pairs[i]->getRealPeakPtr()->getBasePeakPtr()->getId() == peak_id) {
-      selected_pairs.push_back(pairs[i]);
+PeakIonPairPtrVec getMatchedPairs(const PeakIonPairPtrVec &pair_ptrs, int peak_id) {
+  PeakIonPairPtrVec selected_pair_ptrs;
+  for (size_t i = 0; i < pair_ptrs.size(); i++) {
+    if (pair_ptrs[i]->getRealPeakPtr()->getBasePeakPtr()->getId() == peak_id) {
+      selected_pair_ptrs.push_back(pair_ptrs[i]);
     }
   }
-  return selected_pairs;
+  return selected_pair_ptrs;
 }
 
-void findPairs(ExtendMsPtr ms_three_ptr, TheoPeakPtrVec &theo_peaks, 
-               int bgn, int end, PeakIonPairPtrVec &pairs) {
-  std::sort(theo_peaks.begin(), theo_peaks.end(), theoPeakUp);
+void findPairs(ExtendMsPtr ms_three_ptr, TheoPeakPtrVec &theo_peak_ptrs, 
+               int bgn, int end, PeakIonPairPtrVec &pair_ptrs) {
+  std::sort(theo_peak_ptrs.begin(), theo_peak_ptrs.end(), theoPeakUp);
   std::vector<double> ms_masses = getExtendMassVec(ms_three_ptr);
-  std::vector<double> theo_masses = getTheoMassVec(theo_peaks);
+  std::vector<double> theo_masses = getTheoMassVec(theo_peak_ptrs);
 
-  unsigned int i = 0;
-  unsigned int j = 0;
+  size_t i = 0;
+  size_t j = 0;
   while (i < ms_masses.size() && j < theo_masses.size()) {
     double deviation = ms_masses[i] - theo_masses[j];
-    IonPtr ion_ptr = theo_peaks[j]->getIonPtr();
+    IonPtr ion_ptr = theo_peak_ptrs[j]->getIonPtr();
     double err = ms_three_ptr->getPeakPtr(i)->getOrigTolerance();
     if (ion_ptr->getPos() >= bgn && ion_ptr->getPos() <= end) {
       if (std::abs(deviation) <= err) {
         PeakIonPairPtr pair_ptr 
             = PeakIonPairPtr(new PeakIonPair(ms_three_ptr->getPeakPtr(i), 
-                                             theo_peaks[j]));
-        pairs.push_back(pair_ptr);
+                                             theo_peak_ptrs[j]));
+        pair_ptrs.push_back(pair_ptr);
       }
     }
     if (increaseIJ(i, j, deviation, err, ms_masses, theo_masses)) {
@@ -90,21 +95,21 @@ PeakIonPairPtrVec getPeakIonPairs (const ProteoformPtr &proteoform_ptr,
                                                     activation_ptr, 
                                                     min_mass);
 
-  PeakIonPairPtrVec pairs;
-  findPairs(ms_three_ptr, theo_peaks, 0, proteoform_ptr->getLen(), pairs);
-  return pairs;
+  PeakIonPairPtrVec pair_ptrs;
+  findPairs(ms_three_ptr, theo_peaks, 0, proteoform_ptr->getLen(), pair_ptrs);
+  return pair_ptrs;
 
 }
 
-double computePairConverage(const PeakIonPairPtrVec &pairs, int begin, 
+double computePairConverage(const PeakIonPairPtrVec &pair_ptrs, int begin, 
                             int end, int coverage_type) {
   int total_num = end - begin  + 1;
   if (total_num <= 0) {
     return 0.0;
   }
   std::vector<bool> is_cov(total_num);
-  for (unsigned int i  = 0; i < pairs.size(); i++) {
-    IonPtr ion_ptr = pairs[i]->getTheoPeakPtr()->getIonPtr();
+  for (size_t i  = 0; i < pair_ptrs.size(); i++) {
+    IonPtr ion_ptr = pair_ptrs[i]->getTheoPeakPtr()->getIonPtr();
     bool cov = false;
     if (coverage_type == N_TERM_COVERAGE) {
       if (ion_ptr->getIonTypePtr()->isNTerm()) {
@@ -127,7 +132,7 @@ double computePairConverage(const PeakIonPairPtrVec &pairs, int begin,
     }
   }
   int cov_num = 0;
-  for (unsigned int i = 0; i < is_cov.size(); i++) {
+  for (size_t i = 0; i < is_cov.size(); i++) {
     if (is_cov[i]) {
       cov_num++;
     }
