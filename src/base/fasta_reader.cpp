@@ -3,6 +3,11 @@
 
 namespace prot {
 
+FastaSeq::FastaSeq(const std::string &name, const std::string &ori_seq) {
+  name_ = name;
+  seq_ = rmChar(ori_seq);
+}
+
 /** process fasta string and remove unknown letters */
 std::string FastaSeq::rmChar(const std::string &ori_seq) {
   std::string seq = "";

@@ -48,14 +48,22 @@ typedef std::shared_ptr<ExtendPeak> ExtendPeakPtr;
 typedef std::vector<ExtendPeakPtr> ExtendPeakPtrVec;
 typedef std::shared_ptr<Ms<ExtendPeakPtr>> ExtendMsPtr;
 
+ExtendMsPtr createMsThreePtr(DeconvMsPtr deconv_ms_ptr, double delta, 
+                             SpParaPtr sp_para_ptr);
+
 inline bool extendPeakUp(const ExtendPeakPtr &a, const ExtendPeakPtr &b){
   return a->getPosition() < b->getPosition();
 }
 
-std::vector<double> getExtendMassVec (ExtendMsPtr extend_ms_ptr);
-
-ExtendMsPtr createMsThreePtr(DeconvMsPtr deconv_ms_ptr, double delta, 
-                             SpParaPtr sp_para_ptr);
+/* use inline to speedup */
+inline std::vector<double> getExtendMassVec (ExtendMsPtr extend_ms_ptr) {
+  std::vector<double> masses;
+  ExtendPeakPtrVec peak_ptr_list = extend_ms_ptr->getPeakPtrVec();
+  for (size_t i = 0; i < peak_ptr_list.size(); i++) {
+    masses.push_back(peak_ptr_list[i]->getPosition());
+  }
+  return masses;
+}
 
 } /* namespace prot */
 

@@ -18,7 +18,9 @@ class Prsm {
  public:
   Prsm(ProteoformPtr proteoform_ptr, DeconvMsPtr deconv_ms_ptr, 
        double adjusted_prec_mass, double calibration, SpParaPtr sp_para_ptr);
+
   Prsm(xercesc::DOMElement* element,ProteoformPtrVec proteoforms);
+
   double getAdjustedPrecMass() {return adjusted_prec_mass_;}
 
   ProteoformPtr getProteoformPtr() {return proteoform_ptr_;}
@@ -120,81 +122,86 @@ typedef std::vector<PrsmPtr> PrsmPtrVec;
 typedef std::vector<PrsmPtrVec> PrsmPtrVec2D;
 typedef std::vector<PrsmPtrVec2D> PrsmPtrVec3D;
 
+inline bool prsmEValueUp(const PrsmPtr &a, const PrsmPtr &b) {
+  return a->getEValue() < b->getEValue();
+}
+
+inline bool prsmEValueDown(const PrsmPtr &a, const PrsmPtr &b) {
+  return a->getEValue() > b->getEValue();
+}
+
+inline bool prsmMatchFragmentDown(const PrsmPtr &a, const PrsmPtr &b) {
+  return a->getMatchFragNum() > b->getMatchFragNum();
+}
+
+// sort by the order of protein sequences in the database 
 inline bool prsmProteoformIdUp(PrsmPtr p1, PrsmPtr p2) {
   return p1->getProteoformPtr()->getDbResSeqPtr()->getId()
       < p2->getProteoformPtr()->getDbResSeqPtr()->getId();
 }
 
-inline bool prsmMatchFragmentDown(PrsmPtr p1, PrsmPtr p2) {
-  return p1->getMatchFragNum() > p2->getMatchFragNum();
-}
-//compare two complete prsm, first match fragment number, second start pos 
-inline bool prsmCompPreMatchFragmentDown(PrsmPtr p1, PrsmPtr p2) {
- if(p1->getMatchFragNum() > p2->getMatchFragNum()){
-   return true;
- }
- else if(p1->getMatchFragNum() == p2->getMatchFragNum()){
-   return p1->getProteoformPtr()->getStartPos()<p2->getProteoformPtr()->getStartPos();
- }
- return false;
-}
-
-inline bool prsmEValueUp(PrsmPtr p1, PrsmPtr p2) {
-  return p1->getEValue() < p2->getEValue();
-}
-
-inline bool prsmEValueDown(PrsmPtr p1, PrsmPtr p2) {
-  return p1->getEValue() > p2->getEValue();
-}
-
-inline bool prsmSpectrumIdUpPrecursorIdUp(PrsmPtr p1, PrsmPtr p2){
-    if(p1->getSpectrumId() < p2->getSpectrumId()){
+// sort by the order of spectrum id, the precursor id
+inline bool prsmSpectrumIdUpPrecursorIdUp(const PrsmPtr &a, const PrsmPtr &b){
+    if(a->getSpectrumId() < b->getSpectrumId()){
         return false;
     }
-    else if(p1->getSpectrumId() > p2->getSpectrumId()){
+    else if(a->getSpectrumId() > b->getSpectrumId()){
         return true;
     }
     else{
-        if(p1->getPrecursorId()>p2->getPrecursorId()){
+        if(a->getPrecursorId()>b->getPrecursorId()){
             return true;
         }
         return false;
     }
 }
 
-inline bool prsmSpectrumIdUpMatchFragUp(PrsmPtr p1, PrsmPtr p2){
-    if(p1->getSpectrumId() < p2->getSpectrumId()){
-        return true;
-    }
-    else if(p1->getSpectrumId() > p2->getSpectrumId()){
-        return false;
-    }
-    else{
-        if(p1->getMatchFragNum()>p2->getMatchFragNum()){
-            return true;
-        }
-        return false;
-    }
+// sort by number of matched fragment ions, then start position 
+inline bool prsmCompPreMatchFragDown(const PrsmPtr &a, const PrsmPtr &b) {
+  if(a->getMatchFragNum() > b->getMatchFragNum()){
+    return true;
+  }
+  else if(a->getMatchFragNum() == b->getMatchFragNum()){
+    return a->getProteoformPtr()->getStartPos()<b->getProteoformPtr()->getStartPos();
+  }
+  return false;
 }
 
-inline bool prsmSpectrumIdUpEvalueUp(PrsmPtr p1, PrsmPtr p2){
-    if(p1->getSpectrumId() < p2->getSpectrumId()){
-        return true;
+// sort by spectrum id then match ions
+inline bool prsmSpectrumIdUpMatchFragDown(const PrsmPtr &a, const PrsmPtr &b){
+  if(a->getSpectrumId() < b->getSpectrumId()){
+    return true;
+  }
+  else if(a->getSpectrumId() > b->getSpectrumId()){
+    return false;
+  }
+  else{
+    if(a->getMatchFragNum() > b->getMatchFragNum()){
+      return true;
     }
-    else if(p1->getSpectrumId() > p2->getSpectrumId()){
-        return false;
-    }
-    else{
-        if(p1->getEValue() < p2->getEValue()){
-            return true;
-        }
-        return false;
-    }
+    return false;
+  }
 }
 
-PrsmPtrVec readPrsm(std::string file_name,ProteoformPtrVec proteoforms);
+// sort by spectrum id then evalue
+inline bool prsmSpectrumIdUpEvalueUp(const PrsmPtr &a, const PrsmPtr &b){
+  if(a->getSpectrumId() < b->getSpectrumId()){
+    return true;
+  }
+  else if(a->getSpectrumId() > b->getSpectrumId()){
+    return false;
+  }
+  else{
+    if(a->getEValue() < b->getEValue()){
+      return true;
+    }
+    return false;
+  }
+}
 
-void filterPrsms(PrsmPtrVec &prsms, MsHeaderPtr header_ptr, PrsmPtrVec &sele_prsms); 
+PrsmPtrVec readPrsm(const std::string &file_name, const ProteoformPtrVec &proteoforms);
+
+void filterPrsms(const PrsmPtrVec &prsms, MsHeaderPtr header_ptr, PrsmPtrVec &sele_prsms); 
 
 void addSpectrumPtrsToPrsms(PrsmPtrVec &prsms, PrsmParaPtr prsm_para_ptr);
 

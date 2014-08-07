@@ -1,10 +1,3 @@
-/*
- * prsm_writer.hpp
- *
- *  Created on: Dec 30, 2013
- *      Author: xunlikun
- */
-
 #ifndef PRSM_WRITER_HPP_
 #define PRSM_WRITER_HPP_
 
@@ -18,13 +11,13 @@ namespace prot {
 
 class PrsmWriter {
 public:
- PrsmWriter(std::string file_name);
- ~PrsmWriter();
+ PrsmWriter(const std::string &file_name);
+
  void close();
  void write(PrsmPtr prsm_ptr);
- void writeVector(PrsmPtrVec &prsms);
- void writeVector2D(PrsmPtrVec2D &prsms);
- void writeVector3D(PrsmPtrVec3D &prsms);
+ void writeVector(const PrsmPtrVec &prsm_ptrs);
+ void writeVector2D(const PrsmPtrVec2D &prsm_ptrs);
+ void writeVector3D(const PrsmPtrVec3D &prsm_ptrs);
 private:
   //XmlDOMDocument* doc_;
   std::ofstream file_;

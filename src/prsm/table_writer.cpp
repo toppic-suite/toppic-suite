@@ -1,17 +1,11 @@
-/*
- * table_writer.cpp
- *
- *  Created on: Feb 19, 2014
- *      Author: xunlikun
- */
-
 #include "base/file_util.hpp"
 #include "prsm/table_writer.hpp"
 
 namespace prot {
 
 TableWriter::TableWriter(PrsmParaPtr prsm_para_ptr, 
-                         std::string input_file_ext, std::string output_file_ext) {
+                         const std::string &input_file_ext, 
+                         const std::string &output_file_ext) {
   prsm_para_ptr_ = prsm_para_ptr;
   input_file_ext_ = input_file_ext;
   output_file_ext_ = output_file_ext;
@@ -50,46 +44,44 @@ void TableWriter::write(){
       << "FDR" << "\t"
       << std::endl;
 
-  ProteoformPtrVec raw_forms 
+  ProteoformPtrVec raw_form_ptrs 
       = readFastaToProteoform(prsm_para_ptr_->getSearchDbFileName(), 
                               prsm_para_ptr_->getFixModResiduePtrVec());
 
   LOG_DEBUG("protein data set loaded");
   std::string input_file_name = base_name + "." + input_file_ext_;
   LOG_DEBUG("input file_name " << input_file_name);
-  PrsmPtrVec prsms = readPrsm(input_file_name, raw_forms);
-  sort(prsms.begin(),prsms.end(),prsmSpectrumIdUpMatchFragUp);
+  PrsmPtrVec prsm_ptrs = readPrsm(input_file_name, raw_form_ptrs);
+  sort(prsm_ptrs.begin(),prsm_ptrs.end(),prsmSpectrumIdUpPrecursorIdUp);
   LOG_DEBUG("read prsm complete ");
-  addSpectrumPtrsToPrsms(prsms, prsm_para_ptr_);
-  LOG_DEBUG("prsms loaded");
+  addSpectrumPtrsToPrsms(prsm_ptrs, prsm_para_ptr_);
+  LOG_DEBUG("prsm_ptrs loaded");
 
-  for(unsigned int i=0;i<prsms.size();i++){
+  for(size_t i=0;i<prsm_ptrs.size();i++){
     file_ << spectrum_file_name << "\t"
-        << prsms[i]->getId() << "\t"
-        << prsms[i]->getSpectrumId()<< "\t"
-        << prsms[i]->getDeconvMsPtr()->getHeaderPtr()->getActivationPtr()->getName()<< "\t"
-        << prsms[i]->getSpectrumScan() << "\t"
-        << prsms[i]->getDeconvMsPtr()->size()<< "\t"
-        << prsms[i]->getDeconvMsPtr()->getHeaderPtr()->getPrecCharge() << "\t"
-        << prsms[i]->getOriPrecMass()<< "\t"//"Precursor_mass"
-        << prsms[i]->getAdjustedPrecMass() << "\t"
-        << prsms[i]->getProteoformPtr()->getDbResSeqPtr()->getId() << "\t"
-        << prsms[i]->getProteoformPtr()->getSpeciesId() << "\t"
-        << prsms[i]->getProteoformPtr()->getDbResSeqPtr()->getName() << "\t"
-        << prsms[i]->getProteoformPtr()->getDbResSeqPtr()->getSeqMass() << "\t"
-        << prsms[i]->getProteoformPtr()->getStartPos() << "\t"
-        << prsms[i]->getProteoformPtr()->getEndPos() << "\t"
-        << prsms[i]->getProteoformPtr()->getProteinMatchSeq() << "\t"
-        << prsms[i]->getProteoformPtr()->getUnexpectedChangeNum() << "\t"
-        << prsms[i]->getMatchPeakNum() << "\t"
-        << prsms[i]->getMatchFragNum() << "\t"
-        << prsms[i]->getPValue() << "\t"
-        << prsms[i]->getEValue() << "\t"
-        << prsms[i]->getProbPtr()->getOneProtProb()<< "\t"
-        << prsms[i]->getFdr() << "\t"
+        << prsm_ptrs[i]->getId() << "\t"
+        << prsm_ptrs[i]->getSpectrumId()<< "\t"
+        << prsm_ptrs[i]->getDeconvMsPtr()->getHeaderPtr()->getActivationPtr()->getName()<< "\t"
+        << prsm_ptrs[i]->getSpectrumScan() << "\t"
+        << prsm_ptrs[i]->getDeconvMsPtr()->size()<< "\t"
+        << prsm_ptrs[i]->getDeconvMsPtr()->getHeaderPtr()->getPrecCharge() << "\t"
+        << prsm_ptrs[i]->getOriPrecMass()<< "\t"//"Precursor_mass"
+        << prsm_ptrs[i]->getAdjustedPrecMass() << "\t"
+        << prsm_ptrs[i]->getProteoformPtr()->getDbResSeqPtr()->getId() << "\t"
+        << prsm_ptrs[i]->getProteoformPtr()->getSpeciesId() << "\t"
+        << prsm_ptrs[i]->getProteoformPtr()->getDbResSeqPtr()->getName() << "\t"
+        << prsm_ptrs[i]->getProteoformPtr()->getDbResSeqPtr()->getSeqMass() << "\t"
+        << prsm_ptrs[i]->getProteoformPtr()->getStartPos() << "\t"
+        << prsm_ptrs[i]->getProteoformPtr()->getEndPos() << "\t"
+        << prsm_ptrs[i]->getProteoformPtr()->getProteinMatchSeq() << "\t"
+        << prsm_ptrs[i]->getProteoformPtr()->getUnexpectedChangeNum() << "\t"
+        << prsm_ptrs[i]->getMatchPeakNum() << "\t"
+        << prsm_ptrs[i]->getMatchFragNum() << "\t"
+        << prsm_ptrs[i]->getPValue() << "\t"
+        << prsm_ptrs[i]->getEValue() << "\t"
+        << prsm_ptrs[i]->getProbPtr()->getOneProtProb()<< "\t"
+        << prsm_ptrs[i]->getFdr() << "\t"
         << std::endl;
-//    std::cout<<prsms[i]->getSpectrumId()<<std::endl;
-//    std::cout<<prsms[i]->getProteoformPtr()->getProteinMatchSeq()<<std::endl;
   }
   //write end;
   file_.close();

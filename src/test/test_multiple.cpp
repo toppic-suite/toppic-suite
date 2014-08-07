@@ -1,7 +1,6 @@
 #include <iostream>
 
 #include "base/fasta_reader.hpp"
-#include "base/species.hpp"
 #include "base/base_data.hpp"
 
 #include "prsm/prsm_para.hpp"

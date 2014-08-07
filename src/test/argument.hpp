@@ -1,10 +1,3 @@
-/*
- * command.hpp
- *
- *  Created on: Apr 24, 2014
- *      Author: xunlikun
- */
-
 #ifndef PROT_ARGUMENT_HPP_
 #define PROT_ARGUMENT_HPP_
 

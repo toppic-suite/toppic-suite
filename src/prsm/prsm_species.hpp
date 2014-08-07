@@ -1,6 +1,3 @@
-
-#include "base/species.hpp"
-#include "prsm/prsm.hpp"
 #ifndef PRSM_SPECIES_HPP_
 #define PRSM_SPECIES_HPP_
 
@@ -15,27 +12,23 @@ namespace prot {
 
 class PrsmSpecies {
  public:
-  PrsmSpecies(std::string db_file,
-              std::string spec_file,
-              std::string input_file,
-              std::string output_file,
+  PrsmSpecies(const std::string &db_file_name,
+              const std::string &spec_file_name,
+              const std::string &input_file_ext,
+              const std::string &output_file_ext, 
               double ppo);
-
-  PrsmSpecies(std::map<std::string,std::string> arguments,
-              std::string input_file,
-              std::string output_file);
   void process();
  private:
-  std::string db_file_;
-  std::string spec_file_;
-  std::string input_file_;
-  std::string output_file_;
+  std::string db_file_name_;
+  std::string spec_file_name_;
+  std::string input_file_ext_;
+  std::string output_file_ext_;
   double ppo_;
 };
 
 typedef std::shared_ptr<PrsmSpecies> PrsmSpeciesPtr;
 
-SpeciesPtrVec setSpeciesId(const PrsmPtrVec &prsms,double ppo);
+void setSpeciesId(PrsmPtrVec& prsm_ptrs,double ppo);
 
 } /* namespace prot */
 

@@ -1,10 +1,3 @@
-/*
- * prsm_selector.hpp
- *
- *  Created on: Feb 18, 2014
- *      Author: xunlikun
- */
-
 #ifndef PRSM_SELECTOR_HPP_
 #define PRSM_SELECTOR_HPP_
 
@@ -20,18 +13,19 @@ namespace prot {
 
 class PrsmSelector {
  public:
-  PrsmSelector(std::string db_file,std::string spec_file,std::string in_file,std::string out_file,int n_top);
-  PrsmSelector(std::map<std::string,std::string> arguments,std::string in_file,std::string out_file,int n_top);
+  PrsmSelector(const std::string &db_file_name,
+               const std::string &spec_file_name,
+               const std::string &in_file_ext, 
+               const std::string &out_file_ext, int n_top);
   void process();
  private:
-  std::string spec_file_;
-  std::string db_file_;
-  std::string input_file_;
-  std::string output_file_;
+  std::string spec_file_name_;
+  std::string db_file_name_;
+  std::string input_file_ext_;
+  std::string output_file_ext_;
   int n_top_;
 
-  PrsmPtrVec getTopPrsms(PrsmPtrVec selected_prsm,int n_top);
-  bool findPrsm(PrsmPtrVec result,PrsmPtr prsm);
+  PrsmPtrVec getTopPrsms(PrsmPtrVec &prsm_ptrs, int n_top);
 };
 
 typedef std::shared_ptr<PrsmSelector> PrsmSelectorPtr;

@@ -1,10 +1,3 @@
-/*
- * prsmfdr.hpp
- *
- *  Created on: Mar 20, 2014
- *      Author: xunlikun
- */
-
 #ifndef PROT_PRSM_FDR_HPP_
 #define PROT_PRSM_FDR_HPP_
 
@@ -20,17 +13,18 @@ namespace prot {
 
 class PrsmFdr {
  public:
-  PrsmFdr(std::string db_file_name, std::string spec_file_name, 
-          std::string input_ext,std::string output_ext);
-  PrsmFdr(std::map<std::string,std::string> arguments,std::string input_ext,std::string output_ext);
+  PrsmFdr(const std::string &db_file_name,
+          const std::string &spec_file_name,
+          const std::string &input_file_ext,
+          const std::string &output_file_ext);
   void process();
  private:
-  std::string db_file_;
-  std::string spec_file_;
-  std::string input_file_;
-  std::string output_file_;
+  std::string db_file_name_;
+  std::string spec_file_name_;
+  std::string input_file_ext_;
+  std::string output_file_ext_;
 
-  void compute(PrsmPtrVec &target,PrsmPtrVec decoy);
+  void compute(PrsmPtrVec &target, PrsmPtrVec &decoy);
 };
 typedef std::shared_ptr<PrsmFdr> PrsmFdrPtr;
 

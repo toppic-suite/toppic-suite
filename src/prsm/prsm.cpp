@@ -37,7 +37,7 @@ void Prsm::initScores(SpParaPtr sp_para_ptr) {
   match_peak_num_ = 0;
   match_fragment_num_ = 0;
   TheoPeakPtr prev_ion(nullptr);;
-  for (unsigned int i = 0; i < pairs.size(); i++) {
+  for (size_t i = 0; i < pairs.size(); i++) {
     if (pairs[i]->getTheoPeakPtr() != prev_ion) {
       prev_ion = pairs[i]->getTheoPeakPtr();
       match_fragment_num_ += pairs[i]->getRealPeakPtr()->getScore();
@@ -45,7 +45,7 @@ void Prsm::initScores(SpParaPtr sp_para_ptr) {
   }
   std::sort(pairs.begin(),pairs.end(),peakIonPairUp);
   DeconvPeakPtr prev_deconv_peak(nullptr);
-  for (unsigned int i = 0; i < pairs.size(); i++) {
+  for (size_t i = 0; i < pairs.size(); i++) {
     if (pairs[i]->getRealPeakPtr()->getBasePeakPtr() != prev_deconv_peak) {
       prev_deconv_peak = pairs[i]->getRealPeakPtr()->getBasePeakPtr();
       match_peak_num_ += pairs[i]->getRealPeakPtr()->getScore();
@@ -132,7 +132,7 @@ bool Prsm::isMatchMs(MsHeaderPtr header_ptr) {
   }
 }
 
-PrsmPtrVec readPrsm(std::string file_name,ProteoformPtrVec proteoforms){
+PrsmPtrVec readPrsm(const std::string &file_name, const ProteoformPtrVec &proteo_ptrs){
   PrsmPtrVec results;
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if(parser){
@@ -142,7 +142,7 @@ PrsmPtrVec readPrsm(std::string file_name,ProteoformPtrVec proteoforms){
       int simple_prsm_num = getChildCount(root, "prsm");
       for (int i = 0; i < simple_prsm_num; i++) {
         xercesc::DOMElement* prsm_element = getChildElement(root, "prsm", i);
-        results.push_back(PrsmPtr(new Prsm(prsm_element,proteoforms)));
+        results.push_back(PrsmPtr(new Prsm(prsm_element,proteo_ptrs)));
 
       }
     }
@@ -151,7 +151,7 @@ PrsmPtrVec readPrsm(std::string file_name,ProteoformPtrVec proteoforms){
   return results;
 }
 
-void addSpectrumPtrsToPrsms(PrsmPtrVec &prsms, PrsmParaPtr prsm_para_ptr){
+void addSpectrumPtrsToPrsms(PrsmPtrVec &prsm_ptrs, PrsmParaPtr prsm_para_ptr){
   MsAlignReader reader(prsm_para_ptr->getSpectrumFileName());
   DeconvMsPtr ms_ptr = reader.getNextMs();
   double delta = 0;
@@ -165,14 +165,14 @@ void addSpectrumPtrsToPrsms(PrsmPtrVec &prsms, PrsmParaPtr prsm_para_ptr){
       int spectrum_id = deconv_ms_ptr->getHeaderPtr()->getId();
       int prec_id = deconv_ms_ptr->getHeaderPtr()->getPrecId();
       //std::cout << "spectrum id " << spectrum_id << std::endl;
-      for(unsigned int i = start_prsm; i<prsms.size(); i++){
-        if(prsms[i]->isMatchMs(deconv_ms_ptr->getHeaderPtr())){
-          prsms[i]->setDeconvMsPtr(deconv_ms_ptr);
-          double delta = prsms[i]->getAdjustedPrecMass() - prsms[i]->getOriPrecMass();
-          prsms[i]->setRefineMs(createMsThreePtr(deconv_ms_ptr, delta, prsm_para_ptr->getSpParaPtr()));
+      for(size_t i = start_prsm; i<prsm_ptrs.size(); i++){
+        if(prsm_ptrs[i]->isMatchMs(deconv_ms_ptr->getHeaderPtr())){
+          prsm_ptrs[i]->setDeconvMsPtr(deconv_ms_ptr);
+          double delta = prsm_ptrs[i]->getAdjustedPrecMass() - prsm_ptrs[i]->getOriPrecMass();
+          prsm_ptrs[i]->setRefineMs(createMsThreePtr(deconv_ms_ptr, delta, prsm_para_ptr->getSpParaPtr()));
         }
-        if ((spectrum_id == prsms[i]->getSpectrumId() && prec_id < prsms[i]->getPrecursorId()) ||
-            spectrum_id < prsms[i]->getSpectrumId()) {
+        if ((spectrum_id == prsm_ptrs[i]->getSpectrumId() && prec_id < prsm_ptrs[i]->getPrecursorId()) ||
+            spectrum_id < prsm_ptrs[i]->getSpectrumId()) {
           start_prsm = i;
           break;
         }
@@ -182,11 +182,11 @@ void addSpectrumPtrsToPrsms(PrsmPtrVec &prsms, PrsmParaPtr prsm_para_ptr){
   }
 }
 
-void filterPrsms(PrsmPtrVec &prsms, MsHeaderPtr header_ptr, 
-                 PrsmPtrVec &sele_prsms) {
-  for (unsigned int i = 0; i < prsms.size(); i++) {
-    if (prsms[i]->isMatchMs(header_ptr)) {
-      sele_prsms.push_back(prsms[i]);
+void filterPrsms(const PrsmPtrVec &prsm_ptrs, MsHeaderPtr header_ptr, 
+                 PrsmPtrVec &sele_prsm_ptrs) {
+  for (size_t i = 0; i < prsm_ptrs.size(); i++) {
+    if (prsm_ptrs[i]->isMatchMs(header_ptr)) {
+      sele_prsm_ptrs.push_back(prsm_ptrs[i]);
     }
   }
 }

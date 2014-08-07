@@ -168,4 +168,15 @@ void FixResidueFactory::initFactory(const std::string &file_name) {
   }
 }
 
+ResiduePtrVec FixResidueFactory::getFixResiduePtrVec(const std::string &id) {
+  if (fix_res_list_map_.find(id) != fix_res_list_map_.end()) {
+    return fix_res_list_map_.find(id)->second;
+  }
+  else {
+    LOG_ERROR("Incorrect id for fix mod residue list.");
+    ResiduePtrVec empty_list;
+    return empty_list;
+  }
+}
+
 }

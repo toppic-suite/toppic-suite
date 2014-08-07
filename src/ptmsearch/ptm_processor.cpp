@@ -71,10 +71,10 @@ void PtmProcessor::initData() {
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
   std::string simplePrsmFileName = basename(sp_file_name)
       + "." + mng_ptr_->input_file_ext_;
-  simple_prsms_  = readSimplePrsm(simplePrsmFileName.c_str());
+  simple_prsms_  = readSimplePrsms(simplePrsmFileName.c_str());
   // find sequences for simple prsms
   for(unsigned int i =0;i< simple_prsms_.size();i++){
-    simple_prsms_[i]->findSeq(proteoforms_);
+    simple_prsms_[i]->assignProteoformPtr(proteoforms_);
   }
   comp_shift_ = CompShiftLowMemPtr(new CompShiftLowMem());
 }
@@ -92,7 +92,7 @@ void PtmProcessor::process(){
     SpectrumSetPtr spectrum_set_ptr = getSpectrumSet(deconv_sp, 0, sp_para_ptr);
     if(spectrum_set_ptr != nullptr){
       SimplePrsmPtrVec selected_prsms 
-          = findSimplePrsms(simple_prsms_,deconv_sp->getHeaderPtr());
+          = getMatchedSimplePrsms(simple_prsms_,deconv_sp->getHeaderPtr());
       processOneSpectrum(spectrum_set_ptr, selected_prsms);
     }
     std::cout << std::flush << "Ptm searching is processing " << cnt 
@@ -127,7 +127,7 @@ void PtmProcessor::processOneSpectrum(SpectrumSetPtr spectrum_set_ptr,
     PrsmPtrVec complete_prsms = slow_filter->getPrsms(
         s-1, SemiAlignTypeFactory::getCompletePtr());
     std::sort(complete_prsms.begin(), complete_prsms.end(), 
-              prsmCompPreMatchFragmentDown);
+              prsmCompPreMatchFragDown);
     PrsmPtrVec sele_complete_prsms;
     seleTopPrsms(complete_prsms, sele_complete_prsms, mng_ptr_->n_report_);
     complete_writers_[s-1]->writeVector(sele_complete_prsms);
@@ -136,7 +136,7 @@ void PtmProcessor::processOneSpectrum(SpectrumSetPtr spectrum_set_ptr,
     PrsmPtrVec prefix_prsms = slow_filter->getPrsms(
         s-1, SemiAlignTypeFactory::getPrefixPtr());
     std::sort(prefix_prsms.begin(), prefix_prsms.end(), 
-              prsmCompPreMatchFragmentDown);
+              prsmCompPreMatchFragDown);
     PrsmPtrVec sele_prefix_prsms;
     seleTopPrsms(prefix_prsms, sele_prefix_prsms, mng_ptr_->n_report_);
     prefix_writers_[s-1]->writeVector(sele_prefix_prsms);

@@ -1,10 +1,3 @@
-/*
- * output_selector.hpp
- *
- *  Created on: Feb 19, 2014
- *      Author: xunlikun
- */
-
 #ifndef OUTPUT_SELECTOR_HPP_
 #define OUTPUT_SELECTOR_HPP_
 
@@ -19,23 +12,19 @@ namespace prot {
 
 class OutputSelector {
  public:
-  OutputSelector(const std::string &db_file,
-                 const std::string &spec_file,
-                 const std::string &input_file,
-                 const std::string &output_file,
+  OutputSelector(const std::string &db_file_name,
+                 const std::string &spec_file_name,
+                 const std::string &input_file_ext,
+                 const std::string &output_file_ext,
                  const std::string &cutoff_type,
                  double cutoff_value);
-
-  OutputSelector(std::map<std::string,std::string> &arguments,
-                 const std::string &input_file,
-                 const std::string &output_file);
   void process();
  private:
-  std::string db_file_;
-  std::string spec_file_;
-  std::string input_file_;
-  std::string output_file_;
+  std::string db_file_name_;
+  std::string spec_file_name_;
   std::string cutoff_type_;
+  std::string input_file_ext_;
+  std::string output_file_ext_;
   double cutoff_value_;
 };
 

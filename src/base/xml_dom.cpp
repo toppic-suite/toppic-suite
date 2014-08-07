@@ -18,6 +18,7 @@ namespace prot {
 
 XmlDOMParser* XmlDOMParserFactory::dom_parser_ = nullptr;
 
+
 /* XmlDOMParser */
 XmlDOMParser::XmlDOMParser() : parser_(nullptr), err_handler_(nullptr) {
   xercesc::XMLPlatformUtils::Initialize();
@@ -36,6 +37,14 @@ XmlDOMParser::~XmlDOMParser() {
 xercesc::DOMDocument* XmlDOMParser::parse(const std::string &xml_file) {
   parser_->parse(xml_file.c_str());
   return parser_->adoptDocument();
+}
+
+/* XmlDOMParserFactory */
+XmlDOMParser* XmlDOMParserFactory::getXmlDOMParserInstance() {
+  if (dom_parser_ == nullptr) {
+    dom_parser_ = new XmlDOMParser();
+  }
+  return dom_parser_;
 }
 
 /* XmlDOMImplenmation */
@@ -64,6 +73,14 @@ xercesc::DOMLSSerializer* XmlDOMImpl::createSerializer() {
       xercesc::XMLUni::fgDOMWRTDiscardDefaultContent, true);
   writer->setNewLine(X("\n"));
   return writer;
+}
+
+/*XmlDOMImplFactory */
+XmlDOMImpl* XmlDOMImplFactory::getXmlDOMImplInstance() {
+  if (dom_impl_ == nullptr) {
+    dom_impl_ = new XmlDOMImpl();
+  }
+  return dom_impl_;
 }
 
 }

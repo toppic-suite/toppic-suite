@@ -14,11 +14,10 @@ namespace prot {
 
 class FastaSeq {
  public:
-  FastaSeq(const std::string &name, const std::string &ori_seq) {
-    name_ = name;
-    seq_ = rmChar(ori_seq);
-  }
+  FastaSeq(const std::string &name, const std::string &ori_seq);
+
   std::string getName() {return name_;}
+
   std::string getSeq() {return seq_;}
 
  private:

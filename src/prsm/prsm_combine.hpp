@@ -1,10 +1,3 @@
-/*
- * prsm_combine.hpp
- *
- *  Created on: Feb 18, 2014
- *      Author: xunlikun
- */
-
 #ifndef PRSM_COMBINE_HPP_
 #define PRSM_COMBINE_HPP_
 
@@ -15,27 +8,27 @@
 #include "base/proteoform.hpp"
 #include "base/fasta_reader.hpp"
 #include "prsm/prsm.hpp"
+#include "prsm/prsm_para.hpp"
 #include "prsm/prsm_writer.hpp"
 
 namespace prot {
 
 class PrsmCombine {
  public:
-  PrsmCombine(std::string db_file, std::string spec_file,
-              std::vector<std::string> &in_file_exts, std::string out_file);
+  PrsmCombine(const std::string &db_file_name, 
+              const std::string &spec_file_name, 
+              const std::vector<std::string> &in_file_exts,
+              const std::string &out_file_ext);
 
-  PrsmCombine(std::map<std::string, std::string> arguments,
-              std::vector<std::string> &in_file_exts,
-              std::string out_file);
-  virtual ~PrsmCombine();
   void process();
  private:
-  std::string spec_file_;
-  std::string db_file_;
+  std::string spec_file_name_;
+  std::string db_file_name_;
   std::vector<std::string> input_file_exts_;
-  std::string output_files_;
+  std::string output_file_ext_;
 
 };
+
 typedef std::shared_ptr<PrsmCombine> PrsmCombinePtr;
 } /* namespace prot */
 
