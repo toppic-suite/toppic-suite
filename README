@@ -4,3 +4,7 @@ unzip linux_inlude.zip
 cd build
 cmake ..
 make 
+
+cd bin
+link -s ../conf ./
+

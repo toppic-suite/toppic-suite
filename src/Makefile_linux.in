@@ -4,8 +4,6 @@ CC = g++
 # define any compile-time flags
 CPPFLAGS = -Wall -std=c++11 -O3 -DPROT_LINUX
 # -pg
-FILECPPFLAGS = -Wall -O3 
-# -pg
 #
 # define any directories containing header files other than /usr/include
 #
@@ -38,3 +36,5 @@ TDGF_OBJS = $(addprefix $(OBJ_DIR)/, evalue_processor.o comp_prob_value.o count_
 POISSON_OBJS = $(addprefix $(OBJ_DIR)/, poisson_processor.o poisson_comp_pvalue.o) 
 
 XPP_OBJS = $(addprefix $(OBJ_DIR)/, anno_view.o xml_generator.o transformer.o) 
+
+CONSOLE_OBJS = $(addprefix $(OBJ_DIR)/, argument.o)
