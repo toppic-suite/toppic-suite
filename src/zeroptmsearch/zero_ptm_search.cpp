@@ -11,14 +11,14 @@
 namespace prot {
 
 void zeroPtmSearch(SpectrumSetPtr spec_set_ptr, 
-                   SemiAlignTypePtr type,
+                   SemiAlignTypePtr type_ptr,
                    ProteoformPtrVec &proteoform_ptr_vec, 
                    ZeroPtmMngPtr mng_ptr, 
                    PrsmPtrVec &prsms) {
   ExtendMsPtr ms_three = spec_set_ptr->getMsThreePtr();
 
   ZpFastMatchPtrVec fast_matches 
-      = zeroPtmFastFilter(type, ms_three, proteoform_ptr_vec, 
+      = zeroPtmFastFilter(type_ptr, ms_three, proteoform_ptr_vec, 
                           mng_ptr->zero_ptm_filter_result_num_);
 
   LOG_DEBUG("fast_match ended size " << fast_matches.size());
@@ -27,7 +27,7 @@ void zeroPtmSearch(SpectrumSetPtr spec_set_ptr,
       = zeroPtmSlowFilter(deconv_ms, fast_matches, mng_ptr); 
 
   LOG_DEBUG("slow_match ended size " << slow_matches.size());
-  for (unsigned int i = 0; i < slow_matches.size(); i++) {
+  for (size_t i = 0; i < slow_matches.size(); i++) {
       prsms.push_back(slow_matches[i]->geneResult());
   }
   LOG_DEBUG("prsm generation ended size " << prsms.size());
