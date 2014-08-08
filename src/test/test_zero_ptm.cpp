@@ -62,7 +62,7 @@ int zero_ptm_process(int argc, char* argv[]) {
     if (arguments["searchType"] == "TARGET+DECOY") {
       generateShuffleDb(ori_db_file_name, db_file_name);
     }
-    /*
+
     int start_s = clock();
 
     std::cout << "Zero ptm searching starts " << std::endl;
@@ -71,7 +71,6 @@ int zero_ptm_process(int argc, char* argv[]) {
 
     int stop_s = clock();
     std::cout << std::endl << "Running time: " << (stop_s-start_s) / double(CLOCKS_PER_SEC)  << " seconds " << std::endl;
-    */
 
     std::cout << "Outputting table starts " << std::endl;
     TableWriterPtr table_out = TableWriterPtr(new TableWriter(prsm_para_ptr, "ZERO_COMPLETE", "ZERO_COMPLETE_TABLE"));
