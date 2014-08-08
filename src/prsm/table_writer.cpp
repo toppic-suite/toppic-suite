@@ -79,7 +79,7 @@ void TableWriter::write(){
         << prsm_ptrs[i]->getMatchFragNum() << "\t"
         << prsm_ptrs[i]->getPValue() << "\t"
         << prsm_ptrs[i]->getEValue() << "\t"
-        << prsm_ptrs[i]->getProbPtr()->getOneProtProb()<< "\t"
+        << prsm_ptrs[i]->getOneProtProb()<< "\t"
         << prsm_ptrs[i]->getFdr() << "\t"
         << std::endl;
   }

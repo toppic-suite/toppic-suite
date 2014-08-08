@@ -115,19 +115,51 @@ Prsm::Prsm(xercesc::DOMElement* element,ProteoformPtrVec proteoforms){
   refine_ms_three_ = ExtendMsPtr(nullptr);
 }
 
+double Prsm::getEValue() {
+  if (prob_ptr_ == nullptr) {
+    LOG_WARN("Probability pointer is null.");
+    return -1;
+  }
+  else {
+    return prob_ptr_->getEValue();
+  }
+}
+
+double Prsm::getPValue() {
+  if (prob_ptr_ == nullptr) {
+    LOG_WARN("Probability pointer is null.");
+    return -1;
+  }
+  else {
+    return prob_ptr_->getPValue();
+  }
+}
+
+double Prsm::getOneProtProb() {
+  if (prob_ptr_ == nullptr) {
+    LOG_WARN("Probability pointer is null.");
+    return -1;
+  }
+  else {
+    return prob_ptr_->getOneProtProb();
+  }
+}
+
+
 bool Prsm::isMatchMs(MsHeaderPtr header_ptr) {
   int id = header_ptr->getId();
   std::string scan = header_ptr->getScansString();
   int prec_id = header_ptr->getPrecId();
   double prec_mass = header_ptr->getPrecMonoMass();
   if (id == spectrum_id_ && prec_id == precursor_id_) {
-    LOG_DEBUG("scan " << scan << " prsm scan " << spectrum_scan_
+    LOG_TRACE("scan " << scan << " prsm scan " << spectrum_scan_
               << " prec mass " << prec_mass << " prsm mass " << ori_prec_mass_);
     if (scan != spectrum_scan_) {
       LOG_ERROR("Error in Prsm.");
     }
     return true;
   } else {
+    LOG_TRACE("prsm spectrum id " << spectrum_id_ << " ms spectrum id " << id);
     return false;
   }
 }
@@ -143,7 +175,6 @@ PrsmPtrVec readPrsm(const std::string &file_name, const ProteoformPtrVec &proteo
       for (int i = 0; i < simple_prsm_num; i++) {
         xercesc::DOMElement* prsm_element = getChildElement(root, "prsm", i);
         results.push_back(PrsmPtr(new Prsm(prsm_element,proteo_ptrs)));
-
       }
     }
     delete doc;
@@ -164,7 +195,7 @@ void addSpectrumPtrsToPrsms(PrsmPtrVec &prsm_ptrs, PrsmParaPtr prsm_para_ptr){
       DeconvMsPtr deconv_ms_ptr = spec_set_ptr->getDeconvMsPtr();
       int spectrum_id = deconv_ms_ptr->getHeaderPtr()->getId();
       int prec_id = deconv_ms_ptr->getHeaderPtr()->getPrecId();
-      //std::cout << "spectrum id " << spectrum_id << std::endl;
+      LOG_TRACE("spectrum id " << spectrum_id);
       for(size_t i = start_prsm; i<prsm_ptrs.size(); i++){
         if(prsm_ptrs[i]->isMatchMs(deconv_ms_ptr->getHeaderPtr())){
           prsm_ptrs[i]->setDeconvMsPtr(deconv_ms_ptr);

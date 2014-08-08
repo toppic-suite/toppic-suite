@@ -40,7 +40,7 @@ int process(int argc, char* argv[]) {
       return 1;
     }
     std::map<std::string, std::string> arguments = argu_processor.getArguments();
-    std::cout << "TopId 0.5 " << std::endl;
+    std::cout << "TopPC 0.5 " << std::endl;
 
     std::string exe_dir = arguments["executiveDir"];
     std::cout << "Executive file directory is: " << exe_dir << std::endl;

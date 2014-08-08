@@ -18,16 +18,17 @@ all:
 	cd ptmsearch; make
 	cd xpp; make	
 	cd console; make
+	cd test; make
 
 clean:
 	cd base; make clean
 	cd spec; make clean
 	cd prsm; make clean
-	cd poisson; clean
+	cd poisson; make clean
 	cd zeroptmsearch; make clean
 	cd tdgf; make clean
 	cd filterdiagonal; make clean
 	cd ptmsearch; make clean
 	cd xpp; make clean
 	cd console; make clean
-
+	cd test; make clean

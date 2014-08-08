@@ -122,7 +122,7 @@ ResiduePtrVec ResidueFactory::getResiduePtrVecInstance(const std::string &file_n
       xercesc::DOMElement* element = getChildElement(parent, "residue", i);
       std::string acid_name = getChildValue(element, "acid", 0);
       std::string ptm_abbr_name = getChildValue(element, "ptm", 0);
-      LOG_DEBUG(" acid " << acid_name << " ptm " << ptm_abbr_name);
+      LOG_DEBUG("acid " << acid_name << " ptm " << ptm_abbr_name);
       AcidPtr acid_ptr = AcidFactory::getBaseAcidPtrByName(acid_name);
       if (acid_ptr.get() == nullptr) {
         LOG_ERROR( "acid " << acid_name  << " not found ");
