@@ -17,7 +17,7 @@ LFLAGS = -L../../thirdparty/linux_lib -L/lib -L/opt/local/lib
 # define any libraries to link into executable:
 LIBS = -static -lxalan-c -lxalanMsg -lxerces-c -lboost_program_options -lboost_filesystem -lboost_system -lpthread
 
-OBJ_DIR = ../../obj
+OBJ_DIR = ../../bin/obj
 
 BIN_DIR = ../../bin
 
