@@ -9,22 +9,18 @@ namespace prot {
 class ZeroPtmFastMatch {
  public:
   ZeroPtmFastMatch (ProteoformPtr proteoform_ptr, double score, 
-                    int begin, int end) {
-    proteoform_ptr_ = proteoform_ptr;
-    score_ = score;
-    begin_ = begin;
-    end_ = end;
-  }
+                    int begin, int end);
+
   double getScore() {return score_;}
 
-  ProteoformPtr getProteoformPtr() {return proteoform_ptr_;}
+  ProteoformPtr getProteoformPtr() {return proteo_ptr_;}
 
   int getBegin() {return begin_;}
 
   int getEnd() {return end_;}
 
  private:
-  ProteoformPtr proteoform_ptr_;
+  ProteoformPtr proteo_ptr_;
   double score_;
   int begin_;
   int end_;
@@ -33,14 +29,14 @@ class ZeroPtmFastMatch {
 typedef std::shared_ptr<ZeroPtmFastMatch> ZpFastMatchPtr;
 typedef std::vector<ZpFastMatchPtr> ZpFastMatchPtrVec;
 
-inline bool compareZeroPtmFastMatchDown(ZpFastMatchPtr m1, 
-                                        ZpFastMatchPtr m2) {
-  return m1->getScore() > m2->getScore();
+inline bool compareZeroPtmFastMatchDown(const ZpFastMatchPtr &a, 
+                                        const ZpFastMatchPtr &b) {
+  return a->getScore() > b->getScore();
 }
 
-ZpFastMatchPtrVec zeroPtmFastFilter(SemiAlignTypePtr semi_align_type,
+ZpFastMatchPtrVec zeroPtmFastFilter(SemiAlignTypePtr semi_align_type_ptr,
                                     ExtendMsPtr ms_ptr,
-                                    ProteoformPtrVec &form_ptr_vec,
+                                    const ProteoformPtrVec &proteo_ptrs,
                                     int report_num);
 
 }

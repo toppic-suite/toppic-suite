@@ -25,17 +25,17 @@ ZeroPtmSlowMatch::ZeroPtmSlowMatch(DeconvMsPtr deconv_ms_ptr,
 
   ActivationPtr activation_ptr = deconv_ms_ptr_->getHeaderPtr()->getActivationPtr();
   double min_mass = sp_para_ptr->getMinMass();
-  TheoPeakPtrVec theo_peaks = getProteoformTheoPeak(proteoform_ptr_, 
+  TheoPeakPtrVec theo_peak_ptrs = getProteoformTheoPeak(proteoform_ptr_, 
                                                     activation_ptr, min_mass);
 
-  compScore(refine_ms_ptr_,theo_peaks, sp_para_ptr->getPeakTolerancePtr()->getPpo());
+  compScore(refine_ms_ptr_,theo_peak_ptrs, sp_para_ptr->getPeakTolerancePtr()->getPpo());
 }
 
 // compute the average ppo
-double compAvg(std::vector<double> ppos, double recal_ppo) {
+double compAvg(const std::vector<double> &ppos, double recal_ppo) {
   int cnt = 0;
   double sum = 0;
-  for (unsigned int i = 0; i < ppos.size(); i++) {
+  for (size_t i = 0; i < ppos.size(); i++) {
     if (std::abs(ppos[i]) <= recal_ppo) {
       cnt++;
       sum += ppos[i];
@@ -64,10 +64,11 @@ bool ZeroPtmSlowMatch::isValid (double recal, double ppo) {
 }
 
 // input is refineMsThree, result is score and recal and recalMass 
-void ZeroPtmSlowMatch::compScore (ExtendMsPtr refine_ms_ptr, TheoPeakPtrVec theo_peaks,
+void ZeroPtmSlowMatch::compScore (ExtendMsPtr refine_ms_ptr, 
+                                  const TheoPeakPtrVec &theo_peak_ptrs,
                                   double ppo) {
   std::vector<double> ms_masses = getExtendMassVec(refine_ms_ptr);
-  std::vector<double> theo_masses = getTheoMassVec(theo_peaks);
+  std::vector<double> theo_masses = getTheoMassVec(theo_peak_ptrs);
   std::vector<double> result_ppos = compMsMassPpos(ms_masses, theo_masses, ppo);
 
   if (!mng_ptr_->do_recalibration_) {
@@ -79,7 +80,7 @@ void ZeroPtmSlowMatch::compScore (ExtendMsPtr refine_ms_ptr, TheoPeakPtrVec theo
       recal_ = 0;
     }
   }
-  for (unsigned int i = 0; i < ms_masses.size(); i++) {
+  for (size_t i = 0; i < ms_masses.size(); i++) {
     ms_masses[i] = ms_masses[i] * (1 + recal_);
   }
   score_ = compNumMatchedTheoMasses(ms_masses, theo_masses, ppo);
@@ -93,13 +94,13 @@ PrsmPtr ZeroPtmSlowMatch::geneResult() {
 }
 
 ZpSlowMatchPtrVec zeroPtmSlowFilter(DeconvMsPtr deconv_ms_ptr,
-                                    ZpFastMatchPtrVec fast_matches,
+                                    const ZpFastMatchPtrVec &fast_match_ptrs,
                                     ZeroPtmMngPtr mng_ptr) {
 
   ZpSlowMatchPtrVec slow_matches;
-  for (unsigned int i = 0; i < fast_matches.size(); i++) {
+  for (size_t i = 0; i < fast_match_ptrs.size(); i++) {
     ZpSlowMatchPtr slow_match = ZpSlowMatchPtr(
-        new ZeroPtmSlowMatch(deconv_ms_ptr, fast_matches[i], mng_ptr));
+        new ZeroPtmSlowMatch(deconv_ms_ptr, fast_match_ptrs[i], mng_ptr));
     slow_matches.push_back(slow_match);
   }
   /* sort */
