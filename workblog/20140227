@@ -1,6 +1,0 @@
-problem:
-
-1:running the whole pipeline,it woule report an null pointer problem.but search first and then compute the e-value
-the problem disappear
-
-2: computing the e-value need very long time.829 spectrum cost 10h;
