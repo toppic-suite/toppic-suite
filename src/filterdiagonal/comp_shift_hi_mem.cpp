@@ -1,11 +1,3 @@
-/*
- * comp_shift_hi_mem.cpp
- *
- *  Created on: Dec 1, 2013
- *      Author: xunlikun
- */
-
-#include <time.h>
 #include <iostream>
 
 #include "base/logger.hpp"
@@ -13,229 +5,213 @@
 
 namespace prot {
 
-CompShiftHiMem::CompShiftHiMem(ProteoformPtrVec seqs,
-                               PtmFastFilterMngPtr mng){
-    scale_ = mng->ptm_fast_filter_scale_;
-    LOG_DEBUG("Scale"+scale_);
-    LOG_DEBUG("Sequence number"+seqs.size());
-    shift_array_len_ = 20000 * scale_ + 2;
-    initSeqBeginEnds(seqs);
-    initIndexes(seqs);
-    int debug_info_shift_array_len = shift_array_len_;
-    LOG_DEBUG("shift_array_len_ ="+convertToString(debug_info_shift_array_len));
-    LOG_DEBUG("seq_total_len_"+convertToString(seq_total_len_));
-    int indexes_size = indexes_.size();
-    LOG_DEBUG("indexes.length"+convertToString(indexes_size));
+CompShiftHiMem::CompShiftHiMem(const ProteoformPtrVec &proteo_ptrs,
+                               PtmFastFilterMngPtr mng_ptr){
+  scale_ = mng_ptr->ptm_fast_filter_scale_;
+  LOG_DEBUG("Scale: " + scale_);
+  LOG_DEBUG("Proteoform point number: " + proteo_ptrs.size());
+
+  col_num_ = mng_ptr->max_proteoform_mass * scale_;
+  initProteoformBeginEnds(proteo_ptrs);
+  initIndexes(proteo_ptrs);
+
+  LOG_DEBUG("column number: " << col_num_);
+  LOG_DEBUG("row number: " << row_num_);
+  LOG_DEBUG("indexes size: "<< sizeof(col_indexes_)/sizeof(col_indexes_[0]));
 }
 
 CompShiftHiMem::~CompShiftHiMem(){
-    delete pos_seq_ids_;
+  delete proteo_row_begins_;
+  delete row_proteo_ids_;
+  delete col_index_begins_;
+  delete col_index_ends_;
+  delete col_indexes_;
 }
 
-std::vector<std::vector<int>> CompShiftHiMem::compConvolution(
-    std::vector<int> masses,int bgn_pos,int num){
+void CompShiftHiMem::initProteoformBeginEnds(const ProteoformPtrVec &proteo_ptrs){
+  proteo_row_begins_ = new int[proteo_ptrs.size()];
+  int* proteo_row_ends;
+  proteo_row_ends = new int[proteo_ptrs.size()];
+  int  pnt = 0;
+  for(size_t i=0; i< proteo_ptrs.size(); i++){
+    proteo_row_begins_[i] = pnt;
+    proteo_row_ends[i] = pnt + proteo_ptrs[i]->getResSeqPtr()->getLen() - 1;
+    pnt += proteo_ptrs[i]->getResSeqPtr()->getLen();
+  }
+  row_num_ = pnt;
+  row_proteo_ids_ = new int[row_num_];
+  for(size_t i =0; i<proteo_ptrs.size(); i++){
+    for(int j= proteo_row_begins_[i]; j<= proteo_row_ends[i];j++){
+      row_proteo_ids_[j] = i;
+    }
+  }
+  delete proteo_row_ends;
+}
 
-  std::vector<short> scores;
-  for(int i=0;i<seq_total_len_ ;i++){
-    scores.push_back(0);
+inline void CompShiftHiMem::updateColumnMatchNums(ProteoformPtr proteo_ptr, 
+                                                  int* col_match_nums) {
+  std::vector<int> masses = proteo_ptr->getBpSpecPtr()->getScaledPrmMasses(scale_);
+  for (size_t bgn = 0; bgn < masses.size(); bgn++) {
+    for (size_t cur = bgn + 1; cur < masses.size(); cur++) {
+      int diff = masses[cur] - masses[bgn];
+      if (diff < col_num_) {
+        col_match_nums[diff]++;
+      }
+      else {
+        break;
+      }
+    }
+  }
+}
+
+void CompShiftHiMem::initIndexes(const ProteoformPtrVec &proteo_ptrs){
+  int* col_match_nums = new int[col_num_];
+  int* col_index_pnts = new int[col_num_];
+  col_index_begins_ = new int[col_num_];
+  col_index_ends_ = new int[col_num_];
+
+  for(size_t i =0; i<proteo_ptrs.size(); i++){
+    updateColumnMatchNums(proteo_ptrs[i], col_match_nums);
   }
 
-  int begin_index =0;
-  int end_index = 0;
-  unsigned int m =0;
+  int pnt = 0;
+  for(int i=0; i< col_num_; i++){
+    col_index_begins_[i] = pnt;
+    col_index_pnts[i] = pnt;
+    col_index_ends_[i] = pnt + col_match_nums[i]-1;
+    pnt += col_match_nums[i];
+  }
 
-  for(unsigned int i =bgn_pos+1;i<masses.size();i++){
+  col_indexes_ = new int[pnt];
+
+  for(size_t i=0; i<proteo_ptrs.size(); i++){
+    if (i/1000*1000 == i) {
+      LOG_DEBUG("preprocessing proteoform " << i);
+    }
+    std::vector<int> masses  
+        = proteo_ptrs[i]->getBpSpecPtr()->getScaledPrmMasses(scale_);
+    for (size_t bgn=0; bgn < masses.size(); bgn++) {
+      for (size_t cur = bgn+1; cur < masses.size(); cur++) {
+        int diff = masses[cur] - masses[bgn];
+        if (diff < col_num_) {
+          col_indexes_[col_index_pnts[diff]] = proteo_row_begins_[i] + bgn;
+          col_index_pnts[diff]++;
+        }
+        else {
+          break;
+        }
+      }
+    }
+  }
+  delete col_match_nums;
+  delete col_index_pnts;
+}
+
+
+std::vector<std::pair<int,int>> CompShiftHiMem::compConvolution(
+    const std::vector<int> &masses,int bgn_pos,int num){
+
+  short* scores = new short[row_num_];
+
+  int begin_index;
+  int end_index;
+  int m;
+
+  for (size_t i = bgn_pos+1; i<masses.size(); i++){
     m = masses[i]-masses[bgn_pos];
-    if(m>=shift_array_len_){
+    if(m>=col_num_){
       break;
     }
     if(m>0){
-      begin_index = index_begins_[m-1];
+      begin_index = col_index_begins_[m-1];
     }
     else{
-      begin_index = index_begins_[m];
+      begin_index = col_index_begins_[m];
     }
-    end_index = index_ends_[m+1];
-    //logger
+    end_index = col_index_ends_[m+1];
     for(int j = begin_index;j<end_index;j++){
-      scores[indexes_[j]]++;
+      scores[col_indexes_[j]]++;
     }
   }
-  //logger
-  return getShiftScores(scores,num);
+  std::vector<std::pair<int,int>> results = getShiftScores(scores, num);
+  delete scores;
+  return results;
 }
 
-std::vector<std::vector<int>> CompShiftHiMem::compConvolution(
-    std::vector<int> masses,std::vector<int> errors,int bgn_pos,int num){
+std::vector<std::pair<int,int>> CompShiftHiMem::compConvolution(
+    const std::vector<int> &masses, const std::vector<int> &errors,int bgn_pos,int num){
 
-    std::vector<short> scores;
-    for(int i=0;i<seq_total_len_ ;i++){
-        scores.push_back(0);
+  short* scores = new short[row_num_];
+
+  int begin_index;
+  int end_index;
+  int m;
+
+  for(size_t i =bgn_pos+1; i<masses.size(); i++){
+
+    m = masses[i]-masses[bgn_pos];
+    // m - errors[i] performs better than m - errors[i] -  errors[bgn_pos]
+    int left = m-errors[i];
+    if(left < 0){
+      left=0;
     }
-
-    int begin_index =0;
-    int end_index = 0;
-    int m =0;
-    int e =0;
-
-    for(unsigned int i =bgn_pos+1;i<masses.size();i++){
-
-        m = masses[i]-masses[bgn_pos];
-        int left = m-errors[i]-e;
-        if(left < 0){
-            left=0;
-        }
-        unsigned int right = m+errors[i]+e;
-        if(right>=shift_array_len_-1){
-            break;
-        }
-        begin_index = index_begins_[left];
-        end_index= index_ends_[right];
-        for(int j=begin_index;j<=end_index;j++){
-            scores[indexes_[j]]++;
-        }
+    int right = m+errors[i];
+    if(right >= col_num_){
+      break;
     }
-    return getShiftScores(scores,num);
+    begin_index = col_index_begins_[left];
+    end_index= col_index_ends_[right];
+    for(int j=begin_index;j<=end_index;j++){
+      scores[col_indexes_[j]]++;
+    }
+  }
+  std::vector<std::pair<int,int>> results = getShiftScores(scores, num);
+  delete scores;
+  return results;
 }
 
-std::vector<std::vector<int>> CompShiftHiMem::getShiftScores(
-    std::vector<short> scores,int num){
-    std::vector<short> top_scores;
-    std::vector<int> top_position;
-    for(int i =0; i<num;i++){
-        top_scores.push_back(0);
-        top_position.push_back(-1);
+inline std::vector<std::pair<int,int>> CompShiftHiMem::getShiftScores(short* scores,int num){
+  short* top_scores = new short[num];
+  int* top_rows = new int[num];
+  memset(top_rows, -1, num * sizeof(int));
+
+  int last_scr = top_scores[num-1];
+  for(int i=0; i<row_num_; i++){
+    if(scores[i] <= last_scr){
+      continue;
     }
-    int last_scr = top_scores[num-1];
-    for(int i=0;i<seq_total_len_;i++){
-        if(scores[i]<=last_scr){
-            continue;
-        }
-        for(int j=num-2;j>=0;j--){
-            if(scores[i]>top_scores[j]){
-                top_scores[j+1] = top_scores[j];
-                top_position[j+1] = top_position[j];
-            }
-            else{
-                top_scores[j+1] = scores[i];
-                top_position[j+1] = i;
-                break;
-            }
-        }
-        if(scores[i]>top_scores[0]){
-            top_scores[0] = scores[i];
-            top_position[0]=i;
-        }
-        last_scr = top_scores[num-1];
+    for(int j=num-2;j>=0;j--){
+      if(scores[i]>top_scores[j]){
+        top_scores[j+1] = top_scores[j];
+        top_rows[j+1] = top_rows[j];
+      }
+      else{
+        top_scores[j+1] = scores[i];
+        top_rows[j+1] = i;
+        break;
+      }
     }
-    //logger
-    int output_num =0;
-    for(int i=0;i<num;i++){
-        if(top_position[i]>=0){
-            output_num++;
-        }
+    if(scores[i]>top_scores[0]){
+      top_scores[0] = scores[i];
+      top_rows[0]=i;
     }
-    std::vector<std::vector<int>> result;
-    for(int i=0;i<output_num;i++){
-        std::vector<int> temp;
-        temp.push_back(pos_seq_ids_[top_position[i]]);
-        temp.push_back(top_scores[i]);
-        result.push_back(temp);
+    last_scr = top_scores[num-1];
+  }
+  int output_num =0;
+  for(int i=0;i<num;i++){
+    if(top_rows[i]>=0){
+      output_num++;
     }
-    return result;
+  }
+  std::vector<std::pair<int,int>> results;
+  for(int i=0;i<output_num;i++){
+    std::pair<int,int> proteo_score(row_proteo_ids_[top_rows[i]], top_scores[i]);
+    results.push_back(proteo_score);
+  }
+  delete top_scores;
+  delete top_rows;
+  return results;
 }
 
-void CompShiftHiMem::initSeqBeginEnds(ProteoformPtrVec seqs){
-    std::vector<int> seq_ends;
-    int pnt = 0;
-    for(unsigned int i=0;i<seqs.size();i++){
-        seq_begins_.push_back(pnt);
-        seq_ends.push_back(pnt+seqs[i]->getResSeqPtr()->getLen()-1);
-        pnt+= seqs[i]->getResSeqPtr()->getLen();
-    }
-    seq_total_len_ = pnt;
-    pos_seq_ids_ = new int[seq_total_len_];
-    for(unsigned int i =0;i<seqs.size();i++){
-        for(int j= seq_begins_[i];j<=seq_ends[i];j++){
-            pos_seq_ids_[j] = i;
-        }
-    }
-}
-void CompShiftHiMem::initIndexes(ProteoformPtrVec seqs){
-    std::vector<int> cnt;
-    std::vector<int> index_pnt;
-    for(unsigned int i =0;i< shift_array_len_;i++){
-        cnt.push_back(0);
-        index_begins_.push_back(0);
-        index_ends_.push_back(0);
-        index_pnt.push_back(0);
-    }
-
-    for(unsigned int i =0;i<seqs.size();i++){
-        updateCnt(seqs[i],cnt);
-    }
-
-    int pnt = 0;
-    for(unsigned int i=0;i<cnt.size();i++){
-        index_begins_[i] = pnt;
-        index_pnt[i] = pnt;
-        index_ends_[i] = pnt+cnt[i]-1;
-        pnt+=cnt[i];
-    }
-
-    for(int i=0;i<pnt;i++){
-        indexes_.push_back(0);
-    }
-
-    for(unsigned int i=0;i<seqs.size();i++){
-        if(i/1000*1000 == i){
-            int m = i;
-            LOG_DEBUG("preprocessing seq "+convertToString(m));
-        }
-    IonTypePtr b_ptr = IonTypeFactory::getIonTypePtr_B();
-        std::vector<int> mass 
-        = seqs[i]->getBpSpecPtr()->getScaledMass(scale_,b_ptr);
-        unsigned int bgn = 0;
-        unsigned int end =0;
-        unsigned int diff =0;
-        while(bgn <mass.size()){
-            end = bgn+1;
-            while(end < mass.size()){
-                diff = mass[end] - mass[bgn];
-                if(diff >= shift_array_len_){
-                    break;
-                }
-                else{
-                    indexes_[index_pnt[diff]] =seq_begins_[i]+bgn;
-                    index_pnt[diff]++;
-                }
-                end++;
-            }
-            bgn++;
-        }
-    }
-
-}
-void CompShiftHiMem::updateCnt(ProteoformPtr seq,std::vector<int>& cnt){
-  IonTypePtr b_ptr = IonTypeFactory::getIonTypePtr_B();
-  std::vector<int> mass = seq->getBpSpecPtr()->getScaledMass(scale_,b_ptr);
-    unsigned int bgn =0;
-    unsigned int end =0;
-    unsigned int diff=0;
-    while(bgn < mass.size()){
-        end = bgn + 1;
-        while (end < mass.size()){
-            diff = mass[end]-mass[bgn];
-            if(diff >= cnt.size()){
-                break;
-            }
-            else{
-                cnt[diff]++;
-            }
-            end ++;
-        }
-        bgn++;
-    }
-}
 
 } /* namespace prot */

@@ -1,10 +1,3 @@
-/*
- * ptm_fast_filter_block.hpp
- *
- *  Created on: Dec 1, 2013
- *      Author: xunlikun
- */
-
 #ifndef PTM_FAST_FILTER_BLOCK_HPP_
 #define PTM_FAST_FILTER_BLOCK_HPP_
 
