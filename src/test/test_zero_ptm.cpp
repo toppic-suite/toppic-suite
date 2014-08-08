@@ -6,6 +6,7 @@
 #include "zeroptmsearch/zero_ptm_search.hpp"
 
 int main(int argc, char* argv[]) {
+  /*
   try {
     std::cout << "ZeroPtmConsole 0.1 " << std::endl;
     prot::ZeroPtmMngPtr mng_ptr
@@ -16,5 +17,6 @@ int main(int argc, char* argv[]) {
   } catch (const char* e) {
     std::cout << "Exception " << e << std::endl;
   }
+  */
   return 0;
 }

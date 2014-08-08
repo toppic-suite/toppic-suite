@@ -1,14 +1,16 @@
 include ../Makefile.in
 
-TEST_OBJS = $(addprefix $(OBJ_DIR)/, argument.o test_console.o)
+TEST_ZERO_PTM_OBJS = $(addprefix $(OBJ_DIR)/, test_zero_ptm.o)
 
-OBJS = $(BASE_OBJS) $(SPEC_OBJS) $(PRSM_OBJS) $(ZERO_PTM_OBJS) $(FILTER_OBJS) $(PTM_OBJS) $(TDGF_OBJS) $(POISSON_OBJS) $(XPP_OBJS) $(TEST_OBJS)
+OBJS = $(BASE_OBJS) $(SPEC_OBJS) $(PRSM_OBJS) $(ZERO_PTM_OBJS) $(FILTER_OBJS) $(PTM_OBJS) $(TDGF_OBJS) $(POISSON_OBJS) $(XPP_OBJS) $(CONSOLE_OBJS) 
+
+TEST_ZERO_PTM_LINK_OBJS = $(OBJS) $(TEST_ZERO_PTM_OBJS)
 
 BIN_DIR = ../../bin
 
 #
 # define the executable file 
-MAIN = $(BIN_DIR)/topid
+TEST_ZERO_PTM = $(BIN_DIR)/test_zero_ptm
 #
 #
 # The following part of the makefile is generic; it can be used to 
@@ -18,15 +20,15 @@ MAIN = $(BIN_DIR)/topid
 #
 .PHONY: depend clean
 #
-all:    $(MAIN)
+all:    $(TEST_ZERO_PTM)
 
-$(MAIN): $(OBJS) 
-	$(CC) $(CPPFLAGS) $(INCLUDES) -o $(MAIN) $(OBJS) $(LFLAGS) $(LIBS)
+$(TEST_ZERO_PTM): $(TEST_ZERO_PTM_LINK_OBJS) 
+	$(CC) $(CPPFLAGS) $(INCLUDES) -o $(TEST_ZERO_PTM) $(TEST_ZERO_PTM_LINK_OBJS) $(LFLAGS) $(LIBS)
 
 $(OBJ_DIR)/%.o: %.cpp
 	$(CC) -c $(CPPFLAGS) $(INCLUDES) $< -o $@
 
 clean:
-	$(RM) *~ $(MAIN) $(TEST_OBJS)
+	$(RM) *~ $(TEST_ZERO_PTM) $(TEST_ZERO_PTM_OBJS)
 
 depend: $(SRCS)
