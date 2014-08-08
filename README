@@ -1,3 +1,6 @@
+cd third_party
+unzip linux_inlude.zip
+
 cd build
 cmake ..
 make 
