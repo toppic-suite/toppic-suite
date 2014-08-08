@@ -42,7 +42,7 @@ void AcidFactory::initFactory(const std::string &file_name) {
     XmlDOMDocument doc(parser, file_name.c_str());
     xercesc::DOMElement* parent = doc.getDocumentElement();
     int acid_num = getChildCount(parent, "amino_acid");
-    LOG_DEBUG( "acid num " << acid_num);
+    LOG_DEBUG("acid num " << acid_num);
     for (int i = 0; i < acid_num; i++) {
       xercesc::DOMElement* element = getChildElement(parent, "amino_acid", i);
       std::string name = getChildValue(element, "name", 0);
