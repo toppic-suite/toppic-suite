@@ -14,7 +14,7 @@ LFLAGS = -L../../thirdparty/windows_lib/ -L/lib -L/opt/local/lib
 # define any libraries to link into executable:
 LIBS = -lxalan-c -lxalanMsg -lxerces-c -lboost_filesystem-mgw48-1_55 -lboost_system-mgw48-1_55 -lboost_program_options-mgw48-1_55
 
-OBJ_DIR = ../../obj
+OBJ_DIR = ../../bin/obj
 
 BIN_DIR = ../../bin
 
