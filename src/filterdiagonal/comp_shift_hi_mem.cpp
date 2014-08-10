@@ -72,6 +72,7 @@ void CompShiftHiMem::initIndexes(const ProteoformPtrVec &proteo_ptrs){
   // init col_match_nums
   memset(col_match_nums, 0, col_num_ * sizeof(int));
   // no need to init
+  std::fill(col_match_nums, col_match_nums + col_num_, 0);
   int* col_index_pnts = new int[col_num_];
   // no need to init
   col_index_begins_ = new int[col_num_];
