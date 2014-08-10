@@ -72,7 +72,6 @@ int process(int argc, char* argv[]) {
         = PtmFastFilterMngPtr(new PtmFastFilterMng(prsm_para_ptr, "FILTER"));
     PtmFastFilterProcessorPtr filter_processor = PtmFastFilterProcessorPtr(new PtmFastFilterProcessor(filter_mng_ptr));
     filter_processor->process();
-    //filter_processor->combineBlock();
     filter_processor = nullptr;
 
     std::cout << "Ptm searching starts" << std::endl;
