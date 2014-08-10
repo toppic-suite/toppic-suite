@@ -29,7 +29,7 @@ def checkIn(line, clines):
 			break
 		elif (arr1[3] == arr2[4]):
 			if float(arr1[15]) > float(arr2[14]): 
-:				res = 2
+				res = 2
 			else: 
 				res = 3
 			break
