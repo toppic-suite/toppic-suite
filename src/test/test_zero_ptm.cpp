@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 
 #include "base/fasta_reader.hpp"
 #include "base/base_data.hpp"
@@ -96,5 +97,6 @@ int zero_ptm_process(int argc, char* argv[]) {
 
 int main(int argc, char* argv[]) {
   prot::log_level = 2;
+  std::cout << std::setprecision(10);
   return prot::zero_ptm_process(argc, argv);
 }
