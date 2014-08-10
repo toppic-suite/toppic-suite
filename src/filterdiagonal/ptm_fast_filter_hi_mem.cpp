@@ -43,15 +43,15 @@ SimplePrsmPtrVec2D PtmFastFilterHiMem::compute(PrmMsPtr ms){
       = prot::getIntMassErrorList(ms,mng_->ptm_fast_filter_scale_,true,false);
   SimplePrsmPtrVec2D match;
   for(unsigned int i=0;i<masses[0].size();i++){
-    std::vector<std::vector<int>> results 
+    std::vector<std::pair<int,int>> results 
         =index_->compConvolution(masses[0],masses[1],i,
                                  mng_->ptm_fast_filter_result_num_);
     SimplePrsmPtrVec temp_match;
     for(unsigned int j =0;j <results.size();j++){
       temp_match.push_back(
           SimplePrsmPtr(new SimplePrsm(ms->getHeaderPtr(),
-                                       seqs_[results[j][0]],
-                                       results[j][1])));
+                                       seqs_[results[j].first],
+                                       results[j].second)));
     }
     match.push_back(temp_match);
   }

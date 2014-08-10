@@ -1,10 +1,3 @@
-/*
- * comp_shift_hi_mem.hpp
- *
- *  Created on: Dec 1, 2013
- *      Author: xunlikun
- */
-
 #ifndef COMP_SHIFT_HI_MEM_HPP_
 #define COMP_SHIFT_HI_MEM_HPP_
 
@@ -16,28 +9,36 @@ namespace prot {
 
 class CompShiftHiMem {
  public:
-  CompShiftHiMem(ProteoformPtrVec seqs,PtmFastFilterMngPtr mng);
-  ~CompShiftHiMem();
-  std::vector<std::vector<int>> compConvolution(std::vector<int> masses,
-                                                int bgn_pos,int num);
-  std::vector<std::vector<int>> compConvolution(std::vector<int> masses,
-                                                std::vector<int> errors,
-                                                int bgn_pos,int num);
-  std::vector<std::vector<int>> getShiftScores(std::vector<short> scores,
-                                               int num);
- private:
-  unsigned int shift_array_len_;
-  int scale_;
-  std::vector<int> seq_begins_;
-  int seq_total_len_;
-  int* pos_seq_ids_;
-  std::vector<int> index_begins_;
-  std::vector<int> index_ends_;
-  std::vector<int> indexes_;
+  CompShiftHiMem(const ProteoformPtrVec &proteo_ptrs, PtmFastFilterMngPtr mng_ptr);
 
-  void initSeqBeginEnds(ProteoformPtrVec seqs);
-  void initIndexes(ProteoformPtrVec seqs);
-  void updateCnt(ProteoformPtr seq,std::vector<int>& cnt);
+  ~CompShiftHiMem();
+
+  std::vector<std::pair<int,int>> compConvolution(const std::vector<int> &masses,
+                                                  int bgn_pos,int num);
+
+  std::vector<std::pair<int,int>> compConvolution(const std::vector<int> &masses,
+                                                  const std::vector<int> &errors,
+                                                  int bgn_pos,int num);
+
+ private:
+  // scale factor
+  int scale_;
+  int col_num_;
+
+  int row_num_;
+  // the first row of each proteoform  
+  int* proteo_row_begins_;
+  // the proteoform id of each row
+  int* row_proteo_ids_;
+
+  int* col_index_begins_;
+  int* col_index_ends_;
+  int* col_indexes_;
+
+  void updateColumnMatchNums(ProteoformPtr proteo_ptr, int* col_match_nums);
+  void initProteoformBeginEnds(const ProteoformPtrVec &proteo_ptrs);
+  void initIndexes(const ProteoformPtrVec &proteo_ptrs);
+  std::vector<std::pair<int,int>> getShiftScores(short* scores, int num);
 };
 
 typedef std::shared_ptr<CompShiftHiMem> CompShiftHiMemPtr;

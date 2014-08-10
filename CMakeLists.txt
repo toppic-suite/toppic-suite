@@ -38,41 +38,41 @@ file(GLOB PTM_SCRS   ${CMAKE_CURRENT_SOURCE_DIR}/src/ptmsearch/*.cpp)
 file(GLOB POISSON_SCRS   ${CMAKE_CURRENT_SOURCE_DIR}/src/poisson/*.cpp)
 file(GLOB TDGF_SCRS   ${CMAKE_CURRENT_SOURCE_DIR}/src/tdgf/*.cpp)
 file(GLOB XPP_SCRS   ${CMAKE_CURRENT_SOURCE_DIR}/src/xpp/*.cpp)
-file(GLOB TEST_SCRS   ${CMAKE_CURRENT_SOURCE_DIR}/src/test/argument.cpp)
-file(GLOB MAIN_SCRS   ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_console.cpp) 
-file(GLOB MULTIPLE_SCRS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_multiple.cpp) 
-file(GLOB TEST_EVALUE_SCRS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_evalue.cpp) 
+file(GLOB ARGU_SCRS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/argument.cpp)
+file(GLOB MAIN_SCRS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppc.cpp) 
+file(GLOB TEST_ZERO_PTM_SCRS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_zero_ptm.cpp) 
+#file(GLOB TEST_EVALUE_SCRS ${CMAKE_CURRENT_SOURCE_DIR}/console/test/test_evalue.cpp) 
 
 link_directories(${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/linux_lib/)
 
-message(STATUS "multiple sources " ${MULTIPLE_SCRS})
-
-add_executable(topid ${BASE_SCRS} ${SPEC_SCRS} ${PRSM_SCRS}
+add_executable(toppc ${BASE_SCRS} ${SPEC_SCRS} ${PRSM_SCRS}
         ${ZERO_PTM_SCRS} ${FILTER_SCRS} ${PTM_SCRS} ${POISSON_SCRS}
-        ${TDGF_SCRS} ${XPP_SCRS} ${TEST_SCRS} ${MAIN_SCRS})
-
-add_executable(test_multiple ${BASE_SCRS} ${SPEC_SCRS} ${PRSM_SCRS}
-        ${ZERO_PTM_SCRS} ${FILTER_SCRS} ${PTM_SCRS} ${POISSON_SCRS} 
-        ${TDGF_SCRS} ${XPP_SCRS} ${TEST_SCRS} ${MULTIPLE_SCRS})
-
-add_executable(test_evalue ${BASE_SCRS} ${SPEC_SCRS} ${PRSM_SCRS}
-        ${ZERO_PTM_SCRS} ${FILTER_SCRS} ${PTM_SCRS} ${POISSON_SCRS} 
-        ${TDGF_SCRS} ${XPP_SCRS} ${TEST_SCRS} ${TEST_EVALUE_SCRS})
-
-IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-  # Linux specific code
-  target_link_libraries(topid xalan-c xalanMsg xerces-c boost_program_options boost_filesystem boost_system pthread)
-  target_link_libraries(test_multiple xalan-c xalanMsg xerces-c boost_program_options boost_filesystem boost_system pthread)
-  target_link_libraries(test_evalue xalan-c xalanMsg xerces-c boost_program_options boost_filesystem boost_system pthread)
-ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
+        ${TDGF_SCRS} ${XPP_SCRS} ${ARGU_SCRS} ${MAIN_SCRS})
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Mingw")
   # Mingw specific code
-  target_link_libraries(topid xalan-c xalanMsg xerces-c
-          boost_filesystem-mgw48-1_55 boost_system-mgw48-1_55
-          boost_program_options-mgw48-1_55)
-  target_link_libraries(test_multiple xalan-c xalanMsg xerces-c
+  target_link_libraries(toppc xalan-c xalanMsg xerces-c
           boost_filesystem-mgw48-1_55 boost_system-mgw48-1_55
           boost_program_options-mgw48-1_55)
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Mingw") 
+
+IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+  # Linux specific code
+  target_link_libraries(toppc xalan-c xalanMsg xerces-c boost_program_options boost_filesystem boost_system pthread)
+
+  add_executable(test_zero_ptm ${BASE_SCRS} ${SPEC_SCRS} ${PRSM_SCRS}
+          ${ZERO_PTM_SCRS} ${FILTER_SCRS} ${PTM_SCRS} ${POISSON_SCRS} 
+          ${TDGF_SCRS} ${XPP_SCRS} ${ARGU_SCRS} ${TEST_ZERO_PTM_SCRS})
+  target_link_libraries(test_zero_ptm xalan-c xalanMsg xerces-c boost_program_options boost_filesystem boost_system pthread)
+
+  #  add_executable(test_multiple ${BASE_SCRS} ${SPEC_SCRS} ${PRSM_SCRS}
+  #        ${ZERO_PTM_SCRS} ${FILTER_SCRS} ${PTM_SCRS} ${POISSON_SCRS} 
+  #        ${TDGF_SCRS} ${XPP_SCRS} ${ARGU_SCRS} ${MULTIPLE_SCRS})
+  #  add_executable(test_evalue ${BASE_SCRS} ${SPEC_SCRS} ${PRSM_SCRS}
+  #        ${ZERO_PTM_SCRS} ${FILTER_SCRS} ${PTM_SCRS} ${POISSON_SCRS} 
+  #        ${TDGF_SCRS} ${XPP_SCRS} ${ARGU_SCRS} ${TEST_EVALUE_SCRS})
+  #  target_link_libraries(test_multiple xalan-c xalanMsg xerces-c boost_program_options boost_filesystem boost_system pthread)
+  #  target_link_libraries(test_evalue xalan-c xalanMsg xerces-c boost_program_options boost_filesystem boost_system pthread)
+ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
+
 

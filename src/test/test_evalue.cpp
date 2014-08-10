@@ -28,7 +28,7 @@
 
 #include "xpp/xml_generator.hpp"
 #include "xpp/transformer.hpp"
-#include "test/argument.hpp"
+#include "console/argument.hpp"
 
 namespace prot {
 

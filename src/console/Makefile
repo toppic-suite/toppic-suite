@@ -1,34 +1,14 @@
-# define the g++ compiler to use
-CC = g++
-#
-# define any compile-time flags
-CPPFLAGS = -Wall -g -std=c++11
-#
-# define any directories containing header files other than /usr/include
-#
-INCLUDES = -I..
-#
-# define library paths in addition to /usr/lib
-LFLAGS = -L/lib -L/opt/local/lib
-#
-# define any libraries to link into executable:
-LIBS = -lxerces-c 
-#
-# define the C++ source files
-SRCS = output_selector.cpp table_writer.cpp 
-#
-# define the C object files 
-#
+include ../Makefile.in
 
-OBJ_DIR = ../../obj
+TOPPC_OBJS = $(addprefix $(OBJ_DIR)/, toppc.o)
 
-OBJS = $(addprefix $(OBJ_DIR)/, output_selector.o table_writer.o)
+OBJS = $(BASE_OBJS) $(SPEC_OBJS) $(PRSM_OBJS) $(ZERO_PTM_OBJS) $(FILTER_OBJS) $(PTM_OBJS) $(TDGF_OBJS) $(POISSON_OBJS) $(XPP_OBJS) $(CONSOLE_OBJS) ${TOPPC_OBJS}
 
 BIN_DIR = ../../bin
 
 #
 # define the executable file 
-MAIN = $(BIN_DIR)/ptm_search
+MAIN = $(BIN_DIR)/toppc
 #
 #
 # The following part of the makefile is generic; it can be used to 
@@ -41,12 +21,12 @@ MAIN = $(BIN_DIR)/ptm_search
 all:    $(MAIN)
 
 $(MAIN): $(OBJS) 
-#	$(CC) $(CPPFLAGS) $(INCLUDES) -o $(MAIN) $(OBJS) $(LFLAGS) $(LIBS)
+	$(CC) $(CPPFLAGS) $(INCLUDES) -o $(MAIN) $(OBJS) $(LFLAGS) $(LIBS)
 
 $(OBJ_DIR)/%.o: %.cpp
 	$(CC) -c $(CPPFLAGS) $(INCLUDES) $< -o $@
 
 clean:
-	$(RM) *~ $(MAIN) $(OBJS)
+	$(RM) *~ $(MAIN) $(TEST_OBJS)
 
 depend: $(SRCS)
