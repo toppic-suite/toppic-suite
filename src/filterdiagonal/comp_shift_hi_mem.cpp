@@ -66,6 +66,7 @@ inline void CompShiftHiMem::updateColumnMatchNums(ProteoformPtr proteo_ptr,
 
 void CompShiftHiMem::initIndexes(const ProteoformPtrVec &proteo_ptrs){
   int* col_match_nums = new int[col_num_];
+  std::fill(col_match_nums, col_match_nums + col_num_, 0);
   int* col_index_pnts = new int[col_num_];
   col_index_begins_ = new int[col_num_];
   col_index_ends_ = new int[col_num_];
