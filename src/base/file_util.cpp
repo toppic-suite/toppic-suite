@@ -12,13 +12,12 @@
 
 #endif
 
-
 namespace fs = boost::filesystem;
 
 namespace prot {
 
 #ifdef PROT_LINUX
-
+//linux
   std::string getExecutiveDir(const std::string &argv_0) {
     int buffer_size = 1024;
     char* buffer = new char[buffer_size];

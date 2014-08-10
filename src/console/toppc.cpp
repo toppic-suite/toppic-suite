@@ -28,7 +28,7 @@
 
 #include "xpp/xml_generator.hpp"
 #include "xpp/transformer.hpp"
-#include "test/argument.hpp"
+#include "console/argument.hpp"
 
 namespace prot {
 
@@ -40,7 +40,7 @@ int process(int argc, char* argv[]) {
       return 1;
     }
     std::map<std::string, std::string> arguments = argu_processor.getArguments();
-    std::cout << "TopId 0.5 " << std::endl;
+    std::cout << "TopPC 0.5 " << std::endl;
 
     std::string exe_dir = arguments["executiveDir"];
     std::cout << "Executive file directory is: " << exe_dir << std::endl;
@@ -72,7 +72,6 @@ int process(int argc, char* argv[]) {
         = PtmFastFilterMngPtr(new PtmFastFilterMng(prsm_para_ptr, "FILTER"));
     PtmFastFilterProcessorPtr filter_processor = PtmFastFilterProcessorPtr(new PtmFastFilterProcessor(filter_mng_ptr));
     filter_processor->process();
-    //filter_processor->combineBlock();
     filter_processor = nullptr;
 
     std::cout << "Ptm searching starts" << std::endl;

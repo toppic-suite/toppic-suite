@@ -82,13 +82,14 @@ ZpFastMatchPtr computePrefixMatch(
   bool is_prefix = false;
   int seq_end = 0;
   for (size_t i = 0; i < prms.size() - 1; i++) {
+    LOG_TRACE("residue sum mass " << res_sum_mass << " prsm  " << prms[i] 
+              << " residue " << proteo_ptr->getResSeqPtr()->getResiduePtr(i)->toString()
+              << " error " << std::abs(res_sum_mass - prms[i])
+              << " max error " << max_error << " "
+              << proteo_ptr->getDbResSeqPtr()->getName());
     if (std::abs(res_sum_mass - prms[i]) <= max_error) {
       is_prefix = true;
       seq_end = i - 1;
-      LOG_TRACE("residue sum mass " << res_sum_mass << " prsm  " << prms[i] 
-                << " error " << std::abs(res_sum_mass - prms[i])
-                << " max error " << max_error << " "
-                << proteo_ptr->getDbResSeqPtr()->getName());
       break;
     } else {
       if (prms[i] > res_sum_mass) {
@@ -203,6 +204,7 @@ ZpFastMatchPtrVec zeroPtmFastFilter(SemiAlignTypePtr semi_align_type_ptr,
   
   ZpFastMatchPtrVec match_vec;
   for (size_t i = 0; i < proteo_ptrs.size(); i++) {
+    LOG_DEBUG("Processing proteoform " << i);
     if (semi_align_type_ptr == SemiAlignTypeFactory::getCompletePtr()) { 
         match_vec.push_back(computeCompMatch(ms_ptr, proteo_ptrs[i]));
     }

@@ -17,6 +17,7 @@ class PtmFastFilterMng {
   PrsmParaPtr prsm_para_ptr_;
 
   /** parameters for fast filteration */
+  int max_proteoform_mass = 50000;
 
   //Candidate protein number for each spectrum
   int ptm_fast_filter_result_num_ = 20;

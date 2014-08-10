@@ -35,13 +35,15 @@ class Prsm {
 
   double getMatchPeakNum() {return match_peak_num_;}
 
-  double getEValue() {return prob_ptr_->getEValue();}
+  double getEValue(); 
+
+  double getPValue();
+
+  double getOneProtProb();
 
   double getFdr() {return fdr_;}
 
   int getId() {return prsm_id_;}
-
-  double getPValue() {return prob_ptr_->getPValue();}
 
   double getMatchFragNum() {return match_fragment_num_;}
 
@@ -142,18 +144,18 @@ inline bool prsmProteoformIdUp(PrsmPtr p1, PrsmPtr p2) {
 
 // sort by the order of spectrum id, the precursor id
 inline bool prsmSpectrumIdUpPrecursorIdUp(const PrsmPtr &a, const PrsmPtr &b){
-    if(a->getSpectrumId() < b->getSpectrumId()){
-        return false;
+  if(a->getSpectrumId() < b->getSpectrumId()){
+    return true;
+  }
+  else if(a->getSpectrumId() > b->getSpectrumId()){
+    return false;
+  }
+  else{
+    if(a->getPrecursorId() < b->getPrecursorId()){
+      return true;
     }
-    else if(a->getSpectrumId() > b->getSpectrumId()){
-        return true;
-    }
-    else{
-        if(a->getPrecursorId()>b->getPrecursorId()){
-            return true;
-        }
-        return false;
-    }
+    return false;
+  }
 }
 
 // sort by number of matched fragment ions, then start position 

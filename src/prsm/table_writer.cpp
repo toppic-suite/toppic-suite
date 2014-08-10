@@ -1,3 +1,5 @@
+#include <iomanip>
+
 #include "base/file_util.hpp"
 #include "prsm/table_writer.hpp"
 
@@ -56,7 +58,7 @@ void TableWriter::write(){
   LOG_DEBUG("read prsm complete ");
   addSpectrumPtrsToPrsms(prsm_ptrs, prsm_para_ptr_);
   LOG_DEBUG("prsm_ptrs loaded");
-
+  file_ << std::setprecision(10);
   for(size_t i=0;i<prsm_ptrs.size();i++){
     file_ << spectrum_file_name << "\t"
         << prsm_ptrs[i]->getId() << "\t"
@@ -79,7 +81,7 @@ void TableWriter::write(){
         << prsm_ptrs[i]->getMatchFragNum() << "\t"
         << prsm_ptrs[i]->getPValue() << "\t"
         << prsm_ptrs[i]->getEValue() << "\t"
-        << prsm_ptrs[i]->getProbPtr()->getOneProtProb()<< "\t"
+        << prsm_ptrs[i]->getOneProtProb()<< "\t"
         << prsm_ptrs[i]->getFdr() << "\t"
         << std::endl;
   }
