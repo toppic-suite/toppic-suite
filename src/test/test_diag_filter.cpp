@@ -77,15 +77,7 @@ int zero_ptm_process(int argc, char* argv[]) {
     std::cout << std::endl << "Running time: " << (stop_s-start_s) / double(CLOCKS_PER_SEC)  << " seconds " << std::endl;
 
     std::cout << "Outputting table starts " << std::endl;
-    TableWriterPtr table_out = TableWriterPtr(new TableWriter(prsm_para_ptr, "ZERO_COMPLETE", "ZERO_COMPLETE_TABLE"));
-    table_out->write();
-    table_out = TableWriterPtr(new TableWriter(prsm_para_ptr, "ZERO_PREFIX", "ZERO_PREFIX_TABLE"));
-    table_out->write();
-    table_out = TableWriterPtr(new TableWriter(prsm_para_ptr, "ZERO_SUFFIX", "ZERO_SUFFIX_TABLE"));
-    table_out->write();
-    table_out = TableWriterPtr(new TableWriter(prsm_para_ptr, "ZERO_INTERNAL", "ZERO_INTERNAL_TABLE"));
-    table_out->write();
-    table_out = nullptr;
+
     std::cout << "Outputting table finished." << std::endl;
 
   } catch (const char* e) {
