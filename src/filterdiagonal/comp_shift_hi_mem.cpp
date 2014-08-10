@@ -1,4 +1,5 @@
 #include <iostream>
+#include <algorithm>
 
 #include "base/logger.hpp"
 #include "filterdiagonal/comp_shift_hi_mem.hpp"
@@ -8,8 +9,8 @@ namespace prot {
 CompShiftHiMem::CompShiftHiMem(const ProteoformPtrVec &proteo_ptrs,
                                PtmFastFilterMngPtr mng_ptr){
   scale_ = mng_ptr->ptm_fast_filter_scale_;
-  LOG_DEBUG("Scale: " + scale_);
-  LOG_DEBUG("Proteoform point number: " + proteo_ptrs.size());
+  LOG_DEBUG("Scale: " << scale_);
+  LOG_DEBUG("Proteoform number: " << proteo_ptrs.size());
 
   col_num_ = mng_ptr->max_proteoform_mass * scale_;
   initProteoformBeginEnds(proteo_ptrs);
@@ -17,7 +18,6 @@ CompShiftHiMem::CompShiftHiMem(const ProteoformPtrVec &proteo_ptrs,
 
   LOG_DEBUG("column number: " << col_num_);
   LOG_DEBUG("row number: " << row_num_);
-  LOG_DEBUG("indexes size: "<< sizeof(col_indexes_)/sizeof(col_indexes_[0]));
 }
 
 CompShiftHiMem::~CompShiftHiMem(){
@@ -29,8 +29,10 @@ CompShiftHiMem::~CompShiftHiMem(){
 }
 
 void CompShiftHiMem::initProteoformBeginEnds(const ProteoformPtrVec &proteo_ptrs){
+  //no need to init
   proteo_row_begins_ = new int[proteo_ptrs.size()];
   int* proteo_row_ends;
+  //no need to init
   proteo_row_ends = new int[proteo_ptrs.size()];
   int  pnt = 0;
   for(size_t i=0; i< proteo_ptrs.size(); i++){
@@ -39,6 +41,7 @@ void CompShiftHiMem::initProteoformBeginEnds(const ProteoformPtrVec &proteo_ptrs
     pnt += proteo_ptrs[i]->getResSeqPtr()->getLen();
   }
   row_num_ = pnt;
+  //no need to init
   row_proteo_ids_ = new int[row_num_];
   for(size_t i =0; i<proteo_ptrs.size(); i++){
     for(int j= proteo_row_begins_[i]; j<= proteo_row_ends[i];j++){
@@ -66,8 +69,13 @@ inline void CompShiftHiMem::updateColumnMatchNums(ProteoformPtr proteo_ptr,
 
 void CompShiftHiMem::initIndexes(const ProteoformPtrVec &proteo_ptrs){
   int* col_match_nums = new int[col_num_];
+  // init col_match_nums
+  memset(col_match_nums, 0, col_num_ * sizeof(int));
+  // no need to init
   int* col_index_pnts = new int[col_num_];
+  // no need to init
   col_index_begins_ = new int[col_num_];
+  // no need to init
   col_index_ends_ = new int[col_num_];
 
   for(size_t i =0; i<proteo_ptrs.size(); i++){
@@ -81,8 +89,9 @@ void CompShiftHiMem::initIndexes(const ProteoformPtrVec &proteo_ptrs){
     col_index_ends_[i] = pnt + col_match_nums[i]-1;
     pnt += col_match_nums[i];
   }
-
+  // no need to init
   col_indexes_ = new int[pnt];
+  LOG_DEBUG("indexes size: "<< pnt);
 
   for(size_t i=0; i<proteo_ptrs.size(); i++){
     if (i/1000*1000 == i) {
@@ -112,6 +121,8 @@ std::vector<std::pair<int,int>> CompShiftHiMem::compConvolution(
     const std::vector<int> &masses,int bgn_pos,int num){
 
   short* scores = new short[row_num_];
+  memset(scores, 0, row_num_ * sizeof(short));
+  
 
   int begin_index;
   int end_index;
@@ -142,6 +153,7 @@ std::vector<std::pair<int,int>> CompShiftHiMem::compConvolution(
     const std::vector<int> &masses, const std::vector<int> &errors,int bgn_pos,int num){
 
   short* scores = new short[row_num_];
+  memset(scores, 0, row_num_ * sizeof(short));
 
   int begin_index;
   int end_index;
@@ -173,7 +185,8 @@ std::vector<std::pair<int,int>> CompShiftHiMem::compConvolution(
 inline std::vector<std::pair<int,int>> CompShiftHiMem::getShiftScores(short* scores,int num){
   short* top_scores = new short[num];
   int* top_rows = new int[num];
-  memset(top_rows, -1, num * sizeof(int));
+  std::fill_n(top_scores, num, 0);
+  std::fill_n(top_rows, num, -1);
 
   int last_scr = top_scores[num-1];
   for(int i=0; i<row_num_; i++){

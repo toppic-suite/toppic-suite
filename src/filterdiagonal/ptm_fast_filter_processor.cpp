@@ -1,10 +1,3 @@
-/*
- * ptm_fast_filter_processor.cpp
- *
- *  Created on: Dec 1, 2013
- *      Author: xunlikun
- */
-
 #include <sstream>
 
 #include "base/proteoform.hpp"
@@ -23,7 +16,7 @@ PtmFastFilterProcessor::PtmFastFilterProcessor(PtmFastFilterMngPtr mng_ptr){
   ProteoformPtrVec proteoforms 
       = readFastaToProteoform(prsm_para_ptr->getSearchDbFileName(),
                               prsm_para_ptr->getFixModResiduePtrVec());
-    filter_ptr_ = PtmFastFilterBlockPtr(new PtmFastFilterBlock(proteoforms,mng_ptr_));
+  filter_ptr_ = PtmFastFilterBlockPtr(new PtmFastFilterBlock(proteoforms,mng_ptr_));
 }
 
 void PtmFastFilterProcessor::process(){
