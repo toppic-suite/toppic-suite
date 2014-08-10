@@ -2,8 +2,8 @@
 
 import sys, getopt
 
-def getStatus(pep):
-	if (pep.startswith("M.") or pep.startswith(".")):
+def getStatus(pep, first):
+	if ((pep.startswith("M.") and int(first) == 2) or pep.startswith(".")):
 		if (pep.endswith(".")):
 			return 1
 		else:
@@ -14,10 +14,11 @@ def getStatus(pep):
 		else:
 			return 4
 
-def writeToFile(file, arr):
-	file.write(arr[3] + "\t" + arr[4] + "\t" + arr[5] + "\t")
-	file.write(arr[8] + "\t" + arr[9] + "\t" + arr[13] + "\t")
-	file.write(arr[15] + "\t" + arr[16] + "\n")
+def writeToFile(file, line):
+	file.write(line)        
+#	file.write(arr[3] + "\t" + arr[4] + "\t" + arr[5] + "\t")
+#	file.write(arr[8] + "\t" + arr[9] + "\t" + arr[13] + "\t")
+#	file.write(arr[15] + "\t" + arr[16] + "\n")
 	
 	
 def process(inputfile, num):
@@ -29,22 +30,22 @@ def process(inputfile, num):
 		for line in fp:
 			arr = line.split("\t")
 			if line.startswith("Data_file_name"):
-				writeToFile(file1, arr)
-				writeToFile(file2, arr)
-				writeToFile(file3, arr)
-				writeToFile(file4, arr)
+				writeToFile(file1, line)
+				writeToFile(file2, line)
+				writeToFile(file3, line)
+				writeToFile(file4, line)
 				continue
 				
 			if int(arr[14]) == num:
-				status = getStatus(arr[13])
-				if status == 1:
-					writeToFile(file1, arr)
+			        status = getStatus(arr[13],arr[11])
+			        if status == 1:
+					writeToFile(file1, line)
 				elif status == 2:
-					writeToFile(file2, arr)
+					writeToFile(file2, line)
 				elif status == 3:
-					writeToFile(file3, arr)
+					writeToFile(file3, line)
 				elif status == 4:
-					writeToFile(file4, arr)
+					writeToFile(file4, line)
 					
 	file1.close()
 	file2.close()
