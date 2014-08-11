@@ -1,10 +1,3 @@
-/*
- * basic_diag_pair.hpp
- *
- *  Created on: Jan 1, 2014
- *      Author: xunlikun
- */
-
 #ifndef PROT_BASIC_DIAG_PAIR_HPP_
 #define PROT_BASIC_DIAG_PAIR_HPP_
 
@@ -29,29 +22,17 @@ class BasicDiagPair:public Pair {
   BasicDiagPair(int x,int y,double score,int diag_order,
                 double diff,int prm_peak_type);
 
-  int getBaseType() const {
-    return base_type_;
-  }
+  int getBaseType() {return base_type_;}
 
-  int getDiagOrder() const {
-    return diag_order_;
-  }
+  int getDiagOrder() {return diag_order_;}
 
-  const BasicDiagPairDiagPtr& getDiagonal() const {
-    return diagonal_;
-  }
+  const BasicDiagPairDiagPtr& getDiagonal() {return diagonal_;}
 
-  void setDiagonal(const BasicDiagPairDiagPtr& diagonal) {
-    diagonal_ = diagonal;
-  }
+  void setDiagonal(const BasicDiagPairDiagPtr& diagonal) {diagonal_ = diagonal;}
 
-  double getDiff() const {
-    return diff_;
-  }
+  double getDiff() {return diff_;}
 
-  double getScore() const {
-    return score_;
-  }
+  double getScore() {return score_;}
 
  protected:
   int diag_order_;
@@ -62,17 +43,15 @@ class BasicDiagPair:public Pair {
 
 };
 
-//bool contains(BasicDiagPairPtrVec pairs,int y);
+BasicDiagPairPtrVec compDiagPair(PrmMsPtr ms_ptr, const std::vector<double>& seq_masses,
+                                 DiagonalHeaderPtr header_ptr);
 
-BasicDiagPairPtrVec compDiagPair(PrmMsPtr sp,std::vector<double> seq_masses,
-                                 DiagonalHeaderPtr header);
+BasicDiagPairDiagPtrVec getDiagonals(const DiagonalHeaderPtrVec& header_ptrs,
+                                     PrmMsPtr ms_six_ptr, ProteoformPtr proteo_ptr,
+                                     PtmMngPtr mng_ptr);
 
-BasicDiagPairDiagPtrVec getDiagonals(DiagonalHeaderPtrVec headers,
-                                     PrmMsPtr ms_six,ProteoformPtr seq,
-                                     PtmMngPtr mng);
-
-BasicDiagPairDiagPtr getDiagonal(int cnt,DiagonalHeaderPtr header,PrmMsPtr ms_six,
-                                 ProteoformPtr seq,PtmMngPtr mng);
+BasicDiagPairDiagPtr getDiagonal(int cnt,DiagonalHeaderPtr header_ptr, PrmMsPtr ms_six_ptr,
+                                 ProteoformPtr proteo_ptr, PtmMngPtr mng_ptr);
 } /* namespace prot */
 
 #endif /* BASIC_DIAG_PAIR_HPP_ */

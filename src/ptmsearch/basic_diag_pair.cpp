@@ -1,10 +1,3 @@
-/*
- * basic_diag_pair.cpp
- *
- *  Created on: Jan 1, 2014
- *      Author: xunlikun
- */
-
 #include "ptmsearch/basic_diag_pair.hpp"
 
 namespace prot {
@@ -18,12 +11,10 @@ BasicDiagPair::BasicDiagPair(int x,int y,double score,
     base_type_ = prm_peak_type;
 }
 
-BasicDiagPairPtrVec compDiagPair(PrmMsPtr sp,std::vector<double> seq_masses,
-                                 DiagonalHeaderPtr header){
+BasicDiagPairPtrVec compDiagPair(PrmMsPtr ms_ptr, const std::vector<double>& seq_masses,
+                                 DiagonalHeaderPtr header_ptr){
   // i starts from 0 and ends at size - 1 to include the first prm 0 and the 
   // last prm precursor_mass - water_mass
-  unsigned int i=0;
-  unsigned int j=0;
   std::vector<std::vector<double>> scores;
   std::vector<std::vector<int>> positions;
   for(unsigned int k =0;k< seq_masses.size();k++){
@@ -32,17 +23,19 @@ BasicDiagPairPtrVec compDiagPair(PrmMsPtr sp,std::vector<double> seq_masses,
     scores.push_back(score);
     positions.push_back(position);
   }
-  double n_term_shift = header->getProtNTermShift();
+  unsigned int i=0;
+  unsigned int j=0;
+  double n_term_shift = header_ptr->getProtNTermShift();
   std::vector<double> real_masses;
-  for(unsigned int k =0;k<sp->size();k++){
-    real_masses.push_back(sp->getPeakPtr(k)->getPosition());
+  for(unsigned int k =0;k<ms_ptr->size();k++){
+    real_masses.push_back(ms_ptr->getPeakPtr(k)->getPosition());
   }
 
-  while(i < sp->size() && j < seq_masses.size()){
-    PrmPeakPtr peak = sp->getPeakPtr(i);
+  while(i < ms_ptr->size() && j < seq_masses.size()){
+    PrmPeakPtr peak = ms_ptr->getPeakPtr(i);
     int type = peak->getBaseType();
     double error = 0;
-    if(header->isNStrict() && !header->isCStrict()){
+    if(header_ptr->isNStrict() && !header_ptr->isCStrict()){
       error = peak->getNStrictCRelaxTolerance();
     }
     else{
@@ -68,7 +61,7 @@ BasicDiagPairPtrVec compDiagPair(PrmMsPtr sp,std::vector<double> seq_masses,
     for(int k=0;k<2;k++){
       int pos = positions[j][k];
       if(pos >= 0){
-        double mass = sp->getPeakPtr(pos)->getPosition() - seq_masses[j];
+        double mass = ms_ptr->getPeakPtr(pos)->getPosition() - seq_masses[j];
         if(k==0){
           pair_list.push_back(BasicDiagPairPtr(
                   new BasicDiagPair(pos,j,1.0,pair_list.size(),
@@ -90,7 +83,7 @@ BasicDiagPairPtrVec compDiagPair(PrmMsPtr sp,std::vector<double> seq_masses,
   return pair_list;
 }
 
-BasicDiagPairDiagPtrVec getDiagonals(DiagonalHeaderPtrVec headers,
+BasicDiagPairDiagPtrVec getDiagonals(const DiagonalHeaderPtrVec& headers,
                                      PrmMsPtr ms_six, ProteoformPtr seq,
                                      PtmMngPtr mng){
   BasicDiagPairDiagPtrVec diagonal_list;
