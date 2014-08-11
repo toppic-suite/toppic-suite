@@ -51,9 +51,9 @@ int PrmPeak::getBreakType() {
 }
 
 /* 
- * in several local function, reference arguments are used as the 
- * output of function
- */
+ *  * in several local function, reference arguments are used as the 
+ *   * output of function
+ *    */
 void addTwoMasses(PrmPeakPtrVec &list, DeconvPeakPtr peak_ptr,
                   double prec_mono_mass, ActivationPtr active_type_ptr){
   double orig_mass = peak_ptr->getMonoMass() - active_type_ptr->getNShift();
@@ -226,8 +226,8 @@ PrmMsPtr createShiftMsSixPtr(DeconvMsPtr deconv_ms_ptr, double delta, double shi
   return PrmMsPtr(new Ms<PrmPeakPtr>(header_ptr, prm_peak_list, ppo));
 }
 
-std::vector<std::vector<int>> getIntMassErrorList(PrmMsPtr prm_ms_ptr, double scale,
-                                                  bool n_strict, bool c_strict){
+std::pair<std::vector<int>, std::vector<int>> getIntMassErrorList(PrmMsPtr prm_ms_ptr, double scale,
+                                                                  bool n_strict, bool c_strict){
   std::vector<int> masses;
   std::vector<int> errors;
   int last_mass = -1;
@@ -256,9 +256,7 @@ std::vector<std::vector<int>> getIntMassErrorList(PrmMsPtr prm_ms_ptr, double sc
       last_error = e;
     }
   }
-  std::vector<std::vector<int>> results;
-  results.push_back(masses);
-  results.push_back(errors);
+  std::pair<std::vector<int>, std::vector<int>> results( masses, errors);
   return results;
 }
 

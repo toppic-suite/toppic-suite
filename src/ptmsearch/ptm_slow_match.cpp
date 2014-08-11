@@ -23,11 +23,11 @@ PtmSlowMatch::PtmSlowMatch(ProteoformPtr proteoform, SpectrumSetPtr spectrum_set
 void PtmSlowMatch::initPsAlign(CompShiftLowMemPtr comp_shift){
   double scale = mng_->ptm_fast_filter_scale_;
   // n term strict c term nonstrict
-  std::vector<std::vector<int>> sp_masses_toles = getIntMassErrorList(ms_six_,scale,true,false);
+  std::pair<std::vector<int>, std::vector<int>> sp_masses_toles = getIntMassErrorList(ms_six_,scale,true,false);
 
   std::vector<double> best_shifts = comp_shift->findBestShift(
-      sp_masses_toles[0],
-      sp_masses_toles[1],
+      sp_masses_toles.first,
+      sp_masses_toles.second,
       proteoform_->getBpSpecPtr()->getScaledPrmMasses(scale),
       mng_->n_top_diagonals_,
       mng_->min_diagonal_gap_,

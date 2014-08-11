@@ -16,7 +16,7 @@ class CompShiftHiMem {
   std::vector<std::pair<int,int>> compConvolution(const std::vector<int> &masses,
                                                   int bgn_pos,int num);
 
-  std::vector<std::pair<int,int>> compConvolution(const std::vector<int> &masses,
+  std::vector<std::pair<int,int>> compConvolution(const std::vector<int> &masses, 
                                                   const std::vector<int> &errors,
                                                   int bgn_pos,int num);
 

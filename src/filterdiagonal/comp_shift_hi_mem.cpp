@@ -150,7 +150,7 @@ std::vector<std::pair<int,int>> CompShiftHiMem::compConvolution(
 }
 
 std::vector<std::pair<int,int>> CompShiftHiMem::compConvolution(
-    const std::vector<int> &masses, const std::vector<int> &errors,int bgn_pos,int num){
+    const std::vector<int> &masses, const std::vector<int> &errors, int bgn_pos,int num){
 
   short* scores = new short[row_num_];
   memset(scores, 0, row_num_ * sizeof(short));
@@ -161,7 +161,7 @@ std::vector<std::pair<int,int>> CompShiftHiMem::compConvolution(
 
   for(size_t i =bgn_pos+1; i<masses.size(); i++){
 
-    m = masses[i]-masses[bgn_pos];
+    m = masses[i] -masses[bgn_pos];
     // m - errors[i] performs better than m - errors[i] -  errors[bgn_pos]
     int left = m-errors[i];
     if(left < 0){
