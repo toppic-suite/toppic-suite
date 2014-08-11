@@ -1,33 +1,27 @@
-/*
- * ptm_fast_filter_hi_mem.h
- *
- *  Created on: Dec 1, 2013
- *      Author: xunlikun
- */
-
 #ifndef PTM_FAST_FILTER_HI_MEM_H_
 #define PTM_FAST_FILTER_HI_MEM_H_
 
-#include "ptm_fast_filter_mng.hpp"
 #include "base/proteoform.hpp"
-#include "comp_shift_hi_mem.hpp"
-#include "prsm/simple_prsm.hpp"
 #include "spec/prm_peak.hpp"
+#include "prsm/simple_prsm.hpp"
+#include "filterdiagonal/ptm_fast_filter_mng.hpp"
+#include "filterdiagonal/comp_shift_hi_mem.hpp"
 
 namespace prot {
 
 class PtmFastFilterHiMem {
-public:
-    PtmFastFilterHiMem(ProteoformPtrVec seqs,PtmFastFilterMngPtr mng);
-    SimplePrsmPtrVec getBestMatch(PrmMsPtr ms);
+ public:
+  PtmFastFilterHiMem(const ProteoformPtrVec &proteo_ptrs,
+                     PtmFastFilterMngPtr mng_ptr);
+  SimplePrsmPtrVec getBestMatch(PrmMsPtr ms_ptr);
 
-private:
-    PtmFastFilterMngPtr mng_;
-    ProteoformPtrVec seqs_;
-    CompShiftHiMemPtr index_;
+ private:
+  PtmFastFilterMngPtr mng_ptr_;
+  ProteoformPtrVec proteo_ptrs_;
+  CompShiftHiMemPtr index_ptr_;
 
-    SimplePrsmPtrVec2D compute(PrmMsPtr ms);
-    SimplePrsmPtrVec sort(SimplePrsmPtrVec2D matches);
+  SimplePrsmPtrVec2D compute(PrmMsPtr ms_ptr);
+  SimplePrsmPtrVec sort(const SimplePrsmPtrVec2D &match_ptrs);
 };
 
 typedef std::shared_ptr<PtmFastFilterHiMem> PtmFastFilterHiMemPtr;

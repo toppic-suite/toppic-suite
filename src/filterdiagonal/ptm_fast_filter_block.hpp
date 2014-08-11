@@ -14,21 +14,22 @@ namespace prot {
 
 class PtmFastFilterBlock {
  public:
-  PtmFastFilterBlock(ProteoformPtrVec seqs,PtmFastFilterMngPtr mng);
-  int getBlockSize(){return seq_blocks_.size();}
-  void initBlock(int i){
-    filter_=NULL;
-    filter_ = PtmFastFilterHiMemPtr(
-        new PtmFastFilterHiMem(seq_blocks_[i],mng_));
-  }
-  SimplePrsmPtrVec getBestMathBatch(SpectrumSetPtr specttum_set);
- private:
-  PtmFastFilterMngPtr mng_;
-  ProteoformPtrVec seqs_;
-  std::vector<ProteoformPtrVec> seq_blocks_;
-  PtmFastFilterHiMemPtr filter_;
+  PtmFastFilterBlock(const ProteoformPtrVec &proteo_ptrs, 
+                     PtmFastFilterMngPtr mng_ptr);
 
-  void initSeqBlocks();
+  int getBlockSize(){return proteo_blocks_.size();}
+
+  void initBlock(int i);
+
+  SimplePrsmPtrVec getBestMathBatch(SpectrumSetPtr specttum_set_ptr);
+
+ private:
+  PtmFastFilterMngPtr mng_ptr_;
+  ProteoformPtrVec proteo_ptrs_;
+  std::vector<ProteoformPtrVec> proteo_blocks_;
+  PtmFastFilterHiMemPtr filter_ptr_;
+
+  void initProteoBlocks();
 };
 
 typedef std::shared_ptr<PtmFastFilterBlock> PtmFastFilterBlockPtr;

@@ -75,8 +75,8 @@ PrmMsPtr createMsSixPtr(DeconvMsPtr deconv_ms_ptr, double delta, SpParaPtr sp_pa
 PrmMsPtr createShiftMsSixPtr(DeconvMsPtr deconv_ms_ptr, double delta, double shift, 
                              SpParaPtr sp_para_ptr);
 
-std::vector<std::vector<int>> getIntMassErrorList(PrmMsPtr prm_ms_ptr, double scale,
-                                                  bool n_strict, bool c_strict);
+std::pair<std::vector<int>,std::vector<int>> getIntMassErrorList(PrmMsPtr prm_ms_ptr, double scale,
+                                                                 bool n_strict, bool c_strict);
 
 std::vector<double> getMassList(PrmMsPtr prm_ms_ptr);
 std::vector<double> getScoreList(PrmMsPtr prm_ms_ptr);
