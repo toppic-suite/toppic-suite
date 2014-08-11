@@ -7,7 +7,9 @@ PtmFastFilterBlock::PtmFastFilterBlock(const ProteoformPtrVec &proteo_ptrs,
                                        PtmFastFilterMngPtr mng_ptr){
   mng_ptr_ = mng_ptr;
   proteo_ptrs_ = proteo_ptrs;
+  LOG_DEBUG("start init blocks.")
   initProteoBlocks();
+  LOG_DEBUG("init blocks is done.")
 }
 
 void PtmFastFilterBlock::initBlock(int i) {
@@ -19,18 +21,14 @@ void PtmFastFilterBlock::initProteoBlocks(){
   size_t start_idx = 0;
   size_t proteo_idx =0;
   int block_len=0;
-  while(start_idx < proteo_ptrs_.size()){
+  while(proteo_idx < proteo_ptrs_.size()){
     int proteo_len = proteo_ptrs_[proteo_idx]->getResSeqPtr()->getLen();
-    if(proteo_idx < proteo_ptrs_.size() 
-       && block_len + proteo_len < mng_ptr_->db_block_size_){
+    if(block_len + proteo_len < mng_ptr_->db_block_size_) {
       block_len = block_len + proteo_len;
       proteo_idx++;
     }
     else{
       size_t end_idx = proteo_idx;
-      if(end_idx == proteo_ptrs_.size()){
-        end_idx --;
-      }
       ProteoformPtrVec proteo_in_block;
       for(size_t i = start_idx; i<=end_idx; i++){
         proteo_in_block.push_back(proteo_ptrs_[i]);
@@ -40,6 +38,14 @@ void PtmFastFilterBlock::initProteoBlocks(){
       proteo_idx = end_idx +1;
       block_len = 0;
     }
+  }
+  /* last block */
+  if (start_idx < proteo_ptrs_.size()) {
+    ProteoformPtrVec proteo_in_block;
+    for(size_t i = start_idx; i < proteo_ptrs_.size(); i++){
+      proteo_in_block.push_back(proteo_ptrs_[i]);
+    }
+    proteo_blocks_.push_back(proteo_in_block);
   }
 }
 
