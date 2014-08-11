@@ -14,7 +14,9 @@ PtmFastFilterProcessor::PtmFastFilterProcessor(PtmFastFilterMngPtr mng_ptr){
   ProteoformPtrVec proteoform_ptrs 
       = readFastaToProteoform(prsm_para_ptr->getSearchDbFileName(),
                               prsm_para_ptr->getFixModResiduePtrVec());
+  LOG_DEBUG("start init filter.");
   filter_ptr_ = PtmFastFilterBlockPtr(new PtmFastFilterBlock(proteoform_ptrs, mng_ptr_));
+  LOG_DEBUG("init filter is done.");
 }
 
 void PtmFastFilterProcessor::process(){
