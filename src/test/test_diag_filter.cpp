@@ -5,30 +5,11 @@
 #include "base/base_data.hpp"
 
 #include "prsm/prsm_para.hpp"
-#include "prsm/prsm_combine.hpp"
-#include "prsm/prsm_selector.hpp"
-#include "prsm/output_selector.hpp"
-#include "prsm/prsm_species.hpp"
-#include "prsm/table_writer.hpp"
-#include "prsm/prsm_fdr.hpp"
-
-#include "zeroptmsearch/zero_ptm_mng.hpp"
-#include "zeroptmsearch/zero_ptm_search.hpp"
+#include "prsm/simple_prsm_table_writer.hpp"
 
 #include "filterdiagonal/ptm_fast_filter_mng.hpp"
 #include "filterdiagonal/ptm_fast_filter_processor.hpp"
 
-#include "ptmsearch/ptm_mng.hpp"
-#include "ptmsearch/ptm_processor.hpp"
-
-#include "poisson/poisson_processor.hpp"
-#include "poisson/poisson_mng.hpp"
-
-#include "tdgf/evalue_processor.hpp"
-#include "tdgf/tdgf_mng.hpp"
-
-#include "xpp/xml_generator.hpp"
-#include "xpp/transformer.hpp"
 #include "console/argument.hpp"
 
 namespace prot {
@@ -77,7 +58,10 @@ int zero_ptm_process(int argc, char* argv[]) {
     std::cout << std::endl << "Running time: " << (stop_s-start_s) / double(CLOCKS_PER_SEC)  << " seconds " << std::endl;
 
     std::cout << "Outputting table starts " << std::endl;
-
+    SimplePrsmTableWriterPtr table_out = SimplePrsmTableWriterPtr(
+        new SimplePrsmTableWriter(prsm_para_ptr, "FILTER_COMBINED", "FILTER_TABLE"));
+    table_out->write();
+    table_out = nullptr;
     std::cout << "Outputting table finished." << std::endl;
 
   } catch (const char* e) {
