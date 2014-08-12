@@ -73,7 +73,7 @@ void PtmProcessor::initData() {
       + "." + mng_ptr_->input_file_ext_;
   simple_prsms_  = readSimplePrsms(simplePrsmFileName.c_str());
   // find sequences for simple prsms
-  for(unsigned int i =0;i< simple_prsms_.size();i++){
+  for(size_t i =0;i< simple_prsms_.size();i++){
     simple_prsms_[i]->assignProteoformPtr(proteoforms_);
   }
   comp_shift_ = CompShiftLowMemPtr(new CompShiftLowMem());

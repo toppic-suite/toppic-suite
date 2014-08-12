@@ -172,7 +172,7 @@ int process(int argc, char* argv[]) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
   }
-  std::cout << "Topid finished." << std::endl;
+  std::cout << "TopPC finished." << std::endl;
   return 0;
 }
 

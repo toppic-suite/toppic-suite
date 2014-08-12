@@ -16,18 +16,18 @@ PtmSlowFilter::PtmSlowFilter(
     PtmMngPtr mng){
 
   // init complete_prefix_slow_matches
-  for(unsigned int i=0;i<fast_Matches.size();i++){
+  for(size_t i=0;i<fast_Matches.size();i++){
     ProteoformPtrVec raw_forms;
     raw_forms.push_back(fast_Matches[i]->getProteoformPtr());
     ProteoformPtrVec prot_mod_forms 
         = generateProtModProteoform(raw_forms, mng->prsm_para_ptr_->getAllowProtModPtrVec());
-    for (unsigned int j = 0; j < prot_mod_forms.size(); j++) {
+    for (size_t j = 0; j < prot_mod_forms.size(); j++) {
       complete_prefix_slow_matches_.push_back(PtmSlowMatchPtr(
             new PtmSlowMatch(prot_mod_forms[j],spectrum_set,comp_shift,mng)));
     }
   }
   // init suffix_internal_slow_matches
-  for(unsigned int i=0; i<complete_prefix_slow_matches_.size();i++){
+  for(size_t i=0; i<complete_prefix_slow_matches_.size();i++){
     ProtModPtr prot_mod = complete_prefix_slow_matches_[i]->getProteoform()->getProtModPtr();
     if (prot_mod == ProtModFactory::getProtModPtr_NONE()) {
       suffix_internal_slow_matches_.push_back(complete_prefix_slow_matches_[i]);
@@ -35,7 +35,7 @@ PtmSlowFilter::PtmSlowFilter(
   }
 
   // compute complete and prefix prsms 
-  for(unsigned int i=0; i<complete_prefix_slow_matches_.size();i++){
+  for(size_t i=0; i<complete_prefix_slow_matches_.size();i++){
     PrsmPtrVec comps;
     complete_prefix_slow_matches_[i]->compute(SemiAlignTypeFactory::getCompletePtr(), comps);
     complete_prsms_.push_back(comps);
@@ -45,7 +45,7 @@ PtmSlowFilter::PtmSlowFilter(
   }
 
   // compute suffix and internal prsms 
-  for(unsigned int i=0; i< suffix_internal_slow_matches_.size();i++){
+  for(size_t i=0; i< suffix_internal_slow_matches_.size();i++){
     PrsmPtrVec suffixs;
     suffix_internal_slow_matches_[i]->compute(SemiAlignTypeFactory::getSuffixPtr(), suffixs);
     suffix_prsms_.push_back(suffixs);
@@ -58,28 +58,28 @@ PtmSlowFilter::PtmSlowFilter(
 PrsmPtrVec PtmSlowFilter::getPrsms(int nshift, SemiAlignTypePtr type){
   PrsmPtrVec matches;
   if (type == SemiAlignTypeFactory::getCompletePtr()) {
-    for (unsigned int i = 0; i < complete_prsms_.size(); i++) {
+    for (size_t i = 0; i < complete_prsms_.size(); i++) {
       if (complete_prsms_[i][nshift] != nullptr) {
         matches.push_back(complete_prsms_[i][nshift]);
       }
     }
   }
   else if (type == SemiAlignTypeFactory::getPrefixPtr()) {
-    for (unsigned int i = 0; i < prefix_prsms_.size(); i++) {
+    for (size_t i = 0; i < prefix_prsms_.size(); i++) {
       if (prefix_prsms_[i][nshift] != nullptr) {
         matches.push_back(prefix_prsms_[i][nshift]);
       }
     }
   }
   else if (type == SemiAlignTypeFactory::getSuffixPtr()) {
-    for (unsigned int i = 0; i < suffix_prsms_.size(); i++) {
+    for (size_t i = 0; i < suffix_prsms_.size(); i++) {
       if (suffix_prsms_[i][nshift] != nullptr) {
         matches.push_back(suffix_prsms_[i][nshift]);
       }
     }
   }
   else if (type == SemiAlignTypeFactory::getInternalPtr()) {
-    for (unsigned int i = 0; i < internal_prsms_.size(); i++) {
+    for (size_t i = 0; i < internal_prsms_.size(); i++) {
       if (internal_prsms_[i][nshift] != nullptr) {
         matches.push_back(internal_prsms_[i][nshift]);
       }

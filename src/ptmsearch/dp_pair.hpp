@@ -1,10 +1,3 @@
-/*
- * dp_pair.hpp
- *
- *  Created on: Jan 8, 2014
- *      Author: xunlikun
- */
-
 #ifndef PROT_DP_PAIR_HPP_
 #define PROT_DP_PAIR_HPP_
 
@@ -25,51 +18,27 @@ typedef std::vector<DPPairPtr> DPPairPtrVec;
 class DPPair : public Pair{
  public:
   DPPair(int x,int y,double pair_score,double diff,
-         int order,int n_shift,DiagonalHeaderPtr header);
+         int order,int n_shift, DiagonalHeaderPtr header_ptr);
 
-  const DPPairPtr& getDiagPrev() const {
-    return diag_prev_;
-  }
+  DPPairPtr getDiagPrev() {return diag_prev_;}
 
-  void setDiagPrev(const DPPairPtr& diagPrev) {
-    diag_prev_ = diagPrev;
-  }
+  void setDiagPrev(DPPairPtr diagPrev) {diag_prev_ = diagPrev;}
 
-  double getDiff() const {
-    return diff_;
-  }
+  double getDiff() {return diff_;}
 
-  const DiagonalHeaderPtr& getDiagonalHeader() const {
-    return header_;
-  }
+  DiagonalHeaderPtr getDiagonalHeader() {return header_;}
 
-  int getDiagOrder() const {
-    return order_;
-  }
+  int getDiagOrder() {return order_;}
 
-  double getPairScore() const {
-    return pair_score_;
-  }
+  double getPairScore() {return pair_score_;}
 
-  double getScr(int s) {
-    return scores_[s];
-  }
+  double getScr(int s) {return scores_[s];}
 
-  DPPairPtr getPre(int s){
-    return prevs_[s];
-  }
+  DPPairPtr getPre(int s){return prevs_[s];}
 
+  int getType(int s){return types_[s];}
 
-  int getType(int s){
-    return types_[s];
-  }
-
-  bool isAssisting(){
-    if(pair_score_==0.0){
-      return true;
-    }
-    return false;
-  }
+  bool isAssisting(){ return (pair_score_==0.0); }
 
   void updateTable(int s,double score,int path_type,DPPairPtr prev_pair);
 
