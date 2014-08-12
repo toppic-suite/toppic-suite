@@ -1,10 +1,3 @@
-/*
- * diagonal_header.hpp
- *
- *  Created on: Dec 30, 2013
- *      Author: xunlikun
- */
-
 #ifndef PROT_DIAGONAL_HEADER_HPP_
 #define PROT_DIAGONAL_HEADER_HPP_
 
@@ -135,16 +128,10 @@ class DiagonalHeader {
 };
 
 // generate (clone) a new diagonal header with new bgn and end
-DiagonalHeaderPtr geneDiagonalHeaderPtr(int bgn, int end, DiagonalHeaderPtr shift);
+DiagonalHeaderPtr geneDiagonalHeaderPtr(int bgn, int end, DiagonalHeaderPtr diag_ptr);
 
-ChangePtrVec getUnexpectedChanges(DiagonalHeaderPtrVec headers,int first_res_pos,int last_res_pos);
-
-/*
-DiagonalHeaderPtrVec getNTermShiftListTruncPrefix(ProteoformPtr seq);
-DiagonalHeaderPtrVec getNTermShiftListTruncsuffix(PrmMsPtr ms,ProteoformPtr seq);
-DiagonalHeaderPtrVec get1dHeaders(DiagonalHeaderPtrVec2D headers);
-*/
-
+ChangePtrVec getUnexpectedChanges(const DiagonalHeaderPtrVec &diag_ptrs,
+                                  int first_res_pos,int last_res_pos);
 
 } /* namespace prot */
 

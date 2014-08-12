@@ -37,7 +37,7 @@ void PtmSlowMatch::initPsAlign(CompShiftLowMemPtr comp_shift){
   BasicDiagPairDiagPtrVec diagonals = getDiagonals(n_term_shift_headers,
                                                    ms_six_,proteoform_,mng_);
   /*
-  for (unsigned int i = 0; i < diagonals.size(); i++) {
+  for (size_t i = 0; i < diagonals.size(); i++) {
     std::cout << "diagonal " << i << " shift " << diagonals[i]->getHeader()->getProtNTermShift()
         << " match point num " << diagonals[i]->size() << std::endl;
   }
@@ -50,7 +50,7 @@ void PtmSlowMatch::initPsAlign(CompShiftLowMemPtr comp_shift){
 // get headers without n trunc and c trunc information 
 DiagonalHeaderPtrVec getNTermShiftListCommonHeaders(std::vector<double> best_shifts) {
   DiagonalHeaderPtrVec headers;
-  for (unsigned int i = 0; i < best_shifts.size(); i++) {
+  for (size_t i = 0; i < best_shifts.size(); i++) {
     // n term shift; c term nostrict; no prot nterm match; no prot cterm match,
     // no pep nterm match; no pep cterm match
     DiagonalHeaderPtr header_ptr(new DiagonalHeader(best_shifts[i], 
@@ -83,7 +83,7 @@ DiagonalHeaderPtr getBottomRightCornerHeader(ProteoformPtr proteoform,
 int findSimilarShiftPos(const std::vector<double> &shifts, double s) {
   int best_pos = -1;
   double best_diff = std::numeric_limits<double>::infinity();
-  for(unsigned int i = 0; i < shifts.size();i++){
+  for(size_t i = 0; i < shifts.size();i++){
     if(std::abs(shifts[i] - s) < best_diff){
       best_pos = i;
       best_diff = std::abs(shifts[i] - s);
@@ -93,7 +93,7 @@ int findSimilarShiftPos(const std::vector<double> &shifts, double s) {
 }
 
 bool isExist(const DiagonalHeaderPtrVec &headers, double shift) {
-  for(unsigned int i = 0; i < headers.size();i++){
+  for(size_t i = 0; i < headers.size();i++){
     if(headers[i]->getProtNTermShift() == shift) {
       return true;
     }
@@ -126,13 +126,13 @@ DiagonalHeaderPtrVec PtmSlowMatch::getNTermShiftHeaders(
   std::vector<double> n_term_match_shifts;
   // shifts for c_term matches
   std::vector<double> c_term_match_shifts;
-  for(unsigned int i=1;i< prm_masses.size();i++){
+  for(size_t i=1;i< prm_masses.size();i++){
     n_term_match_shifts.push_back(-prm_masses[i]);
     c_term_match_shifts.push_back(prec_mass - prm_masses[i]);
   }
 
   // add trunc headers that have similar shift to best shift headers
-  for (unsigned int i = 0; i < headers.size(); i++) {
+  for (size_t i = 0; i < headers.size(); i++) {
     double s = headers[i]->getProtNTermShift();
     // find a similar shift in n_term_match_shifts
     int best_n_pos = findSimilarShiftPos(n_term_match_shifts, s);

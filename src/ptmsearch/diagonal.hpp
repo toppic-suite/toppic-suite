@@ -1,9 +1,3 @@
-/*
- * diagonal.hpp
- *
- *  Created on: Jan 1, 2014
- *      Author: xunlikun
- */
 
 #ifndef PROT_DIAGONAL_HPP_
 #define PROT_DIAGONAL_HPP_
@@ -20,49 +14,39 @@ template <class T>
 class Diagonal{
  public:
   Diagonal(){};
-  Diagonal(DiagonalHeaderPtr header){
-    header_ = header;
-  };
+  Diagonal(DiagonalHeaderPtr header_ptr){ header_ptr_ = header_ptr; };
   /**
    * need init pair_ptr_list after create
    */
-  Diagonal(DiagonalHeaderPtr header,std::vector<T> pair_ptr_list){
-    header_ = header;
+  Diagonal(DiagonalHeaderPtr header_ptr,std::vector<T> pair_ptr_list) {
+    header_ptr = header_ptr;
     pair_ptr_list_ = pair_ptr_list;
   };
 
-  unsigned int size(){
-    return pair_ptr_list_.size();
-  }
+  size_t size(){return pair_ptr_list_.size(); }
 
-  DiagonalHeaderPtr getHeader(){
-    return header_;
-  }
+  DiagonalHeaderPtr getHeader(){return header_ptr_;}
 
-  std::vector<T> getDiagPair(){
-    return pair_ptr_list_;
-  }
+  const std::vector<T>& getDiagPair(){return pair_ptr_list_;}
 
-  T getDiagPair(int i){
-    return pair_ptr_list_[i];
-  }
+  T getDiagPair(int i){return pair_ptr_list_[i];}
 
  private:
-  DiagonalHeaderPtr header_;
+  DiagonalHeaderPtr header_ptr_;
   std::vector<T> pair_ptr_list_;
 };
 
 DiagonalHeaderPtrVec refineHeadersBgnEnd(
     int first_res_pos,
     int last_res_pos,
-    ProteoformPtr seq,
-    DeconvMsPtr deconv_ms,
-    ExtendMsPtr ms_three,
-    PtmMngPtr mng,
-    DiagonalHeaderPtrVec headers);
+    ProteoformPtr proteo_ptr,
+    DeconvMsPtr deconv_ms_ptr,
+    ExtendMsPtr ms_three_ptr,
+    PtmMngPtr mng_ptr,
+    const DiagonalHeaderPtrVec& heade_ptrs);
 
-int getNewBgn(PeakIonPairPtrVec pairs);
-int getNewEnd(PeakIonPairPtrVec pairs);
+int getNewBgn(const PeakIonPairPtrVec& pair_ptrs);
+int getNewEnd(const PeakIonPairPtrVec& pair_ptrs);
 
 } /* namespace prot */
 

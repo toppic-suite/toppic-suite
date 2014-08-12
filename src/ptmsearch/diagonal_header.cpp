@@ -1,10 +1,3 @@
-/*
- * diagonal_header.cpp
- *
- *  Created on: Dec 30, 2013
- *      Author: xunlikun
- */
-
 #include <cmath>
 
 #include "base/prot_mod.hpp"
@@ -46,18 +39,18 @@ DiagonalHeaderPtr DiagonalHeader::clone() {
 }
 
 DiagonalHeaderPtr geneDiagonalHeaderPtr(int bgn, int end, 
-                                        DiagonalHeaderPtr header) {
-  DiagonalHeaderPtr new_header = header->clone();
-  new_header->setMatchFirstBpPos(bgn);
-  new_header->setMatchLastBpPos(end);
-  return new_header;
+                                        DiagonalHeaderPtr header_ptr) {
+  DiagonalHeaderPtr new_header_ptr = header_ptr->clone();
+  new_header_ptr->setMatchFirstBpPos(bgn);
+  new_header_ptr->setMatchLastBpPos(end);
+  return new_header_ptr;
 }
 
-void DiagonalHeader::initData(double c_shift, ProteoformPtr proteoform, 
+void DiagonalHeader::initData(double c_shift, ProteoformPtr proteo_ptr, 
                               double align_pref_suff_shift_thresh) {
   // set protein c term shift
   prot_C_term_shift_ = c_shift;
-  std::vector<double> prm_masses = proteoform->getBpSpecPtr()->getPrmMasses();
+  std::vector<double> prm_masses = proteo_ptr->getBpSpecPtr()->getPrmMasses();
 
   trunc_first_res_pos_ = getFirstResPos(prot_N_term_shift_,
                                         prm_masses);
@@ -82,31 +75,31 @@ void DiagonalHeader::initData(double c_shift, ProteoformPtr proteoform,
   }
 }
 
-ChangePtrVec getUnexpectedChanges(DiagonalHeaderPtrVec headers, int first_res_pos, 
-                                  int last_res_pos) {
+ChangePtrVec getUnexpectedChanges(const DiagonalHeaderPtrVec &header_ptrs, 
+                                  int first_res_pos, int last_res_pos) {
   ChangePtrVec change_list;
-  if (!headers[0]->isPepNTermMatch() && !headers[0]->isProtNTermMatch()) {
+  if (!header_ptrs[0]->isPepNTermMatch() && !header_ptrs[0]->isProtNTermMatch()) {
     change_list.push_back(
-        ChangePtr(new Change(0, headers[0]->getMatchFirstBpPos()-first_res_pos,
-                             UNEXPECTED_CHANGE, headers[0]->getPepNTermShift(), nullptr)));
+        ChangePtr(new Change(0, header_ptrs[0]->getMatchFirstBpPos()-first_res_pos,
+                             UNEXPECTED_CHANGE, header_ptrs[0]->getPepNTermShift(), nullptr)));
   }
-  for (unsigned int i = 0; i < headers.size() - 1; i++) {
+  for (size_t i = 0; i < header_ptrs.size() - 1; i++) {
     change_list.push_back(
         ChangePtr(
             new Change(
-                headers[i]->getMatchLastBpPos()-first_res_pos,
-                headers[i + 1]->getMatchFirstBpPos()-first_res_pos,
+                header_ptrs[i]->getMatchLastBpPos()-first_res_pos,
+                header_ptrs[i + 1]->getMatchFirstBpPos()-first_res_pos,
                 UNEXPECTED_CHANGE,
-                headers[i + 1]->getProtNTermShift()
-                    - headers[i]->getProtNTermShift(),
+                header_ptrs[i + 1]->getProtNTermShift()
+                    - header_ptrs[i]->getProtNTermShift(),
                 nullptr)));
   }
-  DiagonalHeaderPtr last_header = headers[headers.size() - 1];
-  if (!last_header->isPepCTermMatch() && !last_header->isProtCTermMatch()) {
+  DiagonalHeaderPtr last_header_ptr = header_ptrs[header_ptrs.size() - 1];
+  if (!last_header_ptr->isPepCTermMatch() && !last_header_ptr->isProtCTermMatch()) {
     change_list.push_back(
-        ChangePtr(new Change(last_header->getMatchLastBpPos()-first_res_pos, 
+        ChangePtr(new Change(last_header_ptr->getMatchLastBpPos()-first_res_pos, 
                              (last_res_pos + 1) -first_res_pos,
-                             UNEXPECTED_CHANGE, last_header->getPepCTermShift(), nullptr)));
+                             UNEXPECTED_CHANGE, last_header_ptr->getPepCTermShift(), nullptr)));
   }
   return change_list;
 }
@@ -116,7 +109,7 @@ DiagonalHeaderPtrVec getNTermShiftListTruncPrefix(ProteoformPtr seq) {
   DiagonalHeaderPtrVec extend_n_term_shift;
   std::vector<double> seq_masses = seq->getBpSpecPtr()->getPrmMasses();
   double shift;
-  for (unsigned int i = 1; i < seq_masses.size(); i++) {
+  for (size_t i = 1; i < seq_masses.size(); i++) {
     shift = -seq_masses[i];
     extend_n_term_shift.push_back(
         DiagonalHeaderPtr(new DiagonalHeader(shift, true, false, true, false)));
@@ -131,7 +124,7 @@ DiagonalHeaderPtrVec getNTermShiftListTruncsuffix(PrmMsPtr ms,
   std::vector<double> ms_masses = prot::getMassList(ms);
   std::vector<double> seq_masses = seq->getBpSpecPtr()->getPrmMasses();
   double shift;
-  for (unsigned int i = 1; i < seq_masses.size(); i++) {
+  for (size_t i = 1; i < seq_masses.size(); i++) {
     shift = ms_masses[ms_masses.size() - 1] - seq_masses[i];
     extend_n_term_shift.push_back(
         DiagonalHeaderPtr(new DiagonalHeader(shift, true, false, true, false)));
@@ -140,8 +133,8 @@ DiagonalHeaderPtrVec getNTermShiftListTruncsuffix(PrmMsPtr ms,
 }
 DiagonalHeaderPtrVec get1dHeaders(DiagonalHeaderPtrVec2D headers) {
   DiagonalHeaderPtrVec header_list;
-  for (unsigned int i = 0; i < headers.size(); i++) {
-    for (unsigned int j = 0; j < headers[i].size(); j++) {
+  for (size_t i = 0; i < headers.size(); i++) {
+    for (size_t j = 0; j < headers[i].size(); j++) {
       header_list.push_back(headers[i][j]);
     }
   }

@@ -13,21 +13,18 @@ BasicDiagPair::BasicDiagPair(int x,int y,double score,
 
 BasicDiagPairPtrVec compDiagPair(PrmMsPtr ms_ptr, const std::vector<double>& seq_masses,
                                  DiagonalHeaderPtr header_ptr){
+  std::vector<double> n_term_scores(seq_masses.size());
+  std::vector<double> c_term_scores(seq_masses.size());
+  std::vector<int> n_term_positions(seq_masses.size(), -1);
+  std::vector<int> c_term_positions(seq_masses.size(), -1);
+
   // i starts from 0 and ends at size - 1 to include the first prm 0 and the 
   // last prm precursor_mass - water_mass
-  std::vector<std::vector<double>> scores;
-  std::vector<std::vector<int>> positions;
-  for(unsigned int k =0;k< seq_masses.size();k++){
-    std::vector<double> score {0,0};
-    std::vector<int> position {-1,-1};
-    scores.push_back(score);
-    positions.push_back(position);
-  }
-  unsigned int i=0;
-  unsigned int j=0;
+  size_t i=0;
+  size_t j=0;
   double n_term_shift = header_ptr->getProtNTermShift();
   std::vector<double> real_masses;
-  for(unsigned int k =0;k<ms_ptr->size();k++){
+  for(size_t k =0;k<ms_ptr->size();k++){
     real_masses.push_back(ms_ptr->getPeakPtr(k)->getPosition());
   }
 
@@ -43,9 +40,17 @@ BasicDiagPairPtrVec compDiagPair(PrmMsPtr ms_ptr, const std::vector<double>& seq
     }
     double deviation = peak->getPosition()-seq_masses[j] - n_term_shift;
     if(std::abs(deviation) <= error){
-      if(scores[j][type]<peak->getScore()){
-        scores[j][type] = peak->getScore();
-        positions[j][type]=i;
+      if (type == PRM_PEAK_TYPE_ORIGINAL) {
+        if(n_term_scores[j] < peak->getScore()){
+          n_term_scores[j] = peak->getScore();
+          n_term_positions[j] = i;
+        }
+      }
+      else {
+        if(c_term_scores[j] < peak->getScore()){
+          c_term_scores[j] = peak->getScore();
+          c_term_positions[j] = i;
+        }
       }
     }
     if(increaseIJ(i,j,deviation,peak->getNRelaxCStrictTolerance(),
@@ -56,25 +61,22 @@ BasicDiagPairPtrVec compDiagPair(PrmMsPtr ms_ptr, const std::vector<double>& seq
       j++;
     }
   }
+  /* add pairs */
   BasicDiagPairPtrVec pair_list;
   for(j=0; j<seq_masses.size();j++){
-    for(int k=0;k<2;k++){
-      int pos = positions[j][k];
-      if(pos >= 0){
-        double mass = ms_ptr->getPeakPtr(pos)->getPosition() - seq_masses[j];
-        if(k==0){
-          pair_list.push_back(BasicDiagPairPtr(
-                  new BasicDiagPair(pos,j,1.0,pair_list.size(),
-                                    mass,
-                                    PRM_PEAK_TYPE_ORIGINAL)));
-        }
-        else{
-          pair_list.push_back(BasicDiagPairPtr(
-                  new BasicDiagPair(pos,j,1.0,pair_list.size(),
-                                    mass, 
-                                    PRM_PEAK_TYPE_REVERSED)));
-        }
-      }
+    int pos = n_term_positions[j];
+    if(pos >= 0){
+      double diff = ms_ptr->getPeakPtr(pos)->getPosition() - seq_masses[j];
+      pair_list.push_back(BasicDiagPairPtr(
+              new BasicDiagPair(pos,j,1.0,pair_list.size(),
+                                diff, PRM_PEAK_TYPE_ORIGINAL)));
+    }
+    pos = c_term_positions[j];
+    if (pos >= 0) {
+      double diff = ms_ptr->getPeakPtr(pos)->getPosition() - seq_masses[j];
+      pair_list.push_back(BasicDiagPairPtr(
+              new BasicDiagPair(pos,j,1.0,pair_list.size(),
+                                diff, PRM_PEAK_TYPE_REVERSED)));
     }
   }
 
@@ -83,41 +85,42 @@ BasicDiagPairPtrVec compDiagPair(PrmMsPtr ms_ptr, const std::vector<double>& seq
   return pair_list;
 }
 
-BasicDiagPairDiagPtrVec getDiagonals(const DiagonalHeaderPtrVec& headers,
-                                     PrmMsPtr ms_six, ProteoformPtr seq,
-                                     PtmMngPtr mng){
+BasicDiagPairDiagPtrVec getDiagonals(const DiagonalHeaderPtrVec& header_ptrs,
+                                     PrmMsPtr ms_six_ptr, ProteoformPtr proteo_ptr,
+                                     PtmMngPtr mng_ptr){
   BasicDiagPairDiagPtrVec diagonal_list;
   int cnt =0;
-  for(unsigned int i=0;i<headers.size();i++){
-    BasicDiagPairDiagPtr diagonal = getDiagonal(cnt,headers[i],ms_six,seq,mng);
-    if(diagonal!=nullptr){
-      diagonal_list.push_back(diagonal);
+  for(size_t i=0;i<header_ptrs.size();i++){
+    BasicDiagPairDiagPtr diagonal_ptr = getDiagonal(cnt,header_ptrs[i],ms_six_ptr,
+                                                    proteo_ptr, mng_ptr);
+    if(diagonal_ptr!=nullptr){
+      diagonal_list.push_back(diagonal_ptr);
       cnt++;
     }
   }
   return diagonal_list;
 }
 
-BasicDiagPairDiagPtr getDiagonal(int cnt,DiagonalHeaderPtr header,
-                                 PrmMsPtr ms_six,
-                                 ProteoformPtr proteoform,
-                                 PtmMngPtr mng){
-  BpSpecPtr bp_spec_ptr = proteoform->getBpSpecPtr();
-  double n_shift = header->getProtNTermShift();
-  double c_shift = ms_six->getHeaderPtr()->getPrecMonoMass()
-      -proteoform->getResSeqPtr()->getSeqMass()-n_shift;
-  header->initData(c_shift, proteoform, mng->align_prefix_suffix_shift_thresh_);
+BasicDiagPairDiagPtr getDiagonal(int cnt,DiagonalHeaderPtr header_ptr,
+                                 PrmMsPtr ms_six_ptr,
+                                 ProteoformPtr proteo_ptr,
+                                 PtmMngPtr mng_ptr){
+  BpSpecPtr bp_spec_ptr = proteo_ptr->getBpSpecPtr();
+  double n_shift = header_ptr->getProtNTermShift();
+  double c_shift = ms_six_ptr->getHeaderPtr()->getPrecMonoMass()
+      -proteo_ptr->getResSeqPtr()->getSeqMass()-n_shift;
+  header_ptr->initData(c_shift, proteo_ptr, mng_ptr->align_prefix_suffix_shift_thresh_);
 
   std::vector<double> prm_masses = bp_spec_ptr->getPrmMasses();
-  BasicDiagPairPtrVec diag_pair_list = compDiagPair(ms_six, prm_masses, header);
+  BasicDiagPairPtrVec diag_pair_list = compDiagPair(ms_six_ptr, prm_masses, header_ptr);
   if (diag_pair_list.size() > 0) {
-    header->setId(cnt);
-    BasicDiagPairDiagPtr diagonal 
-        = BasicDiagPairDiagPtr(new Diagonal<BasicDiagPairPtr>(header,diag_pair_list));
-    for(unsigned int i=0;i<diag_pair_list.size();i++){
-      diag_pair_list[i]->setDiagonal(diagonal);
+    header_ptr->setId(cnt);
+    BasicDiagPairDiagPtr diagonal_ptr 
+        = BasicDiagPairDiagPtr(new Diagonal<BasicDiagPairPtr>(header_ptr,diag_pair_list));
+    for(size_t i=0;i<diag_pair_list.size();i++){
+      diag_pair_list[i]->setDiagonal(diagonal_ptr);
     }
-    return diagonal;
+    return diagonal_ptr;
   }
   return nullptr;
 }

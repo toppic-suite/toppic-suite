@@ -29,10 +29,10 @@ void PSAlign::initDPPair() {
   dp_2d_pairs_.clear();
   segment_bgn_pairs_.clear();
   segment_end_pairs_.clear();
-  for (unsigned int i = 0; i < diagonals_.size(); i++) {
+  for (size_t i = 0; i < diagonals_.size(); i++) {
     DPPairPtrVec temp_dppair;
     dp_2d_pairs_.push_back(temp_dppair);
-    for (unsigned int j = 0; j < diagonals_[i]->size(); j++) {
+    for (size_t j = 0; j < diagonals_[i]->size(); j++) {
       int x = diagonals_[i]->getDiagPair(j)->getX();
       int y = diagonals_[i]->getDiagPair(j)->getY();
       double score = diagonals_[i]->getDiagPair(j)->getScore();
@@ -52,8 +52,8 @@ void PSAlign::initDPPair() {
       new DPPair(-1, -1, 0, 0, -1, mng_->n_unknown_shift_, nullptr));
   first_pair_->setDiagPrev(nullptr);
   dp_pairs_.push_back(first_pair_);
-  for (unsigned int i = 0; i < dp_2d_pairs_.size(); i++) {
-    for (unsigned int j = 0; j < dp_2d_pairs_[i].size(); j++) {
+  for (size_t i = 0; i < dp_2d_pairs_.size(); i++) {
+    for (size_t j = 0; j < dp_2d_pairs_[i].size(); j++) {
       dp_pairs_.push_back(dp_2d_pairs_[i][j]);
       if (j > 0) {
         dp_2d_pairs_[i][j]->setDiagPrev(dp_2d_pairs_[i][j - 1]);
@@ -82,7 +82,7 @@ DPPairPtr PSAlign::getTruncPre(DPPairPtr cur_pair, int s,
   DPPairPtr trunc_prev;
   if (cur_pair == last_pair_) {
     double trunc_score = - std::numeric_limits<double>::max();
-    for (unsigned int i = 0; i < segment_end_pairs_.size(); i++) {
+    for (size_t i = 0; i < segment_end_pairs_.size(); i++) {
       DPPairPtr prev_pair = segment_end_pairs_[i];
       if (type == SemiAlignTypeFactory::getCompletePtr()
           || type == SemiAlignTypeFactory::getSuffixPtr()) {
@@ -165,7 +165,7 @@ DPPairPtr PSAlign::getShiftPre(DPPairPtr cur_pair, int p, int s,
 
 void PSAlign::dp(SemiAlignTypePtr align_type) {
   dpPrep();
-  for (unsigned int p = 1; p < dp_pairs_.size(); p++) {
+  for (size_t p = 1; p < dp_pairs_.size(); p++) {
     for (int s = 0; s <= mng_->n_unknown_shift_; s++) {
       DPPairPtr trunc_prev = getTruncPre(dp_pairs_[p], s, align_type);
       double trunc_score;

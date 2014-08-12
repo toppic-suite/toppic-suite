@@ -1,62 +1,55 @@
-/*
- * comp_shift_low_mem.cpp
- *
- *  Created on: Dec 27, 2013
- *      Author: xunlikun
- */
-
 #include <cmath>
 
 #include "ptmsearch/comp_shift_low_mem.hpp"
 
 namespace prot {
 
-CompShiftLowMem::CompShiftLowMem(){
-  for(int i=0;i< max_len_;i++){
-    num_.push_back(0);
-  }
+CompShiftLowMem::CompShiftLowMem() {
+  num_size_ = 1000;
+  num_ = new short[1000];
+}
+
+CompShiftLowMem::~CompShiftLowMem() {
+  delete num_;
 }
 
 std::vector<std::vector<int>> CompShiftLowMem::findBestShift(
-    std::vector<int> a,std::vector<int> b){
+    const std::vector<int> &a,const std::vector<int> &b){
   return findBestShift(a,b,1,0);
 }
 
-std::vector<double> CompShiftLowMem::findBestShift(std::vector<int> a,
-                                                   std::vector<int> errors,
-                                                   std::vector<int> b,
+std::vector<double> CompShiftLowMem::findBestShift(const std::vector<int> &a,
+                                                   const std::vector<int> &errors,
+                                                   const std::vector<int> &b,
                                                    int total,int min_gap,
                                                    double scale){
   std::vector<std::vector<int>> list = findBestShift(a,errors,b,total,min_gap);
   std::vector<double> result;
-  for(unsigned int i = 0;i<list.size();i++){
+  for(size_t i = 0;i<list.size();i++){
     result.push_back(list[i][0]/scale);
   }
   return result;
 }
 
 std::vector<std::vector<int>> CompShiftLowMem::findBestShift(
-    std::vector<int> a,std::vector<int> errors,std::vector<int> b,
-    int total,int minimum_gap){
+    const std::vector<int> &a, const std::vector<int> &errors,
+    const std::vector<int> &b, int total,int minimum_gap){
   int a_length = a.size();
   int b_length = b.size();
   std::vector<std::vector<int>> ans;
   if(b_length == 0){
-    std::vector<int> temp;
-    temp.push_back(0);
-    temp.push_back(0);
+    std::vector<int> temp = {0,0};
     ans.push_back(temp);
     return ans;
   }
   int delta = a[0]-b[b_length-1];
   int minD = delta-1;
   int maxD = a[a_length-1]-b[0]+1+errors[a_length-1];
-  if(maxD-minD > (int)num_.size()){
-    int required_length = maxD-minD+1;
-    num_.clear();
-    for(int i=0;i<required_length;i++){
-      num_.push_back(0);
-    }
+  if(maxD-minD + 1 >= num_size_){
+    num_size_ = maxD-minD+1;
+    delete num_;
+    // no need to init
+    num_ = new short[num_size_];
   }
   for(int i=0;i<a_length;i++){
     int a_value = a[i];
@@ -89,26 +82,24 @@ std::vector<std::vector<int>> CompShiftLowMem::findBestShift(
     }
   }
 
-  for(unsigned int i=0;i<ans.size();i++){
+  for(size_t i=0;i<ans.size();i++){
     ans[i][0] += minD;
   }
   return ans;
 }
 
-std::vector<std::vector<int>> CompShiftLowMem::findBestShift(
-    std::vector<int> a,std::vector<int> b,int total,int min_gap) {
+inline std::vector<std::vector<int>> CompShiftLowMem::findBestShift(
+    const std::vector<int> &a, const std::vector<int> &b,int total,int min_gap) {
   const int a_length = a.size();
   const int b_length = b.size();
   std::vector<std::vector<int>> ans;
   const int delta = a[0]-b[b_length-1];
   const int minD = delta-1;
   const int maxD = a[a_length-1]-b[0]+1;
-  if(maxD-minD >(int)num_.size()){
-    int required_length = maxD-minD+1;
-    num_.clear();
-    for(int i=0;i<required_length;i++){
-      num_.push_back(0);
-    }
+  if(maxD-minD + 1 >= num_size_) {
+    num_size_ = maxD-minD+1;
+    delete num_;
+    num_ = new short[num_size_];
   }
 
   for(int i=0;i<a_length;i++){
@@ -143,19 +134,19 @@ std::vector<std::vector<int>> CompShiftLowMem::findBestShift(
     }
   }
 
-  for(unsigned int i=0;i<ans.size();i++){
+  for(size_t i=0;i<ans.size();i++){
     ans[i][0] +=minD;
   }
   return ans;
 }
 
-int CompShiftLowMem::checkD(std::vector<std::vector<int>> &ans,int d,
-                            int cur_min,int total,int min_gap){
+inline int CompShiftLowMem::checkD(std::vector<std::vector<int>> &ans,int d,
+                                   int cur_min,int total,int min_gap){
   short new_value = num_[d];
   if(new_value < cur_min){
     return cur_min;
   }
-  for(unsigned int i =0;i<ans.size();i++){
+  for(size_t i =0;i<ans.size();i++){
     std::vector<int>  cur = ans[i];
     if(std::abs(cur[0]-d)<= min_gap){
       if(cur[1]<new_value){
