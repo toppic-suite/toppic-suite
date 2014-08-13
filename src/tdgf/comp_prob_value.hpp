@@ -11,13 +11,14 @@ namespace prot {
 
 class CompProbValue {
  public:
-  CompProbValue(double convert_ratio, ResFreqPtrVec residues, 
+  CompProbValue(double convert_ratio, const ResFreqPtrVec &residue_ptrs, 
                 int max_layer_num, int max_table_height, 
                 double max_sp_prec_mass);
 
   ~CompProbValue();
 
-  void compute(ResFreqPtrVec n_term_residues, PrmPeakPtrVec peaks, 
+  void compute(const ResFreqPtrVec &n_term_residue_ptrs, 
+               const PrmPeakPtrVec &peak_ptrs, 
                int thresh, int shift_num, bool strict);
   // main function to get probabilities
   double getCondProb(int shift, int thresh);
@@ -90,15 +91,15 @@ class CompProbValue {
 
   // computation
   void clearVar();
-  void setMassErr(PrmPeakPtrVec &peaks, bool strict);
+  void setMassErr(const PrmPeakPtrVec &peak_ptrs, bool strict);
 
-  void setPosScores(std::vector<int> &peak_masses, 
-                    std::vector<int> &peak_tolerances,
-                    std::vector<int> &base_types);
+  void setPosScores(const std::vector<int> &peak_masses, 
+                    const std::vector<int> &peak_tolerances,
+                    const std::vector<int> &base_types);
 
   void setHeight(int thresh, int max_peak_mass);
-  void setPeakBgnEnd(std::vector<int> &peak_masses, 
-                     std::vector<int> &peak_tolerances);
+  void setPeakBgnEnd(const std::vector<int> &peak_masses, 
+                     const std::vector<int> &peak_tolerances);
   void comp();
   void compPrecProbs();
   void runClear(int page_pos);
@@ -116,10 +117,10 @@ class CompProbValue {
 
 typedef std::shared_ptr<CompProbValue> CompProbValuePtr;
 
-int computeAvgLength(ResFreqPtrVec &residues, double convert_ratio);
+int computeAvgLength(const ResFreqPtrVec &residue_ptrs, double convert_ratio);
 
-void compProbArray(CompProbValuePtr comp_prob_ptr, ResFreqPtrVec &n_term_residues, 
-                   PrmPeakPtrVec &peaks, PrsmPtrVec &prsms, bool strict, 
+void compProbArray(CompProbValuePtr comp_prob_ptr, const ResFreqPtrVec &n_term_residue_ptrs, 
+                   const PrmPeakPtrVec &peak_ptrs, const PrsmPtrVec &prsm_ptrs, bool strict, 
                    std::vector<double> &results);
 
 }

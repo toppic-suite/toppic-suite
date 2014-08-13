@@ -6,24 +6,24 @@
 
 namespace prot {
 
-CountTestNum::CountTestNum(ProteoformPtrVec &raw_forms, 
-                           ProteoformPtrVec &prot_mod_forms,
-                           ResFreqPtrVec &residues,
+CountTestNum::CountTestNum(const ProteoformPtrVec &raw_proteo_ptrs, 
+                           const ProteoformPtrVec &mod_proteo_ptrs,
+                           const ResFreqPtrVec &residue_ptrs,
                            double convert_ratio,
                            double max_prec_mass,
                            double max_ptm_mass) {
-  raw_forms_ = raw_forms;
-  prot_mod_forms_ = prot_mod_forms;
+  raw_proteo_ptrs_ = raw_proteo_ptrs;
+  mod_proteo_ptrs_ = mod_proteo_ptrs;
   convert_ratio_ = convert_ratio;
   max_ptm_mass_ = max_ptm_mass;
   max_sp_len_ = (int)std::round(max_prec_mass * convert_ratio_);
-  residue_avg_len_ = computeAvgLength(residues, convert_ratio_);
+  residue_avg_len_ = computeAvgLength(residue_ptrs, convert_ratio_);
   LOG_DEBUG("get residue average length");
-  initCompMassCnt(prot_mod_forms);
+  initCompMassCnt(mod_proteo_ptrs);
   LOG_DEBUG("complete mass count initialized");
-  initPrefMassCnt(prot_mod_forms);
+  initPrefMassCnt(mod_proteo_ptrs);
   LOG_DEBUG("prefix mass count initialized");
-  initSuffMassCnt(raw_forms);
+  initSuffMassCnt(raw_proteo_ptrs);
   LOG_DEBUG("suffix mass count initialized");
   initInternalMassCnt();
   LOG_DEBUG("internal mass count initialized");
@@ -44,7 +44,7 @@ CountTestNum::~CountTestNum() {
   }
 }
 
-int CountTestNum::convertMass(double m) {
+inline int CountTestNum::convertMass(double m) {
   int n = (int) std::round(m * convert_ratio_);
   if (n < 0) {
     LOG_WARN("Negative mass value: " << m);
@@ -57,41 +57,41 @@ int CountTestNum::convertMass(double m) {
 }
 
 /** initialize the four tables for mass counts */
-void CountTestNum::initCompMassCnt(ProteoformPtrVec &prot_mod_forms) {
+inline void CountTestNum::initCompMassCnt(const ProteoformPtrVec &mod_proteo_ptrs) {
   comp_mass_cnts_ = new double[max_sp_len_]; 
-  for (unsigned int i = 0; i < prot_mod_forms.size(); i++) {
-    double m = prot_mod_forms[i]->getResSeqPtr()->getResMassSum();
+  for (size_t i = 0; i < mod_proteo_ptrs.size(); i++) {
+    double m = mod_proteo_ptrs[i]->getResSeqPtr()->getResMassSum();
     //System.out.println("mass " + m);
     comp_mass_cnts_[convertMass(m)] += 1.0;
   }
 }
 
 /** initialize the four tables for mass counts */
-void CountTestNum::initPrefMassCnt(ProteoformPtrVec &prot_mod_forms) {
+inline void CountTestNum::initPrefMassCnt(const ProteoformPtrVec &mod_proteo_ptrs) {
   pref_mass_cnts_ = new double[max_sp_len_];
-  for (unsigned int i = 0; i < prot_mod_forms.size(); i++) {
-    std::vector<double> prm_masses = prot_mod_forms[i]->getBpSpecPtr()->getPrmMasses();
+  for (size_t i = 0; i < mod_proteo_ptrs.size(); i++) {
+    std::vector<double> prm_masses = mod_proteo_ptrs[i]->getBpSpecPtr()->getPrmMasses();
     // prefix
-    for (unsigned int j = 1; j < prm_masses.size() - 1; j++) {
+    for (size_t j = 1; j < prm_masses.size() - 1; j++) {
       pref_mass_cnts_[convertMass(prm_masses[j])] += 1.0;
     }
   }
 }
 
 /** initialize the four tables for mass counts */
-void CountTestNum::initSuffMassCnt(ProteoformPtrVec &raw_forms) {
+inline void CountTestNum::initSuffMassCnt(const ProteoformPtrVec &raw_proteo_ptrs) {
   // sequence mass 
   suff_mass_cnts_ = new double[max_sp_len_];
-  for (unsigned int i = 0; i < raw_forms.size(); i++) {
-    BreakPointPtrVec break_points = raw_forms[i]->getBpSpecPtr()->getBreakPointPtrVec();
+  for (size_t i = 0; i < raw_proteo_ptrs.size(); i++) {
+    BreakPointPtrVec break_points = raw_proteo_ptrs[i]->getBpSpecPtr()->getBreakPointPtrVec();
     // suffix
-    for (unsigned int j = 1; j < break_points.size() - 1; j++) {
+    for (size_t j = 1; j < break_points.size() - 1; j++) {
       suff_mass_cnts_[convertMass(break_points[j]->getSrm())] += 1.0;
     }
   }
 }
 
-void CountTestNum::initInternalMassCnt() {
+inline void CountTestNum::initInternalMassCnt() {
   internal_mass_cnts_ = new double[max_sp_len_];
   // middle
   double norm_count = 0;
@@ -102,27 +102,27 @@ void CountTestNum::initInternalMassCnt() {
   }
 }
 
-double CountTestNum::compCandNum(SemiAlignTypePtr type, int shift_num, double ori_mass, 
+double CountTestNum::compCandNum(SemiAlignTypePtr type_ptr, int shift_num, double ori_mass, 
                                  double ori_tolerance) {
   double cand_num = 0;
   if (shift_num == 0) {
-    cand_num = compNonPtmCandNum(type, shift_num, ori_mass, ori_tolerance);
+    cand_num = compNonPtmCandNum(type_ptr, shift_num, ori_mass, ori_tolerance);
   }
   // with shifts 
   else if (shift_num >= 1){
     if (max_ptm_mass_ >=10000) {
       // max shift mass is larger than 10k, we treat it as no limitation 
-      cand_num = compPtmCandNum(type, shift_num, ori_mass);
+      cand_num = compPtmCandNum(type_ptr, shift_num, ori_mass);
     }
     else {
-      cand_num = compPtmRestrictCandNum(type, shift_num, ori_mass);
+      cand_num = compPtmRestrictCandNum(type_ptr, shift_num, ori_mass);
     }
     // multiple adjustment 
-    if (type == SemiAlignTypeFactory::getPrefixPtr() 
-        || type == SemiAlignTypeFactory::getSuffixPtr()) {
+    if (type_ptr == SemiAlignTypeFactory::getPrefixPtr() 
+        || type_ptr == SemiAlignTypeFactory::getSuffixPtr()) {
       cand_num = cand_num * PREFIX_SUFFIX_ADJUST();
     }
-    else if (type == SemiAlignTypeFactory::getInternalPtr()) {
+    else if (type_ptr == SemiAlignTypeFactory::getInternalPtr()) {
       cand_num = cand_num * INTERNAL_ADJUST();
     }
   }
@@ -133,54 +133,54 @@ double CountTestNum::compCandNum(SemiAlignTypePtr type, int shift_num, double or
   return cand_num;
 }
 
-double CountTestNum::compNonPtmCandNum(SemiAlignTypePtr type, int shift_num, 
+double CountTestNum::compNonPtmCandNum(SemiAlignTypePtr type_ptr, int shift_num, 
                                        double ori_mass, double ori_tolerance) {
   int low = std::floor((ori_mass - ori_tolerance) * convert_ratio_);
   int high = std::ceil((ori_mass + ori_tolerance) * convert_ratio_);
-  double cand_num = compSeqNum(type, low, high);
+  double cand_num = compSeqNum(type_ptr, low, high);
   return cand_num;
 }
 
-double CountTestNum::compPtmCandNum (SemiAlignTypePtr type, 
+double CountTestNum::compPtmCandNum (SemiAlignTypePtr type_ptr, 
                                      int shift_num, double ori_mass) {
   double cand_num = 0;
-  if (type == SemiAlignTypeFactory::getCompletePtr()) {
-    cand_num = prot_mod_forms_.size();
-  } else if (type == SemiAlignTypeFactory::getPrefixPtr()) {
-    for (unsigned int i = 0; i < raw_forms_.size(); i++) {
-      cand_num += prot_mod_forms_[i]->getResSeqPtr()->getLen();
+  if (type_ptr == SemiAlignTypeFactory::getCompletePtr()) {
+    cand_num = mod_proteo_ptrs_.size();
+  } else if (type_ptr == SemiAlignTypeFactory::getPrefixPtr()) {
+    for (size_t i = 0; i < raw_proteo_ptrs_.size(); i++) {
+      cand_num += mod_proteo_ptrs_[i]->getResSeqPtr()->getLen();
     }
-  } else if (type == SemiAlignTypeFactory::getSuffixPtr()) {
-    for (unsigned int i = 0; i < raw_forms_.size(); i++) {
-      cand_num += raw_forms_[i]->getResSeqPtr()->getLen();
+  } else if (type_ptr == SemiAlignTypeFactory::getSuffixPtr()) {
+    for (size_t i = 0; i < raw_proteo_ptrs_.size(); i++) {
+      cand_num += raw_proteo_ptrs_[i]->getResSeqPtr()->getLen();
     }
-  } else if (type == SemiAlignTypeFactory::getInternalPtr()) {
-    for (unsigned int i = 0; i < raw_forms_.size(); i++) {
-      cand_num = cand_num + raw_forms_[i]->getResSeqPtr()->getLen() 
-          * raw_forms_[i]->getResSeqPtr()->getLen();
+  } else if (type_ptr == SemiAlignTypeFactory::getInternalPtr()) {
+    for (size_t i = 0; i < raw_proteo_ptrs_.size(); i++) {
+      cand_num = cand_num + raw_proteo_ptrs_[i]->getResSeqPtr()->getLen() 
+          * raw_proteo_ptrs_[i]->getResSeqPtr()->getLen();
     }
   }
   return cand_num;
 }
 
-double CountTestNum::compPtmRestrictCandNum (SemiAlignTypePtr type, 
+double CountTestNum::compPtmRestrictCandNum (SemiAlignTypePtr type_ptr, 
                                              int shift_num, double ori_mass) {
   double shift = max_ptm_mass_ * shift_num;
   int low = std::floor((ori_mass - shift) * convert_ratio_);
   int high = std::ceil((ori_mass + shift) * convert_ratio_);
-  double cand_num = compSeqNum(type, low, high);
+  double cand_num = compSeqNum(type_ptr, low, high);
   return cand_num;
 }
 
-double CountTestNum::compSeqNum(SemiAlignTypePtr type, int low, int high) {
+double CountTestNum::compSeqNum(SemiAlignTypePtr type_ptr, int low, int high) {
   double candNum = 0;
-  if (type == SemiAlignTypeFactory::getCompletePtr()) {
+  if (type_ptr == SemiAlignTypeFactory::getCompletePtr()) {
     candNum = compMassNum(comp_mass_cnts_, low, high);
-  } else if (type == SemiAlignTypeFactory::getPrefixPtr()) {
+  } else if (type_ptr == SemiAlignTypeFactory::getPrefixPtr()) {
     candNum = compMassNum(pref_mass_cnts_, low, high);
-  } else if (type == SemiAlignTypeFactory::getSuffixPtr()) {
+  } else if (type_ptr == SemiAlignTypeFactory::getSuffixPtr()) {
     candNum = compMassNum(suff_mass_cnts_, low, high);
-  } else if (type == SemiAlignTypeFactory::getInternalPtr()) {
+  } else if (type_ptr == SemiAlignTypeFactory::getInternalPtr()) {
     candNum = compMassNum(internal_mass_cnts_, low, high);
   }
   return candNum;

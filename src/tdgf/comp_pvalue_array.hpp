@@ -9,23 +9,24 @@ namespace prot {
 
 class CompPValueArray {
  public:
-  CompPValueArray(ProteoformPtrVec &raw_forms, 
-                  ProteoformPtrVec &prot_mod_forms,
-                  ResFreqPtrVec &residues,
+  CompPValueArray(const ProteoformPtrVec &raw_proteo_ptrs, 
+                  const ProteoformPtrVec &mod_proteo_ptrs,
+                  const ResFreqPtrVec &residue_ptrs,
                   TdgfMngPtr mng_ptr);
 
-  ExtremeValuePtrVec compExtremeValues(PrmMsPtr ms_six, 
-                                       PrsmPtrVec &prsms, bool strict);
+  ExtremeValuePtrVec compExtremeValues(PrmMsPtr ms_six_ptr, 
+                                       const PrsmPtrVec &prsm_ptrs, 
+                                       bool strict);
 
   void setPValue(DeconvMsPtr ms_ptr, PrsmPtr prsm_ptr);
-  void setPValueArray(PrmMsPtr prm_ms_ptr, PrsmPtrVec prsms);
+  void setPValueArray(PrmMsPtr prm_ms_ptr, PrsmPtrVec &prsm_ptrs);
 
  private:
   TdgfMngPtr mng_ptr_;
   CompProbValuePtr comp_prob_ptr_;
   CountTestNumPtr test_num_ptr_;
-  ResFreqPtrVec pep_n_term_residues_;
-  ResFreqPtrVec prot_n_term_residues_;
+  ResFreqPtrVec pep_n_term_residue_ptrs_;
+  ResFreqPtrVec prot_n_term_residue_ptrs_;
 
   ExtremeValuePtr compExtremeValue(PrmMsPtr ms_ptr, PrsmPtr prsm_ptr);
 };
