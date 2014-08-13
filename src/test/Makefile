@@ -4,11 +4,15 @@ TEST_ZERO_PTM_OBJS = $(addprefix $(OBJ_DIR)/, test_zero_ptm.o)
 
 TEST_DIAG_FILTER_OBJS = $(addprefix $(OBJ_DIR)/, test_diag_filter.o)
 
+TEST_PTM_SEARCH_OBJS = $(addprefix $(OBJ_DIR)/, test_ptm_search.o)
+
 OBJS = $(BASE_OBJS) $(SPEC_OBJS) $(PRSM_OBJS) $(ZERO_PTM_OBJS) $(FILTER_OBJS) $(PTM_OBJS) $(TDGF_OBJS) $(POISSON_OBJS) $(XPP_OBJS) $(CONSOLE_OBJS) 
 
 TEST_ZERO_PTM_LINK_OBJS = $(OBJS) $(TEST_ZERO_PTM_OBJS)
 
 TEST_DIAG_FILTER_LINK_OBJS = $(OBJS) $(TEST_DIAG_FILTER_OBJS)
+
+TEST_PTM_SEARCH_LINK_OBJS = $(OBJS) $(TEST_PTM_SEARCH_OBJS)
 
 BIN_DIR = ../../bin
 
@@ -16,6 +20,7 @@ BIN_DIR = ../../bin
 # define the executable file 
 TEST_ZERO_PTM = $(BIN_DIR)/test_zero_ptm
 TEST_DIAG_FILTER = $(BIN_DIR)/test_diag_filter
+TEST_PTM_SEARCH = $(BIN_DIR)/test_ptm_search
 #
 # The following part of the makefile is generic; it can be used to 
 # build any executable just by changing the definitions above and by
@@ -24,7 +29,7 @@ TEST_DIAG_FILTER = $(BIN_DIR)/test_diag_filter
 #
 .PHONY: depend clean
 #
-all:    $(TEST_ZERO_PTM) $(TEST_DIAG_FILTER)
+all:    $(TEST_ZERO_PTM) $(TEST_DIAG_FILTER) $(TEST_PTM_SEARCH)
 
 $(TEST_ZERO_PTM): $(TEST_ZERO_PTM_LINK_OBJS) 
 	$(CC) $(CPPFLAGS) $(INCLUDES) -o $(TEST_ZERO_PTM) $(TEST_ZERO_PTM_LINK_OBJS) $(LFLAGS) $(LIBS)
@@ -32,10 +37,13 @@ $(TEST_ZERO_PTM): $(TEST_ZERO_PTM_LINK_OBJS)
 $(TEST_DIAG_FILTER): $(TEST_DIAG_FILTER_LINK_OBJS) 
 	$(CC) $(CPPFLAGS) $(INCLUDES) -o $(TEST_DIAG_FILTER) $(TEST_DIAG_FILTER_LINK_OBJS) $(LFLAGS) $(LIBS)
 
+$(TEST_PTM_SEARCH): $(TEST_PTM_SEARCH_LINK_OBJS) 
+	$(CC) $(CPPFLAGS) $(INCLUDES) -o $(TEST_PTM_SEARCH) $(TEST_PTM_SEARCH_LINK_OBJS) $(LFLAGS) $(LIBS)
+
 $(OBJ_DIR)/%.o: %.cpp
 	$(CC) -c $(CPPFLAGS) $(INCLUDES) $< -o $@
 
 clean:
-	$(RM) *~ $(TEST_ZERO_PTM) $(TEST_ZERO_PTM_OBJS)
+	$(RM) *~ $(TEST_ZERO_PTM) $(TEST_DIAG_FILTER) $(TEST_PTM_SEARCH) $(TEST_ZERO_PTM_OBJS) $(TEST_DIAG_FILTER_OBJS) $(TEST_PTM_SEARCH_OBJS)
 
 depend: $(SRCS)
