@@ -1,10 +1,3 @@
-/*
- * ps_align.hpp
- *
- *  Created on: Jan 8, 2014
- *      Author: xunlikun
- */
-
 #ifndef PROT_PS_ALIGN_HPP_
 #define PROT_PS_ALIGN_HPP_
 
@@ -16,36 +9,37 @@ namespace prot {
 class PSAlign {
  public:
   PSAlign();
-  PSAlign(std::vector<double> sp_masses,std::vector<double> seq_masses,
-          BasicDiagPairDiagPtrVec diagonals,PtmMngPtr mng);
-  void compute(SemiAlignTypePtr align_type);
+  PSAlign(const std::vector<double> &ms_masses,
+          const std::vector<double> &seq_masses,
+          const BasicDiagonalPtrVec &diagonal_ptrs,
+          PtmMngPtr mng_ptr);
+  void compute(SemiAlignTypePtr align_type_ptr);
   void initDPPair();
-  void dp(SemiAlignTypePtr align_type);
+  void dp(SemiAlignTypePtr align_type_ptr);
   void backtrace();
   DiagonalHeaderPtrVec backtrace(int s);
 
   double getAlignScr(int s){return align_scores_[s];};
-  DiagonalHeaderPtrVec getResult(int s){return backtrack_diagonals_[s];};
+  DiagonalHeaderPtrVec getResult(int s){return backtrack_diagonal_ptrs_[s];};
 
  protected:
   PtmMngPtr mng_;
-  std::vector<double> sp_masses_;
+  std::vector<double> ms_masses_;
   std::vector<double> seq_masses_;
-  BasicDiagPairDiagPtrVec diagonals_;
+  BasicDiagonalPtrVec diagonal_ptrs_;
 
-  BasicDiagPairPtrVec diag_pairs_;
-  std::vector<DPPairPtrVec> dp_2d_pairs_;
-  DPPairPtr first_pair_;
-  DPPairPtr last_pair_;
-  DPPairPtrVec segment_bgn_pairs_;
-  DPPairPtrVec segment_end_pairs_;
-  DPPairPtrVec dp_pairs_;
-  DiagonalHeaderPtrVec2D backtrack_diagonals_;
+  std::vector<DPPairPtrVec> dp_2d_pair_ptrs_;
+  DPPairPtr first_pair_ptr_;
+  DPPairPtr last_pair_ptr_;
+  DPPairPtrVec segment_bgn_pair_ptrs_;
+  DPPairPtrVec segment_end_pair_ptrs_;
+  DPPairPtrVec dp_pair_ptrs_;
+  DiagonalHeaderPtrVec2D backtrack_diagonal_ptrs_;
   std::vector<double> align_scores_;
 
   void dpPrep();
-  DPPairPtr getTruncPre(DPPairPtr cur_pair,int s,SemiAlignTypePtr type);
-  DPPairPtr getShiftPre(DPPairPtr cur_pair,int p,int s,SemiAlignTypePtr type);
+  DPPairPtr getTruncPre(DPPairPtr cur_pair_ptr,int s, SemiAlignTypePtr type_ptr);
+  DPPairPtr getShiftPre(DPPairPtr cur_pair_ptr,int p,int s,SemiAlignTypePtr type_ptr);
 };
 
 typedef std::shared_ptr<PSAlign> PSAlignPtr;
