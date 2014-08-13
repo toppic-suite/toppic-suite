@@ -1,10 +1,3 @@
-/*
- * ptm_processor.hpp
- *
- *  Created on: Dec 20, 2013
- *      Author: xunlikun
- */
-
 #ifndef PROT_PTM_PROCESSOR_HPP_
 #define PROT_PTM_PROCESSOR_HPP_
 

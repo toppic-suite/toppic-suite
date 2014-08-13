@@ -1,10 +1,3 @@
-/*
- * ptm_processor.cpp
- *
- *  Created on: Dec 20, 2013
- *      Author: xunlikun
- */
-
 #include "base/prot_mod.hpp"
 #include "base/fasta_reader.hpp"
 #include "base/file_util.hpp"

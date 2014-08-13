@@ -14,8 +14,9 @@ namespace prot {
 class BasicDiagPair;
 typedef std::shared_ptr<BasicDiagPair> BasicDiagPairPtr;
 typedef std::vector<BasicDiagPairPtr> BasicDiagPairPtrVec;
-typedef std::shared_ptr<Diagonal<BasicDiagPairPtr>> BasicDiagPairDiagPtr;
-typedef std::vector<BasicDiagPairDiagPtr> BasicDiagPairDiagPtrVec;
+typedef Diagonal<BasicDiagPairPtr> BasicDiagonal;
+typedef std::shared_ptr<BasicDiagonal> BasicDiagonalPtr;
+typedef std::vector<BasicDiagonalPtr> BasicDiagonalPtrVec;
 
 class BasicDiagPair:public Pair {
  public:
@@ -26,9 +27,9 @@ class BasicDiagPair:public Pair {
 
   int getDiagOrder() {return diag_order_;}
 
-  const BasicDiagPairDiagPtr& getDiagonal() {return diagonal_;}
+  const BasicDiagonalPtr getDiagonalPtr() {return diagonal_ptr_;}
 
-  void setDiagonal(const BasicDiagPairDiagPtr& diagonal) {diagonal_ = diagonal;}
+  void setDiagonalPtr(BasicDiagonalPtr diagonal_ptr) {diagonal_ptr_ = diagonal_ptr;}
 
   double getDiff() {return diff_;}
 
@@ -37,20 +38,20 @@ class BasicDiagPair:public Pair {
  protected:
   int diag_order_;
   double diff_;
-  BasicDiagPairDiagPtr diagonal_;
+  BasicDiagonalPtr diagonal_ptr_;
   double score_;
   int base_type_;
 
 };
 
 BasicDiagPairPtrVec compDiagPair(PrmMsPtr ms_ptr, const std::vector<double>& seq_masses,
-                                 DiagonalHeaderPtr header_ptr);
+                           DiagonalHeaderPtr header_ptr);
 
-BasicDiagPairDiagPtrVec getDiagonals(const DiagonalHeaderPtrVec& header_ptrs,
-                                     PrmMsPtr ms_six_ptr, ProteoformPtr proteo_ptr,
-                                     PtmMngPtr mng_ptr);
+BasicDiagonalPtrVec  getDiagonals(const DiagonalHeaderPtrVec& header_ptrs,
+                                  PrmMsPtr ms_six_ptr, ProteoformPtr proteo_ptr,
+                                  PtmMngPtr mng_ptr);
 
-BasicDiagPairDiagPtr getDiagonal(int cnt,DiagonalHeaderPtr header_ptr, PrmMsPtr ms_six_ptr,
+BasicDiagonalPtr  getDiagonalPtr(int cnt,DiagonalHeaderPtr header_ptr, PrmMsPtr ms_six_ptr,
                                  ProteoformPtr proteo_ptr, PtmMngPtr mng_ptr);
 } /* namespace prot */
 

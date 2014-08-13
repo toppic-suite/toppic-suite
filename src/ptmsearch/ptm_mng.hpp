@@ -1,10 +1,3 @@
-/*
- * ptm_mng.hpp
- *
- *  Created on: Dec 19, 2013
- *      Author: xunlikun
- */
-
 #ifndef PROT_PTM_MNG_HPP_
 #define PROT_PTM_MNG_HPP_
 
@@ -15,8 +8,8 @@ namespace prot {
 class PtmMng {
  public :
   PtmMng(PrsmParaPtr prsm_para_ptr, int n_report, int shift_num,
-         double align_max_shift, std::string input_file_ext, 
-         std::string output_file_ext) {
+         double align_max_shift, const std::string &input_file_ext, 
+         const std::string &output_file_ext) {
     prsm_para_ptr_ = prsm_para_ptr;
     n_report_ = n_report;
     n_unknown_shift_ = shift_num;

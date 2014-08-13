@@ -34,8 +34,8 @@ void PtmSlowMatch::initPsAlign(CompShiftLowMemPtr comp_shift){
       scale);
   DiagonalHeaderPtrVec n_term_shift_headers 
       = getNTermShiftHeaders (best_shifts, ms_six_, proteoform_, mng_);
-  BasicDiagPairDiagPtrVec diagonals = getDiagonals(n_term_shift_headers,
-                                                   ms_six_,proteoform_,mng_);
+  BasicDiagonalPtrVec diagonals = getDiagonals(n_term_shift_headers,
+                                               ms_six_,proteoform_,mng_);
   /*
   for (size_t i = 0; i < diagonals.size(); i++) {
     std::cout << "diagonal " << i << " shift " << diagonals[i]->getHeader()->getProtNTermShift()
