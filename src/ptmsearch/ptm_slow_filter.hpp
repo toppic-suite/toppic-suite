@@ -1,10 +1,3 @@
-/*
- * ptm_slow_filter.hpp
- *
- *  Created on: Dec 27, 2013
- *      Author: xunlikun
- */
-
 #ifndef PROT_PTM_SLOW_FILTER_HPP_
 #define PROT_PTM_SLOW_FILTER_HPP_
 
@@ -21,19 +14,19 @@ namespace prot {
 class PtmSlowFilter {
  public:
   PtmSlowFilter(
-      SpectrumSetPtr spectrum_set,
-      SimplePrsmPtrVec fast_Matches,
-      CompShiftLowMemPtr comp_shift,
-      PtmMngPtr mng);
-  PrsmPtrVec getPrsms(int nshift, SemiAlignTypePtr type);
+      SpectrumSetPtr spectrum_set_ptr,
+      SimplePrsmPtrVec simple_prsm_ptrs,
+      CompShiftLowMemPtr comp_shift_ptr,
+      PtmMngPtr mng_ptr);
+  PrsmPtrVec getPrsms(int shift_num, SemiAlignTypePtr type_ptr);
 
  private:
-  PtmSlowMatchPtrVec complete_prefix_slow_matches_;
-  PtmSlowMatchPtrVec suffix_internal_slow_matches_;
-  PrsmPtrVec2D complete_prsms_;
-  PrsmPtrVec2D prefix_prsms_;
-  PrsmPtrVec2D suffix_prsms_;
-  PrsmPtrVec2D internal_prsms_;
+  PtmSlowMatchPtrVec complete_prefix_slow_match_ptrs_;
+  PtmSlowMatchPtrVec suffix_internal_slow_match_ptrs_;
+  PrsmPtrVec2D complete_prsm_2d_ptrs_;
+  PrsmPtrVec2D prefix_prsm_2d_ptrs_;
+  PrsmPtrVec2D suffix_prsm_2d_ptrs_;
+  PrsmPtrVec2D internal_prsm_2d_ptrs_;
 };
 
 typedef std::shared_ptr<PtmSlowFilter> PtmSlowFilterPtr;
