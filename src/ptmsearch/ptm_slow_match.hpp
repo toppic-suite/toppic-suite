@@ -1,10 +1,3 @@
-/*
- * ptm_slow_match.hpp
- *
- *  Created on: Dec 27, 2013
- *      Author: xunlikun
- */
-
 #ifndef PROT_PTM_SLOW_MATCH_HPP_
 #define PROT_PTM_SLOW_MATCH_HPP_
 
@@ -28,27 +21,27 @@ namespace prot {
 
 class PtmSlowMatch {
  public:
-  PtmSlowMatch(ProteoformPtr seq,
-      SpectrumSetPtr spectrum_set,
-      CompShiftLowMemPtr comp_shift,
-      PtmMngPtr mng);
+  PtmSlowMatch(ProteoformPtr proteo_ptr,
+      SpectrumSetPtr spectrum_set_ptr,
+      CompShiftLowMemPtr comp_shift_ptr,
+      PtmMngPtr mng_ptr);
 
-  ProteoformPtr getProteoform(){return proteoform_;};
-  void compute(SemiAlignTypePtr type, PrsmPtrVec &prsms);
+  ProteoformPtr getProteoform(){return proteo_ptr_;};
+  void compute(SemiAlignTypePtr type_ptr, PrsmPtrVec &prsm_ptrs);
 
  private:
-  PtmMngPtr mng_;
-  ProteoformPtr proteoform_;
-  DeconvMsPtr deconv_ms_;
-  PrmMsPtr ms_six_;
-  ExtendMsPtr ms_three_;
-  PSAlignPtr ps_align_;
+  PtmMngPtr mng_ptr_;
+  ProteoformPtr proteo_ptr_;
+  DeconvMsPtr deconv_ms_ptr_;
+  PrmMsPtr ms_six_ptr_;
+  ExtendMsPtr ms_three_ptr_;
+  PSAlignPtr ps_align_ptr_;
 
-  void initPsAlign(CompShiftLowMemPtr comp_shift);
+  void initPsAlign(CompShiftLowMemPtr comp_shift_ptr);
 
   DiagonalHeaderPtrVec getNTermShiftHeaders(
-      std::vector<double> best_shifts, PrmMsPtr ms_six, 
-      ProteoformPtr proteoform, PtmMngPtr mng);
+      const std::vector<double> &best_shifts, PrmMsPtr ms_six_ptr, 
+      ProteoformPtr proteo_ptr, PtmMngPtr mng_ptr);
 
   PrsmPtr geneResult(int shift_num);
 };

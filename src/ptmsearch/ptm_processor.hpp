@@ -17,20 +17,20 @@ class PtmProcessor {
 
  private:
   PtmMngPtr mng_ptr_;
-  ProteoformPtrVec proteoforms_;
-  SimplePrsmPtrVec simple_prsms_;
-  CompShiftLowMemPtr comp_shift_;
-  std::vector<PrsmWriterPtr> complete_writers_;
-  std::vector<PrsmWriterPtr> prefix_writers_;
-  std::vector<PrsmWriterPtr> suffix_writers_;
-  std::vector<PrsmWriterPtr> internal_writers_;
-  PrsmWriterPtr all_writer_;
+  ProteoformPtrVec proteo_ptrs_;
+  SimplePrsmPtrVec simple_prsm_ptrs_;
+  CompShiftLowMemPtr comp_shift_ptr_;
+  std::vector<PrsmWriterPtr> complete_writer_ptrs_;
+  std::vector<PrsmWriterPtr> prefix_writer_ptrs_;
+  std::vector<PrsmWriterPtr> suffix_writer_ptrs_;
+  std::vector<PrsmWriterPtr> internal_writer_ptrs_;
+  PrsmWriterPtr all_writer_ptr_;
 
   void initWriters();
   void initData();
   void closeWriters();
   void processOneSpectrum(SpectrumSetPtr spectrum_set_ptr, 
-                          SimplePrsmPtrVec matches);
+                          SimplePrsmPtrVec simple_prsm_ptrs);
 };
 
 typedef std::shared_ptr<PtmProcessor> PtmProcessorPtr;

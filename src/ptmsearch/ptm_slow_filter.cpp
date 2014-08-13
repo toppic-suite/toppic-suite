@@ -1,91 +1,84 @@
-/*
- * ptm_slow_filter.cpp
- *
- *  Created on: Dec 27, 2013
- *      Author: xunlikun
- */
-
 #include "ptmsearch/ptm_slow_filter.hpp"
 
 namespace prot {
 
 PtmSlowFilter::PtmSlowFilter(
-    SpectrumSetPtr spectrum_set,
-    SimplePrsmPtrVec fast_Matches,
-    CompShiftLowMemPtr comp_shift,
-    PtmMngPtr mng){
+    SpectrumSetPtr spectrum_set_ptr,
+    SimplePrsmPtrVec simple_prsm_ptrs,
+    CompShiftLowMemPtr comp_shift_ptr,
+    PtmMngPtr mng_ptr){
 
-  // init complete_prefix_slow_matches
-  for(size_t i=0;i<fast_Matches.size();i++){
-    ProteoformPtrVec raw_forms;
-    raw_forms.push_back(fast_Matches[i]->getProteoformPtr());
-    ProteoformPtrVec prot_mod_forms 
-        = generateProtModProteoform(raw_forms, mng->prsm_para_ptr_->getAllowProtModPtrVec());
-    for (size_t j = 0; j < prot_mod_forms.size(); j++) {
-      complete_prefix_slow_matches_.push_back(PtmSlowMatchPtr(
-            new PtmSlowMatch(prot_mod_forms[j],spectrum_set,comp_shift,mng)));
+  // init complete_prefix_slow_prsm_ptrs
+  for(size_t i=0;i<simple_prsm_ptrs.size();i++){
+    ProteoformPtrVec raw_proteo_ptrs;
+    raw_proteo_ptrs.push_back(simple_prsm_ptrs[i]->getProteoformPtr());
+    ProteoformPtrVec mod_proteo_ptrs 
+        = generateProtModProteoform(raw_proteo_ptrs, mng_ptr->prsm_para_ptr_->getAllowProtModPtrVec());
+    for (size_t j = 0; j < mod_proteo_ptrs.size(); j++) {
+      complete_prefix_slow_match_ptrs_.push_back(PtmSlowMatchPtr(
+            new PtmSlowMatch(mod_proteo_ptrs[j],spectrum_set_ptr,comp_shift_ptr,mng_ptr)));
     }
   }
-  // init suffix_internal_slow_matches
-  for(size_t i=0; i<complete_prefix_slow_matches_.size();i++){
-    ProtModPtr prot_mod = complete_prefix_slow_matches_[i]->getProteoform()->getProtModPtr();
-    if (prot_mod == ProtModFactory::getProtModPtr_NONE()) {
-      suffix_internal_slow_matches_.push_back(complete_prefix_slow_matches_[i]);
+  // init suffix_internal_slow_prsm_ptrs
+  for(size_t i=0; i<complete_prefix_slow_match_ptrs_.size();i++){
+    ProtModPtr prot_mod_ptr = complete_prefix_slow_match_ptrs_[i]->getProteoform()->getProtModPtr();
+    if (prot_mod_ptr == ProtModFactory::getProtModPtr_NONE()) {
+      suffix_internal_slow_match_ptrs_.push_back(complete_prefix_slow_match_ptrs_[i]);
     }
   }
 
   // compute complete and prefix prsms 
-  for(size_t i=0; i<complete_prefix_slow_matches_.size();i++){
-    PrsmPtrVec comps;
-    complete_prefix_slow_matches_[i]->compute(SemiAlignTypeFactory::getCompletePtr(), comps);
-    complete_prsms_.push_back(comps);
-    PrsmPtrVec prefixs;
-    complete_prefix_slow_matches_[i]->compute(SemiAlignTypeFactory::getPrefixPtr(), prefixs);
-    prefix_prsms_.push_back(prefixs);
+  for(size_t i=0; i<complete_prefix_slow_match_ptrs_.size();i++){
+    PrsmPtrVec comp_ptrs;
+    complete_prefix_slow_match_ptrs_[i]->compute(SemiAlignTypeFactory::getCompletePtr(), comp_ptrs);
+    complete_prsm_2d_ptrs_.push_back(comp_ptrs);
+    PrsmPtrVec prefix_ptrs;
+    complete_prefix_slow_match_ptrs_[i]->compute(SemiAlignTypeFactory::getPrefixPtr(), prefix_ptrs);
+    prefix_prsm_2d_ptrs_.push_back(prefix_ptrs);
   }
 
   // compute suffix and internal prsms 
-  for(size_t i=0; i< suffix_internal_slow_matches_.size();i++){
-    PrsmPtrVec suffixs;
-    suffix_internal_slow_matches_[i]->compute(SemiAlignTypeFactory::getSuffixPtr(), suffixs);
-    suffix_prsms_.push_back(suffixs);
-    PrsmPtrVec internals;
-    suffix_internal_slow_matches_[i]->compute(SemiAlignTypeFactory::getInternalPtr(), internals);
-    internal_prsms_.push_back(internals);
+  for(size_t i=0; i< suffix_internal_slow_match_ptrs_.size();i++){
+    PrsmPtrVec suffix_ptrs;
+    suffix_internal_slow_match_ptrs_[i]->compute(SemiAlignTypeFactory::getSuffixPtr(), suffix_ptrs);
+    suffix_prsm_2d_ptrs_.push_back(suffix_ptrs);
+    PrsmPtrVec internal_ptrs;
+    suffix_internal_slow_match_ptrs_[i]->compute(SemiAlignTypeFactory::getInternalPtr(), internal_ptrs);
+    internal_prsm_2d_ptrs_.push_back(internal_ptrs);
   }
 }
 
-PrsmPtrVec PtmSlowFilter::getPrsms(int nshift, SemiAlignTypePtr type){
-  PrsmPtrVec matches;
-  if (type == SemiAlignTypeFactory::getCompletePtr()) {
-    for (size_t i = 0; i < complete_prsms_.size(); i++) {
-      if (complete_prsms_[i][nshift] != nullptr) {
-        matches.push_back(complete_prsms_[i][nshift]);
+PrsmPtrVec PtmSlowFilter::getPrsms(int shift_num, SemiAlignTypePtr type_ptr){
+  PrsmPtrVec prsm_ptrs;
+  if (type_ptr == SemiAlignTypeFactory::getCompletePtr()) {
+    for (size_t i = 0; i < complete_prsm_2d_ptrs_.size(); i++) {
+      if (complete_prsm_2d_ptrs_[i][shift_num] != nullptr) {
+        prsm_ptrs.push_back(complete_prsm_2d_ptrs_[i][shift_num]);
       }
     }
   }
-  else if (type == SemiAlignTypeFactory::getPrefixPtr()) {
-    for (size_t i = 0; i < prefix_prsms_.size(); i++) {
-      if (prefix_prsms_[i][nshift] != nullptr) {
-        matches.push_back(prefix_prsms_[i][nshift]);
+  else if (type_ptr == SemiAlignTypeFactory::getPrefixPtr()) {
+    for (size_t i = 0; i < prefix_prsm_2d_ptrs_.size(); i++) {
+      if (prefix_prsm_2d_ptrs_[i][shift_num] != nullptr) {
+        prsm_ptrs.push_back(prefix_prsm_2d_ptrs_[i][shift_num]);
       }
     }
   }
-  else if (type == SemiAlignTypeFactory::getSuffixPtr()) {
-    for (size_t i = 0; i < suffix_prsms_.size(); i++) {
-      if (suffix_prsms_[i][nshift] != nullptr) {
-        matches.push_back(suffix_prsms_[i][nshift]);
+  else if (type_ptr == SemiAlignTypeFactory::getSuffixPtr()) {
+    for (size_t i = 0; i < suffix_prsm_2d_ptrs_.size(); i++) {
+      if (suffix_prsm_2d_ptrs_[i][shift_num] != nullptr) {
+        prsm_ptrs.push_back(suffix_prsm_2d_ptrs_[i][shift_num]);
       }
     }
   }
-  else if (type == SemiAlignTypeFactory::getInternalPtr()) {
-    for (size_t i = 0; i < internal_prsms_.size(); i++) {
-      if (internal_prsms_[i][nshift] != nullptr) {
-        matches.push_back(internal_prsms_[i][nshift]);
+  else if (type_ptr == SemiAlignTypeFactory::getInternalPtr()) {
+    for (size_t i = 0; i < internal_prsm_2d_ptrs_.size(); i++) {
+      if (internal_prsm_2d_ptrs_[i][shift_num] != nullptr) {
+        prsm_ptrs.push_back(internal_prsm_2d_ptrs_[i][shift_num]);
       }
     }
   }
-  return matches;
+  return prsm_ptrs;
 }
 
 } /* namespace prot */
