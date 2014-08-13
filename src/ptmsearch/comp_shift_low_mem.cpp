@@ -4,15 +4,6 @@
 
 namespace prot {
 
-CompShiftLowMem::CompShiftLowMem() {
-  num_size_ = 1000;
-  num_ = new short[1000];
-}
-
-CompShiftLowMem::~CompShiftLowMem() {
-  delete num_;
-}
-
 std::vector<std::vector<int>> CompShiftLowMem::findBestShift(
     const std::vector<int> &a,const std::vector<int> &b){
   return findBestShift(a,b,1,0);
@@ -45,11 +36,11 @@ std::vector<std::vector<int>> CompShiftLowMem::findBestShift(
   int delta = a[0]-b[b_length-1];
   int minD = delta-1;
   int maxD = a[a_length-1]-b[0]+1+errors[a_length-1];
-  if(maxD-minD + 1 >= num_size_){
-    num_size_ = maxD-minD+1;
-    delete num_;
-    // no need to init
-    num_ = new short[num_size_];
+  if(maxD-minD + 1 >= (int)num_.size()){
+    size_t required_len = maxD - minD + 1;
+    for (size_t i = num_.size(); i < required_len; i++) {
+      num_.push_back(0);
+    }
   }
   for(int i=0;i<a_length;i++){
     int a_value = a[i];
@@ -96,10 +87,11 @@ inline std::vector<std::vector<int>> CompShiftLowMem::findBestShift(
   const int delta = a[0]-b[b_length-1];
   const int minD = delta-1;
   const int maxD = a[a_length-1]-b[0]+1;
-  if(maxD-minD + 1 >= num_size_) {
-    num_size_ = maxD-minD+1;
-    delete num_;
-    num_ = new short[num_size_];
+  if(maxD-minD + 1 >= (int)num_.size()) {
+    int required_len = maxD - minD + 1;
+    for (int i = num_.size(); i < required_len; i++) {
+      num_.push_back(0);
+    }
   }
 
   for(int i=0;i<a_length;i++){

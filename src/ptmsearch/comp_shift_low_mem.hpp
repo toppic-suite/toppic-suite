@@ -8,9 +8,6 @@ namespace prot {
 
 class CompShiftLowMem {
  public:
-  CompShiftLowMem();
-
-  ~CompShiftLowMem();
 
   std::vector<std::vector<int>> findBestShift(const std::vector<int> &a,
                                               const std::vector<int> &b);
@@ -27,8 +24,7 @@ class CompShiftLowMem {
                                               int total,int minimum_gap) ;
 
  private:
-  int num_size_;
-  short* num_;
+  std::vector<short> num_;
   std::vector<std::vector<int>> findBestShift(const std::vector<int> &a,
                                               const std::vector<int> &b,
                                               int total,int minimum_gap) ;
