@@ -50,13 +50,13 @@ void PSAlign::initDPPair() {
   dp_pairs_.clear();
   first_pair_ = DPPairPtr(
       new DPPair(-1, -1, 0, 0, -1, mng_->n_unknown_shift_, nullptr));
-  first_pair_->setDiagPrev(nullptr);
+  first_pair_->setDiagPrevPairPtr(nullptr);
   dp_pairs_.push_back(first_pair_);
   for (size_t i = 0; i < dp_2d_pairs_.size(); i++) {
     for (size_t j = 0; j < dp_2d_pairs_[i].size(); j++) {
       dp_pairs_.push_back(dp_2d_pairs_[i][j]);
       if (j > 0) {
-        dp_2d_pairs_[i][j]->setDiagPrev(dp_2d_pairs_[i][j - 1]);
+        dp_2d_pairs_[i][j]->setDiagPrevPairPtr(dp_2d_pairs_[i][j - 1]);
       }
     }
   }
@@ -66,7 +66,7 @@ void PSAlign::initDPPair() {
   last_pair_ = DPPairPtr(
       new DPPair(sp_masses_.size(), seq_masses_.size(), 0, diff, -1,
                  mng_->n_unknown_shift_, nullptr));
-  last_pair_->setDiagPrev(nullptr);
+  last_pair_->setDiagPrevPairPtr(nullptr);
   dp_pairs_.push_back(last_pair_);
 }
 
@@ -87,17 +87,17 @@ DPPairPtr PSAlign::getTruncPre(DPPairPtr cur_pair, int s,
       if (type == SemiAlignTypeFactory::getCompletePtr()
           || type == SemiAlignTypeFactory::getSuffixPtr()) {
         if (prev_pair->getDiagonalHeader()->isProtCTermMatch()) {
-          if (prev_pair->getScr(s) > trunc_score) {
+          if (prev_pair->getScore(s) > trunc_score) {
             trunc_prev = prev_pair;
-            trunc_score = prev_pair->getScr(s);
+            trunc_score = prev_pair->getScore(s);
           }
         }
       }
       else {
         if (prev_pair->getDiagonalHeader()->isPepCTermMatch()) {
-          if (prev_pair->getScr(s) > trunc_score) {
+          if (prev_pair->getScore(s) > trunc_score) {
             trunc_prev = prev_pair;
-            trunc_score = prev_pair->getScr(s);
+            trunc_score = prev_pair->getScore(s);
           }
         }
       }
@@ -151,7 +151,7 @@ DPPairPtr PSAlign::getShiftPre(DPPairPtr cur_pair, int p, int s,
         || abs_shift > mng_->align_max_shift_) {
       continue;
     }
-    double prev_score = prev_pair->getScr(s - 1);
+    double prev_score = prev_pair->getScore(s - 1);
     if (abs_shift > mng_-> align_large_shift_thresh_) {
       prev_score = prev_score - mng_-> align_large_shift_panelty_;
     }
@@ -175,7 +175,7 @@ void PSAlign::dp(SemiAlignTypePtr align_type) {
         trunc_score = trunc_prev->getScr(s);
       }
 
-      DPPairPtr diag_prev = dp_pairs_[p]->getDiagPrev();
+      DPPairPtr diag_prev = dp_pairs_[p]->getDiagPrevPairPtr();
       double diag_score;
       if (diag_prev != nullptr) {
         diag_score = diag_prev->getScr(s);
@@ -224,12 +224,13 @@ DiagonalHeaderPtrVec PSAlign::backtrace(int s) {
   int cur_end = -1;
   int cur_bgn = -1;
   DPPairPtr p = last_pair_;
-  if (p->getPre(s) == nullptr || p->getPre(s) == first_pair_ || p->getScr(s) <= 0) {
+  if (p->getPrevPairPtr(s) == nullptr || p->getPrevPairPtr(s) == first_pair_ 
+      || p->getScr(s) <= 0) {
     return list;
   }
 
   while (p != first_pair_) {
-    DPPairPtr pre = p->getPre(s);
+    DPPairPtr pre = p->getPrevPairPtr(s);
     if (p == last_pair_) {
       cur_header = pre->getDiagonalHeader();
       cur_end = pre->getY();
