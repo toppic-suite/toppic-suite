@@ -8,7 +8,7 @@ PtmSlowFilter::PtmSlowFilter(
     CompShiftLowMemPtr comp_shift_ptr,
     PtmMngPtr mng_ptr){
 
-  // init complete_prefix_slow_prsm_ptrs
+  // init complete_prefix_slow_match_ptrs
   for(size_t i=0;i<simple_prsm_ptrs.size();i++){
     ProteoformPtrVec raw_proteo_ptrs;
     raw_proteo_ptrs.push_back(simple_prsm_ptrs[i]->getProteoformPtr());
