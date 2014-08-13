@@ -9,13 +9,15 @@ namespace prot {
 
 class CountTestNum {
  public:
-  CountTestNum(ProteoformPtrVec &raw_forms, ProteoformPtrVec &prot_mod_forms,
-               ResFreqPtrVec &residues, double convert_ratio, double max_prec_mass,
+  CountTestNum(const ProteoformPtrVec &raw_proteo_ptrs, 
+               const ProteoformPtrVec &mod_proteo_ptrs,
+               const ResFreqPtrVec &residue_ptrs, 
+               double convert_ratio, double max_prec_mass,
                double max_ptm_mass);
 
   ~CountTestNum();
 
-  double compCandNum(SemiAlignTypePtr type, int shift_num, 
+  double compCandNum(SemiAlignTypePtr type_ptr, int shift_num, 
                      double ori_mass, double ori_tolerance);
 
  private:
@@ -23,8 +25,8 @@ class CountTestNum {
   static double INTERNAL_ADJUST() {return 0.508;}
 
 
-  ProteoformPtrVec raw_forms_;
-  ProteoformPtrVec prot_mod_forms_;
+  ProteoformPtrVec raw_proteo_ptrs_;
+  ProteoformPtrVec mod_proteo_ptrs_;
 
   double *comp_mass_cnts_;
   double *pref_mass_cnts_;
@@ -38,15 +40,15 @@ class CountTestNum {
   double norm_factor_;
 
   int convertMass(double m);
-  void initCompMassCnt(ProteoformPtrVec &prot_mod_forms);
-  void initPrefMassCnt(ProteoformPtrVec &prot_mod_forms);
-  void initSuffMassCnt(ProteoformPtrVec &raw_forms);
+  void initCompMassCnt(const ProteoformPtrVec &prot_mod_forms);
+  void initPrefMassCnt(const ProteoformPtrVec &prot_mod_forms);
+  void initSuffMassCnt(const ProteoformPtrVec &raw_forms);
   void initInternalMassCnt();
-  double compNonPtmCandNum(SemiAlignTypePtr type, int shift_num, 
+  double compNonPtmCandNum(SemiAlignTypePtr type_ptr, int shift_num, 
                            double ori_mass, double ori_tolerance);
-  double compPtmCandNum (SemiAlignTypePtr type, int shift_num, double ori_mass);
-  double compPtmRestrictCandNum (SemiAlignTypePtr type, int shift_num, double ori_mass);
-  double compSeqNum(SemiAlignTypePtr type, int low, int high);
+  double compPtmCandNum (SemiAlignTypePtr type_ptr, int shift_num, double ori_mass);
+  double compPtmRestrictCandNum (SemiAlignTypePtr type_ptr, int shift_num, double ori_mass);
+  double compSeqNum(SemiAlignTypePtr type_ptr, int low, int high);
   double compMassNum(double *cnts, int low, int high);
 };
 

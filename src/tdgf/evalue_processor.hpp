@@ -19,9 +19,9 @@ class EValueProcessor {
  private:
   TdgfMngPtr mng_ptr_;
   CompPValueArrayPtr comp_pvalue_ptr_;
-  ProteoformPtrVec proteoforms_;
-  PrsmPtrVec prsms_;
-  bool checkPrsms(PrsmPtrVec &prsms);
+  ProteoformPtrVec proteo_ptrs_;
+  PrsmPtrVec prsm_ptrs_;
+  bool checkPrsms(const PrsmPtrVec &prsm_ptrs);
 };
 
 typedef std::shared_ptr<EValueProcessor> EValueProcessorPtr;

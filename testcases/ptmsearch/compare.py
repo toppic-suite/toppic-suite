@@ -25,13 +25,10 @@ def checkIn(line, clines):
 		cline = clines[i]
 		arr2 = cline.split("\t")
 		if ((arr1[3] == arr2[4]) and (arr1[9] == arr2[11]) ):
-			res = 1
-			break
-		elif (arr1[3] == arr2[4]):
-			if float(arr1[15]) > float(arr2[17]): 
-				res = 2
+			if float(arr1[15]) > float(arr2[18]):
+				res = 1
 			else: 
-				res = 3
+				res = 2
 			break
 	return res
 
@@ -53,7 +50,7 @@ def process(cppResult, javaResult, outfile):
 			file.write("Java" + "\t" + line )
 		#elif (int(checkIn(line, clines)) == 1):
 		#	file.write("same" + "\t" + line.rstrip('\n') + "\t" + getLine(line, clines))
-		elif (int(checkIn(line, clines)) == 2):
+		elif (int(checkIn(line, clines)) == 1):
 			file.write("Not same good protein" + "\t" + line )
 			
 	file.close()
