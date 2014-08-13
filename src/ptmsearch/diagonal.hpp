@@ -19,7 +19,7 @@ class Diagonal{
    * need init pair_ptr_list after create
    */
   Diagonal(DiagonalHeaderPtr header_ptr,std::vector<T> pair_ptr_list) {
-    header_ptr = header_ptr;
+    header_ptr_ = header_ptr;
     pair_ptr_list_ = pair_ptr_list;
   };
 

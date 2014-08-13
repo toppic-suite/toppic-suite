@@ -152,9 +152,6 @@ std::vector<std::pair<int,int>> CompShiftHiMem::compConvolution(
 std::vector<std::pair<int,int>> CompShiftHiMem::compConvolution(
     const std::vector<int> &masses, const std::vector<int> &errors, int bgn_pos,int num){
 
-  for (size_t i = 0; i < masses.size(); i++) {
-    LOG_DEBUG(i << " mass " << masses[i]/100.0);
-  }
   short* scores = new short[row_num_];
   memset(scores, 0, row_num_ * sizeof(short));
 
