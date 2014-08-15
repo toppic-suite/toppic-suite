@@ -117,7 +117,7 @@ DiagonalHeaderPtrVec refineHeadersBgnEnd(
     PeakIonPairPtrVec pair_ptrs = findPairs(ms_three_ptr, theo_peak_ptrs, bgn, end);
     if(pair_ptrs.size()<1){
       int pair_size = pair_ptrs.size();
-      LOG_WARN("Empty Segment is found "+prot::convertToString(pair_size));
+      LOG_TRACE("Empty Segment is found "+prot::convertToString(pair_size));
       if (i == 0 ) {
         int new_bgn = first_res_pos;
         int new_end = first_res_pos;

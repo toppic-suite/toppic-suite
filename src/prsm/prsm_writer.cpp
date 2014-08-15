@@ -20,15 +20,14 @@ void PrsmWriter::write(PrsmPtr prsm_ptr) {
   if(prsm_ptr!=nullptr){
     XmlDOMImpl* impl = XmlDOMImplFactory::getXmlDOMImplInstance();
     xercesc::DOMLSSerializer* serializer = impl->createSerializer();
-    XmlDOMDocument* doc = new XmlDOMDocument(impl->createDoc("prsm_list"));
-    xercesc::DOMElement* element = prsm_ptr->toXmlElement(doc);
+    XmlDOMDocument doc (impl->createDoc("prsm_list"));
+    xercesc::DOMElement* element = prsm_ptr->toXmlElement(&doc);
     //LOG_DEBUG("Element generated");
     std::string str = writeToString(serializer, element);
     //LOG_DEBUG("String generated");
     writeToStreamByRemovingDoubleLF(file_, str);
     element->release();
     serializer->release();
-    delete doc;
   }
 }
 

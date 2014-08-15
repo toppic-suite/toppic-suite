@@ -21,11 +21,11 @@ CompShiftHiMem::CompShiftHiMem(const ProteoformPtrVec &proteo_ptrs,
 }
 
 CompShiftHiMem::~CompShiftHiMem(){
-  delete proteo_row_begins_;
-  delete row_proteo_ids_;
-  delete col_index_begins_;
-  delete col_index_ends_;
-  delete col_indexes_;
+  delete[] proteo_row_begins_;
+  delete[] row_proteo_ids_;
+  delete[] col_index_begins_;
+  delete[] col_index_ends_;
+  delete[] col_indexes_;
 }
 
 void CompShiftHiMem::initProteoformBeginEnds(const ProteoformPtrVec &proteo_ptrs){
@@ -48,7 +48,7 @@ void CompShiftHiMem::initProteoformBeginEnds(const ProteoformPtrVec &proteo_ptrs
       row_proteo_ids_[j] = i;
     }
   }
-  delete proteo_row_ends;
+  delete[] proteo_row_ends;
 }
 
 inline void CompShiftHiMem::updateColumnMatchNums(ProteoformPtr proteo_ptr, 
@@ -112,8 +112,8 @@ void CompShiftHiMem::initIndexes(const ProteoformPtrVec &proteo_ptrs){
       }
     }
   }
-  delete col_match_nums;
-  delete col_index_pnts;
+  delete[] col_match_nums;
+  delete[] col_index_pnts;
 }
 
 
@@ -145,7 +145,7 @@ std::vector<std::pair<int,int>> CompShiftHiMem::compConvolution(
     }
   }
   std::vector<std::pair<int,int>> results = getShiftScores(scores, num);
-  delete scores;
+  delete[] scores;
   return results;
 }
 
@@ -178,7 +178,7 @@ std::vector<std::pair<int,int>> CompShiftHiMem::compConvolution(
     }
   }
   std::vector<std::pair<int,int>> results = getShiftScores(scores, num);
-  delete scores;
+  delete[] scores;
   return results;
 }
 
@@ -221,8 +221,8 @@ inline std::vector<std::pair<int,int>> CompShiftHiMem::getShiftScores(short* sco
     std::pair<int,int> proteo_score(row_proteo_ids_[top_rows[i]], top_scores[i]);
     results.push_back(proteo_score);
   }
-  delete top_scores;
-  delete top_rows;
+  delete[] top_scores;
+  delete[] top_rows;
   return results;
 }
 

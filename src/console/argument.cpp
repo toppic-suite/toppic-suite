@@ -137,8 +137,8 @@ bool Argument::parse(int argc, char* argv[]) {
       showUsage(display_desc);
       return false;
     }
-
-    arguments_["executiveDir"] = getExecutiveDir(argv[0]);
+    std::string argv_0 (argv[0]);
+    arguments_["executiveDir"] = getExecutiveDir(argv_0);
     if (vm.count("argument-file")) {
       setArgumentsByConfigFile(argument_file_name);
     }

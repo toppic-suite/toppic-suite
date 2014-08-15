@@ -15,20 +15,6 @@
 #include "zeroptmsearch/zero_ptm_mng.hpp"
 #include "zeroptmsearch/zero_ptm_search.hpp"
 
-#include "filterdiagonal/ptm_fast_filter_mng.hpp"
-#include "filterdiagonal/ptm_fast_filter_processor.hpp"
-
-#include "ptmsearch/ptm_mng.hpp"
-#include "ptmsearch/ptm_processor.hpp"
-
-#include "poisson/poisson_processor.hpp"
-#include "poisson/poisson_mng.hpp"
-
-#include "tdgf/evalue_processor.hpp"
-#include "tdgf/tdgf_mng.hpp"
-
-#include "xpp/xml_generator.hpp"
-#include "xpp/transformer.hpp"
 #include "console/argument.hpp"
 
 namespace prot {

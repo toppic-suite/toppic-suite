@@ -168,16 +168,13 @@ PrsmPtrVec readPrsm(const std::string &file_name, const ProteoformPtrVec &proteo
   PrsmPtrVec results;
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if(parser){
-    XmlDOMDocument* doc = new XmlDOMDocument(parser, file_name.c_str());
-    if (doc) {
-      xercesc::DOMElement* root = doc->getDocumentElement();
-      int simple_prsm_num = getChildCount(root, "prsm");
-      for (int i = 0; i < simple_prsm_num; i++) {
-        xercesc::DOMElement* prsm_element = getChildElement(root, "prsm", i);
-        results.push_back(PrsmPtr(new Prsm(prsm_element,proteo_ptrs)));
-      }
+    XmlDOMDocument doc(parser, file_name.c_str());
+    xercesc::DOMElement* root = doc.getDocumentElement();
+    int simple_prsm_num = getChildCount(root, "prsm");
+    for (int i = 0; i < simple_prsm_num; i++) {
+      xercesc::DOMElement* prsm_element = getChildElement(root, "prsm", i);
+      results.push_back(PrsmPtr(new Prsm(prsm_element,proteo_ptrs)));
     }
-    delete doc;
   }
   return results;
 }

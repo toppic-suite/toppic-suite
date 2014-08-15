@@ -2,18 +2,19 @@
 CC = g++
 #
 # define any compile-time flags
-CPPFLAGS = -Wall -std=c++11  -O3 -DPROT_LINUX 
+CPPFLAGS = -Wall -std=c++11  -O0 -g -DPROT_LINUX 
 # -pg
 #
 # define any directories containing header files other than /usr/include
 #
-INCLUDES = -I../../thirdparty/linux_include  -I../ 
+
+INCLUDES = -I../
 #
-# define library paths in addition to /usr/lib
-LFLAGS = -L../../thirdparty/linux_lib -L/lib -L/opt/local/lib
+## define library paths in addition to /usr/lib
+LFLAGS = -L/lib -L/opt/local/lib
 #
 # define any libraries to link into executable:
-LIBS = -static -lxalan-c -lxalanMsg -lxerces-c -lboost_program_options -lboost_filesystem -lboost_system -lpthread
+LIBS = -lxerces-c -lboost_program_options -lboost_filesystem -lboost_system -lpthread
 
 OBJ_DIR = ../../bin/obj
 
@@ -34,7 +35,5 @@ PTM_OBJS = $(addprefix $(OBJ_DIR)/, ptm_slow_filter.o comp_shift_low_mem.o ptm_p
 TDGF_OBJS = $(addprefix $(OBJ_DIR)/, evalue_processor.o comp_prob_value.o count_test_num.o comp_pvalue_array.o) 
 
 POISSON_OBJS = $(addprefix $(OBJ_DIR)/, poisson_processor.o poisson_comp_pvalue.o) 
-
-XPP_OBJS = $(addprefix $(OBJ_DIR)/, anno_view.o xml_generator.o transformer.o) 
 
 CONSOLE_OBJS = $(addprefix $(OBJ_DIR)/, argument.o)

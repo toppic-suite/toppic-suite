@@ -31,7 +31,7 @@ namespace prot {
       LOG_ERROR("Can not find executive directory!");
       return file_name = "";
     }
-    delete buffer;
+    delete[] buffer;
     fs::path full_path(file_name);
     std::string exe_dir = full_path.remove_filename().string();
     return exe_dir;

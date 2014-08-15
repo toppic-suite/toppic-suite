@@ -12,12 +12,12 @@ all:
 	cd spec; make
 	cd prsm; make
 	cd zeroptmsearch; make
-	cd poisson; make
-	cd tdgf; make
+#	cd poisson; make
+#	cd tdgf; make
 	cd filterdiagonal; make
 	cd ptmsearch; make
-	cd xpp; make	
-	cd console; make
+#	cd xpp; make	
+#	cd console; make
 	cd test; make
 
 clean:
