@@ -171,17 +171,22 @@ PrsmPtr PtmSlowMatch::geneResult(int shift_num){
   if(header_ptrs.size()==0) {
     return nullptr;
   }
-  double refine_prec_mass = ms_three_ptr_->getHeaderPtr()->getPrecMonoMass();
   int first_pos = header_ptrs[0]->getTruncFirstResPos();
   int last_pos = header_ptrs[header_ptrs.size()-1]->getTruncLastResPos();
   ProteoformPtr sub_proteo_ptr  = getSubProteoform(proteo_ptr_, first_pos, last_pos);
+  double refine_prec_mass = refinePrecursorAndHeaderShift(proteo_ptr_, ms_three_ptr_, 
+                                                          header_ptrs, mng_ptr_);
+
+  double delta = refine_prec_mass - deconv_ms_ptr_->getHeaderPtr()->getPrecMonoMass();
+  SpParaPtr sp_para_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr();
+  ExtendMsPtr refine_ms_ptr_ = createMsThreePtr(deconv_ms_ptr_, delta, sp_para_ptr);
+
   DiagonalHeaderPtrVec refined_header_ptrs = refineHeadersBgnEnd(
-      first_pos, last_pos, proteo_ptr_, deconv_ms_ptr_, ms_three_ptr_,mng_ptr_, header_ptrs);
+      proteo_ptr_, refine_ms_ptr_, header_ptrs, mng_ptr_);
 
   if(refined_header_ptrs.size()==0){
     return nullptr;
   }
-
 
   ChangePtrVec changes = getUnexpectedChanges(refined_header_ptrs, 
                                               first_pos, last_pos);

@@ -36,14 +36,16 @@ class Diagonal{
   std::vector<T> pair_ptr_list_;
 };
 
+double refinePrecursorAndHeaderShift(ProteoformPtr proteo_ptr,
+                                     ExtendMsPtr ms_three_ptr, 
+                                     DiagonalHeaderPtrVec &header_ptrs,
+                                     PtmMngPtr mng_ptr);
+
 DiagonalHeaderPtrVec refineHeadersBgnEnd(
-    int first_res_pos,
-    int last_res_pos,
     ProteoformPtr proteo_ptr,
-    DeconvMsPtr deconv_ms_ptr,
     ExtendMsPtr ms_three_ptr,
-    PtmMngPtr mng_ptr,
-    const DiagonalHeaderPtrVec& heade_ptrs);
+    const DiagonalHeaderPtrVec& heade_ptrs,
+    PtmMngPtr mng_ptr);
 
 int getNewBgn(const PeakIonPairPtrVec& pair_ptrs);
 int getNewEnd(const PeakIonPairPtrVec& pair_ptrs);
