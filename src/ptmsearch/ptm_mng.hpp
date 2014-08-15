@@ -48,10 +48,7 @@ class PtmMng {
   // set panelty to 3
   double align_large_shift_panelty_ = 3;
 
-  /*
-
-  double adjust_prec_step_width_ = 0.005;
-  */
+  double refine_prec_step_width_ = 0.005;
 
 };
 

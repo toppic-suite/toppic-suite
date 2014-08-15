@@ -30,21 +30,81 @@ inline TheoPeakPtrVec getDiagonalTheoPeak(ProteoformPtr proteo_ptr,
                      max_mass);
 }
 
+double refinePrecursorAndHeaderShift(ProteoformPtr proteo_ptr,
+                                     ExtendMsPtr ms_three_ptr, 
+                                     DiagonalHeaderPtrVec &header_ptrs,
+                                     PtmMngPtr mng_ptr) {
+  double prec_mass = ms_three_ptr->getHeaderPtr()->getPrecMonoMass();
+  double tole = ms_three_ptr->getHeaderPtr()->getErrorTolerance();
+  int one_side_step_num = 0;
+  if (tole > 0) {
+    one_side_step_num = (int)std::floor(tole/mng_ptr->refine_prec_step_width_);
+  }
+  int step_num = 1 + 2 * one_side_step_num;
+  DiagonalHeaderPtrVec test_ptrs;
+  for (size_t i = 0; i < header_ptrs.size(); i++) {
+    test_ptrs.push_back(header_ptrs[i]->clone());
+  }
+  DiagonalHeaderPtr last_test_ptr = test_ptrs[test_ptrs.size()-1];
+  double change = - one_side_step_num * mng_ptr->refine_prec_step_width_;
+  /* for the first test_ptrs.size() - 1 headers, change C-term shift,
+   * for the last header, change N-term shift */
+  for (size_t i = 0; i < test_ptrs.size() - 1; i++) {
+    test_ptrs[i]->changeOnlyCTermShift(change);
+  }
+  last_test_ptr->changeOnlyNTermShift(change);
+  int first_res_pos = header_ptrs[0]->getTruncFirstResPos();
+  double best_score = -1;
+  double best_delta = 0;
+  for (int i = 0; i < step_num; i++) {
+    double delta = (i - one_side_step_num) * mng_ptr->refine_prec_step_width_;
+    double cur_score = 0;
+    for(size_t j=0; j< test_ptrs.size(); j++){
+      TheoPeakPtrVec theo_peak_ptrs = getDiagonalTheoPeak(
+          proteo_ptr,
+          ms_three_ptr->getHeaderPtr()->getActivationPtr(),
+          test_ptrs,
+          j,
+          mng_ptr->prsm_para_ptr_->getSpParaPtr()->getMinMass());
+
+      int bgn = test_ptrs[j]->getMatchFirstBpPos()-first_res_pos;
+      int end = test_ptrs[j]->getMatchLastBpPos()-first_res_pos;
+      PeakIonPairPtrVec pair_ptrs = findPairs(ms_three_ptr, theo_peak_ptrs, bgn, end);
+      cur_score += pair_ptrs.size();
+    }
+    if (cur_score > best_score) {
+      best_score = cur_score;
+      best_delta = delta;
+    }
+    change = mng_ptr->refine_prec_step_width_;
+    for (size_t j = 0; j < test_ptrs.size() - 1; j++) {
+      test_ptrs[i]->changeOnlyCTermShift(change);
+    }
+    last_test_ptr->changeOnlyNTermShift(change);
+  }
+  for (size_t i = 0; i < header_ptrs.size() - 1; i++) {
+    header_ptrs[i]->changeOnlyCTermShift(best_delta);
+  }
+  DiagonalHeaderPtr last_header_ptr = header_ptrs[header_ptrs.size()-1];
+  last_header_ptr->changeOnlyNTermShift(best_delta);
+
+  return prec_mass + best_delta;
+}
+
 
 DiagonalHeaderPtrVec refineHeadersBgnEnd(
-    int first_res_pos,
-    int last_res_pos,
     ProteoformPtr proteo_ptr,
-    DeconvMsPtr deconv_ms_ptr,
     ExtendMsPtr ms_three_ptr,
-    PtmMngPtr mng_ptr,
-    const DiagonalHeaderPtrVec& header_ptrs){
+    const DiagonalHeaderPtrVec& header_ptrs,
+    PtmMngPtr mng_ptr){
 
   DiagonalHeaderPtrVec result_list;
+  int first_res_pos = header_ptrs[0]->getTruncFirstResPos();
+  int last_res_pos = header_ptrs[header_ptrs.size()-1]->getTruncLastResPos();
   for(size_t i=0;i<header_ptrs.size();i++){
     TheoPeakPtrVec theo_peak_ptrs = getDiagonalTheoPeak(
         proteo_ptr,
-        deconv_ms_ptr->getHeaderPtr()->getActivationPtr(),
+        ms_three_ptr->getHeaderPtr()->getActivationPtr(),
         header_ptrs,
         i,
         mng_ptr->prsm_para_ptr_->getSpParaPtr()->getMinMass());

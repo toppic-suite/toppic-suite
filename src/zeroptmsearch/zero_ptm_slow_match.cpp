@@ -26,7 +26,7 @@ ZeroPtmSlowMatch::ZeroPtmSlowMatch(DeconvMsPtr deconv_ms_ptr,
   ActivationPtr activation_ptr = deconv_ms_ptr_->getHeaderPtr()->getActivationPtr();
   double min_mass = sp_para_ptr->getMinMass();
   TheoPeakPtrVec theo_peak_ptrs = getProteoformTheoPeak(proteoform_ptr_, 
-                                                    activation_ptr, min_mass);
+                                                        activation_ptr, min_mass);
 
   compScore(refine_ms_ptr_,theo_peak_ptrs, sp_para_ptr->getPeakTolerancePtr()->getPpo());
 }

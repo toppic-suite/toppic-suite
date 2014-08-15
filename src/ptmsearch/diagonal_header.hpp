@@ -26,13 +26,15 @@ class DiagonalHeader {
   void initData(double c_shift,ProteoformPtr proteoform, 
                 double align_pref_suff_shift_thresh);
 
-  void changeNTermShift(double s){
-    prot_N_term_shift_ -= s;
-    pep_N_term_shift_ -= s;
+  void changeOnlyNTermShift(double s){
+    prot_N_term_shift_ +=s;
+    pep_N_term_shift_+=s;
+  }
+
+  void changeOnlyCTermShift(double s){
     prot_C_term_shift_ +=s;
     pep_C_term_shift_+=s;
   }
-
 
   int getTruncFirstResPos() {return trunc_first_res_pos_;}
 

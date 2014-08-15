@@ -48,16 +48,16 @@ class TdgfMng {
   std::string output_file_ext_;
 };
 
-TdgfMng::TdgfMng(PrsmParaPtr prsm_para_ptr, 
-                 int shift_num, double max_ptm_mass, 
-                 const std::string &input_file_ext, 
-                 const std::string &output_file_ext) {
-    prsm_para_ptr_ = prsm_para_ptr,
-    max_ptm_mass_ = max_ptm_mass;
-    unexpected_shift_num_ = shift_num;
-    input_file_ext_ = input_file_ext;
-    output_file_ext_ = output_file_ext;
-  }
+inline TdgfMng::TdgfMng(PrsmParaPtr prsm_para_ptr, 
+                        int shift_num, double max_ptm_mass, 
+                        const std::string &input_file_ext, 
+                        const std::string &output_file_ext) {
+  prsm_para_ptr_ = prsm_para_ptr,
+  max_ptm_mass_ = max_ptm_mass;
+  unexpected_shift_num_ = shift_num;
+  input_file_ext_ = input_file_ext;
+  output_file_ext_ = output_file_ext;
+}
 
 typedef std::shared_ptr<TdgfMng> TdgfMngPtr;
 
