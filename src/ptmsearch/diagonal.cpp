@@ -35,6 +35,9 @@ double refinePrecursorAndHeaderShift(ProteoformPtr proteo_ptr,
                                      DiagonalHeaderPtrVec &header_ptrs,
                                      PtmMngPtr mng_ptr) {
   double prec_mass = ms_three_ptr->getHeaderPtr()->getPrecMonoMass();
+  if (header_ptrs.size() == 0) {
+    return prec_mass;
+  }
   double tole = ms_three_ptr->getHeaderPtr()->getErrorTolerance();
   int one_side_step_num = 0;
   if (tole > 0) {
@@ -78,7 +81,7 @@ double refinePrecursorAndHeaderShift(ProteoformPtr proteo_ptr,
     }
     change = mng_ptr->refine_prec_step_width_;
     for (size_t j = 0; j < test_ptrs.size() - 1; j++) {
-      test_ptrs[i]->changeOnlyCTermShift(change);
+      test_ptrs[j]->changeOnlyCTermShift(change);
     }
     last_test_ptr->changeOnlyNTermShift(change);
   }
