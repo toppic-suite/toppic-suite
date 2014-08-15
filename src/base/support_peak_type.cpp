@@ -15,18 +15,15 @@ SupportPeakType::SupportPeakType(int id, const std::string &name) {
 void SPTypeFactory::initFactory(const std::string &file_name){
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
-    XmlDOMDocument* doc = new XmlDOMDocument(parser, file_name.c_str());
-    if (doc) {
-      xercesc::DOMElement* root = doc->getDocumentElement();
-      int prm_peak_type_num = getChildCount(root, "support_peak_type");
-      for (int i = 0; i < prm_peak_type_num; i++) {
-        xercesc::DOMElement* element 
-            = getChildElement(root, "support_peak_type", i);
-        int id = getIntChildValue(element, "id", 0);
-        std::string name = getChildValue(element, "name", 0);
-        sp_type_ptr_vec_.push_back(SPTypePtr(new SupportPeakType(id,name)));
-      }
-      delete doc;
+    XmlDOMDocument doc(parser, file_name.c_str());
+    xercesc::DOMElement* parent = doc.getDocumentElement();
+    int prm_peak_type_num = getChildCount(parent, "support_peak_type");
+    for (int i = 0; i < prm_peak_type_num; i++) {
+      xercesc::DOMElement* element 
+          = getChildElement(parent, "support_peak_type", i);
+      int id = getIntChildValue(element, "id", 0);
+      std::string name = getChildValue(element, "name", 0);
+      sp_type_ptr_vec_.push_back(SPTypePtr(new SupportPeakType(id,name)));
     }
   }
 }

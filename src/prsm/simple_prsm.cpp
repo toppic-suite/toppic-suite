@@ -90,16 +90,13 @@ SimplePrsmPtrVec readSimplePrsms(const std::string &file_name){
   SimplePrsmPtrVec result_ptrs;
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if(parser){
-    XmlDOMDocument* doc = new XmlDOMDocument(parser, file_name.c_str());
-    if (doc) {
-      xercesc::DOMElement* root = doc->getDocumentElement();
-      int simple_prsm_num = prot::getChildCount(root, "simple_prsm");
-      for (int i = 0; i < simple_prsm_num; i++) {
-        xercesc::DOMElement* simple_prsm = getChildElement(root, "simple_prsm", i);
-        result_ptrs.push_back(SimplePrsmPtr(new SimplePrsm(simple_prsm)));
-      }
+    XmlDOMDocument doc(parser, file_name.c_str());
+    xercesc::DOMElement* root = doc.getDocumentElement();
+    int simple_prsm_num = prot::getChildCount(root, "simple_prsm");
+    for (int i = 0; i < simple_prsm_num; i++) {
+      xercesc::DOMElement* simple_prsm = getChildElement(root, "simple_prsm", i);
+      result_ptrs.push_back(SimplePrsmPtr(new SimplePrsm(simple_prsm)));
     }
-    delete doc;
   }
   return result_ptrs;
 }

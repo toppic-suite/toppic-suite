@@ -28,7 +28,8 @@ int zero_ptm_process(int argc, char* argv[]) {
     std::map<std::string, std::string> arguments = argu_processor.getArguments();
     std::cout << "TopPC 0.5 " << std::endl;
 
-    std::string exe_dir = arguments["executiveDir"];
+    std::string exe_dir = "";
+    exe_dir = arguments["executiveDir"];
     std::cout << "Executive file directory is: " << exe_dir << std::endl;
     initBaseData(exe_dir);
 
@@ -69,6 +70,7 @@ int zero_ptm_process(int argc, char* argv[]) {
     int stop_s = clock();
     std::cout << std::endl << "Running time: " << (stop_s-start_s) / double(CLOCKS_PER_SEC)  << " seconds " << std::endl;
 
+    /*
     std::cout << "Outputting table starts " << std::endl;
     TableWriterPtr table_out = TableWriterPtr(new TableWriter(prsm_para_ptr, "PTM_1_COMPLETE", "PTM_1_COMPLETE_TABLE"));
     table_out->write();
@@ -88,6 +90,7 @@ int zero_ptm_process(int argc, char* argv[]) {
     table_out->write();
     table_out = nullptr;
     std::cout << "Outputting table finished." << std::endl;
+    */
 
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;

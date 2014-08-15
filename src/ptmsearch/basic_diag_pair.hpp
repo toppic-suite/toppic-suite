@@ -16,6 +16,7 @@ typedef std::shared_ptr<BasicDiagPair> BasicDiagPairPtr;
 typedef std::vector<BasicDiagPairPtr> BasicDiagPairPtrVec;
 typedef Diagonal<BasicDiagPairPtr> BasicDiagonal;
 typedef std::shared_ptr<BasicDiagonal> BasicDiagonalPtr;
+typedef std::weak_ptr<BasicDiagonal> BasicDiagonalWeakPtr;
 typedef std::vector<BasicDiagonalPtr> BasicDiagonalPtrVec;
 
 class BasicDiagPair:public Pair {
@@ -27,7 +28,7 @@ class BasicDiagPair:public Pair {
 
   int getDiagOrder() {return diag_order_;}
 
-  const BasicDiagonalPtr getDiagonalPtr() {return diagonal_ptr_;}
+  const BasicDiagonalWeakPtr getDiagonalPtr() {return diagonal_ptr_;}
 
   void setDiagonalPtr(BasicDiagonalPtr diagonal_ptr) {diagonal_ptr_ = diagonal_ptr;}
 
@@ -38,7 +39,7 @@ class BasicDiagPair:public Pair {
  protected:
   int diag_order_;
   double diff_;
-  BasicDiagonalPtr diagonal_ptr_;
+  BasicDiagonalWeakPtr diagonal_ptr_;
   double score_;
   int base_type_;
 
