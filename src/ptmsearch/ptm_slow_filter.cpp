@@ -15,8 +15,9 @@ PtmSlowFilter::PtmSlowFilter(
     ProteoformPtrVec mod_proteo_ptrs 
         = generateProtModProteoform(raw_proteo_ptrs, mng_ptr->prsm_para_ptr_->getAllowProtModPtrVec());
     for (size_t j = 0; j < mod_proteo_ptrs.size(); j++) {
-      complete_prefix_slow_match_ptrs_.push_back(PtmSlowMatchPtr(
-            new PtmSlowMatch(mod_proteo_ptrs[j],spectrum_set_ptr,comp_shift_ptr,mng_ptr)));
+      PtmSlowMatchPtr ptm_slow_match_ptr(new PtmSlowMatch(mod_proteo_ptrs[j],spectrum_set_ptr,
+                                                          comp_shift_ptr,mng_ptr));
+      complete_prefix_slow_match_ptrs_.push_back(ptm_slow_match_ptr);
     }
   }
   // init suffix_internal_slow_prsm_ptrs

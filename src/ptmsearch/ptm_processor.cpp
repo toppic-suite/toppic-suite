@@ -64,7 +64,7 @@ void PtmProcessor::initData() {
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
   std::string simplePrsmFileName = basename(sp_file_name)
       + "." + mng_ptr_->input_file_ext_;
-  simple_prsm_ptrs_  = readSimplePrsms(simplePrsmFileName.c_str());
+  simple_prsm_ptrs_  = readSimplePrsms(simplePrsmFileName);
   // find sequences for simple prsms
   for(size_t i =0;i< simple_prsm_ptrs_.size();i++){
     simple_prsm_ptrs_[i]->assignProteoformPtr(proteo_ptrs_);
@@ -75,12 +75,12 @@ void PtmProcessor::initData() {
 // process ptm search
 void PtmProcessor::process(){
   std::string sp_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
-  MsAlignReader spReader(sp_file_name);
-  DeconvMsPtr deconv_sp;
   int spectra_num = countSpNum (sp_file_name);
+  MsAlignReader sp_reader(sp_file_name);
+  DeconvMsPtr deconv_sp;
   int cnt = 0;
   SpParaPtr sp_para_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr();
-  while((deconv_sp = spReader.getNextMs())!= nullptr){
+  while((deconv_sp = sp_reader.getNextMs())!= nullptr){
     cnt++;
     SpectrumSetPtr spectrum_set_ptr = getSpectrumSet(deconv_sp, 0, sp_para_ptr);
     if(spectrum_set_ptr != nullptr){
@@ -91,7 +91,7 @@ void PtmProcessor::process(){
     std::cout << std::flush << "Ptm searching is processing " << cnt 
         << " of " << spectra_num << " spectra.\r";
   }
-  spReader.close();
+  sp_reader.close();
   closeWriters();
   std::cout << std::endl << "Ptm searching finished." << std::endl;
 }
@@ -117,6 +117,7 @@ void PtmProcessor::processOneSpectrum(SpectrumSetPtr spectrum_set_ptr,
                                       SimplePrsmPtrVec simple_prsm_ptrs) {
   PtmSlowFilterPtr slow_filter_ptr = PtmSlowFilterPtr(
       new PtmSlowFilter(spectrum_set_ptr,simple_prsm_ptrs,comp_shift_ptr_,mng_ptr_));
+  //LOG_DEBUG("init filter complete");
   for (int s = 1; s <= mng_ptr_->n_unknown_shift_; s++) {
     PrsmPtrVec complete_prsm_ptrs = slow_filter_ptr->getPrsms(
         s-1, SemiAlignTypeFactory::getCompletePtr());

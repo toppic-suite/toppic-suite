@@ -20,10 +20,9 @@ DiagonalHeader::DiagonalHeader(double n_term_shift,
   pep_C_term_match_ = pep_c_match;
 }
 DiagonalHeaderPtr DiagonalHeader::clone() {
-  DiagonalHeaderPtr cloned = DiagonalHeaderPtr(
-      new DiagonalHeader(prot_N_term_shift_, n_strict_, c_strict_, 
-                         prot_N_term_match_, prot_C_term_match_,
-                         pep_N_term_match_, pep_C_term_match_));
+  DiagonalHeaderPtr cloned(new DiagonalHeader(prot_N_term_shift_, n_strict_, c_strict_, 
+                                              prot_N_term_match_, prot_C_term_match_,
+                                              pep_N_term_match_, pep_C_term_match_));
   cloned->setId(id_);
   cloned->setTruncFirstResPos(trunc_first_res_pos_);
   cloned->setMatchFirstBpPos(match_first_bp_pos_);
@@ -84,22 +83,21 @@ ChangePtrVec getUnexpectedChanges(const DiagonalHeaderPtrVec &header_ptrs,
                              UNEXPECTED_CHANGE, header_ptrs[0]->getPepNTermShift(), nullptr)));
   }
   for (size_t i = 0; i < header_ptrs.size() - 1; i++) {
-    change_list.push_back(
-        ChangePtr(
-            new Change(
-                header_ptrs[i]->getMatchLastBpPos()-first_res_pos,
-                header_ptrs[i + 1]->getMatchFirstBpPos()-first_res_pos,
-                UNEXPECTED_CHANGE,
-                header_ptrs[i + 1]->getProtNTermShift()
-                    - header_ptrs[i]->getProtNTermShift(),
-                nullptr)));
+    ChangePtr change_ptr(new Change(header_ptrs[i]->getMatchLastBpPos()-first_res_pos,
+                                    header_ptrs[i + 1]->getMatchFirstBpPos()-first_res_pos,
+                                    UNEXPECTED_CHANGE,
+                                    header_ptrs[i + 1]->getProtNTermShift()
+                                    - header_ptrs[i]->getProtNTermShift(),
+                                    nullptr));
+    change_list.push_back(change_ptr);
   }
   DiagonalHeaderPtr last_header_ptr = header_ptrs[header_ptrs.size() - 1];
   if (!last_header_ptr->isPepCTermMatch() && !last_header_ptr->isProtCTermMatch()) {
-    change_list.push_back(
-        ChangePtr(new Change(last_header_ptr->getMatchLastBpPos()-first_res_pos, 
-                             (last_res_pos + 1) -first_res_pos,
-                             UNEXPECTED_CHANGE, last_header_ptr->getPepCTermShift(), nullptr)));
+    ChangePtr change_ptr(new Change(last_header_ptr->getMatchLastBpPos()-first_res_pos, 
+                                    (last_res_pos + 1) -first_res_pos,
+                                    UNEXPECTED_CHANGE, last_header_ptr->getPepCTermShift(), 
+                                    nullptr));
+    change_list.push_back(change_ptr);
   }
   return change_list;
 }

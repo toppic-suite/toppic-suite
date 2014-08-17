@@ -50,14 +50,12 @@ int zero_ptm_process(int argc, char* argv[]) {
       generateShuffleDb(ori_db_file_name, db_file_name);
     }
 
-    /*
     std::cout << "Fast filtering starts " << std::endl;
     PtmFastFilterMngPtr filter_mng_ptr 
         = PtmFastFilterMngPtr(new PtmFastFilterMng(prsm_para_ptr, "FILTER"));
     PtmFastFilterProcessorPtr filter_processor = PtmFastFilterProcessorPtr(new PtmFastFilterProcessor(filter_mng_ptr));
     filter_processor->process();
     filter_processor = nullptr;
-    */
 
     int start_s = clock();
     std::cout << "Ptm searching starts" << std::endl;

@@ -33,10 +33,10 @@ void PSAlign::initDPPair() {
       int y = diagonal_ptrs_[i]->getDiagPair(j)->getY();
       double score = diagonal_ptrs_[i]->getDiagPair(j)->getScore();
       double diff = diagonal_ptrs_[i]->getDiagPair(j)->getDiff();
-      dp_2d_pair_ptrs_[i].push_back(
-          DPPairPtr(
-              new DPPair(x, y, score, diff, j, mng_->n_unknown_shift_,
-                         diagonal_ptrs_[i]->getHeader())));
+      DPPairPtr dp_pair_ptr(new DPPair(x, y, score, diff, j, 
+                                       mng_->n_unknown_shift_,
+                                       diagonal_ptrs_[i]->getHeader()));
+      dp_2d_pair_ptrs_[i].push_back(dp_pair_ptr);
     }
     segment_bgn_pair_ptrs_.push_back(dp_2d_pair_ptrs_[i][0]);
     segment_end_pair_ptrs_.push_back(dp_2d_pair_ptrs_[i][diagonal_ptrs_[i]->size() - 1]);

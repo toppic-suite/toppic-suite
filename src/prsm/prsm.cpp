@@ -46,10 +46,10 @@ void Prsm::initScores(SpParaPtr sp_para_ptr) {
   std::sort(pairs.begin(),pairs.end(),peakIonPairUp);
   DeconvPeakPtr prev_deconv_peak(nullptr);
   for (size_t i = 0; i < pairs.size(); i++) {
-    if (pairs[i]->getRealPeakPtr()->getBasePeakPtr() != prev_deconv_peak) {
+    //if (pairs[i]->getRealPeakPtr()->getBasePeakPtr() != prev_deconv_peak) {
       prev_deconv_peak = pairs[i]->getRealPeakPtr()->getBasePeakPtr();
       match_peak_num_ += pairs[i]->getRealPeakPtr()->getScore();
-    }
+    //}
   }
 }
 

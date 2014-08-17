@@ -67,16 +67,16 @@ BasicDiagPairPtrVec compDiagPair(PrmMsPtr ms_ptr, const std::vector<double>& seq
     int pos = n_term_positions[j];
     if(pos >= 0){
       double diff = ms_ptr->getPeakPtr(pos)->getPosition() - seq_masses[j];
-      pair_list.push_back(BasicDiagPairPtr(
-              new BasicDiagPair(pos,j,1.0,pair_list.size(),
-                                diff, PRM_PEAK_TYPE_ORIGINAL)));
+      BasicDiagPairPtr diag_pair_ptr(new BasicDiagPair(pos,j,1.0,pair_list.size(),
+                                                       diff, PRM_PEAK_TYPE_ORIGINAL));
+      pair_list.push_back(diag_pair_ptr);
     }
     pos = c_term_positions[j];
     if (pos >= 0) {
       double diff = ms_ptr->getPeakPtr(pos)->getPosition() - seq_masses[j];
-      pair_list.push_back(BasicDiagPairPtr(
-              new BasicDiagPair(pos,j,1.0,pair_list.size(),
-                                diff, PRM_PEAK_TYPE_REVERSED)));
+      BasicDiagPairPtr diag_pair_ptr(new BasicDiagPair(pos,j,1.0,pair_list.size(),
+                                                       diff, PRM_PEAK_TYPE_REVERSED));
+      pair_list.push_back(diag_pair_ptr);
     }
   }
 
