@@ -25,7 +25,8 @@ def checkIn(line, clines):
 		cline = clines[i]
 		arr2 = cline.split("\t")
 		if ((arr1[3] == arr2[4]) and (arr1[9] == arr2[11]) ):
-			if float(arr1[15]) > float(arr2[18]):
+			if float(arr1[15]) > float(arr2[17]):
+				print arr1[3] + "\t" + arr1[9] + "\t" + arr1[15] + "\t" + arr2[17] 
 				res = 1
 			else: 
 				res = 2
