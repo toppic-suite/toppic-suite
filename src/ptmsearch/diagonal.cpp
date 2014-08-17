@@ -48,7 +48,15 @@ double refinePrecursorAndHeaderShift(ProteoformPtr proteo_ptr,
   for (size_t i = 0; i < header_ptrs.size(); i++) {
     test_ptrs.push_back(header_ptrs[i]->clone());
   }
+  for (size_t i = 0; i < header_ptrs.size() - 1; i++) {
+    int middle = (test_ptrs[i]->getMatchLastBpPos() + test_ptrs[i+1]->getMatchFirstBpPos())/2;
+    test_ptrs[i]->setMatchLastBpPos(middle);
+    test_ptrs[i]->setMatchFirstBpPos(middle);
+  }
+  test_ptrs[0]->setMatchFirstBpPos(test_ptrs[0]->getTruncFirstResPos());
   DiagonalHeaderPtr last_test_ptr = test_ptrs[test_ptrs.size()-1];
+  last_test_ptr->setMatchLastBpPos(last_test_ptr->getTruncLastResPos());
+  //LOG_DEBUG("TEST PTR SIZE" << test_ptrs.size());
   double change = - one_side_step_num * mng_ptr->refine_prec_step_width_;
   /* for the first test_ptrs.size() - 1 headers, change C-term shift,
    * for the last header, change N-term shift */
@@ -58,9 +66,16 @@ double refinePrecursorAndHeaderShift(ProteoformPtr proteo_ptr,
   last_test_ptr->changeOnlyNTermShift(change);
   int first_res_pos = header_ptrs[0]->getTruncFirstResPos();
   double best_score = -1;
-  double best_delta = 0;
+  int best_i_start = -1;
+  int best_i_end = -1;
+  bool continuous = false;
+  /*
+  for (size_t i = 0; i < ms_three_ptr->size(); i++) {
+    std::cout << "ms " << ms_three_ptr->getPeakPtr(i)->getPosition() << std::endl;
+  }
+  */
   for (int i = 0; i < step_num; i++) {
-    double delta = (i - one_side_step_num) * mng_ptr->refine_prec_step_width_;
+    //double delta = (i - one_side_step_num) * mng_ptr->refine_prec_step_width_;
     double cur_score = 0;
     for(size_t j=0; j< test_ptrs.size(); j++){
       TheoPeakPtrVec theo_peak_ptrs = getDiagonalTheoPeak(
@@ -73,18 +88,52 @@ double refinePrecursorAndHeaderShift(ProteoformPtr proteo_ptr,
       int bgn = test_ptrs[j]->getMatchFirstBpPos()-first_res_pos;
       int end = test_ptrs[j]->getMatchLastBpPos()-first_res_pos;
       PeakIonPairPtrVec pair_ptrs = findPairs(ms_three_ptr, theo_peak_ptrs, bgn, end);
+      /*
+      std::cout << j << " begin " << bgn << " end " << end << std::endl;
+      if (i == 27) {
+        for (size_t k = 0; k < theo_peak_ptrs.size(); k++) {
+          std::cout << j << " theo " << theo_peak_ptrs[k]->getPosition() << std::endl;
+        }
+        for (size_t k = 0; k < pair_ptrs.size(); k++) {
+          IonPtr ion_ptr = pair_ptrs[k]->getTheoPeakPtr()->getIonPtr();
+          std::cout << j << " match " << k << " " << pair_ptrs[k]->getRealPeakPtr()->getPosition() 
+              << " " << pair_ptrs[k]->getTheoPeakPtr()->getPosition() << " " 
+              << ion_ptr->getIonTypePtr()->getName() << " " 
+              << ion_ptr->getDisplayPos() << std::endl;
+        }
+      }
+      */
       cur_score += pair_ptrs.size();
     }
+    //LOG_DEBUG("i " << i << " header number "<<  test_ptrs.size() << " delta " << delta << " cur score " << cur_score);
     if (cur_score > best_score) {
       best_score = cur_score;
-      best_delta = delta;
+      best_i_start = i;
+      best_i_end = i;
+      continuous = true;
     }
+    else if (cur_score == best_score) {
+      if (continuous) {
+        best_i_end = i;
+      }
+    }
+    else {
+      continuous = false;
+    }
+
     change = mng_ptr->refine_prec_step_width_;
     for (size_t j = 0; j < test_ptrs.size() - 1; j++) {
       test_ptrs[j]->changeOnlyCTermShift(change);
     }
     last_test_ptr->changeOnlyNTermShift(change);
   }
+  for (size_t i = 0; i < header_ptrs.size(); i++) {
+    header_ptrs[i]->setMatchFirstBpPos(test_ptrs[i]->getMatchFirstBpPos());
+    header_ptrs[i]->setMatchLastBpPos(test_ptrs[i]->getMatchLastBpPos());
+  }
+  double best_i = (best_i_end + best_i_start) /2; 
+  double best_delta = (best_i - one_side_step_num) * mng_ptr->refine_prec_step_width_;
+  //LOG_DEBUG("best_delta " << best_delta);
   for (size_t i = 0; i < header_ptrs.size() - 1; i++) {
     header_ptrs[i]->changeOnlyCTermShift(best_delta);
   }
