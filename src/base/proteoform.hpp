@@ -102,6 +102,9 @@ ProteoformPtr getDbProteoformPtr(DbResSeqPtr db_res_seq_ptr);
 ProteoformPtr getProtModProteoform(ProteoformPtr db_form_ptr, 
                                    ProtModPtr prot_mod_ptr); 
 
+
+ProteoformPtrVec2D generate2DProtModProteoform(const ProteoformPtrVec &db_form_ptrs, 
+                                               const ProtModPtrVec &prot_mod_ptrs);
 /* 
  * get subproteoform. local_start and local_end are relatively to 
  * the start position in the original proteoform

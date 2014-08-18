@@ -77,8 +77,10 @@ bool SimplePrsm::isLargerSpectrumId(MsHeaderPtr header_ptr){
   return false;
 }
 
-void SimplePrsm::assignProteoformPtr(const std::vector<ProteoformPtr> &proteo_ptrs){
+void SimplePrsm::assignProteoformPtr(const ProteoformPtrVec &proteo_ptrs,
+                                     const ProteoformPtrVec2D &mod_proteo_2d_ptrs){
   proteo_ptr_ = proteo_ptrs[seq_id_];
+  mod_proteo_ptrs_ = mod_proteo_2d_ptrs[seq_id_];
   if(proteo_ptr_->getSeqId() != seq_id_ || proteo_ptr_->getSeqName() != seq_name_){
     std::cout<< "Sequence ID and/or name is not consistent!" << std::endl;
     std::exit(0);

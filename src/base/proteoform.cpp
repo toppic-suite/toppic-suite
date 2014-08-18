@@ -349,6 +349,22 @@ ProteoformPtrVec generateProtModProteoform(const ProteoformPtrVec &ori_forms,
   return new_forms;
 }
 
+ProteoformPtrVec2D generate2DProtModProteoform(const ProteoformPtrVec &ori_forms, 
+                                               const ProtModPtrVec &prot_mods) {
+  ProteoformPtrVec2D new_forms;
+  for (size_t i = 0; i < ori_forms.size(); i++) {
+    ProteoformPtrVec mod_forms;
+    for (size_t j = 0; j < prot_mods.size(); j++) {
+      ProteoformPtr ptr = getProtModProteoform(ori_forms[i], prot_mods[j]);
+      if (ptr.get() != nullptr) {
+        mod_forms.push_back(ptr);
+      }
+    }
+    new_forms.push_back(mod_forms);
+  }
+  return new_forms;
+}
+
 ResFreqPtrVec compNTermResidueFreq(const ProteoformPtrVec &prot_mod_forms) {
   std::vector<double> counts;
   ResiduePtrVec residue_list;
