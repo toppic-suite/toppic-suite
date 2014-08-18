@@ -32,6 +32,9 @@ inline void PtmSlowMatch::initPsAlign(CompShiftLowMemPtr comp_shift_ptr){
       = getNTermShiftHeaders (best_shifts, ms_six_ptr_, proteo_ptr_, mng_ptr_);
   BasicDiagonalPtrVec diagonal_ptrs = getDiagonals(n_term_shift_header_ptrs,
                                                    ms_six_ptr_,proteo_ptr_,mng_ptr_);
+  for (size_t i = 0; i < diagonal_ptrs.size(); i++) {
+    diagonal_ptrs[i]->getHeader()->setId(i);
+  }
   std::vector<double> ms_masses = getMassList(ms_six_ptr_);
   std::vector<double> seq_masses = proteo_ptr_->getBpSpecPtr()->getPrmMasses();
   ps_align_ptr_ = PSAlignPtr(new PSAlign(ms_masses,seq_masses,diagonal_ptrs,mng_ptr_));

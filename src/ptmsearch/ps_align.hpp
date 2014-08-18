@@ -27,6 +27,8 @@ class PSAlign {
   std::vector<double> ms_masses_;
   std::vector<double> seq_masses_;
   BasicDiagonalPtrVec diagonal_ptrs_;
+  std::vector<std::vector<int>> idxes_;
+  std::vector<std::vector<bool>> penalties_;
 
   std::vector<DPPairPtrVec> dp_2d_pair_ptrs_;
   DPPairPtr first_pair_ptr_;
@@ -40,6 +42,7 @@ class PSAlign {
   void dpPrep();
   DPPairPtr getTruncPre(DPPairPtr cur_pair_ptr,int s, SemiAlignTypePtr type_ptr);
   DPPairPtr getShiftPre(DPPairPtr cur_pair_ptr,int p,int s,SemiAlignTypePtr type_ptr);
+  DPPairPtr oldGetShiftPre(DPPairPtr cur_pair_ptr,int p,int s,SemiAlignTypePtr type_ptr);
 };
 
 typedef std::shared_ptr<PSAlign> PSAlignPtr;

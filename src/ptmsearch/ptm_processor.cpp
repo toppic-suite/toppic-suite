@@ -61,13 +61,16 @@ void PtmProcessor::initData() {
   proteo_ptrs_ = readFastaToProteoform(
       prsm_para_ptr->getSearchDbFileName(), 
       prsm_para_ptr->getFixModResiduePtrVec());
+  mod_proteo_2d_ptrs_ =  
+       generate2DProtModProteoform(proteo_ptrs_, prsm_para_ptr->getAllowProtModPtrVec());
+
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
   std::string simplePrsmFileName = basename(sp_file_name)
       + "." + mng_ptr_->input_file_ext_;
   simple_prsm_ptrs_  = readSimplePrsms(simplePrsmFileName);
   // find sequences for simple prsms
   for(size_t i =0;i< simple_prsm_ptrs_.size();i++){
-    simple_prsm_ptrs_[i]->assignProteoformPtr(proteo_ptrs_);
+    simple_prsm_ptrs_[i]->assignProteoformPtr(proteo_ptrs_, mod_proteo_2d_ptrs_);
   }
   comp_shift_ptr_ = CompShiftLowMemPtr(new CompShiftLowMem());
 }
@@ -84,9 +87,11 @@ void PtmProcessor::process(){
     cnt++;
     SpectrumSetPtr spectrum_set_ptr = getSpectrumSet(deconv_sp, 0, sp_para_ptr);
     if(spectrum_set_ptr != nullptr){
+
       SimplePrsmPtrVec selected_prsm_ptrs 
           = getMatchedSimplePrsms(simple_prsm_ptrs_,deconv_sp->getHeaderPtr());
       processOneSpectrum(spectrum_set_ptr, selected_prsm_ptrs);
+
     }
     std::cout << std::flush << "Ptm searching is processing " << cnt 
         << " of " << spectra_num << " spectra.\r";
@@ -115,6 +120,7 @@ inline void seleTopPrsms(const PrsmPtrVec &all_prsm_ptrs,
 
 void PtmProcessor::processOneSpectrum(SpectrumSetPtr spectrum_set_ptr, 
                                       SimplePrsmPtrVec simple_prsm_ptrs) {
+
   PtmSlowFilterPtr slow_filter_ptr = PtmSlowFilterPtr(
       new PtmSlowFilter(spectrum_set_ptr,simple_prsm_ptrs,comp_shift_ptr_,mng_ptr_));
   //LOG_DEBUG("init filter complete");

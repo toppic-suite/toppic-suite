@@ -9,17 +9,20 @@ PtmSlowFilter::PtmSlowFilter(
     PtmMngPtr mng_ptr){
 
   // init complete_prefix_slow_match_ptrs
+  //int start_s = clock();
   for(size_t i=0;i<simple_prsm_ptrs.size();i++){
     ProteoformPtrVec raw_proteo_ptrs;
     raw_proteo_ptrs.push_back(simple_prsm_ptrs[i]->getProteoformPtr());
-    ProteoformPtrVec mod_proteo_ptrs 
-        = generateProtModProteoform(raw_proteo_ptrs, mng_ptr->prsm_para_ptr_->getAllowProtModPtrVec());
+    ProteoformPtrVec mod_proteo_ptrs = simple_prsm_ptrs[i]->getModProteoformPtrs(); 
     for (size_t j = 0; j < mod_proteo_ptrs.size(); j++) {
       PtmSlowMatchPtr ptm_slow_match_ptr(new PtmSlowMatch(mod_proteo_ptrs[j],spectrum_set_ptr,
                                                           comp_shift_ptr,mng_ptr));
       complete_prefix_slow_match_ptrs_.push_back(ptm_slow_match_ptr);
     }
   }
+  //int stop_s = clock();
+  //std::cout << "init complete match ptrs running time: " << (stop_s-start_s) / double(CLOCKS_PER_SEC)  << " seconds " << std::endl;
+
   // init suffix_internal_slow_prsm_ptrs
   for(size_t i=0; i<complete_prefix_slow_match_ptrs_.size();i++){
     ProtModPtr prot_mod_ptr = complete_prefix_slow_match_ptrs_[i]->getProteoform()->getProtModPtr();
@@ -29,6 +32,7 @@ PtmSlowFilter::PtmSlowFilter(
   }
 
   // compute complete and prefix prsms 
+  //start_s = clock();
   for(size_t i=0; i<complete_prefix_slow_match_ptrs_.size();i++){
     PrsmPtrVec comp_ptrs;
     complete_prefix_slow_match_ptrs_[i]->compute(SemiAlignTypeFactory::getCompletePtr(), comp_ptrs);
@@ -37,6 +41,8 @@ PtmSlowFilter::PtmSlowFilter(
     complete_prefix_slow_match_ptrs_[i]->compute(SemiAlignTypeFactory::getPrefixPtr(), prefix_ptrs);
     prefix_prsm_2d_ptrs_.push_back(prefix_ptrs);
   }
+  //stop_s = clock();
+  //std::cout <<  "compute complete alignment running time: " << (stop_s-start_s) / double(CLOCKS_PER_SEC)  << " seconds " << std::endl;
 
   // compute suffix and internal prsms 
   for(size_t i=0; i< suffix_internal_slow_match_ptrs_.size();i++){

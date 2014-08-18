@@ -18,6 +18,7 @@ class PtmProcessor {
  private:
   PtmMngPtr mng_ptr_;
   ProteoformPtrVec proteo_ptrs_;
+  ProteoformPtrVec2D mod_proteo_2d_ptrs_;
   SimplePrsmPtrVec simple_prsm_ptrs_;
   CompShiftLowMemPtr comp_shift_ptr_;
   std::vector<PrsmWriterPtr> complete_writer_ptrs_;

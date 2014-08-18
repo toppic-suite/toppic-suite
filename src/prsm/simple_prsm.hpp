@@ -21,6 +21,7 @@ public:
     SimplePrsm(xercesc::DOMElement* element);
     std::string getSeqName(){return seq_name_;}
     ProteoformPtr getProteoformPtr(){return proteo_ptr_;}
+    ProteoformPtrVec getModProteoformPtrs() {return mod_proteo_ptrs_;}
     int getSeqId(){return seq_id_;}
     double getScore(){return score_;}
     int getSpectrumId(){return spectrum_id_;}
@@ -33,7 +34,8 @@ public:
     //to study
     bool isSameSpectrum(MsHeaderPtr header_ptr);
     bool isLargerSpectrumId(MsHeaderPtr header_ptr);
-    void assignProteoformPtr(const std::vector<ProteoformPtr> &proteo_ptrs);
+    void assignProteoformPtr(const ProteoformPtrVec &proteo_ptrs,
+                             const ProteoformPtrVec2D &mod_proteo_2d_ptrs);
 
 private:
     int spectrum_id_;
@@ -42,6 +44,7 @@ private:
     double prec_mass_;
 
     ProteoformPtr proteo_ptr_;
+    ProteoformPtrVec mod_proteo_ptrs_;
     int seq_id_;
     std::string seq_name_;
     double score_;
