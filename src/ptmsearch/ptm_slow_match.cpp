@@ -30,6 +30,11 @@ inline void PtmSlowMatch::initPsAlign(CompShiftLowMemPtr comp_shift_ptr){
       scale);
   DiagonalHeaderPtrVec n_term_shift_header_ptrs 
       = getNTermShiftHeaders (best_shifts, ms_six_ptr_, proteo_ptr_, mng_ptr_);
+  /*
+  for (size_t i = 0; i < n_term_shift_header_ptrs.size(); i++) {
+    std::cout << " diagonal " << i << " shift " << n_term_shift_header_ptrs[i]->getProtNTermShift() << std::endl;
+  }
+  */
   BasicDiagonalPtrVec diagonal_ptrs = getDiagonals(n_term_shift_header_ptrs,
                                                    ms_six_ptr_,proteo_ptr_,mng_ptr_);
   for (size_t i = 0; i < diagonal_ptrs.size(); i++) {
@@ -113,7 +118,7 @@ inline DiagonalHeaderPtrVec PtmSlowMatch::getNTermShiftHeaders(
       = getBottomRightCornerHeader(proteo_ptr, ms_six_ptr);
   c_extend_header_ptrs.push_back(bottom_right_corner_header_ptr);
 
-  double prec_mass = ms_six_ptr->getHeaderPtr()->getPrecMonoMass();
+  double prec_mass_minus_water = ms_six_ptr->getHeaderPtr()->getPrecMonoMass() - MassConstant::getWaterMass();
   std::vector<double> prm_masses = proteo_ptr_->getBpSpecPtr()->getPrmMasses();
   // shifts for n_term matches
   std::vector<double> n_term_match_shifts;
@@ -121,7 +126,7 @@ inline DiagonalHeaderPtrVec PtmSlowMatch::getNTermShiftHeaders(
   std::vector<double> c_term_match_shifts;
   for(size_t i=1;i< prm_masses.size();i++){
     n_term_match_shifts.push_back(-prm_masses[i]);
-    c_term_match_shifts.push_back(prec_mass - prm_masses[i]);
+    c_term_match_shifts.push_back(prec_mass_minus_water - prm_masses[i]);
   }
 
   // add trunc headers that have similar shift to best shift headers
@@ -141,8 +146,10 @@ inline DiagonalHeaderPtrVec PtmSlowMatch::getNTermShiftHeaders(
     }
 
     int best_c_pos = findSimilarShiftPos(c_term_match_shifts, s);
+    //LOG_DEBUG("Shift " << s <<" C term position " << best_c_pos);
     if (best_c_pos >= 0) {
       double new_shift = c_term_match_shifts[best_c_pos];
+      //LOG_DEBUG("Shift " << s <<" C term shift " << new_shift);
       if (!isExist(c_extend_header_ptrs, new_shift)) {
         // n term nostrict, c_term strict, prot n_term no match ; prot c_term no match
         // pep n_term no match, pep c_term match 
@@ -171,6 +178,8 @@ void PtmSlowMatch::compute(SemiAlignTypePtr type_ptr, PrsmPtrVec &prsm_ptrs) {
 
 PrsmPtr PtmSlowMatch::geneResult(int shift_num){
   DiagonalHeaderPtrVec header_ptrs= ps_align_ptr_->getResult(shift_num);
+  //double score = ps_align_ptr_->getAlignScr(shift_num);
+  //LOG_DEBUG("Shift " << shift_num << " score " << score);
   if(header_ptrs.size()==0) {
     return nullptr;
   }

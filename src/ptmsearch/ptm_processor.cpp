@@ -83,7 +83,9 @@ void PtmProcessor::process(){
   DeconvMsPtr deconv_sp;
   int cnt = 0;
   SpParaPtr sp_para_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr();
+  double total_time = 0;
   while((deconv_sp = sp_reader.getNextMs())!= nullptr){
+    long start_t = clock();
     cnt++;
     SpectrumSetPtr spectrum_set_ptr = getSpectrumSet(deconv_sp, 0, sp_para_ptr);
     if(spectrum_set_ptr != nullptr){
@@ -93,8 +95,14 @@ void PtmProcessor::process(){
       processOneSpectrum(spectrum_set_ptr, selected_prsm_ptrs);
 
     }
+    long stop_t = clock();
+    double time = (stop_t - start_t) /double (CLOCKS_PER_SEC);
+    total_time += time;
+    //std::cout << std::flush << "Ptm searching is processing " << cnt 
+    //    << " of " << spectra_num << " spectra.\r";
     std::cout << std::flush << "Ptm searching is processing " << cnt 
-        << " of " << spectra_num << " spectra.\r";
+        << " of " << spectra_num << " spectra." << " time " << time << " total time " << total_time << " seconds " << std::endl;
+
   }
   sp_reader.close();
   closeWriters();
