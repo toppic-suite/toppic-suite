@@ -30,6 +30,11 @@ class CompShiftLowMem {
                                               int total,int minimum_gap) ;
   int checkD(std::vector<std::vector<int>> &ans,int d,int cur_min,
              int total,int min_gap);
+
+  void resetNumbers(const std::vector<int> &a, const std::vector<int> &errors,
+                    const std::vector<int> &b);
+  void resetNumbers(const std::vector<int> &a, const std::vector<int> &b);
+  void resetNumbers();
 };
 
 typedef std::shared_ptr<CompShiftLowMem> CompShiftLowMemPtr;
