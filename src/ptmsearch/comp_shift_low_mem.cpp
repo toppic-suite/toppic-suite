@@ -23,6 +23,49 @@ std::vector<double> CompShiftLowMem::findBestShift(const std::vector<int> &a,
   return result;
 }
 
+inline void CompShiftLowMem::resetNumbers(const std::vector<int> &a,
+                                          const std::vector<int> &errors,
+                                          const std::vector<int> &b) {
+  int a_length = a.size();
+  int b_length = b.size();
+  int delta = a[0]-b[b_length-1];
+  int minD = delta -1;
+  for(int i=0;i<a_length;i++){
+    int a_value = a[i];
+    for(int j =0;j <b_length;j++){
+      int d = a_value - b[j] - minD;
+      int start = 0;
+      if(d > errors[i]){
+        start = d- errors[i];
+      }
+      for(int k = start;k<=d+errors[i];k++){
+        num_[k]=0;
+      }
+    }
+  }
+}
+
+inline void CompShiftLowMem::resetNumbers(const std::vector<int> &a,
+                                          const std::vector<int> &b) {
+  int a_length = a.size();
+  int b_length = b.size();
+  int delta = a[0]-b[b_length-1];
+  int minD = delta -1;
+  for(int i=0;i<a_length;i++){
+    int a_value = a[i];
+    for(int j =0;j <b_length;j++){
+      int d = a_value - b[j]- minD;
+      num_[d-1] =0;
+      num_[d] =0;
+      num_[d+1] = 0;
+    }
+  }
+}
+
+inline void CompShiftLowMem::resetNumbers() {
+  std::fill(num_.begin(), num_.end(), 0);
+}
+
 std::vector<std::vector<int>> CompShiftLowMem::findBestShift(
     const std::vector<int> &a, const std::vector<int> &errors,
     const std::vector<int> &b, int total,int minimum_gap){
@@ -41,19 +84,9 @@ std::vector<std::vector<int>> CompShiftLowMem::findBestShift(
       num_.push_back(0);
     }
   }
-  for(int i=0;i<a_length;i++){
-    int a_value = a[i];
-    for(int j =0;j <b_length;j++){
-      int d = a_value - b[j]-delta;
-      int start = 0;
-      if(d >errors[i]){
-        start = d- errors[i];
-      }
-      for(int k = start;k<=d+errors[i];k++){
-        num_[k]=0;
-      }
-    }
-  }
+
+  resetNumbers(a, errors, b);
+  //resetNumbers();
 
   int current_minimum =1;
 
@@ -93,35 +126,21 @@ inline std::vector<std::vector<int>> CompShiftLowMem::findBestShift(
     }
   }
 
-  for(int i=0;i<a_length;i++){
-    int a_value = a[i];
-    for(int j =0;j <b_length;j++){
-      int d = a_value - b[j]-delta;
-      num_[d] =0;
-      num_[d+1] =0;
-      num_[d+2] = 0;
-    }
-  }
-
-  for(int i=0;i<a_length;i++){
-    int a_value = a[i];
-    for(int j =0;j <b_length;j++){
-      int d = a_value - b[j]-delta;
-      num_[d] ++;
-      num_[d+1] ++;
-      num_[d+2] ++;
-    }
-  }
+  resetNumbers(a, b);
+  //resetNumbers();
 
   int cur_min =1;
 
   for(int i=0;i<a_length;i++){
     int a_value = a[i];
     for(int j =0;j <b_length;j++){
-      int d = a_value - b[j]-delta;
-      cur_min=checkD(ans,d+1,cur_min,total,min_gap);
+      int d = a_value - b[j]- minD;
+      num_[d-1] ++;
+      cur_min=checkD(ans,d-1,cur_min,total,min_gap);
+      num_[d] ++;
       cur_min=checkD(ans,d,cur_min,total,min_gap);
-      cur_min=checkD(ans,d+2,cur_min,total,min_gap);
+      num_[d+1] ++;
+      cur_min=checkD(ans,d+1,cur_min,total,min_gap);
     }
   }
 
