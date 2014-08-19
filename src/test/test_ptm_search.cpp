@@ -51,7 +51,6 @@ int zero_ptm_process(int argc, char* argv[]) {
     }
 
     /*
-
     std::cout << "Fast filtering starts " << std::endl;
     PtmFastFilterMngPtr filter_mng_ptr 
         = PtmFastFilterMngPtr(new PtmFastFilterMng(prsm_para_ptr, "FILTER"));
@@ -60,7 +59,7 @@ int zero_ptm_process(int argc, char* argv[]) {
     filter_processor = nullptr;
     */
 
-    int start_s = clock();
+    long start_s = clock();
     std::cout << "Ptm searching starts" << std::endl;
     PtmMngPtr ptm_mng_ptr = PtmMngPtr(new PtmMng(prsm_para_ptr, n_top, shift_num,
                                                  max_ptm_mass, "FILTER_COMBINED", "PTM"));
@@ -68,7 +67,7 @@ int zero_ptm_process(int argc, char* argv[]) {
     ptm_processor->process();
     ptm_processor = nullptr;
 
-    int stop_s = clock();
+    long stop_s = clock();
     std::cout << std::endl << "Running time: " << (stop_s-start_s) / double(CLOCKS_PER_SEC)  << " seconds " << std::endl;
 
     /*

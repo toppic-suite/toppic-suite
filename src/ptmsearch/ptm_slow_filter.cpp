@@ -15,6 +15,7 @@ PtmSlowFilter::PtmSlowFilter(
     raw_proteo_ptrs.push_back(simple_prsm_ptrs[i]->getProteoformPtr());
     ProteoformPtrVec mod_proteo_ptrs = simple_prsm_ptrs[i]->getModProteoformPtrs(); 
     for (size_t j = 0; j < mod_proteo_ptrs.size(); j++) {
+      //std::cout << mod_proteo_ptrs[j]->getProteinMatchSeq() << std::endl;
       PtmSlowMatchPtr ptm_slow_match_ptr(new PtmSlowMatch(mod_proteo_ptrs[j],spectrum_set_ptr,
                                                           comp_shift_ptr,mng_ptr));
       complete_prefix_slow_match_ptrs_.push_back(ptm_slow_match_ptr);

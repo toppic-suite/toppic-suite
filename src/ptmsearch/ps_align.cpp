@@ -266,7 +266,7 @@ void PSAlign::dp(SemiAlignTypePtr align_type_ptr) {
       //int stop_s = clock();
       //trunc_time = trunc_time + stop_s - start_s;
       //start_s = clock();
-      DPPairPtr shift_prev = oldGetShiftPre(dp_pair_ptrs_[p], p, s, align_type_ptr);
+      DPPairPtr shift_prev = getShiftPre(dp_pair_ptrs_[p], p, s, align_type_ptr);
       double shift_score;
       if (shift_prev == nullptr) {
         shift_score =  - std::numeric_limits<double>::max();

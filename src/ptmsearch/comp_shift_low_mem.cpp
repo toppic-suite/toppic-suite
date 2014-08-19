@@ -1,5 +1,6 @@
 #include <cmath>
 
+#include "base/logger.hpp"
 #include "ptmsearch/comp_shift_low_mem.hpp"
 
 namespace prot {
@@ -29,8 +30,6 @@ std::vector<std::vector<int>> CompShiftLowMem::findBestShift(
   int b_length = b.size();
   std::vector<std::vector<int>> ans;
   if(b_length == 0){
-    std::vector<int> temp = {0,0};
-    ans.push_back(temp);
     return ans;
   }
   int delta = a[0]-b[b_length-1];
