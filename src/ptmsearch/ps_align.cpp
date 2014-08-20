@@ -75,7 +75,7 @@ void PSAlign::initDPPair() {
                  mng_->n_unknown_shift_, nullptr));
   last_pair_ptr_->setDiagPrevPairPtr(nullptr);
   dp_pair_ptrs_.push_back(last_pair_ptr_);
-
+  std::sort(dp_pair_ptrs_.begin(), dp_pair_ptrs_.end(), comparePairUp);
   // init indexes 
   for (size_t i = 0; i < dp_pair_ptrs_.size(); i++) {
     std::vector<int> ends (diagonal_ptrs_.size(), -1);
