@@ -209,7 +209,7 @@ std::string Proteoform::getProteinMatchSeq(){
   }
   std::string suffix = "";
   if(end_pos_< (int)protein_string.length()-3){
-    suffix = protein_string.substr(end_pos_,1);
+    suffix = protein_string.substr(end_pos_+1,1);
   }
 
   return prefix+"."+result+"."+suffix;
