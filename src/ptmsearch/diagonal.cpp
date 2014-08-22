@@ -51,7 +51,7 @@ double refinePrecursorAndHeaderShift(ProteoformPtr proteo_ptr,
   for (size_t i = 0; i < header_ptrs.size() - 1; i++) {
     int middle = (test_ptrs[i]->getMatchLastBpPos() + test_ptrs[i+1]->getMatchFirstBpPos())/2;
     test_ptrs[i]->setMatchLastBpPos(middle);
-    test_ptrs[i]->setMatchFirstBpPos(middle);
+    test_ptrs[i+1]->setMatchFirstBpPos(middle);
   }
   test_ptrs[0]->setMatchFirstBpPos(test_ptrs[0]->getTruncFirstResPos());
   DiagonalHeaderPtr last_test_ptr = test_ptrs[test_ptrs.size()-1];
@@ -163,6 +163,7 @@ DiagonalHeaderPtrVec refineHeadersBgnEnd(
 
     int bgn = header_ptrs[i]->getMatchFirstBpPos()-first_res_pos;
     int end = header_ptrs[i]->getMatchLastBpPos()-first_res_pos;
+
     PeakIonPairPtrVec pair_ptrs = findPairs(ms_three_ptr, theo_peak_ptrs, bgn, end);
     if(pair_ptrs.size()<1){
       int pair_size = pair_ptrs.size();
