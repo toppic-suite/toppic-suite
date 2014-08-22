@@ -70,7 +70,6 @@ int zero_ptm_process(int argc, char* argv[]) {
     long stop_s = clock();
     std::cout << std::endl << "Running time: " << (stop_s-start_s) / double(CLOCKS_PER_SEC)  << " seconds " << std::endl;
 
-    /*
     std::cout << "Outputting table starts " << std::endl;
     TableWriterPtr table_out = TableWriterPtr(new TableWriter(prsm_para_ptr, "PTM_1_COMPLETE", "PTM_1_COMPLETE_TABLE"));
     table_out->write();
@@ -90,7 +89,6 @@ int zero_ptm_process(int argc, char* argv[]) {
     table_out->write();
     table_out = nullptr;
     std::cout << "Outputting table finished." << std::endl;
-    */
 
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
