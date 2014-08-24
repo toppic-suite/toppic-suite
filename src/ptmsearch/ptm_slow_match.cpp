@@ -186,11 +186,9 @@ PrsmPtr PtmSlowMatch::geneResult(int shift_num){
   int first_pos = header_ptrs[0]->getTruncFirstResPos();
   int last_pos = header_ptrs[header_ptrs.size()-1]->getTruncLastResPos();
   ProteoformPtr sub_proteo_ptr  = getSubProteoform(proteo_ptr_, first_pos, last_pos);
-  /*
   double refine_prec_mass = refinePrecursorAndHeaderShift(proteo_ptr_, ms_three_ptr_, 
                                                           header_ptrs, mng_ptr_);
-                                                          */
-  double refine_prec_mass = ms_three_ptr_->getHeaderPtr()->getPrecMonoMass();
+  //double refine_prec_mass = ms_three_ptr_->getHeaderPtr()->getPrecMonoMass();
 
   double delta = refine_prec_mass - deconv_ms_ptr_->getHeaderPtr()->getPrecMonoMass();
   SpParaPtr sp_para_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr();
