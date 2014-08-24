@@ -106,7 +106,7 @@ double compIonScore(ExtendMsPtr ms_ptr, const TheoPeakPtrVec &peak_ptrs,
 }
 
 PeakIonPairPtrVec findPairs(ExtendMsPtr ms_ptr, TheoPeakPtrVec peak_ptrs,
-                            int bgn,int end){
+                            int bgn, int end, double add_tolerance) {
   PeakIonPairPtrVec pair_list;
   std::sort(peak_ptrs.begin(), peak_ptrs.end(),theoPeakUp);
   std::vector<double> theo_masses;
@@ -125,7 +125,7 @@ PeakIonPairPtrVec findPairs(ExtendMsPtr ms_ptr, TheoPeakPtrVec peak_ptrs,
     double deviation = ms_ptr->getPeakPtr(i)->getPosition() 
         - peak_ptrs[j]->getModMass();
     IonPtr ion = peak_ptrs[j]->getIonPtr();
-    double err = ms_ptr->getPeakPtr(i)->getOrigTolerance();
+    double err = ms_ptr->getPeakPtr(i)->getOrigTolerance() + add_tolerance;
     if(ion->getPos()>=bgn && ion->getPos()<=end){
       if(std::abs(deviation)<=err){
         pair_list.push_back(

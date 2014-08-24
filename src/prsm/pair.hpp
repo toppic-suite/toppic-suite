@@ -44,7 +44,7 @@ double compIonScore(ExtendMsPtr ms_ptr, const TheoPeakPtrVec &peak_ptrs,double r
 
 // peak_ptrs are sorted with masses
 PeakIonPairPtrVec findPairs(ExtendMsPtr ms_ptr, TheoPeakPtrVec peak_ptrs,
-                            int bgn, int end);
+                            int bgn, int end, double add_tolerance);
 
 std::vector<double> getNCScore(ExtendMsPtr ms_ptr, const TheoPeakPtrVec &peak_ptrs,
                                int bgn,int end,double delta,double ppo);
