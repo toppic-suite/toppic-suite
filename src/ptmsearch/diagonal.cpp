@@ -129,7 +129,6 @@ double refinePrecursorAndHeaderShift(ProteoformPtr proteo_ptr,
   double best_delta = - (best_pos - one_side_step_num) * mng_ptr->refine_prec_step_width_;
   //LOG_DEBUG("best delta " << best_delta);
 
-  //LOG_DEBUG("best_delta " << best_delta);
   for (size_t i = 0; i < header_ptrs.size() - 1; i++) {
     header_ptrs[i]->changeOnlyCTermShift(best_delta);
   }

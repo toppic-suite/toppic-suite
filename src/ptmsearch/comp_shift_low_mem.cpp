@@ -86,14 +86,14 @@ std::vector<std::vector<int>> CompShiftLowMem::findBestShift(
   }
 
   resetNumbers(a, errors, b);
-  //resetNumbers();
+  // resetNumbers();
 
   int current_minimum =1;
 
   for(int i=0;i<a_length;i++){
     int a_value = a[i];
     for(int j =0;j <b_length;j++){
-      int d = a_value - b[j]-delta;
+      int d = a_value - b[j] - minD;
       int start = 0;
       if(d >errors[i]){
         start = d- errors[i];
