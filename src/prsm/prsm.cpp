@@ -47,12 +47,10 @@ void Prsm::initScores(SpParaPtr sp_para_ptr) {
   DeconvPeakPtr prev_deconv_peak(nullptr);
   //  LOG_DEBUG("total peak number " << pairs.size());
   for (size_t i = 0; i < pairs.size(); i++) {
-    // LOG_DEBUG(i << " real peak " << pairs[i]->getRealPeakPtr()->getPosition()
-    //          << " theoretical peak " << pairs[i]->getTheoPeakPtr()->getPosition());
-    //if (pairs[i]->getRealPeakPtr()->getBasePeakPtr() != prev_deconv_peak) {
+    if (pairs[i]->getRealPeakPtr()->getBasePeakPtr() != prev_deconv_peak) {
       prev_deconv_peak = pairs[i]->getRealPeakPtr()->getBasePeakPtr();
       match_peak_num_ += pairs[i]->getRealPeakPtr()->getScore();
-    //}
+    }
   }
 }
 
