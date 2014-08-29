@@ -6,6 +6,7 @@
 #include "prsm/prsm_writer.hpp"
 #include "tdgf/tdgf_mng.hpp"
 #include "tdgf/comp_pvalue_array.hpp"
+#include "tdgf/comp_pvalue_lookup_table.hpp"
 
 namespace prot {
 
@@ -23,6 +24,7 @@ class EValueProcessor {
  private:
   TdgfMngPtr mng_ptr_;
   CompPValueArrayPtr comp_pvalue_ptr_;
+  CompPValueLookupTablePtr comp_pvalue_table_ptr_;
   ProteoformPtrVec proteo_ptrs_;
   PrsmPtrVec prsm_ptrs_;
   bool checkPrsms(const PrsmPtrVec &prsm_ptrs);
