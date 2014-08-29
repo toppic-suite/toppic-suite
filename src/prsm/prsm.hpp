@@ -207,6 +207,12 @@ void filterPrsms(const PrsmPtrVec &prsms, MsHeaderPtr header_ptr, PrsmPtrVec &se
 
 void addSpectrumPtrsToPrsms(PrsmPtrVec &prsms, PrsmParaPtr prsm_para_ptr);
 
+PrsmPtrVec selectSpeciesPrsms(const PrsmPtrVec &prsm_ptrs,int species_id);
+
+std::vector<int> getSpeciesIds(const PrsmPtrVec &prsm_ptrs,int seq_id);
+
+std::vector<int> getSpeciesIds(const PrsmPtrVec &prsm_ptrs);
+
 }
 #endif
 

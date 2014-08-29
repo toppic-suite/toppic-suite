@@ -220,4 +220,51 @@ void filterPrsms(const PrsmPtrVec &prsm_ptrs, MsHeaderPtr header_ptr,
   }
 }
 
+std::vector<int> getSpeciesIds(const PrsmPtrVec &prsm_ptrs){
+  std::vector<int> species_ids;
+  for(size_t i=0;i<prsm_ptrs.size();i++){
+    bool find = false;
+    for(size_t j=0;j<species_ids.size();j++){
+      if(species_ids[j]==prsm_ptrs[i]->getProteoformPtr()->getSpeciesId()){
+        find = true;
+        break;
+      }
+    }
+    if(!find){
+      species_ids.push_back(prsm_ptrs[i]->getProteoformPtr()->getSpeciesId());
+    }
+  }
+  return species_ids;
+}
+
+std::vector<int> getSpeciesIds(const PrsmPtrVec &prsm_ptrs,int seq_id){
+  std::vector<int> species_ids;
+  for(size_t i=0;i<prsm_ptrs.size();i++){
+    int new_id = prsm_ptrs[i]->getProteoformPtr()->getSpeciesId();
+    if(prsm_ptrs[i]->getProteoformPtr()->getDbResSeqPtr()->getId() == seq_id){
+      bool flag= false;
+      for(size_t j=0;j<species_ids.size();j++){
+        if(species_ids[j]==new_id){
+          flag=true;
+          break;
+        }
+      }
+      if(!flag){
+        species_ids.push_back(new_id);
+      }
+    }
+  }
+  return species_ids;
+}
+
+PrsmPtrVec selectSpeciesPrsms(const PrsmPtrVec &prsm_ptrs,int species_id){
+  PrsmPtrVec select_prsm_ptrs;
+  for(size_t i=0;i<prsm_ptrs.size();i++){
+    if(species_id == prsm_ptrs[i]->getProteoformPtr()->getSpeciesId()){
+      select_prsm_ptrs.push_back(prsm_ptrs[i]);
+    }
+  }
+  return select_prsm_ptrs;
+}
+
 }

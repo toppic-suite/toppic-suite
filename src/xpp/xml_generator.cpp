@@ -1,10 +1,3 @@
-/*
- * xml_generator.cpp
- *
- *  Created on: Feb 24, 2014
- *      Author: xunlikun
- */
-
 #include <map>
 
 #include "base/file_util.hpp"
@@ -25,7 +18,7 @@ void XmlGenerator::outputPrsms(PrsmPtrVec prsms){
     std::string file_name = mng_->xml_path_+ FILE_SEPARATOR + 
         "prsms" + FILE_SEPARATOR + "prsm"+convertToString(prsms[i]->getId())+".xml";
     XmlWriter writer(file_name,"");
-    writer.write(genePrsmView(writer.getDoc(),prsms[i], mng_->prsm_para_ptr_->getSpParaPtr()->getMinMass()));
+    writer.write(genePrsmView(writer.getDoc(),prsms[i], mng_));
     writer.close();
 
     std::vector<std::string> file_info;
@@ -43,7 +36,7 @@ void XmlGenerator::outputAllPrsms(PrsmPtrVec prsms){
   XmlWriter writer(file_name,"prsm_list");
   for(unsigned int i=0;i<prsms.size();i++){
     writer.write(genePrsmView(writer.getDoc(),prsms[i], 
-                              mng_->prsm_para_ptr_->getSpParaPtr()->getMinMass()));
+                              mng_));
     writer.close();
   }
 }
@@ -57,7 +50,7 @@ void XmlGenerator::outputProteins(PrsmPtrVec prsms){
           +FILE_SEPARATOR+ "protein"+convertToString(raw_forms_[i]->getDbResSeqPtr()->getId())+".xml";
       XmlWriter writer(file_name,"");
       writer.write(proteinToXml(writer.getDoc(),prsms,raw_forms_[i],species, 
-                              mng_->prsm_para_ptr_->getSpParaPtr()->getMinMass()));
+                              mng_));
       writer.close();
       std::vector<std::string> file_info;
       file_info.push_back(file_name);
@@ -73,7 +66,7 @@ void XmlGenerator::outputAllProteins(PrsmPtrVec prsms){
   std::string file_name = mng_->xml_path_+ FILE_SEPARATOR +"proteins.xml";
   XmlWriter writer(file_name,"protein_list");
   writer.write(allProteinToXml(writer.getDoc(),prsms,raw_forms_, 
-                               mng_->prsm_para_ptr_->getSpParaPtr()->getMinMass()));
+                               mng_));
   writer.close();
   std::vector<std::string> file_info;
   file_info.push_back(file_name);
@@ -93,7 +86,7 @@ void XmlGenerator::outputSpecies(PrsmPtrVec prsms){
       XmlWriter writer(file_name,"");
       std::sort(select_prsms.begin(),select_prsms.end(),prsmEValueUp);
       writer.write(speciesToXml(writer.getDoc(),select_prsms, 
-                                mng_->prsm_para_ptr_->getSpParaPtr()->getMinMass()));
+                                mng_));
       writer.close();
 
       std::vector<std::string> file_info;

@@ -16,7 +16,7 @@ all:
 	cd tdgf; make
 	cd filterdiagonal; make
 	cd ptmsearch; make
-#	cd xpp; make	
+	cd xpp; make	
 	cd console; make
 	cd test; make
 

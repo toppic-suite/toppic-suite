@@ -1,10 +1,3 @@
-/*
- * transformer.hpp
- *
- *  Created on: Feb 17, 2014
- *      Author: xunlikun
- */
-
 #ifndef TRANSFORMER_HPP_
 #define TRANSFORMER_HPP_
 

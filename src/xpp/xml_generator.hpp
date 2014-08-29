@@ -1,10 +1,3 @@
-/*
- * xml_generator.hpp
- *
- *  Created on: Feb 24, 2014
- *      Author: xunlikun
- */
-
 #ifndef XML_GENERATOR_HPP_
 #define XML_GENERATOR_HPP_
 
