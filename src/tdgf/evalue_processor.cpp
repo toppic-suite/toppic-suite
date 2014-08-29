@@ -32,9 +32,15 @@ void EValueProcessor::init() {
       = compResidueFreq(prsm_para_ptr->getFixModResiduePtrVec(), raw_proteo_ptrs); 
   LOG_DEBUG("residue frequency initialized");
 
-  comp_pvalue_ptr_ = CompPValueArrayPtr(
-      new CompPValueArray(raw_proteo_ptrs, mod_proteo_ptrs, residue_freqs, mng_ptr_));
-  LOG_DEBUG("comp pvalue array initialized");
+  if (mng_ptr_->use_table) {
+    comp_pvalue_table_ptr_ = CompPValueLookupTablePtr(
+        new CompPValueLookupTable(raw_proteo_ptrs, mod_proteo_ptrs, residue_freqs, mng_ptr_));
+  }
+  else {
+    comp_pvalue_ptr_ = CompPValueArrayPtr(
+        new CompPValueArray(raw_proteo_ptrs, mod_proteo_ptrs, residue_freqs, mng_ptr_));
+    LOG_DEBUG("comp pvalue array initialized");
+  }
 
   std::string input_file_name = basename(prsm_para_ptr->getSpectrumFileName())
       + "." + mng_ptr_->input_file_ext_;
@@ -90,7 +96,13 @@ bool EValueProcessor::checkPrsms(const PrsmPtrVec &prsm_ptrs) {
 
 void EValueProcessor::compEvalues(SpectrumSetPtr spec_set_ptr, 
                                   bool is_separate, PrsmPtrVec &sele_prsm_ptrs) {
-  comp_pvalue_ptr_->process(spec_set_ptr, is_separate, sele_prsm_ptrs);
+  
+  if (mng_ptr_->use_table) {
+    comp_pvalue_table_ptr_->process(spec_set_ptr->getDeconvMsPtr(), sele_prsm_ptrs);
+  }
+  else {
+    comp_pvalue_ptr_->process(spec_set_ptr, is_separate, sele_prsm_ptrs);
+  }
 
   // if matched peak number is too small or E-value is 0, replace it
   // with a max evalue.
