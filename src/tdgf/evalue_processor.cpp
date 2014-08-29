@@ -55,11 +55,6 @@ void EValueProcessor::process(bool is_separate) {
   PrsmWriter writer(output_file_name);
   int cnt = 0;
 
-  //struct timeval start_time; 
-  //struct timeval end_time; 
-           
-  //gettimeofday(&start_time, NULL);
-
   DeconvMsPtr ms_ptr = reader.getNextMs();
   while (ms_ptr.get() != nullptr) {
     cnt++;
@@ -70,9 +65,6 @@ void EValueProcessor::process(bool is_separate) {
           << spectrum_num << " spectra.\r";
     }
     
-    //gettimeofday(&end_time, NULL); 
-    //float duration = end_time.tv_sec - start_time.tv_sec;
-    //std::cout << std::endl << "Duration: " << duration << " seconds." << std::endl;
   }
   reader.close();
 
@@ -96,6 +88,25 @@ bool EValueProcessor::checkPrsms(const PrsmPtrVec &prsm_ptrs) {
   return true;
 }
 
+void EValueProcessor::compEvalues(SpectrumSetPtr spec_set_ptr, 
+                                  bool is_separate, PrsmPtrVec &sele_prsm_ptrs) {
+  comp_pvalue_ptr_->process(spec_set_ptr, is_separate, sele_prsm_ptrs);
+
+  // if matched peak number is too small or E-value is 0, replace it
+  // with a max evalue.
+  for (unsigned i = 0; i < sele_prsm_ptrs.size(); i++) {
+    if (sele_prsm_ptrs[i]->getMatchFragNum() < mng_ptr_->comp_evalue_min_match_frag_num_) {
+      sele_prsm_ptrs[i]->setProbPtr(getMaxEvaluePtr());
+    }
+    else {
+      if (sele_prsm_ptrs[i]->getEValue() == 0.0) {
+        LOG_WARN("Invalid e value!");
+        sele_prsm_ptrs[i]->setProbPtr(getMaxEvaluePtr());
+      }
+    }
+  }
+}
+
 void EValueProcessor::processOneSpectrum(DeconvMsPtr ms_ptr, bool is_separate,
                                          PrsmWriter &writer) {
   SpectrumSetPtr spec_set_ptr 
@@ -105,34 +116,17 @@ void EValueProcessor::processOneSpectrum(DeconvMsPtr ms_ptr, bool is_separate,
     filterPrsms(prsm_ptrs_, ms_ptr->getHeaderPtr(), sele_prsm_ptrs);
 
     bool need_comp = checkPrsms(sele_prsm_ptrs);
-    LOG_DEBUG("Need computation: " << need_comp );
+    //LOG_DEBUG("Need computation: " << need_comp );
   
     if (need_comp) {
-      if (is_separate) {
-        for (unsigned i = 0; i < sele_prsm_ptrs.size(); i++) {
-          comp_pvalue_ptr_->setPValue(ms_ptr, sele_prsm_ptrs[i]);
-        }
-      } 
-      else {
-        comp_pvalue_ptr_->setPValueArray(spec_set_ptr->getMsSixPtr(), 
-                                         sele_prsm_ptrs);
-      }
-      // if matched peak number is too small or E-value is 0, replace it
-      // with a max evalue.
-      for (unsigned i = 0; i < sele_prsm_ptrs.size(); i++) {
-        if (sele_prsm_ptrs[i]->getMatchFragNum() < mng_ptr_->comp_evalue_min_match_frag_num_
-            || sele_prsm_ptrs[i]->getEValue() == 0.0) {
-          LOG_WARN("Invalid e value!");
-          sele_prsm_ptrs[i]->setProbPtr(getMaxEvaluePtr());
-        }
-      }
+      compEvalues(spec_set_ptr, is_separate, sele_prsm_ptrs);
     }
     
-    LOG_DEBUG("start sort");
+    //LOG_DEBUG("start sort");
     std::sort(sele_prsm_ptrs.begin(), sele_prsm_ptrs.end(), prsmEValueUp);
-    LOG_DEBUG("start writing");
+    //LOG_DEBUG("start writing");
     writer.writeVector(sele_prsm_ptrs);
-    LOG_DEBUG("writing complete");
+    //LOG_DEBUG("writing complete");
   }
 }
 

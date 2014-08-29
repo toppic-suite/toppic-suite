@@ -204,7 +204,6 @@ ZpFastMatchPtrVec zeroPtmFastFilter(SemiAlignTypePtr semi_align_type_ptr,
   
   ZpFastMatchPtrVec match_vec;
   for (size_t i = 0; i < proteo_ptrs.size(); i++) {
-    LOG_DEBUG("Processing proteoform " << i);
     if (semi_align_type_ptr == SemiAlignTypeFactory::getCompletePtr()) { 
         match_vec.push_back(computeCompMatch(ms_ptr, proteo_ptrs[i]));
     }
@@ -221,7 +220,7 @@ ZpFastMatchPtrVec zeroPtmFastFilter(SemiAlignTypePtr semi_align_type_ptr,
 
   /* sort */
   std::sort(match_vec.begin(), match_vec.end(), compareZeroPtmFastMatchDown);
-  LOG_DEBUG("sort  finished BEST SCORE " << match_vec[0]->getScore());
+  //LOG_DEBUG("sort  finished BEST SCORE " << match_vec[0]->getScore());
 
   size_t num = report_num;
   if (num > proteo_ptrs.size()) {

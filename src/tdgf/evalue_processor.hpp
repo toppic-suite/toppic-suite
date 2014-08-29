@@ -16,6 +16,10 @@ class EValueProcessor {
   void process(bool is_separate);
   void processOneSpectrum(DeconvMsPtr ms_ptr, bool is_separate,
                           PrsmWriter &writer);
+
+  void compEvalues(SpectrumSetPtr spectrum_set_ptr, bool is_separate, 
+                   PrsmPtrVec &sele_prsm_ptrs);
+
  private:
   TdgfMngPtr mng_ptr_;
   CompPValueArrayPtr comp_pvalue_ptr_;

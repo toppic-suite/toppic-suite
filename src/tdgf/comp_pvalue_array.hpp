@@ -1,6 +1,7 @@
 #ifndef PROT_COMP_PVALUE_ARRAY_HPP_
 #define PROT_COMP_PVALUE_ARRAY_HPP_
 
+#include "spec/spectrum_set.hpp"
 #include "tdgf/tdgf_mng.hpp"
 #include "tdgf/comp_prob_value.hpp"
 #include "tdgf/count_test_num.hpp"
@@ -14,12 +15,12 @@ class CompPValueArray {
                   const ResFreqPtrVec &residue_ptrs,
                   TdgfMngPtr mng_ptr);
 
-  ExtremeValuePtrVec compExtremeValues(PrmMsPtr ms_six_ptr, 
-                                       const PrsmPtrVec &prsm_ptrs, 
-                                       bool strict);
+  void compMultiExtremeValues(PrmMsPtr ms_six_ptr, PrsmPtrVec &prsm_ptrs, 
+                              bool strict);
 
-  void setPValue(DeconvMsPtr ms_ptr, PrsmPtr prsm_ptr);
-  void setPValueArray(PrmMsPtr prm_ms_ptr, PrsmPtrVec &prsm_ptrs);
+  void compSingleExtremeValue(DeconvMsPtr deconv_ms_ptr, PrsmPtr prsm_ptr);
+
+  void process(SpectrumSetPtr spec_set_ptr, bool is_separate, PrsmPtrVec &prsm_ptrs);
 
  private:
   TdgfMngPtr mng_ptr_;
@@ -28,7 +29,6 @@ class CompPValueArray {
   ResFreqPtrVec pep_n_term_residue_ptrs_;
   ResFreqPtrVec prot_n_term_residue_ptrs_;
 
-  ExtremeValuePtr compExtremeValue(PrmMsPtr ms_ptr, PrsmPtr prsm_ptr);
 };
 
 typedef std::shared_ptr<CompPValueArray> CompPValueArrayPtr;

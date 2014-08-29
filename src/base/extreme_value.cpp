@@ -1,4 +1,5 @@
 #include <cmath>
+#include <limits>
 
 #include "extreme_value.hpp"
 
@@ -13,7 +14,8 @@ ExtremeValue::ExtremeValue (double one_prot_prob, double test_num,
 }
 
 ExtremeValuePtr getMaxEvaluePtr() {
-  ExtremeValuePtr evalue_ptr = ExtremeValuePtr(new ExtremeValue(1.0, 1.0, 1.0));
+  ExtremeValuePtr evalue_ptr 
+      = ExtremeValuePtr(new ExtremeValue(1.0, std::numeric_limits<double>::max(), 1.0));
   return evalue_ptr;
 }
 

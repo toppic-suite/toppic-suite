@@ -26,9 +26,9 @@ CompPValueArray::CompPValueArray(const ProteoformPtrVec &raw_proteo_ptrs,
 }
 
 /* set alignment */
-ExtremeValuePtrVec CompPValueArray::compExtremeValues(PrmMsPtr ms_six_ptr, 
-                                                      const PrsmPtrVec &prsm_ptrs, 
-                                                      bool strict) {
+void CompPValueArray::compMultiExtremeValues(PrmMsPtr ms_six_ptr, 
+                                             PrsmPtrVec &prsm_ptrs, 
+                                             bool strict) {
   PrmPeakPtrVec prm_peak_ptrs = ms_six_ptr->getPeakPtrVec();
   std::vector<double> prot_probs; 
   compProbArray(comp_prob_ptr_, prot_n_term_residue_ptrs_, 
@@ -39,7 +39,6 @@ ExtremeValuePtrVec CompPValueArray::compExtremeValues(PrmMsPtr ms_six_ptr,
   //LOG_DEBUG("probability computation complete");
   double prec_mass = ms_six_ptr->getHeaderPtr()->getPrecMonoMassMinusWater();
   double tolerance = ms_six_ptr->getHeaderPtr()->getErrorTolerance();
-  ExtremeValuePtrVec ev_prob_ptrs; 
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     //LOG_DEBUG("prsm " << i << " prsm size " << prsm_ptrs.size());
     int unexpect_shift_num = prsm_ptrs[i]->getProteoformPtr()->getUnexpectedChangeNum();
@@ -53,24 +52,17 @@ ExtremeValuePtrVec CompPValueArray::compExtremeValues(PrmMsPtr ms_six_ptr,
     }
     if (type_ptr == SemiAlignTypeFactory::getCompletePtr() 
         || type_ptr == SemiAlignTypeFactory::getPrefixPtr()) {
-      ev_prob_ptrs.push_back(ExtremeValuePtr(new ExtremeValue(prot_probs[i], cand_num, 1)));
+      ExtremeValuePtr prob_ptr(new ExtremeValue(prot_probs[i], cand_num, 1));
+      prsm_ptrs[i]->setProbPtr(prob_ptr);
     } else {
-      ev_prob_ptrs.push_back(ExtremeValuePtr(new ExtremeValue(pep_probs[i], cand_num,1)));
+      ExtremeValuePtr prob_ptr(new ExtremeValue(pep_probs[i], cand_num, 1));
+      prsm_ptrs[i]->setProbPtr(prob_ptr);
     }
     //LOG_DEBUG("assignment complete");
   }
-  return ev_prob_ptrs;
 }
 
-ExtremeValuePtr CompPValueArray::compExtremeValue(PrmMsPtr prm_ms_ptr, 
-                                                  PrsmPtr prsm_ptr) {
-  PrsmPtrVec prsm_ptrs;
-  prsm_ptrs.push_back(prsm_ptr);
-  ExtremeValuePtrVec extreme_values = compExtremeValues(prm_ms_ptr, prsm_ptrs, true);
-  return extreme_values[0];
-}
-
-void CompPValueArray::setPValue(DeconvMsPtr ms_ptr, PrsmPtr prsm_ptr) {
+void CompPValueArray::compSingleExtremeValue(DeconvMsPtr ms_ptr, PrsmPtr prsm_ptr) {
   double refine_prec_mass = prsm_ptr->getAdjustedPrecMass();
   DeconvMsPtr refine_ms_ptr = getRefineMs(ms_ptr, prsm_ptr->getCalibration(),
                                           refine_prec_mass);
@@ -81,16 +73,25 @@ void CompPValueArray::setPValue(DeconvMsPtr ms_ptr, PrsmPtr prsm_ptr) {
                << " precursor " << refine_prec_mass);
   // Delta = 0 is important 
   PrmMsPtr prm_ms_ptr = createMsSixPtr(refine_ms_ptr, 0, mng_ptr_->prsm_para_ptr_->getSpParaPtr());
-  ExtremeValuePtr prob_ptr = compExtremeValue(prm_ms_ptr, prsm_ptr);
-  prsm_ptr->setProbPtr(prob_ptr);
+
+  PrsmPtrVec prsm_ptrs;
+  prsm_ptrs.push_back(prsm_ptr);
+  compMultiExtremeValues(prm_ms_ptr, prsm_ptrs, true);
 }
 
-void CompPValueArray::setPValueArray(PrmMsPtr prm_ms_ptr, PrsmPtrVec &prsm_ptrs) {
-  ExtremeValuePtrVec extreme_values = compExtremeValues(prm_ms_ptr, prsm_ptrs, false);
-  for (size_t i = 0; i < prsm_ptrs.size(); i++) {
-    prsm_ptrs[i]->setProbPtr(extreme_values[i]);
+
+void CompPValueArray::process(SpectrumSetPtr spec_set_ptr, 
+                              bool is_separate, PrsmPtrVec &prsm_ptrs) {
+
+  if (is_separate) {
+    for (unsigned i = 0; i < prsm_ptrs.size(); i++) {
+      compSingleExtremeValue(spec_set_ptr->getDeconvMsPtr(), 
+                             prsm_ptrs[i]);
+    }
+  } 
+  else {
+    compMultiExtremeValues(spec_set_ptr->getMsSixPtr(), prsm_ptrs, false);
   }
-  //LOG_DEBUG("Set value complete");
 }
 
 }
