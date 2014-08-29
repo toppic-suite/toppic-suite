@@ -10,13 +10,29 @@ class TdgfMng {
   TdgfMng(PrsmParaPtr prsm_para_ptr, int shift_num, double max_ptm_mass, 
           const std::string &input_file_ext, const std::string &output_file_ext);
 
-  PrsmParaPtr prsm_para_ptr_;
+  /*********************************
+   * Common parameters
+   * *******************************/
+  std::string input_file_ext_;
+  std::string output_file_ext_;
 
-  /** parameters for tdmg */
-  double max_ptm_mass_ = 1000000;
+  PrsmParaPtr prsm_para_ptr_;
 
   /** Prsm filter */
   int comp_evalue_min_match_frag_num_ = 4;
+
+  bool use_table = false;
+
+  /**********************************
+   * Tdgf Table parameters 
+   * ********************************/
+
+
+  /**********************************
+   * Tdgf parameters 
+   * ********************************/
+  /* max ptm mass is used in the function for counting sequence numbers*/
+  double max_ptm_mass_ = 1000000;
 
   /** do tdgf computation if poisson report evalue > 10^-8 
    * or match frag num < 25 */
@@ -31,21 +47,6 @@ class TdgfMng {
   int max_table_height_ = 128;
   int min_height_ = 10;
 
-  /* Semi alignment type determination */
-  /* a prsm with a shift < 300 at n-terminus is treated as a prefix */
-  double prefix_suffix_shift_thresh_ = 300;
-
-  /**
-   * Postprocessing: adjustment makes it more conservative to identify Prsms
-   * with multiple shifts
-   */
-  // the following three values should be adjusted
-  double multiple_shift_adjustment_ = 4;
-  double multiple_shfit_adjustment_base_ = 10;
-  double min_adjustment_ = 100;
-
-  std::string input_file_ext_;
-  std::string output_file_ext_;
 };
 
 inline TdgfMng::TdgfMng(PrsmParaPtr prsm_para_ptr, 

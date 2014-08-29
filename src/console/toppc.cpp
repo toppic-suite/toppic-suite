@@ -91,6 +91,7 @@ int process(int argc, char* argv[]) {
     combine_processor = nullptr;
     std::cout << "Combining prsms finished." << std::endl;
 
+    /*
     std::cout << "Poisson computation starts" << std::endl;
     PoissonMngPtr poisson_mng_ptr = PoissonMngPtr(new PoissonMng (prsm_para_ptr, shift_num, max_ptm_mass, 
                                                       "RAW_RESULT", "POISSON_EVALUE"));
@@ -98,6 +99,7 @@ int process(int argc, char* argv[]) {
     poisson->init();
     poisson->process();
     poisson = nullptr;
+    */
 
     std::cout << "E-value computation starts" << std::endl;
     TdgfMngPtr tdgf_mng_ptr = TdgfMngPtr(new TdgfMng (prsm_para_ptr, shift_num, max_ptm_mass,
@@ -156,6 +158,7 @@ int process(int argc, char* argv[]) {
     table_out = nullptr;
     std::cout << "Outputting table finished." << std::endl;
 
+    /*
     std::cout << "Generating view xml files starts " << std::endl;
     XmlGeneratorPtr xml_gene = XmlGeneratorPtr(new XmlGenerator(prsm_para_ptr, exe_dir,"OUTPUT_RESULT"));
     xml_gene->process();
@@ -165,8 +168,7 @@ int process(int argc, char* argv[]) {
     std::cout << "Converting xml files to html files starts " << std::endl;
     translate(arguments);
     std::cout << "Converting xml files to html files finished." << std::endl;
-
-    std::cout << "Identification End!" << std::endl;
+    */
 
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;

@@ -79,7 +79,7 @@ class CompProbValue {
   int shift_num_;
 
   std::vector<std::vector<std::vector<double>>> results_; // nLayer peak number, height;
-  std::vector<std::vector<std::vector<double>>> priors_;  // peak number, height
+  double shift_prob_;  
 
   // the prob that a randam protein has the same precursor to the spectrum 
   std::vector<double> prec_probs_; 
@@ -100,6 +100,8 @@ class CompProbValue {
   void setHeight(int thresh, int max_peak_mass);
   void setPeakBgnEnd(const std::vector<int> &peak_masses, 
                      const std::vector<int> &peak_tolerances);
+
+  double getShiftProb();
   void comp();
   void compPrecProbs();
   void runClear(int page_pos);
@@ -111,8 +113,7 @@ class CompProbValue {
   void runUpdate(int page_end, int scr_bgn, int scr_end);
   void compOneLayer(std::vector<std::vector<double>> &prev_results, 
                     bool is_first_layer,  
-                    std::vector<std::vector<double>> &cur_results, 
-                    std::vector<std::vector<double>> &cur_priors);
+                    std::vector<std::vector<double>> &cur_results);
 };
 
 typedef std::shared_ptr<CompProbValue> CompProbValuePtr;

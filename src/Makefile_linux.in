@@ -37,4 +37,4 @@ POISSON_OBJS = $(addprefix $(OBJ_DIR)/, poisson_processor.o poisson_comp_pvalue.
 
 XPP_OBJS = $(addprefix $(OBJ_DIR)/, anno_view.o xml_generator.o transformer.o) 
 
-CONSOLE_OBJS = $(addprefix $(OBJ_DIR)/, argument.o)
+ARGUMENT_OBJS = $(addprefix $(OBJ_DIR)/, argument.o)

@@ -21,16 +21,16 @@ void zeroPtmSearch(SpectrumSetPtr spec_set_ptr,
       = zeroPtmFastFilter(type_ptr, ms_three, proteoform_ptr_vec, 
                           mng_ptr->zero_ptm_filter_result_num_);
 
-  LOG_DEBUG("fast_match ended size " << fast_matches.size());
+  //LOG_DEBUG("fast_match ended size " << fast_matches.size());
   DeconvMsPtr deconv_ms = spec_set_ptr->getDeconvMsPtr();
   ZpSlowMatchPtrVec slow_matches 
       = zeroPtmSlowFilter(deconv_ms, fast_matches, mng_ptr); 
 
-  LOG_DEBUG("slow_match ended size " << slow_matches.size());
+  //LOG_DEBUG("slow_match ended size " << slow_matches.size());
   for (size_t i = 0; i < slow_matches.size(); i++) {
       prsms.push_back(slow_matches[i]->geneResult());
   }
-  LOG_DEBUG("prsm generation ended size " << prsms.size());
+  //LOG_DEBUG("prsm generation ended size " << prsms.size());
 
   std::sort(prsms.begin(), prsms.end(), prsmMatchFragmentDown);
   if (prsms.size() > 0) {
@@ -48,7 +48,7 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
       = generateProtModProteoform(raw_forms, prsm_para_ptr->getAllowProtModPtrVec());
 
   int spectra_num = countSpNum (prsm_para_ptr->getSpectrumFileName());
-  LOG_DEBUG("spectra_number  " << spectra_num);
+  //LOG_DEBUG("spectra_number  " << spectra_num);
 
   MsAlignReader reader(prsm_para_ptr->getSpectrumFileName());
   std::string output_file_name = basename(prsm_para_ptr->getSpectrumFileName())
@@ -63,7 +63,7 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
       + SemiAlignTypeFactory::getInternalPtr()->getName());
   PrsmWriter all_writer(output_file_name);
 
-  LOG_DEBUG("start reading");
+  //LOG_DEBUG("start reading");
   int n = 0;
   DeconvMsPtr ms_ptr = reader.getNextMs();
   LOG_DEBUG("init ms_ptr");
@@ -96,7 +96,7 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
       std::cout << std::flush << "Zero ptm searching is processing " << n << " of " << spectra_num << " spectra.\r";
     }
     ms_ptr = reader.getNextMs();
-    LOG_DEBUG("spectrum " << n);
+    //LOG_DEBUG("spectrum " << n);
   }
 
   reader.close();

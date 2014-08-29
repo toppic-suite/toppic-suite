@@ -15,6 +15,12 @@
 #include "zeroptmsearch/zero_ptm_mng.hpp"
 #include "zeroptmsearch/zero_ptm_search.hpp"
 
+#include "filterdiagonal/ptm_fast_filter_mng.hpp"
+#include "filterdiagonal/ptm_fast_filter_processor.hpp"
+
+#include "ptmsearch/ptm_mng.hpp"
+#include "ptmsearch/ptm_processor.hpp"
+
 #include "tdgf/evalue_processor.hpp"
 #include "tdgf/tdgf_mng.hpp"
 
@@ -53,58 +59,54 @@ int zero_ptm_process(int argc, char* argv[]) {
       generateShuffleDb(ori_db_file_name, db_file_name);
     }
 
-    int start_s = clock();
-
+    /*
     std::cout << "Zero ptm searching starts " << std::endl;
     ZeroPtmMngPtr zero_mng_ptr = ZeroPtmMngPtr(new ZeroPtmMng (prsm_para_ptr, "ZERO"));
     zeroPtmSearchProcess(zero_mng_ptr);
 
-    int stop_s = clock();
-    std::cout << std::endl << "Running time: " << (stop_s-start_s) / double(CLOCKS_PER_SEC)  << " seconds " << std::endl;
+    std::cout << "Fast filtering starts " << std::endl;
+    PtmFastFilterMngPtr filter_mng_ptr 
+        = PtmFastFilterMngPtr(new PtmFastFilterMng(prsm_para_ptr, "FILTER"));
+    PtmFastFilterProcessorPtr filter_processor = PtmFastFilterProcessorPtr(new PtmFastFilterProcessor(filter_mng_ptr));
+    filter_processor->process();
+    filter_processor = nullptr;
 
-    TableWriterPtr table_out = TableWriterPtr(new TableWriter(prsm_para_ptr, "ZERO_COMPLETE", "ZERO_COMPLETE_TABLE"));
-    table_out->write();
-    table_out = TableWriterPtr(new TableWriter(prsm_para_ptr, "ZERO_PREFIX", "ZERO_PREFIX_TABLE"));
-    table_out->write();
-    table_out = TableWriterPtr(new TableWriter(prsm_para_ptr, "ZERO_SUFFIX", "ZERO_SUFFIX_TABLE"));
-    table_out->write();
-    table_out = TableWriterPtr(new TableWriter(prsm_para_ptr, "ZERO_INTERNAL", "ZERO_INTERNAL_TABLE"));
-    table_out->write();
-    table_out = nullptr;
-    std::cout << "Outputting table finished." << std::endl;
+    std::cout << "Ptm searching starts" << std::endl;
+    PtmMngPtr ptm_mng_ptr = PtmMngPtr(new PtmMng(prsm_para_ptr, n_top, shift_num,
+                                                 max_ptm_mass, "FILTER_COMBINED", "PTM"));
+    PtmProcessorPtr ptm_processor = PtmProcessorPtr(new PtmProcessor(ptm_mng_ptr));
+    ptm_processor->process();
+    ptm_processor = nullptr;
+
+    std::cout << "Combining prsms starts" << std::endl;
+    std::vector<std::string> input_exts ;
+    input_exts.push_back("ZERO");
+    input_exts.push_back("PTM");
+    PrsmCombinePtr combine_processor = PrsmCombinePtr(new PrsmCombine(db_file_name, sp_file_name,
+                                                                    input_exts, "RAW_RESULT"));
+    combine_processor->process();
+    combine_processor = nullptr;
+    std::cout << "Combining prsms finished." << std::endl;
+    */
+
+    int start_s = clock();
 
     std::cout << "E-value computation starts" << std::endl;
     TdgfMngPtr tdgf_mng_ptr = TdgfMngPtr(new TdgfMng (prsm_para_ptr, shift_num, max_ptm_mass,
-                                                      "ZERO_COMPLETE", "ZERO_COMPLETE_EVALUE"));
-    EValueProcessorPtr processor_ptr = EValueProcessorPtr(new EValueProcessor(tdgf_mng_ptr));
-    processor_ptr->init();
+                                                      "RAW_RESULT", "EVALUE"));
+    EValueProcessorPtr evalue_processor_ptr = EValueProcessorPtr(new EValueProcessor(tdgf_mng_ptr));
+    evalue_processor_ptr->init();
     // compute E-value for a set of prsms each run 
-    processor_ptr->process(false);
-    processor_ptr = nullptr;
+    evalue_processor_ptr->process(false);
+    evalue_processor_ptr = nullptr;
 
-    tdgf_mng_ptr = TdgfMngPtr(new TdgfMng (prsm_para_ptr, shift_num, max_ptm_mass,
-                                           "ZERO_PREFIX", "ZERO_PREFIX_EVALUE"));
-    processor_ptr = EValueProcessorPtr(new EValueProcessor(tdgf_mng_ptr));
-    processor_ptr->init();
-    // compute E-value for a set of prsms each run 
-    processor_ptr->process(false);
-    processor_ptr = nullptr;
+    int stop_s = clock();
+    std::cout << std::endl << "Running time: " << (stop_s-start_s) / double(CLOCKS_PER_SEC)  << " seconds " << std::endl;
 
-    tdgf_mng_ptr = TdgfMngPtr(new TdgfMng (prsm_para_ptr, shift_num, max_ptm_mass,
-                                           "ZERO_SUFFIX", "ZERO_SUFFIX_EVALUE"));
-    processor_ptr = EValueProcessorPtr(new EValueProcessor(tdgf_mng_ptr));
-    processor_ptr->init();
-    // compute E-value for a set of prsms each run 
-    processor_ptr->process(false);
-    processor_ptr = nullptr;
-
-    tdgf_mng_ptr = TdgfMngPtr(new TdgfMng (prsm_para_ptr, shift_num, max_ptm_mass,
-                                           "ZERO_INTERNAL", "ZERO_INTERNAL_EVALUE"));
-    processor_ptr = EValueProcessorPtr(new EValueProcessor(tdgf_mng_ptr));
-    processor_ptr->init();
-    // compute E-value for a set of prsms each run 
-    processor_ptr->process(false);
-    processor_ptr = nullptr;
+    TableWriterPtr table_writer_ptr = TableWriterPtr(new TableWriter(prsm_para_ptr, "EVALUE", "EVALUE_TABLE"));
+    table_writer_ptr->write();
+    table_writer_ptr = nullptr;
+    std::cout << "Outputting table finished." << std::endl;
 
 
   } catch (const char* e) {
