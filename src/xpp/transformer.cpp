@@ -1,13 +1,6 @@
-/*
- * transformer.cpp
- *
- *  Created on: Feb 17, 2014
- *      Author: xunlikun
- */
-
-#include <xpp/transformer.hpp>
-#include <xpp/anno_view.hpp>
 #include "base/file_util.hpp"
+#include "xpp/transformer.hpp"
+#include "xpp/anno_view.hpp"
 
 namespace prot {
 

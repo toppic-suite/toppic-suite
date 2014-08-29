@@ -44,6 +44,7 @@ file(GLOB TEST_ZERO_PTM_SCRS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_zero_ptm.
 file(GLOB TEST_DIAG_FILTER_SCRS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_diag_filter.cpp) 
 file(GLOB TEST_PTM_SEARCH_SCRS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_ptm_search.cpp) 
 file(GLOB TEST_EVALUE_SCRS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_evalue.cpp) 
+file(GLOB TEST_XPP_SCRS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_xpp.cpp) 
 
 link_directories(${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/linux_lib/)
 
@@ -81,6 +82,11 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
           ${ZERO_PTM_SCRS} ${FILTER_SCRS} ${PTM_SCRS} ${POISSON_SCRS} 
           ${TDGF_SCRS} ${XPP_SCRS} ${ARGU_SCRS} ${TEST_EVALUE_SCRS})
   target_link_libraries(test_evalue xalan-c xalanMsg xerces-c boost_program_options boost_filesystem boost_system pthread)
+
+  add_executable(test_xpp ${BASE_SCRS} ${SPEC_SCRS} ${PRSM_SCRS}
+          ${ZERO_PTM_SCRS} ${FILTER_SCRS} ${PTM_SCRS} ${POISSON_SCRS} 
+          ${TDGF_SCRS} ${XPP_SCRS} ${ARGU_SCRS} ${TEST_XPP_SCRS})
+  target_link_libraries(test_xpp xalan-c xalanMsg xerces-c boost_program_options boost_filesystem boost_system pthread)
 
   #  add_executable(test_multiple ${BASE_SCRS} ${SPEC_SCRS} ${PRSM_SCRS}
   #        ${ZERO_PTM_SCRS} ${FILTER_SCRS} ${PTM_SCRS} ${POISSON_SCRS} 
