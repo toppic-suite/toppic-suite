@@ -268,11 +268,12 @@ void CompProbValue::comp() {
 void CompProbValue::compPrecProbs() {
   // zero ptm
   int last_peak_index = peak_masses_.size() - 1;
+  double prec_mass_minus_water = peak_masses_[last_peak_index];
   double prob = 0;
   for (int i = 0; i < height_; i++) {
     prob += results_[0][last_peak_index][i];
   }
-  if (prob == 0) {
+  if (prob == 0 && prec_mass_minus_water >= 1000) {
     LOG_WARN("Precursor probability is zero!"); 
   }
   prec_probs_.push_back(prob);

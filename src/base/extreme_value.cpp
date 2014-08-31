@@ -29,7 +29,7 @@ ExtremeValue::ExtremeValue (xercesc::DOMElement* element){
     
 void ExtremeValue::init() {
   e_value_ = one_prot_prob_ * test_num_ * adjust_factor_;
-  if (one_prot_prob_ > 1) {
+  if (one_prot_prob_ > 1 || test_num_ == std::numeric_limits<double>::max() ) {
     p_value_  = 1.0;
   }
   else {
