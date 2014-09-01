@@ -1,5 +1,5 @@
-#ifndef TRANSFORMER_HPP_
-#define TRANSFORMER_HPP_
+#ifndef PROT_TRANSFORMER_HPP_
+#define PROT_TRANSFORMER_HPP_
 
 #include <memory>
 #include <map>
@@ -14,4 +14,4 @@ void translate(std::map<std::string,std::string> arguments);
 
 }
 
-#endif /* TRANSFORMER_HPP_ */
+#endif /* PROT_TRANSFORMER_HPP_ */
