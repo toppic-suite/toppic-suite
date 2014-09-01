@@ -1,17 +1,17 @@
 #include <algorithm>
 #include <iostream>
-#include "filterdiagonal/ptm_fast_filter_hi_mem.hpp"
+#include "diagfilter/diag_filter.hpp"
 
 namespace prot {
 
-PtmFastFilterHiMem::PtmFastFilterHiMem(const ProteoformPtrVec &proteo_ptrs,
-                                       PtmFastFilterMngPtr mng_ptr){
+DiagFilter::DiagFilter(const ProteoformPtrVec &proteo_ptrs,
+                       DiagFilterMngPtr mng_ptr){
   mng_ptr_ = mng_ptr;
   proteo_ptrs_ = proteo_ptrs;
-  index_ptr_ = CompShiftHiMemPtr(new CompShiftHiMem(proteo_ptrs, mng_ptr));
+  index_ptr_ = CompShiftPtr(new CompShift(proteo_ptrs, mng_ptr));
 }
 
-SimplePrsmPtrVec PtmFastFilterHiMem::getBestMatch(PrmMsPtr ms_ptr){
+SimplePrsmPtrVec DiagFilter::getBestMatch(PrmMsPtr ms_ptr){
   SimplePrsmPtrVec match_ptrs = compute(ms_ptr);
   SimplePrsmPtrVec unique_match_ptrs = getUniqueMatches(match_ptrs);
   std::sort(unique_match_ptrs.begin(), unique_match_ptrs.end(),simplePrsmDown);
@@ -32,7 +32,7 @@ SimplePrsmPtrVec PtmFastFilterHiMem::getBestMatch(PrmMsPtr ms_ptr){
   return result_ptrs;
 }
 
-inline SimplePrsmPtrVec PtmFastFilterHiMem::compute(PrmMsPtr ms_ptr){
+inline SimplePrsmPtrVec DiagFilter::compute(PrmMsPtr ms_ptr){
   std::pair<std::vector<int>, std::vector<int>> mass_errors 
       = getIntMassErrorList(ms_ptr, mng_ptr_->ptm_fast_filter_scale_,true,false);
   SimplePrsmPtrVec match_ptrs;

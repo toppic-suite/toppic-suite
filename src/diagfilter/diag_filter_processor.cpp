@@ -4,22 +4,22 @@
 #include "base/file_util.hpp"
 #include "spec/msalign_reader.hpp"
 #include "prsm/simple_prsm_writer.hpp"
-#include "filterdiagonal/ptm_fast_filter_processor.hpp"
+#include "diagfilter/diag_filter_processor.hpp"
 
 namespace prot {
 
-PtmFastFilterProcessor::PtmFastFilterProcessor(PtmFastFilterMngPtr mng_ptr){
+DiagFilterProcessor::DiagFilterProcessor(DiagFilterMngPtr mng_ptr){
   mng_ptr_ = mng_ptr;
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   ProteoformPtrVec proteoform_ptrs 
       = readFastaToProteoform(prsm_para_ptr->getSearchDbFileName(),
                               prsm_para_ptr->getFixModResiduePtrVec());
   LOG_DEBUG("start init filter.");
-  filter_ptr_ = PtmFastFilterBlockPtr(new PtmFastFilterBlock(proteoform_ptrs, mng_ptr_));
+  filter_ptr_ = DiagFilterBlockPtr(new DiagFilterBlock(proteoform_ptrs, mng_ptr_));
   LOG_DEBUG("init filter is done.");
 }
 
-void PtmFastFilterProcessor::process(){
+void DiagFilterProcessor::process(){
   std::string sp_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
   int n_spectrum = countSpNum(sp_file_name);
   for(int i=0;i< filter_ptr_->getBlockSize();i++){
@@ -31,8 +31,8 @@ void PtmFastFilterProcessor::process(){
                mng_ptr_->ptm_fast_filter_result_num_);
 }
 
-void PtmFastFilterProcessor::processBlock(int block, const std::string &sp_file_name,
-                                          int n_spectra){
+void DiagFilterProcessor::processBlock(int block, const std::string &sp_file_name,
+                                       int n_spectra){
   filter_ptr_->initBlock(block);
   MsAlignReader reader(sp_file_name);
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;

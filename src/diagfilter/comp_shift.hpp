@@ -1,17 +1,17 @@
-#ifndef COMP_SHIFT_HI_MEM_HPP_
-#define COMP_SHIFT_HI_MEM_HPP_
+#ifndef PROT_COMP_SHIFT_HPP_
+#define PROT_COMP_SHIFT_HPP_
 
 #include "base/proteoform.hpp"
 #include "base/base_data.hpp"
-#include "filterdiagonal/ptm_fast_filter_mng.hpp"
+#include "diagfilter/diag_filter_mng.hpp"
 
 namespace prot {
 
-class CompShiftHiMem {
+class CompShift {
  public:
-  CompShiftHiMem(const ProteoformPtrVec &proteo_ptrs, PtmFastFilterMngPtr mng_ptr);
+  CompShift(const ProteoformPtrVec &proteo_ptrs, DiagFilterMngPtr mng_ptr);
 
-  ~CompShiftHiMem();
+  ~CompShift();
 
   std::vector<std::pair<int,int>> compConvolution(const std::vector<int> &masses,
                                                   int bgn_pos,int num);
@@ -42,8 +42,8 @@ class CompShiftHiMem {
   std::vector<std::pair<int,int>> getShiftScores(short* scores, int num);
 };
 
-typedef std::shared_ptr<CompShiftHiMem> CompShiftHiMemPtr;
+typedef std::shared_ptr<CompShift> CompShiftPtr;
 
 } /* namespace prot */
 
-#endif /* COMP_SHIFT_HI_MEM_HPP_ */
+#endif /* PROT_COMP_SHIFT_HPP_ */
