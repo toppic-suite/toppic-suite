@@ -2,25 +2,27 @@
 #include <algorithm>
 
 #include "base/logger.hpp"
-#include "filterdiagonal/comp_shift_hi_mem.hpp"
+#include "base/prot_mod.hpp"
+#include "diagfilter/comp_shift.hpp"
 
 namespace prot {
 
-CompShiftHiMem::CompShiftHiMem(const ProteoformPtrVec &proteo_ptrs,
-                               PtmFastFilterMngPtr mng_ptr){
+CompShift::CompShift(const ProteoformPtrVec &proteo_ptrs,
+                     DiagFilterMngPtr mng_ptr) {
   scale_ = mng_ptr->ptm_fast_filter_scale_;
   LOG_DEBUG("Scale: " << scale_);
   LOG_DEBUG("Proteoform number: " << proteo_ptrs.size());
 
   col_num_ = mng_ptr->max_proteoform_mass * scale_;
-  initProteoformBeginEnds(proteo_ptrs);
-  initIndexes(proteo_ptrs);
+  bool acetylation = containNME_ACETYLATION(mng_ptr->prsm_para_ptr_->getAllowProtModPtrVec());
+  initProteoformBeginEnds(proteo_ptrs, acetylation);
+  initIndexes(proteo_ptrs, acetylation);
 
   LOG_DEBUG("column number: " << col_num_);
   LOG_DEBUG("row number: " << row_num_);
 }
 
-CompShiftHiMem::~CompShiftHiMem(){
+CompShift::~CompShift(){
   delete[] proteo_row_begins_;
   delete[] row_proteo_ids_;
   delete[] col_index_begins_;
@@ -28,7 +30,8 @@ CompShiftHiMem::~CompShiftHiMem(){
   delete[] col_indexes_;
 }
 
-void CompShiftHiMem::initProteoformBeginEnds(const ProteoformPtrVec &proteo_ptrs){
+inline void CompShift::initProteoformBeginEnds(const ProteoformPtrVec &proteo_ptrs, 
+                                                    bool acetylation){
   //no need to init
   proteo_row_begins_ = new int[proteo_ptrs.size()];
   int* proteo_row_ends;
@@ -37,8 +40,12 @@ void CompShiftHiMem::initProteoformBeginEnds(const ProteoformPtrVec &proteo_ptrs
   int  pnt = 0;
   for(size_t i=0; i< proteo_ptrs.size(); i++){
     proteo_row_begins_[i] = pnt;
-    proteo_row_ends[i] = pnt + proteo_ptrs[i]->getResSeqPtr()->getLen() - 1;
-    pnt += proteo_ptrs[i]->getResSeqPtr()->getLen();
+    int len = proteo_ptrs[i]->getResSeqPtr()->getLen() ;
+    if (acetylation) {
+      len++;
+    }
+    proteo_row_ends[i] = pnt + len - 1;
+    pnt += len;
   }
   row_num_ = pnt;
   //no need to init
@@ -51,9 +58,15 @@ void CompShiftHiMem::initProteoformBeginEnds(const ProteoformPtrVec &proteo_ptrs
   delete[] proteo_row_ends;
 }
 
-inline void CompShiftHiMem::updateColumnMatchNums(ProteoformPtr proteo_ptr, 
-                                                  int* col_match_nums) {
+inline void CompShift::updateColumnMatchNums(ProteoformPtr proteo_ptr, 
+                                                  int* col_match_nums, 
+                                                  bool acetylation) {
   std::vector<int> masses = proteo_ptr->getBpSpecPtr()->getScaledPrmMasses(scale_);
+  if (acetylation) {
+    double ace_mass = - ProtModFactory::getProtModPtr_NME_ACETYLATION()->getProtShift();
+    masses.push_back(ace_mass);
+    std::sort(masses.begin(), masses.end(),std::less<double>()); 
+  }
   for (size_t bgn = 0; bgn < masses.size(); bgn++) {
     for (size_t cur = bgn + 1; cur < masses.size(); cur++) {
       int diff = masses[cur] - masses[bgn];
@@ -67,7 +80,8 @@ inline void CompShiftHiMem::updateColumnMatchNums(ProteoformPtr proteo_ptr,
   }
 }
 
-void CompShiftHiMem::initIndexes(const ProteoformPtrVec &proteo_ptrs){
+inline void CompShift::initIndexes(const ProteoformPtrVec &proteo_ptrs, 
+                                        bool acetylation){
   int* col_match_nums = new int[col_num_];
   // init col_match_nums
   memset(col_match_nums, 0, col_num_ * sizeof(int));
@@ -79,7 +93,7 @@ void CompShiftHiMem::initIndexes(const ProteoformPtrVec &proteo_ptrs){
   col_index_ends_ = new int[col_num_];
 
   for(size_t i =0; i<proteo_ptrs.size(); i++){
-    updateColumnMatchNums(proteo_ptrs[i], col_match_nums);
+    updateColumnMatchNums(proteo_ptrs[i], col_match_nums, acetylation);
   }
 
   int pnt = 0;
@@ -99,6 +113,11 @@ void CompShiftHiMem::initIndexes(const ProteoformPtrVec &proteo_ptrs){
     }
     std::vector<int> masses  
         = proteo_ptrs[i]->getBpSpecPtr()->getScaledPrmMasses(scale_);
+    if (acetylation) {
+      double ace_mass = - ProtModFactory::getProtModPtr_NME_ACETYLATION()->getProtShift();
+      masses.push_back(ace_mass);
+      std::sort(masses.begin(), masses.end(),std::less<double>()); 
+    }
     for (size_t bgn=0; bgn < masses.size(); bgn++) {
       for (size_t cur = bgn+1; cur < masses.size(); cur++) {
         int diff = masses[cur] - masses[bgn];
@@ -117,7 +136,7 @@ void CompShiftHiMem::initIndexes(const ProteoformPtrVec &proteo_ptrs){
 }
 
 
-std::vector<std::pair<int,int>> CompShiftHiMem::compConvolution(
+std::vector<std::pair<int,int>> CompShift::compConvolution(
     const std::vector<int> &masses,int bgn_pos,int num){
 
   short* scores = new short[row_num_];
@@ -149,7 +168,7 @@ std::vector<std::pair<int,int>> CompShiftHiMem::compConvolution(
   return results;
 }
 
-std::vector<std::pair<int,int>> CompShiftHiMem::compConvolution(
+std::vector<std::pair<int,int>> CompShift::compConvolution(
     const std::vector<int> &masses, const std::vector<int> &errors, int bgn_pos,int num){
 
   short* scores = new short[row_num_];
@@ -182,7 +201,7 @@ std::vector<std::pair<int,int>> CompShiftHiMem::compConvolution(
   return results;
 }
 
-inline std::vector<std::pair<int,int>> CompShiftHiMem::getShiftScores(short* scores,int num){
+inline std::vector<std::pair<int,int>> CompShift::getShiftScores(short* scores,int num){
   short* top_scores = new short[num];
   int* top_rows = new int[num];
   std::fill_n(top_scores, num, 0);

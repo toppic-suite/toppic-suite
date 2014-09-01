@@ -1,6 +1,6 @@
 #include "base/file_util.hpp"
-#include "xpp/transformer.hpp"
-#include "xpp/anno_view.hpp"
+#include "prsmview/transformer.hpp"
+#include "prsmview/anno_view.hpp"
 
 namespace prot {
 
