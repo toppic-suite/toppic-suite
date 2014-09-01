@@ -10,7 +10,7 @@ TEST_PTM_SEARCH_OBJS = $(addprefix $(OBJ_DIR)/, test_ptm_search.o)
 
 TEST_EVALUE_OBJS = $(addprefix $(OBJ_DIR)/, test_evalue.o)
 
-TEST_XPP_OBJS = $(addprefix $(OBJ_DIR)/, test_xpp.o)
+TEST_PRSM_VIEW_OBJS = $(addprefix $(OBJ_DIR)/, test_xpp.o)
 
 OBJS = $(BASE_OBJS) $(SPEC_OBJS) $(PRSM_OBJS) $(ZERO_PTM_OBJS) $(DIAG_FILTER_OBJS) $(ONE_PTM_FILTER_OBJS) $(PTM_OBJS) $(TDGF_OBJS) $(XPP_OBJS) $(ARGUMENT_OBJS) 
 
@@ -24,7 +24,7 @@ TEST_PTM_SEARCH_LINK_OBJS = $(OBJS) $(TEST_PTM_SEARCH_OBJS)
 
 TEST_EVALUE_LINK_OBJS = $(OBJS) $(TEST_EVALUE_OBJS)
 
-TEST_XPP_LINK_OBJS = $(OBJS) $(TEST_XPP_OBJS)
+TEST_PRSM_VIEW_LINK_OBJS = $(OBJS) $(TEST_PRSM_VIEW_OBJS)
 
 
 BIN_DIR = ../../bin
@@ -36,7 +36,7 @@ TEST_DIAG_FILTER = $(BIN_DIR)/test_diag_filter
 TEST_ONE_PTM_FILTER = $(BIN_DIR)/test_one_ptm_filter
 TEST_PTM_SEARCH = $(BIN_DIR)/test_ptm_search
 TEST_EVALUE = $(BIN_DIR)/test_evalue
-TEST_XPP = $(BIN_DIR)/test_xpp
+TEST_PRSM_VIEW = $(BIN_DIR)/test_prsm_view
 #
 # The following part of the makefile is generic; it can be used to 
 # build any executable just by changing the definitions above and by
@@ -69,6 +69,6 @@ $(OBJ_DIR)/%.o: %.cpp
 	$(CC) -c $(CPPFLAGS) $(INCLUDES) $< -o $@
 
 clean:
-	$(RM) *~ $(TEST_ZERO_PTM) $(TEST_DIAG_FILTER) $(TEST_PTM_SEARCH) $(TEST_ZERO_PTM_OBJS) $(TEST_DIAG_FILTER_OBJS) $(TEST_PTM_SEARCH_OBJS)
+	$(RM) *~ $(TEST_ZERO_PTM) $(TEST_DIAG_FILTER) $(TEST_ONE_PTM_FILTER) $(TEST_PTM_SEARCH) $(TEST_EVALUE) $(TEST_PRSM_VIEW) $(TEST_ZERO_PTM_OBJS) $(TEST_DIAG_FILTER_OBJS) $(TEST_ONE_PTM_FILTER_OBJS) $(TEST_PTM_SEARCH_OBJS) $(TEST_EVALUE_OBJS) $(TEST_PRSM_VIEW_OBJS) 
 
 depend: $(SRCS)
