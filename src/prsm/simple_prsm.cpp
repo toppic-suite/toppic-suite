@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cmath>
+#include <algorithm>
 
 #include "simple_prsm.hpp"
 #include "base/logger.hpp"
@@ -114,5 +115,22 @@ SimplePrsmPtrVec getMatchedSimplePrsms(const SimplePrsmPtrVec &simple_prsm_ptrs,
   }
   return result_ptrs;
 }
+
+SimplePrsmPtrVec getUniqueMatches(SimplePrsmPtrVec &match_ptrs) {
+  std::sort(match_ptrs.begin(), match_ptrs.end(),simplePrsmSeqIdUpScoreDown);
+
+  SimplePrsmPtrVec unique_match_ptrs;
+  int prev_seq_id = -1;
+  for(size_t i=0;i< match_ptrs.size();i++){
+    int cur_seq_id = match_ptrs[i]->getSeqId();
+    if (cur_seq_id != prev_seq_id) {
+      unique_match_ptrs.push_back(match_ptrs[i]);
+      prev_seq_id = cur_seq_id;
+    }
+  }
+
+  return unique_match_ptrs;
+}
+
 
 } /* namespace prot */

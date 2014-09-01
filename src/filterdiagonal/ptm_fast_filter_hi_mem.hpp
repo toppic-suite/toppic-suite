@@ -20,8 +20,7 @@ class PtmFastFilterHiMem {
   ProteoformPtrVec proteo_ptrs_;
   CompShiftHiMemPtr index_ptr_;
 
-  SimplePrsmPtrVec2D compute(PrmMsPtr ms_ptr);
-  SimplePrsmPtrVec sort(const SimplePrsmPtrVec2D &match_ptrs);
+  SimplePrsmPtrVec compute(PrmMsPtr ms_ptr);
 };
 
 typedef std::shared_ptr<PtmFastFilterHiMem> PtmFastFilterHiMemPtr;

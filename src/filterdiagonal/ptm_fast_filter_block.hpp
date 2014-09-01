@@ -26,10 +26,8 @@ class PtmFastFilterBlock {
  private:
   PtmFastFilterMngPtr mng_ptr_;
   ProteoformPtrVec proteo_ptrs_;
-  std::vector<ProteoformPtrVec> proteo_blocks_;
+  ProteoformPtrVec2D proteo_blocks_;
   PtmFastFilterHiMemPtr filter_ptr_;
-
-  void initProteoBlocks();
 };
 
 typedef std::shared_ptr<PtmFastFilterBlock> PtmFastFilterBlockPtr;

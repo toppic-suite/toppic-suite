@@ -61,6 +61,7 @@ int zero_ptm_process(int argc, char* argv[]) {
       generateShuffleDb(ori_db_file_name, db_file_name);
     }
 
+    /*
     std::cout << "Fast filtering starts " << std::endl;
     PtmFastFilterMngPtr filter_mng_ptr 
         = PtmFastFilterMngPtr(new PtmFastFilterMng(prsm_para_ptr, "FILTER"));
@@ -87,12 +88,13 @@ int zero_ptm_process(int argc, char* argv[]) {
 
     std::cout << "E-value computation starts" << std::endl;
     TdgfMngPtr tdgf_mng_ptr = TdgfMngPtr(new TdgfMng (prsm_para_ptr, shift_num, max_ptm_mass,
-                                                      "POISSON_EVALUE", "EVALUE"));
+                                                      "RAW_RESULT", "EVALUE"));
     EValueProcessorPtr processor = EValueProcessorPtr(new EValueProcessor(tdgf_mng_ptr));
     processor->init();
     // compute E-value for a set of prsms each run 
     processor->process(false);
     processor = nullptr;
+    */
 
     if (arguments["searchType"]=="TARGET") { 
       std::cout << "Top prsm selecting starts" << std::endl;
@@ -142,6 +144,7 @@ int zero_ptm_process(int argc, char* argv[]) {
     table_out = nullptr;
     std::cout << "Outputting table finished." << std::endl;
 
+    /*
     std::cout << "Generating view xml files starts " << std::endl;
     XmlGeneratorPtr xml_gene = XmlGeneratorPtr(new XmlGenerator(prsm_para_ptr, exe_dir,"OUTPUT_RESULT"));
     xml_gene->process();
@@ -151,6 +154,7 @@ int zero_ptm_process(int argc, char* argv[]) {
     std::cout << "Converting xml files to html files starts " << std::endl;
     translate(arguments);
     std::cout << "Converting xml files to html files finished." << std::endl;
+    */
 
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;

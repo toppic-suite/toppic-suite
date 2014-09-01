@@ -481,5 +481,39 @@ bool isStrictCompatiablePtmSpecies(ProteoformPtr a, ProteoformPtr b,
   return true;
 }
 
+inline ProteoformPtrVec2D getProteoBlocks(const ProteoformPtrVec &proteo_ptrs, int db_block_size) {
+  size_t start_idx = 0;
+  size_t proteo_idx =0;
+  int block_len=0;
+  ProteoformPtrVec2D proteo_blocks;
+  while(proteo_idx < proteo_ptrs.size()){
+    int proteo_len = proteo_ptrs[proteo_idx]->getResSeqPtr()->getLen();
+    if(block_len + proteo_len < db_block_size) {
+      block_len = block_len + proteo_len;
+      proteo_idx++;
+    }
+    else{
+      size_t end_idx = proteo_idx;
+      ProteoformPtrVec proteo_in_block;
+      for(size_t i = start_idx; i<=end_idx; i++){
+        proteo_in_block.push_back(proteo_ptrs[i]);
+      }
+      proteo_blocks.push_back(proteo_in_block);
+      start_idx = end_idx +1;
+      proteo_idx = end_idx +1;
+      block_len = 0;
+    }
+  }
+  /* last block */
+  if (start_idx < proteo_ptrs.size()) {
+    ProteoformPtrVec proteo_in_block;
+    for(size_t i = start_idx; i < proteo_ptrs.size(); i++){
+      proteo_in_block.push_back(proteo_ptrs[i]);
+    }
+    proteo_blocks.push_back(proteo_in_block);
+  }
+  return proteo_blocks;
+}
+
 } /* namespace prot */
 

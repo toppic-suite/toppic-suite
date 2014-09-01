@@ -55,8 +55,19 @@ SimplePrsmPtrVec getMatchedSimplePrsms(const SimplePrsmPtrVec &simple_prsm_ptrs,
 
 SimplePrsmPtrVec readSimplePrsms(const std::string &filename);
 
+SimplePrsmPtrVec getUniqueMatches(SimplePrsmPtrVec &match_ptrs);
+
 inline bool simplePrsmDown(const SimplePrsmPtr a,SimplePrsmPtr b) {
   return a->getScore() > b->getScore();
+}
+
+inline bool simplePrsmSeqIdUpScoreDown(const SimplePrsmPtr a,SimplePrsmPtr b) {
+  if (a->getSeqId() != b->getSeqId()) {
+    return a->getSeqId() < b->getSeqId();
+  }
+  else {
+    return a->getScore() > b->getScore();
+  }
 }
 
 } /* namespace prot */

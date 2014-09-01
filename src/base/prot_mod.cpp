@@ -83,4 +83,13 @@ ProtModPtr ProtModFactory::getBaseProtModPtrByName(const std::string &name) {
   return ProtModPtr(nullptr);
 }
 
+bool containNME_ACETYLATION(const ProtModPtrVec &prot_mod_ptrs) {
+  for (size_t i = 0; i < prot_mod_ptrs.size(); i++) {
+    if (prot_mod_ptrs[i] == ProtModFactory::getProtModPtr_NME_ACETYLATION ()) {
+      return true;
+    }
+  }
+  return false;
+}
+
 }

@@ -17,10 +17,7 @@ private:
     PtmFastFilterBlockPtr filter_ptr_;
 
     void processBlock(int block, const std::string &sp_file_name,int n_spectra);
-    SimplePrsmPtrVec2D readSimplePrsm(const std::string &sp_file_name);
-    SimplePrsmPtrVec2D getBestMatch(const SimplePrsmPtrVec2D &match_ptrs,
-                                    MsHeaderPtr header_ptr);
-    void combineBlock();
+
 };
 
 typedef std::shared_ptr<PtmFastFilterProcessor> PtmFastFilterProcessorPtr;
