@@ -17,21 +17,21 @@ namespace prot {
 
 class XmlGenerator {
  public:
-  XmlGenerator(PrsmParaPtr prsm_para_ptr, std::string exec_dir, 
-               std::string input_file);
+  XmlGenerator(PrsmParaPtr prsm_para_ptr, const std::string &exec_dir, 
+               const std::string &input_file_name);
   void process();
-  void outputPrsms(PrsmPtrVec prsms);
-  void outputAllPrsms(PrsmPtrVec prsms);
-  void outputSpecies(PrsmPtrVec prsms);
-  void outputProteins(PrsmPtrVec prsms);
-  void outputAllProteins(PrsmPtrVec prsms);
+  void outputPrsms(const PrsmPtrVec &prsm_ptrs);
+  void outputAllPrsms(const PrsmPtrVec &prsm_ptrs);
+  void outputSpecies(const PrsmPtrVec &prsm_ptrs);
+  void outputProteins(const PrsmPtrVec &prsm_ptrs);
+  void outputAllProteins(const PrsmPtrVec &prsm_ptrs);
   void outputFileList();
 
  private:
-  std::string input_file_;
-  PrsmViewMngPtr mng_;
-  ProteoformPtrVec raw_forms_;
-  AnnoViewPtr anno_view_;
+  std::string input_file_name_;
+  PrsmViewMngPtr mng_ptr_;
+  ProteoformPtrVec proteo_ptrs_;
+  AnnoViewPtr anno_view_ptr_;
 };
 
 typedef std::shared_ptr<XmlGenerator> XmlGeneratorPtr;

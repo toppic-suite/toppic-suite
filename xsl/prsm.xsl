@@ -741,24 +741,6 @@
 <br/>
 </xsl:if>
 
-<xsl:text disable-output-escaping="yes">Unknown PTM:&amp;nbsp;</xsl:text>
-<br/><br/>
-<xsl:if test="../unknow_ptm_number != 0">
-<table border="1" style="margin-left: 50" >
-<tr>
-    <td width="140">Monoisotopic mass</td>
-</tr>
-<xsl:for-each select="shift" >
-   <xsl:if test="known_type = 4">
-	<tr>
-	<td align="center"><xsl:value-of select="mass"/></td>
-	</tr>
-   </xsl:if>
-</xsl:for-each>
-</table>
-</xsl:if>
-
-
 
 </div>
 </xsl:template>

@@ -100,8 +100,13 @@ double getDoubleChildValue(xercesc::DOMElement* parent,
 
 int getIntChildValue(xercesc::DOMElement* parent,  
                      const char* child_tag, int i) {
-  std::string value = getChildValue(parent, child_tag, i);
-  return std::stoi(value);
+  try {
+    std::string value = getChildValue(parent, child_tag, i);
+    return std::stoi(value);
+  }
+  catch (std::string s) {
+    return 0;
+  }
 }
 
 bool getBoolChildValue(xercesc::DOMElement* parent,

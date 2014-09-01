@@ -27,6 +27,7 @@ Proteoform::Proteoform(xercesc::DOMElement* element,
 
   start_pos_ = getIntChildValue(element, "start_pos", 0);
   end_pos_ = getIntChildValue(element, "end_pos", 0);
+  species_id_ = getIntChildValue(element, "species_id", 0);
 
   xercesc::DOMElement* db_element= getChildElement(element,"db_residue_seq",0);
   int db_seq_id = getIntChildValue(db_element, "id", 0);
@@ -38,6 +39,7 @@ Proteoform::Proteoform(xercesc::DOMElement* element,
               << db_proteoform->getSeqName() << " xml name " << db_seq_name);
     std::exit(0);
   }
+  
   db_residue_seq_ptr_ = db_proteoform->getDbResSeqPtr();
 
   xercesc::DOMElement* mod_element= getChildElement(element,"prot_mod",0);
@@ -221,6 +223,9 @@ void Proteoform::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
   xml_doc->addElement(element, "start_pos", str.c_str());
   str = convertToString(end_pos_);
   xml_doc->addElement(element, "end_pos", str.c_str());
+  str = convertToString(species_id_);
+  xml_doc->addElement(element, "species_id", str.c_str());
+
   db_residue_seq_ptr_->appendXml(xml_doc,element);
   prot_mod_ptr_->appendxml(xml_doc,element);
   //    residue_seq_ptr_->appendXml(xml_doc,element);

@@ -4,7 +4,7 @@
 
 namespace prot {
 
-void translate(std::map<std::string,std::string> arguments) {
+void translate(std::map<std::string,std::string> &arguments) {
   std::string spectrum_file_name_ = arguments["spectrumFileName"];
   std::string xml_dir = basename(spectrum_file_name_) + "_xml";
   std::string html_dir = basename(spectrum_file_name_) + "_html";
@@ -32,6 +32,7 @@ void translate(std::map<std::string,std::string> arguments) {
     const char* xml_in = anno_view[i][0].c_str();
     const char* xsl_in = anno_view[i][1].c_str();
     const char* xml_out = anno_view[i][2].c_str();
+    LOG_DEBUG("xml in " << xml_in << " xsl in " << xsl_in << " xml out " << xml_out);
 
     theXanlanTransformer.transform(xml_in,xsl_in,xml_out);
   }

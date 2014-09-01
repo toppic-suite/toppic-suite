@@ -306,29 +306,53 @@ xercesc::DOMElement* proteinToXml(XmlDOMDocument* xml_doc,
   return prot_element;
 }
 
+PrsmPtr getBestEValuePrsmPtr (ProteoformPtr proteo_ptr, const PrsmPtrVec &prsm_ptrs) {
+  PrsmPtr best_ptr(nullptr);
+  double best_evalue = std::numeric_limits<double>::max();
+  int seq_id = proteo_ptr->getDbResSeqPtr()->getId();
+  for (size_t i = 0; i < prsm_ptrs.size(); i++) {
+    if (prsm_ptrs[i]->getProteoformPtr()->getDbResSeqPtr()->getId() == seq_id && 
+        prsm_ptrs[i]->getEValue() < best_evalue) {
+      best_evalue = prsm_ptrs[i]->getEValue();
+      best_ptr = prsm_ptrs[i];
+    }
+  }
+  return best_ptr;
+}
+
+inline bool evalueCompare(const std::pair<ProteoformPtr, double> &a, const std::pair<ProteoformPtr, double> &b) {
+    return a.second < b.second;
+}
+
+
 xercesc::DOMElement* allProteinToXml(XmlDOMDocument* xml_doc,
                                   const PrsmPtrVec &prsm_ptrs,
                                   const ProteoformPtrVec &proteo_ptrs,
                                   PrsmViewMngPtr mng_ptr){
   xercesc::DOMElement* prot_elements = xml_doc->createElement("proteins");
+  // sort 
+  std::vector<std::pair<ProteoformPtr, double>> proteo_evalues;
   for(size_t i=0;i<proteo_ptrs.size();i++){
-    std::vector<int> species_ids = getSpeciesIds(prsm_ptrs,proteo_ptrs[i]->getDbResSeqPtr()->getId());
-    if(species_ids.size()>0){
-      prot_elements->appendChild(proteinToXml(xml_doc,prsm_ptrs,proteo_ptrs[i],species_ids, mng_ptr));
+    PrsmPtr best_ptr = getBestEValuePrsmPtr (proteo_ptrs[i], prsm_ptrs);
+    if (best_ptr != nullptr) {
+      std::pair<ProteoformPtr, double> cur_proteo_evalue(proteo_ptrs[i], best_ptr->getEValue());
+      proteo_evalues.push_back(cur_proteo_evalue);
     }
   }
-//  std::string str=convertToString(protein->getSeqId());
-//  xml_doc->addElement(prot_element, "sequence_id", str.c_str());
-//  str=protein->getSeqName();
-//  xml_doc->addElement(prot_element, "sequence_name", str.c_str());
-//  int count = species.size();
-//  str=convertToString(count);
-//  xml_doc->addElement(prot_element, "species_number", str.c_str());
-//  for(size_t i=0;i<species.size();i++){
-//    PrsmPtrVec select_prsms = selectSpeciesPrsms(prsms,species[i]);
-//    std::sort(select_prsms.begin(),select_prsms.end(),prsmEValueDown);
-//    prot_element->appendChild(speciesToXml(xml_doc,select_prsms));
-//  }
+  std::sort(proteo_evalues.begin(), proteo_evalues.end(), evalueCompare);
+  /*
+  for (size_t i = 0; i < proteo_evalues.size(); i++) {
+    LOG_DEBUG("rank " << i << " evalue " << proteo_evalues[i].second);
+  }
+  */
+
+  
+  for(size_t i=0;i<proteo_evalues.size();i++){
+    std::vector<int> species_ids = getSpeciesIds(prsm_ptrs,proteo_evalues[i].first->getDbResSeqPtr()->getId());
+    if(species_ids.size()>0){
+      prot_elements->appendChild(proteinToXml(xml_doc,prsm_ptrs,proteo_evalues[i].first,species_ids, mng_ptr));
+    }
+  }
   return prot_elements;
 }
 
