@@ -16,8 +16,8 @@
 #include "zeroptmsearch/zero_ptm_mng.hpp"
 #include "zeroptmsearch/zero_ptm_search.hpp"
 
-#include "filterdiagonal/ptm_fast_filter_mng.hpp"
-#include "filterdiagonal/ptm_fast_filter_processor.hpp"
+#include "diagfilter/diag_filter_mng.hpp"
+#include "diagfilter/diag_filter_processor.hpp"
 
 #include "oneptmfilter/one_ptm_filter_mng.hpp"
 #include "oneptmfilter/one_ptm_filter_processor.hpp"
@@ -69,11 +69,11 @@ int zero_ptm_process(int argc, char* argv[]) {
     zeroPtmSearchProcess(zero_mng_ptr);
 
     std::cout << "Fast filtering starts " << std::endl;
-    PtmFastFilterMngPtr filter_mng_ptr 
-        = PtmFastFilterMngPtr(new PtmFastFilterMng(prsm_para_ptr, "DIAG_FILTER"));
-    PtmFastFilterProcessorPtr filter_processor = PtmFastFilterProcessorPtr(new PtmFastFilterProcessor(filter_mng_ptr));
-    filter_processor->process();
-    filter_processor = nullptr;
+    DiagFilterMngPtr diag_filter_mng_ptr 
+        = DiagFilterMngPtr(new DiagFilterMng(prsm_para_ptr, "DIAG_FILTER"));
+    DiagFilterProcessorPtr diag_filter_processor = DiagFilterProcessorPtr(new DiagFilterProcessor(diag_filter_mng_ptr));
+    diag_filter_processor->process();
+    diag_filter_processor = nullptr;
     */
 
     std::cout << "One Ptm filtering starts " << std::endl;

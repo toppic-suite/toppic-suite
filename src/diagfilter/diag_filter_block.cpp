@@ -1,11 +1,11 @@
 #include <iostream>
 #include "base/proteoform.hpp"
-#include "filterdiagonal/ptm_fast_filter_block.hpp"
+#include "diagfilter/diag_filter_block.hpp"
 
 namespace prot {
 
-PtmFastFilterBlock::PtmFastFilterBlock(const ProteoformPtrVec &proteo_ptrs,
-                                       PtmFastFilterMngPtr mng_ptr){
+DiagFilterBlock::DiagFilterBlock(const ProteoformPtrVec &proteo_ptrs,
+                                       DiagFilterMngPtr mng_ptr){
   mng_ptr_ = mng_ptr;
   proteo_ptrs_ = proteo_ptrs;
   LOG_DEBUG("start init blocks.")
@@ -13,12 +13,11 @@ PtmFastFilterBlock::PtmFastFilterBlock(const ProteoformPtrVec &proteo_ptrs,
   LOG_DEBUG("init blocks is done.")
 }
 
-void PtmFastFilterBlock::initBlock(int i) {
-  filter_ptr_ = PtmFastFilterHiMemPtr(
-      new PtmFastFilterHiMem(proteo_blocks_[i],mng_ptr_));
+void DiagFilterBlock::initBlock(int i) {
+  filter_ptr_ = DiagFilterPtr(new DiagFilter(proteo_blocks_[i],mng_ptr_));
 }
 
-SimplePrsmPtrVec PtmFastFilterBlock::getBestMathBatch(
+SimplePrsmPtrVec DiagFilterBlock::getBestMathBatch(
     SpectrumSetPtr spectrum_set_ptr){
   PrmMsPtr ms_ptr = spectrum_set_ptr->getMsTwoPtr();
   return filter_ptr_->getBestMatch(ms_ptr);

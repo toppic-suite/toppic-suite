@@ -3,12 +3,12 @@
 
 #include "base/logger.hpp"
 #include "base/prot_mod.hpp"
-#include "filterdiagonal/comp_shift_hi_mem.hpp"
+#include "diagfilter/comp_shift.hpp"
 
 namespace prot {
 
-CompShiftHiMem::CompShiftHiMem(const ProteoformPtrVec &proteo_ptrs,
-                               PtmFastFilterMngPtr mng_ptr) {
+CompShift::CompShift(const ProteoformPtrVec &proteo_ptrs,
+                     DiagFilterMngPtr mng_ptr) {
   scale_ = mng_ptr->ptm_fast_filter_scale_;
   LOG_DEBUG("Scale: " << scale_);
   LOG_DEBUG("Proteoform number: " << proteo_ptrs.size());
@@ -22,7 +22,7 @@ CompShiftHiMem::CompShiftHiMem(const ProteoformPtrVec &proteo_ptrs,
   LOG_DEBUG("row number: " << row_num_);
 }
 
-CompShiftHiMem::~CompShiftHiMem(){
+CompShift::~CompShift(){
   delete[] proteo_row_begins_;
   delete[] row_proteo_ids_;
   delete[] col_index_begins_;
@@ -30,7 +30,7 @@ CompShiftHiMem::~CompShiftHiMem(){
   delete[] col_indexes_;
 }
 
-inline void CompShiftHiMem::initProteoformBeginEnds(const ProteoformPtrVec &proteo_ptrs, 
+inline void CompShift::initProteoformBeginEnds(const ProteoformPtrVec &proteo_ptrs, 
                                                     bool acetylation){
   //no need to init
   proteo_row_begins_ = new int[proteo_ptrs.size()];
@@ -58,7 +58,7 @@ inline void CompShiftHiMem::initProteoformBeginEnds(const ProteoformPtrVec &prot
   delete[] proteo_row_ends;
 }
 
-inline void CompShiftHiMem::updateColumnMatchNums(ProteoformPtr proteo_ptr, 
+inline void CompShift::updateColumnMatchNums(ProteoformPtr proteo_ptr, 
                                                   int* col_match_nums, 
                                                   bool acetylation) {
   std::vector<int> masses = proteo_ptr->getBpSpecPtr()->getScaledPrmMasses(scale_);
@@ -80,7 +80,7 @@ inline void CompShiftHiMem::updateColumnMatchNums(ProteoformPtr proteo_ptr,
   }
 }
 
-inline void CompShiftHiMem::initIndexes(const ProteoformPtrVec &proteo_ptrs, 
+inline void CompShift::initIndexes(const ProteoformPtrVec &proteo_ptrs, 
                                         bool acetylation){
   int* col_match_nums = new int[col_num_];
   // init col_match_nums
@@ -136,7 +136,7 @@ inline void CompShiftHiMem::initIndexes(const ProteoformPtrVec &proteo_ptrs,
 }
 
 
-std::vector<std::pair<int,int>> CompShiftHiMem::compConvolution(
+std::vector<std::pair<int,int>> CompShift::compConvolution(
     const std::vector<int> &masses,int bgn_pos,int num){
 
   short* scores = new short[row_num_];
@@ -168,7 +168,7 @@ std::vector<std::pair<int,int>> CompShiftHiMem::compConvolution(
   return results;
 }
 
-std::vector<std::pair<int,int>> CompShiftHiMem::compConvolution(
+std::vector<std::pair<int,int>> CompShift::compConvolution(
     const std::vector<int> &masses, const std::vector<int> &errors, int bgn_pos,int num){
 
   short* scores = new short[row_num_];
@@ -201,7 +201,7 @@ std::vector<std::pair<int,int>> CompShiftHiMem::compConvolution(
   return results;
 }
 
-inline std::vector<std::pair<int,int>> CompShiftHiMem::getShiftScores(short* scores,int num){
+inline std::vector<std::pair<int,int>> CompShift::getShiftScores(short* scores,int num){
   short* top_scores = new short[num];
   int* top_rows = new int[num];
   std::fill_n(top_scores, num, 0);

@@ -1,6 +1,6 @@
 include ../Makefile.in
 
-OBJS = $(FILTER_OBJS)
+OBJS = $(DIAG_FILTER_OBJS)
 
 BIN_DIR = ../../bin
 
