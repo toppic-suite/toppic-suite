@@ -17,7 +17,7 @@ all:
 	cd filterdiagonal; make
 	cd oneptmfilter; make
 	cd ptmsearch; make
-	cd xpp; make	
+	cd prsmview; make	
 	cd console; make
 	cd test; make
 
@@ -31,6 +31,6 @@ clean:
 	cd filterdiagonal; make clean
 	cd oneptmfilter; make clean
 	cd ptmsearch; make clean
-	cd xpp; make clean
+	cd prsm_view; make clean
 	cd console; make clean
 	cd test; make clean
