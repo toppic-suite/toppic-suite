@@ -51,9 +51,13 @@ typedef std::shared_ptr<Ms<ExtendPeakPtr>> ExtendMsPtr;
 ExtendMsPtr createMsThreePtr(DeconvMsPtr deconv_ms_ptr, double delta, 
                              SpParaPtr sp_para_ptr);
 
+std::pair<std::vector<int>, std::vector<int>> getExtendIntMassErrorList(
+    ExtendMsPtr ext_ms_ptr, double scale);
+
 inline bool extendPeakUp(const ExtendPeakPtr &a, const ExtendPeakPtr &b){
   return a->getPosition() < b->getPosition();
 }
+
 
 /* use inline to speedup */
 inline std::vector<double> getExtendMassVec (ExtendMsPtr extend_ms_ptr) {

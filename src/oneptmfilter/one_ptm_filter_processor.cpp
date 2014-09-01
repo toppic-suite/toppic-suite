@@ -3,7 +3,7 @@
 #include "base/file_util.hpp"
 #include "spec/msalign_reader.hpp"
 #include "prsm/simple_prsm_writer.hpp"
-#include "filterdiagonal/ptm_fast_filter_processor.hpp"
+#include "oneptmfilter/one_ptm_filter_processor.hpp"
 
 namespace prot {
 
@@ -19,7 +19,7 @@ OnePtmFilterProcessor::OnePtmFilterProcessor(OnePtmFilterMngPtr mng_ptr){
   LOG_DEBUG("init filter is done.");
 }
 
-void OnePtmFastProcessor::process(){
+void OnePtmFilterProcessor::process(){
   std::string sp_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
   int n_spectrum = countSpNum(sp_file_name);
   for(int i=0;i< filter_ptr_->getBlockSize();i++){
@@ -28,7 +28,7 @@ void OnePtmFastProcessor::process(){
     processBlock(i, sp_file_name, n_spectrum);
   }
   combineBlock(sp_file_name, filter_ptr_->getBlockSize(), mng_ptr_->output_file_ext_, 
-               mng_ptr_->ptm_fast_filter_result_num_);
+               mng_ptr_->one_ptm_filter_result_num_);
 }
 
 void OnePtmFilterProcessor::processBlock(int block, const std::string &sp_file_name,
