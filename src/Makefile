@@ -14,7 +14,7 @@ all:
 	cd zeroptmsearch; make
 #	cd poisson; make
 	cd tdgf; make
-	cd filterdiagonal; make
+	cd diagfilter; make
 	cd oneptmfilter; make
 	cd ptmsearch; make
 	cd prsmview; make	
@@ -28,9 +28,9 @@ clean:
 	cd poisson; make clean
 	cd zeroptmsearch; make clean
 	cd tdgf; make clean
-	cd filterdiagonal; make clean
+	cd diagfilter; make clean
 	cd oneptmfilter; make clean
 	cd ptmsearch; make clean
-	cd prsm_view; make clean
+	cd prsmview; make clean
 	cd console; make clean
 	cd test; make clean
