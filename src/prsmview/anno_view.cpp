@@ -1,6 +1,6 @@
 
 #include "spec/peak.hpp"
-#include "xpp/anno_view.hpp"
+#include "prsmview/anno_view.hpp"
 
 namespace prot{
 
@@ -38,7 +38,7 @@ std::vector<std::vector<std::string>> readViewXmlFiles(const std::string &file_n
   return file_list;
 }
 
-xercesc::DOMElement* genePrsmView(XmlDOMDocument* xml_doc,PrsmPtr prsm_ptr, ViewMngPtr mng_ptr){
+xercesc::DOMElement* genePrsmView(XmlDOMDocument* xml_doc,PrsmPtr prsm_ptr, PrsmViewMngPtr mng_ptr){
   xercesc::DOMElement* element = xml_doc->createElement("prsm");
   std::string str = convertToString(prsm_ptr->getId());
   xml_doc->addElement(element, "prsm_id", str.c_str());
@@ -132,7 +132,7 @@ xercesc::DOMElement* genePrsmView(XmlDOMDocument* xml_doc,PrsmPtr prsm_ptr, View
 xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
                                      ProteoformPtr proteoform_ptr,
                                      ExtendMsPtr ms_three_ptr,
-                                     ViewMngPtr mng_ptr) {
+                                     PrsmViewMngPtr mng_ptr) {
   xercesc::DOMElement* prot_element = xml_doc->createElement("annotated_protein");
   std::string str=convertToString(proteoform_ptr->getSeqId());
   xml_doc->addElement(prot_element, "sequence_id", str.c_str());
@@ -268,7 +268,7 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
 
 
 xercesc::DOMElement* speciesToXml(XmlDOMDocument* xml_doc, const PrsmPtrVec &prsm_ptrs, 
-                                  ViewMngPtr mng_ptr){
+                                  PrsmViewMngPtr mng_ptr){
   xercesc::DOMElement* species_element = xml_doc->createElement("species");
   std::string str=convertToString(prsm_ptrs[0]->getProteoformPtr()->getSeqId());
   xml_doc->addElement(species_element, "sequence_id", str.c_str());
@@ -289,7 +289,7 @@ xercesc::DOMElement* proteinToXml(XmlDOMDocument* xml_doc,
                                   const PrsmPtrVec &prsm_ptrs,
                                   ProteoformPtr proteo_ptr,
                                   const std::vector<int> &species_ids,
-                                  ViewMngPtr mng_ptr){
+                                  PrsmViewMngPtr mng_ptr){
   xercesc::DOMElement* prot_element = xml_doc->createElement("protein");
   std::string str=convertToString(proteo_ptr->getSeqId());
   xml_doc->addElement(prot_element, "sequence_id", str.c_str());
@@ -309,7 +309,7 @@ xercesc::DOMElement* proteinToXml(XmlDOMDocument* xml_doc,
 xercesc::DOMElement* allProteinToXml(XmlDOMDocument* xml_doc,
                                   const PrsmPtrVec &prsm_ptrs,
                                   const ProteoformPtrVec &proteo_ptrs,
-                                  ViewMngPtr mng_ptr){
+                                  PrsmViewMngPtr mng_ptr){
   xercesc::DOMElement* prot_elements = xml_doc->createElement("proteins");
   for(size_t i=0;i<proteo_ptrs.size();i++){
     std::vector<int> species_ids = getSpeciesIds(prsm_ptrs,proteo_ptrs[i]->getDbResSeqPtr()->getId());

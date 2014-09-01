@@ -7,8 +7,8 @@
 #include "prsm/prsm_para.hpp"
 #include "prsm/simple_prsm_table_writer.hpp"
 
-#include "diagfilter/diag_filter_mng.hpp"
-#include "diagfilter/diag_filter_processor.hpp"
+#include "oneptmfilter/one_ptm_filter_mng.hpp"
+#include "oneptmfilter/one_ptm_filter_processor.hpp"
 
 #include "console/argument.hpp"
 
@@ -48,9 +48,9 @@ int zero_ptm_process(int argc, char* argv[]) {
     long start_s = clock();
 
     std::cout << "Fast filtering starts " << std::endl;
-    DiagFilterMngPtr filter_mng_ptr 
-        = DiagFilterMngPtr(new DiagFilterMng(prsm_para_ptr, "FILTER"));
-    DiagFilterProcessorPtr filter_processor = DiagFilterProcessorPtr(new DiagFilterProcessor(filter_mng_ptr));
+    OnePtmFilterMngPtr filter_mng_ptr 
+        = OnePtmFilterMngPtr(new OnePtmFilterMng(prsm_para_ptr, "FILTER"));
+    OnePtmFilterProcessorPtr filter_processor = OnePtmFilterProcessorPtr(new OnePtmFilterProcessor(filter_mng_ptr));
     filter_processor->process();
     filter_processor = nullptr;
 

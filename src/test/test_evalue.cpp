@@ -9,14 +9,18 @@
 #include "prsm/prsm_selector.hpp"
 #include "prsm/output_selector.hpp"
 #include "prsm/prsm_species.hpp"
+#include "prsm/simple_prsm_writer.hpp"
 #include "prsm/table_writer.hpp"
 #include "prsm/prsm_fdr.hpp"
 
 #include "zeroptmsearch/zero_ptm_mng.hpp"
 #include "zeroptmsearch/zero_ptm_search.hpp"
 
-#include "filterdiagonal/ptm_fast_filter_mng.hpp"
-#include "filterdiagonal/ptm_fast_filter_processor.hpp"
+#include "diagfilter/diag_filter_mng.hpp"
+#include "diagfilter/diag_filter_processor.hpp"
+
+#include "oneptmfilter/one_ptm_filter_mng.hpp"
+#include "oneptmfilter/one_ptm_filter_processor.hpp"
 
 #include "ptmsearch/ptm_mng.hpp"
 #include "ptmsearch/ptm_processor.hpp"
@@ -65,11 +69,21 @@ int zero_ptm_process(int argc, char* argv[]) {
     zeroPtmSearchProcess(zero_mng_ptr);
 
     std::cout << "Fast filtering starts " << std::endl;
-    PtmFastFilterMngPtr filter_mng_ptr 
-        = PtmFastFilterMngPtr(new PtmFastFilterMng(prsm_para_ptr, "FILTER"));
-    PtmFastFilterProcessorPtr filter_processor = PtmFastFilterProcessorPtr(new PtmFastFilterProcessor(filter_mng_ptr));
-    filter_processor->process();
-    filter_processor = nullptr;
+    DiagFilterMngPtr diag_filter_mng_ptr 
+        = DiagFilterMngPtr(new DiagFilterMng(prsm_para_ptr, "DIAG_FILTER"));
+    DiagFilterProcessorPtr diag_filter_processor = DiagFilterProcessorPtr(new DiagFilterProcessor(diag_filter_mng_ptr));
+    diag_filter_processor->process();
+    diag_filter_processor = nullptr;
+    */
+
+    std::cout << "One Ptm filtering starts " << std::endl;
+    OnePtmFilterMngPtr one_ptm_filter_mng_ptr 
+        = OnePtmFilterMngPtr(new OnePtmFilterMng(prsm_para_ptr, "ONE_PTM_FILTER"));
+    OnePtmFilterProcessorPtr one_ptm_filter_processor = OnePtmFilterProcessorPtr(new OnePtmFilterProcessor(one_ptm_filter_mng_ptr));
+    one_ptm_filter_processor->process();
+    one_ptm_filter_processor = nullptr;
+
+    combineSimplePrsms(sp_file_name, "ONE_PTM_FILTER_COMBINED", "DIAG_FILTER_COMBINED", "FILTER_COMBINED");
 
     std::cout << "Ptm searching starts" << std::endl;
     PtmMngPtr ptm_mng_ptr = PtmMngPtr(new PtmMng(prsm_para_ptr, n_top, shift_num,
@@ -87,7 +101,6 @@ int zero_ptm_process(int argc, char* argv[]) {
     combine_processor->process();
     combine_processor = nullptr;
     std::cout << "Combining prsms finished." << std::endl;
-    */
 
     int start_s = clock();
 
@@ -106,6 +119,59 @@ int zero_ptm_process(int argc, char* argv[]) {
     TableWriterPtr table_writer_ptr = TableWriterPtr(new TableWriter(prsm_para_ptr, "EVALUE", "EVALUE_TABLE"));
     table_writer_ptr->write();
     table_writer_ptr = nullptr;
+    std::cout << "Outputting table finished." << std::endl;
+
+    if (arguments["searchType"]=="TARGET") { 
+      std::cout << "Top prsm selecting starts" << std::endl;
+      PrsmSelectorPtr selector = PrsmSelectorPtr(new PrsmSelector(db_file_name, sp_file_name, "EVALUE", "TOP", n_top));
+      selector->process();
+      selector = nullptr;
+      std::cout << "Top prsm selecting finished." << std::endl;
+    }
+    else {
+      std::cout << "Top prsm selecting starts " << std::endl;
+      PrsmSelectorPtr selector = PrsmSelectorPtr(new PrsmSelector(db_file_name, sp_file_name, "EVALUE", "TOP_PRE", n_top));
+      selector->process();
+      selector = nullptr;
+      std::cout << "Top prsm selecting finished." << std::endl;
+
+      TableWriterPtr table_writer_ptr = TableWriterPtr(new TableWriter(prsm_para_ptr, "TOP_PRE", "TOP_PRE_TABLE"));
+      table_writer_ptr->write();
+      table_writer_ptr = nullptr;
+      std::cout << "Outputting table finished." << std::endl;
+
+      std::cout << "FDR computation starts " << std::endl;
+      PrsmFdrPtr fdr = PrsmFdrPtr(new PrsmFdr(db_file_name, sp_file_name, "TOP_PRE", "TOP"));
+      fdr->process();
+      fdr = nullptr;
+      std::cout << "FDR computation finished." << std::endl;
+    }
+
+    std::cout << "Prsm cutoff selecting starts " << std::endl;
+    std::string cutoff_type = arguments["cutoffValue"];
+    double cutoff_value;
+    std::istringstream (arguments["cutoffValue"]) >> cutoff_value;
+    OutputSelectorPtr output_selector = OutputSelectorPtr(
+        new OutputSelector(db_file_name, sp_file_name, "TOP", "CUTOFF_RESULT", 
+                           cutoff_type, cutoff_value));
+    output_selector->process();
+    output_selector = nullptr;
+    std::cout << "Prsm cutoff selecting finished." << std::endl;
+
+    std::cout << "Finding species starts " << std::endl;
+    double ppo;
+    std::istringstream (arguments["error_tolerance"]) >> ppo;
+    ppo = ppo /1000000.0;
+    PrsmSpeciesPtr prsm_species = PrsmSpeciesPtr(new PrsmSpecies(db_file_name, sp_file_name, 
+                                                                 "CUTOFF_RESULT", "OUTPUT_RESULT", ppo));
+    prsm_species->process();
+    prsm_species = nullptr;
+    std::cout << "Finding species finished." << std::endl;
+
+    std::cout << "Outputting table starts " << std::endl;
+    TableWriterPtr table_out = TableWriterPtr(new TableWriter(prsm_para_ptr, "OUTPUT_RESULT", "OUTPUT_TABLE"));
+    table_out->write();
+    table_out = nullptr;
     std::cout << "Outputting table finished." << std::endl;
 
 

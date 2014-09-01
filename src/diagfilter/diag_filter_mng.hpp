@@ -1,15 +1,15 @@
 
-#ifndef PROT_PTM_FASTFILTER_MNG_HPP_
-#define PROT_PTM_FASTFILTER_MNG_HPP_
+#ifndef PROT_DIAG_FILTER_MNG_HPP_
+#define PROT_DIAG_FILTER_MNG_HPP_
 
 #include "prsm/prsm_para.hpp"
 
 namespace prot {
 
-class PtmFastFilterMng {
+class DiagFilterMng {
  public:
 
-  PtmFastFilterMng(PrsmParaPtr prsm_para_ptr, std::string output_file_ext) {
+  DiagFilterMng(PrsmParaPtr prsm_para_ptr, const std::string &output_file_ext) {
     prsm_para_ptr_ = prsm_para_ptr;
     output_file_ext_ = output_file_ext;
   }
@@ -28,8 +28,8 @@ class PtmFastFilterMng {
 
 };
 
-typedef std::shared_ptr<PtmFastFilterMng> PtmFastFilterMngPtr;
+typedef std::shared_ptr<DiagFilterMng> DiagFilterMngPtr;
 
 } /* namespace tools */
 
-#endif /* PTM_FASTFILTER_MNG_HPP_ */
+#endif /* DIAG_FILTER_MNG_HPP_ */

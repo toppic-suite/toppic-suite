@@ -2,14 +2,14 @@
 
 #include "base/file_util.hpp"
 #include "prsm/prsm_species.hpp"
-#include "xpp/xml_generator.hpp"
+#include "prsmview/xml_generator.hpp"
 
 namespace prot {
 XmlGenerator::XmlGenerator(PrsmParaPtr prsm_para_ptr, 
                            std::string exec_dir, 
                            std::string input_file) {
   input_file_ = input_file;
-  mng_ = ViewMngPtr(new ViewMng(prsm_para_ptr, exec_dir));
+  mng_ = PrsmViewMngPtr(new PrsmViewMng(prsm_para_ptr, exec_dir));
   anno_view_ = AnnoViewPtr(new AnnoView());
 }
 

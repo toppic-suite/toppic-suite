@@ -10,6 +10,7 @@
 namespace prot {
 
 #define PROT_MOD_NONE "NONE"
+#define PROT_MOD_NME_ACETYLATION "NME_ACETYLATION"
 
 class ProtMod {
  public:
@@ -60,9 +61,15 @@ class ProtModFactory {
     return getBaseProtModPtrByName(PROT_MOD_NONE);
   }
 
+  static ProtModPtr getProtModPtr_NME_ACETYLATION () {
+    return getBaseProtModPtrByName(PROT_MOD_NME_ACETYLATION);
+  }
+
  private:
   static ProtModPtrVec prot_mod_ptr_vec_;
 };
+
+bool containNME_ACETYLATION(const ProtModPtrVec &prot_mod_ptrs);
 
 }
 #endif

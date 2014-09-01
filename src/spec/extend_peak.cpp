@@ -85,4 +85,29 @@ ExtendMsPtr createMsThreePtr(DeconvMsPtr deconv_ms_ptr, double delta,
   return ExtendMsPtr(new Ms<ExtendPeakPtr>(header_ptr,list_filtered, ppo));
 }
 
+std::pair<std::vector<int>, std::vector<int>> getExtendIntMassErrorList(
+    ExtendMsPtr ext_ms_ptr, double scale) {
+  std::vector<int> masses;
+  std::vector<int> errors;
+  int last_mass = -1;
+  int last_error = 0;
+  for(size_t i=0;i<ext_ms_ptr->size();i++){
+    int m = (int)std::round(ext_ms_ptr->getPeakPtr(i)->getPosition()*scale);
+    int e = (int) std::ceil(ext_ms_ptr->getPeakPtr(i)->getOrigTolerance()*scale);
+    if(m != last_mass){
+      masses.push_back(m);
+      errors.push_back(e);
+      last_mass = m;
+      last_error = e;
+    }
+    else if(e>last_error){
+      errors.pop_back();
+      errors.push_back(e);
+      last_error = e;
+    }
+  }
+  std::pair<std::vector<int>, std::vector<int>> results( masses, errors);
+  return results;
+}
+
 } /* namespace prot */

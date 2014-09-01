@@ -4,22 +4,22 @@
 #include "base/file_util.hpp"
 #include "spec/msalign_reader.hpp"
 #include "prsm/simple_prsm_writer.hpp"
-#include "filterdiagonal/ptm_fast_filter_processor.hpp"
+#include "diagfilter/diag_filter_processor.hpp"
 
 namespace prot {
 
-PtmFastFilterProcessor::PtmFastFilterProcessor(PtmFastFilterMngPtr mng_ptr){
+DiagFilterProcessor::DiagFilterProcessor(DiagFilterMngPtr mng_ptr){
   mng_ptr_ = mng_ptr;
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   ProteoformPtrVec proteoform_ptrs 
       = readFastaToProteoform(prsm_para_ptr->getSearchDbFileName(),
                               prsm_para_ptr->getFixModResiduePtrVec());
   LOG_DEBUG("start init filter.");
-  filter_ptr_ = PtmFastFilterBlockPtr(new PtmFastFilterBlock(proteoform_ptrs, mng_ptr_));
+  filter_ptr_ = DiagFilterBlockPtr(new DiagFilterBlock(proteoform_ptrs, mng_ptr_));
   LOG_DEBUG("init filter is done.");
 }
 
-void PtmFastFilterProcessor::process(){
+void DiagFilterProcessor::process(){
   std::string sp_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
   int n_spectrum = countSpNum(sp_file_name);
   for(int i=0;i< filter_ptr_->getBlockSize();i++){
@@ -27,11 +27,12 @@ void PtmFastFilterProcessor::process(){
         << filter_ptr_->getBlockSize() << " starts" << std::endl; 
     processBlock(i, sp_file_name, n_spectrum);
   }
-  combineBlock();
+  combineBlock(sp_file_name, filter_ptr_->getBlockSize(), mng_ptr_->output_file_ext_, 
+               mng_ptr_->ptm_fast_filter_result_num_);
 }
 
-void PtmFastFilterProcessor::processBlock(int block, const std::string &sp_file_name,
-                                          int n_spectra){
+void DiagFilterProcessor::processBlock(int block, const std::string &sp_file_name,
+                                       int n_spectra){
   filter_ptr_->initBlock(block);
   MsAlignReader reader(sp_file_name);
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
@@ -58,50 +59,5 @@ void PtmFastFilterProcessor::processBlock(int block, const std::string &sp_file_
       << " finished. " << std::endl;
 }
 
-void PtmFastFilterProcessor::combineBlock(){
-  SimplePrsmPtrVec2D match_ptrs;
-
-  std::string sp_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
-
-  for(int i=0;i<filter_ptr_->getBlockSize();i++){
-    std::string block_file_name = basename(sp_file_name) + 
-        "." + mng_ptr_->output_file_ext_+"_"+std::to_string(i);
-    match_ptrs.push_back(readSimplePrsms(block_file_name));
-  }
-
-  std::vector<int> pointers(filter_ptr_->getBlockSize());
-
-  MsAlignReader reader(sp_file_name);
-  std::string output_file_name = basename(sp_file_name) 
-      + "." + mng_ptr_->output_file_ext_+"_COMBINED";
-  SimplePrsmWriter writer(output_file_name);
-  DeconvMsPtr deconv_ms_ptr;
-  while((deconv_ms_ptr = reader.getNextMs()) != nullptr){
-    SimplePrsmPtrVec selected_match_ptrs;
-    for(size_t i = 0;i<match_ptrs.size();i++){
-      for(size_t j = pointers[i]; j <match_ptrs[i].size(); j++){
-        if(match_ptrs[i][j]->isSameSpectrum(deconv_ms_ptr->getHeaderPtr())){
-          selected_match_ptrs.push_back(match_ptrs[i][j]);
-        }
-        if (match_ptrs[i][j]->isLargerSpectrumId(deconv_ms_ptr->getHeaderPtr())) {
-          pointers[i] = j;
-          break;
-        }
-      }
-    }
-    std::sort(selected_match_ptrs.begin(),selected_match_ptrs.end(),simplePrsmDown);
-    SimplePrsmPtrVec result_match_ptrs;
-    for(size_t i=0; i < selected_match_ptrs.size(); i++){
-      if( i >= mng_ptr_-> ptm_fast_filter_result_num_){
-        break;
-      }
-      result_match_ptrs.push_back(selected_match_ptrs[i]);
-    }
-
-    writer.write(result_match_ptrs);
-  }
-  reader.close();
-  writer.close();
-}
 
 } /* namespace prot */

@@ -88,7 +88,7 @@ int zero_ptm_process(int argc, char* argv[]) {
 
     std::cout << "E-value computation starts" << std::endl;
     TdgfMngPtr tdgf_mng_ptr = TdgfMngPtr(new TdgfMng (prsm_para_ptr, shift_num, max_ptm_mass,
-                                                      "POISSON_EVALUE", "EVALUE"));
+                                                      "RAW_RESULT", "EVALUE"));
     EValueProcessorPtr processor = EValueProcessorPtr(new EValueProcessor(tdgf_mng_ptr));
     processor->init();
     // compute E-value for a set of prsms each run 

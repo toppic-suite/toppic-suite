@@ -19,6 +19,14 @@ class SimplePrsmWriter {
   std::ofstream file_;
 };
 
+void combineBlock(const std::string &sp_file_name, int block_size, 
+                  const std::string &output_file_ext, unsigned int result_num);
+
+void combineSimplePrsms(const std::string &sp_file_name,  
+                        const std::string &input_file_ext_1,
+                        const std::string &input_file_ext_2,
+                        const std::string &output_file_ext); 
+
 } /* namespace prot */
 
 #endif /* SIMPLE_PRSM_WRITER_HPP_ */

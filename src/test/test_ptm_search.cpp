@@ -8,8 +8,8 @@
 #include "prsm/simple_prsm_table_writer.hpp"
 #include "prsm/table_writer.hpp"
 
-#include "filterdiagonal/ptm_fast_filter_mng.hpp"
-#include "filterdiagonal/ptm_fast_filter_processor.hpp"
+#include "diagfilter/diag_filter_mng.hpp"
+#include "diagfilter/diag_filter_processor.hpp"
 
 #include "ptmsearch/ptm_mng.hpp"
 #include "ptmsearch/ptm_processor.hpp"
@@ -51,9 +51,9 @@ int zero_ptm_process(int argc, char* argv[]) {
     }
 
     std::cout << "Fast filtering starts " << std::endl;
-    PtmFastFilterMngPtr filter_mng_ptr 
-        = PtmFastFilterMngPtr(new PtmFastFilterMng(prsm_para_ptr, "FILTER"));
-    PtmFastFilterProcessorPtr filter_processor = PtmFastFilterProcessorPtr(new PtmFastFilterProcessor(filter_mng_ptr));
+    DiagFilterMngPtr filter_mng_ptr 
+        = DiagFilterMngPtr(new DiagFilterMng(prsm_para_ptr, "FILTER"));
+    DiagFilterProcessorPtr filter_processor = DiagFilterProcessorPtr(new DiagFilterProcessor(filter_mng_ptr));
     filter_processor->process();
     filter_processor = nullptr;
 
