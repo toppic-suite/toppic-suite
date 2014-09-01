@@ -15,6 +15,7 @@ all:
 #	cd poisson; make
 	cd tdgf; make
 	cd filterdiagonal; make
+	cd oneptmfilter; make
 	cd ptmsearch; make
 	cd xpp; make	
 	cd console; make
@@ -28,6 +29,7 @@ clean:
 	cd zeroptmsearch; make clean
 	cd tdgf; make clean
 	cd filterdiagonal; make clean
+	cd oneptmfilter; make clean
 	cd ptmsearch; make clean
 	cd xpp; make clean
 	cd console; make clean

@@ -13,16 +13,13 @@ class OnePtmCompShift {
 
   ~OnePtmCompShift();
 
-  std::vector<std::pair<int,int>> compConvolution(std::vector<int> &masses,
-                                                  int bgn_pos,int num);
-
   std::vector<std::pair<int,int>> compConvolution(std::vector<int> &masses, 
-                                                  std::vector<int> &errors,
-                                                  int bgn_pos,int num);
+                                                  std::vector<int> &errors, int num);
 
  private:
   // scale factor
   int scale_;
+  bool acetylation_;
   int proteo_num_;
   int col_num_;
 
@@ -41,13 +38,11 @@ class OnePtmCompShift {
   int* rev_col_index_ends_;
   int* rev_col_indexes_;
 
-  void updateColumnMatchNums(ProteoformPtr proteo_ptr, int* col_match_nums, 
-                             bool acetylation);
-  void initProteoformBeginEnds(const ProteoformPtrVec &proteo_ptrs, bool acetylation);
-  void initIndexes(const ProteoformPtrVec &proteo_ptrs, bool acetylation);
-  void updateRevColumnMatchNums(ProteoformPtr proteo_ptr, int* col_match_nums, 
-                                bool acetylation);
-  void initRevIndexes(const ProteoformPtrVec &proteo_ptrs, bool acetylation);
+  void updateColumnMatchNums(ProteoformPtr proteo_ptr, int* col_match_nums);
+  void initProteoformBeginEnds(const ProteoformPtrVec &proteo_ptrs);
+  void initIndexes(const ProteoformPtrVec &proteo_ptrs);
+  void updateRevColumnMatchNums(ProteoformPtr proteo_ptr, int* col_match_nums);
+  void initRevIndexes(const ProteoformPtrVec &proteo_ptrs);
   std::vector<std::pair<int,int>> getShiftScores(short* scores, short* rev_scores, int num);
 };
 

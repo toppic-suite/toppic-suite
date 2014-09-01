@@ -11,7 +11,7 @@ PtmFastFilterHiMem::PtmFastFilterHiMem(const ProteoformPtrVec &proteo_ptrs,
   index_ptr_ = CompShiftHiMemPtr(new CompShiftHiMem(proteo_ptrs, mng_ptr));
 }
 
-inline SimplePrsmPtrVec PtmFastFilterHiMem::getBestMatch(PrmMsPtr ms_ptr){
+SimplePrsmPtrVec PtmFastFilterHiMem::getBestMatch(PrmMsPtr ms_ptr){
   SimplePrsmPtrVec match_ptrs = compute(ms_ptr);
   SimplePrsmPtrVec unique_match_ptrs = getUniqueMatches(match_ptrs);
   std::sort(unique_match_ptrs.begin(), unique_match_ptrs.end(),simplePrsmDown);

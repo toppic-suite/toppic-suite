@@ -20,7 +20,7 @@ class OnePtmFilterMng {
   int max_proteoform_mass = 50000;
 
   //Candidate protein number for each spectrum
-  size_t ptm_fast_filter_result_num_ = 10;
+  unsigned int one_ptm_filter_result_num_ = 20;
   int db_block_size_ = 5000000;
   int ptm_fast_filter_scale_ = 100;
 

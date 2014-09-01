@@ -20,7 +20,7 @@ private:
 
 };
 
-typedef std::shared_ptr<PtmFastFilterProcessor> PtmFastFilterProcessorPtr;
+typedef std::shared_ptr<OnePtmFilterProcessor> OnePtmFilterProcessorPtr;
 
 } /* namespace prot */
 

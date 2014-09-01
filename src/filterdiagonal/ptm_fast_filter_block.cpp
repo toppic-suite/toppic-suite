@@ -1,4 +1,5 @@
 #include <iostream>
+#include "base/proteoform.hpp"
 #include "filterdiagonal/ptm_fast_filter_block.hpp"
 
 namespace prot {

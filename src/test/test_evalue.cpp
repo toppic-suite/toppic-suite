@@ -9,6 +9,7 @@
 #include "prsm/prsm_selector.hpp"
 #include "prsm/output_selector.hpp"
 #include "prsm/prsm_species.hpp"
+#include "prsm/simple_prsm_writer.hpp"
 #include "prsm/table_writer.hpp"
 #include "prsm/prsm_fdr.hpp"
 
@@ -17,6 +18,9 @@
 
 #include "filterdiagonal/ptm_fast_filter_mng.hpp"
 #include "filterdiagonal/ptm_fast_filter_processor.hpp"
+
+#include "oneptmfilter/one_ptm_filter_mng.hpp"
+#include "oneptmfilter/one_ptm_filter_processor.hpp"
 
 #include "ptmsearch/ptm_mng.hpp"
 #include "ptmsearch/ptm_processor.hpp"
@@ -59,16 +63,27 @@ int zero_ptm_process(int argc, char* argv[]) {
       generateShuffleDb(ori_db_file_name, db_file_name);
     }
 
+    /*
     std::cout << "Zero ptm searching starts " << std::endl;
     ZeroPtmMngPtr zero_mng_ptr = ZeroPtmMngPtr(new ZeroPtmMng (prsm_para_ptr, "ZERO"));
     zeroPtmSearchProcess(zero_mng_ptr);
 
     std::cout << "Fast filtering starts " << std::endl;
     PtmFastFilterMngPtr filter_mng_ptr 
-        = PtmFastFilterMngPtr(new PtmFastFilterMng(prsm_para_ptr, "FILTER"));
+        = PtmFastFilterMngPtr(new PtmFastFilterMng(prsm_para_ptr, "DIAG_FILTER"));
     PtmFastFilterProcessorPtr filter_processor = PtmFastFilterProcessorPtr(new PtmFastFilterProcessor(filter_mng_ptr));
     filter_processor->process();
     filter_processor = nullptr;
+    */
+
+    std::cout << "One Ptm filtering starts " << std::endl;
+    OnePtmFilterMngPtr one_ptm_filter_mng_ptr 
+        = OnePtmFilterMngPtr(new OnePtmFilterMng(prsm_para_ptr, "ONE_PTM_FILTER"));
+    OnePtmFilterProcessorPtr one_ptm_filter_processor = OnePtmFilterProcessorPtr(new OnePtmFilterProcessor(one_ptm_filter_mng_ptr));
+    one_ptm_filter_processor->process();
+    one_ptm_filter_processor = nullptr;
+
+    combineSimplePrsms(sp_file_name, "ONE_PTM_FILTER_COMBINED", "DIAG_FILTER_COMBINED", "FILTER_COMBINED");
 
     std::cout << "Ptm searching starts" << std::endl;
     PtmMngPtr ptm_mng_ptr = PtmMngPtr(new PtmMng(prsm_para_ptr, n_top, shift_num,

@@ -481,7 +481,7 @@ bool isStrictCompatiablePtmSpecies(ProteoformPtr a, ProteoformPtr b,
   return true;
 }
 
-inline ProteoformPtrVec2D getProteoBlocks(const ProteoformPtrVec &proteo_ptrs, int db_block_size) {
+ProteoformPtrVec2D getProteoBlocks(const ProteoformPtrVec &proteo_ptrs, int db_block_size) {
   size_t start_idx = 0;
   size_t proteo_idx =0;
   int block_len=0;

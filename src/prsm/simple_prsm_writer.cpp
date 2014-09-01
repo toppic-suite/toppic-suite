@@ -82,4 +82,47 @@ void combineBlock(const std::string &sp_file_name, int block_size,
   writer.close();
 }
 
+void combineSimplePrsms(const std::string &sp_file_name,  
+                        const std::string &input_file_ext_1,
+                        const std::string &input_file_ext_2,
+                        const std::string &output_file_ext){
+  SimplePrsmPtrVec2D match_ptrs;
+
+  std::string input_file_name_1 = basename(sp_file_name) + "." + input_file_ext_1;
+  match_ptrs.push_back(readSimplePrsms(input_file_name_1));
+
+  std::string input_file_name_2 = basename(sp_file_name) + "." + input_file_ext_2;
+  match_ptrs.push_back(readSimplePrsms(input_file_name_2));
+
+  std::vector<int> pointers(2);
+
+  MsAlignReader reader(sp_file_name);
+  std::string output_file_name = basename(sp_file_name) + "." + output_file_ext;
+  SimplePrsmWriter writer(output_file_name);
+  DeconvMsPtr deconv_ms_ptr;
+  while((deconv_ms_ptr = reader.getNextMs()) != nullptr){
+    SimplePrsmPtrVec selected_match_ptrs;
+    for(size_t i = 0;i<match_ptrs.size();i++){
+      for(size_t j = pointers[i]; j <match_ptrs[i].size(); j++){
+        if(match_ptrs[i][j]->isSameSpectrum(deconv_ms_ptr->getHeaderPtr())){
+          selected_match_ptrs.push_back(match_ptrs[i][j]);
+        }
+        if (match_ptrs[i][j]->isLargerSpectrumId(deconv_ms_ptr->getHeaderPtr())) {
+          pointers[i] = j;
+          break;
+        }
+      }
+    }
+    std::sort(selected_match_ptrs.begin(),selected_match_ptrs.end(),simplePrsmDown);
+    SimplePrsmPtrVec result_match_ptrs;
+    for(size_t i=0; i < selected_match_ptrs.size(); i++){
+      result_match_ptrs.push_back(selected_match_ptrs[i]);
+    }
+
+    writer.write(result_match_ptrs);
+  }
+  reader.close();
+  writer.close();
+}
+
 } /* namespace prot */
