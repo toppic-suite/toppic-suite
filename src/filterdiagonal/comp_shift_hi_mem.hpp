@@ -35,9 +35,10 @@ class CompShiftHiMem {
   int* col_index_ends_;
   int* col_indexes_;
 
-  void updateColumnMatchNums(ProteoformPtr proteo_ptr, int* col_match_nums);
-  void initProteoformBeginEnds(const ProteoformPtrVec &proteo_ptrs);
-  void initIndexes(const ProteoformPtrVec &proteo_ptrs);
+  void updateColumnMatchNums(ProteoformPtr proteo_ptr, int* col_match_nums, 
+                             bool acetylation);
+  void initProteoformBeginEnds(const ProteoformPtrVec &proteo_ptrs, bool acetylation);
+  void initIndexes(const ProteoformPtrVec &proteo_ptrs, bool acetylation);
   std::vector<std::pair<int,int>> getShiftScores(short* scores, int num);
 };
 

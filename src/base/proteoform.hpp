@@ -127,6 +127,8 @@ bool isSamePeptideAndMass(ProteoformPtr a, ProteoformPtr b, double ppo);
 
 bool isStrictCompatiablePtmSpecies(ProteoformPtr a, ProteoformPtr b, double ppo);
 
+ProteoformPtrVec2D getProteoBlocks(const ProteoformPtrVec &proteo_ptrs, int db_block_size);
+
 } /* namespace prot */
 
 #endif /* PROTEOFORM_HPP_ */

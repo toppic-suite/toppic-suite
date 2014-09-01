@@ -27,7 +27,8 @@ void PtmFastFilterProcessor::process(){
         << filter_ptr_->getBlockSize() << " starts" << std::endl; 
     processBlock(i, sp_file_name, n_spectrum);
   }
-  combineBlock();
+  combineBlock(sp_file_name, filter_ptr_->getBlockSize(), mng_ptr_->output_file_ext_, 
+               mng_ptr_->ptm_fast_filter_result_num_);
 }
 
 void PtmFastFilterProcessor::processBlock(int block, const std::string &sp_file_name,
@@ -58,50 +59,5 @@ void PtmFastFilterProcessor::processBlock(int block, const std::string &sp_file_
       << " finished. " << std::endl;
 }
 
-void PtmFastFilterProcessor::combineBlock(){
-  SimplePrsmPtrVec2D match_ptrs;
-
-  std::string sp_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
-
-  for(int i=0;i<filter_ptr_->getBlockSize();i++){
-    std::string block_file_name = basename(sp_file_name) + 
-        "." + mng_ptr_->output_file_ext_+"_"+std::to_string(i);
-    match_ptrs.push_back(readSimplePrsms(block_file_name));
-  }
-
-  std::vector<int> pointers(filter_ptr_->getBlockSize());
-
-  MsAlignReader reader(sp_file_name);
-  std::string output_file_name = basename(sp_file_name) 
-      + "." + mng_ptr_->output_file_ext_+"_COMBINED";
-  SimplePrsmWriter writer(output_file_name);
-  DeconvMsPtr deconv_ms_ptr;
-  while((deconv_ms_ptr = reader.getNextMs()) != nullptr){
-    SimplePrsmPtrVec selected_match_ptrs;
-    for(size_t i = 0;i<match_ptrs.size();i++){
-      for(size_t j = pointers[i]; j <match_ptrs[i].size(); j++){
-        if(match_ptrs[i][j]->isSameSpectrum(deconv_ms_ptr->getHeaderPtr())){
-          selected_match_ptrs.push_back(match_ptrs[i][j]);
-        }
-        if (match_ptrs[i][j]->isLargerSpectrumId(deconv_ms_ptr->getHeaderPtr())) {
-          pointers[i] = j;
-          break;
-        }
-      }
-    }
-    std::sort(selected_match_ptrs.begin(),selected_match_ptrs.end(),simplePrsmDown);
-    SimplePrsmPtrVec result_match_ptrs;
-    for(size_t i=0; i < selected_match_ptrs.size(); i++){
-      if( i >= mng_ptr_-> ptm_fast_filter_result_num_){
-        break;
-      }
-      result_match_ptrs.push_back(selected_match_ptrs[i]);
-    }
-
-    writer.write(result_match_ptrs);
-  }
-  reader.close();
-  writer.close();
-}
 
 } /* namespace prot */
