@@ -169,6 +169,7 @@ std::string Proteoform::getProteinMatchSeq(){
   std::string mid_string = protein_string.substr(start_pos_,end_pos_+1);
   int mid_start=0;
   std::sort(change_list_.begin(),change_list_.end(),compareChangeUp);
+
   ChangePtrVec change_stack;
   for(size_t i=0;i<change_list_.size();i++){
     while(change_stack.size()>0){
@@ -210,7 +211,7 @@ std::string Proteoform::getProteinMatchSeq(){
     prefix = protein_string.substr(start_pos_-1,1);
   }
   std::string suffix = "";
-  if(end_pos_< (int)protein_string.length()-3){
+  if(end_pos_< (int)protein_string.length()-1){
     suffix = protein_string.substr(end_pos_+1,1);
   }
 

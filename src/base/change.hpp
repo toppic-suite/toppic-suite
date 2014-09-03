@@ -45,6 +45,26 @@ class Change {
 typedef std::shared_ptr<Change> ChangePtr;
 typedef std::vector<ChangePtr> ChangePtrVec;
 
+inline bool compareChangeTypeUpPosUp(const ChangePtr &a, const ChangePtr &b) {
+  if (a->getChangeType() < b->getChangeType()) {
+    return true;
+  }
+  else if (a->getChangeType() > b->getChangeType()) {
+    return false;
+  }
+  else {
+    if (a->getLeftBpPos() < b->getLeftBpPos()) {
+      return true;
+    }
+    else if (a->getLeftBpPos() > b->getLeftBpPos()) {
+      return false;
+    }
+    else {
+      return a->getRightBpPos() < b->getRightBpPos();
+    }
+  }
+}
+
 inline bool compareChangeUp(ChangePtr c1, ChangePtr c2) {
   if (c1->getLeftBpPos() < c2->getLeftBpPos()) {
     return true;

@@ -36,6 +36,7 @@ inline SimplePrsmPtrVec OnePtmFilter::compute(PrmMsPtr ms_ptr){
   std::pair<std::vector<int>, std::vector<int>> mass_errors 
       = getIntMassErrorList(ms_ptr, mng_ptr_->ptm_fast_filter_scale_, true, false);
   SimplePrsmPtrVec match_ptrs;
+  //LOG_DEBUG("start convolution");
   std::vector<std::pair<int,int>> results 
       =index_ptr_->compConvolution(mass_errors.first, mass_errors.second, 
                                    mng_ptr_->one_ptm_filter_result_num_);

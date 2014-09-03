@@ -123,11 +123,6 @@ inline void OnePtmCompShift::initIndexes(const ProteoformPtrVec &proteo_ptrs){
     for (size_t bgn=0; bgn < masses.size(); bgn++) {
       for (size_t cur = bgn+1; cur < masses.size(); cur++) {
         int diff = masses[cur] - masses[bgn];
-        /*
-        if (bgn == 0) {
-          LOG_DEBUG("INT MASS " << diff);
-        }
-        */
         if (diff < col_num_) {
           col_indexes_[col_index_pnts[diff]] = proteo_row_begins_[i] + bgn;
           col_index_pnts[diff]++;
@@ -205,6 +200,13 @@ inline void OnePtmCompShift::initRevIndexes(const ProteoformPtrVec &proteo_ptrs)
     for (size_t bgn=0; bgn < masses.size(); bgn++) {
       for (size_t cur = bgn+1; cur < masses.size(); cur++) {
         int diff = -(masses[cur] - masses[bgn]);
+        
+        /*
+        if (bgn == 0) {
+          LOG_DEBUG("INT MASS " << diff);
+        }
+        */
+
         if (diff < col_num_) {
           rev_col_indexes_[rev_col_index_pnts[diff]] = proteo_row_begins_[i] + bgn;
           rev_col_index_pnts[diff]++;
@@ -240,11 +242,11 @@ std::vector<std::pair<int,int>> OnePtmCompShift::compConvolution(
     }
     int right = m+errors[i];
     if(right < 0 || right >= col_num_){
-      break;
+      continue;
     }
+    //LOG_DEBUG("SP MASS " << m);
     begin_index = col_index_begins_[left];
     end_index= col_index_ends_[right];
-    //LOG_DEBUG("SP MASS " << m);
     for(int j=begin_index;j<=end_index;j++){
       scores[col_indexes_[j]]++;
       //LOG_DEBUG("ROW INDEX " << col_indexes_[j] << " score " << scores[col_indexes_[j]]);
@@ -256,16 +258,18 @@ std::vector<std::pair<int,int>> OnePtmCompShift::compConvolution(
 
   for(size_t i = 0; i<masses.size(); i++){
 
-    m = masses[i] - MassConstant::getWaterMass();
+    m = masses[i] - MassConstant::getWaterMass() * scale_;
+    //LOG_DEBUG("REV_SP MASS " << m);
     int left = m-errors[i];
+    //LOG_DEBUG("LEFT " << left);
     if(left < 0){
       left=0;
     }
     int right = m + errors[i];
+    //LOG_DEBUG("RIGHT " << right);
     if (right < 0 || right >= col_num_) {
-      break;
+      continue;
     }
-    //LOG_DEBUG("REV_SP MASS " << m);
     begin_index = rev_col_index_begins_[left];
     end_index= rev_col_index_ends_[right];
     for(int j=begin_index;j<=end_index;j++){
