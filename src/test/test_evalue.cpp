@@ -63,7 +63,6 @@ int zero_ptm_process(int argc, char* argv[]) {
       generateShuffleDb(ori_db_file_name, db_file_name);
     }
 
-    /*
     std::cout << "Zero ptm searching starts " << std::endl;
     ZeroPtmMngPtr zero_mng_ptr = ZeroPtmMngPtr(new ZeroPtmMng (prsm_para_ptr, "ZERO"));
     zeroPtmSearchProcess(zero_mng_ptr);
@@ -74,7 +73,6 @@ int zero_ptm_process(int argc, char* argv[]) {
     DiagFilterProcessorPtr diag_filter_processor = DiagFilterProcessorPtr(new DiagFilterProcessor(diag_filter_mng_ptr));
     diag_filter_processor->process();
     diag_filter_processor = nullptr;
-    */
 
     std::cout << "One Ptm filtering starts " << std::endl;
     OnePtmFilterMngPtr one_ptm_filter_mng_ptr 
