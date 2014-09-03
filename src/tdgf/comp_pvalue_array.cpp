@@ -30,7 +30,7 @@ void CompPValueArray::compMultiExtremeValues(PrmMsPtr ms_six_ptr,
                                              PrsmPtrVec &prsm_ptrs, 
                                              bool strict) {
   PrmPeakPtrVec prm_peak_ptrs = ms_six_ptr->getPeakPtrVec();
-  std::vector<double> prot_probs; 
+  std::vector<double> prot_probs;
   compProbArray(comp_prob_ptr_, prot_n_term_residue_ptrs_, 
                 prm_peak_ptrs, prsm_ptrs, strict, prot_probs);
   std::vector<double> pep_probs;
@@ -45,6 +45,7 @@ void CompPValueArray::compMultiExtremeValues(PrmMsPtr ms_six_ptr,
     SemiAlignTypePtr type_ptr = prsm_ptrs[i]->getProteoformPtr()->getSemiAlignType();
     double cand_num = test_num_ptr_->compCandNum(type_ptr, unexpect_shift_num, 
                                                  prec_mass, tolerance);
+    //LOG_DEBUG("Shift number " << unexpect_shift_num << " type " << type_ptr->getName() << " one prob " << prot_probs[i] << " cand num " << cand_num);
     //LOG_DEBUG("candidate number " << cand_num);
     if (cand_num == 0.0) {
       LOG_WARN("Zero candidate number");
