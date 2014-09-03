@@ -58,7 +58,8 @@ inline int CountTestNum::convertMass(double m) {
 
 /** initialize the four tables for mass counts */
 inline void CountTestNum::initCompMassCnt(const ProteoformPtrVec &mod_proteo_ptrs) {
-  comp_mass_cnts_ = new double[max_sp_len_]; 
+  // init to 0
+  comp_mass_cnts_ = new double[max_sp_len_](); 
   for (size_t i = 0; i < mod_proteo_ptrs.size(); i++) {
     double m = mod_proteo_ptrs[i]->getResSeqPtr()->getResMassSum();
     //System.out.println("mass " + m);
@@ -68,7 +69,8 @@ inline void CountTestNum::initCompMassCnt(const ProteoformPtrVec &mod_proteo_ptr
 
 /** initialize the four tables for mass counts */
 inline void CountTestNum::initPrefMassCnt(const ProteoformPtrVec &mod_proteo_ptrs) {
-  pref_mass_cnts_ = new double[max_sp_len_];
+  // init to 0
+  pref_mass_cnts_ = new double[max_sp_len_]();
   for (size_t i = 0; i < mod_proteo_ptrs.size(); i++) {
     std::vector<double> prm_masses = mod_proteo_ptrs[i]->getBpSpecPtr()->getPrmMasses();
     // prefix
@@ -81,7 +83,8 @@ inline void CountTestNum::initPrefMassCnt(const ProteoformPtrVec &mod_proteo_ptr
 /** initialize the four tables for mass counts */
 inline void CountTestNum::initSuffMassCnt(const ProteoformPtrVec &raw_proteo_ptrs) {
   // sequence mass 
-  suff_mass_cnts_ = new double[max_sp_len_];
+  // init to 0
+  suff_mass_cnts_ = new double[max_sp_len_]();
   for (size_t i = 0; i < raw_proteo_ptrs.size(); i++) {
     BreakPointPtrVec break_points = raw_proteo_ptrs[i]->getBpSpecPtr()->getBreakPointPtrVec();
     // suffix
@@ -92,7 +95,8 @@ inline void CountTestNum::initSuffMassCnt(const ProteoformPtrVec &raw_proteo_ptr
 }
 
 inline void CountTestNum::initInternalMassCnt() {
-  internal_mass_cnts_ = new double[max_sp_len_];
+  // init to 0
+  internal_mass_cnts_ = new double[max_sp_len_]();
   // middle
   double norm_count = 0;
   // use approxiation to speed up
@@ -138,6 +142,11 @@ double CountTestNum::compNonPtmCandNum(SemiAlignTypePtr type_ptr, int shift_num,
   int low = std::floor((ori_mass - ori_tolerance) * convert_ratio_);
   int high = std::ceil((ori_mass + ori_tolerance) * convert_ratio_);
   double cand_num = compSeqNum(type_ptr, low, high);
+  /*
+  if (type_ptr == SemiAlignTypeFactory::getCompletePtr()) {
+    LOG_DEBUG("low " << low << " high " << high << " cand num " << cand_num);
+  }
+  */
   return cand_num;
 }
 

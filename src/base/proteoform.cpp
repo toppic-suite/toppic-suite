@@ -127,6 +127,7 @@ ChangePtrVec Proteoform::getUnexpectedChangePtrVec(){
 
 SemiAlignTypePtr Proteoform::getSemiAlignType() {
   int trunc_len = prot_mod_ptr_->getTruncPtr()->getTruncLen();
+  //LOG_DEBUG("seq " << getProteinMatchSeq() << " trunc len " << trunc_len << " start pos " << start_pos_);
   bool is_prefix = false;
   if (start_pos_ == trunc_len) {
     is_prefix = true;

@@ -63,6 +63,7 @@ int zero_ptm_process(int argc, char* argv[]) {
       generateShuffleDb(ori_db_file_name, db_file_name);
     }
 
+    /*
     std::cout << "Zero ptm searching starts " << std::endl;
     ZeroPtmMngPtr zero_mng_ptr = ZeroPtmMngPtr(new ZeroPtmMng (prsm_para_ptr, "ZERO"));
     zeroPtmSearchProcess(zero_mng_ptr);
@@ -99,6 +100,7 @@ int zero_ptm_process(int argc, char* argv[]) {
     combine_processor->process();
     combine_processor = nullptr;
     std::cout << "Combining prsms finished." << std::endl;
+    */
 
     int start_s = clock();
 
@@ -118,7 +120,8 @@ int zero_ptm_process(int argc, char* argv[]) {
     table_writer_ptr->write();
     table_writer_ptr = nullptr;
     std::cout << "Outputting table finished." << std::endl;
-
+    
+    /*
     if (arguments["searchType"]=="TARGET") { 
       std::cout << "Top prsm selecting starts" << std::endl;
       PrsmSelectorPtr selector = PrsmSelectorPtr(new PrsmSelector(db_file_name, sp_file_name, "EVALUE", "TOP", n_top));
@@ -171,6 +174,7 @@ int zero_ptm_process(int argc, char* argv[]) {
     table_out->write();
     table_out = nullptr;
     std::cout << "Outputting table finished." << std::endl;
+    */
 
 
   } catch (const char* e) {
