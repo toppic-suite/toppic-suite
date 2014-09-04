@@ -19,6 +19,11 @@ ExtremeValuePtr getMaxEvaluePtr() {
   return evalue_ptr;
 }
 
+void ExtremeValue::setOneProtProb (double one_prot_prob) {
+  one_prot_prob_ = one_prot_prob;
+  init();
+}
+
 
 ExtremeValue::ExtremeValue (xercesc::DOMElement* element){
   one_prot_prob_ = getDoubleChildValue(element, "one_protein_probability", 0);

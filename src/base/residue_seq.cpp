@@ -40,7 +40,6 @@ std::string ResidueSeq::toAcidString() {
   for (size_t i = 0; i < residues_.size(); i++) {
     s << residues_[i]->getAcidPtr()->getOneLetter();
   }
-  s << std::endl;
   return s.str();
 }
 

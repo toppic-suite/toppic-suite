@@ -165,48 +165,38 @@ double Proteoform::getMass(){
 }
 
 std::string Proteoform::getProteinMatchSeq(){
-  std::string result="";
   std::string protein_string = db_residue_seq_ptr_->toAcidString();
-  std::string mid_string = protein_string.substr(start_pos_,end_pos_+1);
-  int mid_start=0;
-  std::sort(change_list_.begin(),change_list_.end(),compareChangeUp);
+  //LOG_DEBUG("protein string lenth " << protein_string.length() << " string " << protein_string);
+  std::string mid_string = protein_string.substr(start_pos_, end_pos_- start_pos_ +1);
+  //LOG_DEBUG("mid string lenth " << mid_string.length() << " string " << mid_string);
+  std::sort(change_list_.begin(),change_list_.end(),compareChangeTypeUpPosUp);
 
-  ChangePtrVec change_stack;
-  for(size_t i=0;i<change_list_.size();i++){
-    while(change_stack.size()>0){
-      if(change_list_[i]->getLeftBpPos() < change_stack[change_stack.size()-1]->getRightBpPos()){
-        result += mid_string.substr(mid_start,change_list_[i]->getLeftBpPos()-mid_start);
-        result +="(";
-        mid_start = change_list_[i]->getLeftBpPos();
-        change_stack.push_back(change_list_[i]);
-        break;
-      }
-      else{
-        result += mid_string.substr(mid_start,change_stack[change_stack.size()-1]->getRightBpPos()-mid_start);
-        mid_start = change_stack[change_stack.size()-1]->getRightBpPos();
-        result +=")";
-        result += "["+convertToString(change_stack[change_stack.size()-1]->getMassShift(),5)+"]";
-        change_stack.pop_back();
-      }
-    }
-    if(change_stack.size()==0){
-      change_stack.push_back(change_list_[i]);
-      result += mid_string.substr(mid_start,change_list_[i]->getLeftBpPos()-mid_start);
-      result += "(";
-      mid_start = change_list_[i]->getLeftBpPos();
-    }
+  std::vector<std::string> break_left_strings; 
+  std::vector<std::string> break_right_strings; 
+  for (size_t i = 0; i < mid_string.length() + 1; i++) {
+    break_left_strings.push_back("");
+    break_right_strings.push_back("");
   }
-
-  while(change_stack.size()>0){
-//    std::cout<<mid_string<<"|"<<mid_start<<","<<(change_stack[change_stack.size()-1]->getRightBpPos()-mid_start)<<std::endl;
-    result += mid_string.substr(mid_start,change_stack[change_stack.size()-1]->getRightBpPos()-mid_start);
-    mid_start = change_stack[change_stack.size()-1]->getRightBpPos();
-    result +=")";
-    result += "["+convertToString(change_stack[change_stack.size()-1]->getMassShift(),5)+"]";
-    change_stack.pop_back();
+  for (size_t i = 0; i < change_list_.size(); i++) {
+      int left_pos = change_list_[i]->getLeftBpPos();
+      break_left_strings[left_pos] = "(" + break_left_strings[left_pos];
+      int right_pos = change_list_[i]->getRightBpPos();
+      double shift = change_list_[i]->getMassShift();
+      break_right_strings[right_pos] +=  ")";
+      if (change_list_[i]->getPtmPtr() == nullptr) {
+          break_right_strings[right_pos] = break_right_strings[right_pos] + "["+convertToString(shift,5)+"]";
+      }
+      else {
+          break_right_strings[right_pos] = break_right_strings[right_pos] + "["+change_list_[i]->getPtmPtr()->getAbbrName()+"]";
+      }
   }
-
-  result += mid_string.substr(mid_start,end_pos_-start_pos_-mid_start+1);
+  std::string result="";
+  for (size_t i = 0; i < mid_string.length(); i++) {
+    result = result + break_right_strings[i] + break_left_strings[i] + mid_string.substr(i, 1);
+  }
+  // last break;
+  result = result + break_right_strings[mid_string.length()];
+  
   std::string prefix = "";
   if(start_pos_>0){
     prefix = protein_string.substr(start_pos_-1,1);
@@ -216,6 +206,7 @@ std::string Proteoform::getProteinMatchSeq(){
     suffix = protein_string.substr(end_pos_+1,1);
   }
 
+  //LOG_DEBUG("Prefix " << prefix << " result " << result << " suffix length " << suffix.length() << " suffix " << suffix);
   return prefix+"."+result+"."+suffix;
 }
 
