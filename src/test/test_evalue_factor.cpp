@@ -6,6 +6,7 @@
 
 #include "prsm/prsm_para.hpp"
 #include "prsm/prsm_combine.hpp"
+#include "prsm/prsm_prob.hpp"
 #include "prsm/prsm_selector.hpp"
 #include "prsm/output_selector.hpp"
 #include "prsm/prsm_species.hpp"
@@ -32,7 +33,7 @@
 
 namespace prot {
 
-int zero_ptm_process(int argc, char* argv[]) {
+int testProcess(int argc, char* argv[]) {
   try {
     Argument argu_processor;
     bool success = argu_processor.parse(argc, argv);
@@ -119,60 +120,70 @@ int zero_ptm_process(int argc, char* argv[]) {
     table_writer_ptr->write();
     table_writer_ptr = nullptr;
     std::cout << "Outputting table finished." << std::endl;
-    
-    if (arguments["searchType"]=="TARGET") { 
-      std::cout << "Top prsm selecting starts" << std::endl;
-      PrsmSelectorPtr selector = PrsmSelectorPtr(new PrsmSelector(db_file_name, sp_file_name, "EVALUE", "TOP", n_top));
-      selector->process();
-      selector = nullptr;
-      std::cout << "Top prsm selecting finished." << std::endl;
-    }
-    else {
-      std::cout << "Top prsm selecting starts " << std::endl;
-      PrsmSelectorPtr selector = PrsmSelectorPtr(new PrsmSelector(db_file_name, sp_file_name, "EVALUE", "TOP_PRE", n_top));
-      selector->process();
-      selector = nullptr;
-      std::cout << "Top prsm selecting finished." << std::endl;
-
-      TableWriterPtr table_writer_ptr = TableWriterPtr(new TableWriter(prsm_para_ptr, "TOP_PRE", "TOP_PRE_TABLE"));
-      table_writer_ptr->write();
-      table_writer_ptr = nullptr;
-      std::cout << "Outputting table finished." << std::endl;
-
-      std::cout << "FDR computation starts " << std::endl;
-      PrsmFdrPtr fdr = PrsmFdrPtr(new PrsmFdr(db_file_name, sp_file_name, "TOP_PRE", "TOP"));
-      fdr->process();
-      fdr = nullptr;
-      std::cout << "FDR computation finished." << std::endl;
-    }
-
-    std::cout << "Prsm cutoff selecting starts " << std::endl;
-    std::string cutoff_type = arguments["cutoffValue"];
-    double cutoff_value;
-    std::istringstream (arguments["cutoffValue"]) >> cutoff_value;
-    OutputSelectorPtr output_selector = OutputSelectorPtr(
-        new OutputSelector(db_file_name, sp_file_name, "TOP", "CUTOFF_RESULT", 
-                           cutoff_type, cutoff_value));
-    output_selector->process();
-    output_selector = nullptr;
-    std::cout << "Prsm cutoff selecting finished." << std::endl;
-
-    std::cout << "Finding species starts " << std::endl;
-    double ppo;
-    std::istringstream (arguments["error_tolerance"]) >> ppo;
-    ppo = ppo /1000000.0;
-    PrsmSpeciesPtr prsm_species = PrsmSpeciesPtr(new PrsmSpecies(db_file_name, sp_file_name, 
-                                                                 "CUTOFF_RESULT", "OUTPUT_RESULT", ppo));
-    prsm_species->process();
-    prsm_species = nullptr;
-    std::cout << "Finding species finished." << std::endl;
     */
+    
+    double K1 = 0.03125;
+    double K2 = 0.03125;
+    double inte = 1.0;
+    for (double pref = 0.5; pref > 0.0001; pref /= 2) {
+      PrsmProbPtr prob_processor = PrsmProbPtr(new PrsmProb(db_file_name, sp_file_name,
+                                                            "EVALUE", "EVALUE_ADJUST", K1, K2, pref, inte));
+      prob_processor->process();
+      prob_processor = nullptr;
+      std::cout << "Combining prsms finished." << std::endl;
 
-    std::cout << "Outputting table starts " << std::endl;
-    TableWriterPtr table_out = TableWriterPtr(new TableWriter(prsm_para_ptr, "OUTPUT_RESULT", "OUTPUT_TABLE"));
-    table_out->write();
-    table_out = nullptr;
-    std::cout << "Outputting table finished." << std::endl;
+
+      if (arguments["searchType"]=="TARGET") { 
+        std::cout << "Top prsm selecting starts" << std::endl;
+        PrsmSelectorPtr selector = PrsmSelectorPtr(new PrsmSelector(db_file_name, sp_file_name, "EVALUE_ADJUST", "TOP", n_top));
+        selector->process();
+        selector = nullptr;
+        std::cout << "Top prsm selecting finished." << std::endl;
+      }
+      else {
+        std::cout << "Top prsm selecting starts " << std::endl;
+        PrsmSelectorPtr selector = PrsmSelectorPtr(new PrsmSelector(db_file_name, sp_file_name, "EVALUE_ADJUST", "TOP_PRE", n_top));
+        selector->process();
+        selector = nullptr;
+        std::cout << "Top prsm selecting finished." << std::endl;
+
+        std::cout << "FDR computation starts " << std::endl;
+        PrsmFdrPtr fdr = PrsmFdrPtr(new PrsmFdr(db_file_name, sp_file_name, "TOP_PRE", "TOP"));
+        fdr->process();
+        fdr = nullptr;
+        std::cout << "FDR computation finished." << std::endl;
+      }
+
+      std::cout << "Prsm cutoff selecting starts " << std::endl;
+      std::string cutoff_type = arguments["cutoffValue"];
+      double cutoff_value;
+      std::istringstream (arguments["cutoffValue"]) >> cutoff_value;
+      OutputSelectorPtr output_selector = OutputSelectorPtr(
+          new OutputSelector(db_file_name, sp_file_name, "TOP", "OUTPUT_RESULT_" + std::to_string(K1) + "_" + std::to_string(K2) + "_" + std::to_string(pref) + "_" + std::to_string(inte), 
+                             cutoff_type, cutoff_value));
+      output_selector->process();
+      output_selector = nullptr;
+      std::cout << "Prsm cutoff selecting finished." << std::endl;
+
+      /*
+         std::cout << "Finding species starts " << std::endl;
+         double ppo;
+         std::istringstream (arguments["error_tolerance"]) >> ppo;
+         ppo = ppo /1000000.0;
+         PrsmSpeciesPtr prsm_species = PrsmSpeciesPtr(new PrsmSpecies(db_file_name, sp_file_name, 
+         "CUTOFF_RESULT", "OUTPUT_RESULT", ppo));
+         prsm_species->process();
+         prsm_species = nullptr;
+         std::cout << "Finding species finished." << std::endl;
+         */
+
+      std::cout << "Outputting table starts " << std::endl;
+      TableWriterPtr table_out = TableWriterPtr(new TableWriter(prsm_para_ptr, "OUTPUT_RESULT_" + std::to_string(K1) + "_" + std::to_string(K2) + "_" + std::to_string(pref) + "_" +std::to_string(inte), 
+                                                                "OUTPUT_TABLE_" + std::to_string(K1) + "_" + std::to_string(K2) +"_" + std::to_string(pref) + "_" + std::to_string(inte) ));
+      table_out->write();
+      table_out = nullptr;
+      std::cout << "Outputting table finished." << std::endl;
+    }
 
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
@@ -187,5 +198,5 @@ int zero_ptm_process(int argc, char* argv[]) {
 int main(int argc, char* argv[]) {
   prot::log_level = 2;
   std::cout << std::setprecision(10);
-  return prot::zero_ptm_process(argc, argv);
+  return prot::testProcess(argc, argv);
 }

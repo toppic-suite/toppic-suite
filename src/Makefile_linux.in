@@ -23,7 +23,7 @@ BASE_OBJS = $(addprefix $(OBJ_DIR)/, logger.o xml_dom_err_handler.o segment.o fi
 
 SPEC_OBJS = $(addprefix $(OBJ_DIR)/, peak.o extend_peak.o support_peak.o prm_peak.o spectrum_set.o sp_para.o theo_peak.o peak_tolerance.o msalign_reader.o deconv_ms.o peak_list.o ms_header.o deconv_peak.o)
 
-PRSM_OBJS = $(addprefix $(OBJ_DIR)/, simple_prsm_table_writer.o prsm_coverage.o prsm_para.o prsm_fdr.o prsm_species.o output_selector.o table_writer.o prsm_selector.o cleavage.o pair.o prsm_combine.o prsm_writer.o simple_prsm_writer.o peak_ion_pair.o prsm.o simple_prsm.o)
+PRSM_OBJS = $(addprefix $(OBJ_DIR)/, prsm_prob.o simple_prsm_table_writer.o prsm_coverage.o prsm_para.o prsm_fdr.o prsm_species.o output_selector.o table_writer.o prsm_selector.o cleavage.o pair.o prsm_combine.o prsm_writer.o simple_prsm_writer.o peak_ion_pair.o prsm.o simple_prsm.o)
 
 ZERO_PTM_OBJS = $(addprefix $(OBJ_DIR)/, zero_ptm_slow_match.o zero_ptm_fast_match.o zero_ptm_search.o)
 

@@ -23,6 +23,8 @@ class ExtremeValue {
 
   double getAdjustFactor() { return adjust_factor_;}
 
+  void setOneProtProb(double one_prot_prob);
+
   void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
  private:
