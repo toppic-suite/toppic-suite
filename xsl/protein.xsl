@@ -15,11 +15,11 @@
                     <strong><xsl:value-of select="sequence_name"/></strong>
                 </p>
 
-                <xsl:apply-templates select="species">
 <!--
+                <xsl:apply-templates select="species">
                     <xsl:sort select="min(prsm/e_value)" order="ascending" data-type="number"/>
--->
                 </xsl:apply-templates>
+-->
 
                 <xsl:call-template name="navigation"/>
             </body>

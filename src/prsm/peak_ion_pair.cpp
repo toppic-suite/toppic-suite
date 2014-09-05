@@ -28,14 +28,22 @@ void PeakIonPair::appendTheoPeakToXml(XmlDOMDocument* xml_doc,
   int pos=4;
   xercesc::DOMElement* element = xml_doc->createElement("matched_ion");
   std::string str 
-      = theo_peak_ptr_->getIonPtr()->getIonTypePtr()->getName().substr(0,1);
+      = theo_peak_ptr_->getIonPtr()->getIonTypePtr()->getName();
   xml_doc->addElement(element, "type", str.c_str());
   str = convertToString(theo_peak_ptr_->getShift());
   xml_doc->addElement(element, "match_shift", str.c_str()); 
   str = convertToString(real_peak_ptr_->getMonoMass(),pos);
-  xml_doc->addElement(element, "adjusted_mass", str.c_str()); 
+  xml_doc->addElement(element, "theoretical_mass", str.c_str()); 
   str = convertToString(theo_peak_ptr_->getIonPtr()->getDisplayPos());
   xml_doc->addElement(element, "ion_display_position", str.c_str());
+  str = theo_peak_ptr_->getIonPtr()->getIonTypePtr()->getName();
+  // convert display position to a string with five letters.
+  std::string disp_pos = convertToString(theo_peak_ptr_->getIonPtr()->getDisplayPos());
+  while (disp_pos.length() < 5) {
+    disp_pos = "0" + disp_pos;
+  }
+  str += disp_pos;
+  xml_doc->addElement(element, "ion_sort_name", str.c_str());
   str = convertToString(theo_peak_ptr_->getIonPtr()->getPos());
   xml_doc->addElement(element, "ion_left_position", str.c_str());
   double error = real_peak_ptr_->getMonoMass() - theo_peak_ptr_->getModMass();
