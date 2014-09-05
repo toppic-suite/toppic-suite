@@ -146,6 +146,7 @@ int zero_ptm_process(int argc, char* argv[]) {
     output_selector->process();
     output_selector = nullptr;
     std::cout << "Prsm cutoff selecting finished." << std::endl;
+    */
 
     std::cout << "Finding species starts " << std::endl;
     double ppo;
@@ -153,6 +154,7 @@ int zero_ptm_process(int argc, char* argv[]) {
     ppo = ppo /1000000.0;
     PrsmSpeciesPtr prsm_species = PrsmSpeciesPtr(new PrsmSpecies(db_file_name, sp_file_name, 
                                                                  "CUTOFF_RESULT", "OUTPUT_RESULT", ppo));
+    /*
     prsm_species->process();
     prsm_species = nullptr;
     std::cout << "Finding species finished." << std::endl;
@@ -162,13 +164,13 @@ int zero_ptm_process(int argc, char* argv[]) {
     table_out->write();
     table_out = nullptr;
     std::cout << "Outputting table finished." << std::endl;
+    */
 
     std::cout << "Generating view xml files starts " << std::endl;
     XmlGeneratorPtr xml_gene_ptr = XmlGeneratorPtr(new XmlGenerator(prsm_para_ptr, exe_dir,"OUTPUT_RESULT"));
     xml_gene_ptr->process();
     xml_gene_ptr = nullptr;
     std::cout << "Generating view xml files finished." << std::endl;
-    */
 
     std::cout << "Converting xml files to html files starts " << std::endl;
     translate(arguments);

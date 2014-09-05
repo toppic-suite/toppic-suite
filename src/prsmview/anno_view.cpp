@@ -61,7 +61,7 @@ xercesc::DOMElement* genePrsmView(XmlDOMDocument* xml_doc,PrsmPtr prsm_ptr, Prsm
     xml_doc->addElement(element, "e_value", "N/A");
   }
   double fdr = prsm_ptr->getFdr();
-  if (fdr < -1) {
+  if (fdr >= 0) {
     str=convertToString(prsm_ptr->getFdr(), mng_ptr->decimal_point_num);
     xml_doc->addElement(element, "fdr", str.c_str());
   }
@@ -234,7 +234,7 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
 
   for (int i = 0; i < prot_len; i++) {
     cleavage_ptrs[i]->appendXml(xml_doc, anno_element);
-    res_ptrs[i]->appendXml(xml_doc, anno_element);
+    res_ptrs[i]->appendViewXml(xml_doc, anno_element);
   }
   cleavage_ptrs[prot_len]->appendXml(xml_doc, anno_element);
   return prot_element;
