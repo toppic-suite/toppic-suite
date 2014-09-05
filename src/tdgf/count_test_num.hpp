@@ -22,7 +22,7 @@ class CountTestNum {
 
  private:
   static double PREFIX_SUFFIX_ADJUST() {return 0.693;}
-  static double INTERNAL_ADJUST() {return 0.0508;}
+  static double INTERNAL_ADJUST() {return 0.508;}
 
 
   ProteoformPtrVec raw_proteo_ptrs_;

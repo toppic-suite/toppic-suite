@@ -8,6 +8,7 @@
 #include "prsm/prsm_selector.hpp"
 #include "prsm/output_selector.hpp"
 #include "prsm/prsm_species.hpp"
+#include "prsm/simple_prsm_writer.hpp"
 #include "prsm/table_writer.hpp"
 #include "prsm/prsm_fdr.hpp"
 
@@ -16,6 +17,9 @@
 
 #include "diagfilter/diag_filter_mng.hpp"
 #include "diagfilter/diag_filter_processor.hpp"
+
+#include "oneptmfilter/one_ptm_filter_mng.hpp"
+#include "oneptmfilter/one_ptm_filter_processor.hpp"
 
 #include "ptmsearch/ptm_mng.hpp"
 #include "ptmsearch/ptm_processor.hpp"
@@ -68,12 +72,21 @@ int process(int argc, char* argv[]) {
     ZeroPtmMngPtr zero_mng_ptr = ZeroPtmMngPtr(new ZeroPtmMng (prsm_para_ptr, "ZERO"));
     zeroPtmSearchProcess(zero_mng_ptr);
 
-    std::cout << "Fast filtering starts " << std::endl;
-    DiagFilterMngPtr filter_mng_ptr 
-        = DiagFilterMngPtr(new DiagFilterMng(prsm_para_ptr, "FILTER"));
-    DiagFilterProcessorPtr filter_processor = DiagFilterProcessorPtr(new DiagFilterProcessor(filter_mng_ptr));
-    filter_processor->process();
-    filter_processor = nullptr;
+    std::cout << "Diagonal filtering starts " << std::endl;
+    DiagFilterMngPtr diag_filter_mng_ptr 
+        = DiagFilterMngPtr(new DiagFilterMng(prsm_para_ptr, "DIAG_FILTER"));
+    DiagFilterProcessorPtr diag_filter_processor = DiagFilterProcessorPtr(new DiagFilterProcessor(diag_filter_mng_ptr));
+    diag_filter_processor->process();
+    diag_filter_processor = nullptr;
+
+    std::cout << "One Ptm filtering starts " << std::endl;
+    OnePtmFilterMngPtr one_ptm_filter_mng_ptr 
+        = OnePtmFilterMngPtr(new OnePtmFilterMng(prsm_para_ptr, "ONE_PTM_FILTER"));
+    OnePtmFilterProcessorPtr one_ptm_filter_processor = OnePtmFilterProcessorPtr(new OnePtmFilterProcessor(one_ptm_filter_mng_ptr));
+    one_ptm_filter_processor->process();
+    one_ptm_filter_processor = nullptr;
+
+    combineSimplePrsms(sp_file_name, "ONE_PTM_FILTER_COMBINED", "DIAG_FILTER_COMBINED", "FILTER_COMBINED");
 
     std::cout << "Ptm searching starts" << std::endl;
     PtmMngPtr ptm_mng_ptr = PtmMngPtr(new PtmMng(prsm_para_ptr, n_top, shift_num,

@@ -27,7 +27,8 @@ class CompProbValue {
  private:
   static int const ORI_PAGE_LEN = 5000;
   static int const ORI_BLOCK_LEN = 50;
-  static double K() {return 0.55;}
+  static double K1() {return 0.1;}
+  static double K2() {return 0.1;}
 
   /* double to integer convert ratio */
   double convert_ratio_;

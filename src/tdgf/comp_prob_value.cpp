@@ -53,11 +53,11 @@ inline void CompProbValue::setFactors () {
   //zero ptm 
   factors_.push_back(1);
   //one ptm
-  factors_.push_back(K());
+  factors_.push_back(K1());
   //i>=2 ptms based on experience: divide K by i^2
   int max_shift_num = max_layer_num_ - 1;
   for (int i = 2; i <= max_shift_num; i++) {
-    factors_.push_back(K());
+    factors_.push_back(K2());
   }
 }
 

@@ -2,38 +2,37 @@
 
 namespace prot {
 
-Cleavage::Cleavage(int pos){
-  pos_=pos;
+Cleavage::Cleavage(int display_pos){
+  display_pos_= display_pos;
   exist_n_ion_ = false;
   exist_c_ion_ = false;
-  shift_= 0.0;
-  display_pos_ = 0;
+  is_unexpected_change_ = false;
+  unexpected_change_color_ = 0;
+  type_ = CLEAVAGE_TYPE_NORMAL;
 }
 
 void Cleavage::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
   xercesc::DOMElement* element = xml_doc->createElement("character");
-      std::string str = "cleavage";
-      xml_doc->addElement(element, "type", str.c_str());
-      str = type_;
-      xml_doc->addElement(element, "cleavage_type", str.c_str());
-      str = trunc_;
-      xml_doc->addElement(element, "cleavage_trunc", str.c_str());
-      str = convertToString(pos_);
-      xml_doc->addElement(element, "position", str.c_str());
-      str = convertToString(display_pos_);
-      xml_doc->addElement(element, "display_position", str.c_str());
-      str = convertToString(exist_n_ion_);
-      xml_doc->addElement(element, "exist_n_ion", str.c_str());
-      str = convertToString(exist_c_ion_);
-      xml_doc->addElement(element, "exist_c_ion", str.c_str());
-      str = convertToString(shift_,2);
-      xml_doc->addElement(element, "shift_no_letter", str.c_str());
-      xercesc::DOMElement* peaks = xml_doc->createElement("matched_peaks");
-      for(size_t i=0;i<pairs_.size();i++){
-        pairs_[i]->appendRealPeakToXml(xml_doc,peaks);
-      }
-      element->appendChild(peaks);
-      parent->appendChild(element);
+  std::string str = convertToString(display_pos_);
+  xml_doc->addElement(element, "display_position", str.c_str());
+  str = "cleavage";
+  xml_doc->addElement(element, "type", str.c_str());
+  str = type_;
+  xml_doc->addElement(element, "cleavage_type", str.c_str());
+  str = convertToString(is_unexpected_change_);
+  xml_doc->addElement(element, "is_unexpected_change", str.c_str());
+  str = convertToString(unexpected_change_color_);
+  xml_doc->addElement(element, "unexpected_change_color", str.c_str());
+  str = convertToString(exist_n_ion_);
+  xml_doc->addElement(element, "exist_n_ion", str.c_str());
+  str = convertToString(exist_c_ion_);
+  xml_doc->addElement(element, "exist_c_ion", str.c_str());
+  xercesc::DOMElement* peaks = xml_doc->createElement("matched_peaks");
+  for(size_t i=0;i<pairs_.size();i++){
+    pairs_[i]->appendRealPeakToXml(xml_doc,peaks);
+  }
+  element->appendChild(peaks);
+  parent->appendChild(element);
 }
 
 CleavagePtrVec getProteoCleavage(ProteoformPtr prot_ptr,
@@ -43,13 +42,12 @@ CleavagePtrVec getProteoCleavage(ProteoformPtr prot_ptr,
   PeakIonPairPtrVec pairs = getPeakIonPairs (prot_ptr, ms_three_ptr, min_mass);
 
   PeakIonPairPtrVec2D peak_list;
-  std::vector<bool> n_ion;
-  std::vector<bool> c_ion;
-  for(size_t i=0; i<prot_ptr->getDbResSeqPtr()->getResidues().size()+1; i++){
+  int prot_len = prot_ptr->getDbResSeqPtr()->getLen();
+  std::vector<bool> n_ion (false, prot_len + 1);
+  std::vector<bool> c_ion (false, prot_len + 1);
+  for(int i=0; i< prot_len + 1; i++){
     PeakIonPairPtrVec temp;
     peak_list.push_back(temp);
-    n_ion.push_back(false);
-    c_ion.push_back(false);
   }
 
   for(size_t i=0;i<pairs.size();i++){
@@ -63,8 +61,8 @@ CleavagePtrVec getProteoCleavage(ProteoformPtr prot_ptr,
     }
   }
 
-  for(size_t i=0;i< prot_ptr->getDbResSeqPtr()->getResidues().size()+1;i++){
-    CleavagePtr cleavage = CleavagePtr(new Cleavage(i));
+  for(int i=0;i< prot_len+1;i++){
+    CleavagePtr cleavage = CleavagePtr(new Cleavage(i * 2));
     cleavage->setPairs(peak_list[i]);
     cleavage->setExistCIon(c_ion[i]);
     cleavage->setExistNIon(n_ion[i]);

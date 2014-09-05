@@ -5,7 +5,7 @@ cd tmp
 ln -s  ../../data/st.fasta ./ 
 ln -s  ../../data/st_no_digestion.msalign ./
 cd ..
-# ../../bin/test_zero_ptm tmp/st.fasta tmp/st_no_digestion.msalign -c C57 | tee tmp/log 
+../../bin/test_zero_ptm tmp/st.fasta tmp/st_no_digestion.msalign -c C57 | tee tmp/log 
 
 cp ../data/st_no_digestion_java_0.7.table ./tmp
 ./find_semi_type_ids.py -i  tmp/st_no_digestion_java_0.7.table -n 0 |tee tmp/find_type.log

@@ -7,9 +7,15 @@
 
 namespace prot {
 
+#define CLEAVAGE_TYPE_NORMAL "normal"
+#define CLEAVAGE_TYPE_N_TRUNCATION "n_truncation"
+#define CLEAVAGE_TYPE_C_TRUNCATION "c_truncation"
+#define CLEAVAGE_TYPE_SEQ_START "seq_start"
+#define CLEAVAGE_TYPE_SEQ_END "seq_end"
+
 class Cleavage {
  public:
-  Cleavage(int pos);
+  Cleavage(int display_pos);
 
   void setPairs(PeakIonPairPtrVec pairs) {pairs_ = pairs;} 
 
@@ -17,29 +23,24 @@ class Cleavage {
 
   void setExistCIon(bool c) {exist_c_ion_ = c;};
 
-  void setShift(double shift)  {shift_=shift;}
-
   void setType(const std::string &type) {type_=type;}
 
-  void setDisplayPos(int i){display_pos_=i;}
+  void setUnexpectedChange(bool u) {is_unexpected_change_ = u;}
+  
+  void setUnexpectedChangeColor(int color) {unexpected_change_color_ = color;}
 
   std::string getType(){return type_;}
-
-  void setTrunc(const std::string &trunc) {trunc_ = trunc;}
-
-  std::string getTrunc() {return trunc_;}
 
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
  private:
-  int pos_;
   int display_pos_;
   bool exist_n_ion_;
   bool exist_c_ion_;
   std::string type_;
-  std::string trunc_;
-  double shift_;
   PeakIonPairPtrVec pairs_;
+  bool is_unexpected_change_;
+  int unexpected_change_color_;
 };
 
 typedef std::shared_ptr<Cleavage> CleavagePtr;
