@@ -3,53 +3,35 @@
 
 #include "base/residue.hpp"
 
+
 namespace prot {
+
+#define ANNO_RESIDUE_TYPE_NORMAL "normal"
+#define ANNO_RESIDUE_TYPE_N_TRUNCATION "n_truncation"
+#define ANNO_RESIDUE_TYPE_C_TRUNCATION "c_truncation"
+#define ANNO_RESIDUE_TYPE_KNOWN_CHANGE "known_change"
 
 class AnnoResidue : public Residue {
  public:
-  AnnoResidue(ResiduePtr residue_ptr);
-
-  void setPos(int pos) {pos_ = pos; }
-
-  void setDisplayPos(int display_pos) {display_pos_ = display_pos;}
+  AnnoResidue(ResiduePtr residue_ptr, int display_pos);
 
   void setType(const std::string &type) {type_ = type;}
 
-  void setShiftStyle(const std::string &shift_type) {shift_style_ = shift_type;}
+  void setUnexpectedChange(bool u) {is_unexpected_change_ = u;}
 
-  std::string getType() {return type_;}
-
-  void setIsModifyed(bool is_modified) {is_modified_ = is_modified;}
-
-  bool isModified() {return is_modified_;}
-
-  void setShift(double shift) {shift_ = shift;}
-
-  double getShift() {return shift_;}
-
-  void setExpected(bool e) {is_expected_ = e;}
-
-  void setDisplayBg(int bg){display_bg_ = bg;}
+  void setUnexpectedChangeColor(int color) {unexpected_change_color_ = color;}
 
   void appendViewXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
  private:
-  //residues pos
-  int pos_ = 0;
-  //residues type
-  std::string type_ = "normal";
-  //display pos shown in match seq
+  //residues display pos
   int display_pos_ = 0;
-  //display background color in html file
-  int display_bg_ = -1;
-  //is modified
-  bool is_modified_ = false;
+  //residues type
+  std::string type_ = ANNO_RESIDUE_TYPE_NORMAL;
   //is expected
-  bool is_expected_ = false;
-  //expected shift type
-  std::string shift_style_;
-  //modify mass
-  double shift_ = 0;
+  bool is_unexpected_change_ = false;
+  //unexpected change color
+  int unexpected_change_color_ = 0;
 };
 
 typedef std::shared_ptr<AnnoResidue> AnnoResiduePtr;

@@ -44,7 +44,7 @@ class Proteoform {
 
   const std::string& getSeqName() {return db_residue_seq_ptr_->getName();}
 
-  const ChangePtrVec& getChangePtrVec() {return change_list_;}
+  ChangePtrVec getChangePtrVec() {return change_list_;}
 
   int getSpeciesId() {return species_id_;}
 

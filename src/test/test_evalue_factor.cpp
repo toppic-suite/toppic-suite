@@ -124,8 +124,8 @@ int testProcess(int argc, char* argv[]) {
     
     double K1 = 0.03125;
     double K2 = 0.03125;
-    double inte = 1.0;
-    for (double pref = 0.5; pref > 0.0001; pref /= 2) {
+    double pref = 1.0;
+    for (double inte = 10; inte > 0.0001; inte /= 2) {
       PrsmProbPtr prob_processor = PrsmProbPtr(new PrsmProb(db_file_name, sp_file_name,
                                                             "EVALUE", "EVALUE_ADJUST", K1, K2, pref, inte));
       prob_processor->process();

@@ -171,31 +171,31 @@ std::string Proteoform::getProteinMatchSeq(){
   //LOG_DEBUG("mid string lenth " << mid_string.length() << " string " << mid_string);
   std::sort(change_list_.begin(),change_list_.end(),compareChangeTypeUpPosUp);
 
-  std::vector<std::string> break_left_strings; 
-  std::vector<std::string> break_right_strings; 
+  std::vector<std::string> cleavage_left_strings; 
+  std::vector<std::string> cleavage_right_strings; 
   for (size_t i = 0; i < mid_string.length() + 1; i++) {
-    break_left_strings.push_back("");
-    break_right_strings.push_back("");
+    cleavage_left_strings.push_back("");
+    cleavage_right_strings.push_back("");
   }
   for (size_t i = 0; i < change_list_.size(); i++) {
       int left_pos = change_list_[i]->getLeftBpPos();
-      break_left_strings[left_pos] = "(" + break_left_strings[left_pos];
+      cleavage_left_strings[left_pos] = "(" + cleavage_left_strings[left_pos];
       int right_pos = change_list_[i]->getRightBpPos();
       double shift = change_list_[i]->getMassShift();
-      break_right_strings[right_pos] +=  ")";
+      cleavage_right_strings[right_pos] +=  ")";
       if (change_list_[i]->getPtmPtr() == nullptr) {
-          break_right_strings[right_pos] = break_right_strings[right_pos] + "["+convertToString(shift,5)+"]";
+          cleavage_right_strings[right_pos] = cleavage_right_strings[right_pos] + "["+convertToString(shift,5)+"]";
       }
       else {
-          break_right_strings[right_pos] = break_right_strings[right_pos] + "["+change_list_[i]->getPtmPtr()->getAbbrName()+"]";
+          cleavage_right_strings[right_pos] = cleavage_right_strings[right_pos] + "["+change_list_[i]->getPtmPtr()->getAbbrName()+"]";
       }
   }
   std::string result="";
   for (size_t i = 0; i < mid_string.length(); i++) {
-    result = result + break_right_strings[i] + break_left_strings[i] + mid_string.substr(i, 1);
+    result = result + cleavage_right_strings[i] + cleavage_left_strings[i] + mid_string.substr(i, 1);
   }
   // last break;
-  result = result + break_right_strings[mid_string.length()];
+  result = result + cleavage_right_strings[mid_string.length()];
   
   std::string prefix = "";
   if(start_pos_>0){

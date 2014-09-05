@@ -57,7 +57,7 @@ xercesc::DOMElement* getChildElement(xercesc::DOMElement *parent,
   if (element == nullptr) {
     std::stringstream stream;
     stream << "Get Child Element " << tag << " return null";
-    LOG_TRACE(stream.str());
+    LOG_WARN(stream.str());
     throw stream.str();
   }
   return element;
@@ -70,7 +70,7 @@ std::string getChildValue(xercesc::DOMElement* parent,
   if (node_list == nullptr) {
     std::stringstream stream;
     stream << "Get Child Element " << child_tag << " return null";
-    LOG_TRACE( stream.str());
+    LOG_WARN( stream.str());
     throw stream.str();
   }
   xercesc::DOMElement* child = 
@@ -78,7 +78,7 @@ std::string getChildValue(xercesc::DOMElement* parent,
   if (child == nullptr) {
     std::stringstream stream;
     stream << "Get Child Element " << child_tag << " return null";
-    LOG_TRACE( stream.str());
+    LOG_WARN( stream.str());
     throw stream.str();
   }
 
