@@ -15,7 +15,7 @@ namespace prot {
 
 class Cleavage {
  public:
-  Cleavage(int display_pos);
+  Cleavage(int pos);
 
   void setPairs(PeakIonPairPtrVec pairs) {pairs_ = pairs;} 
 
@@ -34,7 +34,7 @@ class Cleavage {
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
  private:
-  int display_pos_;
+  int pos_;
   bool exist_n_ion_;
   bool exist_c_ion_;
   std::string type_;

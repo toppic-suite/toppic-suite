@@ -13,7 +13,7 @@ namespace prot {
 
 class AnnoResidue : public Residue {
  public:
-  AnnoResidue(ResiduePtr residue_ptr, int display_pos);
+  AnnoResidue(ResiduePtr residue_ptr, int pos);
 
   void setType(const std::string &type) {type_ = type;}
 
@@ -24,8 +24,8 @@ class AnnoResidue : public Residue {
   void appendViewXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
  private:
-  //residues display pos
-  int display_pos_ = 0;
+  //residues position
+  int pos_ = 0;
   //residues type
   std::string type_ = ANNO_RESIDUE_TYPE_NORMAL;
   //is expected

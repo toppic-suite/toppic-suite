@@ -10,7 +10,7 @@ void translate(std::map<std::string,std::string> &arguments) {
   std::string html_dir = basename(spectrum_file_name_) + "_html";
   std::string exec_dir = arguments["executiveDir"];
 
-  createFolder(html_dir + FILE_SEPARATOR +"species");
+  createFolder(html_dir + FILE_SEPARATOR +"proteoforms");
   createFolder(html_dir + FILE_SEPARATOR +"prsms");
   createFolder(html_dir + FILE_SEPARATOR +"proteins");
   copyFile(exec_dir + FILE_SEPARATOR + "etc" + FILE_SEPARATOR + "FreeMono.ttf", 

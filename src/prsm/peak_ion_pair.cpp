@@ -15,7 +15,9 @@ void PeakIonPair::appendRealPeakToXml(XmlDOMDocument* xml_doc,
 
   xercesc::DOMElement* element = xml_doc->createElement("matched_peak");
   std::string str = theo_peak_ptr_->getIonPtr()->getIonTypePtr()->getName();
-  xml_doc->addElement(element, "real_peak_ion_name", str.c_str());
+  xml_doc->addElement(element, "ion_type", str.c_str());
+  str = convertToString(theo_peak_ptr_->getIonPtr()->getDisplayPos());
+  xml_doc->addElement(element, "ion_display_position", str.c_str());
   str = convertToString(real_peak_ptr_->getBasePeakPtr()->getId());
   xml_doc->addElement(element, "peak_id", str.c_str());
   str = convertToString(real_peak_ptr_->getBasePeakPtr()->getCharge());
@@ -29,7 +31,7 @@ void PeakIonPair::appendTheoPeakToXml(XmlDOMDocument* xml_doc,
   xercesc::DOMElement* element = xml_doc->createElement("matched_ion");
   std::string str 
       = theo_peak_ptr_->getIonPtr()->getIonTypePtr()->getName();
-  xml_doc->addElement(element, "type", str.c_str());
+  xml_doc->addElement(element, "ion_type", str.c_str());
   str = convertToString(theo_peak_ptr_->getShift());
   xml_doc->addElement(element, "match_shift", str.c_str()); 
   str = convertToString(real_peak_ptr_->getMonoMass(),pos);
