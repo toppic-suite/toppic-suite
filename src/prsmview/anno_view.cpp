@@ -1,5 +1,6 @@
 
 #include "base/anno_residue.hpp"
+#include "base/anno_change.hpp"
 #include "spec/peak.hpp"
 #include "prsmview/anno_view.hpp"
 
@@ -43,9 +44,6 @@ xercesc::DOMElement* genePrsmView(XmlDOMDocument* xml_doc,PrsmPtr prsm_ptr, Prsm
   xercesc::DOMElement* element = xml_doc->createElement("prsm");
   std::string str = convertToString(prsm_ptr->getId());
   xml_doc->addElement(element, "prsm_id", str.c_str());
-  //  str = convertToString(prsm->getSpectrumId());
-  //  xml_doc->addElement(element, "spectrum_id", str.c_str());
-  //  xml_doc->addElement(element, "spectrum_scan", prsm->getSpectrumScan().c_str());
   if(prsm_ptr->getProbPtr().get()!=nullptr){
     str=convertToString(prsm_ptr->getProbPtr()->getPValue(), mng_ptr->decimal_point_num);
     xml_doc->addElement(element, "p_value", str.c_str());
@@ -82,7 +80,8 @@ xercesc::DOMElement* genePrsmView(XmlDOMDocument* xml_doc,PrsmPtr prsm_ptr, Prsm
   //get ion_pair
   PeakIonPairPtrVec pair_ptrs =  getPeakIonPairs (prsm_ptr->getProteoformPtr(), 
                                                   prsm_ptr->getRefineMs(),
-                                              mng_ptr->min_mass);
+                                                  mng_ptr->min_mass);
+  //LOG_DEBUG("pair completed");
   //peaks to view
   xercesc::DOMElement* ms_element = xml_doc->createElement("ms");
   prsm_ptr->getDeconvMsPtr()->getHeaderPtr()->appendXml(xml_doc,ms_element);//attention
@@ -118,6 +117,7 @@ xercesc::DOMElement* genePrsmView(XmlDOMDocument* xml_doc,PrsmPtr prsm_ptr, Prsm
     }
   }
   element->appendChild(ms_element);
+  //LOG_DEBUG("ms completed");
 
   //proteoform to view
   xercesc::DOMElement* prot_element = geneProteinView(xml_doc,
@@ -125,6 +125,7 @@ xercesc::DOMElement* genePrsmView(XmlDOMDocument* xml_doc,PrsmPtr prsm_ptr, Prsm
                                                       prsm_ptr->getRefineMs(),
                                                       mng_ptr);
   element->appendChild(prot_element);
+  //LOG_DEBUG("protein view completed");
 
   return element;
   }
@@ -138,16 +139,12 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
   std::string str=convertToString(proteoform_ptr->getSeqId());
   xml_doc->addElement(prot_element, "sequence_id", str.c_str());
   str=convertToString(proteoform_ptr->getSpeciesId());
-  xml_doc->addElement(prot_element, "species_id", str.c_str());
+  xml_doc->addElement(prot_element, "proteoform_id", str.c_str());
   str=proteoform_ptr->getSeqName();
   xml_doc->addElement(prot_element, "sequence_name", str.c_str());
   double mass = proteoform_ptr->getMass();
   str=convertToString(mass, mng_ptr->decimal_point_num);
   xml_doc->addElement(prot_element, "protein_mass", str.c_str());
-  str=convertToString(proteoform_ptr->getStartPos());
-  xml_doc->addElement(prot_element, "first_residue_position", str.c_str());
-  str=convertToString(proteoform_ptr->getEndPos());
-  xml_doc->addElement(prot_element, "last_residue_position", str.c_str());
   str=convertToString(proteoform_ptr->getProtModPtr()->getPtmPtr()->isAcetylation());
   xml_doc->addElement(prot_element, "n_acetylation", str.c_str());
   int unexpected_shift_number = proteoform_ptr->getChangePtrVec().size()-proteoform_ptr->getUnexpectedChangeNum();
@@ -158,31 +155,33 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
 
   ChangePtrVec change_ptrs = proteoform_ptr->getChangePtrVec(); 
   std::sort(change_ptrs.begin(),change_ptrs.end(),compareChangeTypeUpPosUp);
-  /*
-  xercesc::DOMElement* change_list = xml_doc->createElement("known_change_list");
-  for(size_t i=0;i<change_ptrs.size().size();i++){
-    int change_type = change_ptrs[i]->getChangeType();
-    if(charge_ptrs[i]->getChangeType()!=UNEXPECTED_CHANGE){
-      xercesc::DOMElement* shift_element = xml_doc->createElement("known_change");
-      shift_list->appendChild(shift_element);
-      str=convertToString(change_type);
-      xml_doc->addElement(shift_element, "change_type", str.c_str());
-      xml_doc->addElement(shift_element, "ptm_name", abb_name.c_str());
-    }
-  }
-  */
 
   xercesc::DOMElement* anno_element = xml_doc->createElement("annotation");
   prot_element->appendChild(anno_element);
+  str=convertToString(proteoform_ptr->getDbResSeqPtr()->getLen());
+  xml_doc->addElement(anno_element, "protein_length", str.c_str());
+
+  str=convertToString(proteoform_ptr->getStartPos());
+  xml_doc->addElement(anno_element, "first_residue_position", str.c_str());
+  str=convertToString(proteoform_ptr->getEndPos());
+  xml_doc->addElement(anno_element, "last_residue_position", str.c_str());
+  str=convertToString(proteoform_ptr->getProtModPtr()->getPtmPtr()->isAcetylation());
+
+  //LOG_DEBUG("summary completed");
+
   CleavagePtrVec cleavage_ptrs = getProteoCleavage(proteoform_ptr,ms_three_ptr,mng_ptr->min_mass);
+
+  //LOG_DEBUG("cleavage completed");
 
   int prot_len = proteoform_ptr->getDbResSeqPtr()->getLen();
   // obtain residue_ptrs 
   AnnoResiduePtrVec res_ptrs;
   for(int i=0;i< prot_len;i++){
-    res_ptrs.push_back(AnnoResiduePtr(new AnnoResidue(proteoform_ptr->getDbResSeqPtr()->getResiduePtr(i), 2*i + 1)));
+    res_ptrs.push_back(AnnoResiduePtr(new AnnoResidue(proteoform_ptr->getDbResSeqPtr()->getResiduePtr(i), i)));
   }
 
+
+  //LOG_DEBUG("residue completed");
   // add information for N-terminal truncation
   int start_pos = proteoform_ptr->getStartPos();
   for (int i =0; i < start_pos; i++) { 
@@ -193,6 +192,7 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
   if (start_pos > 0) {
     cleavage_ptrs[start_pos]->setType(CLEAVAGE_TYPE_SEQ_START);
   }
+  //LOG_DEBUG("n-trunc completed");
 
   // add information for C-terminal truncation
   int end_pos = proteoform_ptr->getEndPos();
@@ -204,39 +204,70 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
     cleavage_ptrs[i+1]->setType(CLEAVAGE_TYPE_C_TRUNCATION);
     res_ptrs[i]->setType(ANNO_RESIDUE_TYPE_C_TRUNCATION);
   }
+  //LOG_DEBUG("c-trunc completed");
 
+  // CONTINUE to write anno_change_ptrs.
+
+  AnnoChangePtrVec anno_change_ptrs;
   int unexpected_shift_color = 0;
+  int last_right = -1;
   for (size_t i = 0; i < change_ptrs.size(); i++) {
     // add information for known changes 
     int left_bp = change_ptrs[i]->getLeftBpPos() + start_pos;
     int right_bp = change_ptrs[i]->getRightBpPos() + start_pos;
+    double shift = change_ptrs[i]->getMassShift();
     if (change_ptrs[i]->getChangeType() != UNEXPECTED_CHANGE) { 
       res_ptrs[left_bp]->setType(ANNO_RESIDUE_TYPE_KNOWN_CHANGE);
     }
     else {
+      //LOG_DEBUG("left bp " << left_bp << " right bp " << right_bp << " protein len " << prot_len << " res size " << res_ptrs.size() << " cleavage size " << cleavage_ptrs.size());
       if (left_bp == right_bp) {
+        int this_left = left_bp * 2;
+        if (this_left > last_right + 1) {
+          AnnoChangePtr anno_change_ptr(new AnnoChange(last_right + 1, this_left - 1, 0, -1, -1));
+        }
+        int this_right = right_bp * 2;
+        AnnoChangePtr anno_change_ptr(new AnnoChange(this_left , this_right, shift, unexpected_shift_color, 0));
+        anno_change_ptrs.push_back(anno_change_ptr);
+        last_right = this_right;
+        
         cleavage_ptrs[left_bp]->setUnexpectedChange(true);
         cleavage_ptrs[left_bp]->setUnexpectedChangeColor(unexpected_shift_color);;
       }
       else {
-        for (int j = left_bp; j < right_bp; j++) {
+        int this_left = left_bp * 2 + 1;
+        if (this_left > last_right + 1) {
+          AnnoChangePtr anno_change_ptr(new AnnoChange(last_right + 1, this_left - 1, 0, -1, -1));
+        }
+        int this_right = right_bp * 2 - 1;
+        AnnoChangePtr anno_change_ptr(new AnnoChange(this_left, this_right, shift, unexpected_shift_color, 1));
+        anno_change_ptrs.push_back(anno_change_ptr);
+        last_right = this_right;
+
+        for (int j = left_bp; j < right_bp - 1; j++) {
           res_ptrs[j]->setUnexpectedChange(true);
           res_ptrs[j]->setUnexpectedChangeColor(unexpected_shift_color);;
           cleavage_ptrs[j+1]->setUnexpectedChange(true);
           cleavage_ptrs[j+1]->setUnexpectedChangeColor(unexpected_shift_color);;
         }
-        res_ptrs[right_bp]->setUnexpectedChange(true);
-        res_ptrs[right_bp]->setUnexpectedChangeColor(unexpected_shift_color);;
+        res_ptrs[right_bp-1]->setUnexpectedChange(true);
+        res_ptrs[right_bp-1]->setUnexpectedChangeColor(unexpected_shift_color);;
       }
       unexpected_shift_color = (unexpected_shift_color) + 1 % 2;
     }
+    
   }
+  LOG_DEBUG("unexpected completed");
 
-  for (int i = 0; i < prot_len; i++) {
-    cleavage_ptrs[i]->appendXml(xml_doc, anno_element);
+  for (size_t i = 0; i < res_ptrs.size(); i++) {
     res_ptrs[i]->appendViewXml(xml_doc, anno_element);
   }
-  cleavage_ptrs[prot_len]->appendXml(xml_doc, anno_element);
+  for (size_t i = 0; i < cleavage_ptrs.size(); i++) {
+    cleavage_ptrs[i]->appendXml(xml_doc, anno_element);
+  }
+  for (size_t i = 0; i < anno_change_ptrs.size(); i++) {
+    anno_change_ptrs[i]->appendXml(xml_doc, anno_element);
+  }
   return prot_element;
 }
 

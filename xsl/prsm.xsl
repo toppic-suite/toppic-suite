@@ -8,8 +8,8 @@
     <html>
       <head>
         <title>Protein-Spectrum-Match for Spectrum #<xsl:value-of select="ms/ms_header/id"/> -
-          Species #<xsl:value-of select="annotated_protein/species-id"/> 
-          for <xsl:value-of select="annotated_protein/sequence_name"/>
+          Proteoform #<xsl:value-of select="annotated_protein/proteoform_id"/> 
+          of Protein <xsl:value-of select="annotated_protein/sequence_name"/>
         </title>
         <script type="text/javascript" src="../sorttable.js"/>
 
@@ -96,7 +96,7 @@
       <body onload="changePosition()">
         <xsl:call-template name="navigation"/>
 
-        <h2>Protein-Spectrum-Match for Spectrum #<xsl:value-of select="ms/ms_header/id"/>
+        <h2>Protein-Spectrum-Match #<xsl:value-of select="prsm_id"/> for Spectrum #<xsl:value-of select="ms/ms_header/id"/>
         </h2>
 
         <table cellpadding="3" width="750" class="info">
@@ -179,9 +179,13 @@
         <div>
           <a href="#" onclick="showAllPeaks();">All peaks (<xsl:value-of select="count(ms/peaks/peak)"/>)</a>
           &#160;
-          <a href="#" onclick="showMatchedPeaks();">Matched peaks (<xsl:value-of select="count(ms/peaks/peak[count(matched_ions/matched_ion)>0])"/>)</a>
+          <a href="#" onclick="showMatchedPeaks();">
+            Matched peaks (<xsl:value-of select="count(ms/peaks/peak[count(matched_ions/matched_ion)>0])"/>)
+          </a>
           &#160;
-          <a href="#" onclick="showNotMatchedPeaks();">Not matched peaks (<xsl:value-of select="count(ms/peaks/peak[count(matched_ions/matched_ion)=0])"/>)</a>
+          <a href="#" onclick="showNotMatchedPeaks();">
+            Not matched peaks (<xsl:value-of select="count(ms/peaks/peak[count(matched_ions/matched_ion)=0])"/>)
+          </a>
         </div>
 
         <div class="outer">
@@ -211,24 +215,231 @@
   <xsl:template name="navigation">
     <p>
       <a href="../proteins.html">All proteins</a> /
-      <a href="../proteins/protein{annotated_protein/sequence_id}.html"><xsl:value-of select="annotated_protein/sequence_name"/></a> /
-      <a href="../species/species{annotated_protein/species_id}.html">Species # <xsl:value-of select="annotated_protein/species_id"/></a>
+      <a href="../proteins/protein{annotated_protein/sequence_id}.html">
+        <xsl:value-of select="annotated_protein/sequence_name"/>
+      </a> /
+      <a href="../proteoforms/proteoform{annotated_protein/proteoform_id}.html">
+        Proteoform #<xsl:value-of select="annotated_protein/proteoform_id"/>
+      </a>
     </p>
+  </xsl:template>
+
+  <xsl:template match="residue">
+    <xsl:text disable-output-escaping="yes"><![CDATA[<span style="]]></xsl:text>
+      <xsl:if test="residue_type = 'known_change'">
+        <xsl:text disable-output-escaping="yes"><![CDATA[font-weight:bold;color:red;]]></xsl:text>
+      </xsl:if>
+      <xsl:if test="residue_type = 'n_truncation'">
+        <xsl:text disable-output-escaping="yes"><![CDATA[color:grey;]]></xsl:text>
+      </xsl:if>
+      <xsl:if test="residue_type = 'c_truncation'">
+        <xsl:text disable-output-escaping="yes"><![CDATA[color:grey;]]></xsl:text>
+      </xsl:if>
+
+      <xsl:if test="is_unexpected_change = '1'">
+        <xsl:if test="unexpected_change_color = 0">
+          <xsl:text disable-output-escaping="yes"><![CDATA[background:#DFFFFF;]]></xsl:text>
+        </xsl:if>
+        <xsl:if test="unexpected_change_color = 1">
+          <xsl:text disable-output-escaping="yes"><![CDATA[background:#CECEF6;]]></xsl:text>
+        </xsl:if>
+      </xsl:if>
+
+        <xsl:text disable-output-escaping="yes"><![CDATA[">]]></xsl:text>
+      <xsl:value-of select="acid"/>
+      <xsl:text disable-output-escaping="yes"><![CDATA[</span>]]></xsl:text>
+  </xsl:template>
+
+  <xsl:template match="matched_peaks" mode="prsm">
+    <xsl:for-each select="matched_peak">
+      <xsl:value-of select="peak_id"/><xsl:text>,</xsl:text>
+    </xsl:for-each>
+  </xsl:template>
+
+  <xsl:template match="matched_peaks" mode="title">
+    <xsl:for-each select="matched_peak">
+      <xsl:value-of select="ion_type"/>
+      <xsl:value-of select="ion_display_position"/>
+      <xsl:text>&#160;</xsl:text>
+      <xsl:value-of select="peak_charge"/>
+      <xsl:text>+&#160;</xsl:text>
+    </xsl:for-each>
+  </xsl:template>
+
+  <xsl:template match="cleavage">
+    <xsl:text disable-output-escaping="yes"><![CDATA[<span style="]]></xsl:text>
+      <xsl:if test="cleavage_type = 'seq_start'">
+        <xsl:text disable-output-escaping="yes"><![CDATA[font-weight:bold;color:red;]]></xsl:text>
+      </xsl:if>
+      <xsl:if test="cleavage_type = 'seq_end'">
+        <xsl:text disable-output-escaping="yes"><![CDATA[font-weight:bold;color:red;"]]></xsl:text>
+      </xsl:if>
+
+      <xsl:if test="is_unexpected_change = '1'">
+        <xsl:if test="unexpected_change_color = 0">
+          <xsl:text disable-output-escaping="yes"><![CDATA[background:#DFFFFF;]]></xsl:text>
+        </xsl:if>
+        <xsl:if test="unexpected_change_color = 1">
+          <xsl:text disable-output-escaping="yes"><![CDATA[background:#CECEF6;]]></xsl:text>
+        </xsl:if>
+      </xsl:if>
+      <xsl:text disable-output-escaping="yes"><![CDATA[">]]></xsl:text>
+
+      <xsl:choose>
+        <xsl:when test="exist_n_ion = '0' and exist_c_ion = '0'">
+          <xsl:choose>
+            <xsl:when test="cleavage_type = 'seq_start'">
+              <xsl:text>]</xsl:text>
+            </xsl:when>
+            <xsl:when test="cleavage_type = 'seq_end'">
+              <xsl:text>[</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>&#160;</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:otherwise>
+          <a style="text-decoration:none" href="#">
+            <xsl:attribute name="title"> 
+              <xsl:apply-templates select="matched_peaks" mode="title"/>
+            </xsl:attribute>
+            <xsl:attribute name="onclick"> 
+              showIonPeaks('<xsl:apply-templates select="matched_peaks" mode="prsm"/>')
+            </xsl:attribute>
+            <xsl:choose>
+              <xsl:when test="exist_n_ion = '1' and exist_c_ion = '0'">
+                <xsl:text disable-output-escaping="yes">&amp;#x23AB;</xsl:text>
+              </xsl:when>
+              <xsl:when test="exist_n_ion = '0' and exist_c_ion = '1'">
+                <xsl:text disable-output-escaping="yes">&amp;#x23A9;</xsl:text>
+              </xsl:when>
+              <xsl:when test="exist_n_ion = '1' and exist_c_ion = '1'">
+                <xsl:text disable-output-escaping="yes">&amp;#x23B1;</xsl:text>
+              </xsl:when>
+            </xsl:choose>
+          </a>
+        </xsl:otherwise>
+      </xsl:choose>
+
+      <xsl:text disable-output-escaping="yes"><![CDATA[</span>]]></xsl:text>
+  </xsl:template>
+
+  <xsl:template name="add_one_letter">
+    <xsl:param name="i" />
+    <xsl:param name="j" />
+    <xsl:param name="k" />
+    <xsl:if test="$k &lt; 10">
+      <xsl:variable name="pos" select="$i * 30 + $j * 10 + $k"/>
+      <xsl:text disable-output-escaping="yes"><![CDATA[<td width="8px">]]></xsl:text>
+        <xsl:if test="$pos &lt;= protein_length + 1">
+          <xsl:apply-templates select="cleavage[position = $pos]"/>
+        </xsl:if>
+        <xsl:text disable-output-escaping="yes"><![CDATA[</td>]]></xsl:text>
+      <xsl:text disable-output-escaping="yes"><![CDATA[<td width="8px">]]></xsl:text>
+        <xsl:if test="$pos &lt;= protein_length">
+          <xsl:apply-templates select="residue[position = $pos]"/>
+        </xsl:if>
+        <xsl:text disable-output-escaping="yes"><![CDATA[</td>]]></xsl:text>
+      <xsl:call-template name="add_one_letter">
+        <xsl:with-param name="i" select="$i"/>
+        <xsl:with-param name="j" select="$j"/>
+        <xsl:with-param name="k" select="$k+1"/>
+      </xsl:call-template>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="add_blank">
+    <xsl:text disable-output-escaping="yes">
+      <![CDATA[<td width="16px"></td>]]>
+    </xsl:text>
+  </xsl:template>
+
+  <xsl:template name="add_ten_letters">
+    <xsl:param name="i" />
+    <xsl:param name="j" />
+
+    <xsl:if test="$j &lt; 3">
+      <xsl:call-template name="add_one_letter">
+        <xsl:with-param name="i" select="$i"/>
+        <xsl:with-param name="j" select="$j"/>
+        <xsl:with-param name="k" select="0"/>
+      </xsl:call-template>
+
+      <xsl:if test="$j &lt; 2">
+        <xsl:call-template name="add_blank"/>
+      </xsl:if>
+
+      <xsl:call-template name="add_ten_letters">
+        <xsl:with-param name="i" select="$i"/>
+        <xsl:with-param name="j" select="$j+1"/>
+      </xsl:call-template>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="add_begin_position">
+    <xsl:param name="position" />
+
+    <xsl:text disable-output-escaping="yes"><![CDATA[<td width="40px" align="right">]]></xsl:text>
+      <xsl:if test="$position &lt;= last_residue_position">
+        <xsl:value-of select="$position + 1"/>
+      </xsl:if>
+      <xsl:text disable-output-escaping="yes"><![CDATA[</td>]]></xsl:text>
+
+    <xsl:text disable-output-escaping="yes"><![CDATA[<td width="16px"></td>]]></xsl:text>
+  </xsl:template>
+
+  <xsl:template name="add_end_position">
+    <xsl:param name="position" />
+
+    <xsl:text disable-output-escaping="yes"><![CDATA[<td width="16px"></td>]]></xsl:text>
+    <xsl:text disable-output-escaping="yes"><![CDATA[<td width="40px" align="left">]]></xsl:text>
+      <xsl:if test="$position &lt; last_residue_position + 30">
+        <xsl:choose>
+          <xsl:when test="$position &lt; last_residue_position">
+            <xsl:value-of select="$position + 1"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="last_residue_position + 1"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:if>
+      <xsl:text disable-output-escaping="yes"><![CDATA[</td>]]></xsl:text>
   </xsl:template>
 
 
   <xsl:template name="add_table_row">
     <xsl:param name="i" />
-    <xsl:param name="table_row_num" />
-    <xsl:if test="$table_row_num > $i">
+    <xsl:param name="table_last_row" />
+    <xsl:if test="$table_last_row &gt;= $i">
       <tr>
-        <td>
-          <xsl:text>row</xsl:text>
-        </td>
+      <xsl:text>&#10;</xsl:text>
+        <xsl:variable name="row_residue_num" select="30"/>
+        <xsl:variable name="begin_pos" select="$i * $row_residue_num"/>
+
+        <xsl:call-template name="add_begin_position">
+          <xsl:with-param name="position" select="$begin_pos"/>
+        </xsl:call-template>
+
+
+        <xsl:call-template name="add_ten_letters">
+          <xsl:with-param name="i" select="$i"/>
+          <xsl:with-param name="j" select="0"/>
+        </xsl:call-template>
+
+        <xsl:variable name="end_pos" select="$i * $row_residue_num + $row_residue_num - 1"/>
+
+        <xsl:call-template name="add_end_position">
+          <xsl:with-param name="position" select="$end_pos"/>
+        </xsl:call-template>
+
+        <xsl:text>&#10;</xsl:text>
       </tr>
+      <xsl:text>&#10;</xsl:text>
+
       <xsl:call-template name="add_table_row">
         <xsl:with-param name="i" select="$i + 1"/>
-        <xsl:with-param name="table_row_num" select="$table_row_num"/>
+        <xsl:with-param name="table_last_row" select="$table_last_row"/>
       </xsl:call-template>
     </xsl:if>
   </xsl:template>
@@ -237,21 +448,44 @@
   <xsl:template match="annotated_protein/annotation" mode="prsm">
     <div id="alignment" style="font-family: 'FreeMono', Miltonian, monospace; font-size:16;line-height:2.5;background-color:#FFF">
       <xsl:variable name="table_col_num" select="64"/>
-      <xsl:variable name="row_letter_num" select="60"/>
-      <xsl:variable name="character_num" select="count(character)"/>
-      <xsl:variable name="table_row_num" select="ceiling($character_num div $row_letter_num)"/>
+      <xsl:variable name="row_residue_num" select="30"/>
+      <xsl:variable name="residue_num" select="count(residue)"/>
+      <xsl:variable name="table_first_row">
+        <xsl:variable name="tmp" select="floor(first_residue_position div $row_residue_num)"/>
+        <xsl:choose>
+          <xsl:when test="$tmp &gt; 0">
+            <xsl:value-of select="$tmp - 1"/>
+          </xsl:when>
+          <xsl:otherwise> 
+            <xsl:value-of select="$tmp"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
+      <xsl:variable name="table_total_row_num" select="ceiling($residue_num div $row_residue_num)"/>
+      <xsl:variable name="table_last_row">
+        <xsl:variable name="tmp" select="floor(last_residue_position div $row_residue_num)"/>
+        <xsl:choose>
+          <xsl:when test="$table_total_row_num &gt; $tmp + 1">
+            <xsl:value-of select="$tmp + 1"/>
+          </xsl:when>
+          <xsl:otherwise> 
+            <xsl:value-of select="$tmp"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
 
       <table border="0"  cellspacing="0px" cellpadding="0px">
         <xsl:call-template name="add_table_row">
-          <xsl:with-param name="i" select="0"/>
-          <xsl:with-param name="table_row_num" select="$table_row_num"/>
+          <xsl:with-param name="i" select="$table_first_row"/>
+          <xsl:with-param name="table_last_row" select="$table_last_row"/>
         </xsl:call-template>
 
 
+          <!--
         
           
 
-          <!--
           </tr>
           <tr>
             <xsl:for-each select="for $j in 0 to 2 return $j">
@@ -318,7 +552,7 @@
         <xsl:value-of select="theoretical_mass"/>
       </td>
       <td  width="50" align="center" sorttable_customkey="{ion_sort_name}">
-        <xsl:value-of select="type"/>
+        <xsl:value-of select="ion_type"/>
         <xsl:value-of select="ion_display_position"/>
       </td>
       <td  width="70" align="center">
