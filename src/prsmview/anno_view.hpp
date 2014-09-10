@@ -5,13 +5,12 @@
 
 #include "base/extreme_value.hpp"
 #include "base/proteoform.hpp"
-#include "base/anno_residue.hpp"
 #include "spec/deconv_peak.hpp"
 #include "spec/extend_peak.hpp"
 #include "spec/sp_para.hpp"
-#include "prsm/cleavage.hpp"
 #include "prsm/prsm.hpp"
-
+#include "prsmview/anno_residue.hpp"
+#include "prsmview/anno_cleavage.hpp"
 #include "prsmview/prsm_view_mng.hpp"
 
 namespace prot{

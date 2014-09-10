@@ -1,5 +1,5 @@
-#ifndef ANNO_RESIDUE_HPP_
-#define ANNO_RESIDUE_HPP_
+#ifndef PROT_ANNO_RESIDUE_HPP_
+#define PROT_ANNO_RESIDUE_HPP_
 
 #include "base/residue.hpp"
 
@@ -39,4 +39,4 @@ typedef std::vector<AnnoResiduePtr> AnnoResiduePtrVec;
 
 }
 
-#endif /* ANNO_RESIDUE_HPP_ */
+#endif /* PROT_ANNO_RESIDUE_HPP_ */

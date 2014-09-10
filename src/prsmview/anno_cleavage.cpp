@@ -1,8 +1,8 @@
-#include "prsm/cleavage.hpp"
+#include "prsmview/anno_cleavage.hpp"
 
 namespace prot {
 
-Cleavage::Cleavage(int pos){
+AnnoCleavage::AnnoCleavage(int pos){
   pos_= pos;
   exist_n_ion_ = false;
   exist_c_ion_ = false;
@@ -11,7 +11,7 @@ Cleavage::Cleavage(int pos){
   type_ = CLEAVAGE_TYPE_NORMAL;
 }
 
-void Cleavage::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
+void AnnoCleavage::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
   xercesc::DOMElement* element = xml_doc->createElement("cleavage");
   std::string str = convertToString(pos_);
   xml_doc->addElement(element, "position", str.c_str());
@@ -33,10 +33,10 @@ void Cleavage::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
   parent->appendChild(element);
 }
 
-CleavagePtrVec getProteoCleavage(ProteoformPtr prot_ptr,
-                                 ExtendMsPtr ms_three_ptr,
-                                 double min_mass){
-  CleavagePtrVec cleavages;
+AnnoCleavagePtrVec getProteoCleavage(ProteoformPtr prot_ptr,
+                                     ExtendMsPtr ms_three_ptr,
+                                     double min_mass){
+  AnnoCleavagePtrVec cleavages;
   PeakIonPairPtrVec pairs = getPeakIonPairs (prot_ptr, ms_three_ptr, min_mass);
 
   PeakIonPairPtrVec2D peak_list;
@@ -60,7 +60,7 @@ CleavagePtrVec getProteoCleavage(ProteoformPtr prot_ptr,
   }
 
   for(int i=0;i< prot_len+1;i++){
-    CleavagePtr cleavage = CleavagePtr(new Cleavage(i));
+    AnnoCleavagePtr cleavage = AnnoCleavagePtr(new AnnoCleavage(i));
     cleavage->setPairs(peak_list[i]);
     cleavage->setExistNIon(n_ion[i]);
     cleavage->setExistCIon(c_ion[i]);

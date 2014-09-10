@@ -2,6 +2,8 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0">
   <xsl:output encoding="UTF-8" method="html" omit-xml-declaration="yes" indent="yes"/>
 
+  <xsl:include href="basic_prsm.xsl"/> 
+
   <xsl:template match="prsm">
     <html>
       <head>
@@ -92,6 +94,7 @@
       </head>
 
       <body onload="changePosition()">
+        <!--
         <xsl:call-template name="navigation"/>
 
         <h2>Protein-Spectrum-Match #<xsl:value-of select="prsm_id"/> for Spectrum #<xsl:value-of select="ms/ms_header/id"/>
@@ -172,15 +175,8 @@
 
 
         <xsl:apply-templates select="annotated_protein/annotation" mode="prsm"/> 
+        <br></br>
 
-        <div>
-          <br/>
-          Fixed PTMs: <br/>
-          <br/>
-          Variable PTMs: <br/>
-        </div>
-
-        <br/>
 
         <div>
           <a href="#" onclick="showAllPeaks();">All peaks (<xsl:value-of select="count(ms/peaks/peak)"/>)</a>
@@ -193,7 +189,6 @@
             Not matched peaks (<xsl:value-of select="count(ms/peaks/peak[count(matched_ions/matched_ion)=0])"/>)
           </a>
         </div>
-
 
         <div class="outer">
           <div class="innera">
@@ -208,6 +203,9 @@
             </table>
           </div>
         </div>
+
+        -->
+        
 
         <xsl:call-template name="navigation"/>
       </body>
@@ -414,8 +412,7 @@
       <xsl:text disable-output-escaping="yes"><![CDATA[</td>]]></xsl:text>
   </xsl:template>
 
-
-  <xsl:template match="unexpected_change" mode="first_column">
+  <xsl:template match="change" mode="first_coloum">
     <xsl:param name="pos" />
 
     <xsl:text disable-output-escaping="yes"><![CDATA[<td align="left"; colspan="]]></xsl:text>
@@ -423,8 +420,7 @@
       <xsl:variable name="end_pos">
         <xsl:choose>
           <xsl:when test="right_position  &gt;= $pos + 60">
-            <!-- 59 + 2 blanks + 2 right end num + 1 cell for large numbers -->
-            <xsl:value-of select="$pos + 64"/>
+            <xsl:value-of select="$pos + 59"/>
           </xsl:when>
           <xsl:otherwise> 
             <xsl:value-of select="right_position"/>
@@ -433,96 +429,77 @@
       </xsl:variable>
 
       <xsl:variable name="tmp" select="$end_pos - $pos + 1"/>
-      <xsl:variable name="blank_num" select="floor(($tmp - 1) div 20)"/>
+      <xsl:variable name="blank_num" select="($tmp - 1) mod 20"/>
       <xsl:variable name="span" select="$tmp + $blank_num"/>
       <xsl:value-of select="$span"/>
 
       <xsl:text disable-output-escaping="yes"><![CDATA[">]]></xsl:text>
-
-      <xsl:if test="$pos = left_position and type ='SHIFT'">
-
-        <xsl:choose>
-          <xsl:when test="unexpected_change_color = 0">
-            <xsl:text disable-output-escaping="yes"><![CDATA[<font color="#2D3333">]]></xsl:text>
-              <xsl:value-of select="mass_shift"/>
-              <xsl:text disable-output-escaping="yes"><![CDATA[</font>]]></xsl:text>
-          </xsl:when>
-          <xsl:when test="unexpected_change_color = 1">
-            <xsl:text disable-output-escaping="yes"><![CDATA[<font color="#3E3E4A">]]></xsl:text>
-              <xsl:value-of select="mass_shift"/>
-              <xsl:text disable-output-escaping="yes"><![CDATA[</font>]]></xsl:text>
-          </xsl:when>
-        </xsl:choose>
+      <xsl:if test="$pos = left_position">
+        <xsl:value-of select="mass_shift"/>
       </xsl:if>
 
       <xsl:text disable-output-escaping="yes"><![CDATA[</td>]]></xsl:text>
 
+    <xsl:call-template name="add_shift">
+      <xsl:with-param name="i" select="$i"/>
+      <xsl:with-param name="j" select="$j+1"/>
+    </xsl:call-template>
   </xsl:template>
 
-  <xsl:template match="unexpected_change" mode="non_first_column">
+  <xsl:template match="change" mode="non_first_coloum">
     <xsl:param name="pos" />
-    <xsl:param name="row_start_pos" />
 
-    <xsl:variable name="end_pos">
-      <xsl:choose>
-        <xsl:when test="right_position  &gt;= $row_start_pos + 60">
-          <!-- 59 + 2 blanks + 2 right end num + 1 cell for large numbers -->
-          <xsl:value-of select="$row_start_pos + 64"/>
-        </xsl:when>
-        <xsl:otherwise> 
-          <xsl:value-of select="right_position"/>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
+      <xsl:variable name="end_pos">
+        <xsl:choose>
+          <xsl:when test="right_position  &gt;= $pos + 60">
+            <xsl:value-of select="$pos + 59"/>
+          </xsl:when>
+          <xsl:otherwise> 
+            <xsl:value-of select="right_position"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
 
-    <xsl:text disable-output-escaping="yes"><![CDATA[<td align="left"  colspan="]]></xsl:text>
+    <xsl:text disable-output-escaping="yes"><![CDATA[<td align="left"; colspan="]]></xsl:text>
 
-      <xsl:variable name="tmp" select="$end_pos - $pos + 1"/>
-      <xsl:variable name="blank_num" select="floor(($end_pos mod 60) div 20) - floor(($pos mod 60)  div 20)"/>
+      <xsl:variable name="tmp" select="end_pos - $pos + 1"/>
+      <xsl:variable name="blank_num" select="(($end_pos mod 60) mod 20) - ($pos mod 60)  mod 20)"/>
       <xsl:variable name="span" select="$tmp + $blank_num"/>
       <xsl:value-of select="$span"/>
-      <xsl:text disable-output-escaping="yes"><![CDATA[" ]]></xsl:text>
 
-      <xsl:text disable-output-escaping="yes"><![CDATA[>]]></xsl:text>
-
-      <xsl:if test="$pos = left_position and type ='SHIFT'">
-
-        <xsl:choose>
-          <xsl:when test="unexpected_change_color = 0">
-            <xsl:text disable-output-escaping="yes"><![CDATA[<font color="#2D3333">]]></xsl:text>
-              <xsl:value-of select="mass_shift"/>
-              <xsl:text disable-output-escaping="yes"><![CDATA[</font>]]></xsl:text>
-          </xsl:when>
-          <xsl:when test="unexpected_change_color = 1">
-            <xsl:text disable-output-escaping="yes"><![CDATA[<font color="#3E3E4A">]]></xsl:text>
-              <xsl:value-of select="mass_shift"/>
-              <xsl:text disable-output-escaping="yes"><![CDATA[</font>]]></xsl:text>
-          </xsl:when>
-        </xsl:choose>
+      <xsl:text disable-output-escaping="yes"><![CDATA[">]]></xsl:text>
+      <xsl:if test="$pos = left_position">
+        <xsl:value-of select="mass_shift"/>
       </xsl:if>
 
       <xsl:text disable-output-escaping="yes"><![CDATA[</td>]]></xsl:text>
 
+    <xsl:call-template name="add_shift">
+      <xsl:with-param name="i" select="$i"/>
+      <xsl:with-param name="j" select="$j+1"/>
+    </xsl:call-template>
   </xsl:template>
 
   <xsl:template name="add_shift">
     <xsl:param name="i" />
     <xsl:param name="j" />
 
-    <xsl:if test="$j &lt; 62">
+    <xsl:if test="$j &lt; 60">
       <xsl:variable name="pos" select="$i * 60 + $j"/>
       <xsl:choose> 
         <xsl:when test="$j = 0">
-          <xsl:apply-templates select="unexpected_change[left_position &lt;= $pos and right_position &gt;= $pos ]" mode="first_column">
+          <!--
+          <xsl:apply-templates select="match[left_position &lt;= $pos and right_position &gt;= $pos ]" mode="first_column">
             <xsl:with-param name="pos" select="$pos"/>
           </xsl:apply-templates>
+          -->
         </xsl:when>
-
         <xsl:when test="$j &gt; 0">
-          <xsl:apply-templates select="unexpected_change[left_position = $pos]" mode="non_first_column">
+          <!--
+          <xsl:apply-templates select="match[left_position = $pos]" mode="non_first_column">
             <xsl:with-param name="pos" select="$pos"/>
-            <xsl:with-param name="row_start_pos" select="$i * 60"/>
           </xsl:apply-templates>
+          -->
         </xsl:when>
       </xsl:choose>
       <xsl:call-template name="add_shift">
@@ -530,7 +507,6 @@
         <xsl:with-param name="j" select="$j+1"/>
       </xsl:call-template>
     </xsl:if>
-
   </xsl:template>
 
 
@@ -538,30 +514,28 @@
     <xsl:param name="i" />
     <xsl:param name="table_last_row" />
     <xsl:if test="$table_last_row &gt;= $i">
-
-      <tr>
-        <td>
-        <xsl:text>&#160;</xsl:text>
-        </td>
-      </tr>
-
       <!-- shifts -->
+        <!--
       <tr>
         <xsl:text>&#10;</xsl:text>
-        <xsl:text disable-output-escaping="yes"><![CDATA[<td colspan="2">&#160;</td>]]></xsl:text>
+
+
+        <xsl:text disable-output-escaping="yes"><![CDATA[<td colspan="2"></td>]]></xsl:text>
 
         <xsl:call-template name="add_shift">
           <xsl:with-param name="i" select="$i"/>
           <xsl:with-param name="j" select="0"/>
         </xsl:call-template>
 
+        <xsl:text disable-output-escaping="yes"><![CDATA[<td colspan="2"></td>]]></xsl:text>
         <xsl:text>&#10;</xsl:text>
 
       </tr>
       <xsl:text>&#10;</xsl:text>
+        -->
 
       <tr>
-      <xsl:text>&#10;</xsl:text>
+        <xsl:text>&#10;</xsl:text>
         <xsl:variable name="row_residue_num" select="30"/>
         <xsl:variable name="begin_pos" select="$i * $row_residue_num"/>
 
@@ -570,18 +544,18 @@
         </xsl:call-template>
 
 
+        <!--
         <xsl:call-template name="add_ten_letters">
           <xsl:with-param name="i" select="$i"/>
           <xsl:with-param name="j" select="0"/>
         </xsl:call-template>
+        -->
 
         <xsl:variable name="end_pos" select="$i * $row_residue_num + $row_residue_num - 1"/>
 
         <xsl:call-template name="add_end_position">
           <xsl:with-param name="position" select="$end_pos"/>
         </xsl:call-template>
-        <!-- an extra cell for large shift numbers -->
-        <td></td>
 
         <xsl:text>&#10;</xsl:text>
       </tr>
@@ -597,6 +571,8 @@
 
   <xsl:template match="annotated_protein/annotation" mode="prsm">
     <div id="alignment" style="font-family: 'FreeMono', Miltonian, monospace; font-size:16;line-height:2.5;background-color:#FFF">
+
+        <!--
       <xsl:variable name="row_residue_num" select="30"/>
       <xsl:variable name="residue_num" select="count(residue)"/>
       <xsl:variable name="table_first_row">
@@ -611,7 +587,7 @@
         </xsl:choose>
       </xsl:variable>
 
-      <xsl:variable name="table_total_row_num" select="ceiling($residue_num div $row_residue_num)"/>
+      <xsl:variable name="table_total_row_num" select="ceiling(($residue_num + 1) div $row_residue_num)"/>
       <xsl:variable name="table_last_row">
         <xsl:variable name="tmp" select="floor(last_residue_position div $row_residue_num)"/>
         <xsl:choose>
@@ -630,6 +606,7 @@
           <xsl:with-param name="table_last_row" select="$table_last_row"/>
         </xsl:call-template>
       </table>         
+        -->
     </div>
   </xsl:template>
 

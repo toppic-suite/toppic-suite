@@ -1,7 +1,8 @@
 
-#include "base/anno_residue.hpp"
-#include "base/anno_change.hpp"
 #include "spec/peak.hpp"
+#include "prsmview/anno_residue.hpp"
+#include "prsmview/anno_unexpected_change.hpp"
+#include "prsmview/anno_expected_change.hpp"
 #include "prsmview/anno_view.hpp"
 
 namespace prot{
@@ -45,14 +46,14 @@ xercesc::DOMElement* genePrsmView(XmlDOMDocument* xml_doc,PrsmPtr prsm_ptr, Prsm
   std::string str = convertToString(prsm_ptr->getId());
   xml_doc->addElement(element, "prsm_id", str.c_str());
   if(prsm_ptr->getProbPtr().get()!=nullptr){
-    str=convertToString(prsm_ptr->getProbPtr()->getPValue(), mng_ptr->decimal_point_num);
+    str=convertToString(prsm_ptr->getProbPtr()->getPValue(), mng_ptr->decimal_point_num_);
     xml_doc->addElement(element, "p_value", str.c_str());
   }
   else{
     xml_doc->addElement(element, "p_value", "N/A");
   }
   if(prsm_ptr->getProbPtr().get()!=nullptr){
-    str=convertToString(prsm_ptr->getProbPtr()->getEValue(), mng_ptr->decimal_point_num);
+    str=convertToString(prsm_ptr->getProbPtr()->getEValue(), mng_ptr->decimal_point_num_);
     xml_doc->addElement(element, "e_value", str.c_str());
   }
   else{
@@ -60,7 +61,7 @@ xercesc::DOMElement* genePrsmView(XmlDOMDocument* xml_doc,PrsmPtr prsm_ptr, Prsm
   }
   double fdr = prsm_ptr->getFdr();
   if (fdr >= 0) {
-    str=convertToString(prsm_ptr->getFdr(), mng_ptr->decimal_point_num);
+    str=convertToString(prsm_ptr->getFdr(), mng_ptr->decimal_point_num_);
     xml_doc->addElement(element, "fdr", str.c_str());
   }
   else {
@@ -72,15 +73,15 @@ xercesc::DOMElement* genePrsmView(XmlDOMDocument* xml_doc,PrsmPtr prsm_ptr, Prsm
   xml_doc->addElement(element, "matched_peak_number", str.c_str());
   //  str=convertToString(prsm->getOriPrecMass());
   //  xml_doc->addElement(element, "precursor_mass", str.c_str());
-  str=convertToString(prsm_ptr->getAdjustedPrecMass(), mng_ptr->precise_point_num);
+  str=convertToString(prsm_ptr->getAdjustedPrecMass(), mng_ptr->precise_point_num_);
   xml_doc->addElement(element, "adjusted_precursor_mass", str.c_str());
-  str=convertToString(prsm_ptr->getCalibration(), mng_ptr->precise_point_num);
+  str=convertToString(prsm_ptr->getCalibration(), mng_ptr->precise_point_num_);
   xml_doc->addElement(element, "calibration", str.c_str());
 
   //get ion_pair
   PeakIonPairPtrVec pair_ptrs =  getPeakIonPairs (prsm_ptr->getProteoformPtr(), 
                                                   prsm_ptr->getRefineMs(),
-                                                  mng_ptr->min_mass);
+                                                  mng_ptr->min_mass_);
   //LOG_DEBUG("pair completed");
   //peaks to view
   xercesc::DOMElement* ms_element = xml_doc->createElement("ms");
@@ -95,12 +96,12 @@ xercesc::DOMElement* genePrsmView(XmlDOMDocument* xml_doc,PrsmPtr prsm_ptr, Prsm
     xml_doc->addElement(peak_element, "id", str.c_str());
     double mass = peak_ptr->getPosition();
     int charge = peak_ptr->getCharge();
-    str=convertToString(mass, mng_ptr->precise_point_num);
+    str=convertToString(mass, mng_ptr->precise_point_num_);
     xml_doc->addElement(peak_element, "monoisotopic_mass", str.c_str());
     double mz = compMonoMz(mass, charge);
-    str=convertToString(mz, mng_ptr->precise_point_num);
+    str=convertToString(mz, mng_ptr->precise_point_num_);
     xml_doc->addElement(peak_element, "monoisotopic_mz", str.c_str());
-    str=convertToString(peak_ptr->getIntensity(), mng_ptr->decimal_point_num);
+    str=convertToString(peak_ptr->getIntensity(), mng_ptr->decimal_point_num_);
     xml_doc->addElement(peak_element, "intensity", str.c_str());
     str=convertToString(charge);
     xml_doc->addElement(peak_element, "charge", str.c_str());
@@ -143,7 +144,7 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
   str=proteoform_ptr->getSeqName();
   xml_doc->addElement(prot_element, "sequence_name", str.c_str());
   double mass = proteoform_ptr->getMass();
-  str=convertToString(mass, mng_ptr->decimal_point_num);
+  str=convertToString(mass, mng_ptr->decimal_point_num_);
   xml_doc->addElement(prot_element, "protein_mass", str.c_str());
   str=convertToString(proteoform_ptr->getProtModPtr()->getPtmPtr()->isAcetylation());
   xml_doc->addElement(prot_element, "n_acetylation", str.c_str());
@@ -169,7 +170,7 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
 
   //LOG_DEBUG("summary completed");
 
-  CleavagePtrVec cleavage_ptrs = getProteoCleavage(proteoform_ptr,ms_three_ptr,mng_ptr->min_mass);
+  AnnoCleavagePtrVec cleavage_ptrs = getProteoCleavage(proteoform_ptr,ms_three_ptr,mng_ptr->min_mass_);
 
   //LOG_DEBUG("cleavage completed");
 
@@ -179,7 +180,6 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
   for(int i=0;i< prot_len;i++){
     res_ptrs.push_back(AnnoResiduePtr(new AnnoResidue(proteoform_ptr->getDbResSeqPtr()->getResiduePtr(i), i)));
   }
-
 
   //LOG_DEBUG("residue completed");
   // add information for N-terminal truncation
@@ -206,9 +206,8 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
   }
   //LOG_DEBUG("c-trunc completed");
 
-  // CONTINUE to write anno_change_ptrs.
-
-  AnnoChangePtrVec anno_change_ptrs;
+  AnnoUnexpectedChangePtrVec unexpected_change_ptrs;
+  AnnoExpectedChangePtrVec expected_change_ptrs;
   int unexpected_shift_color = 0;
   int last_right = -1;
   for (size_t i = 0; i < change_ptrs.size(); i++) {
@@ -218,17 +217,28 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
     double shift = change_ptrs[i]->getMassShift();
     if (change_ptrs[i]->getChangeType() != UNEXPECTED_CHANGE) { 
       res_ptrs[left_bp]->setType(ANNO_RESIDUE_TYPE_KNOWN_CHANGE);
+
+      AnnoExpectedChangePtr existing_ptr 
+          = findExpectedChange(expected_change_ptrs, change_ptrs[i]->getChangeType(), change_ptrs[i]->getPtmPtr());
+      if (existing_ptr == nullptr) {
+        existing_ptr = AnnoExpectedChangePtr(new AnnoExpectedChange(change_ptrs[i]->getChangeType(), change_ptrs[i]->getPtmPtr()));
+        expected_change_ptrs.push_back(existing_ptr);
+      }
+      int pos = left_bp + start_pos;
+      std::string acid_letter = proteoform_ptr->getDbResSeqPtr()->getResiduePtr(pos)->getAcidPtr()->getOneLetter();
+      existing_ptr->addOccurence(pos, acid_letter);
     }
     else {
       //LOG_DEBUG("left bp " << left_bp << " right bp " << right_bp << " protein len " << prot_len << " res size " << res_ptrs.size() << " cleavage size " << cleavage_ptrs.size());
       if (left_bp == right_bp) {
         int this_left = left_bp * 2;
         if (this_left > last_right + 1) {
-          AnnoChangePtr anno_change_ptr(new AnnoChange(last_right + 1, this_left - 1, 0, -1, -1));
+          AnnoUnexpectedChangePtr anno_change_ptr(new AnnoUnexpectedChange(last_right + 1, this_left - 1, 0, -1, "EMPTY"));
+          unexpected_change_ptrs.push_back(anno_change_ptr);
         }
         int this_right = right_bp * 2;
-        AnnoChangePtr anno_change_ptr(new AnnoChange(this_left , this_right, shift, unexpected_shift_color, 0));
-        anno_change_ptrs.push_back(anno_change_ptr);
+        AnnoUnexpectedChangePtr anno_change_ptr(new AnnoUnexpectedChange(this_left , this_right, shift, unexpected_shift_color, "SHIFT"));
+        unexpected_change_ptrs.push_back(anno_change_ptr);
         last_right = this_right;
         
         cleavage_ptrs[left_bp]->setUnexpectedChange(true);
@@ -237,11 +247,12 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
       else {
         int this_left = left_bp * 2 + 1;
         if (this_left > last_right + 1) {
-          AnnoChangePtr anno_change_ptr(new AnnoChange(last_right + 1, this_left - 1, 0, -1, -1));
+          AnnoUnexpectedChangePtr anno_change_ptr(new AnnoUnexpectedChange(last_right + 1, this_left - 1, 0, -1, "EMPTY"));
+          unexpected_change_ptrs.push_back(anno_change_ptr);
         }
         int this_right = right_bp * 2 - 1;
-        AnnoChangePtr anno_change_ptr(new AnnoChange(this_left, this_right, shift, unexpected_shift_color, 1));
-        anno_change_ptrs.push_back(anno_change_ptr);
+        AnnoUnexpectedChangePtr anno_change_ptr(new AnnoUnexpectedChange(this_left, this_right, shift, unexpected_shift_color, "SHIFT"));
+        unexpected_change_ptrs.push_back(anno_change_ptr);
         last_right = this_right;
 
         for (int j = left_bp; j < right_bp - 1; j++) {
@@ -255,8 +266,12 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
       }
       unexpected_shift_color = (unexpected_shift_color) + 1 % 2;
     }
-    
   }
+  // last annochange
+  AnnoUnexpectedChangePtr anno_change_ptr(new AnnoUnexpectedChange(last_right + 1, std::numeric_limits<int>::max(), 0, -1, "EMPTY"));
+  unexpected_change_ptrs.push_back(anno_change_ptr);
+  
+
   LOG_DEBUG("unexpected completed");
 
   for (size_t i = 0; i < res_ptrs.size(); i++) {
@@ -265,8 +280,11 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
   for (size_t i = 0; i < cleavage_ptrs.size(); i++) {
     cleavage_ptrs[i]->appendXml(xml_doc, anno_element);
   }
-  for (size_t i = 0; i < anno_change_ptrs.size(); i++) {
-    anno_change_ptrs[i]->appendXml(xml_doc, anno_element);
+  for (size_t i = 0; i < unexpected_change_ptrs.size(); i++) {
+    unexpected_change_ptrs[i]->appendXml(xml_doc, anno_element, mng_ptr->decimal_point_num_);
+  }
+  for (size_t i = 0; i < expected_change_ptrs.size(); i++) {
+    expected_change_ptrs[i]->appendXml(xml_doc, anno_element);
   }
   return prot_element;
 }
