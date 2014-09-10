@@ -1,5 +1,5 @@
-#ifndef PROT_CLEAVAGE_HPP_
-#define PROT_CLEAVAGE_HPP_
+#ifndef PROT_ANNO_CLEAVAGE_HPP_
+#define PROT_ANNO_CLEAVAGE_HPP_
 
 #include "base/proteoform.hpp"
 #include "spec/extend_peak.hpp"
@@ -13,9 +13,9 @@ namespace prot {
 #define CLEAVAGE_TYPE_SEQ_START "seq_start"
 #define CLEAVAGE_TYPE_SEQ_END "seq_end"
 
-class Cleavage {
+class AnnoCleavage {
  public:
-  Cleavage(int pos);
+  AnnoCleavage(int pos);
 
   void setPairs(PeakIonPairPtrVec pairs) {pairs_ = pairs;} 
 
@@ -43,12 +43,12 @@ class Cleavage {
   int unexpected_change_color_;
 };
 
-typedef std::shared_ptr<Cleavage> CleavagePtr;
-typedef std::vector<CleavagePtr> CleavagePtrVec;
+typedef std::shared_ptr<AnnoCleavage> AnnoCleavagePtr;
+typedef std::vector<AnnoCleavagePtr> AnnoCleavagePtrVec;
 
-CleavagePtrVec getProteoCleavage(ProteoformPtr prot_ptr, 
-                                 ExtendMsPtr ms_three_ptr,
-                                 double min_mass);
+AnnoCleavagePtrVec getProteoCleavage(ProteoformPtr prot_ptr, 
+                                     ExtendMsPtr ms_three_ptr,
+                                     double min_mass);
 } /* namespace prot */
 
-#endif /* CLEAVAGE_HPP_ */
+#endif /* PROT_ANNO_CLEAVAGE_HPP_ */

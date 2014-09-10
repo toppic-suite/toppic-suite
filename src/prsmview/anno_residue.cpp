@@ -1,5 +1,5 @@
 
-#include "base/anno_residue.hpp"
+#include "prsmview/anno_residue.hpp"
 
 namespace prot {
 
