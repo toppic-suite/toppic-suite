@@ -21,8 +21,8 @@ void AnnoExpectedChange::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* 
   for (size_t i = 0; i < occurences_.size(); i++) {
     xercesc::DOMElement* position_element = xml_doc->createElement("occurence");
     std::string str = convertToString(occurences_[i].first);
-    xml_doc->addElement(element, "position", str.c_str());
-    xml_doc->addElement(element, "acid_letter", occurences_[i].second.c_str());
+    xml_doc->addElement(position_element, "position", str.c_str());
+    xml_doc->addElement(position_element, "acid_letter", occurences_[i].second.c_str());
     element->appendChild(position_element);
   }
   parent->appendChild(element);

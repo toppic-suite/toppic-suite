@@ -71,10 +71,6 @@ xercesc::DOMElement* genePrsmView(XmlDOMDocument* xml_doc,PrsmPtr prsm_ptr, Prsm
   xml_doc->addElement(element, "matched_fragment_number", str.c_str());
   str=convertToString((int)prsm_ptr->getMatchPeakNum());
   xml_doc->addElement(element, "matched_peak_number", str.c_str());
-  //  str=convertToString(prsm->getOriPrecMass());
-  //  xml_doc->addElement(element, "precursor_mass", str.c_str());
-  str=convertToString(prsm_ptr->getAdjustedPrecMass(), mng_ptr->precise_point_num_);
-  xml_doc->addElement(element, "adjusted_precursor_mass", str.c_str());
   str=convertToString(prsm_ptr->getCalibration(), mng_ptr->precise_point_num_);
   xml_doc->addElement(element, "calibration", str.c_str());
 
@@ -145,14 +141,12 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
   xml_doc->addElement(prot_element, "sequence_name", str.c_str());
   double mass = proteoform_ptr->getMass();
   str=convertToString(mass, mng_ptr->decimal_point_num_);
-  xml_doc->addElement(prot_element, "protein_mass", str.c_str());
+  xml_doc->addElement(prot_element, "proteoform_mass", str.c_str());
   str=convertToString(proteoform_ptr->getProtModPtr()->getPtmPtr()->isAcetylation());
   xml_doc->addElement(prot_element, "n_acetylation", str.c_str());
-  int unexpected_shift_number = proteoform_ptr->getChangePtrVec().size()-proteoform_ptr->getUnexpectedChangeNum();
-  str=convertToString(unexpected_shift_number);
-  xml_doc->addElement(prot_element, "unexpected_shift_number", str.c_str());
-  str=convertToString(proteoform_ptr->getDbResSeqPtr()->getLen());
-  xml_doc->addElement(prot_element, "db_acid_number", str.c_str());
+  int unexpected_change_number = proteoform_ptr->getUnexpectedChangeNum();
+  str=convertToString(unexpected_change_number);
+  xml_doc->addElement(prot_element, "unexpected_change_number", str.c_str());
 
   ChangePtrVec change_ptrs = proteoform_ptr->getChangePtrVec(); 
   std::sort(change_ptrs.begin(),change_ptrs.end(),compareChangeTypeUpPosUp);
@@ -212,11 +206,11 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
   int last_right = -1;
   for (size_t i = 0; i < change_ptrs.size(); i++) {
     // add information for known changes 
-    int left_bp = change_ptrs[i]->getLeftBpPos() + start_pos;
-    int right_bp = change_ptrs[i]->getRightBpPos() + start_pos;
+    int left_db_bp = change_ptrs[i]->getLeftBpPos() + start_pos;
+    int right_db_bp = change_ptrs[i]->getRightBpPos() + start_pos;
     double shift = change_ptrs[i]->getMassShift();
     if (change_ptrs[i]->getChangeType() != UNEXPECTED_CHANGE) { 
-      res_ptrs[left_bp]->setType(ANNO_RESIDUE_TYPE_KNOWN_CHANGE);
+      res_ptrs[left_db_bp]->setType(ANNO_RESIDUE_TYPE_KNOWN_CHANGE);
 
       AnnoExpectedChangePtr existing_ptr 
           = findExpectedChange(expected_change_ptrs, change_ptrs[i]->getChangeType(), change_ptrs[i]->getPtmPtr());
@@ -224,45 +218,44 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
         existing_ptr = AnnoExpectedChangePtr(new AnnoExpectedChange(change_ptrs[i]->getChangeType(), change_ptrs[i]->getPtmPtr()));
         expected_change_ptrs.push_back(existing_ptr);
       }
-      int pos = left_bp + start_pos;
-      std::string acid_letter = proteoform_ptr->getDbResSeqPtr()->getResiduePtr(pos)->getAcidPtr()->getOneLetter();
-      existing_ptr->addOccurence(pos, acid_letter);
+      std::string acid_letter = proteoform_ptr->getDbResSeqPtr()->getResiduePtr(left_db_bp)->getAcidPtr()->getOneLetter();
+      existing_ptr->addOccurence(left_db_bp, acid_letter);
     }
     else {
       //LOG_DEBUG("left bp " << left_bp << " right bp " << right_bp << " protein len " << prot_len << " res size " << res_ptrs.size() << " cleavage size " << cleavage_ptrs.size());
-      if (left_bp == right_bp) {
-        int this_left = left_bp * 2;
+      if (left_db_bp == right_db_bp) {
+        int this_left = left_db_bp * 2;
         if (this_left > last_right + 1) {
           AnnoUnexpectedChangePtr anno_change_ptr(new AnnoUnexpectedChange(last_right + 1, this_left - 1, 0, -1, "EMPTY"));
           unexpected_change_ptrs.push_back(anno_change_ptr);
         }
-        int this_right = right_bp * 2;
+        int this_right = right_db_bp * 2;
         AnnoUnexpectedChangePtr anno_change_ptr(new AnnoUnexpectedChange(this_left , this_right, shift, unexpected_shift_color, "SHIFT"));
         unexpected_change_ptrs.push_back(anno_change_ptr);
         last_right = this_right;
         
-        cleavage_ptrs[left_bp]->setUnexpectedChange(true);
-        cleavage_ptrs[left_bp]->setUnexpectedChangeColor(unexpected_shift_color);;
+        cleavage_ptrs[left_db_bp]->setUnexpectedChange(true);
+        cleavage_ptrs[left_db_bp]->setUnexpectedChangeColor(unexpected_shift_color);;
       }
       else {
-        int this_left = left_bp * 2 + 1;
+        int this_left = left_db_bp * 2 + 1;
         if (this_left > last_right + 1) {
           AnnoUnexpectedChangePtr anno_change_ptr(new AnnoUnexpectedChange(last_right + 1, this_left - 1, 0, -1, "EMPTY"));
           unexpected_change_ptrs.push_back(anno_change_ptr);
         }
-        int this_right = right_bp * 2 - 1;
+        int this_right = right_db_bp * 2 - 1;
         AnnoUnexpectedChangePtr anno_change_ptr(new AnnoUnexpectedChange(this_left, this_right, shift, unexpected_shift_color, "SHIFT"));
         unexpected_change_ptrs.push_back(anno_change_ptr);
         last_right = this_right;
 
-        for (int j = left_bp; j < right_bp - 1; j++) {
+        for (int j = left_db_bp; j < right_db_bp - 1; j++) {
           res_ptrs[j]->setUnexpectedChange(true);
           res_ptrs[j]->setUnexpectedChangeColor(unexpected_shift_color);;
           cleavage_ptrs[j+1]->setUnexpectedChange(true);
           cleavage_ptrs[j+1]->setUnexpectedChangeColor(unexpected_shift_color);;
         }
-        res_ptrs[right_bp-1]->setUnexpectedChange(true);
-        res_ptrs[right_bp-1]->setUnexpectedChangeColor(unexpected_shift_color);;
+        res_ptrs[right_db_bp-1]->setUnexpectedChange(true);
+        res_ptrs[right_db_bp-1]->setUnexpectedChangeColor(unexpected_shift_color);;
       }
       unexpected_shift_color = (unexpected_shift_color) + 1 % 2;
     }
