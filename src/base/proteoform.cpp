@@ -22,6 +22,7 @@ Proteoform::Proteoform(DbResSeqPtr db_res_seq_ptr,
   species_id_=0;
 }
 
+
 Proteoform::Proteoform(xercesc::DOMElement* element, 
                        const ProteoformPtrVec &db_proteoforms){
 
@@ -167,7 +168,7 @@ double Proteoform::getMass(){
 std::string Proteoform::getProteinMatchSeq(){
   std::string protein_string = db_residue_seq_ptr_->toAcidString();
   //LOG_DEBUG("protein string lenth " << protein_string.length() << " string " << protein_string);
-  std::string mid_string = protein_string.substr(start_pos_, end_pos_- start_pos_ +1);
+  std::string mid_string = residue_seq_ptr_->toAcidString();
   //LOG_DEBUG("mid string lenth " << mid_string.length() << " string " << mid_string);
   std::sort(change_list_.begin(),change_list_.end(),compareChangeTypeUpPosUp);
 
@@ -259,52 +260,58 @@ ProteoformPtr getProtModProteoform(ProteoformPtr db_form_ptr,
     //LOG_DEBUG("NO valid trunc");
     return ProteoformPtr(nullptr);
   }
-  // first residue might be acetylated 
-  int start = trunc_ptr->getTruncLen();
-  ResiduePtrVec residues;
-  ResiduePtr residue = db_res_seq_ptr->getResiduePtr(start);
-  PtmPtr ori_ptm = residue->getPtmPtr();
-  PtmPtr ptm = prot_mod_ptr->getPtmPtr();
-  ChangePtrVec change_list;
-  if (ptm->isEmpty() || !ori_ptm->isEmpty()) {
-    residues.push_back(residue);
-    if (!ori_ptm->isEmpty()) {
-      ChangePtr change_ptr = ChangePtr(
-          new Change(0, 1, FIXED_CHANGE, ori_ptm->getMonoMass(), ori_ptm));
-      change_list.push_back(change_ptr);
+
+  int start_res = trunc_ptr->getTruncLen();
+  /* last bp index */
+  int end_res = db_form_ptr->getLen();
+  ChangePtrVec ori_change_ptrs = db_form_ptr->getChangePtrVec();
+  ChangePtrVec change_ptrs;
+  for (size_t i = 0; i < ori_change_ptrs.size(); i++) {
+    if (ori_change_ptrs[i]->getLeftBpPos() >= start_res 
+        && ori_change_ptrs[i]->getRightBpPos() <= end_res + 1) {
+      ChangePtr change_ptr = ChangePtr(new Change(ori_change_ptrs[i], start_res));
+      change_ptrs.push_back(change_ptr);
     }
   }
+
+  // first residue might be acetylated 
+  ResiduePtrVec residue_ptrs;
+  ResiduePtr first_residue_ptr = db_res_seq_ptr->getResiduePtr(start_res);
+
+  PtmPtr ori_ptm_ptr = first_residue_ptr->getPtmPtr();
+  PtmPtr prot_ptm_ptr = prot_mod_ptr->getPtmPtr();
+  /* if there is a conflict */
+  if (!ori_ptm_ptr ->isEmpty() && !prot_ptm_ptr->isEmpty()) {
+    return ProteoformPtr(nullptr);
+  }
+
+  if (prot_ptm_ptr->isEmpty()) {
+    residue_ptrs.push_back(first_residue_ptr);
+  }
   else {
-    AcidPtr acid = residue->getAcidPtr();
-    ResiduePtr mut_residue = ResidueFactory::getBaseResiduePtrByAcidPtm(acid, ptm);
-    if (mut_residue.get() == nullptr) {
+    /* add protein n-terminal mod */
+    AcidPtr acid_ptr = first_residue_ptr->getAcidPtr();
+    ResiduePtr mut_residue_ptr = ResidueFactory::getBaseResiduePtrByAcidPtm(acid_ptr, prot_ptm_ptr);
+    if (mut_residue_ptr == nullptr) {
       LOG_ERROR( "Proteoform:: residue not found");
       throw("Residue not found");
     }
-    residues.push_back(mut_residue);
-    change_list.push_back(ChangePtr(new Change(0,1, PROTEIN_VARIABLE_CHANGE, 
-                                               ptm->getMonoMass(), ptm)));
+    residue_ptrs.push_back(mut_residue_ptr);
+    change_ptrs.push_back(ChangePtr(new Change(0,1, PROTEIN_VARIABLE_CHANGE, 
+                                               prot_ptm_ptr->getMonoMass(), prot_ptm_ptr)));
   }
+
   // add all other residues
-  for (int i = start + 1; i < db_res_seq_ptr->getLen(); i++) {
-    residues.push_back(db_res_seq_ptr->getResiduePtr(i));
+  for (int i = start_res + 1; i < db_res_seq_ptr->getLen(); i++) {
+    residue_ptrs.push_back(db_res_seq_ptr->getResiduePtr(i));
   }
-  ResSeqPtr seq_ptr = ResSeqPtr(new ResidueSeq(residues));
-  // start from 1 since ptm on the first residue has been added to the change
-  // list
-  for (int i = 1; i < seq_ptr->getLen(); i++) {
-    PtmPtr ptm_ptr = seq_ptr->getResiduePtr(i)->getPtmPtr();
-    if (!ptm_ptr->isEmpty()) {
-      ChangePtr change_ptr = ChangePtr(
-          new Change(i, i+1, FIXED_CHANGE, ptm_ptr->getMonoMass(), ptm_ptr));
-      change_list.push_back(change_ptr);
-    }
-  }
+  ResSeqPtr seq_ptr = ResSeqPtr(new ResidueSeq(residue_ptrs));
+
   //LOG_DEBUG("mod protein sequence name " << db_res_seq_ptr->getName() 
   //<< " len " << db_res_seq_ptr->getLen());
   return ProteoformPtr(
-      new Proteoform(db_res_seq_ptr, prot_mod_ptr, seq_ptr, start, 
-                     db_res_seq_ptr->getLen()-1, change_list));
+      new Proteoform(db_res_seq_ptr, prot_mod_ptr, seq_ptr, start_res, 
+                     db_res_seq_ptr->getLen()-1, change_ptrs));
 }
 
 ProteoformPtr getSubProteoform(ProteoformPtr proteoform_ptr, 
@@ -320,7 +327,7 @@ ProteoformPtr getSubProteoform(ProteoformPtr proteoform_ptr,
   for (size_t i = 0; i < ori_change_list.size(); i++) {
     if (ori_change_list[i]->getLeftBpPos() >= local_start 
         && ori_change_list[i]->getRightBpPos() <= local_end + 1) {
-      ChangePtr change_ptr = ChangePtr(new Change(*ori_change_list[i], local_start));
+      ChangePtr change_ptr = ChangePtr(new Change(ori_change_list[i], local_start));
       change_list.push_back(change_ptr);
     }
   }

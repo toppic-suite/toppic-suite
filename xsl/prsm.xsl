@@ -70,7 +70,7 @@
 
           .innera {
           overflow:auto;
-          width:52em;
+          width:50em;
           height:28em;
           margin:0;
           }
@@ -94,110 +94,99 @@
       <body onload="changePosition()">
         <xsl:call-template name="navigation"/>
 
-        <h2>Protein-Spectrum-Match #<xsl:value-of select="prsm_id"/> for Spectrum #<xsl:value-of select="ms/ms_header/id"/>
-        </h2>
+        <h3>Protein-Spectrum-Match #<xsl:value-of select="prsm_id"/> for Spectrum #<xsl:value-of select="ms/ms_header/id"/>
+        </h3>
 
         <table cellpadding="3" width="750" class="info">
           <tr>
+
             <td>PrSM ID: </td>
-            <td>
-              <xsl:value-of select="prsm_id"/>
-            </td>
-            <td>
-              Scan(s): 
-            </td>
-            <td> 
-              <xsl:value-of select="ms/ms_header/scans"/>
-            </td>
+
+            <td> <xsl:value-of select="prsm_id"/> </td>
+
+            <td> Scan(s): </td>
+
+            <td> <xsl:value-of select="ms/ms_header/scans"/> </td>
+
             <td>Precursor charge:</td>
-            <td>
-              <xsl:value-of select="ms/ms_header/precursor_charge"/>
-            </td>
-            <td>
-              Precursor m/z:
-            </td>
-            <td>
-              <xsl:value-of select="ms/ms_header/precursor_mz"/>
-            </td>
+
+            <td> <xsl:value-of select="ms/ms_header/precursor_charge"/> </td>
+
           </tr>
           <tr>
+
+            <td> Precursor m/z: </td>
+
+            <td> <xsl:value-of select="ms/ms_header/precursor_mz"/> </td>
+
             <td>Precursor mass:</td>
-            <td>
-              <xsl:value-of select="ms/ms_header/precursor_mass"/>
-            </td>
-            <td>Adjusted precursor mass:</td>
-            <td>
-              <xsl:value-of select="adjusted_precursor_mass"/>
-            </td>
+
+            <td> <xsl:value-of select="ms/ms_header/precursor_mass"/> </td>
+
+            <td>Proteoform mass:</td>
+
+            <td> <xsl:value-of select="annotated_protein/proteoform_mass"/> </td>
+
+          </tr>
+          <tr>
+
             <td># matched peaks:</td>
-            <td>
-              <xsl:value-of select="matched_peak_number"/>
-            </td>
-            <td># matched fragments:</td>
-            <td>
-              <xsl:value-of select="matched_fragment_number"/>
-            </td>
+
+            <td> <xsl:value-of select="matched_peak_number"/> </td>
+
+            <td># matched fragment ions:</td> 
+            
+            <td> <xsl:value-of select="matched_fragment_number"/> </td>
+
+            <td># unexpected PTMs:</td>
+
+            <td> <xsl:value-of select="annotated_protein/unexpected_change_number"/> </td>
+
           </tr>
           <tr>
             <td>E-value:</td>
-            <td>
-              <xsl:value-of select="e_value"/>
-            </td>
+
+            <td> <xsl:value-of select="e_value"/> </td>
+
             <td>P-value:</td>
-            <td>
-              <xsl:value-of select="p_value"/>
-            </td>
+
+            <td> <xsl:value-of select="p_value"/> </td>
+
             <td>Spectral FDR:</td>
-            <td>
-              <xsl:choose>
-                <xsl:when test="contains(fdr,'-')">
-                  N/A
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="fdr"/>
-                </xsl:otherwise>
-              </xsl:choose>
 
-            </td>
-            <td>Proteoform mass:</td>
-            <td>
-              <xsl:value-of select="adjusted_precursor_mass"/>
-            </td>
+            <td> <xsl:value-of select="fdr"/> </td>
 
-          </tr>
-          <tr>
           </tr>
         </table>
         <br/>
 
-
         <xsl:apply-templates select="annotated_protein/annotation" mode="prsm"/> 
-
-        <div>
-          <br/>
-          Fixed PTMs: <br/>
-          <br/>
-          Variable PTMs: <br/>
-        </div>
 
         <br/>
 
         <div>
-          <a href="#" onclick="showAllPeaks();">All peaks (<xsl:value-of select="count(ms/peaks/peak)"/>)</a>
-          &#160;
-          <a href="#" onclick="showMatchedPeaks();">
-            Matched peaks (<xsl:value-of select="count(ms/peaks/peak[count(matched_ions/matched_ion)>0])"/>)
+          <a href="#" onclick="showAllPeaks();">
+            <xsl:text>All peaks (</xsl:text>
+            <xsl:value-of select="count(ms/peaks/peak)"/>
+            <xsl:text>)</xsl:text>
           </a>
-          &#160;
+          <xsl:text>&#160;</xsl:text>
+          <a href="#" onclick="showMatchedPeaks();">
+            <xsl:text>Matched peaks (</xsl:text>
+            <xsl:value-of select="count(ms/peaks/peak[count(matched_ions/matched_ion)>0])"/>
+            <xsl:text>)</xsl:text>
+          </a>
+          <xsl:text>&#160;</xsl:text>
           <a href="#" onclick="showNotMatchedPeaks();">
-            Not matched peaks (<xsl:value-of select="count(ms/peaks/peak[count(matched_ions/matched_ion)=0])"/>)
+            <xsl:text>Not matched peaks (</xsl:text>
+            <xsl:value-of select="count(ms/peaks/peak[count(matched_ions/matched_ion)=0])"/>
+            <xsl:text>)</xsl:text>
           </a>
         </div>
 
-
         <div class="outer">
           <div class="innera">
-            <table border="1" class="sortable">
+            <table border="1"  class="sortable">
               <thead>
                 <xsl:call-template name="peaks-header"/>
               </thead>
@@ -234,25 +223,25 @@
   <xsl:template match="residue">
     <xsl:text disable-output-escaping="yes"><![CDATA[<span style="]]></xsl:text>
       <xsl:if test="residue_type = 'known_change'">
-        <xsl:text disable-output-escaping="yes"><![CDATA[font-weight:bold;color:red;]]></xsl:text>
+        <xsl:text>font-weight:bold;color:red;</xsl:text>
       </xsl:if>
       <xsl:if test="residue_type = 'n_truncation'">
-        <xsl:text disable-output-escaping="yes"><![CDATA[color:grey;]]></xsl:text>
+        <xsl:text>color:grey;</xsl:text>
       </xsl:if>
       <xsl:if test="residue_type = 'c_truncation'">
-        <xsl:text disable-output-escaping="yes"><![CDATA[color:grey;]]></xsl:text>
+        <xsl:text>color:grey;</xsl:text>
       </xsl:if>
 
       <xsl:if test="is_unexpected_change = '1'">
         <xsl:if test="unexpected_change_color = 0">
-          <xsl:text disable-output-escaping="yes"><![CDATA[background:#DFFFFF;]]></xsl:text>
+          <xsl:text>background:#DFFFFF;</xsl:text>
         </xsl:if>
         <xsl:if test="unexpected_change_color = 1">
-          <xsl:text disable-output-escaping="yes"><![CDATA[background:#CECEF6;]]></xsl:text>
+          <xsl:text>background:#CECEF6;</xsl:text>
         </xsl:if>
       </xsl:if>
 
-        <xsl:text disable-output-escaping="yes"><![CDATA[">]]></xsl:text>
+      <xsl:text disable-output-escaping="yes"><![CDATA[">]]></xsl:text>
       <xsl:value-of select="acid"/>
       <xsl:text disable-output-escaping="yes"><![CDATA[</span>]]></xsl:text>
   </xsl:template>
@@ -276,18 +265,18 @@
   <xsl:template match="cleavage">
     <xsl:text disable-output-escaping="yes"><![CDATA[<span style="]]></xsl:text>
       <xsl:if test="cleavage_type = 'seq_start'">
-        <xsl:text disable-output-escaping="yes"><![CDATA[font-weight:bold;color:red;]]></xsl:text>
+        <xsl:text>font-weight:bold;color:red;</xsl:text>
       </xsl:if>
       <xsl:if test="cleavage_type = 'seq_end'">
-        <xsl:text disable-output-escaping="yes"><![CDATA[font-weight:bold;color:red;"]]></xsl:text>
+        <xsl:text>font-weight:bold;color:red;</xsl:text>
       </xsl:if>
 
       <xsl:if test="is_unexpected_change = '1'">
         <xsl:if test="unexpected_change_color = 0">
-          <xsl:text disable-output-escaping="yes"><![CDATA[background:#DFFFFF;]]></xsl:text>
+          <xsl:text>background:#DFFFFF;</xsl:text>
         </xsl:if>
         <xsl:if test="unexpected_change_color = 1">
-          <xsl:text disable-output-escaping="yes"><![CDATA[background:#CECEF6;]]></xsl:text>
+          <xsl:text>background:#CECEF6;</xsl:text>
         </xsl:if>
       </xsl:if>
       <xsl:text disable-output-escaping="yes"><![CDATA[">]]></xsl:text>
@@ -301,9 +290,6 @@
             <xsl:when test="cleavage_type = 'seq_end'">
               <xsl:text>[</xsl:text>
             </xsl:when>
-            <xsl:otherwise>
-              <xsl:text>&#160;</xsl:text>
-            </xsl:otherwise>
           </xsl:choose>
         </xsl:when>
         <xsl:otherwise>
@@ -312,7 +298,9 @@
               <xsl:apply-templates select="matched_peaks" mode="title"/>
             </xsl:attribute>
             <xsl:attribute name="onclick"> 
-              showIonPeaks('<xsl:apply-templates select="matched_peaks" mode="prsm"/>')
+              <xsl:text>showIonPeaks('</xsl:text>
+              <xsl:apply-templates select="matched_peaks" mode="prsm"/>
+              <xsl:text>')</xsl:text>
             </xsl:attribute>
             <xsl:choose>
               <xsl:when test="exist_n_ion = '1' and exist_c_ion = '0'">
@@ -338,12 +326,12 @@
     <xsl:param name="k" />
     <xsl:if test="$k &lt; 10">
       <xsl:variable name="pos" select="$i * 30 + $j * 10 + $k"/>
-      <xsl:text disable-output-escaping="yes"><![CDATA[<td width="8px">]]></xsl:text>
+      <xsl:text disable-output-escaping="yes"><![CDATA[<td width="10px">]]></xsl:text>
         <xsl:if test="$pos &lt;= protein_length + 1">
           <xsl:apply-templates select="cleavage[position = $pos]"/>
         </xsl:if>
         <xsl:text disable-output-escaping="yes"><![CDATA[</td>]]></xsl:text>
-      <xsl:text disable-output-escaping="yes"><![CDATA[<td width="8px">]]></xsl:text>
+      <xsl:text disable-output-escaping="yes"><![CDATA[<td width="10px">]]></xsl:text>
         <xsl:if test="$pos &lt;= protein_length">
           <xsl:apply-templates select="residue[position = $pos]"/>
         </xsl:if>
@@ -354,12 +342,6 @@
         <xsl:with-param name="k" select="$k+1"/>
       </xsl:call-template>
     </xsl:if>
-  </xsl:template>
-
-  <xsl:template name="add_blank">
-    <xsl:text disable-output-escaping="yes">
-      <![CDATA[<td width="16px"></td>]]>
-    </xsl:text>
   </xsl:template>
 
   <xsl:template name="add_ten_letters">
@@ -374,7 +356,7 @@
       </xsl:call-template>
 
       <xsl:if test="$j &lt; 2">
-        <xsl:call-template name="add_blank"/>
+        <td width="16px"></td>
       </xsl:if>
 
       <xsl:call-template name="add_ten_letters">
@@ -388,9 +370,7 @@
     <xsl:param name="position" />
 
     <xsl:text disable-output-escaping="yes"><![CDATA[<td width="40px" align="right">]]></xsl:text>
-      <xsl:if test="$position &lt;= last_residue_position">
-        <xsl:value-of select="$position + 1"/>
-      </xsl:if>
+      <xsl:value-of select="$position + 1"/>
       <xsl:text disable-output-escaping="yes"><![CDATA[</td>]]></xsl:text>
 
     <xsl:text disable-output-escaping="yes"><![CDATA[<td width="16px"></td>]]></xsl:text>
@@ -401,16 +381,14 @@
 
     <xsl:text disable-output-escaping="yes"><![CDATA[<td width="16px"></td>]]></xsl:text>
     <xsl:text disable-output-escaping="yes"><![CDATA[<td width="40px" align="left">]]></xsl:text>
-      <xsl:if test="$position &lt; last_residue_position + 30">
-        <xsl:choose>
-          <xsl:when test="$position &lt; last_residue_position">
-            <xsl:value-of select="$position + 1"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="last_residue_position + 1"/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:if>
+      <xsl:choose>
+        <xsl:when test="$position &lt; protein_length">
+          <xsl:value-of select="$position + 1"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="protein_length"/>
+        </xsl:otherwise>
+      </xsl:choose>
       <xsl:text disable-output-escaping="yes"><![CDATA[</td>]]></xsl:text>
   </xsl:template>
 
@@ -509,7 +487,7 @@
     <xsl:param name="i" />
     <xsl:param name="j" />
 
-    <xsl:if test="$j &lt; 62">
+    <xsl:if test="$j &lt; 60">
       <xsl:variable name="pos" select="$i * 60 + $j"/>
       <xsl:choose> 
         <xsl:when test="$j = 0">
@@ -538,12 +516,6 @@
     <xsl:param name="i" />
     <xsl:param name="table_last_row" />
     <xsl:if test="$table_last_row &gt;= $i">
-
-      <tr>
-        <td>
-        <xsl:text>&#160;</xsl:text>
-        </td>
-      </tr>
 
       <!-- shifts -->
       <tr>
@@ -593,12 +565,28 @@
       </xsl:call-template>
     </xsl:if>
   </xsl:template>
+
+  <xsl:template match="occurence">
+    <xsl:value-of select="acid_letter"/>
+    <xsl:value-of select="position + 1"/>
+    <xsl:text>&#160;</xsl:text>
+  </xsl:template>
+
+  <xsl:template match="expected_change">
+    <font color="red">
+      <xsl:value-of select="modification/abbr_name"/>
+      <xsl:text>[</xsl:text>
+      <xsl:apply-templates select="occurence"/>
+      <xsl:text>]</xsl:text>
+    </font>
+    <xsl:text>&#160;</xsl:text>
+  </xsl:template>
       
 
   <xsl:template match="annotated_protein/annotation" mode="prsm">
     <div id="alignment" style="font-family: 'FreeMono', Miltonian, monospace; font-size:16;line-height:2.5;background-color:#FFF">
       <xsl:variable name="row_residue_num" select="30"/>
-      <xsl:variable name="residue_num" select="count(residue)"/>
+      <xsl:variable name="residue_num" select="protein_length"/>
       <xsl:variable name="table_first_row">
         <xsl:variable name="tmp" select="floor(first_residue_position div $row_residue_num)"/>
         <xsl:choose>
@@ -625,25 +613,66 @@
       </xsl:variable>
 
       <table border="0"  cellspacing="0px" cellpadding="0px">
+        <xsl:if test="$table_first_row &gt; 0">
+          <tr>
+            <td colspan="2"></td>
+            <td colspan="62" align="center">
+              <xsl:text>... </xsl:text> 
+              <xsl:value-of select="$table_first_row * 30"/>
+              <xsl:text> amino acid residues are skipped at the N-terminus ...</xsl:text> 
+            </td>
+            <td colspan="3"></td>
+          </tr>
+        </xsl:if>
         <xsl:call-template name="add_table_row">
           <xsl:with-param name="i" select="$table_first_row"/>
           <xsl:with-param name="table_last_row" select="$table_last_row"/>
         </xsl:call-template>
+
+        <xsl:if test="$table_last_row * 30 + 30 &lt; $residue_num">
+          <tr> <td>&#160; </td></tr>
+          <tr>
+            <td colspan="2"></td>
+            <td colspan="62" align="center">
+              <xsl:text>... </xsl:text> 
+              <xsl:value-of select="$residue_num - $table_last_row * 30 - 30"/>
+              <xsl:text> amino acid residues are skipped at the C-terminus ...</xsl:text> 
+            </td>
+            <td colspan="3"></td>
+          </tr>
+        </xsl:if>
       </table>         
+    </div>
+
+    <div>
+      <xsl:variable name="fix_ptm_num" select="count(expected_change[change_type=1])"/>
+      <xsl:if test="$fix_ptm_num &gt; 0">
+        <br/>
+        <xsl:text>Fixed PTMs: </xsl:text> 
+        <xsl:apply-templates select="expected_change[change_type=1]"/>
+        <br/>
+      </xsl:if>
+      <xsl:variable name="variable_ptm_num" select="count(expected_change[change_type=2 or change_type = 3])"/>
+      <xsl:if test="$variable_ptm_num &gt; 0">
+        <br/>
+        <xsl:text>Variable PTMs: </xsl:text> 
+        <xsl:apply-templates select="expected_change[change_type=2 or change_type =3]"/>
+        <br/>
+      </xsl:if>
     </div>
   </xsl:template>
 
   <xsl:template name="peaks-header">
     <tr>
-      <td width="120" class="sortableHeader">Monoisotopic mass</td>
+      <td width="100" class="sortableHeader">Monoisotopic mass</td>
       <td width="100" class="sortableHeader">Monoisotopic m/z</td>
       <td width="80" class="sortableHeader">Intensity</td>
       <td width="70" class="sortableHeader">Charge</td>
-      <td width="120" class="sortableHeader">Theoretical mass</td>
+      <td width="103" class="sortableHeader">Theoretical mass</td>
       <td width="50" class="sortableHeader">Ion</td>
       <td width="70" class="sortableHeader">position</td>
       <td width="70" class="sortableHeader">Mass error</td>
-      <td width="70" class="sortableHeader">PPM error</td>
+      <td width="73" class="sortableHeader">PPM error</td>
     </tr>
   </xsl:template>
 
@@ -652,7 +681,7 @@
       <xsl:if test="count(matched_ions/matched_ion) = 0">
         <xsl:attribute name="class">nobreak</xsl:attribute>
       </xsl:if>
-      <td align="center" width="120">
+      <td align="center" width="100">
         <xsl:value-of select="monoisotopic_mass"/>
       </td>
       <td align="center" width="100">
@@ -674,7 +703,7 @@
 
   <xsl:template match="matched_ion">
     <tr>
-      <td  width="115" align="center">
+      <td  width="95" align="center">
         <xsl:value-of select="theoretical_mass"/>
       </td>
       <td  width="50" align="center" sorttable_customkey="{ion_sort_name}">
@@ -688,7 +717,7 @@
       <td  width="70" align="center">
         <xsl:value-of select="mass_error"/>
       </td>
-      <td  width="69" align="center">
+      <td  width="70" align="center">
         <xsl:value-of select="ppm"/>
       </td>
     </tr>

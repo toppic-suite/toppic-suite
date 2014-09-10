@@ -27,12 +27,12 @@ Change::Change(xercesc::DOMElement* change_element) {
 }
 
 /* Generate a new change instance with a new start position */
-Change::Change(Change ori, int start) {
-  left_bp_pos_ = ori.left_bp_pos_ - start;
-  right_bp_pos_ = ori.right_bp_pos_ - start;
-  change_type_ = ori.change_type_;
-  mass_shift_ = ori.mass_shift_;
-  ptm_ptr_ = ori.ptm_ptr_;
+Change::Change(ChangePtr ori_ptr, int start) {
+  left_bp_pos_ = ori_ptr->left_bp_pos_ - start;
+  right_bp_pos_ = ori_ptr->right_bp_pos_ - start;
+  change_type_ = ori_ptr->change_type_;
+  mass_shift_ = ori_ptr->mass_shift_;
+  ptm_ptr_ = ori_ptr->ptm_ptr_;
 }
 
 void Change::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){

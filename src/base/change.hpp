@@ -12,6 +12,9 @@ namespace prot {
 #define VARIABLE_CHANGE   3
 #define UNEXPECTED_CHANGE 4
 
+class Change;
+typedef std::shared_ptr<Change> ChangePtr;
+
 class Change {
  public:
   Change(int left_bp_pos, int right_bp_pos, int change_type,
@@ -19,7 +22,7 @@ class Change {
 
   Change(xercesc::DOMElement* change_element);
 
-  Change(Change ori_change, int shift);
+  Change(ChangePtr ori_change, int shift);
   
   int getLeftBpPos() {return left_bp_pos_;}
 
@@ -42,7 +45,6 @@ class Change {
   PtmPtr ptm_ptr_;
 };
 
-typedef std::shared_ptr<Change> ChangePtr;
 typedef std::vector<ChangePtr> ChangePtrVec;
 
 inline bool compareChangeTypeUpPosUp(const ChangePtr &a, const ChangePtr &b) {
