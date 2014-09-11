@@ -314,7 +314,7 @@ xercesc::DOMElement* proteinToXml(XmlDOMDocument* xml_doc,
   xml_doc->addElement(prot_element, "sequence_name", str.c_str());
   int count = species_ids.size();
   str=convertToString(count);
-  xml_doc->addElement(prot_element, "species_number", str.c_str());
+  xml_doc->addElement(prot_element, "compatible_proteoform_number", str.c_str());
   for(size_t i=0;i<species_ids.size();i++){
     PrsmPtrVec select_prsm_ptrs = selectSpeciesPrsms(prsm_ptrs,species_ids[i]);
     std::sort(select_prsm_ptrs.begin(),select_prsm_ptrs.end(),prsmEValueUp);
