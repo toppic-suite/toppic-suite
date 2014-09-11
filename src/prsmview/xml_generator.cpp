@@ -74,8 +74,7 @@ void XmlGenerator::outputProteins(const PrsmPtrVec &prsm_ptrs){
       std::string file_name = mng_ptr_->xml_path_ + FILE_SEPARATOR +"proteins" 
           +FILE_SEPARATOR+ "protein"+convertToString(proteo_ptrs_[i]->getDbResSeqPtr()->getId())+".xml";
       XmlWriter writer(file_name,"");
-      writer.write(proteinToXml(writer.getDoc(),prsm_ptrs,proteo_ptrs_[i],species, 
-                                mng_ptr_));
+      writer.write(proteinToXml(writer.getDoc(),prsm_ptrs,proteo_ptrs_[i],species, mng_ptr_));
       writer.close();
       std::vector<std::string> file_info;
       file_info.push_back(file_name);
