@@ -43,6 +43,29 @@ void XmlGenerator::outputAllPrsms(const PrsmPtrVec &prsm_ptrs){
   }
 }
 
+void XmlGenerator::outputProteoforms(const PrsmPtrVec &prsm_ptrs){
+
+  std::vector<int> species_ids = getSpeciesIds(prsm_ptrs);
+  for(unsigned int i=0;i<species_ids.size();i++){
+    PrsmPtrVec select_prsm_ptrs = selectSpeciesPrsms(prsm_ptrs,species_ids[i]);
+    if(select_prsm_ptrs.size()>0){
+      std::string file_name = mng_ptr_->xml_path_+ FILE_SEPARATOR + "proteoforms" 
+          + FILE_SEPARATOR + "proteoform"+convertToString(species_ids[i])+".xml";
+      XmlWriter writer(file_name,"");
+      std::sort(select_prsm_ptrs.begin(),select_prsm_ptrs.end(),prsmEValueUp);
+      writer.write(proteoformToXml(writer.getDoc(),select_prsm_ptrs, mng_ptr_));
+      writer.close();
+
+      std::vector<std::string> file_info;
+      file_info.push_back(file_name);
+      file_info.push_back(mng_ptr_->executive_dir_ + FILE_SEPARATOR + "xsl" + FILE_SEPARATOR + "proteoform.xsl");
+      file_info.push_back(mng_ptr_->html_path_+ FILE_SEPARATOR+ "proteoforms" + FILE_SEPARATOR 
+                          + "proteoform"+convertToString(species_ids[i])+".html");
+      anno_view_ptr_->file_list_.push_back(file_info);
+    }
+  }
+}
+
 void XmlGenerator::outputProteins(const PrsmPtrVec &prsm_ptrs){
 
   for(unsigned int i=0;i<proteo_ptrs_.size();i++){
@@ -78,29 +101,6 @@ void XmlGenerator::outputAllProteins(const PrsmPtrVec &prsm_ptrs){
   anno_view_ptr_->file_list_.push_back(file_info);
 }
 
-void XmlGenerator::outputSpecies(const PrsmPtrVec &prsm_ptrs){
-
-  std::vector<int> species = getSpeciesIds(prsm_ptrs);
-  for(unsigned int i=0;i<species.size();i++){
-    PrsmPtrVec select_prsm_ptrs = selectSpeciesPrsms(prsm_ptrs,species[i]);
-    if(select_prsm_ptrs.size()>0){
-      std::string file_name = mng_ptr_->xml_path_+ FILE_SEPARATOR + "proteoforms" 
-          + FILE_SEPARATOR + "proteoform"+convertToString(species[i])+".xml";
-      XmlWriter writer(file_name,"");
-      std::sort(select_prsm_ptrs.begin(),select_prsm_ptrs.end(),prsmEValueUp);
-      writer.write(speciesToXml(writer.getDoc(),select_prsm_ptrs, 
-                                mng_ptr_));
-      writer.close();
-
-      std::vector<std::string> file_info;
-      file_info.push_back(file_name);
-      file_info.push_back(mng_ptr_->executive_dir_ + FILE_SEPARATOR + "xsl" + FILE_SEPARATOR + "proteoform.xsl");
-      file_info.push_back(mng_ptr_->html_path_+ FILE_SEPARATOR+ "proteoforms" + FILE_SEPARATOR 
-                          + "proteoform"+convertToString(species[i])+".html");
-      anno_view_ptr_->file_list_.push_back(file_info);
-    }
-  }
-}
 void XmlGenerator::outputFileList(){
   std::string file_name = mng_ptr_->xml_path_+ FILE_SEPARATOR + "files.xml";
   XmlWriter writer(file_name,"");
@@ -129,11 +129,10 @@ void XmlGenerator::process(){
 
   outputPrsms(prsm_ptrs);
   outputAllPrsms(prsm_ptrs);
-  outputSpecies(prsm_ptrs);
+  outputProteoforms(prsm_ptrs);
   outputProteins(prsm_ptrs);
   outputAllProteins(prsm_ptrs);
   outputFileList();
-
 }
 
 } /* namespace prot */

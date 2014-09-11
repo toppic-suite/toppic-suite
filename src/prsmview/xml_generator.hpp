@@ -22,7 +22,7 @@ class XmlGenerator {
   void process();
   void outputPrsms(const PrsmPtrVec &prsm_ptrs);
   void outputAllPrsms(const PrsmPtrVec &prsm_ptrs);
-  void outputSpecies(const PrsmPtrVec &prsm_ptrs);
+  void outputProteoforms(const PrsmPtrVec &prsm_ptrs);
   void outputProteins(const PrsmPtrVec &prsm_ptrs);
   void outputAllProteins(const PrsmPtrVec &prsm_ptrs);
   void outputFileList();

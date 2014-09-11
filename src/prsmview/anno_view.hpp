@@ -29,8 +29,8 @@ xercesc::DOMElement* genePrsmView(XmlDOMDocument* xml_doc, PrsmPtr prsm_ptr, Prs
 xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,ProteoformPtr proteo_ptr,
                                      ExtendMsPtr ms_three_ptr, PrsmViewMngPtr mng_ptr);
 
-xercesc::DOMElement* speciesToXml(XmlDOMDocument* xml_doc, const PrsmPtrVec &prsm_ptrs, 
-                                  PrsmViewMngPtr mng_ptr);
+xercesc::DOMElement* proteoformToXml(XmlDOMDocument* xml_doc, const PrsmPtrVec &prsm_ptrs, 
+                                     PrsmViewMngPtr mng_ptr);
 
 xercesc::DOMElement* proteinToXml(XmlDOMDocument* xml_doc,
                                   const PrsmPtrVec &prsm_ptrs,

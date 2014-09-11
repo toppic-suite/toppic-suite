@@ -284,22 +284,22 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
 
 
 
-xercesc::DOMElement* speciesToXml(XmlDOMDocument* xml_doc, const PrsmPtrVec &prsm_ptrs, 
-                                  PrsmViewMngPtr mng_ptr){
-  xercesc::DOMElement* species_element = xml_doc->createElement("species");
+xercesc::DOMElement* proteoformToXml(XmlDOMDocument* xml_doc, const PrsmPtrVec &prsm_ptrs, 
+                                     PrsmViewMngPtr mng_ptr){
+  xercesc::DOMElement* proteoform_element = xml_doc->createElement("compatible_proteoform");
   std::string str=convertToString(prsm_ptrs[0]->getProteoformPtr()->getSeqId());
-  xml_doc->addElement(species_element, "sequence_id", str.c_str());
+  xml_doc->addElement(proteoform_element, "sequence_id", str.c_str());
   str=prsm_ptrs[0]->getProteoformPtr()->getSeqName();
-  xml_doc->addElement(species_element, "sequence_name", str.c_str());
+  xml_doc->addElement(proteoform_element, "sequence_name", str.c_str());
   str=convertToString(prsm_ptrs[0]->getProteoformPtr()->getSpeciesId());
-  xml_doc->addElement(species_element, "species_id", str.c_str());
+  xml_doc->addElement(proteoform_element, "proteoform_id", str.c_str());
   int count = prsm_ptrs.size();
   str=convertToString(count);
-  xml_doc->addElement(species_element, "prsm_number", str.c_str());
+  xml_doc->addElement(proteoform_element, "prsm_number", str.c_str());
   for(size_t i=0;i<prsm_ptrs.size();i++){
-    species_element->appendChild(genePrsmView(xml_doc,prsm_ptrs[i], mng_ptr));
+    proteoform_element->appendChild(genePrsmView(xml_doc,prsm_ptrs[i], mng_ptr));
   }
-  return species_element;
+  return proteoform_element;
 }
 
 xercesc::DOMElement* proteinToXml(XmlDOMDocument* xml_doc,
@@ -318,7 +318,7 @@ xercesc::DOMElement* proteinToXml(XmlDOMDocument* xml_doc,
   for(size_t i=0;i<species_ids.size();i++){
     PrsmPtrVec select_prsm_ptrs = selectSpeciesPrsms(prsm_ptrs,species_ids[i]);
     std::sort(select_prsm_ptrs.begin(),select_prsm_ptrs.end(),prsmEValueUp);
-    prot_element->appendChild(speciesToXml(xml_doc,select_prsm_ptrs, mng_ptr));
+    prot_element->appendChild(proteoformToXml(xml_doc,select_prsm_ptrs, mng_ptr));
   }
   return prot_element;
 }
