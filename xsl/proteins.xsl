@@ -34,10 +34,11 @@
           The <a href="prsms/prsm{prsm_id}.html">best PrSM</a> has an E-value <xsl:value-of select="e_value"/>. There
           <xsl:choose>
             <xsl:when test="count(../../compatible_proteoform) = 1">is <a href="species/species{annotated_protein/species_id}.html">1 proteoform</a>.  </xsl:when>
-            <xsl:otherwise>are <xsl:value-of select="count(../../species)"/> proteoforms.</xsl:otherwise>
+            <xsl:otherwise>are <xsl:value-of select="count(../../compatible_proteoform)"/> proteoforms.</xsl:otherwise>
           </xsl:choose>
         </xsl:otherwise>
       </xsl:choose>
+      <br/>
     </xsl:if>
   </xsl:template>
 

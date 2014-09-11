@@ -263,9 +263,27 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
   // last annochange
   AnnoUnexpectedChangePtr anno_change_ptr(new AnnoUnexpectedChange(last_right + 1, std::numeric_limits<int>::max(), 0, -1, "EMPTY"));
   unexpected_change_ptrs.push_back(anno_change_ptr);
-  
+  /* remove EMPTY_CHANGES */
+  AnnoUnexpectedChangePtr non_empty_ptr;
+  AnnoUnexpectedChangePtrVec short_unexpected_change_ptrs;
+  for (size_t i = 0; i < unexpected_change_ptrs.size(); i++) {
+    AnnoUnexpectedChangePtr cur_change_ptr = unexpected_change_ptrs[i];
+    if (cur_change_ptr->getChangeType() != "EMPTY") {
+      short_unexpected_change_ptrs.push_back(cur_change_ptr);
+      non_empty_ptr = cur_change_ptr;
+    }
+    else {
+      if (non_empty_ptr == nullptr) {
+        // first empty segment is kept 
+        short_unexpected_change_ptrs.push_back(cur_change_ptr);
+      }
+      else {
+        non_empty_ptr->setRightPos(cur_change_ptr->getRightPos());
+      }
+    }
+  }
 
-  LOG_DEBUG("unexpected completed");
+  //LOG_DEBUG("unexpected completed");
 
   for (size_t i = 0; i < res_ptrs.size(); i++) {
     res_ptrs[i]->appendViewXml(xml_doc, anno_element);
@@ -273,8 +291,8 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
   for (size_t i = 0; i < cleavage_ptrs.size(); i++) {
     cleavage_ptrs[i]->appendXml(xml_doc, anno_element);
   }
-  for (size_t i = 0; i < unexpected_change_ptrs.size(); i++) {
-    unexpected_change_ptrs[i]->appendXml(xml_doc, anno_element, mng_ptr->decimal_point_num_);
+  for (size_t i = 0; i < short_unexpected_change_ptrs.size(); i++) {
+    short_unexpected_change_ptrs[i]->appendXml(xml_doc, anno_element, mng_ptr->decimal_point_num_);
   }
   for (size_t i = 0; i < expected_change_ptrs.size(); i++) {
     expected_change_ptrs[i]->appendXml(xml_doc, anno_element);

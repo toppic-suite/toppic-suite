@@ -120,5 +120,38 @@
     </div>
   </xsl:template>
 
+  <xsl:template match="cleavage">
+    <xsl:text disable-output-escaping="yes"><![CDATA[<span style="]]></xsl:text>
+      <xsl:if test="cleavage_type = 'seq_start'">
+        <xsl:text>font-weight:bold;color:red;</xsl:text>
+      </xsl:if>
+      <xsl:if test="cleavage_type = 'seq_end'">
+        <xsl:text>font-weight:bold;color:red;</xsl:text>
+      </xsl:if>
+
+      <xsl:if test="is_unexpected_change = '1'">
+        <xsl:if test="unexpected_change_color = 0">
+          <xsl:text>background:#DFFFFF;</xsl:text>
+        </xsl:if>
+        <xsl:if test="unexpected_change_color = 1">
+          <xsl:text>background:#CECEF6;</xsl:text>
+        </xsl:if>
+      </xsl:if>
+      <xsl:text disable-output-escaping="yes"><![CDATA[">]]></xsl:text>
+
+      <xsl:choose>
+        <xsl:when test="cleavage_type = 'seq_start'">
+          <xsl:text>]</xsl:text>
+        </xsl:when>
+        <xsl:when test="cleavage_type = 'seq_end'">
+          <xsl:text>[</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>&#160;</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+      <xsl:text disable-output-escaping="yes"><![CDATA[</span>]]></xsl:text>
+  </xsl:template>
+
 </xsl:stylesheet>
 

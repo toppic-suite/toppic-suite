@@ -16,6 +16,12 @@ class AnnoUnexpectedChange {
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent,
                  int decimal_point_num);
 
+  std::string getChangeType() {return type_;}
+
+  int getRightPos() {return right_pos_;}
+
+  void setRightPos(int right_pos) {right_pos_ = right_pos;}
+
  private:
   int left_pos_;
   int right_pos_;

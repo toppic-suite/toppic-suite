@@ -301,6 +301,67 @@
     </div>
   </xsl:template>
 
+  <xsl:template match="cleavage">
+    <xsl:text disable-output-escaping="yes"><![CDATA[<span style="]]></xsl:text>
+      <xsl:if test="cleavage_type = 'seq_start'">
+        <xsl:text>font-weight:bold;color:red;</xsl:text>
+      </xsl:if>
+      <xsl:if test="cleavage_type = 'seq_end'">
+        <xsl:text>font-weight:bold;color:red;</xsl:text>
+      </xsl:if>
+
+      <xsl:if test="is_unexpected_change = '1'">
+        <xsl:if test="unexpected_change_color = 0">
+          <xsl:text>background:#DFFFFF;</xsl:text>
+        </xsl:if>
+        <xsl:if test="unexpected_change_color = 1">
+          <xsl:text>background:#CECEF6;</xsl:text>
+        </xsl:if>
+      </xsl:if>
+      <xsl:text disable-output-escaping="yes"><![CDATA[">]]></xsl:text>
+
+      <xsl:choose>
+        <xsl:when test="exist_n_ion = '0' and exist_c_ion = '0'">
+          <xsl:choose>
+            <xsl:when test="cleavage_type = 'seq_start'">
+              <xsl:text>]</xsl:text>
+            </xsl:when>
+            <xsl:when test="cleavage_type = 'seq_end'">
+              <xsl:text>[</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>&#160;</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:otherwise>
+          <a style="text-decoration:none" href="#">
+            <xsl:attribute name="title"> 
+              <xsl:apply-templates select="matched_peaks" mode="title"/>
+            </xsl:attribute>
+            <xsl:attribute name="onclick"> 
+              <xsl:text>showIonPeaks('</xsl:text>
+              <xsl:apply-templates select="matched_peaks" mode="prsm"/>
+              <xsl:text>')</xsl:text>
+            </xsl:attribute>
+            <xsl:choose>
+              <xsl:when test="exist_n_ion = '1' and exist_c_ion = '0'">
+                <xsl:text disable-output-escaping="yes">&amp;#x23AB;</xsl:text>
+              </xsl:when>
+              <xsl:when test="exist_n_ion = '0' and exist_c_ion = '1'">
+                <xsl:text disable-output-escaping="yes">&amp;#x23A9;</xsl:text>
+              </xsl:when>
+              <xsl:when test="exist_n_ion = '1' and exist_c_ion = '1'">
+                <xsl:text disable-output-escaping="yes">&amp;#x23B1;</xsl:text>
+              </xsl:when>
+            </xsl:choose>
+          </a>
+        </xsl:otherwise>
+      </xsl:choose>
+
+      <xsl:text disable-output-escaping="yes"><![CDATA[</span>]]></xsl:text>
+  </xsl:template>
+
   <xsl:template name="peaks-header">
     <tr>
       <td width="100" class="sortableHeader">Monoisotopic mass</td>
