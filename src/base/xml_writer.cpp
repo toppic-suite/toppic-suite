@@ -1,10 +1,3 @@
-/*
- * xml_writer.cpp
- *
- *  Created on: Feb 24, 2014
- *      Author: xunlikun
- */
-
 #include "base/xml_writer.hpp"
 
 namespace prot {
@@ -16,7 +9,7 @@ XmlWriter::XmlWriter(const std::string &file_name,
   LOG_DEBUG("file_name " << file_name);
   file_ << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << std::endl;
   if(root_.compare("")!=0){
-  file_ << ("<"+root_+">");
+    file_ << ("<"+root_+">");
   }
   XmlDOMImpl* impl = XmlDOMImplFactory::getXmlDOMImplInstance();
   doc_ = new XmlDOMDocument(impl->createDoc(root_.compare("")!=0?root_:"ROOT"));
