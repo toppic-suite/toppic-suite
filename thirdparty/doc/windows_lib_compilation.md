@@ -1,8 +1,8 @@
 ##Windows:
-1. download mingw64 with x86_64-w64-mingw32 and msys64 
-2. set Environment Variablse add <mingw64 path>/bin to PATH
+* download mingw64 with x86_64-w64-mingw32 and msys64 
+* set Environment Variablse add <mingw64 path>/bin to PATH
 
-Boost: 
+##Boost: 
 1. download boost 1.55.0
 2. cd boost_1.55.0/tools/build/v2
 3. bootstrap.sh mingw
@@ -11,7 +11,7 @@ Boost:
 target-os=windows link=static runtime-link=static architecture=x86
 address-model=64 threading=single (threading=single maybe removed)
 
-Xcerces
+##Xcerces
 1. download xerces-c-3.1.1
 2. unzip xerces to msys64 and get into the path xerces-c-3.1.1
 3. run ./configure host=x86_64-w64-mingw64 build=x86_64-w64-mingw64 CFLAGS=-O3
@@ -19,7 +19,7 @@ CXXFLAGS=-O3 --prefix=<the path you want to save the include and lib of xerces>
 --disable-sse2 (--disable-sse2 maybe removed)
 4. enter src and run make clean make
 
-Xalan
+##Xalan
 1. export XERCESCROOT=<path>/proteomics_cpp/thirdparty/xerces-c-3.1.1/
 2. export XALANCROOT=<path>/proteomics_cpp/thirdparty/xalan-c-1.11/c/
 3. ./runConfigure -p mingw-msys -c gcc -x g++ -r none -z -march=athlon64 -z -m64
@@ -29,7 +29,7 @@ Xalan
    see the Makefile in the directory
 6. make make install
 
-Download links:
+##Download links:
 1. mingw64 4.8.2 (x86_64-w64-mingw32:x86_64-4.8.2-release-posix-seh-rt_v3-rev4.7z): 
    http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/4.8.2/threads-posix/seh/
 2. msys64 20140704 (msys2-x86_64-20140704.exe): http://sourceforge.net/projects/msys2/files/Base/x86_64/msys2-x86_64-20140704.exe
