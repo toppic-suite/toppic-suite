@@ -1,15 +1,14 @@
 include ../Makefile.in
 
-TOPPC_OBJS = $(addprefix $(OBJ_DIR)/, toppc.o)
+TOPPIC_OBJS = $(addprefix $(OBJ_DIR)/, toppic.o)
 
-OBJS = $(BASE_OBJS) $(SPEC_OBJS) $(PRSM_OBJS) $(ZERO_PTM_OBJS) $(DIAG_FILTER_OBJS) $(ONE_PTM_FILTER_OBJS) $(PTM_OBJS) $(TDGF_OBJS) $(ARGUMENT_OBJS) $(TOPPC_OBJS)
-#OBJS = $(BASE_OBJS) $(SPEC_OBJS) $(PRSM_OBJS) $(ZERO_PTM_OBJS) $(FILTER_OBJS) $(PTM_OBJS) $(TDGF_OBJS) $(POISSON_OBJS) $(XPP_OBJS) $(CONSOLE_OBJS) ${TOPPC_OBJS}
+OBJS = $(BASE_OBJS) $(SPEC_OBJS) $(PRSM_OBJS) $(ZERO_PTM_OBJS) $(DIAG_FILTER_OBJS) $(ONE_PTM_FILTER_OBJS) $(PTM_OBJS) $(TDGF_OBJS) ${PRSM_VIEW_OBJS} $(ARGUMENT_OBJS) $(TOPPIC_OBJS)
 
 BIN_DIR = ../../bin
 
 #
 # define the executable file 
-MAIN = $(BIN_DIR)/toppc
+MAIN = $(BIN_DIR)/toppic
 #
 #
 # The following part of the makefile is generic; it can be used to 
