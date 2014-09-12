@@ -40,7 +40,7 @@ file(GLOB POISSON_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/poisson/*.cpp)
 file(GLOB TDGF_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/tdgf/*.cpp)
 file(GLOB PRSM_VIEW_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/prsmview/*.cpp)
 file(GLOB ARGU_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/argument.cpp)
-file(GLOB MAIN_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppc.cpp) 
+file(GLOB MAIN_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic.cpp) 
 file(GLOB TEST_ZERO_PTM_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_zero_ptm.cpp) 
 file(GLOB TEST_DIAG_FILTER_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_diag_filter.cpp) 
 file(GLOB TEST_PTM_SEARCH_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_ptm_search.cpp) 
@@ -49,7 +49,7 @@ file(GLOB TEST_PRSM_VIEW_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_prsm_vie
 
 link_directories(${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/linux_lib/)
 
-add_executable(toppc ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
+add_executable(toppic ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
         ${ZERO_PTM_SRCS} ${DIAG_FILTER_SRCS} ${ONE_PTM_FILTER_SRCS} ${PTM_SRCS} ${POISSON_SRCS}
         ${TDGF_SRCS} ${PRSM_VIEW_SRCS} ${ARGU_SRCS} ${MAIN_SRCS})
 
@@ -62,7 +62,7 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Mingw")
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   # Linux specific code
-  target_link_libraries(toppc xalan-c xalanMsg xerces-c boost_program_options boost_filesystem boost_system pthread)
+  target_link_libraries(toppic xalan-c xalanMsg xerces-c boost_program_options boost_filesystem boost_system pthread)
 
   add_executable(test_zero_ptm ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
           ${ZERO_PTM_SRCS} ${ARGU_SRCS} ${TEST_ZERO_PTM_SRCS})
