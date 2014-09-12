@@ -30,8 +30,12 @@ CXXFLAGS=-O3 --prefix=<the path you want to save the include and lib of xerces>
 * make make install
 
 ##Download links:
-1. mingw64 4.8.2 [x86_64-w64-mingw32:x86_64-4.8.2-release-posix-seh-rt_v3-rev4.7z](http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/4.8.2/threads-posix/seh/)
-2. msys64 20140704 (msys2-x86_64-20140704.exe): http://sourceforge.net/projects/msys2/files/Base/x86_64/msys2-x86_64-20140704.exe
-3. boost 1.55.0 (boost_1_55_0.zip): http://sourceforge.net/projects/boost/files/boost/1.55.0/
-4. xerces-c-3.1.1 (xerces-c-3.1.1.zip): http://xerces.apache.org/xerces-c/download.cgi
-5. xalan 1.11 (xalan_c-1.11-src.zip): http://xalan.apache.org/xalan-c/download.html
+
+
+| Software | Version   |
+|----------|-----------|
+|[mingw64](http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/4.8.2/threads-posix/seh/x86_64-4.8.2-release-posix-seh-rt_v3-rev4.7z/download) | x86_64-4.8.2 |
+|[msys64](http://sourceforge.net/projects/msys2/files/Base/x86_64/msys2-x86_64-20140910.exe/download)| 20140910   |
+|[boost](http://sourceforge.net/projects/boost/files/boost/1.56.0/)| 1.56.0|
+|[xerces-c](http://xerces.apache.org/xerces-c/download.cgi)|3.1.1|
+|[xalan](http://xalan.apache.org/xalan-c/download.html)|1.11|
