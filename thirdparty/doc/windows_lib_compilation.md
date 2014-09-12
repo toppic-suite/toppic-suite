@@ -1,4 +1,4 @@
-Windows:
+##Windows:
 1. download mingw64 with x86_64-w64-mingw32 and msys64 
 2. set Environment Variablse add <mingw64 path>/bin to PATH
 
