@@ -14,8 +14,6 @@ address-model=64 threading=single (threading=single maybe removed)
 ##Xcerces
 * download xerces-c-3.1.1
 * unzip xerces to msys64 and get into the path xerces-c-3.1.1
-* 
-* 
 ```sh
 ./configure host=x86_64-w64-mingw64 build=x86_64-w64-mingw64 CFLAGS=-O3 
 ```
