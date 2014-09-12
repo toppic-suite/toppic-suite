@@ -3,10 +3,10 @@
 * set Environment Variablse add <mingw64 path>/bin to PATH
 
 ##Boost: 
-* download boost 1.55.0
-* cd boost_1.55.0/tools/build/v2
+* download boost 1.56.0
+* cd boost_1.56.0/tools/build/v2
 * bootstrap.sh mingw
-* cd boost_1.55.0
+* cd boost_1.56.0
 * tools/build/v2/b2.exe --prefix=<destination path> --toolset=gcc
 target-os=windows link=static runtime-link=static architecture=x86
 address-model=64 threading=single (threading=single maybe removed)
