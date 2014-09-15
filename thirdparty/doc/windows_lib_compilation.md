@@ -14,22 +14,37 @@ address-model=64 threading=single (threading=single maybe removed)
 ##Xcerces
 * download xerces-c-3.1.1
 * unzip xerces to msys64 and get into the path xerces-c-3.1.1
+* use the configuration below, `--disable-sse2` may be removed
 ```sh
-./configure host=x86_64-w64-mingw64 build=x86_64-w64-mingw64 CFLAGS=-O3 
+./configure host=x86_64-w64-mingw64 build=x86_64-w64-mingw64 CFLAGS=-O3 CXXFLAGS=-O3 --prefix=<the path you want to save the include and lib of xerces> --disable-sse2
 ```
-CXXFLAGS=-O3 --prefix=<the path you want to save the include and lib of xerces>
---disable-sse2 (--disable-sse2 maybe removed)
-* enter src and run make clean make
 
+* compile as usual
+```sh
+cd src
+make clean
+make
+```
 ##Xalan
-* export XERCESCROOT=<path>/proteomics_cpp/thirdparty/xerces-c-3.1.1/
-* export XALANCROOT=<path>/proteomics_cpp/thirdparty/xalan-c-1.11/c/
-* ./runConfigure -p mingw-msys -c gcc -x g++ -r none -z -march=athlon64 -z -m64
-* edit src/xalanc/Makefile 
-* edit src/xalanc/Utils/XalanMsgLig/Makefile
-* edit Makefile.incl and remove "/" in prefix
-   see the Makefile in the directory
-* make make install
+* set evironment varialbe `XERCESCROOT`
+```sh
+export XERCESCROOT=<path>/proteomics_cpp/thirdparty/xerces-c-3.1.1/
+```
+* set evironment varialbe `XALANCROOT`
+```sh
+export XALANCROOT=<path>/proteomics_cpp/thirdparty/xalan-c-1.11/c/
+```
+* configuration
+```sh
+./runConfigure -p mingw-msys -c gcc -x g++ -r none -z -march=athlon64 -z -m64
+```
+* edit `src/xalanc/Makefile` 
+* edit `src/xalanc/Utils/XalanMsgLig/Makefile`
+* edit `Makefile.incl` and remove `/` in prefix, see the `Makefile` in the directory
+* compile as usual
+```sh
+make make install
+```
 
 ##Download links:
 
