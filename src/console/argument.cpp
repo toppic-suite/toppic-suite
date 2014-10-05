@@ -22,6 +22,7 @@ void Argument::initArguments() {
   arguments_["numOfTopPrsms"] = "1";
   arguments_["maxPtmMass"] = "1000000";
   arguments_["executiveDir"] = ".";
+  arguments_["logFileName"] = "";
 }
 
 void Argument::showUsage(boost::program_options::options_description &desc) {
@@ -74,6 +75,7 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string max_ptm_mass = "";
   std::string cutoff_type = "";
   std::string cutoff_value = "";
+  std::string log_file_name = "";
 
   /** Define and parse the program options*/
   try {
@@ -91,8 +93,9 @@ bool Argument::parse(int argc, char* argv[]) {
         ("max-ptm,m", po::value<std::string> (&max_ptm_mass), "<positive double value>. Maximum absolute value of the PTM masses in the identified proteoform. Default value: 1000000.")
         ("shift-number,s", po::value<std::string> (&shift_num), "<int value>. Maximum number of unexpected PTMs. Default value: 2.")
         ("cutoff-type,t", po::value<std::string> (&cutoff_type), "<EVALUE|FDR>. Cutoff value type for reporting protein-spectrum-matches. Default value: EVALUE.")
-        ("cutoff-value,v", po::value<std::string> (&cutoff_value), "Cutoff value for reporting protein-spectrum-matches. Default value: 0.01.");
-
+        ("cutoff-value,v", po::value<std::string> (&cutoff_value), "Cutoff value for reporting protein-spectrum-matches. Default value: 0.01.")
+        ("log-file-name,l", po::value<std::string> (&log_file_name), "log file name with path.");
+        
     po::options_description desc("Options");
 
     desc.add_options() 
@@ -108,8 +111,10 @@ bool Argument::parse(int argc, char* argv[]) {
         ("max-ptm,m", po::value<std::string> (&max_ptm_mass), "<positive double value>. Maximum absolute value of the PTM masses in the identified proteoform. Default value: 1000000.")
         ("cutoff-type,t", po::value<std::string> (&cutoff_type), "<EVALUE|FDR>. Cutoff value type for reporting protein-spectrum-matches. Default value: EVALUE.")
         ("cutoff-value,v", po::value<std::string> (&cutoff_value), "Cutoff value for reporting protein-spectrum-matches. Default value: 0.01.")
+        ("log-file-name,l", po::value<std::string>(&log_file_name), "log file name with path")
         ("database-file-name", po::value<std::string>(&database_file_name)->required(), "database file name with path")
         ("spectrum-file-name", po::value<std::string>(&spectrum_file_name)->required(), "spectrum file name with path");
+        
 
     po::positional_options_description positional_options;
     positional_options.add("database-file-name", 1);
@@ -173,6 +178,9 @@ bool Argument::parse(int argc, char* argv[]) {
     }
     if (vm.count("cutoff-value")) {
       arguments_["cutoffValue"] = cutoff_value;
+    }
+    if (vm.count("log-file-name")) {
+      arguments_["logFileName"] = log_file_name;
     }
   }
   catch(std::exception&e ) {

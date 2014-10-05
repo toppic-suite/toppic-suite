@@ -38,6 +38,15 @@ void DiagFilterProcessor::processBlock(int block, const std::string &sp_file_nam
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   std::string output_file_name = basename(prsm_para_ptr->getSpectrumFileName())
       + "." + mng_ptr_->output_file_ext_+"_"+ std::to_string(block);
+      
+  std::string log_file_name = prsm_para_ptr->getLogFileName();
+
+  std::ofstream logfile;
+
+  if (log_file_name.length() != 0){
+    logfile.open(log_file_name, std::ios::out | std::ios::app);
+  }
+      
   SimplePrsmWriter writer(output_file_name);
   DeconvMsPtr deconv_ms_ptr;
   int cnt = 0;
@@ -50,11 +59,19 @@ void DiagFilterProcessor::processBlock(int block, const std::string &sp_file_nam
       SimplePrsmPtrVec match_ptrs = filter_ptr_->getBestMathBatch(spectrum_set_ptr);
       writer.write(match_ptrs);
     }
+    
+    if (log_file_name.length() != 0){
+      if (logfile.is_open()) {
+        logfile << 0.053 + (double) cnt / n_spectra * 0.075 << std::endl;
+      }
+    }
+    
     std::cout << std::flush << "Fast filtering block " << (block +1) 
         << " is processing " << cnt << " of " << n_spectra << " spectra.\r";
   }
   reader.close();
   writer.close();
+  logfile.close();
   std::cout << std::endl << "Fast filtering block " << (block +1) 
       << " finished. " << std::endl;
 }

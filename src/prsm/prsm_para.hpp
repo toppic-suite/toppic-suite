@@ -17,6 +17,7 @@ class PrsmPara {
   PrsmPara(std::map<std::string,std::string> &arguments);
   std::string getSearchDbFileName() {return search_db_file_name_;}
   std::string getSpectrumFileName() {return spec_file_name_;}
+  std::string getLogFileName() {return log_file_name_;}
   const ResiduePtrVec& getFixModResiduePtrVec() {return fix_mod_residue_list_;}
   const ProtModPtrVec& getAllowProtModPtrVec() {return allow_prot_mod_list_;}
   SpParaPtr getSpParaPtr() {return sp_para_ptr_;}
@@ -24,6 +25,7 @@ class PrsmPara {
  private:
   std::string search_db_file_name_;
   std::string spec_file_name_;
+  std::string log_file_name_;
 
   ResiduePtrVec fix_mod_residue_list_;
   ProtModPtrVec allow_prot_mod_list_;
