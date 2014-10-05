@@ -78,6 +78,15 @@ void PtmProcessor::initData() {
 // process ptm search
 void PtmProcessor::process(){
   std::string sp_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
+  
+  std::string log_file_name = mng_ptr_->prsm_para_ptr_->getLogFileName();
+
+  std::ofstream logfile;
+
+  if (log_file_name.length() != 0){
+    logfile.open(log_file_name, std::ios::out | std::ios::app);
+  }    
+  
   int spectra_num = countSpNum (sp_file_name);
   MsAlignReader sp_reader(sp_file_name);
   DeconvMsPtr deconv_sp;
@@ -100,11 +109,19 @@ void PtmProcessor::process(){
     total_time += time;
     //std::cout << std::flush << "Ptm searching is processing " << cnt 
     //    << " of " << spectra_num << " spectra.\r";
+    
+    if (log_file_name.length() != 0){
+      if (logfile.is_open()) {
+        logfile << 0.203 + (double) cnt / spectra_num * 0.17 << std::endl;
+      }
+    }
+    
     std::cout << std::flush << "Ptm searching is processing " << cnt 
-        << " of " << spectra_num << " spectra." << " time " << time << " total time " << total_time << " seconds " << std::endl;
+        << " of " << spectra_num << " spectra." << " time " << time << " total time " << total_time << " seconds.\r ";
 
   }
   sp_reader.close();
+  logfile.close();
   closeWriters();
   std::cout << std::endl << "Ptm searching finished." << std::endl;
 }

@@ -6,6 +6,7 @@ namespace prot {
 PrsmPara::PrsmPara(std::map<std::string, std::string> &arguments) {
   search_db_file_name_ = arguments["databaseFileName"];
   spec_file_name_ = arguments["spectrumFileName"];
+  log_file_name_ = arguments["logFileName"];
 
   fix_mod_residue_list_ = FixResidueFactory::getFixResiduePtrVec(arguments["cysteineProtection"]);
 

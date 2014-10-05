@@ -54,6 +54,14 @@ void EValueProcessor::init() {
 
 void EValueProcessor::process(bool is_separate) {
   std::string spectrum_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
+  std::string log_file_name = mng_ptr_->prsm_para_ptr_->getLogFileName();
+  
+  std::ofstream logfile;
+
+  if (log_file_name.length() != 0){
+    logfile.open(log_file_name, std::ios::out | std::ios::app);
+  }   
+  
   int spectrum_num = countSpNum(spectrum_file_name);
   MsAlignReader reader (spectrum_file_name);
   std::string output_file_name = basename(spectrum_file_name)
@@ -71,7 +79,14 @@ void EValueProcessor::process(bool is_separate) {
           << spectrum_num << " spectra.\r";
     }
     
+    if (log_file_name.length() != 0){
+      if (logfile.is_open()) {
+		 logfile << 0.373 + (double) cnt / spectrum_num * 0.62 << std::endl;
+      }
+    }	
+    
   }
+  logfile.close();
   reader.close();
 
   //because the prsm_writer ~PrsmWriter changed and the fileclosing is an independant function

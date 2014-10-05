@@ -54,6 +54,7 @@ int process(int argc, char* argv[]) {
     std::string db_file_name = arguments["databaseFileName"];
     std::string sp_file_name = arguments["spectrumFileName"];
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
+    std::string log_file_name = arguments["logFileName"];
 
     int n_top;
     std::istringstream (arguments["numOfTopPrsms"]) >> n_top;
@@ -107,7 +108,7 @@ int process(int argc, char* argv[]) {
 
     std::cout << "E-value computation starts" << std::endl;
     TdgfMngPtr tdgf_mng_ptr = TdgfMngPtr(new TdgfMng (prsm_para_ptr, shift_num, max_ptm_mass,
-                                                      "POISSON_EVALUE", "EVALUE"));
+                                                      "RAW_RESULT", "EVALUE"));
     EValueProcessorPtr processor = EValueProcessorPtr(new EValueProcessor(tdgf_mng_ptr));
     processor->init();
     // compute E-value for a set of prsms each run 
@@ -171,6 +172,16 @@ int process(int argc, char* argv[]) {
     std::cout << "Converting xml files to html files starts " << std::endl;
     translate(arguments);
     std::cout << "Converting xml files to html files finished." << std::endl;
+    
+    std::ofstream logfile;
+
+    if (log_file_name.length() != 0){
+      logfile.open(log_file_name, std::ios::out | std::ios::app);
+      if (logfile.is_open()) {
+	    logfile << 1 << std::endl;
+      }
+      logfile.close();
+    }  
 
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;

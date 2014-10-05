@@ -53,6 +53,15 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
   MsAlignReader reader(prsm_para_ptr->getSpectrumFileName());
   std::string output_file_name = basename(prsm_para_ptr->getSpectrumFileName())
                                           + "." + mng_ptr->output_file_ext_;
+
+  std::string log_file_name = prsm_para_ptr->getLogFileName();
+
+  std::ofstream logfile;
+
+  if (log_file_name.length() != 0){
+    logfile.open(log_file_name, std::ios::out | std::ios::app);
+  }
+
   PrsmWriter comp_writer(output_file_name + "_" 
                          + SemiAlignTypeFactory::getCompletePtr()->getName());
   PrsmWriter pref_writer(output_file_name + "_"
@@ -93,6 +102,11 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
                     raw_forms, mng_ptr, internal_prsms);
       internal_writer.writeVector(internal_prsms);
       all_writer.writeVector(internal_prsms);
+      if (log_file_name.length() != 0){
+        if (logfile.is_open()) {
+          logfile << (double) n / spectra_num * 0.053 << std::endl;
+        }
+      }
       std::cout << std::flush << "Zero ptm searching is processing " << n << " of " << spectra_num << " spectra.\r";
     }
     ms_ptr = reader.getNextMs();
@@ -100,6 +114,7 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
   }
 
   reader.close();
+  logfile.close();
 
   //because the prsm_writer ~PrsmWriter changed and the fileclosing is an independant function
   comp_writer.close();
