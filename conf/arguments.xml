@@ -3,11 +3,12 @@
 <title>task</title>
 <database_file_name>in/prot.fasta</database_file_name>
 <spectrum_file_name>in/spectra.msalign</spectrum_file_name>
-<fragmentation_method>CID</fragmentation_method>
-<cysteine_protecting_group>C58</cysteine_protecting_group>
+<log_file_name>log.txt</log_file_name>
+<fragmentation_method>FILE</fragmentation_method>
+<cysteine_protecting_group>C57</cysteine_protecting_group>
 <search_type>TARGET+DECOY</search_type>
-<shift_number>1</shift_number>
-<error_tolerance>50</error_tolerance>
+<shift_number>2</shift_number>
+<error_tolerance>15</error_tolerance>
 <cutoff_type>FDR</cutoff_type>
 <cutoff_value>0.01</cutoff_value>
 <max_ptm_mass>1000000</max_ptm_mass>
