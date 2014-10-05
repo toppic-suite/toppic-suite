@@ -38,6 +38,7 @@ void Argument::setArgumentsByConfigFile(const std::string &filename){
       xercesc::DOMElement* root = doc->getDocumentElement();
       arguments_["oriDatabaseFileName"]=getChildValue(root,"database_file_name",0);
       arguments_["spectrumFileName"]=getChildValue(root,"spectrum_file_name",0);
+      arguments_["logFileName"]=getChildValue(root,"log_file_name",0);
       arguments_["activation"]=getChildValue(root,"fragmentation_method",0);
       arguments_["cysteineProtection"]=getChildValue(root,"cysteine_protecting_group",0);
       arguments_["searchType"]=getChildValue(root,"search_type",0);
@@ -45,6 +46,7 @@ void Argument::setArgumentsByConfigFile(const std::string &filename){
       arguments_["errorTolerance"]=getChildValue(root,"error_tolerance",0);
       arguments_["cutoffType"]=getChildValue(root,"cutoff_type",0);
       arguments_["cutoffValue"]=getChildValue(root,"cutoff_value",0);
+      arguments_["maxPtmMass"]=getChildValue(root,"max_ptm_mass",0);
       arguments_["maxPtmMass"]=getChildValue(root,"max_ptm_mass",0);
 
       xercesc::DOMElement* prot_mod_list = getChildElement(root,"protein_variable_ptm_list",0);
@@ -84,6 +86,7 @@ bool Argument::parse(int argc, char* argv[]) {
 
     display_desc.add_options() 
         ("help,h", "Print help messages") 
+        ("argument-file,f",po::value<std::string>(&argument_file_name),"Argument file name.")
         ("activation,a", po::value<std::string>(&activation),
          "<CID|HCD|ETD|FILE>. Designate the activation type of tandem mass spectra. FILE means the activation type is given in spectral data file. Default value: FILE.")
         ("cysteine-protection,c", po::value<std::string> (&protection), 
