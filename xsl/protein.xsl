@@ -12,6 +12,12 @@
 <link rel="stylesheet" type="text/css" href="../resources/prsm.css"></link>
 <script type="text/javascript" language="javascript" src="../resources/media/js/jquery.js"></script>
 <script type="text/javascript" language="javascript" src="../resources/media/js/jquery.dataTables.js"></script>
+<style type="text/css">
+	@font-face {
+		font-family: "FreeMono";
+		src: url("../resources/FreeMono.ttf")
+	}
+</style>
 <body>
 <div class="container">
 <xsl:call-template name="navigation"/>
@@ -91,7 +97,7 @@
         </xsl:choose>
       </xsl:variable>
 
-      <table border="0"  cellspacing="0px" cellpadding="0px">
+      <table  class="table table-borderless table-condensed nopadding table-bold" >
         <xsl:if test="$table_first_row &gt; 0">
           <tr>
             <td colspan="2"></td>
