@@ -173,9 +173,8 @@ int process(int argc, char* argv[]) {
     translate(arguments);
     std::cout << "Converting xml files to html files finished." << std::endl;
     
-    std::ofstream logfile;
-
     if (log_file_name.length() != 0){
+      std::ofstream logfile;
       logfile.open(log_file_name, std::ios::out | std::ios::app);
       if (logfile.is_open()) {
 	    logfile << 1 << std::endl;
