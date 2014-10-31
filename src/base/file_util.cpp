@@ -147,7 +147,7 @@ void cleanDir(const std::string &path){
   for(fs::directory_iterator dir_iter(absolute(sp).parent_path()) ; dir_iter != end_iter ; ++dir_iter){
     std::string filename = dir_iter->path().string();
     if (filename.compare(0, base.length(), base) == 0){
-      if (filename != absolute(sp).string()&&!fs::is_directory(dir_iter->path())){
+      if (filename != absolute(sp).string()&&!fs::is_directory(dir_iter->path())&&filename != base + ".OUTPUT_TABLE"){
         fs::remove(dir_iter->path());
       }
     }
