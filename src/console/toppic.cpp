@@ -178,6 +178,13 @@ int process(int argc, char* argv[]) {
     translate(arguments);
     std::cout << "Converting xml files to html files finished." << std::endl;
     
+    if (arguments["keepTempFiles"] != "true"){
+      std::cout << "Deleting temporary files started." << std::endl;
+      delDir(basename(sp_file_name) + "_xml");
+      cleanDir(sp_file_name);	  
+      std::cout << "Deleting temporary files finished." << std::endl;
+    }
+    
     if (log_file_name.length() != 0){
       std::ofstream logfile;
       logfile.open(log_file_name, std::ios::out | std::ios::app);

@@ -23,6 +23,7 @@ void Argument::initArguments() {
   arguments_["maxPtmMass"] = "1000000";
   arguments_["executiveDir"] = ".";
   arguments_["logFileName"] = "";
+  arguments_["keepTempFiles"] = "";
 }
 
 void Argument::showUsage(boost::program_options::options_description &desc) {
@@ -96,7 +97,6 @@ bool Argument::parse(int argc, char* argv[]) {
         ("ptm-number,p", po::value<std::string> (&shift_num), "<0|1|2>. Maximum number of unexpected post-translational modifications in a proteoform-spectrum-match. Default value: 2.")
         ("cutoff-type,t", po::value<std::string> (&cutoff_type), "<EVALUE|FDR>. Cutoff type for reporting protein-spectrum-matches. Default value: EVALUE.")
         ("cutoff-value,v", po::value<std::string> (&cutoff_value), "<positive double value>. Cutoff value for reporting protein-spectrum-matches. Default value: 0.01.");
-
     po::options_description desc("Options");
 
     desc.add_options() 
@@ -113,8 +113,10 @@ bool Argument::parse(int argc, char* argv[]) {
         ("cutoff-type,t", po::value<std::string> (&cutoff_type), "<EVALUE|FDR>. Cutoff value type for reporting protein-spectrum-matches. Default value: EVALUE.")
         ("cutoff-value,v", po::value<std::string> (&cutoff_value), "<positive double value>. Cutoff value for reporting protein-spectrum-matches. Default value: 0.01.")
         ("log-file-name,l", po::value<std::string>(&log_file_name), "Log file name with its path.")
+        ("keep-temp-files,k", "Keep temporary files.")
         ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name with its path.")
         ("spectrum-file-name", po::value<std::string>(&spectrum_file_name)->required(), "Spectrum file name with its path.");
+        
 
     po::positional_options_description positional_options;
     positional_options.add("database-file-name", 1);
@@ -181,6 +183,9 @@ bool Argument::parse(int argc, char* argv[]) {
     }
     if (vm.count("log-file-name")) {
       arguments_["logFileName"] = log_file_name;
+    }
+    if (vm.count("keep-temp-files")) {
+      arguments_["keepTempFiles"] = "true";
     }
   }
   catch(std::exception&e ) {
