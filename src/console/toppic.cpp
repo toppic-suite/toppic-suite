@@ -68,7 +68,7 @@ int process(int argc, char* argv[]) {
     if (arguments["searchType"] == "TARGET+DECOY") {
       generateShuffleDb(ori_db_file_name, db_file_name);
     }
-
+    
     std::cout << "Zero ptm searching starts " << std::endl;
     ZeroPtmMngPtr zero_mng_ptr = ZeroPtmMngPtr(new ZeroPtmMng (prsm_para_ptr, "ZERO"));
     zeroPtmSearchProcess(zero_mng_ptr);
@@ -172,6 +172,12 @@ int process(int argc, char* argv[]) {
     std::cout << "Converting xml files to html files starts " << std::endl;
     translate(arguments);
     std::cout << "Converting xml files to html files finished." << std::endl;
+    
+    if (arguments["keepTempFiles"] != "true"){
+	  std::cout << "Deleting temporary files." << std::endl;
+	  delDir(basename(sp_file_name) + "_xml");
+      cleanDir(sp_file_name);	  
+    }
     
     if (log_file_name.length() != 0){
       std::ofstream logfile;
