@@ -117,7 +117,7 @@ void PtmProcessor::process(){
     }
     
     std::cout << std::flush << "Ptm searching is processing " << cnt 
-        << " of " << spectra_num << " spectra." << " time " << time << " total time " << total_time << " seconds.\r ";
+        << " of " << spectra_num << " spectra.\r";
 
   }
   sp_reader.close();
