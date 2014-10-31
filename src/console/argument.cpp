@@ -26,7 +26,7 @@ void Argument::initArguments() {
 }
 
 void Argument::showUsage(boost::program_options::options_description &desc) {
-  std::cout << "Usage: topid [options] database-file-name spectrum-file-name" << std::endl; 
+  std::cout << "Usage: toppic [options] database-file-name spectrum-file-name" << std::endl; 
   std::cout << desc << std::endl; 
 }
 
@@ -85,39 +85,36 @@ bool Argument::parse(int argc, char* argv[]) {
     po::options_description display_desc("Options");
 
     display_desc.add_options() 
-        ("help,h", "Print help messages") 
-        ("argument-file,f",po::value<std::string>(&argument_file_name),"Argument file name.")
+        ("help,h", "Print the help message.") 
         ("activation,a", po::value<std::string>(&activation),
-         "<CID|HCD|ETD|FILE>. Designate the activation type of tandem mass spectra. FILE means the activation type is given in spectral data file. Default value: FILE.")
+         "<CID|HCD|ETD|FILE>. Activation type of tandem mass spectra. When FILE is used, the activation type information is given in the input spectral data file. Default value: FILE.")
         ("cysteine-protection,c", po::value<std::string> (&protection), 
-         "<C0|C57|C58>. Cysteine protecting group C0: no modification,C57: Carbamidoemetylation, or C58:Carboxymethylation. Default value: C0.")
-        ("decoy,d", "Use decoy protein database to estimate false discovery rates.")
-        ("error-tolerance,e", po::value<std::string> (&error_tole), "<int value>. Error tolerance in PPM. Default value: 15.")
-        ("max-ptm,m", po::value<std::string> (&max_ptm_mass), "<positive double value>. Maximum absolute value of the PTM masses in the identified proteoform. Default value: 1000000.")
-        ("shift-number,s", po::value<std::string> (&shift_num), "<int value>. Maximum number of unexpected PTMs. Default value: 2.")
-        ("cutoff-type,t", po::value<std::string> (&cutoff_type), "<EVALUE|FDR>. Cutoff value type for reporting protein-spectrum-matches. Default value: EVALUE.")
-        ("cutoff-value,v", po::value<std::string> (&cutoff_value), "Cutoff value for reporting protein-spectrum-matches. Default value: 0.01.")
-        ("log-file-name,l", po::value<std::string> (&log_file_name), "log file name with path.");
-        
+         "<C0|C57|C58>. Cysteine protecting group: C0: no modification, C57: Carbamidoemetylation, or C58:Carboxymethylation. Default value: C0.")
+        ("decoy,d", "Use a decoy protein database to estimate false discovery rates.")
+        ("error-tolerance,e", po::value<std::string> (&error_tole), "<positive integer value>. Error tolerance for precursor and fragment masses in PPM. Default value: 15.")
+        ("max-ptm,m", po::value<std::string> (&max_ptm_mass), "<positive double value>. Maximum absolute value of masses (in Dalton) of unexpected post-translational modifications in proteoforms. Default value: 1000000.")
+        ("ptm-number,p", po::value<std::string> (&shift_num), "<0|1|2>. Maximum number of unexpected post-translational modifications in a proteoform-spectrum-match. Default value: 2.")
+        ("cutoff-type,t", po::value<std::string> (&cutoff_type), "<EVALUE|FDR>. Cutoff type for reporting protein-spectrum-matches. Default value: EVALUE.")
+        ("cutoff-value,v", po::value<std::string> (&cutoff_value), "<positive double value>. Cutoff value for reporting protein-spectrum-matches. Default value: 0.01.");
+
     po::options_description desc("Options");
 
     desc.add_options() 
-        ("help,h", "Print help messages") 
+        ("help,h", "Print the help message.") 
         ("argument-file,f",po::value<std::string>(&argument_file_name),"Argument file name.")
         ("activation,a", po::value<std::string>(&activation),
-         "<CID|HCD|ETD|FILE>. Designate the activation type of tandem mass spectra. FILE means the activation type is given in spectral data file. Default value: FILE.")
+         "<CID|HCD|ETD|FILE>. The activation type of tandem mass spectra. When FILE is used, the activation type information is given in spectral data file. Default value: FILE.")
         ("cysteine-protection,c", po::value<std::string> (&protection), 
-         "<C0|C57|C58>. Cysteine protection group C0: no modification,C57: Carbamidoemetylation, or C58:Carboxymethylation. Default value: C0.")
-        ("decoy,d", "Use decoy protein database to estimate false discovery rates.")
-        ("shift-number,s", po::value<std::string> (&shift_num), "<int value>. Maximum number of unexpected PTMs. Default value: 2.")
-        ("error-tolerance,e", po::value<std::string> (&error_tole), "<int value>. Error tolerance in PPM. Default value: 15.")
-        ("max-ptm,m", po::value<std::string> (&max_ptm_mass), "<positive double value>. Maximum absolute value of the PTM masses in the identified proteoform. Default value: 1000000.")
+         "<C0|C57|C58>. Cysteine protecting group: C0: no modification, C57: Carbamidoemetylation, or C58:Carboxymethylation. Default value: C0.")
+        ("decoy,d", "Use a decoy protein database to estimate false discovery rates.")
+        ("error-tolerance,e", po::value<std::string> (&error_tole), "<int value>. Error tolerance of precursor and fragment masses in PPM. Default value: 15.")
+        ("max-ptm,m", po::value<std::string> (&max_ptm_mass), "<positive double value>. Maximum absolute value (in Dalton) of the masses of unexpected PTMs in the identified proteoform. Default value: 1000000.")
+        ("ptm-number,p", po::value<std::string> (&shift_num), "<0|1|2>. Maximum number of unexpected PTMs. Default value: 2.")
         ("cutoff-type,t", po::value<std::string> (&cutoff_type), "<EVALUE|FDR>. Cutoff value type for reporting protein-spectrum-matches. Default value: EVALUE.")
-        ("cutoff-value,v", po::value<std::string> (&cutoff_value), "Cutoff value for reporting protein-spectrum-matches. Default value: 0.01.")
-        ("log-file-name,l", po::value<std::string>(&log_file_name), "log file name with path")
-        ("database-file-name", po::value<std::string>(&database_file_name)->required(), "database file name with path")
-        ("spectrum-file-name", po::value<std::string>(&spectrum_file_name)->required(), "spectrum file name with path");
-        
+        ("cutoff-value,v", po::value<std::string> (&cutoff_value), "<positive double value>. Cutoff value for reporting protein-spectrum-matches. Default value: 0.01.")
+        ("log-file-name,l", po::value<std::string>(&log_file_name), "Log file name with its path.")
+        ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name with its path.")
+        ("spectrum-file-name", po::value<std::string>(&spectrum_file_name)->required(), "Spectrum file name with its path.");
 
     po::positional_options_description positional_options;
     positional_options.add("database-file-name", 1);
@@ -190,12 +187,15 @@ bool Argument::parse(int argc, char* argv[]) {
     std::cerr << "Unhandled Exception in parsing command line"<<e.what()<<", application will now exit"<<std::endl;
     return false;
   }
+  
+  /*
   std::cout <<"*** Parameters begin ***" << std::endl;
   for(std::map<std::string, std::string>::const_iterator it = arguments_.begin();
       it != arguments_.end(); ++it) {
         std::cout << it->first << " " << it->second << std::endl;
   }
   std::cout <<"*** Parameters end ***" << std::endl;
+  */
   return validateArguments();
 }
 
@@ -212,7 +212,7 @@ bool Argument::validateArguments() {
   std::string activation = arguments_["activation"];
   if(activation != "CID" && activation != "HCD" 
      && activation != "ETD" && activation != "FILE") {
-    LOG_ERROR("Activation " << activation << " error! The value should be CID|HCD|ETD|FILE!");
+    LOG_ERROR("Activation type " << activation << " error! The value should be CID|HCD|ETD|FILE!");
     return false;
   }
   std::string protection = arguments_["cysteineProtection"];
@@ -227,7 +227,7 @@ bool Argument::validateArguments() {
   }
   std::string shift_number = arguments_["shiftNumber"];
   if (shift_number != "0" && shift_number != "1" && shift_number != "2") {
-    LOG_ERROR("Shift number "<< shift_number <<" error! The value should be 0|1|2!");
+    LOG_ERROR("PTM number "<< shift_number <<" error! The value should be 0|1|2!");
     return false;
   }
   
@@ -238,7 +238,7 @@ bool Argument::validateArguments() {
   }
 
   if (cutoff_type == "FDR" && search_type != "TARGET+DECOY"){
-    LOG_ERROR("Cutoff type "<< cutoff_type << " error! FDR cutoff can not be used when the search type is TARGET!");
+    LOG_ERROR("Cutoff type "<< cutoff_type << " error! FDR cutoff cannot be used when no decoy database is used! Please add argument '-d' in the command.");
     return false;
   }
 
@@ -246,12 +246,12 @@ bool Argument::validateArguments() {
   try {
     double mass = atof(max_ptm_mass.c_str());
     if(mass <= 0.0){
-      LOG_ERROR("Max ptm mass " << max_ptm_mass << " error! The value should be positive");
+      LOG_ERROR("Maximum PTM mass " << max_ptm_mass << " error! The value should be positive.");
       return false;
     }
   }
   catch (int e) {
-    LOG_ERROR("Max ptm mass " << max_ptm_mass << " should be a number");
+    LOG_ERROR("Maximum ptm mass " << max_ptm_mass << " should be a number.");
     return false;
   }
   return true;
@@ -260,12 +260,12 @@ bool Argument::validateArguments() {
   try {
     double th = atof(cutoff_value.c_str());
     if(th<0){
-      LOG_ERROR("Cutoff_value " << cutoff_value << " error! The value should be positive");
+      LOG_ERROR("Cutoff value " << cutoff_value << " error! The value should be positive.");
       return false;
     }
   }
   catch (int e) {
-    LOG_ERROR("Cutoff value " << cutoff_value << " should be a number");
+    LOG_ERROR("Cutoff value " << cutoff_value << " should be a number.");
     return false;
   }
   return true;

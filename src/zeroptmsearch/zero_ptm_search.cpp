@@ -107,11 +107,12 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
           logfile << (double) n / spectra_num * 0.053 << std::endl;
         }
       }
-      std::cout << std::flush << "Zero ptm searching is processing " << n << " of " << spectra_num << " spectra.\r";
+      std::cout << std::flush << "Zero PTM search is processing " << n << " of " << spectra_num << " spectra.\r";
     }
     ms_ptr = reader.getNextMs();
     //LOG_DEBUG("spectrum " << n);
   }
+  std::cout << std::endl;
 
   reader.close();
   logfile.close();
@@ -122,8 +123,6 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
   suff_writer.close();
   internal_writer.close();
   all_writer.close();
-
-  std::cout << std::endl << "Zero ptm searching finished." << std::endl;
 }
 
 } // end namespace

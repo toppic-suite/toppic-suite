@@ -9,13 +9,13 @@ CompPValueLookupTable::CompPValueLookupTable(const ProteoformPtrVec &raw_proteo_
                                              TdgfMngPtr mng_ptr) {
   mng_ptr_ = mng_ptr;
   initTable();
-  LOG_DEBUG("table initialized")
-                        
+  LOG_DEBUG("table initialized");
+
   test_num_ptr_ = CountTestNumPtr(new CountTestNum(raw_proteo_ptrs, mod_proteo_ptrs,
                                                    residue_ptrs, mng_ptr->convert_ratio_,
                                                    mng_ptr->max_prec_mass_,
                                                    mng_ptr->max_ptm_mass_));
-  LOG_DEBUG("test number initialized")
+  LOG_DEBUG("test number initialized");
 }
 
 void CompPValueLookupTable::initTable() {
@@ -23,7 +23,7 @@ void CompPValueLookupTable::initTable() {
 }
 
 double CompPValueLookupTable::compProb(int ppo, double prec_mass, int peak_num, int match_frag_num, 
-                                      int unexpected_shift_num) {
+                                       int unexpected_shift_num) {
   // add implementation.
   return 1.0;
 }
