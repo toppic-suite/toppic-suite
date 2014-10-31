@@ -34,6 +34,12 @@ function showMatchedPeaks() {
 		if (document.getElementById('peak' + i + 'Y') != null){
 			document.getElementById('peak' + i + 'Y').style.display = "";
 		}
+		if (document.getElementById('peak' + i + 'C') != null){
+			document.getElementById('peak' + i + 'C').style.display = "";
+		}
+		if (document.getElementById('peak' + i + 'Z_DOT') != null){
+			document.getElementById('peak' + i + 'Z_DOT').style.display = "";
+		}
 		if (document.getElementById('peak' + i) != null){
 			document.getElementById('peak' + i).style.display = "none";
 		}
@@ -48,6 +54,12 @@ function showNotMatchedPeaks() {
 		}
 		if (document.getElementById('peak' + i + 'Y') != null){
 			document.getElementById('peak' + i + 'Y').style.display = "none";
+		}
+		if (document.getElementById('peak' + i + 'C') != null){
+			document.getElementById('peak' + i + 'C').style.display = "none";
+		}
+		if (document.getElementById('peak' + i + 'Z_DOT') != null){
+			document.getElementById('peak' + i + 'Z_DOT').style.display = "none";
 		}
 		if (document.getElementById('peak' + i) != null){
 			document.getElementById('peak' + i).style.display = "";
@@ -64,6 +76,12 @@ function showAllPeaks() {
 		if (document.getElementById('peak' + i + 'Y') != null){
 			document.getElementById('peak' + i + 'Y').style.display = "";
 		}
+		if (document.getElementById('peak' + i + 'C') != null){
+			document.getElementById('peak' + i + 'C').style.display = "";
+		}
+		if (document.getElementById('peak' + i + 'Z_DOT') != null){
+			document.getElementById('peak' + i + 'Z_DOT').style.display = "";
+		}
 		if (document.getElementById('peak' + i) != null){
 			document.getElementById('peak' + i).style.display = "";
 		}
@@ -79,6 +97,12 @@ function showIonPeaks(ids) {
 		}
 		if (document.getElementById('peak' + i + 'Y') != null){
 			document.getElementById('peak' + i + 'Y').style.display = "none";
+		}
+		if (document.getElementById('peak' + i + 'C') != null){
+			document.getElementById('peak' + i + 'C').style.display = "none";
+		}
+		if (document.getElementById('peak' + i + 'Z_DOT') != null){
+			document.getElementById('peak' + i + 'Z_DOT').style.display = "none";
 		}
 		if (document.getElementById('peak' + i) != null){
 			document.getElementById('peak' + i).style.display = "none";
