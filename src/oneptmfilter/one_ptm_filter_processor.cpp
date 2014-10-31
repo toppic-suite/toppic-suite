@@ -23,12 +23,16 @@ void OnePtmFilterProcessor::process(){
   std::string sp_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
   int n_spectrum = countSpNum(sp_file_name);
   for(int i=0;i< filter_ptr_->getBlockSize();i++){
-    std::cout << "Fast filtering block " << (i+1) << " out of " 
-        << filter_ptr_->getBlockSize() << " starts" << std::endl; 
+    std::cout << "One PTM filtering block " << (i+1) << " out of " 
+        << filter_ptr_->getBlockSize() << " started." << std::endl; 
     processBlock(i, sp_file_name, n_spectrum);
+    std::cout << "One PTM filtering block " << (i +1) 
+      << " finished. " << std::endl;
   }
+  std::cout << "Combining blocks started." << std::endl; 
   combineBlock(sp_file_name, filter_ptr_->getBlockSize(), mng_ptr_->output_file_ext_, 
                mng_ptr_->one_ptm_filter_result_num_);
+  std::cout << "Combining blocks finished." << std::endl; 
 }
 
 void OnePtmFilterProcessor::processBlock(int block, const std::string &sp_file_name,
@@ -66,14 +70,13 @@ void OnePtmFilterProcessor::processBlock(int block, const std::string &sp_file_n
       }
     }
     
-    std::cout << std::flush << "Fast filtering block " << (block +1) 
+    std::cout << std::flush << "One PTM filtering block " << (block +1) 
         << " is processing " << cnt << " of " << n_spectra << " spectra.\r";
   }
+  std::cout << std::endl;
   reader.close();
   writer.close();
   logfile.close();
-  std::cout << std::endl << "Fast filtering block " << (block +1) 
-      << " finished. " << std::endl;
 }
 
 } /* namespace prot */

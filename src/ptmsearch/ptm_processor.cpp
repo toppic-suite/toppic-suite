@@ -62,7 +62,7 @@ void PtmProcessor::initData() {
       prsm_para_ptr->getSearchDbFileName(), 
       prsm_para_ptr->getFixModResiduePtrVec());
   mod_proteo_2d_ptrs_ =  
-       generate2DProtModProteoform(proteo_ptrs_, prsm_para_ptr->getAllowProtModPtrVec());
+      generate2DProtModProteoform(proteo_ptrs_, prsm_para_ptr->getAllowProtModPtrVec());
 
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
   std::string simplePrsmFileName = basename(sp_file_name)
@@ -107,8 +107,8 @@ void PtmProcessor::process(){
     long stop_t = clock();
     double time = (stop_t - start_t) /double (CLOCKS_PER_SEC);
     total_time += time;
-    //std::cout << std::flush << "Ptm searching is processing " << cnt 
-    //    << " of " << spectra_num << " spectra.\r";
+    std::cout << std::flush <<  "PTM search is processing " << cnt 
+        << " of " << spectra_num << " spectra.\r";
     
     if (log_file_name.length() != 0){
       if (logfile.is_open()) {
@@ -116,14 +116,14 @@ void PtmProcessor::process(){
       }
     }
     
-    std::cout << std::flush << "Ptm searching is processing " << cnt 
-        << " of " << spectra_num << " spectra." << " time " << time << " total time " << total_time << " seconds.\r ";
+    //std::cout << std::flush << "Ptm searching is processing " << cnt 
+    //    << " of " << spectra_num << " spectra." << " time " << time << " total time " << total_time << " seconds.\r ";
 
   }
   sp_reader.close();
   logfile.close();
   closeWriters();
-  std::cout << std::endl << "Ptm searching finished." << std::endl;
+  std::cout << std::endl;
 }
 
 inline void seleTopPrsms(const PrsmPtrVec &all_prsm_ptrs, 

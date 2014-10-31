@@ -81,7 +81,7 @@ void EValueProcessor::process(bool is_separate) {
     
     if (log_file_name.length() != 0){
       if (logfile.is_open()) {
-		 logfile << 0.373 + (double) cnt / spectrum_num * 0.62 << std::endl;
+        logfile << 0.373 + (double) cnt / spectrum_num * 0.62 << std::endl;
       }
     }	
     
@@ -91,7 +91,7 @@ void EValueProcessor::process(bool is_separate) {
 
   //because the prsm_writer ~PrsmWriter changed and the fileclosing is an independant function
   writer.close();
-  std::cout << std::endl << "E-value computation finished." << std::endl;
+  std::cout << std::endl;
 }
 
 bool EValueProcessor::checkPrsms(const PrsmPtrVec &prsm_ptrs) {

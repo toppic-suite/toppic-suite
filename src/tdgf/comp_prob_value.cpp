@@ -365,7 +365,8 @@ inline void CompProbValue::runInit(std::vector<std::vector<double>> &results,
   }
 }
 
-inline void CompProbValue::runAddProb(int page_pos, int prev_pos, int size, double f) {
+inline void CompProbValue::runAddProb(int page_pos, int prev_pos, 
+                                      int size, double f) {
   for (int i = page_pos; i < page_pos + size; i++) {
     page_table_[i] = page_table_[i] + page_table_[prev_pos] * f;
     prev_pos++;
@@ -411,7 +412,6 @@ inline void CompProbValue::compOneLayer(std::vector<std::vector<double>> &prev_r
   for (size_t i = 0; i < peak_masses_.size(); i++) {
     std::vector<double> tmp(height_, 0.0);
     cur_results.push_back(tmp);
-    //cur_priors.push_back(tmp);
   }
   //LOG_DEBUG("start for loop ");
   size_t peak_index = 0;
