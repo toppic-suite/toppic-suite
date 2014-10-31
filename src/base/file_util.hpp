@@ -27,6 +27,10 @@ void copyFile(const std::string &file_name, const std::string &path,
 
 bool copyDir(boost::filesystem::path const & source, boost::filesystem::path const & destination);
 
+void delDir(const std::string &path);
+
+void cleanDir(const std::string &path);
+
 }
 
 #endif

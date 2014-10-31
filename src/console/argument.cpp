@@ -23,6 +23,7 @@ void Argument::initArguments() {
   arguments_["maxPtmMass"] = "1000000";
   arguments_["executiveDir"] = ".";
   arguments_["logFileName"] = "";
+  arguments_["keepTempFiles"] = "";
 }
 
 void Argument::showUsage(boost::program_options::options_description &desc) {
@@ -94,10 +95,11 @@ bool Argument::parse(int argc, char* argv[]) {
         ("decoy,d", "Use decoy protein database to estimate false discovery rates.")
         ("error-tolerance,e", po::value<std::string> (&error_tole), "<int value>. Error tolerance in PPM. Default value: 15.")
         ("max-ptm,m", po::value<std::string> (&max_ptm_mass), "<positive double value>. Maximum absolute value of the PTM masses in the identified proteoform. Default value: 1000000.")
-        ("shift-number,s", po::value<std::string> (&shift_num), "<int value>. Maximum number of unexpected PTMs. Default value: 2.")
+        ("ptm-number,p", po::value<std::string> (&shift_num), "<int value>. Maximum number of unexpected PTMs. Default value: 2.")
         ("cutoff-type,t", po::value<std::string> (&cutoff_type), "<EVALUE|FDR>. Cutoff value type for reporting protein-spectrum-matches. Default value: EVALUE.")
         ("cutoff-value,v", po::value<std::string> (&cutoff_value), "Cutoff value for reporting protein-spectrum-matches. Default value: 0.01.")
-        ("log-file-name,l", po::value<std::string> (&log_file_name), "log file name with path.");
+        ("log-file-name,l", po::value<std::string> (&log_file_name), "Log file name.")
+        ("keep-temp-files,k", "Keep temporary files.");
         
     po::options_description desc("Options");
 
@@ -109,12 +111,13 @@ bool Argument::parse(int argc, char* argv[]) {
         ("cysteine-protection,c", po::value<std::string> (&protection), 
          "<C0|C57|C58>. Cysteine protection group C0: no modification,C57: Carbamidoemetylation, or C58:Carboxymethylation. Default value: C0.")
         ("decoy,d", "Use decoy protein database to estimate false discovery rates.")
-        ("shift-number,s", po::value<std::string> (&shift_num), "<int value>. Maximum number of unexpected PTMs. Default value: 2.")
+        ("ptm-number,p", po::value<std::string> (&shift_num), "<int value>. Maximum number of unexpected PTMs. Default value: 2.")
         ("error-tolerance,e", po::value<std::string> (&error_tole), "<int value>. Error tolerance in PPM. Default value: 15.")
         ("max-ptm,m", po::value<std::string> (&max_ptm_mass), "<positive double value>. Maximum absolute value of the PTM masses in the identified proteoform. Default value: 1000000.")
         ("cutoff-type,t", po::value<std::string> (&cutoff_type), "<EVALUE|FDR>. Cutoff value type for reporting protein-spectrum-matches. Default value: EVALUE.")
         ("cutoff-value,v", po::value<std::string> (&cutoff_value), "Cutoff value for reporting protein-spectrum-matches. Default value: 0.01.")
         ("log-file-name,l", po::value<std::string>(&log_file_name), "log file name with path")
+        ("keep-temp-files,k", "Keep temporary files.")
         ("database-file-name", po::value<std::string>(&database_file_name)->required(), "database file name with path")
         ("spectrum-file-name", po::value<std::string>(&spectrum_file_name)->required(), "spectrum file name with path");
         
@@ -184,6 +187,9 @@ bool Argument::parse(int argc, char* argv[]) {
     }
     if (vm.count("log-file-name")) {
       arguments_["logFileName"] = log_file_name;
+    }
+    if (vm.count("keep-temp-files")) {
+      arguments_["keepTempFiles"] = "true";
     }
   }
   catch(std::exception&e ) {
