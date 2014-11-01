@@ -142,7 +142,7 @@ int process(int argc, char* argv[]) {
     }
 
     std::cout << "PRSM selecting by cutoff started." << std::endl;
-    std::string cutoff_type = arguments["cutoffValue"];
+    std::string cutoff_type = arguments["cutoffType"];
     double cutoff_value;
     std::istringstream (arguments["cutoffValue"]) >> cutoff_value;
     OutputSelectorPtr output_selector = OutputSelectorPtr(
