@@ -15,7 +15,7 @@ void translate(std::map<std::string,std::string> &arguments)
     createFolder(html_dir + FILE_SEPARATOR +"proteoforms");
     createFolder(html_dir + FILE_SEPARATOR +"prsms");
     createFolder(html_dir + FILE_SEPARATOR +"proteins");
-    boost::filesystem::path from_path(exec_dir + FILE_SEPARATOR + "resources");
+    boost::filesystem::path from_path(exec_dir + FILE_SEPARATOR + "toppic_resources" + FILE_SEPARATOR + "web");
     boost::filesystem::path to_path(html_dir + FILE_SEPARATOR + "resources");
     copyDir(from_path, to_path);
 

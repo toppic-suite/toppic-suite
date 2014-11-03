@@ -8,7 +8,7 @@
 
 #include <string>
 
-#define CONFIG_DIR  "conf"
+#define CONFIG_DIR  "toppic_resources/conf"
 #define CONFIG_FILE_NAME "configuration.xml"
 
 namespace prot {

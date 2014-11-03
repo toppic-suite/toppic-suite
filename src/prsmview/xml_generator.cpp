@@ -25,7 +25,7 @@ void XmlGenerator::outputPrsms(const PrsmPtrVec &prsm_ptrs){
 
     std::vector<std::string> file_info;
     file_info.push_back(file_name);
-    file_info.push_back(mng_ptr_->executive_dir_ + FILE_SEPARATOR + "xsl" + FILE_SEPARATOR + "prsm.xsl");
+    file_info.push_back(mng_ptr_->executive_dir_ + FILE_SEPARATOR + "toppic_resources" + FILE_SEPARATOR + "xsl" + FILE_SEPARATOR + "prsm.xsl");
     file_info.push_back(mng_ptr_->html_path_+ FILE_SEPARATOR + "prsms" + FILE_SEPARATOR 
                         + "prsm"+ convertToString(prsm_ptrs[i]->getId())+".html");
     anno_view_ptr_->file_list_.push_back(file_info);
@@ -58,7 +58,7 @@ void XmlGenerator::outputProteoforms(const PrsmPtrVec &prsm_ptrs){
 
       std::vector<std::string> file_info;
       file_info.push_back(file_name);
-      file_info.push_back(mng_ptr_->executive_dir_ + FILE_SEPARATOR + "xsl" + FILE_SEPARATOR + "proteoform.xsl");
+      file_info.push_back(mng_ptr_->executive_dir_ + FILE_SEPARATOR + "toppic_resources" + FILE_SEPARATOR + "xsl" + FILE_SEPARATOR + "proteoform.xsl");
       file_info.push_back(mng_ptr_->html_path_+ FILE_SEPARATOR+ "proteoforms" + FILE_SEPARATOR 
                           + "proteoform"+convertToString(species_ids[i])+".html");
       anno_view_ptr_->file_list_.push_back(file_info);
@@ -78,7 +78,7 @@ void XmlGenerator::outputProteins(const PrsmPtrVec &prsm_ptrs){
       writer.close();
       std::vector<std::string> file_info;
       file_info.push_back(file_name);
-      file_info.push_back(mng_ptr_->executive_dir_ + FILE_SEPARATOR + "xsl" + FILE_SEPARATOR + "protein.xsl");
+      file_info.push_back(mng_ptr_->executive_dir_ + FILE_SEPARATOR + "toppic_resources" + FILE_SEPARATOR + "xsl" + FILE_SEPARATOR + "protein.xsl");
       file_info.push_back(mng_ptr_->html_path_+ FILE_SEPARATOR + "proteins" + FILE_SEPARATOR 
                           + "protein"+convertToString(proteo_ptrs_[i]->getDbResSeqPtr()->getId())+".html");
       anno_view_ptr_->file_list_.push_back(file_info);
@@ -95,7 +95,7 @@ void XmlGenerator::outputAllProteins(const PrsmPtrVec &prsm_ptrs){
   writer.close();
   std::vector<std::string> file_info;
   file_info.push_back(file_name);
-  file_info.push_back(mng_ptr_->executive_dir_ + FILE_SEPARATOR + "xsl" + FILE_SEPARATOR +"proteins.xsl");
+  file_info.push_back(mng_ptr_->executive_dir_ + FILE_SEPARATOR + "toppic_resources" + FILE_SEPARATOR + "xsl" + FILE_SEPARATOR +"proteins.xsl");
   file_info.push_back(mng_ptr_->html_path_+ FILE_SEPARATOR + "proteins.html");
   anno_view_ptr_->file_list_.push_back(file_info);
 }

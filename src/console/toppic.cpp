@@ -205,6 +205,7 @@ int process(int argc, char* argv[]) {
 }
 
 int main(int argc, char* argv[]) {
+  //prot::log_level = 2;
   return prot::process(argc, argv);
 }
 

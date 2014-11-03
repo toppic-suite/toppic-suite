@@ -159,8 +159,8 @@ void command::initOption() {
 }
 
 void command::initArguments() {
-  arguments_["argumentFileName"] = "conf/arguments.xml";
-  arguments_["configuration"] = "conf/configuration.xml";
+  arguments_["argumentFileName"] = "toppic_resources/conf/arguments.xml";
+  arguments_["configuration"] = "toppic_resources/conf/configuration.xml";
   arguments_["databaseFileName"] = "in/prot.fasta";
   arguments_["spectrumFileName"] = "in/spectra.msalign";
   arguments_["activation"] = "FILE";
@@ -237,16 +237,16 @@ bool existFile(std::string filename){
 
 bool checkPath(std::string path){
   std::vector<std::string> file_to_check;
-  file_to_check.push_back("/conf/acid.xml");
-  file_to_check.push_back("/conf/activation.xml");
-  file_to_check.push_back("/conf/configuration.xml");
-  file_to_check.push_back("/conf/ion_type.xml");
-  file_to_check.push_back("/conf/neutral_loss.xml");
-  file_to_check.push_back("/conf/prot_mod.xml");
-  file_to_check.push_back("/conf/ptm.xml");
-  file_to_check.push_back("/conf/residue.xml");
-  file_to_check.push_back("/conf/support_peak_type.xml");
-  file_to_check.push_back("/conf/trunc.xml");
+  file_to_check.push_back("/toppic_resources/conf/acid.xml");
+  file_to_check.push_back("/toppic_resources/conf/activation.xml");
+  file_to_check.push_back("/toppic_resources/conf/configuration.xml");
+  file_to_check.push_back("/toppic_resources/conf/ion_type.xml");
+  file_to_check.push_back("/toppic_resources/conf/neutral_loss.xml");
+  file_to_check.push_back("/toppic_resources/conf/prot_mod.xml");
+  file_to_check.push_back("/toppic_resources/conf/ptm.xml");
+  file_to_check.push_back("/toppic_resources/conf/residue.xml");
+  file_to_check.push_back("/toppic_resources/conf/support_peak_type.xml");
+  file_to_check.push_back("/toppic_resources/conf/trunc.xml");
   bool flag = true;
   for(size_t i=0;i<file_to_check.size();i++){
     if(!existFile(path+file_to_check[i])){
@@ -266,7 +266,7 @@ std::string getExePath(std::string & command_path) {
     command_path = command_path.substr(0, pos);
   }
   std::fstream file;
-  file.open(command_path + "/conf/acid.xml", std::ios::in);
+  file.open(command_path + "/toppic_resources/conf/acid.xml", std::ios::in);
   if (!file) {
     std::string os_path = std::getenv("PATH");
     size_t pos = os_path.find(";", 0);
@@ -278,7 +278,7 @@ std::string getExePath(std::string & command_path) {
           paths[i] = paths[i].substr(0, paths[i].length() - 1);
         }
         file.close();
-        file.open(paths[i] + "/conf/acid.xml", std::ios::in);
+        file.open(paths[i] + "/toppic_resources/conf/acid.xml", std::ios::in);
         if (file) {
           if (checkPath(paths[i])) {
             run_path = paths[i];
@@ -298,7 +298,7 @@ std::string getExePath(std::string & command_path) {
         if (paths[i].find_last_of('\\') == paths[i].length() - 1) {
           paths[i] = paths[i].substr(0, paths[i].length() - 1);
         }
-        file.open(paths[i] + "/conf/acid.xml", std::ios::in);
+        file.open(paths[i] + "/toppic_resources/conf/acid.xml", std::ios::in);
         if (file) {
           if (checkPath(paths[i])) {
             run_path = paths[i];
@@ -324,7 +324,7 @@ std::string getExePath(std::string & command_path) {
 //    std::cout<<command_path<<std::endl;
 //    std::cout<<up_path<<std::endl;
 //    std::cout<<up_path<<"/conf/acid.xml"<<std::endl;
-    if(existFile(up_path+"/conf/acid.xml")){
+    if(existFile(up_path+"/toppic_resources/conf/acid.xml")){
       run_path=up_path;
     }
   }
