@@ -69,7 +69,7 @@
 </xsl:template>
 
   <xsl:template match="annotated_protein/annotation" mode="protein">
-    <div id="alignment" style="font-family: 'FreeMono', Miltonian, monospace; font-size:16;line-height:2.5;background-color:#FFF">
+    <div id="alignment" style="font-family: 'FreeMono', Miltonian, monospace; font-size:16;line-height:2.5;background-color:#FFF;width:800px;">
       <xsl:variable name="row_residue_num" select="30"/>
       <xsl:variable name="residue_num" select="protein_length"/>
       <xsl:variable name="table_first_row">
