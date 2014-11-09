@@ -23,8 +23,5 @@ typedef std::vector<DbBlockPtr> DbBlockPtrVec;
 
 DbBlockPtrVec readDbBlockIndex(const std::string &index_file_name);
 
-void generateDbBlockIndex(const std::string &db_file_name, 
-                          int block_size);
-
 }
 #endif
