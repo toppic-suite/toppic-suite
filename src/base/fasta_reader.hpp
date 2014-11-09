@@ -6,6 +6,12 @@
 #include <string>
 #include <vector>
 
+#define BOOST_NO_CXX11_SCOPED_ENUMS
+#include <boost/filesystem/path.hpp>
+#include <boost/filesystem/operations.hpp>
+#undef BOOST_NO_CXX11_SCOPED_ENUMS
+
+
 #include "base/string_util.hpp"
 #include "base/residue_seq.hpp"
 #include "base/proteoform.hpp"
@@ -36,6 +42,8 @@ class FastaReader {
    **/
   FastaReader(const std::string &file_name);
 
+  void setSeqId(int seq_id) {seq_id_ = seq_id;}
+
   /**
    * Read FASTA file and return next protein
    * name and sequence. 
@@ -47,14 +55,24 @@ class FastaReader {
  private:
   std::ifstream input_;
   std::string ori_name_;
-  int id_ = 0;
+  int seq_id_ = 0;
 };
 
+/*
 ProteoformPtrVec readFastaToProteoform(const std::string &file_name, 
                                        const ResiduePtrVec &residue_list);
+                                       */
+
+ProteoformPtrVec readFastaToProteoform(const std::string &file_name, 
+                                       const ResiduePtrVec &residue_list,
+                                       int seq_bgn_id);
 
 void generateShuffleDb(const std::string &file_name, 
                        const std::string &target_decoy_file_name);
+
+void dbPreprocess(const std::string &ori_db_file_name, 
+                  const std::string &db_file_name, 
+                  bool decoy, int block_size);
 
 }
 

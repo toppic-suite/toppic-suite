@@ -4,6 +4,8 @@
 #include "base/fasta_reader.hpp"
 #include "base/base_data.hpp"
 
+#include "spec/msalign_reader.hpp"
+
 #include "prsm/prsm_para.hpp"
 #include "prsm/prsm_combine.hpp"
 #include "prsm/prsm_selector.hpp"
@@ -46,9 +48,14 @@ int zero_ptm_process(int argc, char* argv[]) {
 
     PrsmParaPtr prsm_para_ptr = PrsmParaPtr(new PrsmPara(arguments));
 
+    bool decoy = false;
     if (arguments["searchType"] == "TARGET+DECOY") {
-      generateShuffleDb(ori_db_file_name, db_file_name);
+      decoy = true;
     }
+    int db_block_size = std::stoi(arguments["databaseBlockSize"]);
+
+    dbPreprocess (ori_db_file_name, db_file_name, decoy, db_block_size);
+    generateSpIndex(sp_file_name);
 
     int start_s = clock();
 

@@ -10,6 +10,7 @@ Argument::Argument() {
 void Argument::initArguments() {
   arguments_["oriDatabaseFileName"]="";
   arguments_["databaseFileName"] = "";
+  arguments_["databaseBlockSize"] = "1000000";
   arguments_["spectrumFileName"] = "";
   arguments_["activation"] = "FILE";
   arguments_["searchType"] = "TARGET";
