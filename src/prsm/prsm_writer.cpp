@@ -15,6 +15,13 @@ void PrsmWriter::close(){
   file_.close();
 }
 
+void PrsmWriter::write(PrsmStrPtr prsm_str_ptr) {
+  std::vector<std::string> strs = prsm_str_ptr->getStrVec();
+  for(size_t i = 0; i < strs.size(); i++) {
+    file_ << strs[i] << std::endl;
+  }
+}
+
 
 void PrsmWriter::write(PrsmPtr prsm_ptr) {
   if(prsm_ptr!=nullptr){

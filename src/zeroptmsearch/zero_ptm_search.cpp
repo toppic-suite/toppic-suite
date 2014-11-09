@@ -5,6 +5,7 @@
 #include "base/db_block.hpp"
 #include "spec/msalign_reader.hpp"
 #include "prsm/prsm_writer.hpp"
+#include "prsm/prsm_str_combine.hpp"
 #include "zeroptmsearch/zero_ptm_fast_match.hpp"
 #include "zeroptmsearch/zero_ptm_slow_match.hpp"
 #include "zeroptmsearch/zero_ptm_search.hpp"
@@ -145,7 +146,6 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
         << " finished. " << std::endl;
   }
 
-  /*
   std::cout << "Zero PTM search: combining blocks started." << std::endl; 
   std::string sp_file_name = mng_ptr->prsm_para_ptr_->getSpectrumFileName();
   std::string output_ext = mng_ptr->output_file_ext_;
@@ -168,7 +168,6 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
                                                         mng_ptr->report_num_));
   inter_combine_ptr->process();
   std::cout << "Zero PTM serach: combining blocks finished." << std::endl; 
-  */
 }
 
 } // end namespace
