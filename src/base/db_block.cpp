@@ -17,7 +17,7 @@ DbBlock::DbBlock(int block_index, int seq_index) {
 DbBlockPtrVec readDbBlockIndex(const std::string &db_file_name) {
   DbBlockPtrVec db_block_ptr_vec;
   std::ifstream input;
-  std::string index_file_name = db_file_name + "_index";
+  std::string index_file_name = db_file_name + "_block_index";
   input.open(index_file_name.c_str(), std::ios::in);
   if (!input.is_open()) {
     LOG_ERROR( "index file  " << index_file_name << " does not exist.");
