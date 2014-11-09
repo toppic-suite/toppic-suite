@@ -18,7 +18,7 @@ all:
 #	cd oneptmfilter; make
 #	cd ptmsearch; make
 #	cd prsmview; make	
-#	cd console; make
+	cd console; make
 	cd test; make
 
 clean:

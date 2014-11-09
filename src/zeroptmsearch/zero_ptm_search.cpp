@@ -52,7 +52,7 @@ void zeroPtmSearchProcessBlock(ZeroPtmMngPtr mng_ptr, DbBlockPtr block_ptr,
   ProteoformPtrVec prot_mod_forms 
       = generateProtModProteoform(raw_forms, prsm_para_ptr->getAllowProtModPtrVec());
 
-  int spectra_num = getSpNum (prsm_para_ptr->getSpectrumFileName());
+  int spectrum_num = getSpNum (prsm_para_ptr->getSpectrumFileName());
 
   MsAlignReader reader(prsm_para_ptr->getSpectrumFileName());
   std::string output_file_name = basename(prsm_para_ptr->getSpectrumFileName())
@@ -113,10 +113,12 @@ void zeroPtmSearchProcessBlock(ZeroPtmMngPtr mng_ptr, DbBlockPtr block_ptr,
       all_writer.writeVector(internal_prsms);
       if (log_file_name.length() != 0){
         if (logfile.is_open()) {
-          logfile << (double) n / spectra_num / total_block_num * 0.053 << std::endl;
+          logfile << (double) (n + spectrum_num * block_ptr->getBlockIdx())
+                               / spectrum_num / total_block_num * 0.053 << std::endl;
         }
       }
-      std::cout << std::flush << "Zero PTM search is processing " << n << " of " << spectra_num << " spectra.\r";
+      std::cout << std::flush << "Zero PTM search is processing " << n << " of " 
+          << spectrum_num << " spectra.\r";
     }
     ms_ptr = reader.getNextMs();
     //LOG_DEBUG("spectrum " << n);
@@ -154,19 +156,23 @@ void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr) {
                                                         block_num, output_ext + "_COMPLETE", 
                                                         mng_ptr->report_num_));
   comp_combine_ptr->process();
+  comp_combine_ptr = nullptr;
 
   PrsmStrCombinePtr pref_combine_ptr(new PrsmStrCombine(sp_file_name, output_ext + "_PREFIX",
                                                         block_num, output_ext + "_PREFIX", 
                                                         mng_ptr->report_num_));
   pref_combine_ptr->process();
+  pref_combine_ptr = nullptr;
   PrsmStrCombinePtr suff_combine_ptr(new PrsmStrCombine(sp_file_name, output_ext + "_SUFFIX",
                                                         block_num, output_ext + "_SUFFIX", 
                                                         mng_ptr->report_num_));
   suff_combine_ptr->process();
+  suff_combine_ptr = nullptr;
   PrsmStrCombinePtr inter_combine_ptr(new PrsmStrCombine(sp_file_name, output_ext + "_INTERNAL",
                                                         block_num, output_ext + "_INTERNAL", 
                                                         mng_ptr->report_num_));
   inter_combine_ptr->process();
+  inter_combine_ptr = nullptr;
   std::cout << "Zero PTM serach: combining blocks finished." << std::endl; 
 }
 
