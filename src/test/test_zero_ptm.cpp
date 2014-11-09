@@ -35,6 +35,8 @@ int zero_ptm_process(int argc, char* argv[]) {
     std::cout << "Executive file directory is: " << exe_dir << std::endl;
     initBaseData(exe_dir);
 
+    LOG_DEBUG("Init base data completed");
+
     std::string db_file_name = arguments["databaseFileName"];
     std::string sp_file_name = arguments["spectrumFileName"];
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
@@ -52,6 +54,7 @@ int zero_ptm_process(int argc, char* argv[]) {
     if (arguments["searchType"] == "TARGET+DECOY") {
       decoy = true;
     }
+    LOG_DEBUG("block size " << arguments["databaseBlockSize"]);
     int db_block_size = std::stoi(arguments["databaseBlockSize"]);
 
     dbPreprocess (ori_db_file_name, db_file_name, decoy, db_block_size);

@@ -202,6 +202,7 @@ bool Argument::parse(int argc, char* argv[]) {
   }
   std::cout <<"*** Parameters end ***" << std::endl;
   */
+
   return validateArguments();
 }
 
