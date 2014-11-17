@@ -4,6 +4,7 @@
 #include "spec/msalign_reader.hpp"
 #include "spec/spectrum_set.hpp"
 #include "prsm/simple_prsm_writer.hpp"
+#include "prsm/simple_prsm_str_combine.hpp"
 #include "oneptmfilter/one_ptm_filter_processor.hpp"
 #include "oneptmfilter/one_ptm_filter.hpp"
 
@@ -25,20 +26,17 @@ void OnePtmFilterProcessor::process(){
         << " finished. " << std::endl;
   }
 
-  std::cout << "Combining blocks started." << std::endl; 
+  std::cout << "One PTM filtering: combining blocks started." << std::endl; 
 
+  std::string sp_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
   int block_num = db_block_ptr_vec.size();
-  /*
-  PrsmStrCombinePtr combine_ptr(new PrsmStrCombine(sp_file_name, output_ext,
-                                                   block_num, output_ext, 
-                                                   mng_ptr_->one_ptm_filter_result_num_));
-                                                   */
 
-  /*
-  combineBlock(sp_file_name, filter_ptr_->getBlockSize(), mng_ptr_->output_file_ext_, 
-               mng_ptr_->one_ptm_filter_result_num_);
-               */
-  std::cout << "Combining blocks finished." << std::endl; 
+  SimplePrsmStrCombinePtr combine_ptr(new SimplePrsmStrCombine(sp_file_name, mng_ptr_->output_file_ext_,
+                                                               block_num, mng_ptr_->output_file_ext_, 
+                                                               mng_ptr_->one_ptm_filter_result_num_));
+  combine_ptr->process();
+
+  std::cout << "One PTM filtering: combining blocks finished." << std::endl; 
 }
 
 void OnePtmFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num) {
