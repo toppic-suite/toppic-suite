@@ -4,7 +4,7 @@
 
 namespace prot {
 
-std::string getNumStr(std::string line) {
+std::string getNumStr(const std::string &line) {
   int start = line.find(">");
   int end = line.find("<", start);
   std::string num_str = line.substr(start + 1, end - start - 1);

@@ -2,6 +2,7 @@
 #define PROT_SIMPLE_PRSM_WRITER_HPP_
 
 #include "prsm/simple_prsm.hpp"
+#include "prsm/simple_prsm_str.hpp"
 
 namespace prot {
 
@@ -11,6 +12,7 @@ class SimplePrsmWriter {
   SimplePrsmWriter(const std::string &file_name);
   ~SimplePrsmWriter();
   void close();
+  void write(SimplePrsmStrPtr prsm_str_ptr);
   void write(const SimplePrsmPtrVec &simple_prsm_ptrs);
 
  private:

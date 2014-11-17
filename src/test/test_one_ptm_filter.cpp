@@ -16,7 +16,7 @@
 
 namespace prot {
 
-int zero_ptm_process(int argc, char* argv[]) {
+int one_ptm_filter_process(int argc, char* argv[]) {
   try {
     Argument argu_processor;
     bool success = argu_processor.parse(argc, argv);
@@ -56,7 +56,6 @@ int zero_ptm_process(int argc, char* argv[]) {
     generateSpIndex(sp_file_name);
 
 
-    /*
     std::cout << "Fast filtering starts " << std::endl;
     OnePtmFilterMngPtr filter_mng_ptr 
         = OnePtmFilterMngPtr(new OnePtmFilterMng(prsm_para_ptr, "FILTER"));
@@ -64,9 +63,8 @@ int zero_ptm_process(int argc, char* argv[]) {
     filter_processor->process();
     filter_processor = nullptr;
 
-    long stop_s = clock();
-    std::cout << std::endl << "Running time: " << (stop_s-start_s) / double(CLOCKS_PER_SEC)  << " seconds " << std::endl;
-    */
+    //long stop_s = clock();
+    //std::cout << std::endl << "Running time: " << (stop_s-start_s) / double(CLOCKS_PER_SEC)  << " seconds " << std::endl;
 
     /*
     std::cout << "Outputting table starts " << std::endl;
@@ -90,5 +88,5 @@ int zero_ptm_process(int argc, char* argv[]) {
 int main(int argc, char* argv[]) {
   prot::log_level = 2;
   std::cout << std::setprecision(10);
-  return prot::zero_ptm_process(argc, argv);
+  return prot::one_ptm_filter_process(argc, argv);
 }
