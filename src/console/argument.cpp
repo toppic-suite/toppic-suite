@@ -162,7 +162,7 @@ bool Argument::parse(int argc, char* argv[]) {
       arguments_["databaseFileName"]=arguments_["oriDatabaseFileName"] + "_target_decoy";
     }
     else {
-      arguments_["databaseFileName"]=arguments_["oriDatabaseFileName"];
+      arguments_["databaseFileName"]=arguments_["oriDatabaseFileName"] + "_target";
     }
     if (vm.count("cysteine-protection")) {
       arguments_["cysteineProtection"] = protection;
