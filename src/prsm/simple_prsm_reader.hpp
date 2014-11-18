@@ -6,6 +6,7 @@
 
 #include "base/xml_dom_document.hpp"
 #include "prsm/prsm.hpp"
+#include "prsm/simple_prsm.hpp"
 #include "prsm/simple_prsm_str.hpp"
 
 namespace prot {
@@ -17,6 +18,8 @@ class SimplePrsmReader {
   std::vector<std::string> readOnePrsmLines();
 
   SimplePrsmStrPtr readOnePrsmStr();
+
+  SimplePrsmPtr readOnePrsm();
 
   void close();
 

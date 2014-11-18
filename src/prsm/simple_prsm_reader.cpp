@@ -44,6 +44,29 @@ SimplePrsmStrPtr SimplePrsmReader::readOnePrsmStr() {
   return SimplePrsmStrPtr(new SimplePrsmStr(prsm_str_vec));
 }
 
+SimplePrsmPtr SimplePrsmReader::readOnePrsm() {
+  std::vector<std::string> prsm_str_vec = readOnePrsmLines();
+  if (prsm_str_vec.size() == 0) {
+    return SimplePrsmPtr(nullptr);
+  }
+  std::string prsm_str = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+  for (size_t i = 0; i < prsm_str_vec.size(); i++) {
+    prsm_str += prsm_str_vec[i];
+  }
+  xercesc::MemBufInputSource prsm_buf(
+      (const XMLByte*)prsm_str.c_str(), prsm_str.size(), "prsm_str (in memory)");
+
+  XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
+  SimplePrsmPtr ptr;
+  if(parser){
+    XmlDOMDocument doc(parser, prsm_buf);
+    xercesc::DOMElement* root = doc.getDocumentElement();
+    ptr = SimplePrsmPtr(new SimplePrsm(root));
+  }
+  LOG_DEBUG("simple prsm spectrum id " << ptr->getSpectrumId() << " seq name " << ptr->getSeqName());
+  return ptr;
+}
+
 
 void SimplePrsmReader::close() {
   input_.close();
