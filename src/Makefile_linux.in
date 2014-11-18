@@ -13,7 +13,7 @@ INCLUDES = -I../../thirdparty/linux_include  -I../
 LFLAGS = -L../../thirdparty/linux_lib -L/lib -L/opt/local/lib
 #
 # define any libraries to link into executable:
-LIBS = -static -lxalan-c -lxalanMsg -lxerces-c -lboost_program_options -lboost_filesystem -lboost_system -lpthread
+LIBS = -static -lxalan-c -lxalanMsg -lxerces-c -lboost_program_options -lboost_filesystem -lboost_system -lhts -lz -lpthread  
 
 OBJ_DIR = ../../bin/obj
 

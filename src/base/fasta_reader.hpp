@@ -20,14 +20,17 @@ namespace prot {
 
 class FastaSeq {
  public:
-  FastaSeq(const std::string &name, const std::string &ori_seq);
+  FastaSeq(const std::string &name_line, const std::string &ori_seq);
 
   std::string getName() {return name_;}
+
+  std::string getDesc() {return desc_;}
 
   std::string getSeq() {return seq_;}
 
  private:
   std::string name_;
+  std::string desc_;
   std::string seq_;
   /* remove incorrect charaters in sequence */
   std::string rmChar(const std::string &ori_seq);

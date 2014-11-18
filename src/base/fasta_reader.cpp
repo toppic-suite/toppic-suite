@@ -1,12 +1,17 @@
+#include "htslib/faidx.h"
+
 #include "base/logger.hpp"
 #include "base/fasta_reader.hpp"
 #include "base/db_block.hpp"
 
 namespace prot {
 
-FastaSeq::FastaSeq(const std::string &name, const std::string &ori_seq) {
-  name_ = name;
+FastaSeq::FastaSeq(const std::string &name_line, const std::string &ori_seq) {
+  int space_pos = name_line.find(" ");
+  name_ = name_line.substr(0, space_pos);
+  desc_ = name_line.substr(space_pos + 1);
   seq_ = rmChar(ori_seq);
+  LOG_DEBUG("NAME:" << name_ << "DESC:" << desc_);
 }
 
 /** process fasta string and remove unknown letters */
@@ -79,7 +84,7 @@ ProteoformPtr FastaReader::getNextProteoformPtr(const ResiduePtrVec &residue_lis
   AcidPtrVec acid_seq = AcidFactory::convertSeqToAcidSeq(seq_ptr->getSeq()); 
   ResiduePtrVec residue_ptrs = convertAcidToResidueSeq(residue_list, acid_seq);
   DbResSeqPtr db_residue_seq_ptr(
-      new DbResidueSeq(residue_ptrs, seq_id_, seq_ptr->getName())); 
+      new DbResidueSeq(residue_ptrs, seq_id_, seq_ptr->getName(), seq_ptr->getDesc())); 
   seq_id_++;
   return getDbProteoformPtr(db_residue_seq_ptr);
 }
@@ -210,7 +215,7 @@ void dbPreprocess(const std::string &ori_db_file_name,
 
   generateDbBlock(db_file_name, block_size);
 
-  //fai_build(db_file_name.c_str());
+  fai_build(db_file_name.c_str());
 }
 
 }
