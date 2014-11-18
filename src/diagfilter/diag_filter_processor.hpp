@@ -1,6 +1,7 @@
 #ifndef PROT_DIAG_FILTER_PROCESSOR_HPP_
 #define PROT_DIAG_FILTER_PROCESSOR_HPP_
 
+#include "base/db_block.hpp"
 #include "prsm/simple_prsm.hpp"
 #include "diagfilter/diag_filter_mng.hpp"
 #include "diagfilter/diag_filter_block.hpp"
@@ -14,9 +15,8 @@ public:
 
 private:
     DiagFilterMngPtr mng_ptr_;
-    DiagFilterBlockPtr filter_ptr_;
 
-    void processBlock(int block, const std::string &sp_file_name,int n_spectra);
+    void processBlock(DbBlockPtr block_ptr, int total_block_num);
 
 };
 
