@@ -11,7 +11,8 @@ FastaSeq::FastaSeq(const std::string &name_line, const std::string &ori_seq) {
   name_ = name_line.substr(0, space_pos);
   desc_ = name_line.substr(space_pos + 1);
   seq_ = rmChar(ori_seq);
-  LOG_DEBUG("NAME:" << name_ << "DESC:" << desc_);
+  //LOG_DEBUG("name line:" << name_line);
+  //LOG_DEBUG("NAME:" << name_ << "DESC:" << desc_);
 }
 
 /** process fasta string and remove unknown letters */
@@ -126,13 +127,14 @@ void generateShuffleDb(const std::string &file_name,
   while (seq_info!=nullptr) {
     std::string name = seq_info->getName();
     std::string seq = seq_info->getSeq();
+    std::string desc = seq_info->getDesc();
     std::string decoy_name = "DECOY_" + name;
     std::string temp = seq.substr(2, seq.length() - 2);
     std::random_shuffle(temp.begin(), temp.end());
     std::string decoy_seq = seq.substr(0,2) + temp;
-    output << ">" << decoy_name << std::endl;
+    output << ">" << decoy_name << " " << desc <<  std::endl;
     output << decoy_seq << std::endl;
-    output << ">" << name << std::endl;
+    output << ">" << name << " " << desc << std::endl;
     output << seq << std::endl;
 
     seq_info = reader.getNextSeq();
@@ -175,6 +177,7 @@ void generateDbBlock(const std::string &db_file_name,
   int seq_size = 0;
   while (seq_info!=nullptr) {
     std::string name = seq_info->getName();
+    std::string desc = seq_info->getDesc();
     std::string seq = seq_info->getSeq();
     seq_size += seq.length();
     if (seq_size > block_size) {
@@ -186,7 +189,7 @@ void generateDbBlock(const std::string &db_file_name,
       block_file_name = db_file_name + "_" + std::to_string(block_idx);
       block_output.open(block_file_name.c_str(), std::ios::out);
     }
-    block_output << ">" << name << std::endl;
+    block_output << ">" << name << " " << desc << std::endl;
     block_output << seq << std::endl;
     seq_info = reader.getNextSeq();
     seq_idx++;
