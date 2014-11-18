@@ -10,6 +10,7 @@
 #include <xercesc/sax/HandlerBase.hpp>
 #include <xercesc/util/XMLString.hpp>
 #include <xercesc/util/PlatformUtils.hpp>
+#include <xercesc/framework/MemBufInputSource.hpp>
 
 #include "base/xml_dom.hpp"
 
@@ -19,6 +20,8 @@ class XmlDOMDocument {
 
  public:
   XmlDOMDocument(XmlDOMParser* parser, const char* xml_file);
+  XmlDOMDocument(XmlDOMParser* parser, const xercesc::MemBufInputSource &str_buf);
+
   XmlDOMDocument(xercesc::DOMDocument* doc);
   XmlDOMDocument(xercesc::DOMImplementation* implementation, 
                  const std::string &root);

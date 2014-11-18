@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <iomanip>
 
+
 #include "base/logger.hpp"
 #include "base/xml_dom.hpp"
 #include "base/xml_dom_document.hpp"
@@ -17,6 +18,15 @@ XmlDOMDocument::XmlDOMDocument(XmlDOMParser* parser,
   }
   catch (std::exception &e) {
     std::cerr << "xml file " << xml_file << " contain errors" << std::endl;
+  }
+}
+
+XmlDOMDocument::XmlDOMDocument(XmlDOMParser* parser, const xercesc::MemBufInputSource &str_buf) {
+  try {
+    doc_ = parser->parse(str_buf);
+  }
+  catch (std::exception &e) {
+    std::cerr << "xml str buffer contain errors" << std::endl;
   }
 }
 

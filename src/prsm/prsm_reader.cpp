@@ -1,7 +1,8 @@
+#include <xercesc/framework/MemBufInputSource.hpp>
+
 #include "base/logger.hpp"
 #include "base/string_util.hpp"
 #include "prsm/prsm_reader.hpp"
-#include <xercesc/framework/MemBufInputSource.hpp>
 
 namespace prot {
 

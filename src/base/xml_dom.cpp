@@ -39,6 +39,11 @@ xercesc::DOMDocument* XmlDOMParser::parse(const std::string &xml_file) {
   return parser_->adoptDocument();
 }
 
+xercesc::DOMDocument* XmlDOMParser::parse(const xercesc::MemBufInputSource &str_buf) {
+  parser_->parse(str_buf);
+  return parser_->adoptDocument();
+}
+
 /* XmlDOMParserFactory */
 XmlDOMParser* XmlDOMParserFactory::getXmlDOMParserInstance() {
   if (dom_parser_ == nullptr) {

@@ -8,6 +8,7 @@
 #include <xercesc/util/PlatformUtils.hpp>
 #include <xercesc/util/XMLString.hpp>
 #include <xercesc/sax/HandlerBase.hpp>
+#include <xercesc/framework/MemBufInputSource.hpp>
 
 namespace prot {
 
@@ -18,6 +19,8 @@ class XmlDOMParser {
   ~XmlDOMParser();
 
   xercesc::DOMDocument* parse(const std::string &xml_file);
+
+  xercesc::DOMDocument* parse(const xercesc::MemBufInputSource &str_buf);
 
  private:
   xercesc::XercesDOMParser* parser_;
