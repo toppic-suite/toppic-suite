@@ -90,12 +90,6 @@ void PtmProcessor::initData() {
 // process ptm search
 void PtmProcessor::process(){
   
-  std::string log_file_name = mng_ptr_->prsm_para_ptr_->getLogFileName();
-  std::ofstream logfile;
-  if (log_file_name.length() != 0){
-    logfile.open(log_file_name, std::ios::out | std::ios::app);
-  }    
-  
   std::string sp_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
   MsAlignReader sp_reader(sp_file_name);
   std::string input_file_name = basename(sp_file_name)+"."+mng_ptr_->input_file_ext_;
@@ -131,15 +125,10 @@ void PtmProcessor::process(){
     std::cout << std::flush <<  "PTM search is processing " << cnt 
         << " of " << spectrum_num << " spectra.\r";
     
-    if (log_file_name.length() != 0){
-      if (logfile.is_open()) {
-        logfile << 0.203 + (double) cnt / spectrum_num * 0.17 << std::endl;
-      }
-    }
+    WebLog::percent_log(0.203 + (double) cnt / spectrum_num * 0.17);
   }
   sp_reader.close();
   simple_prsm_reader.close();
-  logfile.close();
   closeWriters();
   std::cout << std::endl;
 }

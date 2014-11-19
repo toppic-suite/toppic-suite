@@ -52,14 +52,7 @@ void DiagFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num
   std::string output_file_name = basename(prsm_para_ptr->getSpectrumFileName())
       + "." + mng_ptr_->output_file_ext_+"_"+ std::to_string(block_ptr->getBlockIdx());
   
-  std::string log_file_name = prsm_para_ptr->getLogFileName();
-
-  std::ofstream logfile;
-
-  if (log_file_name.length() != 0){
-    logfile.open(log_file_name, std::ios::out | std::ios::app);
-  }    
-      
+     
   SimplePrsmWriter writer(output_file_name);
   DeconvMsPtr deconv_ms_ptr;
   int spectrum_num = getSpNum (prsm_para_ptr->getSpectrumFileName());
@@ -74,12 +67,8 @@ void DiagFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num
       writer.write(match_ptrs);
     }
     
-    if (log_file_name.length() != 0){
-      if (logfile.is_open()) {
-        logfile << 0.128 + (double) (cnt + spectrum_num * block_ptr->getBlockIdx()) 
-            / spectrum_num / total_block_num * 0.075 << std::endl;
-      }
-    }
+    WebLog::percent_log(0.128 + (double) (cnt + spectrum_num * block_ptr->getBlockIdx())
+                        / spectrum_num / total_block_num * 0.075);
     
     std::cout << std::flush << "Diagonal filtering is processing " << cnt 
         << " of " << spectrum_num << " spectra.\r";
@@ -87,7 +76,7 @@ void DiagFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num
   std::cout << std::endl;
   reader.close();
   writer.close();
-  logfile.close();
+
 }
 
 } /* namespace prot */

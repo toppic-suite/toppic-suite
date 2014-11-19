@@ -59,14 +59,6 @@ void zeroPtmSearchProcessBlock(ZeroPtmMngPtr mng_ptr, DbBlockPtr block_ptr,
                                           + "." + mng_ptr->output_file_ext_;  
   std::string block_str = "_" + std::to_string(block_ptr->getBlockIdx());
 
-  std::string log_file_name = prsm_para_ptr->getLogFileName();
-
-  std::ofstream logfile;
-
-  if (log_file_name.length() != 0){
-    logfile.open(log_file_name, std::ios::out | std::ios::app);
-  }
-
   PrsmWriter comp_writer(output_file_name + "_" 
                          + SemiAlignTypeFactory::getCompletePtr()->getName() 
                          + block_str);
@@ -111,12 +103,10 @@ void zeroPtmSearchProcessBlock(ZeroPtmMngPtr mng_ptr, DbBlockPtr block_ptr,
                     raw_forms, mng_ptr, internal_prsms);
       internal_writer.writeVector(internal_prsms);
       all_writer.writeVector(internal_prsms);
-      if (log_file_name.length() != 0){
-        if (logfile.is_open()) {
-          logfile << (double) (n + spectrum_num * block_ptr->getBlockIdx())
-                               / spectrum_num / total_block_num * 0.053 << std::endl;
-        }
-      }
+
+      WebLog::percent_log((double) (n + spectrum_num * block_ptr->getBlockIdx())
+                    / spectrum_num / total_block_num * 0.053);
+
       std::cout << std::flush << "Zero PTM search is processing " << n << " of " 
           << spectrum_num << " spectra.\r";
     }
@@ -126,7 +116,6 @@ void zeroPtmSearchProcessBlock(ZeroPtmMngPtr mng_ptr, DbBlockPtr block_ptr,
   std::cout << std::endl;
 
   reader.close();
-  logfile.close();
 
   //because the prsm_writer ~PrsmWriter changed and the fileclosing is an independant function
   comp_writer.close();
