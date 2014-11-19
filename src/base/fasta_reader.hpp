@@ -61,10 +61,10 @@ class FastaReader {
   int seq_id_ = 0;
 };
 
-/*
+
 ProteoformPtrVec readFastaToProteoform(const std::string &file_name, 
                                        const ResiduePtrVec &residue_list);
-                                       */
+                                       
 
 ProteoformPtrVec readFastaToProteoform(const std::string &file_name, 
                                        const ResiduePtrVec &residue_list,

@@ -55,6 +55,7 @@ int process(int argc, char* argv[]) {
     std::string sp_file_name = arguments["spectrumFileName"];
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
     std::string log_file_name = arguments["logFileName"];
+	WebLog::init(log_file_name);
 
     int n_top;
     std::istringstream (arguments["numOfTopPrsms"]) >> n_top;
@@ -185,14 +186,7 @@ int process(int argc, char* argv[]) {
       std::cout << "Deleting temporary files finished." << std::endl;
     }
     
-    if (log_file_name.length() != 0){
-      std::ofstream logfile;
-      logfile.open(log_file_name, std::ios::out | std::ios::app);
-      if (logfile.is_open()) {
-	    logfile << 1 << std::endl;
-      }
-      logfile.close();
-    }  
+    WebLog::close();
 
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
