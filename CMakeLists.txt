@@ -24,6 +24,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src
         ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/windows_include)
   SET(CMAKE_LINK_LIBRARY_SUFFIXES .a)
+  SET(CMAKE_EXE_LINKER_FLAGS  "-static -static-libgcc -static-libstdc++")
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows") 
 
 
