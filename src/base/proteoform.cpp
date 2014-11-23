@@ -50,8 +50,9 @@ Proteoform::Proteoform(xercesc::DOMElement* element,
   residue_seq_ptr_ = db_proteoform->getResSeqPtr()->getSubResidueSeq(start_pos_,end_pos_);
 
   if(!prot_mod_ptr_->getPtmPtr()->isEmpty()
-      &&residue_seq_ptr_->getResiduePtr(0)->getPtmPtr()->isEmpty()){
-    ResiduePtr mut_residue = ResidueFactory::getBaseResiduePtrByAcidPtm(residue_seq_ptr_->getResiduePtr(0)->getAcidPtr(),prot_mod_ptr_->getPtmPtr());
+     &&residue_seq_ptr_->getResiduePtr(0)->getPtmPtr()->isEmpty()){
+    ResiduePtr mut_residue = ResidueFactory::getBaseResiduePtrByAcidPtm(
+        residue_seq_ptr_->getResiduePtr(0)->getAcidPtr(),prot_mod_ptr_->getPtmPtr());
     ResiduePtrVec new_residue = residue_seq_ptr_->getResidues();
     new_residue[0]=mut_residue;
     residue_seq_ptr_ = ResSeqPtr(new ResidueSeq(new_residue));

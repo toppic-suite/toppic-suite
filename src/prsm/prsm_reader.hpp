@@ -18,6 +18,8 @@ class PrsmReader {
 
   PrsmStrPtr readOnePrsmStr();
 
+  PrsmPtr readOnePrsm();
+
   void close();
 
  private:

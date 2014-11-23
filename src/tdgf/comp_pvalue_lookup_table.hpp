@@ -9,9 +9,7 @@ namespace prot {
 
 class CompPValueLookupTable {
  public:
-  CompPValueLookupTable(const ProteoformPtrVec &raw_proteo_ptrs, 
-                        const ProteoformPtrVec &mod_proteo_ptrs,
-                        const ResFreqPtrVec &residue_ptrs,
+  CompPValueLookupTable(CountTestNumPtr test_num_ptr,
                         TdgfMngPtr mng_ptr);
 
   void process(DeconvMsPtr deconv_ms_ptr, PrsmPtrVec &prsm_ptrs);
