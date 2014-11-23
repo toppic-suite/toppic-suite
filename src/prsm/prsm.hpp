@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include "htslib/faidx.h"
+
 #include "base/extreme_value.hpp"
 #include "base/proteoform.hpp"
 #include "spec/deconv_peak.hpp"
@@ -18,6 +20,10 @@ class Prsm {
        double adjusted_prec_mass, double calibration, SpParaPtr sp_para_ptr);
 
   Prsm(xercesc::DOMElement* element,ProteoformPtrVec proteoforms);
+
+  Prsm(xercesc::DOMElement* element, faidx_t *fai,
+       const ResiduePtrVec &residue_ptr_vec,
+       const ProtModPtrVec &prot_mod_ptr_vec);
 
   void parseXml(xercesc::DOMElement* element);
 

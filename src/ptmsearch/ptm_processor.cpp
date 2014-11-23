@@ -67,24 +67,6 @@ void PtmProcessor::initData() {
   comp_shift_ptr_ = CompShiftLowMemPtr(new CompShiftLowMem());
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   fai_ = fai_load(prsm_para_ptr->getSearchDbFileName().c_str());
-
-  /*
-  PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
-  proteo_ptrs_ = readFastaToProteoform(
-      prsm_para_ptr->getSearchDbFileName(), 
-      prsm_para_ptr->getFixModResiduePtrVec());
-  mod_proteo_2d_ptrs_ =  
-      generate2DProtModProteoform(proteo_ptrs_, prsm_para_ptr->getAllowProtModPtrVec());
-
-  std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
-  std::string simplePrsmFileName = basename(sp_file_name)
-      + "." + mng_ptr_->input_file_ext_;
-  simple_prsm_ptrs_  = readSimplePrsms(simplePrsmFileName);
-  // find sequences for simple prsms
-  for(size_t i =0;i< simple_prsm_ptrs_.size();i++){
-    simple_prsm_ptrs_[i]->assignProteoformPtr(proteo_ptrs_, mod_proteo_2d_ptrs_);
-  }
-  */
 }
 
 // process ptm search
@@ -115,11 +97,7 @@ void PtmProcessor::process(){
         selected_prsm_ptrs.push_back(prsm_ptr);
         prsm_ptr = simple_prsm_reader.readOnePrsm();
       }
-
-      //SimplePrsmPtrVec selected_prsm_ptrs 
-      //    = getMatchedSimplePrsms(simple_prsm_ptrs_,deconv_sp->getHeaderPtr());
       processOneSpectrum(spectrum_set_ptr, selected_prsm_ptrs);
-
     }
     std::cout << std::flush <<  "PTM search is processing " << cnt 
         << " of " << spectrum_num << " spectra.\r";
