@@ -1,4 +1,3 @@
-#include "htslib/faidx.h"
 
 #include "base/logger.hpp"
 #include "base/fasta_reader.hpp"
@@ -113,6 +112,27 @@ ProteoformPtrVec readFastaToProteoform(const std::string &file_name,
   }
   return list;
 }
+
+ProteoformPtr readFastaToProteoform(faidx_t *fai,
+                                    int id,
+                                    const std::string &seq_name, 
+                                    const std::string &seq_desc,
+                                    const ResiduePtrVec &residue_list) {
+  int seq_len;
+  char *seq = fai_fetch(fai, seq_name.c_str(), &seq_len);
+  if ( seq_len < 0 ) {
+    LOG_ERROR("Failed to fetch sequence " << seq_name);
+  }
+  std::string seq_str(seq);
+  free(seq);
+  //LOG_DEBUG("Seq name " << seq_name << " Seq: " << seq_str);
+  AcidPtrVec acid_seq = AcidFactory::convertSeqToAcidSeq(seq_str); 
+  ResiduePtrVec residue_ptrs = convertAcidToResidueSeq(residue_list, acid_seq);
+  DbResSeqPtr db_residue_seq_ptr(
+      new DbResidueSeq(residue_ptrs, id, seq_name, seq_desc)); 
+  return getDbProteoformPtr(db_residue_seq_ptr);
+}
+
 
 
 /** initialize sequence list */

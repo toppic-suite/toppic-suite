@@ -63,7 +63,7 @@ SimplePrsmPtr SimplePrsmReader::readOnePrsm() {
     xercesc::DOMElement* root = doc.getDocumentElement();
     ptr = SimplePrsmPtr(new SimplePrsm(root));
   }
-  LOG_DEBUG("simple prsm spectrum id " << ptr->getSpectrumId() << " seq name " << ptr->getSeqName());
+  //LOG_DEBUG("simple prsm spectrum id " << ptr->getSpectrumId() << " seq name " << ptr->getSeqName());
   return ptr;
 }
 

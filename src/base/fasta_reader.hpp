@@ -11,6 +11,8 @@
 #include <boost/filesystem/operations.hpp>
 #undef BOOST_NO_CXX11_SCOPED_ENUMS
 
+#include "htslib/faidx.h"
+
 
 #include "base/string_util.hpp"
 #include "base/residue_seq.hpp"
@@ -76,6 +78,12 @@ void generateShuffleDb(const std::string &file_name,
 void dbPreprocess(const std::string &ori_db_file_name, 
                   const std::string &db_file_name, 
                   bool decoy, int block_size);
+
+ProteoformPtr readFastaToProteoform(faidx_t *fai,
+                                    int id,
+                                    const std::string &seq_name, 
+                                    const std::string &seq_desc,
+                                    const ResiduePtrVec &residue_list);
 
 }
 
