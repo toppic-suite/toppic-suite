@@ -4,6 +4,8 @@
 #include <string>
 #include <xercesc/dom/DOM.hpp>
 
+#include "htslib/faidx.h"
+
 #include "base/proteoform.hpp"
 #include "spec/ms_header.hpp"
 #include "base/xml_dom_document.hpp"
@@ -37,6 +39,10 @@ public:
     void assignProteoformPtr(const ProteoformPtrVec &proteo_ptrs,
                              const ProteoformPtrVec2D &mod_proteo_2d_ptrs);
 
+    void addProteoformPtr(faidx_t *fai, const ResiduePtrVec &residue_list,
+                          const ProtModPtrVec &prot_mods);
+
+
 private:
     int spectrum_id_;
     std::string spectrum_scan_;
@@ -47,6 +53,7 @@ private:
     ProteoformPtrVec mod_proteo_ptrs_;
     int seq_id_;
     std::string seq_name_;
+    std::string seq_desc_;
     double score_;
 };
 
@@ -56,6 +63,7 @@ SimplePrsmPtrVec getMatchedSimplePrsms(const SimplePrsmPtrVec &simple_prsm_ptrs,
 SimplePrsmPtrVec readSimplePrsms(const std::string &filename);
 
 SimplePrsmPtrVec getUniqueMatches(SimplePrsmPtrVec &match_ptrs);
+
 
 inline bool simplePrsmDown(const SimplePrsmPtr a,SimplePrsmPtr b) {
   return a->getScore() > b->getScore();

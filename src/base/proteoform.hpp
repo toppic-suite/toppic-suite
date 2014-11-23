@@ -102,6 +102,8 @@ ProteoformPtr getDbProteoformPtr(DbResSeqPtr db_res_seq_ptr);
 ProteoformPtr getProtModProteoform(ProteoformPtr db_form_ptr, 
                                    ProtModPtr prot_mod_ptr); 
 
+ProteoformPtrVec generateProtModProteoform(ProteoformPtr db_form_ptr, 
+                                           const ProtModPtrVec &prot_mod_ptrs); 
 
 ProteoformPtrVec2D generate2DProtModProteoform(const ProteoformPtrVec &db_form_ptrs, 
                                                const ProtModPtrVec &prot_mod_ptrs);

@@ -100,33 +100,33 @@ void PtmProcessor::process(){
   DeconvMsPtr deconv_sp;
   int cnt = 0;
   int spectrum_num = getSpNum (sp_file_name);
-  SpParaPtr sp_para_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr();
-  double total_time = 0;
+  PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
+  SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
+  ResiduePtrVec residue_ptr_vec = prsm_para_ptr->getFixModResiduePtrVec();
+  ProtModPtrVec prot_mod_ptr_vec = prsm_para_ptr->getAllowProtModPtrVec();
 
   while((deconv_sp = sp_reader.getNextMs())!= nullptr){
-    long start_t = clock();
     cnt++;
     SpectrumSetPtr spectrum_set_ptr = getSpectrumSet(deconv_sp, 0, sp_para_ptr);
     if(spectrum_set_ptr != nullptr){
       SimplePrsmPtrVec selected_prsm_ptrs;
       while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == deconv_sp->getHeaderPtr()->getId()) {
+        prsm_ptr->addProteoformPtr(fai_, residue_ptr_vec, prot_mod_ptr_vec);
         selected_prsm_ptrs.push_back(prsm_ptr);
         prsm_ptr = simple_prsm_reader.readOnePrsm();
       }
 
       //SimplePrsmPtrVec selected_prsm_ptrs 
       //    = getMatchedSimplePrsms(simple_prsm_ptrs_,deconv_sp->getHeaderPtr());
-      //processOneSpectrum(spectrum_set_ptr, selected_prsm_ptrs);
+      processOneSpectrum(spectrum_set_ptr, selected_prsm_ptrs);
 
     }
-    long stop_t = clock();
-    double time = (stop_t - start_t) /double (CLOCKS_PER_SEC);
-    total_time += time;
     std::cout << std::flush <<  "PTM search is processing " << cnt 
         << " of " << spectrum_num << " spectra.\r";
     
     WebLog::percent_log(0.203 + (double) cnt / spectrum_num * 0.17);
   }
+  LOG_DEBUG("Search completed");
   sp_reader.close();
   simple_prsm_reader.close();
   closeWriters();

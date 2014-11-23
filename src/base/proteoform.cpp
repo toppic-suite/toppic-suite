@@ -339,6 +339,17 @@ ProteoformPtr getSubProteoform(ProteoformPtr proteoform_ptr,
                      local_end + proteoform_ptr->getStartPos(), change_list));
 }
 
+ProteoformPtrVec generateProtModProteoform(ProteoformPtr proteo_ptr, 
+                                           const ProtModPtrVec &prot_mods) {
+  ProteoformPtrVec new_forms;
+  for (size_t j = 0; j < prot_mods.size(); j++) {
+    ProteoformPtr ptr = getProtModProteoform(proteo_ptr, prot_mods[j]);
+    if (ptr.get() != nullptr) {
+      new_forms.push_back(ptr);
+    }
+  }
+  return new_forms;
+}
 
 ProteoformPtrVec generateProtModProteoform(const ProteoformPtrVec &ori_forms, 
                                            const ProtModPtrVec &prot_mods) {
