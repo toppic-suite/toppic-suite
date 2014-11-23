@@ -19,6 +19,8 @@ class Prsm {
 
   Prsm(xercesc::DOMElement* element,ProteoformPtrVec proteoforms);
 
+  void parseXml(xercesc::DOMElement* element);
+
   double getAdjustedPrecMass() {return adjusted_prec_mass_;}
 
   ProteoformPtr getProteoformPtr() {return proteoform_ptr_;}

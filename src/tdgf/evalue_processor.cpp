@@ -21,28 +21,12 @@ void EValueProcessor::init() {
   CountTestNumPtr test_num_ptr = CountTestNumPtr(new CountTestNum(mng_ptr_));
   LOG_DEBUG("Count test number initialized.");
 
-  /*
-  ProteoformPtrVec raw_proteo_ptrs 
-      = readFastaToProteoform(prsm_para_ptr->getSearchDbFileName(), 
-                              prsm_para_ptr->getFixModResiduePtrVec());
-
-  ProteoformPtrVec mod_proteo_ptrs 
-      = generateProtModProteoform(raw_proteo_ptrs, prsm_para_ptr->getAllowProtModPtrVec());
-
-  LOG_DEBUG("protein data set loaded");
-
-  ResFreqPtrVec residue_freqs 
-      = compResidueFreq(prsm_para_ptr->getFixModResiduePtrVec(), raw_proteo_ptrs); 
-  LOG_DEBUG("residue frequency initialized");
-  */
   
   ResFreqPtrVec residue_freqs = test_num_ptr->getResFreqPtrVec();
 
   if (mng_ptr_->use_table) {
-    /*
     comp_pvalue_table_ptr_ = CompPValueLookupTablePtr(
-        new CompPValueLookupTable(raw_proteo_ptrs, mod_proteo_ptrs, residue_freqs, mng_ptr_));
-        */
+        new CompPValueLookupTable(test_num_ptr, mng_ptr_));
   }
   else {
     comp_pvalue_ptr_ = CompPValueArrayPtr(new CompPValueArray(test_num_ptr, mng_ptr_));
@@ -81,9 +65,7 @@ void EValueProcessor::process(bool is_separate) {
     }
     
     WebLog::percent_log(0.373 + (double) cnt / spectrum_num * 0.62);
-    
   }
-
   reader.close();
 
   //because the prsm_writer ~PrsmWriter changed and the fileclosing is an independant function
