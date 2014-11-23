@@ -10,9 +10,13 @@ namespace prot {
 
 class CompPValueArray {
  public:
+  /*
   CompPValueArray(const ProteoformPtrVec &raw_proteo_ptrs, 
                   const ProteoformPtrVec &mod_proteo_ptrs,
                   const ResFreqPtrVec &residue_ptrs,
+                  TdgfMngPtr mng_ptr);
+                  */
+  CompPValueArray(CountTestNumPtr test_num_ptr,
                   TdgfMngPtr mng_ptr);
 
   void compMultiExtremeValues(PrmMsPtr ms_six_ptr, PrsmPtrVec &prsm_ptrs, 
@@ -26,6 +30,7 @@ class CompPValueArray {
   TdgfMngPtr mng_ptr_;
   CompProbValuePtr comp_prob_ptr_;
   CountTestNumPtr test_num_ptr_;
+  ResFreqPtrVec residue_ptrs_;
   ResFreqPtrVec pep_n_term_residue_ptrs_;
   ResFreqPtrVec prot_n_term_residue_ptrs_;
 
