@@ -69,6 +69,54 @@ Proteoform::Proteoform(xercesc::DOMElement* element,
   }
 }
 
+/*
+Proteoform::Proteoform(xercesc::DOMElement* element) {
+
+  start_pos_ = getIntChildValue(element, "start_pos", 0);
+  end_pos_ = getIntChildValue(element, "end_pos", 0);
+  species_id_ = getIntChildValue(element, "species_id", 0);
+
+  xercesc::DOMElement* db_element= getChildElement(element,"db_residue_seq",0);
+  int db_seq_id = getIntChildValue(db_element, "id", 0);
+  std::string db_seq_name = getChildValue(db_element, "name", 0);
+
+  ProteoformPtr db_proteoform = db_proteoforms[db_seq_id];
+  if(db_proteoform->getSeqId() != db_seq_id 
+     || db_proteoform->getSeqName() != db_seq_name){
+    LOG_ERROR("Sequence ID and/or name is not consistent!" << " name " 
+              << db_proteoform->getSeqName() << " xml name " << db_seq_name);
+    std::exit(0);
+  }
+  
+  db_residue_seq_ptr_ = db_proteoform->getDbResSeqPtr();
+
+  xercesc::DOMElement* mod_element= getChildElement(element,"prot_mod",0);
+  std::string mod_name = getChildValue(mod_element, "name", 0);
+  prot_mod_ptr_ = ProtModFactory::getBaseProtModPtrByName(mod_name);
+
+  residue_seq_ptr_ = db_proteoform->getResSeqPtr()->getSubResidueSeq(start_pos_,end_pos_);
+
+  if(!prot_mod_ptr_->getPtmPtr()->isEmpty()
+     &&residue_seq_ptr_->getResiduePtr(0)->getPtmPtr()->isEmpty()){
+    ResiduePtr mut_residue = ResidueFactory::getBaseResiduePtrByAcidPtm(
+        residue_seq_ptr_->getResiduePtr(0)->getAcidPtr(),prot_mod_ptr_->getPtmPtr());
+    ResiduePtrVec new_residue = residue_seq_ptr_->getResidues();
+    new_residue[0]=mut_residue;
+    residue_seq_ptr_ = ResSeqPtr(new ResidueSeq(new_residue));
+  }
+
+  bp_spec_ptr_= BpSpecPtr(new BpSpec(residue_seq_ptr_));
+
+  xercesc::DOMElement* change_list_element= prot::getChildElement(element,"change_list",0);
+  int change_len = getChildCount(change_list_element,"change");
+
+  for(int i=0;i<change_len;i++){
+    xercesc::DOMElement* change_element = getChildElement(change_list_element,"change",i);
+    change_list_.push_back(ChangePtr(new Change(change_element)));
+  }
+}
+*/
+
 /* get several segments without unexpected PTMs from a proteoform */
 SegmentPtrVec Proteoform::getSegmentPtrVec() {
   ChangePtrVec unexpected_changes;
