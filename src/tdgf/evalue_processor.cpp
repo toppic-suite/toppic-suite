@@ -18,7 +18,10 @@ EValueProcessor::EValueProcessor(TdgfMngPtr mng_ptr) {
 }
 
 void EValueProcessor::init() {
-  PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
+  CountTestNumPtr test_num_ptr = CountTestNumPtr(new CountTestNum(mng_ptr_));
+  LOG_DEBUG("Count test number initialized.");
+
+  /*
   ProteoformPtrVec raw_proteo_ptrs 
       = readFastaToProteoform(prsm_para_ptr->getSearchDbFileName(), 
                               prsm_para_ptr->getFixModResiduePtrVec());
@@ -31,22 +34,27 @@ void EValueProcessor::init() {
   ResFreqPtrVec residue_freqs 
       = compResidueFreq(prsm_para_ptr->getFixModResiduePtrVec(), raw_proteo_ptrs); 
   LOG_DEBUG("residue frequency initialized");
+  */
+  
+  ResFreqPtrVec residue_freqs = test_num_ptr->getResFreqPtrVec();
 
   if (mng_ptr_->use_table) {
+    /*
     comp_pvalue_table_ptr_ = CompPValueLookupTablePtr(
         new CompPValueLookupTable(raw_proteo_ptrs, mod_proteo_ptrs, residue_freqs, mng_ptr_));
+        */
   }
   else {
-    comp_pvalue_ptr_ = CompPValueArrayPtr(
-        new CompPValueArray(raw_proteo_ptrs, mod_proteo_ptrs, residue_freqs, mng_ptr_));
+    comp_pvalue_ptr_ = CompPValueArrayPtr(new CompPValueArray(test_num_ptr, mng_ptr_));
     LOG_DEBUG("comp pvalue array initialized");
   }
 
+  PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   std::string input_file_name = basename(prsm_para_ptr->getSpectrumFileName())
       + "." + mng_ptr_->input_file_ext_;
   //std::cout<<input_file_name<<std::endl;
-  prsm_ptrs_ = readPrsm(input_file_name, raw_proteo_ptrs);
-  LOG_DEBUG("prsm_ptrs loaded");
+  //prsm_ptrs_ = readPrsm(input_file_name, raw_proteo_ptrs);
+  //LOG_DEBUG("prsm_ptrs loaded");
 }
 
 

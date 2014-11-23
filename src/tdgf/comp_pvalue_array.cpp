@@ -2,7 +2,7 @@
 #include "tdgf/comp_pvalue_array.hpp"
 
 namespace prot {
-
+/*
 CompPValueArray::CompPValueArray(const ProteoformPtrVec &raw_proteo_ptrs, 
                                  const ProteoformPtrVec &mod_proteo_ptrs,
                                  const ResFreqPtrVec &residue_ptrs,
@@ -23,6 +23,22 @@ CompPValueArray::CompPValueArray(const ProteoformPtrVec &raw_proteo_ptrs,
                                                    mng_ptr->max_prec_mass_,
                                                    mng_ptr->max_ptm_mass_));
   LOG_DEBUG("test number initialized")
+}
+*/
+
+CompPValueArray::CompPValueArray(CountTestNumPtr test_num_ptr,
+                                 TdgfMngPtr mng_ptr) {
+  mng_ptr_ = mng_ptr;
+  test_num_ptr_ = test_num_ptr;
+  residue_ptrs_ = test_num_ptr->getResFreqPtrVec();
+  pep_n_term_residue_ptrs_ = residue_ptrs_;
+  prot_n_term_residue_ptrs_ = test_num_ptr->getNTermResFreqPtrVec();
+  comp_prob_ptr_ = CompProbValuePtr(
+      new CompProbValue(mng_ptr_->convert_ratio_,
+                        residue_ptrs_, mng_ptr_->unexpected_shift_num_ + 1, 
+                        mng_ptr_->max_table_height_, 
+                        mng_ptr_->max_prec_mass_));
+  LOG_DEBUG("comp prob value initialized")
 }
 
 /* set alignment */
