@@ -159,13 +159,11 @@ int process(int argc, char* argv[]) {
       selector = nullptr;
       std::cout << "Top PRSM selecting finished." << std::endl;
 
-      /*
       std::cout << "FDR computation started. " << std::endl;
       PrsmFdrPtr fdr = PrsmFdrPtr(new PrsmFdr(db_file_name, sp_file_name, "TOP_PRE", "TOP"));
       fdr->process();
       fdr = nullptr;
       std::cout << "FDR computation finished." << std::endl;
-      */
     }
 
     /*

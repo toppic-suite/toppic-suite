@@ -14,9 +14,9 @@ DbResidueSeq::DbResidueSeq(const ResiduePtrVec &residues, int id,
 void DbResidueSeq::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
   xercesc::DOMElement* element = xml_doc->createElement("db_residue_seq");
   std::string str = convertToString(id_);
-  xml_doc->addElement(element, "db_id", str.c_str());
-  xml_doc->addElement(element, "db_name", name_.c_str());
-  xml_doc->addElement(element, "db_desc", desc_.c_str());
+  xml_doc->addElement(element, "db_seq_id", str.c_str());
+  xml_doc->addElement(element, "db_seq_name", name_.c_str());
+  xml_doc->addElement(element, "db_seq_desc", desc_.c_str());
   parent->appendChild(element);
 }
 

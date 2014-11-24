@@ -22,6 +22,12 @@ void PrsmWriter::write(PrsmStrPtr prsm_str_ptr) {
   }
 }
 
+void PrsmWriter::writeVector(const PrsmStrPtrVec &prsm_str_ptr_vec) {
+  for(size_t i = 0; i < prsm_str_ptr_vec.size(); i++) {
+    write(prsm_str_ptr_vec[i]);
+  }
+}
+
 
 void PrsmWriter::write(PrsmPtr prsm_ptr) {
   if(prsm_ptr!=nullptr){

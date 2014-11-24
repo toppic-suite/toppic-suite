@@ -17,7 +17,7 @@ PrsmSelector::PrsmSelector(const std::string &db_file_name,
 
 bool containsSameDbSeq(const PrsmStrPtrVec prsm_ptrs, PrsmStrPtr target_prsm_ptr) {
   for(size_t i=0; i< prsm_ptrs.size();i++){
-    if(prsm_ptrs[i]->getDbId() == target_prsm_ptr->getDbId()){
+    if(prsm_ptrs[i]->getDbSeqId() == target_prsm_ptr->getDbSeqId()){
       return true;
     }
   }

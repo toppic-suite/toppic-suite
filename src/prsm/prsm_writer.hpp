@@ -17,6 +17,7 @@ public:
  void close();
 
  void write(PrsmStrPtr prsm_str_ptr);
+ void writeVector(const PrsmStrPtrVec &prsm_str_ptr_vec);
 
  void write(PrsmPtr prsm_ptr);
  void writeVector(const PrsmPtrVec &prsm_ptrs);
