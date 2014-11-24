@@ -62,12 +62,9 @@ int process(int argc, char* argv[]) {
     std::string log_file_name = arguments["logFileName"];
   	WebLog::init(log_file_name);
 
-    int n_top;
-    std::istringstream (arguments["numOfTopPrsms"]) >> n_top;
-    int shift_num;
-    std::istringstream (arguments["shiftNumber"]) >> shift_num;
-    double max_ptm_mass;
-    std::istringstream (arguments["maxPtmMass"]) >> max_ptm_mass;
+    int n_top = std::stoi(arguments["numOfTopPrsms"]);
+    int shift_num = std::stoi(arguments["shiftNumber"]);
+    double max_ptm_mass = std::stod(arguments["maxPtmMass"]);
 
     PrsmParaPtr prsm_para_ptr = PrsmParaPtr(new PrsmPara(arguments));
 
@@ -136,12 +133,6 @@ int process(int argc, char* argv[]) {
     PrsmStrCombinePtr combine_ptr(new PrsmStrCombine(sp_file_name, input_exts, "RAW_RESULT", top_num));
     combine_ptr->process();
     combine_ptr = nullptr;
-    /*
-    PrsmCombinePtr combine_processor = PrsmCombinePtr(new PrsmCombine(db_file_name, sp_file_name,
-                                                                    input_exts, "RAW_RESULT"));
-    combine_processor->process();
-    combine_processor = nullptr;
-    */
     std::cout << "Combining PRSMs finished." << std::endl;
 
     std::cout << "E-value computation started." << std::endl;
@@ -154,7 +145,6 @@ int process(int argc, char* argv[]) {
     processor = nullptr;
     std::cout << "E-value computation finished." << std::endl;
 
-    /*
     if (arguments["searchType"]=="TARGET") { 
       std::cout << "Top PRSM selecting started" << std::endl;
       PrsmSelectorPtr selector = PrsmSelectorPtr(new PrsmSelector(db_file_name, sp_file_name, "EVALUE", "TOP", n_top));
@@ -169,13 +159,16 @@ int process(int argc, char* argv[]) {
       selector = nullptr;
       std::cout << "Top PRSM selecting finished." << std::endl;
 
+      /*
       std::cout << "FDR computation started. " << std::endl;
       PrsmFdrPtr fdr = PrsmFdrPtr(new PrsmFdr(db_file_name, sp_file_name, "TOP_PRE", "TOP"));
       fdr->process();
       fdr = nullptr;
       std::cout << "FDR computation finished." << std::endl;
+      */
     }
 
+    /*
     std::cout << "PRSM selecting by cutoff started." << std::endl;
     std::string cutoff_type = arguments["cutoffType"];
     double cutoff_value;

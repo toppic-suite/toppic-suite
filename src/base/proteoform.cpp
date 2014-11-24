@@ -29,8 +29,8 @@ Proteoform::Proteoform(xercesc::DOMElement* element,
 
 
   xercesc::DOMElement* db_element= getChildElement(element,"db_residue_seq",0);
-  int db_seq_id = getIntChildValue(db_element, "id", 0);
-  std::string db_seq_name = getChildValue(db_element, "name", 0);
+  int db_seq_id = getIntChildValue(db_element, "db_id", 0);
+  std::string db_seq_name = getChildValue(db_element, "db_name", 0);
   ProteoformPtr db_proteoform = db_proteoforms[db_seq_id];
   if(db_proteoform->getSeqId() != db_seq_id 
      || db_proteoform->getSeqName() != db_seq_name){
@@ -46,9 +46,9 @@ Proteoform::Proteoform(xercesc::DOMElement* element, faidx_t *fai,
                        const ResiduePtrVec &residue_ptr_vec) {
 
   xercesc::DOMElement* db_element= getChildElement(element,"db_residue_seq",0);
-  int db_seq_id = getIntChildValue(db_element, "id", 0);
-  std::string db_seq_name = getChildValue(db_element, "name", 0);
-  std::string db_seq_desc = getChildValue(db_element, "description", 0);
+  int db_seq_id = getIntChildValue(db_element, "db_id", 0);
+  std::string db_seq_name = getChildValue(db_element, "db_name", 0);
+  std::string db_seq_desc = getChildValue(db_element, "db_desc", 0);
 
   ProteoformPtr db_proteoform = readFastaToProteoform(fai, db_seq_id, db_seq_name, 
                                                       db_seq_desc, residue_ptr_vec); 

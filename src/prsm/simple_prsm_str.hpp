@@ -33,6 +33,11 @@ inline bool simplePrsmStrScoreDown(const SimplePrsmStrPtr &a, const SimplePrsmSt
   return a->getScore() > b->getScore();
 }
 
+std::string getValueStr(std::string line);
+
+std::string getXmlLine(const std::vector<std::string> &str_vec,
+                       const std::string &property);
+
 }
 
 #endif

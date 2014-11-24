@@ -14,6 +14,8 @@ class PrsmStr {
   std::vector<std::string> getStrVec() {return str_vec_;}
 
   int getSpectrumId() {return spectrum_id_;}
+
+  int getDbId() {return db_id_;}
   
   double getMatchFragNum() {return match_frag_num_;}
 
@@ -25,6 +27,8 @@ class PrsmStr {
   std::vector<std::string> str_vec_;
 
   int spectrum_id_;
+
+  int db_id_;
 
   double match_frag_num_;
 
