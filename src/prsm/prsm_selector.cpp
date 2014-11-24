@@ -37,6 +37,7 @@ PrsmPtrVec PrsmSelector::getTopPrsms(PrsmPtrVec &prsm_ptrs, int n_top){
   return result_ptrs;
 }
 
+/*
 void PrsmSelector::process(){
   std::string base_name = basename(spec_file_name_);
   std::string input_file_name = base_name+"."+input_file_ext_;
@@ -57,6 +58,39 @@ void PrsmSelector::process(){
     writer.writeVector(result_ptrs);
   }
   //because the prsm_writer ~PrsmWriter changed and the fileclosing is an independant function
+  writer.close();
+}
+*/
+
+void PrsmSelector::process(){
+  std::string base_name = basename(spec_file_name_);
+  std::string input_file_name = base_name+"."+input_file_ext_;
+  PrsmReaderPtr reader_ptr(new PrsmReader(input_file_name));
+  PrsmStrPtr prsm_str_ptr = reader_ptr->readOnePrsmStr();
+
+  PrsmWriter writer(base_name +"."+output_file_ext_);
+  
+  // combine
+  int spec_id = 0;
+  while (prsm_str_ptr != nullptr) {
+    PrsmStrPtrVec cur_str_ptrs;
+    while (prsm_str_ptr != nullptr && prsm_str_ptr->getSpectrumId() == spec_id) {
+      cur_str_ptrs.push_back(prsm_str_ptr);
+      prsm_str_ptr = reader_ptr->readOnePrsmStr();
+    }
+    if (cur_str_ptrs.size() > 0) {
+      std::sort(cur_str_ptrs.begin(),cur_str_ptrs.end(),prsmStrMatchEValueUp);
+      for (int i = 0; i < top_num_; i++) {
+        if (i >= (int)cur_str_ptrs.size()) {
+          break;
+        }
+        writer.write(cur_str_ptrs[i]);
+      }
+    }
+    spec_id++;
+  }
+  
+  reader_ptr->close();
   writer.close();
 }
 
