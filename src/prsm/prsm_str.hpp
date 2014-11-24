@@ -15,20 +15,24 @@ class PrsmStr {
 
   int getSpectrumId() {return spectrum_id_;}
 
-  int getDbId() {return db_id_;}
+  int getDbSeqId() {return db_seq_id_;}
+
+  std::string getDbSeqName() {return db_seq_name_;}
   
   double getMatchFragNum() {return match_frag_num_;}
 
   double getEValue() {return e_value_;}
 
-  double getFdr() {return fdr_;}
+  void setFdr(double fdr);
 
  private:
   std::vector<std::string> str_vec_;
 
   int spectrum_id_;
 
-  int db_id_;
+  int db_seq_id_;
+
+  std::string db_seq_name_;
 
   double match_frag_num_;
 
@@ -48,8 +52,8 @@ inline bool prsmStrMatchFragmentDown(const PrsmStrPtr &a, const PrsmStrPtr &b) {
   return a->getMatchFragNum() > b->getMatchFragNum();
 }
 
-inline bool prsmStrFdrUp(const PrsmStrPtr &a, const PrsmStrPtr &b) {
-  return a->getFdr() < b->getFdr();
+inline bool prsmStrSpectrumIdUp(const PrsmStrPtr &a, const PrsmStrPtr &b) {
+  return a->getSpectrumId() < b->getSpectrumId();
 }
 
 }
