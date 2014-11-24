@@ -23,6 +23,8 @@ PrsmStr::PrsmStr(const std::vector<std::string> &str_vec) {
   else {
     e_value_ = std::stod(getValueStr(line));
   }
+  line = getXmlLine(str_vec_, "fdr"); 
+  fdr_ = std::stod(getValueStr(line));
   //LOG_DEBUG("spectrum id " << spectrum_id_ << " match num " << match_frag_num_);
 }
 
@@ -38,8 +40,13 @@ int getXmlLineIndex(const std::vector<std::string> &str_vec,
 }
 
 void PrsmStr::setFdr(double fdr) {
-  int i = getXmlLineIndex(str_vec_, "FDR");
-  str_vec_[i] = "<FDR>" + std::to_string(fdr) + "</FDR>";
+  int i = getXmlLineIndex(str_vec_, "fdr");
+  str_vec_[i] = "<fdr>" + std::to_string(fdr) + "</fdr>";
+}
+
+void PrsmStr::setId(int id) {
+  int i = getXmlLineIndex(str_vec_, "prsm_id");
+  str_vec_[i] = "<prsm_id>" + std::to_string(id) + "</prsm_id>";
 }
 
 }

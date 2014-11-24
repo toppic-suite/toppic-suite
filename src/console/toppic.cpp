@@ -166,7 +166,6 @@ int process(int argc, char* argv[]) {
       std::cout << "FDR computation finished." << std::endl;
     }
 
-    /*
     std::cout << "PRSM selecting by cutoff started." << std::endl;
     std::string cutoff_type = arguments["cutoffType"];
     double cutoff_value;
@@ -178,6 +177,7 @@ int process(int argc, char* argv[]) {
     output_selector = nullptr;
     std::cout << "PRSM selecting by cutoff finished." << std::endl;
 
+    /*
     std::cout << "Finding protein species started." << std::endl;
     double ppo;
     std::istringstream (arguments["error_tolerance"]) >> ppo;

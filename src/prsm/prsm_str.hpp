@@ -23,6 +23,10 @@ class PrsmStr {
 
   double getEValue() {return e_value_;}
 
+  double getFdr() {return fdr_;}
+
+  void setId(int id);
+
   void setFdr(double fdr);
 
  private:
