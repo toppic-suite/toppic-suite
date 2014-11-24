@@ -1,4 +1,5 @@
 #include "base/file_util.hpp"
+#include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_selector.hpp"
 
 namespace prot {
@@ -14,16 +15,29 @@ PrsmSelector::PrsmSelector(const std::string &db_file_name,
   n_top_ = n_top;
 }
 
-bool containsSameDbSeq(const PrsmPtrVec prsm_ptrs, PrsmPtr target_prsm_ptr) {
+bool containsSameDbSeq(const PrsmStrPtrVec prsm_ptrs, PrsmStrPtr target_prsm_ptr) {
   for(size_t i=0; i< prsm_ptrs.size();i++){
-    if(prsm_ptrs[i]->getProteoformPtr()->getDbResSeqPtr()->getId()==
-        target_prsm_ptr->getProteoformPtr()->getDbResSeqPtr()->getId()){
+    if(prsm_ptrs[i]->getDbId() == target_prsm_ptr->getDbId()){
       return true;
     }
   }
   return false;
 }
 
+PrsmStrPtrVec getTopPrsms(PrsmStrPtrVec &prsm_str_ptrs, int n_top){
+  std::sort(prsm_str_ptrs.begin(),prsm_str_ptrs.end(),prsmStrEValueUp);
+  int size = prsm_str_ptrs.size();
+  int max = size > n_top? n_top:size;
+  PrsmStrPtrVec result_ptrs;
+  for(int i=0;i<max;i++){
+    if(!containsSameDbSeq(result_ptrs, prsm_str_ptrs[i])){
+      result_ptrs.push_back(prsm_str_ptrs[i]);
+    }
+  }
+  return result_ptrs;
+}
+
+/*
 PrsmPtrVec PrsmSelector::getTopPrsms(PrsmPtrVec &prsm_ptrs, int n_top){
   std::sort(prsm_ptrs.begin(),prsm_ptrs.end(),prsmEValueUp);
   int size = prsm_ptrs.size();
@@ -36,6 +50,7 @@ PrsmPtrVec PrsmSelector::getTopPrsms(PrsmPtrVec &prsm_ptrs, int n_top){
   }
   return result_ptrs;
 }
+*/
 
 /*
 void PrsmSelector::process(){
@@ -65,32 +80,27 @@ void PrsmSelector::process(){
 void PrsmSelector::process(){
   std::string base_name = basename(spec_file_name_);
   std::string input_file_name = base_name+"."+input_file_ext_;
-  PrsmReaderPtr reader_ptr(new PrsmReader(input_file_name));
-  PrsmStrPtr prsm_str_ptr = reader_ptr->readOnePrsmStr();
+  PrsmReader reader(input_file_name);
+  PrsmStrPtr prsm_str_ptr = reader.readOnePrsmStr();
 
   PrsmWriter writer(base_name +"."+output_file_ext_);
   
-  // combine
   int spec_id = 0;
   while (prsm_str_ptr != nullptr) {
     PrsmStrPtrVec cur_str_ptrs;
     while (prsm_str_ptr != nullptr && prsm_str_ptr->getSpectrumId() == spec_id) {
       cur_str_ptrs.push_back(prsm_str_ptr);
-      prsm_str_ptr = reader_ptr->readOnePrsmStr();
+      prsm_str_ptr = reader.readOnePrsmStr();
     }
-    if (cur_str_ptrs.size() > 0) {
-      std::sort(cur_str_ptrs.begin(),cur_str_ptrs.end(),prsmStrMatchEValueUp);
-      for (int i = 0; i < top_num_; i++) {
-        if (i >= (int)cur_str_ptrs.size()) {
-          break;
-        }
-        writer.write(cur_str_ptrs[i]);
-      }
+    PrsmStrPtrVec result_ptrs = getTopPrsms(cur_str_ptrs, n_top_);
+    for (size_t i = 0; i < result_ptrs.size(); i++) {
+      writer.write(result_ptrs[i]);
     }
+
     spec_id++;
   }
   
-  reader_ptr->close();
+  reader.close();
   writer.close();
 }
 
