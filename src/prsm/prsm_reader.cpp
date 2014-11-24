@@ -69,23 +69,20 @@ PrsmPtr PrsmReader::readOnePrsm(faidx_t *fai, const ResiduePtrVec &residue_ptr_v
   return ptr;
 }
 
-/*
-  xercesc::MemBufInputSource prsm_buf(
-      (const XMLByte*)prsm_str.c_str(), prsm_str.size(), "prsm_str (in memory)");
-
-  XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
-  PrsmPtr ptr;
-  if(parser){
-    //XmlDOMDocument doc(parser, prsm_buf);
-    //xercesc::DOMElement* root = doc.getDocumentElement();
-    //ptr = PrsmPtr(new Prsm(root, proteo_ptrs));
-  }
-  return ptr;
-}
-*/
-
 void PrsmReader::close() {
   input_.close();
+}
+
+PrsmStrPtrVec readAllPrsmStrs(const std::string &input_file_name) {
+  PrsmReader reader(input_file_name);
+  PrsmStrPtrVec prsm_str_ptrs;
+  PrsmStrPtr prsm_str_ptr = reader.readOnePrsmStr();
+  while (prsm_str_ptr != nullptr) {
+    prsm_str_ptrs.push_back(prsm_str_ptr);
+    prsm_str_ptr = reader.readOnePrsmStr();
+  }
+  reader.close();
+  return prsm_str_ptrs;
 }
 
 

@@ -29,6 +29,8 @@ class PrsmReader {
 typedef std::shared_ptr<PrsmReader> PrsmReaderPtr;
 typedef std::vector<PrsmReaderPtr> PrsmReaderPtrVec;
 
+PrsmStrPtrVec readAllPrsmStrs(const std::string &input_file_name);
+
 } /* namespace prot */
 
 #endif /* PROT_PRSM_READER_HPP_ */

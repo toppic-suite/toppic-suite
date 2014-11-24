@@ -17,16 +17,8 @@ PrsmFdr::PrsmFdr(const std::string &db_file_name,
 void PrsmFdr::process(){
   std::string base_name = basename(spec_file_name_);
   std::string input_file_name = base_name+"."+input_file_ext_;
-  std::string output_file_name = base_name+"."+output_file_ext_;
 
-  PrsmReader reader(input_file_name);
-  PrsmStrPtrVec prsm_str_ptrs;
-  PrsmStrPtr prsm_str_ptr = reader.readOnePrsmStr();
-  while (prsm_str_ptr != nullptr) {
-    prsm_str_ptrs.push_back(prsm_str_ptr);
-    prsm_str_ptr = reader.readOnePrsmStr();
-  }
-  reader.close();
+  PrsmStrPtrVec prsm_str_ptrs = readAllPrsmStrs(input_file_name);
 
   PrsmStrPtrVec target_ptrs;
   PrsmStrPtrVec decoy_ptrs;
@@ -45,6 +37,7 @@ void PrsmFdr::process(){
     }
   }
   compute(target_ptrs,decoy_ptrs);
+  std::string output_file_name = base_name+"."+output_file_ext_;
   PrsmWriter writer(output_file_name);
   std::sort(target_ptrs.begin(),target_ptrs.end(),prsmStrSpectrumIdUp);
   writer.writeVector(target_ptrs);
