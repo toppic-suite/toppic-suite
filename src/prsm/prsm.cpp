@@ -122,18 +122,14 @@ Prsm::Prsm(xercesc::DOMElement* element,ProteoformPtrVec proteoforms){
 }
 
 Prsm::Prsm(xercesc::DOMElement* element, faidx_t *fai,
-           const ResiduePtrVec &residue_ptr_vec,
-           const ProtModPtrVec &prot_mod_ptr_vec) {
+           const ResiduePtrVec &residue_ptr_vec) {
 
   parseXml(element);
 
   xercesc::DOMElement* proteoform_element
       = getChildElement(element,"proteoform",0);
-  /*
   proteoform_ptr_ = ProteoformPtr(
-      new Proteoform(proteoform_element, fai, residue_ptr_vec, 
-                     prot_mod_ptr_vec));
-                     */
+      new Proteoform(proteoform_element, fai, residue_ptr_vec));
 }
 
 double Prsm::getEValue() {

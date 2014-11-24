@@ -1,6 +1,8 @@
 #ifndef PROT_PROTEOFORM_HPP_
 #define PROT_PROTEOFORM_HPP_
 
+#include "htslib/faidx.h"
+
 #include "base/residue_freq.hpp"
 #include "base/db_residue_seq.hpp"
 #include "base/bp_spec.hpp"
@@ -25,6 +27,10 @@ class Proteoform {
              const ChangePtrVec &change_ptr_vec);
 
   Proteoform(xercesc::DOMElement* element, const ProteoformPtrVec &db_proteoforms);
+
+  Proteoform(xercesc::DOMElement* element, faidx_t *fai, const ResiduePtrVec &residue_ptr_vec);
+
+  void parseXml(xercesc::DOMElement* element, ProteoformPtr db_proteoform);
 
   DbResSeqPtr getDbResSeqPtr() {return db_residue_seq_ptr_;}
 

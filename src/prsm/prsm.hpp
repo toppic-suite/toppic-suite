@@ -22,8 +22,7 @@ class Prsm {
   Prsm(xercesc::DOMElement* element,ProteoformPtrVec proteoforms);
 
   Prsm(xercesc::DOMElement* element, faidx_t *fai,
-       const ResiduePtrVec &residue_ptr_vec,
-       const ProtModPtrVec &prot_mod_ptr_vec);
+       const ResiduePtrVec &residue_ptr_vec);
 
   void parseXml(xercesc::DOMElement* element);
 

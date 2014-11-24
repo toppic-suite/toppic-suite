@@ -18,7 +18,7 @@ class PrsmReader {
 
   PrsmStrPtr readOnePrsmStr();
 
-  PrsmPtr readOnePrsm();
+  PrsmPtr readOnePrsm(faidx_t *fai, const ResiduePtrVec &residue_ptr_vec);
 
   void close();
 
