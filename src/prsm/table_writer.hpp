@@ -21,6 +21,9 @@ class TableWriter {
               const std::string &input_file_ext, 
               const std::string &output_file_ext);
   void write();
+
+  void writeSelectedPrsms(std::ofstream &file, PrsmPtrVec &prsm_ptrs, 
+                          DeconvMsPtr ms_ptr);
  private:
   PrsmParaPtr prsm_para_ptr_;
   std::string input_file_ext_;
