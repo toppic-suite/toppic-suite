@@ -177,17 +177,18 @@ int process(int argc, char* argv[]) {
     output_selector = nullptr;
     std::cout << "PRSM selecting by cutoff finished." << std::endl;
 
-    /*
     std::cout << "Finding protein species started." << std::endl;
     double ppo;
     std::istringstream (arguments["error_tolerance"]) >> ppo;
     ppo = ppo /1000000.0;
-    PrsmSpeciesPtr prsm_species = PrsmSpeciesPtr(new PrsmSpecies(db_file_name, sp_file_name, 
-                                                                 "CUTOFF_RESULT", "OUTPUT_RESULT", ppo));
+    ResiduePtrVec residue_ptr_vec = prsm_para_ptr->getFixModResiduePtrVec();
+    PrsmSpeciesPtr prsm_species = PrsmSpeciesPtr(
+        new PrsmSpecies(db_file_name, sp_file_name, "CUTOFF_RESULT", "OUTPUT_RESULT", residue_ptr_vec, ppo));
     prsm_species->process();
     prsm_species = nullptr;
     std::cout << "Finding protein species finished." << std::endl;
 
+    /*
     std::cout << "Outputting table started." << std::endl;
     TableWriterPtr table_out = TableWriterPtr(new TableWriter(prsm_para_ptr, "OUTPUT_RESULT", "OUTPUT_TABLE"));
     table_out->write();
