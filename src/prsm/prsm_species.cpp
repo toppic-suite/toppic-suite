@@ -94,6 +94,7 @@ void setSpeciesId(PrsmPtrVec& prsm_ptrs,double ppo){
 void PrsmSpecies::process(){
   std::string base_name = basename(spec_file_name_);
   std::string input_file_name = base_name+"."+input_file_ext_;
+  
   ProteoformPtrVec proteo_ptrs_ 
       = readFastaToProteoform(db_file_name_, ResidueFactory::getBaseResiduePtrVec());
   PrsmPtrVec prsm_ptrs = readPrsm(input_file_name,proteo_ptrs_);

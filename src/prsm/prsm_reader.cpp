@@ -85,5 +85,22 @@ PrsmStrPtrVec readAllPrsmStrs(const std::string &input_file_name) {
   return prsm_str_ptrs;
 }
 
+PrsmPtrVec readAllPrsms(const std::string &prsm_file_name, 
+                        const std::string &db_file_name,
+                        const ResiduePtrVec &residue_ptr_vec) {
+  faidx_t * fai = fai_load(db_file_name.c_str());
+  PrsmReader reader(prsm_file_name);
+  PrsmPtrVec prsm_ptrs;
+  PrsmPtr prsm_ptr = reader.readOnePrsm(fai, residue_ptr_vec);
+  while (prsm_ptr != nullptr) {
+    prsm_ptrs.push_back(prsm_ptr);
+    prsm_ptr = reader.readOnePrsm(fai, residue_ptr_vec);
+  }
+  reader.close();
+  fai_destroy(fai);
+  return prsm_ptrs;
+
+}
+
 
 } /* namespace prot */
