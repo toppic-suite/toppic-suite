@@ -1,14 +1,15 @@
 #include <map>
 
 #include "base/file_util.hpp"
+#include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_species.hpp"
 #include "prsmview/xml_generator.hpp"
 
 namespace prot {
 XmlGenerator::XmlGenerator(PrsmParaPtr prsm_para_ptr, 
                            const std::string &exec_dir, 
-                           const std::string &input_file_name) {
-  input_file_name_ = input_file_name;
+                           const std::string &input_file_ext) {
+  input_file_ext_ = input_file_ext;
   mng_ptr_ = PrsmViewMngPtr(new PrsmViewMng(prsm_para_ptr, exec_dir));
   anno_view_ptr_ = AnnoViewPtr(new AnnoView());
 }
@@ -115,10 +116,12 @@ void XmlGenerator::process(){
 
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   std::string spectrum_file_name = prsm_para_ptr->getSpectrumFileName();
-  proteo_ptrs_ = readFastaToProteoform(prsm_para_ptr->getSearchDbFileName(),
-                                     prsm_para_ptr->getFixModResiduePtrVec());
-  std::string input_name = basename(spectrum_file_name)+"."+input_file_name_;
-  PrsmPtrVec prsm_ptrs = readPrsm(basename(spectrum_file_name)+"."+input_file_name_,proteo_ptrs_);
+  std::string input_file_name = basename(spectrum_file_name) + "." + input_file_ext_;
+  std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
+  ResiduePtrVec residue_ptr_vec = prsm_para_ptr->getFixModResiduePtrVec();
+
+  PrsmPtrVec prsm_ptrs = readAllPrsms(input_file_name, db_file_name,
+                                      residue_ptr_vec);
   LOG_DEBUG("prsm loaded");
 
   addSpectrumPtrsToPrsms(prsm_ptrs, prsm_para_ptr);
