@@ -1,4 +1,5 @@
 #include "base/file_util.hpp"
+#include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_species.hpp"
 
 namespace prot {
@@ -7,11 +8,13 @@ PrsmSpecies::PrsmSpecies(const std::string &db_file_name,
                          const std::string &spec_file_name,
                          const std::string &input_file_ext,
                          const std::string &output_file_ext,
+                         const ResiduePtrVec &residue_ptr_vec,
                          double ppo) {
   db_file_name_ = db_file_name;
   spec_file_name_ = spec_file_name;
   input_file_ext_ =input_file_ext;
   output_file_ext_ = output_file_ext;
+  residue_ptr_vec_ = residue_ptr_vec;
   ppo_ = ppo;
 }
 
@@ -61,7 +64,7 @@ ProteoformPtrVec2D getZeroPtmList(const ProteoformPtrVec& proteo_ptrs, double pp
 
 void setSpeciesId(PrsmPtrVec& prsm_ptrs,double ppo){
   ProteoformPtrVec2D proteo_groups = groupProteins(prsm_ptrs);
-
+  
   // find zero ptm species 
   ProteoformPtrVec2D species = getZeroPtmList(proteo_groups[0],ppo);
 
@@ -95,17 +98,14 @@ void PrsmSpecies::process(){
   std::string base_name = basename(spec_file_name_);
   std::string input_file_name = base_name+"."+input_file_ext_;
   
-  ProteoformPtrVec proteo_ptrs_ 
-      = readFastaToProteoform(db_file_name_, ResidueFactory::getBaseResiduePtrVec());
-  PrsmPtrVec prsm_ptrs = readPrsm(input_file_name,proteo_ptrs_);
+  PrsmPtrVec prsm_ptrs = readAllPrsms(input_file_name, db_file_name_,
+                                      residue_ptr_vec_);
   sort(prsm_ptrs.begin(),prsm_ptrs.end(),prsmSpectrumIdUpPrecursorIdUp);
   setSpeciesId(prsm_ptrs,ppo_);
   //output
   std::string output_file_name = base_name +"."+output_file_ext_;
   PrsmWriter writer(output_file_name);
   writer.writeVector(prsm_ptrs);
-  //because the prsm_writer ~PrsmWriter changed and the
-  // fileclosing is an independant function
   writer.close();
 }
 
