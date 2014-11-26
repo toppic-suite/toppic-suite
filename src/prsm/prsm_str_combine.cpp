@@ -53,7 +53,7 @@ void PrsmStrCombine::process() {
     for (size_t i = 0; i < input_num; i++) {
       if (prsm_str_ptrs[i] != nullptr) {
         finish = false;
-        if (prsm_str_ptrs[i]->getSpectrumId() == spec_id) {
+        while (prsm_str_ptrs[i] != nullptr && prsm_str_ptrs[i]->getSpectrumId() == spec_id) {
           cur_str_ptrs.push_back(prsm_str_ptrs[i]);
           prsm_str_ptrs[i] = reader_ptrs[i]->readOnePrsmStr();
         }

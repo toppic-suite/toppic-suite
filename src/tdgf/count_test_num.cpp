@@ -66,6 +66,55 @@ inline int CountTestNum::convertMass(double m) {
   return n;
 }
 
+void updateResidueCounts(const ResiduePtrVec &residue_list, 
+                         std::vector<double> &counts,
+                         ProteoformPtr prot_ptr) {
+  ResSeqPtr seq_ptr = prot_ptr->getResSeqPtr();    
+  for (int i = 0; i < seq_ptr->getLen(); i++) {
+    ResiduePtr res_ptr = seq_ptr->getResiduePtr(i);
+    int pos = findResidue(residue_list, res_ptr);
+    if (pos >= 0) {
+      // found 
+      counts[pos] = counts[pos]+1;
+    }
+  }
+}
+
+ResFreqPtrVec compResidueFreq(const ResiduePtrVec &residue_list, 
+                              const std::vector<double> &counts) {
+  double sum = 0;
+  for (size_t i = 0; i < counts.size(); i++) {
+    sum = sum + counts[i];
+  }
+  ResFreqPtrVec res_freq_list;
+  for (size_t i = 0; i < residue_list.size(); i++) {
+    ResFreqPtr res_freq_ptr(new ResidueFreq(residue_list[i]->getAcidPtr(), 
+                                            residue_list[i]->getPtmPtr(),
+                                            counts[i]/sum));
+    res_freq_list.push_back(res_freq_ptr);
+  }
+  return res_freq_list;
+}
+
+void updateNTermResidueCounts(ResiduePtrVec &residue_list, std::vector<double> &counts,
+                              const ProteoformPtrVec &mod_proteo_ptrs) {
+  for (size_t i = 0; i < mod_proteo_ptrs.size(); i++) {
+    ResSeqPtr seq_ptr = mod_proteo_ptrs[i]->getResSeqPtr();    
+    if (seq_ptr->getLen() >= 1) {
+      ResiduePtr res_ptr = seq_ptr->getResiduePtr(0);
+      int pos = findResidue(residue_list, res_ptr);
+      if (pos >= 0) {
+        // found 
+        counts[pos] = counts[pos]+1;
+      }
+      else {
+        residue_list.push_back(res_ptr);
+        counts.push_back(1);
+      }
+    }
+  }
+}
+
 void CountTestNum::init(PrsmParaPtr para_ptr) {
   std::string db_file_name = para_ptr->getSearchDbFileName();
   comp_mass_cnts_ = new double[max_sp_len_](); 
@@ -122,55 +171,6 @@ void CountTestNum::init(PrsmParaPtr para_ptr) {
 
   // internal 
   initInternalMassCnt();
-}
-
-void updateResidueCounts(const ResiduePtrVec &residue_list, 
-                         std::vector<double> &counts,
-                         ProteoformPtr prot_ptr) {
-  ResSeqPtr seq_ptr = prot_ptr->getResSeqPtr();    
-  for (int i = 0; i < seq_ptr->getLen(); i++) {
-    ResiduePtr res_ptr = seq_ptr->getResiduePtr(i);
-    int pos = findResidue(residue_list, res_ptr);
-    if (pos >= 0) {
-      // found 
-      counts[pos] = counts[pos]+1;
-    }
-  }
-}
-
-ResFreqPtrVec compResidueFreq(const ResiduePtrVec &residue_list, 
-                              const std::vector<double> &counts) {
-  double sum = 0;
-  for (size_t i = 0; i < counts.size(); i++) {
-    sum = sum + counts[i];
-  }
-  ResFreqPtrVec res_freq_list;
-  for (size_t i = 0; i < residue_list.size(); i++) {
-    ResFreqPtr res_freq_ptr(new ResidueFreq(residue_list[i]->getAcidPtr(), 
-                                            residue_list[i]->getPtmPtr(),
-                                            counts[i]/sum));
-    res_freq_list.push_back(res_freq_ptr);
-  }
-  return res_freq_list;
-}
-
-void updateNTermResidueCounts(ResiduePtrVec &residue_list, std::vector<double> counts,
-                              const ProteoformPtrVec &mod_proteo_ptrs) {
-  for (size_t i = 0; i < mod_proteo_ptrs.size(); i++) {
-    ResSeqPtr seq_ptr = mod_proteo_ptrs[i]->getResSeqPtr();    
-    if (seq_ptr->getLen() >= 1) {
-      ResiduePtr res_ptr = seq_ptr->getResiduePtr(0);
-      int pos = findResidue(residue_list, res_ptr);
-      if (pos >= 0) {
-        // found 
-        counts[pos] = counts[pos]+1;
-      }
-      else {
-        residue_list.push_back(res_ptr);
-        counts.push_back(1);
-      }
-    }
-  }
 }
 
 /** initialize the four tables for mass counts */

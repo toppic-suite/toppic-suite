@@ -190,7 +190,8 @@ function showIonPeaks(ids) {
 	<p style="font-size:15px;">
 		<a href="../proteins.html">All proteins</a> /
 		<a href="../proteins/protein{annotated_protein/sequence_id}.html">
-		<xsl:value-of select="annotated_protein/sequence_name"/></a> /
+		<xsl:value-of select="annotated_protein/sequence_name"/> 
+		<xsl:value-of select="annotated_protein/sequence_description"/></a> /
 		<a href="../proteoforms/proteoform{annotated_protein/proteoform_id}.html">
         Proteoform #<xsl:value-of select="annotated_protein/proteoform_id"/></a>
 	</p>

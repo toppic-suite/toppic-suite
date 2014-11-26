@@ -68,22 +68,28 @@ void XmlGenerator::outputProteoforms(const PrsmPtrVec &prsm_ptrs){
 }
 
 void XmlGenerator::outputProteins(const PrsmPtrVec &prsm_ptrs){
+  //LOG_DEBUG("prsm number " << prsm_ptrs.size());
+  FastaReader reader(mng_ptr_->prsm_para_ptr_->getSearchDbFileName());
+  ResiduePtrVec residue_ptr_vec = mng_ptr_->prsm_para_ptr_->getFixModResiduePtrVec();
+  ProteoformPtr proteo_ptr = reader.getNextProteoformPtr(residue_ptr_vec);
 
-  for(unsigned int i=0;i<proteo_ptrs_.size();i++){
-    std::vector<int> species = getSpeciesIds(prsm_ptrs,proteo_ptrs_[i]->getDbResSeqPtr()->getId());
+  while (proteo_ptr != nullptr) { 
+    std::vector<int> species = getSpeciesIds(prsm_ptrs,proteo_ptr->getDbResSeqPtr()->getId());
+    //LOG_DEBUG("species size " << species.size());
     if(species.size()>0){
       std::string file_name = mng_ptr_->xml_path_ + FILE_SEPARATOR +"proteins" 
-          +FILE_SEPARATOR+ "protein"+convertToString(proteo_ptrs_[i]->getDbResSeqPtr()->getId())+".xml";
+          +FILE_SEPARATOR+ "protein"+convertToString(proteo_ptr->getDbResSeqPtr()->getId())+".xml";
       XmlWriter writer(file_name,"");
-      writer.write(proteinToXml(writer.getDoc(),prsm_ptrs,proteo_ptrs_[i],species, mng_ptr_));
+      writer.write(proteinToXml(writer.getDoc(),prsm_ptrs,proteo_ptr,species, mng_ptr_));
       writer.close();
       std::vector<std::string> file_info;
       file_info.push_back(file_name);
       file_info.push_back(mng_ptr_->executive_dir_ + FILE_SEPARATOR + "toppic_resources" + FILE_SEPARATOR + "xsl" + FILE_SEPARATOR + "protein.xsl");
       file_info.push_back(mng_ptr_->html_path_+ FILE_SEPARATOR + "proteins" + FILE_SEPARATOR 
-                          + "protein"+convertToString(proteo_ptrs_[i]->getDbResSeqPtr()->getId())+".html");
+                          + "protein"+convertToString(proteo_ptr->getDbResSeqPtr()->getId())+".html");
       anno_view_ptr_->file_list_.push_back(file_info);
     }
+    proteo_ptr = reader.getNextProteoformPtr(residue_ptr_vec);
   }
 }
 
@@ -91,8 +97,7 @@ void XmlGenerator::outputAllProteins(const PrsmPtrVec &prsm_ptrs){
 
   std::string file_name = mng_ptr_->xml_path_+ FILE_SEPARATOR +"proteins.xml";
   XmlWriter writer(file_name,"protein_list");
-  writer.write(allProteinToXml(writer.getDoc(),prsm_ptrs,proteo_ptrs_, 
-                               mng_ptr_));
+  writer.write(allProteinToXml(writer.getDoc(),prsm_ptrs, mng_ptr_));
   writer.close();
   std::vector<std::string> file_info;
   file_info.push_back(file_name);
