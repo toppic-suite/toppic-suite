@@ -113,7 +113,6 @@ int process(int argc, char* argv[]) {
     simple_combine_ptr = nullptr;
     std::cout << "Combining simple PRSMs finished." << std::endl;
 
-
     std::cout << "PTM search started." << std::endl;
     PtmMngPtr ptm_mng_ptr = PtmMngPtr(new PtmMng(prsm_para_ptr, n_top, shift_num,
                                                  max_ptm_mass, "FILTER", "PTM"));
@@ -129,8 +128,8 @@ int process(int argc, char* argv[]) {
     input_exts.push_back("ZERO_SUFFIX");
     input_exts.push_back("ZERO_INTERNAL");
     input_exts.push_back("PTM");
-    top_num = (shift_num + 1) * 4;
-    PrsmStrCombinePtr combine_ptr(new PrsmStrCombine(sp_file_name, input_exts, "RAW_RESULT", top_num));
+    int prsm_top_num = (shift_num + 1) * 4;
+    PrsmStrCombinePtr combine_ptr(new PrsmStrCombine(sp_file_name, input_exts, "RAW_RESULT", prsm_top_num));
     combine_ptr->process();
     combine_ptr = nullptr;
     std::cout << "Combining PRSMs finished." << std::endl;
@@ -194,7 +193,6 @@ int process(int argc, char* argv[]) {
     table_out = nullptr;
     std::cout << "Outputting table finished." << std::endl;
 
-    /*
     std::cout << "Generating view xml files started." << std::endl;
     XmlGeneratorPtr xml_gene = XmlGeneratorPtr(new XmlGenerator(prsm_para_ptr, exe_dir,"OUTPUT_RESULT"));
     xml_gene->process();
@@ -205,6 +203,7 @@ int process(int argc, char* argv[]) {
     translate(arguments);
     std::cout << "Converting xml files to html files finished." << std::endl;
     
+    /*
     if (arguments["keepTempFiles"] != "true"){
       std::cout << "Deleting temporary files started." << std::endl;
       delDir(basename(sp_file_name) + "_xml");

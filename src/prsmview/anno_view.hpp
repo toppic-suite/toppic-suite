@@ -41,7 +41,6 @@ xercesc::DOMElement* proteinToXml(XmlDOMDocument* xml_doc,
 
 xercesc::DOMElement* allProteinToXml(XmlDOMDocument* xml_doc,
                                      const PrsmPtrVec &prsm_ptrs,
-                                     const ProteoformPtrVec &proteo_ptrs,
                                      PrsmViewMngPtr mng_ptr);
 }
 

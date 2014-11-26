@@ -16,6 +16,7 @@ namespace prot {
 
 EValueProcessor::EValueProcessor(TdgfMngPtr mng_ptr) {
   mng_ptr_ = mng_ptr;
+  init();
 }
 
 void EValueProcessor::init() {
@@ -49,7 +50,8 @@ void EValueProcessor::process(bool is_separate) {
   MsAlignReader reader (spectrum_file_name);
 
   std::string input_file_name 
-      = basename(spectrum_file_name + "." + mng_ptr_->input_file_ext_);
+      = basename(spectrum_file_name) + "." + mng_ptr_->input_file_ext_;
+  LOG_DEBUG("input file name " << input_file_name);
   PrsmReader prsm_reader(input_file_name);
   ResiduePtrVec residue_ptr_vec = prsm_para_ptr->getFixModResiduePtrVec();
   PrsmPtr prsm_ptr = prsm_reader.readOnePrsm(fai_, residue_ptr_vec);
@@ -65,6 +67,10 @@ void EValueProcessor::process(bool is_separate) {
   while (ms_ptr.get() != nullptr) {
     cnt++;
     PrsmPtrVec selected_prsm_ptrs;
+    //LOG_DEBUG("prsm " << prsm_ptr);
+    //if (prsm_ptr != nullptr) {
+      //LOG_DEBUG("spectrum id " << ms_ptr->getHeaderPtr()->getId() << " prsm spectrum id " << prsm_ptr->getSpectrumId());
+    //}
     while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == ms_ptr->getHeaderPtr()->getId()) {
       selected_prsm_ptrs.push_back(prsm_ptr);
       prsm_ptr = prsm_reader.readOnePrsm(fai_, residue_ptr_vec);
@@ -130,6 +136,7 @@ void EValueProcessor::processOneSpectrum(DeconvMsPtr ms_ptr,
                                          PrsmPtrVec &sele_prsm_ptrs,
                                          bool is_separate,
                                          PrsmWriter &writer) {
+  //LOG_DEBUG("sele prsm number " << sele_prsm_ptrs.size());
   SpectrumSetPtr spec_set_ptr 
       = getSpectrumSet(ms_ptr, 0, mng_ptr_->prsm_para_ptr_->getSpParaPtr());
   if (spec_set_ptr.get() != nullptr) {
@@ -143,7 +150,6 @@ void EValueProcessor::processOneSpectrum(DeconvMsPtr ms_ptr,
     
     //LOG_DEBUG("start sort");
     std::sort(sele_prsm_ptrs.begin(), sele_prsm_ptrs.end(), prsmEValueUp);
-    //LOG_DEBUG("start writing");
     writer.writeVector(sele_prsm_ptrs);
     //LOG_DEBUG("writing complete");
   }

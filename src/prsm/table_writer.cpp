@@ -50,7 +50,7 @@ void TableWriter::write(){
   MsAlignReader reader (spectrum_file_name);
 
   std::string input_file_name 
-      = basename(spectrum_file_name + "." + input_file_ext_);
+      = basename(spectrum_file_name) + "." + input_file_ext_;
   PrsmReader prsm_reader(input_file_name);
   ResiduePtrVec residue_ptr_vec = prsm_para_ptr_->getFixModResiduePtrVec();
   faidx_t *fai = fai_load(prsm_para_ptr_->getSearchDbFileName().c_str());
@@ -59,6 +59,7 @@ void TableWriter::write(){
   DeconvMsPtr ms_ptr = reader.getNextMs();
   while (ms_ptr.get() != nullptr) {
     PrsmPtrVec selected_prsm_ptrs;
+    //LOG_DEBUG("spectrum id " << ms_ptr->getHeaderPtr()->getId() << " prsm ptr " << prsm_ptr);
     while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == ms_ptr->getHeaderPtr()->getId()) {
       selected_prsm_ptrs.push_back(prsm_ptr);
       prsm_ptr = prsm_reader.readOnePrsm(fai, residue_ptr_vec);

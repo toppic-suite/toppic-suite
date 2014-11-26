@@ -57,14 +57,6 @@ class CountTestNum {
   void initPrefMassCnt(const ProteoformPtrVec &prot_mod_forms);
   void initSuffMassCnt(const ProteoformPtrVec &raw_forms);
   void initInternalMassCnt();
-  void updateResidueCounts(const ResiduePtrVec &residue_list, 
-                           std::vector<double> &counts,
-                           ProteoformPtr prot_ptr);
-  ResFreqPtrVec compResidueFreq(const ResiduePtrVec &residue_list, 
-                                const std::vector<double> &counts);
-  void updateNTermResidueCounts(ResiduePtrVec &residue_list, 
-                                std::vector<double> counts,
-                                const ProteoformPtrVec &mod_proteo_ptrs);
 
   double compNonPtmCandNum(SemiAlignTypePtr type_ptr, int shift_num, 
                            double ori_mass, double ori_tolerance);
@@ -75,6 +67,18 @@ class CountTestNum {
 };
 
 typedef std::shared_ptr<CountTestNum> CountTestNumPtr;
+
+void updateNTermResidueCounts(ResiduePtrVec &residue_list, 
+                              std::vector<double> &counts,
+                              const ProteoformPtrVec &mod_proteo_ptrs);
+
+
+void updateResidueCounts(const ResiduePtrVec &residue_list, 
+                         std::vector<double> &counts,
+                         ProteoformPtr prot_ptr);
+
+ResFreqPtrVec compResidueFreq(const ResiduePtrVec &residue_list, 
+                              const std::vector<double> &counts);
 
 }
 

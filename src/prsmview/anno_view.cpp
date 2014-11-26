@@ -1,4 +1,5 @@
 
+#include "base/fasta_reader.hpp"
 #include "spec/peak.hpp"
 #include "prsmview/anno_residue.hpp"
 #include "prsmview/anno_unexpected_change.hpp"
@@ -311,6 +312,8 @@ xercesc::DOMElement* proteoformToXml(XmlDOMDocument* xml_doc, const PrsmPtrVec &
   xml_doc->addElement(proteoform_element, "sequence_id", str.c_str());
   str=prsm_ptrs[0]->getProteoformPtr()->getSeqName();
   xml_doc->addElement(proteoform_element, "sequence_name", str.c_str());
+  str=prsm_ptrs[0]->getProteoformPtr()->getSeqDesc();
+  xml_doc->addElement(proteoform_element, "sequence_description", str.c_str());
   str=convertToString(prsm_ptrs[0]->getProteoformPtr()->getSpeciesId());
   xml_doc->addElement(proteoform_element, "proteoform_id", str.c_str());
   int count = prsm_ptrs.size();
@@ -332,6 +335,8 @@ xercesc::DOMElement* proteinToXml(XmlDOMDocument* xml_doc,
   xml_doc->addElement(prot_element, "sequence_id", str.c_str());
   str=proteo_ptr->getSeqName();
   xml_doc->addElement(prot_element, "sequence_name", str.c_str());
+  str=prsm_ptrs[0]->getProteoformPtr()->getSeqDesc();
+  xml_doc->addElement(prot_element, "sequence_description", str.c_str());
   int count = species_ids.size();
   str=convertToString(count);
   xml_doc->addElement(prot_element, "compatible_proteoform_number", str.c_str());
@@ -364,25 +369,23 @@ inline bool evalueCompare(const std::pair<ProteoformPtr, double> &a, const std::
 
 xercesc::DOMElement* allProteinToXml(XmlDOMDocument* xml_doc,
                                   const PrsmPtrVec &prsm_ptrs,
-                                  const ProteoformPtrVec &proteo_ptrs,
                                   PrsmViewMngPtr mng_ptr){
   xercesc::DOMElement* prot_elements = xml_doc->createElement("proteins");
   // sort 
+  FastaReader reader(mng_ptr->prsm_para_ptr_->getSearchDbFileName());
+  ResiduePtrVec residue_ptr_vec = mng_ptr->prsm_para_ptr_->getFixModResiduePtrVec();
+  ProteoformPtr proteo_ptr = reader.getNextProteoformPtr(residue_ptr_vec);
   std::vector<std::pair<ProteoformPtr, double>> proteo_evalues;
-  for(size_t i=0;i<proteo_ptrs.size();i++){
-    PrsmPtr best_ptr = getBestEValuePrsmPtr (proteo_ptrs[i], prsm_ptrs);
+
+  while (proteo_ptr != nullptr) {
+    PrsmPtr best_ptr = getBestEValuePrsmPtr (proteo_ptr, prsm_ptrs);
     if (best_ptr != nullptr) {
-      std::pair<ProteoformPtr, double> cur_proteo_evalue(proteo_ptrs[i], best_ptr->getEValue());
+      std::pair<ProteoformPtr, double> cur_proteo_evalue(proteo_ptr, best_ptr->getEValue());
       proteo_evalues.push_back(cur_proteo_evalue);
     }
+    proteo_ptr = reader.getNextProteoformPtr(residue_ptr_vec);
   }
   std::sort(proteo_evalues.begin(), proteo_evalues.end(), evalueCompare);
-  /*
-  for (size_t i = 0; i < proteo_evalues.size(); i++) {
-    LOG_DEBUG("rank " << i << " evalue " << proteo_evalues[i].second);
-  }
-  */
-
   
   for(size_t i=0;i<proteo_evalues.size();i++){
     std::vector<int> species_ids = getSpeciesIds(prsm_ptrs,proteo_evalues[i].first->getDbResSeqPtr()->getId());

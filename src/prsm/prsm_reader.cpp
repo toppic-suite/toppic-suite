@@ -17,6 +17,7 @@ std::vector<std::string> PrsmReader::readOnePrsmLines() {
   std::vector<std::string> line_list;
   while (std::getline(input_, line)) {
     line = trim(line);
+    //LOG_DEBUG("line " << line);
     if (line ==  "<prsm>") {
       line_list.push_back(line);
     }
@@ -48,6 +49,7 @@ PrsmStrPtr PrsmReader::readOnePrsmStr() {
 
 PrsmPtr PrsmReader::readOnePrsm(faidx_t *fai, const ResiduePtrVec &residue_ptr_vec) {
   std::vector<std::string> prsm_str_vec = readOnePrsmLines();
+  //LOG_DEBUG("prsm str vec size " << prsm_str_vec.size());
   if (prsm_str_vec.size() == 0) {
     return PrsmPtr(nullptr);
   }
@@ -55,6 +57,7 @@ PrsmPtr PrsmReader::readOnePrsm(faidx_t *fai, const ResiduePtrVec &residue_ptr_v
   for (size_t i = 0; i < prsm_str_vec.size(); i++) {
     prsm_str += prsm_str_vec[i];
   }
+  //LOG_DEBUG("prsm str " << prsm_str);
   xercesc::MemBufInputSource prsm_buf(
       (const XMLByte*)prsm_str.c_str(), prsm_str.size(), "prsm_str (in memory)");
 
