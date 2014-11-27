@@ -15,7 +15,7 @@ FastaSeq::FastaSeq(const std::string &name_line, const std::string &ori_seq) {
 }
 
 /** process fasta string and remove unknown letters */
-std::string FastaSeq::rmChar(const std::string &ori_seq) {
+std::string rmChar(const std::string &ori_seq) {
   std::string seq = "";
   for (size_t i = 0; i < ori_seq.length(); i++) {
     char c = ori_seq.at(i);
@@ -123,8 +123,9 @@ ProteoformPtr readFastaToProteoform(faidx_t *fai,
   if ( seq_len < 0 ) {
     LOG_ERROR("Failed to fetch sequence " << seq_name);
   }
-  std::string seq_str(seq);
+  std::string raw_seq_str(seq);
   free(seq);
+  std::string seq_str = rmChar(raw_seq_str);
   //LOG_DEBUG("Seq name " << seq_name << " Seq: " << seq_str);
   AcidPtrVec acid_seq = AcidFactory::convertSeqToAcidSeq(seq_str); 
   ResiduePtrVec residue_ptrs = convertAcidToResidueSeq(residue_list, acid_seq);
