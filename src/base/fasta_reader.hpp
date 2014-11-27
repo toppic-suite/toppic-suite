@@ -34,9 +34,8 @@ class FastaSeq {
   std::string name_;
   std::string desc_;
   std::string seq_;
-  /* remove incorrect charaters in sequence */
-  std::string rmChar(const std::string &ori_seq);
 }; 
+
 
 typedef std::shared_ptr<FastaSeq> FastaSeqPtr;
 
@@ -62,6 +61,9 @@ class FastaReader {
   std::string ori_name_;
   int seq_id_ = 0;
 };
+
+/* remove incorrect charaters in sequence */
+std::string rmChar(const std::string &ori_seq);
 
 
 ProteoformPtrVec readFastaToProteoform(const std::string &file_name, 
