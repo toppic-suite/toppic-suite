@@ -24,7 +24,8 @@ void Argument::initArguments() {
   arguments_["maxPtmMass"] = "1000000";
   arguments_["executiveDir"] = ".";
   arguments_["logFileName"] = "";
-  arguments_["keepTempFiles"] = "";
+  arguments_["keepTempFiles"] = "false";
+  arguments_["fullBinaryPath"] = "false";
 }
 
 void Argument::showUsage(boost::program_options::options_description &desc) {
@@ -115,6 +116,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("cutoff-value,v", po::value<std::string> (&cutoff_value), "<positive double value>. Cutoff value for reporting protein-spectrum-matches. Default value: 0.01.")
         ("log-file-name,l", po::value<std::string>(&log_file_name), "Log file name with its path.")
         ("keep-temp-files,k", "Keep temporary files.")
+        ("full-binary-path,b", "Full binary path.")
         ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name with its path.")
         ("spectrum-file-name", po::value<std::string>(&spectrum_file_name)->required(), "Spectrum file name with its path.");
         
@@ -146,8 +148,12 @@ bool Argument::parse(int argc, char* argv[]) {
       return false;
     }
     std::string argv_0 (argv[0]);
-    //arguments_["executiveDir"] = getExecutiveDir(argv_0);
-    arguments_["executiveDir"] = "/N/u/xwliu/BigRed2/toppic";
+    if (vm.count("full-binary-path")) {
+      arguments_["executiveDir"] = argv[0];
+    }
+    else {
+      arguments_["executiveDir"] = getExecutiveDir(argv_0);
+    }
     LOG_DEBUG("Executive Dir " << arguments_["ExecutiveDir"]);
     if (vm.count("argument-file")) {
       setArgumentsByConfigFile(argument_file_name);
@@ -189,6 +195,9 @@ bool Argument::parse(int argc, char* argv[]) {
     }
     if (vm.count("keep-temp-files")) {
       arguments_["keepTempFiles"] = "true";
+    }
+    if (vm.count("full-binary-path")) {
+      arguments_["fullBinaryPath"] = "true";
     }
   }
   catch(std::exception&e ) {
