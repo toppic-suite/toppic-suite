@@ -146,7 +146,9 @@ bool Argument::parse(int argc, char* argv[]) {
       return false;
     }
     std::string argv_0 (argv[0]);
-    arguments_["executiveDir"] = getExecutiveDir(argv_0);
+    //arguments_["executiveDir"] = getExecutiveDir(argv_0);
+    arguments_["executiveDir"] = "/N/u/xwliu/BigRed2/toppic";
+    LOG_DEBUG("Executive Dir " << arguments_["ExecutiveDir"]);
     if (vm.count("argument-file")) {
       setArgumentsByConfigFile(argument_file_name);
     }
