@@ -11,7 +11,8 @@ namespace prot {
 
 class ZeroPtmSlowMatch {
  public:
-  ZeroPtmSlowMatch(DeconvMsPtr deconv_ms_ptr, ZpFastMatchPtr fast_match_ptr,
+  ZeroPtmSlowMatch(DeconvMsPtrVec deconv_ms_ptr_vec, 
+                   ZpFastMatchPtr fast_match_ptr,
                    ZeroPtmMngPtr mng_ptr);
 
   double getScore() {return score_;}
@@ -21,11 +22,11 @@ class ZeroPtmSlowMatch {
  private:
   ZeroPtmMngPtr mng_ptr_;
   ZpFastMatchPtr fast_match_ptr_;
-  DeconvMsPtr deconv_ms_ptr_;
+  DeconvMsPtrVec deconv_ms_ptr_vec_;
   ProteoformPtr proteoform_ptr_;
 
   double refine_prec_mass_;
-  ExtendMsPtr refine_ms_ptr_;
+  ExtendMsPtrVec refine_ms_ptr_vec_;
 
   double score_ = 0;
   double recal_ = 0;

@@ -27,6 +27,7 @@ void Argument::initArguments() {
   arguments_["keepTempFiles"] = "false";
   arguments_["fullBinaryPath"] = "false";
   arguments_["useTable"] = "true";
+  arguments_["groupSpectrumNumber"] = "1";
 }
 
 void Argument::showUsage(boost::program_options::options_description &desc) {

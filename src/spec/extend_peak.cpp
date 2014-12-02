@@ -32,9 +32,9 @@ void ExtendPeak::appendXml(XmlDOMDocument* xml_doc,
 }
 
 
-ExtendMsPtr createMsThreePtr(DeconvMsPtr deconv_ms_ptr, double delta, 
-                             SpParaPtr sp_para_ptr) {
-  MsHeaderPtr header_ptr = getDeltaHeaderPtr(deconv_ms_ptr, delta);
+ExtendMsPtr createMsThreePtr(DeconvMsPtr deconv_ms_ptr, SpParaPtr sp_para_ptr, 
+                             double new_prec_mass) {
+  MsHeaderPtr header_ptr = getHeaderPtr(deconv_ms_ptr, new_prec_mass);
 
   ExtendPeakPtrVec list;
   double ext_min_mass = sp_para_ptr->getExtendMinMass();
@@ -108,6 +108,16 @@ std::pair<std::vector<int>, std::vector<int>> getExtendIntMassErrorList(
   }
   std::pair<std::vector<int>, std::vector<int>> results( masses, errors);
   return results;
+}
+
+ExtendMsPtrVec createMsThreePtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, 
+                                   SpParaPtr sp_para_ptr, double new_prec_mass) {
+  ExtendMsPtrVec extend_ms_ptr_vec;
+  for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
+    extend_ms_ptr_vec.push_back(
+        createMsThreePtr(deconv_ms_ptr_vec[i], sp_para_ptr, new_prec_mass));
+  }
+  return extend_ms_ptr_vec;
 }
 
 } /* namespace prot */
