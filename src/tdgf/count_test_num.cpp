@@ -132,15 +132,6 @@ void CountTestNum::init(PrsmParaPtr para_ptr) {
   ProtModPtrVec prot_mods = para_ptr->getAllowProtModPtrVec();
   ProteoformPtr proteo_ptr = reader.getNextProteoformPtr(residue_list);
   
-  ProteoformPtrVec raw_proteo_ptrs 
-      = readFastaToProteoform(para_ptr->getSearchDbFileName(), 
-                              para_ptr->getFixModResiduePtrVec());
-
-  ResFreqPtrVec residue_freqs 
-      = compResidueFreq(para_ptr->getFixModResiduePtrVec(), raw_proteo_ptrs); 
-  
-  residue_avg_len_ = computeAvgLength(residue_freqs, convert_ratio_);
-  
   while (proteo_ptr != nullptr) {
     ProteoformPtrVec mod_proteo_ptrs = generateProtModProteoform(proteo_ptr, prot_mods);
     for (size_t i = 0; i < mod_proteo_ptrs.size(); i++) {
