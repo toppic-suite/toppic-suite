@@ -122,6 +122,7 @@ void CountTestNum::init(PrsmParaPtr para_ptr) {
   suff_mass_cnts_ = new double[max_sp_len_]();
 
   ResiduePtrVec residue_list = para_ptr->getFixModResiduePtrVec();
+  
   std::vector<double> residue_counts(residue_list.size(), 0.0);
 
   ResiduePtrVec n_term_residue_list;
@@ -165,6 +166,9 @@ void CountTestNum::init(PrsmParaPtr para_ptr) {
   }
   // compute residue freq;
   residue_ptrs_ =  compResidueFreq(residue_list, residue_counts);
+
+  // compute residue average length
+  residue_avg_len_ = computeAvgLength(residue_ptrs_, convert_ratio_);
 
   // compute n term residue freq;
   prot_n_term_residue_ptrs_ =  compResidueFreq(n_term_residue_list, n_term_residue_counts);
@@ -332,6 +336,16 @@ double CountTestNum::compMassNum(double *cnts, int low, int high) {
     cnt += cnts[i];
   }
   return cnt;
+}
+
+int computeAvgLength(const ResFreqPtrVec &residue_ptrs, double convert_ratio) {
+  double mass_sum = 0;
+  double freq_sum = 0;
+  for (size_t i = 0; i < residue_ptrs.size(); i++) {
+    freq_sum = freq_sum + residue_ptrs[i]->getFreq();
+    mass_sum = mass_sum + residue_ptrs[i]->getFreq() * residue_ptrs[i]->getMass();
+  }
+  return (int)std::round(mass_sum/freq_sum * convert_ratio);
 }
 
 }
