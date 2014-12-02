@@ -35,7 +35,7 @@ inline bool compareZeroPtmFastMatchDown(const ZpFastMatchPtr &a,
 }
 
 ZpFastMatchPtrVec zeroPtmFastFilter(SemiAlignTypePtr semi_align_type_ptr,
-                                    ExtendMsPtr ms_ptr,
+                                    const ExtendMsPtrVec &ms_ptr_ptr,
                                     const ProteoformPtrVec &proteo_ptrs,
                                     int report_num);
 

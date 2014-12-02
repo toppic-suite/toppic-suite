@@ -4,9 +4,11 @@
 
 namespace prot {
 
-MsAlignReader::MsAlignReader (const std::string &file_name) {
+MsAlignReader::MsAlignReader (const std::string &file_name, 
+                              int group_spec_num) {
   file_name_ = file_name;
   input_.open(file_name.c_str(), std::ios::in);
+  group_spec_num_ = group_spec_num;
 }
 
 std::vector<std::string> MsAlignReader::readOneSpectrum() {
@@ -139,13 +141,34 @@ DeconvMsPtr MsAlignReader::getNextMs() {
   readNext();
   return deconv_ms_ptr_;
 }
+
+SpectrumSetPtr MsAlignReader::getNextSpectrumSet(SpParaPtr sp_para_ptr) {
+  DeconvMsPtrVec deconv_ms_ptr_vec; 
+  for (int i = 0; i < group_spec_num_; i++) {
+    readNext();
+    if (deconv_ms_ptr_ == nullptr) {
+      return SpectrumSetPtr(nullptr);
+    }
+    deconv_ms_ptr_vec.push_back(deconv_ms_ptr_);
+  }
+  int prec_mono_mass = deconv_ms_ptr_vec[0]->getHeaderPtr()->getPrecMonoMass();
+  int count = 1;
+  for (int i = 1; i < group_spec_num_; i++) {
+    double new_mass = deconv_ms_ptr_vec[i]->getHeaderPtr()->getPrecMonoMass();
+    if (std::abs(prec_mono_mass - new_mass) < 0.5) {
+      prec_mono_mass = (prec_mono_mass * count + new_mass)/ (count+1);
+      count++;
+    }
+  }
+  return SpectrumSetPtr(new SpectrumSet(deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass));
+}
     
 void MsAlignReader::close() {
   input_.close();
 }
 
 int countSpNum(const std::string &spectrum_file_name) {
-  MsAlignReader reader(spectrum_file_name);
+  MsAlignReader reader(spectrum_file_name, 1);
   int cnt = 0;
   DeconvMsPtr deconv_ms_ptr;
   while ((deconv_ms_ptr = reader.getNextMs()) != nullptr) {

@@ -15,7 +15,7 @@ DeconvMsPtr  getRefineMs(DeconvMsPtr deconv_ms_ptr, double calibration,
 
 MsHeaderPtr getHeaderPtr(DeconvMsPtr deconv_ms_ptr, double new_prec_mass);
     
-MsHeaderPtr getDeltaHeaderPtr(DeconvMsPtr deconv_ms_ptr, double delta);
+//MsHeaderPtr getDeltaHeaderPtr(DeconvMsPtr deconv_ms_ptr, double delta);
 
 }
 

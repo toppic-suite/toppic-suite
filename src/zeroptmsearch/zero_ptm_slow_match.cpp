@@ -7,11 +7,11 @@
 
 namespace prot {
 
-ZeroPtmSlowMatch::ZeroPtmSlowMatch(DeconvMsPtr deconv_ms_ptr, 
+ZeroPtmSlowMatch::ZeroPtmSlowMatch(DeconvMsPtrVec deconv_ms_ptr_vec, 
                                    ZpFastMatchPtr fast_match_ptr,
                                    ZeroPtmMngPtr mng_ptr) {
   mng_ptr_ = mng_ptr;
-  deconv_ms_ptr_ = deconv_ms_ptr;
+  deconv_ms_ptr_vec_ = deconv_ms_ptr_vec;
   fast_match_ptr_ = fast_match_ptr;
 
   proteoform_ptr_ = getSubProteoform(fast_match_ptr->getProteoformPtr(), 
@@ -20,8 +20,7 @@ ZeroPtmSlowMatch::ZeroPtmSlowMatch(DeconvMsPtr deconv_ms_ptr,
 
   SpParaPtr sp_para_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr();
   refine_prec_mass_ = proteoform_ptr_->getResSeqPtr()->getSeqMass();
-  double delta = refine_prec_mass_ - deconv_ms_ptr->getHeaderPtr()->getPrecMonoMass();
-  refine_ms_ptr_ = createMsThreePtr(deconv_ms_ptr_, delta, sp_para_ptr);
+  refine_ms_ptr_vec_ = createMsThreePtr(deconv_ms_ptr_vec_, sp_para_ptr, refine_prec_mass);
 
   ActivationPtr activation_ptr = deconv_ms_ptr_->getHeaderPtr()->getActivationPtr();
   double min_mass = sp_para_ptr->getMinMass();

@@ -11,6 +11,8 @@ PrsmPara::PrsmPara(std::map<std::string, std::string> &arguments) {
   errorTolerance_=std::stoi(arguments["errorTolerance"]);
 
 
+  group_spec_num_ = std::stoi(arguments["groupSpectrumNumber"]);
+
   fix_mod_residue_list_ = FixResidueFactory::getFixResiduePtrVec(arguments["cysteineProtection"]);
 
   std::string prot_mod_str = arguments["allowProtMod"];
@@ -25,7 +27,7 @@ PrsmPara::PrsmPara(std::map<std::string, std::string> &arguments) {
   ActivationPtr activation_ptr 
       = ActivationFactory::getBaseActivationPtrByName(activation_name);
 
-  double ppo = atoi(arguments["errorTolerance"].c_str())*0.000001;
+  double ppo = std::stod(arguments["errorTolerance"])*0.000001;
   bool use_min_tolerance = true;
   double min_tolerance = 0.01;
   PeakTolerancePtr peak_tolerance_ptr = PeakTolerancePtr(

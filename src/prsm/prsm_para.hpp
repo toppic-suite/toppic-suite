@@ -20,6 +20,7 @@ class PrsmPara {
   std::string getLogFileName() {return log_file_name_;}
   std::string getExeDir(){return exe_dir_;}
   int getErrorTolerance(){return errorTolerance_;}
+  int getGroupSpecNum() {return group_spec_num_;}
   const ResiduePtrVec& getFixModResiduePtrVec() {return fix_mod_residue_list_;}
   const ProtModPtrVec& getAllowProtModPtrVec() {return allow_prot_mod_list_;}
   SpParaPtr getSpParaPtr() {return sp_para_ptr_;}
@@ -33,6 +34,8 @@ class PrsmPara {
 
   ResiduePtrVec fix_mod_residue_list_;
   ProtModPtrVec allow_prot_mod_list_;
+
+  int group_spec_num_;
 
   /** spectrum parameters */
   SpParaPtr sp_para_ptr_;

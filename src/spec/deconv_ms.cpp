@@ -31,7 +31,8 @@ MsHeaderPtr getHeaderPtr(DeconvMsPtr deconv_ms_ptr, double new_prec_mass) {
   return new_header_ptr;
 }
     
-MsHeaderPtr getDeltaHeaderPtr(DeconvMsPtr deconv_ms_ptr, double delta) {
+/*
+MsHeaderPtr getPrecHeaderPtr(DeconvMsPtr deconv_ms_ptr, double delta) {
   MsHeaderPtr header_ptr = deconv_ms_ptr->getHeaderPtr();
   MsHeaderPtr new_header_ptr(new MsHeader(*header_ptr.get()));
   double mono_mz = header_ptr->getPrecMonoMz() + delta
@@ -39,5 +40,6 @@ MsHeaderPtr getDeltaHeaderPtr(DeconvMsPtr deconv_ms_ptr, double delta) {
   new_header_ptr->setPrecMonoMz(mono_mz);
   return new_header_ptr;
 }
+*/
 
 }
