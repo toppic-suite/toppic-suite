@@ -35,7 +35,9 @@ CompPValueArray::CompPValueArray(CountTestNumPtr test_num_ptr,
   prot_n_term_residue_ptrs_ = test_num_ptr->getNTermResFreqPtrVec();
   comp_prob_ptr_ = CompProbValuePtr(
       new CompProbValue(mng_ptr_->convert_ratio_,
-                        residue_ptrs_, mng_ptr_->unexpected_shift_num_ + 1, 
+                        residue_ptrs_, 
+                        test_num_ptr->getResidueAvgLen(),
+                        mng_ptr_->unexpected_shift_num_ + 1, 
                         mng_ptr_->max_table_height_, 
                         mng_ptr_->max_prec_mass_));
   LOG_DEBUG("comp prob value initialized")

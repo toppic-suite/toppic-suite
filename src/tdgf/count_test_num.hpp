@@ -25,6 +25,7 @@ class CountTestNum {
 
   ResFreqPtrVec getResFreqPtrVec() {return residue_ptrs_;}
   ResFreqPtrVec getNTermResFreqPtrVec() {return prot_n_term_residue_ptrs_;}
+  double getResidueAvgLen() {return residue_avg_len_;}
 
  private:
   static double PREFIX_SUFFIX_ADJUST() {return 0.693;}
@@ -79,6 +80,8 @@ void updateResidueCounts(const ResiduePtrVec &residue_list,
 
 ResFreqPtrVec compResidueFreq(const ResiduePtrVec &residue_list, 
                               const std::vector<double> &counts);
+
+int computeAvgLength(const ResFreqPtrVec &residue_ptrs, double convert_ratio);
 
 }
 

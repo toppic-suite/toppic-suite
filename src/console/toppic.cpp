@@ -75,6 +75,7 @@ int process(int argc, char* argv[]) {
     LOG_DEBUG("block size " << arguments["databaseBlockSize"]);
     int db_block_size = std::stoi(arguments["databaseBlockSize"]);
 
+    /*
     dbPreprocess (ori_db_file_name, db_file_name, decoy, db_block_size);
     generateSpIndex(sp_file_name);
     
@@ -112,6 +113,7 @@ int process(int argc, char* argv[]) {
     simple_combine_ptr->process();
     simple_combine_ptr = nullptr;
     std::cout << "Combining simple PRSMs finished." << std::endl;
+    */
 
     std::cout << "PTM search started." << std::endl;
     PtmMngPtr ptm_mng_ptr = PtmMngPtr(new PtmMng(prsm_para_ptr, n_top, shift_num,
