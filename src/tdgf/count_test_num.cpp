@@ -130,6 +130,16 @@ void CountTestNum::init(PrsmParaPtr para_ptr) {
   FastaReader reader(db_file_name);
   ProtModPtrVec prot_mods = para_ptr->getAllowProtModPtrVec();
   ProteoformPtr proteo_ptr = reader.getNextProteoformPtr(residue_list);
+  
+  ProteoformPtrVec raw_proteo_ptrs 
+      = readFastaToProteoform(para_ptr->getSearchDbFileName(), 
+                              para_ptr->getFixModResiduePtrVec());
+
+  ResFreqPtrVec residue_freqs 
+      = compResidueFreq(para_ptr->getFixModResiduePtrVec(), raw_proteo_ptrs); 
+  
+  residue_avg_len_ = computeAvgLength(residue_freqs, convert_ratio_);
+  
   while (proteo_ptr != nullptr) {
     ProteoformPtrVec mod_proteo_ptrs = generateProtModProteoform(proteo_ptr, prot_mods);
     for (size_t i = 0; i < mod_proteo_ptrs.size(); i++) {
@@ -223,6 +233,7 @@ inline void CountTestNum::initInternalMassCnt() {
   // middle
   double norm_count = 0;
   // use approxiation to speed up
+  LOG_DEBUG("residue_avg_len_ " << residue_avg_len_);
   for (int i = max_sp_len_ - 1; i >= 0; i--) {
     norm_count += suff_mass_cnts_[i];
     internal_mass_cnts_[i] = norm_count/ residue_avg_len_;
@@ -265,11 +276,11 @@ double CountTestNum::compNonPtmCandNum(SemiAlignTypePtr type_ptr, int shift_num,
   int low = std::floor((ori_mass - ori_tolerance) * convert_ratio_);
   int high = std::ceil((ori_mass + ori_tolerance) * convert_ratio_);
   double cand_num = compSeqNum(type_ptr, low, high);
-  /*
-  if (type_ptr == SemiAlignTypeFactory::getCompletePtr()) {
+  
+  //if (type_ptr == SemiAlignTypeFactory::getCompletePtr()) {
     LOG_DEBUG("low " << low << " high " << high << " cand num " << cand_num);
-  }
-  */
+  //}
+  
   return cand_num;
 }
 
@@ -312,6 +323,7 @@ double CountTestNum::compSeqNum(SemiAlignTypePtr type_ptr, int low, int high) {
   } else if (type_ptr == SemiAlignTypeFactory::getSuffixPtr()) {
     candNum = compMassNum(suff_mass_cnts_, low, high);
   } else if (type_ptr == SemiAlignTypeFactory::getInternalPtr()) {
+	LOG_DEBUG("internal_mass_cnts_ " << internal_mass_cnts_[low]);
     candNum = compMassNum(internal_mass_cnts_, low, high);
   }
   return candNum;
