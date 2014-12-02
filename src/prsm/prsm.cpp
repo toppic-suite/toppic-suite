@@ -94,6 +94,7 @@ void Prsm::parseXml(xercesc::DOMElement *element) {
   spectrum_scan_=getChildValue(element, "spectrum_scan", 0);
   precursor_id_=getIntChildValue(element, "precursor_id", 0);
   ori_prec_mass_=getDoubleChildValue(element, "ori_prec_mass", 0);
+  //LOG_DEBUG("reade original precursor mass " << ori_prec_mass_);
   adjusted_prec_mass_=getDoubleChildValue(element, "adjusted_prec_mass", 0);
   calibration_=getDoubleChildValue(element, "calibration", 0);
   fdr_=getDoubleChildValue(element, "fdr", 0);

@@ -77,8 +77,7 @@ int process(int argc, char* argv[]) {
 
     dbPreprocess (ori_db_file_name, db_file_name, decoy, db_block_size);
     generateSpIndex(sp_file_name);
-
-
+    
     std::cout << "Zero PTM search started." << std::endl;
     ZeroPtmMngPtr zero_mng_ptr = ZeroPtmMngPtr(new ZeroPtmMng (prsm_para_ptr, "ZERO"));
     zeroPtmSearchProcess(zero_mng_ptr);
@@ -102,11 +101,12 @@ int process(int argc, char* argv[]) {
 
     std::cout << "Combining simple PRSMs started." << std::endl;
     std::vector<std::string> simple_input_exts;
-    simple_input_exts.push_back("DIAG_FILETER");
+    simple_input_exts.push_back("DIAG_FILTER");
     simple_input_exts.push_back("ONE_PTM_FILTER");
     int top_num = diag_filter_mng_ptr->ptm_fast_filter_result_num_ 
         + one_ptm_filter_mng_ptr->one_ptm_filter_result_num_;
 
+    LOG_DEBUG("top number " << top_num);
     SimplePrsmStrCombinePtr simple_combine_ptr(
         new SimplePrsmStrCombine(sp_file_name, simple_input_exts, "FILTER", top_num));
     simple_combine_ptr->process();
@@ -225,7 +225,7 @@ int process(int argc, char* argv[]) {
 }
 
 int main(int argc, char* argv[]) {
-  //prot::log_level = 2;
+  prot::log_level = 2;
   return prot::process(argc, argv);
 }
 
