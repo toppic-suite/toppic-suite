@@ -1,3 +1,4 @@
+#include <iomanip>
 
 #include "base/file_util.hpp"
 #include "spec/msalign_reader.hpp"
@@ -76,7 +77,9 @@ void TableWriter::write(){
 
 void TableWriter::writeSelectedPrsms(std::ofstream &file, PrsmPtrVec &prsm_ptrs, 
                                      DeconvMsPtr ms_ptr) {
+  file << std::setprecision(10);
   for(size_t i=0;i<prsm_ptrs.size();i++){
+    //LOG_DEBUG("prec mass " << prsm_ptrs[i]->getOriPrecMass());
     file << prsm_para_ptr_->getSpectrumFileName() << "\t"
         << prsm_ptrs[i]->getId() << "\t"
         << prsm_ptrs[i]->getSpectrumId()<< "\t"
@@ -88,7 +91,8 @@ void TableWriter::writeSelectedPrsms(std::ofstream &file, PrsmPtrVec &prsm_ptrs,
         << prsm_ptrs[i]->getAdjustedPrecMass() << "\t"
         << prsm_ptrs[i]->getProteoformPtr()->getDbResSeqPtr()->getId() << "\t"
         << prsm_ptrs[i]->getProteoformPtr()->getSpeciesId() << "\t"
-        << prsm_ptrs[i]->getProteoformPtr()->getDbResSeqPtr()->getName() << "\t"
+        << prsm_ptrs[i]->getProteoformPtr()->getDbResSeqPtr()->getName() << " "
+        << prsm_ptrs[i]->getProteoformPtr()->getDbResSeqPtr()->getDesc() << "\t"
         << prsm_ptrs[i]->getProteoformPtr()->getDbResSeqPtr()->getSeqMass() << "\t"
         << prsm_ptrs[i]->getProteoformPtr()->getStartPos() << "\t"
         << prsm_ptrs[i]->getProteoformPtr()->getEndPos() << "\t"
