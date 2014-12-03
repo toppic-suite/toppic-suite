@@ -146,13 +146,45 @@ void setTolerance(PrmPeakPtrVec &list, PeakTolerancePtr tole_ptr,
   }
 }
 
-PrmMsPtr createMsTwoPtr(DeconvMsPtr deconv_ms_ptr, double delta, 
-                        SpParaPtr sp_para_ptr){
+PrmMsPtrVec createMsTwoPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, 
+                              SpParaPtr sp_para_ptr,
+                              double prec_mono_mass){
+  PrmMsPtrVec prm_ms_ptr_vec;
+  for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
+    prm_ms_ptr_vec.push_back(createMsTwoPtr(deconv_ms_ptr_vec[i], sp_para_ptr,
+                                            prec_mono_mass));
+  }
+  return prm_ms_ptr_vec;
+}
 
-  MsHeaderPtr header_ptr = getDeltaHeaderPtr(deconv_ms_ptr, delta);
+PrmMsPtrVec createMsSixPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, 
+                              SpParaPtr sp_para_ptr,
+                              double prec_mono_mass){
+  PrmMsPtrVec prm_ms_ptr_vec;
+  for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
+    prm_ms_ptr_vec.push_back(createMsSixPtr(deconv_ms_ptr_vec[i], sp_para_ptr,
+                                            prec_mono_mass));
+  }
+  return prm_ms_ptr_vec;
+}
+
+PrmMsPtrVec createShiftMsSixPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, 
+                                   SpParaPtr sp_para_ptr, double prec_mono_mass, 
+                                   double shift) {
+  PrmMsPtrVec prm_ms_ptr_vec;
+  for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
+    prm_ms_ptr_vec.push_back(createShiftMsSixPtr(deconv_ms_ptr_vec[i], sp_para_ptr,
+                                                 prec_mono_mass, shift));
+  }
+  return prm_ms_ptr_vec;
+}
+
+PrmMsPtr createMsTwoPtr(DeconvMsPtr deconv_ms_ptr, SpParaPtr sp_para_ptr,
+                        double prec_mono_mass){
+
+  MsHeaderPtr header_ptr = getHeaderPtr(deconv_ms_ptr, prec_mono_mass);
 
   //getSpTwoPrmPeak
-  double prec_mono_mass = header_ptr->getPrecMonoMass();
   ActivationPtr active_type_ptr = header_ptr->getActivationPtr();
   PrmPeakPtrVec list;
   for(size_t i = 0;i<deconv_ms_ptr->size();i++){
@@ -171,11 +203,11 @@ PrmMsPtr createMsTwoPtr(DeconvMsPtr deconv_ms_ptr, double delta,
   return PrmMsPtr(new Ms<PrmPeakPtr>(header_ptr,list_filtered, ppo)) ;
 }
 
-PrmMsPtr createMsSixPtr(DeconvMsPtr deconv_ms_ptr,double delta, SpParaPtr sp_para_ptr){
+PrmMsPtr createMsSixPtr(DeconvMsPtr deconv_ms_ptr, SpParaPtr sp_para_ptr,
+                        double prec_mono_mass){
 
-  MsHeaderPtr header_ptr = getDeltaHeaderPtr(deconv_ms_ptr, delta);
+  MsHeaderPtr header_ptr = getHeaderPtr(deconv_ms_ptr, prec_mono_mass);
   //getSpSixPrmPeak
-  double prec_mono_mass = header_ptr->getPrecMonoMass();
   ActivationPtr active_type_ptr = header_ptr->getActivationPtr();
   double extend_min_mass = sp_para_ptr->getExtendMinMass();
   PrmPeakPtrVec list;
@@ -206,9 +238,9 @@ PrmMsPtr createMsSixPtr(DeconvMsPtr deconv_ms_ptr,double delta, SpParaPtr sp_par
   return PrmMsPtr(new Ms<PrmPeakPtr>(header_ptr,list_filtered, ppo)) ;
 }
 
-PrmMsPtr createShiftMsSixPtr(DeconvMsPtr deconv_ms_ptr, double delta, double shift,
-                             SpParaPtr sp_para_ptr){
-  PrmMsPtr prm_ms_ptr = createMsSixPtr(deconv_ms_ptr,delta,sp_para_ptr);
+PrmMsPtr createShiftMsSixPtr(DeconvMsPtr deconv_ms_ptr, SpParaPtr sp_para_ptr, 
+                             double prec_mono_mass, double shift) {
+  PrmMsPtr prm_ms_ptr = createMsSixPtr(deconv_ms_ptr,sp_para_ptr, prec_mono_mass);
   MsHeaderPtr ori_header_ptr = prm_ms_ptr->getHeaderPtr();
   MsHeaderPtr header_ptr = MsHeaderPtr(new MsHeader(*ori_header_ptr.get()));
   double mono_mz = (header_ptr->getPrecMonoMass()+shift)

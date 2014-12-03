@@ -24,15 +24,13 @@ class SpectrumSet {
 
   DeconvMsPtrVec getDeconvMsPtrVec(){return deconv_ms_ptr_vec_;}
 
-  /*
-  PrmMsPtr getMsTwoPtr() {return prm_ms_two_ptr_;}
+  PrmMsPtrVec getMsTwoPtrVec() {return prm_ms_two_ptr_vec_;}
 
-  PrmMsPtr getMsSixPtr(){return prm_ms_six_ptr_;}
+  PrmMsPtrVec getMsSixPtrVec(){return prm_ms_six_ptr_vec_;}
 
-  PrmMsPtr getMsShiftSixPtr(double shift){
-    return createShiftMsSixPtr(deconv_ms_ptr_, delta_, -shift, sp_para_ptr_);
+  PrmMsPtrVec getMsShiftSixPtrVec(double shift){
+    return createShiftMsSixPtrVec(deconv_ms_ptr_vec_, sp_para_ptr_, prec_mono_mass_, -shift);
   }
-  */
 
 
  private:
@@ -41,10 +39,10 @@ class SpectrumSet {
   double prec_mono_mass_;
   bool filtered = false;
   ExtendMsPtrVec extend_ms_three_ptr_vec_;
+  PrmMsPtrVec prm_ms_two_ptr_vec_;
+  PrmMsPtrVec prm_ms_six_ptr_vec_;
 
   bool checkFiltration(SpParaPtr sp_para_ptr);
-  //PrmMsPtr prm_ms_two_ptr_;
-  //PrmMsPtr prm_ms_six_ptr_;
 };
 
 typedef std::shared_ptr<SpectrumSet> SpectrumSetPtr;

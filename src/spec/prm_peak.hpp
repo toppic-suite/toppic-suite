@@ -63,6 +63,7 @@ class PrmPeak : public Peak {
 typedef std::shared_ptr<PrmPeak> PrmPeakPtr;
 typedef std::vector<PrmPeakPtr> PrmPeakPtrVec;
 typedef std::shared_ptr<Ms<PrmPeakPtr>> PrmMsPtr;
+typedef std::vector<PrmMsPtr> PrmMsPtrVec;
 
 inline bool prmPeakUp(const PrmPeakPtr &a, const PrmPeakPtr &b){
   return a->getPosition() < b->getPosition();
@@ -74,6 +75,15 @@ PrmMsPtr createMsSixPtr(DeconvMsPtr deconv_ms_ptr, SpParaPtr sp_para_ptr, double
 
 PrmMsPtr createShiftMsSixPtr(DeconvMsPtr deconv_ms_ptr, SpParaPtr sp_para_ptr, double new_prec_mass, 
                              double shift);
+
+PrmMsPtrVec createMsTwoPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, SpParaPtr sp_para_ptr,
+                              double prec_mono_mass);
+
+PrmMsPtrVec createMsSixPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, SpParaPtr sp_para_ptr,
+                              double prec_mono_mass);
+
+PrmMsPtrVec createShiftMsSixPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, SpParaPtr sp_para_ptr, 
+                                   double prec_mono_mass, double shift);
 
 std::pair<std::vector<int>,std::vector<int>> getIntMassErrorList(PrmMsPtr prm_ms_ptr, double scale,
                                                                  bool n_strict, bool c_strict);
