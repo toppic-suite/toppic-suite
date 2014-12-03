@@ -25,9 +25,8 @@ void zeroPtmSearch(SpectrumSetPtr spec_set_ptr,
 
   //LOG_DEBUG("fast_match ended size " << fast_matches.size());
   DeconvMsPtrVec deconv_ms_vec = spec_set_ptr->getDeconvMsPtrVec();
-  /*
   ZpSlowMatchPtrVec slow_matches 
-      = zeroPtmSlowFilter(deconv_ms, fast_matches, mng_ptr); 
+      = zeroPtmSlowFilter(deconv_ms_vec, fast_matches, mng_ptr); 
 
   //LOG_DEBUG("slow_match ended size " << slow_matches.size());
   for (size_t i = 0; i < slow_matches.size(); i++) {
@@ -39,7 +38,6 @@ void zeroPtmSearch(SpectrumSetPtr spec_set_ptr,
   if (prsms.size() > 0) {
     prsms.erase(prsms.begin() + 1, prsms.end());
   }
-  */
 }
 
 void zeroPtmSearchProcessBlock(ZeroPtmMngPtr mng_ptr, DbBlockPtr block_ptr, 
@@ -80,13 +78,12 @@ void zeroPtmSearchProcessBlock(ZeroPtmMngPtr mng_ptr, DbBlockPtr block_ptr,
 
   //LOG_DEBUG("start reading");
   int n = 0;
-  SpectrumSetPtr ss_ptr = reader.getNextSpectrumSet(sp_para_ptr);
+  SpectrumSetPtr spec_set_ptr = reader.getNextSpectrumSet(sp_para_ptr);
   LOG_DEBUG("init ms_ptr");
   //double delta = 0;
-  while (ss_ptr != nullptr) {
+  while (spec_set_ptr != nullptr) {
     n = n + group_spec_num;
-    if (! ss_ptr->isFiltered()) {
-      /*
+    if (spec_set_ptr->isValid()) {
       PrsmPtrVec comp_prsms;
       zeroPtmSearch(spec_set_ptr, SemiAlignTypeFactory::getCompletePtr(), 
                     prot_mod_forms, mng_ptr, comp_prsms);
@@ -107,7 +104,6 @@ void zeroPtmSearchProcessBlock(ZeroPtmMngPtr mng_ptr, DbBlockPtr block_ptr,
                     raw_forms, mng_ptr, internal_prsms);
       internal_writer.writeVector(internal_prsms);
       all_writer.writeVector(internal_prsms);
-      */
 
       WebLog::percent_log( (double)block_ptr->getBlockIdx() / total_block_num * 0.03
               + (double) n / spectrum_num / total_block_num * 0.03);
@@ -115,7 +111,7 @@ void zeroPtmSearchProcessBlock(ZeroPtmMngPtr mng_ptr, DbBlockPtr block_ptr,
       std::cout << std::flush << "Zero PTM search is processing " << n << " of " 
           << spectrum_num << " spectra.\r";
     }
-    ss_ptr = reader.getNextSpectrumSet(sp_para_ptr);
+    spec_set_ptr = reader.getNextSpectrumSet(sp_para_ptr);
     //LOG_DEBUG("spectrum " << n);
   }
   std::cout << std::endl;

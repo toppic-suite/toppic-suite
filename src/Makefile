@@ -11,7 +11,7 @@ all:
 	cd base; make
 	cd spec; make
 	cd prsm; make
-#	cd zeroptmsearch; make
+	cd zeroptmsearch; make
 #	cd diagfilter; make
 #	cd oneptmfilter; make
 #	cd ptmsearch; make

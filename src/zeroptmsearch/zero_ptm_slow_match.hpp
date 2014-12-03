@@ -11,7 +11,7 @@ namespace prot {
 
 class ZeroPtmSlowMatch {
  public:
-  ZeroPtmSlowMatch(DeconvMsPtrVec deconv_ms_ptr_vec, 
+  ZeroPtmSlowMatch(const DeconvMsPtrVec &deconv_ms_ptr_vec, 
                    ZpFastMatchPtr fast_match_ptr,
                    ZeroPtmMngPtr mng_ptr);
 
@@ -29,11 +29,11 @@ class ZeroPtmSlowMatch {
   ExtendMsPtrVec refine_ms_ptr_vec_;
 
   double score_ = 0;
-  double recal_ = 0;
 
-  void compScore (ExtendMsPtr refine_ms_ptr, const TheoPeakPtrVec &theo_peak_ptrs, 
-                  double ppo);
-  bool isValid (double recal, double ppo);
+  void compScore (const ExtendMsPtrVec &refine_ms_ptr_vec);
+
+  //double recal_ = 0;
+  //bool isValid (double recal, double ppo);
 };
 
 typedef std::shared_ptr<ZeroPtmSlowMatch> ZpSlowMatchPtr;
@@ -44,7 +44,7 @@ inline bool compareZeroPtmSlowMatchDown(const ZpSlowMatchPtr &a,
   return a->getScore() > b->getScore();
 }
 
-ZpSlowMatchPtrVec zeroPtmSlowFilter(DeconvMsPtr deconv_ms_ptr,
+ZpSlowMatchPtrVec zeroPtmSlowFilter(const DeconvMsPtrVec &deconv_ms_ptr_vec,
                                     const ZpFastMatchPtrVec &fast_match_ptrs,
                                     ZeroPtmMngPtr mng_ptr); 
 
