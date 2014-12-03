@@ -17,7 +17,7 @@ namespace prot {
 class Prsm {
  public:
   Prsm(ProteoformPtr proteoform_ptr, DeconvMsPtr deconv_ms_ptr, 
-       double adjusted_prec_mass, double calibration, SpParaPtr sp_para_ptr);
+       double adjusted_prec_mass, SpParaPtr sp_para_ptr);
 
   Prsm(xercesc::DOMElement* element,ProteoformPtrVec proteoforms);
 
@@ -32,7 +32,7 @@ class Prsm {
 
   void setProteoformPtr(ProteoformPtr proteoform) {proteoform_ptr_=proteoform;}
 
-  double getCalibration() {return calibration_;}
+  //double getCalibration() {return calibration_;}
 
   DeconvMsPtr getDeconvMsPtr() {return deconv_ms_ptr_;}
 
@@ -101,7 +101,7 @@ class Prsm {
   /* adjusted precursor mass */
   double adjusted_prec_mass_;
   /* calibration */
-  double calibration_;
+  //double calibration_;
 
   /* protein sequence */
   ProteoformPtr proteoform_ptr_;

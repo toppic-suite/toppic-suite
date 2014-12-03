@@ -49,8 +49,8 @@ typedef std::vector<ExtendPeakPtr> ExtendPeakPtrVec;
 typedef std::shared_ptr<Ms<ExtendPeakPtr>> ExtendMsPtr;
 typedef std::vector<ExtendMsPtr> ExtendMsPtrVec;
 
-ExtendMsPtr createMsThreePtr(DeconvMsPtr deconv_ms_ptr, double delta, 
-                             SpParaPtr sp_para_ptr);
+ExtendMsPtr createMsThreePtr(DeconvMsPtr deconv_ms_ptr, SpParaPtr sp_para_ptr,
+                             double new_prec_mass);
 
 ExtendMsPtrVec createMsThreePtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, 
                                    SpParaPtr sp_para_ptr, double new_prec_mass);

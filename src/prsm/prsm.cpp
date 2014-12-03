@@ -8,8 +8,7 @@
 namespace prot {
 
 Prsm::Prsm(ProteoformPtr proteoform_ptr, DeconvMsPtr deconv_ms_ptr, 
-           double adjusted_prec_mass, double calibration, 
-           SpParaPtr sp_para_ptr) {
+           double adjusted_prec_mass, SpParaPtr sp_para_ptr) {
   proteoform_ptr_ = proteoform_ptr;
   deconv_ms_ptr_ = deconv_ms_ptr;
   MsHeaderPtr header_ptr = deconv_ms_ptr->getHeaderPtr();
@@ -18,14 +17,13 @@ Prsm::Prsm(ProteoformPtr proteoform_ptr, DeconvMsPtr deconv_ms_ptr,
   precursor_id_ = header_ptr->getPrecId();
   ori_prec_mass_ = header_ptr->getPrecMonoMass();
   adjusted_prec_mass_ = adjusted_prec_mass;
-  calibration_ = calibration;
+  //calibration_ = calibration;
   init(sp_para_ptr);
 }
 
 void Prsm::init(SpParaPtr sp_para_ptr) {
-  double delta = adjusted_prec_mass_ - ori_prec_mass_;
-  refine_ms_three_ = createMsThreePtr(deconv_ms_ptr_, delta, sp_para_ptr);
-  refine_ms_three_-> recalibrate(calibration_);
+  refine_ms_three_ = createMsThreePtr(deconv_ms_ptr_, sp_para_ptr, adjusted_prec_mass_);
+  //refine_ms_three_-> recalibrate(calibration_);
   initScores(sp_para_ptr);
 }
 

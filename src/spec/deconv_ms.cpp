@@ -8,15 +8,14 @@
 namespace prot {
 
 
-DeconvMsPtr getRefineMs(DeconvMsPtr deconv_ms_ptr, double calibration, 
-                        double new_prec_mass) {
+DeconvMsPtr getRefineMs(DeconvMsPtr deconv_ms_ptr, double new_prec_mass) {
   MsHeaderPtr header_ptr = getHeaderPtr(deconv_ms_ptr, new_prec_mass);
   std::vector<DeconvPeakPtr> peak_ptr_list;
   for (size_t i = 0; i < deconv_ms_ptr->size(); i++) {
     DeconvPeakPtr ori_peak_ptr = deconv_ms_ptr->getPeakPtr(i);
     // * is a dereference operator
     DeconvPeakPtr new_peak_ptr(new DeconvPeak(*ori_peak_ptr.get()));
-    new_peak_ptr->setPosition(new_peak_ptr->getPosition() * (1 + calibration));
+    //new_peak_ptr->setPosition(new_peak_ptr->getPosition() * (1 + calibration));
     peak_ptr_list.push_back(new_peak_ptr);
   }
   DeconvMsPtr ms_ptr(new Ms<DeconvPeakPtr>(header_ptr, peak_ptr_list));
