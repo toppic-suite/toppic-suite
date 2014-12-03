@@ -20,8 +20,8 @@ SpectrumSet::SpectrumSet(DeconvMsPtrVec deconv_ms_ptr_vec, SpParaPtr sp_para_ptr
     }
   }
   prec_mono_mass_ = prec_mono_mass;
-  filtered = checkFiltration(sp_para_ptr);
-  if (!filtered) {
+  valid_ = checkValid(sp_para_ptr);
+  if (valid_) {
     extend_ms_three_ptr_vec_ 
         = createMsThreePtrVec(deconv_ms_ptr_vec_, sp_para_ptr, prec_mono_mass);
     prm_ms_two_ptr_vec_ = createMsTwoPtrVec(deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass);
@@ -29,23 +29,23 @@ SpectrumSet::SpectrumSet(DeconvMsPtrVec deconv_ms_ptr_vec, SpParaPtr sp_para_ptr
   }
 }
 
-bool SpectrumSet::checkFiltration(SpParaPtr sp_para_ptr) {
+bool SpectrumSet::checkValid(SpParaPtr sp_para_ptr) {
   if (prec_mono_mass_ < sp_para_ptr->getMinMass()) {
-    return true;
+    return false;
   }
   int peak_num = 0;
   for (size_t i = 0; i < deconv_ms_ptr_vec_.size(); i++) {
     peak_num += deconv_ms_ptr_vec_[i]->size();
   }
   if(peak_num < sp_para_ptr->getMinPeakNum()){
-    return true;
+    return false;
   }
   for (size_t i = 0; i < deconv_ms_ptr_vec_.size(); i++) {
     if(deconv_ms_ptr_vec_[i]->getHeaderPtr()->getActivationPtr() == nullptr){
-      return true;
+      return false;
     }
   }
-  return false;
+  return true;
 }
 
 } /* namespace prot */

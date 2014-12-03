@@ -18,7 +18,7 @@ class SpectrumSet {
 
   double getPrecMonoMass() {return prec_mono_mass_;}
 
-  bool isFiltered() {return filtered;}
+  bool isValid() {return valid_;}
 
   ExtendMsPtrVec getMsThreePtrVec() {return extend_ms_three_ptr_vec_;}
 
@@ -37,12 +37,12 @@ class SpectrumSet {
   DeconvMsPtrVec deconv_ms_ptr_vec_;
   SpParaPtr sp_para_ptr_;
   double prec_mono_mass_;
-  bool filtered = false;
+  bool valid_ = true;
   ExtendMsPtrVec extend_ms_three_ptr_vec_;
   PrmMsPtrVec prm_ms_two_ptr_vec_;
   PrmMsPtrVec prm_ms_six_ptr_vec_;
 
-  bool checkFiltration(SpParaPtr sp_para_ptr);
+  bool checkValid(SpParaPtr sp_para_ptr);
 };
 
 typedef std::shared_ptr<SpectrumSet> SpectrumSetPtr;
