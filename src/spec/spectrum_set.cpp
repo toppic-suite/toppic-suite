@@ -24,8 +24,8 @@ SpectrumSet::SpectrumSet(DeconvMsPtrVec deconv_ms_ptr_vec, SpParaPtr sp_para_ptr
   if (!filtered) {
     extend_ms_three_ptr_vec_ 
         = createMsThreePtrVec(deconv_ms_ptr_vec_, sp_para_ptr, prec_mono_mass);
-  //prm_ms_two_ptr_ = createMsTwoPtr(deconv_ms_ptr, delta, sp_para_ptr);
-  //prm_ms_six_ptr_ = createMsSixPtr(deconv_ms_ptr,delta,sp_para_ptr);
+    prm_ms_two_ptr_vec_ = createMsTwoPtrVec(deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass);
+    prm_ms_six_ptr_vec_ = createMsSixPtrVec(deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass);
   }
 }
 
