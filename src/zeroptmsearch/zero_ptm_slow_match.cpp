@@ -20,7 +20,7 @@ ZeroPtmSlowMatch::ZeroPtmSlowMatch(DeconvMsPtrVec deconv_ms_ptr_vec,
 
   SpParaPtr sp_para_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr();
   refine_prec_mass_ = proteoform_ptr_->getResSeqPtr()->getSeqMass();
-  refine_ms_ptr_vec_ = createMsThreePtr(deconv_ms_ptr_vec_, sp_para_ptr, refine_prec_mass);
+  refine_ms_ptr_vec_ = createMsThreePtrVec(deconv_ms_ptr_vec_, sp_para_ptr, refine_prec_mass);
 
   ActivationPtr activation_ptr = deconv_ms_ptr_->getHeaderPtr()->getActivationPtr();
   double min_mass = sp_para_ptr->getMinMass();

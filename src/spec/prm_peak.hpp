@@ -68,12 +68,12 @@ inline bool prmPeakUp(const PrmPeakPtr &a, const PrmPeakPtr &b){
   return a->getPosition() < b->getPosition();
 }
 
-PrmMsPtr createMsTwoPtr(DeconvMsPtr deconv_ms_ptr, double delta, SpParaPtr sp_para_ptr);
+PrmMsPtr createMsTwoPtr(DeconvMsPtr deconv_ms_ptr, SpParaPtr sp_para_ptr, double new_prec_mass);
 
-PrmMsPtr createMsSixPtr(DeconvMsPtr deconv_ms_ptr, double delta, SpParaPtr sp_para_ptr); 
+PrmMsPtr createMsSixPtr(DeconvMsPtr deconv_ms_ptr, SpParaPtr sp_para_ptr, double new_prec_mass); 
 
-PrmMsPtr createShiftMsSixPtr(DeconvMsPtr deconv_ms_ptr, double delta, double shift, 
-                             SpParaPtr sp_para_ptr);
+PrmMsPtr createShiftMsSixPtr(DeconvMsPtr deconv_ms_ptr, SpParaPtr sp_para_ptr, double new_prec_mass, 
+                             double shift);
 
 std::pair<std::vector<int>,std::vector<int>> getIntMassErrorList(PrmMsPtr prm_ms_ptr, double scale,
                                                                  bool n_strict, bool c_strict);
