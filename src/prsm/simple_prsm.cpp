@@ -4,6 +4,7 @@
 
 #include "simple_prsm.hpp"
 #include "base/logger.hpp"
+#include "base/fasta_reader.hpp"
 #include "base/proteoform.hpp"
 #include "base/xml_dom_document.hpp"
 
@@ -17,6 +18,7 @@ SimplePrsm::SimplePrsm(MsHeaderPtr header_ptr,ProteoformPtr proteo_ptr,int score
   proteo_ptr_= proteo_ptr;
   seq_id_ = proteo_ptr->getDbResSeqPtr()->getId();
   seq_name_ = proteo_ptr->getDbResSeqPtr()->getName();
+  seq_desc_ = proteo_ptr->getDbResSeqPtr()->getDesc();
   score_ = score;
 }
 
@@ -27,6 +29,7 @@ SimplePrsm::SimplePrsm(xercesc::DOMElement* element){
   prec_mass_ = getDoubleChildValue(element, "precursor_mass", 0);
   seq_id_ = getIntChildValue(element, "sequence_id", 0);
   seq_name_ = getChildValue(element, "sequence_name", 0);
+  seq_desc_ = getChildValue(element, "sequence_desc", 0);
   score_ = getDoubleChildValue(element, "score", 0);
 }
 
@@ -44,6 +47,7 @@ xercesc::DOMElement* SimplePrsm::toXml(XmlDOMDocument* xml_doc){
   str = convertToString(score_);
   xml_doc->addElement(element, "score", str.c_str());
   xml_doc->addElement(element, "sequence_name", seq_name_.c_str());
+  xml_doc->addElement(element, "sequence_desc", seq_desc_.c_str());
   return element;
 }
 
@@ -86,6 +90,12 @@ void SimplePrsm::assignProteoformPtr(const ProteoformPtrVec &proteo_ptrs,
     std::cout<< "Sequence ID and/or name is not consistent!" << std::endl;
     std::exit(0);
   }
+}
+
+void SimplePrsm::addProteoformPtr(faidx_t *fai, const ResiduePtrVec &residue_list,
+                                  const ProtModPtrVec &prot_mods) {
+  proteo_ptr_ = readFastaToProteoform(fai, seq_id_, seq_name_, seq_desc_, residue_list); 
+  mod_proteo_ptrs_ = generateProtModProteoform(proteo_ptr_, prot_mods);
 }
 
 
@@ -131,6 +141,7 @@ SimplePrsmPtrVec getUniqueMatches(SimplePrsmPtrVec &match_ptrs) {
 
   return unique_match_ptrs;
 }
+
 
 
 } /* namespace prot */

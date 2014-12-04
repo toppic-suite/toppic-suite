@@ -1,3 +1,4 @@
+
 #include "base/prot_mod.hpp"
 #include "base/fasta_reader.hpp"
 #include "base/file_util.hpp"
@@ -6,6 +7,7 @@
 #include "spec/msalign_reader.hpp"
 #include "prsm/prsm_writer.hpp"
 #include "prsm/simple_prsm.hpp"
+#include "prsm/simple_prsm_reader.hpp"
 #include "prsm/prsm.hpp"
 #include "ptmsearch/ptm_processor.hpp"
 #include "ptmsearch/ptm_slow_filter.hpp"
@@ -17,6 +19,11 @@ PtmProcessor::PtmProcessor(PtmMngPtr mng_ptr){
   initWriters();
   initData();
 }
+
+PtmProcessor::~PtmProcessor() {
+  fai_destroy(fai_);
+}
+
 
 // initialize writers 
 void PtmProcessor::initWriters(){
@@ -57,70 +64,49 @@ void PtmProcessor::closeWriters() {
 
 // initialize data 
 void PtmProcessor::initData() {
-  PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
-  proteo_ptrs_ = readFastaToProteoform(
-      prsm_para_ptr->getSearchDbFileName(), 
-      prsm_para_ptr->getFixModResiduePtrVec());
-  mod_proteo_2d_ptrs_ =  
-      generate2DProtModProteoform(proteo_ptrs_, prsm_para_ptr->getAllowProtModPtrVec());
-
-  std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
-  std::string simplePrsmFileName = basename(sp_file_name)
-      + "." + mng_ptr_->input_file_ext_;
-  simple_prsm_ptrs_  = readSimplePrsms(simplePrsmFileName);
-  // find sequences for simple prsms
-  for(size_t i =0;i< simple_prsm_ptrs_.size();i++){
-    simple_prsm_ptrs_[i]->assignProteoformPtr(proteo_ptrs_, mod_proteo_2d_ptrs_);
-  }
   comp_shift_ptr_ = CompShiftLowMemPtr(new CompShiftLowMem());
+  PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
+  fai_ = fai_load(prsm_para_ptr->getSearchDbFileName().c_str());
 }
 
 // process ptm search
 void PtmProcessor::process(){
+  
   std::string sp_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
-  
-  std::string log_file_name = mng_ptr_->prsm_para_ptr_->getLogFileName();
-
-  std::ofstream logfile;
-
-  if (log_file_name.length() != 0){
-    logfile.open(log_file_name, std::ios::out | std::ios::app);
-  }    
-  
-  int spectra_num = countSpNum (sp_file_name);
   MsAlignReader sp_reader(sp_file_name);
+  std::string input_file_name = basename(sp_file_name)+"."+mng_ptr_->input_file_ext_;
+  SimplePrsmReader simple_prsm_reader(input_file_name);
+  SimplePrsmPtr prsm_ptr = simple_prsm_reader.readOnePrsm();
+
+  //init variables
   DeconvMsPtr deconv_sp;
   int cnt = 0;
-  SpParaPtr sp_para_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr();
-  double total_time = 0;
+  int spectrum_num = getSpNum (sp_file_name);
+  PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
+  SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
+  ResiduePtrVec residue_ptr_vec = prsm_para_ptr->getFixModResiduePtrVec();
+  ProtModPtrVec prot_mod_ptr_vec = prsm_para_ptr->getAllowProtModPtrVec();
+
   while((deconv_sp = sp_reader.getNextMs())!= nullptr){
-    long start_t = clock();
     cnt++;
     SpectrumSetPtr spectrum_set_ptr = getSpectrumSet(deconv_sp, 0, sp_para_ptr);
     if(spectrum_set_ptr != nullptr){
-
-      SimplePrsmPtrVec selected_prsm_ptrs 
-          = getMatchedSimplePrsms(simple_prsm_ptrs_,deconv_sp->getHeaderPtr());
-      processOneSpectrum(spectrum_set_ptr, selected_prsm_ptrs);
-
-    }
-    long stop_t = clock();
-    double time = (stop_t - start_t) /double (CLOCKS_PER_SEC);
-    total_time += time;
-    std::cout << std::flush <<  "PTM search is processing " << cnt 
-        << " of " << spectra_num << " spectra.\r";
-    
-    if (log_file_name.length() != 0){
-      if (logfile.is_open()) {
-        logfile << 0.203 + (double) cnt / spectra_num * 0.17 << std::endl;
+      SimplePrsmPtrVec selected_prsm_ptrs;
+      while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == deconv_sp->getHeaderPtr()->getId()) {
+        prsm_ptr->addProteoformPtr(fai_, residue_ptr_vec, prot_mod_ptr_vec);
+        selected_prsm_ptrs.push_back(prsm_ptr);
+        prsm_ptr = simple_prsm_reader.readOnePrsm();
       }
+      processOneSpectrum(spectrum_set_ptr, selected_prsm_ptrs);
     }
+    std::cout << std::flush <<  "PTM search is processing " << cnt 
+        << " of " << spectrum_num << " spectra.\r";
     
-    //std::cout << std::flush << "Ptm searching is processing " << cnt 
-    //    << " of " << spectra_num << " spectra." << " time " << time << " total time " << total_time << " seconds.\r ";
+    WebLog::percent_log(0.203 + (double) cnt / spectrum_num * 0.17);
   }
+  LOG_DEBUG("Search completed");
   sp_reader.close();
-  logfile.close();
+  simple_prsm_reader.close();
   closeWriters();
   std::cout << std::endl;
 }

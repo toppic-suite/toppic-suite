@@ -1,9 +1,8 @@
 #include "base/file_util.hpp"
+#include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_fdr.hpp"
 
-
 namespace prot {
-
 PrsmFdr::PrsmFdr(const std::string &db_file_name,
                  const std::string &spec_file_name,
                  const std::string &input_file_ext,
@@ -14,40 +13,40 @@ PrsmFdr::PrsmFdr(const std::string &db_file_name,
   input_file_ext_ = input_file_ext;
   output_file_ext_ = output_file_ext;
 }
+
 void PrsmFdr::process(){
   std::string base_name = basename(spec_file_name_);
   std::string input_file_name = base_name+"."+input_file_ext_;
-  std::string output_file_name = base_name+"."+output_file_ext_;
 
-  ProteoformPtrVec proteo_ptrs = 
-      readFastaToProteoform(db_file_name_,ResidueFactory::getBaseResiduePtrVec());
-  PrsmPtrVec prsm_ptrs = readPrsm(input_file_name,proteo_ptrs);
-  PrsmPtrVec target_ptrs;
-  PrsmPtrVec decoy_ptrs;
-  for(size_t i=0; i<prsm_ptrs.size(); i++){
-    if (prsm_ptrs[i]->getEValue() == 0.0) {
+  PrsmStrPtrVec prsm_str_ptrs = readAllPrsmStrs(input_file_name);
+
+  PrsmStrPtrVec target_ptrs;
+  PrsmStrPtrVec decoy_ptrs;
+  for(size_t i=0; i< prsm_str_ptrs.size(); i++){
+    if (prsm_str_ptrs[i]->getEValue() == 0.0) {
       LOG_ERROR("prot::PRSMFdr zero E value is reported");
     }
     else {
-      std::string prsm_name  = prsm_ptrs[i]->getProteoformPtr()->getDbResSeqPtr()->getName();
-      if(prsm_name.find("DECOY_")==0){
-        decoy_ptrs.push_back(prsm_ptrs[i]);
+      std::string seq_name  = prsm_str_ptrs[i]->getDbSeqName();
+      if(seq_name.find("DECOY_")==0){
+        decoy_ptrs.push_back(prsm_str_ptrs[i]);
       }
       else{
-        target_ptrs.push_back(prsm_ptrs[i]);
+        target_ptrs.push_back(prsm_str_ptrs[i]);
       }
     }
   }
   compute(target_ptrs,decoy_ptrs);
+  std::string output_file_name = base_name+"."+output_file_ext_;
   PrsmWriter writer(output_file_name);
-  std::sort(target_ptrs.begin(),target_ptrs.end(),prsmSpectrumIdUpPrecursorIdUp);
+  std::sort(target_ptrs.begin(),target_ptrs.end(),prsmStrSpectrumIdUp);
   writer.writeVector(target_ptrs);
   writer.close();
 }
 
-void PrsmFdr::compute(PrsmPtrVec &target_ptrs,PrsmPtrVec &decoy_ptrs){
-  std::sort(target_ptrs.begin(),target_ptrs.end(),prsmEValueUp);
-  std::sort(decoy_ptrs.begin(),decoy_ptrs.end(),prsmEValueUp);
+void PrsmFdr::compute(PrsmStrPtrVec &target_ptrs,PrsmStrPtrVec &decoy_ptrs){
+  std::sort(target_ptrs.begin(),target_ptrs.end(),prsmStrEValueUp);
+  std::sort(decoy_ptrs.begin(),decoy_ptrs.end(),prsmStrEValueUp);
 
   for(size_t i=0; i<target_ptrs.size(); i++){
     int n_target=i+1;

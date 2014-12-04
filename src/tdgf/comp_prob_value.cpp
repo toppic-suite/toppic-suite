@@ -8,10 +8,11 @@
 namespace prot {
 
 CompProbValue::CompProbValue(double convert_ratio, const ResFreqPtrVec &residue_ptrs, 
-                             int max_layer_num, int max_table_height, 
+                             double residue_avg_len, int max_layer_num, int max_table_height, 
                              double max_sp_prec_mass) {
   convert_ratio_ = convert_ratio;
-  residue_avg_len_ = computeAvgLength(residue_ptrs, convert_ratio);
+  residue_avg_len_ = residue_avg_len;
+
   for (size_t i = 0; i < residue_ptrs.size(); i++) {
     int int_mass = (int)std::round(residue_ptrs[i]->getMass() * convert_ratio);
     residue_masses_.push_back(int_mass);
@@ -39,15 +40,6 @@ CompProbValue::~CompProbValue() {
   }
 }
 
-int computeAvgLength(const ResFreqPtrVec &residue_ptrs, double convert_ratio) {
-  double mass_sum = 0;
-  double freq_sum = 0;
-  for (size_t i = 0; i < residue_ptrs.size(); i++) {
-    freq_sum = freq_sum + residue_ptrs[i]->getFreq();
-    mass_sum = mass_sum + residue_ptrs[i]->getFreq() * residue_ptrs[i]->getMass();
-  }
-  return (int)std::round(mass_sum/freq_sum * convert_ratio);
-}
 
 inline void CompProbValue::setFactors () {
   //zero ptm 

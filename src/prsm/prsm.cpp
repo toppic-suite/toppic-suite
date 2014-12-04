@@ -88,22 +88,18 @@ void Prsm::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
   parent->appendChild(element);
 }
 
-Prsm::Prsm(xercesc::DOMElement* element,ProteoformPtrVec proteoforms){
+void Prsm::parseXml(xercesc::DOMElement *element) {
   prsm_id_=getIntChildValue(element, "prsm_id", 0);
   spectrum_id_=getIntChildValue(element, "spectrum_id", 0);
   spectrum_scan_=getChildValue(element, "spectrum_scan", 0);
   precursor_id_=getIntChildValue(element, "precursor_id", 0);
   ori_prec_mass_=getDoubleChildValue(element, "ori_prec_mass", 0);
+  //LOG_DEBUG("reade original precursor mass " << ori_prec_mass_);
   adjusted_prec_mass_=getDoubleChildValue(element, "adjusted_prec_mass", 0);
   calibration_=getDoubleChildValue(element, "calibration", 0);
   fdr_=getDoubleChildValue(element, "fdr", 0);
   match_peak_num_=getDoubleChildValue(element, "match_peak_num", 0);
   match_fragment_num_=getDoubleChildValue(element, "match_fragment_num", 0);
-
-  xercesc::DOMElement* proteoform_element
-      = getChildElement(element,"proteoform",0);
-  proteoform_ptr_ 
-      = ProteoformPtr(new Proteoform(proteoform_element,proteoforms));
 
   int prob_count = getChildCount(element,"extreme_value");
   if(prob_count!=0){
@@ -114,6 +110,27 @@ Prsm::Prsm(xercesc::DOMElement* element,ProteoformPtrVec proteoforms){
 
   deconv_ms_ptr_ = DeconvMsPtr(nullptr);
   refine_ms_three_ = ExtendMsPtr(nullptr);
+}
+
+Prsm::Prsm(xercesc::DOMElement* element,ProteoformPtrVec proteoforms){
+  parseXml(element);
+
+  xercesc::DOMElement* proteoform_element
+      = getChildElement(element,"proteoform",0);
+
+  proteoform_ptr_ 
+      = ProteoformPtr(new Proteoform(proteoform_element,proteoforms));
+}
+
+Prsm::Prsm(xercesc::DOMElement* element, faidx_t *fai,
+           const ResiduePtrVec &residue_ptr_vec) {
+
+  parseXml(element);
+
+  xercesc::DOMElement* proteoform_element
+      = getChildElement(element,"proteoform",0);
+  proteoform_ptr_ = ProteoformPtr(
+      new Proteoform(proteoform_element, fai, residue_ptr_vec));
 }
 
 double Prsm::getEValue() {

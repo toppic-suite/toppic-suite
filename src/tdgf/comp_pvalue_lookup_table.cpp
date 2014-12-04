@@ -3,19 +3,12 @@
 
 namespace prot {
 
-CompPValueLookupTable::CompPValueLookupTable(const ProteoformPtrVec &raw_proteo_ptrs, 
-                                             const ProteoformPtrVec &mod_proteo_ptrs,
-                                             const ResFreqPtrVec &residue_ptrs,
+CompPValueLookupTable::CompPValueLookupTable(CountTestNumPtr test_num_ptr,
                                              TdgfMngPtr mng_ptr) {
   mng_ptr_ = mng_ptr;
+  test_num_ptr_ = test_num_ptr;
   initTable();
   LOG_DEBUG("table initialized");
-
-  test_num_ptr_ = CountTestNumPtr(new CountTestNum(raw_proteo_ptrs, mod_proteo_ptrs,
-                                                   residue_ptrs, mng_ptr->convert_ratio_,
-                                                   mng_ptr->max_prec_mass_,
-                                                   mng_ptr->max_ptm_mass_));
-  LOG_DEBUG("test number initialized");
 }
 
 void CompPValueLookupTable::initTable() {

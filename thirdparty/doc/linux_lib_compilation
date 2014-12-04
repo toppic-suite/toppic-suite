@@ -29,7 +29,12 @@ Xalan
 7. make 
 8. make install
 
+Htslib
+1. cd htslib
+2. make
+
 Download links:
 1. boost 1.55.0 (boost_1_55_0.zip): http://sourceforge.net/projects/boost/files/boost/1.55.0/
 2. xerces-c-3.1.1 (xerces-c-3.1.1.zip): http://xerces.apache.org/xerces-c/download.cgi
 3. xalan 1.11 (xalan_c-1.11-src.zip): http://xalan.apache.org/xalan-c/download.html
+4. htslib: https://github.com/samtools/htslib

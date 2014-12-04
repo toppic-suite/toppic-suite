@@ -66,30 +66,30 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   # Linux specific code
 
   
-  target_link_libraries(toppic xalan-c xalanMsg xerces-c boost_program_options boost_filesystem boost_system pthread)
+  target_link_libraries(toppic xalan-c xalanMsg xerces-c boost_program_options boost_filesystem boost_system hts pthread z)
 
   add_executable(test_zero_ptm ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
           ${ZERO_PTM_SRCS} ${ARGU_SRCS} ${TEST_ZERO_PTM_SRCS})
-  target_link_libraries(test_zero_ptm xalan-c xalanMsg xerces-c boost_program_options boost_filesystem boost_system pthread)
+  target_link_libraries(test_zero_ptm xalan-c xalanMsg xerces-c boost_program_options boost_filesystem boost_system hts pthread z)
 
   add_executable(test_diag_filter ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
           ${DIAG_FILTER_SRCS} ${ARGU_SRCS} ${TEST_DIAG_FILTER_SRCS})
-  target_link_libraries(test_diag_filter xalan-c xalanMsg xerces-c boost_program_options boost_filesystem boost_system pthread)
+  target_link_libraries(test_diag_filter xalan-c xalanMsg xerces-c boost_program_options boost_filesystem boost_system hts pthread z)
 
   add_executable(test_ptm_search ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
           ${ZERO_PTM_SRCS} ${DIAG_FILTER_SRCS} ${ONE_PTM_FILTER_SRCS}
           ${PTM_SRCS} ${ARGU_SRCS} ${TEST_PTM_SEARCH_SRCS})
-  target_link_libraries(test_ptm_search xalan-c xalanMsg xerces-c boost_program_options boost_filesystem boost_system pthread)
+  target_link_libraries(test_ptm_search xalan-c xalanMsg xerces-c boost_program_options boost_filesystem boost_system hts pthread z)
 
   add_executable(test_evalue ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
           ${ZERO_PTM_SRCS} ${DIAG_FILTER_SRCS} ${ONE_PTM_FILTER_SRCS} ${PTM_SRCS}  
           ${TDGF_SRCS} ${ARGU_SRCS} ${TEST_EVALUE_SRCS})
-  target_link_libraries(test_evalue xalan-c xalanMsg xerces-c boost_program_options boost_filesystem boost_system pthread)
+  target_link_libraries(test_evalue xalan-c xalanMsg xerces-c boost_program_options boost_filesystem boost_system hts pthread z)
 
   add_executable(test_prsm_view ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
           ${ZERO_PTM_SRCS} ${DIAG_FILTER_SRCS} ${ONE_PTM_FILTER_SRCS} ${PTM_SRCS}  
           ${TDGF_SRCS} ${PRSM_VIEW_SRCS} ${ARGU_SRCS} ${TEST_PRSM_VIEW_SRCS})
-  target_link_libraries(test_prsm_view xalan-c xalanMsg xerces-c boost_program_options boost_filesystem boost_system pthread)
+  target_link_libraries(test_prsm_view xalan-c xalanMsg xerces-c boost_program_options boost_filesystem boost_system hts pthread z)
 
   #  add_executable(test_multiple ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
   #        ${ZERO_PTM_SRCS} ${FILTER_SRCS} ${PTM_SRCS} ${POISSON_SRCS} 

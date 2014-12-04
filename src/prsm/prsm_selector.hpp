@@ -25,7 +25,6 @@ class PrsmSelector {
   std::string output_file_ext_;
   int n_top_;
 
-  PrsmPtrVec getTopPrsms(PrsmPtrVec &prsm_ptrs, int n_top);
 };
 
 typedef std::shared_ptr<PrsmSelector> PrsmSelectorPtr;

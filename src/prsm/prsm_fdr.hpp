@@ -6,7 +6,7 @@
 
 #include "base/string_util.hpp"
 #include "base/fasta_reader.hpp"
-#include "prsm/prsm.hpp"
+//#include "prsm/prsm_str.hpp"
 #include "prsm/prsm_writer.hpp"
 
 namespace prot {
@@ -24,7 +24,7 @@ class PrsmFdr {
   std::string input_file_ext_;
   std::string output_file_ext_;
 
-  void compute(PrsmPtrVec &target, PrsmPtrVec &decoy);
+  void compute(PrsmStrPtrVec &target, PrsmStrPtrVec &decoy);
 };
 typedef std::shared_ptr<PrsmFdr> PrsmFdrPtr;
 

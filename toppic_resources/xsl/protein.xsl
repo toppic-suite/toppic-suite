@@ -6,7 +6,9 @@
 
 <xsl:template match="protein">
 <html>
-<title>Proteoforms for protein <xsl:value-of select="sequence_name"/> </title>
+  <title>Proteoforms for protein <xsl:value-of select="sequence_name"/> 
+		<xsl:value-of select="sequence_description"/>
+  </title>
 <link rel="stylesheet" type="text/css" href="../resources/media/css/jquery.dataTables.css"></link>
 <link rel="stylesheet" type="text/css" href="../resources/bootstrap.min.css"></link>
 <link rel="stylesheet" type="text/css" href="../resources/prsm.css"></link>
@@ -21,7 +23,9 @@
 <body>
 <div class="container">
 <xsl:call-template name="navigation"/>
-<p style="font-size:16px;"><xsl:value-of select="compatible_proteoform_number"/> proteoforms for protein <xsl:value-of select="sequence_name"/></p>
+<p style="font-size:16px;"><xsl:value-of select="compatible_proteoform_number"/> proteoforms for protein <xsl:value-of select="sequence_name"/>
+		<xsl:value-of select="sequence_description"/>
+</p>
 
 <xsl:apply-templates select="compatible_proteoform">
 	<!-- sort not working  <xsl:sort select="min(proteoform_id)" order="ascending" data-type="number"/> -->

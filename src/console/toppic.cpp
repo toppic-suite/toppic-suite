@@ -5,10 +5,12 @@
 
 #include "prsm/prsm_para.hpp"
 #include "prsm/prsm_combine.hpp"
+#include "prsm/prsm_str_combine.hpp"
 #include "prsm/prsm_selector.hpp"
 #include "prsm/output_selector.hpp"
 #include "prsm/prsm_species.hpp"
 #include "prsm/simple_prsm_writer.hpp"
+#include "prsm/simple_prsm_str_combine.hpp"
 #include "prsm/table_writer.hpp"
 #include "prsm/prsm_fdr.hpp"
 
@@ -45,30 +47,38 @@ int process(int argc, char* argv[]) {
       return 1;
     }
     std::map<std::string, std::string> arguments = argu_processor.getArguments();
-    std::cout << "TopPIC 0.8 " << std::endl;
+    std::cout << "TopPC 0.9 " << std::endl;
 
     std::string exe_dir = arguments["executiveDir"];
     std::cout << "Executive file directory is: " << exe_dir << std::endl;
     initBaseData(exe_dir);
 
+    LOG_DEBUG("Init base data completed");
+
     std::string db_file_name = arguments["databaseFileName"];
     std::string sp_file_name = arguments["spectrumFileName"];
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
-    std::string log_file_name = arguments["logFileName"];
 
-    int n_top;
-    std::istringstream (arguments["numOfTopPrsms"]) >> n_top;
-    int shift_num;
-    std::istringstream (arguments["shiftNumber"]) >> shift_num;
-    double max_ptm_mass;
-    std::istringstream (arguments["maxPtmMass"]) >> max_ptm_mass;
+    std::string log_file_name = arguments["logFileName"];
+  	WebLog::init(log_file_name);
+
+    int n_top = std::stoi(arguments["numOfTopPrsms"]);
+    int shift_num = std::stoi(arguments["shiftNumber"]);
+    double max_ptm_mass = std::stod(arguments["maxPtmMass"]);
 
     PrsmParaPtr prsm_para_ptr = PrsmParaPtr(new PrsmPara(arguments));
 
+    bool decoy = false;
     if (arguments["searchType"] == "TARGET+DECOY") {
-      generateShuffleDb(ori_db_file_name, db_file_name);
+      decoy = true;
     }
+    LOG_DEBUG("block size " << arguments["databaseBlockSize"]);
+    int db_block_size = std::stoi(arguments["databaseBlockSize"]);
 
+    /*
+    dbPreprocess (ori_db_file_name, db_file_name, decoy, db_block_size);
+    generateSpIndex(sp_file_name);
+    
     std::cout << "Zero PTM search started." << std::endl;
     ZeroPtmMngPtr zero_mng_ptr = ZeroPtmMngPtr(new ZeroPtmMng (prsm_para_ptr, "ZERO"));
     zeroPtmSearchProcess(zero_mng_ptr);
@@ -90,11 +100,24 @@ int process(int argc, char* argv[]) {
     one_ptm_filter_processor = nullptr;
     std::cout << "One PTM filtering finished." << std::endl;
 
-    combineSimplePrsms(sp_file_name, "ONE_PTM_FILTER_COMBINED", "DIAG_FILTER_COMBINED", "FILTER_COMBINED");
+    std::cout << "Combining simple PRSMs started." << std::endl;
+    std::vector<std::string> simple_input_exts;
+    simple_input_exts.push_back("DIAG_FILTER");
+    simple_input_exts.push_back("ONE_PTM_FILTER");
+    int top_num = diag_filter_mng_ptr->ptm_fast_filter_result_num_ 
+        + one_ptm_filter_mng_ptr->one_ptm_filter_result_num_;
+
+    LOG_DEBUG("top number " << top_num);
+    SimplePrsmStrCombinePtr simple_combine_ptr(
+        new SimplePrsmStrCombine(sp_file_name, simple_input_exts, "FILTER", top_num));
+    simple_combine_ptr->process();
+    simple_combine_ptr = nullptr;
+    std::cout << "Combining simple PRSMs finished." << std::endl;
+    */
 
     std::cout << "PTM search started." << std::endl;
     PtmMngPtr ptm_mng_ptr = PtmMngPtr(new PtmMng(prsm_para_ptr, n_top, shift_num,
-                                                 max_ptm_mass, "FILTER_COMBINED", "PTM"));
+                                                 max_ptm_mass, "FILTER", "PTM"));
     PtmProcessorPtr ptm_processor = PtmProcessorPtr(new PtmProcessor(ptm_mng_ptr));
     ptm_processor->process();
     ptm_processor = nullptr;
@@ -102,12 +125,15 @@ int process(int argc, char* argv[]) {
 
     std::cout << "Combining PRSMs started." << std::endl;
     std::vector<std::string> input_exts ;
-    input_exts.push_back("ZERO");
+    input_exts.push_back("ZERO_COMPLETE");
+    input_exts.push_back("ZERO_PREFIX");
+    input_exts.push_back("ZERO_SUFFIX");
+    input_exts.push_back("ZERO_INTERNAL");
     input_exts.push_back("PTM");
-    PrsmCombinePtr combine_processor = PrsmCombinePtr(new PrsmCombine(db_file_name, sp_file_name,
-                                                                    input_exts, "RAW_RESULT"));
-    combine_processor->process();
-    combine_processor = nullptr;
+    int prsm_top_num = (shift_num + 1) * 4;
+    PrsmStrCombinePtr combine_ptr(new PrsmStrCombine(sp_file_name, input_exts, "RAW_RESULT", prsm_top_num));
+    combine_ptr->process();
+    combine_ptr = nullptr;
     std::cout << "Combining PRSMs finished." << std::endl;
 
     std::cout << "E-value computation started." << std::endl;
@@ -156,8 +182,9 @@ int process(int argc, char* argv[]) {
     double ppo;
     std::istringstream (arguments["error_tolerance"]) >> ppo;
     ppo = ppo /1000000.0;
-    PrsmSpeciesPtr prsm_species = PrsmSpeciesPtr(new PrsmSpecies(db_file_name, sp_file_name, 
-                                                                 "CUTOFF_RESULT", "OUTPUT_RESULT", ppo));
+    ResiduePtrVec residue_ptr_vec = prsm_para_ptr->getFixModResiduePtrVec();
+    PrsmSpeciesPtr prsm_species = PrsmSpeciesPtr(
+        new PrsmSpecies(db_file_name, sp_file_name, "CUTOFF_RESULT", "OUTPUT_RESULT", residue_ptr_vec, ppo));
     prsm_species->process();
     prsm_species = nullptr;
     std::cout << "Finding protein species finished." << std::endl;
@@ -178,21 +205,16 @@ int process(int argc, char* argv[]) {
     translate(arguments);
     std::cout << "Converting xml files to html files finished." << std::endl;
     
+    /*
     if (arguments["keepTempFiles"] != "true"){
       std::cout << "Deleting temporary files started." << std::endl;
       delDir(basename(sp_file_name) + "_xml");
       cleanDir(sp_file_name);	  
       std::cout << "Deleting temporary files finished." << std::endl;
     }
+    */
     
-    if (log_file_name.length() != 0){
-      std::ofstream logfile;
-      logfile.open(log_file_name, std::ios::out | std::ios::app);
-      if (logfile.is_open()) {
-	    logfile << 1 << std::endl;
-      }
-      logfile.close();
-    }  
+    WebLog::close();
 
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
@@ -205,7 +227,7 @@ int process(int argc, char* argv[]) {
 }
 
 int main(int argc, char* argv[]) {
-  //prot::log_level = 2;
+  prot::log_level = 2;
   return prot::process(argc, argv);
 }
 

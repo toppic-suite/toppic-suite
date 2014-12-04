@@ -6,6 +6,7 @@
 
 #include "base/xml_dom_document.hpp"
 #include "prsm/prsm.hpp"
+#include "prsm/prsm_str.hpp"
 
 namespace prot {
 
@@ -14,6 +15,10 @@ public:
  PrsmWriter(const std::string &file_name);
 
  void close();
+
+ void write(PrsmStrPtr prsm_str_ptr);
+ void writeVector(const PrsmStrPtrVec &prsm_str_ptr_vec);
+
  void write(PrsmPtr prsm_ptr);
  void writeVector(const PrsmPtrVec &prsm_ptrs);
  void writeVector2D(const PrsmPtrVec2D &prsm_ptrs);

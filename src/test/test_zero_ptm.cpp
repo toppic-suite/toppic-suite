@@ -4,6 +4,8 @@
 #include "base/fasta_reader.hpp"
 #include "base/base_data.hpp"
 
+#include "spec/msalign_reader.hpp"
+
 #include "prsm/prsm_para.hpp"
 #include "prsm/prsm_combine.hpp"
 #include "prsm/prsm_selector.hpp"
@@ -33,6 +35,8 @@ int zero_ptm_process(int argc, char* argv[]) {
     std::cout << "Executive file directory is: " << exe_dir << std::endl;
     initBaseData(exe_dir);
 
+    LOG_DEBUG("Init base data completed");
+
     std::string db_file_name = arguments["databaseFileName"];
     std::string sp_file_name = arguments["spectrumFileName"];
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
@@ -46,9 +50,15 @@ int zero_ptm_process(int argc, char* argv[]) {
 
     PrsmParaPtr prsm_para_ptr = PrsmParaPtr(new PrsmPara(arguments));
 
+    bool decoy = false;
     if (arguments["searchType"] == "TARGET+DECOY") {
-      generateShuffleDb(ori_db_file_name, db_file_name);
+      decoy = true;
     }
+    LOG_DEBUG("block size " << arguments["databaseBlockSize"]);
+    int db_block_size = std::stoi(arguments["databaseBlockSize"]);
+
+    dbPreprocess (ori_db_file_name, db_file_name, decoy, db_block_size);
+    generateSpIndex(sp_file_name);
 
     int start_s = clock();
 
@@ -59,6 +69,7 @@ int zero_ptm_process(int argc, char* argv[]) {
     int stop_s = clock();
     std::cout << std::endl << "Running time: " << (stop_s-start_s) / double(CLOCKS_PER_SEC)  << " seconds " << std::endl;
 
+    /*
     std::cout << "Outputting table starts " << std::endl;
     TableWriterPtr table_out = TableWriterPtr(new TableWriter(prsm_para_ptr, "ZERO_COMPLETE", "ZERO_COMPLETE_TABLE"));
     table_out->write();
@@ -70,6 +81,7 @@ int zero_ptm_process(int argc, char* argv[]) {
     table_out->write();
     table_out = nullptr;
     std::cout << "Outputting table finished." << std::endl;
+    */
 
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;

@@ -1,6 +1,8 @@
 #ifndef PROT_PROTEOFORM_HPP_
 #define PROT_PROTEOFORM_HPP_
 
+#include "htslib/faidx.h"
+
 #include "base/residue_freq.hpp"
 #include "base/db_residue_seq.hpp"
 #include "base/bp_spec.hpp"
@@ -26,6 +28,10 @@ class Proteoform {
 
   Proteoform(xercesc::DOMElement* element, const ProteoformPtrVec &db_proteoforms);
 
+  Proteoform(xercesc::DOMElement* element, faidx_t *fai, const ResiduePtrVec &residue_ptr_vec);
+
+  void parseXml(xercesc::DOMElement* element, ProteoformPtr db_proteoform);
+
   DbResSeqPtr getDbResSeqPtr() {return db_residue_seq_ptr_;}
 
   ProtModPtr getProtModPtr() {return prot_mod_ptr_;}
@@ -43,6 +49,8 @@ class Proteoform {
   int getSeqId() {return db_residue_seq_ptr_->getId();}
 
   const std::string& getSeqName() {return db_residue_seq_ptr_->getName();}
+
+  const std::string& getSeqDesc() {return db_residue_seq_ptr_->getDesc();}
 
   ChangePtrVec getChangePtrVec() {return change_list_;}
 
@@ -102,6 +110,8 @@ ProteoformPtr getDbProteoformPtr(DbResSeqPtr db_res_seq_ptr);
 ProteoformPtr getProtModProteoform(ProteoformPtr db_form_ptr, 
                                    ProtModPtr prot_mod_ptr); 
 
+ProteoformPtrVec generateProtModProteoform(ProteoformPtr db_form_ptr, 
+                                           const ProtModPtrVec &prot_mod_ptrs); 
 
 ProteoformPtrVec2D generate2DProtModProteoform(const ProteoformPtrVec &db_form_ptrs, 
                                                const ProtModPtrVec &prot_mod_ptrs);

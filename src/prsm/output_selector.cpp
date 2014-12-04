@@ -1,5 +1,8 @@
 #include "base/file_util.hpp"
+#include "prsm/prsm_str.hpp"
+#include "prsm/prsm_reader.hpp"
 #include "prsm/output_selector.hpp"
+
 
 namespace prot {
 
@@ -20,28 +23,24 @@ OutputSelector::OutputSelector(const std::string &db_file_name,
 void OutputSelector::process(){
   std::string base_name = basename(spec_file_name_);
   std::string input_file_name = base_name + "." + input_file_ext_;
-  ProteoformPtrVec proteoforms 
-      = readFastaToProteoform(db_file_name_,ResidueFactory::getBaseResiduePtrVec());
-  PrsmPtrVec prsms = readPrsm(input_file_name,proteoforms);
-  // it's no need to process prsm
+
+  PrsmStrPtrVec prsms = readAllPrsmStrs(input_file_name);
+
   //select
-  sort(prsms.begin(),prsms.end(),prsmSpectrumIdUpEvalueUp);
+  sort(prsms.begin(),prsms.end(),prsmStrSpectrumIdUp);
   bool evalue_cutoff = (cutoff_type_ == "EVALUE");
 
-  PrsmPtrVec selected_prsms;
-  ProteoformPtrVec selected_prots;
+  PrsmStrPtrVec selected_prsms;
   int id =0;
   for(size_t i=0; i<prsms.size(); i++){
     if(evalue_cutoff && prsms[i]->getEValue() <= cutoff_value_){
       prsms[i]->setId(id);
       selected_prsms.push_back(prsms[i]);
-      selected_prots.push_back(prsms[i]->getProteoformPtr());
       id++;
     }
     else if(!evalue_cutoff && prsms[i]->getFdr() <= cutoff_value_){
       prsms[i]->setId(id);
       selected_prsms.push_back(prsms[i]);
-      selected_prots.push_back(prsms[i]->getProteoformPtr());
       id++;
     }
   }
@@ -50,8 +49,6 @@ void OutputSelector::process(){
   std::string output_file_name = base_name + "." + output_file_ext_;
   PrsmWriter writer(output_file_name);
   writer.writeVector(selected_prsms);
-
-  //because the prsm_writer ~PrsmWriter changed and the fileclosing is an independant function
   writer.close();
 }
 } /* namespace prot */

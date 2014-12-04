@@ -12,7 +12,7 @@ namespace prot {
 class CompProbValue {
  public:
   CompProbValue(double convert_ratio, const ResFreqPtrVec &residue_ptrs, 
-                int max_layer_num, int max_table_height, 
+                double residue_avg_len, int max_layer_num, int max_table_height, 
                 double max_sp_prec_mass);
 
   ~CompProbValue();
@@ -119,7 +119,6 @@ class CompProbValue {
 
 typedef std::shared_ptr<CompProbValue> CompProbValuePtr;
 
-int computeAvgLength(const ResFreqPtrVec &residue_ptrs, double convert_ratio);
 
 void compProbArray(CompProbValuePtr comp_prob_ptr, const ResFreqPtrVec &n_term_residue_ptrs, 
                    const PrmPeakPtrVec &peak_ptrs, const PrsmPtrVec &prsm_ptrs, bool strict, 

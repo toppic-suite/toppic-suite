@@ -28,9 +28,8 @@ class XmlGenerator {
   void outputFileList();
 
  private:
-  std::string input_file_name_;
+  std::string input_file_ext_;
   PrsmViewMngPtr mng_ptr_;
-  ProteoformPtrVec proteo_ptrs_;
   AnnoViewPtr anno_view_ptr_;
 };
 

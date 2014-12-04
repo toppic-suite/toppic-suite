@@ -13,14 +13,22 @@ class OnePtmFilter {
  public:
   OnePtmFilter(const ProteoformPtrVec &proteo_ptrs,
                OnePtmFilterMngPtr mng_ptr);
-  SimplePrsmPtrVec getBestMatch(PrmMsPtr ms_ptr);
+  void computeBestMatch(PrmMsPtr ms_ptr);
+
+  SimplePrsmPtrVec getCompMatchPtrs() {return comp_match_ptrs_;}
+  SimplePrsmPtrVec getPrefMatchPtrs() {return pref_match_ptrs_;}
+  SimplePrsmPtrVec getSuffMatchPtrs() {return suff_match_ptrs_;}
+  SimplePrsmPtrVec getInternalMatchPtrs() {return internal_match_ptrs_;}
 
  private:
   OnePtmFilterMngPtr mng_ptr_;
   ProteoformPtrVec proteo_ptrs_;
   OnePtmCompShiftPtr index_ptr_;
-
-  SimplePrsmPtrVec compute(PrmMsPtr ms_ptr);
+  
+  SimplePrsmPtrVec comp_match_ptrs_;
+  SimplePrsmPtrVec pref_match_ptrs_;
+  SimplePrsmPtrVec suff_match_ptrs_;
+  SimplePrsmPtrVec internal_match_ptrs_;
 };
 
 typedef std::shared_ptr<OnePtmFilter> OnePtmFilterPtr;
