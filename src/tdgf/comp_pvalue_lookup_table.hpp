@@ -25,8 +25,7 @@ class CompPValueLookupTable {
   double ptm1_[41][20];
   double ptm2_[41][20];
 
-  double compProb(int ppo, double prec_mass, int peak_num, int match_frag_num,
-                  int unexpected_shift_num);
+  double compProb(int match_frag_num, int unexpected_shift_num);
 };
 
 typedef std::shared_ptr<CompPValueLookupTable> CompPValueLookupTablePtr;

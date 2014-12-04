@@ -16,7 +16,7 @@ namespace prot {
 
 EValueProcessor::EValueProcessor(TdgfMngPtr mng_ptr) {
   mng_ptr_ = mng_ptr;
-  init();
+  //init();
 }
 
 void EValueProcessor::init() {

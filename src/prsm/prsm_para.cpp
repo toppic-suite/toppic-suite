@@ -8,6 +8,8 @@ PrsmPara::PrsmPara(std::map<std::string, std::string> &arguments) {
   spec_file_name_ = arguments["spectrumFileName"];
   log_file_name_ = arguments["logFileName"];
   exe_dir_ = arguments["executiveDir"];
+  errorTolerance_=std::stoi(arguments["errorTolerance"]);
+
 
   fix_mod_residue_list_ = FixResidueFactory::getFixResiduePtrVec(arguments["cysteineProtection"]);
 
