@@ -62,11 +62,9 @@ void DiagFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num
   while((spec_set_ptr = reader.getNextSpectrumSet(sp_para_ptr)) != nullptr){
     cnt+= group_spec_num;
     if(spec_set_ptr->isValid()){
-      /*
-      PrmMsPtr ms_ptr = spectrum_set_ptr->getMsTwoPtr();
-      SimplePrsmPtrVec match_ptrs = filter_ptr->getBestMatch(ms_ptr);
+      PrmMsPtrVec ms_ptr_vec = spec_set_ptr->getMsTwoPtrVec();
+      SimplePrsmPtrVec match_ptrs = filter_ptr->getBestMatch(ms_ptr_vec);
       writer.write(match_ptrs);
-      */
     }
     
     WebLog::percent_log(0.03 + (double) block_ptr->getBlockIdx() / total_block_num * 0.05
