@@ -45,14 +45,17 @@ class BasicDiagPair:public Pair {
 
 };
 
-BasicDiagPairPtrVec compDiagPair(PrmMsPtr ms_ptr, const std::vector<double>& seq_masses,
-                           DiagonalHeaderPtr header_ptr);
+BasicDiagPairPtrVec compDiagPair(const PrmMsPtrVec &ms_ptr_vec, 
+                                 const std::vector<double>& seq_masses,
+                                 DiagonalHeaderPtr header_ptr);
 
-BasicDiagonalPtrVec  getDiagonals(const DiagonalHeaderPtrVec& header_ptrs,
-                                  PrmMsPtr ms_six_ptr, ProteoformPtr proteo_ptr,
+BasicDiagonalPtrVec  getDiagonals(const DiagonalHeaderPtrVec &header_ptr_vec,
+                                  const PrmMsPtrVec &ms_six_ptr_vec, 
+                                  ProteoformPtr proteo_ptr,
                                   PtmMngPtr mng_ptr);
 
-BasicDiagonalPtr  getDiagonalPtr(int cnt,DiagonalHeaderPtr header_ptr, PrmMsPtr ms_six_ptr,
+BasicDiagonalPtr  getDiagonalPtr(int cnt, DiagonalHeaderPtr header_ptr, 
+                                 const PrmMsPtrVec &ms_six_ptr_vec,
                                  ProteoformPtr proteo_ptr, PtmMngPtr mng_ptr);
 } /* namespace prot */
 

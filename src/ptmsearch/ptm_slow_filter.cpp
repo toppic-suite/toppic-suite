@@ -10,6 +10,7 @@ PtmSlowFilter::PtmSlowFilter(
 
   // init complete_prefix_slow_match_ptrs
   //int start_s = clock();
+  //LOG_DEBUG("start prot mod  simple prsm ptrs size " << simple_prsm_ptrs.size());
   for(size_t i=0;i<simple_prsm_ptrs.size();i++){
     ProteoformPtrVec raw_proteo_ptrs;
     raw_proteo_ptrs.push_back(simple_prsm_ptrs[i]->getProteoformPtr());
@@ -32,6 +33,8 @@ PtmSlowFilter::PtmSlowFilter(
     }
   }
 
+  //LOG_DEBUG("prot mod inited");
+
   // compute complete and prefix prsms 
   //start_s = clock();
   for(size_t i=0; i<complete_prefix_slow_match_ptrs_.size();i++){
@@ -42,6 +45,8 @@ PtmSlowFilter::PtmSlowFilter(
     complete_prefix_slow_match_ptrs_[i]->compute(SemiAlignTypeFactory::getPrefixPtr(), prefix_ptrs);
     prefix_prsm_2d_ptrs_.push_back(prefix_ptrs);
   }
+  //LOG_DEBUG("complete prefix completed");
+
   //stop_s = clock();
   //std::cout <<  "compute complete alignment running time: " << (stop_s-start_s) / double(CLOCKS_PER_SEC)  << " seconds " << std::endl;
 
@@ -54,6 +59,7 @@ PtmSlowFilter::PtmSlowFilter(
     suffix_internal_slow_match_ptrs_[i]->compute(SemiAlignTypeFactory::getInternalPtr(), internal_ptrs);
     internal_prsm_2d_ptrs_.push_back(internal_ptrs);
   }
+  //LOG_DEBUG("suffix internal completed");
 }
 
 PrsmPtrVec PtmSlowFilter::getPrsms(int shift_num, SemiAlignTypePtr type_ptr){

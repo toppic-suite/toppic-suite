@@ -14,7 +14,7 @@ all:
 	cd zeroptmsearch; make
 	cd diagfilter; make
 	cd oneptmfilter; make
-#	cd ptmsearch; make
+	cd ptmsearch; make
 #	cd tdgf; make
 #	cd poisson; make
 #	cd prsmview; make	

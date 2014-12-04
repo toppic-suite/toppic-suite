@@ -51,15 +51,15 @@ inline TheoPeakPtrVec getNTermTheoPeakPtrs (const TheoPeakPtrVec theo_peak_ptrs)
 }
 
 double refinePrecursorAndHeaderShift(ProteoformPtr proteo_ptr,
-                                     ExtendMsPtr ms_three_ptr, 
+                                     const ExtendMsPtrVec &ms_three_ptr_vec, 
                                      DiagonalHeaderPtrVec &header_ptrs,
                                      PtmMngPtr mng_ptr) {
 
-  double prec_mass = ms_three_ptr->getHeaderPtr()->getPrecMonoMass();
+  double prec_mass = ms_three_ptr_vec[0]->getHeaderPtr()->getPrecMonoMass();
   if (header_ptrs.size() == 0) {
     return prec_mass;
   }
-  double tole = ms_three_ptr->getHeaderPtr()->getErrorTolerance();
+  double tole = ms_three_ptr_vec[0]->getHeaderPtr()->getErrorTolerance();
 
   int one_side_step_num = 0;
   if (tole > 0) {
@@ -73,35 +73,39 @@ double refinePrecursorAndHeaderShift(ProteoformPtr proteo_ptr,
    * c-terminal ions */
   PeakIonPairPtrVec matched_pair_ptrs;
   for(size_t i=0; i< header_ptrs.size() - 1; i++){
-    TheoPeakPtrVec theo_peak_ptrs = getDiagonalTheoPeak(
-        proteo_ptr,
-        ms_three_ptr->getHeaderPtr()->getActivationPtr(),
-        header_ptrs,
-        i,
-        mng_ptr->prsm_para_ptr_->getSpParaPtr()->getMinMass());
-    TheoPeakPtrVec c_term_peak_ptrs = getCTermTheoPeakPtrs(theo_peak_ptrs);
-    
-    int bgn = header_ptrs[i]->getMatchFirstBpPos()-first_res_pos;
-    int end = header_ptrs[i]->getMatchLastBpPos()-first_res_pos;
-  
-    PeakIonPairPtrVec pair_ptrs = findPairs(ms_three_ptr, c_term_peak_ptrs, bgn, end, tole);
-    matched_pair_ptrs.insert(matched_pair_ptrs.end(), pair_ptrs.begin(), pair_ptrs.end());
+    for (size_t j = 0; j < ms_three_ptr_vec.size(); j++) {
+      TheoPeakPtrVec theo_peak_ptrs = getDiagonalTheoPeak(
+          proteo_ptr,
+          ms_three_ptr_vec[j]->getHeaderPtr()->getActivationPtr(),
+          header_ptrs,
+          i,
+          mng_ptr->prsm_para_ptr_->getSpParaPtr()->getMinMass());
+      TheoPeakPtrVec c_term_peak_ptrs = getCTermTheoPeakPtrs(theo_peak_ptrs);
+
+      int bgn = header_ptrs[i]->getMatchFirstBpPos()-first_res_pos;
+      int end = header_ptrs[i]->getMatchLastBpPos()-first_res_pos;
+
+      PeakIonPairPtrVec pair_ptrs = findPairs(ms_three_ptr_vec[j], c_term_peak_ptrs, bgn, end, tole);
+      matched_pair_ptrs.insert(matched_pair_ptrs.end(), pair_ptrs.begin(), pair_ptrs.end());
+    }
   }
 
   /* for last diagonal, obtain the distribution of errors of n-term ions */
-  TheoPeakPtrVec theo_peak_ptrs = getDiagonalTheoPeak(
-      proteo_ptr,
-      ms_three_ptr->getHeaderPtr()->getActivationPtr(),
-      header_ptrs,
-      header_ptrs.size() - 1,
-      mng_ptr->prsm_para_ptr_->getSpParaPtr()->getMinMass());
-  TheoPeakPtrVec n_term_peak_ptrs = getNTermTheoPeakPtrs(theo_peak_ptrs);
+  for (size_t j = 0; j < ms_three_ptr_vec.size(); j++) {
+    TheoPeakPtrVec theo_peak_ptrs = getDiagonalTheoPeak(
+        proteo_ptr,
+        ms_three_ptr_vec[j]->getHeaderPtr()->getActivationPtr(),
+        header_ptrs,
+        header_ptrs.size() - 1,
+        mng_ptr->prsm_para_ptr_->getSpParaPtr()->getMinMass());
+    TheoPeakPtrVec n_term_peak_ptrs = getNTermTheoPeakPtrs(theo_peak_ptrs);
 
-  int bgn = header_ptrs[header_ptrs.size()-1]->getMatchFirstBpPos()-first_res_pos;
-  int end = header_ptrs[header_ptrs.size()-1]->getMatchLastBpPos()-first_res_pos;
+    int bgn = header_ptrs[header_ptrs.size()-1]->getMatchFirstBpPos()-first_res_pos;
+    int end = header_ptrs[header_ptrs.size()-1]->getMatchLastBpPos()-first_res_pos;
 
-  PeakIonPairPtrVec pair_ptrs = findPairs(ms_three_ptr, n_term_peak_ptrs, bgn, end, tole);
-  matched_pair_ptrs.insert(matched_pair_ptrs.end(), pair_ptrs.begin(), pair_ptrs.end());
+    PeakIonPairPtrVec pair_ptrs = findPairs(ms_three_ptr_vec[j], n_term_peak_ptrs, bgn, end, tole);
+    matched_pair_ptrs.insert(matched_pair_ptrs.end(), pair_ptrs.begin(), pair_ptrs.end());
+  }
 
   for (size_t i = 0; i < matched_pair_ptrs.size(); i++) {
     double diff = matched_pair_ptrs[i]->getTheoPeakPtr()->getPosition() - 
@@ -240,25 +244,29 @@ double oldRefinePrecursorAndHeaderShift(ProteoformPtr proteo_ptr,
 
 DiagonalHeaderPtrVec refineHeadersBgnEnd(
     ProteoformPtr proteo_ptr,
-    ExtendMsPtr ms_three_ptr,
+    const ExtendMsPtrVec &ms_three_ptr_vec,
     const DiagonalHeaderPtrVec& header_ptrs,
     PtmMngPtr mng_ptr){
 
   DiagonalHeaderPtrVec result_list;
   int first_res_pos = header_ptrs[0]->getTruncFirstResPos();
   int last_res_pos = header_ptrs[header_ptrs.size()-1]->getTruncLastResPos();
-  for(size_t i=0;i<header_ptrs.size();i++){
-    TheoPeakPtrVec theo_peak_ptrs = getDiagonalTheoPeak(
-        proteo_ptr,
-        ms_three_ptr->getHeaderPtr()->getActivationPtr(),
-        header_ptrs,
-        i,
-        mng_ptr->prsm_para_ptr_->getSpParaPtr()->getMinMass());
-
+  for(size_t i=0; i<header_ptrs.size();i++){
     int bgn = header_ptrs[i]->getMatchFirstBpPos()-first_res_pos;
     int end = header_ptrs[i]->getMatchLastBpPos()-first_res_pos;
+    PeakIonPairPtrVec pair_ptrs; 
+    for (size_t j = 0; j < ms_three_ptr_vec.size(); j++) {
+      TheoPeakPtrVec theo_peak_ptrs = getDiagonalTheoPeak(
+          proteo_ptr,
+          ms_three_ptr_vec[j]->getHeaderPtr()->getActivationPtr(),
+          header_ptrs,
+          i,
+          mng_ptr->prsm_para_ptr_->getSpParaPtr()->getMinMass());
 
-    PeakIonPairPtrVec pair_ptrs = findPairs(ms_three_ptr, theo_peak_ptrs, bgn, end, 0);
+
+      PeakIonPairPtrVec cur_pair_ptrs = findPairs(ms_three_ptr_vec[j], theo_peak_ptrs, bgn, end, 0);
+      pair_ptrs.insert(pair_ptrs.end(), cur_pair_ptrs.begin(), cur_pair_ptrs.end());
+    }
     if(pair_ptrs.size()<1){
       int pair_size = pair_ptrs.size();
       LOG_TRACE("Empty Segment is found "+prot::convertToString(pair_size));

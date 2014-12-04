@@ -7,9 +7,10 @@ PtmSlowMatch::PtmSlowMatch(ProteoformPtr proteo_ptr,
                            CompShiftLowMemPtr comp_shift_ptr, 
                            PtmMngPtr mng_ptr){
   mng_ptr_ = mng_ptr;
-  deconv_ms_ptr_ = spectrum_set_ptr->getDeconvMsPtr();
-  ms_six_ptr_=spectrum_set_ptr->getMsSixPtr();
-  ms_three_ptr_ = spectrum_set_ptr->getMsThreePtr();
+  prec_mono_mass_ = spectrum_set_ptr->getPrecMonoMass();
+  deconv_ms_ptr_vec_ = spectrum_set_ptr->getDeconvMsPtrVec();
+  ms_six_ptr_vec_ = spectrum_set_ptr->getMsSixPtrVec();
+  ms_three_ptr_vec_ = spectrum_set_ptr->getMsThreePtrVec();
   proteo_ptr_ = proteo_ptr;
   initPsAlign(comp_shift_ptr);
 }
@@ -18,31 +19,25 @@ PtmSlowMatch::PtmSlowMatch(ProteoformPtr proteo_ptr,
 inline void PtmSlowMatch::initPsAlign(CompShiftLowMemPtr comp_shift_ptr){
   double scale = mng_ptr_->ptm_fast_filter_scale_;
   // n term strict c term nonstrict
-  std::pair<std::vector<int>, std::vector<int>> sp_masses_toles 
-      = getIntMassErrorList(ms_six_ptr_,scale,true,false);
+  std::vector<std::pair<int,int>> sp_masses_toles 
+      = getIntMassErrorList(ms_six_ptr_vec_,scale,true,false);
 
   std::vector<double> best_shifts = comp_shift_ptr->findBestShift(
-      sp_masses_toles.first,
-      sp_masses_toles.second,
+      sp_masses_toles,
       proteo_ptr_->getBpSpecPtr()->getScaledPrmMasses(scale),
       mng_ptr_->n_top_diagonals_,
       mng_ptr_->min_diagonal_gap_,
       scale);
   DiagonalHeaderPtrVec n_term_shift_header_ptrs 
-      = getNTermShiftHeaders (best_shifts, ms_six_ptr_, proteo_ptr_, mng_ptr_);
+      = getNTermShiftHeaders (best_shifts, prec_mono_mass_, proteo_ptr_, mng_ptr_);
 
-  /*
-  for (size_t i = 0; i < n_term_shift_header_ptrs.size(); i++) {
-    std::cout << " diagonal " << i << " shift " << n_term_shift_header_ptrs[i]->getProtNTermShift() << std::endl;
-  }
-  */
 
   BasicDiagonalPtrVec diagonal_ptrs = getDiagonals(n_term_shift_header_ptrs,
-                                                   ms_six_ptr_,proteo_ptr_,mng_ptr_);
+                                                   ms_six_ptr_vec_,proteo_ptr_,mng_ptr_);
   for (size_t i = 0; i < diagonal_ptrs.size(); i++) {
     diagonal_ptrs[i]->getHeader()->setId(i);
   }
-  std::vector<double> ms_masses = getMassList(ms_six_ptr_);
+  std::vector<double> ms_masses = getMassList(ms_six_ptr_vec_);
   std::vector<double> seq_masses = proteo_ptr_->getBpSpecPtr()->getPrmMasses();
   
   ps_align_ptr_ = PSAlignPtr(new PSAlign(ms_masses,seq_masses,diagonal_ptrs,mng_ptr_));
@@ -71,8 +66,7 @@ inline DiagonalHeaderPtr getTopLeftCornerHeader() {
 }
 
 inline DiagonalHeaderPtr getBottomRightCornerHeader(ProteoformPtr proteo_ptr,
-                                                    PrmMsPtr ms_six_ptr) {
-  double prec_mass = ms_six_ptr->getHeaderPtr()->getPrecMonoMass();
+                                                    double prec_mass) {
   double mole_mass = proteo_ptr->getResSeqPtr()->getSeqMass();
   double shift = prec_mass - mole_mass;
   // n term nostrict, c_term strict, prot n_term no match ; prot c_term match
@@ -104,7 +98,7 @@ inline bool isExist(const DiagonalHeaderPtrVec &header_ptrs, double shift) {
 
 inline DiagonalHeaderPtrVec PtmSlowMatch::getNTermShiftHeaders(
     const std::vector<double> &best_shifts,
-    PrmMsPtr ms_six_ptr,
+    double prec_mass,
     ProteoformPtr proteo_ptr,
     PtmMngPtr mng_ptr){
 
@@ -118,10 +112,10 @@ inline DiagonalHeaderPtrVec PtmSlowMatch::getNTermShiftHeaders(
   DiagonalHeaderPtrVec c_extend_header_ptrs;
   // get bottom-right corner header in the spectral grid. 
   DiagonalHeaderPtr bottom_right_corner_header_ptr 
-      = getBottomRightCornerHeader(proteo_ptr, ms_six_ptr);
+      = getBottomRightCornerHeader(proteo_ptr, prec_mass);
   c_extend_header_ptrs.push_back(bottom_right_corner_header_ptr);
 
-  double prec_mass_minus_water = ms_six_ptr->getHeaderPtr()->getPrecMonoMass() - MassConstant::getWaterMass();
+  double prec_mass_minus_water = prec_mass - MassConstant::getWaterMass();
   std::vector<double> prm_masses = proteo_ptr_->getBpSpecPtr()->getPrmMasses();
   // shifts for n_term matches
   std::vector<double> n_term_match_shifts;
@@ -189,16 +183,15 @@ PrsmPtr PtmSlowMatch::geneResult(int shift_num){
   int first_pos = header_ptrs[0]->getTruncFirstResPos();
   int last_pos = header_ptrs[header_ptrs.size()-1]->getTruncLastResPos();
   ProteoformPtr sub_proteo_ptr  = getSubProteoform(proteo_ptr_, first_pos, last_pos);
-  double refine_prec_mass = refinePrecursorAndHeaderShift(proteo_ptr_, ms_three_ptr_, 
-                                                          header_ptrs, mng_ptr_);
-  //double refine_prec_mass = ms_three_ptr_->getHeaderPtr()->getPrecMonoMass();
 
-  double delta = refine_prec_mass - deconv_ms_ptr_->getHeaderPtr()->getPrecMonoMass();
+  double refine_prec_mass = refinePrecursorAndHeaderShift(proteo_ptr_, ms_three_ptr_vec_, 
+                                                          header_ptrs, mng_ptr_);
+
   SpParaPtr sp_para_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr();
-  ExtendMsPtr refine_ms_ptr_ = createMsThreePtr(deconv_ms_ptr_, delta, sp_para_ptr);
+  ExtendMsPtrVec refine_ms_ptr_vec_ = createMsThreePtrVec(deconv_ms_ptr_vec_,  sp_para_ptr, refine_prec_mass);
 
   DiagonalHeaderPtrVec refined_header_ptrs = refineHeadersBgnEnd(
-      proteo_ptr_, refine_ms_ptr_, header_ptrs, mng_ptr_);
+      proteo_ptr_, refine_ms_ptr_vec_, header_ptrs, mng_ptr_);
 
   if(refined_header_ptrs.size()==0){
     return nullptr;
@@ -208,8 +201,8 @@ PrsmPtr PtmSlowMatch::geneResult(int shift_num){
                                               first_pos, last_pos);
   sub_proteo_ptr->addUnexpectedChangePtrVec(changes);
 
-  return PrsmPtr(new Prsm(sub_proteo_ptr, deconv_ms_ptr_, refine_prec_mass,
-          0, mng_ptr_->prsm_para_ptr_->getSpParaPtr()));
+  return PrsmPtr(new Prsm(sub_proteo_ptr, deconv_ms_ptr_vec_, refine_prec_mass,
+          mng_ptr_->prsm_para_ptr_->getSpParaPtr()));
 }
 
 } /* namespace prot */
