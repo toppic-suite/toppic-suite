@@ -21,7 +21,7 @@ class TdgfMng {
   /** Prsm filter */
   int comp_evalue_min_match_frag_num_ = 4;
 
-  bool use_table = false;
+  bool use_table = true;
 
   /**********************************
    * Tdgf Table parameters 

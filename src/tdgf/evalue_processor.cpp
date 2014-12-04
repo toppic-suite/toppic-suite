@@ -28,12 +28,12 @@ void EValueProcessor::init() {
   ResFreqPtrVec residue_freqs = test_num_ptr->getResFreqPtrVec();
   if (mng_ptr_->use_table) {
     comp_pvalue_table_ptr_ = CompPValueLookupTablePtr(
-        new CompPValueLookupTable(test_num_ptr, mng_ptr_));
+        new CompPValueLookupTable(mng_ptr_));
   }
-  else {
-    comp_pvalue_ptr_ = CompPValueArrayPtr(new CompPValueArray(test_num_ptr, mng_ptr_));
-    LOG_DEBUG("comp pvalue array initialized");
-  }
+
+  comp_pvalue_ptr_ = CompPValueArrayPtr(new CompPValueArray(test_num_ptr, mng_ptr_));
+  LOG_DEBUG("comp pvalue array initialized");
+
 }
 
 EValueProcessor::~EValueProcessor() {
