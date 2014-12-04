@@ -180,7 +180,7 @@ int process(int argc, char* argv[]) {
 
     std::cout << "Finding protein species started." << std::endl;
     double ppo;
-    std::istringstream (arguments["error_tolerance"]) >> ppo;
+    std::istringstream (arguments["errorTolerance"]) >> ppo;
     ppo = ppo /1000000.0;
     ResiduePtrVec residue_ptr_vec = prsm_para_ptr->getFixModResiduePtrVec();
     PrsmSpeciesPtr prsm_species = PrsmSpeciesPtr(
