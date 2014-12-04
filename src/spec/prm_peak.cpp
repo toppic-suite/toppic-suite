@@ -258,6 +258,7 @@ PrmMsPtr createShiftMsSixPtr(DeconvMsPtr deconv_ms_ptr, SpParaPtr sp_para_ptr,
   return PrmMsPtr(new Ms<PrmPeakPtr>(header_ptr, prm_peak_list, ppo));
 }
 
+/*
 std::pair<std::vector<int>, std::vector<int>> getIntMassErrorList(PrmMsPtr prm_ms_ptr, double scale,
                                                                   bool n_strict, bool c_strict){
   std::vector<int> masses;
@@ -290,6 +291,44 @@ std::pair<std::vector<int>, std::vector<int>> getIntMassErrorList(PrmMsPtr prm_m
   }
   std::pair<std::vector<int>, std::vector<int>> results( masses, errors);
   return results;
+}
+*/
+
+inline bool massErrorUp(const std::pair<int, int> &a, const std::pair<int,int> b) {
+  return a.first < b.first;
+}
+
+std::vector<std::pair<int, int>> getIntMassErrorList(const PrmMsPtrVec &prm_ms_ptr_vec, 
+                                                     double scale, bool n_strict, bool c_strict){
+  std::vector<std::pair<int,int>> mass_errors;
+  for (size_t i = 0; i < prm_ms_ptr_vec.size(); i++) {
+    PrmMsPtr prm_ms_ptr = prm_ms_ptr_vec[i];
+    std::pair<int,int> last_mass_error(-1, 0);
+    for(size_t i=0;i<prm_ms_ptr->size();i++){
+      int m = (int)std::round(prm_ms_ptr->getPeakPtr(i)->getPosition()*scale);
+      int e = 0;
+      if(n_strict && c_strict){
+        e = (int) std::ceil(prm_ms_ptr->getPeakPtr(i)->getStrictTolerance()*scale);
+      }
+      else if(n_strict && !c_strict){
+        e = (int) std::ceil(prm_ms_ptr->getPeakPtr(i)->getNStrictCRelaxTolerance()*scale);
+      }
+      else if(!n_strict && c_strict){
+        e = (int) std::ceil(prm_ms_ptr->getPeakPtr(i)->getNRelaxCStrictTolerance()*scale);
+      }
+      if(m != last_mass_error.first){
+        mass_errors.push_back(std::pair<int,int>(m,e));
+        last_mass_error = std::pair<int,int>(m,e);
+      }
+      else if(e>last_mass_error.second){
+        mass_errors.pop_back();
+        mass_errors.push_back(std::pair<int,int>(m,e));
+        last_mass_error = std::pair<int,int>(m,e);
+      }
+    }
+  }
+  std::sort(mass_errors.begin(), mass_errors.end(),massErrorUp);
+  return mass_errors;
 }
 
 std::vector<double> getMassList(PrmMsPtr prm_ms_ptr){

@@ -13,14 +13,14 @@ class DiagFilter {
  public:
   DiagFilter(const ProteoformPtrVec &proteo_ptrs,
              DiagFilterMngPtr mng_ptr);
-  SimplePrsmPtrVec getBestMatch(PrmMsPtr ms_ptr);
+  SimplePrsmPtrVec getBestMatch(const PrmMsPtrVec &ms_ptr_vec);
 
  private:
   DiagFilterMngPtr mng_ptr_;
   ProteoformPtrVec proteo_ptrs_;
   CompShiftPtr index_ptr_;
 
-  SimplePrsmPtrVec compute(PrmMsPtr ms_ptr);
+  SimplePrsmPtrVec compute(const PrmMsPtrVec &ms_ptr_vec);
 };
 
 typedef std::shared_ptr<DiagFilter> DiagFilterPtr;

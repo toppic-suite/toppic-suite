@@ -18,43 +18,46 @@ typedef std::vector<SimplePrsmPtr> SimplePrsmPtrVec;
 typedef std::vector<SimplePrsmPtrVec> SimplePrsmPtrVec2D;
 
 class SimplePrsm {
- public:
-  SimplePrsm(MsHeaderPtr header_ptr,ProteoformPtr proteo_ptr, int score);
-  SimplePrsm(xercesc::DOMElement* element);
-  std::string getSeqName(){return seq_name_;}
-  ProteoformPtr getProteoformPtr(){return proteo_ptr_;}
-  ProteoformPtrVec getModProteoformPtrs() {return mod_proteo_ptrs_;}
-  int getSeqId(){return seq_id_;}
-  double getScore(){return score_;}
-  int getSpectrumId(){return spectrum_id_;}
-  const std::string& getSpectrumScan(){return spectrum_scan_;}
-  double getPrecMass(){return prec_mass_;}
-  void setPrecursorId(int precursorId) {precursor_id_ = precursorId;}
-  int getPrecursorId(){return precursor_id_;}
-  xercesc::DOMElement* toXml(XmlDOMDocument* xml_doc);
+public:
+    SimplePrsm(MsHeaderPtr header_ptr,int spectrum_num,
+               ProteoformPtr proteo_ptr, int score);
+    SimplePrsm(xercesc::DOMElement* element);
+    std::string getSeqName(){return seq_name_;}
+    ProteoformPtr getProteoformPtr(){return proteo_ptr_;}
+    ProteoformPtrVec getModProteoformPtrs() {return mod_proteo_ptrs_;}
+    int getSeqId(){return seq_id_;}
+    double getScore(){return score_;}
+    int getSpectrumId(){return spectrum_id_;}
+    const std::string& getSpectrumScan(){return spectrum_scan_;}
+    int getSpectrumNum() {return spectrum_num_;}
+    double getPrecMass(){return prec_mass_;}
+    void setPrecursorId(int precursorId) {precursor_id_ = precursorId;}
+    int getPrecursorId(){return precursor_id_;}
+    xercesc::DOMElement* toXml(XmlDOMDocument* xml_doc);
 
-  //to study
-  bool isSameSpectrum(MsHeaderPtr header_ptr);
-  bool isLargerSpectrumId(MsHeaderPtr header_ptr);
-  void assignProteoformPtr(const ProteoformPtrVec &proteo_ptrs,
-                           const ProteoformPtrVec2D &mod_proteo_2d_ptrs);
+    //to study
+    bool isSameSpectrum(MsHeaderPtr header_ptr);
+    bool isLargerSpectrumId(MsHeaderPtr header_ptr);
+    void assignProteoformPtr(const ProteoformPtrVec &proteo_ptrs,
+                             const ProteoformPtrVec2D &mod_proteo_2d_ptrs);
 
-  void addProteoformPtr(faidx_t *fai, const ResiduePtrVec &residue_list,
-                        const ProtModPtrVec &prot_mods);
+    void addProteoformPtr(faidx_t *fai, const ResiduePtrVec &residue_list,
+                          const ProtModPtrVec &prot_mods);
 
 
- private:
-  int spectrum_id_;
-  std::string spectrum_scan_;
-  int precursor_id_;
-  double prec_mass_;
+private:
+    int spectrum_id_;
+    std::string spectrum_scan_;
+    int precursor_id_;
+    int spectrum_num_;
+    double prec_mass_;
 
-  ProteoformPtr proteo_ptr_;
-  ProteoformPtrVec mod_proteo_ptrs_;
-  int seq_id_;
-  std::string seq_name_;
-  std::string seq_desc_;
-  double score_;
+    ProteoformPtr proteo_ptr_;
+    ProteoformPtrVec mod_proteo_ptrs_;
+    int seq_id_;
+    std::string seq_name_;
+    std::string seq_desc_;
+    double score_;
 };
 
 SimplePrsmPtrVec getMatchedSimplePrsms(const SimplePrsmPtrVec &simple_prsm_ptrs,

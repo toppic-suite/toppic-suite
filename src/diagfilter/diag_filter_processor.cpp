@@ -48,23 +48,25 @@ void DiagFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num
                               block_ptr->getSeqIdx());
   DiagFilterPtr filter_ptr(new DiagFilter(raw_forms, mng_ptr_));
 
-  MsAlignReader reader(prsm_para_ptr->getSpectrumFileName());
+  int group_spec_num = mng_ptr_->prsm_para_ptr_->getGroupSpecNum();
+  SpParaPtr sp_para_ptr =  mng_ptr_->prsm_para_ptr_->getSpParaPtr();
+  MsAlignReader reader(prsm_para_ptr->getSpectrumFileName(), group_spec_num);
   std::string output_file_name = basename(prsm_para_ptr->getSpectrumFileName())
       + "." + mng_ptr_->output_file_ext_+"_"+ std::to_string(block_ptr->getBlockIdx());
   
      
   SimplePrsmWriter writer(output_file_name);
-  DeconvMsPtr deconv_ms_ptr;
+  SpectrumSetPtr spec_set_ptr;
   int spectrum_num = getSpNum (prsm_para_ptr->getSpectrumFileName());
   int cnt = 0;
-  while((deconv_ms_ptr = reader.getNextMs()) != nullptr){
-    cnt++;
-    SpectrumSetPtr spectrum_set_ptr = getSpectrumSet(deconv_ms_ptr,0,
-                                                     prsm_para_ptr->getSpParaPtr());
-    if(spectrum_set_ptr != nullptr){
+  while((spec_set_ptr = reader.getNextSpectrumSet(sp_para_ptr)) != nullptr){
+    cnt+= group_spec_num;
+    if(spec_set_ptr->isValid()){
+      /*
       PrmMsPtr ms_ptr = spectrum_set_ptr->getMsTwoPtr();
       SimplePrsmPtrVec match_ptrs = filter_ptr->getBestMatch(ms_ptr);
       writer.write(match_ptrs);
+      */
     }
     
     WebLog::percent_log(0.03 + (double) block_ptr->getBlockIdx() / total_block_num * 0.05

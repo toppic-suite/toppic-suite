@@ -10,11 +10,13 @@
 
 namespace prot {
 
-SimplePrsm::SimplePrsm(MsHeaderPtr header_ptr,ProteoformPtr proteo_ptr,int score){
+SimplePrsm::SimplePrsm(MsHeaderPtr header_ptr, int spectrum_num, 
+                       ProteoformPtr proteo_ptr,int score){
   spectrum_id_ = header_ptr->getId();
   spectrum_scan_ = header_ptr->getScansString();
   precursor_id_ = header_ptr->getPrecId();
   prec_mass_ = header_ptr->getPrecMonoMass();
+  spectrum_num_ = spectrum_num;
   proteo_ptr_= proteo_ptr;
   seq_id_ = proteo_ptr->getDbResSeqPtr()->getId();
   seq_name_ = proteo_ptr->getDbResSeqPtr()->getName();
@@ -27,6 +29,7 @@ SimplePrsm::SimplePrsm(xercesc::DOMElement* element){
   spectrum_scan_ = getChildValue(element, "spectrum_scan", 0);
   precursor_id_ = getIntChildValue(element, "precursor_id", 0);
   prec_mass_ = getDoubleChildValue(element, "precursor_mass", 0);
+  spectrum_num_ = getDoubleChildValue(element, "spectrum_number", 0);
   seq_id_ = getIntChildValue(element, "sequence_id", 0);
   seq_name_ = getChildValue(element, "sequence_name", 0);
   seq_desc_ = getChildValue(element, "sequence_desc", 0);
@@ -42,6 +45,8 @@ xercesc::DOMElement* SimplePrsm::toXml(XmlDOMDocument* xml_doc){
   xml_doc->addElement(element, "precursor_id", str.c_str());
   str = convertToString(prec_mass_);
   xml_doc->addElement(element, "precursor_mass", str.c_str());
+  str = convertToString(spectrum_num_);
+  xml_doc->addElement(element, "spectrum_number", str.c_str());
   str = convertToString(seq_id_);
   xml_doc->addElement(element, "sequence_id", str.c_str());
   str = convertToString(score_);
