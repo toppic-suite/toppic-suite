@@ -13,7 +13,7 @@ all:
 	cd prsm; make
 	cd zeroptmsearch; make
 	cd diagfilter; make
-#	cd oneptmfilter; make
+	cd oneptmfilter; make
 #	cd ptmsearch; make
 #	cd tdgf; make
 #	cd poisson; make
