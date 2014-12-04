@@ -28,6 +28,7 @@ CompProbValue::CompProbValue(double convert_ratio, const ResFreqPtrVec &residue_
 
   max_sp_len_ = (int) std::round(max_sp_prec_mass * convert_ratio_);
   pos_scores_ = new short[max_sp_len_ + block_len_];
+  tmp_pos_scores_ = new short[mas_sp_len_ + block_len_];
   setFactors();
 }
 
@@ -37,6 +38,9 @@ CompProbValue::~CompProbValue() {
   }
   if (pos_scores_ != nullptr) {
     delete pos_scores_;
+  }
+  if (tmp_pos_scores_ != nullptr) {
+    delete tmp_pos_scores_;
   }
 }
 
@@ -81,7 +85,7 @@ inline void CompProbValue::clearVar() {
 }
 
 void CompProbValue::compute(const ResFreqPtrVec &n_residue_ptrs, 
-                            const PrmPeakPtrVec &peak_ptrs, 
+                            const PrmPeakPtrVec2D &peak_ptr_2d, 
                             int thresh, int shift_num, bool strict) {
   //clear variables
   clearVar();
@@ -95,6 +99,7 @@ void CompProbValue::compute(const ResFreqPtrVec &n_residue_ptrs,
     return;
   }
   setMassErr(peak_ptrs, strict);
+  /*
   setPosScores(peak_masses_, peak_tolerances_, base_types_);
   int last_peak_index = peak_masses_.size() - 1;
   int max_peak_mass = peak_masses_[last_peak_index]
@@ -112,10 +117,17 @@ void CompProbValue::compute(const ResFreqPtrVec &n_residue_ptrs,
   }
   shift_num_ = shift_num;
   comp();
+  */
 }
 
-inline void CompProbValue::setMassErr(const PrmPeakPtrVec &peak_ptrs, bool strict) {
+inline void CompProbValue::setMassErr(const PrmPeakPtrVec2D &peak_ptr_2d, bool strict) {
   //LOG_DEBUG("MAX MASS " << peak_ptrs[peak_ptrs.size() - 1]->getMonoMass());
+  // add mass 0;
+  peak_masses_.push_back(0);
+  peak_tolerances_.push_back(0);
+  base_types_.push_back(PRM_PEAK_TYPE_ORIGIN);
+  spec_ids_.push_back(0);
+  //TO CONTINUE ***
   for (size_t i = 0; i < peak_ptrs.size(); i++) {
     peak_masses_.push_back((int) std::round(peak_ptrs[i]->getMonoMass()
                                             * convert_ratio_));

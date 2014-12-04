@@ -87,6 +87,7 @@ class CompProbValue {
 
   double* page_table_;
   short* pos_scores_;
+  short* tmp_pos_scores_;
 
   void setFactors();
 
