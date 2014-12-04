@@ -13,6 +13,8 @@ class CompPValueLookupTable {
 
   void process(DeconvMsPtr deconv_ms_ptr, PrsmPtrVec &prsm_ptrs);
 
+  bool inTable(DeconvMsPtr deconv_ms_ptr, PrsmPtrVec &prsm_ptrs);
+
  private:
 
   void initTable();
@@ -25,7 +27,7 @@ class CompPValueLookupTable {
   double ptm1_[41][20];
   double ptm2_[41][20];
 
-  double compProb(int match_frag_num, int unexpected_shift_num);
+  double compProb(int peak_num, int match_frag_num, int unexpected_shift_num);
 };
 
 typedef std::shared_ptr<CompPValueLookupTable> CompPValueLookupTablePtr;
@@ -33,6 +35,11 @@ typedef std::shared_ptr<CompPValueLookupTable> CompPValueLookupTablePtr;
 int getPeakIndex(int i);
 
 int getFragIndex(int i);
+
+// get x1, x2, y1, y2
+std::vector<int> getFourIndex(int peak_num, int frag_num);
+
+int getPeakNumFromIndex(int idx);
 
 }
 
