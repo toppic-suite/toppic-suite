@@ -74,7 +74,9 @@ void OnePtmFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_n
                               block_ptr->getSeqIdx());
   OnePtmFilterPtr filter_ptr(new OnePtmFilter(raw_forms, mng_ptr_));
 
-  MsAlignReader reader(prsm_para_ptr->getSpectrumFileName());
+  int group_spec_num = mng_ptr_->prsm_para_ptr_->getGroupSpecNum();
+  SpParaPtr sp_para_ptr =  mng_ptr_->prsm_para_ptr_->getSpParaPtr();
+  MsAlignReader reader(prsm_para_ptr->getSpectrumFileName(), group_spec_num);
   std::string output_file_name = basename(prsm_para_ptr->getSpectrumFileName())
       + "." + mng_ptr_->output_file_ext_;
   std::string block_str = std::to_string(block_ptr->getBlockIdx());
@@ -83,17 +85,15 @@ void OnePtmFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_n
   SimplePrsmWriter pref_writer(output_file_name + "_PREFIX_" + block_str);
   SimplePrsmWriter suff_writer(output_file_name + "_SUFFIX_" + block_str);
   SimplePrsmWriter internal_writer(output_file_name + "_INTERNAL_" + block_str);
-      
-  DeconvMsPtr deconv_ms_ptr;
+
+  SpectrumSetPtr spec_set_ptr;
   int spectrum_num = getSpNum (prsm_para_ptr->getSpectrumFileName());
   int cnt = 0;
-  while((deconv_ms_ptr = reader.getNextMs()) != nullptr){
-    cnt++;
-    SpectrumSetPtr spectrum_set_ptr = getSpectrumSet(deconv_ms_ptr,0,
-                                                     prsm_para_ptr->getSpParaPtr());
-    if(spectrum_set_ptr != nullptr){
-      PrmMsPtr ms_ptr = spectrum_set_ptr->getMsTwoPtr();
-      filter_ptr->computeBestMatch(ms_ptr);
+  while((spec_set_ptr = reader.getNextSpectrumSet(sp_para_ptr)) != nullptr){
+    cnt+= group_spec_num;
+    if(spec_set_ptr->isValid()){
+      PrmMsPtrVec ms_ptr_vec = spec_set_ptr->getMsTwoPtrVec();
+      filter_ptr->computeBestMatch(ms_ptr_vec);
       comp_writer.write(filter_ptr->getCompMatchPtrs());
       pref_writer.write(filter_ptr->getPrefMatchPtrs());
       suff_writer.write(filter_ptr->getSuffMatchPtrs());

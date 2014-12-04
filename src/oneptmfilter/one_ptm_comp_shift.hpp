@@ -13,7 +13,7 @@ class OnePtmCompShift {
 
   ~OnePtmCompShift();
 
-  void compConvolution(std::vector<int> &masses, std::vector<int> &errors, int num);
+  void compConvolution(const std::vector<std::pair<int,int>> &mass_errors, int num);
 
   std::vector<std::pair<int,int>> getTopCompProteoScores() {return top_comp_proteo_scores_;}
   std::vector<std::pair<int,int>> getTopPrefProteoScores() {return top_pref_proteo_scores_;}
