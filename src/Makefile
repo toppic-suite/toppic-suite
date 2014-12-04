@@ -12,14 +12,14 @@ all:
 	cd spec; make
 	cd prsm; make
 	cd zeroptmsearch; make
-#	cd diagfilter; make
+	cd diagfilter; make
 #	cd oneptmfilter; make
 #	cd ptmsearch; make
 #	cd tdgf; make
 #	cd poisson; make
 #	cd prsmview; make	
 #	cd console; make
-#	cd test; make
+	cd test; make
 
 clean:
 	cd base; make clean
