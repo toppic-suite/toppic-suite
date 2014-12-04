@@ -16,6 +16,7 @@ class PrsmSpecies {
               const std::string &spec_file_name,
               const std::string &input_file_ext,
               const std::string &output_file_ext, 
+              const ResiduePtrVec &residue_ptv_vec,
               double ppo);
   void process();
  private:
@@ -23,6 +24,7 @@ class PrsmSpecies {
   std::string spec_file_name_;
   std::string input_file_ext_;
   std::string output_file_ext_;
+  ResiduePtrVec residue_ptr_vec_;
   double ppo_;
 };
 

@@ -7,7 +7,7 @@
 
 #include <string>
 #include <iostream>
-
+#include <fstream>
 
 namespace prot {
 
@@ -53,6 +53,17 @@ extern int log_level;
       std::cout << "LOG ERROR: " << __FILE__ << ": " << X << std::endl;      \
     }                                   \
   }
+
+class WebLog {
+ public:
+  static void init(std::string log_file_name);
+  static void percent_log(double p);
+  static void close();
+
+ private:
+  static std::ofstream log_;
+  static std::string log_file_name_;
+};
 
 }
 #endif

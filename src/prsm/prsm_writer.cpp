@@ -7,12 +7,25 @@ PrsmWriter::PrsmWriter(const std::string &file_name) {
   file_.open(file_name.c_str());
   LOG_DEBUG("file_name " << file_name);
   file_ << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << std::endl;
-  file_ << "<prsm_list>";
+  file_ << "<prsm_list>" << std::endl;
 }
 
 void PrsmWriter::close(){
   file_ << "</prsm_list>" << std::endl;
   file_.close();
+}
+
+void PrsmWriter::write(PrsmStrPtr prsm_str_ptr) {
+  std::vector<std::string> strs = prsm_str_ptr->getStrVec();
+  for(size_t i = 0; i < strs.size(); i++) {
+    file_ << strs[i] << std::endl;
+  }
+}
+
+void PrsmWriter::writeVector(const PrsmStrPtrVec &prsm_str_ptr_vec) {
+  for(size_t i = 0; i < prsm_str_ptr_vec.size(); i++) {
+    write(prsm_str_ptr_vec[i]);
+  }
 }
 
 

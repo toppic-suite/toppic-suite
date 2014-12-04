@@ -1,14 +1,15 @@
 #include <map>
 
 #include "base/file_util.hpp"
+#include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_species.hpp"
 #include "prsmview/xml_generator.hpp"
 
 namespace prot {
 XmlGenerator::XmlGenerator(PrsmParaPtr prsm_para_ptr, 
                            const std::string &exec_dir, 
-                           const std::string &input_file_name) {
-  input_file_name_ = input_file_name;
+                           const std::string &input_file_ext) {
+  input_file_ext_ = input_file_ext;
   mng_ptr_ = PrsmViewMngPtr(new PrsmViewMng(prsm_para_ptr, exec_dir));
   anno_view_ptr_ = AnnoViewPtr(new AnnoView());
 }
@@ -67,22 +68,28 @@ void XmlGenerator::outputProteoforms(const PrsmPtrVec &prsm_ptrs){
 }
 
 void XmlGenerator::outputProteins(const PrsmPtrVec &prsm_ptrs){
+  //LOG_DEBUG("prsm number " << prsm_ptrs.size());
+  FastaReader reader(mng_ptr_->prsm_para_ptr_->getSearchDbFileName());
+  ResiduePtrVec residue_ptr_vec = mng_ptr_->prsm_para_ptr_->getFixModResiduePtrVec();
+  ProteoformPtr proteo_ptr = reader.getNextProteoformPtr(residue_ptr_vec);
 
-  for(unsigned int i=0;i<proteo_ptrs_.size();i++){
-    std::vector<int> species = getSpeciesIds(prsm_ptrs,proteo_ptrs_[i]->getDbResSeqPtr()->getId());
+  while (proteo_ptr != nullptr) { 
+    std::vector<int> species = getSpeciesIds(prsm_ptrs,proteo_ptr->getDbResSeqPtr()->getId());
+    //LOG_DEBUG("species size " << species.size());
     if(species.size()>0){
       std::string file_name = mng_ptr_->xml_path_ + FILE_SEPARATOR +"proteins" 
-          +FILE_SEPARATOR+ "protein"+convertToString(proteo_ptrs_[i]->getDbResSeqPtr()->getId())+".xml";
+          +FILE_SEPARATOR+ "protein"+convertToString(proteo_ptr->getDbResSeqPtr()->getId())+".xml";
       XmlWriter writer(file_name,"");
-      writer.write(proteinToXml(writer.getDoc(),prsm_ptrs,proteo_ptrs_[i],species, mng_ptr_));
+      writer.write(proteinToXml(writer.getDoc(),prsm_ptrs,proteo_ptr,species, mng_ptr_));
       writer.close();
       std::vector<std::string> file_info;
       file_info.push_back(file_name);
       file_info.push_back(mng_ptr_->executive_dir_ + FILE_SEPARATOR + "toppic_resources" + FILE_SEPARATOR + "xsl" + FILE_SEPARATOR + "protein.xsl");
       file_info.push_back(mng_ptr_->html_path_+ FILE_SEPARATOR + "proteins" + FILE_SEPARATOR 
-                          + "protein"+convertToString(proteo_ptrs_[i]->getDbResSeqPtr()->getId())+".html");
+                          + "protein"+convertToString(proteo_ptr->getDbResSeqPtr()->getId())+".html");
       anno_view_ptr_->file_list_.push_back(file_info);
     }
+    proteo_ptr = reader.getNextProteoformPtr(residue_ptr_vec);
   }
 }
 
@@ -90,8 +97,7 @@ void XmlGenerator::outputAllProteins(const PrsmPtrVec &prsm_ptrs){
 
   std::string file_name = mng_ptr_->xml_path_+ FILE_SEPARATOR +"proteins.xml";
   XmlWriter writer(file_name,"protein_list");
-  writer.write(allProteinToXml(writer.getDoc(),prsm_ptrs,proteo_ptrs_, 
-                               mng_ptr_));
+  writer.write(allProteinToXml(writer.getDoc(),prsm_ptrs, mng_ptr_));
   writer.close();
   std::vector<std::string> file_info;
   file_info.push_back(file_name);
@@ -115,10 +121,12 @@ void XmlGenerator::process(){
 
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   std::string spectrum_file_name = prsm_para_ptr->getSpectrumFileName();
-  proteo_ptrs_ = readFastaToProteoform(prsm_para_ptr->getSearchDbFileName(),
-                                     prsm_para_ptr->getFixModResiduePtrVec());
-  std::string input_name = basename(spectrum_file_name)+"."+input_file_name_;
-  PrsmPtrVec prsm_ptrs = readPrsm(basename(spectrum_file_name)+"."+input_file_name_,proteo_ptrs_);
+  std::string input_file_name = basename(spectrum_file_name) + "." + input_file_ext_;
+  std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
+  ResiduePtrVec residue_ptr_vec = prsm_para_ptr->getFixModResiduePtrVec();
+
+  PrsmPtrVec prsm_ptrs = readAllPrsms(input_file_name, db_file_name,
+                                      residue_ptr_vec);
   LOG_DEBUG("prsm loaded");
 
   addSpectrumPtrsToPrsms(prsm_ptrs, prsm_para_ptr);

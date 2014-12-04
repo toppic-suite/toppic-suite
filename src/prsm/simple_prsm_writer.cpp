@@ -28,6 +28,13 @@ void SimplePrsmWriter::close(){
   file_.close();
 }
 
+void SimplePrsmWriter::write(SimplePrsmStrPtr prsm_str_ptr) {
+  std::vector<std::string> strs = prsm_str_ptr->getStrVec();
+  for(size_t i = 0; i < strs.size(); i++) {
+    file_ << strs[i] << std::endl;
+  }
+}
+
 void SimplePrsmWriter::write(const SimplePrsmPtrVec &simple_prsm_ptrs){
   for(size_t i=0;i<simple_prsm_ptrs.size();i++){
     xercesc::DOMElement* element = simple_prsm_ptrs[i]->toXml(doc_);

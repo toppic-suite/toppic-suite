@@ -7,6 +7,7 @@
 #include "spec/msalign_reader.hpp"
 #include "spec/spectrum_set.hpp"
 #include "prsm/prsm.hpp"
+#include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_writer.hpp"
 #include "tdgf/evalue_processor.hpp"
 
@@ -15,79 +16,76 @@ namespace prot {
 
 EValueProcessor::EValueProcessor(TdgfMngPtr mng_ptr) {
   mng_ptr_ = mng_ptr;
+  init();
 }
 
 void EValueProcessor::init() {
-  PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
-  ProteoformPtrVec raw_proteo_ptrs 
-      = readFastaToProteoform(prsm_para_ptr->getSearchDbFileName(), 
-                              prsm_para_ptr->getFixModResiduePtrVec());
+  CountTestNumPtr test_num_ptr = CountTestNumPtr(new CountTestNum(mng_ptr_));
+  LOG_DEBUG("Count test number initialized.");
 
-  ProteoformPtrVec mod_proteo_ptrs 
-      = generateProtModProteoform(raw_proteo_ptrs, prsm_para_ptr->getAllowProtModPtrVec());
+  fai_ = fai_load(mng_ptr_->prsm_para_ptr_->getSearchDbFileName().c_str());
 
-  LOG_DEBUG("protein data set loaded");
-
-  ResFreqPtrVec residue_freqs 
-      = compResidueFreq(prsm_para_ptr->getFixModResiduePtrVec(), raw_proteo_ptrs); 
-  LOG_DEBUG("residue frequency initialized");
-
+  ResFreqPtrVec residue_freqs = test_num_ptr->getResFreqPtrVec();
   if (mng_ptr_->use_table) {
     comp_pvalue_table_ptr_ = CompPValueLookupTablePtr(
-        new CompPValueLookupTable(raw_proteo_ptrs, mod_proteo_ptrs, residue_freqs, mng_ptr_));
+        new CompPValueLookupTable(test_num_ptr, mng_ptr_));
   }
   else {
-    comp_pvalue_ptr_ = CompPValueArrayPtr(
-        new CompPValueArray(raw_proteo_ptrs, mod_proteo_ptrs, residue_freqs, mng_ptr_));
+    comp_pvalue_ptr_ = CompPValueArrayPtr(new CompPValueArray(test_num_ptr, mng_ptr_));
     LOG_DEBUG("comp pvalue array initialized");
   }
+}
 
-  std::string input_file_name = basename(prsm_para_ptr->getSpectrumFileName())
-      + "." + mng_ptr_->input_file_ext_;
-  //std::cout<<input_file_name<<std::endl;
-  prsm_ptrs_ = readPrsm(input_file_name, raw_proteo_ptrs);
-  LOG_DEBUG("prsm_ptrs loaded");
+EValueProcessor::~EValueProcessor() {
+  fai_destroy(fai_);
 }
 
 
 /* compute E-value. Separate: compute E-value separately or not */
 
 void EValueProcessor::process(bool is_separate) {
-  std::string spectrum_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
-  std::string log_file_name = mng_ptr_->prsm_para_ptr_->getLogFileName();
-  
-  std::ofstream logfile;
+  PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
 
-  if (log_file_name.length() != 0){
-    logfile.open(log_file_name, std::ios::out | std::ios::app);
-  }   
-  
-  int spectrum_num = countSpNum(spectrum_file_name);
+  std::string spectrum_file_name = prsm_para_ptr->getSpectrumFileName();
   MsAlignReader reader (spectrum_file_name);
+
+  std::string input_file_name 
+      = basename(spectrum_file_name) + "." + mng_ptr_->input_file_ext_;
+  LOG_DEBUG("input file name " << input_file_name);
+  PrsmReader prsm_reader(input_file_name);
+  ResiduePtrVec residue_ptr_vec = prsm_para_ptr->getFixModResiduePtrVec();
+  PrsmPtr prsm_ptr = prsm_reader.readOnePrsm(fai_, residue_ptr_vec);
+
   std::string output_file_name = basename(spectrum_file_name)
        + "." + mng_ptr_->output_file_ext_;
   PrsmWriter writer(output_file_name);
+
   int cnt = 0;
+  int spectrum_num = getSpNum (spectrum_file_name);
 
   DeconvMsPtr ms_ptr = reader.getNextMs();
   while (ms_ptr.get() != nullptr) {
     cnt++;
-    processOneSpectrum(ms_ptr, is_separate, writer);
+    PrsmPtrVec selected_prsm_ptrs;
+    //LOG_DEBUG("prsm " << prsm_ptr);
+    //if (prsm_ptr != nullptr) {
+      //LOG_DEBUG("spectrum id " << ms_ptr->getHeaderPtr()->getId() << " prsm spectrum id " << prsm_ptr->getSpectrumId());
+    //}
+    while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == ms_ptr->getHeaderPtr()->getId()) {
+      selected_prsm_ptrs.push_back(prsm_ptr);
+      prsm_ptr = prsm_reader.readOnePrsm(fai_, residue_ptr_vec);
+    }
+    processOneSpectrum(ms_ptr, selected_prsm_ptrs, is_separate, writer);
     ms_ptr = reader.getNextMs();
     if (ms_ptr.get() != nullptr) {
       std::cout << std::flush << "E-value computation is processing " << cnt << " of " 
           << spectrum_num << " spectra.\r";
     }
     
-    if (log_file_name.length() != 0){
-      if (logfile.is_open()) {
-        logfile << 0.373 + (double) cnt / spectrum_num * 0.62 << std::endl;
-      }
-    }	
-    
+    WebLog::percent_log(0.373 + (double) cnt / spectrum_num * 0.62);
   }
-  logfile.close();
   reader.close();
+  prsm_reader.close();
 
   //because the prsm_writer ~PrsmWriter changed and the fileclosing is an independant function
   writer.close();
@@ -134,13 +132,14 @@ void EValueProcessor::compEvalues(SpectrumSetPtr spec_set_ptr,
   }
 }
 
-void EValueProcessor::processOneSpectrum(DeconvMsPtr ms_ptr, bool is_separate,
+void EValueProcessor::processOneSpectrum(DeconvMsPtr ms_ptr, 
+                                         PrsmPtrVec &sele_prsm_ptrs,
+                                         bool is_separate,
                                          PrsmWriter &writer) {
+  //LOG_DEBUG("sele prsm number " << sele_prsm_ptrs.size());
   SpectrumSetPtr spec_set_ptr 
       = getSpectrumSet(ms_ptr, 0, mng_ptr_->prsm_para_ptr_->getSpParaPtr());
   if (spec_set_ptr.get() != nullptr) {
-    PrsmPtrVec sele_prsm_ptrs;
-    filterPrsms(prsm_ptrs_, ms_ptr->getHeaderPtr(), sele_prsm_ptrs);
 
     bool need_comp = checkPrsms(sele_prsm_ptrs);
     //LOG_DEBUG("Need computation: " << need_comp );
@@ -151,7 +150,6 @@ void EValueProcessor::processOneSpectrum(DeconvMsPtr ms_ptr, bool is_separate,
     
     //LOG_DEBUG("start sort");
     std::sort(sele_prsm_ptrs.begin(), sele_prsm_ptrs.end(), prsmEValueUp);
-    //LOG_DEBUG("start writing");
     writer.writeVector(sele_prsm_ptrs);
     //LOG_DEBUG("writing complete");
   }

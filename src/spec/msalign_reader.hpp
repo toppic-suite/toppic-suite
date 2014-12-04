@@ -33,5 +33,9 @@ class MsAlignReader {
 
 int countSpNum(const std::string &spectrum_file);
 
+void generateSpIndex(const std::string &spectrum_file_name);
+
+int getSpNum(const std::string &spectrum_file_name);
+
 }
 #endif

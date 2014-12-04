@@ -222,8 +222,7 @@ inline void OnePtmCompShift::initRevIndexes(const ProteoformPtrVec &proteo_ptrs)
 }
 
 
-std::vector<std::pair<int,int>> OnePtmCompShift::compConvolution(
-    std::vector<int> &masses, std::vector<int> &errors, int num){
+void OnePtmCompShift::compConvolution(std::vector<int> &masses, std::vector<int> &errors, int num){
 
   short* scores = new short[row_num_];
   memset(scores, 0, row_num_ * sizeof(short));
@@ -278,10 +277,9 @@ std::vector<std::pair<int,int>> OnePtmCompShift::compConvolution(
     }
   }
 
-  std::vector<std::pair<int,int>> results = getShiftScores(scores, rev_scores, num);
+  compShiftScores(scores, rev_scores, num);
   delete[] scores;
   delete[] rev_scores;
-  return results;
 }
 
 inline bool scoreCompare(const std::pair<int, int> &a, const std::pair<int, int> &b) {
@@ -291,6 +289,7 @@ inline bool scoreCompare(const std::pair<int, int> &a, const std::pair<int, int>
 inline void addResults(std::vector<std::pair<int,int>> &results, std::vector<std::pair<int,int>> &single_type_results, 
                        int single_type_num) {
 
+  results.clear();
   std::sort(single_type_results.begin(), single_type_results.end(), scoreCompare);
   int output_num =0;
   for(int i=0;i< single_type_num;i++){
@@ -307,7 +306,7 @@ inline void addResults(std::vector<std::pair<int,int>> &results, std::vector<std
   }
 }
 
-inline std::vector<std::pair<int,int>> OnePtmCompShift::getShiftScores(short* scores, short* rev_scores, int num){
+inline void OnePtmCompShift::compShiftScores(short* scores, short* rev_scores, int num){
   std::vector<std::pair<int,int>> comp_proteo_scores;
   std::vector<std::pair<int,int>> pref_proteo_scores;
   std::vector<std::pair<int,int>> suff_proteo_scores;
@@ -353,12 +352,10 @@ inline std::vector<std::pair<int,int>> OnePtmCompShift::getShiftScores(short* sc
   int single_type_num = num / 4;
   //LOG_DEBUG("num " << num << " Single type num " << single_type_num);
   std::vector<std::pair<int,int>> results;
-  addResults(results, comp_proteo_scores, single_type_num);
-  addResults(results, pref_proteo_scores, single_type_num);
-  addResults(results, suff_proteo_scores, single_type_num);
-  addResults(results, internal_proteo_scores, single_type_num);
-
-  return results;
+  addResults(top_comp_proteo_scores_, comp_proteo_scores, single_type_num);
+  addResults(top_pref_proteo_scores_, pref_proteo_scores, single_type_num);
+  addResults(top_suff_proteo_scores_, suff_proteo_scores, single_type_num);
+  addResults(top_internal_proteo_scores_, internal_proteo_scores, single_type_num);
 }
 
 
