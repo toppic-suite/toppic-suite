@@ -9,23 +9,31 @@ namespace prot {
 
 class CompPValueLookupTable {
  public:
-  CompPValueLookupTable(CountTestNumPtr test_num_ptr,
-                        TdgfMngPtr mng_ptr);
+  CompPValueLookupTable(TdgfMngPtr mng_ptr);
 
   void process(DeconvMsPtr deconv_ms_ptr, PrsmPtrVec &prsm_ptrs);
 
-
  private:
-  TdgfMngPtr mng_ptr_;
-  CountTestNumPtr test_num_ptr_;
-  
+
   void initTable();
 
-  double compProb(int ppo, double prec_mass, int peak_num, 
-                  int match_frag_num, int unexpected_shift_num);
+  TdgfMngPtr mng_ptr_;
+  CountTestNumPtr test_num_ptr_;
+  std::ifstream input_;
+
+  double ptm0_[41][20];
+  double ptm1_[41][20];
+  double ptm2_[41][20];
+
+  double compProb(int ppo, double prec_mass, int peak_num, int match_frag_num,
+                  int unexpected_shift_num);
 };
 
 typedef std::shared_ptr<CompPValueLookupTable> CompPValueLookupTablePtr;
+
+int getPeakIndex(int i);
+
+int getFragIndex(int i);
 
 }
 
