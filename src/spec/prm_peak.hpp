@@ -85,8 +85,8 @@ PrmMsPtrVec createMsSixPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, SpParaPtr
 PrmMsPtrVec createShiftMsSixPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, SpParaPtr sp_para_ptr, 
                                    double prec_mono_mass, double shift);
 
-std::pair<std::vector<int>,std::vector<int>> getIntMassErrorList(PrmMsPtr prm_ms_ptr, double scale,
-                                                                 bool n_strict, bool c_strict);
+std::vector<std::pair<int,int>> getIntMassErrorList(const PrmMsPtrVec &prm_ms_ptr_vec, double scale,
+                                                    bool n_strict, bool c_strict);
 
 std::vector<double> getMassList(PrmMsPtr prm_ms_ptr);
 std::vector<double> getScoreList(PrmMsPtr prm_ms_ptr);
