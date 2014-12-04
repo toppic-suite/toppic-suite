@@ -16,8 +16,10 @@ CompPValueLookupTable::CompPValueLookupTable(TdgfMngPtr mng_ptr) {
 
 void CompPValueLookupTable::initTable() {
   // add init table
-  int ppo = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()
-      ->getPpo();
+  int ppo = mng_ptr_->prsm_para_ptr_->getErrorTolerance();
+
+  LOG_DEBUG("ppo " << ppo);
+
   std::string line;
   std::vector<std::string> strs;
 
@@ -33,6 +35,8 @@ void CompPValueLookupTable::initTable() {
         std::stod(strs[2]);
   }
 
+  input_.close();
+
   input_.open(
       mng_ptr_->prsm_para_ptr_->getExeDir() + FILE_SEPARATOR
           + "toppic_resources" + FILE_SEPARATOR + "p_value_table"
@@ -44,6 +48,8 @@ void CompPValueLookupTable::initTable() {
     ptm1_[getPeakIndex(std::stoi(strs[0]))][getFragIndex(std::stoi(strs[1]))] =
         std::stod(strs[2]);
   }
+
+  input_.close();
 
   input_.open(
       mng_ptr_->prsm_para_ptr_->getExeDir() + FILE_SEPARATOR
@@ -57,11 +63,11 @@ void CompPValueLookupTable::initTable() {
         std::stod(strs[2]);
   }
 
+  input_.close();
   LOG_DEBUG("table initialized");
 }
 
-double CompPValueLookupTable::compProb(int ppo, double prec_mass, int peak_num,
-                                       int match_frag_num,
+double CompPValueLookupTable::compProb(int match_frag_num,
                                        int unexpected_shift_num) {
   // add implementation.
   return 1.0;
@@ -70,8 +76,7 @@ double CompPValueLookupTable::compProb(int ppo, double prec_mass, int peak_num,
 /* set alignment */
 void CompPValueLookupTable::process(DeconvMsPtr deconv_ms_ptr,
                                     PrsmPtrVec &prsm_ptrs) {
-  int ppo = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()
-      ->getPpo();
+
   int peak_num = deconv_ms_ptr->size();
   double tolerance = deconv_ms_ptr->getHeaderPtr()->getErrorTolerance();
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
@@ -80,8 +85,7 @@ void CompPValueLookupTable::process(DeconvMsPtr deconv_ms_ptr,
     int unexpected_shift_num = prsm_ptrs[i]->getProteoformPtr()
         ->getUnexpectedChangeNum();
 
-    double prot_prob = compProb(ppo, refine_prec_mass, peak_num, match_frag_num,
-                                unexpected_shift_num);
+    double prot_prob = compProb(match_frag_num, unexpected_shift_num);
 
     SemiAlignTypePtr type_ptr = prsm_ptrs[i]->getProteoformPtr()
         ->getSemiAlignType();
