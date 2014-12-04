@@ -13,8 +13,12 @@ class OnePtmCompShift {
 
   ~OnePtmCompShift();
 
-  std::vector<std::pair<int,int>> compConvolution(std::vector<int> &masses, 
-                                                  std::vector<int> &errors, int num);
+  void compConvolution(std::vector<int> &masses, std::vector<int> &errors, int num);
+
+  std::vector<std::pair<int,int>> getTopCompProteoScores() {return top_comp_proteo_scores_;}
+  std::vector<std::pair<int,int>> getTopPrefProteoScores() {return top_pref_proteo_scores_;}
+  std::vector<std::pair<int,int>> getTopSuffProteoScores() {return top_suff_proteo_scores_;}
+  std::vector<std::pair<int,int>> getTopInternalProteoScores() {return top_internal_proteo_scores_;}
 
  private:
   // scale factor
@@ -38,12 +42,17 @@ class OnePtmCompShift {
   int* rev_col_index_ends_;
   int* rev_col_indexes_;
 
+  std::vector<std::pair<int,int>> top_comp_proteo_scores_;
+  std::vector<std::pair<int,int>> top_pref_proteo_scores_;
+  std::vector<std::pair<int,int>> top_suff_proteo_scores_;
+  std::vector<std::pair<int,int>> top_internal_proteo_scores_;
+
   void updateColumnMatchNums(ProteoformPtr proteo_ptr, int* col_match_nums);
   void initProteoformBeginEnds(const ProteoformPtrVec &proteo_ptrs);
   void initIndexes(const ProteoformPtrVec &proteo_ptrs);
   void updateRevColumnMatchNums(ProteoformPtr proteo_ptr, int* col_match_nums);
   void initRevIndexes(const ProteoformPtrVec &proteo_ptrs);
-  std::vector<std::pair<int,int>> getShiftScores(short* scores, short* rev_scores, int num);
+  void compShiftScores(short* scores, short* rev_scores, int num);
 };
 
 typedef std::shared_ptr<OnePtmCompShift> OnePtmCompShiftPtr;
