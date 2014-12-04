@@ -71,33 +71,38 @@ void PtmProcessor::initData() {
 
 // process ptm search
 void PtmProcessor::process(){
-  
-  std::string sp_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
-  MsAlignReader sp_reader(sp_file_name);
+  PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
+  std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
   std::string input_file_name = basename(sp_file_name)+"."+mng_ptr_->input_file_ext_;
   SimplePrsmReader simple_prsm_reader(input_file_name);
   SimplePrsmPtr prsm_ptr = simple_prsm_reader.readOnePrsm();
 
   //init variables
-  DeconvMsPtr deconv_sp;
-  int cnt = 0;
   int spectrum_num = getSpNum (sp_file_name);
-  PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
   ResiduePtrVec residue_ptr_vec = prsm_para_ptr->getFixModResiduePtrVec();
   ProtModPtrVec prot_mod_ptr_vec = prsm_para_ptr->getAllowProtModPtrVec();
 
-  while((deconv_sp = sp_reader.getNextMs())!= nullptr){
-    cnt++;
-    SpectrumSetPtr spectrum_set_ptr = getSpectrumSet(deconv_sp, 0, sp_para_ptr);
-    if(spectrum_set_ptr != nullptr){
+  int group_spec_num = prsm_para_ptr->getGroupSpecNum();
+  MsAlignReader sp_reader(sp_file_name, group_spec_num);
+  int cnt = 0;
+  SpectrumSetPtr spec_set_ptr;
+
+  LOG_DEBUG("Start search");
+  while((spec_set_ptr = sp_reader.getNextSpectrumSet(sp_para_ptr))!= nullptr){
+    cnt+= group_spec_num;
+    if(spec_set_ptr->isValid()){
       SimplePrsmPtrVec selected_prsm_ptrs;
-      while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == deconv_sp->getHeaderPtr()->getId()) {
+      int spec_id = spec_set_ptr->getSpecId();
+      while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_id) {
         prsm_ptr->addProteoformPtr(fai_, residue_ptr_vec, prot_mod_ptr_vec);
         selected_prsm_ptrs.push_back(prsm_ptr);
         prsm_ptr = simple_prsm_reader.readOnePrsm();
       }
-      processOneSpectrum(spectrum_set_ptr, selected_prsm_ptrs);
+      if (selected_prsm_ptrs.size() > 0) {
+        //LOG_DEBUG("start processing one spectrum.");
+        processOneSpectrum(spec_set_ptr, selected_prsm_ptrs);
+      }
     }
     std::cout << std::flush <<  "PTM search is processing " << cnt 
         << " of " << spectrum_num << " spectra.\r";
@@ -133,7 +138,6 @@ void PtmProcessor::processOneSpectrum(SpectrumSetPtr spectrum_set_ptr,
 
   PtmSlowFilterPtr slow_filter_ptr = PtmSlowFilterPtr(
       new PtmSlowFilter(spectrum_set_ptr,simple_prsm_ptrs,comp_shift_ptr_,mng_ptr_));
-  //LOG_DEBUG("init filter complete");
   for (int s = 1; s <= mng_ptr_->n_unknown_shift_; s++) {
     PrsmPtrVec complete_prsm_ptrs = slow_filter_ptr->getPrsms(
         s-1, SemiAlignTypeFactory::getCompletePtr());

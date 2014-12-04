@@ -10,6 +10,25 @@ std::vector<std::vector<int>> CompShiftLowMem::findBestShift(
   return findBestShift(a,b,1,0);
 }
 
+std::vector<double> CompShiftLowMem::findBestShift(const std::vector<std::pair<int,int>> &a_e,
+                                                   const std::vector<int> &b,
+                                                   int total,int min_gap,
+                                                   double scale){
+  std::vector<int> a;
+  std::vector<int> e;
+  for (size_t i = 0; i < a_e.size(); i++) {
+    a.push_back(a_e[i].first);
+    e.push_back(a_e[i].second);
+  }
+  std::vector<std::vector<int>> list = findBestShift(a,e, b,total,min_gap);
+  std::vector<double> result;
+  for(size_t i = 0;i<list.size();i++){
+    result.push_back(list[i][0]/scale);
+  }
+  return result;
+}
+
+/*
 std::vector<double> CompShiftLowMem::findBestShift(const std::vector<int> &a,
                                                    const std::vector<int> &errors,
                                                    const std::vector<int> &b,
@@ -22,6 +41,7 @@ std::vector<double> CompShiftLowMem::findBestShift(const std::vector<int> &a,
   }
   return result;
 }
+*/
 
 inline void CompShiftLowMem::resetNumbers(const std::vector<int> &a,
                                           const std::vector<int> &errors,

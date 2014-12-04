@@ -89,6 +89,8 @@ std::vector<std::pair<int,int>> getIntMassErrorList(const PrmMsPtrVec &prm_ms_pt
                                                     bool n_strict, bool c_strict);
 
 std::vector<double> getMassList(PrmMsPtr prm_ms_ptr);
+std::vector<double> getMassList(const PrmMsPtrVec &prm_ms_ptr_vec);
+
 std::vector<double> getScoreList(PrmMsPtr prm_ms_ptr);
 
 } /* namespace prot */

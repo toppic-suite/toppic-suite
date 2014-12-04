@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <iostream>
 
+#include "base/logger.hpp"
 #include "base/base_data.hpp"
 #include "spec/prm_peak.hpp"
 
@@ -336,6 +337,17 @@ std::vector<double> getMassList(PrmMsPtr prm_ms_ptr){
   for(size_t i=0;i<prm_ms_ptr->size();i++){
     results.push_back(prm_ms_ptr->getPeakPtr(i)->getPosition());
   }
+  return results;
+}
+
+std::vector<double> getMassList(const PrmMsPtrVec &prm_ms_ptr_vec){
+  std::vector<double> results;
+  for (size_t i = 0; i < prm_ms_ptr_vec.size(); i++) {
+    for(size_t j=0;j<prm_ms_ptr_vec[i]->size();j++){
+      results.push_back(prm_ms_ptr_vec[i]->getPeakPtr(j)->getPosition());
+    }
+  }
+  std::sort(results.begin(), results.end(), std::less<double>());
   return results;
 }
 
