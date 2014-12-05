@@ -16,7 +16,6 @@ namespace prot {
 
 EValueProcessor::EValueProcessor(TdgfMngPtr mng_ptr) {
   mng_ptr_ = mng_ptr;
-  //init();
 }
 
 void EValueProcessor::init() {
@@ -49,7 +48,7 @@ void EValueProcessor::process(bool is_separate) {
   std::string spectrum_file_name = prsm_para_ptr->getSpectrumFileName();
   MsAlignReader reader (spectrum_file_name);
 
-  std::string input_file_name 
+  std::string input_file_name
       = basename(spectrum_file_name) + "." + mng_ptr_->input_file_ext_;
   LOG_DEBUG("input file name " << input_file_name);
   PrsmReader prsm_reader(input_file_name);
@@ -78,10 +77,10 @@ void EValueProcessor::process(bool is_separate) {
     processOneSpectrum(ms_ptr, selected_prsm_ptrs, is_separate, writer);
     ms_ptr = reader.getNextMs();
     if (ms_ptr.get() != nullptr) {
-      std::cout << std::flush << "E-value computation is processing " << cnt << " of " 
+      std::cout << std::flush << "E-value computation is processing " << cnt << " of "
           << spectrum_num << " spectra.\r";
     }
-    
+
     WebLog::percent_log(0.373 + (double) cnt / spectrum_num * 0.62);
   }
   reader.close();
@@ -98,7 +97,7 @@ bool EValueProcessor::checkPrsms(const PrsmPtrVec &prsm_ptrs) {
     if (extreme_value_ptr != nullptr) {
       double evalue = extreme_value_ptr->getEValue();
       double frag_num = prsm_ptrs[i]->getMatchFragNum();
-      if (evalue <= mng_ptr_->computation_evalue_cutoff 
+      if (evalue <= mng_ptr_->computation_evalue_cutoff
           && frag_num >= mng_ptr_->computation_frag_num_cutoff) {
         return false;
       }
@@ -107,11 +106,12 @@ bool EValueProcessor::checkPrsms(const PrsmPtrVec &prsm_ptrs) {
   return true;
 }
 
-void EValueProcessor::compEvalues(SpectrumSetPtr spec_set_ptr, 
+void EValueProcessor::compEvalues(SpectrumSetPtr spec_set_ptr,
                                   bool is_separate, PrsmPtrVec &sele_prsm_ptrs) {
-  
-  if (mng_ptr_->use_table) {
+
+  if (mng_ptr_->use_table && comp_pvalue_table_ptr_->inTable(spec_set_ptr->getDeconvMsPtr(), sele_prsm_ptrs)) {
     comp_pvalue_table_ptr_->process(spec_set_ptr->getDeconvMsPtr(), sele_prsm_ptrs);
+    LOG_DEBUG("Using table");
   }
   else {
     comp_pvalue_ptr_->process(spec_set_ptr, is_separate, sele_prsm_ptrs);
@@ -132,22 +132,22 @@ void EValueProcessor::compEvalues(SpectrumSetPtr spec_set_ptr,
   }
 }
 
-void EValueProcessor::processOneSpectrum(DeconvMsPtr ms_ptr, 
+void EValueProcessor::processOneSpectrum(DeconvMsPtr ms_ptr,
                                          PrsmPtrVec &sele_prsm_ptrs,
                                          bool is_separate,
                                          PrsmWriter &writer) {
   //LOG_DEBUG("sele prsm number " << sele_prsm_ptrs.size());
-  SpectrumSetPtr spec_set_ptr 
+  SpectrumSetPtr spec_set_ptr
       = getSpectrumSet(ms_ptr, 0, mng_ptr_->prsm_para_ptr_->getSpParaPtr());
   if (spec_set_ptr.get() != nullptr) {
 
     bool need_comp = checkPrsms(sele_prsm_ptrs);
     //LOG_DEBUG("Need computation: " << need_comp );
-  
+
     if (need_comp) {
       compEvalues(spec_set_ptr, is_separate, sele_prsm_ptrs);
     }
-    
+
     //LOG_DEBUG("start sort");
     std::sort(sele_prsm_ptrs.begin(), sele_prsm_ptrs.end(), prsmEValueUp);
     writer.writeVector(sele_prsm_ptrs);

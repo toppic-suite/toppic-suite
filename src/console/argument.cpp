@@ -26,6 +26,7 @@ void Argument::initArguments() {
   arguments_["logFileName"] = "";
   arguments_["keepTempFiles"] = "false";
   arguments_["fullBinaryPath"] = "false";
+  arguments_["useTable"] = "true";
 }
 
 void Argument::showUsage(boost::program_options::options_description &desc) {
@@ -81,6 +82,7 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string cutoff_type = "";
   std::string cutoff_value = "";
   std::string log_file_name = "";
+  std::string use_table = "";
 
   /** Define and parse the program options*/
   try {
@@ -98,7 +100,8 @@ bool Argument::parse(int argc, char* argv[]) {
         ("max-ptm,m", po::value<std::string> (&max_ptm_mass), "<positive double value>. Maximum absolute value of masses (in Dalton) of unexpected post-translational modifications in proteoforms. Default value: 1000000.")
         ("ptm-number,p", po::value<std::string> (&shift_num), "<0|1|2>. Maximum number of unexpected post-translational modifications in a proteoform-spectrum-match. Default value: 2.")
         ("cutoff-type,t", po::value<std::string> (&cutoff_type), "<EVALUE|FDR>. Cutoff type for reporting protein-spectrum-matches. Default value: EVALUE.")
-        ("cutoff-value,v", po::value<std::string> (&cutoff_value), "<positive double value>. Cutoff value for reporting protein-spectrum-matches. Default value: 0.01.");
+        ("cutoff-value,v", po::value<std::string> (&cutoff_value), "<positive double value>. Cutoff value for reporting protein-spectrum-matches. Default value: 0.01.")
+        ("use-table,u", po::value<std::string> (&use_table), "<true|false>. Use precomputed tables to estimate p-value. If used, the error tolerance can only by 5, 10 or 15. Default value: true.");
     po::options_description desc("Options");
 
     desc.add_options() 
@@ -116,6 +119,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("cutoff-value,v", po::value<std::string> (&cutoff_value), "<positive double value>. Cutoff value for reporting protein-spectrum-matches. Default value: 0.01.")
         ("log-file-name,l", po::value<std::string>(&log_file_name), "Log file name with its path.")
         ("keep-temp-files,k", "Keep temporary files.")
+        ("use-table,u", po::value<std::string> (&use_table), "<true|false>. Use precomputed tables to estimate p-value. If used, the error tolerance can only by 5, 10 or 15. Default value: true.")
         ("full-binary-path,b", "Full binary path.")
         ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name with its path.")
         ("spectrum-file-name", po::value<std::string>(&spectrum_file_name)->required(), "Spectrum file name with its path.");
@@ -199,6 +203,9 @@ bool Argument::parse(int argc, char* argv[]) {
     if (vm.count("full-binary-path")) {
       arguments_["fullBinaryPath"] = "true";
     }
+    if (vm.count("use-table")) {
+      arguments_["useTable"] = use_table;
+    }
   }
   catch(std::exception&e ) {
     std::cerr << "Unhandled Exception in parsing command line"<<e.what()<<", application will now exit"<<std::endl;
@@ -257,6 +264,17 @@ bool Argument::validateArguments() {
 
   if (cutoff_type == "FDR" && search_type != "TARGET+DECOY"){
     LOG_ERROR("Cutoff type "<< cutoff_type << " error! FDR cutoff cannot be used when no decoy database is used! Please add argument '-d' in the command.");
+    return false;
+  }
+
+  std::string use_table = arguments_["useTable"];
+  if(use_table != "true" && use_table != "false"){
+    LOG_ERROR("Use table " << use_table << " error! The value should be true|false!");
+    return false;
+  }
+
+  if(use_table == "true" && arguments_["errorTolerance"] !="5" && arguments_["errorTolerance"]!="10" && arguments_["errorTolerance"]!="15"){
+    LOG_ERROR("Error tolerance can only be 5, 10 or 15 when using precomputed tables!");
     return false;
   }
 
