@@ -128,7 +128,7 @@ void CompPValueLookupTable::process(DeconvMsPtr deconv_ms_ptr,
 
     double prot_prob = 1.0;
 
-    if (match_frag_num <= 5) {
+    if (match_frag_num < 5) {
       prot_prob = 1.0;
     } else {
       prot_prob = compProb(peak_num, match_frag_num, unexpected_shift_num);
