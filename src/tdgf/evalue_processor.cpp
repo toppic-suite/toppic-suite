@@ -120,7 +120,7 @@ void EValueProcessor::compEvalues(SpectrumSetPtr spec_set_ptr,
   // if matched peak number is too small or E-value is 0, replace it
   // with a max evalue.
   for (unsigned i = 0; i < sele_prsm_ptrs.size(); i++) {
-    if (sele_prsm_ptrs[i]->getMatchFragNum() < mng_ptr_->comp_evalue_min_match_frag_num_) {
+    if (sele_prsm_ptrs[i]->getMatchFragNum() <= mng_ptr_->comp_evalue_min_match_frag_num_) {
       sele_prsm_ptrs[i]->setProbPtr(getMaxEvaluePtr());
     }
     else {
