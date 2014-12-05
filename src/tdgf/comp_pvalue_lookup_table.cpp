@@ -126,7 +126,13 @@ void CompPValueLookupTable::process(DeconvMsPtr deconv_ms_ptr,
     int unexpected_shift_num = prsm_ptrs[i]->getProteoformPtr()
         ->getUnexpectedChangeNum();
 
-    double prot_prob = compProb(peak_num, match_frag_num, unexpected_shift_num);
+    double prot_prob = 1.0;
+
+    if (match_frag_num <= 5) {
+      prot_prob = 1.0;
+    } else {
+      prot_prob = compProb(peak_num, match_frag_num, unexpected_shift_num);
+    }
 
     SemiAlignTypePtr type_ptr = prsm_ptrs[i]->getProteoformPtr()
         ->getSemiAlignType();
