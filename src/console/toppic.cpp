@@ -139,6 +139,10 @@ int process(int argc, char* argv[]) {
     std::cout << "E-value computation started." << std::endl;
     TdgfMngPtr tdgf_mng_ptr = TdgfMngPtr(new TdgfMng (prsm_para_ptr, shift_num, max_ptm_mass,
                                                       "RAW_RESULT", "EVALUE"));
+                                                      
+    if (arguments["useTable"] == "false")
+      tdgf_mng_ptr->use_table = false;
+                                                            
     EValueProcessorPtr processor = EValueProcessorPtr(new EValueProcessor(tdgf_mng_ptr));
     processor->init();
     // compute E-value for a set of prsms each run 
@@ -227,7 +231,7 @@ int process(int argc, char* argv[]) {
 }
 
 int main(int argc, char* argv[]) {
-  prot::log_level = 2;
+  //prot::log_level = 2;
   return prot::process(argc, argv);
 }
 
