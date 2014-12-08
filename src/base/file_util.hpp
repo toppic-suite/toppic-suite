@@ -29,6 +29,8 @@ bool copyDir(boost::filesystem::path const & source, boost::filesystem::path con
 
 void delDir(const std::string &path);
 
+void delFile(const std::string &path);
+
 void cleanDir(const std::string &path);
 
 }

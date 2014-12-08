@@ -61,7 +61,8 @@ int process(int argc, char* argv[]) {
 
     std::string log_file_name = arguments["logFileName"];
   	WebLog::init(log_file_name);
-    if (arguments["useTable"] != "false")
+  	
+    if (arguments["useTable"] == "false")
       WebLog::useTable(false);
 
     int n_top = std::stoi(arguments["numOfTopPrsms"]);
@@ -215,11 +216,11 @@ int process(int argc, char* argv[]) {
     if (arguments["keepTempFiles"] != "true"){
       std::cout << "Deleting temporary files started." << std::endl;
       delDir(basename(sp_file_name) + "_xml");
+      delFile(exe_dir + "/run.log");
       cleanDir(sp_file_name);
       cleanDir(db_file_name);	  
       std::cout << "Deleting temporary files finished." << std::endl;
-    }
-    
+    }  
     
     WebLog::close();
 
@@ -234,7 +235,7 @@ int process(int argc, char* argv[]) {
 }
 
 int main(int argc, char* argv[]) {
-  //prot::log_level = 2;
+  prot::log_level = 2;
   return prot::process(argc, argv);
 }
 

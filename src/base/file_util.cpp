@@ -140,6 +140,13 @@ void delDir(const std::string &path){
     fs::remove_all(dir);
 }
 
+void delFile(const std::string &path){
+  fs::path dir(path);
+	
+  if(fs::exists(dir))
+    fs::remove(dir);
+}
+
 void cleanDir(const std::string &path){
   fs::path sp(path);
   fs::directory_iterator end_iter;
