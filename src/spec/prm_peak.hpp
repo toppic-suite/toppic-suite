@@ -62,6 +62,7 @@ class PrmPeak : public Peak {
 
 typedef std::shared_ptr<PrmPeak> PrmPeakPtr;
 typedef std::vector<PrmPeakPtr> PrmPeakPtrVec;
+typedef std::vector<PrmPeakPtrVec> PrmPeakPtrVec2D;
 typedef std::shared_ptr<Ms<PrmPeakPtr>> PrmMsPtr;
 typedef std::vector<PrmMsPtr> PrmMsPtrVec;
 

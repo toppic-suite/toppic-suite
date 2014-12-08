@@ -11,9 +11,9 @@ class CompPValueLookupTable {
  public:
   CompPValueLookupTable(TdgfMngPtr mng_ptr);
 
-  void process(DeconvMsPtr deconv_ms_ptr, PrsmPtrVec &prsm_ptrs);
-
   bool inTable(DeconvMsPtr deconv_ms_ptr, PrsmPtrVec &prsm_ptrs);
+
+  void process(const DeconvMsPtrVec &deconv_ms_ptr_vec, PrsmPtrVec &prsm_ptrs);
 
  private:
 
