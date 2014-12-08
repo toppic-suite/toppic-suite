@@ -104,9 +104,9 @@ void zeroPtmSearchProcessBlock(ZeroPtmMngPtr mng_ptr, DbBlockPtr block_ptr,
       internal_writer.writeVector(internal_prsms);
       all_writer.writeVector(internal_prsms);
 
-      WebLog::percent_log((double) (n + spectrum_num * block_ptr->getBlockIdx())
-                    / spectrum_num / total_block_num * 0.053);
-
+      WebLog::percent_log( (double)block_ptr->getBlockIdx() / total_block_num * 0.03
+              + (double) n / spectrum_num / total_block_num * 0.03);
+          
       std::cout << std::flush << "Zero PTM search is processing " << n << " of " 
           << spectrum_num << " spectra.\r";
     }

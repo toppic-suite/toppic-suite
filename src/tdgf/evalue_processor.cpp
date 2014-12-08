@@ -81,7 +81,11 @@ void EValueProcessor::process(bool is_separate) {
           << spectrum_num << " spectra.\r";
     }
 
-    WebLog::percent_log(0.373 + (double) cnt / spectrum_num * 0.62);
+    if (mng_ptr_->use_table == false){
+      WebLog::percent_log(0.26 + (double) cnt / spectrum_num * 0.73);
+    } else {
+	  WebLog::percent_log((0.91 + (double) cnt / spectrum_num * 0.07) / 3.5);	
+	}
   }
   reader.close();
   prsm_reader.close();

@@ -13,13 +13,14 @@ void WebLog::init(std::string log_file_name) {
   if (log_file_name_.length() > 0) {
     log_.open(log_file_name, std::ios::out | std::ios::app);
   }
+  ratio_ = 3.5;
 }
 
 void WebLog::useTable(bool flag) {
   if (flag) {
-	ratio_ = 1.5;  
+	ratio_ = 3.5;  
   } else {
-    ratio_ = 1;
+    ratio_ = 1.0;
   }
 }
 
