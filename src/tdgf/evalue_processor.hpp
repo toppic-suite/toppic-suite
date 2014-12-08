@@ -19,7 +19,7 @@ class EValueProcessor {
 
   void init();
   void process(bool is_separate);
-  void processOneSpectrum(DeconvMsPtr ms_ptr, 
+  void processOneSpectrum(SpectrumSetPtr spec_set_ptr,
                           PrsmPtrVec &sele_prsm_ptrs,
                           bool is_separate,
                           PrsmWriter &writer);
@@ -34,8 +34,6 @@ class EValueProcessor {
   faidx_t *fai_;
   bool checkPrsms(const PrsmPtrVec &prsm_ptrs);
 
-  //ProteoformPtrVec proteo_ptrs_;
-  //PrsmPtrVec prsm_ptrs_;
 };
 
 typedef std::shared_ptr<EValueProcessor> EValueProcessorPtr;

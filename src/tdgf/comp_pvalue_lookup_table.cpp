@@ -122,12 +122,14 @@ double CompPValueLookupTable::compProb(int peak_num, int match_frag_num,
 }
 
 /* set alignment */
-void CompPValueLookupTable::process(DeconvMsPtr deconv_ms_ptr,
-                                    PrsmPtrVec &prsm_ptrs) {
-
-  double tolerance = deconv_ms_ptr->getHeaderPtr()->getErrorTolerance();
-  double refine_prec_mass = deconv_ms_ptr->getHeaderPtr()->getPrecMonoMassMinusWater();
-  int peak_num = deconv_ms_ptr->size();
+void CompPValueLookupTable::process(const DeconvMsPtrVec &deconv_ms_ptr_vec, PrsmPtrVec &prsm_ptrs) {
+  int ppo = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
+  int peak_num = 0; 
+  for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
+    peak_num += deconv_ms_ptr_vec[i]->size();
+  }
+  double tolerance = deconv_ms_ptr_vec[0]->getHeaderPtr()->getErrorTolerance();
+  double refine_prec_mass = deconv_ms_ptr_vec[0]->getHeaderPtr()->getPrecMonoMassMinusWater();
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     
     int match_frag_num = prsm_ptrs[i]->getMatchFragNum();

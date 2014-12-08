@@ -33,8 +33,6 @@ DIAG_FILTER_OBJS =  $(addprefix $(OBJ_DIR)/, comp_shift.o diag_filter.o diag_fil
 
 ONE_PTM_FILTER_OBJS =  $(addprefix $(OBJ_DIR)/, one_ptm_comp_shift.o one_ptm_filter.o one_ptm_filter_processor.o) 
 
-#PTM_OBJS = $(addprefix $(OBJ_DIR)/, ptm_slow_filter.o comp_shift_low_mem.o ptm_processor.o diagonal_header.o ptm_slow_match.o basic_diag_pair.o diagonal.o dp_pair.o ps_align.o)
-
 PTM_OBJS = $(addprefix $(OBJ_DIR)/, ptm_processor.o ptm_slow_filter.o ptm_slow_match.o ps_align.o comp_shift_low_mem.o diagonal_header.o basic_diag_pair.o diagonal.o dp_pair.o)
 
 TDGF_OBJS = $(addprefix $(OBJ_DIR)/, evalue_processor.o comp_prob_value.o count_test_num.o comp_pvalue_array.o comp_pvalue_lookup_table.o) 
