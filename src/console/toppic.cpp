@@ -61,6 +61,8 @@ int process(int argc, char* argv[]) {
 
     std::string log_file_name = arguments["logFileName"];
   	WebLog::init(log_file_name);
+    if (arguments["useTable"] != "false")
+      WebLog::useTable(false);
 
     int n_top = std::stoi(arguments["numOfTopPrsms"]);
     int shift_num = std::stoi(arguments["shiftNumber"]);

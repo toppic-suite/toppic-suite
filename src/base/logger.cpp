@@ -6,6 +6,7 @@ int log_level = 5;
 
 std::ofstream WebLog::log_;
 std::string WebLog::log_file_name_;
+double WebLog::ratio_;
 
 void WebLog::init(std::string log_file_name) {
   log_file_name_ = log_file_name;
@@ -14,9 +15,17 @@ void WebLog::init(std::string log_file_name) {
   }
 }
 
+void WebLog::useTable(bool flag) {
+  if (flag) {
+	ratio_ = 1.5;  
+  } else {
+    ratio_ = 1;
+  }
+}
+
 void WebLog::percent_log(double p) {
   if (log_.is_open()) {
-    log_ << p << std::endl;
+    log_ << p * ratio_ << std::endl;
   }
 }
 

@@ -59,8 +59,10 @@ class WebLog {
   static void init(std::string log_file_name);
   static void percent_log(double p);
   static void close();
+  static void useTable(bool flag);
 
  private:
+  static double ratio_;
   static std::ofstream log_;
   static std::string log_file_name_;
 };
