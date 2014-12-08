@@ -213,7 +213,8 @@ int process(int argc, char* argv[]) {
     if (arguments["keepTempFiles"] != "true"){
       std::cout << "Deleting temporary files started." << std::endl;
       delDir(basename(sp_file_name) + "_xml");
-      cleanDir(sp_file_name);	  
+      cleanDir(sp_file_name);
+      cleanDir(db_file_name);	  
       std::cout << "Deleting temporary files finished." << std::endl;
     }
     
