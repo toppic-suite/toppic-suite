@@ -123,7 +123,7 @@ double CompPValueLookupTable::compProb(int peak_num, int match_frag_num,
 
 /* set alignment */
 void CompPValueLookupTable::process(const DeconvMsPtrVec &deconv_ms_ptr_vec, PrsmPtrVec &prsm_ptrs) {
-  int ppo = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
+  //int ppo = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
   int peak_num = 0; 
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
     peak_num += deconv_ms_ptr_vec[i]->size();
