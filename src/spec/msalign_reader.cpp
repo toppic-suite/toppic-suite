@@ -151,7 +151,8 @@ SpectrumSetPtr MsAlignReader::getNextSpectrumSet(SpParaPtr sp_para_ptr) {
     }
     deconv_ms_ptr_vec.push_back(deconv_ms_ptr_);
   }
-  int prec_mono_mass = deconv_ms_ptr_vec[0]->getHeaderPtr()->getPrecMonoMass();
+  double prec_mono_mass = deconv_ms_ptr_vec[0]->getHeaderPtr()->getPrecMonoMass();
+  //LOG_DEBUG("prec mass " << prec_mono_mass);
   int count = 1;
   for (int i = 1; i < group_spec_num_; i++) {
     double new_mass = deconv_ms_ptr_vec[i]->getHeaderPtr()->getPrecMonoMass();
@@ -160,6 +161,7 @@ SpectrumSetPtr MsAlignReader::getNextSpectrumSet(SpParaPtr sp_para_ptr) {
       count++;
     }
   }
+  //LOG_DEBUG("prec mass result " << prec_mono_mass);
   return SpectrumSetPtr(new SpectrumSet(deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass));
 }
     

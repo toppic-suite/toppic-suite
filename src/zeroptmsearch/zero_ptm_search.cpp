@@ -18,11 +18,11 @@ void zeroPtmSearch(SpectrumSetPtr spec_set_ptr,
                    ZeroPtmMngPtr mng_ptr, 
                    PrsmPtrVec &prsms) {
   ExtendMsPtrVec ms_three_vec = spec_set_ptr->getMsThreePtrVec();
+  //LOG_DEBUG("ms three vector size " << ms_three_vec.size());
 
   ZpFastMatchPtrVec fast_matches 
       = zeroPtmFastFilter(type_ptr, ms_three_vec, proteoform_ptr_vec, 
                           mng_ptr->zero_ptm_filter_result_num_);
-
   //LOG_DEBUG("fast_match ended size " << fast_matches.size());
   DeconvMsPtrVec deconv_ms_vec = spec_set_ptr->getDeconvMsPtrVec();
   ZpSlowMatchPtrVec slow_matches 

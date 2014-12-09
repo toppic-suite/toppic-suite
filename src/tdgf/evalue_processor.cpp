@@ -131,22 +131,12 @@ void EValueProcessor::compEvalues(SpectrumSetPtr spec_set_ptr,
   }
 }
 
-<<<<<<< HEAD
-void EValueProcessor::processOneSpectrum(DeconvMsPtr ms_ptr,
-=======
 void EValueProcessor::processOneSpectrum(SpectrumSetPtr spec_set_ptr,
->>>>>>> Completed tdgf for multiple spectra
                                          PrsmPtrVec &sele_prsm_ptrs,
                                          bool is_separate,
                                          PrsmWriter &writer) {
   //LOG_DEBUG("sele prsm number " << sele_prsm_ptrs.size());
-<<<<<<< HEAD
-  SpectrumSetPtr spec_set_ptr
-      = getSpectrumSet(ms_ptr, 0, mng_ptr_->prsm_para_ptr_->getSpParaPtr());
-  if (spec_set_ptr.get() != nullptr) {
-=======
   if (spec_set_ptr->isValid()) {
->>>>>>> Completed tdgf for multiple spectra
 
     bool need_comp = checkPrsms(sele_prsm_ptrs);
     //LOG_DEBUG("Need computation: " << need_comp );
