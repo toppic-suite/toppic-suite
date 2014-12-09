@@ -157,10 +157,13 @@ void CompPValueLookupTable::process(const DeconvMsPtrVec &deconv_ms_ptr_vec, Prs
   }
 }
 
-bool CompPValueLookupTable::inTable(DeconvMsPtr deconv_ms_ptr,
-                                    PrsmPtrVec &prsm_ptrs) {
+bool CompPValueLookupTable::inTable(const DeconvMsPtrVec &deconv_ms_ptr_vec,
+                                    const PrsmPtrVec &prsm_ptrs) {
 
-  int peak_num = deconv_ms_ptr->size();
+  int peak_num = 0;
+  for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
+    peak_num += deconv_ms_ptr_vec[i]->size();
+  }
 
   if (peak_num > 500 || peak_num < 10)
     return false;

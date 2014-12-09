@@ -105,16 +105,12 @@ bool EValueProcessor::checkPrsms(const PrsmPtrVec &prsm_ptrs) {
 
 void EValueProcessor::compEvalues(SpectrumSetPtr spec_set_ptr,
                                   bool is_separate, PrsmPtrVec &sele_prsm_ptrs) {
-<<<<<<< HEAD
 
-  if (mng_ptr_->use_table && comp_pvalue_table_ptr_->inTable(spec_set_ptr->getDeconvMsPtr(), sele_prsm_ptrs)) {
-    comp_pvalue_table_ptr_->process(spec_set_ptr->getDeconvMsPtr(), sele_prsm_ptrs);
-    LOG_DEBUG("Using table");
-=======
-  
-  if (mng_ptr_->use_table) {
+  if (mng_ptr_->use_table && 
+      comp_pvalue_table_ptr_->inTable(spec_set_ptr->getDeconvMsPtrVec(), sele_prsm_ptrs)) {
+
     comp_pvalue_table_ptr_->process(spec_set_ptr->getDeconvMsPtrVec(), sele_prsm_ptrs);
->>>>>>> Completed tdgf for multiple spectra
+    LOG_DEBUG("Using table");
   }
   else {
     comp_pvalue_ptr_->process(spec_set_ptr, is_separate, sele_prsm_ptrs);
