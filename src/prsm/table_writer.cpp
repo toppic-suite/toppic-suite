@@ -1,4 +1,5 @@
 #include <iomanip>
+#include <boost/algorithm/string.hpp>
 
 #include "base/file_util.hpp"
 #include "spec/msalign_reader.hpp"
@@ -48,7 +49,9 @@ void TableWriter::write(){
       << "FDR" << "\t"
       << std::endl;
 
-  MsAlignReader reader (spectrum_file_name);
+  int group_spec_num = prsm_para_ptr_->getGroupSpecNum();
+  SpParaPtr sp_para_ptr = prsm_para_ptr_->getSpParaPtr();
+  MsAlignReader reader (spectrum_file_name, group_spec_num);
 
   std::string input_file_name 
       = basename(spectrum_file_name) + "." + input_file_ext_;
@@ -57,16 +60,15 @@ void TableWriter::write(){
   faidx_t *fai = fai_load(prsm_para_ptr_->getSearchDbFileName().c_str());
   PrsmPtr prsm_ptr = prsm_reader.readOnePrsm(fai, residue_ptr_vec);
 
-  DeconvMsPtr ms_ptr = reader.getNextMs();
-  while (ms_ptr.get() != nullptr) {
+  SpectrumSetPtr spec_set_ptr;
+  while ((spec_set_ptr= reader.getNextSpectrumSet(sp_para_ptr)) != nullptr) {
     PrsmPtrVec selected_prsm_ptrs;
     //LOG_DEBUG("spectrum id " << ms_ptr->getHeaderPtr()->getId() << " prsm ptr " << prsm_ptr);
-    while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == ms_ptr->getHeaderPtr()->getId()) {
+    while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_set_ptr->getSpecId()) {
       selected_prsm_ptrs.push_back(prsm_ptr);
       prsm_ptr = prsm_reader.readOnePrsm(fai, residue_ptr_vec);
     }
-    writeSelectedPrsms(file, selected_prsm_ptrs, ms_ptr);
-    ms_ptr = reader.getNextMs();
+    writeSelectedPrsms(file, selected_prsm_ptrs, spec_set_ptr);
   }
   fai_destroy(fai);
   reader.close();
@@ -76,17 +78,32 @@ void TableWriter::write(){
 }
 
 void TableWriter::writeSelectedPrsms(std::ofstream &file, PrsmPtrVec &prsm_ptrs, 
-                                     DeconvMsPtr ms_ptr) {
+                                     SpectrumSetPtr spec_set_ptr) {
+  std::string spec_ids;
+  std::string spec_activations;
+  std::string spec_scans;
+  int peak_num = 0;
+  DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
+  for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
+    spec_ids = spec_ids + std::to_string(deconv_ms_ptr_vec[i]->getHeaderPtr()->getId()) + " ";
+    spec_activations = spec_activations + deconv_ms_ptr_vec[i]->getHeaderPtr()->getActivationPtr()->getName() + " ";
+    spec_scans = spec_scans + deconv_ms_ptr_vec[i]->getHeaderPtr()->getScansString() + " ";
+    peak_num += deconv_ms_ptr_vec[i]->size();
+  }
+  boost::algorithm::trim(spec_ids);
+  boost::algorithm::trim(spec_activations);
+  boost::algorithm::trim(spec_scans);
+
   file << std::setprecision(10);
   for(size_t i=0;i<prsm_ptrs.size();i++){
     //LOG_DEBUG("prec mass " << prsm_ptrs[i]->getOriPrecMass());
     file << prsm_para_ptr_->getSpectrumFileName() << "\t"
         << prsm_ptrs[i]->getId() << "\t"
-        << prsm_ptrs[i]->getSpectrumId()<< "\t"
-        << ms_ptr->getHeaderPtr()->getActivationPtr()->getName()<< "\t"
-        << prsm_ptrs[i]->getSpectrumScan() << "\t"
-        << ms_ptr->size()<< "\t"
-        << ms_ptr->getHeaderPtr()->getPrecCharge() << "\t"
+        << spec_ids << "\t"
+        << spec_activations<< "\t"
+        << spec_scans << "\t"
+        << peak_num << "\t"
+        << deconv_ms_ptr_vec[0]->getHeaderPtr()->getPrecCharge() << "\t"
         << prsm_ptrs[i]->getOriPrecMass()<< "\t"//"Precursor_mass"
         << prsm_ptrs[i]->getAdjustedPrecMass() << "\t"
         << prsm_ptrs[i]->getProteoformPtr()->getDbResSeqPtr()->getId() << "\t"

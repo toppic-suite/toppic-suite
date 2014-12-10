@@ -3,6 +3,8 @@
 #include "base/fasta_reader.hpp"
 #include "base/base_data.hpp"
 
+#include "spec/msalign_reader.hpp"
+
 #include "prsm/prsm_para.hpp"
 #include "prsm/prsm_combine.hpp"
 #include "prsm/prsm_str_combine.hpp"
@@ -32,8 +34,8 @@
 #include "tdgf/evalue_processor.hpp"
 #include "tdgf/tdgf_mng.hpp"
 
-#include "prsmview/xml_generator.hpp"
-#include "prsmview/transformer.hpp"
+//#include "prsmview/xml_generator.hpp"
+//#include "prsmview/transformer.hpp"
 
 #include "console/argument.hpp"
 
@@ -78,7 +80,7 @@ int process(int argc, char* argv[]) {
     LOG_DEBUG("block size " << arguments["databaseBlockSize"]);
     int db_block_size = std::stoi(arguments["databaseBlockSize"]);
 
-    
+    /*
     dbPreprocess (ori_db_file_name, db_file_name, decoy, db_block_size);
     generateSpIndex(sp_file_name);
     
@@ -109,7 +111,6 @@ int process(int argc, char* argv[]) {
     simple_input_exts.push_back("ONE_PTM_FILTER");
     int top_num = diag_filter_mng_ptr->ptm_fast_filter_result_num_ 
         + one_ptm_filter_mng_ptr->one_ptm_filter_result_num_;
-
     LOG_DEBUG("top number " << top_num);
     SimplePrsmStrCombinePtr simple_combine_ptr(
         new SimplePrsmStrCombine(sp_file_name, simple_input_exts, "FILTER", top_num));
@@ -117,7 +118,6 @@ int process(int argc, char* argv[]) {
     simple_combine_ptr = nullptr;
     std::cout << "Combining simple PRSMs finished." << std::endl;
     
-
     std::cout << "PTM search started." << std::endl;
     PtmMngPtr ptm_mng_ptr = PtmMngPtr(new PtmMng(prsm_para_ptr, n_top, shift_num,
                                                  max_ptm_mass, "FILTER", "PTM"));
@@ -142,7 +142,6 @@ int process(int argc, char* argv[]) {
     std::cout << "E-value computation started." << std::endl;
     TdgfMngPtr tdgf_mng_ptr = TdgfMngPtr(new TdgfMng (prsm_para_ptr, shift_num, max_ptm_mass,
                                                       "RAW_RESULT", "EVALUE"));
-                                                      
     if (arguments["useTable"] == "false")
       tdgf_mng_ptr->use_table = false;
                                                             
@@ -173,7 +172,7 @@ int process(int argc, char* argv[]) {
       fdr = nullptr;
       std::cout << "FDR computation finished." << std::endl;
     }
-
+    
     std::cout << "PRSM selecting by cutoff started." << std::endl;
     std::string cutoff_type = arguments["cutoffType"];
     double cutoff_value;
@@ -195,6 +194,7 @@ int process(int argc, char* argv[]) {
     prsm_species->process();
     prsm_species = nullptr;
     std::cout << "Finding protein species finished." << std::endl;
+    */
 
     std::cout << "Outputting table started." << std::endl;
     TableWriterPtr table_out = TableWriterPtr(new TableWriter(prsm_para_ptr, "OUTPUT_RESULT", "OUTPUT_TABLE"));
@@ -202,6 +202,7 @@ int process(int argc, char* argv[]) {
     table_out = nullptr;
     std::cout << "Outputting table finished." << std::endl;
 
+    /*
     std::cout << "Generating view xml files started." << std::endl;
     XmlGeneratorPtr xml_gene = XmlGeneratorPtr(new XmlGenerator(prsm_para_ptr, exe_dir,"OUTPUT_RESULT"));
     xml_gene->process();
@@ -221,6 +222,7 @@ int process(int argc, char* argv[]) {
       cleanDir(db_file_name);	  
       std::cout << "Deleting temporary files finished." << std::endl;
     }  
+    */
     
     WebLog::close();
 
