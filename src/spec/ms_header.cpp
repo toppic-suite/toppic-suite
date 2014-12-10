@@ -123,7 +123,6 @@ xercesc::DOMElement* MsHeader::getHeaderXml(XmlDOMDocument* xml_doc) {
   str = convertToString(prec_mono_mz_);
   xml_doc->addElement(element, "prec_mono_mz", str.c_str());
   str = convertToString(prec_charge_);
-  xml_doc->addElement(element, "precursor_charge", str.c_str());
   xml_doc->addElement(element, "prec_charge", str.c_str());
   str = convertToString(error_tolerance_);
   xml_doc->addElement(element, "error_tolerance", str.c_str());
