@@ -23,7 +23,7 @@ class TableWriter {
   void write();
 
   void writeSelectedPrsms(std::ofstream &file, PrsmPtrVec &prsm_ptrs, 
-                          DeconvMsPtr ms_ptr);
+                          SpectrumSetPtr ms_ptr);
  private:
   PrsmParaPtr prsm_para_ptr_;
   std::string input_file_ext_;

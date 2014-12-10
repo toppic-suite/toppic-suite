@@ -18,7 +18,7 @@ all:
 	cd tdgf; make
 #	cd poisson; make
 #	cd prsmview; make	
-#	cd console; make
+	cd console; make
 	cd test; make
 
 clean:
