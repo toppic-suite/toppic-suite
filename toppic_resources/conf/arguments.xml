@@ -12,7 +12,7 @@
 <cutoff_type>FDR</cutoff_type>
 <cutoff_value>0.01</cutoff_value>
 <max_ptm_mass>1000000</max_ptm_mass>
-<use_table>true</use_table>
+<use_table>false</use_table>
 
 <protein_variable_ptm_list>
 <protein_variable_ptm>NONE</protein_variable_ptm>
