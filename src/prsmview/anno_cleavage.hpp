@@ -4,6 +4,7 @@
 #include "base/proteoform.hpp"
 #include "spec/extend_peak.hpp"
 #include "prsm/peak_ion_pair.hpp"
+#include "prsm/prsm.hpp"
 
 namespace prot {
 
@@ -15,7 +16,7 @@ namespace prot {
 
 class AnnoCleavage {
  public:
-  AnnoCleavage(int pos);
+  AnnoCleavage(int pos, const PeakIonPairPtrVec &pairs, bool exist_n_ion, bool exist_c_ion);
 
   void setPairs(PeakIonPairPtrVec pairs) {pairs_ = pairs;} 
 
@@ -46,9 +47,7 @@ class AnnoCleavage {
 typedef std::shared_ptr<AnnoCleavage> AnnoCleavagePtr;
 typedef std::vector<AnnoCleavagePtr> AnnoCleavagePtrVec;
 
-AnnoCleavagePtrVec getProteoCleavage(ProteoformPtr prot_ptr, 
-                                     ExtendMsPtr ms_three_ptr,
-                                     double min_mass);
+AnnoCleavagePtrVec getProteoCleavage(PrsmPtr prsm_ptr, double min_mass);
 } /* namespace prot */
 
 #endif /* PROT_ANNO_CLEAVAGE_HPP_ */

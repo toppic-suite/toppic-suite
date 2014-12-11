@@ -58,7 +58,7 @@ class Prsm {
 
   int getPrecursorId() {return precursor_id_;}
 
-  ExtendMsPtrVec getRefineMsVec() {return refine_ms_three_vec_;}
+  ExtendMsPtrVec getRefineMsPtrVec() {return refine_ms_three_vec_;}
 
   bool isMatchMs(MsHeaderPtr header_ptr);
 

@@ -128,8 +128,8 @@ PeakIonPairPtrVec findPairs(ExtendMsPtr ms_ptr, TheoPeakPtrVec peak_ptrs,
     double err = ms_ptr->getPeakPtr(i)->getOrigTolerance() + add_tolerance;
     if(ion->getPos()>=bgn && ion->getPos()<=end){
       if(std::abs(deviation)<=err){
-        pair_list.push_back(
-            PeakIonPairPtr(new PeakIonPair(ms_ptr->getPeakPtr(i),peak_ptrs[j])));
+        pair_list.push_back(PeakIonPairPtr(new PeakIonPair(
+                    ms_ptr->getHeaderPtr(), ms_ptr->getPeakPtr(i),peak_ptrs[j])));
       }
     }
     if(increaseIJ(i,j,deviation,err,ms_masses,theo_masses)){

@@ -61,7 +61,7 @@ void Prsm::initScores(SpParaPtr sp_para_ptr) {
   for (size_t i = 0; i < refine_ms_three_vec_.size(); i++) {
     // refined one 
     PeakIonPairPtrVec pairs = getPeakIonPairs (proteoform_ptr_, refine_ms_three_vec_[i], 
-                                               sp_para_ptr->getMinMass(), 0);
+                                               sp_para_ptr->getMinMass());
     match_fragment_num_ += compMatchFragNum(pairs);
     match_peak_num_ += compMatchPeakNum(pairs);
   }
