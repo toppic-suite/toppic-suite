@@ -34,8 +34,8 @@
 #include "tdgf/evalue_processor.hpp"
 #include "tdgf/tdgf_mng.hpp"
 
-//#include "prsmview/xml_generator.hpp"
-//#include "prsmview/transformer.hpp"
+#include "prsmview/xml_generator.hpp"
+#include "prsmview/transformer.hpp"
 
 #include "console/argument.hpp"
 
@@ -194,7 +194,6 @@ int process(int argc, char* argv[]) {
     prsm_species->process();
     prsm_species = nullptr;
     std::cout << "Finding protein species finished." << std::endl;
-    */
 
     std::cout << "Outputting table started." << std::endl;
     TableWriterPtr table_out = TableWriterPtr(new TableWriter(prsm_para_ptr, "OUTPUT_RESULT", "OUTPUT_TABLE"));
@@ -202,18 +201,18 @@ int process(int argc, char* argv[]) {
     table_out = nullptr;
     std::cout << "Outputting table finished." << std::endl;
 
-    /*
     std::cout << "Generating view xml files started." << std::endl;
     XmlGeneratorPtr xml_gene = XmlGeneratorPtr(new XmlGenerator(prsm_para_ptr, exe_dir,"OUTPUT_RESULT"));
     xml_gene->process();
     xml_gene = nullptr;
     std::cout << "Generating view xml files finished." << std::endl;
+    */
 
     std::cout << "Converting xml files to html files started." << std::endl;
     translate(arguments);
     std::cout << "Converting xml files to html files finished." << std::endl;
     
-    
+    /*
     if (arguments["keepTempFiles"] != "true"){
       std::cout << "Deleting temporary files started." << std::endl;
       delDir(basename(sp_file_name) + "_xml");

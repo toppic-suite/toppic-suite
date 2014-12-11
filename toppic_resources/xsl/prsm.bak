@@ -26,37 +26,27 @@ $(document).ready(function() {
 		
 var peaksCount = <xsl:value-of select="count(ms/peaks/peak)"/>;
 
+<!--
 function showMatchedPeaks() {
   var elems = document.getElementsByClassName("matched_peak");
-  for(var i = 0; elems.length > i; i++) {
+  for(var i = 0; i < elems.length; i++) {
     elems[i].style.display = "";
   }
   elems = document.getElementsByClassName("unmatched_peak");
-  for(var i = 0; elems.length > i; i++) {
+  for(var i = 0; i < elems.length; i++) {
     elems[i].style.display = "none";
   }
   $('div.dataTables_scrollBody').height(400);
 }
 
-function showNotMatchedPeaks() {
-  var elems = document.getElementsByClassName("matched_peak");
-  for(var i = 0; elems.length > i; i++) {
-    elems[i].style.display = "none";
-  }
-  elems = document.getElementsByClassName("unmatched_peak");
-  for(var i = 0; elems.length > i; i++) {
-    elems[i].style.display = "";
-  }
-  $('div.dataTables_scrollBody').height(400);
-}
 
 function showAllPeaks() {
   var elems = document.getElementsByClassName('matched_peak');
-  for(var i = 0; elems.length > i; i++) {
+  for(var i = 0; i < elems.length; i++) {
     elems[i].style.display = '';
   }
   elems = document.getElementsByClassName('unmatched_peak');
-  for(var i = 0; elems.length > i; i++) {
+  for(var i = 0; i < elems.length; i++) {
     elems[i].style.display = '';
   }
   $('div.dataTables_scrollBody').height(400);
@@ -64,22 +54,19 @@ function showAllPeaks() {
 
 function showIonPeaks(ids) {
   var elems = document.getElementsByClassName('matched_peak');
-  for(var i = 0; elems.length > i; i++) {
-    elems[i].style.display = 'none';
+  for(var i = 0; i < elems.length; i++) {
+    elems[i].style.display = '';
   }
   elems = document.getElementsByClassName('unmatched_peak');
-  for(var i = 0; elems.length > i; i++) {
+  for(var i = 0; i < elems.length; i++) {
     elems[i].style.display = 'none';
   }
 			 
 	var s = ids.split(",");
 		   
 	for (i = 0; s.length>i; i++) {
-    elems = document.getElementsByClassName(s[i]);
-    for(var j = 0; elems.length > j; j++) {
-		  elems[j].style.display  =  "";
-      elems[j].style.background  =  "#BEECFF";
-    }
+		document.getElementById('peak' + s[i]).style.display  =  "";
+		document.getElementById('peak' + s[i]).style.background  =  "#BEECFF";
 	}
 	$('div.dataTables_scrollBody').height(400);
 }
@@ -330,7 +317,7 @@ function showIonPeaks(ids) {
 
 <xsl:template match="matched_ion">
 <xsl:variable name="peakID" select="../../peak_id" as="xs:integer"/>
-<tr id="spec{../../spec_id}peak{../../peak_id}{ion_type}" class="matched_peak" name="{ion_left_position}">
+<tr id="spec{../../spec_id}peak{../../peak_id}{ion_type}" class="matched_peak" >
 <td align="center"><xsl:value-of select="../../spec_id"/></td>
 <td align="center"><xsl:value-of select="$peakID + 1"/></td>
 <td align="center"><xsl:value-of select="../../monoisotopic_mass"/></td>
