@@ -1,3 +1,4 @@
+#include <boost/algorithm/string.hpp>
 
 #include "base/fasta_reader.hpp"
 #include "spec/peak.hpp"
@@ -72,55 +73,82 @@ xercesc::DOMElement* genePrsmView(XmlDOMDocument* xml_doc,PrsmPtr prsm_ptr, Prsm
   xml_doc->addElement(element, "matched_fragment_number", str.c_str());
   str=convertToString((int)prsm_ptr->getMatchPeakNum());
   xml_doc->addElement(element, "matched_peak_number", str.c_str());
-  str=convertToString(prsm_ptr->getCalibration(), mng_ptr->precise_point_num_);
-  xml_doc->addElement(element, "calibration", str.c_str());
 
-  //get ion_pair
-  PeakIonPairPtrVec pair_ptrs =  getPeakIonPairs (prsm_ptr->getProteoformPtr(), 
-                                                  prsm_ptr->getRefineMs(),
-                                                  mng_ptr->min_mass_);
-  //LOG_DEBUG("pair completed");
-  //peaks to view
   xercesc::DOMElement* ms_element = xml_doc->createElement("ms");
-  prsm_ptr->getDeconvMsPtr()->getHeaderPtr()->appendXml(xml_doc,ms_element);//attention
+  xercesc::DOMElement* ms_header_element = xml_doc->createElement("ms_header");
+  ms_element->appendChild(ms_header_element);
+  DeconvMsPtrVec deconv_ms_ptr_vec = prsm_ptr->getDeconvMsPtrVec();
+  std::string spec_ids;
+  std::string spec_scans;
+  for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
+    spec_ids = spec_ids + std::to_string(deconv_ms_ptr_vec[i]->getHeaderPtr()->getId()) + " ";
+    spec_scans = spec_scans + deconv_ms_str_vec[i]->getHeaderPtr()->getScansString() + " ";
+  }
+  boost::algorithm::trim(spec_ids);
+  boost::algorithm::trim(spec_scans);
+  xml_doc->addElement(ms_header_element, "ids", spec_ids.c_str());
+  xml_doc->addElement(ms_header_element, "scans", spec_scans.c_str());
+  double precursor_mass = prsm_ptr->getOriginalPrecMass();
+  str=convertToString(precursor_mass);
+  xml_doc->addElement(ms_header_element, "precursor_mono_mass", str.c_str());
+  int precursor_charge = deconv_ms_ptr_vec[0]->getHeaderPtr()->getPrecCharge();
+  str=convertToString(precursor_charge);
+  xml_doc->addElement(ms_header_element, "precursor_charge", str.c_str());
+  double precursor_mz = compMonoMz(precursor_mass, precursor_charge); 
+  str=convertToString(precursor_mz);
+  xml_doc->addElement(ms_header_element, "precursor_mz", str.c_str());
+
+  //peaks to view
   xercesc::DOMElement* peaks = xml_doc->createElement("peaks");
   ms_element->appendChild(peaks);
-  for(size_t i=0;i<prsm_ptr->getDeconvMsPtr()->size();i++){
-    xercesc::DOMElement* peak_element = xml_doc->createElement("peak");
-    peaks->appendChild(peak_element);
-    DeconvPeakPtr peak_ptr = prsm_ptr->getDeconvMsPtr()->getPeakPtr(i);
-    str=convertToString(peak_ptr->getId());
-    xml_doc->addElement(peak_element, "id", str.c_str());
-    double mass = peak_ptr->getPosition();
-    int charge = peak_ptr->getCharge();
-    str=convertToString(mass, mng_ptr->precise_point_num_);
-    xml_doc->addElement(peak_element, "monoisotopic_mass", str.c_str());
-    double mz = compMonoMz(mass, charge);
-    str=convertToString(mz, mng_ptr->precise_point_num_);
-    xml_doc->addElement(peak_element, "monoisotopic_mz", str.c_str());
-    str=convertToString(peak_ptr->getIntensity(), mng_ptr->decimal_point_num_);
-    xml_doc->addElement(peak_element, "intensity", str.c_str());
-    str=convertToString(charge);
-    xml_doc->addElement(peak_element, "charge", str.c_str());
-    PeakIonPairPtrVec selected_pair_ptrs = getMatchedPairs(pair_ptrs,peak_ptr->getId());
-    if(selected_pair_ptrs.size()>0){
-      int match_ions_number = selected_pair_ptrs.size();
-      str=convertToString(match_ions_number);
-      xml_doc->addElement(peak_element, "matched_ions_num", str.c_str());
-      xercesc::DOMElement* mi_element = xml_doc->createElement("matched_ions");
-      peak_element->appendChild(mi_element);
-      for(size_t j=0;j< selected_pair_ptrs.size();j++){
-        selected_pair_ptrs[j]->appendTheoPeakToXml(xml_doc,mi_element);
+  DeconvMsPtrVec refine_ms_ptr_vec = prsm_ptr->getRefineMsPtrVec();
+  int peak_bgn_id = 0;
+  for (size_t s = 0; s < refine_ms_ptr_vec.size(); s++) {
+
+    //get ion_pair
+    PeakIonPairPtrVec pair_ptrs =  getPeakIonPairs (prsm_ptr->getProteoformPtr(), 
+                                                    refine_ms_ptr_vec[s],
+                                                    mng_ptr->min_mass_, peak_bgn_id);
+    //LOG_DEBUG("pair completed");
+    for(size_t i=0;i<prsm_ptr->getDeconvMsPtr()->size();i++){
+      xercesc::DOMElement* peak_element = xml_doc->createElement("peak");
+      peaks->appendChild(peak_element);
+      str = convertToString(refine_ms_ptr_vec[s]->getHeaderPtr()->getId());
+      xml_doc->addElement(peak_element, "spec_id", str.c_str());
+      DeconvPeakPtr peak_ptr = prsm_ptr->getDeconvMsPtr()->getPeakPtr(i);
+      str=convertToString(peak_ptr->getId() + peak_bgn_id);
+      xml_doc->addElement(peak_element, "peak_id", str.c_str());
+      double mass = peak_ptr->getPosition();
+      int charge = peak_ptr->getCharge();
+      str=convertToString(mass, mng_ptr->precise_point_num_);
+      xml_doc->addElement(peak_element, "monoisotopic_mass", str.c_str());
+      double mz = compMonoMz(mass, charge);
+      str=convertToString(mz, mng_ptr->precise_point_num_);
+      xml_doc->addElement(peak_element, "monoisotopic_mz", str.c_str());
+      str=convertToString(peak_ptr->getIntensity(), mng_ptr->decimal_point_num_);
+      xml_doc->addElement(peak_element, "intensity", str.c_str());
+      str=convertToString(charge);
+      xml_doc->addElement(peak_element, "charge", str.c_str());
+      PeakIonPairPtrVec selected_pair_ptrs = getMatchedPairs(pair_ptrs,peak_ptr->getId());
+      if(selected_pair_ptrs.size()>0){
+        int match_ions_number = selected_pair_ptrs.size();
+        str=convertToString(match_ions_number);
+        xml_doc->addElement(peak_element, "matched_ions_num", str.c_str());
+        xercesc::DOMElement* mi_element = xml_doc->createElement("matched_ions");
+        peak_element->appendChild(mi_element);
+        for(size_t j=0;j< selected_pair_ptrs.size();j++){
+          selected_pair_ptrs[j]->appendTheoPeakToXml(xml_doc,mi_element);
+        }
       }
     }
+    peak_bgn_id += refine_ms_ptr_vec.size();
   }
   element->appendChild(ms_element);
   //LOG_DEBUG("ms completed");
 
   //proteoform to view
   xercesc::DOMElement* prot_element = geneProteinView(xml_doc,
-                                                      prsm_ptr->getProteoformPtr(),
-                                                      prsm_ptr->getRefineMs(),
+                                                      prsm_ptr,
                                                       mng_ptr);
   element->appendChild(prot_element);
   //LOG_DEBUG("protein view completed");
@@ -130,10 +158,10 @@ xercesc::DOMElement* genePrsmView(XmlDOMDocument* xml_doc,PrsmPtr prsm_ptr, Prsm
 
 
 xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
-                                     ProteoformPtr proteoform_ptr,
-                                     ExtendMsPtr ms_three_ptr,
+                                     PrsmPtr prsm_ptr,
                                      PrsmViewMngPtr mng_ptr) {
   xercesc::DOMElement* prot_element = xml_doc->createElement("annotated_protein");
+  ProteoformPtr proteoform_ptr = prsm_ptr->getProteoformPtr();
   std::string str=convertToString(proteoform_ptr->getSeqId());
   xml_doc->addElement(prot_element, "sequence_id", str.c_str());
   str=convertToString(proteoform_ptr->getSpeciesId());

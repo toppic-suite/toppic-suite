@@ -15,6 +15,9 @@ class PeakIonPair {
  public:
   PeakIonPair(ExtendPeakPtr real_peak_ptr, TheoPeakPtr theo_peak_ptr); 
 
+  PeakIonPair(ExtendPeakPtr real_peak_ptr, TheoPeakPtr theo_peak_ptr, 
+              int peak_bgn_id); 
+
   ExtendPeakPtr getRealPeakPtr() {return real_peak_ptr_;}
 
   TheoPeakPtr getTheoPeakPtr() {return theo_peak_ptr_;}
@@ -29,6 +32,7 @@ class PeakIonPair {
 
  private:
   int id_;
+  int real_peak_bgn_id_ = 0;
   ExtendPeakPtr real_peak_ptr_;
   TheoPeakPtr theo_peak_ptr_;
 };
@@ -47,7 +51,7 @@ PeakIonPairPtrVec getMatchedPairs(const PeakIonPairPtrVec &pair_ptrs,
 
 PeakIonPairPtrVec getPeakIonPairs(const ProteoformPtr &proteoform_ptr, 
                                   const ExtendMsPtr &ms_three_ptr, 
-                                  double min_mass);
+                                  double min_mass, int peak_bgn_id);
 
 double computePairConverage(const PeakIonPairPtrVec &pair_ptrs, int begin, 
                             int end, int coverage_type);
