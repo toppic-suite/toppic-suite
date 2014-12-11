@@ -8,6 +8,14 @@ namespace prot {
 PeakIonPair::PeakIonPair(ExtendPeakPtr real_peak_ptr, TheoPeakPtr theo_peak_ptr) {
   real_peak_ptr_ = real_peak_ptr;
   theo_peak_ptr_ = theo_peak_ptr;
+  real_peak_bgn_id_ = 0;
+}
+
+PeakIonPair::PeakIonPair(ExtendPeakPtr real_peak_ptr, TheoPeakPtr theo_peak_ptr,
+                         int peak_bgn_id) {
+  real_peak_ptr_ = real_peak_ptr;
+  theo_peak_ptr_ = theo_peak_ptr;
+  real_peak_bgn_id_ = peak_bgn_id;
 }
 
 void PeakIonPair::appendRealPeakToXml(XmlDOMDocument* xml_doc, 
@@ -67,7 +75,7 @@ PeakIonPairPtrVec getMatchedPairs(const PeakIonPairPtrVec &pair_ptrs, int peak_i
 }
 
 void findPairs(ExtendMsPtr ms_three_ptr, TheoPeakPtrVec &theo_peak_ptrs, 
-               int bgn, int end, PeakIonPairPtrVec &pair_ptrs) {
+               int bgn, int end, PeakIonPairPtrVec &pair_ptrs, int peak_bgn_id) {
   std::sort(theo_peak_ptrs.begin(), theo_peak_ptrs.end(), theoPeakUp);
   std::vector<double> ms_masses = getExtendMassVec(ms_three_ptr);
   std::vector<double> theo_masses = getTheoMassVec(theo_peak_ptrs);
@@ -82,7 +90,8 @@ void findPairs(ExtendMsPtr ms_three_ptr, TheoPeakPtrVec &theo_peak_ptrs,
       if (std::abs(deviation) <= err) {
         PeakIonPairPtr pair_ptr 
             = PeakIonPairPtr(new PeakIonPair(ms_three_ptr->getPeakPtr(i), 
-                                             theo_peak_ptrs[j]));
+                                             theo_peak_ptrs[j],
+                                             peak_bgn_id));
         pair_ptrs.push_back(pair_ptr);
       }
     }
@@ -97,7 +106,7 @@ void findPairs(ExtendMsPtr ms_three_ptr, TheoPeakPtrVec &theo_peak_ptrs,
 /* parameter min_mass is necessary */
 PeakIonPairPtrVec getPeakIonPairs (const ProteoformPtr &proteoform_ptr, 
                                    const ExtendMsPtr &ms_three_ptr, 
-                                   double min_mass) {
+                                   double min_mass, int peak_bgn_id) {
   ActivationPtr activation_ptr 
       = ms_three_ptr->getHeaderPtr()->getActivationPtr();
 
@@ -106,7 +115,7 @@ PeakIonPairPtrVec getPeakIonPairs (const ProteoformPtr &proteoform_ptr,
                                                     min_mass);
 
   PeakIonPairPtrVec pair_ptrs;
-  findPairs(ms_three_ptr, theo_peaks, 0, proteoform_ptr->getLen(), pair_ptrs);
+  findPairs(ms_three_ptr, theo_peaks, 0, proteoform_ptr->getLen(), pair_ptrs, peak_bgn_id);
   return pair_ptrs;
 
 }
