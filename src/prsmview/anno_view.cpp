@@ -82,13 +82,13 @@ xercesc::DOMElement* genePrsmView(XmlDOMDocument* xml_doc,PrsmPtr prsm_ptr, Prsm
   std::string spec_scans;
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
     spec_ids = spec_ids + std::to_string(deconv_ms_ptr_vec[i]->getHeaderPtr()->getId()) + " ";
-    spec_scans = spec_scans + deconv_ms_str_vec[i]->getHeaderPtr()->getScansString() + " ";
+    spec_scans = spec_scans + deconv_ms_ptr_vec[i]->getHeaderPtr()->getScansString() + " ";
   }
   boost::algorithm::trim(spec_ids);
   boost::algorithm::trim(spec_scans);
   xml_doc->addElement(ms_header_element, "ids", spec_ids.c_str());
   xml_doc->addElement(ms_header_element, "scans", spec_scans.c_str());
-  double precursor_mass = prsm_ptr->getOriginalPrecMass();
+  double precursor_mass = prsm_ptr->getOriPrecMass();
   str=convertToString(precursor_mass);
   xml_doc->addElement(ms_header_element, "precursor_mono_mass", str.c_str());
   int precursor_charge = deconv_ms_ptr_vec[0]->getHeaderPtr()->getPrecCharge();
@@ -101,22 +101,20 @@ xercesc::DOMElement* genePrsmView(XmlDOMDocument* xml_doc,PrsmPtr prsm_ptr, Prsm
   //peaks to view
   xercesc::DOMElement* peaks = xml_doc->createElement("peaks");
   ms_element->appendChild(peaks);
-  DeconvMsPtrVec refine_ms_ptr_vec = prsm_ptr->getRefineMsPtrVec();
-  int peak_bgn_id = 0;
-  for (size_t s = 0; s < refine_ms_ptr_vec.size(); s++) {
-
+  ExtendMsPtrVec refine_ms_ptr_vec = prsm_ptr->getRefineMsPtrVec();
+  for (size_t s = 0; s < deconv_ms_ptr_vec.size(); s++) {
     //get ion_pair
     PeakIonPairPtrVec pair_ptrs =  getPeakIonPairs (prsm_ptr->getProteoformPtr(), 
                                                     refine_ms_ptr_vec[s],
-                                                    mng_ptr->min_mass_, peak_bgn_id);
+                                                    mng_ptr->min_mass_);
     //LOG_DEBUG("pair completed");
-    for(size_t i=0;i<prsm_ptr->getDeconvMsPtr()->size();i++){
+    for(size_t i=0;i< deconv_ms_ptr_vec[s]->size();i++){
       xercesc::DOMElement* peak_element = xml_doc->createElement("peak");
       peaks->appendChild(peak_element);
-      str = convertToString(refine_ms_ptr_vec[s]->getHeaderPtr()->getId());
+      str = convertToString(deconv_ms_ptr_vec[s]->getHeaderPtr()->getId());
       xml_doc->addElement(peak_element, "spec_id", str.c_str());
-      DeconvPeakPtr peak_ptr = prsm_ptr->getDeconvMsPtr()->getPeakPtr(i);
-      str=convertToString(peak_ptr->getId() + peak_bgn_id);
+      DeconvPeakPtr peak_ptr = deconv_ms_ptr_vec[s]->getPeakPtr(i);
+      str=convertToString(peak_ptr->getId());
       xml_doc->addElement(peak_element, "peak_id", str.c_str());
       double mass = peak_ptr->getPosition();
       int charge = peak_ptr->getCharge();
@@ -129,7 +127,9 @@ xercesc::DOMElement* genePrsmView(XmlDOMDocument* xml_doc,PrsmPtr prsm_ptr, Prsm
       xml_doc->addElement(peak_element, "intensity", str.c_str());
       str=convertToString(charge);
       xml_doc->addElement(peak_element, "charge", str.c_str());
-      PeakIonPairPtrVec selected_pair_ptrs = getMatchedPairs(pair_ptrs,peak_ptr->getId());
+      int spec_id = deconv_ms_ptr_vec[s]->getHeaderPtr()->getId(); 
+      PeakIonPairPtrVec selected_pair_ptrs = getMatchedPairs(pair_ptrs, spec_id,  
+                                                             peak_ptr->getId());
       if(selected_pair_ptrs.size()>0){
         int match_ions_number = selected_pair_ptrs.size();
         str=convertToString(match_ions_number);
@@ -141,7 +141,6 @@ xercesc::DOMElement* genePrsmView(XmlDOMDocument* xml_doc,PrsmPtr prsm_ptr, Prsm
         }
       }
     }
-    peak_bgn_id += refine_ms_ptr_vec.size();
   }
   element->appendChild(ms_element);
   //LOG_DEBUG("ms completed");
@@ -195,7 +194,7 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
 
   //LOG_DEBUG("summary completed");
 
-  AnnoCleavagePtrVec cleavage_ptrs = getProteoCleavage(proteoform_ptr,ms_three_ptr,mng_ptr->min_mass_);
+  AnnoCleavagePtrVec cleavage_ptrs = getProteoCleavage(prsm_ptr, mng_ptr->min_mass_);
 
   //LOG_DEBUG("cleavage completed");
 

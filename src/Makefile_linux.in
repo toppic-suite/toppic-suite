@@ -37,7 +37,7 @@ TDGF_OBJS = $(addprefix $(OBJ_DIR)/, evalue_processor.o comp_prob_value.o count_
 
 POISSON_OBJS = $(addprefix $(OBJ_DIR)/, poisson_processor.o poisson_comp_pvalue.o) 
 
-#PRSM_VIEW_OBJS = $(addprefix $(OBJ_DIR)/, anno_cleavage.o anno_expected_change.o anno_unexpected_change.o anno_residue.o anno_view.o xml_generator.o transformer.o) 
+PRSM_VIEW_OBJS = $(addprefix $(OBJ_DIR)/, anno_cleavage.o anno_expected_change.o anno_unexpected_change.o anno_residue.o anno_view.o xml_generator.o transformer.o) 
 
-PRSM_VIEW_OBJS = $(addprefix $(OBJ_DIR)/, anno_view.o) 
+#PRSM_VIEW_OBJS = $(addprefix $(OBJ_DIR)/, anno_cleavage.o anno_view.o) 
 ARGUMENT_OBJS = $(addprefix $(OBJ_DIR)/, argument.o)
