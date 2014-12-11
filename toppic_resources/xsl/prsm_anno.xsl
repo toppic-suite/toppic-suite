@@ -27,7 +27,7 @@
 
 <xsl:template match="matched_peaks" mode="prsm">
 	<xsl:for-each select="matched_peak">
-		<xsl:value-of select="concat(peak_id, ion_type)"/><xsl:text>,</xsl:text>
+		<xsl:value-of select="ion_left_position"/><xsl:text>,</xsl:text>
     </xsl:for-each>
 </xsl:template>
 

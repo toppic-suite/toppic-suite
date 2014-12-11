@@ -88,14 +88,15 @@ xercesc::DOMElement* genePrsmView(XmlDOMDocument* xml_doc,PrsmPtr prsm_ptr, Prsm
   boost::algorithm::trim(spec_scans);
   xml_doc->addElement(ms_header_element, "ids", spec_ids.c_str());
   xml_doc->addElement(ms_header_element, "scans", spec_scans.c_str());
+  int pos = 4;
   double precursor_mass = prsm_ptr->getOriPrecMass();
-  str=convertToString(precursor_mass);
+  str=convertToString(precursor_mass, pos);
   xml_doc->addElement(ms_header_element, "precursor_mono_mass", str.c_str());
   int precursor_charge = deconv_ms_ptr_vec[0]->getHeaderPtr()->getPrecCharge();
   str=convertToString(precursor_charge);
   xml_doc->addElement(ms_header_element, "precursor_charge", str.c_str());
   double precursor_mz = compMonoMz(precursor_mass, precursor_charge); 
-  str=convertToString(precursor_mz);
+  str=convertToString(precursor_mz, pos);
   xml_doc->addElement(ms_header_element, "precursor_mz", str.c_str());
 
   //peaks to view
