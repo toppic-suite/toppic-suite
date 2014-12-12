@@ -75,7 +75,7 @@ function showIonPeaks(ids) {
 	var s = ids.split(",");
 		   
 	for (i = 0; s.length>i; i++) {
-    elems = document.getElementsByClassName(s[i]);
+    elems = document.getElementsByName(s[i]);
     for(var j = 0; elems.length > j; j++) {
 		  elems[j].style.display  =  "";
       elems[j].style.background  =  "#BEECFF";
@@ -330,7 +330,7 @@ function showIonPeaks(ids) {
 
 <xsl:template match="matched_ion">
 <xsl:variable name="peakID" select="../../peak_id" as="xs:integer"/>
-<tr id="spec{../../spec_id}peak{../../peak_id}{ion_type}" class="matched_peak" name="{ion_left_position}">
+<tr id="spec{../../spec_id}peak{../../peak_id}{ion_type}" class="matched_peak" name="{ion_position}">
 <td align="center"><xsl:value-of select="../../spec_id"/></td>
 <td align="center"><xsl:value-of select="$peakID + 1"/></td>
 <td align="center"><xsl:value-of select="../../monoisotopic_mass"/></td>
