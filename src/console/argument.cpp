@@ -105,6 +105,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("generating-function,g", "Use the generating function approach to calculate p-values and E-values.");
     po::options_description desc("Options");
 
+    po::options_description desc("Options");
     desc.add_options() 
         ("help,h", "Print the help message.") 
         ("argument-file,f",po::value<std::string>(&argument_file_name),"Argument file name.")
