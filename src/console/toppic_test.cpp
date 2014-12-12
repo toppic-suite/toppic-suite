@@ -210,6 +210,7 @@ int process(int argc, char* argv[]) {
     translate(arguments);
     std::cout << "Converting xml files to html files finished." << std::endl;
     
+    /*
     if (arguments["keepTempFiles"] != "true"){
       std::cout << "Deleting temporary files started." << std::endl;
       delDir(basename(sp_file_name) + "_xml");
@@ -218,6 +219,7 @@ int process(int argc, char* argv[]) {
       cleanDir(db_file_name);	  
       std::cout << "Deleting temporary files finished." << std::endl;
     }  
+    */
     
     WebLog::close();
 
@@ -232,7 +234,7 @@ int process(int argc, char* argv[]) {
 }
 
 int main(int argc, char* argv[]) {
-  //prot::log_level = 2;
+  prot::log_level = 2;
   return prot::process(argc, argv);
 }
 
