@@ -98,6 +98,11 @@ double CompPValueLookupTable::compProb(int peak_num, int match_frag_num,
     p22 = ptm2_[x2][y2];
   }
 
+  p11 = log(p11);
+  p12 = log(p12);
+  p21 = log(p21);
+  p22 = log(p22);
+
   x1 = getPeakNumFromIndex(idx[0]);
   x2 = getPeakNumFromIndex(idx[1]);
   y1 = 5 * (idx[2] + 1);
@@ -109,6 +114,8 @@ double CompPValueLookupTable::compProb(int peak_num, int match_frag_num,
       + (peak_num - x1) * (match_frag_num - y1) * p22)
       / ((x2 - x1) * (y2 - y1));
 
+  res = exp(res);
+
   LOG_DEBUG("prob " << res);
 
   return res;
@@ -119,9 +126,10 @@ void CompPValueLookupTable::process(DeconvMsPtr deconv_ms_ptr,
                                     PrsmPtrVec &prsm_ptrs) {
 
   double tolerance = deconv_ms_ptr->getHeaderPtr()->getErrorTolerance();
+  double refine_prec_mass = deconv_ms_ptr->getHeaderPtr()->getPrecMonoMassMinusWater();
   int peak_num = deconv_ms_ptr->size();
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
-    double refine_prec_mass = prsm_ptrs[i]->getAdjustedPrecMass();
+    
     int match_frag_num = prsm_ptrs[i]->getMatchFragNum();
     int unexpected_shift_num = prsm_ptrs[i]->getProteoformPtr()
         ->getUnexpectedChangeNum();
