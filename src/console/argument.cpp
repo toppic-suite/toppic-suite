@@ -100,7 +100,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("max-ptm,m", po::value<std::string> (&max_ptm_mass), "<positive double value>. Maximum absolute value of masses (in Dalton) of unexpected post-translational modifications in proteoforms. Default value: 1000000.")
         ("ptm-number,p", po::value<std::string> (&shift_num), "<0|1|2>. Maximum number of unexpected post-translational modifications in a proteoform-spectrum-match. Default value: 2.")
         ("cutoff-type,t", po::value<std::string> (&cutoff_type), "<EVALUE|FDR>. Cutoff type for reporting protein-spectrum-matches. Default value: EVALUE.")
-        ("cutoff-value,v", po::value<std::string> (&cutoff_value), "<positive double value>. Cutoff value for reporting protein-spectrum-matches. Default value: 0.01.")
+        ("cutoff-value,v", po::value<std::string> (&cutoff_value), "<positive double value>. Cutoff value for reporting protein-spectrum-matches. Default value: 0.01.");
     po::options_description desc("Options");
 
     desc.add_options() 
