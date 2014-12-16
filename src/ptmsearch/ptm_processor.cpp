@@ -88,7 +88,7 @@ void PtmProcessor::process(){
   int cnt = 0;
   SpectrumSetPtr spec_set_ptr;
 
-  LOG_DEBUG("Start search");
+  //LOG_DEBUG("Start search");
   while((spec_set_ptr = sp_reader.getNextSpectrumSet(sp_para_ptr))!= nullptr){
     cnt+= group_spec_num;
     if(spec_set_ptr->isValid()){

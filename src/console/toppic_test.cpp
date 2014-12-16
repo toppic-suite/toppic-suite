@@ -80,6 +80,7 @@ int process(int argc, char* argv[]) {
     LOG_DEBUG("block size " << arguments["databaseBlockSize"]);
     int db_block_size = std::stoi(arguments["databaseBlockSize"]);
 
+    /*
     dbPreprocess (ori_db_file_name, db_file_name, decoy, db_block_size);
     generateSpIndex(sp_file_name);
     
@@ -116,6 +117,7 @@ int process(int argc, char* argv[]) {
     simple_combine_ptr->process();
     simple_combine_ptr = nullptr;
     std::cout << "Combining simple PRSMs finished." << std::endl;
+    */
     
     std::cout << "PTM search started." << std::endl;
     PtmMngPtr ptm_mng_ptr = PtmMngPtr(new PtmMng(prsm_para_ptr, n_top, shift_num,
@@ -125,6 +127,7 @@ int process(int argc, char* argv[]) {
     ptm_processor = nullptr;
     std::cout << "PTM search finished" << std::endl;
 
+    /*
     std::cout << "Combining PRSMs started." << std::endl;
     std::vector<std::string> input_exts ;
     input_exts.push_back("ZERO_COMPLETE");
@@ -210,7 +213,6 @@ int process(int argc, char* argv[]) {
     translate(arguments);
     std::cout << "Converting xml files to html files finished." << std::endl;
     
-    /*
     if (arguments["keepTempFiles"] != "true"){
       std::cout << "Deleting temporary files started." << std::endl;
       delDir(basename(sp_file_name) + "_xml");

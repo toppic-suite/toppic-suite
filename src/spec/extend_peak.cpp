@@ -92,7 +92,7 @@ std::pair<std::vector<int>, std::vector<int>> getExtendIntMassErrorList(
   int last_mass = -1;
   int last_error = 0;
   for(size_t i=0;i<ext_ms_ptr->size();i++){
-    int m = (int)std::round(ext_ms_ptr->getPeakPtr(i)->getPosition()*scale);
+    int m = (int) std::round(ext_ms_ptr->getPeakPtr(i)->getPosition()*scale);
     int e = (int) std::ceil(ext_ms_ptr->getPeakPtr(i)->getOrigTolerance()*scale);
     if(m != last_mass){
       masses.push_back(m);

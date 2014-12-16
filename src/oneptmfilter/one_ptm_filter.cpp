@@ -12,8 +12,9 @@ OnePtmFilter::OnePtmFilter(const ProteoformPtrVec &proteo_ptrs,
 }
 
 void OnePtmFilter::computeBestMatch(const PrmMsPtrVec &ms_ptr_vec){
+  PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
   std::vector<std::pair<int,int>> mass_errors 
-      = getIntMassErrorList(ms_ptr_vec, mng_ptr_->ptm_fast_filter_scale_, true, false);
+      = getIntMassErrorList(ms_ptr_vec, tole_ptr, mng_ptr_->ptm_fast_filter_scale_, true, false);
   //LOG_DEBUG("start convolution");
   index_ptr_->compConvolution(mass_errors, mng_ptr_->one_ptm_filter_result_num_);
   std::vector<std::pair<int,int>> comp_scores = index_ptr_->getTopCompProteoScores();

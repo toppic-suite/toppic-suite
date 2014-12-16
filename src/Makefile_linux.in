@@ -21,7 +21,7 @@ BIN_DIR = ../../bin
 
 BASE_OBJS = $(addprefix $(OBJ_DIR)/, db_block.o logger.o xml_dom_err_handler.o segment.o file_util.o xml_writer.o support_peak_type.o semi_align_type.o db_residue_seq.o extreme_value.o algorithm.o ion.o base_data.o fasta_reader.o proteoform.o bp_spec.o break_point.o residue_seq.o change.o acid.o ptm.o residue_freq.o residue.o xml_dom.o xml_dom_document.o ion_type.o neutral_loss.o trunc.o prot_mod.o activation.o)
 
-SPEC_OBJS = $(addprefix $(OBJ_DIR)/, theo_peak.o support_peak.o sp_para.o spectrum_set.o prm_peak.o deconv_peak.o deconv_ms.o extend_peak.o msalign_reader.o ms_header.o peak.o peak_list.o peak_tolerance.o)
+SPEC_OBJS = $(addprefix $(OBJ_DIR)/, prm_peak.o multi_spec_peak.o theo_peak.o support_peak.o sp_para.o spectrum_set.o deconv_peak.o deconv_ms.o extend_peak.o msalign_reader.o ms_header.o peak.o peak_list.o peak_tolerance.o)
 
 PRSM_OBJS = $(addprefix $(OBJ_DIR)/, table_writer.o prsm_species.o output_selector.o prsm_fdr.o prsm_selector.o simple_prsm_writer.o simple_prsm_str_combine.o simple_prsm.o simple_prsm_reader.o simple_prsm_str.o prsm_para.o prsm_str.o prsm_reader.o prsm_str_combine.o prsm_writer.o prsm.o pair.o peak_ion_pair.o)
 

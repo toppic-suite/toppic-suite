@@ -34,8 +34,10 @@ SimplePrsmPtrVec DiagFilter::getBestMatch(const PrmMsPtrVec &ms_ptr_vec){
 
 
 inline SimplePrsmPtrVec DiagFilter::compute(const PrmMsPtrVec &ms_ptr_vec){
+
+  PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
   std::vector<std::pair<int,int>> mass_errors 
-      = getIntMassErrorList(ms_ptr_vec, mng_ptr_->ptm_fast_filter_scale_,true,false);
+      = getIntMassErrorList(ms_ptr_vec, tole_ptr, mng_ptr_->ptm_fast_filter_scale_,true,false);
   SimplePrsmPtrVec match_ptrs;
   for(size_t i=0;i<mass_errors.size();i++){
     std::vector<std::pair<int,int>> results 
