@@ -14,6 +14,7 @@ bool increaseIJ(size_t i, size_t j, double deviation,
    * we assume that each real peak is matched to at most one theoretical
    * peak, so we do not check i and j+1
    */
+  //LOG_DEBUG("i " << i << " j " << j << " ms mass size " << ms_masses.size() << " theo mass size " << theo_masses.size());
   if (deviation <= 0) {
     return true;
   }

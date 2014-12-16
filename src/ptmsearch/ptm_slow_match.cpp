@@ -19,9 +19,9 @@ PtmSlowMatch::PtmSlowMatch(ProteoformPtr proteo_ptr,
 inline void PtmSlowMatch::initPsAlign(CompShiftLowMemPtr comp_shift_ptr){
   double scale = mng_ptr_->ptm_fast_filter_scale_;
   // n term strict c term nonstrict
+  PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
   std::vector<std::pair<int,int>> sp_masses_toles 
-      = getIntMassErrorList(ms_six_ptr_vec_,scale,true,false);
-
+      = getIntMassErrorList(ms_six_ptr_vec_,tole_ptr,scale,true,false);
   std::vector<double> best_shifts = comp_shift_ptr->findBestShift(
       sp_masses_toles,
       proteo_ptr_->getBpSpecPtr()->getScaledPrmMasses(scale),
@@ -31,15 +31,17 @@ inline void PtmSlowMatch::initPsAlign(CompShiftLowMemPtr comp_shift_ptr){
   DiagonalHeaderPtrVec n_term_shift_header_ptrs 
       = getNTermShiftHeaders (best_shifts, prec_mono_mass_, proteo_ptr_, mng_ptr_);
 
-
+  PrmPeakPtrVec prm_peaks = getPrmPeakPtrs(ms_six_ptr_vec_, tole_ptr);
+  int group_spec_num = ms_six_ptr_vec_.size();
   BasicDiagonalPtrVec diagonal_ptrs = getDiagonals(n_term_shift_header_ptrs,
-                                                   ms_six_ptr_vec_,proteo_ptr_,mng_ptr_);
-  for (size_t i = 0; i < diagonal_ptrs.size(); i++) {
-    diagonal_ptrs[i]->getHeader()->setId(i);
-  }
-  std::vector<double> ms_masses = getMassList(ms_six_ptr_vec_);
+                                                   prm_peaks, prec_mono_mass_, group_spec_num,
+                                                   proteo_ptr_,mng_ptr_);
   std::vector<double> seq_masses = proteo_ptr_->getBpSpecPtr()->getPrmMasses();
-  
+  std::vector<double> ms_masses;
+  for (size_t i = 0; i < prm_peaks.size(); i++) {
+    ms_masses.push_back(prm_peaks[i]->getPosition());
+  }
+
   ps_align_ptr_ = PSAlignPtr(new PSAlign(ms_masses,seq_masses,diagonal_ptrs,mng_ptr_));
 }
 

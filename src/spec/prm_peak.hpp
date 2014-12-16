@@ -17,8 +17,8 @@ namespace prot {
 
 class PrmPeak : public Peak {
  public:
-  PrmPeak(DeconvPeakPtr base_peak_ptr, int base_type, double mono_mass, 
-          double score);
+  PrmPeak(int spec_id, DeconvPeakPtr base_peak_ptr, int base_type, 
+          double mono_mass, double score);
 
   void addNghbEdge(DeconvPeakPtr deconv_peak_ptr, double offset,
                    SPTypePtr peak_type, double score);
@@ -39,6 +39,10 @@ class PrmPeak : public Peak {
 
   double getNRelaxCStrictTolerance(){return n_relax_c_strict_tolerance_;}
 
+  int getSpecId() {return spec_id_;}
+
+  int getPeakId() {return peak_id_;}
+
   int getBreakType();
 
   void setStrictTolerance(double tolerance){strict_tolerance_ = tolerance;}
@@ -49,8 +53,12 @@ class PrmPeak : public Peak {
   void setNRelaxCStrictTolerance(double tolerance){
     n_relax_c_strict_tolerance_ = tolerance;}
 
+  void setPeakId(int peak_id) {peak_id_ = peak_id;}
+
  private:
   DeconvPeakPtr base_peak_ptr_;
+  int peak_id_;
+  int spec_id_;
   double mono_mass_;
   double score_;
   int base_type_;
@@ -70,12 +78,14 @@ inline bool prmPeakUp(const PrmPeakPtr &a, const PrmPeakPtr &b){
   return a->getPosition() < b->getPosition();
 }
 
+/*
 PrmMsPtr createMsTwoPtr(DeconvMsPtr deconv_ms_ptr, SpParaPtr sp_para_ptr, double new_prec_mass);
 
 PrmMsPtr createMsSixPtr(DeconvMsPtr deconv_ms_ptr, SpParaPtr sp_para_ptr, double new_prec_mass); 
 
 PrmMsPtr createShiftMsSixPtr(DeconvMsPtr deconv_ms_ptr, SpParaPtr sp_para_ptr, double new_prec_mass, 
                              double shift);
+                             */
 
 PrmMsPtrVec createMsTwoPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, SpParaPtr sp_para_ptr,
                               double prec_mono_mass);
@@ -86,13 +96,19 @@ PrmMsPtrVec createMsSixPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, SpParaPtr
 PrmMsPtrVec createShiftMsSixPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, SpParaPtr sp_para_ptr, 
                                    double prec_mono_mass, double shift);
 
-std::vector<std::pair<int,int>> getIntMassErrorList(const PrmMsPtrVec &prm_ms_ptr_vec, double scale,
-                                                    bool n_strict, bool c_strict);
+std::vector<std::pair<int, int>> getIntMassErrorList(const PrmMsPtrVec &prm_ms_ptr_vec, 
+                                                     PeakTolerancePtr tole_ptr,
+                                                     double scale, bool n_strict, bool c_strict);
+
+PrmPeakPtrVec getPrmPeakPtrs(const PrmMsPtrVec &prm_ms_ptr_vec, PeakTolerancePtr tole_ptr);
+
+/*
 
 std::vector<double> getMassList(PrmMsPtr prm_ms_ptr);
 std::vector<double> getMassList(const PrmMsPtrVec &prm_ms_ptr_vec);
 
 std::vector<double> getScoreList(PrmMsPtr prm_ms_ptr);
+*/
 
 } /* namespace prot */
 

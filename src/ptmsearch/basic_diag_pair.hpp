@@ -21,10 +21,7 @@ typedef std::vector<BasicDiagonalPtr> BasicDiagonalPtrVec;
 
 class BasicDiagPair:public Pair {
  public:
-  BasicDiagPair(int x,int y,double score,int diag_order,
-                double diff,int prm_peak_type);
-
-  int getBaseType() {return base_type_;}
+  BasicDiagPair(int x,int y,double score,int diag_order, double diff);
 
   int getDiagOrder() {return diag_order_;}
 
@@ -41,22 +38,22 @@ class BasicDiagPair:public Pair {
   double diff_;
   BasicDiagonalWeakPtr diagonal_ptr_;
   double score_;
-  int base_type_;
-
 };
 
+
+BasicDiagonalPtrVec getDiagonals(const DiagonalHeaderPtrVec& header_ptr_vec,
+                                 const PrmPeakPtrVec &prm_peaks, 
+                                 double prec_mono_mass, int group_spec_num,
+                                 ProteoformPtr proteo_ptr, PtmMngPtr mng_ptr);
+/*
 BasicDiagPairPtrVec compDiagPair(const PrmMsPtrVec &ms_ptr_vec, 
                                  const std::vector<double>& seq_masses,
                                  DiagonalHeaderPtr header_ptr);
 
-BasicDiagonalPtrVec  getDiagonals(const DiagonalHeaderPtrVec &header_ptr_vec,
-                                  const PrmMsPtrVec &ms_six_ptr_vec, 
-                                  ProteoformPtr proteo_ptr,
-                                  PtmMngPtr mng_ptr);
-
 BasicDiagonalPtr  getDiagonalPtr(int cnt, DiagonalHeaderPtr header_ptr, 
                                  const PrmMsPtrVec &ms_six_ptr_vec,
                                  ProteoformPtr proteo_ptr, PtmMngPtr mng_ptr);
+                                 */
 } /* namespace prot */
 
 #endif /* BASIC_DIAG_PAIR_HPP_ */
