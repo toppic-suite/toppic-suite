@@ -101,7 +101,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("ptm-number,p", po::value<std::string> (&shift_num), "<0|1|2>. Maximum number of unexpected post-translational modifications in a proteoform-spectrum-match. Default value: 2.")
         ("cutoff-type,t", po::value<std::string> (&cutoff_type), "<EVALUE|FDR>. Cutoff type for reporting protein-spectrum-matches. Default value: EVALUE.")
         ("cutoff-value,v", po::value<std::string> (&cutoff_value), "<positive double value>. Cutoff value for reporting protein-spectrum-matches. Default value: 0.01.")
-        ("generating-function,g", "Use generating function to calculate p-values and E-values. Precomputed tables are used by default to save time. When tables are used, the estimation is faster, but less accurate. The valid error tolerances are 5, 10 and 15 only when tables used.");
+        ("generating-function,g", "Use the generating function approach to calculate p-values and E-values.");
     po::options_description desc("Options");
 
     desc.add_options() 
@@ -119,7 +119,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("cutoff-value,v", po::value<std::string> (&cutoff_value), "<positive double value>. Cutoff value for reporting protein-spectrum-matches. Default value: 0.01.")
         ("log-file-name,l", po::value<std::string>(&log_file_name), "Log file name with its path.")
         ("keep-temp-files,k", "Keep temporary files.")
-        ("generating-function,g", "Use generating function to calculate p-values and E-values. Precomputed tables are used by default to save time. When tables are used, the estimation is faster, but less accurate. The valid error tolerances are 5, 10 and 15 only when tables used.")
+        ("generating-function,g", "Use generating function to calculate p-values and E-values.")
         ("full-binary-path,b", "Full binary path.")
         ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name with its path.")
         ("spectrum-file-name", po::value<std::string>(&spectrum_file_name)->required(), "Spectrum file name with its path.");
