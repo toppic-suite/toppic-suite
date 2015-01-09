@@ -151,10 +151,15 @@ void cleanDir(const std::string &path){
   fs::path sp(path);
   fs::directory_iterator end_iter;
   std::string base = basename(absolute(sp).string());
+  std::string output_table = "OUTPUT_TABLE", fasta = "fasta", msliagn = "msalign";
+  
   for(fs::directory_iterator dir_iter(absolute(sp).parent_path()) ; dir_iter != end_iter ; ++dir_iter){
     std::string filename = dir_iter->path().string();
     if (filename.compare(0, base.length(), base) == 0){
-      if (filename != absolute(sp).string()&&!fs::is_directory(dir_iter->path())&&filename != base + ".OUTPUT_TABLE"&&filename != base + ".fasta"){
+      if (filename != absolute(sp).string()&&!fs::is_directory(dir_iter->path())&&
+          filename.compare(filename.length() - output_table.length(), output_table.length(), output_table) != 0&&
+          filename.compare(filename.length() - fasta.length(), fasta.length(), fasta) != 0&&
+          filename.compare(filename.length() - msliagn.length(), msliagn.length(), msliagn) != 0){
         fs::remove(dir_iter->path());
       }
     } else if (filename.compare(filename.size() - 12, 12, "target_decoy") == 0){
