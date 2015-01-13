@@ -49,6 +49,10 @@ int process(int argc, char* argv[]) {
     std::map<std::string, std::string> arguments = argu_processor.getArguments();
     std::cout << "TopPC 0.9 " << std::endl;
 
+#ifdef __MINGW32__
+   arguments["executiveDir"] = "C:\\TopPIC";
+#endif
+
     std::string exe_dir = arguments["executiveDir"];
     std::cout << "Executive file directory is: " << exe_dir << std::endl;
     initBaseData(exe_dir);
