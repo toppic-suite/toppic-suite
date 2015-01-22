@@ -45,6 +45,11 @@ FastaReader::FastaReader(const std::string &file_name) {
     throw "fasta file does not exist.";
   }
   std::getline(input_, ori_name_);
+
+  while(ori_name_.length() <= 1){
+	  std::getline(input_, ori_name_);
+  }  
+
 }
 
 FastaSeqPtr FastaReader::getNextSeq() {
