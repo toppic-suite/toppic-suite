@@ -29,6 +29,8 @@ std::string rmChar(const std::string &ori_seq) {
       r = 'E';
     } else if (c == 'X') {
       r = 'A';
+    } else if (c == 'J') {
+      r = 'I';
     }
     seq = seq + r;
   }
