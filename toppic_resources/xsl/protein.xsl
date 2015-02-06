@@ -6,7 +6,7 @@
 
 <xsl:template match="protein">
 <html>
-  <title>Proteoforms for protein <xsl:value-of select="sequence_name"/> 
+  <title>Proteoforms for protein <xsl:value-of select="sequence_name"/><xsl:text> </xsl:text>
 		<xsl:value-of select="sequence_description"/>
   </title>
 <link rel="stylesheet" type="text/css" href="../resources/media/css/jquery.dataTables.css"></link>
@@ -23,7 +23,7 @@
 <body>
 <div class="container">
 <xsl:call-template name="navigation"/>
-<p style="font-size:16px;"><xsl:value-of select="compatible_proteoform_number"/> proteoforms for protein <xsl:value-of select="sequence_name"/>
+<p style="font-size:16px;"><xsl:value-of select="compatible_proteoform_number"/> proteoforms for protein <xsl:value-of select="sequence_name"/><xsl:text> </xsl:text>
 		<xsl:value-of select="sequence_description"/>
 </p>
 

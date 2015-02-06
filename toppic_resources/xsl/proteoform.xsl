@@ -4,7 +4,7 @@
 
 <xsl:template match="compatible_proteoform">
 <html>
-  <title>Proteoform #<xsl:value-of select="proteoform_id"/> from <xsl:value-of select="sequence_name"/>
+  <title>Proteoform #<xsl:value-of select="proteoform_id"/> from <xsl:value-of select="sequence_name"/><xsl:text> </xsl:text>
 		<xsl:value-of select="sequence_description"/>
   
   
@@ -60,7 +60,7 @@
 <xsl:template name="navigation">
 <p style="font-size:15px;">
 	<a href="../proteins.html">All proteins</a> /
-  <a href="../proteins/protein{sequence_id}.html"><xsl:value-of select="sequence_name"/>
+  <a href="../proteins/protein{sequence_id}.html"><xsl:value-of select="sequence_name"/><xsl:text> </xsl:text>
 		<xsl:value-of select="sequence_description"/>
   </a>
 </p>

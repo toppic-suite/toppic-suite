@@ -29,7 +29,7 @@
 <xsl:template match="protein">
 <div id="p{sequence_id}">
   <p style="font-size:16px;">
-    <a href="proteins/protein{sequence_id}.html"><xsl:value-of select="sequence_name"/>
+    <a href="proteins/protein{sequence_id}.html"><xsl:value-of select="sequence_name"/><xsl:text> </xsl:text>
 		<xsl:value-of select="sequence_description"/>
   </a></p>
 <xsl:apply-templates select="compatible_proteoform/prsm"></xsl:apply-templates>
