@@ -15,7 +15,7 @@ void Argument::initArguments() {
   arguments_["activation"] = "FILE";
   arguments_["searchType"] = "TARGET";
   arguments_["cysteineProtection"] = "C0";
-  arguments_["shiftNumber"] = "2";
+  arguments_["ptmNumber"] = "2";
   arguments_["errorTolerance"] = "15";
   arguments_["cutoffType"] = "EVALUE";
   arguments_["cutoffValue"] = "0.01";
@@ -46,7 +46,7 @@ void Argument::setArgumentsByConfigFile(const std::string &filename){
       arguments_["activation"]=getChildValue(root,"fragmentation_method",0);
       arguments_["cysteineProtection"]=getChildValue(root,"cysteine_protecting_group",0);
       arguments_["searchType"]=getChildValue(root,"search_type",0);
-      arguments_["shiftNumber"]=getChildValue(root,"shift_number",0);
+      arguments_["ptmNumber"]=getChildValue(root,"shift_number",0);
       arguments_["errorTolerance"]=getChildValue(root,"error_tolerance",0);
       arguments_["cutoffType"]=getChildValue(root,"cutoff_type",0);
       arguments_["cutoffValue"]=getChildValue(root,"cutoff_value",0);
@@ -76,7 +76,7 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string argument_file_name = "";
   std::string activation = "";
   std::string protection = "";
-  std::string shift_num = "";
+  std::string ptm_num = "";
   std::string error_tole = "";
   std::string max_ptm_mass = "";
   std::string cutoff_type = "";
@@ -98,7 +98,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("decoy,d", "Use a decoy protein database to estimate false discovery rates.")
         ("error-tolerance,e", po::value<std::string> (&error_tole), "<positive integer value>. Error tolerance for precursor and fragment masses in PPM. Default value: 15.")
         ("max-ptm,m", po::value<std::string> (&max_ptm_mass), "<positive double value>. Maximum absolute value of masses (in Dalton) of unexpected post-translational modifications in proteoforms. Default value: 1000000.")
-        ("ptm-number,p", po::value<std::string> (&shift_num), "<0|1|2>. Maximum number of unexpected post-translational modifications in a proteoform-spectrum-match. Default value: 2.")
+        ("ptm-number,p", po::value<std::string> (&ptm_num), "<0|1|2>. Maximum number of unexpected post-translational modifications in a proteoform-spectrum-match. Default value: 2.")
         ("cutoff-type,t", po::value<std::string> (&cutoff_type), "<EVALUE|FDR>. Cutoff type for reporting protein-spectrum-matches. Default value: EVALUE.")
         ("cutoff-value,v", po::value<std::string> (&cutoff_value), "<positive double value>. Cutoff value for reporting protein-spectrum-matches. Default value: 0.01.")
         ("generating-function,g", "Use the generating function approach to calculate p-values and E-values.");
@@ -114,7 +114,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("decoy,d", "Use a decoy protein database to estimate false discovery rates.")
         ("error-tolerance,e", po::value<std::string> (&error_tole), "<int value>. Error tolerance of precursor and fragment masses in PPM. Default value: 15.")
         ("max-ptm,m", po::value<std::string> (&max_ptm_mass), "<positive double value>. Maximum absolute value (in Dalton) of the masses of unexpected PTMs in the identified proteoform. Default value: 1000000.")
-        ("ptm-number,p", po::value<std::string> (&shift_num), "<0|1|2>. Maximum number of unexpected PTMs. Default value: 2.")
+        ("ptm-number,p", po::value<std::string> (&ptm_num), "<0|1|2>. Maximum number of unexpected PTMs. Default value: 2.")
         ("cutoff-type,t", po::value<std::string> (&cutoff_type), "<EVALUE|FDR>. Cutoff value type for reporting protein-spectrum-matches. Default value: EVALUE.")
         ("cutoff-value,v", po::value<std::string> (&cutoff_value), "<positive double value>. Cutoff value for reporting protein-spectrum-matches. Default value: 0.01.")
         ("log-file-name,l", po::value<std::string>(&log_file_name), "Log file name with its path.")
@@ -178,8 +178,8 @@ bool Argument::parse(int argc, char* argv[]) {
     if (vm.count("cysteine-protection")) {
       arguments_["cysteineProtection"] = protection;
     }
-    if (vm.count("shift-number")) {
-      arguments_["shiftNumber"] = shift_num;
+    if (vm.count("ptm-number")) {
+      arguments_["ptmNumber"] = ptm_num;
     }
     if (vm.count("error-tolerance")) {
       arguments_["errorTolerance"] = error_tole;
@@ -249,9 +249,9 @@ bool Argument::validateArguments() {
     LOG_ERROR("Search type " << search_type << " error! The value should be TARGET|TARGET+DECOY!");
     return false;
   }
-  std::string shift_number = arguments_["shiftNumber"];
-  if (shift_number != "0" && shift_number != "1" && shift_number != "2") {
-    LOG_ERROR("PTM number "<< shift_number <<" error! The value should be 0|1|2!");
+  std::string ptm_number = arguments_["ptmNumber"];
+  if (ptm_number != "0" && ptm_number != "1" && ptm_number != "2") {
+    LOG_ERROR("PTM number "<< ptm_number <<" error! The value should be 0|1|2!");
     return false;
   }
   
