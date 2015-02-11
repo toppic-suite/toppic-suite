@@ -70,7 +70,7 @@ int process(int argc, char* argv[]) {
       WebLog::useTable(false);
 
     int n_top = std::stoi(arguments["numOfTopPrsms"]);
-    int shift_num = std::stoi(arguments["shiftNumber"]);
+    int ptm_num = std::stoi(arguments["ptmNumber"]);
     double max_ptm_mass = std::stod(arguments["maxPtmMass"]);
 
     PrsmParaPtr prsm_para_ptr = PrsmParaPtr(new PrsmPara(arguments));
@@ -123,7 +123,7 @@ int process(int argc, char* argv[]) {
     
 
     std::cout << "PTM search started." << std::endl;
-    PtmMngPtr ptm_mng_ptr = PtmMngPtr(new PtmMng(prsm_para_ptr, n_top, shift_num,
+    PtmMngPtr ptm_mng_ptr = PtmMngPtr(new PtmMng(prsm_para_ptr, n_top, ptm_num,
                                                  max_ptm_mass, "FILTER", "PTM"));
     PtmProcessorPtr ptm_processor = PtmProcessorPtr(new PtmProcessor(ptm_mng_ptr));
     ptm_processor->process();
@@ -137,14 +137,14 @@ int process(int argc, char* argv[]) {
     input_exts.push_back("ZERO_SUFFIX");
     input_exts.push_back("ZERO_INTERNAL");
     input_exts.push_back("PTM");
-    int prsm_top_num = (shift_num + 1) * 4;
+    int prsm_top_num = (ptm_num + 1) * 4;
     PrsmStrCombinePtr combine_ptr(new PrsmStrCombine(sp_file_name, input_exts, "RAW_RESULT", prsm_top_num));
     combine_ptr->process();
     combine_ptr = nullptr;
     std::cout << "Combining PRSMs finished." << std::endl;
 
     std::cout << "E-value computation started." << std::endl;
-    TdgfMngPtr tdgf_mng_ptr = TdgfMngPtr(new TdgfMng (prsm_para_ptr, shift_num, max_ptm_mass,
+    TdgfMngPtr tdgf_mng_ptr = TdgfMngPtr(new TdgfMng (prsm_para_ptr, ptm_num, max_ptm_mass,
                                                       "RAW_RESULT", "EVALUE"));
                                                       
     if (arguments["useTable"] == "false")
