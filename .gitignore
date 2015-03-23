@@ -1,0 +1,6 @@
+build/*
+thirdparty/*
+bin/*
+
+*.o
+*.so
