@@ -47,11 +47,7 @@ int process(int argc, char* argv[]) {
       return 1;
     }
     std::map<std::string, std::string> arguments = argu_processor.getArguments();
-    std::cout << "TopPC 0.9 " << std::endl;
-
-#ifdef __MINGW32__
-   arguments["executiveDir"] = "C:\\TopPIC";
-#endif
+    std::cout << "TopPIC 0.9 " << std::endl;
 
     std::string exe_dir = arguments["executiveDir"];
     std::cout << "Executive file directory is: " << exe_dir << std::endl;
@@ -62,16 +58,19 @@ int process(int argc, char* argv[]) {
     std::string db_file_name = arguments["databaseFileName"];
     std::string sp_file_name = arguments["spectrumFileName"];
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
-
     std::string log_file_name = arguments["logFileName"];
-  	WebLog::init(log_file_name);
   	
-    if (arguments["useTable"] == "false")
-      WebLog::useTable(false);
 
     int n_top = std::stoi(arguments["numOfTopPrsms"]);
     int ptm_num = std::stoi(arguments["ptmNumber"]);
     double max_ptm_mass = std::stod(arguments["maxPtmMass"]);
+    bool use_gf = false; 
+    if (arguments["useGf"] == "true") {
+      use_gf = true;
+    }
+    /* initialize log file */
+  	WebLog::init(log_file_name, use_gf);
+
 
     PrsmParaPtr prsm_para_ptr = PrsmParaPtr(new PrsmPara(arguments));
 
@@ -144,12 +143,8 @@ int process(int argc, char* argv[]) {
     std::cout << "Combining PRSMs finished." << std::endl;
 
     std::cout << "E-value computation started." << std::endl;
-    TdgfMngPtr tdgf_mng_ptr = TdgfMngPtr(new TdgfMng (prsm_para_ptr, ptm_num, max_ptm_mass,
+    TdgfMngPtr tdgf_mng_ptr = TdgfMngPtr(new TdgfMng (prsm_para_ptr, ptm_num, max_ptm_mass, use_gf,
                                                       "RAW_RESULT", "EVALUE"));
-                                                      
-    if (arguments["useTable"] == "false")
-      tdgf_mng_ptr->use_table = false;
-                                                            
     EValueProcessorPtr processor = EValueProcessorPtr(new EValueProcessor(tdgf_mng_ptr));
     processor->init();
     // compute E-value for a set of prsms each run 

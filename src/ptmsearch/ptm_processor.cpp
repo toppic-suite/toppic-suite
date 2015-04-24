@@ -102,7 +102,7 @@ void PtmProcessor::process(){
     std::cout << std::flush <<  "PTM search is processing " << cnt 
         << " of " << spectrum_num << " spectra.\r";
     
-    WebLog::percent_log(0.09 + (double) cnt / spectrum_num * 0.17);
+    WebLog::percentLog(0.09 + (double) cnt / spectrum_num * 0.17);
   }
   LOG_DEBUG("Search completed");
   sp_reader.close();
