@@ -22,11 +22,11 @@ void Argument::initArguments() {
   arguments_["allowProtMod"] = "NONE,NME,NME_ACETYLATION";
   arguments_["numOfTopPrsms"] = "1";
   arguments_["maxPtmMass"] = "1000000";
+  arguments_["useGf"] = "false";
   arguments_["executiveDir"] = ".";
   arguments_["logFileName"] = "";
   arguments_["keepTempFiles"] = "false";
   arguments_["fullBinaryPath"] = "false";
-  arguments_["useTable"] = "true";
 }
 
 void Argument::showUsage(boost::program_options::options_description &desc) {
@@ -51,7 +51,7 @@ void Argument::setArgumentsByConfigFile(const std::string &filename){
       arguments_["cutoffType"]=getChildValue(root,"cutoff_type",0);
       arguments_["cutoffValue"]=getChildValue(root,"cutoff_value",0);
       arguments_["maxPtmMass"]=getChildValue(root,"max_ptm_mass",0);
-      arguments_["useTable"]=getChildValue(root,"use_table",0);
+      arguments_["useGf"]=getChildValue(root,"use_gf",0);
 
       xercesc::DOMElement* prot_mod_list = getChildElement(root,"protein_variable_ptm_list",0);
       int allow_prot_node_number = getChildCount(prot_mod_list,"protein_variable_ptm");
@@ -203,7 +203,7 @@ bool Argument::parse(int argc, char* argv[]) {
       arguments_["fullBinaryPath"] = "true";
     }
     if (vm.count("generating-function")) {
-      arguments_["useTable"] = "false";
+      arguments_["useGf"] = "true";
     }
   }
   catch(std::exception&e ) {
@@ -266,14 +266,14 @@ bool Argument::validateArguments() {
     return false;
   }
 
-  std::string use_table = arguments_["useTable"];
-  if(use_table != "true" && use_table != "false"){
-    LOG_ERROR("Use table " << use_table << " error! The value should be true|false!");
+  std::string use_gf = arguments_["useGf"];
+  if(use_gf != "true" && use_gf != "false"){
+    LOG_ERROR("Use gf " << use_gf << " error! The value should be true|false!");
     return false;
   }
 
-  if(use_table == "true" && arguments_["errorTolerance"] !="5" && arguments_["errorTolerance"]!="10" && arguments_["errorTolerance"]!="15"){
-    LOG_ERROR("Error tolerance can only be 5, 10 or 15 when using precomputed tables!");
+  if(use_gf == "false" && arguments_["errorTolerance"] !="5" && arguments_["errorTolerance"]!="10" && arguments_["errorTolerance"]!="15"){
+    LOG_ERROR("Error tolerance can only be 5, 10 or 15 when the generation function approach for E-value computation is not selected!");
     return false;
   }
 

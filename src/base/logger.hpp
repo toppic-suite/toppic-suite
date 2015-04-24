@@ -56,10 +56,9 @@ extern int log_level;
 
 class WebLog {
  public:
-  static void init(std::string log_file_name);
-  static void percent_log(double p);
+  static void init(std::string log_file_name, bool use_gf);
+  static void percentLog(double p);
   static void close();
-  static void useTable(bool flag);
 
  private:
   static double ratio_;

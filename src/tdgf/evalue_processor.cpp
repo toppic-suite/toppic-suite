@@ -25,7 +25,7 @@ void EValueProcessor::init() {
   fai_ = fai_load(mng_ptr_->prsm_para_ptr_->getSearchDbFileName().c_str());
 
   ResFreqPtrVec residue_freqs = test_num_ptr->getResFreqPtrVec();
-  if (mng_ptr_->use_table) {
+  if (!mng_ptr_->use_gf_) {
     comp_pvalue_table_ptr_ = CompPValueLookupTablePtr(
         new CompPValueLookupTable(mng_ptr_));
   }
@@ -81,11 +81,11 @@ void EValueProcessor::process(bool is_separate) {
           << spectrum_num << " spectra.\r";
     }
 
-    if (mng_ptr_->use_table == false){
-      WebLog::percent_log(0.26 + (double) cnt / spectrum_num * 0.73);
+    if (mng_ptr_->use_gf_){
+      WebLog::percentLog(0.26 + (double) cnt / spectrum_num * 0.73);
     } else {
-	  WebLog::percent_log((0.91 + (double) cnt / spectrum_num * 0.07) / 3.5);	
-	}
+      WebLog::percentLog((0.91 + (double) cnt / spectrum_num * 0.07) / 3.5);	
+    }
   }
   reader.close();
   prsm_reader.close();
@@ -113,7 +113,7 @@ bool EValueProcessor::checkPrsms(const PrsmPtrVec &prsm_ptrs) {
 void EValueProcessor::compEvalues(SpectrumSetPtr spec_set_ptr,
                                   bool is_separate, PrsmPtrVec &sele_prsm_ptrs) {
 
-  if (mng_ptr_->use_table && comp_pvalue_table_ptr_->inTable(spec_set_ptr->getDeconvMsPtr(), sele_prsm_ptrs)) {
+  if (!mng_ptr_->use_gf_ && comp_pvalue_table_ptr_->inTable(spec_set_ptr->getDeconvMsPtr(), sele_prsm_ptrs)) {
     comp_pvalue_table_ptr_->process(spec_set_ptr->getDeconvMsPtr(), sele_prsm_ptrs);
     LOG_DEBUG("Using table");
   }

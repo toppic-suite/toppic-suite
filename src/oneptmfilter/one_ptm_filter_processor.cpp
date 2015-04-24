@@ -100,7 +100,7 @@ void OnePtmFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_n
       internal_writer.write(filter_ptr->getInternalMatchPtrs());
     }
     
-    WebLog::percent_log(0.08 + (double) (cnt / spectrum_num * (1 + block_ptr->getBlockIdx())
+    WebLog::percentLog(0.08 + (double) (cnt / spectrum_num * (1 + block_ptr->getBlockIdx())
                 / total_block_num * 0.01));
     
     std::cout << std::flush << "One PTM filtering is processing " << cnt 
