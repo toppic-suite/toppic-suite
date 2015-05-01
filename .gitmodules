@@ -1,0 +1,3 @@
+[submodule "toppic_server"]
+	path = toppic_server
+	url = https://github.iu.edu/xwliu/toppic_server.git
