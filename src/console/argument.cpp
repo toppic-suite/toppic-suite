@@ -106,7 +106,6 @@ bool Argument::parse(int argc, char* argv[]) {
         ("generating-function,g", "Use the generating function approach to calculate p-values and E-values.");
     po::options_description desc("Options");
 
-    po::options_description desc("Options");
     desc.add_options() 
         ("help,h", "Print the help message.") 
         ("argument-file,f",po::value<std::string>(&argument_file_name),"Argument file name.")
@@ -124,7 +123,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("keep-temp-files,k", "Keep temporary files.")
         ("generating-function,g", "Use generating function to calculate p-values and E-values.")
         ("full-binary-path,b", "Full binary path.")
-        ("group-number,g", po::value<std::string> (&group_num), "Specify the number of spectra in a group. Default value: 1.")
+        ("group-number,r", po::value<std::string> (&group_num), "Specify the number of spectra in a group. Default value: 1.")
         ("full-binary-path,b", "Full binary path.")
         ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name with its path.")
         ("spectrum-file-name", po::value<std::string>(&spectrum_file_name)->required(), "Spectrum file name with its path.");

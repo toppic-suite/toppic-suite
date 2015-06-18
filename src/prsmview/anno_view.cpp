@@ -363,7 +363,7 @@ xercesc::DOMElement* proteinToXml(XmlDOMDocument* xml_doc,
   xml_doc->addElement(prot_element, "sequence_id", str.c_str());
   str=proteo_ptr->getSeqName();
   xml_doc->addElement(prot_element, "sequence_name", str.c_str());
-  str=prsm_ptrs[0]->getProteoformPtr()->getSeqDesc();
+  str=proteo_ptr->getSeqDesc();
   xml_doc->addElement(prot_element, "sequence_description", str.c_str());
   int count = species_ids.size();
   str=convertToString(count);
