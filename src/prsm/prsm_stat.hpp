@@ -14,7 +14,6 @@ namespace prot {
 class PrsmStat {
  public:
   PrsmStat(PrsmParaPtr prsm_para_ptr, 
-           double min_mass,
            const std::string &input_file_ext, 
            const std::string &output_file_ext);
   void process();
@@ -28,6 +27,8 @@ class PrsmStat {
   std::string output_file_ext_;
   AcidPtrVec acid_ptr_vec_;
 };
+
+typedef std::shared_ptr<PrsmStat> PrsmStatPtr;
 
 
 } /* namespace prot */
