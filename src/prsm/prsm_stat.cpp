@@ -14,11 +14,10 @@
 namespace prot {
 
 PrsmStat::PrsmStat(PrsmParaPtr prsm_para_ptr, 
-                   double min_mass,
                    const std::string &input_file_ext, 
                    const std::string &output_file_ext) {
   prsm_para_ptr_ = prsm_para_ptr;
-  min_mass_ = min_mass;
+  min_mass_ = prsm_para_ptr_->getSpParaPtr()->getMinMass();
   input_file_ext_ = input_file_ext;
   output_file_ext_ = output_file_ext;
   acid_ptr_vec_ = AcidFactory::getBaseAcidPtrVec();
