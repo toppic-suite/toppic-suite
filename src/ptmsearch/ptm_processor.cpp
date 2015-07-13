@@ -1,7 +1,7 @@
-
 #include "base/prot_mod.hpp"
 #include "base/fasta_reader.hpp"
 #include "base/file_util.hpp"
+#include "base/web_logger.hpp"
 #include "spec/deconv_ms.hpp"
 #include "spec/spectrum_set.hpp"
 #include "spec/msalign_reader.hpp"
@@ -102,7 +102,7 @@ void PtmProcessor::process(){
     std::cout << std::flush <<  "PTM search is processing " << cnt 
         << " of " << spectrum_num << " spectra.\r";
     
-    WebLog::percentLog(0.09 + (double) cnt / spectrum_num * 0.17);
+    WebLog::percentLog(cnt, spectrum_num, WebLog::PtmTime());
   }
   LOG_DEBUG("Search completed");
   sp_reader.close();

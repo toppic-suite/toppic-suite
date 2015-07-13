@@ -2,6 +2,7 @@
 
 #include "base/fasta_reader.hpp"
 #include "base/base_data.hpp"
+#include "base/web_logger.hpp"
 
 #include "prsm/prsm_para.hpp"
 #include "prsm/prsm_combine.hpp"
@@ -47,7 +48,7 @@ int process(int argc, char* argv[]) {
       return 1;
     }
     std::map<std::string, std::string> arguments = argu_processor.getArguments();
-    std::cout << "TopPIC 0.9 " << std::endl;
+    std::cout << "TopPIC 0.9.2" << std::endl;
 
     std::string exe_dir = arguments["executiveDir"];
     std::cout << "Executive file directory is: " << exe_dir << std::endl;
@@ -59,7 +60,6 @@ int process(int argc, char* argv[]) {
     std::string sp_file_name = arguments["spectrumFileName"];
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
     std::string log_file_name = arguments["logFileName"];
-  	
 
     int n_top = std::stoi(arguments["numOfTopPrsms"]);
     int ptm_num = std::stoi(arguments["ptmNumber"]);
@@ -69,8 +69,7 @@ int process(int argc, char* argv[]) {
       use_gf = true;
     }
     /* initialize log file */
-  	WebLog::init(log_file_name, use_gf);
-
+  	WebLog::init(log_file_name, use_gf, ptm_num);
 
     PrsmParaPtr prsm_para_ptr = PrsmParaPtr(new PrsmPara(arguments));
 
@@ -81,53 +80,60 @@ int process(int argc, char* argv[]) {
     LOG_DEBUG("block size " << arguments["databaseBlockSize"]);
     int db_block_size = std::stoi(arguments["databaseBlockSize"]);
 
-    
     dbPreprocess (ori_db_file_name, db_file_name, decoy, db_block_size);
     generateSpIndex(sp_file_name);
     
     std::cout << "Zero PTM search started." << std::endl;
     ZeroPtmMngPtr zero_mng_ptr = ZeroPtmMngPtr(new ZeroPtmMng (prsm_para_ptr, "ZERO"));
     zeroPtmSearchProcess(zero_mng_ptr);
+    WebLog::completeFunction(WebLog::ZeroPtmTime());
     std::cout << "Zero PTM search finished." << std::endl;
 
-    std::cout << "Diagonal filtering started." << std::endl;
-    DiagFilterMngPtr diag_filter_mng_ptr 
-        = DiagFilterMngPtr(new DiagFilterMng(prsm_para_ptr, "DIAG_FILTER"));
-    DiagFilterProcessorPtr diag_filter_processor = DiagFilterProcessorPtr(new DiagFilterProcessor(diag_filter_mng_ptr));
-    diag_filter_processor->process();
-    diag_filter_processor = nullptr;
-    std::cout << "Diagonal filtering finished." << std::endl;
+    std::vector<std::string> filtering_result_exts;
+    int filtering_result_num = 0;
+    if (ptm_num >= 1) {
+      std::cout << "One PTM filtering started." << std::endl;
+      OnePtmFilterMngPtr one_ptm_filter_mng_ptr 
+          = OnePtmFilterMngPtr(new OnePtmFilterMng(prsm_para_ptr, "ONE_PTM_FILTER"));
+      OnePtmFilterProcessorPtr one_ptm_filter_processor = OnePtmFilterProcessorPtr(new OnePtmFilterProcessor(one_ptm_filter_mng_ptr));
+      one_ptm_filter_processor->process();
+      one_ptm_filter_processor = nullptr;
+      WebLog::completeFunction(WebLog::OnePtmFilterTime());
+      std::cout << "One PTM filtering finished." << std::endl;
+      //one ptm filtering results information
+      filtering_result_exts.push_back("ONE_PTM_FILTER");
+      filtering_result_num += one_ptm_filter_mng_ptr->one_ptm_filter_result_num_;
 
-    std::cout << "One PTM filtering started." << std::endl;
-    OnePtmFilterMngPtr one_ptm_filter_mng_ptr 
-        = OnePtmFilterMngPtr(new OnePtmFilterMng(prsm_para_ptr, "ONE_PTM_FILTER"));
-    OnePtmFilterProcessorPtr one_ptm_filter_processor = OnePtmFilterProcessorPtr(new OnePtmFilterProcessor(one_ptm_filter_mng_ptr));
-    one_ptm_filter_processor->process();
-    one_ptm_filter_processor = nullptr;
-    std::cout << "One PTM filtering finished." << std::endl;
+      if (ptm_num >= 2) {
+        std::cout << "Diagonal filtering started." << std::endl;
+        DiagFilterMngPtr diag_filter_mng_ptr 
+            = DiagFilterMngPtr(new DiagFilterMng(prsm_para_ptr, "DIAG_FILTER"));
+        DiagFilterProcessorPtr diag_filter_processor = DiagFilterProcessorPtr(new DiagFilterProcessor(diag_filter_mng_ptr));
+        diag_filter_processor->process();
+        diag_filter_processor = nullptr;
+        WebLog::completeFunction(WebLog::DiagFilterTime());
+        std::cout << "Diagonal filtering finished." << std::endl;
+        filtering_result_exts.push_back("DIAG_FILTER");
+        filtering_result_num += diag_filter_mng_ptr->ptm_fast_filter_result_num_; 
+      }
 
-    std::cout << "Combining simple PRSMs started." << std::endl;
-    std::vector<std::string> simple_input_exts;
-    simple_input_exts.push_back("DIAG_FILTER");
-    simple_input_exts.push_back("ONE_PTM_FILTER");
-    int top_num = diag_filter_mng_ptr->ptm_fast_filter_result_num_ 
-        + one_ptm_filter_mng_ptr->one_ptm_filter_result_num_;
+      std::cout << "Combining simple PRSMs started." << std::endl;
+      LOG_DEBUG("filtering result number " << filtering_result_num);
+      SimplePrsmStrCombinePtr simple_combine_ptr(
+          new SimplePrsmStrCombine(sp_file_name, filtering_result_exts, "FILTER", filtering_result_num));
+      simple_combine_ptr->process();
+      simple_combine_ptr = nullptr;
+      std::cout << "Combining simple PRSMs finished." << std::endl;
 
-    LOG_DEBUG("top number " << top_num);
-    SimplePrsmStrCombinePtr simple_combine_ptr(
-        new SimplePrsmStrCombine(sp_file_name, simple_input_exts, "FILTER", top_num));
-    simple_combine_ptr->process();
-    simple_combine_ptr = nullptr;
-    std::cout << "Combining simple PRSMs finished." << std::endl;
-    
-
-    std::cout << "PTM search started." << std::endl;
-    PtmMngPtr ptm_mng_ptr = PtmMngPtr(new PtmMng(prsm_para_ptr, n_top, ptm_num,
-                                                 max_ptm_mass, "FILTER", "PTM"));
-    PtmProcessorPtr ptm_processor = PtmProcessorPtr(new PtmProcessor(ptm_mng_ptr));
-    ptm_processor->process();
-    ptm_processor = nullptr;
-    std::cout << "PTM search finished" << std::endl;
+      std::cout << "PTM search started." << std::endl;
+      PtmMngPtr ptm_mng_ptr = PtmMngPtr(new PtmMng(prsm_para_ptr, n_top, ptm_num,
+                                                   max_ptm_mass, "FILTER", "PTM"));
+      PtmProcessorPtr ptm_processor = PtmProcessorPtr(new PtmProcessor(ptm_mng_ptr));
+      ptm_processor->process();
+      ptm_processor = nullptr;
+      WebLog::completeFunction(WebLog::PtmTime());
+      std::cout << "PTM search finished" << std::endl;
+    }
 
     std::cout << "Combining PRSMs started." << std::endl;
     std::vector<std::string> input_exts ;
@@ -135,7 +141,9 @@ int process(int argc, char* argv[]) {
     input_exts.push_back("ZERO_PREFIX");
     input_exts.push_back("ZERO_SUFFIX");
     input_exts.push_back("ZERO_INTERNAL");
-    input_exts.push_back("PTM");
+    if (ptm_num >= 1) {
+      input_exts.push_back("PTM");
+    }
     int prsm_top_num = (ptm_num + 1) * 4;
     PrsmStrCombinePtr combine_ptr(new PrsmStrCombine(sp_file_name, input_exts, "RAW_RESULT", prsm_top_num));
     combine_ptr->process();
@@ -150,6 +158,12 @@ int process(int argc, char* argv[]) {
     // compute E-value for a set of prsms each run 
     processor->process(false);
     processor = nullptr;
+    if (use_gf) {
+      WebLog::completeFunction(WebLog::GfEvalueTime());
+    }
+    else {
+      WebLog::completeFunction(WebLog::TableEvalueTime());
+    }
     std::cout << "E-value computation finished." << std::endl;
 
     if (arguments["searchType"]=="TARGET") { 
@@ -210,7 +224,6 @@ int process(int argc, char* argv[]) {
     std::cout << "Converting xml files to html files started." << std::endl;
     translate(arguments);
     std::cout << "Converting xml files to html files finished." << std::endl;
-    
     
     if (arguments["keepTempFiles"] != "true"){
       std::cout << "Deleting temporary files started." << std::endl;

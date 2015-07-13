@@ -53,18 +53,6 @@ extern int log_level;
       std::cout << "LOG ERROR: " << __FILE__ << ": " << X << std::endl;      \
     }                                   \
   }
-
-class WebLog {
- public:
-  static void init(std::string log_file_name, bool use_gf);
-  static void percentLog(double p);
-  static void close();
-
- private:
-  static double ratio_;
-  static std::ofstream log_;
-  static std::string log_file_name_;
-};
-
 }
+
 #endif
