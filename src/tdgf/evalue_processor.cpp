@@ -1,6 +1,6 @@
 //#include <sys/time.h>
-
 #include "base/logger.hpp"
+#include "base/web_logger.hpp"
 #include "base/file_util.hpp"
 #include "base/proteoform.hpp"
 #include "base/fasta_reader.hpp"
@@ -82,9 +82,9 @@ void EValueProcessor::process(bool is_separate) {
     }
 
     if (mng_ptr_->use_gf_){
-      WebLog::percentLog(0.26 + (double) cnt / spectrum_num * 0.73);
+      WebLog::percentLog(cnt, spectrum_num, WebLog::GfEvalueTime());
     } else {
-      WebLog::percentLog((0.91 + (double) cnt / spectrum_num * 0.07) / 3.5);	
+      WebLog::percentLog(cnt, spectrum_num, WebLog::TableEvalueTime());	
     }
   }
   reader.close();

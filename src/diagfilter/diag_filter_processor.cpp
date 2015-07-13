@@ -2,6 +2,7 @@
 #include "base/base_data.hpp"
 #include "base/fasta_reader.hpp"
 #include "base/file_util.hpp"
+#include "base/web_logger.hpp"
 #include "spec/msalign_reader.hpp"
 #include "prsm/simple_prsm_writer.hpp"
 #include "prsm/simple_prsm_str_combine.hpp"
@@ -67,8 +68,8 @@ void DiagFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num
       writer.write(match_ptrs);
     }
     
-    WebLog::percentLog(0.03 + (double) block_ptr->getBlockIdx() / total_block_num * 0.05
-                + (double) cnt / spectrum_num / total_block_num * 0.05);
+    WebLog::percentLog(cnt, spectrum_num, block_ptr->getBlockIdx(), total_block_num, 
+                       WebLog::DiagFilterTime());
     
     std::cout << std::flush << "Diagonal filtering is processing " << cnt 
         << " of " << spectrum_num << " spectra.\r";

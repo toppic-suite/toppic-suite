@@ -1,6 +1,7 @@
 #include "base/proteoform.hpp"
 #include "base/fasta_reader.hpp"
 #include "base/file_util.hpp"
+#include "base/web_logger.hpp"
 #include "spec/msalign_reader.hpp"
 #include "spec/spectrum_set.hpp"
 #include "prsm/simple_prsm_writer.hpp"
@@ -100,8 +101,8 @@ void OnePtmFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_n
       internal_writer.write(filter_ptr->getInternalMatchPtrs());
     }
     
-    WebLog::percentLog(0.08 + (double) (cnt / spectrum_num * (1 + block_ptr->getBlockIdx())
-                / total_block_num * 0.01));
+    WebLog::percentLog(cnt, spectrum_num, block_ptr->getBlockIdx(), total_block_num,  
+                       WebLog::OnePtmFilterTime());
     
     std::cout << std::flush << "One PTM filtering is processing " << cnt 
         << " of " << spectrum_num << " spectra.\r";
