@@ -58,8 +58,8 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   # Windows specific code
   link_directories(${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/windows_lib/)  
   target_link_libraries(toppic xalan-c xalanMsg xerces-c
-          boost_filesystem-mgw48-s-1_56 boost_system-mgw48-s-1_56.a
-          boost_program_options-mgw48-s-1_56 hts pthread z Ws2_32)
+          boost_filesystem-mgw48-s-1_56 boost_system-mgw48-s-1_56
+          boost_program_options-mgw48-s-1_56 boost_date_time-mgw48-s-1_56 hts pthread z Ws2_32)
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows") 
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
