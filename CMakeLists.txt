@@ -65,7 +65,8 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   # Linux specific code
 
-  target_link_libraries(toppic xalan-c xalanMsg xerces-c boost_program_options boost_filesystem boost_system hts pthread z)
+  target_link_libraries(toppic xalan-c xalanMsg xerces-c boost_program_options
+    boost_filesystem boost_system boost_date_time hts pthread z)
 
   #add_executable(test_zero_ptm ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
   #        ${ZERO_PTM_SRCS} ${ARGU_SRCS} ${TEST_ZERO_PTM_SRCS})
