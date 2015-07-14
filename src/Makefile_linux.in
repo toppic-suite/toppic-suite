@@ -13,7 +13,7 @@ INCLUDES = -I../../thirdparty/linux_include  -I../
 LFLAGS = -L../../thirdparty/linux_lib -L/lib -L/opt/local/lib
 #
 # define any libraries to link into executable:
-LIBS = -static -lxalan-c -lxalanMsg -lxerces-c -lboost_program_options -lboost_filesystem -lboost_system -lhts -lz -lpthread  
+LIBS = -static -lxalan-c -lxalanMsg -lxerces-c -lboost_program_options -lboost_filesystem -lboost_system -lboost_date_time -lhts -lz -lpthread  
 
 OBJ_DIR = ../../bin/obj
 
@@ -39,4 +39,4 @@ POISSON_OBJS = $(addprefix $(OBJ_DIR)/, poisson_processor.o poisson_comp_pvalue.
 
 PRSM_VIEW_OBJS = $(addprefix $(OBJ_DIR)/, anno_cleavage.o anno_expected_change.o anno_unexpected_change.o anno_residue.o anno_view.o xml_generator.o transformer.o) 
 
-ARGUMENT_OBJS = $(addprefix $(OBJ_DIR)/, argument.o)
+ARGUMENT_OBJS = $(addprefix $(OBJ_DIR)/, argument.o summary.o)
