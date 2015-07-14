@@ -37,11 +37,14 @@
 #include "prsmview/transformer.hpp"
 
 #include "console/argument.hpp"
+#include "console/summary.hpp"
 
 namespace prot {
 
 int process(int argc, char* argv[]) {
   try {
+    boost::posix_time::ptime start_time = boost::posix_time::microsec_clock::local_time();
+
     Argument argu_processor;
     bool success = argu_processor.parse(argc, argv);
     if (!success) {
@@ -233,6 +236,10 @@ int process(int argc, char* argv[]) {
       cleanDir(db_file_name);	  
       std::cout << "Deleting temporary files finished." << std::endl;
     }  
+
+    boost::posix_time::ptime stop_time = boost::posix_time::microsec_clock::local_time();
+
+    Summary::outputSummary(argu_processor, start_time, stop_time);
     
     WebLog::close();
 

@@ -2,6 +2,7 @@
 #define PROT_ARGUMENT_HPP_
 
 #include <map>
+#include <iostream>
 #include <fstream>
 #include <algorithm>
 #include <memory>
@@ -17,6 +18,7 @@ namespace prot {
 class Argument {
  public:
   Argument();
+  void outputArguments(std::ofstream &output);
 
   bool parse(int argc, char* argv[]);
   std::map<std::string,std::string> getArguments(){return arguments_;}

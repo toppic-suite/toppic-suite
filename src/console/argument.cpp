@@ -29,6 +29,40 @@ void Argument::initArguments() {
   arguments_["fullBinaryPath"] = "false";
 }
 
+void Argument::outputArguments(std::ofstream &output) {
+  output << std::endl;
+  output << "2. Parameters" << std::endl;
+  output << "Protein database file: " << arguments_["oriDatabaseFileName"] << std::endl;
+  output << "Spectrum file: " << arguments_["spectrumFileName"] << std::endl;
+  output << "Activation type: " << arguments_["activation"] << std::endl;
+  output << "Search type: " << arguments_["searchType"] << std::endl;
+  std::string cysteine_type = arguments_["cysteineProtection"];
+  std::string cysteine_group = "";
+  if (cysteine_type == "C0") {
+    cysteine_group = "None";
+  }
+  else if (cysteine_type == "C57") {
+    cysteine_group = "Carbamidomethylation";
+  }
+  else if (cysteine_type == "C58") {
+    cysteine_group = "Carboxymethylation";
+  }
+  output << "Cysteine protection group: " << cysteine_group << std::endl;
+  output << "Maximum number of unexpected PTMs: " << arguments_["ptmNumber"] << std::endl;
+  output << "Error tolerance: " << arguments_["errorTolerance"] << " ppm" << std::endl;
+  output << "Cutoff type: " << arguments_["cutoffType"] << std::endl;
+  output << "Cutoff value: " << arguments_["cutoffValue"] << std::endl;
+  output << "Allowed N-terminal modifications: " << arguments_["allowProtMod"] << std::endl;
+  output << "Maximum PTM mass: " << arguments_["maxPtmMass"] << " Da" << std::endl;
+  if (arguments_["useGf"] == "true") {
+    output << "E-value computation: Generation function" << std::endl;
+  }
+  else {
+    output << "E-value computation: Lookup table" << std::endl;
+  }
+  output << std::endl;
+}
+
 void Argument::showUsage(boost::program_options::options_description &desc) {
   std::cout << "Usage: toppic [options] database-file-name spectrum-file-name" << std::endl; 
   std::cout << desc << std::endl; 
