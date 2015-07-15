@@ -37,46 +37,6 @@ PrsmStrPtrVec getTopPrsms(PrsmStrPtrVec &prsm_str_ptrs, int n_top){
   return result_ptrs;
 }
 
-/*
-PrsmPtrVec PrsmSelector::getTopPrsms(PrsmPtrVec &prsm_ptrs, int n_top){
-  std::sort(prsm_ptrs.begin(),prsm_ptrs.end(),prsmEValueUp);
-  int size = prsm_ptrs.size();
-  int max = size > n_top? n_top:size;
-  PrsmPtrVec result_ptrs;
-  for(int i=0;i<max;i++){
-    if(!containsSameDbSeq(result_ptrs, prsm_ptrs[i])){
-      result_ptrs.push_back(prsm_ptrs[i]);
-    }
-  }
-  return result_ptrs;
-}
-*/
-
-/*
-void PrsmSelector::process(){
-  std::string base_name = basename(spec_file_name_);
-  std::string input_file_name = base_name+"."+input_file_ext_;
-  ProteoformPtrVec proteo_ptrs 
-      = readFastaToProteoform(db_file_name_, ResidueFactory::getBaseResiduePtrVec());
-  PrsmPtrVec prsm_ptrs = readPrsm(input_file_name,proteo_ptrs);
-  std::string output_file_name = base_name+"."+output_file_ext_;
-  int max_id = prsm_ptrs[prsm_ptrs.size()-1]->getSpectrumId();
-  PrsmWriter writer(output_file_name);
-  for(int i=0; i<= max_id;i++){
-    PrsmPtrVec selected_prsm_ptrs;
-    for(size_t j=0;j<prsm_ptrs.size();j++){
-      if(prsm_ptrs[j]->getSpectrumId()==i){
-        selected_prsm_ptrs.push_back(prsm_ptrs[j]);
-      }
-    }
-    PrsmPtrVec result_ptrs = getTopPrsms(selected_prsm_ptrs, n_top_);
-    writer.writeVector(result_ptrs);
-  }
-  //because the prsm_writer ~PrsmWriter changed and the fileclosing is an independant function
-  writer.close();
-}
-*/
-
 void PrsmSelector::process(){
   std::string base_name = basename(spec_file_name_);
   std::string input_file_name = base_name+"."+input_file_ext_;

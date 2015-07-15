@@ -47,9 +47,13 @@ class ExtendPeak : public Peak{
 typedef std::shared_ptr<ExtendPeak> ExtendPeakPtr;
 typedef std::vector<ExtendPeakPtr> ExtendPeakPtrVec;
 typedef std::shared_ptr<Ms<ExtendPeakPtr>> ExtendMsPtr;
+typedef std::vector<ExtendMsPtr> ExtendMsPtrVec;
 
-ExtendMsPtr createMsThreePtr(DeconvMsPtr deconv_ms_ptr, double delta, 
-                             SpParaPtr sp_para_ptr);
+ExtendMsPtr createMsThreePtr(DeconvMsPtr deconv_ms_ptr, SpParaPtr sp_para_ptr,
+                             double new_prec_mass);
+
+ExtendMsPtrVec createMsThreePtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, 
+                                   SpParaPtr sp_para_ptr, double new_prec_mass);
 
 std::pair<std::vector<int>, std::vector<int>> getExtendIntMassErrorList(
     ExtendMsPtr ext_ms_ptr, double scale);
@@ -68,6 +72,7 @@ inline std::vector<double> getExtendMassVec (ExtendMsPtr extend_ms_ptr) {
   }
   return masses;
 }
+
 
 } /* namespace prot */
 

@@ -50,6 +50,7 @@ class SpPara {
 
   PeakTolerancePtr peak_tolerance_ptr_;
   ActivationPtr activation_ptr_;
+
 };
 
 typedef std::shared_ptr<SpPara> SpParaPtr;

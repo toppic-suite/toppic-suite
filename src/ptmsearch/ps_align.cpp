@@ -323,8 +323,10 @@ DiagonalHeaderPtrVec PSAlign::backtrace(int s) {
     return list;
   }
 
+  //LOG_DEBUG("backtrace start ");
   while (p != first_pair_ptr_) {
     DPPairPtr pre = p->getPrevPairPtr(s);
+    //LOG_DEBUG("p " << p << " pre ptr " << pre);
     if (p == last_pair_ptr_) {
       cur_header = pre->getDiagonalHeader();
       cur_end = pre->getY();

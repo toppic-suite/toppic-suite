@@ -18,16 +18,16 @@ void zeroPtmSearch(SpectrumSetPtr spec_set_ptr,
                    ProteoformPtrVec &proteoform_ptr_vec, 
                    ZeroPtmMngPtr mng_ptr, 
                    PrsmPtrVec &prsms) {
-  ExtendMsPtr ms_three = spec_set_ptr->getMsThreePtr();
+  ExtendMsPtrVec ms_three_vec = spec_set_ptr->getMsThreePtrVec();
+  //LOG_DEBUG("ms three vector size " << ms_three_vec.size());
 
   ZpFastMatchPtrVec fast_matches 
-      = zeroPtmFastFilter(type_ptr, ms_three, proteoform_ptr_vec, 
+      = zeroPtmFastFilter(type_ptr, ms_three_vec, proteoform_ptr_vec, 
                           mng_ptr->zero_ptm_filter_result_num_);
-
   //LOG_DEBUG("fast_match ended size " << fast_matches.size());
-  DeconvMsPtr deconv_ms = spec_set_ptr->getDeconvMsPtr();
+  DeconvMsPtrVec deconv_ms_vec = spec_set_ptr->getDeconvMsPtrVec();
   ZpSlowMatchPtrVec slow_matches 
-      = zeroPtmSlowFilter(deconv_ms, fast_matches, mng_ptr); 
+      = zeroPtmSlowFilter(deconv_ms_vec, fast_matches, mng_ptr); 
 
   //LOG_DEBUG("slow_match ended size " << slow_matches.size());
   for (size_t i = 0; i < slow_matches.size(); i++) {
@@ -44,6 +44,7 @@ void zeroPtmSearch(SpectrumSetPtr spec_set_ptr,
 void zeroPtmSearchProcessBlock(ZeroPtmMngPtr mng_ptr, DbBlockPtr block_ptr, 
                                int total_block_num) { 
   PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
+  SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
   std::string db_block_file_name = prsm_para_ptr->getSearchDbFileName() 
       + "_" + std::to_string(block_ptr->getBlockIdx());
   ProteoformPtrVec raw_forms 
@@ -55,7 +56,9 @@ void zeroPtmSearchProcessBlock(ZeroPtmMngPtr mng_ptr, DbBlockPtr block_ptr,
 
   int spectrum_num = getSpNum (prsm_para_ptr->getSpectrumFileName());
 
-  MsAlignReader reader(prsm_para_ptr->getSpectrumFileName());
+  int group_spec_num = prsm_para_ptr->getGroupSpecNum();
+  MsAlignReader reader(prsm_para_ptr->getSpectrumFileName(), group_spec_num);
+
   std::string output_file_name = basename(prsm_para_ptr->getSpectrumFileName())
                                           + "." + mng_ptr->output_file_ext_;  
   std::string block_str = "_" + std::to_string(block_ptr->getBlockIdx());
@@ -76,14 +79,12 @@ void zeroPtmSearchProcessBlock(ZeroPtmMngPtr mng_ptr, DbBlockPtr block_ptr,
 
   //LOG_DEBUG("start reading");
   int n = 0;
-  DeconvMsPtr ms_ptr = reader.getNextMs();
+  SpectrumSetPtr spec_set_ptr = reader.getNextSpectrumSet(sp_para_ptr);
   LOG_DEBUG("init ms_ptr");
-  double delta = 0;
-  while (ms_ptr.get() != nullptr) {
-    n++;
-    SpectrumSetPtr spec_set_ptr 
-        = getSpectrumSet(ms_ptr, delta, prsm_para_ptr->getSpParaPtr());
-    if (spec_set_ptr.get() != nullptr) {
+  //double delta = 0;
+  while (spec_set_ptr != nullptr) {
+    n = n + group_spec_num;
+    if (spec_set_ptr->isValid()) {
       PrsmPtrVec comp_prsms;
       zeroPtmSearch(spec_set_ptr, SemiAlignTypeFactory::getCompletePtr(), 
                     prot_mod_forms, mng_ptr, comp_prsms);
@@ -111,7 +112,7 @@ void zeroPtmSearchProcessBlock(ZeroPtmMngPtr mng_ptr, DbBlockPtr block_ptr,
       std::cout << std::flush << "Zero PTM search is processing " << n << " of " 
           << spectrum_num << " spectra.\r";
     }
-    ms_ptr = reader.getNextMs();
+    spec_set_ptr = reader.getNextSpectrumSet(sp_para_ptr);
     //LOG_DEBUG("spectrum " << n);
   }
   std::cout << std::endl;

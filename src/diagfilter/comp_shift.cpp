@@ -168,6 +168,7 @@ std::vector<std::pair<int,int>> CompShift::compConvolution(
   return results;
 }
 
+/*
 std::vector<std::pair<int,int>> CompShift::compConvolution(
     const std::vector<int> &masses, const std::vector<int> &errors, int bgn_pos,int num){
 
@@ -187,6 +188,40 @@ std::vector<std::pair<int,int>> CompShift::compConvolution(
       left=0;
     }
     int right = m+errors[i];
+    if(right >= col_num_){
+      break;
+    }
+    begin_index = col_index_begins_[left];
+    end_index= col_index_ends_[right];
+    for(int j=begin_index;j<=end_index;j++){
+      scores[col_indexes_[j]]++;
+    }
+  }
+  std::vector<std::pair<int,int>> results = getShiftScores(scores, num);
+  delete[] scores;
+  return results;
+}
+*/
+
+std::vector<std::pair<int,int>> CompShift::compConvolution(
+    const std::vector<std::pair<int,int>> &mass_errors, int bgn_pos,int num){
+
+  short* scores = new short[row_num_];
+  memset(scores, 0, row_num_ * sizeof(short));
+
+  int begin_index;
+  int end_index;
+  int m;
+
+  for(size_t i =bgn_pos+1; i< mass_errors.size(); i++){
+
+    m = mass_errors[i].first -mass_errors[bgn_pos].first;
+    // m - errors[i] performs better than m - errors[i] -  errors[bgn_pos]
+    int left = m-mass_errors[i].second;
+    if(left < 0){
+      left=0;
+    }
+    int right = m + mass_errors[i].second;
     if(right >= col_num_){
       break;
     }

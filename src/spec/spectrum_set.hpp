@@ -13,35 +13,41 @@ namespace prot {
 
 class SpectrumSet {
  public:
-  SpectrumSet(DeconvMsPtr deconv_ms_ptr, double delta, SpParaPtr sp_para_ptr);
+  SpectrumSet(DeconvMsPtrVec deconv_ms_ptr_vec, SpParaPtr sp_para_ptr, 
+              double prec_mono_mass);
 
-  DeconvMsPtr getDeconvMsPtr(){return deconv_ms_ptr_;}
+  double getPrecMonoMass() {return prec_mono_mass_;}
 
-  ExtendMsPtr getMsThreePtr() {return extend_ms_three_ptr_;}
+  bool isValid() {return valid_;}
 
-  PrmMsPtr getMsTwoPtr() {return prm_ms_two_ptr_;}
+  int getSpecId() {return deconv_ms_ptr_vec_[0]->getHeaderPtr()->getId();}
 
-  PrmMsPtr getMsSixPtr(){return prm_ms_six_ptr_;}
+  ExtendMsPtrVec getMsThreePtrVec() {return extend_ms_three_ptr_vec_;}
 
-  PrmMsPtr getMsShiftSixPtr(double shift){
-    return createShiftMsSixPtr(deconv_ms_ptr_, delta_, -shift, sp_para_ptr_);
+  DeconvMsPtrVec getDeconvMsPtrVec(){return deconv_ms_ptr_vec_;}
+
+  PrmMsPtrVec getMsTwoPtrVec() {return prm_ms_two_ptr_vec_;}
+
+  PrmMsPtrVec getMsSixPtrVec(){return prm_ms_six_ptr_vec_;}
+
+  PrmMsPtrVec getMsShiftSixPtrVec(double shift){
+    return createShiftMsSixPtrVec(deconv_ms_ptr_vec_, sp_para_ptr_, prec_mono_mass_, -shift);
   }
 
-  double getDelta(){return delta_;}
 
  private:
-  DeconvMsPtr deconv_ms_ptr_;
+  DeconvMsPtrVec deconv_ms_ptr_vec_;
   SpParaPtr sp_para_ptr_;
-  double delta_;
-  PrmMsPtr prm_ms_two_ptr_;
-  ExtendMsPtr extend_ms_three_ptr_;
-  PrmMsPtr prm_ms_six_ptr_;
+  double prec_mono_mass_;
+  bool valid_ = true;
+  ExtendMsPtrVec extend_ms_three_ptr_vec_;
+  PrmMsPtrVec prm_ms_two_ptr_vec_;
+  PrmMsPtrVec prm_ms_six_ptr_vec_;
+
+  bool checkValid(SpParaPtr sp_para_ptr);
 };
 
 typedef std::shared_ptr<SpectrumSet> SpectrumSetPtr;
-
-SpectrumSetPtr getSpectrumSet(DeconvMsPtr deconv_ms_ptr, double delta, 
-                              SpParaPtr sp_para_ptr);
 
 } /* namespace prot */
 

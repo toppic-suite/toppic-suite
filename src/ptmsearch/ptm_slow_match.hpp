@@ -32,15 +32,16 @@ class PtmSlowMatch {
  private:
   PtmMngPtr mng_ptr_;
   ProteoformPtr proteo_ptr_;
-  DeconvMsPtr deconv_ms_ptr_;
-  PrmMsPtr ms_six_ptr_;
-  ExtendMsPtr ms_three_ptr_;
+  double prec_mono_mass_;
+  DeconvMsPtrVec deconv_ms_ptr_vec_;
+  PrmMsPtrVec ms_six_ptr_vec_;
+  ExtendMsPtrVec ms_three_ptr_vec_;
   PSAlignPtr ps_align_ptr_;
 
   void initPsAlign(CompShiftLowMemPtr comp_shift_ptr);
 
   DiagonalHeaderPtrVec getNTermShiftHeaders(
-      const std::vector<double> &best_shifts, PrmMsPtr ms_six_ptr, 
+      const std::vector<double> &best_shifts, double prec_mono_mass, 
       ProteoformPtr proteo_ptr, PtmMngPtr mng_ptr);
 
   PrsmPtr geneResult(int shift_num);

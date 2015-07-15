@@ -2,10 +2,12 @@
 
 namespace prot {
 
-AnnoCleavage::AnnoCleavage(int pos){
+AnnoCleavage::AnnoCleavage(int pos, const PeakIonPairPtrVec &pairs, 
+                           bool exist_n_ion, bool exist_c_ion){
   pos_= pos;
-  exist_n_ion_ = false;
-  exist_c_ion_ = false;
+  pairs_ = pairs;
+  exist_n_ion_ = exist_n_ion;
+  exist_c_ion_ = exist_c_ion;
   is_unexpected_change_ = false;
   unexpected_change_color_ = 0;
   type_ = CLEAVAGE_TYPE_NORMAL;
@@ -33,37 +35,34 @@ void AnnoCleavage::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent
   parent->appendChild(element);
 }
 
-AnnoCleavagePtrVec getProteoCleavage(ProteoformPtr prot_ptr,
-                                     ExtendMsPtr ms_three_ptr,
-                                     double min_mass){
+AnnoCleavagePtrVec getProteoCleavage(PrsmPtr prsm_ptr, double min_mass){
   AnnoCleavagePtrVec cleavages;
-  PeakIonPairPtrVec pairs = getPeakIonPairs (prot_ptr, ms_three_ptr, min_mass);
-
-  PeakIonPairPtrVec2D peak_list;
-  int prot_len = prot_ptr->getDbResSeqPtr()->getLen();
+  ProteoformPtr proteo_ptr = prsm_ptr->getProteoformPtr();
+  ExtendMsPtrVec refine_ms_ptr_vec = prsm_ptr->getRefineMsPtrVec();
+  int prot_len = proteo_ptr->getDbResSeqPtr()->getLen();
   std::vector<bool> n_ion (prot_len + 1, false);
   std::vector<bool> c_ion (prot_len + 1, false);
-  for(int i=0; i< prot_len + 1; i++){
-    PeakIonPairPtrVec temp;
-    peak_list.push_back(temp);
-  }
-  for(size_t i=0;i<pairs.size();i++){
-    int pos = pairs[i]->getTheoPeakPtr()->getIonPtr()->getPos()+prot_ptr->getStartPos();
-    //LOG_DEBUG("start pos " << prot_ptr->getStartPos() << " pos " << pos);
-    peak_list[pos].push_back(pairs[i]);
-    if(pairs[i]->getTheoPeakPtr()->getIonPtr()->getIonTypePtr()->isNTerm()){
-      n_ion[pos] = true;
-    }
-    else{
-      c_ion[pos] = true;
+  PeakIonPairPtrVec2D peak_list(prot_len + 1, PeakIonPairPtrVec(0));
+
+  for (size_t m = 0; m < refine_ms_ptr_vec.size(); m++) {
+    PeakIonPairPtrVec pairs = getPeakIonPairs (proteo_ptr, refine_ms_ptr_vec[m], 
+                                               min_mass);
+    for(size_t i=0; i<pairs.size(); i++){
+      int pos = pairs[i]->getTheoPeakPtr()->getIonPtr()->getPos()+ proteo_ptr->getStartPos();
+      //LOG_DEBUG("start pos " << prot_ptr->getStartPos() << " pos " << pos);
+      peak_list[pos].push_back(pairs[i]);
+      if(pairs[i]->getTheoPeakPtr()->getIonPtr()->getIonTypePtr()->isNTerm()){
+        n_ion[pos] = true;
+      }
+      else{
+        c_ion[pos] = true;
+      }
     }
   }
 
   for(int i=0;i< prot_len+1;i++){
-    AnnoCleavagePtr cleavage = AnnoCleavagePtr(new AnnoCleavage(i));
-    cleavage->setPairs(peak_list[i]);
-    cleavage->setExistNIon(n_ion[i]);
-    cleavage->setExistCIon(c_ion[i]);
+    AnnoCleavagePtr cleavage = AnnoCleavagePtr(
+        new AnnoCleavage(i, peak_list[i], n_ion[i], c_ion[i]));
     cleavages.push_back(cleavage);
     //LOG_DEBUG("i  " << i << " n ion " << n_ion[i] << " c ion " << c_ion[i]);
   }
