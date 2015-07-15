@@ -2,6 +2,7 @@
 
 #include "base/fasta_reader.hpp"
 #include "base/base_data.hpp"
+#include "base/web_logger.hpp"
 
 #include "spec/msalign_reader.hpp"
 
@@ -61,25 +62,29 @@ int process(int argc, char* argv[]) {
     std::string db_file_name = arguments["databaseFileName"];
     std::string sp_file_name = arguments["spectrumFileName"];
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
-
     std::string log_file_name = arguments["logFileName"];
-  	WebLog::init(log_file_name);
-  	
-    if (arguments["useTable"] == "false")
-      WebLog::useTable(false);
+    
+    //int n_top = std::stoi(arguments["numOfTopPrsms"]);
+    int ptm_num = std::stoi(arguments["ptmNumber"]);
+    //double max_ptm_mass = std::stod(arguments["maxPtmMass"]);
+    bool use_gf = false; 
+    if (arguments["useGf"] == "true") {
+      use_gf = true;
+    }
+    /* initialize log file */
+  	WebLog::init(log_file_name, use_gf, ptm_num);
 
-    int n_top = std::stoi(arguments["numOfTopPrsms"]);
-    int shift_num = std::stoi(arguments["shiftNumber"]);
-    double max_ptm_mass = std::stod(arguments["maxPtmMass"]);
 
     PrsmParaPtr prsm_para_ptr = PrsmParaPtr(new PrsmPara(arguments));
 
+    /*
     bool decoy = false;
     if (arguments["searchType"] == "TARGET+DECOY") {
       decoy = true;
     }
+    */
     LOG_DEBUG("block size " << arguments["databaseBlockSize"]);
-    int db_block_size = std::stoi(arguments["databaseBlockSize"]);
+    //int db_block_size = std::stoi(arguments["databaseBlockSize"]);
 
     /*
     dbPreprocess (ori_db_file_name, db_file_name, decoy, db_block_size);
