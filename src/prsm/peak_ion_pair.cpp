@@ -5,7 +5,9 @@
 
 namespace prot {
 
-PeakIonPair::PeakIonPair(ExtendPeakPtr real_peak_ptr, TheoPeakPtr theo_peak_ptr) {
+PeakIonPair::PeakIonPair(MsHeaderPtr ms_header_ptr, ExtendPeakPtr real_peak_ptr, 
+                         TheoPeakPtr theo_peak_ptr) {
+  ms_header_ptr_ = ms_header_ptr;
   real_peak_ptr_ = real_peak_ptr;
   theo_peak_ptr_ = theo_peak_ptr;
 }
@@ -16,8 +18,12 @@ void PeakIonPair::appendRealPeakToXml(XmlDOMDocument* xml_doc,
   xercesc::DOMElement* element = xml_doc->createElement("matched_peak");
   std::string str = theo_peak_ptr_->getIonPtr()->getIonTypePtr()->getName();
   xml_doc->addElement(element, "ion_type", str.c_str());
+  str = convertToString(theo_peak_ptr_->getIonPtr()->getPos());
+  xml_doc->addElement(element, "ion_position", str.c_str());
   str = convertToString(theo_peak_ptr_->getIonPtr()->getDisplayPos());
   xml_doc->addElement(element, "ion_display_position", str.c_str());
+  str = convertToString(ms_header_ptr_->getId());
+  xml_doc->addElement(element, "spec_id", str.c_str());
   str = convertToString(real_peak_ptr_->getBasePeakPtr()->getId());
   xml_doc->addElement(element, "peak_id", str.c_str());
   str = convertToString(real_peak_ptr_->getBasePeakPtr()->getCharge());
@@ -36,6 +42,8 @@ void PeakIonPair::appendTheoPeakToXml(XmlDOMDocument* xml_doc,
   xml_doc->addElement(element, "match_shift", str.c_str()); 
   str = convertToString(real_peak_ptr_->getMonoMass(),pos);
   xml_doc->addElement(element, "theoretical_mass", str.c_str()); 
+  str = convertToString(theo_peak_ptr_->getIonPtr()->getPos());
+  xml_doc->addElement(element, "ion_position", str.c_str());
   str = convertToString(theo_peak_ptr_->getIonPtr()->getDisplayPos());
   xml_doc->addElement(element, "ion_display_position", str.c_str());
   str = theo_peak_ptr_->getIonPtr()->getIonTypePtr()->getName();
@@ -56,10 +64,12 @@ void PeakIonPair::appendTheoPeakToXml(XmlDOMDocument* xml_doc,
   parent->appendChild(element);
 }
 
-PeakIonPairPtrVec getMatchedPairs(const PeakIonPairPtrVec &pair_ptrs, int peak_id) {
+PeakIonPairPtrVec getMatchedPairs(const PeakIonPairPtrVec &pair_ptrs, 
+                                  int spec_id, int peak_id) {
   PeakIonPairPtrVec selected_pair_ptrs;
   for (size_t i = 0; i < pair_ptrs.size(); i++) {
-    if (pair_ptrs[i]->getRealPeakPtr()->getBasePeakPtr()->getId() == peak_id) {
+    if (pair_ptrs[i]->getMsHeaderPtr()->getId() == spec_id &&
+        pair_ptrs[i]->getRealPeakPtr()->getBasePeakPtr()->getId() == peak_id) {
       selected_pair_ptrs.push_back(pair_ptrs[i]);
     }
   }
@@ -80,9 +90,8 @@ void findPairs(ExtendMsPtr ms_three_ptr, TheoPeakPtrVec &theo_peak_ptrs,
     double err = ms_three_ptr->getPeakPtr(i)->getOrigTolerance();
     if (ion_ptr->getPos() >= bgn && ion_ptr->getPos() <= end) {
       if (std::abs(deviation) <= err) {
-        PeakIonPairPtr pair_ptr 
-            = PeakIonPairPtr(new PeakIonPair(ms_three_ptr->getPeakPtr(i), 
-                                             theo_peak_ptrs[j]));
+        PeakIonPairPtr pair_ptr = PeakIonPairPtr(new PeakIonPair(
+                ms_three_ptr->getHeaderPtr(), ms_three_ptr->getPeakPtr(i), theo_peak_ptrs[j]));
         pair_ptrs.push_back(pair_ptr);
       }
     }
@@ -96,8 +105,7 @@ void findPairs(ExtendMsPtr ms_three_ptr, TheoPeakPtrVec &theo_peak_ptrs,
 
 /* parameter min_mass is necessary */
 PeakIonPairPtrVec getPeakIonPairs (const ProteoformPtr &proteoform_ptr, 
-                                   const ExtendMsPtr &ms_three_ptr, 
-                                   double min_mass) {
+                                   const ExtendMsPtr &ms_three_ptr, double min_mass) {
   ActivationPtr activation_ptr 
       = ms_three_ptr->getHeaderPtr()->getActivationPtr();
 

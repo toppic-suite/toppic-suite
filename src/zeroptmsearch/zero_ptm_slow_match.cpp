@@ -7,11 +7,11 @@
 
 namespace prot {
 
-ZeroPtmSlowMatch::ZeroPtmSlowMatch(DeconvMsPtr deconv_ms_ptr, 
+ZeroPtmSlowMatch::ZeroPtmSlowMatch(const DeconvMsPtrVec &deconv_ms_ptr_vec, 
                                    ZpFastMatchPtr fast_match_ptr,
                                    ZeroPtmMngPtr mng_ptr) {
   mng_ptr_ = mng_ptr;
-  deconv_ms_ptr_ = deconv_ms_ptr;
+  deconv_ms_ptr_vec_ = deconv_ms_ptr_vec;
   fast_match_ptr_ = fast_match_ptr;
 
   proteoform_ptr_ = getSubProteoform(fast_match_ptr->getProteoformPtr(), 
@@ -20,15 +20,9 @@ ZeroPtmSlowMatch::ZeroPtmSlowMatch(DeconvMsPtr deconv_ms_ptr,
 
   SpParaPtr sp_para_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr();
   refine_prec_mass_ = proteoform_ptr_->getResSeqPtr()->getSeqMass();
-  double delta = refine_prec_mass_ - deconv_ms_ptr->getHeaderPtr()->getPrecMonoMass();
-  refine_ms_ptr_ = createMsThreePtr(deconv_ms_ptr_, delta, sp_para_ptr);
+  refine_ms_ptr_vec_ = createMsThreePtrVec(deconv_ms_ptr_vec_, sp_para_ptr, refine_prec_mass_);
 
-  ActivationPtr activation_ptr = deconv_ms_ptr_->getHeaderPtr()->getActivationPtr();
-  double min_mass = sp_para_ptr->getMinMass();
-  TheoPeakPtrVec theo_peak_ptrs = getProteoformTheoPeak(proteoform_ptr_, 
-                                                        activation_ptr, min_mass);
-
-  compScore(refine_ms_ptr_,theo_peak_ptrs, sp_para_ptr->getPeakTolerancePtr()->getPpo());
+  compScore(refine_ms_ptr_vec_);
 }
 
 // compute the average ppo
@@ -52,6 +46,8 @@ double compAvg(const std::vector<double> &ppos, double recal_ppo) {
  * compute the validation of the candidates based on the different of
  * precursor mass
  */
+
+/*
 bool ZeroPtmSlowMatch::isValid (double recal, double ppo) {
   if (!mng_ptr_->ms_one_ms_two_same_recal_) {
     return true;
@@ -62,13 +58,11 @@ bool ZeroPtmSlowMatch::isValid (double recal, double ppo) {
     return std::abs(prec_ppo) <= ppo;
   }
 }
+*/
 
 // input is refineMsThree, result is score and recal and recalMass 
-void ZeroPtmSlowMatch::compScore (ExtendMsPtr refine_ms_ptr, 
-                                  const TheoPeakPtrVec &theo_peak_ptrs,
-                                  double ppo) {
-  std::vector<double> ms_masses = getExtendMassVec(refine_ms_ptr);
-  std::vector<double> theo_masses = getTheoMassVec(theo_peak_ptrs);
+void ZeroPtmSlowMatch::compScore (const ExtendMsPtrVec &refine_ms_ptr_vec) {
+  /*
   std::vector<double> result_ppos = compMsMassPpos(ms_masses, theo_masses, ppo);
 
   if (!mng_ptr_->do_recalibration_) {
@@ -80,27 +74,37 @@ void ZeroPtmSlowMatch::compScore (ExtendMsPtr refine_ms_ptr,
       recal_ = 0;
     }
   }
-  for (size_t i = 0; i < ms_masses.size(); i++) {
-    ms_masses[i] = ms_masses[i] * (1 + recal_);
+  */
+
+  score_ = 0;
+  double min_mass = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getMinMass();
+  double ppo = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
+  for (size_t i = 0; i < refine_ms_ptr_vec.size(); i++) {
+    ActivationPtr activation_ptr = refine_ms_ptr_vec[i]->getHeaderPtr()->getActivationPtr();
+    TheoPeakPtrVec theo_peak_ptrs = getProteoformTheoPeak(proteoform_ptr_, 
+                                                          activation_ptr, min_mass);
+
+    std::vector<double> theo_masses = getTheoMassVec(theo_peak_ptrs);
+    std::vector<double> ms_masses = getExtendMassVec(refine_ms_ptr_vec[i]);
+    score_ += compNumMatchedTheoMasses(ms_masses, theo_masses, ppo);
   }
-  score_ = compNumMatchedTheoMasses(ms_masses, theo_masses, ppo);
 }
 
 // get result 
 PrsmPtr ZeroPtmSlowMatch::geneResult() {
   SpParaPtr sp_para_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr();
-  return PrsmPtr(new Prsm(proteoform_ptr_, deconv_ms_ptr_, refine_prec_mass_, 
-                          recal_, sp_para_ptr));
+  return PrsmPtr(new Prsm(proteoform_ptr_, deconv_ms_ptr_vec_, refine_prec_mass_, 
+                          sp_para_ptr));
 }
 
-ZpSlowMatchPtrVec zeroPtmSlowFilter(DeconvMsPtr deconv_ms_ptr,
+ZpSlowMatchPtrVec zeroPtmSlowFilter(const DeconvMsPtrVec &deconv_ms_ptr_vec,
                                     const ZpFastMatchPtrVec &fast_match_ptrs,
                                     ZeroPtmMngPtr mng_ptr) {
 
   ZpSlowMatchPtrVec slow_matches;
   for (size_t i = 0; i < fast_match_ptrs.size(); i++) {
     ZpSlowMatchPtr slow_match = ZpSlowMatchPtr(
-        new ZeroPtmSlowMatch(deconv_ms_ptr, fast_match_ptrs[i], mng_ptr));
+        new ZeroPtmSlowMatch(deconv_ms_ptr_vec, fast_match_ptrs[i], mng_ptr));
     slow_matches.push_back(slow_match);
   }
   /* sort */

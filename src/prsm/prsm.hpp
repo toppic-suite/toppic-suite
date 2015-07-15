@@ -16,10 +16,10 @@ namespace prot {
 
 class Prsm {
  public:
-  Prsm(ProteoformPtr proteoform_ptr, DeconvMsPtr deconv_ms_ptr, 
-       double adjusted_prec_mass, double calibration, SpParaPtr sp_para_ptr);
+  Prsm(ProteoformPtr proteoform_ptr, const DeconvMsPtrVec &deconv_ms_ptr_vec, 
+       double adjusted_prec_mass, SpParaPtr sp_para_ptr);
 
-  Prsm(xercesc::DOMElement* element,ProteoformPtrVec proteoforms);
+  //Prsm(xercesc::DOMElement* element,ProteoformPtrVec proteoforms);
 
   Prsm(xercesc::DOMElement* element, faidx_t *fai,
        const ResiduePtrVec &residue_ptr_vec);
@@ -32,11 +32,9 @@ class Prsm {
 
   void setProteoformPtr(ProteoformPtr proteoform) {proteoform_ptr_=proteoform;}
 
-  double getCalibration() {return calibration_;}
+  DeconvMsPtrVec getDeconvMsPtrVec() {return deconv_ms_ptr_vec_;}
 
-  DeconvMsPtr getDeconvMsPtr() {return deconv_ms_ptr_;}
-
-  void setDeconvMsPtr(DeconvMsPtr ms) {deconv_ms_ptr_=ms;}
+  void setDeconvMsPtrVec(DeconvMsPtrVec ms_vec) {deconv_ms_ptr_vec_=ms_vec;}
 
   double getMatchPeakNum() {return match_peak_num_;}
 
@@ -60,11 +58,11 @@ class Prsm {
 
   int getPrecursorId() {return precursor_id_;}
 
-  ExtendMsPtr getRefineMs() {return refine_ms_three_;}
+  ExtendMsPtrVec getRefineMsPtrVec() {return refine_ms_three_vec_;}
 
   bool isMatchMs(MsHeaderPtr header_ptr);
 
-  void setRefineMs(ExtendMsPtr refine_ms_three){refine_ms_three_ = refine_ms_three;}
+  void setRefineMsVec(ExtendMsPtrVec refine_ms_three_vec){refine_ms_three_vec_ = refine_ms_three_vec;}
 
   ExtremeValuePtr getProbPtr() {return prob_ptr_;} 
 
@@ -95,13 +93,13 @@ class Prsm {
 
   std::string spectrum_scan_;
 
+  int spectrum_num_;
+
   int precursor_id_;
 
   double ori_prec_mass_;
   /* adjusted precursor mass */
   double adjusted_prec_mass_;
-  /* calibration */
-  double calibration_;
 
   /* protein sequence */
   ProteoformPtr proteoform_ptr_;
@@ -111,9 +109,9 @@ class Prsm {
   double fdr_ = -1;
 
   /* The following are not saved in xml */
-  DeconvMsPtr deconv_ms_ptr_;
+  DeconvMsPtrVec deconv_ms_ptr_vec_;
   /* adjusted extended msThree, used for matching ions and peaks */
-  ExtendMsPtr refine_ms_three_;
+  ExtendMsPtrVec refine_ms_three_vec_;
 
   double match_peak_num_ = 0;
   double match_fragment_num_ = 0;
@@ -206,7 +204,7 @@ inline bool prsmSpectrumIdUpEvalueUp(const PrsmPtr &a, const PrsmPtr &b){
   }
 }
 
-PrsmPtrVec readPrsm(const std::string &file_name, const ProteoformPtrVec &proteoforms);
+//PrsmPtrVec readPrsm(const std::string &file_name, const ProteoformPtrVec &proteoforms);
 
 void filterPrsms(const PrsmPtrVec &prsms, MsHeaderPtr header_ptr, PrsmPtrVec &sele_prsms); 
 

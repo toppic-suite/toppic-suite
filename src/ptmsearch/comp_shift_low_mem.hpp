@@ -12,11 +12,17 @@ class CompShiftLowMem {
   std::vector<std::vector<int>> findBestShift(const std::vector<int> &a,
                                               const std::vector<int> &b);
 
+  std::vector<double> findBestShift(const std::vector<std::pair<int,int>> &a_e,
+                                    const std::vector<int> &b,
+                                    int total,int minimum_gap, double scale);
+
+  /*
   std::vector<double> findBestShift(const std::vector<int> &a,
                                     const std::vector<int> &errors,
                                     const std::vector<int> &b,
                                     int total,int minimum_gap,
                                     double scale);
+                                    */
 
   std::vector<std::vector<int>> findBestShift(const std::vector<int> &a,
                                               const std::vector<int> &errors,

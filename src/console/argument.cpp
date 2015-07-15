@@ -27,6 +27,7 @@ void Argument::initArguments() {
   arguments_["logFileName"] = "";
   arguments_["keepTempFiles"] = "false";
   arguments_["fullBinaryPath"] = "false";
+  arguments_["groupSpectrumNumber"] = "1";
 }
 
 void Argument::outputArguments(std::ofstream &output) {
@@ -34,6 +35,7 @@ void Argument::outputArguments(std::ofstream &output) {
   output << "2. Parameters" << std::endl;
   output << "Protein database file: " << arguments_["oriDatabaseFileName"] << std::endl;
   output << "Spectrum file: " << arguments_["spectrumFileName"] << std::endl;
+  output << "Number of spectra in a group: " << arguments_["groupSpectrumNumber"] << std::endl;
   output << "Activation type: " << arguments_["activation"] << std::endl;
   output << "Search type: " << arguments_["searchType"] << std::endl;
   std::string cysteine_type = arguments_["cysteineProtection"];
@@ -117,6 +119,7 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string cutoff_value = "";
   std::string log_file_name = "";
   std::string use_table = "";
+  std::string group_num = "";
 
   /** Define and parse the program options*/
   try {
@@ -154,6 +157,8 @@ bool Argument::parse(int argc, char* argv[]) {
         ("log-file-name,l", po::value<std::string>(&log_file_name), "Log file name with its path.")
         ("keep-temp-files,k", "Keep temporary files.")
         ("generating-function,g", "Use generating function to calculate p-values and E-values.")
+        ("full-binary-path,b", "Full binary path.")
+        ("group-number,r", po::value<std::string> (&group_num), "Specify the number of spectra in a group. Default value: 1.")
         ("full-binary-path,b", "Full binary path.")
         ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name with its path.")
         ("spectrum-file-name", po::value<std::string>(&spectrum_file_name)->required(), "Spectrum file name with its path.");
@@ -238,6 +243,9 @@ bool Argument::parse(int argc, char* argv[]) {
     }
     if (vm.count("generating-function")) {
       arguments_["useGf"] = "true";
+    }
+    if (vm.count("group-number")) {
+      arguments_["groupSpectrumNumber"] = group_num;
     }
   }
   catch(std::exception&e ) {

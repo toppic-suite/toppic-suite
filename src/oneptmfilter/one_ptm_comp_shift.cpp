@@ -221,7 +221,67 @@ inline void OnePtmCompShift::initRevIndexes(const ProteoformPtrVec &proteo_ptrs)
   delete[] rev_col_index_pnts;
 }
 
+void OnePtmCompShift::compConvolution(const std::vector<std::pair<int,int>> &mass_errors, int num){
 
+  short* scores = new short[row_num_];
+  memset(scores, 0, row_num_ * sizeof(short));
+
+  int begin_index;
+  int end_index;
+  int m;
+
+  for(size_t i = 0; i<mass_errors.size(); i++){
+
+    m = mass_errors[i].first;
+    // m - errors[i] performs better than m - errors[i] -  errors[bgn_pos]
+    int left = m-mass_errors[i].second;
+    if(left < 0){
+      left=0;
+    }
+    int right = m+mass_errors[i].second;
+    if(right < 0 || right >= col_num_){
+      continue;
+    }
+    //LOG_DEBUG("SP MASS " << m);
+    begin_index = col_index_begins_[left];
+    end_index= col_index_ends_[right];
+    for(int j=begin_index;j<=end_index;j++){
+      scores[col_indexes_[j]]++;
+      //LOG_DEBUG("ROW INDEX " << col_indexes_[j] << " score " << scores[col_indexes_[j]]);
+    }
+  }
+
+  short* rev_scores = new short[row_num_];
+  memset(rev_scores, 0, row_num_ * sizeof(short));
+
+  for(size_t i = 0; i<mass_errors.size(); i++){
+
+    m = mass_errors[i].first - MassConstant::getWaterMass() * scale_;
+    //LOG_DEBUG("REV_SP MASS " << m);
+    int left = m-mass_errors[i].second;
+    //LOG_DEBUG("LEFT " << left);
+    if(left < 0){
+      left=0;
+    }
+    int right = m + mass_errors[i].second;
+    //LOG_DEBUG("RIGHT " << right);
+    if (right < 0 || right >= col_num_) {
+      continue;
+    }
+    begin_index = rev_col_index_begins_[left];
+    end_index= rev_col_index_ends_[right];
+    for(int j=begin_index;j<=end_index;j++){
+      rev_scores[rev_col_indexes_[j]]++;
+      //LOG_DEBUG("REV ROW INDEX " << rev_col_indexes_[j] << " rev score " << rev_scores[rev_col_indexes_[j]]);
+    }
+  }
+
+  compShiftScores(scores, rev_scores, num);
+  delete[] scores;
+  delete[] rev_scores;
+}
+
+/*
 void OnePtmCompShift::compConvolution(std::vector<int> &masses, std::vector<int> &errors, int num){
 
   short* scores = new short[row_num_];
@@ -281,6 +341,7 @@ void OnePtmCompShift::compConvolution(std::vector<int> &masses, std::vector<int>
   delete[] scores;
   delete[] rev_scores;
 }
+*/
 
 inline bool scoreCompare(const std::pair<int, int> &a, const std::pair<int, int> &b) {
     return a.second > b.second;

@@ -48,7 +48,9 @@ int zero_ptm_process(int argc, char* argv[]) {
     double max_ptm_mass;
     std::istringstream (arguments["maxPtmMass"]) >> max_ptm_mass;
 
+    LOG_DEBUG("start prsm init");
     PrsmParaPtr prsm_para_ptr = PrsmParaPtr(new PrsmPara(arguments));
+    LOG_DEBUG("end prsm init");
 
     bool decoy = false;
     if (arguments["searchType"] == "TARGET+DECOY") {

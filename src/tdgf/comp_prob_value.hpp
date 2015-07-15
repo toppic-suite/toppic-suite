@@ -9,6 +9,20 @@
 
 namespace prot {
 
+class ProbPeak {
+ public:
+  ProbPeak(PrmPeakPtr peak_ptr, int spectrum_id, int height, 
+           bool strict, double convert_ratio);
+  int mass_;
+  int tolerance_;
+  int base_type_;
+  int spectrum_id_;
+  int mass_bgn_;
+  int mass_end_;
+  int table_bgn_;
+  int table_end_;
+};
+
 class CompProbValue {
  public:
   CompProbValue(double convert_ratio, const ResFreqPtrVec &residue_ptrs, 
@@ -18,7 +32,7 @@ class CompProbValue {
   ~CompProbValue();
 
   void compute(const ResFreqPtrVec &n_term_residue_ptrs, 
-               const PrmPeakPtrVec &peak_ptrs, 
+               const PrmPeakPtrVec2D &peak_ptr_2d, 
                int thresh, int shift_num, bool strict);
   // main function to get probabilities
   double getCondProb(int shift, int thresh);
@@ -57,9 +71,7 @@ class CompProbValue {
   /** spectrum */
   int max_sp_len_ = 0;
 
-  std::vector<int> peak_masses_;
-  std::vector<int> peak_tolerances_;
-  std::vector<int> base_types_;
+  std::vector<ProbPeak> prob_peaks_;
   int sp_len_;
 
   /** table height */
@@ -72,11 +84,6 @@ class CompProbValue {
   std::vector<int> acid_dists_;   // acidMass * height;
   std::vector<double> factors_; //normalization factors;
 
-  std::vector<int> peak_mass_bgns_;
-  std::vector<int> peak_mass_ends_;
-  std::vector<int> peak_table_bgns_;
-  std::vector<int> peak_table_ends_;
-
   int shift_num_;
 
   std::vector<std::vector<std::vector<double>>> results_; // nLayer peak number, height;
@@ -87,18 +94,22 @@ class CompProbValue {
 
   double* page_table_;
   short* pos_scores_;
+  short* tmp_pos_scores_;
 
   void setFactors();
 
   // computation
   void clearVar();
-  void setMassErr(const PrmPeakPtrVec &peak_ptrs, bool strict);
+  void setMassErr(const PrmPeakPtrVec2D &peak_ptr_2d, bool strict);
 
-  void setPosScores(const std::vector<int> &peak_masses, 
-                    const std::vector<int> &peak_tolerances,
-                    const std::vector<int> &base_types);
+  void updatePosScores(const std::vector<ProbPeak> &prob_peaks, 
+                       int spectrum_id);
 
-  void setHeight(int thresh, int max_peak_mass);
+  void setPosScores(const std::vector<ProbPeak> &prob_peaks, 
+                    int group_spec_num);
+
+  void setVars(int thresh);
+
   void setPeakBgnEnd(const std::vector<int> &peak_masses, 
                      const std::vector<int> &peak_tolerances);
 
@@ -121,7 +132,7 @@ typedef std::shared_ptr<CompProbValue> CompProbValuePtr;
 
 
 void compProbArray(CompProbValuePtr comp_prob_ptr, const ResFreqPtrVec &n_term_residue_ptrs, 
-                   const PrmPeakPtrVec &peak_ptrs, const PrsmPtrVec &prsm_ptrs, bool strict, 
+                   const PrmPeakPtrVec2D &peak_ptr_2d, const PrsmPtrVec &prsm_ptrs, bool strict, 
                    std::vector<double> &results);
 
 }

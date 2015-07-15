@@ -10,13 +10,13 @@ typedef std::shared_ptr<Ms<DeconvPeakPtr>> DeconvMsPtr;
 
 typedef std::vector<DeconvMsPtr> DeconvMsPtrVec;
 
-DeconvMsPtr  getRefineMs(DeconvMsPtr deconv_ms_ptr, double calibration, 
-                         double new_prec_mass);
+//DeconvMsPtr  getRefineMs(DeconvMsPtr deconv_ms_ptr, double new_prec_mass);
+
+DeconvMsPtrVec  getRefineMsPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, 
+                                  double new_prec_mass);
 
 MsHeaderPtr getHeaderPtr(DeconvMsPtr deconv_ms_ptr, double new_prec_mass);
     
-MsHeaderPtr getDeltaHeaderPtr(DeconvMsPtr deconv_ms_ptr, double delta);
-
 }
 
 #endif

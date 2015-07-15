@@ -11,8 +11,8 @@ DiagFilter::DiagFilter(const ProteoformPtrVec &proteo_ptrs,
   index_ptr_ = CompShiftPtr(new CompShift(proteo_ptrs, mng_ptr));
 }
 
-SimplePrsmPtrVec DiagFilter::getBestMatch(PrmMsPtr ms_ptr){
-  SimplePrsmPtrVec match_ptrs = compute(ms_ptr);
+SimplePrsmPtrVec DiagFilter::getBestMatch(const PrmMsPtrVec &ms_ptr_vec){
+  SimplePrsmPtrVec match_ptrs = compute(ms_ptr_vec);
   SimplePrsmPtrVec unique_match_ptrs = getUniqueMatches(match_ptrs);
   std::sort(unique_match_ptrs.begin(), unique_match_ptrs.end(),simplePrsmDown);
   size_t num = mng_ptr_->ptm_fast_filter_result_num_;
@@ -32,17 +32,20 @@ SimplePrsmPtrVec DiagFilter::getBestMatch(PrmMsPtr ms_ptr){
   return result_ptrs;
 }
 
-inline SimplePrsmPtrVec DiagFilter::compute(PrmMsPtr ms_ptr){
-  std::pair<std::vector<int>, std::vector<int>> mass_errors 
-      = getIntMassErrorList(ms_ptr, mng_ptr_->ptm_fast_filter_scale_,true,false);
+
+inline SimplePrsmPtrVec DiagFilter::compute(const PrmMsPtrVec &ms_ptr_vec){
+
+  PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
+  std::vector<std::pair<int,int>> mass_errors 
+      = getIntMassErrorList(ms_ptr_vec, tole_ptr, mng_ptr_->ptm_fast_filter_scale_,true,false);
   SimplePrsmPtrVec match_ptrs;
-  for(size_t i=0;i<mass_errors.first.size();i++){
+  for(size_t i=0;i<mass_errors.size();i++){
     std::vector<std::pair<int,int>> results 
-        =index_ptr_->compConvolution(mass_errors.first, mass_errors.second, i,
-                                     mng_ptr_->ptm_fast_filter_result_num_);
+        =index_ptr_->compConvolution(mass_errors, i, mng_ptr_->ptm_fast_filter_result_num_);
     for(size_t j =0;j <results.size();j++){
       match_ptrs.push_back(
-          SimplePrsmPtr(new SimplePrsm(ms_ptr->getHeaderPtr(),
+          SimplePrsmPtr(new SimplePrsm(ms_ptr_vec[0]->getHeaderPtr(),
+                                       ms_ptr_vec.size(),
                                        proteo_ptrs_[results[j].first],
                                        results[j].second)));
     }
