@@ -119,6 +119,22 @@ PeakIonPairPtrVec getPeakIonPairs (const ProteoformPtr &proteoform_ptr,
 
 }
 
+int getNumPeakIonPairs(const ProteoformPtr &proteoform_ptr,
+        const ExtendMsPtr &ms_three_ptr, double min_mass) {
+
+    int match_peak_num = 0;
+    PeakIonPairPtrVec pairs = getPeakIonPairs(proteoform_ptr, ms_three_ptr,
+            min_mass);
+    DeconvPeakPtr prev_deconv_peak(nullptr);
+    for (size_t i = 0; i < pairs.size(); i++) {
+        if (pairs[i]->getRealPeakPtr()->getBasePeakPtr() != prev_deconv_peak) {
+            prev_deconv_peak = pairs[i]->getRealPeakPtr()->getBasePeakPtr();
+            match_peak_num += pairs[i]->getRealPeakPtr()->getScore();
+        }
+    }
+    return match_peak_num;
+}
+
 double computePairConverage(const PeakIonPairPtrVec &pair_ptrs, int begin, 
                             int end, int coverage_type) {
   int total_num = end - begin  + 1;
