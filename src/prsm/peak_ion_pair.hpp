@@ -55,6 +55,9 @@ PeakIonPairPtrVec getPeakIonPairs(const ProteoformPtr &proteoform_ptr,
 PeakIonPairPtrVec getPeakIonPairs(const ProteoformPtr &proteoform_ptr, 
         const ExtendMsPtrVec &ms_ptr_vec, double min_mass);
 
+int getNumPeakIonPairs(const ProteoformPtr &proteoform_ptr,
+        const ExtendMsPtr &ms_three_ptr, double min_mass);
+
 double computePairConverage(const PeakIonPairPtrVec &pair_ptrs, int begin, 
         int end, int coverage_type);
 
