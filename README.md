@@ -12,7 +12,7 @@ unzip linux_include.zip
 mkdir build
 cd build
 cmake ..
-make 
+make -j4 
 
 cd bin
 link -s ../conf ./
