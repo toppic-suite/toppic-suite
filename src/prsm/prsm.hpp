@@ -19,10 +19,10 @@ class Prsm {
   Prsm(ProteoformPtr proteoform_ptr, const DeconvMsPtrVec &deconv_ms_ptr_vec, 
        double adjusted_prec_mass, SpParaPtr sp_para_ptr);
 
-  //Prsm(xercesc::DOMElement* element,ProteoformPtrVec proteoforms);
+  Prsm(xercesc::DOMElement* element,ProteoformPtrVec proteoforms);
 
   Prsm(xercesc::DOMElement* element, faidx_t *fai,
-       const ResiduePtrVec &residue_ptr_vec);
+          const ResiduePtrVec &residue_ptr_vec);
 
   void parseXml(xercesc::DOMElement* element);
 
@@ -204,7 +204,7 @@ inline bool prsmSpectrumIdUpEvalueUp(const PrsmPtr &a, const PrsmPtr &b){
   }
 }
 
-//PrsmPtrVec readPrsm(const std::string &file_name, const ProteoformPtrVec &proteoforms);
+PrsmPtrVec readPrsm(const std::string &file_name, const ProteoformPtrVec &proteoforms);
 
 void filterPrsms(const PrsmPtrVec &prsms, MsHeaderPtr header_ptr, PrsmPtrVec &sele_prsms); 
 

@@ -47,16 +47,16 @@ inline bool peakIonPairUp(const PeakIonPairPtr &a, const PeakIonPairPtr &b) {
 }
 
 PeakIonPairPtrVec getMatchedPairs(const PeakIonPairPtrVec &pair_ptrs, 
-                                  int spec_id, int peak_id);
+        int spec_id, int peak_id);
 
 PeakIonPairPtrVec getPeakIonPairs(const ProteoformPtr &proteoform_ptr, 
-                                  const ExtendMsPtr &ms_three_ptr, double min_mass);
+        const ExtendMsPtr &ms_three_ptr, double min_mass);
 
-int getNumPeakIonPairs(const ProteoformPtr &proteoform_ptr,
-                       const ExtendMsPtr &ms_three_ptr, double min_mass); 
+PeakIonPairPtrVec getPeakIonPairs(const ProteoformPtr &proteoform_ptr, 
+        const ExtendMsPtrVec &ms_ptr_vec, double min_mass);
 
 double computePairConverage(const PeakIonPairPtrVec &pair_ptrs, int begin, 
-                            int end, int coverage_type);
+        int end, int coverage_type);
 
 }
 

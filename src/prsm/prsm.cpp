@@ -122,16 +122,14 @@ void Prsm::parseXml(xercesc::DOMElement *element) {
   }
 }
 
-/*
 Prsm::Prsm(xercesc::DOMElement* element,ProteoformPtrVec proteoforms){
-  parseXml(element);
+    parseXml(element);
 
-  xercesc::DOMElement* proteoform_element
-      = getChildElement(element,"proteoform",0);
-  proteoform_ptr_ 
-      = ProteoformPtr(new Proteoform(proteoform_element,proteoforms));
+    xercesc::DOMElement* proteoform_element
+        = getChildElement(element,"proteoform",0);
+    proteoform_ptr_ 
+        = ProteoformPtr(new Proteoform(proteoform_element,proteoforms));
 }
-*/
 
 Prsm::Prsm(xercesc::DOMElement* element, faidx_t *fai,
            const ResiduePtrVec &residue_ptr_vec) {
@@ -191,22 +189,22 @@ bool Prsm::isMatchMs(MsHeaderPtr header_ptr) {
   }
 }
 
-/*
+
 PrsmPtrVec readPrsm(const std::string &file_name, const ProteoformPtrVec &proteo_ptrs){
-  PrsmPtrVec results;
-  XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
-  if(parser){
-    XmlDOMDocument doc(parser, file_name.c_str());
-    xercesc::DOMElement* root = doc.getDocumentElement();
-    int simple_prsm_num = getChildCount(root, "prsm");
-    for (int i = 0; i < simple_prsm_num; i++) {
-      xercesc::DOMElement* prsm_element = getChildElement(root, "prsm", i);
-      results.push_back(PrsmPtr(new Prsm(prsm_element,proteo_ptrs)));
+    PrsmPtrVec results;
+    XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
+    if(parser){
+        XmlDOMDocument doc(parser, file_name.c_str());
+        xercesc::DOMElement* root = doc.getDocumentElement();
+        int simple_prsm_num = getChildCount(root, "prsm");
+        for (int i = 0; i < simple_prsm_num; i++) {
+            xercesc::DOMElement* prsm_element = getChildElement(root, "prsm", i);
+            results.push_back(PrsmPtr(new Prsm(prsm_element, proteo_ptrs)));
+        }
     }
-  }
-  return results;
+    return results;
 }
-*/
+
 
 void addSpectrumPtrsToPrsms(PrsmPtrVec &prsm_ptrs, PrsmParaPtr prsm_para_ptr){
   MsAlignReader reader(prsm_para_ptr->getSpectrumFileName(), prsm_para_ptr->getGroupSpecNum());

@@ -1,9 +1,0 @@
-Linux 
-
-1. ln -s Makefile_linux.in Makefile.in 
-2. make all
-
-Windows
-
-1. cp Makefile_win.in Makefile.in
-2. make all

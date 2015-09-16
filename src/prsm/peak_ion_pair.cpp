@@ -119,21 +119,18 @@ PeakIonPairPtrVec getPeakIonPairs (const ProteoformPtr &proteoform_ptr,
 
 }
 
-int getNumPeakIonPairs(const ProteoformPtr &proteoform_ptr,
-        const ExtendMsPtr &ms_three_ptr, double min_mass) {
+PeakIonPairPtrVec getPeakIonPairs(const ProteoformPtr &proteoform_ptr,                                              
+        const ExtendMsPtrVec &ms_ptr_vec, double min_mass) {
 
-    int match_peak_num = 0;
-    PeakIonPairPtrVec pairs = getPeakIonPairs(proteoform_ptr, ms_three_ptr,
-            min_mass);
-    DeconvPeakPtr prev_deconv_peak(nullptr);
-    for (size_t i = 0; i < pairs.size(); i++) {
-        if (pairs[i]->getRealPeakPtr()->getBasePeakPtr() != prev_deconv_peak) {
-            prev_deconv_peak = pairs[i]->getRealPeakPtr()->getBasePeakPtr();
-            match_peak_num += pairs[i]->getRealPeakPtr()->getScore();
-        }
+    PeakIonPairPtrVec pair_ptrs;
+    for (size_t i = 0; i < ms_ptr_vec.size(); i++) {
+        PeakIonPairPtrVec pair_ptr_tmp = getPeakIonPairs(proteoform_ptr, ms_ptr_vec[i],
+                min_mass);
+        pair_ptrs.insert(pair_ptrs.end(), pair_ptr_tmp.begin(), pair_ptr_tmp.end());
     }
-    return match_peak_num;
+    return pair_ptrs;
 }
+
 
 double computePairConverage(const PeakIonPairPtrVec &pair_ptrs, int begin, 
                             int end, int coverage_type) {

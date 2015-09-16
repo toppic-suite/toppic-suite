@@ -1,6 +1,8 @@
 #include <iostream>
 #include <fstream>
 
+#include <boost/algorithm/string.hpp>
+
 #include "base/proteoform.hpp"
 #include "base/fasta_reader.hpp"
 #include "base/file_util.hpp"
@@ -190,119 +192,143 @@ void PrsmCoverage::computeCoverage(std::ofstream &file, PrsmPtr prsm_ptr,
 }
 
 void PrsmCoverage::compOneCoverage(std::ofstream &file, PrsmPtr prsm_ptr, 
-                                PeakIonPairPtrVec &pair_ptrs, PrsmParaPtr prsm_para_ptr) {
-
-  file << prsm_para_ptr_->getSpectrumFileName() << "\t"
-      << prsm_ptr->getId() << "\t"
-      << prsm_ptr->getSpectrumId()<< "\t"
-      << prsm_ptr->getDeconvMsPtr()->getHeaderPtr()->getActivationPtr()->getName()<< "\t"
-      << prsm_ptr->getSpectrumScan() << "\t"
-      << prsm_ptr->getDeconvMsPtr()->size()<< "\t"
-      << prsm_ptr->getDeconvMsPtr()->getHeaderPtr()->getPrecCharge() << "\t"
-      << prsm_ptr->getOriPrecMass()<< "\t"//"Precursor_mass"
-      << prsm_ptr->getAdjustedPrecMass() << "\t"
-      << prsm_ptr->getProteoformPtr()->getDbResSeqPtr()->getId() << "\t"
-      << prsm_ptr->getProteoformPtr()->getSpeciesId() << "\t"
-      << prsm_ptr->getProteoformPtr()->getDbResSeqPtr()->getName() << "\t"
-      << prsm_ptr->getProteoformPtr()->getDbResSeqPtr()->getSeqMass() << "\t"
-      << prsm_ptr->getProteoformPtr()->getStartPos() << "\t"
-      << prsm_ptr->getProteoformPtr()->getEndPos() << "\t"
-      << prsm_ptr->getProteoformPtr()->getProteinMatchSeq() << "\t"
-      << prsm_ptr->getProteoformPtr()->getUnexpectedChangeNum() << "\t"
-      << prsm_ptr->getMatchPeakNum() << "\t"
-      << prsm_ptr->getMatchFragNum() << "\t"
-      << prsm_ptr->getPValue() << "\t"
-      << prsm_ptr->getEValue() << "\t"
-      << prsm_ptr->getProbPtr()->getOneProtProb()<< "\t"
-      << prsm_ptr->getFdr() << "\t";
-  computeCoverage(file, prsm_ptr, pair_ptrs, prsm_para_ptr);
-  file << std::endl;
+        PeakIonPairPtrVec &pair_ptrs, PrsmParaPtr prsm_para_ptr) {
+    std::string spec_ids;
+    std::string spec_activations;
+    std::string spec_scans;
+    int peak_num = 0;
+    DeconvMsPtrVec deconv_ms_ptr_vec = prsm_ptr->getDeconvMsPtrVec();
+    for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
+        spec_ids = spec_ids + std::to_string(deconv_ms_ptr_vec[i]->getHeaderPtr()->getId()) + " ";
+        spec_activations = spec_activations + deconv_ms_ptr_vec[i]->getHeaderPtr()->getActivationPtr()->getName() + " ";
+        spec_scans = spec_scans + deconv_ms_ptr_vec[i]->getHeaderPtr()->getScansString() + " ";
+        peak_num += deconv_ms_ptr_vec[i]->size();
+    }
+    boost::algorithm::trim(spec_ids);
+    boost::algorithm::trim(spec_activations);
+    boost::algorithm::trim(spec_scans);
+    file << prsm_para_ptr_->getSpectrumFileName() << "\t"
+        << prsm_ptr->getId() << "\t"
+        << spec_ids << "\t"
+        << spec_activations << "\t"
+        << spec_scans << "\t"
+        << peak_num << "\t"
+        << deconv_ms_ptr_vec[0]->getHeaderPtr()->getPrecCharge() << "\t"
+        << prsm_ptr->getOriPrecMass()<< "\t"//"Precursor_mass"
+        << prsm_ptr->getAdjustedPrecMass() << "\t"
+        << prsm_ptr->getProteoformPtr()->getDbResSeqPtr()->getId() << "\t"
+        << prsm_ptr->getProteoformPtr()->getSpeciesId() << "\t"
+        << prsm_ptr->getProteoformPtr()->getDbResSeqPtr()->getName() << "\t"
+        << prsm_ptr->getProteoformPtr()->getDbResSeqPtr()->getSeqMass() << "\t"
+        << prsm_ptr->getProteoformPtr()->getStartPos() << "\t"
+        << prsm_ptr->getProteoformPtr()->getEndPos() << "\t"
+        << prsm_ptr->getProteoformPtr()->getProteinMatchSeq() << "\t"
+        << prsm_ptr->getProteoformPtr()->getUnexpectedChangeNum() << "\t"
+        << prsm_ptr->getMatchPeakNum() << "\t"
+        << prsm_ptr->getMatchFragNum() << "\t"
+        << prsm_ptr->getPValue() << "\t"
+        << prsm_ptr->getEValue() << "\t"
+        << prsm_ptr->getProbPtr()->getOneProtProb()<< "\t"
+        << prsm_ptr->getFdr() << "\t";
+    computeCoverage(file, prsm_ptr, pair_ptrs, prsm_para_ptr);
+    file << std::endl;
 }
 
 
 void PrsmCoverage::compTwoCoverage(std::ofstream &file, PrsmPtr prsm_ptr,  
-                                   PeakIonPairPtrVec &pair_ptrs_1, 
-                                   PeakIonPairPtrVec &pair_ptrs_2, 
-                                   PeakIonPairPtrVec &pair_ptrs_3, 
-                                   PrsmParaPtr prsm_para_ptr) {
-  file << prsm_para_ptr_->getSpectrumFileName() << "\t"
-      << prsm_ptr->getId() << "\t"
-      << prsm_ptr->getSpectrumId()<< "\t"
-      << prsm_ptr->getDeconvMsPtr()->getHeaderPtr()->getActivationPtr()->getName()<< "\t"
-      << prsm_ptr->getSpectrumScan() << "\t"
-      << prsm_ptr->getDeconvMsPtr()->size()<< "\t"
-      << prsm_ptr->getDeconvMsPtr()->getHeaderPtr()->getPrecCharge() << "\t"
-      << prsm_ptr->getOriPrecMass()<< "\t"//"Precursor_mass"
-      << prsm_ptr->getAdjustedPrecMass() << "\t"
-      << prsm_ptr->getProteoformPtr()->getDbResSeqPtr()->getId() << "\t"
-      << prsm_ptr->getProteoformPtr()->getSpeciesId() << "\t"
-      << prsm_ptr->getProteoformPtr()->getDbResSeqPtr()->getName() << "\t"
-      << prsm_ptr->getProteoformPtr()->getDbResSeqPtr()->getSeqMass() << "\t"
-      << prsm_ptr->getProteoformPtr()->getStartPos() << "\t"
-      << prsm_ptr->getProteoformPtr()->getEndPos() << "\t"
-      << prsm_ptr->getProteoformPtr()->getProteinMatchSeq() << "\t"
-      << prsm_ptr->getProteoformPtr()->getUnexpectedChangeNum() << "\t"
-      << prsm_ptr->getMatchPeakNum() << "\t"
-      << prsm_ptr->getMatchFragNum() << "\t"
-      << prsm_ptr->getPValue() << "\t"
-      << prsm_ptr->getEValue() << "\t"
-      << prsm_ptr->getProbPtr()->getOneProtProb()<< "\t"
-      << prsm_ptr->getFdr() << "\t";
-  computeCoverage(file, prsm_ptr, pair_ptrs_1, prsm_para_ptr);
-  computeCoverage(file, prsm_ptr, pair_ptrs_2, prsm_para_ptr);
-  computeCoverage(file, prsm_ptr, pair_ptrs_3, prsm_para_ptr);
-  file << std::endl;
+        PeakIonPairPtrVec &pair_ptrs_1, 
+        PeakIonPairPtrVec &pair_ptrs_2, 
+        PeakIonPairPtrVec &pair_ptrs_3, 
+        PrsmParaPtr prsm_para_ptr) {
+
+    std::string spec_ids;
+    std::string spec_activations;
+    std::string spec_scans;
+    int peak_num = 0;
+    DeconvMsPtrVec deconv_ms_ptr_vec = prsm_ptr->getDeconvMsPtrVec();
+    for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
+        spec_ids = spec_ids + std::to_string(deconv_ms_ptr_vec[i]->getHeaderPtr()->getId()) + " ";
+        spec_activations = spec_activations + deconv_ms_ptr_vec[i]->getHeaderPtr()->getActivationPtr()->getName() + " ";
+        spec_scans = spec_scans + deconv_ms_ptr_vec[i]->getHeaderPtr()->getScansString() + " ";
+        peak_num += deconv_ms_ptr_vec[i]->size();
+    }
+    boost::algorithm::trim(spec_ids);
+    boost::algorithm::trim(spec_activations);
+    boost::algorithm::trim(spec_scans);
+
+    file << prsm_para_ptr_->getSpectrumFileName() << "\t"
+        << prsm_ptr->getId() << "\t"
+        << spec_ids << "\t"
+        << spec_activations << "\t"
+        << spec_scans << "\t"
+        << peak_num << "\t"
+        << deconv_ms_ptr_vec[0]->getHeaderPtr()->getPrecCharge() << "\t"
+        << prsm_ptr->getOriPrecMass()<< "\t"//"Precursor_mass"
+        << prsm_ptr->getAdjustedPrecMass() << "\t"
+        << prsm_ptr->getProteoformPtr()->getDbResSeqPtr()->getId() << "\t"
+        << prsm_ptr->getProteoformPtr()->getSpeciesId() << "\t"
+        << prsm_ptr->getProteoformPtr()->getDbResSeqPtr()->getName() << "\t"
+        << prsm_ptr->getProteoformPtr()->getDbResSeqPtr()->getSeqMass() << "\t"
+        << prsm_ptr->getProteoformPtr()->getStartPos() << "\t"
+        << prsm_ptr->getProteoformPtr()->getEndPos() << "\t"
+        << prsm_ptr->getProteoformPtr()->getProteinMatchSeq() << "\t"
+        << prsm_ptr->getProteoformPtr()->getUnexpectedChangeNum() << "\t"
+        << prsm_ptr->getMatchPeakNum() << "\t"
+        << prsm_ptr->getMatchFragNum() << "\t"
+        << prsm_ptr->getPValue() << "\t"
+        << prsm_ptr->getEValue() << "\t"
+        << prsm_ptr->getProbPtr()->getOneProtProb()<< "\t"
+        << prsm_ptr->getFdr() << "\t";
+    computeCoverage(file, prsm_ptr, pair_ptrs_1, prsm_para_ptr);
+    computeCoverage(file, prsm_ptr, pair_ptrs_2, prsm_para_ptr);
+    computeCoverage(file, prsm_ptr, pair_ptrs_3, prsm_para_ptr);
+    file << std::endl;
 }
 
 void PrsmCoverage::processOnePrsm(std::ofstream &file, PrsmPtr prsm_ptr, 
-                                  PrsmParaPtr prsm_para_ptr) {
-  double min_mass = prsm_para_ptr_->getSpParaPtr()->getMinMass();
-  PeakIonPairPtrVec pair_ptrs =  getPeakIonPairs (prsm_ptr->getProteoformPtr(), 
-                                              prsm_ptr->getRefineMs(),
-                                              min_mass);
-  compOneCoverage(file, prsm_ptr, pair_ptrs, prsm_para_ptr);
+        PrsmParaPtr prsm_para_ptr) {
+    double min_mass = prsm_para_ptr_->getSpParaPtr()->getMinMass();
+    PeakIonPairPtrVec pair_ptrs =  getPeakIonPairs (prsm_ptr->getProteoformPtr(), 
+            prsm_ptr->getRefineMsPtrVec(), min_mass);
+    compOneCoverage(file, prsm_ptr, pair_ptrs, prsm_para_ptr);
 }
 
 void PrsmCoverage::processTwoPrsms(std::ofstream &file, PrsmPtr prsm_ptr_1, PrsmPtr prsm_ptr_2, 
-                                  PrsmParaPtr prsm_para_ptr) {
-  double min_mass = prsm_para_ptr_->getSpParaPtr()->getMinMass();
-  PeakIonPairPtrVec pair_ptrs_11;
-  if (prsm_ptr_1 != nullptr) {
-    pair_ptrs_11 =  getPeakIonPairs (prsm_ptr_1->getProteoformPtr(), 
-                                 prsm_ptr_1->getRefineMs(),
-                                 min_mass);
-  }
-  PeakIonPairPtrVec pair_ptrs_12;
-  if (prsm_ptr_1 != nullptr && prsm_ptr_2 != nullptr) {
-    pair_ptrs_12 =  getPeakIonPairs (prsm_ptr_1->getProteoformPtr(), 
-                                 prsm_ptr_2->getRefineMs(),
-                                 min_mass);
-  }
-  PeakIonPairPtrVec pair_ptrs_1;
-  pair_ptrs_1.insert(pair_ptrs_1.begin(), pair_ptrs_11.begin(), pair_ptrs_11.end());
-  pair_ptrs_1.insert(pair_ptrs_1.begin(), pair_ptrs_12.begin(), pair_ptrs_12.end());
-  if (prsm_ptr_1 != nullptr) {
-    compTwoCoverage(file, prsm_ptr_1, pair_ptrs_11, pair_ptrs_12, pair_ptrs_1, prsm_para_ptr);
-  }
+        PrsmParaPtr prsm_para_ptr) {
+    double min_mass = prsm_para_ptr_->getSpParaPtr()->getMinMass();
+    PeakIonPairPtrVec pair_ptrs_11;
+    if (prsm_ptr_1 != nullptr) {
+        pair_ptrs_11 =  getPeakIonPairs (prsm_ptr_1->getProteoformPtr(), 
+                prsm_ptr_1->getRefineMsPtrVec(), min_mass);
+    }
+    PeakIonPairPtrVec pair_ptrs_12;
+    if (prsm_ptr_1 != nullptr && prsm_ptr_2 != nullptr) {
+        pair_ptrs_12 =  getPeakIonPairs (prsm_ptr_1->getProteoformPtr(), 
+                prsm_ptr_2->getRefineMsPtrVec(), min_mass);
+    }
+    PeakIonPairPtrVec pair_ptrs_1;
+    pair_ptrs_1.insert(pair_ptrs_1.begin(), pair_ptrs_11.begin(), pair_ptrs_11.end());
+    pair_ptrs_1.insert(pair_ptrs_1.begin(), pair_ptrs_12.begin(), pair_ptrs_12.end());
+    if (prsm_ptr_1 != nullptr) {
+        compTwoCoverage(file, prsm_ptr_1, pair_ptrs_11, pair_ptrs_12, pair_ptrs_1, prsm_para_ptr);
+    }
 
-  PeakIonPairPtrVec pair_ptrs_21;
-  if (prsm_ptr_1 != nullptr && prsm_ptr_2 != nullptr) {
-    pair_ptrs_21 =  getPeakIonPairs (prsm_ptr_2->getProteoformPtr(), 
-                                 prsm_ptr_1->getRefineMs(),
-                                 min_mass);
-  }
-  PeakIonPairPtrVec pair_ptrs_22;
-  if (prsm_ptr_2 != nullptr) {
-    pair_ptrs_22 =  getPeakIonPairs (prsm_ptr_2->getProteoformPtr(), 
-                                 prsm_ptr_2->getRefineMs(),
-                                 min_mass);
-  }
-  PeakIonPairPtrVec pair_ptrs_2;
-  pair_ptrs_2.insert(pair_ptrs_2.begin(), pair_ptrs_21.begin(), pair_ptrs_21.end());
-  pair_ptrs_2.insert(pair_ptrs_2.begin(), pair_ptrs_22.begin(), pair_ptrs_22.end());
-  if (prsm_ptr_2 != nullptr) {
-    compTwoCoverage(file, prsm_ptr_2, pair_ptrs_21, pair_ptrs_22, pair_ptrs_2, prsm_para_ptr);
-  }
+    PeakIonPairPtrVec pair_ptrs_21;
+    if (prsm_ptr_1 != nullptr && prsm_ptr_2 != nullptr) {
+        pair_ptrs_21 =  getPeakIonPairs (prsm_ptr_2->getProteoformPtr(), 
+                prsm_ptr_1->getRefineMsPtrVec(), min_mass);
+    }
+    PeakIonPairPtrVec pair_ptrs_22;
+    if (prsm_ptr_2 != nullptr) {
+        pair_ptrs_22 =  getPeakIonPairs (prsm_ptr_2->getProteoformPtr(), 
+                prsm_ptr_2->getRefineMsPtrVec(), min_mass);
+    }
+    PeakIonPairPtrVec pair_ptrs_2;
+    pair_ptrs_2.insert(pair_ptrs_2.begin(), pair_ptrs_21.begin(), pair_ptrs_21.end());
+    pair_ptrs_2.insert(pair_ptrs_2.begin(), pair_ptrs_22.begin(), pair_ptrs_22.end());
+    if (prsm_ptr_2 != nullptr) {
+        compTwoCoverage(file, prsm_ptr_2, pair_ptrs_21, pair_ptrs_22, pair_ptrs_2, prsm_para_ptr);
+    }
 }
 
 void PrsmCoverage::processCombineCoverage(){
@@ -325,7 +351,7 @@ void PrsmCoverage::processCombineCoverage(){
   printTwoTitle(file);
 
   std::string spectrum_file_name = prsm_para_ptr_->getSpectrumFileName();
-  MsAlignReader reader (spectrum_file_name);
+  MsAlignReader reader (spectrum_file_name, prsm_para_ptr_->getGroupSpecNum());
 
   DeconvMsPtr ms_ptr_1 = reader.getNextMs();
   DeconvMsPtr ms_ptr_2 = reader.getNextMs();
