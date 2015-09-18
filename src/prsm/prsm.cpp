@@ -54,6 +54,27 @@ inline double compMatchPeakNum(PeakIonPairPtrVec &pairs) {
   return match_peak_num;
 }
 
+void Prsm::initMatchNum(double min_mass) {
+  PeakIonPairPtrVec pairs = getPeakIonPairs(proteoform_ptr_, refine_ms_three_vec_,
+                                            min_mass);
+  match_peak_num_ = 0;
+  match_fragment_num_ = 0;
+  TheoPeakPtr prev_ion(nullptr);
+  for (size_t i = 0; i < pairs.size(); i++) {
+    if (pairs[i]->getTheoPeakPtr() != prev_ion) {
+      prev_ion = pairs[i]->getTheoPeakPtr();
+      match_fragment_num_ += pairs[i]->getRealPeakPtr()->getScore();
+    }
+  }
+  std::sort(pairs.begin(), pairs.end(), peakIonPairUp);
+  DeconvPeakPtr prev_deconv_peak(nullptr);
+  for (size_t i = 0; i < pairs.size(); i++) {
+    if (pairs[i]->getRealPeakPtr()->getBasePeakPtr() != prev_deconv_peak) {
+      prev_deconv_peak = pairs[i]->getRealPeakPtr()->getBasePeakPtr();
+      match_peak_num_ += pairs[i]->getRealPeakPtr()->getScore();
+    }
+  }
+}
 
 void Prsm::initScores(SpParaPtr sp_para_ptr) {
   match_fragment_num_ = 0;

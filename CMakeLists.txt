@@ -39,7 +39,7 @@ file(GLOB ZERO_PTM_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/zeroptmsearch/*.cpp)
 file(GLOB DIAG_FILTER_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/diagfilter/*.cpp)
 file(GLOB ONE_PTM_FILTER_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/oneptmfilter/*.cpp)
 file(GLOB PTM_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/ptmsearch/*.cpp)
-#file(GLOB POISSON_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/poisson/*.cpp)
+file(GLOB LOCAL_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/local/*.cpp) 
 file(GLOB TDGF_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/tdgf/*.cpp)
 file(GLOB PRSM_VIEW_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/prsmview/*.cpp)
 file(GLOB ARGU_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/argument.cpp)
@@ -52,7 +52,7 @@ file(GLOB TEST_EVALUE_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_evalue.cpp)
 file(GLOB TEST_PRSM_VIEW_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_prsm_view.cpp) 
 
 add_executable(toppic ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
-        ${ZERO_PTM_SRCS} ${DIAG_FILTER_SRCS} ${ONE_PTM_FILTER_SRCS} ${PTM_SRCS} #${POISSON_SRCS}
+    ${ZERO_PTM_SRCS} ${DIAG_FILTER_SRCS} ${ONE_PTM_FILTER_SRCS} ${PTM_SRCS} ${LOCAL_SRCS}
 	${TDGF_SRCS} ${PRSM_VIEW_SRCS} ${ARGU_SRCS} ${MAIN_SRCS} ${SUMMARY_SRCS})
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
