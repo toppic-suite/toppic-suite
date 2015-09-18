@@ -140,5 +140,15 @@ AcidPtrVec AcidFactory::convertSeqToAcidSeq(const std::string &seq) {
   return acid_seq;
 }
 
+double AcidFactory::getPeptideMass(const std::string &seq) {
+    double mass = 0.0;
+    if (seq.length() > 0) {
+        for (size_t i = 0; i < seq.length(); i++) {
+            mass += getBaseAcidPtrByOneLetter(seq.substr(i, 1))->getMonoMass();
+        }
+    }
+    return mass;
+}
+
 } /* end namespace */
 

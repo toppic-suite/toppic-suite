@@ -18,7 +18,7 @@ typedef std::shared_ptr<Change> ChangePtr;
 class Change {
  public:
   Change(int left_bp_pos, int right_bp_pos, int change_type,
-         double mass_shift, PtmPtr ptm_ptr);
+         double mass_shift, const PtmPtr & ptm_ptr);
 
   Change(xercesc::DOMElement* change_element);
 
@@ -26,13 +26,31 @@ class Change {
   
   int getLeftBpPos() {return left_bp_pos_;}
 
+  void setLeftBpPos(int i) {left_bp_pos_ = i;}
+
   int getRightBpPos() {return right_bp_pos_;}
+
+  void setRightBpPos(int i) { right_bp_pos_ = i;}
+
+  void setSplit(int i) {split_pos_ = i;}
 
   int getChangeType() {return change_type_;}
 
+  void setChangeType(int i) { change_type_ = i;}
+
   double getMassShift() {return mass_shift_;}
 
+  void setMassShift(double m) { mass_shift_ = m;}
+
   PtmPtr getPtmPtr() {return ptm_ptr_;}
+
+  void setPtmPtr(const PtmPtr& ptm) { ptm_ptr_ = ptm;}
+
+  void setScr(std::vector<double> s) { scr_ = s;}
+
+  std::vector<double> getScr() { return scr_;}
+
+  void setConf(double c) { conf_ = c;}
 
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
@@ -40,9 +58,12 @@ class Change {
   // left and right positions are based on break point positions 
   int left_bp_pos_;
   int right_bp_pos_;
+  int split_pos_ = 0;
   int change_type_;
   double mass_shift_;
   PtmPtr ptm_ptr_;
+  std::vector<double> scr_;
+  double conf_;
 };
 
 typedef std::vector<ChangePtr> ChangePtrVec;

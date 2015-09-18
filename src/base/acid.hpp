@@ -105,6 +105,8 @@ class AcidFactory {
    */
   static AcidPtrVec convertSeqToAcidSeq(const std::string &seq);
 
+  static double getPeptideMass(const std::string &seq);
+
  private:
   static AcidPtrVec acid_ptr_vec_;
 };

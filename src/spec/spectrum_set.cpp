@@ -1,3 +1,5 @@
+#include <functional>
+
 #include "base/base_data.hpp"
 #include "spec/extend_peak.hpp"
 #include "spec/spectrum_set.hpp"
@@ -46,6 +48,32 @@ bool SpectrumSet::checkValid(SpParaPtr sp_para_ptr) {
     }
   }
   return true;
+}
+
+SpectrumSetPtr getSpectrumSet(const DeconvMsPtrVec & deconv_ms_ptr_vec, 
+        const SpParaPtr & sp_para_ptr, double prec_mono_mass) {
+    DeconvMsPtrVec deconv_vec;
+    for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
+        if ((int)deconv_ms_ptr_vec[i]->size() < sp_para_ptr->getMinPeakNum()
+                || deconv_ms_ptr_vec[i]->getHeaderPtr()->getPrecMonoMass() < sp_para_ptr->getMinMass()) {
+            continue;
+        }
+
+        if (deconv_ms_ptr_vec[i]->getHeaderPtr()->getActivationPtr() == nullptr) {
+            if (sp_para_ptr->getActivationPtr() != nullptr) {
+                deconv_ms_ptr_vec[i]->getHeaderPtr()->setActivationPtr(sp_para_ptr->getActivationPtr());
+            } else {
+                continue;
+            }
+        }
+        deconv_vec.push_back(deconv_ms_ptr_vec[i]);
+    }
+
+    if (deconv_vec.size() == 0) {
+        return SpectrumSetPtr(nullptr);
+    } else {
+        return SpectrumSetPtr(new SpectrumSet(deconv_vec, sp_para_ptr, prec_mono_mass));
+    }
 }
 
 } /* namespace prot */

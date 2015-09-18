@@ -49,6 +49,8 @@ class SpectrumSet {
 
 typedef std::shared_ptr<SpectrumSet> SpectrumSetPtr;
 
+SpectrumSetPtr getSpectrumSet(const DeconvMsPtrVec & deconv_ms_ptr_vec,
+        const SpParaPtr & sp_para_ptr, double prec_mono_mass);
 } /* namespace prot */
 
 #endif /* SPECTRUM_SET_HPP_ */
