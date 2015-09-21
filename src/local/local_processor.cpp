@@ -29,8 +29,8 @@ LocalProcessor::LocalProcessor(LocalMngPtr& mng_ptr) {
 }
 
 void LocalProcessor::init() {
-    para_.resize(4);
-    std::fill(para_.begin(), para_.end(), 0.0);
+    //para_.resize(4);
+    //std::fill(para_.begin(), para_.end(), 0.0);
 
     std::string spectrum_file_name =
         mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
@@ -49,89 +49,89 @@ void LocalProcessor::init() {
     addSpectrumPtrsToPrsms(prsm_ptrs_, mng_ptr_->prsm_para_ptr_);
     LOG_DEBUG("spectrum added");
 
-    for (size_t i = 0; i < prsm_ptrs_.size(); i++) {
-        if (prsm_ptrs_[i]->getProteoformPtr()->getUnexpectedChangeNum() == 0) {
+    /*for (size_t i = 0; i < prsm_ptrs_.size(); i++) {*/
+        //if (prsm_ptrs_[i]->getProteoformPtr()->getUnexpectedChangeNum() == 0) {
 
-            IonTypePtr n_ion_type_ptr =
-                prsm_ptrs_[i]->getDeconvMsPtrVec()[0]->getHeaderPtr()->getActivationPtr()
-                ->getNIonTypePtr();
+            //IonTypePtr n_ion_type_ptr =
+                //prsm_ptrs_[i]->getDeconvMsPtrVec()[0]->getHeaderPtr()->getActivationPtr()
+                //->getNIonTypePtr();
 
-            std::vector<double> theo_double =
-                prsm_ptrs_[i]->getProteoformPtr()->getBpSpecPtr()->getBreakPointMasses(
-                    n_ion_type_ptr);
+            //std::vector<double> theo_double =
+                //prsm_ptrs_[i]->getProteoformPtr()->getBpSpecPtr()->getBreakPointMasses(
+                    //n_ion_type_ptr);
 
-            std::vector<int> theo_int(theo_double.size());
+            //std::vector<int> theo_int(theo_double.size());
 
-            std::transform(theo_double.begin(), theo_double.end(), theo_int.begin(),
-            [](double d) {
-                return std::round(d * SCALE_FACTOR);
-            });
+            //std::transform(theo_double.begin(), theo_double.end(), theo_int.begin(),
+            //[](double d) {
+                //return std::round(d * SCALE_FACTOR);
+            //});
 
-            std::sort(theo_int.begin(), theo_int.end());
-            auto last = std::unique(theo_int.begin(), theo_int.end());
-            theo_int.erase(last, theo_int.end());
+            //std::sort(theo_int.begin(), theo_int.end());
+            //auto last = std::unique(theo_int.begin(), theo_int.end());
+            //theo_int.erase(last, theo_int.end());
 
-            std::vector<int> theo_int_ext;
+            //std::vector<int> theo_int_ext;
 
-            for (size_t j = 0; j < theo_double.size(); j++) {
-                theo_int_ext.push_back(std::round((theo_double[j] + 42.01056) * SCALE_FACTOR));
-                theo_int_ext.push_back(std::round((theo_double[j] + 79.95682) * SCALE_FACTOR));
-                theo_int_ext.push_back(std::round((theo_double[j] + 14.01565) * SCALE_FACTOR));
-                theo_int_ext.push_back(std::round((theo_double[j] + 15.99491) * SCALE_FACTOR));
-                theo_int_ext.push_back(std::round((theo_double[j] + 114.042927) * SCALE_FACTOR));
-                theo_int_ext.push_back(std::round((theo_double[j] - 27.994915) * SCALE_FACTOR));
-                theo_int_ext.push_back(std::round((theo_double[j] - 18.0105) * SCALE_FACTOR));
-            }
+            //for (size_t j = 0; j < theo_double.size(); j++) {
+                //theo_int_ext.push_back(std::round((theo_double[j] + 42.01056) * SCALE_FACTOR));
+                //theo_int_ext.push_back(std::round((theo_double[j] + 79.95682) * SCALE_FACTOR));
+                //theo_int_ext.push_back(std::round((theo_double[j] + 14.01565) * SCALE_FACTOR));
+                //theo_int_ext.push_back(std::round((theo_double[j] + 15.99491) * SCALE_FACTOR));
+                //theo_int_ext.push_back(std::round((theo_double[j] + 114.042927) * SCALE_FACTOR));
+                //theo_int_ext.push_back(std::round((theo_double[j] - 27.994915) * SCALE_FACTOR));
+                //theo_int_ext.push_back(std::round((theo_double[j] - 18.0105) * SCALE_FACTOR));
+            //}
 
-            // get unique
-            std::sort(theo_int.begin(), theo_int.end());
-            last = std::unique(theo_int.begin(), theo_int.end());
-            theo_int.erase(last, theo_int.end());
+            //// get unique
+            //std::sort(theo_int.begin(), theo_int.end());
+            //last = std::unique(theo_int.begin(), theo_int.end());
+            //theo_int.erase(last, theo_int.end());
 
-            SpectrumSetPtr spec_set_ptr =
-                getSpectrumSet(prsm_ptrs_[i]->getDeconvMsPtrVec(),
-                               mng_ptr_->prsm_para_ptr_->getSpParaPtr(),
-                               prsm_ptrs_[i]->getAdjustedPrecMass());
+            //SpectrumSetPtr spec_set_ptr =
+                //getSpectrumSet(prsm_ptrs_[i]->getDeconvMsPtrVec(),
+                               //mng_ptr_->prsm_para_ptr_->getSpParaPtr(),
+                               //prsm_ptrs_[i]->getAdjustedPrecMass());
 
-            PrmMsPtrVec prm = spec_set_ptr->getMsSixPtrVec();
+            //PrmMsPtrVec prm = spec_set_ptr->getMsSixPtrVec();
 
-            std::vector<int> spec_int;
-            for (size_t j = 0; j < prm.size(); j++) {
-                for (size_t k = 0; k< prm[j]->getPeakPtrVec().size(); k++) {
-                    spec_int.push_back(std::round(prm[j]->getPeakPtr(k)->getMonoMass() * SCALE_FACTOR));
-                }
-            }
+            //std::vector<int> spec_int;
+            //for (size_t j = 0; j < prm.size(); j++) {
+                //for (size_t k = 0; k< prm[j]->getPeakPtrVec().size(); k++) {
+                    //spec_int.push_back(std::round(prm[j]->getPeakPtr(k)->getMonoMass() * SCALE_FACTOR));
+                //}
+            //}
 
-            std::sort(spec_int.begin(), spec_int.end());
-            last = std::unique(spec_int.begin(), spec_int.end());
-            spec_int.erase(last, spec_int.end());
+            //std::sort(spec_int.begin(), spec_int.end());
+            //last = std::unique(spec_int.begin(), spec_int.end());
+            //spec_int.erase(last, spec_int.end());
 
-            std::vector<int> common;
+            //std::vector<int> common;
 
-            std::set_intersection(theo_int.begin(), theo_int.end(),
-                                  spec_int.begin(), spec_int.end(), std::back_inserter(common));
+            //std::set_intersection(theo_int.begin(), theo_int.end(),
+                                  //spec_int.begin(), spec_int.end(), std::back_inserter(common));
 
-            para_[0] += theo_int.size() - common.size();
-            para_[1] += theo_int_ext.size();
-            para_[2] += common.size();
+            //para_[0] += theo_int.size() - common.size();
+            //para_[1] += theo_int_ext.size();
+            //para_[2] += common.size();
 
-            common.clear();
-            std::set_intersection(theo_int_ext.begin(), theo_int_ext.end(),
-                                  spec_int.begin(), spec_int.end(), std::back_inserter(common));
+            //common.clear();
+            //std::set_intersection(theo_int_ext.begin(), theo_int_ext.end(),
+                                  //spec_int.begin(), spec_int.end(), std::back_inserter(common));
 
-            para_[3] += common.size();
-        }
-    }
+            //para_[3] += common.size();
+        //}
+    //}
 
-    double p11, p01, p10, p00;
+    //double p11, p01, p10, p00;
 
-    p11 = para_[2] / (para_[0] + para_[2]);
-    p01 = para_[0] / (para_[0] + para_[2]);
-    p10 = para_[3] * 7 / para_[1];
-    p00 = 1 - p10;
+    //p11 = para_[2] / (para_[0] + para_[2]);
+    //p01 = para_[0] / (para_[0] + para_[2]);
+    //p10 = para_[3] * 7 / para_[1];
+    //p00 = 1 - p10;
 
-    p1_ = p01 / p00;
-    p2_ = p11 / p10;
+    //p1_ = p01 / p00;
+    /*p2_ = p11 / p10;*/
     // const value of p1, p2 will be used in other datasets
     p1_ = 0.915258, p2_ = 21.1822;
 
@@ -390,6 +390,9 @@ void LocalProcessor::processTwoPtm(PrsmPtr& prsm) {
     double mass1 = change_ptr1->getMassShift();
     double mass2 = change_ptr2->getMassShift();
 
+    PtmPtr ptm1 = change_ptr1->getPtmPtr();
+    PtmPtr ptm2 = change_ptr2->getPtmPtr();
+
     int ori_start = prsm->getProteoformPtr()->getStartPos();
     int ori_end = prsm->getProteoformPtr()->getEndPos();
 
@@ -484,6 +487,17 @@ void LocalProcessor::processTwoPtm(PrsmPtr& prsm) {
         one_ptm_scr = *std::max_element(one_ptm_scr_vec.begin(),
                                         one_ptm_scr_vec.end());
         one_ptm_scr = one_ptm_scr * beta_ * theta_;
+    }
+
+    if (t_two_ptm_scr == 0.0 && two_ptm_scr == 0.0 && one_ptm_scr == 0.0) {
+        prsm->getProteoformPtr()->setStartPos(ori_start);
+        prsm->getProteoformPtr()->setEndPos(ori_end);
+        change_ptr1->setMassShift(mass1);
+        change_ptr2->setMassShift(mass2);
+        change_ptr1->setPtmPtr(ptm1);
+        change_ptr2->setPtmPtr(ptm2);
+        prsm->getProteoformPtr()->addChangePtr(change_ptr2);
+        processTwoUnknown(prsm, ptm1_known, ptm2_known);
     }
 
     LOG_DEBUG(t_two_ptm_scr << " " << two_ptm_scr << " " << one_ptm_scr);

@@ -156,6 +156,15 @@ void getSupPeakNum(const PrsmPtr & prsm, const ChangePtr & change, double min_ma
     }
 }
 
+bool modifiable(const ProteoformPtr& proteoform_ptr, int i, int j,
+                const PtmPtr& ptm_ptr, bool cysteine_protected) {
+    for (int k = i; k <= j; k++) {
+        if (modifiable(proteoform_ptr, k, ptm_ptr, cysteine_protected))
+            return true;
+    }
+    return false;
+}
+
 bool modifiable(const ProteoformPtr& proteoform_ptr, int i,
                 const PtmPtr& ptm_ptr, bool cysteine_protected) {
 
@@ -592,19 +601,23 @@ double getScr(PrsmPtr & prsm, bool known, const LocalMngPtr& mng_ptr) {
 
     for (int i = 1; i < len + 1; i++) {
         theo_mod = theo_double[i] + mass1;
-        n_match = getNumMatch(theo_mod, spec_double, spec_torlerance);
-        for (int j = 0; j < num_match + 1; j++) {
-            two_ptm_table[1][i][j] = two_ptm_table[0][i - 1][j - n_match]
+        if (modifiable(prsm->getProteoformPtr(), 0, i, ptm1, mng_ptr->cysteine_protected_)) {
+            n_match = getNumMatch(theo_mod, spec_double, spec_torlerance);
+            for (int j = 0; j < num_match + 1; j++) {
+                two_ptm_table[1][i][j] = two_ptm_table[0][i - 1][j - n_match]
                                      + two_ptm_table[1][i - 1][j - n_match];
+            }
         }
     }
 
     for (int i = 1; i < len + 1; i++) {
         theo_mod = theo_double[i] + mass1 + mass2;
-        n_match = getNumMatch(theo_mod, spec_double, spec_torlerance);
-        for (int j = 0; j < num_match + 1; j++) {
-            two_ptm_table[2][i][j] = two_ptm_table[1][i - 1][j - n_match]
+        if (modifiable(prsm->getProteoformPtr(), i, len, ptm2, mng_ptr->cysteine_protected_)) {
+            n_match = getNumMatch(theo_mod, spec_double, spec_torlerance);
+            for (int j = 0; j < num_match + 1; j++) {
+                two_ptm_table[2][i][j] = two_ptm_table[1][i - 1][j - n_match]
                                      + two_ptm_table[2][i - 1][j - n_match];
+            }
         }
     }
 
@@ -984,19 +997,23 @@ int getSplit(const PrsmPtr & prsm, const PtmPtr & ptm1, const PtmPtr & ptm2, con
 
         for (int j = 1; j <= i; j++) {
             theo_mod = theo_double[j] + mass1;
-            n_match = getNumMatch(theo_mod, spec_double, spec_torlerance);
-            for (int k = 1; k <= num_match; k++) {
-                two_ptm_table1[j][k] = two_ptm_table0[j - 1][k - n_match]
+            if (modifiable(prsm->getProteoformPtr(), 0, i, ptm1, mng_ptr->cysteine_protected_)) {
+                n_match = getNumMatch(theo_mod, spec_double, spec_torlerance);
+                for (int k = 1; k <= num_match; k++) {
+                    two_ptm_table1[j][k] = two_ptm_table0[j - 1][k - n_match]
                                        + two_ptm_table1[j - 1][k - n_match];
+                }
             }
         }
 
         for (int j = i + 1; j < len + 1; j++) {
             theo_mod = theo_double[j] + mass1 + mass2;
-            n_match = getNumMatch(theo_mod, spec_double, spec_torlerance);
-            for (int k = 1; k < num_match + 1; k++) {
-                two_ptm_table2[j][k] = two_ptm_table1[j - 1][k - n_match]
+            if (modifiable(prsm->getProteoformPtr(), j, len, ptm2, mng_ptr->cysteine_protected_)) {
+                n_match = getNumMatch(theo_mod, spec_double, spec_torlerance);
+                for (int k = 1; k < num_match + 1; k++) {
+                    two_ptm_table2[j][k] = two_ptm_table1[j - 1][k - n_match]
                                        + two_ptm_table2[j - 1][k - n_match];
+                }
             }
         }
 

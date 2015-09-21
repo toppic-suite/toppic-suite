@@ -29,11 +29,11 @@
 #include "ptmsearch/ptm_mng.hpp"
 #include "ptmsearch/ptm_processor.hpp"
 
-#include "poisson/poisson_processor.hpp"
-#include "poisson/poisson_mng.hpp"
-
 #include "tdgf/evalue_processor.hpp"
 #include "tdgf/tdgf_mng.hpp"
+
+#include "local/local_mng.hpp"
+#include "local/local_processor.hpp"
 
 #include "prsmview/xml_generator.hpp"
 #include "prsmview/transformer.hpp"
@@ -214,14 +214,24 @@ int process(int argc, char* argv[]) {
     prsm_species = nullptr;
     std::cout << "Finding protein species finished." << std::endl;
 
+    std::cout << "PTM localization started." << std::endl;
+    LocalMngPtr local_mng = LocalMngPtr(new LocalMng(prsm_para_ptr, arguments["cysteineProtection"],
+                                        arguments["local_threshold"], max_ptm_mass,
+                                        "OUTPUT_RESULT", "LOCAL_RESULT"));
+    LocalProcessorPtr local_ptr = LocalProcessorPtr(new LocalProcessor(local_mng));
+    local_ptr->init();
+    local_ptr->process();
+    local_ptr = nullptr;
+    std::cout << "PTM localization finished." << std::endl;
+
     std::cout << "Outputting table started." << std::endl;
-    TableWriterPtr table_out = TableWriterPtr(new TableWriter(prsm_para_ptr, "OUTPUT_RESULT", "OUTPUT_TABLE"));
+    TableWriterPtr table_out = TableWriterPtr(new TableWriter(prsm_para_ptr, "LOCAL_RESULT", "OUTPUT_TABLE"));
     table_out->write();
     table_out = nullptr;
     std::cout << "Outputting table finished." << std::endl;
 
     std::cout << "Generating view xml files started." << std::endl;
-    XmlGeneratorPtr xml_gene = XmlGeneratorPtr(new XmlGenerator(prsm_para_ptr, exe_dir,"OUTPUT_RESULT"));
+    XmlGeneratorPtr xml_gene = XmlGeneratorPtr(new XmlGenerator(prsm_para_ptr, exe_dir,"LOCAL_RESULT"));
     xml_gene->process();
     xml_gene = nullptr;
     std::cout << "Generating view xml files finished." << std::endl;

@@ -21,6 +21,10 @@ class AnnoResidue : public Residue {
 
   void setUnexpectedChangeColor(int color) {unexpected_change_color_ = color;}
 
+  void setPossiblePosColor(int c) {possible_pos_color_ = c;}
+
+  void setAnno(std::string s) {anno_ = s;}
+
   void appendViewXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
  private:
@@ -32,6 +36,10 @@ class AnnoResidue : public Residue {
   bool is_unexpected_change_ = false;
   //unexpected change color
   int unexpected_change_color_ = 0;
+  //possible postion for known ptms
+  int possible_pos_color_ = 0;
+  // all possible positions with score
+  std::string anno_;
 };
 
 typedef std::shared_ptr<AnnoResidue> AnnoResiduePtr;
