@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<residue_list>
+<residue>
+    <acid>Alanine</acid>
+    <ptm>No PTM</ptm>
+</residue>
+<residue>
+	<acid>Arginine</acid>
+    <ptm>No PTM</ptm>
+</residue>
+<residue>
+	<acid>Asparagine</acid>
+    <ptm>No PTM</ptm>
+</residue>
+<residue>
+	<acid>Aspartic_acid</acid>
+    <ptm>No PTM</ptm>
+</residue>
+<residue>
+	<acid>Cysteine</acid>
+  <ptm>Carbamidomethylation</ptm>
+</residue>
+<residue>
+	<acid>Glutamic_acid</acid>
+    <ptm>No PTM</ptm>
+</residue>
+<residue>
+	<acid>Glutamine</acid>
+    <ptm>No PTM</ptm>
+</residue>
+<residue>
+	<acid>Glycine</acid>
+    <ptm>No PTM</ptm>
+</residue>
+<residue>
+	<acid>Histidine</acid>
+    <ptm>No PTM</ptm>
+</residue>
+<residue>
+	<acid>Isoleucine</acid>
+    <ptm>No PTM</ptm>
+</residue>
+<residue>
+	<acid>Leucine</acid>
+    <ptm>No PTM</ptm>
+</residue>
+<residue>
+	<acid>Lysine</acid>
+    <ptm>No PTM</ptm>
+</residue>
+<residue>
+	<acid>Methionine</acid>
+    <ptm>No PTM</ptm>
+</residue>
+<residue>
+	<acid>Phenylalanine</acid>
+    <ptm>No PTM</ptm>
+</residue>
+<residue>
+	<acid>Proline</acid>
+    <ptm>No PTM</ptm>
+</residue>
+<residue>
+	<acid>Serine</acid>
+    <ptm>No PTM</ptm>
+</residue>
+<residue>
+    <acid>Xerine</acid>
+    <ptm>No PTM</ptm>
+</residue>
+<residue>
+	<acid>Threonine</acid>
+    <ptm>No PTM</ptm>
+</residue>
+<residue>
+    <acid>Bhreonine</acid>
+    <ptm>No PTM</ptm>
+</residue>
+<residue>
+	<acid>Tryptophan</acid>
+    <ptm>No PTM</ptm>
+</residue>
+<residue>
+	<acid>Valine</acid>
+    <ptm>No PTM</ptm>
+</residue>
+<residue>
+	<acid>Tyrosine</acid>
+    <ptm>No PTM</ptm>
+</residue>
+<residue>
+	<acid>Selenocysteine</acid>
+    <ptm>No PTM</ptm>
+</residue>
+</residue_list>

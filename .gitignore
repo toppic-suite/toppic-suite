@@ -1,6 +1,7 @@
 build/*
 thirdparty/*
 bin/*
+releases/*
 
 *.o
 *.so
