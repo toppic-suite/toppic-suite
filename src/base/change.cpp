@@ -71,8 +71,7 @@ void Change::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
 
         std::vector<double>::iterator iter = scr_.begin();
         xercesc::DOMElement* ele = xml_doc->createElement("score_list");
-        for (int i = left_bp_pos_ - split_pos_; i < right_bp_pos_ - split_pos_;
-                i++) {
+        for (int i = left_bp_pos_ - split_pos_; i < right_bp_pos_ - split_pos_; i++) {
             if (scr_.size() == 0)
                 break;
 

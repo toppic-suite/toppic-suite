@@ -91,7 +91,8 @@ SegmentPtrVec Proteoform::getSegmentPtrVec() {
     ChangePtrVec unexpected_changes;
     double mass_shift_sum = 0;
     for (size_t i = 0; i < change_list_.size(); i++) {
-        if (change_list_[i]->getChangeType() == UNEXPECTED_CHANGE) {
+        if (change_list_[i]->getChangeType() == UNEXPECTED_CHANGE
+            || change_list_[i]->getChangeType() == VARIABLE_CHANGE) {
             unexpected_changes.push_back(change_list_[i]);
             mass_shift_sum += change_list_[i]->getMassShift();
         }
@@ -166,6 +167,18 @@ int Proteoform::getUnexpectedChangeNum() {
     return n;
 }
 
+int Proteoform::getUnexpectedChangeNum(double err) {
+    int n = 0;
+    for (size_t i = 0; i < change_list_.size(); i++) {
+        if (change_list_[i]->getChangeType() == UNEXPECTED_CHANGE) {
+            if (std::abs(change_list_[i]->getMassShift()) <= 1+ err)
+                continue;
+            n++;
+        }
+    }
+    return n;
+}
+
 ChangePtrVec Proteoform::getUnexpectedChangePtrVec() {
     ChangePtrVec un_change;
     for (size_t i = 0; i < change_list_.size(); i++) {
@@ -174,6 +187,17 @@ ChangePtrVec Proteoform::getUnexpectedChangePtrVec() {
         }
     }
     return un_change;
+}
+
+ChangePtrVec Proteoform::getUnexpectedChangePtrVec(double err) {
+    ChangePtrVec un_change;
+    for (size_t i = 0; i < change_list_.size(); i++) {
+        if (change_list_[i]->getChangeType() == UNEXPECTED_CHANGE) {
+            if (std::abs(change_list_[i]->getMassShift()) > 1+ err)
+                un_change.push_back(change_list_[i]);
+        }
+    }
+    return un_change;  
 }
 
 std::vector<int> Proteoform::getUnexpectedChangeId() {

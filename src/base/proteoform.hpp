@@ -76,11 +76,15 @@ class Proteoform {
 
     int getUnexpectedChangeNum();
 
+    int getUnexpectedChangeNum(double err);
+
     SemiAlignTypePtr getSemiAlignType();
 
     double getMass();
 
     ChangePtrVec getUnexpectedChangePtrVec() ;
+
+    ChangePtrVec getUnexpectedChangePtrVec(double err);
 
     std::vector<int> getUnexpectedChangeId();
 

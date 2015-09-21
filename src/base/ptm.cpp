@@ -33,6 +33,8 @@ void Ptm::appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent) {
     xml_doc->addElement(element, "abbr_name", abbr_name_.c_str());
     std::string str = convertToString(mono_mass_);
     xml_doc->addElement(element, "mono_mass", str.c_str());
+    str = convertToString(unimod_id_);
+    xml_doc->addElement(element, "unimod", str.c_str());
     parent->appendChild(element);
 }
 
@@ -71,10 +73,14 @@ void PtmFactory::initFactory(const std::string &file_name) {
     std::sort(ptm_ptr_vec_.begin(), ptm_ptr_vec_.end(), ptmMassUp);
 
     for (size_t i = 1; i < ptm_ptr_vec_.size(); i++) {
-        if (ptm_ptr_vec_[i]->getName() == "Carbamidomethylation" || ptm_ptr_vec_[i]->getName() == "Carboxymethyl")
+        if (ptm_ptr_vec_[i]->getName() == "Carbamidomethylation" 
+            || ptm_ptr_vec_[i]->getName() == "Carboxymethyl"
+                || ptm_ptr_vec_[i]->getMonoMass() == 0.0)
             continue;
         for (size_t j = 1; j < ptm_ptr_vec_.size(); j++) {
-            if (ptm_ptr_vec_[j]->getName() == "Carbamidomethylation" || ptm_ptr_vec_[j]->getName() == "Carboxymethyl")
+            if (ptm_ptr_vec_[j]->getName() == "Carbamidomethylation" 
+                || ptm_ptr_vec_[j]->getName() == "Carboxymethyl"
+                    || ptm_ptr_vec_[j]->getMonoMass() == 0.0)
                 continue;
 
             ptm_pair_vec_.push_back(std::make_pair(ptm_ptr_vec_[i], ptm_ptr_vec_[j]));
@@ -160,7 +166,9 @@ PtmPairVec PtmFactory::getBasePtmPairByMass(double mass1, double mass2,
 
 bool PtmFactory::isKnown(double m, double error_tolerance) {
     for (size_t i = 0; i < ptm_ptr_vec_.size(); i++) {
-        if (ptm_ptr_vec_[i]->getMonoMass() == 0.0) {
+        if (ptm_ptr_vec_[i]->getMonoMass() == 0.0
+            ||ptm_ptr_vec_[i]->getAbbrName() == "Carbamidomethylation" 
+                || ptm_ptr_vec_[i]->getAbbrName() == "Carboxymethyl" ) {
             continue;
         }
         double ptm_mass = ptm_ptr_vec_[i]->getMonoMass();

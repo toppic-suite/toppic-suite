@@ -97,6 +97,8 @@ void TableWriter::writeSelectedPrsms(std::ofstream &file, PrsmPtrVec &prsm_ptrs,
   file << std::setprecision(10);
   for(size_t i=0;i<prsm_ptrs.size();i++){
     //LOG_DEBUG("prec mass " << prsm_ptrs[i]->getOriPrecMass());
+    double err = prsm_ptrs[i]->getOriPrecMass() *
+        prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
     file << prsm_para_ptr_->getSpectrumFileName() << "\t"
         << prsm_ptrs[i]->getId() << "\t"
         << spec_ids << "\t"
@@ -113,8 +115,8 @@ void TableWriter::writeSelectedPrsms(std::ofstream &file, PrsmPtrVec &prsm_ptrs,
         << prsm_ptrs[i]->getProteoformPtr()->getDbResSeqPtr()->getSeqMass() << "\t"
         << prsm_ptrs[i]->getProteoformPtr()->getStartPos() << "\t"
         << prsm_ptrs[i]->getProteoformPtr()->getEndPos() << "\t"
-        << prsm_ptrs[i]->getProteoformPtr()->getProteinMatchSeq() << "\t"
-        << prsm_ptrs[i]->getProteoformPtr()->getUnexpectedChangeNum() << "\t"
+        << prsm_ptrs[i]->getProteoformPtr()->getProteinMatchSeq(err) << "\t"
+        << prsm_ptrs[i]->getProteoformPtr()->getUnexpectedChangeNum(err) << "\t"
         << prsm_ptrs[i]->getMatchPeakNum() << "\t"
         << prsm_ptrs[i]->getMatchFragNum() << "\t"
         << prsm_ptrs[i]->getPValue() << "\t"

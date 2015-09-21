@@ -24,6 +24,9 @@ void AnnoResidue::appendViewXml(XmlDOMDocument* xml_doc,
   xml_doc->addElement(element, "is_unexpected_change", str.c_str());
   str = convertToString(unexpected_change_color_);
   xml_doc->addElement(element, "unexpected_change_color", str.c_str());
+  str = convertToString(possible_pos_color_);
+  xml_doc->addElement(element, "possible_pos_color", str.c_str());
+  xml_doc->addElement(element, "anno", anno_.c_str());
   parent->appendChild(element);
 }
 

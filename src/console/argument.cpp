@@ -27,6 +27,7 @@ void Argument::initArguments() {
   arguments_["logFileName"] = "";
   arguments_["keepTempFiles"] = "false";
   arguments_["fullBinaryPath"] = "false";
+  arguments_["local_threshold"] = "0.9";
   arguments_["groupSpectrumNumber"] = "1";
 }
 
@@ -120,6 +121,7 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string log_file_name = "";
   std::string use_table = "";
   std::string group_num = "";
+  std::string local_threshold = "";
 
   /** Define and parse the program options*/
   try {
@@ -138,7 +140,8 @@ bool Argument::parse(int argc, char* argv[]) {
         ("ptm-number,p", po::value<std::string> (&ptm_num), "<0|1|2>. Maximum number of unexpected post-translational modifications in a proteoform-spectrum-match. Default value: 2.")
         ("cutoff-type,t", po::value<std::string> (&cutoff_type), "<EVALUE|FDR>. Cutoff type for reporting protein-spectrum-matches. Default value: EVALUE.")
         ("cutoff-value,v", po::value<std::string> (&cutoff_value), "<positive double value>. Cutoff value for reporting protein-spectrum-matches. Default value: 0.01.")
-        ("generating-function,g", "Use the generating function approach to calculate p-values and E-values.");
+        ("generating-function,g", "Use the generating function approach to calculate p-values and E-values.")
+        ("local-threshold,s", po::value<std::string> (&local_threshold), "<positive double value>. Threshold value for reporting PTM localization. Default value: 0.9.");
     po::options_description desc("Options");
 
     desc.add_options() 
@@ -157,9 +160,9 @@ bool Argument::parse(int argc, char* argv[]) {
         ("log-file-name,l", po::value<std::string>(&log_file_name), "Log file name with its path.")
         ("keep-temp-files,k", "Keep temporary files.")
         ("generating-function,g", "Use generating function to calculate p-values and E-values.")
+        ("local-threshold,s", po::value<std::string> (&local_threshold), "<positive double value>. Threshold value for reporting PTM localization. Default value: 0.9.")
         ("full-binary-path,b", "Full binary path.")
         ("group-number,r", po::value<std::string> (&group_num), "Specify the number of spectra in a group. Default value: 1.")
-        ("full-binary-path,b", "Full binary path.")
         ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name with its path.")
         ("spectrum-file-name", po::value<std::string>(&spectrum_file_name)->required(), "Spectrum file name with its path.");
 
@@ -243,6 +246,9 @@ bool Argument::parse(int argc, char* argv[]) {
     }
     if (vm.count("generating-function")) {
       arguments_["useGf"] = "true";
+    }
+    if (vm.count("local-threshold")) {
+      arguments_["local_threshold"] = "local_threshold";
     }
     if (vm.count("group-number")) {
       arguments_["groupSpectrumNumber"] = group_num;

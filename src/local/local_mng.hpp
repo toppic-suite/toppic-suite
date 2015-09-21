@@ -47,7 +47,7 @@ inline LocalMng::LocalMng(PrsmParaPtr prsm_para_ptr, const std::string& protect,
     thread_ = std::stod(t);
     max_ptm_mass_ = max_ptm_mass;
     weight_ = theta_ = 0.994;
-    beta_ = 0.8;
+    beta_ = 0.28;
     p1_ = p2_ = 0.0;
 }
 

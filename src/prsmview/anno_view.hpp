@@ -26,7 +26,8 @@ std::vector<std::vector<std::string>> readViewXmlFiles(const std::string &file_n
 
 xercesc::DOMElement* genePrsmView(XmlDOMDocument* xml_doc, PrsmPtr prsm_ptr, PrsmViewMngPtr mng_ptr);
 
-xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc, PrsmPtr prsm_ptr, PrsmViewMngPtr mng_ptr);
+xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc, PrsmPtr prsm_ptr,
+                                     PrsmViewMngPtr mng_ptr, double err);
 
 xercesc::DOMElement* proteoformToXml(XmlDOMDocument* xml_doc, const PrsmPtrVec &prsm_ptrs, 
                                      PrsmViewMngPtr mng_ptr);
@@ -41,6 +42,13 @@ xercesc::DOMElement* proteinToXml(XmlDOMDocument* xml_doc,
 xercesc::DOMElement* allProteinToXml(XmlDOMDocument* xml_doc,
                                      const PrsmPtrVec &prsm_ptrs,
                                      PrsmViewMngPtr mng_ptr);
+
+xercesc::DOMElement* allModificationToXml(XmlDOMDocument* xml_doc,
+        PrsmPtrVec & prsm_ptrs, const PrsmViewMngPtr & mng_ptr);
+
+std::vector<xercesc::DOMElement*> modificationToXml(XmlDOMDocument* xml_doc,
+        PrsmPtrVec & prsm_ptrs, const PrsmViewMngPtr & mng_ptr);
+
 }
 
 #endif /* PROT_ANNO_VIEW_HPP_ */

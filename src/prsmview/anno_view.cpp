@@ -1,3 +1,5 @@
+
+#include <set>
 #include <boost/algorithm/string.hpp>
 
 #include "base/fasta_reader.hpp"
@@ -147,9 +149,9 @@ xercesc::DOMElement* genePrsmView(XmlDOMDocument* xml_doc,PrsmPtr prsm_ptr, Prsm
   //LOG_DEBUG("ms completed");
 
   //proteoform to view
-  xercesc::DOMElement* prot_element = geneProteinView(xml_doc,
-                                                      prsm_ptr,
-                                                      mng_ptr);
+  double err = prsm_ptr->getOriPrecMass() * 
+      mng_ptr->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
+  xercesc::DOMElement* prot_element = geneProteinView(xml_doc, prsm_ptr, mng_ptr, err);
   element->appendChild(prot_element);
   //LOG_DEBUG("protein view completed");
 
@@ -159,7 +161,7 @@ xercesc::DOMElement* genePrsmView(XmlDOMDocument* xml_doc,PrsmPtr prsm_ptr, Prsm
 
 xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
                                      PrsmPtr prsm_ptr,
-                                     PrsmViewMngPtr mng_ptr) {
+                                     PrsmViewMngPtr mng_ptr, double err) {
   xercesc::DOMElement* prot_element = xml_doc->createElement("annotated_protein");
   ProteoformPtr proteoform_ptr = prsm_ptr->getProteoformPtr();
   std::string str=convertToString(proteoform_ptr->getSeqId());
@@ -236,6 +238,9 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
   int unexpected_shift_color = 0;
   int last_right = -1;
   for (size_t i = 0; i < change_ptrs.size(); i++) {
+    // if the mass is less than 1 Da
+    if (std::abs(change_ptrs[i]->getMassShift()) <= 1 + err)
+        continue;
     // add information for known changes 
     int left_db_bp = change_ptrs[i]->getLeftBpPos() + start_pos;
     int right_db_bp = change_ptrs[i]->getRightBpPos() + start_pos;
@@ -253,7 +258,6 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
       existing_ptr->addOccurence(left_db_bp, acid_letter);
     }
     else {
-      //LOG_DEBUG("left bp " << left_bp << " right bp " << right_bp << " protein len " << prot_len << " res size " << res_ptrs.size() << " cleavage size " << cleavage_ptrs.size());
       if (left_db_bp == right_db_bp) {
         int this_left = left_db_bp * 2;
         if (this_left > last_right + 1) {
@@ -262,9 +266,25 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
         }
         int this_right = right_db_bp * 2;
         AnnoUnexpectedChangePtr anno_change_ptr(new AnnoUnexpectedChange(this_left , this_right, shift, unexpected_shift_color, "SHIFT"));
+        anno_change_ptr->setPtmPtr(change_ptrs[i]->getPtmPtr());
+        std::string anno_info = "PTM: ";
+        if (change_ptrs[i]->getPtmPtr() == nullptr) {
+            anno_info += "Unknown";
+        } else {
+            anno_info += change_ptrs[i]->getPtmPtr()->getName();
+        }
+
+        for (int k = left_db_bp; k <= right_db_bp; k++) {
+            std::string acid_letter = proteoform_ptr->getDbResSeqPtr()
+                                      ->getResiduePtr(k)->getAcidPtr()->getOneLetter();
+            anno_change_ptr->addOccurence(k, acid_letter);
+            res_ptrs[k]->setPossiblePosColor(1);
+            res_ptrs[k]->setAnno(anno_info);
+        }
+
+
         unexpected_change_ptrs.push_back(anno_change_ptr);
         last_right = this_right;
-        
         cleavage_ptrs[left_db_bp]->setUnexpectedChange(true);
         cleavage_ptrs[left_db_bp]->setUnexpectedChangeColor(unexpected_shift_color);;
       }
@@ -276,6 +296,53 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
         }
         int this_right = right_db_bp * 2 - 1;
         AnnoUnexpectedChangePtr anno_change_ptr(new AnnoUnexpectedChange(this_left, this_right, shift, unexpected_shift_color, "SHIFT"));
+
+        anno_change_ptr->setPtmPtr(change_ptrs[i]->getPtmPtr());
+        std::string anno_info = "PTM: ";
+        if (change_ptrs[i]->getPtmPtr() != nullptr) {
+            anno_info += change_ptrs[i]->getPtmPtr()->getName() + "\n";
+            std::vector<double> scr = change_ptrs[i]->getScr();
+            for (int k = left_db_bp; k < right_db_bp; k++) {
+                if (scr[k - left_db_bp] > 0) {
+                    std::string acid_letter = proteoform_ptr->getDbResSeqPtr()
+                        ->getResiduePtr(k)->getAcidPtr()->getOneLetter();
+                    anno_info += "Site: " + acid_letter + std::to_string(k) + " ";
+                    anno_info += "Confidence: "
+                        + convertToString(scr[k - left_db_bp] * 100, 2) + "%\n";
+                }
+            }
+            for (int k = left_db_bp; k < right_db_bp; k++) {
+                if (scr[k - left_db_bp] > 0) {
+                    std::string acid_letter = proteoform_ptr->getDbResSeqPtr()
+                        ->getResiduePtr(k)->getAcidPtr()->getOneLetter();
+                    anno_change_ptr->addOccurence(k, acid_letter);
+                    res_ptrs[k]->setPossiblePosColor(1);
+                    res_ptrs[k]->setAnno(anno_info);
+                }
+            }
+        } else {
+            anno_info += "Unknown\n";
+            std::string acid_letter = proteoform_ptr->getDbResSeqPtr()
+                ->getResiduePtr(left_db_bp)->getAcidPtr()->getOneLetter();
+            anno_change_ptr->addOccurence(left_db_bp, acid_letter);
+            anno_info += "Region: " + acid_letter + std::to_string(left_db_bp) + " - ";
+            acid_letter = proteoform_ptr->getDbResSeqPtr()->getResiduePtr(
+                    right_db_bp - 1)->getAcidPtr()->getOneLetter();
+            anno_info += acid_letter + std::to_string(right_db_bp - 1);
+            anno_change_ptr->addOccurence(right_db_bp - 1, acid_letter);
+            double scr_sum = 0.0;
+            std::vector<double> scr = change_ptrs[i]->getScr();
+            for (int k = left_db_bp; k < right_db_bp; k++) {
+                scr_sum += scr[k - left_db_bp];
+            }
+            anno_info += " Confindence: " + convertToString(scr_sum * 100, 2) + "%\n";
+            for (int k = left_db_bp; k < right_db_bp; k++) {
+                res_ptrs[k]->setPossiblePosColor(1);
+                res_ptrs[k]->setAnno(anno_info);
+            }
+
+        }
+
         unexpected_change_ptrs.push_back(anno_change_ptr);
         last_right = this_right;
 
@@ -422,6 +489,91 @@ xercesc::DOMElement* allProteinToXml(XmlDOMDocument* xml_doc,
     }
   }
   return prot_elements;
+}
+
+std::vector<xercesc::DOMElement*> modificationToXml(XmlDOMDocument* xml_doc,
+        PrsmPtrVec & prsm_ptrs, const PrsmViewMngPtr & mng_ptr) {
+    double ppo = mng_ptr->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
+    xercesc::DOMElement* mod_element;
+    std::set<std::string> mod_set;
+
+    for (size_t i = 0; i < prsm_ptrs.size(); i++) {
+        double err = ppo * prsm_ptrs[i]->getOriPrecMass();
+        ChangePtrVec change_vec = prsm_ptrs[i]->getProteoformPtr()->getUnexpectedChangePtrVec(err);
+        for (size_t j = 0; j < change_vec.size(); j++) {
+            if (change_vec[j]->getPtmPtr() != nullptr)
+                mod_set.insert(change_vec[j]->getPtmPtr()->getName());
+        }
+    }
+
+    std::vector<xercesc::DOMElement *> xml_vec;
+
+    for (std::set<std::string>::iterator iter = mod_set.begin(); iter != mod_set.end(); iter++) {
+        PrsmPtrVec select_prsm_ptrs;
+        std::for_each(prsm_ptrs.begin(), prsm_ptrs.end(),
+        [iter, &select_prsm_ptrs, ppo](PrsmPtr p) {
+            double err = ppo * p->getOriPrecMass();
+            ChangePtrVec change_vec = p->getProteoformPtr()->getUnexpectedChangePtrVec(err);
+            for (size_t i = 0; i < change_vec.size(); i++) {
+                if (change_vec[i]->getPtmPtr() != nullptr) {
+                    if (change_vec[i]->getPtmPtr()->getName() == *iter) {
+                        select_prsm_ptrs.push_back(p);
+                        break;
+                    }
+                }
+            }
+
+        });
+
+        mod_element = xml_doc->createElement("modification");
+        xml_doc->addElement(mod_element, "modification_name", (*iter).c_str());
+        std::sort(select_prsm_ptrs.begin(),select_prsm_ptrs.end(),prsmEValueUp);
+        mod_element->appendChild(proteoformToXml(xml_doc,select_prsm_ptrs, mng_ptr));
+
+        xml_vec.push_back(mod_element);
+    }
+    return xml_vec;
+}
+
+xercesc::DOMElement* allModificationToXml(XmlDOMDocument* xml_doc,
+        PrsmPtrVec & prsm_ptrs, const PrsmViewMngPtr & mng_ptr) {
+
+    double ppo = mng_ptr->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
+    xercesc::DOMElement* mod_elements = xml_doc->createElement("modifications");
+
+    std::sort(prsm_ptrs.begin(), prsm_ptrs.end(),
+    [](const PrsmPtr & lhs, const PrsmPtr & rhs) {
+        return lhs->getProteoformPtr()->getDbResSeqPtr()->getId() < rhs->getProteoformPtr()->getDbResSeqPtr()->getId();
+    });
+
+    int prot_id = prsm_ptrs[0]->getProteoformPtr()->getDbResSeqPtr()->getId();
+
+    PrsmPtrVec prsm_mod;
+    std::vector<xercesc::DOMElement*> mods;
+    for (size_t i = 0; i< prsm_ptrs.size(); i++) {
+
+        double err = ppo * prsm_ptrs[i]->getOriPrecMass();
+        if (prsm_ptrs[i]->getProteoformPtr()->getDbResSeqPtr()->getId() == prot_id) {
+            if (prsm_ptrs[i]->getProteoformPtr()->getUnexpectedChangeNum(err) > 0)
+                prsm_mod.push_back(prsm_ptrs[i]);
+        } else {
+            mods.clear();
+            mods = modificationToXml(xml_doc, prsm_mod, mng_ptr);
+            for (size_t i = 0; i < mods.size(); i++) {
+                mod_elements->appendChild(mods[i]);
+            }
+            prsm_mod.clear();
+            prsm_mod.push_back(prsm_ptrs[i]);
+            prot_id = prsm_ptrs[i]->getProteoformPtr()->getDbResSeqPtr()->getId();
+        }
+    }
+
+    mods = modificationToXml(xml_doc, prsm_mod, mng_ptr);
+
+    for (size_t i = 0; i < mods.size(); i++) {
+        mod_elements->appendChild(mods[i]);
+    }
+    return mod_elements;
 }
 
 }

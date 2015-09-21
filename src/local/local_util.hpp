@@ -24,6 +24,9 @@ void getSupPeakNum(const PrsmPtr & prsm, const ChangePtr & change,
 bool modifiable(const ProteoformPtr& proteoform_ptr, int i,
                 const PtmPtr& ptm_ptr, bool cysteine_protected);
 
+bool modifiable(const ProteoformPtr& proteoform_ptr, int i, int j,
+                const PtmPtr& ptm_ptr, bool cysteine_protected);
+
 template<typename T>
 std::vector<double> normalize(const std::vector<T>& scr,
                               typename std::enable_if<std::is_arithmetic<T>::value>::type* = 0) {
