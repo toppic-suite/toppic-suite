@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 <amino_acid_list>
 <amino_acid>
+	<name>None</name>
+	<one_letter>X</one_letter>
+	<three_letter>Xxx</three_letter>
+	<composition></composition>
+	<mono_mass>0.0</mono_mass>
+	<average_mass>0.0</average_mass>
+	<frequency>0.0</frequency>
++</amino_acid>
+<amino_acid>
 	<name>Alanine</name>
 	<one_letter>A</one_letter>
 	<three_letter>Ala</three_letter>

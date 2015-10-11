@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?> 
+<ptm_select>
+<abbreviation>No PTM</abbreviation>
+<abbreviation>Phospho</abbreviation>
+<abbreviation>Acetylation</abbreviation>
+<abbreviation>tri-Me</abbreviation>
+<abbreviation>di-Me</abbreviation>
+<abbreviation>Me</abbreviation>
+<abbreviation>Carbamidomethylation</abbreviation>
+<abbreviation>Carboxymethyl</abbreviation>
+</ptm_select>
