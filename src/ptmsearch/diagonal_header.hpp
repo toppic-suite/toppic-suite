@@ -23,17 +23,17 @@ class DiagonalHeader {
 
   DiagonalHeaderPtr clone();
 
-  void initData(double c_shift,ProteoformPtr proteoform, 
-                double align_pref_suff_shift_thresh);
+  void initHeader(double c_shift,ProteoformPtr proteoform, 
+          double align_pref_suff_shift_thresh);
 
   void changeOnlyNTermShift(double s){
-    prot_N_term_shift_ +=s;
-    pep_N_term_shift_+=s;
+      prot_N_term_shift_ +=s;
+      pep_N_term_shift_+=s;
   }
 
   void changeOnlyCTermShift(double s){
-    prot_C_term_shift_ +=s;
-    pep_C_term_shift_+=s;
+      prot_C_term_shift_ +=s;
+      pep_C_term_shift_+=s;
   }
 
   int getTruncFirstResPos() {return trunc_first_res_pos_;}
@@ -53,35 +53,35 @@ class DiagonalHeader {
   int getTruncLastResPos() {return trunc_last_res_pos_;}
 
   void setPepCTermShift(double pepCTermShift) {
-    pep_C_term_shift_ = pepCTermShift;
+      pep_C_term_shift_ = pepCTermShift;
   }
 
   void setPepNTermShift(double pepNTermShift) {
-    pep_N_term_shift_ = pepNTermShift;
+      pep_N_term_shift_ = pepNTermShift;
   }
 
   void setProtCTermShift(double protCTermShift) {
-    prot_C_term_shift_ = protCTermShift;
+      prot_C_term_shift_ = protCTermShift;
   }
 
   void setProtNTermShift(double protNTermShift) {
-    prot_N_term_shift_ = protNTermShift;
+      prot_N_term_shift_ = protNTermShift;
   }
 
   void setTruncFirstResPos(int truncFirstResPos) {
-    trunc_first_res_pos_ = truncFirstResPos;
+      trunc_first_res_pos_ = truncFirstResPos;
   }
 
   void setTruncLastResPos(int truncLastResPos) {
-    trunc_last_res_pos_ = truncLastResPos;
+      trunc_last_res_pos_ = truncLastResPos;
   }
 
   void setMatchFirstBpPos(int match_first_bp_pos) {
-    match_first_bp_pos_ = match_first_bp_pos;
+      match_first_bp_pos_ = match_first_bp_pos;
   }
 
   void setMatchLastBpPos(int match_last_bp_pos) {
-    match_last_bp_pos_ = match_last_bp_pos;
+      match_last_bp_pos_ = match_last_bp_pos;
   }
 
   bool isNStrict(){return n_strict_;}
@@ -133,8 +133,11 @@ class DiagonalHeader {
 // generate (clone) a new diagonal header with new bgn and end
 DiagonalHeaderPtr geneDiagonalHeaderPtr(int bgn, int end, DiagonalHeaderPtr diag_ptr);
 
-ChangePtrVec getUnexpectedChanges(const DiagonalHeaderPtrVec &diag_ptrs,
-                                  int first_res_pos,int last_res_pos);
+ChangePtrVec getDiagonalMassChanges(const DiagonalHeaderPtrVec &diag_ptrs,
+        int first_res_pos,int last_res_pos, int change_type);
+
+ChangePtrVec getDiagonalMassChanges(const DiagonalHeaderPtrVec &header_ptrs, 
+        int first_res_pos, int last_res_pos, std::vector<int> &change_types);
 
 } /* namespace prot */
 

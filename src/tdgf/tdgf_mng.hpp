@@ -8,7 +8,8 @@ namespace prot {
 class TdgfMng {
  public:
   TdgfMng(PrsmParaPtr prsm_para_ptr, int shift_num, double max_ptm_mass, bool use_gf, 
-          const std::string &input_file_ext, const std::string &output_file_ext);
+          bool variable_ptm, const std::string &input_file_ext, 
+          const std::string &output_file_ext);
 
   /*********************************
    * Common parameters
@@ -22,6 +23,8 @@ class TdgfMng {
   int comp_evalue_min_match_frag_num_ = 4;
 
   bool use_gf_ = false;
+
+  bool variable_ptm_ = false;
 
   /**********************************
    * Tdgf Table parameters 
@@ -51,12 +54,14 @@ class TdgfMng {
 
 inline TdgfMng::TdgfMng(PrsmParaPtr prsm_para_ptr, 
                         int shift_num, double max_ptm_mass, bool use_gf,
+                        bool variable_ptm,
                         const std::string &input_file_ext, 
                         const std::string &output_file_ext) {
   prsm_para_ptr_ = prsm_para_ptr,
   max_ptm_mass_ = max_ptm_mass;
   unexpected_shift_num_ = shift_num;
   use_gf_ = use_gf;
+  variable_ptm_ = variable_ptm;
   input_file_ext_ = input_file_ext;
   output_file_ext_ = output_file_ext;
 }

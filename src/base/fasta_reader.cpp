@@ -61,7 +61,8 @@ FastaSeqPtr FastaReader::getNextSeq() {
 
   /* get the letters of sequence */
   std::string ori_seq;
-  std::string prot_name = ori_name_.substr(1, ori_name_.size() -1 );
+  ori_name_ = trim(ori_name_);
+  std::string prot_name = ori_name_.substr(1, ori_name_.size() - 1);
   std::string line;
   while (std::getline(input_, line)) {
     if (line.length() >= 1 && line.substr(0, 1) == ">") {
@@ -141,7 +142,17 @@ ProteoformPtr readFastaToProteoform(faidx_t *fai,
   return getDbProteoformPtr(db_residue_seq_ptr);
 }
 
-
+std::string readFastaByIndex(faidx_t *fai, int id, std::string seq_name) {
+    int seq_len;
+    char *seq = fai_fetch(fai, seq_name.c_str(), &seq_len);
+    if ( seq_len < 0 ) {
+        LOG_ERROR("Failed to fetch sequence " << seq_name);
+    }
+    std::string raw_seq_str(seq);
+    free(seq);
+    std::string seq_str = rmChar(raw_seq_str);
+    return seq_str;
+}
 
 /** initialize sequence list */
 void generateShuffleDb(const std::string &file_name, 
@@ -228,25 +239,25 @@ void generateDbBlock(const std::string &db_file_name,
   
 
 void dbPreprocess(const std::string &ori_db_file_name, 
-                  const std::string &db_file_name, 
-                  bool decoy, int block_size) {
+        const std::string &db_file_name, 
+        bool decoy, int block_size) {
 
-  std::string standard_db_file_name = ori_db_file_name + "_standard";
-  generateStandardDb(ori_db_file_name, standard_db_file_name);
-  
-  if (decoy) {
-    generateShuffleDb(standard_db_file_name, db_file_name);
-  }
-  else {
-    boost::filesystem::path ori_path(standard_db_file_name);
-    boost::filesystem::path db_path(db_file_name);
-    boost::filesystem::copy_file(ori_path, db_path, 
-                                 boost::filesystem::copy_option::overwrite_if_exists);
-  }
+    std::string standard_db_file_name = ori_db_file_name + "_standard";
+    generateStandardDb(ori_db_file_name, standard_db_file_name);
 
-  generateDbBlock(db_file_name, block_size);
+    if (decoy) {
+        generateShuffleDb(standard_db_file_name, db_file_name);
+    }
+    else {
+        boost::filesystem::path ori_path(standard_db_file_name);
+        boost::filesystem::path db_path(db_file_name);
+        boost::filesystem::copy_file(ori_path, db_path, 
+                boost::filesystem::copy_option::overwrite_if_exists);
+    }
 
-  fai_build(db_file_name.c_str());
+    generateDbBlock(db_file_name, block_size);
+
+    fai_build(db_file_name.c_str());
 }
 
 }

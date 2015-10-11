@@ -39,65 +39,41 @@ file(GLOB ZERO_PTM_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/zeroptmsearch/*.cpp)
 file(GLOB DIAG_FILTER_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/diagfilter/*.cpp)
 file(GLOB ONE_PTM_FILTER_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/oneptmfilter/*.cpp)
 file(GLOB PTM_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/ptmsearch/*.cpp)
-file(GLOB LOCAL_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/local/*.cpp) 
+#file(GLOB POISSON_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/poisson/*.cpp)
 file(GLOB TDGF_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/tdgf/*.cpp)
 file(GLOB PRSM_VIEW_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/prsmview/*.cpp)
 file(GLOB ARGU_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/argument.cpp)
-file(GLOB MAIN_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic.cpp) 
+#file(GLOB MAIN_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic.cpp) 
 file(GLOB SUMMARY_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/summary.cpp) 
+file(GLOB GRAPH_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/graph/*.cpp)
+file(GLOB GRAPH_ALIGN_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/graph_align/*.cpp)
 file(GLOB TEST_ZERO_PTM_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_zero_ptm.cpp) 
 file(GLOB TEST_DIAG_FILTER_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_diag_filter.cpp) 
 file(GLOB TEST_PTM_SEARCH_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_ptm_search.cpp) 
 file(GLOB TEST_EVALUE_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_evalue.cpp) 
 file(GLOB TEST_PRSM_VIEW_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_prsm_view.cpp) 
+file(GLOB TEST_GRAPH_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_graph_align.cpp) 
 
-add_executable(toppic ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
-    ${ZERO_PTM_SRCS} ${DIAG_FILTER_SRCS} ${ONE_PTM_FILTER_SRCS} ${PTM_SRCS} ${LOCAL_SRCS}
-	${TDGF_SRCS} ${PRSM_VIEW_SRCS} ${ARGU_SRCS} ${MAIN_SRCS} ${SUMMARY_SRCS})
+#add_executable(toppic ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
+#        ${ZERO_PTM_SRCS} ${DIAG_FILTER_SRCS} ${ONE_PTM_FILTER_SRCS} ${PTM_SRCS} #${POISSON_SRCS}
+#	${TDGF_SRCS} ${PRSM_VIEW_SRCS} ${ARGU_SRCS} ${MAIN_SRCS} ${SUMMARY_SRCS})
+
+add_executable(test_graph ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
+    ${ZERO_PTM_SRCS} ${DIAG_FILTER_SRCS} ${ONE_PTM_FILTER_SRCS} ${PTM_SRCS} ${POISSON_SRCS}
+    ${GRAPH_SRCS} ${GRAPH_ALIGN_SRCS} ${TDGF_SRCS} ${PRSM_VIEW_SRCS} ${ARGU_SRCS} ${TEST_GRAPH_SRCS})
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-  # Windows specific code
-  link_directories(${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/windows_lib/)  
-  target_link_libraries(toppic xalan-c xalanMsg xerces-c
-          boost_filesystem-mgw48-s-1_56 boost_system-mgw48-s-1_56
-          boost_program_options-mgw48-s-1_56 boost_date_time-mgw48-s-1_56 hts pthread z Ws2_32)
+    # Windows specific code
+    target_link_libraries(toppic xalan-c xalanMsg xerces-c
+        boost_filesystem-mgw48-s-1_56 boost_system-mgw48-s-1_56
+        boost_program_options-mgw48-s-1_56 boost_date_time-mgw48-s-1_56 hts pthread z Ws2_32)
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows") 
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-  # Linux specific code
+    # Linux specific code
 
-  target_link_libraries(toppic xalan-c xalanMsg xerces-c boost_program_options
-    boost_filesystem boost_system boost_date_time hts pthread z)
+    target_link_libraries(test_graph xalan-c xalanMsg xerces-c boost_program_options
+        boost_filesystem boost_system boost_date_time hts pthread z)
 
-  #add_executable(test_zero_ptm ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
-  #        ${ZERO_PTM_SRCS} ${ARGU_SRCS} ${TEST_ZERO_PTM_SRCS})
-  #target_link_libraries(test_zero_ptm xalan-c xalanMsg xerces-c boost_program_options boost_filesystem boost_system hts pthread z)
-
-  #add_executable(test_diag_filter ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
-  #        ${DIAG_FILTER_SRCS} ${ARGU_SRCS} ${TEST_DIAG_FILTER_SRCS})
-  #target_link_libraries(test_diag_filter xalan-c xalanMsg xerces-c boost_program_options boost_filesystem boost_system hts pthread z)
-
-  #add_executable(test_ptm_search ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
-  #        ${ZERO_PTM_SRCS} ${DIAG_FILTER_SRCS} ${ONE_PTM_FILTER_SRCS}
-  #        ${PTM_SRCS} ${ARGU_SRCS} ${TEST_PTM_SEARCH_SRCS})
-  #target_link_libraries(test_ptm_search xalan-c xalanMsg xerces-c boost_program_options boost_filesystem boost_system hts pthread z)
-
-  #add_executable(test_evalue ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
-  #        ${ZERO_PTM_SRCS} ${DIAG_FILTER_SRCS} ${ONE_PTM_FILTER_SRCS} ${PTM_SRCS}  
-  #        ${TDGF_SRCS} ${ARGU_SRCS} ${TEST_EVALUE_SRCS})
-  #target_link_libraries(test_evalue xalan-c xalanMsg xerces-c boost_program_options boost_filesystem boost_system hts pthread z)
-
-  #add_executable(test_prsm_view ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
-  #        ${ZERO_PTM_SRCS} ${DIAG_FILTER_SRCS} ${ONE_PTM_FILTER_SRCS} ${PTM_SRCS}  
-  #        ${TDGF_SRCS} ${PRSM_VIEW_SRCS} ${ARGU_SRCS} ${TEST_PRSM_VIEW_SRCS})
-  #target_link_libraries(test_prsm_view xalan-c xalanMsg xerces-c boost_program_options boost_filesystem boost_system hts pthread z)
-
-  #  add_executable(test_multiple ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
-  #        ${ZERO_PTM_SRCS} ${FILTER_SRCS} ${PTM_SRCS} ${POISSON_SRCS} 
-  #        ${TDGF_SRCS} ${XPP_SRCS} ${ARGU_SRCS} ${MULTIPLE_SRCS})
-  #  add_executable(test_evalue ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
-  #        ${ZERO_PTM_SRCS} ${FILTER_SRCS} ${PTM_SRCS} ${POISSON_SRCS} 
-  #        ${TDGF_SRCS} ${XPP_SRCS} ${ARGU_SRCS} ${TEST_EVALUE_SRCS})
-  #  target_link_libraries(test_multiple xalan-c xalanMsg xerces-c boost_program_options boost_filesystem boost_system pthread)
-  #  target_link_libraries(test_evalue xalan-c xalanMsg xerces-c boost_program_options boost_filesystem boost_system pthread)
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
+

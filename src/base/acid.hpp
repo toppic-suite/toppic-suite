@@ -37,6 +37,9 @@ class Acid {
   /* Get amino acid three letter representation. */
   std::string getThreeLetter() {return three_letter_;}
 
+  /* Is it an empty PTM*/
+  bool isEmpty();
+
   void appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
  private:
@@ -106,6 +109,8 @@ class AcidFactory {
   static AcidPtrVec convertSeqToAcidSeq(const std::string &seq);
 
   static double getPeptideMass(const std::string &seq);
+
+  static AcidPtr findEmptyAcidPtr();
 
  private:
   static AcidPtrVec acid_ptr_vec_;

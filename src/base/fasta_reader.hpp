@@ -62,6 +62,8 @@ class FastaReader {
   int seq_id_ = 0;
 };
 
+typedef std::shared_ptr<FastaReader> FastaReaderPtr;
+
 /* remove incorrect charaters in sequence */
 std::string rmChar(const std::string &ori_seq);
 
@@ -87,6 +89,8 @@ ProteoformPtr readFastaToProteoform(faidx_t *fai,
                                     const std::string &seq_desc,
                                     const ResiduePtrVec &residue_list);
 
-}
+std::string readFastaByIndex(faidx_t *fai, int id, std::string seq_name);
+
+}  //namepace prot
 
 #endif

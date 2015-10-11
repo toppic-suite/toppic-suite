@@ -23,6 +23,13 @@ Acid::Acid (const std::string &name, const std::string &one_letter,
   avg_mass_ = avg_mass;
 }
 
+bool Acid::isEmpty() {
+    if (mono_mass_ == 0.0)
+        return true;
+    else 
+        return false;
+}
+
 void Acid::appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
   xercesc::DOMElement* element = xml_doc->createElement("amino_acid");
   xml_doc->addElement(element, "name", name_.c_str());
@@ -148,6 +155,15 @@ double AcidFactory::getPeptideMass(const std::string &seq) {
         }
     }
     return mass;
+}
+
+AcidPtr AcidFactory::findEmptyAcidPtr() {
+    for (size_t i = 0; i < acid_ptr_vec_.size(); i++) {
+        if (acid_ptr_vec_[i]->isEmpty()) {
+            return acid_ptr_vec_[i];
+        }
+    }
+    throw "Empty acid does not exist!";
 }
 
 } /* end namespace */

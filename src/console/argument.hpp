@@ -31,8 +31,6 @@ class Argument {
   std::map<std::string,std::string> arguments_;
 };
 
-bool testFile(std::string filename);
-
-}
+}  // namespace prot
 
 #endif /* ARGUMENT_HPP_ */

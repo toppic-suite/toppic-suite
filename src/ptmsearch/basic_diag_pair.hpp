@@ -25,7 +25,7 @@ class BasicDiagPair:public Pair {
 
   int getDiagOrder() {return diag_order_;}
 
-  const BasicDiagonalWeakPtr getDiagonalPtr() {return diagonal_ptr_;}
+  const BasicDiagonalWeakPtr geneDiagonalPtr() {return diagonal_ptr_;}
 
   void setDiagonalPtr(BasicDiagonalPtr diagonal_ptr) {diagonal_ptr_ = diagonal_ptr;}
 
@@ -41,10 +41,9 @@ class BasicDiagPair:public Pair {
 };
 
 
-BasicDiagonalPtrVec getDiagonals(const DiagonalHeaderPtrVec& header_ptr_vec,
+BasicDiagonalPtrVec geneDiagonals(const DiagonalHeaderPtrVec& header_ptr_vec,
                                  const PrmPeakPtrVec &prm_peaks, 
-                                 double prec_mono_mass, int group_spec_num,
-                                 ProteoformPtr proteo_ptr, PtmMngPtr mng_ptr);
+                                 int group_spec_num, ProteoformPtr proteo_ptr);
 /*
 BasicDiagPairPtrVec compDiagPair(const PrmMsPtrVec &ms_ptr_vec, 
                                  const std::vector<double>& seq_masses,

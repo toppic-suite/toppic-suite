@@ -20,7 +20,7 @@ class CountTestNum {
 
   ~CountTestNum();
 
-  double compCandNum(SemiAlignTypePtr type_ptr, int shift_num, 
+  double compCandNum(SemiAlignTypePtr type_ptr, int index, 
                      double ori_mass, double ori_tolerance);
 
   ResFreqPtrVec getResFreqPtrVec() {return residue_ptrs_;}
@@ -59,9 +59,9 @@ class CountTestNum {
   void initSuffMassCnt(const ProteoformPtrVec &raw_forms);
   void initInternalMassCnt();
 
-  double compNonPtmCandNum(SemiAlignTypePtr type_ptr, int shift_num, 
+  double compNonPtmCandNum(SemiAlignTypePtr type_ptr, 
                            double ori_mass, double ori_tolerance);
-  double compPtmCandNum (SemiAlignTypePtr type_ptr, int shift_num, double ori_mass);
+  double compPtmCandNum (SemiAlignTypePtr type_ptr, double ori_mass);
   double compPtmRestrictCandNum (SemiAlignTypePtr type_ptr, int shift_num, double ori_mass);
   double compSeqNum(SemiAlignTypePtr type_ptr, int low, int high);
   double compMassNum(double *cnts, int low, int high);

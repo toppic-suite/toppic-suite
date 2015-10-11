@@ -235,52 +235,49 @@ inline void CountTestNum::initInternalMassCnt() {
   }
 }
 
-double CountTestNum::compCandNum(SemiAlignTypePtr type_ptr, int shift_num, double ori_mass, 
-                                 double ori_tolerance) {
-  double cand_num = 0;
-  if (shift_num == 0) {
-    cand_num = compNonPtmCandNum(type_ptr, shift_num, ori_mass, ori_tolerance);
-  }
-  // with shifts 
-  else if (shift_num >= 1){
-    if (max_ptm_mass_ >=10000) {
-      // max shift mass is larger than 10k, we treat it as no limitation 
-      cand_num = compPtmCandNum(type_ptr, shift_num, ori_mass);
+double CountTestNum::compCandNum(SemiAlignTypePtr type_ptr, int index, 
+                                 double ori_mass, double ori_tolerance) {
+    double cand_num = 0;
+    if (index == 0) {
+        cand_num = compNonPtmCandNum(type_ptr, ori_mass, ori_tolerance);
+    } else if (index >= 1){ // with shifts
+        if (max_ptm_mass_ >=10000) {
+            // max shift mass is larger than 10k, we treat it as no limitation 
+            cand_num = compPtmCandNum(type_ptr, ori_mass);
+        }
+        else {
+            cand_num = compPtmRestrictCandNum(type_ptr, index, ori_mass);
+        }
+        // multiple adjustment 
+        if (type_ptr == SemiAlignTypeFactory::getPrefixPtr() 
+                || type_ptr == SemiAlignTypeFactory::getSuffixPtr()) {
+            cand_num = cand_num * PREFIX_SUFFIX_ADJUST();
+        }
+        else if (type_ptr == SemiAlignTypeFactory::getInternalPtr()) {
+            cand_num = cand_num * INTERNAL_ADJUST();
+        }
     }
-    else {
-      cand_num = compPtmRestrictCandNum(type_ptr, shift_num, ori_mass);
-    }
-    // multiple adjustment 
-    if (type_ptr == SemiAlignTypeFactory::getPrefixPtr() 
-        || type_ptr == SemiAlignTypeFactory::getSuffixPtr()) {
-      cand_num = cand_num * PREFIX_SUFFIX_ADJUST();
-    }
-    else if (type_ptr == SemiAlignTypeFactory::getInternalPtr()) {
-      cand_num = cand_num * INTERNAL_ADJUST();
-    }
-  }
 
-  if (cand_num == 0.0) {
-    LOG_WARN("candidate number is ZERO");
-  }
-  return cand_num;
+    if (cand_num == 0.0) {
+        LOG_WARN("candidate number is ZERO");
+    }
+    return cand_num;
 }
 
-double CountTestNum::compNonPtmCandNum(SemiAlignTypePtr type_ptr, int shift_num, 
+double CountTestNum::compNonPtmCandNum(SemiAlignTypePtr type_ptr, 
                                        double ori_mass, double ori_tolerance) {
   int low = std::floor((ori_mass - ori_tolerance) * convert_ratio_);
   int high = std::ceil((ori_mass + ori_tolerance) * convert_ratio_);
   double cand_num = compSeqNum(type_ptr, low, high);
   
   //if (type_ptr == SemiAlignTypeFactory::getCompletePtr()) {
-    LOG_DEBUG("low " << low << " high " << high << " cand num " << cand_num);
+  LOG_DEBUG("low " << low << " high " << high << " cand num " << cand_num);
   //}
   
   return cand_num;
 }
 
-double CountTestNum::compPtmCandNum (SemiAlignTypePtr type_ptr, 
-                                     int shift_num, double ori_mass) {
+double CountTestNum::compPtmCandNum (SemiAlignTypePtr type_ptr, double ori_mass) {
   double cand_num = 0;
   if (type_ptr == SemiAlignTypeFactory::getCompletePtr()) {
     cand_num = mod_proteo_lens_.size();

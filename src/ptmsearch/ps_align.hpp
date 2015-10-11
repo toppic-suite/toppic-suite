@@ -1,6 +1,8 @@
 #ifndef PROT_PS_ALIGN_HPP_
 #define PROT_PS_ALIGN_HPP_
 
+#include "prsm/prsm.hpp"
+#include "ptmsearch/ptm_align_mng.hpp"
 #include "ptmsearch/dp_pair.hpp"
 #include "ptmsearch/basic_diag_pair.hpp"
 
@@ -12,7 +14,7 @@ class PSAlign {
   PSAlign(const std::vector<double> &ms_masses,
           const std::vector<double> &seq_masses,
           const BasicDiagonalPtrVec &diagonal_ptrs,
-          PtmMngPtr mng_ptr);
+          PtmAlignMngPtr mng_ptr);
   void compute(SemiAlignTypePtr align_type_ptr);
   void initDPPair();
   void dp(SemiAlignTypePtr align_type_ptr);
@@ -20,10 +22,13 @@ class PSAlign {
   DiagonalHeaderPtrVec backtrace(int s);
 
   double getAlignScr(int s){return align_scores_[s];};
-  DiagonalHeaderPtrVec getResult(int s){return backtrack_diagonal_ptrs_[s];};
+  DiagonalHeaderPtrVec getDiagonalHeaders(int s){return backtrack_diagonal_ptrs_[s];};
+
+  PrsmPtr geneResult(int shift_num, ProteoformPtr proteo_ptr, DeconvMsPtrVec &deconv_ms_ptr_vec,
+          ExtendMsPtrVec &ms_three_ptr_vec, PrsmParaPtr prsm_para_ptr);
 
  protected:
-  PtmMngPtr mng_;
+  PtmAlignMngPtr mng_ptr_;;
   std::vector<double> ms_masses_;
   std::vector<double> seq_masses_;
   BasicDiagonalPtrVec diagonal_ptrs_;

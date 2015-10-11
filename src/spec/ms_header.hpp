@@ -17,6 +17,8 @@ class MsHeader {
 
   double getPrecMonoMassMinusWater();
 
+  std::pair<int,int> getPrecMonoMassMinusWaterError(double scale);
+
   std::string getScansString();
 
   void setScans(const std::string &s);

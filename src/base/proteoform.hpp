@@ -98,6 +98,8 @@ class Proteoform {
 
     void addUnexpectedChangePtrVec(const ChangePtrVec &changes);
 
+    void addChangePtrVec(const ChangePtrVec &changes);
+
     void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
     bool isAcety();

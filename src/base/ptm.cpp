@@ -15,6 +15,8 @@ namespace prot {
 
 PtmPtrVec PtmFactory::ptm_ptr_vec_;
 PtmPairVec PtmFactory::ptm_pair_vec_;
+PtmPtrVec PtmFactory::ptm_select_vec_;
+std::vector<std::string> PtmFactory::ptm_select_;
 
 Ptm::Ptm(const std::string &abbr_name, double mono_mass):
     abbr_name_(abbr_name), mono_mass_(mono_mass) {
@@ -36,6 +38,26 @@ void Ptm::appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent) {
     str = convertToString(unimod_id_);
     xml_doc->addElement(element, "unimod", str.c_str());
     parent->appendChild(element);
+}
+
+void PtmFactory::selectPtm(const std::string & file_name) {
+    XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
+    if (parser) {
+        XmlDOMDocument doc(parser, file_name.c_str());
+        xercesc::DOMElement* parent = doc.getDocumentElement();
+        int num = getChildCount(parent, "abbreviation");
+        for (int i = 0; i < num; i++) {
+            std::string name = getChildValue(parent, "abbreviation", i);
+            ptm_select_.push_back(name);
+        }
+    }
+
+    for (size_t i = 0; i < ptm_ptr_vec_.size(); i++) {
+        if (std::find(ptm_select_.begin(), ptm_select_.end(),
+                    ptm_ptr_vec_[i]->getAbbrName()) != ptm_select_.end()) {
+            ptm_select_vec_.push_back(ptm_ptr_vec_[i]);
+        }
+    }
 }
 
 void PtmFactory::initFactory(const std::string &file_name) {
@@ -65,7 +87,7 @@ void PtmFactory::initFactory(const std::string &file_name) {
                 }
             }
             ptm_ptr_vec_.push_back(
-                PtmPtr(new Ptm(name, abbr_name, mono_mass, posN, posC, pos, id)));
+                    PtmPtr(new Ptm(name, abbr_name, mono_mass, posN, posC, pos, id)));
 
         }
     }
@@ -74,12 +96,12 @@ void PtmFactory::initFactory(const std::string &file_name) {
 
     for (size_t i = 1; i < ptm_ptr_vec_.size(); i++) {
         if (ptm_ptr_vec_[i]->getName() == "Carbamidomethylation" 
-            || ptm_ptr_vec_[i]->getName() == "Carboxymethyl"
+                || ptm_ptr_vec_[i]->getName() == "Carboxymethyl"
                 || ptm_ptr_vec_[i]->getMonoMass() == 0.0)
             continue;
         for (size_t j = 1; j < ptm_ptr_vec_.size(); j++) {
             if (ptm_ptr_vec_[j]->getName() == "Carbamidomethylation" 
-                || ptm_ptr_vec_[j]->getName() == "Carboxymethyl"
+                    || ptm_ptr_vec_[j]->getName() == "Carboxymethyl"
                     || ptm_ptr_vec_[j]->getMonoMass() == 0.0)
                 continue;
 
@@ -155,7 +177,7 @@ PtmPairVec PtmFactory::getBasePtmPairByMass(double mass1, double mass2,
     double mass = mass1 + mass2;
     for (size_t i = 0; i < ptm_pair_vec_.size(); i++) {
         double pair_mass = ptm_pair_vec_[i].first->getMonoMass()
-                           + ptm_pair_vec_[i].second->getMonoMass();
+            + ptm_pair_vec_[i].second->getMonoMass();
         if (std::abs(pair_mass - mass) < error_tolerance
                 || std::abs(std::abs(pair_mass - mass) - 1) < error_tolerance)
             res.push_back(ptm_pair_vec_[i]);
@@ -167,7 +189,7 @@ PtmPairVec PtmFactory::getBasePtmPairByMass(double mass1, double mass2,
 bool PtmFactory::isKnown(double m, double error_tolerance) {
     for (size_t i = 0; i < ptm_ptr_vec_.size(); i++) {
         if (ptm_ptr_vec_[i]->getMonoMass() == 0.0
-            ||ptm_ptr_vec_[i]->getAbbrName() == "Carbamidomethylation" 
+                ||ptm_ptr_vec_[i]->getAbbrName() == "Carbamidomethylation" 
                 || ptm_ptr_vec_[i]->getAbbrName() == "Carboxymethyl" ) {
             continue;
         }

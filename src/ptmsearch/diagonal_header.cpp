@@ -45,7 +45,7 @@ DiagonalHeaderPtr geneDiagonalHeaderPtr(int bgn, int end,
   return new_header_ptr;
 }
 
-void DiagonalHeader::initData(double c_shift, ProteoformPtr proteo_ptr, 
+void DiagonalHeader::initHeader(double c_shift, ProteoformPtr proteo_ptr, 
                               double align_pref_suff_shift_thresh) {
   // set protein c term shift
   prot_C_term_shift_ = c_shift;
@@ -74,71 +74,102 @@ void DiagonalHeader::initData(double c_shift, ProteoformPtr proteo_ptr,
   }
 }
 
-ChangePtrVec getUnexpectedChanges(const DiagonalHeaderPtrVec &header_ptrs, 
-                                  int first_res_pos, int last_res_pos) {
-  ChangePtrVec change_list;
-  if (!header_ptrs[0]->isPepNTermMatch() && !header_ptrs[0]->isProtNTermMatch()) {
-    change_list.push_back(
-        ChangePtr(new Change(0, header_ptrs[0]->getMatchFirstBpPos()-first_res_pos,
-                             UNEXPECTED_CHANGE, header_ptrs[0]->getPepNTermShift(), nullptr)));
-  }
-  for (size_t i = 0; i < header_ptrs.size() - 1; i++) {
-    ChangePtr change_ptr(new Change(header_ptrs[i]->getMatchLastBpPos()-first_res_pos,
-                                    header_ptrs[i + 1]->getMatchFirstBpPos()-first_res_pos,
-                                    UNEXPECTED_CHANGE,
-                                    header_ptrs[i + 1]->getProtNTermShift()
-                                    - header_ptrs[i]->getProtNTermShift(),
-                                    nullptr));
-    change_list.push_back(change_ptr);
-  }
-  DiagonalHeaderPtr last_header_ptr = header_ptrs[header_ptrs.size() - 1];
-  if (!last_header_ptr->isPepCTermMatch() && !last_header_ptr->isProtCTermMatch()) {
-    ChangePtr change_ptr(new Change(last_header_ptr->getMatchLastBpPos()-first_res_pos, 
-                                    (last_res_pos + 1) -first_res_pos,
-                                    UNEXPECTED_CHANGE, last_header_ptr->getPepCTermShift(), 
-                                    nullptr));
-    change_list.push_back(change_ptr);
-  }
-  return change_list;
+ChangePtrVec getDiagonalMassChanges(const DiagonalHeaderPtrVec &header_ptrs, 
+        int first_res_pos, int last_res_pos, int change_type) {
+    ChangePtrVec change_list;
+    if (!header_ptrs[0]->isPepNTermMatch() && !header_ptrs[0]->isProtNTermMatch()) {
+        change_list.push_back(
+                ChangePtr(new Change(0, header_ptrs[0]->getMatchFirstBpPos()-first_res_pos,
+                        change_type, header_ptrs[0]->getPepNTermShift(), nullptr)));
+    }
+    for (size_t i = 0; i < header_ptrs.size() - 1; i++) {
+        ChangePtr change_ptr(new Change(header_ptrs[i]->getMatchLastBpPos()-first_res_pos,
+                    header_ptrs[i + 1]->getMatchFirstBpPos()-first_res_pos,
+                    change_type,
+                    header_ptrs[i + 1]->getProtNTermShift()
+                    - header_ptrs[i]->getProtNTermShift(),
+                    nullptr));
+        change_list.push_back(change_ptr);
+    }
+    DiagonalHeaderPtr last_header_ptr = header_ptrs[header_ptrs.size() - 1];
+    if (!last_header_ptr->isPepCTermMatch() && !last_header_ptr->isProtCTermMatch()) {
+        ChangePtr change_ptr(new Change(last_header_ptr->getMatchLastBpPos()-first_res_pos, 
+                    (last_res_pos + 1) -first_res_pos,
+                    change_type, last_header_ptr->getPepCTermShift(), 
+                    nullptr));
+        change_list.push_back(change_ptr);
+    }
+    return change_list;
 }
+
+ChangePtrVec getDiagonalMassChanges(const DiagonalHeaderPtrVec &header_ptrs, 
+        int first_res_pos, int last_res_pos, std::vector<int> &change_types) {
+    ChangePtrVec change_list;
+    if (!header_ptrs[0]->isPepNTermMatch() && !header_ptrs[0]->isProtNTermMatch()) {
+        change_list.push_back(
+                ChangePtr(new Change(0, header_ptrs[0]->getMatchFirstBpPos()-first_res_pos,
+                        change_types[0], 
+                        header_ptrs[0]->getPepNTermShift(), nullptr)));
+    }
+    for (size_t i = 0; i < header_ptrs.size() - 1; i++) {
+        ChangePtr change_ptr(new Change(header_ptrs[i]->getMatchLastBpPos()-first_res_pos,
+                    header_ptrs[i + 1]->getMatchFirstBpPos()-first_res_pos,
+                    change_types[i + 1],
+                    header_ptrs[i + 1]->getProtNTermShift()
+                    - header_ptrs[i]->getProtNTermShift(),
+                    nullptr));
+        change_list.push_back(change_ptr);
+    }
+    DiagonalHeaderPtr last_header_ptr = header_ptrs[header_ptrs.size() - 1];
+    if (!last_header_ptr->isPepCTermMatch() && !last_header_ptr->isProtCTermMatch()) {
+        ChangePtr change_ptr(new Change(last_header_ptr->getMatchLastBpPos()-first_res_pos, 
+                    (last_res_pos + 1) -first_res_pos,
+                    Change::getUnexpectedChange(), last_header_ptr->getPepCTermShift(), 
+                    nullptr));
+        change_list.push_back(change_ptr);
+    }
+    return change_list;
+}
+
+} /* namespace prot */
 
 /*
-DiagonalHeaderPtrVec getNTermShiftListTruncPrefix(ProteoformPtr seq) {
-  DiagonalHeaderPtrVec extend_n_term_shift;
-  std::vector<double> seq_masses = seq->getBpSpecPtr()->getPrmMasses();
-  double shift;
-  for (size_t i = 1; i < seq_masses.size(); i++) {
-    shift = -seq_masses[i];
-    extend_n_term_shift.push_back(
-        DiagonalHeaderPtr(new DiagonalHeader(shift, true, false, true, false)));
-  }
+   DiagonalHeaderPtrVec getNTermShiftListTruncPrefix(ProteoformPtr seq) {
+   DiagonalHeaderPtrVec extend_n_term_shift;
+   std::vector<double> seq_masses = seq->getBpSpecPtr()->getPrmMasses();
+   double shift;
+   for (size_t i = 1; i < seq_masses.size(); i++) {
+   shift = -seq_masses[i];
+   extend_n_term_shift.push_back(
+   DiagonalHeaderPtr(new DiagonalHeader(shift, true, false, true, false)));
+   }
 
-  return extend_n_term_shift;
-}
+   return extend_n_term_shift;
+   }
 
-DiagonalHeaderPtrVec getNTermShiftListTruncsuffix(PrmMsPtr ms,
-                                                  ProteoformPtr seq) {
-  DiagonalHeaderPtrVec extend_n_term_shift;
-  std::vector<double> ms_masses = prot::getMassList(ms);
-  std::vector<double> seq_masses = seq->getBpSpecPtr()->getPrmMasses();
-  double shift;
-  for (size_t i = 1; i < seq_masses.size(); i++) {
-    shift = ms_masses[ms_masses.size() - 1] - seq_masses[i];
-    extend_n_term_shift.push_back(
-        DiagonalHeaderPtr(new DiagonalHeader(shift, true, false, true, false)));
-  }
-  return extend_n_term_shift;
-}
-DiagonalHeaderPtrVec get1dHeaders(DiagonalHeaderPtrVec2D headers) {
-  DiagonalHeaderPtrVec header_list;
-  for (size_t i = 0; i < headers.size(); i++) {
-    for (size_t j = 0; j < headers[i].size(); j++) {
-      header_list.push_back(headers[i][j]);
-    }
-  }
-  return header_list;
-}
+   DiagonalHeaderPtrVec getNTermShiftListTruncsuffix(PrmMsPtr ms,
+   ProteoformPtr seq) {
+   DiagonalHeaderPtrVec extend_n_term_shift;
+   std::vector<double> ms_masses = prot::getMassList(ms);
+   std::vector<double> seq_masses = seq->getBpSpecPtr()->getPrmMasses();
+   double shift;
+   for (size_t i = 1; i < seq_masses.size(); i++) {
+   shift = ms_masses[ms_masses.size() - 1] - seq_masses[i];
+   extend_n_term_shift.push_back(
+   DiagonalHeaderPtr(new DiagonalHeader(shift, true, false, true, false)));
+   }
+   return extend_n_term_shift;
+   }
+   DiagonalHeaderPtrVec get1dHeaders(DiagonalHeaderPtrVec2D headers) {
+   DiagonalHeaderPtrVec header_list;
+   for (size_t i = 0; i < headers.size(); i++) {
+   for (size_t j = 0; j < headers[i].size(); j++) {
+   header_list.push_back(headers[i][j]);
+   }
+   }
+   return header_list;
+   }
 
 */
 
-} /* namespace prot */
+//}  namespace prot 

@@ -42,8 +42,24 @@ void CompPValueArray::compMultiExtremeValues(const PrmMsPtrVec &ms_six_ptr_vec,
     //LOG_DEBUG("prsm " << i << " prsm size " << prsm_ptrs.size());
     int unexpect_shift_num = prsm_ptrs[i]->getProteoformPtr()->getUnexpectedChangeNum();
     SemiAlignTypePtr type_ptr = prsm_ptrs[i]->getProteoformPtr()->getSemiAlignType();
-    double cand_num = test_num_ptr_->compCandNum(type_ptr, unexpect_shift_num, 
-                                                 prec_mass, tolerance);
+
+    int index; 
+    if (mng_ptr_->variable_ptm_) {
+        // need to be improved
+        if (unexpect_shift_num == 0) { 
+            index = 1;
+        }
+        else {
+            index = unexpect_shift_num;
+        }
+    }
+    else {
+        index = unexpect_shift_num;
+    }
+
+    double cand_num = test_num_ptr_->compCandNum(type_ptr, index, 
+            prec_mass, tolerance);
+
     //LOG_DEBUG("Shift number " << unexpect_shift_num << " type " << type_ptr->getName() 
     //<< " one prob " << prot_probs[i] << " cand num " << cand_num);
     //LOG_DEBUG("candidate number " << cand_num);

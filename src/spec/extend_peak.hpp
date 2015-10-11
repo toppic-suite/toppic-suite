@@ -55,8 +55,11 @@ ExtendMsPtr createMsThreePtr(DeconvMsPtr deconv_ms_ptr, SpParaPtr sp_para_ptr,
 ExtendMsPtrVec createMsThreePtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, 
                                    SpParaPtr sp_para_ptr, double new_prec_mass);
 
-std::pair<std::vector<int>, std::vector<int>> getExtendIntMassErrorList(
-    ExtendMsPtr ext_ms_ptr, double scale);
+/*std::pair<std::vector<int>, std::vector<int>> getExtendIntMassErrorList(*/
+    /*ExtendMsPtr ext_ms_ptr, double scale);*/
+
+std::vector<std::pair<int, int>> 
+getExtendIntMassErrorList(const ExtendMsPtrVec &ext_ms_ptr_vec, double scale); 
 
 inline bool extendPeakUp(const ExtendPeakPtr &a, const ExtendPeakPtr &b){
   return a->getPosition() < b->getPosition();

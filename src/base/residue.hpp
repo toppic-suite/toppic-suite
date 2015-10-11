@@ -57,6 +57,7 @@ private:
 
 typedef std::shared_ptr<Residue> ResiduePtr;
 typedef std::vector<ResiduePtr> ResiduePtrVec;
+typedef std::vector<ResiduePtrVec> ResiduePtrVec2D;
 
 ResiduePtr getResiduePtrByAcid(const ResiduePtrVec &residue_list,
                                AcidPtr acid_ptr);

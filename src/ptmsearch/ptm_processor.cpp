@@ -31,7 +31,7 @@ void PtmProcessor::initWriters(){
   std::string output_file_name = basename(sp_file_name)+"."+mng_ptr_->output_file_ext_;
 
   all_writer_ptr_ = PrsmWriterPtr (new PrsmWriter (output_file_name));
-  for (int s = 1; s <= mng_ptr_->n_unknown_shift_; s++) {
+  for (int s = 1; s <= mng_ptr_->getShiftNum() ; s++) {
     std::string file_name = output_file_name+"_"+ convertToString(s)
         +"_"+ SemiAlignTypeFactory::getCompletePtr()->getName();
     PrsmWriterPtr complete_writer_ptr = PrsmWriterPtr (new PrsmWriter (file_name));
@@ -54,7 +54,7 @@ void PtmProcessor::initWriters(){
 // close writers
 void PtmProcessor::closeWriters() {
   all_writer_ptr_->close();
-  for (int s = 1; s <= mng_ptr_->n_unknown_shift_; s++) {
+  for (int s = 1; s <= mng_ptr_->getShiftNum(); s++) {
       complete_writer_ptrs_[s-1]->close();
       prefix_writer_ptrs_[s-1]->close();
       suffix_writer_ptrs_[s-1]->close();
@@ -134,11 +134,12 @@ inline void seleTopPrsms(const PrsmPtrVec &all_prsm_ptrs,
 
 
 void PtmProcessor::processOneSpectrum(SpectrumSetPtr spectrum_set_ptr, 
-                                      SimplePrsmPtrVec simple_prsm_ptrs) {
+                                      SimplePrsmPtrVec ori_simple_prsm_ptrs) {
 
+  SimplePrsmPtrVec simple_prsm_ptrs = getUniqueMatches(ori_simple_prsm_ptrs);
   PtmSlowFilterPtr slow_filter_ptr = PtmSlowFilterPtr(
       new PtmSlowFilter(spectrum_set_ptr,simple_prsm_ptrs,comp_shift_ptr_,mng_ptr_));
-  for (int s = 1; s <= mng_ptr_->n_unknown_shift_; s++) {
+  for (int s = 1; s <= mng_ptr_->getShiftNum(); s++) {
     PrsmPtrVec complete_prsm_ptrs = slow_filter_ptr->getPrsms(
         s-1, SemiAlignTypeFactory::getCompletePtr());
     std::sort(complete_prsm_ptrs.begin(), complete_prsm_ptrs.end(), 

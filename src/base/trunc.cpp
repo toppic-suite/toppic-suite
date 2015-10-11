@@ -36,30 +36,30 @@ void Trunc::appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
   parent->appendChild(element);
 }
 
-bool Trunc::isSameTrunc(int len, ResSeqPtr res_seq_ptr) {
-  if(trunc_len_ != len){
-    return false;
-  }
-  for(int i=0;i<trunc_len_;i++){
-    if(acid_str_[i] != res_seq_ptr->getResiduePtr(i)->getAcidPtr()){
-      return false;
+bool Trunc::isSameTrunc(int len, const ResiduePtrVec& res_ptr_vec) {
+    if(trunc_len_ != len){
+        return false;
     }
-  }
-  return true;
+    for(int i=0;i<trunc_len_;i++){
+        if(acid_str_[i] != res_ptr_vec[i]->getAcidPtr()){
+            return false;
+        }
+    }
+    return true;
 }
 
-bool Trunc::isValidTrunc(ResSeqPtr res_seq_ptr) {
-  //check if trunc acids match N-terminal acids of the protein 
-  bool result = true;
-  if (trunc_len_ >= res_seq_ptr->getLen()) {
-    result = false; 
-  }
-  else {
-    result = isSameTrunc(trunc_len_, res_seq_ptr);
-  }
-  //LOG_DEBUG("Valid trunc " << result << " trunc len " << trunc_len_ 
-  //          << " seq len " << res_seq_ptr->getLen());
-  return result;
+bool Trunc::isValidTrunc(const ResiduePtrVec & res_ptr_vec) {
+    //check if trunc acids match N-terminal acids of the protein 
+    bool result = true;
+    if (trunc_len_ >= (int)res_ptr_vec.size()) {
+        result = false; 
+    }
+    else {
+        result = isSameTrunc(trunc_len_, res_ptr_vec);
+    }
+    //LOG_DEBUG("Valid trunc " << result << " trunc len " << trunc_len_ 
+    //          << " seq len " << res_seq_ptr->getLen());
+    return result;
 }
 
 void TruncFactory::initFactory(const std::string &file_name) {
