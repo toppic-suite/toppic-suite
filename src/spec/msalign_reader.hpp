@@ -37,6 +37,8 @@ class MsAlignReader {
 
 };
 
+typedef std::shared_ptr<MsAlignReader> MsAlignReaderPtr;
+
 int countSpNum(const std::string &spectrum_file);
 
 void generateSpIndex(const std::string &spectrum_file_name);

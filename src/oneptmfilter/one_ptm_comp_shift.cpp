@@ -66,9 +66,9 @@ inline void OnePtmCompShift::updateColumnMatchNums(ProteoformPtr proteo_ptr,
                                                   int* col_match_nums) {
   std::vector<int> masses = proteo_ptr->getBpSpecPtr()->getScaledPrmMasses(scale_);
   if (acetylation_) {
-    double ace_mass = - ProtModFactory::getProtModPtr_NME_ACETYLATION()->getProtShift();
+    int ace_mass = (int)std::round(-ProtModFactory::getProtModPtr_NME_ACETYLATION()->getProtShift() * scale_);
     masses.push_back(ace_mass);
-    std::sort(masses.begin(), masses.end(),std::less<double>()); 
+    std::sort(masses.begin(), masses.end(),std::less<int>()); 
   }
   for (size_t bgn = 0; bgn < masses.size(); bgn++) {
     for (size_t cur = bgn + 1; cur < masses.size(); cur++) {
@@ -116,9 +116,9 @@ inline void OnePtmCompShift::initIndexes(const ProteoformPtrVec &proteo_ptrs){
     std::vector<int> masses  
         = proteo_ptrs[i]->getBpSpecPtr()->getScaledPrmMasses(scale_);
     if (acetylation_) {
-      double ace_mass = - ProtModFactory::getProtModPtr_NME_ACETYLATION()->getProtShift();
+      int ace_mass = (int)std::round(-ProtModFactory::getProtModPtr_NME_ACETYLATION()->getProtShift() * scale_);
       masses.push_back(ace_mass);
-      std::sort(masses.begin(), masses.end(),std::less<double>()); 
+      std::sort(masses.begin(), masses.end(),std::less<int>()); 
     }
     for (size_t bgn=0; bgn < masses.size(); bgn++) {
       for (size_t cur = bgn+1; cur < masses.size(); cur++) {
@@ -141,10 +141,10 @@ inline void OnePtmCompShift::updateRevColumnMatchNums(ProteoformPtr proteo_ptr,
                                                       int* col_match_nums) {
   std::vector<int> masses = proteo_ptr->getBpSpecPtr()->getScaledPrmMasses(scale_);
   if (acetylation_) {
-    double ace_mass = - ProtModFactory::getProtModPtr_NME_ACETYLATION()->getProtShift();
+    int ace_mass = (int)std::round(-ProtModFactory::getProtModPtr_NME_ACETYLATION()->getProtShift() * scale_);
     masses.push_back(ace_mass);
+    std::sort(masses.begin(), masses.end(), std::greater<int>());
   }
-  std::sort(masses.begin(), masses.end(),std::greater<double>() ); 
   for (size_t bgn = 0; bgn < masses.size(); bgn++) {
     for (size_t cur = bgn + 1; cur < masses.size(); cur++) {
       int diff = -(masses[cur] - masses[bgn]);
@@ -192,11 +192,11 @@ inline void OnePtmCompShift::initRevIndexes(const ProteoformPtrVec &proteo_ptrs)
     std::vector<int> masses  
         = proteo_ptrs[i]->getBpSpecPtr()->getScaledPrmMasses(scale_);
     if (acetylation_) {
-      double ace_mass = - ProtModFactory::getProtModPtr_NME_ACETYLATION()->getProtShift();
+      int ace_mass = (int)std::round(-ProtModFactory::getProtModPtr_NME_ACETYLATION()->getProtShift() * scale_);
       masses.push_back(ace_mass);
+      std::sort(masses.begin(), masses.end(), std::greater<int>());
     }
 
-    std::sort(masses.begin(), masses.end(), std::greater<double>()); 
     for (size_t bgn=0; bgn < masses.size(); bgn++) {
       for (size_t cur = bgn+1; cur < masses.size(); cur++) {
         int diff = -(masses[cur] - masses[bgn]);
@@ -348,23 +348,25 @@ inline bool scoreCompare(const std::pair<int, int> &a, const std::pair<int, int>
 }
 
 inline void addResults(std::vector<std::pair<int,int>> &results, std::vector<std::pair<int,int>> &single_type_results, 
-                       int single_type_num) {
+        int single_type_num) {
 
-  results.clear();
-  std::sort(single_type_results.begin(), single_type_results.end(), scoreCompare);
-  int output_num =0;
-  for(int i=0;i< single_type_num;i++){
-    if (i >= (int)single_type_results.size()) {
-      break;
+    results.clear();
+    std::sort(single_type_results.begin(), single_type_results.end(), scoreCompare);
+    int output_num =0;
+    for(int i=0;i< single_type_num;i++){
+        if (i >= (int)single_type_results.size()) {
+            break;
+        }
+        //LOG_DEBUG("rank " << i << " score " << single_type_results[i].second);
+        if(single_type_results[i].second > 4){
+            output_num++;
+        } else {
+            break;
+        }
     }
-    //LOG_DEBUG("rank " << i << " score " << single_type_results[i].second);
-    if(single_type_results[i].second > 4){
-      output_num++;
+    for(int i=0;i<output_num;i++){
+        results.push_back(single_type_results[i]);
     }
-  }
-  for(int i=0;i<output_num;i++){
-    results.push_back(single_type_results[i]);
-  }
 }
 
 inline void OnePtmCompShift::compShiftScores(short* scores, short* rev_scores, int num){
@@ -397,7 +399,7 @@ inline void OnePtmCompShift::compShiftScores(short* scores, short* rev_scores, i
       if (rev_scores[j] > best_rev_score) {
         best_rev_score = rev_scores[j];
       }
-      if (j <= suff && scores[j] > best_suff_score) {
+      if (j <= suff && rev_scores[j] > best_suff_score) {
         best_suff_score = rev_scores[j];
       }
     }
@@ -408,7 +410,7 @@ inline void OnePtmCompShift::compShiftScores(short* scores, short* rev_scores, i
     std::pair<int,int> suff_proteo_score(i, best_score + best_suff_score);
     suff_proteo_scores.push_back(suff_proteo_score);
     std::pair<int,int> internal_proteo_score(i, best_score + best_rev_score);
-    internal_proteo_scores.push_back(suff_proteo_score);
+    internal_proteo_scores.push_back(internal_proteo_score);
   }
   int single_type_num = num / 4;
   //LOG_DEBUG("num " << num << " Single type num " << single_type_num);

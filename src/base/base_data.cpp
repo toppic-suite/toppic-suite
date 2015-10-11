@@ -29,8 +29,7 @@ void initBaseData(const std::string &exe_dir) {
     XmlDOMDocument doc(parser, config_file_name.c_str());
     xercesc::DOMElement* root = doc.getDocumentElement();
     LOG_DEBUG("root " << root);
-    std::string acid_file_name = getChildValue(root, "acid_list_file_name",
-                                               0);
+    std::string acid_file_name = getChildValue(root, "acid_list_file_name", 0);
     acid_file_name = conf_dir + FILE_SEPARATOR + acid_file_name;
     LOG_DEBUG("acid file name: " << acid_file_name);
     AcidFactory::initFactory(acid_file_name);
@@ -40,11 +39,14 @@ void initBaseData(const std::string &exe_dir) {
     ptm_file_name = conf_dir + FILE_SEPARATOR + ptm_file_name;
     LOG_DEBUG("ptm file name: " << ptm_file_name);
     PtmFactory::initFactory(ptm_file_name);
+
+    std::string ptm_select_file_name = getChildValue(root, "ptm_select_file_name", 0);
+    ptm_select_file_name = conf_dir + FILE_SEPARATOR + ptm_select_file_name;
+    LOG_DEBUG("ptm select file " << ptm_select_file_name);
+    PtmFactory::selectPtm(ptm_select_file_name);
     LOG_DEBUG("ptm initialized");
 
-    std::string residue_file_name = getChildValue(root,
-                                                  "residue_list_file_name",
-                                                  0);
+    std::string residue_file_name = getChildValue(root, "residue_list_file_name", 0);
     residue_file_name = conf_dir + FILE_SEPARATOR + residue_file_name;
     LOG_DEBUG("residue file name: " << residue_file_name);
     ResidueFactory::initFactory(residue_file_name);

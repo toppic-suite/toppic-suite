@@ -23,9 +23,9 @@ class Trunc {
 
   void appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
-  bool isSameTrunc(int len, ResSeqPtr res_seq_ptr);
+  bool isSameTrunc(int len, const ResiduePtrVec& res_ptr_vec);
 
-  bool isValidTrunc(ResSeqPtr res_seq_ptr);
+  bool isValidTrunc(const ResiduePtrVec& res_ptr_vec);
 
  private:
   std::string name_;

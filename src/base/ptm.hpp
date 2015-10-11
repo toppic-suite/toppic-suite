@@ -89,6 +89,7 @@ class PtmFactory {
     static const PtmPtrVec& getBasePtmPtrVec() {
         return ptm_ptr_vec_;
     }
+    static void selectPtm(const std::string & file_name);
     static PtmPtr findEmptyPtmPtr();
     /**
      * Returns a PTM based on the abbreviation name. Returns null if the
@@ -115,6 +116,8 @@ class PtmFactory {
   private:
     static PtmPtrVec ptm_ptr_vec_;
     static PtmPairVec ptm_pair_vec_;
+    static PtmPtrVec ptm_select_vec_;
+    static std::vector<std::string> ptm_select_;
 };
 
 inline bool ptmMassUp(const PtmPtr &a, const PtmPtr &b) {

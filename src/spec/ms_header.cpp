@@ -61,6 +61,13 @@ double MsHeader::getPrecMonoMassMinusWater() {
   }
 }
 
+std::pair<int,int> MsHeader::getPrecMonoMassMinusWaterError(double scale) {
+  int mass = (int) std::round(getPrecMonoMassMinusWater() * scale);
+  int error = (int) std::ceil(error_tolerance_*scale);
+  std::pair<int,int> result (mass,error);
+  return result;
+}
+
 std::string MsHeader::toString() {
   std::stringstream tmp;
         tmp << "MS HEADER\n";

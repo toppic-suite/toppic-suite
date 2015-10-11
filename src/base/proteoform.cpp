@@ -24,7 +24,6 @@ Proteoform::Proteoform(DbResSeqPtr db_res_seq_ptr, ProtModPtr prot_mod_ptr,
 Proteoform::Proteoform(xercesc::DOMElement* element,
                        const ProteoformPtrVec &db_proteoforms) {
 
-
     xercesc::DOMElement* db_element= getChildElement(element,"db_residue_seq",0);
     int db_seq_id = getIntChildValue(db_element, "db_seq_id", 0);
     std::string db_seq_name = getChildValue(db_element, "db_seq_name", 0);
@@ -88,12 +87,12 @@ void Proteoform::parseXml(xercesc::DOMElement* element, ProteoformPtr db_proteof
 
 /* get several segments without unexpected PTMs from a proteoform */
 SegmentPtrVec Proteoform::getSegmentPtrVec() {
-    ChangePtrVec unexpected_changes;
+    ChangePtrVec changes;
     double mass_shift_sum = 0;
     for (size_t i = 0; i < change_list_.size(); i++) {
-        if (change_list_[i]->getChangeType() == UNEXPECTED_CHANGE
-            || change_list_[i]->getChangeType() == VARIABLE_CHANGE) {
-            unexpected_changes.push_back(change_list_[i]);
+        if (change_list_[i]->getChangeType() == Change::getUnexpectedChange()
+            || change_list_[i]->getChangeType() == Change::getVariableChange()) {
+            changes.push_back(change_list_[i]);
             mass_shift_sum += change_list_[i]->getMassShift();
         }
     }
@@ -101,14 +100,14 @@ SegmentPtrVec Proteoform::getSegmentPtrVec() {
     double n_shift = 0;
     double c_shift = mass_shift_sum;
     int left = 0;
-    for (size_t i = 0; i < unexpected_changes.size(); i++) {
-        int right = unexpected_changes[i]->getLeftBpPos();
+    for (size_t i = 0; i < changes.size(); i++) {
+        int right = changes[i]->getLeftBpPos();
         SegmentPtr segment_ptr = SegmentPtr(
                                      new Segment(left, right, n_shift, c_shift));
         segments.push_back(segment_ptr);
-        left = unexpected_changes[i]->getRightBpPos();
-        n_shift = n_shift + unexpected_changes[i]->getMassShift();
-        c_shift = c_shift - unexpected_changes[i]->getMassShift();
+        left = changes[i]->getRightBpPos();
+        n_shift = n_shift + changes[i]->getMassShift();
+        c_shift = c_shift - changes[i]->getMassShift();
     }
     int right = residue_seq_ptr_->getLen();
     SegmentPtr segment_ptr = SegmentPtr(
@@ -160,7 +159,7 @@ std::string Proteoform::toString() {
 int Proteoform::getUnexpectedChangeNum() {
     int n = 0;
     for (size_t i = 0; i < change_list_.size(); i++) {
-        if (change_list_[i]->getChangeType() == UNEXPECTED_CHANGE) {
+        if (change_list_[i]->getChangeType() == Change::getUnexpectedChange()) {
             n++;
         }
     }
@@ -170,7 +169,7 @@ int Proteoform::getUnexpectedChangeNum() {
 int Proteoform::getUnexpectedChangeNum(double err) {
     int n = 0;
     for (size_t i = 0; i < change_list_.size(); i++) {
-        if (change_list_[i]->getChangeType() == UNEXPECTED_CHANGE) {
+        if (change_list_[i]->getChangeType() == Change::getUnexpectedChange()) {
             if (std::abs(change_list_[i]->getMassShift()) <= 1+ err)
                 continue;
             n++;
@@ -182,7 +181,7 @@ int Proteoform::getUnexpectedChangeNum(double err) {
 ChangePtrVec Proteoform::getUnexpectedChangePtrVec() {
     ChangePtrVec un_change;
     for (size_t i = 0; i < change_list_.size(); i++) {
-        if (change_list_[i]->getChangeType() == UNEXPECTED_CHANGE) {
+        if (change_list_[i]->getChangeType() == Change::getUnexpectedChange()) {
             un_change.push_back(change_list_[i]);
         }
     }
@@ -409,7 +408,7 @@ ProteoformPtr getProtModProteoform(ProteoformPtr db_form_ptr,
     // check if the proteoform can be truncated
     TruncPtr trunc_ptr = prot_mod_ptr->getTruncPtr();
     DbResSeqPtr db_res_seq_ptr = db_form_ptr->getDbResSeqPtr();
-    bool valid_trunc = trunc_ptr->isValidTrunc(db_res_seq_ptr);
+    bool valid_trunc = trunc_ptr->isValidTrunc(db_res_seq_ptr->getResidues());
     if (!valid_trunc) {
         //LOG_DEBUG("NO valid trunc");
         return ProteoformPtr(nullptr);
@@ -686,6 +685,13 @@ void Proteoform::rmChangePtr(ChangePtr c) {
     change_list_.erase(std::remove(change_list_.begin(), change_list_.end(), c),
                        change_list_.end());
 }
+
+void Proteoform::addChangePtrVec(const ChangePtrVec& changes) {
+    for (size_t i = 0; i < changes.size(); i++) {
+        change_list_.push_back(changes[i]);
+    }
+}
+
 
 } /* namespace prot */
 

@@ -100,14 +100,12 @@ inline BasicDiagPairPtrVec compDiagPair(const PrmPeakPtrVec &prm_peaks,
 
 BasicDiagonalPtr getDiagonalPtr(DiagonalHeaderPtr header_ptr,
                                 const PrmPeakPtrVec &prm_peaks,
-                                double prec_mono_mass,
                                 int group_spec_num,
-                                ProteoformPtr proteo_ptr,
-                                PtmMngPtr mng_ptr){
+                                ProteoformPtr proteo_ptr){
   BpSpecPtr bp_spec_ptr = proteo_ptr->getBpSpecPtr();
-  double n_shift = header_ptr->getProtNTermShift();
-  double c_shift = prec_mono_mass - proteo_ptr->getResSeqPtr()->getSeqMass() - n_shift;
-  header_ptr->initData(c_shift, proteo_ptr, mng_ptr->align_prefix_suffix_shift_thresh_);
+  /*double n_shift = header_ptr->getProtNTermShift();*/
+  //double c_shift = prec_mono_mass - proteo_ptr->getResSeqPtr()->getSeqMass() - n_shift;
+  /*header_ptr->initData(c_shift, proteo_ptr, mng_ptr->align_prefix_suffix_shift_thresh_);*/
 
   std::vector<double> prm_masses = bp_spec_ptr->getPrmMasses();
   BasicDiagPairPtrVec diag_pair_list = compDiagPair(prm_peaks, group_spec_num, prm_masses, header_ptr);
@@ -122,24 +120,24 @@ BasicDiagonalPtr getDiagonalPtr(DiagonalHeaderPtr header_ptr,
   return nullptr;
 }
 
-BasicDiagonalPtrVec getDiagonals(const DiagonalHeaderPtrVec& header_ptr_vec,
-                                 const PrmPeakPtrVec &prm_peaks, 
-                                 double prec_mono_mass, int group_spec_num,
-                                 ProteoformPtr proteo_ptr, PtmMngPtr mng_ptr){
-  BasicDiagonalPtrVec diagonal_list;
-  for(size_t i=0; i<header_ptr_vec.size(); i++){
-    BasicDiagonalPtr diagonal_ptr 
-        = getDiagonalPtr(header_ptr_vec[i], prm_peaks, prec_mono_mass, 
-                         group_spec_num, proteo_ptr, mng_ptr);
-    if(diagonal_ptr!=nullptr){
-      diagonal_list.push_back(diagonal_ptr);
+BasicDiagonalPtrVec geneDiagonals(const DiagonalHeaderPtrVec& header_ptr_vec,
+        const PrmPeakPtrVec &prm_peaks, 
+        int group_spec_num, ProteoformPtr proteo_ptr){
+
+    BasicDiagonalPtrVec diagonal_list;
+    for(size_t i=0; i<header_ptr_vec.size(); i++){
+        BasicDiagonalPtr diagonal_ptr 
+            = getDiagonalPtr(header_ptr_vec[i], prm_peaks, 
+                    group_spec_num, proteo_ptr);
+        if(diagonal_ptr!=nullptr){
+            diagonal_list.push_back(diagonal_ptr);
+        }
     }
-  }
-  // important set id for headers
-  for (size_t i = 0; i < diagonal_list.size(); i++) {
-    diagonal_list[i]->getHeader()->setId(i);
-  }
-  return diagonal_list;
+    // important set id for headers
+    for (size_t i = 0; i < diagonal_list.size(); i++) {
+        diagonal_list[i]->getHeader()->setId(i);
+    }
+    return diagonal_list;
 }
 
 

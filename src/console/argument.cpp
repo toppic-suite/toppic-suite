@@ -29,6 +29,8 @@ void Argument::initArguments() {
   arguments_["fullBinaryPath"] = "false";
   arguments_["local_threshold"] = "0.9";
   arguments_["groupSpectrumNumber"] = "1";
+  arguments_["filteringResultNumber"] = "20";
+  arguments_["residueModFileName"]="";
 }
 
 void Argument::outputArguments(std::ofstream &output) {
@@ -63,6 +65,7 @@ void Argument::outputArguments(std::ofstream &output) {
   else {
     output << "E-value computation: Lookup table" << std::endl;
   }
+  output << "Residue modification file name: " << arguments_["residueModFileName"] << std::endl;
   output << std::endl;
 }
 
@@ -72,6 +75,7 @@ void Argument::showUsage(boost::program_options::options_description &desc) {
 }
 
 void Argument::setArgumentsByConfigFile(const std::string &filename){
+  initArguments();
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if(parser){
     XmlDOMDocument* doc = new XmlDOMDocument(parser, filename.c_str());
@@ -122,6 +126,8 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string use_table = "";
   std::string group_num = "";
   std::string local_threshold = "";
+  std::string filtering_result_num = "";
+  std::string residue_mod_file_name = "";
 
   /** Define and parse the program options*/
   try {
@@ -135,11 +141,11 @@ bool Argument::parse(int argc, char* argv[]) {
         ("cysteine-protection,c", po::value<std::string> (&protection), 
          "<C0|C57|C58>. Cysteine protecting group: C0: no modification, C57: Carbamidoemetylation, or C58:Carboxymethylation. Default value: C0.")
         ("decoy,d", "Use a decoy protein database to estimate false discovery rates.")
-        ("error-tolerance,e", po::value<std::string> (&error_tole), "<positive integer value>. Error tolerance for precursor and fragment masses in PPM. Default value: 15.")
-        ("max-ptm,m", po::value<std::string> (&max_ptm_mass), "<positive double value>. Maximum absolute value of masses (in Dalton) of unexpected post-translational modifications in proteoforms. Default value: 1000000.")
+        ("error-tolerance,e", po::value<std::string> (&error_tole), "<positive integer>. Error tolerance for precursor and fragment masses in PPM. Default value: 15.")
+        ("max-ptm,m", po::value<std::string> (&max_ptm_mass), "<positive number>. Maximum absolute value of masses (in Dalton) of unexpected post-translational modifications in proteoforms. Default value: 1000000.")
         ("ptm-number,p", po::value<std::string> (&ptm_num), "<0|1|2>. Maximum number of unexpected post-translational modifications in a proteoform-spectrum-match. Default value: 2.")
         ("cutoff-type,t", po::value<std::string> (&cutoff_type), "<EVALUE|FDR>. Cutoff type for reporting protein-spectrum-matches. Default value: EVALUE.")
-        ("cutoff-value,v", po::value<std::string> (&cutoff_value), "<positive double value>. Cutoff value for reporting protein-spectrum-matches. Default value: 0.01.")
+        ("cutoff-value,v", po::value<std::string> (&cutoff_value), "<positive number>. Cutoff value for reporting protein-spectrum-matches. Default value: 0.01.")
         ("generating-function,g", "Use the generating function approach to calculate p-values and E-values.")
         ("local-threshold,s", po::value<std::string> (&local_threshold), "<positive double value>. Threshold value for reporting PTM localization. Default value: 0.9.");
     po::options_description desc("Options");
@@ -157,6 +163,8 @@ bool Argument::parse(int argc, char* argv[]) {
         ("ptm-number,p", po::value<std::string> (&ptm_num), "<0|1|2>. Maximum number of unexpected PTMs. Default value: 2.")
         ("cutoff-type,t", po::value<std::string> (&cutoff_type), "<EVALUE|FDR>. Cutoff value type for reporting protein-spectrum-matches. Default value: EVALUE.")
         ("cutoff-value,v", po::value<std::string> (&cutoff_value), "<positive double value>. Cutoff value for reporting protein-spectrum-matches. Default value: 0.01.")
+        ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "Variable PTM file name.")
+        ("filtering-result-number,n", po::value<std::string>(&filtering_result_num), "Filtering result number. Default value: 20.")
         ("log-file-name,l", po::value<std::string>(&log_file_name), "Log file name with its path.")
         ("keep-temp-files,k", "Keep temporary files.")
         ("generating-function,g", "Use generating function to calculate p-values and E-values.")
@@ -253,6 +261,12 @@ bool Argument::parse(int argc, char* argv[]) {
     if (vm.count("group-number")) {
       arguments_["groupSpectrumNumber"] = group_num;
     }
+    if (vm.count("filtering-result-number")) {
+      arguments_["filteringResultNumber"] = filtering_result_num;
+    }
+    if (vm.count("mod-file-name")) {
+      arguments_["residueModFileName"] = residue_mod_file_name;
+    }
   }
   catch(std::exception&e ) {
     std::cerr << "Unhandled Exception in parsing command line"<<e.what()<<", application will now exit"<<std::endl;
@@ -272,12 +286,12 @@ bool Argument::parse(int argc, char* argv[]) {
 }
 
 bool Argument::validateArguments() {
-  if (!testFile(arguments_["oriDatabaseFileName"])) {
+  if (!boost::filesystem::exists(arguments_["oriDatabaseFileName"])) {
     LOG_ERROR("Database file " << arguments_["databaseFileName"] << " does not exist!");
     return false;
   }
 
-  if (!testFile(arguments_["spectrumFileName"])) {
+  if (!boost::filesystem::exists(arguments_["spectrumFileName"])) {
     LOG_ERROR("Spectrum file " << arguments_["spectrumFileName"] << " does not exist!");
     return false;
   }
@@ -352,19 +366,6 @@ bool Argument::validateArguments() {
     return false;
   }
   return true;
-}
-
-bool testFile(std::string filename){
-  std::fstream file;
-    file.open(filename, std::ios::in);
-    if (!file) {
-      file.close();
-      return false;
-    }
-    else{
-      file.close();
-      return true;
-    }
 }
 
 } /* namespace prot */

@@ -59,25 +59,24 @@ inline void CompShift::initProteoformBeginEnds(const ProteoformPtrVec &proteo_pt
 }
 
 inline void CompShift::updateColumnMatchNums(ProteoformPtr proteo_ptr, 
-                                                  int* col_match_nums, 
-                                                  bool acetylation) {
-  std::vector<int> masses = proteo_ptr->getBpSpecPtr()->getScaledPrmMasses(scale_);
-  if (acetylation) {
-    double ace_mass = - ProtModFactory::getProtModPtr_NME_ACETYLATION()->getProtShift();
-    masses.push_back(ace_mass);
-    std::sort(masses.begin(), masses.end(),std::less<double>()); 
-  }
-  for (size_t bgn = 0; bgn < masses.size(); bgn++) {
-    for (size_t cur = bgn + 1; cur < masses.size(); cur++) {
-      int diff = masses[cur] - masses[bgn];
-      if (diff < col_num_) {
-        col_match_nums[diff]++;
-      }
-      else {
-        break;
-      }
+        int* col_match_nums, bool acetylation) {
+    std::vector<int> masses = proteo_ptr->getBpSpecPtr()->getScaledPrmMasses(scale_);
+    if (acetylation) {
+        int ace_mass = (int)std::round(- ProtModFactory::getProtModPtr_NME_ACETYLATION()->getProtShift() * scale_);
+        masses.push_back(ace_mass);
+        std::sort(masses.begin(), masses.end(),std::less<int>()); 
     }
-  }
+    for (size_t bgn = 0; bgn < masses.size(); bgn++) {
+        for (size_t cur = bgn + 1; cur < masses.size(); cur++) {
+            int diff = masses[cur] - masses[bgn];
+            if (diff < col_num_) {
+                col_match_nums[diff]++;
+            }
+            else {
+                break;
+            }
+        }
+    }
 }
 
 inline void CompShift::initIndexes(const ProteoformPtrVec &proteo_ptrs, 
@@ -114,9 +113,9 @@ inline void CompShift::initIndexes(const ProteoformPtrVec &proteo_ptrs,
     std::vector<int> masses  
         = proteo_ptrs[i]->getBpSpecPtr()->getScaledPrmMasses(scale_);
     if (acetylation) {
-      double ace_mass = - ProtModFactory::getProtModPtr_NME_ACETYLATION()->getProtShift();
+      int ace_mass = (int)std::round(-ProtModFactory::getProtModPtr_NME_ACETYLATION()->getProtShift() * scale_);
       masses.push_back(ace_mass);
-      std::sort(masses.begin(), masses.end(),std::less<double>()); 
+      std::sort(masses.begin(), masses.end(),std::less<int>()); 
     }
     for (size_t bgn=0; bgn < masses.size(); bgn++) {
       for (size_t cur = bgn+1; cur < masses.size(); cur++) {
@@ -137,35 +136,34 @@ inline void CompShift::initIndexes(const ProteoformPtrVec &proteo_ptrs,
 
 
 std::vector<std::pair<int,int>> CompShift::compConvolution(
-    const std::vector<int> &masses,int bgn_pos,int num){
+        const std::vector<int> &masses,int bgn_pos,int num){
 
-  short* scores = new short[row_num_];
-  memset(scores, 0, row_num_ * sizeof(short));
-  
+    short* scores = new short[row_num_];
+    memset(scores, 0, row_num_ * sizeof(short));
 
-  int begin_index;
-  int end_index;
-  int m;
+    int begin_index;
+    int end_index;
+    int m;
 
-  for (size_t i = bgn_pos+1; i<masses.size(); i++){
-    m = masses[i]-masses[bgn_pos];
-    if(m>=col_num_){
-      break;
+    for (size_t i = bgn_pos+1; i<masses.size(); i++){
+        m = masses[i]-masses[bgn_pos];
+        if(m >= col_num_) {
+            break;
+        }
+        if(m > 0) {
+            begin_index = col_index_begins_[m-1];
+        }
+        else {
+            begin_index = col_index_begins_[m];
+        }
+        end_index = col_index_ends_[m+1];
+        for(int j = begin_index;j<end_index;j++){
+            scores[col_indexes_[j]]++;
+        }
     }
-    if(m>0){
-      begin_index = col_index_begins_[m-1];
-    }
-    else{
-      begin_index = col_index_begins_[m];
-    }
-    end_index = col_index_ends_[m+1];
-    for(int j = begin_index;j<end_index;j++){
-      scores[col_indexes_[j]]++;
-    }
-  }
-  std::vector<std::pair<int,int>> results = getShiftScores(scores, num);
-  delete[] scores;
-  return results;
+    std::vector<std::pair<int,int>> results = getShiftScores(scores, num);
+    delete[] scores;
+    return results;
 }
 
 /*

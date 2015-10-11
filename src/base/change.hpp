@@ -54,6 +54,12 @@ class Change {
 
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
+  static int getInputChange() {return 0;}
+  static int getFixedChange() {return 1;}
+  static int getProteinVariableChange() {return 2;}
+  static int getVariableChange() {return 3;}
+  static int getUnexpectedChange() {return 4;}
+
  private:
   // left and right positions are based on break point positions 
   int left_bp_pos_;

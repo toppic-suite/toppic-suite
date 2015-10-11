@@ -277,7 +277,7 @@ std::vector<std::pair<int, int>> getIntMassErrorList(const PrmMsPtrVec &prm_ms_p
     mass_errors.push_back(getMassError(zero_prm_ptr, scale, n_strict, c_strict));
     //add prec mass for each spectrum 
     PrmPeakPtr prec_prm_ptr = getPrecPeakPtr(i, prec_mass, tole_ptr, 1);
-
+    mass_errors.push_back(getMassError(prec_prm_ptr, scale, true, true));
   }
 
   std::sort(mass_errors.begin(), mass_errors.end(),massErrorUp);
