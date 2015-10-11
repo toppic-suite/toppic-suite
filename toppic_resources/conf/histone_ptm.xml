@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?> 
+<post_translational_modifications>
+<modification>
+  <name>No PTM</name>
+  <abbreviation>No PTM</abbreviation>
+  <formula></formula>
+  <unimod>-1</unimod>
+  <mono_mass>0</mono_mass>
+  <average_mass>0</average_mass>
+  <is_empty>true</is_empty>
+  <residues location="N-term"></residues>
+  <residues location="C-term"></residues>
+  <residues location="Anywhere"></residues>
+  <rule>all kingdom</rule>
+</modification>
+<modification>
+  <name>Acetylation</name>
+  <abbreviation>Acetylation</abbreviation>
+  <formula>H(2) C(2) O</formula>
+  <unimod>1</unimod>
+  <mono_mass>42.010565</mono_mass>
+  <average_mass>42.0367</average_mass>
+  <is_empty>false</is_empty>
+  <residues location="N-term"></residues>
+  <residues location="C-term"></residues>
+  <residues location="Anywhere">KR</residues>
+</modification> 
+<modification>
+  <name>Methylation</name>
+  <abbreviation>Me</abbreviation>
+  <formula>H(2) C</formula>
+  <unimod>34</unimod>
+  <mono_mass>14.015650</mono_mass>
+  <average_mass>14.0266</average_mass>
+  <is_empty>false</is_empty>
+  <residues location="N-term"></residues>
+  <residues location="C-term"></residues>
+  <residues location="Anywhere">KR</residues>
+</modification> 
+<modification>
+  <name>Dimethylation</name>
+  <abbreviation>di-Me</abbreviation>
+  <formula>H(4) C(2)</formula>
+  <unimod>36</unimod>
+  <mono_mass>28.031300</mono_mass>
+  <average_mass>28.0532</average_mass>
+  <is_empty>false</is_empty>
+  <residues location="N-term"></residues>
+  <residues location="C-term"></residues>
+  <residues location="Anywhere">KR</residues>
+</modification>
+<modification>
+  <name>Trimethylation</name>
+  <abbreviation>tri-Me</abbreviation>
+  <formula>H(6) C(3)</formula>
+  <unimod>37</unimod>
+  <mono_mass>42.046950</mono_mass>
+  <average_mass>42.0797</average_mass>
+  <is_empty>false</is_empty>
+  <residues location="N-term"></residues>
+  <residues location="C-term"></residues>
+  <residues location="Anywhere">R</residues>
+</modification> 
+<modification>
+  <name>Phosphorylation</name>
+  <abbreviation>Phospho</abbreviation>
+  <formula>H O(3) P</formula>
+  <unimod>21</unimod>
+  <mono_mass>79.966331</mono_mass>
+  <average_mass>79.9799</average_mass>
+  <is_empty>false</is_empty>
+  <neutral_loss>97.976896</neutral_loss>
+  <residues location="N-term"></residues>
+  <residues location="C-term"></residues>
+  <residues location="Anywhere">STY</residues>
+</modification>
+<modification>
+  <name>Carbamidomethylation</name>
+  <abbreviation>Carbamidomethylation</abbreviation>
+  <formula>H(3) C(2) N(1) O(1)</formula>
+  <unimod>-1</unimod>
+  <mono_mass>57.021464</mono_mass>
+  <average_mass>57.0513</average_mass>
+  <is_empty>false</is_empty>
+  <residues location="N-term"></residues>
+  <residues location="C-term"></residues>
+  <residues location="Anywhere">C</residues>
+  <rule></rule>
+</modification>
+<modification>
+  <name>Iodoacetic acid derivative</name>
+  <abbreviation>Carboxymethyl</abbreviation>
+  <formula>H(2) C(2) O(2)</formula>
+  <unimod>-1</unimod>
+  <mono_mass>58.005479</mono_mass>
+  <average_mass>58.0361</average_mass>
+  <is_empty>false</is_empty>
+  <residues location="N-term"></residues>
+  <residues location="C-term"></residues>
+  <residues location="Anywhere">CKW</residues>
+  <rule></rule>
+</modification> 
+</post_translational_modifications>

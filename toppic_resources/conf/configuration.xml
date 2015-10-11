@@ -2,12 +2,13 @@
 <configuration>
 	<acid_list_file_name>acid.xml</acid_list_file_name>
 	<ptm_list_file_name>ptm.xml</ptm_list_file_name>
+    <ptm_select_file_name>ptm_select.xml</ptm_select_file_name>
 	<residue_list_file_name>residue.xml</residue_list_file_name>
 	<trunc_list_file_name>trunc.xml</trunc_list_file_name>
 	<prot_mod_list_file_name>prot_mod.xml</prot_mod_list_file_name>
 	<ion_type_list_file_name>ion_type.xml</ion_type_list_file_name>
 	<neutral_loss_list_file_name>neutral_loss.xml</neutral_loss_list_file_name>
 	<activation_list_file_name>activation.xml</activation_list_file_name>
-  <support_peak_type_file_name>support_peak_type.xml</support_peak_type_file_name>
+    <support_peak_type_file_name>support_peak_type.xml</support_peak_type_file_name>
 	<build_in_fix_mod_residue_list_file_name>build_in_fix_mod_residue_list.xml</build_in_fix_mod_residue_list_file_name>
 </configuration>
