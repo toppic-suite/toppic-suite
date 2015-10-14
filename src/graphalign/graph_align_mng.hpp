@@ -11,11 +11,13 @@ class GraphAlignMng {
  public:
   GraphAlignMng(PrsmParaPtr prsm_para_ptr, 
                 const std::string &residue_mod_file_name,
-                int shift_num,
+                int max_known_mods,
+                int n_unknown_shift,
                 const std::string &output_file_ext) {
     prsm_para_ptr_ = prsm_para_ptr;
     residue_mod_file_name_ = residue_mod_file_name;
-    n_unknown_shift_ = shift_num;
+    max_known_mods_ = max_known_mods;
+    n_unknown_shift_ = n_unknown_shift;
     output_file_ext_ = output_file_ext;
   }
 
@@ -26,7 +28,7 @@ class GraphAlignMng {
   // set it to 1 for testing 
   double error_tolerance_ = 0.1;
 
-  double max_ptm_sum_mass_ = 300.00;
+  double max_ptm_sum_mass_ = 10000.00;
 
   double min_consistent_dist_ = 1.0;
 
@@ -40,6 +42,8 @@ class GraphAlignMng {
   double align_prefix_suffix_shift_thresh_ = 300;
 
   double refine_prec_step_width_ = 0.005;
+
+  int max_known_mods_ = 10;
 
   int n_unknown_shift_ =2;
 

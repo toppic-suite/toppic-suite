@@ -13,43 +13,52 @@ namespace prot {
 class GraphDpNode;
 typedef std::shared_ptr<GraphDpNode>  GraphDpNodePtr;
 typedef std::vector<GraphDpNodePtr> GraphDpNodePtrVec;
+typedef std::vector<GraphDpNodePtrVec> GraphDpNodePtrVec2D;
 
 class GraphDpNode { 
  public:
   GraphDpNode(int first_idx, int second_idx, double node_score,
-              int n_shift);
+              int n_unknown_shifts, int max_known_mods);
   int getFirstIdx() {return first_idx_;}
   int getSecondIdx() {return second_idx_;}
 
-  double getScore(int s) {return scores_[s];}
-
-  GraphDpNodePtr getPrevNodePtr(int s){return prev_node_ptrs_[s];}
-
-  int getType(int s){return types_[s];}
-
-  void updateTable(int s,double score,int path_type, 
-                   GraphDpNodePtr prev_node_ptr);
-
-  void updateBestNode(int s, double score, GraphDpNodePtr prev_node_ptr);
-
-  double getBestNodeScore(int s) {return best_node_scores_[s];}
-
-  GraphDpNodePtr getBestNodePtr(int s) {return best_node_ptrs_[s];}
-
   double getNodeScore() {return node_score_;}
+  int getPrevEdgeType(int s, int m){return prev_edge_types_[s][m];}
+  int getPrevEdgeModNum(int s, int m){return prev_edge_mod_nums_[s][m];}
+
+  double getBestScore(int s, int m) {return best_scores_[s][m];}
+
+  GraphDpNodePtr getPrevNodePtr(int s, int m){return prev_node_ptrs_[s][m];}
+
+  void updateTable(int s, int m, int path_type, int mod_num,
+                   GraphDpNodePtr prev_node_ptr, int score);
+
+  /*
+  void updateBestNode(int s, int m, double score, GraphDpNodePtr prev_node_ptr);
+
+  double getBestNodeScore(int s, int m) {return best_node_scores_[s][m];}
+
+  GraphDpNodePtr getBestNodePtr(int s, int m) {return best_node_ptrs_[s][m];}
+  */
+
 
  private:
   int first_idx_;
   int second_idx_;
+  // the score for current node
   double node_score_;
-  GraphDpNodePtrVec prev_node_ptrs_;
-  std::vector<double> scores_;
-  std::vector<int> types_;
-  GraphDpNodePtrVec best_node_ptrs_;
-  std::vector<double> best_node_scores_;
+  std::vector<std::vector<int>> prev_edge_types_;
+  std::vector<std::vector<int>> prev_edge_mod_nums_;
+
+  GraphDpNodePtrVec2D prev_node_ptrs_;
+  std::vector<std::vector<double>> best_scores_;
+
+  /*
+  GraphDpNodePtrVec2D best_node_ptrs_;
+  std::vector<std::vector<double>> best_node_scores_;
+  */
 };
 
-typedef std::vector<GraphDpNodePtrVec> GraphDpNodePtrVec2D;
 
 } /* namespace prot */
 
