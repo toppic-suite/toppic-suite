@@ -21,7 +21,7 @@ MAIN = $(BIN_DIR)/graph_align
 all:    $(MAIN)
 
 $(MAIN): $(OBJS) $(LINK_OBJS) 
-	$(CC) $(CPPFLAGS) $(INCLUDES) -o $(BIN_DIR)/graph_align $(OBJS) $(LINK_OBJS) $(LFLAGS) $(LIBS)
+#	$(CC) $(CPPFLAGS) $(INCLUDES) -o $(BIN_DIR)/graph_align $(OBJS) $(LINK_OBJS) $(LFLAGS) $(LIBS)
 
 $(OBJ_DIR)/%.o: %.cpp
 	$(CC) -c $(CPPFLAGS) $(INCLUDES) $< -o $@

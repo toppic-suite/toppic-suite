@@ -42,8 +42,8 @@
 #include "graph/graph.hpp"
 #include "graph/proteo_graph.hpp"
 
-#include "graph_align/graph_align_mng.hpp"
-#include "graph_align/graph_align_processor.hpp"
+#include "graphalign/graph_align_mng.hpp"
+#include "graphalign/graph_align_processor.hpp"
 
 namespace prot {
 

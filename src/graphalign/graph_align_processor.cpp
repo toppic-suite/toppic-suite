@@ -2,8 +2,8 @@
 #include "graph/graph_util.hpp"
 #include "graph/proteo_graph_reader.hpp"
 #include "graph/spec_graph_reader.hpp"
-#include "graph_align/graph_align.hpp"
-#include "graph_align/graph_align_processor.hpp"
+#include "graphalign/graph_align.hpp"
+#include "graphalign/graph_align_processor.hpp"
 
 namespace prot {
 
