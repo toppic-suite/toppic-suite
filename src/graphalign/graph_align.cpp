@@ -13,8 +13,10 @@ GraphAlign::GraphAlign(GraphAlignMngPtr mng_ptr,
   mng_ptr_ = mng_ptr;
   proteo_graph_ptr_ = proteo_graph_ptr;
   spec_graph_ptr_ = spec_graph_ptr;
-  DistTuplePtrVec proteo_vec = proteo_graph_ptr_->getDistTuplePtrVec();
+
+  DistTuplePtrVec2D proteo_vec = proteo_graph_ptr_->getDistTuplePtrVec2D();
   tuple_vec_.insert(tuple_vec_.begin(), proteo_vec.begin(), proteo_vec.end());
+  /*
   DistTuplePtrVec spec_vec = spec_graph_ptr_->getDistTuplePtrVec();
   tuple_vec_.insert(tuple_vec_.begin(), spec_vec.begin(), spec_vec.end());
   std::sort(tuple_vec_.begin(), tuple_vec_.end(),distUp);
@@ -23,9 +25,11 @@ GraphAlign::GraphAlign(GraphAlignMngPtr mng_ptr,
   proteo_ver_num_ = num_vertices(*pg_.get());
   spec_ver_num_ = num_vertices(*sg_.get());
   LOG_DEBUG("Graph constructor end");
+  */
 }
 
 
+/*
 void GraphAlign::getConsistentPairs() {
   LOG_DEBUG("consistent pair start");
   int tole = mng_ptr_->getIntTolerance();
@@ -519,6 +523,7 @@ PrsmPtr GraphAlign::geneResult(int s ){
   return PrsmPtr(new Prsm(sub_proteo_ptr, deconv_ms_ptr_vec, refine_prec_mass,
           mng_ptr_->prsm_para_ptr_->getSpParaPtr()));
 }
+*/
 
 }
 

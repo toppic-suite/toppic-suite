@@ -9,6 +9,7 @@ ProteoGraph::ProteoGraph(DbResSeqPtr db_res_seq_ptr,
                          MassGraphPtr graph_ptr,
                          bool is_nme,
                          double convert_ratio,
+                         int max_mod_num,
                          int max_ptm_sum_mass) {
   db_proteo_ptr_ = getDbProteoformPtr(db_res_seq_ptr);
   graph_ptr_ = graph_ptr;
@@ -17,7 +18,7 @@ ProteoGraph::ProteoGraph(DbResSeqPtr db_res_seq_ptr,
   LOG_DEBUG("node num " << node_num_);
   pair_num_ = node_num_ * (node_num_ + 1) /2;
   compSeqMasses(convert_ratio);
-  compDistances(convert_ratio, max_ptm_sum_mass);
+  compDistances(convert_ratio, max_mod_num, max_ptm_sum_mass);
 }
 
 int ProteoGraph::getVecIndex(int v1, int v2) {
@@ -45,19 +46,23 @@ void ProteoGraph::compSeqMasses(double convert_ratio) {
   }
 }
 
-void ProteoGraph::compDistances(double convert_ratio, int max_ptm_sum_mass) {
+void ProteoGraph::compDistances(double convert_ratio, int max_mod_num, int max_ptm_sum_mass) {
   MassGraph *g_p = graph_ptr_.get();
   //get mass without ptms
 
-  std::vector<std::set<int>> dist_vecs; 
+  std::vector<std::vector<std::set<int>>> dist_vecs; 
   for (int i = 0; i < pair_num_; i++) {; 
     std::set<int> empty_set;
-    dist_vecs.push_back(empty_set);
+    std::vector<std::set<int>> one_pair_vec;
+    for (int j = 0; j < max_mod_num + 1; j ++) {
+      one_pair_vec.push_back(empty_set);
+    }
+    dist_vecs.push_back(one_pair_vec);
   }
   // initialize pair (i, i)
   for (int i = 0; i < node_num_; i++) {
     int index = getVecIndex(i, i);
-    dist_vecs[index].insert(0);
+    dist_vecs[index][0].insert(0);
   }
   for (int i = 0; i < node_num_ - 1; i++) {
     for (int j = i+1; j < node_num_; j++) {
@@ -71,27 +76,43 @@ void ProteoGraph::compDistances(double convert_ratio, int max_ptm_sum_mass) {
         if(target(*ei, *g_p) == v2 ) {
           MassGraph::edge_descriptor e = *ei;
           int d =(*g_p)[e].int_mass_;
-          for (std::set<int>::iterator it=dist_vecs[pre_index].begin(); 
-               it!=dist_vecs[pre_index].end(); it++) {
-            int new_d = d + *it;
-            if (std::abs(new_d - seq_masses_[index]) <= max_ptm_sum_mass) {
-              dist_vecs[index].insert(new_d);
+          int change = (*g_p)[e].change_type_;
+          for (int k = 0; k < max_mod_num + 1; k++) {
+            if (k == max_mod_num && (change == Change::getProteinVariableChange() || change == Change::getVariableChange())) {
+              continue;
+            }
+            for (std::set<int>::iterator it=dist_vecs[pre_index][k].begin(); 
+                 it!=dist_vecs[pre_index][k].end(); it++) {
+              int new_d = d + *it;
+              if (std::abs(new_d - seq_masses_[index]) <= max_ptm_sum_mass) {
+                if (change == Change::getProteinVariableChange() || change == Change::getVariableChange()) {
+                  dist_vecs[index][k+1].insert(new_d);
+                }
+                else {
+                  dist_vecs[index][k].insert(new_d);
+                }
+              }
             }
           }
         }
       }
     }
   }
+
   int count = 0;
   for (int i = 0; i < node_num_ - 1; i++) {
     for (int j = i+1; j < node_num_; j++) {
       int index = getVecIndex(i, j);
-      for (std::set<int>::iterator it=dist_vecs[index].begin(); 
-           it!=dist_vecs[index].end(); it++) {
-        DistTuplePtr tuple_ptr(new DistTuple(graph_ptr_, i, j, *it));
-        tuple_vec_.push_back(tuple_ptr);
+      DistTuplePtrVec cur_tuple_vec;
+      for (int k = 0; k < max_mod_num + 1; k++) {
+        for (std::set<int>::iterator it=dist_vecs[index][k].begin(); 
+             it!=dist_vecs[index][k].end(); it++) {
+          DistTuplePtr tuple_ptr(new DistTuple(graph_ptr_, i, j, k, *it));
+          cur_tuple_vec.push_back(tuple_ptr);
+        }
+        count += dist_vecs[index][k].size();
       }
-      count += dist_vecs[index].size();
+      tuple_vec_.push_back(cur_tuple_vec);
       //LOG_DEBUG("i " << i << " j " << j << " size " << dist_vecs[index].size());
     }
   }

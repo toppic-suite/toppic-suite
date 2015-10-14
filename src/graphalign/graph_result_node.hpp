@@ -8,20 +8,23 @@ namespace prot {
 
 class GraphResultNode { 
  public:
-  GraphResultNode(GraphDpNodePtr node_ptr, int shift_num) {
+  GraphResultNode(GraphDpNodePtr node_ptr, int s, int m) {
     first_idx_ = node_ptr->getFirstIdx();
     second_idx_ = node_ptr->getSecondIdx();
-    type_ = node_ptr->getType(shift_num);
+    prev_edge_type_ = node_ptr->getPrevEdgeType(s, m);
+    prev_edge_mod_num_ = node_ptr->getPrevEdgeModNum(s, m);
   }
 
   int getFirstIdx() {return first_idx_;}
   int getSecondIdx() {return second_idx_;}
-  int getType(){return type_;}
+  int getPrevEdgeType(){return prev_edge_type_;}
+  int getPrevEdgeModNum(){return prev_edge_mod_num_;}
 
  private:
   int first_idx_;
   int second_idx_;
-  int type_;
+  int prev_edge_type_;
+  int prev_edge_mod_num_;
 };
 
 typedef std::shared_ptr<GraphResultNode> GraphResultNodePtr;
