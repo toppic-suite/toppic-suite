@@ -13,8 +13,8 @@ all:
 	cd prsm; make
 	cd zeroptmfilter; make
 	cd zeroptmsearch; make
-	cd diagfilter; make
 	cd oneptmfilter; make
+	cd diagfilter; make
 	cd ptmsearch; make
 	cd tdgf; make
 #	cd poisson; make
@@ -26,12 +26,13 @@ clean:
 	cd base; make clean
 	cd spec; make clean
 	cd prsm; make clean
-	cd poisson; make clean
+	cd zeroptmfilter; make clean
 	cd zeroptmsearch; make clean
-	cd tdgf; make clean
-	cd diagfilter; make clean
 	cd oneptmfilter; make clean
+	cd diagfilter; make clean
 	cd ptmsearch; make clean
+# cd poisson; make clean
+	cd tdgf; make clean
 	cd prsmview; make clean
 	cd console; make clean
 	cd test; make clean
