@@ -2,7 +2,7 @@
 #define PROT_GRAPH_ALIGN_PROCESSOR_HPP_
 
 #include "graph/graph.hpp"
-#include "graph_align/graph_align_mng.hpp"
+#include "graphalign/graph_align_mng.hpp"
 
 namespace prot {
 

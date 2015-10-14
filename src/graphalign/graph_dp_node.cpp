@@ -1,6 +1,6 @@
 #include <limits>
 
-#include "graph_align/graph_dp_node.hpp"
+#include "graphalign/graph_dp_node.hpp"
 
 namespace prot {
 

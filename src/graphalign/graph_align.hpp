@@ -6,9 +6,9 @@
 #include "graph/graph.hpp"
 #include "graph/proteo_graph.hpp"
 #include "graph/spec_graph.hpp"
-#include "graph_align/graph_dp_node.hpp"
-#include "graph_align/graph_result_node.hpp"
-#include "graph_align/graph_align_mng.hpp"
+#include "graphalign/graph_dp_node.hpp"
+#include "graphalign/graph_result_node.hpp"
+#include "graphalign/graph_align_mng.hpp"
 
 namespace prot {
 

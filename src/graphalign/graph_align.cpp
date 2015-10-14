@@ -1,8 +1,8 @@
 #include "ptmsearch/diagonal.hpp"
 #include "ptmsearch/diagonal_header.hpp"
 #include "graph/graph_util.hpp"
-#include "graph_align/graph_align_processor.hpp"
-#include "graph_align/graph_align.hpp"
+#include "graphalign/graph_align_processor.hpp"
+#include "graphalign/graph_align.hpp"
 
 namespace prot {
 
