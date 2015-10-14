@@ -1,11 +1,63 @@
-<?xml version="1.0" encoding="ISO-8859-1" ?> 
-<ptm_select>
-<abbreviation>No PTM</abbreviation>
-<abbreviation>Phospho</abbreviation>
-<abbreviation>Acetylation</abbreviation>
-<abbreviation>tri-Me</abbreviation>
-<abbreviation>di-Me</abbreviation>
-<abbreviation>Me</abbreviation>
-<abbreviation>Carbamidomethylation</abbreviation>
-<abbreviation>Carboxymethyl</abbreviation>
-</ptm_select>
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<residue_list>
+        <residue>
+                <acid>Lysine</acid>
+                <ptm>No PTM</ptm>
+        </residue>
+        <residue>
+                <acid>Lysine</acid>
+                <ptm>Acetylation</ptm>
+        </residue>
+        <residue>
+                <acid>Lysine</acid>
+                <ptm>Me</ptm>
+        </residue>        
+        <residue>
+                <acid>Lysine</acid>
+                <ptm>di-Me</ptm>
+        </residue>
+        <residue>
+                <acid>Arginine</acid>
+                <ptm>No PTM</ptm>
+        </residue>
+        <residue>
+                <acid>Arginine</acid>
+                <ptm>Acetylation</ptm>
+        </residue>
+        <residue>
+                <acid>Arginine</acid>
+                <ptm>Me</ptm>
+        </residue>
+        <residue>
+                <acid>Arginine</acid>
+                <ptm>di-Me</ptm>
+        </residue>
+        <residue>
+                <acid>Arginine</acid>
+                <ptm>tri-Me</ptm>
+        </residue>
+        <residue>
+                <acid>Serine</acid>
+                <ptm>No PTM</ptm>
+        </residue>        
+        <residue>
+                <acid>Serine</acid>
+                <ptm>Phospho</ptm>
+        </residue>
+        <residue>
+                <acid>Tyrosine</acid>
+                <ptm>No PTM</ptm>
+        </residue>
+        <residue>
+                <acid>Tyrosine</acid>
+                <ptm>Phospho</ptm>
+        </residue>        
+        <residue>
+                <acid>Threonine</acid>
+                <ptm>No PTM</ptm>
+        </residue>
+        <residue>
+                <acid>Threonine</acid>
+                <ptm>Phospho</ptm>
+        </residue>
+</residue_list>
