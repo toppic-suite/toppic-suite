@@ -54,8 +54,6 @@ class FastaReader {
    **/                  
   FastaSeqPtr getNextSeq();
 
-  ProteoformPtr getNextProteoformPtr(const ResiduePtrVec &residue_list);
-
  private:
   std::ifstream input_;
   std::string ori_name_;
@@ -67,27 +65,12 @@ typedef std::shared_ptr<FastaReader> FastaReaderPtr;
 /* remove incorrect charaters in sequence */
 std::string rmChar(const std::string &ori_seq);
 
-
-ProteoformPtrVec readFastaToProteoform(const std::string &file_name, 
-                                       const ResiduePtrVec &residue_list);
-                                       
-
-ProteoformPtrVec readFastaToProteoform(const std::string &file_name, 
-                                       const ResiduePtrVec &residue_list,
-                                       int seq_bgn_id);
-
 void generateShuffleDb(const std::string &file_name, 
                        const std::string &target_decoy_file_name);
 
 void dbPreprocess(const std::string &ori_db_file_name, 
                   const std::string &db_file_name, 
                   bool decoy, int block_size);
-
-ProteoformPtr readFastaToProteoform(faidx_t *fai,
-                                    int id,
-                                    const std::string &seq_name, 
-                                    const std::string &seq_desc,
-                                    const ResiduePtrVec &residue_list);
 
 std::string readFastaByIndex(faidx_t *fai, int id, std::string seq_name);
 
