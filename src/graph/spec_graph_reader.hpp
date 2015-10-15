@@ -11,7 +11,7 @@ class SpecGraphReader {
   SpecGraphReader(const std::string &sp_file_name,
                   int group_sp_num, double convert_ratio,
                   SpParaPtr sp_para_ptr);
-  SpecGraphPtr getNextSpecGraphPtr();
+  SpecGraphPtrVec getNextSpecGraphPtrVec(int error);
 
  private:
   MsAlignReaderPtr ms_reader_ptr_;

@@ -50,26 +50,28 @@ void GraphAlignProcessor::process() {
                               sp_para_ptr);
   LOG_DEBUG("init spec reader complete");
 
-  SpecGraphPtr spec_ptr = spec_reader.getNextSpecGraphPtr();
+  SpecGraphPtrVec spec_ptr_vec = spec_reader.getNextSpecGraphPtrVec(mng_ptr_->prec_error_);
   LOG_DEBUG("spec ptr reading complete");
   //writeToDot("spec.dot", spec_ptr->getMassGraphPtr());
   int sp_count = 0;
-  while (spec_ptr != nullptr) {
+  while (spec_ptr_vec.size() != 0) {
     sp_count++;
-    LOG_DEBUG("spectrum id " << spec_ptr->getSpectrumSetPtr()->getSpecId());
-    if (spec_ptr->getSpectrumSetPtr()->isValid()) {
-      for (size_t i = 0; i < proteo_ptrs.size(); i++) {
-        GraphAlign graph_align(mng_ptr_, proteo_ptrs[i], spec_ptr);
-        graph_align.process();
-        for (int s = 0; s <= mng_ptr_->n_unknown_shift_; s++) {
-          PrsmPtr prsm_ptr = graph_align.geneResult(s);
-          if (prsm_ptr != nullptr) {
-            prsm_writer.write(prsm_ptr);
+    LOG_DEBUG("spectrum id " << spec_ptr_vec[0]->getSpectrumSetPtr()->getSpecId());
+    for (size_t spec = 0; spec < spec_ptr_vec.size(); spec++) {
+      if (spec_ptr_vec[spec]->getSpectrumSetPtr()->isValid()) {
+        for (size_t i = 0; i < proteo_ptrs.size(); i++) {
+          GraphAlign graph_align(mng_ptr_, proteo_ptrs[i], spec_ptr_vec[spec]);
+          graph_align.process();
+          for (int shift = 0; shift <= mng_ptr_->n_unknown_shift_; shift++) {
+            PrsmPtr prsm_ptr = graph_align.geneResult(shift);
+            if (prsm_ptr != nullptr) {
+              prsm_writer.write(prsm_ptr);
+            }
           }
         }
       }
     }
-    spec_ptr = spec_reader.getNextSpecGraphPtr();
+    spec_ptr_vec = spec_reader.getNextSpecGraphPtrVec(mng_ptr_->prec_error_);
   }
   prsm_writer.close();
 }
