@@ -38,7 +38,7 @@ void SpecGraph::compSpecDistances(double convert_ratio) {
       int int_dist = std::round(dist * convert_ratio);
       int index = getVecIndex(i, j);
       peak_dists_[index] = int_dist;
-      DistTuplePtr tuple_ptr(new DistTuple(graph_ptr_, i, j, int_dist));
+      DistTuplePtr tuple_ptr(new DistTuple(graph_ptr_, i, j, 0, int_dist));
       tuple_vec_.push_back(tuple_ptr);
       count++;
           //LOG_DEBUG("i " << i << " j " << j << " count " << count);

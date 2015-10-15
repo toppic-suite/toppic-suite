@@ -36,12 +36,10 @@ void GraphDpNode::updateTable(int s, int m, int path_type, int mod_num,
   best_scores_[s][m] = score;
 }
 
-/*
-void GraphDpNode::updateBestNode(int s, double score, 
-                                 GraphDpNodePtr best_node_ptr) {
-  best_node_scores_[s] = score;
-  best_node_ptrs_[s] = best_node_ptr;
+void GraphDpNode::updateBestShiftNode(int s, int m, double score, 
+                                      GraphDpNodePtr best_node_ptr) {
+  best_shift_scores_[s][m] = score;
+  best_shift_node_ptrs_[s][m] = best_node_ptr;
 }
-*/
 
 } /* namespace prot */

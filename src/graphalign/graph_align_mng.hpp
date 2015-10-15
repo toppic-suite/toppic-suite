@@ -11,13 +11,13 @@ class GraphAlignMng {
  public:
   GraphAlignMng(PrsmParaPtr prsm_para_ptr, 
                 const std::string &residue_mod_file_name,
-                int max_known_mods,
                 int n_unknown_shift,
+                int max_known_mods,
                 const std::string &output_file_ext) {
     prsm_para_ptr_ = prsm_para_ptr;
     residue_mod_file_name_ = residue_mod_file_name;
-    max_known_mods_ = max_known_mods;
     n_unknown_shift_ = n_unknown_shift;
+    max_known_mods_ = max_known_mods;
     output_file_ext_ = output_file_ext;
   }
 
