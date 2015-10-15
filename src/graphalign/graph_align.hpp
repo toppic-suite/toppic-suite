@@ -12,7 +12,7 @@
 
 namespace prot {
 
-typedef std::vector<std::vector<std::vector<std::pair<int, int>>>> ConsistentPairs;
+typedef std::vector<std::vector<std::vector<std::vector<std::pair<int, int>>>>> ConsistentPairs;
 
 class GraphAlign {
  public:
@@ -21,6 +21,7 @@ class GraphAlign {
   void process();
 
   PrsmPtr geneResult(int s, int m);
+  PrsmPtr geneResult(int s);
 
  private:
   GraphAlignMngPtr mng_ptr_;
@@ -33,29 +34,34 @@ class GraphAlign {
   int max_mod_num_;
   int n_unknown_shift_;
   DistTuplePtrVec2D tuple_vec_;
-  /*
   ConsistentPairs cons_pairs_;
-
   GraphDpNodePtrVec2D table_;
+  GraphResultNodePtrVec3D result_nodes_;
 
-  GraphResultNodePtrVec2D result_nodes_;
-
-  //tempary
   GraphResultNodePtrVec2D nodes_2d_;
   DiagonalHeaderPtrVec diag_headers_; 
   DiagonalHeaderPtrVec2D diag_headers_2d_; 
 
   void getConsistentPairs();
   void initTable();
-  void dp();
-  void backtrace();
-  GraphResultNodePtrVec backtrace(int s);
-  void getNodeDiagonals(int s);
-  void geneHeaders();
 
-  GraphDpNodePtr compBestVariableNode(int i, int j, int s);
-  GraphDpNodePtr compBestShiftNode(int i, int j, int s);
-  void compBestNode(int i, int j, int s);
+  GraphDpNodePtr compBestVariableNode(int i, int j, int s, int m, int &best_edge_mod_num);
+  GraphDpNodePtr compBestShiftNode(int i, int j, int s, int m);
+  void updateBestShiftNode(int i, int j, int s, int m);
+  void dp();
+
+  GraphResultNodePtrVec backtrace(int s, int m);
+  void backtrace();
+
+  void getNodeDiagonals(int s, int m);
+
+  void geneHeaders();
+  
+  /*
+
+  //tempary
+
+
   */
 };
 

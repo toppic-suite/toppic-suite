@@ -33,13 +33,11 @@ class GraphDpNode {
   void updateTable(int s, int m, int path_type, int mod_num,
                    GraphDpNodePtr prev_node_ptr, int score);
 
-  /*
-  void updateBestNode(int s, int m, double score, GraphDpNodePtr prev_node_ptr);
+  void updateBestShiftNode(int s, int m, double score, GraphDpNodePtr prev_node_ptr);
 
-  double getBestNodeScore(int s, int m) {return best_node_scores_[s][m];}
+  double getBestShiftScore(int s, int m) {return best_shift_scores_[s][m];}
 
-  GraphDpNodePtr getBestNodePtr(int s, int m) {return best_node_ptrs_[s][m];}
-  */
+  GraphDpNodePtr getBestShiftNodePtr(int s, int m) {return best_shift_node_ptrs_[s][m];}
 
 
  private:
@@ -47,16 +45,17 @@ class GraphDpNode {
   int second_idx_;
   // the score for current node
   double node_score_;
+
+  // prev edge and node for dp
   std::vector<std::vector<int>> prev_edge_types_;
   std::vector<std::vector<int>> prev_edge_mod_nums_;
 
   GraphDpNodePtrVec2D prev_node_ptrs_;
   std::vector<std::vector<double>> best_scores_;
 
-  /*
-  GraphDpNodePtrVec2D best_node_ptrs_;
-  std::vector<std::vector<double>> best_node_scores_;
-  */
+  // the vector for finding shift nodes
+  GraphDpNodePtrVec2D best_shift_node_ptrs_;
+  std::vector<std::vector<double>> best_shift_scores_;
 };
 
 

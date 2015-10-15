@@ -93,7 +93,8 @@ int proteoform_graph_test(int argc, char* argv[]) {
     PrsmParaPtr prsm_para_ptr = PrsmParaPtr(new PrsmPara(arguments));
 
     std::cout << "Graph alignment started." << std::endl;
-    GraphAlignMngPtr ga_mng_ptr = GraphAlignMngPtr(new GraphAlignMng(prsm_para_ptr, residue_mod_file_name, ptm_num, "GRAPH_ALIGN"));
+    int max_mod_num = 10;
+    GraphAlignMngPtr ga_mng_ptr = GraphAlignMngPtr(new GraphAlignMng(prsm_para_ptr, residue_mod_file_name, ptm_num, max_mod_num,  "GRAPH_ALIGN"));
     LOG_DEBUG("shift num " << ptm_num);
     GraphAlignProcessorPtr ga_processor_ptr = GraphAlignProcessorPtr(new GraphAlignProcessor(ga_mng_ptr));
     ga_processor_ptr->process();

@@ -14,7 +14,8 @@ class ProteoGraphReader {
                     const ResiduePtrVec &fix_mod_res_ptr_vec, 
                     const ProtModPtrVec &prot_mod_ptr_vec,
                     const ResiduePtrVec &residue_mod_ptr_vec,
-                    double convert_ratio, int max_ptm_sum_mass);
+                    double convert_ratio, int max_mod_num,
+                    int max_ptm_sum_mass);
 
   ProteoGraphPtr getNextProteoGraphPtr();
 
@@ -22,6 +23,7 @@ class ProteoGraphReader {
   /* db_residue_seq contains fixed modifications */
   ResiduePtrVec fix_mod_res_ptr_vec_; 
   double convert_ratio_;
+  int max_mod_num_;
   int max_ptm_sum_mass_;
   ProteoAnnoPtr proteo_anno_ptr_;
   FastaReaderPtr reader_ptr_;

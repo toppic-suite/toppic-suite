@@ -29,6 +29,7 @@ void GraphAlignProcessor::process() {
                            prsm_para_ptr->getAllowProtModPtrVec(),
                            residue_mod_ptr_vec,
                            mng_ptr_->convert_ratio_,
+                           mng_ptr_->max_known_mods_,
                            mng_ptr_->getIntMaxPtmSumMass());
   LOG_DEBUG("init reader complete");
   ProteoGraphPtrVec proteo_ptrs;

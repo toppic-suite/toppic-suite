@@ -7,10 +7,11 @@ ProteoGraphReader::ProteoGraphReader(const std::string &db_file_name,
                                      const ResiduePtrVec &fix_mod_res_ptr_vec, 
                                      const ProtModPtrVec &prot_mod_ptr_vec,
                                      const ResiduePtrVec &residue_mod_ptr_vec,
-                                     double convert_ratio,
+                                     double convert_ratio, int max_mod_num,
                                      int max_ptm_sum_mass) {
   fix_mod_res_ptr_vec_ = fix_mod_res_ptr_vec;
   convert_ratio_ = convert_ratio;
+  max_mod_num_ = max_mod_num;
   max_ptm_sum_mass_ = max_ptm_sum_mass;
   reader_ptr_ = FastaReaderPtr(new FastaReader(db_file_name));
   proteo_anno_ptr_ = ProteoAnnoPtr(
@@ -55,7 +56,8 @@ ProteoGraphPtr ProteoGraphReader::getNextProteoGraphPtr() {
   seq_id_++;
   return ProteoGraphPtr(new ProteoGraph(db_residue_seq_ptr, graph_ptr, 
                                         proteo_anno_ptr_->isNme(),
-                                        convert_ratio_, max_ptm_sum_mass_));
+                                        convert_ratio_, max_mod_num_,
+                                        max_ptm_sum_mass_));
 }
 
 }
