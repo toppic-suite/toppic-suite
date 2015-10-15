@@ -69,7 +69,7 @@ void XmlGenerator::outputProteoforms(const PrsmPtrVec &prsm_ptrs){
 
 void XmlGenerator::outputProteins(const PrsmPtrVec &prsm_ptrs){
   //LOG_DEBUG("prsm number " << prsm_ptrs.size());
-  FastaReader reader(mng_ptr_->prsm_para_ptr_->getSearchDbFileName());
+  ProteoformReader reader(mng_ptr_->prsm_para_ptr_->getSearchDbFileName());
   ResiduePtrVec residue_ptr_vec = mng_ptr_->prsm_para_ptr_->getFixModResiduePtrVec();
   ProteoformPtr proteo_ptr = reader.getNextProteoformPtr(residue_ptr_vec);
 

@@ -1,7 +1,7 @@
 #include <cmath>
 
 #include "base/logger.hpp"
-#include "base/fasta_reader.hpp"
+#include "base/proteoform_reader.hpp"
 #include "tdgf/count_test_num.hpp"
 #include "tdgf/comp_prob_value.hpp"
 
@@ -128,7 +128,7 @@ void CountTestNum::init(PrsmParaPtr para_ptr) {
   ResiduePtrVec n_term_residue_list;
   std::vector<double> n_term_residue_counts;
 
-  FastaReader reader(db_file_name);
+  ProteoformReader reader(db_file_name);
   ProtModPtrVec prot_mods = para_ptr->getAllowProtModPtrVec();
   ProteoformPtr proteo_ptr = reader.getNextProteoformPtr(residue_list);
   
