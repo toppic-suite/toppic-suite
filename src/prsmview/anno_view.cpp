@@ -2,7 +2,7 @@
 #include <set>
 #include <boost/algorithm/string.hpp>
 
-#include "base/fasta_reader.hpp"
+#include "base/proteoform_reader.hpp"
 #include "spec/peak.hpp"
 #include "prsmview/anno_residue.hpp"
 #include "prsmview/anno_unexpected_change.hpp"
@@ -467,7 +467,7 @@ xercesc::DOMElement* allProteinToXml(XmlDOMDocument* xml_doc,
                                   PrsmViewMngPtr mng_ptr){
   xercesc::DOMElement* prot_elements = xml_doc->createElement("proteins");
   // sort 
-  FastaReader reader(mng_ptr->prsm_para_ptr_->getSearchDbFileName());
+  ProteoformReader reader(mng_ptr->prsm_para_ptr_->getSearchDbFileName());
   ResiduePtrVec residue_ptr_vec = mng_ptr->prsm_para_ptr_->getFixModResiduePtrVec();
   ProteoformPtr proteo_ptr = reader.getNextProteoformPtr(residue_ptr_vec);
   std::vector<std::pair<ProteoformPtr, double>> proteo_evalues;
