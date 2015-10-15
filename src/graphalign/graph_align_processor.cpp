@@ -34,16 +34,17 @@ void GraphAlignProcessor::process() {
   LOG_DEBUG("init reader complete");
   ProteoGraphPtrVec proteo_ptrs;
   ProteoGraphPtr proteo_ptr;
-  //writeToDot("proteo.dot", proteo_ptr->getMassGraphPtr());
   int count = 0;
   while ((proteo_ptr = reader.getNextProteoGraphPtr()) != nullptr) {
     count++;
     proteo_ptrs.push_back(proteo_ptr);
   }
+  writeToDot("proteo.dot", proteo_ptrs[0]->getMassGraphPtr());
   LOG_DEBUG("Prot graph number " << count);
   std::string output_file_name = basename(sp_file_name)+"."+mng_ptr_->output_file_ext_;
   PrsmWriter prsm_writer(output_file_name);
 
+  LOG_DEBUG("start init spec reader");
   SpecGraphReader spec_reader(sp_file_name, 
                               prsm_para_ptr->getGroupSpecNum(),
                               mng_ptr_->convert_ratio_,
@@ -62,6 +63,7 @@ void GraphAlignProcessor::process() {
         for (size_t i = 0; i < proteo_ptrs.size(); i++) {
           GraphAlign graph_align(mng_ptr_, proteo_ptrs[i], spec_ptr_vec[spec]);
           graph_align.process();
+          LOG_DEBUG("align process complete");
           for (int shift = 0; shift <= mng_ptr_->n_unknown_shift_; shift++) {
             PrsmPtr prsm_ptr = graph_align.geneResult(shift);
             if (prsm_ptr != nullptr) {

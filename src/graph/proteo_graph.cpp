@@ -99,20 +99,23 @@ void ProteoGraph::compDistances(double convert_ratio, int max_mod_num, int max_p
     }
   }
 
+  DistTuplePtrVec empty_vec;
+  for (int k = 0; k < max_mod_num + 1; k++) {
+    tuple_vec_.push_back(empty_vec);
+  }
+
   int count = 0;
   for (int i = 0; i < node_num_ - 1; i++) {
     for (int j = i+1; j < node_num_; j++) {
       int index = getVecIndex(i, j);
-      DistTuplePtrVec cur_tuple_vec;
       for (int k = 0; k < max_mod_num + 1; k++) {
         for (std::set<int>::iterator it=dist_vecs[index][k].begin(); 
              it!=dist_vecs[index][k].end(); it++) {
           DistTuplePtr tuple_ptr(new DistTuple(graph_ptr_, i, j, k, *it));
-          cur_tuple_vec.push_back(tuple_ptr);
+          tuple_vec_[k].push_back(tuple_ptr);
         }
         count += dist_vecs[index][k].size();
       }
-      tuple_vec_.push_back(cur_tuple_vec);
       //LOG_DEBUG("i " << i << " j " << j << " size " << dist_vecs[index].size());
     }
   }

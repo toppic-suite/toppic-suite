@@ -31,7 +31,6 @@ class GraphAlign {
   SpecGraphPtr spec_graph_ptr_;
   MassGraphPtr sg_;
   int spec_ver_num_;
-  int max_mod_num_;
   int n_unknown_shift_;
   DistTuplePtrVec2D tuple_vec_;
   ConsistentPairs cons_pairs_;

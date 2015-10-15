@@ -4,11 +4,13 @@ LINK_OBJS = $(BASE_OBJS) $(SPEC_OBJS) $(PRSM_OBJS) $(PTM_OBJS) $(TDGF_OBJS) $(AR
 
 OBJS = $(GRAPH_ALIGN_OBJS) 
 
+LINK_OBJS = $(BASE_OBJS) $(SPEC_OBJS) $(PRSM_OBJS) $(ZERO_PTM_OBJS) $(DIAG_FILTER_OBJS) $(ONE_PTM_FILTER_OBJS) $(PTM_OBJS) $(ARGUMENT_OBJS) $(GRAPH_OBJS) $(GRAPH_ALIGN_OBJS) $(TDGF_OBJS) 
+
 BIN_DIR = ../../bin
 
 #
 # define the executable file 
-MAIN = $(BIN_DIR)/graph_align
+MAIN = $(BIN_DIR)/test_graph_align
 #
 #
 # The following part of the makefile is generic; it can be used to 
@@ -21,7 +23,7 @@ MAIN = $(BIN_DIR)/graph_align
 all:    $(MAIN)
 
 $(MAIN): $(OBJS) $(LINK_OBJS) 
-#	$(CC) $(CPPFLAGS) $(INCLUDES) -o $(BIN_DIR)/graph_align $(OBJS) $(LINK_OBJS) $(LFLAGS) $(LIBS)
+	$(CC) $(CPPFLAGS) $(INCLUDES) -o $(MAIN) $(LINK_OBJS) $(LFLAGS) $(LIBS)
 
 $(OBJ_DIR)/%.o: %.cpp
 	$(CC) -c $(CPPFLAGS) $(INCLUDES) $< -o $@

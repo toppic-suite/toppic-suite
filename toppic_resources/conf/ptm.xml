@@ -7,7 +7,7 @@
   <unimod>-1</unimod>
   <mono_mass>0</mono_mass>
   <average_mass>0</average_mass>
-  <is_empty>true</is_empty>
+  <is_empty>false</is_empty>
   <residues location="N-term"></residues>
   <residues location="C-term"></residues>
   <residues location="Anywhere"></residues>
@@ -39,6 +39,32 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">K</residues>
   <rule>all kingdom</rule>
+</modification>
+<modification>
+  <name>Trimethylation</name>
+  <abbreviation>tri-Me</abbreviation>
+  <formula>H(6) C(3)</formula>
+  <unimod>37</unimod>
+  <mono_mass>42.046950</mono_mass>
+  <average_mass>42.0797</average_mass>
+  <is_empty>false</is_empty>
+  <residues location="N-term">PAFYILM</residues>
+  <residues location="C-term"></residues>
+  <residues location="Anywhere">CKRHDENQ</residues>
+  <rule>PFYILM in prokaryotes, except p, others in N-terminus after cleavage of signal peptide</rule>
+</modification> 
+<modification>
+  <name>Dimethylation</name>
+  <abbreviation>di-Me</abbreviation>
+  <formula>H(4) C(2)</formula>
+  <unimod>36</unimod>
+  <mono_mass>28.031300</mono_mass>
+  <average_mass>28.0532</average_mass>
+  <is_empty>false</is_empty>
+  <residues location="N-term">ARNDCEQGHILKMFPSTWYV</residues>
+  <residues location="C-term"></residues>
+  <residues location="Anywhere">CKRHDENQ</residues>
+  <rule>PFYILM in prokaryotes, except p, others in N-terminus after cleavage of signal peptide</rule>
 </modification>
 <modification>
   <name>Hydroxylation</name>
