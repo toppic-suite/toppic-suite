@@ -16,6 +16,16 @@ GraphAlign::GraphAlign(GraphAlignMngPtr mng_ptr,
 
   DistTuplePtrVec2D proteo_vec = proteo_graph_ptr_->getDistTuplePtrVec2D();
   tuple_vec_.insert(tuple_vec_.begin(), proteo_vec.begin(), proteo_vec.end());
+  /*
+  for (size_t i = 0; i < tuple_vec_.size(); i++) {
+    LOG_DEBUG("i " << i << " size " << tuple_vec_[i].size());
+  }
+  for (size_t i = 0; i < tuple_vec_[2].size(); i++) {
+    LOG_DEBUG("first " << tuple_vec_[2][i]->getFirstVertex() 
+              << " second " << tuple_vec_[2][i]->getSecondVertex()
+              << " dist " << tuple_vec_[2][i]->getDist());
+  }
+  */
   DistTuplePtrVec spec_vec = spec_graph_ptr_->getDistTuplePtrVec();
   for (int i = 0; i < mng_ptr->max_known_mods_ + 1; i++) {
     tuple_vec_[i].insert(tuple_vec_[i].begin(), spec_vec.begin(), spec_vec.end());
@@ -34,7 +44,7 @@ void GraphAlign::getConsistentPairs() {
   int tole = mng_ptr_->getIntTolerance();
   LOG_DEBUG("Integer error tolerance " << tole);
   std::vector<std::pair<int,int>> empty_list;
-  std::vector<std::vector<std::pair<int,int>>> empty_vec(max_mod_num_ + 1, empty_list);
+  std::vector<std::vector<std::pair<int,int>>> empty_vec(mng_ptr_->max_known_mods_ + 1, empty_list);
   for (int i = 0; i < proteo_ver_num_; i++) {
     std::vector<std::vector<std::vector<std::pair<int,int>>>> empty_vec_2d;     
     for (int j = 0; j < spec_ver_num_; j++) {
@@ -80,11 +90,14 @@ void GraphAlign::getConsistentPairs() {
             if (new_tuple_ptr->getGraphPtr() == pg_) {
               int pr_v1 = new_tuple_ptr->getFirstVertex();
               int pr_v2 = new_tuple_ptr->getSecondVertex();
-              //LOG_DEBUG("pr v1 " << pr_v1 << " pr v2 " << pr_v2);
+              //LOG_DEBUG("pr v1 " << pr_v1 << " pr v2 " << pr_v2 << " m " << m << " max mod " << mng_ptr_->max_known_mods_);
+              //LOG_DEBUG("m size " << cons_pairs_[pr_v2][sp_v2].size());
               std::pair<int, int> pre_pair(pr_v1, sp_v1);
+              //LOG_DEBUG("size " << cons_pairs_[pr_v2][sp_v2][m].size());
               cons_pairs_[pr_v2][sp_v2][m].push_back(pre_pair);
             }
           }
+          //LOG_DEBUG("sp v1 sp v2 complete");
         }
       }
     }
@@ -104,6 +117,7 @@ void GraphAlign::initTable() {
     }
     table_.push_back(node_vec);
   }
+  LOG_DEBUG("init table step 1");
   for (int i = 0; i < proteo_ver_num_; i++) {
     table_[i][0]->updateTable(0, 0, GRAPH_ALIGN_TYPE_NULL, 0,  nullptr, 0);
     table_[i][0]->updateBestShiftNode(0, 0, 0, table_[i][0]);
@@ -117,6 +131,11 @@ inline GraphDpNodePtr GraphAlign::compBestVariableNode(int i, int j, int s, int 
   best_edge_mod_num = -1;
   GraphDpNodePtr best_prev_node = nullptr;
   for (int p = 0; p <= m; p++) {
+    /*
+    if (i== 3 && j == 15 && m == 2 && p == 2 ) {
+      LOG_DEBUG("consistent pair size "  << cons_pairs_[i][j][p].size());
+    }
+    */
     for (size_t q = 0; q < cons_pairs_[i][j][p].size(); q++) {
       std::pair<int, int> pair = cons_pairs_[i][j][p][q];
       int pi = pair.first;
@@ -182,6 +201,13 @@ void GraphAlign::dp() {
             var_score = best_var_node->getBestScore(s, m-edge_mod_num);
           }
 
+          /*
+          if (i == 3) {
+            double cur_pos = spec_graph_ptr_->getPrmPeakPtr(j)->getPosition();
+            LOG_DEBUG("i " << i << " j " << j << " peak pos " << cur_pos << " s " << s << " m " << m << " var score " << var_score);
+          }
+          */
+
           GraphDpNodePtr best_shift_node = compBestShiftNode(i, j, s, m);
           double shift_score;
           if (best_shift_node != nullptr) {
@@ -190,6 +216,7 @@ void GraphAlign::dp() {
             shift_score = - std::numeric_limits<double>::max();
           }
           double new_score = table_[i][j]->getNodeScore();
+          //LOG_DEBUG("new score " << new_score);
 
           void updateTable(int s, int m, int path_type, int mod_num,
                            GraphDpNodePtr prev_node_ptr, int score);

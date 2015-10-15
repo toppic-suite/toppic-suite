@@ -20,6 +20,8 @@ all:
 #	cd poisson; make
 	cd prsmview; make	
 	cd console; make
+	cd graph; make
+	cd graphalign; make
 	cd test; make
 
 clean:

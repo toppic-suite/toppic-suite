@@ -11,20 +11,16 @@ GraphDpNode::GraphDpNode(int first_idx, int second_idx,
   second_idx_ = second_idx;
   node_score_ = node_score;
   for(int i=0; i < n_unknown_shifts + 1;i++){
-    std::vector<int> edge_types;
-    std::vector<int> mod_nums;
-    GraphDpNodePtrVec node_ptrs;
-    std::vector<double> scores;
-    for (int j = 0; j < max_known_mods + 1; j++) {
-      edge_types.push_back(GRAPH_ALIGN_TYPE_NULL);
-      mod_nums.push_back(0);
-      node_ptrs.push_back(nullptr);
-      scores.push_back(-std::numeric_limits<double>::max());
-    }
+    std::vector<int> edge_types(max_known_mods + 1, GRAPH_ALIGN_TYPE_NULL);
     prev_edge_types_.push_back(edge_types);
+    std::vector<int> mod_nums (max_known_mods + 1, 0);
     prev_edge_mod_nums_.push_back(mod_nums);
+    GraphDpNodePtrVec node_ptrs (max_known_mods + 1, nullptr);
     prev_node_ptrs_.push_back(node_ptrs);
+    best_shift_node_ptrs_.push_back(node_ptrs);
+    std::vector<double> scores(max_known_mods + 1, -std::numeric_limits<double>::max());
     best_scores_.push_back(scores);
+    best_shift_scores_.push_back(scores);
   }
 }
 

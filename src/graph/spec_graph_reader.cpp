@@ -61,11 +61,14 @@ SpecGraphPtrVec SpecGraphReader::getNextSpecGraphPtrVec(int error) {
   }
 
   DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
+  //LOG_DEBUG("deconv ms size " << deconv_ms_ptr_vec.size());
   double prec_mono_mass = deconv_ms_ptr_vec[0]->getHeaderPtr()->getPrecMonoMass();
-  for (size_t i = 0; i < prec_errors.size(); i++) {
-    SpectrumSetPtr adjusted_spec_set_ptr 
-        = getSpectrumSet(deconv_ms_ptr_vec, sp_para_ptr_, prec_mono_mass + prec_errors[i]);
-    if (spec_set_ptr->isValid()) {
+  //LOG_DEBUG("prec_mono_mass  " << prec_mono_mass);
+  if (spec_set_ptr->isValid()) {
+    LOG_DEBUG("valid");
+    for (size_t i = 0; i < prec_errors.size(); i++) {
+      SpectrumSetPtr adjusted_spec_set_ptr 
+          = getSpectrumSet(deconv_ms_ptr_vec, sp_para_ptr_, prec_mono_mass + prec_errors[i]);
       PrmMsPtrVec ms_six_vec = adjusted_spec_set_ptr->getMsSixPtrVec();
       PrmPeakPtrVec peak_vec = getPrmPeakPtrs(ms_six_vec, sp_para_ptr_->getPeakTolerancePtr());
       MassGraphPtr graph_ptr = getMassGraphPtr(peak_vec); 
@@ -73,11 +76,13 @@ SpecGraphPtrVec SpecGraphReader::getNextSpecGraphPtrVec(int error) {
       SpecGraphPtr spec_graph_ptr = SpecGraphPtr(new SpecGraph(adjusted_spec_set_ptr, peak_vec, graph_ptr, convert_ratio_));
       graph_ptr_vec.push_back(spec_graph_ptr);
     }
-    else {
-      SpecGraphPtr spec_graph_ptr = SpecGraphPtr(new SpecGraph(adjusted_spec_set_ptr));
-      graph_ptr_vec.push_back(spec_graph_ptr);
-    }
   }
+  else {
+    LOG_DEBUG("no valid");
+    SpecGraphPtr spec_graph_ptr = SpecGraphPtr(new SpecGraph(spec_set_ptr));
+    graph_ptr_vec.push_back(spec_graph_ptr);
+  }
+  LOG_DEBUG("set geneneted");
   return graph_ptr_vec;
 }
 
