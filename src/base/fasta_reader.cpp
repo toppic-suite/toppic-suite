@@ -79,68 +79,6 @@ FastaSeqPtr FastaReader::getNextSeq() {
   input_.close();
   return FastaSeqPtr(new FastaSeq(prot_name, ori_seq));
 }
-/**
- * Read FASTA file and return next protein as an ResSeq.
- * residue_list determine fixed PTMs
- **/
-ProteoformPtr FastaReader::getNextProteoformPtr(const ResiduePtrVec &residue_list) {
-  FastaSeqPtr seq_ptr = getNextSeq();
-  if (seq_ptr.get() == nullptr) {
-    return ProteoformPtr(nullptr);
-  }
-  LOG_TRACE("name " << seq_ptr->getName() << " seq " << seq_ptr->getSeq());
-  AcidPtrVec acid_seq = AcidFactory::convertSeqToAcidSeq(seq_ptr->getSeq()); 
-  ResiduePtrVec residue_ptrs = convertAcidToResidueSeq(residue_list, acid_seq);
-  DbResSeqPtr db_residue_seq_ptr(
-      new DbResidueSeq(residue_ptrs, seq_id_, seq_ptr->getName(), seq_ptr->getDesc())); 
-  seq_id_++;
-  return getDbProteoformPtr(db_residue_seq_ptr);
-}
-
-ProteoformPtrVec readFastaToProteoform(const std::string &file_name, 
-                                       const ResiduePtrVec &residue_list) {
-  return readFastaToProteoform(file_name, residue_list, 0);
-}
-
-ProteoformPtrVec readFastaToProteoform(const std::string &file_name, 
-                                       const ResiduePtrVec &residue_list,
-                                       int seq_bgn_id) {
-  LOG_DEBUG( "start open file " << file_name);
-  FastaReader reader(file_name);
-  reader.setSeqId (seq_bgn_id);
-  
-  LOG_DEBUG( "open file done " << file_name);
-  ProteoformPtrVec list;
-  ProteoformPtr ptr = reader.getNextProteoformPtr(residue_list);
-  int count = 0;
-  while (ptr.get() != nullptr) {
-    list.push_back(ptr);
-    ptr = reader.getNextProteoformPtr(residue_list);
-    count++;
-  }
-  return list;
-}
-
-ProteoformPtr readFastaToProteoform(faidx_t *fai,
-                                    int id,
-                                    const std::string &seq_name, 
-                                    const std::string &seq_desc,
-                                    const ResiduePtrVec &residue_list) {
-  int seq_len;
-  char *seq = fai_fetch(fai, seq_name.c_str(), &seq_len);
-  if ( seq_len < 0 ) {
-    LOG_ERROR("Failed to fetch sequence " << seq_name);
-  }
-  std::string raw_seq_str(seq);
-  free(seq);
-  std::string seq_str = rmChar(raw_seq_str);
-  //LOG_DEBUG("Seq name " << seq_name << " Seq: " << seq_str);
-  AcidPtrVec acid_seq = AcidFactory::convertSeqToAcidSeq(seq_str); 
-  ResiduePtrVec residue_ptrs = convertAcidToResidueSeq(residue_list, acid_seq);
-  DbResSeqPtr db_residue_seq_ptr(
-      new DbResidueSeq(residue_ptrs, id, seq_name, seq_desc)); 
-  return getDbProteoformPtr(db_residue_seq_ptr);
-}
 
 std::string readFastaByIndex(faidx_t *fai, int id, std::string seq_name) {
     int seq_len;

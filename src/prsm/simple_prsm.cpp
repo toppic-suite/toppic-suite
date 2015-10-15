@@ -4,7 +4,7 @@
 
 #include "simple_prsm.hpp"
 #include "base/logger.hpp"
-#include "base/fasta_reader.hpp"
+#include "base/proteoform_reader.hpp"
 #include "base/proteoform.hpp"
 #include "base/xml_dom_document.hpp"
 

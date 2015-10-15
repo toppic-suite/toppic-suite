@@ -1,6 +1,6 @@
 #include "base/proteoform.hpp"
 #include "base/base_data.hpp"
-#include "base/fasta_reader.hpp"
+#include "base/proteoform_reader.hpp"
 #include "base/file_util.hpp"
 #include "base/web_logger.hpp"
 #include "spec/msalign_reader.hpp"
