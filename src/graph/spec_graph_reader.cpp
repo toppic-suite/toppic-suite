@@ -46,22 +46,39 @@ MassGraphPtr SpecGraphReader::getMassGraphPtr(const PrmPeakPtrVec &peak_vec) {
   return graph_ptr;
 }
 
-SpecGraphPtr SpecGraphReader::getNextSpecGraphPtr() {
+SpecGraphPtrVec SpecGraphReader::getNextSpecGraphPtrVec(int error) {
   SpectrumSetPtr spec_set_ptr = ms_reader_ptr_->getNextSpectrumSet(sp_para_ptr_);
   LOG_DEBUG("get spec set ");
+  SpecGraphPtrVec graph_ptr_vec;
   if (spec_set_ptr  == nullptr) {
-    return SpecGraphPtr(nullptr);
+    return graph_ptr_vec;
   }
-  if (spec_set_ptr->isValid()) {
-    PrmMsPtrVec ms_six_vec = spec_set_ptr->getMsSixPtrVec();
-    PrmPeakPtrVec peak_vec = getPrmPeakPtrs(ms_six_vec, sp_para_ptr_->getPeakTolerancePtr());
-    MassGraphPtr graph_ptr = getMassGraphPtr(peak_vec); 
-    LOG_DEBUG("graph complete");
-    return SpecGraphPtr(new SpecGraph(spec_set_ptr, peak_vec, graph_ptr, convert_ratio_));
+  std::vector<double> prec_errors;
+  prec_errors.push_back(0);
+  for (int i = 1; i <= error; i++) {
+    prec_errors.push_back(- i * MassConstant::getIsotopeMass());
+    prec_errors.push_back(i * MassConstant::getIsotopeMass());
   }
-  else {
-    return SpecGraphPtr(new SpecGraph(spec_set_ptr));
+
+  DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
+  double prec_mono_mass = deconv_ms_ptr_vec[0]->getHeaderPtr()->getPrecMonoMass();
+  for (size_t i = 0; i < prec_errors.size(); i++) {
+    SpectrumSetPtr adjusted_spec_set_ptr 
+        = getSpectrumSet(deconv_ms_ptr_vec, sp_para_ptr_, prec_mono_mass + prec_errors[i]);
+    if (spec_set_ptr->isValid()) {
+      PrmMsPtrVec ms_six_vec = adjusted_spec_set_ptr->getMsSixPtrVec();
+      PrmPeakPtrVec peak_vec = getPrmPeakPtrs(ms_six_vec, sp_para_ptr_->getPeakTolerancePtr());
+      MassGraphPtr graph_ptr = getMassGraphPtr(peak_vec); 
+      LOG_DEBUG("graph complete");
+      SpecGraphPtr spec_graph_ptr = SpecGraphPtr(new SpecGraph(adjusted_spec_set_ptr, peak_vec, graph_ptr, convert_ratio_));
+      graph_ptr_vec.push_back(spec_graph_ptr);
+    }
+    else {
+      SpecGraphPtr spec_graph_ptr = SpecGraphPtr(new SpecGraph(adjusted_spec_set_ptr));
+      graph_ptr_vec.push_back(spec_graph_ptr);
+    }
   }
+  return graph_ptr_vec;
 }
 
 }

@@ -38,6 +38,7 @@ class SpecGraph {
 };
 
 typedef std::shared_ptr<SpecGraph> SpecGraphPtr;
+typedef std::vector<SpecGraphPtr> SpecGraphPtrVec;
 
 } /* namespace prot */
 

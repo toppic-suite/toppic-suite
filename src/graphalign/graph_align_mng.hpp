@@ -47,6 +47,8 @@ class GraphAlignMng {
 
   int n_unknown_shift_ =2;
 
+  int prec_error_ = 2;
+
   std::string output_file_ext_;
 };
 
