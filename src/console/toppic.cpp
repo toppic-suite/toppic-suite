@@ -69,14 +69,16 @@ int process(int argc, char* argv[]) {
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
     std::string log_file_name = arguments["logFileName"];
 
-    int n_top = std::stoi(arguments["numOfTopPrsms"]);
     int ptm_num = std::stoi(arguments["ptmNumber"]);
+
+    int n_top = std::stoi(arguments["numOfTopPrsms"]);
     double max_ptm_mass = std::stod(arguments["maxPtmMass"]);
     double filtering_result_num = std::stod(arguments["filteringResultNumber"]);
     bool use_gf = false; 
     if (arguments["useGf"] == "true") {
       use_gf = true;
     }
+
     /* initialize log file */
   	WebLog::init(log_file_name, use_gf, ptm_num);
 
