@@ -642,7 +642,7 @@ bool isStrictCompatiablePtmSpecies(ProteoformPtr a, ProteoformPtr b,
         if(ac->getRightBpPos() <= bc->getLeftBpPos() || bc->getRightBpPos() <= ac->getLeftBpPos()) {
             return false;
         }
-        if(abs(ac->getMassShift()-bc->getMassShift() > shift_tolerance)) {
+        if(std::abs(ac->getMassShift()-bc->getMassShift()) > shift_tolerance) {
             return false;
         }
     }
