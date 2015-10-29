@@ -29,9 +29,11 @@ ZERO_PTM_FILTER_OBJS = $(addprefix $(OBJ_DIR)/, zero_ptm_comp_shift.o zero_ptm_f
 
 ZERO_PTM_SEARCH_OBJS = $(addprefix $(OBJ_DIR)/, zero_ptm_slow_match.o zero_ptm_fast_match.o zero_ptm_search.o)
 
-DIAG_FILTER_OBJS =  $(addprefix $(OBJ_DIR)/, comp_shift.o diag_filter.o diag_filter_processor.o) 
-
 ONE_PTM_FILTER_OBJS =  $(addprefix $(OBJ_DIR)/, one_ptm_comp_shift.o one_ptm_filter.o one_ptm_filter_processor.o) 
+
+ONE_PTM_SEARCH_OBJS =  $(addprefix $(OBJ_DIR)/, one_ptm_search_processor.o) 
+
+DIAG_FILTER_OBJS =  $(addprefix $(OBJ_DIR)/, comp_shift.o diag_filter.o diag_filter_processor.o) 
 
 PTM_OBJS = $(addprefix $(OBJ_DIR)/, ptm_slow_filter.o comp_shift_low_mem.o ptm_processor.o diagonal_header.o ptm_slow_match.o basic_diag_pair.o diagonal.o dp_pair.o ps_align.o)
 
