@@ -153,47 +153,37 @@ inline void seleTopPrsms(const PrsmPtrVec &all_prsm_ptrs,
 
 
 void OnePtmSearchProcessor::processOneSpectrum(SpectrumSetPtr spectrum_set_ptr, 
-                                         SimplePrsmPtrVec simple_prsm_ptrs,
-                                         SemiAlignTypePtr align_ptr) {
+                                               SimplePrsmPtrVec simple_prsm_ptrs,
+                                               SemiAlignTypePtr align_ptr) {
   OnePtmSlowFilterPtr slow_filter_ptr = OnePtmSlowFilterPtr(
       new OnePtmSlowFilter(spectrum_set_ptr,simple_prsm_ptrs,comp_shift_ptr_, align_ptr, mng_ptr_));
 
   /*
-  for (int s = 1; s <= mng_ptr_->n_unknown_shift_; s++) {
-    PrsmPtrVec complete_prsm_ptrs = slow_filter_ptr->getPrsms(
-        s-1, SemiAlignTypeFactory::getCompletePtr());
-    std::sort(complete_prsm_ptrs.begin(), complete_prsm_ptrs.end(), 
-              prsmCompPreMatchFragDown);
-    PrsmPtrVec sele_complete_prsm_ptrs;
-    seleTopPrsms(complete_prsm_ptrs, sele_complete_prsm_ptrs, mng_ptr_->n_report_);
-    complete_writer_ptrs_[s-1]->writeVector(sele_complete_prsm_ptrs);
-    all_writer_ptr_->writeVector(sele_complete_prsm_ptrs);
+  PrsmPtrVec complete_prsm_ptrs = slow_filter_ptr->getPrsms(SemiAlignTypeFactory::getCompletePtr());
+  std::sort(complete_prsm_ptrs.begin(), complete_prsm_ptrs.end(), 
+            prsmCompPreMatchFragDown);
+  PrsmPtrVec sele_complete_prsm_ptrs;
+  seleTopPrsms(complete_prsm_ptrs, sele_complete_prsm_ptrs, mng_ptr_->n_report_);
+  complete_writer_ptr_->writeVector(sele_complete_prsm_ptrs);
 
-    PrsmPtrVec prefix_prsm_ptrs = slow_filter_ptr->getPrsms(
-        s-1, SemiAlignTypeFactory::getPrefixPtr());
-    std::sort(prefix_prsm_ptrs.begin(), prefix_prsm_ptrs.end(), 
-              prsmCompPreMatchFragDown);
-    PrsmPtrVec sele_prefix_prsm_ptrs;
-    seleTopPrsms(prefix_prsm_ptrs, sele_prefix_prsm_ptrs, mng_ptr_->n_report_);
-    prefix_writer_ptrs_[s-1]->writeVector(sele_prefix_prsm_ptrs);
-    all_writer_ptr_->writeVector(sele_prefix_prsm_ptrs);
+  PrsmPtrVec prefix_prsm_ptrs = slow_filter_ptr->getPrsms(SemiAlignTypeFactory::getPrefixPtr());
+  std::sort(prefix_prsm_ptrs.begin(), prefix_prsm_ptrs.end(), 
+            prsmCompPreMatchFragDown);
+  PrsmPtrVec sele_prefix_prsm_ptrs;
+  seleTopPrsms(prefix_prsm_ptrs, sele_prefix_prsm_ptrs, mng_ptr_->n_report_);
+  prefix_writer_ptr_->writeVector(sele_prefix_prsm_ptrs);
 
-    PrsmPtrVec suffix_prsm_ptrs = slow_filter_ptr->getPrsms(
-        s-1, SemiAlignTypeFactory::getSuffixPtr());
-    std::sort(suffix_prsm_ptrs.begin(), suffix_prsm_ptrs.end(), prsmMatchFragmentDown);
-    PrsmPtrVec sele_suffix_prsm_ptrs;
-    seleTopPrsms(suffix_prsm_ptrs, sele_suffix_prsm_ptrs, mng_ptr_->n_report_);
-    suffix_writer_ptrs_[s-1]->writeVector(sele_suffix_prsm_ptrs);
-    all_writer_ptr_->writeVector(sele_suffix_prsm_ptrs);
+  PrsmPtrVec suffix_prsm_ptrs = slow_filter_ptr->getPrsms(SemiAlignTypeFactory::getSuffixPtr());
+  std::sort(suffix_prsm_ptrs.begin(), suffix_prsm_ptrs.end(), prsmMatchFragmentDown);
+  PrsmPtrVec sele_suffix_prsm_ptrs;
+  seleTopPrsms(suffix_prsm_ptrs, sele_suffix_prsm_ptrs, mng_ptr_->n_report_);
+  suffix_writer_ptr_->writeVector(sele_suffix_prsm_ptrs);
 
-    PrsmPtrVec internal_prsm_ptrs = slow_filter_ptr->getPrsms(
-        s-1, SemiAlignTypeFactory::getInternalPtr());
-    std::sort(internal_prsm_ptrs.begin(), internal_prsm_ptrs.end(), prsmMatchFragmentDown);
-    PrsmPtrVec sele_internal_prsm_ptrs;
-    seleTopPrsms(internal_prsm_ptrs, sele_internal_prsm_ptrs, mng_ptr_->n_report_);
-    internal_writer_ptrs_[s-1]->writeVector(sele_internal_prsm_ptrs);
-    all_writer_ptr_->writeVector(sele_internal_prsm_ptrs);
-  }
+  PrsmPtrVec internal_prsm_ptrs = slow_filter_ptr->getPrsms(SemiAlignTypeFactory::getInternalPtr());
+  std::sort(internal_prsm_ptrs.begin(), internal_prsm_ptrs.end(), prsmMatchFragmentDown);
+  PrsmPtrVec sele_internal_prsm_ptrs;
+  seleTopPrsms(internal_prsm_ptrs, sele_internal_prsm_ptrs, mng_ptr_->n_report_);
+  internal_writer_ptr_->writeVector(sele_internal_prsm_ptrs);
   */
 }
 
