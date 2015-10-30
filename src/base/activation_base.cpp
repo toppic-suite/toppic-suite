@@ -10,10 +10,11 @@ void ActivationBase::initBase(const std::string &file_name){
   if (parser) {
     XmlDOMDocument doc(parser, file_name.c_str());
     xercesc::DOMElement* parent = doc.getDocumentElement();
-    int activation_num = getChildCount(parent, "activation");
+    std::string element_name = Activation::getXmlElementName();
+    int activation_num = getChildCount(parent, element_name.c_str());
     for (int i = 0; i < activation_num; i++) {
       xercesc::DOMElement* element 
-          = getChildElement(parent, "activation", i);
+          = getChildElement(parent, element_name.c_str(), i);
       ActivationPtr ptr(new Activation(element));
       activation_ptr_vec_.push_back(ptr);
     }
@@ -29,6 +30,12 @@ ActivationPtr ActivationBase::getActivationPtrByName(
     }
   }
   return ActivationPtr(nullptr);
+}
+
+ActivationPtr ActivationBase::getActivationPtrFromXml(xercesc::DOMElement * element) {
+  std::string name = Activation::getNameFromXml(element);
+  ActivationPtr activation_ptr = getActivationPtrByName(name);
+  return activation_ptr;
 }
 
 } /* namespace prot */

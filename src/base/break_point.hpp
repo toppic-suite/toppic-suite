@@ -20,8 +20,6 @@ class BreakPoint {
   double getCTermMass(IonTypePtr ion_type_ptr) {
     return srm_ + ion_type_ptr->getShift();}
 
-  void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
-
  private:
   double prm_;
   double srm_;

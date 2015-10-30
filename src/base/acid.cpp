@@ -31,7 +31,8 @@ Acid::Acid (xercesc::DOMElement* element) {
 }
 
 void Acid::appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
-  xercesc::DOMElement* element = xml_doc->createElement("amino_acid");
+  std::string element_name = Acid::getXmlElementName();
+  xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
   xml_doc->addElement(element, "name", name_.c_str());
   xml_doc->addElement(element, "one_letter", one_letter_.c_str());
   xml_doc->addElement(element, "three_letter", three_letter_.c_str());
