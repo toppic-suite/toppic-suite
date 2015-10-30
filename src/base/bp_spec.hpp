@@ -7,6 +7,7 @@
 
 namespace prot {
 
+// break point spectrum
 class BpSpec {
  public:
   BpSpec() {};

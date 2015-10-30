@@ -10,7 +10,7 @@
 #include "base/segment.hpp"
 #include "base/prot_mod.hpp"
 #include "base/semi_align_type.hpp"
-#include "base/base_data.hpp"
+#include "base/conf.hpp"
 
 
 namespace prot {
