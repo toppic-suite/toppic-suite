@@ -22,14 +22,7 @@ void AcidBase::initBase(const std::string &file_name) {
     LOG_DEBUG("acid num " << acid_num);
     for (int i = 0; i < acid_num; i++) {
       xercesc::DOMElement* element = getChildElement(parent, "amino_acid", i);
-      std::string name = getChildValue(element, "name", 0);
-      std::string one_letter = getChildValue(element, "one_letter", 0);
-      std::string three_letter = getChildValue(element, "three_letter", 0);
-      std::string composition = getChildValue(element, "composition", 0);
-      double mono_mass = getDoubleChildValue(element, "mono_mass", 0);
-      double avg_mass = getDoubleChildValue(element, "average_mass", 0);
-      AcidPtr ptr(new Acid(name, one_letter, three_letter, 
-                           composition, mono_mass, avg_mass));
+      AcidPtr ptr(new Acid(element));
       acid_ptr_vec_.push_back(ptr);
       // check if it is an empty acid
       if (ptr->getMonoMass() == 0.0) {
@@ -43,7 +36,7 @@ void AcidBase::initBase(const std::string &file_name) {
  * Returns an amino acid based on the the name. Returns null if the amino
  * acid name does not exist.
  */
-AcidPtr AcidBase::getBaseAcidPtrByName(const std::string &name) {
+AcidPtr AcidBase::getAcidPtrByName(const std::string &name) {
   for (size_t i = 0; i < acid_ptr_vec_.size(); i++) {
     std::string n = acid_ptr_vec_[i]->getName();
     if (n == name) {
@@ -57,7 +50,7 @@ AcidPtr AcidBase::getBaseAcidPtrByName(const std::string &name) {
  * Returns an amino acid based on the one letter representation. Returns
  * null if the one letter representation does not exist.
  */
-AcidPtr AcidBase::getBaseAcidPtrByOneLetter(const std::string &one_letter) {
+AcidPtr AcidBase::getAcidPtrByOneLetter(const std::string &one_letter) {
   for (size_t i = 0; i < acid_ptr_vec_.size(); i++) {
     std::string l = acid_ptr_vec_[i]->getOneLetter();
     if (l == one_letter)  {
@@ -72,7 +65,7 @@ AcidPtr AcidBase::getBaseAcidPtrByOneLetter(const std::string &one_letter) {
  * Returns an amino acid based on the three letter representation. Returns
  * null if the three letter representation does not exist.
  */
-AcidPtr AcidBase::getBaseAcidPtrByThreeLetter(const std::string &three_letter) {
+AcidPtr AcidBase::getAcidPtrByThreeLetter(const std::string &three_letter) {
   for (size_t i = 0; i < acid_ptr_vec_.size(); i++) {
     std::string l = acid_ptr_vec_[i]->getThreeLetter();
     if (l == three_letter) {
@@ -86,24 +79,24 @@ AcidPtr AcidBase::getBaseAcidPtrByThreeLetter(const std::string &three_letter) {
 /**
  * Checks if the list contains an amino acid with the specific name.
  */
-bool AcidBase::baseContainsName(const std::string &name) {
-  return getBaseAcidPtrByName(name).get() != nullptr;
+bool AcidBase::containsName(const std::string &name) {
+  return getAcidPtrByName(name).get() != nullptr;
 }
 
 /**
  * Checks if the list contains an amino acid with the specific one letter
  * representation.
  */
-bool AcidBase::baseContainsOneLetter(const std::string &one_letter) {
-  return getBaseAcidPtrByOneLetter(one_letter).get() != nullptr;
+bool AcidBase::containsOneLetter(const std::string &one_letter) {
+  return getAcidPtrByOneLetter(one_letter).get() != nullptr;
 }
 
 /**
  * Checks if the list contains an amino acid with the specific three letter
  * representation.
  */
-bool AcidBase::baseContainsThreeLetter(const std::string &three_letter) {
-  return getBaseAcidPtrByThreeLetter(three_letter).get() != nullptr;
+bool AcidBase::containsThreeLetter(const std::string &three_letter) {
+  return getAcidPtrByThreeLetter(three_letter).get() != nullptr;
 }
 
 /**
@@ -114,7 +107,7 @@ AcidPtrVec AcidBase::convertSeqToAcidSeq(const std::string &seq) {
   AcidPtrVec acid_seq;
   if (seq.length() > 0) {
     for (size_t i = 0; i < seq.length(); i++) {
-      acid_seq.push_back(getBaseAcidPtrByOneLetter(seq.substr(i, 1)));
+      acid_seq.push_back(getAcidPtrByOneLetter(seq.substr(i, 1)));
     }
   }
   return acid_seq;
