@@ -22,7 +22,6 @@ class OnePtmSlowMatch {
  public:
   OnePtmSlowMatch(ProteoformPtr proteo_ptr,
                   SpectrumSetPtr spectrum_set_ptr,
-                  CompShiftLowMemPtr comp_shift_ptr,
                   SemiAlignTypePtr align_type_ptr,
                   OnePtmSearchMngPtr mng_ptr);
 
@@ -42,12 +41,14 @@ class OnePtmSlowMatch {
 
   PSAlignPtr ps_align_ptr_;
 
-  void initOnePtmAlign(CompShiftLowMemPtr comp_shift_ptr);
+  void initOnePtmAlign();
 
-  BasicDiagonalPtrVec compAlignDiagonals(CompShiftLowMemPtr comp_shift_ptr);
+  BasicDiagonalPtrVec compAlignDiagonals();
   std::vector<double> compBestShifts(CompShiftLowMemPtr comp_shift_ptr);
-  void extendNHeaders(std::vector<double> &best_shifts, DiagonalHeaderPtrVec &n_extend_header_ptrs);
-  void extendCHeaders(std::vector<double> &best_shifts, DiagonalHeaderPtrVec &c_extend_header_ptrs);
+  void extendNHeaders(DiagonalHeaderPtrVec &n_extend_header_ptrs);
+  void extendCHeaders(DiagonalHeaderPtrVec &c_extend_header_ptrs);
+  BasicDiagonalPtrVec removeEmptyDiagonals(BasicDiagonalPtrVec &n_diagonal_ptrs,
+                                           BasicDiagonalPtrVec &c_diagonal_ptrs);
   BasicDiagonalPtrVec getDiagonals(DiagonalHeaderPtrVec &header_ptrs);
 };
 

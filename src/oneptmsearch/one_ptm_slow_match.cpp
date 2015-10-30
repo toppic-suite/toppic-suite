@@ -5,7 +5,6 @@ namespace prot {
 
 OnePtmSlowMatch::OnePtmSlowMatch(ProteoformPtr proteo_ptr, 
                            SpectrumSetPtr spectrum_set_ptr,
-                           CompShiftLowMemPtr comp_shift_ptr, 
                            SemiAlignTypePtr align_type_ptr,
                            OnePtmSearchMngPtr mng_ptr){
   mng_ptr_ = mng_ptr;
@@ -20,7 +19,7 @@ OnePtmSlowMatch::OnePtmSlowMatch(ProteoformPtr proteo_ptr,
   group_spec_num_ = ms_six_ptr_vec_.size();
 
   proteo_ptr_ = proteo_ptr;
-  initOnePtmAlign(comp_shift_ptr);
+  initOnePtmAlign();
 }
 
 // initialize ps_align
@@ -62,9 +61,22 @@ inline void OnePtmSlowMatch::extendCHeaders(DiagonalHeaderPtrVec &c_extend_heade
 
 // if there are no diagonals with more than 2 matched peaks nearby, remove the
 // diagonal
-inline void OnePtmSlowMatch::removeEmptyDiagonals(BasicDiagonalPtrVec &n_diagonal_ptrs,
-                                                  BasicDiagonalPtrVec &c_diagonal_ptrs) {
+inline BasicDiagonalPtrVec OnePtmSlowMatch::removeEmptyDiagonals(
+    BasicDiagonalPtrVec &n_diagonal_ptrs,
+    BasicDiagonalPtrVec &c_diagonal_ptrs) {
+  std::vector<bool> n_keep (false, n_diagonal_ptrs.size());
+  std::vector<bool> c_keep (false, c_diagonal_ptrs.size());
+  // keep the first top-left
+  n_keep[0] = true;
+  // the the firt bottom-right
+  c_keep[0] = true;
+  for (size_t i = 1; n < n_diagonal_ptrs.size(); i++) {
+    DiagonalPtr diag_ptr = n_diagonal_ptrs[i];
+    if (diag_ptr
+  }
 
+  BasicDiagonalPtrVec diag_ptrs;
+  return diag_ptrs;
 }
 
 inline BasicDiagonalPtrVec OnePtmSlowMatch::compAlignDiagonals() {
@@ -96,7 +108,7 @@ inline BasicDiagonalPtrVec OnePtmSlowMatch::compAlignDiagonals() {
 
   // combine 
   BasicDiagonalPtrVec diagonal_ptrs;
-  diagonal_ptrs.insert(diagonal_ptrs.end(), n_diagonal_ptrs.begin(), n_digaonal_ptrs.end());
+  diagonal_ptrs.insert(diagonal_ptrs.end(), n_diagonal_ptrs.begin(), n_diagonal_ptrs.end());
   diagonal_ptrs.insert(diagonal_ptrs.end(), c_diagonal_ptrs.begin(), c_diagonal_ptrs.end());
   return diagonal_ptrs;
 }
