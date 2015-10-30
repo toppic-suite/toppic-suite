@@ -101,19 +101,5 @@ bool AcidBase::containsThreeLetter(const std::string &three_letter) {
   return getAcidPtrByThreeLetter(three_letter).get() != nullptr;
 }
 
-/**
- * Converts a protein sequence (with one letter representation of amino
- * acids) to an amino acid array.
- */
-AcidPtrVec AcidBase::convertSeqToAcidSeq(const std::string &seq) {
-  AcidPtrVec acid_seq;
-  if (seq.length() > 0) {
-    for (size_t i = 0; i < seq.length(); i++) {
-      acid_seq.push_back(getAcidPtrByOneLetter(seq.substr(i, 1)));
-    }
-  }
-  return acid_seq;
-}
-
 } /* end namespace */
 

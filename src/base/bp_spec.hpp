@@ -28,8 +28,6 @@ class BpSpec {
 
   std::vector<int> getScaledPrmMasses(double scale);
 
-  void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
-
  private:
   BreakPointPtrVec break_point_ptr_vec_;
 

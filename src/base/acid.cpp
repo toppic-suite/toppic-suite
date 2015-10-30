@@ -12,14 +12,14 @@ namespace prot {
 
 Acid::Acid (const std::string &name, const std::string &one_letter, 
             const std::string &three_letter, const std::string &composition, 
-            double mono_mass, double avg_mass) {
-  name_ = name;
-  one_letter_ = one_letter;
-  three_letter_ = three_letter;
-  composition_ = composition;
-  mono_mass_ = mono_mass;
-  average_mass_ = avg_mass;
-}
+            double mono_mass, double average_mass): 
+    name_(name),
+    one_letter_(one_letter),
+    three_letter_(three_letter),
+    composition_(composition),
+    mono_mass_(mono_mass),
+    average_mass_(average_mass) {
+    }
 
 Acid::Acid (xercesc::DOMElement* element) { 
   name_ = getChildValue(element, "name", 0);
