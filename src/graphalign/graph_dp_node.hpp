@@ -15,6 +15,10 @@ typedef std::shared_ptr<GraphDpNode>  GraphDpNodePtr;
 typedef std::vector<GraphDpNodePtr> GraphDpNodePtrVec;
 typedef std::vector<GraphDpNodePtrVec> GraphDpNodePtrVec2D;
 
+typedef std::weak_ptr<GraphDpNode>  GraphDpNodeWeakPtr;
+typedef std::vector<GraphDpNodeWeakPtr> GraphDpNodeWeakPtrVec;
+typedef std::vector<GraphDpNodeWeakPtrVec> GraphDpNodeWeakPtrVec2D;
+
 class GraphDpNode { 
  public:
   GraphDpNode(int first_idx, int second_idx, double node_score,
@@ -28,7 +32,7 @@ class GraphDpNode {
 
   double getBestScore(int s, int m) {return best_scores_[s][m];}
 
-  GraphDpNodePtr getPrevNodePtr(int s, int m){return prev_node_ptrs_[s][m];}
+  GraphDpNodePtr getPrevNodePtr(int s, int m){return prev_node_ptrs_[s][m].lock();}
 
   void updateTable(int s, int m, int path_type, int mod_num,
                    GraphDpNodePtr prev_node_ptr, int score);
@@ -37,7 +41,7 @@ class GraphDpNode {
 
   double getBestShiftScore(int s, int m) {return best_shift_scores_[s][m];}
 
-  GraphDpNodePtr getBestShiftNodePtr(int s, int m) {return best_shift_node_ptrs_[s][m];}
+  GraphDpNodePtr getBestShiftNodePtr(int s, int m) {return best_shift_node_ptrs_[s][m].lock();}
 
 
  private:
@@ -50,11 +54,11 @@ class GraphDpNode {
   std::vector<std::vector<int>> prev_edge_types_;
   std::vector<std::vector<int>> prev_edge_mod_nums_;
 
-  GraphDpNodePtrVec2D prev_node_ptrs_;
+  GraphDpNodeWeakPtrVec2D prev_node_ptrs_;
   std::vector<std::vector<double>> best_scores_;
 
   // the vector for finding shift nodes
-  GraphDpNodePtrVec2D best_shift_node_ptrs_;
+  GraphDpNodeWeakPtrVec2D best_shift_node_ptrs_;
   std::vector<std::vector<double>> best_shift_scores_;
 };
 
