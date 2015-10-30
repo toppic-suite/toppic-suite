@@ -15,7 +15,8 @@ GraphDpNode::GraphDpNode(int first_idx, int second_idx,
     prev_edge_types_.push_back(edge_types);
     std::vector<int> mod_nums (max_known_mods + 1, 0);
     prev_edge_mod_nums_.push_back(mod_nums);
-    GraphDpNodePtrVec node_ptrs (max_known_mods + 1, nullptr);
+    GraphDpNodePtr empty_node = nullptr;
+    GraphDpNodeWeakPtrVec node_ptrs (max_known_mods + 1, empty_node);
     prev_node_ptrs_.push_back(node_ptrs);
     best_shift_node_ptrs_.push_back(node_ptrs);
     std::vector<double> scores(max_known_mods + 1, -std::numeric_limits<double>::max());
