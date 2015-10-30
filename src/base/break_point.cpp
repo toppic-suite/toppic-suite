@@ -3,9 +3,9 @@
 
 namespace prot {
 
-BreakPoint::BreakPoint(double prm, double srm){
-  prm_ = prm;
-  srm_ = srm;
-}
+BreakPoint::BreakPoint(double prm, double srm): 
+    prm_(prm), 
+    srm_(srm) {
+    }
 
 } /* namespace prot */

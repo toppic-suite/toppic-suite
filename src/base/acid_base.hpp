@@ -49,12 +49,6 @@ class AcidBase {
    */
   static bool containsThreeLetter(const std::string &three_letter);
 
-  /**
-   * Converts a protein sequence (with one letter representation of amino
-   * acids) to an amino acid array.
-   */
-  static AcidPtrVec convertSeqToAcidSeq(const std::string &seq);
-
  private:
   static AcidPtrVec acid_ptr_vec_;
   static AcidPtr empty_acid_ptr_;
