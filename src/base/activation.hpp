@@ -44,19 +44,6 @@ class Activation {
 typedef std::shared_ptr<Activation> ActivationPtr;
 typedef std::vector<ActivationPtr> ActivationPtrVec;
 
-/* activation factory */
-class ActivationFactory {
- private:
-  static ActivationPtrVec activation_ptr_vec_;
-
- public:
-  static void initFactory(const std::string &file_name);
-
-  static const ActivationPtrVec& getBaseActivationPtrVec() {return activation_ptr_vec_;}
-
-  static ActivationPtr getBaseActivationPtrByName(const std::string &name);
-};
-
-} /* namespace prot */
+}
 
 #endif /* ACTIVATION_HPP_ */
