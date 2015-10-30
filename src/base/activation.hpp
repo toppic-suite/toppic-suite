@@ -30,8 +30,12 @@ class Activation {
 
   IonTypePtr getCIonTypePtr() {return c_ion_type_ptr_;}
 
-  void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+  void appendNameToXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
+  static std::string getNameFromXml(xercesc::DOMElement * element);
+
+  static std::string getXmlElementName() {return "activation";}
+  
  private:
   std::string name_;
   // n terminal ion type 

@@ -20,11 +20,17 @@ Activation::Activation(xercesc::DOMElement * element) {
   c_ion_type_ptr_ = IonTypeFactory::getBaseIonTypePtrByName(ion_type_name);
 }
 
-void Activation::appendXml(XmlDOMDocument* xml_doc,
-                           xercesc::DOMElement* parent){
-    xercesc::DOMElement* element = xml_doc->createElement("activation");
-    xml_doc->addElement(element, "name", name_.c_str());
-    parent->appendChild(element);
+void Activation::appendNameToXml(XmlDOMDocument* xml_doc,
+                                 xercesc::DOMElement* parent){
+  std::string element_name = Activation::getXmlElementName();
+  xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
+  xml_doc->addElement(element, "name", name_.c_str());
+  parent->appendChild(element);
+}
+
+std::string Activation::getNameFromXml(xercesc::DOMElement * element) {
+  std::string name = getChildValue(element, "name", 0);
+  return name;
 }
 
 } /* namespace prot */

@@ -42,6 +42,8 @@ class Acid {
   /* Get amino acid three letter representation. */
   std::string getThreeLetter() {return three_letter_;}
 
+  static std::string getXmlElementName() {return "amino_acid";}
+
  private:
   /* Name of amino acid */
   std::string name_;

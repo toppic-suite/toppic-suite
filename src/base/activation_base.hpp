@@ -16,6 +16,9 @@ class ActivationBase {
   static const ActivationPtrVec& getActivationPtrVec() {return activation_ptr_vec_;}
 
   static ActivationPtr getActivationPtrByName(const std::string &name);
+
+  static ActivationPtr getActivationPtrFromXml(xercesc::DOMElement * element);
+
 };
 
 } /* namespace prot */

@@ -31,7 +31,7 @@ Ptm::Ptm(const std::string &name, const std::string &abbr_name,
 }
 
 void Ptm::appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent) {
-    xercesc::DOMElement* element = xml_doc->createElement("modification");
+    xercesc::DOMElement* element = xml_doc->createElement("ptm");
     xml_doc->addElement(element, "abbr_name", abbr_name_.c_str());
     std::string str = convertToString(mono_mass_);
     xml_doc->addElement(element, "mono_mass", str.c_str());
@@ -65,9 +65,9 @@ void PtmFactory::initFactory(const std::string &file_name) {
     if (parser) {
         XmlDOMDocument doc(parser, file_name.c_str());
         xercesc::DOMElement* parent = doc.getDocumentElement();
-        int ptm_num = getChildCount(parent, "modification");
+        int ptm_num = getChildCount(parent, "ptm");
         for (int i = 0; i < ptm_num; i++) {
-            xercesc::DOMElement* element = getChildElement(parent, "modification", i);
+            xercesc::DOMElement* element = getChildElement(parent, "ptm", i);
             std::string name = getChildValue(element, "name", 0);
             std::string abbr_name = getChildValue(element, "abbreviation", 0);
             int id = std::stoi(getChildValue(element, "unimod", 0));

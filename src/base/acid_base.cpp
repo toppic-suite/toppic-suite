@@ -18,10 +18,12 @@ void AcidBase::initBase(const std::string &file_name) {
   if (parser) {
     XmlDOMDocument doc(parser, file_name.c_str());
     xercesc::DOMElement* parent = doc.getDocumentElement();
-    int acid_num = getChildCount(parent, "amino_acid");
+    std::string element_name = Acid::getXmlElementName();
+    int acid_num = getChildCount(parent, element_name.c_str());
     LOG_DEBUG("acid num " << acid_num);
     for (int i = 0; i < acid_num; i++) {
-      xercesc::DOMElement* element = getChildElement(parent, "amino_acid", i);
+      xercesc::DOMElement* element 
+          = getChildElement(parent, element_name.c_str(), i);
       AcidPtr ptr(new Acid(element));
       acid_ptr_vec_.push_back(ptr);
       // check if it is an empty acid
