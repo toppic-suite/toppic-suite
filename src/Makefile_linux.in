@@ -19,7 +19,9 @@ OBJ_DIR = ../../bin/obj
 
 BIN_DIR = ../../bin
 
-BASE_OBJS = $(addprefix $(OBJ_DIR)/, acid.o activation.o algorithm.o base_data.o bp_spec.o break_point.o change.o db_block.o db_residue_seq.o extreme_value.o fasta_reader.o file_util.o ion.o ion_type.o logger.o neutral_loss.o proteoform.o proteoform_reader.o prot_mod.o ptm.o residue.o residue_freq.o residue_seq.o segment.o semi_align_type.o support_peak_type.o trunc.o web_logger.o xml_dom.o xml_dom_document.o xml_dom_err_handler.o xml_writer.o)
+BASE_OBJS = $(addprefix $(OBJ_DIR)/, acid_base.o acid_util.o acid.o activation_base.o activation.o algorithm.o bp_spec.o break_point.o ptm.o)
+
+#BASE_OBJS = $(addprefix $(OBJ_DIR)/, acid.o activation.o algorithm.o bp_spec.o break_point.o change.o db_block.o conf.o db_residue_seq.o extreme_value.o fasta_reader.o file_util.o ion.o ion_type.o logger.o neutral_loss.o proteoform.o proteoform_reader.o prot_mod.o ptm.o residue.o residue_freq.o residue_seq.o segment.o semi_align_type.o support_peak_type.o trunc.o web_logger.o xml_dom.o xml_dom_document.o xml_dom_err_handler.o xml_writer.o)
 
 SPEC_OBJS = $(addprefix $(OBJ_DIR)/, peak.o extend_peak.o support_peak.o prm_peak.o spectrum_set.o sp_para.o theo_peak.o peak_tolerance.o msalign_reader.o deconv_ms.o peak_list.o ms_header.o deconv_peak.o)
 
@@ -31,7 +33,7 @@ ZERO_PTM_SEARCH_OBJS = $(addprefix $(OBJ_DIR)/, zero_ptm_slow_match.o zero_ptm_f
 
 ONE_PTM_FILTER_OBJS =  $(addprefix $(OBJ_DIR)/, one_ptm_comp_shift.o one_ptm_filter.o one_ptm_filter_processor.o) 
 
-ONE_PTM_SEARCH_OBJS =  $(addprefix $(OBJ_DIR)/, one_ptm_search_processor.o) 
+ONE_PTM_SEARCH_OBJS =  $(addprefix $(OBJ_DIR)/, one_ptm_search_processor.o one_ptm_slow_match.o) 
 
 DIAG_FILTER_OBJS =  $(addprefix $(OBJ_DIR)/, comp_shift.o diag_filter.o diag_filter_processor.o) 
 
