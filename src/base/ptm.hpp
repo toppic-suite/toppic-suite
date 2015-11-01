@@ -16,6 +16,7 @@
 namespace prot {
 
 class Ptm;
+typedef std::shared_ptr<Ptm> PtmPtr;
 
 class Ptm {
  public:
@@ -24,6 +25,8 @@ class Ptm {
       const std::string &n_term_acid_str,
       const std::string &c_term_acid_str, 
       const std::string &anywhere_acid_str);
+
+  Ptm(xercesc::DOMElement* element); 
 
   const std::string& getName() {return name_;}
 
@@ -42,7 +45,12 @@ class Ptm {
 
   static std::string getXmlElementName() {return "modification";}
 
-  void appendNameToXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+  void appendAbbrNameToXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+
+  // comparison function
+  static bool cmpMassIncrease(const PtmPtr &a, const PtmPtr &b) {
+    return a->getMonoMass() < b->getMonoMass();
+  }
 
  private:
   /* Full name */
@@ -59,10 +67,7 @@ class Ptm {
   AcidPtrVec anywhere_acids_;
 };
 
-typedef std::shared_ptr<Ptm> PtmPtr;
 typedef std::vector<PtmPtr> PtmPtrVec;
-typedef std::pair<PtmPtr, PtmPtr> PtmPair;
-typedef std::vector<PtmPair> PtmPairVec;
 
 }
 

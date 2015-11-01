@@ -10,9 +10,9 @@
 
 namespace prot {
 
-Acid::Acid (const std::string &name, const std::string &one_letter, 
-            const std::string &three_letter, const std::string &composition, 
-            double mono_mass, double average_mass): 
+Acid::Acid(const std::string &name, const std::string &one_letter, 
+           const std::string &three_letter, const std::string &composition, 
+           double mono_mass, double average_mass): 
     name_(name),
     one_letter_(one_letter),
     three_letter_(three_letter),
@@ -21,7 +21,7 @@ Acid::Acid (const std::string &name, const std::string &one_letter,
     average_mass_(average_mass) {
     }
 
-Acid::Acid (xercesc::DOMElement* element) { 
+Acid::Acid(xercesc::DOMElement* element) { 
   name_ = getChildValue(element, "name", 0);
   one_letter_ = getChildValue(element, "one_letter", 0);
   three_letter_ = getChildValue(element, "three_letter", 0);

@@ -28,10 +28,34 @@ Ptm::Ptm(const std::string &name, const std::string &abbr_name,
       anywhere_acids_ = AcidUtil::convertStrToAcidPtrVec(anywhere_acid_str);
     }
 
-void Ptm::appendNameToXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent) {
+Ptm::Ptm(xercesc::DOMElement* element) { 
+  name_ = getChildValue(element, "name", 0);
+  abbr_name_ = getChildValue(element, "abbreviation", 0);
+  mono_mass_ = getDoubleChildValue(element, "mono_mass", 0);
+  unimod_id_ = getIntChildValue(element, "unimod", 0);
+  std::string n_term_acid_str, c_term_acid_str, anywhere_acid_str;
+  xercesc::DOMNodeList* list = element->getElementsByTagName(X("residues"));
+  for (size_t j = 0; j < list->getLength(); j++) {
+    if (Y(list->item(j)->getAttributes()->item(0)->getNodeValue()).compare("N-term") == 0) {
+      xercesc::DOMElement* child = dynamic_cast<xercesc::DOMElement*>(list->item(j));
+      n_term_acid_str = Y(child->getTextContent());
+    } else if (Y(list->item(j)->getAttributes()->item(0)->getNodeValue()).compare("C-term") == 0) {
+      xercesc::DOMElement* child = dynamic_cast<xercesc::DOMElement*>(list->item(j));
+      c_term_acid_str = Y(child->getTextContent());
+    } else if (Y(list->item(j)->getAttributes()->item(0)->getNodeValue()).compare("Anywhere") == 0) {
+      xercesc::DOMElement* child = dynamic_cast<xercesc::DOMElement*>(list->item(j));
+      anywhere_acid_str = Y(child->getTextContent());
+    }
+  }
+  n_term_acids_ = AcidUtil::convertStrToAcidPtrVec(n_term_acid_str);
+  c_term_acids_ = AcidUtil::convertStrToAcidPtrVec(c_term_acid_str);
+  anywhere_acids_ = AcidUtil::convertStrToAcidPtrVec(anywhere_acid_str);
+}
+
+void Ptm::appendAbbrNameToXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent) {
   std::string element_name = Ptm::getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
-  xml_doc->addElement(element, "name", abbr_name_.c_str());
+  xml_doc->addElement(element, "abbr_name", abbr_name_.c_str());
   parent->appendChild(element);
 }
 
