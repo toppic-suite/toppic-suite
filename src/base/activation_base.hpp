@@ -1,5 +1,5 @@
-#ifndef PROT_ACTIVATION_BASE_HPP_
-#define PROT_ACTIVATION_BASE_HPP_
+#ifndef PROT_BASE_ACTIVATION_BASE_HPP_
+#define PROT_BASE_ACTIVATION_BASE_HPP_
 
 #include "base/activation.hpp"
 

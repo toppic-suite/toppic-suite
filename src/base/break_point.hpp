@@ -1,6 +1,5 @@
-
-#ifndef PROT_BREAK_POINT_HPP_
-#define PROT_BREAK_POINT_HPP_
+#ifndef PROT_BASE_BREAK_POINT_HPP_
+#define PROT_BASE_BREAK_POINT_HPP_
 
 #include "base/ion_type.hpp"
 

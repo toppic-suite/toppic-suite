@@ -3,8 +3,8 @@
  * date    2013-11-17
  */
 
-#ifndef PROT_PTM_HPP_
-#define PROT_PTM_HPP_
+#ifndef PROT_BASE_PTM_HPP_
+#define PROT_BASE_PTM_HPP_
 
 #include <string>
 #include <vector>
@@ -43,10 +43,11 @@ class Ptm {
 
   int getUnimodId() {return unimod_id_;}
 
-  static std::string getXmlElementName() {return "modification";}
-
   void appendAbbrNameToXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
+  static std::string getAbbrNameFromXml(xercesc::DOMElement * element);
+
+  static std::string getXmlElementName() {return "modification";}
   // comparison function
   static bool cmpMassIncrease(const PtmPtr &a, const PtmPtr &b) {
     return a->getMonoMass() < b->getMonoMass();

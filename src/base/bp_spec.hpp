@@ -1,6 +1,5 @@
-
-#ifndef PROT_BP_SPEC_HPP_
-#define PROT_BP_SPEC_HPP_
+#ifndef PROT_BASE_BP_SPEC_HPP_
+#define PROT_BASE_BP_SPEC_HPP_
 
 #include "base/residue_seq.hpp"
 #include "base/break_point.hpp"

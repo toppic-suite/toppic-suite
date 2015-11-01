@@ -5,7 +5,7 @@
 
 #include <map>
 
-#include "base/conf.hpp"
+#include "base/config.hpp"
 #include "base/residue.hpp"
 #include "base/prot_mod.hpp"
 #include "base/ion_type.hpp"
