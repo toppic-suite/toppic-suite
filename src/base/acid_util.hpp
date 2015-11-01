@@ -14,6 +14,8 @@ class AcidUtil {
    */
   static AcidPtrVec convertStrToAcidPtrVec(const std::string &seq);
 
+  static double compAcidPtrVecMass(const AcidPtrVec &ptr_vec);
+
 };
 
 }
