@@ -1,4 +1,6 @@
+
 #include "base/activation_base.hpp"
+#include "base/xml_dom_util.hpp"
 
 namespace prot {
 
@@ -11,10 +13,10 @@ void ActivationBase::initBase(const std::string &file_name){
     XmlDOMDocument doc(parser, file_name.c_str());
     xercesc::DOMElement* parent = doc.getDocumentElement();
     std::string element_name = Activation::getXmlElementName();
-    int activation_num = getChildCount(parent, element_name.c_str());
+    int activation_num = XmlDomUtil::getChildCount(parent, element_name.c_str());
     for (int i = 0; i < activation_num; i++) {
       xercesc::DOMElement* element 
-          = getChildElement(parent, element_name.c_str(), i);
+          = XmlDomUtil::getChildElement(parent, element_name.c_str(), i);
       ActivationPtr ptr(new Activation(element));
       activation_ptr_vec_.push_back(ptr);
     }

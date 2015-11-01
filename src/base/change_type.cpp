@@ -1,4 +1,6 @@
+
 #include "base/change_type.hpp"
+#include "base/xml_dom_util.hpp"
 
 namespace prot {
 
@@ -16,7 +18,7 @@ void ChangeType::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
 }
 
 ChangeTypePtr ChangeType::getChangeTypePtrFromXml(xercesc::DOMElement * element) {
-  std::string name = getChildValue(element, "name", 0);
+  std::string name = XmlDomUtil::getChildValue(element, "name", 0);
   if (name == ChangeType::INPUT->getName()) {
     return ChangeType::INPUT;
   }

@@ -2,8 +2,8 @@
  * author  Xiaowen Liu
  * date    2015-7-11
  */
-#ifndef PROT_WEB_LOGGER_HPP_
-#define PROT_WEB_LOGGER_HPP_
+#ifndef PROT_BASE_WEB_LOGGER_HPP_
+#define PROT_BASE_WEB_LOGGER_HPP_
 
 #include <string>
 #include <iostream>

@@ -22,6 +22,8 @@ class Trunc {
 
   double getShift() {return shift_;}
 
+  static std::string getNameFromXml(xercesc::DOMElement * element);
+
   static std::string getXmlElementName() {return "truncation";}
 
  private:

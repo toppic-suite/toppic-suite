@@ -12,13 +12,11 @@
 
 namespace fs = boost::filesystem;
 
-namespace prot
-{
+namespace prot {
 
 #ifdef PROT_LINUX
 //linux
 std::string getExecutiveDir(const std::string &argv_0){
-	
   int buffer_size = 1024;
   char* buffer = new char[buffer_size];
   size_t len = readlink ("/proc/self/exe", buffer, buffer_size);
@@ -41,7 +39,6 @@ std::string getExecutiveDir(const std::string &argv_0){
 
 //windows
 std::string getExecutiveDir(const std::string &argv_0){
-	
   fs::path full_path;
   full_path = fs::system_complete( fs::path(argv_0));
 

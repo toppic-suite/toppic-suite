@@ -11,6 +11,7 @@
 #include "base/logger.hpp"
 #include "base/xml_dom.hpp"
 #include "base/xml_dom_document.hpp"
+#include "base/xml_dom_util.hpp"
 
 namespace prot {
 
@@ -26,9 +27,9 @@ void PtmBase::initBase(const std::string &file_name) {
     XmlDOMDocument doc(parser, file_name.c_str());
     xercesc::DOMElement* parent = doc.getDocumentElement();
     std::string element_name = Ptm::getXmlElementName();
-    int ptm_num = getChildCount(parent, element_name.c_str());
+    int ptm_num = XmlDomUtil::getChildCount(parent, element_name.c_str());
     for (int i = 0; i < ptm_num; i++) {
-      xercesc::DOMElement* element = getChildElement(parent, element_name.c_str(), i);
+      xercesc::DOMElement* element = XmlDomUtil::getChildElement(parent, element_name.c_str(), i);
       PtmPtr ptm_ptr(new Ptm(element));
       ptm_ptr_vec_.push_back(ptm_ptr);
       // check empty ptr
@@ -72,19 +73,6 @@ PtmPtr PtmBase::getPtmPtrFromXml(xercesc::DOMElement * element) {
   PtmPtr ptm_ptr = getPtmPtrByAbbrName(abbr_name);
   return ptm_ptr;
 }
-
-/*
-PtmPtr PtmFactory::addBasePtm(const std::string &abbr_name, double mono_mass) {
-  PtmPtr ptm_ptr = getBasePtmPtrByAbbrName(abbr_name);
-  if (ptm_ptr.get() == nullptr) {
-    PtmPtr new_ptm(new Ptm(abbr_name, mono_mass));
-    ptm_ptr_vec_.push_back(new_ptm);
-    return new_ptm;
-  } else {
-    return ptm_ptr;
-  }
-}
-*/
 
 }
 

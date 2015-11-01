@@ -26,7 +26,7 @@ DbBlockPtrVec DbBlock::readDbBlockIndex(const std::string &db_file_name) {
   std::string line;
   std::vector<std::string> strs;
   while (std::getline(input, line)) {
-    strs = split(line, '\t');
+    strs = StringUtil::split(line, '\t');
     int block_index = std::stoi(strs[0]);
     int seq_index = std::stoi(strs[1]);
     LOG_DEBUG("block " << block_index << " seq " << seq_index);
