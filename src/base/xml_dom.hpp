@@ -1,5 +1,5 @@
-#ifndef PROT_XML_DOM_HPP_
-#define PROT_XML_DOM_HPP_
+#ifndef PROT_BASE_XML_DOM_HPP_
+#define PROT_BASE_XML_DOM_HPP_
 
 #include <string>
 

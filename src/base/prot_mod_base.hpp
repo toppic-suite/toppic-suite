@@ -35,7 +35,7 @@ class ProtModBase {
   static ProtModPtrVec prot_mod_ptr_vec_;
   static ProtModPtr prot_mod_ptr_NONE_;
   static ProtModPtr prot_mod_ptr_NME_;
-  static ProtModPtr prot_mod_ptr_NME_ACETYLATION;
+  static ProtModPtr prot_mod_ptr_NME_ACETYLATION_;
 
   static std::string getName_NONE() {return "NONE";}
   static std::string getName_NME() {return "NME";}

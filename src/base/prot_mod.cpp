@@ -1,6 +1,8 @@
 #include "base/logger.hpp"
 #include "base/ptm_base.hpp"
+#include "base/trunc_base.hpp"
 #include "base/prot_mod.hpp"
+#include "base/xml_dom_util.hpp"
 
 namespace prot {
 
@@ -14,14 +16,14 @@ ProtMod::ProtMod(const std::string &name, TruncPtr trunc_ptr,
     }
 
 ProtMod::ProtMod(xercesc::DOMElement* element) { 
-  name_ = getChildValue(element, "name", 0);
-  /*
-     std::trunc_name = getChildValue(element, "trunc_name", 0);
-     TruncPtr trunc_ptr = TruncFactory::getBaseTruncPtrByName(trunc_name);
-     */
+  name_ = XmlDomUtil::getChildValue(element, "name", 0);
+  std::string trunc_element_name = Trunc::getXmlElementName();
+  xercesc::DOMElement* trunc_element 
+      = XmlDomUtil::getChildElement(element, trunc_element_name.c_str(), 0);
+  trunc_ptr_ = TruncBase::getTruncPtrFromXml(trunc_element);
   std::string ptm_element_name = Ptm::getXmlElementName();
   xercesc::DOMElement* ptm_element 
-      = getChildElement(element, ptm_element_name.c_str(), 0);
+      = XmlDomUtil::getChildElement(element, ptm_element_name.c_str(), 0);
   ptm_ptr_ = PtmBase::getPtmPtrFromXml(ptm_element);
   prot_shift_ = trunc_ptr_->getShift() + ptm_ptr_->getMonoMass();
   pep_shift_ = ptm_ptr_->getMonoMass();

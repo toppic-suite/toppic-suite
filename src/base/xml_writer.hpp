@@ -1,5 +1,5 @@
-#ifndef XML_WRITER_HPP_
-#define XML_WRITER_HPP_
+#ifndef XML_BASE_WRITER_HPP_
+#define XML_BASE_WRITER_HPP_
 
 #include <iostream>
 #include <fstream>

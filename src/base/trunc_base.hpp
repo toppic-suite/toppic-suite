@@ -12,6 +12,8 @@ class TruncBase {
   static const TruncPtrVec& getBaseTruncPtrVec() {return trunc_ptr_vec_;}
   static TruncPtr getTruncPtrByName(const std::string &name);
 
+  static TruncPtr getTruncPtrFromXml(xercesc::DOMElement * element);
+
  private:
   static TruncPtrVec trunc_ptr_vec_;
 };

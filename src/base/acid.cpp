@@ -5,8 +5,10 @@
 #include <base/logger.hpp>
 
 #include "base/acid.hpp"
+#include "base/string_util.hpp"
 #include "base/xml_dom.hpp"
 #include "base/xml_dom_document.hpp"
+#include "base/xml_dom_util.hpp"
 
 namespace prot {
 
@@ -22,12 +24,12 @@ Acid::Acid(const std::string &name, const std::string &one_letter,
     }
 
 Acid::Acid(xercesc::DOMElement* element) { 
-  name_ = getChildValue(element, "name", 0);
-  one_letter_ = getChildValue(element, "one_letter", 0);
-  three_letter_ = getChildValue(element, "three_letter", 0);
-  composition_ = getChildValue(element, "composition", 0);
-  mono_mass_ = getDoubleChildValue(element, "mono_mass", 0);
-  average_mass_ = getDoubleChildValue(element, "average_mass", 0);
+  name_ = XmlDomUtil::getChildValue(element, "name", 0);
+  one_letter_ = XmlDomUtil::getChildValue(element, "one_letter", 0);
+  three_letter_ = XmlDomUtil::getChildValue(element, "three_letter", 0);
+  composition_ = XmlDomUtil::getChildValue(element, "composition", 0);
+  mono_mass_ = XmlDomUtil::getDoubleChildValue(element, "mono_mass", 0);
+  average_mass_ = XmlDomUtil::getDoubleChildValue(element, "average_mass", 0);
 }
 
 void Acid::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
@@ -37,9 +39,9 @@ void Acid::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
   xml_doc->addElement(element, "one_letter", one_letter_.c_str());
   xml_doc->addElement(element, "three_letter", three_letter_.c_str());
   xml_doc->addElement(element, "composition", composition_.c_str());
-  std::string str = convertToString(mono_mass_);
+  std::string str = StringUtil::convertToString(mono_mass_);
   xml_doc->addElement(element, "mono_mass", str.c_str());
-  str = convertToString(average_mass_);
+  str = StringUtil::convertToString(average_mass_);
   xml_doc->addElement(element, "average_mass", str.c_str());
   parent->appendChild(element);
 }

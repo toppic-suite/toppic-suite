@@ -2,11 +2,11 @@
  * author  Xiaowen Liu
  * date    2013-11-1
  */
-#include <base/logger.hpp>
-
+#include "base/logger.hpp"
 #include "base/acid_base.hpp"
 #include "base/xml_dom.hpp"
 #include "base/xml_dom_document.hpp"
+#include "base/xml_dom_util.hpp"
 
 namespace prot {
 
@@ -19,11 +19,11 @@ void AcidBase::initBase(const std::string &file_name) {
     XmlDOMDocument doc(parser, file_name.c_str());
     xercesc::DOMElement* parent = doc.getDocumentElement();
     std::string element_name = Acid::getXmlElementName();
-    int acid_num = getChildCount(parent, element_name.c_str());
+    int acid_num = XmlDomUtil::getChildCount(parent, element_name.c_str());
     LOG_DEBUG("acid num " << acid_num);
     for (int i = 0; i < acid_num; i++) {
       xercesc::DOMElement* element 
-          = getChildElement(parent, element_name.c_str(), i);
+          = XmlDomUtil::getChildElement(parent, element_name.c_str(), i);
       AcidPtr ptr(new Acid(element));
       acid_ptr_vec_.push_back(ptr);
       // check if it is an empty acid

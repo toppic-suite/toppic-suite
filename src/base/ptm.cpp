@@ -11,6 +11,7 @@
 #include "base/ptm.hpp"
 #include "base/xml_dom.hpp"
 #include "base/xml_dom_document.hpp"
+#include "base/xml_dom_util.hpp"
 
 namespace prot {
 
@@ -29,10 +30,10 @@ Ptm::Ptm(const std::string &name, const std::string &abbr_name,
     }
 
 Ptm::Ptm(xercesc::DOMElement* element) { 
-  name_ = getChildValue(element, "name", 0);
-  abbr_name_ = getChildValue(element, "abbreviation", 0);
-  mono_mass_ = getDoubleChildValue(element, "mono_mass", 0);
-  unimod_id_ = getIntChildValue(element, "unimod", 0);
+  name_ = XmlDomUtil::getChildValue(element, "name", 0);
+  abbr_name_ = XmlDomUtil::getChildValue(element, "abbreviation", 0);
+  mono_mass_ = XmlDomUtil::getDoubleChildValue(element, "mono_mass", 0);
+  unimod_id_ = XmlDomUtil::getIntChildValue(element, "unimod", 0);
   std::string n_term_acid_str, c_term_acid_str, anywhere_acid_str;
   xercesc::DOMNodeList* list = element->getElementsByTagName(X("residues"));
   for (size_t j = 0; j < list->getLength(); j++) {
@@ -60,7 +61,7 @@ void Ptm::appendAbbrNameToXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* paren
 }
 
 std::string Ptm::getAbbrNameFromXml(xercesc::DOMElement * element) {
-  std::string abbr_name = getChildValue(element, "abbreviation", 0);
+  std::string abbr_name = XmlDomUtil::getChildValue(element, "abbreviation", 0);
   return abbr_name;
 }
 
