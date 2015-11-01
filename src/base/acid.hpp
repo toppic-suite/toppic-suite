@@ -16,11 +16,11 @@ namespace prot {
 
 class Acid {
  public:
-  Acid (const std::string &name, const std::string &one_letter, 
-        const std::string &three_letter, const std::string &composition, 
-        double mono_mass, double avg_mass); 
+  Acid(const std::string &name, const std::string &one_letter, 
+       const std::string &three_letter, const std::string &composition, 
+       double mono_mass, double avg_mass); 
 
-  Acid (xercesc::DOMElement* element); 
+  Acid(xercesc::DOMElement* element); 
 
   void appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
