@@ -1,5 +1,5 @@
-#ifndef PROT_ACID_UTIL_HPP_
-#define PROT_ACID_UTIL_HPP_
+#ifndef PROT_BASE_ACID_UTIL_HPP_
+#define PROT_BASE_ACID_UTIL_HPP_
 
 #include "base/acid.hpp"
 #include "base/acid_base.hpp"

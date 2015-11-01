@@ -5,8 +5,8 @@
  *  Author: Xiaowen Liu
  */
 
-#ifndef PROT_ACTIVATION_HPP_
-#define PROT_ACTIVATION_HPP_
+#ifndef PROT_BASE_ACTIVATION_HPP_
+#define PROT_BASE_ACTIVATION_HPP_
 
 #include "xercesc/dom/DOM.hpp"
 #include "base/ion_type.hpp"

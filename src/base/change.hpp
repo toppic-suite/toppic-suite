@@ -1,24 +1,28 @@
-#ifndef PROT_CHANGE_HPP_
-#define PROT_CHANGE_HPP_
+#ifndef PROT_BASE_CHANGE_HPP_
+#define PROT_BASE_CHANGE_HPP_
 
+#include "base/change_type.hpp"
 #include "base/ptm.hpp"
 #include "base/xml_dom_document.hpp"
 
 namespace prot {
 
 class Change;
+typedef std::shared_ptr<Change> ChangePtr;
 
 class Change {
  public:
-  Change(int left_bp_pos, int right_bp_pos, int change_type,
-         double mass_shift, const PtmPtr &ptm_ptr);
+  Change(int left_bp_pos, int right_bp_pos, 
+         ChangeTypePtr change_type_ptr,
+         double mass_shift, PtmPtr ptm_ptr);
+
   Change(xercesc::DOMElement* change_element);
 
   int getLeftBpPos() {return left_bp_pos_;}
 
   int getRightBpPos() {return right_bp_pos_;}
 
-  int getChangeType() {return change_type_;}
+  ChangeTypePtr getChangeTypePtr() {return change_type_ptr_;}
 
   double getMassShift() {return mass_shift_;}
 
@@ -26,21 +30,22 @@ class Change {
 
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
+  static std::string getXmlElementName() {return "change";}
+
+  static bool cmpPosIncrease(const ChangePtr &a, const ChangePtr &b);
+
  private:
   // left and right positions are based on break point positions 
   int left_bp_pos_;
   int right_bp_pos_;
-  int change_type_;
+  ChangeTypePtr change_type_ptr_;
   double mass_shift_;
   PtmPtr ptm_ptr_;
 };
 
-typedef std::shared_ptr<Change> ChangePtr;
 typedef std::vector<ChangePtr> ChangePtrVec;
 
-bool compareChangePosUp(ChangePtr c1, ChangePtr c2);
-
-
 }
+
 #endif
 

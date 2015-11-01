@@ -67,6 +67,12 @@ bool PtmBase::containsAbbrName(const std::string &abbr_name) {
   return getPtmPtrByAbbrName(abbr_name).get() != nullptr;
 }
 
+PtmPtr PtmBase::getPtmPtrFromXml(xercesc::DOMElement * element) {
+  std::string abbr_name = Ptm::getAbbrNameFromXml(element);
+  PtmPtr ptm_ptr = getPtmPtrByAbbrName(abbr_name);
+  return ptm_ptr;
+}
+
 /*
 PtmPtr PtmFactory::addBasePtm(const std::string &abbr_name, double mono_mass) {
   PtmPtr ptm_ptr = getBasePtmPtrByAbbrName(abbr_name);

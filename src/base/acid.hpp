@@ -3,8 +3,8 @@
  * date    2013-11-01
  */
 
-#ifndef PROT_ACID_HPP_
-#define PROT_ACID_HPP_
+#ifndef PROT_BASE_ACID_HPP_
+#define PROT_BASE_ACID_HPP_
 
 #include <memory>
 #include <string>
@@ -22,7 +22,7 @@ class Acid {
 
   Acid(xercesc::DOMElement* element); 
 
-  void appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+  void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
   /* Get amino acid composition. */
   std::string getAcidComposition() {return composition_;}

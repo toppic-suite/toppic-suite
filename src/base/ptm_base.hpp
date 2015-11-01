@@ -3,8 +3,8 @@
  * date    2013-11-17
  */
 
-#ifndef PROT_PTM_BASE_HPP_
-#define PROT_PTM_BASE_HPP_
+#ifndef PROT_BASE_PTM_BASE_HPP_
+#define PROT_BASE_PTM_BASE_HPP_
 
 #include <string>
 #include <vector>
@@ -35,6 +35,8 @@ class PtmBase {
   static bool containsAbbrName(const std::string &abbr_name);
 
   //static PtmPtr addBasePtm(const std::string &abbr_name, double mono_mass);
+  
+  static PtmPtr getPtmPtrFromXml(xercesc::DOMElement * element);
 
  private:
   static PtmPtrVec ptm_ptr_vec_;

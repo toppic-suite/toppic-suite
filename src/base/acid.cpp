@@ -30,7 +30,7 @@ Acid::Acid(xercesc::DOMElement* element) {
   average_mass_ = getDoubleChildValue(element, "average_mass", 0);
 }
 
-void Acid::appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
+void Acid::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
   std::string element_name = Acid::getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
   xml_doc->addElement(element, "name", name_.c_str());

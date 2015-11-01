@@ -1,5 +1,5 @@
-#ifndef PROT_ALGORITHM_HPP_
-#define PROT_ALGORITHM_HPP_
+#ifndef PROT_BASE_ALGORITHM_HPP_
+#define PROT_BASE_ALGORITHM_HPP_
 
 #include <cstddef>
 #include <vector>
