@@ -1,21 +1,22 @@
-
-#ifndef PROT_NEUTRAL_LOSS_HPP_
-#define PROT_NEUTRAL_LOSS_HPP_
+#ifndef PROT_BASE_NEUTRAL_LOSS_HPP_
+#define PROT_BASE_NEUTRAL_LOSS_HPP_
 
 #include <string>
 #include <vector>
 #include <memory>
+#include "base/xml_dom_document.hpp"
 
 namespace prot {
-
-#define NEUTRAL_LOSS_NONE "NONE"
 
 class NeutralLoss {
 
  public:
   NeutralLoss(const std::string &name, double mass);
+  NeutralLoss(xercesc::DOMElement* element);
   std::string getName(){return name_;}
   double getMass(){return mass_;}
+
+  static std::string getXmlElementName() {return "neutral_loss";}
 
  private:
   std::string name_;
@@ -24,22 +25,6 @@ class NeutralLoss {
 
 typedef std::shared_ptr<NeutralLoss> NeutralLossPtr;
 typedef std::vector<NeutralLossPtr> NeutralLossPtrVec;
-
-/* neutral loss factory */
-class NeutralLossFactory {
- public:
-  static void initFactory(const std::string &file_name);
-  static NeutralLossPtrVec getBaseNeutralLossPtrVec() {
-    return neutral_loss_ptr_vec_;}
-  static NeutralLossPtr getBaseNeutralLossPtrByName(const std::string &name);
-
-  static NeutralLossPtr getNeutralLossPtr_NONE () {
-    return getBaseNeutralLossPtrByName(NEUTRAL_LOSS_NONE);
-  }
-
- private:
-  static NeutralLossPtrVec neutral_loss_ptr_vec_;
-};
 
 } /* namespace prot */
 
