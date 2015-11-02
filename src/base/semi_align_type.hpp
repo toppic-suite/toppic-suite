@@ -1,5 +1,5 @@
-#ifndef PROT_SEMI_ALIGN_TYPE_HPP_
-#define PROT_SEMI_ALIGN_TYPE_HPP_
+#ifndef PROT_BASE_SEMI_ALIGN_TYPE_HPP_
+#define PROT_BASE_SEMI_ALIGN_TYPE_HPP_
 
 #include <string>
 #include <memory>
@@ -20,22 +20,6 @@ class SemiAlignType {
 };
 
 typedef std::shared_ptr<SemiAlignType> SemiAlignTypePtr;
-
-class SemiAlignTypeFactory {
- private:
-  static SemiAlignTypePtr semi_align_type_complete_;
-  static SemiAlignTypePtr semi_align_type_prefix_;
-  static SemiAlignTypePtr semi_align_type_suffix_;
-  static SemiAlignTypePtr semi_align_type_internal_;
-
- public:
-  static SemiAlignTypePtr getCompletePtr() {return semi_align_type_complete_;}
-  static SemiAlignTypePtr getPrefixPtr() {return semi_align_type_prefix_;}
-  static SemiAlignTypePtr getSuffixPtr() {return semi_align_type_suffix_;}
-  static SemiAlignTypePtr getInternalPtr() {return semi_align_type_internal_;}
-
-  static std::string convertSemiAlignTypeToString (int i);
-};
 
 }
 
