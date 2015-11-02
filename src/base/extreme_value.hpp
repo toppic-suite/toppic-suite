@@ -1,5 +1,5 @@
-#ifndef PROT_EXTREME_VALUE_HPP_
-#define PROT_EXTREME_VALUE_HPP_
+#ifndef PROT_BASE_EXTREME_VALUE_HPP_
+#define PROT_BASE_EXTREME_VALUE_HPP_
 
 #include <memory>
 #include <vector>
