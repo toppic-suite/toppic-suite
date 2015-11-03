@@ -7,6 +7,9 @@
 
 namespace prot {
 
+class ExtremeValue;
+typedef std::shared_ptr<ExtremeValue> ExtremeValuePtr;
+
 class ExtremeValue {
  public:
   ExtremeValue (double one_prot_prob, double test_num, double adjust_factor);
@@ -27,6 +30,10 @@ class ExtremeValue {
 
   void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
+  static std::string getXmlElementName() {return "extreme_value";}
+
+  static ExtremeValuePtr getMaxEvaluePtr();
+
  private:
   /** 
    * one_prot_prob is the probability that the spectrum and a randem problem 
@@ -41,10 +48,7 @@ class ExtremeValue {
   void init();
 };
 
-typedef std::shared_ptr<ExtremeValue> ExtremeValuePtr;
 typedef std::vector<ExtremeValuePtr> ExtremeValuePtrVec;
-
-ExtremeValuePtr getMaxEvaluePtr();
 
 }
 
