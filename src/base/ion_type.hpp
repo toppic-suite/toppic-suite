@@ -22,7 +22,7 @@ class IonType {
 
   double getBYShift() {return b_y_shift_;}
 
-  void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+  void appendNameToXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
   static std::string getXmlElementName() {return "ion_type";}
 

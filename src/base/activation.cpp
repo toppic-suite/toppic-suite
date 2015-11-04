@@ -1,5 +1,5 @@
 #include "base/activation.hpp"
-#include "base/ion_type.hpp"
+#include "base/ion_type_base.hpp"
 #include "base/xml_dom_document.hpp"
 #include "base/xml_dom_util.hpp"
 
@@ -16,9 +16,9 @@ Activation::Activation(const std::string &name,
 Activation::Activation(xercesc::DOMElement * element) {
   name_ = XmlDomUtil::getChildValue(element, "name", 0);
   std::string ion_type_name = XmlDomUtil::getChildValue(element, "n_ion_type",0);
-  n_ion_type_ptr_ = IonTypeFactory::getBaseIonTypePtrByName(ion_type_name);
+  n_ion_type_ptr_ = IonTypeBase::getIonTypePtrByName(ion_type_name);
   ion_type_name = XmlDomUtil::getChildValue(element, "c_ion_type", 0);
-  c_ion_type_ptr_ = IonTypeFactory::getBaseIonTypePtrByName(ion_type_name);
+  c_ion_type_ptr_ = IonTypeBase::getIonTypePtrByName(ion_type_name);
 }
 
 void Activation::appendNameToXml(XmlDOMDocument* xml_doc,
