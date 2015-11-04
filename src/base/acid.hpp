@@ -22,7 +22,7 @@ class Acid {
 
   Acid(xercesc::DOMElement* element); 
 
-  void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+  void appendNameToXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
   /* Get amino acid composition. */
   std::string getAcidComposition() {return composition_;}

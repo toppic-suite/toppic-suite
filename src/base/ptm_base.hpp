@@ -23,6 +23,8 @@ class PtmBase {
 
   static PtmPtr getEmptyPtmPtr() {return empty_ptm_ptr_;}
 
+  static bool isEmptyPtmPtr(PtmPtr ptm_ptr) {return ptm_ptr == empty_ptm_ptr_;}
+
   static PtmPtr getPtmPtr_Acetylation() {return acetylation_ptr_;}
   /**
    * Returns a PTM based on the abbreviation name. Returns null if the
