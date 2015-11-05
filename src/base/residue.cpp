@@ -5,8 +5,7 @@
 #include "base/residue.hpp"
 #include "base/file_util.hpp"
 #include "base/string_util.hpp"
-#include "base/xml_dom.hpp"
-#include "base/xml_dom_document.hpp"
+#include "base/xml_dom_util.hpp"
 
 namespace prot {
 
@@ -27,11 +26,12 @@ Residue::Residue(xercesc::DOMElement* element) {
   std::string acid_element_name = Acid::getXmlElementName();
   xercesc::DOMElement* acid_element 
       = XmlDomUtil::getChildElement(element, acid_element_name.c_str(), 0);
-  std::string acid_name = Acid::get
-  acid_ptr_
-  std::string acid_name = getChildValue(element, "acid", 0);
-  std::string ptm_abbr_name = getChildValue(element, "ptm", 0);
-  residue_ptr_vec_.push_back(ResiduePtr(new Residue(acid_name, ptm_abbr_name)));
+  acid_ptr_ = AcidBase::getAcidPtrFromXml(acid_element);
+  std::string ptm_element_name = Ptm::getXmlElementName();
+  xercesc::DOMElement* ptm_element 
+      = XmlDomUtil::getChildElement(element, ptm_element_name.c_str(), 0);
+  ptm_ptr_ = PtmBase::getPtmPtrFromXml(ptm_element);  
+  mass_ = acid_ptr_->getMonoMass() + ptm_ptr_->getMonoMass();
 }
 
 std::string Residue::toString(const std::string &delim_bgn, 

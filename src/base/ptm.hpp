@@ -47,6 +47,7 @@ class Ptm {
   static std::string getAbbrNameFromXml(xercesc::DOMElement * element);
 
   static std::string getXmlElementName() {return "modification";}
+
   // comparison function
   static bool cmpMassIncrease(const PtmPtr &a, const PtmPtr &b) {
     return a->getMonoMass() < b->getMonoMass();

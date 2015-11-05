@@ -22,8 +22,6 @@ class Acid {
 
   Acid(xercesc::DOMElement* element); 
 
-  void appendNameToXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
-
   /* Get amino acid composition. */
   std::string getAcidComposition() {return composition_;}
 
@@ -41,6 +39,10 @@ class Acid {
 
   /* Get amino acid three letter representation. */
   std::string getThreeLetter() {return three_letter_;}
+
+  void appendNameToXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+
+  static std::string getNameFromXml(xercesc::DOMElement * element);
 
   static std::string getXmlElementName() {return "amino_acid";}
 

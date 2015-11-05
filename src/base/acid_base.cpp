@@ -101,5 +101,11 @@ bool AcidBase::containsThreeLetter(const std::string &three_letter) {
   return getAcidPtrByThreeLetter(three_letter).get() != nullptr;
 }
 
+AcidPtr AcidBase::getAcidPtrFromXml(xercesc::DOMElement * element) {
+  std::string name = Acid::getNameFromXml(element);
+  AcidPtr acid_ptr = getAcidPtrByName(name);
+  return acid_ptr;
+}
+
 } /* end namespace */
 

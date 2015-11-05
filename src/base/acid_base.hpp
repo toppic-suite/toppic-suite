@@ -49,6 +49,8 @@ class AcidBase {
    */
   static bool containsThreeLetter(const std::string &three_letter);
 
+  static AcidPtr getAcidPtrFromXml(xercesc::DOMElement * element);
+
  private:
   static AcidPtrVec acid_ptr_vec_;
   static AcidPtr empty_acid_ptr_;

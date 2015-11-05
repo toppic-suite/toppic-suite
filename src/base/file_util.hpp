@@ -12,6 +12,7 @@
 namespace prot {
 
 class FileUtil {
+ public:
   static std::string getFileSeparator();
 
   static std::string getExecutiveDir(const std::string &argv_0);
