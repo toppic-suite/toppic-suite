@@ -6,103 +6,93 @@
 #include <map>
 
 #include "base/config.hpp"
-#include "base/residue.hpp"
-#include "base/prot_mod.hpp"
-#include "base/ion_type.hpp"
-#include "base/neutral_loss.hpp"
-#include "base/activation.hpp"
-#include "base/support_peak_type.hpp"
 #include "base/logger.hpp"
-#include "base/string_util.hpp"
-#include "base/xml_dom.hpp"
 #include "base/xml_dom_document.hpp"
+#include "base/string_util.hpp"
+#include "base/xml_dom_util.hpp"
 #include "base/file_util.hpp"
+
+#include "base/acid_base.hpp"
+#include "base/ptm_base.hpp"
+#include "base/residue_base.hpp"
+#include "base/trunc_base.hpp"
+#include "base/prot_mod_base.hpp"
+#include "base/ion_type_base.hpp"
+#include "base/neutral_loss_base.hpp"
+#include "base/activation_base.hpp"
+#include "base/support_peak_type_base.hpp"
 
 namespace prot {
 
-void initConf(const std::string &exe_dir) {
-  std::string conf_dir = exe_dir + FILE_SEPARATOR + CONFIG_DIR;
+void Config::initConf(const std::string &exe_dir) {
+  std::string separator = FileUtil::getFileSeparator();
+  std::string conf_dir = exe_dir + separator + Config::getConfigDir();
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
-    std::string config_file_name = conf_dir + FILE_SEPARATOR + CONFIG_FILE_NAME;
+    std::string config_file_name = conf_dir + separator 
+        + Config::getConfigFileName();
     LOG_DEBUG("config_file_name: " << config_file_name);
     XmlDOMDocument doc(parser, config_file_name.c_str());
     xercesc::DOMElement* root = doc.getDocumentElement();
     LOG_DEBUG("root " << root);
-    std::string acid_file_name = getChildValue(root, "acid_list_file_name", 0);
-    acid_file_name = conf_dir + FILE_SEPARATOR + acid_file_name;
+    std::string acid_file_name = XmlDomUtil::getChildValue(root, "acid_list_file_name", 0);
+    acid_file_name = conf_dir + separator + acid_file_name;
     LOG_DEBUG("acid file name: " << acid_file_name);
-    AcidFactory::initFactory(acid_file_name);
+    AcidBase::initBase(acid_file_name);
     LOG_DEBUG("acid initialized ");
 
-    std::string ptm_file_name = getChildValue(root, "ptm_list_file_name", 0);
-    ptm_file_name = conf_dir + FILE_SEPARATOR + ptm_file_name;
+    std::string ptm_file_name = XmlDomUtil::getChildValue(root, "ptm_list_file_name", 0);
+    ptm_file_name = conf_dir + separator + ptm_file_name;
     LOG_DEBUG("ptm file name: " << ptm_file_name);
-    PtmFactory::initFactory(ptm_file_name);
+    PtmBase::initBase(ptm_file_name);
 
-    std::string ptm_select_file_name = getChildValue(root, "ptm_select_file_name", 0);
-    ptm_select_file_name = conf_dir + FILE_SEPARATOR + ptm_select_file_name;
-    LOG_DEBUG("ptm select file " << ptm_select_file_name);
-    PtmFactory::selectPtm(ptm_select_file_name);
-    LOG_DEBUG("ptm initialized");
-
-    std::string residue_file_name = getChildValue(root, "residue_list_file_name", 0);
-    residue_file_name = conf_dir + FILE_SEPARATOR + residue_file_name;
+    std::string residue_file_name = XmlDomUtil::getChildValue(root, "residue_list_file_name", 0);
+    residue_file_name = conf_dir + separator + residue_file_name;
     LOG_DEBUG("residue file name: " << residue_file_name);
-    ResidueFactory::initFactory(residue_file_name);
+    ResidueBase::initBase(residue_file_name);
     LOG_DEBUG("residue initialized");
 
-    std::string trunc_file_name = getChildValue(root, "trunc_list_file_name",
-                                                0);
-    trunc_file_name = conf_dir + FILE_SEPARATOR + trunc_file_name;
+    std::string trunc_file_name 
+        = XmlDomUtil::getChildValue(root, "trunc_list_file_name", 0);
+    trunc_file_name = conf_dir + separator + trunc_file_name;
     LOG_DEBUG("trunc file name: " << trunc_file_name);
-    TruncFactory::initFactory(trunc_file_name);
+    TruncBase::initBase(trunc_file_name);
     LOG_DEBUG("trunc initialized ");
 
-    std::string prot_mod_file_name = getChildValue(root,
-                                                   "prot_mod_list_file_name",
-                                                   0);
-    prot_mod_file_name = conf_dir + FILE_SEPARATOR + prot_mod_file_name;
+    std::string prot_mod_file_name
+        = XmlDomUtil::getChildValue(root, "prot_mod_list_file_name", 0);
+    prot_mod_file_name = conf_dir + separator + prot_mod_file_name;
     LOG_DEBUG("prot mod file name: " << prot_mod_file_name);
-    ProtModFactory::initFactory(prot_mod_file_name);
+    ProtModBase::initBase(prot_mod_file_name);
     LOG_DEBUG("prot mod initialized ");
 
-    std::string ion_type_file_name = getChildValue(root,
-                                                   "ion_type_list_file_name",
-                                                   0);
-    ion_type_file_name = conf_dir + FILE_SEPARATOR + ion_type_file_name;
+    std::string ion_type_file_name 
+        = XmlDomUtil::getChildValue(root, "ion_type_list_file_name", 0);
+    ion_type_file_name = conf_dir + separator + ion_type_file_name;
     LOG_DEBUG("ion type file name: " << ion_type_file_name);
-    IonTypeFactory::initFactory(ion_type_file_name);
+    IonTypeBase::initBase(ion_type_file_name);
     LOG_DEBUG("ion type initialized ");
 
-    std::string neutral_loss_file_name = getChildValue(
-        root, "neutral_loss_list_file_name", 0);
-    neutral_loss_file_name = conf_dir + FILE_SEPARATOR + neutral_loss_file_name;
+    std::string neutral_loss_file_name 
+        = XmlDomUtil::getChildValue(root, "neutral_loss_list_file_name", 0);
+    neutral_loss_file_name = conf_dir + separator + neutral_loss_file_name;
     LOG_DEBUG("neutral loss file name: " << neutral_loss_file_name);
-    NeutralLossFactory::initFactory(neutral_loss_file_name);
+    NeutralLossBase::initBase(neutral_loss_file_name);
     LOG_DEBUG("neutral loss initialized ");
 
-    std::string activation_file_name = getChildValue(
-        root, "activation_list_file_name", 0);
-    activation_file_name = conf_dir + FILE_SEPARATOR + activation_file_name;
+    std::string activation_file_name 
+        = XmlDomUtil::getChildValue(root, "activation_list_file_name", 0);
+    activation_file_name = conf_dir + separator + activation_file_name;
     LOG_DEBUG("activation file name: " << activation_file_name);
-    ActivationFactory::initFactory(activation_file_name);
+    ActivationBase::initBase(activation_file_name);
     LOG_DEBUG("activation initialized ");
 
-    std::string sp_type_file_name = getChildValue(
-        root, "support_peak_type_file_name", 0);
-    sp_type_file_name = conf_dir + FILE_SEPARATOR + sp_type_file_name;
+    std::string sp_type_file_name 
+        = XmlDomUtil::getChildValue(root, "support_peak_type_file_name", 0);
+    sp_type_file_name = conf_dir + separator + sp_type_file_name;
     LOG_DEBUG("support_peak_type_file_name: " << sp_type_file_name);
-    SPTypeFactory::initFactory(sp_type_file_name);
+    SPTypeBase::initBase(sp_type_file_name);
     LOG_DEBUG("support peak type initialized ");
-
-    std::string build_in_fix_mod_residue_list_file_name = getChildValue(
-        root, "build_in_fix_mod_residue_list_file_name", 0);
-    build_in_fix_mod_residue_list_file_name = conf_dir + FILE_SEPARATOR 
-        + build_in_fix_mod_residue_list_file_name;
-    LOG_DEBUG("build in fix mod residue list file name: " << build_in_fix_mod_residue_list_file_name);
-    FixResidueFactory::initFactory(build_in_fix_mod_residue_list_file_name);
-    LOG_DEBUG("fix mod residue initialized ");
   }
 }
 

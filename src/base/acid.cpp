@@ -39,5 +39,10 @@ void Acid::appendNameToXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
   parent->appendChild(element);
 }
 
+std::string Acid::getNameFromXml(xercesc::DOMElement * element) {
+  std::string name = XmlDomUtil::getChildValue(element, "name", 0);
+  return name;
+}
+
 } /* end namespace */
 
