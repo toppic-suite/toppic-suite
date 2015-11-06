@@ -1,43 +1,15 @@
-#ifndef PROT_FASTA_READER_HPP_
-#define PROT_FASTA_READER_HPP_
+#ifndef PROT_BASE_FASTA_READER_HPP_
+#define PROT_BASE_FASTA_READER_HPP_
 
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
 
-#define BOOST_NO_CXX11_SCOPED_ENUMS
-#include <boost/filesystem/path.hpp>
-#include <boost/filesystem/operations.hpp>
-#undef BOOST_NO_CXX11_SCOPED_ENUMS
-
-#include "htslib/faidx.h"
-
-
+#include "base/fasta_seq.hpp"
 #include "base/string_util.hpp"
-#include "base/residue_seq.hpp"
-#include "base/proteoform.hpp"
 
 namespace prot {
-
-class FastaSeq {
- public:
-  FastaSeq(const std::string &name_line, const std::string &ori_seq);
-
-  std::string getName() {return name_;}
-
-  std::string getDesc() {return desc_;}
-
-  std::string getSeq() {return seq_;}
-
- private:
-  std::string name_;
-  std::string desc_;
-  std::string seq_;
-}; 
-
-
-typedef std::shared_ptr<FastaSeq> FastaSeqPtr;
 
 class FastaReader {
  public:
@@ -61,18 +33,6 @@ class FastaReader {
 };
 
 typedef std::shared_ptr<FastaReader> FastaReaderPtr;
-
-/* remove incorrect charaters in sequence */
-std::string rmChar(const std::string &ori_seq);
-
-void generateShuffleDb(const std::string &file_name, 
-                       const std::string &target_decoy_file_name);
-
-void dbPreprocess(const std::string &ori_db_file_name, 
-                  const std::string &db_file_name, 
-                  bool decoy, int block_size);
-
-std::string readFastaByIndex(faidx_t *fai, int id, std::string seq_name);
 
 }  //namepace prot
 
