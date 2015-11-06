@@ -1,5 +1,5 @@
-#ifndef PROT_DB_RESIDUE_SEQ_HPP_
-#define PROT_DB_RESIDUE_SEQ_HPP_
+#ifndef PROT_BASE_DB_RESIDUE_SEQ_HPP_
+#define PROT_BASE_DB_RESIDUE_SEQ_HPP_
 
 #include <string>
 
@@ -18,6 +18,8 @@ class DbResidueSeq: public ResidueSeq {
   const std::string& getName() {return name_;}
   const std::string& getDesc() {return desc_;}
   std::string getNameDesc() {return name_ + " " + desc_;}
+
+  static std::string getXmlElementName() {return "db_residue_seq";}
 
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 

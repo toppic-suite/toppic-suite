@@ -2,8 +2,7 @@
  * author  Xiaowen Liu
  * date    2013-11-1
  */
-#include <base/logger.hpp>
-
+#include "base/logger.hpp"
 #include "base/acid.hpp"
 #include "base/string_util.hpp"
 #include "base/xml_dom.hpp"
