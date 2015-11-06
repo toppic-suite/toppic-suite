@@ -1,5 +1,5 @@
-#ifndef PROT_SEGMENT_HPP_
-#define PROT_SEGMENT_HPP_
+#ifndef PROT_BASE_SEGMENT_HPP_
+#define PROT_BASE_SEGMENT_HPP_
 
 #include "base/trunc.hpp"
 
