@@ -44,6 +44,7 @@ std::string ResidueSeq::toAcidString() {
   return s.str();
 }
 
+/*
 void ResidueSeq::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
   std::string element_name = ResidueSeq::getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
@@ -56,6 +57,7 @@ void ResidueSeq::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
   element->appendChild(residuelist);
   parent->appendChild(element);
 }
+*/
 
 ResSeqPtr ResidueSeq::getEmptyResidueSeq() {
   ResiduePtrVec residues;

@@ -21,7 +21,7 @@ class DbResidueSeq: public ResidueSeq {
 
   static std::string getXmlElementName() {return "db_residue_seq";}
 
-  void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+  void appendRefToXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
  private:
   int id_;

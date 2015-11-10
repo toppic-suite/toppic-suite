@@ -12,7 +12,7 @@ DbResidueSeq::DbResidueSeq(const ResiduePtrVec &residues, int id,
     desc_(desc) {
     }
 
-void DbResidueSeq::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
+void DbResidueSeq::appendRefToXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
   std::string element_name = DbResidueSeq::getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
   std::string str = StringUtil::convertToString(id_);

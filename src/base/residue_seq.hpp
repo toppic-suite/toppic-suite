@@ -45,7 +45,7 @@ class ResidueSeq {
 
   static std::string getXmlElementName() {return "residue_seq";}
 
-  void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+  //void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
  private:
   /** residue list */

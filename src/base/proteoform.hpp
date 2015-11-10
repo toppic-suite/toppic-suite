@@ -47,20 +47,21 @@ class Proteoform {
 
    AlignTypePtr getAlignType();
 
-   int getChangeNum(ChangeType change_type);
+   int getChangeNum(ChangeTypePtr ct_ptr);
 
-   ChangePtrVec getChangePtrVec(ChangeType change_type);
+   ChangePtrVec getChangePtrVec(ChangeTypePtr ct_ptr);
 
    SegmentPtrVec getSegmentPtrVec();
 
    std::string getProteinMatchSeq();
 
-    std::string toString();
+   std::string toString();
 
-    void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+
+   static std::string getXmlElementName() {return "proteoform";}
 
   private:
-
     /* db_residue_seq contains fixed modifications */
     DbResSeqPtr db_residue_seq_ptr_;
 
