@@ -40,7 +40,7 @@ void PeakIonPair::appendTheoPeakToXml(XmlDOMDocument* xml_doc,
   xml_doc->addElement(element, "ion_type", str.c_str());
   str = convertToString(theo_peak_ptr_->getShift());
   xml_doc->addElement(element, "match_shift", str.c_str()); 
-  str = convertToString(real_peak_ptr_->getMonoMass(),pos);
+  str = convertToString(theo_peak_ptr_->getModMass(),pos);
   xml_doc->addElement(element, "theoretical_mass", str.c_str()); 
   str = convertToString(theo_peak_ptr_->getIonPtr()->getPos());
   xml_doc->addElement(element, "ion_position", str.c_str());
