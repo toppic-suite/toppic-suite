@@ -38,12 +38,13 @@ file(GLOB PRSM_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/prsm/*.cpp)
 file(GLOB ZERO_PTM_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/zeroptmsearch/*.cpp)
 file(GLOB DIAG_FILTER_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/diagfilter/*.cpp)
 file(GLOB ONE_PTM_FILTER_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/oneptmfilter/*.cpp)
+file(GLOB ZERO_PTM_FILTER_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/zeroptmfilter/*.cpp)
 file(GLOB PTM_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/ptmsearch/*.cpp)
 #file(GLOB POISSON_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/poisson/*.cpp)
 file(GLOB TDGF_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/tdgf/*.cpp)
 file(GLOB PRSM_VIEW_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/prsmview/*.cpp)
 file(GLOB ARGU_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/argument.cpp)
-#file(GLOB MAIN_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic.cpp) 
+file(GLOB MAIN_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic.cpp) 
 file(GLOB SUMMARY_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/summary.cpp) 
 file(GLOB GRAPH_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/graph/*.cpp)
 file(GLOB GRAPH_ALIGN_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/graphalign/*.cpp)
@@ -54,13 +55,13 @@ file(GLOB TEST_EVALUE_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_evalue.cpp)
 file(GLOB TEST_PRSM_VIEW_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_prsm_view.cpp) 
 file(GLOB TEST_GRAPH_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_graph_align.cpp) 
 
-#add_executable(toppic ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
-#        ${ZERO_PTM_SRCS} ${DIAG_FILTER_SRCS} ${ONE_PTM_FILTER_SRCS} ${PTM_SRCS} #${POISSON_SRCS}
-#	${TDGF_SRCS} ${PRSM_VIEW_SRCS} ${ARGU_SRCS} ${MAIN_SRCS} ${SUMMARY_SRCS})
+add_executable(toppic ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
+    ${ZERO_PTM_SRCS} ${DIAG_FILTER_SRCS} ${ONE_PTM_FILTER_SRCS} ${ZERO_PTM_FILTER_SRCS} ${PTM_SRCS}
+	${TDGF_SRCS} ${PRSM_VIEW_SRCS} ${ARGU_SRCS} ${MAIN_SRCS} ${SUMMARY_SRCS})
 
-add_executable(test_graph ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
-    ${ZERO_PTM_SRCS} ${DIAG_FILTER_SRCS} ${ONE_PTM_FILTER_SRCS} ${PTM_SRCS} ${POISSON_SRCS}
-    ${GRAPH_SRCS} ${GRAPH_ALIGN_SRCS} ${TDGF_SRCS} ${PRSM_VIEW_SRCS} ${ARGU_SRCS} ${TEST_GRAPH_SRCS})
+#add_executable(test_graph ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
+#    ${ZERO_PTM_SRCS} ${DIAG_FILTER_SRCS} ${ONE_PTM_FILTER_SRCS} ${PTM_SRCS} ${POISSON_SRCS}
+#    ${GRAPH_SRCS} ${GRAPH_ALIGN_SRCS} ${TDGF_SRCS} ${PRSM_VIEW_SRCS} ${ARGU_SRCS} ${TEST_GRAPH_SRCS})
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     # Windows specific code
@@ -72,7 +73,7 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     # Linux specific code
 
-    target_link_libraries(test_graph xalan-c xalanMsg xerces-c boost_program_options
+    target_link_libraries(toppic xalan-c xalanMsg xerces-c boost_program_options
         boost_filesystem boost_system boost_date_time hts pthread z)
 
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 

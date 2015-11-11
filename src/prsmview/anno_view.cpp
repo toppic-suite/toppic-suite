@@ -266,22 +266,6 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
         }
         int this_right = right_db_bp * 2;
         AnnoUnexpectedChangePtr anno_change_ptr(new AnnoUnexpectedChange(this_left , this_right, shift, unexpected_shift_color, "SHIFT"));
-        anno_change_ptr->setPtmPtr(change_ptrs[i]->getPtmPtr());
-        std::string anno_info = "PTM: ";
-        if (change_ptrs[i]->getPtmPtr() == nullptr) {
-            anno_info += "Unknown";
-        } else {
-            anno_info += change_ptrs[i]->getPtmPtr()->getName();
-        }
-
-        for (int k = left_db_bp; k <= right_db_bp; k++) {
-            std::string acid_letter = proteoform_ptr->getDbResSeqPtr()
-                                      ->getResiduePtr(k)->getAcidPtr()->getOneLetter();
-            anno_change_ptr->addOccurence(k, acid_letter);
-            res_ptrs[k]->setPossiblePosColor(1);
-            res_ptrs[k]->setAnno(anno_info);
-        }
-
 
         unexpected_change_ptrs.push_back(anno_change_ptr);
         last_right = this_right;
@@ -296,52 +280,6 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
         }
         int this_right = right_db_bp * 2 - 1;
         AnnoUnexpectedChangePtr anno_change_ptr(new AnnoUnexpectedChange(this_left, this_right, shift, unexpected_shift_color, "SHIFT"));
-
-        anno_change_ptr->setPtmPtr(change_ptrs[i]->getPtmPtr());
-        std::string anno_info = "PTM: ";
-        if (change_ptrs[i]->getPtmPtr() != nullptr) {
-            anno_info += change_ptrs[i]->getPtmPtr()->getName() + "\n";
-            std::vector<double> scr = change_ptrs[i]->getScr();
-            for (int k = left_db_bp; k < right_db_bp; k++) {
-                if (scr[k - left_db_bp] > 0) {
-                    std::string acid_letter = proteoform_ptr->getDbResSeqPtr()
-                        ->getResiduePtr(k)->getAcidPtr()->getOneLetter();
-                    anno_info += "Site: " + acid_letter + std::to_string(k) + " ";
-                    anno_info += "Confidence: "
-                        + convertToString(scr[k - left_db_bp] * 100, 2) + "%\n";
-                }
-            }
-            for (int k = left_db_bp; k < right_db_bp; k++) {
-                if (scr[k - left_db_bp] > 0) {
-                    std::string acid_letter = proteoform_ptr->getDbResSeqPtr()
-                        ->getResiduePtr(k)->getAcidPtr()->getOneLetter();
-                    anno_change_ptr->addOccurence(k, acid_letter);
-                    res_ptrs[k]->setPossiblePosColor(1);
-                    res_ptrs[k]->setAnno(anno_info);
-                }
-            }
-        } else {
-            anno_info += "Unknown\n";
-            std::string acid_letter = proteoform_ptr->getDbResSeqPtr()
-                ->getResiduePtr(left_db_bp)->getAcidPtr()->getOneLetter();
-            anno_change_ptr->addOccurence(left_db_bp, acid_letter);
-            anno_info += "Region: " + acid_letter + std::to_string(left_db_bp) + " - ";
-            acid_letter = proteoform_ptr->getDbResSeqPtr()->getResiduePtr(
-                    right_db_bp - 1)->getAcidPtr()->getOneLetter();
-            anno_info += acid_letter + std::to_string(right_db_bp - 1);
-            anno_change_ptr->addOccurence(right_db_bp - 1, acid_letter);
-            double scr_sum = 0.0;
-            std::vector<double> scr = change_ptrs[i]->getScr();
-            for (int k = left_db_bp; k < right_db_bp; k++) {
-                scr_sum += scr[k - left_db_bp];
-            }
-            anno_info += " Confindence: " + convertToString(scr_sum * 100, 2) + "%\n";
-            for (int k = left_db_bp; k < right_db_bp; k++) {
-                res_ptrs[k]->setPossiblePosColor(1);
-                res_ptrs[k]->setAnno(anno_info);
-            }
-
-        }
 
         unexpected_change_ptrs.push_back(anno_change_ptr);
         last_right = this_right;

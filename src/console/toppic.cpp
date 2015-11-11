@@ -117,7 +117,6 @@ int process(int argc, char* argv[]) {
     time(&stop_s);
     std::cout <<  "Zero PTM search running time: " << difftime(stop_s, start_s)  << " seconds " << std::endl;
 
-    /*
     std::vector<std::string> filtering_result_exts;
     int total_filtering_result_num = 0;
     if (ptm_num >= 1) {
@@ -283,7 +282,6 @@ int process(int argc, char* argv[]) {
     std::cout << "Converting xml files to html files finished." << std::endl;
     time(&stop_s);
     std::cout <<  "Html generation running time: " << difftime(stop_s, start_s) << " seconds " << std::endl;
-    */
     
     if (arguments["keepTempFiles"] != "true"){
       std::cout << "Deleting temporary files started." << std::endl;
@@ -311,7 +309,7 @@ int process(int argc, char* argv[]) {
 }
 
 int main(int argc, char* argv[]) {
-  prot::log_level = 2;
+  //prot::log_level = 2;
   return prot::process(argc, argv);
 }
 

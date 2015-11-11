@@ -71,13 +71,16 @@ int proteoform_graph_test(int argc, char* argv[]) {
     std::string log_file_name = arguments["logFileName"];
     std::string residue_mod_file_name = arguments["residueModFileName"];
 
-    int n_top = std::stoi(arguments["numOfTopPrsms"]);
     int ptm_num = std::stoi(arguments["ptmNumber"]);
+
+    /*
+    int n_top = std::stoi(arguments["numOfTopPrsms"]);
     double max_ptm_mass = std::stod(arguments["maxPtmMass"]);
     bool use_gf = false; 
     if (arguments["useGf"] == "true") {
       use_gf = true;
     }
+    */
 
     bool decoy = false;
     if (arguments["searchType"] == "TARGET+DECOY") {
@@ -102,6 +105,16 @@ int proteoform_graph_test(int argc, char* argv[]) {
     ga_processor_ptr = nullptr;
     std::cout << "Graph alignment finished." << std::endl;
 
+    std::cout << "Combining PRSMs started." << std::endl;
+    std::vector<std::string> input_exts ;
+    input_exts.push_back("GRAPH_ALIGN");
+    int prsm_top_num = 1;
+    PrsmStrCombinePtr combine_ptr(new PrsmStrCombine(sp_file_name, input_exts, "RAW_RESULT", prsm_top_num));
+    combine_ptr->process();
+    combine_ptr = nullptr;
+    std::cout << "Combining PRSMs finished." << std::endl;
+
+    /*
     std::cout << "E-value computation started." << std::endl;
     bool variable_ptm = true;
     TdgfMngPtr tdgf_mng_ptr = TdgfMngPtr(new TdgfMng (prsm_para_ptr, ptm_num, max_ptm_mass, use_gf,
@@ -144,10 +157,10 @@ int proteoform_graph_test(int argc, char* argv[]) {
     output_selector->process();
     output_selector = nullptr;
     std::cout << "PRSM selecting by cutoff finished." << std::endl;
-
+    */
 
     std::cout << "Outputting table started." << std::endl;
-    TableWriterPtr table_out = TableWriterPtr(new TableWriter(prsm_para_ptr, "CUTOFF_RESULT", "OUTPUT_TABLE"));
+    TableWriterPtr table_out = TableWriterPtr(new TableWriter(prsm_para_ptr, "RAW_RESULT", "OUTPUT_TABLE"));
     table_out->write();
     table_out = nullptr;
     std::cout << "Outputting table finished." << std::endl;
