@@ -1,11 +1,14 @@
-#ifndef PROT_DECONV_PEAK_HPP_
-#define PROT_DECONV_PEAK_HPP_
+#ifndef PROT_SPEC_DECONV_PEAK_HPP_
+#define PROT_SPEC_DECONV_PEAK_HPP_
 
 #include <memory>
 #include <vector>
 #include "spec/peak.hpp"
 
 namespace prot {
+
+class DeconvPeak;
+typedef std::shared_ptr<DeconvPeak> DeconvPeakPtr;
 
 class DeconvPeak : public Peak {
  public:
@@ -27,19 +30,19 @@ class DeconvPeak : public Peak {
 
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
+  static bool cmpPosIncreasep(const DeconvPeakPtr &a, const DeconvPeakPtr &b){
+    return a->getPosition() < b->getPosition();
+  }
+
+  static std::string getXmlElementName() {return "deconv_peak";}
+
  private:
   int id_;
   int charge_;
   double score_ = 1.0;
 };
 
-typedef std::shared_ptr<DeconvPeak> DeconvPeakPtr;
 typedef std::vector<DeconvPeakPtr> DeconvPeakPtrVec;
-
-inline bool deconvPeakUp(const DeconvPeakPtr &a, const DeconvPeakPtr &b){
-  return a->getPosition() < b->getPosition();
-}
-
 
 }
 #endif
