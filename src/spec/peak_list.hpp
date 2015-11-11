@@ -1,5 +1,5 @@
-#ifndef PROT_PEAK_LIST_HPP_
-#define PROT_PEAK_LIST_HPP_
+#ifndef PROT_SPEC_PEAK_LIST_HPP_
+#define PROT_SPEC_PEAK_LIST_HPP_
 
 namespace prot {
 
