@@ -1,11 +1,14 @@
-#ifndef PROT_MULTI_SPEC_PEAK_HPP_
-#define PROT_MULTI_SPEC_PEAK_HPP_
+#ifndef PROT_SPEC_MULTI_SPEC_PEAK_HPP_
+#define PROT_SPEC_MULTI_SPEC_PEAK_HPP_
 
 #include <memory>
 #include <vector>
 #include "spec/peak.hpp"
 
 namespace prot {
+
+class MultiSpecPeak;
+typedef std::shared_ptr<MultiSpecPeak> MultiSpecPeakPtr;
 
 class MultiSpecPeak : public Peak {
  public:
@@ -26,6 +29,10 @@ class MultiSpecPeak : public Peak {
 
   void setId(int id) {id_ = id;}
 
+  static bool cmpPosIncrease(const MultiSpecPeakPtr &a, const MultiSpecPeakPtr &b){
+    return a->getPosition() < b->getPosition();
+  }
+
  private:
   int id_;
   int spec_id_;
@@ -34,13 +41,7 @@ class MultiSpecPeak : public Peak {
   double score_;
 };
 
-typedef std::shared_ptr<MultiSpecPeak> MultiSpecPeakPtr;
 typedef std::vector<MultiSpecPeakPtr> MultiSpecPeakPtrVec;
-
-inline bool multiSpecPeakUp(const MultiSpecPeakPtr &a, const MultiSpecPeakPtr &b){
-  return a->getPosition() < b->getPosition();
-}
-
 
 }
 #endif

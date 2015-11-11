@@ -6,11 +6,11 @@
 #include <algorithm>
 
 #include "spec/deconv_peak.hpp"
-#include "spec/ms.hpp"
-#include "spec/deconv_ms.hpp"
-#include "spec/sp_para.hpp"
 
 namespace prot {
+
+class ExtendPeak;
+typedef std::shared_ptr<ExtendPeak> ExtendPeakPtr;
 
 class ExtendPeak : public Peak{
  public:
@@ -36,6 +36,12 @@ class ExtendPeak : public Peak{
 
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
+  static bool cmpPosIncrease(const ExtendPeakPtr &a, const ExtendPeakPtr &b){
+    return a->getPosition() < b->getPosition();
+  }
+
+  static std::string getXmlElementName() {return "extend_peak";}
+
  private:
   DeconvPeakPtr base_peak_ptr_;
   double mono_mass_;
@@ -44,37 +50,8 @@ class ExtendPeak : public Peak{
   double reverse_tolerance_;
 };
 
-typedef std::shared_ptr<ExtendPeak> ExtendPeakPtr;
 typedef std::vector<ExtendPeakPtr> ExtendPeakPtrVec;
-typedef std::shared_ptr<Ms<ExtendPeakPtr>> ExtendMsPtr;
-typedef std::vector<ExtendMsPtr> ExtendMsPtrVec;
 
-ExtendMsPtr createMsThreePtr(DeconvMsPtr deconv_ms_ptr, SpParaPtr sp_para_ptr,
-                             double new_prec_mass);
-
-ExtendMsPtrVec createMsThreePtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, 
-                                   SpParaPtr sp_para_ptr, double new_prec_mass);
-
-/*std::pair<std::vector<int>, std::vector<int>> getExtendIntMassErrorList(*/
-    /*ExtendMsPtr ext_ms_ptr, double scale);*/
-
-std::vector<std::pair<int, int>> 
-getExtendIntMassErrorList(const ExtendMsPtrVec &ext_ms_ptr_vec, double scale); 
-
-inline bool extendPeakUp(const ExtendPeakPtr &a, const ExtendPeakPtr &b){
-  return a->getPosition() < b->getPosition();
-}
-
-
-/* use inline to speedup */
-inline std::vector<double> getExtendMassVec (ExtendMsPtr extend_ms_ptr) {
-  std::vector<double> masses;
-  ExtendPeakPtrVec peak_ptr_list = extend_ms_ptr->getPeakPtrVec();
-  for (size_t i = 0; i < peak_ptr_list.size(); i++) {
-    masses.push_back(peak_ptr_list[i]->getPosition());
-  }
-  return masses;
-}
 
 
 } /* namespace prot */
