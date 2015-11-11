@@ -6,7 +6,7 @@
 namespace prot {
 
 class ProteoformFactory {
-
+ public:
   /* get db proteoform */
   static ProteoformPtr geneDbProteoformPtr(DbResSeqPtr db_res_seq_ptr);
 

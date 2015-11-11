@@ -60,4 +60,15 @@ bool Change::cmpPosIncrease(const ChangePtr &a, const ChangePtr &b) {
   }
 }
 
+ChangePtr Change::geneChangePtr(ChangePtr ori_ptr, int start_pos) {
+  int left_bp_pos = ori_ptr->left_bp_pos_ - start_pos;
+  int right_bp_pos = ori_ptr->right_bp_pos_ - start_pos;
+  ChangeTypePtr change_type_ptr = ori_ptr->change_type_ptr_;
+  double mass_shift = ori_ptr->mass_shift_;
+  PtmPtr ptm_ptr = ori_ptr->ptm_ptr_;
+  ChangePtr change_ptr(
+      new Change(left_bp_pos, right_bp_pos, change_type_ptr, mass_shift, ptm_ptr));
+  return change_ptr;
+}
+
 }

@@ -34,6 +34,8 @@ class Change {
 
   static bool cmpPosIncrease(const ChangePtr &a, const ChangePtr &b);
 
+  static ChangePtr geneChangePtr(ChangePtr ori_change_ptr, int start_pos);
+
  private:
   // left and right positions are based on break point positions 
   int left_bp_pos_;

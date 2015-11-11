@@ -20,7 +20,7 @@ class ResidueUtil {
   static ResiduePtr getResiduePtrByAcid(const ResiduePtrVec &residue_list,
                                         AcidPtr acid_ptr);
 
-  int findResidue(const ResiduePtrVec &residue_list, ResiduePtr residue_ptr);
+  static int findResidue(const ResiduePtrVec &residue_list, ResiduePtr residue_ptr);
 
   static ResiduePtrVec convertAcidToResiduePtrVec(const ResiduePtrVec &residue_list,
                                                   const AcidPtrVec &acid_list);

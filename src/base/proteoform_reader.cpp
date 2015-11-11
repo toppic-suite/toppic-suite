@@ -2,6 +2,7 @@
 #include "base/acid_util.hpp"
 #include "base/residue_util.hpp"
 #include "base/proteoform_reader.hpp"
+#include "base/proteoform_factory.hpp"
 
 namespace prot {
 
@@ -25,7 +26,7 @@ ProteoformPtr ProteoformReader::getNextProteoformPtr(
   DbResSeqPtr db_residue_seq_ptr(
       new DbResidueSeq(residue_ptrs, seq_id_, seq_ptr->getName(), seq_ptr->getDesc())); 
   seq_id_++;
-  return getDbProteoformPtr(db_residue_seq_ptr);
+  return ProteoformFactory::geneDbProteoformPtr(db_residue_seq_ptr);
 }
 
 ProteoformPtrVec ProteoformReader::readFastaToProteoform(const std::string &file_name,
