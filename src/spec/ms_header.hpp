@@ -1,5 +1,5 @@
-#ifndef PROT_MS_HEADER_HPP_
-#define PROT_MS_HEADER_HPP_
+#ifndef PROT_SPEC_MS_HEADER_HPP_
+#define PROT_SPEC_MS_HEADER_HPP_
 
 #include "base/activation.hpp"
 
@@ -82,6 +82,8 @@ class MsHeader {
   xercesc::DOMElement* getHeaderXml(XmlDOMDocument* xml_doc);
 
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+
+  static std::string getXmlElementName() {return "ms_header";}
 
  private:
   /** data set name */

@@ -1,10 +1,10 @@
-#ifndef PROT_SP_PARA_HPP_
-#define PROT_SP_PARA_HPP_
+#ifndef PROT_SPEC_SP_PARA_HPP_
+#define PROT_SPEC_SP_PARA_HPP_
 
 #include <memory>
-#include "spec/peak_tolerance.hpp"
 #include "base/activation.hpp"
 #include "base/xml_dom_document.hpp"
+#include "spec/peak_tolerance.hpp"
 
 namespace prot {
 
@@ -38,6 +38,8 @@ class SpPara {
   void setMinPeakNum(int min_peak_num) {min_peak_num_=min_peak_num;}
 
   void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
+
+  static std::string getXmlElementName() {return "sp_para";}
 
  private:
   int min_peak_num_;

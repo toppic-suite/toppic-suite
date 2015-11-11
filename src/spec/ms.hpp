@@ -1,5 +1,5 @@
-#ifndef PROT_MS_HPP_
-#define PROT_MS_HPP_
+#ifndef PROT_SPEC_MS_HPP_
+#define PROT_SPEC_MS_HPP_
 
 #include <sstream>
 

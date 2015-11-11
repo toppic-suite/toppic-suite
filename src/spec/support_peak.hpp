@@ -1,5 +1,5 @@
-#ifndef PROT_SUPPORT_PEAK_HPP_
-#define PROT_SUPPORT_PEAK_HPP_
+#ifndef PROT_SPEC_SUPPORT_PEAK_HPP_
+#define PROT_SPEC_SUPPORT_PEAK_HPP_
 
 #include "base/support_peak_type.hpp"
 #include "spec/deconv_peak.hpp"
