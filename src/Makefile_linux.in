@@ -19,7 +19,7 @@ OBJ_DIR = ../../bin/obj
 
 BIN_DIR = ../../bin
 
-BASE_OBJS = $(addprefix $(OBJ_DIR)/, acid_base.o acid_util.o acid.o activation_base.o activation.o algorithm.o align_type.o base_data.o bp_spec.o break_point.o change.o change_type.o db_block.o db_residue_seq.o fasta_seq.o fasta_reader.o fasta_index_reader.o fasta_util.o file_util.o logger.o prot_mod_base.o prot_mod_util.o prot_mod.o proteoform.o ptm_base.o ptm.o residue.o residue_freq.o residue_seq.o segment.o string_util.o trunc_base.o trunc_util.o trunc.o web_logger.o xml_dom.o xml_dom_document.o xml_dom_err_handler.o xml_dom_util.o xml_writer.o)
+BASE_OBJS = $(addprefix $(OBJ_DIR)/, acid_base.o acid_util.o acid.o activation_base.o activation.o algorithm.o align_type.o base_data.o bp_spec.o break_point.o change.o change_type.o db_block.o db_residue_seq.o fasta_seq.o fasta_reader.o fasta_index_reader.o fasta_util.o file_util.o logger.o prot_mod_base.o prot_mod_util.o prot_mod.o proteoform.o proteoform_factory.o ptm_base.o ptm.o residue.o residue_freq.o residue_seq.o segment.o string_util.o trunc_base.o trunc_util.o trunc.o web_logger.o xml_dom.o xml_dom_document.o xml_dom_err_handler.o xml_dom_util.o xml_writer.o)
 
 #BASE_OBJS = $(addprefix $(OBJ_DIR)/, acid.o activation.o algorithm.o bp_spec.o break_point.o change.o db_block.o conf.o db_residue_seq.o extreme_value.o fasta_reader.o file_util.o ion.o ion_type.o logger.o neutral_loss.o proteoform.o proteoform_reader.o prot_mod.o ptm.o residue.o residue_freq.o residue_seq.o segment.o semi_align_type.o support_peak_type.o trunc.o web_logger.o xml_dom.o xml_dom_document.o xml_dom_err_handler.o xml_writer.o)
 
