@@ -5,6 +5,9 @@
 
 namespace prot {
 
+class MsHeader;
+typedef std::shared_ptr<MsHeader> MsHeaderPtr;
+
 class MsHeader {
  public:
   MsHeader() {};
@@ -85,6 +88,8 @@ class MsHeader {
 
   static std::string getXmlElementName() {return "ms_header";}
 
+  static MsHeaderPtr geneMsHeaderPtr(MsHeaderPtr ori_ptr, double new_prec_mass);
+
  private:
   /** data set name */
   std::string file_name_;
@@ -113,7 +118,6 @@ class MsHeader {
   double error_tolerance_=0.0;
 };
 
-typedef std::shared_ptr<MsHeader> MsHeaderPtr;
 }
 
 #endif

@@ -1,14 +1,9 @@
 #ifndef PROT_SPEC_DECONV_MS_FACTORY_HPP_
 #define PROT_SPEC_DECONV_MS_FACTORY_HPP_
 
-#include "spec/ms.hpp"
-#include "spec/deconv_peak.hpp"
+#include "spec/deconv_ms.hpp"
 
 namespace prot {
-
-typedef std::shared_ptr<Ms<DeconvPeakPtr>> DeconvMsPtr;
-
-typedef std::vector<DeconvMsPtr> DeconvMsPtrVec;
 
 class DeconvMsFactory {
  public:

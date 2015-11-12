@@ -51,7 +51,7 @@ class Ms {
     return header_str + tmp.str();
   }
 
-  MsHeaderPtr getHeaderPtr() {return header_ptr_;}
+  MsHeaderPtr getMsHeaderPtr() {return header_ptr_;}
 
   void setHeaderPtr(MsHeaderPtr header_ptr) {header_ptr = header_ptr_;}
 

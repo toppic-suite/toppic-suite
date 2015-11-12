@@ -152,7 +152,14 @@ xercesc::DOMElement* MsHeader::getHeaderXml(XmlDOMDocument* xml_doc) {
 }
 
 void MsHeader::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
-    parent->appendChild(getHeaderXml(xml_doc));
+  parent->appendChild(getHeaderXml(xml_doc));
+}
+
+MsHeaderPtr MsHeader::geneMsHeaderPtr(MsHeaderPtr ori_ptr, double new_prec_mass) {
+  MsHeaderPtr new_header_ptr(new MsHeader(*ori_ptr.get()));
+  double mono_mz = PeakUtil::compMonoMz(new_prec_mass, ori_ptr->getPrecCharge());
+  new_header_ptr->setPrecMonoMz(mono_mz);
+  return new_header_ptr;
 }
 
 }
