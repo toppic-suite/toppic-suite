@@ -16,6 +16,9 @@
 
 namespace prot {
 
+class Residue;
+typedef std::shared_ptr<Residue> ResiduePtr;
+
 class Residue {
  public:
   Residue(AcidPtr acid_ptr, PtmPtr ptm_ptr); 
@@ -36,8 +39,9 @@ class Residue {
   /**
    * Checks if the residue contains the same amino acid and ptm.
    */
-  bool isSame(AcidPtr acid_ptr, PtmPtr ptm_ptr) {
-    return acid_ptr_ == acid_ptr && ptm_ptr_ == ptm_ptr;
+  bool isSame(ResiduePtr residue_ptr) {
+    return acid_ptr_ == residue_ptr->getAcidPtr() 
+        && ptm_ptr_ == residue_ptr->getPtmPtr();
   }
 
   /** Get string representation */
@@ -45,6 +49,9 @@ class Residue {
                        const std::string &delim_end);
 
   std::string toString() {return toString("[", "]");}
+
+  void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent,
+                 const std::string &element_name);
 
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
@@ -59,7 +66,6 @@ private:
   double mass_;
 };
 
-typedef std::shared_ptr<Residue> ResiduePtr;
 typedef std::vector<ResiduePtr> ResiduePtrVec;
 typedef std::vector<ResiduePtrVec> ResiduePtrVec2D;
 

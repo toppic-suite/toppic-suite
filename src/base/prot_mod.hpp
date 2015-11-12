@@ -1,7 +1,7 @@
 #ifndef PROT_BASE_PROT_MOD_HPP_
 #define PROT_BASE_PROT_MOD_HPP_
 
-#include "base/ptm.hpp"
+#include "base/mod.hpp"
 #include "base/trunc.hpp"
 #include "base/xml_dom_document.hpp"
 
@@ -10,7 +10,7 @@ namespace prot {
 class ProtMod {
  public:
   ProtMod(const std::string &name, TruncPtr trunc_ptr,
-          PtmPtr ptm_ptr);
+          ModPtr mod_ptr);
 
   ProtMod(xercesc::DOMElement* element); 
 
@@ -18,7 +18,9 @@ class ProtMod {
 
   TruncPtr getTruncPtr() { return trunc_ptr_;}
 
-  PtmPtr getPtmPtr() { return ptm_ptr_;}
+  ModPtr getModPtr() { return mod_ptr_;}
+
+  int getMosPos() {return mod_pos_;}
 
   double getProtShift() { return prot_shift_;}
 
@@ -31,7 +33,8 @@ class ProtMod {
  private:
   std::string name_;
   TruncPtr trunc_ptr_;
-  PtmPtr ptm_ptr_;
+  ModPtr mod_ptr_;
+  int mod_pos_;
   double prot_shift_;
   double pep_shift_;
 };
