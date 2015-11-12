@@ -8,7 +8,7 @@
 namespace prot {
 
 class PrmMsFactory {
-
+ public:
   static PrmMsPtrVec geneMsTwoPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, 
                                      SpParaPtr sp_para_ptr,
                                      double prec_mono_mass);
