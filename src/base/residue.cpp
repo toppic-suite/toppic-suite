@@ -44,14 +44,18 @@ std::string Residue::toString(const std::string &delim_bgn,
   }
 }
 
-void Residue::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
-  std::string element_name = Residue::getXmlElementName();
+void Residue::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent,
+                        const std::string &element_name){
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
   std::string str = StringUtil::convertToString(mass_);
-  xml_doc->addElement(element, "mass", str.c_str());
   acid_ptr_->appendNameToXml(xml_doc,element);
   ptm_ptr_->appendAbbrNameToXml(xml_doc,element);
   parent->appendChild(element);
+}
+
+void Residue::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
+  std::string element_name = Residue::getXmlElementName();
+  appendXml(xml_doc, parent, element_name);
 }
 
 }

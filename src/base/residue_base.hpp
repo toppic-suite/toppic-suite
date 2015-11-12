@@ -21,12 +21,10 @@ class ResidueBase {
 
   static const ResiduePtrVec& getBaseResiduePtrVec() {return residue_ptr_vec_;}
   
-  static ResiduePtr getResiduePtrByAcidPtm(AcidPtr acid_ptr, PtmPtr ptm_ptr);
+  static ResiduePtr getBaseResiduePtr(ResiduePtr residue_ptr);
   
-  static ResiduePtr addResidue(AcidPtr acid_ptr, PtmPtr ptm_ptr);
+  //static ResiduePtrVec getResiduePtrVecInstance(const std::string &file_name);
   
-  static ResiduePtrVec getResiduePtrVecInstance(const std::string &file_name);
-
  private:
   static ResiduePtrVec residue_ptr_vec_;
 };
