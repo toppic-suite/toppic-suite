@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "base/logger.hpp"
+#include "spec/prm_peak_factory.hpp"
 #include "spec/prm_ms.hpp"
 
 namespace prot {
@@ -48,10 +49,10 @@ std::vector<std::pair<int, int>> PrmMs::getIntMassErrorList(
     }
     //add zero mass for each spectrum to increase the score for zero mass
     double prec_mass = prm_ms_ptr_vec[i]->getMsHeaderPtr()->getPrecMonoMass();
-    PrmPeakPtr zero_prm_ptr = getZeroPeakPtr(i, prec_mass, tole_ptr, 1);
+    PrmPeakPtr zero_prm_ptr = PrmPeakFactory::getZeroPeakPtr(i, prec_mass, tole_ptr, 1);
     mass_errors.push_back(getMassError(zero_prm_ptr, scale, n_strict, c_strict));
     //add prec mass for each spectrum 
-    PrmPeakPtr prec_prm_ptr = getPrecPeakPtr(i, prec_mass, tole_ptr, 1);
+    PrmPeakPtr prec_prm_ptr = PrmPeakFactory::getPrecPeakPtr(i, prec_mass, tole_ptr, 1);
     mass_errors.push_back(getMassError(prec_prm_ptr, scale, true, true));
   }
 
@@ -68,14 +69,14 @@ PrmPeakPtrVec PrmMs::getPrmPeakPtrs(const PrmMsPtrVec &prm_ms_ptr_vec,
     }
   }
   // add zero 
-  double prec_mass = prm_ms_ptr_vec[0]->getHeaderPtr()->getPrecMonoMass();
+  double prec_mass = prm_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMass();
   // use spec_id = 0 and score = group_spec_num (size of prm_ms_ptr_vec)
-  PrmPeakPtr zero_prm_ptr = getZeroPeakPtr(0, prec_mass, tole_ptr, prm_ms_ptr_vec.size());
+  PrmPeakPtr zero_prm_ptr = PrmPeakFactory::getZeroPeakPtr(0, prec_mass, tole_ptr, prm_ms_ptr_vec.size());
   peak_list.push_back(zero_prm_ptr);
   // add prec mass  
-  PrmPeakPtr prec_prm_ptr = getPrecPeakPtr(0, prec_mass, tole_ptr, prm_ms_ptr_vec.size());
+  PrmPeakPtr prec_prm_ptr = PrmPeakFactory::getPrecPeakPtr(0, prec_mass, tole_ptr, prm_ms_ptr_vec.size());
   peak_list.push_back(prec_prm_ptr);
-  std::sort(peak_list.begin(), peak_list.end(), prmPeakUp);
+  std::sort(peak_list.begin(), peak_list.end(), PrmPeak::cmpPosIncrease);
   for (size_t i = 0; i < peak_list.size(); i++) {
     peak_list[i]->setPeakId(i);
   }

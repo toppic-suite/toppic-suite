@@ -16,7 +16,7 @@ typedef std::shared_ptr<PrmPeak> PrmPeakPtr;
 
 class PrmPeak : public Peak {
  public:
-  PrmPeak(DeconvPeakPtr base_peak_ptr, int spec_id,
+  PrmPeak(int spec_id, DeconvPeakPtr base_peak_ptr,
           PrmBaseTypePtr base_type, 
           double mono_mass, double score);
 
@@ -60,10 +60,10 @@ class PrmPeak : public Peak {
   }
 
  private:
-  DeconvPeakPtr base_peak_ptr_;
-  int peak_id_;
   int spec_id_;
+  DeconvPeakPtr base_peak_ptr_;
   PrmBaseTypePtr base_type_;
+  int peak_id_;
   double mono_mass_;
   double score_;
   double strict_tolerance_;
