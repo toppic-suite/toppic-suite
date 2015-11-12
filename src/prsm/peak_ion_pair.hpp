@@ -1,15 +1,15 @@
-#ifndef PROT_PEAK_ION_PAIR_HPP_
-#define PROT_PEAK_ION_PAIR_HPP_
+#ifndef PROT_PRSM_PEAK_ION_PAIR_HPP_
+#define PROT_PRSM_PEAK_ION_PAIR_HPP_
 
 #include "base/xml_dom_document.hpp"
+#include "spec/ms_header.hpp"
 #include "spec/extend_peak.hpp"
 #include "spec/theo_peak.hpp"
 
 namespace prot {
 
-#define N_TERM_COVERAGE 0
-#define C_TERM_COVERAGE 1
-#define BOTH_TERM_COVERAGE 2
+class PeakIonPair;
+typedef std::shared_ptr<PeakIonPair> PeakIonPairPtr;
 
 class PeakIonPair {
  public:
@@ -30,39 +30,16 @@ class PeakIonPair {
   void appendTheoPeakToXml(XmlDOMDocument* xml_doc, 
                            xercesc::DOMElement* parent);
 
+  static bool cmpRealPeakPosInc(const PeakIonPairPtr &a, const PeakIonPairPtr &b);
+
  private:
   int id_;
   MsHeaderPtr ms_header_ptr_;
   ExtendPeakPtr real_peak_ptr_;
   TheoPeakPtr theo_peak_ptr_;
 };
-
-typedef std::shared_ptr<PeakIonPair> PeakIonPairPtr;
 typedef std::vector<PeakIonPairPtr> PeakIonPairPtrVec;
 typedef std::vector<PeakIonPairPtrVec> PeakIonPairPtrVec2D;
-
-inline bool peakIonPairUp(const PeakIonPairPtr &a, const PeakIonPairPtr &b) {
-  return a->getRealPeakPtr()->getBasePeakPtr()->getPosition() 
-      < b->getRealPeakPtr()->getBasePeakPtr()->getPosition();
-}
-
-PeakIonPairPtrVec getMatchedPairs(const PeakIonPairPtrVec &pair_ptrs, 
-        int spec_id, int peak_id);
-
-PeakIonPairPtrVec getPeakIonPairs(const ProteoformPtr &proteoform_ptr, 
-        const ExtendMsPtr &ms_three_ptr, double min_mass);
-
-PeakIonPairPtrVec getPeakIonPairs(const ProteoformPtr &proteoform_ptr, 
-        const ExtendMsPtrVec &ms_ptr_vec, double min_mass);
-
-int getNumPeakIonPairs(const ProteoformPtr &proteoform_ptr,
-        const ExtendMsPtr &ms_three_ptr, double min_mass);
-
-int getNumPeakIonPairs(const ProteoformPtr &proteoform_ptr,
-        const ExtendMsPtrVec &ms_ptr_vec, double min_mass);
-
-double computePairConverage(const PeakIonPairPtrVec &pair_ptrs, int begin, 
-        int end, int coverage_type);
 
 }
 
