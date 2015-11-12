@@ -8,12 +8,13 @@
 
 namespace prot {
 
-PrmPeak::PrmPeak(DeconvPeakPtr base_peak_ptr, int spec_id,
+PrmPeak::PrmPeak(int spec_id, 
+                 DeconvPeakPtr base_peak_ptr, 
                  PrmBaseTypePtr base_type,
                  double mono_mass, double score):
     Peak(mono_mass, base_peak_ptr->getIntensity()),
-    base_peak_ptr_(base_peak_ptr),
     spec_id_(spec_id),
+    base_peak_ptr_(base_peak_ptr),
     base_type_(base_type),
     mono_mass_(mono_mass),
     score_(score),
