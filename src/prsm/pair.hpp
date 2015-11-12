@@ -1,5 +1,5 @@
-#ifndef PAIR_HPP_
-#define PAIR_HPP_
+#ifndef PROT_PRSM_PAIR_HPP_
+#define PROT_PRSM_PAIR_HPP_
 
 #include "base/algorithm.hpp"
 #include "spec/extend_peak.hpp"
