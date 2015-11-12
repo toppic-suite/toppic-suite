@@ -1,5 +1,5 @@
-#ifndef PROT_MSALIGN_READER_HPP_
-#define PROT_MSALIGN_READER_HPP_
+#ifndef PROT_SPEC_MSALIGN_READER_HPP_
+#define PROT_SPEC_MSALIGN_READER_HPP_
 
 #include <vector>
 #include <string>
@@ -38,12 +38,6 @@ class MsAlignReader {
 };
 
 typedef std::shared_ptr<MsAlignReader> MsAlignReaderPtr;
-
-int countSpNum(const std::string &spectrum_file);
-
-void generateSpIndex(const std::string &spectrum_file_name);
-
-int getSpNum(const std::string &spectrum_file_name);
 
 }
 #endif

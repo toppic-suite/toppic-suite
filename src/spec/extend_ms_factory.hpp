@@ -8,7 +8,7 @@
 namespace prot {
 
 class ExtendMsFactory {
-
+ public:
   static ExtendMsPtr geneMsThreePtr(DeconvMsPtr deconv_ms_ptr, SpParaPtr sp_para_ptr,
                                     double new_prec_mass);
 

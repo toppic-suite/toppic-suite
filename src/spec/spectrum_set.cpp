@@ -1,35 +1,38 @@
 #include <functional>
 
-#include "base/base_data.hpp"
-#include "spec/extend_peak.hpp"
+#include "spec/extend_ms_factory.hpp"
+#include "spec/prm_ms_factory.hpp"
 #include "spec/spectrum_set.hpp"
 
 namespace prot {
 
-SpectrumSet::SpectrumSet(DeconvMsPtrVec deconv_ms_ptr_vec, SpParaPtr sp_para_ptr,
-                         double prec_mono_mass) {
-  deconv_ms_ptr_vec_ = deconv_ms_ptr_vec;
-  sp_para_ptr_ = sp_para_ptr;
-  // add error tolerance for precursor mass 
-  double ppo = sp_para_ptr_->getPeakTolerancePtr()->getPpo();
-  ActivationPtr activation_ptr = sp_para_ptr->getActivationPtr();
-  for (size_t i = 0; i < deconv_ms_ptr_vec_.size(); i++) {
-    DeconvMsPtr deconv_ms_ptr = deconv_ms_ptr_vec[i];
-    deconv_ms_ptr->getHeaderPtr()->setErrorToleranceByPpo(ppo);
-    if(deconv_ms_ptr->getHeaderPtr()->getActivationPtr() == nullptr 
-       && activation_ptr != nullptr){
-      deconv_ms_ptr->getHeaderPtr()->setActivationPtr(activation_ptr);
+SpectrumSet::SpectrumSet(DeconvMsPtrVec deconv_ms_ptr_vec,
+                         SpParaPtr sp_para_ptr,
+                         double prec_mono_mass): 
+    deconv_ms_ptr_vec_(deconv_ms_ptr_vec),
+    sp_para_ptr_(sp_para_ptr),
+    prec_mono_mass_(prec_mono_mass) {
+      // add error tolerance for precursor mass 
+      double ppo = sp_para_ptr_->getPeakTolerancePtr()->getPpo();
+      ActivationPtr activation_ptr = sp_para_ptr->getActivationPtr();
+      for (size_t i = 0; i < deconv_ms_ptr_vec_.size(); i++) {
+        DeconvMsPtr deconv_ms_ptr = deconv_ms_ptr_vec[i];
+        MsHeaderPtr ms_header_ptr = deconv_ms_ptr->getMsHeaderPtr();
+        ms_header_ptr->setErrorToleranceByPpo(ppo);
+        if(ms_header_ptr->getActivationPtr() == nullptr && activation_ptr != nullptr){
+          ms_header_ptr->setActivationPtr(activation_ptr);
+        }
+      }
+      valid_ = checkValid(sp_para_ptr);
+      if (valid_) {
+        extend_ms_three_ptr_vec_ 
+            = ExtendMsFactory::geneMsThreePtrVec(deconv_ms_ptr_vec_, sp_para_ptr, prec_mono_mass);
+        prm_ms_two_ptr_vec_ 
+            = PrmMsFactory::geneMsTwoPtrVec(deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass);
+        prm_ms_six_ptr_vec_ 
+            = PrmMsFactory::geneMsSixPtrVec(deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass);
+      }
     }
-  }
-  prec_mono_mass_ = prec_mono_mass;
-  valid_ = checkValid(sp_para_ptr);
-  if (valid_) {
-    extend_ms_three_ptr_vec_ 
-        = createMsThreePtrVec(deconv_ms_ptr_vec_, sp_para_ptr, prec_mono_mass);
-    prm_ms_two_ptr_vec_ = createMsTwoPtrVec(deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass);
-    prm_ms_six_ptr_vec_ = createMsSixPtrVec(deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass);
-  }
-}
 
 bool SpectrumSet::checkValid(SpParaPtr sp_para_ptr) {
   if (prec_mono_mass_ < sp_para_ptr->getMinMass()) {
@@ -43,37 +46,11 @@ bool SpectrumSet::checkValid(SpParaPtr sp_para_ptr) {
     return false;
   }
   for (size_t i = 0; i < deconv_ms_ptr_vec_.size(); i++) {
-    if(deconv_ms_ptr_vec_[i]->getHeaderPtr()->getActivationPtr() == nullptr){
+    if(deconv_ms_ptr_vec_[i]->getMsHeaderPtr()->getActivationPtr() == nullptr){
       return false;
     }
   }
   return true;
-}
-
-SpectrumSetPtr getSpectrumSet(const DeconvMsPtrVec & deconv_ms_ptr_vec, 
-        const SpParaPtr & sp_para_ptr, double prec_mono_mass) {
-    DeconvMsPtrVec deconv_vec;
-    for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
-        if ((int)deconv_ms_ptr_vec[i]->size() < sp_para_ptr->getMinPeakNum()
-                || deconv_ms_ptr_vec[i]->getHeaderPtr()->getPrecMonoMass() < sp_para_ptr->getMinMass()) {
-            continue;
-        }
-
-        if (deconv_ms_ptr_vec[i]->getHeaderPtr()->getActivationPtr() == nullptr) {
-            if (sp_para_ptr->getActivationPtr() != nullptr) {
-                deconv_ms_ptr_vec[i]->getHeaderPtr()->setActivationPtr(sp_para_ptr->getActivationPtr());
-            } else {
-                continue;
-            }
-        }
-        deconv_vec.push_back(deconv_ms_ptr_vec[i]);
-    }
-
-    if (deconv_vec.size() == 0) {
-        return SpectrumSetPtr(nullptr);
-    } else {
-        return SpectrumSetPtr(new SpectrumSet(deconv_vec, sp_para_ptr, prec_mono_mass));
-    }
 }
 
 } /* namespace prot */
