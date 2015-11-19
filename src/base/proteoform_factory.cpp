@@ -5,7 +5,9 @@
 #include "base/ptm_base.hpp"
 #include "base/residue_base.hpp"
 #include "base/trunc_util.hpp"
+#include "base/mod_base.hpp"
 #include "base/prot_mod_base.hpp"
+#include "base/prot_mod_util.hpp"
 #include "base/proteoform_factory.hpp"
 
 namespace prot {
@@ -14,6 +16,8 @@ ProteoformPtr ProteoformFactory::geneDbProteoformPtr(DbResSeqPtr db_res_seq_ptr)
   int start_pos = 0;
   int end_pos = db_res_seq_ptr->getLen() - 1;
   ChangePtrVec change_list;
+  // change list need to be updated
+  /*
   for (int i = 0; i < db_res_seq_ptr->getLen(); i++) {
     PtmPtr ptm_ptr = db_res_seq_ptr->getResiduePtr(i)->getPtmPtr();
     if (ptm_ptr == PtmBase::getEmptyPtmPtr()) {
@@ -22,6 +26,7 @@ ProteoformPtr ProteoformFactory::geneDbProteoformPtr(DbResSeqPtr db_res_seq_ptr)
       change_list.push_back(change_ptr);
     }
   }
+  */
   ProtModPtr none_prot_mod_ptr = ProtModBase::getProtModPtr_NONE();
   return ProteoformPtr(new Proteoform(db_res_seq_ptr, none_prot_mod_ptr,
                                       db_res_seq_ptr, start_pos, end_pos,
@@ -31,64 +36,45 @@ ProteoformPtr ProteoformFactory::geneDbProteoformPtr(DbResSeqPtr db_res_seq_ptr)
 ProteoformPtr ProteoformFactory::geneProtModProteoform(ProteoformPtr db_form_ptr,
                                                        ProtModPtr prot_mod_ptr) {
   // check if the proteoform can be truncated
-  TruncPtr trunc_ptr = prot_mod_ptr->getTruncPtr();
   DbResSeqPtr db_res_seq_ptr = db_form_ptr->getDbResSeqPtr();
-  bool valid_trunc = TruncUtil::isValidTrunc(trunc_ptr, db_res_seq_ptr->getResidues());
-  if (!valid_trunc) {
-    //LOG_DEBUG("NO valid trunc");
+  bool valid_mod = ProtModUtil::allowMod(prot_mod_ptr, db_res_seq_ptr->getResidues());
+  if (!valid_mod) {
+    //LOG_DEBUG("NO valid mod");
     return ProteoformPtr(nullptr);
   }
 
-  int start_res = trunc_ptr->getTruncLen();
+  TruncPtr trunc_ptr = prot_mod_ptr->getTruncPtr();
+  int start = trunc_ptr->getTruncLen();
   /* last bp index */
-  int end_res = db_form_ptr->getLen();
+  int end = db_form_ptr->getLen();
+  // copy input changes
   ChangePtrVec ori_change_ptrs = db_form_ptr->getChangePtrVec();
   ChangePtrVec change_ptrs;
   for (size_t i = 0; i < ori_change_ptrs.size(); i++) {
-    if (ori_change_ptrs[i]->getLeftBpPos() >= start_res
-        && ori_change_ptrs[i]->getRightBpPos() <= end_res + 1) {
-      ChangePtr change_ptr = Change::geneChangePtr(ori_change_ptrs[i], start_res);
+    if (ori_change_ptrs[i]->getLeftBpPos() >= start
+        && ori_change_ptrs[i]->getRightBpPos() <= end + 1) {
+      ChangePtr change_ptr = Change::geneChangePtr(ori_change_ptrs[i], start);
       change_ptrs.push_back(change_ptr);
     }
   }
 
-  // first residue might be acetylated
-  ResiduePtrVec residue_ptrs;
-  ResiduePtr first_residue_ptr = db_res_seq_ptr->getResiduePtr(start_res);
-
-  PtmPtr ori_ptm_ptr = first_residue_ptr->getPtmPtr();
-  PtmPtr prot_ptm_ptr = prot_mod_ptr->getPtmPtr();
-  /* if there is a conflict */
-  if (ori_ptm_ptr != PtmBase::getEmptyPtmPtr() 
-      && prot_ptm_ptr != PtmBase::getEmptyPtmPtr()) {
-    return ProteoformPtr(nullptr);
+  ResiduePtrVec ori_vec = db_res_seq_ptr->getResidues();
+  ResiduePtrVec new_vec(ori_vec.begin()+start, ori_vec.begin()+end);
+  // apply mod
+  ModPtr mod_ptr = prot_mod_ptr->getModPtr();
+  if (!ModBase::isNoneModPtr(mod_ptr)) {
+    int mod_pos = prot_mod_ptr->getModPos();
+    int new_pos = mod_pos - start;
+    new_vec[new_pos] = prot_mod_ptr->getModPtr()->getModResiduePtr();
+    change_ptrs.push_back(ChangePtr(new Change(new_pos, new_pos+1, ChangeType::PROTEIN_VARIABLE,
+                                               mod_ptr->getShift(), mod_ptr)));
   }
-
-  if (prot_ptm_ptr == PtmBase::getEmptyPtmPtr()) {
-    residue_ptrs.push_back(first_residue_ptr);
-  } else {
-    /* add protein n-terminal mod */
-    AcidPtr acid_ptr = first_residue_ptr->getAcidPtr();
-    ResiduePtr mut_residue_ptr = ResidueBase::getResiduePtrByAcidPtm(acid_ptr, prot_ptm_ptr);
-    if (mut_residue_ptr == nullptr) {
-      LOG_ERROR( "Proteoform:: residue not found");
-      throw("Residue not found");
-    }
-    residue_ptrs.push_back(mut_residue_ptr);
-    change_ptrs.push_back(ChangePtr(new Change(0,1, ChangeType::PROTEIN_VARIABLE,
-                                               prot_ptm_ptr->getMonoMass(), prot_ptm_ptr)));
-  }
-
-  // add all other residues
-  for (int i = start_res + 1; i < db_res_seq_ptr->getLen(); i++) {
-    residue_ptrs.push_back(db_res_seq_ptr->getResiduePtr(i));
-  }
-  ResSeqPtr seq_ptr = ResSeqPtr(new ResidueSeq(residue_ptrs));
+  ResSeqPtr seq_ptr = ResSeqPtr(new ResidueSeq(new_vec));
 
   //LOG_DEBUG("mod protein sequence name " << db_res_seq_ptr->getName()
   //<< " len " << db_res_seq_ptr->getLen());
   return ProteoformPtr(
-      new Proteoform(db_res_seq_ptr, prot_mod_ptr, seq_ptr, start_res,
+      new Proteoform(db_res_seq_ptr, prot_mod_ptr, seq_ptr, start,
                      db_res_seq_ptr->getLen()-1, change_ptrs));
 }
 

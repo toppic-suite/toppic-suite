@@ -3,6 +3,7 @@
 
 #include "base/logger.hpp"
 #include "base/change_type.hpp"
+#include "base/mod_base.hpp"
 #include "base/string_util.hpp"
 #include "base/proteoform.hpp"
 
@@ -124,12 +125,12 @@ inline void updateMatchSeq(const ChangePtrVec &changes,
     int right_pos = changes[i]->getRightBpPos();
     double shift = changes[i]->getMassShift();
     right_strings[right_pos] +=  ")";
-    if (changes[i]->getPtmPtr() == nullptr) {
+    if (ModBase::isNoneModPtr(changes[i]->getModPtr())) {
       right_strings[right_pos] = right_strings[right_pos] 
           + "["+StringUtil::convertToString(shift,5)+"]";
     } else {
       right_strings[right_pos] = right_strings[right_pos] 
-          + "["+changes[i]->getPtmPtr()->getAbbrName()+"]";
+          + "["+changes[i]->getModPtr()->getModResiduePtr()->getPtmPtr()->getAbbrName()+"]";
     }
   }
 }

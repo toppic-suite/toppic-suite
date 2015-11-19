@@ -6,7 +6,7 @@ namespace prot {
 
 ProtModPtrVec ProtModBase::prot_mod_ptr_vec_;
 ProtModPtr ProtModBase::prot_mod_ptr_NONE_;
-ProtModPtr ProtModBase::prot_mod_ptr_NME_;
+//ProtModPtr ProtModBase::prot_mod_ptr_NME_;
 //ProtModPtr ProtModBase::prot_mod_ptr_NME_ACETYLATION_;
 
 void ProtModBase::initBase(const std::string &file_name) {
@@ -23,10 +23,10 @@ void ProtModBase::initBase(const std::string &file_name) {
       if (prot_mod_ptr->getName() == getName_NONE()) {
         prot_mod_ptr_NONE_ = prot_mod_ptr;
       }
+      /*
       if (prot_mod_ptr->getName() == getName_NME()) {
         prot_mod_ptr_NME_ = prot_mod_ptr;
       }
-      /*
       if (prot_mod_ptr->getName() == getName_NME_ACETYLATION()) {
         prot_mod_ptr_NME_ACETYLATION_ = prot_mod_ptr;
       }

@@ -5,8 +5,9 @@
 #include "spec/extend_ms_factory.hpp"
 #include "spec/msalign_reader.hpp"
 #include "spec/spectrum_set.hpp"
-#include "prsm/prsm.hpp"
 #include "prsm/peak_ion_pair.hpp"
+#include "prsm/peak_ion_pair_factory.hpp"
+#include "prsm/prsm.hpp"
 
 namespace prot {
 
@@ -57,8 +58,9 @@ inline double compMatchPeakNum(PeakIonPairPtrVec &pairs) {
 }
 
 void Prsm::initMatchNum(double min_mass) {
-  PeakIonPairPtrVec pairs = getPeakIonPairs(proteoform_ptr_, refine_ms_three_vec_,
-                                            min_mass);
+  PeakIonPairPtrVec pairs = 
+      PeakIonPairFactory::genePeakIonPairs(proteoform_ptr_, refine_ms_three_vec_,
+                                           min_mass);
   match_peak_num_ = 0;
   match_fragment_num_ = 0;
   TheoPeakPtr prev_ion(nullptr);
@@ -68,7 +70,7 @@ void Prsm::initMatchNum(double min_mass) {
       match_fragment_num_ += pairs[i]->getRealPeakPtr()->getScore();
     }
   }
-  std::sort(pairs.begin(), pairs.end(), peakIonPairUp);
+  std::sort(pairs.begin(), pairs.end(), PeakIonPair::cmpRealPeakPosInc);
   DeconvPeakPtr prev_deconv_peak(nullptr);
   for (size_t i = 0; i < pairs.size(); i++) {
     if (pairs[i]->getRealPeakPtr()->getBasePeakPtr() != prev_deconv_peak) {
@@ -83,8 +85,9 @@ void Prsm::initScores(SpParaPtr sp_para_ptr) {
   match_peak_num_ = 0;
   for (size_t i = 0; i < refine_ms_three_vec_.size(); i++) {
     // refined one 
-    PeakIonPairPtrVec pairs = getPeakIonPairs(proteoform_ptr_, refine_ms_three_vec_[i], 
-                                              sp_para_ptr->getMinMass());
+    PeakIonPairPtrVec pairs = 
+        PeakIonPairFactory::genePeakIonPairs(proteoform_ptr_, refine_ms_three_vec_[i], 
+                                             sp_para_ptr->getMinMass());
     match_fragment_num_ += compMatchFragNum(pairs);
     match_peak_num_ += compMatchPeakNum(pairs);
   }

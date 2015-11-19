@@ -49,7 +49,7 @@ class Ptm {
   static std::string getXmlElementName() {return "modification";}
 
   // comparison function
-  static bool cmpMassIncrease(const PtmPtr &a, const PtmPtr &b) {
+  static bool cmpMassInc(const PtmPtr &a, const PtmPtr &b) {
     return a->getMonoMass() < b->getMonoMass();
   }
 

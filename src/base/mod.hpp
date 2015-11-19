@@ -2,9 +2,13 @@
 #define PROT_BASE_MOD_HPP_
 
 #include "base/residue.hpp"
+#include "base/residue_base.hpp"
 #include "base/xml_dom_document.hpp"
 
 namespace prot {
+
+class Mod;
+typedef std::shared_ptr<Mod> ModPtr;
 
 class Mod {
  public:
@@ -15,6 +19,11 @@ class Mod {
   ResiduePtr getOriResiduePtr() { return ori_residue_ptr_;}
 
   ResiduePtr getModResiduePtr() { return mod_residue_ptr_;}
+
+  bool isSame(ModPtr mod_ptr) {
+    return ori_residue_ptr_ == mod_ptr->getOriResiduePtr() 
+        && mod_residue_ptr_ == mod_ptr->getModResiduePtr();
+  }
 
   double getShift() {return mod_residue_ptr_->getMass() - ori_residue_ptr_->getMass();}
 
@@ -27,7 +36,6 @@ class Mod {
   ResiduePtr mod_residue_ptr_;
 };
 
-typedef std::shared_ptr<Mod> ModPtr;
 typedef std::vector<ModPtr> ModPtrVec;
 
 }

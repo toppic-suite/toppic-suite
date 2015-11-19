@@ -48,7 +48,7 @@ void PtmBase::initBase(const std::string &file_name) {
   if (acetylation_ptr_ == nullptr) {
     LOG_WARN("No ptm acetylation!");
   }
-  std::sort(ptm_ptr_vec_.begin(), ptm_ptr_vec_.end(), Ptm::cmpMassIncrease);
+  std::sort(ptm_ptr_vec_.begin(), ptm_ptr_vec_.end(), Ptm::cmpMassInc);
 }
 
 // Returns a PTM based on the abbreviation name. Returns null if the
