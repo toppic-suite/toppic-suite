@@ -44,7 +44,7 @@ inline double compMatchFragNum(const PeakIonPairPtrVec &pairs) {
 
 inline double compMatchPeakNum(PeakIonPairPtrVec &pairs) {
   double match_peak_num = 0;
-  std::sort(pairs.begin(),pairs.end(),peakIonPairUp);
+  std::sort(pairs.begin(),pairs.end(),PeakIonPair::cmpRealPeakPosInc);
   DeconvPeakPtr prev_deconv_peak(nullptr);
   //  LOG_DEBUG("total peak number " << pairs.size());
   for (size_t i = 0; i < pairs.size(); i++) {
