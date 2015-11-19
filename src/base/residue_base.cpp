@@ -1,5 +1,6 @@
 #include "base/logger.hpp"
-
+#include "base/acid_base.hpp"
+#include "base/ptm_base.hpp"
 #include "base/residue_base.hpp"
 #include "base/file_util.hpp"
 #include "base/xml_dom_util.hpp"
@@ -7,6 +8,7 @@
 namespace prot {
 
 ResiduePtrVec ResidueBase::residue_ptr_vec_;
+ResiduePtr ResidueBase::empty_residue_ptr_;
 
 void ResidueBase::initBase(const std::string &file_name) {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
@@ -20,6 +22,10 @@ void ResidueBase::initBase(const std::string &file_name) {
       xercesc::DOMElement* element
           = XmlDomUtil::getChildElement(parent, element_name.c_str(), i);
       ResiduePtr residue_ptr(new Residue(element));
+      if (residue_ptr->getAcidPtr() == AcidBase::getEmptyAcidPtr() 
+          && residue_ptr->getPtmPtr() == PtmBase::getEmptyPtmPtr()) {
+        empty_residue_ptr_ = residue_ptr;
+      }
       residue_ptr_vec_.push_back(residue_ptr);
     }
   }
@@ -35,6 +41,11 @@ ResiduePtr ResidueBase::getBaseResiduePtr(ResiduePtr residue_ptr) {
   }
   residue_ptr_vec_.push_back(residue_ptr);
   return residue_ptr;
+}
+
+ResiduePtr ResidueBase::getResiduePtrFromXml(xercesc::DOMElement * element) {
+  ResiduePtr ptr(new Residue(element));
+  return getBaseResiduePtr(ptr);
 }
 
 /*

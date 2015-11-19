@@ -10,11 +10,11 @@ namespace prot {
 
 class PeakIonPairFactory {
  public:
-  PeakIonPairPtrVec getPeakIonPairs(const ProteoformPtr &proteoform_ptr, 
-                                    const ExtendMsPtr &ms_three_ptr, double min_mass);
+  static PeakIonPairPtrVec genePeakIonPairs(const ProteoformPtr &proteoform_ptr, 
+                                            const ExtendMsPtr &ms_three_ptr, double min_mass);
 
-  PeakIonPairPtrVec getPeakIonPairs(const ProteoformPtr &proteoform_ptr, 
-                                    const ExtendMsPtrVec &ms_ptr_vec, double min_mass);
+  static PeakIonPairPtrVec genePeakIonPairs(const ProteoformPtr &proteoform_ptr, 
+                                            const ExtendMsPtrVec &ms_ptr_vec, double min_mass);
 };
 
 }

@@ -10,7 +10,7 @@ class ProtModUtil {
  public:
   static bool allowMod(ProtModPtr prot_mod_ptr, const ResiduePtrVec &residues); 
 
-  static bool contain_NME_ACETYLATION(const ProtModPtrVec &prot_mod_ptrs);
+  //static bool contain_NME_ACETYLATION(const ProtModPtrVec &prot_mod_ptrs);
 };
 
 }

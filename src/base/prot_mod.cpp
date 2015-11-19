@@ -26,7 +26,7 @@ ProtMod::ProtMod(xercesc::DOMElement* element) {
   std::string mod_element_name = Ptm::getXmlElementName();
   xercesc::DOMElement* mod_element 
       = XmlDomUtil::getChildElement(element, mod_element_name.c_str(), 0);
-  mod_ptr_ = ModPtr(new Mod(mod_element));
+  mod_ptr_= ModPtr(new Mod(mod_element)); 
   mod_pos_ = trunc_ptr_->getTruncLen();
   prot_shift_ = trunc_ptr_->getShift() + mod_ptr_->getShift();
   pep_shift_ = mod_ptr_->getShift();

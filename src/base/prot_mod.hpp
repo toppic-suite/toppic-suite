@@ -20,7 +20,7 @@ class ProtMod {
 
   ModPtr getModPtr() { return mod_ptr_;}
 
-  int getMosPos() {return mod_pos_;}
+  int getModPos() {return mod_pos_;}
 
   double getProtShift() { return prot_shift_;}
 

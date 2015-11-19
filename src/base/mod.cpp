@@ -13,12 +13,10 @@ Mod::Mod(ResiduePtr ori_residue_ptr, ResiduePtr mod_residue_ptr):
 Mod::Mod(xercesc::DOMElement* element) { 
   xercesc::DOMElement* ori_residue_element 
       = XmlDomUtil::getChildElement(element, "ori_residue", 0);
-  ResiduePtr tmp_ori_ptr(new Residue(ori_residue_element)); 
-  ori_residue_ptr_ = ResidueBase::getBaseResiduePtr(tmp_ori_ptr);
+  ori_residue_ptr_ = ResidueBase::getResiduePtrFromXml(ori_residue_element);
   xercesc::DOMElement* mod_residue_element 
       = XmlDomUtil::getChildElement(element, "mod_residue", 0);
-  ResiduePtr tmp_mod_ptr(new Residue(mod_residue_element)); 
-  mod_residue_ptr_ = ResidueBase::getBaseResiduePtr(tmp_mod_ptr);
+  mod_residue_ptr_ = ResidueBase::getResiduePtrFromXml(mod_residue_element);
 }
 
 void Mod::appendToXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent){
