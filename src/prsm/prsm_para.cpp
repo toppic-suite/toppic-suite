@@ -1,4 +1,9 @@
 #include <boost/algorithm/string.hpp>
+
+#include "base/activation_base.hpp"
+#include "base/mass_constant.hpp"
+#include "base/mod_util.hpp"
+#include "base/prot_mod_base.hpp"
 #include "prsm/prsm_para.hpp"
 
 namespace prot {
@@ -10,22 +15,21 @@ PrsmPara::PrsmPara(std::map<std::string, std::string> &arguments) {
   exe_dir_ = arguments["executiveDir"];
   errorTolerance_=std::stoi(arguments["errorTolerance"]);
 
-
   group_spec_num_ = std::stoi(arguments["groupSpectrumNumber"]);
 
-  fix_mod_residue_list_ = FixResidueFactory::getFixResiduePtrVec(arguments["cysteineProtection"]);
+  fix_mod_list_ = ModUtil::readMod(arguments["fixModification"]);
 
   std::string prot_mod_str = arguments["allowProtMod"];
   std::vector<std::string> strs;
   boost::split(strs, prot_mod_str, boost::is_any_of(","));
   for (size_t i = 0; i < strs.size(); i++) {
-    ProtModPtr ptr = ProtModFactory::getBaseProtModPtrByName(strs[i]);
-    allow_prot_mod_list_.push_back(ptr);
+    ProtModPtr ptr = ProtModBase::getProtModPtrByName(strs[i]);
+    prot_mod_list_.push_back(ptr);
   }
 
   std::string activation_name = arguments["activation"];
   ActivationPtr activation_ptr 
-      = ActivationFactory::getBaseActivationPtrByName(activation_name);
+      = ActivationBase::getActivationPtrByName(activation_name);
 
   double ppo = std::stod(arguments["errorTolerance"])*0.000001;
   bool use_min_tolerance = true;
