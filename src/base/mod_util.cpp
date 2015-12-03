@@ -1,13 +1,13 @@
 #include "base/logger.hpp"
 #include "base/mod_base.hpp"
-#include "base/mod_reader.hpp"
+#include "base/mod_util.hpp"
 #include "base/xml_dom.hpp"
 #include "base/xml_dom_document.hpp"
 #include "base/xml_dom_util.hpp"
 
 namespace prot {
 
-ModPtrVec ModReader::readMod(const std::string &file_name) {
+ModPtrVec ModUtil::readMod(const std::string &file_name) {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   ModPtrVec mod_ptr_vec;
   if (parser) {

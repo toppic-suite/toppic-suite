@@ -40,4 +40,9 @@ void ProtMod::appendNameToXml(XmlDOMDocument* xml_doc,
   parent->appendChild(element);
 }
 
+std::string ProtMod::getNameFromXml(xercesc::DOMElement * element) {
+  std::string name = XmlDomUtil::getChildValue(element, "name", 0);
+  return name;
+}
+
 }

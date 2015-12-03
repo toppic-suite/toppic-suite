@@ -45,4 +45,10 @@ ProtModPtr ProtModBase::getProtModPtrByName(const std::string &name) {
   return ProtModPtr(nullptr);
 }
 
+ProtModPtr ProtModBase::getProtModPtrFromXml(xercesc::DOMElement * element) {
+  std::string name = Ptm::getAbbrNameFromXml(element);
+  ProtModPtr prot_mod_ptr = getProtModPtrByName(name);
+  return prot_mod_ptr;
+}
+
 }

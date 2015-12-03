@@ -23,6 +23,8 @@ class ProtModBase {
     return prot_mod_ptr_NONE_;
   }
 
+  static ProtModPtr getProtModPtrFromXml(xercesc::DOMElement * element);
+
   /*
   static ProtModPtr getProtModPtr_NME () {
     return prot_mod_ptr_NME_;

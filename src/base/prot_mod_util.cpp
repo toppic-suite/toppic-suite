@@ -3,6 +3,7 @@
 #include "base/prot_mod_base.hpp"
 #include "base/prot_mod_util.hpp"
 #include "base/trunc_util.hpp"
+#include "base/xml_dom_util.hpp"
 
 namespace prot {
 
@@ -28,6 +29,26 @@ bool ProtModUtil::allowMod(ProtModPtr prot_mod_ptr, const ResiduePtrVec &residue
     return true;
   }
 }
+
+ProtModPtrVec ProtModUtil::readProtMod(const std::string &file_name) {
+  XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
+  ProtModPtrVec mod_ptr_vec;
+  if (parser) {
+    XmlDOMDocument doc(parser, file_name.c_str());
+    xercesc::DOMElement* parent = doc.getDocumentElement();
+    std::string element_name = ProtMod::getXmlElementName();
+    int mod_num = XmlDomUtil::getChildCount(parent, element_name.c_str());
+    LOG_DEBUG("mod num " << mod_num);
+    for (int i = 0; i < mod_num; i++) {
+      xercesc::DOMElement* element 
+          = XmlDomUtil::getChildElement(parent, element_name.c_str(), i);
+      ProtModPtr ptr = ProtModBase::getProtModPtrFromXml(element);
+      mod_ptr_vec.push_back(ptr);
+    }
+  }
+  return mod_ptr_vec;
+}
+
 
 /*
 bool ProtModUtil::contain_NME_ACETYLATION(const ProtModPtrVec &prot_mod_ptrs) {
