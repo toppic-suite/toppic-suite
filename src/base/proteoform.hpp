@@ -2,7 +2,7 @@
 #define PROT_BASE_PROTEOFORM_HPP_
 
 #include "base/residue_freq.hpp"
-#include "base/db_residue_seq.hpp"
+#include "base/fasta_seq.hpp"
 #include "base/bp_spec.hpp"
 #include "base/change.hpp"
 #include "base/segment.hpp"
@@ -13,11 +13,19 @@ namespace prot {
 
 class Proteoform {
   public:
-   Proteoform(DbResSeqPtr db_res_seq_ptr, ProtModPtr prot_mod_ptr,
-              ResSeqPtr res_seq_ptr, int start_pos, int end_pos,
+   Proteoform(FastaSeqPtr fasta_seq_ptr, ProtModPtr prot_mod_ptr, 
+              int start_pos, int end_pos, ResSeqPtr res_seq_ptr, 
               const ChangePtrVec &change_ptr_vec);
 
-   DbResSeqPtr getDbResSeqPtr() { return db_residue_seq_ptr_;}
+   FastaSeqPtr getFastaSeqPtr() {return fasta_seq_ptr_;}
+
+   std::string getSeqName() { return fasta_seq_ptr_->getName();}
+
+   std::string getSeqDesc() { return fasta_seq_ptr_->getDesc();}
+
+   int getStartPos() { return start_pos_;}
+
+   int getEndPos() { return end_pos_;}
 
    ProtModPtr getProtModPtr() { return prot_mod_ptr_;}
 
@@ -25,17 +33,7 @@ class Proteoform {
 
    BpSpecPtr getBpSpecPtr() { return bp_spec_ptr_;}
 
-   int getStartPos() { return start_pos_;}
-
-   int getEndPos() { return end_pos_;}
-
    int getLen() { return end_pos_ - start_pos_ + 1; }
-
-   int getSeqId() { return db_residue_seq_ptr_->getId(); }
-
-   const std::string& getSeqName() { return db_residue_seq_ptr_->getName(); }
-
-   const std::string& getSeqDesc() { return db_residue_seq_ptr_->getDesc(); }
 
    int getChangeNum() {return change_list_.size();}
 
@@ -62,27 +60,25 @@ class Proteoform {
    static std::string getXmlElementName() {return "proteoform";}
 
   private:
-    /* db_residue_seq contains fixed modifications */
-    DbResSeqPtr db_residue_seq_ptr_;
+   FastaSeqPtr fasta_seq_ptr_;
 
-    ProtModPtr prot_mod_ptr_;
+   ProtModPtr prot_mod_ptr_;
 
-    /* residue_seq starts from start_pos_ and ends at end_pos_, and contains
-     * fixed and variable modifications */
-    ResSeqPtr residue_seq_ptr_;
+   // start and end positions are relative to the
+   // database sequence
+   int start_pos_;
+   int end_pos_;
 
-    /* bp_spec is generated from residue_seq */
-    BpSpecPtr bp_spec_ptr_;
+   /* residue_seq starts from start_pos_ and ends at end_pos_, and contains
+    * fixed and variable modifications */
+   ResSeqPtr residue_seq_ptr_;
 
-    // start and end positions are relative to the
-    // database residue sequence
-    int start_pos_;
+   /* bp_spec is generated from residue_seq */
+   BpSpecPtr bp_spec_ptr_;
 
-    int end_pos_;
+   int species_id_ = 0;
 
-    int species_id_ = 0;
-
-    ChangePtrVec change_list_;
+   ChangePtrVec change_list_;
 };
 
 typedef std::shared_ptr<Proteoform> ProteoformPtr;

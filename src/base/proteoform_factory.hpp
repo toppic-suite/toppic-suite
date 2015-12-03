@@ -8,11 +8,11 @@ namespace prot {
 class ProteoformFactory {
  public:
   /* get db proteoform */
-  static ProteoformPtr geneDbProteoformPtr(DbResSeqPtr db_res_seq_ptr);
+  static ProteoformPtr geneDbProteoformPtr(FastaSeqPtr seq_ptr, ModPtrVec fix_mod_list);
 
   /* generate a proteoform with protein mod */
   static ProteoformPtr geneProtModProteoform(ProteoformPtr db_form_ptr,
-                                           ProtModPtr prot_mod_ptr);
+                                             ProtModPtr prot_mod_ptr);
 
   static ProteoformPtrVec geneProtModProteoform(ProteoformPtr db_form_ptr,
                                                 const ProtModPtrVec &prot_mod_ptrs);

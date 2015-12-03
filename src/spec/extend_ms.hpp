@@ -13,7 +13,7 @@ typedef std::shared_ptr<Ms<ExtendPeakPtr>> ExtendMsPtr;
 typedef std::vector<ExtendMsPtr> ExtendMsPtrVec;
 
 class ExtendMs {
-  /* use inline to speedup */
+ public:
   static std::vector<double> getExtendMassVec (ExtendMsPtr extend_ms_ptr);
 
   static std::vector<std::pair<int, int>> getExtendIntMassErrorList(

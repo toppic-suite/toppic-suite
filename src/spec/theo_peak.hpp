@@ -19,7 +19,7 @@ class TheoPeak : public Peak {
 
   double getShift() {return shift_;}
 
-  static bool cmpPosIncrease(const TheoPeakPtr &a, const TheoPeakPtr &b){
+  static bool cmpPosInc(const TheoPeakPtr &a, const TheoPeakPtr &b){
     return a->getPosition() < b->getPosition();
 }
 

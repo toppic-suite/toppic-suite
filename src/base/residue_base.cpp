@@ -43,6 +43,11 @@ ResiduePtr ResidueBase::getBaseResiduePtr(ResiduePtr residue_ptr) {
   return residue_ptr;
 }
 
+ResiduePtr ResidueBase::getBaseResiduePtr(AcidPtr acid_ptr, PtmPtr ptm_ptr) {
+  ResiduePtr residue_ptr = ResiduePtr(new Residue(acid_ptr, ptm_ptr));
+  return getBaseResiduePtr(residue_ptr);
+}
+
 ResiduePtr ResidueBase::getResiduePtrFromXml(xercesc::DOMElement * element) {
   ResiduePtr ptr(new Residue(element));
   return getBaseResiduePtr(ptr);

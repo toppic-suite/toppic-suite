@@ -45,4 +45,13 @@ std::string FastaSeq::rmChar(const std::string &ori_seq) {
   return seq;
 }
 
+void FastaSeq::appendNameDescToXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
+  std::string element_name = FastaSeq::getXmlElementName();
+  xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
+  xml_doc->addElement(element, "seq_name", name_.c_str());
+  xml_doc->addElement(element, "seq_desc", desc_.c_str());
+  parent->appendChild(element);
+}
+
+
 }

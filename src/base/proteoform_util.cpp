@@ -70,8 +70,8 @@ ResFreqPtrVec ProteoformUtil::compResidueFreq(const ResiduePtrVec &residue_list,
   return res_freq_list;
 }
 
-bool ProteoformUtil::isSamePeptideAndMass(ProteoformPtr a, ProteoformPtr b, 
-                                          double ppo) {
+bool ProteoformUtil::isSameSeqAndMass(ProteoformPtr a, ProteoformPtr b, 
+                                      double ppo) {
   if(a->getDbResSeqPtr()->getId() != b->getDbResSeqPtr()->getId()) {
     return false;
   }
@@ -91,7 +91,7 @@ bool ProteoformUtil::isSamePeptideAndMass(ProteoformPtr a, ProteoformPtr b,
 
 bool ProteoformUtil::isStrictCompatiablePtmSpecies(ProteoformPtr a, ProteoformPtr b,
                                                    double ppo) {
-  if(!isSamePeptideAndMass(a,b,ppo)) {
+  if(!isSameSeqAndMass(a,b,ppo)) {
     return false;
   }
   if(a->getChangePtrVec().size() != b->getChangePtrVec().size()) {

@@ -24,14 +24,15 @@ class ResidueBase {
   static ResiduePtr getEmptyResiduePtr() {return empty_residue_ptr_;}
 
   static ResiduePtr getResiduePtrFromXml(xercesc::DOMElement * element);
-  
-  //static ResiduePtrVec getResiduePtrVecInstance(const std::string &file_name);
+
+  static ResiduePtr getBaseResiduePtr(ResiduePtr residue_ptr);
+
+  static ResiduePtr getBaseResiduePtr(AcidPtr acid_ptr, PtmPtr ptm_ptr);
   
  private:
   static ResiduePtrVec residue_ptr_vec_;
   static ResiduePtr empty_residue_ptr_;
 
-  static ResiduePtr getBaseResiduePtr(ResiduePtr residue_ptr);
 };
 
 }

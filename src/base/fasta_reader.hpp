@@ -18,8 +18,6 @@ class FastaReader {
    **/
   FastaReader(const std::string &file_name);
 
-  void setSeqId(int seq_id) {seq_id_ = seq_id;}
-
   /**
    * Read FASTA file and return next protein
    * name and sequence. 
@@ -29,7 +27,6 @@ class FastaReader {
  private:
   std::ifstream input_;
   std::string ori_name_;
-  int seq_id_ = 0;
 };
 
 typedef std::shared_ptr<FastaReader> FastaReaderPtr;
