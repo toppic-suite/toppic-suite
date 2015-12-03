@@ -22,7 +22,7 @@ class PrsmPara {
   int getErrorTolerance(){return errorTolerance_;}
   int getGroupSpecNum() {return group_spec_num_;}
   const ModPtrVec& getFixModPtrVec() {return fix_mod_list_;}
-  const ProtModPtrVec& getAllowProtModPtrVec() {return allow_prot_mod_list_;}
+  const ProtModPtrVec& getProtModPtrVec() {return prot_mod_list_;}
   SpParaPtr getSpParaPtr() {return sp_para_ptr_;}
 
  private:
@@ -33,7 +33,7 @@ class PrsmPara {
   int errorTolerance_;
 
   ModPtrVec fix_mod_list_;
-  ProtModPtrVec allow_prot_mod_list_;
+  ProtModPtrVec prot_mod_list_;
 
   int group_spec_num_;
 
