@@ -30,6 +30,8 @@ class ProtMod {
 
   static std::string getXmlElementName() {return "prot_mod";}
 
+  static std::string getNameFromXml(xercesc::DOMElement * element);
+
  private:
   std::string name_;
   TruncPtr trunc_ptr_;

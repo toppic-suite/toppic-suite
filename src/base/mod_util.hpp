@@ -1,11 +1,11 @@
-#ifndef PROT_BASE_MOD_READER_HPP_
-#define PROT_BASE_MOD_READER_HPP_
+#ifndef PROT_BASE_MOD_UTIL_HPP_
+#define PROT_BASE_MOD_UTIL_HPP_
 
 #include "base/mod.hpp"
 
 namespace prot {
 
-class ModReader {
+class ModUtil {
  public:
   static ModPtrVec readMod(const std::string &file_name);
 };
