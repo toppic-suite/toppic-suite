@@ -4,6 +4,8 @@
 #include "base/logger.hpp"
 #include "base/ptm_base.hpp"
 #include "base/residue_base.hpp"
+#include "base/residue_util.hpp"
+#include "base/residue_seq.hpp"
 #include "base/trunc_util.hpp"
 #include "base/mod_base.hpp"
 #include "base/prot_mod_base.hpp"
@@ -12,31 +14,34 @@
 
 namespace prot {
 
-ProteoformPtr ProteoformFactory::geneDbProteoformPtr(DbResSeqPtr db_res_seq_ptr) {
+ProteoformPtr ProteoformFactory::geneDbProteoformPtr(FastaSeqPtr fasta_seq_ptr, ModPtrVec fix_mod_list) {
+  ProtModPtr none_prot_mod_ptr = ProtModBase::getProtModPtr_NONE();
+  ResiduePtrVec residue_ptrs = ResidueUtil::convertStrToResiduePtrVec(fasta_seq_ptr->getSeq());
   int start_pos = 0;
-  int end_pos = db_res_seq_ptr->getLen() - 1;
+  int end_pos = fasta_seq_ptr->getLen() - 1;
+
   ChangePtrVec change_list;
-  // change list need to be updated
-  /*
-  for (int i = 0; i < db_res_seq_ptr->getLen(); i++) {
-    PtmPtr ptm_ptr = db_res_seq_ptr->getResiduePtr(i)->getPtmPtr();
-    if (ptm_ptr == PtmBase::getEmptyPtmPtr()) {
-      ChangePtr change_ptr = ChangePtr(
-          new Change(i, i+1, ChangeType::FIXED, ptm_ptr->getMonoMass(), ptm_ptr));
-      change_list.push_back(change_ptr);
+  // add fixed ptms;
+  for (size_t i = 0; i < residue_ptrs.size(); i++) {
+    for (size_t j = 0; j < fix_mod_list.size(); j++) {
+      if (residue_ptrs[i] == fix_mod_list[j]->getOriResiduePtr()) {
+        residue_ptrs[i] = fix_mod_list[j]->getModResiduePtr();
+        ChangePtr change_ptr = ChangePtr(
+            new Change(i, i+1, ChangeType::FIXED, fix_mod_list[j]->getShift(), fix_mod_list[j]));
+        change_list.push_back(change_ptr);
+        break;
+      }
     }
   }
-  */
-  ProtModPtr none_prot_mod_ptr = ProtModBase::getProtModPtr_NONE();
-  return ProteoformPtr(new Proteoform(db_res_seq_ptr, none_prot_mod_ptr,
-                                      db_res_seq_ptr, start_pos, end_pos,
-                                      change_list));
+  ResSeqPtr res_seq_ptr(new ResidueSeq(residue_ptrs));
+  return ProteoformPtr(new Proteoform(fasta_seq_ptr, none_prot_mod_ptr, start_pos, 
+                                      end_pos, res_seq_ptr, change_list));
 }
 
 ProteoformPtr ProteoformFactory::geneProtModProteoform(ProteoformPtr db_form_ptr,
                                                        ProtModPtr prot_mod_ptr) {
   // check if the proteoform can be truncated
-  DbResSeqPtr db_res_seq_ptr = db_form_ptr->getDbResSeqPtr();
+  ResSeqPtr db_res_seq_ptr = db_form_ptr->getResSeqPtr();
   bool valid_mod = ProtModUtil::allowMod(prot_mod_ptr, db_res_seq_ptr->getResidues());
   if (!valid_mod) {
     //LOG_DEBUG("NO valid mod");
@@ -71,11 +76,11 @@ ProteoformPtr ProteoformFactory::geneProtModProteoform(ProteoformPtr db_form_ptr
   }
   ResSeqPtr seq_ptr = ResSeqPtr(new ResidueSeq(new_vec));
 
-  //LOG_DEBUG("mod protein sequence name " << db_res_seq_ptr->getName()
-  //<< " len " << db_res_seq_ptr->getLen());
+  FastaSeqPtr fasta_seq_ptr = db_form_ptr->getFastaSeqPtr();
+
   return ProteoformPtr(
-      new Proteoform(db_res_seq_ptr, prot_mod_ptr, seq_ptr, start,
-                     db_res_seq_ptr->getLen()-1, change_ptrs));
+      new Proteoform(db_form_ptr->getFastaSeqPtr(), prot_mod_ptr, start,
+                     db_res_seq_ptr->getLen()-1, seq_ptr, change_ptrs));
 }
 
 ProteoformPtr ProteoformFactory::geneSubProteoform(ProteoformPtr proteoform_ptr,

@@ -22,26 +22,15 @@ namespace prot {
 
 class ProteoformReader {
  public:
-  /**
-   * Constructs an instance with a File.
-   **/
-  ProteoformReader(const std::string &file_name);
-
-  ProteoformPtr getNextProteoformPtr(const ResiduePtrVec &residue_list);
-
-  void setSeqId (int id) {seq_id_ = id;}
-
+  /*
   static ProteoformPtrVec readFastaToProteoform(const std::string &file_name, 
-                                                const ResiduePtrVec &residue_list);
+                                                const FixModPtrVec &fix_mod_list);
 
 
   static ProteoformPtrVec readFastaToProteoform(const std::string &file_name, 
-                                                const ResiduePtrVec &residue_list,
+                                                const FixModPtrVec &fix_mod_list,
                                                 int seq_bgn_id);
-
- private:
-  FastaReaderPtr reader_ptr_;
-  int seq_id_ = 0;
+                                                */
 };
 
 }

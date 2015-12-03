@@ -3,14 +3,15 @@
 
 namespace prot {
 
-ResiduePtr ResidueUtil::getResiduePtrByAcid(const ResiduePtrVec &residue_ptr_vec,
-                                            AcidPtr acid_ptr) {
-  for (size_t i = 0; i < residue_ptr_vec.size(); i++) {
-    if (residue_ptr_vec[i]->getAcidPtr() == acid_ptr) {
-      return residue_ptr_vec[i];
-    }
+static ResiduePtrVec convertStrToResiduePtrVec(const std::string &seq) {
+  ResiduePtrVec residue_ptr_vec;
+  for (size_t i = 0; i < seq.length(); i++) {
+    AcidPtr acid_ptr = AcidBase::getAcidPtrByOneLetter(seq.substr(i, 1));
+    PtmPtr ptm_ptr = PtmBase::getEmptyPtmPtr();
+    ResiduePtr residue_ptr = ResidueBase::getBaseResiduePtr(acid_ptr, ptm_ptr);
+    residue_ptr_vec.push_back(residue_ptr_vec);
   }
-  return ResiduePtr(nullptr);
+  return residue_ptr_vec;
 }
 
 int ResidueUtil::findResidue(const ResiduePtrVec &residue_list, 
@@ -21,17 +22,6 @@ int ResidueUtil::findResidue(const ResiduePtrVec &residue_list,
     }
   }
   return -1;
-}
-
-
-ResiduePtrVec ResidueUtil::convertAcidToResiduePtrVec(const ResiduePtrVec &residue_list,
-                                                      const AcidPtrVec &acid_ptrs) {
-  ResiduePtrVec result_seq;
-  for (size_t i = 0; i < acid_ptrs.size(); i++) {
-    ResiduePtr residue_ptr = getResiduePtrByAcid(residue_list, acid_ptrs[i]);
-    result_seq.push_back(residue_ptr);
-  }
-  return result_seq;
 }
 
 }

@@ -34,7 +34,7 @@ TheoPeakPtrVec TheoPeakFactory::geneTheoPeak(BpSpecPtr bp_spec_ptr, ActivationPt
       theo_peaks.push_back(TheoPeakPtr(new TheoPeak(ion,c_mass,c_term_shift)));
     }
   }
-  std::sort(theo_peaks.begin(),theo_peaks.end(),TheoPeak::cmpPosIncrease);
+  std::sort(theo_peaks.begin(),theo_peaks.end(),TheoPeak::cmpPosInc);
   return theo_peaks;
 }
 

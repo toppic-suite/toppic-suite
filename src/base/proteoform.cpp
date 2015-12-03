@@ -9,12 +9,11 @@
 
 namespace prot {
 
-Proteoform::Proteoform(DbResSeqPtr db_res_seq_ptr, ProtModPtr prot_mod_ptr,
-                       ResSeqPtr res_seq_ptr, int start_pos, int end_pos,
+Proteoform::Proteoform(FastaSeqPtr fasta_seq_ptr, ProtModPtr prot_mod_ptr, 
+                       int start_pos, int end_pos, ResSeqPtr res_seq_ptr, 
                        const ChangePtrVec &change_ptr_vec):
-    db_residue_seq_ptr_(db_res_seq_ptr),
+    fasta_seq_ptr_(fasta_seq_ptr),
     prot_mod_ptr_(prot_mod_ptr),
-    residue_seq_ptr_(res_seq_ptr),
     start_pos_(start_pos),
     end_pos_(end_pos),
     change_list_(change_ptr_vec) {
@@ -45,7 +44,7 @@ AlignTypePtr Proteoform::getAlignType() {
   }
 
   bool is_suffix = false;
-  if (end_pos_ == db_residue_seq_ptr_->getLen() - 1) {
+  if (end_pos_ == fasta_seq_ptr_->getLen() - 1) {
     is_suffix = true;
   }
 
@@ -136,7 +135,7 @@ inline void updateMatchSeq(const ChangePtrVec &changes,
 }
                                        
 std::string Proteoform::getProteinMatchSeq() {
-  std::string protein_string = db_residue_seq_ptr_->toAcidString();
+  std::string protein_string = fasta_seq_ptr_->getSeq();
   //LOG_DEBUG("protein string lenth " << protein_string.length() << " string " << protein_string);
   std::string mid_string = residue_seq_ptr_->toAcidString();
   //LOG_DEBUG("mid string lenth " << mid_string.length() << " string " << mid_string);
@@ -188,7 +187,7 @@ std::string Proteoform::toString() {
 void Proteoform::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent) {
   std::string element_name = getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
-  db_residue_seq_ptr_->appendRefToXml(xml_doc,element);
+  fasta_seq_ptr_->appendNameDescToXml(xml_doc,element);
   prot_mod_ptr_->appendNameToXml(xml_doc,element);
   std::string str = StringUtil::convertToString(start_pos_);
   xml_doc->addElement(element, "start_pos", str.c_str());

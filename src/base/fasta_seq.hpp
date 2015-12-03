@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include "base/xml_dom_document.hpp"
+
 namespace prot {
 
 class FastaSeq {
@@ -19,6 +21,12 @@ class FastaSeq {
   std::string getDesc() {return desc_;}
 
   std::string getSeq() {return seq_;}
+
+  int getLen() {return seq_.length();}
+
+  static std::string getXmlElementName() {return "fasta_seq";}
+
+  void appendNameDescToXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
  private:
   std::string name_;

@@ -14,7 +14,7 @@ class ProteoformUtil {
   static ResFreqPtrVec compResidueFreq(const ResiduePtrVec &residue_list,
                                        const ProteoformPtrVec &raw_mods);
 
-  static bool isSamePeptideAndMass(ProteoformPtr a, ProteoformPtr b, double ppo);
+  static bool isSameSeqAndMass(ProteoformPtr a, ProteoformPtr b, double ppo);
 
   static bool isStrictCompatiablePtmSpecies(ProteoformPtr a, ProteoformPtr b, double ppo);
 

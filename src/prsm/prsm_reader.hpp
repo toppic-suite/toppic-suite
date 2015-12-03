@@ -1,5 +1,5 @@
-#ifndef PROT_PRSM_READER_HPP_
-#define PROT_PRSM_READER_HPP_
+#ifndef PROT_PRSM_PRSM_READER_HPP_
+#define PROT_PRSM_PRSM_READER_HPP_
 
 #include <iostream>
 #include <fstream>

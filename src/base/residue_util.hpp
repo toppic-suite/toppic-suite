@@ -17,14 +17,9 @@ namespace prot {
 
 class ResidueUtil {
  public:
-  static ResiduePtr getResiduePtrByAcid(const ResiduePtrVec &residue_list,
-                                        AcidPtr acid_ptr);
+  static ResiduePtrVec convertStrToResiduePtrVec(const std::string &seq);
 
   static int findResidue(const ResiduePtrVec &residue_list, ResiduePtr residue_ptr);
-
-  static ResiduePtrVec convertAcidToResiduePtrVec(const ResiduePtrVec &residue_list,
-                                                  const AcidPtrVec &acid_list);
-
 };
 
 }
