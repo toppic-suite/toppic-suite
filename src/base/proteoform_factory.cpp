@@ -151,8 +151,8 @@ ProteoformPtrVec2D ProteoformFactory::gene2DProtModProteoform(const ProteoformPt
   return new_forms;
 }
 
-ProteoformPtrVec ProteoformFactory::readFastaToProteoform(const std::string &file_name, 
-                                                          const ModPtrVec &fix_mod_list) {
+ProteoformPtrVec ProteoformFactory::readFastaToProteoformPtrVec(const std::string &file_name, 
+                                                                const ModPtrVec &fix_mod_list) {
   LOG_DEBUG( "start open file " << file_name);
   FastaReader reader(file_name);
   LOG_DEBUG( "open file done " << file_name);
@@ -167,6 +167,19 @@ ProteoformPtrVec ProteoformFactory::readFastaToProteoform(const std::string &fil
     count++;
   }
   return list;
+}
+
+ProteoformPtr ProteoformFactory::readFastaToProteformPtr(FastaIndexReaderPtr reader_ptr, 
+                                                         const std::string &seq_name,
+                                                         const std::string &seq_desc,
+                                                         const ModPtrVec &fix_mod_list) {
+  FastaSeqPtr seq_ptr = reader_ptr->readFastaSeq(seq_name, seq_desc);
+  if (seq_ptr != nullptr) {
+    return geneDbProteoformPtr(seq_ptr, fix_mod_list);
+  }
+  else {
+    return ProteoformPtr(nullptr);
+  }
 }
 
 } /* namespace prot */

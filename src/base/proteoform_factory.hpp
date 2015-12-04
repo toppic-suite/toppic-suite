@@ -2,6 +2,7 @@
 #define PROT_BASE_PROTEOFORM_FACTORY_HPP_
 
 #include "base/proteoform.hpp"
+#include "base/fasta_index_reader.hpp"
 
 namespace prot {
 
@@ -30,8 +31,13 @@ class ProteoformFactory {
   static ProteoformPtrVec geneProtModProteoform(const ProteoformPtrVec &ori_forms,
                                                 const ProtModPtrVec &prot_mods);
 
-  static ProteoformPtrVec readFastaToProteoform(const std::string &file_name, 
-                                                const ModPtrVec &fix_mod_list);
+  static ProteoformPtrVec readFastaToProteoformPtrVec(const std::string &file_name, 
+                                                      const ModPtrVec &fix_mod_list);
+
+  static ProteoformPtr readFastaToProteformPtr(FastaIndexReaderPtr reader_ptr, 
+                                               const std::string &seq_name,
+                                               const std::string &seq_desc,
+                                               const ModPtrVec &fix_mod_list);
 
 };
 
