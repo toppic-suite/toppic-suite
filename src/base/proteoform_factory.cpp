@@ -2,6 +2,7 @@
 #include <algorithm>
 
 #include "base/logger.hpp"
+#include "base/fasta_reader.hpp"
 #include "base/ptm_base.hpp"
 #include "base/residue_base.hpp"
 #include "base/residue_util.hpp"
@@ -100,12 +101,12 @@ ProteoformPtr ProteoformFactory::geneSubProteoform(ProteoformPtr proteoform_ptr,
             change_list.push_back(change_ptr);
         }
     }
-    DbResSeqPtr db_res_seq_ptr = proteoform_ptr->getDbResSeqPtr();
     ProtModPtr prot_mod_ptr = proteoform_ptr->getProtModPtr();
     return ProteoformPtr(
-               new Proteoform(db_res_seq_ptr, prot_mod_ptr, seq_ptr,
+               new Proteoform(proteoform_ptr->getFastaSeqPtr(), prot_mod_ptr, 
                               local_start + proteoform_ptr->getStartPos(),
-                              local_end + proteoform_ptr->getStartPos(), change_list));
+                              local_end + proteoform_ptr->getStartPos(), 
+                              seq_ptr, change_list));
 }
 
 ProteoformPtrVec ProteoformFactory::geneProtModProteoform(ProteoformPtr proteo_ptr,
@@ -148,6 +149,24 @@ ProteoformPtrVec2D ProteoformFactory::gene2DProtModProteoform(const ProteoformPt
     new_forms.push_back(mod_forms);
   }
   return new_forms;
+}
+
+ProteoformPtrVec ProteoformFactory::readFastaToProteoform(const std::string &file_name, 
+                                                          const ModPtrVec &fix_mod_list) {
+  LOG_DEBUG( "start open file " << file_name);
+  FastaReader reader(file_name);
+  LOG_DEBUG( "open file done " << file_name);
+
+  ProteoformPtrVec list;
+  FastaSeqPtr seq_ptr = reader.getNextSeq();
+  int count = 0;
+  while (seq_ptr != nullptr) {
+    ProteoformPtr proteo_ptr = ProteoformFactory::geneDbProteoformPtr(seq_ptr, fix_mod_list);
+    list.push_back(proteo_ptr);
+    seq_ptr = reader.getNextSeq();
+    count++;
+  }
+  return list;
 }
 
 } /* namespace prot */

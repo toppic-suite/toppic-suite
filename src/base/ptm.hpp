@@ -21,9 +21,9 @@ class Ptm {
  public:
   Ptm(const std::string &name, const std::string &abbr_name,
       double mono_mass, int unimod_id, 
-      const std::string &n_term_acid_str,
-      const std::string &c_term_acid_str, 
-      const std::string &anywhere_acid_str);
+      const std::string &n_term_residue_str,
+      const std::string &c_term_residue_str, 
+      const std::string &anywhere_residue_str);
 
   Ptm(xercesc::DOMElement* element); 
 
@@ -34,11 +34,11 @@ class Ptm {
   /* Get  monoisotopic mass. */
   double getMonoMass() {return mono_mass_;}
 
-  const AcidPtrVec& getNTermAcids() {return n_term_acids_;}
+  //const ResiduePtrVec& getNTermResidues() {return n_term_residues_;}
 
-  const AcidPtrVec& getCTermAcids() {return c_term_acids_;}
+  //const ResiduePtrVec& getCTermResidues() {return c_term_residues_;}
 
-  const AcidPtrVec& getAnywhereAcids() {return anywhere_acids_;}
+  //const ResiduePtrVec& getAnywhereResidues() {return anywhere_residues_;}
 
   int getUnimodId() {return unimod_id_;}
 
@@ -63,9 +63,11 @@ class Ptm {
   // unimod id
   int unimod_id_;
   // possible acids
-  AcidPtrVec n_term_acids_;
-  AcidPtrVec c_term_acids_;
-  AcidPtrVec anywhere_acids_;
+  /*
+  ResiduePtrVec n_term_residues_;
+  ResiduePtrVec c_term_residues_;
+  ResiduePtrVec anywhere_residues_;
+  */
 };
 
 typedef std::vector<PtmPtr> PtmPtrVec;

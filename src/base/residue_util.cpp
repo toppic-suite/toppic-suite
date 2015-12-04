@@ -24,4 +24,12 @@ int ResidueUtil::findResidue(const ResiduePtrVec &residue_list,
   return -1;
 }
 
+double ResidueUtil::compResiduePtrVecMass(const ResiduePtrVec &ptr_vec) {
+  double mass = 0;
+  for (size_t i = 0; i < ptr_vec.size(); i++) {
+    mass += ptr_vec[i]->getMonoMass();
+  }
+  return mass;
+}
+
 }

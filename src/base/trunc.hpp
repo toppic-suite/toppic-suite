@@ -2,7 +2,7 @@
 #define PROT_BASE_TRUNC_HPP_
 
 #include <string>
-#include "base/acid.hpp"
+#include "base/residue.hpp"
 #include "base/xml_dom_document.hpp"
 
 namespace prot {
@@ -18,7 +18,7 @@ class Trunc {
 
   int getTruncLen() {return trunc_len_;}
 
-  const AcidPtrVec& getAcidPtrVec() {return acid_ptr_vec_;}
+  const ResiduePtrVec& getResiduePtrVec() {return residue_ptr_vec_;}
 
   double getShift() {return shift_;}
 
@@ -29,7 +29,7 @@ class Trunc {
  private:
   std::string name_;
   int trunc_len_;
-  AcidPtrVec acid_ptr_vec_;
+  ResiduePtrVec residue_ptr_vec_;
   double shift_;
 };
 

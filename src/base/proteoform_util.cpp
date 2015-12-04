@@ -72,7 +72,7 @@ ResFreqPtrVec ProteoformUtil::compResidueFreq(const ResiduePtrVec &residue_list,
 
 bool ProteoformUtil::isSameSeqAndMass(ProteoformPtr a, ProteoformPtr b, 
                                       double ppo) {
-  if(a->getDbResSeqPtr()->getId() != b->getDbResSeqPtr()->getId()) {
+  if(a->getSeqName() != b->getSeqName()) {
     return false;
   }
   if(a->getStartPos() != b->getStartPos()) {
