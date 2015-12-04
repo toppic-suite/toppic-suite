@@ -7,9 +7,9 @@ bool TruncUtil::isSameTrunc(TruncPtr trunc_ptr, const ResiduePtrVec& res_ptr_vec
   if(trunc_ptr->getTruncLen() != len){
     return false;
   }
-  AcidPtrVec acid_ptr_vec = trunc_ptr->getAcidPtrVec();
+  ResiduePtrVec residue_ptr_vec = trunc_ptr->getResiduePtrVec();
   for(int i=0;i<trunc_ptr->getTruncLen();i++){
-    if(acid_ptr_vec[i] != res_ptr_vec[i]->getAcidPtr()){
+    if(residue_ptr_vec[i] != res_ptr_vec[i]){
       return false;
     }
   }

@@ -20,6 +20,8 @@ class ResidueUtil {
   static ResiduePtrVec convertStrToResiduePtrVec(const std::string &seq);
 
   static int findResidue(const ResiduePtrVec &residue_list, ResiduePtr residue_ptr);
+
+  static double compResiduePtrVecMass(const ResiduePtrVec &ptr_vec);
 };
 
 }

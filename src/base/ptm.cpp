@@ -7,7 +7,6 @@
 #include <memory>
 #include <algorithm>
 
-#include "base/acid_util.hpp"
 #include "base/ptm.hpp"
 #include "base/xml_dom.hpp"
 #include "base/xml_dom_document.hpp"
@@ -17,16 +16,16 @@ namespace prot {
 
 Ptm::Ptm(const std::string &name, const std::string &abbr_name,
          double mono_mass, int unimod_id, 
-         const std::string &n_term_acid_str,
-         const std::string &c_term_acid_str, 
-         const std::string &anywhere_acid_str): 
+         const std::string &n_term_residue_str,
+         const std::string &c_term_residue_str, 
+         const std::string &anywhere_residue_str): 
     name_(name),
     abbr_name_(abbr_name),
     mono_mass_(mono_mass),
     unimod_id_(unimod_id) {
-      n_term_acids_ = AcidUtil::convertStrToAcidPtrVec(n_term_acid_str);
-      c_term_acids_ = AcidUtil::convertStrToAcidPtrVec(c_term_acid_str);
-      anywhere_acids_ = AcidUtil::convertStrToAcidPtrVec(anywhere_acid_str);
+      //n_term_acids_ = AcidUtil::convertStrToAcidPtrVec(n_term_acid_str);
+      //c_term_acids_ = AcidUtil::convertStrToAcidPtrVec(c_term_acid_str);
+      //anywhere_acids_ = AcidUtil::convertStrToAcidPtrVec(anywhere_acid_str);
     }
 
 Ptm::Ptm(xercesc::DOMElement* element) { 
@@ -34,6 +33,7 @@ Ptm::Ptm(xercesc::DOMElement* element) {
   abbr_name_ = XmlDomUtil::getChildValue(element, "abbreviation", 0);
   mono_mass_ = XmlDomUtil::getDoubleChildValue(element, "mono_mass", 0);
   unimod_id_ = XmlDomUtil::getIntChildValue(element, "unimod", 0);
+  /*
   std::string n_term_acid_str, c_term_acid_str, anywhere_acid_str;
   xercesc::DOMNodeList* list = element->getElementsByTagName(X("residues"));
   for (size_t j = 0; j < list->getLength(); j++) {
@@ -51,6 +51,7 @@ Ptm::Ptm(xercesc::DOMElement* element) {
   n_term_acids_ = AcidUtil::convertStrToAcidPtrVec(n_term_acid_str);
   c_term_acids_ = AcidUtil::convertStrToAcidPtrVec(c_term_acid_str);
   anywhere_acids_ = AcidUtil::convertStrToAcidPtrVec(anywhere_acid_str);
+  */
 }
 
 void Ptm::appendAbbrNameToXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent) {

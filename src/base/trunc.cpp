@@ -1,25 +1,25 @@
 #include "base/logger.hpp"
-#include "base/acid_util.hpp"
 #include "base/trunc.hpp"
+#include "base/residue_util.hpp"
 #include "base/xml_dom_util.hpp"
 
 namespace prot {
 
 Trunc::Trunc(const std::string &name, int trunc_len, 
-             const std::string &acid_str) {
+             const std::string &residue_str) {
   name_ = name;
   trunc_len_ = trunc_len;
-  acid_ptr_vec_ = AcidUtil::convertStrToAcidPtrVec(acid_str);
-  shift_ = -AcidUtil::compAcidPtrVecMass(acid_ptr_vec_);
+  residue_ptr_vec_ = ResidueUtil::convertStrToResiduePtrVec(residue_str);
+  shift_ = -ResidueUtil::compResiduePtrVecMass(residue_ptr_vec_);
 }
 
 Trunc::Trunc(xercesc::DOMElement* element) { 
   name_ = XmlDomUtil::getChildValue(element, "name", 0);
   trunc_len_ = XmlDomUtil::getIntChildValue(element, "trunc_len", 0);
-  std::string acid_str = XmlDomUtil::getChildValue(element, "acid_str", 0);
-  LOG_DEBUG( "name " << name_ << " str " << acid_str << " trunc len " << trunc_len_);
-  acid_ptr_vec_ = AcidUtil::convertStrToAcidPtrVec(acid_str);
-  shift_ = -AcidUtil::compAcidPtrVecMass(acid_ptr_vec_);
+  std::string residue_str = XmlDomUtil::getChildValue(element, "residue_str", 0);
+  LOG_DEBUG( "name " << name_ << " str " << residue_str << " trunc len " << trunc_len_);
+  residue_ptr_vec_ = ResidueUtil::convertStrToResiduePtrVec(residue_str);
+  shift_ = -ResidueUtil::compResiduePtrVecMass(residue_ptr_vec_);
 }
 
 std::string Trunc::getNameFromXml(xercesc::DOMElement * element) {

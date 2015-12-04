@@ -30,6 +30,9 @@ class ProteoformFactory {
   static ProteoformPtrVec geneProtModProteoform(const ProteoformPtrVec &ori_forms,
                                                 const ProtModPtrVec &prot_mods);
 
+  static ProteoformPtrVec readFastaToProteoform(const std::string &file_name, 
+                                                const ModPtrVec &fix_mod_list);
+
 };
 
 } /* namespace prot */

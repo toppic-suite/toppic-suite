@@ -19,7 +19,7 @@ OBJ_DIR = ../../bin/obj
 
 BIN_DIR = ../../bin
 
-BASE_OBJS = $(addprefix $(OBJ_DIR)/, acid_base.o acid.o activation_base.o activation.o algorithm.o align_type.o base_data.o bp_spec.o break_point.o change.o change_type.o db_block.o db_residue_seq.o fasta_seq.o fasta_reader.o fasta_index_reader.o fasta_util.o file_util.o logger.o mod.o mod_base.o mod_util.o prot_mod_base.o prot_mod_util.o prot_mod.o proteoform.o proteoform_factory.o proteoform_reader.o proteoform_util.o ptm_base.o ptm.o residue.o residue_base.o residue_freq.o residue_seq.o segment.o string_util.o trunc_base.o trunc_util.o trunc.o web_logger.o xml_dom.o xml_dom_document.o xml_dom_err_handler.o xml_dom_util.o xml_writer.o)
+BASE_OBJS = $(addprefix $(OBJ_DIR)/, acid_base.o acid.o activation_base.o activation.o algorithm.o align_type.o base_data.o bp_spec.o break_point.o change.o change_type.o db_block.o db_residue_seq.o fasta_seq.o fasta_reader.o fasta_index_reader.o fasta_util.o file_util.o logger.o mod.o mod_base.o mod_util.o prot_mod_base.o prot_mod_util.o prot_mod.o proteoform.o proteoform_factory.o proteoform_util.o ptm_base.o ptm.o residue.o residue_base.o residue_freq.o residue_seq.o segment.o string_util.o trunc_base.o trunc_util.o trunc.o web_logger.o xml_dom.o xml_dom_document.o xml_dom_err_handler.o xml_dom_util.o xml_writer.o)
 
 SPEC_OBJS = $(addprefix $(OBJ_DIR)/, deconv_peak.o deconv_ms_factory.o extend_peak.o extend_ms.o extend_ms_factory.o ms_header.o msalign_reader.o msalign_util.o multi_spec_peak.o peak.o peak_tolerance.o prm_base_type.o prm_break_type.o prm_peak.o prm_peak_factory.o prm_ms.o prm_ms_factory.o sp_para.o spectrum_set.o support_peak.o theo_peak.o theo_peak_factory.o theo_peak_util.o)
 
