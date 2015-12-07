@@ -1,4 +1,5 @@
 #include "base/logger.hpp"
+#include "base/proteoform_factory.hpp"
 #include "base/string_util.hpp"
 #include "base/xml_dom_util.hpp"
 #include "spec/ms.hpp"
@@ -28,12 +29,10 @@ Prsm::Prsm(ProteoformPtr proteoform_ptr, const DeconvMsPtrVec &deconv_ms_ptr_vec
 Prsm::Prsm(xercesc::DOMElement* element, FastaIndexReaderPtr reader_ptr, 
            const ModPtrVec &fix_mod_list) {
   parseXml(element);
-  xercesc::DOMElement* proteoform_element
-      = getChildElement(element,"proteoform",0);
-  /*
-  proteoform_ptr_ = ProteoformUtil::readProteoformPtr(
-      new Proteoform(proteoform_element, fai, residue_ptr_vec));
-      */
+  std::string form_elem_name = Proteoform::getXmlElementName();
+  xercesc::DOMElement* form_element
+      = XmlDomUtil::getChildElement(element, form_elem_name.c_str(),0);
+  proteoform_ptr_ = ProteoformPtr(new Proteoform(form_element, reader_ptr, fix_mod_list));
 }
 
 
