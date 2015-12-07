@@ -3,6 +3,7 @@
 
 #include "base/residue_freq.hpp"
 #include "base/fasta_seq.hpp"
+#include "base/fasta_index_reader.hpp"
 #include "base/bp_spec.hpp"
 #include "base/change.hpp"
 #include "base/segment.hpp"
@@ -11,11 +12,18 @@
 
 namespace prot {
 
+class Proteoform;
+
+typedef std::shared_ptr<Proteoform> ProteoformPtr;
+
 class Proteoform {
   public:
    Proteoform(FastaSeqPtr fasta_seq_ptr, ProtModPtr prot_mod_ptr, 
               int start_pos, int end_pos, ResSeqPtr res_seq_ptr, 
               const ChangePtrVec &change_ptr_vec);
+
+   Proteoform(xercesc::DOMElement* element, FastaIndexReaderPtr reader_ptr,
+              const ModPtrVec &fix_mod_list);
 
    FastaSeqPtr getFastaSeqPtr() {return fasta_seq_ptr_;}
 
@@ -57,6 +65,8 @@ class Proteoform {
 
    void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
+   void parseXml(xercesc::DOMElement* element, ProteoformPtr db_proteoform);
+
    static std::string getXmlElementName() {return "proteoform";}
 
   private:
@@ -81,7 +91,6 @@ class Proteoform {
    ChangePtrVec change_list_;
 };
 
-typedef std::shared_ptr<Proteoform> ProteoformPtr;
 typedef std::vector<ProteoformPtr> ProteoformPtrVec;
 typedef std::vector<ProteoformPtrVec> ProteoformPtrVec2D;
 

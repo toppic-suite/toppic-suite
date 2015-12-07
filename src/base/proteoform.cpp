@@ -4,8 +4,12 @@
 #include "base/logger.hpp"
 #include "base/change_type.hpp"
 #include "base/mod_base.hpp"
+#include "base/prot_mod_base.hpp"
 #include "base/string_util.hpp"
+#include "base/fasta_index_reader.hpp"
 #include "base/proteoform.hpp"
+#include "base/proteoform_factory.hpp"
+#include "base/xml_dom_util.hpp"
 
 namespace prot {
 
@@ -21,6 +25,56 @@ Proteoform::Proteoform(FastaSeqPtr fasta_seq_ptr, ProtModPtr prot_mod_ptr,
       std::sort(change_list_.begin(), change_list_.end(), Change::cmpPosIncrease);
       species_id_=0;
     }
+
+Proteoform::Proteoform(xercesc::DOMElement* element, FastaIndexReaderPtr reader_ptr,
+                       const ModPtrVec &fix_mod_list) {
+
+  std::string seq_element_name = FastaSeq::getXmlElementName();
+  xercesc::DOMElement* seq_element= XmlDomUtil::getChildElement(element,seq_element_name.c_str(),0);
+  std::string seq_name = FastaSeq::getNameFromXml(seq_element);
+  std::string seq_desc = FastaSeq::getDescFromXml(seq_element);
+
+  ProteoformPtr form_ptr = ProteoformFactory::readFastaToProteoformPtr(reader_ptr, seq_name,
+                                                                            seq_desc, fix_mod_list);
+  parseXml(element, form_ptr);
+}
+
+void Proteoform::parseXml(xercesc::DOMElement* element, ProteoformPtr form_ptr) {
+  start_pos_ = XmlDomUtil::getIntChildValue(element, "start_pos", 0);
+  end_pos_ = XmlDomUtil::getIntChildValue(element, "end_pos", 0);
+  species_id_ = XmlDomUtil::getIntChildValue(element, "species_id", 0);
+
+  std::string pm_element_name = ProtMod::getXmlElementName();
+  xercesc::DOMElement* pm_element= XmlDomUtil::getChildElement(element,pm_element_name.c_str(),0);
+  prot_mod_ptr_ = ProtModBase::getProtModPtrFromXml(pm_element);
+
+  fasta_seq_ptr_ = form_ptr->getFastaSeqPtr();
+  residue_seq_ptr_ = form_ptr->getResSeqPtr()->getSubResidueSeq(start_pos_,end_pos_);
+
+  ModPtr mod_ptr = prot_mod_ptr_->getModPtr();
+  if (!ModBase::isNoneModPtr(mod_ptr)) {
+    if (residue_seq_ptr_->getLen() >= 1 
+        && mod_ptr->getOriResiduePtr() == residue_seq_ptr_->getResiduePtr(0)) {
+      ResiduePtrVec residues = residue_seq_ptr_->getResidues();
+      residues[0]=mod_ptr->getModResiduePtr();
+      residue_seq_ptr_ = ResSeqPtr(new ResidueSeq(residues));
+
+    }
+  }
+
+  bp_spec_ptr_= BpSpecPtr(new BpSpec(residue_seq_ptr_));
+
+  std::string change_element_name = Change::getXmlElementName();
+
+  xercesc::DOMElement* change_list_element= XmlDomUtil::getChildElement(element,"change_list",0);
+  int change_len = XmlDomUtil::getChildCount(change_list_element, change_element_name.c_str());
+
+  for(int i=0; i<change_len; i++) {
+    xercesc::DOMElement* change_element 
+        = XmlDomUtil::getChildElement(change_list_element, change_element_name.c_str(), i);
+    change_list_.push_back(ChangePtr(new Change(change_element)));
+  }
+}
 
 // get mass of the modified proteoform
 double Proteoform::getMass() {

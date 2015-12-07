@@ -169,10 +169,10 @@ ProteoformPtrVec ProteoformFactory::readFastaToProteoformPtrVec(const std::strin
   return list;
 }
 
-ProteoformPtr ProteoformFactory::readFastaToProteformPtr(FastaIndexReaderPtr reader_ptr, 
-                                                         const std::string &seq_name,
-                                                         const std::string &seq_desc,
-                                                         const ModPtrVec &fix_mod_list) {
+ProteoformPtr ProteoformFactory::readFastaToProteoformPtr(FastaIndexReaderPtr reader_ptr, 
+                                                          const std::string &seq_name,
+                                                          const std::string &seq_desc,
+                                                          const ModPtrVec &fix_mod_list) {
   FastaSeqPtr seq_ptr = reader_ptr->readFastaSeq(seq_name, seq_desc);
   if (seq_ptr != nullptr) {
     return geneDbProteoformPtr(seq_ptr, fix_mod_list);
