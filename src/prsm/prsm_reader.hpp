@@ -17,8 +17,9 @@ class PrsmReader {
   std::vector<std::string> readOnePrsmLines();
 
   PrsmStrPtr readOnePrsmStr();
-
-  PrsmPtr readOnePrsm(faidx_t *fai, const ResiduePtrVec &residue_ptr_vec);
+  
+  PrsmPtr readOnePrsm(FastaIndexReaderPtr reader_ptr, 
+                      const ModPtrVec fix_mod_list);
 
   void close();
 
@@ -33,7 +34,7 @@ PrsmStrPtrVec readAllPrsmStrs(const std::string &input_file_name);
 
 PrsmPtrVec readAllPrsms(const std::string &prsm_file_name, 
                         const std::string &db_file_name,
-                        const ResiduePtrVec &residue_ptr_vec);
+                        const ModPtrVec  &fix_mod_list);
 } /* namespace prot */
 
 #endif /* PROT_PRSM_READER_HPP_ */
