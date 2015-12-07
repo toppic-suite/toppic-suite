@@ -47,7 +47,7 @@ PrsmStrPtr PrsmReader::readOnePrsmStr() {
   return PrsmStrPtr(new PrsmStr(prsm_str_vec));
 }
 
-PrsmPtr PrsmReader::readOnePrsm(faidx_t *fai, const ResiduePtrVec &residue_ptr_vec) {
+PrsmPtr PrsmReader::readOnePrsm(FastaIndexReaderPtr reader_ptr, const ModPtrVec &fix_mod_list) {
   std::vector<std::string> prsm_str_vec = readOnePrsmLines();
   //LOG_DEBUG("prsm str vec size " << prsm_str_vec.size());
   if (prsm_str_vec.size() == 0) {
@@ -66,7 +66,7 @@ PrsmPtr PrsmReader::readOnePrsm(faidx_t *fai, const ResiduePtrVec &residue_ptr_v
   if(parser){
     XmlDOMDocument doc(parser, prsm_buf);
     xercesc::DOMElement* root = doc.getDocumentElement();
-    ptr = PrsmPtr(new Prsm(root, fai, residue_ptr_vec));
+    ptr = PrsmPtr(new Prsm(root, reader_ptr, fix_mod_list));
   }
   //LOG_DEBUG("simple prsm spectrum id " << ptr->getSpectrumId() << " seq name " << ptr->getSeqName());
   return ptr;
