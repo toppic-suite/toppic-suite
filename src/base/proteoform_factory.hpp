@@ -34,10 +34,10 @@ class ProteoformFactory {
   static ProteoformPtrVec readFastaToProteoformPtrVec(const std::string &file_name, 
                                                       const ModPtrVec &fix_mod_list);
 
-  static ProteoformPtr readFastaToProteformPtr(FastaIndexReaderPtr reader_ptr, 
-                                               const std::string &seq_name,
-                                               const std::string &seq_desc,
-                                               const ModPtrVec &fix_mod_list);
+  static ProteoformPtr readFastaToProteoformPtr(FastaIndexReaderPtr reader_ptr, 
+                                                const std::string &seq_name,
+                                                const std::string &seq_desc,
+                                                const ModPtrVec &fix_mod_list);
 
 };
 

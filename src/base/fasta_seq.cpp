@@ -1,5 +1,6 @@
 #include "base/logger.hpp"
 #include "base/fasta_seq.hpp"
+#include "base/xml_dom_util.hpp"
 
 namespace prot {
 
@@ -53,5 +54,14 @@ void FastaSeq::appendNameDescToXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* 
   parent->appendChild(element);
 }
 
+std::string FastaSeq::getNameFromXml(xercesc::DOMElement * element) {
+  std::string name = XmlDomUtil::getChildValue(element, "seq_name", 0);
+  return name;
+}
+
+std::string FastaSeq::getDescFromXml(xercesc::DOMElement * element) {
+  std::string desc = XmlDomUtil::getChildValue(element, "seq_desc", 0);
+  return desc;
+}
 
 }
