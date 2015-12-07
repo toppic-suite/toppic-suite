@@ -28,6 +28,10 @@ class FastaSeq {
 
   void appendNameDescToXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
+  static std::string getNameFromXml(xercesc::DOMElement* element);
+
+  static std::string getDescFromXml(xercesc::DOMElement* element);
+
  private:
   std::string name_;
   std::string desc_;

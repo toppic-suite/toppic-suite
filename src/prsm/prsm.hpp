@@ -5,8 +5,8 @@
 
 #include "base/extreme_value.hpp"
 #include "base/proteoform.hpp"
-#include "spec/deconv_peak.hpp"
-#include "spec/extend_peak.hpp"
+#include "spec/deconv_ms.hpp"
+#include "spec/extend_ms.hpp"
 #include "spec/sp_para.hpp"
 
 namespace prot {
@@ -18,6 +18,9 @@ class Prsm {
  public:
   Prsm(ProteoformPtr proteoform_ptr, const DeconvMsPtrVec &deconv_ms_ptr_vec, 
        double adjusted_prec_mass, SpParaPtr sp_para_ptr);
+
+  Prsm(xercesc::DOMElement* element, FastaIndexReaderPtr reader_ptr, 
+       const ModPtrVec &fix_mod_list);
 
   // get 
   int getPrsmId() {return prsm_id_;}
@@ -90,12 +93,6 @@ class Prsm {
 
   // sort by number of matched fragment ions, then start position 
   static bool cmpMatchFragDecStartPosInc(const PrsmPtr &a, const PrsmPtr &b);
-
-  // sort by the order of protein sequences in the database 
-  static bool cmpProteoformIdInc(const PrsmPtr &a, const PrsmPtr &b) {
-    return a->getProteoformPtr()->getDbResSeqPtr()->getId()
-        < b->getProteoformPtr()->getDbResSeqPtr()->getId();
-  }
 
   // sort by the order of spectrum id, the precursor id
   static bool cmpSpectrumIdIncPrecursorIdInc(const PrsmPtr &a, const PrsmPtr &b);

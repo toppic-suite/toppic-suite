@@ -16,7 +16,7 @@ std::vector<std::string> PrsmReader::readOnePrsmLines() {
   std::string line;
   std::vector<std::string> line_list;
   while (std::getline(input_, line)) {
-    line = trim(line);
+    line = StringUtil::trim(line);
     //LOG_DEBUG("line " << line);
     if (line ==  "<prsm>") {
       line_list.push_back(line);
@@ -47,7 +47,8 @@ PrsmStrPtr PrsmReader::readOnePrsmStr() {
   return PrsmStrPtr(new PrsmStr(prsm_str_vec));
 }
 
-PrsmPtr PrsmReader::readOnePrsm(FastaIndexReaderPtr reader_ptr, const ModPtrVec &fix_mod_list) {
+PrsmPtr PrsmReader::readOnePrsm(FastaIndexReaderPtr reader_ptr, 
+                                const ModPtrVec fix_mod_list) {
   std::vector<std::string> prsm_str_vec = readOnePrsmLines();
   //LOG_DEBUG("prsm str vec size " << prsm_str_vec.size());
   if (prsm_str_vec.size() == 0) {
@@ -90,19 +91,17 @@ PrsmStrPtrVec readAllPrsmStrs(const std::string &input_file_name) {
 
 PrsmPtrVec readAllPrsms(const std::string &prsm_file_name, 
                         const std::string &db_file_name,
-                        const ResiduePtrVec &residue_ptr_vec) {
-  faidx_t * fai = fai_load(db_file_name.c_str());
+                        const ModPtrVec  &fix_mod_list) {
+  FastaIndexReaderPtr fasta_reader_ptr(new FastaIndexReader(db_file_name));
   PrsmReader reader(prsm_file_name);
   PrsmPtrVec prsm_ptrs;
-  PrsmPtr prsm_ptr = reader.readOnePrsm(fai, residue_ptr_vec);
+  PrsmPtr prsm_ptr = reader.readOnePrsm(fasta_reader_ptr, fix_mod_list);
   while (prsm_ptr != nullptr) {
     prsm_ptrs.push_back(prsm_ptr);
-    prsm_ptr = reader.readOnePrsm(fai, residue_ptr_vec);
+    prsm_ptr = reader.readOnePrsm(fasta_reader_ptr, fix_mod_list);
   }
   reader.close();
-  fai_destroy(fai);
   return prsm_ptrs;
-
 }
 
 
