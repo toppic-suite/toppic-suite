@@ -25,6 +25,18 @@ Prsm::Prsm(ProteoformPtr proteoform_ptr, const DeconvMsPtrVec &deconv_ms_ptr_vec
   init(sp_para_ptr);
 }
 
+Prsm::Prsm(xercesc::DOMElement* element, FastaIndexReaderPtr reader_ptr, 
+           const ModPtrVec &fix_mod_list) {
+  parseXml(element);
+  xercesc::DOMElement* proteoform_element
+      = getChildElement(element,"proteoform",0);
+  /*
+  proteoform_ptr_ = ProteoformUtil::readProteoformPtr(
+      new Proteoform(proteoform_element, fai, residue_ptr_vec));
+      */
+}
+
+
 void Prsm::init(SpParaPtr sp_para_ptr) {
   refine_ms_three_vec_ 
       = ExtendMsFactory::geneMsThreePtrVec(deconv_ms_ptr_vec_, sp_para_ptr, adjusted_prec_mass_);
