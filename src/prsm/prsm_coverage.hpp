@@ -1,5 +1,5 @@
-#ifndef PROT_PRSM_COVERAGE_HPP_
-#define PROT_PRSM_COVERAGE_HPP_
+#ifndef PROT_PRSM_PRSM_COVERAGE_HPP_
+#define PROT_PRSM_PRSM_COVERAGE_HPP_
 
 #include "base/string_util.hpp"
 #include "base/fasta_reader.hpp"
