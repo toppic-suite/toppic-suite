@@ -8,13 +8,13 @@ PrsmTopSelector::PrsmTopSelector(const std::string &db_file_name,
                                  const std::string &spec_file_name,
                                  const std::string &in_file_ext,
                                  const std::string &out_file_ext, 
-                                 int n_top){
-  spec_file_name_ = spec_file_name;
-  db_file_name_ = db_file_name;
-  input_file_ext_ = in_file_ext;
-  output_file_ext_ = out_file_ext;
-  n_top_ = n_top;
-}
+                                 int n_top): 
+    spec_file_name_(spec_file_name), 
+    db_file_name_(db_file_name),
+    input_file_ext_(in_file_ext),
+    output_file_ext_(out_file_ext),
+    n_top_(n_top) {
+    }
 
 bool containsSameDbSeq(const PrsmStrPtrVec prsm_ptrs, PrsmStrPtr target_prsm_ptr) {
   for(size_t i=0; i< prsm_ptrs.size();i++){
@@ -26,7 +26,7 @@ bool containsSameDbSeq(const PrsmStrPtrVec prsm_ptrs, PrsmStrPtr target_prsm_ptr
 }
 
 PrsmStrPtrVec getTopPrsms(PrsmStrPtrVec &prsm_str_ptrs, int n_top){
-  std::sort(prsm_str_ptrs.begin(),prsm_str_ptrs.end(),prsmStrEValueUp);
+  std::sort(prsm_str_ptrs.begin(),prsm_str_ptrs.end(),PrsmStr::cmpEValueInc);
   int size = prsm_str_ptrs.size();
   int max = size > n_top? n_top:size;
   PrsmStrPtrVec result_ptrs;
@@ -44,7 +44,7 @@ void PrsmTopSelector::process(){
   PrsmReader reader(input_file_name);
   PrsmStrPtr prsm_str_ptr = reader.readOnePrsmStr();
 
-  PrsmWriter writer(base_name +"."+output_file_ext_);
+  PrsmXmlWriter writer(base_name +"."+output_file_ext_);
   
   int spec_id = 0;
   while (prsm_str_ptr != nullptr) {

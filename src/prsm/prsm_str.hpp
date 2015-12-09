@@ -1,11 +1,14 @@
-#ifndef PROT_PRSM_STR_HPP_
-#define PROT_PRSM_STR_HPP_
+#ifndef PROT_PRSM_PRSM_STR_HPP_
+#define PROT_PRSM_PRSM_STR_HPP_
 
 #include <memory>
 #include <vector>
 #include <string>
 
 namespace prot {
+
+class PrsmStr;
+typedef std::shared_ptr<PrsmStr> PrsmStrPtr;
 
 class PrsmStr {
  public:
@@ -29,6 +32,19 @@ class PrsmStr {
 
   void setFdr(double fdr);
 
+  //comparison 
+  static bool cmpEValueInc(const PrsmStrPtr &a, const PrsmStrPtr &b) {
+    return a->getEValue() < b->getEValue();
+  }
+
+  static bool cmpMatchFragmentDec(const PrsmStrPtr &a, const PrsmStrPtr &b) {
+    return a->getMatchFragNum() > b->getMatchFragNum();
+  }
+
+  static bool cmpSpectrumIdInc(const PrsmStrPtr &a, const PrsmStrPtr &b) {
+    return a->getSpectrumId() < b->getSpectrumId();
+  }
+
  private:
   std::vector<std::string> str_vec_;
 
@@ -45,20 +61,8 @@ class PrsmStr {
   double fdr_;
 };
 
-typedef std::shared_ptr<PrsmStr> PrsmStrPtr;
 typedef std::vector<PrsmStrPtr> PrsmStrPtrVec;
 
-inline bool prsmStrEValueUp(const PrsmStrPtr &a, const PrsmStrPtr &b) {
-  return a->getEValue() < b->getEValue();
-}
-
-inline bool prsmStrMatchFragmentDown(const PrsmStrPtr &a, const PrsmStrPtr &b) {
-  return a->getMatchFragNum() > b->getMatchFragNum();
-}
-
-inline bool prsmStrSpectrumIdUp(const PrsmStrPtr &a, const PrsmStrPtr &b) {
-  return a->getSpectrumId() < b->getSpectrumId();
-}
 
 }
 

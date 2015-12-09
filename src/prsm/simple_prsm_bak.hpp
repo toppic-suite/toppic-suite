@@ -34,11 +34,15 @@ class SimplePrsm {
   int getPrecursorId(){return precursor_id_;}
   xercesc::DOMElement* toXml(XmlDOMDocument* xml_doc);
 
-  static std::string getXmlElementName() {return "simple_prsm";}
+  //to study
+  bool isSameSpectrum(MsHeaderPtr header_ptr);
+  bool isLargerSpectrumId(MsHeaderPtr header_ptr);
+  void assignProteoformPtr(const ProteoformPtrVec &proteo_ptrs,
+                           const ProteoformPtrVec2D &mod_proteo_2d_ptrs);
 
-  static bool cmpScoreDec(const SimplePrsmPtr a,SimplePrsmPtr b) {
-    return a->getScore() > b->getScore();
-  }
+  void addProteoformPtr(faidx_t *fai, const ResiduePtrVec &residue_list,
+                        const ProtModPtrVec &prot_mods);
+
 
  private:
   int spectrum_id_;
@@ -53,6 +57,18 @@ class SimplePrsm {
   std::string seq_desc_;
   double score_;
 };
+
+SimplePrsmPtrVec getMatchedSimplePrsms(const SimplePrsmPtrVec &simple_prsm_ptrs,
+                                       MsHeaderPtr header);
+
+SimplePrsmPtrVec readSimplePrsms(const std::string &filename);
+
+SimplePrsmPtrVec getUniqueMatches(SimplePrsmPtrVec &match_ptrs);
+
+
+inline bool simplePrsmDown(const SimplePrsmPtr a,SimplePrsmPtr b) {
+  return a->getScore() > b->getScore();
+}
 
 } /* namespace prot */
 

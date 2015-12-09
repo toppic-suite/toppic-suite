@@ -77,7 +77,7 @@ void PrsmReader::close() {
   input_.close();
 }
 
-PrsmStrPtrVec readAllPrsmStrs(const std::string &input_file_name) {
+PrsmStrPtrVec PrsmReader::readAllPrsmStrs(const std::string &input_file_name) {
   PrsmReader reader(input_file_name);
   PrsmStrPtrVec prsm_str_ptrs;
   PrsmStrPtr prsm_str_ptr = reader.readOnePrsmStr();
@@ -89,9 +89,9 @@ PrsmStrPtrVec readAllPrsmStrs(const std::string &input_file_name) {
   return prsm_str_ptrs;
 }
 
-PrsmPtrVec readAllPrsms(const std::string &prsm_file_name, 
-                        const std::string &db_file_name,
-                        const ModPtrVec  &fix_mod_list) {
+PrsmPtrVec PrsmReader::readAllPrsms(const std::string &prsm_file_name, 
+                                    const std::string &db_file_name,
+                                    const ModPtrVec  &fix_mod_list) {
   FastaIndexReaderPtr fasta_reader_ptr(new FastaIndexReader(db_file_name));
   PrsmReader reader(prsm_file_name);
   PrsmPtrVec prsm_ptrs;
