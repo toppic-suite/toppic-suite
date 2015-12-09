@@ -1,5 +1,5 @@
-#ifndef PRSM_SELECTOR_HPP_
-#define PRSM_SELECTOR_HPP_
+#ifndef PROT_PRSM_PRSM_TOP_SELECTOR_HPP_
+#define PROT_PRSM_PRSM_TOP_SELECTOR_HPP_
 
 #include <map>
 
@@ -11,12 +11,12 @@
 
 namespace prot {
 
-class PrsmSelector {
+class PrsmTopSelector {
  public:
-  PrsmSelector(const std::string &db_file_name,
-               const std::string &spec_file_name,
-               const std::string &in_file_ext, 
-               const std::string &out_file_ext, int n_top);
+  PrsmTopSelector(const std::string &db_file_name,
+                  const std::string &spec_file_name,
+                  const std::string &in_file_ext, 
+                  const std::string &out_file_ext, int n_top);
   void process();
  private:
   std::string spec_file_name_;
@@ -27,7 +27,7 @@ class PrsmSelector {
 
 };
 
-typedef std::shared_ptr<PrsmSelector> PrsmSelectorPtr;
+typedef std::shared_ptr<PrsmTopSelector> PrsmTopSelectorPtr;
 
 } /* namespace prot */
 

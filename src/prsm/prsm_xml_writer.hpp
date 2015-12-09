@@ -1,5 +1,5 @@
-#ifndef PRSM_WRITER_HPP_
-#define PRSM_WRITER_HPP_
+#ifndef PROT_PRSM_PRSM_XML_WRITER_HPP_
+#define PROT_PRSM_PRSM_XML_WRITER_HPP_
 
 #include <iostream>
 #include <fstream>
@@ -10,9 +10,9 @@
 
 namespace prot {
 
-class PrsmWriter {
+class PrsmXmlWriter {
 public:
- PrsmWriter(const std::string &file_name);
+ PrsmXmlWriter(const std::string &file_name);
 
  void close();
 
@@ -28,8 +28,8 @@ private:
   std::ofstream file_;
 };
 
-typedef std::shared_ptr<PrsmWriter> PrsmWriterPtr;
-typedef std::vector<PrsmWriterPtr> PrsmWriterPtrVec;
+typedef std::shared_ptr<PrsmXmlWriter> PrsmXmlWriterPtr;
+typedef std::vector<PrsmXmlWriterPtr> PrsmXmlWriterPtrVec;
 
 } /* namespace prot */
 

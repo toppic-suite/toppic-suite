@@ -1,5 +1,5 @@
-#ifndef TABLE_WRITER_HPP_
-#define TABLE_WRITER_HPP_
+#ifndef PROT_PRSM_PRSM_TABLE_WRITER_HPP_
+#define PROT_PRSM_PRSM_TABLE_WRITER_HPP_
 
 #include <iostream>
 #include <fstream>
@@ -15,22 +15,22 @@
 
 namespace prot {
 
-class TableWriter {
+class PrsmTableWriter {
  public:
-  TableWriter(PrsmParaPtr prsm_para_ptr, 
-              const std::string &input_file_ext, 
-              const std::string &output_file_ext);
+  PrsmTableWriter(PrsmParaPtr prsm_para_ptr, 
+                  const std::string &input_file_ext, 
+                  const std::string &output_file_ext);
   void write();
 
-  void writeSelectedPrsms(std::ofstream &file, PrsmPtrVec &prsm_ptrs, 
-                          SpectrumSetPtr ms_ptr);
+  void writePrsm(std::ofstream &file, PrsmPtr prsm_ptr);
+
  private:
   PrsmParaPtr prsm_para_ptr_;
   std::string input_file_ext_;
   std::string output_file_ext_;
 };
 
-typedef std::shared_ptr<TableWriter> TableWriterPtr;
+typedef std::shared_ptr<PrsmTableWriter> PrsmTableWriterPtr;
 
 } /* namespace prot */
 
