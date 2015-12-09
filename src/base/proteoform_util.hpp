@@ -7,6 +7,7 @@
 namespace prot {
 
 class ProteoformUtil {
+ public:
   /* calculate frequencies for n_terminal_residues */
   static ResFreqPtrVec compNTermResidueFreq(const ProteoformPtrVec &prot_mod_forms);
 

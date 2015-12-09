@@ -1,5 +1,6 @@
 #include "base/file_util.hpp"
 #include "prsm/prsm_reader.hpp"
+#include "prsm/prsm_str.hpp"
 #include "prsm/prsm_fdr.hpp"
 
 namespace prot {
@@ -17,7 +18,7 @@ void PrsmFdr::process(){
   std::string base_name = FileUtil::basename(spec_file_name_);
   std::string input_file_name = base_name+"."+input_file_ext_;
 
-  PrsmStrPtrVec prsm_str_ptrs = readAllPrsmStrs(input_file_name);
+  PrsmStrPtrVec prsm_str_ptrs = PrsmReader::readAllPrsmStrs(input_file_name);
 
   PrsmStrPtrVec target_ptrs;
   PrsmStrPtrVec decoy_ptrs;
@@ -37,15 +38,15 @@ void PrsmFdr::process(){
   }
   compute(target_ptrs,decoy_ptrs);
   std::string output_file_name = base_name+"."+output_file_ext_;
-  PrsmWriter writer(output_file_name);
-  std::sort(target_ptrs.begin(),target_ptrs.end(),prsmStrSpectrumIdUp);
+  PrsmXmlWriter writer(output_file_name);
+  std::sort(target_ptrs.begin(),target_ptrs.end(),PrsmStr::cmpSpectrumIdInc);
   writer.writeVector(target_ptrs);
   writer.close();
 }
 
 void PrsmFdr::compute(PrsmStrPtrVec &target_ptrs,PrsmStrPtrVec &decoy_ptrs){
-  std::sort(target_ptrs.begin(),target_ptrs.end(),prsmStrEValueUp);
-  std::sort(decoy_ptrs.begin(),decoy_ptrs.end(),prsmStrEValueUp);
+  std::sort(target_ptrs.begin(),target_ptrs.end(),PrsmStr::cmpEValueInc);
+  std::sort(decoy_ptrs.begin(),decoy_ptrs.end(),PrsmStr::cmpEValueInc);
 
   for(size_t i=0; i<target_ptrs.size(); i++){
     int n_target=i+1;

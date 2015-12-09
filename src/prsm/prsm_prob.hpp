@@ -10,7 +10,7 @@
 #include "base/proteoform_factory.hpp"
 #include "prsm/prsm.hpp"
 #include "prsm/prsm_para.hpp"
-#include "prsm/prsm_writer.hpp"
+#include "prsm/prsm_xml_writer.hpp"
 
 namespace prot {
 

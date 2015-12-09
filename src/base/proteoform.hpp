@@ -45,9 +45,11 @@ class Proteoform {
 
    int getChangeNum() {return change_list_.size();}
 
-   ChangePtrVec getChangePtrVec() { return change_list_; }
+   ChangePtrVec getChangePtrVec() {return change_list_;}
 
-   int getSpeciesId() { return species_id_; }
+   int getSpeciesId() {return species_id_;}
+
+   void setSpeciesId(int id) {species_id_ = id;}
 
    double getMass();
 

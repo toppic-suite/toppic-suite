@@ -28,7 +28,7 @@ void PrsmProb::process() {
   PrsmReader prsm_reader(input_file_name);
   PrsmPtr prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec_);
 
-  PrsmWriter all_writer(FileUtil::basename(spec_file_name_)+"."+output_file_ext_);
+  PrsmXmlWriter all_writer(FileUtil::basename(spec_file_name_)+"."+output_file_ext_);
 
   while(prsm_ptr != nullptr) {
     int shift_num = prsm_ptr->getProteoformPtr()->getChangeNum(ChangeType::UNEXPECTED);

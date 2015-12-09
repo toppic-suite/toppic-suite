@@ -1,5 +1,5 @@
-#ifndef PROT_PRSM_STR_COMBINE_HPP_
-#define PROT_PRSM_STR_COMBINE_HPP_
+#ifndef PROT_PRSM_PRSM_STR_COMBINE_HPP_
+#define PROT_PRSM_PRSM_STR_COMBINE_HPP_
 
 #include <vector>
 #include <string>
@@ -9,7 +9,7 @@
 #include "base/fasta_reader.hpp"
 #include "prsm/prsm.hpp"
 #include "prsm/prsm_para.hpp"
-#include "prsm/prsm_writer.hpp"
+#include "prsm/prsm_xml_writer.hpp"
 
 namespace prot {
 

@@ -23,6 +23,12 @@ class PrsmReader {
 
   void close();
 
+  static PrsmStrPtrVec readAllPrsmStrs(const std::string &input_file_name);
+
+  static PrsmPtrVec readAllPrsms(const std::string &prsm_file_name, 
+                                 const std::string &db_file_name,
+                                 const ModPtrVec  &fix_mod_list);
+
  private:
   std::ifstream input_;
 };
@@ -30,11 +36,6 @@ class PrsmReader {
 typedef std::shared_ptr<PrsmReader> PrsmReaderPtr;
 typedef std::vector<PrsmReaderPtr> PrsmReaderPtrVec;
 
-PrsmStrPtrVec readAllPrsmStrs(const std::string &input_file_name);
-
-PrsmPtrVec readAllPrsms(const std::string &prsm_file_name, 
-                        const std::string &db_file_name,
-                        const ModPtrVec  &fix_mod_list);
 } /* namespace prot */
 
 #endif /* PROT_PRSM_READER_HPP_ */

@@ -1,4 +1,5 @@
 #include "base/file_util.hpp"
+#include "base/proteoform_util.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_species.hpp"
 
@@ -7,23 +8,25 @@ namespace prot {
 PrsmSpecies::PrsmSpecies(const std::string &db_file_name,
                          const std::string &spec_file_name,
                          const std::string &input_file_ext,
+                         const ModPtrVec &fix_mod_ptr_vec,
                          const std::string &output_file_ext,
                          const ResiduePtrVec &residue_ptr_vec,
-                         double ppo) {
-  db_file_name_ = db_file_name;
-  spec_file_name_ = spec_file_name;
-  input_file_ext_ =input_file_ext;
-  output_file_ext_ = output_file_ext;
-  residue_ptr_vec_ = residue_ptr_vec;
-  ppo_ = ppo;
-}
+                         double ppo): 
+    db_file_name_(db_file_name),
+    spec_file_name_(spec_file_name),
+    input_file_ext_(input_file_ext),
+    fix_mod_ptr_vec_(fix_mod_ptr_vec),
+    output_file_ext_(output_file_ext),
+    residue_ptr_vec_(residue_ptr_vec),
+    ppo_(ppo) {
+    }
 
 ProteoformPtrVec2D groupProteins(const PrsmPtrVec &prsm_ptrs){
   //get max shift number
   int max_shift_number = 0;
   for(size_t i=0;i<prsm_ptrs.size();i++){
     int cur_shift_number 
-        = prsm_ptrs[i]->getProteoformPtr()->getUnexpectedChangeNum();
+        = prsm_ptrs[i]->getProteoformPtr()->getChangeNum(ChangeType::UNEXPECTED);
     if(max_shift_number < cur_shift_number) {
       max_shift_number = cur_shift_number;
     }
@@ -33,7 +36,7 @@ ProteoformPtrVec2D groupProteins(const PrsmPtrVec &prsm_ptrs){
   for(int shift =0;shift<=max_shift_number;shift++){
     ProteoformPtrVec proteo_ptrs;
     for(size_t i=0;i<prsm_ptrs.size();i++ ){
-      if(shift == prsm_ptrs[i]->getProteoformPtr()->getUnexpectedChangeNum()) {
+      if(shift == prsm_ptrs[i]->getProteoformPtr()->getChangeNum(ChangeType::UNEXPECTED)) {
         proteo_ptrs.push_back(prsm_ptrs[i]->getProteoformPtr());
       }
     }
@@ -47,7 +50,7 @@ ProteoformPtrVec2D getZeroPtmList(const ProteoformPtrVec& proteo_ptrs, double pp
   for(size_t i=0;i<proteo_ptrs.size();i++){
     bool is_found = false;
     for(size_t j=0; j<species.size(); j++){
-      if(isSamePeptideAndMass(proteo_ptrs[i], species[j][0],ppo)){
+      if(ProteoformUtil::isSameSeqAndMass(proteo_ptrs[i], species[j][0],ppo)){
         species[j].push_back(proteo_ptrs[i]);
         is_found = true;
         break;
@@ -72,8 +75,8 @@ void setSpeciesId(PrsmPtrVec& prsm_ptrs,double ppo){
     for(size_t j=0; j<proteo_groups[i].size();j++){
       bool is_found = false;
       for(size_t m = 0; m< species.size(); m++){
-        if(isStrictCompatiablePtmSpecies(proteo_groups[i][j], species[m][0],
-                                         ppo)){
+        if(ProteoformUtil::isStrictCompatiablePtmSpecies(
+                proteo_groups[i][j], species[m][0], ppo)){
           species[m].push_back(proteo_groups[i][j]);
           is_found = true;
           break;
@@ -95,16 +98,16 @@ void setSpeciesId(PrsmPtrVec& prsm_ptrs,double ppo){
 }
 
 void PrsmSpecies::process(){
-  std::string base_name = basename(spec_file_name_);
+  std::string base_name = FileUtil::basename(spec_file_name_);
   std::string input_file_name = base_name+"."+input_file_ext_;
   
-  PrsmPtrVec prsm_ptrs = readAllPrsms(input_file_name, db_file_name_,
-                                      residue_ptr_vec_);
-  sort(prsm_ptrs.begin(),prsm_ptrs.end(),prsmSpectrumIdUpPrecursorIdUp);
+  PrsmPtrVec prsm_ptrs = PrsmReader::readAllPrsms(input_file_name, db_file_name_,
+                                                  fix_mod_ptr_vec_);
+  sort(prsm_ptrs.begin(),prsm_ptrs.end(),Prsm::cmpSpectrumIdIncPrecursorIdInc);
   setSpeciesId(prsm_ptrs,ppo_);
   //output
   std::string output_file_name = base_name +"."+output_file_ext_;
-  PrsmWriter writer(output_file_name);
+  PrsmXmlWriter writer(output_file_name);
   writer.writeVector(prsm_ptrs);
   writer.close();
 }

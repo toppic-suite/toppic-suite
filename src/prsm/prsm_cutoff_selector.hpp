@@ -6,7 +6,7 @@
 #include "base/proteoform.hpp"
 #include "base/fasta_reader.hpp"
 #include "prsm/prsm.hpp"
-#include "prsm/prsm_writer.hpp"
+#include "prsm/prsm_xml_writer.hpp"
 
 namespace prot {
 
@@ -22,9 +22,9 @@ class PrsmCutoffSelector {
  private:
   std::string db_file_name_;
   std::string spec_file_name_;
-  std::string cutoff_type_;
   std::string input_file_ext_;
   std::string output_file_ext_;
+  std::string cutoff_type_;
   double cutoff_value_;
 };
 
