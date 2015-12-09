@@ -1,17 +1,17 @@
 #include "base/file_util.hpp"
 #include "prsm/prsm_str.hpp"
 #include "prsm/prsm_reader.hpp"
-#include "prsm/output_selector.hpp"
+#include "prsm/prsm_cutoff_selector.hpp"
 
 
 namespace prot {
 
-OutputSelector::OutputSelector(const std::string &db_file_name,
-                               const std::string &spec_file_name,
-                               const std::string &input_file_ext,
-                               const std::string &output_file_ext,
-                               const std::string &cutoff_type,
-                               double cutoff_value) {
+PrsmCutoffSelector::PrsmCutoffSelector(const std::string &db_file_name,
+                                       const std::string &spec_file_name,
+                                       const std::string &input_file_ext,
+                                       const std::string &output_file_ext,
+                                       const std::string &cutoff_type,
+                                       double cutoff_value) {
   db_file_name_= db_file_name;
   spec_file_name_ = spec_file_name;
   cutoff_type_ = cutoff_type;
@@ -20,8 +20,8 @@ OutputSelector::OutputSelector(const std::string &db_file_name,
   output_file_ext_ = output_file_ext;
 }
 
-void OutputSelector::process(){
-  std::string base_name = basename(spec_file_name_);
+void PrsmCutoffSelector::process(){
+  std::string base_name = FileUtil::basename(spec_file_name_);
   std::string input_file_name = base_name + "." + input_file_ext_;
 
   PrsmStrPtrVec prsms = readAllPrsmStrs(input_file_name);
@@ -51,4 +51,5 @@ void OutputSelector::process(){
   writer.writeVector(selected_prsms);
   writer.close();
 }
+
 } /* namespace prot */

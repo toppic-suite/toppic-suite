@@ -1,13 +1,14 @@
 #include "base/file_util.hpp"
 #include "prsm/prsm_reader.hpp"
-#include "prsm/prsm_selector.hpp"
+#include "prsm/prsm_top_selector.hpp"
 
 namespace prot {
 
-PrsmSelector::PrsmSelector(const std::string &db_file_name,
-                           const std::string &spec_file_name,
-                           const std::string &in_file_ext,
-                           const std::string &out_file_ext, int n_top){
+PrsmTopSelector::PrsmTopSelector(const std::string &db_file_name,
+                                 const std::string &spec_file_name,
+                                 const std::string &in_file_ext,
+                                 const std::string &out_file_ext, 
+                                 int n_top){
   spec_file_name_ = spec_file_name;
   db_file_name_ = db_file_name;
   input_file_ext_ = in_file_ext;
@@ -37,8 +38,8 @@ PrsmStrPtrVec getTopPrsms(PrsmStrPtrVec &prsm_str_ptrs, int n_top){
   return result_ptrs;
 }
 
-void PrsmSelector::process(){
-  std::string base_name = basename(spec_file_name_);
+void PrsmTopSelector::process(){
+  std::string base_name = FileUtil::basename(spec_file_name_);
   std::string input_file_name = base_name+"."+input_file_ext_;
   PrsmReader reader(input_file_name);
   PrsmStrPtr prsm_str_ptr = reader.readOnePrsmStr();
