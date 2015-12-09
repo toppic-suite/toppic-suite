@@ -1,12 +1,11 @@
-#ifndef PROT_PRSM_FDR_HPP_
-#define PROT_PRSM_FDR_HPP_
+#ifndef PROT_PRSM_PRSM_FDR_HPP_
+#define PROT_PRSM_PRSM_FDR_HPP_
 
 #include <map>
 #include <string>
 
 #include "base/string_util.hpp"
 #include "base/fasta_reader.hpp"
-//#include "prsm/prsm_str.hpp"
 #include "prsm/prsm_writer.hpp"
 
 namespace prot {

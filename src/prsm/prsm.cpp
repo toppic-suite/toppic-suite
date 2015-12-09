@@ -13,18 +13,18 @@
 namespace prot {
 
 Prsm::Prsm(ProteoformPtr proteoform_ptr, const DeconvMsPtrVec &deconv_ms_ptr_vec, 
-           double adjusted_prec_mass, SpParaPtr sp_para_ptr) {
-  proteoform_ptr_ = proteoform_ptr;
-  deconv_ms_ptr_vec_ = deconv_ms_ptr_vec;
-  MsHeaderPtr header_ptr = deconv_ms_ptr_vec[0]->getMsHeaderPtr();
-  spectrum_id_ = header_ptr->getId();
-  spectrum_scan_ = header_ptr->getScansString();
-  precursor_id_ = header_ptr->getPrecId();
-  spectrum_num_ = deconv_ms_ptr_vec.size();
-  ori_prec_mass_ = header_ptr->getPrecMonoMass();
-  adjusted_prec_mass_ = adjusted_prec_mass;
-  init(sp_para_ptr);
-}
+           double adjusted_prec_mass, SpParaPtr sp_para_ptr):
+    adjusted_prec_mass_(adjusted_prec_mass),
+    proteoform_ptr_(proteoform_ptr),
+    deconv_ms_ptr_vec_(deconv_ms_ptr_vec) {
+      MsHeaderPtr header_ptr = deconv_ms_ptr_vec[0]->getMsHeaderPtr();
+      spectrum_id_ = header_ptr->getId();
+      spectrum_scan_ = header_ptr->getScansString();
+      precursor_id_ = header_ptr->getPrecId();
+      spectrum_num_ = deconv_ms_ptr_vec.size();
+      ori_prec_mass_ = header_ptr->getPrecMonoMass();
+      init(sp_para_ptr);
+    }
 
 Prsm::Prsm(xercesc::DOMElement* element, FastaIndexReaderPtr reader_ptr, 
            const ModPtrVec &fix_mod_list) {
