@@ -1,3 +1,5 @@
+#include <cmath>
+
 #include "base/logger.hpp"
 #include "base/algorithm.hpp"
 #include "spec/extend_ms.hpp"
