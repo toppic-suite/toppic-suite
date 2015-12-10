@@ -2,6 +2,7 @@
 #define PROT_BASE_PRM_BREAK_TYPE_HPP_
 
 #include <memory>
+#include <string>
 
 namespace prot {
 

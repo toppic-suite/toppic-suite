@@ -2,6 +2,7 @@
 #define PROT_BASE_PRM_BASE_TYPE_HPP_
 
 #include <memory>
+#include <string>
 
 namespace prot {
 
@@ -13,12 +14,14 @@ class PrmBaseType {
   static const PrmBaseTypePtr ORIGINAL;
   static const PrmBaseTypePtr REVERSED;
 
+  PrmBaseType(std::string name) {name_=name;}
+
   std::string getName() {return name_;}
 
  private:
   std::string name_;
-  PrmBaseType(std::string name): name_(name) {};
 };
+
 
 }
 
