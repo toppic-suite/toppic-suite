@@ -5,7 +5,7 @@
 #include "spec/msalign_reader.hpp"
 #include "spec/msalign_util.hpp"
 #include "spec/spectrum_set.hpp"
-#include "prsm/simple_prsm_writer.hpp"
+#include "prsm/simple_prsm_xml_writer.hpp"
 #include "prsm/simple_prsm_str_combine.hpp"
 #include "zeroptmfilter/zero_ptm_filter_processor.hpp"
 #include "zeroptmfilter/zero_ptm_filter.hpp"
@@ -72,10 +72,10 @@ void ZeroPtmFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_
       + "." + mng_ptr_->output_file_ext_;
   std::string block_str = std::to_string(block_ptr->getBlockIdx());
 
-  SimplePrsmWriter comp_writer(output_file_name + "_COMPLETE_" + block_str);
-  SimplePrsmWriter pref_writer(output_file_name + "_PREFIX_" + block_str);
-  SimplePrsmWriter suff_writer(output_file_name + "_SUFFIX_" + block_str);
-  SimplePrsmWriter internal_writer(output_file_name + "_INTERNAL_" + block_str);
+  SimplePrsmXmlWriter comp_writer(output_file_name + "_COMPLETE_" + block_str);
+  SimplePrsmXmlWriter pref_writer(output_file_name + "_PREFIX_" + block_str);
+  SimplePrsmXmlWriter suff_writer(output_file_name + "_SUFFIX_" + block_str);
+  SimplePrsmXmlWriter internal_writer(output_file_name + "_INTERNAL_" + block_str);
     
   SpectrumSetPtr spec_set_ptr;
   int spectrum_num = MsAlignUtil::getSpNum (prsm_para_ptr->getSpectrumFileName());

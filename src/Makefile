@@ -12,17 +12,17 @@ all:
 	cd spec; make
 	cd prsm; make
 	cd zeroptmfilter; make
-	cd zeroptmsearch; make
-	cd oneptmfilter; make
-	cd diagfilter; make
-	cd ptmsearch; make
-	cd tdgf; make
+#	cd zeroptmsearch; make
+#	cd oneptmfilter; make
+#	cd diagfilter; make
+#	cd ptmsearch; make
+#	cd tdgf; make
 #	cd poisson; make
-	cd prsmview; make	
+#	cd prsmview; make	
 	cd console; make
-	cd graph; make
-	cd graphalign; make
-	cd test; make
+#	cd graph; make
+#	cd graphalign; make
+#	cd test; make
 
 clean:
 	cd base; make clean
