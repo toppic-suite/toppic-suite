@@ -1,4 +1,5 @@
 #include "base/logger.hpp"
+#include "base/ptm_base.hpp"
 #include "base/mod_base.hpp"
 #include "base/prot_mod_base.hpp"
 #include "base/prot_mod_util.hpp"
@@ -49,16 +50,16 @@ ProtModPtrVec ProtModUtil::readProtMod(const std::string &file_name) {
   return mod_ptr_vec;
 }
 
-
-/*
-bool ProtModUtil::contain_NME_ACETYLATION(const ProtModPtrVec &prot_mod_ptrs) {
+ProtModPtr ProtModUtil::findNME_Acetylation(const ProtModPtrVec &prot_mod_ptrs, 
+                                             const ResiduePtrVec &residues) {
   for (size_t i = 0; i < prot_mod_ptrs.size(); i++) {
-    if (prot_mod_ptrs[i] == ProtModBase::getProtModPtr_NME_ACETYLATION()) {
-      return true;
+    PtmPtr ptm_ptr = prot_mod_ptrs[i]->getModPtr()->getModResiduePtr()->getPtmPtr();
+    if (ptm_ptr == PtmBase::getPtmPtr_Acetylation() &&
+        allowMod(prot_mod_ptrs[i], residues)) {
+      return prot_mod_ptrs[i];
     }
   }
-  return false;
+  return nullptr;
 }
-*/
 
 }
