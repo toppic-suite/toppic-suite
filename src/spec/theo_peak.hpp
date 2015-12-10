@@ -25,7 +25,6 @@ class TheoPeak : public Peak {
 
  private:
   IonPtr ion_ptr_;
-  double unmod_mass_;
   double shift_;
 };
 

@@ -25,14 +25,8 @@ namespace prot {
     char* buffer = new char[buffer_size];
     size_t len = readlink ("/proc/self/exe", buffer, buffer_size);
     std::string file_name;
-    if (len >= 0){
-      buffer[len] = '\0';
-      file_name = std::string (buffer);
-    }
-    else{
-      LOG_ERROR("Can not find executive directory!");
-      return file_name = "";
-    }
+    buffer[len] = '\0';
+    file_name = std::string (buffer);
     delete[] buffer;
     fs::path full_path(file_name);
     std::string exe_dir = full_path.remove_filename().string();
