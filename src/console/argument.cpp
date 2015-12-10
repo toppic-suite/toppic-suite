@@ -1,4 +1,5 @@
 #include "base/file_util.hpp"
+#include "base/xml_dom_util.hpp"
 #include "console/argument.hpp"
 
 namespace prot {
@@ -81,28 +82,28 @@ void Argument::setArgumentsByConfigFile(const std::string &filename){
     XmlDOMDocument* doc = new XmlDOMDocument(parser, filename.c_str());
     if (doc) {
       xercesc::DOMElement* root = doc->getDocumentElement();
-      arguments_["oriDatabaseFileName"]=getChildValue(root,"database_file_name",0);
-      arguments_["spectrumFileName"]=getChildValue(root,"spectrum_file_name",0);
-      arguments_["logFileName"]=getChildValue(root,"log_file_name",0);
-      arguments_["activation"]=getChildValue(root,"fragmentation_method",0);
-      arguments_["cysteineProtection"]=getChildValue(root,"cysteine_protecting_group",0);
-      arguments_["searchType"]=getChildValue(root,"search_type",0);
-      arguments_["ptmNumber"]=getChildValue(root,"shift_number",0);
-      arguments_["errorTolerance"]=getChildValue(root,"error_tolerance",0);
-      arguments_["cutoffType"]=getChildValue(root,"cutoff_type",0);
-      arguments_["cutoffValue"]=getChildValue(root,"cutoff_value",0);
-      arguments_["maxPtmMass"]=getChildValue(root,"max_ptm_mass",0);
-      arguments_["useGf"]=getChildValue(root,"use_gf",0);
+      arguments_["oriDatabaseFileName"]=XmlDomUtil::getChildValue(root,"database_file_name",0);
+      arguments_["spectrumFileName"]=XmlDomUtil::getChildValue(root,"spectrum_file_name",0);
+      arguments_["logFileName"]=XmlDomUtil::getChildValue(root,"log_file_name",0);
+      arguments_["activation"]=XmlDomUtil::getChildValue(root,"fragmentation_method",0);
+      arguments_["cysteineProtection"]=XmlDomUtil::getChildValue(root,"cysteine_protecting_group",0);
+      arguments_["searchType"]=XmlDomUtil::getChildValue(root,"search_type",0);
+      arguments_["ptmNumber"]=XmlDomUtil::getChildValue(root,"shift_number",0);
+      arguments_["errorTolerance"]=XmlDomUtil::getChildValue(root,"error_tolerance",0);
+      arguments_["cutoffType"]=XmlDomUtil::getChildValue(root,"cutoff_type",0);
+      arguments_["cutoffValue"]=XmlDomUtil::getChildValue(root,"cutoff_value",0);
+      arguments_["maxPtmMass"]=XmlDomUtil::getChildValue(root,"max_ptm_mass",0);
+      arguments_["useGf"]=XmlDomUtil::getChildValue(root,"use_gf",0);
 
-      xercesc::DOMElement* prot_mod_list = getChildElement(root,"protein_variable_ptm_list",0);
-      int allow_prot_node_number = getChildCount(prot_mod_list,"protein_variable_ptm");
+      xercesc::DOMElement* prot_mod_list = XmlDomUtil::getChildElement(root,"protein_variable_ptm_list",0);
+      int allow_prot_node_number = XmlDomUtil::getChildCount(prot_mod_list,"protein_variable_ptm");
       std::string allow_mod="";
       for(int i=0;i<allow_prot_node_number;i++){
         if(i==0){
-          allow_mod = getChildValue(prot_mod_list,"protein_variable_ptm",i);
+          allow_mod = XmlDomUtil::getChildValue(prot_mod_list,"protein_variable_ptm",i);
         }
         else{
-          allow_mod = allow_mod+","+getChildValue(prot_mod_list,"protein_variable_ptm",i);
+          allow_mod = allow_mod+","+XmlDomUtil::getChildValue(prot_mod_list,"protein_variable_ptm",i);
         }
       }
       arguments_["allowProtMod"]=allow_mod;
@@ -205,7 +206,7 @@ bool Argument::parse(int argc, char* argv[]) {
       arguments_["executiveDir"] = argv[0];
     }
     else {
-      arguments_["executiveDir"] = getExecutiveDir(argv_0);
+      arguments_["executiveDir"] = FileUtil::getExecutiveDir(argv_0);
     }
     LOG_DEBUG("Executive Dir " << arguments_["ExecutiveDir"]);
     if (vm.count("argument-file")) {
