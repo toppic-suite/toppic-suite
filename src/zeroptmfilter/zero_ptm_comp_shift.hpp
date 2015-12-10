@@ -1,5 +1,5 @@
-#ifndef ZERO_PTM_COMP_SHIFT_HPP_
-#define ZERO_PTM_COMP_SHIFT_HPP_
+#ifndef ZERO_PTM_FILTER_ZERO_PTM_COMP_SHIFT_HPP_
+#define ZERO_PTM_FILTER_ZERO_PTM_COMP_SHIFT_HPP_
 
 #include "base/proteoform.hpp"
 #include "base/base_data.hpp"
@@ -26,7 +26,7 @@ class ZeroPtmCompShift {
  private:
   // scale factor
   int scale_;
-  bool acetylation_;
+  //bool acetylation_;
   int proteo_num_;
   int col_num_;
 
