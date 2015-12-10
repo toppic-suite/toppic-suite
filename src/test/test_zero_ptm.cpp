@@ -7,15 +7,15 @@
 #include "spec/msalign_reader.hpp"
 
 #include "prsm/prsm_para.hpp"
-#include "prsm/prsm_combine.hpp"
-#include "prsm/prsm_selector.hpp"
-#include "prsm/output_selector.hpp"
+#include "prsm/prsm_str_combine.hpp"
+#include "prsm/prsm_top_selector.hpp"
+#include "prsm/prsm_cutoff_selector.hpp"
 #include "prsm/prsm_species.hpp"
-#include "prsm/table_writer.hpp"
+#include "prsm/prsm_table_writer.hpp"
 #include "prsm/prsm_fdr.hpp"
 
-#include "zeroptmsearch/zero_ptm_mng.hpp"
-#include "zeroptmsearch/zero_ptm_search.hpp"
+#include "zeroptmfilter/zero_ptm_filter_mng.hpp"
+#include "zeroptmfilter/zero_ptm_filter_processor.hpp"
 
 #include "console/argument.hpp"
 
@@ -29,28 +29,33 @@ int zero_ptm_process(int argc, char* argv[]) {
       return 1;
     }
     std::map<std::string, std::string> arguments = argu_processor.getArguments();
-    std::cout << "TopPC 0.5 " << std::endl;
+    std::cout << "TopPIC 0.9.2" << std::endl;
 
     std::string exe_dir = arguments["executiveDir"];
     std::cout << "Executive file directory is: " << exe_dir << std::endl;
-    initBaseData(exe_dir);
 
+    //initBaseData(exe_dir);
+    
+    /*
     LOG_DEBUG("Init base data completed");
 
     std::string db_file_name = arguments["databaseFileName"];
     std::string sp_file_name = arguments["spectrumFileName"];
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
+    std::string log_file_name = arguments["logFileName"];
 
-    int n_top;
-    std::istringstream (arguments["numOfTopPrsms"]) >> n_top;
-    int shift_num;
-    std::istringstream (arguments["shiftNumber"]) >> shift_num;
-    double max_ptm_mass;
-    std::istringstream (arguments["maxPtmMass"]) >> max_ptm_mass;
+    int n_top = std::stoi(arguments["numOfTopPrsms"]);
+    int ptm_num = std::stoi(arguments["ptmNumber"]);
+    double max_ptm_mass = std::stod(arguments["maxPtmMass"]);
+    double filtering_result_num = std::stod(arguments["filteringResultNumber"]);
+    bool use_gf = false; 
+    if (arguments["useGf"] == "true") {
+      use_gf = true;
+    }
+    // initialize log file 
+  	WebLog::init(log_file_name, use_gf, ptm_num);
 
-    LOG_DEBUG("start prsm init");
     PrsmParaPtr prsm_para_ptr = PrsmParaPtr(new PrsmPara(arguments));
-    LOG_DEBUG("end prsm init");
 
     bool decoy = false;
     if (arguments["searchType"] == "TARGET+DECOY") {
@@ -62,14 +67,19 @@ int zero_ptm_process(int argc, char* argv[]) {
     dbPreprocess (ori_db_file_name, db_file_name, decoy, db_block_size);
     generateSpIndex(sp_file_name);
 
-    int start_s = clock();
+    time_t start_s;
+    time_t stop_s;
 
-    std::cout << "Zero ptm searching starts " << std::endl;
-    ZeroPtmMngPtr zero_mng_ptr = ZeroPtmMngPtr(new ZeroPtmMng (prsm_para_ptr, "ZERO"));
-    zeroPtmSearchProcess(zero_mng_ptr);
-
-    int stop_s = clock();
-    std::cout << std::endl << "Running time: " << (stop_s-start_s) / double(CLOCKS_PER_SEC)  << " seconds " << std::endl;
+    time(&start_s);
+    std::cout << "Zero PTM filtering started." << std::endl;
+    ZeroPtmFilterMngPtr zero_filter_mng_ptr = ZeroPtmFilterMngPtr(new ZeroPtmFilterMng (prsm_para_ptr, "ZERO_FILTER"));
+    ZeroPtmFilterProcessorPtr zero_filter_processor = ZeroPtmFilterProcessorPtr(new ZeroPtmFilterProcessor(zero_filter_mng_ptr));
+    zero_filter_processor->process();
+    //WebLog::completeFunction(WebLog::ZeroPtmTime());
+    std::cout << "Zero PTM filtering finished." << std::endl;
+    time(&stop_s);
+    std::cout <<  "Zero PTM filtering running time: " << difftime(stop_s, start_s)  << " seconds " << std::endl;
+    */
 
     /*
     std::cout << "Outputting table starts " << std::endl;

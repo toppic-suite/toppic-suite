@@ -201,7 +201,7 @@ bool Prsm::cmpMatchFragDecStartPosInc(const PrsmPtr &a, const PrsmPtr &b) {
 }
 
 // sort by the order of spectrum id, the precursor id
-bool PrsmCmpSpectrumIdIncPrecursorIdInc(const PrsmPtr &a, const PrsmPtr &b){
+bool Prsm::cmpSpectrumIdIncPrecursorIdInc(const PrsmPtr &a, const PrsmPtr &b){
   if(a->getSpectrumId() < b->getSpectrumId()){
     return true;
   }

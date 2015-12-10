@@ -43,7 +43,7 @@ void SimplePrsmStrCombine::process() {
     reader_ptrs.push_back(reader_ptr);
     prsm_str_ptrs.push_back(str_ptr);
   }
-  SimplePrsmWriter writer(base_name +"."+output_file_ext_);
+  SimplePrsmXmlWriter writer(base_name +"."+output_file_ext_);
   
   // combine
   int spec_id = 0;
