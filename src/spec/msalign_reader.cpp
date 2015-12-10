@@ -1,3 +1,5 @@
+#include <cmath>
+
 #include "base/logger.hpp"
 #include "base/activation_base.hpp"
 #include "base/string_util.hpp"

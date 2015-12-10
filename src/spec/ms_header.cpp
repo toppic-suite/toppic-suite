@@ -1,5 +1,5 @@
 #include <sstream>
-#include <stdlib.h>
+#include <cmath>
 
 #include "base/activation_base.hpp"
 #include "base/logger.hpp"

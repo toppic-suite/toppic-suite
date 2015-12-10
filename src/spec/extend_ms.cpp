@@ -1,3 +1,5 @@
+#include <cmath>
+
 #include "spec/extend_ms.hpp"
 
 namespace prot {
