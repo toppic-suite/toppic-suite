@@ -16,7 +16,8 @@ ZeroPtmCompShift::ZeroPtmCompShift(const ProteoformPtrVec &proteo_ptrs,
 
   col_num_ = mng_ptr->max_proteoform_mass * scale_;
   proteo_num_ = proteo_ptrs.size();
-  acetylation_ = containNME_ACETYLATION(mng_ptr->prsm_para_ptr_->getAllowProtModPtrVec());
+  //acetylation_ = containNME_ACETYLATION(mng_ptr->prsm_para_ptr_->getAllowProtModPtrVec());
+  prot_mod_ptr_vec_ = mng_ptr_->prsm_para_ptr_->getProtModPtrVec();
   initProteoformBeginEnds(proteo_ptrs);
   initIndexes(proteo_ptrs);
   initRevIndexes(proteo_ptrs);
