@@ -3,6 +3,7 @@
 
 #include "base/logger.hpp"
 #include "base/prot_mod.hpp"
+#include "base/prot_mod_util.hpp"
 #include "base/mass_constant.hpp"
 #include "zeroptmfilter/zero_ptm_comp_shift.hpp"
 
@@ -17,7 +18,7 @@ ZeroPtmCompShift::ZeroPtmCompShift(const ProteoformPtrVec &proteo_ptrs,
   col_num_ = mng_ptr->max_proteoform_mass * scale_;
   proteo_num_ = proteo_ptrs.size();
   //acetylation_ = containNME_ACETYLATION(mng_ptr->prsm_para_ptr_->getAllowProtModPtrVec());
-  prot_mod_ptr_vec_ = mng_ptr_->prsm_para_ptr_->getProtModPtrVec();
+  prot_mod_ptr_vec_ = mng_ptr->prsm_para_ptr_->getProtModPtrVec();
   initProteoformBeginEnds(proteo_ptrs);
   initIndexes(proteo_ptrs);
   initRevIndexes(proteo_ptrs);
@@ -29,6 +30,7 @@ ZeroPtmCompShift::ZeroPtmCompShift(const ProteoformPtrVec &proteo_ptrs,
 ZeroPtmCompShift::~ZeroPtmCompShift(){
   delete[] proteo_row_begins_;
   delete[] proteo_row_ends_;
+  delete[] acet_mods_;
   delete[] row_proteo_ids_;
   delete[] col_index_begins_;
   delete[] col_index_ends_;
@@ -43,11 +45,14 @@ inline void ZeroPtmCompShift::initProteoformBeginEnds(const ProteoformPtrVec &pr
   proteo_row_begins_ = new int[proteo_ptrs.size()];
   //no need to init
   proteo_row_ends_ = new int[proteo_ptrs.size()];
+  acet_mods_ = new ProtModPtr[proteo_ptrs.size()]; 
   int  pnt = 0;
   for(size_t i=0; i< proteo_ptrs.size(); i++){
     proteo_row_begins_[i] = pnt;
     int len = proteo_ptrs[i]->getResSeqPtr()->getLen() ;
-    if (acetylation_) {
+    ResiduePtrVec res_ptr_vec = proteo_ptrs[i]->getResSeqPtr()->getResidues();
+    acet_mods_[i] = ProtModUtil::findNME_Acetylation(prot_mod_ptr_vec_, res_ptr_vec);
+    if (acet_mods_[i] != nullptr) {
       len++;
     }
     proteo_row_ends_[i] = pnt + len - 1;
@@ -63,11 +68,11 @@ inline void ZeroPtmCompShift::initProteoformBeginEnds(const ProteoformPtrVec &pr
   }
 }
 
-inline void ZeroPtmCompShift::updateColumnMatchNums(ProteoformPtr proteo_ptr, 
+inline void ZeroPtmCompShift::updateColumnMatchNums(ProteoformPtr proteo_ptr, ProtModPtr acet_mod, 
                                                     int* col_match_nums) {
   std::vector<int> masses = proteo_ptr->getBpSpecPtr()->getScaledPrmMasses(scale_);
-  if (acetylation_) {
-    int ace_mass = (int)std::round(- ProtModFactory::getProtModPtr_NME_ACETYLATION()->getProtShift() * scale_);
+  if (acet_mod != nullptr) {
+    int ace_mass = (int)std::round(- acet_mod->getProtShift() * scale_);
     masses.push_back(ace_mass);
     std::sort(masses.begin(), masses.end(),std::less<int>()); 
   }
@@ -96,7 +101,7 @@ inline void ZeroPtmCompShift::initIndexes(const ProteoformPtrVec &proteo_ptrs){
   col_index_ends_ = new int[col_num_];
 
   for(size_t i =0; i<proteo_ptrs.size(); i++){
-    updateColumnMatchNums(proteo_ptrs[i], col_match_nums);
+    updateColumnMatchNums(proteo_ptrs[i], acet_mods_[i], col_match_nums);
   }
 
   int pnt = 0;
@@ -116,8 +121,9 @@ inline void ZeroPtmCompShift::initIndexes(const ProteoformPtrVec &proteo_ptrs){
     }
     std::vector<int> masses  
         = proteo_ptrs[i]->getBpSpecPtr()->getScaledPrmMasses(scale_);
-    if (acetylation_) {
-      int ace_mass = (int)std::round(- ProtModFactory::getProtModPtr_NME_ACETYLATION()->getProtShift() * scale_);
+
+    if (acet_mods_[i] != nullptr) {
+      int ace_mass = (int)std::round(- acet_mods_[i]->getProtShift() * scale_);
       masses.push_back(ace_mass);
       std::sort(masses.begin(), masses.end(),std::less<int>()); 
     }
@@ -138,11 +144,11 @@ inline void ZeroPtmCompShift::initIndexes(const ProteoformPtrVec &proteo_ptrs){
   delete[] col_index_pnts;
 }
 
-inline void ZeroPtmCompShift::updateRevColumnMatchNums(ProteoformPtr proteo_ptr, 
+inline void ZeroPtmCompShift::updateRevColumnMatchNums(ProteoformPtr proteo_ptr, ProtModPtr acet_mod, 
                                                       int* col_match_nums) {
   std::vector<int> masses = proteo_ptr->getBpSpecPtr()->getScaledPrmMasses(scale_);
-  if (acetylation_) {
-    int ace_mass = (int)std::round(- ProtModFactory::getProtModPtr_NME_ACETYLATION()->getProtShift() * scale_);
+  if (acet_mod != nullptr) {
+    int ace_mass = (int)std::round(- acet_mod->getProtShift() * scale_);
     masses.push_back(ace_mass);
     std::sort(masses.begin(), masses.end(),std::greater<int>() ); 
   }
@@ -172,7 +178,7 @@ inline void ZeroPtmCompShift::initRevIndexes(const ProteoformPtrVec &proteo_ptrs
   rev_col_index_ends_ = new int[col_num_];
 
   for(size_t i =0; i<proteo_ptrs.size(); i++){
-    updateRevColumnMatchNums(proteo_ptrs[i], rev_col_match_nums);
+    updateRevColumnMatchNums(proteo_ptrs[i], acet_mods_[i], rev_col_match_nums);
   }
 
   int pnt = 0;
@@ -192,8 +198,9 @@ inline void ZeroPtmCompShift::initRevIndexes(const ProteoformPtrVec &proteo_ptrs
     }
     std::vector<int> masses  
         = proteo_ptrs[i]->getBpSpecPtr()->getScaledPrmMasses(scale_);
-    if (acetylation_) {
-      int ace_mass = (int)std::round(- ProtModFactory::getProtModPtr_NME_ACETYLATION()->getProtShift() * scale_);
+
+    if (acet_mods_[i] != nullptr) {
+      int ace_mass = (int)std::round(- acet_mods_[i]->getProtShift() * scale_);
       masses.push_back(ace_mass);
       std::sort(masses.begin(), masses.end(), std::greater<int>()); 
     }
@@ -337,7 +344,7 @@ inline void ZeroPtmCompShift::compShiftScores(short* scores, short* rev_scores, 
     int bgn = proteo_row_begins_[i];
     int end = proteo_row_ends_[i];
     int pref = bgn + 1;
-    if (acetylation_) {
+    if (acet_mods_[i]) {
       pref = bgn + 2;
     }
     if (pref > end) {

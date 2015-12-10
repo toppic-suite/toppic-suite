@@ -1,8 +1,9 @@
-#ifndef ZERO_PTM_FILTER_H_
-#define ZERO_PTM_FILTER_H_
+#ifndef ZERO_PTM_FILTER_ZERO_PTM_FILTER_H_
+#define ZERO_PTM_FILTER_ZERO_PTM_FILTER_H_
 
 #include "base/proteoform.hpp"
 #include "spec/extend_peak.hpp"
+#include "spec/extend_ms.hpp"
 #include "prsm/simple_prsm.hpp"
 #include "zeroptmfilter/zero_ptm_filter_mng.hpp"
 #include "zeroptmfilter/zero_ptm_comp_shift.hpp"

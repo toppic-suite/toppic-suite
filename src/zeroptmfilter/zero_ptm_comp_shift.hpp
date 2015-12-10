@@ -27,6 +27,7 @@ class ZeroPtmCompShift {
   // scale factor
   int scale_;
   //bool acetylation_;
+  ProtModPtrVec prot_mod_ptr_vec_;
   int proteo_num_;
   int col_num_;
 
@@ -34,6 +35,7 @@ class ZeroPtmCompShift {
   // the first row of each proteoform  
   int* proteo_row_begins_;
   int* proteo_row_ends_;
+  ProtModPtr* acet_mods_;
   // the proteoform id of each row
   int* row_proteo_ids_;
 
@@ -50,10 +52,10 @@ class ZeroPtmCompShift {
   std::vector<std::pair<int,int>> top_suff_proteo_scores_;
   std::vector<std::pair<int,int>> top_internal_proteo_scores_;
 
-  void updateColumnMatchNums(ProteoformPtr proteo_ptr, int* col_match_nums);
+  void updateColumnMatchNums(ProteoformPtr proteo_ptr, ProtModPtr acet_mod, int* col_match_nums);
   void initProteoformBeginEnds(const ProteoformPtrVec &proteo_ptrs);
   void initIndexes(const ProteoformPtrVec &proteo_ptrs);
-  void updateRevColumnMatchNums(ProteoformPtr proteo_ptr, int* col_match_nums);
+  void updateRevColumnMatchNums(ProteoformPtr proteo_ptr, ProtModPtr acet_mod, int* col_match_nums);
   void initRevIndexes(const ProteoformPtrVec &proteo_ptrs);
   void compShiftScores(short* scores, short* rev_scores, ZeroPtmFilterMngPtr mng_ptr);
 };
