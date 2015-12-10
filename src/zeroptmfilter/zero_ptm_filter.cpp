@@ -14,8 +14,8 @@ ZeroPtmFilter::ZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
 void ZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec){
   PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
   std::vector<std::pair<int,int>> mass_errors 
-      = getExtendIntMassErrorList(ms_ptr_vec, mng_ptr_->filter_scale_);
-  std::pair<int,int> prec_mass_error = ms_ptr_vec[0]->getHeaderPtr()->getPrecMonoMassMinusWaterError(mng_ptr_->filter_scale_);
+      = ExtendMs::getExtendIntMassErrorList(ms_ptr_vec, mng_ptr_->filter_scale_);
+  std::pair<int,int> prec_mass_error = ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMassMinusWaterError(mng_ptr_->filter_scale_);
   //LOG_DEBUG("start convolution");
   index_ptr_->compConvolution(mass_errors, prec_mass_error, mng_ptr_);
 
@@ -24,7 +24,7 @@ void ZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec){
   int group_spec_num = ms_ptr_vec.size();
   for (size_t i = 0; i < comp_scores.size(); i++) {
     comp_match_ptrs_.push_back( 
-        SimplePrsmPtr(new SimplePrsm(ms_ptr_vec[0]->getHeaderPtr(), group_spec_num,
+        SimplePrsmPtr(new SimplePrsm(ms_ptr_vec[0]->getMsHeaderPtr(), group_spec_num,
                                      proteo_ptrs_[comp_scores[i].first], comp_scores[i].second)));
   }
 
@@ -32,7 +32,7 @@ void ZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec){
   pref_match_ptrs_.clear();
   for (size_t i = 0; i < pref_scores.size(); i++) {
     pref_match_ptrs_.push_back( 
-        SimplePrsmPtr(new SimplePrsm(ms_ptr_vec[0]->getHeaderPtr(), group_spec_num,
+        SimplePrsmPtr(new SimplePrsm(ms_ptr_vec[0]->getMsHeaderPtr(), group_spec_num,
                                      proteo_ptrs_[pref_scores[i].first], pref_scores[i].second)));
   }
 
@@ -40,7 +40,7 @@ void ZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec){
   suff_match_ptrs_.clear();
   for (size_t i = 0; i < suff_scores.size(); i++) {
     suff_match_ptrs_.push_back( 
-        SimplePrsmPtr(new SimplePrsm(ms_ptr_vec[0]->getHeaderPtr(), group_spec_num,
+        SimplePrsmPtr(new SimplePrsm(ms_ptr_vec[0]->getMsHeaderPtr(), group_spec_num,
                                      proteo_ptrs_[suff_scores[i].first], suff_scores[i].second)));
   }
 
@@ -48,7 +48,7 @@ void ZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec){
   internal_match_ptrs_.clear();
   for (size_t i = 0; i < internal_scores.size(); i++) {
     internal_match_ptrs_.push_back( 
-        SimplePrsmPtr(new SimplePrsm(ms_ptr_vec[0]->getHeaderPtr(), group_spec_num,
+        SimplePrsmPtr(new SimplePrsm(ms_ptr_vec[0]->getMsHeaderPtr(), group_spec_num,
                                      proteo_ptrs_[internal_scores[i].first], internal_scores[i].second)));
   }
 

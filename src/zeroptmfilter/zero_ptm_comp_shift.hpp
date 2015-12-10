@@ -1,6 +1,8 @@
 #ifndef ZERO_PTM_FILTER_ZERO_PTM_COMP_SHIFT_HPP_
 #define ZERO_PTM_FILTER_ZERO_PTM_COMP_SHIFT_HPP_
 
+#include <cmath>
+
 #include "base/proteoform.hpp"
 #include "base/base_data.hpp"
 #include "zeroptmfilter/zero_ptm_filter_mng.hpp"

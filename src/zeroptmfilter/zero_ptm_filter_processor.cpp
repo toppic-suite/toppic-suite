@@ -1,8 +1,9 @@
 #include "base/proteoform.hpp"
-#include "base/proteoform_reader.hpp"
+#include "base/proteoform_factory.hpp"
 #include "base/file_util.hpp"
 #include "base/web_logger.hpp"
 #include "spec/msalign_reader.hpp"
+#include "spec/msalign_util.hpp"
 #include "spec/spectrum_set.hpp"
 #include "prsm/simple_prsm_writer.hpp"
 #include "prsm/simple_prsm_str_combine.hpp"
@@ -17,7 +18,7 @@ ZeroPtmFilterProcessor::ZeroPtmFilterProcessor(ZeroPtmFilterMngPtr mng_ptr){
 
 void ZeroPtmFilterProcessor::process(){
   std::string db_file_name = mng_ptr_->prsm_para_ptr_->getSearchDbFileName();
-  DbBlockPtrVec db_block_ptr_vec = readDbBlockIndex(db_file_name);
+  DbBlockPtrVec db_block_ptr_vec = DbBlock::readDbBlockIndex(db_file_name);
 
   for(size_t i=0; i< db_block_ptr_vec.size(); i++){
     std::cout << "Zero PTM filtering block " << (i+1) << " out of " 
@@ -60,15 +61,14 @@ void ZeroPtmFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_
   std::string db_block_file_name = prsm_para_ptr->getSearchDbFileName() 
       + "_" + std::to_string(block_ptr->getBlockIdx());
   ProteoformPtrVec raw_forms 
-      = readFastaToProteoform(db_block_file_name, 
-                              prsm_para_ptr->getFixModResiduePtrVec(),
-                              block_ptr->getSeqIdx());
+      = ProteoformFactory::readFastaToProteoformPtrVec(db_block_file_name, 
+                                                       prsm_para_ptr->getFixModPtrVec());
   ZeroPtmFilterPtr filter_ptr(new ZeroPtmFilter(raw_forms, mng_ptr_));
 
   int group_spec_num = mng_ptr_->prsm_para_ptr_->getGroupSpecNum();
   SpParaPtr sp_para_ptr =  mng_ptr_->prsm_para_ptr_->getSpParaPtr();
   MsAlignReader reader(prsm_para_ptr->getSpectrumFileName(), group_spec_num);
-  std::string output_file_name = basename(prsm_para_ptr->getSpectrumFileName())
+  std::string output_file_name = FileUtil::basename(prsm_para_ptr->getSpectrumFileName())
       + "." + mng_ptr_->output_file_ext_;
   std::string block_str = std::to_string(block_ptr->getBlockIdx());
 
@@ -78,7 +78,7 @@ void ZeroPtmFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_
   SimplePrsmWriter internal_writer(output_file_name + "_INTERNAL_" + block_str);
     
   SpectrumSetPtr spec_set_ptr;
-  int spectrum_num = getSpNum (prsm_para_ptr->getSpectrumFileName());
+  int spectrum_num = MsAlignUtil::getSpNum (prsm_para_ptr->getSpectrumFileName());
   int cnt = 0;
   while((spec_set_ptr = reader.getNextSpectrumSet(sp_para_ptr)) != nullptr){
     cnt+= group_spec_num;
