@@ -15,7 +15,7 @@ void Argument::initArguments() {
   arguments_["spectrumFileName"] = "";
   arguments_["activation"] = "FILE";
   arguments_["searchType"] = "TARGET";
-  arguments_["cysteineProtection"] = "C0";
+  arguments_["fixedMod"] = "";
   arguments_["ptmNumber"] = "2";
   arguments_["errorTolerance"] = "15";
   arguments_["cutoffType"] = "EVALUE";
@@ -31,7 +31,7 @@ void Argument::initArguments() {
   arguments_["local_threshold"] = "0.9";
   arguments_["groupSpectrumNumber"] = "1";
   arguments_["filteringResultNumber"] = "20";
-  arguments_["residueModFileName"]="";
+  //arguments_["residueModFileName"]="";
 }
 
 void Argument::outputArguments(std::ofstream &output) {
@@ -42,18 +42,7 @@ void Argument::outputArguments(std::ofstream &output) {
   output << "Number of spectra in a group: " << arguments_["groupSpectrumNumber"] << std::endl;
   output << "Activation type: " << arguments_["activation"] << std::endl;
   output << "Search type: " << arguments_["searchType"] << std::endl;
-  std::string cysteine_type = arguments_["cysteineProtection"];
-  std::string cysteine_group = "";
-  if (cysteine_type == "C0") {
-    cysteine_group = "None";
-  }
-  else if (cysteine_type == "C57") {
-    cysteine_group = "Carbamidomethylation";
-  }
-  else if (cysteine_type == "C58") {
-    cysteine_group = "Carboxymethylation";
-  }
-  output << "Cysteine protection group: " << cysteine_group << std::endl;
+  output << "fixed modifications: " << arguments_["fixedMod"] << std::endl;
   output << "Maximum number of unexpected PTMs: " << arguments_["ptmNumber"] << std::endl;
   output << "Error tolerance: " << arguments_["errorTolerance"] << " ppm" << std::endl;
   output << "Cutoff type: " << arguments_["cutoffType"] << std::endl;
@@ -66,7 +55,7 @@ void Argument::outputArguments(std::ofstream &output) {
   else {
     output << "E-value computation: Lookup table" << std::endl;
   }
-  output << "Residue modification file name: " << arguments_["residueModFileName"] << std::endl;
+  //output << "Residue modification file name: " << arguments_["residueModFileName"] << std::endl;
   output << std::endl;
 }
 
@@ -86,7 +75,7 @@ void Argument::setArgumentsByConfigFile(const std::string &filename){
       arguments_["spectrumFileName"]=XmlDomUtil::getChildValue(root,"spectrum_file_name",0);
       arguments_["logFileName"]=XmlDomUtil::getChildValue(root,"log_file_name",0);
       arguments_["activation"]=XmlDomUtil::getChildValue(root,"fragmentation_method",0);
-      arguments_["cysteineProtection"]=XmlDomUtil::getChildValue(root,"cysteine_protecting_group",0);
+      arguments_["fixedMod"]=XmlDomUtil::getChildValue(root,"fixed_mod",0);
       arguments_["searchType"]=XmlDomUtil::getChildValue(root,"search_type",0);
       arguments_["ptmNumber"]=XmlDomUtil::getChildValue(root,"shift_number",0);
       arguments_["errorTolerance"]=XmlDomUtil::getChildValue(root,"error_tolerance",0);
@@ -117,7 +106,7 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string spectrum_file_name = "";
   std::string argument_file_name = "";
   std::string activation = "";
-  std::string protection = "";
+  std::string fixed_mod = "";
   std::string ptm_num = "";
   std::string error_tole = "";
   std::string max_ptm_mass = "";
@@ -139,8 +128,8 @@ bool Argument::parse(int argc, char* argv[]) {
         ("help,h", "Print the help message.") 
         ("activation,a", po::value<std::string>(&activation),
          "<CID|HCD|ETD|FILE>. Activation type of tandem mass spectra. When FILE is used, the activation type information is given in the input spectral data file. Default value: FILE.")
-        ("cysteine-protection,c", po::value<std::string> (&protection), 
-         "<C0|C57|C58>. Cysteine protecting group: C0: no modification, C57: Carbamidoemetylation, or C58:Carboxymethylation. Default value: C0.")
+        ("fixed-mod,f", po::value<std::string> (&fixed_mod), 
+         "Fixed modifications: C57: Carbamidoemetylation, C58:Carboxymethylation, or a fixed modification file name.")
         ("decoy,d", "Use a decoy protein database to estimate false discovery rates.")
         ("error-tolerance,e", po::value<std::string> (&error_tole), "<positive integer>. Error tolerance for precursor and fragment masses in PPM. Default value: 15.")
         ("max-ptm,m", po::value<std::string> (&max_ptm_mass), "<positive number>. Maximum absolute value of masses (in Dalton) of unexpected post-translational modifications in proteoforms. Default value: 1000000.")
@@ -156,8 +145,9 @@ bool Argument::parse(int argc, char* argv[]) {
         ("argument-file,f",po::value<std::string>(&argument_file_name),"Argument file name.")
         ("activation,a", po::value<std::string>(&activation),
          "<CID|HCD|ETD|FILE>. The activation type of tandem mass spectra. When FILE is used, the activation type information is given in spectral data file. Default value: FILE.")
-        ("cysteine-protection,c", po::value<std::string> (&protection), 
-         "<C0|C57|C58>. Cysteine protecting group: C0: no modification, C57: Carbamidoemetylation, or C58:Carboxymethylation. Default value: C0.")
+
+        ("fixed-mod,f", po::value<std::string> (&fixed_mod), 
+         "Fixed modifications: C57: Carbamidoemetylation, C58:Carboxymethylation, or a fixed modification file name.")
         ("decoy,d", "Use a decoy protein database to estimate false discovery rates.")
         ("error-tolerance,e", po::value<std::string> (&error_tole), "<int value>. Error tolerance of precursor and fragment masses in PPM. Default value: 15.")
         ("max-ptm,m", po::value<std::string> (&max_ptm_mass), "<positive double value>. Maximum absolute value (in Dalton) of the masses of unexpected PTMs in the identified proteoform. Default value: 1000000.")
@@ -226,8 +216,8 @@ bool Argument::parse(int argc, char* argv[]) {
     else {
       arguments_["databaseFileName"]=arguments_["oriDatabaseFileName"] + "_target";
     }
-    if (vm.count("cysteine-protection")) {
-      arguments_["cysteineProtection"] = protection;
+    if (vm.count("fixed-mod")) {
+      arguments_["fixedMod"] = fixed_mod;
     }
     if (vm.count("ptm-number")) {
       arguments_["ptmNumber"] = ptm_num;
@@ -302,11 +292,13 @@ bool Argument::validateArguments() {
     LOG_ERROR("Activation type " << activation << " error! The value should be CID|HCD|ETD|FILE!");
     return false;
   }
+  /*
   std::string protection = arguments_["cysteineProtection"];
   if(protection != "C0" && protection != "C57" && protection != "C58") {
     LOG_ERROR("Cysteine protection group " << protection <<" error! The value should be C0|C57|C58!");
     return false;
   }
+  */
   std::string search_type = arguments_["searchType"];
   if(search_type != "TARGET" && search_type != "TARGET+DECOY"){
     LOG_ERROR("Search type " << search_type << " error! The value should be TARGET|TARGET+DECOY!");

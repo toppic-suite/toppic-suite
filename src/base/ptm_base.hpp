@@ -26,6 +26,8 @@ class PtmBase {
   static bool isEmptyPtmPtr(PtmPtr ptm_ptr) {return ptm_ptr == empty_ptm_ptr_;}
 
   static PtmPtr getPtmPtr_Acetylation() {return acetylation_ptr_;}
+  static PtmPtr getPtmPtr_C57() {return c57_ptr_;}
+  static PtmPtr getPtmPtr_C58() {return c58_ptr_;}
   /**
    * Returns a PTM based on the abbreviation name. Returns null if the
    * abbreviation name does not exist.
@@ -42,8 +44,12 @@ class PtmBase {
   static PtmPtrVec ptm_ptr_vec_;
   static PtmPtr empty_ptm_ptr_;
   static PtmPtr acetylation_ptr_;
+  static PtmPtr c57_ptr_;
+  static PtmPtr c58_ptr_;
 
   static std::string getAcetylationAbbrName() {return "Acetylation";}
+  static std::string getC57AbbrName() {return "Carbamidomethylation";}
+  static std::string getC58AbbrName() {return "Carboxymethyl";}
 };
 
 }

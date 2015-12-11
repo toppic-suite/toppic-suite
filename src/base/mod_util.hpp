@@ -8,6 +8,8 @@ namespace prot {
 class ModUtil {
  public:
   static ModPtrVec readMod(const std::string &file_name);
+
+  static ModPtrVec geneFixedModList(const std::string &str);
 };
 
 }

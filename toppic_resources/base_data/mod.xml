@@ -18,4 +18,40 @@
       </ptm>
     </mod_residue>
   </mod>
+  <mod>
+    <ori_residue>
+      <amino_acid>
+	      <name>Cysteine</name>
+      </amino_acid>
+      <ptm>
+        <abbreviation>No PTM</abbreviation>
+      </ptm>
+    </ori_residue>
+    <mod_residue>
+      <amino_acid>
+	      <name>Cysteine</name>
+      </amino_acid>
+      <ptm>
+        <abbreviation>Carbamidomethylation</abbreviation>
+      </ptm>
+    </mod_residue>
+  </mod>
+  <mod>
+    <ori_residue>
+      <amino_acid>
+	      <name>Cysteine</name>
+      </amino_acid>
+      <ptm>
+        <abbreviation>No PTM</abbreviation>
+      </ptm>
+    </ori_residue>
+    <mod_residue>
+      <amino_acid>
+	      <name>Cysteine</name>
+      </amino_acid>
+      <ptm>
+        <abbreviation>Carboxymethyl</abbreviation>
+      </ptm>
+    </mod_residue>
+  </mod>
 </mod_list>

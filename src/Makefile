@@ -22,7 +22,7 @@ all:
 	cd console; make
 #	cd graph; make
 #	cd graphalign; make
-#	cd test; make
+	cd test; make
 
 clean:
 	cd base; make clean

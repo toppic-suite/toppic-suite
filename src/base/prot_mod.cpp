@@ -7,9 +7,10 @@
 
 namespace prot {
 
-ProtMod::ProtMod(const std::string &name, TruncPtr trunc_ptr, 
-                 ModPtr mod_ptr): 
+ProtMod::ProtMod(const std::string &name, const std::string &type,
+                 TruncPtr trunc_ptr, ModPtr mod_ptr): 
     name_(name),
+    type_(type),
     trunc_ptr_(trunc_ptr),
     mod_ptr_(mod_ptr) {
       mod_pos_ = trunc_ptr->getTruncLen();
@@ -19,6 +20,7 @@ ProtMod::ProtMod(const std::string &name, TruncPtr trunc_ptr,
 
 ProtMod::ProtMod(xercesc::DOMElement* element) { 
   name_ = XmlDomUtil::getChildValue(element, "name", 0);
+  type_ = XmlDomUtil::getChildValue(element, "type", 0);
   std::string trunc_element_name = Trunc::getXmlElementName();
   xercesc::DOMElement* trunc_element 
       = XmlDomUtil::getChildElement(element, trunc_element_name.c_str(), 0);
