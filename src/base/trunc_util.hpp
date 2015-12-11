@@ -8,8 +8,6 @@ namespace prot {
 
 class TruncUtil {
  public:
-  static bool isSameTrunc(TruncPtr trunc_ptr, const ResiduePtrVec& res_ptr_vec, int len);
-
   static bool isValidTrunc(TruncPtr trunc_ptr, const ResiduePtrVec & res_ptr_vec);
 };
 

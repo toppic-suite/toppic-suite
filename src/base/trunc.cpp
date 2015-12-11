@@ -6,20 +6,24 @@
 namespace prot {
 
 Trunc::Trunc(const std::string &name, int trunc_len, 
-             const std::string &residue_str) {
+             const std::string &trunc_residues,
+             const std::string &allow_first_remain_residues) {
   name_ = name;
   trunc_len_ = trunc_len;
-  residue_ptr_vec_ = ResidueUtil::convertStrToResiduePtrVec(residue_str);
-  shift_ = -ResidueUtil::compResiduePtrVecMass(residue_ptr_vec_);
+  trunc_residue_ptr_vec_ = ResidueUtil::convertStrToResiduePtrVec(trunc_residues);
+  allow_first_remain_residue_ptrs_ = ResidueUtil::convertStrToResiduePtrVec(allow_first_remain_residues);
+  shift_ = -ResidueUtil::compResiduePtrVecMass(trunc_residue_ptr_vec_);
 }
 
 Trunc::Trunc(xercesc::DOMElement* element) { 
   name_ = XmlDomUtil::getChildValue(element, "name", 0);
   trunc_len_ = XmlDomUtil::getIntChildValue(element, "trunc_len", 0);
-  std::string residue_str = XmlDomUtil::getChildValue(element, "residue_str", 0);
-  LOG_DEBUG( "name " << name_ << " str " << residue_str << " trunc len " << trunc_len_);
-  residue_ptr_vec_ = ResidueUtil::convertStrToResiduePtrVec(residue_str);
-  shift_ = -ResidueUtil::compResiduePtrVecMass(residue_ptr_vec_);
+  std::string trunc_residues = XmlDomUtil::getChildValue(element, "trunc_residues", 0);
+  LOG_DEBUG( "name " << name_ << " str " << trunc_residues << " trunc len " << trunc_len_);
+  trunc_residue_ptr_vec_ = ResidueUtil::convertStrToResiduePtrVec(trunc_residues);
+  std::string allow_first_remain_residues = XmlDomUtil::getChildValue(element, "allow_first_remain_residues", 0);
+  allow_first_remain_residue_ptrs_ = ResidueUtil::convertStrToResiduePtrVec(allow_first_remain_residues);
+  shift_ = -ResidueUtil::compResiduePtrVecMass(trunc_residue_ptr_vec_);
 }
 
 std::string Trunc::getNameFromXml(xercesc::DOMElement * element) {

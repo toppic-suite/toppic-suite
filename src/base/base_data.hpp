@@ -11,6 +11,7 @@
 namespace prot {
 
 class BaseData {
+ public:
   static std::string getBaseDataDir() {return "toppic_resources/base_data";}
 
   static std::string getBaseDataConfigFileName() {return "base_data_config.xml";}

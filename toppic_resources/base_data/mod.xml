@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<mod_list>
+  <mod>
+    <ori_residue>
+      <amino_acid>
+        <name>None</name>
+      </amino_acid>
+      <ptm>
+        <abbreviation>No PTM</abbreviation>
+      </ptm>
+    </ori_residue>
+    <mod_residue>
+      <amino_acid>
+        <name>None</name>
+      </amino_acid>
+      <ptm>
+        <abbreviation>No PTM</abbreviation>
+      </ptm>
+    </mod_residue>
+  </mod>
+</mod_list>
