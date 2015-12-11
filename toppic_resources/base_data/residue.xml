@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<residue_list>
+  <residue>
+    <amino_acid>
+      <name>None</name>
+    </amino_acid>
+    <ptm>
+      <abbreviation>No PTM</abbreviation>
+    </ptm>
+  </residue>
+  <residue>
+    <amino_acid>
+      <name>Alanine</name>
+    </amino_acid>
+    <ptm>
+      <abbreviation>No PTM</abbreviation>
+    </ptm>
+  </residue>
+  <residue>
+    <amino_acid>
+      <name>Arginine</name>
+    </amino_acid>
+    <ptm>
+      <abbreviation>No PTM</abbreviation>
+    </ptm>
+  </residue>
+  <residue>
+    <amino_acid>
+      <name>Asparagine</name>
+    </amino_acid>
+    <ptm>
+      <abbreviation>No PTM</abbreviation>
+    </ptm>
+  </residue>
+  <residue>
+    <amino_acid>
+      <name>Aspartic_acid</name>
+    </amino_acid>
+    <ptm>
+      <abbreviation>No PTM</abbreviation>
+    </ptm>
+  </residue>
+  <residue>
+    <amino_acid>
+      <name>Cysteine</name>
+    </amino_acid>
+    <ptm>
+      <abbreviation>No PTM</abbreviation>
+    </ptm>
+  </residue>
+  <residue>
+    <amino_acid>
+      <name>Glutamic_acid</name>
+    </amino_acid>
+    <ptm>
+      <abbreviation>No PTM</abbreviation>
+    </ptm>
+  </residue>
+  <residue>
+    <amino_acid>
+      <name>Glutamine</name>
+    </amino_acid>
+    <ptm>
+      <abbreviation>No PTM</abbreviation>
+    </ptm>
+  </residue>
+  <residue>
+    <amino_acid>
+      <name>Glycine</name>
+    </amino_acid>
+    <ptm>
+      <abbreviation>No PTM</abbreviation>
+    </ptm>
+  </residue>
+  <residue>
+    <amino_acid>
+      <name>Histidine</name>
+    </amino_acid>
+    <ptm>
+      <abbreviation>No PTM</abbreviation>
+    </ptm>
+  </residue>
+  <residue>
+    <amino_acid>
+      <name>Isoleucine</name>
+    </amino_acid>
+    <ptm>
+      <abbreviation>No PTM</abbreviation>
+    </ptm>
+  </residue>
+  <residue>
+    <amino_acid>
+      <name>Leucine</name>
+    </amino_acid>
+    <ptm>
+      <abbreviation>No PTM</abbreviation>
+    </ptm>
+  </residue>
+  <residue>
+    <amino_acid>
+      <name>Lysine</name>
+    </amino_acid>
+    <ptm>
+      <abbreviation>No PTM</abbreviation>
+    </ptm>
+  </residue>
+  <residue>
+    <amino_acid>
+      <name>Methionine</name>
+    </amino_acid>
+    <ptm>
+      <abbreviation>No PTM</abbreviation>
+    </ptm>
+  </residue>
+  <residue>
+    <amino_acid>
+      <name>Phenylalanine</name>
+    </amino_acid>
+    <ptm>
+      <abbreviation>No PTM</abbreviation>
+    </ptm>
+  </residue>
+  <residue>
+    <amino_acid>
+      <name>Proline</name>
+    </amino_acid>
+    <ptm>
+      <abbreviation>No PTM</abbreviation>
+    </ptm>
+  </residue>
+  <residue>
+    <amino_acid>
+      <name>Serine</name>
+    </amino_acid>
+    <ptm>
+      <abbreviation>No PTM</abbreviation>
+    </ptm>
+  </residue>
+  <residue>
+    <amino_acid>
+      <name>Threonine</name>
+    </amino_acid>
+    <ptm>
+      <abbreviation>No PTM</abbreviation>
+    </ptm>
+  </residue>
+  <residue>
+    <amino_acid>
+      <name>Tryptophan</name>
+    </amino_acid>
+    <ptm>
+      <abbreviation>No PTM</abbreviation>
+    </ptm>
+  </residue>
+  <residue>
+    <amino_acid>
+      <name>Tyrosine</name>
+    </amino_acid>
+    <ptm>
+      <abbreviation>No PTM</abbreviation>
+    </ptm>
+  </residue>
+  <residue>
+    <amino_acid>
+      <name>Valine</name>
+    </amino_acid>
+    <ptm>
+      <abbreviation>No PTM</abbreviation>
+    </ptm>
+  </residue>
+  <residue>
+    <amino_acid>
+      <name>Selenocysteine</name>
+    </amino_acid>
+    <ptm>
+      <abbreviation>No PTM</abbreviation>
+    </ptm>
+  </residue>
+  <residue>
+    <amino_acid>
+      <name>Pyrrolysine</name>
+    </amino_acid>
+    <ptm>
+      <abbreviation>No PTM</abbreviation>
+    </ptm>
+  </residue>
+</residue_list>

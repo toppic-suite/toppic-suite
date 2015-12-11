@@ -3,32 +3,27 @@
 
 namespace prot {
 
-bool TruncUtil::isSameTrunc(TruncPtr trunc_ptr, const ResiduePtrVec& res_ptr_vec, int len) {
-  if(trunc_ptr->getTruncLen() != len){
+bool TruncUtil::isValidTrunc(TruncPtr trunc_ptr, const ResiduePtrVec & res_ptr_vec) {
+  //check if trunc acids match N-terminal acids of the protein 
+  int trunc_len = trunc_ptr->getTruncLen();
+  if (trunc_len  >= (int)res_ptr_vec.size()) {
     return false;
   }
-  ResiduePtrVec residue_ptr_vec = trunc_ptr->getResiduePtrVec();
+
+  ResiduePtrVec trunc_residue_ptr_vec = trunc_ptr->getTruncResiduePtrVec();
   for(int i=0;i<trunc_ptr->getTruncLen();i++){
-    if(residue_ptr_vec[i] != res_ptr_vec[i]){
+    if(trunc_residue_ptr_vec[i] != res_ptr_vec[i]){
       return false;
     }
   }
-  return true;
-}
-
-bool TruncUtil::isValidTrunc(TruncPtr trunc_ptr, const ResiduePtrVec & res_ptr_vec) {
-  //check if trunc acids match N-terminal acids of the protein 
-  bool result = true;
-  int trunc_len = trunc_ptr->getTruncLen();
-  if (trunc_len >= (int)res_ptr_vec.size()) {
-    result = false; 
+  // check the second letter for NME
+  ResiduePtrVec allow_first_remain_residues = trunc_ptr->getAllowFirstRemainResiduePtrs();
+  for (size_t i = 0; i < allow_first_remain_residues.size(); i++) {
+    if (res_ptr_vec[trunc_len] == allow_first_remain_residues[i]) {
+      return true;
+    }
   }
-  else {
-    result = isSameTrunc(trunc_ptr, res_ptr_vec, trunc_len);
-  }
-  //LOG_DEBUG("Valid trunc " << result << " trunc len " << trunc_len_ 
-  //          << " seq len " << res_seq_ptr->getLen());
-  return result;
+  return false;
 }
 
 }

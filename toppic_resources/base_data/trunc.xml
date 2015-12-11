@@ -3,11 +3,13 @@
 <truncation>
 	<name>NONE</name>
 	<trunc_len>0</trunc_len>
-	<acid_str></acid_str>
+	<trunc_residues></trunc_residues>
+  <allow_first_remain_residues></allow_first_remain_residues>
 </truncation>
 <truncation>
 	<name>NME</name>
 	<trunc_len>1</trunc_len>
-	<acid_str>M</acid_str>
+	<trunc_residues>M</trunc_residues>
+  <allow_first_remain_residues>ACGPSTV</allow_first_remain_residues>
 </truncation>
 </truncation_list>

@@ -16,6 +16,7 @@
 #include "base/ptm_base.hpp"
 #include "base/residue_base.hpp"
 #include "base/trunc_base.hpp"
+#include "base/mod_base.hpp"
 #include "base/prot_mod_base.hpp"
 #include "base/ion_type_base.hpp"
 #include "base/neutral_loss_base.hpp"
@@ -58,6 +59,13 @@ void BaseData::init(const std::string &exe_dir) {
     LOG_DEBUG("trunc file name: " << trunc_file_name);
     TruncBase::initBase(trunc_file_name);
     LOG_DEBUG("trunc initialized ");
+
+    std::string mod_file_name 
+        = XmlDomUtil::getChildValue(root, "mod_list_file_name", 0);
+    mod_file_name = base_data_dir + separator + mod_file_name;
+    LOG_DEBUG("mod file name: " << mod_file_name);
+    ModBase::initBase(mod_file_name);
+    LOG_DEBUG("mod initialized ");
 
     std::string prot_mod_file_name
         = XmlDomUtil::getChildValue(root, "prot_mod_list_file_name", 0);

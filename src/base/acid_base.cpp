@@ -45,6 +45,7 @@ AcidPtr AcidBase::getAcidPtrByName(const std::string &name) {
       return acid_ptr_vec_[i];
     }
   }
+  LOG_DEBUG( "Acid not found: " + name);
   return AcidPtr(nullptr);
 }
 

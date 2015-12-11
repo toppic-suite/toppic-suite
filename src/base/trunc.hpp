@@ -10,7 +10,8 @@ namespace prot {
 class Trunc {
  public:
   Trunc(const std::string &name, int trunc_len, 
-        const std::string &acid_str);
+        const std::string &trunc_residues,
+        const std::string &allow_first_remain_residues_);
 
   Trunc(xercesc::DOMElement* element); 
 
@@ -18,7 +19,9 @@ class Trunc {
 
   int getTruncLen() {return trunc_len_;}
 
-  const ResiduePtrVec& getResiduePtrVec() {return residue_ptr_vec_;}
+  const ResiduePtrVec& getTruncResiduePtrVec() {return trunc_residue_ptr_vec_;}
+
+  const ResiduePtrVec& getAllowFirstRemainResiduePtrs() {return allow_first_remain_residue_ptrs_;}
 
   double getShift() {return shift_;}
 
@@ -29,7 +32,8 @@ class Trunc {
  private:
   std::string name_;
   int trunc_len_;
-  ResiduePtrVec residue_ptr_vec_;
+  ResiduePtrVec trunc_residue_ptr_vec_;
+  ResiduePtrVec allow_first_remain_residue_ptrs_;
   double shift_;
 };
 

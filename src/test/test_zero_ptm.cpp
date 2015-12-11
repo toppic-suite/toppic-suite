@@ -34,7 +34,7 @@ int zero_ptm_process(int argc, char* argv[]) {
     std::string exe_dir = arguments["executiveDir"];
     std::cout << "Executive file directory is: " << exe_dir << std::endl;
 
-    //initBaseData(exe_dir);
+    BaseData::init(exe_dir);
     
     /*
     LOG_DEBUG("Init base data completed");

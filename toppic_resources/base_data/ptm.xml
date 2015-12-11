@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?> 
-<post_translational_modifications>
-<modification>
+<ptm_list>
+<ptm>
   <name>No PTM</name>
   <abbreviation>No PTM</abbreviation>
   <formula></formula>
@@ -12,8 +12,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere"></residues>
   <rule>all kingdom</rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Phosphorylation</name>
   <abbreviation>Phospho</abbreviation>
   <formula>H O(3) P</formula>
@@ -26,8 +26,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">STY</residues>
   <rule>C is in only Prokaryotes</rule>
-</modification> 
-<modification>
+</ptm> 
+<ptm>
   <name>Acetylation</name>
   <abbreviation>Acetylation</abbreviation>
   <formula>H(2) C(2) O</formula>
@@ -39,8 +39,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">K</residues>
   <rule>all kingdom</rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Trimethylation</name>
   <abbreviation>tri-Me</abbreviation>
   <formula>H(6) C(3)</formula>
@@ -52,8 +52,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">CKRHDENQ</residues>
   <rule>PFYILM in prokaryotes, except p, others in N-terminus after cleavage of signal peptide</rule>
-</modification> 
-<modification>
+</ptm> 
+<ptm>
   <name>Dimethylation</name>
   <abbreviation>di-Me</abbreviation>
   <formula>H(4) C(2)</formula>
@@ -65,8 +65,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">CKRHDENQ</residues>
   <rule>PFYILM in prokaryotes, except p, others in N-terminus after cleavage of signal peptide</rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Hydroxylation</name>
   <abbreviation>Hydroxylation</abbreviation>
   <formula>H(2) O</formula>
@@ -78,8 +78,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">PKDNRY</residues>
   <rule>Eukaryotes</rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Methylation</name>
   <abbreviation>Me</abbreviation>
   <formula>H(2) C</formula>
@@ -91,8 +91,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">CKRHDENQ</residues>
   <rule>PFYILM in prokaryotes, except p, others in N-terminus after cleavage of signal peptide</rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Ubiquitin</name>
   <abbreviation>GlyGly</abbreviation>
   <formula>H(6) C(4) N(2) O(2)</formula>
@@ -104,9 +104,9 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">K</residues>
   <rule></rule>
-</modification>
+</ptm>
 
-<modification>
+<ptm>
   <name>Gamma-carboxyglutamic acid</name>
   <abbreviation>carboxylation</abbreviation>
   <formula>C O(2)</formula>
@@ -118,8 +118,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">E</residues>
   <rule>Eukaryotes</rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Carbamidomethylation</name>
   <abbreviation>Carbamidomethylation</abbreviation>
   <formula>H(3) C(2) N(1) O(1)</formula>
@@ -131,8 +131,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">C</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Iodoacetic acid derivative</name>
   <abbreviation>Carboxymethyl</abbreviation>
   <formula>H(2) C(2) O(2)</formula>
@@ -144,8 +144,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">CKW</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Glucosylation Glycation</name>
   <abbreviation>Glucosylation Glycation</abbreviation>
   <formula>C(6) H(10) O(5)</formula>
@@ -157,8 +157,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">NTK</residues>
   <rule>all kingdom</rule>
-</modification> 
-<modification>
+</ptm> 
+<ptm>
   <name>Glu->Ala substitution</name>
   <abbreviation>Glu->Ala</abbreviation>
   <formula>H(-2) C(-2) O(-2)</formula>
@@ -170,8 +170,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">E</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Lys->Ala substitution</name>
   <abbreviation>Lys->Ala</abbreviation>
   <formula>H(-7) C(-3) N(-1)</formula>
@@ -183,8 +183,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">K</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Asn->Gly substitution</name>
   <abbreviation>Asn->Gly</abbreviation>
   <formula>H(-3) C(-2) N(-1) O(-1)</formula>
@@ -196,8 +196,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">N</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Phe->Val substitution</name>
   <abbreviation>Phe->Val</abbreviation>
   <formula>C(-4)</formula>
@@ -209,8 +209,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">F</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Trp->Phe substitution</name>
   <abbreviation>Trp->Phe</abbreviation>
   <formula>H(-1) C(-2) N(-1)</formula>
@@ -222,8 +222,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">W</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Phe->Leu/Ile substitution</name>
   <abbreviation>Phe->Xle</abbreviation>
   <formula>H(2) C(-3)</formula>
@@ -235,8 +235,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">F</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Thr->Ala substitution</name>
   <abbreviation>Thr->Ala</abbreviation>
   <formula>H(-2) C(-1) O(-1)</formula>
@@ -248,8 +248,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">T</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Ser->Gly substitution</name>
   <abbreviation>Ser->Gly</abbreviation>
   <formula>H(-2) C(-1) O(-1)</formula>
@@ -261,8 +261,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">S</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Val->Ala substitution</name>
   <abbreviation>Val->Ala</abbreviation>
   <formula>H(-4) C(-2)</formula>
@@ -274,8 +274,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">V</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Arg->Lys substitution</name>
   <abbreviation>Arg->Lys</abbreviation>
   <formula>N(-2)</formula>
@@ -287,8 +287,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">R</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Pro->Ala substitution</name>
   <abbreviation>Pro->Ala</abbreviation>
   <formula>H(-2) C(-2)</formula>
@@ -300,8 +300,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">P</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Met->Leu/Ile substitution</name>
   <abbreviation>Met->Xle</abbreviation>
   <formula>H(2) C S(-1)</formula>
@@ -313,8 +313,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">M</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Ser->Ala substitution</name>
   <abbreviation>Ser->Ala</abbreviation>
   <formula>O(-1)</formula>
@@ -326,8 +326,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">S</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Leu/Ile->Val substitution</name>
   <abbreviation>Xle->Val</abbreviation>
   <formula>H(-2) C(-1)</formula>
@@ -339,8 +339,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">I</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Ala->Gly substitution</name>
   <abbreviation>Ala->Gly</abbreviation>
   <formula>H(-2) C(-1)</formula>
@@ -352,8 +352,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">A</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Thr->Ser substitution</name>
   <abbreviation>Thr->Ser</abbreviation>
   <formula>H(-2) C(-1)</formula>
@@ -365,8 +365,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">T</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Glu->Asp substitution</name>
   <abbreviation>Glu->Asp</abbreviation>
   <formula>H(-2) C(-1)</formula>
@@ -378,9 +378,9 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">E</residues>
   <rule></rule>
-</modification>
+</ptm>
 
-<modification>
+<ptm>
   <name>Leu/Ile->Met substitution</name>
   <abbreviation>Xle->Met</abbreviation>
   <formula>H(-2) C(-1) S</formula>
@@ -392,8 +392,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">I</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Ala->Pro substitution</name>
   <abbreviation>Ala->Pro</abbreviation>
   <formula>H(2) C(2)</formula>
@@ -405,9 +405,9 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">A</residues>
   <rule></rule>
-</modification>
+</ptm>
 
-<modification>
+<ptm>
   <name>Ala->Thr substitution</name>
   <abbreviation>Ala->Thr</abbreviation>
   <formula>H(2) C O</formula>
@@ -419,8 +419,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">A</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Gly->Ser substitution</name>
   <abbreviation>Gly->Ser</abbreviation>
   <formula>H(2) C O</formula>
@@ -432,9 +432,9 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">G</residues>
   <rule></rule>
-</modification>
+</ptm>
 
-<modification>
+<ptm>
   <name>Lys->Tyr substitution</name>
   <abbreviation>Lys->Tyr</abbreviation>
   <formula>H(-3) C(3) N(-1) O</formula>
@@ -446,8 +446,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">K</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Phe->Trp substitution</name>
   <abbreviation>Phe->Trp</abbreviation>
   <formula>H C(2) N</formula>
@@ -459,8 +459,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">F</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Val->Phe substitution</name>
   <abbreviation>Val->Phe</abbreviation>
   <formula>C(4)</formula>
@@ -472,8 +472,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">V</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Gly->Asn substitution</name>
   <abbreviation>Gly->Asn</abbreviation>
   <formula>H(3) C(2) N O</formula>
@@ -485,8 +485,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">G</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Ala->Lys substitution</name>
   <abbreviation>Ala->Lys</abbreviation>
   <formula>H(7) C(3) N</formula>
@@ -498,8 +498,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">A</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Ala->Glu substitution</name>
   <abbreviation>Ala->Glu</abbreviation>
   <formula>H(2) C(2) O(2)</formula>
@@ -511,9 +511,9 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">A</residues>
   <rule></rule>
-</modification>
+</ptm>
 
-<modification>
+<ptm>
   <name>Diydroxylation</name>
   <abbreviation>dihydroxy</abbreviation>
   <formula>O(2)</formula>
@@ -525,8 +525,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">YMRKPCFW</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Glutathione disulfide</name>
   <abbreviation>Glutathione</abbreviation>
   <formula>H(15) C(10) N(3) O(6) S</formula>
@@ -538,9 +538,9 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">C</residues>
   <rule></rule>
-</modification>
+</ptm>
 
-<modification>
+<ptm>
   <name>Biotinylation</name>
   <abbreviation>Biotin</abbreviation>
   <formula>H(14) C(10) N(2) O(2) S</formula>
@@ -552,8 +552,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">K</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Fucose</name>
   <abbreviation>Fucose</abbreviation>
   <formula>dHex</formula>
@@ -565,8 +565,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">STN</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Formylation</name>
   <abbreviation>Formyl</abbreviation>
   <formula>C O</formula>
@@ -578,8 +578,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere"></residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Beta-methylthiolation</name>
   <abbreviation>b-methylthiol</abbreviation>
   <formula>H(2) C S</formula>
@@ -591,8 +591,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">CDNK</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Monoglutamyl</name>
   <abbreviation>Glu</abbreviation>
   <formula>H(7) C(5) N O(3)</formula>
@@ -604,8 +604,8 @@
   <residues location="C-term">ARNDCEQGHILKMFPSTWYV</residues>
   <residues location="Anywhere">E</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Diglutamyl</name>
   <abbreviation>GluGlu</abbreviation>
   <formula>H(14) C(10) N(2) O(6)</formula>
@@ -617,8 +617,8 @@
   <residues location="C-term">ARNDCEQGHILKMFPSTWYV</residues>
   <residues location="Anywhere">E</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Thr->Pro substitution</name>
   <abbreviation>Thr->Pro</abbreviation>
   <formula>C O(-1)</formula>
@@ -630,8 +630,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">T</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Glycosyl-L-hydroxyproline</name>
   <abbreviation>glycosyl</abbreviation>
   <formula>H(8) C(5) O(5)</formula>
@@ -643,8 +643,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">P</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Decanoyl</name>
   <abbreviation>decanoyl</abbreviation>
   <formula>H(18) C(10) O</formula>
@@ -656,9 +656,9 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">ST</residues>
   <rule></rule>
-</modification>
+</ptm>
 
-<modification>
+<ptm>
   <name>Cys->Asn substitution</name>
   <abbreviation>Cys->Asn</abbreviation>
   <formula>H C N O S(-1)</formula>
@@ -670,8 +670,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">C</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Asn->Val substitution</name>
   <abbreviation>Asn->Val</abbreviation>
   <formula>H(3) C N(-1) O(-1)</formula>
@@ -683,8 +683,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">N</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Val->Pro substitution</name>
   <abbreviation>Val->Pro</abbreviation>
   <formula>H(-2)</formula>
@@ -696,8 +696,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">V</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>His->Leu/Ile substitution</name>
   <abbreviation>His->Xle</abbreviation>
   <formula>H(4) N(-2)</formula>
@@ -709,9 +709,9 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">H</residues>
   <rule></rule>
-</modification>
+</ptm>
 
-<modification>
+<ptm>
   <name>Leu/Ile->Arg substitution</name>
   <abbreviation>Xle->Arg</abbreviation>
   <formula>H N(3)</formula>
@@ -723,8 +723,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">IL</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Lys->Pro substitution</name>
   <abbreviation>Lys->Pro</abbreviation>
   <formula>H(-5) C(-1) N(-1)</formula>
@@ -736,9 +736,9 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">K</residues>
   <rule></rule>
-</modification>
+</ptm>
 
-<modification>
+<ptm>
   <name>Val->Asn substitution</name>
   <abbreviation>Val->Asn</abbreviation>
   <formula>H(-3) C(-1) N O</formula>
@@ -750,9 +750,9 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">V</residues>
   <rule></rule>
-</modification>
+</ptm>
 
-<modification>
+<ptm>
   <name>Asp->Pro substitution</name>
   <abbreviation>Asp->Pro</abbreviation>
   <formula>H(2) C O(-2)</formula>
@@ -764,9 +764,9 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">D</residues>
   <rule></rule>
-</modification>
+</ptm>
 
-<modification>
+<ptm>
   <name>Leu/Ile->Asp substitution</name>
   <abbreviation>Xle->Asp</abbreviation>
   <formula>H(-6) C(-2) O(2)</formula>
@@ -778,8 +778,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">IL</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Val->Ala substitution</name>
   <abbreviation>Val->Ala</abbreviation>
   <formula>H(-4) C(-2)</formula>
@@ -791,8 +791,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">V</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Thr->Tyr substitution</name>
   <abbreviation>Thr->Tyr</abbreviation>
   <formula>H(2) C(5)</formula>
@@ -804,8 +804,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">T</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Cys->Thr substitution</name>
   <abbreviation>Cys->Thr</abbreviation>
   <formula>H(2) C O S(-1)</formula>
@@ -817,8 +817,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">C</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Ala->Lys substitution</name>
   <abbreviation>Ala->Lys</abbreviation>
   <formula>H(7) C(3) N</formula>
@@ -830,8 +830,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">A</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>Trp->Ser substitution</name>
   <abbreviation>Trp->Ser</abbreviation>
   <formula>H(-5) C(-8) N(-1) O</formula>
@@ -843,9 +843,9 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">W</residues>
   <rule></rule>
-</modification>
+</ptm>
 
-<modification>
+<ptm>
   <name>Cys->Arg substitution</name>
   <abbreviation>Cys->Arg</abbreviation>
   <formula>H(7) C(3) N(3) S(-1)</formula>
@@ -857,8 +857,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">C</residues>
   <rule></rule>
-</modification>
-<modification>
+</ptm>
+<ptm>
   <name>MDA adduct</name>
   <abbreviation>MDA</abbreviation>
   <formula>H(2) C(3) O</formula>
@@ -870,9 +870,8 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">K</residues>
   <rule></rule>
-</modification>
-
-<modification>
+</ptm>
+<ptm>
   <name>Disulfide bond</name>
   <abbreviation>Disulfide bond</abbreviation>
   <formula>H(-2)</formula>
@@ -884,9 +883,9 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">C</residues>
   <rule></rule>
-</modification>
+</ptm>
 
-<modification>
+<ptm>
   <name>Hexose</name>
   <abbreviation>Hexose</abbreviation>
   <formula>H(2) C(3) O</formula>
@@ -898,9 +897,9 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">NTWCRYS</residues>
   <rule></rule>
-</modification>
+</ptm>
 
-<modification>
+<ptm>
   <name>Leu/Ile->Met substitution</name>
   <abbreviation>Xle->Met</abbreviation>
   <formula>H(-2) C(-1) S</formula>
@@ -912,6 +911,5 @@
   <residues location="C-term"></residues>
   <residues location="Anywhere">I</residues>
   <rule></rule>
-</modification>
-
-</post_translational_modifications> 
+</ptm>
+</ptm_list> 
