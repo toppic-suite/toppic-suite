@@ -17,7 +17,7 @@ PrsmPara::PrsmPara(std::map<std::string, std::string> &arguments) {
 
   group_spec_num_ = std::stoi(arguments["groupSpectrumNumber"]);
 
-  fix_mod_list_ = ModUtil::readMod(arguments["fixModification"]);
+  fix_mod_list_ = ModUtil::geneFixedModList(arguments["fixedMod"]);
 
   std::string prot_mod_str = arguments["allowProtMod"];
   std::vector<std::string> strs;
@@ -37,9 +37,9 @@ PrsmPara::PrsmPara(std::map<std::string, std::string> &arguments) {
   PeakTolerancePtr peak_tolerance_ptr = PeakTolerancePtr(
       new PeakTolerance(ppo, use_min_tolerance, min_tolerance));
 
-  /** extend sp parameter */
+  // extend sp parameter 
   double IM = MassConstant::getIsotopeMass();
-  /** the set of offsets used to expand the monoisotopic mass list */
+  // the set of offsets used to expand the monoisotopic mass list 
   std::vector<double> ext_offsets {{0, -IM, IM}};
   double extend_min_mass = 5000;
 

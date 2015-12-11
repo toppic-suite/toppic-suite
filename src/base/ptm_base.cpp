@@ -20,6 +20,8 @@ PtmPtrVec PtmBase::ptm_ptr_vec_;
 PtmPtr PtmBase::empty_ptm_ptr_;
 
 PtmPtr PtmBase::acetylation_ptr_;
+PtmPtr PtmBase::c57_ptr_;
+PtmPtr PtmBase::c58_ptr_;
 
 void PtmBase::initBase(const std::string &file_name) {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
@@ -40,13 +42,17 @@ void PtmBase::initBase(const std::string &file_name) {
       if (ptm_ptr->getAbbrName() == PtmBase::getAcetylationAbbrName()) {
         acetylation_ptr_ = ptm_ptr;
       }
+      if (ptm_ptr->getAbbrName() == PtmBase::getC57AbbrName()) {
+        c57_ptr_ = ptm_ptr;
+      }
+      if (ptm_ptr->getAbbrName() == PtmBase::getC58AbbrName()) {
+        c58_ptr_ = ptm_ptr;
+      }
     }
   }
-  if (empty_ptm_ptr_ == nullptr) {
-    LOG_WARN("No empty ptm!");
-  }
-  if (acetylation_ptr_ == nullptr) {
-    LOG_WARN("No ptm acetylation!");
+  if (empty_ptm_ptr_ == nullptr || acetylation_ptr_ == nullptr 
+      || c57_ptr_ == nullptr || c58_ptr_ == nullptr) {
+    LOG_WARN("ptm missing!");
   }
   std::sort(ptm_ptr_vec_.begin(), ptm_ptr_vec_.end(), Ptm::cmpMassInc);
 }

@@ -3,6 +3,7 @@
 #include <memory>
 #include <algorithm>
 
+#include "base/ptm_base.hpp"
 #include "base/mod_base.hpp"
 #include "base/logger.hpp"
 #include "base/xml_dom.hpp"
@@ -13,6 +14,8 @@ namespace prot {
 
 ModPtrVec ModBase::mod_ptr_vec_;
 ModPtr ModBase::none_mod_ptr_;
+ModPtr ModBase::c57_mod_ptr_;
+ModPtr ModBase::c58_mod_ptr_;
 
 void ModBase::initBase(const std::string &file_name) {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
@@ -30,9 +33,17 @@ void ModBase::initBase(const std::string &file_name) {
           && mod_ptr->getModResiduePtr() ==ResidueBase::getEmptyResiduePtr()) {
         none_mod_ptr_ = mod_ptr;
       }
+      if (mod_ptr->getModResiduePtr()->getAcidPtr()->getOneLetter() == "C"
+          && mod_ptr->getModResiduePtr()->getPtmPtr() == PtmBase::getPtmPtr_C57()) {
+        c57_mod_ptr_ = mod_ptr;
+      }
+      if (mod_ptr->getModResiduePtr()->getAcidPtr()->getOneLetter() == "C"
+          && mod_ptr->getModResiduePtr()->getPtmPtr() == PtmBase::getPtmPtr_C58()) {
+        c58_mod_ptr_ = mod_ptr;
+      }
     }
-    if (none_mod_ptr_ == nullptr) {
-      LOG_WARN("No none mod!");
+    if (none_mod_ptr_ == nullptr || c57_mod_ptr_ == nullptr || c58_mod_ptr_ == nullptr) {
+      LOG_WARN("mod missing!");
     }
   }
 }

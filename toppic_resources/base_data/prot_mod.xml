@@ -2,6 +2,7 @@
 <prot_mod_list>
   <prot_mod>
     <name>NONE</name>
+    <type>NONE</type>
     <truncation>
       <name>NONE</name>
     </truncation>
@@ -26,6 +27,7 @@
   </prot_mod>
   <prot_mod>
     <name>NME</name>
+    <type>NME</type>
     <truncation>
       <name>NME</name>
     </truncation>
@@ -51,6 +53,7 @@
 
   <prot_mod>
     <name>NME_ACETYLATION_ALA</name>
+    <type>NME_ACETYLATION</type>
     <truncation>
       <name>NME</name>
     </truncation>
@@ -76,6 +79,7 @@
 
   <prot_mod>
     <name>NME_ACETYLATION_GLY</name>
+    <type>NME_ACETYLATION</type>
     <truncation>
       <name>NME</name>
     </truncation>
@@ -101,6 +105,7 @@
 
   <prot_mod>
     <name>NME_ACETYLATION_SER</name>
+    <type>NME_ACETYLATION</type>
     <truncation>
       <name>NME</name>
     </truncation>
@@ -126,6 +131,7 @@
 
   <prot_mod>
     <name>NME_ACETYLATION_THR</name>
+    <type>NME_ACETYLATION</type>
     <truncation>
       <name>NME</name>
     </truncation>

@@ -18,6 +18,10 @@ class ModBase {
 
   static ModPtr getNoneModPtr() {return none_mod_ptr_;}
 
+  static ModPtr getC57ModPtr() {return c57_mod_ptr_;}
+
+  static ModPtr getC58ModPtr() {return c58_mod_ptr_;}
+
   static bool isNoneModPtr(ModPtr mod_ptr) {return mod_ptr == none_mod_ptr_;}
 
   static ModPtr getModPtrFromXml(xercesc::DOMElement * element);
@@ -25,6 +29,10 @@ class ModBase {
  private:
   static ModPtrVec mod_ptr_vec_;
   static ModPtr none_mod_ptr_;
+  //C57
+  static ModPtr c57_mod_ptr_;
+  //C58
+  static ModPtr c58_mod_ptr_;
 
   static ModPtr getBaseModPtr(ModPtr mod_ptr);
 };

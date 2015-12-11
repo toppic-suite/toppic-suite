@@ -26,5 +26,21 @@ ModPtrVec ModUtil::readMod(const std::string &file_name) {
   return mod_ptr_vec;
 }
 
+ModPtrVec ModUtil::geneFixedModList(const std::string &str) {
+  if (str == "" || str == "C57" || str == "C58") {
+    ModPtrVec mod_ptr_vec;
+    if (str == "C57") {
+      mod_ptr_vec.push_back(ModBase::getC57ModPtr());
+    }
+    else {
+      mod_ptr_vec.push_back(ModBase::getC58ModPtr());
+    }
+    return mod_ptr_vec;
+  }
+  else {
+    return readMod(str);
+  }
+}
+
 } /* end namespace */
 

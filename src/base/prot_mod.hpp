@@ -9,12 +9,14 @@ namespace prot {
 
 class ProtMod {
  public:
-  ProtMod(const std::string &name, TruncPtr trunc_ptr,
-          ModPtr mod_ptr);
+  ProtMod(const std::string &name, const std::string &type,
+          TruncPtr trunc_ptr, ModPtr mod_ptr);
 
   ProtMod(xercesc::DOMElement* element); 
 
   const std::string& getName() { return name_;};
+
+  const std::string& getType() { return type_;};
 
   TruncPtr getTruncPtr() { return trunc_ptr_;}
 
@@ -34,6 +36,7 @@ class ProtMod {
 
  private:
   std::string name_;
+  std::string type_;
   TruncPtr trunc_ptr_;
   ModPtr mod_ptr_;
   int mod_pos_;

@@ -2,9 +2,12 @@
 #include <iomanip>
 
 #include "base/fasta_reader.hpp"
+#include "base/fasta_util.hpp"
 #include "base/base_data.hpp"
+#include "base/web_logger.hpp"
 
 #include "spec/msalign_reader.hpp"
+#include "spec/msalign_util.hpp"
 
 #include "prsm/prsm_para.hpp"
 #include "prsm/prsm_str_combine.hpp"
@@ -36,7 +39,6 @@ int zero_ptm_process(int argc, char* argv[]) {
 
     BaseData::init(exe_dir);
     
-    /*
     LOG_DEBUG("Init base data completed");
 
     std::string db_file_name = arguments["databaseFileName"];
@@ -54,8 +56,10 @@ int zero_ptm_process(int argc, char* argv[]) {
     }
     // initialize log file 
   	WebLog::init(log_file_name, use_gf, ptm_num);
+    LOG_DEBUG("web log inited");
 
     PrsmParaPtr prsm_para_ptr = PrsmParaPtr(new PrsmPara(arguments));
+    LOG_DEBUG("prsm para inited");
 
     bool decoy = false;
     if (arguments["searchType"] == "TARGET+DECOY") {
@@ -64,12 +68,13 @@ int zero_ptm_process(int argc, char* argv[]) {
     LOG_DEBUG("block size " << arguments["databaseBlockSize"]);
     int db_block_size = std::stoi(arguments["databaseBlockSize"]);
 
-    dbPreprocess (ori_db_file_name, db_file_name, decoy, db_block_size);
-    generateSpIndex(sp_file_name);
+    FastaUtil::dbPreprocess (ori_db_file_name, db_file_name, decoy, db_block_size);
+    MsAlignUtil::geneSpIndex(sp_file_name);
 
     time_t start_s;
     time_t stop_s;
 
+    /*
     time(&start_s);
     std::cout << "Zero PTM filtering started." << std::endl;
     ZeroPtmFilterMngPtr zero_filter_mng_ptr = ZeroPtmFilterMngPtr(new ZeroPtmFilterMng (prsm_para_ptr, "ZERO_FILTER"));
