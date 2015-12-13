@@ -23,8 +23,9 @@ PrsmPara::PrsmPara(std::map<std::string, std::string> &arguments) {
   std::vector<std::string> strs;
   boost::split(strs, prot_mod_str, boost::is_any_of(","));
   for (size_t i = 0; i < strs.size(); i++) {
-    ProtModPtr ptr = ProtModBase::getProtModPtrByName(strs[i]);
-    prot_mod_list_.push_back(ptr);
+    ProtModPtrVec mods = ProtModBase::getProtModPtrByType(strs[i]);
+    LOG_DEBUG("prot mod type " << strs[i] << " num " << mods.size());
+    prot_mod_list_.insert(prot_mod_list_.end(), mods.begin(), mods.end());
   }
 
   std::string activation_name = arguments["activation"];

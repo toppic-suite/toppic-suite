@@ -50,7 +50,6 @@
       </mod_residue>
     </mod>
   </prot_mod>
-
   <prot_mod>
     <name>NME_ACETYLATION_ALA</name>
     <type>NME_ACETYLATION</type>
@@ -76,7 +75,6 @@
       </mod_residue>
     </mod>
   </prot_mod>
-
   <prot_mod>
     <name>NME_ACETYLATION_GLY</name>
     <type>NME_ACETYLATION</type>
@@ -102,7 +100,6 @@
       </mod_residue>
     </mod>
   </prot_mod>
-
   <prot_mod>
     <name>NME_ACETYLATION_SER</name>
     <type>NME_ACETYLATION</type>
@@ -128,7 +125,6 @@
       </mod_residue>
     </mod>
   </prot_mod>
-
   <prot_mod>
     <name>NME_ACETYLATION_THR</name>
     <type>NME_ACETYLATION</type>

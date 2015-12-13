@@ -17,7 +17,9 @@ class ProtModBase {
     return prot_mod_ptr_vec_;
   }
 
-  static ProtModPtr getProtModPtrByName (const std::string &name);
+  static ProtModPtr getProtModPtrByName(const std::string &name);
+
+  static ProtModPtrVec getProtModPtrByType(const std::string &type);
 
   static ProtModPtr getProtModPtr_NONE () {
     return prot_mod_ptr_NONE_;

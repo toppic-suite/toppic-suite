@@ -20,6 +20,7 @@ Proteoform::Proteoform(FastaSeqPtr fasta_seq_ptr, ProtModPtr prot_mod_ptr,
     prot_mod_ptr_(prot_mod_ptr),
     start_pos_(start_pos),
     end_pos_(end_pos),
+    residue_seq_ptr_(res_seq_ptr),
     change_list_(change_ptr_vec) {
       bp_spec_ptr_ = BpSpecPtr(new BpSpec(res_seq_ptr));
       std::sort(change_list_.begin(), change_list_.end(), Change::cmpPosIncrease);

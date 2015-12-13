@@ -17,10 +17,13 @@ ZeroPtmCompShift::ZeroPtmCompShift(const ProteoformPtrVec &proteo_ptrs,
 
   col_num_ = mng_ptr->max_proteoform_mass * scale_;
   proteo_num_ = proteo_ptrs.size();
-  //acetylation_ = containNME_ACETYLATION(mng_ptr->prsm_para_ptr_->getAllowProtModPtrVec());
   prot_mod_ptr_vec_ = mng_ptr->prsm_para_ptr_->getProtModPtrVec();
+
+  LOG_DEBUG("start init");
   initProteoformBeginEnds(proteo_ptrs);
+  LOG_DEBUG("init indexes");
   initIndexes(proteo_ptrs);
+  LOG_DEBUG("init rev indexes");
   initRevIndexes(proteo_ptrs);
 
   LOG_DEBUG("column number: " << col_num_);
@@ -28,9 +31,10 @@ ZeroPtmCompShift::ZeroPtmCompShift(const ProteoformPtrVec &proteo_ptrs,
 }
 
 ZeroPtmCompShift::~ZeroPtmCompShift(){
+  /*
+  LOG_DEBUG("start free"); 
   delete[] proteo_row_begins_;
   delete[] proteo_row_ends_;
-  delete[] acet_mods_;
   delete[] row_proteo_ids_;
   delete[] col_index_begins_;
   delete[] col_index_ends_;
@@ -38,29 +42,33 @@ ZeroPtmCompShift::~ZeroPtmCompShift(){
   delete[] rev_col_index_begins_;
   delete[] rev_col_index_ends_;
   delete[] rev_col_indexes_;
+  LOG_DEBUG("end free"); 
+  */
 }
 
 inline void ZeroPtmCompShift::initProteoformBeginEnds(const ProteoformPtrVec &proteo_ptrs){
   //no need to init
-  proteo_row_begins_ = new int[proteo_ptrs.size()];
-  //no need to init
-  proteo_row_ends_ = new int[proteo_ptrs.size()];
-  acet_mods_ = new ProtModPtr[proteo_ptrs.size()]; 
+  LOG_DEBUG("proteome size " << proteo_ptrs.size());
+  proteo_row_begins_.resize(proteo_ptrs.size());
+  proteo_row_ends_.resize(proteo_ptrs.size());
   int  pnt = 0;
+  LOG_DEBUG("start iteration");
   for(size_t i=0; i< proteo_ptrs.size(); i++){
     proteo_row_begins_[i] = pnt;
     int len = proteo_ptrs[i]->getResSeqPtr()->getLen() ;
     ResiduePtrVec res_ptr_vec = proteo_ptrs[i]->getResSeqPtr()->getResidues();
-    acet_mods_[i] = ProtModUtil::findNME_Acetylation(prot_mod_ptr_vec_, res_ptr_vec);
+    ProtModPtr prot_mod_ptr = ProtModUtil::findNME_Acetylation(prot_mod_ptr_vec_, res_ptr_vec);
+    acet_mods_.push_back(prot_mod_ptr);
     if (acet_mods_[i] != nullptr) {
       len++;
+      //LOG_DEBUG("index " << i << " not nullptr");
     }
     proteo_row_ends_[i] = pnt + len - 1;
     pnt += len;
   }
+  //LOG_DEBUG("end iteration");
   row_num_ = pnt;
-  //no need to init
-  row_proteo_ids_ = new int[row_num_];
+  row_proteo_ids_.resize(row_num_);
   for(size_t i =0; i<proteo_ptrs.size(); i++){
     for(int j= proteo_row_begins_[i]; j<= proteo_row_ends_[i];j++){
       row_proteo_ids_[j] = i;
@@ -69,7 +77,7 @@ inline void ZeroPtmCompShift::initProteoformBeginEnds(const ProteoformPtrVec &pr
 }
 
 inline void ZeroPtmCompShift::updateColumnMatchNums(ProteoformPtr proteo_ptr, ProtModPtr acet_mod, 
-                                                    int* col_match_nums) {
+                                                    std::vector<int> &col_match_nums) {
   std::vector<int> masses = proteo_ptr->getBpSpecPtr()->getScaledPrmMasses(scale_);
   if (acet_mod != nullptr) {
     int ace_mass = (int)std::round(- acet_mod->getProtShift() * scale_);
@@ -90,15 +98,11 @@ inline void ZeroPtmCompShift::updateColumnMatchNums(ProteoformPtr proteo_ptr, Pr
 }
 
 inline void ZeroPtmCompShift::initIndexes(const ProteoformPtrVec &proteo_ptrs){
-  int* col_match_nums = new int[col_num_];
-  // init col_match_nums
-  memset(col_match_nums, 0, col_num_ * sizeof(int));
-  // no need to init
-  int* col_index_pnts = new int[col_num_];
-  // no need to init
-  col_index_begins_ = new int[col_num_];
-  // no need to init
-  col_index_ends_ = new int[col_num_];
+  std::vector<int> col_match_nums (col_num_, 0); 
+  // no need to initalize 
+  std::vector<int> col_index_pnts (col_num_);
+  col_index_begins_.resize(col_num_);
+  col_index_ends_.resize(col_num_);
 
   for(size_t i =0; i<proteo_ptrs.size(); i++){
     updateColumnMatchNums(proteo_ptrs[i], acet_mods_[i], col_match_nums);
@@ -112,7 +116,7 @@ inline void ZeroPtmCompShift::initIndexes(const ProteoformPtrVec &proteo_ptrs){
     pnt += col_match_nums[i];
   }
   // no need to init
-  col_indexes_ = new int[pnt];
+  col_indexes_.resize(pnt, 0);
   LOG_DEBUG("indexes size: "<< pnt);
 
   for(size_t i=0; i<proteo_ptrs.size(); i++){
@@ -140,18 +144,17 @@ inline void ZeroPtmCompShift::initIndexes(const ProteoformPtrVec &proteo_ptrs){
       }
     }
   }
-  delete[] col_match_nums;
-  delete[] col_index_pnts;
 }
 
 inline void ZeroPtmCompShift::updateRevColumnMatchNums(ProteoformPtr proteo_ptr, ProtModPtr acet_mod, 
-                                                      int* col_match_nums) {
+                                                       std::vector<int> &col_match_nums) {
   std::vector<int> masses = proteo_ptr->getBpSpecPtr()->getScaledPrmMasses(scale_);
+  //LOG_DEBUG("mass lenth " << masses.size());
   if (acet_mod != nullptr) {
     int ace_mass = (int)std::round(- acet_mod->getProtShift() * scale_);
     masses.push_back(ace_mass);
-    std::sort(masses.begin(), masses.end(),std::greater<int>() ); 
   }
+  std::sort(masses.begin(), masses.end(),std::greater<int>() ); 
   for (size_t bgn = 0; bgn < masses.size(); bgn++) {
     for (size_t cur = bgn + 1; cur < masses.size(); cur++) {
       int diff = -(masses[cur] - masses[bgn]);
@@ -167,19 +170,17 @@ inline void ZeroPtmCompShift::updateRevColumnMatchNums(ProteoformPtr proteo_ptr,
 
 
 inline void ZeroPtmCompShift::initRevIndexes(const ProteoformPtrVec &proteo_ptrs){
-  int* rev_col_match_nums = new int[col_num_];
-  // init col_match_nums
-  memset(rev_col_match_nums, 0, col_num_ * sizeof(int));
-  // no need to init
-  int* rev_col_index_pnts = new int[col_num_];
-  // no need to init
-  rev_col_index_begins_ = new int[col_num_];
-  // no need to init
-  rev_col_index_ends_ = new int[col_num_];
+  LOG_DEBUG("start init rev col num " << col_num_);
+  std::vector<int> rev_col_match_nums(col_num_, 0);
+  // no need to initalize
+  std::vector<int> rev_col_index_pnts(col_num_);
+  rev_col_index_begins_.resize(col_num_);
+  rev_col_index_ends_.resize(col_num_);
 
   for(size_t i =0; i<proteo_ptrs.size(); i++){
     updateRevColumnMatchNums(proteo_ptrs[i], acet_mods_[i], rev_col_match_nums);
   }
+  LOG_DEBUG("update ended");
 
   int pnt = 0;
   for(int i=0; i< col_num_; i++){
@@ -189,7 +190,7 @@ inline void ZeroPtmCompShift::initRevIndexes(const ProteoformPtrVec &proteo_ptrs
     pnt += rev_col_match_nums[i];
   }
   // no need to init
-  rev_col_indexes_ = new int[pnt];
+  rev_col_indexes_.resize(pnt);
   LOG_DEBUG("indexes size: "<< pnt);
 
   for(size_t i=0; i<proteo_ptrs.size(); i++){
@@ -202,8 +203,8 @@ inline void ZeroPtmCompShift::initRevIndexes(const ProteoformPtrVec &proteo_ptrs
     if (acet_mods_[i] != nullptr) {
       int ace_mass = (int)std::round(- acet_mods_[i]->getProtShift() * scale_);
       masses.push_back(ace_mass);
-      std::sort(masses.begin(), masses.end(), std::greater<int>()); 
     }
+    std::sort(masses.begin(), masses.end(), std::greater<int>()); 
     for (size_t bgn=0; bgn < masses.size(); bgn++) {
       for (size_t cur = bgn+1; cur < masses.size(); cur++) {
         int diff = -(masses[cur] - masses[bgn]);
@@ -218,15 +219,12 @@ inline void ZeroPtmCompShift::initRevIndexes(const ProteoformPtrVec &proteo_ptrs
       }
     }
   }
-  delete[] rev_col_match_nums;
-  delete[] rev_col_index_pnts;
 }
 
 void ZeroPtmCompShift::compConvolution(const std::vector<std::pair<int,int>> &mass_errors, 
                                        std::pair<int,int> &prec_mass_error, ZeroPtmFilterMngPtr mng_ptr){
 
-  short* scores = new short[row_num_];
-  memset(scores, 0, row_num_ * sizeof(short));
+  std::vector<short> scores(row_num_, 0);
 
   int begin_index;
   int end_index;
@@ -252,11 +250,16 @@ void ZeroPtmCompShift::compConvolution(const std::vector<std::pair<int,int>> &ma
     }
   }
 
-  short* rev_scores = new short[row_num_];
-  memset(rev_scores, 0, row_num_ * sizeof(short));
+  int best_score = 0;
+  for (size_t i = 0; i < scores.size(); i++) {
+    if (scores[i] > best_score) {
+      best_score = scores[i];
+    }
+  }
+  //LOG_DEBUG("\nbest score " << best_score << "\n");
 
+  std::vector<short> rev_scores(row_num_, 0);
   for(size_t i = 0; i < mass_errors.size() - 1; i++){
-
     m = mass_errors[i].first - MassConstant::getWaterMass() * scale_;
     //LOG_DEBUG("REV_SP MASS " << m);
     int left = m-mass_errors[i].second;
@@ -271,11 +274,20 @@ void ZeroPtmCompShift::compConvolution(const std::vector<std::pair<int,int>> &ma
     }
     begin_index = rev_col_index_begins_[left];
     end_index= rev_col_index_ends_[right];
+    //LOG_DEBUG("begin index " << begin_index << " end index " << end_index);
     for(int j=begin_index;j<=end_index;j++){
       rev_scores[rev_col_indexes_[j]]++;
       //LOG_DEBUG("REV ROW INDEX " << rev_col_indexes_[j] << " rev score " << rev_scores[rev_col_indexes_[j]]);
     }
   }
+
+  best_score = 0;
+  for (size_t i = 0; i < rev_scores.size(); i++) {
+    if (rev_scores[i] > best_score) {
+      best_score = rev_scores[i];
+    }
+  }
+  //LOG_DEBUG("best rev score " << best_score << "\n");
 
   // precursor mass 
   m = prec_mass_error.first;
@@ -285,7 +297,7 @@ void ZeroPtmCompShift::compConvolution(const std::vector<std::pair<int,int>> &ma
     left=0;
   }
   int right = m + prec_mass_error.second;
-  LOG_DEBUG("prec left " << left << " pref right " << right);
+  //LOG_DEBUG("prec left " << left << " pref right " << right);
   if(right >= 0 || right < col_num_){
     // update scores
     begin_index = col_index_begins_[left];
@@ -296,23 +308,22 @@ void ZeroPtmCompShift::compConvolution(const std::vector<std::pair<int,int>> &ma
     // update rev scores
     begin_index = rev_col_index_begins_[left];
     end_index= rev_col_index_ends_[right];
-    LOG_DEBUG("rev begin index " << begin_index << " rev end index " << end_index);
+    //LOG_DEBUG("rev begin index " << begin_index << " rev end index " << end_index);
     for(int j=begin_index;j<=end_index;j++){
       rev_scores[rev_col_indexes_[j]] += PRECURSOR_MATCH_SCORE;
-      LOG_DEBUG("rev row index " << rev_col_indexes_[j] << " rev score " << rev_scores[rev_col_indexes_[j]]);
+      //LOG_DEBUG("rev row index " << rev_col_indexes_[j] << " rev score " << rev_scores[rev_col_indexes_[j]]);
     }
   }
 
   compShiftScores(scores, rev_scores, mng_ptr);
-  delete[] scores;
-  delete[] rev_scores;
 }
 
 inline bool scoreCompare(const std::pair<int, int> &a, const std::pair<int, int> &b) {
     return a.second > b.second;
 }
 
-inline void addResults(std::vector<std::pair<int,int>> &results, std::vector<std::pair<int,int>> &single_type_results, 
+inline void addResults(std::vector<std::pair<int,int>> &results, 
+                       std::vector<std::pair<int,int>> &single_type_results, 
                        int single_type_num) {
 
   results.clear();
@@ -335,7 +346,9 @@ inline void addResults(std::vector<std::pair<int,int>> &results, std::vector<std
   }
 }
 
-inline void ZeroPtmCompShift::compShiftScores(short* scores, short* rev_scores, ZeroPtmFilterMngPtr mng_ptr){
+inline void ZeroPtmCompShift::compShiftScores(std::vector<short> &scores, 
+                                              std::vector<short> &rev_scores, 
+                                              ZeroPtmFilterMngPtr mng_ptr){
   std::vector<std::pair<int,int>> comp_proteo_scores;
   std::vector<std::pair<int,int>> pref_proteo_scores;
   std::vector<std::pair<int,int>> suff_proteo_scores;
