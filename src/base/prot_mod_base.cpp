@@ -19,6 +19,7 @@ void ProtModBase::initBase(const std::string &file_name) {
     for (int i = 0; i < mod_num; i++) {
       xercesc::DOMElement* element = XmlDomUtil::getChildElement(parent, element_name.c_str(), i);
       ProtModPtr prot_mod_ptr(new ProtMod(element));
+      //LOG_DEBUG("index " << i << " nullptr " << (prot_mod_ptr == nullptr));
       prot_mod_ptr_vec_.push_back(prot_mod_ptr);
       if (prot_mod_ptr->getName() == getName_NONE()) {
         prot_mod_ptr_NONE_ = prot_mod_ptr;
@@ -42,7 +43,19 @@ ProtModPtr ProtModBase::getProtModPtrByName(const std::string &name) {
       return prot_mod_ptr_vec_[i];
     }
   }
+  LOG_WARN("prot mod nullptr");
   return ProtModPtr(nullptr);
+}
+
+ProtModPtrVec ProtModBase::getProtModPtrByType(const std::string &type) {
+  ProtModPtrVec prot_mods;
+  for (size_t i = 0; i < prot_mod_ptr_vec_.size(); i++) {
+    std::string t = prot_mod_ptr_vec_[i]->getType();
+    if (t == type) {
+      prot_mods.push_back(prot_mod_ptr_vec_[i]);
+    }
+  }
+  return prot_mods;
 }
 
 ProtModPtr ProtModBase::getProtModPtrFromXml(xercesc::DOMElement * element) {
