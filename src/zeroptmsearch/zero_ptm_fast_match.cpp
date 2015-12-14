@@ -204,10 +204,10 @@ ZpFastMatchPtr computeInternalMatch(
                                              best_bgn, best_end-1));
 }
 
-ZpFastMatchPtrVec filter(AlignTypePtr align_type_ptr,
-                         const ExtendMsPtrVec &ms_ptr_vec,
-                         const ProteoformPtrVec &proteo_ptrs,
-                         int report_num) {
+ZpFastMatchPtrVec ZeroPtmFastMatch::filter(AlignTypePtr align_type_ptr,
+                                           const ExtendMsPtrVec &ms_ptr_vec,
+                                           const ProteoformPtrVec &proteo_ptrs,
+                                           int report_num) {
   
   ZpFastMatchPtrVec match_vec;
   for (size_t i = 0; i < proteo_ptrs.size(); i++) {

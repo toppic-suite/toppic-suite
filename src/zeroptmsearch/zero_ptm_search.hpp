@@ -9,7 +9,10 @@
 
 namespace prot {
 
-void zeroPtmSearchProcess(ZeroPtmSearchMngPtr mng_ptr);
+class ZeroPtmSearch {
+ public:
+  static void process(ZeroPtmSearchMngPtr mng_ptr);
+};
 
 } /* namespace_prot */
 
