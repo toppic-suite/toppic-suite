@@ -13,7 +13,7 @@ namespace prot {
 
 ZeroPtmSlowMatch::ZeroPtmSlowMatch(const DeconvMsPtrVec &deconv_ms_ptr_vec, 
                                    ZpFastMatchPtr fast_match_ptr,
-                                   ZeroPtmMngPtr mng_ptr): 
+                                   ZeroPtmSearchMngPtr mng_ptr): 
     mng_ptr_(mng_ptr),
     deconv_ms_ptr_vec_(deconv_ms_ptr_vec),
     fast_match_ptr_(fast_match_ptr) {
@@ -73,7 +73,7 @@ PrsmPtr ZeroPtmSlowMatch::geneResult() {
 
 ZpSlowMatchPtrVec ZeroPtmSlowMatch::filter(const DeconvMsPtrVec &deconv_ms_ptr_vec,
                                            const ZpFastMatchPtrVec &fast_match_ptrs,
-                                           ZeroPtmMngPtr mng_ptr) {
+                                           ZeroPtmSearchMngPtr mng_ptr) {
 
   ZpSlowMatchPtrVec slow_matches;
   for (size_t i = 0; i < fast_match_ptrs.size(); i++) {

@@ -21,7 +21,7 @@ namespace prot {
 void zeroPtmSearchOneSpec(SpectrumSetPtr spec_set_ptr, 
                           SimplePrsmPtrVec &simple_prsm_ptr_vec,
                           FastaIndexReaderPtr reader_ptr,
-                          ZeroPtmMngPtr mng_ptr, 
+                          ZeroPtmSearchMngPtr mng_ptr, 
                           AlignTypePtr type_ptr,
                           PrsmPtrVec &prsms) {
 
@@ -66,7 +66,7 @@ void zeroPtmSearchOneSpec(SpectrumSetPtr spec_set_ptr,
   }
 }
 
-void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr){
+void zeroPtmSearchProcess(ZeroPtmSearchMngPtr mng_ptr){
   PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
   std::string input_file_name = FileUtil::basename(sp_file_name)+"."+mng_ptr->input_file_ext_;
