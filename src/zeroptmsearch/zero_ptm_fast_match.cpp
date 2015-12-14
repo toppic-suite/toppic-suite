@@ -45,7 +45,7 @@ double compDiagScr(ExtendMsPtr ms_ptr,
 
 double compScore(ExtendMsPtr ms_ptr, ProteoformPtr proteo_ptr, double n_shift,
                  double c_shift) {
-  MsHeaderPtr header_ptr = ms_ptr->getHeaderPtr();
+  MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
   ActivationPtr activation = header_ptr->getActivationPtr();
   IonTypePtr n_ion_type_ptr = activation->getNIonTypePtr();
   std::vector<double> masses 
@@ -71,7 +71,7 @@ double compScore(const ExtendMsPtrVec &ms_ptr_vec, ProteoformPtr proteo_ptr,
 
 ZpFastMatchPtr computeCompMatch(const ExtendMsPtrVec &ms_ptr_vec, 
                                 ProteoformPtr proteo_ptr) {
-  MsHeaderPtr header_ptr = ms_ptr_vec[0]->getHeaderPtr();
+  MsHeaderPtr header_ptr = ms_ptr_vec[0]->getMsHeaderPtr();
   double max_error = header_ptr->getErrorTolerance();
   double res_sum_mass = header_ptr->getPrecMonoMassMinusWater();
   double prot_mass = proteo_ptr->getResSeqPtr()->getResMassSum();
@@ -93,18 +93,20 @@ ZpFastMatchPtr computePrefixMatch(
     const ExtendMsPtrVec &ms_ptr_vec, ProteoformPtr proteo_ptr) {
   /* check if there is a matched prefix */
   std::vector<double> prms = proteo_ptr->getBpSpecPtr()->getPrmMasses();
-  MsHeaderPtr header_ptr = ms_ptr_vec[0]->getHeaderPtr();
+  MsHeaderPtr header_ptr = ms_ptr_vec[0]->getMsHeaderPtr();
   double max_error = header_ptr->getErrorTolerance();
   double res_sum_mass = header_ptr->getPrecMonoMassMinusWater();
 
   bool is_prefix = false;
   int seq_end = 0;
   for (size_t i = 0; i < prms.size() - 1; i++) {
+    /*
     LOG_TRACE("residue sum mass " << res_sum_mass << " prsm  " << prms[i] 
               << " residue " << proteo_ptr->getResSeqPtr()->getResiduePtr(i)->toString()
               << " error " << std::abs(res_sum_mass - prms[i])
               << " max error " << max_error << " "
               << proteo_ptr->getDbResSeqPtr()->getName());
+              */
     if (std::abs(res_sum_mass - prms[i]) <= max_error) {
       is_prefix = true;
       seq_end = i - 1;
@@ -126,7 +128,7 @@ ZpFastMatchPtr computePrefixMatch(
 ZpFastMatchPtr computeSuffixMatch(
     const ExtendMsPtrVec &ms_ptr_vec, ProteoformPtr proteo_ptr) {
   std::vector<double> prms = proteo_ptr->getBpSpecPtr()->getPrmMasses();
-  MsHeaderPtr header_ptr = ms_ptr_vec[0]->getHeaderPtr();
+  MsHeaderPtr header_ptr = ms_ptr_vec[0]->getMsHeaderPtr();
   double max_error = header_ptr->getErrorTolerance();
   double res_sum_mass = header_ptr->getPrecMonoMassMinusWater();
   double diff = prms[prms.size()-1] - res_sum_mass;
@@ -157,7 +159,7 @@ ZpFastMatchPtr computeSuffixMatch(
 ZpFastMatchPtr computeInternalMatch(
     const ExtendMsPtrVec &ms_ptr_vec, ProteoformPtr proteo_ptr) {
   std::vector<double> prms = proteo_ptr->getBpSpecPtr()->getPrmMasses();
-  MsHeaderPtr header_ptr = ms_ptr_vec[0]->getHeaderPtr();
+  MsHeaderPtr header_ptr = ms_ptr_vec[0]->getMsHeaderPtr();
   double max_error = header_ptr->getErrorTolerance();
   double res_sum_mass = header_ptr->getPrecMonoMassMinusWater();
 
@@ -202,29 +204,29 @@ ZpFastMatchPtr computeInternalMatch(
                                              best_bgn, best_end-1));
 }
 
-ZpFastMatchPtrVec zeroPtmFastFilter(SemiAlignTypePtr semi_align_type_ptr,
-                                    const ExtendMsPtrVec &ms_ptr_vec,
-                                    const ProteoformPtrVec &proteo_ptrs,
-                                    int report_num) {
+ZpFastMatchPtrVec filter(AlignTypePtr align_type_ptr,
+                         const ExtendMsPtrVec &ms_ptr_vec,
+                         const ProteoformPtrVec &proteo_ptrs,
+                         int report_num) {
   
   ZpFastMatchPtrVec match_vec;
   for (size_t i = 0; i < proteo_ptrs.size(); i++) {
-    if (semi_align_type_ptr == SemiAlignTypeFactory::getCompletePtr()) { 
+    if (align_type_ptr == AlignType::COMPLETE) { 
         match_vec.push_back(computeCompMatch(ms_ptr_vec, proteo_ptrs[i]));
     }
-    else if (semi_align_type_ptr == SemiAlignTypeFactory::getPrefixPtr()) { 
+    else if (align_type_ptr == AlignType::PREFIX) { 
         match_vec.push_back(computePrefixMatch(ms_ptr_vec, proteo_ptrs[i]));
     }
-    else if (semi_align_type_ptr == SemiAlignTypeFactory::getSuffixPtr()) { 
+    else if (align_type_ptr == AlignType::SUFFIX) { 
         match_vec.push_back(computeSuffixMatch(ms_ptr_vec, proteo_ptrs[i]));
     }
-    else if (semi_align_type_ptr == SemiAlignTypeFactory::getInternalPtr()) { 
+    else if (align_type_ptr == AlignType::INTERNAL) { 
         match_vec.push_back(computeInternalMatch(ms_ptr_vec, proteo_ptrs[i]));
     }
   }
 
   // sort 
-  std::sort(match_vec.begin(), match_vec.end(), compareZeroPtmFastMatchDown);
+  std::sort(match_vec.begin(), match_vec.end(), ZeroPtmFastMatch::cmpScoreDec);
   //LOG_DEBUG("sort  finished BEST SCORE " << match_vec[0]->getScore());
 
   size_t num = report_num;

@@ -16,7 +16,7 @@ namespace prot {
 SimplePrsm::SimplePrsm(MsHeaderPtr header_ptr, int spectrum_num, 
                        ProteoformPtr proteo_ptr,int score): 
   spectrum_num_(spectrum_num),
-  proteo_ptr_(proteo_ptr),
+  //proteo_ptr_(proteo_ptr),
   score_(score) {
   spectrum_id_ = header_ptr->getId();
   spectrum_scan_ = header_ptr->getScansString();

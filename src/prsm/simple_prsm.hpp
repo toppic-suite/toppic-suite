@@ -23,8 +23,9 @@ class SimplePrsm {
              ProteoformPtr proteo_ptr, int score);
   SimplePrsm(xercesc::DOMElement* element);
   std::string getSeqName(){return seq_name_;}
-  ProteoformPtr getProteoformPtr(){return proteo_ptr_;}
-  ProteoformPtrVec getModProteoformPtrs() {return mod_proteo_ptrs_;}
+  std::string getSeqDesc(){return seq_desc_;}
+  //ProteoformPtr getProteoformPtr(){return proteo_ptr_;}
+  //ProteoformPtrVec getModProteoformPtrs() {return mod_proteo_ptrs_;}
   double getScore(){return score_;}
   int getSpectrumId(){return spectrum_id_;}
   const std::string& getSpectrumScan(){return spectrum_scan_;}
@@ -47,8 +48,8 @@ class SimplePrsm {
   int spectrum_num_;
   double prec_mass_;
 
-  ProteoformPtr proteo_ptr_;
-  ProteoformPtrVec mod_proteo_ptrs_;
+  //ProteoformPtr proteo_ptr_;
+  //ProteoformPtrVec mod_proteo_ptrs_;
   std::string seq_name_;
   std::string seq_desc_;
   double score_;

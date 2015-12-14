@@ -25,6 +25,6 @@ $(OBJ_DIR)/%.o: %.cpp
 	$(CC) -c $(CPPFLAGS) $(INCLUDES) $< -o $@
 
 clean:
-	$(RM) *~ $(MAIN) $(ZERO_PTM_OBJS)
+	$(RM) *~ $(MAIN) $(ZERO_PTM_SEARCH_OBJS)
 
 depend: $(SRCS)

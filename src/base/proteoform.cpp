@@ -36,7 +36,7 @@ Proteoform::Proteoform(xercesc::DOMElement* element, FastaIndexReaderPtr reader_
   std::string seq_desc = FastaSeq::getDescFromXml(seq_element);
 
   ProteoformPtr form_ptr = ProteoformFactory::readFastaToProteoformPtr(reader_ptr, seq_name,
-                                                                            seq_desc, fix_mod_list);
+                                                                       seq_desc, fix_mod_list);
   parseXml(element, form_ptr);
 }
 
