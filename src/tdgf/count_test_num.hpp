@@ -69,19 +69,6 @@ class CountTestNum {
 
 typedef std::shared_ptr<CountTestNum> CountTestNumPtr;
 
-void updateNTermResidueCounts(ResiduePtrVec &residue_list, 
-                              std::vector<double> &counts,
-                              const ProteoformPtrVec &mod_proteo_ptrs);
-
-
-void updateResidueCounts(const ResiduePtrVec &residue_list, 
-                         std::vector<double> &counts,
-                         ProteoformPtr prot_ptr);
-
-ResFreqPtrVec compResidueFreq(const ResiduePtrVec &residue_list, 
-                              const std::vector<double> &counts);
-
-int computeAvgLength(const ResFreqPtrVec &residue_ptrs, double convert_ratio);
 
 }
 
