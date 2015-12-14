@@ -20,6 +20,9 @@
 #include "zeroptmfilter/zero_ptm_filter_mng.hpp"
 #include "zeroptmfilter/zero_ptm_filter_processor.hpp"
 
+#include "zeroptmsearch/zero_ptm_search_mng.hpp"
+#include "zeroptmsearch/zero_ptm_search.hpp"
+
 #include "console/argument.hpp"
 
 namespace prot {
@@ -83,6 +86,15 @@ int zero_ptm_process(int argc, char* argv[]) {
     std::cout << "Zero PTM filtering finished." << std::endl;
     time(&stop_s);
     std::cout <<  "Zero PTM filtering running time: " << difftime(stop_s, start_s)  << " seconds " << std::endl;
+
+
+    time(&start_s);
+    std::cout << "Zero PTM search started." << std::endl;
+    ZeroPtmSearchMngPtr zero_search_mng_ptr = ZeroPtmSearchMngPtr(new ZeroPtmSearchMng (prsm_para_ptr, "ZERO_FILTER", "ZERO"));
+    ZeroPtmSearch::process(zero_search_mng_ptr);
+    std::cout << "Zero PTM search finished." << std::endl;
+    time(&stop_s);
+    std::cout <<  "Zero PTM search running time: " << difftime(stop_s, start_s)  << " seconds " << std::endl;
 
     /*
     std::cout << "Outputting table starts " << std::endl;
