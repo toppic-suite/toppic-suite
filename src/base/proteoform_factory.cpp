@@ -16,6 +16,9 @@
 namespace prot {
 
 ProteoformPtr ProteoformFactory::geneDbProteoformPtr(FastaSeqPtr fasta_seq_ptr, ModPtrVec fix_mod_list) {
+  if (fasta_seq_ptr == nullptr) {
+    return ProteoformPtr(nullptr);
+  }
   ProtModPtr none_prot_mod_ptr = ProtModBase::getProtModPtr_NONE();
   ResiduePtrVec residue_ptrs = ResidueUtil::convertStrToResiduePtrVec(fasta_seq_ptr->getSeq());
   int start_pos = 0;

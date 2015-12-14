@@ -42,5 +42,24 @@ ModPtrVec ModUtil::geneFixedModList(const std::string &str) {
   }
 }
 
+ResiduePtrVec ModUtil::geneResidueListWithMod(ResiduePtrVec residue_list,
+                                              ModPtrVec fix_mod_list) {
+  ResiduePtrVec result;
+  for (size_t i = 0; i < residue_list.size(); i++) {
+    bool mod = false;
+    for (size_t j = 0; j < fix_mod_list.size(); j++) {
+      if (fix_mod_list[j]->getOriResiduePtr() == residue_list[i]) {
+        mod = true;
+        result.push_back(fix_mod_list[j]->getModResiduePtr());
+        break;                 
+      }
+    }
+    if (!mod) {
+      result.push_back(residue_list[i]);
+    }
+  }
+  return result;
+}
+
 } /* end namespace */
 

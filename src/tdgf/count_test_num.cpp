@@ -1,6 +1,9 @@
 #include <cmath>
 
 #include "base/logger.hpp"
+#include "base/fasta_reader.hpp"
+#include "base/mod_util.hpp"
+#include "base/residue_base.hpp"
 #include "base/residue_util.hpp"
 #include "base/proteoform_factory.hpp"
 #include "tdgf/count_test_num.hpp"
@@ -98,19 +101,22 @@ void CountTestNum::init(PrsmParaPtr para_ptr) {
   pref_mass_cnts_ = new double[max_sp_len_]();
   suff_mass_cnts_ = new double[max_sp_len_]();
 
-  ResiduePtrVec residue_list = para_ptr->getFixModResiduePtrVec();
+  ResiduePtrVec non_ptm_residue_list = ResidueBase::getBaseNonePtmResiduePtrVec();
+  ModPtrVec fix_mod_list = para_ptr->getFixModPtrVec();
+  ResiduePtrVec residue_list = ModUtil::geneResidueListWithMod(non_ptm_residue_list, fix_mod_list);
   
   std::vector<double> residue_counts(residue_list.size(), 0.0);
 
   ResiduePtrVec n_term_residue_list;
   std::vector<double> n_term_residue_counts;
 
-  ProteoformReader reader(db_file_name);
-  ProtModPtrVec prot_mods = para_ptr->getAllowProtModPtrVec();
-  ProteoformPtr proteo_ptr = reader.getNextProteoformPtr(residue_list);
+  ProtModPtrVec prot_mods = para_ptr->getProtModPtrVec();
+  FastaReader reader(db_file_name);
+  FastaSeqPtr seq_ptr = reader.getNextSeq();
   
-  while (proteo_ptr != nullptr) {
-    ProteoformPtrVec mod_proteo_ptrs = generateProtModProteoform(proteo_ptr, prot_mods);
+  while (seq_ptr != nullptr) {
+    ProteoformPtr proteo_ptr = ProteoformFactory::geneDbProteoformPtr(seq_ptr, fix_mod_list);
+    ProteoformPtrVec mod_proteo_ptrs = ProteoformFactory::geneProtModProteoform(proteo_ptr, prot_mods);
     for (size_t i = 0; i < mod_proteo_ptrs.size(); i++) {
       // complete
       double m = mod_proteo_ptrs[i]->getResSeqPtr()->getResMassSum();
@@ -140,7 +146,7 @@ void CountTestNum::init(PrsmParaPtr para_ptr) {
     updateNTermResidueCounts(n_term_residue_list, n_term_residue_counts, mod_proteo_ptrs);
 
     // next protein 
-    proteo_ptr = reader.getNextProteoformPtr(residue_list);
+    seq_ptr = reader.getNextSeq();
   }
   // compute residue freq;
   residue_ptrs_ =  compResidueFreq(residue_list, residue_counts);
@@ -168,7 +174,7 @@ inline void CountTestNum::initInternalMassCnt() {
   }
 }
 
-double CountTestNum::compCandNum(SemiAlignTypePtr type_ptr, int index, 
+double CountTestNum::compCandNum(AlignTypePtr type_ptr, int index, 
                                  double ori_mass, double ori_tolerance) {
     double cand_num = 0;
     if (index == 0) {
@@ -182,11 +188,10 @@ double CountTestNum::compCandNum(SemiAlignTypePtr type_ptr, int index,
             cand_num = compPtmRestrictCandNum(type_ptr, index, ori_mass);
         }
         // multiple adjustment 
-        if (type_ptr == SemiAlignTypeFactory::getPrefixPtr() 
-                || type_ptr == SemiAlignTypeFactory::getSuffixPtr()) {
+        if (type_ptr == AlignType::PREFIX || type_ptr == AlignType::SUFFIX) {
             cand_num = cand_num * PREFIX_SUFFIX_ADJUST();
         }
-        else if (type_ptr == SemiAlignTypeFactory::getInternalPtr()) {
+        else if (type_ptr == AlignType::INTERNAL) {
             cand_num = cand_num * INTERNAL_ADJUST();
         }
     }
@@ -197,7 +202,7 @@ double CountTestNum::compCandNum(SemiAlignTypePtr type_ptr, int index,
     return cand_num;
 }
 
-double CountTestNum::compNonPtmCandNum(SemiAlignTypePtr type_ptr, 
+double CountTestNum::compNonPtmCandNum(AlignTypePtr type_ptr, 
                                        double ori_mass, double ori_tolerance) {
   int low = std::floor((ori_mass - ori_tolerance) * convert_ratio_);
   int high = std::ceil((ori_mass + ori_tolerance) * convert_ratio_);
@@ -210,19 +215,19 @@ double CountTestNum::compNonPtmCandNum(SemiAlignTypePtr type_ptr,
   return cand_num;
 }
 
-double CountTestNum::compPtmCandNum (SemiAlignTypePtr type_ptr, double ori_mass) {
+double CountTestNum::compPtmCandNum (AlignTypePtr type_ptr, double ori_mass) {
   double cand_num = 0;
-  if (type_ptr == SemiAlignTypeFactory::getCompletePtr()) {
+  if (type_ptr == AlignType::COMPLETE) {
     cand_num = mod_proteo_lens_.size();
-  } else if (type_ptr == SemiAlignTypeFactory::getPrefixPtr()) {
+  } else if (type_ptr == AlignType::PREFIX) {
     for (size_t i = 0; i < raw_proteo_lens_.size(); i++) {
       cand_num += mod_proteo_lens_[i];
     }
-  } else if (type_ptr == SemiAlignTypeFactory::getSuffixPtr()) {
+  } else if (type_ptr == AlignType::SUFFIX) {
     for (size_t i = 0; i < raw_proteo_lens_.size(); i++) {
       cand_num += raw_proteo_lens_[i];
     }
-  } else if (type_ptr == SemiAlignTypeFactory::getInternalPtr()) {
+  } else if (type_ptr == AlignType::INTERNAL) {
     for (size_t i = 0; i < raw_proteo_lens_.size(); i++) {
       cand_num = cand_num + raw_proteo_lens_[i] * raw_proteo_lens_[i];
     }
@@ -230,7 +235,7 @@ double CountTestNum::compPtmCandNum (SemiAlignTypePtr type_ptr, double ori_mass)
   return cand_num;
 }
 
-double CountTestNum::compPtmRestrictCandNum (SemiAlignTypePtr type_ptr, 
+double CountTestNum::compPtmRestrictCandNum (AlignTypePtr type_ptr, 
                                              int shift_num, double ori_mass) {
   double shift = max_ptm_mass_ * shift_num;
   int low = std::floor((ori_mass - shift) * convert_ratio_);
@@ -239,15 +244,15 @@ double CountTestNum::compPtmRestrictCandNum (SemiAlignTypePtr type_ptr,
   return cand_num;
 }
 
-double CountTestNum::compSeqNum(SemiAlignTypePtr type_ptr, int low, int high) {
+double CountTestNum::compSeqNum(AlignTypePtr type_ptr, int low, int high) {
   double candNum = 0;
-  if (type_ptr == SemiAlignTypeFactory::getCompletePtr()) {
+  if (type_ptr == AlignType::COMPLETE) {
     candNum = compMassNum(comp_mass_cnts_, low, high);
-  } else if (type_ptr == SemiAlignTypeFactory::getPrefixPtr()) {
+  } else if (type_ptr == AlignType::PREFIX) {
     candNum = compMassNum(pref_mass_cnts_, low, high);
-  } else if (type_ptr == SemiAlignTypeFactory::getSuffixPtr()) {
+  } else if (type_ptr == AlignType::SUFFIX) {
     candNum = compMassNum(suff_mass_cnts_, low, high);
-  } else if (type_ptr == SemiAlignTypeFactory::getInternalPtr()) {
+  } else if (type_ptr == AlignType::INTERNAL) {
 	LOG_DEBUG("internal_mass_cnts_ " << internal_mass_cnts_[low]);
     candNum = compMassNum(internal_mass_cnts_, low, high);
   }

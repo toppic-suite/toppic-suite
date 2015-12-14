@@ -43,7 +43,7 @@ ResiduePtr ResidueBase::getBaseResiduePtr(ResiduePtr residue_ptr) {
   return residue_ptr;
 }
 
-ResiduePtrVec ResidueBase::getBaseNonePtmResiduePtr() {
+ResiduePtrVec ResidueBase::getBaseNonePtmResiduePtrVec() {
   ResiduePtrVec result;
   for (size_t i = 0; i < residue_ptr_vec_.size(); i++) {
     if (residue_ptr_vec_[i]->getPtmPtr() == PtmBase::getEmptyPtmPtr()) {
