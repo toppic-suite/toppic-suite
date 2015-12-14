@@ -16,7 +16,7 @@ all:
 #	cd oneptmfilter; make
 #	cd diagfilter; make
 #	cd ptmsearch; make
-	cd tdgf; make
+#	cd tdgf; make
 #	cd prsmview; make	
 	cd console; make
 #	cd graph; make
