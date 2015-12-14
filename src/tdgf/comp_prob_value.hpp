@@ -42,6 +42,10 @@ class CompProbValue {
   double getCondProb(int shift, int thresh);
   double getCondProbOneValue(int shift, int value);
 
+  static void compProbArray(CompProbValuePtr comp_prob_ptr, const ResFreqPtrVec &n_term_residue_ptrs, 
+                            const PrmPeakPtrVec2D &peak_ptr_2d, const PrsmPtrVec &prsm_ptrs, bool strict, 
+                            std::vector<double> &results);
+
  private:
   static int const ORI_PAGE_LEN = 5000;
   static int const ORI_BLOCK_LEN = 50;
@@ -131,9 +135,6 @@ class CompProbValue {
                     bool is_first_layer,  
                     std::vector<std::vector<double>> &cur_results);
 
-  static void compProbArray(CompProbValuePtr comp_prob_ptr, const ResFreqPtrVec &n_term_residue_ptrs, 
-                            const PrmPeakPtrVec2D &peak_ptr_2d, const PrsmPtrVec &prsm_ptrs, bool strict, 
-                            std::vector<double> &results);
 };
 
 }
