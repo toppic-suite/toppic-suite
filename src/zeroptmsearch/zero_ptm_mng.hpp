@@ -10,12 +10,12 @@ namespace prot {
 class ZeroPtmMng {
  public:
   ZeroPtmMng(PrsmParaPtr prsm_para_ptr, 
-          const std::string & input_file_ext,
-          const std::string & output_file_ext) {
-    prsm_para_ptr_ = prsm_para_ptr;
-    input_file_ext_ = input_file_ext;
-    output_file_ext_ = output_file_ext;
-  }
+             const std::string & input_file_ext,
+             const std::string & output_file_ext): 
+      prsm_para_ptr_(prsm_para_ptr), 
+      input_file_ext_(input_file_ext),
+      output_file_ext_(output_file_ext) {
+      }
 
   PrsmParaPtr prsm_para_ptr_;
 

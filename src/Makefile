@@ -12,7 +12,7 @@ all:
 	cd spec; make
 	cd prsm; make
 	cd zeroptmfilter; make
-#	cd zeroptmsearch; make
+	cd zeroptmsearch; make
 #	cd oneptmfilter; make
 #	cd diagfilter; make
 #	cd ptmsearch; make

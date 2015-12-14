@@ -9,6 +9,10 @@
 
 namespace prot {
 
+class ZeroPtmSlowMatch;
+typedef std::shared_ptr<ZeroPtmSlowMatch> ZpSlowMatchPtr;
+typedef std::vector<ZpSlowMatchPtr> ZpSlowMatchPtrVec;
+
 class ZeroPtmSlowMatch {
  public:
   ZeroPtmSlowMatch(const DeconvMsPtrVec &deconv_ms_ptr_vec, 
@@ -19,10 +23,14 @@ class ZeroPtmSlowMatch {
 
   PrsmPtr geneResult();
 
+  static ZpSlowMatchPtrVec filter(const DeconvMsPtrVec &deconv_ms_ptr_vec,
+                                  const ZpFastMatchPtrVec &fast_match_ptrs,
+                                  ZeroPtmMngPtr mng_ptr); 
+
  private:
   ZeroPtmMngPtr mng_ptr_;
-  ZpFastMatchPtr fast_match_ptr_;
   DeconvMsPtrVec deconv_ms_ptr_vec_;
+  ZpFastMatchPtr fast_match_ptr_;
   ProteoformPtr proteoform_ptr_;
 
   double refine_prec_mass_;
@@ -32,21 +40,14 @@ class ZeroPtmSlowMatch {
 
   void compScore (const ExtendMsPtrVec &refine_ms_ptr_vec);
 
+  static bool cmpScoreDec(const ZpSlowMatchPtr &a, 
+                          const ZpSlowMatchPtr &b) {
+    return a->getScore() > b->getScore();
+  }
+
   //double recal_ = 0;
   //bool isValid (double recal, double ppo);
 };
-
-typedef std::shared_ptr<ZeroPtmSlowMatch> ZpSlowMatchPtr;
-typedef std::vector<ZpSlowMatchPtr> ZpSlowMatchPtrVec;
-
-inline bool compareZeroPtmSlowMatchDown(const ZpSlowMatchPtr &a, 
-                                        const ZpSlowMatchPtr &b) {
-  return a->getScore() > b->getScore();
-}
-
-ZpSlowMatchPtrVec zeroPtmSlowFilter(const DeconvMsPtrVec &deconv_ms_ptr_vec,
-                                    const ZpFastMatchPtrVec &fast_match_ptrs,
-                                    ZeroPtmMngPtr mng_ptr); 
 
 }
 
