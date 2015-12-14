@@ -96,19 +96,18 @@ int zero_ptm_process(int argc, char* argv[]) {
     time(&stop_s);
     std::cout <<  "Zero PTM search running time: " << difftime(stop_s, start_s)  << " seconds " << std::endl;
 
-    /*
     std::cout << "Outputting table starts " << std::endl;
-    TableWriterPtr table_out = TableWriterPtr(new TableWriter(prsm_para_ptr, "ZERO_COMPLETE", "ZERO_COMPLETE_TABLE"));
+    PrsmTableWriterPtr table_out = PrsmTableWriterPtr(
+        new PrsmTableWriter(prsm_para_ptr, "ZERO_COMPLETE", "ZERO_COMPLETE_TABLE"));
     table_out->write();
-    table_out = TableWriterPtr(new TableWriter(prsm_para_ptr, "ZERO_PREFIX", "ZERO_PREFIX_TABLE"));
+    table_out = PrsmTableWriterPtr(new PrsmTableWriter(prsm_para_ptr, "ZERO_PREFIX", "ZERO_PREFIX_TABLE"));
     table_out->write();
-    table_out = TableWriterPtr(new TableWriter(prsm_para_ptr, "ZERO_SUFFIX", "ZERO_SUFFIX_TABLE"));
+    table_out = PrsmTableWriterPtr(new PrsmTableWriter(prsm_para_ptr, "ZERO_SUFFIX", "ZERO_SUFFIX_TABLE"));
     table_out->write();
-    table_out = TableWriterPtr(new TableWriter(prsm_para_ptr, "ZERO_INTERNAL", "ZERO_INTERNAL_TABLE"));
+    table_out = PrsmTableWriterPtr(new PrsmTableWriter(prsm_para_ptr, "ZERO_INTERNAL", "ZERO_INTERNAL_TABLE"));
     table_out->write();
     table_out = nullptr;
     std::cout << "Outputting table finished." << std::endl;
-    */
 
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;

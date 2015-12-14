@@ -57,7 +57,7 @@ Ptm::Ptm(xercesc::DOMElement* element) {
 void Ptm::appendAbbrNameToXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent) {
   std::string element_name = Ptm::getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
-  xml_doc->addElement(element, "abbr_name", abbr_name_.c_str());
+  xml_doc->addElement(element, "abbreviation", abbr_name_.c_str());
   parent->appendChild(element);
 }
 

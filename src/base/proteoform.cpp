@@ -41,10 +41,12 @@ Proteoform::Proteoform(xercesc::DOMElement* element, FastaIndexReaderPtr reader_
 }
 
 void Proteoform::parseXml(xercesc::DOMElement* element, ProteoformPtr form_ptr) {
+  LOG_DEBUG("start parse proteoform");
   start_pos_ = XmlDomUtil::getIntChildValue(element, "start_pos", 0);
   end_pos_ = XmlDomUtil::getIntChildValue(element, "end_pos", 0);
   species_id_ = XmlDomUtil::getIntChildValue(element, "species_id", 0);
 
+  LOG_DEBUG("start parse prot mod");
   std::string pm_element_name = ProtMod::getXmlElementName();
   xercesc::DOMElement* pm_element= XmlDomUtil::getChildElement(element,pm_element_name.c_str(),0);
   prot_mod_ptr_ = ProtModBase::getProtModPtrFromXml(pm_element);
@@ -65,6 +67,7 @@ void Proteoform::parseXml(xercesc::DOMElement* element, ProteoformPtr form_ptr) 
 
   bp_spec_ptr_= BpSpecPtr(new BpSpec(residue_seq_ptr_));
 
+  LOG_DEBUG("start parse changes");
   std::string change_element_name = Change::getXmlElementName();
 
   xercesc::DOMElement* change_list_element= XmlDomUtil::getChildElement(element,"change_list",0);
@@ -75,6 +78,7 @@ void Proteoform::parseXml(xercesc::DOMElement* element, ProteoformPtr form_ptr) 
         = XmlDomUtil::getChildElement(change_list_element, change_element_name.c_str(), i);
     change_list_.push_back(ChangePtr(new Change(change_element)));
   }
+  LOG_DEBUG("end parse proteoform");
 }
 
 // get mass of the modified proteoform
