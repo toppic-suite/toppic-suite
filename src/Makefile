@@ -16,8 +16,7 @@ all:
 #	cd oneptmfilter; make
 #	cd diagfilter; make
 #	cd ptmsearch; make
-#	cd tdgf; make
-#	cd poisson; make
+	cd tdgf; make
 #	cd prsmview; make	
 	cd console; make
 #	cd graph; make
@@ -33,7 +32,6 @@ clean:
 	cd oneptmfilter; make clean
 	cd diagfilter; make clean
 	cd ptmsearch; make clean
-# cd poisson; make clean
 	cd tdgf; make clean
 	cd prsmview; make clean
 	cd console; make clean

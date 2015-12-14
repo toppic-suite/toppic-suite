@@ -1,35 +1,12 @@
 #include <cmath>
 
 #include "base/logger.hpp"
-#include "base/proteoform_reader.hpp"
+#include "base/residue_util.hpp"
+#include "base/proteoform_factory.hpp"
 #include "tdgf/count_test_num.hpp"
 #include "tdgf/comp_prob_value.hpp"
 
 namespace prot {
-/*
-CountTestNum::CountTestNum(const ProteoformPtrVec &raw_proteo_ptrs, 
-                           const ProteoformPtrVec &mod_proteo_ptrs,
-                           const ResFreqPtrVec &residue_ptrs,
-                           double convert_ratio,
-                           double max_prec_mass,
-                           double max_ptm_mass) {
-  raw_proteo_ptrs_ = raw_proteo_ptrs;
-  mod_proteo_ptrs_ = mod_proteo_ptrs;
-  convert_ratio_ = convert_ratio;
-  max_ptm_mass_ = max_ptm_mass;
-  max_sp_len_ = (int)std::round(max_prec_mass * convert_ratio_);
-  residue_avg_len_ = computeAvgLength(residue_ptrs, convert_ratio_);
-  LOG_DEBUG("get residue average length");
-  initCompMassCnt(mod_proteo_ptrs);
-  LOG_DEBUG("complete mass count initialized");
-  initPrefMassCnt(mod_proteo_ptrs);
-  LOG_DEBUG("prefix mass count initialized");
-  initSuffMassCnt(raw_proteo_ptrs);
-  LOG_DEBUG("suffix mass count initialized");
-  initInternalMassCnt();
-  LOG_DEBUG("internal mass count initialized");
-}
-*/
 
 CountTestNum::CountTestNum(TdgfMngPtr mng_ptr) {
   convert_ratio_ = mng_ptr->convert_ratio_;
@@ -72,7 +49,7 @@ void updateResidueCounts(const ResiduePtrVec &residue_list,
   ResSeqPtr seq_ptr = prot_ptr->getResSeqPtr();    
   for (int i = 0; i < seq_ptr->getLen(); i++) {
     ResiduePtr res_ptr = seq_ptr->getResiduePtr(i);
-    int pos = findResidue(residue_list, res_ptr);
+    int pos = ResidueUtil::findResidue(residue_list, res_ptr);
     if (pos >= 0) {
       // found 
       counts[pos] = counts[pos]+1;
@@ -102,7 +79,7 @@ void updateNTermResidueCounts(ResiduePtrVec &residue_list, std::vector<double> &
     ResSeqPtr seq_ptr = mod_proteo_ptrs[i]->getResSeqPtr();    
     if (seq_ptr->getLen() >= 1) {
       ResiduePtr res_ptr = seq_ptr->getResiduePtr(0);
-      int pos = findResidue(residue_list, res_ptr);
+      int pos = ResidueUtil::findResidue(residue_list, res_ptr);
       if (pos >= 0) {
         // found 
         counts[pos] = counts[pos]+1;
@@ -177,50 +154,6 @@ void CountTestNum::init(PrsmParaPtr para_ptr) {
   // internal 
   initInternalMassCnt();
 }
-
-/** initialize the four tables for mass counts */
-/*
-inline void CountTestNum::initCompMassCnt(const ProteoformPtrVec &mod_proteo_ptrs) {
-  // init to 0
-  comp_mass_cnts_ = new double[max_sp_len_](); 
-  for (size_t i = 0; i < mod_proteo_ptrs.size(); i++) {
-    double m = mod_proteo_ptrs[i]->getResSeqPtr()->getResMassSum();
-    //System.out.println("mass " + m);
-    comp_mass_cnts_[convertMass(m)] += 1.0;
-  }
-}
-*/
-
-/** initialize the four tables for mass counts */
-/*
-inline void CountTestNum::initPrefMassCnt(const ProteoformPtrVec &mod_proteo_ptrs) {
-  // init to 0
-  pref_mass_cnts_ = new double[max_sp_len_]();
-  for (size_t i = 0; i < mod_proteo_ptrs.size(); i++) {
-    std::vector<double> prm_masses = mod_proteo_ptrs[i]->getBpSpecPtr()->getPrmMasses();
-    // prefix
-    for (size_t j = 1; j < prm_masses.size() - 1; j++) {
-      pref_mass_cnts_[convertMass(prm_masses[j])] += 1.0;
-    }
-  }
-}
-*/
-
-/** initialize the four tables for mass counts */
-/*
-inline void CountTestNum::initSuffMassCnt(const ProteoformPtrVec &raw_proteo_ptrs) {
-  // sequence mass 
-  // init to 0
-  suff_mass_cnts_ = new double[max_sp_len_]();
-  for (size_t i = 0; i < raw_proteo_ptrs.size(); i++) {
-    BreakPointPtrVec break_points = raw_proteo_ptrs[i]->getBpSpecPtr()->getBreakPointPtrVec();
-    // suffix
-    for (size_t j = 1; j < break_points.size() - 1; j++) {
-      suff_mass_cnts_[convertMass(break_points[j]->getSrm())] += 1.0;
-    }
-  }
-}
-*/
 
 inline void CountTestNum::initInternalMassCnt() {
   // init to 0
