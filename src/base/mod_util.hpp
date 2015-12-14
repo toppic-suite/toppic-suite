@@ -10,6 +10,9 @@ class ModUtil {
   static ModPtrVec readMod(const std::string &file_name);
 
   static ModPtrVec geneFixedModList(const std::string &str);
+
+  static ResiduePtrVec geneResidueListWithMod(ResiduePtrVec residue_list,
+                                              ModPtrVec fix_mod_list);
 };
 
 }
