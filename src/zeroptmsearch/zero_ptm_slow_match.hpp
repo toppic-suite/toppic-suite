@@ -3,7 +3,7 @@
 
 #include "spec/deconv_peak.hpp"
 #include "spec/theo_peak.hpp"
-#include "zeroptmsearch/zero_ptm_mng.hpp"
+#include "zeroptmsearch/zero_ptm_search_mng.hpp"
 #include "zeroptmsearch/zero_ptm_fast_match.hpp"
 #include "prsm/prsm.hpp"
 
@@ -17,7 +17,7 @@ class ZeroPtmSlowMatch {
  public:
   ZeroPtmSlowMatch(const DeconvMsPtrVec &deconv_ms_ptr_vec, 
                    ZpFastMatchPtr fast_match_ptr,
-                   ZeroPtmMngPtr mng_ptr);
+                   ZeroPtmSearchMngPtr mng_ptr);
 
   double getScore() {return score_;}
 
@@ -25,10 +25,10 @@ class ZeroPtmSlowMatch {
 
   static ZpSlowMatchPtrVec filter(const DeconvMsPtrVec &deconv_ms_ptr_vec,
                                   const ZpFastMatchPtrVec &fast_match_ptrs,
-                                  ZeroPtmMngPtr mng_ptr); 
+                                  ZeroPtmSearchMngPtr mng_ptr); 
 
  private:
-  ZeroPtmMngPtr mng_ptr_;
+  ZeroPtmSearchMngPtr mng_ptr_;
   DeconvMsPtrVec deconv_ms_ptr_vec_;
   ZpFastMatchPtr fast_match_ptr_;
   ProteoformPtr proteoform_ptr_;
