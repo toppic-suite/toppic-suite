@@ -5,7 +5,7 @@
 
 #include "base/proteoform.hpp"
 #include "prsm/prsm.hpp"
-#include "prsm/prsm_writer.hpp"
+#include "prsm/prsm_xml_writer.hpp"
 #include "tdgf/tdgf_mng.hpp"
 #include "tdgf/comp_pvalue_array.hpp"
 #include "tdgf/comp_pvalue_lookup_table.hpp"
@@ -22,7 +22,7 @@ class EValueProcessor {
   void processOneSpectrum(SpectrumSetPtr spec_set_ptr,
                           PrsmPtrVec &sele_prsm_ptrs,
                           bool is_separate,
-                          PrsmWriter &writer);
+                          PrsmXmlWriter &writer);
 
   void compEvalues(SpectrumSetPtr spectrum_set_ptr, bool is_separate, 
                    PrsmPtrVec &sele_prsm_ptrs);
