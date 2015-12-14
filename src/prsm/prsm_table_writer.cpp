@@ -54,7 +54,9 @@ void PrsmTableWriter::write(){
   FastaIndexReaderPtr seq_reader(new FastaIndexReader(db_file_name));
   ModPtrVec fix_mod_ptr_vec = prsm_para_ptr_->getFixModPtrVec();
   PrsmReader prsm_reader(input_file_name);
+  LOG_DEBUG("start read prsm");
   PrsmPtr prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
+  LOG_DEBUG("end read prsm");
 
   //init variables
   std::string sp_file_name = prsm_para_ptr_->getSpectrumFileName();
@@ -73,7 +75,9 @@ void PrsmTableWriter::write(){
             = ExtendMsFactory::geneMsThreePtrVec(deconv_ms_ptr_vec, sp_para_ptr, new_prec_mass);
         prsm_ptr->setRefineMsVec(extend_ms_ptr_vec);
         writePrsm(file, prsm_ptr);
+        LOG_DEBUG("start read prsm");
         prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
+        LOG_DEBUG("end read prsm");
       }
     }
   }

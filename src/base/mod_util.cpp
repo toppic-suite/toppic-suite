@@ -32,7 +32,7 @@ ModPtrVec ModUtil::geneFixedModList(const std::string &str) {
     if (str == "C57") {
       mod_ptr_vec.push_back(ModBase::getC57ModPtr());
     }
-    else {
+    else if (str == "C58") {
       mod_ptr_vec.push_back(ModBase::getC58ModPtr());
     }
     return mod_ptr_vec;
