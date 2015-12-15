@@ -308,6 +308,14 @@ void CompShift::compZeroPtmConvolution(const std::vector<std::pair<int,int>> &ma
   findTopScores(scores, rev_scores, comp_num, pref_suff_num, inte_num);
 }
 
+void CompShift::compOnePtmConvolution(const std::vector<std::pair<int,int>> &mass_errors, 
+                                      int comp_num, int pref_suff_num, int inte_num) {
+  std::vector<short> scores(row_num_, 0);
+  std::vector<short> rev_scores(row_num_, 0);
+  compScores(mass_errors, scores, rev_scores);
+  findTopScores(scores, rev_scores, comp_num, pref_suff_num, inte_num);
+}
+
 inline bool scoreCompare(const std::pair<int, int> &a, const std::pair<int, int> &b) {
     return a.second > b.second;
 }

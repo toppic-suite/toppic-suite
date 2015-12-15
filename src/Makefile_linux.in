@@ -25,11 +25,11 @@ SPEC_OBJS = $(addprefix $(OBJ_DIR)/, deconv_peak.o deconv_ms_factory.o extend_pe
 
 PRSM_OBJS = $(addprefix $(OBJ_DIR)/, peak_ion_pair.o peak_ion_pair_factory.o peak_ion_pair_util.o prsm.o prsm_coverage.o prsm_cutoff_selector.o prsm_fdr.o prsm_para.o prsm_prob.o prsm_reader.o prsm_species.o prsm_stat.o prsm_str.o prsm_str_combine.o prsm_table_writer.o prsm_top_selector.o prsm_util.o prsm_xml_writer.o simple_prsm.o simple_prsm_reader.o simple_prsm_str.o simple_prsm_str_combine.o simple_prsm_table_writer.o simple_prsm_xml_writer.o)
 
-ZERO_PTM_FILTER_OBJS = $(addprefix $(OBJ_DIR)/, zero_ptm_comp_shift.o zero_ptm_filter.o zero_ptm_filter_processor.o)
+ZERO_PTM_FILTER_OBJS = $(addprefix $(OBJ_DIR)/, comp_shift.o zero_ptm_filter.o zero_ptm_filter_processor.o)
 
 ZERO_PTM_SEARCH_OBJS = $(addprefix $(OBJ_DIR)/, zero_ptm_slow_match.o zero_ptm_fast_match.o zero_ptm_search.o)
 
-ONE_PTM_FILTER_OBJS =  $(addprefix $(OBJ_DIR)/, one_ptm_comp_shift.o one_ptm_filter.o one_ptm_filter_processor.o) 
+ONE_PTM_FILTER_OBJS =  $(addprefix $(OBJ_DIR)/, one_ptm_filter.o one_ptm_filter_processor.o) 
 
 ONE_PTM_SEARCH_OBJS =  $(addprefix $(OBJ_DIR)/, one_ptm_search_processor.o one_ptm_slow_match.o) 
 
