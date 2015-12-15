@@ -41,6 +41,10 @@ class SimplePrsm {
     return a->getScore() > b->getScore();
   }
 
+  static bool cmpNameInc(const SimplePrsmPtr a,SimplePrsmPtr b) {
+    return a->getSeqName() < b->getSeqName();
+  }
+
  private:
   int spectrum_id_;
   std::string spectrum_scan_;

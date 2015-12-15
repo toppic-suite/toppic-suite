@@ -13,7 +13,8 @@ namespace prot {
 class CompShift {
  public:
   CompShift(const ProteoformPtrVec &proteo_ptrs, int scale,
-            double max_proteoform_mass, ProtModPtrVec prot_mod_ptr_vec);
+            double max_proteoform_mass, ProtModPtrVec prot_mod_ptr_vec,
+            bool use_reverse);
 
   ~CompShift();
 
@@ -29,14 +30,15 @@ class CompShift {
   std::vector<std::pair<int,int>> getTopSuffProteoScores() {return top_suff_proteo_scores_;}
   std::vector<std::pair<int,int>> getTopInternalProteoScores() {return top_internal_proteo_scores_;}
 
+  std::vector<std::pair<int,int>> getTopDiagScores() {return top_diag_scores_;}
+
  private:
-  // scale factor
   int scale_;
-  //bool acetylation_;
   ProtModPtrVec prot_mod_ptr_vec_;
+  bool use_reverse_;
+
   int proteo_num_;
   int col_num_;
-
   int row_num_;
   // the first row of each proteoform  
   std::vector<int> proteo_row_begins_;
@@ -58,6 +60,8 @@ class CompShift {
   std::vector<std::pair<int,int>> top_suff_proteo_scores_;
   std::vector<std::pair<int,int>> top_internal_proteo_scores_;
 
+  std::vector<std::pair<int,int>> top_diag_scores_;
+
   void updateColumnMatchNums(ProteoformPtr proteo_ptr, ProtModPtr acet_mod, 
                              std::vector<int> &col_match_nums);
   void initProteoformBeginEnds(const ProteoformPtrVec &proteo_ptrs);
@@ -67,10 +71,15 @@ class CompShift {
   void initRevIndexes(const ProteoformPtrVec &proteo_ptrs);
 
   void compScores(const std::vector<std::pair<int,int>> &mass_errors,
-                  std::vector<short> &scores, std::vector<short> &rev_scores);
+                  std::vector<short> &scores);
+
+  void compRevScores(const std::vector<std::pair<int,int>> &mass_errors,
+                     std::vector<short> &rev_scores);
 
   void findTopScores(std::vector<short> &scores, std::vector<short> &rev_scores, 
                      int comp_num, int pref_suff_num, int inte_num);
+
+  void findTopDiagScores(std::vector<short> &scores, int num);
 };
 
 typedef std::shared_ptr<CompShift> CompShiftPtr;

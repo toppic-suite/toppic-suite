@@ -58,11 +58,11 @@ void OnePtmFilterProcessor::process(){
   input_file_exts.push_back(mng_ptr_->output_file_ext_ + "_SUFFIX");
   input_file_exts.push_back(mng_ptr_->output_file_ext_ + "_INTERNAL");
 
-  SimplePrsmStrCombine combine(sp_file_name, input_file_exts, mng_ptr_->output_file_ext_, 
-                               mng_ptr_->one_ptm_filter_result_num_);
-  combine.process();
+  //SimplePrsmStrCombine combine(sp_file_name, input_file_exts, mng_ptr_->output_file_ext_, 
+  //                             mng_ptr_->one_ptm_filter_result_num_);
+  //combine.process();
 
-  std::cout << "One PTM filtering: combining blocks finished." << std::endl; 
+  //std::cout << "One PTM filtering: combining blocks finished." << std::endl; 
 }
 
 void OnePtmFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num) {
