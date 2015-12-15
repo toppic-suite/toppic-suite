@@ -1,24 +1,25 @@
-#ifndef ZERO_PTM_FILTER_ZERO_PTM_COMP_SHIFT_HPP_
-#define ZERO_PTM_FILTER_ZERO_PTM_COMP_SHIFT_HPP_
+#ifndef ZERO_PTM_FILTER_COMP_SHIFT_HPP_
+#define ZERO_PTM_FILTER_COMP_SHIFT_HPP_
 
 #include <cmath>
 
 #include "base/proteoform.hpp"
 #include "base/base_data.hpp"
-#include "zeroptmfilter/zero_ptm_filter_mng.hpp"
 
 namespace prot {
 
 #define PRECURSOR_MATCH_SCORE 10000
 
-class ZeroPtmCompShift {
+class CompShift {
  public:
-  ZeroPtmCompShift(const ProteoformPtrVec &proteo_ptrs, ZeroPtmFilterMngPtr mng_ptr);
+  CompShift(const ProteoformPtrVec &proteo_ptrs, int scale,
+            double max_proteoform_mass, ProtModPtrVec prot_mod_ptr_vec);
 
-  ~ZeroPtmCompShift();
+  ~CompShift();
 
-  void compConvolution(const std::vector<std::pair<int,int>> &mass_errors, 
-                       std::pair<int,int> &prec_mass_error, ZeroPtmFilterMngPtr mng_ptr);
+  void compZeroPtmConvolution(const std::vector<std::pair<int,int>> &mass_errors, 
+                              std::pair<int,int> &prec_mass_error, 
+                              int comp_num, int pref_suff_num, int inte_num);
 
   std::vector<std::pair<int,int>> getTopCompProteoScores() {return top_comp_proteo_scores_;}
   std::vector<std::pair<int,int>> getTopPrefProteoScores() {return top_pref_proteo_scores_;}
@@ -61,13 +62,16 @@ class ZeroPtmCompShift {
   void updateRevColumnMatchNums(ProteoformPtr proteo_ptr, ProtModPtr acet_mod, 
                                 std::vector<int> &col_match_nums);
   void initRevIndexes(const ProteoformPtrVec &proteo_ptrs);
-  void compShiftScores(std::vector<short> &scores, 
-                       std::vector<short> &rev_scores, 
-                       ZeroPtmFilterMngPtr mng_ptr);
+
+  void compScores(const std::vector<std::pair<int,int>> &mass_errors,
+                  std::vector<short> &scores, std::vector<short> &rev_scores);
+
+  void findTopScores(std::vector<short> &scores, std::vector<short> &rev_scores, 
+                     int comp_num, int pref_suff_num, int inte_num);
 };
 
-typedef std::shared_ptr<ZeroPtmCompShift> ZeroPtmCompShiftPtr;
+typedef std::shared_ptr<CompShift> CompShiftPtr;
 
 } /* namespace prot */
 
-#endif /* ZERO_PTM_COMP_SHIFT_HPP_ */
+#endif /* COMP_SHIFT_HPP_ */
