@@ -37,7 +37,7 @@ DIAG_FILTER_OBJS =  $(addprefix $(OBJ_DIR)/, comp_shift.o diag_filter.o diag_fil
 
 PTM_OBJS = $(addprefix $(OBJ_DIR)/, ptm_slow_filter.o comp_shift_low_mem.o ptm_processor.o diagonal_header.o ptm_slow_match.o basic_diag_pair.o diagonal.o dp_pair.o ps_align.o)
 
-TDGF_OBJS = $(addprefix $(OBJ_DIR)/, tdgf_mng.o evalue_processor.o comp_prob_value.o count_test_num.o comp_pvalue_array.o comp_pvalue_lookup_table.o) 
+TDGF_OBJS = $(addprefix $(OBJ_DIR)/, tdgf_mng.o tdgf_util.o evalue_processor.o comp_prob_value.o count_test_num.o comp_pvalue_array.o comp_pvalue_lookup_table.o) 
 
 POISSON_OBJS = $(addprefix $(OBJ_DIR)/, poisson_processor.o poisson_comp_pvalue.o) 
 
