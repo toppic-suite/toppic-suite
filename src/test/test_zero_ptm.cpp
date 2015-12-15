@@ -23,6 +23,9 @@
 #include "zeroptmsearch/zero_ptm_search_mng.hpp"
 #include "zeroptmsearch/zero_ptm_search.hpp"
 
+#include "tdgf/tdgf_mng.hpp"
+#include "tdgf/evalue_processor.hpp"
+
 #include "console/argument.hpp"
 
 namespace prot {
@@ -52,7 +55,6 @@ int zero_ptm_process(int argc, char* argv[]) {
     int n_top = std::stoi(arguments["numOfTopPrsms"]);
     int ptm_num = std::stoi(arguments["ptmNumber"]);
     double max_ptm_mass = std::stod(arguments["maxPtmMass"]);
-    double filtering_result_num = std::stod(arguments["filteringResultNumber"]);
     bool use_gf = false; 
     if (arguments["useGf"] == "true") {
       use_gf = true;
@@ -96,9 +98,41 @@ int zero_ptm_process(int argc, char* argv[]) {
     time(&stop_s);
     std::cout <<  "Zero PTM search running time: " << difftime(stop_s, start_s)  << " seconds " << std::endl;
 
+    time(&start_s);
+    std::cout << "E-value computation started." << std::endl;
+    bool variable_ptm = false;
+    TdgfMngPtr tdgf_mng_ptr = TdgfMngPtr(new TdgfMng (prsm_para_ptr, ptm_num, max_ptm_mass, use_gf,
+                                                      variable_ptm, "ZERO", "EVALUE"));
+    EValueProcessorPtr processor = EValueProcessorPtr(new EValueProcessor(tdgf_mng_ptr));
+    processor->init();
+    // compute E-value for a set of prsms each run 
+    processor->process(false);
+    processor = nullptr;
+    std::cout << "E-value computation finished." << std::endl;
+    time(&stop_s);
+    std::cout <<  "Computing e-values running time: " << difftime(stop_s, start_s)  << " seconds " << std::endl;
+
+    std::cout << "Top PRSM selecting started" << std::endl;
+    PrsmTopSelectorPtr selector = PrsmTopSelectorPtr(
+        new PrsmTopSelector(db_file_name, sp_file_name, "EVALUE", "TOP", n_top));
+    selector->process();
+    selector = nullptr;
+    std::cout << "Top PRSM selecting finished." << std::endl;
+
+    std::cout << "PRSM selecting by cutoff started." << std::endl;
+    std::string cutoff_type = arguments["cutoffType"];
+    double cutoff_value;
+    std::istringstream (arguments["cutoffValue"]) >> cutoff_value;
+    PrsmCutoffSelectorPtr cutoff_selector = PrsmCutoffSelectorPtr(
+        new PrsmCutoffSelector(db_file_name, sp_file_name, "TOP", "CUTOFF_RESULT", 
+                           cutoff_type, cutoff_value));
+    cutoff_selector->process();
+    cutoff_selector = nullptr;
+    std::cout << "PRSM selecting by cutoff finished." << std::endl;
+
     std::cout << "Outputting table starts " << std::endl;
     PrsmTableWriterPtr table_out = PrsmTableWriterPtr(
-        new PrsmTableWriter(prsm_para_ptr, "ZERO_COMPLETE", "ZERO_COMPLETE_TABLE"));
+        new PrsmTableWriter(prsm_para_ptr, "CUTOFF_RESULT", "ZERO_COMPLETE_TABLE"));
     table_out->write();
     table_out = PrsmTableWriterPtr(new PrsmTableWriter(prsm_para_ptr, "ZERO_PREFIX", "ZERO_PREFIX_TABLE"));
     table_out->write();
