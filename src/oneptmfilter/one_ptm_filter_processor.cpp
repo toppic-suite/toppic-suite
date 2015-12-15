@@ -1,10 +1,10 @@
 #include "base/proteoform.hpp"
-#include "base/proteoform_reader.hpp"
+#include "base/proteoform_factory.hpp"
 #include "base/file_util.hpp"
 #include "base/web_logger.hpp"
 #include "spec/msalign_reader.hpp"
 #include "spec/spectrum_set.hpp"
-#include "prsm/simple_prsm_writer.hpp"
+#include "prsm/simple_prsm_xml_writer.hpp"
 #include "prsm/simple_prsm_str_combine.hpp"
 #include "oneptmfilter/one_ptm_filter_processor.hpp"
 #include "oneptmfilter/one_ptm_filter.hpp"
@@ -17,7 +17,7 @@ OnePtmFilterProcessor::OnePtmFilterProcessor(OnePtmFilterMngPtr mng_ptr){
 
 void OnePtmFilterProcessor::process(){
   std::string db_file_name = mng_ptr_->prsm_para_ptr_->getSearchDbFileName();
-  DbBlockPtrVec db_block_ptr_vec = readDbBlockIndex(db_file_name);
+  DbBlockPtrVec db_block_ptr_vec = DbBlock::readDbBlockIndex(db_file_name);
 
   for(size_t i=0; i< db_block_ptr_vec.size(); i++){
     std::cout << "One PTM filtering block " << (i+1) << " out of " 
@@ -34,22 +34,22 @@ void OnePtmFilterProcessor::process(){
 
   SimplePrsmStrCombine comp_combine(sp_file_name, mng_ptr_->output_file_ext_ + "_COMPLETE",
                                     block_num, mng_ptr_->output_file_ext_ + "_COMPLETE", 
-                                    mng_ptr_->one_ptm_filter_result_num_/4 );
+                                    mng_ptr_->comp_num_);
   comp_combine.process();
 
   SimplePrsmStrCombine pref_combine(sp_file_name, mng_ptr_->output_file_ext_ + "_PREFIX",
                                     block_num, mng_ptr_->output_file_ext_ + "_PREFIX", 
-                                    mng_ptr_->one_ptm_filter_result_num_/4 );
+                                    mng_ptr_->pref_suff_num_);
   pref_combine.process();
 
   SimplePrsmStrCombine suff_combine(sp_file_name, mng_ptr_->output_file_ext_ + "_SUFFIX",
                                     block_num, mng_ptr_->output_file_ext_ + "_SUFFIX", 
-                                    mng_ptr_->one_ptm_filter_result_num_/4 );
+                                    mng_ptr_->pref_suff_num_);
   suff_combine.process();
 
   SimplePrsmStrCombine internal_combine(sp_file_name, mng_ptr_->output_file_ext_ + "_INTERNAL",
                                         block_num, mng_ptr_->output_file_ext_ + "_INTERNAL", 
-                                        mng_ptr_->one_ptm_filter_result_num_/4 );
+                                        mng_ptr_->inte_num_);
   internal_combine.process();
 
   std::vector<std::string> input_file_exts;

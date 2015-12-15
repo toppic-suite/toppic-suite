@@ -2,10 +2,10 @@
 #define ONE_PTM_FILTER_H_
 
 #include "base/proteoform.hpp"
-#include "spec/prm_peak.hpp"
+#include "spec/prm_ms.hpp"
 #include "prsm/simple_prsm.hpp"
+#include "zeroptmfilter/comp_shift.hpp"
 #include "oneptmfilter/one_ptm_filter_mng.hpp"
-#include "oneptmfilter/one_ptm_comp_shift.hpp"
 
 namespace prot {
 
@@ -23,7 +23,7 @@ class OnePtmFilter {
  private:
   OnePtmFilterMngPtr mng_ptr_;
   ProteoformPtrVec proteo_ptrs_;
-  OnePtmCompShiftPtr index_ptr_;
+  CompShiftPtr index_ptr_;
   
   SimplePrsmPtrVec comp_match_ptrs_;
   SimplePrsmPtrVec pref_match_ptrs_;

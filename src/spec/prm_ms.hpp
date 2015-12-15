@@ -14,7 +14,7 @@ typedef std::shared_ptr<Ms<PrmPeakPtr>> PrmMsPtr;
 typedef std::vector<PrmMsPtr> PrmMsPtrVec;
 
 class PrmMs {
-
+ public:
   static std::vector<std::pair<int, int>> getIntMassErrorList(const PrmMsPtrVec &prm_ms_ptr_vec, 
                                                               PeakTolerancePtr tole_ptr,
                                                               double scale, bool n_strict, bool c_strict);

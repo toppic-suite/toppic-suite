@@ -18,7 +18,8 @@ void ZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec){
   PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
   std::vector<std::pair<int,int>> mass_errors 
       = ExtendMs::getExtendIntMassErrorList(ms_ptr_vec, mng_ptr_->filter_scale_);
-  std::pair<int,int> prec_mass_error = ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMassMinusWaterError(mng_ptr_->filter_scale_);
+  std::pair<int,int> prec_mass_error 
+      = ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMassMinusWaterError(mng_ptr_->filter_scale_);
   //LOG_DEBUG("start convolution");
   index_ptr_->compZeroPtmConvolution(mass_errors, prec_mass_error, mng_ptr_->comp_num_, 
                                      mng_ptr_->pref_suff_num_, mng_ptr_->inte_num_);
