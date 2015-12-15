@@ -10,7 +10,8 @@
 namespace prot {
 
 CompShift::CompShift(const ProteoformPtrVec &proteo_ptrs, int scale,
-                     double max_proteoform_mass, ProtModPtrVec prot_mod_ptr_vec) {
+                     double max_proteoform_mass, ProtModPtrVec prot_mod_ptr_vec,
+                     bool use_reverse) {
   scale_ = scale;
   LOG_DEBUG("Scale: " << scale_);
   LOG_DEBUG("Proteoform number: " << proteo_ptrs.size());
@@ -18,13 +19,16 @@ CompShift::CompShift(const ProteoformPtrVec &proteo_ptrs, int scale,
   col_num_ = max_proteoform_mass * scale_;
   proteo_num_ = proteo_ptrs.size();
   prot_mod_ptr_vec_ = prot_mod_ptr_vec;
+  use_reverse_ = use_reverse;
 
   LOG_DEBUG("start init");
   initProteoformBeginEnds(proteo_ptrs);
   LOG_DEBUG("init indexes");
   initIndexes(proteo_ptrs);
-  LOG_DEBUG("init rev indexes");
-  initRevIndexes(proteo_ptrs);
+  if (use_reverse_) {
+    LOG_DEBUG("init rev indexes");
+    initRevIndexes(proteo_ptrs);
+  }
 
   LOG_DEBUG("column number: " << col_num_);
   LOG_DEBUG("row number: " << row_num_);
@@ -209,11 +213,10 @@ inline void CompShift::initRevIndexes(const ProteoformPtrVec &proteo_ptrs){
 }
 
 void CompShift::compScores(const std::vector<std::pair<int,int>> &mass_errors,
-                           std::vector<short> &scores, std::vector<short> &rev_scores) {
+                           std::vector<short> &scores) {
   int begin_index;
   int end_index;
   int m;
-
   for(size_t i = 0; i<mass_errors.size(); i++){
     m = mass_errors[i].first;
     // m - errors[i] performs better than m - errors[i] -  errors[bgn_pos]
@@ -233,7 +236,6 @@ void CompShift::compScores(const std::vector<std::pair<int,int>> &mass_errors,
       //LOG_DEBUG("ROW INDEX " << col_indexes_[j] << " score " << scores[col_indexes_[j]]);
     }
   }
-
   //int best_score = 0;
   //for (size_t i = 0; i < scores.size(); i++) {
   //  if (scores[i] > best_score) {
@@ -242,6 +244,14 @@ void CompShift::compScores(const std::vector<std::pair<int,int>> &mass_errors,
   //}
   //LOG_DEBUG("\nbest score " << best_score << "\n");
   //
+}
+
+
+void CompShift::compRevScores(const std::vector<std::pair<int,int>> &mass_errors,
+                              std::vector<short> &rev_scores) {
+  int begin_index;
+  int end_index;
+  int m;
   for(size_t i = 0; i < mass_errors.size(); i++){
     m = mass_errors[i].first - MassConstant::getWaterMass() * scale_;
     //LOG_DEBUG("REV_SP MASS " << m);
@@ -277,8 +287,9 @@ void CompShift::compZeroPtmConvolution(const std::vector<std::pair<int,int>> &ma
                                        std::pair<int,int> &prec_mass_error, 
                                        int comp_num, int pref_suff_num, int inte_num) {
   std::vector<short> scores(row_num_, 0);
+  compScores(mass_errors, scores);
   std::vector<short> rev_scores(row_num_, 0);
-  compScores(mass_errors, scores, rev_scores);
+  compRevScores(mass_errors, rev_scores);
   // precursor mass 
   int begin_index, end_index;
   int m = prec_mass_error.first;
@@ -311,8 +322,9 @@ void CompShift::compZeroPtmConvolution(const std::vector<std::pair<int,int>> &ma
 void CompShift::compOnePtmConvolution(const std::vector<std::pair<int,int>> &mass_errors, 
                                       int comp_num, int pref_suff_num, int inte_num) {
   std::vector<short> scores(row_num_, 0);
+  compScores(mass_errors, scores);
   std::vector<short> rev_scores(row_num_, 0);
-  compScores(mass_errors, scores, rev_scores);
+  compRevScores(mass_errors, rev_scores);
   findTopScores(scores, rev_scores, comp_num, pref_suff_num, inte_num);
 }
 
@@ -391,11 +403,29 @@ inline void CompShift::findTopScores(std::vector<short> &scores, std::vector<sho
     internal_proteo_scores.push_back(internal_proteo_score);
   }
   //LOG_DEBUG("num " << num << " Single type num " << single_type_num);
-  std::vector<std::pair<int,int>> results;
   addResults(top_comp_proteo_scores_, comp_proteo_scores, comp_num);
   addResults(top_pref_proteo_scores_, pref_proteo_scores, pref_suff_num);
   addResults(top_suff_proteo_scores_, suff_proteo_scores, pref_suff_num);
   addResults(top_internal_proteo_scores_, internal_proteo_scores, inte_num);
+}
+
+inline void CompShift::findTopDiagScores(std::vector<short> &scores, int num) {
+  std::vector<std::pair<int,int>> diag_scores;
+  for (int i = 0; i < proteo_num_; i++) {
+    int bgn = proteo_row_begins_[i];
+    int end = proteo_row_ends_[i];
+    int best_score = 0;
+    //LOG_DEBUG("begin " << bgn << " end " << end << " rev 0 " << rev_scores[0]);
+    for (int j = bgn; j <= end; j++) {
+      if (scores[j] > best_score) {
+        best_score = scores[j];
+      }
+    }
+    std::pair<int,int> diag_score(i, best_score);
+    diag_scores.push_back(diag_score);
+  }
+  //LOG_DEBUG("num " << num << " Single type num " << single_type_num);
+  addResults(top_diag_scores_, diag_scores, num);
 }
 
 } /* namespace prot */

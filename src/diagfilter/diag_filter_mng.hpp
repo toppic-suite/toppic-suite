@@ -1,4 +1,3 @@
-
 #ifndef PROT_DIAG_FILTER_MNG_HPP_
 #define PROT_DIAG_FILTER_MNG_HPP_
 
@@ -19,12 +18,12 @@ class DiagFilterMng {
     PrsmParaPtr prsm_para_ptr_;
 
     /** parameters for fast filteration */
-    int max_proteoform_mass = 20000;
+    int max_proteoform_mass_ = 20000;
 
     //Candidate protein number for each spectrum
     size_t ptm_fast_filter_result_num_ = 20;
     int db_block_size_ = 5000000;
-    int ptm_fast_filter_scale_ = 100;
+    int filter_scale_ = 100;
 
     std::string output_file_ext_;
 

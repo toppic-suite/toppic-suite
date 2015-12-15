@@ -2,10 +2,10 @@
 #define PROT_DIAG_FILTER_H_
 
 #include "base/proteoform.hpp"
-#include "spec/prm_peak.hpp"
+#include "spec/prm_ms.hpp"
 #include "prsm/simple_prsm.hpp"
+#include "zeroptmfilter/comp_shift.hpp"
 #include "diagfilter/diag_filter_mng.hpp"
-#include "diagfilter/comp_shift.hpp"
 
 namespace prot {
 
