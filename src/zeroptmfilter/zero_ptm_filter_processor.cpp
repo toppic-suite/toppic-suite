@@ -35,22 +35,22 @@ void ZeroPtmFilterProcessor::process(){
 
   SimplePrsmStrCombine comp_combine(sp_file_name, mng_ptr_->output_file_ext_ + "_COMPLETE",
                                     block_num, mng_ptr_->output_file_ext_ + "_COMPLETE", 
-                                    mng_ptr_->comp_result_num_);
+                                    mng_ptr_->comp_num_);
   comp_combine.process();
 
   SimplePrsmStrCombine pref_combine(sp_file_name, mng_ptr_->output_file_ext_ + "_PREFIX",
                                     block_num, mng_ptr_->output_file_ext_ + "_PREFIX", 
-                                    mng_ptr_->pref_suff_result_num_);
+                                    mng_ptr_->pref_suff_num_);
   pref_combine.process();
 
   SimplePrsmStrCombine suff_combine(sp_file_name, mng_ptr_->output_file_ext_ + "_SUFFIX",
                                     block_num, mng_ptr_->output_file_ext_ + "_SUFFIX", 
-                                    mng_ptr_->pref_suff_result_num_);
+                                    mng_ptr_->pref_suff_num_);
   suff_combine.process();
 
   SimplePrsmStrCombine internal_combine(sp_file_name, mng_ptr_->output_file_ext_ + "_INTERNAL",
                                         block_num, mng_ptr_->output_file_ext_ + "_INTERNAL", 
-                                        mng_ptr_->internal_result_num_);
+                                        mng_ptr_->inte_num_);
   internal_combine.process();
 
   std::cout << "Zero PTM filtering: combining blocks finished." << std::endl; 

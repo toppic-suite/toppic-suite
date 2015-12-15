@@ -6,7 +6,7 @@
 #include "spec/extend_ms.hpp"
 #include "prsm/simple_prsm.hpp"
 #include "zeroptmfilter/zero_ptm_filter_mng.hpp"
-#include "zeroptmfilter/zero_ptm_comp_shift.hpp"
+#include "zeroptmfilter/comp_shift.hpp"
 
 namespace prot {
 
@@ -24,7 +24,7 @@ class ZeroPtmFilter {
  private:
   ZeroPtmFilterMngPtr mng_ptr_;
   ProteoformPtrVec proteo_ptrs_;
-  ZeroPtmCompShiftPtr index_ptr_;
+  CompShiftPtr index_ptr_;
   
   SimplePrsmPtrVec comp_match_ptrs_;
   SimplePrsmPtrVec pref_match_ptrs_;

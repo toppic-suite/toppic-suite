@@ -8,7 +8,10 @@ ZeroPtmFilter::ZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
                              ZeroPtmFilterMngPtr mng_ptr){
   mng_ptr_ = mng_ptr;
   proteo_ptrs_ = proteo_ptrs;
-  index_ptr_ = ZeroPtmCompShiftPtr(new ZeroPtmCompShift(proteo_ptrs, mng_ptr));
+  index_ptr_ = CompShiftPtr( new CompShift(proteo_ptrs, 
+                                           mng_ptr->filter_scale_,
+                                           mng_ptr->max_proteoform_mass_,
+                                           mng_ptr->prsm_para_ptr_->getProtModPtrVec()));
 }
 
 void ZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec){
@@ -17,7 +20,8 @@ void ZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec){
       = ExtendMs::getExtendIntMassErrorList(ms_ptr_vec, mng_ptr_->filter_scale_);
   std::pair<int,int> prec_mass_error = ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMassMinusWaterError(mng_ptr_->filter_scale_);
   //LOG_DEBUG("start convolution");
-  index_ptr_->compConvolution(mass_errors, prec_mass_error, mng_ptr_);
+  index_ptr_->compZeroPtmConvolution(mass_errors, prec_mass_error, mng_ptr_->comp_num_, 
+                                     mng_ptr_->pref_suff_num_, mng_ptr_->inte_num_);
 
   std::vector<std::pair<int,int>> comp_scores = index_ptr_->getTopCompProteoScores();
   comp_match_ptrs_.clear();
