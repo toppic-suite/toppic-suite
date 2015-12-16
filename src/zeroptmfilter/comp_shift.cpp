@@ -236,14 +236,32 @@ void CompShift::compScores(const std::vector<std::pair<int,int>> &mass_errors,
       //LOG_DEBUG("ROW INDEX " << col_indexes_[j] << " score " << scores[col_indexes_[j]]);
     }
   }
-  //int best_score = 0;
-  //for (size_t i = 0; i < scores.size(); i++) {
-  //  if (scores[i] > best_score) {
-  //    best_score = scores[i];
-  //  }
-  //}
-  //LOG_DEBUG("\nbest score " << best_score << "\n");
-  //
+}
+
+void CompShift::compScores(const std::vector<std::pair<int,int>> &mass_errors,
+                           int start, std::vector<short> &scores) {
+  int begin_index;
+  int end_index;
+  int m;
+  for(size_t i = start; i<mass_errors.size(); i++){
+    m = mass_errors[i].first - mass_errors[start].first;
+    // m - errors[i] performs better than m - errors[i] -  errors[bgn_pos]
+    int left = m-mass_errors[i].second;
+    if(left < 0){
+      left=0;
+    }
+    int right = m+mass_errors[i].second;
+    if(right < 0 || right >= col_num_){
+      continue;
+    }
+    //LOG_DEBUG("SP MASS " << m);
+    begin_index = col_index_begins_[left];
+    end_index= col_index_ends_[right];
+    for(int j=begin_index;j<=end_index;j++){
+      scores[col_indexes_[j]]++;
+      //LOG_DEBUG("ROW INDEX " << col_indexes_[j] << " score " << scores[col_indexes_[j]]);
+    }
+  }
 }
 
 
@@ -326,6 +344,13 @@ void CompShift::compOnePtmConvolution(const std::vector<std::pair<int,int>> &mas
   std::vector<short> rev_scores(row_num_, 0);
   compRevScores(mass_errors, rev_scores);
   findTopScores(scores, rev_scores, comp_num, pref_suff_num, inte_num);
+}
+
+void CompShift::compDiagConvolution(const std::vector<std::pair<int,int>> &mass_errors, 
+                                    int start, int top_num) {
+  std::vector<short> scores(row_num_, 0);
+  compScores(mass_errors, start, scores);
+  findTopDiagScores(scores, top_num);
 }
 
 inline bool scoreCompare(const std::pair<int, int> &a, const std::pair<int, int> &b) {

@@ -1,10 +1,11 @@
 #include "base/proteoform.hpp"
 #include "base/base_data.hpp"
-#include "base/proteoform_reader.hpp"
+#include "base/db_block.hpp"
+#include "base/proteoform_factory.hpp"
 #include "base/file_util.hpp"
 #include "base/web_logger.hpp"
-#include "spec/msalign_reader.hpp"
-#include "prsm/simple_prsm_writer.hpp"
+#include "spec/msalign_util.hpp"
+#include "prsm/simple_prsm_xml_writer.hpp"
 #include "prsm/simple_prsm_str_combine.hpp"
 #include "diagfilter/diag_filter_processor.hpp"
 
@@ -16,7 +17,7 @@ DiagFilterProcessor::DiagFilterProcessor(DiagFilterMngPtr mng_ptr){
 
 void DiagFilterProcessor::process(){
   std::string db_file_name = mng_ptr_->prsm_para_ptr_->getSearchDbFileName();
-  DbBlockPtrVec db_block_ptr_vec = readDbBlockIndex(db_file_name);
+  DbBlockPtrVec db_block_ptr_vec = DbBlock::readDbBlockIndex(db_file_name);
 
   for(size_t i=0; i< db_block_ptr_vec.size(); i++){
     std::cout << "Diagonal filtering block " << (i+1) << " out of " 
@@ -33,7 +34,7 @@ void DiagFilterProcessor::process(){
 
   SimplePrsmStrCombinePtr combine_ptr(new SimplePrsmStrCombine(sp_file_name, mng_ptr_->output_file_ext_,
                                                                block_num, mng_ptr_->output_file_ext_, 
-                                                               mng_ptr_->ptm_fast_filter_result_num_));
+                                                               mng_ptr_->filter_result_num_));
   combine_ptr->process();
 
   std::cout << "Diagonal filtering: combining blocks finished." << std::endl; 
@@ -44,21 +45,20 @@ void DiagFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num
   std::string db_block_file_name = prsm_para_ptr->getSearchDbFileName() 
       + "_" + std::to_string(block_ptr->getBlockIdx());
   ProteoformPtrVec raw_forms 
-      = readFastaToProteoform(db_block_file_name, 
-                              prsm_para_ptr->getFixModResiduePtrVec(),
-                              block_ptr->getSeqIdx());
+      = ProteoformFactory::readFastaToProteoformPtrVec(db_block_file_name, 
+                                                       prsm_para_ptr->getFixModPtrVec());
   DiagFilterPtr filter_ptr(new DiagFilter(raw_forms, mng_ptr_));
 
   int group_spec_num = mng_ptr_->prsm_para_ptr_->getGroupSpecNum();
   SpParaPtr sp_para_ptr =  mng_ptr_->prsm_para_ptr_->getSpParaPtr();
   MsAlignReader reader(prsm_para_ptr->getSpectrumFileName(), group_spec_num);
-  std::string output_file_name = basename(prsm_para_ptr->getSpectrumFileName())
+
+  std::string output_file_name = FileUtil::basename(prsm_para_ptr->getSpectrumFileName())
       + "." + mng_ptr_->output_file_ext_+"_"+ std::to_string(block_ptr->getBlockIdx());
-  
-     
-  SimplePrsmWriter writer(output_file_name);
+  SimplePrsmXmlWriter writer(output_file_name);
+    
   SpectrumSetPtr spec_set_ptr;
-  int spectrum_num = getSpNum (prsm_para_ptr->getSpectrumFileName());
+  int spectrum_num = MsAlignUtil::getSpNum (prsm_para_ptr->getSpectrumFileName());
   int cnt = 0;
   while((spec_set_ptr = reader.getNextSpectrumSet(sp_para_ptr)) != nullptr){
     cnt+= group_spec_num;
@@ -67,10 +67,8 @@ void DiagFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num
       SimplePrsmPtrVec match_ptrs = filter_ptr->getBestMatch(ms_ptr_vec);
       writer.write(match_ptrs);
     }
-    
     WebLog::percentLog(cnt, spectrum_num, block_ptr->getBlockIdx(), total_block_num, 
                        WebLog::DiagFilterTime());
-    
     std::cout << std::flush << "Diagonal filtering is processing " << cnt 
         << " of " << spectrum_num << " spectra.\r";
   }

@@ -7,7 +7,7 @@ namespace prot {
 
 class SimplePrsmUtil {
  public:
-  SimplePrsmPtrVec getUniqueMatches(SimplePrsmPtrVec &match_ptrs);
+  static SimplePrsmPtrVec getUniqueMatches(SimplePrsmPtrVec &match_ptrs);
 };
 
 } /* namespace prot */
