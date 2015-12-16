@@ -25,6 +25,9 @@ class CompShift {
   void compOnePtmConvolution(const std::vector<std::pair<int,int>> &mass_errors, 
                              int comp_num, int pref_suff_num, int inte_num);
 
+  void compDiagConvolution(const std::vector<std::pair<int,int>> &mass_errors, 
+                           int start, int top_num);
+
   std::vector<std::pair<int,int>> getTopCompProteoScores() {return top_comp_proteo_scores_;}
   std::vector<std::pair<int,int>> getTopPrefProteoScores() {return top_pref_proteo_scores_;}
   std::vector<std::pair<int,int>> getTopSuffProteoScores() {return top_suff_proteo_scores_;}
@@ -72,6 +75,9 @@ class CompShift {
 
   void compScores(const std::vector<std::pair<int,int>> &mass_errors,
                   std::vector<short> &scores);
+
+  void compScores(const std::vector<std::pair<int,int>> &mass_errors,
+                  int start, std::vector<short> &scores);
 
   void compRevScores(const std::vector<std::pair<int,int>> &mass_errors,
                      std::vector<short> &rev_scores);
