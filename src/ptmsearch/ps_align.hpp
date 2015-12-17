@@ -15,9 +15,9 @@ class PSAlign {
           const std::vector<double> &seq_masses,
           const BasicDiagonalPtrVec &diagonal_ptrs,
           PtmAlignMngPtr mng_ptr);
-  void compute(SemiAlignTypePtr align_type_ptr);
+  void compute(AlignTypePtr type_ptr);
   void initDPPair();
-  void dp(SemiAlignTypePtr align_type_ptr);
+  void dp(AlignTypePtr type_ptr);
   void backtrace();
   DiagonalHeaderPtrVec backtrace(int s);
 
@@ -45,9 +45,8 @@ class PSAlign {
   std::vector<double> align_scores_;
 
   void dpPrep();
-  DPPairPtr getTruncPre(DPPairPtr cur_pair_ptr,int s, SemiAlignTypePtr type_ptr);
-  DPPairPtr getShiftPre(DPPairPtr cur_pair_ptr,int p,int s,SemiAlignTypePtr type_ptr);
-  DPPairPtr oldGetShiftPre(DPPairPtr cur_pair_ptr,int p,int s,SemiAlignTypePtr type_ptr);
+  DPPairPtr getTruncPre(DPPairPtr cur_pair_ptr,int s, AlignTypePtr type_ptr);
+  DPPairPtr getShiftPre(DPPairPtr cur_pair_ptr,int p,int s,AlignTypePtr type_ptr);
 };
 
 typedef std::shared_ptr<PSAlign> PSAlignPtr;

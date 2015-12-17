@@ -18,7 +18,7 @@ class PtmSlowFilter {
       SimplePrsmPtrVec simple_prsm_ptrs,
       CompShiftLowMemPtr comp_shift_ptr,
       PtmMngPtr mng_ptr);
-  PrsmPtrVec getPrsms(int shift_num, SemiAlignTypePtr type_ptr);
+  PrsmPtrVec getPrsms(int shift_num, AlignTypePtr type_ptr);
 
  private:
   PtmSlowMatchPtrVec complete_prefix_slow_match_ptrs_;

@@ -4,8 +4,8 @@
 
 #include <memory>
 #include "spec/theo_peak.hpp"
+#include "spec/extend_ms.hpp"
 #include "prsm/peak_ion_pair.hpp"
-#include "prsm/pair.hpp"
 #include "ptmsearch/diagonal_header.hpp"
 
 namespace prot {

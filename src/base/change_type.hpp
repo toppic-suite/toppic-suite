@@ -2,6 +2,7 @@
 #define PROT_BASE_CHANGE_TYPE_HPP_
 
 #include <memory>
+#include <vector>
 
 #include "base/xml_dom_document.hpp"
 
@@ -30,6 +31,8 @@ class ChangeType {
   std::string name_;
   ChangeType(std::string name): name_(name) {};
 };
+
+typedef std::vector<ChangeTypePtr> ChangeTypePtrVec;
 
 }
 

@@ -33,7 +33,7 @@ class PrmPeak : public Peak {
 
   double getStrictTolerance(){return strict_tolerance_;}
 
-  PrmBaseTypePtr getBaseType(){return base_type_;}
+  PrmBaseTypePtr getBaseTypePtr(){return base_type_;}
 
   double getNStrictCRelaxTolerance(){return n_strict_c_relax_tolerance_;}
 

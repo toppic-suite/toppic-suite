@@ -27,7 +27,7 @@ class PtmSlowMatch {
       PtmMngPtr mng_ptr);
 
   ProteoformPtr getProteoform(){return proteo_ptr_;};
-  void compute(SemiAlignTypePtr type_ptr, PrsmPtrVec &prsm_ptrs);
+  void compute(AlignTypePtr type_ptr, PrsmPtrVec &prsm_ptrs);
 
  private:
   PtmMngPtr mng_ptr_;
