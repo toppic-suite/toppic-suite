@@ -2,7 +2,7 @@
 #define PROT_DP_PAIR_HPP_
 
 #include "ptmsearch/diagonal_header.hpp"
-#include "prsm/pair.hpp"
+#include "ptmsearch/pair.hpp"
 
 namespace prot {
 

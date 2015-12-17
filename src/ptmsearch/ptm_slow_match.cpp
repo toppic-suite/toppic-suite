@@ -22,7 +22,7 @@ inline void PtmSlowMatch::initPsAlign(CompShiftLowMemPtr comp_shift_ptr){
   // n term strict c term nonstrict
   PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
   std::vector<std::pair<int,int>> sp_masses_toles 
-      = getIntMassErrorList(ms_six_ptr_vec_,tole_ptr,scale,true,false);
+      = PrmMs::getIntMassErrorList(ms_six_ptr_vec_,tole_ptr,scale,true,false);
   std::vector<double> best_shifts = comp_shift_ptr->findBestShift(
       sp_masses_toles,
       proteo_ptr_->getBpSpecPtr()->getScaledPrmMasses(scale),
@@ -32,7 +32,7 @@ inline void PtmSlowMatch::initPsAlign(CompShiftLowMemPtr comp_shift_ptr){
   DiagonalHeaderPtrVec n_term_shift_header_ptrs 
       = getNTermShiftHeaders (best_shifts, prec_mono_mass_, proteo_ptr_, mng_ptr_);
 
-  PrmPeakPtrVec prm_peaks = getPrmPeakPtrs(ms_six_ptr_vec_, tole_ptr);
+  PrmPeakPtrVec prm_peaks = PrmMs::getPrmPeakPtrs(ms_six_ptr_vec_, tole_ptr);
   int group_spec_num = ms_six_ptr_vec_.size();
   BasicDiagonalPtrVec diagonal_ptrs = geneDiagonals(n_term_shift_header_ptrs,
                                                    prm_peaks, group_spec_num,
@@ -134,7 +134,7 @@ inline DiagonalHeaderPtrVec PtmSlowMatch::getNTermShiftHeaders(
   return header_ptrs;
 }
 
-void PtmSlowMatch::compute(SemiAlignTypePtr type_ptr, PrsmPtrVec &prsm_ptrs) {
+void PtmSlowMatch::compute(AlignTypePtr type_ptr, PrsmPtrVec &prsm_ptrs) {
     ps_align_ptr_->compute(type_ptr);
     for (int s = 1; s <= mng_ptr_->getShiftNum(); s++) {
         PrsmPtr prsm_ptr = ps_align_ptr_->geneResult(s, proteo_ptr_, deconv_ms_ptr_vec_, 

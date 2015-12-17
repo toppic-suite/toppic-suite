@@ -5,7 +5,7 @@
 #include <vector>
 #include "base/algorithm.hpp"
 #include "spec/prm_peak.hpp"
-#include "prsm/pair.hpp"
+#include "ptmsearch/pair.hpp"
 #include "ptmsearch/diagonal.hpp"
 #include "ptmsearch/diagonal_header.hpp"
 

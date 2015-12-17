@@ -10,12 +10,14 @@
 
 namespace prot {
 
-void findPairs(ExtendMsPtr ms_three_ptr, TheoPeakPtrVec &theo_peak_ptrs, 
-               int bgn, int end, PeakIonPairPtrVec &pair_ptrs) {
+PeakIonPairPtrVec PeakIonPairFactory::findPairs(ExtendMsPtr ms_three_ptr, 
+                                                TheoPeakPtrVec &theo_peak_ptrs, 
+                                                int bgn, int end, double add_tolerance) {
   std::sort(theo_peak_ptrs.begin(), theo_peak_ptrs.end(), TheoPeak::cmpPosInc);
   std::vector<double> ms_masses = ExtendMs::getExtendMassVec(ms_three_ptr);
   std::vector<double> theo_masses = TheoPeakUtil::getTheoMassVec(theo_peak_ptrs);
 
+  PeakIonPairPtrVec pair_ptrs;
   size_t i = 0;
   size_t j = 0;
   while (i < ms_masses.size() && j < theo_masses.size()) {
@@ -35,6 +37,7 @@ void findPairs(ExtendMsPtr ms_three_ptr, TheoPeakPtrVec &theo_peak_ptrs,
       j++;
     }
   }
+  return pair_ptrs;
 }
 
 /* parameter min_mass is necessary */
@@ -48,10 +51,7 @@ PeakIonPairPtrVec PeakIonPairFactory::genePeakIonPairs (const ProteoformPtr &pro
                                                                       activation_ptr, 
                                                                       min_mass);
 
-  PeakIonPairPtrVec pair_ptrs;
-  findPairs(ms_three_ptr, theo_peaks, 0, proteoform_ptr->getLen(), pair_ptrs);
-  return pair_ptrs;
-
+  return findPairs(ms_three_ptr, theo_peaks, 0, proteoform_ptr->getLen(), 0);
 }
 
 PeakIonPairPtrVec PeakIonPairFactory::genePeakIonPairs(const ProteoformPtr &proteoform_ptr,

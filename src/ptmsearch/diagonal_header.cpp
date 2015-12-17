@@ -75,17 +75,17 @@ void DiagonalHeader::initHeader(double c_shift, ProteoformPtr proteo_ptr,
 }
 
 ChangePtrVec getDiagonalMassChanges(const DiagonalHeaderPtrVec &header_ptrs, 
-        int first_res_pos, int last_res_pos, int change_type) {
+        int first_res_pos, int last_res_pos, ChangeTypePtr change_type_ptr) {
     ChangePtrVec change_list;
     if (!header_ptrs[0]->isPepNTermMatch() && !header_ptrs[0]->isProtNTermMatch()) {
         change_list.push_back(
                 ChangePtr(new Change(0, header_ptrs[0]->getMatchFirstBpPos()-first_res_pos,
-                        change_type, header_ptrs[0]->getPepNTermShift(), nullptr)));
+                        change_type_ptr, header_ptrs[0]->getPepNTermShift(), nullptr)));
     }
     for (size_t i = 0; i < header_ptrs.size() - 1; i++) {
         ChangePtr change_ptr(new Change(header_ptrs[i]->getMatchLastBpPos()-first_res_pos,
                     header_ptrs[i + 1]->getMatchFirstBpPos()-first_res_pos,
-                    change_type,
+                    change_type_ptr,
                     header_ptrs[i + 1]->getProtNTermShift()
                     - header_ptrs[i]->getProtNTermShift(),
                     nullptr));
@@ -95,7 +95,7 @@ ChangePtrVec getDiagonalMassChanges(const DiagonalHeaderPtrVec &header_ptrs,
     if (!last_header_ptr->isPepCTermMatch() && !last_header_ptr->isProtCTermMatch()) {
         ChangePtr change_ptr(new Change(last_header_ptr->getMatchLastBpPos()-first_res_pos, 
                     (last_res_pos + 1) -first_res_pos,
-                    change_type, last_header_ptr->getPepCTermShift(), 
+                    change_type_ptr, last_header_ptr->getPepCTermShift(), 
                     nullptr));
         change_list.push_back(change_ptr);
     }
@@ -103,7 +103,7 @@ ChangePtrVec getDiagonalMassChanges(const DiagonalHeaderPtrVec &header_ptrs,
 }
 
 ChangePtrVec getDiagonalMassChanges(const DiagonalHeaderPtrVec &header_ptrs, 
-        int first_res_pos, int last_res_pos, std::vector<int> &change_types) {
+        int first_res_pos, int last_res_pos, ChangeTypePtrVec &change_types) {
     ChangePtrVec change_list;
     if (!header_ptrs[0]->isPepNTermMatch() && !header_ptrs[0]->isProtNTermMatch()) {
         change_list.push_back(
@@ -124,7 +124,7 @@ ChangePtrVec getDiagonalMassChanges(const DiagonalHeaderPtrVec &header_ptrs,
     if (!last_header_ptr->isPepCTermMatch() && !last_header_ptr->isProtCTermMatch()) {
         ChangePtr change_ptr(new Change(last_header_ptr->getMatchLastBpPos()-first_res_pos, 
                     (last_res_pos + 1) -first_res_pos,
-                    Change::getUnexpectedChange(), last_header_ptr->getPepCTermShift(), 
+                    ChangeType::UNEXPECTED, last_header_ptr->getPepCTermShift(), 
                     nullptr));
         change_list.push_back(change_ptr);
     }

@@ -1,5 +1,7 @@
-
 #include "base/logger.hpp"
+#include "base/neutral_loss_base.hpp"
+#include "spec/theo_peak_factory.hpp"
+#include "prsm/peak_ion_pair_factory.hpp"
 #include "ptmsearch/diagonal.hpp"
 
 namespace prot {
@@ -22,12 +24,12 @@ inline TheoPeakPtrVec getDiagonalTheoPeak(ProteoformPtr proteo_ptr,
       +last_header_ptr->getPepCTermShift();
   double max_mass = subseq_ptr->getSeqMass() + 
       pep_n_term_shift + pep_c_term_shift - min_mass;
-  return getTheoPeak(pep_ptr,activation_ptr,NeutralLossFactory::getNeutralLossPtr_NONE(),
-                     pep_n_term_shift,pep_c_term_shift,
-                     header_ptrs[i]->getMatchFirstBpPos()-first_res_pos,
-                     header_ptrs[i]->getMatchLastBpPos()-first_res_pos,
-                     min_mass, 
-                     max_mass);
+  return TheoPeakFactory::geneTheoPeak(pep_ptr,activation_ptr,NeutralLossBase::getNeutralLossPtr_NONE(),
+                                       pep_n_term_shift,pep_c_term_shift,
+                                       header_ptrs[i]->getMatchFirstBpPos()-first_res_pos,
+                                       header_ptrs[i]->getMatchLastBpPos()-first_res_pos,
+                                       min_mass, 
+                                       max_mass);
 }
 
 inline TheoPeakPtrVec getCTermTheoPeakPtrs (const TheoPeakPtrVec theo_peak_ptrs) {
@@ -56,11 +58,11 @@ double refinePrecursorAndHeaderShift(ProteoformPtr proteo_ptr,
                                      double min_mass,
                                      double refine_prec_step_width) {
 
-  double prec_mass = ms_three_ptr_vec[0]->getHeaderPtr()->getPrecMonoMass();
+  double prec_mass = ms_three_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMass();
   if (header_ptrs.size() == 0) {
     return prec_mass;
   }
-  double tole = ms_three_ptr_vec[0]->getHeaderPtr()->getErrorTolerance();
+  double tole = ms_three_ptr_vec[0]->getMsHeaderPtr()->getErrorTolerance();
 
   int one_side_step_num = 0;
   if (tole > 0) {
@@ -76,14 +78,14 @@ double refinePrecursorAndHeaderShift(ProteoformPtr proteo_ptr,
   for(size_t i=0; i< header_ptrs.size() - 1; i++){
     for (size_t j = 0; j < ms_three_ptr_vec.size(); j++) {
       TheoPeakPtrVec theo_peak_ptrs = getDiagonalTheoPeak(
-          proteo_ptr, ms_three_ptr_vec[j]->getHeaderPtr()->getActivationPtr(),
+          proteo_ptr, ms_three_ptr_vec[j]->getMsHeaderPtr()->getActivationPtr(),
           header_ptrs, i, min_mass);
       TheoPeakPtrVec c_term_peak_ptrs = getCTermTheoPeakPtrs(theo_peak_ptrs);
 
       int bgn = header_ptrs[i]->getMatchFirstBpPos()-first_res_pos;
       int end = header_ptrs[i]->getMatchLastBpPos()-first_res_pos;
 
-      PeakIonPairPtrVec pair_ptrs = findPairs(ms_three_ptr_vec[j], c_term_peak_ptrs, bgn, end, tole);
+      PeakIonPairPtrVec pair_ptrs = PeakIonPairFactory::findPairs(ms_three_ptr_vec[j], c_term_peak_ptrs, bgn, end, tole);
       matched_pair_ptrs.insert(matched_pair_ptrs.end(), pair_ptrs.begin(), pair_ptrs.end());
     }
   }
@@ -92,7 +94,7 @@ double refinePrecursorAndHeaderShift(ProteoformPtr proteo_ptr,
   for (size_t j = 0; j < ms_three_ptr_vec.size(); j++) {
     TheoPeakPtrVec theo_peak_ptrs = getDiagonalTheoPeak(
         proteo_ptr,
-        ms_three_ptr_vec[j]->getHeaderPtr()->getActivationPtr(),
+        ms_three_ptr_vec[j]->getMsHeaderPtr()->getActivationPtr(),
         header_ptrs,
         header_ptrs.size() - 1, min_mass);
     TheoPeakPtrVec n_term_peak_ptrs = getNTermTheoPeakPtrs(theo_peak_ptrs);
@@ -100,7 +102,7 @@ double refinePrecursorAndHeaderShift(ProteoformPtr proteo_ptr,
     int bgn = header_ptrs[header_ptrs.size()-1]->getMatchFirstBpPos()-first_res_pos;
     int end = header_ptrs[header_ptrs.size()-1]->getMatchLastBpPos()-first_res_pos;
 
-    PeakIonPairPtrVec pair_ptrs = findPairs(ms_three_ptr_vec[j], n_term_peak_ptrs, bgn, end, tole);
+    PeakIonPairPtrVec pair_ptrs = PeakIonPairFactory::findPairs(ms_three_ptr_vec[j], n_term_peak_ptrs, bgn, end, tole);
     matched_pair_ptrs.insert(matched_pair_ptrs.end(), pair_ptrs.begin(), pair_ptrs.end());
   }
 
@@ -155,15 +157,16 @@ DiagonalHeaderPtrVec refineHeadersBgnEnd(
         for (size_t j = 0; j < ms_three_ptr_vec.size(); j++) {
             TheoPeakPtrVec theo_peak_ptrs = getDiagonalTheoPeak(
                     proteo_ptr,
-                    ms_three_ptr_vec[j]->getHeaderPtr()->getActivationPtr(),
+                    ms_three_ptr_vec[j]->getMsHeaderPtr()->getActivationPtr(),
                     header_ptrs,
                     i, min_mass);
-            PeakIonPairPtrVec cur_pair_ptrs = findPairs(ms_three_ptr_vec[j], theo_peak_ptrs, bgn, end, 0);
+            PeakIonPairPtrVec cur_pair_ptrs = 
+                PeakIonPairFactory::findPairs(ms_three_ptr_vec[j], theo_peak_ptrs, bgn, end, 0);
             pair_ptrs.insert(pair_ptrs.end(), cur_pair_ptrs.begin(), cur_pair_ptrs.end());
         }
         if(pair_ptrs.size()<1){
             int pair_size = pair_ptrs.size();
-            LOG_TRACE("Empty Segment is found "+prot::convertToString(pair_size));
+            LOG_TRACE("Empty Segment is found "+StringUtil::convertToString(pair_size));
             if (i == 0 ) {
                 int new_bgn = first_res_pos;
                 int new_end = first_res_pos;
@@ -212,16 +215,17 @@ DiagonalHeaderPtrVec2D refineHeadersBgnEnd(
             for (size_t k = 0; k < ms_three_ptr_vec.size(); k++) {
                 TheoPeakPtrVec theo_peak_ptrs = getDiagonalTheoPeak(
                         proteo_ptr,
-                        ms_three_ptr_vec[k]->getHeaderPtr()->getActivationPtr(),
+                        ms_three_ptr_vec[k]->getMsHeaderPtr()->getActivationPtr(),
                         header_ptrs_1d,
                         index, min_mass);
-                PeakIonPairPtrVec cur_pair_ptrs = findPairs(ms_three_ptr_vec[k], theo_peak_ptrs, bgn, end, 0);
+                PeakIonPairPtrVec cur_pair_ptrs 
+                    = PeakIonPairFactory::findPairs(ms_three_ptr_vec[k], theo_peak_ptrs, bgn, end, 0);
                 pair_ptrs.insert(pair_ptrs.end(), cur_pair_ptrs.begin(), cur_pair_ptrs.end());
             }
             index++;
             if(pair_ptrs.size() < 1){
                 int pair_size = pair_ptrs.size();
-                LOG_TRACE("Empty Segment is found "+prot::convertToString(pair_size));
+                LOG_TRACE("Empty Segment is found "+ StringUtil::convertToString(pair_size));
                 if (header_ptrs_2d[i][j] == first_header) {
                     int new_bgn = first_res_pos;
                     int new_end = first_res_pos;
