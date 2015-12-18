@@ -134,10 +134,10 @@ class DiagonalHeader {
 DiagonalHeaderPtr geneDiagonalHeaderPtr(int bgn, int end, DiagonalHeaderPtr diag_ptr);
 
 ChangePtrVec getDiagonalMassChanges(const DiagonalHeaderPtrVec &diag_ptrs,
-        int first_res_pos,int last_res_pos, int change_type);
+        int first_res_pos,int last_res_pos, ChangeTypePtr change_type_ptr);
 
 ChangePtrVec getDiagonalMassChanges(const DiagonalHeaderPtrVec &header_ptrs, 
-        int first_res_pos, int last_res_pos, std::vector<int> &change_types);
+        int first_res_pos, int last_res_pos, ChangeTypePtrVec &change_type_ptrs);
 
 } /* namespace prot */
 

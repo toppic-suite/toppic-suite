@@ -142,6 +142,10 @@ ChangePtrVec Proteoform::getChangePtrVec(ChangeTypePtr ct_ptr) {
   return change_ptr_vec;
 }
 
+void Proteoform::addChangePtrVec(ChangePtrVec &new_changes) {
+  change_list_.insert(change_list_.end(), new_changes.begin(), new_changes.end());
+}
+
 // get several segments without unexpected PTMs from a proteoform 
 SegmentPtrVec Proteoform::getSegmentPtrVec() {
   ChangePtrVec changes;
