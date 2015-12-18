@@ -1,3 +1,5 @@
+#include "base/proteoform_factory.hpp"
+#include "spec/extend_ms_factory.hpp"
 #include "ptmsearch/ps_align.hpp"
 
 namespace prot {
@@ -319,7 +321,7 @@ PrsmPtr PSAlign::geneResult(int shift_num, ProteoformPtr proteo_ptr,
     }
     int first_pos = header_ptrs[0]->getTruncFirstResPos();
     int last_pos = header_ptrs[header_ptrs.size()-1]->getTruncLastResPos();
-    ProteoformPtr sub_proteo_ptr  = getSubProteoform(proteo_ptr, first_pos, last_pos);
+    ProteoformPtr sub_proteo_ptr  = ProteoformFactory::geneSubProteoform(proteo_ptr, first_pos, last_pos);
 
     double min_mass = prsm_para_ptr->getSpParaPtr()->getMinMass();
 
@@ -328,7 +330,8 @@ PrsmPtr PSAlign::geneResult(int shift_num, ProteoformPtr proteo_ptr,
             mng_ptr_->refine_prec_step_width_);
 
     SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
-    ExtendMsPtrVec refine_ms_ptr_vec = createMsThreePtrVec(deconv_ms_ptr_vec,  sp_para_ptr, refine_prec_mass);
+    ExtendMsPtrVec refine_ms_ptr_vec = ExtendMsFactory::geneMsThreePtrVec(deconv_ms_ptr_vec,  
+                                                                          sp_para_ptr, refine_prec_mass);
 
     DiagonalHeaderPtrVec refined_header_ptrs = refineHeadersBgnEnd(
             proteo_ptr, refine_ms_ptr_vec, header_ptrs, min_mass);
@@ -338,7 +341,7 @@ PrsmPtr PSAlign::geneResult(int shift_num, ProteoformPtr proteo_ptr,
     }
 
     ChangePtrVec changes = getDiagonalMassChanges(refined_header_ptrs, first_pos, 
-            last_pos, Change::getUnexpectedChange() );
+            last_pos, ChangeType::UNEXPECTED);
     sub_proteo_ptr->addChangePtrVec(changes);
 
     return PrsmPtr(new Prsm(sub_proteo_ptr, deconv_ms_ptr_vec, refine_prec_mass,
