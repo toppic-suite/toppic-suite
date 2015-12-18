@@ -34,4 +34,4 @@ std::string Activation::getNameFromXml(xercesc::DOMElement * element) {
   return name;
 }
 
-} /* namespace prot */
+} 

@@ -32,7 +32,9 @@ class Change {
 
   static std::string getXmlElementName() {return "change";}
 
-  static bool cmpPosIncrease(const ChangePtr &a, const ChangePtr &b);
+  static bool cmpPosInc(const ChangePtr &a, const ChangePtr &b);
+
+  static bool cmpTypeIncPosInc(const ChangePtr &a, const ChangePtr &b);
 
   static ChangePtr geneChangePtr(ChangePtr ori_change_ptr, int start_pos);
 

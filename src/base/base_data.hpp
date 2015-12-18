@@ -1,7 +1,5 @@
-/*
- * author  Xiaowen Liu
- * date    2013-11-01
- */
+// author  Xiaowen Liu
+// date    2013-11-01
 
 #ifndef PROT_BASE_BASE_DATA_HPP_
 #define PROT_BASE_BASE_DATA_HPP_

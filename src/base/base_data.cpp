@@ -1,7 +1,5 @@
-/*
- * author  Xiaowen Liu
- * date    2013-11-1
- */
+// author  Xiaowen Liu
+// date    2013-11-1
 
 #include <map>
 

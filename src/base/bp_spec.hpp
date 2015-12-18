@@ -17,12 +17,12 @@ class BpSpec {
 
   BreakPointPtr getBreakPointPtr(int i) {return break_point_ptr_vec_[i];}
 
-  /* Get neutral ion masses for a specific ion type */
+  // Get neutral ion masses for a specific ion type 
   std::vector<double> getBreakPointMasses(IonTypePtr ion_type_ptr);
 
   std::vector<double> getPrmMasses();
 
-  /* Get rounded scaled neutral ion masses */ 
+  // Get rounded scaled neutral ion masses  
   std::vector<int> getScaledMass(double scale, IonTypePtr ion_type_ptr);
 
   std::vector<int> getScaledPrmMasses(double scale);
@@ -36,6 +36,6 @@ class BpSpec {
 typedef std::shared_ptr<BpSpec> BpSpecPtr;
 typedef std::vector<BpSpecPtr> BpSpecPtrVec;
 
-} /* namespace prot */
+}
 
-#endif /* BP_SPEC_HPP_ */
+#endif 

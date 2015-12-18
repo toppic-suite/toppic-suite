@@ -6,19 +6,16 @@
 
 namespace prot {
 
-/* if we need to increase i, return true, otherwise, return false. */
+// if we need to increase i, return true, otherwise, return false
 bool increaseIJ(size_t i, size_t j, double deviation, 
                 double tolerance, const std::vector<double> &ms_masses, 
                 const std::vector<double> &theo_masses) {
-  /*
-   * we assume that each real peak is matched to at most one theoretical
-   * peak, so we do not check i and j+1
-   */
-  //LOG_DEBUG("i " << i << " j " << j << " ms mass size " << ms_masses.size() << " theo mass size " << theo_masses.size());
+  // we assume that each real peak is matched to at most one theoretical
+  // peak, so we do not check i and j+1
   if (deviation <= 0) {
     return true;
   }
-  /* severl real peak can be matched to the same theoretical peak */
+  // severl real peak can be matched to the same theoretical peak 
   if (i >= ms_masses.size() - 1 ) {
     return false;
   }
@@ -30,7 +27,7 @@ bool increaseIJ(size_t i, size_t j, double deviation,
   }
   else {
     j_is_closer 
-      = std::abs(next_pos - theo_masses[j]) < std::abs(next_pos - theo_masses[j+1]);
+        = std::abs(next_pos - theo_masses[j]) < std::abs(next_pos - theo_masses[j+1]);
   }
   if (std::abs(next_pos - theo_masses[j]) <= tolerance  && j_is_closer) { 
     return true;
@@ -39,7 +36,7 @@ bool increaseIJ(size_t i, size_t j, double deviation,
   }
 }
 
-/* compute deviation for each peak */
+// compute deviation for each peak 
 std::vector<double> compMsMassPpos(const std::vector<double> &ms_masses, 
                                    const std::vector<double> &theo_masses, 
                                    double ppo) {
@@ -83,7 +80,7 @@ std::vector<double> compTheoMassPpos(const std::vector<double> &ms_masses,
   for (size_t p = 0; p < theo_masses.size(); p++) {
     min_distances.push_back(std::numeric_limits<double>::infinity());
   }
-  /* extendMsThree do not have 0 and precursor mass */
+  // extendMsThree do not have 0 and precursor mass 
   size_t i = 0;
   size_t j = 0;
   while (i < ms_masses.size() && j < theo_masses.size()) {
@@ -111,7 +108,7 @@ std::vector<double> compTheoMassPpos(const std::vector<double> &ms_masses,
   return result_ppos;
 }
 
-/* compute the number of matched theoretical masses (fragment ions) */
+// compute the number of matched theoretical masses (fragment ions) 
 double compNumMatchedTheoMasses (const std::vector<double> &ms_masses, 
                                  const std::vector<double> &theo_masses, 
                                  double ppo) {
@@ -126,8 +123,8 @@ double compNumMatchedTheoMasses (const std::vector<double> &ms_masses,
   return score;
 }
 
-/* compute the position of the last residue of a proteoform based 
- * on its n term shift */
+// compute the position of the last residue of a proteoform based 
+// on its n term shift 
 int getFirstResPos(double n_term_shift, const std::vector<double> &prm_masses){
   double trunc_mass = - n_term_shift;
   int best_pos = -1;
@@ -141,8 +138,8 @@ int getFirstResPos(double n_term_shift, const std::vector<double> &prm_masses){
   return best_pos;
 }
 
-/* compute the position of the last residue of a proteoform based on 
- * its c term shift */
+// compute the position of the last residue of a proteoform based on 
+// its c term shift 
 int getLastResPos(double c_term_shift, const std::vector<double> &prm_masses){
   double trunc_mass = -c_term_shift;
   int best_pos = -1;

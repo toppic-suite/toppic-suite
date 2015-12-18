@@ -1,14 +1,13 @@
-
 #include "base/change_type.hpp"
 #include "base/xml_dom_util.hpp"
 
 namespace prot {
 
-const ChangeTypePtr ChangeType::INPUT = ChangeTypePtr(new ChangeType("Input"));
-const ChangeTypePtr ChangeType::FIXED = ChangeTypePtr(new ChangeType("Fixed"));
-const ChangeTypePtr ChangeType::PROTEIN_VARIABLE = ChangeTypePtr(new ChangeType("Protein variable"));
-const ChangeTypePtr ChangeType::VARIABLE = ChangeTypePtr(new ChangeType("Variable"));
-const ChangeTypePtr ChangeType::UNEXPECTED = ChangeTypePtr(new ChangeType("Unexpected"));
+const ChangeTypePtr ChangeType::INPUT = ChangeTypePtr(new ChangeType(1, "Input"));
+const ChangeTypePtr ChangeType::FIXED = ChangeTypePtr(new ChangeType(2, "Fixed"));
+const ChangeTypePtr ChangeType::PROTEIN_VARIABLE = ChangeTypePtr(new ChangeType(3, "Protein variable"));
+const ChangeTypePtr ChangeType::VARIABLE = ChangeTypePtr(new ChangeType(4, "Variable"));
+const ChangeTypePtr ChangeType::UNEXPECTED = ChangeTypePtr(new ChangeType(5, "Unexpected"));
 
 void ChangeType::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
   std::string element_name = ChangeType::getXmlElementName();

@@ -1,4 +1,3 @@
-
 #include "base/activation_base.hpp"
 #include "base/xml_dom_util.hpp"
 
@@ -6,7 +5,6 @@ namespace prot {
 
 ActivationPtrVec ActivationBase::activation_ptr_vec_;
 
-/* Methods for ActivationFactory */
 void ActivationBase::initBase(const std::string &file_name){
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
@@ -40,4 +38,4 @@ ActivationPtr ActivationBase::getActivationPtrFromXml(xercesc::DOMElement * elem
   return activation_ptr;
 }
 
-} /* namespace prot */
+} 

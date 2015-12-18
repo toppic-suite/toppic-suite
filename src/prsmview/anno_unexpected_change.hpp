@@ -25,9 +25,9 @@ class AnnoUnexpectedChange {
 
   void setRightPos(int right_pos) {right_pos_ = right_pos;}
 
-  PtmPtr getPtmPtr() {return ptm_ptr_;}
+  ModPtr getModPtr() {return mod_ptr_;}
 
-  void setPtmPtr(PtmPtr p) {ptm_ptr_ = p;}
+  void setModPtr(ModPtr m) {mod_ptr_ = m;}
 
  private:
   int left_pos_;
@@ -35,7 +35,7 @@ class AnnoUnexpectedChange {
   double mass_shift_;
   int color_;
   std::string type_;
-  PtmPtr ptm_ptr_;
+  ModPtr mod_ptr_;
   std::vector<std::pair<int, std::string> > occurences_;
 };
 

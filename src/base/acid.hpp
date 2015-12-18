@@ -1,7 +1,5 @@
-/*
- * author  Xiaowen Liu
- * date    2013-11-01
- */
+// author  Xiaowen Liu
+// date    2013-11-01
 
 #ifndef PROT_BASE_ACID_HPP_
 #define PROT_BASE_ACID_HPP_
@@ -22,22 +20,22 @@ class Acid {
 
   Acid(xercesc::DOMElement* element); 
 
-  /* Get amino acid composition. */
+  // Get amino acid composition
   std::string getAcidComposition() {return composition_;}
 
-  /* Get average mass. */
+  // Get average mass
   double getAvgMass() {return average_mass_;}
 
-  /* Get  monoisotopic mass. */
+  // Get  monoisotopic mass
   double getMonoMass() {return mono_mass_;}
 
-  /* Get amino acid name. */
+  // Get amino acid name
   std::string getName() {return name_;}
 
-  /* Get amino acid one letter representation. */
+  // Get amino acid one letter representation
   std::string getOneLetter() {return one_letter_;}
 
-  /* Get amino acid three letter representation. */
+  // Get amino acid three letter representation
   std::string getThreeLetter() {return three_letter_;}
 
   void appendNameToXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
@@ -47,17 +45,17 @@ class Acid {
   static std::string getXmlElementName() {return "amino_acid";}
 
  private:
-  /* Name of amino acid */
+  // Name of amino acid
   std::string name_;
-  /* One letter representation */
+  // One letter representation 
   std::string one_letter_;
-  /* Three letter representation */
+  // Three letter representation 
   std::string three_letter_;
-  /* amino acid chemical composition */
+  // amino acid chemical composition 
   std::string composition_;
-  /* residue monoisotopic mass */
+  // residue monoisotopic mass 
   double mono_mass_;
-  /* residue average mass */
+  // residue average mass 
   double average_mass_;
 };
 

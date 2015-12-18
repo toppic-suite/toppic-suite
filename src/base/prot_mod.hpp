@@ -1,6 +1,7 @@
 #ifndef PROT_BASE_PROT_MOD_HPP_
 #define PROT_BASE_PROT_MOD_HPP_
 
+#include "base/ptm_base.hpp"
 #include "base/mod.hpp"
 #include "base/trunc.hpp"
 #include "base/xml_dom_document.hpp"
@@ -27,6 +28,8 @@ class ProtMod {
   double getProtShift() { return prot_shift_;}
 
   double getPepShift() { return pep_shift_;}
+
+  bool isAcetylation();
 
   void appendNameToXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 

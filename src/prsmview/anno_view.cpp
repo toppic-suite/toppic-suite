@@ -1,9 +1,12 @@
-
 #include <set>
 #include <boost/algorithm/string.hpp>
 
-#include "base/proteoform_reader.hpp"
+#include "base/residue_util.hpp"
+#include "base/xml_dom_util.hpp"
+#include "base/proteoform_factory.hpp"
 #include "spec/peak.hpp"
+#include "prsm/peak_ion_pair_factory.hpp"
+#include "prsm/peak_ion_pair_util.hpp"
 #include "prsmview/anno_residue.hpp"
 #include "prsmview/anno_unexpected_change.hpp"
 #include "prsmview/anno_expected_change.hpp"
@@ -30,13 +33,13 @@ std::vector<std::vector<std::string>> readViewXmlFiles(const std::string &file_n
     XmlDOMDocument* doc = new XmlDOMDocument(parser, file_name.c_str());
     if (doc) {
       xercesc::DOMElement* root = doc->getDocumentElement();
-      int file_num = getChildCount(root, "file");
+      int file_num = XmlDomUtil::getChildCount(root, "file");
       for (int i = 0; i < file_num; i++) {
-        xercesc::DOMElement* file_element = getChildElement(root, "file", i);
+        xercesc::DOMElement* file_element = XmlDomUtil::getChildElement(root, "file", i);
         std::vector<std::string> file_info;
-        file_info.push_back(prot::getChildValue(file_element,"xml",0));
-        file_info.push_back(prot::getChildValue(file_element,"xsl",0));
-        file_info.push_back(prot::getChildValue(file_element,"html",0));
+        file_info.push_back(XmlDomUtil::getChildValue(file_element,"xml",0));
+        file_info.push_back(XmlDomUtil::getChildValue(file_element,"xsl",0));
+        file_info.push_back(XmlDomUtil::getChildValue(file_element,"html",0));
         file_list.push_back(file_info);
       }
     }
@@ -47,17 +50,17 @@ std::vector<std::vector<std::string>> readViewXmlFiles(const std::string &file_n
 
 xercesc::DOMElement* genePrsmView(XmlDOMDocument* xml_doc,PrsmPtr prsm_ptr, PrsmViewMngPtr mng_ptr){
   xercesc::DOMElement* element = xml_doc->createElement("prsm");
-  std::string str = convertToString(prsm_ptr->getId());
+  std::string str = StringUtil::convertToString(prsm_ptr->getPrsmId());
   xml_doc->addElement(element, "prsm_id", str.c_str());
-  if(prsm_ptr->getProbPtr().get()!=nullptr){
-    str=convertToString(prsm_ptr->getProbPtr()->getPValue(), mng_ptr->decimal_point_num_);
+  if(prsm_ptr->getExtremeValuePtr().get()!=nullptr){
+    str=StringUtil::convertToString(prsm_ptr->getExtremeValuePtr()->getPValue(), mng_ptr->decimal_point_num_);
     xml_doc->addElement(element, "p_value", str.c_str());
   }
   else{
     xml_doc->addElement(element, "p_value", "N/A");
   }
-  if(prsm_ptr->getProbPtr().get()!=nullptr){
-    str=convertToString(prsm_ptr->getProbPtr()->getEValue(), mng_ptr->decimal_point_num_);
+  if(prsm_ptr->getExtremeValuePtr().get()!=nullptr){
+    str=StringUtil::convertToString(prsm_ptr->getExtremeValuePtr()->getEValue(), mng_ptr->decimal_point_num_);
     xml_doc->addElement(element, "e_value", str.c_str());
   }
   else{
@@ -65,15 +68,15 @@ xercesc::DOMElement* genePrsmView(XmlDOMDocument* xml_doc,PrsmPtr prsm_ptr, Prsm
   }
   double fdr = prsm_ptr->getFdr();
   if (fdr >= 0) {
-    str=convertToString(prsm_ptr->getFdr(), mng_ptr->decimal_point_num_);
+    str=StringUtil::convertToString(prsm_ptr->getFdr(), mng_ptr->decimal_point_num_);
     xml_doc->addElement(element, "fdr", str.c_str());
   }
   else {
     xml_doc->addElement(element, "fdr", "N/A");
   }
-  str=convertToString((int)prsm_ptr->getMatchFragNum());
+  str=StringUtil::convertToString((int)prsm_ptr->getMatchFragNum());
   xml_doc->addElement(element, "matched_fragment_number", str.c_str());
-  str=convertToString((int)prsm_ptr->getMatchPeakNum());
+  str=StringUtil::convertToString((int)prsm_ptr->getMatchPeakNum());
   xml_doc->addElement(element, "matched_peak_number", str.c_str());
 
   xercesc::DOMElement* ms_element = xml_doc->createElement("ms");
@@ -83,8 +86,8 @@ xercesc::DOMElement* genePrsmView(XmlDOMDocument* xml_doc,PrsmPtr prsm_ptr, Prsm
   std::string spec_ids;
   std::string spec_scans;
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
-    spec_ids = spec_ids + std::to_string(deconv_ms_ptr_vec[i]->getHeaderPtr()->getId()) + " ";
-    spec_scans = spec_scans + deconv_ms_ptr_vec[i]->getHeaderPtr()->getScansString() + " ";
+    spec_ids = spec_ids + std::to_string(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getId()) + " ";
+    spec_scans = spec_scans + deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getScansString() + " ";
   }
   boost::algorithm::trim(spec_ids);
   boost::algorithm::trim(spec_scans);
@@ -92,13 +95,13 @@ xercesc::DOMElement* genePrsmView(XmlDOMDocument* xml_doc,PrsmPtr prsm_ptr, Prsm
   xml_doc->addElement(ms_header_element, "scans", spec_scans.c_str());
   int pos = 4;
   double precursor_mass = prsm_ptr->getOriPrecMass();
-  str=convertToString(precursor_mass, pos);
+  str=StringUtil::convertToString(precursor_mass, pos);
   xml_doc->addElement(ms_header_element, "precursor_mono_mass", str.c_str());
-  int precursor_charge = deconv_ms_ptr_vec[0]->getHeaderPtr()->getPrecCharge();
-  str=convertToString(precursor_charge);
+  int precursor_charge = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecCharge();
+  str=StringUtil::convertToString(precursor_charge);
   xml_doc->addElement(ms_header_element, "precursor_charge", str.c_str());
-  double precursor_mz = compMonoMz(precursor_mass, precursor_charge); 
-  str=convertToString(precursor_mz, pos);
+  double precursor_mz = Peak::compMonoMz(precursor_mass, precursor_charge); 
+  str=StringUtil::convertToString(precursor_mz, pos);
   xml_doc->addElement(ms_header_element, "precursor_mz", str.c_str());
 
   //peaks to view
@@ -107,35 +110,35 @@ xercesc::DOMElement* genePrsmView(XmlDOMDocument* xml_doc,PrsmPtr prsm_ptr, Prsm
   ExtendMsPtrVec refine_ms_ptr_vec = prsm_ptr->getRefineMsPtrVec();
   for (size_t s = 0; s < deconv_ms_ptr_vec.size(); s++) {
     //get ion_pair
-    PeakIonPairPtrVec pair_ptrs =  getPeakIonPairs (prsm_ptr->getProteoformPtr(), 
-                                                    refine_ms_ptr_vec[s],
-                                                    mng_ptr->min_mass_);
+    PeakIonPairPtrVec pair_ptrs = PeakIonPairFactory::genePeakIonPairs(prsm_ptr->getProteoformPtr(), 
+                                                                       refine_ms_ptr_vec[s],
+                                                                       mng_ptr->min_mass_);
     //LOG_DEBUG("pair completed");
     for(size_t i=0;i< deconv_ms_ptr_vec[s]->size();i++){
       xercesc::DOMElement* peak_element = xml_doc->createElement("peak");
       peaks->appendChild(peak_element);
-      str = convertToString(deconv_ms_ptr_vec[s]->getHeaderPtr()->getId());
+      str = StringUtil::convertToString(deconv_ms_ptr_vec[s]->getMsHeaderPtr()->getId());
       xml_doc->addElement(peak_element, "spec_id", str.c_str());
       DeconvPeakPtr peak_ptr = deconv_ms_ptr_vec[s]->getPeakPtr(i);
-      str=convertToString(peak_ptr->getId());
+      str=StringUtil::convertToString(peak_ptr->getId());
       xml_doc->addElement(peak_element, "peak_id", str.c_str());
       double mass = peak_ptr->getPosition();
       int charge = peak_ptr->getCharge();
-      str=convertToString(mass, mng_ptr->precise_point_num_);
+      str=StringUtil::convertToString(mass, mng_ptr->precise_point_num_);
       xml_doc->addElement(peak_element, "monoisotopic_mass", str.c_str());
-      double mz = compMonoMz(mass, charge);
-      str=convertToString(mz, mng_ptr->precise_point_num_);
+      double mz = Peak::compMonoMz(mass, charge);
+      str=StringUtil::convertToString(mz, mng_ptr->precise_point_num_);
       xml_doc->addElement(peak_element, "monoisotopic_mz", str.c_str());
-      str=convertToString(peak_ptr->getIntensity(), mng_ptr->decimal_point_num_);
+      str=StringUtil::convertToString(peak_ptr->getIntensity(), mng_ptr->decimal_point_num_);
       xml_doc->addElement(peak_element, "intensity", str.c_str());
-      str=convertToString(charge);
+      str=StringUtil::convertToString(charge);
       xml_doc->addElement(peak_element, "charge", str.c_str());
-      int spec_id = deconv_ms_ptr_vec[s]->getHeaderPtr()->getId(); 
-      PeakIonPairPtrVec selected_pair_ptrs = getMatchedPairs(pair_ptrs, spec_id,  
-                                                             peak_ptr->getId());
+      int spec_id = deconv_ms_ptr_vec[s]->getMsHeaderPtr()->getId(); 
+      PeakIonPairPtrVec selected_pair_ptrs 
+          = PeakIonPairUtil::getMatchedPairs(pair_ptrs, spec_id, peak_ptr->getId());
       if(selected_pair_ptrs.size()>0){
         int match_ions_number = selected_pair_ptrs.size();
-        str=convertToString(match_ions_number);
+        str=StringUtil::convertToString(match_ions_number);
         xml_doc->addElement(peak_element, "matched_ions_num", str.c_str());
         xercesc::DOMElement* mi_element = xml_doc->createElement("matched_ions");
         peak_element->appendChild(mi_element);
@@ -164,36 +167,36 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
                                      PrsmViewMngPtr mng_ptr, double err) {
   xercesc::DOMElement* prot_element = xml_doc->createElement("annotated_protein");
   ProteoformPtr proteoform_ptr = prsm_ptr->getProteoformPtr();
-  std::string str=convertToString(proteoform_ptr->getSeqId());
-  xml_doc->addElement(prot_element, "sequence_id", str.c_str());
-  str=convertToString(proteoform_ptr->getSpeciesId());
+  //std::string str=StringUtil::convertToString(proteoform_ptr->getSeqId());
+  //xml_doc->addElement(prot_element, "sequence_id", str.c_str());
+  std::string str=StringUtil::convertToString(proteoform_ptr->getSpeciesId());
   xml_doc->addElement(prot_element, "proteoform_id", str.c_str());
   str=proteoform_ptr->getSeqName();
   xml_doc->addElement(prot_element, "sequence_name", str.c_str());
   str=proteoform_ptr->getSeqDesc();
   xml_doc->addElement(prot_element, "sequence_description", str.c_str());
   double mass = proteoform_ptr->getMass();
-  str=convertToString(mass, mng_ptr->decimal_point_num_);
+  str=StringUtil::convertToString(mass, mng_ptr->decimal_point_num_);
   xml_doc->addElement(prot_element, "proteoform_mass", str.c_str());
-  str=convertToString(proteoform_ptr->getProtModPtr()->getPtmPtr()->isAcetylation());
+  str=StringUtil::convertToString(proteoform_ptr->getProtModPtr()->isAcetylation());
   xml_doc->addElement(prot_element, "n_acetylation", str.c_str());
-  int unexpected_change_number = proteoform_ptr->getUnexpectedChangeNum();
-  str=convertToString(unexpected_change_number);
+  int unexpected_change_number = proteoform_ptr->getChangeNum(ChangeType::UNEXPECTED);
+  str=StringUtil::convertToString(unexpected_change_number);
   xml_doc->addElement(prot_element, "unexpected_change_number", str.c_str());
 
   ChangePtrVec change_ptrs = proteoform_ptr->getChangePtrVec(); 
-  std::sort(change_ptrs.begin(),change_ptrs.end(),compareChangeTypeUpPosUp);
+  std::sort(change_ptrs.begin(),change_ptrs.end(),Change::cmpTypeIncPosInc);
 
   xercesc::DOMElement* anno_element = xml_doc->createElement("annotation");
   prot_element->appendChild(anno_element);
-  str=convertToString(proteoform_ptr->getDbResSeqPtr()->getLen());
+  str=StringUtil::convertToString(proteoform_ptr->getFastaSeqPtr()->getLen());
   xml_doc->addElement(anno_element, "protein_length", str.c_str());
 
-  str=convertToString(proteoform_ptr->getStartPos());
+  str=StringUtil::convertToString(proteoform_ptr->getStartPos());
   xml_doc->addElement(anno_element, "first_residue_position", str.c_str());
-  str=convertToString(proteoform_ptr->getEndPos());
+  str=StringUtil::convertToString(proteoform_ptr->getEndPos());
   xml_doc->addElement(anno_element, "last_residue_position", str.c_str());
-  str=convertToString(proteoform_ptr->getProtModPtr()->getPtmPtr()->isAcetylation());
+  str=StringUtil::convertToString(proteoform_ptr->getProtModPtr()->isAcetylation());
 
   //LOG_DEBUG("summary completed");
 
@@ -201,11 +204,14 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
 
   //LOG_DEBUG("cleavage completed");
 
-  int prot_len = proteoform_ptr->getDbResSeqPtr()->getLen();
+  int prot_len = proteoform_ptr->getFastaSeqPtr()->getLen();
   // obtain residue_ptrs 
   AnnoResiduePtrVec res_ptrs;
+  std::string fasta_seq = proteoform_ptr->getFastaSeqPtr()->getSeq();
+  ModPtrVec fix_mod_list = mng_ptr->prsm_para_ptr_->getFixModPtrVec();
+  ResiduePtrVec fasta_residues = ResidueUtil::convertStrToResiduePtrVec(fasta_seq,fix_mod_list); 
   for(int i=0;i< prot_len;i++){
-    res_ptrs.push_back(AnnoResiduePtr(new AnnoResidue(proteoform_ptr->getDbResSeqPtr()->getResiduePtr(i), i)));
+    res_ptrs.push_back(AnnoResiduePtr(new AnnoResidue(fasta_residues[i], i)));
   }
 
   //LOG_DEBUG("residue completed");
@@ -245,16 +251,17 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
     int left_db_bp = change_ptrs[i]->getLeftBpPos() + start_pos;
     int right_db_bp = change_ptrs[i]->getRightBpPos() + start_pos;
     double shift = change_ptrs[i]->getMassShift();
-    if (change_ptrs[i]->getChangeType() != UNEXPECTED_CHANGE) { 
+    if (change_ptrs[i]->getChangeTypePtr() != ChangeType::UNEXPECTED) { 
       res_ptrs[left_db_bp]->setType(ANNO_RESIDUE_TYPE_KNOWN_CHANGE);
-
       AnnoExpectedChangePtr existing_ptr 
-          = findExpectedChange(expected_change_ptrs, change_ptrs[i]->getChangeType(), change_ptrs[i]->getPtmPtr());
+          = findExpectedChange(expected_change_ptrs, change_ptrs[i]->getChangeTypePtr(), change_ptrs[i]->getModPtr());
       if (existing_ptr == nullptr) {
-        existing_ptr = AnnoExpectedChangePtr(new AnnoExpectedChange(change_ptrs[i]->getChangeType(), change_ptrs[i]->getPtmPtr()));
+        existing_ptr = AnnoExpectedChangePtr(new AnnoExpectedChange(change_ptrs[i]->getChangeTypePtr(), 
+                                                                    change_ptrs[i]->getModPtr()));
         expected_change_ptrs.push_back(existing_ptr);
       }
-      std::string acid_letter = proteoform_ptr->getDbResSeqPtr()->getResiduePtr(left_db_bp)->getAcidPtr()->getOneLetter();
+      std::string fasta_seq = proteoform_ptr->getFastaSeqPtr()->getSeq();
+      std::string acid_letter = fasta_seq.substr(left_db_bp, 1);
       existing_ptr->addOccurence(left_db_bp, acid_letter);
     }
     else {
@@ -266,22 +273,20 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
         }
         int this_right = right_db_bp * 2;
         AnnoUnexpectedChangePtr anno_change_ptr(new AnnoUnexpectedChange(this_left , this_right, shift, unexpected_shift_color, "SHIFT"));
-        anno_change_ptr->setPtmPtr(change_ptrs[i]->getPtmPtr());
+        anno_change_ptr->setModPtr(change_ptrs[i]->getModPtr());
         std::string anno_info = "PTM: ";
-        if (change_ptrs[i]->getPtmPtr() == nullptr) {
+        if (change_ptrs[i]->getModPtr() == nullptr) {
             anno_info += "Unknown";
         } else {
-            anno_info += change_ptrs[i]->getPtmPtr()->getName();
+            anno_info += change_ptrs[i]->getModPtr()->getModResiduePtr()->getPtmPtr()->getAbbrName();
         }
-
+        std::string fasta_seq = proteoform_ptr->getFastaSeqPtr()->getSeq();
         for (int k = left_db_bp; k <= right_db_bp; k++) {
-            std::string acid_letter = proteoform_ptr->getDbResSeqPtr()
-                                      ->getResiduePtr(k)->getAcidPtr()->getOneLetter();
+            std::string acid_letter = fasta_seq.substr(k,1);
             anno_change_ptr->addOccurence(k, acid_letter);
             res_ptrs[k]->setPossiblePosColor(1);
             res_ptrs[k]->setAnno(anno_info);
         }
-
 
         unexpected_change_ptrs.push_back(anno_change_ptr);
         last_right = this_right;
@@ -297,10 +302,10 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
         int this_right = right_db_bp * 2 - 1;
         AnnoUnexpectedChangePtr anno_change_ptr(new AnnoUnexpectedChange(this_left, this_right, shift, unexpected_shift_color, "SHIFT"));
 
-        anno_change_ptr->setPtmPtr(change_ptrs[i]->getPtmPtr());
+        anno_change_ptr->setModPtr(change_ptrs[i]->getModPtr());
         std::string anno_info = "PTM: ";
-        if (change_ptrs[i]->getPtmPtr() != nullptr) {
-            anno_info += change_ptrs[i]->getPtmPtr()->getName() + "\n";
+        if (change_ptrs[i]->getModPtr() != nullptr) {
+            anno_info += change_ptrs[i]->getModPtr()->getModResiduePtr()->getPtmPtr()->getName() + "\n";
             std::vector<double> scr = change_ptrs[i]->getScr();
             for (int k = left_db_bp; k < right_db_bp; k++) {
                 if (scr[k - left_db_bp] > 0) {
@@ -308,7 +313,7 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
                         ->getResiduePtr(k)->getAcidPtr()->getOneLetter();
                     anno_info += "Site: " + acid_letter + std::to_string(k) + " ";
                     anno_info += "Confidence: "
-                        + convertToString(scr[k - left_db_bp] * 100, 2) + "%\n";
+                        + StringUtil::convertToString(scr[k - left_db_bp] * 100, 2) + "%\n";
                 }
             }
             for (int k = left_db_bp; k < right_db_bp; k++) {
@@ -335,7 +340,7 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
             for (int k = left_db_bp; k < right_db_bp; k++) {
                 scr_sum += scr[k - left_db_bp];
             }
-            anno_info += " Confindence: " + convertToString(scr_sum * 100, 2) + "%\n";
+            anno_info += " Confindence: " + StringUtil::convertToString(scr_sum * 100, 2) + "%\n";
             for (int k = left_db_bp; k < right_db_bp; k++) {
                 res_ptrs[k]->setPossiblePosColor(1);
                 res_ptrs[k]->setAnno(anno_info);
@@ -403,16 +408,16 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
 xercesc::DOMElement* proteoformToXml(XmlDOMDocument* xml_doc, const PrsmPtrVec &prsm_ptrs, 
                                      PrsmViewMngPtr mng_ptr){
   xercesc::DOMElement* proteoform_element = xml_doc->createElement("compatible_proteoform");
-  std::string str=convertToString(prsm_ptrs[0]->getProteoformPtr()->getSeqId());
+  std::string str=StringUtil::convertToString(prsm_ptrs[0]->getProteoformPtr()->getSeqId());
   xml_doc->addElement(proteoform_element, "sequence_id", str.c_str());
   str=prsm_ptrs[0]->getProteoformPtr()->getSeqName();
   xml_doc->addElement(proteoform_element, "sequence_name", str.c_str());
   str=prsm_ptrs[0]->getProteoformPtr()->getSeqDesc();
   xml_doc->addElement(proteoform_element, "sequence_description", str.c_str());
-  str=convertToString(prsm_ptrs[0]->getProteoformPtr()->getSpeciesId());
+  str=StringUtil::convertToString(prsm_ptrs[0]->getProteoformPtr()->getSpeciesId());
   xml_doc->addElement(proteoform_element, "proteoform_id", str.c_str());
   int count = prsm_ptrs.size();
-  str=convertToString(count);
+  str=StringUtil::convertToString(count);
   xml_doc->addElement(proteoform_element, "prsm_number", str.c_str());
   for(size_t i=0;i<prsm_ptrs.size();i++){
     proteoform_element->appendChild(genePrsmView(xml_doc,prsm_ptrs[i], mng_ptr));
@@ -426,14 +431,14 @@ xercesc::DOMElement* proteinToXml(XmlDOMDocument* xml_doc,
                                   const std::vector<int> &species_ids,
                                   PrsmViewMngPtr mng_ptr){
   xercesc::DOMElement* prot_element = xml_doc->createElement("protein");
-  std::string str=convertToString(proteo_ptr->getSeqId());
+  std::string str=StringUtil::convertToString(proteo_ptr->getSeqId());
   xml_doc->addElement(prot_element, "sequence_id", str.c_str());
   str=proteo_ptr->getSeqName();
   xml_doc->addElement(prot_element, "sequence_name", str.c_str());
   str=proteo_ptr->getSeqDesc();
   xml_doc->addElement(prot_element, "sequence_description", str.c_str());
   int count = species_ids.size();
-  str=convertToString(count);
+  str=StringUtil::convertToString(count);
   xml_doc->addElement(prot_element, "compatible_proteoform_number", str.c_str());
   for(size_t i=0;i<species_ids.size();i++){
     PrsmPtrVec select_prsm_ptrs = selectSpeciesPrsms(prsm_ptrs,species_ids[i]);

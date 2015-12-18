@@ -22,7 +22,7 @@ FastaSeqPtr FastaReader::getNextSeq() {
     return FastaSeqPtr(nullptr);
   }
 
-  /* get the letters of sequence */
+  // get the letters of sequence 
   std::string ori_seq;
   ori_name_ = StringUtil::trim(ori_name_);
   std::string prot_name = ori_name_.substr(1, ori_name_.size() - 1);
