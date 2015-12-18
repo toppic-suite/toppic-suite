@@ -48,7 +48,7 @@ void Change::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
   parent->appendChild(element);
 }
 
-bool Change::cmpPosIncrease(const ChangePtr &a, const ChangePtr &b) {
+bool Change::cmpPosInc(const ChangePtr &a, const ChangePtr &b) {
   if (a->getLeftBpPos() < b->getLeftBpPos()) {
     return true;
   }
@@ -57,6 +57,26 @@ bool Change::cmpPosIncrease(const ChangePtr &a, const ChangePtr &b) {
   }
   else {
     return a->getRightBpPos() < b->getRightBpPos();
+  }
+}
+
+bool Change::cmpTypeIncPosInc(const ChangePtr &a, const ChangePtr &b) {
+  if (a->getChangeTypePtr()->getId() < b->getChangeTypePtr()->getId()) {
+    return true;
+  }
+  else if (a->getChangeTypePtr()->getId() > b->getChangeTypePtr()->getId()) {
+    return false;
+  }
+  else {
+    if (a->getLeftBpPos() < b->getLeftBpPos()) {
+      return true;
+    }
+    else if (a->getLeftBpPos() > b->getLeftBpPos()) {
+      return false;
+    }
+    else {
+      return a->getRightBpPos() < b->getRightBpPos();
+    }
   }
 }
 

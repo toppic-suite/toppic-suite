@@ -5,7 +5,6 @@
 
 namespace prot {
 
-/* activation base */
 class ActivationBase {
  private:
   static ActivationPtrVec activation_ptr_vec_;
@@ -21,6 +20,6 @@ class ActivationBase {
 
 };
 
-} /* namespace prot */
+} 
 
-#endif /* ACTIVATION_HPP_ */
+#endif 

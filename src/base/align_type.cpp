@@ -11,5 +11,4 @@ AlignType::AlignType(const std::string &name, int id):
     name_(name), 
     id_(id) {
     }
-
 }

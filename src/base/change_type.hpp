@@ -19,6 +19,7 @@ class ChangeType {
   static const ChangeTypePtr VARIABLE;
   static const ChangeTypePtr UNEXPECTED;
 
+  int getId() {return id_;}
   std::string getName() {return name_;}
 
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
@@ -28,8 +29,9 @@ class ChangeType {
   static std::string getXmlElementName() {return "change_type";}
 
  private:
+  int id_;
   std::string name_;
-  ChangeType(std::string name): name_(name) {};
+  ChangeType(int id, std::string name): id_(id), name_(name) {};
 };
 
 typedef std::vector<ChangeTypePtr> ChangeTypePtrVec;

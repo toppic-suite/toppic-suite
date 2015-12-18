@@ -17,6 +17,20 @@ ResiduePtrVec ResidueUtil::convertStrToResiduePtrVec(const std::string &seq) {
   return residue_ptr_vec;
 }
 
+ResiduePtrVec ResidueUtil::convertStrToResiduePtrVec(const std::string &seq, 
+                                                     ModPtrVec &fix_mod_ptr_vec) {
+  ResiduePtrVec residue_ptrs = ResidueUtil::convertStrToResiduePtrVec(seq);
+  for (size_t i = 0; i < residue_ptrs.size(); i++) {
+    for (size_t j = 0; j < fix_mod_ptr_vec.size(); j++) {
+      if (residue_ptrs[i] == fix_mod_ptr_vec[j]->getOriResiduePtr()) {
+        residue_ptrs[i] = fix_mod_ptr_vec[j]->getModResiduePtr();
+        break;
+      }
+    }
+  }
+  return residue_ptrs;
+}
+
 int ResidueUtil::findResidue(const ResiduePtrVec &residue_list, 
                              ResiduePtr residue_ptr) {
   for (size_t i = 0; i < residue_list.size(); i++) {

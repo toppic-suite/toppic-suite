@@ -1,7 +1,6 @@
-/*
- * author  Xiaowen Liu
- * date    2013-11-1
- */
+// author  Xiaowen Liu
+// date    2013-11-1
+
 #include "base/logger.hpp"
 #include "base/acid.hpp"
 #include "base/string_util.hpp"
@@ -43,5 +42,4 @@ std::string Acid::getNameFromXml(xercesc::DOMElement * element) {
   return name;
 }
 
-} /* end namespace */
-
+} 

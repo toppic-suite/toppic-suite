@@ -13,15 +13,10 @@ namespace prot {
 
 class FastaReader {
  public:
-  /**
-   * Constructs an instance with a File.
-   **/
   FastaReader(const std::string &file_name);
 
-  /**
-   * Read FASTA file and return next protein
-   * name and sequence. 
-   **/                  
+  // Read FASTA file and return next protein
+  // name and sequence. 
   FastaSeqPtr getNextSeq();
 
  private:

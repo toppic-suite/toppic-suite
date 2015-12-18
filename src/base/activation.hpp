@@ -1,9 +1,5 @@
-/*
- * Activation.hpp
- *
- *  Created on: Nov 25, 2013
- *  Author: Xiaowen Liu
- */
+// Author: Xiaowen Liu
+// Created on: Nov 25, 2013
 
 #ifndef PROT_BASE_ACTIVATION_HPP_
 #define PROT_BASE_ACTIVATION_HPP_
@@ -50,4 +46,4 @@ typedef std::vector<ActivationPtr> ActivationPtrVec;
 
 }
 
-#endif /* ACTIVATION_HPP_ */
+#endif 

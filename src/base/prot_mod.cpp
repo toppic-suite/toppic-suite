@@ -47,4 +47,13 @@ std::string ProtMod::getNameFromXml(xercesc::DOMElement * element) {
   return name;
 }
 
+bool ProtMod::isAcetylation() {
+  if (mod_ptr_->getModResiduePtr()->getPtmPtr() == PtmBase::getPtmPtr_Acetylation()) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
 }

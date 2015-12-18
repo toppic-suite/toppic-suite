@@ -35,10 +35,8 @@ class ExtremeValue {
   static ExtremeValuePtr getMaxEvaluePtr();
 
  private:
-  /** 
-   * one_prot_prob is the probability that the spectrum and a randem problem 
-   * have a protein-spectrum-match with a score no less than the threshold 
-   **/
+  // one_prot_prob is the probability that the spectrum and a randem problem 
+  // have a protein-spectrum-match with a score no less than the threshold 
   double one_prot_prob_;
   double test_num_;
   double adjust_factor_;

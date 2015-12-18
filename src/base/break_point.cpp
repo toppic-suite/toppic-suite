@@ -8,4 +8,4 @@ BreakPoint::BreakPoint(double prm, double srm):
     srm_(srm) {
     }
 
-} /* namespace prot */
+} // namespace prot 
