@@ -16,9 +16,9 @@ PrsmTopSelector::PrsmTopSelector(const std::string &db_file_name,
     n_top_(n_top) {
     }
 
-bool containsSameDbSeq(const PrsmStrPtrVec prsm_ptrs, PrsmStrPtr target_prsm_ptr) {
+bool containsSameFastaSeq(const PrsmStrPtrVec prsm_ptrs, PrsmStrPtr target_prsm_ptr) {
   for(size_t i=0; i< prsm_ptrs.size();i++){
-    if(prsm_ptrs[i]->getDbSeqId() == target_prsm_ptr->getDbSeqId()){
+    if (prsm_ptrs[i]->getDbSeqName() == target_prsm_ptr->getDbSeqName()) {
       return true;
     }
   }
@@ -31,7 +31,7 @@ PrsmStrPtrVec getTopPrsms(PrsmStrPtrVec &prsm_str_ptrs, int n_top){
   int max = size > n_top? n_top:size;
   PrsmStrPtrVec result_ptrs;
   for(int i=0;i<max;i++){
-    if(!containsSameDbSeq(result_ptrs, prsm_str_ptrs[i])){
+    if(!containsSameFastaSeq(result_ptrs, prsm_str_ptrs[i])){
       result_ptrs.push_back(prsm_str_ptrs[i]);
     }
   }

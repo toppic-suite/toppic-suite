@@ -13,12 +13,10 @@ SpectrumSet::SpectrumSet(DeconvMsPtrVec deconv_ms_ptr_vec,
     sp_para_ptr_(sp_para_ptr),
     prec_mono_mass_(prec_mono_mass) {
       // add error tolerance for precursor mass 
-      double ppo = sp_para_ptr_->getPeakTolerancePtr()->getPpo();
       ActivationPtr activation_ptr = sp_para_ptr->getActivationPtr();
       for (size_t i = 0; i < deconv_ms_ptr_vec_.size(); i++) {
         DeconvMsPtr deconv_ms_ptr = deconv_ms_ptr_vec[i];
         MsHeaderPtr ms_header_ptr = deconv_ms_ptr->getMsHeaderPtr();
-        ms_header_ptr->setErrorToleranceByPpo(ppo);
         if(ms_header_ptr->getActivationPtr() == nullptr && activation_ptr != nullptr){
           ms_header_ptr->setActivationPtr(activation_ptr);
         }

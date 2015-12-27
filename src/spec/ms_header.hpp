@@ -20,7 +20,7 @@ class MsHeader {
 
   double getPrecMonoMassMinusWater();
 
-  std::pair<int,int> getPrecMonoMassMinusWaterError(double scale);
+  std::pair<int,int> getPrecMonoMassMinusWaterError(double ppo, double scale);
 
   std::string getScansString();
 
@@ -51,7 +51,7 @@ class MsHeader {
 
   int getPrecId() {return prec_id_;}
 
-  double getErrorTolerance() {return error_tolerance_;}
+  double getErrorTolerance(double ppo) {return getPrecMonoMass() * ppo;}
 
   /* set function */
   void setActivationPtr(ActivationPtr acti_ptr) {activation_ptr_ = acti_ptr;}
@@ -79,8 +79,8 @@ class MsHeader {
 
   void setPrecId(int prec_id) {prec_id_ = prec_id;}
 
-  void setErrorToleranceByPpo(double ppo) {
-    error_tolerance_ = getPrecMonoMass() * ppo;}
+  //void setErrorToleranceByPpo(double ppo) {
+  //  error_tolerance_ = getPrecMonoMass() * ppo;}
 
   xercesc::DOMElement* getHeaderXml(XmlDOMDocument* xml_doc);
 
@@ -115,7 +115,7 @@ class MsHeader {
   /** precursor charge state */ 
   int prec_charge_ = -1;
   /** precursor mass error tolerance */
-  double error_tolerance_=0.0;
+  //double error_tolerance_=0.0;
 };
 
 }

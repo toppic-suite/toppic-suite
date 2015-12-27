@@ -27,7 +27,6 @@ MsHeader::MsHeader(xercesc::DOMElement* element){
   prec_sp_mz_ = XmlDomUtil::getDoubleChildValue(element,"prec_sp_mz",0);
   prec_mono_mz_ = XmlDomUtil::getDoubleChildValue(element,"prec_mono_mz",0);
   prec_charge_ = XmlDomUtil::getIntChildValue(element,"prec_charge",0);
-  error_tolerance_ = XmlDomUtil::getDoubleChildValue(element,"error_tolerance",0);
   std::string element_name = Activation::getXmlElementName();
   xercesc::DOMElement* ac_element 
       = XmlDomUtil::getChildElement(element,element_name.c_str(),0);
@@ -63,12 +62,16 @@ double MsHeader::getPrecMonoMassMinusWater() {
   }
 }
 
-std::pair<int,int> MsHeader::getPrecMonoMassMinusWaterError(double scale) {
+
+std::pair<int,int> MsHeader::getPrecMonoMassMinusWaterError(double ppo, 
+                                                            double scale) {
   int mass = (int) std::round(getPrecMonoMassMinusWater() * scale);
-  int error = (int) std::ceil(error_tolerance_*scale);
+  double error_tolerance = getErrorTolerance(ppo);
+  int error = (int) std::ceil(error_tolerance*scale);
   std::pair<int,int> result (mass,error);
   return result;
 }
+
 
 std::string MsHeader::toString() {
   std::stringstream tmp;
@@ -129,25 +132,11 @@ xercesc::DOMElement* MsHeader::getHeaderXml(XmlDOMDocument* xml_doc) {
   xml_doc->addElement(element, "retention_time", str.c_str());
   str = StringUtil::convertToString(prec_sp_mz_);
   xml_doc->addElement(element, "prec_sp_mz", str.c_str());
-  str = StringUtil::convertToString(prec_mono_mz_);
+  str = StringUtil::convertToString(prec_mono_mz_, precison);
   xml_doc->addElement(element, "prec_mono_mz", str.c_str());
   str = StringUtil::convertToString(prec_charge_);
   xml_doc->addElement(element, "prec_charge", str.c_str());
-  str = StringUtil::convertToString(prec_charge_);
-  xml_doc->addElement(element, "precursor_charge", str.c_str());
-  str = StringUtil::convertToString(error_tolerance_);
-  xml_doc->addElement(element, "error_tolerance", str.c_str());
   activation_ptr_->appendNameToXml(xml_doc, element);
-  str = StringUtil::convertToString(prec_mono_mz_, precison);
-  xml_doc->addElement(element, "precursor_mz", str.c_str());
-  if (prec_mono_mz_ < 0) {
-    std::cout << "monoisotopic mass is not initialized!" << std::endl;
-  } else {
-    double prec_mass = prec_mono_mz_ * prec_charge_
-        - prec_charge_ * prot::MassConstant::getProtonMass();
-    str = StringUtil::convertToString(prec_mass, precison);
-    xml_doc->addElement(element, "precursor_mass", str.c_str());
-  }
   return element;
 }
 

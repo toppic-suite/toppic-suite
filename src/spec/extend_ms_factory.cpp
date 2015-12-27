@@ -53,8 +53,7 @@ ExtendMsPtr ExtendMsFactory::geneMsThreePtr(
         = peak_tole_ptr->compRelaxErrorTole(mass, prec_mono_mass);
     list_filtered[i]->setReverseTolerance(reve_tole);
   }
-  double ppo = peak_tole_ptr->getPpo();
-  return ExtendMsPtr(new Ms<ExtendPeakPtr>(header_ptr,list_filtered, ppo));
+  return ExtendMsPtr(new Ms<ExtendPeakPtr>(header_ptr,list_filtered));
 }
 
 ExtendMsPtrVec ExtendMsFactory::geneMsThreePtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, 

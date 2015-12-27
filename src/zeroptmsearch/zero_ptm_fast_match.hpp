@@ -31,7 +31,7 @@ class ZeroPtmFastMatch {
   static ZpFastMatchPtrVec filter(AlignTypePtr align_type_ptr,
                                   const ExtendMsPtrVec &ms_ptr_ptr,
                                   const ProteoformPtrVec &proteo_ptrs,
-                                  int report_num);
+                                  int report_num, double ppo);
  private:
   ProteoformPtr proteo_ptr_;
   double score_;

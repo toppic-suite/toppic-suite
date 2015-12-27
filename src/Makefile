@@ -24,7 +24,7 @@ all:
 	cd test; make
 
 clean:
-	cd base; make clean
+#	cd base; make clean
 	cd spec; make clean
 	cd prsm; make clean
 	cd zeroptmfilter; make clean
