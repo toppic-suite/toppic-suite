@@ -79,7 +79,6 @@ int zero_ptm_process(int argc, char* argv[]) {
     time_t start_s;
     time_t stop_s;
 
-    /*
     time(&start_s);
     std::cout << "Zero PTM filtering started." << std::endl;
     ZeroPtmFilterMngPtr zero_filter_mng_ptr = ZeroPtmFilterMngPtr(new ZeroPtmFilterMng (prsm_para_ptr, "ZERO_FILTER"));
@@ -89,7 +88,6 @@ int zero_ptm_process(int argc, char* argv[]) {
     std::cout << "Zero PTM filtering finished." << std::endl;
     time(&stop_s);
     std::cout <<  "Zero PTM filtering running time: " << difftime(stop_s, start_s)  << " seconds " << std::endl;
-
 
     time(&start_s);
     std::cout << "Zero PTM search started." << std::endl;
@@ -112,7 +110,6 @@ int zero_ptm_process(int argc, char* argv[]) {
     std::cout << "E-value computation finished." << std::endl;
     time(&stop_s);
     std::cout <<  "Computing e-values running time: " << difftime(stop_s, start_s)  << " seconds " << std::endl;
-    */
 
     std::cout << "Top PRSM selecting started" << std::endl;
     PrsmTopSelectorPtr selector = PrsmTopSelectorPtr(
@@ -136,6 +133,8 @@ int zero_ptm_process(int argc, char* argv[]) {
     PrsmTableWriterPtr table_out = PrsmTableWriterPtr(
         new PrsmTableWriter(prsm_para_ptr, "CUTOFF_RESULT", "ZERO_TABLE"));
     table_out->write();
+    table_out = nullptr;
+    std::cout << "Outputting table finished." << std::endl;
     /*
     table_out = PrsmTableWriterPtr(new PrsmTableWriter(prsm_para_ptr, "ZERO_COMPLETE", "ZERO_COMPLETE_TABLE"));
     table_out->write();
@@ -146,8 +145,6 @@ int zero_ptm_process(int argc, char* argv[]) {
     table_out = PrsmTableWriterPtr(new PrsmTableWriter(prsm_para_ptr, "ZERO_INTERNAL", "ZERO_INTERNAL_TABLE"));
     table_out->write();
     */
-    table_out = nullptr;
-    std::cout << "Outputting table finished." << std::endl;
 
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
