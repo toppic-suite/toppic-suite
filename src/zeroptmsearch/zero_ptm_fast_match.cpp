@@ -70,9 +70,9 @@ double compScore(const ExtendMsPtrVec &ms_ptr_vec, ProteoformPtr proteo_ptr,
 
 
 ZpFastMatchPtr computeCompMatch(const ExtendMsPtrVec &ms_ptr_vec, 
-                                ProteoformPtr proteo_ptr) {
+                                ProteoformPtr proteo_ptr, double ppo) {
   MsHeaderPtr header_ptr = ms_ptr_vec[0]->getMsHeaderPtr();
-  double max_error = header_ptr->getErrorTolerance();
+  double max_error = header_ptr->getErrorTolerance(ppo);
   double res_sum_mass = header_ptr->getPrecMonoMassMinusWater();
   double prot_mass = proteo_ptr->getResSeqPtr()->getResMassSum();
   double error = std::abs(res_sum_mass - prot_mass);
@@ -89,12 +89,12 @@ ZpFastMatchPtr computeCompMatch(const ExtendMsPtrVec &ms_ptr_vec,
       new ZeroPtmFastMatch(proteo_ptr, score, 0, end));
 }
 
-ZpFastMatchPtr computePrefixMatch(
-    const ExtendMsPtrVec &ms_ptr_vec, ProteoformPtr proteo_ptr) {
+ZpFastMatchPtr computePrefixMatch(const ExtendMsPtrVec &ms_ptr_vec, 
+                                  ProteoformPtr proteo_ptr, double ppo) {
   /* check if there is a matched prefix */
   std::vector<double> prms = proteo_ptr->getBpSpecPtr()->getPrmMasses();
   MsHeaderPtr header_ptr = ms_ptr_vec[0]->getMsHeaderPtr();
-  double max_error = header_ptr->getErrorTolerance();
+  double max_error = header_ptr->getErrorTolerance(ppo);
   double res_sum_mass = header_ptr->getPrecMonoMassMinusWater();
 
   bool is_prefix = false;
@@ -125,11 +125,11 @@ ZpFastMatchPtr computePrefixMatch(
   return ZpFastMatchPtr(new ZeroPtmFastMatch(proteo_ptr, score, 0, seq_end));
 }
 
-ZpFastMatchPtr computeSuffixMatch(
-    const ExtendMsPtrVec &ms_ptr_vec, ProteoformPtr proteo_ptr) {
+ZpFastMatchPtr computeSuffixMatch(const ExtendMsPtrVec &ms_ptr_vec, 
+                                  ProteoformPtr proteo_ptr, double ppo) {
   std::vector<double> prms = proteo_ptr->getBpSpecPtr()->getPrmMasses();
   MsHeaderPtr header_ptr = ms_ptr_vec[0]->getMsHeaderPtr();
-  double max_error = header_ptr->getErrorTolerance();
+  double max_error = header_ptr->getErrorTolerance(ppo);
   double res_sum_mass = header_ptr->getPrecMonoMassMinusWater();
   double diff = prms[prms.size()-1] - res_sum_mass;
 
@@ -156,11 +156,11 @@ ZpFastMatchPtr computeSuffixMatch(
       new ZeroPtmFastMatch(proteo_ptr, score, seq_bgn, seq_end));
 }
 
-ZpFastMatchPtr computeInternalMatch(
-    const ExtendMsPtrVec &ms_ptr_vec, ProteoformPtr proteo_ptr) {
+ZpFastMatchPtr computeInternalMatch(const ExtendMsPtrVec &ms_ptr_vec, 
+                                    ProteoformPtr proteo_ptr, double ppo) {
   std::vector<double> prms = proteo_ptr->getBpSpecPtr()->getPrmMasses();
   MsHeaderPtr header_ptr = ms_ptr_vec[0]->getMsHeaderPtr();
-  double max_error = header_ptr->getErrorTolerance();
+  double max_error = header_ptr->getErrorTolerance(ppo);
   double res_sum_mass = header_ptr->getPrecMonoMassMinusWater();
 
   ActivationPtr activation = header_ptr->getActivationPtr();
@@ -207,21 +207,21 @@ ZpFastMatchPtr computeInternalMatch(
 ZpFastMatchPtrVec ZeroPtmFastMatch::filter(AlignTypePtr align_type_ptr,
                                            const ExtendMsPtrVec &ms_ptr_vec,
                                            const ProteoformPtrVec &proteo_ptrs,
-                                           int report_num) {
+                                           int report_num, double ppo) {
   
   ZpFastMatchPtrVec match_vec;
   for (size_t i = 0; i < proteo_ptrs.size(); i++) {
     if (align_type_ptr == AlignType::COMPLETE) { 
-        match_vec.push_back(computeCompMatch(ms_ptr_vec, proteo_ptrs[i]));
+        match_vec.push_back(computeCompMatch(ms_ptr_vec, proteo_ptrs[i], ppo));
     }
     else if (align_type_ptr == AlignType::PREFIX) { 
-        match_vec.push_back(computePrefixMatch(ms_ptr_vec, proteo_ptrs[i]));
+        match_vec.push_back(computePrefixMatch(ms_ptr_vec, proteo_ptrs[i], ppo));
     }
     else if (align_type_ptr == AlignType::SUFFIX) { 
-        match_vec.push_back(computeSuffixMatch(ms_ptr_vec, proteo_ptrs[i]));
+        match_vec.push_back(computeSuffixMatch(ms_ptr_vec, proteo_ptrs[i], ppo));
     }
     else if (align_type_ptr == AlignType::INTERNAL) { 
-        match_vec.push_back(computeInternalMatch(ms_ptr_vec, proteo_ptrs[i]));
+        match_vec.push_back(computeInternalMatch(ms_ptr_vec, proteo_ptrs[i], ppo));
     }
   }
 

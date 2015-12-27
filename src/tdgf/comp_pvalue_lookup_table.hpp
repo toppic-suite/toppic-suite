@@ -13,7 +13,7 @@ class CompPValueLookupTable {
 
   bool inTable(const DeconvMsPtrVec &deconv_ms_ptr_vec, const PrsmPtrVec &prsm_ptrs);
 
-  void process(const DeconvMsPtrVec &deconv_ms_ptr_vec, PrsmPtrVec &prsm_ptrs);
+  void process(const DeconvMsPtrVec &deconv_ms_ptr_vec, PrsmPtrVec &prsm_ptrs, double ppo);
 
  private:
 

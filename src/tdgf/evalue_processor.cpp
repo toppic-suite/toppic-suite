@@ -60,6 +60,7 @@ void EValueProcessor::process(bool is_separate) {
   //init variables
   int spectrum_num = MsAlignUtil::getSpNum(spectrum_file_name);
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
+  double ppo = sp_para_ptr->getPeakTolerancePtr()->getPpo();
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
   MsAlignReader sp_reader(spectrum_file_name, group_spec_num);
   int cnt = 0;
@@ -74,7 +75,7 @@ void EValueProcessor::process(bool is_separate) {
         selected_prsm_ptrs.push_back(prsm_ptr);
         prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
       }
-      processOneSpectrum(spec_set_ptr, selected_prsm_ptrs, is_separate, writer);
+      processOneSpectrum(spec_set_ptr, selected_prsm_ptrs, ppo, is_separate, writer);
     }
 
     std::cout << std::flush << "E-value computation is processing " << cnt << " of " 
@@ -107,16 +108,16 @@ bool EValueProcessor::checkPrsms(const PrsmPtrVec &prsm_ptrs) {
   return true;
 }
 
-void EValueProcessor::compEvalues(SpectrumSetPtr spec_set_ptr,
-                                  bool is_separate, PrsmPtrVec &sele_prsm_ptrs) {
+void EValueProcessor::compEvalues(SpectrumSetPtr spec_set_ptr, PrsmPtrVec &sele_prsm_ptrs,
+                                  double ppo, bool is_separate) {
 
   if (!mng_ptr_->use_gf_ 
       && comp_pvalue_table_ptr_->inTable(spec_set_ptr->getDeconvMsPtrVec(), sele_prsm_ptrs)) {
-    comp_pvalue_table_ptr_->process(spec_set_ptr->getDeconvMsPtrVec(), sele_prsm_ptrs);
+    comp_pvalue_table_ptr_->process(spec_set_ptr->getDeconvMsPtrVec(), sele_prsm_ptrs, ppo);
     LOG_DEBUG("Using table");
   }
   else {
-    comp_pvalue_ptr_->process(spec_set_ptr, is_separate, sele_prsm_ptrs);
+    comp_pvalue_ptr_->process(spec_set_ptr, sele_prsm_ptrs, ppo, is_separate);
   }
 
   // if matched peak number is too small or E-value is 0, replace it
@@ -136,7 +137,7 @@ void EValueProcessor::compEvalues(SpectrumSetPtr spec_set_ptr,
 
 void EValueProcessor::processOneSpectrum(SpectrumSetPtr spec_set_ptr,
                                          PrsmPtrVec &sele_prsm_ptrs,
-                                         bool is_separate,
+                                         double ppo, bool is_separate,
                                          PrsmXmlWriter &writer) {
   //LOG_DEBUG("sele prsm number " << sele_prsm_ptrs.size());
   if (spec_set_ptr->isValid()) {
@@ -145,7 +146,7 @@ void EValueProcessor::processOneSpectrum(SpectrumSetPtr spec_set_ptr,
     //LOG_DEBUG("Need computation: " << need_comp );
 
     if (need_comp) {
-      compEvalues(spec_set_ptr, is_separate, sele_prsm_ptrs);
+      compEvalues(spec_set_ptr, sele_prsm_ptrs, ppo, is_separate);
     }
 
     //LOG_DEBUG("start sort");

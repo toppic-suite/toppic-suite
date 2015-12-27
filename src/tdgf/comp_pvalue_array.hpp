@@ -14,11 +14,11 @@ class CompPValueArray {
                   TdgfMngPtr mng_ptr);
 
   void compMultiExtremeValues(const PrmMsPtrVec &ms_six_ptr_vec, PrsmPtrVec &prsm_ptrs, 
-                              bool strict);
+                              double ppo, bool strict);
 
-  void compSingleExtremeValue(const DeconvMsPtrVec &ms_ptr_vec, PrsmPtr prsm_ptr);
+  void compSingleExtremeValue(const DeconvMsPtrVec &ms_ptr_vec, PrsmPtr prsm_ptr, double ppo);
 
-  void process(SpectrumSetPtr spec_set_ptr, bool is_separate, PrsmPtrVec &prsm_ptrs);
+  void process(SpectrumSetPtr spec_set_ptr, PrsmPtrVec &prsm_ptrs, double ppo, bool is_separate);
 
  private:
   TdgfMngPtr mng_ptr_;

@@ -19,12 +19,6 @@ class Ms {
     peak_ptr_list_ = peak_ptr_list;
   }
 
-  Ms(MsHeaderPtr header_ptr, const std::vector<T> &peak_ptr_list, double ppo) {
-    header_ptr_ = header_ptr;
-    peak_ptr_list_ = peak_ptr_list;
-    header_ptr_->setErrorToleranceByPpo(ppo);
-  }
-
   /**
    * Removes precursor mass. In ETD data, MSMS may contain a high precursor
    * mass peak. So we use the following to remove it.

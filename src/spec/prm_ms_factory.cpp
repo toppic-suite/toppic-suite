@@ -76,8 +76,7 @@ PrmMsPtr geneMsTwoPtr(DeconvMsPtr deconv_ms_ptr, int spec_id, SpParaPtr sp_para_
   //sort 
   std::sort(list_filtered.begin(), list_filtered.end(),PrmPeak::cmpPosIncrease);
 
-  double ppo = sp_para_ptr->getPeakTolerancePtr()->getPpo();
-  return PrmMsPtr(new Ms<PrmPeakPtr>(header_ptr,list_filtered, ppo)) ;
+  return PrmMsPtr(new Ms<PrmPeakPtr>(header_ptr,list_filtered)) ;
 }
 
 PrmMsPtr geneMsSixPtr(DeconvMsPtr deconv_ms_ptr, int spec_id, SpParaPtr sp_para_ptr,
@@ -107,8 +106,7 @@ PrmMsPtr geneMsSixPtr(DeconvMsPtr deconv_ms_ptr, int spec_id, SpParaPtr sp_para_
   //sort 
   std::sort(list_filtered.begin(), list_filtered.end(),PrmPeak::cmpPosIncrease);
 
-  double ppo = sp_para_ptr->getPeakTolerancePtr()->getPpo();
-  return PrmMsPtr(new Ms<PrmPeakPtr>(header_ptr,list_filtered, ppo)) ;
+  return PrmMsPtr(new Ms<PrmPeakPtr>(header_ptr,list_filtered)) ;
 }
 
 PrmMsPtr geneShiftMsSixPtr(DeconvMsPtr deconv_ms_ptr, int spec_id, SpParaPtr sp_para_ptr, 
@@ -126,8 +124,7 @@ PrmMsPtr geneShiftMsSixPtr(DeconvMsPtr deconv_ms_ptr, int spec_id, SpParaPtr sp_
       prm_peak_list.push_back(prm_ms_ptr->getPeakPtr(i));
     }
   }
-  double ppo = sp_para_ptr->getPeakTolerancePtr()->getPpo();
-  return PrmMsPtr(new Ms<PrmPeakPtr>(header_ptr, prm_peak_list, ppo));
+  return PrmMsPtr(new Ms<PrmPeakPtr>(header_ptr, prm_peak_list));
 }
 
 PrmMsPtrVec PrmMsFactory::geneMsTwoPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, 

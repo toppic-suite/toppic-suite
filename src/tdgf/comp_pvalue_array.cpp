@@ -24,7 +24,7 @@ CompPValueArray::CompPValueArray(CountTestNumPtr test_num_ptr,
 /* set alignment */
 void CompPValueArray::compMultiExtremeValues(const PrmMsPtrVec &ms_six_ptr_vec, 
                                              PrsmPtrVec &prsm_ptrs, 
-                                             bool strict) {
+                                             double ppo, bool strict) {
   PrmPeakPtrVec2D prm_ptr_2d;
   for (size_t i = 0; i < ms_six_ptr_vec.size(); i++) {
     PrmPeakPtrVec prm_peak_ptrs = ms_six_ptr_vec[i]->getPeakPtrVec();
@@ -38,7 +38,7 @@ void CompPValueArray::compMultiExtremeValues(const PrmMsPtrVec &ms_six_ptr_vec,
                                prm_ptr_2d, prsm_ptrs, strict, pep_probs);
   //LOG_DEBUG("probability computation complete");
   double prec_mass = ms_six_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMassMinusWater();
-  double tolerance = ms_six_ptr_vec[0]->getMsHeaderPtr()->getErrorTolerance();
+  double tolerance = ms_six_ptr_vec[0]->getMsHeaderPtr()->getErrorTolerance(ppo);
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     //LOG_DEBUG("prsm " << i << " prsm size " << prsm_ptrs.size());
     int unexpect_shift_num = prsm_ptrs[i]->getProteoformPtr()->getChangeNum(ChangeType::UNEXPECTED);
@@ -80,7 +80,7 @@ void CompPValueArray::compMultiExtremeValues(const PrmMsPtrVec &ms_six_ptr_vec,
 }
 
 void CompPValueArray::compSingleExtremeValue(const DeconvMsPtrVec &ms_ptr_vec, 
-                                             PrsmPtr prsm_ptr) {
+                                             PrsmPtr prsm_ptr, double ppo) {
   double refine_prec_mass = prsm_ptr->getAdjustedPrecMass();
   DeconvMsPtrVec refine_ms_ptr_vec = DeconvMsFactory::getRefineMsPtrVec(ms_ptr_vec, refine_prec_mass);
 
@@ -96,21 +96,21 @@ void CompPValueArray::compSingleExtremeValue(const DeconvMsPtrVec &ms_ptr_vec,
 
   PrsmPtrVec prsm_ptrs;
   prsm_ptrs.push_back(prsm_ptr);
-  compMultiExtremeValues(prm_ms_ptr_vec, prsm_ptrs, true);
+  compMultiExtremeValues(prm_ms_ptr_vec, prsm_ptrs, ppo, true);
 }
 
 
-void CompPValueArray::process(SpectrumSetPtr spec_set_ptr, 
-                              bool is_separate, PrsmPtrVec &prsm_ptrs) {
+void CompPValueArray::process(SpectrumSetPtr spec_set_ptr, PrsmPtrVec &prsm_ptrs,
+                              double ppo, bool is_separate) {
 
   if (is_separate) {
     for (unsigned i = 0; i < prsm_ptrs.size(); i++) {
       compSingleExtremeValue(spec_set_ptr->getDeconvMsPtrVec(), 
-                             prsm_ptrs[i]);
+                             prsm_ptrs[i], ppo);
     }
   } 
   else {
-    compMultiExtremeValues(spec_set_ptr->getMsSixPtrVec(), prsm_ptrs, false);
+    compMultiExtremeValues(spec_set_ptr->getMsSixPtrVec(), prsm_ptrs, ppo, false);
   }
 }
 

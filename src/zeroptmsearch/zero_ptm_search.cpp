@@ -45,10 +45,10 @@ void zeroPtmSearchOneSpec(SpectrumSetPtr spec_set_ptr,
       proteoform_ptr_vec.push_back(proteo_ptr);
     }
   }
-
+  double ppo = mng_ptr->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
   ZpFastMatchPtrVec fast_matches 
       = ZeroPtmFastMatch::filter(type_ptr, ms_three_vec, proteoform_ptr_vec, 
-                          mng_ptr->zero_ptm_filter_result_num_);
+                          mng_ptr->zero_ptm_filter_result_num_, ppo);
   //LOG_DEBUG("fast_match ended size " << fast_matches.size());
   DeconvMsPtrVec deconv_ms_vec = spec_set_ptr->getDeconvMsPtrVec();
   ZpSlowMatchPtrVec slow_matches 
