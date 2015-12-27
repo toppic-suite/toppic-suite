@@ -188,6 +188,17 @@ double Prsm::getOneProtProb() {
   }
 }
 
+// sort by the number of matched fragments, then the number of matched peaks
+bool Prsm::cmpMatchFragmentDecMatchPeakDec(const PrsmPtr &a, const PrsmPtr &b) {
+  if(a->getMatchFragNum() > b->getMatchFragNum()){
+    return true;
+  }
+  else if(a->getMatchFragNum() < b->getMatchFragNum()){
+    return false;
+  }
+  return a->getMatchPeakNum() > b->getMatchPeakNum();
+}
+
 
 // sort by number of matched fragment ions, then start position 
 bool Prsm::cmpMatchFragDecStartPosInc(const PrsmPtr &a, const PrsmPtr &b) {

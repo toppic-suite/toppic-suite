@@ -60,7 +60,7 @@ void zeroPtmSearchOneSpec(SpectrumSetPtr spec_set_ptr,
   }
   //LOG_DEBUG("prsm generation ended size " << prsms.size());
 
-  std::sort(prsms.begin(), prsms.end(), Prsm::cmpMatchFragmentDec);
+  std::sort(prsms.begin(), prsms.end(), Prsm::cmpMatchFragmentDecMatchPeakDec);
   if (prsms.size() > 0) {
     prsms.erase(prsms.begin() + 1, prsms.end());
   }

@@ -85,10 +85,11 @@ class Prsm {
     return a->getEValue() > b->getEValue();
   }
 
-
   static bool cmpMatchFragmentDec(const PrsmPtr &a, const PrsmPtr &b) {
     return a->getMatchFragNum() > b->getMatchFragNum();
   }
+
+  static bool cmpMatchFragmentDecMatchPeakDec(const PrsmPtr &a, const PrsmPtr &b);
 
   // sort by number of matched fragment ions, then start position 
   static bool cmpMatchFragDecStartPosInc(const PrsmPtr &a, const PrsmPtr &b);
