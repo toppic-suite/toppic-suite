@@ -142,7 +142,7 @@ bool Argument::parse(int argc, char* argv[]) {
 
     desc.add_options() 
         ("help,h", "Print the help message.") 
-        ("argument-file,f",po::value<std::string>(&argument_file_name),"Argument file name.")
+        ("argument-file,r",po::value<std::string>(&argument_file_name),"Argument file name.")
         ("activation,a", po::value<std::string>(&activation),
          "<CID|HCD|ETD|FILE>. The activation type of tandem mass spectra. When FILE is used, the activation type information is given in spectral data file. Default value: FILE.")
 

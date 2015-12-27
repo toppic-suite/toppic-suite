@@ -101,8 +101,8 @@ bool ProteoformUtil::isStrictCompatiablePtmSpecies(ProteoformPtr a, ProteoformPt
   // sort changes
   ChangePtrVec a_change_vec = a->getChangePtrVec();
   ChangePtrVec b_change_vec = b->getChangePtrVec();
-  std::sort(a_change_vec.begin(),a_change_vec.end(),Change::cmpPosIncrease);
-  std::sort(b_change_vec.begin(),b_change_vec.end(),Change::cmpPosIncrease);
+  std::sort(a_change_vec.begin(),a_change_vec.end(),Change::cmpPosInc);
+  std::sort(b_change_vec.begin(),b_change_vec.end(),Change::cmpPosInc);
   for(size_t i=0; i< a->getChangePtrVec().size(); i++) {
     ChangePtr ac = a_change_vec[i];
     ChangePtr bc = b_change_vec[i];
