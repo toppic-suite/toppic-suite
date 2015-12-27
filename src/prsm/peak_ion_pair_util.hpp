@@ -13,7 +13,7 @@ class PeakIonPairUtil {
   static PeakIonPairPtrVec getMatchedPairs(const PeakIonPairPtrVec &pair_ptrs, 
                                            int spec_id, int peak_id);
 
-  static int getPeakIonPairNum(const PeakIonPairPtrVec &pair_ptrs); 
+  static int getPeakIonPairNum(PeakIonPairPtrVec pair_ptrs); 
 
   static double computePairConverage(const PeakIonPairPtrVec &pair_ptrs, int begin, 
                                      int end, PrmBreakTypePtr type_ptr);

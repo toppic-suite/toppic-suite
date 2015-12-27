@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "base/logger.hpp"
 #include "base/algorithm.hpp"
 #include "spec/theo_peak.hpp"
@@ -17,10 +19,10 @@ PeakIonPairPtrVec PeakIonPairUtil::getMatchedPairs(const PeakIonPairPtrVec &pair
   return selected_pair_ptrs;
 }
 
-int PeakIonPairUtil::getPeakIonPairNum(const PeakIonPairPtrVec &pairs) {
+int PeakIonPairUtil::getPeakIonPairNum(PeakIonPairPtrVec pairs) {
   int match_peak_num = 0;
   DeconvPeakPtr prev_deconv_peak(nullptr);
-  // do we need to sort pair?
+  std::sort(pairs.begin(), pairs.end(), PeakIonPair::cmpRealPeakPosInc);
   for (size_t i = 0; i < pairs.size(); i++) {
     if (pairs[i]->getRealPeakPtr()->getBasePeakPtr() != prev_deconv_peak) {
       prev_deconv_peak = pairs[i]->getRealPeakPtr()->getBasePeakPtr();

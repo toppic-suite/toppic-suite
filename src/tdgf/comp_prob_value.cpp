@@ -17,7 +17,7 @@ ProbPeak::ProbPeak(PrmPeakPtr peak_ptr, int spectrum_id, int height,
   } else {
     tolerance_ = std::ceil(peak_ptr->getNStrictCRelaxTolerance() * convert_ratio);
   }
-  base_type_ptr_ = peak_ptr->getBaseType();
+  base_type_ptr_ = peak_ptr->getBaseTypePtr();
   spectrum_id_ = spectrum_id;
   mass_bgn_ = mass_ - tolerance_;
   mass_end_ = mass_ + tolerance_;

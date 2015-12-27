@@ -23,7 +23,7 @@ Proteoform::Proteoform(FastaSeqPtr fasta_seq_ptr, ProtModPtr prot_mod_ptr,
     residue_seq_ptr_(res_seq_ptr),
     change_list_(change_ptr_vec) {
       bp_spec_ptr_ = BpSpecPtr(new BpSpec(res_seq_ptr));
-      std::sort(change_list_.begin(), change_list_.end(), Change::cmpPosIncrease);
+      std::sort(change_list_.begin(), change_list_.end(), Change::cmpPosInc);
       species_id_=0;
     }
 
@@ -202,7 +202,7 @@ std::string Proteoform::getProteinMatchSeq() {
   //LOG_DEBUG("protein string lenth " << protein_string.length() << " string " << protein_string);
   std::string mid_string = residue_seq_ptr_->toAcidString();
   //LOG_DEBUG("mid string lenth " << mid_string.length() << " string " << mid_string);
-  std::sort(change_list_.begin(),change_list_.end(),Change::cmpPosIncrease);
+  std::sort(change_list_.begin(),change_list_.end(),Change::cmpPosInc);
 
   std::vector<std::string> left_strings(mid_string.length() + 1, "");
   std::vector<std::string> right_strings(mid_string.length() + 1, "");
