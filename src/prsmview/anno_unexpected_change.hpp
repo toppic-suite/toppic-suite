@@ -17,17 +17,17 @@ class AnnoUnexpectedChange {
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent,
                  int decimal_point_num);
 
-  void addOccurence(int pos, const std::string &acid_letter);
-
   std::string getChangeType() {return type_;}
 
   int getRightPos() {return right_pos_;}
 
   void setRightPos(int right_pos) {right_pos_ = right_pos;}
 
-  ModPtr getModPtr() {return mod_ptr_;}
+  //void addOccurence(int pos, const std::string &acid_letter);
 
-  void setModPtr(ModPtr m) {mod_ptr_ = m;}
+  //ModPtr getModPtr() {return mod_ptr_;}
+
+  //void setModPtr(ModPtr m) {mod_ptr_ = m;}
 
  private:
   int left_pos_;
@@ -35,8 +35,8 @@ class AnnoUnexpectedChange {
   double mass_shift_;
   int color_;
   std::string type_;
-  ModPtr mod_ptr_;
-  std::vector<std::pair<int, std::string> > occurences_;
+  //ModPtr mod_ptr_;
+  //std::vector<std::pair<int, std::string> > occurences_;
 };
 
 typedef std::shared_ptr<AnnoUnexpectedChange> AnnoUnexpectedChangePtr;
