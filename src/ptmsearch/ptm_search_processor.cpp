@@ -90,7 +90,6 @@ void PtmSearchProcessor::process(){
         prsm_ptr = simple_prsm_reader.readOnePrsm();
       }
       if (selected_prsm_ptrs.size() > 0) {
-        //LOG_DEBUG("start processing one spectrum.");
         processOneSpectrum(spec_set_ptr, selected_prsm_ptrs);
       }
     }
@@ -158,7 +157,7 @@ void PtmSearchProcessor::processOneSpectrum(SpectrumSetPtr spectrum_set_ptr,
     std::sort(internal_prsm_ptrs.begin(), internal_prsm_ptrs.end(), Prsm::cmpMatchFragmentDec);
     PrsmPtrVec sele_internal_prsm_ptrs;
     seleTopPrsms(internal_prsm_ptrs, sele_internal_prsm_ptrs, mng_ptr_->n_report_);
-    internal_writer_ptrs_[s-1]->writeVector(sele_internal_prsm_ptrs);
+    internal_writer_ptrs_[s-2]->writeVector(sele_internal_prsm_ptrs);
     all_writer_ptr_->writeVector(sele_internal_prsm_ptrs);
   }
 }
