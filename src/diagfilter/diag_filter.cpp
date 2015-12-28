@@ -10,11 +10,12 @@ DiagFilter::DiagFilter(const ProteoformPtrVec &proteo_ptrs,
                        DiagFilterMngPtr mng_ptr){
   mng_ptr_ = mng_ptr;
   proteo_ptrs_ = proteo_ptrs;
+  bool use_rev = false;
   index_ptr_ = CompShiftPtr(new CompShift(proteo_ptrs, 
                                           mng_ptr->filter_scale_,
                                           mng_ptr->max_proteoform_mass_,
                                           mng_ptr->prsm_para_ptr_->getProtModPtrVec(),
-                                          false));
+                                          use_rev));
 }
 
 SimplePrsmPtrVec DiagFilter::getBestMatch(const PrmMsPtrVec &ms_ptr_vec){

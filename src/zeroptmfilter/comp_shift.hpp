@@ -13,7 +13,8 @@ namespace prot {
 class CompShift {
  public:
   CompShift(const ProteoformPtrVec &proteo_ptrs, int scale,
-            double max_proteoform_mass, ProtModPtrVec prot_mod_ptr_vec);
+            double max_proteoform_mass, ProtModPtrVec prot_mod_ptr_vec, 
+            bool use_rev);
 
   ~CompShift();
 

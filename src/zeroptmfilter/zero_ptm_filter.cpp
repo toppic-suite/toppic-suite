@@ -8,10 +8,12 @@ ZeroPtmFilter::ZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
                              ZeroPtmFilterMngPtr mng_ptr){
   mng_ptr_ = mng_ptr;
   proteo_ptrs_ = proteo_ptrs;
+  bool use_rev = true;
   index_ptr_ = CompShiftPtr( new CompShift(proteo_ptrs, 
                                            mng_ptr->filter_scale_,
                                            mng_ptr->max_proteoform_mass_,
-                                           mng_ptr->prsm_para_ptr_->getProtModPtrVec()));
+                                           mng_ptr->prsm_para_ptr_->getProtModPtrVec(),
+                                           use_rev));
 }
 
 void ZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec){
