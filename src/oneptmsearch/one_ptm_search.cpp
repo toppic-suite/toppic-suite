@@ -11,7 +11,7 @@
 #include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_str_combine.hpp"
 #include "oneptmsearch/comp_shift_low_mem.hpp"
-#include "oneptmsearch/one_ptm_slow_match.hpp"
+#include "oneptmsearch/ptm_slow_match.hpp"
 #include "oneptmsearch/one_ptm_search.hpp"
 
 namespace prot {
@@ -20,7 +20,7 @@ void onePtmSearchOneSpec(SpectrumSetPtr spec_set_ptr,
                          SimplePrsmPtrVec &simple_prsm_ptr_vec,
                          CompShiftLowMemPtr comp_shift_ptr,
                          FastaIndexReaderPtr reader_ptr,
-                         OnePtmSearchMngPtr mng_ptr, 
+                         PtmSearchMngPtr mng_ptr, 
                          AlignTypePtr type_ptr,
                          PrsmPtrVec &prsms) {
 
@@ -44,10 +44,10 @@ void onePtmSearchOneSpec(SpectrumSetPtr spec_set_ptr,
   }
 
   for (size_t i = 0; i < proteoform_ptr_vec.size(); i++) { 
-    OnePtmSlowMatch slow_match(proteoform_ptr_vec[i],
-                               spec_set_ptr, type_ptr,
-                               comp_shift_ptr, mng_ptr);
-    prsms.push_back(slow_match.compute());
+    PtmSlowMatch slow_match(proteoform_ptr_vec[i],
+                            spec_set_ptr, type_ptr,
+                            comp_shift_ptr, mng_ptr);
+    prsms.push_back(slow_match.compute(type_ptr, 1));
   }
   //LOG_DEBUG("prsm generation ended size " << prsms.size());
   std::sort(prsms.begin(), prsms.end(), Prsm::cmpMatchFragmentDecMatchPeakDec);
@@ -56,7 +56,7 @@ void onePtmSearchOneSpec(SpectrumSetPtr spec_set_ptr,
   }
 }
 
-void OnePtmSearch::process(OnePtmSearchMngPtr mng_ptr){
+void OnePtmSearch::process(PtmSearchMngPtr mng_ptr){
   PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
   std::string input_file_name = FileUtil::basename(sp_file_name)+"."+mng_ptr->input_file_ext_;

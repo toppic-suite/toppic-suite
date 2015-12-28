@@ -1,24 +1,23 @@
-#ifndef PROT_PTM_MNG_HPP_
-#define PROT_PTM_MNG_HPP_
+#ifndef PROT_PTM_SEARCH_MNG_HPP_
+#define PROT_PTM_SEARCH_MNG_HPP_
 
 #include "prsm/prsm_para.hpp"
-#include "ptmsearch/ptm_align_mng.hpp"
+#include "oneptmsearch/ps_align_para.hpp"
 
 namespace prot {
 
-class PtmMng {
+class PtmSearchMng {
  public :
-  PtmMng(PrsmParaPtr prsm_para_ptr, int n_report, int shift_num,
-         double align_max_shift, const std::string &input_file_ext, 
-         const std::string &output_file_ext) {
+  PtmSearchMng(PrsmParaPtr prsm_para_ptr, int n_report, 
+               double align_max_shift, int shift_num, 
+               const std::string &input_file_ext, 
+               const std::string &output_file_ext) {
     prsm_para_ptr_ = prsm_para_ptr;
     n_report_ = n_report;
     input_file_ext_ = input_file_ext;
     output_file_ext_ = output_file_ext;
-    align_mng_ptr_ = PtmAlignMngPtr(new PtmAlignMng(shift_num, align_max_shift));
+    align_para_ptr_ = PsAlignParaPtr(new PsAlignPara(shift_num, align_max_shift));
   }
-  
-  int getShiftNum() {return align_mng_ptr_->n_unknown_shift_;}
   
   PrsmParaPtr prsm_para_ptr_;
 
@@ -31,19 +30,18 @@ class PtmMng {
   /* parameters for compute shift low memory */ 
   int ptm_fast_filter_scale_ = 100;
   int n_top_diagonals_ = 20;
-  double min_double_gap = 0.25;
+  double min_double_gap=0.25;
   int min_diagonal_gap_ = (int)(ptm_fast_filter_scale_ * min_double_gap);
 
   /* parameters for diagonal generation */
   double extend_trunc_error_tolerance_ = 0.5;
   double align_prefix_suffix_shift_thresh_ = 300;
 
-  PtmAlignMngPtr align_mng_ptr_;
-
+  PsAlignParaPtr align_para_ptr_;
 };
 
-typedef std::shared_ptr<PtmMng> PtmMngPtr;
+typedef std::shared_ptr<PtmSearchMng> PtmSearchMngPtr;
 
 } /* namespace prot */
 
-#endif /* PTM_MNG_HPP_ */
+#endif /* ONE_PTM_SEARCH_MNG_HPP_ */
