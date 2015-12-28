@@ -10,7 +10,8 @@
 namespace prot {
 
 CompShift::CompShift(const ProteoformPtrVec &proteo_ptrs, int scale,
-                     double max_proteoform_mass, ProtModPtrVec prot_mod_ptr_vec) {
+                     double max_proteoform_mass, ProtModPtrVec prot_mod_ptr_vec,
+                     bool use_rev) {
   scale_ = scale;
   LOG_DEBUG("Scale: " << scale_);
   LOG_DEBUG("Proteoform number: " << proteo_ptrs.size());
@@ -23,8 +24,10 @@ CompShift::CompShift(const ProteoformPtrVec &proteo_ptrs, int scale,
   initProteoformBeginEnds(proteo_ptrs);
   LOG_DEBUG("init indexes");
   initIndexes(proteo_ptrs);
-  LOG_DEBUG("init rev indexes");
-  initRevIndexes(proteo_ptrs);
+  if (use_rev) {
+    LOG_DEBUG("init rev indexes");
+    initRevIndexes(proteo_ptrs);
+  }
 
   LOG_DEBUG("column number: " << col_num_);
   LOG_DEBUG("row number: " << row_num_);
