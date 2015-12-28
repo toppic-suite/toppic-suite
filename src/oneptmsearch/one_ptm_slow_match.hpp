@@ -22,11 +22,13 @@ class OnePtmSlowMatch {
  public:
   OnePtmSlowMatch(ProteoformPtr proteo_ptr,
                   SpectrumSetPtr spectrum_set_ptr,
+                  AlignTypePtr align_type_ptr,
                   CompShiftLowMemPtr comp_shift_ptr,
                   OnePtmSearchMngPtr mng_ptr);
 
   ProteoformPtr getProteoform(){return proteo_ptr_;};
-  void compute(AlignTypePtr type_ptr, PrsmPtrVec &prsm_ptrs);
+
+  PrsmPtr compute();
 
  private:
   OnePtmSearchMngPtr mng_ptr_;
@@ -35,15 +37,22 @@ class OnePtmSlowMatch {
   DeconvMsPtrVec deconv_ms_ptr_vec_;
   PrmMsPtrVec ms_six_ptr_vec_;
   ExtendMsPtrVec ms_three_ptr_vec_;
+  AlignTypePtr align_type_ptr_;
+  CompShiftLowMemPtr comp_shift_ptr_;
   PSAlignPtr ps_align_ptr_;
 
-  void initPsAlign(CompShiftLowMemPtr comp_shift_ptr);
+  void addCornerDiagonals(DiagonalHeaderPtrVec &n_extend_header_ptrs,
+                          DiagonalHeaderPtrVec &c_extend_header_ptrs);
 
-  DiagonalHeaderPtrVec getNTermShiftHeaders(
-      const std::vector<double> &best_shifts, double prec_mono_mass, 
-      ProteoformPtr proteo_ptr, OnePtmSearchMngPtr mng_ptr);
+  DiagonalHeaderPtrVec getNTermShiftListCommonHeaders();
 
-  PrsmPtr geneResult(int shift_num);
+  void addPrefixDiagonals(DiagonalHeaderPtrVec &common_header_ptrs,
+                          DiagonalHeaderPtrVec &n_extend_header_ptrs);
+
+  void addSuffixDiagonals(DiagonalHeaderPtrVec &common_header_ptrs,
+                          DiagonalHeaderPtrVec &c_extend_header_ptrs);
+
+  DiagonalHeaderPtrVec geneNTermShiftHeaders();
 };
 
 typedef std::shared_ptr<OnePtmSlowMatch> OnePtmSlowMatchPtr;

@@ -6,7 +6,7 @@ OnePtmSlowFilter::OnePtmSlowFilter(
     SpectrumSetPtr spectrum_set_ptr,
     SimplePrsmPtrVec simple_prsm_ptrs,
     CompShiftLowMemPtr comp_shift_ptr,
-    SemiAlignTypePtr type_ptr, 
+    AlignTypePtr type_ptr, 
     OnePtmSearchMngPtr mng_ptr){
 
   OnePtmSlowMatchPtrVec slow_match_ptrs;
