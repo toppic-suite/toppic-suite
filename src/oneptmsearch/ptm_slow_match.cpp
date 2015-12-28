@@ -1,13 +1,13 @@
 #include "oneptmsearch/diagonal_header_util.hpp"
-#include "oneptmsearch/one_ptm_slow_match.hpp"
+#include "oneptmsearch/ptm_slow_match.hpp"
 
 namespace prot {
 
-OnePtmSlowMatch::OnePtmSlowMatch(ProteoformPtr proteo_ptr, 
-                                 SpectrumSetPtr spectrum_set_ptr,
-                                 AlignTypePtr align_type_ptr,
-                                 CompShiftLowMemPtr comp_shift_ptr, 
-                                 OnePtmSearchMngPtr mng_ptr){
+PtmSlowMatch::PtmSlowMatch(ProteoformPtr proteo_ptr, 
+                           SpectrumSetPtr spectrum_set_ptr,
+                           AlignTypePtr align_type_ptr,
+                           CompShiftLowMemPtr comp_shift_ptr, 
+                           PtmSearchMngPtr mng_ptr){
   proteo_ptr_ = proteo_ptr;
   deconv_ms_ptr_vec_ = spectrum_set_ptr->getDeconvMsPtrVec();
   ms_six_ptr_vec_ = spectrum_set_ptr->getMsSixPtrVec();
@@ -16,9 +16,10 @@ OnePtmSlowMatch::OnePtmSlowMatch(ProteoformPtr proteo_ptr,
   align_type_ptr_ = align_type_ptr;
   comp_shift_ptr_ = comp_shift_ptr;
   mng_ptr_ = mng_ptr;
+  init();
 }
 
-inline void OnePtmSlowMatch::addCornerDiagonals(DiagonalHeaderPtrVec &n_extend_header_ptrs,
+inline void PtmSlowMatch::addCornerDiagonals(DiagonalHeaderPtrVec &n_extend_header_ptrs,
                                                 DiagonalHeaderPtrVec &c_extend_header_ptrs) {
   // get top-left corner header in spectral grid (shift is 0)
   DiagonalHeaderPtr top_left_corner_header_ptr = DiagonalHeaderUtil::getTopLeftCornerHeader();
@@ -32,7 +33,7 @@ inline void OnePtmSlowMatch::addCornerDiagonals(DiagonalHeaderPtrVec &n_extend_h
 }
 
 // get headers without n trunc and c trunc information 
-inline DiagonalHeaderPtrVec OnePtmSlowMatch::getNTermShiftListCommonHeaders() {
+inline DiagonalHeaderPtrVec PtmSlowMatch::getNTermShiftListCommonHeaders() {
   double scale = mng_ptr_->ptm_fast_filter_scale_;
   // n term strict c term nonstrict
   PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
@@ -55,7 +56,7 @@ inline DiagonalHeaderPtrVec OnePtmSlowMatch::getNTermShiftListCommonHeaders() {
   return header_ptrs;
 }
 
-inline void OnePtmSlowMatch::addPrefixDiagonals(DiagonalHeaderPtrVec &common_header_ptrs,
+inline void PtmSlowMatch::addPrefixDiagonals(DiagonalHeaderPtrVec &common_header_ptrs,
                                                 DiagonalHeaderPtrVec &n_extend_header_ptrs) {
   std::vector<double> prm_masses = proteo_ptr_->getBpSpecPtr()->getPrmMasses();
   // shifts for n_term matches
@@ -81,7 +82,7 @@ inline void OnePtmSlowMatch::addPrefixDiagonals(DiagonalHeaderPtrVec &common_hea
   }
 }
 
-inline void OnePtmSlowMatch::addSuffixDiagonals(DiagonalHeaderPtrVec &common_header_ptrs,
+inline void PtmSlowMatch::addSuffixDiagonals(DiagonalHeaderPtrVec &common_header_ptrs,
                                                 DiagonalHeaderPtrVec &c_extend_header_ptrs) {
   double prec_mass_minus_water = prec_mono_mass_ - MassConstant::getWaterMass();
   std::vector<double> prm_masses = proteo_ptr_->getBpSpecPtr()->getPrmMasses();
@@ -110,13 +111,14 @@ inline void OnePtmSlowMatch::addSuffixDiagonals(DiagonalHeaderPtrVec &common_hea
   }
 }
 
-inline DiagonalHeaderPtrVec OnePtmSlowMatch::geneNTermShiftHeaders() {
+inline DiagonalHeaderPtrVec PtmSlowMatch::geneNTermShiftHeaders() {
   DiagonalHeaderPtrVec n_extend_header_ptrs;
   DiagonalHeaderPtrVec c_extend_header_ptrs;
  
   // add corner diagonals for all types of alignments
   addCornerDiagonals(n_extend_header_ptrs, c_extend_header_ptrs);
   
+  DiagonalHeaderPtrVec header_ptrs;
   // if not complete alignment, find best shifts
   if (align_type_ptr_ != AlignType::COMPLETE) {
     DiagonalHeaderPtrVec common_header_ptrs = getNTermShiftListCommonHeaders();
@@ -127,8 +129,11 @@ inline DiagonalHeaderPtrVec OnePtmSlowMatch::geneNTermShiftHeaders() {
     if (align_type_ptr_ == AlignType::PREFIX || align_type_ptr_ == AlignType::INTERNAL) {
       addSuffixDiagonals(common_header_ptrs, c_extend_header_ptrs);
     }
+    // add original headers for ps alignment with >=2 ptms
+    if (mng_ptr_->align_para_ptr_->getUnknownShiftNum() >= 2) {
+      header_ptrs.insert(header_ptrs.end(), common_header_ptrs.begin(), common_header_ptrs.end());
+    }
   }
-  DiagonalHeaderPtrVec header_ptrs;
   header_ptrs.insert(header_ptrs.end(), n_extend_header_ptrs.begin(), n_extend_header_ptrs.end());
   header_ptrs.insert(header_ptrs.end(), c_extend_header_ptrs.begin(), c_extend_header_ptrs.end());
   for (size_t i = 0; i < header_ptrs.size(); i++) {
@@ -140,7 +145,7 @@ inline DiagonalHeaderPtrVec OnePtmSlowMatch::geneNTermShiftHeaders() {
 }
 
 // initialize ps_align
-PrsmPtr OnePtmSlowMatch::compute(){
+void PtmSlowMatch::init(){
   DiagonalHeaderPtrVec n_term_shift_header_ptrs = geneNTermShiftHeaders(); 
   PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
   PrmPeakPtrVec prm_peaks = PrmMs::getPrmPeakPtrs(ms_six_ptr_vec_, tole_ptr);
@@ -155,8 +160,10 @@ PrsmPtr OnePtmSlowMatch::compute(){
   }
   ps_align_ptr_ = PSAlignPtr(new PSAlign(ms_masses, seq_masses,
                                          diagonal_ptrs, mng_ptr_->align_para_ptr_));
+}
+
+PrsmPtr PtmSlowMatch::compute(AlignTypePtr align_type_ptr, int shift_num) {
   ps_align_ptr_->compute(align_type_ptr_);
-  int shift_num = 1;
   return ps_align_ptr_->geneResult(shift_num, proteo_ptr_, deconv_ms_ptr_vec_, 
                                    ms_three_ptr_vec_, mng_ptr_->prsm_para_ptr_);
 }

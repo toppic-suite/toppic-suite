@@ -2,7 +2,7 @@
 #include "base/neutral_loss_base.hpp"
 #include "spec/theo_peak_factory.hpp"
 #include "prsm/peak_ion_pair_factory.hpp"
-#include "ptmsearch/diagonal.hpp"
+#include "oneptmsearch/diagonal.hpp"
 
 namespace prot {
 

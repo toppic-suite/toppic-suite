@@ -10,28 +10,29 @@
 #include "spec/spectrum_set.hpp"
 #include "prsm/prsm.hpp"
 #include "oneptmsearch/diagonal_header.hpp"
-#include "oneptmsearch/one_ptm_search_mng.hpp"
+#include "oneptmsearch/ptm_search_mng.hpp"
 #include "oneptmsearch/comp_shift_low_mem.hpp"
-#include "oneptmsearch/one_ptm_search_mng.hpp"
 #include "oneptmsearch/basic_diag_pair.hpp"
 #include "oneptmsearch/ps_align.hpp"
 
 namespace prot {
 
-class OnePtmSlowMatch {
+class PtmSlowMatch {
  public:
-  OnePtmSlowMatch(ProteoformPtr proteo_ptr,
-                  SpectrumSetPtr spectrum_set_ptr,
-                  AlignTypePtr align_type_ptr,
-                  CompShiftLowMemPtr comp_shift_ptr,
-                  OnePtmSearchMngPtr mng_ptr);
+  PtmSlowMatch(ProteoformPtr proteo_ptr,
+               SpectrumSetPtr spectrum_set_ptr,
+               AlignTypePtr align_type_ptr,
+               CompShiftLowMemPtr comp_shift_ptr,
+               PtmSearchMngPtr mng_ptr);
 
   ProteoformPtr getProteoform(){return proteo_ptr_;};
 
-  PrsmPtr compute();
+  void init();
+
+  PrsmPtr compute(AlignTypePtr align_type_ptr, int shift_num);
 
  private:
-  OnePtmSearchMngPtr mng_ptr_;
+  PtmSearchMngPtr mng_ptr_;
   ProteoformPtr proteo_ptr_;
   double prec_mono_mass_;
   DeconvMsPtrVec deconv_ms_ptr_vec_;
@@ -55,8 +56,8 @@ class OnePtmSlowMatch {
   DiagonalHeaderPtrVec geneNTermShiftHeaders();
 };
 
-typedef std::shared_ptr<OnePtmSlowMatch> OnePtmSlowMatchPtr;
-typedef std::vector<OnePtmSlowMatchPtr> OnePtmSlowMatchPtrVec;
+typedef std::shared_ptr<PtmSlowMatch> PtmSlowMatchPtr;
+typedef std::vector<PtmSlowMatchPtr> PtmSlowMatchPtrVec;
 
 } /* namespace prot */
 
