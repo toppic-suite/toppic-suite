@@ -12,8 +12,7 @@ OnePtmFilter::OnePtmFilter(const ProteoformPtrVec &proteo_ptrs,
   index_ptr_ = CompShiftPtr(new CompShift(proteo_ptrs, 
                                           mng_ptr->filter_scale_,
                                           mng_ptr->max_proteoform_mass_,
-                                          mng_ptr->prsm_para_ptr_->getProtModPtrVec(),
-                                          true));
+                                          mng_ptr->prsm_para_ptr_->getProtModPtrVec()));
 }
 
 void OnePtmFilter::computeBestMatch(const PrmMsPtrVec &ms_ptr_vec){
@@ -57,6 +56,5 @@ void OnePtmFilter::computeBestMatch(const PrmMsPtrVec &ms_ptr_vec){
   }
 
 }
-
 
 } /* namespace prot */

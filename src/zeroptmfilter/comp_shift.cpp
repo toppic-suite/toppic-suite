@@ -10,8 +10,7 @@
 namespace prot {
 
 CompShift::CompShift(const ProteoformPtrVec &proteo_ptrs, int scale,
-                     double max_proteoform_mass, ProtModPtrVec prot_mod_ptr_vec,
-                     bool use_reverse) {
+                     double max_proteoform_mass, ProtModPtrVec prot_mod_ptr_vec) {
   scale_ = scale;
   LOG_DEBUG("Scale: " << scale_);
   LOG_DEBUG("Proteoform number: " << proteo_ptrs.size());
@@ -19,16 +18,13 @@ CompShift::CompShift(const ProteoformPtrVec &proteo_ptrs, int scale,
   col_num_ = max_proteoform_mass * scale_;
   proteo_num_ = proteo_ptrs.size();
   prot_mod_ptr_vec_ = prot_mod_ptr_vec;
-  use_reverse_ = use_reverse;
 
   LOG_DEBUG("start init");
   initProteoformBeginEnds(proteo_ptrs);
   LOG_DEBUG("init indexes");
   initIndexes(proteo_ptrs);
-  if (use_reverse_) {
-    LOG_DEBUG("init rev indexes");
-    initRevIndexes(proteo_ptrs);
-  }
+  LOG_DEBUG("init rev indexes");
+  initRevIndexes(proteo_ptrs);
 
   LOG_DEBUG("column number: " << col_num_);
   LOG_DEBUG("row number: " << row_num_);
@@ -334,16 +330,24 @@ void CompShift::compZeroPtmConvolution(const std::vector<std::pair<int,int>> &ma
       //LOG_DEBUG("rev row index " << rev_col_indexes_[j] << " rev score " << rev_scores[rev_col_indexes_[j]]);
     }
   }
-  findTopScores(scores, rev_scores, comp_num, pref_suff_num, inte_num);
+  double threshold = PRECURSOR_MATCH_SCORE * 2.0 + 4.0;
+  findTopScores(scores, rev_scores, threshold, comp_num, pref_suff_num, inte_num);
 }
 
 void CompShift::compOnePtmConvolution(const std::vector<std::pair<int,int>> &mass_errors, 
                                       int comp_num, int pref_suff_num, int inte_num) {
+  /*
+  LOG_DEBUG("mass number " << mass_errors.size());
+  for (size_t i = 0; i < mass_errors.size(); i++) {
+    LOG_DEBUG(i << " mass " << mass_errors[i].first << " error " << mass_errors[i].second);
+  }
+  */
   std::vector<short> scores(row_num_, 0);
   compScores(mass_errors, scores);
   std::vector<short> rev_scores(row_num_, 0);
   compRevScores(mass_errors, rev_scores);
-  findTopScores(scores, rev_scores, comp_num, pref_suff_num, inte_num);
+  double threshold = 4.0; 
+  findTopScores(scores, rev_scores, threshold, comp_num, pref_suff_num, inte_num);
 }
 
 void CompShift::compDiagConvolution(const std::vector<std::pair<int,int>> &mass_errors, 
@@ -353,23 +357,23 @@ void CompShift::compDiagConvolution(const std::vector<std::pair<int,int>> &mass_
   findTopDiagScores(scores, top_num);
 }
 
-inline bool scoreCompare(const std::pair<int, int> &a, const std::pair<int, int> &b) {
+inline bool cmpScore(const std::pair<int, int> &a, const std::pair<int, int> &b) {
     return a.second > b.second;
 }
 
 inline void addResults(std::vector<std::pair<int,int>> &results, 
                        std::vector<std::pair<int,int>> &single_type_results, 
-                       int single_type_num) {
+                       double threshold, int single_type_num) {
 
   results.clear();
-  std::sort(single_type_results.begin(), single_type_results.end(), scoreCompare);
+  std::sort(single_type_results.begin(), single_type_results.end(), cmpScore);
   int output_num =0;
   for(int i=0;i< single_type_num;i++){
     if (i >= (int)single_type_results.size()) {
       break;
     }
     //LOG_DEBUG("rank " << i << " score " << single_type_results[i].second);
-    if(single_type_results[i].second >= PRECURSOR_MATCH_SCORE * 2.0 + 4){
+    if(single_type_results[i].second >= threshold){
       output_num++;
     }
     else {
@@ -382,7 +386,7 @@ inline void addResults(std::vector<std::pair<int,int>> &results,
 }
 
 inline void CompShift::findTopScores(std::vector<short> &scores, std::vector<short> &rev_scores, 
-                                     int comp_num, int pref_suff_num, int inte_num) {
+                                     double threshold, int comp_num, int pref_suff_num, int inte_num) {
   std::vector<std::pair<int,int>> comp_proteo_scores;
   std::vector<std::pair<int,int>> pref_proteo_scores;
   std::vector<std::pair<int,int>> suff_proteo_scores;
@@ -428,10 +432,10 @@ inline void CompShift::findTopScores(std::vector<short> &scores, std::vector<sho
     internal_proteo_scores.push_back(internal_proteo_score);
   }
   //LOG_DEBUG("num " << num << " Single type num " << single_type_num);
-  addResults(top_comp_proteo_scores_, comp_proteo_scores, comp_num);
-  addResults(top_pref_proteo_scores_, pref_proteo_scores, pref_suff_num);
-  addResults(top_suff_proteo_scores_, suff_proteo_scores, pref_suff_num);
-  addResults(top_internal_proteo_scores_, internal_proteo_scores, inte_num);
+  addResults(top_comp_proteo_scores_, comp_proteo_scores, threshold, comp_num);
+  addResults(top_pref_proteo_scores_, pref_proteo_scores, threshold, pref_suff_num);
+  addResults(top_suff_proteo_scores_, suff_proteo_scores, threshold, pref_suff_num);
+  addResults(top_internal_proteo_scores_, internal_proteo_scores, threshold, inte_num);
 }
 
 inline void CompShift::findTopDiagScores(std::vector<short> &scores, int num) {
@@ -450,7 +454,8 @@ inline void CompShift::findTopDiagScores(std::vector<short> &scores, int num) {
     diag_scores.push_back(diag_score);
   }
   //LOG_DEBUG("num " << num << " Single type num " << single_type_num);
-  addResults(top_diag_scores_, diag_scores, num);
+  double threshold = 4.0;
+  addResults(top_diag_scores_, diag_scores, threshold, num);
 }
 
 } /* namespace prot */

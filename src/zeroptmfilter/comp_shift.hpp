@@ -13,8 +13,7 @@ namespace prot {
 class CompShift {
  public:
   CompShift(const ProteoformPtrVec &proteo_ptrs, int scale,
-            double max_proteoform_mass, ProtModPtrVec prot_mod_ptr_vec,
-            bool use_reverse);
+            double max_proteoform_mass, ProtModPtrVec prot_mod_ptr_vec);
 
   ~CompShift();
 
@@ -38,7 +37,6 @@ class CompShift {
  private:
   int scale_;
   ProtModPtrVec prot_mod_ptr_vec_;
-  bool use_reverse_;
 
   int proteo_num_;
   int col_num_;
@@ -83,7 +81,7 @@ class CompShift {
                      std::vector<short> &rev_scores);
 
   void findTopScores(std::vector<short> &scores, std::vector<short> &rev_scores, 
-                     int comp_num, int pref_suff_num, int inte_num);
+                     double threshold, int comp_num, int pref_suff_num, int inte_num);
 
   void findTopDiagScores(std::vector<short> &scores, int num);
 };

@@ -13,18 +13,18 @@ all:
 	cd prsm; make
 	cd zeroptmfilter; make
 	cd zeroptmsearch; make
-#	cd oneptmfilter; make
-	cd diagfilter; make
+	cd oneptmfilter; make
+#	cd diagfilter; make
 #	cd ptmsearch; make
-	cd tdgf; make
+#	cd tdgf; make
 #	cd prsmview; make	
-	cd console; make
+#	cd console; make
 #	cd graph; make
 #	cd graphalign; make
 	cd test; make
 
 clean:
-#	cd base; make clean
+	cd base; make clean
 	cd spec; make clean
 	cd prsm; make clean
 	cd zeroptmfilter; make clean
