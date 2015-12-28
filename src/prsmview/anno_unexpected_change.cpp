@@ -13,11 +13,13 @@ AnnoUnexpectedChange::AnnoUnexpectedChange(int left_pos, int right_pos,
   type_ = type;
 }
 
+/*
 void AnnoUnexpectedChange::addOccurence(int pos,
                                         const std::string &acid_letter) {
   std::pair<int, std::string> new_occurence(pos, acid_letter);
   occurences_.push_back(new_occurence);
 }
+*/
 
 void AnnoUnexpectedChange::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent,
                                      int decimal_point_num){
@@ -31,7 +33,8 @@ void AnnoUnexpectedChange::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement
   str = StringUtil::convertToString(color_);
   xml_doc->addElement(element, "unexpected_change_color", str.c_str());
   xml_doc->addElement(element, "type", type_.c_str());
-
+  
+  /*
   if (type_ == "SHIFT") {
       xml_doc->addElement(element, "change_type", StringUtil::convertToString(4).c_str());
   }
@@ -54,6 +57,7 @@ void AnnoUnexpectedChange::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement
       }
   }
   xml_doc->addElement(element, "occurence", occu.c_str());
+  */
   parent->appendChild(element);
 }
 
