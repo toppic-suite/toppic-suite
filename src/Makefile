@@ -14,6 +14,7 @@ all:
 	cd zeroptmfilter; make
 	cd zeroptmsearch; make
 	cd oneptmfilter; make
+	cd oneptmsearch; make
 #	cd diagfilter; make
 #	cd ptmsearch; make
 #	cd tdgf; make
@@ -30,6 +31,7 @@ clean:
 	cd zeroptmfilter; make clean
 	cd zeroptmsearch; make clean
 	cd oneptmfilter; make clean
+	cd oneptmsearch; make clean
 	cd diagfilter; make clean
 	cd ptmsearch; make clean
 	cd tdgf; make clean

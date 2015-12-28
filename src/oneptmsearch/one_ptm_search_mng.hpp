@@ -2,7 +2,7 @@
 #define PROT_ONE_PTM_SEARCH_MNG_HPP_
 
 #include "prsm/prsm_para.hpp"
-#include "ptmsearch/ptm_align_mng.hpp"
+#include "oneptmsearch/ps_align_para.hpp"
 
 namespace prot {
 
@@ -15,7 +15,7 @@ class OnePtmSearchMng {
     n_report_ = n_report;
     input_file_ext_ = input_file_ext;
     output_file_ext_ = output_file_ext;
-    align_mng_ptr_ = PtmAlignMngPtr(new PtmAlignMng(1, align_max_shift));
+    align_para_ptr_ = PsAlignParaPtr(new PsAlignPara(1, align_max_shift));
   }
   
   PrsmParaPtr prsm_para_ptr_;
@@ -36,10 +36,13 @@ class OnePtmSearchMng {
   double extend_trunc_error_tolerance_ = 0.5;
   double align_prefix_suffix_shift_thresh_ = 300;
 
+  /*
   int top_diag_num_ = 3;
   int diag_min_size_ = 3;
 
-  PtmAlignMngPtr align_mng_ptr_;
+  */
+
+  PsAlignParaPtr align_para_ptr_;
 };
 
 typedef std::shared_ptr<OnePtmSearchMng> OnePtmSearchMngPtr;
