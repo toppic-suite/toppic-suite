@@ -26,7 +26,7 @@ class Acid {
   // Get average mass
   double getAvgMass() {return average_mass_;}
 
-  // Get  monoisotopic mass
+  // Get monoisotopic mass
   double getMonoMass() {return mono_mass_;}
 
   // Get amino acid name

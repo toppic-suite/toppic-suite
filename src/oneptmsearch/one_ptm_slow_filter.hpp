@@ -5,7 +5,7 @@
 
 #include "spec/spectrum_set.hpp"
 #include "prsm/simple_prsm.hpp"
-#include "ptmsearch/comp_shift_low_mem.hpp"
+#include "oneptmsearch/comp_shift_low_mem.hpp"
 #include "oneptmsearch/one_ptm_search_mng.hpp"
 #include "oneptmsearch/one_ptm_slow_match.hpp"
 
