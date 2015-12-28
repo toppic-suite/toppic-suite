@@ -1,6 +1,6 @@
 #include "base/proteoform_factory.hpp"
 #include "spec/extend_ms_factory.hpp"
-#include "ptmsearch/ps_align.hpp"
+#include "oneptmsearch/ps_align.hpp"
 
 namespace prot {
 
@@ -47,7 +47,7 @@ void PSAlign::initDPPair() {
       double score = diagonal_ptrs_[i]->getDiagPair(j)->getScore();
       double diff = diagonal_ptrs_[i]->getDiagPair(j)->getDiff();
       DPPairPtr dp_pair_ptr(new DPPair(x, y, score, diff, j, 
-                                       mng_ptr_->n_unknown_shift_,
+                                       para_ptr_->n_unknown_shift_,
                                        diagonal_ptrs_[i]->getHeader()));
       dp_2d_pair_ptrs_[i].push_back(dp_pair_ptr);
     }
@@ -58,7 +58,7 @@ void PSAlign::initDPPair() {
   // init 1d dp pairs 
   dp_pair_ptrs_.clear();
   first_pair_ptr_ = DPPairPtr(
-      new DPPair(-1, -1, 0, 0, -1, mng_ptr_->n_unknown_shift_, nullptr));
+      new DPPair(-1, -1, 0, 0, -1, para_ptr_->n_unknown_shift_, nullptr));
   first_pair_ptr_->setDiagPrevPairPtr(nullptr);
   dp_pair_ptrs_.push_back(first_pair_ptr_);
   for (size_t i = 0; i < dp_2d_pair_ptrs_.size(); i++) {
@@ -74,7 +74,7 @@ void PSAlign::initDPPair() {
       - seq_masses_[seq_masses_.size() - 1];
   last_pair_ptr_ = DPPairPtr(
       new DPPair(ms_masses_.size(), seq_masses_.size(), 0, diff, -1,
-                 mng_ptr_->n_unknown_shift_, nullptr));
+                 para_ptr_->n_unknown_shift_, nullptr));
   last_pair_ptr_->setDiagPrevPairPtr(nullptr);
   dp_pair_ptrs_.push_back(last_pair_ptr_);
   std::sort(dp_pair_ptrs_.begin(), dp_pair_ptrs_.end(), Pair::cmpPosInc);
@@ -104,12 +104,12 @@ void PSAlign::initDPPair() {
         double abs_shift = std::abs(prev_pair_nterm_shift - cur_pair_nterm_shift);
         if (prev_x >= cur_x || prev_y >= cur_y
                 || prev_pair_ptr->getDiagonalHeader() == cur_pair_ptr->getDiagonalHeader()
-                || abs_shift > mng_ptr_->align_max_shift_) {
+                || abs_shift > para_ptr_->align_max_shift_) {
             continue;
         }
         int diag_id = prev_pair_ptr->getDiagonalHeader()->getId();
         ends[diag_id] = j;
-        if (abs_shift > mng_ptr_-> align_large_shift_thresh_) {
+        if (abs_shift > para_ptr_-> align_large_shift_thresh_) {
             large_shifts[diag_id] = true;
         }
     }
@@ -120,7 +120,7 @@ void PSAlign::initDPPair() {
 
 void PSAlign::dpPrep() {
   std::sort(dp_pair_ptrs_.begin(),dp_pair_ptrs_.end(),Pair::cmpPosInc);
-  for (int s = 0; s < mng_ptr_->n_unknown_shift_ + 1; s++) {
+  for (int s = 0; s < para_ptr_->n_unknown_shift_ + 1; s++) {
     dp_pair_ptrs_[0]->updateTable(s, 0, PATH_TYPE_NULL, nullptr);
   }
 }
@@ -184,7 +184,7 @@ inline DPPairPtr PSAlign::getShiftPre(DPPairPtr cur_pair_ptr, int p, int s,
       DPPairPtr prev_pair_ptr = dp_pair_ptrs_[idxes_[p][d]];
       double prev_score = prev_pair_ptr->getScore(s - 1);
       if (penalties_[p][d]) {
-        prev_score = prev_score - mng_ptr_-> align_large_shift_panelty_;
+        prev_score = prev_score - para_ptr_-> align_large_shift_panelty_;
       }
       if (prev_score > shift_score) {
         shift_prev = prev_pair_ptr;
@@ -205,7 +205,7 @@ void PSAlign::dp(AlignTypePtr align_type_ptr) {
   //int shift_time = 0;
   //int update_time = 0;
   for (size_t p = 1; p < dp_pair_ptrs_.size(); p++) {
-    for (int s = 0; s <= mng_ptr_->n_unknown_shift_; s++) {
+    for (int s = 0; s <= para_ptr_->n_unknown_shift_; s++) {
       //int start_s = clock();
       DPPairPtr trunc_prev_ptr = getTruncPre(dp_pair_ptrs_[p], s, align_type_ptr);
       double trunc_score;
@@ -265,7 +265,7 @@ void PSAlign::dp(AlignTypePtr align_type_ptr) {
 void PSAlign::backtrace() {
   align_scores_.clear();
   backtrack_diagonal_ptrs_.clear();
-  for (int s = 0; s <= mng_ptr_->n_unknown_shift_; s++) {
+  for (int s = 0; s <= para_ptr_->n_unknown_shift_; s++) {
     align_scores_.push_back(last_pair_ptr_->getScore(s));
     backtrack_diagonal_ptrs_.push_back(backtrace(s));
   }
@@ -324,10 +324,11 @@ PrsmPtr PSAlign::geneResult(int shift_num, ProteoformPtr proteo_ptr,
     ProteoformPtr sub_proteo_ptr  = ProteoformFactory::geneSubProteoform(proteo_ptr, first_pos, last_pos);
 
     double min_mass = prsm_para_ptr->getSpParaPtr()->getMinMass();
+    double ppo = prsm_para_ptr->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
 
     double refine_prec_mass = refinePrecursorAndHeaderShift(proteo_ptr, ms_three_ptr_vec, 
-            header_ptrs, min_mass, 
-            mng_ptr_->refine_prec_step_width_);
+                                                            header_ptrs, ppo, min_mass, 
+                                                            para_ptr_->refine_prec_step_width_);
 
     SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
     ExtendMsPtrVec refine_ms_ptr_vec = ExtendMsFactory::geneMsThreePtrVec(deconv_ms_ptr_vec,  

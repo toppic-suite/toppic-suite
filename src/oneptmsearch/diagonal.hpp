@@ -38,7 +38,7 @@ class Diagonal{
 double refinePrecursorAndHeaderShift(ProteoformPtr proteo_ptr,
                                      const ExtendMsPtrVec &ms_three_ptr_vec, 
                                      DiagonalHeaderPtrVec &header_ptrs,
-                                     double min_mass,
+                                     double ppo, double min_mass,
                                      double refine_prec_step_width);
 
 DiagonalHeaderPtrVec refineHeadersBgnEnd(

@@ -20,6 +20,9 @@
 #include "oneptmfilter/one_ptm_filter_mng.hpp"
 #include "oneptmfilter/one_ptm_filter_processor.hpp"
 
+#include "oneptmsearch/one_ptm_search_mng.hpp"
+#include "oneptmsearch/one_ptm_search.hpp"
+
 #include "tdgf/tdgf_mng.hpp"
 #include "tdgf/evalue_processor.hpp"
 
@@ -86,15 +89,15 @@ int one_ptm_process(int argc, char* argv[]) {
     time(&stop_s);
     std::cout <<  "One PTM filtering running time: " << difftime(stop_s, start_s)  << " seconds " << std::endl;
 
-    /*
     time(&start_s);
-    std::cout << "Zero PTM search started." << std::endl;
-    ZeroPtmSearchMngPtr zero_search_mng_ptr = ZeroPtmSearchMngPtr(new ZeroPtmSearchMng (prsm_para_ptr, "ZERO_FILTER", "ZERO"));
-    ZeroPtmSearch::process(zero_search_mng_ptr);
-    std::cout << "Zero PTM search finished." << std::endl;
+    std::cout << "One PTM search started." << std::endl;
+    OnePtmSearchMngPtr one_search_mng_ptr = OnePtmSearchMngPtr(new OnePtmSearchMng (prsm_para_ptr, n_top, max_ptm_mass, "ONE_PTM_FILTER", "ONE"));
+    OnePtmSearch::process(one_search_mng_ptr);
+    std::cout << "One PTM search finished." << std::endl;
     time(&stop_s);
-    std::cout <<  "Zero PTM search running time: " << difftime(stop_s, start_s)  << " seconds " << std::endl;
+    std::cout <<  "ONe PTM search running time: " << difftime(stop_s, start_s)  << " seconds " << std::endl;
 
+    /*
     time(&start_s);
     std::cout << "E-value computation started." << std::endl;
     bool variable_ptm = false;
