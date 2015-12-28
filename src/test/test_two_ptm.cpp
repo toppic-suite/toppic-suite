@@ -82,6 +82,7 @@ int two_ptm_process(int argc, char* argv[]) {
     time_t start_s;
     time_t stop_s;
 
+    /*
     time(&start_s);
     std::cout << "Diagonal PTM filtering started." << std::endl;
     DiagFilterMngPtr diag_filter_mng_ptr 
@@ -93,6 +94,7 @@ int two_ptm_process(int argc, char* argv[]) {
     std::cout << "Diagonal filtering finished." << std::endl;
     time(&stop_s);
     std::cout <<  "Diagonal filtering running time: " << difftime(stop_s, start_s)  << " seconds " << std::endl;
+    */
 
     time(&start_s);
     std::cout << "Two PTM search started." << std::endl;
