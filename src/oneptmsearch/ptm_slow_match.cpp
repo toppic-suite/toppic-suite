@@ -168,4 +168,13 @@ PrsmPtr PtmSlowMatch::compute(AlignTypePtr align_type_ptr, int shift_num) {
                                    ms_three_ptr_vec_, mng_ptr_->prsm_para_ptr_);
 }
 
+void PtmSlowMatch::compute(AlignTypePtr type_ptr, PrsmPtrVec &prsm_ptrs) {
+  ps_align_ptr_->compute(type_ptr);
+  for (int s = 2; s <= mng_ptr_->align_para_ptr_->getUnknownShiftNum(); s++) {
+    PrsmPtr prsm_ptr = ps_align_ptr_->geneResult(s, proteo_ptr_, deconv_ms_ptr_vec_, 
+                                                 ms_three_ptr_vec_, mng_ptr_->prsm_para_ptr_);
+    prsm_ptrs.push_back(prsm_ptr);
+  }
+}
+
 } /* namespace prot */

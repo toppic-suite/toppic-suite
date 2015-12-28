@@ -31,6 +31,8 @@ class PtmSlowMatch {
 
   PrsmPtr compute(AlignTypePtr align_type_ptr, int shift_num);
 
+  void compute(AlignTypePtr type_ptr, PrsmPtrVec &prsm_ptrs);
+
  private:
   PtmSearchMngPtr mng_ptr_;
   ProteoformPtr proteo_ptr_;

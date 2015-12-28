@@ -1,14 +1,14 @@
 #include "base/prot_mod_base.hpp"
 #include "base/proteoform_factory.hpp"
-#include "ptmsearch/ptm_slow_filter.hpp"
+#include "ptmsearch/ptm_search_slow_filter.hpp"
 
 namespace prot {
 
-PtmSlowFilter::PtmSlowFilter(
+PtmSearchSlowFilter::PtmSearchSlowFilter(
     SpectrumSetPtr spectrum_set_ptr,
     SimplePrsmPtrVec simple_prsm_ptrs,
     CompShiftLowMemPtr comp_shift_ptr,
-    PtmMngPtr mng_ptr){
+    PtmSearchMngPtr mng_ptr){
 
   std::string db_file_name = mng_ptr->prsm_para_ptr_->getSearchDbFileName();
   FastaIndexReaderPtr reader_ptr(new FastaIndexReader(db_file_name));
@@ -23,7 +23,10 @@ PtmSlowFilter::PtmSlowFilter(
     ProteoformPtrVec mod_form_ptr_vec = ProteoformFactory::geneProtModProteoform(
         proteo_ptr, prot_mod_ptr_vec);
     for (size_t j = 0; j < mod_form_ptr_vec.size(); j++) {
+      // this slow match is used for four type of alignment, INTERNAL is used to
+      // include more diagonals. 
       PtmSlowMatchPtr ptm_slow_match_ptr(new PtmSlowMatch(mod_form_ptr_vec[j],spectrum_set_ptr,
+                                                          AlignType::INTERNAL,
                                                           comp_shift_ptr,mng_ptr));
       complete_prefix_slow_match_ptrs_.push_back(ptm_slow_match_ptr);
     }
@@ -63,7 +66,7 @@ PtmSlowFilter::PtmSlowFilter(
   //LOG_DEBUG("suffix internal completed");
 }
 
-PrsmPtrVec PtmSlowFilter::getPrsms(int shift_num, AlignTypePtr type_ptr){
+PrsmPtrVec PtmSearchSlowFilter::getPrsms(int shift_num, AlignTypePtr type_ptr){
   PrsmPtrVec prsm_ptrs;
   if (type_ptr == AlignType::COMPLETE) {
     for (size_t i = 0; i < complete_prsm_2d_ptrs_.size(); i++) {
