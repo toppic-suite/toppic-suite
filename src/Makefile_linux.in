@@ -35,7 +35,7 @@ ONE_PTM_SEARCH_OBJS =  $(addprefix $(OBJ_DIR)/, basic_diag_pair.o comp_shift_low
 
 DIAG_FILTER_OBJS =  $(addprefix $(OBJ_DIR)/, diag_filter.o diag_filter_processor.o) 
 
-PTM_SEARCH_OBJS = $(addprefix $(OBJ_DIR)/, ptm_search_slow_match.o ptm_search_slow_filter.o ptm_search_processor.o)
+PTM_SEARCH_OBJS = $(addprefix $(OBJ_DIR)/, ptm_search_slow_filter.o ptm_search_processor.o)
 
 TDGF_OBJS = $(addprefix $(OBJ_DIR)/, tdgf_mng.o tdgf_util.o evalue_processor.o comp_prob_value.o count_test_num.o comp_pvalue_array.o comp_pvalue_lookup_table.o) 
 
