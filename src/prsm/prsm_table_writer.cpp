@@ -54,9 +54,9 @@ void PrsmTableWriter::write(){
   FastaIndexReaderPtr seq_reader(new FastaIndexReader(db_file_name));
   ModPtrVec fix_mod_ptr_vec = prsm_para_ptr_->getFixModPtrVec();
   PrsmReader prsm_reader(input_file_name);
-  LOG_DEBUG("start read prsm");
+  //LOG_DEBUG("start read prsm");
   PrsmPtr prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
-  LOG_DEBUG("end read prsm");
+  //LOG_DEBUG("end read prsm");
 
   //init variables
   std::string sp_file_name = prsm_para_ptr_->getSpectrumFileName();
@@ -75,9 +75,9 @@ void PrsmTableWriter::write(){
             = ExtendMsFactory::geneMsThreePtrVec(deconv_ms_ptr_vec, sp_para_ptr, new_prec_mass);
         prsm_ptr->setRefineMsVec(extend_ms_ptr_vec);
         writePrsm(file, prsm_ptr);
-        LOG_DEBUG("start read prsm");
+        //LOG_DEBUG("start read prsm");
         prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
-        LOG_DEBUG("end read prsm");
+        //LOG_DEBUG("end read prsm");
       }
     }
   }
@@ -107,23 +107,23 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   //LOG_DEBUG("prec mass " << prsm_ptrs[i]->getOriPrecMass());
   //double err = prsm_ptr->getOriPrecMass() *
   //    prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
-  file << prsm_para_ptr_->getSpectrumFileName() << "\t"
-      << prsm_ptr->getPrsmId() << "\t"
+  file << prsm_para_ptr_->getSpectrumFileName() << "\t";
+  file << prsm_ptr->getPrsmId() << "\t"
       << spec_ids << "\t"
       << spec_activations<< "\t"
       << spec_scans << "\t"
-      << peak_num << "\t"
-      << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecCharge() << "\t"
+      << peak_num << "\t";
+  file<< deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecCharge() << "\t"
       << prsm_ptr->getOriPrecMass()<< "\t"//"Precursor_mass"
       << prsm_ptr->getAdjustedPrecMass() << "\t"
-      << prsm_ptr->getProteoformPtr()->getSpeciesId() << "\t"
-      << prsm_ptr->getProteoformPtr()->getSeqName() << " "
-      << prsm_ptr->getProteoformPtr()->getSeqDesc() << "\t"
-      << prsm_ptr->getProteoformPtr()->getStartPos() << "\t"
-      << prsm_ptr->getProteoformPtr()->getEndPos() << "\t"
-      << prsm_ptr->getProteoformPtr()->getProteinMatchSeq() << "\t"
-      << prsm_ptr->getProteoformPtr()->getChangeNum(ChangeType::UNEXPECTED) << "\t"
-      << prsm_ptr->getMatchPeakNum() << "\t"
+      << prsm_ptr->getProteoformPtr()->getSpeciesId() << "\t";
+  file<< prsm_ptr->getProteoformPtr()->getSeqName() << " "
+      << prsm_ptr->getProteoformPtr()->getSeqDesc() << "\t";
+  file<< prsm_ptr->getProteoformPtr()->getStartPos() << "\t"
+      << prsm_ptr->getProteoformPtr()->getEndPos() << "\t";
+  file<< prsm_ptr->getProteoformPtr()->getProteinMatchSeq() << "\t";
+  file<< prsm_ptr->getProteoformPtr()->getChangeNum(ChangeType::UNEXPECTED) << "\t";
+  file << prsm_ptr->getMatchPeakNum() << "\t"
       << prsm_ptr->getMatchFragNum() << "\t"
       << prsm_ptr->getPValue() << "\t"
       << prsm_ptr->getEValue() << "\t"

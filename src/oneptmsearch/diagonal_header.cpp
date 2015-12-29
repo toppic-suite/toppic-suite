@@ -1,6 +1,7 @@
 #include <cmath>
 
 #include "base/prot_mod.hpp"
+#include "base/mod_base.hpp"
 #include "base/change.hpp"
 #include "base/algorithm.hpp"
 #include "oneptmsearch/diagonal_header.hpp"
@@ -77,10 +78,11 @@ void DiagonalHeader::initHeader(double c_shift, ProteoformPtr proteo_ptr,
 ChangePtrVec getDiagonalMassChanges(const DiagonalHeaderPtrVec &header_ptrs, 
         int first_res_pos, int last_res_pos, ChangeTypePtr change_type_ptr) {
     ChangePtrVec change_list;
+    ModPtr none_ptr = ModBase::getNoneModPtr();
     if (!header_ptrs[0]->isPepNTermMatch() && !header_ptrs[0]->isProtNTermMatch()) {
         change_list.push_back(
                 ChangePtr(new Change(0, header_ptrs[0]->getMatchFirstBpPos()-first_res_pos,
-                        change_type_ptr, header_ptrs[0]->getPepNTermShift(), nullptr)));
+                        change_type_ptr, header_ptrs[0]->getPepNTermShift(), none_ptr)));
     }
     for (size_t i = 0; i < header_ptrs.size() - 1; i++) {
         ChangePtr change_ptr(new Change(header_ptrs[i]->getMatchLastBpPos()-first_res_pos,
@@ -88,7 +90,7 @@ ChangePtrVec getDiagonalMassChanges(const DiagonalHeaderPtrVec &header_ptrs,
                     change_type_ptr,
                     header_ptrs[i + 1]->getProtNTermShift()
                     - header_ptrs[i]->getProtNTermShift(),
-                    nullptr));
+                    none_ptr));
         change_list.push_back(change_ptr);
     }
     DiagonalHeaderPtr last_header_ptr = header_ptrs[header_ptrs.size() - 1];
@@ -96,7 +98,7 @@ ChangePtrVec getDiagonalMassChanges(const DiagonalHeaderPtrVec &header_ptrs,
         ChangePtr change_ptr(new Change(last_header_ptr->getMatchLastBpPos()-first_res_pos, 
                     (last_res_pos + 1) -first_res_pos,
                     change_type_ptr, last_header_ptr->getPepCTermShift(), 
-                    nullptr));
+                    none_ptr));
         change_list.push_back(change_ptr);
     }
     return change_list;
@@ -105,11 +107,12 @@ ChangePtrVec getDiagonalMassChanges(const DiagonalHeaderPtrVec &header_ptrs,
 ChangePtrVec getDiagonalMassChanges(const DiagonalHeaderPtrVec &header_ptrs, 
         int first_res_pos, int last_res_pos, ChangeTypePtrVec &change_types) {
     ChangePtrVec change_list;
+    ModPtr none_ptr = ModBase::getNoneModPtr();
     if (!header_ptrs[0]->isPepNTermMatch() && !header_ptrs[0]->isProtNTermMatch()) {
         change_list.push_back(
                 ChangePtr(new Change(0, header_ptrs[0]->getMatchFirstBpPos()-first_res_pos,
                         change_types[0], 
-                        header_ptrs[0]->getPepNTermShift(), nullptr)));
+                        header_ptrs[0]->getPepNTermShift(), none_ptr)));
     }
     for (size_t i = 0; i < header_ptrs.size() - 1; i++) {
         ChangePtr change_ptr(new Change(header_ptrs[i]->getMatchLastBpPos()-first_res_pos,
@@ -117,7 +120,7 @@ ChangePtrVec getDiagonalMassChanges(const DiagonalHeaderPtrVec &header_ptrs,
                     change_types[i + 1],
                     header_ptrs[i + 1]->getProtNTermShift()
                     - header_ptrs[i]->getProtNTermShift(),
-                    nullptr));
+                    none_ptr));
         change_list.push_back(change_ptr);
     }
     DiagonalHeaderPtr last_header_ptr = header_ptrs[header_ptrs.size() - 1];
@@ -125,7 +128,7 @@ ChangePtrVec getDiagonalMassChanges(const DiagonalHeaderPtrVec &header_ptrs,
         ChangePtr change_ptr(new Change(last_header_ptr->getMatchLastBpPos()-first_res_pos, 
                     (last_res_pos + 1) -first_res_pos,
                     ChangeType::UNEXPECTED, last_header_ptr->getPepCTermShift(), 
-                    nullptr));
+                    none_ptr));
         change_list.push_back(change_ptr);
     }
     return change_list;
