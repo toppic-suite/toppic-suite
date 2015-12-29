@@ -228,7 +228,7 @@ int two_base_opt(int argc, char* argv[]) {
 
     std::cout << "Outputting table starts " << std::endl;
     PrsmTableWriterPtr table_out = PrsmTableWriterPtr(
-        new PrsmTableWriter(prsm_para_ptr, "CUTOFF_RESULT", "ZERO_TABLE"));
+        new PrsmTableWriter(prsm_para_ptr, "CUTOFF_RESULT", "OUTPUT_TABLE"));
     table_out->write();
     table_out = nullptr;
     std::cout << "Outputting table finished." << std::endl;
