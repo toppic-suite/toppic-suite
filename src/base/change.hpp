@@ -38,7 +38,7 @@ class Change {
 
   static ChangePtr geneChangePtr(ChangePtr ori_change_ptr, int start_pos);
 
- private:
+ protected:
   // left and right positions are based on break point positions 
   int left_bp_pos_;
   int right_bp_pos_;
