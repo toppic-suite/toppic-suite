@@ -47,7 +47,9 @@ void onePtmSearchOneSpec(SpectrumSetPtr spec_set_ptr,
     PtmSlowMatch slow_match(proteoform_ptr_vec[i],
                             spec_set_ptr, type_ptr,
                             comp_shift_ptr, mng_ptr);
-    prsms.push_back(slow_match.compute(type_ptr, 1));
+    PrsmPtr tmp = slow_match.compute(type_ptr, 1);
+    if (tmp != nullptr)
+      prsms.push_back(tmp);
   }
   //LOG_DEBUG("prsm generation ended size " << prsms.size());
   std::sort(prsms.begin(), prsms.end(), Prsm::cmpMatchFragmentDecMatchPeakDec);
