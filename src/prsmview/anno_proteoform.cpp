@@ -9,6 +9,7 @@
 #include "prsm/peak_ion_pair_util.hpp"
 #include "prsmview/anno_cleavage.hpp"
 #include "prsmview/anno_residue.hpp"
+#include "prsmview/anno_ptm.hpp"
 #include "prsmview/prsm_view_mng.hpp"
 
 namespace prot{
@@ -88,17 +89,18 @@ void addTruncationAnno(ProteoformPtr proteoform_ptr, AnnoCleavagePtrVec &cleavag
   }
 }
 
-void addKnownPtms(ChangePtrVec &change_ptrs, AnnoPtmPtrVec &ptm_ptrs, 
-                  AnnoResiduePtrVec &res_ptrs) {
+void addKnownPtms(ProteoformPtr proteoform_ptr, ChangePtrVec &change_ptrs, 
+                  AnnoPtmPtrVec &ptm_ptrs, AnnoResiduePtrVec &res_ptrs) {
+  int start_pos = proteoform_ptr->getStartPos();
   for (size_t i = 0; i < change_ptrs.size(); i++) {
     int left_db_bp = change_ptrs[i]->getLeftBpPos() + start_pos;
     res_ptrs[left_db_bp]->setType(ANNO_RESIDUE_TYPE_KNOWN_CHANGE);
+    PtmPtr ptm_ptr = change_ptrs[i]->getModPtr()->getModResiduePtr()->getPtmPtr();
     AnnoPtmPtr existing_ptr 
-        = findExpectedChange(expected_change_ptrs, change_ptrs[i]->getChangeTypePtr(), change_ptrs[i]->getModPtr());
+        = AnnoPtm::findPtm(ptm_ptrs, ptm_ptr, change_ptrs[i]->getChangeTypePtr());
     if (existing_ptr == nullptr) {
-      existing_ptr = AnnoExpectedChangePtr(new AnnoExpectedChange(change_ptrs[i]->getChangeTypePtr(), 
-                                                                  change_ptrs[i]->getModPtr()));
-      expected_change_ptrs.push_back(existing_ptr);
+      existing_ptr = AnnoPtmPtr(new AnnoPtm(ptm_ptr, change_ptrs[i]->getChangeTypePtr())); 
+      ptm_ptrs.push_back(existing_ptr);
     }
     std::string fasta_seq = proteoform_ptr->getFastaSeqPtr()->getSeq();
     std::string acid_letter = fasta_seq.substr(left_db_bp, 1);
@@ -126,6 +128,15 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
   //LOG_DEBUG("residue completed");
   
   addTruncationAnno(proteoform_ptr, cleavage_ptrs, res_ptrs);
+
+  AnnoPtmPtrVec anno_ptm_ptrs;
+  ChangePtrVec change_ptrs = proteoform_ptr->getChangePtrVec(ChangeType::FIXED);
+  addKnownPtms(proteoform_ptr, change_ptrs, anno_ptm_ptrs, res_ptrs);
+  change_ptrs = proteoform_ptr->getChangePtrVec(ChangeType::PROTEIN_VARIABLE);
+  addKnownPtms(proteoform_ptr, change_ptrs, anno_ptm_ptrs, res_ptrs);
+  change_ptrs = proteoform_ptr->getChangePtrVec(ChangeType::VARIABLE);
+  addKnownPtms(proteoform_ptr, change_ptrs, anno_ptm_ptrs, res_ptrs);
+
 
   /*
   AnnoUnexpectedChangePtrVec unexpected_change_ptrs;
