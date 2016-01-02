@@ -5,6 +5,9 @@
 #include <vector>
 #include <string>
 
+#include "prsm/prsm.hpp"
+#include "prsm/prsm_para.hpp"
+
 namespace prot {
 
 class PrsmUtil {
@@ -13,6 +16,14 @@ class PrsmUtil {
 
   static std::string getXmlLine(const std::vector<std::string> &str_vec,
                                 const std::string &property);
+
+  static PrsmPtrVec selectSpeciesPrsms(const PrsmPtrVec &prsm_ptrs,int species_id);
+
+  static std::vector<int> getSpeciesIds(const PrsmPtrVec &prsm_ptrs, std::string &seq_name);
+
+  static std::vector<int> getSpeciesIds(const PrsmPtrVec &prsm_ptrs);
+
+  static void addSpectrumPtrsToPrsms(PrsmPtrVec &prsm_ptrs, PrsmParaPtr prsm_para_ptr);
 };
 
 }
