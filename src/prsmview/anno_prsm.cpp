@@ -7,8 +7,8 @@
 #include "prsm/peak_ion_pair_factory.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
 #include "prsmview/anno_residue.hpp"
-#include "prsmview/anno_change.hpp"
 #include "prsmview/anno_prsm.hpp"
+#include "prsmview/anno_proteoform.hpp"
 
 namespace prot{
 
@@ -132,11 +132,11 @@ xercesc::DOMElement* geneAnnoPrsm(XmlDOMDocument* xml_doc,PrsmPtr prsm_ptr, Prsm
   prsm_element->appendChild(ms_element);
 
   //proteoform to view
-  //double ppo = mng_ptr->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
-  //double err = prsm_ptr->getOriPrecMass() * ppo; 
-  //xercesc::DOMElement* prot_element = geneAnnoProteoform(xml_doc, prsm_ptr, mng_ptr, err);
-  //prsm_element->appendChild(prot_element);
-  //LOG_DEBUG("protein view completed");
+  double ppo = mng_ptr->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
+  double err = prsm_ptr->getOriPrecMass() * ppo; 
+  xercesc::DOMElement* prot_element = geneAnnoProteoform(xml_doc, prsm_ptr, mng_ptr, err);
+  prsm_element->appendChild(prot_element);
+  LOG_DEBUG("proteoform view completed");
 
   return prsm_element;
   }

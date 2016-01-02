@@ -22,19 +22,15 @@ class AnnoView {
 
 typedef std::shared_ptr<AnnoView> AnnoViewPtr;
 
+
 std::vector<std::vector<std::string>> readViewXmlFiles(const std::string &file_name);
-
-xercesc::DOMElement* genePrsmView(XmlDOMDocument* xml_doc, PrsmPtr prsm_ptr, PrsmViewMngPtr mng_ptr);
-
-xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc, PrsmPtr prsm_ptr,
-                                     PrsmViewMngPtr mng_ptr, double err);
 
 xercesc::DOMElement* proteoformToXml(XmlDOMDocument* xml_doc, const PrsmPtrVec &prsm_ptrs, 
                                      PrsmViewMngPtr mng_ptr);
 
 xercesc::DOMElement* proteinToXml(XmlDOMDocument* xml_doc,
                                   const PrsmPtrVec &prsm_ptrs,
-                                  ProteoformPtr proteo_ptr,
+                                  FastaSeqPtr seq_ptr,
                                   const std::vector<int> &species_ids,
                                   PrsmViewMngPtr mng_ptr);
 
@@ -43,11 +39,13 @@ xercesc::DOMElement* allProteinToXml(XmlDOMDocument* xml_doc,
                                      const PrsmPtrVec &prsm_ptrs,
                                      PrsmViewMngPtr mng_ptr);
 
+/*
 xercesc::DOMElement* allModificationToXml(XmlDOMDocument* xml_doc,
         PrsmPtrVec & prsm_ptrs, const PrsmViewMngPtr & mng_ptr);
 
 std::vector<xercesc::DOMElement*> modificationToXml(XmlDOMDocument* xml_doc,
         PrsmPtrVec & prsm_ptrs, const PrsmViewMngPtr & mng_ptr);
+        */
 
 }
 
