@@ -60,6 +60,7 @@ bool Change::cmpPosInc(const ChangePtr &a, const ChangePtr &b) {
   }
 }
 
+/*
 bool Change::cmpTypeIncPosInc(const ChangePtr &a, const ChangePtr &b) {
   if (a->getChangeTypePtr()->getId() < b->getChangeTypePtr()->getId()) {
     return true;
@@ -79,6 +80,7 @@ bool Change::cmpTypeIncPosInc(const ChangePtr &a, const ChangePtr &b) {
     }
   }
 }
+*/
 
 ChangePtr Change::geneChangePtr(ChangePtr ori_ptr, int start_pos) {
   int left_bp_pos = ori_ptr->left_bp_pos_ - start_pos;

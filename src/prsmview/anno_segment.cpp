@@ -3,6 +3,15 @@
 
 namespace prot {
 
+AnnoSegment::AnnoSegment(std::string segment_type, int left_pos, int right_pos,
+                         double mass_shift, int color) {
+  segment_type_ = segment_type;
+  left_pos_ = left_pos;
+  right_pos_ = right_pos;
+  mass_shift_ = mass_shift;
+  color_ = color;
+}
+
 void AnnoSegment::addOccurence(int pos, const std::string &acid_letter) {
   std::pair<int, std::string> new_occurence(pos, acid_letter);
   occurences_.push_back(new_occurence);
@@ -11,9 +20,9 @@ void AnnoSegment::addOccurence(int pos, const std::string &acid_letter) {
 void AnnoSegment::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent,
                             int precison){
   xercesc::DOMElement* element = xml_doc->createElement("unexpected_change");
-  std::string str = StringUtil::convertToString(left_bp_pos_);
+  std::string str = StringUtil::convertToString(left_pos_);
   xml_doc->addElement(element, "left_position", str.c_str());
-  str = StringUtil::convertToString(right_bp_pos_);
+  str = StringUtil::convertToString(right_pos_);
   xml_doc->addElement(element, "right_position", str.c_str());
   str = StringUtil::convertToString(mass_shift_, precison);
   xml_doc->addElement(element, "mass_shift", str.c_str());
