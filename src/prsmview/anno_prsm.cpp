@@ -3,18 +3,17 @@
 
 #include "base/residue_util.hpp"
 #include "base/xml_dom_util.hpp"
-#include "base/proteoform_factory.hpp"
 #include "spec/peak.hpp"
 #include "prsm/peak_ion_pair_factory.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
 #include "prsmview/anno_residue.hpp"
 #include "prsmview/anno_change.hpp"
-#include "prsmview/anno_prsm_view.hpp"
+#include "prsmview/anno_prsm.hpp"
 
 namespace prot{
 
-void addPrsmHeader(XmlDOMDocument* xml_doc, PrsmPtr prsm_ptr, PrsmViewMngPtr mng_ptr) {
-  xercesc::DOMElement* element = xml_doc->createElement("prsm");
+void addPrsmHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement* element, 
+                   PrsmPtr prsm_ptr, PrsmViewMngPtr mng_ptr) {
   std::string str = StringUtil::convertToString(prsm_ptr->getPrsmId());
   xml_doc->addElement(element, "prsm_id", str.c_str());
   if(prsm_ptr->getExtremeValuePtr().get()!=nullptr){
@@ -45,7 +44,8 @@ void addPrsmHeader(XmlDOMDocument* xml_doc, PrsmPtr prsm_ptr, PrsmViewMngPtr mng
   xml_doc->addElement(element, "matched_peak_number", str.c_str());
 }
 
-void addMsHeader(xercesc::DOMElement* ms_element, PrsmPtr prsm_ptr, PrsmViewMngPtr mng_ptr) {
+void addMsHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement* ms_element, 
+                 PrsmPtr prsm_ptr, PrsmViewMngPtr mng_ptr) {
   xercesc::DOMElement* ms_header_element = xml_doc->createElement("ms_header");
   ms_element->appendChild(ms_header_element);
   DeconvMsPtrVec deconv_ms_ptr_vec = prsm_ptr->getDeconvMsPtrVec();
@@ -61,7 +61,7 @@ void addMsHeader(xercesc::DOMElement* ms_element, PrsmPtr prsm_ptr, PrsmViewMngP
   xml_doc->addElement(ms_header_element, "scans", spec_scans.c_str());
   int pos = 4;
   double precursor_mass = prsm_ptr->getOriPrecMass();
-  str=StringUtil::convertToString(precursor_mass, pos);
+  std::string str=StringUtil::convertToString(precursor_mass, pos);
   xml_doc->addElement(ms_header_element, "precursor_mono_mass", str.c_str());
   int precursor_charge = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecCharge();
   str=StringUtil::convertToString(precursor_charge);
@@ -71,11 +71,13 @@ void addMsHeader(xercesc::DOMElement* ms_element, PrsmPtr prsm_ptr, PrsmViewMngP
   xml_doc->addElement(ms_header_element, "precursor_mz", str.c_str());
 }
 
-void addMsPeaks(xercesc::DOMElement* ms_element, PrsmPtr prsm_ptr, PrsmViewMngPtr mng_ptr) {
+void addMsPeaks(XmlDOMDocument *xml_doc, xercesc::DOMElement* ms_element, 
+                PrsmPtr prsm_ptr, PrsmViewMngPtr mng_ptr) {
   //peaks to view
+  DeconvMsPtrVec deconv_ms_ptr_vec = prsm_ptr->getDeconvMsPtrVec();
+  ExtendMsPtrVec refine_ms_ptr_vec = prsm_ptr->getRefineMsPtrVec();
   xercesc::DOMElement* peaks = xml_doc->createElement("peaks");
   ms_element->appendChild(peaks);
-  ExtendMsPtrVec refine_ms_ptr_vec = prsm_ptr->getRefineMsPtrVec();
   for (size_t s = 0; s < deconv_ms_ptr_vec.size(); s++) {
     //get ion_pair
     PeakIonPairPtrVec pair_ptrs = PeakIonPairFactory::genePeakIonPairs(prsm_ptr->getProteoformPtr(), 
@@ -85,7 +87,7 @@ void addMsPeaks(xercesc::DOMElement* ms_element, PrsmPtr prsm_ptr, PrsmViewMngPt
     for(size_t i=0;i< deconv_ms_ptr_vec[s]->size();i++){
       xercesc::DOMElement* peak_element = xml_doc->createElement("peak");
       peaks->appendChild(peak_element);
-      str = StringUtil::convertToString(deconv_ms_ptr_vec[s]->getMsHeaderPtr()->getId());
+      std::string str = StringUtil::convertToString(deconv_ms_ptr_vec[s]->getMsHeaderPtr()->getId());
       xml_doc->addElement(peak_element, "spec_id", str.c_str());
       DeconvPeakPtr peak_ptr = deconv_ms_ptr_vec[s]->getPeakPtr(i);
       str=StringUtil::convertToString(peak_ptr->getId());
@@ -118,23 +120,24 @@ void addMsPeaks(xercesc::DOMElement* ms_element, PrsmPtr prsm_ptr, PrsmViewMngPt
   }
 }
 
-xercesc::DOMElement* genePrsmView(XmlDOMDocument* xml_doc,PrsmPtr prsm_ptr, PrsmViewMngPtr mng_ptr){
+xercesc::DOMElement* geneAnnoPrsm(XmlDOMDocument* xml_doc,PrsmPtr prsm_ptr, PrsmViewMngPtr mng_ptr){
 
-  addPrsmHeader(xml_doc, prsm_ptr, mng_ptr);
+  xercesc::DOMElement* prsm_element = xml_doc->createElement("prsm");
+  addPrsmHeader(xml_doc, prsm_element, prsm_ptr, mng_ptr);
 
   //add ms
   xercesc::DOMElement* ms_element = xml_doc->createElement("ms");
-  addMsHeader(ms_element, prsm_ptr, mng_ptr);
-  addMsPeaks(ms_element, prsm_ptr, mng_ptr);
-  element->appendChild(ms_element);
+  addMsHeader(xml_doc, ms_element, prsm_ptr, mng_ptr);
+  addMsPeaks(xml_doc, ms_element, prsm_ptr, mng_ptr);
+  prsm_element->appendChild(ms_element);
 
   //proteoform to view
-  double ppo = mng_ptr->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
-  double err = prsm_ptr->getOriPrecMass() * ppo; 
-  xercesc::DOMElement* prot_element = geneProteinView(xml_doc, prsm_ptr, mng_ptr, err);
-  element->appendChild(prot_element);
+  //double ppo = mng_ptr->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
+  //double err = prsm_ptr->getOriPrecMass() * ppo; 
+  //xercesc::DOMElement* prot_element = geneAnnoProteoform(xml_doc, prsm_ptr, mng_ptr, err);
+  //prsm_element->appendChild(prot_element);
   //LOG_DEBUG("protein view completed");
 
-  return element;
+  return prsm_element;
   }
 }
