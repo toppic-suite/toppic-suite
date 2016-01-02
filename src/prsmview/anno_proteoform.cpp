@@ -88,6 +88,24 @@ void addTruncationAnno(ProteoformPtr proteoform_ptr, AnnoCleavagePtrVec &cleavag
   }
 }
 
+void addKnownPtms(ChangePtrVec &change_ptrs, AnnoPtmPtrVec &ptm_ptrs, 
+                  AnnoResiduePtrVec &res_ptrs) {
+  for (size_t i = 0; i < change_ptrs.size(); i++) {
+    int left_db_bp = change_ptrs[i]->getLeftBpPos() + start_pos;
+    res_ptrs[left_db_bp]->setType(ANNO_RESIDUE_TYPE_KNOWN_CHANGE);
+    AnnoPtmPtr existing_ptr 
+        = findExpectedChange(expected_change_ptrs, change_ptrs[i]->getChangeTypePtr(), change_ptrs[i]->getModPtr());
+    if (existing_ptr == nullptr) {
+      existing_ptr = AnnoExpectedChangePtr(new AnnoExpectedChange(change_ptrs[i]->getChangeTypePtr(), 
+                                                                  change_ptrs[i]->getModPtr()));
+      expected_change_ptrs.push_back(existing_ptr);
+    }
+    std::string fasta_seq = proteoform_ptr->getFastaSeqPtr()->getSeq();
+    std::string acid_letter = fasta_seq.substr(left_db_bp, 1);
+    existing_ptr->addOccurence(left_db_bp, acid_letter);
+  }
+}
+
 
 xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
                                      PrsmPtr prsm_ptr,
