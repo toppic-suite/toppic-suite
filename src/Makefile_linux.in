@@ -43,7 +43,7 @@ POISSON_OBJS = $(addprefix $(OBJ_DIR)/, poisson_processor.o poisson_comp_pvalue.
 
 #PRSM_VIEW_OBJS = $(addprefix $(OBJ_DIR)/, anno_cleavage.o anno_expected_change.o anno_unexpected_change.o anno_residue.o anno_view.o xml_generator.o transformer.o) 
 
-PRSM_VIEW_OBJS = $(addprefix $(OBJ_DIR)/, anno_prsm.o anno_change.o anno_cleavage.o anno_residue.o anno_proteoform.o) 
+PRSM_VIEW_OBJS = $(addprefix $(OBJ_DIR)/, anno_prsm.o anno_change.o anno_cleavage.o anno_residue.o anno_ptm.o anno_proteoform.o) 
 
 ARGUMENT_OBJS = $(addprefix $(OBJ_DIR)/, argument.o)
 
