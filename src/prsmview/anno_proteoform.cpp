@@ -7,13 +7,14 @@
 #include "spec/peak.hpp"
 #include "prsm/peak_ion_pair_factory.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
+#include "prsmview/anno_cleavage.hpp"
 #include "prsmview/anno_residue.hpp"
+#include "prsmview/prsm_view_mng.hpp"
 
 namespace prot{
 
-void addSummary(xercesc::DOMElement *prot_element) {
-  xercesc::DOMElement* prot_element = xml_doc->createElement("annotated_protein");
-  ProteoformPtr proteoform_ptr = prsm_ptr->getProteoformPtr();
+void addSummary(XmlDOMDocument* xml_doc, xercesc::DOMElement *prot_element, 
+                ProteoformPtr proteoform_ptr, PrsmViewMngPtr mng_ptr) {
   //std::string str=StringUtil::convertToString(proteoform_ptr->getSeqId());
   //xml_doc->addElement(prot_element, "sequence_id", str.c_str());
   std::string str=StringUtil::convertToString(proteoform_ptr->getSpeciesId());
@@ -33,10 +34,12 @@ void addSummary(xercesc::DOMElement *prot_element) {
 
   ChangePtrVec change_ptrs = proteoform_ptr->getChangePtrVec(); 
   std::sort(change_ptrs.begin(),change_ptrs.end(),Change::cmpTypeIncPosInc);
+}
 
-  xercesc::DOMElement* anno_element = xml_doc->createElement("annotation");
-  prot_element->appendChild(anno_element);
-  str=StringUtil::convertToString(proteoform_ptr->getFastaSeqPtr()->getLen());
+void addAnnoHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement *anno_element, 
+                ProteoformPtr proteoform_ptr, PrsmViewMngPtr mng_ptr) {
+
+  std::string str=StringUtil::convertToString(proteoform_ptr->getFastaSeqPtr()->getLen());
   xml_doc->addElement(anno_element, "protein_length", str.c_str());
 
   str=StringUtil::convertToString(proteoform_ptr->getStartPos());
@@ -46,18 +49,20 @@ void addSummary(xercesc::DOMElement *prot_element) {
   str=StringUtil::convertToString(proteoform_ptr->getProtModPtr()->isAcetylation());
 }
 
-AnnoResiduePtrVec getAnnoResidues() {
+AnnoResiduePtrVec getAnnoResidues(ProteoformPtr proteoform_ptr, PrsmViewMngPtr mng_ptr) {
   AnnoResiduePtrVec res_ptrs;
   std::string fasta_seq = proteoform_ptr->getFastaSeqPtr()->getSeq();
   ModPtrVec fix_mod_list = mng_ptr->prsm_para_ptr_->getFixModPtrVec();
   ResiduePtrVec fasta_residues = ResidueUtil::convertStrToResiduePtrVec(fasta_seq,fix_mod_list); 
+  int prot_len = proteoform_ptr->getFastaSeqPtr()->getLen();
   for(int i=0;i< prot_len;i++){
     res_ptrs.push_back(AnnoResiduePtr(new AnnoResidue(fasta_residues[i], i)));
   }
   return res_ptrs;
 }
 
-void addTruncationAnno() {
+void addTruncationAnno(ProteoformPtr proteoform_ptr, AnnoCleavagePtrVec &cleavage_ptrs,
+                       AnnoResiduePtrVec res_ptrs) {
   // add information for N-terminal truncation
   int start_pos = proteoform_ptr->getStartPos();
   for (int i =0; i < start_pos; i++) { 
@@ -71,6 +76,7 @@ void addTruncationAnno() {
   //LOG_DEBUG("n-trunc completed");
 
   // add information for C-terminal truncation
+  int prot_len = proteoform_ptr->getFastaSeqPtr()->getLen();
   int end_pos = proteoform_ptr->getEndPos();
   if (end_pos < prot_len - 1) {
     cleavage_ptrs[end_pos + 1]->setType(CLEAVAGE_TYPE_SEQ_END);
@@ -86,19 +92,22 @@ void addTruncationAnno() {
 xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
                                      PrsmPtr prsm_ptr,
                                      PrsmViewMngPtr mng_ptr, double err) {
+  ProteoformPtr proteoform_ptr = prsm_ptr->getProteoformPtr();
   xercesc::DOMElement* prot_element = xml_doc->createElement("annotated_protein");
-  addSummary(prot_element):
+  addSummary(xml_doc, prot_element, proteoform_ptr, mng_ptr);
+  xercesc::DOMElement* anno_element = xml_doc->createElement("annotation");
+  prot_element->appendChild(anno_element);
+  addAnnoHeader(xml_doc, anno_element, proteoform_ptr, mng_ptr);
   //LOG_DEBUG("summary completed");
 
   AnnoCleavagePtrVec cleavage_ptrs = getProteoCleavage(prsm_ptr, mng_ptr->min_mass_);
   //LOG_DEBUG("cleavage completed");
 
-  int prot_len = proteoform_ptr->getFastaSeqPtr()->getLen();
   // obtain residue_ptrs 
-  AnnoResiduePtrVec res_ptrs = getResiduePtrs();
+  AnnoResiduePtrVec res_ptrs = getAnnoResidues(proteoform_ptr, mng_ptr);
   //LOG_DEBUG("residue completed");
   
-  addTruncationAnno();
+  addTruncationAnno(proteoform_ptr, cleavage_ptrs, res_ptrs);
 
   /*
   AnnoUnexpectedChangePtrVec unexpected_change_ptrs;
