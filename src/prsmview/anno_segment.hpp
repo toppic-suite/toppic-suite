@@ -9,6 +9,11 @@ namespace prot {
 
 class AnnoSegment {
  public:
+  AnnoSegment(std::string segment_type, int left_pos, int right_pos,
+              double mass_shift, int color);
+  std::string getType() {return segment_type_;}
+  int getRightPos() {return right_pos_;}
+  void setRightPos(int right_pos) {right_pos_ = right_pos;}
 
   void addOccurence(int pos, const std::string &acid_letter);
 
@@ -16,8 +21,8 @@ class AnnoSegment {
 
  private:
   std::string segment_type_;
-  int left_bp_pos_;
-  int right_bp_pos_;
+  int left_pos_;
+  int right_pos_;
   double mass_shift_;
   int color_;
   PtmPtr ptm_ptr_;

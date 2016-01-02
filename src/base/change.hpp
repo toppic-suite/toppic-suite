@@ -34,8 +34,6 @@ class Change {
 
   static bool cmpPosInc(const ChangePtr &a, const ChangePtr &b);
 
-  static bool cmpTypeIncPosInc(const ChangePtr &a, const ChangePtr &b);
-
   static ChangePtr geneChangePtr(ChangePtr ori_change_ptr, int start_pos);
 
  protected:

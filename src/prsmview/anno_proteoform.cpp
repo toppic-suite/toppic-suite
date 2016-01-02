@@ -1,6 +1,7 @@
 #include <set>
 #include <boost/algorithm/string.hpp>
 
+#include "base/change.hpp"
 #include "base/residue_util.hpp"
 #include "base/xml_dom_util.hpp"
 #include "base/proteoform_factory.hpp"
@@ -10,6 +11,7 @@
 #include "prsmview/anno_cleavage.hpp"
 #include "prsmview/anno_residue.hpp"
 #include "prsmview/anno_ptm.hpp"
+#include "prsmview/anno_segment.hpp"
 #include "prsmview/prsm_view_mng.hpp"
 
 namespace prot{
@@ -32,9 +34,6 @@ void addSummary(XmlDOMDocument* xml_doc, xercesc::DOMElement *prot_element,
   int unexpected_change_number = proteoform_ptr->getChangeNum(ChangeType::UNEXPECTED);
   str=StringUtil::convertToString(unexpected_change_number);
   xml_doc->addElement(prot_element, "unexpected_change_number", str.c_str());
-
-  ChangePtrVec change_ptrs = proteoform_ptr->getChangePtrVec(); 
-  std::sort(change_ptrs.begin(),change_ptrs.end(),Change::cmpTypeIncPosInc);
 }
 
 void addAnnoHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement *anno_element, 
@@ -91,6 +90,7 @@ void addTruncationAnno(ProteoformPtr proteoform_ptr, AnnoCleavagePtrVec &cleavag
 
 void addKnownPtms(ProteoformPtr proteoform_ptr, ChangePtrVec &change_ptrs, 
                   AnnoPtmPtrVec &ptm_ptrs, AnnoResiduePtrVec &res_ptrs) {
+  std::sort(change_ptrs.begin(), change_ptrs.end(), Change::cmpPosInc);
   int start_pos = proteoform_ptr->getStartPos();
   for (size_t i = 0; i < change_ptrs.size(); i++) {
     int left_db_bp = change_ptrs[i]->getLeftBpPos() + start_pos;
@@ -108,6 +108,146 @@ void addKnownPtms(ProteoformPtr proteoform_ptr, ChangePtrVec &change_ptrs,
   }
 }
 
+void addInsertion(int left_db_bp, int right_db_bp, ChangePtr change_ptr, int color, 
+                  int &last_right, AnnoSegmentPtrVec &segment_ptrs, AnnoCleavagePtrVec &cleavage_ptrs) {
+  double shift = change_ptr->getMassShift();
+  int this_left = left_db_bp * 2;
+  if (this_left > last_right + 1) {
+    AnnoSegmentPtr segment_ptr(new AnnoSegment("EMPTY", last_right + 1, this_left - 1, 0, -1));
+    segment_ptrs.push_back(segment_ptr);
+  }
+  int this_right = right_db_bp * 2;
+  AnnoSegmentPtr segment_ptr(new AnnoSegment("SHIFT", this_left , this_right, shift, color));
+  std::string anno_info = "PTM: Unknown ";
+  segment_ptrs.push_back(segment_ptr);
+  last_right = this_right;
+  cleavage_ptrs[left_db_bp]->setUnexpectedChange(true);
+  cleavage_ptrs[left_db_bp]->setUnexpectedChangeColor(color);;
+}
+
+void addLocalizationResult(AnnoSegmentPtr segment_ptr, ChangePtr change_ptr) {
+  /*
+  segment_ptr->setPtmPtr(change_ptrs[i]->getModPtr());
+  std::string anno_info = "PTM: ";
+  if (change_ptrs[i]->getModPtr() != nullptr) {
+    anno_info += change_ptrs[i]->getModPtr()->getModResiduePtr()->getPtmPtr()->getName() + "\n";
+    std::vector<double> scr = change_ptrs[i]->getScr();
+    for (int k = left_db_bp; k < right_db_bp; k++) {
+      if (scr[k - left_db_bp] > 0) {
+        std::string acid_letter = proteoform_ptr->getDbResSeqPtr()
+            ->getResiduePtr(k)->getAcidPtr()->getOneLetter();
+        anno_info += "Site: " + acid_letter + std::to_string(k) + " ";
+        anno_info += "Confidence: "
+            + StringUtil::convertToString(scr[k - left_db_bp] * 100, 2) + "%\n";
+      }
+    }
+    for (int k = left_db_bp; k < right_db_bp; k++) {
+      if (scr[k - left_db_bp] > 0) {
+        std::string acid_letter = proteoform_ptr->getDbResSeqPtr()
+            ->getResiduePtr(k)->getAcidPtr()->getOneLetter();
+        anno_change_ptr->addOccurence(k, acid_letter);
+        res_ptrs[k]->setPossiblePosColor(1);
+        res_ptrs[k]->setAnno(anno_info);
+      }
+    }
+  } else {
+    anno_info += "Unknown\n";
+    std::string acid_letter = proteoform_ptr->getDbResSeqPtr()
+        ->getResiduePtr(left_db_bp)->getAcidPtr()->getOneLetter();
+    anno_change_ptr->addOccurence(left_db_bp, acid_letter);
+    anno_info += "Region: " + acid_letter + std::to_string(left_db_bp) + " - ";
+    acid_letter = proteoform_ptr->getDbResSeqPtr()->getResiduePtr(
+        right_db_bp - 1)->getAcidPtr()->getOneLetter();
+    anno_info += acid_letter + std::to_string(right_db_bp - 1);
+    anno_change_ptr->addOccurence(right_db_bp - 1, acid_letter);
+    double scr_sum = 0.0;
+    std::vector<double> scr = change_ptrs[i]->getScr();
+    for (int k = left_db_bp; k < right_db_bp; k++) {
+      scr_sum += scr[k - left_db_bp];
+    }
+    anno_info += " Confindence: " + StringUtil::convertToString(scr_sum * 100, 2) + "%\n";
+    for (int k = left_db_bp; k < right_db_bp; k++) {
+      res_ptrs[k]->setPossiblePosColor(1);
+      res_ptrs[k]->setAnno(anno_info);
+    }
+  }
+  */
+}
+
+void addMod(int left_db_bp, int right_db_bp, ChangePtr change_ptr, int color, int &last_right, 
+            AnnoSegmentPtrVec &segment_ptrs, AnnoCleavagePtrVec &cleavage_ptrs,
+            AnnoResiduePtrVec &res_ptrs) {
+  int this_left = left_db_bp * 2 + 1;
+  if (this_left > last_right + 1) {
+    AnnoSegmentPtr segment_ptr(new AnnoSegment("EMPTY", last_right + 1, this_left - 1, 0, -1));
+    segment_ptrs.push_back(segment_ptr);
+  }
+  int this_right = right_db_bp * 2 - 1;
+  double shift = change_ptr->getMassShift();
+  AnnoSegmentPtr segment_ptr(new AnnoSegment("SHIFT", this_left , this_right, shift, color));
+
+  addLocalizationResult(segment_ptr, change_ptr);
+
+  segment_ptrs.push_back(segment_ptr);
+  last_right = this_right;
+  for (int j = left_db_bp; j < right_db_bp - 1; j++) {
+    res_ptrs[j]->setUnexpectedChange(true);
+    res_ptrs[j]->setUnexpectedChangeColor(color);;
+    cleavage_ptrs[j+1]->setUnexpectedChange(true);
+    cleavage_ptrs[j+1]->setUnexpectedChangeColor(color);;
+  }
+  res_ptrs[right_db_bp-1]->setUnexpectedChange(true);
+  res_ptrs[right_db_bp-1]->setUnexpectedChangeColor(color);;
+}
+
+AnnoSegmentPtrVec getSegments(ProteoformPtr proteoform_ptr, ChangePtrVec &change_ptrs, 
+                              AnnoCleavagePtrVec &cleavage_ptrs, AnnoResiduePtrVec &res_ptrs) {
+  AnnoSegmentPtrVec segment_ptrs;
+  int unexpected_shift_color = 0;
+  int last_right = -1;
+  int start_pos = proteoform_ptr->getStartPos();
+  for (size_t i = 0; i < change_ptrs.size(); i++) {
+    int left_db_bp = change_ptrs[i]->getLeftBpPos() + start_pos;
+    int right_db_bp = change_ptrs[i]->getRightBpPos() + start_pos;
+    if (left_db_bp == right_db_bp) {
+      // if the shift does not cover any amino acids, start from the cleavage
+      addInsertion(left_db_bp, right_db_bp, change_ptrs[i], unexpected_shift_color,
+                   last_right, segment_ptrs, cleavage_ptrs);
+    }
+    else {
+      addMod(left_db_bp, right_db_bp, change_ptrs[i], unexpected_shift_color,
+             last_right, segment_ptrs, cleavage_ptrs, res_ptrs);
+    }
+    unexpected_shift_color = (unexpected_shift_color) + 1 % 2;
+  }
+
+  // last annochange
+  AnnoSegmentPtr segment_ptr(new AnnoSegment("EMPTY", last_right + 1, std::numeric_limits<int>::max(), 0, -1));
+  segment_ptrs.push_back(segment_ptr);
+  return segment_ptrs;
+}
+
+AnnoSegmentPtrVec removeEmptySegment(AnnoSegmentPtrVec &segment_ptrs) {
+  AnnoSegmentPtr non_empty_ptr;
+  AnnoSegmentPtrVec selected_segment_ptrs;
+  for (size_t i = 0; i < segment_ptrs.size(); i++) {
+    AnnoSegmentPtr cur_segment_ptr = segment_ptrs[i];
+    if (cur_segment_ptr->getType() != "EMPTY") {
+      selected_segment_ptrs.push_back(cur_segment_ptr);
+      non_empty_ptr = cur_segment_ptr;
+    }
+    else {
+      if (non_empty_ptr == nullptr) {
+        // first empty segment is kept 
+        selected_segment_ptrs.push_back(cur_segment_ptr);
+      }
+      else {
+        non_empty_ptr->setRightPos(cur_segment_ptr->getRightPos());
+      }
+    }
+  }
+  return selected_segment_ptrs;
+}
 
 xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
                                      PrsmPtr prsm_ptr,
@@ -137,155 +277,14 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
   change_ptrs = proteoform_ptr->getChangePtrVec(ChangeType::VARIABLE);
   addKnownPtms(proteoform_ptr, change_ptrs, anno_ptm_ptrs, res_ptrs);
 
+  change_ptrs = proteoform_ptr->getChangePtrVec(ChangeType::UNEXPECTED);
+  std::sort(change_ptrs.begin(), change_ptrs.end(), Change::cmpPosInc);
+  AnnoSegmentPtrVec segment_ptrs = getSegments(proteoform_ptr, change_ptrs,
+                                               cleavage_ptrs, res_ptrs);
 
-  /*
-  AnnoUnexpectedChangePtrVec unexpected_change_ptrs;
-  AnnoExpectedChangePtrVec expected_change_ptrs;
-  int unexpected_shift_color = 0;
-  int last_right = -1;
-  for (size_t i = 0; i < change_ptrs.size(); i++) {
-    // if the mass is less than 1 Da
-    if (std::abs(change_ptrs[i]->getMassShift()) <= 1 + err)
-        continue;
-    // add information for known changes 
-    int left_db_bp = change_ptrs[i]->getLeftBpPos() + start_pos;
-    int right_db_bp = change_ptrs[i]->getRightBpPos() + start_pos;
-    double shift = change_ptrs[i]->getMassShift();
-    if (change_ptrs[i]->getChangeTypePtr() != ChangeType::UNEXPECTED) { 
-      res_ptrs[left_db_bp]->setType(ANNO_RESIDUE_TYPE_KNOWN_CHANGE);
-      AnnoExpectedChangePtr existing_ptr 
-          = findExpectedChange(expected_change_ptrs, change_ptrs[i]->getChangeTypePtr(), change_ptrs[i]->getModPtr());
-      if (existing_ptr == nullptr) {
-        existing_ptr = AnnoExpectedChangePtr(new AnnoExpectedChange(change_ptrs[i]->getChangeTypePtr(), 
-                                                                    change_ptrs[i]->getModPtr()));
-        expected_change_ptrs.push_back(existing_ptr);
-      }
-      std::string fasta_seq = proteoform_ptr->getFastaSeqPtr()->getSeq();
-      std::string acid_letter = fasta_seq.substr(left_db_bp, 1);
-      existing_ptr->addOccurence(left_db_bp, acid_letter);
-    }
-    else {
-      if (left_db_bp == right_db_bp) {
-        int this_left = left_db_bp * 2;
-        if (this_left > last_right + 1) {
-          AnnoUnexpectedChangePtr anno_change_ptr(new AnnoUnexpectedChange(last_right + 1, this_left - 1, 0, -1, "EMPTY"));
-          unexpected_change_ptrs.push_back(anno_change_ptr);
-        }
-        int this_right = right_db_bp * 2;
-        AnnoUnexpectedChangePtr anno_change_ptr(new AnnoUnexpectedChange(this_left , this_right, shift, unexpected_shift_color, "SHIFT"));
-        anno_change_ptr->setModPtr(change_ptrs[i]->getModPtr());
-        std::string anno_info = "PTM: ";
-        if (change_ptrs[i]->getModPtr() == nullptr) {
-            anno_info += "Unknown";
-        } else {
-            anno_info += change_ptrs[i]->getModPtr()->getModResiduePtr()->getPtmPtr()->getAbbrName();
-        }
-        std::string fasta_seq = proteoform_ptr->getFastaSeqPtr()->getSeq();
-        for (int k = left_db_bp; k <= right_db_bp; k++) {
-            std::string acid_letter = fasta_seq.substr(k,1);
-            anno_change_ptr->addOccurence(k, acid_letter);
-            res_ptrs[k]->setPossiblePosColor(1);
-            res_ptrs[k]->setAnno(anno_info);
-        }
-
-        unexpected_change_ptrs.push_back(anno_change_ptr);
-        last_right = this_right;
-        cleavage_ptrs[left_db_bp]->setUnexpectedChange(true);
-        cleavage_ptrs[left_db_bp]->setUnexpectedChangeColor(unexpected_shift_color);;
-      }
-      else {
-        int this_left = left_db_bp * 2 + 1;
-        if (this_left > last_right + 1) {
-          AnnoUnexpectedChangePtr anno_change_ptr(new AnnoUnexpectedChange(last_right + 1, this_left - 1, 0, -1, "EMPTY"));
-          unexpected_change_ptrs.push_back(anno_change_ptr);
-        }
-        int this_right = right_db_bp * 2 - 1;
-        AnnoUnexpectedChangePtr anno_change_ptr(new AnnoUnexpectedChange(this_left, this_right, shift, unexpected_shift_color, "SHIFT"));
-
-        anno_change_ptr->setModPtr(change_ptrs[i]->getModPtr());
-        std::string anno_info = "PTM: ";
-        if (change_ptrs[i]->getModPtr() != nullptr) {
-            anno_info += change_ptrs[i]->getModPtr()->getModResiduePtr()->getPtmPtr()->getName() + "\n";
-            std::vector<double> scr = change_ptrs[i]->getScr();
-            for (int k = left_db_bp; k < right_db_bp; k++) {
-                if (scr[k - left_db_bp] > 0) {
-                    std::string acid_letter = proteoform_ptr->getDbResSeqPtr()
-                        ->getResiduePtr(k)->getAcidPtr()->getOneLetter();
-                    anno_info += "Site: " + acid_letter + std::to_string(k) + " ";
-                    anno_info += "Confidence: "
-                        + StringUtil::convertToString(scr[k - left_db_bp] * 100, 2) + "%\n";
-                }
-            }
-            for (int k = left_db_bp; k < right_db_bp; k++) {
-                if (scr[k - left_db_bp] > 0) {
-                    std::string acid_letter = proteoform_ptr->getDbResSeqPtr()
-                        ->getResiduePtr(k)->getAcidPtr()->getOneLetter();
-                    anno_change_ptr->addOccurence(k, acid_letter);
-                    res_ptrs[k]->setPossiblePosColor(1);
-                    res_ptrs[k]->setAnno(anno_info);
-                }
-            }
-        } else {
-            anno_info += "Unknown\n";
-            std::string acid_letter = proteoform_ptr->getDbResSeqPtr()
-                ->getResiduePtr(left_db_bp)->getAcidPtr()->getOneLetter();
-            anno_change_ptr->addOccurence(left_db_bp, acid_letter);
-            anno_info += "Region: " + acid_letter + std::to_string(left_db_bp) + " - ";
-            acid_letter = proteoform_ptr->getDbResSeqPtr()->getResiduePtr(
-                    right_db_bp - 1)->getAcidPtr()->getOneLetter();
-            anno_info += acid_letter + std::to_string(right_db_bp - 1);
-            anno_change_ptr->addOccurence(right_db_bp - 1, acid_letter);
-            double scr_sum = 0.0;
-            std::vector<double> scr = change_ptrs[i]->getScr();
-            for (int k = left_db_bp; k < right_db_bp; k++) {
-                scr_sum += scr[k - left_db_bp];
-            }
-            anno_info += " Confindence: " + StringUtil::convertToString(scr_sum * 100, 2) + "%\n";
-            for (int k = left_db_bp; k < right_db_bp; k++) {
-                res_ptrs[k]->setPossiblePosColor(1);
-                res_ptrs[k]->setAnno(anno_info);
-            }
-
-        }
-
-        unexpected_change_ptrs.push_back(anno_change_ptr);
-        last_right = this_right;
-
-        for (int j = left_db_bp; j < right_db_bp - 1; j++) {
-          res_ptrs[j]->setUnexpectedChange(true);
-          res_ptrs[j]->setUnexpectedChangeColor(unexpected_shift_color);;
-          cleavage_ptrs[j+1]->setUnexpectedChange(true);
-          cleavage_ptrs[j+1]->setUnexpectedChangeColor(unexpected_shift_color);;
-        }
-        res_ptrs[right_db_bp-1]->setUnexpectedChange(true);
-        res_ptrs[right_db_bp-1]->setUnexpectedChangeColor(unexpected_shift_color);;
-      }
-      unexpected_shift_color = (unexpected_shift_color) + 1 % 2;
-    }
-  }
-  // last annochange
-  AnnoUnexpectedChangePtr anno_change_ptr(new AnnoUnexpectedChange(last_right + 1, std::numeric_limits<int>::max(), 0, -1, "EMPTY"));
-  unexpected_change_ptrs.push_back(anno_change_ptr);
   // remove EMPTY_CHANGES 
-  AnnoUnexpectedChangePtr non_empty_ptr;
-  AnnoUnexpectedChangePtrVec short_unexpected_change_ptrs;
-  for (size_t i = 0; i < unexpected_change_ptrs.size(); i++) {
-    AnnoUnexpectedChangePtr cur_change_ptr = unexpected_change_ptrs[i];
-    if (cur_change_ptr->getChangeType() != "EMPTY") {
-      short_unexpected_change_ptrs.push_back(cur_change_ptr);
-      non_empty_ptr = cur_change_ptr;
-    }
-    else {
-      if (non_empty_ptr == nullptr) {
-        // first empty segment is kept 
-        short_unexpected_change_ptrs.push_back(cur_change_ptr);
-      }
-      else {
-        non_empty_ptr->setRightPos(cur_change_ptr->getRightPos());
-      }
-    }
-  }
-
+  // this step may be removed
+  AnnoSegmentPtrVec selected_segment_ptrs = removeEmptySegment(segment_ptrs);
   //LOG_DEBUG("unexpected completed");
 
   for (size_t i = 0; i < res_ptrs.size(); i++) {
@@ -294,13 +293,12 @@ xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
   for (size_t i = 0; i < cleavage_ptrs.size(); i++) {
     cleavage_ptrs[i]->appendXml(xml_doc, anno_element);
   }
-  for (size_t i = 0; i < short_unexpected_change_ptrs.size(); i++) {
-    short_unexpected_change_ptrs[i]->appendXml(xml_doc, anno_element, mng_ptr->decimal_point_num_);
+  for (size_t i = 0; i < selected_segment_ptrs.size(); i++) {
+    selected_segment_ptrs[i]->appendXml(xml_doc, anno_element, mng_ptr->decimal_point_num_);
   }
-  for (size_t i = 0; i < expected_change_ptrs.size(); i++) {
-    expected_change_ptrs[i]->appendXml(xml_doc, anno_element);
+  for (size_t i = 0; i < anno_ptm_ptrs.size(); i++) {
+    anno_ptm_ptrs[i]->appendXml(xml_doc, anno_element);
   }
-  */
   return prot_element;
 }
 
