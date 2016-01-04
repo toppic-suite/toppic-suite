@@ -53,6 +53,13 @@ xercesc::DOMElement* SimplePrsm::toXml(XmlDOMDocument* xml_doc){
   xml_doc->addElement(element, "score", str.c_str());
   xml_doc->addElement(element, "sequence_name", seq_name_.c_str());
   xml_doc->addElement(element, "sequence_desc", seq_desc_.c_str());
+
+  element_name = NTermShift::getXmlElementName() + "_list";
+  xercesc::DOMElement* shift_list = xml_doc->createElement(element_name.c_str());
+  for(size_t i=0; i<n_term_shifts_.size(); i++) {
+    n_term_shifts_[i]->appendXml(xml_doc, shift_list);
+  }
+  element->appendChild(shift_list);
   return element;
 }
 

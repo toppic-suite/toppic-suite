@@ -4,11 +4,10 @@
 #include <string>
 #include <xercesc/dom/DOM.hpp>
 
-#include "htslib/faidx.h"
-
 #include "base/proteoform.hpp"
 #include "base/xml_dom_document.hpp"
 #include "spec/ms_header.hpp"
+#include "prsm/n_term_shift.hpp"
 
 namespace prot {
 
@@ -33,6 +32,8 @@ class SimplePrsm {
   double getPrecMass(){return prec_mass_;}
   void setPrecursorId(int precursorId) {precursor_id_ = precursorId;}
   int getPrecursorId(){return precursor_id_;}
+  NTermShiftPtrVec getNTermShiftPtrVec() {return n_term_shifts_;}
+
   xercesc::DOMElement* toXml(XmlDOMDocument* xml_doc);
 
   static std::string getXmlElementName() {return "simple_prsm";}
@@ -57,6 +58,8 @@ class SimplePrsm {
   std::string seq_name_;
   std::string seq_desc_;
   double score_;
+
+  NTermShiftPtrVec n_term_shifts_;
 };
 
 } /* namespace prot */
