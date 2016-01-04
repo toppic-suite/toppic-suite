@@ -20,7 +20,7 @@
 #include "oneptmfilter/one_ptm_filter_mng.hpp"
 #include "oneptmfilter/one_ptm_filter_processor.hpp"
 
-#include "oneptmsearch/one_ptm_search_mng.hpp"
+#include "oneptmsearch/ptm_search_mng.hpp"
 #include "oneptmsearch/one_ptm_search.hpp"
 
 #include "tdgf/tdgf_mng.hpp"
@@ -91,7 +91,9 @@ int one_ptm_process(int argc, char* argv[]) {
 
     time(&start_s);
     std::cout << "One PTM search started." << std::endl;
-    OnePtmSearchMngPtr one_search_mng_ptr = OnePtmSearchMngPtr(new OnePtmSearchMng (prsm_para_ptr, n_top, max_ptm_mass, "ONE_PTM_FILTER", "ONE"));
+    int shift_num = 1;
+    PtmSearchMngPtr one_search_mng_ptr 
+        = PtmSearchMngPtr(new PtmSearchMng (prsm_para_ptr, n_top, max_ptm_mass, shift_num, "ONE_PTM_FILTER", "ONE_PTM"));
     OnePtmSearch::process(one_search_mng_ptr);
     std::cout << "One PTM search finished." << std::endl;
     time(&stop_s);
