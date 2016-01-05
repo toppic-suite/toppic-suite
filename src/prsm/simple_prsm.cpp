@@ -35,6 +35,19 @@ SimplePrsm::SimplePrsm(xercesc::DOMElement* element){
   seq_name_ = XmlDomUtil::getChildValue(element, "sequence_name", 0);
   seq_desc_ = XmlDomUtil::getChildValue(element, "sequence_desc", 0);
   score_ = XmlDomUtil::getDoubleChildValue(element, "score", 0);
+  // n term shifts
+  std::string shift_element_name = NTermShift::getXmlElementName();
+  std::string list_name = shift_element_name + "_list";
+
+  xercesc::DOMElement* shift_list_element= XmlDomUtil::getChildElement(element, list_name.c_str(),0);
+  int shift_num = XmlDomUtil::getChildCount(shift_list_element, shift_element_name.c_str());
+
+  for(int i=0; i<shift_num; i++) {
+    xercesc::DOMElement* shift_element 
+        = XmlDomUtil::getChildElement(shift_list_element, shift_element_name.c_str(), i);
+    n_term_shifts_.push_back(NTermShiftPtr(new NTermShift(shift_element)));
+  }
+
 }
 
 xercesc::DOMElement* SimplePrsm::toXml(XmlDOMDocument* xml_doc){
