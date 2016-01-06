@@ -54,7 +54,7 @@ std::string XmlDomUtil::getChildValue(xercesc::DOMElement* parent,
 double XmlDomUtil::getDoubleChildValue(xercesc::DOMElement* parent,  
                                        const char* child_tag, int i) {
   std::string value = getChildValue(parent, child_tag, i);
-  //LOG_DEBUG("tag " << child_tag << "double value " << value << " number " << std::stod(value));
+  //LOG_DEBUG("tag " << child_tag << "double value " << value);
   return std::stod(value);
 }
 

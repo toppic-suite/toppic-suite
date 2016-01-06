@@ -29,12 +29,12 @@ class CompShift {
   void compDiagConvolution(const std::vector<std::pair<int,int>> &mass_errors, 
                            int start, int top_num);
 
-  const FilterProteinPtrVec& getTopCompProts() {return top_comp_prots_;}
-  const FilterProteinPtrVec& getTopPrefProts() {return top_pref_prots_;}
-  const FilterProteinPtrVec& getTopSuffProts() {return top_suff_prots_;}
-  const FilterProteinPtrVec& getTopInternalProts() {return top_internal_prots_;}
+  FilterProteinPtrVec getTopCompProts() {return top_comp_prots_;}
+  FilterProteinPtrVec getTopPrefProts() {return top_pref_prots_;}
+  FilterProteinPtrVec getTopSuffProts() {return top_suff_prots_;}
+  FilterProteinPtrVec getTopInternalProts() {return top_internal_prots_;}
 
-  const FilterProteinPtrVec& getTopDiagProts() {return top_comp_prots_;}
+  FilterProteinPtrVec getTopDiagProts() {return top_comp_prots_;}
 
  private:
   int scale_;

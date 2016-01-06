@@ -24,11 +24,12 @@ OnePtmSlowMatch::OnePtmSlowMatch(ProteoformPtr proteo_ptr,
 inline void OnePtmSlowMatch::addPrefixDiagonals(DiagonalHeaderPtrVec &n_extend_header_ptrs) {
   std::vector<double> shifts = simple_prsm_ptr_->getNTruncShifts();
   for (size_t i = 0; i < shifts.size(); i++) {
-    if (!DiagonalHeaderUtil::isExistHeader(n_extend_header_ptrs, shifts[i])) {
+    double new_shift = shifts[i] - proteo_ptr_->getProtModPtr()->getProtShift(); 
+    if (!DiagonalHeaderUtil::isExistHeader(n_extend_header_ptrs, new_shift)) {
       // n_term strict; c_term nostrict; prot n_term no_match; prot c_term no_match
       // pep n_term match; pep c_term no_match
       DiagonalHeaderPtr header_ptr(
-          new DiagonalHeader(shifts[i], true, false, false, false, true, false));
+          new DiagonalHeader(new_shift, true, false, false, false, true, false));
       n_extend_header_ptrs.push_back(header_ptr);
     }
   }
@@ -88,11 +89,12 @@ inline void OnePtmSlowMatch::addComplementDiagonals(DiagonalHeaderPtrVec &n_exte
 inline void OnePtmSlowMatch::addSuffixDiagonals(DiagonalHeaderPtrVec &c_extend_header_ptrs) {
   std::vector<double>shifts = simple_prsm_ptr_->getCTruncShifts();
   for (size_t i = 0; i < shifts.size(); i++) {
-    if (!DiagonalHeaderUtil::isExistHeader(c_extend_header_ptrs, shifts[i])) {
+    double new_shift = shifts[i] - proteo_ptr_->getProtModPtr()->getProtShift(); 
+    if (!DiagonalHeaderUtil::isExistHeader(c_extend_header_ptrs, new_shift)) {
       // n term nostrict, c_term strict, prot n_term no match ; prot c_term no match
       // pep n_term no match, pep c_term match 
       DiagonalHeaderPtr header_ptr(
-          new DiagonalHeader(shifts[i], false, true, false, false, false, true));
+          new DiagonalHeader(new_shift, false, true, false, false, false, true));
       c_extend_header_ptrs.push_back(header_ptr);
     }
   }
@@ -130,18 +132,18 @@ inline DiagonalHeaderPtrVec OnePtmSlowMatch::geneOnePtmNTermShiftHeaders() {
 
 // initialize ps_align
 void OnePtmSlowMatch::init(){
-  auto start = std::chrono::high_resolution_clock::now();
+  //auto start = std::chrono::high_resolution_clock::now();
   DiagonalHeaderPtrVec n_term_shift_header_ptrs = geneOnePtmNTermShiftHeaders(); 
-  auto step_1 = std::chrono::high_resolution_clock::now();
-  std::cout << "Init n term diag time: " << std::chrono::duration_cast<std::chrono::nanoseconds>(step_1-start).count() << "\t";
+  //auto step_1 = std::chrono::high_resolution_clock::now();
+  //LOG_DEBUG("Init n term diag time: " << std::chrono::duration_cast<std::chrono::nanoseconds>(step_1-start).count());
   PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
   PrmPeakPtrVec prm_peaks = PrmMs::getPrmPeakPtrs(ms_six_ptr_vec_, tole_ptr);
   int group_spec_num = ms_six_ptr_vec_.size();
   BasicDiagonalPtrVec diagonal_ptrs = geneDiagonals(n_term_shift_header_ptrs,
                                                     prm_peaks, group_spec_num,
                                                     proteo_ptr_);
-  auto step_2 = std::chrono::high_resolution_clock::now();
-  std::cout << "Init diag time: " << std::chrono::duration_cast<std::chrono::nanoseconds>(step_2-step_1).count() << "\t";
+  //auto step_2 = std::chrono::high_resolution_clock::now();
+  //LOG_DEBUG("Init diag time: " << std::chrono::duration_cast<std::chrono::nanoseconds>(step_2-step_1).count());
 
   std::vector<double> seq_masses = proteo_ptr_->getBpSpecPtr()->getPrmMasses();
   std::vector<double> ms_masses (prm_peaks.size());
@@ -151,8 +153,8 @@ void OnePtmSlowMatch::init(){
   ps_align_ptr_ = PSAlignPtr(new PSAlign(ms_masses, seq_masses,
                                          diagonal_ptrs, mng_ptr_->align_para_ptr_));
 
-  auto step_3 = std::chrono::high_resolution_clock::now();
-  std::cout << "Init ps time: " << std::chrono::duration_cast<std::chrono::nanoseconds>(step_3-step_2).count() << std::endl;
+  //auto step_3 = std::chrono::high_resolution_clock::now();
+  //LOG_DEBUG("Init ps time: " << std::chrono::duration_cast<std::chrono::nanoseconds>(step_3-step_2).count());
 }
 
 PrsmPtr OnePtmSlowMatch::compute(AlignTypePtr align_type_ptr, int shift_num) {

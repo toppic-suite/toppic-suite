@@ -101,6 +101,7 @@ void OnePtmFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_n
   pref_writer.close();
   suff_writer.close();
   internal_writer.close();
+  LOG_DEBUG("block end");
 }
 
 } /* namespace prot */

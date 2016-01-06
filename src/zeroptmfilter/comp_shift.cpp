@@ -20,6 +20,9 @@ CompShift::CompShift(const ProteoformPtrVec &proteo_ptrs, int scale,
   proteo_num_ = proteo_ptrs.size();
   prot_mod_ptr_vec_ = prot_mod_ptr_vec;
 
+  LOG_DEBUG("column number: " << col_num_);
+  LOG_DEBUG("row number: " << row_num_);
+
   LOG_DEBUG("start init");
   initProteoformBeginEnds(proteo_ptrs);
   LOG_DEBUG("init indexes");
@@ -29,8 +32,6 @@ CompShift::CompShift(const ProteoformPtrVec &proteo_ptrs, int scale,
     initRevIndexes(proteo_ptrs);
   }
 
-  LOG_DEBUG("column number: " << col_num_);
-  LOG_DEBUG("row number: " << row_num_);
 }
 
 CompShift::~CompShift(){
@@ -66,19 +67,24 @@ inline void CompShift::initProteoformBeginEnds(const ProteoformPtrVec &proteo_pt
       row_proteo_ids_[j] = i;
     }
     std::vector<int> masses = proteo_ptrs[i]->getBpSpecPtr()->getScaledPrmMasses(scale_);
+    std::vector<double> double_masses = proteo_ptrs[i]->getBpSpecPtr()->getPrmMasses();
     if (acet_mods_[i] != nullptr) {
       int ace_mass = (int)std::round(- acet_mods_[i]->getProtShift() * scale_);
       masses.push_back(ace_mass);
       std::sort(masses.begin(), masses.end(),std::less<int>()); 
+      double double_ace_mass = - acet_mods_[i]->getProtShift();
+      double_masses.push_back(double_ace_mass);
+      std::sort(double_masses.begin(), double_masses.end(),std::less<double>()); 
     }
     for(int j= proteo_row_begins_[i]; j<= proteo_row_ends_[i];j++){
       int pos = j - proteo_row_begins_[i];
-      n_trunc_shifts_[j] = - masses[pos];
+      n_trunc_shifts_[j] = - double_masses[pos];
     }
-    std::sort(masses.begin(), masses.end(),std::greater<int>()); 
+    std::sort(double_masses.begin(), double_masses.end(),std::greater<double>()); 
     for(int j= proteo_row_begins_[i]; j<= proteo_row_ends_[i];j++){
       int pos = j - proteo_row_begins_[i];
-      c_trunc_shifts_[j] = masses[pos] - masses[0];
+      c_trunc_shifts_[j] = double_masses[pos] - double_masses[0];
+      //LOG_DEBUG("c_trum shift " << c_trunc_shifts_[j]);
     }
   }
 }
@@ -105,6 +111,7 @@ inline void CompShift::updateColumnMatchNums(ProteoformPtr proteo_ptr, ProtModPt
 }
 
 inline void CompShift::initIndexes(const ProteoformPtrVec &proteo_ptrs){
+  LOG_DEBUG("column num " << col_num_);
   std::vector<int> col_match_nums (col_num_, 0); 
   // no need to initalize 
   std::vector<int> col_index_pnts (col_num_);
