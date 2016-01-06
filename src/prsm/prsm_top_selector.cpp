@@ -18,7 +18,7 @@ PrsmTopSelector::PrsmTopSelector(const std::string &db_file_name,
 
 bool containsSameFastaSeq(const PrsmStrPtrVec prsm_ptrs, PrsmStrPtr target_prsm_ptr) {
   for(size_t i=0; i< prsm_ptrs.size();i++){
-    if (prsm_ptrs[i]->getDbSeqName() == target_prsm_ptr->getDbSeqName()) {
+    if (prsm_ptrs[i]->getSeqName() == target_prsm_ptr->getSeqName()) {
       return true;
     }
   }

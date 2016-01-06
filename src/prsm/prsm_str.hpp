@@ -18,7 +18,7 @@ class PrsmStr {
 
   int getSpectrumId() {return spectrum_id_;}
 
-  std::string getDbSeqName() {return db_seq_name_;}
+  std::string getSeqName() {return seq_name_;}
   
   double getMatchFragNum() {return match_frag_num_;}
 
@@ -48,7 +48,7 @@ class PrsmStr {
 
   int spectrum_id_;
 
-  std::string db_seq_name_;
+  std::string seq_name_;
 
   double match_frag_num_;
 
