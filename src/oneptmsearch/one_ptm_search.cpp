@@ -14,6 +14,7 @@
 #include "prsm/prsm_str_combine.hpp"
 #include "oneptmsearch/comp_shift_low_mem.hpp"
 #include "oneptmsearch/ptm_slow_match.hpp"
+#include "oneptmsearch/one_ptm_slow_match.hpp"
 #include "oneptmsearch/one_ptm_search.hpp"
 
 namespace prot {
@@ -29,6 +30,7 @@ void onePtmSearchOneSpec(SpectrumSetPtr spec_set_ptr,
   ModPtrVec fix_mod_list = mng_ptr->prsm_para_ptr_->getFixModPtrVec();
   ProtModPtrVec prot_mod_ptr_vec = mng_ptr->prsm_para_ptr_->getProtModPtrVec();
   ProteoformPtrVec proteoform_ptr_vec;
+  SimplePrsmPtrVec prsm_vec;
   for (size_t i = 0; i < simple_prsm_ptr_vec.size(); i++) {
     std::string seq_name = simple_prsm_ptr_vec[i]->getSeqName();
     std::string seq_desc = simple_prsm_ptr_vec[i]->getSeqDesc();
@@ -39,22 +41,28 @@ void onePtmSearchOneSpec(SpectrumSetPtr spec_set_ptr,
           proteo_ptr, prot_mod_ptr_vec);
       proteoform_ptr_vec.insert(proteoform_ptr_vec.end(), mod_form_ptr_vec.begin(), 
                                 mod_form_ptr_vec.end());
+      prsm_vec.insert(prsm_vec.end(), mod_form_ptr_vec.size(), simple_prsm_ptr_vec[i]);
     }
     else {
       proteoform_ptr_vec.push_back(proteo_ptr);
+      prsm_vec.push_back(simple_prsm_ptr_vec[i]);
     }
   }
 
   for (size_t i = 0; i < proteoform_ptr_vec.size(); i++) { 
-    auto start = std::chrono::high_resolution_clock::now();
+    //auto start = std::chrono::high_resolution_clock::now();
+    /*
     PtmSlowMatch slow_match(proteoform_ptr_vec[i],
                             spec_set_ptr, type_ptr,
                             comp_shift_ptr, mng_ptr);
-    auto step_1 = std::chrono::high_resolution_clock::now();
-    std::cout << "Init time: " << std::chrono::duration_cast<std::chrono::nanoseconds>(step_1-start).count() << std::endl;
+                            */
+    OnePtmSlowMatch slow_match(proteoform_ptr_vec[i], spec_set_ptr,
+                               prsm_vec[i], type_ptr, mng_ptr);
+    //auto step_1 = std::chrono::high_resolution_clock::now();
+    //LOG_DEBUG("Init time: " << std::chrono::duration_cast<std::chrono::nanoseconds>(step_1-start).count());
     PrsmPtr tmp = slow_match.compute(type_ptr, 1);
-    auto step_2 = std::chrono::high_resolution_clock::now();
-    std::cout << "Alignment time: " << std::chrono::duration_cast<std::chrono::nanoseconds>(step_2-step_1).count() << std::endl;
+    //auto step_2 = std::chrono::high_resolution_clock::now();
+    //LOG_DEBUG("Alignment time: " << std::chrono::duration_cast<std::chrono::nanoseconds>(step_2-step_1).count());
 
     if (tmp != nullptr)
       prsms.push_back(tmp);
@@ -165,7 +173,7 @@ void OnePtmSearch::process(PtmSearchMngPtr mng_ptr){
         all_writer.writeVector(prsms);
       }
     }
-    std::cout << std::flush <<  "Zero Ptm intenal search is processing " << cnt 
+    std::cout << std::flush <<  "One Ptm intenal search is processing " << cnt 
         << " of " << spectrum_num << " spectra.\r";
     //WebLog::percentLog(cnt, spectrum_num, WebLog::PtmTime());
   }

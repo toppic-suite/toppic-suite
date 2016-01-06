@@ -40,6 +40,7 @@ SimplePrsm::SimplePrsm(xercesc::DOMElement* element){
   // n trunc shifts
   xercesc::DOMElement* n_shift_list_element= XmlDomUtil::getChildElement(element, "n_trunc_shift_list",0);
   int n_shift_num = XmlDomUtil::getChildCount(n_shift_list_element, "shift");
+  //LOG_DEBUG("n shift _num " << n_shift_num);
   for(int i=0; i<n_shift_num; i++) {
     double shift = XmlDomUtil::getDoubleChildValue(n_shift_list_element, "shift", i);
     n_trunc_shifts_.push_back(shift);
@@ -47,6 +48,7 @@ SimplePrsm::SimplePrsm(xercesc::DOMElement* element){
   //c trunc shifts
   xercesc::DOMElement* c_shift_list_element= XmlDomUtil::getChildElement(element, "c_trunc_shift_list",0);
   int c_shift_num = XmlDomUtil::getChildCount(c_shift_list_element, "shift");
+  //LOG_DEBUG("c shift _num " << c_shift_num);
   for(int i=0; i<c_shift_num; i++) {
     double shift = XmlDomUtil::getDoubleChildValue(c_shift_list_element, "shift", i);
     c_trunc_shifts_.push_back(shift);
@@ -68,7 +70,7 @@ xercesc::DOMElement* SimplePrsm::toXml(XmlDOMDocument* xml_doc){
   xml_doc->addElement(element, "sequence_name", seq_name_.c_str());
   xml_doc->addElement(element, "sequence_desc", seq_desc_.c_str());
   str = StringUtil::convertToString(prot_mass_);
-  xml_doc->addElement(element, "proteoform_mass", seq_desc_.c_str());
+  xml_doc->addElement(element, "proteoform_mass", str.c_str());
   str = StringUtil::convertToString(score_);
   xml_doc->addElement(element, "score", str.c_str());
 
