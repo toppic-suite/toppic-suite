@@ -430,7 +430,7 @@ void CompShift::addNTruncShifts(FilterProteinPtrVec &prot_ptrs,
       }
       shifts.push_back(n_trunc_shifts_[pos_scores[j].first]);
     }
-    prot_ptr->setNTruncShifts(shifts);
+    prot_ptr->setNTermShifts(shifts);
   }
 }
 
@@ -455,7 +455,7 @@ void CompShift::addCTruncShifts(FilterProteinPtrVec &prot_ptrs,
       }
       shifts.push_back(c_trunc_shifts_[pos_scores[j].first]);
     }
-    prot_ptr->setCTruncShifts(shifts);
+    prot_ptr->setCTermShifts(shifts);
   }
 }
 

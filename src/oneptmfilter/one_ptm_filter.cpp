@@ -42,9 +42,10 @@ void OnePtmFilter::computeBestMatch(const PrmMsPtrVec &ms_ptr_vec){
   for (size_t i = 0; i < pref_prots.size(); i++) {
     int id = pref_prots[i]->getProteinId();
     int score = pref_prots[i]->getScore();
-    pref_match_ptrs_.push_back( 
-        SimplePrsmPtr(new SimplePrsm(ms_ptr_vec[0]->getMsHeaderPtr(), group_spec_num,
-                                     proteo_ptrs_[id], score)));
+    SimplePrsmPtr prsm_ptr(new SimplePrsm(ms_ptr_vec[0]->getMsHeaderPtr(), group_spec_num,
+                                          proteo_ptrs_[id], score));
+    prsm_ptr->setCTruncShifts(pref_prots[i]->getCTermShifts());
+    pref_match_ptrs_.push_back(prsm_ptr); 
   }
 
   FilterProteinPtrVec suff_prots = index_ptr_->getTopSuffProts();
@@ -52,9 +53,10 @@ void OnePtmFilter::computeBestMatch(const PrmMsPtrVec &ms_ptr_vec){
   for (size_t i = 0; i < suff_prots.size(); i++) {
     int id = suff_prots[i]->getProteinId();
     int score = suff_prots[i]->getScore();
-    suff_match_ptrs_.push_back( 
-        SimplePrsmPtr(new SimplePrsm(ms_ptr_vec[0]->getMsHeaderPtr(), group_spec_num,
-                                     proteo_ptrs_[id], score)));
+    SimplePrsmPtr prsm_ptr(new SimplePrsm(ms_ptr_vec[0]->getMsHeaderPtr(), group_spec_num,
+                                          proteo_ptrs_[id], score));
+    prsm_ptr->setNTruncShifts(suff_prots[i]->getNTermShifts());
+    suff_match_ptrs_.push_back(prsm_ptr); 
   }
 
   FilterProteinPtrVec internal_prots = index_ptr_->getTopInternalProts();
@@ -62,11 +64,12 @@ void OnePtmFilter::computeBestMatch(const PrmMsPtrVec &ms_ptr_vec){
   for (size_t i = 0; i < internal_prots.size(); i++) {
     int id = internal_prots[i]->getProteinId();
     int score = internal_prots[i]->getScore();
-    internal_match_ptrs_.push_back( 
-        SimplePrsmPtr(new SimplePrsm(ms_ptr_vec[0]->getMsHeaderPtr(), group_spec_num,
-                                     proteo_ptrs_[id], score)));
+    SimplePrsmPtr prsm_ptr(new SimplePrsm(ms_ptr_vec[0]->getMsHeaderPtr(), group_spec_num,
+                                          proteo_ptrs_[id], score));
+    prsm_ptr->setNTruncShifts(internal_prots[i]->getNTermShifts());
+    prsm_ptr->setCTruncShifts(internal_prots[i]->getCTermShifts());
+    internal_match_ptrs_.push_back(prsm_ptr); 
   }
-
 }
 
 } /* namespace prot */

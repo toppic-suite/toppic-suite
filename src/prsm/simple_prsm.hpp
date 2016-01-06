@@ -7,7 +7,6 @@
 #include "base/proteoform.hpp"
 #include "base/xml_dom_document.hpp"
 #include "spec/ms_header.hpp"
-#include "prsm/n_term_shift.hpp"
 
 namespace prot {
 
@@ -23,8 +22,6 @@ class SimplePrsm {
   SimplePrsm(xercesc::DOMElement* element);
   std::string getSeqName(){return seq_name_;}
   std::string getSeqDesc(){return seq_desc_;}
-  //ProteoformPtr getProteoformPtr(){return proteo_ptr_;}
-  //ProteoformPtrVec getModProteoformPtrs() {return mod_proteo_ptrs_;}
   double getScore(){return score_;}
   int getSpectrumId(){return spectrum_id_;}
   const std::string& getSpectrumScan(){return spectrum_scan_;}
@@ -32,7 +29,12 @@ class SimplePrsm {
   double getPrecMass(){return prec_mass_;}
   void setPrecursorId(int precursorId) {precursor_id_ = precursorId;}
   int getPrecursorId(){return precursor_id_;}
-  NTermShiftPtrVec getNTermShiftPtrVec() {return n_term_shifts_;}
+
+  std::vector<double>& getNTruncShifts() {return n_trunc_shifts_;}
+  std::vector<double>& getCTruncShifts() {return c_trunc_shifts_;}
+
+  void setNTruncShifts(const std::vector<double> &shifts) {n_trunc_shifts_ = shifts;}
+  void setCTruncShifts(const std::vector<double> &c_term_shifts);
 
   xercesc::DOMElement* toXml(XmlDOMDocument* xml_doc);
 
@@ -53,13 +55,14 @@ class SimplePrsm {
   int spectrum_num_;
   double prec_mass_;
 
-  //ProteoformPtr proteo_ptr_;
-  //ProteoformPtrVec mod_proteo_ptrs_;
   std::string seq_name_;
   std::string seq_desc_;
+  double prot_mass_;
+
   double score_;
 
-  NTermShiftPtrVec n_term_shifts_;
+  std::vector<double> n_trunc_shifts_;
+  std::vector<double> c_trunc_shifts_;
 };
 
 } /* namespace prot */

@@ -23,7 +23,7 @@ BASE_OBJS = $(addprefix $(OBJ_DIR)/, acid_base.o acid.o activation_base.o activa
 
 SPEC_OBJS = $(addprefix $(OBJ_DIR)/, deconv_peak.o deconv_ms_factory.o extend_peak.o extend_ms.o extend_ms_factory.o ms_header.o msalign_reader.o msalign_util.o multi_spec_peak.o peak.o peak_tolerance.o prm_base_type.o prm_break_type.o prm_peak.o prm_peak_factory.o prm_ms.o prm_ms_factory.o sp_para.o spectrum_set.o support_peak.o theo_peak.o theo_peak_factory.o theo_peak_util.o)
 
-PRSM_OBJS = $(addprefix $(OBJ_DIR)/, n_term_shift.o peak_ion_pair.o peak_ion_pair_factory.o peak_ion_pair_util.o prsm.o prsm_coverage.o prsm_cutoff_selector.o prsm_fdr.o prsm_para.o prsm_prob.o prsm_reader.o prsm_species.o prsm_stat.o prsm_str.o prsm_str_combine.o prsm_table_writer.o prsm_top_selector.o prsm_util.o prsm_xml_writer.o simple_prsm.o simple_prsm_reader.o simple_prsm_str.o simple_prsm_str_combine.o simple_prsm_table_writer.o simple_prsm_util.o simple_prsm_xml_writer.o)
+PRSM_OBJS = $(addprefix $(OBJ_DIR)/, peak_ion_pair.o peak_ion_pair_factory.o peak_ion_pair_util.o prsm.o prsm_coverage.o prsm_cutoff_selector.o prsm_fdr.o prsm_para.o prsm_prob.o prsm_reader.o prsm_species.o prsm_stat.o prsm_str.o prsm_str_combine.o prsm_table_writer.o prsm_top_selector.o prsm_util.o prsm_xml_writer.o simple_prsm.o simple_prsm_reader.o simple_prsm_str.o simple_prsm_str_combine.o simple_prsm_table_writer.o simple_prsm_util.o simple_prsm_xml_writer.o)
 
 ZERO_PTM_FILTER_OBJS = $(addprefix $(OBJ_DIR)/, comp_shift.o zero_ptm_filter.o zero_ptm_filter_processor.o)
 
@@ -31,7 +31,7 @@ ZERO_PTM_SEARCH_OBJS = $(addprefix $(OBJ_DIR)/, zero_ptm_fast_match.o zero_ptm_s
 
 ONE_PTM_FILTER_OBJS =  $(addprefix $(OBJ_DIR)/, one_ptm_filter.o one_ptm_filter_processor.o) 
 
-ONE_PTM_SEARCH_OBJS =  $(addprefix $(OBJ_DIR)/, basic_diag_pair.o comp_shift_low_mem.o diagonal.o diagonal_header.o dp_pair.o one_ptm_search.o ptm_slow_match.o pair.o ps_align.o) 
+ONE_PTM_SEARCH_OBJS =  $(addprefix $(OBJ_DIR)/, basic_diag_pair.o comp_shift_low_mem.o diagonal.o diagonal_header.o dp_pair.o one_ptm_search.o one_ptm_slow_match.o ptm_slow_match.o pair.o ps_align.o) 
 
 DIAG_FILTER_OBJS =  $(addprefix $(OBJ_DIR)/, diag_filter.o diag_filter_processor.o) 
 

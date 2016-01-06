@@ -1,5 +1,5 @@
-#ifndef PROT_ONE_PTM_SLOW_MATCH_HPP_
-#define PROT_ONE_PTM_SLOW_MATCH_HPP_
+#ifndef PROT_PTM_SLOW_MATCH_HPP_
+#define PROT_PTM_SLOW_MATCH_HPP_
 
 #include <memory>
 #include <vector>
@@ -43,9 +43,6 @@ class PtmSlowMatch {
   AlignTypePtr align_type_ptr_;
   CompShiftLowMemPtr comp_shift_ptr_;
   PSAlignPtr ps_align_ptr_;
-
-  void addCornerDiagonals(DiagonalHeaderPtrVec &n_extend_header_ptrs,
-                          DiagonalHeaderPtrVec &c_extend_header_ptrs);
 
   DiagonalHeaderPtrVec getNTermShiftListCommonHeaders();
 

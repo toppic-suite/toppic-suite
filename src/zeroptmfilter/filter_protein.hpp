@@ -14,17 +14,17 @@ class FilterProtein {
       }
   int getProteinId() {return protein_id_;}
   int getScore() {return score_;}
-  std::vector<double> getNTruncShifts() {return n_trunc_shifts_;}
-  std::vector<double> getCTruncShifts() {return c_trunc_shifts_;}
+  std::vector<double> getNTermShifts() {return n_term_shifts_;}
+  std::vector<double> getCTermShifts() {return c_term_shifts_;}
 
-  void setNTruncShifts(std::vector<double> shifts) {n_trunc_shifts_ = shifts;}
-  void setCTruncShifts(std::vector<double> shifts) {c_trunc_shifts_ = shifts;}
+  void setNTermShifts(std::vector<double> shifts) {n_term_shifts_ = shifts;}
+  void setCTermShifts(std::vector<double> shifts) {c_term_shifts_ = shifts;}
 
  private:
   int protein_id_;
   int score_;
-  std::vector<double> n_trunc_shifts_;
-  std::vector<double> c_trunc_shifts_;
+  std::vector<double> n_term_shifts_;
+  std::vector<double> c_term_shifts_;
 };
 
 typedef std::shared_ptr<FilterProtein> FilterProteinPtr;
