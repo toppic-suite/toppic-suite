@@ -24,6 +24,7 @@ SimplePrsm::SimplePrsm(MsHeaderPtr header_ptr, int spectrum_num,
   prec_mass_ = header_ptr->getPrecMonoMass();
   seq_name_ = proteo_ptr->getSeqName();
   seq_desc_ = proteo_ptr->getSeqDesc();
+  prot_mass_ = proteo_ptr->getResSeqPtr()->getSeqMass();
 }
 
 SimplePrsm::SimplePrsm(xercesc::DOMElement* element){
@@ -34,20 +35,22 @@ SimplePrsm::SimplePrsm(xercesc::DOMElement* element){
   spectrum_num_ = XmlDomUtil::getDoubleChildValue(element, "spectrum_number", 0);
   seq_name_ = XmlDomUtil::getChildValue(element, "sequence_name", 0);
   seq_desc_ = XmlDomUtil::getChildValue(element, "sequence_desc", 0);
+  prot_mass_ = XmlDomUtil::getDoubleChildValue(element, "proteoform_mass", 0);
   score_ = XmlDomUtil::getDoubleChildValue(element, "score", 0);
-  // n term shifts
-  std::string shift_element_name = NTermShift::getXmlElementName();
-  std::string list_name = shift_element_name + "_list";
-
-  xercesc::DOMElement* shift_list_element= XmlDomUtil::getChildElement(element, list_name.c_str(),0);
-  int shift_num = XmlDomUtil::getChildCount(shift_list_element, shift_element_name.c_str());
-
-  for(int i=0; i<shift_num; i++) {
-    xercesc::DOMElement* shift_element 
-        = XmlDomUtil::getChildElement(shift_list_element, shift_element_name.c_str(), i);
-    n_term_shifts_.push_back(NTermShiftPtr(new NTermShift(shift_element)));
+  // n trunc shifts
+  xercesc::DOMElement* n_shift_list_element= XmlDomUtil::getChildElement(element, "n_trunc_shift_list",0);
+  int n_shift_num = XmlDomUtil::getChildCount(n_shift_list_element, "shift");
+  for(int i=0; i<n_shift_num; i++) {
+    double shift = XmlDomUtil::getDoubleChildValue(n_shift_list_element, "shift", i);
+    n_trunc_shifts_.push_back(shift);
   }
-
+  //c trunc shifts
+  xercesc::DOMElement* c_shift_list_element= XmlDomUtil::getChildElement(element, "c_trunc_shift_list",0);
+  int c_shift_num = XmlDomUtil::getChildCount(c_shift_list_element, "shift");
+  for(int i=0; i<c_shift_num; i++) {
+    double shift = XmlDomUtil::getDoubleChildValue(c_shift_list_element, "shift", i);
+    c_trunc_shifts_.push_back(shift);
+  }
 }
 
 xercesc::DOMElement* SimplePrsm::toXml(XmlDOMDocument* xml_doc){
@@ -62,18 +65,34 @@ xercesc::DOMElement* SimplePrsm::toXml(XmlDOMDocument* xml_doc){
   xml_doc->addElement(element, "precursor_mass", str.c_str());
   str = StringUtil::convertToString(spectrum_num_);
   xml_doc->addElement(element, "spectrum_number", str.c_str());
-  str = StringUtil::convertToString(score_);
-  xml_doc->addElement(element, "score", str.c_str());
   xml_doc->addElement(element, "sequence_name", seq_name_.c_str());
   xml_doc->addElement(element, "sequence_desc", seq_desc_.c_str());
+  str = StringUtil::convertToString(prot_mass_);
+  xml_doc->addElement(element, "proteoform_mass", seq_desc_.c_str());
+  str = StringUtil::convertToString(score_);
+  xml_doc->addElement(element, "score", str.c_str());
 
-  element_name = NTermShift::getXmlElementName() + "_list";
-  xercesc::DOMElement* shift_list = xml_doc->createElement(element_name.c_str());
-  for(size_t i=0; i<n_term_shifts_.size(); i++) {
-    n_term_shifts_[i]->appendXml(xml_doc, shift_list);
+  xercesc::DOMElement* n_shift_list = xml_doc->createElement("n_trunc_shift_list");
+  for(size_t i=0; i<n_trunc_shifts_.size(); i++) {
+    str = StringUtil::convertToString(n_trunc_shifts_[i]);
+    xml_doc->addElement(n_shift_list, "shift", str.c_str());
   }
-  element->appendChild(shift_list);
+  element->appendChild(n_shift_list);
+
+  xercesc::DOMElement* c_shift_list = xml_doc->createElement("c_trunc_shift_list");
+  for(size_t i=0; i<c_trunc_shifts_.size(); i++) {
+    str = StringUtil::convertToString(c_trunc_shifts_[i]);
+    xml_doc->addElement(c_shift_list, "shift", str.c_str());
+  }
+  element->appendChild(c_shift_list);
   return element;
+}
+
+void SimplePrsm::setCTruncShifts(const std::vector<double> &c_term_shifts) {
+  for (size_t i = 0; i < c_term_shifts.size(); i++) {
+    double shift = prec_mass_ - (prot_mass_ + c_term_shifts[i]);
+    c_trunc_shifts_.push_back(shift);
+  }
 }
 
 } /* namespace prot */
