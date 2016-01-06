@@ -1,3 +1,5 @@
+#include <chrono>
+
 #include "base/logger.hpp"
 #include "base/web_logger.hpp"
 #include "base/file_util.hpp"
@@ -44,10 +46,16 @@ void onePtmSearchOneSpec(SpectrumSetPtr spec_set_ptr,
   }
 
   for (size_t i = 0; i < proteoform_ptr_vec.size(); i++) { 
+    auto start = std::chrono::high_resolution_clock::now();
     PtmSlowMatch slow_match(proteoform_ptr_vec[i],
                             spec_set_ptr, type_ptr,
                             comp_shift_ptr, mng_ptr);
+    auto step_1 = std::chrono::high_resolution_clock::now();
+    std::cout << "Init time: " << std::chrono::duration_cast<std::chrono::nanoseconds>(step_1-start).count() << std::endl;
     PrsmPtr tmp = slow_match.compute(type_ptr, 1);
+    auto step_2 = std::chrono::high_resolution_clock::now();
+    std::cout << "Alignment time: " << std::chrono::duration_cast<std::chrono::nanoseconds>(step_2-step_1).count() << std::endl;
+
     if (tmp != nullptr)
       prsms.push_back(tmp);
   }

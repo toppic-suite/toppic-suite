@@ -1,3 +1,5 @@
+#include <chrono>
+
 #include "oneptmsearch/diagonal_header_util.hpp"
 #include "oneptmsearch/ptm_slow_match.hpp"
 
@@ -39,12 +41,17 @@ inline DiagonalHeaderPtrVec PtmSlowMatch::getNTermShiftListCommonHeaders() {
   PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
   std::vector<std::pair<int,int>> sp_masses_toles 
       = PrmMs::getIntMassErrorList(ms_six_ptr_vec_,tole_ptr,scale,true,false);
+
+  auto start = std::chrono::high_resolution_clock::now();
   std::vector<double> best_shifts = comp_shift_ptr_->findBestShift(
       sp_masses_toles,
       proteo_ptr_->getBpSpecPtr()->getScaledPrmMasses(scale),
       mng_ptr_->n_top_diagonals_,
       mng_ptr_->min_diagonal_gap_,
       scale);
+  auto step_1 = std::chrono::high_resolution_clock::now();
+  std::cout << "Compute best shifts: " << std::chrono::duration_cast<std::chrono::nanoseconds>(step_1-start).count() << "\t";
+
   DiagonalHeaderPtrVec header_ptrs;
   for (size_t i = 0; i < best_shifts.size(); i++) {
     // n term shift; c term nostrict; no prot nterm match; no prot cterm match,
@@ -121,7 +128,12 @@ inline DiagonalHeaderPtrVec PtmSlowMatch::geneNTermShiftHeaders() {
   DiagonalHeaderPtrVec header_ptrs;
   // if not complete alignment, find best shifts
   if (align_type_ptr_ != AlignType::COMPLETE) {
+
+    auto start = std::chrono::high_resolution_clock::now();
     DiagonalHeaderPtrVec common_header_ptrs = getNTermShiftListCommonHeaders();
+    auto step_1 = std::chrono::high_resolution_clock::now();
+    std::cout << "Compute N-term shifts: " << std::chrono::duration_cast<std::chrono::nanoseconds>(step_1-start).count() << "\t";
+
     if (align_type_ptr_ == AlignType::SUFFIX || align_type_ptr_ == AlignType::INTERNAL) {
       // add prefix masses
       addPrefixDiagonals(common_header_ptrs, n_extend_header_ptrs);  
@@ -146,13 +158,19 @@ inline DiagonalHeaderPtrVec PtmSlowMatch::geneNTermShiftHeaders() {
 
 // initialize ps_align
 void PtmSlowMatch::init(){
+  auto start = std::chrono::high_resolution_clock::now();
   DiagonalHeaderPtrVec n_term_shift_header_ptrs = geneNTermShiftHeaders(); 
+  auto step_1 = std::chrono::high_resolution_clock::now();
+  std::cout << "Init n term diag time: " << std::chrono::duration_cast<std::chrono::nanoseconds>(step_1-start).count() << "\t";
   PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
   PrmPeakPtrVec prm_peaks = PrmMs::getPrmPeakPtrs(ms_six_ptr_vec_, tole_ptr);
   int group_spec_num = ms_six_ptr_vec_.size();
   BasicDiagonalPtrVec diagonal_ptrs = geneDiagonals(n_term_shift_header_ptrs,
                                                     prm_peaks, group_spec_num,
                                                     proteo_ptr_);
+  auto step_2 = std::chrono::high_resolution_clock::now();
+  std::cout << "Init diag time: " << std::chrono::duration_cast<std::chrono::nanoseconds>(step_2-step_1).count() << "\t";
+
   std::vector<double> seq_masses = proteo_ptr_->getBpSpecPtr()->getPrmMasses();
   std::vector<double> ms_masses (prm_peaks.size());
   for (size_t i = 0; i < prm_peaks.size(); i++) {
@@ -160,6 +178,9 @@ void PtmSlowMatch::init(){
   }
   ps_align_ptr_ = PSAlignPtr(new PSAlign(ms_masses, seq_masses,
                                          diagonal_ptrs, mng_ptr_->align_para_ptr_));
+
+  auto step_3 = std::chrono::high_resolution_clock::now();
+  std::cout << "Init ps time: " << std::chrono::duration_cast<std::chrono::nanoseconds>(step_3-step_2).count() << std::endl;
 }
 
 PrsmPtr PtmSlowMatch::compute(AlignTypePtr align_type_ptr, int shift_num) {
