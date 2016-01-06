@@ -111,12 +111,27 @@ int zero_ptm_process(int argc, char* argv[]) {
     time(&stop_s);
     std::cout <<  "Computing e-values running time: " << difftime(stop_s, start_s)  << " seconds " << std::endl;
 
-    std::cout << "Top PRSM selecting started" << std::endl;
-    PrsmTopSelectorPtr selector = PrsmTopSelectorPtr(
-        new PrsmTopSelector(db_file_name, sp_file_name, "EVALUE", "TOP", n_top));
-    selector->process();
-    selector = nullptr;
-    std::cout << "Top PRSM selecting finished." << std::endl;
+    if (arguments["searchType"]=="TARGET") { 
+      std::cout << "Top PRSM selecting started" << std::endl;
+      PrsmTopSelectorPtr selector = PrsmTopSelectorPtr(new PrsmTopSelector(db_file_name, sp_file_name, "EVALUE", "TOP", n_top));
+      selector->process();
+      selector = nullptr;
+      std::cout << "Top PRSM selecting finished." << std::endl;
+    }
+    else {
+      std::cout << "Top PRSM selecting started " << std::endl;
+      PrsmTopSelectorPtr selector = PrsmTopSelectorPtr(new PrsmTopSelector(db_file_name, sp_file_name, "EVALUE", "TOP_PRE", n_top));
+      selector->process();
+      selector = nullptr;
+      std::cout << "Top PRSM selecting finished." << std::endl;
+
+      std::cout << "FDR computation started. " << std::endl;
+      PrsmFdrPtr fdr = PrsmFdrPtr(new PrsmFdr(db_file_name, sp_file_name, "TOP_PRE", "TOP"));
+      fdr->process();
+      fdr = nullptr;
+      std::cout << "FDR computation finished." << std::endl;
+      
+    }
 
     std::cout << "PRSM selecting by cutoff started." << std::endl;
     std::string cutoff_type = arguments["cutoffType"];
@@ -135,7 +150,6 @@ int zero_ptm_process(int argc, char* argv[]) {
     table_out->write();
     table_out = nullptr;
     std::cout << "Outputting table finished." << std::endl;
-    /*
     table_out = PrsmTableWriterPtr(new PrsmTableWriter(prsm_para_ptr, "ZERO_COMPLETE", "ZERO_COMPLETE_TABLE"));
     table_out->write();
     table_out = PrsmTableWriterPtr(new PrsmTableWriter(prsm_para_ptr, "ZERO_PREFIX", "ZERO_PREFIX_TABLE"));
@@ -144,7 +158,6 @@ int zero_ptm_process(int argc, char* argv[]) {
     table_out->write();
     table_out = PrsmTableWriterPtr(new PrsmTableWriter(prsm_para_ptr, "ZERO_INTERNAL", "ZERO_INTERNAL_TABLE"));
     table_out->write();
-    */
 
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;

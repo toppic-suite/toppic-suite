@@ -27,7 +27,8 @@ void PrsmFdr::process(){
       LOG_ERROR("prot::PRSMFdr zero E value is reported");
     }
     else {
-      std::string seq_name  = prsm_str_ptrs[i]->getDbSeqName();
+      std::string seq_name  = prsm_str_ptrs[i]->getSeqName();
+      //LOG_DEBUG("seq name " << seq_name);
       if(seq_name.find("DECOY_")==0){
         decoy_ptrs.push_back(prsm_str_ptrs[i]);
       }
@@ -46,8 +47,6 @@ void PrsmFdr::process(){
 
 void PrsmFdr::compute(PrsmStrPtrVec &target_ptrs,PrsmStrPtrVec &decoy_ptrs){
   std::sort(target_ptrs.begin(),target_ptrs.end(),PrsmStr::cmpEValueInc);
-  std::sort(decoy_ptrs.begin(),decoy_ptrs.end(),PrsmStr::cmpEValueInc);
-
   for(size_t i=0; i<target_ptrs.size(); i++){
     int n_target=i+1;
     double target_evalue = target_ptrs[i]->getEValue();

@@ -10,8 +10,8 @@ PrsmStr::PrsmStr(const std::vector<std::string> &str_vec) {
   str_vec_ = str_vec;
   std::string line = PrsmUtil::getXmlLine(str_vec_, "<spectrum_id>");
   spectrum_id_ = std::stoi(PrsmUtil::getValueStr(line));
-  line = PrsmUtil::getXmlLine(str_vec_, "<db_seq_name>");
-  db_seq_name_ = PrsmUtil::getValueStr(line);
+  line = PrsmUtil::getXmlLine(str_vec_, "<seq_name>");
+  seq_name_ = PrsmUtil::getValueStr(line);
   line = PrsmUtil::getXmlLine(str_vec_, "<match_fragment_num>");
   match_frag_num_ = std::stod(PrsmUtil::getValueStr(line));
   line = PrsmUtil::getXmlLine(str_vec_, "<e_value>"); 
