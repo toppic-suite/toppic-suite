@@ -2,6 +2,7 @@
 #include <iostream>
 #include "spec/prm_ms.hpp"
 #include "prsm/simple_prsm_util.hpp"
+#include "zeroptmfilter/filter_protein.hpp"
 #include "diagfilter/diag_filter.hpp"
 
 namespace prot {
@@ -48,13 +49,14 @@ inline SimplePrsmPtrVec DiagFilter::compute(const PrmMsPtrVec &ms_ptr_vec){
   SimplePrsmPtrVec match_ptrs;
   for(size_t i=0;i<mass_errors.size();i++){
     index_ptr_->compDiagConvolution(mass_errors, i, mng_ptr_->filter_result_num_);
-    std::vector<std::pair<int,int>> results = index_ptr_->getTopDiagScores();
+    FilterProteinPtrVec results = index_ptr_->getTopDiagProts();
     for(size_t j =0;j <results.size();j++){
+      int id = results[j]->getProteinId();
+      int score = results[j]->getScore();
       match_ptrs.push_back(
           SimplePrsmPtr(new SimplePrsm(ms_ptr_vec[0]->getMsHeaderPtr(),
                                        ms_ptr_vec.size(),
-                                       proteo_ptrs_[results[j].first],
-                                       results[j].second)));
+                                       proteo_ptrs_[id], score)));
     }
   }
   return match_ptrs;

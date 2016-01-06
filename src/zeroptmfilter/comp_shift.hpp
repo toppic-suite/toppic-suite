@@ -5,6 +5,7 @@
 
 #include "base/proteoform.hpp"
 #include "base/base_data.hpp"
+#include "zeroptmfilter/filter_protein.hpp"
 
 namespace prot {
 
@@ -23,17 +24,17 @@ class CompShift {
                               int comp_num, int pref_suff_num, int inte_num);
 
   void compOnePtmConvolution(const std::vector<std::pair<int,int>> &mass_errors, 
-                             int comp_num, int pref_suff_num, int inte_num);
+                             int comp_num, int pref_suff_num, int inte_num, int shift_num);
 
   void compDiagConvolution(const std::vector<std::pair<int,int>> &mass_errors, 
                            int start, int top_num);
 
-  std::vector<std::pair<int,int>> getTopCompProteoScores() {return top_comp_proteo_scores_;}
-  std::vector<std::pair<int,int>> getTopPrefProteoScores() {return top_pref_proteo_scores_;}
-  std::vector<std::pair<int,int>> getTopSuffProteoScores() {return top_suff_proteo_scores_;}
-  std::vector<std::pair<int,int>> getTopInternalProteoScores() {return top_internal_proteo_scores_;}
+  const FilterProteinPtrVec& getTopCompProts() {return top_comp_prots_;}
+  const FilterProteinPtrVec& getTopPrefProts() {return top_pref_prots_;}
+  const FilterProteinPtrVec& getTopSuffProts() {return top_suff_prots_;}
+  const FilterProteinPtrVec& getTopInternalProts() {return top_internal_prots_;}
 
-  std::vector<std::pair<int,int>> getTopDiagScores() {return top_diag_scores_;}
+  const FilterProteinPtrVec& getTopDiagProts() {return top_comp_prots_;}
 
  private:
   int scale_;
@@ -42,12 +43,15 @@ class CompShift {
   int proteo_num_;
   int col_num_;
   int row_num_;
+
   // the first row of each proteoform  
   std::vector<int> proteo_row_begins_;
   std::vector<int> proteo_row_ends_;
   ProtModPtrVec acet_mods_;
   // the proteoform id of each row
   std::vector<int> row_proteo_ids_;
+  std::vector<double> n_trunc_shifts_;
+  std::vector<double> c_trunc_shifts_;
 
   std::vector<int> col_index_begins_;
   std::vector<int> col_index_ends_;
@@ -57,12 +61,12 @@ class CompShift {
   std::vector<int> rev_col_index_ends_;
   std::vector<int> rev_col_indexes_;
 
-  std::vector<std::pair<int,int>> top_comp_proteo_scores_;
-  std::vector<std::pair<int,int>> top_pref_proteo_scores_;
-  std::vector<std::pair<int,int>> top_suff_proteo_scores_;
-  std::vector<std::pair<int,int>> top_internal_proteo_scores_;
+  FilterProteinPtrVec top_comp_prots_;
+  FilterProteinPtrVec top_pref_prots_;
+  FilterProteinPtrVec top_suff_prots_;
+  FilterProteinPtrVec top_internal_prots_;
 
-  std::vector<std::pair<int,int>> top_diag_scores_;
+  FilterProteinPtrVec top_diag_prots_;
 
   void updateColumnMatchNums(ProteoformPtr proteo_ptr, ProtModPtr acet_mod, 
                              std::vector<int> &col_match_nums);
@@ -82,9 +86,16 @@ class CompShift {
                      std::vector<short> &rev_scores);
 
   void findTopScores(std::vector<short> &scores, std::vector<short> &rev_scores, 
-                     double threshold, int comp_num, int pref_suff_num, int inte_num);
+                     double threshold, int comp_num, int pref_suff_num, int inte_num,
+                     bool add_shifts, int shift_num);
 
   void findTopDiagScores(std::vector<short> &scores, int num);
+
+  void addNTruncShifts(FilterProteinPtrVec &prot_ptrs, 
+                       std::vector<short> &scores, int shift_num);
+
+  void addCTruncShifts(FilterProteinPtrVec &prot_ptrs, 
+                       std::vector<short> &scores, int shift_num);
 };
 
 typedef std::shared_ptr<CompShift> CompShiftPtr;

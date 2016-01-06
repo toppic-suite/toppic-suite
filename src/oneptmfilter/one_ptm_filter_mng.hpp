@@ -22,6 +22,7 @@ class OnePtmFilterMng {
   unsigned int comp_num_ = 5;
   unsigned int pref_suff_num_ = 5;
   unsigned int inte_num_ = 10;
+  unsigned int shift_num_ = 10;
   int filter_scale_ = 100;
 
   std::string output_file_ext_;
