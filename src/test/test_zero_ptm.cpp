@@ -79,6 +79,7 @@ int zero_ptm_process(int argc, char* argv[]) {
     time_t start_s;
     time_t stop_s;
 
+    /*
     time(&start_s);
     std::cout << "Zero PTM filtering started." << std::endl;
     ZeroPtmFilterMngPtr zero_filter_mng_ptr = ZeroPtmFilterMngPtr(new ZeroPtmFilterMng (prsm_para_ptr, "ZERO_FILTER"));
@@ -110,6 +111,7 @@ int zero_ptm_process(int argc, char* argv[]) {
     std::cout << "E-value computation finished." << std::endl;
     time(&stop_s);
     std::cout <<  "Computing e-values running time: " << difftime(stop_s, start_s)  << " seconds " << std::endl;
+    */
 
     if (arguments["searchType"]=="TARGET") { 
       std::cout << "Top PRSM selecting started" << std::endl;

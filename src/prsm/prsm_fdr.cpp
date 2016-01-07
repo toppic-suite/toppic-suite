@@ -47,6 +47,7 @@ void PrsmFdr::process(){
 
 void PrsmFdr::compute(PrsmStrPtrVec &target_ptrs,PrsmStrPtrVec &decoy_ptrs){
   std::sort(target_ptrs.begin(),target_ptrs.end(),PrsmStr::cmpEValueInc);
+  std::sort(decoy_ptrs.begin(),decoy_ptrs.end(),PrsmStr::cmpEValueInc);
   for(size_t i=0; i<target_ptrs.size(); i++){
     int n_target=i+1;
     double target_evalue = target_ptrs[i]->getEValue();
