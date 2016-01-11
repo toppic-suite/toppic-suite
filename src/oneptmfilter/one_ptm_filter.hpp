@@ -13,7 +13,8 @@ class OnePtmFilter {
  public:
   OnePtmFilter(const ProteoformPtrVec &proteo_ptrs,
                OnePtmFilterMngPtr mng_ptr);
-  void computeBestMatch(const PrmMsPtrVec &ms_ptr_vec);
+  void computeBestMatch(const PrmMsPtrVec &prm_ms_ptr_vec,
+                        const PrmMsPtrVec &srm_ms_ptr_vec);
 
   SimplePrsmPtrVec getCompMatchPtrs() {return comp_match_ptrs_;}
   SimplePrsmPtrVec getPrefMatchPtrs() {return pref_match_ptrs_;}

@@ -116,7 +116,7 @@ double CompPValueLookupTable::compProb(int peak_num, int match_frag_num,
 
   res = exp(res);
 
-  LOG_DEBUG("prob " << res);
+  //LOG_DEBUG("prob " << res);
 
   return res;
 }

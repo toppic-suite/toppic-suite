@@ -167,7 +167,7 @@ inline void CompProbValue::updatePosScores(const std::vector<ProbPeak> &prob_pea
         end = len - 1;
       }
       //LOG_DEBUG("peak " << i << " bgn " << bgn << " end " << end);
-      if (prob_peaks[i].base_type_ptr_ == PrmBaseType::ORIGINAL) {
+      if (prob_peaks[i].base_type_ptr_ == BasePeakType::ORIGINAL) {
         // the peak is m
         for (int p = bgn; p <= end; p++) {
           if (tmp_pos_scores_[p] == 0) {

@@ -162,7 +162,7 @@ double CountTestNum::compNonPtmCandNum(AlignTypePtr type_ptr,
   double cand_num = compSeqNum(type_ptr, low, high);
   
   //if (type_ptr == SemiAlignTypeFactory::getCompletePtr()) {
-  LOG_DEBUG("low " << low << " high " << high << " cand num " << cand_num);
+  //LOG_DEBUG("low " << low << " high " << high << " cand num " << cand_num);
   //}
   
   return cand_num;
@@ -206,7 +206,6 @@ double CountTestNum::compSeqNum(AlignTypePtr type_ptr, int low, int high) {
   } else if (type_ptr == AlignType::SUFFIX) {
     candNum = compMassNum(suff_mass_cnts_, low, high);
   } else if (type_ptr == AlignType::INTERNAL) {
-	LOG_DEBUG("internal_mass_cnts_ " << internal_mass_cnts_[low]);
     candNum = compMassNum(internal_mass_cnts_, low, high);
   }
   return candNum;

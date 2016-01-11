@@ -32,6 +32,8 @@ class SpectrumSet {
 
   PrmMsPtrVec getMsTwoPtrVec() {return prm_ms_two_ptr_vec_;}
 
+  PrmMsPtrVec getSuffixMsTwoPtrVec() {return srm_ms_two_ptr_vec_;}
+
   PrmMsPtrVec getMsSixPtrVec(){return prm_ms_six_ptr_vec_;}
 
   PrmMsPtrVec getMsShiftSixPtrVec(double shift){
@@ -46,6 +48,7 @@ class SpectrumSet {
   bool valid_ = true;
   ExtendMsPtrVec extend_ms_three_ptr_vec_;
   PrmMsPtrVec prm_ms_two_ptr_vec_;
+  PrmMsPtrVec srm_ms_two_ptr_vec_;
   PrmMsPtrVec prm_ms_six_ptr_vec_;
 
   bool checkValid(SpParaPtr sp_para_ptr);

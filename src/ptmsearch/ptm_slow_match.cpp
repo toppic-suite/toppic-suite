@@ -1,7 +1,7 @@
 #include <chrono>
 
 #include "oneptmsearch/diagonal_header_util.hpp"
-#include "oneptmsearch/ptm_slow_match.hpp"
+#include "ptmsearch/ptm_slow_match.hpp"
 
 namespace prot {
 

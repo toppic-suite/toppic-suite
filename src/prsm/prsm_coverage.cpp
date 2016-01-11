@@ -5,7 +5,7 @@
 
 #include "base/proteoform.hpp"
 #include "base/file_util.hpp"
-#include "spec/prm_break_type.hpp"
+#include "spec/rm_break_type.hpp"
 #include "spec/msalign_reader.hpp"
 #include "spec/msalign_util.hpp"
 #include "spec/extend_ms_factory.hpp"
@@ -180,25 +180,25 @@ void PrsmCoverage::computeCoverage(std::ofstream &file, PrsmPtr prsm_ptr,
   int len = prsm_ptr->getProteoformPtr()->getResSeqPtr()->getLen() - 1;
   int begin = 1;
   int end = len - 1;
-  double n_full_coverage = PeakIonPairUtil::computePairConverage(pair_ptrs, begin, end, PrmBreakType::N_TERM);
-  double c_full_coverage = PeakIonPairUtil::computePairConverage(pair_ptrs, begin, end, PrmBreakType::C_TERM);
-  double both_full_coverage = PeakIonPairUtil::computePairConverage(pair_ptrs, begin, end, PrmBreakType::BOTH);
+  double n_full_coverage = PeakIonPairUtil::computePairConverage(pair_ptrs, begin, end, RmBreakType::N_TERM);
+  double c_full_coverage = PeakIonPairUtil::computePairConverage(pair_ptrs, begin, end, RmBreakType::C_TERM);
+  double both_full_coverage = PeakIonPairUtil::computePairConverage(pair_ptrs, begin, end, RmBreakType::BOTH);
   int one_third = len /3;
   end = one_third;
-  double left_n_full_coverage = PeakIonPairUtil::computePairConverage(pair_ptrs, begin, end, PrmBreakType::N_TERM);
-  double left_c_full_coverage = PeakIonPairUtil::computePairConverage(pair_ptrs, begin, end, PrmBreakType::C_TERM);
-  double left_both_full_coverage = PeakIonPairUtil::computePairConverage(pair_ptrs, begin, end, PrmBreakType::BOTH);
+  double left_n_full_coverage = PeakIonPairUtil::computePairConverage(pair_ptrs, begin, end, RmBreakType::N_TERM);
+  double left_c_full_coverage = PeakIonPairUtil::computePairConverage(pair_ptrs, begin, end, RmBreakType::C_TERM);
+  double left_both_full_coverage = PeakIonPairUtil::computePairConverage(pair_ptrs, begin, end, RmBreakType::BOTH);
   begin = one_third + 1;
   int two_thirds = len/3 * 2;
   end = two_thirds;
-  double middle_n_full_coverage = PeakIonPairUtil::computePairConverage(pair_ptrs, begin, end, PrmBreakType::N_TERM);
-  double middle_c_full_coverage = PeakIonPairUtil::computePairConverage(pair_ptrs, begin, end, PrmBreakType::C_TERM);
-  double middle_both_full_coverage = PeakIonPairUtil::computePairConverage(pair_ptrs, begin, end, PrmBreakType::BOTH);
+  double middle_n_full_coverage = PeakIonPairUtil::computePairConverage(pair_ptrs, begin, end, RmBreakType::N_TERM);
+  double middle_c_full_coverage = PeakIonPairUtil::computePairConverage(pair_ptrs, begin, end, RmBreakType::C_TERM);
+  double middle_both_full_coverage = PeakIonPairUtil::computePairConverage(pair_ptrs, begin, end, RmBreakType::BOTH);
   begin = two_thirds + 1;
   end = len -1;
-  double right_n_full_coverage = PeakIonPairUtil::computePairConverage(pair_ptrs, begin, end, PrmBreakType::N_TERM);
-  double right_c_full_coverage = PeakIonPairUtil::computePairConverage(pair_ptrs, begin, end, PrmBreakType::C_TERM);
-  double right_both_full_coverage = PeakIonPairUtil::computePairConverage(pair_ptrs, begin, end, PrmBreakType::BOTH);
+  double right_n_full_coverage = PeakIonPairUtil::computePairConverage(pair_ptrs, begin, end, RmBreakType::N_TERM);
+  double right_c_full_coverage = PeakIonPairUtil::computePairConverage(pair_ptrs, begin, end, RmBreakType::C_TERM);
+  double right_both_full_coverage = PeakIonPairUtil::computePairConverage(pair_ptrs, begin, end, RmBreakType::BOTH);
   file << n_full_coverage << "\t"
       << c_full_coverage << "\t"
       << both_full_coverage << "\t"

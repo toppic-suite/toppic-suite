@@ -1,7 +1,7 @@
 #include <cmath>
 
 #include "base/logger.hpp"
-#include "oneptmsearch/comp_shift_low_mem.hpp"
+#include "ptmsearch/comp_shift_low_mem.hpp"
 
 namespace prot {
 

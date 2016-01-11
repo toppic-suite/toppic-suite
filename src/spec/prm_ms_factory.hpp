@@ -13,6 +13,10 @@ class PrmMsFactory {
                                      SpParaPtr sp_para_ptr,
                                      double prec_mono_mass);
 
+  static PrmMsPtrVec geneSuffixMsTwoPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, 
+                                           SpParaPtr sp_para_ptr,
+                                           double prec_mono_mass);
+
   static PrmMsPtrVec geneMsSixPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, 
                                      SpParaPtr sp_para_ptr,
                                      double prec_mono_mass);

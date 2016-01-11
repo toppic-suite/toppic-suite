@@ -34,7 +34,7 @@ inline BasicDiagPairPtrVec compDiagPair(const PrmPeakPtrVec &prm_peaks,
   //LOG_DEBUG("real mass size " << real_masses.size() << " seq mass size " << seq_masses.size());
   while(i < prm_peaks.size() && j < seq_masses.size()){
     PrmPeakPtr peak = prm_peaks[i];
-    PrmBaseTypePtr type_ptr = peak->getBaseTypePtr();
+    BasePeakTypePtr type_ptr = peak->getBaseTypePtr();
     int spec_id = peak->getSpecId();
     double error = 0;
     if(header_ptr->isNStrict() && !header_ptr->isCStrict()){
@@ -47,7 +47,7 @@ inline BasicDiagPairPtrVec compDiagPair(const PrmPeakPtrVec &prm_peaks,
     //LOG_DEBUG("deviation" << i << " " << j << " spec id " << spec_id);
     if(std::abs(deviation) <= error){
       double peak_score = peak->getScore();
-      if (type_ptr == PrmBaseType::ORIGINAL) {
+      if (type_ptr == BasePeakType::ORIGINAL) {
         if(n_term_scores[spec_id][j] < peak_score){
           n_term_scores[spec_id][j] = peak_score;
         }
