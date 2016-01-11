@@ -10,7 +10,7 @@ namespace prot {
 
 PrmPeak::PrmPeak(int spec_id, 
                  DeconvPeakPtr base_peak_ptr, 
-                 PrmBaseTypePtr base_type,
+                 BasePeakTypePtr base_type,
                  double mono_mass, double score):
     Peak(mono_mass, base_peak_ptr->getIntensity()),
     spec_id_(spec_id),
@@ -31,24 +31,24 @@ void PrmPeak::addNghbEdge(DeconvPeakPtr deconv_peak_ptr,double offset,
   neighbor_list_.push_back(support_peak_ptr);
 }
 
-PrmBreakTypePtr PrmPeak::getBreakType() {
-  PrmBreakTypePtr bt_ptr = PrmBreakType::NONE;
+RmBreakTypePtr PrmPeak::getBreakType() {
+  RmBreakTypePtr bt_ptr = RmBreakType::NONE;
   for(size_t i=0; i<neighbor_list_.size(); i++){
     if(neighbor_list_[i]->getPeakTypePtr() == 
        SPTypeBase::getSPTypePtr_N_TERM()) {
-      if(bt_ptr == PrmBreakType::NONE) {
-        bt_ptr = PrmBreakType::N_TERM;
+      if(bt_ptr == RmBreakType::NONE) {
+        bt_ptr = RmBreakType::N_TERM;
       }
-      else if(bt_ptr == PrmBreakType::C_TERM){
-        bt_ptr = PrmBreakType::BOTH;
+      else if(bt_ptr == RmBreakType::C_TERM){
+        bt_ptr = RmBreakType::BOTH;
       }
     }
     else{
-      if(bt_ptr == PrmBreakType::NONE){
-        bt_ptr = PrmBreakType::C_TERM;
+      if(bt_ptr == RmBreakType::NONE){
+        bt_ptr = RmBreakType::C_TERM;
       }
-      else if(bt_ptr == PrmBreakType::N_TERM){
-        bt_ptr = PrmBreakType::BOTH;
+      else if(bt_ptr == RmBreakType::N_TERM){
+        bt_ptr = RmBreakType::BOTH;
       }
     }
   }

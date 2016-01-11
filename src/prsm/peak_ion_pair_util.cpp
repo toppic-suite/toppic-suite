@@ -33,7 +33,7 @@ int PeakIonPairUtil::getPeakIonPairNum(PeakIonPairPtrVec pairs) {
 }
 
 double PeakIonPairUtil::computePairConverage(const PeakIonPairPtrVec &pair_ptrs, int begin, 
-                                             int end, PrmBreakTypePtr type_ptr) {
+                                             int end, RmBreakTypePtr type_ptr) {
   int total_num = end - begin  + 1;
   if (total_num <= 0) {
     return 0.0;
@@ -42,17 +42,17 @@ double PeakIonPairUtil::computePairConverage(const PeakIonPairPtrVec &pair_ptrs,
   for (size_t i  = 0; i < pair_ptrs.size(); i++) {
     IonPtr ion_ptr = pair_ptrs[i]->getTheoPeakPtr()->getIonPtr();
     bool cov = false;
-    if (type_ptr == PrmBreakType::N_TERM) {
+    if (type_ptr == RmBreakType::N_TERM) {
       if (ion_ptr->getIonTypePtr()->isNTerm()) {
         cov = true;
       }
     }
-    else if (type_ptr == PrmBreakType::C_TERM) {
+    else if (type_ptr == RmBreakType::C_TERM) {
       if (!ion_ptr->getIonTypePtr()->isNTerm()) {
         cov = true;
       }
     }
-    else if (type_ptr == PrmBreakType::BOTH) {
+    else if (type_ptr == RmBreakType::BOTH) {
       cov = true;
     }
     if (cov) {

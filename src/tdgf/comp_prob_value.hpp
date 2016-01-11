@@ -5,7 +5,7 @@
 
 #include "base/residue_freq.hpp"
 #include "spec/prm_peak.hpp"
-#include "spec/prm_base_type.hpp"
+#include "spec/base_peak_type.hpp"
 #include "prsm/prsm.hpp"
 
 namespace prot {
@@ -16,7 +16,7 @@ class ProbPeak {
            bool strict, double convert_ratio);
   int mass_;
   int tolerance_;
-  PrmBaseTypePtr base_type_ptr_;
+  BasePeakTypePtr base_type_ptr_;
   int spectrum_id_;
   int mass_bgn_;
   int mass_end_;

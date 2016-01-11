@@ -19,11 +19,13 @@ class CompShift {
 
   ~CompShift();
 
-  void compZeroPtmConvolution(const std::vector<std::pair<int,int>> &mass_errors, 
-                              std::pair<int,int> &prec_mass_error, 
+  void compZeroPtmConvolution(const std::vector<std::pair<int,int>> &pref_mass_errors, 
+                              const std::vector<std::pair<int,int>> &suff_mass_errors,
+                              std::pair<int,int> &prec_minus_water_mass_error, 
                               int comp_num, int pref_suff_num, int inte_num);
 
-  void compOnePtmConvolution(const std::vector<std::pair<int,int>> &mass_errors, 
+  void compOnePtmConvolution(const std::vector<std::pair<int,int>> &pref_mass_errors, 
+                             const std::vector<std::pair<int,int>> &suff_mass_errors,
                              int comp_num, int pref_suff_num, int inte_num, int shift_num);
 
   void compDiagConvolution(const std::vector<std::pair<int,int>> &mass_errors, 
@@ -76,13 +78,13 @@ class CompShift {
                                 std::vector<int> &col_match_nums);
   void initRevIndexes(const ProteoformPtrVec &proteo_ptrs);
 
-  void compScores(const std::vector<std::pair<int,int>> &mass_errors,
+  void compScores(const std::vector<std::pair<int,int>> &pref_mass_errors,
                   std::vector<short> &scores);
 
-  void compScores(const std::vector<std::pair<int,int>> &mass_errors,
+  void compScores(const std::vector<std::pair<int,int>> &pref_mass_errors,
                   int start, std::vector<short> &scores);
 
-  void compRevScores(const std::vector<std::pair<int,int>> &mass_errors,
+  void compRevScores(const std::vector<std::pair<int,int>> &suff_mass_errors,
                      std::vector<short> &rev_scores);
 
   void findTopScores(std::vector<short> &scores, std::vector<short> &rev_scores, 

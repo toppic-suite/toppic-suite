@@ -235,19 +235,19 @@ inline void CompShift::initRevIndexes(const ProteoformPtrVec &proteo_ptrs){
   }
 }
 
-void CompShift::compScores(const std::vector<std::pair<int,int>> &mass_errors,
+void CompShift::compScores(const std::vector<std::pair<int,int>> &pref_mass_errors,
                            std::vector<short> &scores) {
   int begin_index;
   int end_index;
   int m;
-  for(size_t i = 0; i<mass_errors.size(); i++){
-    m = mass_errors[i].first;
+  for(size_t i = 0; i<pref_mass_errors.size(); i++){
+    m = pref_mass_errors[i].first;
     // m - errors[i] performs better than m - errors[i] -  errors[bgn_pos]
-    int left = m-mass_errors[i].second;
+    int left = m - pref_mass_errors[i].second;
     if(left < 0){
       left=0;
     }
-    int right = m+mass_errors[i].second;
+    int right = m + pref_mass_errors[i].second;
     if(right < 0 || right >= col_num_){
       continue;
     }
@@ -261,19 +261,19 @@ void CompShift::compScores(const std::vector<std::pair<int,int>> &mass_errors,
   }
 }
 
-void CompShift::compScores(const std::vector<std::pair<int,int>> &mass_errors,
+void CompShift::compScores(const std::vector<std::pair<int,int>> &pref_mass_errors,
                            int start, std::vector<short> &scores) {
   int begin_index;
   int end_index;
   int m;
-  for(size_t i = start; i<mass_errors.size(); i++){
-    m = mass_errors[i].first - mass_errors[start].first;
+  for(size_t i = start; i<pref_mass_errors.size(); i++){
+    m = pref_mass_errors[i].first - pref_mass_errors[start].first;
     // m - errors[i] performs better than m - errors[i] -  errors[bgn_pos]
-    int left = m-mass_errors[i].second;
+    int left = m - pref_mass_errors[i].second;
     if(left < 0){
       left=0;
     }
-    int right = m+mass_errors[i].second;
+    int right = m + pref_mass_errors[i].second;
     if(right < 0 || right >= col_num_){
       continue;
     }
@@ -287,7 +287,36 @@ void CompShift::compScores(const std::vector<std::pair<int,int>> &mass_errors,
   }
 }
 
+void CompShift::compRevScores(const std::vector<std::pair<int,int>> &suff_mass_errors,
+                              std::vector<short> &rev_scores) {
+  int begin_index;
+  int end_index;
+  int m;
+  for(size_t i = 0; i < suff_mass_errors.size(); i++){
+    m = suff_mass_errors[i].first;
+    //LOG_DEBUG("REV_SP MASS " << m);
+    int left = m-suff_mass_errors[i].second;
+    //LOG_DEBUG("LEFT " << left);
+    if(left < 0){
+      left=0;
+    }
+    int right = m + suff_mass_errors[i].second;
+    //LOG_DEBUG("RIGHT " << right);
+    if (right < 0 || right >= col_num_) {
+      continue;
+    }
+    begin_index = rev_col_index_begins_[left];
+    end_index= rev_col_index_ends_[right];
+    //LOG_DEBUG("begin index " << begin_index << " end index " << end_index);
+    for(int j=begin_index;j<=end_index;j++){
+      rev_scores[rev_col_indexes_[j]]++;
+      //LOG_DEBUG("REV ROW INDEX " << rev_col_indexes_[j] << " rev score " << rev_scores[rev_col_indexes_[j]]);
+    }
+  }
+}
 
+
+/*
 void CompShift::compRevScores(const std::vector<std::pair<int,int>> &mass_errors,
                               std::vector<short> &rev_scores) {
   int begin_index;
@@ -314,32 +343,26 @@ void CompShift::compRevScores(const std::vector<std::pair<int,int>> &mass_errors
       //LOG_DEBUG("REV ROW INDEX " << rev_col_indexes_[j] << " rev score " << rev_scores[rev_col_indexes_[j]]);
     }
   }
-
-  //best_score = 0;
-  //for (size_t i = 0; i < rev_scores.size(); i++) {
-  //  if (rev_scores[i] > best_score) {
-  //    best_score = rev_scores[i];
-  //  }
-  //}
-  //LOG_DEBUG("best rev score " << best_score << "\n");
 }
+*/
 
-void CompShift::compZeroPtmConvolution(const std::vector<std::pair<int,int>> &mass_errors, 
-                                       std::pair<int,int> &prec_mass_error, 
+void CompShift::compZeroPtmConvolution(const std::vector<std::pair<int,int>> &pref_mass_errors, 
+                                       const std::vector<std::pair<int,int>> &suff_mass_errors,
+                                       std::pair<int,int> &prec_minus_water_mass_error, 
                                        int comp_num, int pref_suff_num, int inte_num) {
   std::vector<short> scores(row_num_, 0);
-  compScores(mass_errors, scores);
+  compScores(pref_mass_errors, scores);
   std::vector<short> rev_scores(row_num_, 0);
-  compRevScores(mass_errors, rev_scores);
+  compRevScores(suff_mass_errors, rev_scores);
   // precursor mass 
   int begin_index, end_index;
-  int m = prec_mass_error.first;
+  int m = prec_minus_water_mass_error.first;
   // m - errors[i] performs better than m - errors[i] -  errors[bgn_pos]
-  int left = m - prec_mass_error.second;
+  int left = m - prec_minus_water_mass_error.second;
   if(left < 0){
     left=0;
   }
-  int right = m + prec_mass_error.second;
+  int right = m + prec_minus_water_mass_error.second;
   //LOG_DEBUG("prec left " << left << " pref right " << right);
   if(right >= 0 || right < col_num_){
     // update scores
@@ -361,7 +384,8 @@ void CompShift::compZeroPtmConvolution(const std::vector<std::pair<int,int>> &ma
   findTopScores(scores, rev_scores, threshold, comp_num, pref_suff_num, inte_num, false, 0);
 }
 
-void CompShift::compOnePtmConvolution(const std::vector<std::pair<int,int>> &mass_errors, 
+void CompShift::compOnePtmConvolution(const std::vector<std::pair<int,int>> &pref_mass_errors, 
+                                      const std::vector<std::pair<int,int>> &suff_mass_errors,
                                       int comp_num, int pref_suff_num, int inte_num, int shift_num) {
   /*
   LOG_DEBUG("mass number " << mass_errors.size());
@@ -370,9 +394,9 @@ void CompShift::compOnePtmConvolution(const std::vector<std::pair<int,int>> &mas
   }
   */
   std::vector<short> scores(row_num_, 0);
-  compScores(mass_errors, scores);
+  compScores(pref_mass_errors, scores);
   std::vector<short> rev_scores(row_num_, 0);
-  compRevScores(mass_errors, rev_scores);
+  compRevScores(suff_mass_errors, rev_scores);
   double threshold = 4.0; 
   findTopScores(scores, rev_scores, threshold, comp_num, pref_suff_num, inte_num, true, shift_num);
 }

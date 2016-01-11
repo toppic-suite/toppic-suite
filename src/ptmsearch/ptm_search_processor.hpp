@@ -7,7 +7,7 @@
 #include "prsm/simple_prsm.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 #include "oneptmsearch/ptm_search_mng.hpp"
-#include "oneptmsearch/comp_shift_low_mem.hpp"
+#include "ptmsearch/comp_shift_low_mem.hpp"
 
 namespace prot {
 

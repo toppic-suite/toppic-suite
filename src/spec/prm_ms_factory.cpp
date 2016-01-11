@@ -1,7 +1,7 @@
 #include <algorithm>
 
 #include "base/logger.hpp"
-#include "spec/prm_base_type.hpp"
+#include "spec/base_peak_type.hpp"
 #include "spec/prm_ms_factory.hpp"
 
 namespace prot {
@@ -11,17 +11,37 @@ void addTwoMasses(PrmPeakPtrVec &list, int spec_id, DeconvPeakPtr deconv_peak_pt
   double ori_mass = deconv_peak_ptr->getMonoMass();
   double n_term_mass = ori_mass - active_type_ptr->getNShift();
   PrmPeakPtr new_peak_ptr 
-      = PrmPeakPtr(new PrmPeak(spec_id, deconv_peak_ptr,PrmBaseType::ORIGINAL,n_term_mass,1));
+      = PrmPeakPtr(new PrmPeak(spec_id, deconv_peak_ptr,BasePeakType::ORIGINAL,n_term_mass,1));
   new_peak_ptr->setStrictTolerance(tole_ptr->compStrictErrorTole(ori_mass));
   new_peak_ptr->setNStrictCRelacTolerance(tole_ptr->compStrictErrorTole(ori_mass));
   new_peak_ptr->setNRelaxCStrictTolerance(tole_ptr->compRelaxErrorTole(ori_mass, prec_mono_mass));
   list.push_back(new_peak_ptr);
   double reverse_mass = prec_mono_mass - (deconv_peak_ptr->getMonoMass()-active_type_ptr->getCShift());
   PrmPeakPtr reverse_peak_ptr 
-      = PrmPeakPtr(new PrmPeak(spec_id, deconv_peak_ptr,PrmBaseType::REVERSED,reverse_mass,1));
+      = PrmPeakPtr(new PrmPeak(spec_id, deconv_peak_ptr,BasePeakType::REVERSED,reverse_mass,1));
   reverse_peak_ptr->setStrictTolerance(tole_ptr->compStrictErrorTole(ori_mass));
   reverse_peak_ptr->setNRelaxCStrictTolerance(tole_ptr->compStrictErrorTole(ori_mass));
   reverse_peak_ptr->setNStrictCRelacTolerance(tole_ptr->compRelaxErrorTole(ori_mass, prec_mono_mass));
+  list.push_back(reverse_peak_ptr);
+}
+
+void addSuffixTwoMasses(PrmPeakPtrVec &list, int spec_id, DeconvPeakPtr deconv_peak_ptr, 
+                        double prec_mono_mass, ActivationPtr active_type_ptr, PeakTolerancePtr tole_ptr) {
+  double ori_mass = deconv_peak_ptr->getMonoMass();
+  double c_res_mass = ori_mass - active_type_ptr->getCShift() - MassConstant::getWaterMass();
+  PrmPeakPtr new_peak_ptr 
+      = PrmPeakPtr(new PrmPeak(spec_id, deconv_peak_ptr,BasePeakType::ORIGINAL,c_res_mass,1));
+  new_peak_ptr->setStrictTolerance(tole_ptr->compStrictErrorTole(ori_mass));
+  new_peak_ptr->setNStrictCRelacTolerance(tole_ptr->compRelaxErrorTole(ori_mass, prec_mono_mass));
+  new_peak_ptr->setNRelaxCStrictTolerance(tole_ptr->compStrictErrorTole(ori_mass));
+  list.push_back(new_peak_ptr);
+  double reverse_mass = prec_mono_mass - (deconv_peak_ptr->getMonoMass()-active_type_ptr->getNShift())
+      - MassConstant::getWaterMass();
+  PrmPeakPtr reverse_peak_ptr 
+      = PrmPeakPtr(new PrmPeak(spec_id, deconv_peak_ptr,BasePeakType::REVERSED,reverse_mass,1));
+  reverse_peak_ptr->setStrictTolerance(tole_ptr->compStrictErrorTole(ori_mass));
+  reverse_peak_ptr->setNStrictCRelacTolerance(tole_ptr->compStrictErrorTole(ori_mass));
+  reverse_peak_ptr->setNRelaxCStrictTolerance(tole_ptr->compRelaxErrorTole(ori_mass, prec_mono_mass));
   list.push_back(reverse_peak_ptr);
 }
 
@@ -31,7 +51,7 @@ void addSixMasses(PrmPeakPtrVec &list, int spec_id, DeconvPeakPtr deconv_peak_pt
   double ori_mass = deconv_peak_ptr->getMonoMass();
   for(size_t i = 0;i<offsets.size();i++){
     double mass = ori_mass - active_type_ptr->getNShift()+offsets[i];
-    PrmPeakPtr peak_ptr = PrmPeakPtr(new PrmPeak(spec_id, deconv_peak_ptr,PrmBaseType::ORIGINAL,mass,1));
+    PrmPeakPtr peak_ptr = PrmPeakPtr(new PrmPeak(spec_id, deconv_peak_ptr,BasePeakType::ORIGINAL,mass,1));
     peak_ptr->setStrictTolerance(tole_ptr->compStrictErrorTole(ori_mass));
     peak_ptr->setNStrictCRelacTolerance(tole_ptr->compStrictErrorTole(ori_mass));
     peak_ptr->setNRelaxCStrictTolerance(tole_ptr->compRelaxErrorTole(ori_mass, prec_mono_mass));
@@ -39,7 +59,7 @@ void addSixMasses(PrmPeakPtrVec &list, int spec_id, DeconvPeakPtr deconv_peak_pt
   }
   for(size_t i = 0;i<offsets.size();i++){
     double mass = prec_mono_mass-(ori_mass-active_type_ptr->getCShift()+offsets[i]);
-    PrmPeakPtr peak_ptr = PrmPeakPtr(new PrmPeak(spec_id, deconv_peak_ptr,PrmBaseType::REVERSED,mass,1));
+    PrmPeakPtr peak_ptr = PrmPeakPtr(new PrmPeak(spec_id, deconv_peak_ptr,BasePeakType::REVERSED,mass,1));
     peak_ptr->setStrictTolerance(tole_ptr->compStrictErrorTole(ori_mass));
     peak_ptr->setNRelaxCStrictTolerance(tole_ptr->compStrictErrorTole(ori_mass));
     peak_ptr->setNStrictCRelacTolerance(tole_ptr->compRelaxErrorTole(ori_mass, prec_mono_mass));
@@ -74,7 +94,28 @@ PrmMsPtr geneMsTwoPtr(DeconvMsPtr deconv_ms_ptr, int spec_id, SpParaPtr sp_para_
   PrmPeakPtrVec list_filtered;
   filterPeaks(list, list_filtered, prec_mono_mass, sp_para_ptr->getMinMass());
   //sort 
-  std::sort(list_filtered.begin(), list_filtered.end(),PrmPeak::cmpPosIncrease);
+  std::sort(list_filtered.begin(), list_filtered.end(),PrmPeak::cmpPosInc);
+
+  return PrmMsPtr(new Ms<PrmPeakPtr>(header_ptr,list_filtered)) ;
+}
+
+PrmMsPtr geneSuffixMsTwoPtr(DeconvMsPtr deconv_ms_ptr, int spec_id, SpParaPtr sp_para_ptr,
+                            double prec_mono_mass){
+  MsHeaderPtr ori_header_ptr = deconv_ms_ptr->getMsHeaderPtr();
+  MsHeaderPtr header_ptr = MsHeader::geneMsHeaderPtr(ori_header_ptr, prec_mono_mass);
+  //getSpTwoPrmPeak
+  ActivationPtr active_type_ptr = header_ptr->getActivationPtr();
+  PeakTolerancePtr tole_ptr = sp_para_ptr->getPeakTolerancePtr();
+  PrmPeakPtrVec list;
+  for(size_t i = 0;i<deconv_ms_ptr->size();i++){
+    addSuffixTwoMasses(list, spec_id,deconv_ms_ptr->getPeakPtr(i),prec_mono_mass,
+                       active_type_ptr, tole_ptr);
+  }
+  //filter low mass peaks
+  PrmPeakPtrVec list_filtered;
+  filterPeaks(list, list_filtered, prec_mono_mass, sp_para_ptr->getMinMass());
+  //sort 
+  std::sort(list_filtered.begin(), list_filtered.end(),PrmPeak::cmpPosInc);
 
   return PrmMsPtr(new Ms<PrmPeakPtr>(header_ptr,list_filtered)) ;
 }
@@ -104,7 +145,7 @@ PrmMsPtr geneMsSixPtr(DeconvMsPtr deconv_ms_ptr, int spec_id, SpParaPtr sp_para_
   PrmPeakPtrVec list_filtered;
   filterPeaks(list, list_filtered, prec_mono_mass, sp_para_ptr->getMinMass());
   //sort 
-  std::sort(list_filtered.begin(), list_filtered.end(),PrmPeak::cmpPosIncrease);
+  std::sort(list_filtered.begin(), list_filtered.end(),PrmPeak::cmpPosInc);
 
   return PrmMsPtr(new Ms<PrmPeakPtr>(header_ptr,list_filtered)) ;
 }
@@ -133,6 +174,17 @@ PrmMsPtrVec PrmMsFactory::geneMsTwoPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_ve
   PrmMsPtrVec prm_ms_ptr_vec;
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
     prm_ms_ptr_vec.push_back(geneMsTwoPtr(deconv_ms_ptr_vec[i], i, 
+                                          sp_para_ptr, prec_mono_mass));
+  }
+  return prm_ms_ptr_vec;
+}
+
+PrmMsPtrVec PrmMsFactory::geneSuffixMsTwoPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, 
+                                                SpParaPtr sp_para_ptr,
+                                                double prec_mono_mass){
+  PrmMsPtrVec prm_ms_ptr_vec;
+  for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
+    prm_ms_ptr_vec.push_back(geneSuffixMsTwoPtr(deconv_ms_ptr_vec[i], i, 
                                           sp_para_ptr, prec_mono_mass));
   }
   return prm_ms_ptr_vec;

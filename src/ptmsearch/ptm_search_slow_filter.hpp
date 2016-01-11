@@ -6,8 +6,8 @@
 #include "spec/spectrum_set.hpp"
 #include "prsm/simple_prsm.hpp"
 #include "oneptmsearch/ptm_search_mng.hpp"
-#include "oneptmsearch/comp_shift_low_mem.hpp"
-#include "oneptmsearch/ptm_slow_match.hpp"
+#include "ptmsearch/ptm_slow_match.hpp"
+#include "ptmsearch/comp_shift_low_mem.hpp"
 
 namespace prot {
 

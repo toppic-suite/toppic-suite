@@ -77,7 +77,7 @@ PrmPeakPtrVec PrmMs::getPrmPeakPtrs(const PrmMsPtrVec &prm_ms_ptr_vec,
   // add prec mass  
   PrmPeakPtr prec_prm_ptr = PrmPeakFactory::getPrecPeakPtr(0, prec_mass, tole_ptr, prm_ms_ptr_vec.size());
   peak_list.push_back(prec_prm_ptr);
-  std::sort(peak_list.begin(), peak_list.end(), PrmPeak::cmpPosIncrease);
+  std::sort(peak_list.begin(), peak_list.end(), PrmPeak::cmpPosInc);
   for (size_t i = 0; i < peak_list.size(); i++) {
     peak_list[i]->setPeakId(i);
   }

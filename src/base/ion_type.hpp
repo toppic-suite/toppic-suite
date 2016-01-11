@@ -32,7 +32,7 @@ class IonType {
   // A B C are n-terminal ions and X Y Z are non-n-terminal ions 
   bool n_term_;
   /**
-   * Shift stands for the shift of the ion compared to M. For example, the
+   * Shift stands for the shift of the ion compared to residue mass. For example, the
    * shift for B ion is 0, and the shift for Y ion is 18 (chrg 0);
    */
   double shift_;

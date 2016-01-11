@@ -12,8 +12,8 @@
 #include "prsm/simple_prsm_reader.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_str_combine.hpp"
-#include "oneptmsearch/comp_shift_low_mem.hpp"
-#include "oneptmsearch/ptm_slow_match.hpp"
+//#include "ptmsearch/comp_shift_low_mem.hpp"
+//#include "ptmsearch/ptm_slow_match.hpp"
 #include "oneptmsearch/one_ptm_slow_match.hpp"
 #include "oneptmsearch/one_ptm_search.hpp"
 
@@ -21,7 +21,7 @@ namespace prot {
 
 void onePtmSearchOneSpec(SpectrumSetPtr spec_set_ptr, 
                          SimplePrsmPtrVec &simple_prsm_ptr_vec,
-                         CompShiftLowMemPtr comp_shift_ptr,
+                         //CompShiftLowMemPtr comp_shift_ptr,
                          FastaIndexReaderPtr reader_ptr,
                          PtmSearchMngPtr mng_ptr, 
                          AlignTypePtr type_ptr,
@@ -95,7 +95,7 @@ void OnePtmSearch::process(PtmSearchMngPtr mng_ptr){
   PrsmXmlWriter internal_writer(output_file_name + "_" + AlignType::INTERNAL->getName());
   PrsmXmlWriter all_writer(output_file_name);
 
-  CompShiftLowMemPtr comp_shift_ptr = CompShiftLowMemPtr(new CompShiftLowMem());
+  //CompShiftLowMemPtr comp_shift_ptr = CompShiftLowMemPtr(new CompShiftLowMem());
 
   //init variables
   std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
@@ -122,7 +122,7 @@ void OnePtmSearch::process(PtmSearchMngPtr mng_ptr){
       if (comp_selected_prsm_ptrs.size() > 0) {
         //LOG_DEBUG("start processing one spectrum.");
         PrsmPtrVec prsms;
-        onePtmSearchOneSpec(spec_set_ptr, comp_selected_prsm_ptrs, comp_shift_ptr,
+        onePtmSearchOneSpec(spec_set_ptr, comp_selected_prsm_ptrs, 
                             reader_ptr, mng_ptr, AlignType::COMPLETE, prsms);
         comp_writer.writeVector(prsms);
         all_writer.writeVector(prsms);
@@ -137,7 +137,7 @@ void OnePtmSearch::process(PtmSearchMngPtr mng_ptr){
       if (pref_selected_prsm_ptrs.size() > 0) {
         //LOG_DEBUG("start processing one spectrum.");
         PrsmPtrVec prsms;
-        onePtmSearchOneSpec(spec_set_ptr, pref_selected_prsm_ptrs, comp_shift_ptr,
+        onePtmSearchOneSpec(spec_set_ptr, pref_selected_prsm_ptrs, 
                             reader_ptr, mng_ptr, AlignType::PREFIX, prsms);
         pref_writer.writeVector(prsms);
         all_writer.writeVector(prsms);
@@ -152,7 +152,7 @@ void OnePtmSearch::process(PtmSearchMngPtr mng_ptr){
       if (suff_selected_prsm_ptrs.size() > 0) {
         //LOG_DEBUG("start processing one spectrum.");
         PrsmPtrVec prsms;
-        onePtmSearchOneSpec(spec_set_ptr, suff_selected_prsm_ptrs, comp_shift_ptr,
+        onePtmSearchOneSpec(spec_set_ptr, suff_selected_prsm_ptrs, 
                             reader_ptr, mng_ptr, AlignType::SUFFIX, prsms);
         suff_writer.writeVector(prsms);
         all_writer.writeVector(prsms);
@@ -167,13 +167,13 @@ void OnePtmSearch::process(PtmSearchMngPtr mng_ptr){
       if (internal_selected_prsm_ptrs.size() > 0) {
         //LOG_DEBUG("start processing one spectrum.");
         PrsmPtrVec prsms;
-        onePtmSearchOneSpec(spec_set_ptr, internal_selected_prsm_ptrs, comp_shift_ptr, 
+        onePtmSearchOneSpec(spec_set_ptr, internal_selected_prsm_ptrs,  
                             reader_ptr, mng_ptr, AlignType::INTERNAL, prsms);
         internal_writer.writeVector(prsms);
         all_writer.writeVector(prsms);
       }
     }
-    std::cout << std::flush <<  "One Ptm intenal search is processing " << cnt 
+    std::cout << std::flush <<  "One Ptm search is processing " << cnt 
         << " of " << spectrum_num << " spectra.\r";
     //WebLog::percentLog(cnt, spectrum_num, WebLog::PtmTime());
   }

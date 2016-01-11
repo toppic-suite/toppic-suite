@@ -2,41 +2,46 @@
 #include <iomanip>
 
 #include "base/fasta_reader.hpp"
+#include "base/fasta_util.hpp"
 #include "base/base_data.hpp"
+#include "base/web_logger.hpp"
+
+#include "spec/msalign_reader.hpp"
+#include "spec/msalign_util.hpp"
 
 #include "prsm/prsm_para.hpp"
-#include "prsm/prsm_combine.hpp"
-#include "prsm/prsm_selector.hpp"
-#include "prsm/output_selector.hpp"
+#include "prsm/prsm_str_combine.hpp"
+#include "prsm/prsm_top_selector.hpp"
+#include "prsm/prsm_cutoff_selector.hpp"
 #include "prsm/prsm_species.hpp"
-#include "prsm/simple_prsm_writer.hpp"
-#include "prsm/simple_prsm_table_writer.hpp"
-#include "prsm/table_writer.hpp"
+#include "prsm/prsm_table_writer.hpp"
 #include "prsm/prsm_fdr.hpp"
 
-#include "zeroptmsearch/zero_ptm_mng.hpp"
-#include "zeroptmsearch/zero_ptm_search.hpp"
+#include "zeroptmfilter/zero_ptm_filter_mng.hpp"
+#include "zeroptmfilter/zero_ptm_filter_processor.hpp"
 
-#include "diagfilter/diag_filter_mng.hpp"
-#include "diagfilter/diag_filter_processor.hpp"
+#include "zeroptmsearch/zero_ptm_search_mng.hpp"
+#include "zeroptmsearch/zero_ptm_search.hpp"
 
 #include "oneptmfilter/one_ptm_filter_mng.hpp"
 #include "oneptmfilter/one_ptm_filter_processor.hpp"
 
-#include "ptmsearch/ptm_mng.hpp"
-#include "ptmsearch/ptm_processor.hpp"
+#include "oneptmsearch/ptm_search_mng.hpp"
+#include "oneptmsearch/one_ptm_search.hpp"
 
-#include "tdgf/evalue_processor.hpp"
+#include "diagfilter/diag_filter_mng.hpp"
+#include "diagfilter/diag_filter_processor.hpp"
+
+#include "ptmsearch/ptm_search_processor.hpp"
+
 #include "tdgf/tdgf_mng.hpp"
-
-#include "prsmview/xml_generator.hpp"
-#include "prsmview/transformer.hpp"
+#include "tdgf/evalue_processor.hpp"
 
 #include "console/argument.hpp"
 
 namespace prot {
 
-int zero_ptm_process(int argc, char* argv[]) {
+int two_ptm_process(int argc, char* argv[]) {
   try {
     Argument argu_processor;
     bool success = argu_processor.parse(argc, argv);
@@ -44,135 +49,199 @@ int zero_ptm_process(int argc, char* argv[]) {
       return 1;
     }
     std::map<std::string, std::string> arguments = argu_processor.getArguments();
-    std::cout << "TopPC 0.5 " << std::endl;
+    std::cout << "TopPIC 0.9.2" << std::endl;
 
-    std::string exe_dir = "";
-    exe_dir = arguments["executiveDir"];
+    std::string exe_dir = arguments["executiveDir"];
     std::cout << "Executive file directory is: " << exe_dir << std::endl;
-    initBaseData(exe_dir);
+
+    BaseData::init(exe_dir);
+    
+    LOG_DEBUG("Init base data completed");
 
     std::string db_file_name = arguments["databaseFileName"];
     std::string sp_file_name = arguments["spectrumFileName"];
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
+    std::string log_file_name = arguments["logFileName"];
 
-    int n_top;
-    std::istringstream (arguments["numOfTopPrsms"]) >> n_top;
-    int shift_num;
-    std::istringstream (arguments["shiftNumber"]) >> shift_num;
-    double max_ptm_mass;
-    std::istringstream (arguments["maxPtmMass"]) >> max_ptm_mass;
+    int n_top = std::stoi(arguments["numOfTopPrsms"]);
+    int ptm_num = std::stoi(arguments["ptmNumber"]);
+    double max_ptm_mass = std::stod(arguments["maxPtmMass"]);
+    int filter_result_num = std::stoi(arguments["filteringResultNumber"]);
+    
+    bool use_gf = false; 
+    if (arguments["useGf"] == "true") {
+      use_gf = true;
+    }
+    // initialize log file 
+  	WebLog::init(log_file_name, use_gf, ptm_num);
+    LOG_DEBUG("web log inited");
 
     PrsmParaPtr prsm_para_ptr = PrsmParaPtr(new PrsmPara(arguments));
+    LOG_DEBUG("prsm para inited");
 
+    bool decoy = false;
     if (arguments["searchType"] == "TARGET+DECOY") {
-      generateShuffleDb(ori_db_file_name, db_file_name);
+      decoy = true;
     }
+    LOG_DEBUG("block size " << arguments["databaseBlockSize"]);
+    int db_block_size = std::stoi(arguments["databaseBlockSize"]);
 
-    /*
-    std::cout << "Zero ptm searching starts " << std::endl;
-    ZeroPtmMngPtr zero_mng_ptr = ZeroPtmMngPtr(new ZeroPtmMng (prsm_para_ptr, "ZERO"));
-    zeroPtmSearchProcess(zero_mng_ptr);
+    FastaUtil::dbPreprocess (ori_db_file_name, db_file_name, decoy, db_block_size);
+    MsAlignUtil::geneSpIndex(sp_file_name);
 
-    std::cout << "Diagonal filtering starts " << std::endl;
-    DiagFilterMngPtr diag_filter_mng_ptr 
-        = DiagFilterMngPtr(new DiagFilterMng(prsm_para_ptr, "DIAG_FILTER"));
-    DiagFilterProcessorPtr diag_filter_processor = DiagFilterProcessorPtr(new DiagFilterProcessor(diag_filter_mng_ptr));
-    diag_filter_processor->process();
-    diag_filter_processor = nullptr;
+    time_t start_s;
+    time_t stop_s;
 
-    std::cout << "One Ptm filtering starts " << std::endl;
-    OnePtmFilterMngPtr one_ptm_filter_mng_ptr 
-        = OnePtmFilterMngPtr(new OnePtmFilterMng(prsm_para_ptr, "ONE_PTM_FILTER"));
-    OnePtmFilterProcessorPtr one_ptm_filter_processor = OnePtmFilterProcessorPtr(new OnePtmFilterProcessor(one_ptm_filter_mng_ptr));
-    one_ptm_filter_processor->process();
-    one_ptm_filter_processor = nullptr;
-
-    combineSimplePrsms(sp_file_name, "ONE_PTM_FILTER_COMBINED", "DIAG_FILTER_COMBINED", "FILTER_COMBINED");
-
-    std::cout << "Ptm searching starts" << std::endl;
-    PtmMngPtr ptm_mng_ptr = PtmMngPtr(new PtmMng(prsm_para_ptr, n_top, shift_num,
-                                                 max_ptm_mass, "FILTER_COMBINED", "PTM"));
-    PtmProcessorPtr ptm_processor = PtmProcessorPtr(new PtmProcessor(ptm_mng_ptr));
-    ptm_processor->process();
-    ptm_processor = nullptr;
-
-    std::cout << "Combining prsms starts" << std::endl;
     std::vector<std::string> input_exts ;
-    input_exts.push_back("ZERO");
-    input_exts.push_back("PTM");
-    PrsmCombinePtr combine_processor = PrsmCombinePtr(new PrsmCombine(db_file_name, sp_file_name,
-                                                                    input_exts, "RAW_RESULT"));
-    combine_processor->process();
-    combine_processor = nullptr;
-    std::cout << "Combining prsms finished." << std::endl;
 
-    std::cout << "E-value computation starts" << std::endl;
-    TdgfMngPtr tdgf_mng_ptr = TdgfMngPtr(new TdgfMng (prsm_para_ptr, shift_num, max_ptm_mass,
-                                                      "RAW_RESULT", "EVALUE"));
-    EValueProcessorPtr processor = EValueProcessorPtr(new EValueProcessor(tdgf_mng_ptr));
-    processor->init();
+    time(&start_s);
+    std::cout << "Zero PTM filtering started." << std::endl;
+    ZeroPtmFilterMngPtr zero_filter_mng_ptr = ZeroPtmFilterMngPtr(new ZeroPtmFilterMng (prsm_para_ptr, "ZERO_FILTER"));
+    ZeroPtmFilterProcessorPtr zero_filter_processor = ZeroPtmFilterProcessorPtr(new ZeroPtmFilterProcessor(zero_filter_mng_ptr));
+    zero_filter_processor->process();
+    //WebLog::completeFunction(WebLog::ZeroPtmTime());
+    std::cout << "Zero PTM filtering finished." << std::endl;
+    time(&stop_s);
+    std::cout <<  "Zero PTM filtering running time: " << difftime(stop_s, start_s)  << " seconds " << std::endl;
+
+    time(&start_s);
+    std::cout << "Zero PTM search started." << std::endl;
+    ZeroPtmSearchMngPtr zero_search_mng_ptr = ZeroPtmSearchMngPtr(new ZeroPtmSearchMng (prsm_para_ptr, "ZERO_FILTER", "ZERO_PTM"));
+    ZeroPtmSearch::process(zero_search_mng_ptr);
+    std::cout << "Zero PTM search finished." << std::endl;
+    time(&stop_s);
+    std::cout <<  "Zero PTM search running time: " << difftime(stop_s, start_s)  << " seconds " << std::endl;
+
+    input_exts.push_back("ZERO_PTM_COMPLETE");
+    input_exts.push_back("ZERO_PTM_PREFIX");
+    input_exts.push_back("ZERO_PTM_SUFFIX");
+    input_exts.push_back("ZERO_PTM_INTERNAL");
+
+    time(&start_s);
+    std::cout << "One PTM filtering started." << std::endl;
+    OnePtmFilterMngPtr one_ptm_filter_mng_ptr = OnePtmFilterMngPtr(new OnePtmFilterMng (prsm_para_ptr, "ONE_PTM_FILTER"));
+    OnePtmFilterProcessorPtr one_filter_processor = OnePtmFilterProcessorPtr(new OnePtmFilterProcessor(one_ptm_filter_mng_ptr));
+    one_filter_processor->process();
+    //WebLog::completeFunction(WebLog::ZeroPtmTime());
+    std::cout << "One PTM filtering finished." << std::endl;
+    time(&stop_s);
+    std::cout <<  "One PTM filtering running time: " << difftime(stop_s, start_s)  << " seconds " << std::endl;
+
+    time(&start_s);
+    std::cout << "One PTM search started." << std::endl;
+    int shift_num = 1;
+    PtmSearchMngPtr one_search_mng_ptr 
+        = PtmSearchMngPtr(new PtmSearchMng (prsm_para_ptr, n_top, max_ptm_mass, shift_num, "ONE_PTM_FILTER", "ONE_PTM"));
+    OnePtmSearch::process(one_search_mng_ptr);
+    std::cout << "One PTM search finished." << std::endl;
+    time(&stop_s);
+    std::cout <<  "ONe PTM search running time: " << difftime(stop_s, start_s)  << " seconds " << std::endl;
+    input_exts.push_back("ONE_PTM_COMPLETE");
+    input_exts.push_back("ONE_PTM_PREFIX");
+    input_exts.push_back("ONE_PTM_SUFFIX");
+    input_exts.push_back("ONE_PTM_INTERNAL");
+
+    time(&start_s);
+    std::cout << "Diagonal PTM filtering started." << std::endl;
+    DiagFilterMngPtr diag_filter_mng_ptr 
+        = DiagFilterMngPtr(new DiagFilterMng (prsm_para_ptr, filter_result_num, "DIAG_FILTER"));
+    DiagFilterProcessorPtr diag_filter_processor 
+        = DiagFilterProcessorPtr(new DiagFilterProcessor(diag_filter_mng_ptr));
+    diag_filter_processor->process();
+    //WebLog::completeFunction(WebLog::ZeroPtmTime());
+    std::cout << "Diagonal filtering finished." << std::endl;
+    time(&stop_s);
+    std::cout <<  "Diagonal filtering running time: " << difftime(stop_s, start_s)  << " seconds " << std::endl;
+
+    time(&start_s);
+    std::cout << "Two PTM search started." << std::endl;
+    shift_num = 2;
+    PtmSearchMngPtr two_search_mng_ptr 
+        = PtmSearchMngPtr(new PtmSearchMng (prsm_para_ptr, n_top, max_ptm_mass, shift_num,
+                                            "DIAG_FILTER", "PTM"));
+    PtmSearchProcessorPtr processor = PtmSearchProcessorPtr(new PtmSearchProcessor(two_search_mng_ptr));
+    processor->process();
+    std::cout << "Two PTM search finished." << std::endl;
+    time(&stop_s);
+    std::cout <<  "Two PTM search running time: " << difftime(stop_s, start_s)  << " seconds " << std::endl;
+    input_exts.push_back("PTM_2_COMPLETE");
+    input_exts.push_back("PTM_2_PREFIX");
+    input_exts.push_back("PTM_2_SUFFIX");
+    input_exts.push_back("PTM_2_INTERNAL");
+
+    time(&start_s);
+    std::cout << "Combining PRSMs started." << std::endl;
+    ptm_num = 2;
+    int prsm_top_num = (ptm_num + 1) * 4;
+    PrsmStrCombinePtr combine_ptr(new PrsmStrCombine(sp_file_name, input_exts, "RAW_RESULT", prsm_top_num));
+    combine_ptr->process();
+    combine_ptr = nullptr;
+    std::cout << "Combining PRSMs finished." << std::endl;
+    time(&stop_s);
+    std::cout <<  "Combining prsms search running time: " << difftime(stop_s, start_s) << " seconds " << std::endl;
+
+    time(&start_s);
+    std::cout << "E-value computation started." << std::endl;
+    bool variable_ptm = false;
+    TdgfMngPtr tdgf_mng_ptr = TdgfMngPtr(new TdgfMng (prsm_para_ptr, ptm_num, max_ptm_mass, use_gf,
+                                                      variable_ptm, "RAW_RESULT", "EVALUE"));
+    EValueProcessorPtr evalue_processor = EValueProcessorPtr(new EValueProcessor(tdgf_mng_ptr));
+    evalue_processor->init();
     // compute E-value for a set of prsms each run 
-    processor->process(false);
-    processor = nullptr;
+    evalue_processor->process(false);
+    evalue_processor = nullptr;
+    std::cout << "E-value computation finished." << std::endl;
+    time(&stop_s);
+    std::cout <<  "Computing e-values running time: " << difftime(stop_s, start_s)  << " seconds " << std::endl;
 
+    time(&start_s);
     if (arguments["searchType"]=="TARGET") { 
-      std::cout << "Top prsm selecting starts" << std::endl;
-      PrsmSelectorPtr selector = PrsmSelectorPtr(new PrsmSelector(db_file_name, sp_file_name, "EVALUE", "TOP", n_top));
+      std::cout << "Top PRSM selecting started" << std::endl;
+      PrsmTopSelectorPtr selector = PrsmTopSelectorPtr(new PrsmTopSelector(db_file_name, sp_file_name, "EVALUE", "TOP", n_top));
       selector->process();
       selector = nullptr;
-      std::cout << "Top prsm selecting finished." << std::endl;
+      std::cout << "Top PRSM selecting finished." << std::endl;
     }
     else {
-      std::cout << "Top prsm selecting starts " << std::endl;
-      PrsmSelectorPtr selector = PrsmSelectorPtr(new PrsmSelector(db_file_name, sp_file_name, "EVALUE", "TOP_PRE", n_top));
+      std::cout << "Top PRSM selecting started " << std::endl;
+      PrsmTopSelectorPtr selector = PrsmTopSelectorPtr(new PrsmTopSelector(db_file_name, sp_file_name, "EVALUE", "TOP_PRE", n_top));
       selector->process();
       selector = nullptr;
-      std::cout << "Top prsm selecting finished." << std::endl;
+      std::cout << "Top PRSM selecting finished." << std::endl;
 
-      std::cout << "FDR computation starts " << std::endl;
+      std::cout << "FDR computation started. " << std::endl;
       PrsmFdrPtr fdr = PrsmFdrPtr(new PrsmFdr(db_file_name, sp_file_name, "TOP_PRE", "TOP"));
       fdr->process();
       fdr = nullptr;
       std::cout << "FDR computation finished." << std::endl;
     }
 
-    std::cout << "Prsm cutoff selecting starts " << std::endl;
-    std::string cutoff_type = arguments["cutoffValue"];
+    std::cout << "PRSM selecting by cutoff started." << std::endl;
+    std::string cutoff_type = arguments["cutoffType"];
     double cutoff_value;
     std::istringstream (arguments["cutoffValue"]) >> cutoff_value;
-    OutputSelectorPtr output_selector = OutputSelectorPtr(
-        new OutputSelector(db_file_name, sp_file_name, "TOP", "CUTOFF_RESULT", 
+    PrsmCutoffSelectorPtr cutoff_selector = PrsmCutoffSelectorPtr(
+        new PrsmCutoffSelector(db_file_name, sp_file_name, "TOP", "CUTOFF_RESULT", 
                            cutoff_type, cutoff_value));
-    output_selector->process();
-    output_selector = nullptr;
-    std::cout << "Prsm cutoff selecting finished." << std::endl;
-
-    std::cout << "Finding species starts " << std::endl;
-    double ppo;
-    std::istringstream (arguments["error_tolerance"]) >> ppo;
-    ppo = ppo /1000000.0;
-    PrsmSpeciesPtr prsm_species = PrsmSpeciesPtr(new PrsmSpecies(db_file_name, sp_file_name, 
-                                                                 "CUTOFF_RESULT", "OUTPUT_RESULT", ppo));
-    prsm_species->process();
-    prsm_species = nullptr;
-    std::cout << "Finding species finished." << std::endl;
+    cutoff_selector->process();
+    cutoff_selector = nullptr;
+    std::cout << "PRSM selecting by cutoff finished." << std::endl;
 
     std::cout << "Outputting table starts " << std::endl;
-    TableWriterPtr table_out = TableWriterPtr(new TableWriter(prsm_para_ptr, "OUTPUT_RESULT", "OUTPUT_TABLE"));
+    PrsmTableWriterPtr table_out = PrsmTableWriterPtr(
+        new PrsmTableWriter(prsm_para_ptr, "CUTOFF_RESULT", "TWO_TABLE"));
     table_out->write();
     table_out = nullptr;
     std::cout << "Outputting table finished." << std::endl;
-    */
 
-    std::cout << "Generating view xml files starts " << std::endl;
-    XmlGeneratorPtr xml_gene_ptr = XmlGeneratorPtr(new XmlGenerator(prsm_para_ptr, exe_dir,"OUTPUT_RESULT"));
-    xml_gene_ptr->process();
-    xml_gene_ptr = nullptr;
-    std::cout << "Generating view xml files finished." << std::endl;
-
-    std::cout << "Converting xml files to html files starts " << std::endl;
-    translate(arguments);
-    std::cout << "Converting xml files to html files finished." << std::endl;
+    table_out = PrsmTableWriterPtr(new PrsmTableWriter(prsm_para_ptr, "PTM_2_COMPLETE", "PTM_2_COMPLETE_TABLE"));
+    table_out->write();
+    table_out = PrsmTableWriterPtr(new PrsmTableWriter(prsm_para_ptr, "PTM_2_PREFIX", "PTM_2_PREFIX_TABLE"));
+    table_out->write();
+    table_out = PrsmTableWriterPtr(new PrsmTableWriter(prsm_para_ptr, "PTM_2_SUFFIX", "PTM_2_SUFFIX_TABLE"));
+    table_out->write();
+    table_out = PrsmTableWriterPtr(new PrsmTableWriter(prsm_para_ptr, "PTM_2_INTERNAL", "PTM_2_INTERNAL_TABLE"));
+    table_out->write();
 
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
@@ -187,5 +256,5 @@ int zero_ptm_process(int argc, char* argv[]) {
 int main(int argc, char* argv[]) {
   prot::log_level = 2;
   std::cout << std::setprecision(10);
-  return prot::zero_ptm_process(argc, argv);
+  return prot::two_ptm_process(argc, argv);
 }

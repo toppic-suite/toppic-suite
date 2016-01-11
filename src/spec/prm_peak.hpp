@@ -6,8 +6,8 @@
 
 #include "spec/deconv_peak.hpp"
 #include "spec/support_peak.hpp"
-#include "spec/prm_base_type.hpp"
-#include "spec/prm_break_type.hpp"
+#include "spec/base_peak_type.hpp"
+#include "spec/rm_break_type.hpp"
 
 namespace prot {
 
@@ -17,7 +17,7 @@ typedef std::shared_ptr<PrmPeak> PrmPeakPtr;
 class PrmPeak : public Peak {
  public:
   PrmPeak(int spec_id, DeconvPeakPtr base_peak_ptr,
-          PrmBaseTypePtr base_type, 
+          BasePeakTypePtr base_type, 
           double mono_mass, double score);
 
   void addNghbEdge(DeconvPeakPtr deconv_peak_ptr, double offset,
@@ -33,7 +33,7 @@ class PrmPeak : public Peak {
 
   double getStrictTolerance(){return strict_tolerance_;}
 
-  PrmBaseTypePtr getBaseTypePtr(){return base_type_;}
+  BasePeakTypePtr getBaseTypePtr(){return base_type_;}
 
   double getNStrictCRelaxTolerance(){return n_strict_c_relax_tolerance_;}
 
@@ -43,7 +43,7 @@ class PrmPeak : public Peak {
 
   int getPeakId() {return peak_id_;}
 
-  PrmBreakTypePtr getBreakType();
+  RmBreakTypePtr getBreakType();
 
   void setStrictTolerance(double tolerance){strict_tolerance_ = tolerance;}
 
@@ -55,14 +55,14 @@ class PrmPeak : public Peak {
 
   void setPeakId(int peak_id) {peak_id_ = peak_id;}
 
-  static bool cmpPosIncrease(const PrmPeakPtr &a, const PrmPeakPtr &b){
+  static bool cmpPosInc(const PrmPeakPtr &a, const PrmPeakPtr &b){
     return a->getPosition() < b->getPosition();
   }
 
  private:
   int spec_id_;
   DeconvPeakPtr base_peak_ptr_;
-  PrmBaseTypePtr base_type_;
+  BasePeakTypePtr base_type_;
   int peak_id_;
   double mono_mass_;
   double score_;

@@ -32,6 +32,7 @@ void OnePtmFilterProcessor::process(){
   std::string sp_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
   int block_num = db_block_ptr_vec.size();
 
+  LOG_DEBUG("comp number " << mng_ptr_->comp_num_);
   SimplePrsmStrCombine comp_combine(sp_file_name, mng_ptr_->output_file_ext_ + "_COMPLETE",
                                     block_num, mng_ptr_->output_file_ext_ + "_COMPLETE", 
                                     mng_ptr_->comp_num_);
@@ -82,8 +83,9 @@ void OnePtmFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_n
   while((spec_set_ptr = reader.getNextSpectrumSet(sp_para_ptr)) != nullptr){
     cnt+= group_spec_num;
     if(spec_set_ptr->isValid()){
-      PrmMsPtrVec ms_ptr_vec = spec_set_ptr->getMsTwoPtrVec();
-      filter_ptr->computeBestMatch(ms_ptr_vec);
+      PrmMsPtrVec prm_ms_ptr_vec = spec_set_ptr->getMsTwoPtrVec();
+      PrmMsPtrVec srm_ms_ptr_vec = spec_set_ptr->getSuffixMsTwoPtrVec();
+      filter_ptr->computeBestMatch(prm_ms_ptr_vec, srm_ms_ptr_vec);
       comp_writer.write(filter_ptr->getCompMatchPtrs());
       pref_writer.write(filter_ptr->getPrefMatchPtrs());
       suff_writer.write(filter_ptr->getSuffMatchPtrs());
