@@ -23,7 +23,7 @@ PeakIonPairPtrVec PeakIonPairFactory::findPairs(ExtendMsPtr ms_three_ptr,
   while (i < ms_masses.size() && j < theo_masses.size()) {
     double deviation = ms_masses[i] - theo_masses[j];
     IonPtr ion_ptr = theo_peak_ptrs[j]->getIonPtr();
-    double err = ms_three_ptr->getPeakPtr(i)->getOrigTolerance();
+    double err = ms_three_ptr->getPeakPtr(i)->getOrigTolerance() + add_tolerance;
     if (ion_ptr->getPos() >= bgn && ion_ptr->getPos() <= end) {
       if (std::abs(deviation) <= err) {
         PeakIonPairPtr pair_ptr = PeakIonPairPtr(new PeakIonPair(
