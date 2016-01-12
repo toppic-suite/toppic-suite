@@ -52,9 +52,9 @@ std::vector<std::vector<std::string>> readViewXmlFiles(const std::string &file_n
 xercesc::DOMElement* proteoformToXml(XmlDOMDocument* xml_doc, const PrsmPtrVec &prsm_ptrs, 
                                      PrsmViewMngPtr mng_ptr){
   xercesc::DOMElement* proteoform_element = xml_doc->createElement("compatible_proteoform");
-  //std::string str=StringUtil::convertToString(prsm_ptrs[0]->getProteoformPtr()->getSeqId());
-  //xml_doc->addElement(proteoform_element, "sequence_id", str.c_str());
-  std::string str=prsm_ptrs[0]->getProteoformPtr()->getSeqName();
+  std::string str=StringUtil::convertToString(prsm_ptrs[0]->getProteoformPtr()->getProtId());
+  xml_doc->addElement(proteoform_element, "sequence_id", str.c_str());
+  str=prsm_ptrs[0]->getProteoformPtr()->getSeqName();
   xml_doc->addElement(proteoform_element, "sequence_name", str.c_str());
   str=prsm_ptrs[0]->getProteoformPtr()->getSeqDesc();
   xml_doc->addElement(proteoform_element, "sequence_description", str.c_str());
@@ -73,12 +73,13 @@ xercesc::DOMElement* proteoformToXml(XmlDOMDocument* xml_doc, const PrsmPtrVec &
 xercesc::DOMElement* proteinToXml(XmlDOMDocument* xml_doc,
                                   const PrsmPtrVec &prsm_ptrs,
                                   FastaSeqPtr seq_ptr,
+                                  int prot_id,
                                   const std::vector<int> &species_ids,
                                   PrsmViewMngPtr mng_ptr){
   xercesc::DOMElement* prot_element = xml_doc->createElement("protein");
-  //std::string str=StringUtil::convertToString(proteo_ptr->getSeqId());
-  //xml_doc->addElement(prot_element, "sequence_id", str.c_str());
-  std::string str=seq_ptr->getName();
+  std::string str=StringUtil::convertToString(prot_id);
+  xml_doc->addElement(prot_element, "sequence_id", str.c_str());
+  str=seq_ptr->getName();
   xml_doc->addElement(prot_element, "sequence_name", str.c_str());
   str=seq_ptr->getDesc();
   xml_doc->addElement(prot_element, "sequence_description", str.c_str());
@@ -134,8 +135,9 @@ xercesc::DOMElement* allProteinToXml(XmlDOMDocument* xml_doc,
   for(size_t i=0;i<seq_evalues.size();i++){
     std::string seq_name = seq_evalues[i].first->getName();
     std::vector<int> species_ids = PrsmUtil::getSpeciesIds(prsm_ptrs,seq_name);
+    int prot_id = PrsmUtil::getProteinId(prsm_ptrs, seq_name);
     if(species_ids.size()>0){
-      prot_elements->appendChild(proteinToXml(xml_doc,prsm_ptrs,seq_evalues[i].first,species_ids, mng_ptr));
+      prot_elements->appendChild(proteinToXml(xml_doc,prsm_ptrs,seq_evalues[i].first, prot_id, species_ids, mng_ptr));
     }
   }
   return prot_elements;

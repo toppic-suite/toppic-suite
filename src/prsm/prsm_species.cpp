@@ -10,14 +10,12 @@ PrsmSpecies::PrsmSpecies(const std::string &db_file_name,
                          const std::string &input_file_ext,
                          const ModPtrVec &fix_mod_ptr_vec,
                          const std::string &output_file_ext,
-                         const ResiduePtrVec &residue_ptr_vec,
                          double ppo): 
     db_file_name_(db_file_name),
     spec_file_name_(spec_file_name),
     input_file_ext_(input_file_ext),
     fix_mod_ptr_vec_(fix_mod_ptr_vec),
     output_file_ext_(output_file_ext),
-    residue_ptr_vec_(residue_ptr_vec),
     ppo_(ppo) {
     }
 
@@ -65,6 +63,34 @@ ProteoformPtrVec2D getZeroPtmList(const ProteoformPtrVec& proteo_ptrs, double pp
   return species;
 }
 
+void setProtId(PrsmPtrVec& prsm_ptrs){
+  PrsmPtrVec2D proteins;
+  std::vector<std::string> protein_names;
+  for(size_t i=0;i<prsm_ptrs.size();i++) {
+    std::string name = prsm_ptrs[i]->getProteoformPtr()->getSeqName();
+    bool is_found = false;
+    for(size_t j=0; j<protein_names.size(); j++){
+      if(protein_names[j] == name) {
+        proteins[j].push_back(prsm_ptrs[i]);
+        is_found = true;
+        break;
+      }
+    }
+    if(!is_found){
+      PrsmPtrVec new_protein;
+      new_protein.push_back(prsm_ptrs[i]);
+      proteins.push_back(new_protein);
+      protein_names.push_back(name);
+    }
+  }
+
+  for(size_t i=0; i<proteins.size();i++){
+    for (size_t j = 0; j < proteins[i].size(); j++) {
+      proteins[i][j]->getProteoformPtr()->setProtId(i);
+    }
+  }
+}
+
 void setSpeciesId(PrsmPtrVec& prsm_ptrs,double ppo){
   ProteoformPtrVec2D proteo_groups = groupProteins(prsm_ptrs);
   
@@ -104,6 +130,7 @@ void PrsmSpecies::process(){
   PrsmPtrVec prsm_ptrs = PrsmReader::readAllPrsms(input_file_name, db_file_name_,
                                                   fix_mod_ptr_vec_);
   sort(prsm_ptrs.begin(),prsm_ptrs.end(),Prsm::cmpSpectrumIdIncPrecursorIdInc);
+  setProtId(prsm_ptrs);
   setSpeciesId(prsm_ptrs,ppo_);
   //output
   std::string output_file_name = base_name +"."+output_file_ext_;

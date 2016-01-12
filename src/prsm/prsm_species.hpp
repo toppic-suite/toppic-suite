@@ -17,7 +17,6 @@ class PrsmSpecies {
               const std::string &input_file_ext,
               const ModPtrVec &fix_mod_ptr_vec,
               const std::string &output_file_ext, 
-              const ResiduePtrVec &residue_ptv_vec,
               double ppo);
   void process();
  private:

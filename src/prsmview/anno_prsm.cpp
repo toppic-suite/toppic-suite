@@ -136,7 +136,7 @@ xercesc::DOMElement* geneAnnoPrsm(XmlDOMDocument* xml_doc,PrsmPtr prsm_ptr, Prsm
   double err = prsm_ptr->getOriPrecMass() * ppo; 
   xercesc::DOMElement* prot_element = geneAnnoProteoform(xml_doc, prsm_ptr, mng_ptr, err);
   prsm_element->appendChild(prot_element);
-  LOG_DEBUG("proteoform view completed");
+  //LOG_DEBUG("proteoform view completed");
 
   return prsm_element;
   }

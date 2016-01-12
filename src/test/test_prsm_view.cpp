@@ -230,10 +230,23 @@ int two_ptm_process(int argc, char* argv[]) {
     cutoff_selector->process();
     cutoff_selector = nullptr;
     std::cout << "PRSM selecting by cutoff finished." << std::endl;
+    */
 
+    std::cout << "Finding protein species started." << std::endl;
+    double ppo;
+    std::istringstream (arguments["errorTolerance"]) >> ppo;
+    ppo = ppo /1000000.0;
+    ModPtrVec mod_ptr_vec = prsm_para_ptr->getFixModPtrVec();
+    PrsmSpeciesPtr prsm_species = PrsmSpeciesPtr(
+        new PrsmSpecies(db_file_name, sp_file_name, "CUTOFF_RESULT", mod_ptr_vec, "OUTPUT_RESULT", ppo));
+    prsm_species->process();
+    prsm_species = nullptr;
+    std::cout << "Finding protein species finished." << std::endl;
+
+    /*
     std::cout << "Outputting table starts " << std::endl;
     PrsmTableWriterPtr table_out = PrsmTableWriterPtr(
-        new PrsmTableWriter(prsm_para_ptr, "CUTOFF_RESULT", "OUTPUT_TABLE"));
+        new PrsmTableWriter(prsm_para_ptr, "OUTPUT_RESULT", "OUTPUT_TABLE"));
     table_out->write();
     table_out = nullptr;
     std::cout << "Outputting table finished." << std::endl;
@@ -241,18 +254,16 @@ int two_ptm_process(int argc, char* argv[]) {
 
     time(&start_s);
     std::cout << "Generating view xml files started." << std::endl;
-    XmlGeneratorPtr xml_gene = XmlGeneratorPtr(new XmlGenerator(prsm_para_ptr, exe_dir, "CUTOFF_RESULT"));
+    XmlGeneratorPtr xml_gene = XmlGeneratorPtr(new XmlGenerator(prsm_para_ptr, exe_dir, "OUTPUT_RESULT"));
     xml_gene->process();
     xml_gene = nullptr;
     std::cout << "Generating view xml files finished." << std::endl;
 
-    /*
     std::cout << "Converting xml files to html files started." << std::endl;
     translate(arguments);
     std::cout << "Converting xml files to html files finished." << std::endl;
     time(&stop_s);
     std::cout <<  "Html generation running time: " << difftime(stop_s, start_s) << " seconds " << std::endl;
-    */
 
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;

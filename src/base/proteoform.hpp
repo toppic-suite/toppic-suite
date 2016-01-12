@@ -51,6 +51,10 @@ class Proteoform {
 
    void setSpeciesId(int id) {species_id_ = id;}
 
+   int getProtId() {return prot_id_;}
+   
+   void setProtId(int id) {prot_id_ = id;}
+
    double getMass();
 
    AlignTypePtr getAlignType();
@@ -91,6 +95,8 @@ class Proteoform {
    BpSpecPtr bp_spec_ptr_;
 
    int species_id_ = 0;
+
+   int prot_id_ = 0;
 
    ChangePtrVec change_list_;
 };
