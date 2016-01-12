@@ -94,6 +94,7 @@ int two_ptm_process(int argc, char* argv[]) {
 
     std::vector<std::string> input_exts ;
 
+    /*
     time(&start_s);
     std::cout << "Zero PTM filtering started." << std::endl;
     ZeroPtmFilterMngPtr zero_filter_mng_ptr = ZeroPtmFilterMngPtr(new ZeroPtmFilterMng (prsm_para_ptr, "ZERO_FILTER"));
@@ -111,12 +112,14 @@ int two_ptm_process(int argc, char* argv[]) {
     std::cout << "Zero PTM search finished." << std::endl;
     time(&stop_s);
     std::cout <<  "Zero PTM search running time: " << difftime(stop_s, start_s)  << " seconds " << std::endl;
+    */
 
     input_exts.push_back("ZERO_PTM_COMPLETE");
     input_exts.push_back("ZERO_PTM_PREFIX");
     input_exts.push_back("ZERO_PTM_SUFFIX");
     input_exts.push_back("ZERO_PTM_INTERNAL");
 
+    /*
     time(&start_s);
     std::cout << "One PTM filtering started." << std::endl;
     OnePtmFilterMngPtr one_ptm_filter_mng_ptr = OnePtmFilterMngPtr(new OnePtmFilterMng (prsm_para_ptr, "ONE_PTM_FILTER"));
@@ -136,10 +139,12 @@ int two_ptm_process(int argc, char* argv[]) {
     std::cout << "One PTM search finished." << std::endl;
     time(&stop_s);
     std::cout <<  "ONe PTM search running time: " << difftime(stop_s, start_s)  << " seconds " << std::endl;
+    */
     input_exts.push_back("ONE_PTM_COMPLETE");
     input_exts.push_back("ONE_PTM_PREFIX");
     input_exts.push_back("ONE_PTM_SUFFIX");
     input_exts.push_back("ONE_PTM_INTERNAL");
+
 
     time(&start_s);
     std::cout << "Diagonal PTM filtering started." << std::endl;
@@ -153,6 +158,7 @@ int two_ptm_process(int argc, char* argv[]) {
     time(&stop_s);
     std::cout <<  "Diagonal filtering running time: " << difftime(stop_s, start_s)  << " seconds " << std::endl;
 
+    /*
     time(&start_s);
     std::cout << "Two PTM search started." << std::endl;
     shift_num = 2;
@@ -242,6 +248,7 @@ int two_ptm_process(int argc, char* argv[]) {
     table_out->write();
     table_out = PrsmTableWriterPtr(new PrsmTableWriter(prsm_para_ptr, "PTM_2_INTERNAL", "PTM_2_INTERNAL_TABLE"));
     table_out->write();
+    */
 
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
