@@ -87,6 +87,16 @@ double refinePrecursorAndHeaderShift(ProteoformPtr proteo_ptr,
 
       PeakIonPairPtrVec pair_ptrs = PeakIonPairFactory::findPairs(ms_three_ptr_vec[j], c_term_peak_ptrs, bgn, end, tole);
       matched_pair_ptrs.insert(matched_pair_ptrs.end(), pair_ptrs.begin(), pair_ptrs.end());
+      /*
+      if (header_ptrs.size() == 2) {
+        LOG_DEBUG("header ptr size " << header_ptrs.size() << " bgn " << bgn << " end " << end);
+        for (size_t j = 0; j < pair_ptrs.size(); j++) {
+          LOG_DEBUG("matched " << j << " theo peak " << pair_ptrs[j]->getTheoPeakPtr()->getPosition()
+                    << " real peak " << pair_ptrs[j]->getRealPeakPtr()->getPosition()
+                    << " diff " << (pair_ptrs[j]->getRealPeakPtr()->getPosition() - pair_ptrs[j]->getTheoPeakPtr()->getPosition()) );
+        }
+      }
+      */
     }
   }
 
@@ -104,6 +114,16 @@ double refinePrecursorAndHeaderShift(ProteoformPtr proteo_ptr,
 
     PeakIonPairPtrVec pair_ptrs = PeakIonPairFactory::findPairs(ms_three_ptr_vec[j], n_term_peak_ptrs, bgn, end, tole);
     matched_pair_ptrs.insert(matched_pair_ptrs.end(), pair_ptrs.begin(), pair_ptrs.end());
+    /*
+    if (header_ptrs.size() == 2) {
+      LOG_DEBUG("header ptr size " << header_ptrs.size() << " bgn " << bgn << " end " << end);
+      for (size_t k = 0; k < pair_ptrs.size(); k++) {
+        LOG_DEBUG("matched " << k << " theo peak " << pair_ptrs[k]->getTheoPeakPtr()->getPosition()
+                  << " real peak " << pair_ptrs[k]->getRealPeakPtr()->getPosition()
+                  << " diff " << (pair_ptrs[k]->getRealPeakPtr()->getPosition() - pair_ptrs[k]->getTheoPeakPtr()->getPosition()) );
+      }
+    }
+    */
   }
 
   for (size_t i = 0; i < matched_pair_ptrs.size(); i++) {
@@ -146,7 +166,6 @@ DiagonalHeaderPtrVec refineHeadersBgnEnd(
         const ExtendMsPtrVec &ms_three_ptr_vec,
         const DiagonalHeaderPtrVec& header_ptrs,
         double min_mass){
-
     DiagonalHeaderPtrVec result_list;
     int first_res_pos = header_ptrs[0]->getTruncFirstResPos();
     int last_res_pos = header_ptrs[header_ptrs.size()-1]->getTruncLastResPos();

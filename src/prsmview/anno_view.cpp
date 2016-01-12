@@ -10,6 +10,7 @@
 #include "prsm/peak_ion_pair_util.hpp"
 #include "prsm/prsm_util.hpp"
 #include "prsmview/anno_residue.hpp"
+#include "prsmview/anno_prsm.hpp"
 #include "prsmview/anno_view.hpp"
 
 namespace prot{
@@ -48,14 +49,12 @@ std::vector<std::vector<std::string>> readViewXmlFiles(const std::string &file_n
   return file_list;
 }
 
-
-/*
 xercesc::DOMElement* proteoformToXml(XmlDOMDocument* xml_doc, const PrsmPtrVec &prsm_ptrs, 
                                      PrsmViewMngPtr mng_ptr){
   xercesc::DOMElement* proteoform_element = xml_doc->createElement("compatible_proteoform");
   //std::string str=StringUtil::convertToString(prsm_ptrs[0]->getProteoformPtr()->getSeqId());
   //xml_doc->addElement(proteoform_element, "sequence_id", str.c_str());
-  str=prsm_ptrs[0]->getProteoformPtr()->getSeqName();
+  std::string str=prsm_ptrs[0]->getProteoformPtr()->getSeqName();
   xml_doc->addElement(proteoform_element, "sequence_name", str.c_str());
   str=prsm_ptrs[0]->getProteoformPtr()->getSeqDesc();
   xml_doc->addElement(proteoform_element, "sequence_description", str.c_str());
@@ -65,11 +64,11 @@ xercesc::DOMElement* proteoformToXml(XmlDOMDocument* xml_doc, const PrsmPtrVec &
   str=StringUtil::convertToString(count);
   xml_doc->addElement(proteoform_element, "prsm_number", str.c_str());
   for(size_t i=0;i<prsm_ptrs.size();i++){
-    proteoform_element->appendChild(genePrsmView(xml_doc,prsm_ptrs[i], mng_ptr));
+    proteoform_element->appendChild(geneAnnoPrsm(xml_doc,prsm_ptrs[i], mng_ptr));
   }
   return proteoform_element;
 }
-*/
+
 
 xercesc::DOMElement* proteinToXml(XmlDOMDocument* xml_doc,
                                   const PrsmPtrVec &prsm_ptrs,

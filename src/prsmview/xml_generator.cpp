@@ -6,6 +6,7 @@
 #include "prsm/prsm_util.hpp"
 #include "prsm/prsm_species.hpp"
 #include "prsmview/anno_prsm.hpp"
+#include "prsmview/anno_view.hpp"
 #include "prsmview/xml_generator.hpp"
 
 namespace prot {

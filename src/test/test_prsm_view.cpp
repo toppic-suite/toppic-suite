@@ -37,6 +37,9 @@
 #include "tdgf/tdgf_mng.hpp"
 #include "tdgf/evalue_processor.hpp"
 
+#include "prsmview/xml_generator.hpp"
+#include "prsmview/transformer.hpp"
+
 #include "console/argument.hpp"
 
 namespace prot {
@@ -94,6 +97,7 @@ int two_ptm_process(int argc, char* argv[]) {
 
     std::vector<std::string> input_exts ;
 
+    /*
     time(&start_s);
     std::cout << "Zero PTM filtering started." << std::endl;
     ZeroPtmFilterMngPtr zero_filter_mng_ptr = ZeroPtmFilterMngPtr(new ZeroPtmFilterMng (prsm_para_ptr, "ZERO_FILTER"));
@@ -229,19 +233,26 @@ int two_ptm_process(int argc, char* argv[]) {
 
     std::cout << "Outputting table starts " << std::endl;
     PrsmTableWriterPtr table_out = PrsmTableWriterPtr(
-        new PrsmTableWriter(prsm_para_ptr, "CUTOFF_RESULT", "TWO_TABLE"));
+        new PrsmTableWriter(prsm_para_ptr, "CUTOFF_RESULT", "OUTPUT_TABLE"));
     table_out->write();
     table_out = nullptr;
     std::cout << "Outputting table finished." << std::endl;
+    */
 
-    table_out = PrsmTableWriterPtr(new PrsmTableWriter(prsm_para_ptr, "PTM_2_COMPLETE", "PTM_2_COMPLETE_TABLE"));
-    table_out->write();
-    table_out = PrsmTableWriterPtr(new PrsmTableWriter(prsm_para_ptr, "PTM_2_PREFIX", "PTM_2_PREFIX_TABLE"));
-    table_out->write();
-    table_out = PrsmTableWriterPtr(new PrsmTableWriter(prsm_para_ptr, "PTM_2_SUFFIX", "PTM_2_SUFFIX_TABLE"));
-    table_out->write();
-    table_out = PrsmTableWriterPtr(new PrsmTableWriter(prsm_para_ptr, "PTM_2_INTERNAL", "PTM_2_INTERNAL_TABLE"));
-    table_out->write();
+    time(&start_s);
+    std::cout << "Generating view xml files started." << std::endl;
+    XmlGeneratorPtr xml_gene = XmlGeneratorPtr(new XmlGenerator(prsm_para_ptr, exe_dir, "CUTOFF_RESULT"));
+    xml_gene->process();
+    xml_gene = nullptr;
+    std::cout << "Generating view xml files finished." << std::endl;
+
+    /*
+    std::cout << "Converting xml files to html files started." << std::endl;
+    translate(arguments);
+    std::cout << "Converting xml files to html files finished." << std::endl;
+    time(&stop_s);
+    std::cout <<  "Html generation running time: " << difftime(stop_s, start_s) << " seconds " << std::endl;
+    */
 
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;

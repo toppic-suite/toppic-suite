@@ -249,7 +249,7 @@ AnnoSegmentPtrVec removeEmptySegment(AnnoSegmentPtrVec &segment_ptrs) {
   return selected_segment_ptrs;
 }
 
-xercesc::DOMElement* geneProteinView(XmlDOMDocument* xml_doc,
+xercesc::DOMElement* geneAnnoProteoform(XmlDOMDocument* xml_doc,
                                      PrsmPtr prsm_ptr,
                                      PrsmViewMngPtr mng_ptr, double err) {
   ProteoformPtr proteoform_ptr = prsm_ptr->getProteoformPtr();
