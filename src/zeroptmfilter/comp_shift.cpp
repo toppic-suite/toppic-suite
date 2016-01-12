@@ -568,6 +568,7 @@ inline void CompShift::findTopDiagScores(std::vector<short> &scores, int num) {
   //LOG_DEBUG("num " << num << " Single type num " << single_type_num);
   double threshold = 4.0;
   addResults(top_diag_prots_, diag_scores, threshold, num);
+  //LOG_DEBUG("top diag size " << top_diag_prots_.size());
 }
 
 } /* namespace prot */

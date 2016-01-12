@@ -36,7 +36,7 @@ class CompShift {
   FilterProteinPtrVec getTopSuffProts() {return top_suff_prots_;}
   FilterProteinPtrVec getTopInternalProts() {return top_internal_prots_;}
 
-  FilterProteinPtrVec getTopDiagProts() {return top_comp_prots_;}
+  FilterProteinPtrVec getTopDiagProts() {return top_diag_prots_;}
 
  private:
   int scale_;
