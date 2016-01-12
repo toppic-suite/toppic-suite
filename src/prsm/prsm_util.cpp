@@ -55,6 +55,15 @@ std::vector<int> PrsmUtil::getSpeciesIds(const PrsmPtrVec &prsm_ptrs, std::strin
   return species_ids;
 }
 
+int PrsmUtil::getProteinId(const PrsmPtrVec &prsm_ptrs, std::string &seq_name){
+  for(size_t i=0;i<prsm_ptrs.size();i++){
+    if(prsm_ptrs[i]->getProteoformPtr()->getSeqName() == seq_name){
+      return prsm_ptrs[i]->getProteoformPtr()->getProtId();
+    }
+  }
+  return -1;
+}
+
 std::vector<int> PrsmUtil::getSpeciesIds(const PrsmPtrVec &prsm_ptrs){
   std::vector<int> species_ids;
   for(size_t i=0;i<prsm_ptrs.size();i++){

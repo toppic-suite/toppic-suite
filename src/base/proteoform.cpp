@@ -45,6 +45,7 @@ void Proteoform::parseXml(xercesc::DOMElement* element, ProteoformPtr form_ptr) 
   start_pos_ = XmlDomUtil::getIntChildValue(element, "start_pos", 0);
   end_pos_ = XmlDomUtil::getIntChildValue(element, "end_pos", 0);
   species_id_ = XmlDomUtil::getIntChildValue(element, "species_id", 0);
+  prot_id_ = XmlDomUtil::getIntChildValue(element, "prot_id", 0);
 
   //LOG_DEBUG("start parse prot mod");
   std::string pm_element_name = ProtMod::getXmlElementName();
@@ -258,6 +259,8 @@ void Proteoform::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent) 
   xml_doc->addElement(element, "end_pos", str.c_str());
   str = StringUtil::convertToString(species_id_);
   xml_doc->addElement(element, "species_id", str.c_str());
+  str = StringUtil::convertToString(prot_id_);
+  xml_doc->addElement(element, "prot_id", str.c_str());
 
   element_name = Change::getXmlElementName() + "_list";
   xercesc::DOMElement* cl = xml_doc->createElement(element_name.c_str());

@@ -18,16 +18,16 @@ namespace prot{
 
 void addSummary(XmlDOMDocument* xml_doc, xercesc::DOMElement *prot_element, 
                 ProteoformPtr proteoform_ptr, PrsmViewMngPtr mng_ptr) {
-  //std::string str=StringUtil::convertToString(proteoform_ptr->getSeqId());
-  //xml_doc->addElement(prot_element, "sequence_id", str.c_str());
-  std::string str=StringUtil::convertToString(proteoform_ptr->getSpeciesId());
+  std::string str=StringUtil::convertToString(proteoform_ptr->getProtId());
+  xml_doc->addElement(prot_element, "sequence_id", str.c_str());
+  str=StringUtil::convertToString(proteoform_ptr->getSpeciesId());
   xml_doc->addElement(prot_element, "proteoform_id", str.c_str());
   str=proteoform_ptr->getSeqName();
   xml_doc->addElement(prot_element, "sequence_name", str.c_str());
   str=proteoform_ptr->getSeqDesc();
   xml_doc->addElement(prot_element, "sequence_description", str.c_str());
   double mass = proteoform_ptr->getMass();
-  str=StringUtil::convertToString(mass, mng_ptr->decimal_point_num_);
+  str=StringUtil::convertToString(mass, mng_ptr->precise_point_num_);
   xml_doc->addElement(prot_element, "proteoform_mass", str.c_str());
   str=StringUtil::convertToString(proteoform_ptr->getProtModPtr()->isAcetylation());
   xml_doc->addElement(prot_element, "n_acetylation", str.c_str());

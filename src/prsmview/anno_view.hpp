@@ -31,6 +31,7 @@ xercesc::DOMElement* proteoformToXml(XmlDOMDocument* xml_doc, const PrsmPtrVec &
 xercesc::DOMElement* proteinToXml(XmlDOMDocument* xml_doc,
                                   const PrsmPtrVec &prsm_ptrs,
                                   FastaSeqPtr seq_ptr,
+                                  int prot_id,
                                   const std::vector<int> &species_ids,
                                   PrsmViewMngPtr mng_ptr);
 

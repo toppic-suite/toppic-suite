@@ -20,6 +20,8 @@ class PrsmUtil {
   static PrsmPtrVec selectSpeciesPrsms(const PrsmPtrVec &prsm_ptrs,int species_id);
 
   static std::vector<int> getSpeciesIds(const PrsmPtrVec &prsm_ptrs, std::string &seq_name);
+  
+  static int getProteinId(const PrsmPtrVec &prsm_ptrs, std::string &seq_name);
 
   static std::vector<int> getSpeciesIds(const PrsmPtrVec &prsm_ptrs);
 
