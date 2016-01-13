@@ -31,7 +31,7 @@ void Argument::initArguments() {
   arguments_["local_threshold"] = "0.9";
   arguments_["groupSpectrumNumber"] = "1";
   arguments_["filteringResultNumber"] = "20";
-  //arguments_["residueModFileName"]="";
+  arguments_["residueModFileName"]="";
 }
 
 void Argument::outputArguments(std::ofstream &output) {
@@ -136,16 +136,17 @@ bool Argument::parse(int argc, char* argv[]) {
         ("ptm-number,p", po::value<std::string> (&ptm_num), "<0|1|2>. Maximum number of unexpected post-translational modifications in a proteoform-spectrum-match. Default value: 2.")
         ("cutoff-type,t", po::value<std::string> (&cutoff_type), "<EVALUE|FDR>. Cutoff type for reporting protein-spectrum-matches. Default value: EVALUE.")
         ("cutoff-value,v", po::value<std::string> (&cutoff_value), "<positive number>. Cutoff value for reporting protein-spectrum-matches. Default value: 0.01.")
+        ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "Variable PTM file name.")
         ("generating-function,g", "Use the generating function approach to calculate p-values and E-values.")
+        ("group-number,r", po::value<std::string> (&group_num), "Specify the number of spectra in a group. Default value: 1.")
         ("local-threshold,s", po::value<std::string> (&local_threshold), "<positive double value>. Threshold value for reporting PTM localization. Default value: 0.9.");
     po::options_description desc("Options");
 
     desc.add_options() 
         ("help,h", "Print the help message.") 
-        ("argument-file,r",po::value<std::string>(&argument_file_name),"Argument file name.")
+        ("argument-file,c",po::value<std::string>(&argument_file_name),"Argument file name.")
         ("activation,a", po::value<std::string>(&activation),
-         "<CID|HCD|ETD|FILE>. The activation type of tandem mass spectra. When FILE is used, the activation type information is given in spectral data file. Default value: FILE.")
-
+         "<CID|HCD|ETD|FILE>. Activation type of tandem mass spectra. When FILE is used, the activation type information is given in spectral data file. Default value: FILE.")
         ("fixed-mod,f", po::value<std::string> (&fixed_mod), 
          "Fixed modifications: C57: Carbamidoemetylation, C58:Carboxymethylation, or a fixed modification file name.")
         ("decoy,d", "Use a decoy protein database to estimate false discovery rates.")
@@ -263,15 +264,15 @@ bool Argument::parse(int argc, char* argv[]) {
     std::cerr << "Unhandled Exception in parsing command line"<<e.what()<<", application will now exit"<<std::endl;
     return false;
   }
-  
+
   /*
-  std::cout <<"*** Parameters begin ***" << std::endl;
-  for(std::map<std::string, std::string>::const_iterator it = arguments_.begin();
-      it != arguments_.end(); ++it) {
-        std::cout << it->first << " " << it->second << std::endl;
-  }
-  std::cout <<"*** Parameters end ***" << std::endl;
-  */
+     std::cout <<"*** Parameters begin ***" << std::endl;
+     for(std::map<std::string, std::string>::const_iterator it = arguments_.begin();
+     it != arguments_.end(); ++it) {
+     std::cout << it->first << " " << it->second << std::endl;
+     }
+     std::cout <<"*** Parameters end ***" << std::endl;
+     */
 
   return validateArguments();
 }
@@ -293,12 +294,12 @@ bool Argument::validateArguments() {
     return false;
   }
   /*
-  std::string protection = arguments_["cysteineProtection"];
-  if(protection != "C0" && protection != "C57" && protection != "C58") {
-    LOG_ERROR("Cysteine protection group " << protection <<" error! The value should be C0|C57|C58!");
-    return false;
-  }
-  */
+     std::string protection = arguments_["cysteineProtection"];
+     if(protection != "C0" && protection != "C57" && protection != "C58") {
+     LOG_ERROR("Cysteine protection group " << protection <<" error! The value should be C0|C57|C58!");
+     return false;
+     }
+     */
   std::string search_type = arguments_["searchType"];
   if(search_type != "TARGET" && search_type != "TARGET+DECOY"){
     LOG_ERROR("Search type " << search_type << " error! The value should be TARGET|TARGET+DECOY!");
@@ -309,7 +310,7 @@ bool Argument::validateArguments() {
     LOG_ERROR("PTM number "<< ptm_number <<" error! The value should be 0|1|2!");
     return false;
   }
-  
+
   std::string cutoff_type = arguments_["cutoffType"];
   if (cutoff_type != "EVALUE" && cutoff_type != "FDR") {
     LOG_ERROR("Cutoff type " << cutoff_type << " error! The value should be EVALUE|FDR");
