@@ -10,6 +10,7 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/graphviz.hpp>
 
+#include "base/ptm_base.hpp"
 #include "base/residue.hpp"
 #include "base/change.hpp"
 #include "base/logger.hpp"
@@ -85,7 +86,7 @@ class EdgeInfoWriter {
     if (e[v].res_ptr_ != nullptr) {
       out << e[v].res_ptr_->getAcidPtr()->getOneLetter();
       PtmPtr ptm_ptr = e[v].res_ptr_->getPtmPtr();
-      if (!ptm_ptr->isEmpty()) {
+      if (!PtmBase::isEmptyPtmPtr(ptm_ptr)) {
         out << "[" << ptm_ptr->getAbbrName() << "]";
       }
       out << ":";

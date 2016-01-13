@@ -2,7 +2,7 @@
 #define PROT_GRAPH_ALIGN_HPP_
 
 #include "prsm/prsm.hpp"
-#include "ptmsearch/diagonal_header.hpp"
+#include "oneptmsearch/diagonal_header.hpp"
 #include "graph/graph.hpp"
 #include "graph/proteo_graph.hpp"
 #include "graph/spec_graph.hpp"

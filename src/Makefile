@@ -20,8 +20,8 @@ all:
 	cd tdgf; make
 	cd prsmview; make	
 	cd console; make
-#	cd graph; make
-#	cd graphalign; make
+	cd graph; make
+	cd graphalign; make
 	cd test; make
 
 clean:

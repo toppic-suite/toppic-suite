@@ -21,9 +21,9 @@ namespace prot {
 class ProteoAnno {
 
  public:
-  ProteoAnno(const ResiduePtrVec &fix_mod_res_ptr_vec, 
+  ProteoAnno(const ModPtrVec &fix_mod_ptr_vec, 
              const ProtModPtrVec &prot_mod_ptr_vec, 
-             const ResiduePtrVec &residue_mod_ptr_vec);
+             const ModPtrVec &var_mod_ptr_vec);
 
   void anno(const std::string &seq);
 
@@ -40,9 +40,9 @@ class ProteoAnno {
   ResiduePtrVec2D res_vec_2d_;
   std::vector<std::vector<int>> change_vec_2d_;
 
-  ResiduePtrVec fix_mod_res_ptr_vec_;
+  ModPtrVec fix_mod_ptr_vec_;
   ProtModPtrVec prot_mod_ptr_vec_;
-  ResiduePtrVec residue_mod_ptr_vec_;
+  ModPtrVec var_mod_ptr_vec_;
 
   std::map<AcidPtr, ResiduePtrVec> ptm_map_;
   bool is_nme_;

@@ -1,5 +1,7 @@
-#include "ptmsearch/diagonal.hpp"
-#include "ptmsearch/diagonal_header.hpp"
+#include "base/proteoform_factory.hpp"
+#include "spec/extend_ms_factory.hpp"
+#include "oneptmsearch/diagonal.hpp"
+#include "oneptmsearch/diagonal_header.hpp"
 #include "graph/graph_util.hpp"
 #include "graphalign/graph_align_processor.hpp"
 #include "graphalign/graph_align.hpp"
@@ -274,13 +276,13 @@ GraphResultNodePtrVec GraphAlign::backtrace(int s, int m) {
     }
   }
   LOG_DEBUG("obtained result node ptr vec");
-  DbResSeqPtr db_res_seq_ptr = proteo_graph_ptr_->getDbResSeqPtr();
+  ResSeqPtr res_seq_ptr = proteo_graph_ptr_->getProteoformPtr()->getResSeqPtr();
   for (int i = 0; i < (int)results.size() - 1; i++) {
       int p_cur_idx = results[i]->getFirstIdx();
       int s_cur_idx = results[i]->getSecondIdx();
       int p_prev_idx = results[i+1]->getFirstIdx();
       int s_prev_idx = results[i+1]->getSecondIdx();
-      ResSeqPtr sub_seq_ptr = db_res_seq_ptr->getSubResidueSeq(p_prev_idx, p_cur_idx -1);
+      ResSeqPtr sub_seq_ptr = res_seq_ptr->getSubResidueSeq(p_prev_idx, p_cur_idx -1);
       double cur_pos = spec_graph_ptr_->getPrmPeakPtr(s_cur_idx)->getPosition();
       double prev_pos = spec_graph_ptr_->getPrmPeakPtr(s_prev_idx)->getPosition();
       double dist = cur_pos - prev_pos;
@@ -339,7 +341,7 @@ void GraphAlign::getNodeDiagonals(int s, int m) {
   }
   nodes_2d_.push_back(cur_vec);
 
-  DbResSeqPtr db_res_seq_ptr = proteo_graph_ptr_->getDbResSeqPtr();
+  ResSeqPtr res_seq_ptr = proteo_graph_ptr_->getProteoformPtr()->getResSeqPtr();
   for (size_t i = 0; i < nodes_2d_.size(); i++) {
     for (size_t j = 0; j < nodes_2d_[i].size(); j++) {
       int p_idx = nodes_2d_[i][j]->getFirstIdx();
@@ -478,7 +480,7 @@ void  GraphAlign::geneHeaders() {
   for (size_t i = 0; i < diag_headers_.size(); i++) {
     double n_shift = diag_headers_[i]->getProtNTermShift();
     double prec_mono_mass = spec_graph_ptr_->getSpectrumSetPtr()->getPrecMonoMass();
-    double c_shift = prec_mono_mass - proteo_graph_ptr_->getDbResSeqPtr()->getSeqMass() - n_shift;
+    double c_shift = prec_mono_mass - proteo_graph_ptr_->getProteoformPtr()->getResSeqPtr()->getSeqMass() - n_shift;
     diag_headers_[i]->initHeader(c_shift, proteo_graph_ptr_->getProteoformPtr(), mng_ptr_->align_prefix_suffix_shift_thresh_);
     LOG_DEBUG("header " << i << " n shift " << n_shift );
   }
@@ -515,20 +517,22 @@ PrsmPtr GraphAlign::geneResult(int s, int m){
   LOG_DEBUG("last pos " << last_pos);
   ProteoformPtr proteo_ptr = proteo_graph_ptr_->getProteoformPtr();
 
-  ProteoformPtr sub_proteo_ptr  = getSubProteoform(proteo_ptr, first_pos, last_pos);
+  ProteoformPtr sub_proteo_ptr  = ProteoformFactory::geneSubProteoform(proteo_ptr, first_pos, last_pos);
 
   LOG_DEBUG("get sub proteo first pos " << first_pos << " last pos " << last_pos);
   SpParaPtr sp_para_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr();
   ExtendMsPtrVec ms_three_ptr_vec = spec_graph_ptr_->getSpectrumSetPtr()->getMsThreePtrVec();
   double min_mass = sp_para_ptr->getMinMass();
+  double ppo = sp_para_ptr->getPeakTolerancePtr()->getPpo();
   LOG_DEBUG("begin refine");
   double refine_prec_mass = refinePrecursorAndHeaderShift(proteo_ptr, ms_three_ptr_vec, 
-                                                          diag_headers_, min_mass, 
+                                                          diag_headers_, ppo, min_mass, 
                                                           mng_ptr_->refine_prec_step_width_);
   LOG_DEBUG("get reine prec mass" << refine_prec_mass);
   
   DeconvMsPtrVec deconv_ms_ptr_vec = spec_graph_ptr_->getSpectrumSetPtr()->getDeconvMsPtrVec();
-  ExtendMsPtrVec refine_ms_ptr_vec = createMsThreePtrVec(deconv_ms_ptr_vec,  sp_para_ptr, refine_prec_mass);
+  ExtendMsPtrVec refine_ms_ptr_vec 
+      = ExtendMsFactory::geneMsThreePtrVec(deconv_ms_ptr_vec,  sp_para_ptr, refine_prec_mass);
   
   DiagonalHeaderPtrVec2D refined_headers_2d = refineHeadersBgnEnd(
       proteo_ptr, refine_ms_ptr_vec, diag_headers_2d_, diag_headers_, min_mass);
@@ -538,18 +542,18 @@ PrsmPtr GraphAlign::geneResult(int s, int m){
   }
 
   DiagonalHeaderPtrVec refined_headers;
-  std::vector<int> change_types;
+  std::vector<ChangeTypePtr> change_types;
   for (size_t i = 0; i < refined_headers_2d.size(); i++) {
     for (size_t j = 0; j < refined_headers_2d[i].size(); j++) {
       refined_headers.push_back(refined_headers_2d[i][j]);
       if (i == 0 and j == 0) {
-        change_types.push_back(-1);
+        change_types.push_back(nullptr);
       }
       else if (j == 0)  {
-        change_types.push_back(Change::getUnexpectedChange());
+        change_types.push_back(ChangeType::UNEXPECTED);
       }
       else {
-        change_types.push_back(Change::getVariableChange());
+        change_types.push_back(ChangeType::VARIABLE);
       }
       LOG_DEBUG("i " << i << " j " << j << " type " << change_types[change_types.size()-1]);
     }
@@ -557,9 +561,11 @@ PrsmPtr GraphAlign::geneResult(int s, int m){
 
   ChangePtrVec changes = getDiagonalMassChanges(refined_headers, first_pos, last_pos, 
                                                 change_types);
+  /*
   for (size_t i = 0; i < changes.size(); i++) {
     LOG_DEBUG("change " << i << " start " << changes[i]->getLeftBpPos() << " end " << changes[i]->getRightBpPos() << " type " << changes[i]->getChangeType());
   }
+  */
   sub_proteo_ptr->addChangePtrVec(changes);
 
   return PrsmPtr(new Prsm(sub_proteo_ptr, deconv_ms_ptr_vec, refine_prec_mass,

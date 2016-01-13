@@ -4,18 +4,18 @@
 namespace prot {
 
 ProteoGraphReader::ProteoGraphReader(const std::string &db_file_name,
-                                     const ResiduePtrVec &fix_mod_res_ptr_vec, 
+                                     const ModPtrVec &fix_mod_ptr_vec, 
                                      const ProtModPtrVec &prot_mod_ptr_vec,
-                                     const ResiduePtrVec &residue_mod_ptr_vec,
+                                     const ModPtrVec &var_mod_ptr_vec,
                                      double convert_ratio, int max_mod_num,
                                      int max_ptm_sum_mass) {
-  fix_mod_res_ptr_vec_ = fix_mod_res_ptr_vec;
+  fix_mod_ptr_vec_ = fix_mod_ptr_vec;
   convert_ratio_ = convert_ratio;
   max_mod_num_ = max_mod_num;
   max_ptm_sum_mass_ = max_ptm_sum_mass;
   reader_ptr_ = FastaReaderPtr(new FastaReader(db_file_name));
   proteo_anno_ptr_ = ProteoAnnoPtr(
-          new ProteoAnno(fix_mod_res_ptr_vec, prot_mod_ptr_vec, residue_mod_ptr_vec));
+          new ProteoAnno(fix_mod_ptr_vec, prot_mod_ptr_vec, var_mod_ptr_vec));
 }
 
 MassGraphPtr ProteoGraphReader::getMassGraphPtr() {
@@ -48,13 +48,15 @@ ProteoGraphPtr ProteoGraphReader::getNextProteoGraphPtr() {
   LOG_DEBUG("name " << seq_ptr->getName() << " seq " << seq_ptr->getSeq());
   proteo_anno_ptr_->anno(seq_ptr->getSeq());
   MassGraphPtr graph_ptr = getMassGraphPtr(); 
+  /*
   LOG_DEBUG("graph complete");
   AcidPtrVec acid_seq = AcidFactory::convertSeqToAcidSeq(seq_ptr->getSeq());
   ResiduePtrVec residue_ptrs = convertAcidToResidueSeq(fix_mod_res_ptr_vec_, acid_seq);
   DbResSeqPtr db_residue_seq_ptr(
       new DbResidueSeq(residue_ptrs, seq_id_, seq_ptr->getName(), seq_ptr->getDesc())); 
+      */
   seq_id_++;
-  return ProteoGraphPtr(new ProteoGraph(db_residue_seq_ptr, graph_ptr, 
+  return ProteoGraphPtr(new ProteoGraph(seq_ptr, fix_mod_ptr_vec_, graph_ptr, 
                                         proteo_anno_ptr_->isNme(),
                                         convert_ratio_, max_mod_num_,
                                         max_ptm_sum_mass_));

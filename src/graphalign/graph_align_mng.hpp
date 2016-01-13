@@ -10,12 +10,12 @@ namespace prot {
 class GraphAlignMng {
  public:
   GraphAlignMng(PrsmParaPtr prsm_para_ptr, 
-                const std::string &residue_mod_file_name,
+                const std::string &var_mod_file_name,
                 int n_unknown_shift,
                 int max_known_mods,
                 const std::string &output_file_ext) {
     prsm_para_ptr_ = prsm_para_ptr;
-    residue_mod_file_name_ = residue_mod_file_name;
+    var_mod_file_name_ = var_mod_file_name;
     n_unknown_shift_ = n_unknown_shift;
     max_known_mods_ = max_known_mods;
     output_file_ext_ = output_file_ext;
@@ -23,7 +23,7 @@ class GraphAlignMng {
 
   PrsmParaPtr prsm_para_ptr_;
 
-  std::string residue_mod_file_name_;
+  std::string var_mod_file_name_;
 
   // set it to 1 for testing 
   double error_tolerance_ = 0.1;
