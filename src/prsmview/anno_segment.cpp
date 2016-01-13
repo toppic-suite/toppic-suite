@@ -39,13 +39,15 @@ std::string AnnoSegment::getResidueAnno() {
     anno_ += "PTM: Unknown\n";
     anno_ += "Site: " + occurences_[0].second + StringUtil::convertToString(occurences_[0].first);
     anno_ += " - ";
-    anno_ += occurences_[1].second + StringUtil::convertToString(occurences_[1].first) + " ";
+    anno_ += occurences_[occurences_.size() - 1].second;
+    anno_ += StringUtil::convertToString(occurences_[occurences_.size() - 1].first) + " ";
     double tmp = std::accumulate(score_.begin(), score_.end(), 0.0);
     anno_ += "Confidence: " + StringUtil::convertToString(tmp * 100, 4) + "%";	  
     if (occurences_.size() > 0) {
       occu_ += occurences_[0].second + StringUtil::convertToString(occurences_[0].first);
       occu_ += " - ";
-      occu_ += occurences_[1].second + StringUtil::convertToString(occurences_[1].first);
+      occu_ += occurences_[occurences_.size() - 1].second;
+      occu_ += StringUtil::convertToString(occurences_[occurences_.size() - 1].first);
     }
   }
   return anno_;
