@@ -62,15 +62,15 @@ SpecGraphPtrVec SpecGraphReader::getNextSpecGraphPtrVec(int error) {
 
   DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
   //LOG_DEBUG("deconv ms size " << deconv_ms_ptr_vec.size());
-  double prec_mono_mass = deconv_ms_ptr_vec[0]->getHeaderPtr()->getPrecMonoMass();
+  double prec_mono_mass = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMass();
   //LOG_DEBUG("prec_mono_mass  " << prec_mono_mass);
   if (spec_set_ptr->isValid()) {
     LOG_DEBUG("valid");
     for (size_t i = 0; i < prec_errors.size(); i++) {
-      SpectrumSetPtr adjusted_spec_set_ptr 
-          = getSpectrumSet(deconv_ms_ptr_vec, sp_para_ptr_, prec_mono_mass + prec_errors[i]);
+      SpectrumSetPtr adjusted_spec_set_ptr(
+          new SpectrumSet(deconv_ms_ptr_vec, sp_para_ptr_, prec_mono_mass + prec_errors[i]));
       PrmMsPtrVec ms_six_vec = adjusted_spec_set_ptr->getMsSixPtrVec();
-      PrmPeakPtrVec peak_vec = getPrmPeakPtrs(ms_six_vec, sp_para_ptr_->getPeakTolerancePtr());
+      PrmPeakPtrVec peak_vec = PrmMs::getPrmPeakPtrs(ms_six_vec, sp_para_ptr_->getPeakTolerancePtr());
       MassGraphPtr graph_ptr = getMassGraphPtr(peak_vec); 
       LOG_DEBUG("graph complete");
       SpecGraphPtr spec_graph_ptr = SpecGraphPtr(new SpecGraph(adjusted_spec_set_ptr, peak_vec, graph_ptr, convert_ratio_));

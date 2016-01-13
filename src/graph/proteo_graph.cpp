@@ -1,17 +1,21 @@
 #include "base/logger.hpp"
+#include "base/change_type.hpp"
 #include "base/fasta_reader.hpp"
+#include "base/residue_seq.hpp"
+#include "base/proteoform_factory.hpp"
 #include "graph/graph_util.hpp"
 #include "graph/proteo_graph.hpp"
 
 namespace prot {
 
-ProteoGraph::ProteoGraph(DbResSeqPtr db_res_seq_ptr,
+ProteoGraph::ProteoGraph(FastaSeqPtr fasta_seq_ptr,
+                         ModPtrVec fix_mod_ptr_vec,
                          MassGraphPtr graph_ptr,
                          bool is_nme,
                          double convert_ratio,
                          int max_mod_num,
                          int max_ptm_sum_mass) {
-  db_proteo_ptr_ = getDbProteoformPtr(db_res_seq_ptr);
+  db_proteo_ptr_ = ProteoformFactory::geneDbProteoformPtr(fasta_seq_ptr, fix_mod_ptr_vec);
   graph_ptr_ = graph_ptr;
   is_nme_ = is_nme;
   node_num_ = num_vertices(*graph_ptr.get());
@@ -32,13 +36,13 @@ int ProteoGraph::getSeqMass(int v1, int v2) {
 }
 
 void ProteoGraph::compSeqMasses(double convert_ratio) {
-  DbResSeqPtr db_res_seq_ptr = db_proteo_ptr_->getDbResSeqPtr();
+  ResSeqPtr res_seq_ptr = db_proteo_ptr_->getResSeqPtr();
   seq_masses_= std::vector<int>(pair_num_, 0);
   for (int i = 0; i < node_num_; i ++) {
     int mass = 0;
     for (int j = i+1; j < node_num_; j++) {
       int cur_mass 
-          = std::round(db_res_seq_ptr->getResiduePtr(j-1)->getMass() * convert_ratio) ;
+          = std::round(res_seq_ptr->getResiduePtr(j-1)->getMass() * convert_ratio) ;
       mass += cur_mass;
       int index = getVecIndex(i, j);
       seq_masses_[index] = mass;
@@ -78,14 +82,15 @@ void ProteoGraph::compDistances(double convert_ratio, int max_mod_num, int max_p
           int d =(*g_p)[e].int_mass_;
           int change = (*g_p)[e].change_type_;
           for (int k = 0; k < max_mod_num + 1; k++) {
-            if (k == max_mod_num && (change == Change::getProteinVariableChange() || change == Change::getVariableChange())) {
+            if (k == max_mod_num && 
+                (change == ChangeType::PROTEIN_VARIABLE->getId() || change == ChangeType::VARIABLE->getId())) {
               continue;
             }
             for (std::set<int>::iterator it=dist_vecs[pre_index][k].begin(); 
                  it!=dist_vecs[pre_index][k].end(); it++) {
               int new_d = d + *it;
               if (std::abs(new_d - seq_masses_[index]) <= max_ptm_sum_mass) {
-                if (change == Change::getProteinVariableChange() || change == Change::getVariableChange()) {
+                if (change == ChangeType::PROTEIN_VARIABLE->getId() || change == ChangeType::VARIABLE->getId()) {
                   dist_vecs[index][k+1].insert(new_d);
                 }
                 else {

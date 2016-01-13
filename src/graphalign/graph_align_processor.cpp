@@ -1,4 +1,5 @@
-#include "prsm/prsm_writer.hpp"
+#include "base/file_util.hpp"
+#include "prsm/prsm_xml_writer.hpp"
 #include "graph/graph_util.hpp"
 #include "graph/proteo_graph_reader.hpp"
 #include "graph/spec_graph_reader.hpp"
@@ -18,16 +19,18 @@ void GraphAlignProcessor::process() {
   std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
   LOG_DEBUG("Search db file name " << db_file_name);
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
-  std::string residue_mod_file_name = mng_ptr_->residue_mod_file_name_;
-  LOG_DEBUG("start reading " << residue_mod_file_name);
-  ResiduePtrVec residue_mod_ptr_vec 
-      = ResidueFactory::getResiduePtrVecInstance(residue_mod_file_name);
-  LOG_DEBUG("end reading " << residue_mod_file_name);
+  std::string var_mod_file_name = mng_ptr_->var_mod_file_name_;
+  LOG_DEBUG("start reading " << var_mod_file_name);
+  ModPtrVec var_mod_ptr_vec; 
+
+  //*** to complete = ResidueFactory::getResiduePtrVecInstance(residue_mod_file_name);
+  //
+  LOG_DEBUG("end reading " << var_mod_file_name);
 
   ProteoGraphReader reader(db_file_name, 
-                           prsm_para_ptr->getFixModResiduePtrVec(),
-                           prsm_para_ptr->getAllowProtModPtrVec(),
-                           residue_mod_ptr_vec,
+                           prsm_para_ptr->getFixModPtrVec(),
+                           prsm_para_ptr->getProtModPtrVec(),
+                           var_mod_ptr_vec,
                            mng_ptr_->convert_ratio_,
                            mng_ptr_->max_known_mods_,
                            mng_ptr_->getIntMaxPtmSumMass());
@@ -41,8 +44,8 @@ void GraphAlignProcessor::process() {
   }
   writeToDot("proteo.dot", proteo_ptrs[0]->getMassGraphPtr());
   LOG_DEBUG("Prot graph number " << count);
-  std::string output_file_name = basename(sp_file_name)+"."+mng_ptr_->output_file_ext_;
-  PrsmWriter prsm_writer(output_file_name);
+  std::string output_file_name = FileUtil::basename(sp_file_name)+"."+mng_ptr_->output_file_ext_;
+  PrsmXmlWriter prsm_writer(output_file_name);
 
   LOG_DEBUG("start init spec reader");
   SpecGraphReader spec_reader(sp_file_name, 
