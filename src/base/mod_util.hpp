@@ -7,7 +7,9 @@ namespace prot {
 
 class ModUtil {
  public:
-  static ModPtrVec readMod(const std::string &file_name);
+  static ModPtrVec readModXml(const std::string &file_name);
+
+  static std::vector<ModPtrVec> readModTxt(const std::string &file_name);
 
   static ModPtrVec geneFixedModList(const std::string &str);
 

@@ -147,6 +147,19 @@ void Proteoform::addChangePtrVec(ChangePtrVec &new_changes) {
   change_list_.insert(change_list_.end(), new_changes.begin(), new_changes.end());
 }
 
+void Proteoform::addChangePtr(ChangePtr &change_ptr) {
+  change_list_.push_back(change_ptr);
+}
+
+void Proteoform::rmChangePtr(ChangePtr &change_ptr) {
+  for (auto iter = change_list_.begin(); iter != change_list_.end(); iter++) {
+    if (*iter == change_ptr) {
+      change_list_.erase(iter);
+      return;
+    }
+  }
+}
+
 // get several segments without unexpected PTMs from a proteoform 
 SegmentPtrVec Proteoform::getSegmentPtrVec() {
   ChangePtrVec changes;

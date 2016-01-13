@@ -29,14 +29,14 @@ inline DiagonalHeaderPtrVec PtmSlowMatch::getNTermShiftListCommonHeaders() {
   std::vector<std::pair<int,int>> sp_masses_toles 
       = PrmMs::getIntMassErrorList(ms_six_ptr_vec_,tole_ptr,scale,true,false);
 
-  auto start = std::chrono::high_resolution_clock::now();
+  //auto start = std::chrono::high_resolution_clock::now();
   std::vector<double> best_shifts = comp_shift_ptr_->findBestShift(
       sp_masses_toles,
       proteo_ptr_->getBpSpecPtr()->getScaledPrmMasses(scale),
       mng_ptr_->n_top_diagonals_,
       mng_ptr_->min_diagonal_gap_,
       scale);
-  auto step_1 = std::chrono::high_resolution_clock::now();
+  //auto step_1 = std::chrono::high_resolution_clock::now();
   //std::cout << "Compute best shifts: " << std::chrono::duration_cast<std::chrono::nanoseconds>(step_1-start).count() << "\t";
 
   DiagonalHeaderPtrVec header_ptrs;
@@ -117,9 +117,9 @@ inline DiagonalHeaderPtrVec PtmSlowMatch::geneNTermShiftHeaders() {
   // if not complete alignment, find best shifts
   if (align_type_ptr_ != AlignType::COMPLETE) {
 
-    auto start = std::chrono::high_resolution_clock::now();
+    //auto start = std::chrono::high_resolution_clock::now();
     DiagonalHeaderPtrVec common_header_ptrs = getNTermShiftListCommonHeaders();
-    auto step_1 = std::chrono::high_resolution_clock::now();
+    //auto step_1 = std::chrono::high_resolution_clock::now();
     ///std::cout << "Compute N-term shifts: " << std::chrono::duration_cast<std::chrono::nanoseconds>(step_1-start).count() << "\t";
 
     if (align_type_ptr_ == AlignType::SUFFIX || align_type_ptr_ == AlignType::INTERNAL) {

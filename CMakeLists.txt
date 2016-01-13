@@ -47,9 +47,9 @@ file(GLOB PRSM_VIEW_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/prsmview/*.cpp)
 file(GLOB LOCAL_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/local/*.cpp)
 file(GLOB ARGU_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/argument.cpp)
 file(GLOB MAIN_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic.cpp) 
-file(GLOB SUMMARY_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/summary.cpp) 
-file(GLOB GRAPH_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/graph/*.cpp)
-file(GLOB GRAPH_ALIGN_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/graphalign/*.cpp)
+#file(GLOB SUMMARY_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/summary.cpp) 
+#file(GLOB GRAPH_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/graph/*.cpp)
+#file(GLOB GRAPH_ALIGN_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/graphalign/*.cpp)
 file(GLOB TEST_ZERO_PTM_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_zero_ptm.cpp) 
 file(GLOB TEST_DIAG_FILTER_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_diag_filter.cpp) 
 file(GLOB TEST_PTM_SEARCH_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_ptm_search.cpp) 
@@ -60,7 +60,7 @@ file(GLOB TEST_BSE_OPT ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_base_opt.cpp)
 
 add_executable(toppic ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
     ${ZERO_PTM_SRCS} ${ZERO_PTM_FILTER} ${DIAG_FILTER_SRCS} ${ONE_PTM_FILTER_SRCS} ${ONE_PTM_SEARCH_SRCS}
-    ${PTM_SRCS} ${TDGF_SRCS} ${PRSM_VIEW_SRCS} ${ARGU_SRCS} ${MAIN_SRCS})
+    ${PTM_SRCS} ${TDGF_SRCS} ${LOCAL_SRCS} ${PRSM_VIEW_SRCS} ${ARGU_SRCS} ${MAIN_SRCS})
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     # Windows specific code
