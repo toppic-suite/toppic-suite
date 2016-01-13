@@ -21,7 +21,26 @@
         </xsl:if>
     </xsl:if>
     <xsl:text disable-output-escaping="yes"><![CDATA[">]]></xsl:text>
-    <xsl:value-of select="acid"/>
+		<xsl:if test="is_unexpected_change = '1'">
+			<a style="text-decoration:none" href="#">
+				<xsl:attribute name="title">
+					<xsl:value-of select="anno" />
+				</xsl:attribute>
+				<xsl:if test="possible_pos_color = 1">
+					<font color="red">
+						<xsl:value-of select="acid" />
+					</font>
+				</xsl:if>
+				<xsl:if test="possible_pos_color = 0">
+					<font color="black">
+						<xsl:value-of select="acid" />
+					</font>
+				</xsl:if>
+			</a>
+		</xsl:if>
+		<xsl:if test="not(is_unexpected_change = '1')">
+			<xsl:value-of select="acid" />
+		</xsl:if>
     <xsl:text disable-output-escaping="yes"><![CDATA[]]></xsl:text>
 </xsl:template>
 
@@ -138,7 +157,7 @@
 
       <xsl:text disable-output-escaping="yes"><![CDATA[">]]></xsl:text>
 
-      <xsl:if test="$pos = left_position and type ='SHIFT'">
+      <xsl:if test="$pos = left_position and segment_type ='SHIFT'">
 
         <xsl:choose>
           <xsl:when test="unexpected_change_color = 0">
@@ -184,7 +203,7 @@
 
       <xsl:text disable-output-escaping="yes"><![CDATA[>]]></xsl:text>
 
-      <xsl:if test="$pos = left_position and type ='SHIFT'">
+      <xsl:if test="$pos = left_position and segment_type ='SHIFT'">
 
         <xsl:choose>
           <xsl:when test="unexpected_change_color = 0">
@@ -303,7 +322,38 @@
     <xsl:text>&#160;</xsl:text>
   </xsl:template>
       
-
+  <xsl:template match="unexpected_change">
+    <xsl:text>&#160;</xsl:text>
+    <xsl:variable name="s_type" select="segment_type" />
+    <xsl:if test="contains($s_type, 'SHIFT')">
+      <xsl:variable name="known_ptm" select="count(ptm)" />
+      <xsl:if test="$known_ptm &gt; 0">
+        <xsl:element name="a">
+          <xsl:attribute name="href">
+            <xsl:text>http://www.unimod.org/modifications_view.php?editid1=</xsl:text>
+            <xsl:value-of select="modification/unimod" />
+          </xsl:attribute>
+          <xsl:attribute name="target">
+            <xsl:text>_blank</xsl:text>
+          </xsl:attribute>
+          <font color="red">
+            <xsl:value-of select="modification/name" />
+            <xsl:text>&#160;[</xsl:text>
+            <xsl:value-of select="occurence" />
+            <xsl:text>]</xsl:text>
+          </font>
+          </xsl:element>
+      </xsl:if>
+      <xsl:if test="$known_ptm = 0">
+        <font color="red">
+          <xsl:text>Unknown [</xsl:text>
+          <xsl:value-of select="occurence" />
+          <xsl:text>]</xsl:text>
+        </font>
+      </xsl:if>
+      <xsl:text>&#160;</xsl:text>			
+    </xsl:if>
+  </xsl:template>
 
 </xsl:stylesheet>
 

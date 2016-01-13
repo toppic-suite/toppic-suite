@@ -37,6 +37,12 @@
 #include "tdgf/tdgf_mng.hpp"
 #include "tdgf/evalue_processor.hpp"
 
+#include "local/local_mng.hpp"
+#include "local/local_processor.hpp"
+
+#include "prsmview/xml_generator.hpp"
+#include "prsmview/transformer.hpp"
+
 #include "console/argument.hpp"
 
 namespace prot {
@@ -55,7 +61,7 @@ int two_base_opt(int argc, char* argv[]) {
     std::cout << "Executive file directory is: " << exe_dir << std::endl;
 
     BaseData::init(exe_dir);
-    
+
     LOG_DEBUG("Init base data completed");
 
     std::string db_file_name = arguments["databaseFileName"];
@@ -67,13 +73,13 @@ int two_base_opt(int argc, char* argv[]) {
     int ptm_num = std::stoi(arguments["ptmNumber"]);
     double max_ptm_mass = std::stod(arguments["maxPtmMass"]);
     int filter_result_num = std::stoi(arguments["filteringResultNumber"]);
-    
+
     bool use_gf = false; 
     if (arguments["useGf"] == "true") {
       use_gf = true;
     }
     // initialize log file 
-  	WebLog::init(log_file_name, use_gf, ptm_num);
+    WebLog::init(log_file_name, use_gf, ptm_num);
     LOG_DEBUG("web log inited");
 
     PrsmParaPtr prsm_para_ptr = PrsmParaPtr(new PrsmPara(arguments));
@@ -221,17 +227,51 @@ int two_base_opt(int argc, char* argv[]) {
     std::istringstream (arguments["cutoffValue"]) >> cutoff_value;
     PrsmCutoffSelectorPtr cutoff_selector = PrsmCutoffSelectorPtr(
         new PrsmCutoffSelector(db_file_name, sp_file_name, "TOP", "CUTOFF_RESULT", 
-                           cutoff_type, cutoff_value));
+                               cutoff_type, cutoff_value));
     cutoff_selector->process();
     cutoff_selector = nullptr;
     std::cout << "PRSM selecting by cutoff finished." << std::endl;
 
+    std::cout << "Finding protein species started." << std::endl;
+    double ppo;
+    std::istringstream(arguments["errorTolerance"]) >> ppo;
+    ppo = ppo / 1000000.0;
+    ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();
+    PrsmSpeciesPtr prsm_species = PrsmSpeciesPtr(
+        new PrsmSpecies(db_file_name, sp_file_name, "CUTOFF_RESULT",
+                        fix_mod_list, "OUTPUT_RESULT",ppo));
+    prsm_species->process();
+    prsm_species = nullptr;
+    std::cout << "Finding protein species finished." << std::endl;
+
+
+    std::cout << "PTM localization started." << std::endl;
+    LocalMngPtr local_mng = LocalMngPtr(
+        new LocalMng(prsm_para_ptr, arguments["local_threshold"],
+                     arguments["residueModFileName"], max_ptm_mass,
+                     "OUTPUT_RESULT", "LOCAL_RESULT"));
+    LocalProcessorPtr local_ptr = LocalProcessorPtr(new LocalProcessor(local_mng));
+    local_ptr->process();
+    local_ptr = nullptr;
+    std::cout << "PTM localization finished." << std::endl;
+
     std::cout << "Outputting table starts " << std::endl;
     PrsmTableWriterPtr table_out = PrsmTableWriterPtr(
-        new PrsmTableWriter(prsm_para_ptr, "CUTOFF_RESULT", "OUTPUT_TABLE"));
+        new PrsmTableWriter(prsm_para_ptr, "LOCAL_RESULT", "OUTPUT_TABLE"));
     table_out->write();
     table_out = nullptr;
     std::cout << "Outputting table finished." << std::endl;
+
+    std::cout << "Generating view xml files started." << std::endl;
+    XmlGeneratorPtr xml_gene = XmlGeneratorPtr(new XmlGenerator(prsm_para_ptr, exe_dir, "LOCAL_RESULT"));
+    xml_gene->process();
+    xml_gene = nullptr;
+    std::cout << "Generating view xml files finished." << std::endl;
+
+    std::cout << "Converting xml files to html files started." << std::endl;
+    translate(arguments);
+    std::cout << "Converting xml files to html files finished." << std::endl;
+
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;

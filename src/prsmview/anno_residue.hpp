@@ -10,6 +10,7 @@ namespace prot {
 #define ANNO_RESIDUE_TYPE_N_TRUNCATION "n_truncation"
 #define ANNO_RESIDUE_TYPE_C_TRUNCATION "c_truncation"
 #define ANNO_RESIDUE_TYPE_KNOWN_CHANGE "known_change"
+#define ANNO_RESIDUE_TYPE_UNKNOWN_CHANGE "unknown_change"
 
 class AnnoResidue : public Residue {
  public:

@@ -4,6 +4,7 @@
 #include "base/change_type.hpp"
 #include "base/mod.hpp"
 #include "base/xml_dom_document.hpp"
+#include "local/local_anno.hpp"
 
 namespace prot {
 
@@ -20,13 +21,23 @@ class Change {
 
   int getLeftBpPos() {return left_bp_pos_;}
 
+  void setLeftBpPos(int p) {left_bp_pos_ = p;}
+
   int getRightBpPos() {return right_bp_pos_;}
+
+  void setRightBpPos(int p) {right_bp_pos_ = p;}
 
   ChangeTypePtr getChangeTypePtr() {return change_type_ptr_;}
 
   double getMassShift() {return mass_shift_;}
 
+  void setMassShift(double m) {mass_shift_ = m;}
+
   ModPtr getModPtr() {return mod_ptr_;}
+
+  LocalAnnoPtr getLocalAnno() {return local_anno_ptr_;}
+
+  void setLocalAnno(LocalAnnoPtr p);
 
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
@@ -43,6 +54,7 @@ class Change {
   ChangeTypePtr change_type_ptr_;
   double mass_shift_;
   ModPtr mod_ptr_;
+  LocalAnnoPtr local_anno_ptr_;
 };
 
 typedef std::vector<ChangePtr> ChangePtrVec;
