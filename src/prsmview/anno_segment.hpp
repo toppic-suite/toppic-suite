@@ -19,15 +19,19 @@ class AnnoSegment {
   void setRightPos(int right_pos) {right_pos_ = right_pos;}
 
   void addOccurence(int pos, const std::string &acid_letter);
-  
+
   void setPtmPtr(PtmPtr p) {ptm_ptr_ = p;}
 
-  void addScr(double s) {score_.push_back(s);};
+  void addScr(double s) {score_.push_back(s);}
+
+  std::string getResidueAnno();
 
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent, int precison);
 
  private:
   std::string segment_type_;
+  std::string anno_;
+  std::string occu_;
   int left_pos_;
   int right_pos_;
   double mass_shift_;
