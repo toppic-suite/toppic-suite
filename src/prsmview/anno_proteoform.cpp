@@ -141,7 +141,7 @@ void addMod(ProteoformPtr proteoform_ptr, int left_db_bp, int right_db_bp,
   if (change_ptr->getLocalAnno() != nullptr) {
     for (int j = left_db_bp; j < right_db_bp; j++) {
       std::string fasta_seq = proteoform_ptr->getFastaSeqPtr()->getSeq();
-      std::string acid_letter = fasta_seq.substr(left_db_bp, 1);
+      std::string acid_letter = fasta_seq.substr(j, 1);
       segment_ptr->addOccurence(j, acid_letter);
     }
     for (size_t j = 0; j < change_ptr->getLocalAnno()->getScrVec().size(); j++) {
