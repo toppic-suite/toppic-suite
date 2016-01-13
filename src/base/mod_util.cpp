@@ -1,13 +1,16 @@
 #include "base/logger.hpp"
 #include "base/mod_base.hpp"
 #include "base/mod_util.hpp"
+#include "base/ptm_base.hpp"
+#include "base/acid_base.hpp"
+#include "base/string_util.hpp"
 #include "base/xml_dom.hpp"
 #include "base/xml_dom_document.hpp"
 #include "base/xml_dom_util.hpp"
 
 namespace prot {
 
-ModPtrVec ModUtil::readMod(const std::string &file_name) {
+ModPtrVec ModUtil::readModXml(const std::string &file_name) {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   ModPtrVec mod_ptr_vec;
   if (parser) {
@@ -26,6 +29,51 @@ ModPtrVec ModUtil::readMod(const std::string &file_name) {
   return mod_ptr_vec;
 }
 
+std::vector<ModPtrVec> ModUtil::readModTxt(const std::string &file_name) {
+  LOG_DEBUG("mod txt file " << file_name);
+  std::vector<ModPtrVec> mod_ptr_vec2d(3);
+  std::ifstream infile(file_name.c_str());
+  std::string line;
+  while(std::getline(infile, line)) {
+    if (line == "" || line[0] == '#')
+      continue;
+    line = StringUtil::rmComment(line);
+    try { 
+      std::vector<std::string> l = StringUtil::split(line, ',');
+      if (l.size() != 5) throw line;
+
+      if (l[2] == "*" && l[3] == "any") throw line;
+
+      if (l[2] == "*") l[2] = "ARNDCEQGHILKMFPSTWYV";
+
+      PtmPtr p = PtmBase::getPtmPtrByAbbrName(l[0]);
+
+      for (size_t i = 0; i < l[2].length(); i++) {
+        AcidPtr a = AcidBase::getAcidPtrByOneLetter(l[2].substr(i, 1));
+        ResiduePtr ori_residue_ptr = ResidueBase::getBaseResiduePtr(std::make_shared<Residue>(a, PtmBase::getEmptyPtmPtr()));
+        ResiduePtr mod_residue_ptr = ResidueBase::getBaseResiduePtr(std::make_shared<Residue>(a, p));
+        ModPtr m = ModBase::getBaseModPtr(std::make_shared<Mod>(ori_residue_ptr, mod_residue_ptr));
+        if (l[3] == "N-term") {
+          mod_ptr_vec2d[0].push_back(m);
+        } else if (l[3] == "C-term") {
+          mod_ptr_vec2d[1].push_back(m);
+        } else if (l[3] == "any") {
+          mod_ptr_vec2d[2].push_back(m);
+        } else {
+          throw line;
+        }
+      }
+    } catch (char const* e) {
+      std::cerr << "Errors in the Variable PTM file: " 
+          << file_name << std::endl
+          << "Please check the line" << std::endl
+          << "\t" << e << std::endl;
+      exit (EXIT_FAILURE);
+    }
+  }
+  return mod_ptr_vec2d;
+}
+
 ModPtrVec ModUtil::geneFixedModList(const std::string &str) {
   if (str == "" || str == "C57" || str == "C58") {
     ModPtrVec mod_ptr_vec;
@@ -38,7 +86,7 @@ ModPtrVec ModUtil::geneFixedModList(const std::string &str) {
     return mod_ptr_vec;
   }
   else {
-    return readMod(str);
+    return readModXml(str);
   }
 }
 

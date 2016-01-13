@@ -23,9 +23,6 @@ Ptm::Ptm(const std::string &name, const std::string &abbr_name,
     abbr_name_(abbr_name),
     mono_mass_(mono_mass),
     unimod_id_(unimod_id) {
-      //n_term_acids_ = AcidUtil::convertStrToAcidPtrVec(n_term_acid_str);
-      //c_term_acids_ = AcidUtil::convertStrToAcidPtrVec(c_term_acid_str);
-      //anywhere_acids_ = AcidUtil::convertStrToAcidPtrVec(anywhere_acid_str);
     }
 
 Ptm::Ptm(xercesc::DOMElement* element) { 
@@ -33,25 +30,6 @@ Ptm::Ptm(xercesc::DOMElement* element) {
   abbr_name_ = XmlDomUtil::getChildValue(element, "abbreviation", 0);
   mono_mass_ = XmlDomUtil::getDoubleChildValue(element, "mono_mass", 0);
   unimod_id_ = XmlDomUtil::getIntChildValue(element, "unimod", 0);
-  /*
-  std::string n_term_acid_str, c_term_acid_str, anywhere_acid_str;
-  xercesc::DOMNodeList* list = element->getElementsByTagName(X("residues"));
-  for (size_t j = 0; j < list->getLength(); j++) {
-    if (Y(list->item(j)->getAttributes()->item(0)->getNodeValue()).compare("N-term") == 0) {
-      xercesc::DOMElement* child = dynamic_cast<xercesc::DOMElement*>(list->item(j));
-      n_term_acid_str = Y(child->getTextContent());
-    } else if (Y(list->item(j)->getAttributes()->item(0)->getNodeValue()).compare("C-term") == 0) {
-      xercesc::DOMElement* child = dynamic_cast<xercesc::DOMElement*>(list->item(j));
-      c_term_acid_str = Y(child->getTextContent());
-    } else if (Y(list->item(j)->getAttributes()->item(0)->getNodeValue()).compare("Anywhere") == 0) {
-      xercesc::DOMElement* child = dynamic_cast<xercesc::DOMElement*>(list->item(j));
-      anywhere_acid_str = Y(child->getTextContent());
-    }
-  }
-  n_term_acids_ = AcidUtil::convertStrToAcidPtrVec(n_term_acid_str);
-  c_term_acids_ = AcidUtil::convertStrToAcidPtrVec(c_term_acid_str);
-  anywhere_acids_ = AcidUtil::convertStrToAcidPtrVec(anywhere_acid_str);
-  */
 }
 
 void Ptm::appendAbbrNameToXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent) {

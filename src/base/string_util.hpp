@@ -26,6 +26,8 @@ class StringUtil {
   static std::string convertToString(int value);
 
   static std::string convertToString(bool value);
+
+  static std::string rmComment(const std::string &ori_s, const std::string &comment = "#");
 };
 
 }
