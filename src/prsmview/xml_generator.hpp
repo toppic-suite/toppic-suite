@@ -5,11 +5,10 @@
 #include <xercesc/util/PlatformUtils.hpp>
 
 #include "base/proteoform.hpp"
-#include "base/proteoform_reader.hpp"
+#include "base/fasta_reader.hpp"
 #include "base/xml_writer.hpp"
 #include "spec/msalign_reader.hpp"
 #include "prsm/prsm.hpp"
-#include "ptmsearch/ptm_mng.hpp"
 #include "prsmview/prsm_view_mng.hpp"
 #include "prsmview/anno_view.hpp"
 

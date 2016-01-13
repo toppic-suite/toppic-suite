@@ -1,5 +1,5 @@
-#ifndef PROT_SIMPLE_PRSM_READER_HPP_
-#define PROT_SIMPLE_PRSM_READER_HPP_
+#ifndef PROT_PRSM_SIMPLE_PRSM_READER_HPP_
+#define PROT_PRSM_SIMPLE_PRSM_READER_HPP_
 
 #include <iostream>
 #include <fstream>
@@ -22,6 +22,8 @@ class SimplePrsmReader {
   SimplePrsmPtr readOnePrsm();
 
   void close();
+
+  static SimplePrsmPtrVec readSimplePrsms(const std::string &file_name);
 
  private:
   std::ifstream input_;

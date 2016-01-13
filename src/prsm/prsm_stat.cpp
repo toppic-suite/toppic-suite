@@ -4,11 +4,14 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include "base/acid_base.hpp"
 #include "base/file_util.hpp"
 #include "spec/peak.hpp"
+#include "spec/extend_ms_factory.hpp"
 #include "spec/msalign_reader.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/peak_ion_pair.hpp"
+#include "prsm/peak_ion_pair_factory.hpp"
 #include "prsm/prsm_stat.hpp"
 
 namespace prot {
@@ -20,7 +23,7 @@ PrsmStat::PrsmStat(PrsmParaPtr prsm_para_ptr,
   min_mass_ = prsm_para_ptr_->getSpParaPtr()->getMinMass();
   input_file_ext_ = input_file_ext;
   output_file_ext_ = output_file_ext;
-  acid_ptr_vec_ = AcidFactory::getBaseAcidPtrVec();
+  acid_ptr_vec_ = AcidBase::getBaseAcidPtrVec();
 }
 
 int countCoverage(const std::vector<bool> &match_ion_vec, int start, int end) {
@@ -72,32 +75,30 @@ void PrsmStat::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   int peak_num = 0;
   DeconvMsPtrVec deconv_ms_ptr_vec = prsm_ptr->getDeconvMsPtrVec();
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
-    spec_ids = spec_ids + std::to_string(deconv_ms_ptr_vec[i]->getHeaderPtr()->getId()) + " ";
-    spec_activations = spec_activations + deconv_ms_ptr_vec[i]->getHeaderPtr()->getActivationPtr()->getName() + " ";
-    spec_scans = spec_scans + deconv_ms_ptr_vec[i]->getHeaderPtr()->getScansString() + " ";
+    spec_ids = spec_ids + std::to_string(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getId()) + " ";
+    spec_activations = spec_activations + deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getActivationPtr()->getName() + " ";
+    spec_scans = spec_scans + deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getScansString() + " ";
     peak_num += deconv_ms_ptr_vec[i]->size();
   }
   boost::algorithm::trim(spec_ids);
   boost::algorithm::trim(spec_activations);
   boost::algorithm::trim(spec_scans);
   file << prsm_para_ptr_->getSpectrumFileName() << "\t"
-      << prsm_ptr->getId() << "\t"
+      << prsm_ptr->getPrsmId() << "\t"
       << spec_ids << "\t"
       << spec_activations<< "\t"
       << spec_scans << "\t"
       << peak_num << "\t"
-      << deconv_ms_ptr_vec[0]->getHeaderPtr()->getPrecCharge() << "\t"
+      << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecCharge() << "\t"
       << prsm_ptr->getOriPrecMass()<< "\t"//"Precursor_mass"
       << prsm_ptr->getAdjustedPrecMass() << "\t"
-      << prsm_ptr->getProteoformPtr()->getDbResSeqPtr()->getId() << "\t"
       << prsm_ptr->getProteoformPtr()->getSpeciesId() << "\t"
-      << prsm_ptr->getProteoformPtr()->getDbResSeqPtr()->getName() << " "
-      << prsm_ptr->getProteoformPtr()->getDbResSeqPtr()->getDesc() << "\t"
-      << prsm_ptr->getProteoformPtr()->getDbResSeqPtr()->getSeqMass() << "\t"
+      << prsm_ptr->getProteoformPtr()->getSeqName() << " "
+      << prsm_ptr->getProteoformPtr()->getSeqDesc() << "\t"
       << prsm_ptr->getProteoformPtr()->getStartPos() << "\t"
       << prsm_ptr->getProteoformPtr()->getEndPos() << "\t"
       << prsm_ptr->getProteoformPtr()->getProteinMatchSeq() << "\t"
-      << prsm_ptr->getProteoformPtr()->getUnexpectedChangeNum() << "\t"
+      << prsm_ptr->getProteoformPtr()->getChangeNum(ChangeType::UNEXPECTED) << "\t"
       << prsm_ptr->getMatchPeakNum() << "\t"
       << prsm_ptr->getMatchFragNum() << "\t"
       << prsm_ptr->getPValue() << "\t"
@@ -127,9 +128,9 @@ void PrsmStat::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   std::vector<std::vector<bool>> both_ion_2d;
   for (size_t s = 0; s < deconv_ms_ptr_vec.size(); s++) {
     //get ion_pair
-    PeakIonPairPtrVec pair_ptrs =  getPeakIonPairs (prsm_ptr->getProteoformPtr(), 
-                                                    refine_ms_ptr_vec[s],
-                                                    min_mass_);
+    PeakIonPairPtrVec pair_ptrs = PeakIonPairFactory::genePeakIonPairs(prsm_ptr->getProteoformPtr(), 
+                                                                       refine_ms_ptr_vec[s],
+                                                                       min_mass_);
     std::vector<bool> n_ion (proteo_len + 1, false);
     std::vector<bool> c_ion (proteo_len + 1, false);
     std::vector<bool> both_ion (proteo_len + 1, false);
@@ -215,7 +216,7 @@ void PrsmStat::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
 
 void PrsmStat::process() {
   std::string spectrum_file_name  = prsm_para_ptr_->getSpectrumFileName(); 
-  std::string base_name = basename(spectrum_file_name);
+  std::string base_name = FileUtil::basename(spectrum_file_name);
   std::string output_file_name = base_name + "." + output_file_ext_;
   std::ofstream file; 
   file.open(output_file_name.c_str());
@@ -229,10 +230,8 @@ void PrsmStat::process() {
       << "Charge" << "\t"
       << "Precursor_mass" << "\t"
       << "Adjusted_precursor_mass" << "\t"
-      << "Protein_ID" << "\t"
       << "Species_ID" << "\t"
       << "Protein_name" << "\t"
-      << "Protein_mass" << "\t"
       << "First_residue" << "\t"
       << "Last_residue" << "\t"
       << "Peptide" << "\t"
@@ -302,22 +301,38 @@ void PrsmStat::process() {
 
   file << std::endl;
 
-  std::string input_file_name = basename(spectrum_file_name) + "." + input_file_ext_;
+  std::string input_file_name = FileUtil::basename(spectrum_file_name) + "." + input_file_ext_;
   std::string db_file_name = prsm_para_ptr_->getSearchDbFileName();
-  ResiduePtrVec residue_ptr_vec = prsm_para_ptr_->getFixModResiduePtrVec();
+  ModPtrVec fix_mod_ptr_vec = prsm_para_ptr_->getFixModPtrVec();
 
-  PrsmPtrVec prsm_ptrs = readAllPrsms(input_file_name, db_file_name,
-                                      residue_ptr_vec);
-  LOG_DEBUG("prsm loaded");
+  std::string sp_file_name = prsm_para_ptr_->getSpectrumFileName();
+  FastaIndexReaderPtr seq_reader(new FastaIndexReader(db_file_name));
+  PrsmReader prsm_reader(input_file_name);
+  PrsmPtr prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
 
-  addSpectrumPtrsToPrsms(prsm_ptrs, prsm_para_ptr_);
-  LOG_DEBUG("spectrum added");
+  //init variables
+  MsAlignReader sp_reader(sp_file_name, group_spec_num);
+  SpectrumSetPtr spec_set_ptr;
 
-  std::sort(prsm_ptrs.begin(), prsm_ptrs.end(), prsmSpectrumIdUpPrecursorIdUp); 
-
-  for (size_t i = 0; i < prsm_ptrs.size(); i++) {
-    writePrsm(file, prsm_ptrs[i]);
+  SpParaPtr sp_para_ptr = prsm_para_ptr_->getSpParaPtr();
+  while((spec_set_ptr = sp_reader.getNextSpectrumSet(sp_para_ptr))!= nullptr){
+    if(spec_set_ptr->isValid()){
+      int spec_id = spec_set_ptr->getSpecId();
+      while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_id) {
+        DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
+        prsm_ptr->setDeconvMsPtrVec(deconv_ms_ptr_vec);
+        double new_prec_mass = prsm_ptr->getAdjustedPrecMass();
+        ExtendMsPtrVec extend_ms_ptr_vec 
+            = ExtendMsFactory::geneMsThreePtrVec(deconv_ms_ptr_vec, sp_para_ptr, new_prec_mass);
+        prsm_ptr->setRefineMsVec(extend_ms_ptr_vec);
+        writePrsm(file, prsm_ptr);
+        prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
+      }
+    }
   }
+
+  sp_reader.close();
+  prsm_reader.close();
   //write end;
   file.close();
 }

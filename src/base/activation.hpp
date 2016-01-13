@@ -1,15 +1,11 @@
-/*
- * Activation.hpp
- *
- *  Created on: Nov 25, 2013
- *  Author: Xiaowen Liu
- */
+// Author: Xiaowen Liu
+// Created on: Nov 25, 2013
 
-#ifndef PROT_ACTIVATION_HPP_
-#define PROT_ACTIVATION_HPP_
+#ifndef PROT_BASE_ACTIVATION_HPP_
+#define PROT_BASE_ACTIVATION_HPP_
 
-#include "xercesc/dom/DOM.hpp"
 #include "base/ion_type.hpp"
+#include "base/xml_dom_document.hpp"
 
 namespace prot {
 
@@ -22,20 +18,21 @@ class Activation {
 
   std::string getName() {return name_;}
 
-  double getNShift() {return n_ion_type_ptr_->getShift()-getBIonShift();}
-
-  double getCShift() {return c_ion_type_ptr_->getShift()-getYIonShift();}
+  double getNShift() {return n_ion_type_ptr_->getBYShift();}
+  
+  double getCShift() {return c_ion_type_ptr_->getBYShift();}
 
   IonTypePtr getNIonTypePtr() {return n_ion_type_ptr_;}
 
   IonTypePtr getCIonTypePtr() {return c_ion_type_ptr_;}
 
-  void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+  void appendNameToXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
+  static std::string getNameFromXml(xercesc::DOMElement * element);
+
+  static std::string getXmlElementName() {return "activation";}
+  
  private:
-  static double getBIonShift() {return 0;}
-  static double getYIonShift() {return 18.0106;}
-
   std::string name_;
   // n terminal ion type 
   IonTypePtr n_ion_type_ptr_;
@@ -47,19 +44,6 @@ class Activation {
 typedef std::shared_ptr<Activation> ActivationPtr;
 typedef std::vector<ActivationPtr> ActivationPtrVec;
 
-/* activation factory */
-class ActivationFactory {
- private:
-  static ActivationPtrVec activation_ptr_vec_;
+}
 
- public:
-  static void initFactory(const std::string &file_name);
-
-  static const ActivationPtrVec& getBaseActivationPtrVec() {return activation_ptr_vec_;}
-
-  static ActivationPtr getBaseActivationPtrByName(const std::string &name);
-};
-
-} /* namespace prot */
-
-#endif /* ACTIVATION_HPP_ */
+#endif 

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<truncation_list>
+<truncation>
+	<name>NONE</name>
+	<trunc_len>0</trunc_len>
+	<trunc_residues></trunc_residues>
+  <allow_first_remain_residues></allow_first_remain_residues>
+</truncation>
+<truncation>
+	<name>NME</name>
+	<trunc_len>1</trunc_len>
+	<trunc_residues>M</trunc_residues>
+  <allow_first_remain_residues>ACGPSTV</allow_first_remain_residues>
+</truncation>
+</truncation_list>

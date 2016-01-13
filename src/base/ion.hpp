@@ -1,6 +1,5 @@
-
-#ifndef PROT_ION_HPP_
-#define PROT_ION_HPP_
+#ifndef PROT_BASE_ION_HPP_
+#define PROT_BASE_ION_HPP_
 
 #include <string>
 

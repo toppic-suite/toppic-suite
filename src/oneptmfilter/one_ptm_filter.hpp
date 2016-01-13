@@ -2,10 +2,10 @@
 #define ONE_PTM_FILTER_H_
 
 #include "base/proteoform.hpp"
-#include "spec/prm_peak.hpp"
+#include "spec/prm_ms.hpp"
 #include "prsm/simple_prsm.hpp"
+#include "zeroptmfilter/comp_shift.hpp"
 #include "oneptmfilter/one_ptm_filter_mng.hpp"
-#include "oneptmfilter/one_ptm_comp_shift.hpp"
 
 namespace prot {
 
@@ -13,7 +13,8 @@ class OnePtmFilter {
  public:
   OnePtmFilter(const ProteoformPtrVec &proteo_ptrs,
                OnePtmFilterMngPtr mng_ptr);
-  void computeBestMatch(const PrmMsPtrVec &ms_ptr_vec);
+  void computeBestMatch(const PrmMsPtrVec &prm_ms_ptr_vec,
+                        const PrmMsPtrVec &srm_ms_ptr_vec);
 
   SimplePrsmPtrVec getCompMatchPtrs() {return comp_match_ptrs_;}
   SimplePrsmPtrVec getPrefMatchPtrs() {return pref_match_ptrs_;}
@@ -23,7 +24,7 @@ class OnePtmFilter {
  private:
   OnePtmFilterMngPtr mng_ptr_;
   ProteoformPtrVec proteo_ptrs_;
-  OnePtmCompShiftPtr index_ptr_;
+  CompShiftPtr index_ptr_;
   
   SimplePrsmPtrVec comp_match_ptrs_;
   SimplePrsmPtrVec pref_match_ptrs_;

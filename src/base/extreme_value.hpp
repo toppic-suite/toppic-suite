@@ -1,11 +1,14 @@
-#ifndef PROT_EXTREME_VALUE_HPP_
-#define PROT_EXTREME_VALUE_HPP_
+#ifndef PROT_BASE_EXTREME_VALUE_HPP_
+#define PROT_BASE_EXTREME_VALUE_HPP_
 
 #include <memory>
 #include <vector>
 #include "base/xml_dom_document.hpp"
 
 namespace prot {
+
+class ExtremeValue;
+typedef std::shared_ptr<ExtremeValue> ExtremeValuePtr;
 
 class ExtremeValue {
  public:
@@ -27,11 +30,13 @@ class ExtremeValue {
 
   void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
+  static std::string getXmlElementName() {return "extreme_value";}
+
+  static ExtremeValuePtr getMaxEvaluePtr();
+
  private:
-  /** 
-   * one_prot_prob is the probability that the spectrum and a randem problem 
-   * have a protein-spectrum-match with a score no less than the threshold 
-   **/
+  // one_prot_prob is the probability that the spectrum and a randem problem 
+  // have a protein-spectrum-match with a score no less than the threshold 
   double one_prot_prob_;
   double test_num_;
   double adjust_factor_;
@@ -41,10 +46,7 @@ class ExtremeValue {
   void init();
 };
 
-typedef std::shared_ptr<ExtremeValue> ExtremeValuePtr;
 typedef std::vector<ExtremeValuePtr> ExtremeValuePtrVec;
-
-ExtremeValuePtr getMaxEvaluePtr();
 
 }
 

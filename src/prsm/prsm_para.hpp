@@ -1,10 +1,10 @@
-#ifndef PROT_PRSM_PARA_HPP_
-#define PROT_PRSM_PARA_HPP_
+#ifndef PROT_PRSM_PRSM_PARA_HPP_
+#define PROT_PRSM_PRSM_PARA_HPP_
 
 #include <string>
 #include <map>
 
-#include "base/residue.hpp"
+#include "base/mod.hpp"
 #include "base/prot_mod.hpp"
 #include "base/activation.hpp"
 #include "spec/peak_tolerance.hpp"
@@ -21,8 +21,8 @@ class PrsmPara {
   std::string getExeDir(){return exe_dir_;}
   int getErrorTolerance(){return errorTolerance_;}
   int getGroupSpecNum() {return group_spec_num_;}
-  const ResiduePtrVec& getFixModResiduePtrVec() {return fix_mod_residue_list_;}
-  const ProtModPtrVec& getAllowProtModPtrVec() {return allow_prot_mod_list_;}
+  const ModPtrVec& getFixModPtrVec() {return fix_mod_list_;}
+  const ProtModPtrVec& getProtModPtrVec() {return prot_mod_list_;}
   SpParaPtr getSpParaPtr() {return sp_para_ptr_;}
 
  private:
@@ -32,8 +32,8 @@ class PrsmPara {
   std::string exe_dir_;
   int errorTolerance_;
 
-  ResiduePtrVec fix_mod_residue_list_;
-  ProtModPtrVec allow_prot_mod_list_;
+  ModPtrVec fix_mod_list_;
+  ProtModPtrVec prot_mod_list_;
 
   int group_spec_num_;
 

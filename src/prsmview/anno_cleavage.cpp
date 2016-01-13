@@ -1,3 +1,4 @@
+#include "prsm/peak_ion_pair_factory.hpp"
 #include "prsmview/anno_cleavage.hpp"
 
 namespace prot {
@@ -15,17 +16,17 @@ AnnoCleavage::AnnoCleavage(int pos, const PeakIonPairPtrVec &pairs,
 
 void AnnoCleavage::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
   xercesc::DOMElement* element = xml_doc->createElement("cleavage");
-  std::string str = convertToString(pos_);
+  std::string str = StringUtil::convertToString(pos_);
   xml_doc->addElement(element, "position", str.c_str());
   str = type_;
   xml_doc->addElement(element, "cleavage_type", str.c_str());
-  str = convertToString(is_unexpected_change_);
+  str = StringUtil::convertToString(is_unexpected_change_);
   xml_doc->addElement(element, "is_unexpected_change", str.c_str());
-  str = convertToString(unexpected_change_color_);
+  str = StringUtil::convertToString(unexpected_change_color_);
   xml_doc->addElement(element, "unexpected_change_color", str.c_str());
-  str = convertToString(exist_n_ion_);
+  str = StringUtil::convertToString(exist_n_ion_);
   xml_doc->addElement(element, "exist_n_ion", str.c_str());
-  str = convertToString(exist_c_ion_);
+  str = StringUtil::convertToString(exist_c_ion_);
   xml_doc->addElement(element, "exist_c_ion", str.c_str());
   xercesc::DOMElement* peaks = xml_doc->createElement("matched_peaks");
   for(size_t i=0;i<pairs_.size();i++){
@@ -39,14 +40,14 @@ AnnoCleavagePtrVec getProteoCleavage(PrsmPtr prsm_ptr, double min_mass){
   AnnoCleavagePtrVec cleavages;
   ProteoformPtr proteo_ptr = prsm_ptr->getProteoformPtr();
   ExtendMsPtrVec refine_ms_ptr_vec = prsm_ptr->getRefineMsPtrVec();
-  int prot_len = proteo_ptr->getDbResSeqPtr()->getLen();
+  int prot_len = proteo_ptr->getFastaSeqPtr()->getLen();
   std::vector<bool> n_ion (prot_len + 1, false);
   std::vector<bool> c_ion (prot_len + 1, false);
   PeakIonPairPtrVec2D peak_list(prot_len + 1, PeakIonPairPtrVec(0));
 
   for (size_t m = 0; m < refine_ms_ptr_vec.size(); m++) {
-    PeakIonPairPtrVec pairs = getPeakIonPairs (proteo_ptr, refine_ms_ptr_vec[m], 
-                                               min_mass);
+    PeakIonPairPtrVec pairs 
+        = PeakIonPairFactory::genePeakIonPairs(proteo_ptr, refine_ms_ptr_vec[m], min_mass);
     for(size_t i=0; i<pairs.size(); i++){
       int pos = pairs[i]->getTheoPeakPtr()->getIonPtr()->getPos()+ proteo_ptr->getStartPos();
       //LOG_DEBUG("start pos " << prot_ptr->getStartPos() << " pos " << pos);

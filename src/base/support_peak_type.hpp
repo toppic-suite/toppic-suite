@@ -1,24 +1,26 @@
-
-#ifndef SUPPORT_PEAK_TYPE_HPP_
-#define SUPPORT_PEAK_TYPE_HPP_
+#ifndef PROT_BASE_SUPPORT_PEAK_TYPE_HPP_
+#define PROT_BASE_SUPPORT_PEAK_TYPE_HPP_
 
 #include <memory>
 #include <string>
 #include <vector>
 
-#include <xercesc/dom/DOM.hpp>
+#include "base/xml_dom_document.hpp"
 
 namespace prot {
-
-#define SP_TYPE_N_TERM "N_TERM"
 
 class SupportPeakType {
  public:
   SupportPeakType(int id, const std::string &name);
 
+  SupportPeakType(xercesc::DOMElement* element);
+
   int getId(){return id_;}
 
   std::string getName(){return name_;}
+
+  static std::string getXmlElementName() {return "support_peak_type";}
+
  private:
   int id_;
   std::string name_;
@@ -26,23 +28,6 @@ class SupportPeakType {
 
 typedef std::shared_ptr<SupportPeakType> SPTypePtr;
 typedef std::vector<SPTypePtr> SPTypePtrVec;
-
-/* support peak type factory */
-class SPTypeFactory {
- public:
-  static void initFactory(const std::string &file_name);
-  static const SPTypePtrVec& getBaseSPTypePtrVec() {
-    return sp_type_ptr_vec_;}
-
-  static SPTypePtr getBaseSPTypePtrByName(const std::string &name);
-  static SPTypePtr getBaseSPTypePtrById(int id);
-
-  static SPTypePtr getSPTypePtr_N_TERM() {
-    return getBaseSPTypePtrByName(SP_TYPE_N_TERM);
-  }
- private:
-  static SPTypePtrVec sp_type_ptr_vec_;
-};
 
 } /* namespace prot */
 

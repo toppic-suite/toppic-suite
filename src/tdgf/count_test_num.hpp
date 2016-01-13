@@ -20,7 +20,7 @@ class CountTestNum {
 
   ~CountTestNum();
 
-  double compCandNum(SemiAlignTypePtr type_ptr, int index, 
+  double compCandNum(AlignTypePtr type_ptr, int index, 
                      double ori_mass, double ori_tolerance);
 
   ResFreqPtrVec getResFreqPtrVec() {return residue_ptrs_;}
@@ -59,29 +59,16 @@ class CountTestNum {
   void initSuffMassCnt(const ProteoformPtrVec &raw_forms);
   void initInternalMassCnt();
 
-  double compNonPtmCandNum(SemiAlignTypePtr type_ptr, 
+  double compNonPtmCandNum(AlignTypePtr type_ptr, 
                            double ori_mass, double ori_tolerance);
-  double compPtmCandNum (SemiAlignTypePtr type_ptr, double ori_mass);
-  double compPtmRestrictCandNum (SemiAlignTypePtr type_ptr, int shift_num, double ori_mass);
-  double compSeqNum(SemiAlignTypePtr type_ptr, int low, int high);
+  double compPtmCandNum (AlignTypePtr type_ptr, double ori_mass);
+  double compPtmRestrictCandNum (AlignTypePtr type_ptr, int shift_num, double ori_mass);
+  double compSeqNum(AlignTypePtr type_ptr, int low, int high);
   double compMassNum(double *cnts, int low, int high);
 };
 
 typedef std::shared_ptr<CountTestNum> CountTestNumPtr;
 
-void updateNTermResidueCounts(ResiduePtrVec &residue_list, 
-                              std::vector<double> &counts,
-                              const ProteoformPtrVec &mod_proteo_ptrs);
-
-
-void updateResidueCounts(const ResiduePtrVec &residue_list, 
-                         std::vector<double> &counts,
-                         ProteoformPtr prot_ptr);
-
-ResFreqPtrVec compResidueFreq(const ResiduePtrVec &residue_list, 
-                              const std::vector<double> &counts);
-
-int computeAvgLength(const ResFreqPtrVec &residue_ptrs, double convert_ratio);
 
 }
 

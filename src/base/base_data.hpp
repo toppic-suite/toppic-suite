@@ -1,21 +1,23 @@
-/*
- * author  Xiaowen Liu
- * date    2013-11-01
- */
+// author  Xiaowen Liu
+// date    2013-11-01
 
-#ifndef PROT_BASE_DATA_HPP_
-#define PROT_BASE_DATA_HPP_
+#ifndef PROT_BASE_BASE_DATA_HPP_
+#define PROT_BASE_BASE_DATA_HPP_
 
 #include <string>
 
-#define CONFIG_DIR  "toppic_resources/conf"
-#define CONFIG_FILE_NAME "configuration.xml"
-
 namespace prot {
 
+class BaseData {
+ public:
+  static std::string getBaseDataDir() {return "toppic_resources/base_data";}
 
-void initBaseData(const std::string &exe_dir);
+  static std::string getBaseDataConfigFileName() {return "base_data_config.xml";}
+
+  static void init(const std::string &exe_dir);
+};
 
 }
+
 #endif
 

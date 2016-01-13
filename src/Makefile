@@ -14,14 +14,14 @@ all:
 	cd zeroptmfilter; make
 	cd zeroptmsearch; make
 	cd oneptmfilter; make
+	cd oneptmsearch; make
 	cd diagfilter; make
 	cd ptmsearch; make
 	cd tdgf; make
-#	cd poisson; make
 	cd prsmview; make	
 	cd console; make
-	cd graph; make
-	cd graphalign; make
+#	cd graph; make
+#	cd graphalign; make
 	cd test; make
 
 clean:
@@ -31,9 +31,9 @@ clean:
 	cd zeroptmfilter; make clean
 	cd zeroptmsearch; make clean
 	cd oneptmfilter; make clean
+	cd oneptmsearch; make clean
 	cd diagfilter; make clean
 	cd ptmsearch; make clean
-# cd poisson; make clean
 	cd tdgf; make clean
 	cd prsmview; make clean
 	cd console; make clean

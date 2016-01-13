@@ -14,7 +14,7 @@ std::vector<std::string> SimplePrsmReader::readOnePrsmLines() {
   std::string line;
   std::vector<std::string> line_list;
   while (std::getline(input_, line)) {
-    line = trim(line);
+    line = StringUtil::trim(line);
     if (line ==  "<simple_prsm>") {
       line_list.push_back(line);
     }
@@ -70,6 +70,17 @@ SimplePrsmPtr SimplePrsmReader::readOnePrsm() {
 
 void SimplePrsmReader::close() {
   input_.close();
+}
+
+SimplePrsmPtrVec SimplePrsmReader::readSimplePrsms(const std::string &file_name){
+  SimplePrsmPtrVec result_ptrs;
+  SimplePrsmReader reader(file_name);
+  SimplePrsmPtr prsm_ptr = reader.readOnePrsm();
+  while (prsm_ptr != nullptr) {
+    result_ptrs.push_back(prsm_ptr);
+    prsm_ptr = reader.readOnePrsm();
+  }
+  return result_ptrs;
 }
 
 

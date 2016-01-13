@@ -1,5 +1,5 @@
-#ifndef PROT_PRSM_READER_HPP_
-#define PROT_PRSM_READER_HPP_
+#ifndef PROT_PRSM_PRSM_READER_HPP_
+#define PROT_PRSM_PRSM_READER_HPP_
 
 #include <iostream>
 #include <fstream>
@@ -17,10 +17,17 @@ class PrsmReader {
   std::vector<std::string> readOnePrsmLines();
 
   PrsmStrPtr readOnePrsmStr();
-
-  PrsmPtr readOnePrsm(faidx_t *fai, const ResiduePtrVec &residue_ptr_vec);
+  
+  PrsmPtr readOnePrsm(FastaIndexReaderPtr reader_ptr, 
+                      const ModPtrVec fix_mod_list);
 
   void close();
+
+  static PrsmStrPtrVec readAllPrsmStrs(const std::string &input_file_name);
+
+  static PrsmPtrVec readAllPrsms(const std::string &prsm_file_name, 
+                                 const std::string &db_file_name,
+                                 const ModPtrVec  &fix_mod_list);
 
  private:
   std::ifstream input_;
@@ -29,11 +36,6 @@ class PrsmReader {
 typedef std::shared_ptr<PrsmReader> PrsmReaderPtr;
 typedef std::vector<PrsmReaderPtr> PrsmReaderPtrVec;
 
-PrsmStrPtrVec readAllPrsmStrs(const std::string &input_file_name);
-
-PrsmPtrVec readAllPrsms(const std::string &prsm_file_name, 
-                        const std::string &db_file_name,
-                        const ResiduePtrVec &residue_ptr_vec);
 } /* namespace prot */
 
 #endif /* PROT_PRSM_READER_HPP_ */

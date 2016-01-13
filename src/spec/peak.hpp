@@ -1,5 +1,5 @@
-#ifndef PROT_PEAK_HPP_
-#define PROT_PEAK_HPP_
+#ifndef PROT_SPEC_PEAK_HPP_
+#define PROT_SPEC_PEAK_HPP_
 
 #include "base/mass_constant.hpp"
 #include "base/xml_dom_document.hpp"
@@ -20,18 +20,21 @@ class Peak {
 
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
+  static std::string getXmlElementName() {return "peak";}
+
+  static double compPeakMass(double mono_mz, int charge) {
+    return mono_mz * charge - charge * MassConstant::getProtonMass();
+  }
+
+  static double compMonoMz(double mono_mass, int charge) {
+    return mono_mass / charge + MassConstant::getProtonMass();
+  }
+
  private:
   double position_;
   double intensity_;
 };
 
-inline double compPeakMass(double mono_mz, int charge) {
-  return mono_mz * charge - charge * MassConstant::getProtonMass();
-}
-
-inline double compMonoMz(double mono_mass, int charge) {
-  return mono_mass / charge + MassConstant::getProtonMass();
-}
 
 }
 #endif

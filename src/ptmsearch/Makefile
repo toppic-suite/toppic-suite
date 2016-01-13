@@ -1,6 +1,6 @@
 include ../Makefile.in
 
-OBJS = $(PTM_OBJS)
+OBJS = $(PTM_SEARCH_OBJS)
 
 BIN_DIR = ../../bin
 

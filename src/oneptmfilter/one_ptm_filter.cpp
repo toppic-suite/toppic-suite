@@ -1,5 +1,7 @@
 #include <algorithm>
 #include <iostream>
+#include "spec/prm_ms.hpp"
+#include "zeroptmfilter/filter_protein.hpp"
 #include "oneptmfilter/one_ptm_filter.hpp"
 
 namespace prot {
@@ -8,49 +10,69 @@ OnePtmFilter::OnePtmFilter(const ProteoformPtrVec &proteo_ptrs,
                            OnePtmFilterMngPtr mng_ptr){
   mng_ptr_ = mng_ptr;
   proteo_ptrs_ = proteo_ptrs;
-  index_ptr_ = OnePtmCompShiftPtr(new OnePtmCompShift(proteo_ptrs, mng_ptr));
+  bool use_rev = true;
+  index_ptr_ = CompShiftPtr(new CompShift(proteo_ptrs, 
+                                          mng_ptr->filter_scale_,
+                                          mng_ptr->max_proteoform_mass_,
+                                          mng_ptr->prsm_para_ptr_->getProtModPtrVec(),
+                                          use_rev));
 }
 
-void OnePtmFilter::computeBestMatch(const PrmMsPtrVec &ms_ptr_vec){
+void OnePtmFilter::computeBestMatch(const PrmMsPtrVec &prm_ms_ptr_vec, 
+                                    const PrmMsPtrVec &srm_ms_ptr_vec){
   PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
-  std::vector<std::pair<int,int>> mass_errors 
-      = getIntMassErrorList(ms_ptr_vec, tole_ptr, mng_ptr_->ptm_fast_filter_scale_, true, false);
+  std::vector<std::pair<int,int>> pref_mass_errors 
+      = PrmMs::getIntMassErrorList(prm_ms_ptr_vec, tole_ptr, mng_ptr_->filter_scale_, true, false);
+  std::vector<std::pair<int,int>> suff_mass_errors 
+      = PrmMs::getIntMassErrorList(srm_ms_ptr_vec, tole_ptr, mng_ptr_->filter_scale_, false, true);
   //LOG_DEBUG("start convolution");
-  index_ptr_->compConvolution(mass_errors, mng_ptr_->one_ptm_filter_result_num_);
-  std::vector<std::pair<int,int>> comp_scores = index_ptr_->getTopCompProteoScores();
+  index_ptr_->compOnePtmConvolution(pref_mass_errors, suff_mass_errors, 
+                                    mng_ptr_->comp_num_, mng_ptr_->pref_suff_num_, 
+                                    mng_ptr_->inte_num_, mng_ptr_->shift_num_);
+  FilterProteinPtrVec comp_prots = index_ptr_->getTopCompProts();
   comp_match_ptrs_.clear();
-  int group_spec_num = ms_ptr_vec.size();
-  for (size_t i = 0; i < comp_scores.size(); i++) {
+  int group_spec_num = prm_ms_ptr_vec.size();
+  for (size_t i = 0; i < comp_prots.size(); i++) {
+    int id = comp_prots[i]->getProteinId();
+    int score = comp_prots[i]->getScore();
     comp_match_ptrs_.push_back( 
-        SimplePrsmPtr(new SimplePrsm(ms_ptr_vec[0]->getHeaderPtr(), group_spec_num,
-                                     proteo_ptrs_[comp_scores[i].first], comp_scores[i].second)));
+        SimplePrsmPtr(new SimplePrsm(prm_ms_ptr_vec[0]->getMsHeaderPtr(), group_spec_num,
+                                     proteo_ptrs_[id], score)));
   }
 
-  std::vector<std::pair<int,int>> pref_scores = index_ptr_->getTopPrefProteoScores();
+  FilterProteinPtrVec pref_prots = index_ptr_->getTopPrefProts();
   pref_match_ptrs_.clear();
-  for (size_t i = 0; i < pref_scores.size(); i++) {
-    pref_match_ptrs_.push_back( 
-        SimplePrsmPtr(new SimplePrsm(ms_ptr_vec[0]->getHeaderPtr(), group_spec_num,
-                                     proteo_ptrs_[pref_scores[i].first], pref_scores[i].second)));
+  for (size_t i = 0; i < pref_prots.size(); i++) {
+    int id = pref_prots[i]->getProteinId();
+    int score = pref_prots[i]->getScore();
+    SimplePrsmPtr prsm_ptr(new SimplePrsm(prm_ms_ptr_vec[0]->getMsHeaderPtr(), group_spec_num,
+                                          proteo_ptrs_[id], score));
+    prsm_ptr->setCTruncShifts(pref_prots[i]->getCTermShifts());
+    pref_match_ptrs_.push_back(prsm_ptr); 
   }
 
-  std::vector<std::pair<int,int>> suff_scores = index_ptr_->getTopSuffProteoScores();
+  FilterProteinPtrVec suff_prots = index_ptr_->getTopSuffProts();
   suff_match_ptrs_.clear();
-  for (size_t i = 0; i < suff_scores.size(); i++) {
-    suff_match_ptrs_.push_back( 
-        SimplePrsmPtr(new SimplePrsm(ms_ptr_vec[0]->getHeaderPtr(), group_spec_num,
-                                     proteo_ptrs_[suff_scores[i].first], suff_scores[i].second)));
+  for (size_t i = 0; i < suff_prots.size(); i++) {
+    int id = suff_prots[i]->getProteinId();
+    int score = suff_prots[i]->getScore();
+    SimplePrsmPtr prsm_ptr(new SimplePrsm(prm_ms_ptr_vec[0]->getMsHeaderPtr(), group_spec_num,
+                                          proteo_ptrs_[id], score));
+    prsm_ptr->setNTruncShifts(suff_prots[i]->getNTermShifts());
+    suff_match_ptrs_.push_back(prsm_ptr); 
   }
 
-  std::vector<std::pair<int,int>> internal_scores = index_ptr_->getTopInternalProteoScores();
+  FilterProteinPtrVec internal_prots = index_ptr_->getTopInternalProts();
   internal_match_ptrs_.clear();
-  for (size_t i = 0; i < internal_scores.size(); i++) {
-    internal_match_ptrs_.push_back( 
-        SimplePrsmPtr(new SimplePrsm(ms_ptr_vec[0]->getHeaderPtr(), group_spec_num,
-                                     proteo_ptrs_[internal_scores[i].first], internal_scores[i].second)));
+  for (size_t i = 0; i < internal_prots.size(); i++) {
+    int id = internal_prots[i]->getProteinId();
+    int score = internal_prots[i]->getScore();
+    SimplePrsmPtr prsm_ptr(new SimplePrsm(prm_ms_ptr_vec[0]->getMsHeaderPtr(), group_spec_num,
+                                          proteo_ptrs_[id], score));
+    prsm_ptr->setNTruncShifts(internal_prots[i]->getNTermShifts());
+    prsm_ptr->setCTruncShifts(internal_prots[i]->getCTermShifts());
+    internal_match_ptrs_.push_back(prsm_ptr); 
   }
-
 }
-
 
 } /* namespace prot */

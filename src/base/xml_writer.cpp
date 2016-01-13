@@ -1,4 +1,5 @@
 #include "base/xml_writer.hpp"
+#include "base/xml_dom_util.hpp"
 
 namespace prot {
 
@@ -22,8 +23,8 @@ XmlWriter::~XmlWriter(){
 }
 
 void XmlWriter::write(xercesc::DOMElement* element){
-  std::string str = writeToString(serializer_, element);
-  writeToStreamByRemovingDoubleLF(file_, str);
+  std::string str = XmlDomUtil::writeToString(serializer_, element);
+  XmlDomUtil::writeToStreamByRemovingDoubleLF(file_, str);
   element->release();
 }
 

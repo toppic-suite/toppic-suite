@@ -1,11 +1,14 @@
-#ifndef PROT_PRSM_STR_HPP_
-#define PROT_PRSM_STR_HPP_
+#ifndef PROT_PRSM_PRSM_STR_HPP_
+#define PROT_PRSM_PRSM_STR_HPP_
 
 #include <memory>
 #include <vector>
 #include <string>
 
 namespace prot {
+
+class PrsmStr;
+typedef std::shared_ptr<PrsmStr> PrsmStrPtr;
 
 class PrsmStr {
  public:
@@ -15,9 +18,7 @@ class PrsmStr {
 
   int getSpectrumId() {return spectrum_id_;}
 
-  int getDbSeqId() {return db_seq_id_;}
-
-  std::string getDbSeqName() {return db_seq_name_;}
+  std::string getSeqName() {return seq_name_;}
   
   double getMatchFragNum() {return match_frag_num_;}
 
@@ -29,14 +30,25 @@ class PrsmStr {
 
   void setFdr(double fdr);
 
+  //comparison 
+  static bool cmpEValueInc(const PrsmStrPtr &a, const PrsmStrPtr &b) {
+    return a->getEValue() < b->getEValue();
+  }
+
+  static bool cmpMatchFragmentDec(const PrsmStrPtr &a, const PrsmStrPtr &b) {
+    return a->getMatchFragNum() > b->getMatchFragNum();
+  }
+
+  static bool cmpSpectrumIdInc(const PrsmStrPtr &a, const PrsmStrPtr &b) {
+    return a->getSpectrumId() < b->getSpectrumId();
+  }
+
  private:
   std::vector<std::string> str_vec_;
 
   int spectrum_id_;
 
-  int db_seq_id_;
-
-  std::string db_seq_name_;
+  std::string seq_name_;
 
   double match_frag_num_;
 
@@ -45,20 +57,8 @@ class PrsmStr {
   double fdr_;
 };
 
-typedef std::shared_ptr<PrsmStr> PrsmStrPtr;
 typedef std::vector<PrsmStrPtr> PrsmStrPtrVec;
 
-inline bool prsmStrEValueUp(const PrsmStrPtr &a, const PrsmStrPtr &b) {
-  return a->getEValue() < b->getEValue();
-}
-
-inline bool prsmStrMatchFragmentDown(const PrsmStrPtr &a, const PrsmStrPtr &b) {
-  return a->getMatchFragNum() > b->getMatchFragNum();
-}
-
-inline bool prsmStrSpectrumIdUp(const PrsmStrPtr &a, const PrsmStrPtr &b) {
-  return a->getSpectrumId() < b->getSpectrumId();
-}
 
 }
 
