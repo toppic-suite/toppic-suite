@@ -13,6 +13,7 @@ Change::Change(int left_bp_pos, int right_bp_pos,
     change_type_ptr_(change_type_ptr),
     mass_shift_(mass_shift),
     mod_ptr_(mod_ptr) {
+      local_anno_ptr_ = nullptr;
     }
 
 Change::Change(xercesc::DOMElement* element) {
@@ -30,6 +31,13 @@ Change::Change(xercesc::DOMElement* element) {
         = XmlDomUtil::getChildElement(element, mod_element_name.c_str(), 0);
     mod_ptr_ = ModBase::getModPtrFromXml(mod_element);
   }
+  std::string local_element_name = LocalAnno::getXmlElementName();;
+  int local_count = XmlDomUtil::getChildCount(element, local_element_name.c_str());
+  if (local_count != 0) {
+    xercesc::DOMElement * local_element
+        = XmlDomUtil::getChildElement(element, local_element_name.c_str(), 0); 
+    local_anno_ptr_ = LocalAnnoPtr(new LocalAnno(local_element));
+  }
 }
 
 void Change::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
@@ -44,6 +52,9 @@ void Change::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
   xml_doc->addElement(element, "mass_shift", str.c_str());
   if (mod_ptr_ != nullptr) {
     mod_ptr_->appendToXml(xml_doc, element);
+  }
+  if (local_anno_ptr_ != nullptr) {
+    local_anno_ptr_->appendToXml(xml_doc, element);
   }
   parent->appendChild(element);
 }
@@ -60,28 +71,6 @@ bool Change::cmpPosInc(const ChangePtr &a, const ChangePtr &b) {
   }
 }
 
-/*
-bool Change::cmpTypeIncPosInc(const ChangePtr &a, const ChangePtr &b) {
-  if (a->getChangeTypePtr()->getId() < b->getChangeTypePtr()->getId()) {
-    return true;
-  }
-  else if (a->getChangeTypePtr()->getId() > b->getChangeTypePtr()->getId()) {
-    return false;
-  }
-  else {
-    if (a->getLeftBpPos() < b->getLeftBpPos()) {
-      return true;
-    }
-    else if (a->getLeftBpPos() > b->getLeftBpPos()) {
-      return false;
-    }
-    else {
-      return a->getRightBpPos() < b->getRightBpPos();
-    }
-  }
-}
-*/
-
 ChangePtr Change::geneChangePtr(ChangePtr ori_ptr, int start_pos) {
   int left_bp_pos = ori_ptr->left_bp_pos_ - start_pos;
   int right_bp_pos = ori_ptr->right_bp_pos_ - start_pos;
@@ -91,6 +80,12 @@ ChangePtr Change::geneChangePtr(ChangePtr ori_ptr, int start_pos) {
   ChangePtr change_ptr(
       new Change(left_bp_pos, right_bp_pos, change_type_ptr, mass_shift, mod_ptr));
   return change_ptr;
+}
+
+void Change::setLocalAnno(LocalAnnoPtr p) {
+  local_anno_ptr_ = p;
+  left_bp_pos_ = p->getLeftBpPos();
+  right_bp_pos_ = p->getRightBpPos() + 1;
 }
 
 }

@@ -34,12 +34,6 @@ class Ptm {
   /* Get  monoisotopic mass. */
   double getMonoMass() {return mono_mass_;}
 
-  //const ResiduePtrVec& getNTermResidues() {return n_term_residues_;}
-
-  //const ResiduePtrVec& getCTermResidues() {return c_term_residues_;}
-
-  //const ResiduePtrVec& getAnywhereResidues() {return anywhere_residues_;}
-
   int getUnimodId() {return unimod_id_;}
 
   void appendAbbrNameToXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
@@ -53,6 +47,8 @@ class Ptm {
     return a->getMonoMass() < b->getMonoMass();
   }
 
+  bool isSame(PtmPtr ptm_ptr) { return abbr_name_ == ptm_ptr->getAbbrName();}
+
  private:
   /* Full name */
   std::string name_;
@@ -62,12 +58,6 @@ class Ptm {
   double mono_mass_;
   // unimod id
   int unimod_id_;
-  // possible acids
-  /*
-  ResiduePtrVec n_term_residues_;
-  ResiduePtrVec c_term_residues_;
-  ResiduePtrVec anywhere_residues_;
-  */
 };
 
 typedef std::vector<PtmPtr> PtmPtrVec;

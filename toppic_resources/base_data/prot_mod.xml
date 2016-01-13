@@ -70,7 +70,7 @@
 	        <name>Alanine</name>
         </amino_acid>
         <ptm>
-          <abbreviation>Acetylation</abbreviation>
+          <abbreviation>Acetyl</abbreviation>
         </ptm>
       </mod_residue>
     </mod>
@@ -95,7 +95,7 @@
 	        <name>Glycine</name>
         </amino_acid>
         <ptm>
-          <abbreviation>Acetylation</abbreviation>
+          <abbreviation>Acetyl</abbreviation>
         </ptm>
       </mod_residue>
     </mod>
@@ -120,7 +120,7 @@
 	        <name>Serine</name>
         </amino_acid>
         <ptm>
-          <abbreviation>Acetylation</abbreviation>
+          <abbreviation>Acetyl</abbreviation>
         </ptm>
       </mod_residue>
     </mod>
@@ -145,7 +145,7 @@
 	        <name>Threonine</name>
         </amino_acid>
         <ptm>
-          <abbreviation>Acetylation</abbreviation>
+          <abbreviation>Acetyl</abbreviation>
         </ptm>
       </mod_residue>
     </mod>

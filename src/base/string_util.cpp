@@ -70,5 +70,15 @@ std::string StringUtil::convertToString(bool value) {
   return stream.str();
 }
 
+std::string StringUtil::rmComment(const std::string &ori_s, const std::string &comment) {
+  std::string s = ori_s;
+  std::string::size_type i = s.find(comment);
+
+  if (i != std::string::npos)                                                   
+    s.erase(i);
+
+  return s;
+}
+
 }
 

@@ -65,6 +65,10 @@ class Proteoform {
 
    void addChangePtrVec(ChangePtrVec &change_ptr_vec);
 
+   void addChangePtr(ChangePtr &change_ptr);
+
+   void rmChangePtr(ChangePtr &change_ptr);
+
    SegmentPtrVec getSegmentPtrVec();
 
    std::string getProteinMatchSeq();
