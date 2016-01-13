@@ -146,6 +146,7 @@ int two_ptm_process(int argc, char* argv[]) {
     input_exts.push_back("ONE_PTM_INTERNAL");
 
 
+    /*
     time(&start_s);
     std::cout << "Diagonal PTM filtering started." << std::endl;
     DiagFilterMngPtr diag_filter_mng_ptr 
@@ -157,11 +158,11 @@ int two_ptm_process(int argc, char* argv[]) {
     std::cout << "Diagonal filtering finished." << std::endl;
     time(&stop_s);
     std::cout <<  "Diagonal filtering running time: " << difftime(stop_s, start_s)  << " seconds " << std::endl;
+    */
 
-    /*
     time(&start_s);
     std::cout << "Two PTM search started." << std::endl;
-    shift_num = 2;
+    int shift_num = 2;
     PtmSearchMngPtr two_search_mng_ptr 
         = PtmSearchMngPtr(new PtmSearchMng (prsm_para_ptr, n_top, max_ptm_mass, shift_num,
                                             "DIAG_FILTER", "PTM"));
@@ -248,7 +249,6 @@ int two_ptm_process(int argc, char* argv[]) {
     table_out->write();
     table_out = PrsmTableWriterPtr(new PrsmTableWriter(prsm_para_ptr, "PTM_2_INTERNAL", "PTM_2_INTERNAL_TABLE"));
     table_out->write();
-    */
 
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
