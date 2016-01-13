@@ -31,21 +31,21 @@ void AnnoSegment::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent,
   xml_doc->addElement(element, "segment_type", segment_type_.c_str());
   std::string occu = "";
   if (ptm_ptr_ != nullptr) {
-      ptm_ptr_->appendAbbrNameToXml(xml_doc, element);
-      for (size_t i = 0; i < occurences_.size(); i++) {
-          if (i != occurences_.size() - 1) {
-              occu += occurences_[i].second + StringUtil::convertToString(occurences_[i].first);
-              occu += " / ";
-          } else {
-              occu += occurences_[i].second + StringUtil::convertToString(occurences_[i].first);
-          }
+    ptm_ptr_->appendAbbrNameToXml(xml_doc, element);
+    for (size_t i = 0; i < occurences_.size(); i++) {
+      if (i != occurences_.size() - 1) {
+        occu += occurences_[i].second + StringUtil::convertToString(occurences_[i].first);
+        occu += " / ";
+      } else {
+        occu += occurences_[i].second + StringUtil::convertToString(occurences_[i].first);
       }
+    }
   } else {
-      if (occurences_.size() > 0) {
-          occu += occurences_[0].second + StringUtil::convertToString(occurences_[0].first);
-          occu += " - ";
-          occu += occurences_[1].second + StringUtil::convertToString(occurences_[1].first);
-      }
+    if (occurences_.size() > 0) {
+      occu += occurences_[0].second + StringUtil::convertToString(occurences_[0].first);
+      occu += " - ";
+      occu += occurences_[1].second + StringUtil::convertToString(occurences_[1].first);
+    }
   }
   xml_doc->addElement(element, "occurence", occu.c_str());
   parent->appendChild(element);
@@ -53,9 +53,9 @@ void AnnoSegment::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent,
 
 }
 
-  /*
-  
-  if (type_ == "SHIFT") {
-      xml_doc->addElement(element, "change_type", StringUtil::convertToString(4).c_str());
-  }
-  */
+/*
+
+   if (type_ == "SHIFT") {
+   xml_doc->addElement(element, "change_type", StringUtil::convertToString(4).c_str());
+   }
+   */

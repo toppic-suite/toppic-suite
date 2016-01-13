@@ -125,56 +125,8 @@ void addInsertion(int left_db_bp, int right_db_bp, ChangePtr change_ptr, int col
   cleavage_ptrs[left_db_bp]->setUnexpectedChangeColor(color);;
 }
 
-void addLocalizationResult(AnnoSegmentPtr segment_ptr, ChangePtr change_ptr) {
-  /*
-  segment_ptr->setPtmPtr(change_ptrs[i]->getModPtr());
-  std::string anno_info = "PTM: ";
-  if (change_ptrs[i]->getModPtr() != nullptr) {
-    anno_info += change_ptrs[i]->getModPtr()->getModResiduePtr()->getPtmPtr()->getName() + "\n";
-    std::vector<double> scr = change_ptrs[i]->getScr();
-    for (int k = left_db_bp; k < right_db_bp; k++) {
-      if (scr[k - left_db_bp] > 0) {
-        std::string acid_letter = proteoform_ptr->getDbResSeqPtr()
-            ->getResiduePtr(k)->getAcidPtr()->getOneLetter();
-        anno_info += "Site: " + acid_letter + std::to_string(k) + " ";
-        anno_info += "Confidence: "
-            + StringUtil::convertToString(scr[k - left_db_bp] * 100, 2) + "%\n";
-      }
-    }
-    for (int k = left_db_bp; k < right_db_bp; k++) {
-      if (scr[k - left_db_bp] > 0) {
-        std::string acid_letter = proteoform_ptr->getDbResSeqPtr()
-            ->getResiduePtr(k)->getAcidPtr()->getOneLetter();
-        anno_change_ptr->addOccurence(k, acid_letter);
-        res_ptrs[k]->setPossiblePosColor(1);
-        res_ptrs[k]->setAnno(anno_info);
-      }
-    }
-  } else {
-    anno_info += "Unknown\n";
-    std::string acid_letter = proteoform_ptr->getDbResSeqPtr()
-        ->getResiduePtr(left_db_bp)->getAcidPtr()->getOneLetter();
-    anno_change_ptr->addOccurence(left_db_bp, acid_letter);
-    anno_info += "Region: " + acid_letter + std::to_string(left_db_bp) + " - ";
-    acid_letter = proteoform_ptr->getDbResSeqPtr()->getResiduePtr(
-        right_db_bp - 1)->getAcidPtr()->getOneLetter();
-    anno_info += acid_letter + std::to_string(right_db_bp - 1);
-    anno_change_ptr->addOccurence(right_db_bp - 1, acid_letter);
-    double scr_sum = 0.0;
-    std::vector<double> scr = change_ptrs[i]->getScr();
-    for (int k = left_db_bp; k < right_db_bp; k++) {
-      scr_sum += scr[k - left_db_bp];
-    }
-    anno_info += " Confindence: " + StringUtil::convertToString(scr_sum * 100, 2) + "%\n";
-    for (int k = left_db_bp; k < right_db_bp; k++) {
-      res_ptrs[k]->setPossiblePosColor(1);
-      res_ptrs[k]->setAnno(anno_info);
-    }
-  }
-  */
-}
-
-void addMod(int left_db_bp, int right_db_bp, ChangePtr change_ptr, int color, int &last_right, 
+void addMod(ProteoformPtr proteoform_ptr, int left_db_bp, int right_db_bp,
+            ChangePtr change_ptr, int color, int &last_right, 
             AnnoSegmentPtrVec &segment_ptrs, AnnoCleavagePtrVec &cleavage_ptrs,
             AnnoResiduePtrVec &res_ptrs) {
   int this_left = left_db_bp * 2 + 1;
@@ -186,7 +138,20 @@ void addMod(int left_db_bp, int right_db_bp, ChangePtr change_ptr, int color, in
   double shift = change_ptr->getMassShift();
   AnnoSegmentPtr segment_ptr(new AnnoSegment("SHIFT", this_left , this_right, shift, color));
 
-  addLocalizationResult(segment_ptr, change_ptr);
+  if (change_ptr->getLocalAnno() != nullptr) {
+    for (int j = left_db_bp; j < right_db_bp; j++) {
+      std::string fasta_seq = proteoform_ptr->getFastaSeqPtr()->getSeq();
+      std::string acid_letter = fasta_seq.substr(left_db_bp, 1);
+      segment_ptr->addOccurence(j, acid_letter);
+
+    }
+    for (size_t j = 0; j < change_ptr->getLocalAnno()->getScrVec().size(); j++) {
+      segment_ptr->addScr(change_ptr->getLocalAnno()->getScrVec()[j]);
+    }  
+    if (change_ptr->getLocalAnno()->getPtmPtr() != nullptr) {
+      segment_ptr->setPtmPtr(change_ptr->getLocalAnno()->getPtmPtr());
+    }
+  }
 
   segment_ptrs.push_back(segment_ptr);
   last_right = this_right;
@@ -215,7 +180,7 @@ AnnoSegmentPtrVec getSegments(ProteoformPtr proteoform_ptr, ChangePtrVec &change
                    last_right, segment_ptrs, cleavage_ptrs);
     }
     else {
-      addMod(left_db_bp, right_db_bp, change_ptrs[i], unexpected_shift_color,
+      addMod(proteoform_ptr, left_db_bp, right_db_bp, change_ptrs[i], unexpected_shift_color,
              last_right, segment_ptrs, cleavage_ptrs, res_ptrs);
     }
     unexpected_shift_color = (unexpected_shift_color) + 1 % 2;
@@ -250,8 +215,8 @@ AnnoSegmentPtrVec removeEmptySegment(AnnoSegmentPtrVec &segment_ptrs) {
 }
 
 xercesc::DOMElement* geneAnnoProteoform(XmlDOMDocument* xml_doc,
-                                     PrsmPtr prsm_ptr,
-                                     PrsmViewMngPtr mng_ptr, double err) {
+                                        PrsmPtr prsm_ptr,
+                                        PrsmViewMngPtr mng_ptr) {
   ProteoformPtr proteoform_ptr = prsm_ptr->getProteoformPtr();
   xercesc::DOMElement* prot_element = xml_doc->createElement("annotated_protein");
   addSummary(xml_doc, prot_element, proteoform_ptr, mng_ptr);
@@ -266,7 +231,7 @@ xercesc::DOMElement* geneAnnoProteoform(XmlDOMDocument* xml_doc,
   // obtain residue_ptrs 
   AnnoResiduePtrVec res_ptrs = getAnnoResidues(proteoform_ptr, mng_ptr);
   //LOG_DEBUG("residue completed");
-  
+
   addTruncationAnno(proteoform_ptr, cleavage_ptrs, res_ptrs);
 
   AnnoPtmPtrVec anno_ptm_ptrs;
