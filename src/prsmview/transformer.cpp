@@ -8,16 +8,16 @@ namespace prot
 void translate(std::map<std::string,std::string> &arguments)
 {
     std::string spectrum_file_name_ = arguments["spectrumFileName"];
-    std::string xml_dir = basename(spectrum_file_name_) + "_xml";
-    std::string html_dir = basename(spectrum_file_name_) + "_html";
+    std::string xml_dir = FileUtil::basename(spectrum_file_name_) + "_xml";
+    std::string html_dir = FileUtil::basename(spectrum_file_name_) + "_html";
     std::string exec_dir = arguments["executiveDir"];
 
-    createFolder(html_dir + FILE_SEPARATOR +"proteoforms");
-    createFolder(html_dir + FILE_SEPARATOR +"prsms");
-    createFolder(html_dir + FILE_SEPARATOR +"proteins");
-    boost::filesystem::path from_path(exec_dir + FILE_SEPARATOR + "toppic_resources" + FILE_SEPARATOR + "web");
-    boost::filesystem::path to_path(html_dir + FILE_SEPARATOR + "resources");
-    copyDir(from_path, to_path);
+    FileUtil::createFolder(html_dir + FileUtil::getFileSeparator() +"proteoforms");
+    FileUtil::createFolder(html_dir + FileUtil::getFileSeparator() +"prsms");
+    FileUtil::createFolder(html_dir + FileUtil::getFileSeparator() +"proteins");
+    boost::filesystem::path from_path(exec_dir + FileUtil::getFileSeparator() + "toppic_resources" + FileUtil::getFileSeparator() + "web");
+    boost::filesystem::path to_path(html_dir + FileUtil::getFileSeparator() + "resources");
+    FileUtil::copyDir(from_path, to_path);
 
 
 
@@ -28,7 +28,7 @@ void translate(std::map<std::string,std::string> &arguments)
     //std::cout<<"trans start ! XalanTransformer"<<std::endl;
     xalanc::XalanTransformer theXanlanTransformer;
 
-    std::string xml_file_list = xml_dir + FILE_SEPARATOR + "files.xml";
+    std::string xml_file_list = xml_dir + FileUtil::getFileSeparator() + "files.xml";
     std::vector<std::vector<std::string>> anno_view = readViewXmlFiles(xml_file_list);
     for(unsigned int i=0; i<anno_view.size(); i++)
     {

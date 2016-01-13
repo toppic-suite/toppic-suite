@@ -17,12 +17,12 @@ class ZeroPtmFilterMng {
   PrsmParaPtr prsm_para_ptr_;
 
   /** parameters for fast filteration */
-  int max_proteoform_mass = 100000;
+  int max_proteoform_mass_ = 100000;
 
   //Candidate protein number for each spectrum
-  unsigned int comp_result_num_ = 5;
-  unsigned int pref_suff_result_num_ = 5;
-  unsigned int internal_result_num_ = 10;
+  unsigned int comp_num_ = 5;
+  unsigned int pref_suff_num_ = 5;
+  unsigned int inte_num_ = 10;
   int filter_scale_ = 100;
 
   std::string output_file_ext_;

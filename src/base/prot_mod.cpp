@@ -1,95 +1,59 @@
-#include <base/logger.hpp>
-
+#include "base/logger.hpp"
+#include "base/ptm_base.hpp"
+#include "base/trunc_base.hpp"
+#include "base/mod_base.hpp"
 #include "base/prot_mod.hpp"
+#include "base/xml_dom_util.hpp"
 
 namespace prot {
 
-ProtModPtrVec ProtModFactory::prot_mod_ptr_vec_;
+ProtMod::ProtMod(const std::string &name, const std::string &type,
+                 TruncPtr trunc_ptr, ModPtr mod_ptr): 
+    name_(name),
+    type_(type),
+    trunc_ptr_(trunc_ptr),
+    mod_ptr_(mod_ptr) {
+      mod_pos_ = trunc_ptr->getTruncLen();
+      prot_shift_ = trunc_ptr_->getShift() + mod_ptr_->getShift();
+      pep_shift_ = mod_ptr_->getShift();
+    }
 
-ProtMod::ProtMod(const std::string &name, TruncPtr trunc_ptr, 
-                 PtmPtr ptm_ptr, const AcidPtrVec &valid_acid_ptr_vec) {
-  name_ = name;
-  trunc_ptr_ = trunc_ptr;
-  ptm_ptr_ = ptm_ptr;
-  valid_acid_ptr_vec_ = valid_acid_ptr_vec;
-  prot_shift_ = trunc_ptr_->getShift() + ptm_ptr_->getMonoMass();
-  pep_shift_ = ptm_ptr_->getMonoMass();
+ProtMod::ProtMod(xercesc::DOMElement* element) { 
+  name_ = XmlDomUtil::getChildValue(element, "name", 0);
+  type_ = XmlDomUtil::getChildValue(element, "type", 0);
+  std::string trunc_element_name = Trunc::getXmlElementName();
+  xercesc::DOMElement* trunc_element 
+      = XmlDomUtil::getChildElement(element, trunc_element_name.c_str(), 0);
+  trunc_ptr_ = TruncBase::getTruncPtrFromXml(trunc_element);
+  std::string mod_element_name = Mod::getXmlElementName();
+  xercesc::DOMElement* mod_element 
+      = XmlDomUtil::getChildElement(element, mod_element_name.c_str(), 0);
+  mod_ptr_= ModBase::getModPtrFromXml(mod_element); 
+  mod_pos_ = trunc_ptr_->getTruncLen();
+  prot_shift_ = trunc_ptr_->getShift() + mod_ptr_->getShift();
+  pep_shift_ = mod_ptr_->getShift();
 }
 
-void ProtMod::appendxml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
-  xercesc::DOMElement* element = xml_doc->createElement("prot_mod");
+void ProtMod::appendNameToXml(XmlDOMDocument* xml_doc,
+                              xercesc::DOMElement* parent){
+  std::string element_name = ProtMod::getXmlElementName();
+  xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
   xml_doc->addElement(element, "name", name_.c_str());
   parent->appendChild(element);
 }
 
-bool ProtMod::allowMod(const ResiduePtrVec &residues){
-    if (name_ == "NONE") {
-        return true;
-    }
-    else if (name_ == "NME") {
-        if(residues.size()>=2 && residues[0]->getAcidPtr()->getOneLetter() == "M"){
-            return true;
-        }
-        return false;
-    }
-    else if (name_ == "ACETYLATION") {
-        return true;
-    }
-    else if (name_ == "NME_ACETYLATION"){
-        if(residues.size()>=2 && residues[0]->getAcidPtr()->getOneLetter() == "M"){
-            return true;
-        }
-        return false;
-    }
-  return false;
+std::string ProtMod::getNameFromXml(xercesc::DOMElement * element) {
+  std::string name = XmlDomUtil::getChildValue(element, "name", 0);
+  return name;
 }
 
-void ProtModFactory::initFactory(const std::string &file_name) {
-  prot::XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
-  if (parser) {
-    prot::XmlDOMDocument doc(parser, file_name.c_str());
-    xercesc::DOMElement* parent = doc.getDocumentElement();
-    int mod_num = getChildCount(parent, "prot_mod");
-    for (int i = 0; i < mod_num; i++) {
-      xercesc::DOMElement* element = getChildElement(parent, "prot_mod", i);
-      std::string name = getChildValue(element, "name", 0);
-      std::string trunc_name = getChildValue(element, "trunc_name", 0);
-      std::string ptm_name = getChildValue(element, "ptm_name", 0);
-      std::string valid_acids = getChildValue(element, "valid_acids", 0);
-      TruncPtr trunc_ptr = TruncFactory::getBaseTruncPtrByName(trunc_name);
-      PtmPtr ptm_ptr = PtmFactory::getBasePtmPtrByAbbrName(ptm_name);
-      LOG_DEBUG( "name " << name << " trunc_name " 
-                << trunc_name << " valid acids " << valid_acids);
-      AcidPtrVec valid_acid_ptrs;
-      for (size_t j = 0; j < valid_acids.length(); j++) {
-        std::string letter = valid_acids.substr(j, 1);
-        AcidPtr acid_ptr = AcidFactory::getBaseAcidPtrByOneLetter(letter);
-        valid_acid_ptrs.push_back(acid_ptr);
-      }
-      prot_mod_ptr_vec_.push_back(ProtModPtr(
-              new ProtMod(name, trunc_ptr, ptm_ptr, valid_acid_ptrs)));
-
-    }
+bool ProtMod::isAcetylation() {
+  if (mod_ptr_->getModResiduePtr()->getPtmPtr() == PtmBase::getPtmPtr_Acetylation()) {
+    return true;
   }
-}
-
-ProtModPtr ProtModFactory::getBaseProtModPtrByName(const std::string &name) {
-  for (size_t i = 0; i < prot_mod_ptr_vec_.size(); i++) {
-    std::string n = prot_mod_ptr_vec_[i]->getName();
-    if (n == name) {
-      return prot_mod_ptr_vec_[i];
-    }
+  else {
+    return false;
   }
-  return ProtModPtr(nullptr);
-}
-
-bool containNME_ACETYLATION(const ProtModPtrVec &prot_mod_ptrs) {
-  for (size_t i = 0; i < prot_mod_ptrs.size(); i++) {
-    if (prot_mod_ptrs[i] == ProtModFactory::getProtModPtr_NME_ACETYLATION ()) {
-      return true;
-    }
-  }
-  return false;
 }
 
 }

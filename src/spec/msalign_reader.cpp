@@ -1,21 +1,24 @@
+#include <cmath>
+
 #include "base/logger.hpp"
+#include "base/activation_base.hpp"
 #include "base/string_util.hpp"
 #include "spec/msalign_reader.hpp"
 
 namespace prot {
 
 MsAlignReader::MsAlignReader (const std::string &file_name, 
-                              int group_spec_num) {
-  file_name_ = file_name;
-  input_.open(file_name.c_str(), std::ios::in);
-  group_spec_num_ = group_spec_num;
-}
+                              int group_spec_num): 
+    file_name_(file_name),
+    group_spec_num_(group_spec_num) {
+      input_.open(file_name.c_str(), std::ios::in);
+    }
 
 std::vector<std::string> MsAlignReader::readOneSpectrum() {
   std::string line;
   std::vector<std::string> line_list;
   while (std::getline(input_, line)) {
-    line = trim(line);
+    line = StringUtil::trim(line);
     if (line ==  "BEGIN IONS") {
       line_list.push_back(line);
     }
@@ -56,7 +59,7 @@ void MsAlignReader::readNext() {
   for (size_t i = 1; i < spectrum_str_vec_.size() - 1; i++) {
     std::string letter = spectrum_str_vec_[i].substr(0,1);
     if (letter >= "A" && letter <= "Z") {
-      strs = split(spectrum_str_vec_[i], '=');
+      strs = StringUtil::split(spectrum_str_vec_[i], '=');
       if (strs[0] == "ID") {
         id = std::stoi(strs[1]);
       }
@@ -108,7 +111,7 @@ void MsAlignReader::readNext() {
   }
   if (activation != "") {
     ActivationPtr activation_ptr = 
-        ActivationFactory::getBaseActivationPtrByName(activation);
+        ActivationBase::getActivationPtrByName(activation);
     header_ptr->setActivationPtr(activation_ptr);
   }
   header_ptr->setMsLevel(level);
@@ -122,7 +125,7 @@ void MsAlignReader::readNext() {
   for (size_t i = 1; i < spectrum_str_vec_.size() - 1; i++) {
     std::string letter = spectrum_str_vec_[i].substr(0,1);
     if (letter >= "0" && letter <= "9") {
-      strs = split(spectrum_str_vec_[i], '\t');
+      strs = StringUtil::split(spectrum_str_vec_[i], '\t');
       double mass = std::stod(strs[0]);
       double inte = std::stod(strs[1]);
       int charge = std::stoi(strs[2]);
@@ -151,11 +154,11 @@ SpectrumSetPtr MsAlignReader::getNextSpectrumSet(SpParaPtr sp_para_ptr) {
     }
     deconv_ms_ptr_vec.push_back(deconv_ms_ptr_);
   }
-  double prec_mono_mass = deconv_ms_ptr_vec[0]->getHeaderPtr()->getPrecMonoMass();
+  double prec_mono_mass = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMass();
   //LOG_DEBUG("prec mass " << prec_mono_mass);
   int count = 1;
   for (int i = 1; i < group_spec_num_; i++) {
-    double new_mass = deconv_ms_ptr_vec[i]->getHeaderPtr()->getPrecMonoMass();
+    double new_mass = deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getPrecMonoMass();
     if (std::abs(prec_mono_mass - new_mass) < 0.5) {
       prec_mono_mass = (prec_mono_mass * count + new_mass)/ (count+1);
       count++;
@@ -167,37 +170,6 @@ SpectrumSetPtr MsAlignReader::getNextSpectrumSet(SpParaPtr sp_para_ptr) {
     
 void MsAlignReader::close() {
   input_.close();
-}
-
-int countSpNum(const std::string &spectrum_file_name) {
-  MsAlignReader reader(spectrum_file_name, 1);
-  int cnt = 0;
-  DeconvMsPtr deconv_ms_ptr;
-  while ((deconv_ms_ptr = reader.getNextMs()) != nullptr) {
-    cnt++;
-  }
-  reader.close();
-  return cnt;
-}
-
-void generateSpIndex(const std::string &spectrum_file_name) {
-  int sp_num = countSpNum(spectrum_file_name); 
-  std::ofstream index_output;
-  std::string index_file_name = spectrum_file_name + "_index";
-  index_output.open(index_file_name.c_str(), std::ios::out);
-  index_output << sp_num << std::endl;
-  index_output.close();
-}
-
-int getSpNum(const std::string &spectrum_file_name) {
-  std::ifstream index_input;
-  std::string index_file_name = spectrum_file_name + "_index";
-  index_input.open(index_file_name.c_str(), std::ios::in);
-  std::string line;
-  std::getline(index_input, line);
-  int sp_num = std::stoi(line);
-  LOG_DEBUG("Get sp number " << sp_num);
-  return sp_num;
 }
 
 }

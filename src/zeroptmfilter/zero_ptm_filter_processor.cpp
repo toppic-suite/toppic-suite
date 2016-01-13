@@ -1,10 +1,11 @@
 #include "base/proteoform.hpp"
-#include "base/proteoform_reader.hpp"
+#include "base/proteoform_factory.hpp"
 #include "base/file_util.hpp"
 #include "base/web_logger.hpp"
 #include "spec/msalign_reader.hpp"
+#include "spec/msalign_util.hpp"
 #include "spec/spectrum_set.hpp"
-#include "prsm/simple_prsm_writer.hpp"
+#include "prsm/simple_prsm_xml_writer.hpp"
 #include "prsm/simple_prsm_str_combine.hpp"
 #include "zeroptmfilter/zero_ptm_filter_processor.hpp"
 #include "zeroptmfilter/zero_ptm_filter.hpp"
@@ -17,7 +18,7 @@ ZeroPtmFilterProcessor::ZeroPtmFilterProcessor(ZeroPtmFilterMngPtr mng_ptr){
 
 void ZeroPtmFilterProcessor::process(){
   std::string db_file_name = mng_ptr_->prsm_para_ptr_->getSearchDbFileName();
-  DbBlockPtrVec db_block_ptr_vec = readDbBlockIndex(db_file_name);
+  DbBlockPtrVec db_block_ptr_vec = DbBlock::readDbBlockIndex(db_file_name);
 
   for(size_t i=0; i< db_block_ptr_vec.size(); i++){
     std::cout << "Zero PTM filtering block " << (i+1) << " out of " 
@@ -34,22 +35,22 @@ void ZeroPtmFilterProcessor::process(){
 
   SimplePrsmStrCombine comp_combine(sp_file_name, mng_ptr_->output_file_ext_ + "_COMPLETE",
                                     block_num, mng_ptr_->output_file_ext_ + "_COMPLETE", 
-                                    mng_ptr_->comp_result_num_);
+                                    mng_ptr_->comp_num_);
   comp_combine.process();
 
   SimplePrsmStrCombine pref_combine(sp_file_name, mng_ptr_->output_file_ext_ + "_PREFIX",
                                     block_num, mng_ptr_->output_file_ext_ + "_PREFIX", 
-                                    mng_ptr_->pref_suff_result_num_);
+                                    mng_ptr_->pref_suff_num_);
   pref_combine.process();
 
   SimplePrsmStrCombine suff_combine(sp_file_name, mng_ptr_->output_file_ext_ + "_SUFFIX",
                                     block_num, mng_ptr_->output_file_ext_ + "_SUFFIX", 
-                                    mng_ptr_->pref_suff_result_num_);
+                                    mng_ptr_->pref_suff_num_);
   suff_combine.process();
 
   SimplePrsmStrCombine internal_combine(sp_file_name, mng_ptr_->output_file_ext_ + "_INTERNAL",
                                         block_num, mng_ptr_->output_file_ext_ + "_INTERNAL", 
-                                        mng_ptr_->internal_result_num_);
+                                        mng_ptr_->inte_num_);
   internal_combine.process();
 
   std::cout << "Zero PTM filtering: combining blocks finished." << std::endl; 
@@ -60,25 +61,24 @@ void ZeroPtmFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_
   std::string db_block_file_name = prsm_para_ptr->getSearchDbFileName() 
       + "_" + std::to_string(block_ptr->getBlockIdx());
   ProteoformPtrVec raw_forms 
-      = readFastaToProteoform(db_block_file_name, 
-                              prsm_para_ptr->getFixModResiduePtrVec(),
-                              block_ptr->getSeqIdx());
+      = ProteoformFactory::readFastaToProteoformPtrVec(db_block_file_name, 
+                                                       prsm_para_ptr->getFixModPtrVec());
   ZeroPtmFilterPtr filter_ptr(new ZeroPtmFilter(raw_forms, mng_ptr_));
 
   int group_spec_num = mng_ptr_->prsm_para_ptr_->getGroupSpecNum();
   SpParaPtr sp_para_ptr =  mng_ptr_->prsm_para_ptr_->getSpParaPtr();
   MsAlignReader reader(prsm_para_ptr->getSpectrumFileName(), group_spec_num);
-  std::string output_file_name = basename(prsm_para_ptr->getSpectrumFileName())
+  std::string output_file_name = FileUtil::basename(prsm_para_ptr->getSpectrumFileName())
       + "." + mng_ptr_->output_file_ext_;
   std::string block_str = std::to_string(block_ptr->getBlockIdx());
 
-  SimplePrsmWriter comp_writer(output_file_name + "_COMPLETE_" + block_str);
-  SimplePrsmWriter pref_writer(output_file_name + "_PREFIX_" + block_str);
-  SimplePrsmWriter suff_writer(output_file_name + "_SUFFIX_" + block_str);
-  SimplePrsmWriter internal_writer(output_file_name + "_INTERNAL_" + block_str);
+  SimplePrsmXmlWriter comp_writer(output_file_name + "_COMPLETE_" + block_str);
+  SimplePrsmXmlWriter pref_writer(output_file_name + "_PREFIX_" + block_str);
+  SimplePrsmXmlWriter suff_writer(output_file_name + "_SUFFIX_" + block_str);
+  SimplePrsmXmlWriter internal_writer(output_file_name + "_INTERNAL_" + block_str);
     
   SpectrumSetPtr spec_set_ptr;
-  int spectrum_num = getSpNum (prsm_para_ptr->getSpectrumFileName());
+  int spectrum_num = MsAlignUtil::getSpNum (prsm_para_ptr->getSpectrumFileName());
   int cnt = 0;
   while((spec_set_ptr = reader.getNextSpectrumSet(sp_para_ptr)) != nullptr){
     cnt+= group_spec_num;

@@ -1,11 +1,15 @@
-#ifndef PROT_SIMPLE_PRSM_STR_HPP_
-#define PROT_SIMPLE_PRSM_STR_HPP_
+#ifndef PROT_PRSM_SIMPLE_PRSM_STR_HPP_
+#define PROT_PRSM_SIMPLE_PRSM_STR_HPP_
 
 #include <memory>
 #include <vector>
 #include <string>
 
 namespace prot {
+
+class SimplePrsmStr;
+
+typedef std::shared_ptr<SimplePrsmStr> SimplePrsmStrPtr;
 
 class SimplePrsmStr {
  public:
@@ -17,6 +21,10 @@ class SimplePrsmStr {
   
   double getScore() {return score_;}
 
+  static bool cmpScoreDec(const SimplePrsmStrPtr &a, const SimplePrsmStrPtr &b) {
+    return a->getScore() > b->getScore();
+  }
+
  private:
   std::vector<std::string> str_vec_;
 
@@ -26,17 +34,7 @@ class SimplePrsmStr {
 
 };
 
-typedef std::shared_ptr<SimplePrsmStr> SimplePrsmStrPtr;
 typedef std::vector<SimplePrsmStrPtr> SimplePrsmStrPtrVec;
-
-inline bool simplePrsmStrScoreDown(const SimplePrsmStrPtr &a, const SimplePrsmStrPtr &b) {
-  return a->getScore() > b->getScore();
-}
-
-std::string getValueStr(std::string line);
-
-std::string getXmlLine(const std::vector<std::string> &str_vec,
-                       const std::string &property);
 
 }
 

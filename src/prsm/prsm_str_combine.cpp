@@ -31,7 +31,7 @@ PrsmStrCombine::PrsmStrCombine(const std::string &spec_file_name,
 
 void PrsmStrCombine::process() {
   size_t input_num = input_file_exts_.size();
-  std::string base_name = basename(spec_file_name_); 
+  std::string base_name = FileUtil::basename(spec_file_name_); 
   // open files
   PrsmReaderPtrVec reader_ptrs;
   PrsmStrPtrVec prsm_str_ptrs;
@@ -42,7 +42,7 @@ void PrsmStrCombine::process() {
     reader_ptrs.push_back(reader_ptr);
     prsm_str_ptrs.push_back(str_ptr);
   }
-  PrsmWriter writer(base_name +"."+output_file_ext_);
+  PrsmXmlWriter writer(base_name +"."+output_file_ext_);
   
   // combine
   int spec_id = 0;
@@ -60,7 +60,7 @@ void PrsmStrCombine::process() {
       }
     }
     if (cur_str_ptrs.size() > 0) {
-      std::sort(cur_str_ptrs.begin(),cur_str_ptrs.end(),prsmStrMatchFragmentDown);
+      std::sort(cur_str_ptrs.begin(),cur_str_ptrs.end(),PrsmStr::cmpMatchFragmentDec);
       for (int i = 0; i < top_num_; i++) {
         if (i >= (int)cur_str_ptrs.size()) {
           break;

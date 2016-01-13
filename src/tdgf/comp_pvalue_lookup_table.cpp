@@ -1,8 +1,8 @@
 #include <boost/algorithm/string.hpp>
 
 #include "base/logger.hpp"
-#include "tdgf/comp_pvalue_lookup_table.hpp"
 #include "base/file_util.hpp"
+#include "tdgf/comp_pvalue_lookup_table.hpp"
 
 namespace prot {
 
@@ -27,9 +27,9 @@ void CompPValueLookupTable::initTable() {
   std::vector<std::string> strs;
 
   input_.open(
-      mng_ptr_->prsm_para_ptr_->getExeDir() + FILE_SEPARATOR
-          + "toppic_resources" + FILE_SEPARATOR + "p_value_table"
-          + FILE_SEPARATOR + "ppm" + std::to_string(ppo) + "_ptm0.txt",
+      mng_ptr_->prsm_para_ptr_->getExeDir() + FileUtil::getFileSeparator()
+          + "toppic_resources" + FileUtil::getFileSeparator() + "p_value_table"
+          + FileUtil::getFileSeparator() + "ppm" + std::to_string(ppo) + "_ptm0.txt",
       std::ios::in);
 
   while (std::getline(input_, line)) {
@@ -41,9 +41,9 @@ void CompPValueLookupTable::initTable() {
   input_.close();
 
   input_.open(
-      mng_ptr_->prsm_para_ptr_->getExeDir() + FILE_SEPARATOR
-          + "toppic_resources" + FILE_SEPARATOR + "p_value_table"
-          + FILE_SEPARATOR + "ppm" + std::to_string(ppo) + "_ptm1.txt",
+      mng_ptr_->prsm_para_ptr_->getExeDir() + FileUtil::getFileSeparator()
+          + "toppic_resources" + FileUtil::getFileSeparator() + "p_value_table"
+          + FileUtil::getFileSeparator() + "ppm" + std::to_string(ppo) + "_ptm1.txt",
       std::ios::in);
 
   while (std::getline(input_, line)) {
@@ -55,9 +55,9 @@ void CompPValueLookupTable::initTable() {
   input_.close();
 
   input_.open(
-      mng_ptr_->prsm_para_ptr_->getExeDir() + FILE_SEPARATOR
-          + "toppic_resources" + FILE_SEPARATOR + "p_value_table"
-          + FILE_SEPARATOR + "ppm" + std::to_string(ppo) + "_ptm2.txt",
+      mng_ptr_->prsm_para_ptr_->getExeDir() + FileUtil::getFileSeparator()
+          + "toppic_resources" + FileUtil::getFileSeparator() + "p_value_table"
+          + FileUtil::getFileSeparator() + "ppm" + std::to_string(ppo) + "_ptm2.txt",
       std::ios::in);
 
   while (std::getline(input_, line)) {
@@ -116,25 +116,25 @@ double CompPValueLookupTable::compProb(int peak_num, int match_frag_num,
 
   res = exp(res);
 
-  LOG_DEBUG("prob " << res);
+  //LOG_DEBUG("prob " << res);
 
   return res;
 }
 
 /* set alignment */
-void CompPValueLookupTable::process(const DeconvMsPtrVec &deconv_ms_ptr_vec, PrsmPtrVec &prsm_ptrs) {
+void CompPValueLookupTable::process(const DeconvMsPtrVec &deconv_ms_ptr_vec, PrsmPtrVec &prsm_ptrs,
+                                    double ppo) {
   //int ppo = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
   int peak_num = 0; 
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
     peak_num += deconv_ms_ptr_vec[i]->size();
   }
-  double tolerance = deconv_ms_ptr_vec[0]->getHeaderPtr()->getErrorTolerance();
-  double refine_prec_mass = deconv_ms_ptr_vec[0]->getHeaderPtr()->getPrecMonoMassMinusWater();
+  double tolerance = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getErrorTolerance(ppo);
+  double refine_prec_mass = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMassMinusWater();
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     
     int match_frag_num = prsm_ptrs[i]->getMatchFragNum();
-    int unexpected_shift_num = prsm_ptrs[i]->getProteoformPtr()
-        ->getUnexpectedChangeNum();
+    int unexpected_shift_num = prsm_ptrs[i]->getProteoformPtr()->getChangeNum(ChangeType::UNEXPECTED);
 
     double prot_prob = 1.0;
 
@@ -144,15 +144,14 @@ void CompPValueLookupTable::process(const DeconvMsPtrVec &deconv_ms_ptr_vec, Prs
       prot_prob = compProb(peak_num, match_frag_num, unexpected_shift_num);
     }
 
-    SemiAlignTypePtr type_ptr = prsm_ptrs[i]->getProteoformPtr()
-        ->getSemiAlignType();
+    AlignTypePtr type_ptr = prsm_ptrs[i]->getProteoformPtr()->getAlignType();
 
     double cand_num = test_num_ptr_->compCandNum(type_ptr, unexpected_shift_num,
                                                  refine_prec_mass, tolerance);
 
-    ExtremeValuePtr prob_ptr(new ExtremeValue(prot_prob, cand_num, 1));
+    ExtremeValuePtr ev_ptr(new ExtremeValue(prot_prob, cand_num, 1));
 
-    prsm_ptrs[i]->setProbPtr(prob_ptr);
+    prsm_ptrs[i]->setExtremeValuePtr(ev_ptr);
 
   }
 }
@@ -176,8 +175,7 @@ bool CompPValueLookupTable::inTable(const DeconvMsPtrVec &deconv_ms_ptr_vec,
 
     std::vector<int> idx = getFourIndex(peak_num, match_frag_num);
 
-    int unexpected_shift_num = prsm_ptrs[i]->getProteoformPtr()
-        ->getUnexpectedChangeNum();
+    int unexpected_shift_num = prsm_ptrs[i]->getProteoformPtr()->getChangeNum(ChangeType::UNEXPECTED);
 
     if (unexpected_shift_num == 0) {
       if (ptm0_[idx[0]][idx[2]] == 0 || ptm0_[idx[0]][idx[3]] == 0

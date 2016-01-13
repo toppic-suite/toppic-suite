@@ -27,8 +27,8 @@ inline PrsmViewMng::PrsmViewMng(PrsmParaPtr prsm_para_ptr, std::string exec_dir)
   prsm_para_ptr_ = prsm_para_ptr;
   std::string spectrum_file_name = prsm_para_ptr_->getSpectrumFileName();
 
-  xml_path_ = basename(spectrum_file_name) + "_xml";
-  html_path_ = basename(spectrum_file_name) + "_html";
+  xml_path_ = FileUtil::basename(spectrum_file_name) + "_xml";
+  html_path_ = FileUtil::basename(spectrum_file_name) + "_html";
   executive_dir_ = exec_dir;
   min_mass_ = prsm_para_ptr_->getSpParaPtr()->getMinMass();
 }

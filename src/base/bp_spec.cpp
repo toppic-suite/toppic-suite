@@ -1,5 +1,6 @@
 
 #include <algorithm>
+#include <cmath>
 #include <memory>
 #include <string>
 #include <vector>
@@ -87,16 +88,6 @@ std::vector<int> BpSpec::getScaledPrmMasses(double scale){
     result.push_back(std::floor(value+0.5));
   }
   return result;
-}
-
-void BpSpec::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
-  xercesc::DOMElement* element = xml_doc->createElement("bp_spec");
-  xercesc::DOMElement* bplist = xml_doc->createElement("break_point_list");
-  for(size_t i=0;i<break_point_ptr_vec_.size();i++){
-    break_point_ptr_vec_[i]->appendXml(xml_doc,bplist);
-  }
-  element->appendChild(bplist);
-  parent->appendChild(element);
 }
 
 } /* namespace prot */

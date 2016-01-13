@@ -1,5 +1,5 @@
-#ifndef PROT_RESIDUE_SEQ_HPP_
-#define PROT_RESIDUE_SEQ_HPP_
+#ifndef PROT_BASE_RESIDUE_SEQ_HPP_
+#define PROT_BASE_RESIDUE_SEQ_HPP_
 
 #include <string>
 
@@ -43,16 +43,19 @@ class ResidueSeq {
 
   std::string toAcidString();
 
-  void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+  static std::string getXmlElementName() {return "residue_seq";}
+
+  //void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
  private:
   /** residue list */
   ResiduePtrVec residues_;
   /** the sum of residue mass */
   double residue_mass_sum_;
+
+  static ResSeqPtr getEmptyResidueSeq();
 };
 
-ResSeqPtr getEmptyResidueSeq();
 
 }
 #endif

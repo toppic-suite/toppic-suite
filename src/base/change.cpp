@@ -1,114 +1,96 @@
+#include "base/mod_base.hpp"
 #include "base/change.hpp"
+#include "base/string_util.hpp"
+#include "base/xml_dom_util.hpp"
 
 namespace prot {
 
-Change::Change(int left_bp_pos, int right_bp_pos, int change_type,
-               double mass_shift, const PtmPtr & ptm_ptr): 
-    left_bp_pos_(left_bp_pos), right_bp_pos_(right_bp_pos), 
-    change_type_(change_type), mass_shift_(mass_shift), ptm_ptr_(ptm_ptr) {
-}
-
-Change::Change(xercesc::DOMElement* change_element) {
-    left_bp_pos_ = getIntChildValue(change_element, "left_bp_pos", 0);
-    right_bp_pos_ = getIntChildValue(change_element, "right_bp_pos", 0);
-    change_type_ = getIntChildValue(change_element, "change_type", 0);
-    mass_shift_ = getDoubleChildValue(change_element, "mass_shift", 0);
-    split_pos_ = getIntChildValue(change_element, "split_pos", 0);
-    int ptm_count = getChildCount(change_element, "modification");
-
-    PtmPtr change_ptm = nullptr;
-    if (ptm_count != 0) {
-        xercesc::DOMElement* ptm_element = getChildElement(change_element,
-                "modification", 0);
-        ptm_ptr_ = PtmFactory::getBasePtmPtrByAbbrName(
-                getChildValue(ptm_element, "abbr_name", 0));
+Change::Change(int left_bp_pos, int right_bp_pos, 
+               ChangeTypePtr change_type_ptr,
+               double mass_shift, ModPtr mod_ptr): 
+    left_bp_pos_(left_bp_pos), 
+    right_bp_pos_(right_bp_pos),
+    change_type_ptr_(change_type_ptr),
+    mass_shift_(mass_shift),
+    mod_ptr_(mod_ptr) {
     }
-    int scr_count = getChildCount(change_element, "score_list");
 
-    if (scr_count > 0) {
-        xercesc::DOMElement* scr_list = getChildElement(change_element,
-                "score_list", 0);
-        scr_count = getChildCount(scr_list, "score");
-        scr_.resize(right_bp_pos_ - left_bp_pos_);
-        for (int i = 0; i < scr_count; i++) {
-            xercesc::DOMElement* scr = getChildElement(scr_list, "score", i);
-            if (split_pos_ == 0) {
-                scr_[std::stoi(Y(scr->getAttribute(X("pos")))) - left_bp_pos_] =
-                    getDoubleChildValue(scr_list, "score", i);
-            } else {
-                scr_[std::stoi(Y(scr->getAttribute(X("pos")))) - left_bp_pos_] =
-                    getDoubleChildValue(scr_list, "score", i);
-            }
-        }
-    }
-}
-
-/* Generate a new change instance with a new start position */
-Change::Change(ChangePtr ori_ptr, int start) {
-  left_bp_pos_ = ori_ptr->left_bp_pos_ - start;
-  right_bp_pos_ = ori_ptr->right_bp_pos_ - start;
-  change_type_ = ori_ptr->change_type_;
-  mass_shift_ = ori_ptr->mass_shift_;
-  ptm_ptr_ = ori_ptr->ptm_ptr_;
+Change::Change(xercesc::DOMElement* element) {
+  left_bp_pos_ = XmlDomUtil::getIntChildValue(element, "left_bp_pos", 0);
+  right_bp_pos_ = XmlDomUtil::getIntChildValue(element, "right_bp_pos", 0);
+  std::string ct_element_name = ChangeType::getXmlElementName();
+  xercesc::DOMElement* ct_element 
+      = XmlDomUtil::getChildElement(element, ct_element_name.c_str(), 0);
+  change_type_ptr_ = ChangeType::getChangeTypePtrFromXml(ct_element);
+  mass_shift_ = XmlDomUtil::getDoubleChildValue(element, "mass_shift", 0);
+  std::string mod_element_name = Mod::getXmlElementName();
+  int mod_count = XmlDomUtil::getChildCount(element, mod_element_name.c_str());
+  if (mod_count != 0) {
+    xercesc::DOMElement* mod_element 
+        = XmlDomUtil::getChildElement(element, mod_element_name.c_str(), 0);
+    mod_ptr_ = ModBase::getModPtrFromXml(mod_element);
+  }
 }
 
 void Change::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
-    xercesc::DOMElement* element = xml_doc->createElement("change");
-    std::string str = convertToString(left_bp_pos_);
-    xml_doc->addElement(element, "left_bp_pos", str.c_str());
-    str = convertToString(right_bp_pos_);
-    xml_doc->addElement(element, "right_bp_pos", str.c_str());
-    str = convertToString(change_type_);
-    xml_doc->addElement(element, "change_type", str.c_str());
-    str = convertToString(mass_shift_);
-    xml_doc->addElement(element, "mass_shift", str.c_str());
-    str = convertToString(split_pos_);
-    xml_doc->addElement(element, "split_pos", str.c_str());
-
-    if (scr_.size() != 0) {
-        if (ptm_ptr_ != nullptr)
-            ptm_ptr_->appendxml(xml_doc, element);
-
-        std::vector<double>::iterator iter = scr_.begin();
-        xercesc::DOMElement* ele = xml_doc->createElement("score_list");
-        for (int i = left_bp_pos_ - split_pos_; i < right_bp_pos_ - split_pos_; i++) {
-            if (scr_.size() == 0)
-                break;
-
-            if (scr_[i] <= 0.0)
-                continue;
-
-            xercesc::DOMElement* scr = xml_doc->createElement("score");
-            xml_doc->addElement(ele, scr);
-            scr->setTextContent(X(convertToString(scr_[i], 5).c_str()));
-            scr->setAttribute(X("pos"),
-                    X(convertToString((int )(i + split_pos_)).c_str()));
-        }
-        element->appendChild(ele);
-    } else {
-        if (ptm_ptr_ != nullptr)
-            ptm_ptr_->appendxml(xml_doc, element);
-    }
-    parent->appendChild(element);
+  std::string element_name = Change::getXmlElementName();
+  xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
+  std::string str = StringUtil::convertToString(left_bp_pos_);
+  xml_doc->addElement(element, "left_bp_pos", str.c_str());
+  str = StringUtil::convertToString(right_bp_pos_);
+  xml_doc->addElement(element, "right_bp_pos", str.c_str());
+  change_type_ptr_->appendXml(xml_doc, element);
+  str = StringUtil::convertToString(mass_shift_);
+  xml_doc->addElement(element, "mass_shift", str.c_str());
+  if (mod_ptr_ != nullptr) {
+    mod_ptr_->appendToXml(xml_doc, element);
+  }
+  parent->appendChild(element);
 }
 
-std::string getChangeTypeName(int change_type){
-  if(change_type==0){
-    return "INPUT_CHANGE";
+bool Change::cmpPosInc(const ChangePtr &a, const ChangePtr &b) {
+  if (a->getLeftBpPos() < b->getLeftBpPos()) {
+    return true;
   }
-  if(change_type==1){
-    return "FIXED_CHANGE";
+  else if (a->getLeftBpPos() > b->getLeftBpPos()) {
+    return false;
   }
-  if(change_type==2){
-    return "PROTEIN_VARIABLE_CHANGE";
+  else {
+    return a->getRightBpPos() < b->getRightBpPos();
   }
-  if(change_type==3){
-    return "VARIABLE_CHANGE";
+}
+
+/*
+bool Change::cmpTypeIncPosInc(const ChangePtr &a, const ChangePtr &b) {
+  if (a->getChangeTypePtr()->getId() < b->getChangeTypePtr()->getId()) {
+    return true;
   }
-  if(change_type==4){
-    return "UNEXPECTED_CHANGE";
+  else if (a->getChangeTypePtr()->getId() > b->getChangeTypePtr()->getId()) {
+    return false;
   }
-  return "UNEXPECTED_CHANGE";
+  else {
+    if (a->getLeftBpPos() < b->getLeftBpPos()) {
+      return true;
+    }
+    else if (a->getLeftBpPos() > b->getLeftBpPos()) {
+      return false;
+    }
+    else {
+      return a->getRightBpPos() < b->getRightBpPos();
+    }
+  }
+}
+*/
+
+ChangePtr Change::geneChangePtr(ChangePtr ori_ptr, int start_pos) {
+  int left_bp_pos = ori_ptr->left_bp_pos_ - start_pos;
+  int right_bp_pos = ori_ptr->right_bp_pos_ - start_pos;
+  ChangeTypePtr change_type_ptr = ori_ptr->change_type_ptr_;
+  double mass_shift = ori_ptr->mass_shift_;
+  ModPtr mod_ptr = ori_ptr->mod_ptr_;
+  ChangePtr change_ptr(
+      new Change(left_bp_pos, right_bp_pos, change_type_ptr, mass_shift, mod_ptr));
+  return change_ptr;
 }
 
 }

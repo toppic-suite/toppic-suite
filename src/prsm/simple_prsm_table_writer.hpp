@@ -5,8 +5,8 @@
  *      Author: qkou
  */
 
-#ifndef PROT_SIMPLE_TABLE_WRITER_HPP_
-#define PROT_SIMPLE_TABLE_WRITER_HPP_
+#ifndef PROT_PRSM_SIMPLE_TABLE_WRITER_HPP_
+#define PROT_PRSM_SIMPLE_TABLE_WRITER_HPP_
 
 #include "prsm/prsm_para.hpp"
 #include "prsm/simple_prsm.hpp"

@@ -1,5 +1,5 @@
-#ifndef PROT_XML_DOM_DOCUMENT_HPP_
-#define PROT_XML_DOM_DOCUMENT_HPP_
+#ifndef PROT_BASE_XML_DOM_DOCUMENT_HPP_
+#define PROT_BASE_XML_DOM_DOCUMENT_HPP_
 
 #include <iostream>
 #include <fstream>
@@ -23,6 +23,7 @@ class XmlDOMDocument {
   XmlDOMDocument(XmlDOMParser* parser, const xercesc::MemBufInputSource &str_buf);
 
   XmlDOMDocument(xercesc::DOMDocument* doc);
+
   XmlDOMDocument(xercesc::DOMImplementation* implementation, 
                  const std::string &root);
   ~XmlDOMDocument();
@@ -47,40 +48,6 @@ class XmlDOMDocument {
   xercesc::DOMDocument* doc_;
 };
 
-xercesc::DOMNodeList* getChildElements(xercesc::DOMElement *parent,
-                                const char* tag);
-
-xercesc::DOMElement* getChildElement(xercesc::DOMElement* parent, 
-                                const char* tag, int index);
-
-std::string getChildValue(xercesc::DOMElement* parent, 
-                          const char* child_tag, int index);
-
-double getDoubleChildValue(xercesc::DOMElement* parent, 
-                          const char* child_tag, int index);
-
-int getIntChildValue(xercesc::DOMElement* parent,  
-                     const char* child_tag, int index);
-
-bool getBoolChildValue(xercesc::DOMElement* parent,
-                       const char* child_tag, int index);
-
-int getChildCount(xercesc::DOMElement * parent, const char* child_tag);
-
-std::string getAttributeValue(xercesc::DOMElement * parent,
-                                const char* attribute_tag);
-
-std::string convertToString(double value);
-
-std::string convertToString(double value,int number);
-
-std::string convertToString(int value);
-
-std::string convertToString(bool value);
-
-std::string writeToString(xercesc::DOMLSSerializer* serializer, xercesc::DOMNode *node);
-
-void writeToStreamByRemovingDoubleLF(std::ofstream &file, std::string &str);
-
 }
+
 #endif

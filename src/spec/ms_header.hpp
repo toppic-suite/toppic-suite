@@ -1,9 +1,12 @@
-#ifndef PROT_MS_HEADER_HPP_
-#define PROT_MS_HEADER_HPP_
+#ifndef PROT_SPEC_MS_HEADER_HPP_
+#define PROT_SPEC_MS_HEADER_HPP_
 
 #include "base/activation.hpp"
 
 namespace prot {
+
+class MsHeader;
+typedef std::shared_ptr<MsHeader> MsHeaderPtr;
 
 class MsHeader {
  public:
@@ -17,7 +20,7 @@ class MsHeader {
 
   double getPrecMonoMassMinusWater();
 
-  std::pair<int,int> getPrecMonoMassMinusWaterError(double scale);
+  std::pair<int,int> getPrecMonoMassMinusWaterError(double ppo, double scale);
 
   std::string getScansString();
 
@@ -48,7 +51,7 @@ class MsHeader {
 
   int getPrecId() {return prec_id_;}
 
-  double getErrorTolerance() {return error_tolerance_;}
+  double getErrorTolerance(double ppo) {return getPrecMonoMass() * ppo;}
 
   /* set function */
   void setActivationPtr(ActivationPtr acti_ptr) {activation_ptr_ = acti_ptr;}
@@ -76,12 +79,16 @@ class MsHeader {
 
   void setPrecId(int prec_id) {prec_id_ = prec_id;}
 
-  void setErrorToleranceByPpo(double ppo) {
-    error_tolerance_ = getPrecMonoMass() * ppo;}
+  //void setErrorToleranceByPpo(double ppo) {
+  //  error_tolerance_ = getPrecMonoMass() * ppo;}
 
   xercesc::DOMElement* getHeaderXml(XmlDOMDocument* xml_doc);
 
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+
+  static std::string getXmlElementName() {return "ms_header";}
+
+  static MsHeaderPtr geneMsHeaderPtr(MsHeaderPtr ori_ptr, double new_prec_mass);
 
  private:
   /** data set name */
@@ -108,10 +115,9 @@ class MsHeader {
   /** precursor charge state */ 
   int prec_charge_ = -1;
   /** precursor mass error tolerance */
-  double error_tolerance_=0.0;
+  //double error_tolerance_=0.0;
 };
 
-typedef std::shared_ptr<MsHeader> MsHeaderPtr;
 }
 
 #endif

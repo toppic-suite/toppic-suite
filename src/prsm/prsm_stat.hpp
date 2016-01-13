@@ -1,5 +1,5 @@
-#ifndef PRSM_STAT_HPP_
-#define PRSM_STAT_HPP_
+#ifndef PROT_PRSM_PRSM_STAT_HPP_
+#define PROT_PRSM_PRSM_STAT_HPP_
 
 #include <string>
 

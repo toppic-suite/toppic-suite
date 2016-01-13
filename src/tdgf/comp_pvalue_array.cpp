@@ -1,4 +1,5 @@
 #include "base/logger.hpp"
+#include "spec/deconv_ms_factory.hpp"
 #include "tdgf/comp_pvalue_array.hpp"
 
 namespace prot {
@@ -23,25 +24,25 @@ CompPValueArray::CompPValueArray(CountTestNumPtr test_num_ptr,
 /* set alignment */
 void CompPValueArray::compMultiExtremeValues(const PrmMsPtrVec &ms_six_ptr_vec, 
                                              PrsmPtrVec &prsm_ptrs, 
-                                             bool strict) {
+                                             double ppo, bool strict) {
   PrmPeakPtrVec2D prm_ptr_2d;
   for (size_t i = 0; i < ms_six_ptr_vec.size(); i++) {
     PrmPeakPtrVec prm_peak_ptrs = ms_six_ptr_vec[i]->getPeakPtrVec();
     prm_ptr_2d.push_back(prm_peak_ptrs);
   }
   std::vector<double> prot_probs;
-  compProbArray(comp_prob_ptr_, prot_n_term_residue_ptrs_, 
-                prm_ptr_2d, prsm_ptrs, strict, prot_probs);
+  CompProbValue::compProbArray(comp_prob_ptr_, prot_n_term_residue_ptrs_, 
+                               prm_ptr_2d, prsm_ptrs, strict, prot_probs);
   std::vector<double> pep_probs;
-  compProbArray(comp_prob_ptr_, pep_n_term_residue_ptrs_, 
-                prm_ptr_2d, prsm_ptrs, strict, pep_probs);
+  CompProbValue::compProbArray(comp_prob_ptr_, pep_n_term_residue_ptrs_, 
+                               prm_ptr_2d, prsm_ptrs, strict, pep_probs);
   //LOG_DEBUG("probability computation complete");
-  double prec_mass = ms_six_ptr_vec[0]->getHeaderPtr()->getPrecMonoMassMinusWater();
-  double tolerance = ms_six_ptr_vec[0]->getHeaderPtr()->getErrorTolerance();
+  double prec_mass = ms_six_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMassMinusWater();
+  double tolerance = ms_six_ptr_vec[0]->getMsHeaderPtr()->getErrorTolerance(ppo);
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     //LOG_DEBUG("prsm " << i << " prsm size " << prsm_ptrs.size());
-    int unexpect_shift_num = prsm_ptrs[i]->getProteoformPtr()->getUnexpectedChangeNum();
-    SemiAlignTypePtr type_ptr = prsm_ptrs[i]->getProteoformPtr()->getSemiAlignType();
+    int unexpect_shift_num = prsm_ptrs[i]->getProteoformPtr()->getChangeNum(ChangeType::UNEXPECTED);
+    AlignTypePtr type_ptr = prsm_ptrs[i]->getProteoformPtr()->getAlignType();
 
     int index; 
     if (mng_ptr_->variable_ptm_) {
@@ -67,22 +68,21 @@ void CompPValueArray::compMultiExtremeValues(const PrmMsPtrVec &ms_six_ptr_vec,
       LOG_WARN("Zero candidate number");
       cand_num = std::numeric_limits<double>::infinity();
     }
-    if (type_ptr == SemiAlignTypeFactory::getCompletePtr() 
-        || type_ptr == SemiAlignTypeFactory::getPrefixPtr()) {
-      ExtremeValuePtr prob_ptr(new ExtremeValue(prot_probs[i], cand_num, 1));
-      prsm_ptrs[i]->setProbPtr(prob_ptr);
+    if (type_ptr == AlignType::COMPLETE || type_ptr == AlignType::PREFIX) {
+      ExtremeValuePtr ev_ptr(new ExtremeValue(prot_probs[i], cand_num, 1));
+      prsm_ptrs[i]->setExtremeValuePtr(ev_ptr);
     } else {
-      ExtremeValuePtr prob_ptr(new ExtremeValue(pep_probs[i], cand_num, 1));
-      prsm_ptrs[i]->setProbPtr(prob_ptr);
+      ExtremeValuePtr ev_ptr(new ExtremeValue(pep_probs[i], cand_num, 1));
+      prsm_ptrs[i]->setExtremeValuePtr(ev_ptr);
     }
     //LOG_DEBUG("assignment complete");
   }
 }
 
 void CompPValueArray::compSingleExtremeValue(const DeconvMsPtrVec &ms_ptr_vec, 
-                                             PrsmPtr prsm_ptr) {
+                                             PrsmPtr prsm_ptr, double ppo) {
   double refine_prec_mass = prsm_ptr->getAdjustedPrecMass();
-  DeconvMsPtrVec refine_ms_ptr_vec = getRefineMsPtrVec(ms_ptr_vec, refine_prec_mass);
+  DeconvMsPtrVec refine_ms_ptr_vec = DeconvMsFactory::getRefineMsPtrVec(ms_ptr_vec, refine_prec_mass);
 
   /*
   LOG_DEBUG("recalibration " << prsm_ptr->getCalibration()
@@ -90,27 +90,27 @@ void CompPValueArray::compSingleExtremeValue(const DeconvMsPtrVec &ms_ptr_vec,
                << ms_ptr->getHeaderPtr()->getPrecMonoMass()
                << " precursor " << refine_prec_mass);
                */
-  PrmMsPtrVec prm_ms_ptr_vec = createMsSixPtrVec(refine_ms_ptr_vec, 
-                                                 mng_ptr_->prsm_para_ptr_->getSpParaPtr(),
-                                                 refine_prec_mass);
+  PrmMsPtrVec prm_ms_ptr_vec = PrmMsFactory::geneMsSixPtrVec(refine_ms_ptr_vec, 
+                                                             mng_ptr_->prsm_para_ptr_->getSpParaPtr(),
+                                                             refine_prec_mass);
 
   PrsmPtrVec prsm_ptrs;
   prsm_ptrs.push_back(prsm_ptr);
-  compMultiExtremeValues(prm_ms_ptr_vec, prsm_ptrs, true);
+  compMultiExtremeValues(prm_ms_ptr_vec, prsm_ptrs, ppo, true);
 }
 
 
-void CompPValueArray::process(SpectrumSetPtr spec_set_ptr, 
-                              bool is_separate, PrsmPtrVec &prsm_ptrs) {
+void CompPValueArray::process(SpectrumSetPtr spec_set_ptr, PrsmPtrVec &prsm_ptrs,
+                              double ppo, bool is_separate) {
 
   if (is_separate) {
     for (unsigned i = 0; i < prsm_ptrs.size(); i++) {
       compSingleExtremeValue(spec_set_ptr->getDeconvMsPtrVec(), 
-                             prsm_ptrs[i]);
+                             prsm_ptrs[i], ppo);
     }
   } 
   else {
-    compMultiExtremeValues(spec_set_ptr->getMsSixPtrVec(), prsm_ptrs, false);
+    compMultiExtremeValues(spec_set_ptr->getMsSixPtrVec(), prsm_ptrs, ppo, false);
   }
 }
 

@@ -1,5 +1,5 @@
-#ifndef PROT_MS_HPP_
-#define PROT_MS_HPP_
+#ifndef PROT_SPEC_MS_HPP_
+#define PROT_SPEC_MS_HPP_
 
 #include <sstream>
 
@@ -17,12 +17,6 @@ class Ms {
   Ms(MsHeaderPtr header_ptr, const std::vector<T> &peak_ptr_list) {
     header_ptr_ = header_ptr;
     peak_ptr_list_ = peak_ptr_list;
-  }
-
-  Ms(MsHeaderPtr header_ptr, const std::vector<T> &peak_ptr_list, double ppo) {
-    header_ptr_ = header_ptr;
-    peak_ptr_list_ = peak_ptr_list;
-    header_ptr_->setErrorToleranceByPpo(ppo);
   }
 
   /**
@@ -51,7 +45,7 @@ class Ms {
     return header_str + tmp.str();
   }
 
-  MsHeaderPtr getHeaderPtr() {return header_ptr_;}
+  MsHeaderPtr getMsHeaderPtr() {return header_ptr_;}
 
   void setHeaderPtr(MsHeaderPtr header_ptr) {header_ptr = header_ptr_;}
 

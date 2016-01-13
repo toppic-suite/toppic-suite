@@ -17,7 +17,7 @@ ProbPeak::ProbPeak(PrmPeakPtr peak_ptr, int spectrum_id, int height,
   } else {
     tolerance_ = std::ceil(peak_ptr->getNStrictCRelaxTolerance() * convert_ratio);
   }
-  base_type_ = peak_ptr->getBaseType();
+  base_type_ptr_ = peak_ptr->getBaseTypePtr();
   spectrum_id_ = spectrum_id;
   mass_bgn_ = mass_ - tolerance_;
   mass_end_ = mass_ + tolerance_;
@@ -167,7 +167,7 @@ inline void CompProbValue::updatePosScores(const std::vector<ProbPeak> &prob_pea
         end = len - 1;
       }
       //LOG_DEBUG("peak " << i << " bgn " << bgn << " end " << end);
-      if (prob_peaks[i].base_type_ == PRM_PEAK_TYPE_ORIGINAL) {
+      if (prob_peaks[i].base_type_ptr_ == BasePeakType::ORIGINAL) {
         // the peak is m
         for (int p = bgn; p <= end; p++) {
           if (tmp_pos_scores_[p] == 0) {
@@ -522,26 +522,26 @@ int getMaxScore(const PrsmPtrVec &prsm_ptrs) {
 int getMaxShift(PrsmPtrVec prsm_ptrs) {
   int shift = 0;
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
-    if (prsm_ptrs[i]->getProteoformPtr()->getUnexpectedChangeNum() > shift) {
-      shift = prsm_ptrs[i]->getProteoformPtr()->getUnexpectedChangeNum();
+    if (prsm_ptrs[i]->getProteoformPtr()->getChangeNum(ChangeType::UNEXPECTED) > shift) {
+      shift = prsm_ptrs[i]->getProteoformPtr()->getChangeNum(ChangeType::UNEXPECTED);
     }
   }
   return shift;
 }
 
-void compProbArray(CompProbValuePtr comp_prob_ptr, 
-                   const ResFreqPtrVec &n_term_residue_ptrs, 
-                   const PrmPeakPtrVec2D &peak_ptr_2d, 
-                   const PrsmPtrVec &prsm_ptrs, 
-                   bool strict, 
-                   std::vector<double> &results) {
+void CompProbValue::compProbArray(CompProbValuePtr comp_prob_ptr, 
+                                  const ResFreqPtrVec &n_term_residue_ptrs, 
+                                  const PrmPeakPtrVec2D &peak_ptr_2d, 
+                                  const PrsmPtrVec &prsm_ptrs, 
+                                  bool strict, 
+                                  std::vector<double> &results) {
   int max_score = getMaxScore(prsm_ptrs);
   int max_shift = getMaxShift(prsm_ptrs);
   //std::cout << std::endl << "max score " << max_score << " max shift " << max_shift << std::endl;
   comp_prob_ptr->compute(n_term_residue_ptrs, peak_ptr_2d, max_score, max_shift, strict);
   results.clear();
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
-    int shift_num = prsm_ptrs[i]->getProteoformPtr()->getUnexpectedChangeNum();
+    int shift_num = prsm_ptrs[i]->getProteoformPtr()->getChangeNum(ChangeType::UNEXPECTED);
     int score = prsm_ptrs[i]->getMatchFragNum();
     results.push_back(comp_prob_ptr->getCondProb(shift_num, score));
   }

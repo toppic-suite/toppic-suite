@@ -5,11 +5,14 @@
 
 #include "spec/spectrum_set.hpp"
 #include "prsm/prsm.hpp"
-#include "zeroptmsearch/zero_ptm_mng.hpp"
+#include "zeroptmsearch/zero_ptm_search_mng.hpp"
 
 namespace prot {
 
-void zeroPtmSearchProcess(ZeroPtmMngPtr mng_ptr);
+class ZeroPtmSearch {
+ public:
+  static void process(ZeroPtmSearchMngPtr mng_ptr);
+};
 
 } /* namespace_prot */
 

@@ -5,6 +5,7 @@
 
 #include "base/residue_freq.hpp"
 #include "spec/prm_peak.hpp"
+#include "spec/base_peak_type.hpp"
 #include "prsm/prsm.hpp"
 
 namespace prot {
@@ -15,13 +16,16 @@ class ProbPeak {
            bool strict, double convert_ratio);
   int mass_;
   int tolerance_;
-  int base_type_;
+  BasePeakTypePtr base_type_ptr_;
   int spectrum_id_;
   int mass_bgn_;
   int mass_end_;
   int table_bgn_;
   int table_end_;
 };
+
+class CompProbValue;
+typedef std::shared_ptr<CompProbValue> CompProbValuePtr;
 
 class CompProbValue {
  public:
@@ -37,6 +41,10 @@ class CompProbValue {
   // main function to get probabilities
   double getCondProb(int shift, int thresh);
   double getCondProbOneValue(int shift, int value);
+
+  static void compProbArray(CompProbValuePtr comp_prob_ptr, const ResFreqPtrVec &n_term_residue_ptrs, 
+                            const PrmPeakPtrVec2D &peak_ptr_2d, const PrsmPtrVec &prsm_ptrs, bool strict, 
+                            std::vector<double> &results);
 
  private:
   static int const ORI_PAGE_LEN = 5000;
@@ -126,14 +134,8 @@ class CompProbValue {
   void compOneLayer(std::vector<std::vector<double>> &prev_results, 
                     bool is_first_layer,  
                     std::vector<std::vector<double>> &cur_results);
+
 };
-
-typedef std::shared_ptr<CompProbValue> CompProbValuePtr;
-
-
-void compProbArray(CompProbValuePtr comp_prob_ptr, const ResFreqPtrVec &n_term_residue_ptrs, 
-                   const PrmPeakPtrVec2D &peak_ptr_2d, const PrsmPtrVec &prsm_ptrs, bool strict, 
-                   std::vector<double> &results);
 
 }
 #endif

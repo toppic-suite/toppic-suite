@@ -3,8 +3,8 @@
  * date    2013-11-01
  */
 
-#ifndef PROT_RESIDUE_HPP_
-#define PROT_RESIDUE_HPP_
+#ifndef PROT_BASE_RESIDUE_HPP_
+#define PROT_BASE_RESIDUE_HPP_
 
 #include <string>
 #include <memory>
@@ -16,11 +16,16 @@
 
 namespace prot {
 
+class Residue;
+typedef std::shared_ptr<Residue> ResiduePtr;
+
 class Residue {
  public:
   Residue(AcidPtr acid_ptr, PtmPtr ptm_ptr); 
 
   Residue(const std::string &acid_name, const std::string &abbr_name);
+
+  Residue(xercesc::DOMElement* element); 
 
   /** Get amino acid. */
   AcidPtr getAcidPtr() {return acid_ptr_; }
@@ -34,8 +39,9 @@ class Residue {
   /**
    * Checks if the residue contains the same amino acid and ptm.
    */
-  bool isSame(AcidPtr acid_ptr, PtmPtr ptm_ptr) {
-    return acid_ptr_.get() == acid_ptr.get() && ptm_ptr_.get() == ptm_ptr.get();
+  bool isSame(ResiduePtr residue_ptr) {
+    return acid_ptr_ == residue_ptr->getAcidPtr() 
+        && ptm_ptr_ == residue_ptr->getPtmPtr();
   }
 
   /** Get string representation */
@@ -44,7 +50,12 @@ class Residue {
 
   std::string toString() {return toString("[", "]");}
 
+  void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent,
+                 const std::string &element_name);
+
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+
+  static std::string getXmlElementName() {return "residue";}
 
 private:
   /** amino acid */
@@ -55,44 +66,9 @@ private:
   double mass_;
 };
 
-typedef std::shared_ptr<Residue> ResiduePtr;
 typedef std::vector<ResiduePtr> ResiduePtrVec;
 typedef std::vector<ResiduePtrVec> ResiduePtrVec2D;
 
-ResiduePtr getResiduePtrByAcid(const ResiduePtrVec &residue_list,
-                               AcidPtr acid_ptr);
-
-int findResidue(const ResiduePtrVec &residue_list, ResiduePtr residue_ptr);
-
-ResiduePtrVec convertAcidToResidueSeq(const ResiduePtrVec &residue_list,
-                                      const AcidPtrVec &acid_list);
-/* residue factory */
-class ResidueFactory {
- public:
-  static void initFactory(const std::string &file_name);
-
-  static const ResiduePtrVec& getBaseResiduePtrVec() {return residue_ptr_vec_;}
-  
-  static ResiduePtr getBaseResiduePtrByAcidPtm(AcidPtr acid_ptr, PtmPtr ptm_ptr);
-  
-  static ResiduePtr addBaseResidue(AcidPtr acid_ptr, PtmPtr ptm_ptr);
-  
-  static ResiduePtrVec getResiduePtrVecInstance(const std::string &file_name);
-
- private:
-  static ResiduePtrVec residue_ptr_vec_;
-};
-
-/* residue list factory */
-class FixResidueFactory {
- public:
-  static void initFactory(const std::string &file_name);
-
-  static ResiduePtrVec getFixResiduePtrVec(const std::string &id);
-  
- private:
-  static std::map<std::string,ResiduePtrVec> fix_res_list_map_;
-};
-
 }
+
 #endif
