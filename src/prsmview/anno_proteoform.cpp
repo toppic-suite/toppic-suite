@@ -37,7 +37,7 @@ void addSummary(XmlDOMDocument* xml_doc, xercesc::DOMElement *prot_element,
 }
 
 void addAnnoHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement *anno_element, 
-                ProteoformPtr proteoform_ptr, PrsmViewMngPtr mng_ptr) {
+                   ProteoformPtr proteoform_ptr, PrsmViewMngPtr mng_ptr) {
 
   std::string str=StringUtil::convertToString(proteoform_ptr->getFastaSeqPtr()->getLen());
   xml_doc->addElement(anno_element, "protein_length", str.c_str());
@@ -143,7 +143,6 @@ void addMod(ProteoformPtr proteoform_ptr, int left_db_bp, int right_db_bp,
       std::string fasta_seq = proteoform_ptr->getFastaSeqPtr()->getSeq();
       std::string acid_letter = fasta_seq.substr(left_db_bp, 1);
       segment_ptr->addOccurence(j, acid_letter);
-
     }
     for (size_t j = 0; j < change_ptr->getLocalAnno()->getScrVec().size(); j++) {
       segment_ptr->addScr(change_ptr->getLocalAnno()->getScrVec()[j]);
@@ -155,9 +154,13 @@ void addMod(ProteoformPtr proteoform_ptr, int left_db_bp, int right_db_bp,
 
   segment_ptrs.push_back(segment_ptr);
   last_right = this_right;
+
+  std::string anno = segment_ptr->getResidueAnno();
+
   for (int j = left_db_bp; j < right_db_bp - 1; j++) {
     res_ptrs[j]->setUnexpectedChange(true);
-    res_ptrs[j]->setUnexpectedChangeColor(color);;
+    res_ptrs[j]->setUnexpectedChangeColor(color);
+    res_ptrs[j]->setAnno(anno);
     cleavage_ptrs[j+1]->setUnexpectedChange(true);
     cleavage_ptrs[j+1]->setUnexpectedChangeColor(color);;
   }
