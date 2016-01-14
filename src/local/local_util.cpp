@@ -74,13 +74,12 @@ void LocalUtil::scr_filter(std::vector<double> & scr, int & bgn, int & end,
   scr = scr2;
 }
 
-void LocalUtil::compSupPeakNum(ProteoformPtr proteoform,
-                               ExtendMsPtrVec extend_ms_ptr_vec, ChangePtr change,
-                               double min_mass, int & left, int & right) {
+void LocalUtil::compSupPeakNum(ProteoformPtr proteoform, const ExtendMsPtrVec & extend_ms_ptr_vec, 
+                               ChangePtr change, double min_mass, int & left, int & right) {
   left = right = 0;
   PeakIonPairPtrVec pair_ptrs = 
-      PeakIonPairFactory::genePeakIonPairs(proteoform, extend_ms_ptr_vec,
-                                           mng_ptr_->min_mass_);
+      PeakIonPairFactory::genePeakIonPairs(proteoform, extend_ms_ptr_vec, mng_ptr_->min_mass_);
+
   for (size_t i = 0; i < pair_ptrs.size(); i++) {
     std::string ion_name = 
         pair_ptrs[i]->getTheoPeakPtr()->getIonPtr()->getIonTypePtr()->getName();
@@ -122,10 +121,8 @@ PtmPairVec LocalUtil::getPtmPairVecByMass(double mass1, double mass2, double err
     double pair_mass = ptm_pair_vec_[i].first->getMonoMass() 
         + ptm_pair_vec_[i].second->getMonoMass();
 
-    if (std::abs(pair_mass - mass) < err
-        || std::abs(std::abs(pair_mass - mass) - 1) < err)
+    if (std::abs(pair_mass - mass) < err || std::abs(std::abs(pair_mass - mass) - 1) < err)
       res.push_back(ptm_pair_vec_[i]);
-
   }
   return res;
 }
@@ -173,21 +170,109 @@ double getPeptideMass(const std::string & seq) {
   return m;
 }
 
-void LocalUtil::onePtmTermAdjust(ProteoformPtr proteoform, ExtendMsPtrVec extend_ms_ptr_vec,
+void LocalUtil::getNtermTruncRange(ProteoformPtr proteoform, const ExtendMsPtrVec & extend_ms_ptr_vec,
+                                   int & min, int & max) {
+  int left_sup, tmp;
+  ChangePtrVec change_vec = proteoform->getChangePtrVec(ChangeType::UNEXPECTED);
+  ChangePtr change_ptr = change_vec[0];
+  compSupPeakNum(proteoform, extend_ms_ptr_vec, change_ptr, mng_ptr_->min_mass_, left_sup, tmp);
+
+  if (left_sup > LEFT_SUP_LIMIT) {
+    min = max = 0;
+    return;
+  }
+
+  double ori_mass = proteoform->getChangePtrVec(ChangeType::UNEXPECTED)[0]->getMassShift();
+  double mass = ori_mass;
+  int ori_start = proteoform->getStartPos();
+  max = min = 0;
+  while (ori_start + min > 0) {
+    min--;
+    std::string t_seq = proteoform->getFastaSeqPtr()->getSeq().substr(ori_start + min, -min);
+    mass = ori_mass - getPeptideMass(t_seq);
+    if (std::abs(mass) >= mng_ptr_->max_ptm_mass_ || ori_start + min <= 0) {
+      min++;
+      break;
+    }
+  }
+  mass = ori_mass;
+  while (std::abs(ori_mass) < mng_ptr_->max_ptm_mass_) {
+    max++;
+    std::string t_seq = proteoform->getFastaSeqPtr()->getSeq().substr(ori_start, max);
+    mass = ori_mass + getPeptideMass(t_seq);
+    if (std::abs(mass) >= mng_ptr_->max_ptm_mass_) {
+      max--;
+      break;
+    }
+  }
+
+  ChangePtrVec fix_change_vec = proteoform->getChangePtrVec(ChangeType::FIXED);
+
+  for (size_t i = 0; i < fix_change_vec.size(); i++) {
+    if (fix_change_vec[i]->getModPtr()->getModResiduePtr()->getPtmPtr()->getAbbrName() == "Acetyl") {
+      change_vec[0]->setMassShift(ori_mass + fix_change_vec[i]->getModPtr()->getShift());
+      fix_change_vec.erase(fix_change_vec.begin() + i);
+      change_vec.insert(change_vec.end(), fix_change_vec.begin(), fix_change_vec.end());
+      std::sort(change_vec.begin(), change_vec.end(), Change::cmpPosInc);
+      break;
+    }
+  }
+
+  proteoform = std::make_shared<Proteoform>(proteoform->getFastaSeqPtr(), proteoform->getProtModPtr(),
+                                            proteoform->getStartPos(), proteoform->getEndPos(), 
+                                            proteoform->getResSeqPtr(), change_vec);
+}
+
+void LocalUtil::getCtermTruncRange(ProteoformPtr proteoform, const ExtendMsPtrVec & extend_ms_ptr_vec,          
+                                   int & min, int & max) {
+  ChangePtrVec change_vec = proteoform->getChangePtrVec(ChangeType::UNEXPECTED);
+  ChangePtr change_ptr = change_vec[change_vec.size() - 1];
+  int right_sup, tmp;
+  compSupPeakNum(proteoform, extend_ms_ptr_vec, change_ptr, mng_ptr_->min_mass_, tmp, right_sup);
+
+  if (right_sup > RIGHT_SUP_LIMIT) {
+    min = max = 0;
+    return;
+  }
+
+  double ori_mass = change_vec[change_vec.size() - 1]->getMassShift();
+  double mass = ori_mass;
+  int ori_end = proteoform->getEndPos();
+  max = min = 0;
+  while (ori_end + std::abs(max) < proteoform->getFastaSeqPtr()->getLen() - 1) {
+    max++;
+    std::string t_seq = proteoform->getFastaSeqPtr()->getSeq().substr(ori_end + 1, max);
+    mass = ori_mass - getPeptideMass(t_seq);
+    if (std::abs(mass) >= mng_ptr_->max_ptm_mass_ || ori_end + std::abs(max) >= proteoform->getFastaSeqPtr()->getLen() - 1) {
+      max--;
+      break;
+    }
+  }
+
+  mass = ori_mass;
+  while (std::abs(ori_mass) < mng_ptr_->max_ptm_mass_) {
+    min--;
+    std::string t_seq = proteoform->getFastaSeqPtr()->getSeq().substr(ori_end + 1 + min, -min);
+    mass = ori_mass + getPeptideMass(t_seq);
+    if (std::abs(mass) >= mng_ptr_->max_ptm_mass_) {
+      min++;
+      break;
+    }
+  }
+}
+
+void LocalUtil::onePtmTermAdjust(ProteoformPtr proteoform, const ExtendMsPtrVec & extend_ms_ptr_vec,
                                  double & mass, double err) {
-  int left_sup, right_sup;
+
+  int n_trunc_min, n_trunc_max, c_trunc_min, c_trunc_max;
+  getNtermTruncRange(proteoform, extend_ms_ptr_vec, n_trunc_min, n_trunc_max);
+  getCtermTruncRange(proteoform, extend_ms_ptr_vec, c_trunc_min, c_trunc_max);
+
   ChangePtr change_ptr = proteoform->getChangePtrVec(ChangeType::UNEXPECTED)[0];
   ChangePtrVec fix_change_vec = proteoform->getChangePtrVec(ChangeType::FIXED);
-  compSupPeakNum(proteoform, extend_ms_ptr_vec, change_ptr, mng_ptr_->min_mass_, left_sup, right_sup);
   double ori_mass = change_ptr->getMassShift();
   mass = ori_mass;
   int ori_start = proteoform->getStartPos(), ori_end = proteoform->getEndPos();
-  int n_trunc_min, n_trunc_max, c_trunc_min, c_trunc_max;
-  getNtermTruncRange(proteoform, n_trunc_min, n_trunc_max, mng_ptr_->max_ptm_mass_);
-  getCtermTruncRange(proteoform, c_trunc_min, c_trunc_max, mng_ptr_->max_ptm_mass_);
-
-  if (left_sup > LEFT_SUP_LIMIT) n_trunc_min = n_trunc_max = 0;
-  if (right_sup > RIGHT_SUP_LIMIT) c_trunc_min = c_trunc_max = 0;
 
   std::string n_seq, c_seq;
   std::vector<bool> ptm_known_vec;
@@ -215,7 +300,6 @@ void LocalUtil::onePtmTermAdjust(ProteoformPtr proteoform, ExtendMsPtrVec extend
 
       n_vec.push_back(i);
       c_vec.push_back(j);
-
       PtmPtrVec ptm_vec_tmp = getPtmPtrVecByMass(mass, err);
       ptm_known_vec.push_back(ptm_vec_tmp.size() > 0);
       change_ptr->setMassShift(mass);
@@ -265,22 +349,19 @@ void LocalUtil::onePtmTermAdjust(ProteoformPtr proteoform, ExtendMsPtrVec extend
 }
 
 void LocalUtil::twoPtmTermAdjust(ProteoformPtr proteoform, int num_match, 
-                                 ExtendMsPtrVec extend_ms_ptr_vec, double prec_mass,
+                                 const ExtendMsPtrVec & extend_ms_ptr_vec, double prec_mass,
                                  double & mass1, double & mass2) {
-  int left_sup, right_sup;
+
+  int n_trunc_min, n_trunc_max, c_trunc_min, c_trunc_max;
+  getNtermTruncRange(proteoform, extend_ms_ptr_vec, n_trunc_min, n_trunc_max);
+  getCtermTruncRange(proteoform, extend_ms_ptr_vec, c_trunc_min, c_trunc_max);
+
   ChangePtr change_ptr1 = proteoform->getChangePtrVec(ChangeType::UNEXPECTED)[0];
   ChangePtr change_ptr2 = proteoform->getChangePtrVec(ChangeType::UNEXPECTED)[1];
   ChangePtrVec fix_change_vec = proteoform->getChangePtrVec(ChangeType::FIXED);
   int ori_start = proteoform->getStartPos(), ori_end = proteoform->getEndPos();
   double ori_mass1 = change_ptr1->getMassShift(), ori_mass2 = change_ptr2->getMassShift();
   mass1 = ori_mass1, mass2 = ori_mass2;
-  int tmp, n_trunc_min, n_trunc_max, c_trunc_min, c_trunc_max;
-  compSupPeakNum(proteoform, extend_ms_ptr_vec, change_ptr1, mng_ptr_->min_mass_, left_sup, tmp);
-  compSupPeakNum(proteoform, extend_ms_ptr_vec, change_ptr2, mng_ptr_->min_mass_, tmp, right_sup);
-  getNtermTruncRange(proteoform, n_trunc_min, n_trunc_max, mng_ptr_->max_ptm_mass_);
-  getCtermTruncRange(proteoform, c_trunc_min, c_trunc_max, mng_ptr_->max_ptm_mass_);
-  if (left_sup > LEFT_SUP_LIMIT) n_trunc_min = n_trunc_max = 0;
-  if (right_sup > RIGHT_SUP_LIMIT) c_trunc_min = c_trunc_max = 0;
 
   std::vector<bool> ptm1_known_vec, ptm2_known_vec;
   std::vector<int> c_vec, n_vec;
@@ -362,67 +443,6 @@ void LocalUtil::twoPtmTermAdjust(ProteoformPtr proteoform, int num_match,
                                             proteoform->getResSeqPtr(), new_change_vec);
 }
 
-void LocalUtil::getNtermTruncRange(ProteoformPtr proteoform, int & min, int & max, double max_mass) {
-  double ori_mass = 
-      proteoform->getChangePtrVec(ChangeType::UNEXPECTED)[0]->getMassShift();
-  double mass = ori_mass;
-  int ori_start = proteoform->getStartPos();
-  max = min = 0;
-  while (ori_start + min > 0) {
-    min--;
-    std::string t_seq =
-        proteoform->getFastaSeqPtr()->getSeq().substr(ori_start + min, -min);
-    mass = ori_mass - getPeptideMass(t_seq);
-    if (std::abs(mass) >= max_mass || ori_start + min <= 0) {
-      min++;
-      break;
-    }
-  }
-  mass = ori_mass;
-  while (std::abs(ori_mass) < max_mass) {
-    max++;
-    std::string t_seq = 
-        proteoform->getFastaSeqPtr()->getSeq().substr(ori_start, max);
-    mass = ori_mass + getPeptideMass(t_seq);
-    if (std::abs(mass) >= max_mass) {
-      max--;
-      break;
-    }
-  }
-}
-
-void LocalUtil::getCtermTruncRange(ProteoformPtr proteoform,            
-                                   int & min, int & max, double max_mass) {
-  ChangePtrVec change_vec = 
-      proteoform->getChangePtrVec(ChangeType::UNEXPECTED);
-  double ori_mass = change_vec[change_vec.size() - 1]->getMassShift();
-  double mass = ori_mass;
-  int ori_end = proteoform->getEndPos();
-  max = min = 0;
-  while (ori_end + std::abs(max) < proteoform->getFastaSeqPtr()->getLen() - 1) {
-    max++;
-    std::string t_seq =
-        proteoform->getFastaSeqPtr()->getSeq().substr(ori_end + 1, max);
-    mass = ori_mass - getPeptideMass(t_seq);
-    if (std::abs(mass) >= max_mass 
-        || ori_end + std::abs(max) >= proteoform->getFastaSeqPtr()->getLen() - 1) {
-      max--;
-      break;
-    }
-  }
-  mass = ori_mass;
-  while (std::abs(ori_mass) < max_mass) {
-    min--;
-    std::string t_seq =
-        proteoform->getFastaSeqPtr()->getSeq().substr(ori_end + 1 + min, -min);
-    mass = ori_mass + getPeptideMass(t_seq);
-    if (std::abs(mass) >= max_mass) {
-      min++;
-      break;
-    }
-  }
-}
-
 void LocalUtil::readPtmTxt(const std::string &file_name) {
   std::ifstream infile(file_name.c_str());
   std::string line;
@@ -444,7 +464,7 @@ void LocalUtil::readPtmTxt(const std::string &file_name) {
   }
 }
 
-void LocalUtil::compOnePtmScr(ProteoformPtr proteoform, ExtendMsPtrVec extend_ms_ptr_vec, 
+void LocalUtil::compOnePtmScr(ProteoformPtr proteoform, const ExtendMsPtrVec & extend_ms_ptr_vec, 
                               std::vector<double> &scr_vec, double & raw_scr, PtmPtrVec & ptm_vec) {
   raw_scr = 0.0;
   ChangePtr change_ptr = proteoform->getChangePtrVec(ChangeType::UNEXPECTED)[0];
@@ -485,8 +505,7 @@ void LocalUtil::compOnePtmScr(ProteoformPtr proteoform, ExtendMsPtrVec extend_ms
   ptm_vec.push_back(p);
 }
 
-void two_ptm_mass_adjust(double & mass1, double & mass2,
-                         PtmPtr p1, PtmPtr p2) {
+void two_ptm_mass_adjust(double & mass1, double & mass2, PtmPtr p1, PtmPtr p2) {
   if (p1 == nullptr || p2 == nullptr) return; 
   double err = mass1 + mass2 - p1->getMonoMass() - p2->getMonoMass();
   if (std::abs(err) < 1) {
@@ -504,22 +523,18 @@ void two_ptm_mass_adjust(double & mass1, double & mass2,
 }
 
 void LocalUtil::compTwoPtmScr(ProteoformPtr proteoform, int num_match, 
-                              ExtendMsPtrVec extend_ms_ptr_vec, double prec_mass,
+                              const ExtendMsPtrVec & extend_ms_ptr_vec, double prec_mass,
                               double & raw_scr, PtmPairVec ptm_pair_vec) {
-  double mass1 = 
-      proteoform->getChangePtrVec(ChangeType::UNEXPECTED)[0]->getMassShift(); 
-  double mass2 =
-      proteoform->getChangePtrVec(ChangeType::UNEXPECTED)[1]->getMassShift();
+  double mass1 = proteoform->getChangePtrVec(ChangeType::UNEXPECTED)[0]->getMassShift(); 
+  double mass2 = proteoform->getChangePtrVec(ChangeType::UNEXPECTED)[1]->getMassShift();
   std::vector<double> scr_vec;
   for (size_t i = 0; i < ptm_pair_vec.size(); i++) {
     two_ptm_mass_adjust(mass1, mass2, ptm_pair_vec[i].first, ptm_pair_vec[i].second);
-    scr_vec.push_back(dpTwoPtmScr(proteoform, num_match, 
-                                  extend_ms_ptr_vec, prec_mass,
-                                  mass1, mass2, ptm_pair_vec[i].first,
-                                  ptm_pair_vec[i].second));
+    scr_vec.push_back(dpTwoPtmScr(proteoform, num_match, extend_ms_ptr_vec, prec_mass,
+                                  mass1, mass2, ptm_pair_vec[i].first, ptm_pair_vec[i].second));
   }
-  int idx = std::distance(scr_vec.begin(), 
-                          std::max_element(scr_vec.begin(), scr_vec.end()));
+
+  int idx = std::distance(scr_vec.begin(), std::max_element(scr_vec.begin(), scr_vec.end()));
   raw_scr = scr_vec[idx];
   PtmPtr p1 = ptm_pair_vec[idx].first;
   PtmPtr p2 = ptm_pair_vec[idx].second;
@@ -527,26 +542,34 @@ void LocalUtil::compTwoPtmScr(ProteoformPtr proteoform, int num_match,
   ptm_pair_vec.push_back(std::make_pair(p1, p2));
 }
 
-void compNumMatch(double * b, int *s, int g, std::vector<std::pair<double, double>> spec_peak, double prec_mass) {
-  memset(s, 0, sizeof(int) * g);
-  int i = 0, j = 0;
-  while (i < g && j < (int)spec_peak.size()) {
+std::vector<std::pair<double, double>> getSpecPeak(const ExtendMsPtrVec & extend_ms_ptr_vec) {
+  std::vector<std::pair<double, double>> spec_peak;
+  for (size_t i = 0; i < extend_ms_ptr_vec.size(); i++) {
+    for (size_t j = 0; j < extend_ms_ptr_vec[i]->getPeakPtrVec().size(); j++) {
+      spec_peak.push_back(std::make_pair(extend_ms_ptr_vec[i]->getPeakPtr(j)->getMonoMass(),
+                                         extend_ms_ptr_vec[i]->getPeakPtr(j)->getOrigTolerance()));
+    }
+  }
+  return spec_peak;
+}
+
+void compNumMatch(const std::vector<double> & b, std::vector<int> & s, 
+                  std::vector<std::pair<double, double>> spec_peak, double prec_mass) {
+
+  size_t i = 0, j = 0;
+  while (i < b.size() && j < spec_peak.size()) {
     if (std::abs(spec_peak[j].first - b[i]) <= spec_peak[j].second) {
-      s[i]++;
-      i++;
-      j++;
+      s[i]++; i++; j++;
     } else if (b[i] > spec_peak[j].first) {
       j++;
     } else {
       i++;
     }
   }
-  i = g - 1, j = 0;
-  while (i >= 0 && j < (int)spec_peak.size()) {
+  i = b.size() - 1, j = 0;
+  while (i >= 0 && j < spec_peak.size()) {
     if (std::abs(spec_peak[j].first - prec_mass + b[i]) <= spec_peak[j].second) {
-      s[i]++;
-      i--;
-      j++;
+      s[i]++; i--; j++;
     } else if (prec_mass - b[i] > spec_peak[j].first) {
       i--;
     } else {
@@ -555,33 +578,47 @@ void compNumMatch(double * b, int *s, int g, std::vector<std::pair<double, doubl
   } 
 }
 
-double LocalUtil::dpTwoPtmScr(ProteoformPtr proteoform, int h, 
-                              ExtendMsPtrVec extend_ms_ptr_vec, double prec_mass,
-                              double mass1, double mass2, PtmPtr ptm1, PtmPtr ptm2) {
+void fillTableB(std::vector<std::vector<double>> & b_table, const std::string & seq,
+                double mass1, double mass2, int g) {
 
-  std::vector<std::pair<double, double>> spec_peak;
-  for (size_t i = 0; i < extend_ms_ptr_vec.size(); i++) {
-    for (size_t j = 0; j < extend_ms_ptr_vec[i]->getPeakPtrVec().size(); j++) {
-      spec_peak.push_back(std::make_pair(extend_ms_ptr_vec[i]->getPeakPtr(j)->getMonoMass(),
-                                         extend_ms_ptr_vec[i]->getPeakPtr(j)->getOrigTolerance()));
-    }
-  }
+  for (size_t i = 0; i < b_table.size(); i++) 
+    b_table.resize(g - 1);
 
-  int g = proteoform->getLen();
-  // fill B(f,g)
-  double b_table[3][g - 1];
-  std::string seq = proteoform->getFastaSeqPtr()->getSeq();
-  for (int i = 1; i <= g - 1; i++) {
+  for (size_t i = 1; i < b_table[0].size(); i++) {
     b_table[0][i - 1] = getPeptideMass(seq.substr(0, i));
     b_table[1][i - 1] = getPeptideMass(seq.substr(0, i)) + mass1;
     b_table[2][i - 1] = getPeptideMass(seq.substr(0, i)) + mass1 + mass2;
   }
-  // fill S(f,g)
-  int s_table[3][g];
-  s_table[0][g - 1] = s_table[1][g - 1] = s_table[2][g - 1] = 0;
-  for (int i = 0; i < 3; i++) {
-    compNumMatch(b_table[i], s_table[i], g, spec_peak, prec_mass);
+}
+
+void fillTableS(std::vector<std::vector<double>> & b_table, std::vector<std::vector<int>> & s_table,
+                std::vector<std::pair<double, double>> spec_peak, double prec_mass, int g) {
+
+  for (size_t i = 0; i < s_table.size(); i++) {
+    s_table[i].resize(g);
+    std::fill(s_table[i].begin(), s_table[i].end(), 0);
   }
+
+  for (int i = 0; i < 3; i++) {
+    compNumMatch(b_table[i], s_table[i], spec_peak, prec_mass);
+  }
+}
+
+double LocalUtil::dpTwoPtmScr(ProteoformPtr proteoform, int h, const ExtendMsPtrVec & extend_ms_ptr_vec, 
+                              double prec_mass, double mass1, double mass2, PtmPtr ptm1, PtmPtr ptm2) {
+
+  std::vector<std::pair<double, double>> spec_peak = getSpecPeak(extend_ms_ptr_vec);
+
+  int g = proteoform->getLen();
+
+  std::string seq = proteoform->getFastaSeqPtr()->getSeq();
+
+  std::vector<std::vector<double>> b_table(3);
+  fillTableB(b_table, seq, mass1, mass2, g);
+
+  std::vector<std::vector<int>> s_table(3);
+  fillTableS(b_table, s_table, spec_peak, prec_mass, g);
+
   // fill D(f,g,h)
   int d_table[3][g + 1][h + 1];
   memset(d_table, 0, sizeof(int) * 3 * (g + 1) * (h + 1));
@@ -619,13 +656,15 @@ double LocalUtil::dpTwoPtmScr(ProteoformPtr proteoform, int h,
   }
 
   double scr = 0.0;
+  int count = 0;
   for (int i = 0; i <= h; i++) {
+    count += d_table[2][g][i];
     scr += d_table[2][g][i] * std::pow(p1_, g - i) * std::pow(p2_, i);
   }
-  return scr;
+  return scr / count;
 }
 
-void LocalUtil::compSplitPoint(ProteoformPtr proteoform, int h, ExtendMsPtrVec extend_ms_ptr_vec,
+void LocalUtil::compSplitPoint(ProteoformPtr proteoform, int h, const ExtendMsPtrVec & extend_ms_ptr_vec,
                                double prec_mass) {
   ChangePtr change_ptr1 = proteoform->getChangePtrVec(ChangeType::UNEXPECTED)[0];
   ChangePtr change_ptr2 = proteoform->getChangePtrVec(ChangeType::UNEXPECTED)[1];
@@ -635,38 +674,24 @@ void LocalUtil::compSplitPoint(ProteoformPtr proteoform, int h, ExtendMsPtrVec e
   two_ptm_mass_adjust(mass1, mass2, ptm1, ptm2);
   change_ptr1->setMassShift(mass1); change_ptr2->setMassShift(mass2);
 
-  std::vector<std::pair<double, double>> spec_peak;
-  for (size_t i = 0; i < extend_ms_ptr_vec.size(); i++) {
-    for (size_t j = 0; j < extend_ms_ptr_vec[i]->getPeakPtrVec().size(); j++) {
-      spec_peak.push_back(std::make_pair(extend_ms_ptr_vec[i]->getPeakPtr(j)->getMonoMass(),
-                                         extend_ms_ptr_vec[i]->getPeakPtr(j)->getOrigTolerance()));
-    }
-  }
+  std::vector<std::pair<double, double>> spec_peak = getSpecPeak(extend_ms_ptr_vec);
 
   int g = proteoform->getLen();
-  double b_table[3][g - 1];
-
-  int s_table[3][g];
-  s_table[0][g - 1] = s_table[1][g - 1] = s_table[2][g - 1] = 0;
-
-  int d_table[3][g + 1][h + 1];
 
   std::string seq = proteoform->getFastaSeqPtr()->getSeq();
+
+  std::vector<std::vector<double>> b_table(3);
+  fillTableB(b_table, seq, mass1, mass2, g);
+
+  std::vector<std::vector<int>> s_table(3);
+  fillTableS(b_table, s_table, spec_peak, prec_mass, g);
+
+  int d_table[3][g + 1][h + 1];
 
   std::vector<double> split_scr_vec;
   for (int k = 1; k < g; k++) {
     memset(d_table, 0, sizeof(int) * 3 * (g + 1) * (h + 1));
     d_table[0][0][0] = 1;
-
-    for (int i = 1; i <= g - 1; i++) {
-      b_table[0][i - 1] = getPeptideMass(seq.substr(0, i));
-      b_table[1][i - 1] = getPeptideMass(seq.substr(0, i)) + mass1;
-      b_table[2][i - 1] = getPeptideMass(seq.substr(0, i)) + mass1 + mass2;
-    }
-
-    for (int i = 0; i < 3; i++) {
-      compNumMatch(b_table[i], s_table[i], g, spec_peak, prec_mass);
-    }
 
     for (int i = 1; i <= g; i++) {
       for (int j = 0; j <= h; j++) {
@@ -706,8 +731,8 @@ void LocalUtil::compSplitPoint(ProteoformPtr proteoform, int h, ExtendMsPtrVec e
     split_scr_vec.push_back(scr);
   }
 
-  int split_point = 1 + std::distance(split_scr_vec.begin(), 
-                                      std::max_element(split_scr_vec.begin(), split_scr_vec.end()));
+  int split_point = std::distance(split_scr_vec.begin(), 
+                                  std::max_element(split_scr_vec.begin(), split_scr_vec.end()));
   std::vector<double> ptm_scr;
 
   for (int i = 0; i <= split_point; i++) {
@@ -725,8 +750,7 @@ void LocalUtil::compSplitPoint(ProteoformPtr proteoform, int h, ExtendMsPtrVec e
   int bgn, end;
   double conf;
   scr_filter(ptm_scr, bgn, end, conf, mng_ptr_->thread_);
-  LocalAnnoPtr anno1 = 
-      std::make_shared<LocalAnno>(bgn, end, conf, ptm_scr, 0, ptm1);
+  LocalAnnoPtr anno1 = std::make_shared<LocalAnno>(bgn, end, conf, ptm_scr, 0, ptm1);
   change_ptr1->setLocalAnno(anno1);
   ptm_scr.clear();
   int len = proteoform->getLen();
@@ -742,8 +766,7 @@ void LocalUtil::compSplitPoint(ProteoformPtr proteoform, int h, ExtendMsPtrVec e
   }
   ptm_scr = normalize(ptm_scr);
   scr_filter(ptm_scr, bgn, end, conf, mng_ptr_->thread_);
-  LocalAnnoPtr anno2 = 
-      std::make_shared<LocalAnno>(bgn, end, conf, ptm_scr, 0, ptm1);
+  LocalAnnoPtr anno2 = std::make_shared<LocalAnno>(bgn, end, conf, ptm_scr, 0, ptm1);
   change_ptr2->setLocalAnno(anno1);  
 }
 
