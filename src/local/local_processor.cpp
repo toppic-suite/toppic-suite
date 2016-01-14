@@ -57,8 +57,6 @@ void LocalProcessor::process() {
             = ExtendMsFactory::geneMsThreePtrVec(deconv_ms_ptr_vec, sp_para_ptr, new_prec_mass);
         prsm_ptr->setRefineMsVec(extend_ms_ptr_vec);
 
-        std::cout << prsm_ptr->getPrsmId() << std::endl;
-
         if (prsm_ptr->getProteoformPtr()->getChangeNum(ChangeType::UNEXPECTED) > 0)
           processOneSpectrum(prsm_ptr);
 
@@ -85,8 +83,7 @@ void LocalProcessor::processOneSpectrum(PrsmPtr prsm) {
 }
 
 void LocalProcessor::processOnePtm(PrsmPtr prsm) {
-  int ori_num_match_ion = 
-      LocalUtil::compNumPeakIonPairs(prsm->getProteoformPtr(), prsm->getRefineMsPtrVec());
+  int ori_num_match_ion = LocalUtil::compNumPeakIonPairs(prsm->getProteoformPtr(), prsm->getRefineMsPtrVec());
 
   // we will get a nullptr if the mass shift can't be explained by a variable ptm
   ProteoformPtr one_known_prsm = processOneKnown(prsm);
@@ -101,21 +98,24 @@ void LocalProcessor::processOnePtm(PrsmPtr prsm) {
   ProteoformPtr one_unknown_prsm = processOneUnknown(prsm);
   ProteoformPtr two_known_prsm = processTwoKnown(prsm);
 
-  if (two_known_prsm->getChangePtrVec(ChangeType::UNEXPECTED)[0]->getLocalAnno()->getRawScr()
-      > one_unknown_prsm->getChangePtrVec(ChangeType::UNEXPECTED)[0]->getLocalAnno()->getRawScr()) {
-    if (LocalUtil::compNumPeakIonPairs(two_known_prsm, prsm->getRefineMsPtrVec()) 
-        > ori_num_match_ion - DESC_MATCH_LIMIT)
-      prsm->setProteoformPtr(two_known_prsm);
-  } else {
-    if (LocalUtil::compNumPeakIonPairs(one_unknown_prsm, prsm->getRefineMsPtrVec()) 
-        > ori_num_match_ion - DESC_MATCH_LIMIT)
-      prsm->setProteoformPtr(one_unknown_prsm);
+  if (two_known_prsm != nullptr) {
+    if (two_known_prsm->getChangePtrVec(ChangeType::UNEXPECTED)[0]->getLocalAnno()->getRawScr()
+        > one_unknown_prsm->getChangePtrVec(ChangeType::UNEXPECTED)[0]->getLocalAnno()->getRawScr()) {
+      if (LocalUtil::compNumPeakIonPairs(two_known_prsm, prsm->getRefineMsPtrVec()) 
+          > ori_num_match_ion - DESC_MATCH_LIMIT) {
+        prsm->setProteoformPtr(two_known_prsm);
+        return;
+      }
+    }
   }
+
+  if (LocalUtil::compNumPeakIonPairs(one_unknown_prsm, prsm->getRefineMsPtrVec()) 
+      > ori_num_match_ion - DESC_MATCH_LIMIT)
+    prsm->setProteoformPtr(one_unknown_prsm);
 }
 
 void LocalProcessor::processTwoPtm(PrsmPtr prsm) {
-  int ori_num_match_ion = 
-      LocalUtil::compNumPeakIonPairs(prsm->getProteoformPtr(), prsm->getRefineMsPtrVec());
+  int ori_num_match_ion = LocalUtil::compNumPeakIonPairs(prsm->getProteoformPtr(), prsm->getRefineMsPtrVec());
 
   ProteoformPtr two_known_prsm = processTwoKnown(prsm);
 
@@ -129,16 +129,21 @@ void LocalProcessor::processTwoPtm(PrsmPtr prsm) {
   ProteoformPtr two_unknown_prsm = processTwoUnknown(prsm);
   ProteoformPtr one_known_prsm = processOneKnown(prsm);
 
-  if (two_unknown_prsm->getChangePtrVec(ChangeType::UNEXPECTED)[0]->getLocalAnno()->getRawScr()
-      > one_known_prsm->getChangePtrVec(ChangeType::UNEXPECTED)[0]->getLocalAnno()->getRawScr()) {
-    if (LocalUtil::compNumPeakIonPairs(two_unknown_prsm, prsm->getRefineMsPtrVec()) 
-        > ori_num_match_ion - DESC_MATCH_LIMIT)
-      prsm->setProteoformPtr(two_known_prsm);
-  } else {
-    if (LocalUtil::compNumPeakIonPairs(one_known_prsm, prsm->getRefineMsPtrVec()) 
-        > ori_num_match_ion - DESC_MATCH_LIMIT)
-      prsm->setProteoformPtr(one_known_prsm);
+  if (one_known_prsm != nullptr) {
+    if (one_known_prsm->getChangePtrVec(ChangeType::UNEXPECTED)[0]->getLocalAnno()->getRawScr()
+        >two_unknown_prsm->getChangePtrVec(ChangeType::UNEXPECTED)[0]->getLocalAnno()->getRawScr()) {
+      if (LocalUtil::compNumPeakIonPairs(one_known_prsm, prsm->getRefineMsPtrVec()) 
+          > ori_num_match_ion - DESC_MATCH_LIMIT) {
+        prsm->setProteoformPtr(one_known_prsm);
+        return;
+      }
+    }
+
   }
+
+  if (LocalUtil::compNumPeakIonPairs(two_unknown_prsm, prsm->getRefineMsPtrVec()) 
+      > ori_num_match_ion - DESC_MATCH_LIMIT)
+    prsm->setProteoformPtr(two_known_prsm);
 }
 
 // we will get a nullptr if the mass shift can't be explained by a variable ptm

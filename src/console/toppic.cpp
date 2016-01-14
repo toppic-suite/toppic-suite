@@ -244,7 +244,6 @@ int two_base_opt(int argc, char* argv[]) {
     prsm_species = nullptr;
     std::cout << "Finding protein species finished." << std::endl;
 
-
     std::cout << "PTM localization started." << std::endl;
     LocalMngPtr local_mng = LocalMngPtr(
         new LocalMng(prsm_para_ptr, arguments["local_threshold"],
