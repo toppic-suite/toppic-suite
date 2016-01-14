@@ -28,10 +28,8 @@ LocalProcessor::LocalProcessor(LocalMngPtr mng_ptr) {
 
 void LocalProcessor::process() {
   std::string spec_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
-  std::string input_file_name = 
-      FileUtil::basename(spec_file_name) + "." + mng_ptr_->input_file_ext_;
-  std::string output_file_name =
-      FileUtil::basename(spec_file_name) + "." + mng_ptr_->output_file_ext_;
+  std::string input_file_name = FileUtil::basename(spec_file_name) + "." + mng_ptr_->input_file_ext_;
+  std::string output_file_name = FileUtil::basename(spec_file_name) + "." + mng_ptr_->output_file_ext_;
   PrsmXmlWriter writer(output_file_name);
   std::string db_file_name = mng_ptr_->prsm_para_ptr_->getSearchDbFileName();
 
@@ -171,8 +169,7 @@ ProteoformPtr LocalProcessor::processOneKnown(const PrsmPtr & prsm) {
     LocalUtil::onePtmTermAdjust(one_known_proteoform, 
                                 prsm->getRefineMsPtrVec(),
                                 mass, prsm->getAdjustedPrecMass() * ppm_);                                     
-    ptm_vec =                                                                   
-        LocalUtil::getPtmPtrVecByMass(mass, prsm->getAdjustedPrecMass() * ppm_);
+    ptm_vec = LocalUtil::getPtmPtrVecByMass(mass, prsm->getAdjustedPrecMass() * ppm_);
   }
   // even after adjusting N/C-termimals, still no explanation. return nullptr
   if (ptm_vec.size() == 0) return nullptr;
@@ -190,8 +187,7 @@ ProteoformPtr LocalProcessor::processOneKnown(const PrsmPtr & prsm) {
   double conf;
   LocalUtil::scr_filter(scr_vec, bgn, end, conf, thread_);
   // it is known ptm, raw_scr * theta_; otherwise raw_scr * (1 - theta_)
-  LocalAnnoPtr anno = 
-      std::make_shared<LocalAnno>(bgn, end, conf, scr_vec, raw_scr * theta_, ptm_vec[0]);
+  LocalAnnoPtr anno = std::make_shared<LocalAnno>(bgn, end, conf, scr_vec, raw_scr * theta_, ptm_vec[0]);
   one_known_proteoform->getChangePtrVec(ChangeType::UNEXPECTED)[0]->setLocalAnno(anno);
   return one_known_proteoform;
 }
@@ -240,8 +236,7 @@ ProteoformPtr LocalProcessor::processOneUnknown(const PrsmPtr & prsm) {
   int bgn, end;
   double conf;
   LocalUtil::scr_filter(scr_vec, bgn, end, conf, thread_);
-  LocalAnnoPtr anno = 
-      std::make_shared<LocalAnno>(bgn, end, conf, scr_vec, raw_scr * (1 - theta_), nullptr);
+  LocalAnnoPtr anno = std::make_shared<LocalAnno>(bgn, end, conf, scr_vec, raw_scr * (1 - theta_), nullptr);
   one_unknown_proteoform->getChangePtrVec(ChangeType::UNEXPECTED)[0]->setLocalAnno(anno);
   return one_unknown_proteoform;
 }
@@ -282,11 +277,9 @@ ProteoformPtr LocalProcessor::processTwoKnown(const PrsmPtr & prsm) {
 
   if (ptm_pair_vec.size() == 0) {
     LocalUtil::twoPtmTermAdjust(two_known_proteoform, prsm->getMatchPeakNum(),
-                                prsm->getRefineMsPtrVec(),
-                                prsm->getAdjustedPrecMass(),
+                                prsm->getRefineMsPtrVec(), prsm->getAdjustedPrecMass(),
                                 mass1, mass2);
-    ptm_pair_vec = 
-        LocalUtil::getPtmPairVecByMass(mass1, mass2, prsm->getAdjustedPrecMass() * ppm_);
+    ptm_pair_vec = LocalUtil::getPtmPairVecByMass(mass1, mass2, prsm->getAdjustedPrecMass() * ppm_);
   }
 
   if (ptm_pair_vec.size() == 0) return nullptr;
@@ -304,11 +297,9 @@ ProteoformPtr LocalProcessor::processTwoKnown(const PrsmPtr & prsm) {
   PtmPtr ptm2 = ptm_pair_vec[0].second;
   raw_scr = raw_scr * theta_ * theta_ * (1 - beta_);
   std::vector<double> empty_scr_vec;
-  LocalAnnoPtr anno1 = 
-      std::make_shared<LocalAnno>(0, 0, 0, empty_scr_vec, raw_scr, ptm1);
+  LocalAnnoPtr anno1 = std::make_shared<LocalAnno>(0, 0, 0, empty_scr_vec, raw_scr, ptm1);
   two_known_proteoform->getChangePtrVec(ChangeType::UNEXPECTED)[0]->setLocalAnno(anno1);
-  LocalAnnoPtr anno2 = 
-      std::make_shared<LocalAnno>(0, 0, 0, empty_scr_vec, raw_scr, ptm2);
+  LocalAnnoPtr anno2 = std::make_shared<LocalAnno>(0, 0, 0, empty_scr_vec, raw_scr, ptm2);
   two_known_proteoform->getChangePtrVec(ChangeType::UNEXPECTED)[1]->setLocalAnno(anno2);
   LocalUtil::compSplitPoint(two_known_proteoform,prsm->getMatchPeakNum(),
                             extend_ms_ptr_vec, prsm->getAdjustedPrecMass());
@@ -330,12 +321,10 @@ ProteoformPtr LocalProcessor::processTwoUnknown(const PrsmPtr & prsm) {
 
   double mass1 = change_vec[0]->getMassShift();
   double mass2 = change_vec[1]->getMassShift();
-  PtmPtrVec ptm_vec1 = 
-      LocalUtil::getPtmPtrVecByMass(mass1, prsm->getAdjustedPrecMass() * ppm_);
+  PtmPtrVec ptm_vec1 = LocalUtil::getPtmPtrVecByMass(mass1, prsm->getAdjustedPrecMass() * ppm_);
   if (ptm_vec1.size() == 0) ptm_vec1.push_back(nullptr);
 
-  PtmPtrVec ptm_vec2 = 
-      LocalUtil::getPtmPtrVecByMass(mass2, prsm->getAdjustedPrecMass() * ppm_);
+  PtmPtrVec ptm_vec2 = LocalUtil::getPtmPtrVecByMass(mass2, prsm->getAdjustedPrecMass() * ppm_);
   if (ptm_vec2.size() == 0) ptm_vec2.push_back(nullptr);
 
   PtmPairVec ptm_pair_vec;
@@ -378,11 +367,9 @@ ProteoformPtr LocalProcessor::processTwoUnknown(const PrsmPtr & prsm) {
     raw_scr = raw_scr * theta_;
 
   std::vector<double> empty_scr_vec;
-  LocalAnnoPtr anno1 = 
-      std::make_shared<LocalAnno>(0, 0, 0, empty_scr_vec, raw_scr, ptm1);
+  LocalAnnoPtr anno1 = std::make_shared<LocalAnno>(0, 0, 0, empty_scr_vec, raw_scr, ptm1);
   two_unknown_proteoform->getChangePtrVec(ChangeType::UNEXPECTED)[0]->setLocalAnno(anno1);
-  LocalAnnoPtr anno2 = 
-      std::make_shared<LocalAnno>(0, 0, 0, empty_scr_vec, raw_scr, ptm2);
+  LocalAnnoPtr anno2 = std::make_shared<LocalAnno>(0, 0, 0, empty_scr_vec, raw_scr, ptm2);
   two_unknown_proteoform->getChangePtrVec(ChangeType::UNEXPECTED)[1]->setLocalAnno(anno2);
 
   LocalUtil::compSplitPoint(two_unknown_proteoform, prsm->getMatchPeakNum(),
