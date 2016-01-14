@@ -18,7 +18,7 @@ ResiduePtrVec ResidueUtil::convertStrToResiduePtrVec(const std::string &seq) {
 }
 
 ResiduePtrVec ResidueUtil::convertStrToResiduePtrVec(const std::string &seq, 
-                                                     ModPtrVec &fix_mod_ptr_vec) {
+                                                     const ModPtrVec &fix_mod_ptr_vec) {
   ResiduePtrVec residue_ptrs = ResidueUtil::convertStrToResiduePtrVec(seq);
   for (size_t i = 0; i < residue_ptrs.size(); i++) {
     for (size_t j = 0; j < fix_mod_ptr_vec.size(); j++) {
