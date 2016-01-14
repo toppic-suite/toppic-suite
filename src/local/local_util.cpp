@@ -124,6 +124,7 @@ PtmPairVec LocalUtil::getPtmPairVecByMass(double mass1, double mass2, double err
     if (std::abs(pair_mass - mass) < err || std::abs(std::abs(pair_mass - mass) - 1) < err)
       res.push_back(ptm_pair_vec_[i]);
   }
+
   return res;
 }
 
@@ -391,6 +392,9 @@ void LocalUtil::twoPtmTermAdjust(ProteoformPtr proteoform, int num_match,
       c_vec.push_back(j);
 
       PtmPairVec ptm_pair_vec = getPtmPairVecByMass(mass1, mass2, prec_mass * ppm_);
+      if (ptm_pair_vec.size() == 0) {
+        ptm_pair_vec.push_back(std::make_pair(nullptr, nullptr));
+      }
       ptm1_known_vec.push_back(getPtmPtrVecByMass(mass1, prec_mass * ppm_).size() > 0);
       ptm2_known_vec.push_back(getPtmPtrVecByMass(mass2, prec_mass * ppm_).size() > 0);
       change_ptr1->setMassShift(mass1);
@@ -567,7 +571,7 @@ void compNumMatch(const std::vector<double> & b, std::vector<int> & s,
     }
   }
   i = b.size() - 1, j = 0;
-  while (i >= 0 && j < spec_peak.size()) {
+  while ((int)i >= 0 && j < spec_peak.size()) {
     if (std::abs(spec_peak[j].first - prec_mass + b[i]) <= spec_peak[j].second) {
       s[i]++; i--; j++;
     } else if (prec_mass - b[i] > spec_peak[j].first) {
