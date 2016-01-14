@@ -8,6 +8,7 @@
 #include "prsm/prsm.hpp"
 #include "prsm/peak_ion_pair.hpp"
 #include "prsm/peak_ion_pair_factory.hpp"
+#include "spec/msalign_util.hpp"
 #include "local_processor.hpp"
 #include "local_util.hpp"
 #include "local_anno.hpp"
@@ -42,7 +43,10 @@ void LocalProcessor::process() {
   SpectrumSetPtr spec_set_ptr;
   SpParaPtr sp_para_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr();
 
+  int spectrum_num = MsAlignUtil::getSpNum (mng_ptr_->prsm_para_ptr_->getSpectrumFileName());
+  int cnt = 0;
   while((spec_set_ptr = sp_reader.getNextSpectrumSet(sp_para_ptr))!= nullptr){
+    cnt += group_spec_num;
     if(spec_set_ptr->isValid()){
       int spec_id = spec_set_ptr->getSpecId();
       while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_id) {
@@ -53,6 +57,8 @@ void LocalProcessor::process() {
             = ExtendMsFactory::geneMsThreePtrVec(deconv_ms_ptr_vec, sp_para_ptr, new_prec_mass);
         prsm_ptr->setRefineMsVec(extend_ms_ptr_vec);
 
+        std::cout << prsm_ptr->getPrsmId() << std::endl;
+
         if (prsm_ptr->getProteoformPtr()->getChangeNum(ChangeType::UNEXPECTED) > 0)
           processOneSpectrum(prsm_ptr);
 
@@ -60,6 +66,8 @@ void LocalProcessor::process() {
         prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_list);
       }
     }
+    std::cout << std::flush << "Localizaton is processing " << cnt 
+        << " of " << spectrum_num << " spectra.\r";
   }
   sp_reader.close();
   prsm_reader.close();
@@ -68,8 +76,7 @@ void LocalProcessor::process() {
 
 void LocalProcessor::processOneSpectrum(PrsmPtr prsm) {
   if (prsm->getProteoformPtr()->getChangeNum(ChangeType::UNEXPECTED) == 1) {
-    double mass = 
-        prsm->getProteoformPtr()->getChangePtrVec(ChangeType::UNEXPECTED)[0]->getMassShift();
+    double mass = prsm->getProteoformPtr()->getChangePtrVec(ChangeType::UNEXPECTED)[0]->getMassShift();
     if (std::abs(mass) <= 1 + prsm->getAdjustedPrecMass() * ppm_) return;
     processOnePtm(prsm);  
   } else if (prsm->getProteoformPtr()->getChangeNum(ChangeType::UNEXPECTED) == 2) {
