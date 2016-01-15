@@ -310,7 +310,8 @@ void LocalUtil::onePtmTermAdjust(ProteoformPtr proteoform, const ExtendMsPtrVec 
         mass = mass + getPeptideMass(c_seq);
       }
 
-      if (std::abs(mass) > mng_ptr_->max_ptm_mass_) continue;
+      if (std::abs(mass) > mng_ptr_->max_ptm_mass_ && (i != 0 || j != 0))
+        continue;
 
       n_vec.push_back(i);
       c_vec.push_back(j);
@@ -399,7 +400,10 @@ void LocalUtil::twoPtmTermAdjust(ProteoformPtr proteoform, int num_match,
         mass2 = ori_mass2 + getPeptideMass(c_seq);
       }
 
-      if (std::abs(mass1) > mng_ptr_->max_ptm_mass_ && std::abs(mass2) > mng_ptr_->max_ptm_mass_) continue;
+      if (std::abs(mass1) > mng_ptr_->max_ptm_mass_ 
+          && std::abs(mass2) > mng_ptr_->max_ptm_mass_
+          && (i != 0 || j != 0))
+        continue;
 
       n_vec.push_back(i);
       c_vec.push_back(j);
