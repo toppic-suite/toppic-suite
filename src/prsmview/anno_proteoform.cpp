@@ -157,8 +157,6 @@ void addMod(ProteoformPtr proteoform_ptr, int left_db_bp, int right_db_bp,
   segment_ptrs.push_back(segment_ptr);
   last_right = this_right;
 
-  std::string anno = segment_ptr->getResidueAnno();
-
   for (int j = left_db_bp; j < right_db_bp - 1; j++) {
     res_ptrs[j]->setUnexpectedChange(true);
     res_ptrs[j]->setUnexpectedChangeColor(color);
