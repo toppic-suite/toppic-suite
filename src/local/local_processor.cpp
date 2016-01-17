@@ -143,7 +143,7 @@ void LocalProcessor::processTwoPtm(PrsmPtr prsm) {
 
   if (LocalUtil::compNumPeakIonPairs(two_unknown_prsm, prsm->getRefineMsPtrVec()) 
       > ori_num_match_ion - DESC_MATCH_LIMIT)
-    prsm->setProteoformPtr(two_known_prsm);
+    prsm->setProteoformPtr(two_unknown_prsm);
 }
 
 // we will get a nullptr if the mass shift can't be explained by a variable ptm
