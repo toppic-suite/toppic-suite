@@ -137,6 +137,7 @@ void addMod(ProteoformPtr proteoform_ptr, int left_db_bp, int right_db_bp,
   int this_right = right_db_bp * 2 - 1;
   double shift = change_ptr->getMassShift();
   AnnoSegmentPtr segment_ptr(new AnnoSegment("SHIFT", this_left , this_right, shift, color));
+  std::string anno = "";
 
   if (change_ptr->getLocalAnno() != nullptr) {
     for (int j = left_db_bp; j < right_db_bp; j++) {
@@ -150,6 +151,7 @@ void addMod(ProteoformPtr proteoform_ptr, int left_db_bp, int right_db_bp,
     if (change_ptr->getLocalAnno()->getPtmPtr() != nullptr) {
       segment_ptr->setPtmPtr(change_ptr->getLocalAnno()->getPtmPtr());
     }
+    anno = segment_ptr->getResidueAnno();
   }
 
   segment_ptrs.push_back(segment_ptr);
