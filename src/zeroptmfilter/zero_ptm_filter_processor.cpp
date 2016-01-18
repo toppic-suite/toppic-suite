@@ -76,7 +76,7 @@ void ZeroPtmFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_
   SimplePrsmXmlWriter pref_writer(output_file_name + "_PREFIX_" + block_str);
   SimplePrsmXmlWriter suff_writer(output_file_name + "_SUFFIX_" + block_str);
   SimplePrsmXmlWriter internal_writer(output_file_name + "_INTERNAL_" + block_str);
-    
+
   SpectrumSetPtr spec_set_ptr;
   int spectrum_num = MsAlignUtil::getSpNum (prsm_para_ptr->getSpectrumFileName());
   int cnt = 0;
@@ -90,8 +90,8 @@ void ZeroPtmFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_
       suff_writer.write(filter_ptr->getSuffMatchPtrs());
       internal_writer.write(filter_ptr->getInternalMatchPtrs());
     }
-    //WebLog::percentLog(cnt, spectrum_num, block_ptr->getBlockIdx(), total_block_num,  
-    //                   WebLog::OnePtmFilterTime());
+    WebLog::percentLog(cnt, spectrum_num, block_ptr->getBlockIdx(), total_block_num,  
+                       WebLog::ZeroPtmFilterTime());
     std::cout << std::flush << "Zero PTM filtering is processing " << cnt 
         << " of " << spectrum_num << " spectra.\r";
   }

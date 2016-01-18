@@ -2,6 +2,7 @@
 #include "base/ptm.hpp"
 #include "base/mod_util.hpp"
 #include "base/algorithm.hpp"
+#include "base/web_logger.hpp"
 #include "spec/msalign_reader.hpp"
 #include "spec/spectrum_set.hpp"
 #include "spec/extend_ms_factory.hpp"
@@ -66,6 +67,7 @@ void LocalProcessor::process() {
     }
     std::cout << std::flush << "Localizaton is processing " << cnt 
         << " of " << spectrum_num << " spectra.\r";
+    WebLog::percentLog(cnt, spectrum_num, WebLog::LocalizationTime());
   }
   sp_reader.close();
   prsm_reader.close();

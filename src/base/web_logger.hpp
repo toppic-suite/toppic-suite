@@ -13,14 +13,19 @@ namespace prot {
 
 class WebLog {
  public:
-  static double ZeroPtmTime() {return 3.0;}
-  static double DiagFilterTime() {return 5.0;}
+  static double ZeroPtmFilterTime() {return 3.0;}
+  static double ZeroPtmSearchTime() {return 3.0;}
   static double OnePtmFilterTime() {return 1.0;}
-  static double PtmTime() {return 17.0;}
+  static double OnePtmSearchTime() {return 1.0;}
+  static double DiagFilterTime() {return 5.0;}
+  static double TwoPtmSearchTime() {return 17.0;}
   static double TableEvalueTime() {return 2.0;}
   static double GfEvalueTime() {return 73.0;}
+  static double SelectingTime() {return 73.0;}
+  static double LocalizationTime() {return 73.0;}
+  static double OutPutTime() {return 73.0;}
 
-  static void init(std::string log_file_name, bool use_gf, int ptm_num);
+  static void init(std::string log_file_name, bool use_gf, bool localization, int ptm_num);
   static void close();
 
   static void percentLog(int spectrum_index, int spectrum_num,
