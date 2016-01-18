@@ -26,8 +26,10 @@ std::string AnnoSegment::getResidueAnno() {
   if (ptm_ptr_ != nullptr) {
     anno_ += "PTM: " + ptm_ptr_->getName() + "\n";
     for (size_t i = 0; i < occurences_.size(); i++) {
+      if (score_[i] == 0)
+        continue;
       anno_ += "Site: " + occurences_[i].second + StringUtil::convertToString(occurences_[i].first) + " ";
-      anno_ += "Confidence: " + StringUtil::convertToString(score_[i] * 100, 2) + "%";
+      anno_ += "Confidence: " + StringUtil::convertToString(score_[i] * 100, 2) + "%\n";
       if (i != occurences_.size() - 1) {
         occu_ += occurences_[i].second + StringUtil::convertToString(occurences_[i].first);
         occu_ += " / ";
@@ -43,12 +45,14 @@ std::string AnnoSegment::getResidueAnno() {
     anno_ += StringUtil::convertToString(occurences_[occurences_.size() - 1].first) + " ";
     double tmp = std::accumulate(score_.begin(), score_.end(), 0.0);
     anno_ += "Confidence: " + StringUtil::convertToString(tmp * 100, 2) + "%";	  
-    if (occurences_.size() > 0) {
+    if (occurences_.size() > 1) {
       occu_ += occurences_[0].second + StringUtil::convertToString(occurences_[0].first);
       occu_ += " - ";
       occu_ += occurences_[occurences_.size() - 1].second;
       occu_ += StringUtil::convertToString(occurences_[occurences_.size() - 1].first);
-    }
+    } else if (occurences_.size() == 1) {
+      occu_ += occurences_[0].second + StringUtil::convertToString(occurences_[0].first);
+    } 
   }
   return anno_;
 }

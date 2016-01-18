@@ -345,11 +345,22 @@
           </xsl:element>
       </xsl:if>
       <xsl:if test="$known_ptm = 0">
-        <font color="red">
-          <xsl:text>Unknown [</xsl:text>
-          <xsl:value-of select="occurence" />
-          <xsl:text>]</xsl:text>
-        </font>
+        <xsl:choose>
+          <xsl:when test="occurence != ''">
+            <font color="red">
+              <xsl:text>Unknown [</xsl:text>
+              <xsl:value-of select="occurence" />
+              <xsl:text>]</xsl:text>
+            </font>
+          </xsl:when>
+          <xsl:otherwise>
+            <font color="red">
+              <xsl:text>Unknown [</xsl:text>
+              <xsl:value-of select="mass_shift" />
+              <xsl:text>]</xsl:text>  
+            </font>  
+          </xsl:otherwise>
+      </xsl:choose>
       </xsl:if>
       <xsl:text>&#160;</xsl:text>			
     </xsl:if>
