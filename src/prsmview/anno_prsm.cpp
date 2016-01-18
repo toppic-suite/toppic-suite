@@ -120,22 +120,24 @@ void addMsPeaks(XmlDOMDocument *xml_doc, xercesc::DOMElement* ms_element,
   }
 }
 
-xercesc::DOMElement* geneAnnoPrsm(XmlDOMDocument* xml_doc,PrsmPtr prsm_ptr, PrsmViewMngPtr mng_ptr){
+xercesc::DOMElement* geneAnnoPrsm(XmlDOMDocument* xml_doc,PrsmPtr prsm_ptr, 
+                                  PrsmViewMngPtr mng_ptr, bool detail){
 
   xercesc::DOMElement* prsm_element = xml_doc->createElement("prsm");
   addPrsmHeader(xml_doc, prsm_element, prsm_ptr, mng_ptr);
 
-  //add ms
-  xercesc::DOMElement* ms_element = xml_doc->createElement("ms");
-  addMsHeader(xml_doc, ms_element, prsm_ptr, mng_ptr);
-  addMsPeaks(xml_doc, ms_element, prsm_ptr, mng_ptr);
-  prsm_element->appendChild(ms_element);
+  if (detail) {
+    //add ms
+    xercesc::DOMElement* ms_element = xml_doc->createElement("ms");
+    addMsHeader(xml_doc, ms_element, prsm_ptr, mng_ptr);
+    addMsPeaks(xml_doc, ms_element, prsm_ptr, mng_ptr);
+    prsm_element->appendChild(ms_element);
 
-  //proteoform to view
-  xercesc::DOMElement* prot_element = geneAnnoProteoform(xml_doc, prsm_ptr, mng_ptr);
-  prsm_element->appendChild(prot_element);
-  LOG_DEBUG("proteoform view completed");
-
-  return prsm_element;
+    //proteoform to view
+    xercesc::DOMElement* prot_element = geneAnnoProteoform(xml_doc, prsm_ptr, mng_ptr);
+    prsm_element->appendChild(prot_element);
+    LOG_DEBUG("proteoform view completed");
   }
+  return prsm_element;
+}
 }
