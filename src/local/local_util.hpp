@@ -33,20 +33,20 @@ class LocalUtil {
 
   static void compTwoPtmScr(ProteoformPtr proteoform, int num_match, 
                             const ExtendMsPtrVec & extend_ms_ptr_vec, double prec_mass,
-                            double & raw_scr, PtmPairVec ptm_pair_vec);
+                            double & raw_scr, PtmPairVec & ptm_pair_vec);
 
   static double dpTwoPtmScr(ProteoformPtr proteoform, int num_match, 
                             const ExtendMsPtrVec & extend_ms_ptr_vec, double prec_mass,
                             double mass1, double mass2, PtmPtr p1, PtmPtr p2);
 
-  static void onePtmTermAdjust(ProteoformPtr proteoform, const ExtendMsPtrVec & extend_ms_ptr_vec,
+  static void onePtmTermAdjust(ProteoformPtr & proteoform, const ExtendMsPtrVec & extend_ms_ptr_vec,
                                double & mass, double err);
 
-  static void twoPtmTermAdjust(ProteoformPtr proteoform, int num_match, 
+  static void twoPtmTermAdjust(ProteoformPtr & proteoform, int num_match, 
                                const ExtendMsPtrVec & extend_ms_ptr_vec, double prec_mass,
                                double & mass1, double & mass2);
 
-  static void compSplitPoint(ProteoformPtr proteoform, int num_match, const ExtendMsPtrVec & extend_ms_ptr_vec,
+  static void compSplitPoint(ProteoformPtr & proteoform, int num_match, const ExtendMsPtrVec & extend_ms_ptr_vec,
                              double prec_mass);
 
   static int compNumPeakIonPairs(const ProteoformPtr &proteoform_ptr, const ExtendMsPtrVec &ms_ptr_vec);

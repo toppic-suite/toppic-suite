@@ -183,6 +183,15 @@ ProteoformPtr LocalProcessor::processOneKnown(const PrsmPtr & prsm) {
     LocalUtil::onePtmTermAdjust(one_known_proteoform, 
                                 prsm->getRefineMsPtrVec(),
                                 mass, prsm->getAdjustedPrecMass() * ppm_);                                     
+    if (std::abs(mass) < 1 + prsm->getAdjustedPrecMass() * ppm_){
+      ChangePtr change_ptr = one_known_proteoform->getChangePtrVec(ChangeType::UNEXPECTED)[0];
+      change_ptr->setLeftBpPos(std::max(change_vec[0]->getLeftBpPos()
+                                        + prsm->getProteoformPtr()->getStartPos() 
+                                        - one_known_proteoform->getStartPos(), 0));
+      change_ptr->setRightBpPos(std::min(change_vec[0]->getRightBpPos() + prsm->getProteoformPtr()->getStartPos(),
+                                         one_known_proteoform->getEndPos()) - one_known_proteoform->getStartPos());
+      return one_known_proteoform;
+    }
     ptm_vec = LocalUtil::getPtmPtrVecByMass(mass, prsm->getAdjustedPrecMass() * ppm_);
   }
   // even after adjusting N/C-termimals, still no explanation. return nullptr

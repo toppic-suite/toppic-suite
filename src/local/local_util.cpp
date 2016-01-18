@@ -276,7 +276,7 @@ ProteoformPtr geneProteoform(FastaSeqPtr fasta_seq_ptr, ProtModPtr prot_mod_ptr,
                                       new_res_seq, change_ptr_vec);
 }
 
-void LocalUtil::onePtmTermAdjust(ProteoformPtr proteoform, const ExtendMsPtrVec & extend_ms_ptr_vec,
+void LocalUtil::onePtmTermAdjust(ProteoformPtr & proteoform, const ExtendMsPtrVec & extend_ms_ptr_vec,
                                  double & mass, double err) {
 
   int n_trunc_min, n_trunc_max, c_trunc_min, c_trunc_max;
@@ -313,6 +313,16 @@ void LocalUtil::onePtmTermAdjust(ProteoformPtr proteoform, const ExtendMsPtrVec 
 
       if (std::abs(mass) > mng_ptr_->max_ptm_mass_ && (i != 0 || j != 0))
         continue;
+
+      if (std::abs(mass) < 1 + err) {
+        change_ptr->setMassShift(mass);
+        fix_change_vec.push_back(change_ptr);
+        proteoform = geneProteoform(proteoform->getFastaSeqPtr(),
+                                    proteoform->getProtModPtr(), ori_start + i, ori_end + j, 
+                                    fix_change_vec, 
+                                    mng_ptr_->prsm_para_ptr_->getFixModPtrVec());
+        return;
+      }
 
       n_vec.push_back(i);
       c_vec.push_back(j);
@@ -364,7 +374,7 @@ void LocalUtil::onePtmTermAdjust(ProteoformPtr proteoform, const ExtendMsPtrVec 
                               new_change_vec, mng_ptr_->prsm_para_ptr_->getFixModPtrVec());
 }
 
-void LocalUtil::twoPtmTermAdjust(ProteoformPtr proteoform, int num_match, 
+void LocalUtil::twoPtmTermAdjust(ProteoformPtr & proteoform, int num_match, 
                                  const ExtendMsPtrVec & extend_ms_ptr_vec, double prec_mass,
                                  double & mass1, double & mass2) {
 
@@ -548,7 +558,7 @@ void two_ptm_mass_adjust(double & mass1, double & mass2, PtmPtr p1, PtmPtr p2) {
 
 void LocalUtil::compTwoPtmScr(ProteoformPtr proteoform, int num_match, 
                               const ExtendMsPtrVec & extend_ms_ptr_vec, double prec_mass,
-                              double & raw_scr, PtmPairVec ptm_pair_vec) {
+                              double & raw_scr, PtmPairVec & ptm_pair_vec) {
   double mass1 = proteoform->getChangePtrVec(ChangeType::UNEXPECTED)[0]->getMassShift(); 
   double mass2 = proteoform->getChangePtrVec(ChangeType::UNEXPECTED)[1]->getMassShift();
   std::vector<double> scr_vec;
@@ -688,7 +698,7 @@ double LocalUtil::dpTwoPtmScr(ProteoformPtr proteoform, int h, const ExtendMsPtr
   return scr / count;
 }
 
-void LocalUtil::compSplitPoint(ProteoformPtr proteoform, int h, const ExtendMsPtrVec & extend_ms_ptr_vec,
+void LocalUtil::compSplitPoint(ProteoformPtr & proteoform, int h, const ExtendMsPtrVec & extend_ms_ptr_vec,
                                double prec_mass) {
   ChangePtr change_ptr1 = proteoform->getChangePtrVec(ChangeType::UNEXPECTED)[0];
   ChangePtr change_ptr2 = proteoform->getChangePtrVec(ChangeType::UNEXPECTED)[1];
