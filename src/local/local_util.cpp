@@ -108,7 +108,8 @@ void LocalUtil::compSupPeakNum(ProteoformPtr proteoform, const ExtendMsPtrVec & 
 PtmPtrVec LocalUtil::getPtmPtrVecByMass(double mass, double err) {
   PtmPtrVec res;
   for (size_t i = 0; i < var_ptm_list_.size(); i++) {
-    if (std::abs(var_ptm_list_[i]->getMonoMass() - mass) < err) {
+    if (std::abs(var_ptm_list_[i]->getMonoMass() - mass) < err
+        || std::abs(std::abs(var_ptm_list_[i]->getMonoMass() - mass) - 1) < err) {
       res.push_back(var_ptm_list_[i]);
     }
   }
