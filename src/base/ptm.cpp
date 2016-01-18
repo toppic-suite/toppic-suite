@@ -11,6 +11,7 @@
 #include "base/xml_dom.hpp"
 #include "base/xml_dom_document.hpp"
 #include "base/xml_dom_util.hpp"
+#include "base/string_util.hpp"
 
 namespace prot {
 
@@ -36,6 +37,7 @@ void Ptm::appendAbbrNameToXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* paren
   std::string element_name = Ptm::getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
   xml_doc->addElement(element, "abbreviation", abbr_name_.c_str());
+  xml_doc->addElement(element, "unimod", StringUtil::convertToString(unimod_id_).c_str());
   parent->appendChild(element);
 }
 

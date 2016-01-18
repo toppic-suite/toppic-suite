@@ -166,6 +166,7 @@ void addMod(ProteoformPtr proteoform_ptr, int left_db_bp, int right_db_bp,
   }
   res_ptrs[right_db_bp-1]->setUnexpectedChange(true);
   res_ptrs[right_db_bp-1]->setUnexpectedChangeColor(color);;
+  res_ptrs[right_db_bp-1]->setAnno(anno);
 }
 
 AnnoSegmentPtrVec getSegments(ProteoformPtr proteoform_ptr, ChangePtrVec &change_ptrs, 
