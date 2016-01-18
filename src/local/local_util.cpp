@@ -790,7 +790,7 @@ void LocalUtil::compSplitPoint(ProteoformPtr proteoform, int h, const ExtendMsPt
   }
   ptm_scr = normalize(ptm_scr);
   scr_filter(ptm_scr, bgn, end, conf, mng_ptr_->thread_);
-  LocalAnnoPtr anno2 = std::make_shared<LocalAnno>(bgn, end, conf, ptm_scr, 0, ptm1);
+  LocalAnnoPtr anno2 = std::make_shared<LocalAnno>(split_point + bgn, split_point + end, conf, ptm_scr, 0, ptm1);
   change_ptr2->setLocalAnno(anno1);  
 }
 

@@ -201,7 +201,11 @@ inline void updateMatchSeq(const ChangePtrVec &changes,
     int right_pos = changes[i]->getRightBpPos();
     double shift = changes[i]->getMassShift();
     right_strings[right_pos] +=  ")";
-    if (ModBase::isNoneModPtr(changes[i]->getModPtr())) {
+    if (changes[i]->getLocalAnno() != nullptr 
+        && changes[i]->getLocalAnno()->getPtmPtr() != nullptr) {
+      right_strings[right_pos] = right_strings[right_pos] 
+          + "["+changes[i]->getLocalAnno()->getPtmPtr()->getAbbrName()+"]";
+    } else if (ModBase::isNoneModPtr(changes[i]->getModPtr())) {
       right_strings[right_pos] = right_strings[right_pos] 
           + "["+StringUtil::convertToString(shift,5)+"]";
     } else {
@@ -210,7 +214,7 @@ inline void updateMatchSeq(const ChangePtrVec &changes,
     }
   }
 }
-                                       
+
 std::string Proteoform::getProteinMatchSeq() {
   std::string protein_string = fasta_seq_ptr_->getSeq();
   //LOG_DEBUG("protein string lenth " << protein_string.length() << " string " << protein_string);

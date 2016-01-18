@@ -331,13 +331,13 @@
         <xsl:element name="a">
           <xsl:attribute name="href">
             <xsl:text>http://www.unimod.org/modifications_view.php?editid1=</xsl:text>
-            <xsl:value-of select="modification/unimod" />
+            <xsl:value-of select="ptm/unimod" />
           </xsl:attribute>
           <xsl:attribute name="target">
             <xsl:text>_blank</xsl:text>
           </xsl:attribute>
           <font color="red">
-            <xsl:value-of select="modification/name" />
+            <xsl:value-of select="ptm/abbreviation" />
             <xsl:text>&#160;[</xsl:text>
             <xsl:value-of select="occurence" />
             <xsl:text>]</xsl:text>

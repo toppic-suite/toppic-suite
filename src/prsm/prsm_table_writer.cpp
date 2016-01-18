@@ -105,24 +105,22 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
 
   file << std::setprecision(10);
   //LOG_DEBUG("prec mass " << prsm_ptrs[i]->getOriPrecMass());
-  //double err = prsm_ptr->getOriPrecMass() *
-  //    prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
   file << prsm_para_ptr_->getSpectrumFileName() << "\t";
   file << prsm_ptr->getPrsmId() << "\t"
       << spec_ids << "\t"
       << spec_activations<< "\t"
       << spec_scans << "\t"
       << peak_num << "\t";
-  file<< deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecCharge() << "\t"
+  file << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecCharge() << "\t"
       << prsm_ptr->getOriPrecMass()<< "\t"//"Precursor_mass"
       << prsm_ptr->getAdjustedPrecMass() << "\t"
       << prsm_ptr->getProteoformPtr()->getSpeciesId() << "\t";
-  file<< prsm_ptr->getProteoformPtr()->getSeqName() << " "
+  file << prsm_ptr->getProteoformPtr()->getSeqName() << " "
       << prsm_ptr->getProteoformPtr()->getSeqDesc() << "\t";
-  file<< prsm_ptr->getProteoformPtr()->getStartPos() << "\t"
+  file << prsm_ptr->getProteoformPtr()->getStartPos() << "\t"
       << prsm_ptr->getProteoformPtr()->getEndPos() << "\t";
-  file<< prsm_ptr->getProteoformPtr()->getProteinMatchSeq() << "\t";
-  file<< prsm_ptr->getProteoformPtr()->getChangeNum(ChangeType::UNEXPECTED) << "\t";
+  file << prsm_ptr->getProteoformPtr()->getProteinMatchSeq() << "\t";
+  file << prsm_ptr->getProteoformPtr()->getChangeNum(ChangeType::UNEXPECTED) << "\t";
   file << prsm_ptr->getMatchPeakNum() << "\t"
       << prsm_ptr->getMatchFragNum() << "\t"
       << prsm_ptr->getPValue() << "\t"
