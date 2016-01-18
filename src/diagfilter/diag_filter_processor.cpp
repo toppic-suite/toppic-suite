@@ -56,7 +56,7 @@ void DiagFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num
   std::string output_file_name = FileUtil::basename(prsm_para_ptr->getSpectrumFileName())
       + "." + mng_ptr_->output_file_ext_+"_"+ std::to_string(block_ptr->getBlockIdx());
   SimplePrsmXmlWriter writer(output_file_name);
-    
+
   SpectrumSetPtr spec_set_ptr;
   int spectrum_num = MsAlignUtil::getSpNum (prsm_para_ptr->getSpectrumFileName());
   int cnt = 0;

@@ -76,7 +76,7 @@ void OnePtmFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_n
   SimplePrsmXmlWriter pref_writer(output_file_name + "_PREFIX_" + block_str);
   SimplePrsmXmlWriter suff_writer(output_file_name + "_SUFFIX_" + block_str);
   SimplePrsmXmlWriter internal_writer(output_file_name + "_INTERNAL_" + block_str);
-    
+
   SpectrumSetPtr spec_set_ptr;
   int spectrum_num = MsAlignUtil::getSpNum (prsm_para_ptr->getSpectrumFileName());
   int cnt = 0;
@@ -93,7 +93,7 @@ void OnePtmFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_n
     }
     WebLog::percentLog(cnt, spectrum_num, block_ptr->getBlockIdx(), total_block_num,  
                        WebLog::OnePtmFilterTime());
-    
+
     std::cout << std::flush << "One PTM filtering is processing " << cnt 
         << " of " << spectrum_num << " spectra.\r";
   }

@@ -96,7 +96,7 @@ void PtmSearchProcessor::process(){
     std::cout << std::flush <<  "PTM search is processing " << cnt 
         << " of " << spectrum_num << " spectra.\r";
     
-    WebLog::percentLog(cnt, spectrum_num, WebLog::PtmTime());
+    WebLog::percentLog(cnt, spectrum_num, WebLog::TwoPtmSearchTime());
   }
   LOG_DEBUG("Search completed");
   sp_reader.close();

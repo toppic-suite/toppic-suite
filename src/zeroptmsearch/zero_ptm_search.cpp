@@ -48,7 +48,7 @@ void zeroPtmSearchOneSpec(SpectrumSetPtr spec_set_ptr,
   double ppo = mng_ptr->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
   ZpFastMatchPtrVec fast_matches 
       = ZeroPtmFastMatch::filter(type_ptr, ms_three_vec, proteoform_ptr_vec, 
-                          mng_ptr->zero_ptm_filter_result_num_, ppo);
+                                 mng_ptr->zero_ptm_filter_result_num_, ppo);
   //LOG_DEBUG("fast_match ended size " << fast_matches.size());
   DeconvMsPtrVec deconv_ms_vec = spec_set_ptr->getDeconvMsPtrVec();
   ZpSlowMatchPtrVec slow_matches 
@@ -56,7 +56,7 @@ void zeroPtmSearchOneSpec(SpectrumSetPtr spec_set_ptr,
 
   //LOG_DEBUG("slow_match ended size " << slow_matches.size());
   for (size_t i = 0; i < slow_matches.size(); i++) {
-      prsms.push_back(slow_matches[i]->geneResult());
+    prsms.push_back(slow_matches[i]->geneResult());
   }
   //LOG_DEBUG("prsm generation ended size " << prsms.size());
 
@@ -169,7 +169,7 @@ void ZeroPtmSearch::process(ZeroPtmSearchMngPtr mng_ptr){
     }
     std::cout << std::flush <<  "Zero Ptm search is processing " << cnt 
         << " of " << spectrum_num << " spectra.\r";
-    //WebLog::percentLog(cnt, spectrum_num, WebLog::PtmTime());
+    WebLog::percentLog(cnt, spectrum_num, WebLog::ZeroPtmSearchTime());
   }
   sp_reader.close();
   comp_prsm_reader.close();

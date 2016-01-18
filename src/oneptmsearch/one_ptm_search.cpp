@@ -12,8 +12,6 @@
 #include "prsm/simple_prsm_reader.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_str_combine.hpp"
-//#include "ptmsearch/comp_shift_low_mem.hpp"
-//#include "ptmsearch/ptm_slow_match.hpp"
 #include "oneptmsearch/one_ptm_slow_match.hpp"
 #include "oneptmsearch/one_ptm_search.hpp"
 
@@ -52,10 +50,10 @@ void onePtmSearchOneSpec(SpectrumSetPtr spec_set_ptr,
   for (size_t i = 0; i < proteoform_ptr_vec.size(); i++) { 
     //auto start = std::chrono::high_resolution_clock::now();
     /*
-    PtmSlowMatch slow_match(proteoform_ptr_vec[i],
-                            spec_set_ptr, type_ptr,
-                            comp_shift_ptr, mng_ptr);
-                            */
+       PtmSlowMatch slow_match(proteoform_ptr_vec[i],
+       spec_set_ptr, type_ptr,
+       comp_shift_ptr, mng_ptr);
+       */
     OnePtmSlowMatch slow_match(proteoform_ptr_vec[i], spec_set_ptr,
                                prsm_vec[i], type_ptr, mng_ptr);
     //auto step_1 = std::chrono::high_resolution_clock::now();
@@ -175,7 +173,7 @@ void OnePtmSearch::process(PtmSearchMngPtr mng_ptr){
     }
     std::cout << std::flush <<  "One Ptm search is processing " << cnt 
         << " of " << spectrum_num << " spectra.\r";
-    //WebLog::percentLog(cnt, spectrum_num, WebLog::PtmTime());
+    WebLog::percentLog(cnt, spectrum_num, WebLog::OnePtmSearchTime());
   }
   sp_reader.close();
   comp_prsm_reader.close();

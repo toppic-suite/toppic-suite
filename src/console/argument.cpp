@@ -31,7 +31,7 @@ void Argument::initArguments() {
   arguments_["local_threshold"] = "0.9";
   arguments_["groupSpectrumNumber"] = "1";
   arguments_["filteringResultNumber"] = "20";
-  arguments_["residueModFileName"]="";
+  arguments_["residueModFileName"] = "";
 }
 
 void Argument::outputArguments(std::ofstream &output) {
@@ -55,7 +55,9 @@ void Argument::outputArguments(std::ofstream &output) {
   else {
     output << "E-value computation: Lookup table" << std::endl;
   }
-  //output << "Residue modification file name: " << arguments_["residueModFileName"] << std::endl;
+  if (arguments_["residueModFileName"] != "") {
+    output << "Residue modification file name: " << arguments_["residueModFileName"] << std::endl;
+  }
   output << std::endl;
 }
 
