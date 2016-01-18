@@ -50,7 +50,7 @@ std::vector<std::vector<std::string>> readViewXmlFiles(const std::string &file_n
 }
 
 xercesc::DOMElement* proteoformToXml(XmlDOMDocument* xml_doc, const PrsmPtrVec &prsm_ptrs, 
-                                     PrsmViewMngPtr mng_ptr){
+                                     PrsmViewMngPtr mng_ptr, bool detail){
   xercesc::DOMElement* proteoform_element = xml_doc->createElement("compatible_proteoform");
   std::string str=StringUtil::convertToString(prsm_ptrs[0]->getProteoformPtr()->getProtId());
   xml_doc->addElement(proteoform_element, "sequence_id", str.c_str());
@@ -64,7 +64,7 @@ xercesc::DOMElement* proteoformToXml(XmlDOMDocument* xml_doc, const PrsmPtrVec &
   str=StringUtil::convertToString(count);
   xml_doc->addElement(proteoform_element, "prsm_number", str.c_str());
   for(size_t i=0;i<prsm_ptrs.size();i++){
-    proteoform_element->appendChild(geneAnnoPrsm(xml_doc,prsm_ptrs[i], mng_ptr));
+    proteoform_element->appendChild(geneAnnoPrsm(xml_doc,prsm_ptrs[i], mng_ptr, detail));
   }
   return proteoform_element;
 }
@@ -75,7 +75,8 @@ xercesc::DOMElement* proteinToXml(XmlDOMDocument* xml_doc,
                                   FastaSeqPtr seq_ptr,
                                   int prot_id,
                                   const std::vector<int> &species_ids,
-                                  PrsmViewMngPtr mng_ptr){
+                                  PrsmViewMngPtr mng_ptr,
+                                  bool detail){
   xercesc::DOMElement* prot_element = xml_doc->createElement("protein");
   std::string str=StringUtil::convertToString(prot_id);
   xml_doc->addElement(prot_element, "sequence_id", str.c_str());
@@ -89,7 +90,7 @@ xercesc::DOMElement* proteinToXml(XmlDOMDocument* xml_doc,
   for(size_t i=0;i<species_ids.size();i++){
     PrsmPtrVec select_prsm_ptrs = PrsmUtil::selectSpeciesPrsms(prsm_ptrs,species_ids[i]);
     std::sort(select_prsm_ptrs.begin(),select_prsm_ptrs.end(),Prsm::cmpEValueInc);
-    prot_element->appendChild(proteoformToXml(xml_doc,select_prsm_ptrs, mng_ptr));
+    prot_element->appendChild(proteoformToXml(xml_doc,select_prsm_ptrs, mng_ptr, detail));
   }
   return prot_element;
 }
@@ -108,13 +109,13 @@ PrsmPtr getBestEValuePrsmPtr (std::string &seq_name, const PrsmPtrVec &prsm_ptrs
 }
 
 inline bool evalueCompare(const std::pair<FastaSeqPtr, double> &a, const std::pair<FastaSeqPtr, double> &b) {
-    return a.second < b.second;
+  return a.second < b.second;
 }
 
 
 xercesc::DOMElement* allProteinToXml(XmlDOMDocument* xml_doc,
-                                  const PrsmPtrVec &prsm_ptrs,
-                                  PrsmViewMngPtr mng_ptr){
+                                     const PrsmPtrVec &prsm_ptrs,
+                                     PrsmViewMngPtr mng_ptr){
   xercesc::DOMElement* prot_elements = xml_doc->createElement("proteins");
   // sort 
   FastaReader reader(mng_ptr->prsm_para_ptr_->getSearchDbFileName());
@@ -131,106 +132,18 @@ xercesc::DOMElement* allProteinToXml(XmlDOMDocument* xml_doc,
     seq_ptr = reader.getNextSeq();
   }
   std::sort(seq_evalues.begin(), seq_evalues.end(), evalueCompare);
-  
+
   for(size_t i=0;i<seq_evalues.size();i++){
     std::string seq_name = seq_evalues[i].first->getName();
     std::vector<int> species_ids = PrsmUtil::getSpeciesIds(prsm_ptrs,seq_name);
     int prot_id = PrsmUtil::getProteinId(prsm_ptrs, seq_name);
     if(species_ids.size()>0){
-      prot_elements->appendChild(proteinToXml(xml_doc,prsm_ptrs,seq_evalues[i].first, prot_id, species_ids, mng_ptr));
+      prot_elements->appendChild(proteinToXml(xml_doc,prsm_ptrs,seq_evalues[i].first, 
+                                              prot_id, species_ids, mng_ptr, false));
     }
   }
   return prot_elements;
 }
 
 }
-
-/*
-std::vector<xercesc::DOMElement*> modificationToXml(XmlDOMDocument* xml_doc,
-        PrsmPtrVec & prsm_ptrs, const PrsmViewMngPtr & mng_ptr) {
-    double ppo = mng_ptr->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
-    xercesc::DOMElement* mod_element;
-    std::set<std::string> mod_set;
-
-    for (size_t i = 0; i < prsm_ptrs.size(); i++) {
-        double err = ppo * prsm_ptrs[i]->getOriPrecMass();
-        ChangePtrVec change_vec = prsm_ptrs[i]->getProteoformPtr()->getUnexpectedChangePtrVec(err);
-        for (size_t j = 0; j < change_vec.size(); j++) {
-            if (change_vec[j]->getPtmPtr() != nullptr)
-                mod_set.insert(change_vec[j]->getPtmPtr()->getName());
-        }
-    }
-
-    std::vector<xercesc::DOMElement *> xml_vec;
-
-    for (std::set<std::string>::iterator iter = mod_set.begin(); iter != mod_set.end(); iter++) {
-        PrsmPtrVec select_prsm_ptrs;
-        std::for_each(prsm_ptrs.begin(), prsm_ptrs.end(),
-        [iter, &select_prsm_ptrs, ppo](PrsmPtr p) {
-            double err = ppo * p->getOriPrecMass();
-            ChangePtrVec change_vec = p->getProteoformPtr()->getUnexpectedChangePtrVec(err);
-            for (size_t i = 0; i < change_vec.size(); i++) {
-                if (change_vec[i]->getPtmPtr() != nullptr) {
-                    if (change_vec[i]->getPtmPtr()->getName() == *iter) {
-                        select_prsm_ptrs.push_back(p);
-                        break;
-                    }
-                }
-            }
-
-        });
-
-        mod_element = xml_doc->createElement("modification");
-        xml_doc->addElement(mod_element, "modification_name", (*iter).c_str());
-        std::sort(select_prsm_ptrs.begin(),select_prsm_ptrs.end(),prsmEValueUp);
-        mod_element->appendChild(proteoformToXml(xml_doc,select_prsm_ptrs, mng_ptr));
-
-        xml_vec.push_back(mod_element);
-    }
-    return xml_vec;
-}
-*/
-
-/*
-xercesc::DOMElement* allModificationToXml(XmlDOMDocument* xml_doc,
-        PrsmPtrVec & prsm_ptrs, const PrsmViewMngPtr & mng_ptr) {
-
-    double ppo = mng_ptr->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
-    xercesc::DOMElement* mod_elements = xml_doc->createElement("modifications");
-
-    std::sort(prsm_ptrs.begin(), prsm_ptrs.end(),
-    [](const PrsmPtr & lhs, const PrsmPtr & rhs) {
-        return lhs->getProteoformPtr()->getDbResSeqPtr()->getId() < rhs->getProteoformPtr()->getDbResSeqPtr()->getId();
-    });
-
-    int prot_id = prsm_ptrs[0]->getProteoformPtr()->getDbResSeqPtr()->getId();
-
-    PrsmPtrVec prsm_mod;
-    std::vector<xercesc::DOMElement*> mods;
-    for (size_t i = 0; i< prsm_ptrs.size(); i++) {
-
-        double err = ppo * prsm_ptrs[i]->getOriPrecMass();
-        if (prsm_ptrs[i]->getProteoformPtr()->getDbResSeqPtr()->getId() == prot_id) {
-            if (prsm_ptrs[i]->getProteoformPtr()->getUnexpectedChangeNum(err) > 0)
-                prsm_mod.push_back(prsm_ptrs[i]);
-        } else {
-            mods.clear();
-            mods = modificationToXml(xml_doc, prsm_mod, mng_ptr);
-            for (size_t i = 0; i < mods.size(); i++) {
-                mod_elements->appendChild(mods[i]);
-            }
-            prsm_mod.clear();
-            prsm_mod.push_back(prsm_ptrs[i]);
-            prot_id = prsm_ptrs[i]->getProteoformPtr()->getDbResSeqPtr()->getId();
-        }
-    }
-
-    mods = modificationToXml(xml_doc, prsm_mod, mng_ptr);
-
-    for (size_t i = 0; i < mods.size(); i++) {
-        mod_elements->appendChild(mods[i]);
-    }
-    return mod_elements;
-}
-*/
 

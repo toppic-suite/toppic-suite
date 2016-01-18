@@ -7,7 +7,8 @@
 
 namespace prot{
 
-xercesc::DOMElement* geneAnnoPrsm(XmlDOMDocument* xml_doc, PrsmPtr prsm_ptr, PrsmViewMngPtr mng_ptr);
+xercesc::DOMElement* geneAnnoPrsm(XmlDOMDocument* xml_doc, PrsmPtr prsm_ptr, 
+                                  PrsmViewMngPtr mng_ptr, bool detail = true);
 
 }
 
