@@ -264,6 +264,15 @@ int two_base_opt(int argc, char* argv[]) {
     std::cout << "Converting xml files to html files finished." << std::endl;
     WebLog::completeFunction(WebLog::OutPutTime());
 
+    if (arguments["keepTempFiles"] != "true"){
+      std::cout << "Deleting temporary files started." << std::endl;
+      FileUtil::delDir(FileUtil::basename(sp_file_name) + "_xml");
+      FileUtil::delFile(exe_dir + "/run.log");
+      FileUtil::cleanDir(sp_file_name);
+      FileUtil::cleanDir(db_file_name);   
+      std::cout << "Deleting temporary files finished." << std::endl;
+    }  
+
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;

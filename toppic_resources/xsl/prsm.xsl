@@ -219,27 +219,31 @@ function showIonPeaks(ids) {
 		</table>         
 	</div>
 
-	<div style="font-size:16px;">
-		<xsl:variable name="fix_ptm_num" select="count(expected_change)"/>
-		<xsl:if test="$fix_ptm_num &gt; 0">
-			<br/>
-			<xsl:text>&#160;&#160;&#160;&#160;&#160;Fixed PTMs: </xsl:text> 
-			<xsl:apply-templates select="expected_change"/>
-			<br/>
-		</xsl:if>
+  <div style="font-size:16px;">
+    <xsl:variable name="fix_ptm_num" select="count(expected_change)"/>
+    <xsl:if test="$fix_ptm_num &gt; 0">
+      <br/>
+      <xsl:text>&#160;&#160;&#160;&#160;&#160;Fixed PTMs: </xsl:text> 
+      <xsl:apply-templates select="expected_change"/>
+      <br/>
+    </xsl:if>
+
+    <xsl:variable name="s_type" select="unexpected_change/segment_type"/>
+    <xsl:if test="contains($s_type, 'SHIFT')">
 		<xsl:variable name="variable_ptm_num" select="count(unexpected_change/ptm)"/>
 		<xsl:if test="$variable_ptm_num &gt; 0">
 			<br/>
 			<xsl:text>&#160;&#160;&#160;&#160;&#160;Variable PTMs: </xsl:text> 
-			<xsl:apply-templates select="unexpected_change"/>
+			<xsl:apply-templates select="unexpected_change[segment_type = 'SHIFT']"/>
 			<br/>
 		</xsl:if>
 		<xsl:if test="$variable_ptm_num = 0">
 			<br/>
 			<xsl:text>&#160;&#160;&#160;&#160;&#160;Unexpected PTMs: </xsl:text> 
-			<xsl:apply-templates select="unexpected_change"/>
+			<xsl:apply-templates select="unexpected_change[segment_type = 'SHIFT']"/>
 			<br/>
-		</xsl:if>
+		</xsl:if>    
+    </xsl:if>
 	</div>
 </xsl:template>
 
