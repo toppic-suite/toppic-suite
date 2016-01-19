@@ -58,6 +58,8 @@ std::vector<ModPtrVec> ModUtil::readModTxt(const std::string &file_name) {
         } else if (l[3] == "C-term") {
           mod_ptr_vec2d[1].push_back(m);
         } else if (l[3] == "any") {
+          mod_ptr_vec2d[0].push_back(m);
+          mod_ptr_vec2d[1].push_back(m);
           mod_ptr_vec2d[2].push_back(m);
         } else {
           throw line;
