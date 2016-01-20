@@ -16,7 +16,7 @@ void Argument::initArguments() {
   arguments_["activation"] = "FILE";
   arguments_["searchType"] = "TARGET";
   arguments_["fixedMod"] = "";
-  arguments_["ptmNumber"] = "2";
+  arguments_["ptmNumber"] = "1";
   arguments_["errorTolerance"] = "15";
   arguments_["cutoffType"] = "EVALUE";
   arguments_["cutoffValue"] = "0.01";
@@ -135,12 +135,12 @@ bool Argument::parse(int argc, char* argv[]) {
         ("decoy,d", "Use a decoy protein database to estimate false discovery rates.")
         ("error-tolerance,e", po::value<std::string> (&error_tole), "<positive integer>. Error tolerance for precursor and fragment masses in PPM. Default value: 15.")
         ("max-ptm,m", po::value<std::string> (&max_ptm_mass), "<positive number>. Maximum absolute value of masses (in Dalton) of unexpected post-translational modifications in proteoforms. Default value: 1000000.")
-        ("ptm-number,p", po::value<std::string> (&ptm_num), "<0|1|2>. Maximum number of unexpected post-translational modifications in a proteoform-spectrum-match. Default value: 2.")
+        ("ptm-number,p", po::value<std::string> (&ptm_num), "<0|1|2>. Maximum number of unexpected post-translational modifications in a proteoform-spectrum-match. Default value: 1.")
         ("cutoff-type,t", po::value<std::string> (&cutoff_type), "<EVALUE|FDR>. Cutoff type for reporting protein-spectrum-matches. Default value: EVALUE.")
         ("cutoff-value,v", po::value<std::string> (&cutoff_value), "<positive number>. Cutoff value for reporting protein-spectrum-matches. Default value: 0.01.")
-        ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "Variable PTM file for PTM localization.")
         ("generating-function,g", "Use the generating function approach to calculate p-values and E-values.")
         ("group-number,r", po::value<std::string> (&group_num), "Specify the number of spectra in a group. Default value: 1.")
+        ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "Variable PTM file for PTM localization.")
         ("local-threshold,s", po::value<std::string> (&local_threshold), "<positive double value>. Threshold value for reporting PTM localization. Default value: 0.9.");
     po::options_description desc("Options");
 
@@ -154,10 +154,9 @@ bool Argument::parse(int argc, char* argv[]) {
         ("decoy,d", "Use a decoy protein database to estimate false discovery rates.")
         ("error-tolerance,e", po::value<std::string> (&error_tole), "<int value>. Error tolerance of precursor and fragment masses in PPM. Default value: 15.")
         ("max-ptm,m", po::value<std::string> (&max_ptm_mass), "<positive double value>. Maximum absolute value (in Dalton) of the masses of unexpected PTMs in the identified proteoform. Default value: 1000000.")
-        ("ptm-number,p", po::value<std::string> (&ptm_num), "<0|1|2>. Maximum number of unexpected PTMs. Default value: 2.")
+        ("ptm-number,p", po::value<std::string> (&ptm_num), "<0|1|2>. Maximum number of unexpected PTMs. Default value: 1.")
         ("cutoff-type,t", po::value<std::string> (&cutoff_type), "<EVALUE|FDR>. Cutoff value type for reporting protein-spectrum-matches. Default value: EVALUE.")
         ("cutoff-value,v", po::value<std::string> (&cutoff_value), "<positive double value>. Cutoff value for reporting protein-spectrum-matches. Default value: 0.01.")
-        ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "Variable PTM file for PTM localization.")
         ("filtering-result-number,n", po::value<std::string>(&filtering_result_num), "Filtering result number. Default value: 20.")
         ("log-file-name,l", po::value<std::string>(&log_file_name), "Log file name with its path.")
         ("keep-temp-files,k", "Keep temporary files.")
@@ -166,6 +165,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("full-binary-path,b", "Full binary path.")
         ("group-number,r", po::value<std::string> (&group_num), "Specify the number of spectra in a group. Default value: 1.")
         ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name with its path.")
+        ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "Variable PTM file for PTM localization.")
         ("spectrum-file-name", po::value<std::string>(&spectrum_file_name)->required(), "Spectrum file name with its path.");
 
     po::positional_options_description positional_options;
