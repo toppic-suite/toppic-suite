@@ -73,31 +73,33 @@ void Argument::setArgumentsByConfigFile(const std::string &filename){
     XmlDOMDocument* doc = new XmlDOMDocument(parser, filename.c_str());
     if (doc) {
       xercesc::DOMElement* root = doc->getDocumentElement();
-      arguments_["oriDatabaseFileName"]=XmlDomUtil::getChildValue(root,"database_file_name",0);
-      arguments_["spectrumFileName"]=XmlDomUtil::getChildValue(root,"spectrum_file_name",0);
-      arguments_["logFileName"]=XmlDomUtil::getChildValue(root,"log_file_name",0);
-      arguments_["activation"]=XmlDomUtil::getChildValue(root,"fragmentation_method",0);
-      arguments_["fixedMod"]=XmlDomUtil::getChildValue(root,"fixed_mod",0);
-      arguments_["searchType"]=XmlDomUtil::getChildValue(root,"search_type",0);
-      arguments_["ptmNumber"]=XmlDomUtil::getChildValue(root,"shift_number",0);
-      arguments_["errorTolerance"]=XmlDomUtil::getChildValue(root,"error_tolerance",0);
-      arguments_["cutoffType"]=XmlDomUtil::getChildValue(root,"cutoff_type",0);
-      arguments_["cutoffValue"]=XmlDomUtil::getChildValue(root,"cutoff_value",0);
-      arguments_["maxPtmMass"]=XmlDomUtil::getChildValue(root,"max_ptm_mass",0);
-      arguments_["useGf"]=XmlDomUtil::getChildValue(root,"use_gf",0);
+      arguments_["oriDatabaseFileName"] = XmlDomUtil::getChildValue(root,"database_file_name",0);
+      arguments_["spectrumFileName"] = XmlDomUtil::getChildValue(root,"spectrum_file_name",0);
+      arguments_["logFileName"] = XmlDomUtil::getChildValue(root,"log_file_name",0);
+      arguments_["activation"] = XmlDomUtil::getChildValue(root,"fragmentation_method",0);
+      arguments_["fixedMod"] = XmlDomUtil::getChildValue(root,"fixed_mod",0);
+      arguments_["searchType"] = XmlDomUtil::getChildValue(root,"search_type",0);
+      arguments_["ptmNumber"] = XmlDomUtil::getChildValue(root,"shift_number",0);
+      arguments_["errorTolerance"] = XmlDomUtil::getChildValue(root,"error_tolerance",0);
+      arguments_["cutoffType"] = XmlDomUtil::getChildValue(root,"cutoff_type",0);
+      arguments_["cutoffValue"] = XmlDomUtil::getChildValue(root,"cutoff_value",0);
+      arguments_["maxPtmMass"] = XmlDomUtil::getChildValue(root,"max_ptm_mass",0);
+      arguments_["useGf"] = XmlDomUtil::getChildValue(root,"use_gf",0);
+      arguments_["groupSpectrumNumber"] = XmlDomUtil::getChildValue(root, "groupSpectrumNumber", 0);
+      arguments_["residueModFileName"] = XmlDomUtil::getChildValue(root, "residueModFileName", 0);
+      arguments_["local_threshold"] = XmlDomUtil::getChildValue(root, "local_threshold", 0);
 
       xercesc::DOMElement* prot_mod_list = XmlDomUtil::getChildElement(root,"protein_variable_ptm_list",0);
       int allow_prot_node_number = XmlDomUtil::getChildCount(prot_mod_list,"protein_variable_ptm");
       std::string allow_mod="";
-      for(int i=0;i<allow_prot_node_number;i++){
-        if(i==0){
-          allow_mod = XmlDomUtil::getChildValue(prot_mod_list,"protein_variable_ptm",i);
-        }
-        else{
-          allow_mod = allow_mod+","+XmlDomUtil::getChildValue(prot_mod_list,"protein_variable_ptm",i);
+      for(int i = 0; i < allow_prot_node_number; i++){
+        if(i == 0){
+          allow_mod = XmlDomUtil::getChildValue(prot_mod_list, "protein_variable_ptm", i);
+        } else{
+          allow_mod = allow_mod+","+XmlDomUtil::getChildValue(prot_mod_list, "protein_variable_ptm", i);
         }
       }
-      arguments_["allowProtMod"]=allow_mod;
+      arguments_["allowProtMod"] = allow_mod;
     }
     delete doc;
   }
