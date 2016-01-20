@@ -33,6 +33,9 @@ std::vector<ModPtrVec> ModUtil::readModTxt(const std::string &file_name) {
   LOG_DEBUG("mod txt file " << file_name);
   std::vector<ModPtrVec> mod_ptr_vec2d(3);
   std::ifstream infile(file_name.c_str());
+  if (!infile.is_open()) {
+    return mod_ptr_vec2d;
+  }
   std::string line;
   while(std::getline(infile, line)) {
     if (line == "" || line[0] == '#')
@@ -73,6 +76,7 @@ std::vector<ModPtrVec> ModUtil::readModTxt(const std::string &file_name) {
       exit (EXIT_FAILURE);
     }
   }
+  infile.close();
   return mod_ptr_vec2d;
 }
 
@@ -88,7 +92,7 @@ ModPtrVec ModUtil::geneFixedModList(const std::string &str) {
     return mod_ptr_vec;
   }
   else {
-    return readModXml(str);
+    return readModTxt(str)[2];
   }
 }
 
