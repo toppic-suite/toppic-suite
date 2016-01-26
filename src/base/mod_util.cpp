@@ -90,8 +90,7 @@ ModPtrVec ModUtil::geneFixedModList(const std::string &str) {
       mod_ptr_vec.push_back(ModBase::getC58ModPtr());
     }
     return mod_ptr_vec;
-  }
-  else {
+  } else {
     return readModTxt(str)[2];
   }
 }
