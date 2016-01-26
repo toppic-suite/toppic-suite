@@ -28,8 +28,8 @@ void CompPValueLookupTable::initTable() {
 
   input_.open(
       mng_ptr_->prsm_para_ptr_->getExeDir() + FileUtil::getFileSeparator()
-          + "toppic_resources" + FileUtil::getFileSeparator() + "p_value_table"
-          + FileUtil::getFileSeparator() + "ppm" + std::to_string(ppo) + "_ptm0.txt",
+      + "toppic_resources" + FileUtil::getFileSeparator() + "p_value_table"
+      + FileUtil::getFileSeparator() + "ppm" + std::to_string(ppo) + "_ptm0.txt",
       std::ios::in);
 
   while (std::getline(input_, line)) {
@@ -42,8 +42,8 @@ void CompPValueLookupTable::initTable() {
 
   input_.open(
       mng_ptr_->prsm_para_ptr_->getExeDir() + FileUtil::getFileSeparator()
-          + "toppic_resources" + FileUtil::getFileSeparator() + "p_value_table"
-          + FileUtil::getFileSeparator() + "ppm" + std::to_string(ppo) + "_ptm1.txt",
+      + "toppic_resources" + FileUtil::getFileSeparator() + "p_value_table"
+      + FileUtil::getFileSeparator() + "ppm" + std::to_string(ppo) + "_ptm1.txt",
       std::ios::in);
 
   while (std::getline(input_, line)) {
@@ -56,8 +56,8 @@ void CompPValueLookupTable::initTable() {
 
   input_.open(
       mng_ptr_->prsm_para_ptr_->getExeDir() + FileUtil::getFileSeparator()
-          + "toppic_resources" + FileUtil::getFileSeparator() + "p_value_table"
-          + FileUtil::getFileSeparator() + "ppm" + std::to_string(ppo) + "_ptm2.txt",
+      + "toppic_resources" + FileUtil::getFileSeparator() + "p_value_table"
+      + FileUtil::getFileSeparator() + "ppm" + std::to_string(ppo) + "_ptm2.txt",
       std::ios::in);
 
   while (std::getline(input_, line)) {
@@ -109,9 +109,9 @@ double CompPValueLookupTable::compProb(int peak_num, int match_frag_num,
   y2 = 5 * (idx[3] + 1);
 
   res = ((x2 - peak_num) * (y2 - match_frag_num) * p11
-      + (peak_num - x1) * (y2 - match_frag_num) * p21
-      + (x2 - peak_num) * (match_frag_num - y1) * p12
-      + (peak_num - x1) * (match_frag_num - y1) * p22)
+         + (peak_num - x1) * (y2 - match_frag_num) * p21
+         + (x2 - peak_num) * (match_frag_num - y1) * p12
+         + (peak_num - x1) * (match_frag_num - y1) * p22)
       / ((x2 - x1) * (y2 - y1));
 
   res = exp(res);
@@ -132,7 +132,7 @@ void CompPValueLookupTable::process(const DeconvMsPtrVec &deconv_ms_ptr_vec, Prs
   double tolerance = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getErrorTolerance(ppo);
   double refine_prec_mass = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMassMinusWater();
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
-    
+
     int match_frag_num = prsm_ptrs[i]->getMatchFragNum();
     int unexpected_shift_num = prsm_ptrs[i]->getProteoformPtr()->getChangeNum(ChangeType::UNEXPECTED);
 
@@ -164,7 +164,7 @@ bool CompPValueLookupTable::inTable(const DeconvMsPtrVec &deconv_ms_ptr_vec,
     peak_num += deconv_ms_ptr_vec[i]->size();
   }
 
-  if (peak_num > 500 || peak_num < 10)
+  if (peak_num > 850 || peak_num < 10)
     return false;
 
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
@@ -273,13 +273,10 @@ std::vector<int> getFourIndex(int peak_num, int frag_num) {
     idx[0] = k + 28;
     idx[1] = k + 29;
   } else {
-    if (peak_num <= 450) {
-      idx[0] = 38;
-      idx[1] = 39;
-    } else {
-      idx[0] = 39;
-      idx[1] = 40;
-    }
+    peak_num = peak_num - 400;
+    k = peak_num / 50;
+    idx[0] = k + 38;
+    idx[1] = k + 39;
   }
 
   if (frag_num <= 5) {

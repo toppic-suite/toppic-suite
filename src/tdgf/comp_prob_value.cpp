@@ -150,7 +150,7 @@ inline void CompProbValue::setMassErr(const PrmPeakPtrVec2D &peak_ptr_2d, bool s
 }
 
 inline void CompProbValue::updatePosScores(const std::vector<ProbPeak> &prob_peaks, 
-                                            int spectrum_id) {
+                                           int spectrum_id) {
   int len = max_sp_len_ + block_len_;
   memset(tmp_pos_scores_, 0, len * sizeof(short));
   //LOG_DEBUG("pos scr length " << len);
