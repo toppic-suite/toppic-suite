@@ -23,5 +23,5 @@
 #
 # Variable Modifications (default: none)
 
-Carbamidomethylation,57.021464,C,any,-1 # C57
-Carboxymethyl,58.005479,C,any,6 # C58
+#Carbamidomethylation,57.021464,C,any,-1 # C57
+#Carboxymethyl,58.005479,C,any,6 # C58

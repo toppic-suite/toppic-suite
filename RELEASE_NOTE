@@ -1,19 +1,25 @@
-version 0.8.0 (September 5, 2014)
+Version 1.0 (Jan, 2016)
 
-Completed the comparison between c++ and java implementation.
+    * PTM localization.
+    * PTM filtering and searching optimization
+    * Multiple spectrum support
 
-version 0.8.1 (September 12, 2014)
+Version 0.9.1 (Dec, 2014)
 
-Added new html converters. 
+    * Added table-based E-value estimation.
 
-Version 0.8.4 (November 4, 2014)
+Version 0.9.0 (Dec, 2014)
 
-First released version.
+    * Added indexes are used to reduce memory usage.
 
-Version 0.9.0 (December 4, 2014)
+Version 0.8.4 (Nov, 2014)
 
-Added indexes are used to reduce memory usage.
+    * First released version.
 
-Version 0.9.1 (December 9, 2014)
+version 0.8.1 (Sep, 2014)
 
-Added table-based E-value estimation.
+    * Added new html converters. 
+
+version 0.8.0 (Sep, 2014)
+
+    * Completed the comparison between c++ and java implementation.

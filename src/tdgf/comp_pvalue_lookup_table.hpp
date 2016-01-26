@@ -23,9 +23,9 @@ class CompPValueLookupTable {
   CountTestNumPtr test_num_ptr_;
   std::ifstream input_;
 
-  double ptm0_[41][20];
-  double ptm1_[41][20];
-  double ptm2_[41][20];
+  double ptm0_[48][20];
+  double ptm1_[48][20];
+  double ptm2_[48][20];
 
   double compProb(int peak_num, int match_frag_num, int unexpected_shift_num);
 };
