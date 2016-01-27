@@ -269,15 +269,6 @@ bool Argument::parse(int argc, char* argv[]) {
     return false;
   }
 
-  /*
-     std::cout <<"*** Parameters begin ***" << std::endl;
-     for(std::map<std::string, std::string>::const_iterator it = arguments_.begin();
-     it != arguments_.end(); ++it) {
-     std::cout << it->first << " " << it->second << std::endl;
-     }
-     std::cout <<"*** Parameters end ***" << std::endl;
-     */
-
   return validateArguments();
 }
 
@@ -297,13 +288,7 @@ bool Argument::validateArguments() {
     LOG_ERROR("Activation type " << activation << " error! The value should be CID|HCD|ETD|FILE!");
     return false;
   }
-  /*
-     std::string protection = arguments_["cysteineProtection"];
-     if(protection != "C0" && protection != "C57" && protection != "C58") {
-     LOG_ERROR("Cysteine protection group " << protection <<" error! The value should be C0|C57|C58!");
-     return false;
-     }
-     */
+
   std::string search_type = arguments_["searchType"];
   if(search_type != "TARGET" && search_type != "TARGET+DECOY"){
     LOG_ERROR("Search type " << search_type << " error! The value should be TARGET|TARGET+DECOY!");
@@ -354,7 +339,7 @@ bool Argument::validateArguments() {
   std::string cutoff_value = arguments_["cutoffValue"];
   try {
     double th = atof(cutoff_value.c_str());
-    if(th<0){
+    if(th < 0){
       LOG_ERROR("Cutoff value " << cutoff_value << " error! The value should be positive.");
       return false;
     }

@@ -70,6 +70,9 @@ class LocalUtil {
   static double ppm_, p1_, p2_;
 
 };
+
+ChangePtr geneUnexpectedChange(ChangePtr change, double mass);
+
 } // namespace prot
 
 #endif

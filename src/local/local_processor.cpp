@@ -132,20 +132,30 @@ void LocalProcessor::processTwoPtm(PrsmPtr prsm) {
   ProteoformPtr one_known_prsm = processOneKnown(prsm);
 
   if (one_known_prsm != nullptr) {
-    if (one_known_prsm->getChangePtrVec(ChangeType::UNEXPECTED)[0]->getLocalAnno()->getRawScr()
-        >two_unknown_prsm->getChangePtrVec(ChangeType::UNEXPECTED)[0]->getLocalAnno()->getRawScr()) {
+    // no ptm
+    if (one_known_prsm->getChangePtrVec(ChangeType::UNEXPECTED)[0]->getLocalAnno() == nullptr) {
       if (LocalUtil::compNumPeakIonPairs(one_known_prsm, prsm->getRefineMsPtrVec()) 
           > ori_num_match_ion - DESC_MATCH_LIMIT) {
         prsm->setProteoformPtr(one_known_prsm);
         return;
       }
+    } else if (two_unknown_prsm != nullptr) {
+      std::cout << __LINE__ << std::endl;
+      double one_known_scr = one_known_prsm->getChangePtrVec(ChangeType::UNEXPECTED)[0]->getLocalAnno()->getRawScr();
+      double two_unknown_scr = two_unknown_prsm->getChangePtrVec(ChangeType::UNEXPECTED)[0]->getLocalAnno()->getRawScr();
+      if (one_known_scr > two_unknown_scr) {
+        if (LocalUtil::compNumPeakIonPairs(one_known_prsm, prsm->getRefineMsPtrVec()) 
+            > ori_num_match_ion - DESC_MATCH_LIMIT) {
+          prsm->setProteoformPtr(one_known_prsm);
+          return;
+        }
+      } else {
+        if (LocalUtil::compNumPeakIonPairs(two_unknown_prsm, prsm->getRefineMsPtrVec()) 
+            > ori_num_match_ion - DESC_MATCH_LIMIT)
+          prsm->setProteoformPtr(two_unknown_prsm);
+      }
     }
-
   }
-
-  if (LocalUtil::compNumPeakIonPairs(two_unknown_prsm, prsm->getRefineMsPtrVec()) 
-      > ori_num_match_ion - DESC_MATCH_LIMIT)
-    prsm->setProteoformPtr(two_unknown_prsm);
 }
 
 // we will get a nullptr if the mass shift can't be explained by a variable ptm
@@ -165,12 +175,7 @@ ProteoformPtr LocalProcessor::processOneKnown(const PrsmPtr & prsm) {
 
   ChangePtrVec new_change_vec = 
       prsm->getProteoformPtr()->getChangePtrVec(ChangeType::FIXED);
-  new_change_vec.push_back(
-      std::make_shared<Change>(change_vec[0]->getLeftBpPos(), 
-                               change_vec[0]->getRightBpPos(), 
-                               ChangeType::UNEXPECTED, mass, 
-                               std::make_shared<Mod>(ResidueBase::getEmptyResiduePtr(), 
-                                                     ResidueBase::getEmptyResiduePtr())));
+  new_change_vec.push_back(geneUnexpectedChange(change_vec[0], mass));
   std::sort(new_change_vec.begin(), new_change_vec.end(), Change::cmpPosInc);
   one_known_proteoform = 
       std::make_shared<Proteoform>(prsm->getProteoformPtr()->getFastaSeqPtr(), 
@@ -227,14 +232,8 @@ ProteoformPtr LocalProcessor::processOneUnknown(const PrsmPtr & prsm) {
 
   ProteoformPtr one_unknown_proteoform;
 
-  ChangePtrVec new_change_vec = 
-      prsm->getProteoformPtr()->getChangePtrVec(ChangeType::FIXED);
-  new_change_vec.push_back(
-      std::make_shared<Change>(change_vec[0]->getLeftBpPos(), 
-                               change_vec[0]->getRightBpPos(), 
-                               ChangeType::UNEXPECTED, mass, 
-                               std::make_shared<Mod>(ResidueBase::getEmptyResiduePtr(), 
-                                                     ResidueBase::getEmptyResiduePtr())));
+  ChangePtrVec new_change_vec = prsm->getProteoformPtr()->getChangePtrVec(ChangeType::FIXED);
+  new_change_vec.push_back(geneUnexpectedChange(change_vec[0], mass));
   std::sort(new_change_vec.begin(), new_change_vec.end(), Change::cmpPosInc);
   one_unknown_proteoform = 
       std::make_shared<Proteoform>(prsm->getProteoformPtr()->getFastaSeqPtr(), 
@@ -266,20 +265,19 @@ ProteoformPtr LocalProcessor::processOneUnknown(const PrsmPtr & prsm) {
 
 // similar to processOneKnown, we might get a nullptr from this function
 ProteoformPtr LocalProcessor::processTwoKnown(const PrsmPtr & prsm) {
-  ChangePtrVec change_vec = 
-      prsm->getProteoformPtr()->getChangePtrVec(ChangeType::UNEXPECTED);
+  ChangePtrVec change_vec = prsm->getProteoformPtr()->getChangePtrVec(ChangeType::UNEXPECTED);
+
+  ChangePtr change_ptr1 = geneUnexpectedChange(change_vec[0], change_vec[0]->getMassShift());
+  ChangePtr change_ptr2;
 
   if (change_vec.size() == 1) {
-    change_vec.push_back(
-        std::make_shared<Change>(change_vec[0]->getLeftBpPos(), 
-                                 change_vec[0]->getRightBpPos(), 
-                                 ChangeType::UNEXPECTED, 0.0, 
-                                 std::make_shared<Mod>(ResidueBase::getEmptyResiduePtr(), 
-                                                       ResidueBase::getEmptyResiduePtr())));
+    change_ptr2 = geneUnexpectedChange(change_vec[0], 0.0);
+  } else {
+    change_ptr2 = geneUnexpectedChange(change_vec[1], change_vec[1]->getMassShift());
   }
 
-  double mass1 = change_vec[0]->getMassShift();
-  double mass2 = change_vec[1]->getMassShift();
+  double mass1 = change_ptr1->getMassShift();
+  double mass2 = change_ptr2->getMassShift();
 
   PtmPairVec ptm_pair_vec = 
       LocalUtil::getPtmPairVecByMass(mass1, mass2, prsm->getAdjustedPrecMass() * ppm_);
@@ -288,7 +286,8 @@ ProteoformPtr LocalProcessor::processTwoKnown(const PrsmPtr & prsm) {
 
   ChangePtrVec new_change_vec = 
       prsm->getProteoformPtr()->getChangePtrVec(ChangeType::FIXED);
-  new_change_vec.insert(new_change_vec.end(), change_vec.begin(), change_vec.end());
+  new_change_vec.push_back(change_ptr1);
+  new_change_vec.push_back(change_ptr2);
   std::sort(new_change_vec.begin(), new_change_vec.end(), Change::cmpPosInc);
   two_known_proteoform = 
       std::make_shared<Proteoform>(prsm->getProteoformPtr()->getFastaSeqPtr(), 
@@ -330,20 +329,19 @@ ProteoformPtr LocalProcessor::processTwoKnown(const PrsmPtr & prsm) {
 }
 
 ProteoformPtr LocalProcessor::processTwoUnknown(const PrsmPtr & prsm) {
-  ChangePtrVec change_vec = 
-      prsm->getProteoformPtr()->getChangePtrVec(ChangeType::UNEXPECTED);
+  ChangePtrVec change_vec = prsm->getProteoformPtr()->getChangePtrVec(ChangeType::UNEXPECTED);
+
+  ChangePtr change_ptr1 = geneUnexpectedChange(change_vec[0], change_vec[0]->getMassShift());
+  ChangePtr change_ptr2;
 
   if (change_vec.size() == 1) {
-    change_vec.push_back(
-        std::make_shared<Change>(change_vec[0]->getLeftBpPos(), 
-                                 change_vec[0]->getRightBpPos(), 
-                                 ChangeType::UNEXPECTED, 0.0, 
-                                 std::make_shared<Mod>(ResidueBase::getEmptyResiduePtr(), 
-                                                       ResidueBase::getEmptyResiduePtr())));
+    change_ptr2 = geneUnexpectedChange(change_vec[0], 0.0);
+  } else {
+    change_ptr2 = geneUnexpectedChange(change_vec[1], change_vec[1]->getMassShift());
   }
 
-  double mass1 = change_vec[0]->getMassShift();
-  double mass2 = change_vec[1]->getMassShift();
+  double mass1 = change_ptr1->getMassShift();
+  double mass2 = change_ptr2->getMassShift();
   PtmPtrVec ptm_vec1 = LocalUtil::getPtmPtrVecByMass(mass1, prsm->getAdjustedPrecMass() * ppm_);
   if (ptm_vec1.size() == 0) ptm_vec1.push_back(nullptr);
 
@@ -360,7 +358,8 @@ ProteoformPtr LocalProcessor::processTwoUnknown(const PrsmPtr & prsm) {
 
   ChangePtrVec new_change_vec = 
       prsm->getProteoformPtr()->getChangePtrVec(ChangeType::FIXED);
-  new_change_vec.insert(new_change_vec.end(), change_vec.begin(), change_vec.end());
+  new_change_vec.push_back(change_ptr1);
+  new_change_vec.push_back(change_ptr2);
   std::sort(new_change_vec.begin(), new_change_vec.end(), Change::cmpPosInc);
   ProteoformPtr two_unknown_proteoform = 
       std::make_shared<Proteoform>(prsm->getProteoformPtr()->getFastaSeqPtr(), 
