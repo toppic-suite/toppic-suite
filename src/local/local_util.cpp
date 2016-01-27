@@ -364,10 +364,10 @@ void LocalUtil::onePtmTermAdjust(ProteoformPtr & proteoform, const ExtendMsPtrVe
     c_seq = proteoform->getFastaSeqPtr()->getSeq().substr(ori_end + 1 + c_vec[idx], -c_vec[idx]);
     mass = mass + getPeptideMass(c_seq);
   }
-  change_ptr->setMassShift(mass);
+  change_ptr->setMassShift(ori_mass);
   ChangePtrVec new_change_vec;
   new_change_vec.insert(new_change_vec.end(), fix_change_vec.begin(), fix_change_vec.end());
-  new_change_vec.push_back(change_ptr);
+  new_change_vec.push_back(geneUnexpectedChange(change_ptr, mass));
   std::sort(new_change_vec.begin(), new_change_vec.end(), Change::cmpPosInc);
   proteoform = geneProteoform(proteoform->getFastaSeqPtr(),
                               proteoform->getProtModPtr(), ori_start + n_vec[idx], ori_end + c_vec[idx], 
@@ -465,13 +465,13 @@ void LocalUtil::twoPtmTermAdjust(ProteoformPtr & proteoform, int num_match,
     c_seq = proteoform->getFastaSeqPtr()->getSeq().substr(ori_end + 1 + c_vec[idx], -c_vec[idx]);
     mass2 = ori_mass2 + getPeptideMass(c_seq);
   }
-  change_ptr1->setMassShift(mass1);
-  change_ptr2->setMassShift(mass2);
+  change_ptr1->setMassShift(ori_mass1);
+  change_ptr2->setMassShift(ori_mass2);
   ChangePtrVec new_change_vec;
   new_change_vec.insert(new_change_vec.end(), fix_change_vec.begin(), fix_change_vec.end());
-  new_change_vec.push_back(change_ptr1);  new_change_vec.push_back(change_ptr2);
+  new_change_vec.push_back(geneUnexpectedChange(change_ptr1, mass1));
+  new_change_vec.push_back(geneUnexpectedChange(change_ptr2, mass2));
   std::sort(new_change_vec.begin(), new_change_vec.end(), Change::cmpPosInc);
-
   proteoform = geneProteoform(proteoform->getFastaSeqPtr(),
                               proteoform->getProtModPtr(), ori_start + n_vec[idx], ori_end + c_vec[idx], 
                               new_change_vec, mng_ptr_->prsm_para_ptr_->getFixModPtrVec());
@@ -765,8 +765,27 @@ void LocalUtil::compSplitPoint(ProteoformPtr & proteoform, int h, const ExtendMs
     split_scr_vec.push_back(scr);
   }
 
-  int split_point = std::distance(split_scr_vec.begin(), 
-                                  std::max_element(split_scr_vec.begin(), split_scr_vec.end()));
+  int split_point = std::distance(split_scr_vec.begin(), std::max_element(split_scr_vec.begin(), split_scr_vec.end()));
+
+  double split_max = *std::max_element(split_scr_vec.begin(), split_scr_vec.end());
+
+  double split_scr = 0.0;
+
+  for (int i = split_point; i < split_scr_vec.size(); i++) {
+    if (split_scr_vec[i] == split_max) {
+      split_scr += split_scr_vec[i];
+    } else {
+      break;
+    }
+  }
+
+  split_scr = split_scr / std::accumulate(split_scr_vec.begin(), split_scr_vec.end(), 0.0);
+
+  if (split_scr <= mng_ptr_->thread_) {
+    proteoform = nullptr;
+    return;
+  }
+
   std::vector<double> ptm_scr;
 
   for (int i = 0; i <= split_point; i++) {
@@ -783,6 +802,8 @@ void LocalUtil::compSplitPoint(ProteoformPtr & proteoform, int h, const ExtendMs
   ptm_scr = normalize(ptm_scr);
   int bgn, end;
   double conf;
+  std::transform(ptm_scr.begin(), ptm_scr.end(), ptm_scr.begin(),
+                 std::bind1st(std::multiplies<double>(), split_scr));
   scr_filter(ptm_scr, bgn, end, conf, mng_ptr_->thread_);
   LocalAnnoPtr anno1 = std::make_shared<LocalAnno>(bgn, end, conf, ptm_scr, 0, ptm1);
   change_ptr1->setLocalAnno(anno1);
@@ -799,14 +820,24 @@ void LocalUtil::compSplitPoint(ProteoformPtr & proteoform, int h, const ExtendMs
     }
   }
   ptm_scr = normalize(ptm_scr);
+  std::transform(ptm_scr.begin(), ptm_scr.end(), ptm_scr.begin(),
+                 std::bind1st(std::multiplies<double>(), split_scr));
   scr_filter(ptm_scr, bgn, end, conf, mng_ptr_->thread_);
   LocalAnnoPtr anno2 = std::make_shared<LocalAnno>(split_point + bgn, split_point + end, conf, ptm_scr, 0, ptm1);
-  change_ptr2->setLocalAnno(anno1);  
+  change_ptr2->setLocalAnno(anno2);
 }
 
 int LocalUtil::compNumPeakIonPairs(const ProteoformPtr &proteoform_ptr, 
                                    const ExtendMsPtrVec &ms_ptr_vec) {
   return PeakIonPairFactory::genePeakIonPairs(proteoform_ptr, ms_ptr_vec, mng_ptr_->min_mass_).size();
+}
+
+ChangePtr geneUnexpectedChange(ChangePtr change, double mass) {
+  return std::make_shared<Change>(change->getLeftBpPos(), 
+                                  change->getRightBpPos(), 
+                                  ChangeType::UNEXPECTED, mass, 
+                                  std::make_shared<Mod>(ResidueBase::getEmptyResiduePtr(), 
+                                                        ResidueBase::getEmptyResiduePtr()));
 }
 
 } // namespace prot
