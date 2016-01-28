@@ -73,6 +73,7 @@ void Argument::setArgumentsByConfigFile(const std::string &filename){
     XmlDOMDocument* doc = new XmlDOMDocument(parser, filename.c_str());
     if (doc) {
       xercesc::DOMElement* root = doc->getDocumentElement();
+      arguments_["executiveDir"] = XmlDomUtil::getChildValue(root,"executiveDir",0);
       arguments_["oriDatabaseFileName"] = XmlDomUtil::getChildValue(root,"database_file_name",0);
       arguments_["spectrumFileName"] = XmlDomUtil::getChildValue(root,"spectrum_file_name",0);
       arguments_["logFileName"] = XmlDomUtil::getChildValue(root,"log_file_name",0);
@@ -203,7 +204,7 @@ bool Argument::parse(int argc, char* argv[]) {
     else {
       arguments_["executiveDir"] = FileUtil::getExecutiveDir(argv_0);
     }
-    LOG_DEBUG("Executive Dir " << arguments_["ExecutiveDir"]);
+    LOG_DEBUG("Executive Dir " << arguments_["executiveDir"]);
     if (vm.count("argument-file")) {
       setArgumentsByConfigFile(argument_file_name);
     }
