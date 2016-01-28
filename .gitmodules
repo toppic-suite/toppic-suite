@@ -1,3 +1,6 @@
 [submodule "toppic_server"]
 	path = toppic_server
 	url = https://github.iu.edu/xwliu/toppic_server.git
+[submodule "toppic-website"]
+	path = toppic-website
+	url = https://github.iu.edu/xwliu/toppic-website.git
