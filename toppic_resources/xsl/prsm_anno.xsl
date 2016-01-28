@@ -314,8 +314,8 @@
 
   <xsl:template match="expected_change">
     <font color="red">
-      <xsl:value-of select="modification/abbr_name"/>
-      <xsl:text>[</xsl:text>
+      <xsl:value-of select="ptm/abbreviation"/>
+      <xsl:text>&#160;[</xsl:text>
       <xsl:apply-templates select="occurence"/>
       <xsl:text>]</xsl:text>
     </font>
