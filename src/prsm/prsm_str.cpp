@@ -17,9 +17,8 @@ PrsmStr::PrsmStr(const std::vector<std::string> &str_vec) {
   line = PrsmUtil::getXmlLine(str_vec_, "<e_value>"); 
   if (line == "") { 
     e_value_ = 0.0;
-  }
-  else {
-    e_value_ = std::stod(PrsmUtil::getValueStr(line));
+  } else {
+    e_value_ = std::stold(PrsmUtil::getValueStr(line));
   }
   line = PrsmUtil::getXmlLine(str_vec_, "<fdr>"); 
   fdr_ = std::stod(PrsmUtil::getValueStr(line));
