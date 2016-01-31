@@ -22,7 +22,7 @@ class PrsmStr {
   
   double getMatchFragNum() {return match_frag_num_;}
 
-  double getEValue() {return e_value_;}
+  long double getEValue() {return e_value_;}
 
   double getFdr() {return fdr_;}
 
@@ -52,7 +52,7 @@ class PrsmStr {
 
   double match_frag_num_;
 
-  double e_value_;
+  long double e_value_;
 
   double fdr_;
 };
