@@ -1,3 +1,4 @@
+#include <iomanip>
 #include "base/file_util.hpp"
 #include "base/xml_dom_util.hpp"
 #include "console/argument.hpp"
@@ -59,6 +60,35 @@ void Argument::outputArguments(std::ofstream &output) {
     output << "Residue modification file name: " << arguments_["residueModFileName"] << std::endl;
   }
   output << std::endl;
+}
+
+void Argument::outputArguments() {
+  std::cout << "********************** Parameters **********************" << std::endl;
+  std::cout << std::setw(40) << std::left << "Protein database file: " << arguments_["oriDatabaseFileName"] << std::endl;
+  std::cout << std::setw(40) << std::left<< "Spectrum file: " << arguments_["spectrumFileName"] << std::endl;
+  std::cout << std::setw(40) << std::left<< "Number of spectra in a group: " << arguments_["groupSpectrumNumber"] << std::endl;
+  std::cout << std::setw(40) << std::left<< "Activation type: " << arguments_["activation"] << std::endl;
+  std::cout << std::setw(40) << std::left<< "Search type: " << arguments_["searchType"] << std::endl;
+  std::cout << std::setw(40) << std::left<< "fixed modifications: " << arguments_["fixedMod"] << std::endl;
+  std::cout << std::setw(40) << std::left<< "Maximum number of unexpected PTMs: " << arguments_["ptmNumber"] << std::endl;
+  std::cout << std::setw(40) << std::left<< "Error tolerance: " << arguments_["errorTolerance"] << " ppm" << std::endl;
+  std::cout << std::setw(40) << std::left<< "Cutoff type: " << arguments_["cutoffType"] << std::endl;
+  std::cout << std::setw(40) << std::left<< "Cutoff value: " << arguments_["cutoffValue"] << std::endl;
+  std::cout << std::setw(40) << std::left<< "Allowed N-terminal modifications: " << arguments_["allowProtMod"] << std::endl;
+  std::cout << std::setw(40) << std::left<< "Maximum PTM mass: " << arguments_["maxPtmMass"] << " Da" << std::endl;
+  if (arguments_["useGf"] == "true") {
+    std::cout << std::setw(40) << std::left << "E-value computation: "
+        << "Generation function" << std::endl;
+  }
+  else {
+    std::cout << std::setw(40) << std::left << "E-value computation: "
+        << "Lookup table" << std::endl;
+  }
+  if (arguments_["residueModFileName"] != "") {
+    std::cout << std::setw(40) << std::left << "Residue modification file name: " << arguments_["residueModFileName"] << std::endl;
+  }
+  std::cout << std::setw(40) << std::left << "Executive file directory is: " << arguments_["executiveDir"] << std::endl;
+  std::cout << "********************** Parameters **********************" << std::endl;
 }
 
 void Argument::showUsage(boost::program_options::options_description &desc) {
