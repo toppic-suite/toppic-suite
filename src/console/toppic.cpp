@@ -58,7 +58,7 @@ int two_base_opt(int argc, char* argv[]) {
     std::cout << "TopPIC 1.0" << std::endl;
 
     std::string exe_dir = arguments["executiveDir"];
-    std::cout << "Executive file directory is: " << exe_dir << std::endl;
+    argu_processor.outputArguments();
 
     BaseData::init(exe_dir);
 
