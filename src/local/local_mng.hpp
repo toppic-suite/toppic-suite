@@ -29,7 +29,7 @@ class LocalMng {
   std::string input_file_ext_;
   std::string output_file_ext_;
 
-  double thread_, theta_, beta_;
+  double threshold_, theta_, beta_;
   double min_mass_, max_ptm_mass_;
   double p1_, p2_;
 };
@@ -45,7 +45,7 @@ inline LocalMng::LocalMng(PrsmParaPtr prsm_para_ptr, const std::string& local_th
   output_file_ext_ = output_file_ext;
   residueModFileName_ = residueModFileName;
   min_mass_ = prsm_para_ptr->getSpParaPtr()->getMinMass();
-  thread_ = std::stod(local_threshold);
+  threshold_ = std::stod(local_threshold);
   max_ptm_mass_ = max_ptm_mass;
   theta_ = 0.994;
   beta_ = 0.8;

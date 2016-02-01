@@ -19,6 +19,7 @@ class Argument {
  public:
   Argument();
   void outputArguments(std::ofstream &output);
+  void outputArguments();
 
   bool parse(int argc, char* argv[]);
   std::map<std::string,std::string> getArguments(){return arguments_;}

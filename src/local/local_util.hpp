@@ -3,6 +3,7 @@
 
 #include "base/ptm.hpp"
 #include "base/algorithm.hpp"
+#include "base/acid_base.hpp"
 #include "base/change.hpp"
 #include "prsm/prsm.hpp"
 #include "local_mng.hpp"
@@ -49,7 +50,9 @@ class LocalUtil {
   static void compSplitPoint(ProteoformPtr & proteoform, int num_match, const ExtendMsPtrVec & extend_ms_ptr_vec,
                              double prec_mass);
 
-  static int compNumPeakIonPairs(const ProteoformPtr &proteoform_ptr, const ExtendMsPtrVec &ms_ptr_vec);
+  static int compNumPeakIonPairs(const ProteoformPtr &proteoform_ptr, const ExtendMsPtrVec &ms_ptr_vec){
+    return PeakIonPairFactory::genePeakIonPairs(proteoform_ptr, ms_ptr_vec, mng_ptr_->min_mass_).size();
+  }
 
  private:
   static void readPtmTxt(const std::string &file_name);
@@ -71,7 +74,31 @@ class LocalUtil {
 
 };
 
-ChangePtr geneUnexpectedChange(ChangePtr change, double mass);
+inline ChangePtr geneUnexpectedChange(ChangePtr change, double mass) {
+  return std::make_shared<Change>(change->getLeftBpPos(), 
+                                  change->getRightBpPos(), 
+                                  ChangeType::UNEXPECTED, mass, 
+                                  std::make_shared<Mod>(ResidueBase::getEmptyResiduePtr(), 
+                                                        ResidueBase::getEmptyResiduePtr()));
+}
+
+inline double getPeptideMass(const std::string & seq) {
+  double m = 0;
+  for (size_t i = 0; i < seq.length(); i++) {
+    m += AcidBase::getAcidPtrByOneLetter(seq.substr(i, 1))->getMonoMass();
+  }
+  return m;
+}
+
+inline ChangePtrVec getExpectedChangeVec(ProteoformPtr proteoform) {
+  ChangePtrVec res;
+  for (size_t i = 0; i < proteoform->getChangePtrVec().size(); i++) {
+    if (proteoform->getChangePtrVec()[i]->getChangeTypePtr() != ChangeType::UNEXPECTED) {
+      res.push_back(proteoform->getChangePtrVec()[i]);
+    }
+  }
+  return res;
+}
 
 } // namespace prot
 

@@ -20,7 +20,7 @@ LocalProcessor::LocalProcessor(LocalMngPtr mng_ptr) {
   mng_ptr_ = mng_ptr;
   ppm_ = mng_ptr->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
   theta_ = mng_ptr->theta_;
-  thread_ = mng_ptr->thread_;
+  threshold_ = mng_ptr->threshold_;
   beta_ = mng_ptr->beta_;
   min_mass_ = mng_ptr->min_mass_;
   p1_ = mng_ptr->p1_;
@@ -77,6 +77,7 @@ void LocalProcessor::process() {
 void LocalProcessor::processOneSpectrum(PrsmPtr prsm) {
   if (prsm->getProteoformPtr()->getChangeNum(ChangeType::UNEXPECTED) == 1) {
     double mass = prsm->getProteoformPtr()->getChangePtrVec(ChangeType::UNEXPECTED)[0]->getMassShift();
+    // if the mass shift is between [-1, 1], we don't characterize it
     if (std::abs(mass) <= 1 + prsm->getAdjustedPrecMass() * ppm_) return;
     processOnePtm(prsm);  
   } else if (prsm->getProteoformPtr()->getChangeNum(ChangeType::UNEXPECTED) == 2) {
@@ -85,11 +86,15 @@ void LocalProcessor::processOneSpectrum(PrsmPtr prsm) {
 }
 
 void LocalProcessor::processOnePtm(PrsmPtr prsm) {
+
+  // the original number of matched fragment ions
   int ori_num_match_ion = LocalUtil::compNumPeakIonPairs(prsm->getProteoformPtr(), prsm->getRefineMsPtrVec());
 
-  // we will get a nullptr if the mass shift can't be explained by a variable ptm
+  // we will get a nullptr if the mass shift can't be explained by a known variable ptm
   ProteoformPtr one_known_prsm = processOneKnown(prsm);
 
+  // if it can be explained by one known ptm and the decrease in matched fragement
+  // ions is small
   if (one_known_prsm != nullptr 
       && LocalUtil::compNumPeakIonPairs(one_known_prsm, prsm->getRefineMsPtrVec()) 
       > ori_num_match_ion - DESC_MATCH_LIMIT) {
@@ -140,9 +145,10 @@ void LocalProcessor::processTwoPtm(PrsmPtr prsm) {
         return;
       }
     } else if (two_unknown_prsm != nullptr) {
-      std::cout << __LINE__ << std::endl;
-      double one_known_scr = one_known_prsm->getChangePtrVec(ChangeType::UNEXPECTED)[0]->getLocalAnno()->getRawScr();
-      double two_unknown_scr = two_unknown_prsm->getChangePtrVec(ChangeType::UNEXPECTED)[0]->getLocalAnno()->getRawScr();
+      double one_known_scr = 
+          one_known_prsm->getChangePtrVec(ChangeType::UNEXPECTED)[0]->getLocalAnno()->getRawScr();
+      double two_unknown_scr = 
+          two_unknown_prsm->getChangePtrVec(ChangeType::UNEXPECTED)[0]->getLocalAnno()->getRawScr();
       if (one_known_scr > two_unknown_scr) {
         if (LocalUtil::compNumPeakIonPairs(one_known_prsm, prsm->getRefineMsPtrVec()) 
             > ori_num_match_ion - DESC_MATCH_LIMIT) {
@@ -173,8 +179,7 @@ ProteoformPtr LocalProcessor::processOneKnown(const PrsmPtr & prsm) {
 
   ProteoformPtr one_known_proteoform;
 
-  ChangePtrVec new_change_vec = 
-      prsm->getProteoformPtr()->getChangePtrVec(ChangeType::FIXED);
+  ChangePtrVec new_change_vec = getExpectedChangeVec(prsm->getProteoformPtr());
   new_change_vec.push_back(geneUnexpectedChange(change_vec[0], mass));
   std::sort(new_change_vec.begin(), new_change_vec.end(), Change::cmpPosInc);
   one_known_proteoform = 
@@ -213,7 +218,7 @@ ProteoformPtr LocalProcessor::processOneKnown(const PrsmPtr & prsm) {
 
   int bgn, end;
   double conf;
-  LocalUtil::scr_filter(scr_vec, bgn, end, conf, thread_);
+  LocalUtil::scr_filter(scr_vec, bgn, end, conf, threshold_);
   // it is known ptm, raw_scr * theta_; otherwise raw_scr * (1 - theta_)
   LocalAnnoPtr anno = std::make_shared<LocalAnno>(bgn, end, conf, scr_vec, raw_scr * theta_, ptm_vec[0]);
   one_known_proteoform->getChangePtrVec(ChangeType::UNEXPECTED)[0]->setLocalAnno(anno);
@@ -232,7 +237,7 @@ ProteoformPtr LocalProcessor::processOneUnknown(const PrsmPtr & prsm) {
 
   ProteoformPtr one_unknown_proteoform;
 
-  ChangePtrVec new_change_vec = prsm->getProteoformPtr()->getChangePtrVec(ChangeType::FIXED);
+  ChangePtrVec new_change_vec = getExpectedChangeVec(prsm->getProteoformPtr());
   new_change_vec.push_back(geneUnexpectedChange(change_vec[0], mass));
   std::sort(new_change_vec.begin(), new_change_vec.end(), Change::cmpPosInc);
   one_unknown_proteoform = 
@@ -257,7 +262,8 @@ ProteoformPtr LocalProcessor::processOneUnknown(const PrsmPtr & prsm) {
 
   int bgn, end;
   double conf;
-  LocalUtil::scr_filter(scr_vec, bgn, end, conf, thread_);
+  LocalUtil::scr_filter(scr_vec, bgn, end, conf, threshold_);
+  // it is known ptm, raw_scr * theta_; otherwise raw_scr * (1 - theta_)
   LocalAnnoPtr anno = std::make_shared<LocalAnno>(bgn, end, conf, scr_vec, raw_scr * (1 - theta_), nullptr);
   one_unknown_proteoform->getChangePtrVec(ChangeType::UNEXPECTED)[0]->setLocalAnno(anno);
   return one_unknown_proteoform;
@@ -284,8 +290,7 @@ ProteoformPtr LocalProcessor::processTwoKnown(const PrsmPtr & prsm) {
 
   ProteoformPtr two_known_proteoform;
 
-  ChangePtrVec new_change_vec = 
-      prsm->getProteoformPtr()->getChangePtrVec(ChangeType::FIXED);
+  ChangePtrVec new_change_vec = getExpectedChangeVec(prsm->getProteoformPtr());
   new_change_vec.push_back(change_ptr1);
   new_change_vec.push_back(change_ptr2);
   std::sort(new_change_vec.begin(), new_change_vec.end(), Change::cmpPosInc);
@@ -356,8 +361,7 @@ ProteoformPtr LocalProcessor::processTwoUnknown(const PrsmPtr & prsm) {
     }
   }
 
-  ChangePtrVec new_change_vec = 
-      prsm->getProteoformPtr()->getChangePtrVec(ChangeType::FIXED);
+  ChangePtrVec new_change_vec = getExpectedChangeVec(prsm->getProteoformPtr());
   new_change_vec.push_back(change_ptr1);
   new_change_vec.push_back(change_ptr2);
   std::sort(new_change_vec.begin(), new_change_vec.end(), Change::cmpPosInc);
