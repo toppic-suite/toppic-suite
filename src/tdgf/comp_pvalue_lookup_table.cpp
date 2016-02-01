@@ -19,9 +19,9 @@ void CompPValueLookupTable::initTable() {
   int ppo = mng_ptr_->prsm_para_ptr_->getErrorTolerance();
   LOG_DEBUG("ppo " << ppo);
 
-  memset(ptm0_, 0, sizeof(ptm0_[0][0]) * 41 * 20);
-  memset(ptm1_, 0, sizeof(ptm0_[0][0]) * 41 * 20);
-  memset(ptm2_, 0, sizeof(ptm0_[0][0]) * 41 * 20);
+  memset(ptm0_, 0, sizeof(ptm0_[0][0]) * 48 * 20);
+  memset(ptm1_, 0, sizeof(ptm0_[0][0]) * 48 * 20);
+  memset(ptm2_, 0, sizeof(ptm0_[0][0]) * 48 * 20);
 
   std::string line;
   std::vector<std::string> strs;
@@ -227,12 +227,14 @@ int getPeakIndex(int p) {
       return k - 1 + 29;
     }
   } else {
-    if (p <= 425) {
-      return 38;
-    } else if (p <= 475)
-      return 39;
-    else
-      return 40;
+    p = p - 400;
+    k = p / 50;
+    t = p % 50;
+    if (t >= 25) {
+      return k + 39;
+    } else {
+      return k - 1 + 39;
+    }
   }
 }
 
