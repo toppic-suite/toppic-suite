@@ -123,7 +123,8 @@ PtmPairVec LocalUtil::getPtmPairVecByMass(double mass1, double mass2, double err
     double pair_mass = ptm_pair_vec_[i].first->getMonoMass() 
         + ptm_pair_vec_[i].second->getMonoMass();
 
-    if (std::abs(pair_mass - mass) < err || std::abs(std::abs(pair_mass - mass) - 1) < err)
+    if (std::abs(pair_mass - mass) < err
+        || std::abs(std::abs(pair_mass - mass) - MassConstant::getIsotopeMass() ) < err)
       res.push_back(ptm_pair_vec_[i]);
   }
 
@@ -163,14 +164,6 @@ bool LocalUtil::modifiable(ProteoformPtr proteoform_ptr, int i, PtmPtr ptm_ptr) 
   }
 
   return false;
-}
-
-double getPeptideMass(const std::string & seq) {
-  double m = 0;
-  for (size_t i = 0; i < seq.length(); i++) {
-    m += AcidBase::getAcidPtrByOneLetter(seq.substr(i, 1))->getMonoMass();
-  }
-  return m;
 }
 
 void LocalUtil::getNtermTruncRange(ProteoformPtr proteoform, const ExtendMsPtrVec & extend_ms_ptr_vec,
@@ -314,7 +307,7 @@ void LocalUtil::onePtmTermAdjust(ProteoformPtr & proteoform, const ExtendMsPtrVe
       if (std::abs(mass) > mng_ptr_->max_ptm_mass_ && (i != 0 || j != 0))
         continue;
 
-      if (std::abs(mass) < 1 + err) {
+      if (std::abs(mass) < MassConstant::getIsotopeMass() + err) {
         change_ptr->setMassShift(mass);
         fix_change_vec.push_back(change_ptr);
         proteoform = geneProteoform(proteoform->getFastaSeqPtr(),
@@ -490,6 +483,8 @@ void LocalUtil::readPtmTxt(const std::string &file_name) {
   }
 
   std::sort(var_ptm_list_.begin(), var_ptm_list_.end(), Ptm::cmpMassInc);
+  auto end = std::unique(var_ptm_list_.begin(), var_ptm_list_.end());
+  var_ptm_list_.erase(end, var_ptm_list_.end());
 
   for (size_t i = 0; i < var_ptm_list_.size(); i++) {
     for (size_t j = 0; j < var_ptm_list_.size(); j++) {
@@ -542,16 +537,16 @@ void LocalUtil::compOnePtmScr(ProteoformPtr proteoform, const ExtendMsPtrVec & e
 void two_ptm_mass_adjust(double & mass1, double & mass2, PtmPtr p1, PtmPtr p2) {
   if (p1 == nullptr || p2 == nullptr) return; 
   double err = mass1 + mass2 - p1->getMonoMass() - p2->getMonoMass();
-  if (std::abs(err) < 1) {
+  if (std::abs(err) < MassConstant::getIsotopeMass()) {
     mass1 = p1->getMonoMass() + err / 2;
     mass2 = p2->getMonoMass() + err / 2;
-  } else if (err > 1) {
-    err = err - 1;
-    mass1 = p1->getMonoMass() + 1 + err / 2;
+  } else if (err > MassConstant::getIsotopeMass()) {
+    err = err - MassConstant::getIsotopeMass();
+    mass1 = p1->getMonoMass() + MassConstant::getIsotopeMass() + err / 2;
     mass2 = p2->getMonoMass() + err / 2; 
   } else {
-    err = err + 1;
-    mass1 = p1->getMonoMass() - 1 + err / 2;
+    err = err + MassConstant::getIsotopeMass();
+    mass1 = p1->getMonoMass() - MassConstant::getIsotopeMass() + err / 2;
     mass2 = p2->getMonoMass() + err / 2;
   }
 }
@@ -605,24 +600,37 @@ void compNumMatch(const std::vector<double> & b, std::vector<int> & s,
     if (std::abs(spec_peak[j].first - prec_mass + b[i]) <= spec_peak[j].second) {
       s[i]++; i--; j++;
     } else if (prec_mass - b[i] > spec_peak[j].first) {
-      i--;
-    } else {
       j++;
+    } else {
+      i--;
     }
   } 
 }
 
 void fillTableB(std::vector<std::vector<double>> & b_table, const std::string & seq,
-                double mass1, double mass2, int g) {
+                double mass1, double mass2, int g, ChangePtrVec change_vec) {
 
-  for (size_t i = 0; i < b_table.size(); i++) 
-    b_table.resize(g - 1);
-
-  for (size_t i = 1; i < b_table[0].size(); i++) {
-    b_table[0][i - 1] = getPeptideMass(seq.substr(0, i));
-    b_table[1][i - 1] = getPeptideMass(seq.substr(0, i)) + mass1;
-    b_table[2][i - 1] = getPeptideMass(seq.substr(0, i)) + mass1 + mass2;
+  for (size_t i = 0; i < b_table.size(); i++) {
+    b_table[i].resize(g - 1);
+    std::fill(b_table[i].begin(), b_table[i].end(), 0);
   }
+
+  for (size_t i = 0; i < b_table[0].size(); i++) {
+    if (i == 0) {
+      b_table[0][i] = getPeptideMass(seq.substr(0, 1));
+    } else {
+      b_table[0][i] = b_table[0][i - 1] + getPeptideMass(seq.substr(i, 1));
+    }
+
+    for (size_t j = 0; j < change_vec.size(); j++) {
+      if ((int)i >= change_vec[j]->getLeftBpPos() && (int)i < change_vec[j]->getRightBpPos()) {
+        b_table[0][i] += change_vec[j]->getMassShift();
+      }
+    }
+    b_table[1][i] = b_table[0][i] + mass1;
+    b_table[2][i] = b_table[1][i] + mass2;
+  }
+
 }
 
 void fillTableS(std::vector<std::vector<double>> & b_table, std::vector<std::vector<int>> & s_table,
@@ -645,10 +653,10 @@ double LocalUtil::dpTwoPtmScr(ProteoformPtr proteoform, int h, const ExtendMsPtr
 
   int g = proteoform->getLen();
 
-  std::string seq = proteoform->getFastaSeqPtr()->getSeq();
+  std::string seq = proteoform->getFastaSeqPtr()->getSeq().substr(proteoform->getStartPos(), g);
 
   std::vector<std::vector<double>> b_table(3);
-  fillTableB(b_table, seq, mass1, mass2, g);
+  fillTableB(b_table, seq, mass1, mass2, g, getExpectedChangeVec(proteoform));
 
   std::vector<std::vector<int>> s_table(3);
   fillTableS(b_table, s_table, spec_peak, prec_mass, g);
@@ -715,7 +723,7 @@ void LocalUtil::compSplitPoint(ProteoformPtr & proteoform, int h, const ExtendMs
   std::string seq = proteoform->getFastaSeqPtr()->getSeq();
 
   std::vector<std::vector<double>> b_table(3);
-  fillTableB(b_table, seq, mass1, mass2, g);
+  fillTableB(b_table, seq, mass1, mass2, g, getExpectedChangeVec(proteoform));
 
   std::vector<std::vector<int>> s_table(3);
   fillTableS(b_table, s_table, spec_peak, prec_mass, g);
@@ -771,7 +779,7 @@ void LocalUtil::compSplitPoint(ProteoformPtr & proteoform, int h, const ExtendMs
 
   double split_scr = 0.0;
 
-  for (int i = split_point; i < split_scr_vec.size(); i++) {
+  for (int i = split_point; i < (int)split_scr_vec.size(); i++) {
     if (split_scr_vec[i] == split_max) {
       split_scr += split_scr_vec[i];
     } else {
@@ -781,7 +789,7 @@ void LocalUtil::compSplitPoint(ProteoformPtr & proteoform, int h, const ExtendMs
 
   split_scr = split_scr / std::accumulate(split_scr_vec.begin(), split_scr_vec.end(), 0.0);
 
-  if (split_scr <= mng_ptr_->thread_) {
+  if (split_scr <= mng_ptr_->threshold_) {
     proteoform = nullptr;
     return;
   }
@@ -804,7 +812,7 @@ void LocalUtil::compSplitPoint(ProteoformPtr & proteoform, int h, const ExtendMs
   double conf;
   std::transform(ptm_scr.begin(), ptm_scr.end(), ptm_scr.begin(),
                  std::bind1st(std::multiplies<double>(), split_scr));
-  scr_filter(ptm_scr, bgn, end, conf, mng_ptr_->thread_);
+  scr_filter(ptm_scr, bgn, end, conf, mng_ptr_->threshold_);
   LocalAnnoPtr anno1 = std::make_shared<LocalAnno>(bgn, end, conf, ptm_scr, 0, ptm1);
   change_ptr1->setLocalAnno(anno1);
   ptm_scr.clear();
@@ -822,22 +830,9 @@ void LocalUtil::compSplitPoint(ProteoformPtr & proteoform, int h, const ExtendMs
   ptm_scr = normalize(ptm_scr);
   std::transform(ptm_scr.begin(), ptm_scr.end(), ptm_scr.begin(),
                  std::bind1st(std::multiplies<double>(), split_scr));
-  scr_filter(ptm_scr, bgn, end, conf, mng_ptr_->thread_);
+  scr_filter(ptm_scr, bgn, end, conf, mng_ptr_->threshold_);
   LocalAnnoPtr anno2 = std::make_shared<LocalAnno>(split_point + bgn, split_point + end, conf, ptm_scr, 0, ptm1);
   change_ptr2->setLocalAnno(anno2);
-}
-
-int LocalUtil::compNumPeakIonPairs(const ProteoformPtr &proteoform_ptr, 
-                                   const ExtendMsPtrVec &ms_ptr_vec) {
-  return PeakIonPairFactory::genePeakIonPairs(proteoform_ptr, ms_ptr_vec, mng_ptr_->min_mass_).size();
-}
-
-ChangePtr geneUnexpectedChange(ChangePtr change, double mass) {
-  return std::make_shared<Change>(change->getLeftBpPos(), 
-                                  change->getRightBpPos(), 
-                                  ChangeType::UNEXPECTED, mass, 
-                                  std::make_shared<Mod>(ResidueBase::getEmptyResiduePtr(), 
-                                                        ResidueBase::getEmptyResiduePtr()));
 }
 
 } // namespace prot

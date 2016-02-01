@@ -31,7 +31,9 @@ class LocalProcessor {
 
   LocalMngPtr mng_ptr_;
   double p1_, p2_, ppm_;
-  double theta_, thread_, beta_;
+  double threshold_; // threshold for MIScore;
+  double theta_; // the weight for known/unknown ptm
+  double beta_; // the weight for one/two ptm
   double min_mass_;
 };
 

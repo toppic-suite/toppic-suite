@@ -19,10 +19,10 @@ class PrsmStr {
   int getSpectrumId() {return spectrum_id_;}
 
   std::string getSeqName() {return seq_name_;}
-  
+
   double getMatchFragNum() {return match_frag_num_;}
 
-  long double getEValue() {return e_value_;}
+  double getEValue() {return e_value_;}
 
   double getFdr() {return fdr_;}
 
@@ -52,7 +52,7 @@ class PrsmStr {
 
   double match_frag_num_;
 
-  long double e_value_;
+  double e_value_;
 
   double fdr_;
 };
