@@ -615,7 +615,7 @@ void compNumMatch(const std::vector<double> & b, std::vector<int> & s,
 }
 
 void fillTableB(std::vector<std::vector<double>> & b_table, const std::string & seq,
-                double mass1, double mass2, int g, ChangePtrVec change_vec) {
+                double mass1, double mass2, ChangePtrVec change_vec) {
   for (size_t i = 1; i < b_table.size(); i++) {
     b_table[i].resize(b_table[0].size());
     std::fill(b_table[i].begin(), b_table[i].end(), 0);
@@ -648,10 +648,10 @@ std::vector<double> geneNTheoMass(ProteoformPtr proteoform, const ExtendMsPtrVec
 } 
 
 void fillTableS(std::vector<std::vector<double>> & b_table, std::vector<std::vector<int>> & s_table,
-                std::vector<std::pair<double, double>> spec_peak, double prec_mass, int g) {
+                std::vector<std::pair<double, double>> spec_peak, double prec_mass) {
 
   for (size_t i = 0; i < s_table.size(); i++) {
-    s_table[i].resize(g);
+    s_table[i].resize(b_table[i].size());
     std::fill(s_table[i].begin(), s_table[i].end(), 0);
   }
 
@@ -672,10 +672,10 @@ double LocalUtil::dpTwoPtmScr(ProteoformPtr proteoform, int h, const ExtendMsPtr
   std::vector<std::vector<double>> b_table(3);
   b_table[0] = geneNTheoMass(proteoform, extend_ms_ptr_vec,mng_ptr_->min_mass_);
   std::sort(b_table[0].begin(), b_table[0].end());
-  fillTableB(b_table, seq, mass1, mass2, g, getExpectedChangeVec(proteoform));
+  fillTableB(b_table, seq, mass1, mass2, getExpectedChangeVec(proteoform));
 
   std::vector<std::vector<int>> s_table(3);
-  fillTableS(b_table, s_table, spec_peak, prec_mass, g);
+  fillTableS(b_table, s_table, spec_peak, prec_mass);
 
   // fill D(f,g,h)
   int d_table[3][g + 1][h + 1];
@@ -748,10 +748,10 @@ void LocalUtil::compSplitPoint(ProteoformPtr & proteoform, int h, const ExtendMs
   std::vector<std::vector<double>> b_table(3);
   b_table[0] = geneNTheoMass(no_unexpected, extend_ms_ptr_vec,mng_ptr_->min_mass_);
   std::sort(b_table[0].begin(), b_table[0].end());
-  fillTableB(b_table, seq, mass1, mass2, g, getExpectedChangeVec(proteoform));
+  fillTableB(b_table, seq, mass1, mass2, getExpectedChangeVec(proteoform));
 
   std::vector<std::vector<int>> s_table(3);
-  fillTableS(b_table, s_table, spec_peak, prec_mass, g);
+  fillTableS(b_table, s_table, spec_peak, prec_mass);
 
   int d_table[3][g + 1][h + 1];
 
