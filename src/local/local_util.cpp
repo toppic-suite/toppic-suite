@@ -729,8 +729,8 @@ void LocalUtil::compSplitPoint(ProteoformPtr & proteoform, int h, const ExtendMs
   PtmPtr ptm1 = change_ptr1->getLocalAnno()->getPtmPtr();
   PtmPtr ptm2 = change_ptr2->getLocalAnno()->getPtmPtr();
   two_ptm_mass_adjust(mass1, mass2, ptm1, ptm2);
-  change_ptr1 = geneUnexpectedChange(change_ptr1, mass1);
-  change_ptr2 = geneUnexpectedChange(change_ptr2, mass2);
+  change_ptr1->setMassShift(mass1);
+  change_ptr2->setMassShift(mass2);
 
   std::vector<std::pair<double, double>> spec_peak = getSpecPeak(extend_ms_ptr_vec);
 
@@ -802,13 +802,18 @@ void LocalUtil::compSplitPoint(ProteoformPtr & proteoform, int h, const ExtendMs
 
   double split_scr = 0.0;
 
-  for (int i = split_point; i < (int)split_scr_vec.size(); i++) {
-    if (split_scr_vec[i] == split_max) {
-      split_scr += split_scr_vec[i];
-    } else {
+  int split_end = split_scr_vec.size();
+
+  for (;split_end > 0; split_end--) {
+    if (split_scr_vec[split_end] == split_max)
       break;
-    }
   }
+
+  for (int i = split_point; i <= split_end; i++) {
+    split_scr += split_scr_vec[i];
+  }
+
+  split_point = (split_point + split_end) / 2;
 
   split_scr = split_scr / std::accumulate(split_scr_vec.begin(), split_scr_vec.end(), 0.0);
 
