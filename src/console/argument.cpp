@@ -65,17 +65,17 @@ void Argument::outputArguments(std::ofstream &output) {
 void Argument::outputArguments() {
   std::cout << "********************** Parameters **********************" << std::endl;
   std::cout << std::setw(40) << std::left << "Protein database file: " << arguments_["oriDatabaseFileName"] << std::endl;
-  std::cout << std::setw(40) << std::left<< "Spectrum file: " << arguments_["spectrumFileName"] << std::endl;
-  std::cout << std::setw(40) << std::left<< "Number of spectra in a group: " << arguments_["groupSpectrumNumber"] << std::endl;
-  std::cout << std::setw(40) << std::left<< "Activation type: " << arguments_["activation"] << std::endl;
-  std::cout << std::setw(40) << std::left<< "Search type: " << arguments_["searchType"] << std::endl;
-  std::cout << std::setw(40) << std::left<< "fixed modifications: " << arguments_["fixedMod"] << std::endl;
-  std::cout << std::setw(40) << std::left<< "Maximum number of unexpected PTMs: " << arguments_["ptmNumber"] << std::endl;
-  std::cout << std::setw(40) << std::left<< "Error tolerance: " << arguments_["errorTolerance"] << " ppm" << std::endl;
-  std::cout << std::setw(40) << std::left<< "Cutoff type: " << arguments_["cutoffType"] << std::endl;
-  std::cout << std::setw(40) << std::left<< "Cutoff value: " << arguments_["cutoffValue"] << std::endl;
-  std::cout << std::setw(40) << std::left<< "Allowed N-terminal modifications: " << arguments_["allowProtMod"] << std::endl;
-  std::cout << std::setw(40) << std::left<< "Maximum PTM mass: " << arguments_["maxPtmMass"] << " Da" << std::endl;
+  std::cout << std::setw(40) << std::left << "Spectrum file: " << arguments_["spectrumFileName"] << std::endl;
+  std::cout << std::setw(40) << std::left << "Number of spectra in a group: " << arguments_["groupSpectrumNumber"] << std::endl;
+  std::cout << std::setw(40) << std::left << "Activation type: " << arguments_["activation"] << std::endl;
+  std::cout << std::setw(40) << std::left << "Search type: " << arguments_["searchType"] << std::endl;
+  std::cout << std::setw(40) << std::left << "Fixed modifications: " << arguments_["fixedMod"] << std::endl;
+  std::cout << std::setw(40) << std::left << "Maximum number of unexpected PTMs: " << arguments_["ptmNumber"] << std::endl;
+  std::cout << std::setw(40) << std::left << "Error tolerance: " << arguments_["errorTolerance"] << " ppm" << std::endl;
+  std::cout << std::setw(40) << std::left << "Cutoff type: " << arguments_["cutoffType"] << std::endl;
+  std::cout << std::setw(40) << std::left << "Cutoff value: " << arguments_["cutoffValue"] << std::endl;
+  std::cout << std::setw(40) << std::left << "Allowed N-terminal modifications: " << arguments_["allowProtMod"] << std::endl;
+  std::cout << std::setw(40) << std::left << "Maximum PTM mass: " << arguments_["maxPtmMass"] << " Da" << std::endl;
   if (arguments_["useGf"] == "true") {
     std::cout << std::setw(40) << std::left << "E-value computation: "
         << "Generation function" << std::endl;
@@ -86,6 +86,7 @@ void Argument::outputArguments() {
   }
   if (arguments_["residueModFileName"] != "") {
     std::cout << std::setw(40) << std::left << "Residue modification file name: " << arguments_["residueModFileName"] << std::endl;
+    std::cout << std::setw(40) << std::left << "MIScore threshold: " << arguments_["local_threshold"] << std::endl;
   }
   std::cout << std::setw(40) << std::left << "Executive file directory is: " << arguments_["executiveDir"] << std::endl;
   std::cout << "********************** Parameters **********************" << std::endl;
@@ -142,6 +143,7 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string argument_file_name = "";
   std::string activation = "";
   std::string fixed_mod = "";
+  std::string allow_mod = "";
   std::string ptm_num = "";
   std::string error_tole = "";
   std::string max_ptm_mass = "";
@@ -165,6 +167,8 @@ bool Argument::parse(int argc, char* argv[]) {
          "<CID|HCD|ETD|FILE>. Activation type of tandem mass spectra. When FILE is used, the activation type information is given in the input spectral data file. Default value: FILE.")
         ("fixed-mod,f", po::value<std::string> (&fixed_mod), 
          "Fixed modifications: C57: Carbamidoemetylation, C58:Carboxymethylation, or a fixed modification file name.")
+        ("n-termimal-ptm,o", po::value<std::string> (&allow_mod), 
+         "<NONE|NONE,NME|NONE,NME,NME_ACETYLATION>. Variable PTMs at the N-terminus of the proteoform. Three options are provided: NME and N-Terminal acetylation, NME only, and NONE.")
         ("decoy,d", "Use a decoy protein database to estimate false discovery rates.")
         ("error-tolerance,e", po::value<std::string> (&error_tole), "<positive integer>. Error tolerance for precursor and fragment masses in PPM. Default value: 15.")
         ("max-ptm,m", po::value<std::string> (&max_ptm_mass), "<positive number>. Maximum absolute value of masses (in Dalton) of unexpected post-translational modifications in proteoforms. Default value: 500.")
@@ -184,6 +188,8 @@ bool Argument::parse(int argc, char* argv[]) {
          "<CID|HCD|ETD|FILE>. Activation type of tandem mass spectra. When FILE is used, the activation type information is given in spectral data file. Default value: FILE.")
         ("fixed-mod,f", po::value<std::string> (&fixed_mod), 
          "Fixed modifications: C57: Carbamidoemetylation, C58:Carboxymethylation, or a fixed modification file name.")
+        ("n-termimal-ptm,o", po::value<std::string> (&allow_mod), 
+         "<NONE|NONE,NME|NONE,NME,NME_ACETYLATION>. Variable PTMs at the N-terminus of the proteoform. Three options are provided: NME and N-Terminal acetylation, NME only, and NONE.")
         ("decoy,d", "Use a decoy protein database to estimate false discovery rates.")
         ("error-tolerance,e", po::value<std::string> (&error_tole), "<int value>. Error tolerance of precursor and fragment masses in PPM. Default value: 15.")
         ("max-ptm,m", po::value<std::string> (&max_ptm_mass), "<positive double value>. Maximum absolute value (in Dalton) of the masses of unexpected PTMs in the identified proteoform. Default value: 500.")
@@ -230,8 +236,7 @@ bool Argument::parse(int argc, char* argv[]) {
     std::string argv_0 (argv[0]);
     if (vm.count("full-binary-path")) {
       arguments_["executiveDir"] = argv[0];
-    }
-    else {
+    } else {
       arguments_["executiveDir"] = FileUtil::getExecutiveDir(argv_0);
     }
     LOG_DEBUG("Executive Dir " << arguments_["executiveDir"]);
@@ -248,13 +253,15 @@ bool Argument::parse(int argc, char* argv[]) {
     }
     if (arguments_["searchType"] == "TARGET+DECOY") {
       arguments_["databaseFileName"]=arguments_["oriDatabaseFileName"] + "_target_decoy";
-    }
-    else {
+    } else {
       arguments_["databaseFileName"]=arguments_["oriDatabaseFileName"] + "_target";
     }
     if (vm.count("fixed-mod")) {
       arguments_["fixedMod"] = fixed_mod;
     }
+    if (vm.count("n-termimal-ptm")) {
+      arguments_["allowProtMod"] = allow_mod;
+    }    
     if (vm.count("ptm-number")) {
       arguments_["ptmNumber"] = ptm_num;
     }
@@ -283,7 +290,7 @@ bool Argument::parse(int argc, char* argv[]) {
       arguments_["useGf"] = "true";
     }
     if (vm.count("local-threshold")) {
-      arguments_["local_threshold"] = "local_threshold";
+      arguments_["local_threshold"] = local_threshold;
     }
     if (vm.count("group-number")) {
       arguments_["groupSpectrumNumber"] = group_num;
@@ -328,6 +335,12 @@ bool Argument::validateArguments() {
   std::string ptm_number = arguments_["ptmNumber"];
   if (ptm_number != "0" && ptm_number != "1" && ptm_number != "2") {
     LOG_ERROR("PTM number "<< ptm_number <<" error! The value should be 0|1|2!");
+    return false;
+  }
+
+  std::string allow_mod = arguments_["allowProtMod"]; 
+  if (allow_mod != "NONE" && allow_mod != "NONE,NME" && allow_mod != "NONE,NME,NME_ACETYLATION") {
+    LOG_ERROR("N-Terminal Variable PTM can only be \"NONE\",\"NONE,NME\" or \"NONE,NME,NME_ACETYLATION\",.");
     return false;
   }
 
@@ -379,6 +392,7 @@ bool Argument::validateArguments() {
     LOG_ERROR("Cutoff value " << cutoff_value << " should be a number.");
     return false;
   }
+
   return true;
 }
 
