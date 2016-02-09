@@ -2,6 +2,7 @@
 #include <algorithm>
 #include "prsm/peak_ion_pair_factory.hpp"
 #include "base/acid_base.hpp"
+#include "base/activation_base.hpp"
 #include "base/mod_util.hpp"
 #include "base/residue_util.hpp"
 #include "spec/theo_peak_factory.hpp"
@@ -578,35 +579,39 @@ void LocalUtil::compTwoPtmScr(ProteoformPtr proteoform, int num_match,
   ptm_pair_vec.push_back(std::make_pair(p1, p2));
 }
 
-std::vector<std::pair<double, double>> getSpecPeak(const ExtendMsPtrVec & extend_ms_ptr_vec) {
+std::vector<std::pair<double, double>> getSpecPeak(const ExtendMsPtr & extend_ms_ptr) {
   std::vector<std::pair<double, double>> spec_peak;
-  for (size_t i = 0; i < extend_ms_ptr_vec.size(); i++) {
-    for (size_t j = 0; j < extend_ms_ptr_vec[i]->getPeakPtrVec().size(); j++) {
-      spec_peak.push_back(std::make_pair(extend_ms_ptr_vec[i]->getPeakPtr(j)->getMonoMass(),
-                                         extend_ms_ptr_vec[i]->getPeakPtr(j)->getOrigTolerance()));
-    }
+
+  for (size_t j = 0; j < extend_ms_ptr->getPeakPtrVec().size(); j++) {
+    spec_peak.push_back(std::make_pair(extend_ms_ptr->getPeakPtr(j)->getMonoMass(),
+                                       extend_ms_ptr->getPeakPtr(j)->getOrigTolerance()));
   }
+
   return spec_peak;
 }
 
 void compNumMatch(const std::vector<double> & b, std::vector<int> & s, 
-                  std::vector<std::pair<double, double>> spec_peak, double prec_mass) {
+                  const ExtendMsPtr & extend_ms_ptr, double prec_mass) {
+
+  std::vector<std::pair<double, double>> spec_peak = getSpecPeak(extend_ms_ptr);
+  double n_shift = extend_ms_ptr->getMsHeaderPtr()->getActivationPtr()->getNShift();
 
   size_t i = 0, j = 0;
   while (i < b.size() && j < spec_peak.size()) {
-    if (std::abs(spec_peak[j].first - b[i]) <= spec_peak[j].second) {
+    if (std::abs(spec_peak[j].first - b[i] - n_shift) <= spec_peak[j].second) {
       s[i]++; i++; j++;
-    } else if (b[i] > spec_peak[j].first) {
+    } else if (b[i] + n_shift > spec_peak[j].first) {
       j++;
     } else {
       i++;
     }
   }
+
   i = b.size() - 1, j = 0;
   while ((int)i >= 0 && j < spec_peak.size()) {
-    if (std::abs(spec_peak[j].first - prec_mass + b[i]) <= spec_peak[j].second) {
+    if (std::abs(spec_peak[j].first - prec_mass + b[i] + n_shift) <= spec_peak[j].second) {
       s[i]++; i--; j++;
-    } else if (prec_mass - b[i] > spec_peak[j].first) {
+    } else if (prec_mass - b[i] - n_shift > spec_peak[j].first) {
       j++;
     } else {
       i--;
@@ -614,7 +619,7 @@ void compNumMatch(const std::vector<double> & b, std::vector<int> & s,
   } 
 }
 
-void fillTableB(std::vector<std::vector<double>> & b_table, const std::string & seq,
+void fillTableB(std::vector<std::vector<double>> & b_table,
                 double mass1, double mass2, ChangePtrVec change_vec) {
   for (size_t i = 1; i < b_table.size(); i++) {
     b_table[i].resize(b_table[0].size());
@@ -629,14 +634,10 @@ void fillTableB(std::vector<std::vector<double>> & b_table, const std::string & 
 
 std::vector<double> geneNTheoMass(ProteoformPtr proteoform, const ExtendMsPtrVec & extend_ms_ptr_vec,
                                   double min_mass){
-  TheoPeakPtrVec theo_peaks;
-  for (size_t i = 0; i < extend_ms_ptr_vec.size(); i++) {
-    TheoPeakPtrVec theo_tmp = 
-        TheoPeakFactory::geneProteoformTheoPeak(proteoform, 
-                                                extend_ms_ptr_vec[i]->getMsHeaderPtr()->getActivationPtr(),
-                                                min_mass);
-    theo_peaks.insert(theo_peaks.end(), theo_tmp.begin(), theo_tmp.end());
-  }
+  TheoPeakPtrVec theo_peaks =
+      TheoPeakFactory::geneProteoformTheoPeak(proteoform, 
+                                              ActivationBase::getActivationPtrByName("HCD"),
+                                              min_mass);
 
   std::vector<double> res;
   for (size_t i = 0; i < theo_peaks.size(); i++) {
@@ -644,38 +645,36 @@ std::vector<double> geneNTheoMass(ProteoformPtr proteoform, const ExtendMsPtrVec
       res.push_back(theo_peaks[i]->getModMass());
     }
   }
+  std::sort(res.begin(), res.end());
   return res;
 } 
 
 void fillTableS(std::vector<std::vector<double>> & b_table, std::vector<std::vector<int>> & s_table,
-                std::vector<std::pair<double, double>> spec_peak, double prec_mass) {
+                const ExtendMsPtrVec & extend_ms_ptr_vec, double prec_mass) {
 
   for (size_t i = 0; i < s_table.size(); i++) {
-    s_table[i].resize(b_table[i].size());
+    s_table[i].resize(b_table[i].size() + 1);
     std::fill(s_table[i].begin(), s_table[i].end(), 0);
   }
 
-  for (int i = 0; i < 3; i++) {
-    compNumMatch(b_table[i], s_table[i], spec_peak, prec_mass);
+  for (size_t i = 0; i < extend_ms_ptr_vec.size(); i++) {
+    for (int j = 0; j < 3; j++) {
+      compNumMatch(b_table[j], s_table[j], extend_ms_ptr_vec[i], prec_mass);
+    }
   }
 }
 
 double LocalUtil::dpTwoPtmScr(ProteoformPtr proteoform, int h, const ExtendMsPtrVec & extend_ms_ptr_vec, 
                               double prec_mass, double mass1, double mass2, PtmPtr ptm1, PtmPtr ptm2) {
 
-  std::vector<std::pair<double, double>> spec_peak = getSpecPeak(extend_ms_ptr_vec);
-
   int g = proteoform->getLen();
-
-  std::string seq = proteoform->getFastaSeqPtr()->getSeq().substr(proteoform->getStartPos(), g);
 
   std::vector<std::vector<double>> b_table(3);
   b_table[0] = geneNTheoMass(proteoform, extend_ms_ptr_vec,mng_ptr_->min_mass_);
-  std::sort(b_table[0].begin(), b_table[0].end());
-  fillTableB(b_table, seq, mass1, mass2, getExpectedChangeVec(proteoform));
+  fillTableB(b_table, mass1, mass2, getExpectedChangeVec(proteoform));
 
   std::vector<std::vector<int>> s_table(3);
-  fillTableS(b_table, s_table, spec_peak, prec_mass);
+  fillTableS(b_table, s_table, extend_ms_ptr_vec, prec_mass);
 
   // fill D(f,g,h)
   int d_table[3][g + 1][h + 1];
@@ -733,11 +732,7 @@ void LocalUtil::compSplitPoint(ProteoformPtr & proteoform, int h, const ExtendMs
   change_ptr1->setMassShift(mass1);
   change_ptr2->setMassShift(mass2);
 
-  std::vector<std::pair<double, double>> spec_peak = getSpecPeak(extend_ms_ptr_vec);
-
   int g = proteoform->getLen();
-
-  std::string seq = proteoform->getFastaSeqPtr()->getSeq();
 
   ProteoformPtr no_unexpected =
       geneProteoform(proteoform->getFastaSeqPtr(),
@@ -747,11 +742,10 @@ void LocalUtil::compSplitPoint(ProteoformPtr & proteoform, int h, const ExtendMs
 
   std::vector<std::vector<double>> b_table(3);
   b_table[0] = geneNTheoMass(no_unexpected, extend_ms_ptr_vec,mng_ptr_->min_mass_);
-  std::sort(b_table[0].begin(), b_table[0].end());
-  fillTableB(b_table, seq, mass1, mass2, getExpectedChangeVec(proteoform));
+  fillTableB(b_table, mass1, mass2, getExpectedChangeVec(proteoform));
 
   std::vector<std::vector<int>> s_table(3);
-  fillTableS(b_table, s_table, spec_peak, prec_mass);
+  fillTableS(b_table, s_table, extend_ms_ptr_vec, prec_mass);
 
   int d_table[3][g + 1][h + 1];
 
