@@ -619,8 +619,7 @@ void compNumMatch(const std::vector<double> & b, std::vector<int> & s,
   } 
 }
 
-void fillTableB(std::vector<std::vector<double>> & b_table,
-                double mass1, double mass2, ChangePtrVec change_vec) {
+void fillTableB(std::vector<std::vector<double>> & b_table, double mass1, double mass2) {
   for (size_t i = 1; i < b_table.size(); i++) {
     b_table[i].resize(b_table[0].size());
     std::fill(b_table[i].begin(), b_table[i].end(), 0);
@@ -671,7 +670,7 @@ double LocalUtil::dpTwoPtmScr(ProteoformPtr proteoform, int h, const ExtendMsPtr
 
   std::vector<std::vector<double>> b_table(3);
   b_table[0] = geneNTheoMass(proteoform, extend_ms_ptr_vec,mng_ptr_->min_mass_);
-  fillTableB(b_table, mass1, mass2, getExpectedChangeVec(proteoform));
+  fillTableB(b_table, mass1, mass2);
 
   std::vector<std::vector<int>> s_table(3);
   fillTableS(b_table, s_table, extend_ms_ptr_vec, prec_mass);
@@ -742,7 +741,7 @@ void LocalUtil::compSplitPoint(ProteoformPtr & proteoform, int h, const ExtendMs
 
   std::vector<std::vector<double>> b_table(3);
   b_table[0] = geneNTheoMass(no_unexpected, extend_ms_ptr_vec,mng_ptr_->min_mass_);
-  fillTableB(b_table, mass1, mass2, getExpectedChangeVec(proteoform));
+  fillTableB(b_table, mass1, mass2);
 
   std::vector<std::vector<int>> s_table(3);
   fillTableS(b_table, s_table, extend_ms_ptr_vec, prec_mass);
