@@ -167,7 +167,7 @@ bool Argument::parse(int argc, char* argv[]) {
          "<CID|HCD|ETD|FILE>. Activation type of tandem mass spectra. When FILE is used, the activation type information is given in the input spectral data file. Default value: FILE.")
         ("fixed-mod,f", po::value<std::string> (&fixed_mod), 
          "Fixed modifications: C57: Carbamidoemetylation, C58:Carboxymethylation, or a fixed modification file name.")
-        ("n-termimal-ptm,o", po::value<std::string> (&allow_mod), 
+        ("n-termimal-ptm,n", po::value<std::string> (&allow_mod), 
          "<NONE|NONE,NME|NONE,NME,NME_ACETYLATION>. Variable PTMs at the N-terminus of the proteoform. Three options are provided: NME and N-Terminal acetylation, NME only, and NONE.")
         ("decoy,d", "Use a decoy protein database to estimate false discovery rates.")
         ("error-tolerance,e", po::value<std::string> (&error_tole), "<positive integer>. Error tolerance for precursor and fragment masses in PPM. Default value: 15.")
@@ -188,7 +188,7 @@ bool Argument::parse(int argc, char* argv[]) {
          "<CID|HCD|ETD|FILE>. Activation type of tandem mass spectra. When FILE is used, the activation type information is given in spectral data file. Default value: FILE.")
         ("fixed-mod,f", po::value<std::string> (&fixed_mod), 
          "Fixed modifications: C57: Carbamidoemetylation, C58:Carboxymethylation, or a fixed modification file name.")
-        ("n-termimal-ptm,o", po::value<std::string> (&allow_mod), 
+        ("n-termimal-ptm,n", po::value<std::string> (&allow_mod), 
          "<NONE|NONE,NME|NONE,NME,NME_ACETYLATION>. Variable PTMs at the N-terminus of the proteoform. Three options are provided: NME and N-Terminal acetylation, NME only, and NONE.")
         ("decoy,d", "Use a decoy protein database to estimate false discovery rates.")
         ("error-tolerance,e", po::value<std::string> (&error_tole), "<int value>. Error tolerance of precursor and fragment masses in PPM. Default value: 15.")
@@ -196,7 +196,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("ptm-number,p", po::value<std::string> (&ptm_num), "<0|1|2>. Maximum number of unexpected PTMs. Default value: 1.")
         ("cutoff-type,t", po::value<std::string> (&cutoff_type), "<EVALUE|FDR>. Cutoff value type for reporting protein-spectrum-matches. Default value: EVALUE.")
         ("cutoff-value,v", po::value<std::string> (&cutoff_value), "<positive double value>. Cutoff value for reporting protein-spectrum-matches. Default value: 0.01.")
-        ("filtering-result-number,n", po::value<std::string>(&filtering_result_num), "Filtering result number. Default value: 20.")
+        ("filtering-result-number,o", po::value<std::string>(&filtering_result_num), "Filtering result number. Default value: 20.")
         ("log-file-name,l", po::value<std::string>(&log_file_name), "Log file name with its path.")
         ("keep-temp-files,k", "Keep temporary files.")
         ("generating-function,g", "Use generating function to calculate p-values and E-values.")

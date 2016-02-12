@@ -1,6 +1,8 @@
 # This file is used to specify modifications
 # # for comments
-# To input a modification, use the following command:
+# To input a modification, use the following format:
+#
+# Name,Mass,Residues,Position,UnimodID
 #
 # Name: name of the modification (Unimod PSI-MS name)
 # 	- The Unimod PSI-MS names are recommended
@@ -11,17 +13,21 @@
 #   - It is important to specify accurate masses (integer masses are insufficient).
 # 	- E.g. 15.994915 
 #
-# Residues: affected amino acids
-# 	- Use * if this modification is applicable to any residue. 
+# Residues: amino acids that can be modified
+# 	- Use * if this modification is applicable to all the 20 amino acids. 
 #
-# Position: position in the peptide where the modification can be attached. 
-# 	- One of the following five values should be used:
+# Position: positions in the protein where the modification can be attached. 
+# 	- One of the following three values should be used:
 # 	- any (anywhere), N-term, C-term
 #
 # UnimodID: unmimod id of the modification
 #   - Please use -1, if not in unimod
-#
-# Variable Modifications (default: none)
 
-#Carbamidomethylation,57.021464,C,any,-1 # C57
-#Carboxymethyl,58.005479,C,any,6 # C58
+# C57
+Carbamidomethylation,57.021464,C,any,-1
+
+# C58
+# Carboxymethyl,58.005479,C,any,6
+
+# Phosphorylation
+# Phospho,79.966331,STY,any,21
