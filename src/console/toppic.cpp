@@ -55,7 +55,7 @@ int two_base_opt(int argc, char* argv[]) {
       return 1;
     }
     std::map<std::string, std::string> arguments = argu_processor.getArguments();
-    std::cout << "TopPIC 1.0" << std::endl;
+    std::cout << "TopPIC 1.0.0 beta (" << __DATE__ << ")" << std::endl;
 
     std::string exe_dir = arguments["executiveDir"];
     argu_processor.outputArguments();

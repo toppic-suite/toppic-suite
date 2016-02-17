@@ -72,6 +72,7 @@ void LocalProcessor::process() {
   sp_reader.close();
   prsm_reader.close();
   writer.close();
+  std::cout << std::endl;
 }
 
 void LocalProcessor::processOneSpectrum(PrsmPtr prsm) {

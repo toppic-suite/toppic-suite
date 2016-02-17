@@ -65,10 +65,10 @@ add_executable(toppic ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
     ${ZERO_PTM_SRCS} ${ZERO_PTM_FILTER} ${DIAG_FILTER_SRCS} ${ONE_PTM_FILTER_SRCS} ${ONE_PTM_SEARCH_SRCS}
     ${PTM_SRCS} ${TDGF_SRCS} ${LOCAL_SRCS} ${PRSM_VIEW_SRCS} ${ARGU_SRCS} ${MAIN_SRCS})
 
-add_executable(test_tag ${BASE_SRCS} ${LOCAL_SRCS} ${SPEC_SRCS} ${PRSM_SRCS} ${ARGU_SRCS} ${TAG_SRCS} ${TEST_TAG})
+#add_executable(test_tag ${BASE_SRCS} ${LOCAL_SRCS} ${SPEC_SRCS} ${PRSM_SRCS} ${ARGU_SRCS} ${TAG_SRCS} ${TEST_TAG})
 
-add_executable(test_graph ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
-    ${GRAPH_SRCS} ${GRAPH_ALIGN_SRCS} ${ARGU_SRCS} ${LOCAL_SRCS} ${ONE_PTM_SEARCH_SRCS} ${TEST_GRAPH_SRCS})
+#add_executable(test_graph ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
+#    ${GRAPH_SRCS} ${GRAPH_ALIGN_SRCS} ${ARGU_SRCS} ${LOCAL_SRCS} ${ONE_PTM_SEARCH_SRCS} ${TEST_GRAPH_SRCS})
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     # Windows specific code
@@ -83,11 +83,11 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     target_link_libraries(toppic xalan-c xalanMsg xerces-c boost_program_options
         boost_filesystem boost_system boost_date_time hts pthread z)
 
-    target_link_libraries(test_tag xalan-c xalanMsg xerces-c boost_program_options
-        boost_filesystem boost_system boost_date_time hts pthread z)
+#    target_link_libraries(test_tag xalan-c xalanMsg xerces-c boost_program_options
+#        boost_filesystem boost_system boost_date_time hts pthread z)
 
-    target_link_libraries(test_graph xalan-c xalanMsg xerces-c boost_program_options
-        boost_filesystem boost_system boost_date_time hts pthread z)
+#    target_link_libraries(test_graph xalan-c xalanMsg xerces-c boost_program_options
+#        boost_filesystem boost_system boost_date_time hts pthread z)
 
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
 
