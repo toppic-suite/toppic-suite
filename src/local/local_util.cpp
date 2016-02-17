@@ -259,15 +259,22 @@ void LocalUtil::getCtermTruncRange(ProteoformPtr proteoform, const ExtendMsPtrVe
   }
 }
 
-ProteoformPtr geneProteoform(FastaSeqPtr fasta_seq_ptr, ProtModPtr prot_mod_ptr, 
-                             int start_pos, int end_pos,
+ProteoformPtr geneProteoform(ProteoformPtr proteoform, int start_pos, int end_pos,
                              const ChangePtrVec &change_ptr_vec, const ModPtrVec & mod_ptr_vec) {
+
   ResSeqPtr new_res_seq = std::make_shared<ResidueSeq>(
       ResidueUtil::convertStrToResiduePtrVec(
-          fasta_seq_ptr->getSeq().substr(start_pos, end_pos - start_pos + 1), 
+          proteoform->getFastaSeqPtr()->getSeq().substr(start_pos, end_pos - start_pos + 1), 
           mod_ptr_vec));
-  return std::make_shared<Proteoform>(fasta_seq_ptr,
-                                      prot_mod_ptr, start_pos, end_pos, 
+
+  for (size_t i = 0; i < change_ptr_vec.size(); i++) {
+    int left = proteoform->getStartPos() + change_ptr_vec[i]->getLeftBpPos() - start_pos;
+    int right = proteoform->getStartPos() + change_ptr_vec[i]->getRightBpPos() - start_pos;
+    change_ptr_vec[i]->setLeftBpPos(left);
+    change_ptr_vec[i]->setRightBpPos(right);
+  }
+  return std::make_shared<Proteoform>(proteoform->getFastaSeqPtr(),
+                                      proteoform->getProtModPtr(), start_pos, end_pos, 
                                       new_res_seq, change_ptr_vec);
 }
 
@@ -312,8 +319,7 @@ void LocalUtil::onePtmTermAdjust(ProteoformPtr & proteoform, const ExtendMsPtrVe
       if (std::abs(mass) < MassConstant::getIsotopeMass() + err) {
         change_ptr->setMassShift(mass);
         fix_change_vec.push_back(change_ptr);
-        proteoform = geneProteoform(proteoform->getFastaSeqPtr(),
-                                    proteoform->getProtModPtr(), ori_start + i, ori_end + j, 
+        proteoform = geneProteoform(proteoform, ori_start + i, ori_end + j, 
                                     fix_change_vec, 
                                     mng_ptr_->prsm_para_ptr_->getFixModPtrVec());
         return;
@@ -328,8 +334,7 @@ void LocalUtil::onePtmTermAdjust(ProteoformPtr & proteoform, const ExtendMsPtrVe
       new_change_vec.insert(new_change_vec.end(), fix_change_vec.begin(), fix_change_vec.end());
       new_change_vec.push_back(change_ptr);
       std::sort(new_change_vec.begin(), new_change_vec.end(), Change::cmpPosInc);
-      proteoform = geneProteoform(proteoform->getFastaSeqPtr(),
-                                  proteoform->getProtModPtr(), ori_start + i, ori_end + j, 
+      proteoform = geneProteoform(proteoform, ori_start + i, ori_end + j, 
                                   new_change_vec, mng_ptr_->prsm_para_ptr_->getFixModPtrVec());
       double raw_scr;
       std::vector<double> scr_vec;
@@ -364,8 +369,7 @@ void LocalUtil::onePtmTermAdjust(ProteoformPtr & proteoform, const ExtendMsPtrVe
   new_change_vec.insert(new_change_vec.end(), fix_change_vec.begin(), fix_change_vec.end());
   new_change_vec.push_back(geneUnexpectedChange(change_ptr, mass));
   std::sort(new_change_vec.begin(), new_change_vec.end(), Change::cmpPosInc);
-  proteoform = geneProteoform(proteoform->getFastaSeqPtr(),
-                              proteoform->getProtModPtr(), ori_start + n_vec[idx], ori_end + c_vec[idx], 
+  proteoform = geneProteoform(proteoform, ori_start + n_vec[idx], ori_end + c_vec[idx], 
                               new_change_vec, mng_ptr_->prsm_para_ptr_->getFixModPtrVec());
 }
 
@@ -427,8 +431,7 @@ void LocalUtil::twoPtmTermAdjust(ProteoformPtr & proteoform, int num_match,
       new_change_vec.push_back(change_ptr1); new_change_vec.push_back(change_ptr2);
       std::sort(new_change_vec.begin(), new_change_vec.end(), Change::cmpPosInc);
 
-      proteoform = geneProteoform(proteoform->getFastaSeqPtr(),
-                                  proteoform->getProtModPtr(), ori_start + i, ori_end + j, 
+      proteoform = geneProteoform(proteoform, ori_start + i, ori_end + j, 
                                   new_change_vec, mng_ptr_->prsm_para_ptr_->getFixModPtrVec());
       double raw_scr;
       compTwoPtmScr(proteoform, num_match, extend_ms_ptr_vec, prec_mass, raw_scr, ptm_pair_vec);
@@ -467,8 +470,7 @@ void LocalUtil::twoPtmTermAdjust(ProteoformPtr & proteoform, int num_match,
   new_change_vec.push_back(geneUnexpectedChange(change_ptr1, mass1));
   new_change_vec.push_back(geneUnexpectedChange(change_ptr2, mass2));
   std::sort(new_change_vec.begin(), new_change_vec.end(), Change::cmpPosInc);
-  proteoform = geneProteoform(proteoform->getFastaSeqPtr(),
-                              proteoform->getProtModPtr(), ori_start + n_vec[idx], ori_end + c_vec[idx], 
+  proteoform = geneProteoform(proteoform, ori_start + n_vec[idx], ori_end + c_vec[idx], 
                               new_change_vec, mng_ptr_->prsm_para_ptr_->getFixModPtrVec());
 }
 
@@ -560,8 +562,7 @@ void LocalUtil::compTwoPtmScr(ProteoformPtr proteoform, int num_match,
   double mass2 = proteoform->getChangePtrVec(ChangeType::UNEXPECTED)[1]->getMassShift();
   std::vector<double> scr_vec;
   ProteoformPtr no_unexpected =
-      geneProteoform(proteoform->getFastaSeqPtr(),
-                     proteoform->getProtModPtr(), proteoform->getStartPos(),
+      geneProteoform(proteoform, proteoform->getStartPos(),
                      proteoform->getEndPos(),
                      getExpectedChangeVec(proteoform), mng_ptr_->prsm_para_ptr_->getFixModPtrVec());
 
@@ -734,8 +735,7 @@ void LocalUtil::compSplitPoint(ProteoformPtr & proteoform, int h, const ExtendMs
   int g = proteoform->getLen();
 
   ProteoformPtr no_unexpected =
-      geneProteoform(proteoform->getFastaSeqPtr(),
-                     proteoform->getProtModPtr(), proteoform->getStartPos(),
+      geneProteoform(proteoform, proteoform->getStartPos(),
                      proteoform->getEndPos(),
                      getExpectedChangeVec(proteoform), mng_ptr_->prsm_para_ptr_->getFixModPtrVec());
 

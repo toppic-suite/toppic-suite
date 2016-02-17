@@ -29,8 +29,8 @@ void translate(std::map<std::string,std::string> &arguments){
   std::string xml_file_list = xml_dir + FileUtil::getFileSeparator() + "files.xml";
   std::vector<std::vector<std::string>> anno_view = readViewXmlFiles(xml_file_list);
 
-  for(size_t i=0; i < anno_view.size(); i++) {
-    std::cout << std::flush << "Processing " << i << " of " << anno_view.size() << " files.\r";
+  for(size_t i = 0; i < anno_view.size(); i++) {
+    std::cout << std::flush << "Processing " << i + 1 << " of " << anno_view.size() << " files.\r";
     const char* xml_in = anno_view[i][0].c_str();
     const char* xsl_in = anno_view[i][1].c_str();
     const char* xml_out = anno_view[i][2].c_str();

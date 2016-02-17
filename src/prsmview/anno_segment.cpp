@@ -13,7 +13,7 @@ AnnoSegment::AnnoSegment(std::string segment_type, int left_pos, int right_pos,
 }
 
 void AnnoSegment::addOccurence(int pos, const std::string &acid_letter) {
-  std::pair<int, std::string> new_occurence(pos, acid_letter);
+  std::pair<int, std::string> new_occurence(pos + 1, acid_letter);
   occurences_.push_back(new_occurence);
 }
 
@@ -70,6 +70,7 @@ void AnnoSegment::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent,
   xml_doc->addElement(element, "unexpected_change_color", str.c_str());
   xml_doc->addElement(element, "segment_type", segment_type_.c_str());
   if (ptm_ptr_ != nullptr) {
+    xml_doc->addElement(element, "score", StringUtil::convertToString(std::accumulate(score_.begin(), score_.end(), 0.0)).c_str());
     ptm_ptr_->appendAbbrNameToXml(xml_doc, element);
   }
   xml_doc->addElement(element, "occurence", occu_.c_str());

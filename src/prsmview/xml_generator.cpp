@@ -23,7 +23,7 @@ void XmlGenerator::outputPrsms(const PrsmPtrVec &prsm_ptrs){
     std::string file_name = mng_ptr_->xml_path_+ FileUtil::getFileSeparator() + 
         "prsms" + FileUtil::getFileSeparator() + "prsm"+StringUtil::convertToString(prsm_ptrs[i]->getPrsmId())+".xml";
     XmlWriter writer(file_name,"");
-    std::cout << std::flush << "Processing " << i << " of " << prsm_ptrs.size() << " files.\r";
+    std::cout << std::flush << "Processing " << i + 1 << " of " << prsm_ptrs.size() << " files.\r";
     writer.write(geneAnnoPrsm(writer.getDoc(),prsm_ptrs[i], mng_ptr_));
     writer.close();
 
