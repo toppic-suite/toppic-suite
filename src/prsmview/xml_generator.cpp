@@ -19,10 +19,11 @@ XmlGenerator::XmlGenerator(PrsmParaPtr prsm_para_ptr,
 }
 
 void XmlGenerator::outputPrsms(const PrsmPtrVec &prsm_ptrs){
-  for(unsigned int i=0;i<prsm_ptrs.size();i++){
+  for(size_t i = 0; i < prsm_ptrs.size(); i++){
     std::string file_name = mng_ptr_->xml_path_+ FileUtil::getFileSeparator() + 
         "prsms" + FileUtil::getFileSeparator() + "prsm"+StringUtil::convertToString(prsm_ptrs[i]->getPrsmId())+".xml";
     XmlWriter writer(file_name,"");
+    std::cout << std::flush << "Processing " << i << " of " << prsm_ptrs.size() << " files.\r";
     writer.write(geneAnnoPrsm(writer.getDoc(),prsm_ptrs[i], mng_ptr_));
     writer.close();
 
@@ -35,10 +36,10 @@ void XmlGenerator::outputPrsms(const PrsmPtrVec &prsm_ptrs){
     file_info.push_back(mng_ptr_->html_path_+ FileUtil::getFileSeparator() + "prsms" + FileUtil::getFileSeparator() 
                         + "prsm"+ StringUtil::convertToString(prsm_ptrs[i]->getPrsmId())+".html");
     anno_view_ptr_->file_list_.push_back(file_info);
-
   }
-
+  std::cout << std::endl;
 }
+
 void XmlGenerator::outputAllPrsms(const PrsmPtrVec &prsm_ptrs){
   std::string file_name = mng_ptr_->xml_path_+ FileUtil::getFileSeparator() + "prsms.xml";
   XmlWriter writer(file_name,"prsm_list");

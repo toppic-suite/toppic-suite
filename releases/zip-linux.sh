@@ -4,11 +4,13 @@ if [ "$#" -ne 1 ];then
   exit 1
 fi
 
+rm -rf toppic-linux-${1}
 mkdir toppic-linux-${1}
+mkdir toppic-linux-${1}/example_files
 cp ../bin/toppic toppic-linux-${1} 
 cp ../LICENSE toppic-linux-${1}
-cp ../var_mods.txt toppic-linux-${1}
-cp ../fix_mods.txt toppic-linux-${1}
+cp ../var_mods.txt toppic-linux-${1}/example_files
+cp ../fix_mods.txt toppic-linux-${1}/example_files
 cp -r ../toppic_resources toppic-linux-${1}
 
 zip -r toppic-linux-${1}.zip toppic-linux-${1}
