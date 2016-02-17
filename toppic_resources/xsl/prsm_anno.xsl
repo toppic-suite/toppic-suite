@@ -1,53 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0">
 <xsl:output encoding="UTF-8" method="html" omit-xml-declaration="yes" indent="yes"/>
+
 <xsl:template match="residue">
-	<xsl:text disable-output-escaping="yes"><![CDATA[ style="]]></xsl:text>
-		<xsl:if test="residue_type = 'known_change'">
-		<xsl:text>font-weight:bold;color:red;</xsl:text>
-	</xsl:if>
-    <xsl:if test="residue_type = 'n_truncation'">
-		<xsl:text>color:grey;</xsl:text>
+  <xsl:text disable-output-escaping="yes"><![CDATA[ style="]]></xsl:text>
+  <xsl:if test="residue_type = 'known_change'">
+    <xsl:text>font-weight:bold;color:red;</xsl:text>
+  </xsl:if>
+  <xsl:if test="residue_type = 'n_truncation'">
+    <xsl:text>color:grey;</xsl:text>
+  </xsl:if>
+  <xsl:if test="residue_type = 'c_truncation'">
+    <xsl:text>color:grey;</xsl:text>
+  </xsl:if>
+  <xsl:if test="is_unexpected_change = '1'">
+    <xsl:if test="unexpected_change_color = 0">
+      <xsl:text>background:#DFFFFF;</xsl:text>
     </xsl:if>
-    <xsl:if test="residue_type = 'c_truncation'">
-		<xsl:text>color:grey;</xsl:text>
+    <xsl:if test="unexpected_change_color = 1">
+      <xsl:text>background:#CECEF6;</xsl:text>
     </xsl:if>
-	<xsl:if test="is_unexpected_change = '1'">
-		<xsl:if test="unexpected_change_color = 0">
-			<xsl:text>background:#DFFFFF;</xsl:text>
-        </xsl:if>
-        <xsl:if test="unexpected_change_color = 1">
-			<xsl:text>background:#CECEF6;</xsl:text>
-        </xsl:if>
+  </xsl:if>
+  <xsl:text disable-output-escaping="yes"><![CDATA[">]]></xsl:text>
+  <xsl:if test="is_unexpected_change = '1'">
+    <a style="text-decoration:none" href="#">
+    <xsl:attribute name="title">
+      <xsl:value-of select="anno" />
+    </xsl:attribute>
+    <xsl:if test="not(residue_type = 'known_change')">
+      <xsl:if test="possible_pos_color = 1">
+        <font color="red">
+          <xsl:value-of select="acid" />
+        </font>
+      </xsl:if>
+      <xsl:if test="possible_pos_color = 0">
+        <font color="black">
+          <xsl:value-of select="acid" />
+        </font>
+      </xsl:if>					
     </xsl:if>
-    <xsl:text disable-output-escaping="yes"><![CDATA[">]]></xsl:text>
-		<xsl:if test="is_unexpected_change = '1'">
-			<a style="text-decoration:none" href="#">
-				<xsl:attribute name="title">
-					<xsl:value-of select="anno" />
-				</xsl:attribute>
-				<xsl:if test="possible_pos_color = 1">
-					<font color="red">
-						<xsl:value-of select="acid" />
-					</font>
-				</xsl:if>
-				<xsl:if test="possible_pos_color = 0">
-					<font color="black">
-						<xsl:value-of select="acid" />
-					</font>
-				</xsl:if>
-			</a>
-		</xsl:if>
-		<xsl:if test="not(is_unexpected_change = '1')">
-			<xsl:value-of select="acid" />
-		</xsl:if>
-    <xsl:text disable-output-escaping="yes"><![CDATA[]]></xsl:text>
+    <xsl:if test="residue_type = 'known_change'">
+      <font color="red">
+        <xsl:value-of select="acid" />
+      </font>					
+    </xsl:if>
+    </a>
+  </xsl:if>
+  <xsl:if test="not(is_unexpected_change = '1')">
+    <xsl:value-of select="acid" />
+  </xsl:if>
+  <xsl:text disable-output-escaping="yes"><![CDATA[]]></xsl:text>
 </xsl:template>
 
 <xsl:template match="matched_peaks" mode="prsm">
-	<xsl:for-each select="matched_peak">
-		<xsl:value-of select="ion_position"/><xsl:text>,</xsl:text>
-    </xsl:for-each>
+  <xsl:for-each select="matched_peak">
+    <xsl:value-of select="ion_position"/><xsl:text>,</xsl:text>
+  </xsl:for-each>
 </xsl:template>
 
 <xsl:template match="matched_peaks" mode="title">
