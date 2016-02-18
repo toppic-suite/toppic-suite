@@ -30,30 +30,22 @@
 <div id="p{sequence_id}">
   <p style="font-size:16px;">
     <a href="proteins/protein{sequence_id}.html"><xsl:value-of select="sequence_name"/><xsl:text> </xsl:text>
-		<xsl:value-of select="sequence_description"/>
-  </a></p>
+      <xsl:value-of select="sequence_description"/>
+    </a>
+  </p>
 <xsl:apply-templates select="compatible_proteoform/prsm"></xsl:apply-templates>
 <br/>
 </div>
 </xsl:template>
 
-
-
 <xsl:template match="compatible_proteoform/prsm">
-<xsl:if test="position()=1">
-<xsl:choose>
-	<xsl:when test="count(../prsm) = 1">
-		<p style="font-size:16px;">There is only <a href="prsms/prsm{prsm_id}.html">1 PrSM</a> with an E-value <xsl:value-of select="e_value"/>.</p>
-	</xsl:when>
-    <xsl:otherwise>
-		<p style="font-size:16px;">The <a href="prsms/prsm{prsm_id}.html">best PrSM</a> has an E-value <xsl:value-of select="e_value"/>. There
-        <xsl:choose>
-			<xsl:when test="count(../../compatible_proteoform) = 1">is <a href="species/species{annotated_protein/species_id}.html">1 proteoform</a>.  </xsl:when>
-            <xsl:otherwise>are <xsl:value-of select="count(../../compatible_proteoform)"/> proteoforms.
-            </xsl:otherwise>
-        </xsl:choose></p>
-	</xsl:otherwise>
-</xsl:choose>
-</xsl:if>
+  <xsl:if test="position()=1">
+    <p style="font-size:16px;">The <a href="prsms/prsm{prsm_id}.html">best PrSM</a> has an E-value <xsl:value-of select="e_value"/>. There
+      <xsl:choose>
+        <xsl:when test="count(../../compatible_proteoform) = 1">is 1 proteoform.</xsl:when>
+        <xsl:otherwise>are <xsl:value-of select="count(../../compatible_proteoform)"/> proteoforms.
+        </xsl:otherwise>
+      </xsl:choose></p>
+  </xsl:if>
 </xsl:template>
 </xsl:stylesheet>
