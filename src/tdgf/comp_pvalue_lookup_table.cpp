@@ -170,8 +170,9 @@ bool CompPValueLookupTable::inTable(const DeconvMsPtrVec &deconv_ms_ptr_vec,
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     int match_frag_num = prsm_ptrs[i]->getMatchFragNum();
 
-    if (match_frag_num > 100)
-      return false;
+    if (match_frag_num > 100) return false;
+
+    if (match_frag_num <= 5) continue;
 
     std::vector<int> idx = getFourIndex(peak_num, match_frag_num);
 
@@ -193,7 +194,6 @@ bool CompPValueLookupTable::inTable(const DeconvMsPtrVec &deconv_ms_ptr_vec,
   }
 
   return true;
-
 }
 
 int getPeakIndex(int p) {
