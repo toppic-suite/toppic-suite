@@ -2,6 +2,7 @@
 #define PROT_LOCAL_ANNO_HPP_
 
 #include <vector>
+#include <algorithm>
 #include "base/ptm.hpp"
 #include "base/ptm_base.hpp"
 #include "base/xml_dom_document.hpp"
@@ -24,6 +25,8 @@ class LocalAnno {
   double getConf() {return conf_;}
   // get the score vector containing score for each site
   std::vector<double> getScrVec() {return scr_vec_;}
+
+  double getScr() {return std::accumulate(scr_vec_.begin(), scr_vec_.end(), 0.0);}
 
   PtmPtr getPtmPtr() {return ptm_ptr_;}
 
