@@ -40,6 +40,8 @@ void PrsmTableWriter::write(){
       << "Last_residue" << "\t"
       << "Peptide" << "\t"
       << "#unexpected_modifications" << "\t"
+      << "PTM1_MIScore" << "\t"
+      << "PTM2_MIScore" << "\t"
       << "#matched_peaks" << "\t"
       << "#matched_fragment_ions" << "\t"
       << "P-Value" << "\t"
@@ -87,10 +89,30 @@ void PrsmTableWriter::write(){
   file.close();
 }
 
+std::string outputChangePtr(ChangePtr change) {
+  if (change->getLocalAnno() != nullptr){
+    std::string res;
+    if (change->getLocalAnno()->getPtmPtr() != nullptr) {
+      res += change->getLocalAnno()->getPtmPtr()->getAbbrName() + ":";
+    } else {
+      res += "Unknown:";
+    }
+    double scr = change->getLocalAnno()->getScr() * 100;
+    if (scr > 99.99)  scr = 99.99;
+    std::stringstream ss;
+    ss << std::fixed << std::setprecision(2) << scr;
+    res += ss.str() + "%";
+    return res;
+  } else {
+    return "-";
+  }
+}
+
 void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   std::string spec_ids;
   std::string spec_activations;
   std::string spec_scans;
+  int ptm_num = prsm_ptr->getProteoformPtr()->getChangeNum(ChangeType::UNEXPECTED);
   int peak_num = 0;
   DeconvMsPtrVec deconv_ms_ptr_vec = prsm_ptr->getDeconvMsPtrVec();
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
@@ -105,22 +127,35 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
 
   file << std::setprecision(10);
   //LOG_DEBUG("prec mass " << prsm_ptrs[i]->getOriPrecMass());
-  file << prsm_para_ptr_->getSpectrumFileName() << "\t";
-  file << prsm_ptr->getPrsmId() << "\t"
+  file << prsm_para_ptr_->getSpectrumFileName() << "\t"
+      << prsm_ptr->getPrsmId() << "\t"
       << spec_ids << "\t"
       << spec_activations<< "\t"
       << spec_scans << "\t"
-      << peak_num << "\t";
-  file << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecCharge() << "\t"
+      << peak_num << "\t"
+      << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecCharge() << "\t"
       << prsm_ptr->getOriPrecMass()<< "\t"//"Precursor_mass"
       << prsm_ptr->getAdjustedPrecMass() << "\t"
-      << prsm_ptr->getProteoformPtr()->getSpeciesId() << "\t";
-  file << prsm_ptr->getProteoformPtr()->getSeqName() << " "
-      << prsm_ptr->getProteoformPtr()->getSeqDesc() << "\t";
-  file << prsm_ptr->getProteoformPtr()->getStartPos() << "\t"
-      << prsm_ptr->getProteoformPtr()->getEndPos() << "\t";
-  file << prsm_ptr->getProteoformPtr()->getProteinMatchSeq() << "\t";
-  file << prsm_ptr->getProteoformPtr()->getChangeNum(ChangeType::UNEXPECTED) << "\t";
+      << prsm_ptr->getProteoformPtr()->getSpeciesId() << "\t"
+      << prsm_ptr->getProteoformPtr()->getSeqName() << " "
+      << prsm_ptr->getProteoformPtr()->getSeqDesc() << "\t"
+      << prsm_ptr->getProteoformPtr()->getStartPos() << "\t"
+      << prsm_ptr->getProteoformPtr()->getEndPos() << "\t"
+      << prsm_ptr->getProteoformPtr()->getProteinMatchSeq() << "\t"
+      << ptm_num << "\t";
+
+  if (ptm_num == 0) {
+    file << "-\t-\t";
+  } else if (ptm_num == 1) {
+    ChangePtr change1 = prsm_ptr->getProteoformPtr()->getChangePtrVec(ChangeType::UNEXPECTED)[0];
+    file << outputChangePtr(change1) << "\t-\t"; 
+  } else {
+    ChangePtr change1 = prsm_ptr->getProteoformPtr()->getChangePtrVec(ChangeType::UNEXPECTED)[0];
+    ChangePtr change2 = prsm_ptr->getProteoformPtr()->getChangePtrVec(ChangeType::UNEXPECTED)[1];
+    file << outputChangePtr(change1) << "\t";
+    file << outputChangePtr(change2) << "\t";
+  }
+
   file << prsm_ptr->getMatchPeakNum() << "\t"
       << prsm_ptr->getMatchFragNum() << "\t"
       << prsm_ptr->getPValue() << "\t"
