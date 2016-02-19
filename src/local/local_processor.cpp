@@ -206,7 +206,16 @@ ProteoformPtr LocalProcessor::processOneKnown(const PrsmPtr & prsm) {
     ptm_vec = LocalUtil::getPtmPtrVecByMass(mass, prsm->getAdjustedPrecMass() * ppm_);
   }
   // even after adjusting N/C-termimals, still no explanation. return nullptr
-  if (ptm_vec.size() == 0) return nullptr;
+  if (ptm_vec.size() == 0) {
+    new_change_vec = getExpectedChangeVec(prsm->getProteoformPtr());
+    for (size_t i = 0; i < new_change_vec.size(); i++) {
+      int left = one_known_proteoform->getStartPos() + new_change_vec[i]->getLeftBpPos() - prsm->getProteoformPtr()->getStartPos();
+      int right = one_known_proteoform->getStartPos() + new_change_vec[i]->getRightBpPos() - prsm->getProteoformPtr()->getStartPos();
+      new_change_vec[i]->setLeftBpPos(left);
+      new_change_vec[i]->setRightBpPos(right);
+    }
+    return nullptr;
+  }
 
   double raw_scr;
   std::vector<double> scr_vec;
@@ -310,7 +319,16 @@ ProteoformPtr LocalProcessor::processTwoKnown(const PrsmPtr & prsm) {
     ptm_pair_vec = LocalUtil::getPtmPairVecByMass(mass1, mass2, prsm->getAdjustedPrecMass() * ppm_);
   }
 
-  if (ptm_pair_vec.size() == 0) return nullptr;
+  if (ptm_pair_vec.size() == 0) {
+    new_change_vec = getExpectedChangeVec(prsm->getProteoformPtr());
+    for (size_t i = 0; i < new_change_vec.size(); i++) {
+      int left = two_known_proteoform->getStartPos() + new_change_vec[i]->getLeftBpPos() - prsm->getProteoformPtr()->getStartPos();
+      int right = two_known_proteoform->getStartPos() + new_change_vec[i]->getRightBpPos() - prsm->getProteoformPtr()->getStartPos();
+      new_change_vec[i]->setLeftBpPos(left);
+      new_change_vec[i]->setRightBpPos(right);
+    }
+    return nullptr;
+  }
 
   double raw_scr;
   ExtendMsPtrVec extend_ms_ptr_vec = prsm->getRefineMsPtrVec();
