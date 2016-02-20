@@ -72,6 +72,21 @@ void LocalUtil::scr_filter(std::vector<double> & scr, int & bgn, int & end,
       }
     }
   }
+
+  for (int i = bgn; i <= end; i++) {
+    if (scr[i] != 0) {
+      bgn = i;
+      break;
+    }
+  }
+
+  for (int i = end; i >= bgn; i--) {
+    if (scr[i] != 0) {
+      end = i;
+      break;
+    }
+  }
+
   std::vector<double> scr2;
   scr2.insert(scr2.end(), scr.begin() + bgn, scr.begin() + end + 1);
   scr = scr2;

@@ -162,6 +162,12 @@ void LocalProcessor::processTwoPtm(PrsmPtr prsm) {
           prsm->setProteoformPtr(two_unknown_prsm);
       }
     }
+  } else {
+    if (two_unknown_prsm != nullptr) {
+      if (LocalUtil::compNumPeakIonPairs(two_unknown_prsm, prsm->getRefineMsPtrVec()) 
+          > ori_num_match_ion - DESC_MATCH_LIMIT)
+        prsm->setProteoformPtr(two_unknown_prsm);
+    }
   }
 }
 
