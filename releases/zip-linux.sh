@@ -9,7 +9,7 @@ mkdir toppic-linux-${1}
 mkdir toppic-linux-${1}/example_files
 cp ../bin/toppic toppic-linux-${1} 
 cp ../LICENSE toppic-linux-${1}
-cp ../var_mods.txt toppic-linux-${1}/example_files
+cp ../localization_mods.txt toppic-linux-${1}/example_files
 cp ../fix_mods.txt toppic-linux-${1}/example_files
 cp -r ../toppic_resources toppic-linux-${1}
 
