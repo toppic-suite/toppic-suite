@@ -46,46 +46,29 @@ std::vector<double> LocalUtil::normalize(const std::vector<double> & scr) {
 }
 
 void LocalUtil::scr_filter(std::vector<double> & scr, int & bgn, int & end,
-                           double & conf, double thread) {
+                           double & conf, double threshold) {
+  conf = 0.0;
   bgn = std::distance(scr.begin(), std::max_element(scr.begin(), scr.end()));
-  end = scr.size() - 1;
-  for (; end >= 0; end--) {
-    if (scr[bgn] == scr[end]) {
-      break;
-    }
-  }
-  conf = 0;
-  for (int i = bgn; i <= end; i++) { conf += scr[i];}
-  while (conf <= thread) {
-    if (bgn == 0) {
-      end++; conf += scr[end];
-    } else if (end == (int) scr.size() - 1) {
-      bgn--; conf += scr[bgn];
-    } else {
-      if (scr[bgn] == scr[end]) {
-        end++; conf += scr[end];
-        bgn--; conf += scr[bgn];
-      } else if (scr[bgn] > scr[end]) {
-        bgn--; conf += scr[bgn];
-      } else {
-        end++; conf += scr[end];
-      }
-    }
+  if (scr[bgn] < threshold) {
+    bgn = -1;
+    return;
   }
 
-  for (int i = bgn; i <= end; i++) {
-    if (scr[i] != 0) {
+  end = bgn;
+
+  for (int i = bgn; i >= 0; i--) {
+    if (scr[i] > threshold) {
       bgn = i;
-      break;
     }
   }
 
-  for (int i = end; i >= bgn; i--) {
-    if (scr[i] != 0) {
+  for (int i = end; i < (int)scr.size(); i++) {
+    if (scr[i] > threshold) {
       end = i;
-      break;
     }
   }
+
+  for (int i = bgn; i <= end; i++) { conf += scr[i];}
 
   std::vector<double> scr2;
   scr2.insert(scr2.end(), scr.begin() + bgn, scr.begin() + end + 1);
@@ -851,8 +834,13 @@ void LocalUtil::compSplitPoint(ProteoformPtr & proteoform, int h, const ExtendMs
   std::transform(ptm_scr.begin(), ptm_scr.end(), ptm_scr.begin(),
                  std::bind1st(std::multiplies<double>(), split_scr));
   scr_filter(ptm_scr, bgn, end, conf, mng_ptr_->threshold_);
-  LocalAnnoPtr anno1 = std::make_shared<LocalAnno>(bgn, end, conf, ptm_scr, 0, ptm1);
-  change_ptr1->setLocalAnno(anno1);
+  if (bgn == -1) {
+    change_ptr1->setLocalAnno(nullptr);
+  } else {
+    LocalAnnoPtr anno1 = std::make_shared<LocalAnno>(bgn, end, conf, ptm_scr, 0, ptm1);
+    change_ptr1->setLocalAnno(anno1);
+  }
+
   ptm_scr.clear();
   int len = proteoform->getLen();
   for (int i = split_point + 1; i < len; i++) {
@@ -869,8 +857,13 @@ void LocalUtil::compSplitPoint(ProteoformPtr & proteoform, int h, const ExtendMs
   std::transform(ptm_scr.begin(), ptm_scr.end(), ptm_scr.begin(),
                  std::bind1st(std::multiplies<double>(), split_scr));
   scr_filter(ptm_scr, bgn, end, conf, mng_ptr_->threshold_);
-  LocalAnnoPtr anno2 = std::make_shared<LocalAnno>(split_point + bgn, split_point + end, conf, ptm_scr, 0, ptm1);
-  change_ptr2->setLocalAnno(anno2);
+  if (bgn == -1) {
+    change_ptr2->setLocalAnno(nullptr);
+  } else {
+    LocalAnnoPtr anno2 = std::make_shared<LocalAnno>(split_point + bgn, split_point + end, conf, ptm_scr, 0, ptm2);
+    change_ptr2->setLocalAnno(anno2);
+  }
+
 }
 
 } // namespace prot

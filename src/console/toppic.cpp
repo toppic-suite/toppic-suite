@@ -191,8 +191,7 @@ int two_base_opt(int argc, char* argv[]) {
       selector->process();
       selector = nullptr;
       std::cout << "Top PRSM selecting finished." << std::endl;
-    }
-    else {
+    } else {
       std::cout << "Top PRSM selecting started " << std::endl;
       PrsmTopSelectorPtr selector = PrsmTopSelectorPtr(new PrsmTopSelector(db_file_name, sp_file_name, "EVALUE", "TOP_PRE", n_top));
       selector->process();
@@ -271,7 +270,7 @@ int two_base_opt(int argc, char* argv[]) {
       FileUtil::cleanDir(sp_file_name);
       FileUtil::cleanDir(db_file_name);   
       std::cout << "Deleting temporary files finished." << std::endl;
-    }  
+    }
 
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;

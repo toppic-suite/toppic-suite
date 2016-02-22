@@ -117,9 +117,6 @@ void LocalProcessor::processOnePtm(PrsmPtr prsm) {
     }
   }
 
-  if (LocalUtil::compNumPeakIonPairs(one_unknown_prsm, prsm->getRefineMsPtrVec()) 
-      > ori_num_match_ion - DESC_MATCH_LIMIT)
-    prsm->setProteoformPtr(one_unknown_prsm);
 }
 
 void LocalProcessor::processTwoPtm(PrsmPtr prsm) {
@@ -161,12 +158,6 @@ void LocalProcessor::processTwoPtm(PrsmPtr prsm) {
             > ori_num_match_ion - DESC_MATCH_LIMIT)
           prsm->setProteoformPtr(two_unknown_prsm);
       }
-    }
-  } else {
-    if (two_unknown_prsm != nullptr) {
-      if (LocalUtil::compNumPeakIonPairs(two_unknown_prsm, prsm->getRefineMsPtrVec()) 
-          > ori_num_match_ion - DESC_MATCH_LIMIT)
-        prsm->setProteoformPtr(two_unknown_prsm);
     }
   }
 }
@@ -235,6 +226,7 @@ ProteoformPtr LocalProcessor::processOneKnown(const PrsmPtr & prsm) {
   int bgn, end;
   double conf;
   LocalUtil::scr_filter(scr_vec, bgn, end, conf, threshold_);
+  if (bgn == -1) return nullptr;
   // it is known ptm, raw_scr * theta_; otherwise raw_scr * (1 - theta_)
   LocalAnnoPtr anno = std::make_shared<LocalAnno>(bgn, end, conf, scr_vec, raw_scr * theta_, ptm_vec[0]);
   one_known_proteoform->getChangePtrVec(ChangeType::UNEXPECTED)[0]->setLocalAnno(anno);
