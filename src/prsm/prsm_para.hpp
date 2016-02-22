@@ -24,6 +24,7 @@ class PrsmPara {
   const ModPtrVec& getFixModPtrVec() {return fix_mod_list_;}
   const ProtModPtrVec& getProtModPtrVec() {return prot_mod_list_;}
   SpParaPtr getSpParaPtr() {return sp_para_ptr_;}
+  bool doLocaliztion() {return localization_;}
 
  private:
   std::string search_db_file_name_;
@@ -36,6 +37,8 @@ class PrsmPara {
   ProtModPtrVec prot_mod_list_;
 
   int group_spec_num_;
+
+  bool localization_;
 
   /** spectrum parameters */
   SpParaPtr sp_para_ptr_;
