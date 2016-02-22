@@ -173,7 +173,6 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   if (ptm_num == 0) {
     file << "-\t";
   } else {
-    std::string fasta_seq = prsm_ptr->getProteoformPtr()->getFastaSeqPtr()->getSeq();
     file << outputChangePtr(prsm_ptr->getProteoformPtr()) << "\t";
   }
 
