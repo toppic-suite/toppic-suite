@@ -29,7 +29,7 @@ void Argument::initArguments() {
   arguments_["logFileName"] = "";
   arguments_["keepTempFiles"] = "false";
   arguments_["fullBinaryPath"] = "false";
-  arguments_["local_threshold"] = "0.9";
+  arguments_["local_threshold"] = "0.45";
   arguments_["groupSpectrumNumber"] = "1";
   arguments_["filteringResultNumber"] = "20";
   arguments_["residueModFileName"] = "";
@@ -183,7 +183,7 @@ bool Argument::parse(int argc, char* argv[]) {
          "Specify the number of spectra in a group."
          "In the multiple spectra mode, the parameter is set as 2 or 3 for spectral pairs or triplets generated from the alternating fragmentation mode. Default value: 1.")
         ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "PTM file for localization.")
-        ("local-threshold,s", po::value<std::string> (&local_threshold), "<positive double value>. Threshold value for reporting PTM localization. Default value: 0.9.");
+        ("local-threshold,s", po::value<std::string> (&local_threshold), "<positive double value>. Threshold value for reporting PTM localization. Default value: 0.45.");
     po::options_description desc("Options");
 
     desc.add_options() 
@@ -206,7 +206,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("log-file-name,l", po::value<std::string>(&log_file_name), "Log file name with its path.")
         ("keep-temp-files,k", "Keep temporary files.")
         ("generating-function,g", "Use generating function to calculate p-values and E-values.")
-        ("local-threshold,s", po::value<std::string> (&local_threshold), "<positive double value>. Threshold value for reporting PTM localization. Default value: 0.9.")
+        ("local-threshold,s", po::value<std::string> (&local_threshold), "<positive double value>. Threshold value for reporting PTM localization. Default value: 0.45.")
         ("full-binary-path,b", "Full binary path.")
         ("group-number,r", po::value<std::string> (&group_num), 
          "Specify the number of spectra in a group."

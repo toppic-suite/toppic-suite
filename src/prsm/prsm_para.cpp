@@ -47,6 +47,12 @@ PrsmPara::PrsmPara(std::map<std::string, std::string> &arguments) {
   int min_peak_num = 10;
   double min_mass = 50.0;
 
+  if (arguments["residueModFileName"] != "") {
+    localization_ = true;
+  } else {
+    localization_ = false;
+  }
+
   sp_para_ptr_ = SpParaPtr(new SpPara(min_peak_num, min_mass, extend_min_mass,
                                       ext_offsets, peak_tolerance_ptr, activation_ptr));
 
