@@ -348,9 +348,7 @@
             <xsl:value-of select="ptm/abbreviation" />
             <xsl:text>&#160;[</xsl:text>
             <xsl:value-of select="occurence" />
-            <xsl:text>] with MIScore: </xsl:text>
-            <xsl:value-of select="score" />
-            <xsl:text>%</xsl:text>
+            <xsl:text>]&#160;&#160;</xsl:text>
           </font>
           </xsl:element>
       </xsl:if>
@@ -360,9 +358,7 @@
             <font color="red">
               <xsl:text>Unknown [</xsl:text>
               <xsl:value-of select="occurence" />
-              <xsl:text>] with MIScore: </xsl:text>
-              <xsl:value-of select="score" />
-              <xsl:text>%</xsl:text>
+              <xsl:text>]</xsl:text>
             </font>
           </xsl:when>
           <xsl:otherwise>

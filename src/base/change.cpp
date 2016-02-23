@@ -84,8 +84,10 @@ ChangePtr Change::geneChangePtr(ChangePtr ori_ptr, int start_pos) {
 
 void Change::setLocalAnno(LocalAnnoPtr p) {
   local_anno_ptr_ = p;
-  left_bp_pos_ = p->getLeftBpPos();
-  right_bp_pos_ = p->getRightBpPos() + 1;
+  if (p != nullptr) {
+    left_bp_pos_ = p->getLeftBpPos();
+    right_bp_pos_ = p->getRightBpPos() + 1;
+  }
 }
 
 }

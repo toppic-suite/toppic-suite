@@ -29,38 +29,17 @@ std::string AnnoSegment::getResidueAnno() {
       if (score_[i] == 0)
         continue;
 
-      score_[i] = std::floor(score_[i] * 100);
+      score_[i] = std::floor(score_[i] * 10000) / 100;
 
       anno_ += "Site: " + occurences_[i].second + StringUtil::convertToString(occurences_[i].first) + " ";
       anno_ += "Confidence: " + StringUtil::convertToString(score_[i], 2) + "%\n";
+      occu_ += occurences_[i].second + StringUtil::convertToString(occurences_[i].first) 
+          + ":" + StringUtil::convertToString(score_[i], 2) + "%";
       if (i != occurences_.size() - 1) {
-        occu_ += occurences_[i].second + StringUtil::convertToString(occurences_[i].first);
-        occu_ += " / ";
-      } else {
-        occu_ += occurences_[i].second + StringUtil::convertToString(occurences_[i].first);
-      }
+        occu_ += "; ";
+      } 
     }
-  } /*else {*/
-  //anno_ += "PTM: Unknown\n";
-  //anno_ += "Site: " + occurences_[0].second + StringUtil::convertToString(occurences_[0].first);
-  //anno_ += " - ";
-  //anno_ += occurences_[occurences_.size() - 1].second;
-  //anno_ += StringUtil::convertToString(occurences_[occurences_.size() - 1].first) + " ";
-
-  //double tmp = std::accumulate(score_.begin(), score_.end(), 0.0);
-
-  //if (tmp > 0.9999) tmp = 0.9999;
-
-  //anno_ += "Confidence: " + StringUtil::convertToString(tmp * 100, 2) + "%";
-  //if (occurences_.size() > 1) {
-  //occu_ += occurences_[0].second + StringUtil::convertToString(occurences_[0].first);
-  //occu_ += " - ";
-  //occu_ += occurences_[occurences_.size() - 1].second;
-  //occu_ += StringUtil::convertToString(occurences_[occurences_.size() - 1].first);
-  //} else if (occurences_.size() == 1) {
-  //occu_ += occurences_[0].second + StringUtil::convertToString(occurences_[0].first);
-  //} 
-  /*}*/
+  }
   return anno_;
 }
 
@@ -76,11 +55,6 @@ void AnnoSegment::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent,
   str = StringUtil::convertToString(color_);
   xml_doc->addElement(element, "unexpected_change_color", str.c_str());
   xml_doc->addElement(element, "segment_type", segment_type_.c_str());
-  if (score_.size() > 0) {
-    double scr = std::accumulate(score_.begin(), score_.end(), 0.0);
-    if (scr > 0.9999) scr = 0.9999;
-    xml_doc->addElement(element, "score", StringUtil::convertToString(scr * 100, 2).c_str());
-  }
   if (ptm_ptr_ != nullptr) {
     ptm_ptr_->appendAbbrNameToXml(xml_doc, element);
   }
