@@ -107,12 +107,14 @@ void LocalProcessor::processOnePtm(PrsmPtr prsm) {
   ProteoformPtr two_known_prsm = processTwoKnown(prsm);
 
   if (two_known_prsm != nullptr) {
-    if (two_known_prsm->getChangePtrVec(ChangeType::UNEXPECTED)[0]->getLocalAnno()->getRawScr()
-        > one_unknown_prsm->getChangePtrVec(ChangeType::UNEXPECTED)[0]->getLocalAnno()->getRawScr()) {
-      if (LocalUtil::compNumPeakIonPairs(two_known_prsm, prsm->getRefineMsPtrVec()) 
-          > ori_num_match_ion - DESC_MATCH_LIMIT) {
-        prsm->setProteoformPtr(two_known_prsm);
-        return;
+    if (two_known_prsm->getChangePtrVec(ChangeType::UNEXPECTED)[0]->getLocalAnno() != nullptr) {
+      if (two_known_prsm->getChangePtrVec(ChangeType::UNEXPECTED)[0]->getLocalAnno()->getRawScr()
+          > one_unknown_prsm->getChangePtrVec(ChangeType::UNEXPECTED)[0]->getLocalAnno()->getRawScr()) {
+        if (LocalUtil::compNumPeakIonPairs(two_known_prsm, prsm->getRefineMsPtrVec()) 
+            > ori_num_match_ion - DESC_MATCH_LIMIT) {
+          prsm->setProteoformPtr(two_known_prsm);
+          return;
+        }
       }
     }
   }
