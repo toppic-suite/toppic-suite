@@ -231,7 +231,7 @@ function showIonPeaks(ids) {
     <xsl:variable name="variable_ptm_num" select="count(unexpected_change/ptm)"/>
     <xsl:if test="$variable_ptm_num &gt; 0">
       <br/>
-      <xsl:text>&#160;&#160;&#160;&#160;&#160;Variable PTMs: </xsl:text> 
+      <xsl:text>&#160;&#160;&#160;&#160;&#160;Localized PTMs: </xsl:text> 
       <xsl:apply-templates select="unexpected_change[ptm]"/>
       <br/>
     </xsl:if>
