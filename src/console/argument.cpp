@@ -166,7 +166,7 @@ bool Argument::parse(int argc, char* argv[]) {
     display_desc.add_options() 
         ("help,h", "Print the help message.") 
         ("activation,a", po::value<std::string>(&activation),
-         "<CID|HCD|ETD|FILE>. Activation type of tandem mass spectra. When FILE is used, the activation type information is given in the input spectral data file. Default value: FILE.")
+         "<CID|HCD|ETD|UVPD|FILE>. Activation type of tandem mass spectra. When FILE is used, the activation type information is given in the input spectral data file. Default value: FILE.")
         ("fixed-mod,f", po::value<std::string> (&fixed_mod), 
          "Fixed modifications: C57: Carbamidoemetylation, C58:Carboxymethylation, or a fixed modification file name.")
         ("n-termimal-ptm,n", po::value<std::string> (&allow_mod), 
@@ -189,7 +189,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("help,h", "Print the help message.") 
         ("argument-file,c",po::value<std::string>(&argument_file_name),"Argument file name.")
         ("activation,a", po::value<std::string>(&activation),
-         "<CID|HCD|ETD|FILE>. Activation type of tandem mass spectra. When FILE is used, the activation type information is given in spectral data file. Default value: FILE.")
+         "<CID|HCD|ETD|UVPD|FILE>. Activation type of tandem mass spectra. When FILE is used, the activation type information is given in spectral data file. Default value: FILE.")
         ("fixed-mod,f", po::value<std::string> (&fixed_mod), 
          "Fixed modifications: C57: Carbamidoemetylation, C58:Carboxymethylation, or a fixed modification file name.")
         ("n-termimal-ptm,n", po::value<std::string> (&allow_mod), 
@@ -328,8 +328,8 @@ bool Argument::validateArguments() {
   }
   std::string activation = arguments_["activation"];
   if(activation != "CID" && activation != "HCD" 
-     && activation != "ETD" && activation != "FILE") {
-    LOG_ERROR("Activation type " << activation << " error! The value should be CID|HCD|ETD|FILE!");
+     && activation != "ETD" && activation != "FILE" && activation != "UVPD") {
+    LOG_ERROR("Activation type " << activation << " error! The value should be CID|HCD|ETD|UVPD|FILE!");
     return false;
   }
 

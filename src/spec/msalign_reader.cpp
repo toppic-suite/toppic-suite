@@ -7,10 +7,11 @@
 
 namespace prot {
 
-MsAlignReader::MsAlignReader (const std::string &file_name, 
-                              int group_spec_num): 
+MsAlignReader::MsAlignReader(const std::string &file_name, 
+                             int group_spec_num, ActivationPtr act_ptr): 
     file_name_(file_name),
-    group_spec_num_(group_spec_num) {
+    group_spec_num_(group_spec_num),
+    activation_ptr_(act_ptr) {
       input_.open(file_name.c_str(), std::ios::in);
     }
 
@@ -21,17 +22,14 @@ std::vector<std::string> MsAlignReader::readOneSpectrum() {
     line = StringUtil::trim(line);
     if (line ==  "BEGIN IONS") {
       line_list.push_back(line);
-    }
-    else if (line == "END IONS") {
+    } else if (line == "END IONS") {
       if (line_list.size() != 0) {
         line_list.push_back(line);
       }
       return line_list;
-    }
-    else if (line == "") {
+    } else if (line == "") {
       continue;
-    }
-    else {
+    } else {
       if (line_list.size() > 0) {
         line_list.push_back(line);
       }
@@ -63,25 +61,20 @@ void MsAlignReader::readNext() {
       if (strs[0] == "ID") {
         id = std::stoi(strs[1]);
       }
+
       if (strs[0] == "PRECURSOR_ID") {
         prec_id = std::stoi(strs[1]);
-      }
-      else if (strs[0] == "SCANS") {
+      } else if (strs[0] == "SCANS") {
         scans = strs[1];
-      }
-      else if (strs[0] == "ACTIVATION") {
+      } else if (strs[0] == "ACTIVATION") {
         activation = strs[1];
-      }
-      else if (strs[0] == "TITLE") {
+      } else if (strs[0] == "TITLE") {
         title = strs[1];
-      }
-      else if (strs[0] == "LEVEL") {
+      } else if (strs[0] == "LEVEL") {
         level = std::stoi(strs[1]);
-      }
-      else if (strs[0] == "PRECURSOR_MASS") {
+      } else if (strs[0] == "PRECURSOR_MASS") {
         prec_mass = std::stod(strs[1]);
-      }
-      else if (strs[0] == "PRECURSOR_CHARGE") {
+      } else if (strs[0] == "PRECURSOR_CHARGE") {
         prec_charge = std::stoi(strs[1]);
       }
     }
@@ -98,10 +91,10 @@ void MsAlignReader::readNext() {
   header_ptr->setPrecId(prec_id);
   if (scans != "") {
     header_ptr->setScans(scans);
-  }
-  else {
+  } else {
     header_ptr->setScans("");
   }
+
   if (title != "") {
     std::stringstream ss;
     ss << "sp_" << id;
@@ -109,7 +102,10 @@ void MsAlignReader::readNext() {
   } else {
     header_ptr->setTitle(title);
   }
-  if (activation != "") {
+
+  if (activation_ptr_ != nullptr) {
+    header_ptr->setActivationPtr(activation_ptr_);
+  } else if (activation != "") {
     ActivationPtr activation_ptr = 
         ActivationBase::getActivationPtrByName(activation);
     header_ptr->setActivationPtr(activation_ptr);
@@ -117,7 +113,7 @@ void MsAlignReader::readNext() {
   header_ptr->setMsLevel(level);
 
   header_ptr->setPrecMonoMz(prec_mass /prec_charge
-                       + MassConstant::getProtonMass());
+                            + MassConstant::getProtonMass());
   header_ptr->setPrecCharge(prec_charge);
 
   std::vector<DeconvPeakPtr> peak_ptr_list;
@@ -167,7 +163,7 @@ SpectrumSetPtr MsAlignReader::getNextSpectrumSet(SpParaPtr sp_para_ptr) {
   //LOG_DEBUG("prec mass result " << prec_mono_mass);
   return SpectrumSetPtr(new SpectrumSet(deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass));
 }
-    
+
 void MsAlignReader::close() {
   input_.close();
 }

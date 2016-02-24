@@ -14,7 +14,8 @@ namespace prot {
 
 class MsAlignReader {
  public:
-  MsAlignReader(const std::string &file_name, int group_spec_num);
+  MsAlignReader(const std::string &file_name, int group_spec_num, 
+                ActivationPtr activation_ptr);
 
   std::vector<std::string> readOneSpectrum();
 
@@ -32,7 +33,7 @@ class MsAlignReader {
   std::ifstream input_;
   std::vector<std::string> spectrum_str_vec_;
   int current_ = 0;
-
+  ActivationPtr activation_ptr_;
   DeconvMsPtr deconv_ms_ptr_ = DeconvMsPtr(nullptr);
 
 };

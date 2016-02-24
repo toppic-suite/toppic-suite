@@ -4,7 +4,7 @@
 namespace prot {
 
 int MsAlignUtil::countSpNum(const std::string &spectrum_file_name) {
-  MsAlignReader reader(spectrum_file_name, 1);
+  MsAlignReader reader(spectrum_file_name, 1, nullptr);
   int cnt = 0;
   DeconvMsPtr deconv_ms_ptr;
   while ((deconv_ms_ptr = reader.getNextMs()) != nullptr) {
