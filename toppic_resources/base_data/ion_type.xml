@@ -20,6 +20,17 @@
 	<n_term>false</n_term>
 	<shift>1.9919</shift>
 </ion_type>
+
+<ion_type>
+	<name>A</name>
+	<n_term>true</n_term>
+	<shift>-26.9871</shift>
+</ion_type>
+<ion_type>
+	<name>X</name>
+	<n_term>false</n_term>
+	<shift>44.9977</shift>
+</ion_type>
 <ion_type>
 	<name>PREC</name>
 	<n_term>false</n_term>
