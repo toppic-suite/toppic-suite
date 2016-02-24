@@ -19,6 +19,8 @@ class FastaReader {
   // name and sequence. 
   FastaSeqPtr getNextSeq();
 
+  void close();
+
  private:
   std::ifstream input_;
   std::string ori_name_;

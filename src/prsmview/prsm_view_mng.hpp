@@ -19,6 +19,8 @@ class PrsmViewMng {
   int decimal_point_num_ = 2;
   int precise_point_num_ = 4;
   double min_mass_;
+  size_t cnt_;
+  size_t num_files_;
 };
 
 typedef std::shared_ptr<PrsmViewMng> PrsmViewMngPtr;
@@ -31,6 +33,7 @@ inline PrsmViewMng::PrsmViewMng(PrsmParaPtr prsm_para_ptr, std::string exec_dir)
   html_path_ = FileUtil::basename(spectrum_file_name) + "_html";
   executive_dir_ = exec_dir;
   min_mass_ = prsm_para_ptr_->getSpParaPtr()->getMinMass();
+  cnt_ = 0;
 }
 
 } /* namespace prot */

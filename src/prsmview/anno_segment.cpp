@@ -29,12 +29,12 @@ std::string AnnoSegment::getResidueAnno() {
       if (score_[i] == 0)
         continue;
 
-      score_[i] = std::floor(score_[i] * 10000) / 100;
+      score_[i] = std::floor(score_[i] * 1000) / 10;
 
       anno_ += "Site: " + occurences_[i].second + StringUtil::convertToString(occurences_[i].first) + " ";
-      anno_ += "Confidence: " + StringUtil::convertToString(score_[i], 2) + "%\n";
+      anno_ += "Confidence: " + StringUtil::convertToString(score_[i], 1) + "%\n";
       occu_ += occurences_[i].second + StringUtil::convertToString(occurences_[i].first) 
-          + ":" + StringUtil::convertToString(score_[i], 2) + "%";
+          + ":" + StringUtil::convertToString(score_[i], 1) + "%";
       if (i != occurences_.size() - 1) {
         occu_ += "; ";
       } 

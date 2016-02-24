@@ -25,6 +25,7 @@ class FastaUtil {
                            const std::string &db_file_name, 
                            bool decoy, int block_size);
 
+  static int countProteinNum(const std::string &fasta_file);
 };
 
 }  //namepace prot
