@@ -180,8 +180,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("cutoff-value,v", po::value<std::string> (&cutoff_value), "<positive number>. Cutoff value for reporting protein-spectrum-matches. Default value: 0.01.")
         ("generating-function,g", "Use the generating function approach to calculate p-values and E-values.")
         ("group-number,r", po::value<std::string> (&group_num), 
-         "Specify the number of spectra in a group."
-         "In the multiple spectra mode, the parameter is set as 2 or 3 for spectral pairs or triplets generated from the alternating fragmentation mode. Default value: 1.")
+         "Specify the number of spectra in a group. In the multiple spectra mode, the parameter is set as 2 or 3 for spectral pairs or triplets generated from the alternating fragmentation mode. Default value: 1.")
         ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "PTM file for localization.")
         ("local-threshold,s", po::value<std::string> (&local_threshold), "<positive double value>. Threshold value for reporting PTM localization. Default value: 0.45.");
     po::options_description desc("Options");
@@ -209,8 +208,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("local-threshold,s", po::value<std::string> (&local_threshold), "<positive double value>. Threshold value for reporting PTM localization. Default value: 0.45.")
         ("full-binary-path,b", "Full binary path.")
         ("group-number,r", po::value<std::string> (&group_num), 
-         "Specify the number of spectra in a group."
-         "In the multiple spectra mode, the parameter is set as 2 or 3 for spectral pairs or triplets generated from the alternating fragmentation mode. Default value: 1.")
+         "Specify the number of spectra in a group. In the multiple spectra mode, the parameter is set as 2 or 3 for spectral pairs or triplets generated from the alternating fragmentation mode. Default value: 1.")
         ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name with its path.")
         ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "PTM file for localization.")
         ("spectrum-file-name", po::value<std::string>(&spectrum_file_name)->required(), "Spectrum file name with its path.");
