@@ -12,7 +12,7 @@ FastaReader::FastaReader(const std::string &file_name) {
   std::getline(input_, ori_name_);
 
   while(ori_name_.length() <= 1){
-	  std::getline(input_, ori_name_);
+    std::getline(input_, ori_name_);
   }  
 
 }
@@ -41,6 +41,10 @@ FastaSeqPtr FastaReader::getNextSeq() {
   }
   input_.close();
   return FastaSeqPtr(new FastaSeq(prot_name, ori_seq));
+}
+
+void FastaReader::close() {
+  input_.close();
 }
 
 }

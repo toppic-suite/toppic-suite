@@ -123,6 +123,8 @@ xercesc::DOMElement* allProteinToXml(XmlDOMDocument* xml_doc,
   std::vector<std::pair<FastaSeqPtr, double>> seq_evalues;
 
   while (seq_ptr != nullptr) {
+    mng_ptr->cnt_++;
+    std::cout << std::flush << "Processing " << mng_ptr->cnt_ << " of " << mng_ptr->num_files_ << " files.\r";
     std::string seq_name = seq_ptr->getName();
     PrsmPtr best_ptr = getBestEValuePrsmPtr (seq_name, prsm_ptrs);
     if (best_ptr != nullptr) {

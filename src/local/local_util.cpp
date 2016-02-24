@@ -59,12 +59,16 @@ void LocalUtil::scr_filter(std::vector<double> & scr, int & bgn, int & end,
   for (int i = bgn; i >= 0; i--) {
     if (scr[i] > threshold) {
       bgn = i;
+    } else {
+      scr[i] = 0;
     }
   }
 
   for (int i = end; i < (int)scr.size(); i++) {
     if (scr[i] > threshold) {
       end = i;
+    } else {
+      scr[i] = 0;
     }
   }
 

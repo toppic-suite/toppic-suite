@@ -2,6 +2,7 @@
 
 #include "base/file_util.hpp"
 #include "base/fasta_reader.hpp"
+#include "base/fasta_util.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_util.hpp"
 #include "prsm/prsm_species.hpp"
@@ -20,10 +21,11 @@ XmlGenerator::XmlGenerator(PrsmParaPtr prsm_para_ptr,
 
 void XmlGenerator::outputPrsms(const PrsmPtrVec &prsm_ptrs){
   for(size_t i = 0; i < prsm_ptrs.size(); i++){
+    mng_ptr_->cnt_++;
     std::string file_name = mng_ptr_->xml_path_+ FileUtil::getFileSeparator() + 
         "prsms" + FileUtil::getFileSeparator() + "prsm"+StringUtil::convertToString(prsm_ptrs[i]->getPrsmId())+".xml";
     XmlWriter writer(file_name,"");
-    std::cout << std::flush << "Processing " << i + 1 << " of " << prsm_ptrs.size() << " files.\r";
+    std::cout << std::flush << "Processing " << mng_ptr_->cnt_ << " of " << mng_ptr_->num_files_ << " files.\r";
     writer.write(geneAnnoPrsm(writer.getDoc(),prsm_ptrs[i], mng_ptr_));
     writer.close();
 
@@ -37,16 +39,18 @@ void XmlGenerator::outputPrsms(const PrsmPtrVec &prsm_ptrs){
                         + "prsm"+ StringUtil::convertToString(prsm_ptrs[i]->getPrsmId())+".html");
     anno_view_ptr_->file_list_.push_back(file_info);
   }
-  std::cout << std::endl;
 }
 
 void XmlGenerator::outputAllPrsms(const PrsmPtrVec &prsm_ptrs){
   std::string file_name = mng_ptr_->xml_path_+ FileUtil::getFileSeparator() + "prsms.xml";
   XmlWriter writer(file_name,"prsm_list");
   for(unsigned int i=0;i<prsm_ptrs.size();i++){
+    mng_ptr_->cnt_++;
+    std::cout << std::flush << "Processing " << mng_ptr_->cnt_ << " of " << mng_ptr_->num_files_ << " files.\r";
     writer.write(geneAnnoPrsm(writer.getDoc(),prsm_ptrs[i], mng_ptr_));
     writer.close();
   }
+  std::cout << std::endl;
 }
 
 void XmlGenerator::outputProteoforms(const PrsmPtrVec &prsm_ptrs){
@@ -54,6 +58,8 @@ void XmlGenerator::outputProteoforms(const PrsmPtrVec &prsm_ptrs){
   std::vector<int> species_ids = PrsmUtil::getSpeciesIds(prsm_ptrs);
   LOG_DEBUG("species id size " << species_ids.size());
   for(unsigned int i=0;i<species_ids.size();i++){
+    mng_ptr_->cnt_++;
+    std::cout << std::flush << "Processing " << mng_ptr_->cnt_ << " of " << mng_ptr_->num_files_ << " files.\r";
     PrsmPtrVec select_prsm_ptrs = PrsmUtil::selectSpeciesPrsms(prsm_ptrs,species_ids[i]);
     if(select_prsm_ptrs.size()>0){
       std::string file_name = mng_ptr_->xml_path_+ FileUtil::getFileSeparator() + "proteoforms" 
@@ -80,7 +86,9 @@ void XmlGenerator::outputProteins(const PrsmPtrVec &prsm_ptrs){
   FastaReader reader(mng_ptr_->prsm_para_ptr_->getSearchDbFileName());
   FastaSeqPtr seq_ptr = reader.getNextSeq();
 
-  while (seq_ptr != nullptr) { 
+  while (seq_ptr != nullptr) {
+    mng_ptr_->cnt_++;
+    std::cout << std::flush << "Processing " << mng_ptr_->cnt_ << " of " << mng_ptr_->num_files_ << " files.\r";
     std::string seq_name = seq_ptr->getName();
     int prot_id = PrsmUtil::getProteinId(prsm_ptrs, seq_name);
     std::vector<int> species = PrsmUtil::getSpeciesIds(prsm_ptrs,seq_name);
@@ -108,7 +116,7 @@ void XmlGenerator::outputAllProteins(const PrsmPtrVec &prsm_ptrs){
 
   std::string file_name = mng_ptr_->xml_path_+ FileUtil::getFileSeparator() +"proteins.xml";
   XmlWriter writer(file_name,"protein_list");
-  writer.write(allProteinToXml(writer.getDoc(),prsm_ptrs, mng_ptr_));
+  writer.write(allProteinToXml(writer.getDoc(), prsm_ptrs, mng_ptr_));
   writer.close();
   std::vector<std::string> file_info;
   file_info.push_back(file_name);
@@ -145,6 +153,9 @@ void XmlGenerator::process(){
   LOG_DEBUG("spectrum added");
 
   std::sort(prsm_ptrs.begin(), prsm_ptrs.end(), Prsm::cmpEValueInc); 
+
+  mng_ptr_->num_files_ = prsm_ptrs.size() * 2 + PrsmUtil::getSpeciesIds(prsm_ptrs).size() +
+      FastaUtil::countProteinNum(mng_ptr_->prsm_para_ptr_->getSearchDbFileName()) * 2;
 
   outputPrsms(prsm_ptrs);
   outputProteoforms(prsm_ptrs);

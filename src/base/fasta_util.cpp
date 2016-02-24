@@ -84,7 +84,7 @@ void generateDbBlock(const std::string &db_file_name,
   index_output.close();
   block_output.close();
 }
-  
+
 
 void FastaUtil::dbPreprocess(const std::string &ori_db_file_name, 
                              const std::string &db_file_name, 
@@ -104,6 +104,16 @@ void FastaUtil::dbPreprocess(const std::string &ori_db_file_name,
   }
   generateDbBlock(db_file_name, block_size);
   fai_build(db_file_name.c_str());
+}
+
+int FastaUtil::countProteinNum(const std::string &fasta_file) {
+  FastaReader reader(fasta_file);
+  int cnt = 0;
+  while (reader.getNextSeq() != nullptr) {
+    cnt++;
+  }
+  reader.close();
+  return cnt;
 }
 
 }

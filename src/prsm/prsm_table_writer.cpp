@@ -108,14 +108,14 @@ std::string outputChangePtr(ProteoformPtr proteoform_ptr) {
       res = res + change_vec[i]->getLocalAnno()->getPtmPtr()->getAbbrName() + "[";
       for (int j = left_db_bp; j < right_db_bp; j++) {
         std::string acid_letter = fasta_seq.substr(j, 1);
-        double scr = std::floor(scr_vec[j - left_db_bp] * 10000);
-        scr = scr / 100;
+        double scr = std::floor(scr_vec[j - left_db_bp] * 1000);
+        scr = scr / 10;
         if (scr == 0)
           continue;
 
         res = res + acid_letter + std::to_string(j + 1) + ":";
         std::stringstream ss;
-        ss << std::fixed << std::setprecision(2) << scr;
+        ss << std::fixed << std::setprecision(1) << scr;
         res  = res + ss.str() + "%";
         if (j != right_db_bp - 1) {
           res = res + "; ";
@@ -170,11 +170,13 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
       << prsm_ptr->getProteoformPtr()->getProteinMatchSeq() << "\t"
       << ptm_num << "\t";
 
-  if (ptm_num == 0) {
-    file << "-\t";
-  } else {
-    file << outputChangePtr(prsm_ptr->getProteoformPtr()) << "\t";
-  }
+  if (prsm_para_ptr_->doLocaliztion()) {
+    if (ptm_num == 0) {
+      file << "-\t";
+    } else {
+      file << outputChangePtr(prsm_ptr->getProteoformPtr()) << "\t";
+    }
+  } 
 
   file << prsm_ptr->getMatchPeakNum() << "\t"
       << prsm_ptr->getMatchFragNum() << "\t"
