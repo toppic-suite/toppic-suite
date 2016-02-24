@@ -165,8 +165,8 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
       << prsm_ptr->getProteoformPtr()->getSpeciesId() << "\t"
       << prsm_ptr->getProteoformPtr()->getSeqName() << " "
       << prsm_ptr->getProteoformPtr()->getSeqDesc() << "\t"
-      << prsm_ptr->getProteoformPtr()->getStartPos() << "\t"
-      << prsm_ptr->getProteoformPtr()->getEndPos() << "\t"
+      << (prsm_ptr->getProteoformPtr()->getStartPos() + 1) << "\t"
+      << (prsm_ptr->getProteoformPtr()->getEndPos() + 1) << "\t"
       << prsm_ptr->getProteoformPtr()->getProteinMatchSeq() << "\t"
       << ptm_num << "\t";
 
