@@ -40,7 +40,8 @@ void LocalProcessor::process() {
   ModPtrVec fix_mod_list = mng_ptr_->prsm_para_ptr_->getFixModPtrVec();
   PrsmPtr prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_list);
   int group_spec_num = mng_ptr_->prsm_para_ptr_->getGroupSpecNum();
-  MsAlignReader sp_reader(spec_file_name, group_spec_num);
+  MsAlignReader sp_reader(spec_file_name, group_spec_num,
+                          mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getActivationPtr());
   SpectrumSetPtr spec_set_ptr;
   SpParaPtr sp_para_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr();
 

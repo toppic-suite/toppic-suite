@@ -67,7 +67,9 @@ void ZeroPtmFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_
 
   int group_spec_num = mng_ptr_->prsm_para_ptr_->getGroupSpecNum();
   SpParaPtr sp_para_ptr =  mng_ptr_->prsm_para_ptr_->getSpParaPtr();
-  MsAlignReader reader(prsm_para_ptr->getSpectrumFileName(), group_spec_num);
+  MsAlignReader reader(prsm_para_ptr->getSpectrumFileName(),
+                       group_spec_num,
+                       prsm_para_ptr->getSpParaPtr()->getActivationPtr());
   std::string output_file_name = FileUtil::basename(prsm_para_ptr->getSpectrumFileName())
       + "." + mng_ptr_->output_file_ext_;
   std::string block_str = std::to_string(block_ptr->getBlockIdx());

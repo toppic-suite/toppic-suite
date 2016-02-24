@@ -95,7 +95,8 @@ void ZeroPtmSearch::process(ZeroPtmSearchMngPtr mng_ptr){
   ModPtrVec fix_mod_ptr_vec = prsm_para_ptr->getFixModPtrVec();
 
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
-  MsAlignReader sp_reader(sp_file_name, group_spec_num);
+  MsAlignReader sp_reader(sp_file_name, group_spec_num,
+                          sp_para_ptr->getActivationPtr());
   int cnt = 0;
   SpectrumSetPtr spec_set_ptr;
   //LOG_DEBUG("Start search");

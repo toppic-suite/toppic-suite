@@ -76,7 +76,8 @@ void PtmSearchProcessor::process(){
   ModPtrVec fix_mod_ptr_vec = prsm_para_ptr->getFixModPtrVec();
 
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
-  MsAlignReader sp_reader(sp_file_name, group_spec_num);
+  MsAlignReader sp_reader(sp_file_name, group_spec_num,
+                          sp_para_ptr->getActivationPtr());
   int cnt = 0;
   SpectrumSetPtr spec_set_ptr;
   //LOG_DEBUG("Start search");
@@ -95,7 +96,7 @@ void PtmSearchProcessor::process(){
     }
     std::cout << std::flush <<  "PTM search is processing " << cnt 
         << " of " << spectrum_num << " spectra.\r";
-    
+
     WebLog::percentLog(cnt, spectrum_num, WebLog::TwoPtmSearchTime());
   }
   LOG_DEBUG("Search completed");
@@ -123,7 +124,7 @@ inline void seleTopPrsms(const PrsmPtrVec &all_prsm_ptrs,
 
 
 void PtmSearchProcessor::processOneSpectrum(SpectrumSetPtr spectrum_set_ptr, 
-                                      SimplePrsmPtrVec ori_simple_prsm_ptrs) {
+                                            SimplePrsmPtrVec ori_simple_prsm_ptrs) {
 
   SimplePrsmPtrVec simple_prsm_ptrs = SimplePrsmUtil::getUniqueMatches(ori_simple_prsm_ptrs);
   PtmSearchSlowFilterPtr slow_filter_ptr = PtmSearchSlowFilterPtr(

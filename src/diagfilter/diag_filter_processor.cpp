@@ -51,7 +51,9 @@ void DiagFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num
 
   int group_spec_num = mng_ptr_->prsm_para_ptr_->getGroupSpecNum();
   SpParaPtr sp_para_ptr =  mng_ptr_->prsm_para_ptr_->getSpParaPtr();
-  MsAlignReader reader(prsm_para_ptr->getSpectrumFileName(), group_spec_num);
+  MsAlignReader reader(prsm_para_ptr->getSpectrumFileName(),
+                       group_spec_num,
+                       sp_para_ptr->getActivationPtr());
 
   std::string output_file_name = FileUtil::basename(prsm_para_ptr->getSpectrumFileName())
       + "." + mng_ptr_->output_file_ext_+"_"+ std::to_string(block_ptr->getBlockIdx());

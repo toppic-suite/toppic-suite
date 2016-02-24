@@ -62,7 +62,8 @@ void EValueProcessor::process(bool is_separate) {
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
   double ppo = sp_para_ptr->getPeakTolerancePtr()->getPpo();
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
-  MsAlignReader sp_reader(spectrum_file_name, group_spec_num);
+  MsAlignReader sp_reader(spectrum_file_name, group_spec_num,
+                          sp_para_ptr->getActivationPtr());
   int cnt = 0;
   SpectrumSetPtr spec_set_ptr;
 
