@@ -26,8 +26,9 @@ std::string AnnoSegment::getResidueAnno() {
   if (ptm_ptr_ != nullptr) {
     anno_ += "PTM: " + ptm_ptr_->getName() + "\n";
     for (size_t i = 0; i < occurences_.size(); i++) {
-      if (score_[i] == 0)
-        continue;
+      if (score_[i] == 1) score_[i] = 0.999;
+
+      if (score_[i] == 0) continue;
 
       score_[i] = std::floor(score_[i] * 1000) / 10;
 

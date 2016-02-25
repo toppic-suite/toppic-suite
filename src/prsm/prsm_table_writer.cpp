@@ -108,10 +108,9 @@ std::string outputChangePtr(ProteoformPtr proteoform_ptr) {
       res = res + change_vec[i]->getLocalAnno()->getPtmPtr()->getAbbrName() + "[";
       for (int j = left_db_bp; j < right_db_bp; j++) {
         std::string acid_letter = fasta_seq.substr(j, 1);
-        double scr = std::floor(scr_vec[j - left_db_bp] * 1000);
-        scr = scr / 10;
-        if (scr == 0)
-          continue;
+        double scr = std::floor(scr_vec[j - left_db_bp] * 1000) / 10;
+        if (scr == 100) scr = 99.9;
+        if (scr == 0) continue;
 
         res = res + acid_letter + std::to_string(j + 1) + ":";
         std::stringstream ss;
