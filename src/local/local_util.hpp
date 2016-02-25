@@ -94,7 +94,11 @@ inline ChangePtrVec getExpectedChangeVec(ProteoformPtr proteoform) {
   ChangePtrVec res;
   for (size_t i = 0; i < proteoform->getChangePtrVec().size(); i++) {
     if (proteoform->getChangePtrVec()[i]->getChangeTypePtr() != ChangeType::UNEXPECTED) {
-      res.push_back(proteoform->getChangePtrVec()[i]);
+      ChangePtr tmp = proteoform->getChangePtrVec()[i];
+      res.push_back(std::make_shared<Change>(tmp->getLeftBpPos(), 
+                                             tmp->getRightBpPos(), 
+                                             tmp->getChangeTypePtr(), tmp->getMassShift(), 
+                                             tmp->getModPtr()));
     }
   }
   return res;
