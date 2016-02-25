@@ -37,6 +37,30 @@
   <mono_mass>31.989829</mono_mass>
 </ptm>
 <ptm>
+  <name>Cysteinylation</name>
+  <abbreviation>Cysteinyl</abbreviation>
+  <unimod>312</unimod>
+  <mono_mass>119.004099</mono_mass>
+</ptm>
+<ptm>
+  <name>Biotinylation</name>
+  <abbreviation>Biotin</abbreviation>
+  <unimod>3</unimod>
+  <mono_mass>226.077598</mono_mass>
+</ptm>
+<ptm>
+  <name>di-Methylation</name>
+  <abbreviation>Dimethyl</abbreviation>
+  <unimod>36</unimod>
+  <mono_mass>28.031300</mono_mass>
+</ptm>
+<ptm>
+  <name>tri-Methylation</name>
+  <abbreviation>Trimethyl</abbreviation>
+  <unimod>37</unimod>
+  <mono_mass>42.046950</mono_mass>
+</ptm>
+<ptm>
   <name>Gamma-carboxyglutamic acid</name>
   <abbreviation>carboxylation</abbreviation>
   <unimod>299</unimod>
