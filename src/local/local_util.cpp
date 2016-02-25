@@ -485,6 +485,11 @@ void LocalUtil::readPtmTxt(const std::string &file_name) {
     line = StringUtil::rmComment(line);
     std::vector<std::string> l = StringUtil::split(line, ',');
     PtmPtr p = PtmBase::getPtmPtrByAbbrName(l[0]);
+
+    if (p == nullptr) {
+      p = std::make_shared<Ptm>(l[0], l[0], std::stod(l[1]), std::stoi(l[4]), "", "", "");
+    }
+
     var_ptm_list_.push_back(p);
   }
 

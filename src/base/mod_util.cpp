@@ -51,6 +51,10 @@ std::vector<ModPtrVec> ModUtil::readModTxt(const std::string &file_name) {
 
       PtmPtr p = PtmBase::getPtmPtrByAbbrName(l[0]);
 
+      if (p == nullptr) {
+        p = std::make_shared<Ptm>(l[0], l[0], std::stod(l[1]), std::stoi(l[4]), "", "", "");
+      }
+
       for (size_t i = 0; i < l[2].length(); i++) {
         AcidPtr a = AcidBase::getAcidPtrByOneLetter(l[2].substr(i, 1));
         ResiduePtr ori_residue_ptr = ResidueBase::getBaseResiduePtr(std::make_shared<Residue>(a, PtmBase::getEmptyPtmPtr()));
