@@ -33,6 +33,9 @@ class PtmBase {
    * abbreviation name does not exist.
    */
   static PtmPtr getPtmPtrByAbbrName(const std::string &abbr_name);
+
+  static PtmPtr getPtmPtr(PtmPtr p);
+
   /**
    * Checks if the list contains an amino acid with the specific name.
    */
