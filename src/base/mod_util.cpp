@@ -49,11 +49,9 @@ std::vector<ModPtrVec> ModUtil::readModTxt(const std::string &file_name) {
 
       if (l[2] == "*") l[2] = "ARNDCEQGHILKMFPSTWYV";
 
-      PtmPtr p = PtmBase::getPtmPtrByAbbrName(l[0]);
+      PtmPtr p = std::make_shared<Ptm>(l[0], l[0], std::stod(l[1]), std::stoi(l[4]), "", "", "");
 
-      if (p == nullptr) {
-        p = std::make_shared<Ptm>(l[0], l[0], std::stod(l[1]), std::stoi(l[4]), "", "", "");
-      }
+      p = PtmBase::getPtmPtr(p);
 
       for (size_t i = 0; i < l[2].length(); i++) {
         AcidPtr a = AcidBase::getAcidPtrByOneLetter(l[2].substr(i, 1));

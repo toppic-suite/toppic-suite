@@ -69,6 +69,16 @@ PtmPtr PtmBase::getPtmPtrByAbbrName(const std::string &abbr_name) {
   return PtmPtr(nullptr);
 }
 
+PtmPtr PtmBase::getPtmPtr(PtmPtr p) {
+  for (size_t i = 0; i < ptm_ptr_vec_.size(); i++) {
+    if (ptm_ptr_vec_[i]->isSame(p)) {
+      return ptm_ptr_vec_[i];
+    }
+  }
+  ptm_ptr_vec_.push_back(p);
+  return p;
+}
+
 // Checks if the list contains an amino acid with the specific name.
 bool PtmBase::containsAbbrName(const std::string &abbr_name) {
   return getPtmPtrByAbbrName(abbr_name).get() != nullptr;
