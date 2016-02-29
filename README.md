@@ -33,3 +33,12 @@ cd build
 cmake -G "MinGW Makefiles" ..
 mingw32-make
 ```
+
+On some Linux distributions, you might meet the problem "Could not loading a transcoding service".
+To fix this, please add following lines into your `.bashrc`.
+
+```sh
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+export LANGUAGE=en_US.UTF-8
+ ```
