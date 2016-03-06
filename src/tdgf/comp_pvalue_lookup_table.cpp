@@ -138,9 +138,11 @@ void CompPValueLookupTable::process(const DeconvMsPtrVec &deconv_ms_ptr_vec, Prs
 
     double prot_prob = 1.0;
 
-    if (match_frag_num < 5) {
+    if (match_frag_num <= 5) {
       prot_prob = 1.0;
     } else {
+      if (match_frag_num >= 100) match_frag_num = 100;
+
       prot_prob = compProb(peak_num, match_frag_num, unexpected_shift_num);
     }
 
@@ -152,7 +154,6 @@ void CompPValueLookupTable::process(const DeconvMsPtrVec &deconv_ms_ptr_vec, Prs
     ExtremeValuePtr ev_ptr(new ExtremeValue(prot_prob, cand_num, 1));
 
     prsm_ptrs[i]->setExtremeValuePtr(ev_ptr);
-
   }
 }
 
@@ -170,9 +171,7 @@ bool CompPValueLookupTable::inTable(const DeconvMsPtrVec &deconv_ms_ptr_vec,
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     int match_frag_num = prsm_ptrs[i]->getMatchFragNum();
 
-    if (match_frag_num > 100) return false;
-
-    if (match_frag_num <= 5) continue;
+    if (match_frag_num <= 5 || match_frag_num >= 100) continue;
 
     std::vector<int> idx = getFourIndex(peak_num, match_frag_num);
 
