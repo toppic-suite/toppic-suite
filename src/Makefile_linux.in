@@ -47,6 +47,6 @@ ARGUMENT_OBJS = $(addprefix $(OBJ_DIR)/, argument.o)
 
 LOCAL_OBJS = $(addprefix $(OBJ_DIR)/, local_anno.o local_processor.o local_util.o)
 
-GRAPH_OBJS = $(addprefix $(OBJ_DIR)/, graph_util.o proteo_graph.o proteo_anno.o proteo_graph_reader.o spec_graph.o spec_graph_reader.o)
+GRAPH_OBJS = $(addprefix $(OBJ_DIR)/, dist.o graph_util.o proteo_graph.o proteo_anno.o proteo_graph_reader.o spec_graph.o spec_graph_reader.o)
 
 GRAPH_ALIGN_OBJS = $(addprefix $(OBJ_DIR)/, graph_align_processor.o graph_align.o graph_dp_node.o)

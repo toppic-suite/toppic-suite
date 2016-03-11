@@ -21,8 +21,8 @@ all:
 	cd prsmview; make	
 	cd local; make
 	cd console; make
-#	cd graph; make
-#	cd graphalign; make
+	cd graph; make
+	cd graphalign; make
 	cd test; make
 
 clean:

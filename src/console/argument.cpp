@@ -17,7 +17,11 @@ void Argument::initArguments() {
   arguments_["activation"] = "FILE";
   arguments_["searchType"] = "TARGET";
   arguments_["fixedMod"] = "";
+#ifdef TOPPIC
   arguments_["ptmNumber"] = "1";
+#else
+  arguments_["ptmNumber"] = "0";
+#endif
   arguments_["errorTolerance"] = "15";
   arguments_["cutoffType"] = "EVALUE";
   arguments_["cutoffValue"] = "0.01";
@@ -33,6 +37,7 @@ void Argument::initArguments() {
   arguments_["groupSpectrumNumber"] = "1";
   arguments_["filteringResultNumber"] = "20";
   arguments_["residueModFileName"] = "";
+  arguments_["proteo_graph_dis"] = "20";
 }
 
 void Argument::outputArguments(std::ostream &output, 
@@ -63,6 +68,7 @@ void Argument::outputArguments(std::ostream &output,
     output << std::setw(40) << std::left << "Residue modification file name: " << arguments["residueModFileName"] << std::endl;
     output << std::setw(40) << std::left << "MIScore threshold: " << arguments["local_threshold"] << std::endl;
   }
+  output << std::setw(40) << std::left << "Gap in proteoform graph: " << arguments["proteo_graph_dis"] << std::endl;
   output << std::setw(40) << std::left << "Executive file directory is: " << arguments["executiveDir"] << std::endl;
   output << "********************** Parameters **********************" << std::endl;
   output << std::endl;
@@ -131,6 +137,7 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string local_threshold = "";
   std::string filtering_result_num = "";
   std::string residue_mod_file_name = "";
+  std::string proteo_graph_dis = "";
 
   /** Define and parse the program options*/
   try {
@@ -156,7 +163,8 @@ bool Argument::parse(int argc, char* argv[]) {
         ("group-number,r", po::value<std::string> (&group_num), 
          "Specify the number of spectra in a group. In the multiple spectra mode, the parameter is set as 2 or 3 for spectral pairs or triplets generated from the alternating fragmentation mode. Default value: 1.")
         ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "PTM file for localization.")
-        ("local-threshold,s", po::value<std::string> (&local_threshold), "<positive double value>. Threshold value for reporting PTM localization. Default value: 0.45.");
+        ("local-threshold,s", po::value<std::string> (&local_threshold), "<positive double value>. Threshold value for reporting PTM localization. Default value: 0.45.")
+        ("proteo-graph-dis,j", po::value<std::string> (&proteo_graph_dis), "<positive number>. Gap in constructing proteoform graph. Default value: 20.");
     po::options_description desc("Options");
 
     desc.add_options() 
@@ -185,7 +193,8 @@ bool Argument::parse(int argc, char* argv[]) {
          "Specify the number of spectra in a group. In the multiple spectra mode, the parameter is set as 2 or 3 for spectral pairs or triplets generated from the alternating fragmentation mode. Default value: 1.")
         ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name with its path.")
         ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "PTM file for localization.")
-        ("spectrum-file-name", po::value<std::string>(&spectrum_file_name)->required(), "Spectrum file name with its path.");
+        ("spectrum-file-name", po::value<std::string>(&spectrum_file_name)->required(), "Spectrum file name with its path.")
+        ("proteo-graph-dis,j", po::value<std::string> (&proteo_graph_dis), "<positive number>. Gap in constructing proteoform graph. Default value: 20.");
 
     po::positional_options_description positional_options;
     positional_options.add("database-file-name", 1);
@@ -280,6 +289,9 @@ bool Argument::parse(int argc, char* argv[]) {
     }
     if (vm.count("mod-file-name")) {
       arguments_["residueModFileName"] = residue_mod_file_name;
+    }
+    if (vm.count("proteo-graph-dis")) {
+      arguments_["proteo_graph_dis"] = proteo_graph_dis;
     }
   }
   catch(std::exception&e ) {

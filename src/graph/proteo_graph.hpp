@@ -10,8 +10,10 @@ namespace prot {
 
 class ProteoGraph {
  public:
-  ProteoGraph(FastaSeqPtr seq_ptr, ModPtrVec fix_mod_ptr_vec, MassGraphPtr graph_ptr, 
-              bool is_nme, double convert_ratio, int max_mod_num, int max_ptm_sum_mass);
+  ProteoGraph(FastaSeqPtr seq_ptr, ModPtrVec fix_mod_ptr_vec,
+              MassGraphPtr graph_ptr, bool is_nme, 
+              double convert_ratio, int max_mod_num,
+              int max_ptm_sum_mass, int proteo_graph_gap);
 
   int getVecIndex(int v1, int v2);
   int getSeqMass(int v1, int v2);
@@ -30,6 +32,8 @@ class ProteoGraph {
   std::vector<int> seq_masses_;
   MassGraphPtr graph_ptr_;
   bool is_nme_;
+
+  int proteo_graph_gap_;
 
   DistVec2D dist_vec_;
 

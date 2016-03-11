@@ -45,30 +45,31 @@ file(GLOB POISSON_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/poisson/*.cpp)
 file(GLOB TDGF_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/tdgf/*.cpp)
 file(GLOB PRSM_VIEW_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/prsmview/*.cpp)
 file(GLOB LOCAL_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/local/*.cpp)
+file(GLOB LOCAL_ANNO   ${CMAKE_CURRENT_SOURCE_DIR}/src/local/local_anno.cpp)
 file(GLOB TAG_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/tagfinder/*.cpp)
 file(GLOB ARGU_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/argument.cpp)
 file(GLOB MAIN_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic.cpp) 
-#file(GLOB SUMMARY_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/summary.cpp) 
 file(GLOB GRAPH_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/graph/*.cpp)
 file(GLOB GRAPH_ALIGN_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/graphalign/*.cpp)
+file(GLOB GRAPH_MAIN ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_graph_align.cpp)
+
 file(GLOB TEST_ZERO_PTM_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_zero_ptm.cpp) 
 file(GLOB TEST_DIAG_FILTER_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_diag_filter.cpp) 
 file(GLOB TEST_PTM_SEARCH_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_ptm_search.cpp) 
 file(GLOB TEST_EVALUE_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_evalue.cpp) 
 file(GLOB TEST_PRSM_VIEW_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_prsm_view.cpp) 
-file(GLOB TEST_GRAPH_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_graph_align.cpp) 
 file(GLOB TEST_BSE_OPT ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_base_opt.cpp) 
 file(GLOB TEST_TAG ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_tag_finder.cpp)
-file(GLOB TEST_GRAPH_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_graph_align.cpp) 
+file(GLOB TEST_GRAPH ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_graph_align.cpp) 
 
 add_executable(toppic ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
     ${ZERO_PTM_SRCS} ${ZERO_PTM_FILTER} ${DIAG_FILTER_SRCS} ${ONE_PTM_FILTER_SRCS} ${ONE_PTM_SEARCH_SRCS}
     ${PTM_SRCS} ${TDGF_SRCS} ${LOCAL_SRCS} ${PRSM_VIEW_SRCS} ${ARGU_SRCS} ${MAIN_SRCS})
+set_target_properties(toppic PROPERTIES COMPILE_FLAGS "-DTOPPIC")
 
-#add_executable(test_tag ${BASE_SRCS} ${LOCAL_SRCS} ${SPEC_SRCS} ${PRSM_SRCS} ${ARGU_SRCS} ${TAG_SRCS} ${TEST_TAG})
-
-#add_executable(test_graph ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
-#    ${GRAPH_SRCS} ${GRAPH_ALIGN_SRCS} ${ARGU_SRCS} ${LOCAL_SRCS} ${ONE_PTM_SEARCH_SRCS} ${TEST_GRAPH_SRCS})
+add_executable(toppic_graph ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
+    ${GRAPH_SRCS} ${GRAPH_ALIGN_SRCS} ${ARGU_SRCS} ${LOCAL_ANNO} ${ONE_PTM_SEARCH_SRCS} ${GRAPH_MAIN})
+set_target_properties(toppic_graph PROPERTIES COMPILE_FLAGS "-DMASS_GRAPH")
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     # Windows specific code
@@ -81,13 +82,10 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     # Linux specific code
 
     target_link_libraries(toppic xalan-c xalanMsg xerces-c boost_program_options
-        boost_filesystem boost_system boost_date_time hts pthread z)
+        boost_filesystem boost_system hts pthread z)
 
-#    target_link_libraries(test_tag xalan-c xalanMsg xerces-c boost_program_options
-#        boost_filesystem boost_system boost_date_time hts pthread z)
-
-#    target_link_libraries(test_graph xalan-c xalanMsg xerces-c boost_program_options
-#        boost_filesystem boost_system boost_date_time hts pthread z)
+    target_link_libraries(toppic_graph xalan-c xalanMsg xerces-c boost_program_options
+        boost_filesystem boost_system hts pthread z)
 
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
 

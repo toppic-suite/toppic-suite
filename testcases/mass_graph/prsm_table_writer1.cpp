@@ -29,39 +29,38 @@ void PrsmTableWriter::write(){
   std::string output_file_name = base_name + "." + output_file_ext_;
   std::ofstream file; 
   file.open(output_file_name.c_str());
-  time_t ctt = time(0);
-  file << "Time: ";
-  file << asctime(localtime(&ctt)) << std::endl;
-  Argument::outputArguments(file, arguments_);
-  //write title
-  file << "Data_file_name" << "\t"
-      << "Prsm_ID" << "\t"
-      << "Spectrum_ID"<< "\t"
-      << "Activation_type" << "\t"
-      << "Scan(s)" << "\t"
-      << "#peaks"<< "\t"
-      << "Charge" << "\t"
-      << "Precursor_mass" << "\t"
-      << "Adjusted_precursor_mass" << "\t"
-      << "Species_ID" << "\t"
-      << "Protein_name" << "\t"
-      << "First_residue" << "\t"
-      << "Last_residue" << "\t"
-      << "Peptide" << "\t"
-      << "#unexpected_modifications" << "\t";
+  /*time_t ctt = time(0);*/
+  //file << "Time: ";
+  //file << asctime(localtime(&ctt)) << std::endl;
+  //Argument::outputArguments(file, arguments_);
+  ////write title
+  //file << "Data_file_name" << "\t"
+      //<< "Prsm_ID" << "\t"
+      //<< "Spectrum_ID"<< "\t"
+      //<< "Activation_type" << "\t"
+      //<< "Scan(s)" << "\t"
+      //<< "#peaks"<< "\t"
+      //<< "Charge" << "\t"
+      //<< "Precursor_mass" << "\t"
+      //<< "Adjusted_precursor_mass" << "\t"
+      //<< "Species_ID" << "\t"
+      //<< "Protein_name" << "\t"
+      //<< "First_residue" << "\t"
+      //<< "Last_residue" << "\t"
+      //<< "Peptide" << "\t"
+      //<< "#unexpected_modifications" << "\t";
 
-  if (prsm_para_ptr_->doLocaliztion()) {
-    file << "MIScore" << "\t";
-  }
+  //if (prsm_para_ptr_->doLocaliztion()) {
+    //file << "MIScore" << "\t";
+  //}
 
-  file << "#matched_peaks" << "\t"
-      << "#matched_fragment_ions" << "\t"
-      << "P-Value" << "\t"
-      << "E-Value" << "\t"
-      << "One_Protein_probabilty"<< "\t"
-      << "FDR" << "\t"
-      << "#variable PTMs" << "\t"
-      << std::endl;
+  //file << "#matched_peaks" << "\t"
+      //<< "#matched_fragment_ions" << "\t"
+      //<< "P-Value" << "\t"
+      //<< "E-Value" << "\t"
+      //<< "One_Protein_probabilty"<< "\t"
+      //<< "FDR" << "\t"
+      /*<< std::endl;*/
 
   std::string input_file_name 
       = FileUtil::basename(spectrum_file_name) + "." + input_file_ext_;
@@ -179,6 +178,41 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
       << (prsm_ptr->getProteoformPtr()->getEndPos() + 1) << "\t"
       << prsm_ptr->getProteoformPtr()->getProteinMatchSeq() << "\t"
       << ptm_num << "\t";
+  
+  bool result = true;
+
+  std::string seq = prsm_ptr->getProteoformPtr()->getFastaSeqPtr()->getSeq();
+  std::cout << "seq " << seq << std::endl;
+
+  std::cout << "seq len " << seq.length() << std::endl;
+
+  std::cout << "start " << prsm_ptr->getProteoformPtr()->getStartPos()
+      << " end " << prsm_ptr->getProteoformPtr()->getEndPos() << std::endl;
+  std::cout << "#ptm " 
+      << prsm_ptr->getProteoformPtr()->getChangePtrVec().size() << std::endl;
+
+  ChangePtrVec change_vec = prsm_ptr->getProteoformPtr()->getChangePtrVec();
+
+  for (size_t i = 0; i < change_vec.size(); i++) {
+    int left = change_vec[i]->getLeftBpPos();
+    int right = change_vec[i]->getRightBpPos();
+    std::cout << "Change " << i << " " << seq.substr(left, right - left) << std::endl;
+  }
+
+  if (prsm_ptr->getProteoformPtr()->getStartPos() != 0) {
+    result = false;
+  } else if (prsm_ptr->getProteoformPtr()->getEndPos() != (int)seq.length() - 1) {
+    result = false;
+  } else if (prsm_ptr->getProteoformPtr()->getChangePtrVec().size() != 1) {
+    result = false;
+  } else {
+    result = false;
+    int left = change_vec[0]->getLeftBpPos();
+    int right = change_vec[0]->getRightBpPos();
+    for (int i = left; i < right; i++) {
+      if (seq.substr(i, 1) == "Z") result = true;
+    } 
+  }
 
   if (prsm_para_ptr_->doLocaliztion()) {
     if (ptm_num == 0) {
@@ -193,9 +227,11 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
       << prsm_ptr->getPValue() << "\t"
       << prsm_ptr->getEValue() << "\t"
       << prsm_ptr->getOneProtProb()<< "\t"
-      << prsm_ptr->getFdr() << "\t"
-      << prsm_ptr->getProteoformPtr()->getVariablePtmNum() << "\t"
-      << std::endl;
+      << prsm_ptr->getFdr() << "\t";
+  if (result)
+    file << "1" << std::endl;
+  else
+    file << "0" << std::endl;
 }
 
 } /* namespace prot */

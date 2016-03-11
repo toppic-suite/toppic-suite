@@ -13,12 +13,13 @@ namespace prot {
 ProteoGraph::ProteoGraph(FastaSeqPtr fasta_seq_ptr, ModPtrVec fix_mod_ptr_vec,
                          MassGraphPtr graph_ptr, bool is_nme,
                          double convert_ratio, int max_mod_num,
-                         int max_ptm_sum_mass) {
+                         int max_ptm_sum_mass, int proteo_graph_gap) {
   db_proteo_ptr_ = ProteoformFactory::geneDbProteoformPtr(fasta_seq_ptr, fix_mod_ptr_vec);
   graph_ptr_ = graph_ptr;
   is_nme_ = is_nme;
   node_num_ = num_vertices(*graph_ptr.get());
   LOG_DEBUG("node num " << node_num_);
+  proteo_graph_gap_ = proteo_graph_gap; 
   pair_num_ = node_num_ * (node_num_ + 1) /2;
   compSeqMasses(convert_ratio);
   compDistances(convert_ratio, max_mod_num, max_ptm_sum_mass);
@@ -110,10 +111,10 @@ void ProteoGraph::compDistances(double convert_ratio, int max_mod_num, int max_p
   }
 
   for (int k = 0; k < max_mod_num + 1; k++) {
-    addToDistVec(graph_ptr_, dist_vecs, node_num_, k, dist_vec_[k]);
+    addToDistVec(graph_ptr_, dist_vecs, node_num_, k, dist_vec_[k], proteo_graph_gap_);
   }
-  
-  std::cout << "compDistances time: " << t.elapsed() << std::endl;
+
+  LOG_DEBUG("compDistances time: " << t.elapsed());
 }
 
 }
