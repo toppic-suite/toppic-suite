@@ -76,7 +76,7 @@ int two_ptm_process(int argc, char* argv[]) {
       use_gf = true;
     }
     // initialize log file 
-  	WebLog::init(log_file_name, use_gf, ptm_num);
+  	//WebLog::init(log_file_name, use_gf, ptm_num);
     LOG_DEBUG("web log inited");
 
     PrsmParaPtr prsm_para_ptr = PrsmParaPtr(new PrsmPara(arguments));

@@ -35,63 +35,37 @@ void Argument::initArguments() {
   arguments_["residueModFileName"] = "";
 }
 
-void Argument::outputArguments(std::ofstream &output) {
-  output << std::endl;
-  output << "2. Parameters" << std::endl;
-  output << "Protein database file: " << arguments_["oriDatabaseFileName"] << std::endl;
-  output << "Spectrum file: " << arguments_["spectrumFileName"] << std::endl;
-  output << "Number of spectra in a group: " << arguments_["groupSpectrumNumber"] << std::endl;
-  output << "Activation type: " << arguments_["activation"] << std::endl;
-  output << "Search type: " << arguments_["searchType"] << std::endl;
-  output << "fixed modifications: " << arguments_["fixedMod"] << std::endl;
-  output << "Maximum number of unexpected PTMs: " << arguments_["ptmNumber"] << std::endl;
-  output << "Error tolerance: " << arguments_["errorTolerance"] << " ppm" << std::endl;
-  output << "Cutoff type: " << arguments_["cutoffType"] << std::endl;
-  output << "Cutoff value: " << arguments_["cutoffValue"] << std::endl;
-  output << "Allowed N-terminal modifications: " << arguments_["allowProtMod"] << std::endl;
-  output << "Maximum PTM mass: " << arguments_["maxPtmMass"] << " Da" << std::endl;
+void Argument::outputArguments(std::ostream &output, 
+                               std::map<std::string, std::string> arguments) {
+  output << "********************** Parameters **********************" << std::endl;
+  output << std::setw(40) << std::left << "Protein database file: " << arguments["oriDatabaseFileName"] << std::endl;
+  output << std::setw(40) << std::left << "Spectrum file: " << arguments["spectrumFileName"] << std::endl;
+  output << std::setw(40) << std::left << "Number of spectra in a group: " << arguments["groupSpectrumNumber"] << std::endl;
+  output << std::setw(40) << std::left << "Activation type: " << arguments["activation"] << std::endl;
+  output << std::setw(40) << std::left << "Search type: " << arguments["searchType"] << std::endl;
+  output << std::setw(40) << std::left << "Fixed modifications: " << arguments["fixedMod"] << std::endl;
+  output << std::setw(40) << std::left << "Maximum number of unexpected PTMs: " << arguments["ptmNumber"] << std::endl;
+  output << std::setw(40) << std::left << "Error tolerance: " << arguments["errorTolerance"] << " ppm" << std::endl;
+  output << std::setw(40) << std::left << "Cutoff type: " << arguments["cutoffType"] << std::endl;
+  output << std::setw(40) << std::left << "Cutoff value: " << arguments["cutoffValue"] << std::endl;
+  output << std::setw(40) << std::left << "Allowed N-terminal modifications: " << arguments["allowProtMod"] << std::endl;
+  output << std::setw(40) << std::left << "Maximum PTM mass: " << arguments["maxPtmMass"] << " Da" << std::endl;
 
-  if (arguments_["useGf"] == "true") {
-    output << "E-value computation: Generation function" << std::endl;
-  } else {
-    output << "E-value computation: Lookup table" << std::endl;
-  }
-
-  if (arguments_["residueModFileName"] != "") {
-    output << "Residue modification file name: " << arguments_["residueModFileName"] << std::endl;
-  }
-  output << std::endl;
-}
-
-void Argument::outputArguments() {
-  std::cout << "********************** Parameters **********************" << std::endl;
-  std::cout << std::setw(40) << std::left << "Protein database file: " << arguments_["oriDatabaseFileName"] << std::endl;
-  std::cout << std::setw(40) << std::left << "Spectrum file: " << arguments_["spectrumFileName"] << std::endl;
-  std::cout << std::setw(40) << std::left << "Number of spectra in a group: " << arguments_["groupSpectrumNumber"] << std::endl;
-  std::cout << std::setw(40) << std::left << "Activation type: " << arguments_["activation"] << std::endl;
-  std::cout << std::setw(40) << std::left << "Search type: " << arguments_["searchType"] << std::endl;
-  std::cout << std::setw(40) << std::left << "Fixed modifications: " << arguments_["fixedMod"] << std::endl;
-  std::cout << std::setw(40) << std::left << "Maximum number of unexpected PTMs: " << arguments_["ptmNumber"] << std::endl;
-  std::cout << std::setw(40) << std::left << "Error tolerance: " << arguments_["errorTolerance"] << " ppm" << std::endl;
-  std::cout << std::setw(40) << std::left << "Cutoff type: " << arguments_["cutoffType"] << std::endl;
-  std::cout << std::setw(40) << std::left << "Cutoff value: " << arguments_["cutoffValue"] << std::endl;
-  std::cout << std::setw(40) << std::left << "Allowed N-terminal modifications: " << arguments_["allowProtMod"] << std::endl;
-  std::cout << std::setw(40) << std::left << "Maximum PTM mass: " << arguments_["maxPtmMass"] << " Da" << std::endl;
-
-  if (arguments_["useGf"] == "true") {
-    std::cout << std::setw(40) << std::left << "E-value computation: "
+  if (arguments["useGf"] == "true") {
+    output << std::setw(40) << std::left << "E-value computation: "
         << "Generation function" << std::endl;
   } else {
-    std::cout << std::setw(40) << std::left << "E-value computation: "
+    output << std::setw(40) << std::left << "E-value computation: "
         << "Lookup table" << std::endl;
   }
 
-  if (arguments_["residueModFileName"] != "") {
-    std::cout << std::setw(40) << std::left << "Residue modification file name: " << arguments_["residueModFileName"] << std::endl;
-    std::cout << std::setw(40) << std::left << "MIScore threshold: " << arguments_["local_threshold"] << std::endl;
+  if (arguments["residueModFileName"] != "") {
+    output << std::setw(40) << std::left << "Residue modification file name: " << arguments["residueModFileName"] << std::endl;
+    output << std::setw(40) << std::left << "MIScore threshold: " << arguments["local_threshold"] << std::endl;
   }
-  std::cout << std::setw(40) << std::left << "Executive file directory is: " << arguments_["executiveDir"] << std::endl;
-  std::cout << "********************** Parameters **********************" << std::endl;
+  output << std::setw(40) << std::left << "Executive file directory is: " << arguments["executiveDir"] << std::endl;
+  output << "********************** Parameters **********************" << std::endl;
+  output << std::endl;
 }
 
 void Argument::showUsage(boost::program_options::options_description &desc) {

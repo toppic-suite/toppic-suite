@@ -58,7 +58,7 @@ int two_base_opt(int argc, char* argv[]) {
     std::cout << "TopPIC 1.0.0 beta (" << __DATE__ << ")" << std::endl;
 
     std::string exe_dir = arguments["executiveDir"];
-    argu_processor.outputArguments();
+    Argument::outputArguments(std::cout, arguments);
 
     BaseData::init(exe_dir);
 
@@ -247,7 +247,7 @@ int two_base_opt(int argc, char* argv[]) {
 
     std::cout << "Outputting table starts " << std::endl;
     PrsmTableWriterPtr table_out = PrsmTableWriterPtr(
-        new PrsmTableWriter(prsm_para_ptr, "OUTPUT_RESULT", "OUTPUT_TABLE"));
+        new PrsmTableWriter(prsm_para_ptr, arguments, "OUTPUT_RESULT", "OUTPUT_TABLE"));
     table_out->write();
     table_out = nullptr;
     std::cout << "Outputting table finished." << std::endl;

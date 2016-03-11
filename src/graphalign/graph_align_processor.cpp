@@ -1,4 +1,5 @@
 #include "base/file_util.hpp"
+#include "base/mod_util.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 #include "graph/graph_util.hpp"
 #include "graph/proteo_graph_reader.hpp"
@@ -21,10 +22,7 @@ void GraphAlignProcessor::process() {
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
   std::string var_mod_file_name = mng_ptr_->var_mod_file_name_;
   LOG_DEBUG("start reading " << var_mod_file_name);
-  ModPtrVec var_mod_ptr_vec; 
-
-  //*** to complete = ResidueFactory::getResiduePtrVecInstance(residue_mod_file_name);
-  //
+  ModPtrVec var_mod_ptr_vec = ModUtil::readModTxt(var_mod_file_name)[2]; 
   LOG_DEBUG("end reading " << var_mod_file_name);
 
   ProteoGraphReader reader(db_file_name, 

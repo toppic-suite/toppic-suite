@@ -1,4 +1,6 @@
 #include <iomanip>
+#include <ctime>
+
 #include <boost/algorithm/string.hpp>
 
 #include "base/file_util.hpp"
@@ -6,14 +8,17 @@
 #include "spec/extend_ms_factory.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_table_writer.hpp"
+#include "console/argument.hpp"
 
 namespace prot {
 
 PrsmTableWriter::PrsmTableWriter(PrsmParaPtr prsm_para_ptr, 
+                                 std::map<std::string, std::string> arguments,
                                  const std::string &input_file_ext, 
                                  const std::string &output_file_ext) {
   prsm_para_ptr_ = prsm_para_ptr;
   input_file_ext_ = input_file_ext;
+  arguments_ = arguments;
   output_file_ext_ = output_file_ext;
 }
 
@@ -24,6 +29,10 @@ void PrsmTableWriter::write(){
   std::string output_file_name = base_name + "." + output_file_ext_;
   std::ofstream file; 
   file.open(output_file_name.c_str());
+  time_t ctt = time(0);
+  file << "Time: ";
+  file << asctime(localtime(&ctt)) << std::endl;
+  Argument::outputArguments(file, arguments_);
   //write title
   file << "Data_file_name" << "\t"
       << "Prsm_ID" << "\t"
