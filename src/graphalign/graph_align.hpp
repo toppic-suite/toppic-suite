@@ -32,7 +32,7 @@ class GraphAlign {
   MassGraphPtr sg_;
   int spec_ver_num_;
   int n_unknown_shift_;
-  DistTuplePtrVec2D tuple_vec_;
+  DistVec2D dist_vec_;
   ConsistentPairs cons_pairs_;
   GraphDpNodePtrVec2D table_;
   GraphResultNodePtrVec3D result_nodes_;
@@ -55,13 +55,13 @@ class GraphAlign {
   void getNodeDiagonals(int s, int m);
 
   void geneHeaders();
-  
+
   /*
 
   //tempary
 
 
-  */
+*/
 };
 
 typedef std::shared_ptr<GraphAlign> GraphAlignPtr;

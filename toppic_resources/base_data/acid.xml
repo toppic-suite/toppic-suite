@@ -8,7 +8,7 @@
 	<mono_mass>0.0</mono_mass>
 	<average_mass>0.0</average_mass>
 	<frequency>0.0</frequency>
-+</amino_acid>
+</amino_acid>
 <amino_acid>
 	<name>Alanine</name>
 	<one_letter>A</one_letter>

@@ -5,7 +5,6 @@
 #include "spec/msalign_reader.hpp"
 #include "spec/msalign_util.hpp"
 
-
 #include "tdgf/evalue_processor.hpp"
 #include "tdgf/tdgf_mng.hpp"
 
@@ -19,11 +18,16 @@
 #include "console/argument.hpp"
 #include "console/summary.hpp"
 
+#include "prsmview/xml_generator.hpp"
+#include "prsmview/transformer.hpp"
+
 #include "graph/graph.hpp"
 #include "graph/proteo_graph.hpp"
 
 #include "graphalign/graph_align_mng.hpp"
 #include "graphalign/graph_align_processor.hpp"
+
+#include <boost/timer.hpp>
 
 namespace prot {
 
@@ -37,10 +41,11 @@ int proteoform_graph_test(int argc, char* argv[]) {
       return 1;
     }
     std::map<std::string, std::string> arguments = argu_processor.getArguments();
-    std::cout << "TopPIC 0.9.3" << std::endl;
+    std::cout << "TopPIC mass graph" << std::endl;
 
     std::string exe_dir = arguments["executiveDir"];
-    std::cout << "Executive file directory is: " << exe_dir << std::endl;
+    argu_processor.outputArguments(std::cout, arguments);
+
     BaseData::init(exe_dir);
 
     LOG_DEBUG("Init base data completed");
@@ -53,13 +58,6 @@ int proteoform_graph_test(int argc, char* argv[]) {
 
     int ptm_num = std::stoi(arguments["ptmNumber"]);
 
-    /*
-       bool use_gf = false; 
-       if (arguments["useGf"] == "true") {
-       use_gf = true;
-       }
-       */
-
     bool decoy = false;
     if (arguments["searchType"] == "TARGET+DECOY") {
       decoy = true;
@@ -70,6 +68,8 @@ int proteoform_graph_test(int argc, char* argv[]) {
 
     FastaUtil::dbPreprocess(ori_db_file_name, db_file_name, decoy, db_block_size);
     MsAlignUtil::geneSpIndex(sp_file_name);
+
+    boost::timer t;
 
     PrsmParaPtr prsm_para_ptr = PrsmParaPtr(new PrsmPara(arguments));
 
@@ -83,6 +83,8 @@ int proteoform_graph_test(int argc, char* argv[]) {
     ga_processor_ptr = nullptr;
     std::cout << "Graph alignment finished." << std::endl;
 
+    std::cout << "Graph alignment running time: " << t.elapsed()  << " seconds " << std::endl;
+
     std::cout << "Combining PRSMs started." << std::endl;
     std::vector<std::string> input_exts ;
     input_exts.push_back("GRAPH_ALIGN");
@@ -92,54 +94,9 @@ int proteoform_graph_test(int argc, char* argv[]) {
     combine_ptr = nullptr;
     std::cout << "Combining PRSMs finished." << std::endl;
 
-    /*
-       std::cout << "E-value computation started." << std::endl;
-       bool variable_ptm = true;
-       TdgfMngPtr tdgf_mng_ptr = TdgfMngPtr(new TdgfMng (prsm_para_ptr, ptm_num, max_ptm_mass, use_gf,
-       variable_ptm, "GRAPH_ALIGN", "EVALUE"));
-       EValueProcessorPtr processor = EValueProcessorPtr(new EValueProcessor(tdgf_mng_ptr));
-       processor->init();
-       LOG_DEBUG("e value init complete");
-    // compute E-value for a set of prsms each run 
-    processor->process(false);
-    processor = nullptr;
-
-    if (arguments["searchType"]=="TARGET") { 
-    std::cout << "Top PRSM selecting started" << std::endl;
-    PrsmSelectorPtr selector = PrsmSelectorPtr(new PrsmSelector(db_file_name, sp_file_name, "EVALUE", "TOP", n_top));
-    selector->process();
-    selector = nullptr;
-    std::cout << "Top PRSM selecting finished." << std::endl;
-    }
-    else {
-    std::cout << "Top PRSM selecting started " << std::endl;
-    PrsmSelectorPtr selector = PrsmSelectorPtr(new PrsmSelector(db_file_name, sp_file_name, "EVALUE", "TOP_PRE", n_top));
-    selector->process();
-    selector = nullptr;
-    std::cout << "Top PRSM selecting finished." << std::endl;
-
-    std::cout << "FDR computation started. " << std::endl;
-    PrsmFdrPtr fdr = PrsmFdrPtr(new PrsmFdr(db_file_name, sp_file_name, "TOP_PRE", "TOP"));
-    fdr->process();
-    fdr = nullptr;
-    std::cout << "FDR computation finished." << std::endl;
-    }
-
-    std::cout << "PRSM selecting by cutoff started." << std::endl;
-    std::string cutoff_type = arguments["cutoffType"];
-    double cutoff_value;
-    std::istringstream (arguments["cutoffValue"]) >> cutoff_value;
-    OutputSelectorPtr output_selector = OutputSelectorPtr(
-    new OutputSelector(db_file_name, sp_file_name, "TOP", "CUTOFF_RESULT", 
-    cutoff_type, cutoff_value));
-    output_selector->process();
-    output_selector = nullptr;
-    std::cout << "PRSM selecting by cutoff finished." << std::endl;
-    */
-
     std::cout << "Outputting table starts " << std::endl;
     PrsmTableWriterPtr table_out = PrsmTableWriterPtr(
-        new PrsmTableWriter(prsm_para_ptr, "RAW_RESULT", "OUTPUT_TABLE"));
+        new PrsmTableWriter(prsm_para_ptr, arguments, "RAW_RESULT", "OUTPUT_TABLE"));
     table_out->write();
     table_out = nullptr;
     std::cout << "Outputting table finished." << std::endl;
@@ -155,6 +112,6 @@ int proteoform_graph_test(int argc, char* argv[]) {
 }
 
 int main(int argc, char* argv[]) {
-  prot::log_level = 2;
+  //prot::log_level = 2;
   return prot::proteoform_graph_test(argc, argv);
 }

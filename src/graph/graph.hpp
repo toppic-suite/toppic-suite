@@ -30,7 +30,7 @@ struct EdgeInfo {
     change_type_ = -1;
     int_mass_ = 0;
   }
-  
+
   EdgeInfo (ResiduePtr res_ptr, int change_type, double convert_ratio) {
     res_ptr_ = res_ptr;
     change_type_ = change_type;
@@ -81,23 +81,23 @@ class EdgeInfoWriter {
   EdgeInfoWriter(T _e): e(_e) {}
 
   template<class VertexOrEdge>
-  void operator()(std::ostream& out, const VertexOrEdge& v) const {
-    out << "[label=\"";
-    if (e[v].res_ptr_ != nullptr) {
-      out << e[v].res_ptr_->getAcidPtr()->getOneLetter();
-      PtmPtr ptm_ptr = e[v].res_ptr_->getPtmPtr();
-      if (!PtmBase::isEmptyPtmPtr(ptm_ptr)) {
-        out << "[" << ptm_ptr->getAbbrName() << "]";
-      }
-      out << ":";
-      out << e[v].res_ptr_->getMass() << "\"]";
+void operator()(std::ostream& out, const VertexOrEdge& v) const {
+  out << "[label=\"";
+  if (e[v].res_ptr_ != nullptr) {
+    out << e[v].res_ptr_->getAcidPtr()->getOneLetter();
+    PtmPtr ptm_ptr = e[v].res_ptr_->getPtmPtr();
+    if (!PtmBase::isEmptyPtmPtr(ptm_ptr)) {
+      out << "[" << ptm_ptr->getAbbrName() << "]";
     }
-    else {
-      out << e[v].int_mass_ << "\"]";
-    }
+    out << ":";
+    out << e[v].res_ptr_->getMass() << "\"]";
   }
-  private:
-    T e;
+  else {
+    out << e[v].int_mass_ << "\"]";
+  }
+}
+private:
+T e;
 };
 
 }

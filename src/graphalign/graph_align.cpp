@@ -8,6 +8,21 @@
 
 namespace prot {
 
+std::vector<int> getMinMaxProtDist(DistVec2D dist_vec) {
+  std::vector<int> min_dist, max_dist;
+  for (size_t i = 0; i < dist_vec.size(); i++) {
+    if (dist_vec[i].size() == 0) continue;
+    min_dist.push_back(dist_vec[i][0].dist_);
+    max_dist.push_back(dist_vec[i][dist_vec[i].size() - 1].dist_);
+  }
+  std::sort(min_dist.begin(), min_dist.end());
+  std::sort(max_dist.begin(), max_dist.end());
+  std::vector<int> res;
+  res.push_back(min_dist[0]);
+  res.push_back(max_dist[max_dist.size() - 1]);
+  return res;
+}
+
 GraphAlign::GraphAlign(GraphAlignMngPtr mng_ptr, 
                        ProteoGraphPtr proteo_graph_ptr,
                        SpecGraphPtr spec_graph_ptr) {
@@ -16,23 +31,24 @@ GraphAlign::GraphAlign(GraphAlignMngPtr mng_ptr,
   proteo_graph_ptr_ = proteo_graph_ptr;
   spec_graph_ptr_ = spec_graph_ptr;
 
-  DistTuplePtrVec2D proteo_vec = proteo_graph_ptr_->getDistTuplePtrVec2D();
-  tuple_vec_.insert(tuple_vec_.begin(), proteo_vec.begin(), proteo_vec.end());
-  /*
-  for (size_t i = 0; i < tuple_vec_.size(); i++) {
-    LOG_DEBUG("i " << i << " size " << tuple_vec_[i].size());
-  }
-  for (size_t i = 0; i < tuple_vec_[2].size(); i++) {
-    LOG_DEBUG("first " << tuple_vec_[2][i]->getFirstVertex() 
-              << " second " << tuple_vec_[2][i]->getSecondVertex()
-              << " dist " << tuple_vec_[2][i]->getDist());
-  }
-  */
-  DistTuplePtrVec spec_vec = spec_graph_ptr_->getDistTuplePtrVec();
+  dist_vec_ = proteo_graph_ptr_->getDistVec2D();
+  DistVec spec_dist = spec_graph_ptr_->getDistVec();
+
+  std::vector<int> cutoff = getMinMaxProtDist(dist_vec_);
+  cutoff[0] -= mng_ptr_->getIntTolerance();
+  cutoff[1] += mng_ptr_->getIntTolerance();
+
+  spec_dist.erase(
+      std::remove_if(spec_dist.begin(), spec_dist.end(),
+                     [cutoff](Dist d){return d.dist_ < cutoff[0] || d.dist_ > cutoff[1];}),
+      spec_dist.end());
+
   for (int i = 0; i < mng_ptr->max_known_mods_ + 1; i++) {
-    tuple_vec_[i].insert(tuple_vec_[i].begin(), spec_vec.begin(), spec_vec.end());
-    std::sort(tuple_vec_[i].begin(), tuple_vec_[i].end(),distUp);
+    if (dist_vec_[i].size() == 0) continue;
+    dist_vec_[i].insert(dist_vec_[i].end(), spec_dist.begin(), spec_dist.end());
+    std::sort(dist_vec_[i].begin(), dist_vec_[i].end(), distVecUp);
   }
+
   pg_ = proteo_graph_ptr_->getMassGraphPtr();
   sg_ = spec_graph_ptr_->getMassGraphPtr();
   proteo_ver_num_ = num_vertices(*pg_.get());
@@ -55,51 +71,61 @@ void GraphAlign::getConsistentPairs() {
     cons_pairs_.push_back(empty_vec_2d);
   }
 
-  LOG_DEBUG("tuple vec size " << tuple_vec_.size());
+  LOG_DEBUG("dist_vec_ vec size " << dist_vec_.size());
   int min_dist = mng_ptr_->getIntMinConsistentDist();
-  for (int m = 0; m < (int)tuple_vec_.size(); m++) {
-    for (int i = 0; i < (int)tuple_vec_[m].size(); i++) {
-      DistTuplePtr tuple_ptr = tuple_vec_[m][i];
-      //LOG_DEBUG("graph_ptr " << tuple_ptr->getGraphPtr());
-      if (tuple_ptr->getGraphPtr() == sg_) {
-        int sp_v1 = tuple_ptr->getFirstVertex();
-        int sp_v2 = tuple_ptr->getSecondVertex();
-        int sp_dist = tuple_ptr->getDist();
+  for (int m = 0; m < (int)dist_vec_.size(); m++) {
+    for (int i = 0; i < (int)dist_vec_[m].size(); i++) {
+      Dist distance = dist_vec_[m][i];
+
+      if (distance.getGraphPtr() == sg_) {
+
+        int sp_dist = distance.dist_;
+        std::vector<std::pair<int, int>> sp_pair_ij = distance.pair_ij_;
         // remove zero dist 
         if (sp_dist >= min_dist) {
           //LOG_DEBUG("sp v1 " << sp_v1 << " sp v2 " << sp_v2);
           //search backward
           for (int j = i - 1; j >=0; j--) {
-            DistTuplePtr new_tuple_ptr = tuple_vec_[m][j];
-            int proteo_dist = new_tuple_ptr->getDist();
+            Dist new_distance = dist_vec_[m][j];
+            int proteo_dist = new_distance.dist_;
             if (sp_dist - proteo_dist > tole) {
               break;
             }
-            if (new_tuple_ptr->getGraphPtr() == pg_) {
-              int pr_v1 = new_tuple_ptr->getFirstVertex();
-              int pr_v2 = new_tuple_ptr->getSecondVertex();
-              std::pair<int, int> pre_pair(pr_v1, sp_v1);
-              cons_pairs_[pr_v2][sp_v2][m].push_back(pre_pair);
+            if (new_distance.getGraphPtr() == pg_) {
+              std::vector<std::pair<int, int>> pg_pair_ij = new_distance.pair_ij_;
+              for (size_t k = 0; k < pg_pair_ij.size(); k++) {
+                for (size_t sp = 0; sp < sp_pair_ij.size(); sp++) {
+                  int pr_v1 = pg_pair_ij[k].first;
+                  int pr_v2 = pg_pair_ij[k].second;
+                  int sp_v1 = sp_pair_ij[sp].first;
+                  int sp_v2 = sp_pair_ij[sp].second;
+                  std::pair<int, int> pre_pair(pr_v1, sp_v1);
+                  cons_pairs_[pr_v2][sp_v2][m].push_back(pre_pair);
+                }
+              }
             }
           }
           //search forward
-          for (int j = i + 1; j < (int)tuple_vec_[m].size(); j++) {
-            DistTuplePtr new_tuple_ptr = tuple_vec_[m][j];
-            int proteo_dist = new_tuple_ptr->getDist();
+          for (int j = i + 1; j < (int)dist_vec_[m].size(); j++) {
+            Dist new_distance = dist_vec_[m][j];
+            int proteo_dist = new_distance.dist_;
             if (proteo_dist - sp_dist > tole) {
               break;
             }
-            if (new_tuple_ptr->getGraphPtr() == pg_) {
-              int pr_v1 = new_tuple_ptr->getFirstVertex();
-              int pr_v2 = new_tuple_ptr->getSecondVertex();
-              //LOG_DEBUG("pr v1 " << pr_v1 << " pr v2 " << pr_v2 << " m " << m << " max mod " << mng_ptr_->max_known_mods_);
-              //LOG_DEBUG("m size " << cons_pairs_[pr_v2][sp_v2].size());
-              std::pair<int, int> pre_pair(pr_v1, sp_v1);
-              //LOG_DEBUG("size " << cons_pairs_[pr_v2][sp_v2][m].size());
-              cons_pairs_[pr_v2][sp_v2][m].push_back(pre_pair);
+            if (new_distance.getGraphPtr() == pg_) {
+              std::vector<std::pair<int, int>> pg_pair_ij = new_distance.pair_ij_;
+              for (size_t k = 0; k < pg_pair_ij.size(); k++){
+                for (size_t sp = 0; sp < sp_pair_ij.size(); sp++) {
+                  int pr_v1 = pg_pair_ij[k].first;
+                  int pr_v2 = pg_pair_ij[k].second;
+                  int sp_v1 = sp_pair_ij[sp].first;
+                  int sp_v2 = sp_pair_ij[sp].second;
+                  std::pair<int, int> pre_pair(pr_v1, sp_v1);
+                  cons_pairs_[pr_v2][sp_v2][m].push_back(pre_pair);    
+                }
+              }
             }
           }
-          //LOG_DEBUG("sp v1 sp v2 complete");
         }
       }
     }
@@ -121,7 +147,7 @@ void GraphAlign::initTable() {
   }
   LOG_DEBUG("init table step 1");
   for (int i = 0; i < proteo_ver_num_; i++) {
-    table_[i][0]->updateTable(0, 0, GRAPH_ALIGN_TYPE_NULL, 0,  nullptr, 0);
+    table_[i][0]->updateTable(0, 0, GRAPH_ALIGN_TYPE_NULL, 0,  nullptr, node_score);
     table_[i][0]->updateBestShiftNode(0, 0, 0, table_[i][0]);
     //LOG_DEBUG("type " << table_[i][0]->getType(0) << " first index " << table_[i][0]->getFirstIdx() << " second index " << table_[i][0]->getSecondIdx());
   }
@@ -134,10 +160,10 @@ inline GraphDpNodePtr GraphAlign::compBestVariableNode(int i, int j, int s, int 
   GraphDpNodePtr best_prev_node = nullptr;
   for (int p = 0; p <= m; p++) {
     /*
-    if (i== 3 && j == 15 && m == 2 && p == 2 ) {
-      LOG_DEBUG("consistent pair size "  << cons_pairs_[i][j][p].size());
-    }
-    */
+       if (i== 3 && j == 15 && m == 2 && p == 2 ) {
+       LOG_DEBUG("consistent pair size "  << cons_pairs_[i][j][p].size());
+       }
+       */
     for (size_t q = 0; q < cons_pairs_[i][j][p].size(); q++) {
       std::pair<int, int> pair = cons_pairs_[i][j][p][q];
       int pi = pair.first;
@@ -178,10 +204,10 @@ inline void GraphAlign::updateBestShiftNode(int i, int j, int s, int m) {
   // update best node
   if (table_[i-1][j]->getBestShiftScore(s, m) > table_[i][j-1]->getBestShiftScore(s, m)) {
     table_[i][j]->updateBestShiftNode(s, m, table_[i-1][j]->getBestShiftScore(s, m), table_[i-1][j]->getBestShiftNodePtr(s,m));
-  }
-  else {
+  } else {
     table_[i][j]->updateBestShiftNode(s, m, table_[i][j-1]->getBestShiftScore(s, m), table_[i][j-1]->getBestShiftNodePtr(s,m));
   }
+
   if (table_[i][j]->getBestScore(s,m) > table_[i][j]->getBestShiftScore(s, m)) {
     table_[i][j]->updateBestShiftNode(s, m, table_[i][j]->getBestScore(s, m), table_[i][j]);
   }
@@ -204,11 +230,11 @@ void GraphAlign::dp() {
           }
 
           /*
-          if (i == 3) {
-            double cur_pos = spec_graph_ptr_->getPrmPeakPtr(j)->getPosition();
-            LOG_DEBUG("i " << i << " j " << j << " peak pos " << cur_pos << " s " << s << " m " << m << " var score " << var_score);
-          }
-          */
+             if (i == 3) {
+             double cur_pos = spec_graph_ptr_->getPrmPeakPtr(j)->getPosition();
+             LOG_DEBUG("i " << i << " j " << j << " peak pos " << cur_pos << " s " << s << " m " << m << " var score " << var_score);
+             }
+             */
 
           GraphDpNodePtr best_shift_node = compBestShiftNode(i, j, s, m);
           double shift_score;
@@ -230,8 +256,7 @@ void GraphAlign::dp() {
               table_[i][j]->updateTable(s, m, GRAPH_ALIGN_TYPE_VARIABLE,
                                         edge_mod_num, best_var_node, var_score + new_score);
             }
-          } 
-          else {
+          } else {
             table_[i][j]->updateTable(s, m, GRAPH_ALIGN_TYPE_UNEXPECTED,
                                       0, best_shift_node, shift_score + new_score);
           }
@@ -278,20 +303,20 @@ GraphResultNodePtrVec GraphAlign::backtrace(int s, int m) {
   LOG_DEBUG("obtained result node ptr vec");
   ResSeqPtr res_seq_ptr = proteo_graph_ptr_->getProteoformPtr()->getResSeqPtr();
   for (int i = 0; i < (int)results.size() - 1; i++) {
-      int p_cur_idx = results[i]->getFirstIdx();
-      int s_cur_idx = results[i]->getSecondIdx();
-      int p_prev_idx = results[i+1]->getFirstIdx();
-      int s_prev_idx = results[i+1]->getSecondIdx();
-      ResSeqPtr sub_seq_ptr = res_seq_ptr->getSubResidueSeq(p_prev_idx, p_cur_idx -1);
-      double cur_pos = spec_graph_ptr_->getPrmPeakPtr(s_cur_idx)->getPosition();
-      double prev_pos = spec_graph_ptr_->getPrmPeakPtr(s_prev_idx)->getPosition();
-      double dist = cur_pos - prev_pos;
-      double ptm_mass = dist - sub_seq_ptr->getResMassSum();
-      LOG_DEBUG("p cur " << p_cur_idx << " s cur " << s_cur_idx << 
-                " p prev " << p_prev_idx << " s prev " << s_prev_idx <<
-                " seq " << sub_seq_ptr->toString() << " seq mass " << sub_seq_ptr->getResMassSum() << 
-                " cur pos " << cur_pos << " prev pos " << prev_pos << " dist " << dist << 
-                " ptm mass " << ptm_mass);
+    int p_cur_idx = results[i]->getFirstIdx();
+    int s_cur_idx = results[i]->getSecondIdx();
+    int p_prev_idx = results[i+1]->getFirstIdx();
+    int s_prev_idx = results[i+1]->getSecondIdx();
+    ResSeqPtr sub_seq_ptr = res_seq_ptr->getSubResidueSeq(p_prev_idx, p_cur_idx -1);
+    double cur_pos = spec_graph_ptr_->getPrmPeakPtr(s_cur_idx)->getPosition();
+    double prev_pos = spec_graph_ptr_->getPrmPeakPtr(s_prev_idx)->getPosition();
+    double dist = cur_pos - prev_pos;
+    double ptm_mass = dist - sub_seq_ptr->getResMassSum();
+    LOG_DEBUG("p cur " << p_cur_idx << " s cur " << s_cur_idx << 
+              " p prev " << p_prev_idx << " s prev " << s_prev_idx <<
+              " seq " << sub_seq_ptr->toString() << " seq mass " << sub_seq_ptr->getResMassSum() << 
+              " cur pos " << cur_pos << " prev pos " << prev_pos << " dist " << dist << 
+              " ptm mass " << ptm_mass);
   }
   std::reverse(results.begin(), results.end());
   return results;
@@ -331,8 +356,7 @@ void GraphAlign::getNodeDiagonals(int s, int m) {
     GraphResultNodePtr cur_node = result_nodes_[s][m][i];
     if (cur_node->getShiftNum() == prev_node->getShiftNum() && cur_node->getModNum() == prev_node->getModNum()) {
       cur_vec.push_back(cur_node);
-    }
-    else {
+    } else {
       nodes_2d_.push_back(cur_vec);
       cur_vec.clear();
       cur_vec.push_back(cur_node);
@@ -374,8 +398,7 @@ inline DiagonalHeaderPtr getFirstDiagonal(ProteoGraphPtr proteo_ptr,
   bool pep_n_term = false;
   if (prot_idx == 0 || (proteo_ptr->isNme() && prot_idx == 1)) {
     prot_n_term = true;
-  }
-  else {
+  } else {
     pep_n_term = true;
   }
   bool prot_c_term = false;
@@ -386,8 +409,7 @@ inline DiagonalHeaderPtr getFirstDiagonal(ProteoGraphPtr proteo_ptr,
     // c_term;
     if (last_prot_idx == (int)prm_masses.size() - 1) {
       prot_c_term = true;
-    }
-    else {
+    } else {
       pep_c_term = true;
     }
   }
@@ -416,8 +438,7 @@ inline DiagonalHeaderPtr getLastDiagonal(GraphResultNodePtrVec nodes,
   // c_term;
   if (last_prot_idx == (int)prm_masses.size() - 1) {
     prot_c_term = true;
-  }
-  else {
+  } else {
     pep_c_term = true;
   }
   DiagonalHeaderPtr header_ptr(new DiagonalHeader(shift, false, true, 
@@ -493,8 +514,7 @@ void  GraphAlign::geneHeaders() {
       diag_headers_2d_.push_back(cur_vec);
       cur_vec.clear();
       cur_vec.push_back(diag_headers_[i]);
-    }
-    else {
+    } else {
       cur_vec.push_back(diag_headers_[i]);
     }
   }
@@ -529,11 +549,11 @@ PrsmPtr GraphAlign::geneResult(int s, int m){
                                                           diag_headers_, ppo, min_mass, 
                                                           mng_ptr_->refine_prec_step_width_);
   LOG_DEBUG("get reine prec mass" << refine_prec_mass);
-  
+
   DeconvMsPtrVec deconv_ms_ptr_vec = spec_graph_ptr_->getSpectrumSetPtr()->getDeconvMsPtrVec();
   ExtendMsPtrVec refine_ms_ptr_vec 
       = ExtendMsFactory::geneMsThreePtrVec(deconv_ms_ptr_vec,  sp_para_ptr, refine_prec_mass);
-  
+
   DiagonalHeaderPtrVec2D refined_headers_2d = refineHeadersBgnEnd(
       proteo_ptr, refine_ms_ptr_vec, diag_headers_2d_, diag_headers_, min_mass);
 
@@ -548,11 +568,9 @@ PrsmPtr GraphAlign::geneResult(int s, int m){
       refined_headers.push_back(refined_headers_2d[i][j]);
       if (i == 0 and j == 0) {
         change_types.push_back(nullptr);
-      }
-      else if (j == 0)  {
+      } else if (j == 0)  {
         change_types.push_back(ChangeType::UNEXPECTED);
-      }
-      else {
+      } else {
         change_types.push_back(ChangeType::VARIABLE);
       }
       LOG_DEBUG("i " << i << " j " << j << " type " << change_types[change_types.size()-1]);
@@ -562,14 +580,14 @@ PrsmPtr GraphAlign::geneResult(int s, int m){
   ChangePtrVec changes = getDiagonalMassChanges(refined_headers, first_pos, last_pos, 
                                                 change_types);
   /*
-  for (size_t i = 0; i < changes.size(); i++) {
-    LOG_DEBUG("change " << i << " start " << changes[i]->getLeftBpPos() << " end " << changes[i]->getRightBpPos() << " type " << changes[i]->getChangeType());
-  }
-  */
+     for (size_t i = 0; i < changes.size(); i++) {
+     LOG_DEBUG("change " << i << " start " << changes[i]->getLeftBpPos() << " end " << changes[i]->getRightBpPos() << " type " << changes[i]->getChangeType());
+     }
+     */
   sub_proteo_ptr->addChangePtrVec(changes);
 
   return PrsmPtr(new Prsm(sub_proteo_ptr, deconv_ms_ptr_vec, refine_prec_mass,
-          mng_ptr_->prsm_para_ptr_->getSpParaPtr()));
+                          mng_ptr_->prsm_para_ptr_->getSpParaPtr()));
 }
 
 PrsmPtr GraphAlign::geneResult(int s){

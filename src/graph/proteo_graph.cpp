@@ -6,14 +6,13 @@
 #include "graph/graph_util.hpp"
 #include "graph/proteo_graph.hpp"
 
+#include <boost/timer.hpp>
+
 namespace prot {
 
-ProteoGraph::ProteoGraph(FastaSeqPtr fasta_seq_ptr,
-                         ModPtrVec fix_mod_ptr_vec,
-                         MassGraphPtr graph_ptr,
-                         bool is_nme,
-                         double convert_ratio,
-                         int max_mod_num,
+ProteoGraph::ProteoGraph(FastaSeqPtr fasta_seq_ptr, ModPtrVec fix_mod_ptr_vec,
+                         MassGraphPtr graph_ptr, bool is_nme,
+                         double convert_ratio, int max_mod_num,
                          int max_ptm_sum_mass) {
   db_proteo_ptr_ = ProteoformFactory::geneDbProteoformPtr(fasta_seq_ptr, fix_mod_ptr_vec);
   graph_ptr_ = graph_ptr;
@@ -51,6 +50,8 @@ void ProteoGraph::compSeqMasses(double convert_ratio) {
 }
 
 void ProteoGraph::compDistances(double convert_ratio, int max_mod_num, int max_ptm_sum_mass) {
+  boost::timer t;
+
   MassGraph *g_p = graph_ptr_.get();
   //get mass without ptms
 
@@ -92,8 +93,7 @@ void ProteoGraph::compDistances(double convert_ratio, int max_mod_num, int max_p
               if (std::abs(new_d - seq_masses_[index]) <= max_ptm_sum_mass) {
                 if (change == ChangeType::PROTEIN_VARIABLE->getId() || change == ChangeType::VARIABLE->getId()) {
                   dist_vecs[index][k+1].insert(new_d);
-                }
-                else {
+                } else {
                   dist_vecs[index][k].insert(new_d);
                 }
               }
@@ -104,27 +104,16 @@ void ProteoGraph::compDistances(double convert_ratio, int max_mod_num, int max_p
     }
   }
 
-  DistTuplePtrVec empty_vec;
+  DistVec tmp;
   for (int k = 0; k < max_mod_num + 1; k++) {
-    tuple_vec_.push_back(empty_vec);
+    dist_vec_.push_back(tmp);
   }
 
-  int count = 0;
-  for (int i = 0; i < node_num_ - 1; i++) {
-    for (int j = i+1; j < node_num_; j++) {
-      int index = getVecIndex(i, j);
-      for (int k = 0; k < max_mod_num + 1; k++) {
-        for (std::set<int>::iterator it=dist_vecs[index][k].begin(); 
-             it!=dist_vecs[index][k].end(); it++) {
-          DistTuplePtr tuple_ptr(new DistTuple(graph_ptr_, i, j, k, *it));
-          tuple_vec_[k].push_back(tuple_ptr);
-        }
-        count += dist_vecs[index][k].size();
-      }
-      //LOG_DEBUG("i " << i << " j " << j << " size " << dist_vecs[index].size());
-    }
+  for (int k = 0; k < max_mod_num + 1; k++) {
+    addToDistVec(graph_ptr_, dist_vecs, node_num_, k, dist_vec_[k]);
   }
-  LOG_DEBUG("count " << count);
+  
+  std::cout << "compDistances time: " << t.elapsed() << std::endl;
 }
 
 }

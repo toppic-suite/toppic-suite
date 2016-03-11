@@ -22,7 +22,8 @@ void GraphAlignProcessor::process() {
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
   std::string var_mod_file_name = mng_ptr_->var_mod_file_name_;
   LOG_DEBUG("start reading " << var_mod_file_name);
-  ModPtrVec var_mod_ptr_vec = ModUtil::readModTxt(var_mod_file_name)[2]; 
+  ModPtrVec var_mod_ptr_vec = ModUtil::readModTxt(var_mod_file_name)[2];
+
   LOG_DEBUG("end reading " << var_mod_file_name);
 
   ProteoGraphReader reader(db_file_name, 
@@ -40,7 +41,7 @@ void GraphAlignProcessor::process() {
     count++;
     proteo_ptrs.push_back(proteo_ptr);
   }
-  writeToDot("proteo.dot", proteo_ptrs[0]->getMassGraphPtr());
+
   LOG_DEBUG("Prot graph number " << count);
   std::string output_file_name = FileUtil::basename(sp_file_name)+"."+mng_ptr_->output_file_ext_;
   PrsmXmlWriter prsm_writer(output_file_name);
@@ -54,7 +55,7 @@ void GraphAlignProcessor::process() {
 
   SpecGraphPtrVec spec_ptr_vec = spec_reader.getNextSpecGraphPtrVec(mng_ptr_->prec_error_);
   LOG_DEBUG("spec ptr reading complete");
-  //writeToDot("spec.dot", spec_ptr->getMassGraphPtr());
+  LOG_DEBUG("spec_ptr_vec " << spec_ptr_vec.size());
   int sp_count = 0;
   while (spec_ptr_vec.size() != 0) {
     sp_count++;
@@ -62,15 +63,16 @@ void GraphAlignProcessor::process() {
     for (size_t spec = 0; spec < spec_ptr_vec.size(); spec++) {
       if (spec_ptr_vec[spec]->getSpectrumSetPtr()->isValid()) {
         for (size_t i = 0; i < proteo_ptrs.size(); i++) {
-          GraphAlign graph_align(mng_ptr_, proteo_ptrs[i], spec_ptr_vec[spec]);
-          graph_align.process();
+          GraphAlignPtr graph_align = std::make_shared<GraphAlign>(mng_ptr_, proteo_ptrs[i], spec_ptr_vec[spec]);
+          graph_align->process();
           LOG_DEBUG("align process complete");
           for (int shift = 0; shift <= mng_ptr_->n_unknown_shift_; shift++) {
-            PrsmPtr prsm_ptr = graph_align.geneResult(shift);
+            PrsmPtr prsm_ptr = graph_align->geneResult(shift);
             if (prsm_ptr != nullptr) {
               prsm_writer.write(prsm_ptr);
             }
           }
+          graph_align = nullptr;
         }
       }
     }

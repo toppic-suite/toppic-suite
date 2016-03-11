@@ -7,7 +7,8 @@ SpecGraphReader::SpecGraphReader(const std::string &sp_file_name,
                                  double convert_ratio,
                                  SpParaPtr sp_para_ptr) {
   ms_reader_ptr_ 
-      = MsAlignReaderPtr(new MsAlignReader(sp_file_name, group_sp_num));
+      = MsAlignReaderPtr(new MsAlignReader(sp_file_name, group_sp_num,
+                                           sp_para_ptr->getActivationPtr()));
   group_sp_num_ = group_sp_num;
   convert_ratio_ = convert_ratio;
   sp_para_ptr_ = sp_para_ptr;
@@ -17,12 +18,6 @@ MassGraphPtr SpecGraphReader::getMassGraphPtr(const PrmPeakPtrVec &peak_vec) {
 
   LOG_DEBUG("start mass graph");
   MassGraphPtr graph_ptr = MassGraphPtr(new MassGraph());
-  
-  //*graph_ptr.get()[boost::graph_bundle].name_ = spec_set_ptr->getDeconvMsPtr()
-  //    ->getHeaderPtr()->getScansString();
-  //LOG_DEBUG("spec_graph name " << spec_graph[boost::graph_bundle].name_);
-  //PrmMsPtrVec ms_six_vec = spec_set_ptr->getMsSixPtrVec();
-  //PrmPeakPtrVec peak_vec = getPrmPeakPtrs(ms_six_vec, sp_para_ptr_->getPeakTolerancePtr());
 
   // add mass 0/start nod
   VertexInfo v(0);
@@ -63,7 +58,7 @@ SpecGraphPtrVec SpecGraphReader::getNextSpecGraphPtrVec(int error) {
   DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
   //LOG_DEBUG("deconv ms size " << deconv_ms_ptr_vec.size());
   double prec_mono_mass = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMass();
-  //LOG_DEBUG("prec_mono_mass  " << prec_mono_mass);
+  LOG_DEBUG("prec_mono_mass  " << prec_mono_mass);
   if (spec_set_ptr->isValid()) {
     LOG_DEBUG("valid");
     for (size_t i = 0; i < prec_errors.size(); i++) {
