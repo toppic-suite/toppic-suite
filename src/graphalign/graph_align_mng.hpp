@@ -11,13 +11,14 @@ class GraphAlignMng {
  public:
   GraphAlignMng(PrsmParaPtr prsm_para_ptr, 
                 const std::string &var_mod_file_name,
-                int n_unknown_shift,
-                int max_known_mods,
+                int n_unknown_shift, int max_known_mods,
+                int proteo_graph_gap,
                 const std::string &output_file_ext) {
     prsm_para_ptr_ = prsm_para_ptr;
     var_mod_file_name_ = var_mod_file_name;
     n_unknown_shift_ = n_unknown_shift;
     max_known_mods_ = max_known_mods;
+    proteo_graph_gap_ = proteo_graph_gap;
     output_file_ext_ = output_file_ext;
   }
 
@@ -34,6 +35,8 @@ class GraphAlignMng {
 
   double convert_ratio_ = 274.335215;
   //double convert_ratio_ = 1.0;
+
+  int proteo_graph_gap_;
 
   int getIntTolerance() {return std::ceil(error_tolerance_ * convert_ratio_);}
   int getIntMaxPtmSumMass() {return std::ceil(max_ptm_sum_mass_ * convert_ratio_);}

@@ -9,11 +9,10 @@ int getVecIndex(int v1, int v2, int node_num) {
 }
 
 void addToDistVec(MassGraphPtr graph_ptr, const std::vector<std::vector<std::set<int>>> & dist_vecs,
-                  int node_num, int mod_num, DistVec & dist_vec) {
+                  int node_num, int mod_num, DistVec & dist_vec, int gap) {
   std::set<Dist> dist_set;
-
   for (int i = 0; i < node_num - 1; i++) {
-    for (int j = i + 1; j < node_num && j <= i + 10; j++) {
+    for (int j = i + 1; j < node_num && j <= i + gap; j++) {
       int index = getVecIndex(i, j, node_num);
       for (std::set<int>::iterator it=dist_vecs[index][mod_num].begin(); 
            it!=dist_vecs[index][mod_num].end(); it++) {

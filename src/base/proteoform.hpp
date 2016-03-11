@@ -17,92 +17,99 @@ class Proteoform;
 typedef std::shared_ptr<Proteoform> ProteoformPtr;
 
 class Proteoform {
-  public:
-   Proteoform(FastaSeqPtr fasta_seq_ptr, ProtModPtr prot_mod_ptr, 
-              int start_pos, int end_pos, ResSeqPtr res_seq_ptr, 
-              const ChangePtrVec &change_ptr_vec);
+ public:
+  Proteoform(FastaSeqPtr fasta_seq_ptr, ProtModPtr prot_mod_ptr, 
+             int start_pos, int end_pos, ResSeqPtr res_seq_ptr, 
+             const ChangePtrVec &change_ptr_vec);
 
-   Proteoform(xercesc::DOMElement* element, FastaIndexReaderPtr reader_ptr,
-              const ModPtrVec &fix_mod_list);
+  Proteoform(xercesc::DOMElement* element, FastaIndexReaderPtr reader_ptr,
+             const ModPtrVec &fix_mod_list);
 
-   FastaSeqPtr getFastaSeqPtr() {return fasta_seq_ptr_;}
+  FastaSeqPtr getFastaSeqPtr() {return fasta_seq_ptr_;}
 
-   std::string getSeqName() { return fasta_seq_ptr_->getName();}
+  std::string getSeqName() { return fasta_seq_ptr_->getName();}
 
-   std::string getSeqDesc() { return fasta_seq_ptr_->getDesc();}
+  std::string getSeqDesc() { return fasta_seq_ptr_->getDesc();}
 
-   int getStartPos() { return start_pos_;}
+  int getStartPos() { return start_pos_;}
 
-   int getEndPos() { return end_pos_;}
+  int getEndPos() { return end_pos_;}
 
-   ProtModPtr getProtModPtr() { return prot_mod_ptr_;}
+  ProtModPtr getProtModPtr() { return prot_mod_ptr_;}
 
-   ResSeqPtr getResSeqPtr() { return residue_seq_ptr_;}
+  ResSeqPtr getResSeqPtr() { return residue_seq_ptr_;}
 
-   BpSpecPtr getBpSpecPtr() { return bp_spec_ptr_;}
+  BpSpecPtr getBpSpecPtr() { return bp_spec_ptr_;}
 
-   int getLen() { return end_pos_ - start_pos_ + 1; }
+  int getLen() { return end_pos_ - start_pos_ + 1; }
 
-   int getChangeNum() {return change_list_.size();}
+  int getChangeNum() {return change_list_.size();}
 
-   ChangePtrVec getChangePtrVec() {return change_list_;}
+  ChangePtrVec getChangePtrVec() {return change_list_;}
 
-   int getSpeciesId() {return species_id_;}
+  int getSpeciesId() {return species_id_;}
 
-   void setSpeciesId(int id) {species_id_ = id;}
+  void setSpeciesId(int id) {species_id_ = id;}
 
-   int getProtId() {return prot_id_;}
-   
-   void setProtId(int id) {prot_id_ = id;}
+  int getProtId() {return prot_id_;}
 
-   double getMass();
+  void setProtId(int id) {prot_id_ = id;}
 
-   AlignTypePtr getAlignType();
+  double getMass();
 
-   int getChangeNum(ChangeTypePtr ct_ptr);
+  AlignTypePtr getAlignType();
 
-   ChangePtrVec getChangePtrVec(ChangeTypePtr ct_ptr);
+  int getChangeNum(ChangeTypePtr ct_ptr);
 
-   void addChangePtrVec(ChangePtrVec &change_ptr_vec);
+  ChangePtrVec getChangePtrVec(ChangeTypePtr ct_ptr);
 
-   void addChangePtr(ChangePtr &change_ptr);
+  void addChangePtrVec(ChangePtrVec &change_ptr_vec);
 
-   void rmChangePtr(ChangePtr &change_ptr);
+  void addChangePtr(ChangePtr &change_ptr);
 
-   SegmentPtrVec getSegmentPtrVec();
+  void rmChangePtr(ChangePtr &change_ptr);
 
-   std::string getProteinMatchSeq();
+  SegmentPtrVec getSegmentPtrVec();
 
-   std::string toString();
+  std::string getProteinMatchSeq();
 
-   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+  std::string toString();
 
-   void parseXml(xercesc::DOMElement* element, ProteoformPtr db_proteoform);
+  void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
-   static std::string getXmlElementName() {return "proteoform";}
+  void parseXml(xercesc::DOMElement* element, ProteoformPtr db_proteoform);
 
-  private:
-   FastaSeqPtr fasta_seq_ptr_;
+  static std::string getXmlElementName() {return "proteoform";}
 
-   ProtModPtr prot_mod_ptr_;
+  void setVariablePtmNum(int n) {variable_ptm_num_ = n;}
 
-   // start and end positions are relative to the
-   // database sequence
-   int start_pos_;
-   int end_pos_;
+  int getVariablePtmNum() {return variable_ptm_num_;}
 
-   /* residue_seq starts from start_pos_ and ends at end_pos_, and contains
-    * fixed and variable modifications */
-   ResSeqPtr residue_seq_ptr_;
+ private:
+  FastaSeqPtr fasta_seq_ptr_;
 
-   /* bp_spec is generated from residue_seq */
-   BpSpecPtr bp_spec_ptr_;
+  ProtModPtr prot_mod_ptr_;
 
-   int species_id_ = 0;
+  // start and end positions are relative to the
+  // database sequence
+  int start_pos_;
+  int end_pos_;
 
-   int prot_id_ = 0;
+  /* residue_seq starts from start_pos_ and ends at end_pos_, and contains
+   * fixed and variable modifications */
+  ResSeqPtr residue_seq_ptr_;
 
-   ChangePtrVec change_list_;
+  /* bp_spec is generated from residue_seq */
+  BpSpecPtr bp_spec_ptr_;
+
+  int species_id_ = 0;
+
+  int prot_id_ = 0;
+
+  ChangePtrVec change_list_;
+
+  // Number of variable ptms is used for the test of the mass graph approach
+  int variable_ptm_num_ = 0;
 };
 
 typedef std::vector<ProteoformPtr> ProteoformPtrVec;

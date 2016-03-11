@@ -246,8 +246,6 @@ void GraphAlign::dp() {
           double new_score = table_[i][j]->getNodeScore();
           //LOG_DEBUG("new score " << new_score);
 
-          void updateTable(int s, int m, int path_type, int mod_num,
-                           GraphDpNodePtr prev_node_ptr, int score);
           if (var_score >= shift_score) {
             if (var_score ==  - std::numeric_limits<double>::max()) {
               table_[i][j]->updateTable(s, m, GRAPH_ALIGN_TYPE_NULL, 
@@ -585,6 +583,7 @@ PrsmPtr GraphAlign::geneResult(int s, int m){
      }
      */
   sub_proteo_ptr->addChangePtrVec(changes);
+  sub_proteo_ptr->setVariablePtmNum(m);
 
   return PrsmPtr(new Prsm(sub_proteo_ptr, deconv_ms_ptr_vec, refine_prec_mass,
                           mng_ptr_->prsm_para_ptr_->getSpParaPtr()));

@@ -34,8 +34,10 @@ inline bool distVecUp(const Dist &a, const Dist &b){
   return a.dist_ < b.dist_;
 }
 
-void addToDistVec(MassGraphPtr graph_ptr, const std::vector<std::vector<std::set<int>>> & dist_vecs,
-                  int node_num, int mod_num, DistVec & dist_vec);
+void addToDistVec(MassGraphPtr graph_ptr,
+                  const std::vector<std::vector<std::set<int>>> & dist_vecs,
+                  int node_num, int mod_num, DistVec & dist_vec,
+                  int gap);
 
 }
 

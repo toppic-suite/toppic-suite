@@ -76,7 +76,8 @@ int proteoform_graph_test(int argc, char* argv[]) {
     std::cout << "Graph alignment started." << std::endl;
 
     int max_mod_num = 10;
-    GraphAlignMngPtr ga_mng_ptr = GraphAlignMngPtr(new GraphAlignMng(prsm_para_ptr, residue_mod_file_name, ptm_num, max_mod_num,  "GRAPH_ALIGN"));
+    int gap = std::stoi(arguments["proteo_graph_dis"]);
+    GraphAlignMngPtr ga_mng_ptr = GraphAlignMngPtr(new GraphAlignMng(prsm_para_ptr, residue_mod_file_name, ptm_num, max_mod_num, gap, "GRAPH_ALIGN"));
     LOG_DEBUG("shift num " << ptm_num);
     GraphAlignProcessorPtr ga_processor_ptr = GraphAlignProcessorPtr(new GraphAlignProcessor(ga_mng_ptr));
     ga_processor_ptr->process();
