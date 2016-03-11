@@ -8,7 +8,7 @@ void Summary::outputSummary(Argument arguments,
                             boost::posix_time::ptime stop_time) {
   
   std::string spec_file_name = arguments.getArguments()["spectrumFileName"];
-  std::string base_name = basename(spec_file_name);
+  std::string base_name = FileUtil::basename(spec_file_name);
   std::string output_file_name = base_name + "." + "SUMMARY";
 
   std::ofstream output; 
@@ -22,7 +22,7 @@ void Summary::outputSummary(Argument arguments,
   output << "Running time: " << boost::posix_time::to_simple_string(duration) << std::endl;
 
 
-  arguments.outputArguments(output);
+  Argument::outputArguments(output, arguments.getArguments());
   output.close();
 }
 

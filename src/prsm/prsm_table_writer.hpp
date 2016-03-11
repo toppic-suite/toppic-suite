@@ -18,6 +18,7 @@ namespace prot {
 class PrsmTableWriter {
  public:
   PrsmTableWriter(PrsmParaPtr prsm_para_ptr, 
+                  std::map<std::string, std::string> arguments,
                   const std::string &input_file_ext, 
                   const std::string &output_file_ext);
   void write();
@@ -26,6 +27,7 @@ class PrsmTableWriter {
 
  private:
   PrsmParaPtr prsm_para_ptr_;
+  std::map<std::string, std::string> arguments_;
   std::string input_file_ext_;
   std::string output_file_ext_;
 };

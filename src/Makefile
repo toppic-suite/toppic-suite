@@ -19,9 +19,10 @@ all:
 	cd ptmsearch; make
 	cd tdgf; make
 	cd prsmview; make	
+	cd local; make
 	cd console; make
-	cd graph; make
-	cd graphalign; make
+#	cd graph; make
+#	cd graphalign; make
 	cd test; make
 
 clean:
@@ -36,5 +37,8 @@ clean:
 	cd ptmsearch; make clean
 	cd tdgf; make clean
 	cd prsmview; make clean
+	cd local; make clean
 	cd console; make clean
+	cd graph; make clean
+	cd graphalign; make clean
 	cd test; make clean

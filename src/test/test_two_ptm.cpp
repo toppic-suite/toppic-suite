@@ -73,7 +73,7 @@ int two_ptm_process(int argc, char* argv[]) {
       use_gf = true;
     }
     // initialize log file 
-  	WebLog::init(log_file_name, use_gf, ptm_num);
+  	//WebLog::init(log_file_name, use_gf, ptm_num);
     LOG_DEBUG("web log inited");
 
     PrsmParaPtr prsm_para_ptr = PrsmParaPtr(new PrsmPara(arguments));
@@ -236,18 +236,18 @@ int two_ptm_process(int argc, char* argv[]) {
 
     std::cout << "Outputting table starts " << std::endl;
     PrsmTableWriterPtr table_out = PrsmTableWriterPtr(
-        new PrsmTableWriter(prsm_para_ptr, "CUTOFF_RESULT", "TWO_TABLE"));
+        new PrsmTableWriter(prsm_para_ptr, arguments, "CUTOFF_RESULT", "TWO_TABLE"));
     table_out->write();
     table_out = nullptr;
     std::cout << "Outputting table finished." << std::endl;
 
-    table_out = PrsmTableWriterPtr(new PrsmTableWriter(prsm_para_ptr, "PTM_2_COMPLETE", "PTM_2_COMPLETE_TABLE"));
+    table_out = PrsmTableWriterPtr(new PrsmTableWriter(prsm_para_ptr, arguments, "PTM_2_COMPLETE", "PTM_2_COMPLETE_TABLE"));
     table_out->write();
-    table_out = PrsmTableWriterPtr(new PrsmTableWriter(prsm_para_ptr, "PTM_2_PREFIX", "PTM_2_PREFIX_TABLE"));
+    table_out = PrsmTableWriterPtr(new PrsmTableWriter(prsm_para_ptr, arguments, "PTM_2_PREFIX", "PTM_2_PREFIX_TABLE"));
     table_out->write();
-    table_out = PrsmTableWriterPtr(new PrsmTableWriter(prsm_para_ptr, "PTM_2_SUFFIX", "PTM_2_SUFFIX_TABLE"));
+    table_out = PrsmTableWriterPtr(new PrsmTableWriter(prsm_para_ptr, arguments, "PTM_2_SUFFIX", "PTM_2_SUFFIX_TABLE"));
     table_out->write();
-    table_out = PrsmTableWriterPtr(new PrsmTableWriter(prsm_para_ptr, "PTM_2_INTERNAL", "PTM_2_INTERNAL_TABLE"));
+    table_out = PrsmTableWriterPtr(new PrsmTableWriter(prsm_para_ptr, arguments, "PTM_2_INTERNAL", "PTM_2_INTERNAL_TABLE"));
     table_out->write();
 
   } catch (const char* e) {
