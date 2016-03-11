@@ -15,7 +15,7 @@ ProteoGraphReader::ProteoGraphReader(const std::string &db_file_name,
   max_ptm_sum_mass_ = max_ptm_sum_mass;
   reader_ptr_ = FastaReaderPtr(new FastaReader(db_file_name));
   proteo_anno_ptr_ = ProteoAnnoPtr(
-          new ProteoAnno(fix_mod_ptr_vec, prot_mod_ptr_vec, var_mod_ptr_vec));
+      new ProteoAnno(fix_mod_ptr_vec, prot_mod_ptr_vec, var_mod_ptr_vec));
 }
 
 MassGraphPtr ProteoGraphReader::getMassGraphPtr() {
@@ -48,13 +48,6 @@ ProteoGraphPtr ProteoGraphReader::getNextProteoGraphPtr() {
   LOG_DEBUG("name " << seq_ptr->getName() << " seq " << seq_ptr->getSeq());
   proteo_anno_ptr_->anno(seq_ptr->getSeq());
   MassGraphPtr graph_ptr = getMassGraphPtr(); 
-  /*
-  LOG_DEBUG("graph complete");
-  AcidPtrVec acid_seq = AcidFactory::convertSeqToAcidSeq(seq_ptr->getSeq());
-  ResiduePtrVec residue_ptrs = convertAcidToResidueSeq(fix_mod_res_ptr_vec_, acid_seq);
-  DbResSeqPtr db_residue_seq_ptr(
-      new DbResidueSeq(residue_ptrs, seq_id_, seq_ptr->getName(), seq_ptr->getDesc())); 
-      */
   seq_id_++;
   return ProteoGraphPtr(new ProteoGraph(seq_ptr, fix_mod_ptr_vec_, graph_ptr, 
                                         proteo_anno_ptr_->isNme(),

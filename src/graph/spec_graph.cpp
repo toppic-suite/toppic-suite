@@ -30,21 +30,31 @@ int SpecGraph::getPeakDist(int v1, int v2) {
 }
 
 void SpecGraph::compSpecDistances(double convert_ratio) {
+  std::set<Dist> dist_set;
   int count = 0;
   peak_dists_ = std::vector<int>(pair_num_, 0);
   for (size_t i = 0; i < peak_vec_.size() - 1; i++) {
     for (size_t j = i+1; j < peak_vec_.size(); j++) {
       double dist = peak_vec_[j]->getPosition() - peak_vec_[i]->getPosition();
+
       int int_dist = std::round(dist * convert_ratio);
+
+      Dist tmp = Dist(graph_ptr_, int_dist, i, j);
+      auto search = dist_set.find(tmp);
+
+      if (search != dist_set.end()) {
+        search->pair_ij_.push_back(std::pair<int, int>(i, j));
+      } else {
+        dist_set.insert(tmp);
+      }
+
       int index = getVecIndex(i, j);
       peak_dists_[index] = int_dist;
-      DistTuplePtr tuple_ptr(new DistTuple(graph_ptr_, i, j, 0, int_dist));
-      tuple_vec_.push_back(tuple_ptr);
       count++;
-          //LOG_DEBUG("i " << i << " j " << j << " count " << count);
     }
   }
   LOG_DEBUG("count " << count);
+  std::copy(dist_set.begin(), dist_set.end(), std::back_inserter(dist_));
 }
 
 }

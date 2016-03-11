@@ -24,8 +24,7 @@ ProteoAnno::ProteoAnno(const ModPtrVec &fix_mod_ptr_vec,
       ResiduePtrVec cur_vec;
       cur_vec.push_back(res_ptr);
       ptm_map_[acid_ptr]= cur_vec;
-    }
-    else {
+    } else {
       ptm_map_[acid_ptr].push_back(res_ptr);
     }
   }

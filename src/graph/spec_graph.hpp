@@ -3,8 +3,7 @@
 
 #include "spec/prm_peak.hpp"
 #include "spec/spectrum_set.hpp"
-
-#include "graph/dist_tuple.hpp"
+#include "graph/dist.hpp"
 #include "graph/graph.hpp"
 
 namespace prot {
@@ -16,7 +15,8 @@ class SpecGraph {
             MassGraphPtr mass_graph_ptr, double convert_ratio);
   SpectrumSetPtr getSpectrumSetPtr() {return spec_set_ptr_;}
   MassGraphPtr getMassGraphPtr() {return graph_ptr_;}
-  const DistTuplePtrVec& getDistTuplePtrVec() {return tuple_vec_;}
+
+  DistVec getDistVec() {return dist_;}
   PrmPeakPtr getPrmPeakPtr(int i) {return peak_vec_[i];}
   const PrmPeakPtrVec& getPrmPeakPtrVec() {return peak_vec_;}
 
@@ -29,7 +29,8 @@ class SpecGraph {
   std::vector<int> peak_dists_;
   MassGraphPtr graph_ptr_;
   PrmPeakPtrVec peak_vec_;
-  DistTuplePtrVec tuple_vec_;
+
+  DistVec dist_;
 
   int getVecIndex(int v1, int v2);
 
