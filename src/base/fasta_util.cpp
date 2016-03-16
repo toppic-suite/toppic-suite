@@ -11,13 +11,16 @@ void FastaUtil::generateShuffleDb(const std::string &file_name,
   FastaReader reader(file_name);
 
   FastaSeqPtr seq_info = reader.getNextSeq();
+  std::mt19937 r{std::random_device{}()};
+  r.seed(std::mt19937::default_seed);
   while (seq_info!=nullptr) {
     std::string name = seq_info->getName();
     std::string seq = seq_info->getSeq();
     std::string desc = seq_info->getDesc();
     std::string decoy_name = "DECOY_" + name;
     std::string temp = seq.substr(2, seq.length() - 2);
-    std::random_shuffle(temp.begin(), temp.end());
+    std::shuffle(temp.begin(), temp.end(), r);
+    //std::random_shuffle(temp.begin(), temp.end());
     std::string decoy_seq = seq.substr(0,2) + temp;
     output << ">" << decoy_name << " " << desc <<  std::endl;
     output << decoy_seq << std::endl;
