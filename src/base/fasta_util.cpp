@@ -18,10 +18,16 @@ void FastaUtil::generateShuffleDb(const std::string &file_name,
     std::string seq = seq_info->getSeq();
     std::string desc = seq_info->getDesc();
     std::string decoy_name = "DECOY_" + name;
-    std::string temp = seq.substr(2, seq.length() - 2);
-    std::shuffle(temp.begin(), temp.end(), r);
-    //std::random_shuffle(temp.begin(), temp.end());
-    std::string decoy_seq = seq.substr(0,2) + temp;
+    std::string decoy_seq;
+    if (seq.length() > 2) {
+      std::string temp = seq.substr(2, seq.length() - 2);
+      std::shuffle(temp.begin(), temp.end(), r);
+      //std::random_shuffle(temp.begin(), temp.end());
+      decoy_seq = seq.substr(0,2) + temp;
+    }
+    else {
+      decoy_seq = seq;
+    }
     output << ">" << decoy_name << " " << desc <<  std::endl;
     output << decoy_seq << std::endl;
     output << ">" << name << " " << desc << std::endl;
