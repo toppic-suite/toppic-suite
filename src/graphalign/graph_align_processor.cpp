@@ -2,16 +2,21 @@
 #include "base/mod_util.hpp"
 #include "spec/msalign_util.hpp"
 #include "prsm/prsm_xml_writer.hpp"
+#include "prsm/prsm_reader.hpp"
 #include "graph/graph_util.hpp"
 #include "graph/proteo_graph_reader.hpp"
 #include "graph/spec_graph_reader.hpp"
 #include "graphalign/graph_align.hpp"
 #include "graphalign/graph_align_processor.hpp"
+#include "threadpool.hpp"
+
+#define NUM_THREAD 4
 
 namespace prot {
 
-GraphAlignProcessor::GraphAlignProcessor(
-    GraphAlignMngPtr mng_ptr) {
+boost::mutex mtx;
+
+GraphAlignProcessor::GraphAlignProcessor(GraphAlignMngPtr mng_ptr) {
   mng_ptr_ = mng_ptr;
 }
 
@@ -35,20 +40,19 @@ void GraphAlignProcessor::process() {
                            mng_ptr_->max_known_mods_,
                            mng_ptr_->getIntMaxPtmSumMass(),
                            mng_ptr_->proteo_graph_gap_);
-
-  FastaReader fasta_reader(db_file_name);
-  std::vector<FastaSeqPtr> fasta_vec;
-  FastaSeqPtr fasta_ptr;
   LOG_DEBUG("init reader complete");
+  ProteoGraphPtrVec proteo_ptrs;
+  ProteoGraphPtr proteo_ptr;
   int count = 0;
-  while ((fasta_ptr = fasta_reader.getNextSeq()) != nullptr) {
+  while ((proteo_ptr = reader.getNextProteoGraphPtr()) != nullptr) {
     count++;
-    fasta_vec.push_back(fasta_ptr);
+    proteo_ptrs.push_back(proteo_ptr);
   }
 
   LOG_DEBUG("Prot graph number " << count);
-  std::string output_file_name = FileUtil::basename(sp_file_name) + "." + mng_ptr_->output_file_ext_;
-  PrsmXmlWriter prsm_writer(output_file_name);
+
+  FileUtil::createFolder("mass_graph");
+  std::string output_file_name = "mass_graph" + FileUtil::getFileSeparator() + FileUtil::basename(sp_file_name);
 
   LOG_DEBUG("start init spec reader");
   SpecGraphReader spec_reader(sp_file_name, 
@@ -62,31 +66,51 @@ void GraphAlignProcessor::process() {
   LOG_DEBUG("spec_ptr_vec " << spec_ptr_vec.size());
   int spectrum_num = MsAlignUtil::getSpNum (prsm_para_ptr->getSpectrumFileName());
   int sp_count = 0;
+  ThreadPool pool(NUM_THREAD);
+  GraphAlignMngPtr mng_ptr = mng_ptr_;
+
   while (spec_ptr_vec.size() != 0) {
     sp_count++;
-    LOG_DEBUG("spectrum id " << spec_ptr_vec[0]->getSpectrumSetPtr()->getSpecId());
-    std::cout << std::flush << "Mass graph is processing " << sp_count 
-        << " of " << spectrum_num << " spectra.\r";
-    for (size_t i = 0; i < fasta_vec.size(); i++) {
-      ProteoGraphPtr proteo_ptr = reader.getProteoGraphPtrBySeq(fasta_vec[i]);
-
+    pool.Enqueue([&proteo_ptrs, &mng_ptr, output_file_name, spec_ptr_vec, sp_count, spectrum_num](){
+      PrsmXmlWriter prsm_writer(output_file_name + "_" + std::to_string(sp_count) + "." + mng_ptr->output_file_ext_);
+      mtx.lock();
+      std::cout << std::flush << "Mass graph is processing " << sp_count << " of " << spectrum_num << " spectra.\r";
+      mtx.unlock();
       for (size_t spec = 0; spec < spec_ptr_vec.size(); spec++) {
-        if (spec_ptr_vec[spec]->getSpectrumSetPtr()->isValid() && proteo_ptr != nullptr) {
-          GraphAlignPtr graph_align 
-              = std::make_shared<GraphAlign>(mng_ptr_, proteo_ptr , spec_ptr_vec[spec]);
-          graph_align->process();
-          LOG_DEBUG("align process complete");
-          for (int shift = 0; shift <= mng_ptr_->n_unknown_shift_; shift++) {
-            PrsmPtr prsm_ptr = graph_align->geneResult(shift);
+
+        if (spec_ptr_vec[0]->getSpectrumSetPtr()->isValid()) {
+          for (size_t i = 0; i < proteo_ptrs.size(); i++) {
+            GraphAlignPtr graph_align 
+              = std::make_shared<GraphAlign>(mng_ptr, proteo_ptrs[i], spec_ptr_vec[0]);
+            graph_align->process();
+            PrsmPtr prsm_ptr = graph_align->geneResult(0);
             if (prsm_ptr != nullptr) {
               prsm_writer.write(prsm_ptr);
-            }
+            } 
           }
-          graph_align = nullptr;
         }
       }
-    }
+      prsm_writer.close();
+    });
     spec_ptr_vec = spec_reader.getNextSpecGraphPtrVec(mng_ptr_->prec_error_);
+  }
+  pool.ShutDown();
+  std::cout << std::endl;
+  FastaIndexReaderPtr seq_reader(new FastaIndexReader(db_file_name));
+  ModPtrVec fix_mod_ptr_vec = prsm_para_ptr->getFixModPtrVec();
+  PrsmPtrVec prsm_vec;
+  for (int i = 0; i <= spectrum_num; i++) {
+    std::string fname = output_file_name + "_" + std::to_string(i) + "." + mng_ptr_->output_file_ext_; 
+    PrsmReader prsm_reader(fname);
+    PrsmPtr prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
+    while (prsm_ptr != nullptr) {
+      prsm_vec.push_back(prsm_ptr);
+      prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
+    }
+  }
+  PrsmXmlWriter prsm_writer(FileUtil::basename(sp_file_name) + "." + mng_ptr_->output_file_ext_);
+  for (size_t i = 0; i < prsm_vec.size(); i++) {
+    prsm_writer.write(prsm_vec[i]);
   }
   prsm_writer.close();
 }
