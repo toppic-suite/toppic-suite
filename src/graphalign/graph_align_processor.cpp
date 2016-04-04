@@ -7,7 +7,6 @@
 #include "graph/spec_graph_reader.hpp"
 #include "graphalign/graph_align.hpp"
 #include "graphalign/graph_align_processor.hpp"
-#include "threadpool.hpp"
 
 namespace prot {
 
@@ -35,19 +34,17 @@ void GraphAlignProcessor::process() {
                            mng_ptr_->max_known_mods_,
                            mng_ptr_->getIntMaxPtmSumMass(),
                            mng_ptr_->proteo_graph_gap_);
-
-  FastaReader fasta_reader(db_file_name);
-  std::vector<FastaSeqPtr> fasta_vec;
-  FastaSeqPtr fasta_ptr;
   LOG_DEBUG("init reader complete");
+  ProteoGraphPtrVec proteo_ptrs;
+  ProteoGraphPtr proteo_ptr;
   int count = 0;
-  while ((fasta_ptr = fasta_reader.getNextSeq()) != nullptr) {
+  while ((proteo_ptr = reader.getNextProteoGraphPtr()) != nullptr) {
     count++;
-    fasta_vec.push_back(fasta_ptr);
+    proteo_ptrs.push_back(proteo_ptr);
   }
 
   LOG_DEBUG("Prot graph number " << count);
-  std::string output_file_name = FileUtil::basename(sp_file_name) + "." + mng_ptr_->output_file_ext_;
+  std::string output_file_name = FileUtil::basename(sp_file_name)+"."+mng_ptr_->output_file_ext_;
   PrsmXmlWriter prsm_writer(output_file_name);
 
   LOG_DEBUG("start init spec reader");
@@ -64,16 +61,12 @@ void GraphAlignProcessor::process() {
   int sp_count = 0;
   while (spec_ptr_vec.size() != 0) {
     sp_count++;
+    std::cout << std::flush << "Mass graph is processing " << sp_count << " of " << spectrum_num << " spectra.\r";
     LOG_DEBUG("spectrum id " << spec_ptr_vec[0]->getSpectrumSetPtr()->getSpecId());
-    std::cout << std::flush << "Mass graph is processing " << sp_count 
-        << " of " << spectrum_num << " spectra.\r";
-    for (size_t i = 0; i < fasta_vec.size(); i++) {
-      ProteoGraphPtr proteo_ptr = reader.getProteoGraphPtrBySeq(fasta_vec[i]);
-
-      for (size_t spec = 0; spec < spec_ptr_vec.size(); spec++) {
-        if (spec_ptr_vec[spec]->getSpectrumSetPtr()->isValid() && proteo_ptr != nullptr) {
-          GraphAlignPtr graph_align 
-              = std::make_shared<GraphAlign>(mng_ptr_, proteo_ptr , spec_ptr_vec[spec]);
+    for (size_t spec = 0; spec < spec_ptr_vec.size(); spec++) {
+      if (spec_ptr_vec[spec]->getSpectrumSetPtr()->isValid()) {
+        for (size_t i = 0; i < proteo_ptrs.size(); i++) {
+          GraphAlignPtr graph_align = std::make_shared<GraphAlign>(mng_ptr_, proteo_ptrs[i], spec_ptr_vec[spec]);
           graph_align->process();
           LOG_DEBUG("align process complete");
           for (int shift = 0; shift <= mng_ptr_->n_unknown_shift_; shift++) {
