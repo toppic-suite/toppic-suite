@@ -13,6 +13,8 @@
 
 namespace prot {
 
+boost::mutex mtx;
+
 GraphAlignProcessor::GraphAlignProcessor(GraphAlignMngPtr mng_ptr) {
   mng_ptr_ = mng_ptr;
 }
@@ -47,8 +49,8 @@ void GraphAlignProcessor::process() {
   }
 
   LOG_DEBUG("Prot graph number " << count);
-  std::string output_file_name = FileUtil::basename(sp_file_name)+"."+mng_ptr_->output_file_ext_;
-  PrsmXmlWriter prsm_writer(output_file_name);
+  std::string output_file_name = FileUtil::basename(sp_file_name);//+"."+mng_ptr_->output_file_ext_;
+  
 
   LOG_DEBUG("start init spec reader");
   SpecGraphReader spec_reader(sp_file_name, 
@@ -60,34 +62,38 @@ void GraphAlignProcessor::process() {
   SpecGraphPtrVec spec_ptr_vec = spec_reader.getNextSpecGraphPtrVec(mng_ptr_->prec_error_);
   LOG_DEBUG("spec ptr reading complete");
   LOG_DEBUG("spec_ptr_vec " << spec_ptr_vec.size());
-  //int spectrum_num = MsAlignUtil::getSpNum (prsm_para_ptr->getSpectrumFileName());
-  //int sp_count = 0;
+  int spectrum_num = MsAlignUtil::getSpNum (prsm_para_ptr->getSpectrumFileName());
+  int sp_count = 0;
   ThreadPool pool(NUM_THREAD);
   GraphAlignMngPtr mng_ptr = mng_ptr_;
   while (spec_ptr_vec.size() != 0) {
-    //sp_count++;
-    //std::cout << std::flush << "Mass graph is processing " << sp_count << " of " << spectrum_num << " spectra.\r";
-    //LOG_DEBUG("spectrum id " << spec_ptr_vec[0]->getSpectrumSetPtr()->getSpecId());
-    spec_ptr_vec = spec_reader.getNextSpecGraphPtrVec(mng_ptr_->prec_error_);
-    pool.Enqueue([&proteo_ptrs, &mng_ptr, spec_ptr_vec](){
-      std::cout << "Processed: " 
-                << boost::this_thread::get_id() << " " 
-                << spec_ptr_vec[0]->getSpectrumSetPtr()->getSpecId()
-                << std::endl; 
-      
+    sp_count++;
+    pool.Enqueue([&proteo_ptrs, &mng_ptr, output_file_name, spec_ptr_vec, sp_count, spectrum_num](){
+      PrsmXmlWriter prsm_writer(output_file_name + "_" + std::to_string(sp_count) + "." + mng_ptr->output_file_ext_);
+      mtx.lock();
+      std::cout << std::flush << "Mass graph is processing " << sp_count << " of " << spectrum_num << " spectra.\r";
+      mtx.unlock();
       for (size_t spec = 0; spec < spec_ptr_vec.size(); spec++) {
-        if (spec_ptr_vec[spec]->getSpectrumSetPtr()->isValid()) {
+
+        if (spec_ptr_vec[0]->getSpectrumSetPtr()->isValid()) {
           for (size_t i = 0; i < proteo_ptrs.size(); i++) {
             GraphAlignPtr graph_align 
-              = std::make_shared<GraphAlign>(mng_ptr, proteo_ptrs[i], spec_ptr_vec[spec]);
+              = std::make_shared<GraphAlign>(mng_ptr, proteo_ptrs[i], spec_ptr_vec[0]);
             graph_align->process();
+            PrsmPtr prsm_ptr = graph_align->geneResult(0);
+            if (prsm_ptr != nullptr) {
+              prsm_writer.write(prsm_ptr);
+            } 
           }
         }
       }
+      prsm_writer.close();
     });
+    
     spec_ptr_vec = spec_reader.getNextSpecGraphPtrVec(mng_ptr_->prec_error_);
   }
-  prsm_writer.close();
+  pool.ShutDown();
+  std::cout << std::endl;
 }
 
 }
