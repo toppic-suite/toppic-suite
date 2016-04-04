@@ -7,11 +7,11 @@
 #include "graph/spec_graph_reader.hpp"
 #include "graphalign/graph_align.hpp"
 #include "graphalign/graph_align_processor.hpp"
+#include "threadpool.hpp"
 
 namespace prot {
 
-GraphAlignProcessor::GraphAlignProcessor(
-    GraphAlignMngPtr mng_ptr) {
+GraphAlignProcessor::GraphAlignProcessor(GraphAlignMngPtr mng_ptr) {
   mng_ptr_ = mng_ptr;
 }
 
