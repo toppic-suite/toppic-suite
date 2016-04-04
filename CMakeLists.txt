@@ -7,14 +7,14 @@ SET( CMAKE_VERBOSE_MAKEFILE ON )
 
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../bin)
 
-SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -std=c++11 -O3 -pedantic -pthread")
+SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -std=c++11 -O3")
 #SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -std=c++11 -pg ")
 message(STATUS "system name " ${CMAKE_SYSTEM_NAME})
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   # Linux specific code
   SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DPROT_LINUX")
-  SET(CMAKE_EXE_LINKER_FLAGS  "-static -Wl,--whole-archive -Wl,--no-whole-archive")
+  SET(CMAKE_EXE_LINKER_FLAGS  "-static")
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src
         ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/linux_include)
   link_directories(${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/linux_lib/)
@@ -85,7 +85,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     #    boost_filesystem boost_system hts pthread z)
 
     target_link_libraries(test_graph xalan-c xalanMsg xerces-c boost_program_options
-        boost_filesystem boost_system hts pthread z)
+        boost_filesystem boost_system boost_thread hts pthread z)
 
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
 

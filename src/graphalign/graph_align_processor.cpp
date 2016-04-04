@@ -7,6 +7,9 @@
 #include "graph/spec_graph_reader.hpp"
 #include "graphalign/graph_align.hpp"
 #include "graphalign/graph_align_processor.hpp"
+#include "threadpool.hpp"
+
+#define NUM_THREAD 4
 
 namespace prot {
 
@@ -59,26 +62,15 @@ void GraphAlignProcessor::process() {
   LOG_DEBUG("spec_ptr_vec " << spec_ptr_vec.size());
   int spectrum_num = MsAlignUtil::getSpNum (prsm_para_ptr->getSpectrumFileName());
   int sp_count = 0;
+  ThreadPool pool(NUM_THREAD);
   while (spec_ptr_vec.size() != 0) {
     sp_count++;
-    std::cout << std::flush << "Mass graph is processing " << sp_count << " of " << spectrum_num << " spectra.\r";
-    LOG_DEBUG("spectrum id " << spec_ptr_vec[0]->getSpectrumSetPtr()->getSpecId());
-    for (size_t spec = 0; spec < spec_ptr_vec.size(); spec++) {
-      if (spec_ptr_vec[spec]->getSpectrumSetPtr()->isValid()) {
-        for (size_t i = 0; i < proteo_ptrs.size(); i++) {
-          GraphAlignPtr graph_align = std::make_shared<GraphAlign>(mng_ptr_, proteo_ptrs[i], spec_ptr_vec[spec]);
-          graph_align->process();
-          LOG_DEBUG("align process complete");
-          for (int shift = 0; shift <= mng_ptr_->n_unknown_shift_; shift++) {
-            PrsmPtr prsm_ptr = graph_align->geneResult(shift);
-            if (prsm_ptr != nullptr) {
-              prsm_writer.write(prsm_ptr);
-            }
-          }
-          graph_align = nullptr;
-        }
-      }
-    }
+    //std::cout << std::flush << "Mass graph is processing " << sp_count << " of " << spectrum_num << " spectra.\r";
+    //LOG_DEBUG("spectrum id " << spec_ptr_vec[0]->getSpectrumSetPtr()->getSpecId());
+    spec_ptr_vec = spec_reader.getNextSpecGraphPtrVec(mng_ptr_->prec_error_);
+    pool.Enqueue([sp_count](){
+                 std::cout << "Processed: " << sp_count<< std::endl; 
+                 });
     spec_ptr_vec = spec_reader.getNextSpecGraphPtrVec(mng_ptr_->prec_error_);
   }
   prsm_writer.close();

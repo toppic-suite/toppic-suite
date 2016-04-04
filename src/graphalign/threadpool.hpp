@@ -4,9 +4,9 @@
 
 #include <vector>
 #include <queue>
-#include <thread>
-#include <mutex>
-#include <condition_variable>
+#include "boost/thread/thread.hpp"
+#include "boost/thread/mutex.hpp"
+#include "boost/thread/condition_variable.hpp"
 #include <iostream>
 
 class ThreadPool {
@@ -26,16 +26,16 @@ class ThreadPool {
 
  private:
   // Thread pool storage.
-  std::vector<std::thread> threadPool;
+  std::vector<boost::thread> threadPool;
 
   // Queue to keep track of incoming tasks.
   std::queue<std::function<void()> > tasks;
 
   // Task queue mutex.
-  std::mutex tasksMutex;
+  boost::mutex tasksMutex;
 
   // Condition variable.
-  std::condition_variable condition;
+  boost::condition_variable condition;
 
   // Indicates that pool needs to be shut down.
   bool terminate;
