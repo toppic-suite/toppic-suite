@@ -74,11 +74,12 @@ void GraphAlignProcessor::process() {
   }
 
   int spectrum_num = MsAlignUtil::getSpNum (prsm_para_ptr->getSpectrumFileName());
+  sp_count = 0;
 
   ThreadPool pool(NUM_THREAD);
   GraphAlignMngPtr mng_ptr = mng_ptr_;
 
-  for (sp_count = 0; sp_count <= spectrum_num; sp_count++) {
+  for (sp_count = 1; sp_count <= spectrum_num; sp_count++) {
     pool.Enqueue([&proteo_ptrs, &mng_ptr, &prsm_para_ptr, &sp_para_ptr, output_file_name, sp_count, spectrum_num](){
       PrsmXmlWriter prsm_writer(output_file_name + "_" + std::to_string(sp_count) + "." + mng_ptr->output_file_ext_);
       mtx.lock();
@@ -93,7 +94,7 @@ void GraphAlignProcessor::process() {
         if (spec_ptr_vec[0]->getSpectrumSetPtr()->isValid()) {
           for (size_t i = 0; i < proteo_ptrs.size(); i++) {
             GraphAlignPtr graph_align 
-              = std::make_shared<GraphAlign>(mng_ptr, proteo_ptrs[i], spec_ptr_vec[0]);
+              = std::make_shared<GraphAlign>(mng_ptr, proteo_ptrs[i], spec_ptr_vec[spec]);
             graph_align->process();
             PrsmPtr prsm_ptr = graph_align->geneResult(0);
             if (prsm_ptr != nullptr) {
