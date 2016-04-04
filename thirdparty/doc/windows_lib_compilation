@@ -1,58 +1,51 @@
-##Windows:
-* download mingw64 with x86_64-w64-mingw32 and msys64 
-* set Environment Variablse add <mingw64 path>/bin to PATH
+Windows toolset:
+1. download mingw64 with posix support 
+2. add <mingw64 path>/bin to PATH
 
-##Boost: 
-* download boost 1.56.0
-* cd boost_1.56.0/tools/build/v2
-* bootstrap.sh mingw
-* cd boost_1.56.0
-* tools/build/v2/b2.exe --prefix=<destination path> --toolset=gcc
-target-os=windows link=static runtime-link=static architecture=x86
-address-model=64 threading=single (threading=single maybe removed)
+Boost: 
+1. download boost 1.60.0
+2. cd boost_1.60.0/tools/build/
+3. bootstrap.sh mingw
+4. cd boost_1.60.0
+5. tools/build/b2.exe --prefix=<destination path> toolset=gcc target-os=windows link=static runtime-link=static architecture=x86 address-model=64 threading=multi
 
-##Xcerces
-* download xerces-c-3.1.1
-* unzip xerces to msys64 and get into the path xerces-c-3.1.1
-* use the configuration below, `--disable-sse2` may be removed
-```sh
-./configure host=x86_64-w64-mingw64 build=x86_64-w64-mingw64 CFLAGS=-O3 CXXFLAGS=-O3 --prefix=<the path you want to save the include and lib of xerces> --disable-sse2
-```
+Xcerces
+1. download xerces-c-3.1.1
+2. unzip xerces to msys64 and get into the path xerces-c-3.1.1
+3. use the configuration below, `--disable-sse2` may be removed
+4. ./configure host=x86_64-w64-mingw64 build=x86_64-w64-mingw64 CFLAGS=-O3 CXXFLAGS=-O3 --prefix=<the path you want to save the include and lib of xerces> --disable-sse2
+5. compile as usual. 
 
-* compile as usual
-```sh
-cd src
-make clean
-make
-```
-##Xalan
-* set evironment varialbe `XERCESCROOT`
-```sh
-export XERCESCROOT=<path>/proteomics_cpp/thirdparty/xerces-c-3.1.1/
-```
-* set evironment varialbe `XALANCROOT`
-```sh
-export XALANCROOT=<path>/proteomics_cpp/thirdparty/xalan-c-1.11/c/
-```
-* configuration
-```sh
-./runConfigure -p mingw-msys -c gcc -x g++ -r none -z -march=athlon64 -z -m64
-```
-* edit `src/xalanc/Makefile` 
-* edit `src/xalanc/Utils/XalanMsgLig/Makefile`
-* edit `Makefile.incl` and remove `/` in prefix, see the `Makefile` in the directory
-* compile as usual
-```sh
-make make install
-```
+	cd src
+	make clean
+	make
 
-##Download links:
+Xalan
+1. set evironment varialbe `XERCESCROOT`. 
+
+	export XERCESCROOT=<path>/proteomics_cpp/thirdparty/xerces-c-3.1.1/
+
+2. set evironment varialbe `XALANCROOT`
+
+	export XALANCROOT=<path>/proteomics_cpp/thirdparty/xalan-c-1.11/c/
+
+3. configuration
+
+	./runConfigure -p mingw-msys -c gcc -x g++ -r none -z -march=athlon64 -z -m64
+
+4. edit `src/xalanc/Makefile` 
+5. edit `src/xalanc/Utils/XalanMsgLig/Makefile`
+6. edit `Makefile.incl` and remove `/` in prefix, see the `Makefile` in the directory
+7. compile as usual
+
+	make 
+	make install
 
 
-| Software | Version   |
-|----------|-----------|
-|[mingw64](http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/4.8.2/threads-posix/seh/x86_64-4.8.2-release-posix-seh-rt_v3-rev4.7z/download) | x86_64-4.8.2 |
-|[msys64](http://sourceforge.net/projects/msys2/files/Base/x86_64/msys2-x86_64-20140910.exe/download)| 20140910   |
-|[boost](http://sourceforge.net/projects/boost/files/boost/1.56.0/)| 1.56.0|
-|[xerces-c](http://xerces.apache.org/xerces-c/download.cgi)|3.1.1|
-|[xalan](http://xalan.apache.org/xalan-c/download.html)|1.11|
+Download links:
+
+1. mingw64: http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/4.8.2/threads-posix/seh/x86_64-4.8.2-release-posix-seh-rt_v3-rev4.7z
+2. msys64: http://sourceforge.net/projects/msys2/files/Base/x86_64/msys2-x86_64-20140910.exe
+3. boost: https://sourceforge.net/projects/boost/files/boost/1.60.0/
+4. xerces-c: http://xerces.apache.org/xerces-c/download.cgi
+5. xalan: http://xalan.apache.org/xalan-c/download.html
