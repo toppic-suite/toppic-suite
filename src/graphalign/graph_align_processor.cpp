@@ -3,6 +3,7 @@
 
 #include "base/file_util.hpp"
 #include "base/mod_util.hpp"
+#include "base/threadpool.hpp"
 #include "spec/msalign_util.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_reader.hpp"
@@ -11,7 +12,6 @@
 #include "graph/spec_graph_reader.hpp"
 #include "graphalign/graph_align.hpp"
 #include "graphalign/graph_align_processor.hpp"
-#include "threadpool.hpp"
 
 #define NUM_THREAD 4
 
@@ -53,9 +53,11 @@ void GraphAlignProcessor::process() {
   }
 
   LOG_DEBUG("Prot graph number " << count);
+  
+  std::string mass_graph_tmp = "mass_graph_tmp";
 
-  FileUtil::createFolder("mass_graph");
-  std::string output_file_name = "mass_graph" + FileUtil::getFileSeparator() + FileUtil::basename(sp_file_name);
+  FileUtil::createFolder(mass_graph_tmp);
+  std::string output_file_name = mass_graph_tmp + FileUtil::getFileSeparator() + FileUtil::basename(sp_file_name);
 
   MsAlignReader ms_reader(sp_file_name, prsm_para_ptr->getGroupSpecNum(), sp_para_ptr->getActivationPtr());
   std::vector<std::string> ms_spec = ms_reader.readOneSpectrum();
@@ -123,6 +125,7 @@ void GraphAlignProcessor::process() {
     prsm_writer.write(prsm_vec[i]);
   }
   prsm_writer.close();
+  FileUtil::delDir(mass_graph_tmp);
 }
 
 }
