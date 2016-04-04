@@ -1,3 +1,6 @@
+#include <iostream>
+#include <fstream>
+
 #include "base/file_util.hpp"
 #include "base/mod_util.hpp"
 #include "spec/msalign_util.hpp"
@@ -54,30 +57,37 @@ void GraphAlignProcessor::process() {
   FileUtil::createFolder("mass_graph");
   std::string output_file_name = "mass_graph" + FileUtil::getFileSeparator() + FileUtil::basename(sp_file_name);
 
-  LOG_DEBUG("start init spec reader");
-  SpecGraphReader spec_reader(sp_file_name, 
-                              prsm_para_ptr->getGroupSpecNum(),
-                              mng_ptr_->convert_ratio_,
-                              sp_para_ptr);
-  LOG_DEBUG("init spec reader complete");
-
-  SpecGraphPtrVec spec_ptr_vec = spec_reader.getNextSpecGraphPtrVec(mng_ptr_->prec_error_);
-  LOG_DEBUG("spec ptr reading complete");
-  LOG_DEBUG("spec_ptr_vec " << spec_ptr_vec.size());
-  int spectrum_num = MsAlignUtil::getSpNum (prsm_para_ptr->getSpectrumFileName());
+  MsAlignReader ms_reader(sp_file_name, prsm_para_ptr->getGroupSpecNum(), sp_para_ptr->getActivationPtr());
+  std::vector<std::string> ms_spec = ms_reader.readOneSpectrum();
   int sp_count = 0;
+  while(ms_spec.size() > 0) {
+    sp_count++;
+    std::ofstream spec_file;
+    spec_file.open(output_file_name + "_" + std::to_string(sp_count) + ".msalign");
+    for (size_t i = 0; i < ms_spec.size(); i++) {
+      spec_file << ms_spec[i] << std::endl;
+    }
+    spec_file.close();
+    ms_spec = ms_reader.readOneSpectrum();
+  }
+
+  int spectrum_num = MsAlignUtil::getSpNum (prsm_para_ptr->getSpectrumFileName());
+
   ThreadPool pool(NUM_THREAD);
   GraphAlignMngPtr mng_ptr = mng_ptr_;
 
-  while (spec_ptr_vec.size() != 0) {
-    sp_count++;
-    pool.Enqueue([&proteo_ptrs, &mng_ptr, output_file_name, spec_ptr_vec, sp_count, spectrum_num](){
+  for (sp_count = 0; sp_count <= spectrum_num; sp_count++) {
+    pool.Enqueue([&proteo_ptrs, &mng_ptr, &prsm_para_ptr, &sp_para_ptr, output_file_name, sp_count, spectrum_num](){
       PrsmXmlWriter prsm_writer(output_file_name + "_" + std::to_string(sp_count) + "." + mng_ptr->output_file_ext_);
       mtx.lock();
       std::cout << std::flush << "Mass graph is processing " << sp_count << " of " << spectrum_num << " spectra.\r";
       mtx.unlock();
+      SpecGraphReader spec_reader(output_file_name + "_" + std::to_string(sp_count) + ".msalign",
+                                  prsm_para_ptr->getGroupSpecNum(),
+                                  mng_ptr->convert_ratio_,
+                                  sp_para_ptr);
+      SpecGraphPtrVec spec_ptr_vec = spec_reader.getNextSpecGraphPtrVec(mng_ptr->prec_error_);
       for (size_t spec = 0; spec < spec_ptr_vec.size(); spec++) {
-
         if (spec_ptr_vec[0]->getSpectrumSetPtr()->isValid()) {
           for (size_t i = 0; i < proteo_ptrs.size(); i++) {
             GraphAlignPtr graph_align 
@@ -92,8 +102,8 @@ void GraphAlignProcessor::process() {
       }
       prsm_writer.close();
     });
-    spec_ptr_vec = spec_reader.getNextSpecGraphPtrVec(mng_ptr_->prec_error_);
   }
+
   pool.ShutDown();
   std::cout << std::endl;
   FastaIndexReaderPtr seq_reader(new FastaIndexReader(db_file_name));
