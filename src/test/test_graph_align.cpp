@@ -69,8 +69,6 @@ int proteoform_graph_test(int argc, char* argv[]) {
     FastaUtil::dbPreprocess(ori_db_file_name, db_file_name, decoy, db_block_size);
     MsAlignUtil::geneSpIndex(sp_file_name);
 
-    boost::timer t;
-
     PrsmParaPtr prsm_para_ptr = PrsmParaPtr(new PrsmPara(arguments));
 
     std::cout << "Graph alignment started." << std::endl;
@@ -83,8 +81,6 @@ int proteoform_graph_test(int argc, char* argv[]) {
     ga_processor_ptr->process();
     ga_processor_ptr = nullptr;
     std::cout << "Graph alignment finished." << std::endl;
-
-    std::cout << "Graph alignment running time: " << t.elapsed()  << " seconds " << std::endl;
 
     std::cout << "Combining PRSMs started." << std::endl;
     std::vector<std::string> input_exts ;
