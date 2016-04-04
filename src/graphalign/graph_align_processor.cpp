@@ -2,6 +2,7 @@
 #include "base/mod_util.hpp"
 #include "spec/msalign_util.hpp"
 #include "prsm/prsm_xml_writer.hpp"
+#include "prsm/prsm_reader.hpp"
 #include "graph/graph_util.hpp"
 #include "graph/proteo_graph_reader.hpp"
 #include "graph/spec_graph_reader.hpp"
@@ -49,8 +50,9 @@ void GraphAlignProcessor::process() {
   }
 
   LOG_DEBUG("Prot graph number " << count);
-  std::string output_file_name = FileUtil::basename(sp_file_name);//+"."+mng_ptr_->output_file_ext_;
-  
+
+  FileUtil::createFolder("mass_graph");
+  std::string output_file_name = "mass_graph" + FileUtil::getFileSeparator() + FileUtil::basename(sp_file_name);
 
   LOG_DEBUG("start init spec reader");
   SpecGraphReader spec_reader(sp_file_name, 
@@ -66,6 +68,7 @@ void GraphAlignProcessor::process() {
   int sp_count = 0;
   ThreadPool pool(NUM_THREAD);
   GraphAlignMngPtr mng_ptr = mng_ptr_;
+
   while (spec_ptr_vec.size() != 0) {
     sp_count++;
     pool.Enqueue([&proteo_ptrs, &mng_ptr, output_file_name, spec_ptr_vec, sp_count, spectrum_num](){
@@ -89,11 +92,27 @@ void GraphAlignProcessor::process() {
       }
       prsm_writer.close();
     });
-    
     spec_ptr_vec = spec_reader.getNextSpecGraphPtrVec(mng_ptr_->prec_error_);
   }
   pool.ShutDown();
   std::cout << std::endl;
+  FastaIndexReaderPtr seq_reader(new FastaIndexReader(db_file_name));
+  ModPtrVec fix_mod_ptr_vec = prsm_para_ptr->getFixModPtrVec();
+  PrsmPtrVec prsm_vec;
+  for (int i = 0; i <= spectrum_num; i++) {
+    std::string fname = output_file_name + "_" + std::to_string(i) + "." + mng_ptr_->output_file_ext_; 
+    PrsmReader prsm_reader(fname);
+    PrsmPtr prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
+    while (prsm_ptr != nullptr) {
+      prsm_vec.push_back(prsm_ptr);
+      prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
+    }
+  }
+  PrsmXmlWriter prsm_writer(FileUtil::basename(sp_file_name) + "." + mng_ptr_->output_file_ext_);
+  for (size_t i = 0; i < prsm_vec.size(); i++) {
+    prsm_writer.write(prsm_vec[i]);
+  }
+  prsm_writer.close();
 }
 
 }
