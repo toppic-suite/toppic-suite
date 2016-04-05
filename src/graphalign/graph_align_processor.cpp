@@ -23,6 +23,38 @@ GraphAlignProcessor::GraphAlignProcessor(GraphAlignMngPtr mng_ptr) {
   mng_ptr_ = mng_ptr;
 }
 
+std::function<void()> geneTask(ProteoGraphPtrVec & proteo_ptrs,
+                               GraphAlignMngPtr & mng_ptr,
+                               PrsmParaPtr & prsm_para_ptr,
+                               SpParaPtr & sp_para_ptr,
+                               const std::string & output_file_name, int sp_count, int spectrum_num) {
+  return [&proteo_ptrs, &mng_ptr, &prsm_para_ptr, &sp_para_ptr, output_file_name, sp_count, spectrum_num](){
+    PrsmXmlWriter prsm_writer(output_file_name + "_" + std::to_string(sp_count) + "." + mng_ptr->output_file_ext_);
+    mtx.lock();
+    std::cout << std::flush << "Mass graph is processing " << sp_count << " of " << spectrum_num << " spectra.\r";
+    mtx.unlock();
+    SpecGraphReader spec_reader(output_file_name + "_" + std::to_string(sp_count) + ".msalign",
+                                prsm_para_ptr->getGroupSpecNum(),
+                                mng_ptr->convert_ratio_,
+                                sp_para_ptr);
+    SpecGraphPtrVec spec_ptr_vec = spec_reader.getNextSpecGraphPtrVec(mng_ptr->prec_error_);
+    for (size_t spec = 0; spec < spec_ptr_vec.size(); spec++) {
+      if (spec_ptr_vec[0]->getSpectrumSetPtr()->isValid()) {
+        for (size_t i = 0; i < proteo_ptrs.size(); i++) {
+          GraphAlignPtr graph_align 
+              = std::make_shared<GraphAlign>(mng_ptr, proteo_ptrs[i], spec_ptr_vec[spec]);
+          graph_align->process();
+          PrsmPtr prsm_ptr = graph_align->geneResult(0);
+          if (prsm_ptr != nullptr) {
+            prsm_writer.write(prsm_ptr);
+          } 
+        }
+      }
+    }
+    prsm_writer.close();
+  };
+}
+
 void GraphAlignProcessor::process() {
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
@@ -53,7 +85,7 @@ void GraphAlignProcessor::process() {
   }
 
   LOG_DEBUG("Prot graph number " << count);
-  
+
   std::string mass_graph_tmp = "mass_graph_tmp";
 
   FileUtil::createFolder(mass_graph_tmp);
@@ -80,31 +112,10 @@ void GraphAlignProcessor::process() {
   GraphAlignMngPtr mng_ptr = mng_ptr_;
 
   for (sp_count = 1; sp_count <= spectrum_num; sp_count++) {
-    pool.Enqueue([&proteo_ptrs, &mng_ptr, &prsm_para_ptr, &sp_para_ptr, output_file_name, sp_count, spectrum_num](){
-      PrsmXmlWriter prsm_writer(output_file_name + "_" + std::to_string(sp_count) + "." + mng_ptr->output_file_ext_);
-      mtx.lock();
-      std::cout << std::flush << "Mass graph is processing " << sp_count << " of " << spectrum_num << " spectra.\r";
-      mtx.unlock();
-      SpecGraphReader spec_reader(output_file_name + "_" + std::to_string(sp_count) + ".msalign",
-                                  prsm_para_ptr->getGroupSpecNum(),
-                                  mng_ptr->convert_ratio_,
-                                  sp_para_ptr);
-      SpecGraphPtrVec spec_ptr_vec = spec_reader.getNextSpecGraphPtrVec(mng_ptr->prec_error_);
-      for (size_t spec = 0; spec < spec_ptr_vec.size(); spec++) {
-        if (spec_ptr_vec[0]->getSpectrumSetPtr()->isValid()) {
-          for (size_t i = 0; i < proteo_ptrs.size(); i++) {
-            GraphAlignPtr graph_align 
-              = std::make_shared<GraphAlign>(mng_ptr, proteo_ptrs[i], spec_ptr_vec[spec]);
-            graph_align->process();
-            PrsmPtr prsm_ptr = graph_align->geneResult(0);
-            if (prsm_ptr != nullptr) {
-              prsm_writer.write(prsm_ptr);
-            } 
-          }
-        }
-      }
-      prsm_writer.close();
-    });
+    pool.Enqueue(geneTask(proteo_ptrs, mng_ptr,
+                          prsm_para_ptr, sp_para_ptr,
+                          output_file_name, sp_count,
+                          spectrum_num));
   }
 
   pool.ShutDown();
