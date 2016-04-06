@@ -86,6 +86,7 @@ void GraphAlignProcessor::process() {
 
   LOG_DEBUG("Prot graph number " << count);
 
+  // create a folder for all tmp files
   std::string mass_graph_tmp = "mass_graph_tmp";
 
   FileUtil::createFolder(mass_graph_tmp);
@@ -120,23 +121,24 @@ void GraphAlignProcessor::process() {
 
   pool.ShutDown();
   std::cout << std::endl;
+
   FastaIndexReaderPtr seq_reader(new FastaIndexReader(db_file_name));
   ModPtrVec fix_mod_ptr_vec = prsm_para_ptr->getFixModPtrVec();
-  PrsmPtrVec prsm_vec;
+
+  PrsmXmlWriter prsm_writer(FileUtil::basename(sp_file_name) + "." + mng_ptr_->output_file_ext_);
+
   for (int i = 0; i <= spectrum_num; i++) {
     std::string fname = output_file_name + "_" + std::to_string(i) + "." + mng_ptr_->output_file_ext_; 
     PrsmReader prsm_reader(fname);
     PrsmPtr prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
     while (prsm_ptr != nullptr) {
-      prsm_vec.push_back(prsm_ptr);
+      prsm_writer.write(prsm_ptr);
       prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
     }
   }
-  PrsmXmlWriter prsm_writer(FileUtil::basename(sp_file_name) + "." + mng_ptr_->output_file_ext_);
-  for (size_t i = 0; i < prsm_vec.size(); i++) {
-    prsm_writer.write(prsm_vec[i]);
-  }
+
   prsm_writer.close();
+  // remove all the mass graph tmp files 
   FileUtil::delDir(mass_graph_tmp);
 }
 
