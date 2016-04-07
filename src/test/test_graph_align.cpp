@@ -58,6 +58,8 @@ int proteoform_graph_test(int argc, char* argv[]) {
 
     int ptm_num = std::stoi(arguments["ptmNumber"]);
 
+    int thread_num = std::stoi(arguments["threadNumber"]);
+
     bool decoy = false;
     if (arguments["searchType"] == "TARGET+DECOY") {
       decoy = true;
@@ -78,7 +80,8 @@ int proteoform_graph_test(int argc, char* argv[]) {
 
     int max_mod_num = 10;
     int gap = std::stoi(arguments["proteo_graph_dis"]);
-    GraphAlignMngPtr ga_mng_ptr = GraphAlignMngPtr(new GraphAlignMng(prsm_para_ptr, residue_mod_file_name, ptm_num, max_mod_num, gap, "GRAPH_ALIGN"));
+    GraphAlignMngPtr ga_mng_ptr = GraphAlignMngPtr(new GraphAlignMng(prsm_para_ptr, residue_mod_file_name, 
+                                                                     ptm_num, max_mod_num, gap, thread_num, "GRAPH_ALIGN"));
     //ga_mng_ptr->prec_error_ = 0;
     LOG_DEBUG("shift num " << ptm_num);
     GraphAlignProcessorPtr ga_processor_ptr = GraphAlignProcessorPtr(new GraphAlignProcessor(ga_mng_ptr));
