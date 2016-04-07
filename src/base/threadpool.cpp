@@ -31,11 +31,12 @@ void ThreadPool::Enqueue(std::function<void()> f) {
 }
 
 void ThreadPool::Invoke() {
+  /*
   mtx.lock();
   index ++;
   std::cout << "Thread started index " << index << std::endl; 
   mtx.unlock();
-
+  */
   std::function<void()> task;
   while(true) {
     // Scope based locking.

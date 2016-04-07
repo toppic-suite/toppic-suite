@@ -14,8 +14,6 @@
 #include "graphalign/graph_align.hpp"
 #include "graphalign/graph_align_processor.hpp"
 
-#define NUM_THREAD 3
-
 namespace prot {
 
 
@@ -73,7 +71,7 @@ void GraphAlignProcessor::process() {
   while ((proteo_ptr = reader.getNextProteoGraphPtr()) != nullptr) {
     std::string output_file_name = base_file_name + "_" + std::to_string(proteo_count);
     int sp_count = 0;
-    ThreadPoolPtr pool_ptr(new ThreadPool(NUM_THREAD, output_file_name));
+    ThreadPoolPtr pool_ptr(new ThreadPool(mng_ptr_->thread_num_, output_file_name));
     SpecGraphReader spec_reader(sp_file_name, 
                                 prsm_para_ptr->getGroupSpecNum(),
                                 mng_ptr_->convert_ratio_,
@@ -89,7 +87,7 @@ void GraphAlignProcessor::process() {
           << " spectrum " << sp_count << " of " << spectrum_num << " spectra.\r";
       for (size_t i = 0; i < spec_ptr_vec.size(); i++) {
         if (spec_ptr_vec[i]->getSpectrumSetPtr()->isValid()) {
-          while (pool_ptr->getQueueSize() >= NUM_THREAD * 2) {
+          while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ * 2) {
             boost::this_thread::sleep( boost::posix_time::milliseconds(100) );
           }
           pool_ptr->Enqueue(geneTask(mng_ptr_, proteo_ptr,  spec_ptr_vec[i], pool_ptr));
@@ -104,9 +102,9 @@ void GraphAlignProcessor::process() {
     // combine result files
     std::vector<std::string> input_exts;
     std::string cur_output_ext = mng_ptr_->output_file_ext_ + "_" + std::to_string(proteo_count);
-    for (int i = 0; i < NUM_THREAD; i++) {
+    for (int i = 0; i < mng_ptr_->thread_num_; i++) {
       std::string fname = cur_output_ext + "_" + std::to_string(i); 
-      std::cout << "file name " << fname << std::endl;
+      //std::cout << "file name " << fname << std::endl;
       input_exts.push_back(fname);
     }
     int top_num = 1;
