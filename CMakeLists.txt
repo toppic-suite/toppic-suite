@@ -67,9 +67,9 @@ file(GLOB TEST_GRAPH ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_graph_align.cpp)
 #    ${PTM_SRCS} ${TDGF_SRCS} ${LOCAL_SRCS} ${PRSM_VIEW_SRCS} ${ARGU_SRCS} ${MAIN_SRCS})
 #set_target_properties(toppic PROPERTIES COMPILE_FLAGS "-DTOPPIC")
 
-add_executable(test_graph ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
-    ${GRAPH_SRCS} ${GRAPH_ALIGN_SRCS} ${ARGU_SRCS} ${LOCAL_ANNO} ${ONE_PTM_SEARCH_SRCS} ${GRAPH_MAIN})
-set_target_properties(test_graph PROPERTIES COMPILE_FLAGS "-DMASS_GRAPH")
+add_executable(test_tag ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS} ${TAG_SRCS}
+	${GRAPH_SRCS} ${GRAPH_ALIGN_SRCS} ${ARGU_SRCS} ${LOCAL_ANNO} ${ONE_PTM_SEARCH_SRCS} ${TEST_TAG})
+set_target_properties(test_tag PROPERTIES COMPILE_FLAGS "-DMASS_GRAPH")
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     # Windows specific code
@@ -84,7 +84,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     #    target_link_libraries(toppic xalan-c xalanMsg xerces-c boost_program_options
     #    boost_filesystem boost_system hts pthread z)
 
-    target_link_libraries(test_graph xalan-c xalanMsg xerces-c boost_program_options
+    target_link_libraries(test_tag xalan-c xalanMsg xerces-c boost_program_options
         boost_filesystem boost_system boost_thread hts pthread z)
 
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
