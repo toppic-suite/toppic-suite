@@ -37,10 +37,10 @@ Tagfinder::Tagfinder(PrsmParaPtr prsm_para_ptr, int gap){
 void Tagfinder::process(){
 
   std::string spec_file_name = prsm_para_ptr_->getSpectrumFileName();
-
-  MsAlignReader sp_reader(spec_file_name, 1);
-  SpectrumSetPtr spec_set_ptr;
   SpParaPtr sp_para_ptr = prsm_para_ptr_->getSpParaPtr();
+
+  MsAlignReader sp_reader(spec_file_name, 1, sp_para_ptr->getActivationPtr());
+  SpectrumSetPtr spec_set_ptr;
   while((spec_set_ptr = sp_reader.getNextSpectrumSet(sp_para_ptr))!= nullptr){
     if(spec_set_ptr->isValid()){
       DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
