@@ -41,7 +41,7 @@ int two_base_opt(int argc, char* argv[]) {
     int n_top = std::stoi(arguments["numOfTopPrsms"]);
     int ptm_num = std::stoi(arguments["ptmNumber"]);
     double max_ptm_mass = std::stod(arguments["maxPtmMass"]);
-    int filter_result_num = std::stoi(arguments["filteringResultNumber"]);
+    int filter_result_num = 10;
 
     PrsmParaPtr prsm_para_ptr = PrsmParaPtr(new PrsmPara(arguments));
     LOG_DEBUG("prsm para inited");

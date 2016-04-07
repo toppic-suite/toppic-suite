@@ -1,6 +1,6 @@
 
-#ifndef PROT_TAG_FILTER
-#define PROT_TAG_FILTER
+#ifndef PROT_TAG_FILTER_PROCESSOR
+#define PROT_TAG_FILTER_PROCESSOR
 
 #include "base/db_block.hpp"
 #include "tagfilter/tag_filter_mng.hpp"

@@ -10,6 +10,7 @@ namespace prot {
 
 class TagFilterMng {
  public:
+
   TagFilterMng(PrsmParaPtr prsm_para_ptr, int filtering_result_num,
                const std::string &output_file_ext) {
     prsm_para_ptr_ = prsm_para_ptr;
@@ -18,7 +19,11 @@ class TagFilterMng {
   }
 
   PrsmParaPtr prsm_para_ptr_;
+  
   int filter_result_num_ = 20;
+
+  int prec_error_ = 2;
+
   std::string output_file_ext_;
 
 };
