@@ -1,8 +1,18 @@
 #include "threadpool.hpp"
 
-ThreadPool::ThreadPool(int threads) : terminate(false), stopped(false){
+namespace prot {
+
+ThreadPool::ThreadPool(int threads, std::string file_name) : 
+    terminate(false), 
+    stopped(false) {
+
   for(int i = 0; i < threads; i++) {
-    threadPool.emplace_back(boost::thread(&ThreadPool::Invoke, this));
+    ThreadPtr thread_ptr(new boost::thread(&ThreadPool::Invoke, this));
+    threadPool.emplace_back(thread_ptr);
+    std::string thread_file_name = file_name + "_" + std::to_string(i);
+    PrsmXmlWriterPtr writer_ptr(new PrsmXmlWriter(thread_file_name));
+    std::pair<boost::thread::id, PrsmXmlWriterPtr> id_writer(thread_ptr->get_id(), writer_ptr);
+    writerPool.push_back(id_writer);
   }
 }
 
@@ -21,7 +31,12 @@ void ThreadPool::Enqueue(std::function<void()> f) {
 }
 
 void ThreadPool::Invoke() {
-
+  /*
+  mtx.lock();
+  index ++;
+  std::cout << "Thread started index " << index << std::endl; 
+  mtx.unlock();
+  */
   std::function<void()> task;
   while(true) {
     // Scope based locking.
@@ -63,8 +78,8 @@ void ThreadPool::ShutDown() {
   condition.notify_all();
 
   // Join all threads.
-  for(boost::thread &thread : threadPool){
-    if (thread.joinable()) thread.join();
+  for(ThreadPtr thread_ptr : threadPool){
+    if (thread_ptr->joinable()) thread_ptr->join();
   }
 
   // Empty workers vector.
@@ -72,6 +87,21 @@ void ThreadPool::ShutDown() {
 
   // Indicate that the pool has been shut down.
   stopped = true;
+
+  for (size_t i = 0; i < writerPool.size(); i++) {
+    PrsmXmlWriterPtr writer_ptr = writerPool[i].second; 
+    writer_ptr->close();
+  }
+}
+
+PrsmXmlWriterPtr ThreadPool::getWriter(boost::thread::id thread_id) {
+  for (size_t i = 0; i < writerPool.size(); i++) {
+    if (writerPool[i].first == thread_id) {
+      return writerPool[i].second;
+    }
+  }
+  std::cout << "Thread Error: no PrsmXmlWriter is found" << std::endl;
+  return nullptr;
 }
 
 // Destructor.
@@ -81,3 +111,4 @@ ThreadPool::~ThreadPool() {
   }
 }
 
+}

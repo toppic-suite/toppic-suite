@@ -38,6 +38,7 @@ void Argument::initArguments() {
   arguments_["filteringResultNumber"] = "20";
   arguments_["residueModFileName"] = "";
   arguments_["proteo_graph_dis"] = "20";
+  arguments_["threadNumber"] = "1";
 }
 
 void Argument::outputArguments(std::ostream &output, 
@@ -55,6 +56,7 @@ void Argument::outputArguments(std::ostream &output,
   output << std::setw(40) << std::left << "Cutoff value: " << arguments["cutoffValue"] << std::endl;
   output << std::setw(40) << std::left << "Allowed N-terminal modifications: " << arguments["allowProtMod"] << std::endl;
   output << std::setw(40) << std::left << "Maximum PTM mass: " << arguments["maxPtmMass"] << " Da" << std::endl;
+  output << std::setw(40) << std::left << "Thread number: " << arguments["threadNumber"] << std::endl;
 
   if (arguments["useGf"] == "true") {
     output << std::setw(40) << std::left << "E-value computation: "
@@ -138,6 +140,7 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string filtering_result_num = "";
   std::string residue_mod_file_name = "";
   std::string proteo_graph_dis = "";
+  std::string thread_number = "";
 
   /** Define and parse the program options*/
   try {
@@ -164,7 +167,8 @@ bool Argument::parse(int argc, char* argv[]) {
          "Specify the number of spectra in a group. In the multiple spectra mode, the parameter is set as 2 or 3 for spectral pairs or triplets generated from the alternating fragmentation mode. Default value: 1.")
         ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "PTM file for localization.")
         ("local-threshold,s", po::value<std::string> (&local_threshold), "<positive double value>. Threshold value for reporting PTM localization. Default value: 0.45.")
-        ("proteo-graph-dis,j", po::value<std::string> (&proteo_graph_dis), "<positive number>. Gap in constructing proteoform graph. Default value: 20.");
+        ("proteo-graph-dis,j", po::value<std::string> (&proteo_graph_dis), "<positive number>. Gap in constructing proteoform graph. Default value: 20.")
+        ("thread-number,u", po::value<std::string> (&thread_number), "<positive number>. Number of threads used in the computation. Default value: 1.");
     po::options_description desc("Options");
 
     desc.add_options() 
@@ -191,10 +195,11 @@ bool Argument::parse(int argc, char* argv[]) {
         ("full-binary-path,b", "Full binary path.")
         ("group-number,r", po::value<std::string> (&group_num), 
          "Specify the number of spectra in a group. In the multiple spectra mode, the parameter is set as 2 or 3 for spectral pairs or triplets generated from the alternating fragmentation mode. Default value: 1.")
-        ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name with its path.")
         ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "PTM file for localization.")
-        ("spectrum-file-name", po::value<std::string>(&spectrum_file_name)->required(), "Spectrum file name with its path.")
-        ("proteo-graph-dis,j", po::value<std::string> (&proteo_graph_dis), "<positive number>. Gap in constructing proteoform graph. Default value: 20.");
+        ("proteo-graph-dis,j", po::value<std::string> (&proteo_graph_dis), "<positive number>. Gap in constructing proteoform graph. Default value: 20.")
+        ("thread-number,u", po::value<std::string> (&thread_number), "<positive number>. Number of threads used in the computation. Default value: 1.")
+        ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name with its path.")
+        ("spectrum-file-name", po::value<std::string>(&spectrum_file_name)->required(), "Spectrum file name with its path.");
 
     po::positional_options_description positional_options;
     positional_options.add("database-file-name", 1);
@@ -293,6 +298,9 @@ bool Argument::parse(int argc, char* argv[]) {
     if (vm.count("proteo-graph-dis")) {
       arguments_["proteo_graph_dis"] = proteo_graph_dis;
     }
+    if (vm.count("thread-number")) {
+      arguments_["threadNumber"] = thread_number;
+    }
   }
   catch(std::exception&e ) {
     std::cerr << "Unhandled Exception in parsing command line"<<e.what()<<", application will now exit"<<std::endl;
@@ -360,7 +368,7 @@ bool Argument::validateArguments() {
 
   std::string max_ptm_mass = arguments_["maxPtmMass"];
   try {
-    double mass = atof(max_ptm_mass.c_str());
+    double mass = std::stod(max_ptm_mass.c_str());
     if(mass <= 0.0){
       LOG_ERROR("Maximum PTM mass " << max_ptm_mass << " error! The value should be positive.");
       return false;
@@ -374,9 +382,26 @@ bool Argument::validateArguments() {
 
   std::string cutoff_value = arguments_["cutoffValue"];
   try {
-    double th = atof(cutoff_value.c_str());
+    double th = std::stod(cutoff_value.c_str());
     if(th < 0){
       LOG_ERROR("Cutoff value " << cutoff_value << " error! The value should be positive.");
+      return false;
+    }
+  }
+  catch (int e) {
+    LOG_ERROR("Cutoff value " << cutoff_value << " should be a number.");
+    return false;
+  }
+
+  std::string thread_number = arguments_["threadNumber"];
+  try {
+    int num = std::stoi(thread_number.c_str());
+    if(num <= 0){
+      LOG_ERROR("Thread number " << thread_number << " error! The value should be positive.");
+      return false;
+    }
+    if(num > 64){
+      LOG_ERROR("Thread number " << thread_number << " error! The value is too large.");
       return false;
     }
   }

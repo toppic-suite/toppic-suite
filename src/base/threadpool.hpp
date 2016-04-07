@@ -4,16 +4,22 @@
 
 #include <vector>
 #include <queue>
+#include <iostream>
 #include "boost/thread/thread.hpp"
 #include "boost/thread/mutex.hpp"
 #include "boost/thread/condition_variable.hpp"
-#include <iostream>
+
+#include "prsm/prsm_xml_writer.hpp"
+
+namespace prot {
+
+typedef std::shared_ptr<boost::thread> ThreadPtr;
 
 class ThreadPool {
  public:
 
   // Constructor.
-  ThreadPool(int threads);
+  ThreadPool(int threads, std::string output_file_name);
 
   // Destructor.
   ~ThreadPool();
@@ -24,9 +30,18 @@ class ThreadPool {
   // Shut down the pool.
   void ShutDown();
 
+  int getQueueSize() {return tasks.size();}
+
+  int getThreadNum() {return threadPool.size();}
+
+  PrsmXmlWriterPtr getWriter(boost::thread::id thread_id);
+
  private:
   // Thread pool storage.
-  std::vector<boost::thread> threadPool;
+  std::vector<ThreadPtr> threadPool;
+
+  // prsm writer pool
+  std::vector<std::pair<boost::thread::id, PrsmXmlWriterPtr>> writerPool;
 
   // Queue to keep track of incoming tasks.
   std::queue<std::function<void()> > tasks;
@@ -45,6 +60,14 @@ class ThreadPool {
 
   // Function that will be invoked by our threads.
   void Invoke();
+
+  //boost::mutex mtx;
+
+  //int index = 0;
+
 };
 
+typedef std::shared_ptr<ThreadPool> ThreadPoolPtr;
+
+}
 #endif
