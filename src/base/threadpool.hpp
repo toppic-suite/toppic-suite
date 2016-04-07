@@ -52,8 +52,6 @@ class ThreadPool {
   // Condition variable.
   boost::condition_variable condition;
 
-  boost::mutex mtx;
-
   // Indicates that pool needs to be shut down.
   bool terminate;
 
@@ -63,7 +61,9 @@ class ThreadPool {
   // Function that will be invoked by our threads.
   void Invoke();
 
-  int index = 0;
+  //boost::mutex mtx;
+
+  //int index = 0;
 
 };
 
