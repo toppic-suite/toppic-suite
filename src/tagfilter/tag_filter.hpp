@@ -9,6 +9,8 @@
 
 namespace prot {
 
+typedef std::map<std::string, std::vector<std::pair<int, std::vector<double>>>> seq_tag;
+
 class TagFilter {
  public:
   TagFilter(const ProteoformPtrVec &proteo_ptrs,
@@ -19,9 +21,10 @@ class TagFilter {
  private:
   TagFilterMngPtr mng_ptr_;
   ProteoformPtrVec proteo_ptrs_;
+  std::map<std::string, seq_tag> seq_tag_map_;
   //CompShiftPtr index_ptr_;
 
-  SimplePrsmPtrVec compute(const PrmMsPtrVec &ms_ptr_vec);
+  //SimplePrsmPtrVec compute(const PrmMsPtrVec &ms_ptr_vec);
 };
 
 typedef std::shared_ptr<TagFilter> TagFilterPtr;
