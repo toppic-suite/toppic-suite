@@ -10,7 +10,7 @@
 #include "prsm/prsm_para.hpp"
 
 #include "tagfilter/tag_filter_mng.hpp"
-#include "tagfilter/tag_filter.hpp"
+#include "tagfilter/tag_filter_processor.hpp"
 
 #include "console/argument.hpp"
 
@@ -59,11 +59,11 @@ int two_base_opt(int argc, char* argv[]) {
     TagFilterMngPtr diag_filter_mng_ptr 
         = std::make_shared<TagFilterMng>(prsm_para_ptr, filter_result_num, "TAG_FILTER");
 
-    /*std::cout << "Tag searching started." << std::endl;*/
-    //TagfinderPtr tagfinder = std::make_shared<Tagfinder>(prsm_para_ptr, 3);
-    //tagfinder->process();
-    //tagfinder = nullptr;
-    /*std::cout << "Tag searching finished." << std::endl;*/
+    TagFilterProcessorPtr tag_filter_processor 
+        = std::make_shared<TagFilterProcessor>(diag_filter_mng_ptr);
+    tag_filter_processor->process();
+    std::cout << "Tagonal filtering finished." << std::endl;
+
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
