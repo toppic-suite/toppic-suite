@@ -81,9 +81,8 @@ bool ProteoformUtil::isSameSeqAndMass(ProteoformPtr a, ProteoformPtr b,
   if(a->getEndPos() != b->getEndPos()) {
     return false;
   }
-  double thresh = a->getResSeqPtr()->getSeqMass() * ppo;
-  if(std::abs(a->getResSeqPtr()->getSeqMass()
-              -b->getResSeqPtr()->getSeqMass())> thresh) {
+  double thresh = a->getMass() * ppo;
+  if(std::abs(a->getMass() -b->getMass())> thresh) {
     return false;
   }
   return true;

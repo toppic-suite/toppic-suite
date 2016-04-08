@@ -87,8 +87,9 @@ void Proteoform::parseXml(xercesc::DOMElement* element, ProteoformPtr form_ptr) 
 double Proteoform::getMass() {
   double mass = getResSeqPtr()->getSeqMass();
   for(size_t i = 0; i<change_list_.size(); i++) {
-    // only unexpected changes need to to added
-    if (change_list_[i]->getChangeTypePtr() == ChangeType::UNEXPECTED) {
+    // only unexpected and variable changes need to to added
+    if (change_list_[i]->getChangeTypePtr() == ChangeType::UNEXPECTED
+        || change_list_[i]->getChangeTypePtr() == ChangeType::VARIABLE) {
       mass += change_list_[i]->getMassShift();
     }
   }
