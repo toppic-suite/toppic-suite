@@ -64,7 +64,7 @@ int two_base_opt(int argc, char* argv[]) {
     TagFilterProcessorPtr tag_filter_processor 
         = std::make_shared<TagFilterProcessor>(diag_filter_mng_ptr);
     tag_filter_processor->process();
-    std::cout << "Tagonal filtering finished." << std::endl;
+    std::cout << "Tag filtering finished." << std::endl;
 
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
