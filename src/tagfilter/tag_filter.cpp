@@ -5,18 +5,18 @@
 
 namespace prot{
 
-seq_tag geneSeqTag(const std::string & seq) {
+/*seq_tag geneSeqTag(const std::string & seq) {*/
 
 
-}
+/*}*/
 
 TagFilter::TagFilter(const ProteoformPtrVec &proteo_ptrs,
                      TagFilterMngPtr mng_ptr){
   mng_ptr_ = mng_ptr;
-  for (size_t i = 0; i < proteo_ptrs.size(); i++) {
-    seq_tag_map_[proteo_ptrs[i]->getFastaSeqPtr()->getName()]
-        = geneSeqTag(proteo_ptrs[i]->getFastaSeqPtr()->getSeq());
-  }
+  /*for (size_t i = 0; i < proteo_ptrs.size(); i++) {*/
+    //seq_tag_map_[proteo_ptrs[i]->getFastaSeqPtr()->getName()]
+        //= geneSeqTag(proteo_ptrs[i]->getFastaSeqPtr()->getSeq());
+  /*}*/
 
   ResiduePtrVec residue_list = 
       ResidueUtil::convertStrToResiduePtrVec("ARNDCEQGHILKMFPSTWYVUO", 
@@ -44,7 +44,8 @@ std::vector<std::string> TagFilter::getBestMatch(const PrmMsPtrVec &ms_ptr_vec) 
   PeakTolerancePtr tole_ptr = 
       mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
   PrmPeakPtrVec prm_peak_vec = PrmMs::getPrmPeakPtrs(ms_ptr_vec, tole_ptr);
-  geneSpecTag(prm_peak_vec);
+  std::vector<Tag> spec_tag_vec = geneSpecTag(prm_peak_vec);
+
   return res;
 }
 
