@@ -11,7 +11,7 @@
 
 namespace prot {
 
-typedef std::map<std::string, std::vector<std::pair<int, std::vector<double>>>> SeqTag;
+typedef std::map<std::string, std::vector<std::pair<int, std::vector<double> > > > SeqTag;
 
 class TagFilter {
  public:
@@ -23,7 +23,8 @@ class TagFilter {
  private:
   TagFilterMngPtr mng_ptr_;
   ProteoformPtrVec proteo_ptrs_;
-  std::map<std::string, SeqTag> seq_tag_map_;
+  std::vector<SeqTag> seq_tag_vec_;
+  std::vector<std::string> seq_name_vec_;
   std::vector<std::pair<std::string, double> > residue_mass_list_;
   std::vector<SpecTag> geneSpecTag(const PrmPeakPtrVec & prm_peaks); 
 
