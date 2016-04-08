@@ -1,22 +1,30 @@
 
 #include "base/residue_util.hpp"
 #include "base/mod_util.hpp"
+#include "spec/theo_peak_factory.hpp"
 #include "tag_filter.hpp"
 
 namespace prot{
 
-/*seq_tag geneSeqTag(const std::string & seq) {*/
-
-
-/*}*/
+void TagFilter::geneSeqTag(ProteoformPtr proteoform) {
+  std::string seq = proteoform->getFastaSeqPtr()->getSeq(); 
+  std::cout << "seq " << seq << std::endl;
+  SpParaPtr sp_para_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr();
+  /*TheoPeakPtrVec theo_peaks =*/
+      //TheoPeakFactory::geneProteoformTheoPeak(proteoform, 
+                                              //sp_para_ptr->getActivationPtr(),
+                                              //sp_para_ptr->getMinMass());
+  /*std::cout << "seq " << seq.length() << " " << theo_peaks.size() << std::endl;*/
+}
 
 TagFilter::TagFilter(const ProteoformPtrVec &proteo_ptrs,
                      TagFilterMngPtr mng_ptr){
   mng_ptr_ = mng_ptr;
-  /*for (size_t i = 0; i < proteo_ptrs.size(); i++) {*/
+  for (size_t i = 0; i < proteo_ptrs.size(); i++) {
     //seq_tag_map_[proteo_ptrs[i]->getFastaSeqPtr()->getName()]
-        //= geneSeqTag(proteo_ptrs[i]->getFastaSeqPtr()->getSeq());
-  /*}*/
+    //= 
+    geneSeqTag(proteo_ptrs[i]);
+  }
 
   ResiduePtrVec residue_list = 
       ResidueUtil::convertStrToResiduePtrVec("ARNDCEQGHILKMFPSTWYVUO", 

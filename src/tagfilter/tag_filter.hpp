@@ -24,6 +24,8 @@ class TagFilter {
   //std::map<std::string, seq_tag> seq_tag_map_;
   std::vector<std::pair<std::string, double>> residue_mass_list_;
   std::vector<Tag> geneSpecTag(const PrmPeakPtrVec & prm_peaks); 
+
+  void geneSeqTag(ProteoformPtr proteoform);
 };
 
 typedef std::shared_ptr<TagFilter> TagFilterPtr;

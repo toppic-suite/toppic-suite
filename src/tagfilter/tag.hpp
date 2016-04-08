@@ -8,8 +8,9 @@
 
 namespace prot {
 
-class Tag {
+typedef std::map<std::string, std::vector<std::pair<int, std::vector<double>>>> SeqTag;
 
+class Tag {
  public:
   Tag (const std::string & x, const std::string & y,
        double mass, bool ordered): acidX(x), acidY(y), 
