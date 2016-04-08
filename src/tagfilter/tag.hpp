@@ -8,11 +8,11 @@
 
 namespace prot {
 
-class tag {
+class Tag {
 
  public:
-  tag (const std::string & X, const std::string & Y,
-       double mass, bool ordered): X(X), Y(Y), 
+  Tag (const std::string & x, const std::string & y,
+       double mass, bool ordered): acidX(x), acidY(y), 
     mass(mass), tolerance(200), ordered(ordered){}
 
   double getMinMass() {return mass - tolerance;}
@@ -20,7 +20,7 @@ class tag {
   double getMaxMass() {return mass + tolerance;}
 
  private:
-  std::string X, Y;
+  std::string acidX, acidY;
   double mass, tolerance;
   bool ordered;
 

@@ -1,4 +1,6 @@
 
+#include "base/residue_util.hpp"
+#include "base/mod_util.hpp"
 #include "tag_filter.hpp"
 
 namespace prot{
@@ -15,11 +17,79 @@ TagFilter::TagFilter(const ProteoformPtrVec &proteo_ptrs,
     seq_tag_map_[proteo_ptrs[i]->getFastaSeqPtr()->getName()]
         = geneSeqTag(proteo_ptrs[i]->getFastaSeqPtr()->getSeq());
   }
+
+  ResiduePtrVec residue_list = 
+      ResidueUtil::convertStrToResiduePtrVec("ARNDCEQGHILKMFPSTWYVUO", 
+                                             mng_ptr_->prsm_para_ptr_->getFixModPtrVec());
+
+  ModPtrVec var_mod_ptr_vec = ModUtil::readModTxt(mng_ptr_->var_mod_file_name_)[2];
+
+  for (size_t j = 0; j < var_mod_ptr_vec.size(); j++) {
+    residue_list.push_back(var_mod_ptr_vec[j]->getModResiduePtr());
+  }
+
+  for (size_t i = 0; i < residue_list.size(); i++) {
+    residue_mass_list_.push_back(std::make_pair(residue_list[i]->getAcidPtr()->getOneLetter(), residue_list[i]->getMass()));
+    for (size_t j = i + 1; j < residue_list.size(); j++) {
+      residue_mass_list_.push_back(
+          std::make_pair(residue_list[i]->getAcidPtr()->getOneLetter()
+                         + residue_list[j]->getAcidPtr()->getOneLetter(),
+                         residue_list[i]->getMass() + residue_list[j]->getMass())); 
+    }
+  }
 }
 
-SimplePrsmPtrVec TagFilter::getBestMatch(const PrmMsPtrVec &ms_ptr_vec) {
-
+std::vector<std::string> TagFilter::getBestMatch(const PrmMsPtrVec &ms_ptr_vec) {
+  std::vector<std::string> res;
+  PeakTolerancePtr tole_ptr = 
+      mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
+  PrmPeakPtrVec prm_peak_vec = PrmMs::getPrmPeakPtrs(ms_ptr_vec, tole_ptr);
+  geneSpecTag(prm_peak_vec);
+  return res;
 }
 
+std::vector<Tag> TagFilter::geneSpecTag(const PrmPeakPtrVec & prm_peaks) {
+  std::vector<Tag> tag_vec;
+
+  std::vector<double> mass_list;
+  for (size_t i = 0; i < prm_peaks.size(); i++) {
+    mass_list.push_back(prm_peaks[i]->getMonoMass());
+  }
+  std::sort(mass_list.begin(), mass_list.end());
+  for (size_t i = 0; i < mass_list.size() - 2; i++) {
+    for (size_t j = i + 1; j < mass_list.size() - 1; j++) {
+      double diff = mass_list[j] - mass_list[i];
+      double err = 
+          mass_list[i] * mng_ptr_->prsm_para_ptr_->getErrorTolerance() / 1000000;
+      for (size_t r = 0; r < residue_mass_list_.size(); r++) {
+        if (std::abs(diff - residue_mass_list_[r].second) < err) {
+          if (residue_mass_list_[r].first.length() == 2) {
+            Tag t(residue_mass_list_[r].first.substr(0,1),
+                  residue_mass_list_[r].first.substr(1,1),
+                  mass_list[i], false); 
+            tag_vec.push_back(t);
+          } else if (residue_mass_list_[r].first.length() == 1) {
+            for (size_t k = j + 1; k < mass_list.size(); k++) {
+              double diff2 = mass_list[k] - mass_list[j]; 
+              double err2 =
+                  mass_list[j] * mng_ptr_->prsm_para_ptr_->getErrorTolerance() / 1000000;
+              for (size_t r2 = 0; r2 < residue_mass_list_.size(); r2++) {
+                if (residue_mass_list_[r2].first.length() > 1) continue;
+                if (std::abs(diff2 - residue_mass_list_[r2].second) < err2) {
+                  Tag t(residue_mass_list_[r].first,
+                        residue_mass_list_[r2].first,
+                        mass_list[i], true);
+                  tag_vec.push_back(t);
+                }
+              }
+            }
+          } 
+        }
+      }
+    }
+  }
+
+  return tag_vec;
+}
 
 }

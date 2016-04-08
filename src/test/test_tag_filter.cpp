@@ -57,7 +57,9 @@ int two_base_opt(int argc, char* argv[]) {
     MsAlignUtil::geneSpIndex(sp_file_name);
     std::cout << "Tag filtering started." << std::endl;
     TagFilterMngPtr diag_filter_mng_ptr 
-        = std::make_shared<TagFilterMng>(prsm_para_ptr, filter_result_num, "TAG_FILTER");
+        = std::make_shared<TagFilterMng>(prsm_para_ptr, filter_result_num, 
+                                         arguments["residueModFileName"], 
+                                         "TAG_FILTER");
 
     TagFilterProcessorPtr tag_filter_processor 
         = std::make_shared<TagFilterProcessor>(diag_filter_mng_ptr);

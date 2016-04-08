@@ -16,18 +16,12 @@ TagFilterProcessor::TagFilterProcessor(TagFilterMngPtr mng_ptr){
 }
 
 void TagFilterProcessor::process(){
-
   std::string db_file_name = mng_ptr_->prsm_para_ptr_->getSearchDbFileName();
   DbBlockPtrVec db_block_ptr_vec = DbBlock::readDbBlockIndex(db_file_name);
 
   for(size_t i=0; i< db_block_ptr_vec.size(); i++){
-    std::cout << "Diagonal filtering block " << (i+1) << " out of " 
-        << db_block_ptr_vec.size() << " started." << std::endl; 
     processBlock(db_block_ptr_vec[i], db_block_ptr_vec.size());
-    std::cout << "Diagonal filtering block " << (i +1) 
-        << " finished. " << std::endl;
   }
-
 }
 
 void TagFilterProcessor::processBlock(DbBlockPtr block_ptr, 
@@ -50,7 +44,9 @@ void TagFilterProcessor::processBlock(DbBlockPtr block_ptr,
 
   std::string output_file_name = FileUtil::basename(prsm_para_ptr->getSpectrumFileName())
       + "." + mng_ptr_->output_file_ext_+"_"+ std::to_string(block_ptr->getBlockIdx());
-  SimplePrsmXmlWriter writer(output_file_name);
+
+  std::ofstream writer;
+  writer.open(output_file_name);
 
   std::vector<double> prec_errors;
   prec_errors.push_back(0);
@@ -64,13 +60,19 @@ void TagFilterProcessor::processBlock(DbBlockPtr block_ptr,
   while((spec_set_ptr = reader.getNextSpectrumSet(sp_para_ptr)) != nullptr){
     DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
     double prec_mono_mass = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMass();
+    std::cout << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getId() << std::endl;
     if (spec_set_ptr->isValid()) {
       for (size_t i = 0; i < prec_errors.size(); i++) {
         SpectrumSetPtr adjusted_spec_set_ptr(
             new SpectrumSet(deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass + prec_errors[i]));
         PrmMsPtrVec ms_six_vec = adjusted_spec_set_ptr->getMsSixPtrVec();
-        SimplePrsmPtrVec match_ptrs = filter_ptr->getBestMatch(ms_six_vec);
-        writer.write(match_ptrs);
+        //std::vector<std::string> seq_vec = 
+        filter_ptr->getBestMatch(ms_six_vec);
+        /*for (size_t j = 0; j < seq_vec.size(); j++) {*/
+        //writer << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getId() << "\t" 
+        //<< seq_vec[j] << "\t"
+        //<< prec_errors[i] << std::endl;
+        /*}*/
       }
     }
   }

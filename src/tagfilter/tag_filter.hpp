@@ -3,9 +3,11 @@
 #define PROT_TAG_FILTER
 
 #include "base/proteoform.hpp"
+#include "base/residue_util.hpp"
 #include "spec/prm_ms.hpp"
 #include "prsm/simple_prsm.hpp"
 #include "tag_filter_mng.hpp"
+#include "tag.hpp"
 
 namespace prot {
 
@@ -16,15 +18,14 @@ class TagFilter {
   TagFilter(const ProteoformPtrVec &proteo_ptrs,
             TagFilterMngPtr mng_ptr);
 
-  SimplePrsmPtrVec getBestMatch(const PrmMsPtrVec &ms_ptr_vec);
+  std::vector<std::string> getBestMatch(const PrmMsPtrVec &ms_ptr_vec);
 
  private:
   TagFilterMngPtr mng_ptr_;
   ProteoformPtrVec proteo_ptrs_;
   std::map<std::string, seq_tag> seq_tag_map_;
-  //CompShiftPtr index_ptr_;
-
-  //SimplePrsmPtrVec compute(const PrmMsPtrVec &ms_ptr_vec);
+  std::vector<std::pair<std::string, double>> residue_mass_list_;
+  std::vector<Tag> geneSpecTag(const PrmPeakPtrVec & prm_peaks); 
 };
 
 typedef std::shared_ptr<TagFilter> TagFilterPtr;
