@@ -60,7 +60,7 @@ void TagFilterProcessor::processBlock(DbBlockPtr block_ptr,
   while((spec_set_ptr = reader.getNextSpectrumSet(sp_para_ptr)) != nullptr){
     DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
     double prec_mono_mass = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMass();
-    std::cout << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getId() << std::endl;
+    LOG_DEBUG("Spec ID " <<  deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getId());
     if (spec_set_ptr->isValid()) {
       for (size_t i = 0; i < prec_errors.size(); i++) {
         SpectrumSetPtr adjusted_spec_set_ptr(
