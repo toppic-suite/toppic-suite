@@ -1,4 +1,4 @@
-
+#include "base/acid_base.hpp"
 #include "base/residue_util.hpp"
 #include "base/mod_util.hpp"
 #include "spec/theo_peak_factory.hpp"
@@ -6,24 +6,35 @@
 
 namespace prot{
 
-void TagFilter::geneSeqTag(ProteoformPtr proteoform) {
+double getPeptideMass(const std::string & seq) {
+  double m = 0;
+  for (size_t i = 0; i < seq.length(); i++) {
+    m += AcidBase::getAcidPtrByOneLetter(seq.substr(i, 1))->getMonoMass();
+  }
+  return m;
+}
+
+SeqTag TagFilter::geneSeqTag(ProteoformPtr proteoform) {
+  SeqTag seq_tag;
   std::string seq = proteoform->getFastaSeqPtr()->getSeq(); 
-  std::cout << "seq " << seq << std::endl;
-  SpParaPtr sp_para_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr();
-  /*TheoPeakPtrVec theo_peaks =*/
-      //TheoPeakFactory::geneProteoformTheoPeak(proteoform, 
-                                              //sp_para_ptr->getActivationPtr(),
-                                              //sp_para_ptr->getMinMass());
-  /*std::cout << "seq " << seq.length() << " " << theo_peaks.size() << std::endl;*/
+  for (size_t i = 0; i < seq.length() - 1; i++) {
+    std::string s = seq.substr(i, 2);
+    std::vector<double> mass;
+    for (size_t j = 0; j <= i; j++) {
+      mass.push_back(getPeptideMass(seq.substr(0, j)));
+    }
+    seq_tag[s].push_back(std::make_pair(i, mass));
+  }
+
+  return seq_tag;
 }
 
 TagFilter::TagFilter(const ProteoformPtrVec &proteo_ptrs,
                      TagFilterMngPtr mng_ptr){
   mng_ptr_ = mng_ptr;
   for (size_t i = 0; i < proteo_ptrs.size(); i++) {
-    //seq_tag_map_[proteo_ptrs[i]->getFastaSeqPtr()->getName()]
-    //= 
-    geneSeqTag(proteo_ptrs[i]);
+    seq_tag_map_[proteo_ptrs[i]->getFastaSeqPtr()->getName()]
+        = geneSeqTag(proteo_ptrs[i]);
   }
 
   ResiduePtrVec residue_list = 
@@ -52,13 +63,13 @@ std::vector<std::string> TagFilter::getBestMatch(const PrmMsPtrVec &ms_ptr_vec) 
   PeakTolerancePtr tole_ptr = 
       mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
   PrmPeakPtrVec prm_peak_vec = PrmMs::getPrmPeakPtrs(ms_ptr_vec, tole_ptr);
-  std::vector<Tag> spec_tag_vec = geneSpecTag(prm_peak_vec);
+  std::vector<SpecTag> spec_tag_vec = geneSpecTag(prm_peak_vec);
 
   return res;
 }
 
-std::vector<Tag> TagFilter::geneSpecTag(const PrmPeakPtrVec & prm_peaks) {
-  std::vector<Tag> tag_vec;
+std::vector<SpecTag> TagFilter::geneSpecTag(const PrmPeakPtrVec & prm_peaks) {
+  std::vector<SpecTag> tag_vec;
 
   std::vector<double> mass_list;
   for (size_t i = 0; i < prm_peaks.size(); i++) {
@@ -73,7 +84,7 @@ std::vector<Tag> TagFilter::geneSpecTag(const PrmPeakPtrVec & prm_peaks) {
       for (size_t r = 0; r < residue_mass_list_.size(); r++) {
         if (std::abs(diff - residue_mass_list_[r].second) < err) {
           if (residue_mass_list_[r].first.length() == 2) {
-            Tag t(residue_mass_list_[r].first.substr(0,1),
+            SpecTag t(residue_mass_list_[r].first.substr(0,1),
                   residue_mass_list_[r].first.substr(1,1),
                   mass_list[i], false); 
             tag_vec.push_back(t);
@@ -85,7 +96,7 @@ std::vector<Tag> TagFilter::geneSpecTag(const PrmPeakPtrVec & prm_peaks) {
               for (size_t r2 = 0; r2 < residue_mass_list_.size(); r2++) {
                 if (residue_mass_list_[r2].first.length() > 1) continue;
                 if (std::abs(diff2 - residue_mass_list_[r2].second) < err2) {
-                  Tag t(residue_mass_list_[r].first,
+                  SpecTag t(residue_mass_list_[r].first,
                         residue_mass_list_[r2].first,
                         mass_list[i], true);
                   tag_vec.push_back(t);
