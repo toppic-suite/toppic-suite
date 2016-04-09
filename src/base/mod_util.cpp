@@ -34,7 +34,9 @@ std::vector<ModPtrVec> ModUtil::readModTxt(const std::string &file_name) {
   std::vector<ModPtrVec> mod_ptr_vec2d(3);
   std::ifstream infile(file_name.c_str());
   if (!infile.is_open()) {
-    return mod_ptr_vec2d;
+    std::cerr << "Error: variable PTM file "  
+        << file_name <<  "can not be opened" << std::endl;
+    exit (EXIT_FAILURE);
   }
   std::string line;
   while(std::getline(infile, line)) {
