@@ -23,7 +23,7 @@ SeqTag TagFilter::geneSeqTag(ProteoformPtr proteoform) {
     for (size_t j = 0; j <= i; j++) {
       mass.push_back(getPeptideMass(seq.substr(0, j)));
     }
-    seq_tag[s].push_back(std::make_pair(i, mass));
+    seq_tag[s].push_back(mass);
   }
 
   return seq_tag;
@@ -58,12 +58,12 @@ TagFilter::TagFilter(const ProteoformPtrVec &proteo_ptrs,
   }
 }
 
-void count(const std::vector<std::pair<int, std::vector<double> > > & seq_tag,
+void count(const std::vector<std::vector<double> > & seq_tag,
            double min, double max, std::map<int, int> & counter) {
   if (seq_tag.size() == 0) return; 
   for (size_t i = 0; i < seq_tag.size(); i++) {
-    for (size_t j = 0; j < seq_tag[i].second.size(); j++) {
-      if (seq_tag[i].second[j] >= min && seq_tag[i].second[j] <= max)
+    for (size_t j = 0; j < seq_tag[i].size(); j++) {
+      if (seq_tag[i][j] >= min && seq_tag[i][j] <= max)
         counter[j]++;
     }
   }
@@ -101,7 +101,7 @@ std::vector<std::string> TagFilter::getBestMatch(const PrmMsPtrVec &ms_ptr_vec) 
 
   std::sort(counter.begin(), counter.end(), 
             [](std::pair<std::string, int> a, std::pair<std::string, int> b){
-            return a.second < b.second;
+            return a.second > b.second;
             });
   return res;
 }
