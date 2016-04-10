@@ -11,7 +11,7 @@
 
 namespace prot {
 
-typedef std::map<std::string, std::vector<std::pair<int, std::vector<double> > > > SeqTag;
+typedef std::map<std::string, std::vector<std::vector<double> > > SeqTag;
 
 class TagFilter {
  public:
