@@ -115,18 +115,18 @@ int proteoform_graph_test(int argc, char* argv[]) {
     std::cout << "PRSM selecting by cutoff finished." << std::endl;
 
     /*
-    std::cout << "Finding protein species started." << std::endl;
-    double ppo;
-    std::istringstream(arguments["errorTolerance"]) >> ppo;
-    ppo = ppo / 1000000.0;
-    ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();
-    PrsmSpeciesPtr prsm_species = PrsmSpeciesPtr(
-        new PrsmSpecies(db_file_name, sp_file_name, "CUTOFF_RESULT",
-                        fix_mod_list, "OUTPUT_RESULT",ppo));
-    prsm_species->process();
-    prsm_species = nullptr;
-    std::cout << "Finding protein species finished." << std::endl;
-    */
+       std::cout << "Finding protein species started." << std::endl;
+       double ppo;
+       std::istringstream(arguments["errorTolerance"]) >> ppo;
+       ppo = ppo / 1000000.0;
+       ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();
+       PrsmSpeciesPtr prsm_species = PrsmSpeciesPtr(
+       new PrsmSpecies(db_file_name, sp_file_name, "CUTOFF_RESULT",
+       fix_mod_list, "OUTPUT_RESULT",ppo));
+       prsm_species->process();
+       prsm_species = nullptr;
+       std::cout << "Finding protein species finished." << std::endl;
+       */
 
 
     std::cout << "Outputting table starts " << std::endl;
@@ -137,16 +137,16 @@ int proteoform_graph_test(int argc, char* argv[]) {
     std::cout << "Outputting table finished." << std::endl;
 
     /*
-    std::cout << "Generating view xml files started." << std::endl;
-    XmlGeneratorPtr xml_gene = XmlGeneratorPtr(new XmlGenerator(prsm_para_ptr, exe_dir, "OUTPUT_RESULT"));
-    xml_gene->process();
-    xml_gene = nullptr;
-    std::cout << "Generating view xml files finished." << std::endl;
+       std::cout << "Generating view xml files started." << std::endl;
+       XmlGeneratorPtr xml_gene = XmlGeneratorPtr(new XmlGenerator(prsm_para_ptr, exe_dir, "OUTPUT_RESULT"));
+       xml_gene->process();
+       xml_gene = nullptr;
+       std::cout << "Generating view xml files finished." << std::endl;
 
-    std::cout << "Converting xml files to html files started." << std::endl;
-    translate(arguments);
-    std::cout << "Converting xml files to html files finished." << std::endl;
-    */
+       std::cout << "Converting xml files to html files started." << std::endl;
+       translate(arguments);
+       std::cout << "Converting xml files to html files finished." << std::endl;
+       */
 
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
