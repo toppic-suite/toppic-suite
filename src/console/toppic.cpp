@@ -58,6 +58,8 @@ int two_base_opt(int argc, char* argv[]) {
     std::cout << "TopPIC 1.0.0 beta (" << __DATE__ << ")" << std::endl;
 
     std::string exe_dir = arguments["executiveDir"];
+    time_t start = time(0);
+    arguments["start_time"] = std::string(ctime(&start));
     Argument::outputArguments(std::cout, arguments);
 
     BaseData::init(exe_dir);
@@ -244,6 +246,10 @@ int two_base_opt(int argc, char* argv[]) {
     prsm_species = nullptr;
     std::cout << "Finding protein species finished." << std::endl;
     WebLog::completeFunction(WebLog::SelectingTime());
+
+    time_t end = time(0);
+    arguments["end_time"] = std::string(ctime(&end));
+    arguments["running_time"] = std::to_string((int)difftime(end, start));
 
     std::cout << "Outputting table starts " << std::endl;
     PrsmTableWriterPtr table_out = PrsmTableWriterPtr(
