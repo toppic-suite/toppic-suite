@@ -72,8 +72,12 @@ void Argument::outputArguments(std::ostream &output,
   }
   output << std::setw(40) << std::left << "Gap in proteoform graph: " << arguments["proteo_graph_dis"] << std::endl;
   output << std::setw(40) << std::left << "Executive file directory is: " << arguments["executiveDir"] << std::endl;
+  output << std::setw(40) << std::left << "TopPIC start time: " << arguments["start_time"];
+  if (arguments["end_time"] != "") {
+    output << std::setw(40) << std::left << "TopPIC end time: " << arguments["end_time"];
+    output << std::setw(40) << std::left << "TopPIC running time: " << arguments["running_time"] << " seconds" << std::endl;
+  }
   output << "********************** Parameters **********************" << std::endl;
-  output << std::endl;
 }
 
 void Argument::showUsage(boost::program_options::options_description &desc) {
