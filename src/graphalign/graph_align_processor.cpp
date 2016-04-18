@@ -109,7 +109,8 @@ void GraphAlignProcessor::process() {
     }
     int top_num = 1;
     PrsmStrCombinePtr combine_ptr(new PrsmStrCombine(sp_file_name, input_exts,  cur_output_ext, top_num));
-    combine_ptr->process();
+    bool normalization = true;
+    combine_ptr->process(normalization);
     combine_ptr = nullptr;
     proteo_count++;
   }
@@ -121,7 +122,8 @@ void GraphAlignProcessor::process() {
   }
   int top_num = 1;
   PrsmStrCombinePtr combine_ptr(new PrsmStrCombine(sp_file_name, input_exts, mng_ptr_->output_file_ext_, top_num));
-  combine_ptr->process();
+  bool normalization = true;
+  combine_ptr->process(normalization);
   combine_ptr = nullptr;
 }
 

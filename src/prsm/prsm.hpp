@@ -48,6 +48,8 @@ class Prsm {
 
   double getMatchFragNum() {return match_fragment_num_;}
 
+  double getNormMatchFragNum();
+
   // ExtremeValue related functions
   double getEValue();
 
@@ -87,6 +89,10 @@ class Prsm {
 
   static bool cmpMatchFragmentDec(const PrsmPtr &a, const PrsmPtr &b) {
     return a->getMatchFragNum() > b->getMatchFragNum();
+  }
+
+  static bool cmpNormMatchFragmentDec(const PrsmPtr &a, const PrsmPtr &b) {
+    return a->getNormMatchFragNum() > b->getNormMatchFragNum();
   }
 
   static bool cmpMatchFragmentDecMatchPeakDec(const PrsmPtr &a, const PrsmPtr &b);
