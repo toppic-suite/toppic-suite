@@ -14,6 +14,8 @@ PrsmStr::PrsmStr(const std::vector<std::string> &str_vec) {
   seq_name_ = PrsmUtil::getValueStr(line);
   line = PrsmUtil::getXmlLine(str_vec_, "<match_fragment_num>");
   match_frag_num_ = std::stod(PrsmUtil::getValueStr(line));
+  line = PrsmUtil::getXmlLine(str_vec_, "<norm_match_fragment_num>");
+  norm_match_frag_num_ = std::stod(PrsmUtil::getValueStr(line));
   line = PrsmUtil::getXmlLine(str_vec_, "<e_value>"); 
   if (line == "") { 
     e_value_ = 0.0;
