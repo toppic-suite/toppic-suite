@@ -136,16 +136,16 @@ int proteoform_graph_test(int argc, char* argv[]) {
     std::cout << "Outputting table finished." << std::endl;
 
     /*
-    std::cout << "Generating view xml files started." << std::endl;
-    XmlGeneratorPtr xml_gene = XmlGeneratorPtr(new XmlGenerator(prsm_para_ptr, exe_dir, "OUTPUT_RESULT"));
-    xml_gene->process();
-    xml_gene = nullptr;
-    std::cout << "Generating view xml files finished." << std::endl;
+       std::cout << "Generating view xml files started." << std::endl;
+       XmlGeneratorPtr xml_gene = XmlGeneratorPtr(new XmlGenerator(prsm_para_ptr, exe_dir, "OUTPUT_RESULT"));
+       xml_gene->process();
+       xml_gene = nullptr;
+       std::cout << "Generating view xml files finished." << std::endl;
 
-    std::cout << "Converting xml files to html files started." << std::endl;
-    translate(arguments);
-    std::cout << "Converting xml files to html files finished." << std::endl;
-    */
+       std::cout << "Converting xml files to html files started." << std::endl;
+       translate(arguments);
+       std::cout << "Converting xml files to html files finished." << std::endl;
+       */
 
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;

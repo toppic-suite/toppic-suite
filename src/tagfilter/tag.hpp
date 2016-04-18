@@ -18,6 +18,10 @@ class SpecTag {
 
   double getMaxMass() {return mass + tolerance;}
 
+  bool isOrdered() {return ordered;}
+
+  std::string getSeq() {return acidX + acidY;}
+
  private:
   std::string acidX, acidY;
   double mass, tolerance;
