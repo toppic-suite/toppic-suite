@@ -17,11 +17,7 @@ void Argument::initArguments() {
   arguments_["activation"] = "FILE";
   arguments_["searchType"] = "TARGET";
   arguments_["fixedMod"] = "";
-#ifdef TOPPIC
   arguments_["ptmNumber"] = "1";
-#else
-  arguments_["ptmNumber"] = "0";
-#endif
   arguments_["errorTolerance"] = "15";
   arguments_["cutoffType"] = "EVALUE";
   arguments_["cutoffValue"] = "0.01";
