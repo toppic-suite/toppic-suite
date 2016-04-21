@@ -1,5 +1,5 @@
 #include "base/file_util.hpp"
-#include "prsm/prsm_str.hpp"
+#include "prsm/prsm.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_cutoff_selector.hpp"
 
@@ -24,25 +24,36 @@ void PrsmCutoffSelector::process(){
   std::string base_name = FileUtil::basename(spec_file_name_);
   std::string input_file_name = base_name + "." + input_file_ext_;
 
-  PrsmStrPtrVec prsms = PrsmReader::readAllPrsmStrs(input_file_name);
+  //PrsmStrPtrVec prsms = PrsmReader::readAllPrsmStrs(input_file_name);
+  ModPtrVec fix_mod_list;
+  PrsmPtrVec prsms = PrsmReader::readAllPrsms(input_file_name, db_file_name_, fix_mod_list );
 
-  //select
-  sort(prsms.begin(),prsms.end(),PrsmStr::cmpSpectrumIdInc);
+  sort(prsms.begin(),prsms.end(),Prsm::cmpSpectrumIdIncPrecursorIdInc);
+
   bool evalue_cutoff = (cutoff_type_ == "EVALUE");
+  bool fdr_cutoff = (cutoff_type_ == "FDR");
+  bool frag_cutoff = (cutoff_type_ == "FRAG");
 
-  PrsmStrPtrVec selected_prsms;
-  int id =0;
+  PrsmPtrVec selected_prsms;
+  int id =0; 
   for(size_t i=0; i<prsms.size(); i++){
     if(evalue_cutoff && prsms[i]->getEValue() <= cutoff_value_){
-      prsms[i]->setId(id);
+      prsms[i]->setPrsmId(id);
       selected_prsms.push_back(prsms[i]);
       id++;
-    }
-    else if(!evalue_cutoff && prsms[i]->getFdr() <= cutoff_value_){
-      prsms[i]->setId(id);
+    }   
+    else if(fdr_cutoff && prsms[i]->getFdr() <= cutoff_value_){
+      prsms[i]->setPrsmId(id);
       selected_prsms.push_back(prsms[i]);
       id++;
-    }
+    }   
+    else if (frag_cutoff && prsms[i]->getMatchFragNum() >= cutoff_value_) {
+      prsms[i]->setPrsmId(id);
+      ExtremeValuePtr ev_ptr(new ExtremeValue(-prsms[i]->getMatchFragNum(), 1, 1));
+      prsms[i]->setExtremeValuePtr(ev_ptr);
+      selected_prsms.push_back(prsms[i]);
+      id++;
+    }   
   }
 
   //output
