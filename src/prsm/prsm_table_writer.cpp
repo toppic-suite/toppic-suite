@@ -60,7 +60,7 @@ void PrsmTableWriter::write(){
       << "E-Value" << "\t"
       << "One_Protein_probabilty"<< "\t"
       << "FDR" << "\t"
-      << "#variable PTMs" << "\t"
+      << "#Variable PTMs" << "\t"
       << std::endl;
 
   std::string input_file_name 
