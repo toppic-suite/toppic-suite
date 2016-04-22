@@ -26,6 +26,31 @@
     </mod>
   </prot_mod>
   <prot_mod>
+    <name>M_ACETYLATION</name>
+    <type>M_ACETYLATION</type>
+    <truncation>
+      <name>NONE</name>
+    </truncation>
+    <mod>
+      <ori_residue>
+        <amino_acid>
+	        <name>Methionine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>No PTM</abbreviation>
+        </ptm>
+      </ori_residue>
+      <mod_residue>
+        <amino_acid>
+	        <name>Methionine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>Acetyl</abbreviation>
+        </ptm>
+      </mod_residue>
+    </mod>
+  </prot_mod>
+  <prot_mod>
     <name>NME</name>
     <type>NME</type>
     <truncation>
@@ -143,6 +168,56 @@
       <mod_residue>
         <amino_acid>
 	        <name>Threonine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>Acetyl</abbreviation>
+        </ptm>
+      </mod_residue>
+    </mod>
+  </prot_mod>
+  <prot_mod>
+    <name>NME_ACETYLATION_VAL</name>
+    <type>NME_ACETYLATION</type>
+    <truncation>
+      <name>NME</name>
+    </truncation>
+    <mod>
+      <ori_residue>
+        <amino_acid>
+	        <name>Valine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>No PTM</abbreviation>
+        </ptm>
+      </ori_residue>
+      <mod_residue>
+        <amino_acid>
+	        <name>Valine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>Acetyl</abbreviation>
+        </ptm>
+      </mod_residue>
+    </mod>
+  </prot_mod>
+  <prot_mod>
+    <name>NME_ACETYLATION_CYS</name>
+    <type>NME_ACETYLATION</type>
+    <truncation>
+      <name>NME</name>
+    </truncation>
+    <mod>
+      <ori_residue>
+        <amino_acid>
+	        <name>Cysteine</name>
+        </amino_acid>
+        <ptm>
+          <abbreviation>No PTM</abbreviation>
+        </ptm>
+      </ori_residue>
+      <mod_residue>
+        <amino_acid>
+	        <name>Cysteine</name>
         </amino_acid>
         <ptm>
           <abbreviation>Acetyl</abbreviation>

@@ -99,6 +99,7 @@ int two_base_opt(int argc, char* argv[]) {
     FastaUtil::dbPreprocess (ori_db_file_name, db_file_name, decoy, db_block_size);
     MsAlignUtil::geneSpIndex(sp_file_name);
 
+    /*
     std::vector<std::string> input_exts;
 
     std::cout << "Zero PTM filtering started." << std::endl;
@@ -168,6 +169,7 @@ int two_base_opt(int argc, char* argv[]) {
     combine_ptr->process();
     combine_ptr = nullptr;
     std::cout << "Combining PRSMs finished." << std::endl;
+    */
 
     std::cout << "E-value computation started." << std::endl;
     bool variable_ptm = false;

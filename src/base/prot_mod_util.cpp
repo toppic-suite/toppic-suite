@@ -12,6 +12,19 @@ bool ProtModUtil::allowMod(ProtModPtr prot_mod_ptr, const ResiduePtrVec &residue
   if (prot_mod_ptr == ProtModBase::getProtModPtr_NONE()) {
     return true;
   }
+  else if (prot_mod_ptr == ProtModBase::getProtModPtr_M_ACETYLATION()) {
+    int mod_pos = prot_mod_ptr->getModPos();
+    if (mod_pos >= (int)residues.size()) { 
+      //LOG_DEBUG("pos false");
+      return false;
+    }
+    ModPtr mod_ptr = prot_mod_ptr->getModPtr();
+    if (residues[mod_pos] != mod_ptr->getOriResiduePtr()) {
+      //LOG_DEBUG("mod false");
+      return false;
+    }
+    return true;
+  }
   else {
     // check trunc
     if (!TruncUtil::isValidTrunc(prot_mod_ptr->getTruncPtr(), residues)) {
@@ -19,6 +32,7 @@ bool ProtModUtil::allowMod(ProtModPtr prot_mod_ptr, const ResiduePtrVec &residue
     }
     ModPtr mod_ptr = prot_mod_ptr->getModPtr();
     if (mod_ptr != ModBase::getNoneModPtr()) {
+      // if NME_acetylation
       int mod_pos = prot_mod_ptr->getModPos();
       if (mod_pos >= (int)residues.size()) { 
         //LOG_DEBUG("pos false");
