@@ -13,14 +13,18 @@ MassZeroPtmFilter::MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
   mng_ptr_ = mng_ptr;
   proteo_ptrs_ = proteo_ptrs;
   double rev = false;
+  LOG_DEBUG("get shifts");
   std::vector<std::vector<double>> shift_2d 
       = ProteoformUtil::getNTermShift2D(proteo_ptrs, mng_ptr->prsm_para_ptr_->getProtModPtrVec());
+  LOG_DEBUG("get shifts complete");
   term_index_ptr_ = MassMatchFactory::getMassMatchPtr(proteo_ptrs, shift_2d,
                                                mng_ptr->max_proteoform_mass_,
                                                mng_ptr->filter_scale_, rev);
+  LOG_DEBUG("term index");
   diag_index_ptr_ = MassMatchFactory::getMassMatchPtr(proteo_ptrs, 
                                                       mng_ptr->max_proteoform_mass_,
                                                       mng_ptr->filter_scale_, rev);
+  LOG_DEBUG("diag index");
   rev = true;
   std::vector<std::vector<double>> rev_shift_2d;
   std::vector<double> shift_1d(1,0);
@@ -30,8 +34,10 @@ MassZeroPtmFilter::MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
   rev_term_index_ptr_ = MassMatchFactory::getMassMatchPtr(proteo_ptrs, rev_shift_2d,
                                                           mng_ptr->max_proteoform_mass_,
                                                           mng_ptr->filter_scale_, rev);
+  LOG_DEBUG("rev term index");
   rev_diag_index_ptr_ = MassMatchFactory::getMassMatchPtr(proteo_ptrs, mng_ptr->max_proteoform_mass_,
                                                           mng_ptr->filter_scale_, rev);
+  LOG_DEBUG("rev diag index");
 }
 
 void MassZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec){
@@ -49,7 +55,9 @@ void MassZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec){
   int term_row_num = term_index_ptr_->getRowNum();
   std::vector<short> term_scores(term_row_num, 0);
   term_index_ptr_->compMatchScores(pref_mass_errors, prec_minus_water_mass_error, term_scores);
-
+  for (int i = 0; i < term_row_num; i++) {
+    LOG_DEBUG("row " << i << " score "<< term_scores[i]);
+  }
   int diag_row_num = diag_index_ptr_->getRowNum();
   std::vector<short> diag_scores(diag_row_num, 0);
   diag_index_ptr_->compMatchScores(pref_mass_errors, prec_minus_water_mass_error, diag_scores);
@@ -57,7 +65,9 @@ void MassZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec){
   int rev_term_row_num = rev_term_index_ptr_->getRowNum();
   std::vector<short> rev_term_scores(rev_term_row_num, 0);
   rev_term_index_ptr_->compMatchScores(suff_mass_errors, prec_minus_water_mass_error, rev_term_scores);
-
+  for (int i = 0; i < term_row_num; i++) {
+    LOG_DEBUG("rev row " << i << " score "<< rev_term_scores[i]);
+  }
   int rev_diag_row_num = rev_diag_index_ptr_->getRowNum();
   std::vector<short> rev_diag_scores(rev_diag_row_num, 0);
   rev_diag_index_ptr_->compMatchScores(suff_mass_errors, prec_minus_water_mass_error, rev_diag_scores);

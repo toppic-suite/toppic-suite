@@ -10,7 +10,6 @@
 
 namespace prot {
 
-
 MassMatch::MassMatch(std::vector<std::vector<int>> &mass_2d, 
                      std::vector<std::vector<double>> &real_shift_2d,
                      std::vector<std::vector<int>> &pos_2d,
@@ -22,10 +21,11 @@ MassMatch::MassMatch(std::vector<std::vector<int>> &mass_2d,
   col_num_ = max_proteoform_mass * scale_;
   proteo_num_ = mass_2d.size();
   LOG_DEBUG("column number: " << col_num_);
-  LOG_DEBUG("row number: " << row_num_);
 
   LOG_DEBUG("start init");
   initProteoformBeginEnds(mass_2d, real_shift_2d);
+  LOG_DEBUG("row number: " << row_num_);
+
   LOG_DEBUG("init indexes");
   initIndexes(mass_2d, real_shift_2d, pos_2d);
 }
@@ -43,6 +43,7 @@ inline void MassMatch::initProteoformBeginEnds(std::vector<std::vector<int>> &ma
     proteo_row_begins_[i] = pnt;
     int len = shift_2d[i].size();
     proteo_row_ends_[i] = pnt + len - 1;
+    //LOG_DEBUG("begin " << proteo_row_begins_[i] << " end " << proteo_row_ends_[i]);
     pnt += len;
   }
   row_num_ = pnt;
@@ -103,6 +104,8 @@ inline void MassMatch::fillColumnIndex(std::vector<std::vector<int>> &mass_2d,
     for (size_t s = 0; s < shift_2d[i].size(); s++)  {
       for (size_t cur = pos_2d[i][s]; cur < mass_2d[i].size(); cur++) {
         int shift_mass = mass_2d[i][cur] + shift_2d[i][s];
+        //LOG_DEBUG("i " << i << " s " << s << " cur " << cur << 
+        //          " shift_mass " << shift_mass << " col num " << col_num_);
         if (shift_mass > 0) {
           if (shift_mass < col_num_) {
             col_indexes_[col_index_pnts[shift_mass]] = proteo_row_begins_[i] + s;
@@ -148,16 +151,16 @@ inline void MassMatch::initIndexes(std::vector<std::vector<int>> &mass_2d,
 
 void MassMatch::compScores(const std::vector<std::pair<int,int>> &pref_mass_errors,
                            std::vector<short> &scores) {
-  compScores(pref_mass_errors, 0, scores);
+  compScores(pref_mass_errors, 0, 0.0, scores);
 }
 
 void MassMatch::compScores(const std::vector<std::pair<int,int>> &pref_mass_errors,
-                           int start, std::vector<short> &scores) {
+                           int start, double shift, std::vector<short> &scores) {
   int begin_index;
   int end_index;
   int m;
   for(size_t i = start; i<pref_mass_errors.size(); i++){
-    m = pref_mass_errors[i].first - pref_mass_errors[start].first;
+    m = pref_mass_errors[i].first + shift;
     // m - errors[i] performs better than m - errors[i] -  errors[bgn_pos]
     int left = m - pref_mass_errors[i].second;
     if(left < 0){
@@ -167,7 +170,7 @@ void MassMatch::compScores(const std::vector<std::pair<int,int>> &pref_mass_erro
     if(right < 0 || right >= col_num_){
       continue;
     }
-    //LOG_DEBUG("SP MASS " << m);
+    //LOG_DEBUG("left " << left << " right " << right);
     begin_index = col_index_begins_[left];
     end_index= col_index_ends_[right];
     for(int j=begin_index;j<=end_index;j++){
@@ -180,7 +183,7 @@ void MassMatch::compScores(const std::vector<std::pair<int,int>> &pref_mass_erro
 void MassMatch::compMatchScores(const std::vector<std::pair<int,int>> &pref_mass_errors,
                                 const std::pair<int,int> &prec_minus_water_mass_error, 
                                 std::vector<short> &scores) {
-  compScores(pref_mass_errors, 0, scores);
+  compScores(pref_mass_errors, 0, 0.0, scores);
   // precursor mass 
   int begin_index, end_index;
   int m = prec_minus_water_mass_error.first;

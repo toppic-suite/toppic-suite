@@ -80,8 +80,8 @@ FilterProteinPtrVec MassMatchUtil::findTopProteins(std::vector<short> &scores,
     int bgn = row_begins[i];
     int end = row_ends[i];
     int best_score = 0;
-    //LOG_DEBUG("begin " << bgn << " end " << end << " rev 0 " << rev_scores[0]);
     for (int j = bgn; j <= end; j++) {
+      LOG_DEBUG("begin " << bgn << " end " << end << " score " << scores[j]);
       if (scores[j] > best_score) {
         best_score = scores[j];
       }
@@ -91,10 +91,12 @@ FilterProteinPtrVec MassMatchUtil::findTopProteins(std::vector<short> &scores,
     int rev_end = rev_row_ends[i];
     int rev_best_score = 0;
     for (int j = rev_bgn; j <= rev_end; j++) {
+      LOG_DEBUG("begin " << bgn << " end " << end << " rev_score " << rev_scores[j]);
       if (rev_scores[j] > rev_best_score) {
         rev_best_score = rev_scores[j];
       }
     }
+    LOG_DEBUG("best score " << best_score << " rev best score " << rev_best_score);
 
     std::pair<int,int> proteo_score(i, best_score + rev_best_score);
     proteo_scores.push_back(proteo_score);

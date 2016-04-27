@@ -21,7 +21,7 @@ class MassMatch {
                   std::vector<short> &scores);
 
   void compScores(const std::vector<std::pair<int,int>> &pref_mass_errors,
-                  int start, std::vector<short> &scores);
+                  int start, double shift, std::vector<short> &scores);
 
   void compMatchScores(const std::vector<std::pair<int,int>> &pref_mass_errors,
                        const std::pair<int,int> &prec_minus_water_mass_error, 
