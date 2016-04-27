@@ -28,7 +28,7 @@ void BpSpec::initBreakPoints(const ResSeqPtr &res_seq_ptr){
     prm += res_seq_ptr->getResiduePtr(i)->getMass();
     double srm = res_seq_ptr->getResMassSum()-prm;
     if(srm <0){
-      LOG_WARN("prms is larger than totle mass! ");
+      LOG_WARN("prms is larger than total mass! ");
     }
     break_point_ptr_vec_.push_back(BreakPointPtr(new BreakPoint(prm,srm)));
   }
@@ -63,6 +63,15 @@ std::vector<double> BpSpec::getPrmMasses() {
   return mass_vec;
 }
 
+std::vector<double> BpSpec::getSrmMasses() {
+  std::vector<double> mass_vec;
+  for (size_t i = break_point_ptr_vec_.size() -1; i >= 0; i--) {
+    mass_vec.push_back(break_point_ptr_vec_[i]->getSrm());
+  }
+  std::sort(mass_vec.begin(),mass_vec.end(),std::less<double>());
+  return mass_vec;
+}
+
 /* Get rounded scaled neutral ion masses */ 
 std::vector<int> BpSpec::getScaledMass(double scale, IonTypePtr ion_type_ptr){
   std::vector<int> result;
@@ -81,10 +90,10 @@ std::vector<int> BpSpec::getScaledMass(double scale, IonTypePtr ion_type_ptr){
   return result;
 }
 
-std::vector<int> BpSpec::getScaledPrmMasses(double scale){
+std::vector<int> BpSpec::getScaledSrmMasses(double scale){
   std::vector<int> result;
-  for(size_t i=0; i < break_point_ptr_vec_.size();i++){
-    double value = break_point_ptr_vec_[i]->getPrm()*scale;
+  for(size_t i=break_point_ptr_vec_.size()-1; i >= 0; i--){
+    double value = break_point_ptr_vec_[i]->getSrm()*scale;
     result.push_back(std::floor(value+0.5));
   }
   return result;

@@ -7,7 +7,7 @@
 #include "prsm/simple_prsm_xml_writer.hpp"
 #include "prsm/simple_prsm_str_combine.hpp"
 #include "oneptmfilter/one_ptm_filter_processor.hpp"
-#include "oneptmfilter/one_ptm_filter.hpp"
+#include "oneptmfilter/mass_one_ptm_filter.hpp"
 
 namespace prot {
 
@@ -63,7 +63,7 @@ void OnePtmFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_n
   ProteoformPtrVec raw_forms 
       = ProteoformFactory::readFastaToProteoformPtrVec(db_block_file_name, 
                                                        prsm_para_ptr->getFixModPtrVec());
-  OnePtmFilterPtr filter_ptr(new OnePtmFilter(raw_forms, mng_ptr_));
+  MassOnePtmFilterPtr filter_ptr(new MassOnePtmFilter(raw_forms, mng_ptr_));
 
   int group_spec_num = mng_ptr_->prsm_para_ptr_->getGroupSpecNum();
   SpParaPtr sp_para_ptr =  mng_ptr_->prsm_para_ptr_->getSpParaPtr();

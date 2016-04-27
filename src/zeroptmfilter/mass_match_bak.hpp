@@ -10,10 +10,12 @@ namespace prot {
 
 class MassMatch {
  public:
-  MassMatch(std::vector<std::vector<int>> &mass_2d, 
-            std::vector<std::vector<double>> &real_shift_2d,
-            std::vector<std::vector<int>> &pos_2d,
-            double max_proteoform_mass, double scale);  
+  MassMatch(const ProteoformPtrVec &proteo_ptrs, int scale, 
+            double max_proteoform_mass, bool rev);  
+
+  MassMatch(const ProteoformPtrVec &proteo_ptrs, 
+            const std::vector<std::vector<int>> &shift_2d,
+            int scale, double max_proteoform_mass, bool rev);
 
   ~MassMatch();
 
@@ -22,6 +24,7 @@ class MassMatch {
 
   void compScores(const std::vector<std::pair<int,int>> &pref_mass_errors,
                   int start, std::vector<short> &scores);
+
 
   void compMatchScores(const std::vector<std::pair<int,int>> &pref_mass_errors,
                        const std::pair<int,int> &prec_minus_water_mass_error, 
@@ -33,10 +36,9 @@ class MassMatch {
 
   std::vector<int>& getProteoRowBegins() {return proteo_row_begins_;}
   std::vector<int>& getProteoRowEnds() {return proteo_row_ends_;}
-  std::vector<double>& getTruncShifts() {return trunc_shifts_;}
 
  private:
-  double scale_;
+  int scale_;
   int proteo_num_;
   int col_num_;
   int row_num_;
@@ -52,22 +54,21 @@ class MassMatch {
   std::vector<int> col_index_ends_;
   std::vector<int> col_indexes_;
 
-  void initProteoformBeginEnds(std::vector<std::vector<int>> &mass_2d,
-                               std::vector<std::vector<double>> &shift_2d);
+  void initProteoformBeginEnds(const ProteoformPtrVec &proteo_ptrs,
+                               const std::vector<int> &index_nums);
 
-  void initIndexes(std::vector<std::vector<int>> &mass_2d,
-                   std::vector<std::vector<double>> &real_shift_2d,
-                   std::vector<std::vector<int>> &pos_2d);     
+  void updateColumnMatchNums(ProteoformPtr proteo_ptr, 
+                             std::vector<int> &col_match_nums, 
+                             bool rev);
+  void initIndexes(const ProteoformPtrVec &proteo_ptrs, bool rev);
 
-  void compColumnMatchNums(std::vector<std::vector<int>> &mass_2d,
-                           std::vector<std::vector<int>> &shift_2d,     
-                           std::vector<std::vector<int>> &pos_2d,     
-                           std::vector<int> &col_match_nums);
+  void updateColumnMatchNums(ProteoformPtr proteo_ptr,
+                             const std::vector<int> &int_shifts,
+                             std::vector<int> &col_match_nums, bool rev);
 
-  void fillColumnIndex(std::vector<std::vector<int>> &mass_2d,
-                       std::vector<std::vector<int>> &shift_2d,     
-                       std::vector<std::vector<int>> &pos_2d,     
-                       std::vector<int> &col_index_pnts);
+  void initIndexes(const ProteoformPtrVec &proteo_ptrs, 
+                   const std::vector<std::vector<int>> &shift_2d,
+                   bool rev);
 };
 
 typedef std::shared_ptr<MassMatch> MassMatchPtr;

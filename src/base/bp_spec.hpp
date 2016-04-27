@@ -22,10 +22,14 @@ class BpSpec {
 
   std::vector<double> getPrmMasses();
 
+  std::vector<double> getSrmMasses();
+
   // Get rounded scaled neutral ion masses  
   std::vector<int> getScaledMass(double scale, IonTypePtr ion_type_ptr);
 
   std::vector<int> getScaledPrmMasses(double scale);
+
+  std::vector<int> getScaledSrmMasses(double scale);
 
  private:
   BreakPointPtrVec break_point_ptr_vec_;

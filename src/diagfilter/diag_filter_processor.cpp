@@ -7,6 +7,7 @@
 #include "spec/msalign_util.hpp"
 #include "prsm/simple_prsm_xml_writer.hpp"
 #include "prsm/simple_prsm_str_combine.hpp"
+#include "diagfilter/mass_diag_filter.hpp"
 #include "diagfilter/diag_filter_processor.hpp"
 
 namespace prot {
@@ -47,7 +48,7 @@ void DiagFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num
   ProteoformPtrVec raw_forms 
       = ProteoformFactory::readFastaToProteoformPtrVec(db_block_file_name, 
                                                        prsm_para_ptr->getFixModPtrVec());
-  DiagFilterPtr filter_ptr(new DiagFilter(raw_forms, mng_ptr_));
+  MassDiagFilterPtr filter_ptr(new MassDiagFilter(raw_forms, mng_ptr_));
 
   int group_spec_num = mng_ptr_->prsm_para_ptr_->getGroupSpecNum();
   SpParaPtr sp_para_ptr =  mng_ptr_->prsm_para_ptr_->getSpParaPtr();

@@ -22,13 +22,11 @@ class ProteoformUtil {
   static ProteoformPtrVec2D divideProteoIntoBlocks(const ProteoformPtrVec &proteo_ptrs, 
                                                    int db_block_size);
 
-  static std::vector<int> getNTermShift(ProteoformPtr db_form_ptr,
-                                        const ProtModPtrVec &prot_mod_ptrs,
-                                        double scale);
+  static std::vector<double> getNTermShift(ProteoformPtr db_form_ptr,
+                                        const ProtModPtrVec &prot_mod_ptrs);
 
-  static std::vector<std::vector<int>> getNTermShift2D(
-      ProteoformPtrVec db_form_ptr_vec, const ProtModPtrVec &prot_mod_ptrs,
-      double scale);
+  static std::vector<std::vector<double>> getNTermShift2D(
+      ProteoformPtrVec db_form_ptr_vec, const ProtModPtrVec &prot_mod_ptrs);
 
 };
 

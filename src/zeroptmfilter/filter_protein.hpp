@@ -6,6 +6,10 @@
 
 namespace prot {
 
+class FilterProtein;
+typedef std::shared_ptr<FilterProtein> FilterProteinPtr;
+typedef std::vector<FilterProteinPtr> FilterProteinPtrVec;
+
 class FilterProtein {
  public:
   FilterProtein(int protein_id, int score):
@@ -20,15 +24,15 @@ class FilterProtein {
   void setNTermShifts(std::vector<double> shifts) {n_term_shifts_ = shifts;}
   void setCTermShifts(std::vector<double> shifts) {c_term_shifts_ = shifts;}
 
+  static FilterProteinPtrVec geneResults(std::vector<std::pair<int,int>> &single_type_results, 
+                                         int threshold, int single_type_num);
+
  private:
   int protein_id_;
   int score_;
   std::vector<double> n_term_shifts_;
   std::vector<double> c_term_shifts_;
 };
-
-typedef std::shared_ptr<FilterProtein> FilterProteinPtr;
-typedef std::vector<FilterProteinPtr> FilterProteinPtrVec;
 
 } /* namespace prot */
 

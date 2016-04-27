@@ -8,7 +8,7 @@
 #include "prsm/simple_prsm_xml_writer.hpp"
 #include "prsm/simple_prsm_str_combine.hpp"
 #include "zeroptmfilter/zero_ptm_filter_processor.hpp"
-#include "zeroptmfilter/zero_ptm_filter.hpp"
+#include "zeroptmfilter/mass_zero_ptm_filter.hpp"
 
 namespace prot {
 
@@ -63,7 +63,7 @@ void ZeroPtmFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_
   ProteoformPtrVec raw_forms 
       = ProteoformFactory::readFastaToProteoformPtrVec(db_block_file_name, 
                                                        prsm_para_ptr->getFixModPtrVec());
-  ZeroPtmFilterPtr filter_ptr(new ZeroPtmFilter(raw_forms, mng_ptr_));
+  MassZeroPtmFilterPtr filter_ptr(new MassZeroPtmFilter(raw_forms, mng_ptr_));
 
   int group_spec_num = mng_ptr_->prsm_para_ptr_->getGroupSpecNum();
   SpParaPtr sp_para_ptr =  mng_ptr_->prsm_para_ptr_->getSpParaPtr();
