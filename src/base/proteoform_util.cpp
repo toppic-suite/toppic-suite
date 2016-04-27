@@ -149,28 +149,25 @@ ProteoformPtrVec2D ProteoformUtil::divideProteoIntoBlocks(
   return proteo_blocks;
 }
 
-std::vector<int> ProteoformUtil::getNTermShift(ProteoformPtr db_form_ptr,
-                                               const ProtModPtrVec &prot_mod_ptrs,
-                                               double scale) {
-  std::vector<int> shifts;
+std::vector<double> ProteoformUtil::getNTermShift(ProteoformPtr db_form_ptr,
+                                               const ProtModPtrVec &prot_mod_ptrs) {
+  std::vector<double> shifts;
   for (size_t i = 0; i < prot_mod_ptrs.size(); i++) {
     ResSeqPtr db_res_seq_ptr = db_form_ptr->getResSeqPtr();
     bool valid = ProtModUtil::allowMod(prot_mod_ptrs[i], 
                                        db_res_seq_ptr->getResidues());
     if (valid) {
-      double value = prot_mod_ptrs[i]->getProtShift() *scale;
-      shifts.push_back(std::floor(value+0.5));
+      shifts.push_back(prot_mod_ptrs[i]->getProtShift());
     }
   }
   return shifts;
 }
 
-std::vector<std::vector<int>> ProteoformUtil::getNTermShift2D(
-    ProteoformPtrVec db_form_ptr_vec, const ProtModPtrVec &prot_mod_ptrs,
-    double scale) {
-  std::vector<std::vector<int>> shifts_2d;
+std::vector<std::vector<double>> ProteoformUtil::getNTermShift2D(
+    ProteoformPtrVec db_form_ptr_vec, const ProtModPtrVec &prot_mod_ptrs) {
+  std::vector<std::vector<double>> shifts_2d;
   for (size_t i = 0; i < db_form_ptr_vec.size(); i++) {
-    std::vector<int> shifts = getNTermShift(db_form_ptr_vec[i], prot_mod_ptrs, scale);
+    std::vector<double> shifts = getNTermShift(db_form_ptr_vec[i], prot_mod_ptrs);
     shifts_2d.push_back(shifts);
   }
   return shifts_2d;

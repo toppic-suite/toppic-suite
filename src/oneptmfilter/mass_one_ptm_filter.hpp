@@ -1,20 +1,20 @@
-#ifndef ZERO_PTM_FILTER_MASS_ZERO_PTM_FILTER_H_
-#define ZERO_PTM_FILTER_MASS_ZERO_PTM_FILTER_H_
+#ifndef PROT_MASS_ONE_PTM_FILTER_H_
+#define PROT_MASS_ONE_PTM_FILTER_H_
 
 #include "base/proteoform.hpp"
-#include "spec/extend_peak.hpp"
-#include "spec/extend_ms.hpp"
+#include "spec/prm_ms.hpp"
 #include "prsm/simple_prsm.hpp"
-#include "zeroptmfilter/zero_ptm_filter_mng.hpp"
 #include "zeroptmfilter/mass_match.hpp"
+#include "oneptmfilter/one_ptm_filter_mng.hpp"
 
 namespace prot {
 
-class MassZeroPtmFilter {
+class MassOnePtmFilter {
  public:
-  MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs, ZeroPtmFilterMngPtr
-                    mng_ptr);
-  void computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec);
+  MassOnePtmFilter(const ProteoformPtrVec &proteo_ptrs,
+               OnePtmFilterMngPtr mng_ptr);
+  void computeBestMatch(const PrmMsPtrVec &prm_ms_ptr_vec,
+                        const PrmMsPtrVec &srm_ms_ptr_vec);
 
   SimplePrsmPtrVec getCompMatchPtrs() {return comp_match_ptrs_;}
   SimplePrsmPtrVec getPrefMatchPtrs() {return pref_match_ptrs_;}
@@ -22,7 +22,7 @@ class MassZeroPtmFilter {
   SimplePrsmPtrVec getInternalMatchPtrs() {return internal_match_ptrs_;}
 
  private:
-  ZeroPtmFilterMngPtr mng_ptr_;
+  OnePtmFilterMngPtr mng_ptr_;
   ProteoformPtrVec proteo_ptrs_;
 
   MassMatchPtr diag_index_ptr_;
@@ -36,7 +36,7 @@ class MassZeroPtmFilter {
   SimplePrsmPtrVec internal_match_ptrs_;
 };
 
-typedef std::shared_ptr<MassZeroPtmFilter> MassZeroPtmFilterPtr;
+typedef std::shared_ptr<MassOnePtmFilter> MassOnePtmFilterPtr;
 } /* namespace prot */
 
-#endif /* ZERO_PTM_FILTER_H_ */
+#endif /* ONE_PTM_FILTER_H_ */
