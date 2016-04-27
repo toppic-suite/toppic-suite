@@ -22,6 +22,7 @@ MassMatchPtr MassMatchFactory::getMassMatchPtr(const ProteoformPtrVec &proteo_pt
       mass_2d.push_back(masses);
     }
   }
+  LOG_DEBUG("mass 2d ver 1 complete");
   std::vector<std::vector<double>> real_shift_2d; 
   std::vector<std::vector<int>> pos_2d; 
   for (size_t i = 0; i < proteo_ptrs.size(); i++) {
@@ -41,6 +42,7 @@ MassMatchPtr MassMatchFactory::getMassMatchPtr(const ProteoformPtrVec &proteo_pt
     real_shift_2d.push_back(shifts);
     pos_2d.push_back(positions);
   }
+  LOG_DEBUG("pos 2d ver 1 complete");
   MassMatchPtr index_ptr(new MassMatch(mass_2d, real_shift_2d, pos_2d,
                                        max_proteoform_mass, scale));
   return index_ptr;
@@ -60,11 +62,17 @@ MassMatchPtr MassMatchFactory::getMassMatchPtr(const ProteoformPtrVec &proteo_pt
       mass_2d.push_back(masses);
     }
   }
+  LOG_DEBUG("mass 2d complete");
+  LOG_DEBUG("proteo num " << proteo_ptrs.size());
+  LOG_DEBUG("shift num " << real_shift_2d.size());
+
   std::vector<std::vector<int>> pos_2d; 
   for (size_t i = 0; i < proteo_ptrs.size(); i++) {
-    std::vector<int> positions(real_shift_2d[i].size(), 0);
+    int n = real_shift_2d[i].size();
+    std::vector<int> positions(n, 0);
     pos_2d.push_back(positions);
   }
+  LOG_DEBUG("pos 2d complete");
   MassMatchPtr index_ptr(new MassMatch(mass_2d, real_shift_2d, pos_2d,
                                        max_proteoform_mass, scale));
   return index_ptr;

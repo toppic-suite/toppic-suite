@@ -65,7 +65,7 @@ std::vector<double> BpSpec::getPrmMasses() {
 
 std::vector<double> BpSpec::getSrmMasses() {
   std::vector<double> mass_vec;
-  for (size_t i = break_point_ptr_vec_.size() -1; i >= 0; i--) {
+  for (int i = break_point_ptr_vec_.size() -1; i >= 0; i--) {
     mass_vec.push_back(break_point_ptr_vec_[i]->getSrm());
   }
   std::sort(mass_vec.begin(),mass_vec.end(),std::less<double>());
@@ -92,7 +92,7 @@ std::vector<int> BpSpec::getScaledMass(double scale, IonTypePtr ion_type_ptr){
 
 std::vector<int> BpSpec::getScaledPrmMasses(double scale){
   std::vector<int> result;
-  for(size_t i=break_point_ptr_vec_.size()-1; i >= 0; i--){
+  for(size_t i=0; i < break_point_ptr_vec_.size(); i++){
     double value = break_point_ptr_vec_[i]->getPrm()*scale;
     result.push_back(std::floor(value+0.5));
   }
@@ -102,7 +102,7 @@ std::vector<int> BpSpec::getScaledPrmMasses(double scale){
 
 std::vector<int> BpSpec::getScaledSrmMasses(double scale){
   std::vector<int> result;
-  for(size_t i=break_point_ptr_vec_.size()-1; i >= 0; i--){
+  for(int i=break_point_ptr_vec_.size()-1; i >= 0; i--){
     double value = break_point_ptr_vec_[i]->getSrm()*scale;
     result.push_back(std::floor(value+0.5));
   }

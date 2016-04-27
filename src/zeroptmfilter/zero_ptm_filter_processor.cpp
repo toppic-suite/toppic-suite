@@ -63,7 +63,9 @@ void ZeroPtmFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_
   ProteoformPtrVec raw_forms 
       = ProteoformFactory::readFastaToProteoformPtrVec(db_block_file_name, 
                                                        prsm_para_ptr->getFixModPtrVec());
+  LOG_DEBUG("read fasta complete");
   MassZeroPtmFilterPtr filter_ptr(new MassZeroPtmFilter(raw_forms, mng_ptr_));
+  LOG_DEBUG("filter inited");
 
   int group_spec_num = mng_ptr_->prsm_para_ptr_->getGroupSpecNum();
   SpParaPtr sp_para_ptr =  mng_ptr_->prsm_para_ptr_->getSpParaPtr();

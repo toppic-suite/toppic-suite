@@ -99,7 +99,6 @@ int two_base_opt(int argc, char* argv[]) {
     FastaUtil::dbPreprocess (ori_db_file_name, db_file_name, decoy, db_block_size);
     MsAlignUtil::geneSpIndex(sp_file_name);
 
-    /*
     std::vector<std::string> input_exts;
 
     std::cout << "Zero PTM filtering started." << std::endl;
@@ -120,6 +119,7 @@ int two_base_opt(int argc, char* argv[]) {
     input_exts.push_back("ZERO_PTM_SUFFIX");
     input_exts.push_back("ZERO_PTM_INTERNAL");
 
+    /*
     if (ptm_num >= 1) {
       std::cout << "One PTM filtering started." << std::endl;
       OnePtmFilterMngPtr one_ptm_filter_mng_ptr = OnePtmFilterMngPtr(new OnePtmFilterMng (prsm_para_ptr, "ONE_PTM_FILTER"));
@@ -169,7 +169,6 @@ int two_base_opt(int argc, char* argv[]) {
     combine_ptr->process();
     combine_ptr = nullptr;
     std::cout << "Combining PRSMs finished." << std::endl;
-    */
 
     std::cout << "E-value computation started." << std::endl;
     bool variable_ptm = false;
@@ -273,6 +272,7 @@ int two_base_opt(int argc, char* argv[]) {
       FileUtil::cleanDir(db_file_name);   
       std::cout << "Deleting temporary files finished." << std::endl;
     }
+    */
 
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
@@ -285,7 +285,7 @@ int two_base_opt(int argc, char* argv[]) {
 }
 
 int main(int argc, char* argv[]) {
-  // prot::log_level = 2;
+  prot::log_level = 2;
   std::cout << std::setprecision(10);
   return prot::two_base_opt(argc, argv);
 }

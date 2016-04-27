@@ -51,7 +51,7 @@ inline SimplePrsmPtrVec MassDiagFilter::compute(const PrmMsPtrVec &ms_ptr_vec){
   int threshold = 4;
   for(size_t i=0;i<mass_errors.size();i++){
     std::vector<short> scores(row_num, 0);
-    index_ptr_->compScores(mass_errors, i, scores);
+    index_ptr_->compScores(mass_errors, i, -mass_errors[i].first, scores);
     FilterProteinPtrVec results 
         = MassMatchUtil::findTopProteins(scores, proteo_row_begins, proteo_row_ends, threshold,
                                          mng_ptr_->filter_result_num_);
