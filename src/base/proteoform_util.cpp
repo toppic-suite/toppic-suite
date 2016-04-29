@@ -2,6 +2,7 @@
 #include <cmath>
 
 #include "base/residue_util.hpp"
+#include "base/prot_mod_base.hpp"
 #include "base/prot_mod_util.hpp"
 #include "base/proteoform_util.hpp"
 
@@ -156,6 +157,10 @@ std::vector<double> ProteoformUtil::getNTermShift(ProteoformPtr db_form_ptr,
     ResSeqPtr db_res_seq_ptr = db_form_ptr->getResSeqPtr();
     bool valid = ProtModUtil::allowMod(prot_mod_ptrs[i], 
                                        db_res_seq_ptr->getResidues());
+    // for testing
+    if (prot_mod_ptrs[i]->getType() == ProtModBase::getType_NME()) {
+      valid = true;
+    }
     if (valid) {
       shifts.push_back(prot_mod_ptrs[i]->getProtShift());
     }

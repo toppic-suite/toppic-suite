@@ -50,7 +50,7 @@ class PtmBase {
   static PtmPtr c57_ptr_;
   static PtmPtr c58_ptr_;
 
-  static std::string getAcetylationAbbrName() {return "Acetylation";}
+  static std::string getAcetylationAbbrName() {return "Acetyl";}
   static std::string getC57AbbrName() {return "Carbamidomethylation";}
   static std::string getC58AbbrName() {return "Carboxymethyl";}
 };

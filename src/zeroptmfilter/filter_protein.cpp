@@ -1,5 +1,6 @@
 #include <algorithm>
 
+#include "base/logger.hpp"
 #include "zeroptmfilter/filter_protein.hpp"
 
 namespace prot {
@@ -18,7 +19,7 @@ FilterProteinPtrVec FilterProtein::geneResults(std::vector<std::pair<int,int>> &
     if (i >= (int)single_type_results.size()) {
       break;
     }
-    //LOG_DEBUG("rank " << i << " score " << single_type_results[i].second);
+    //LOG_DEBUG("rank " << i  <<  " score " << single_type_results[i].second);
     if(single_type_results[i].second >= threshold){
       output_num++;
     }

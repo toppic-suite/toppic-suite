@@ -82,6 +82,11 @@ inline void MassMatch::compColumnMatchNums(std::vector<std::vector<int>> &mass_2
         int shift_mass = mass_2d[i][cur] + shift_2d[i][s];
         if (shift_mass > 0) {
           if (shift_mass < col_num_) {
+            /*
+            if (shift_mass >= 545694 && shift_mass <= 545712) {
+              LOG_DEBUG("i " << i << " s " << s << " cur " << cur << " cur mass " << mass_2d[i][cur] << " shift mass " << shift_2d[i][s]);
+            }
+            */
             col_match_nums[shift_mass]++;
           }
           else {
@@ -104,8 +109,12 @@ inline void MassMatch::fillColumnIndex(std::vector<std::vector<int>> &mass_2d,
     for (size_t s = 0; s < shift_2d[i].size(); s++)  {
       for (size_t cur = pos_2d[i][s]; cur < mass_2d[i].size(); cur++) {
         int shift_mass = mass_2d[i][cur] + shift_2d[i][s];
-        //LOG_DEBUG("i " << i << " s " << s << " cur " << cur << 
-        //          " shift_mass " << shift_mass << " col num " << col_num_);
+        /*
+        if (s == 0 || s == 1) {
+          LOG_DEBUG("i " << i << " s " << s << " cur " << cur << 
+                    " shift_mass " << shift_mass << " col num " << col_num_);
+        }
+        */
         if (shift_mass > 0) {
           if (shift_mass < col_num_) {
             col_indexes_[col_index_pnts[shift_mass]] = proteo_row_begins_[i] + s;
@@ -140,6 +149,11 @@ inline void MassMatch::initIndexes(std::vector<std::vector<int>> &mass_2d,
     col_index_begins_[i] = pnt;
     col_index_pnts[i] = pnt;
     col_index_ends_[i] = pnt + col_match_nums[i]-1;
+    /*
+    if (i>= 1385237 && i <= 1385279) {
+      LOG_DEBUG(i << " bgn " << col_index_begins_[i] << " end " << col_index_ends_[i]);
+    }
+    */
     pnt += col_match_nums[i];
   }
   // no need to init
@@ -175,7 +189,7 @@ void MassMatch::compScores(const std::vector<std::pair<int,int>> &pref_mass_erro
     end_index= col_index_ends_[right];
     for(int j=begin_index;j<=end_index;j++){
       scores[col_indexes_[j]]++;
-      //LOG_DEBUG("ROW INDEX " << col_indexes_[j] << " score " << scores[col_indexes_[j]]);
+      //LOG_DEBUG("ROW INDEX " << col_indexes_[j] << " m " << m << " left " << left << " right " << right << " score " << scores[col_indexes_[j]]);
     }
   }
 }
@@ -193,11 +207,12 @@ void MassMatch::compMatchScores(const std::vector<std::pair<int,int>> &pref_mass
     left=0;
   }
   int right = m + prec_minus_water_mass_error.second;
-  //LOG_DEBUG("prec left " << left << " pref right " << right);
   if(right >= 0 && right < col_num_){
     // update scores
     begin_index = col_index_begins_[left];
     end_index= col_index_ends_[right];
+    LOG_DEBUG("prec left " << left << " pref right " << right 
+              << " begin index " << begin_index << " end index " << end_index);
     for(int j=begin_index;j<=end_index;j++){
       scores[col_indexes_[j]] += getPrecursorMatchScore();
     }
