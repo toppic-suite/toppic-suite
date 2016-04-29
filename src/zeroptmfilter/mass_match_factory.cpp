@@ -9,6 +9,18 @@
 
 namespace prot {
 
+
+std::vector<int> getScaledSrmMasses(ProteoformPtr proteo_ptr, double scale) {
+  std::vector<int> masses = proteo_ptr->getBpSpecPtr()->getScaledPrmMasses(scale);
+  std::vector<int> rev_masses;
+  int len = masses.size();
+  for (int i = len -1 ; i >= 0; i--) {
+    rev_masses.push_back(masses[len-1] - masses[i]);
+  }
+  return rev_masses;
+}
+
+
 MassMatchPtr MassMatchFactory::getMassMatchPtr(const ProteoformPtrVec &proteo_ptrs, 
                                                double max_proteoform_mass, double scale, bool rev) {
   std::vector<std::vector<int>> mass_2d; 
@@ -18,7 +30,8 @@ MassMatchPtr MassMatchFactory::getMassMatchPtr(const ProteoformPtrVec &proteo_pt
       mass_2d.push_back(masses);
     }
     else {
-      std::vector<int> masses = proteo_ptrs[i]->getBpSpecPtr()->getScaledSrmMasses(scale);
+      //std::vector<int> masses = proteo_ptrs[i]->getBpSpecPtr()->getScaledSrmMasses(scale);
+      std::vector<int> masses = getScaledSrmMasses(proteo_ptrs[i], scale);
       mass_2d.push_back(masses);
     }
   }
@@ -58,7 +71,8 @@ MassMatchPtr MassMatchFactory::getMassMatchPtr(const ProteoformPtrVec &proteo_pt
       mass_2d.push_back(masses);
     }
     else {
-      std::vector<int> masses = proteo_ptrs[i]->getBpSpecPtr()->getScaledSrmMasses(scale);
+      //std::vector<int> masses = proteo_ptrs[i]->getBpSpecPtr()->getScaledSrmMasses(scale);
+      std::vector<int> masses = getScaledSrmMasses(proteo_ptrs[i], scale);
       mass_2d.push_back(masses);
     }
   }

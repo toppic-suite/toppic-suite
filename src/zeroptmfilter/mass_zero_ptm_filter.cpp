@@ -55,9 +55,11 @@ void MassZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec){
   int term_row_num = term_index_ptr_->getRowNum();
   std::vector<short> term_scores(term_row_num, 0);
   term_index_ptr_->compMatchScores(pref_mass_errors, prec_minus_water_mass_error, term_scores);
+  /*
   for (int i = 0; i < term_row_num; i++) {
     LOG_DEBUG("row " << i << " score "<< term_scores[i]);
   }
+  */
   int diag_row_num = diag_index_ptr_->getRowNum();
   std::vector<short> diag_scores(diag_row_num, 0);
   diag_index_ptr_->compMatchScores(pref_mass_errors, prec_minus_water_mass_error, diag_scores);
@@ -65,9 +67,11 @@ void MassZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec){
   int rev_term_row_num = rev_term_index_ptr_->getRowNum();
   std::vector<short> rev_term_scores(rev_term_row_num, 0);
   rev_term_index_ptr_->compMatchScores(suff_mass_errors, prec_minus_water_mass_error, rev_term_scores);
+  /*
   for (int i = 0; i < term_row_num; i++) {
     LOG_DEBUG("rev row " << i << " score "<< rev_term_scores[i]);
   }
+  */
   int rev_diag_row_num = rev_diag_index_ptr_->getRowNum();
   std::vector<short> rev_diag_scores(rev_diag_row_num, 0);
   rev_diag_index_ptr_->compMatchScores(suff_mass_errors, prec_minus_water_mass_error, rev_diag_scores);

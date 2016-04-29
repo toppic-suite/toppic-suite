@@ -527,7 +527,7 @@ inline void CompShift::findTopScores(std::vector<short> &scores, std::vector<sho
         best_suff_score = rev_scores[j];
       }
     }
-    //LOG_DEBUG("best pref score "  << best_pref_score << " best suffix score " << best_suff_score);
+    LOG_DEBUG("best pref score "  << best_pref_score << " best rev score " << best_rev_score);
     std::pair<int,int> comp_proteo_score(i, best_pref_score + best_suff_score);
     comp_proteo_scores.push_back(comp_proteo_score);
     std::pair<int,int> pref_proteo_score(i, best_pref_score + best_rev_score);
