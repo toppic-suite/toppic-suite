@@ -13,9 +13,9 @@ MassDiagFilter::MassDiagFilter(const ProteoformPtrVec &proteo_ptrs,
                                DiagFilterMngPtr mng_ptr){
   mng_ptr_ = mng_ptr;
   proteo_ptrs_ = proteo_ptrs;
-  bool rev = false;
-  index_ptr_ = MassMatchFactory::getMassMatchPtr(proteo_ptrs, mng_ptr->max_proteoform_mass_, 
-                                                 mng_ptr->filter_scale_, rev);
+  index_ptr_ = MassMatchFactory::getPrmDiagMassMatchPtr(proteo_ptrs,  
+                                                        mng_ptr->max_proteoform_mass_, 
+                                                        mng_ptr->filter_scale_);
 }
 
 SimplePrsmPtrVec MassDiagFilter::getBestMatch(const PrmMsPtrVec &ms_ptr_vec){

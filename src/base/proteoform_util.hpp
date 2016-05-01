@@ -28,6 +28,12 @@ class ProteoformUtil {
   static std::vector<std::vector<double>> getNTermShift2D(
       ProteoformPtrVec db_form_ptr_vec, const ProtModPtrVec &prot_mod_ptrs);
 
+  static std::vector<double> getNTermAcets(ProteoformPtr db_form_ptr,
+                                        const ProtModPtrVec &prot_mod_ptrs);
+
+  static std::vector<std::vector<double>> getNTermAcet2D(
+      ProteoformPtrVec db_form_ptr_vec, const ProtModPtrVec &prot_mod_ptrs);
+
 };
 
 } /* namespace prot */

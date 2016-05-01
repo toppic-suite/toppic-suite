@@ -12,31 +12,34 @@ MassZeroPtmFilter::MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
                                      ZeroPtmFilterMngPtr mng_ptr){
   mng_ptr_ = mng_ptr;
   proteo_ptrs_ = proteo_ptrs;
-  double rev = false;
   LOG_DEBUG("get shifts");
   std::vector<std::vector<double>> shift_2d 
       = ProteoformUtil::getNTermShift2D(proteo_ptrs, mng_ptr->prsm_para_ptr_->getProtModPtrVec());
+  std::vector<std::vector<double>> n_term_acet_2d 
+      = ProteoformUtil::getNTermAcet2D(proteo_ptrs, mng_ptr->prsm_para_ptr_->getProtModPtrVec());
   LOG_DEBUG("get shifts complete");
-  term_index_ptr_ = MassMatchFactory::getMassMatchPtr(proteo_ptrs, shift_2d,
-                                               mng_ptr->max_proteoform_mass_,
-                                               mng_ptr->filter_scale_, rev);
+  term_index_ptr_ = MassMatchFactory::getPrmTermMassMatchPtr(proteo_ptrs, shift_2d, 
+                                                             mng_ptr->max_proteoform_mass_,
+                                                             mng_ptr->filter_scale_);
   LOG_DEBUG("term index");
-  diag_index_ptr_ = MassMatchFactory::getMassMatchPtr(proteo_ptrs, 
-                                                      mng_ptr->max_proteoform_mass_,
-                                                      mng_ptr->filter_scale_, rev);
+  diag_index_ptr_ = MassMatchFactory::getPrmDiagMassMatchPtr(proteo_ptrs,  
+                                                             mng_ptr->max_proteoform_mass_,
+                                                             mng_ptr->filter_scale_);
   LOG_DEBUG("diag index");
-  rev = true;
   std::vector<std::vector<double>> rev_shift_2d;
   std::vector<double> shift_1d(1,0);
   for (size_t i = 0; i < proteo_ptrs.size(); i++) {
     rev_shift_2d.push_back(shift_1d);
   }
-  rev_term_index_ptr_ = MassMatchFactory::getMassMatchPtr(proteo_ptrs, rev_shift_2d,
-                                                          mng_ptr->max_proteoform_mass_,
-                                                          mng_ptr->filter_scale_, rev);
+  rev_term_index_ptr_ = MassMatchFactory::getSrmTermMassMatchPtr(proteo_ptrs, rev_shift_2d, 
+                                                                 n_term_acet_2d,
+                                                                 mng_ptr->max_proteoform_mass_,
+                                                                 mng_ptr->filter_scale_);
+
   LOG_DEBUG("rev term index");
-  rev_diag_index_ptr_ = MassMatchFactory::getMassMatchPtr(proteo_ptrs, mng_ptr->max_proteoform_mass_,
-                                                          mng_ptr->filter_scale_, rev);
+  rev_diag_index_ptr_ = MassMatchFactory::getSrmDiagMassMatchPtr(proteo_ptrs, n_term_acet_2d,
+                                                                 mng_ptr->max_proteoform_mass_,
+                                                                 mng_ptr->filter_scale_);
   LOG_DEBUG("rev diag index");
 }
 
