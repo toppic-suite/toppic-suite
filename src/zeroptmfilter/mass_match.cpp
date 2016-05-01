@@ -211,8 +211,8 @@ void MassMatch::compMatchScores(const std::vector<std::pair<int,int>> &pref_mass
     // update scores
     begin_index = col_index_begins_[left];
     end_index= col_index_ends_[right];
-    LOG_DEBUG("prec left " << left << " pref right " << right 
-              << " begin index " << begin_index << " end index " << end_index);
+    //LOG_DEBUG("prec left " << left << " pref right " << right 
+    //          << " begin index " << begin_index << " end index " << end_index);
     for(int j=begin_index;j<=end_index;j++){
       scores[col_indexes_[j]] += getPrecursorMatchScore();
     }

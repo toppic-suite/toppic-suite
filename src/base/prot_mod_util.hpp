@@ -13,6 +13,7 @@ class ProtModUtil {
   static ProtModPtrVec readProtMod(const std::string &file_name);
 
   static ProtModPtr findNME_Acetylation(const ProtModPtrVec &prot_mod_ptrs, const ResiduePtrVec &residues);
+
 };
 
 }
