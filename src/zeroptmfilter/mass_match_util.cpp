@@ -96,7 +96,7 @@ FilterProteinPtrVec MassMatchUtil::findTopProteins(std::vector<short> &scores,
         rev_best_score = rev_scores[j];
       }
     }
-    //LOG_DEBUG("best score " << best_score << " rev best score " << rev_best_score);
+    LOG_DEBUG("best score " << best_score << " rev best score " << rev_best_score);
 
     std::pair<int,int> proteo_score(i, best_score + rev_best_score);
     proteo_scores.push_back(proteo_score);

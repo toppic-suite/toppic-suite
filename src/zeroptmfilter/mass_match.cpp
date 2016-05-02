@@ -110,8 +110,9 @@ inline void MassMatch::fillColumnIndex(std::vector<std::vector<int>> &mass_2d,
       for (size_t cur = pos_2d[i][s]; cur < mass_2d[i].size(); cur++) {
         int shift_mass = mass_2d[i][cur] + shift_2d[i][s];
         /*
-        if (s == 0 || s == 1) {
-          LOG_DEBUG("i " << i << " s " << s << " cur " << cur << 
+        if (s == 13) {
+          LOG_DEBUG("i " << i << " s " << s << " cur " << cur << " mass " << mass_2d[i][cur]
+                    << " shift " << shift_2d[i][s] <<
                     " shift_mass " << shift_mass << " col num " << col_num_);
         }
         */
@@ -211,8 +212,8 @@ void MassMatch::compMatchScores(const std::vector<std::pair<int,int>> &pref_mass
     // update scores
     begin_index = col_index_begins_[left];
     end_index= col_index_ends_[right];
-    //LOG_DEBUG("prec left " << left << " pref right " << right 
-    //          << " begin index " << begin_index << " end index " << end_index);
+    LOG_DEBUG("prec left " << left << " pref right " << right 
+              << " begin index " << begin_index << " end index " << end_index);
     for(int j=begin_index;j<=end_index;j++){
       scores[col_indexes_[j]] += getPrecursorMatchScore();
     }
