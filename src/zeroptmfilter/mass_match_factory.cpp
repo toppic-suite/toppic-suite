@@ -16,9 +16,15 @@ inline std::vector<int> getScaledSrmMasses(ProteoformPtr proteo_ptr,
   std::vector<int> masses = proteo_ptr->getBpSpecPtr()->getScaledPrmMasses(scale);
   for (size_t i = 0; i < n_ace_shifts.size(); i++) {
       int ace_mass = (int)std::round(- n_ace_shifts[i] * scale);
+      LOG_DEBUG("ace shift " << n_ace_shifts[i] <<  " ace mass " << ace_mass);
       masses.push_back(ace_mass);
   }
   std::sort(masses.begin(), masses.end(),std::less<int>()); 
+  /*
+  for (size_t i = 0; i < masses.size(); i++) {
+    LOG_DEBUG("integer mass " << i << " " << masses[i]);
+  }
+  */
   std::vector<int> rev_masses;
   int len = masses.size();
   for (int i = len -1 ; i >= 0; i--) {
@@ -36,6 +42,11 @@ inline MassMatchPtr getMassMatchPtr(const ProteoformPtrVec &proteo_ptrs,
     std::vector<double> masses;
     if (prm) {
       masses = proteo_ptrs[i]->getBpSpecPtr()->getPrmMasses();
+      /*
+      for (size_t j = 0; j < masses.size(); j++) {
+        LOG_DEBUG("prefix mass " << j << " " << masses[j]);
+      }
+      */
     }
     else {
       masses = proteo_ptrs[i]->getBpSpecPtr()->getSrmMasses();
