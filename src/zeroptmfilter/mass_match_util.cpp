@@ -37,6 +37,11 @@ void addTruncShifts(FilterProteinPtrVec &prot_ptrs, MassMatchPtr index_ptr,
   std::vector<int> row_begins = index_ptr->getProteoRowBegins(); 
   std::vector<int> row_ends = index_ptr->getProteoRowEnds();
   std::vector<double> trunc_shifts = index_ptr->getTruncShifts();
+  /*
+  for (size_t i = 0; i < trunc_shifts.size(); i++) {
+    LOG_DEBUG("trunc shift " << i << " shift " << trunc_shifts[i]);
+  }
+  */
   for (size_t i = 0; i < prot_ptrs.size(); i++) {
     FilterProteinPtr prot_ptr = prot_ptrs[i];
     int prot_id = prot_ptr->getProteinId();
@@ -54,6 +59,7 @@ void addTruncShifts(FilterProteinPtrVec &prot_ptrs, MassMatchPtr index_ptr,
       if ((int)j >= shift_num) {
         break;
       }
+      //LOG_DEBUG("pushed shift " << trunc_shifts[pos_scores[j].first]);
       shifts.push_back(trunc_shifts[pos_scores[j].first]);
     }
     if (n_term) {
@@ -96,7 +102,7 @@ FilterProteinPtrVec MassMatchUtil::findTopProteins(std::vector<short> &scores,
         rev_best_score = rev_scores[j];
       }
     }
-    LOG_DEBUG("best score " << best_score << " rev best score " << rev_best_score);
+    //LOG_DEBUG("best score " << best_score << " rev best score " << rev_best_score);
 
     std::pair<int,int> proteo_score(i, best_score + rev_best_score);
     proteo_scores.push_back(proteo_score);

@@ -52,7 +52,7 @@ inline void MassMatch::initProteoformBeginEnds(std::vector<std::vector<int>> &ma
   for(int i =0; i < proteo_num_; i++){
     for(int j= proteo_row_begins_[i]; j<= proteo_row_ends_[i];j++){
       row_proteo_ids_[j] = i;
-      int pos = j - proteo_row_ends_[i];
+      int pos = j - proteo_row_begins_[i];
       trunc_shifts_[j] = shift_2d[i][pos];
     }
   }
@@ -150,11 +150,6 @@ inline void MassMatch::initIndexes(std::vector<std::vector<int>> &mass_2d,
     col_index_begins_[i] = pnt;
     col_index_pnts[i] = pnt;
     col_index_ends_[i] = pnt + col_match_nums[i]-1;
-    /*
-    if (i>= 1385237 && i <= 1385279) {
-      LOG_DEBUG(i << " bgn " << col_index_begins_[i] << " end " << col_index_ends_[i]);
-    }
-    */
     pnt += col_match_nums[i];
   }
   // no need to init
@@ -212,8 +207,8 @@ void MassMatch::compMatchScores(const std::vector<std::pair<int,int>> &pref_mass
     // update scores
     begin_index = col_index_begins_[left];
     end_index= col_index_ends_[right];
-    LOG_DEBUG("prec left " << left << " pref right " << right 
-              << " begin index " << begin_index << " end index " << end_index);
+    //LOG_DEBUG("prec left " << left << " pref right " << right 
+    //          << " begin index " << begin_index << " end index " << end_index);
     for(int j=begin_index;j<=end_index;j++){
       scores[col_indexes_[j]] += getPrecursorMatchScore();
     }

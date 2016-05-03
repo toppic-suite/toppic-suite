@@ -99,6 +99,7 @@ int two_base_opt(int argc, char* argv[]) {
     FastaUtil::dbPreprocess (ori_db_file_name, db_file_name, decoy, db_block_size);
     MsAlignUtil::geneSpIndex(sp_file_name);
 
+    /*
     std::vector<std::string> input_exts;
 
     std::cout << "Zero PTM filtering started." << std::endl;
@@ -119,7 +120,6 @@ int two_base_opt(int argc, char* argv[]) {
     input_exts.push_back("ZERO_PTM_SUFFIX");
     input_exts.push_back("ZERO_PTM_INTERNAL");
 
-    /*
     if (ptm_num >= 1) {
       std::cout << "One PTM filtering started." << std::endl;
       OnePtmFilterMngPtr one_ptm_filter_mng_ptr = OnePtmFilterMngPtr(new OnePtmFilterMng (prsm_para_ptr, "ONE_PTM_FILTER"));
@@ -143,6 +143,7 @@ int two_base_opt(int argc, char* argv[]) {
     }
 
     if (ptm_num >= 2) {
+    */
       std::cout << "Diagonal PTM filtering started." << std::endl;
       DiagFilterMngPtr diag_filter_mng_ptr 
           = DiagFilterMngPtr(new DiagFilterMng (prsm_para_ptr, filter_result_num, "DIAG_FILTER"));
@@ -152,6 +153,7 @@ int two_base_opt(int argc, char* argv[]) {
       WebLog::completeFunction(WebLog::DiagFilterTime());
       std::cout << "Diagonal filtering finished." << std::endl;
 
+      /*
       std::cout << "Two PTM search started." << std::endl;
       PtmSearchMngPtr two_search_mng_ptr 
           = PtmSearchMngPtr(new PtmSearchMng (prsm_para_ptr, n_top, max_ptm_mass, ptm_num,
@@ -285,7 +287,7 @@ int two_base_opt(int argc, char* argv[]) {
 }
 
 int main(int argc, char* argv[]) {
-  prot::log_level = 2;
+  //prot::log_level = 2;
   std::cout << std::setprecision(10);
   return prot::two_base_opt(argc, argv);
 }

@@ -157,10 +157,11 @@ std::vector<double> ProteoformUtil::getNTermShift(ProteoformPtr db_form_ptr,
     ResSeqPtr db_res_seq_ptr = db_form_ptr->getResSeqPtr();
     bool valid = ProtModUtil::allowMod(prot_mod_ptrs[i], 
                                        db_res_seq_ptr->getResidues());
-    // for testing
+    /*
     if (prot_mod_ptrs[i]->getType() == ProtModBase::getType_NME()) {
       valid = true;
     }
+    */
     if (valid) {
       shifts.push_back(prot_mod_ptrs[i]->getProtShift());
     }
@@ -172,16 +173,15 @@ std::vector<double> ProteoformUtil::getNTermAcets(ProteoformPtr db_form_ptr,
                                                const ProtModPtrVec &prot_mod_ptrs) {
   std::vector<double> shifts;
   for (size_t i = 0; i < prot_mod_ptrs.size(); i++) {
-    ResSeqPtr db_res_seq_ptr = db_form_ptr->getResSeqPtr();
-    bool valid = ProtModUtil::allowMod(prot_mod_ptrs[i], 
-                                       db_res_seq_ptr->getResidues());
-    // for testing
+    // check if it is acetylation
     if (prot_mod_ptrs[i]->getModPtr()->getModResiduePtr()->getPtmPtr() 
-        != PtmBase::getPtmPtr_Acetylation()) {
-      valid = false;
-    }
-    if (valid) {
-      shifts.push_back(prot_mod_ptrs[i]->getProtShift());
+        == PtmBase::getPtmPtr_Acetylation()) {
+      ResSeqPtr db_res_seq_ptr = db_form_ptr->getResSeqPtr();
+      bool valid = ProtModUtil::allowMod(prot_mod_ptrs[i], 
+                                         db_res_seq_ptr->getResidues());
+      if (valid) {
+        shifts.push_back(prot_mod_ptrs[i]->getProtShift());
+      }
     }
   }
   return shifts;
