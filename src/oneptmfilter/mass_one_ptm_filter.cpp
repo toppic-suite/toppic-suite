@@ -84,6 +84,7 @@ void MassOnePtmFilter::computeBestMatch(const PrmMsPtrVec &prm_ms_ptr_vec,
     int score = pref_prots[i]->getScore();
     SimplePrsmPtr prsm_ptr(new SimplePrsm(prm_ms_ptr_vec[0]->getMsHeaderPtr(), group_spec_num,
                                           proteo_ptrs_[id], score));
+    std::vector<double> shifts = pref_prots[i]->getCTermShifts();
     prsm_ptr->setCTruncShifts(pref_prots[i]->getCTermShifts());
     pref_match_ptrs_.push_back(prsm_ptr); 
   }
