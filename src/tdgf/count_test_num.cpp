@@ -133,13 +133,15 @@ double CountTestNum::compCandNum(AlignTypePtr type_ptr, int index,
     if (index == 0) {
         cand_num = compNonPtmCandNum(type_ptr, ori_mass, ori_tolerance);
     } else if (index >= 1){ // with shifts
+        /*
         if (max_ptm_mass_ >=10000) {
             // max shift mass is larger than 10k, we treat it as no limitation 
             cand_num = compPtmCandNum(type_ptr, ori_mass);
         }
         else {
-            cand_num = compPtmRestrictCandNum(type_ptr, index, ori_mass);
         }
+        */
+        cand_num = compPtmRestrictCandNum(type_ptr, index, ori_mass);
         // multiple adjustment 
         if (type_ptr == AlignType::PREFIX || type_ptr == AlignType::SUFFIX) {
             cand_num = cand_num * PREFIX_SUFFIX_ADJUST();
