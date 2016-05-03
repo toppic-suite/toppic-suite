@@ -44,8 +44,16 @@ class SimplePrsm {
     return a->getScore() > b->getScore();
   }
 
-  static bool cmpNameInc(const SimplePrsmPtr a,SimplePrsmPtr b) {
-    return a->getSeqName() < b->getSeqName();
+  static bool cmpNameIncScoreDec(const SimplePrsmPtr a,SimplePrsmPtr b) {
+    if (a->getSeqName() < b->getSeqName()) {
+      return true;
+    }
+    else if (a->getSeqName() > b->getSeqName()) {
+      return false;
+    }
+    else {
+      return a->getScore() > b->getScore();
+    }
   }
 
  private:
