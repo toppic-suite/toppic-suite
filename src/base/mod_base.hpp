@@ -24,6 +24,8 @@ class ModBase {
 
   static ModPtr getBaseModPtr(ModPtr mod_ptr);
 
+  static ModPtr getBaseModPtr(ResiduePtr ori_residue, ResiduePtr mod_residue);
+
   static bool isNoneModPtr(ModPtr mod_ptr) {return mod_ptr == none_mod_ptr_;}
 
   static ModPtr getModPtrFromXml(xercesc::DOMElement * element);

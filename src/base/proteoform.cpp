@@ -106,7 +106,7 @@ AlignTypePtr Proteoform::getAlignType() {
   }
 
   bool is_suffix = false;
-  if (end_pos_ == fasta_seq_ptr_->getLen() - 1) {
+  if (end_pos_ == fasta_seq_ptr_->getAcidPtmPairLen() - 1) {
     is_suffix = true;
   }
 
@@ -218,6 +218,48 @@ inline void updateMatchSeq(const ChangePtrVec &changes,
 }
 
 std::string Proteoform::getProteinMatchSeq() {
+  StringPairVec string_pairs = fasta_seq_ptr_->getAcidPtmPairVec();
+  //LOG_DEBUG("protein string lenth " << protein_string.length() << " string " << protein_string);
+  std::string mid_string = residue_seq_ptr_->toAcidString();
+  //LOG_DEBUG("mid string lenth " << mid_string.length() << " string " << mid_string);
+  std::sort(change_list_.begin(),change_list_.end(),Change::cmpPosInc);
+
+  std::vector<std::string> left_strings(mid_string.size() + 1, "");
+  std::vector<std::string> right_strings(mid_string.size() + 1, "");
+
+  ChangePtrVec input_changes = getChangePtrVec(ChangeType::INPUT);
+  updateMatchSeq(input_changes, left_strings, right_strings);
+  ChangePtrVec fixed_changes = getChangePtrVec(ChangeType::FIXED);
+  updateMatchSeq(fixed_changes, left_strings, right_strings);
+  ChangePtrVec protein_var_changes = getChangePtrVec(ChangeType::PROTEIN_VARIABLE);
+  updateMatchSeq(protein_var_changes, left_strings, right_strings);
+  ChangePtrVec var_changes = getChangePtrVec(ChangeType::VARIABLE);
+  updateMatchSeq(var_changes, left_strings, right_strings);
+  ChangePtrVec unexpected_changes = getChangePtrVec(ChangeType::UNEXPECTED);
+  updateMatchSeq(unexpected_changes, left_strings, right_strings);
+
+  std::string result="";
+  for (size_t i = 0; i < mid_string.length(); i++) {
+    result = result + right_strings[i] + left_strings[i] + mid_string.substr(i, 1);
+  }
+  // last break;
+  result = result + right_strings[string_pairs.size()];
+
+  std::string prefix = "";
+  if(start_pos_>0) {
+    prefix = string_pairs[start_pos_-1].first;
+  }
+  std::string suffix = "";
+  if(end_pos_< (int)string_pairs.size()-1) {
+    suffix = string_pairs[end_pos_+1].first;
+  }
+
+  //LOG_DEBUG("Prefix " << prefix << " result " << result << " suffix length " << suffix.length() << " suffix " << suffix);
+  return prefix+"."+result+"."+suffix;
+}
+
+/*
+std::string Proteoform::getProteinMatchSeq() {
   std::string protein_string = fasta_seq_ptr_->getSeq();
   //LOG_DEBUG("protein string lenth " << protein_string.length() << " string " << protein_string);
   std::string mid_string = residue_seq_ptr_->toAcidString();
@@ -257,6 +299,7 @@ std::string Proteoform::getProteinMatchSeq() {
   //LOG_DEBUG("Prefix " << prefix << " result " << result << " suffix length " << suffix.length() << " suffix " << suffix);
   return prefix+"."+result+"."+suffix;
 }
+*/
 
 
 std::string Proteoform::toString() {

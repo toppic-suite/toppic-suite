@@ -39,7 +39,7 @@ void addSummary(XmlDOMDocument* xml_doc, xercesc::DOMElement *prot_element,
 void addAnnoHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement *anno_element, 
                    ProteoformPtr proteoform_ptr, PrsmViewMngPtr mng_ptr) {
 
-  std::string str=StringUtil::convertToString(proteoform_ptr->getFastaSeqPtr()->getLen());
+  std::string str=StringUtil::convertToString(proteoform_ptr->getFastaSeqPtr()->getAcidPtmPairLen());
   xml_doc->addElement(anno_element, "protein_length", str.c_str());
 
   str=StringUtil::convertToString(proteoform_ptr->getStartPos());
@@ -51,10 +51,15 @@ void addAnnoHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement *anno_element,
 
 AnnoResiduePtrVec getAnnoResidues(ProteoformPtr proteoform_ptr, PrsmViewMngPtr mng_ptr) {
   AnnoResiduePtrVec res_ptrs;
+  /*
   std::string fasta_seq = proteoform_ptr->getFastaSeqPtr()->getSeq();
   ModPtrVec fix_mod_list = mng_ptr->prsm_para_ptr_->getFixModPtrVec();
   ResiduePtrVec fasta_residues = ResidueUtil::convertStrToResiduePtrVec(fasta_seq,fix_mod_list); 
-  int prot_len = proteoform_ptr->getFastaSeqPtr()->getLen();
+  */
+  StringPairVec acid_ptm_pairs = proteoform_ptr->getFastaSeqPtr()->getAcidPtmPairVec();
+  ModPtrVec fix_mod_list = mng_ptr->prsm_para_ptr_->getFixModPtrVec();
+  ResiduePtrVec fasta_residues = ResidueUtil::convertStrToResiduePtrVec(acid_ptm_pairs, fix_mod_list);
+  int prot_len = fasta_residues.size();
   for(int i=0;i< prot_len;i++){
     res_ptrs.push_back(AnnoResiduePtr(new AnnoResidue(fasta_residues[i], i)));
   }
@@ -76,7 +81,7 @@ void addTruncationAnno(ProteoformPtr proteoform_ptr, AnnoCleavagePtrVec &cleavag
   //LOG_DEBUG("n-trunc completed");
 
   // add information for C-terminal truncation
-  int prot_len = proteoform_ptr->getFastaSeqPtr()->getLen();
+  int prot_len = proteoform_ptr->getFastaSeqPtr()->getAcidPtmPairLen();
   int end_pos = proteoform_ptr->getEndPos();
   if (end_pos < prot_len - 1) {
     cleavage_ptrs[end_pos + 1]->setType(CLEAVAGE_TYPE_SEQ_END);
@@ -102,8 +107,12 @@ void addKnownPtms(ProteoformPtr proteoform_ptr, ChangePtrVec &change_ptrs,
       existing_ptr = AnnoPtmPtr(new AnnoPtm(ptm_ptr, change_ptrs[i]->getChangeTypePtr())); 
       ptm_ptrs.push_back(existing_ptr);
     }
+    /*
     std::string fasta_seq = proteoform_ptr->getFastaSeqPtr()->getSeq();
     std::string acid_letter = fasta_seq.substr(left_db_bp, 1);
+    */
+    StringPairVec acid_ptm_pairs = proteoform_ptr->getFastaSeqPtr()->getAcidPtmPairVec();
+    std::string acid_letter = acid_ptm_pairs[left_db_bp].first;
     existing_ptr->addOccurence(left_db_bp, acid_letter);
   }
 }
@@ -139,10 +148,11 @@ void addMod(ProteoformPtr proteoform_ptr, int left_db_bp, int right_db_bp,
   AnnoSegmentPtr segment_ptr(new AnnoSegment("SHIFT", this_left , this_right, shift, color));
   std::string anno = "";
 
+  StringPairVec acid_ptm_pairs = proteoform_ptr->getFastaSeqPtr()->getAcidPtmPairVec();
   if (change_ptr->getLocalAnno() != nullptr) {
     for (int j = left_db_bp; j < right_db_bp; j++) {
-      std::string fasta_seq = proteoform_ptr->getFastaSeqPtr()->getSeq();
-      std::string acid_letter = fasta_seq.substr(j, 1);
+      //std::string fasta_seq = proteoform_ptr->getFastaSeqPtr()->getSeq();
+      std::string acid_letter = acid_ptm_pairs[j].first;
       segment_ptr->addOccurence(j, acid_letter);
     }
     for (size_t j = 0; j < change_ptr->getLocalAnno()->getScrVec().size(); j++) {
