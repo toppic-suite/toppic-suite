@@ -163,7 +163,7 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   boost::algorithm::trim(spec_scans);
 
   file << std::setprecision(10);
-  //LOG_DEBUG("prec mass " << prsm_ptrs[i]->getOriPrecMass());
+  LOG_DEBUG("start output prsm ");
   file << prsm_para_ptr_->getSpectrumFileName() << "\t"
       << prsm_ptr->getPrsmId() << "\t"
       << spec_ids << "\t"
@@ -197,6 +197,7 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
       << prsm_ptr->getFdr() << "\t"
       << prsm_ptr->getProteoformPtr()->getVariablePtmNum() << "\t"
       << std::endl;
+  LOG_DEBUG("end output prsm ");
 }
 
 } /* namespace prot */

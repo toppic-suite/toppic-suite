@@ -291,7 +291,7 @@ int two_base_opt(int argc, char* argv[]) {
 }
 
 int main(int argc, char* argv[]) {
-  // prot::log_level = 2;
+  //prot::log_level = 2;
   std::cout << std::setprecision(10);
   return prot::two_base_opt(argc, argv);
 }

@@ -21,7 +21,9 @@ FastaSeq::FastaSeq(const std::string &name,
                    const std::string &ori_seq): 
     name_(name),
     desc_(desc) {
-      seq_ = rmChar(ori_seq);
+      //seq_ = rmChar(ori_seq);
+      seq_ = ori_seq;
+      compAcidPtmPairVec();
     }
 
 
