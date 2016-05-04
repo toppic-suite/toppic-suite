@@ -219,7 +219,7 @@ inline void updateMatchSeq(const ChangePtrVec &changes,
 
 std::string Proteoform::getProteinMatchSeq() {
   StringPairVec string_pairs = fasta_seq_ptr_->getAcidPtmPairVec();
-  //LOG_DEBUG("protein string lenth " << protein_string.length() << " string " << protein_string);
+  //LOG_DEBUG("string_pairs length " << string_pairs.size() << " string " << FastaSeq::getString(string_pairs));
   std::string mid_string = residue_seq_ptr_->toAcidString();
   //LOG_DEBUG("mid string lenth " << mid_string.length() << " string " << mid_string);
   std::sort(change_list_.begin(),change_list_.end(),Change::cmpPosInc);
@@ -227,6 +227,7 @@ std::string Proteoform::getProteinMatchSeq() {
   std::vector<std::string> left_strings(mid_string.size() + 1, "");
   std::vector<std::string> right_strings(mid_string.size() + 1, "");
 
+  //LOG_DEBUG("change update started");
   ChangePtrVec input_changes = getChangePtrVec(ChangeType::INPUT);
   updateMatchSeq(input_changes, left_strings, right_strings);
   ChangePtrVec fixed_changes = getChangePtrVec(ChangeType::FIXED);
@@ -237,13 +238,14 @@ std::string Proteoform::getProteinMatchSeq() {
   updateMatchSeq(var_changes, left_strings, right_strings);
   ChangePtrVec unexpected_changes = getChangePtrVec(ChangeType::UNEXPECTED);
   updateMatchSeq(unexpected_changes, left_strings, right_strings);
+  //LOG_DEBUG("change update completed");
 
   std::string result="";
   for (size_t i = 0; i < mid_string.length(); i++) {
     result = result + right_strings[i] + left_strings[i] + mid_string.substr(i, 1);
   }
   // last break;
-  result = result + right_strings[string_pairs.size()];
+  result = result + right_strings[mid_string.length()];
 
   std::string prefix = "";
   if(start_pos_>0) {
