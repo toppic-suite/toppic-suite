@@ -40,7 +40,7 @@ AnnoCleavagePtrVec getProteoCleavage(PrsmPtr prsm_ptr, double min_mass){
   AnnoCleavagePtrVec cleavages;
   ProteoformPtr proteo_ptr = prsm_ptr->getProteoformPtr();
   ExtendMsPtrVec refine_ms_ptr_vec = prsm_ptr->getRefineMsPtrVec();
-  int prot_len = proteo_ptr->getFastaSeqPtr()->getLen();
+  int prot_len = proteo_ptr->getFastaSeqPtr()->getAcidPtmPairLen();
   std::vector<bool> n_ion (prot_len + 1, false);
   std::vector<bool> c_ion (prot_len + 1, false);
   PeakIonPairPtrVec2D peak_list(prot_len + 1, PeakIonPairPtrVec(0));

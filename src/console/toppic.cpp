@@ -220,6 +220,7 @@ int two_base_opt(int argc, char* argv[]) {
 
     std::string suffix = "CUTOFF_RESULT";
 
+    /*
     if (localization) {
       std::cout << "PTM localization started." << std::endl;
       LocalMngPtr local_mng = LocalMngPtr(
@@ -233,6 +234,7 @@ int two_base_opt(int argc, char* argv[]) {
       std::cout << "PTM localization finished." << std::endl;
       suffix = "LOCAL_RESULT";
     }
+    */
 
     std::cout << "Finding protein species started." << std::endl;
     double ppo;

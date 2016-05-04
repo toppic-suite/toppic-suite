@@ -22,6 +22,11 @@ class ResidueUtil {
 
   static ResiduePtrVec convertStrToResiduePtrVec(const std::string &seq, const ModPtrVec &fix_mod_ptr_vec);
 
+  static ResiduePtrVec convertStrToResiduePtrVec(const StringPairVec &string_pair_vec);
+
+  static ResiduePtrVec convertStrToResiduePtrVec(const StringPairVec &string_pair_vec,  
+                                                 const ModPtrVec &fix_mod_ptr_vec);
+
   static int findResidue(const ResiduePtrVec &residue_list, ResiduePtr residue_ptr);
 
   static double compResiduePtrVecMass(const ResiduePtrVec &ptr_vec);

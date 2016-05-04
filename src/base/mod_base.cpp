@@ -58,6 +58,11 @@ ModPtr ModBase::getBaseModPtr(ModPtr mod_ptr) {
   return mod_ptr;
 }
 
+ModPtr ModBase::getBaseModPtr(ResiduePtr ori_residue, ResiduePtr mod_residue) {
+  ModPtr mod_ptr(new Mod(ori_residue, mod_residue));
+  return getBaseModPtr(mod_ptr);
+}
+
 ModPtr ModBase::getModPtrFromXml(xercesc::DOMElement * element) {
   ModPtr ptr(new Mod(element));
   return getBaseModPtr(ptr);

@@ -29,6 +29,8 @@ class ResidueBase {
 
   static ResiduePtr getBaseResiduePtr(AcidPtr acid_ptr, PtmPtr ptm_ptr);
 
+  static ResiduePtr getBaseResiduePtr(AcidPtr acid_ptr);
+
   static ResiduePtrVec getBaseNonePtmResiduePtrVec();
   
  private:
