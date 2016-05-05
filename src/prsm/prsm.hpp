@@ -92,7 +92,12 @@ class Prsm {
   }
 
   static bool cmpNormMatchFragmentDec(const PrsmPtr &a, const PrsmPtr &b) {
-    return a->getNormMatchFragNum() > b->getNormMatchFragNum();
+    if (a->getNormMatchFragNum() == b->getNormMatchFragNum()) {
+      return a->getProteoformPtr()->getVariablePtmNum() <
+          b->getProteoformPtr()->getVariablePtmNum(); 
+    } else {
+      return a->getNormMatchFragNum() > b->getNormMatchFragNum();
+    }
   }
 
   static bool cmpMatchFragmentDecMatchPeakDec(const PrsmPtr &a, const PrsmPtr &b);
@@ -111,7 +116,7 @@ class Prsm {
 
   // other functions
   xercesc::DOMElement* toXmlElement(XmlDOMDocument* xml_doc);
-  
+
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
   void parseXml(xercesc::DOMElement *element);
@@ -119,10 +124,10 @@ class Prsm {
   static std::string getXmlElementName() {return "prsm";}
 
   /*
-  void initMatchNum(double min_mass);
+     void initMatchNum(double min_mass);
 
-  bool isMatchMs(MsHeaderPtr header_ptr);
-  */
+     bool isMatchMs(MsHeaderPtr header_ptr);
+     */
  private:
   int prsm_id_ = -1;
   /* spectrum information */
