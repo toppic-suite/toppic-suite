@@ -94,12 +94,13 @@ int proteoform_graph_test(int argc, char* argv[]) {
     std::cout << "Combining PRSMs started." << std::endl;
     std::vector<std::string> input_exts ;
     input_exts.push_back("GRAPH_ALIGN");
-    //for (int i = 1; i <=10; i++) {
-    //  input_exts.push_back("GRAPH_ALIGN_" + std::to_string(i));
-    //}
+    for (int i = 1; i <=100; i++) {
+      input_exts.push_back("GRAPH_ALIGN_" + std::to_string(i));
+    }
     int prsm_top_num = 1;
     PrsmStrCombinePtr combine_ptr(new PrsmStrCombine(sp_file_name, input_exts, "RAW_RESULT", prsm_top_num));
-    combine_ptr->process();
+    bool normalization = true;
+    combine_ptr->process(normalization);
     combine_ptr = nullptr;
     std::cout << "Combining PRSMs finished." << std::endl;
 
@@ -114,24 +115,22 @@ int proteoform_graph_test(int argc, char* argv[]) {
     cutoff_selector = nullptr;
     std::cout << "PRSM selecting by cutoff finished." << std::endl;
 
-    /*
-       std::cout << "Finding protein species started." << std::endl;
-       double ppo;
-       std::istringstream(arguments["errorTolerance"]) >> ppo;
-       ppo = ppo / 1000000.0;
-       ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();
-       PrsmSpeciesPtr prsm_species = PrsmSpeciesPtr(
-       new PrsmSpecies(db_file_name, sp_file_name, "CUTOFF_RESULT",
-       fix_mod_list, "OUTPUT_RESULT",ppo));
-       prsm_species->process();
-       prsm_species = nullptr;
-       std::cout << "Finding protein species finished." << std::endl;
-       */
+    std::cout << "Finding protein species started." << std::endl;
+    double ppo;
+    std::istringstream(arguments["errorTolerance"]) >> ppo;
+    ppo = ppo / 1000000.0;
+    ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();
+    PrsmSpeciesPtr prsm_species = PrsmSpeciesPtr(
+        new PrsmSpecies(db_file_name, sp_file_name, "CUTOFF_RESULT",
+                        fix_mod_list, "OUTPUT_RESULT",ppo));
+    prsm_species->process();
+    prsm_species = nullptr;
+    std::cout << "Finding protein species finished." << std::endl;
 
 
     std::cout << "Outputting table starts " << std::endl;
     PrsmTableWriterPtr table_out = PrsmTableWriterPtr(
-        new PrsmTableWriter(prsm_para_ptr, arguments, "CUTOFF_RESULT", "OUTPUT_TABLE"));
+        new PrsmTableWriter(prsm_para_ptr, arguments, "OUTPUT_RESULT", "OUTPUT_TABLE"));
     table_out->write();
     table_out = nullptr;
     std::cout << "Outputting table finished." << std::endl;
