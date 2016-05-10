@@ -12,7 +12,7 @@ class GraphAlignMng {
   GraphAlignMng(PrsmParaPtr prsm_para_ptr, 
                 const std::string &var_mod_file_name,
                 int n_unknown_shift, int max_known_mods,
-                int proteo_graph_gap,
+                int proteo_graph_gap, double max_ptm_mass,
                 int thread_num,
                 const std::string &output_file_ext) {
     prsm_para_ptr_ = prsm_para_ptr;
@@ -20,6 +20,7 @@ class GraphAlignMng {
     n_unknown_shift_ = n_unknown_shift;
     max_known_mods_ = max_known_mods;
     proteo_graph_gap_ = proteo_graph_gap;
+    max_ptm_mass_ = max_ptm_mass;
     thread_num_ = thread_num;
     output_file_ext_ = output_file_ext;
   }
@@ -55,6 +56,8 @@ class GraphAlignMng {
   int prec_error_ = 2;
 
   int thread_num_ = 1;
+
+  double max_ptm_mass_ = 500;
 
   std::string output_file_ext_;
 };
