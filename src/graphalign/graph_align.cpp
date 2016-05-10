@@ -594,7 +594,7 @@ PrsmPtr GraphAlign::geneResult(int s){
   for (int m = 0; m <= mng_ptr_->max_known_mods_; m++) {
     PrsmPtr cur_prsm_ptr = geneResult(s, m);
     if (cur_prsm_ptr != nullptr) {
-      if (best_prsm_ptr == nullptr || best_prsm_ptr->getMatchFragNum() < cur_prsm_ptr->getMatchFragNum()) {
+      if (best_prsm_ptr == nullptr || best_prsm_ptr->getNormMatchFragNum() < cur_prsm_ptr->getNormMatchFragNum()) {
         best_prsm_ptr = cur_prsm_ptr;
       }
     }

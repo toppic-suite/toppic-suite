@@ -29,7 +29,7 @@ PrsmStrCombine::PrsmStrCombine(const std::string &spec_file_name,
   }
 }
 
-void PrsmStrCombine::process() {
+void PrsmStrCombine::process(bool norm) {
   size_t input_num = input_file_exts_.size();
   std::string base_name = FileUtil::basename(spec_file_name_); 
   // open files
@@ -60,7 +60,12 @@ void PrsmStrCombine::process() {
       }
     }
     if (cur_str_ptrs.size() > 0) {
-      std::sort(cur_str_ptrs.begin(),cur_str_ptrs.end(),PrsmStr::cmpMatchFragmentDec);
+      if (!norm) {
+        std::sort(cur_str_ptrs.begin(),cur_str_ptrs.end(), PrsmStr::cmpMatchFragmentDec);
+      }
+      else {
+        std::sort(cur_str_ptrs.begin(),cur_str_ptrs.end(), PrsmStr::cmpNormMatchFragmentDec);
+      }
       for (int i = 0; i < top_num_; i++) {
         if (i >= (int)cur_str_ptrs.size()) {
           break;

@@ -26,7 +26,10 @@ class PrsmStrCombine {
                  const std::string &out_file_ext, 
                  int top_num);
 
-  void process();
+  void process(bool norm);
+
+  void process() {process(false);}
+
  private:
   std::string spec_file_name_;
   std::vector<std::string> input_file_exts_;
