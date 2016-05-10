@@ -594,7 +594,16 @@ PrsmPtr GraphAlign::geneResult(int s){
   for (int m = 0; m <= mng_ptr_->max_known_mods_; m++) {
     PrsmPtr cur_prsm_ptr = geneResult(s, m);
     if (cur_prsm_ptr != nullptr) {
-      if (best_prsm_ptr == nullptr || best_prsm_ptr->getNormMatchFragNum() < cur_prsm_ptr->getNormMatchFragNum()) {
+      ChangePtrVec change_vec = cur_prsm_ptr->getProteoformPtr()->getChangePtrVec(ChangeType::UNEXPECTED);
+      bool valid = true;
+      for (size_t i = 0; i < change_vec.size(); i++) {
+        if (std::abs(change_vec[i]->getMassShift()) > mng_ptr_->max_ptm_mass_){
+          valid = false;
+          break;
+        }
+      }
+
+      if (valid && (best_prsm_ptr == nullptr || best_prsm_ptr->getNormMatchFragNum() < cur_prsm_ptr->getNormMatchFragNum())) {
         best_prsm_ptr = cur_prsm_ptr;
       }
     }
