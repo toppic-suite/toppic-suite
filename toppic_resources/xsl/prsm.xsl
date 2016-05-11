@@ -220,11 +220,19 @@ function showIonPeaks(ids) {
 	</div>
 
   <div style="font-size:16px;">
-    <xsl:variable name="fix_ptm_num" select="count(expected_change)"/>
+    <xsl:variable name="fix_ptm_num" select="count(expected_change[change_type = 'Fixed'])"/>
     <xsl:if test="$fix_ptm_num &gt; 0">
       <br/>
       <xsl:text>&#160;&#160;&#160;&#160;&#160;Fixed PTMs: </xsl:text> 
-      <xsl:apply-templates select="expected_change"/>
+      <xsl:apply-templates select="expected_change[change_type = 'Fixed']"/>
+      <br/>
+    </xsl:if>
+
+    <xsl:variable name="var_ptm_num" select="count(expected_change[change_type = 'Protein variable'])"/>
+    <xsl:if test="$var_ptm_num &gt; 0">
+      <br/>
+      <xsl:text>&#160;&#160;&#160;&#160;&#160;Variable PTMs: </xsl:text> 
+      <xsl:apply-templates select="expected_change[change_type = 'Protein variable']"/>
       <br/>
     </xsl:if>
 
