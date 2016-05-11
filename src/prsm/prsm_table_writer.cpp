@@ -31,7 +31,7 @@ void PrsmTableWriter::write(){
   file.open(output_file_name.c_str());
   time_t ctt = time(0);
   file << "Time: ";
-  file << asctime(localtime(&ctt)) << std::endl;
+  file << asctime(localtime(&ctt));
   Argument::outputArguments(file, arguments_);
   //write title
   file << "Data_file_name" << "\t"
@@ -60,7 +60,9 @@ void PrsmTableWriter::write(){
       << "E-Value" << "\t"
       << "One_Protein_probabilty"<< "\t"
       << "FDR" << "\t"
+#if defined MASS_GRAPH
       << "#Variable PTMs" << "\t"
+#endif
       << std::endl;
 
   std::string input_file_name 
@@ -194,7 +196,9 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
       << prsm_ptr->getEValue() << "\t"
       << prsm_ptr->getOneProtProb()<< "\t"
       << prsm_ptr->getFdr() << "\t"
+#if defined MASS_GRAPH
       << prsm_ptr->getProteoformPtr()->getVariablePtmNum() << "\t"
+#endif
       << std::endl;
 }
 

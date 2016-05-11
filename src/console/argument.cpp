@@ -52,7 +52,9 @@ void Argument::outputArguments(std::ostream &output,
   output << std::setw(40) << std::left << "Cutoff value: " << arguments["cutoffValue"] << std::endl;
   output << std::setw(40) << std::left << "Allowed N-terminal modifications: " << arguments["allowProtMod"] << std::endl;
   output << std::setw(40) << std::left << "Maximum PTM mass: " << arguments["maxPtmMass"] << " Da" << std::endl;
+#if defined MASS_GRAPH
   output << std::setw(40) << std::left << "Thread number: " << arguments["threadNumber"] << std::endl;
+#endif
 
   if (arguments["useGf"] == "true") {
     output << std::setw(40) << std::left << "E-value computation: "
@@ -66,8 +68,10 @@ void Argument::outputArguments(std::ostream &output,
     output << std::setw(40) << std::left << "Residue modification file name: " << arguments["residueModFileName"] << std::endl;
     output << std::setw(40) << std::left << "MIScore threshold: " << arguments["local_threshold"] << std::endl;
   }
+#if defined MASS_GRAPH
   output << std::setw(40) << std::left << "Gap in proteoform graph: " << arguments["proteo_graph_dis"] << std::endl;
-  output << std::setw(40) << std::left << "Executive file directory is: " << arguments["executiveDir"] << std::endl;
+#endif
+  output << std::setw(40) << std::left << "Executive file directory: " << arguments["executiveDir"] << std::endl;
   output << std::setw(40) << std::left << "TopPIC start time: " << arguments["start_time"];
   if (arguments["end_time"] != "") {
     output << std::setw(40) << std::left << "TopPIC end time: " << arguments["end_time"];
