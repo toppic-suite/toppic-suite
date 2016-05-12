@@ -1,4 +1,6 @@
 #include <iomanip>
+#include <boost/algorithm/string.hpp>
+
 #include "base/file_util.hpp"
 #include "base/xml_dom_util.hpp"
 #include "console/argument.hpp"
@@ -21,7 +23,7 @@ void Argument::initArguments() {
   arguments_["errorTolerance"] = "15";
   arguments_["cutoffType"] = "EVALUE";
   arguments_["cutoffValue"] = "0.01";
-  arguments_["allowProtMod"] = "NONE,NME,NME_ACETYLATION";
+  arguments_["allowProtMod"] = "NONE,M_ACETYLATION,NME,NME_ACETYLATION";
   arguments_["numOfTopPrsms"] = "1";
   arguments_["maxPtmMass"] = "500";
   arguments_["useGf"] = "false";
@@ -339,10 +341,20 @@ bool Argument::validateArguments() {
   }
 
   std::string allow_mod = arguments_["allowProtMod"]; 
+  std::vector<std::string> strs;
+  boost::split(strs, allow_mod, boost::is_any_of(","));
+  for (size_t i = 0; i < strs.size(); i++) {
+    if (strs[i] != "NONE" && strs[i] != "M_ACETYLATION" && strs[i] != "NME" && strs[i] != "NME_ACETYLATION") {
+      LOG_ERROR("N-Terminal Variable PTM can only be NONE, M_ACETYLATION, NME or NME_ACETYLATION.");
+      return false;
+    }
+  }
+  /*
   if (allow_mod != "NONE" && allow_mod != "NONE,NME" && allow_mod != "NONE,NME,NME_ACETYLATION") {
     LOG_ERROR("N-Terminal Variable PTM can only be \"NONE\",\"NONE,NME\" or \"NONE,NME,NME_ACETYLATION\",.");
     return false;
   }
+  */
 
   std::string cutoff_type = arguments_["cutoffType"];
   if (cutoff_type != "EVALUE" && cutoff_type != "FDR") {
