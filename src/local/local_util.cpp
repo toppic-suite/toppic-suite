@@ -188,7 +188,7 @@ void LocalUtil::getNtermTruncRange(ProteoformPtr proteoform, const ExtendMsPtrVe
   max = min = 0;
   while (ori_start + min > 0) {
     min--;
-    std::string t_seq = proteoform->getFastaSeqPtr()->getSeq().substr(ori_start + min, -min);
+    std::string t_seq = proteoform->getFastaSeqPtr()->getRawSeq().substr(ori_start + min, -min);
     mass = ori_mass - getPeptideMass(t_seq);
     if (std::abs(mass) >= mng_ptr_->max_ptm_mass_ || ori_start + min <= 0) {
       min++;
@@ -198,7 +198,7 @@ void LocalUtil::getNtermTruncRange(ProteoformPtr proteoform, const ExtendMsPtrVe
   mass = ori_mass;
   while (std::abs(ori_mass) < mng_ptr_->max_ptm_mass_) {
     max++;
-    std::string t_seq = proteoform->getFastaSeqPtr()->getSeq().substr(ori_start, max);
+    std::string t_seq = proteoform->getFastaSeqPtr()->getRawSeq().substr(ori_start, max);
     mass = ori_mass + getPeptideMass(t_seq);
     if (std::abs(mass) >= mng_ptr_->max_ptm_mass_) {
       max--;
@@ -239,11 +239,12 @@ void LocalUtil::getCtermTruncRange(ProteoformPtr proteoform, const ExtendMsPtrVe
   double mass = ori_mass;
   int ori_end = proteoform->getEndPos();
   max = min = 0;
-  while (ori_end + std::abs(max) < proteoform->getFastaSeqPtr()->getLen() - 1) {
+  while (ori_end + std::abs(max) < proteoform->getFastaSeqPtr()->getRawSeq().length() - 1) {
     max++;
-    std::string t_seq = proteoform->getFastaSeqPtr()->getSeq().substr(ori_end + 1, max);
+    std::string t_seq = proteoform->getFastaSeqPtr()->getRawSeq().substr(ori_end + 1, max);
     mass = ori_mass - getPeptideMass(t_seq);
-    if (std::abs(mass) >= mng_ptr_->max_ptm_mass_ || ori_end + std::abs(max) >= proteoform->getFastaSeqPtr()->getLen() - 1) {
+    if (std::abs(mass) >= mng_ptr_->max_ptm_mass_ ||
+        ori_end + std::abs(max) >= proteoform->getFastaSeqPtr()->getRawSeq().length() - 1) {
       max--;
       break;
     }
@@ -252,7 +253,7 @@ void LocalUtil::getCtermTruncRange(ProteoformPtr proteoform, const ExtendMsPtrVe
   mass = ori_mass;
   while (std::abs(ori_mass) < mng_ptr_->max_ptm_mass_) {
     min--;
-    std::string t_seq = proteoform->getFastaSeqPtr()->getSeq().substr(ori_end + 1 + min, -min);
+    std::string t_seq = proteoform->getFastaSeqPtr()->getRawSeq().substr(ori_end + 1 + min, -min);
     mass = ori_mass + getPeptideMass(t_seq);
     if (std::abs(mass) >= mng_ptr_->max_ptm_mass_) {
       min++;
@@ -266,7 +267,7 @@ ProteoformPtr geneProteoform(ProteoformPtr proteoform, int start_pos, int end_po
 
   ResSeqPtr new_res_seq = std::make_shared<ResidueSeq>(
       ResidueUtil::convertStrToResiduePtrVec(
-          proteoform->getFastaSeqPtr()->getSeq().substr(start_pos, end_pos - start_pos + 1), 
+          proteoform->getFastaSeqPtr()->getRawSeq().substr(start_pos, end_pos - start_pos + 1), 
           mod_ptr_vec));
 
   for (size_t i = 0; i < change_ptr_vec.size(); i++) {
@@ -301,17 +302,17 @@ void LocalUtil::onePtmTermAdjust(ProteoformPtr & proteoform, const ExtendMsPtrVe
   for (int i = n_trunc_min; i <= n_trunc_max; i++) {
     for (int j = c_trunc_min; j <= c_trunc_max; j++) {
       if (i < 0) {
-        n_seq = proteoform->getFastaSeqPtr()->getSeq().substr(ori_start + i, -i);
+        n_seq = proteoform->getFastaSeqPtr()->getRawSeq().substr(ori_start + i, -i);
         mass = ori_mass - getPeptideMass(n_seq);
       } else {
-        n_seq = proteoform->getFastaSeqPtr()->getSeq().substr(ori_start, i);
+        n_seq = proteoform->getFastaSeqPtr()->getRawSeq().substr(ori_start, i);
         mass = ori_mass + getPeptideMass(n_seq);
       }
       if (j >= 0) {
-        c_seq = proteoform->getFastaSeqPtr()->getSeq().substr(ori_end + 1, j);
+        c_seq = proteoform->getFastaSeqPtr()->getRawSeq().substr(ori_end + 1, j);
         mass = mass - getPeptideMass(c_seq);
       } else {
-        c_seq = proteoform->getFastaSeqPtr()->getSeq().substr(ori_end + 1 + j, -j);
+        c_seq = proteoform->getFastaSeqPtr()->getRawSeq().substr(ori_end + 1 + j, -j);
         mass = mass + getPeptideMass(c_seq);
       }
 
@@ -353,17 +354,17 @@ void LocalUtil::onePtmTermAdjust(ProteoformPtr & proteoform, const ExtendMsPtrVe
   }
   int idx = std::distance(raw_scr_vec.begin(), std::max_element(raw_scr_vec.begin(), raw_scr_vec.end()));
   if (n_vec[idx] < 0) {
-    n_seq = proteoform->getFastaSeqPtr()->getSeq().substr(ori_start + n_vec[idx], -n_vec[idx]);
+    n_seq = proteoform->getFastaSeqPtr()->getRawSeq().substr(ori_start + n_vec[idx], -n_vec[idx]);
     mass = ori_mass - getPeptideMass(n_seq);
   } else {
-    n_seq = proteoform->getFastaSeqPtr()->getSeq().substr(ori_start, n_vec[idx]);
+    n_seq = proteoform->getFastaSeqPtr()->getRawSeq().substr(ori_start, n_vec[idx]);
     mass = ori_mass + getPeptideMass(n_seq);
   }
   if (c_vec[idx] >= 0) {
-    c_seq = proteoform->getFastaSeqPtr()->getSeq().substr(ori_end + 1, c_vec[idx]);
+    c_seq = proteoform->getFastaSeqPtr()->getRawSeq().substr(ori_end + 1, c_vec[idx]);
     mass = mass - getPeptideMass(c_seq);
   } else {
-    c_seq = proteoform->getFastaSeqPtr()->getSeq().substr(ori_end + 1 + c_vec[idx], -c_vec[idx]);
+    c_seq = proteoform->getFastaSeqPtr()->getRawSeq().substr(ori_end + 1 + c_vec[idx], -c_vec[idx]);
     mass = mass + getPeptideMass(c_seq);
   }
   change_ptr->setMassShift(ori_mass);
@@ -398,17 +399,17 @@ void LocalUtil::twoPtmTermAdjust(ProteoformPtr & proteoform, int num_match,
   for (int i = n_trunc_min; i <= n_trunc_max; i++) {
     for (int j = c_trunc_min; j <= c_trunc_max; j++) {
       if (i < 0) {
-        n_seq = proteoform->getFastaSeqPtr()->getSeq().substr(ori_start + i, -i);
+        n_seq = proteoform->getFastaSeqPtr()->getRawSeq().substr(ori_start + i, -i);
         mass1 = ori_mass1 - getPeptideMass(n_seq);
       } else {
-        n_seq = proteoform->getFastaSeqPtr()->getSeq().substr(ori_start, i);
+        n_seq = proteoform->getFastaSeqPtr()->getRawSeq().substr(ori_start, i);
         mass1 = ori_mass1 + getPeptideMass(n_seq);
       }
       if (j >= 0) {
-        c_seq = proteoform->getFastaSeqPtr()->getSeq().substr(ori_end + 1, j);
+        c_seq = proteoform->getFastaSeqPtr()->getRawSeq().substr(ori_end + 1, j);
         mass2 = ori_mass2 - getPeptideMass(c_seq);
       } else {
-        c_seq = proteoform->getFastaSeqPtr()->getSeq().substr(ori_end + 1 + j, -j);
+        c_seq = proteoform->getFastaSeqPtr()->getRawSeq().substr(ori_end + 1 + j, -j);
         mass2 = ori_mass2 + getPeptideMass(c_seq);
       }
 
@@ -451,18 +452,18 @@ void LocalUtil::twoPtmTermAdjust(ProteoformPtr & proteoform, int num_match,
   }
   int idx = std::distance(raw_scr_vec.begin(), std::max_element(raw_scr_vec.begin(), raw_scr_vec.end()));
   if (n_vec[idx] < 0) {
-    n_seq = proteoform->getFastaSeqPtr()->getSeq().substr(ori_start + n_vec[idx], -n_vec[idx]);
+    n_seq = proteoform->getFastaSeqPtr()->getRawSeq().substr(ori_start + n_vec[idx], -n_vec[idx]);
     mass1 = ori_mass1 - getPeptideMass(n_seq);
   } else {
-    n_seq = proteoform->getFastaSeqPtr()->getSeq().substr(ori_start, n_vec[idx]);
+    n_seq = proteoform->getFastaSeqPtr()->getRawSeq().substr(ori_start, n_vec[idx]);
     mass1 = ori_mass1 + getPeptideMass(n_seq);
   }
 
   if (c_vec[idx] >= 0) {
-    c_seq = proteoform->getFastaSeqPtr()->getSeq().substr(ori_end + 1, c_vec[idx]);
+    c_seq = proteoform->getFastaSeqPtr()->getRawSeq().substr(ori_end + 1, c_vec[idx]);
     mass2 = ori_mass2 - getPeptideMass(c_seq);
   } else {
-    c_seq = proteoform->getFastaSeqPtr()->getSeq().substr(ori_end + 1 + c_vec[idx], -c_vec[idx]);
+    c_seq = proteoform->getFastaSeqPtr()->getRawSeq().substr(ori_end + 1 + c_vec[idx], -c_vec[idx]);
     mass2 = ori_mass2 + getPeptideMass(c_seq);
   }
   change_ptr1->setMassShift(ori_mass1);
