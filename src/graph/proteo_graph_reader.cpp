@@ -46,8 +46,8 @@ ProteoGraphPtr ProteoGraphReader::getNextProteoGraphPtr() {
   if (seq_ptr.get() == nullptr) {
     return ProteoGraphPtr(nullptr);
   }
-  LOG_DEBUG("name " << seq_ptr->getName() << " seq " << seq_ptr->getSeq());
-  proteo_anno_ptr_->anno(seq_ptr->getSeq());
+  LOG_DEBUG("name " << seq_ptr->getName() << " seq " << seq_ptr->getRawSeq());
+  proteo_anno_ptr_->anno(seq_ptr->getRawSeq());
   MassGraphPtr graph_ptr = getMassGraphPtr(); 
 
   return ProteoGraphPtr(new ProteoGraph(seq_ptr, fix_mod_ptr_vec_, graph_ptr, 
@@ -57,7 +57,7 @@ ProteoGraphPtr ProteoGraphReader::getNextProteoGraphPtr() {
 }
 
 ProteoGraphPtr ProteoGraphReader::getProteoGraphPtrBySeq(FastaSeqPtr seq_ptr) {
-  proteo_anno_ptr_->anno(seq_ptr->getSeq());
+  proteo_anno_ptr_->anno(seq_ptr->getRawSeq());
   MassGraphPtr graph_ptr = getMassGraphPtr(); 
   return ProteoGraphPtr(new ProteoGraph(seq_ptr, fix_mod_ptr_vec_, graph_ptr, 
                                         proteo_anno_ptr_->isNme(),
