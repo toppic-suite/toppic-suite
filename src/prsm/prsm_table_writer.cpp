@@ -29,9 +29,9 @@ void PrsmTableWriter::write(){
   std::string output_file_name = base_name + "." + output_file_ext_;
   std::ofstream file; 
   file.open(output_file_name.c_str());
-  time_t ctt = time(0);
-  file << "Time: ";
-  file << asctime(localtime(&ctt));
+  /*time_t ctt = time(0);*/
+  //file << "Time: ";
+  /*file << asctime(localtime(&ctt));*/
   Argument::outputArguments(file, arguments_);
   //write title
   file << "Data_file_name" << "\t"

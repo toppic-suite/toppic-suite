@@ -1,4 +1,5 @@
 #include <iomanip>
+#include <boost/algorithm/string.hpp>
 #include "base/file_util.hpp"
 #include "base/xml_dom_util.hpp"
 #include "console/argument.hpp"
@@ -158,8 +159,9 @@ bool Argument::parse(int argc, char* argv[]) {
         ("fixed-mod,f", po::value<std::string> (&fixed_mod), 
          "Fixed modifications: C57: Carbamidoemetylation, C58:Carboxymethylation, or a fixed modification file name.")
         ("n-termimal-ptm,n", po::value<std::string> (&allow_mod), 
-         "<NONE|NONE,NME|NONE,NME,NME_ACETYLATION>. Variable PTMs at the N-terminus of the proteoform."
-         "Three options are provided: NONE; NONE and NME; NONE, NME, and NME+N-terminal acetylation. Default value: NONE,NME,NME_ACETYLATION.")
+         "<NONE|NME|NME_ACETYLATION|M_ACETYLATION>. Variable PTMs at the N-terminus of the proteoform. "
+         "Four options are provided: NONE, NME, NME+N-terminal acetylation and N-terminal methionine acetylation. More than one options can be selected by concatenating with comma. "
+         "Default value: NONE,NME,NME_ACETYLATION.")
         ("decoy,d", "Use a decoy protein database to estimate false discovery rates.")
         ("error-tolerance,e", po::value<std::string> (&error_tole), "<positive integer>. Error tolerance for precursor and fragment masses in PPM. Default value: 15.")
         ("max-ptm,m", po::value<std::string> (&max_ptm_mass), "<positive number>. Maximum absolute value of masses (in Dalton) of unexpected post-translational modifications in proteoforms. Default value: 500.")
@@ -171,8 +173,11 @@ bool Argument::parse(int argc, char* argv[]) {
          "Specify the number of spectra in a group. In the multiple spectra mode, the parameter is set as 2 or 3 for spectral pairs or triplets generated from the alternating fragmentation mode. Default value: 1.")
         ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "PTM file for localization.")
         ("local-threshold,s", po::value<std::string> (&local_threshold), "<positive double value>. Threshold value for reporting PTM localization. Default value: 0.45.")
+#if defined MASS_GRAPH
         ("proteo-graph-dis,j", po::value<std::string> (&proteo_graph_dis), "<positive number>. Gap in constructing proteoform graph. Default value: 20.")
-        ("thread-number,u", po::value<std::string> (&thread_number), "<positive number>. Number of threads used in the computation. Default value: 1.");
+        ("thread-number,u", po::value<std::string> (&thread_number), "<positive number>. Number of threads used in the computation. Default value: 1.")
+#endif
+        ;
     po::options_description desc("Options");
 
     desc.add_options() 
@@ -183,8 +188,9 @@ bool Argument::parse(int argc, char* argv[]) {
         ("fixed-mod,f", po::value<std::string> (&fixed_mod), 
          "Fixed modifications: C57: Carbamidoemetylation, C58:Carboxymethylation, or a fixed modification file name.")
         ("n-termimal-ptm,n", po::value<std::string> (&allow_mod), 
-         "<NONE|NONE,NME|NONE,NME,NME_ACETYLATION>. Variable PTMs at the N-terminus of the proteoform."
-         "Three options are provided: NONE; NONE and NME; NONE, NME, and NME+N-terminal acetylation. Default value: NONE,NME,NME_ACETYLATION.")
+         "<NONE|NME|NME_ACETYLATION|M_ACETYLATION>. Variable PTMs at the N-terminus of the proteoform. "
+         "Four options are provided: NONE, NME, NME+N-terminal acetylation and N-terminal methionine acetylation. More than one options can be selected by concatenating with comma. "
+         "Default value: NONE,NME,NME_ACETYLATION.")
         ("decoy,d", "Use a decoy protein database to estimate false discovery rates.")
         ("error-tolerance,e", po::value<std::string> (&error_tole), "<int value>. Error tolerance of precursor and fragment masses in PPM. Default value: 15.")
         ("max-ptm,m", po::value<std::string> (&max_ptm_mass), "<positive double value>. Maximum absolute value (in Dalton) of the masses of unexpected PTMs in the identified proteoform. Default value: 500.")
@@ -343,9 +349,13 @@ bool Argument::validateArguments() {
   }
 
   std::string allow_mod = arguments_["allowProtMod"]; 
-  if (allow_mod != "NONE" && allow_mod != "NONE,NME" && allow_mod != "NONE,NME,NME_ACETYLATION") {
-    LOG_ERROR("N-Terminal Variable PTM can only be \"NONE\",\"NONE,NME\" or \"NONE,NME,NME_ACETYLATION\",.");
-    return false;
+  std::vector<std::string> strs;
+  boost::split(strs, allow_mod, boost::is_any_of(","));
+  for (size_t i = 0; i < strs.size(); i++) {
+    if (strs[i] != "NONE" && strs[i] != "M_ACETYLATION" && strs[i] != "NME" && strs[i] != "NME_ACETYLATION") {
+      LOG_ERROR("N-Terminal Variable PTM can only be NONE, M_ACETYLATION, NME or NME_ACETYLATION.");
+      return false;
+    }
   }
 
   std::string cutoff_type = arguments_["cutoffType"];
