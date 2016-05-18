@@ -189,7 +189,7 @@ bool Argument::parse(int argc, char* argv[]) {
          "Fixed modifications: C57: Carbamidoemetylation, C58:Carboxymethylation, or a fixed modification file name.")
         ("n-termimal-ptm,n", po::value<std::string> (&allow_mod), 
          "<NONE|NME|NME_ACETYLATION|M_ACETYLATION>. Variable PTMs at the N-terminus of the proteoform. "
-         "Four options are provided: NONE, NME, NME+N-terminal acetylation and N-terminal methionine acetylation. More than one options can be selected by concatenating with comma. "
+         "Four options are provided: NONE, NME, NME+N-terminal acetylation and N-terminal methionine acetylation. If more than one option is selected, they are separated by commas. "
          "Default value: NONE,NME,NME_ACETYLATION.")
         ("decoy,d", "Use a decoy protein database to estimate false discovery rates.")
         ("error-tolerance,e", po::value<std::string> (&error_tole), "<int value>. Error tolerance of precursor and fragment masses in PPM. Default value: 15.")
