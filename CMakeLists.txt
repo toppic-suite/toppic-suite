@@ -75,7 +75,11 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     # Windows specific code
     target_link_libraries(toppic xalan-c xalanMsg xerces-c
         boost_filesystem-mgw48-mt-s-1_60 boost_system-mgw48-mt-s-1_60
-        boost_program_options-mgw48-mt-s-1_60 hts pthread z Ws2_32)
+        boost_program_options-mgw48-mt-s-1_60 boost_thread-mgw48-mt-s-1_60 hts pthread z Ws2_32)
+
+    target_link_libraries(test_graph xalan-c xalanMsg xerces-c
+        boost_filesystem-mgw48-mt-s-1_60 boost_system-mgw48-mt-s-1_60
+        boost_program_options-mgw48-mt-s-1_60 boost_thread-mgw48-mt-s-1_60 hts pthread z Ws2_32)		
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows") 
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")

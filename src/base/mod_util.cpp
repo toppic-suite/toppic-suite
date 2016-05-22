@@ -40,9 +40,9 @@ std::vector<ModPtrVec> ModUtil::readModTxt(const std::string &file_name) {
   }
   std::string line;
   while(std::getline(infile, line)) {
-    if (line == "" || line[0] == '#')
-      continue;
+    if (line[0] == '#') continue;
     line = StringUtil::rmComment(line);
+    if (line == "") continue;
     try { 
       std::vector<std::string> l = StringUtil::split(line, ',');
       if (l.size() != 5) throw line;
