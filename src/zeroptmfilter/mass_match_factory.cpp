@@ -144,8 +144,8 @@ MassMatchPtr MassMatchFactory::getPrmTermMassMatchPtr(const ProteoformPtrVec &pr
                                                       double max_proteoform_mass, double scale) {
   std::vector<std::vector<int>> mass_2d; 
   for (size_t i = 0; i < proteo_ptrs.size(); i++) {
-      std::vector<int> masses = proteo_ptrs[i]->getBpSpecPtr()->getScaledPrmMasses(scale);
-      mass_2d.push_back(masses);
+    std::vector<int> masses = proteo_ptrs[i]->getBpSpecPtr()->getScaledPrmMasses(scale);
+    mass_2d.push_back(masses);
   }
   LOG_DEBUG("mass 2d complete");
   LOG_DEBUG("proteo num " << proteo_ptrs.size());

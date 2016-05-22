@@ -126,6 +126,8 @@ xercesc::DOMElement* Prsm::toXmlElement(XmlDOMDocument* xml_doc){
 	xml_doc->addElement(element, "match_peak_num", str.c_str());
 	str = StringUtil::convertToString(match_fragment_num_);
 	xml_doc->addElement(element, "match_fragment_num", str.c_str());
+	str = StringUtil::convertToString(getNormMatchFragNum());
+	xml_doc->addElement(element, "norm_match_fragment_num", str.c_str());
 	proteoform_ptr_->appendXml(xml_doc,element);
 	if(extreme_value_ptr_!=nullptr){
 	  extreme_value_ptr_->appendXml(xml_doc,element);
@@ -186,6 +188,22 @@ double Prsm::getOneProtProb() {
   else {
     return extreme_value_ptr_->getOneProtProb();
   }
+}
+
+/* this function is tempory for testing mass graph alignment */
+double Prsm::getNormMatchFragNum() {
+  int var_change_num = proteoform_ptr_->getVariablePtmNum();
+  int unexp_change_num = proteoform_ptr_->getChangeNum(ChangeType::UNEXPECTED);
+  int start_pos = proteoform_ptr_->getStartPos();
+  int end_pos = proteoform_ptr_->getEndPos();
+  double score = match_fragment_num_ - 2 * var_change_num - 4 * unexp_change_num;
+  if (start_pos == 0 || start_pos == 1) {
+    score = score + 2;
+  }
+  if (end_pos == proteoform_ptr_->getFastaSeqPtr()->getRawSeq().length() - 1) {
+    score = score + 2;
+  }
+  return score;
 }
 
 // sort by the number of matched fragments, then the number of matched peaks

@@ -22,6 +22,8 @@ class PrsmStr {
 
   double getMatchFragNum() {return match_frag_num_;}
 
+  double getNormMatchFragNum() {return norm_match_frag_num_;}
+
   double getEValue() {return e_value_;}
 
   double getFdr() {return fdr_;}
@@ -39,6 +41,10 @@ class PrsmStr {
     return a->getMatchFragNum() > b->getMatchFragNum();
   }
 
+  static bool cmpNormMatchFragmentDec(const PrsmStrPtr &a, const PrsmStrPtr &b) {
+    return a->getNormMatchFragNum() > b->getNormMatchFragNum();
+  }
+
   static bool cmpSpectrumIdInc(const PrsmStrPtr &a, const PrsmStrPtr &b) {
     return a->getSpectrumId() < b->getSpectrumId();
   }
@@ -51,6 +57,9 @@ class PrsmStr {
   std::string seq_name_;
 
   double match_frag_num_;
+
+  /* a tempory variable for testing mass graph alignment */
+  double norm_match_frag_num_;
 
   double e_value_;
 
