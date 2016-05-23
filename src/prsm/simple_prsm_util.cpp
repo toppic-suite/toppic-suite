@@ -3,7 +3,7 @@
 
 namespace prot {
 
-SimplePrsmPtrVec SimplePrsmUtil::getUniqueMatches(SimplePrsmPtrVec &match_ptrs) {
+SimplePrsmPtrVec SimplePrsmUtil::getUniqueMatches(SimplePrsmPtrVec match_ptrs) {
   std::sort(match_ptrs.begin(), match_ptrs.end(),SimplePrsm::cmpNameIncScoreDec);
   SimplePrsmPtrVec unique_match_ptrs;
   std::string prev_name = "";
