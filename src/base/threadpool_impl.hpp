@@ -2,21 +2,22 @@
 
 namespace prot {
 
-ThreadPool::ThreadPool(int threads, std::string file_name) : 
-    terminate(false), 
-    stopped(false) {
+template <typename T>
+ThreadPool<T>::ThreadPool(int threads, std::string file_name) : 
+    terminate(false), stopped(false) {
 
-  for(int i = 0; i < threads; i++) {
-    ThreadPtr thread_ptr(new boost::thread(&ThreadPool::Invoke, this));
-    threadPool.emplace_back(thread_ptr);
-    std::string thread_file_name = file_name + "_" + std::to_string(i);
-    PrsmXmlWriterPtr writer_ptr(new PrsmXmlWriter(thread_file_name));
-    std::pair<boost::thread::id, PrsmXmlWriterPtr> id_writer(thread_ptr->get_id(), writer_ptr);
-    writerPool.push_back(id_writer);
-  }
-}
+      for(int i = 0; i < threads; i++) {
+        ThreadPtr thread_ptr(new boost::thread(&ThreadPool::Invoke, this));
+        threadPool.emplace_back(thread_ptr);
+        std::string thread_file_name = file_name + "_" + std::to_string(i);
+        std::shared_ptr<T> writer_ptr = std::make_shared<T>(thread_file_name);
+        std::pair<boost::thread::id, PrsmXmlWriterPtr> id_writer(thread_ptr->get_id(), writer_ptr);
+        writerPool.push_back(id_writer);
+      }
+    }
 
-void ThreadPool::Enqueue(std::function<void()> f) {
+template <typename T>
+void ThreadPool<T>::Enqueue(std::function<void()> f) {
   // Scope based locking.
   {
     // Put unique lock on task mutex.
@@ -30,13 +31,14 @@ void ThreadPool::Enqueue(std::function<void()> f) {
   condition.notify_one();
 }
 
-void ThreadPool::Invoke() {
+template <typename T>
+void ThreadPool<T>::Invoke() {
   /*
-  mtx.lock();
-  index ++;
-  std::cout << "Thread started index " << index << std::endl; 
-  mtx.unlock();
-  */
+     mtx.lock();
+     index ++;
+     std::cout << "Thread started index " << index << std::endl; 
+     mtx.unlock();
+     */
   std::function<void()> task;
   while(true) {
     // Scope based locking.
@@ -64,7 +66,8 @@ void ThreadPool::Invoke() {
   }
 }
 
-void ThreadPool::ShutDown() {
+template <typename T>
+void ThreadPool<T>::ShutDown() {
   // Scope based locking.
   {
     // Put unique lock on task mutex.
@@ -89,23 +92,25 @@ void ThreadPool::ShutDown() {
   stopped = true;
 
   for (size_t i = 0; i < writerPool.size(); i++) {
-    PrsmXmlWriterPtr writer_ptr = writerPool[i].second; 
+    std::shared_ptr<T> writer_ptr = writerPool[i].second; 
     writer_ptr->close();
   }
 }
 
-PrsmXmlWriterPtr ThreadPool::getWriter(boost::thread::id thread_id) {
+template <typename T>
+std::shared_ptr<T> ThreadPool<T>::getWriter(boost::thread::id thread_id) {
   for (size_t i = 0; i < writerPool.size(); i++) {
     if (writerPool[i].first == thread_id) {
       return writerPool[i].second;
     }
   }
-  std::cout << "Thread Error: no PrsmXmlWriter is found" << std::endl;
+  std::cout << "Thread Error: no writer found" << std::endl;
   return nullptr;
 }
 
 // Destructor.
-ThreadPool::~ThreadPool() {
+template <typename T>
+ThreadPool<T>::~ThreadPool() {
   if (!stopped){
     ShutDown();
   }
