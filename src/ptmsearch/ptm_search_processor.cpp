@@ -15,13 +15,43 @@
 
 namespace prot {
 
+PrsmXmlWriterSet::PrsmXmlWriterSet(int num_unknown_shift, const std::string & output_file_name){
+  all_writer_ptr_ = PrsmXmlWriterPtr(new PrsmXmlWriter (output_file_name));
+  for (int s = 2; s <= num_unknown_shift; s++) {
+    std::string file_name = output_file_name+"_"+ StringUtil::StringUtil::convertToString(s)
+        +"_"+ AlignType::COMPLETE->getName();
+    PrsmXmlWriterPtr complete_writer_ptr = PrsmXmlWriterPtr (new PrsmXmlWriter (file_name));
+    complete_writer_ptrs_.push_back(complete_writer_ptr);
+    file_name = output_file_name+"_"+ StringUtil::convertToString(s)
+        +"_"+ AlignType::PREFIX->getName();
+    PrsmXmlWriterPtr prefix_writer_ptr = PrsmXmlWriterPtr (new PrsmXmlWriter (file_name));
+    prefix_writer_ptrs_.push_back(prefix_writer_ptr);
+    file_name = output_file_name+"_"+ StringUtil::convertToString(s)
+        +"_"+ AlignType::SUFFIX->getName();
+    PrsmXmlWriterPtr suffix_writer_ptr = PrsmXmlWriterPtr (new PrsmXmlWriter (file_name));
+    suffix_writer_ptrs_.push_back(suffix_writer_ptr);
+    file_name = output_file_name+"_"+ StringUtil::convertToString(s)
+        +"_"+ AlignType::INTERNAL->getName();
+    PrsmXmlWriterPtr internal_writer_ptr = PrsmXmlWriterPtr (new PrsmXmlWriter (file_name));
+    internal_writer_ptrs_.push_back(internal_writer_ptr);
+  }
+}
+
+void PrsmXmlWriterSet::close(int num_unknown_shift) {
+  all_writer_ptr_->close();
+  for (int s = 2; s <= num_unknown_shift; s++) {
+    complete_writer_ptrs_[s-2]->close();
+    prefix_writer_ptrs_[s-2]->close();
+    suffix_writer_ptrs_[s-2]->close();
+    internal_writer_ptrs_[s-2]->close();
+  }
+}
+
 PtmSearchProcessor::PtmSearchProcessor(PtmSearchMngPtr mng_ptr){
   mng_ptr_ = mng_ptr;
   initWriters();
   comp_shift_ptr_ = CompShiftLowMemPtr(new CompShiftLowMem());
 }
-
-
 
 // initialize writers 
 void PtmSearchProcessor::initWriters(){
@@ -53,10 +83,10 @@ void PtmSearchProcessor::initWriters(){
 void PtmSearchProcessor::closeWriters() {
   all_writer_ptr_->close();
   for (int s = 2; s <= mng_ptr_->align_para_ptr_->getUnknownShiftNum(); s++) {
-      complete_writer_ptrs_[s-2]->close();
-      prefix_writer_ptrs_[s-2]->close();
-      suffix_writer_ptrs_[s-2]->close();
-      internal_writer_ptrs_[s-2]->close();
+    complete_writer_ptrs_[s-2]->close();
+    prefix_writer_ptrs_[s-2]->close();
+    suffix_writer_ptrs_[s-2]->close();
+    internal_writer_ptrs_[s-2]->close();
   }
 }
 

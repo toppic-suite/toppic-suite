@@ -11,7 +11,7 @@ ThreadPool<T>::ThreadPool(int threads, std::string file_name) :
         threadPool.emplace_back(thread_ptr);
         std::string thread_file_name = file_name + "_" + std::to_string(i);
         std::shared_ptr<T> writer_ptr = std::make_shared<T>(thread_file_name);
-        std::pair<boost::thread::id, PrsmXmlWriterPtr> id_writer(thread_ptr->get_id(), writer_ptr);
+        std::pair<boost::thread::id, std::shared_ptr<T>> id_writer(thread_ptr->get_id(), writer_ptr);
         writerPool.push_back(id_writer);
       }
     }
