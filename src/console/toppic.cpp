@@ -221,21 +221,19 @@ int two_base_opt(int argc, char* argv[]) {
 
     std::string suffix = "CUTOFF_RESULT";
 
-    /*
-       if (localization) {
-       std::cout << "PTM localization started." << std::endl;
-       LocalMngPtr local_mng = LocalMngPtr(
-       new LocalMng(prsm_para_ptr, arguments["local_threshold"],
-       arguments["residueModFileName"], max_ptm_mass,
-       "CUTOFF_RESULT", "LOCAL_RESULT"));
-       LocalProcessorPtr local_ptr = LocalProcessorPtr(new LocalProcessor(local_mng));
-       local_ptr->process();
-       local_ptr = nullptr;
-       WebLog::completeFunction(WebLog::LocalizationTime());
-       std::cout << "PTM localization finished." << std::endl;
-       suffix = "LOCAL_RESULT";
-       }
-       */
+    if (localization) {
+      std::cout << "PTM localization started." << std::endl;
+      LocalMngPtr local_mng = LocalMngPtr(
+          new LocalMng(prsm_para_ptr, arguments["local_threshold"],
+                       arguments["residueModFileName"], max_ptm_mass,
+                       "CUTOFF_RESULT", "LOCAL_RESULT"));
+      LocalProcessorPtr local_ptr = LocalProcessorPtr(new LocalProcessor(local_mng));
+      local_ptr->process();
+      local_ptr = nullptr;
+      WebLog::completeFunction(WebLog::LocalizationTime());
+      std::cout << "PTM localization finished." << std::endl;
+      suffix = "LOCAL_RESULT";
+    }
 
     std::cout << "Finding protein species started." << std::endl;
     double ppo;
