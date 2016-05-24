@@ -38,6 +38,7 @@ std::vector<std::string> SimplePrsmReader::readOnePrsmLines() {
 
 SimplePrsmStrPtr SimplePrsmReader::readOnePrsmStr() {
   std::vector<std::string> prsm_str_vec = readOnePrsmLines();
+  //LOG_DEBUG("prsm str size " << prsm_str_vec.size());
   if (prsm_str_vec.size() == 0) {
     return SimplePrsmStrPtr(nullptr);
   }

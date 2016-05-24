@@ -41,42 +41,45 @@ void Argument::initArguments() {
 void Argument::outputArguments(std::ostream &output, 
                                std::map<std::string, std::string> arguments) {
   output << "********************** Parameters **********************" << std::endl;
-  output << std::setw(40) << std::left << "Protein database file: " << arguments["oriDatabaseFileName"] << std::endl;
-  output << std::setw(40) << std::left << "Spectrum file: " << arguments["spectrumFileName"] << std::endl;
-  output << std::setw(40) << std::left << "Number of spectra in a group: " << arguments["groupSpectrumNumber"] << std::endl;
-  output << std::setw(40) << std::left << "Activation type: " << arguments["activation"] << std::endl;
-  output << std::setw(40) << std::left << "Search type: " << arguments["searchType"] << std::endl;
-  output << std::setw(40) << std::left << "Fixed modifications: " << arguments["fixedMod"] << std::endl;
-  output << std::setw(40) << std::left << "Maximum number of unexpected PTMs: " << arguments["ptmNumber"] << std::endl;
-  output << std::setw(40) << std::left << "Error tolerance: " << arguments["errorTolerance"] << " ppm" << std::endl;
-  output << std::setw(40) << std::left << "Cutoff type: " << arguments["cutoffType"] << std::endl;
-  output << std::setw(40) << std::left << "Cutoff value: " << arguments["cutoffValue"] << std::endl;
-  output << std::setw(40) << std::left << "Allowed N-terminal modifications: " << arguments["allowProtMod"] << std::endl;
-  output << std::setw(40) << std::left << "Maximum PTM mass: " << arguments["maxPtmMass"] << " Da" << std::endl;
+  output << std::setw(44) << std::left << "Protein database file: " << "\t" << arguments["oriDatabaseFileName"] << std::endl;
+  output << std::setw(44) << std::left << "Spectrum file: " << "\t" << arguments["spectrumFileName"] << std::endl;
+  output << std::setw(44) << std::left << "Number of combined spectra: " << "\t" << arguments["groupSpectrumNumber"] << std::endl;
+  output << std::setw(44) << std::left << "Fragmentation method: " << "\t" << arguments["activation"] << std::endl;
+  output << std::setw(44) << std::left << "Search type: " << "\t" << arguments["searchType"] << std::endl;
+  if (arguments["fixMod"] == "") {
+    output << std::setw(44) << std::left << "Fixed modifications: " << "\t" << "None" << std::endl;
+  }
+  else {
+    output << std::setw(44) << std::left << "Fixed modifications: " << "\t" << arguments["fixedMod"] << std::endl;
+  }
+  output << std::setw(44) << std::left << "Maximum number of unexpected modifications: " << "\t" << arguments["ptmNumber"] << std::endl;
+  output << std::setw(44) << std::left << "Error tolerance: " << "\t" << arguments["errorTolerance"] << " ppm" << std::endl;
+  output << std::setw(44) << std::left << "Cutoff type: " << "\t" << arguments["cutoffType"] << std::endl;
+  output << std::setw(44) << std::left << "Cutoff value: " << "\t" << arguments["cutoffValue"] << std::endl;
+  output << std::setw(44) << std::left << "Allowed N-terminal forms: " << "\t" << arguments["allowProtMod"] << std::endl;
+  output << std::setw(44) << std::left << "Maximum mass shift of modifications: " << "\t" << arguments["maxPtmMass"] << " Da" << std::endl;
 #if defined MASS_GRAPH
-  output << std::setw(40) << std::left << "Thread number: " << arguments["threadNumber"] << std::endl;
+  output << std::setw(44) << std::left << "Thread number: " << "\t" << arguments["threadNumber"] << std::endl;
 #endif
 
   if (arguments["useGf"] == "true") {
-    output << std::setw(40) << std::left << "E-value computation: "
-        << "Generation function" << std::endl;
+    output << std::setw(44) << std::left << "E-value computation: " << "\t" << "Generation function" << std::endl;
   } else {
-    output << std::setw(40) << std::left << "E-value computation: "
-        << "Lookup table" << std::endl;
+    output << std::setw(44) << std::left << "E-value computation: " << "\t" << "Lookup table" << std::endl;
   }
 
   if (arguments["residueModFileName"] != "") {
-    output << std::setw(40) << std::left << "Residue modification file name: " << arguments["residueModFileName"] << std::endl;
-    output << std::setw(40) << std::left << "MIScore threshold: " << arguments["local_threshold"] << std::endl;
+    output << std::setw(44) << std::left << "Common modification file name: " << "\t" << arguments["residueModFileName"] << std::endl;
+    output << std::setw(44) << std::left << "MIScore threshold: " << "\t" << arguments["local_threshold"] << std::endl;
   }
 #if defined MASS_GRAPH
-  output << std::setw(40) << std::left << "Gap in proteoform graph: " << arguments["proteo_graph_dis"] << std::endl;
+  output << std::setw(44) << std::left << "Gap in proteoform graph: " << "\t" << arguments["proteo_graph_dis"] << std::endl;
 #endif
-  output << std::setw(40) << std::left << "Executive file directory: " << arguments["executiveDir"] << std::endl;
-  output << std::setw(40) << std::left << "TopPIC start time: " << arguments["start_time"];
+  output << std::setw(44) << std::left << "Executable file directory: " << "\t" << arguments["executiveDir"] << std::endl;
+  output << std::setw(44) << std::left << "Start time: " << "\t" << arguments["start_time"];
   if (arguments["end_time"] != "") {
-    output << std::setw(40) << std::left << "TopPIC end time: " << arguments["end_time"];
-    output << std::setw(40) << std::left << "TopPIC running time: " << arguments["running_time"] << " seconds" << std::endl;
+    output << std::setw(44) << std::left << "End time: " << "\t" << arguments["end_time"];
+    output << std::setw(44) << std::left << "Running time: " << "\t" << arguments["running_time"] << " seconds" << std::endl;
   }
   output << "********************** Parameters **********************" << std::endl;
 }
@@ -155,24 +158,22 @@ bool Argument::parse(int argc, char* argv[]) {
     display_desc.add_options() 
         ("help,h", "Print the help message.") 
         ("activation,a", po::value<std::string>(&activation),
-         "<CID|HCD|ETD|UVPD|FILE>. Activation type of tandem mass spectra. When FILE is used, the activation type information is given in the input spectral data file. Default value: FILE.")
+         "<CID|HCD|ETD|UVPD|FILE>. Fragmentation method of tandem mass spectra. When FILE is used, fragmentation methods of spectra are given in the input spectral data file. Default value: FILE.")
         ("fixed-mod,f", po::value<std::string> (&fixed_mod), 
-         "Fixed modifications: C57: Carbamidoemetylation, C58:Carboxymethylation, or a fixed modification file name.")
-        ("n-termimal-ptm,n", po::value<std::string> (&allow_mod), 
-         "<NONE|NME|NME_ACETYLATION|M_ACETYLATION>. Variable PTMs at the N-terminus of the proteoform. "
-         "Four options are provided: NONE, NME, NME+N-terminal acetylation and N-terminal methionine acetylation. If more than one option is selected, they are separated by commas. "
-         "Default value: NONE,NME,NME_ACETYLATION.")
+         "Fixed modifications. Three available options: C57, C58, or the name of a text file containing the information of fixed modifications. When C57 is selected, carbamidoemetylation on cysteine is the only fixed modification. When C58 is selected, carboxymethylation on cysteine is the only fixed modification.")
+        ("n-termimal-form,n", po::value<std::string> (&allow_mod), 
+         "N-terminal forms of proteins. Four N-terminal forms can be selected: NONE, NME, NME_ACETYLATION, and M_ACETYLATION. NONE stands for no modifications; NME for N-terminal methionine excision, NME_ACETYLATION for N-terminal acetylation after the initiator methionine is removed, and M_ACETYLATION for N-terminal methionine acetylation. When multiple forms are allowed, they are separated by commas. Default value: NONE,NME,NME_ACETYLATION.")
         ("decoy,d", "Use a decoy protein database to estimate false discovery rates.")
         ("error-tolerance,e", po::value<std::string> (&error_tole), "<positive integer>. Error tolerance for precursor and fragment masses in PPM. Default value: 15.")
-        ("max-ptm,m", po::value<std::string> (&max_ptm_mass), "<positive number>. Maximum absolute value of masses (in Dalton) of unexpected post-translational modifications in proteoforms. Default value: 500.")
-        ("ptm-number,p", po::value<std::string> (&ptm_num), "<0|1|2>. Maximum number of unexpected post-translational modifications in a proteoform-spectrum-match. Default value: 1.")
-        ("cutoff-type,t", po::value<std::string> (&cutoff_type), "<EVALUE|FDR>. Cutoff type for reporting protein-spectrum-matches. Default value: EVALUE.")
-        ("cutoff-value,v", po::value<std::string> (&cutoff_value), "<positive number>. Cutoff value for reporting protein-spectrum-matches. Default value: 0.01.")
-        ("generating-function,g", "Use the generating function approach to calculate p-values and E-values.")
-        ("group-number,r", po::value<std::string> (&group_num), 
-         "Specify the number of spectra in a group. In the multiple spectra mode, the parameter is set as 2 or 3 for spectral pairs or triplets generated from the alternating fragmentation mode. Default value: 1.")
-        ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "PTM file for localization.")
-        ("local-threshold,s", po::value<std::string> (&local_threshold), "<positive double value>. Threshold value for reporting PTM localization. Default value: 0.45.")
+        ("max-mod,m", po::value<std::string> (&max_ptm_mass), "<positive number>. Maximum absolute value of mass shifts (in Dalton) of unexpected modifications. Default value: 500.")
+        ("num-mod,p", po::value<std::string> (&ptm_num), "<0|1|2>. Maximum number of unexpected modifications in a proteoform spectrum-match. Default value: 1.")
+        ("cutoff-type,t", po::value<std::string> (&cutoff_type), "<EVALUE|FDR>. Cutoff type for filtering identified proteoform spectrum-matches. Default value: EVALUE.")
+        ("cutoff-value,v", po::value<std::string> (&cutoff_value), "<positive number>. Cutoff value for filtering identified proteoform spectrum-matches. Default value: 0.01.")
+        ("generating-function,g", "Use the generating function approach to compute p-values and E-values.")
+        ("num-combined-spectra,r", po::value<std::string> (&group_num), 
+         "Number of combined spectra. The parameter is set as 2 (or 3) for combining spectral pairs (or triplets) generated by the alternating fragmentation mode. Default value: 1")
+        ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "<modification file name> Specify a text file containing the information of common PTMs for characterization of PTMs in proteoform spectrum-matches.")
+        ("miscore-threshold,s", po::value<std::string> (&local_threshold), "<positive number between 0 and 1>. Threshold modification identification score for filtering results of PTM characterization. Default value: 0.45.")
 #if defined MASS_GRAPH
         ("proteo-graph-dis,j", po::value<std::string> (&proteo_graph_dis), "<positive number>. Gap in constructing proteoform graph. Default value: 20.")
         ("thread-number,u", po::value<std::string> (&thread_number), "<positive number>. Number of threads used in the computation. Default value: 1.")
@@ -181,31 +182,25 @@ bool Argument::parse(int argc, char* argv[]) {
     po::options_description desc("Options");
 
     desc.add_options() 
-        ("help,h", "Print the help message.") 
+        ("help,h", "") 
         ("argument-file,c",po::value<std::string>(&argument_file_name),"Argument file name.")
-        ("activation,a", po::value<std::string>(&activation),
-         "<CID|HCD|ETD|UVPD|FILE>. Activation type of tandem mass spectra. When FILE is used, the activation type information is given in spectral data file. Default value: FILE.")
-        ("fixed-mod,f", po::value<std::string> (&fixed_mod), 
-         "Fixed modifications: C57: Carbamidoemetylation, C58:Carboxymethylation, or a fixed modification file name.")
-        ("n-termimal-ptm,n", po::value<std::string> (&allow_mod), 
-         "<NONE|NME|NME_ACETYLATION|M_ACETYLATION>. Variable PTMs at the N-terminus of the proteoform. "
-         "Four options are provided: NONE, NME, NME+N-terminal acetylation and N-terminal methionine acetylation. If more than one option is selected, they are separated by commas. "
-         "Default value: NONE,NME,NME_ACETYLATION.")
-        ("decoy,d", "Use a decoy protein database to estimate false discovery rates.")
-        ("error-tolerance,e", po::value<std::string> (&error_tole), "<int value>. Error tolerance of precursor and fragment masses in PPM. Default value: 15.")
-        ("max-ptm,m", po::value<std::string> (&max_ptm_mass), "<positive double value>. Maximum absolute value (in Dalton) of the masses of unexpected PTMs in the identified proteoform. Default value: 500.")
-        ("ptm-number,p", po::value<std::string> (&ptm_num), "<0|1|2>. Maximum number of unexpected PTMs. Default value: 1.")
-        ("cutoff-type,t", po::value<std::string> (&cutoff_type), "<EVALUE|FDR>. Cutoff value type for reporting protein-spectrum-matches. Default value: EVALUE.")
-        ("cutoff-value,v", po::value<std::string> (&cutoff_value), "<positive double value>. Cutoff value for reporting protein-spectrum-matches. Default value: 0.01.")
+        ("activation,a", po::value<std::string>(&activation), "")
+        ("fixed-mod,f", po::value<std::string> (&fixed_mod), "")
+        ("n-termimal-form,n", po::value<std::string> (&allow_mod), "")
+        ("decoy,d", "")
+        ("error-tolerance,e", po::value<std::string> (&error_tole), "")
+        ("max-mod,m", po::value<std::string> (&max_ptm_mass), "")
+        ("num-mod,p", po::value<std::string> (&ptm_num), "")
+        ("cutoff-type,t", po::value<std::string> (&cutoff_type), "")
+        ("cutoff-value,v", po::value<std::string> (&cutoff_value), "")
         ("filtering-result-number,o", po::value<std::string>(&filtering_result_num), "Filtering result number. Default value: 20.")
         ("log-file-name,l", po::value<std::string>(&log_file_name), "Log file name with its path.")
         ("keep-temp-files,k", "Keep temporary files.")
-        ("generating-function,g", "Use generating function to calculate p-values and E-values.")
-        ("local-threshold,s", po::value<std::string> (&local_threshold), "<positive double value>. Threshold value for reporting PTM localization. Default value: 0.45.")
+        ("generating-function,g", "")
+        ("local-threshold,s", po::value<std::string> (&local_threshold), "")
         ("full-binary-path,b", "Full binary path.")
-        ("group-number,r", po::value<std::string> (&group_num), 
-         "Specify the number of spectra in a group. In the multiple spectra mode, the parameter is set as 2 or 3 for spectral pairs or triplets generated from the alternating fragmentation mode. Default value: 1.")
-        ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "PTM file for localization.")
+        ("num-combined-spectra,r", po::value<std::string> (&group_num), "")
+        ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "")
         ("proteo-graph-dis,j", po::value<std::string> (&proteo_graph_dis), "<positive number>. Gap in constructing proteoform graph. Default value: 20.")
         ("thread-number,u", po::value<std::string> (&thread_number), "<positive number>. Number of threads used in the computation. Default value: 1.")
         ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name with its path.")

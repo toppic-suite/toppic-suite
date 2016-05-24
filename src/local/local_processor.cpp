@@ -66,7 +66,7 @@ void LocalProcessor::process() {
         prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_list);
       }
     }
-    std::cout << std::flush << "Localizaton is processing " << cnt 
+    std::cout << std::flush << "PTM characterization is processing " << cnt 
         << " of " << spectrum_num << " spectra.\r";
     WebLog::percentLog(cnt, spectrum_num, WebLog::LocalizationTime());
   }

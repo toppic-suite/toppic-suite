@@ -28,7 +28,7 @@ void ZeroPtmFilterProcessor::process(){
         << " finished. " << std::endl;
   }
 
-  std::cout << "Zero PTM filtering: combining blocks started." << std::endl; 
+  std::cout << "Zero PTM filtering combining blocks started." << std::endl; 
 
   std::string sp_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
   int block_num = db_block_ptr_vec.size();
@@ -53,7 +53,7 @@ void ZeroPtmFilterProcessor::process(){
                                         mng_ptr_->inte_num_);
   internal_combine.process();
 
-  std::cout << "Zero PTM filtering: combining blocks finished." << std::endl; 
+  std::cout << "Zero PTM filtering combining blocks finished." << std::endl; 
 }
 
 void ZeroPtmFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num) {
