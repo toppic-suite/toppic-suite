@@ -25,7 +25,7 @@ void XmlGenerator::outputPrsms(const PrsmPtrVec &prsm_ptrs){
     std::string file_name = mng_ptr_->xml_path_+ FileUtil::getFileSeparator() + 
         "prsms" + FileUtil::getFileSeparator() + "prsm"+StringUtil::convertToString(prsm_ptrs[i]->getPrsmId())+".xml";
     XmlWriter writer(file_name,"");
-    std::cout << std::flush << "Processing " << mng_ptr_->cnt_ << " of " << mng_ptr_->num_files_ << " files.\r";
+    std::cout << std::flush << "Generating xml files - processing " << mng_ptr_->cnt_ << " of " << mng_ptr_->num_files_ << " files.\r";
     writer.write(geneAnnoPrsm(writer.getDoc(),prsm_ptrs[i], mng_ptr_));
     writer.close();
 
@@ -46,7 +46,7 @@ void XmlGenerator::outputAllPrsms(const PrsmPtrVec &prsm_ptrs){
   XmlWriter writer(file_name,"prsm_list");
   for(unsigned int i=0;i<prsm_ptrs.size();i++){
     mng_ptr_->cnt_++;
-    std::cout << std::flush << "Processing " << mng_ptr_->cnt_ << " of " << mng_ptr_->num_files_ << " files.\r";
+    std::cout << std::flush << "Generating xml files - processing " << mng_ptr_->cnt_ << " of " << mng_ptr_->num_files_ << " files.\r";
     writer.write(geneAnnoPrsm(writer.getDoc(),prsm_ptrs[i], mng_ptr_));
     writer.close();
   }
@@ -59,7 +59,7 @@ void XmlGenerator::outputProteoforms(const PrsmPtrVec &prsm_ptrs){
   LOG_DEBUG("species id size " << species_ids.size());
   for(unsigned int i=0;i<species_ids.size();i++){
     mng_ptr_->cnt_++;
-    std::cout << std::flush << "Processing " << mng_ptr_->cnt_ << " of " << mng_ptr_->num_files_ << " files.\r";
+    std::cout << std::flush << "Generating xml files - processing " << mng_ptr_->cnt_ << " of " << mng_ptr_->num_files_ << " files.\r";
     PrsmPtrVec select_prsm_ptrs = PrsmUtil::selectSpeciesPrsms(prsm_ptrs,species_ids[i]);
     if(select_prsm_ptrs.size()>0){
       std::string file_name = mng_ptr_->xml_path_+ FileUtil::getFileSeparator() + "proteoforms" 
@@ -88,7 +88,7 @@ void XmlGenerator::outputProteins(const PrsmPtrVec &prsm_ptrs){
 
   while (seq_ptr != nullptr) {
     mng_ptr_->cnt_++;
-    std::cout << std::flush << "Processing " << mng_ptr_->cnt_ << " of " << mng_ptr_->num_files_ << " files.\r";
+    std::cout << std::flush << "Generating xml files is processing " << mng_ptr_->cnt_ << " of " << mng_ptr_->num_files_ << " files.\r";
     std::string seq_name = seq_ptr->getName();
     int prot_id = PrsmUtil::getProteinId(prsm_ptrs, seq_name);
     std::vector<int> species = PrsmUtil::getSpeciesIds(prsm_ptrs,seq_name);
