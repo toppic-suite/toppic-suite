@@ -44,6 +44,9 @@ int proteoform_graph_test(int argc, char* argv[]) {
     std::cout << "TopPIC mass graph" << std::endl;
 
     std::string exe_dir = arguments["executiveDir"];
+
+    time_t start = time(0);
+    arguments["start_time"] = std::string(ctime(&start));
     argu_processor.outputArguments(std::cout, arguments);
 
     BaseData::init(exe_dir);
@@ -133,6 +136,9 @@ int proteoform_graph_test(int argc, char* argv[]) {
     prsm_species = nullptr;
     std::cout << "Finding protein species finished." << std::endl;
 
+    time_t end = time(0);
+    arguments["end_time"] = std::string(ctime(&end));
+    arguments["running_time"] = std::to_string((int)difftime(end, start));
 
     std::cout << "Outputting table starts " << std::endl;
     PrsmTableWriterPtr table_out = PrsmTableWriterPtr(
@@ -141,17 +147,16 @@ int proteoform_graph_test(int argc, char* argv[]) {
     table_out = nullptr;
     std::cout << "Outputting table finished." << std::endl;
 
-    /*
-       std::cout << "Generating view xml files started." << std::endl;
-       XmlGeneratorPtr xml_gene = XmlGeneratorPtr(new XmlGenerator(prsm_para_ptr, exe_dir, "OUTPUT_RESULT"));
-       xml_gene->process();
-       xml_gene = nullptr;
-       std::cout << "Generating view xml files finished." << std::endl;
+    /*std::cout << "Generating view xml files started." << std::endl;*/
+    //XmlGeneratorPtr xml_gene = XmlGeneratorPtr(new XmlGenerator(prsm_para_ptr, exe_dir, "OUTPUT_RESULT"));
+    //xml_gene->process();
+    //xml_gene = nullptr;
+    //std::cout << "Generating view xml files finished." << std::endl;
 
-       std::cout << "Converting xml files to html files started." << std::endl;
-       translate(arguments);
-       std::cout << "Converting xml files to html files finished." << std::endl;
-       */
+    //std::cout << "Converting xml files to html files started." << std::endl;
+    //translate(arguments);
+    /*std::cout << "Converting xml files to html files finished." << std::endl;*/
+
 
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
