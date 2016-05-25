@@ -88,7 +88,7 @@ void XmlGenerator::outputProteins(const PrsmPtrVec &prsm_ptrs){
 
   while (seq_ptr != nullptr) {
     mng_ptr_->cnt_++;
-    std::cout << std::flush << "Generating xml files is processing " << mng_ptr_->cnt_ << " of " << mng_ptr_->num_files_ << " files.\r";
+    std::cout << std::flush << "Generating xml files - processing " << mng_ptr_->cnt_ << " of " << mng_ptr_->num_files_ << " files.\r";
     std::string seq_name = seq_ptr->getName();
     int prot_id = PrsmUtil::getProteinId(prsm_ptrs, seq_name);
     std::vector<int> species = PrsmUtil::getSpeciesIds(prsm_ptrs,seq_name);
