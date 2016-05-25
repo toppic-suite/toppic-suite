@@ -46,7 +46,7 @@ void Argument::outputArguments(std::ostream &output,
   output << std::setw(44) << std::left << "Number of combined spectra: " << "\t" << arguments["groupSpectrumNumber"] << std::endl;
   output << std::setw(44) << std::left << "Fragmentation method: " << "\t" << arguments["activation"] << std::endl;
   output << std::setw(44) << std::left << "Search type: " << "\t" << arguments["searchType"] << std::endl;
-  if (arguments["fixMod"] == "") {
+  if (arguments["fixedMod"] == "") {
     output << std::setw(44) << std::left << "Fixed modifications: " << "\t" << "None" << std::endl;
   }
   else {
@@ -63,7 +63,7 @@ void Argument::outputArguments(std::ostream &output,
 #endif
 
   if (arguments["useGf"] == "true") {
-    output << std::setw(44) << std::left << "E-value computation: " << "\t" << "Generation function" << std::endl;
+    output << std::setw(44) << std::left << "E-value computation: " << "\t" << "Generating function" << std::endl;
   } else {
     output << std::setw(44) << std::left << "E-value computation: " << "\t" << "Lookup table" << std::endl;
   }
@@ -258,16 +258,16 @@ bool Argument::parse(int argc, char* argv[]) {
     if (vm.count("fixed-mod")) {
       arguments_["fixedMod"] = fixed_mod;
     }
-    if (vm.count("n-termimal-ptm")) {
+    if (vm.count("n-termimal-form")) {
       arguments_["allowProtMod"] = allow_mod;
     }    
-    if (vm.count("ptm-number")) {
+    if (vm.count("num-mod")) {
       arguments_["ptmNumber"] = ptm_num;
     }
     if (vm.count("error-tolerance")) {
       arguments_["errorTolerance"] = error_tole;
     }
-    if (vm.count("max-ptm")) {
+    if (vm.count("max-mod")) {
       arguments_["maxPtmMass"] = max_ptm_mass;
     }
     if (vm.count("cutoff-type")) {
@@ -288,10 +288,10 @@ bool Argument::parse(int argc, char* argv[]) {
     if (vm.count("generating-function")) {
       arguments_["useGf"] = "true";
     }
-    if (vm.count("local-threshold")) {
+    if (vm.count("miscore-threshold")) {
       arguments_["local_threshold"] = local_threshold;
     }
-    if (vm.count("group-number")) {
+    if (vm.count("num-combined-spectra")) {
       arguments_["groupSpectrumNumber"] = group_num;
     }
     if (vm.count("filtering-result-number")) {
