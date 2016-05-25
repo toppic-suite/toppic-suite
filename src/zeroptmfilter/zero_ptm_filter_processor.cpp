@@ -21,14 +21,14 @@ void ZeroPtmFilterProcessor::process(){
   DbBlockPtrVec db_block_ptr_vec = DbBlock::readDbBlockIndex(db_file_name);
 
   for(size_t i=0; i< db_block_ptr_vec.size(); i++){
-    std::cout << "Zero PTM filtering block " << (i+1) << " out of " 
+    std::cout << "Zero PTM filtering - block " << (i+1) << " out of " 
         << db_block_ptr_vec.size() << " started." << std::endl; 
     processBlock(db_block_ptr_vec[i], db_block_ptr_vec.size());
-    std::cout << "Zero PTM filtering block " << (i +1) 
+    std::cout << "Zero PTM filtering - block " << (i +1) 
         << " finished. " << std::endl;
   }
 
-  std::cout << "Zero PTM filtering combining blocks started." << std::endl; 
+  std::cout << "Zero PTM filtering - combining blocks started." << std::endl; 
 
   std::string sp_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
   int block_num = db_block_ptr_vec.size();
@@ -53,7 +53,7 @@ void ZeroPtmFilterProcessor::process(){
                                         mng_ptr_->inte_num_);
   internal_combine.process();
 
-  std::cout << "Zero PTM filtering combining blocks finished." << std::endl; 
+  std::cout << "Zero PTM filtering - combining blocks finished." << std::endl; 
 }
 
 void ZeroPtmFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num) {
@@ -96,7 +96,7 @@ void ZeroPtmFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_
     }
     WebLog::percentLog(cnt, spectrum_num, block_ptr->getBlockIdx(), total_block_num,  
                        WebLog::ZeroPtmFilterTime());
-    std::cout << std::flush << "Zero PTM filtering is processing " << cnt 
+    std::cout << std::flush << "Zero PTM filtering - processing " << cnt 
         << " of " << spectrum_num << " spectra.\r";
   }
   std::cout << std::endl;

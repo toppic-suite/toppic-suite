@@ -79,7 +79,7 @@ void EValueProcessor::process(bool is_separate) {
       processOneSpectrum(spec_set_ptr, selected_prsm_ptrs, ppo, is_separate, writer);
     }
 
-    std::cout << std::flush << "E-value computation is processing " << cnt << " of " 
+    std::cout << std::flush << "E-value computation - processing " << cnt << " of " 
         << spectrum_num << " spectra.\r";
 
     if (mng_ptr_->use_gf_){

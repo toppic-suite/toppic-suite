@@ -168,7 +168,7 @@ void ZeroPtmSearch::process(ZeroPtmSearchMngPtr mng_ptr){
         all_writer.writeVector(prsms);
       }
     }
-    std::cout << std::flush <<  "Zero Ptm search is processing " << cnt 
+    std::cout << std::flush <<  "Zero Ptm search - processing " << cnt 
         << " of " << spectrum_num << " spectra.\r";
     WebLog::percentLog(cnt, spectrum_num, WebLog::ZeroPtmSearchTime());
   }

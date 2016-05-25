@@ -34,32 +34,32 @@ void PrsmTableWriter::write(){
   /*file << asctime(localtime(&ctt));*/
   Argument::outputArguments(file, arguments_);
   //write title
-  file << "Data_file_name" << "\t"
-      << "Prsm_ID" << "\t"
-      << "Spectrum_ID"<< "\t"
-      << "Activation_type" << "\t"
+  file << "Data file name" << "\t"
+      << "Prsm ID" << "\t"
+      << "Spectrum ID"<< "\t"
+      << "Fragmentation" << "\t"
       << "Scan(s)" << "\t"
       << "#peaks"<< "\t"
       << "Charge" << "\t"
-      << "Precursor_mass" << "\t"
-      << "Adjusted_precursor_mass" << "\t"
-      << "Species_ID" << "\t"
-      << "Protein_name" << "\t"
-      << "First_residue" << "\t"
-      << "Last_residue" << "\t"
-      << "Peptide" << "\t"
-      << "#unexpected_modifications" << "\t";
+      << "Precursor mass" << "\t"
+      << "Adjusted precursor mass" << "\t"
+      << "Proteoform ID" << "\t"
+      << "Protein name" << "\t"
+      << "First residue" << "\t"
+      << "Last residue" << "\t"
+      << "Proteoform" << "\t"
+      << "#unexpected modifications" << "\t";
 
   if (prsm_para_ptr_->doLocaliztion()) {
     file << "MIScore" << "\t";
   }
 
-  file << "#matched_peaks" << "\t"
-      << "#matched_fragment_ions" << "\t"
-      << "P-Value" << "\t"
-      << "E-Value" << "\t"
-      << "One_Protein_probabilty"<< "\t"
-      << "FDR" << "\t"
+  file << "#matched peaks" << "\t"
+      << "#matched fragment ions" << "\t"
+      << "P-value" << "\t"
+      << "E-value" << "\t"
+//      << "One Protein probabilty"<< "\t"
+      << "Q-value (spectral FDR)" << "\t"
 #if defined MASS_GRAPH
       << "#Variable PTMs" << "\t"
 #endif
@@ -193,13 +193,19 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   file << prsm_ptr->getMatchPeakNum() << "\t"
       << prsm_ptr->getMatchFragNum() << "\t"
       << prsm_ptr->getPValue() << "\t"
-      << prsm_ptr->getEValue() << "\t"
-      << prsm_ptr->getOneProtProb()<< "\t"
-      << prsm_ptr->getFdr() << "\t"
+      << prsm_ptr->getEValue() << "\t";
+      //      << prsm_ptr->getOneProtProb()<< "\t"
+  double fdr = prsm_ptr->getFdr();
+  if (fdr >= 0) {
+    file << fdr << "\t";
+  }
+  else { 
+    file << "\t";
+  }
 #if defined MASS_GRAPH
-      << prsm_ptr->getProteoformPtr()->getVariablePtmNum() << "\t"
+  file << prsm_ptr->getProteoformPtr()->getVariablePtmNum() << "\t";
 #endif
-      << std::endl;
+  file << std::endl;
 }
 
 } /* namespace prot */
