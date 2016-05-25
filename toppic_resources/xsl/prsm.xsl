@@ -112,12 +112,12 @@ function showIonPeaks(ids) {
 	<tr>
 		<td># matched peaks:</td><td> <xsl:value-of select="matched_peak_number"/> </td>
 		<td># matched fragment ions:</td><td> <xsl:value-of select="matched_fragment_number"/> </td>
-		<td># unexpected PTMs:</td><td> <xsl:value-of select="annotated_protein/unexpected_change_number"/> </td>
+		<td># unexpected modifications:</td><td> <xsl:value-of select="annotated_protein/unexpected_change_number"/> </td>
 	</tr>
 	<tr>
 		<td>E-value:</td><td> <xsl:value-of select="e_value"/> </td>
 		<td>P-value:</td><td> <xsl:value-of select="p_value"/> </td>
-		<td>Spectral FDR:</td><td> <xsl:value-of select="fdr"/> </td>
+		<td>Q-value (Spectral FDR):</td><td> <xsl:value-of select="fdr"/> </td>
 	</tr>
 	</table>
 	<br/>
@@ -239,7 +239,7 @@ function showIonPeaks(ids) {
     <xsl:variable name="variable_ptm_num" select="count(unexpected_change/ptm)"/>
     <xsl:if test="$variable_ptm_num &gt; 0">
       <br/>
-      <xsl:text>&#160;&#160;&#160;&#160;&#160;Localized PTMs: </xsl:text> 
+      <xsl:text>&#160;&#160;&#160;&#160;&#160;Characterization modifications: </xsl:text> 
       <xsl:apply-templates select="unexpected_change[ptm]"/>
       <br/>
     </xsl:if>
@@ -247,7 +247,7 @@ function showIonPeaks(ids) {
     <xsl:variable name="unexpected_ptm_num" select="count(unexpected_change[segment_type = 'SHIFT'])"/>
     <xsl:if test="$unexpected_ptm_num &gt; $variable_ptm_num">
     <br/>
-    <xsl:text>&#160;&#160;&#160;&#160;&#160;Unexpected PTMs: </xsl:text>
+    <xsl:text>&#160;&#160;&#160;&#160;&#160;Unexpected modifications: </xsl:text>
     <xsl:apply-templates select="unexpected_change[not(ptm)]"/>
     <br/>
     </xsl:if>
@@ -314,7 +314,7 @@ function showIonPeaks(ids) {
 
 <xsl:template name="peaks-header">
 <tr>
-<th width="25">Spec</th>
+<th width="25">Scan</th>
 <th width="25">Peak</th>
 <th width="90">Mono mass</th>
 <th width="90">Mono m/z</th>
@@ -332,7 +332,7 @@ function showIonPeaks(ids) {
 <xsl:variable name="peakID" select="peak_id" as="xs:integer"/>
 <xsl:if test="count(matched_ions/matched_ion) = 0">
 <tr id="spec{spec_id}peak{peak_id}" class="unmatched_peak">
-<td align="center"><xsl:value-of select="spec_id"/></td>
+<td align="center"><xsl:value-of select="../../ms_header/scans"/></td>
 <td align="center"><xsl:value-of select="$peakID + 1"/></td>
 <td align="center"><xsl:value-of select="monoisotopic_mass"/></td>
 <td align="center"><xsl:value-of select="monoisotopic_mz"/></td>
@@ -348,7 +348,7 @@ function showIonPeaks(ids) {
 <xsl:template match="matched_ion">
 <xsl:variable name="peakID" select="../../peak_id" as="xs:integer"/>
 <tr id="spec{../../spec_id}peak{../../peak_id}{ion_type}" class="matched_peak" name="{ion_position}">
-<td align="center"><xsl:value-of select="../../spec_id"/></td>
+<td align="center"><xsl:value-of select="../../../../ms_header/scans"/></td>
 <td align="center"><xsl:value-of select="$peakID + 1"/></td>
 <td align="center"><xsl:value-of select="../../monoisotopic_mass"/></td>
 <td align="center"><xsl:value-of select="../../monoisotopic_mz"/></td>
