@@ -21,14 +21,14 @@ void DiagFilterProcessor::process(){
   DbBlockPtrVec db_block_ptr_vec = DbBlock::readDbBlockIndex(db_file_name);
 
   for(size_t i=0; i< db_block_ptr_vec.size(); i++){
-    std::cout << "Diagonal filtering block " << (i+1) << " out of " 
+    std::cout << "Diagonal filtering - block " << (i+1) << " out of " 
         << db_block_ptr_vec.size() << " started." << std::endl; 
     processBlock(db_block_ptr_vec[i], db_block_ptr_vec.size());
-    std::cout << "Diagonal filtering block " << (i +1) 
+    std::cout << "Diagonal filtering - block " << (i +1) 
         << " finished. " << std::endl;
   }
 
-  std::cout << "Diagonal filtering: combining blocks started." << std::endl; 
+  std::cout << "Diagonal filtering - combining blocks started." << std::endl; 
 
   std::string sp_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
   int block_num = db_block_ptr_vec.size();
@@ -38,7 +38,7 @@ void DiagFilterProcessor::process(){
                                                                mng_ptr_->filter_result_num_));
   combine_ptr->process();
 
-  std::cout << "Diagonal filtering: combining blocks finished." << std::endl; 
+  std::cout << "Diagonal filtering - combining blocks finished." << std::endl; 
 }
 
 void DiagFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num) {
@@ -72,7 +72,7 @@ void DiagFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num
     }
     WebLog::percentLog(cnt, spectrum_num, block_ptr->getBlockIdx(), total_block_num, 
                        WebLog::DiagFilterTime());
-    std::cout << std::flush << "Diagonal filtering is processing " << cnt 
+    std::cout << std::flush << "Diagonal filtering - processing " << cnt 
         << " of " << spectrum_num << " spectra.\r";
   }
   std::cout << std::endl;

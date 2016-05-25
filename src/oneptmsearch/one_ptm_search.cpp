@@ -172,7 +172,7 @@ void OnePtmSearch::process(PtmSearchMngPtr mng_ptr){
         all_writer.writeVector(prsms);
       }
     }
-    std::cout << std::flush <<  "One PTM search is processing " << cnt 
+    std::cout << std::flush <<  "One PTM search - processing " << cnt 
         << " of " << spectrum_num << " spectra.\r";
     WebLog::percentLog(cnt, spectrum_num, WebLog::OnePtmSearchTime());
   }

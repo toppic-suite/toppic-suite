@@ -94,7 +94,7 @@ void PtmSearchProcessor::process(){
         processOneSpectrum(spec_set_ptr, selected_prsm_ptrs);
       }
     }
-    std::cout << std::flush <<  "PTM search is processing " << cnt 
+    std::cout << std::flush <<  "PTM search - processing " << cnt 
         << " of " << spectrum_num << " spectra.\r";
 
     WebLog::percentLog(cnt, spectrum_num, WebLog::TwoPtmSearchTime());
