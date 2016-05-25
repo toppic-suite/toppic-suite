@@ -9,8 +9,8 @@ mkdir toppic-linux-${1}
 mkdir toppic-linux-${1}/example_files
 cp ../bin/toppic toppic-linux-${1} 
 cp ../LICENSE toppic-linux-${1}
-cp ../localization_mods.txt toppic-linux-${1}/example_files
-cp ../fix_mods.txt toppic-linux-${1}/example_files
+cp ../common_mods.txt toppic-linux-${1}/example_files
+cp ../fixed_mod.txt toppic-linux-${1}/example_files
 cp -r ../toppic_resources toppic-linux-${1}
 
 zip -r toppic-linux-${1}.zip toppic-linux-${1}
