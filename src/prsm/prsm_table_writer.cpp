@@ -206,12 +206,7 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
 #if defined MASS_GRAPH
   file << prsm_ptr->getProteoformPtr()->getVariablePtmNum() << "\t";
 #endif
-<<<<<<< HEAD
   file << std::endl;
-=======
-      << std::endl;
-  LOG_DEBUG("end output prsm ");
->>>>>>> new_fasta
 }
 
 } /* namespace prot */
