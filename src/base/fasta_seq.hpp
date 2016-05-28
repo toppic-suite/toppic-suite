@@ -5,9 +5,11 @@
 #include <string>
 #include <vector>
 
+#include "base/residue.hpp"
 #include "base/xml_dom_document.hpp"
 
 namespace prot {
+
 
 class FastaSeq {
  public:
@@ -20,9 +22,13 @@ class FastaSeq {
 
   std::string getDesc() {return desc_;}
 
-  std::string getSeq() {return seq_;}
+  std::string getRawSeq() {return seq_;}
 
-  int getLen() {return seq_.length();}
+  StringPairVec getAcidPtmPairVec() {return acid_ptm_pair_vec_;}
+
+  int getAcidPtmPairLen() {return acid_ptm_pair_vec_.size();}
+
+  //int getLen() {return seq_.length();}
 
   static std::string getXmlElementName() {return "fasta_seq";}
 
@@ -32,12 +38,18 @@ class FastaSeq {
 
   static std::string getDescFromXml(xercesc::DOMElement* element);
 
+  static std::string getString(const std::pair<std::string,std::string> &str_pair);
+
+  static std::string getString(const StringPairVec &str_pair_vec);
+
  private:
   std::string name_;
   std::string desc_;
   std::string seq_;
+  StringPairVec acid_ptm_pair_vec_;
 
   static std::string rmChar(const std::string &ori_seq);
+  void compAcidPtmPairVec();
 }; 
 
 typedef std::shared_ptr<FastaSeq> FastaSeqPtr;

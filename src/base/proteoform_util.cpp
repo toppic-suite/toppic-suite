@@ -157,11 +157,7 @@ std::vector<double> ProteoformUtil::getNTermShift(ProteoformPtr db_form_ptr,
     ResSeqPtr db_res_seq_ptr = db_form_ptr->getResSeqPtr();
     bool valid = ProtModUtil::allowMod(prot_mod_ptrs[i], 
                                        db_res_seq_ptr->getResidues());
-    /*
-    if (prot_mod_ptrs[i]->getType() == ProtModBase::getType_NME()) {
-      valid = true;
-    }
-    */
+    //LOG_DEBUG("valid " << valid << " shift " << prot_mod_ptrs[i]->getProtShift());
     if (valid) {
       shifts.push_back(prot_mod_ptrs[i]->getProtShift());
     }
