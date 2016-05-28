@@ -15,15 +15,25 @@ void FastaUtil::generateShuffleDb(const std::string &file_name,
   r.seed(std::mt19937::default_seed);
   while (seq_info!=nullptr) {
     std::string name = seq_info->getName();
-    std::string seq = seq_info->getSeq();
+    std::string seq = seq_info->getRawSeq();
+    StringPairVec str_pair_vec = seq_info->getAcidPtmPairVec();
     std::string desc = seq_info->getDesc();
     std::string decoy_name = "DECOY_" + name;
     std::string decoy_seq;
+    /*
     if (seq.length() > 2) {
       std::string temp = seq.substr(2, seq.length() - 2);
       std::shuffle(temp.begin(), temp.end(), r);
       //std::random_shuffle(temp.begin(), temp.end());
       decoy_seq = seq.substr(0,2) + temp;
+    }
+    else {
+      decoy_seq = seq;
+    }
+    */
+    if (str_pair_vec.size() > 2) {
+      std::shuffle(str_pair_vec.begin() + 2, str_pair_vec.end(), r);
+      decoy_seq = FastaSeq::getString(str_pair_vec); 
     }
     else {
       decoy_seq = seq;
@@ -74,7 +84,7 @@ void generateDbBlock(const std::string &db_file_name,
   while (seq_info!=nullptr) {
     std::string name = seq_info->getName();
     std::string desc = seq_info->getDesc();
-    std::string seq = seq_info->getSeq();
+    std::string seq = seq_info->getRawSeq();
     seq_size += seq.length();
     if (seq_size > block_size) {
       block_output.close();

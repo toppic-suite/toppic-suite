@@ -17,9 +17,7 @@ ResiduePtrVec ResidueUtil::convertStrToResiduePtrVec(const std::string &seq) {
   return residue_ptr_vec;
 }
 
-ResiduePtrVec ResidueUtil::convertStrToResiduePtrVec(const std::string &seq, 
-                                                     const ModPtrVec &fix_mod_ptr_vec) {
-  ResiduePtrVec residue_ptrs = ResidueUtil::convertStrToResiduePtrVec(seq);
+void applyFixedMod(ResiduePtrVec &residue_ptrs, const ModPtrVec &fix_mod_ptr_vec) {
   for (size_t i = 0; i < residue_ptrs.size(); i++) {
     for (size_t j = 0; j < fix_mod_ptr_vec.size(); j++) {
       if (residue_ptrs[i] == fix_mod_ptr_vec[j]->getOriResiduePtr()) {
@@ -28,6 +26,32 @@ ResiduePtrVec ResidueUtil::convertStrToResiduePtrVec(const std::string &seq,
       }
     }
   }
+}
+
+ResiduePtrVec ResidueUtil::convertStrToResiduePtrVec(const std::string &seq, 
+                                                     const ModPtrVec &fix_mod_ptr_vec) {
+  ResiduePtrVec residue_ptrs = ResidueUtil::convertStrToResiduePtrVec(seq);
+  applyFixedMod(residue_ptrs, fix_mod_ptr_vec);
+  return residue_ptrs;
+}
+
+ResiduePtrVec ResidueUtil::convertStrToResiduePtrVec(const StringPairVec &string_pair_vec) {
+  ResiduePtrVec residue_ptr_vec;
+  for (size_t i = 0; i < string_pair_vec.size(); i++) {
+    std::string acid_str = string_pair_vec[i].first;
+    AcidPtr acid_ptr = AcidBase::getAcidPtrByOneLetter(acid_str);
+    std::string ptm_str = string_pair_vec[i].second;
+    PtmPtr ptm_ptr = PtmBase::getPtmPtrByAbbrName(ptm_str);
+    ResiduePtr residue_ptr = ResidueBase::getBaseResiduePtr(acid_ptr, ptm_ptr);
+    residue_ptr_vec.push_back(residue_ptr);
+  }
+  return residue_ptr_vec;
+}
+
+ResiduePtrVec ResidueUtil::convertStrToResiduePtrVec(const StringPairVec &string_pair_vec,  
+                                                     const ModPtrVec &fix_mod_ptr_vec) {
+  ResiduePtrVec residue_ptrs = ResidueUtil::convertStrToResiduePtrVec(string_pair_vec);
+  applyFixedMod(residue_ptrs, fix_mod_ptr_vec);
   return residue_ptrs;
 }
 

@@ -20,11 +20,22 @@ ProteoformPtr ProteoformFactory::geneDbProteoformPtr(FastaSeqPtr fasta_seq_ptr, 
     return ProteoformPtr(nullptr);
   }
   ProtModPtr none_prot_mod_ptr = ProtModBase::getProtModPtr_NONE();
-  ResiduePtrVec residue_ptrs = ResidueUtil::convertStrToResiduePtrVec(fasta_seq_ptr->getSeq());
+  ResiduePtrVec residue_ptrs = ResidueUtil::convertStrToResiduePtrVec(fasta_seq_ptr->getAcidPtmPairVec());
   int start_pos = 0;
-  int end_pos = fasta_seq_ptr->getLen() - 1;
+  int end_pos = (int)residue_ptrs.size() - 1;
 
   ChangePtrVec change_list;
+  // add input ptms;
+  for (size_t i = 0; i < residue_ptrs.size(); i++) {
+    if (residue_ptrs[i]->getPtmPtr() != PtmBase::getEmptyPtmPtr()) {
+      ResiduePtr ori_residue = ResidueBase::getBaseResiduePtr(residue_ptrs[i]->getAcidPtr());
+      ModPtr mod_ptr = ModBase::getBaseModPtr(ori_residue, residue_ptrs[i]); 
+      ChangePtr change_ptr = ChangePtr(
+          new Change(i, i+1, ChangeType::INPUT, mod_ptr->getShift(), mod_ptr));
+      change_list.push_back(change_ptr);
+    }
+  }
+
   // add fixed ptms;
   for (size_t i = 0; i < residue_ptrs.size(); i++) {
     for (size_t j = 0; j < fix_mod_list.size(); j++) {

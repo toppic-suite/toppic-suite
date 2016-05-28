@@ -69,6 +69,8 @@ private:
 typedef std::vector<ResiduePtr> ResiduePtrVec;
 typedef std::vector<ResiduePtrVec> ResiduePtrVec2D;
 
+typedef std::vector<std::pair<std::string,std::string>> StringPairVec;
+
 }
 
 #endif

@@ -20,7 +20,7 @@ void ProtModBase::initBase(const std::string &file_name) {
     for (int i = 0; i < mod_num; i++) {
       xercesc::DOMElement* element = XmlDomUtil::getChildElement(parent, element_name.c_str(), i);
       ProtModPtr prot_mod_ptr(new ProtMod(element));
-      //LOG_DEBUG("index " << i << " nullptr " << (prot_mod_ptr == nullptr));
+      //LOG_DEBUG("ptm index " << i << " shift  " << prot_mod_ptr->getProtShift());
       prot_mod_ptr_vec_.push_back(prot_mod_ptr);
       if (prot_mod_ptr->getName() == getName_NONE()) {
         prot_mod_ptr_NONE_ = prot_mod_ptr;

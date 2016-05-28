@@ -106,7 +106,7 @@ void PrsmTableWriter::write(){
 }
 
 std::string outputChangePtr(ProteoformPtr proteoform_ptr) {
-  std::string fasta_seq = proteoform_ptr->getFastaSeqPtr()->getSeq();
+  StringPairVec string_pairs = proteoform_ptr->getFastaSeqPtr()->getAcidPtmPairVec();
   int start_pos = proteoform_ptr->getStartPos();
   ChangePtrVec change_vec = proteoform_ptr->getChangePtrVec(ChangeType::UNEXPECTED);
   std::string res = "";
@@ -120,7 +120,8 @@ std::string outputChangePtr(ProteoformPtr proteoform_ptr) {
       int right_db_bp = change_vec[i]->getRightBpPos() + start_pos;
       res = res + change_vec[i]->getLocalAnno()->getPtmPtr()->getAbbrName() + "[";
       for (int j = left_db_bp; j < right_db_bp; j++) {
-        std::string acid_letter = fasta_seq.substr(j, 1);
+        //std::string acid_letter = fasta_seq.substr(j, 1);
+        std::string acid_letter = string_pairs[j].first;
         double scr = std::floor(scr_vec[j - left_db_bp] * 1000) / 10;
         if (scr == 100) scr = 99.9;
         if (scr == 0) continue;
@@ -164,7 +165,7 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   boost::algorithm::trim(spec_scans);
 
   file << std::setprecision(10);
-  //LOG_DEBUG("prec mass " << prsm_ptrs[i]->getOriPrecMass());
+  LOG_DEBUG("start output prsm ");
   file << prsm_para_ptr_->getSpectrumFileName() << "\t"
       << prsm_ptr->getPrsmId() << "\t"
       << spec_ids << "\t"
@@ -205,7 +206,12 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
 #if defined MASS_GRAPH
   file << prsm_ptr->getProteoformPtr()->getVariablePtmNum() << "\t";
 #endif
+<<<<<<< HEAD
   file << std::endl;
+=======
+      << std::endl;
+  LOG_DEBUG("end output prsm ");
+>>>>>>> new_fasta
 }
 
 } /* namespace prot */
