@@ -44,6 +44,8 @@ int proteoform_graph_test(int argc, char* argv[]) {
     std::cout << "TopPIC mass graph" << std::endl;
 
     std::string exe_dir = arguments["executiveDir"];
+    time_t start = time(0);
+    arguments["start_time"] = std::string(ctime(&start));
     argu_processor.outputArguments(std::cout, arguments);
 
     BaseData::init(exe_dir);
