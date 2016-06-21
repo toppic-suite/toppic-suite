@@ -1,5 +1,6 @@
-Version 1.0 (Jan, 2016)
+Version 1.0.0 (May, 2016)
 
+    * UVPD support
     * PTM localization.
     * PTM filtering and searching optimization
     * Multiple spectrum support
