@@ -1,6 +1,8 @@
 #ifndef PROT_SPEC_PEAK_LIST_HPP_
 #define PROT_SPEC_PEAK_LIST_HPP_
 
+#include <vector>
+
 namespace prot {
 
 template <class T>

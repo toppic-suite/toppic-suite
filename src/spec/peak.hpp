@@ -1,6 +1,8 @@
 #ifndef PROT_SPEC_PEAK_HPP_
 #define PROT_SPEC_PEAK_HPP_
 
+#include <memory>
+
 #include "base/mass_constant.hpp"
 #include "base/xml_dom_document.hpp"
 
@@ -34,6 +36,8 @@ class Peak {
   double position_;
   double intensity_;
 };
+
+typedef std::shared_ptr<Peak> PeakPtr;
 
 
 }
