@@ -4,6 +4,7 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include <cmath>
 
 #include "spec/peak.hpp"
 
@@ -82,7 +83,7 @@ class Envelope {
 
   void setIntensity(int i, double intensity) {intensities_[i] = intensity;}
 
- private:
+ protected:
   
   int refer_idx_;
   // Charge of the envolope 
@@ -93,8 +94,6 @@ class Envelope {
   std::vector<double> mzs_;
   // intensity list of all peaks in this envelope 
   std::vector<double> intensities_;
-
-  std::vector<Peak> peak_list_;
 };
 
 typedef std::vector<EnvelopePtr> EnvelopePtrVec;
