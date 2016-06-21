@@ -45,9 +45,7 @@ PRSM_VIEW_OBJS = $(addprefix $(OBJ_DIR)/, anno_prsm.o anno_segment.o anno_cleava
 
 ARGUMENT_OBJS = $(addprefix $(OBJ_DIR)/, argument.o)
 
-#LOCAL_OBJS = $(addprefix $(OBJ_DIR)/, local_anno.o local_processor.o local_util.o)
-
-LOCAL_OBJS = $(addprefix $(OBJ_DIR)/, local_anno.o)
+LOCAL_OBJS = $(addprefix $(OBJ_DIR)/, local_anno.o local_processor.o local_util.o)
 
 GRAPH_OBJS = $(addprefix $(OBJ_DIR)/, dist.o graph_util.o proteo_graph.o proteo_anno.o proteo_graph_reader.o spec_graph.o spec_graph_reader.o)
 
