@@ -239,12 +239,12 @@ void LocalUtil::getCtermTruncRange(ProteoformPtr proteoform, const ExtendMsPtrVe
   double mass = ori_mass;
   int ori_end = proteoform->getEndPos();
   max = min = 0;
-  while (ori_end + std::abs(max) < proteoform->getFastaSeqPtr()->getRawSeq().length() - 1) {
+  while (ori_end + std::abs(max) < (int)proteoform->getFastaSeqPtr()->getRawSeq().length() - 1) {
     max++;
     std::string t_seq = proteoform->getFastaSeqPtr()->getRawSeq().substr(ori_end + 1, max);
     mass = ori_mass - getPeptideMass(t_seq);
     if (std::abs(mass) >= mng_ptr_->max_ptm_mass_ ||
-        ori_end + std::abs(max) >= proteoform->getFastaSeqPtr()->getRawSeq().length() - 1) {
+        ori_end + std::abs(max) >= (int)proteoform->getFastaSeqPtr()->getRawSeq().length() - 1) {
       max--;
       break;
     }

@@ -200,7 +200,7 @@ double Prsm::getNormMatchFragNum() {
   if (start_pos == 0 || start_pos == 1) {
     score = score + 2;
   }
-  if (end_pos == proteoform_ptr_->getFastaSeqPtr()->getRawSeq().length() - 1) {
+  if (end_pos == (int)proteoform_ptr_->getFastaSeqPtr()->getRawSeq().length() - 1) {
     score = score + 2;
   }
   return score;
