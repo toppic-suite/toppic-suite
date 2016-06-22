@@ -38,7 +38,7 @@ class Peak {
 };
 
 typedef std::shared_ptr<Peak> PeakPtr;
-
+typedef std::vector<PeakPtr> PeakPtrVec;
 
 }
 #endif

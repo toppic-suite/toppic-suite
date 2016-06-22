@@ -20,8 +20,8 @@ class MatchEnv {
 
   void compScr(FeatureMngPtr mng_ptr);
 
-  static bool cmpScoreInc(const MatchEnvPtr &a, const MatchEnvPtr &b) { 
-    return a->getScore() < b->getScore();
+  static bool cmpScoreDec(const MatchEnvPtr &a, const MatchEnvPtr &b) { 
+    return a->getScore() > b->getScore();
   }
 
   int getId() {return id_;}
@@ -30,7 +30,7 @@ class MatchEnv {
 
   RealEnvPtr getRealEnvPtr() {return real_env_ptr_;}
 
-  EnvelopePtr getTheoEnv() {return theo_env_ptr_;}
+  EnvelopePtr getTheoEnvPtr() {return theo_env_ptr_;}
 
   double getScore() {return score_;}
 
@@ -64,6 +64,7 @@ class MatchEnv {
 };
 
 typedef std::vector<MatchEnvPtr> MatchEnvPtrVec;
+typedef std::vector<MatchEnvPtrVec> MatchEnvPtr2D;
 
 }
 
