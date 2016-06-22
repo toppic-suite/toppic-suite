@@ -35,6 +35,8 @@ class RealEnv : public Envelope {
 
   static bool testPeakShare(RealEnvPtr a, RealEnvPtr b);
 
+  bool isExist(int i);
+
  private:
 	// peak index in the spectrum 
 	// if peak_idx[i] == NO_EXIST_PEAK, it does not exist 
@@ -49,8 +51,6 @@ class RealEnv : public Envelope {
 
   void remvDuplMatch(EnvelopePtr theo_env);
   
-  bool isExist(int i);
-
   void cntMissPeakNum();
 
   void cntMaxConsPeakNum();
