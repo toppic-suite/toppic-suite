@@ -127,7 +127,7 @@ class FeatureMng {
   bool do_final_filtering_ = true;
   double low_high_dividor_ = 1500;
   double aa_avg_mass_ = 120;
-  double peak_denity_ = 2;
+  double peak_density_ = 2;
 
   // keep unused peaks
   bool keep_unused_peaks = false;
