@@ -25,6 +25,11 @@ Htslib
 1. cd htslib
 2. make
 
+Proteomics Wizards
+1. download TPP 4.8.0
+2. cp pwiz directory to src/pwiz 
+2. cp library/boost_aux/ to src/pwiz/boost 
+
 Download links:
 1. boost 1.60.0 (boost_1_60_0.tar.gz): https://sourceforge.net/projects/boost/files/boost/1.60.0/
 2. xerces-c-3.1.1 (xerces-c-3.1.1.zip): http://xerces.apache.org/xerces-c/download.cgi
