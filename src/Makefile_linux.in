@@ -7,13 +7,13 @@ CPPFLAGS = -Wall -std=c++11  -O3 -DPROT_LINUX
 #
 # define any directories containing header files other than /usr/include
 #
-INCLUDES = -I../../thirdparty/linux_include  -I../ 
+INCLUDES = -I../../thirdparty/linux_include -I../  
 #
 # define library paths in addition to /usr/lib
 LFLAGS = -L../../thirdparty/linux_lib -L/lib -L/opt/local/lib
 #
 # define any libraries to link into executable:
-LIBS = -static -lxalan-c -lxalanMsg -lxerces-c -lboost_date_time -lboost_program_options -lboost_filesystem -lboost_system -lboost_thread -lhts -lz -lpthread  
+LIBS = -static -lxalan-c -lxalanMsg -lxerces-c -lboost_date_time -lboost_program_options -lboost_filesystem -lboost_iostreams -lboost_regex -lboost_system -lboost_thread -lhts -lz -lpthread  
 
 OBJ_DIR = ../../bin/obj
 
@@ -47,7 +47,7 @@ ARGUMENT_OBJS = $(addprefix $(OBJ_DIR)/, argument.o)
 
 LOCAL_OBJS = $(addprefix $(OBJ_DIR)/, local_anno.o local_processor.o local_util.o)
 
-FEATURE_OBJS = $(addprefix $(OBJ_DIR)/, envelope.o envelope_util.o real_env.o env_base.o feature_mng.o match_env.o match_env_util.o)
+FEATURE_OBJS = $(addprefix $(OBJ_DIR)/, envelope.o envelope_util.o real_env.o env_base.o feature_mng.o match_env.o match_env_util.o match_env_filter.o match_env_refine.o deconv_data.o)
 
 GRAPH_OBJS = $(addprefix $(OBJ_DIR)/, dist.o graph_util.o proteo_graph.o proteo_anno.o proteo_graph_reader.o spec_graph.o spec_graph_reader.o)
 
