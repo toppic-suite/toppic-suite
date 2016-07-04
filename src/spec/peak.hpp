@@ -2,6 +2,7 @@
 #define PROT_SPEC_PEAK_HPP_
 
 #include <memory>
+#include <vector>
 
 #include "base/mass_constant.hpp"
 #include "base/xml_dom_document.hpp"

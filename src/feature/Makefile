@@ -1,9 +1,10 @@
 include ../Makefile.in
 
 OBJS = $(FEATURE_OBJS) 
+
 #
 # define the executable file 
-MAIN = $(BIN_DIR)/feature
+MAIN = $(BIN_DIR)/test_feature
 #
 #
 # The following part of the makefile is generic; it can be used to 
@@ -15,9 +16,9 @@ MAIN = $(BIN_DIR)/feature
 #
 all:    $(MAIN)
 
-$(MAIN): $(FILE_OBJS) $(OBJS)
-# $(CC) $(CPPFLAGS) $(INCLUDES) -o $(MAIN) $(OBJS) $(LFLAGS) $(LIBS)
-#
+$(MAIN): $(OBJS)
+#	$(CC) $(CPPFLAGS) $(INCLUDES) -o $(MAIN) $(OBJS) $(LFLAGS) $(LIBS)
+
 $(OBJ_DIR)/%.o: %.cpp
 	$(CC) -c $(CPPFLAGS) $(INCLUDES) $< -o $@
 
