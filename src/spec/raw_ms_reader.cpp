@@ -1,5 +1,7 @@
 #include "base/logger.hpp"
+#include "base/activation_base.hpp"
 #include "pwiz/data/msdata/SpectrumInfo.hpp"
+#include "pwiz/data/common/cv.hpp"
 #include "spec/raw_ms_reader.hpp" 
 
 namespace prot {
@@ -52,116 +54,33 @@ void RawMsReader::readNext() {
     header_ptr_->setMsLevel(ms_level);
     header_ptr_->setPrecCharge(prec_charge);
     header_ptr_->setFileName(file_name_);
-    //header_ptr_->setTitle("Scan_" + spec_info.scanNumber);
+    header_ptr_->setTitle("Scan_" + std::to_string(spec_info.scanNumber));
     // here is average mz 
     header_ptr_->setPrecSpMz(prec_mz);
     header_ptr_->setRetentionTime(spec_info.retentionTime);
-    //header.setActivationType(h.getPrecursorActivationMethod());
+    pwiz::cv::CVID ac_id = spec_info.massAnalyzerType;
+    std::string ac_name;
+    if (ac_id == pwiz::cv::MS_CID) {
+      ac_name = "CID"; 
+    }
+    else if (ac_id == pwiz::cv::MS_HCD) {
+      ac_name = "HCD";
+    }
+    else if (ac_id == pwiz::cv::MS_ETD) {
+      ac_name = "ETD";
+    }
+    ActivationPtr activation_ptr = ActivationBase::getActivationPtrByName(ac_name); 
+    header_ptr_->setActivationPtr(activation_ptr);
   } 
-  /*
   else {
-    header = new MsHeader(h.getNum(), h.getMsLevel(), 0);
-    header.setFileName(fileName);
-    header.setTitle("Scan_" + scanNum);
-    header.setScan(scanNum);
-    header.setRetentionTime(h.getRetentionTime());
-  }
-  */
-}
-
-}
-  /*
-  ScanHeaderRev h = currentScan.getHeader();
-  if (h.getMsLevel() == 2) {
-    float precMz = h.getPrecursorMz();
-    if (precMz < 0) {
-      precMz = 0;
-    }
-    int precCharge = h.getPrecursorCharge();
-    if (precCharge < 0) {
-      precCharge = 1;
-    }
-    header = new MsHeader(h.getNum(), h.getMsLevel(), precCharge);
-    header.setFileName(fileName);
-    header.setTitle("Scan_" + scanNum);
-    header.setScan(scanNum);
-    // here is average mz 
-    header.setPrecSpMz(precMz);
-    header.setActivationType(h.getPrecursorActivationMethod());
-    header.setRetentionTime(h.getRetentionTime());
-  } else {
-    header = new MsHeader(h.getNum(), h.getMsLevel(), 0);
-    header.setFileName(fileName);
-    header.setTitle("Scan_" + scanNum);
-    header.setScan(scanNum);
-    header.setRetentionTime(h.getRetentionTime());
-  }
-  */
-
-/*
-void RawMsReader::readNext() throws Exception {
-  ScanRev currentScan = null;
-  int scanNum;
-  double mzs[];
-  double intensities[];
-
-  peakList = null;
-  header = null;
-  boolean success = false;
-  while (!success) {
-    try {
-      if (nextIdNum > nTotal) {
-        return;
-      }
-      //System.out.println("\n start rap " + nCurrent + " total number " + nTotal);
-      while (currentScan == null) {
-        currentScan = parser.rap(nextScanNum);
-        nextScanNum++;
-        if (nextScanNum > 2 * nTotal) {
-          logger.error("Only " + nextIdNum + " spectra in " + nTotal + " spectra were found!"); 
-          return;
-        }
-      }
-      scanNum = currentScan.getHeader().getNum();
-      mzs = currentScan.getDoubleMassList();
-      intensities = currentScan.getDoubleIntensityList();
-      peakList = new PeakList<RawPeak>(RawPeak.getRawPeaks(mzs, intensities));
-      ScanHeaderRev h = currentScan.getHeader();
-      if (h.getMsLevel() == 2) {
-        float precMz = h.getPrecursorMz();
-        if (precMz < 0) {
-          precMz = 0;
-        }
-        int precCharge = h.getPrecursorCharge();
-        if (precCharge < 0) {
-          precCharge = 1;
-        }
-        header = new MsHeader(h.getNum(), h.getMsLevel(), precCharge);
-        header.setFileName(fileName);
-        header.setTitle("Scan_" + scanNum);
-        header.setScan(scanNum);
-        // here is average mz 
-        header.setPrecSpMz(precMz);
-        header.setActivationType(h.getPrecursorActivationMethod());
-        header.setRetentionTime(h.getRetentionTime());
-      } else {
-        header = new MsHeader(h.getNum(), h.getMsLevel(), 0);
-        header.setFileName(fileName);
-        header.setTitle("Scan_" + scanNum);
-        header.setScan(scanNum);
-        header.setRetentionTime(h.getRetentionTime());
-      }
-
-      nextIdNum++;
-      success = true;
-      //System.out.println("\n end rap " + nCurrent);
-    }
-    catch (Exception e) {
-      e.printStackTrace();
-      logger.error(e);
-      nextIdNum++;
-    }
+    header_ptr_ = MsHeaderPtr(new MsHeader());
+    header_ptr_->setScan(spec_info.scanNumber);
+    header_ptr_->setMsLevel(ms_level);
+    header_ptr_->setPrecCharge(0);
+    header_ptr_->setFileName(file_name_);
+    header_ptr_->setTitle("Scan_" + std::to_string(spec_info.scanNumber));
+    header_ptr_->setRetentionTime(spec_info.retentionTime);
   }
 }
-*/
 
+}
