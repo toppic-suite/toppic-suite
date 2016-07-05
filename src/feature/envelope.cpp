@@ -14,15 +14,13 @@ Envelope::Envelope(const Envelope &env) {
   intensities_ = env.intensities_;
 }
 
-Envelope::Envelope(int num, std::string str) {
+Envelope::Envelope(int num, std::vector<std::string> &line_list) {
   charge_ = 1;
-  std::vector<std::string> lines;
-  boost::split(lines, str, boost::is_any_of("\n"));
   std::vector<std::string> words;
-  boost::split(words, lines[0], boost::is_any_of("\t"));
+  boost::split(words, line_list[0], boost::is_any_of("\t"));
   mono_mz_ = std::stod(words[8]);
   for (int i = 0; i < num; i++) {
-    boost::split(words, lines[i+1], boost::is_any_of("\t"));
+    boost::split(words, line_list[i+1], boost::is_any_of("\t"));
     mzs_.push_back(std::stod(words[0]));
     intensities_.push_back(std::stod(words[1])/100);
   }
