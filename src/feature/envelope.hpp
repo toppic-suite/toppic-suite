@@ -21,7 +21,7 @@ class Envelope {
 
   Envelope(const Envelope &env);
 
-  Envelope(int num, std::string str);
+  Envelope(int num, std::vector<std::string> &line_List);
 
   Envelope(int refer_idx, int charge, double mono_mz,
            std::vector<double> &mzs, std::vector<double> &intensities);

@@ -68,7 +68,7 @@ class FeatureMng {
   // number >= 3 2) at most 1 missing peak 3) consecutive peak number >=
   // peak_num - 3, 3
   // minimum peak number in an envelope 
-  std::vector<int> min_match_peak_num = {1, 2, 3 };
+  std::vector<int> min_match_peak_num_ = {1, 2, 3 };
   int max_miss_peak_num_ = 1;
   // check consecutive peaks 
   bool check_consecutive_peak_num_ = true;
