@@ -30,6 +30,7 @@ double getPeakScore(double intensity_sum, double tolerance);
 };
 
 typedef std::vector<EnvPeakPairPtr> EnvPeakPairPtrVec;
+typedef std::vector<EnvPeakPairPtrVec> EnvPeakPairPtr2D;
 
 }
 #endif

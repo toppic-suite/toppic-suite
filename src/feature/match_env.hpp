@@ -24,6 +24,8 @@ class MatchEnv {
     return a->getScore() > b->getScore();
   }
 
+  double calcPeakScr(int id_x, double inte_sum, double tolerance);
+
   int getId() {return id_;}
 
   int getMassGroup() {return mass_group_;}
@@ -45,8 +47,6 @@ class MatchEnv {
   double score_;
   EnvelopePtr theo_env_ptr_;
   RealEnvPtr real_env_ptr_;
-
-  double calcPeakScr(int id_x, double inte_sum, double tolerance);
 
   double calcShareInteAccu(int id_x, double inte_sum);
 
