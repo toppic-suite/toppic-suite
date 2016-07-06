@@ -1,5 +1,7 @@
 #include "base/logger.hpp"
 #include "feature/match_env.hpp" 
+#include "feature/env_detect.hpp" 
+#include "feature/env_filter.hpp" 
 #include "feature/prec_env.hpp" 
 
 namespace prot {
@@ -85,17 +87,14 @@ MatchEnvPtr2D initMatchEnv(FeatureMngPtr mng_ptr, PeakPtrVec &peak_list,
       if (mass > mng_ptr->max_mass_) {
         mass = mng_ptr->max_mass_;
       }
-      MatchEnvPtr env_ptr;
-      /*
-      MatchEnvPtr env_ptr  = EnvDetect.detectEnv(sp, idx, charge, mass, mng);
+      MatchEnvPtr env_ptr  = EnvDetect::detectEnv(peak_list, idx, charge, mass, mng_ptr);
       if (env_ptr != nullptr) {
-        if (!EnvFilter.testRealEnvValid(env, mng)) {
-          env = nullptr;
+        if (!EnvFilter::testRealEnvValid(env_ptr, mng_ptr)) {
+          env_ptr = nullptr;
         } else {
-          env.compScr(mng_ptr);
+          env_ptr->compScr(mng_ptr);
         }
       }
-      */
       env_ptrs.push_back(env_ptr);
     }
     result.push_back(env_ptrs);
@@ -118,7 +117,7 @@ MatchEnvPtr findBest(MatchEnvPtr2D &env_ptrs) {
 }
 
 RealEnvPtr PrecEnv::deconv(double prec_win_size, PeakPtrVec &peak_list, 
-                         double prec_mz, double prec_charge) {
+                         double prec_mz, int prec_charge) {
   LOG_DEBUG("Prec: " << prec_mz << " charge: " << prec_charge);
   if (prec_mz <= 0) {
     return nullptr;

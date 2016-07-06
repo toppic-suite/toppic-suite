@@ -20,6 +20,8 @@ class RawMsReader {
  public:
   RawMsReader(std::string &file_name);
   void readNext();
+  PeakPtrVec getPeakList() {return peak_list_;}
+  MsHeaderPtr getHeaderPtr() {return header_ptr_;}
 
  private:
   std::string file_name_;
@@ -33,9 +35,9 @@ class RawMsReader {
   pwiz::msdata::DefaultReaderList readers_;
 	MSDataFilePtr msd_ptr_; 
   pwiz::msdata::SpectrumListPtr spec_list_ptr_;
-   
 };
 
+typedef std::shared_ptr<RawMsReader> RawMsReaderPtr;
 
 }
 

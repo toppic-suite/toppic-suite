@@ -19,7 +19,7 @@ int cntValid(MatchEnvPtr2D &match_envs) {
 }
 
 // Test match envelope has a valid real envelope 
-bool testRealEnvValid(MatchEnvPtr env, FeatureMngPtr mng_ptr) {
+bool EnvFilter::testRealEnvValid(MatchEnvPtr env, FeatureMngPtr mng_ptr) {
   RealEnvPtr real_env = env->getRealEnvPtr();
   int mass_group = env->getMassGroup();
   // 1. test if the number of matched peaks >= min_match_peak_num
@@ -46,7 +46,7 @@ void filterEnvByRealEnv(MatchEnvPtr2D &match_envs, FeatureMngPtr mng_ptr) {
   for (size_t i = 0; i < match_envs.size(); i++) {
     for (size_t j = 0; j < match_envs[i].size(); j++) {
       if (match_envs[i][j] != nullptr) {
-        if (!testRealEnvValid(match_envs[i][j], mng_ptr)) {
+        if (!EnvFilter::testRealEnvValid(match_envs[i][j], mng_ptr)) {
           match_envs[i][j] = nullptr;
         }
       }
