@@ -13,6 +13,8 @@ class EnvFilter {
   
   static void multipleMassFilter(MatchEnvPtr2D &match_env, DeconvDataPtr data_ptr,
                                  FeatureMngPtr mng_ptr);
+
+  static bool testRealEnvValid(MatchEnvPtr env, FeatureMngPtr mng_ptr);
 };
 
 }
