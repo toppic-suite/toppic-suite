@@ -32,6 +32,7 @@ class VertexB : public Vertex {
 };
 
 typedef std::vector<VertexBPtr> VertexBPtrVec;
+typedef std::vector<VertexBPtrVec> VertexBPtr2D;
 
 }
 #endif
