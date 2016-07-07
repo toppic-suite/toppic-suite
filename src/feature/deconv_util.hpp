@@ -32,13 +32,13 @@ typedef std::vector<IntvDensPtr> IntvDensPtrVec;
 
 class DeconvUtil {
  public:
-  IntvDensPtrVec getDensity(std::vector<double> &inte);
+  static IntvDensPtrVec getDensity(std::vector<double> &inte);
 
-  void outputDens(IntvDensPtrVec &dens);
+  static void outputDens(IntvDensPtrVec &dens);
 
-  int getMaxPos(IntvDensPtrVec &dens);
+  static int getMaxPos(IntvDensPtrVec &dens);
 
-  double getBaseLine(std::vector<double> &inte);
+  static double getBaseLine(std::vector<double> &inte);
 
  private:
   static double intv_width_;
