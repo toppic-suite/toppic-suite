@@ -15,7 +15,7 @@ class Dp {
 
   MatchEnvPtrVec getResult() {return results_;}
 
- private:
+ protected:
   DeconvDataPtr data_ptr_;
   FeatureMngPtr mng_ptr_;
   MatchEnvPtr2D win_envs_;

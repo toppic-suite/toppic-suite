@@ -19,7 +19,7 @@ class Vertex {
   virtual bool addPreEnv(MatchEnvPtr env, int max_overlap);
   bool addCurEnv(MatchEnvPtr env, int max_overlap);
   void trim();
-  bool checkConsist(VertexPtr pre, VertexPtr cur, int max_env_per_peak);
+  static bool checkConsist(VertexPtr pre, VertexPtr cur, int max_env_per_peak);
 
   int getMatchEnvSize() {return prec_match_envs_.size() + cur_match_envs_.size();}
 
