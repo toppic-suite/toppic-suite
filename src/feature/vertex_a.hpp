@@ -37,8 +37,8 @@ class VertexA : public Vertex {
   int prev_vertex_;
 };
 
-typedef std::shared_ptr<VertexA> VertexAPtr;
 typedef std::vector<VertexAPtr> VertexAPtrVec;
+typedef std::vector<VertexAPtrVec> VertexAPtr2D;
 
 }
 #endif

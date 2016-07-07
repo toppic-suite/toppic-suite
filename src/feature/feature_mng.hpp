@@ -116,7 +116,7 @@ class FeatureMng {
   std::vector<std::vector<bool>> coexist_table_;
 
   // maximum number of envelopes sharing one peak 
-  int max_env_num_peak_peak_ = 2;
+  int max_env_num_per_peak_ = 2;
   // used in dpB to specify the number of output envelopes 
   int dp_env_num_ = 300;
   // maximum number of vertices per window 
