@@ -3,6 +3,7 @@
 
 #include <string>
 #include <memory>
+#include <map>
 
 namespace prot {
 
@@ -11,6 +12,7 @@ enum InputType {INPUT_MGF, INPUT_MZXML};
 
 class DeconvPara {
  public:
+  DeconvPara(std::map<std::string, std::string> &arguments);
 
   void setDataFileName(std::string &file_name) {data_file_name_ == file_name;}
 
@@ -30,7 +32,7 @@ class DeconvPara {
 
   int max_charge_;
   double max_mass_;
-  double tolerance;
+  double tolerance_;
   double sn_ratio_;
   bool keep_unused_peaks_;
 

@@ -11,6 +11,7 @@ namespace prot {
 
 class DeconvProcess {
  public:
+  DeconvProcess(DeconvParaPtr para_ptr) {para_ptr_ = para_ptr;}
 	int getResult() {return result_;}
   std::string getMsg() {return msg_;}
 
