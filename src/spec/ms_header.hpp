@@ -24,6 +24,8 @@ class MsHeader {
 
   std::string getScansString();
 
+  int getFirstScanNum() {return scans_[0];}
+
   void setScans(const std::string &s);
 
   std::string toString();
@@ -46,8 +48,6 @@ class MsHeader {
   double getPrecMonoMz() {return prec_mono_mz_;}
 
   double getRetentionTime() {return retention_time_;}
-
-  int getFirstScanNum() {return scans_[0];}
 
   int getPrecId() {return prec_id_;}
 

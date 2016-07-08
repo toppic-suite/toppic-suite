@@ -17,11 +17,15 @@ class FeatureMsReader {
 
   void refinePrecChrg(RawMsPtr ms_one, RawMsPtr ms_two, 
                       double prec_win_size);
+
+  int getInputSpNum() {return reader_ptr_->getInputSpNum();}
+
  private:
   RawMsReaderPtr reader_ptr_;
   RawMsPtr ms_one_; 
 
   bool do_refine_prec_mass_ = true;
+
 };
 
 typedef std::shared_ptr<FeatureMsReader> FeatureMsReaderPtr;

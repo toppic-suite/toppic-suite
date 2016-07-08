@@ -8,7 +8,7 @@ namespace prot {
 
 class MatchEnvFilter {
  public:
-  MatchEnvPtrVec filter(MatchEnvPtrVec &ori_envs, double prec_mass, FeatureMngPtr mng_ptr);
+  static MatchEnvPtrVec filter(MatchEnvPtrVec &ori_envs, double prec_mass, FeatureMngPtr mng_ptr);
 };
 
 }

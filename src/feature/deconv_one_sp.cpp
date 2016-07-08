@@ -21,6 +21,10 @@ void DeconvOneSp::setData(PeakPtrVec &peak_list) {
   data_ptr_ = DeconvDataBase::getDataPtr(peak_list, mng_ptr_);
 }
 
+void DeconvOneSp::setData(PeakPtrVec &peak_list, double max_mass, int max_charge) {
+  data_ptr_ = DeconvDataBase::getDataPtr(peak_list, max_mass, max_charge, mng_ptr_);
+}
+
 void DeconvOneSp::run() {
   preprocess();
   // envelope detection 
