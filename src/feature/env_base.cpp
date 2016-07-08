@@ -17,15 +17,15 @@ EnvBase::EnvBase(std::string file_name, int entry_num,
       for (int i = 0; i < entry_num_; i++) {
         int peak_num = 0;
         std::string line;
-        std::string str;
+        std::vector<std::string> line_list;
         while (std::getline(input, line)) {
           if (line == "") {
             break;
           }
           peak_num++;
-          str = str + line + "\n";
+          line_list.push_back(line);
         }
-        envs_[i] = EnvelopePtr(new Envelope(peak_num - 1, str));
+        envs_[i] = EnvelopePtr(new Envelope(peak_num - 1, line_list));
       }
       input.close();
       initBaseMassIdx();

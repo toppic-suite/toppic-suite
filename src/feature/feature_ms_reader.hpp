@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "spec/raw_ms.hpp"
-#include "spec/raw_ms_reader.hpp"
+#include "feature/raw_ms_reader.hpp"
 
 namespace prot {
 
