@@ -13,7 +13,13 @@ class DeconvOneSp {
 
   void setData(PeakPtrVec &peak_list);
 
+	MatchEnvPtrVec getResult() {return result_envs_;}
+
   void preprocess();
+
+  void run();
+
+  MatchEnvPtrVec postprocess(MatchEnvPtrVec  &dp_envs);
 
  private:
 	FeatureMngPtr mng_ptr_;
