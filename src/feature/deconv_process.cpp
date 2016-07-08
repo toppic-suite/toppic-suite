@@ -8,7 +8,7 @@ namespace prot {
 void DeconvProcess::copyParameters(FeatureMngPtr mng_ptr) {
   mng_ptr->max_charge_ = para_ptr_->max_charge_;
   mng_ptr->max_mass_ = para_ptr_->max_mass_;
-  mng_ptr->setTolerance(para_ptr_->tolerance);
+  mng_ptr->setTolerance(para_ptr_->tolerance_);
   mng_ptr->sn_ratio_ = para_ptr_->sn_ratio_;
   mng_ptr->keep_unused_peaks_ = para_ptr_->keep_unused_peaks_;
   mng_ptr->output_multiple_mass_ = para_ptr_->output_multiple_mass_;

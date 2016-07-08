@@ -135,7 +135,7 @@ bool Vertex::checkConsist(VertexPtr pre, VertexPtr cur, int max_env_per_peak) {
       }
     }
   }
-  if (mng_ptr_->check_double_increase_) {
+  if (pre->mng_ptr_->check_double_increase_) {
     MatchEnvPtrVec envs = cur->getCurMatchEnvs();
     if (!pre->passDblIncrCheck(envs)) {
       return false;

@@ -2,7 +2,7 @@
 #include "base/activation_base.hpp"
 #include "pwiz/data/msdata/SpectrumInfo.hpp"
 #include "pwiz/data/common/cv.hpp"
-#include "spec/raw_ms_reader.hpp" 
+#include "feature/raw_ms_reader.hpp" 
 
 namespace prot {
 

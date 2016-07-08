@@ -1,5 +1,5 @@
-#ifndef PROT_SPEC_RAW_MS_READER_HPP_
-#define PROT_SPEC_RAW_MS_READER_HPP_
+#ifndef PROT_FEATURE_RAW_MS_READER_HPP_
+#define PROT_FEATURE_RAW_MS_READER_HPP_
 
 #include <memory>
 #include <vector>
