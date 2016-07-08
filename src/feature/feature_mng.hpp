@@ -19,6 +19,10 @@ class FeatureMng {
 
   double getPercentBound(int mass_group) {return percentage_bound_[mass_group];}
 
+  static int getDefaultMaxCharge() {return 30;}
+
+  static double getDefaultMaxMass() {return 100000;}
+
   // using input parameters to assign: max_chrg, max_mass 
   int max_charge_ = 30;
   double max_mass_ = 100000;
@@ -60,7 +64,7 @@ class FeatureMng {
   int max_forw_peak_num_ = 8;
 
   // error tolerance for matching real peaks to theoretical peaks 
-  double mz_tolerance_ = 0.02f;
+  double mz_tolerance_ = 0.02;
 
   // Envelope filtering
   
@@ -108,7 +112,7 @@ class FeatureMng {
 
   // Envelope assigned to 1 Da intervals
   // number of envelopes per window 
-  int env_num_peak_window_ = 5;
+  int env_num_per_window_ = 5;
 
   // DP algorithm
   // Check double increasing when two envelopes overlap 
@@ -123,16 +127,16 @@ class FeatureMng {
   int max_env_num_per_vertex_ = 10;
 
   // envelope final filtering
-  // use filtering to keep only highest peaks. 
+  // use filtering to  only highest peaks. 
   bool do_final_filtering_ = true;
   double low_high_dividor_ = 1500;
   double aa_avg_mass_ = 120;
   double peak_density_ = 2;
 
-  // keep unused peaks
-  bool keep_unused_peaks = false;
+  //  unused peaks
+  bool keep_unused_peaks_ = false;
 
-  // keep multiple mass 
+  //  multiple mass 
   bool output_multiple_mass_ = false;
   double multiple_min_mass_ = 5000;
   int multiple_min_charge_ = 20;

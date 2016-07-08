@@ -15,12 +15,12 @@ RawMsReader::RawMsReader(std::string &file_name):
       input_sp_num_ = spec_list_ptr_->size();
     }
 
-void RawMsReader::readNext() {
+int RawMsReader::readNext() {
   peak_list_.clear();
   header_ptr_ = nullptr;
 
   if (input_sp_id_ >= input_sp_num_) {
-    return;
+    return -1;
   }
 
   pwiz::msdata::SpectrumPtr cur_spec_ptr = nullptr;
@@ -31,7 +31,7 @@ void RawMsReader::readNext() {
     input_sp_id_++;
     if (input_sp_id_ >= input_sp_num_) {
       LOG_ERROR("Only " << input_sp_num_  << " spectra in the input data!");
-      return;
+      return -1;
     }
   }
   pwiz::msdata::SpectrumInfo spec_info(*cur_spec_ptr);
@@ -81,6 +81,7 @@ void RawMsReader::readNext() {
     header_ptr_->setTitle("Scan_" + std::to_string(spec_info.scanNumber));
     header_ptr_->setRetentionTime(spec_info.retentionTime);
   }
+  return 1;
 }
 
 }
