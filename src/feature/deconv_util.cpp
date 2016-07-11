@@ -6,9 +6,9 @@
 
 namespace prot {
 
-double intv_width_ = 10;
+double DeconvUtil::intv_width_ = 10;
 
-IntvDensPtrVec getDensity(std::vector<double> &inte) {
+IntvDensPtrVec DeconvUtil::getDensity(std::vector<double> &inte) {
   double max_inte = -1;
   for (size_t i = 0; i < inte.size(); i++) {
     if (inte[i] > max_inte) {

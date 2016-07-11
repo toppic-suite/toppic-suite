@@ -1,0 +1,1 @@
+g++ -c -Wall -std=c++11  -O3 -DPROT_LINUX  -I../../thirdparty/linux_include -I../   real_env.cpp -o ../../bin/obj/real_env.o
