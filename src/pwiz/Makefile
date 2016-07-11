@@ -25,6 +25,7 @@ PWIZ_OBJS = \
       			$(PWIZ_OBJ_ARCH)/data/common/cv.o \
 			      $(PWIZ_OBJ_ARCH)/data/common/diff_std.o \
             $(PWIZ_OBJ_ARCH)/data/common/CVTranslator.o \
+            $(PWIZ_OBJ_ARCH)/data/msdata/SpectrumInfo.o \
             $(PWIZ_OBJ_ARCH)/data/msdata/Reader.o \
 			      $(PWIZ_OBJ_ARCH)/data/msdata/MSData.o \
 			      $(PWIZ_OBJ_ARCH)/data/msdata/MSDataFile.o \
@@ -60,7 +61,8 @@ PWIZ_OBJS = \
 all:    $(MAIN)
 
 $(MAIN): $(PWIZ_OBJS) $(TEST_OBJS)
-	$(CC) $(CPPFLAGS) $(INCLUDES) -o $(MAIN) $(TEST_OBJS) $(PWIZ_OBJS) $(LFLAGS) $(LIBS)
+	ar rcs libpwiz.a $(PWIZ_OBJS) 
+	$(CC) $(CPPFLAGS) $(INCLUDES) -o $(MAIN) $(PWIZ_OBJS) $(TEST_OBJS) $(LFLAGS) $(LIBS)
 
 #$(OBJ_DIR)/%.o: %.cpp
 #	$(CC) -c $(CPPFLAGS) $(INCLUDES) $< -o $@
