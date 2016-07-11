@@ -46,7 +46,7 @@ class FeatureMng {
   // initialized before deconvolution 
   
    EnvBasePtr env_base_ptr_;
-   std::string distr_file_name_ = "theo_patt.txt";
+   std::string distr_file_name_ = "/toppic_resources/base_data/theo_patt.txt";
    int distr_entry_num_ =  11000;
    double distr_mass_interval_ = 10;
   // the minimum monoisotopic envelope for an envelope 

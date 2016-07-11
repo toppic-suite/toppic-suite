@@ -13,7 +13,7 @@ EnvBase::EnvBase(std::string file_name, int entry_num,
         LOG_ERROR( "env file  " << file_name << " does not exist.");
         throw "fasta file does not exist.";
       }
-
+      LOG_DEBUG("start reading");
       for (int i = 0; i < entry_num_; i++) {
         int peak_num = 0;
         std::string line;
@@ -25,7 +25,8 @@ EnvBase::EnvBase(std::string file_name, int entry_num,
           peak_num++;
           line_list.push_back(line);
         }
-        envs_[i] = EnvelopePtr(new Envelope(peak_num - 1, line_list));
+        //LOG_DEBUG("one envelope");
+        envs_.push_back(EnvelopePtr(new Envelope(peak_num - 1, line_list)));
       }
       input.close();
       initBaseMassIdx();
