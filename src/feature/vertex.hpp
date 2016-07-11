@@ -16,6 +16,8 @@ class Vertex {
 
   Vertex(VertexPtr ptr);
 
+  Vertex() {};
+
   virtual bool addPreEnv(MatchEnvPtr env, int max_overlap);
   bool addCurEnv(MatchEnvPtr env, int max_overlap);
   void trim();
@@ -33,7 +35,7 @@ class Vertex {
 
   static double getShareScr(VertexPtr pre, VertexPtr cur, double error_tole);
 
- private:
+ protected:
   FeatureMngPtr mng_ptr_;
   int bgn_peak_;
   int peak_num_;

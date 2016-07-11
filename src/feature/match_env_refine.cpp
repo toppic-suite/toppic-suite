@@ -5,9 +5,9 @@
 
 namespace prot {
 
-double max_distance_a_ = 1.0;
-double max_distance_b_ = 1.0;
-double best_ratio_;
+double MatchEnvRefine::max_distance_a_ = 1.0;
+double MatchEnvRefine::max_distance_b_ = 1.0;
+double MatchEnvRefine::best_ratio_;
 
 void MatchEnvRefine::mzRefine(FeatureMngPtr mng_ptr, MatchEnvPtrVec &envs) {
   for (size_t i = 0; i < envs.size(); i++) {

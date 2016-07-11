@@ -14,7 +14,7 @@ class VertexB : public Vertex {
           int pre_win_peak_num, int cur_win_peak_num, int env_num);
   VertexB(VertexBPtr ptr);
 
-  bool addPreEnv(MatchEnvPtr env, int max_overlap);
+  bool addPreEnv(MatchEnvPtr env, int max_overlap) {return false;}
 
   double getScoreB(int i) {return scores_[i];}
 

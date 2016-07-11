@@ -2,6 +2,8 @@ include ../Makefile.in
 
 OBJS = $(FEATURE_OBJS) 
 
+LINK_OBJS = $(BASE_OBJS) $(SPEC_OBJS) $(addprefix $(OBJ_DIR)/, local_anno.o)
+
 #
 # define the executable file 
 MAIN = $(BIN_DIR)/test_feature
@@ -17,7 +19,7 @@ MAIN = $(BIN_DIR)/test_feature
 all:    $(MAIN)
 
 $(MAIN): $(OBJS)
-#	$(CC) $(CPPFLAGS) $(INCLUDES) -o $(MAIN) $(OBJS) $(LFLAGS) $(LIBS)
+	$(CC) $(CPPFLAGS) $(INCLUDES) -o $(MAIN) $(OBJS) $(LINK_OBJS) $(LFLAGS) $(LIBS)
 
 $(OBJ_DIR)/%.o: %.cpp
 	$(CC) -c $(CPPFLAGS) $(INCLUDES) $< -o $@
