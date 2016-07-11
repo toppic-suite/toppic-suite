@@ -24,6 +24,7 @@ all:
 #	cd graph; make
 #	cd graphalign; make
 #	cd test; make
+	cd feature; make
 
 clean:
 	cd base; make clean
@@ -42,3 +43,4 @@ clean:
 	cd graph; make clean
 	cd graphalign; make clean
 	cd test; make clean
+	cd feature; make clean
