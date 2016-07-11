@@ -15,19 +15,23 @@ int deconvProcess(int argc, char* argv[]) {
       return 1;
     }
     std::map<std::string, std::string> arguments = argu_processor.getArguments();
+    LOG_DEBUG("parse complete");
     DeconvParaPtr para_ptr(new DeconvPara(arguments));
+    LOG_DEBUG("deconv para");
     DeconvProcess process(para_ptr);
+    LOG_DEBUG("init process");
     process.process();
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
   }
-  std::cout << "TopPC finished." << std::endl;
+  std::cout << "TopFD finished." << std::endl;
   return 0;
 }
 
 }
 
 int main(int argc, char* argv[]) {
+  prot::log_level = 2;
   return prot::deconvProcess(argc, argv);
 }

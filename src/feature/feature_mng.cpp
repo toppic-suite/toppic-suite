@@ -1,9 +1,14 @@
+#include "base/logger.hpp"
 #include "feature/feature_mng.hpp" 
 
 namespace prot {
 
 FeatureMng::FeatureMng() {
+  std::string exec_dir = "/home/xiaowen/c_project/proteomics_master/bin";
+  distr_file_name_ = exec_dir + distr_file_name_;
+  LOG_DEBUG("distribution file name " << distr_file_name_);
   env_base_ptr_ = EnvBasePtr(new EnvBase(distr_file_name_, distr_entry_num_, distr_mass_interval_));
+  LOG_DEBUG("env base inited");
 }
 
 void FeatureMng::setMinInte(double min_inte) {

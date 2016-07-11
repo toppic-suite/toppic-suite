@@ -11,6 +11,7 @@ DeconvArgument::DeconvArgument() {
 }
 
 void DeconvArgument::initArguments() {
+  arguments_["executiveDir"] = "";
   arguments_["spectrumFileName"] = "";
   arguments_["inputType"] = "mzXML";
   arguments_["outputType"] = "msalign";
@@ -19,7 +20,7 @@ void DeconvArgument::initArguments() {
   arguments_["missingLevelOne"] = "false";
   arguments_["maxCharge"] = "30";
   arguments_["maxMass"] = "100000";
-  arguments_["tolerance"] = "0.02";
+  arguments_["mzError"] = "0.02";
   arguments_["snRatio"] = "1.0";
   arguments_["keepUnusedPeaks"] = "false";
   arguments_["outMultipleMass"] = "false";
@@ -72,6 +73,7 @@ bool DeconvArgument::parse(int argc, char* argv[]) {
     po::positional_options_description positional_options;
     positional_options.add("spectrum-file-name", 1);
 
+
     std::string app_name;
     //= boost::filesystem::basename(argv[0]);
     po::variables_map vm;
@@ -95,10 +97,12 @@ bool DeconvArgument::parse(int argc, char* argv[]) {
       return false;
     }
     std::string argv_0 (argv[0]);
+    arguments_["executiveDir"] = FileUtil::getExecutiveDir(argv_0);
     arguments_["spectrumFileName"] = spectrum_file_name;
     if (vm.count("output_type")) {
       arguments_["outputType"] = output_type;
     }
+
   }
   catch(std::exception&e ) {
     std::cerr << "Unhandled Exception in parsing command line"<<e.what()<<", application will now exit"<<std::endl;
