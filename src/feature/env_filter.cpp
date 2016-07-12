@@ -24,10 +24,12 @@ bool EnvFilter::testRealEnvValid(MatchEnvPtr env, FeatureMngPtr mng_ptr) {
   int mass_group = env->getMassGroup();
   // 1. test if the number of matched peaks >= min_match_peak_num
   if (real_env->getMatchPeakNum() < mng_ptr->min_match_peak_num_[mass_group]) {
+    //LOG_DEBUG("FILETER 1" << " peak num " << real_env->getMatchPeakNum() << " thresh " << mng_ptr->min_match_peak_num_[mass_group]);
     return false;
   }
   // 2. test if the number of missing peaks <= max_miss_peak_num
   if (real_env->getMissPeakNum() > mng_ptr->max_miss_peak_num_) {
+    //LOG_DEBUG("FILETER 2");
     return false;
   }
   // 3. test if consecutive peak number >= peak_num - 3
@@ -35,6 +37,7 @@ bool EnvFilter::testRealEnvValid(MatchEnvPtr env, FeatureMngPtr mng_ptr) {
     // get threshold: peak_num - 3
     int min_cons_peak_num = mng_ptr->compMinConsPeakNum(real_env->getPeakNum(), mass_group);
     if (real_env->getMaxConsPeakNum() < min_cons_peak_num) {
+      //LOG_DEBUG("FILETER 3");
       return false;
     }
   }

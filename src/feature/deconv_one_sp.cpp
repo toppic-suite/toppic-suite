@@ -27,8 +27,10 @@ void DeconvOneSp::setData(PeakPtrVec &peak_list, double max_mass, int max_charge
 
 void DeconvOneSp::run() {
   preprocess();
+  LOG_DEBUG("preprocess complete");
   // envelope detection 
   MatchEnvPtr2D cand_envs = EnvDetect::getCandidate(data_ptr_, mng_ptr_);
+  LOG_DEBUG("candidate complete");
   // envelope filter 
   EnvFilter::filter(cand_envs, data_ptr_, mng_ptr_);
   // assign envelopes to 1 Da windows 

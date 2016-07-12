@@ -1,3 +1,4 @@
+#include "base/logger.hpp"
 #include "feature/real_env.hpp"
 #include "feature/prec_env.hpp"
 #include "feature/feature_ms_reader.hpp" 
@@ -39,11 +40,16 @@ void FeatureMsReader::refinePrecChrg(RawMsPtr ms_one, RawMsPtr ms_two,
   int prec_charge = header_two->getPrecCharge();
 
   PeakPtrVec peak_list = ms_one->getPeakPtrVec();
+  LOG_DEBUG("start refine precursor " << " peak num " << peak_list.size());
   RealEnvPtr env_ptr = PrecEnv::deconv(prec_win_size, peak_list, prec_avg_mz, 
                                        prec_charge);
   if (env_ptr != nullptr) {
     header_two->setPrecMonoMz(env_ptr->getMonoMz());
     header_two->setPrecCharge(env_ptr->getCharge());
+    LOG_DEBUG("prec mz " << env_ptr->getMonoMz() << " prec charge " << env_ptr->getCharge());
+  }
+  else {
+    LOG_DEBUG("EMPTY ENVELOPE POINTER");
   }
 }
 
