@@ -59,9 +59,9 @@ int DeconvUtil::getMaxPos(IntvDensPtrVec &dens) {
 }
 
 double DeconvUtil::getBaseLine(std::vector<double> &inte) {
-  LOG_DEBUG("get density");
+  //LOG_DEBUG("get density");
   IntvDensPtrVec dens = getDensity(inte);
-  LOG_DEBUG("get max pos ");
+  //LOG_DEBUG("get max pos ");
   int max_pos = getMaxPos(dens);
   return dens[max_pos]->getEnd();
 }

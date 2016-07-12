@@ -62,10 +62,12 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr, FeatureMsReaderPtr read
   int count = 0;
   while ((ms_ptr = reader_ptr->getNextMs(para_ptr_->prec_window_)) != nullptr) {
     PeakPtrVec peak_list = ms_ptr->getPeakPtrVec();
+    LOG_DEBUG(" peak list size " << peak_list.size());
     if (peak_list.size() == 0) {
       continue;
     }
     MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
+    LOG_DEBUG("ms level " << header_ptr->getMsLevel() );
     if (header_ptr->getMsLevel() == 1 &&  para_ptr_->ms_level_ != 1) {
       continue;
     }
@@ -95,6 +97,7 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr, FeatureMsReaderPtr read
         deconv_ptr->setData(peak_list, max_frag_mass, header_ptr->getPrecCharge());
       }
     }
+    LOG_DEBUG("set data complete");
     deconv_ptr->run();
     MatchEnvPtrVec result_envs = deconv_ptr->getResult();
     MsalignWriter::writeText(of, result_envs, header_ptr, count);

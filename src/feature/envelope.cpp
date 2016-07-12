@@ -84,10 +84,9 @@ EnvelopePtr Envelope::getSubEnv(int n_back, int n_forw) {
   int new_refer_idx = n_back;
   std::vector<double> new_mzs;
   std::vector<double> new_intes;
-  int base_idx = refer_idx_ - n_back;
   for (int i = refer_idx_ - n_back; i <= refer_idx_ + n_forw; i++) {
-    new_mzs[i - base_idx] = mzs_[i];
-    new_intes[i - base_idx] = intensities_[i];
+    new_mzs.push_back(mzs_[i]);
+    new_intes.push_back(intensities_[i]);
   }
   EnvelopePtr env_ptr(new Envelope(new_refer_idx, charge_, mono_mz_, 
                                    new_mzs, new_intes));

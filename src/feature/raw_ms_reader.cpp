@@ -2,6 +2,7 @@
 #include "base/activation_base.hpp"
 #include "pwiz/data/msdata/SpectrumInfo.hpp"
 #include "pwiz/data/common/cv.hpp"
+#include "pwiz/data/common/ParamTypes.hpp"
 #include "feature/raw_ms_reader.hpp" 
 
 namespace prot {
@@ -34,12 +35,16 @@ int RawMsReader::readNext() {
       return -1;
     }
   }
+  std::vector<pwiz::msdata::MZIntensityPair> pairs;
+  cur_spec_ptr->getMZIntensityPairs(pairs);
+  LOG_DEBUG("mz pair size " << pairs.size()); 
   pwiz::msdata::SpectrumInfo spec_info(*cur_spec_ptr);
-  for (size_t i = 0; i < spec_info.data.size(); i++) {
-    PeakPtr peak_ptr (new Peak(spec_info.data[i].mz, spec_info.data[i].intensity));
+  for (size_t i = 0; i < pairs.size(); i++) {
+    PeakPtr peak_ptr (new Peak(pairs[i].mz, pairs[i].intensity));
     peak_list_.push_back(peak_ptr);
   }
   int ms_level = spec_info.msLevel; 
+  LOG_DEBUG("ms_level " << ms_level);
   if (ms_level == 2) {
     double prec_mz = spec_info.precursors[0].mz;
     if (prec_mz < 0) {
@@ -49,6 +54,7 @@ int RawMsReader::readNext() {
     if (prec_charge  < 0) {
       prec_charge = 1;
     }
+    LOG_DEBUG("prec mz " << prec_mz << " scan number " << spec_info.scanNumber);
     header_ptr_ = MsHeaderPtr(new MsHeader());
     header_ptr_->setScan(spec_info.scanNumber);
     header_ptr_->setMsLevel(ms_level);
@@ -58,17 +64,28 @@ int RawMsReader::readNext() {
     // here is average mz 
     header_ptr_->setPrecSpMz(prec_mz);
     header_ptr_->setRetentionTime(spec_info.retentionTime);
-    pwiz::cv::CVID ac_id = spec_info.massAnalyzerType;
+
     std::string ac_name;
-    if (ac_id == pwiz::cv::MS_CID) {
-      ac_name = "CID"; 
+    std::vector<pwiz::data::CVParam> cv_list = cur_spec_ptr->precursors[0].activation.cvParams;
+    for (size_t i = 0; i < cv_list.size(); i++) {
+      LOG_DEBUG("cv list " << i << " " << cv_list[i].cvid << " " << cv_list[i].value);
+      if (cv_list[i].cvid == pwiz::cv::MS_CID) {
+        ac_name = "CID"; 
+        break;
+      }
+      else if (cv_list[i].cvid == pwiz::cv::MS_HCD) {
+        ac_name = "HCD";
+        break;
+      }
+      else if (cv_list[i].cvid == pwiz::cv::MS_ETD) {
+        ac_name = "ETD";
+        break;
+      }
     }
-    else if (ac_id == pwiz::cv::MS_HCD) {
-      ac_name = "HCD";
+    if (ac_name == "") {
+      LOG_WARN("No activation information is available in reading the spectrum with scan " << spec_info.scanNumber);
     }
-    else if (ac_id == pwiz::cv::MS_ETD) {
-      ac_name = "ETD";
-    }
+    LOG_DEBUG(" ac name " << ac_name);
     ActivationPtr activation_ptr = ActivationBase::getActivationPtrByName(ac_name); 
     header_ptr_->setActivationPtr(activation_ptr);
   } 

@@ -26,7 +26,7 @@ class FeatureMng {
   // using input parameters to assign: max_chrg, max_mass 
   int max_charge_ = 30;
   double max_mass_ = 100000;
-  double window_size_ = 1.0;
+  double window_size_ = 1.5;
 
   // preprocessing
   // estimate min intensity using thrash method. 

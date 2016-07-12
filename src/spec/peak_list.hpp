@@ -5,6 +5,8 @@
 #include <vector>
 #include <cmath>
 
+#include "base/logger.hpp"
+
 namespace prot {
 
 /*
@@ -70,14 +72,20 @@ int searchPos(const std::vector<T> &ptr_list, double pos) {
   int idx = -1;
   int min = 0;
   int max = ptr_list.size() - 1;
-  while (max >= min && pos == -1) {
+  while (max > min && idx == -1) {
     int mid = (max+min)/2;
     if(ptr_list[mid]->getPosition() ==  pos){
       idx = mid;
-    }else if(ptr_list[mid]->getPosition() < pos){
+    }else if(ptr_list[mid]->getPosition() < pos ){
       min = mid +1;
-    }else if(ptr_list[mid]->getPosition() > pos){
+      if (min > max) {
+        min = max;
+      }
+    }else if(ptr_list[mid]->getPosition() > pos ){
       max = mid -1;
+      if (max < min) {
+        max = min;
+      }
     }
   }
   if (idx >= 0) {
@@ -138,6 +146,7 @@ template <class T>
 int getNearPeakIdx(const std::vector<T> &ptr_list, double pos, double tolerance) {
   // find the peak nearest to pos 
   int idx = searchPos(ptr_list, pos);
+  //LOG_DEBUG("pos " << pos << " peak pos " << ptr_list[idx]->getPosition());
   if (idx < 0 || std::abs(ptr_list[idx]->getPosition() - pos) > tolerance) {
     return -1;
   }
