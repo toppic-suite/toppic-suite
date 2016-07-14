@@ -12,6 +12,9 @@ VertexA::VertexA(FeatureMngPtr mng_ptr, int bgn_peak,
 
 VertexA::VertexA(VertexAPtr ptr):
     Vertex(ptr) {
+      this_score_ = ptr->this_score_;
+      score_ = ptr->score_;
+      prev_vertex_ = ptr->prev_vertex_;
     }
 
 bool VertexA::addPreEnv(MatchEnvPtr env, int max_overlap) {

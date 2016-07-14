@@ -47,6 +47,7 @@ void DeconvProcess::process() {
   // writer
   std::string base_name = FileUtil::basename(file_name) + ".msalign";
   std::ofstream of(base_name, std::ofstream::out);
+  of.precision(12);
 
   DeconvOneSpPtr deconv_ptr(new DeconvOneSp(mng_ptr));
 
@@ -73,6 +74,7 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr, FeatureMsReaderPtr read
     }
     int scan_num_ = header_ptr->getFirstScanNum();
     updateMsg(header_ptr, scan_num_, total_scan_num);
+    std::cout << "\r" << msg_;
     LOG_DEBUG("set data....");
     if (header_ptr->getMsLevel() == 1) {
       deconv_ptr->setData(peak_list);
@@ -87,13 +89,11 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr, FeatureMsReaderPtr read
                             FeatureMng::getDefaultMaxCharge());
       }
       else {
-        double max_frag_mass = 0;
-        for (size_t i = 0; i < peak_list.size(); i++) {
-          if (peak_list[i]->getPosition() > max_frag_mass) {
-            max_frag_mass = peak_list[i]->getPosition();
-          }
+        double max_frag_mass = header_ptr->getPrecMonoMass();
+        if (max_frag_mass == 0.0) {
+          max_frag_mass = header_ptr->getPrecSpMass();
         }
-        
+
         deconv_ptr->setData(peak_list, max_frag_mass, header_ptr->getPrecCharge());
       }
     }

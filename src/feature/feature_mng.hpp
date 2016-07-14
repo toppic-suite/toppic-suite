@@ -26,7 +26,7 @@ class FeatureMng {
   // using input parameters to assign: max_chrg, max_mass 
   int max_charge_ = 30;
   double max_mass_ = 100000;
-  double window_size_ = 1.5;
+  double window_size_ = 1.0;
 
   // preprocessing
   // estimate min intensity using thrash method. 
@@ -45,7 +45,7 @@ class FeatureMng {
   // Distribution Envelope factory 
   // initialized before deconvolution 
   
-   EnvBasePtr env_base_ptr_;
+   static EnvBasePtr env_base_ptr_;
    std::string distr_file_name_ = "/toppic_resources/base_data/theo_patt.txt";
    int distr_entry_num_ =  11000;
    double distr_mass_interval_ = 10;

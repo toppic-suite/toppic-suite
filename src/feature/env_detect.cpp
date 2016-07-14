@@ -1,5 +1,5 @@
 #include "base/logger.hpp"
-#include "spec/peak_list.hpp"
+#include "feature/raw_ms_util.hpp"
 #include "feature/env_detect.hpp" 
 
 namespace prot {
@@ -8,12 +8,11 @@ MatchEnvPtr2D EnvDetect::getCandidate(DeconvDataPtr data_ptr, FeatureMngPtr mng_
   PeakPtrVec peak_list = data_ptr->getPeakList();
   int peak_num = peak_list.size();
   int max_charge = data_ptr->getMaxCharge();
-  //LOG_DEBUG("get candidate " << peak_num << " " << max_charge);
+  LOG_DEBUG("get candidate " << peak_num << " " << max_charge);
   MatchEnvPtr2D match_envs;
   for (int idx = 0; idx < peak_num; idx++) {
     MatchEnvPtrVec envs;
     for (int charge = 1; charge <= max_charge; charge++) {
-      //LOG_DEBUG("idx " << idx << " pos " << peak_list[idx]->getPosition() << " charge " << charge);
       MatchEnvPtr env =  detectEnv(peak_list, idx, charge, data_ptr->getMaxMass(), mng_ptr);
       //LOG_DEBUG("detect complete ");
       envs.push_back(env);
@@ -30,6 +29,7 @@ MatchEnvPtr EnvDetect::detectEnv(PeakPtrVec &peak_list, int base_peak,
   double base_mz = peak_list[base_peak]->getPosition();
   // check if the mass is greater than the precursor mass 
   double base_mass = base_mz * charge - charge * MassConstant::getProtonMass();
+  //LOG_DEBUG("peak idx " << base_peak << " base mz " << base_mz << " base mass " << base_mass << " max mass " << max_mass);
   if (base_mass >= max_mass || base_mass < mng_ptr->min_mass_) {
     return nullptr;
   }
@@ -56,15 +56,36 @@ MatchEnvPtr EnvDetect::detectEnv(PeakPtrVec &peak_list, int base_peak,
   double percentage = mng_ptr->getPercentBound(mass_group);
   theo_env = theo_env->getSubEnv(percentage, mng_ptr->min_inte_,
                                  mng_ptr->max_back_peak_num_, mng_ptr->max_forw_peak_num_);
-  //LOG_DEBUG("theo env size " << theo_env->getPeakNum());
+  /*
+  if (base_peak == 62) {
+    LOG_DEBUG("peak 62 theo env size " << theo_env->getPeakNum());
+  }
+  */
 
   // get real envelope 
+  // LOG_DEBUG("intensity " << peak_list[base_peak]->getIntensity() << " min refer inte " << mng_ptr->min_refer_inte_);
   if (peak_list[base_peak]->getIntensity() < mng_ptr->min_refer_inte_) {
     return nullptr;
   }
   RealEnvPtr real_env(new RealEnv(peak_list, theo_env, mng_ptr->mz_tolerance_,
                                   mng_ptr->min_inte_));
-  //LOG_DEBUG("real env size " << real_env->getPeakNum() << " missing peak num " << real_env->getMissPeakNum());
+  /*
+  if (base_peak == 62) {
+    LOG_DEBUG("specific*** peak 62 real env peak num " << real_env->getMatchPeakNum());
+    int peak_num = theo_env->getPeakNum();
+    std::vector<double> mz (peak_num, -1);
+    std::vector<double> inte(peak_num, 0.0);
+    std::vector<int> peak_idx(peak_num, -1);
+    for (size_t i = 0; i < peak_list.size(); i++) {
+      LOG_DEBUG("peak " << i << " mz " << peak_list[i]->getPosition());
+    }
+    for (int i = 0; i < peak_num; i++) {
+      //PeakPtr peak_ptr(new Peak(theo_env->getMz(i), 0));
+      int idx = RawMsUtil::getNearPeakIdx(peak_list, theo_env->getMz(i), mng_ptr->mz_tolerance_);
+      LOG_DEBUG("peak list size " << peak_list.size() << " theo mz " << theo_env->getMz(i) << " idx " << idx << " tolerance " << mng_ptr->mz_tolerance_);
+    }
+  }
+  */
   MatchEnvPtr match_env(new MatchEnv(mass_group, theo_env, real_env));
   return match_env;
 }
@@ -77,28 +98,26 @@ double EnvDetect::calcInteRatio(EnvelopePtr theo_env, PeakPtrVec &peak_list,
   double obs_sum = 0;
   int refer_idx = theo_env->getReferIdx();
   double mz = theo_env->getMz(refer_idx);
-  LOG_DEBUG("step 1");
-  int peak_idx = getNearPeakIdx(peak_list, mz, tolerance);
+  //LOG_DEBUG("step 1");
+  int peak_idx = RawMsUtil::getNearPeakIdx(peak_list, mz, tolerance);
   if (peak_idx >= 0) {
     theo_sum += theo_intes[refer_idx];
     obs_sum += peak_list[peak_idx]->getIntensity();
   }
-  LOG_DEBUG("step 2");
+  //LOG_DEBUG("step 2");
   if (refer_idx - 1 >= 0) {
     theo_sum += theo_intes[refer_idx - 1];
     mz = theo_env->getMz(refer_idx-1);
-    peak_idx = getNearPeakIdx(peak_list, mz, tolerance);
+    peak_idx = RawMsUtil::getNearPeakIdx(peak_list, mz, tolerance);
     if (peak_idx >= 0) {
       obs_sum += peak_list[peak_idx]->getIntensity();
     }
   }
-  LOG_DEBUG("step 3 refer idx " << refer_idx << " peak num " << theo_env->getPeakNum());
+  //LOG_DEBUG("step 3 refer idx " << refer_idx << " peak num " << theo_env->getPeakNum());
   if (refer_idx + 1 < theo_env->getPeakNum()) {
     theo_sum += theo_intes[refer_idx + 1];
     mz = theo_env->getMz(refer_idx + 1);
-    LOG_DEBUG("start getnearpeak ");
-    peak_idx = getNearPeakIdx(peak_list, mz, tolerance);
-    LOG_DEBUG("end getnearpeak ");
+    peak_idx = RawMsUtil::getNearPeakIdx(peak_list, mz, tolerance);
     if (peak_idx >= 0) {
       obs_sum += peak_list[peak_idx]->getIntensity();
     }

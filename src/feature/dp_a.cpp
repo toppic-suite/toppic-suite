@@ -45,6 +45,7 @@ void DpA::dp() {
           cnt++;
           double new_score = Vertex::getShareScr(prev_ver, cur_ver, mng_ptr_->score_error_tolerance_);
           double cur_score = prev_ver->getScrA() + new_score;
+          //LOG_DEBUG("i " << i << " j " << j << " k " << k << " new score " << new_score << " cur_score " << cur_score);
           if (cur_score > cur_ver->getScrA()) {
             cur_ver->setScrA(cur_score);
             cur_ver->setPreA(k);
@@ -58,6 +59,7 @@ void DpA::dp() {
 
 // backtracking 
 void DpA::backtrace() {
+  LOG_DEBUG("start backtrace ");
   int best_ver = -1;
   double best_score = - std::numeric_limits<double>::max();
   for (size_t i = 0; i < vertices_[win_num_ + 1].size(); i++) {
@@ -67,7 +69,10 @@ void DpA::backtrace() {
       best_score = cur_score;
     }
   }
+  //LOG_DEBUG("backtrace 1");
   for (int i = win_num_ + 1; i >= 1; i--) {
+    //LOG_DEBUG("i " << i << " best ver " << best_ver);
+    //LOG_DEBUG(" null " << (vertices_[i][best_ver]==nullptr));
     if (vertices_[i][best_ver]->getPreA() >= 0) {
       MatchEnvPtrVec prev_envs = vertices_[i][best_ver]->getPreMatchEnvs();
       addEnv(results_, prev_envs);
@@ -77,6 +82,7 @@ void DpA::backtrace() {
       break;
     }
   }
+  //LOG_DEBUG("backtrace 2");
   std::sort(results_.begin(), results_.end(), MatchEnv::cmpScoreDec);
 }
 

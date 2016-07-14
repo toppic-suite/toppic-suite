@@ -1,12 +1,12 @@
 #include "base/logger.hpp"
-#include "spec/peak_list.hpp"
+#include "feature/raw_ms_util.hpp"
 #include "feature/deconv_data_base.hpp" 
 
 namespace prot {
 
 DeconvDataPtr DeconvDataBase::getDataPtr(PeakPtrVec &peak_list, FeatureMngPtr mng_ptr) {
 
-  double max_mz = findMaxPos(peak_list);
+  double max_mz = RawMsUtil::findMaxPos(peak_list);
   if (max_mz > mng_ptr->max_mass_) {
     LOG_WARN("Max mz is too large: " << max_mz);
     return nullptr;
@@ -32,7 +32,7 @@ DeconvDataPtr DeconvDataBase::getDataPtr(PeakPtrVec &peak_list, double max_mass,
     LOG_WARN("Max mass is greater than default max mass " << max_mass);
     max_mass = mng_ptr->max_mass_;
   }
-  double max_mz = findMaxPos(peak_list);
+  double max_mz = RawMsUtil::findMaxPos(peak_list);
   if (max_mz > mng_ptr->max_mass_) {
     LOG_WARN("Max mz is too large: " << max_mz);
     return nullptr;

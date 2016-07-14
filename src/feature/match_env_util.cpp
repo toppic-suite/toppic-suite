@@ -3,7 +3,7 @@
 #include <limits>
 
 #include "base/logger.hpp"
-#include "spec/peak_list.hpp" 
+#include "feature/raw_ms_util.hpp" 
 #include "feature/match_env_util.hpp" 
 
 namespace prot {
@@ -109,7 +109,7 @@ PeakPtrVec  MatchEnvUtil::rmAnnoPeak(PeakPtrVec &ms, MatchEnvPtrVec &envs) {
       }
     }
   }
-  rmPeaks(new_list, is_keeps);
+  RawMsUtil::rmPeaks(new_list, is_keeps);
   return new_list;
 }
 
