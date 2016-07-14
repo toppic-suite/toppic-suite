@@ -30,7 +30,7 @@ int RawMsReader::readNext() {
   while (cur_spec_ptr == nullptr) {
     cur_spec_ptr = spec_list_ptr_->spectrum(input_sp_id_, get_binary_data);
     input_sp_id_++;
-    if (input_sp_id_ >= input_sp_num_) {
+    if (input_sp_id_ >= input_sp_num_ + 1) {
       LOG_ERROR("Only " << input_sp_num_  << " spectra in the input data!");
       return -1;
     }

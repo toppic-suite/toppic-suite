@@ -57,9 +57,9 @@ void DeconvOneSp::preprocess() {
     std::vector<double> intes;
     for (size_t i = 0; i < peak_list.size(); i++) {
       intes.push_back(peak_list[i]->getIntensity());
-      double min_inte = DeconvUtil::getBaseLine(intes);
-      mng_ptr_->setMinInte(min_inte);
     }
+    double min_inte = DeconvUtil::getBaseLine(intes);
+    mng_ptr_->setMinInte(min_inte);
   }
 }
 

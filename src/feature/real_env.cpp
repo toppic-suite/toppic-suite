@@ -1,6 +1,6 @@
 #include "base/logger.hpp"
 #include "spec/peak.hpp"
-#include "spec/peak_list.hpp"
+#include "feature/raw_ms_util.hpp"
 #include "feature/real_env.hpp" 
 
 namespace prot {
@@ -32,7 +32,7 @@ void RealEnv::mapPeakList(std::vector<PeakPtr> &peak_list, EnvelopePtr theo_env,
   peak_idxes_.resize(peak_num, getNonExistPeakIdx());
   for (int i = 0; i < peak_num; i++) {
     //PeakPtr peak_ptr(new Peak(theo_env->getMz(i), 0));
-    int idx = getNearPeakIdx(peak_list, theo_env->getMz(i), tolerance);
+    int idx = RawMsUtil::getNearPeakIdx(peak_list, theo_env->getMz(i), tolerance);
     //LOG_DEBUG("peak list size " << peak_list.size() << " theo mz " << theo_env->getMz(i) << " idx " << idx << " tolerance " << tolerance);
     if (idx >= 0 && peak_list[idx]->getIntensity() >= min_inte) {
       peak_idxes_[i] = idx;

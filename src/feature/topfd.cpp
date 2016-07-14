@@ -32,6 +32,6 @@ int deconvProcess(int argc, char* argv[]) {
 }
 
 int main(int argc, char* argv[]) {
-  prot::log_level = 2;
+  //prot::log_level = 2;
   return prot::deconvProcess(argc, argv);
 }

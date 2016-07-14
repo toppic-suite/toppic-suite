@@ -1,6 +1,6 @@
 #include <cmath>
 
-#include "spec/peak_list.hpp" 
+#include "feature/raw_ms_util.hpp" 
 #include "feature/deconv_data.hpp" 
 
 namespace prot {
@@ -11,7 +11,7 @@ DeconvData::DeconvData(PeakPtrVec &peak_list, double max_mass, int max_charge,
     max_mass_(max_mass),
     max_charge_(max_charge),
     win_size_(win_size) {
-      win_num_ = (int) std::ceil(findMaxPos(peak_list_) / win_size_) + 2;
+      win_num_ = (int) std::ceil(RawMsUtil::findMaxPos(peak_list_) / win_size_) + 2;
       initWinId();
       initWinBgnEnd();
     }

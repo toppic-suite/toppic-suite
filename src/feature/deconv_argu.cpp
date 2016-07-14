@@ -24,7 +24,7 @@ void DeconvArgument::initArguments() {
   arguments_["snRatio"] = "1.0";
   arguments_["keepUnusedPeaks"] = "false";
   arguments_["outMultipleMass"] = "false";
-  arguments_["precWindow"] = "1.0";
+  arguments_["precWindow"] = "2.0";
 }
 
 void DeconvArgument::outputArguments(std::ostream &output, 

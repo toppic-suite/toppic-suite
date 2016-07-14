@@ -49,7 +49,9 @@ void filterEnvByRealEnv(MatchEnvPtr2D &match_envs, FeatureMngPtr mng_ptr) {
   for (size_t i = 0; i < match_envs.size(); i++) {
     for (size_t j = 0; j < match_envs[i].size(); j++) {
       if (match_envs[i][j] != nullptr) {
+        //LOG_DEBUG("testing i " << i << " j " << j);
         if (!EnvFilter::testRealEnvValid(match_envs[i][j], mng_ptr)) {
+          //LOG_DEBUG("result filtered");
           match_envs[i][j] = nullptr;
         }
       }
