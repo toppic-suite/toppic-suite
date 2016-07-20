@@ -30,7 +30,7 @@ class MsHeader {
 
   std::string toString();
 
-  /* get functions */
+  // get functions 
   ActivationPtr getActivationPtr() {return activation_ptr_;}
 
   std::string getFileName() {return file_name_;}
@@ -53,7 +53,9 @@ class MsHeader {
 
   double getErrorTolerance(double ppo) {return getPrecMonoMass() * ppo;}
 
-  /* set function */
+  double getPrecInte() {return prec_inte_;}
+
+  // set function 
   void setActivationPtr(ActivationPtr acti_ptr) {activation_ptr_ = acti_ptr;}
 
   void setFileName(const std::string &file_name) {file_name_ = file_name;}
@@ -79,8 +81,7 @@ class MsHeader {
 
   void setPrecId(int prec_id) {prec_id_ = prec_id;}
 
-  //void setErrorToleranceByPpo(double ppo) {
-  //  error_tolerance_ = getPrecMonoMass() * ppo;}
+  void setPrecInte(double inte) {prec_inte_ = inte;}
 
   xercesc::DOMElement* getHeaderXml(XmlDOMDocument* xml_doc);
 
@@ -91,31 +92,32 @@ class MsHeader {
   static MsHeaderPtr geneMsHeaderPtr(MsHeaderPtr ori_ptr, double new_prec_mass);
 
  private:
-  /** data set name */
+  // data set name 
   std::string file_name_;
-  /** A data set may contain several spectra with the same id, but different
-   * precursor id */
+  // A data set may contain several spectra with the same id, but different
+  // precursor id 
   int id_ = -1;
-  /** one spectrum may have several possible precursor mass */
+  // one spectrum may have several possible precursor mass */
   int prec_id_ = -1;
   
   std::string title_;
-  /** a list of scans for merged spectra */
+  // a list of scans for merged spectra 
   std::vector<int> scans_;
-  /** ms level */
+  // ms level 
   int level_=0;
-  /** activation type */
+  // activation type 
   ActivationPtr activation_ptr_;
-  /** retention time */
+  // retention time 
   double retention_time_=0.0;
-  /** precursor m/z value in the MS1 spectrum */
+  // precursor m/z value in the MS1 spectrum 
   double prec_sp_mz_ = -1;
-  /** computed monoisotopic precursor m/z value */
+  // computed monoisotopic precursor m/z value 
   double prec_mono_mz_ = -1;
-  /** precursor charge state */ 
+  // precursor charge state  
   int prec_charge_ = -1;
-  /** precursor mass error tolerance */
-  //double error_tolerance_=0.0;
+  // precursor intensity 
+  double prec_inte_ = 0;
+
 };
 
 }
