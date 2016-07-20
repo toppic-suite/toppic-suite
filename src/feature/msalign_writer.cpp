@@ -7,6 +7,7 @@ void MsalignWriter::writeText(std::ofstream &file, MatchEnvPtrVec &envs,
   file << "BEGIN IONS" << std::endl;
   file << "ID=" << id << std::endl;
   file << "SCANS=" << header_ptr->getScansString() << std::endl;
+  file << "RETENTION_TIME=" << header_ptr->getRetentionTime() << std::endl;
   if (header_ptr->getActivationPtr() != nullptr) {
     file << "ACTIVATION=" << header_ptr->getActivationPtr()->getName() << std::endl;
   }
@@ -14,6 +15,7 @@ void MsalignWriter::writeText(std::ofstream &file, MatchEnvPtrVec &envs,
     file << "PRECURSOR_MZ=" << header_ptr->getPrecMonoMz() << std::endl;
     file << "PRECURSOR_CHARGE=" << header_ptr->getPrecCharge() << std::endl;
     file << "PRECURSOR_MASS=" <<  header_ptr->getPrecMonoMass() << std::endl;
+    file << "PRECURSOR_INTENSITY=" << header_ptr->getPrecInte() << std::endl;
   }
 
   for (size_t i = 0; i < envs.size(); i++) {

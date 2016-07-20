@@ -46,13 +46,12 @@ void FeatureMsReader::refinePrecChrg(RawMsPtr ms_one, RawMsPtr ms_two,
   if (env_ptr != nullptr) {
     header_two->setPrecMonoMz(env_ptr->getMonoMz());
     header_two->setPrecCharge(env_ptr->getCharge());
+    header_two->setPrecInte(env_ptr->compIntensitySum());
     LOG_DEBUG("prec mz " << env_ptr->getMonoMz() << " prec charge " << env_ptr->getCharge());
   }
   else {
     LOG_DEBUG("EMPTY ENVELOPE POINTER");
   }
 }
-
-
 
 }
