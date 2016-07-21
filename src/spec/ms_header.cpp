@@ -151,4 +151,8 @@ MsHeaderPtr MsHeader::geneMsHeaderPtr(MsHeaderPtr ori_ptr, double new_prec_mass)
   return new_header_ptr;
 }
 
+bool MsHeader::cmpPrecInteDec(const MsHeaderPtr &a, const MsHeaderPtr &b) {
+  return a->getPrecInte() > b->getPrecInte();
+}
+
 }

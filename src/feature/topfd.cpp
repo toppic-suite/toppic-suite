@@ -4,11 +4,13 @@
 #include "feature/deconv_argu.hpp"
 #include "feature/deconv_para.hpp"
 #include "feature/deconv_process.hpp"
+#include "feature/feature_detect.hpp"
 
 namespace prot {
 
 int deconvProcess(int argc, char* argv[]) {
   try {
+    /*
     DeconvArgument argu_processor;
     bool success = argu_processor.parse(argc, argv);
     if (!success) {
@@ -21,6 +23,9 @@ int deconvProcess(int argc, char* argv[]) {
     DeconvProcess process(para_ptr);
     LOG_DEBUG("init process");
     process.process();
+    */
+    std::string file_name(argv[1]);
+    FeatureDetect::process(file_name);    
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
@@ -32,6 +37,6 @@ int deconvProcess(int argc, char* argv[]) {
 }
 
 int main(int argc, char* argv[]) {
-  //prot::log_level = 2;
+  prot::log_level = 2;
   return prot::deconvProcess(argc, argv);
 }
