@@ -90,6 +90,8 @@ class MsHeader {
   static std::string getXmlElementName() {return "ms_header";}
 
   static MsHeaderPtr geneMsHeaderPtr(MsHeaderPtr ori_ptr, double new_prec_mass);
+  
+  static bool cmpPrecInteDec(const MsHeaderPtr &a, const MsHeaderPtr &b);
 
  private:
   // data set name 
@@ -119,6 +121,9 @@ class MsHeader {
   double prec_inte_ = 0;
 
 };
+
+typedef std::vector<MsHeaderPtr> MsHeaderPtrVec;
+typedef std::vector<MsHeaderPtrVec> MsHeaderPtr2D;
 
 }
 

@@ -48,11 +48,13 @@ void MsAlignReader::readNext() {
   int id = -1;
   int prec_id = 0;
   std::string scans;
+  double retention_time = -1;
   std::string activation;
   std::string title;
   int level = 2;
   double prec_mass = -1;
   int prec_charge = -1;
+  double prec_inte = -1;
   std::vector<std::string> strs;
   for (size_t i = 1; i < spectrum_str_vec_.size() - 1; i++) {
     std::string letter = spectrum_str_vec_[i].substr(0,1);
@@ -66,6 +68,8 @@ void MsAlignReader::readNext() {
         prec_id = std::stoi(strs[1]);
       } else if (strs[0] == "SCANS") {
         scans = strs[1];
+      } else if (strs[0] == "RETENTION_TIME") {
+        retention_time = std::stod(strs[1]);        
       } else if (strs[0] == "ACTIVATION") {
         activation = strs[1];
       } else if (strs[0] == "TITLE") {
@@ -76,6 +80,8 @@ void MsAlignReader::readNext() {
         prec_mass = std::stod(strs[1]);
       } else if (strs[0] == "PRECURSOR_CHARGE") {
         prec_charge = std::stoi(strs[1]);
+      } else if (strs[0] == "PRECURSOR_INTENSITY") {
+        prec_inte = std::stod(strs[1]);
       }
     }
   }
@@ -94,6 +100,8 @@ void MsAlignReader::readNext() {
   } else {
     header_ptr->setScans("");
   }
+  header_ptr->setRetentionTime(retention_time);
+  //LOG_DEBUG("retention time " << retention_time);
 
   if (title != "") {
     std::stringstream ss;
@@ -115,6 +123,8 @@ void MsAlignReader::readNext() {
   header_ptr->setPrecMonoMz(prec_mass /prec_charge
                             + MassConstant::getProtonMass());
   header_ptr->setPrecCharge(prec_charge);
+  
+  header_ptr->setPrecInte(prec_inte);
 
   std::vector<DeconvPeakPtr> peak_ptr_list;
   int idx = 0;
