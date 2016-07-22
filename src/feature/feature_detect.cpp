@@ -1,5 +1,6 @@
-#include "base/logger.hpp"
+#include <limits>
 
+#include "base/logger.hpp"
 #include "spec/msalign_reader.hpp"
 #include "feature/feature_detect_mng.hpp"
 #include "feature/feature_detect.hpp"
@@ -30,9 +31,17 @@ void outputHeaders(MsHeaderPtrVec &header_ptr_vec) {
 }
 
 bool isConsistent(MsHeaderPtr &a, MsHeaderPtr &b, FeatureDetectMngPtr mng_ptr) {
-  double mass_diff = std::abs(a->getPrecMonoMass() - b->getPrecMonoMass());
-  double error_tole = a->getPrecMonoMass() * mng_ptr->ppo_;
-  if (mass_diff <= error_tole) {
+  double min_diff = std::numeric_limits<double>::max();
+  std::vector<double> ext_masses = mng_ptr->getExtMasses(a->getPrecMonoMass());
+  for (size_t i = 0; i < ext_masses.size(); i++) {
+    double mass_diff = std::abs(ext_masses[i] - b->getPrecMonoMass());
+    if (mass_diff < min_diff) {
+      min_diff = mass_diff;
+    }
+  }
+  
+  double error_tole = mng_ptr->peak_tolerance_ptr_->compStrictErrorTole(a->getPrecMonoMass());
+  if (min_diff <= error_tole) {
     return true;
   }
   return false;
@@ -73,14 +82,14 @@ void groupHeaders(MsHeaderPtrVec &header_ptr_vec, FeatureDetectMngPtr mng_ptr) {
         sorted_ptrs.push_back(remain_ptrs[i]);
       }
     }
-    LOG_DEBUG("sorted ptr size " << sorted_ptrs.size());
+    //LOG_DEBUG("sorted ptr size " << sorted_ptrs.size());
   }
   for (size_t i = 0; i < results.size(); i++) {
     std::cout << "Group " << i << " number " << results[i].size() << std::endl;
     for (size_t j = 0; j < results[i].size(); j++) {
       MsHeaderPtr ptr = results[i][j];
       std::cout << "\t" << ptr->getId() << "\t" << ptr->getFirstScanNum() << "\t";
-      std::cout <<  ptr->getRetentionTime() << "\t" << ptr->getPrecMonoMass() << "\t";
+      std::cout <<  (ptr->getRetentionTime()/60) << "\t" << ptr->getPrecMonoMass() << "\t";
       std::cout << ptr->getPrecMonoMz() << "\t" << ptr->getPrecCharge() << "\t" << ptr->getPrecInte() << std::endl; 
     }
   }
