@@ -16,6 +16,9 @@ void MsalignWriter::writeText(std::ofstream &file, MatchEnvPtrVec &envs,
     file << "PRECURSOR_CHARGE=" << header_ptr->getPrecCharge() << std::endl;
     file << "PRECURSOR_MASS=" <<  header_ptr->getPrecMonoMass() << std::endl;
     file << "PRECURSOR_INTENSITY=" << header_ptr->getPrecInte() << std::endl;
+    if (header_ptr->getFeatureId() >= 0) {
+      file << "FEATURE_ID=" << header_ptr->getFeatureId() << std::endl;
+    }
   }
 
   for (size_t i = 0; i < envs.size(); i++) {
