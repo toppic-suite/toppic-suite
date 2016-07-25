@@ -1,9 +1,11 @@
 #include <limits>
 
 #include "base/logger.hpp"
+#include "base/file_util.hpp"
 #include "spec/msalign_reader.hpp"
 #include "feature/feature_detect_mng.hpp"
 #include "feature/feature_detect.hpp"
+#include "feature/msalign_writer.hpp"
 
 namespace prot {
 
@@ -47,7 +49,7 @@ bool isConsistent(MsHeaderPtr &a, MsHeaderPtr &b, FeatureDetectMngPtr mng_ptr) {
   return false;
 }
 
-void groupHeaders(MsHeaderPtrVec &header_ptr_vec, FeatureDetectMngPtr mng_ptr) {
+MsHeaderPtr2D groupHeaders(MsHeaderPtrVec &header_ptr_vec, FeatureDetectMngPtr mng_ptr) {
   int total_num = header_ptr_vec.size();
   MsHeaderPtrVec remain_ptrs = header_ptr_vec; 
   MsHeaderPtrVec sorted_ptrs = remain_ptrs; 
@@ -84,6 +86,7 @@ void groupHeaders(MsHeaderPtrVec &header_ptr_vec, FeatureDetectMngPtr mng_ptr) {
     }
     //LOG_DEBUG("sorted ptr size " << sorted_ptrs.size());
   }
+  /*
   for (size_t i = 0; i < results.size(); i++) {
     std::cout << "Group " << i << " number " << results[i].size() << std::endl;
     for (size_t j = 0; j < results[i].size(); j++) {
@@ -93,14 +96,42 @@ void groupHeaders(MsHeaderPtrVec &header_ptr_vec, FeatureDetectMngPtr mng_ptr) {
       std::cout << ptr->getPrecMonoMz() << "\t" << ptr->getPrecCharge() << "\t" << ptr->getPrecInte() << std::endl; 
     }
   }
+  */
+  return results;
 
+}
+
+void setFeatureId(MsHeaderPtr2D &header_groups) {
+  for (size_t i = 0; i < header_groups.size(); i++) {
+    for (size_t j = 0; j < header_groups[i].size(); j++) {
+      header_groups[i][j]->setFeatureId(i);
+    }
+  }
+}
+
+void writeMsalign(std::string &input_file_name, MsHeaderPtrVec &header_ptrs) {
+  MsAlignReader sp_reader(input_file_name, 1, nullptr);
+  std::string base_name = FileUtil::basename(input_file_name) + "_feature.msalign";
+  std::ofstream of(base_name, std::ofstream::out);
+  of.precision(12);
+  DeconvMsPtr ms_ptr;
+  int cnt = 0;
+  while((ms_ptr = sp_reader.getNextMs())!= nullptr){
+    ms_ptr->setHeaderPtr(header_ptrs[cnt]);
+    MsalignWriter::writeText(of, ms_ptr);    
+    cnt++;
+  }
+  sp_reader.close();
+  of.close();
 }
 
 void FeatureDetect::process(std::string &input_file_name){
   FeatureDetectMngPtr mng_ptr(new FeatureDetectMng());
   MsHeaderPtrVec header_ptr_vec;
   readHeaders(input_file_name, header_ptr_vec);
-  groupHeaders(header_ptr_vec, mng_ptr);
+  MsHeaderPtr2D header_groups = groupHeaders(header_ptr_vec, mng_ptr);
+  setFeatureId(header_groups);
+  writeMsalign(input_file_name, header_ptr_vec);
   //outputHeaders(header_ptr_vec);
 }
 
