@@ -27,11 +27,18 @@ class PrsmSpecies {
   std::string output_file_ext_;
   ResiduePtrVec residue_ptr_vec_;
   double ppo_;
+
+  ProteoformPtrVec2D groupProteins(const PrsmPtrVec &prsm_ptrs);
+
+  ProteoformPtrVec2D getZeroPtmList(const ProteoformPtrVec& proteo_ptrs, double ppo);
+
+  void setProtId(PrsmPtrVec& prsm_ptrs);
+
+  void setSpeciesId(PrsmPtrVec& prsm_ptrs,double ppo);
 };
 
 typedef std::shared_ptr<PrsmSpecies> PrsmSpeciesPtr;
 
-void setSpeciesId(PrsmPtrVec& prsm_ptrs,double ppo);
 
 } /* namespace prot */
 

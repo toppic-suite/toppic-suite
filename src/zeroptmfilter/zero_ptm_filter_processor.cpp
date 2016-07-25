@@ -86,6 +86,7 @@ void ZeroPtmFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_
   int cnt = 0;
   while((spec_set_ptr = reader.getNextSpectrumSet(sp_para_ptr)) != nullptr){
     cnt+= group_spec_num;
+    LOG_DEBUG("spec set ptr valid " << spec_set_ptr->isValid());
     if(spec_set_ptr->isValid()){
       ExtendMsPtrVec ms_ptr_vec = spec_set_ptr->getMsThreePtrVec();
       filter_ptr->computeBestMatch(ms_ptr_vec);

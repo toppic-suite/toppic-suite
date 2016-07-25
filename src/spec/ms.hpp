@@ -47,7 +47,7 @@ class Ms {
 
   MsHeaderPtr getMsHeaderPtr() {return header_ptr_;}
 
-  void setHeaderPtr(MsHeaderPtr header_ptr) {header_ptr = header_ptr_;}
+  void setHeaderPtr(MsHeaderPtr header_ptr) {header_ptr_ = header_ptr;}
 
   size_t size() {return peak_ptr_list_.size();}
 
