@@ -134,7 +134,7 @@ class Prsm {
   int spectrum_id_;
 
   std::string spectrum_scan_;
-
+  
   int precursor_id_;
 
   int spectrum_num_;

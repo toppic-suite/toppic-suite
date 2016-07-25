@@ -16,7 +16,7 @@ inline std::vector<int> getScaledSrmMasses(ProteoformPtr proteo_ptr,
   std::vector<int> masses = proteo_ptr->getBpSpecPtr()->getScaledPrmMasses(scale);
   for (size_t i = 0; i < n_ace_shifts.size(); i++) {
       int ace_mass = (int)std::round(- n_ace_shifts[i] * scale);
-      LOG_DEBUG("ace shift " << n_ace_shifts[i] <<  " ace mass " << ace_mass);
+      //LOG_DEBUG("ace shift " << n_ace_shifts[i] <<  " ace mass " << ace_mass);
       masses.push_back(ace_mass);
   }
   std::sort(masses.begin(), masses.end(),std::less<int>()); 

@@ -111,7 +111,7 @@ xercesc::DOMElement* Prsm::toXmlElement(XmlDOMDocument* xml_doc){
 	xml_doc->addElement(element, "prsm_id", str.c_str());
 	str = StringUtil::convertToString(spectrum_id_);
 	xml_doc->addElement(element, "spectrum_id", str.c_str());
-	xml_doc->addElement(element, "spectrum_scan", spectrum_scan_.c_str());
+  xml_doc->addElement(element, "spectrum_scan", spectrum_scan_.c_str());
 	str = StringUtil::convertToString(precursor_id_);
 	xml_doc->addElement(element, "precursor_id", str.c_str());
 	str = StringUtil::convertToString(spectrum_num_);

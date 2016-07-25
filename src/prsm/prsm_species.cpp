@@ -19,7 +19,7 @@ PrsmSpecies::PrsmSpecies(const std::string &db_file_name,
     ppo_(ppo) {
     }
 
-ProteoformPtrVec2D groupProteins(const PrsmPtrVec &prsm_ptrs){
+ProteoformPtrVec2D PrsmSpecies::groupProteins(const PrsmPtrVec &prsm_ptrs){
   //get max shift number
   int max_shift_number = 0;
   for(size_t i=0;i<prsm_ptrs.size();i++){
@@ -43,7 +43,7 @@ ProteoformPtrVec2D groupProteins(const PrsmPtrVec &prsm_ptrs){
   return proteogroups;
 }
 
-ProteoformPtrVec2D getZeroPtmList(const ProteoformPtrVec& proteo_ptrs, double ppo){
+ProteoformPtrVec2D PrsmSpecies::getZeroPtmList(const ProteoformPtrVec& proteo_ptrs, double ppo){
   ProteoformPtrVec2D species;
   for(size_t i=0;i<proteo_ptrs.size();i++){
     bool is_found = false;
@@ -63,7 +63,7 @@ ProteoformPtrVec2D getZeroPtmList(const ProteoformPtrVec& proteo_ptrs, double pp
   return species;
 }
 
-void setProtId(PrsmPtrVec& prsm_ptrs){
+void PrsmSpecies::setProtId(PrsmPtrVec& prsm_ptrs){
   PrsmPtrVec2D proteins;
   std::vector<std::string> protein_names;
   for(size_t i=0;i<prsm_ptrs.size();i++) {
@@ -91,7 +91,7 @@ void setProtId(PrsmPtrVec& prsm_ptrs){
   }
 }
 
-void setSpeciesId(PrsmPtrVec& prsm_ptrs,double ppo){
+void PrsmSpecies::setSpeciesId(PrsmPtrVec& prsm_ptrs,double ppo){
   ProteoformPtrVec2D proteo_groups = groupProteins(prsm_ptrs);
   
   // find zero ptm species 

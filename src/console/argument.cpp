@@ -36,6 +36,7 @@ void Argument::initArguments() {
   arguments_["residueModFileName"] = "";
   arguments_["proteo_graph_dis"] = "20";
   arguments_["threadNumber"] = "1";
+  arguments_["useFeature"] = "false";
 }
 
 void Argument::outputArguments(std::ostream &output, 
@@ -203,6 +204,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "")
         ("proteo-graph-dis,j", po::value<std::string> (&proteo_graph_dis), "<positive number>. Gap in constructing proteoform graph. Default value: 20.")
         ("thread-number,u", po::value<std::string> (&thread_number), "<positive number>. Number of threads used in the computation. Default value: 1.")
+        ("use-feature,x", "")
         ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name with its path.")
         ("spectrum-file-name", po::value<std::string>(&spectrum_file_name)->required(), "Spectrum file name with its path.");
 
@@ -305,6 +307,9 @@ bool Argument::parse(int argc, char* argv[]) {
     }
     if (vm.count("thread-number")) {
       arguments_["threadNumber"] = thread_number;
+    }
+    if (vm.count("use-feature")) {
+      arguments_["useFeature"] = "true";
     }
   }
   catch(std::exception&e ) {
