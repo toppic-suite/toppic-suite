@@ -21,6 +21,7 @@ Prsm::Prsm(ProteoformPtr proteoform_ptr, const DeconvMsPtrVec &deconv_ms_ptr_vec
       spectrum_id_ = header_ptr->getId();
       spectrum_scan_ = header_ptr->getScansString();
       precursor_id_ = header_ptr->getPrecId();
+      prec_feature_id_ = header_ptr->getFeatureId();
       spectrum_num_ = deconv_ms_ptr_vec.size();
       ori_prec_mass_ = header_ptr->getPrecMonoMass();
       init(sp_para_ptr);
@@ -114,6 +115,8 @@ xercesc::DOMElement* Prsm::toXmlElement(XmlDOMDocument* xml_doc){
   xml_doc->addElement(element, "spectrum_scan", spectrum_scan_.c_str());
 	str = StringUtil::convertToString(precursor_id_);
 	xml_doc->addElement(element, "precursor_id", str.c_str());
+	str = StringUtil::convertToString(prec_feature_id_);
+	xml_doc->addElement(element, "precursor_feature_id", str.c_str());
 	str = StringUtil::convertToString(spectrum_num_);
 	xml_doc->addElement(element, "spectrum_number", str.c_str());
 	str = StringUtil::convertToString(ori_prec_mass_);
@@ -145,6 +148,7 @@ void Prsm::parseXml(xercesc::DOMElement *element) {
   spectrum_id_=XmlDomUtil::getIntChildValue(element, "spectrum_id", 0);
   spectrum_scan_=XmlDomUtil::getChildValue(element, "spectrum_scan", 0);
   precursor_id_=XmlDomUtil::getIntChildValue(element, "precursor_id", 0);
+  prec_feature_id_ = XmlDomUtil::getIntChildValue(element, "precursor_feature_id", 0);
   spectrum_num_ = XmlDomUtil::getIntChildValue(element, "spectrum_number", 0);
   ori_prec_mass_=XmlDomUtil::getDoubleChildValue(element, "ori_prec_mass", 0);
   adjusted_prec_mass_=XmlDomUtil::getDoubleChildValue(element, "adjusted_prec_mass", 0);

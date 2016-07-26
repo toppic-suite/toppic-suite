@@ -106,6 +106,7 @@ int two_base_opt(int argc, char* argv[]) {
     FastaUtil::dbPreprocess (ori_db_file_name, db_file_name, decoy, db_block_size);
     MsAlignUtil::geneSpIndex(sp_file_name);
 
+    /*
     std::vector<std::string> input_exts;
 
     std::cout << "Zero PTM filtering - started." << std::endl;
@@ -222,9 +223,11 @@ int two_base_opt(int argc, char* argv[]) {
     cutoff_selector->process();
     cutoff_selector = nullptr;
     std::cout << "PRSM selecting by cutoff - finished." << std::endl;
+    */
 
     std::string suffix = "CUTOFF_RESULT";
 
+    /*
     if (localization) {
       std::cout << "PTM characterization - started." << std::endl;
       LocalMngPtr local_mng = LocalMngPtr(
@@ -238,6 +241,7 @@ int two_base_opt(int argc, char* argv[]) {
       std::cout << "PTM characterization - finished." << std::endl;
       suffix = "LOCAL_RESULT";
     }
+    */
 
     std::cout << "Finding protein species - started." << std::endl;
     double ppo;

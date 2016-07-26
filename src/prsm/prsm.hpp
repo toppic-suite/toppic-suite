@@ -30,6 +30,8 @@ class Prsm {
 
   int getPrecursorId() {return precursor_id_;}
 
+  int getPrecFeatureId() {return prec_feature_id_;}
+
   double getOriPrecMass() {return ori_prec_mass_;}
 
   double getAdjustedPrecMass() {return adjusted_prec_mass_;}
@@ -65,6 +67,8 @@ class Prsm {
   void setSpectrumScan(std::string spectrum_scan) {spectrum_scan_ = spectrum_scan;}
 
   void setPrecurorId(int precursor_id) {precursor_id_ = precursor_id;}
+
+  void setPrecFeatureId(int prec_feature_id) {prec_feature_id_ = prec_feature_id;}
 
   void setOriPrecMass(double prec_mass) {ori_prec_mass_ = prec_mass;}
 
@@ -138,6 +142,8 @@ class Prsm {
   int precursor_id_;
 
   int spectrum_num_;
+
+  int prec_feature_id_ = -1;
 
   double ori_prec_mass_;
   /* adjusted precursor mass */
