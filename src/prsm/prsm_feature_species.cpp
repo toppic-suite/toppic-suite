@@ -54,9 +54,8 @@ void PrsmFeatureSpecies::setSpeciesId(const PrsmPtrVec& prsm_ptrs){
     for(size_t j=0; j < species.size(); j++){
       PrsmPtr ref_ptr = species[j][0];
       if (cur_ptr->getProteoformPtr()->getProtId() == ref_ptr->getProteoformPtr()->getProtId()) {
-        MsHeaderPtr cur_header = cur_ptr->getDeconvMsPtrVec()[0]->getMsHeaderPtr();
-        MsHeaderPtr ref_header = ref_ptr->getDeconvMsPtrVec()[0]->getMsHeaderPtr();
-        if (cur_header->getFeatureId() == ref_header->getFeatureId()) {
+        if (cur_ptr->getPrecFeatureId() == ref_ptr->getPrecFeatureId()) {
+          species[j].push_back(cur_ptr);
           is_found = true;
           break;
         }
