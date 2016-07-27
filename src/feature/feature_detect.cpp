@@ -10,7 +10,8 @@
 namespace prot {
 
 void readHeaders(std::string &file_name, MsHeaderPtrVec &header_ptr_vec) {
-  MsAlignReader sp_reader(file_name, 1, nullptr);
+  int sp_num_in_group = 1;
+  MsAlignReader sp_reader(file_name, sp_num_in_group, nullptr);
   
   DeconvMsPtr ms_ptr;
   //LOG_DEBUG("Start search");
@@ -86,7 +87,6 @@ MsHeaderPtr2D groupHeaders(MsHeaderPtrVec &header_ptr_vec, FeatureDetectMngPtr m
     }
     //LOG_DEBUG("sorted ptr size " << sorted_ptrs.size());
   }
-  /*
   for (size_t i = 0; i < results.size(); i++) {
     std::cout << "Group " << i << " number " << results[i].size() << std::endl;
     for (size_t j = 0; j < results[i].size(); j++) {
@@ -96,7 +96,6 @@ MsHeaderPtr2D groupHeaders(MsHeaderPtrVec &header_ptr_vec, FeatureDetectMngPtr m
       std::cout << ptr->getPrecMonoMz() << "\t" << ptr->getPrecCharge() << "\t" << ptr->getPrecInte() << std::endl; 
     }
   }
-  */
   return results;
 
 }
@@ -109,10 +108,10 @@ void setFeatureId(MsHeaderPtr2D &header_groups) {
   }
 }
 
-void writeMsalign(std::string &input_file_name, MsHeaderPtrVec &header_ptrs) {
-  MsAlignReader sp_reader(input_file_name, 1, nullptr);
-  std::string base_name = FileUtil::basename(input_file_name) + "_feature.msalign";
-  std::ofstream of(base_name, std::ofstream::out);
+void writeMsalign(std::string &input_file_name, std::string &output_file_name, MsHeaderPtrVec &header_ptrs) {
+  int sp_num_in_group = 1;
+  MsAlignReader sp_reader(input_file_name, sp_num_in_group, nullptr);
+  std::ofstream of(output_file_name, std::ofstream::out);
   of.precision(12);
   DeconvMsPtr ms_ptr;
   int cnt = 0;
@@ -125,13 +124,16 @@ void writeMsalign(std::string &input_file_name, MsHeaderPtrVec &header_ptrs) {
   of.close();
 }
 
-void FeatureDetect::process(std::string &input_file_name){
+void FeatureDetect::process(std::string &xml_file_name){
   FeatureDetectMngPtr mng_ptr(new FeatureDetectMng());
   MsHeaderPtrVec header_ptr_vec;
-  readHeaders(input_file_name, header_ptr_vec);
+  std::string base_name = FileUtil::basename(xml_file_name);
+  std::string msalign_file_name = base_name + ".msalign";
+  readHeaders(msalign_file_name, header_ptr_vec);
   MsHeaderPtr2D header_groups = groupHeaders(header_ptr_vec, mng_ptr);
   setFeatureId(header_groups);
-  writeMsalign(input_file_name, header_ptr_vec);
+  std::string output_file_name = base_name + "_feature.msalign";
+  writeMsalign(msalign_file_name, output_file_name, header_ptr_vec);
   //outputHeaders(header_ptr_vec);
 }
 

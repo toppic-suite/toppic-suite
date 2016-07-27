@@ -56,12 +56,6 @@ MatchEnvPtr EnvDetect::detectEnv(PeakPtrVec &peak_list, int base_peak,
   double percentage = mng_ptr->getPercentBound(mass_group);
   theo_env = theo_env->getSubEnv(percentage, mng_ptr->min_inte_,
                                  mng_ptr->max_back_peak_num_, mng_ptr->max_forw_peak_num_);
-  /*
-  if (base_peak == 62) {
-    LOG_DEBUG("peak 62 theo env size " << theo_env->getPeakNum());
-  }
-  */
-
   // get real envelope 
   // LOG_DEBUG("intensity " << peak_list[base_peak]->getIntensity() << " min refer inte " << mng_ptr->min_refer_inte_);
   if (peak_list[base_peak]->getIntensity() < mng_ptr->min_refer_inte_) {
@@ -69,23 +63,43 @@ MatchEnvPtr EnvDetect::detectEnv(PeakPtrVec &peak_list, int base_peak,
   }
   RealEnvPtr real_env(new RealEnv(peak_list, theo_env, mng_ptr->mz_tolerance_,
                                   mng_ptr->min_inte_));
-  /*
-  if (base_peak == 62) {
-    LOG_DEBUG("specific*** peak 62 real env peak num " << real_env->getMatchPeakNum());
-    int peak_num = theo_env->getPeakNum();
-    std::vector<double> mz (peak_num, -1);
-    std::vector<double> inte(peak_num, 0.0);
-    std::vector<int> peak_idx(peak_num, -1);
-    for (size_t i = 0; i < peak_list.size(); i++) {
-      LOG_DEBUG("peak " << i << " mz " << peak_list[i]->getPosition());
-    }
-    for (int i = 0; i < peak_num; i++) {
-      //PeakPtr peak_ptr(new Peak(theo_env->getMz(i), 0));
-      int idx = RawMsUtil::getNearPeakIdx(peak_list, theo_env->getMz(i), mng_ptr->mz_tolerance_);
-      LOG_DEBUG("peak list size " << peak_list.size() << " theo mz " << theo_env->getMz(i) << " idx " << idx << " tolerance " << mng_ptr->mz_tolerance_);
-    }
+  MatchEnvPtr match_env(new MatchEnv(mass_group, theo_env, real_env));
+  return match_env;
+}
+
+MatchEnvPtr EnvDetect::detectEnv(PeakPtrVec &peak_list, double mono_mass, 
+                                 int charge, FeatureMngPtr mng_ptr) {
+
+  if (mono_mass < mng_ptr->min_mass_) {
+    return nullptr;
   }
-  */
+
+  // get a reference distribution based on the base mass 
+  EnvelopePtr ref_env = mng_ptr->env_base_ptr_->getEnvByMonoMass(mono_mass);
+  if (ref_env == nullptr) {
+    LOG_WARN("reference envelope is null");
+    return nullptr;
+  }
+
+  // convert the reference distribution to a theoretical distribution
+  // based on the mono mz and charge state
+  double mono_mz = mono_mass /charge + MassConstant::getProtonMass();
+  EnvelopePtr theo_env = ref_env->distrToTheoMono(mono_mz, charge);
+  //LOG_DEBUG("get theo env");
+  // scale theoretical distribution 
+  double ratio = calcInteRatio(theo_env, peak_list, mng_ptr->mz_tolerance_);
+  theo_env->changeIntensity(ratio);
+
+  int mass_group = mng_ptr->getMassGroup(mono_mass);
+  //LOG_DEBUG("theo env raw complete");
+
+  // get the highest 85%--95% peaks 
+  double percentage = mng_ptr->getPercentBound(mass_group);
+  theo_env = theo_env->getSubEnv(percentage, mng_ptr->min_inte_,
+                                 mng_ptr->max_back_peak_num_, mng_ptr->max_forw_peak_num_);
+  // get real envelope 
+  RealEnvPtr real_env(new RealEnv(peak_list, theo_env, mng_ptr->mz_tolerance_,
+                                  mng_ptr->min_inte_));
   MatchEnvPtr match_env(new MatchEnv(mass_group, theo_env, real_env));
   return match_env;
 }

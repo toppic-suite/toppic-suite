@@ -18,6 +18,9 @@ class EnvDetect {
   static MatchEnvPtr detectEnv(PeakPtrVec &peak_list, int base_peak,
                                int charge, double max_mass, FeatureMngPtr mng_ptr);
 
+  static MatchEnvPtr detectEnv(PeakPtrVec &peak_list, double mono_mass, 
+                               int charge, FeatureMngPtr mng_ptr);
+
   static MatchEnvPtr2D getCandidate(DeconvDataPtr data_ptr, FeatureMngPtr mng_ptr);
 };
 
