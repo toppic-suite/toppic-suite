@@ -29,6 +29,9 @@ class RawMsReader {
   int input_sp_num_;
   int input_sp_id_;
   int output_sp_id_;
+
+  int ms1_cnt = 0;
+  int ms2_cnt = 0;
   PeakPtrVec peak_list_;
   MsHeaderPtr header_ptr_;
   

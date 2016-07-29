@@ -3,21 +3,24 @@
 namespace prot {
 
 void MsalignWriter::writeText(std::ofstream &file, MatchEnvPtrVec &envs, 
-                              MsHeaderPtr header_ptr, int id) {
+                              MsHeaderPtr header_ptr) {
   file << "BEGIN IONS" << std::endl;
-  file << "ID=" << id << std::endl;
+  file << "ID=" << header_ptr->getId() << std::endl;
   file << "SCANS=" << header_ptr->getScansString() << std::endl;
   file << "RETENTION_TIME=" << header_ptr->getRetentionTime() << std::endl;
   if (header_ptr->getActivationPtr() != nullptr) {
     file << "ACTIVATION=" << header_ptr->getActivationPtr()->getName() << std::endl;
   }
   if (header_ptr->getMsLevel() > 1) {
+    file << "MS_ONE_ID=" << header_ptr->getMsOneId() << std::endl;
+    file << "MS_ONE_SCAN=" << header_ptr->getMsOneScan() << std::endl;
     file << "PRECURSOR_MZ=" << header_ptr->getPrecMonoMz() << std::endl;
     file << "PRECURSOR_CHARGE=" << header_ptr->getPrecCharge() << std::endl;
     file << "PRECURSOR_MASS=" <<  header_ptr->getPrecMonoMass() << std::endl;
     file << "PRECURSOR_INTENSITY=" << header_ptr->getPrecInte() << std::endl;
     if (header_ptr->getFeatureId() >= 0) {
       file << "FEATURE_ID=" << header_ptr->getFeatureId() << std::endl;
+      file << "FEATURE_INTENSITY=" << header_ptr->getFeatureInte() << std::endl;
     }
   }
 
@@ -44,12 +47,15 @@ void MsalignWriter::writeText(std::ofstream &file, DeconvMsPtr ms_ptr) {
     file << "ACTIVATION=" << header_ptr->getActivationPtr()->getName() << std::endl;
   }
   if (header_ptr->getMsLevel() > 1) {
+    file << "MS_ONE_ID=" << header_ptr->getMsOneId() << std::endl;
+    file << "MS_ONE_SCAN=" << header_ptr->getMsOneScan() << std::endl;
     file << "PRECURSOR_MZ=" << header_ptr->getPrecMonoMz() << std::endl;
     file << "PRECURSOR_CHARGE=" << header_ptr->getPrecCharge() << std::endl;
     file << "PRECURSOR_MASS=" <<  header_ptr->getPrecMonoMass() << std::endl;
     file << "PRECURSOR_INTENSITY=" << header_ptr->getPrecInte() << std::endl;
     if (header_ptr->getFeatureId() >= 0) {
       file << "FEATURE_ID=" << header_ptr->getFeatureId() << std::endl;
+      file << "FEATURE_INTENSITY=" << header_ptr->getFeatureInte() << std::endl;
     }
   }
 

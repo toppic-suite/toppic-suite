@@ -52,10 +52,13 @@ void MsAlignReader::readNext() {
   std::string activation;
   std::string title;
   int level = 2;
+  int ms_one_id = -1;
+  int ms_one_scan = -1;
   double prec_mass = -1;
   int prec_charge = -1;
   double prec_inte = -1;
   int feature_id = -1;
+  double feature_inte = -1;
   std::vector<std::string> strs;
   for (size_t i = 1; i < spectrum_str_vec_.size() - 1; i++) {
     std::string letter = spectrum_str_vec_[i].substr(0,1);
@@ -77,6 +80,10 @@ void MsAlignReader::readNext() {
         title = strs[1];
       } else if (strs[0] == "LEVEL") {
         level = std::stoi(strs[1]);
+      } else if (strs[0] == "MS_ONE_ID") {
+        ms_one_id = std::stod(strs[1]);
+      } else if (strs[0] == "MS_ONE_SCAN") {
+        ms_one_scan = std::stod(strs[1]);
       } else if (strs[0] == "PRECURSOR_MASS") {
         prec_mass = std::stod(strs[1]);
       } else if (strs[0] == "PRECURSOR_CHARGE") {
@@ -85,13 +92,14 @@ void MsAlignReader::readNext() {
         prec_inte = std::stod(strs[1]);
       } else if (strs[0] == "FEATURE_ID") {
         feature_id = std::stoi(strs[1]);
+      } else if (strs[0] == "FEATURE_INTENSITY") {
+        feature_id = std::stod(strs[1]);
       }
     }
   }
   if (id < 0 || prec_charge < 0 || prec_mass < 0) {
-    LOG_ERROR("Input file format error: sp id " << id << " prec_chrg "
+    LOG_WARN("Input file format error: sp id " << id << " prec_chrg "
               << prec_charge << " prec mass " << prec_mass);
-    std::exit(1);
   }
 
   MsHeaderPtr header_ptr(new MsHeader());
@@ -123,6 +131,10 @@ void MsAlignReader::readNext() {
   }
   header_ptr->setMsLevel(level);
 
+  header_ptr->setMsOneId(ms_one_id);
+
+  header_ptr->setMsOneScan(ms_one_scan);
+
   header_ptr->setPrecMonoMz(prec_mass /prec_charge
                             + MassConstant::getProtonMass());
   header_ptr->setPrecCharge(prec_charge);
@@ -130,6 +142,8 @@ void MsAlignReader::readNext() {
   header_ptr->setPrecInte(prec_inte);
 
   header_ptr->setFeatureId(feature_id);
+
+  header_ptr->setFeatureInte(feature_inte);
 
   std::vector<DeconvPeakPtr> peak_ptr_list;
   int idx = 0;

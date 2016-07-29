@@ -16,7 +16,7 @@ void DeconvArgument::initArguments() {
   arguments_["inputType"] = "mzXML";
   arguments_["outputType"] = "msalign";
   arguments_["refinePrecMass"]="true";
-  arguments_["msLevel"] = "2";
+  arguments_["msLevel"] = "1";
   arguments_["missingLevelOne"] = "false";
   arguments_["maxCharge"] = "30";
   arguments_["maxMass"] = "100000";

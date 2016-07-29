@@ -14,7 +14,6 @@ int deconvProcess(int argc, char* argv[]) {
   try {
     std::string exe_dir = FileUtil::getExecutiveDir(argv[0]);
     BaseData::init(exe_dir);
-    /*
     DeconvArgument argu_processor;
     bool success = argu_processor.parse(argc, argv);
     if (!success) {
@@ -22,16 +21,18 @@ int deconvProcess(int argc, char* argv[]) {
     }
     std::map<std::string, std::string> arguments = argu_processor.getArguments();
     LOG_DEBUG("parse complete");
+
+    /*
     DeconvParaPtr para_ptr(new DeconvPara(arguments));
     LOG_DEBUG("deconv para");
     DeconvProcess process(para_ptr);
     LOG_DEBUG("init process");
     process.process();
     */
-
-    std::string file_name(argv[1]);
-    LOG_DEBUG("file name " << file_name);
-    FeatureDetect::process(file_name);    
+    
+    std::string spec_file_name = arguments["spectrumFileName"];
+    LOG_DEBUG("file name " << spec_file_name);
+    FeatureDetect::process(spec_file_name);    
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;

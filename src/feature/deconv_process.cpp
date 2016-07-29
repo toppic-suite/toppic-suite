@@ -45,22 +45,28 @@ void DeconvProcess::process() {
 
   std::string file_name = para_ptr_->getDataFileName();
   // writer
-  std::string base_name = FileUtil::basename(file_name) + ".msalign";
-  std::ofstream of(base_name, std::ofstream::out);
-  of.precision(12);
+  std::string ms1_name = FileUtil::basename(file_name) + ".ms1";
+  std::string ms2_name = FileUtil::basename(file_name) + ".ms2";
+  std::ofstream of1(ms1_name, std::ofstream::out);
+  std::ofstream of2(ms2_name, std::ofstream::out);
+  of1.precision(16);
+  of2.precision(16);
 
   DeconvOneSpPtr deconv_ptr(new DeconvOneSp(mng_ptr));
 
   FeatureMsReaderPtr reader_ptr(new FeatureMsReader(file_name));
-  processSp(deconv_ptr, reader_ptr, of);
+  processSp(deconv_ptr, reader_ptr, of1, of2);
+  of1.close();
+  of2.close();
 }
 
 void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr, FeatureMsReaderPtr reader_ptr, 
-                              std::ofstream &of) {
+                              std::ofstream &of1, std::ofstream &of2) {
   // reader_ptr
   int total_scan_num = reader_ptr->getInputSpNum();
   RawMsPtr ms_ptr;
-  int count = 0;
+  int count1 = 0;
+  int count2 = 0;
   while ((ms_ptr = reader_ptr->getNextMs(para_ptr_->prec_window_)) != nullptr) {
     PeakPtrVec peak_list = ms_ptr->getPeakPtrVec();
     LOG_DEBUG(" peak list size " << peak_list.size());
@@ -78,6 +84,10 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr, FeatureMsReaderPtr read
     LOG_DEBUG("set data....");
     if (header_ptr->getMsLevel() == 1) {
       deconv_ptr->setData(peak_list);
+      deconv_ptr->run();
+      MatchEnvPtrVec result_envs = deconv_ptr->getResult();
+      MsalignWriter::writeText(of1, result_envs, header_ptr);
+      count1++;
     }
     else {
       if (para_ptr_->missing_level_one_) {
@@ -93,15 +103,13 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr, FeatureMsReaderPtr read
         if (max_frag_mass == 0.0) {
           max_frag_mass = header_ptr->getPrecSpMass();
         }
-
         deconv_ptr->setData(peak_list, max_frag_mass, header_ptr->getPrecCharge());
       }
+      deconv_ptr->run();
+      MatchEnvPtrVec result_envs = deconv_ptr->getResult();
+      MsalignWriter::writeText(of2, result_envs, header_ptr);
+      count2++;
     }
-    LOG_DEBUG("set data complete");
-    deconv_ptr->run();
-    MatchEnvPtrVec result_envs = deconv_ptr->getResult();
-    MsalignWriter::writeText(of, result_envs, header_ptr, count);
-    count++;
   }
   std::cout <<"Deconvolution finished." << std::endl;
 }

@@ -22,6 +22,10 @@ RawMsPtr FeatureMsReader::getNextMs(double prec_win_size) {
   if (header_ptr->getMsLevel() == 1) {
     ms_one_ = ms_ptr;
   }
+  if (header_ptr->getMsLevel() == 2 && ms_one_ != nullptr) {
+    header_ptr->setMsOneId(ms_one_->getMsHeaderPtr()->getId());
+    header_ptr->setMsOneScan(ms_one_->getMsHeaderPtr()->getFirstScanNum());
+  }
   if (do_refine_prec_mass_ && header_ptr->getMsLevel() == 2 && ms_one_ != nullptr) {
     refinePrecChrg(ms_one_, ms_ptr, prec_win_size);
   } else {

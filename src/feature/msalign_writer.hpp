@@ -13,7 +13,7 @@ namespace prot {
 class MsalignWriter {
  public:
   static void writeText(std::ofstream &file, MatchEnvPtrVec &envs, 
-                        MsHeaderPtr header_ptr, int id);
+                        MsHeaderPtr header_ptr);
 
   static void writeText(std::ofstream &file, DeconvMsPtr ms_ptr); 
 };

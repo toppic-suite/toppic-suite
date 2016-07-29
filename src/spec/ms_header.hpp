@@ -33,6 +33,8 @@ class MsHeader {
   // get functions 
   ActivationPtr getActivationPtr() {return activation_ptr_;}
 
+  double getFeatureInte() {return feature_inte_;}
+
   std::string getFileName() {return file_name_;}
 
   int getId() {return id_;}
@@ -40,6 +42,10 @@ class MsHeader {
   int getMsLevel() {return level_;}
 
   std::string getTitle() {return title_;}
+
+  int getMsOneId() {return ms_one_id_;}
+
+  int getMsOneScan() {return ms_one_scan_;}
 
   double getPrecSpMz() {return prec_sp_mz_;}
 
@@ -66,6 +72,10 @@ class MsHeader {
 
   void setTitle(const std::string &title) {title_ = title;}
 
+  void setMsOneId(int ms_one_id) {ms_one_id_ = ms_one_id;}
+
+  void setMsOneScan(int ms_one_scan) {ms_one_scan_ = ms_one_scan;}
+
   void setPrecSpMz(double prec_sp_mz) {prec_sp_mz_ = prec_sp_mz;}
 
   void setPrecCharge(int prec_charge) {prec_charge_ = prec_charge;}
@@ -86,6 +96,8 @@ class MsHeader {
   void setPrecInte(double inte) {prec_inte_ = inte;}
 
   void setFeatureId(int feature_id) {feature_id_ = feature_id;}
+
+  void setFeatureInte(double feature_inte) {feature_inte_ = feature_inte;}
 
   xercesc::DOMElement* getHeaderXml(XmlDOMDocument* xml_doc);
 
@@ -113,6 +125,10 @@ class MsHeader {
   int level_=0;
   // activation type 
   ActivationPtr activation_ptr_;
+  // ms1 id 
+  int ms_one_id_ = -1;
+  // ms1 scan number
+  int ms_one_scan_ = -1;
   // retention time 
   double retention_time_=0.0;
   // precursor m/z value in the MS1 spectrum 
@@ -125,6 +141,8 @@ class MsHeader {
   double prec_inte_ = 0;
   // feature id
   int feature_id_ = -1;
+  // feature inte
+  int feature_inte_ = -1;
 };
 
 typedef std::vector<MsHeaderPtr> MsHeaderPtrVec;
