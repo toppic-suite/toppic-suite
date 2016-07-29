@@ -56,6 +56,8 @@ int RawMsReader::readNext() {
     }
     LOG_DEBUG("prec mz " << prec_mz << " scan number " << spec_info.scanNumber);
     header_ptr_ = MsHeaderPtr(new MsHeader());
+    header_ptr_->setId(ms2_cnt);
+    ms2_cnt++;
     header_ptr_->setScan(spec_info.scanNumber);
     header_ptr_->setMsLevel(ms_level);
     header_ptr_->setPrecCharge(prec_charge);
@@ -91,6 +93,8 @@ int RawMsReader::readNext() {
   } 
   else {
     header_ptr_ = MsHeaderPtr(new MsHeader());
+    header_ptr_->setId(ms1_cnt);
+    ms1_cnt++;
     header_ptr_->setScan(spec_info.scanNumber);
     header_ptr_->setMsLevel(ms_level);
     header_ptr_->setPrecCharge(0);

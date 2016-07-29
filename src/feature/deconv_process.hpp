@@ -17,7 +17,8 @@ class DeconvProcess {
 
   void process();
 
-  void processSp(DeconvOneSpPtr deconv_ptr, FeatureMsReaderPtr reader_ptr, std::ofstream &os);
+  void processSp(DeconvOneSpPtr deconv_ptr, FeatureMsReaderPtr reader_ptr, 
+                 std::ofstream &os1, std::ofstream &os2);
 
  private:
   DeconvParaPtr para_ptr_;
