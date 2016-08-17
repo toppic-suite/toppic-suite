@@ -108,7 +108,7 @@ int getMs1IdEnd(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtr best_ptr,
                   FeatureDetectMngPtr mng_ptr) {
   int cur_id = best_ptr->getMsOneId();
   while (cur_id < (int)ms1_ptr_vec.size()-1) {
-    if (containPrecursor(ms1_ptr_vec[cur_id-1], best_ptr, mng_ptr)) {
+    if (containPrecursor(ms1_ptr_vec[cur_id+1], best_ptr, mng_ptr)) {
       cur_id++;
     }
     else {
@@ -157,7 +157,7 @@ int getMs2IdBegin(MsHeaderPtrVec &header_ptr_vec, MsHeaderPtr best_ptr,
 int getMs2IdEnd(MsHeaderPtrVec &header_ptr_vec, MsHeaderPtr best_ptr, int ms1_id_end) {
   int cur_id = best_ptr->getId();
   while (cur_id < (int)header_ptr_vec.size()-1) {
-    if (header_ptr_vec[cur_id - 1]->getMsOneId() <= ms1_id_end) {
+    if (header_ptr_vec[cur_id + 1]->getMsOneId() <= ms1_id_end) {
       cur_id++;
     }
     else {
@@ -180,19 +180,14 @@ void groupHeaders(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtrVec &header_ptr_vec,
     cur_group.push_back(best_ptr);
     int best_id = best_ptr->getId();
     remain_ptrs[best_id] = nullptr;
-    LOG_DEBUG("step 1");
     int ms1_id_begin = getMs1IdBegin(ms1_ptr_vec, best_ptr, mng_ptr);
-    LOG_DEBUG("step 1.2");
     int ms1_id_end = getMs1IdEnd(ms1_ptr_vec, best_ptr, mng_ptr);
-    LOG_DEBUG("step 1.3");
     double cur_inte = getFeatureIntensity(ms1_ptr_vec, best_ptr, ms1_id_begin,
                                           ms1_id_end, mng_ptr);
 
-    LOG_DEBUG("step 2");
     int ms2_id_begin = getMs2IdBegin(header_ptr_vec, best_ptr, ms1_id_begin);
     int ms2_id_end = getMs2IdEnd(header_ptr_vec, best_ptr, ms1_id_end);
 
-    LOG_DEBUG("step 3");
     for (int i = ms2_id_begin; i <= ms2_id_end; i++) {
       if (remain_ptrs[i] != nullptr) {
         if (isConsistent(best_ptr, remain_ptrs[i], mng_ptr)) {
