@@ -93,7 +93,7 @@ void MsAlignReader::readNext() {
       } else if (strs[0] == "FEATURE_ID") {
         feature_id = std::stoi(strs[1]);
       } else if (strs[0] == "FEATURE_INTENSITY") {
-        feature_id = std::stod(strs[1]);
+        feature_inte = std::stod(strs[1]);
       }
     }
   }
