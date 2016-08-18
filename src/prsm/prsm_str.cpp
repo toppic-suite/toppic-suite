@@ -24,6 +24,10 @@ PrsmStr::PrsmStr(const std::vector<std::string> &str_vec) {
   }
   line = PrsmUtil::getXmlLine(str_vec_, "<fdr>"); 
   fdr_ = std::stod(PrsmUtil::getValueStr(line));
+  line = PrsmUtil::getXmlLine(str_vec_, "<proteoform_fdr>"); 
+  proteoform_fdr_ = std::stod(PrsmUtil::getValueStr(line));
+  line = PrsmUtil::getXmlLine(str_vec_, "<species_id>");
+  species_id_ = std::stoi(PrsmUtil::getValueStr(line));
   //LOG_DEBUG("spectrum id " << spectrum_id_ << " match num " << match_frag_num_);
 }
 
@@ -41,6 +45,11 @@ int getXmlLineIndex(const std::vector<std::string> &str_vec,
 void PrsmStr::setFdr(double fdr) {
   int i = getXmlLineIndex(str_vec_, "fdr");
   str_vec_[i] = "<fdr>" + std::to_string(fdr) + "</fdr>";
+}
+
+void PrsmStr::setProteoformFdr(double proteoform_fdr) {
+  int i = getXmlLineIndex(str_vec_, "proteoform_fdr");
+  str_vec_[i] = "<proteoform_fdr>" + std::to_string(proteoform_fdr) + "</proteoform_fdr>";
 }
 
 void PrsmStr::setId(int id) {

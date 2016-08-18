@@ -23,7 +23,9 @@ class PrsmFdr {
   std::string input_file_ext_;
   std::string output_file_ext_;
 
-  void compute(PrsmStrPtrVec &target, PrsmStrPtrVec &decoy);
+  void computeFdr(PrsmStrPtrVec &target, PrsmStrPtrVec &decoy);
+
+  void computeProteoformFdr(PrsmStrPtr2D &target, PrsmStrPtr2D &decoy);
 };
 typedef std::shared_ptr<PrsmFdr> PrsmFdrPtr;
 

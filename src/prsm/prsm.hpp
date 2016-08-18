@@ -42,6 +42,8 @@ class Prsm {
 
   double getFdr() {return fdr_;}
 
+  double getProteoformFdr() {return proteoform_fdr_;}
+
   DeconvMsPtrVec getDeconvMsPtrVec() {return deconv_ms_ptr_vec_;}
 
   ExtendMsPtrVec getRefineMsPtrVec() {return refine_ms_three_vec_;}
@@ -77,6 +79,8 @@ class Prsm {
   void setExtremeValuePtr(ExtremeValuePtr ev_ptr) {extreme_value_ptr_ = ev_ptr;}
 
   void setFdr(double fdr) {fdr_ = fdr;}
+
+  void setProteoformFdr(double proteoform_fdr) {proteoform_fdr_ = proteoform_fdr;}
 
   void setDeconvMsPtrVec(DeconvMsPtrVec ms_vec) {deconv_ms_ptr_vec_=ms_vec;}
 
@@ -155,6 +159,8 @@ class Prsm {
   ExtremeValuePtr extreme_value_ptr_;
 
   double fdr_ = -1;
+
+  double proteoform_fdr_ = -1;
 
   /* The following are not saved in xml */
   DeconvMsPtrVec deconv_ms_ptr_vec_;

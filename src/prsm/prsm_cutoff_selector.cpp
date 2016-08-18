@@ -32,6 +32,7 @@ void PrsmCutoffSelector::process(){
 
   bool evalue_cutoff = (cutoff_type_ == "EVALUE");
   bool fdr_cutoff = (cutoff_type_ == "FDR");
+  bool form_fdr_cutoff = (cutoff_type_ == "FORMFDR");
   bool frag_cutoff = (cutoff_type_ == "FRAG");
 
   PrsmPtrVec selected_prsms;
@@ -47,6 +48,12 @@ void PrsmCutoffSelector::process(){
       selected_prsms.push_back(prsms[i]);
       id++;
     }   
+    else if (form_fdr_cutoff && prsms[i]->getFdr() <= cutoff_value_ 
+             && prsms[i]->getProteoformFdr() <= cutoff_value_) {
+      prsms[i]->setPrsmId(id);
+      selected_prsms.push_back(prsms[i]);
+      id++;
+    }
     else if (frag_cutoff && prsms[i]->getMatchFragNum() >= cutoff_value_) {
       prsms[i]->setPrsmId(id);
       ExtremeValuePtr ev_ptr(new ExtremeValue(-prsms[i]->getMatchFragNum(), 1, 1));

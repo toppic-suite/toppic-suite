@@ -20,6 +20,8 @@ class PrsmStr {
 
   std::string getSeqName() {return seq_name_;}
 
+  int getSpeciesId() {return species_id_;}
+
   double getMatchFragNum() {return match_frag_num_;}
 
   double getNormMatchFragNum() {return norm_match_frag_num_;}
@@ -28,9 +30,13 @@ class PrsmStr {
 
   double getFdr() {return fdr_;}
 
+  double getProteoformFdr() {return proteoform_fdr_;}
+
   void setId(int id);
 
   void setFdr(double fdr);
+
+  void setProteoformFdr(double proteoform_fdr);
 
   //comparison 
   static bool cmpEValueInc(const PrsmStrPtr &a, const PrsmStrPtr &b) {
@@ -56,6 +62,8 @@ class PrsmStr {
 
   std::string seq_name_;
 
+  int species_id_;
+
   double match_frag_num_;
 
   /* a tempory variable for testing mass graph alignment */
@@ -64,10 +72,12 @@ class PrsmStr {
   double e_value_;
 
   double fdr_;
+
+  double proteoform_fdr_;
 };
 
 typedef std::vector<PrsmStrPtr> PrsmStrPtrVec;
-
+typedef std::vector<PrsmStrPtrVec> PrsmStrPtr2D;
 
 }
 

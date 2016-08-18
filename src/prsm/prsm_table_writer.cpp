@@ -60,6 +60,7 @@ void PrsmTableWriter::write(){
       << "E-value" << "\t"
 //      << "One Protein probabilty"<< "\t"
       << "Q-value (spectral FDR)" << "\t"
+      << "Proteoform FDR" << "\t"
 #if defined MASS_GRAPH
       << "#Variable PTMs" << "\t"
 #endif
@@ -199,6 +200,13 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   double fdr = prsm_ptr->getFdr();
   if (fdr >= 0) {
     file << fdr << "\t";
+  }
+  else { 
+    file << "\t";
+  }
+  double proteoform_fdr = prsm_ptr->getProteoformFdr();
+  if (proteoform_fdr >= 0) {
+    file << proteoform_fdr << "\t";
   }
   else { 
     file << "\t";

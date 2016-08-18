@@ -168,7 +168,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("error-tolerance,e", po::value<std::string> (&error_tole), "<a positive integer>. Error tolerance for precursor and fragment masses in PPM. Default value: 15.")
         ("max-mod,m", po::value<std::string> (&max_ptm_mass), "<a positive number>. Maximum absolute value of the mass shift (in Dalton) of an unexpected modification. Default value: 500.")
         ("num-mod,p", po::value<std::string> (&ptm_num), "<0|1|2>. Maximum number of unexpected modifications in a proteoform spectrum-match. Default value: 1.")
-        ("cutoff-type,t", po::value<std::string> (&cutoff_type), "<EVALUE|FDR>. Cutoff type for filtering identified proteoform spectrum-matches. Default value: EVALUE.")
+        ("cutoff-type,t", po::value<std::string> (&cutoff_type), "<EVALUE|FDR|FORMFDR>. Cutoff type for filtering identified proteoform spectrum-matches. Default value: EVALUE.")
         ("cutoff-value,v", po::value<std::string> (&cutoff_value), "<a positive number>. Cutoff value for filtering identified proteoform spectrum-matches. Default value: 0.01.")
         ("generating-function,g", "Use the generating function approach to compute p-values and E-values.")
         ("num-combined-spectra,r", po::value<std::string> (&group_num), 
@@ -359,7 +359,7 @@ bool Argument::validateArguments() {
   }
 
   std::string cutoff_type = arguments_["cutoffType"];
-  if (cutoff_type != "EVALUE" && cutoff_type != "FDR") {
+  if (cutoff_type != "EVALUE" && cutoff_type != "FDR" && cutoff_type != "FORMFDR") {
     LOG_ERROR("Cutoff type " << cutoff_type << " error! The value should be EVALUE|FDR");
     return false;
   }

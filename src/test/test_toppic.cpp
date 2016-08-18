@@ -11,6 +11,7 @@
 
 #include "prsm/prsm_para.hpp"
 #include "prsm/prsm_str_combine.hpp"
+#include "prsm/prsm_form_filter.hpp"
 #include "prsm/prsm_top_selector.hpp"
 #include "prsm/prsm_cutoff_selector.hpp"
 #include "prsm/prsm_species.hpp"
@@ -105,10 +106,9 @@ int two_base_opt(int argc, char* argv[]) {
 
     FastaUtil::dbPreprocess (ori_db_file_name, db_file_name, decoy, db_block_size);
     MsAlignUtil::geneSpIndex(sp_file_name);
-
+    
     std::vector<std::string> input_exts;
 
-    /*
     std::cout << "Zero PTM filtering - started." << std::endl;
     ZeroPtmFilterMngPtr zero_filter_mng_ptr = ZeroPtmFilterMngPtr(new ZeroPtmFilterMng (prsm_para_ptr, "ZERO_FILTER"));
     ZeroPtmFilterProcessorPtr zero_filter_processor = ZeroPtmFilterProcessorPtr(new ZeroPtmFilterProcessor(zero_filter_mng_ptr));
@@ -220,7 +220,7 @@ int two_base_opt(int argc, char* argv[]) {
     }
     std::cout << "Finding protein forms - finished." << std::endl;
     WebLog::completeFunction(WebLog::SelectingTime());
-    */
+
     std::string suffix = "FORMS";
     
     if (arguments["searchType"]=="TARGET+DECOY") { 
@@ -232,23 +232,19 @@ int two_base_opt(int argc, char* argv[]) {
       suffix = "FDR";
     }
 
-
-    /*
     std::cout << "PRSM selecting by cutoff - started." << std::endl;
     std::string cutoff_type = arguments["cutoffType"];
     double cutoff_value;
     std::istringstream (arguments["cutoffValue"]) >> cutoff_value;
     PrsmCutoffSelectorPtr cutoff_selector = PrsmCutoffSelectorPtr(
-        new PrsmCutoffSelector(db_file_name, sp_file_name, "TOP", "CUTOFF_RESULT", 
+        new PrsmCutoffSelector(db_file_name, sp_file_name, suffix, "CUTOFF_RESULT", 
                                cutoff_type, cutoff_value));
     cutoff_selector->process();
     cutoff_selector = nullptr;
     std::cout << "PRSM selecting by cutoff - finished." << std::endl;
 
-    std::string suffix = "CUTOFF_RESULT";
-    */
+    suffix = "CUTOFF_RESULT";
 
-    /*
     if (localization) {
       std::cout << "PTM characterization - started." << std::endl;
       LocalMngPtr local_mng = LocalMngPtr(
@@ -262,23 +258,35 @@ int two_base_opt(int argc, char* argv[]) {
       std::cout << "PTM characterization - finished." << std::endl;
       suffix = "LOCAL_RESULT";
     }
-    */
 
-    /*
+    std::cout << "Outputting the result table - started." << std::endl;
+    PrsmTableWriterPtr table_out = PrsmTableWriterPtr(
+        new PrsmTableWriter(prsm_para_ptr, arguments, suffix, "OUTPUT_TABLE"));
+    table_out->write();
+    table_out = nullptr;
+    std::cout << "Outputting the result table - finished." << std::endl;
+
+    //std::string suffix = "CUTOFF_RESULT";
+    std::cout << "PRSM proteoform filtering - started." << std::endl;
+    PrsmFormFilterPtr form_filter = PrsmFormFilterPtr(
+        new PrsmFormFilter(db_file_name, sp_file_name, suffix, "FORM_FILTER_RESULT", "FORM_RESULT"));
+    form_filter->process();
+    form_filter = nullptr;
+    std::cout << "PRSM proteoform filtering - finished." << std::endl;
+
+    std::cout << "Outputting the proteoform table - started." << std::endl;
+    PrsmTableWriterPtr form_out = PrsmTableWriterPtr(
+        new PrsmTableWriter(prsm_para_ptr, arguments, "FORM_RESULT", "FORM_OUTPUT_TABLE"));
+    form_out->write();
+    form_out = nullptr;
+    std::cout << "Outputting the proteoform table - finished." << std::endl;
 
     time_t end = time(0);
     arguments["end_time"] = std::string(ctime(&end));
     arguments["running_time"] = std::to_string((int)difftime(end, start));
 
-    std::cout << "Outputting the result table - started." << std::endl;
-    PrsmTableWriterPtr table_out = PrsmTableWriterPtr(
-        new PrsmTableWriter(prsm_para_ptr, arguments, "OUTPUT_RESULT", "OUTPUT_TABLE"));
-    table_out->write();
-    table_out = nullptr;
-    std::cout << "Outputting the result table - finished." << std::endl;
-
     std::cout << "Generating xml files started." << std::endl;
-    XmlGeneratorPtr xml_gene = XmlGeneratorPtr(new XmlGenerator(prsm_para_ptr, exe_dir, "OUTPUT_RESULT"));
+    XmlGeneratorPtr xml_gene = XmlGeneratorPtr(new XmlGenerator(prsm_para_ptr, exe_dir, "FORM_FILTER_RESULT"));
     xml_gene->process();
     xml_gene = nullptr;
     std::cout << "Generating xml files - finished." << std::endl;
@@ -288,6 +296,7 @@ int two_base_opt(int argc, char* argv[]) {
     std::cout << "Converting xml files to html files - finished." << std::endl;
     WebLog::completeFunction(WebLog::OutPutTime());
 
+    /*
     if (arguments["keepTempFiles"] != "true"){
       std::cout << "Deleting temporary files - started." << std::endl;
       FileUtil::delDir(FileUtil::basename(sp_file_name) + "_xml");
