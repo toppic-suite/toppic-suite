@@ -14,6 +14,26 @@ PrsmFdr::PrsmFdr(const std::string &db_file_name,
     output_file_ext_(output_file_ext) {
     }
 
+inline PrsmStrPtr2D getGroups(PrsmStrPtrVec &prsm_ptrs) {
+  PrsmStrPtr2D results;
+  for (size_t i = 0; i < prsm_ptrs.size(); i++) {
+    bool found = false;
+    for (size_t j = 0; j < results.size(); j++) {
+      if (results[j][0]->getSpeciesId() == prsm_ptrs[i]->getSpeciesId()) {
+        found = true;
+        results[j].push_back(prsm_ptrs[i]);
+        break;
+      }
+    }
+    if (!found) {
+      PrsmStrPtrVec new_group;
+      new_group.push_back(prsm_ptrs[i]);
+      results.push_back(new_group);
+    }
+  }
+  return results;
+}
+
 void PrsmFdr::process(){
   std::string base_name = FileUtil::basename(spec_file_name_);
   std::string input_file_name = base_name+"."+input_file_ext_;
@@ -37,7 +57,16 @@ void PrsmFdr::process(){
       }
     }
   }
-  compute(target_ptrs,decoy_ptrs);
+  std::sort(target_ptrs.begin(),target_ptrs.end(),PrsmStr::cmpEValueInc);
+  std::sort(decoy_ptrs.begin(),decoy_ptrs.end(),PrsmStr::cmpEValueInc);
+  
+  computeFdr(target_ptrs,decoy_ptrs);
+
+  PrsmStrPtr2D target_proteoforms = getGroups(target_ptrs);
+  PrsmStrPtr2D decoy_proteoforms = getGroups(decoy_ptrs);
+
+  computeProteoformFdr(target_proteoforms, decoy_proteoforms);
+
   std::string output_file_name = base_name+"."+output_file_ext_;
   PrsmXmlWriter writer(output_file_name);
   std::sort(target_ptrs.begin(),target_ptrs.end(),PrsmStr::cmpSpectrumIdInc);
@@ -45,9 +74,7 @@ void PrsmFdr::process(){
   writer.close();
 }
 
-void PrsmFdr::compute(PrsmStrPtrVec &target_ptrs,PrsmStrPtrVec &decoy_ptrs){
-  std::sort(target_ptrs.begin(),target_ptrs.end(),PrsmStr::cmpEValueInc);
-  std::sort(decoy_ptrs.begin(),decoy_ptrs.end(),PrsmStr::cmpEValueInc);
+void PrsmFdr::computeFdr(PrsmStrPtrVec &target_ptrs,PrsmStrPtrVec &decoy_ptrs){
   for(size_t i=0; i<target_ptrs.size(); i++){
     int n_target=i+1;
     double target_evalue = target_ptrs[i]->getEValue();
@@ -65,6 +92,30 @@ void PrsmFdr::compute(PrsmStrPtrVec &target_ptrs,PrsmStrPtrVec &decoy_ptrs){
       fdr=1.0;
     }
     target_ptrs[i]->setFdr(fdr);
+  }
+}
+
+void PrsmFdr::computeProteoformFdr(PrsmStrPtr2D &target_proteoforms,
+                                   PrsmStrPtr2D &decoy_proteoforms) {
+  for(size_t i=0; i<target_proteoforms.size(); i++){
+    int n_target=i+1;
+    double target_evalue = target_proteoforms[i][0]->getEValue();
+    int n_decoy = 0;
+    for(size_t j=0; j<decoy_proteoforms.size(); j++){
+      if(decoy_proteoforms[j][0]->getEValue() <= target_evalue){
+        n_decoy++;
+      }
+      else{
+        break;
+      }
+    }
+    double fdr = (double)n_decoy/(double)n_target;
+    if(fdr>1){
+      fdr=1.0;
+    }
+    for (size_t k = 0; k < target_proteoforms[i].size(); k++) {
+      target_proteoforms[i][k]->setProteoformFdr(fdr);
+    }
   }
 }
 

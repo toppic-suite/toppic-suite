@@ -23,7 +23,7 @@ BASE_OBJS = $(addprefix $(OBJ_DIR)/, acid_base.o acid.o activation_base.o activa
 
 SPEC_OBJS = $(addprefix $(OBJ_DIR)/, base_peak_type.o deconv_peak.o deconv_ms_factory.o extend_peak.o extend_ms.o extend_ms_factory.o ms_header.o msalign_reader.o msalign_util.o multi_spec_peak.o peak.o peak_tolerance.o  prm_peak.o prm_peak_factory.o prm_ms.o prm_ms_factory.o rm_break_type.o sp_para.o spectrum_set.o support_peak.o theo_peak.o theo_peak_factory.o theo_peak_util.o)
 
-PRSM_OBJS = $(addprefix $(OBJ_DIR)/, peak_ion_pair.o peak_ion_pair_factory.o peak_ion_pair_util.o prsm.o prsm_coverage.o prsm_cutoff_selector.o prsm_fdr.o prsm_feature_species.o prsm_para.o prsm_prob.o prsm_reader.o prsm_species.o prsm_stat.o prsm_str.o prsm_str_combine.o prsm_table_writer.o prsm_top_selector.o prsm_util.o prsm_xml_writer.o simple_prsm.o simple_prsm_reader.o simple_prsm_str.o simple_prsm_str_combine.o simple_prsm_table_writer.o simple_prsm_util.o simple_prsm_xml_writer.o threadpool.o)
+PRSM_OBJS = $(addprefix $(OBJ_DIR)/, peak_ion_pair.o peak_ion_pair_factory.o peak_ion_pair_util.o prsm.o prsm_coverage.o prsm_cutoff_selector.o prsm_fdr.o prsm_feature_species.o prsm_form_filter.o prsm_para.o prsm_prob.o prsm_reader.o prsm_species.o prsm_stat.o prsm_str.o prsm_str_combine.o prsm_table_writer.o prsm_top_selector.o prsm_util.o prsm_xml_writer.o simple_prsm.o simple_prsm_reader.o simple_prsm_str.o simple_prsm_str_combine.o simple_prsm_table_writer.o simple_prsm_util.o simple_prsm_xml_writer.o threadpool.o)
 
 ZERO_PTM_FILTER_OBJS = $(addprefix $(OBJ_DIR)/, filter_protein.o mass_match.o mass_match_factory.o mass_match_util.o mass_zero_ptm_filter.o zero_ptm_filter_processor.o)
 

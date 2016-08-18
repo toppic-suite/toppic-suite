@@ -67,20 +67,21 @@ bool isConsistent(MsHeaderPtr &a, MsHeaderPtr &b, FeatureDetectMngPtr mng_ptr) {
 
 bool containPrecursor(DeconvMsPtr ms1_ptr, MsHeaderPtr best_ptr, FeatureDetectMngPtr mng_ptr) {
   double prec_mass = best_ptr->getPrecMonoMass();
-  double prec_chrg = best_ptr->getPrecCharge();
+  //double prec_chrg = best_ptr->getPrecCharge();
   std::vector<double> ext_masses = mng_ptr->getExtMasses(prec_mass);
 
   double min_diff = std::numeric_limits<double>::max();
   for (size_t i = 0; i < ms1_ptr->size(); i++) {
     DeconvPeakPtr peak = ms1_ptr->getPeakPtr(i);
-    if (peak->getCharge() == prec_chrg) {
-      for (size_t j = 0; j < ext_masses.size(); j++) {
-        double mass_diff = std::abs(ext_masses[j] - peak->getPosition());
-        if (mass_diff < min_diff) {
-          min_diff = mass_diff;
-        }
+    //if (peak->getCharge() == prec_chrg) {
+    // do not test charge 
+    for (size_t j = 0; j < ext_masses.size(); j++) {
+      double mass_diff = std::abs(ext_masses[j] - peak->getPosition());
+      if (mass_diff < min_diff) {
+        min_diff = mass_diff;
       }
     }
+    //}
   }
   
   double error_tole = mng_ptr->peak_tolerance_ptr_->compStrictErrorTole(prec_mass);
@@ -173,7 +174,7 @@ void groupHeaders(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtrVec &header_ptr_vec,
   MsHeaderPtrVec remain_ptrs = header_ptr_vec; 
   MsHeaderPtrVec sorted_ptrs = remain_ptrs; 
   while (sorted_ptrs.size() > 0) {
-    LOG_DEBUG("grouping");
+    //LOG_DEBUG("grouping");
     std::sort(sorted_ptrs.begin(), sorted_ptrs.end(), MsHeader::cmpPrecInteDec);
     MsHeaderPtr best_ptr = sorted_ptrs[0];
     MsHeaderPtrVec cur_group;
@@ -197,7 +198,6 @@ void groupHeaders(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtrVec &header_ptr_vec,
       }
     }
 
-    LOG_DEBUG("step 4");
     result_groups.push_back(cur_group);
     int feature_id = features.size();
     double cur_mono_mass = best_ptr->getPrecMonoMass();
@@ -216,7 +216,7 @@ void groupHeaders(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtrVec &header_ptr_vec,
   }
   for (size_t i = 0; i < result_groups.size(); i++) {
     std::cout << "Group " << i << " number " << result_groups[i].size() << " ms1 scan begin " << features[i]->getScanBegin();
-    std::cout << "ms1 scan end " << features[i]->getScanEnd() << " inte " << features[i]->getIntensity() << std::endl;
+    std::cout << " ms1 scan end " << features[i]->getScanEnd() << " inte " << features[i]->getIntensity() << std::endl;
     for (size_t j = 0; j < result_groups[i].size(); j++) {
       MsHeaderPtr ptr = result_groups[i][j];
       std::cout << "\t" << ptr->getId() << "\t" << ptr->getFirstScanNum() << "\t";

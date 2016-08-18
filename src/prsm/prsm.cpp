@@ -125,6 +125,8 @@ xercesc::DOMElement* Prsm::toXmlElement(XmlDOMDocument* xml_doc){
 	xml_doc->addElement(element, "adjusted_prec_mass", str.c_str());
 	str = StringUtil::convertToString(fdr_);
 	xml_doc->addElement(element, "fdr", str.c_str());
+  str = StringUtil::convertToString(proteoform_fdr_);
+  xml_doc->addElement(element, "proteoform_fdr", str.c_str());
 	str = StringUtil::convertToString(match_peak_num_);
 	xml_doc->addElement(element, "match_peak_num", str.c_str());
 	str = StringUtil::convertToString(match_fragment_num_);
@@ -153,6 +155,7 @@ void Prsm::parseXml(xercesc::DOMElement *element) {
   ori_prec_mass_=XmlDomUtil::getDoubleChildValue(element, "ori_prec_mass", 0);
   adjusted_prec_mass_=XmlDomUtil::getDoubleChildValue(element, "adjusted_prec_mass", 0);
   fdr_=XmlDomUtil::getDoubleChildValue(element, "fdr", 0);
+  proteoform_fdr_ = XmlDomUtil::getDoubleChildValue(element, "proteoform_fdr", 0);
   match_peak_num_=XmlDomUtil::getDoubleChildValue(element, "match_peak_num", 0);
   match_fragment_num_=XmlDomUtil::getDoubleChildValue(element, "match_fragment_num", 0);
 
