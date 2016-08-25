@@ -13,11 +13,10 @@ namespace prot {
 
 class PtmSearchSlowFilter {
  public:
-  PtmSearchSlowFilter(
-      SpectrumSetPtr spectrum_set_ptr,
-      SimplePrsmPtrVec simple_prsm_ptrs,
-      CompShiftLowMemPtr comp_shift_ptr,
-      PtmSearchMngPtr mng_ptr);
+  PtmSearchSlowFilter(SpectrumSetPtr spectrum_set_ptr,
+                      SimplePrsmPtrVec simple_prsm_ptrs,
+                      CompShiftLowMem comp_shift,
+                      PtmSearchMngPtr mng_ptr);
   PrsmPtrVec getPrsms(int shift_num, AlignTypePtr type_ptr);
 
  private:

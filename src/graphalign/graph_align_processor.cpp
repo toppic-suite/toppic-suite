@@ -16,6 +16,7 @@
 
 namespace prot {
 
+typedef std::shared_ptr<ThreadPool<PrsmXmlWriter>> PrsmXmlThreadPoolPtr;
 
 GraphAlignProcessor::GraphAlignProcessor(GraphAlignMngPtr mng_ptr) {
   mng_ptr_ = mng_ptr;
@@ -24,7 +25,7 @@ GraphAlignProcessor::GraphAlignProcessor(GraphAlignMngPtr mng_ptr) {
 std::function<void()> geneTask(GraphAlignMngPtr mng_ptr,
                                ProteoGraphPtr proteo_ptr,
                                SpecGraphPtr spec_ptr,
-                               ThreadPoolPtr pool_ptr) {
+                               PrsmXmlThreadPoolPtr pool_ptr) {
   return [mng_ptr, proteo_ptr, spec_ptr, pool_ptr]() {
     GraphAlignPtr graph_align 
         = std::make_shared<GraphAlign>(mng_ptr, proteo_ptr, spec_ptr);
@@ -71,7 +72,7 @@ void GraphAlignProcessor::process() {
   while ((proteo_ptr = reader.getNextProteoGraphPtr()) != nullptr) {
     std::string output_file_name = base_file_name + "_" + std::to_string(proteo_count);
     int sp_count = 0;
-    ThreadPoolPtr pool_ptr(new ThreadPool(mng_ptr_->thread_num_, output_file_name));
+    PrsmXmlThreadPoolPtr pool_ptr = std::make_shared<ThreadPool<PrsmXmlWriter>>(mng_ptr_->thread_num_, output_file_name);
     SpecGraphReader spec_reader(sp_file_name, 
                                 prsm_para_ptr->getGroupSpecNum(),
                                 mng_ptr_->convert_ratio_,

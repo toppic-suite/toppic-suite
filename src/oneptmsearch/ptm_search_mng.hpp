@@ -10,19 +10,23 @@ class PtmSearchMng {
  public :
   PtmSearchMng(PrsmParaPtr prsm_para_ptr, int n_report, 
                double align_max_shift, int shift_num, 
+               int thread_num,
                const std::string &input_file_ext, 
                const std::string &output_file_ext) {
     prsm_para_ptr_ = prsm_para_ptr;
     n_report_ = n_report;
+    thread_num_ = thread_num;
     input_file_ext_ = input_file_ext;
     output_file_ext_ = output_file_ext;
     align_para_ptr_ = PsAlignParaPtr(new PsAlignPara(shift_num, align_max_shift));
   }
-  
+
   PrsmParaPtr prsm_para_ptr_;
 
   /* parameters for ptm search */
   int n_report_ = 1;
+
+  int thread_num_ = 1;
 
   std::string input_file_ext_;
   std::string output_file_ext_;
