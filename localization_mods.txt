@@ -1,0 +1,30 @@
+# This file is used to specify modifications
+# # for comments
+# To input a modification, use the following format:
+#
+# Name,Mass,Residues,Position,UnimodID
+#
+# Name: name of the modification (Unimod PSI-MS name)
+# 	- The Unimod PSI-MS names are recommended
+# 	- E.g. Phospho, Acetyl
+# 	- Visit http://www.unimod.org to get PSI-MS names.
+#
+# Mass: monoisotopic mass of modification. 
+#   - It is important to specify accurate masses (integer masses are insufficient).
+# 	- E.g. 15.994915 
+#
+# Residues: amino acids that can be modified
+# 	- Use * if this modification is applicable to all the 20 amino acids. 
+#
+# Position: positions in the protein where the modification can be attached. 
+# 	- One of the following three values should be used:
+# 	- any (anywhere), N-term, C-term
+#
+# UnimodID: unmimod id of the modification
+#   - Please use -1, if not in unimod
+
+Acetyl,42.010565,K,any,1
+Phospho,79.966331,STY,any,21
+Oxidation,15.994915,CPKDNRY,any,35
+Methyl,14.015650,*,N-term,34
+Methyl,14.015650,CKRHDENQ,any,34
