@@ -15,6 +15,7 @@ namespace prot {
 
 typedef std::shared_ptr<boost::thread> ThreadPtr;
 
+template <typename T>
 class ThreadPool {
  public:
 
@@ -34,14 +35,14 @@ class ThreadPool {
 
   int getThreadNum() {return threadPool.size();}
 
-  PrsmXmlWriterPtr getWriter(boost::thread::id thread_id);
+  std::shared_ptr<T> getWriter(boost::thread::id thread_id);
 
  private:
   // Thread pool storage.
   std::vector<ThreadPtr> threadPool;
 
   // prsm writer pool
-  std::vector<std::pair<boost::thread::id, PrsmXmlWriterPtr>> writerPool;
+  std::vector<std::pair<boost::thread::id, std::shared_ptr<T>>> writerPool;
 
   // Queue to keep track of incoming tasks.
   std::queue<std::function<void()> > tasks;
@@ -67,7 +68,10 @@ class ThreadPool {
 
 };
 
-typedef std::shared_ptr<ThreadPool> ThreadPoolPtr;
+//typedef std::shared_ptr<ThreadPool> ThreadPoolPtr;
 
 }
+
+#include "threadpool_impl.hpp"
+
 #endif

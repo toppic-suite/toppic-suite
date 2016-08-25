@@ -75,6 +75,7 @@ int two_base_opt(int argc, char* argv[]) {
     int ptm_num = std::stoi(arguments["ptmNumber"]);
     double max_ptm_mass = std::stod(arguments["maxPtmMass"]);
     int filter_result_num = std::stoi(arguments["filteringResultNumber"]);
+    int thread_num = std::stoi(arguments["threadNumber"]);
 
     bool use_gf = false; 
     if (arguments["useGf"] == "true") {
@@ -132,7 +133,7 @@ int two_base_opt(int argc, char* argv[]) {
       std::cout << "One PTM search - started." << std::endl;
       int shift_num = 1;
       PtmSearchMngPtr one_search_mng_ptr 
-          = PtmSearchMngPtr(new PtmSearchMng (prsm_para_ptr, n_top, max_ptm_mass, shift_num, "ONE_PTM_FILTER", "ONE_PTM"));
+          = PtmSearchMngPtr(new PtmSearchMng (prsm_para_ptr, n_top, max_ptm_mass, shift_num, thread_num, "ONE_PTM_FILTER", "ONE_PTM"));
       OnePtmSearch::process(one_search_mng_ptr);
       WebLog::completeFunction(WebLog::OnePtmSearchTime());
       std::cout << "One PTM search - finished." << std::endl;
@@ -146,7 +147,7 @@ int two_base_opt(int argc, char* argv[]) {
     if (ptm_num >= 2) {
       std::cout << "Diagonal PTM filtering - started." << std::endl;
       DiagFilterMngPtr diag_filter_mng_ptr 
-          = DiagFilterMngPtr(new DiagFilterMng (prsm_para_ptr, filter_result_num, "DIAG_FILTER"));
+          = DiagFilterMngPtr(new DiagFilterMng (prsm_para_ptr, filter_result_num, thread_num, "DIAG_FILTER"));
       DiagFilterProcessorPtr diag_filter_processor 
           = DiagFilterProcessorPtr(new DiagFilterProcessor(diag_filter_mng_ptr));
       diag_filter_processor->process();
@@ -155,7 +156,7 @@ int two_base_opt(int argc, char* argv[]) {
 
       std::cout << "Two PTM search - started." << std::endl;
       PtmSearchMngPtr two_search_mng_ptr 
-          = PtmSearchMngPtr(new PtmSearchMng (prsm_para_ptr, n_top, max_ptm_mass, ptm_num,
+          = PtmSearchMngPtr(new PtmSearchMng (prsm_para_ptr, n_top, max_ptm_mass, ptm_num, thread_num,
                                               "DIAG_FILTER", "PTM"));
       PtmSearchProcessorPtr processor = PtmSearchProcessorPtr(new PtmSearchProcessor(two_search_mng_ptr));
       processor->process();

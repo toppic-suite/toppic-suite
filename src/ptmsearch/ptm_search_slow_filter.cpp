@@ -7,7 +7,7 @@ namespace prot {
 PtmSearchSlowFilter::PtmSearchSlowFilter(
     SpectrumSetPtr spectrum_set_ptr,
     SimplePrsmPtrVec simple_prsm_ptrs,
-    CompShiftLowMemPtr comp_shift_ptr,
+    CompShiftLowMem comp_shift,
     PtmSearchMngPtr mng_ptr){
 
   std::string db_file_name = mng_ptr->prsm_para_ptr_->getSearchDbFileName();
@@ -27,7 +27,7 @@ PtmSearchSlowFilter::PtmSearchSlowFilter(
       // include more diagonals. 
       PtmSlowMatchPtr ptm_slow_match_ptr(new PtmSlowMatch(mod_form_ptr_vec[j],spectrum_set_ptr,
                                                           AlignType::INTERNAL,
-                                                          comp_shift_ptr,mng_ptr));
+                                                          comp_shift, mng_ptr));
       complete_prefix_slow_match_ptrs_.push_back(ptm_slow_match_ptr);
     }
   }

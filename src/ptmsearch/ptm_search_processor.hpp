@@ -11,6 +11,18 @@
 
 namespace prot {
 
+template <int N>
+class PrsmXmlWriterSet {
+ public:
+  PrsmXmlWriterSet(const std::string & output_file_name);
+  std::vector<PrsmXmlWriterPtr> complete_writer_ptrs_;
+  std::vector<PrsmXmlWriterPtr> prefix_writer_ptrs_;
+  std::vector<PrsmXmlWriterPtr> suffix_writer_ptrs_;
+  std::vector<PrsmXmlWriterPtr> internal_writer_ptrs_;
+  PrsmXmlWriterPtr all_writer_ptr_;
+  void close();
+};
+
 class PtmSearchProcessor {
  public:
   PtmSearchProcessor(PtmSearchMngPtr mng_ptr);
@@ -19,22 +31,12 @@ class PtmSearchProcessor {
 
  private:
   PtmSearchMngPtr mng_ptr_;
-  CompShiftLowMemPtr comp_shift_ptr_;
-
-  std::vector<PrsmXmlWriterPtr> complete_writer_ptrs_;
-  std::vector<PrsmXmlWriterPtr> prefix_writer_ptrs_;
-  std::vector<PrsmXmlWriterPtr> suffix_writer_ptrs_;
-  std::vector<PrsmXmlWriterPtr> internal_writer_ptrs_;
-  PrsmXmlWriterPtr all_writer_ptr_;
+  CompShiftLowMem comp_shift_;
 
   ProteoformPtrVec proteo_ptrs_;
   ProteoformPtrVec2D mod_proteo_2d_ptrs_;
   SimplePrsmPtrVec simple_prsm_ptrs_;
 
-  void initWriters();
-  void closeWriters();
-  void processOneSpectrum(SpectrumSetPtr spectrum_set_ptr, 
-                          SimplePrsmPtrVec simple_prsm_ptrs);
 };
 
 typedef std::shared_ptr<PtmSearchProcessor> PtmSearchProcessorPtr;
