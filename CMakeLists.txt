@@ -51,7 +51,7 @@ file(GLOB ARGU_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/argument.cpp)
 file(GLOB MAIN_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic.cpp) 
 file(GLOB GRAPH_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/graph/*.cpp)
 file(GLOB GRAPH_ALIGN_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/graphalign/*.cpp)
-file(GLOB GRAPH_MAIN ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_graph_align.cpp)
+file(GLOB GRAPH_MAIN ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_mg.cpp)
 
 file(GLOB TEST_ZERO_PTM_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_zero_ptm.cpp) 
 file(GLOB TEST_DIAG_FILTER_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_diag_filter.cpp) 
@@ -67,9 +67,9 @@ add_executable(toppic ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
     ${PTM_SRCS} ${TDGF_SRCS} ${LOCAL_SRCS} ${PRSM_VIEW_SRCS} ${ARGU_SRCS} ${MAIN_SRCS})
 set_target_properties(toppic PROPERTIES COMPILE_FLAGS "-DTOPPIC")
 
-add_executable(test_graph ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
+add_executable(toppic_mg ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
     ${GRAPH_SRCS} ${GRAPH_ALIGN_SRCS} ${ARGU_SRCS} ${LOCAL_ANNO} ${ONE_PTM_SEARCH_SRCS} ${GRAPH_MAIN})
-set_target_properties(test_graph PROPERTIES COMPILE_FLAGS "-DMASS_GRAPH")
+set_target_properties(toppic_mg PROPERTIES COMPILE_FLAGS "-DMASS_GRAPH")
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     # Windows specific code
@@ -77,7 +77,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
         boost_filesystem-mgw48-mt-s-1_60 boost_system-mgw48-mt-s-1_60
         boost_program_options-mgw48-mt-s-1_60 boost_thread-mgw48-mt-s-1_60 hts pthread z Ws2_32)
 
-    target_link_libraries(test_graph xalan-c xalanMsg xerces-c
+    target_link_libraries(toppic_mg xalan-c xalanMsg xerces-c
         boost_filesystem-mgw48-mt-s-1_60 boost_system-mgw48-mt-s-1_60
         boost_program_options-mgw48-mt-s-1_60 boost_thread-mgw48-mt-s-1_60 hts pthread z Ws2_32)		
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows") 
@@ -88,7 +88,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     target_link_libraries(toppic xalan-c xalanMsg xerces-c boost_program_options
         boost_filesystem boost_system boost_thread hts pthread z)
 
-    target_link_libraries(test_graph xalan-c xalanMsg xerces-c boost_program_options
+    target_link_libraries(toppic_mg xalan-c xalanMsg xerces-c boost_program_options
         boost_filesystem boost_system boost_thread hts pthread z)
 
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 

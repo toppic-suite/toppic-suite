@@ -5,6 +5,15 @@ releases/*
 
 *.o
 *.so
+*.dll
 .ycm_extra_conf.py
 .ycm_extra_conf.pyc
 *.pyc
+*.swp
+*.out
+*.OUTPUT_RESULT
+*.OUTPUT_TABLE
+*.RAW_RESULT
+*.TOP
+*.TOP_PRE
+*.ZERO
