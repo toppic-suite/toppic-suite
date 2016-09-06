@@ -28,7 +28,7 @@ void DeconvArgument::initArguments() {
 }
 
 void DeconvArgument::outputArguments(std::ostream &output, 
-                               std::map<std::string, std::string> arguments) {
+                                     std::map<std::string, std::string> arguments) {
   output << "********************** Parameters **********************" << std::endl;
   output << std::setw(44) << std::left << "Spectral file: " << "\t" << arguments["spectrumFileName"] << std::endl;
   output << "********************** Parameters **********************" << std::endl;

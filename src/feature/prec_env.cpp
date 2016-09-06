@@ -126,7 +126,7 @@ MatchEnvPtr findBest(MatchEnvPtr2D &env_ptrs) {
 }
 
 RealEnvPtr PrecEnv::deconv(double prec_win_size, PeakPtrVec &peak_list, 
-                         double prec_mz, int prec_charge) {
+                           double prec_mz, int prec_charge) {
   LOG_DEBUG("Prec: " << prec_mz << " charge: " << prec_charge);
   if (prec_mz <= 0) {
     return nullptr;

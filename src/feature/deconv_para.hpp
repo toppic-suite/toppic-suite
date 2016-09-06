@@ -23,6 +23,7 @@ class DeconvPara {
   int setInputType (std::string &format);
 
   std::string data_file_name_;
+  std::string exec_dir_;
   InputType input_type_;
   OutputType output_type_;
 

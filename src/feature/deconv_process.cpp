@@ -39,7 +39,7 @@ void DeconvProcess::updateMsg(MsHeaderPtr header_ptr, int scan, int total_scan_n
 }
 
 void DeconvProcess::process() {
-  FeatureMngPtr mng_ptr(new FeatureMng());
+  FeatureMngPtr mng_ptr(new FeatureMng(para_ptr_->exec_dir_));
   copyParameters(mng_ptr);
   printParameter(mng_ptr);
 
