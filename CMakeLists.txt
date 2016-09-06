@@ -52,6 +52,8 @@ file(GLOB MAIN_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic.cpp)
 file(GLOB GRAPH_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/graph/*.cpp)
 file(GLOB GRAPH_ALIGN_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/graphalign/*.cpp)
 file(GLOB GRAPH_MAIN ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_mg.cpp)
+file(GLOB FEATURE_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/feature/*.cpp)
+file(GLOB FEATURE_MAIN   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd.cpp)
 
 file(GLOB TEST_ZERO_PTM_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_zero_ptm.cpp) 
 file(GLOB TEST_DIAG_FILTER_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_diag_filter.cpp) 
@@ -70,6 +72,8 @@ set_target_properties(toppic PROPERTIES COMPILE_FLAGS "-DTOPPIC")
 add_executable(toppic_mg ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
     ${GRAPH_SRCS} ${GRAPH_ALIGN_SRCS} ${ARGU_SRCS} ${LOCAL_ANNO} ${ONE_PTM_SEARCH_SRCS} ${GRAPH_MAIN})
 set_target_properties(toppic_mg PROPERTIES COMPILE_FLAGS "-DMASS_GRAPH")
+
+add_executable(topfd ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS} ${LOCAL_ANNO} ${FEATURE_MAIN})
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     # Windows specific code
@@ -90,6 +94,9 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
     target_link_libraries(toppic_mg xalan-c xalanMsg xerces-c boost_program_options
         boost_filesystem boost_system boost_thread hts pthread z)
+
+    target_link_libraries(topfd pwiz xalan-c xalanMsg xerces-c boost_program_options
+        boost_filesystem boost_system boost_thread boost_iostreams boost_regex hts pthread z)
 
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
 

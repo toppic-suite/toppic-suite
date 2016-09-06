@@ -22,14 +22,12 @@ int deconvProcess(int argc, char* argv[]) {
     std::map<std::string, std::string> arguments = argu_processor.getArguments();
     LOG_DEBUG("parse complete");
 
-    /*
     DeconvParaPtr para_ptr(new DeconvPara(arguments));
     LOG_DEBUG("deconv para");
     DeconvProcess process(para_ptr);
     LOG_DEBUG("init process");
     process.process();
-    */
-    
+
     std::string spec_file_name = arguments["spectrumFileName"];
     LOG_DEBUG("file name " << spec_file_name);
     FeatureDetect::process(spec_file_name);    
