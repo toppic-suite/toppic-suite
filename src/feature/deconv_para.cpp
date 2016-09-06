@@ -1,3 +1,5 @@
+
+#include <iostream>
 #include "feature/deconv_para.hpp"
 
 namespace prot {
@@ -15,6 +17,7 @@ DeconvPara::DeconvPara(std::map<std::string, std::string> &arguments) {
   sn_ratio_ = std::stod(arguments["snRatio"]);
   keep_unused_peaks_ = (arguments["keepUnusedPeaks"] == "true");
   prec_window_ = std::stod(arguments["precWindow"]);
+  exec_dir_ = arguments["executiveDir"];
 }
 
 int DeconvPara::setOutputType (std::string &format) {
@@ -38,6 +41,6 @@ int DeconvPara::setInputType (std::string &format) {
   }
   return 0;
 }
-    
+
 
 }

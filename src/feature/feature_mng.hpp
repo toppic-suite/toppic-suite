@@ -7,7 +7,7 @@ namespace prot {
 
 class FeatureMng {
  public:
-  FeatureMng();
+  FeatureMng(const std::string & exec_dir = "");
 
   int getMassGroup(double base_mass);
 
@@ -44,11 +44,11 @@ class FeatureMng {
 
   // Distribution Envelope factory 
   // initialized before deconvolution 
-  
-   static EnvBasePtr env_base_ptr_;
-   std::string distr_file_name_ = "/toppic_resources/base_data/theo_patt.txt";
-   int distr_entry_num_ =  11000;
-   double distr_mass_interval_ = 10;
+
+  static EnvBasePtr env_base_ptr_;
+  std::string distr_file_name_ = "/toppic_resources/base_data/theo_patt.txt";
+  int distr_entry_num_ =  11000;
+  double distr_mass_interval_ = 10;
   // the minimum monoisotopic envelope for an envelope 
   double min_mass_ = 50;
 
@@ -67,7 +67,7 @@ class FeatureMng {
   double mz_tolerance_ = 0.02;
 
   // Envelope filtering
-  
+
   // 1. filtering based on real envelop an real envelope is valid if 1) peak
   // number >= 3 2) at most 1 missing peak 3) consecutive peak number >=
   // peak_num - 3, 3

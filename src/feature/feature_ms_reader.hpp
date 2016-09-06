@@ -12,7 +12,7 @@ namespace prot {
 class FeatureMsReader {
  public:
   FeatureMsReader(std::string &file_name);
-  
+
   RawMsPtr getNextMs(double prec_win_size);
 
   void refinePrecChrg(RawMsPtr ms_one, RawMsPtr ms_two, 
