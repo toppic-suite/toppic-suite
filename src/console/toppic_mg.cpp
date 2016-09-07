@@ -10,9 +10,11 @@
 
 #include "prsm/prsm_para.hpp"
 #include "prsm/prsm_str_combine.hpp"
+#include "prsm/prsm_form_filter.hpp"
 #include "prsm/prsm_top_selector.hpp"
 #include "prsm/prsm_cutoff_selector.hpp"
 #include "prsm/prsm_species.hpp"
+#include "prsm/prsm_feature_species.hpp"
 #include "prsm/prsm_table_writer.hpp"
 
 #include "console/argument.hpp"
@@ -128,11 +130,11 @@ int proteoform_graph_test(int argc, char* argv[]) {
     std::istringstream(arguments["errorTolerance"]) >> ppo;
     ppo = ppo / 1000000.0;
     ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();
-    PrsmSpeciesPtr prsm_species = PrsmSpeciesPtr(
-        new PrsmSpecies(db_file_name, sp_file_name, "CUTOFF_RESULT",
-                        fix_mod_list, "OUTPUT_RESULT",ppo));
-    prsm_species->process();
-    prsm_species = nullptr;
+    PrsmFeatureSpeciesPtr prsm_forms = PrsmFeatureSpeciesPtr(
+        new PrsmFeatureSpecies(db_file_name, sp_file_name, "CUTOFF_RESULT",
+                               "FORMS", fix_mod_list));
+    prsm_forms->process();
+    prsm_forms = nullptr;
     std::cout << "Finding protein species finished." << std::endl;
 
     time_t end = time(0);
@@ -141,11 +143,24 @@ int proteoform_graph_test(int argc, char* argv[]) {
 
     std::cout << "Outputting table starts " << std::endl;
     PrsmTableWriterPtr table_out = PrsmTableWriterPtr(
-        new PrsmTableWriter(prsm_para_ptr, arguments, "OUTPUT_RESULT", "OUTPUT_TABLE"));
+        new PrsmTableWriter(prsm_para_ptr, arguments, "FORMS", "OUTPUT_TABLE"));
     table_out->write();
     table_out = nullptr;
     std::cout << "Outputting table finished." << std::endl;
 
+    std::cout << "PRSM proteoform filtering - started." << std::endl;
+    PrsmFormFilterPtr form_filter = PrsmFormFilterPtr(
+        new PrsmFormFilter(db_file_name, sp_file_name, "FORMS", "FORM_FILTER_RESULT", "FORM_RESULT"));
+    form_filter->process();
+    form_filter = nullptr;
+    std::cout << "PRSM proteoform filtering - finished." << std::endl;
+
+    std::cout << "Outputting the proteoform table - started." << std::endl;
+    PrsmTableWriterPtr form_out = PrsmTableWriterPtr(
+        new PrsmTableWriter(prsm_para_ptr, arguments, "FORM_RESULT", "FORM_OUTPUT_TABLE"));
+    form_out->write();
+    form_out = nullptr;
+    std::cout << "Outputting the proteoform table - finished." << std::endl;
     /*std::cout << "Generating view xml files started." << std::endl;*/
     //XmlGeneratorPtr xml_gene = XmlGeneratorPtr(new XmlGenerator(prsm_para_ptr, exe_dir, "OUTPUT_RESULT"));
     //xml_gene->process();
