@@ -214,16 +214,16 @@ void groupHeaders(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtrVec &header_ptr_vec,
     }
     //LOG_DEBUG("sorted ptr size " << sorted_ptrs.size());
   }
-  for (size_t i = 0; i < result_groups.size(); i++) {
-    std::cout << "Group " << i << " number " << result_groups[i].size() << " ms1 scan begin " << features[i]->getScanBegin();
-    std::cout << " ms1 scan end " << features[i]->getScanEnd() << " inte " << features[i]->getIntensity() << std::endl;
-    for (size_t j = 0; j < result_groups[i].size(); j++) {
-      MsHeaderPtr ptr = result_groups[i][j];
-      std::cout << "\t" << ptr->getId() << "\t" << ptr->getFirstScanNum() << "\t";
-      std::cout <<  (ptr->getRetentionTime()/60) << "\t" << ptr->getPrecMonoMass() << "\t";
-      std::cout << ptr->getPrecMonoMz() << "\t" << ptr->getPrecCharge() << "\t" << ptr->getPrecInte() << std::endl; 
-    }
-  }
+  /*for (size_t i = 0; i < result_groups.size(); i++) {*/
+    //std::cout << "Group " << i << " number " << result_groups[i].size() << " ms1 scan begin " << features[i]->getScanBegin();
+    //std::cout << " ms1 scan end " << features[i]->getScanEnd() << " inte " << features[i]->getIntensity() << std::endl;
+    //for (size_t j = 0; j < result_groups[i].size(); j++) {
+      //MsHeaderPtr ptr = result_groups[i][j];
+      //std::cout << "\t" << ptr->getId() << "\t" << ptr->getFirstScanNum() << "\t";
+      //std::cout <<  (ptr->getRetentionTime()/60) << "\t" << ptr->getPrecMonoMass() << "\t";
+      //std::cout << ptr->getPrecMonoMz() << "\t" << ptr->getPrecCharge() << "\t" << ptr->getPrecInte() << std::endl; 
+    //}
+  /*}*/
 }
 
 void setFeatures(MsHeaderPtr2D &header_groups, FeaturePtrVec &features) {

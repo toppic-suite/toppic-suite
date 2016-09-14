@@ -16,9 +16,9 @@ void DeconvProcess::copyParameters(FeatureMngPtr mng_ptr) {
 }
 
 void DeconvProcess::printParameter(FeatureMngPtr mng_ptr) {
-  std::cout << "TopFD " << std::endl;
+  std::cout << "TopFD 1.0.0 (" << __DATE__ << ")" << std::endl;
   std::cout << "********* parameters begin **********" << std::endl;
-  std::cout << "output file format:    " <<  para_ptr_->output_type_ << std::endl;
+  std::cout << "output file format:    " << para_ptr_->output_type_ << std::endl;
   std::cout << "data type:             " << "centroided" << std::endl;
   std::cout << "maximum charge:        " << mng_ptr->max_charge_ << std::endl;
   std::cout << "maximum mass:          " << mng_ptr->max_mass_ << std::endl;
@@ -78,8 +78,8 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr, FeatureMsReaderPtr read
     if (header_ptr->getMsLevel() == 1 &&  para_ptr_->ms_level_ != 1) {
       continue;
     }
-    int scan_num_ = header_ptr->getFirstScanNum();
-    updateMsg(header_ptr, scan_num_, total_scan_num);
+    //int scan_num_ = header_ptr->getFirstScanNum();
+    updateMsg(header_ptr, count1 + count2 + 1, total_scan_num);
     std::cout << "\r" << msg_;
     LOG_DEBUG("set data....");
     if (header_ptr->getMsLevel() == 1) {
@@ -111,7 +111,7 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr, FeatureMsReaderPtr read
       count2++;
     }
   }
-  std::cout <<"Deconvolution finished." << std::endl;
+  //std::cout <<"Deconvolution finished." << std::endl;
 }
 
 }
