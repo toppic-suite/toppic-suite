@@ -69,6 +69,11 @@ int RawMsReader::readNext() {
   std::vector<pwiz::msdata::MZIntensityPair> pairs;
   cur_spec_ptr->getMZIntensityPairs(pairs);
   LOG_DEBUG("mz pair size " << pairs.size()); 
+  // make sure the peak list is already sorted
+  std::sort(pairs.begin(), pairs.end(),
+    [](const pwiz::msdata::MZIntensityPair &a, const pwiz::msdata::MZIntensityPair& b) {
+      return a.mz < b.mz;
+    }); 
   pwiz::msdata::SpectrumInfo spec_info(*cur_spec_ptr);
   for (size_t i = 0; i < pairs.size(); i++) {
     PeakPtr peak_ptr (new Peak(pairs[i].mz, pairs[i].intensity));
