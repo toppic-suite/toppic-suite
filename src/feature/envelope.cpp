@@ -34,7 +34,6 @@
 #include "base/logger.hpp"
 #include "base/mass_constant.hpp"
 #include "feature/envelope.hpp" 
-#include "feature/envelope_util.hpp" 
 
 namespace prot {
 
@@ -52,29 +51,32 @@ Envelope::Envelope(int num, std::vector<std::string> &line_list) {
   //LOG_DEBUG("line list size " << line_list.size() << " num " << num);
   boost::split(words, line_list[0], boost::is_any_of(" "));
   mono_mz_ = std::stod(words[7]);
+  mzs_.resize(num);
+  intensities_.resize(num);
   for (int i = 0; i < num; i++) {
     boost::split(words, line_list[i+1], boost::is_any_of(" "));
-    mzs_.push_back(std::stod(words[0]));
-    intensities_.push_back(std::stod(words[1])/100);
+    mzs_[i] = std::stod(words[0]);
+    intensities_[i] = std::stod(words[1])/100;
   }
-  refer_idx_ = EnvelopeUtil::getMaxPos(intensities_);
+  refer_idx_ = std::distance(intensities_.begin(), std::max_element(intensities_.begin(), intensities_.end()));
+  //EnvelopeUtil::getMaxPos(intensities_);
 }
 
 Envelope::Envelope(int refer_idx, int charge, double mono_mz,
                    std::vector<double> &mzs, std::vector<double> &intensities):
-      refer_idx_(refer_idx),
-      charge_(charge),
-      mono_mz_(mono_mz),
-      mzs_(mzs),
-      intensities_(intensities) {
-      }
+    refer_idx_(refer_idx),
+    charge_(charge),
+    mono_mz_(mono_mz),
+    mzs_(mzs),
+    intensities_(intensities) {
+    }
 
 EnvelopePtr Envelope::convertToTheo(double mass_diff, int new_charge) {
   double new_mono_mz = (mono_mz_ + mass_diff) / new_charge;
-  std::vector<double> new_mzs;
+  std::vector<double> new_mzs(mzs_.size());
   for (size_t i = 0; i < mzs_.size(); i++) {
     double new_value = (mzs_[i] + mass_diff)/ new_charge;
-    new_mzs.push_back(new_value);
+    new_mzs[i] = new_value;
   }
   EnvelopePtr env_ptr(new Envelope(refer_idx_, new_charge, new_mono_mz, 
                                    new_mzs, intensities_));

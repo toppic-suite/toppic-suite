@@ -41,20 +41,7 @@
 
 namespace prot {
 
-void RawMsUtil::sortOnPos(PeakPtrVec &ptr_list) {
-  for (size_t i = 0; i < ptr_list.size(); i++) {
-    for (size_t j = i + 1; j < ptr_list.size(); j++) {
-      if (ptr_list[i]->getPosition() > ptr_list[j]->getPosition()) {
-        PeakPtr tmp = ptr_list[i];
-        ptr_list[i] = ptr_list[j];
-        ptr_list[j] = tmp;
-      }
-    }
-  }
-}
-
 double RawMsUtil::findMaxPos(PeakPtrVec &ptr_list) {
-  sortOnPos(ptr_list);
   return ptr_list[ptr_list.size() -1]->getPosition();
 }
 

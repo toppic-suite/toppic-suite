@@ -40,15 +40,12 @@ MatchEnvPtr2D EnvDetect::getCandidate(DeconvDataPtr data_ptr, FeatureMngPtr mng_
   int peak_num = peak_list.size();
   int max_charge = data_ptr->getMaxCharge();
   LOG_DEBUG("get candidate " << peak_num << " " << max_charge);
-  MatchEnvPtr2D match_envs;
+  MatchEnvPtr2D match_envs(peak_num);
   for (int idx = 0; idx < peak_num; idx++) {
-    MatchEnvPtrVec envs;
+    match_envs[idx].resize(max_charge);
     for (int charge = 1; charge <= max_charge; charge++) {
-      MatchEnvPtr env =  detectEnv(peak_list, idx, charge, data_ptr->getMaxMass(), mng_ptr);
-      //LOG_DEBUG("detect complete ");
-      envs.push_back(env);
+      match_envs[idx][charge - 1] = detectEnv(peak_list, idx, charge, data_ptr->getMaxMass(), mng_ptr);
     }
-    match_envs.push_back(envs);
   }
   return match_envs;
 }
@@ -72,6 +69,10 @@ MatchEnvPtr EnvDetect::detectEnv(PeakPtrVec &peak_list, int base_peak,
     return nullptr;
   }
 
+  // LOG_DEBUG("intensity " << peak_list[base_peak]->getIntensity() << " min refer inte " << mng_ptr->min_refer_inte_);
+  if (peak_list[base_peak]->getIntensity() < mng_ptr->min_refer_inte_) {
+    return nullptr;
+  }
   // convert the reference distribution to a theoretical distribution
   // based on the base mz and charge state
   EnvelopePtr theo_env = ref_env->distrToTheoBase(base_mz, charge);
@@ -88,10 +89,6 @@ MatchEnvPtr EnvDetect::detectEnv(PeakPtrVec &peak_list, int base_peak,
   theo_env = theo_env->getSubEnv(percentage, mng_ptr->min_inte_,
                                  mng_ptr->max_back_peak_num_, mng_ptr->max_forw_peak_num_);
   // get real envelope 
-  // LOG_DEBUG("intensity " << peak_list[base_peak]->getIntensity() << " min refer inte " << mng_ptr->min_refer_inte_);
-  if (peak_list[base_peak]->getIntensity() < mng_ptr->min_refer_inte_) {
-    return nullptr;
-  }
   RealEnvPtr real_env(new RealEnv(peak_list, theo_env, mng_ptr->mz_tolerance_,
                                   mng_ptr->min_inte_));
   MatchEnvPtr match_env(new MatchEnv(mass_group, theo_env, real_env));

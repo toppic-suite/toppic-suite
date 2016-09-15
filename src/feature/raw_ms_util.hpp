@@ -42,8 +42,6 @@ namespace prot {
 
 class RawMsUtil {
  public: 
-  static void sortOnPos(PeakPtrVec &ptr_list);
-
   static double findMaxPos(PeakPtrVec &ptr_list);
 
   static int searchPos(PeakPtrVec &ptr_list, double pos);
