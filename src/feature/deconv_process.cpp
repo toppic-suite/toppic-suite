@@ -55,8 +55,8 @@ void DeconvProcess::printParameter(FeatureMngPtr mng_ptr) {
   std::cout << "maximum mass:          " << mng_ptr->max_mass_ << std::endl;
   std::cout << "m/z error tolerance:   " << mng_ptr->mz_tolerance_ << std::endl;
   std::cout << "sn ratio:              " << mng_ptr->sn_ratio_ << std::endl;
-  std::cout << "keep unused peak:      " << mng_ptr->keep_unused_peaks_ << std::endl;
-  std::cout << "output multiple mass:  " << mng_ptr->output_multiple_mass_ << std::endl;
+  std::cout << "keep unused peak:      " << (mng_ptr->keep_unused_peaks_? "True":"False") << std::endl;
+  std::cout << "output multiple mass:  " << (mng_ptr->output_multiple_mass_? "True":"False") << std::endl;
   std::cout << "********* parameters end   **********" << std::endl;
 }
 
