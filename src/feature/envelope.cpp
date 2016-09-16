@@ -78,9 +78,8 @@ EnvelopePtr Envelope::convertToTheo(double mass_diff, int new_charge) {
     double new_value = (mzs_[i] + mass_diff)/ new_charge;
     new_mzs[i] = new_value;
   }
-  EnvelopePtr env_ptr(new Envelope(refer_idx_, new_charge, new_mono_mz, 
-                                   new_mzs, intensities_));
-  return env_ptr;
+  return std::make_shared<Envelope>(refer_idx_, new_charge, new_mono_mz, 
+                                    new_mzs, intensities_);
 }
 
 // Convert a theoretical distribution to a theoretical envelope
