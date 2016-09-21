@@ -2,7 +2,7 @@
 import sys
 import os
 from decimal import Decimal
-from util import *
+from util2 import *
 
 if len(sys.argv) < 4:
     print "Usage: " + sys.argv[0] + " msalign_file_name scan"
