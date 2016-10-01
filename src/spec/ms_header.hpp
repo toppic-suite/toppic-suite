@@ -32,6 +32,8 @@
 #ifndef PROT_SPEC_MS_HEADER_HPP_
 #define PROT_SPEC_MS_HEADER_HPP_
 
+#include <cmath>
+
 #include "base/activation.hpp"
 
 namespace prot {
@@ -82,7 +84,13 @@ class MsHeader {
 
   int getPrecCharge() {return prec_charge_;}
 
-  double getPrecMonoMz() {return prec_mono_mz_;}
+  double getPrecMonoMz() {
+    if (std::isnan(prec_mono_mz_)) {
+      return 0.0; 
+    } else {
+      return prec_mono_mz_;
+    }
+  }
 
   double getRetentionTime() {return retention_time_;}
 
@@ -113,8 +121,7 @@ class MsHeader {
 
   void setPrecMonoMz(double prec_mono_mz) {prec_mono_mz_ = prec_mono_mz;}
 
-  void setRetentionTime(double retention_time) {
-    retention_time_ = retention_time;}
+  void setRetentionTime(double retention_time) {retention_time_ = retention_time;}
 
   void setScan(int scan_num) {scans_.push_back(scan_num);}
 
