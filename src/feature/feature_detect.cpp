@@ -44,7 +44,7 @@ namespace prot {
 void readSpectra(std::string &file_name, DeconvMsPtrVec &ms_ptr_vec) {
   int sp_num_in_group = 1;
   MsAlignReader sp_reader(file_name, sp_num_in_group, nullptr);
-  
+
   DeconvMsPtr ms_ptr;
   //LOG_DEBUG("Start search");
   while((ms_ptr = sp_reader.getNextMs())!= nullptr){
@@ -58,7 +58,7 @@ void readSpectra(std::string &file_name, DeconvMsPtrVec &ms_ptr_vec) {
 void readHeaders(std::string &file_name, MsHeaderPtrVec &header_ptr_vec) {
   int sp_num_in_group = 1;
   MsAlignReader sp_reader(file_name, sp_num_in_group, nullptr);
-  
+
   DeconvMsPtr ms_ptr;
   //LOG_DEBUG("Start search");
   while((ms_ptr = sp_reader.getNextMs())!= nullptr){
@@ -88,7 +88,7 @@ bool isConsistent(MsHeaderPtr &a, MsHeaderPtr &b, FeatureDetectMngPtr mng_ptr) {
       min_diff = mass_diff;
     }
   }
-  
+
   double error_tole = mng_ptr->peak_tolerance_ptr_->compStrictErrorTole(a->getPrecMonoMass());
   if (min_diff <= error_tole) {
     return true;
@@ -97,6 +97,7 @@ bool isConsistent(MsHeaderPtr &a, MsHeaderPtr &b, FeatureDetectMngPtr mng_ptr) {
 }
 
 bool containPrecursor(DeconvMsPtr ms1_ptr, MsHeaderPtr best_ptr, FeatureDetectMngPtr mng_ptr) {
+  if (ms1_ptr == nullptr) return false;
   double prec_mass = best_ptr->getPrecMonoMass();
   //double prec_chrg = best_ptr->getPrecCharge();
   std::vector<double> ext_masses = mng_ptr->getExtMasses(prec_mass);
@@ -114,7 +115,7 @@ bool containPrecursor(DeconvMsPtr ms1_ptr, MsHeaderPtr best_ptr, FeatureDetectMn
     }
     //}
   }
-  
+
   double error_tole = mng_ptr->peak_tolerance_ptr_->compStrictErrorTole(prec_mass);
   if (min_diff <= error_tole) {
     return true;
@@ -123,7 +124,7 @@ bool containPrecursor(DeconvMsPtr ms1_ptr, MsHeaderPtr best_ptr, FeatureDetectMn
 }
 
 int getMs1IdBegin(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtr best_ptr, 
-                    FeatureDetectMngPtr mng_ptr) {
+                  FeatureDetectMngPtr mng_ptr) {
   int cur_id = best_ptr->getMsOneId();
   while (cur_id > 0) {
     if (containPrecursor(ms1_ptr_vec[cur_id-1], best_ptr, mng_ptr)) {
@@ -137,7 +138,7 @@ int getMs1IdBegin(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtr best_ptr,
 }
 
 int getMs1IdEnd(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtr best_ptr, 
-                  FeatureDetectMngPtr mng_ptr) {
+                FeatureDetectMngPtr mng_ptr) {
   int cur_id = best_ptr->getMsOneId();
   while (cur_id < (int)ms1_ptr_vec.size()-1) {
     if (containPrecursor(ms1_ptr_vec[cur_id+1], best_ptr, mng_ptr)) {
@@ -246,14 +247,14 @@ void groupHeaders(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtrVec &header_ptr_vec,
     //LOG_DEBUG("sorted ptr size " << sorted_ptrs.size());
   }
   /*for (size_t i = 0; i < result_groups.size(); i++) {*/
-    //std::cout << "Group " << i << " number " << result_groups[i].size() << " ms1 scan begin " << features[i]->getScanBegin();
-    //std::cout << " ms1 scan end " << features[i]->getScanEnd() << " inte " << features[i]->getIntensity() << std::endl;
-    //for (size_t j = 0; j < result_groups[i].size(); j++) {
-      //MsHeaderPtr ptr = result_groups[i][j];
-      //std::cout << "\t" << ptr->getId() << "\t" << ptr->getFirstScanNum() << "\t";
-      //std::cout <<  (ptr->getRetentionTime()/60) << "\t" << ptr->getPrecMonoMass() << "\t";
-      //std::cout << ptr->getPrecMonoMz() << "\t" << ptr->getPrecCharge() << "\t" << ptr->getPrecInte() << std::endl; 
-    //}
+  //std::cout << "Group " << i << " number " << result_groups[i].size() << " ms1 scan begin " << features[i]->getScanBegin();
+  //std::cout << " ms1 scan end " << features[i]->getScanEnd() << " inte " << features[i]->getIntensity() << std::endl;
+  //for (size_t j = 0; j < result_groups[i].size(); j++) {
+  //MsHeaderPtr ptr = result_groups[i][j];
+  //std::cout << "\t" << ptr->getId() << "\t" << ptr->getFirstScanNum() << "\t";
+  //std::cout <<  (ptr->getRetentionTime()/60) << "\t" << ptr->getPrecMonoMass() << "\t";
+  //std::cout << ptr->getPrecMonoMz() << "\t" << ptr->getPrecCharge() << "\t" << ptr->getPrecInte() << std::endl; 
+  //}
   /*}*/
 }
 
@@ -294,11 +295,15 @@ void FeatureDetect::process(std::string &xml_file_name){
   std::string ms2_file_name = base_name + ".ms2";
   MsHeaderPtrVec header_ptr_vec;
   readHeaders(ms2_file_name, header_ptr_vec);
-
+  int ms1_ptr_vec_size = header_ptr_vec[header_ptr_vec.size() - 1]->getMsOneId() + 1;
+  DeconvMsPtrVec ms1_ptr_vec_refine(ms1_ptr_vec_size);
+  for (size_t i = 0; i < ms1_ptr_vec.size(); i++) {
+    ms1_ptr_vec_refine[ms1_ptr_vec[i]->getMsHeaderPtr()->getId()] = ms1_ptr_vec[i];
+  }
   LOG_DEBUG("start grouping");
   MsHeaderPtr2D header_groups;
   FeaturePtrVec features;
-  groupHeaders(ms1_ptr_vec, header_ptr_vec, mng_ptr, header_groups, features);
+  groupHeaders(ms1_ptr_vec_refine, header_ptr_vec, mng_ptr, header_groups, features);
   setFeatures(header_groups, features);
   std::string output_file_name = base_name + ".msalign";
   writeMsalign(ms2_file_name, output_file_name, header_ptr_vec);
