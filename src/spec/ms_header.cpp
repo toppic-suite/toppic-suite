@@ -65,8 +65,8 @@ MsHeader::MsHeader(xercesc::DOMElement* element){
 }
 
 double MsHeader::getPrecMonoMass() {
-  if (prec_mono_mz_ < 0) {
-    LOG_WARN("monoisotopic mass is not initialized")
+  if (prec_mono_mz_ < 0 || std::isnan(prec_mono_mz_)) {
+    LOG_WARN("monoisotopic mass is not initialized");
     return 0.0;
   } 
   else {
@@ -84,7 +84,7 @@ double MsHeader::getPrecSpMass() {
 }
 
 double MsHeader::getPrecMonoMassMinusWater() {
-  if (prec_mono_mz_ < 0) {
+  if (prec_mono_mz_ < 0 || std::isnan(prec_mono_mz_)) {
     LOG_WARN("monoisotopic mass is not initialized");
     return 0.0;
   } else {
@@ -106,17 +106,17 @@ std::pair<int,int> MsHeader::getPrecMonoMassMinusWaterError(double ppo,
 
 std::string MsHeader::toString() {
   std::stringstream tmp;
-        tmp << "MS HEADER\n";
-        tmp << "==========\n";
-        tmp << "Title = " << title_ << "\n";
-        tmp << "Scan Number = " << scans_[0] << "\n";
-        tmp << "MS Level = " << level_ << "\n";
-        tmp << "Activation type = " << activation_ptr_ << "\n";
-        tmp << "Precursor Sp Mz = " << prec_sp_mz_ << "\n";
-        tmp << "Precursor Charge = " << prec_charge_ << "\n";
-        tmp << "Precursro Mono Mz = " << prec_mono_mz_ << "\n";
-        return tmp.str();
-    }
+  tmp << "MS HEADER\n";
+  tmp << "==========\n";
+  tmp << "Title = " << title_ << "\n";
+  tmp << "Scan Number = " << scans_[0] << "\n";
+  tmp << "MS Level = " << level_ << "\n";
+  tmp << "Activation type = " << activation_ptr_ << "\n";
+  tmp << "Precursor Sp Mz = " << prec_sp_mz_ << "\n";
+  tmp << "Precursor Charge = " << prec_charge_ << "\n";
+  tmp << "Precursro Mono Mz = " << prec_mono_mz_ << "\n";
+  return tmp.str();
+}
 
 std::string MsHeader::getScansString() {
   std::stringstream scan_list;
