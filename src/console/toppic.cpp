@@ -47,16 +47,16 @@
 #include "prsm/prsm_species.hpp"
 #include "prsm/prsm_table_writer.hpp"
 #include "prsm/prsm_fdr.hpp"
+#include "prsm/prsm_feature_species.hpp"
+#include "prsm/prsm_form_filter.hpp"
 
 #include "zeroptmfilter/zero_ptm_filter_mng.hpp"
 #include "zeroptmfilter/zero_ptm_filter_processor.hpp"
-
 #include "zeroptmsearch/zero_ptm_search_mng.hpp"
 #include "zeroptmsearch/zero_ptm_search.hpp"
 
 #include "oneptmfilter/one_ptm_filter_mng.hpp"
 #include "oneptmfilter/one_ptm_filter_processor.hpp"
-
 #include "oneptmsearch/ptm_search_mng.hpp"
 #include "oneptmsearch/one_ptm_search.hpp"
 
@@ -271,11 +271,11 @@ int two_base_opt(int argc, char* argv[]) {
     std::istringstream(arguments["errorTolerance"]) >> ppo;
     ppo = ppo / 1000000.0;
     ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();
-    PrsmSpeciesPtr prsm_species = PrsmSpeciesPtr(
-        new PrsmSpecies(db_file_name, sp_file_name, suffix,
-                        fix_mod_list, "OUTPUT_RESULT",ppo));
-    prsm_species->process();
-    prsm_species = nullptr;
+    PrsmFeatureSpeciesPtr prsm_forms = PrsmFeatureSpeciesPtr(
+        new PrsmFeatureSpecies(db_file_name, sp_file_name, "CUTOFF_RESULT",
+                               "FORMS", fix_mod_list));
+    prsm_forms->process();
+    prsm_forms = nullptr;
     std::cout << "Finding protein species - finished." << std::endl;
     WebLog::completeFunction(WebLog::SelectingTime());
 
@@ -285,7 +285,7 @@ int two_base_opt(int argc, char* argv[]) {
 
     std::cout << "Outputting the result table - started." << std::endl;
     PrsmTableWriterPtr table_out = PrsmTableWriterPtr(
-        new PrsmTableWriter(prsm_para_ptr, arguments, "OUTPUT_RESULT", "OUTPUT_TABLE"));
+        new PrsmTableWriter(prsm_para_ptr, arguments, "FORMS", "OUTPUT_TABLE"));
     table_out->write();
     table_out = nullptr;
     std::cout << "Outputting the result table - finished." << std::endl;
@@ -300,6 +300,20 @@ int two_base_opt(int argc, char* argv[]) {
     translate(arguments);
     std::cout << "Converting xml files to html files - finished." << std::endl;
     WebLog::completeFunction(WebLog::OutPutTime());
+
+    std::cout << "PRSM proteoform filtering - started." << std::endl;
+    PrsmFormFilterPtr form_filter = PrsmFormFilterPtr(
+        new PrsmFormFilter(db_file_name, sp_file_name, "FORMS", "FORM_FILTER_RESULT", "FORM_RESULT"));
+    form_filter->process();
+    form_filter = nullptr;
+    std::cout << "PRSM proteoform filtering - finished." << std::endl;
+
+    std::cout << "Outputting the proteoform table - started." << std::endl;
+    PrsmTableWriterPtr form_out = PrsmTableWriterPtr(
+        new PrsmTableWriter(prsm_para_ptr, arguments, "FORM_RESULT", "FORM_OUTPUT_TABLE"));
+    form_out->write();
+    form_out = nullptr;
+    std::cout << "Outputting the proteoform table - finished." << std::endl;
 
     if (arguments["keepTempFiles"] != "true"){
       std::cout << "Deleting temporary files - started." << std::endl;
