@@ -40,13 +40,13 @@ namespace prot {
 
 class DeconvOneSp {
  public:
-  DeconvOneSp(FeatureMngPtr mng_ptr);
+  DeconvOneSp(FeatureMngPtr mng_ptr):mng_ptr_(mng_ptr){};
 
   void setData(PeakPtrVec &peak_list);
 
   void setData(PeakPtrVec &peak_list, double max_mass, int max_charge);
 
-	MatchEnvPtrVec getResult() {return result_envs_;}
+  MatchEnvPtrVec getResult() {return result_envs_;}
 
   void preprocess();
 
@@ -55,9 +55,9 @@ class DeconvOneSp {
   MatchEnvPtrVec postprocess(MatchEnvPtrVec  &dp_envs);
 
  private:
-	FeatureMngPtr mng_ptr_;
-	DeconvDataPtr data_ptr_;
-	MatchEnvPtrVec result_envs_;
+  FeatureMngPtr mng_ptr_;
+  DeconvDataPtr data_ptr_;
+  MatchEnvPtrVec result_envs_;
 };
 
 typedef std::shared_ptr<DeconvOneSp> DeconvOneSpPtr;

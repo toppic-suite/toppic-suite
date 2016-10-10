@@ -36,7 +36,7 @@
 namespace prot {
 
 DeconvDataPtr DeconvDataBase::getDataPtr(PeakPtrVec &peak_list, FeatureMngPtr mng_ptr) {
-
+  if (peak_list.size() == 0) return nullptr;
   double max_mz = RawMsUtil::findMaxPos(peak_list);
   if (max_mz > mng_ptr->max_mass_) {
     LOG_WARN("Max mz is too large: " << max_mz);
@@ -46,10 +46,10 @@ DeconvDataPtr DeconvDataBase::getDataPtr(PeakPtrVec &peak_list, FeatureMngPtr mn
                                       mng_ptr->max_charge_, mng_ptr->window_size_));
 }
 
-	
+
 // generate deconvolution data using given max mass, max charge
 DeconvDataPtr DeconvDataBase::getDataPtr(PeakPtrVec &peak_list, double max_mass,
-                                 int max_charge, FeatureMngPtr mng_ptr) {
+                                         int max_charge, FeatureMngPtr mng_ptr) {
 
   if (max_charge < 1) {
     LOG_WARN("Max charge < 1");
