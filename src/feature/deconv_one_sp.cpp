@@ -44,10 +44,6 @@
 
 namespace prot {
 
-DeconvOneSp::DeconvOneSp(FeatureMngPtr mng_ptr): 
-    mng_ptr_(mng_ptr) {
-	}
-
 void DeconvOneSp::setData(PeakPtrVec &peak_list) {
   data_ptr_ = DeconvDataBase::getDataPtr(peak_list, mng_ptr_);
 }
@@ -57,6 +53,11 @@ void DeconvOneSp::setData(PeakPtrVec &peak_list, double max_mass, int max_charge
 }
 
 void DeconvOneSp::run() {
+  if (data_ptr_ == nullptr) {
+    result_envs_.clear();
+    return;
+  }
+
   preprocess();
   LOG_DEBUG("preprocess complete");
   // envelope detection 

@@ -295,15 +295,10 @@ void FeatureDetect::process(std::string &xml_file_name){
   std::string ms2_file_name = base_name + ".ms2";
   MsHeaderPtrVec header_ptr_vec;
   readHeaders(ms2_file_name, header_ptr_vec);
-  int ms1_ptr_vec_size = header_ptr_vec[header_ptr_vec.size() - 1]->getMsOneId() + 1;
-  DeconvMsPtrVec ms1_ptr_vec_refine(ms1_ptr_vec_size);
-  for (size_t i = 0; i < ms1_ptr_vec.size(); i++) {
-    ms1_ptr_vec_refine[ms1_ptr_vec[i]->getMsHeaderPtr()->getId()] = ms1_ptr_vec[i];
-  }
   LOG_DEBUG("start grouping");
   MsHeaderPtr2D header_groups;
   FeaturePtrVec features;
-  groupHeaders(ms1_ptr_vec_refine, header_ptr_vec, mng_ptr, header_groups, features);
+  groupHeaders(ms1_ptr_vec, header_ptr_vec, mng_ptr, header_groups, features);
   setFeatures(header_groups, features);
   std::string output_file_name = base_name + ".msalign";
   writeMsalign(ms2_file_name, output_file_name, header_ptr_vec);

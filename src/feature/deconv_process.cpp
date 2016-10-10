@@ -100,10 +100,10 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr, FeatureMsReaderPtr read
   int count2 = 0;
   while ((ms_ptr = reader_ptr->getNextMs(para_ptr_->prec_window_)) != nullptr) {
     PeakPtrVec peak_list = ms_ptr->getPeakPtrVec();
-    LOG_DEBUG(" peak list size " << peak_list.size());
-    if (peak_list.size() == 0) {
-      continue;
-    }
+    LOG_DEBUG("peak list size " << peak_list.size());
+    /*if (peak_list.size() == 0) {*/
+    //continue;
+    /*}*/
     MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
     LOG_DEBUG("ms level " << header_ptr->getMsLevel() );
     if (header_ptr->getMsLevel() == 1 &&  para_ptr_->ms_level_ != 1) {
@@ -119,8 +119,7 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr, FeatureMsReaderPtr read
       MatchEnvPtrVec result_envs = deconv_ptr->getResult();
       MsalignWriter::writeText(of1, result_envs, header_ptr);
       count1++;
-    }
-    else {
+    } else {
       if (para_ptr_->missing_level_one_) {
         header_ptr->setPrecCharge(FeatureMng::getDefaultMaxCharge());
         double prec_mz = FeatureMng::getDefaultMaxMass()/FeatureMng::getDefaultMaxCharge();
@@ -128,8 +127,7 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr, FeatureMsReaderPtr read
         header_ptr->setPrecSpMz(prec_mz);
         deconv_ptr->setData(peak_list, FeatureMng::getDefaultMaxMass(), 
                             FeatureMng::getDefaultMaxCharge());
-      }
-      else {
+      } else {
         double max_frag_mass = header_ptr->getPrecMonoMass();
         if (max_frag_mass == 0.0) {
           max_frag_mass = header_ptr->getPrecSpMass();
