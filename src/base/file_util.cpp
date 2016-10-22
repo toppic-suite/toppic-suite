@@ -198,4 +198,42 @@ namespace prot {
       }
     }
   }
+
+  void clean_prefix(const fs::path & sp, const std::string & prefix) {
+    fs::directory_iterator end_iter;
+    for(fs::directory_iterator dir_iter(absolute(sp).parent_path()) ; dir_iter != end_iter ; ++dir_iter){
+      std::string filename = dir_iter->path().string();
+      if (filename.compare(0, prefix.length(), prefix) == 0){
+        fs::remove(dir_iter->path());
+      }
+    }
+  }
+
+  void FileUtil::cleanDir(const std::string &fa_path, const std::string & sp_path) {
+    fs::path fa(fa_path);
+    fs::path sp(sp_path);
+    std::string fa_base = absolute(fa).string();
+    std::string sp_base = basename(absolute(sp).string());
+
+    clean_prefix(fa, fa_base + "_");
+    delFile(absolute(sp).string() + "_index");
+    delFile(sp_base + ".ZERO_PTM");
+    clean_prefix(sp, sp_base + ".ZERO_PTM_");
+    clean_prefix(sp, sp_base + ".ZERO_FILTER_");
+    delFile(sp_base + ".ONE_PTM");
+    clean_prefix(sp, sp_base + ".ONE_PTM_");
+    delFile(sp_base + ".DIAG_FILTER");
+    clean_prefix(sp, sp_base + ".DIAG_FILTER_");
+    delFile(sp_base + ".PTM");
+    clean_prefix(sp, sp_base + ".PTM_");
+    delFile(sp_base + ".TOP");
+    delFile(sp_base + ".CUTOFF_RESULT");            
+    delFile(sp_base + ".LOCAL_RESULT");
+    delFile(sp_base + ".EVALUE");
+    delFile(sp_base + ".RAW_RESULT");      
+    delFile(sp_base + ".FORMS");
+    delFile(sp_base + ".FORM_RESULT");
+    delFile(sp_base + ".FORM_FILTER_RESULT");
+
+  }
 }

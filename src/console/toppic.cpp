@@ -319,8 +319,7 @@ int two_base_opt(int argc, char* argv[]) {
       std::cout << "Deleting temporary files - started." << std::endl;
       FileUtil::delDir(FileUtil::basename(sp_file_name) + "_xml");
       FileUtil::delFile(exe_dir + "/run.log");
-      FileUtil::cleanDir(sp_file_name);
-      FileUtil::cleanDir(db_file_name);   
+      FileUtil::cleanDir(ori_db_file_name, sp_file_name);   
       std::cout << "Deleting temporary files - finished." << std::endl;
     }
 
