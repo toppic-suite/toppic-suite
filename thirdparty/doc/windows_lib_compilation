@@ -26,6 +26,10 @@ Xalan:
 7. make 
 8. make install
 
+Proteomics Wizards
+1. download TPP 4.8.0
+2. cp pwiz directory to src/pwiz 
+2. cp library/boost_aux/ to src/pwiz/boost 
 
 Download links:
 
