@@ -291,7 +291,7 @@ int two_base_opt(int argc, char* argv[]) {
     std::cout << "Outputting the result table - finished." << std::endl;
 
     std::cout << "Generating xml files started." << std::endl;
-    XmlGeneratorPtr xml_gene = XmlGeneratorPtr(new XmlGenerator(prsm_para_ptr, exe_dir, "OUTPUT_RESULT"));
+    XmlGeneratorPtr xml_gene = XmlGeneratorPtr(new XmlGenerator(prsm_para_ptr, exe_dir, "FORMS"));
     xml_gene->process();
     xml_gene = nullptr;
     std::cout << "Generating xml files - finished." << std::endl;
