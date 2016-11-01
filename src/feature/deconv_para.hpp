@@ -35,6 +35,7 @@
 #include <string>
 #include <memory>
 #include <map>
+#include <vector>
 
 namespace prot {
 
@@ -52,6 +53,8 @@ class DeconvPara {
   int setOutputType (std::string &format);
 
   int setInputType (std::string &format);
+
+  std::string getOutputType() {return output_type_str_[output_type_];}
 
   std::string data_file_name_;
   std::string exec_dir_;
@@ -71,6 +74,8 @@ class DeconvPara {
   bool output_multiple_mass_ = false; 
 
   double prec_window_;
+
+  std::vector<std::string> output_type_str_ = {"mgf", "msalign"};
 };
 
 typedef std::shared_ptr<DeconvPara> DeconvParaPtr;
