@@ -48,16 +48,17 @@ void DeconvProcess::copyParameters(FeatureMngPtr mng_ptr) {
 
 void DeconvProcess::printParameter(FeatureMngPtr mng_ptr) {
   std::cout << "TopFD 1.0.0 (" << __DATE__ << ")" << std::endl;
-  std::cout << "********* parameters begin **********" << std::endl;
-  std::cout << "output file format:    " << para_ptr_->output_type_ << std::endl;
-  std::cout << "data type:             " << "centroided" << std::endl;
-  std::cout << "maximum charge:        " << mng_ptr->max_charge_ << std::endl;
-  std::cout << "maximum mass:          " << mng_ptr->max_mass_ << std::endl;
-  std::cout << "m/z error tolerance:   " << mng_ptr->mz_tolerance_ << std::endl;
-  std::cout << "sn ratio:              " << mng_ptr->sn_ratio_ << std::endl;
-  std::cout << "keep unused peak:      " << (mng_ptr->keep_unused_peaks_? "True":"False") << std::endl;
-  std::cout << "output multiple mass:  " << (mng_ptr->output_multiple_mass_? "True":"False") << std::endl;
-  std::cout << "********* parameters end   **********" << std::endl;
+  std::cout << "********************** Parameters **********************" << std::endl;
+  std::cout << std::setw(40) << std::left << "Input file: " << para_ptr_->data_file_name_ << std::endl;
+  std::cout << std::setw(40) << std::left << "Output file format: " << para_ptr_->getOutputType() << std::endl;
+  std::cout << std::setw(40) << std::left << "Data type: " << "centroided" << std::endl;
+  std::cout << std::setw(40) << std::left << "Maximum charge: " << mng_ptr->max_charge_ << std::endl;
+  std::cout << std::setw(40) << std::left << "Maximum mass: " << mng_ptr->max_mass_ << std::endl;
+  std::cout << std::setw(40) << std::left << "m/z error tolerance: " << mng_ptr->mz_tolerance_ << std::endl;
+  std::cout << std::setw(40) << std::left << "sn ratio: " << mng_ptr->sn_ratio_ << std::endl;
+  std::cout << std::setw(40) << std::left << "Keep unused peak: " << (mng_ptr->keep_unused_peaks_? "True":"False") << std::endl;
+  std::cout << std::setw(40) << std::left << "Output multiple mass: " << (mng_ptr->output_multiple_mass_? "True":"False") << std::endl;
+  std::cout << "********************** Parameters **********************" << std::endl;
 }
 
 void DeconvProcess::updateMsg(MsHeaderPtr header_ptr, int scan, int total_scan_num) {
