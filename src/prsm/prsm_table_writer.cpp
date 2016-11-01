@@ -75,6 +75,7 @@ void PrsmTableWriter::write(){
       << "Precursor mass" << "\t"
       << "Adjusted precursor mass" << "\t"
       << "Proteoform ID" << "\t"
+      << "Feature intensity" << "\t"
       << "Protein name" << "\t"
       << "First residue" << "\t"
       << "Last residue" << "\t"
@@ -89,11 +90,11 @@ void PrsmTableWriter::write(){
       << "#matched fragment ions" << "\t"
       << "P-value" << "\t"
       << "E-value" << "\t"
-//      << "One Protein probabilty"<< "\t"
+      //      << "One Protein probabilty"<< "\t"
       << "Q-value (spectral FDR)" << "\t"
-      << "Proteoform FDR" << "\t"
+      << "Proteoform FDR"
 #if defined MASS_GRAPH
-      << "#Variable PTMs" << "\t"
+      << "\t#Variable PTMs" << "\t"
 #endif
       << std::endl;
 
@@ -208,6 +209,7 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
       << prsm_ptr->getOriPrecMass()<< "\t"//"Precursor_mass"
       << prsm_ptr->getAdjustedPrecMass() << "\t"
       << prsm_ptr->getProteoformPtr()->getSpeciesId() << "\t"
+      << prsm_ptr->getPrecFeatureInte() << "\t"
       << prsm_ptr->getProteoformPtr()->getSeqName() << " "
       << prsm_ptr->getProteoformPtr()->getSeqDesc() << "\t"
       << (prsm_ptr->getProteoformPtr()->getStartPos() + 1) << "\t"
@@ -227,7 +229,7 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
       << prsm_ptr->getMatchFragNum() << "\t"
       << prsm_ptr->getPValue() << "\t"
       << prsm_ptr->getEValue() << "\t";
-      //      << prsm_ptr->getOneProtProb()<< "\t"
+  //      << prsm_ptr->getOneProtProb()<< "\t"
   double fdr = prsm_ptr->getFdr();
   if (fdr >= 0) {
     file << fdr << "\t";
