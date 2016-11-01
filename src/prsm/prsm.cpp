@@ -53,6 +53,7 @@ Prsm::Prsm(ProteoformPtr proteoform_ptr, const DeconvMsPtrVec &deconv_ms_ptr_vec
       spectrum_scan_ = header_ptr->getScansString();
       precursor_id_ = header_ptr->getPrecId();
       prec_feature_id_ = header_ptr->getFeatureId();
+      prec_feature_inte_ = header_ptr->getFeatureInte();
       spectrum_num_ = deconv_ms_ptr_vec.size();
       ori_prec_mass_ = header_ptr->getPrecMonoMass();
       init(sp_para_ptr);
@@ -138,36 +139,38 @@ void Prsm::initScores(SpParaPtr sp_para_ptr) {
 
 xercesc::DOMElement* Prsm::toXmlElement(XmlDOMDocument* xml_doc){
   std::string element_name = Prsm::getXmlElementName();
-	xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
-	std::string str = StringUtil::convertToString(prsm_id_);
-	xml_doc->addElement(element, "prsm_id", str.c_str());
-	str = StringUtil::convertToString(spectrum_id_);
-	xml_doc->addElement(element, "spectrum_id", str.c_str());
+  xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
+  std::string str = StringUtil::convertToString(prsm_id_);
+  xml_doc->addElement(element, "prsm_id", str.c_str());
+  str = StringUtil::convertToString(spectrum_id_);
+  xml_doc->addElement(element, "spectrum_id", str.c_str());
   xml_doc->addElement(element, "spectrum_scan", spectrum_scan_.c_str());
-	str = StringUtil::convertToString(precursor_id_);
-	xml_doc->addElement(element, "precursor_id", str.c_str());
-	str = StringUtil::convertToString(prec_feature_id_);
-	xml_doc->addElement(element, "precursor_feature_id", str.c_str());
-	str = StringUtil::convertToString(spectrum_num_);
-	xml_doc->addElement(element, "spectrum_number", str.c_str());
-	str = StringUtil::convertToString(ori_prec_mass_);
-	xml_doc->addElement(element, "ori_prec_mass", str.c_str());
-	str = StringUtil::convertToString(adjusted_prec_mass_);
-	xml_doc->addElement(element, "adjusted_prec_mass", str.c_str());
-	str = StringUtil::convertToString(fdr_);
-	xml_doc->addElement(element, "fdr", str.c_str());
+  str = StringUtil::convertToString(precursor_id_);
+  xml_doc->addElement(element, "precursor_id", str.c_str());
+  str = StringUtil::convertToString(prec_feature_id_);
+  xml_doc->addElement(element, "precursor_feature_id", str.c_str());
+  str = StringUtil::convertToString(prec_feature_inte_);
+  xml_doc->addElement(element, "precursor_feature_inte", str.c_str());	
+  str = StringUtil::convertToString(spectrum_num_);
+  xml_doc->addElement(element, "spectrum_number", str.c_str());
+  str = StringUtil::convertToString(ori_prec_mass_);
+  xml_doc->addElement(element, "ori_prec_mass", str.c_str());
+  str = StringUtil::convertToString(adjusted_prec_mass_);
+  xml_doc->addElement(element, "adjusted_prec_mass", str.c_str());
+  str = StringUtil::convertToString(fdr_);
+  xml_doc->addElement(element, "fdr", str.c_str());
   str = StringUtil::convertToString(proteoform_fdr_);
   xml_doc->addElement(element, "proteoform_fdr", str.c_str());
-	str = StringUtil::convertToString(match_peak_num_);
-	xml_doc->addElement(element, "match_peak_num", str.c_str());
-	str = StringUtil::convertToString(match_fragment_num_);
-	xml_doc->addElement(element, "match_fragment_num", str.c_str());
-	str = StringUtil::convertToString(getNormMatchFragNum());
-	xml_doc->addElement(element, "norm_match_fragment_num", str.c_str());
-	proteoform_ptr_->appendXml(xml_doc,element);
-	if(extreme_value_ptr_!=nullptr){
-	  extreme_value_ptr_->appendXml(xml_doc,element);
-	}
+  str = StringUtil::convertToString(match_peak_num_);
+  xml_doc->addElement(element, "match_peak_num", str.c_str());
+  str = StringUtil::convertToString(match_fragment_num_);
+  xml_doc->addElement(element, "match_fragment_num", str.c_str());
+  str = StringUtil::convertToString(getNormMatchFragNum());
+  xml_doc->addElement(element, "norm_match_fragment_num", str.c_str());
+  proteoform_ptr_->appendXml(xml_doc,element);
+  if(extreme_value_ptr_!=nullptr){
+    extreme_value_ptr_->appendXml(xml_doc,element);
+  }
   return element;
 }
 
@@ -182,6 +185,7 @@ void Prsm::parseXml(xercesc::DOMElement *element) {
   spectrum_scan_=XmlDomUtil::getChildValue(element, "spectrum_scan", 0);
   precursor_id_=XmlDomUtil::getIntChildValue(element, "precursor_id", 0);
   prec_feature_id_ = XmlDomUtil::getIntChildValue(element, "precursor_feature_id", 0);
+  prec_feature_inte_ = XmlDomUtil::getDoubleChildValue(element, "precursor_feature_inte", 0);
   spectrum_num_ = XmlDomUtil::getIntChildValue(element, "spectrum_number", 0);
   ori_prec_mass_=XmlDomUtil::getDoubleChildValue(element, "ori_prec_mass", 0);
   adjusted_prec_mass_=XmlDomUtil::getDoubleChildValue(element, "adjusted_prec_mass", 0);
