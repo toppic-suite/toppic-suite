@@ -42,23 +42,21 @@
 
 #include "prsm/prsm_para.hpp"
 #include "prsm/prsm_str_combine.hpp"
-#include "prsm/prsm_form_filter.hpp"
 #include "prsm/prsm_top_selector.hpp"
 #include "prsm/prsm_cutoff_selector.hpp"
 #include "prsm/prsm_species.hpp"
-#include "prsm/prsm_feature_species.hpp"
 #include "prsm/prsm_table_writer.hpp"
 #include "prsm/prsm_fdr.hpp"
+#include "prsm/prsm_feature_species.hpp"
+#include "prsm/prsm_form_filter.hpp"
 
 #include "zeroptmfilter/zero_ptm_filter_mng.hpp"
 #include "zeroptmfilter/zero_ptm_filter_processor.hpp"
-
 #include "zeroptmsearch/zero_ptm_search_mng.hpp"
 #include "zeroptmsearch/zero_ptm_search.hpp"
 
 #include "oneptmfilter/one_ptm_filter_mng.hpp"
 #include "oneptmfilter/one_ptm_filter_processor.hpp"
-
 #include "oneptmsearch/ptm_search_mng.hpp"
 #include "oneptmsearch/one_ptm_search.hpp"
 
@@ -108,6 +106,7 @@ int two_base_opt(int argc, char* argv[]) {
     int ptm_num = std::stoi(arguments["ptmNumber"]);
     double max_ptm_mass = std::stod(arguments["maxPtmMass"]);
     int filter_result_num = std::stoi(arguments["filteringResultNumber"]);
+    int thread_num = std::stoi(arguments["threadNumber"]);
 
     bool use_gf = false; 
     if (arguments["useGf"] == "true") {
@@ -116,10 +115,6 @@ int two_base_opt(int argc, char* argv[]) {
     bool localization = false;
     if (arguments["residueModFileName"] != "") {
       localization = true;
-    }
-    bool use_feature = false;
-    if (arguments["useFeature"] == "true") {
-      use_feature = true;
     }
     // initialize log file 
     WebLog::init(log_file_name, use_gf, localization, ptm_num);
@@ -137,7 +132,7 @@ int two_base_opt(int argc, char* argv[]) {
 
     FastaUtil::dbPreprocess (ori_db_file_name, db_file_name, decoy, db_block_size);
     MsAlignUtil::geneSpIndex(sp_file_name);
-    
+
     std::vector<std::string> input_exts;
 
     std::cout << "Zero PTM filtering - started." << std::endl;
@@ -169,7 +164,7 @@ int two_base_opt(int argc, char* argv[]) {
       std::cout << "One PTM search - started." << std::endl;
       int shift_num = 1;
       PtmSearchMngPtr one_search_mng_ptr 
-          = PtmSearchMngPtr(new PtmSearchMng (prsm_para_ptr, n_top, max_ptm_mass, shift_num, "ONE_PTM_FILTER", "ONE_PTM"));
+          = PtmSearchMngPtr(new PtmSearchMng (prsm_para_ptr, n_top, max_ptm_mass, shift_num, thread_num, "ONE_PTM_FILTER", "ONE_PTM"));
       OnePtmSearch::process(one_search_mng_ptr);
       WebLog::completeFunction(WebLog::OnePtmSearchTime());
       std::cout << "One PTM search - finished." << std::endl;
@@ -183,7 +178,7 @@ int two_base_opt(int argc, char* argv[]) {
     if (ptm_num >= 2) {
       std::cout << "Diagonal PTM filtering - started." << std::endl;
       DiagFilterMngPtr diag_filter_mng_ptr 
-          = DiagFilterMngPtr(new DiagFilterMng (prsm_para_ptr, filter_result_num, "DIAG_FILTER"));
+          = DiagFilterMngPtr(new DiagFilterMng (prsm_para_ptr, filter_result_num, thread_num, "DIAG_FILTER"));
       DiagFilterProcessorPtr diag_filter_processor 
           = DiagFilterProcessorPtr(new DiagFilterProcessor(diag_filter_mng_ptr));
       diag_filter_processor->process();
@@ -192,7 +187,7 @@ int two_base_opt(int argc, char* argv[]) {
 
       std::cout << "Two PTM search - started." << std::endl;
       PtmSearchMngPtr two_search_mng_ptr 
-          = PtmSearchMngPtr(new PtmSearchMng (prsm_para_ptr, n_top, max_ptm_mass, ptm_num,
+          = PtmSearchMngPtr(new PtmSearchMng (prsm_para_ptr, n_top, max_ptm_mass, ptm_num, thread_num,
                                               "DIAG_FILTER", "PTM"));
       PtmSearchProcessorPtr processor = PtmSearchProcessorPtr(new PtmSearchProcessor(two_search_mng_ptr));
       processor->process();
@@ -224,43 +219,24 @@ int two_base_opt(int argc, char* argv[]) {
     }
     std::cout << "E-value computation - finished." << std::endl;
 
-    std::cout << "Top PRSM selecting - started" << std::endl;
-    PrsmTopSelectorPtr selector = PrsmTopSelectorPtr(new PrsmTopSelector(db_file_name, sp_file_name, "EVALUE", "TOP", n_top));
-    selector->process();
-    selector = nullptr;
-    std::cout << "Top PRSM selecting - finished." << std::endl;
+    if (arguments["searchType"]=="TARGET") { 
+      std::cout << "Top PRSM selecting - started" << std::endl;
+      PrsmTopSelectorPtr selector = PrsmTopSelectorPtr(new PrsmTopSelector(db_file_name, sp_file_name, "EVALUE", "TOP", n_top));
+      selector->process();
+      selector = nullptr;
+      std::cout << "Top PRSM selecting - finished." << std::endl;
+    } else {
+      std::cout << "Top PRSM selecting - started " << std::endl;
+      PrsmTopSelectorPtr selector = PrsmTopSelectorPtr(new PrsmTopSelector(db_file_name, sp_file_name, "EVALUE", "TOP_PRE", n_top));
+      selector->process();
+      selector = nullptr;
+      std::cout << "Top PRSM selecting - finished." << std::endl;
 
-    std::cout << "Finding protein forms - started." << std::endl;
-    double ppo;
-    std::istringstream(arguments["errorTolerance"]) >> ppo;
-    ppo = ppo / 1000000.0;
-    ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();
-    if (use_feature) {
-      PrsmFeatureSpeciesPtr prsm_forms = PrsmFeatureSpeciesPtr(
-          new PrsmFeatureSpecies(db_file_name, sp_file_name, "TOP",
-                                 "FORMS", fix_mod_list));
-      prsm_forms->process();
-      prsm_forms = nullptr;
-    }
-    else {
-      PrsmSpeciesPtr prsm_forms = PrsmSpeciesPtr(
-          new PrsmSpecies(db_file_name, sp_file_name, "TOP",
-                          fix_mod_list, "FORMS",ppo));
-      prsm_forms->process();
-      prsm_forms = nullptr;
-    }
-    std::cout << "Finding protein forms - finished." << std::endl;
-    WebLog::completeFunction(WebLog::SelectingTime());
-
-    std::string suffix = "FORMS";
-    
-    if (arguments["searchType"]=="TARGET+DECOY") { 
       std::cout << "FDR computation - started. " << std::endl;
-      PrsmFdrPtr fdr = PrsmFdrPtr(new PrsmFdr(db_file_name, sp_file_name, "FORMS", "FDR"));
+      PrsmFdrPtr fdr = PrsmFdrPtr(new PrsmFdr(db_file_name, sp_file_name, "TOP_PRE", "TOP"));
       fdr->process();
       fdr = nullptr;
       std::cout << "FDR computation - finished." << std::endl;
-      suffix = "FDR";
     }
 
     std::cout << "PRSM selecting by cutoff - started." << std::endl;
@@ -268,13 +244,13 @@ int two_base_opt(int argc, char* argv[]) {
     double cutoff_value;
     std::istringstream (arguments["cutoffValue"]) >> cutoff_value;
     PrsmCutoffSelectorPtr cutoff_selector = PrsmCutoffSelectorPtr(
-        new PrsmCutoffSelector(db_file_name, sp_file_name, suffix, "CUTOFF_RESULT", 
+        new PrsmCutoffSelector(db_file_name, sp_file_name, "TOP", "CUTOFF_RESULT", 
                                cutoff_type, cutoff_value));
     cutoff_selector->process();
     cutoff_selector = nullptr;
     std::cout << "PRSM selecting by cutoff - finished." << std::endl;
 
-    suffix = "CUTOFF_RESULT";
+    std::string suffix = "CUTOFF_RESULT";
 
     if (localization) {
       std::cout << "PTM characterization - started." << std::endl;
@@ -290,17 +266,44 @@ int two_base_opt(int argc, char* argv[]) {
       suffix = "LOCAL_RESULT";
     }
 
+    std::cout << "Finding protein species - started." << std::endl;
+    double ppo;
+    std::istringstream(arguments["errorTolerance"]) >> ppo;
+    ppo = ppo / 1000000.0;
+    ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();
+    PrsmFeatureSpeciesPtr prsm_forms = PrsmFeatureSpeciesPtr(
+        new PrsmFeatureSpecies(db_file_name, sp_file_name, "CUTOFF_RESULT",
+                               "FORMS", fix_mod_list));
+    prsm_forms->process();
+    prsm_forms = nullptr;
+    std::cout << "Finding protein species - finished." << std::endl;
+    WebLog::completeFunction(WebLog::SelectingTime());
+
+    time_t end = time(0);
+    arguments["end_time"] = std::string(ctime(&end));
+    arguments["running_time"] = std::to_string((int)difftime(end, start));
+
     std::cout << "Outputting the result table - started." << std::endl;
     PrsmTableWriterPtr table_out = PrsmTableWriterPtr(
-        new PrsmTableWriter(prsm_para_ptr, arguments, suffix, "OUTPUT_TABLE"));
+        new PrsmTableWriter(prsm_para_ptr, arguments, "FORMS", "OUTPUT_TABLE"));
     table_out->write();
     table_out = nullptr;
     std::cout << "Outputting the result table - finished." << std::endl;
 
-    //std::string suffix = "CUTOFF_RESULT";
+    std::cout << "Generating xml files started." << std::endl;
+    XmlGeneratorPtr xml_gene = XmlGeneratorPtr(new XmlGenerator(prsm_para_ptr, exe_dir, "FORMS"));
+    xml_gene->process();
+    xml_gene = nullptr;
+    std::cout << "Generating xml files - finished." << std::endl;
+
+    std::cout << "Converting xml files to html files - started." << std::endl;
+    translate(arguments);
+    std::cout << "Converting xml files to html files - finished." << std::endl;
+    WebLog::completeFunction(WebLog::OutPutTime());
+
     std::cout << "PRSM proteoform filtering - started." << std::endl;
     PrsmFormFilterPtr form_filter = PrsmFormFilterPtr(
-        new PrsmFormFilter(db_file_name, sp_file_name, suffix, "FORM_FILTER_RESULT", "FORM_RESULT"));
+        new PrsmFormFilter(db_file_name, sp_file_name, "FORMS", "FORM_FILTER_RESULT", "FORM_RESULT"));
     form_filter->process();
     form_filter = nullptr;
     std::cout << "PRSM proteoform filtering - finished." << std::endl;
@@ -312,31 +315,13 @@ int two_base_opt(int argc, char* argv[]) {
     form_out = nullptr;
     std::cout << "Outputting the proteoform table - finished." << std::endl;
 
-    time_t end = time(0);
-    arguments["end_time"] = std::string(ctime(&end));
-    arguments["running_time"] = std::to_string((int)difftime(end, start));
-
-    std::cout << "Generating xml files started." << std::endl;
-    XmlGeneratorPtr xml_gene = XmlGeneratorPtr(new XmlGenerator(prsm_para_ptr, exe_dir, "FORM_FILTER_RESULT"));
-    xml_gene->process();
-    xml_gene = nullptr;
-    std::cout << "Generating xml files - finished." << std::endl;
-
-    std::cout << "Converting xml files to html files - started." << std::endl;
-    translate(arguments);
-    std::cout << "Converting xml files to html files - finished." << std::endl;
-    WebLog::completeFunction(WebLog::OutPutTime());
-
-    /*
     if (arguments["keepTempFiles"] != "true"){
       std::cout << "Deleting temporary files - started." << std::endl;
       FileUtil::delDir(FileUtil::basename(sp_file_name) + "_xml");
       FileUtil::delFile(exe_dir + "/run.log");
-      FileUtil::cleanDir(sp_file_name);
-      FileUtil::cleanDir(db_file_name);   
+      FileUtil::cleanDir(ori_db_file_name, sp_file_name);   
       std::cout << "Deleting temporary files - finished." << std::endl;
     }
-    */
 
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
@@ -349,7 +334,7 @@ int two_base_opt(int argc, char* argv[]) {
 }
 
 int main(int argc, char* argv[]) {
-  //prot::log_level = 2;
+  // prot::log_level = 2;
   std::cout << std::setprecision(10);
   return prot::two_base_opt(argc, argv);
 }
