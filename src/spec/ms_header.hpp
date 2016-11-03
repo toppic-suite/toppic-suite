@@ -144,7 +144,7 @@ class MsHeader {
   static std::string getXmlElementName() {return "ms_header";}
 
   static MsHeaderPtr geneMsHeaderPtr(MsHeaderPtr ori_ptr, double new_prec_mass);
-  
+
   static bool cmpPrecInteDec(const MsHeaderPtr &a, const MsHeaderPtr &b);
 
  private:
@@ -160,7 +160,7 @@ class MsHeader {
   // a list of scans for merged spectra 
   std::vector<int> scans_;
   // ms level 
-  int level_=0;
+  int level_ = 0;
   // activation type 
   ActivationPtr activation_ptr_;
   // ms1 id 
@@ -168,7 +168,7 @@ class MsHeader {
   // ms1 scan number
   int ms_one_scan_ = -1;
   // retention time 
-  double retention_time_=0.0;
+  double retention_time_ = 0.0;
   // precursor m/z value in the MS1 spectrum 
   double prec_sp_mz_ = -1;
   // computed monoisotopic precursor m/z value 
@@ -180,7 +180,7 @@ class MsHeader {
   // feature id
   int feature_id_ = -1;
   // feature inte
-  int feature_inte_ = -1;
+  double feature_inte_ = -1;
 };
 
 typedef std::vector<MsHeaderPtr> MsHeaderPtrVec;
