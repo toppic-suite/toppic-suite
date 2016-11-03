@@ -52,10 +52,12 @@ DeconvPara::DeconvPara(std::map<std::string, std::string> &arguments) {
 }
 
 int DeconvPara::setOutputType (std::string &format) {
-  if (format=="mgf") {
+  if (format == "mgf") {
     output_type_ = OUTPUT_MGF;
-  } else if (format==("msalign")) {
+  } else if (format == "msalign") {
     output_type_ = OUTPUT_MSALIGN;
+  } else if (format == "text") {
+    output_type_ = OUTPUT_TEXT;
   } else {
     return 1;
   }

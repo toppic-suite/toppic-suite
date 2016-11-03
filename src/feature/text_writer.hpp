@@ -29,56 +29,22 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-#ifndef PROT_FEATURE_DECONV_PARA_HPP_
-#define PROT_FEATURE_DECONV_PARA_HPP_
+#ifndef PROT_FEATURE_TEXT_WRITER_HPP_
+#define PROT_FEATURE_TEXT_WRITER_HPP_
 
-#include <string>
-#include <memory>
-#include <map>
-#include <vector>
+#include <iostream>
+#include <fstream>
+
+#include "spec/ms_header.hpp"
+#include "spec/deconv_ms.hpp"
+#include "feature/match_env.hpp"
 
 namespace prot {
 
-enum OutputType {OUTPUT_MGF, OUTPUT_MSALIGN, OUTPUT_TEXT};
-enum InputType {INPUT_MGF, INPUT_MZXML};
-
-class DeconvPara {
+class TextWriter {
  public:
-  DeconvPara(std::map<std::string, std::string> &arguments);
-
-  void setDataFileName(std::string &file_name) {data_file_name_ == file_name;}
-
-  std::string getDataFileName() {return data_file_name_;}
-
-  int setOutputType (std::string &format);
-
-  int setInputType (std::string &format);
-
-  std::string getOutputType() {return output_type_str_[output_type_];}
-
-  std::string data_file_name_;
-  std::string exec_dir_;
-  InputType input_type_;
-  OutputType output_type_;
-
-  bool refine_prec_mass_;
-  int ms_level_; //ms level
-  bool missing_level_one_;
-
-  int max_charge_;
-  double max_mass_;
-  double tolerance_;
-  double sn_ratio_;
-  bool keep_unused_peaks_;
-
-  bool output_multiple_mass_ = false; 
-
-  double prec_window_;
-
-  std::vector<std::string> output_type_str_ = {"mgf", "msalign", "text"};
+  static void writeText(std::ofstream &file, MatchEnvPtrVec &envs, MsHeaderPtr header_ptr);
 };
-
-typedef std::shared_ptr<DeconvPara> DeconvParaPtr;
 
 }
 #endif

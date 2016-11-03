@@ -29,56 +29,41 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-#ifndef PROT_FEATURE_DECONV_PARA_HPP_
-#define PROT_FEATURE_DECONV_PARA_HPP_
-
-#include <string>
-#include <memory>
-#include <map>
-#include <vector>
+#include "feature/text_writer.hpp"
 
 namespace prot {
 
-enum OutputType {OUTPUT_MGF, OUTPUT_MSALIGN, OUTPUT_TEXT};
-enum InputType {INPUT_MGF, INPUT_MZXML};
+void TextWriter::writeText(std::ofstream &file, MatchEnvPtrVec &envs, MsHeaderPtr header_ptr) {
 
-class DeconvPara {
- public:
-  DeconvPara(std::map<std::string, std::string> &arguments);
+  file << "Result of scan(s): " << header_ptr->getScansString() << std::endl;
+  file << "Ms level: " << header_ptr->getMsLevel() << std::endl;
+  file << "Precursor information: monoisotopic m/z: " << header_ptr->getPrecMonoMz()
+      << " charge: " << header_ptr->getPrecCharge()
+      << " monoisotopic mass: " << header_ptr->getPrecMonoMass() << std::endl;
+  file << "Scans\tMs_Level\tEnvelope\tReference_Idx\tCharge\tScore\tTheo_Peak_Num"
+      << "\tReal_Peak_Num\tTheo_Mono_Mz\tReal_Mono_Mz\tTheo_Mono_Mass\tReal_Mono_Mass"
+      << "\tTheo_Intensity_Sum\tReal_Intensity_Sum" << std::endl;
 
-  void setDataFileName(std::string &file_name) {data_file_name_ == file_name;}
-
-  std::string getDataFileName() {return data_file_name_;}
-
-  int setOutputType (std::string &format);
-
-  int setInputType (std::string &format);
-
-  std::string getOutputType() {return output_type_str_[output_type_];}
-
-  std::string data_file_name_;
-  std::string exec_dir_;
-  InputType input_type_;
-  OutputType output_type_;
-
-  bool refine_prec_mass_;
-  int ms_level_; //ms level
-  bool missing_level_one_;
-
-  int max_charge_;
-  double max_mass_;
-  double tolerance_;
-  double sn_ratio_;
-  bool keep_unused_peaks_;
-
-  bool output_multiple_mass_ = false; 
-
-  double prec_window_;
-
-  std::vector<std::string> output_type_str_ = {"mgf", "msalign", "text"};
-};
-
-typedef std::shared_ptr<DeconvPara> DeconvParaPtr;
+  for (size_t i = 0; i < envs.size(); i++) {
+    MatchEnvPtr env = envs[i];
+    EnvelopePtr theo_env = env->getTheoEnvPtr();
+    RealEnvPtr real_env = env->getRealEnvPtr();
+    file << header_ptr->getScansString() << "\t"
+        << header_ptr->getMsLevel() << "\t"
+        << (i + 1) << "\t"
+        << theo_env->getReferIdx() << "\t"
+        << theo_env->getCharge() << "\t"
+        << env->getScore() << "\t"
+        << theo_env->getPeakNum() << "\t"
+        << (real_env->getPeakNum() - real_env->getMissPeakNum()) << "\t"
+        << theo_env->getMonoMz() << "\t"
+        << real_env->getMonoMz() << "\t"
+        << theo_env->getMonoMass() << "\t"
+        << real_env->getMonoMass() << "\t"
+        << theo_env->compIntensitySum() << "\t"
+        << real_env->compIntensitySum() << std::endl;
+  }
+  file << std::endl; 
+}
 
 }
-#endif
