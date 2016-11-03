@@ -45,7 +45,6 @@ file(GLOB POISSON_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/poisson/*.cpp)
 file(GLOB TDGF_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/tdgf/*.cpp)
 file(GLOB PRSM_VIEW_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/prsmview/*.cpp)
 file(GLOB LOCAL_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/local/*.cpp)
-file(GLOB LOCAL_ANNO   ${CMAKE_CURRENT_SOURCE_DIR}/src/local/local_anno.cpp)
 file(GLOB TAG_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/tagfinder/*.cpp)
 file(GLOB ARGU_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/argument.cpp)
 file(GLOB MAIN_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic.cpp) 
@@ -70,10 +69,10 @@ add_executable(toppic ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
 set_target_properties(toppic PROPERTIES COMPILE_FLAGS "-DTOPPIC")
 
 add_executable(toppic_mg ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
-    ${GRAPH_SRCS} ${GRAPH_ALIGN_SRCS} ${ARGU_SRCS} ${LOCAL_ANNO} ${ONE_PTM_SEARCH_SRCS} ${GRAPH_MAIN})
+    ${GRAPH_SRCS} ${GRAPH_ALIGN_SRCS} ${ARGU_SRCS} ${ONE_PTM_SEARCH_SRCS} ${GRAPH_MAIN})
 set_target_properties(toppic_mg PROPERTIES COMPILE_FLAGS "-DMASS_GRAPH")
 
-add_executable(topfd ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS} ${LOCAL_ANNO} ${FEATURE_MAIN})
+add_executable(topfd ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS} ${FEATURE_MAIN})
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     # Windows specific code
