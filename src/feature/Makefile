@@ -19,7 +19,7 @@ MAIN = $(BIN_DIR)/test_feature
 all:    $(MAIN)
 
 $(MAIN): $(OBJS)
-	$(CC) $(CPPFLAGS) $(INCLUDES) -o $(MAIN) $(OBJS) $(LINK_OBJS) $(LFLAGS) $(LIBS)
+#	$(CC) $(CPPFLAGS) $(INCLUDES) -o $(MAIN) $(OBJS) $(LINK_OBJS) $(LFLAGS) $(LIBS)
 
 $(OBJ_DIR)/%.o: %.cpp
 	$(CC) -c $(CPPFLAGS) $(INCLUDES) $< -o $@
