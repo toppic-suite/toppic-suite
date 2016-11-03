@@ -52,7 +52,7 @@ void readSpectra(std::string &file_name, DeconvMsPtrVec &ms_ptr_vec) {
     //std::cout << std::flush <<  "reading spectrum " << header_ptr_vec.size() << "\r";
   }
   sp_reader.close();
-  std::cout << std::endl;
+//  std::cout << std::endl;
 }
 
 void readHeaders(std::string &file_name, MsHeaderPtrVec &header_ptr_vec) {
@@ -66,7 +66,7 @@ void readHeaders(std::string &file_name, MsHeaderPtrVec &header_ptr_vec) {
     //std::cout << std::flush <<  "reading spectrum " << header_ptr_vec.size() << "\r";
   }
   sp_reader.close();
-  std::cout << std::endl;
+//  std::cout << std::endl;
 }
 
 void outputHeaders(MsHeaderPtrVec &header_ptr_vec) {

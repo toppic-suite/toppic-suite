@@ -61,14 +61,16 @@ int deconvProcess(int argc, char* argv[]) {
     LOG_DEBUG("init process");
     process.process();
 
-    std::string spec_file_name = arguments["spectrumFileName"];
-    LOG_DEBUG("file name " << spec_file_name);
-    FeatureDetect::process(spec_file_name);
+    if (arguments["outputType"] == "msalign") {
+      std::string spec_file_name = arguments["spectrumFileName"];
+      LOG_DEBUG("file name " << spec_file_name);
+      FeatureDetect::process(spec_file_name);
+    }
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
   }
-  std::cout << "TopFD finished." << std::endl;
+  std::cout << std::endl << "TopFD finished." << std::endl;
   return 0;
 }
 

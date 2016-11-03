@@ -33,6 +33,8 @@
 #include "base/file_util.hpp"
 #include "feature/deconv_process.hpp"
 #include "feature/msalign_writer.hpp"
+#include "feature/mgf_writer.hpp"
+#include "feature/text_writer.hpp"
 
 namespace prot {
 
@@ -77,8 +79,18 @@ void DeconvProcess::process() {
 
   std::string file_name = para_ptr_->getDataFileName();
   // writer
-  std::string ms1_name = FileUtil::basename(file_name) + ".ms1";
-  std::string ms2_name = FileUtil::basename(file_name) + ".ms2";
+  std::string ms1_name, ms2_name;
+  if (para_ptr_->output_type_ == OUTPUT_MGF) {
+    ms1_name = FileUtil::basename(file_name) + ".mgf";
+    ms2_name = FileUtil::basename(file_name) + ".mgf";
+  } else if (para_ptr_->output_type_ == OUTPUT_MSALIGN) {
+    ms1_name = FileUtil::basename(file_name) + ".ms1";
+    ms2_name = FileUtil::basename(file_name) + ".ms2";	  
+  } else if (para_ptr_->output_type_ == OUTPUT_TEXT) {
+    ms1_name = FileUtil::basename(file_name) + ".txt";
+    ms2_name = FileUtil::basename(file_name) + ".txt";
+  }
+
   std::ofstream of1(ms1_name, std::ofstream::out);
   std::ofstream of2(ms2_name, std::ofstream::out);
   of1.precision(16);
@@ -118,7 +130,9 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr, FeatureMsReaderPtr read
       deconv_ptr->setData(peak_list);
       deconv_ptr->run();
       MatchEnvPtrVec result_envs = deconv_ptr->getResult();
-      MsalignWriter::writeText(of1, result_envs, header_ptr);
+      if (para_ptr_->output_type_ == OUTPUT_MSALIGN) {
+        MsalignWriter::writeText(of1, result_envs, header_ptr);
+      }
       count1++;
     } else {
       if (para_ptr_->missing_level_one_) {
@@ -137,7 +151,14 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr, FeatureMsReaderPtr read
       }
       deconv_ptr->run();
       MatchEnvPtrVec result_envs = deconv_ptr->getResult();
-      MsalignWriter::writeText(of2, result_envs, header_ptr);
+      if (para_ptr_->output_type_ == OUTPUT_MGF) {
+        MGFWriter::writeText(of2, result_envs, header_ptr);
+      } else if (para_ptr_->output_type_ == OUTPUT_MSALIGN) {
+        MsalignWriter::writeText(of2, result_envs, header_ptr); 
+      } else if (para_ptr_->output_type_ == OUTPUT_TEXT) {
+        TextWriter::writeText(of2, result_envs, header_ptr);
+      }      
+
       count2++;
     }
   }
