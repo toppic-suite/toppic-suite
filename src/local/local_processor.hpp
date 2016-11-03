@@ -34,12 +34,12 @@
 
 #include "htslib/faidx.h"
 #include "base/ptm.hpp"
+#include "base/local_anno.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "spec/theo_peak.hpp"
 #include "tdgf/tdgf_mng.hpp"
 #include "local_mng.hpp"
-#include "local_anno.hpp"
 
 namespace prot {
 

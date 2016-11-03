@@ -21,10 +21,10 @@ all:
 	cd prsmview; make	
 	cd local; make
 	cd graph; make
-	cd graphalign; make
-	cd test; make
 	cd feature; make
 	cd console; make
+	cd test; make
+	cd graphalign; make
 
 clean:
 	cd base; make clean

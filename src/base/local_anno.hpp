@@ -29,8 +29,8 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-#ifndef PROT_LOCAL_ANNO_HPP_
-#define PROT_LOCAL_ANNO_HPP_
+#ifndef PROT_BASE_LOCAL_ANNO_HPP_
+#define PROT_BASE_LOCAL_ANNO_HPP_
 
 #include <vector>
 #include <algorithm>
