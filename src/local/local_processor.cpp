@@ -34,6 +34,7 @@
 #include "base/mod_util.hpp"
 #include "base/algorithm.hpp"
 #include "base/web_logger.hpp"
+#include "base/local_anno.hpp"
 #include "spec/msalign_reader.hpp"
 #include "spec/spectrum_set.hpp"
 #include "spec/extend_ms_factory.hpp"
@@ -43,7 +44,6 @@
 #include "spec/msalign_util.hpp"
 #include "local_processor.hpp"
 #include "local_util.hpp"
-#include "local_anno.hpp"
 
 namespace prot {
 

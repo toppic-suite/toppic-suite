@@ -35,7 +35,7 @@
 #include "base/change_type.hpp"
 #include "base/mod.hpp"
 #include "base/xml_dom_document.hpp"
-#include "local/local_anno.hpp"
+#include "base/local_anno.hpp"
 
 namespace prot {
 
