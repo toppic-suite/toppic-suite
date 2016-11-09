@@ -294,4 +294,22 @@
   <unimod>421</unimod>
   <mono_mass>31.972071</mono_mass>
 </ptm>
+<ptm>
+  <name>Formylation</name>
+  <abbreviation>Formyl</abbreviation>
+  <unimod>122</unimod>
+  <mono_mass>27.994915</mono_mass>
+</ptm>
+<ptm>
+  <name>Palmitoylation</name>
+  <abbreviation>Palmitoyl</abbreviation>
+  <unimod>47</unimod>
+  <mono_mass>238.229666</mono_mass>
+</ptm>
+<ptm>
+  <name>diacylglycerol</name>
+  <abbreviation>Diacylglycerol</abbreviation>
+  <unimod>377</unimod>
+  <mono_mass>576.511761</mono_mass>
+</ptm>
 </ptm_list> 
