@@ -254,7 +254,7 @@
 </ptm>
 <ptm>
   <name>Pyro-glu from E</name>
-  <abbreviation>Glu->pyro-Glu</abbreviation>
+  <abbreviation>Glu-&gt;pyro-Glu</abbreviation>
   <unimod>27</unimod>
   <mono_mass>-18.010565</mono_mass>
 </ptm>
@@ -266,7 +266,7 @@
 </ptm>
 <ptm>
   <name>Pyro-glu from Q</name>
-  <abbreviation>Gln->pyro-Glu</abbreviation>
+  <abbreviation>Gln-&gt;pyro-Glu</abbreviation>
   <unimod>28</unimod>
   <mono_mass>-17.026549</mono_mass>
 </ptm>
