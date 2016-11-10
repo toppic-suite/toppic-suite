@@ -312,4 +312,28 @@
   <unimod>377</unimod>
   <mono_mass>576.511761</mono_mass>
 </ptm>
+<ptm>
+  <name>Myristoylation</name>
+  <abbreviation>Myristoyl</abbreviation>
+  <unimod>45</unimod>
+  <mono_mass>210.198366</mono_mass>
+</ptm>
+<ptm>
+  <name>Geranyl-geranyl</name>
+  <abbreviation>GeranylGeranyl</abbreviation>
+  <unimod>48</unimod>
+  <mono_mass>272.250401</mono_mass>
+</ptm>
+<ptm>
+  <name>Farnesylation</name>
+  <abbreviation>Farnesyl</abbreviation>
+  <unimod>44</unimod>
+  <mono_mass>204.187801</mono_mass>
+</ptm>
+<ptm>
+  <name>glycosylphosphatidylinositol</name>
+  <abbreviation>GPIanchor</abbreviation>
+  <unimod>394</unimod>
+  <mono_mass>123.008530</mono_mass>
+</ptm>
 </ptm_list> 
