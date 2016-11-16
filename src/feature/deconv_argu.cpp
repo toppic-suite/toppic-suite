@@ -84,7 +84,7 @@ bool DeconvArgument::parse(int argc, char* argv[]) {
         ("keep,k", "Report peaks not in good isotopic envelopes.")
         ("max-charge,c", po::value<std::string> (&max_charge),
          "<integer value>. Set the maximum charge state of spectra. Default value is 30.")
-        ("max_mass,m", po::value<std::string> (&max_mass),
+        ("max-mass,m", po::value<std::string> (&max_mass),
          "<float value>. Set the maximum monoisopotic mass of fragment ions. Default value is 100000.")
         ("mz-error,e", po::value<std::string> (&mz_error),
          "<float value>. Set the error tolerance of m/z values of peaks. Default value is 0.02.")
@@ -103,7 +103,7 @@ bool DeconvArgument::parse(int argc, char* argv[]) {
         ("keep,k", "Report peaks not in good isotopic envelopes.")
         ("max-charge,c", po::value<std::string> (&max_charge),
          "<integer value>. Set the maximum charge state of spectra. Default value is 30.")
-        ("max_mass,m", po::value<std::string> (&max_mass),
+        ("max-mass,m", po::value<std::string> (&max_mass),
          "<float value>. Set the maximum monoisopotic mass of fragment ions. Default value is 100000.")
         ("mz-error,e", po::value<std::string> (&mz_error),
          "<float value>. Set the error tolerance of m/z values of peaks. Default value is 0.02.")
