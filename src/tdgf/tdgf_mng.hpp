@@ -77,7 +77,7 @@ class TdgfMng {
   // number of mass shift
   int unexpected_shift_num_ = 2;
   double convert_ratio_ = 274.335215;
-  double max_prec_mass_ = 51000;
+  double max_prec_mass_ = 100000;  
   int max_table_height_ = 128;
   int min_height_ = 10;
 
