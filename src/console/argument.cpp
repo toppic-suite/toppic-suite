@@ -90,9 +90,7 @@ void Argument::outputArguments(std::ostream &output,
   output << std::setw(44) << std::left << "Cutoff value: " << "\t" << arguments["cutoffValue"] << std::endl;
   output << std::setw(44) << std::left << "Allowed N-terminal forms: " << "\t" << arguments["allowProtMod"] << std::endl;
   output << std::setw(44) << std::left << "Maximum mass shift of modifications: " << "\t" << arguments["maxPtmMass"] << " Da" << std::endl;
-#if defined MASS_GRAPH
   output << std::setw(44) << std::left << "Thread number: " << "\t" << arguments["threadNumber"] << std::endl;
-#endif
 
   if (arguments["useGf"] == "true") {
     output << std::setw(44) << std::left << "E-value computation: " << "\t" << "Generating function" << std::endl;
