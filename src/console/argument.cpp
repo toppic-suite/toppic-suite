@@ -30,6 +30,7 @@
 
 
 #include <iomanip>
+#include <boost/thread/thread.hpp>
 #include <boost/algorithm/string.hpp>
 #include "base/file_util.hpp"
 #include "base/xml_dom_util.hpp"
@@ -206,9 +207,8 @@ bool Argument::parse(int argc, char* argv[]) {
         ("miscore-threshold,s", po::value<std::string> (&local_threshold), "<a positive number between 0 and 1>. Score threshold (modification identification score) for filtering results of PTM characterization. Default value: 0.45.")
 #if defined MASS_GRAPH
         ("proteo-graph-dis,j", po::value<std::string> (&proteo_graph_dis), "<positive number>. Gap in constructing proteoform graph. Default value: 20.")
-        ("thread-number,u", po::value<std::string> (&thread_number), "<positive number>. Number of threads used in the computation. Default value: 1.")
-#endif
-        ;
+#endif        
+        ("thread-number,u", po::value<std::string> (&thread_number), "<positive number>. Number of threads used in the computation. Default value: 1.");
     po::options_description desc("Options");
 
     desc.add_options() 
@@ -421,7 +421,6 @@ bool Argument::validateArguments() {
     LOG_ERROR("Maximum ptm mass " << max_ptm_mass << " should be a number.");
     return false;
   }
-  return true;
 
   std::string cutoff_value = arguments_["cutoffValue"];
   try {
@@ -443,8 +442,9 @@ bool Argument::validateArguments() {
       LOG_ERROR("Thread number " << thread_number << " error! The value should be positive.");
       return false;
     }
-    if(num > 64){
-      LOG_ERROR("Thread number " << thread_number << " error! The value is too large.");
+    int n = static_cast<int>(boost::thread::hardware_concurrency());
+    if(num > n){
+      LOG_ERROR("Thread number " << thread_number << " error! The value is too large. Only " << n << " threads are supported.");
       return false;
     }
   }
