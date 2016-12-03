@@ -105,9 +105,6 @@ def get_header_guard_dmlc(filename):
     """Get Header Guard Convention for DMLC Projects.
     For headers in include, directly use the path
     For headers in src, use project name plus path
-    Examples: with project-name = dmlc
-        include/dmlc/timer.h -> DMLC_TIMTER_H_
-        src/io/libsvm_parser.h -> DMLC_IO_LIBSVM_PARSER_H_
     """
     fileinfo = cpplint.FileInfo(filename)
     file_path_from_root = fileinfo.RepositoryName()
