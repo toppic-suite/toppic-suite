@@ -64,9 +64,7 @@
 
 namespace prot {
 
-
 int proteoform_graph_test(int argc, char* argv[]) {
-
   try {
     Argument argu_processor;
     bool success = argu_processor.parse(argc, argv);
@@ -78,7 +76,8 @@ int proteoform_graph_test(int argc, char* argv[]) {
 
     std::string exe_dir = arguments["executiveDir"];
     time_t start = time(0);
-    arguments["start_time"] = std::string(ctime(&start));
+    char buf[50];
+    arguments["start_time"] = std::string(ctime_r(&start, buf));
     argu_processor.outputArguments(std::cout, arguments);
 
     BaseData::init(exe_dir);
@@ -108,38 +107,34 @@ int proteoform_graph_test(int argc, char* argv[]) {
     FastaUtil::dbPreprocess(ori_db_file_name, db_file_name, decoy, db_block_size);
     MsAlignUtil::geneSpIndex(sp_file_name);
 
-    boost::timer t;
-
-    PrsmParaPtr prsm_para_ptr = PrsmParaPtr(new PrsmPara(arguments));
+    PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
 
     std::cout << "Graph alignment started." << std::endl;
 
-
     int max_mod_num = 10;
     int gap = std::stoi(arguments["proteo_graph_dis"]);
-    GraphAlignMngPtr ga_mng_ptr = 
-        GraphAlignMngPtr(new GraphAlignMng(prsm_para_ptr, 
-                                           residue_mod_file_name, 
-                                           ptm_num, max_mod_num, 
-                                           gap, max_ptm_mass,
-                                           thread_num, "GRAPH_ALIGN"));
-    //ga_mng_ptr->prec_error_ = 0;
+    GraphAlignMngPtr ga_mng_ptr
+        = std::make_shared<GraphAlignMng>(prsm_para_ptr,
+                                          residue_mod_file_name,
+                                          ptm_num, max_mod_num,
+                                          gap, max_ptm_mass,
+                                          thread_num, "GRAPH_ALIGN");
+    // ga_mng_ptr->prec_error_ = 0;
     LOG_DEBUG("shift num " << ptm_num);
-    GraphAlignProcessorPtr ga_processor_ptr = GraphAlignProcessorPtr(new GraphAlignProcessor(ga_mng_ptr));
+    GraphAlignProcessorPtr ga_processor_ptr = std::make_shared<GraphAlignProcessor>(ga_mng_ptr);
     ga_processor_ptr->process();
     ga_processor_ptr = nullptr;
     std::cout << "Graph alignment finished." << std::endl;
 
-    std::cout << "Graph alignment running time: " << t.elapsed()  << " seconds " << std::endl;
-
     std::cout << "Combining PRSMs started." << std::endl;
-    std::vector<std::string> input_exts ;
+    std::vector<std::string> input_exts;
     input_exts.push_back("GRAPH_ALIGN");
     for (int i = 1; i <=100; i++) {
       input_exts.push_back("GRAPH_ALIGN_" + std::to_string(i));
     }
     int prsm_top_num = 1;
-    PrsmStrCombinePtr combine_ptr(new PrsmStrCombine(sp_file_name, input_exts, "RAW_RESULT", prsm_top_num));
+    PrsmStrCombinePtr combine_ptr
+        = std::make_shared<PrsmStrCombine>(sp_file_name, input_exts, "RAW_RESULT", prsm_top_num);
     bool normalization = true;
     combine_ptr->process(normalization);
     combine_ptr = nullptr;
@@ -148,10 +143,10 @@ int proteoform_graph_test(int argc, char* argv[]) {
     std::cout << "PRSM selecting by cutoff started." << std::endl;
     std::string cutoff_type = "FRAG";
     double cutoff_value = 10;
-    //std::istringstream (arguments["cutoffValue"]) >> cutoff_value;
-    PrsmCutoffSelectorPtr cutoff_selector = PrsmCutoffSelectorPtr(
-        new PrsmCutoffSelector(db_file_name, sp_file_name, "RAW_RESULT", "CUTOFF_RESULT", 
-                               cutoff_type, cutoff_value));
+    // std::istringstream (arguments["cutoffValue"]) >> cutoff_value;
+    PrsmCutoffSelectorPtr cutoff_selector
+        = std::make_shared<PrsmCutoffSelector>(db_file_name, sp_file_name, "RAW_RESULT",
+                                               "CUTOFF_RESULT", cutoff_type, cutoff_value);
     cutoff_selector->process();
     cutoff_selector = nullptr;
     std::cout << "PRSM selecting by cutoff finished." << std::endl;
@@ -161,48 +156,49 @@ int proteoform_graph_test(int argc, char* argv[]) {
     std::istringstream(arguments["errorTolerance"]) >> ppo;
     ppo = ppo / 1000000.0;
     ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();
-    PrsmFeatureSpeciesPtr prsm_forms = PrsmFeatureSpeciesPtr(
-        new PrsmFeatureSpecies(db_file_name, sp_file_name, "CUTOFF_RESULT",
-                               "FORMS", fix_mod_list));
+    PrsmFeatureSpeciesPtr prsm_forms
+        = std::make_shared<PrsmFeatureSpecies>(db_file_name, sp_file_name,
+                                               "CUTOFF_RESULT", "FORMS", fix_mod_list);
     prsm_forms->process();
     prsm_forms = nullptr;
     std::cout << "Finding protein species finished." << std::endl;
 
     time_t end = time(0);
-    arguments["end_time"] = std::string(ctime(&end));
-    arguments["running_time"] = std::to_string((int)difftime(end, start));
+    arguments["end_time"] = std::string(ctime_r(&end, buf));
+    arguments["running_time"] = std::to_string(static_cast<int>(difftime(end, start)));
 
     std::cout << "Outputting table starts " << std::endl;
-    PrsmTableWriterPtr table_out = PrsmTableWriterPtr(
-        new PrsmTableWriter(prsm_para_ptr, arguments, "FORMS", "OUTPUT_TABLE"));
+    PrsmTableWriterPtr table_out
+        = std::make_shared<PrsmTableWriter>(prsm_para_ptr, arguments, "FORMS", "OUTPUT_TABLE");
     table_out->write();
     table_out = nullptr;
     std::cout << "Outputting table finished." << std::endl;
 
     std::cout << "PRSM proteoform filtering - started." << std::endl;
-    PrsmFormFilterPtr form_filter = PrsmFormFilterPtr(
-        new PrsmFormFilter(db_file_name, sp_file_name, "FORMS", "FORM_FILTER_RESULT", "FORM_RESULT"));
+    PrsmFormFilterPtr form_filter
+        = std::make_shared<PrsmFormFilter>(db_file_name, sp_file_name,
+                                           "FORMS", "FORM_FILTER_RESULT", "FORM_RESULT");
     form_filter->process();
     form_filter = nullptr;
     std::cout << "PRSM proteoform filtering - finished." << std::endl;
 
     std::cout << "Outputting the proteoform table - started." << std::endl;
-    PrsmTableWriterPtr form_out = PrsmTableWriterPtr(
-        new PrsmTableWriter(prsm_para_ptr, arguments, "FORM_RESULT", "FORM_OUTPUT_TABLE"));
+    PrsmTableWriterPtr form_out
+        = std::make_shared<PrsmTableWriter>(prsm_para_ptr, arguments,
+                                            "FORM_RESULT", "FORM_OUTPUT_TABLE");
     form_out->write();
     form_out = nullptr;
     std::cout << "Outputting the proteoform table - finished." << std::endl;
     /*std::cout << "Generating view xml files started." << std::endl;*/
-    //XmlGeneratorPtr xml_gene = XmlGeneratorPtr(new XmlGenerator(prsm_para_ptr, exe_dir, "OUTPUT_RESULT"));
-    //xml_gene->process();
-    //xml_gene = nullptr;
-    //std::cout << "Generating view xml files finished." << std::endl;
+    // XmlGeneratorPtr xml_gene
+    // = XmlGeneratorPtr(new XmlGenerator(prsm_para_ptr, exe_dir, "OUTPUT_RESULT"));
+    // xml_gene->process();
+    // xml_gene = nullptr;
+    // std::cout << "Generating view xml files finished." << std::endl;
 
-    //std::cout << "Converting xml files to html files started." << std::endl;
-    //translate(arguments);
-    /*std::cout << "Converting xml files to html files finished." << std::endl;*/
-
-
+    // std::cout << "Converting xml files to html files started." << std::endl;
+    // translate(arguments);
+    /* std::cout << "Converting xml files to html files finished." << std::endl;*/
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
@@ -211,9 +207,9 @@ int proteoform_graph_test(int argc, char* argv[]) {
   return 0;
 }
 
-}
+}  // namespace prot
 
 int main(int argc, char* argv[]) {
-  //prot::log_level = 2;
+  // prot::log_level = 2;
   return prot::proteoform_graph_test(argc, argv);
 }

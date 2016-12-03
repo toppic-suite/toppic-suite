@@ -55,7 +55,7 @@ int deconvProcess(int argc, char* argv[]) {
     std::map<std::string, std::string> arguments = argu_processor.getArguments();
     LOG_DEBUG("parse complete");
 
-    DeconvParaPtr para_ptr(new DeconvPara(arguments));
+    DeconvParaPtr para_ptr = std::make_shared<DeconvPara>(arguments);
     LOG_DEBUG("deconv para");
     DeconvProcess process(para_ptr);
     LOG_DEBUG("init process");
