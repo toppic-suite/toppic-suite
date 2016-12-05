@@ -340,7 +340,7 @@ int two_base_opt(int argc, char* argv[]) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
   }
-  std::cout << "TopPC finished." << std::endl;
+  std::cout << "TopPIC finished." << std::endl;
   return 0;
 }
 
