@@ -153,6 +153,7 @@ int getMs1IdEnd(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtr best_ptr,
 
 double getFeatureIntensity(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtr best_ptr, 
                            int ms1_id_begin, int ms1_id_end, FeatureDetectMngPtr mng_ptr) {
+  if (ms1_ptr_vec.size() == 0) return 0.0;
   double sum = 0;
   double prec_mass = best_ptr->getPrecMonoMass();
   double error_tole = mng_ptr->peak_tolerance_ptr_->compStrictErrorTole(prec_mass);
@@ -203,6 +204,7 @@ int getMs2IdEnd(MsHeaderPtrVec &header_ptr_vec, MsHeaderPtr best_ptr, int ms1_id
 void groupHeaders(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtrVec &header_ptr_vec, 
                   FeatureDetectMngPtr mng_ptr, MsHeaderPtr2D &result_groups,
                   FeaturePtrVec &features) {
+  if (ms1_ptr_vec.size() == 0) return;
   MsHeaderPtrVec remain_ptrs = header_ptr_vec; 
   MsHeaderPtrVec sorted_ptrs = remain_ptrs; 
   while (sorted_ptrs.size() > 0) {
