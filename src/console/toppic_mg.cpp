@@ -72,7 +72,7 @@ int proteoform_graph_test(int argc, char* argv[]) {
       return 1;
     }
     std::map<std::string, std::string> arguments = argu_processor.getArguments();
-    std::cout << "TopPIC mass graph" << std::endl;
+    std::cout << "TopMG 0.1beta (" << __DATE__ << ")" << std::endl;
 
     std::string exe_dir = arguments["executiveDir"];
     time_t start = time(0);
@@ -203,7 +203,7 @@ int proteoform_graph_test(int argc, char* argv[]) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
   }
-  std::cout << "Proteoform test finished." << std::endl;
+  std::cout << "TopMG finished." << std::endl;
   return 0;
 }
 
