@@ -32,6 +32,10 @@
 #ifndef PROT_DIST_HPP_
 #define PROT_DIST_HPP_
 
+#include <utility>
+#include <set>
+#include <vector>
+
 #include "graph/graph.hpp"
 
 namespace prot {
@@ -61,7 +65,7 @@ class Dist{
 typedef std::vector<Dist> DistVec;
 typedef std::vector<DistVec> DistVec2D;
 
-inline bool distVecUp(const Dist &a, const Dist &b){
+inline bool distVecUp(const Dist & a, const Dist & b) {
   return a.dist_ < b.dist_;
 }
 
@@ -70,6 +74,6 @@ void addToDistVec(MassGraphPtr graph_ptr,
                   int node_num, int mod_num, DistVec & dist_vec,
                   int gap);
 
-}
+}  // namespace prot
 
 #endif
