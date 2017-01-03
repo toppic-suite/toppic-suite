@@ -28,6 +28,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <string>
 
 #include "base/logger.hpp"
 #include "base/acid.hpp"
@@ -38,9 +39,9 @@
 
 namespace prot {
 
-Acid::Acid(const std::string &name, const std::string &one_letter, 
-           const std::string &three_letter, const std::string &composition, 
-           double mono_mass, double average_mass): 
+Acid::Acid(const std::string &name, const std::string &one_letter,
+           const std::string &three_letter, const std::string &composition,
+           double mono_mass, double average_mass):
     name_(name),
     one_letter_(one_letter),
     three_letter_(three_letter),
@@ -49,7 +50,7 @@ Acid::Acid(const std::string &name, const std::string &one_letter,
     average_mass_(average_mass) {
     }
 
-Acid::Acid(xercesc::DOMElement* element) { 
+Acid::Acid(xercesc::DOMElement* element) {
   name_ = XmlDomUtil::getChildValue(element, "name", 0);
   one_letter_ = XmlDomUtil::getChildValue(element, "one_letter", 0);
   three_letter_ = XmlDomUtil::getChildValue(element, "three_letter", 0);
@@ -58,7 +59,7 @@ Acid::Acid(xercesc::DOMElement* element) {
   average_mass_ = XmlDomUtil::getDoubleChildValue(element, "average_mass", 0);
 }
 
-void Acid::appendNameToXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
+void Acid::appendNameToXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   std::string element_name = Acid::getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
   xml_doc->addElement(element, "name", name_.c_str());
@@ -70,4 +71,4 @@ std::string Acid::getNameFromXml(xercesc::DOMElement * element) {
   return name;
 }
 
-} 
+}  // namespace prot

@@ -32,6 +32,8 @@
 #ifndef PROT_BASE_ACTIVATION_BASE_HPP_
 #define PROT_BASE_ACTIVATION_BASE_HPP_
 
+#include <string>
+
 #include "base/activation.hpp"
 
 namespace prot {
@@ -48,9 +50,8 @@ class ActivationBase {
   static ActivationPtr getActivationPtrByName(const std::string &name);
 
   static ActivationPtr getActivationPtrFromXml(xercesc::DOMElement * element);
-
 };
 
-} 
+}  // namespace prot
 
-#endif 
+#endif

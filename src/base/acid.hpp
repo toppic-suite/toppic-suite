@@ -42,11 +42,11 @@ namespace prot {
 
 class Acid {
  public:
-  Acid(const std::string &name, const std::string &one_letter, 
-       const std::string &three_letter, const std::string &composition, 
-       double mono_mass, double avg_mass); 
+  Acid(const std::string &name, const std::string &one_letter,
+       const std::string &three_letter, const std::string &composition,
+       double mono_mass, double avg_mass);
 
-  Acid(xercesc::DOMElement* element); 
+  explicit Acid(xercesc::DOMElement* element);
 
   // Get amino acid composition
   std::string getAcidComposition() {return composition_;}
@@ -66,7 +66,7 @@ class Acid {
   // Get amino acid three letter representation
   std::string getThreeLetter() {return three_letter_;}
 
-  void appendNameToXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+  void appendNameToXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
   static std::string getNameFromXml(xercesc::DOMElement * element);
 
@@ -75,22 +75,22 @@ class Acid {
  private:
   // Name of amino acid
   std::string name_;
-  // One letter representation 
+  // One letter representation
   std::string one_letter_;
-  // Three letter representation 
+  // Three letter representation
   std::string three_letter_;
-  // amino acid chemical composition 
+  // amino acid chemical composition
   std::string composition_;
-  // residue monoisotopic mass 
+  // residue monoisotopic mass
   double mono_mass_;
-  // residue average mass 
+  // residue average mass
   double average_mass_;
 };
 
 typedef std::shared_ptr<Acid> AcidPtr;
 typedef std::vector<AcidPtr> AcidPtrVec;
 
-}
+}  // namespace prot
 
 #endif
 
