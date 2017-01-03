@@ -50,7 +50,11 @@ void Argument::initArguments() {
   arguments_["activation"] = "FILE";
   arguments_["searchType"] = "TARGET";
   arguments_["fixedMod"] = "";
+#ifdef MASS_GRAPH
+  arguments_["ptmNumber"] = "0";
+#else
   arguments_["ptmNumber"] = "1";
+#endif
   arguments_["errorTolerance"] = "15";
   arguments_["cutoffType"] = "EVALUE";
   arguments_["cutoffValue"] = "0.01";
@@ -101,7 +105,9 @@ void Argument::outputArguments(std::ostream &output,
 
   if (arguments["residueModFileName"] != "") {
     output << std::setw(44) << std::left << "Common modification file name: " << "\t" << arguments["residueModFileName"] << std::endl;
+#ifndef MASS_GRAPH
     output << std::setw(44) << std::left << "MIScore threshold: " << "\t" << arguments["local_threshold"] << std::endl;
+#endif
   }
 #if defined MASS_GRAPH
   output << std::setw(44) << std::left << "Gap in proteoform graph: " << "\t" << arguments["proteo_graph_dis"] << std::endl;
