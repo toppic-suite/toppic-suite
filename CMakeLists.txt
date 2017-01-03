@@ -68,9 +68,9 @@ add_executable(toppic ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
     ${PTM_SRCS} ${TDGF_SRCS} ${LOCAL_SRCS} ${PRSM_VIEW_SRCS} ${ARGU_SRCS} ${MAIN_SRCS})
 set_target_properties(toppic PROPERTIES COMPILE_FLAGS "-DTOPPIC")
 
-add_executable(toppic_mg ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
+add_executable(topmg ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
     ${GRAPH_SRCS} ${GRAPH_ALIGN_SRCS} ${ARGU_SRCS} ${ONE_PTM_SEARCH_SRCS} ${GRAPH_MAIN})
-set_target_properties(toppic_mg PROPERTIES COMPILE_FLAGS "-DMASS_GRAPH")
+set_target_properties(topmg PROPERTIES COMPILE_FLAGS "-DMASS_GRAPH")
 
 add_executable(topfd ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS} ${FEATURE_MAIN})
 
@@ -80,7 +80,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
         boost_filesystem-mgw48-mt-s-1_60 boost_system-mgw48-mt-s-1_60
         boost_program_options-mgw48-mt-s-1_60 boost_thread-mgw48-mt-s-1_60 hts pthread z Ws2_32)
 
-    target_link_libraries(toppic_mg xalan-c xalanMsg xerces-c
+    target_link_libraries(topmg xalan-c xalanMsg xerces-c
         boost_filesystem-mgw48-mt-s-1_60 boost_system-mgw48-mt-s-1_60
         boost_program_options-mgw48-mt-s-1_60 boost_thread-mgw48-mt-s-1_60 hts pthread z Ws2_32)
 
@@ -97,7 +97,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     target_link_libraries(toppic xalan-c xalanMsg xerces-c boost_program_options
         boost_filesystem boost_system boost_thread hts pthread z)
 
-    target_link_libraries(toppic_mg xalan-c xalanMsg xerces-c boost_program_options
+    target_link_libraries(topmg xalan-c xalanMsg xerces-c boost_program_options
         boost_filesystem boost_system boost_thread hts pthread z)
 
     target_link_libraries(topfd pwiz xalan-c xalanMsg xerces-c boost_program_options

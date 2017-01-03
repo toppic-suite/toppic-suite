@@ -88,13 +88,15 @@ void PrsmTableWriter::write(){
 
   file << "#matched peaks" << "\t"
       << "#matched fragment ions" << "\t"
+#ifdef TOPPIC
       << "P-value" << "\t"
       << "E-value" << "\t"
       //      << "One Protein probabilty"<< "\t"
       << "Q-value (spectral FDR)" << "\t"
       << "Proteoform FDR"
-#if defined MASS_GRAPH
-      << "\t#Variable PTMs" << "\t"
+#endif
+#ifdef MASS_GRAPH
+      << "#Variable PTMs" << "\t"
 #endif
       << std::endl;
 
@@ -226,25 +228,25 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   } 
 
   file << prsm_ptr->getMatchPeakNum() << "\t"
-      << prsm_ptr->getMatchFragNum() << "\t"
-      << prsm_ptr->getPValue() << "\t"
+      << prsm_ptr->getMatchFragNum() << "\t";
+#ifdef TOPPIC
+  file << prsm_ptr->getPValue() << "\t"
       << prsm_ptr->getEValue() << "\t";
   //      << prsm_ptr->getOneProtProb()<< "\t"
   double fdr = prsm_ptr->getFdr();
   if (fdr >= 0) {
     file << fdr << "\t";
-  }
-  else { 
-    file << "\t";
+  } else { 
+    file << "-" << "\t";
   }
   double proteoform_fdr = prsm_ptr->getProteoformFdr();
   if (proteoform_fdr >= 0) {
     file << proteoform_fdr << "\t";
+  } else { 
+    file << "-" << "\t";
   }
-  else { 
-    file << "\t";
-  }
-#if defined MASS_GRAPH
+#endif
+#ifdef MASS_GRAPH
   file << prsm_ptr->getProteoformPtr()->getVariablePtmNum() << "\t";
 #endif
   file << std::endl;
