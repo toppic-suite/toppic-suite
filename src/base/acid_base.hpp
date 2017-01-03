@@ -32,6 +32,8 @@
 #ifndef PROT_BASE_ACID_BASE_HPP_
 #define PROT_BASE_ACID_BASE_HPP_
 
+#include <string>
+
 #include "base/acid.hpp"
 
 namespace prot {
@@ -74,5 +76,5 @@ class AcidBase {
   static AcidPtr empty_acid_ptr_;
 };
 
-}
+}  // namespace prot
 #endif

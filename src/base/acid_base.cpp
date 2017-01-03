@@ -28,6 +28,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <string>
 
 #include "base/logger.hpp"
 #include "base/acid_base.hpp"
@@ -37,7 +38,7 @@
 
 namespace prot {
 
-AcidPtrVec AcidBase::acid_ptr_vec_; 
+AcidPtrVec AcidBase::acid_ptr_vec_;
 AcidPtr AcidBase::empty_acid_ptr_;
 
 void AcidBase::initBase(const std::string &file_name) {
@@ -49,7 +50,7 @@ void AcidBase::initBase(const std::string &file_name) {
     int acid_num = XmlDomUtil::getChildCount(parent, element_name.c_str());
     LOG_DEBUG("acid num " << acid_num);
     for (int i = 0; i < acid_num; i++) {
-      xercesc::DOMElement* element 
+      xercesc::DOMElement* element
           = XmlDomUtil::getChildElement(parent, element_name.c_str(), i);
       AcidPtr ptr(new Acid(element));
       acid_ptr_vec_.push_back(ptr);
@@ -68,7 +69,7 @@ AcidPtr AcidBase::getAcidPtrByName(const std::string &name) {
       return acid_ptr_vec_[i];
     }
   }
-  LOG_DEBUG( "Acid not found: " + name);
+  LOG_DEBUG("Acid not found: " + name);
   return AcidPtr(nullptr);
 }
 
@@ -79,7 +80,7 @@ AcidPtr AcidBase::getAcidPtrByOneLetter(const std::string &one_letter) {
       return acid_ptr_vec_[i];
     }
   }
-  LOG_DEBUG( "Acid not found " + one_letter);
+  LOG_DEBUG("Acid not found " + one_letter);
   return AcidPtr(nullptr);
 }
 
@@ -90,7 +91,7 @@ AcidPtr AcidBase::getAcidPtrByThreeLetter(const std::string &three_letter) {
       return acid_ptr_vec_[i];
     }
   }
-  LOG_DEBUG( "Acid not found " + three_letter);
+  LOG_DEBUG("Acid not found " + three_letter);
   return AcidPtr(nullptr);
 }
 
@@ -112,4 +113,4 @@ AcidPtr AcidBase::getAcidPtrFromXml(xercesc::DOMElement * element) {
   return acid_ptr;
 }
 
-} 
+}  // namespace prot
