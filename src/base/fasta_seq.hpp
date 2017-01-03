@@ -73,13 +73,14 @@ class FastaSeq {
 
   static std::string getString(const StringPairVec &str_pair_vec);
 
+  static std::string rmChar(const std::string &ori_seq);
+
  private:
   std::string name_;
   std::string desc_;
   std::string seq_;
   StringPairVec acid_ptm_pair_vec_;
 
-  static std::string rmChar(const std::string &ori_seq);
   void compAcidPtmPairVec();
 }; 
 
