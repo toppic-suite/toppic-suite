@@ -39,7 +39,7 @@ namespace prot {
 
 class GraphAlignProcessor {
  public:
-  GraphAlignProcessor(GraphAlignMngPtr mng_ptr);
+  GraphAlignProcessor(GraphAlignMngPtr mng_ptr): mng_ptr_(mng_ptr) {};
   void process();
  private:
   GraphAlignMngPtr mng_ptr_;
