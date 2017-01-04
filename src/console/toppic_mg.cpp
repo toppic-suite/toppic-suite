@@ -83,6 +83,13 @@ int topmg_test(int argc, char* argv[]) {
     std::map<std::string, std::string> arguments = argu_processor.getArguments();
     std::cout << "TopMG 0.1beta (" << __DATE__ << ")" << std::endl;
 
+    boost::filesystem::path p(arguments["residueModFileName"]);
+    if (!boost::filesystem::exists(p)) {
+      std::cerr << arguments["residueModFileName"]
+          << " cannot be found! No modification list found!" << std::endl;
+      return 1;
+    }
+
     std::string exe_dir = arguments["executiveDir"];
     time_t start = time(0);
     char buf[50];
@@ -272,7 +279,7 @@ int topmg_test(int argc, char* argv[]) {
       FileUtil::cleanDir(ori_db_file_name, sp_file_name);
       std::cout << "Deleting temporary files - finished." << std::endl;
     }
-    
+
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
