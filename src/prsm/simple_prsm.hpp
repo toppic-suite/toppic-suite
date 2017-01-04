@@ -75,6 +75,10 @@ class SimplePrsm {
     return a->getScore() > b->getScore();
   }
 
+  static bool cmpIdInc(const SimplePrsmPtr a,SimplePrsmPtr b) {
+    return a->getSpectrumId() < b->getSpectrumId();
+  }
+
   static bool cmpNameIncScoreDec(const SimplePrsmPtr a,SimplePrsmPtr b) {
     if (a->getSeqName() < b->getSeqName()) {
       return true;

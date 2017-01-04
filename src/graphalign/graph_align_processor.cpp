@@ -39,6 +39,8 @@
 #include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_str_combine.hpp"
+#include "prsm/simple_prsm_reader.hpp"
+#include "prsm/simple_prsm_util.hpp"
 #include "graph/graph_util.hpp"
 #include "graph/proteo_graph_reader.hpp"
 #include "graph/spec_graph_reader.hpp"
@@ -48,10 +50,6 @@
 namespace prot {
 
 typedef std::shared_ptr<ThreadPool<PrsmXmlWriter>> PrsmXmlThreadPoolPtr;
-
-GraphAlignProcessor::GraphAlignProcessor(GraphAlignMngPtr mng_ptr) {
-  mng_ptr_ = mng_ptr;
-}
 
 std::function<void()> geneTask(GraphAlignMngPtr mng_ptr,
                                ProteoGraphPtr proteo_ptr,
@@ -95,68 +93,77 @@ void GraphAlignProcessor::process() {
   LOG_DEBUG("init reader complete");
 
   int spectrum_num = MsAlignUtil::getSpNum (prsm_para_ptr->getSpectrumFileName());
-  std::string base_file_name = FileUtil::basename(sp_file_name) + "." + mng_ptr_->output_file_ext_;
+  std::string input_file_name = FileUtil::basename(sp_file_name)+ "." + mng_ptr_->input_file_ext_;
+  SimplePrsmReader simple_prsm_reader(input_file_name);
+  SimplePrsmPtr prsm_ptr = simple_prsm_reader.readOnePrsm();
+  std::string output_file_name = FileUtil::basename(sp_file_name) + "." + mng_ptr_->output_file_ext_;
 
-  //ProteoGraphPtrVec proteo_ptrs;
-  ProteoGraphPtr proteo_ptr;
-  int proteo_count = 0;
-  while ((proteo_ptr = reader.getNextProteoGraphPtr()) != nullptr) {
-    std::string output_file_name = base_file_name + "_" + std::to_string(proteo_count);
-    int sp_count = 0;
-    PrsmXmlThreadPoolPtr pool_ptr = std::make_shared<ThreadPool<PrsmXmlWriter>>(mng_ptr_->thread_num_, output_file_name);
-    SpecGraphReader spec_reader(sp_file_name, 
-                                prsm_para_ptr->getGroupSpecNum(),
-                                mng_ptr_->convert_ratio_,
-                                sp_para_ptr);
-    LOG_DEBUG("init spec reader complete");
-    SpecGraphPtrVec spec_ptr_vec = spec_reader.getNextSpecGraphPtrVec(mng_ptr_->prec_error_);
-    LOG_DEBUG("spec ptr reading complete");
-    LOG_DEBUG("spec_ptr_vec " << spec_ptr_vec.size());
-    while (spec_ptr_vec.size() != 0) {
-      sp_count++;
-      LOG_DEBUG("spectrum id " << spec_ptr_vec[0]->getSpectrumSetPtr()->getSpecId());
-      std::cout << std::flush << "Mass graph is processing protein " << proteo_count 
-          << " spectrum " << sp_count << " of " << spectrum_num << " spectra.\r";
-      for (size_t i = 0; i < spec_ptr_vec.size(); i++) {
-        if (spec_ptr_vec[i]->getSpectrumSetPtr()->isValid()) {
-          while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ * 2) {
-            boost::this_thread::sleep( boost::posix_time::milliseconds(100) );
+  int group_spec_num = prsm_para_ptr->getGroupSpecNum();
+  MsAlignReader sp_reader(sp_file_name, group_spec_num,
+                          sp_para_ptr->getActivationPtr());
+
+  SpecGraphReader spec_reader(sp_file_name, 
+                              prsm_para_ptr->getGroupSpecNum(),
+                              mng_ptr_->convert_ratio_,
+                              sp_para_ptr);
+
+  PrsmXmlThreadPoolPtr pool_ptr =
+      std::make_shared<ThreadPool<PrsmXmlWriter>>(mng_ptr_->thread_num_, output_file_name);
+
+  int cnt = 0;
+  SpectrumSetPtr spec_set_ptr;
+
+  while((spec_set_ptr = sp_reader.getNextSpectrumSet(sp_para_ptr))!= nullptr){
+    cnt += group_spec_num;
+    if(spec_set_ptr->isValid()){
+      int spec_id = spec_set_ptr->getSpecId();
+      SimplePrsmPtrVec selected_prsm_ptrs;
+      while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_id) {
+        if (prsm_ptr->getScore() > 4)
+          selected_prsm_ptrs.push_back(prsm_ptr);
+        prsm_ptr = simple_prsm_reader.readOnePrsm();
+      }
+
+      if (selected_prsm_ptrs.size() > 0) {
+        SimplePrsmPtrVec simple_prsm_ptrs = 
+            SimplePrsmUtil::getUniqueMatches(selected_prsm_ptrs);
+        FastaIndexReaderPtr reader_ptr = std::make_shared<FastaIndexReader>(db_file_name);
+        for (size_t i = 0; i < simple_prsm_ptrs.size(); i++) {
+          std::string seq_name = simple_prsm_ptrs[i]->getSeqName();
+          std::string seq_desc = simple_prsm_ptrs[i]->getSeqDesc();
+          FastaSeqPtr seq_ptr = reader_ptr->readFastaSeq(seq_name, seq_desc);
+          ProteoGraphPtr proteo_ptr = reader.getProteoGraphPtrBySeq(seq_ptr);
+          SpecGraphPtrVec spec_ptr_vec = spec_reader.getNextSpecGraphPtrVec(spec_set_ptr, mng_ptr_->prec_error_);
+          for (size_t k = 0; k < spec_ptr_vec.size(); k++) {
+            while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ * 2) {
+              boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+            }
+            pool_ptr->Enqueue(geneTask(mng_ptr_, proteo_ptr,  spec_ptr_vec[k], pool_ptr));
           }
-          pool_ptr->Enqueue(geneTask(mng_ptr_, proteo_ptr,  spec_ptr_vec[i], pool_ptr));
         }
       }
-      spec_ptr_vec = spec_reader.getNextSpecGraphPtrVec(mng_ptr_->prec_error_);
     }
-
-    pool_ptr->ShutDown();
-    std::cout << std::endl;
-
-    // combine result files
-    std::vector<std::string> input_exts;
-    std::string cur_output_ext = mng_ptr_->output_file_ext_ + "_" + std::to_string(proteo_count);
-    for (int i = 0; i < mng_ptr_->thread_num_; i++) {
-      std::string fname = cur_output_ext + "_" + std::to_string(i); 
-      //std::cout << "file name " << fname << std::endl;
-      input_exts.push_back(fname);
-    }
-    int top_num = 1;
-    PrsmStrCombinePtr combine_ptr(new PrsmStrCombine(sp_file_name, input_exts,  cur_output_ext, top_num));
-    bool normalization = true;
-    combine_ptr->process(normalization);
-    combine_ptr = nullptr;
-    proteo_count++;
+    std::cout << std::flush <<  "Mass graph - processing " << cnt 
+        << " of " << spectrum_num << " spectra.\r";
   }
 
+  pool_ptr->ShutDown();
+  std::cout << std::endl;
+
+  // combine result files
   std::vector<std::string> input_exts;
-  for (int i = 0; i < proteo_count; i++) {
+  for (int i = 0; i < mng_ptr_->thread_num_; i++) {
     std::string fname = mng_ptr_->output_file_ext_ + "_" + std::to_string(i); 
     input_exts.push_back(fname);
   }
   int top_num = 1;
-  PrsmStrCombinePtr combine_ptr(new PrsmStrCombine(sp_file_name, input_exts, mng_ptr_->output_file_ext_, top_num));
+  PrsmStrCombinePtr combine_ptr
+      = std::make_shared<PrsmStrCombine>(sp_file_name, input_exts,
+                                         mng_ptr_->output_file_ext_, top_num);
   bool normalization = true;
   combine_ptr->process(normalization);
   combine_ptr = nullptr;
+
 }
 
 }

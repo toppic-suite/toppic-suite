@@ -227,6 +227,9 @@ namespace prot {
     delFile(sp_base + ".PTM");
     clean_prefix(sp, sp_base + ".PTM_");
     delFile(sp_base + ".TOP");
+    delFile(sp_base + ".GRAPH_FILTER");
+    clean_prefix(sp, sp_base + ".GRAPH_ALIGN_");
+    delFile(sp_base + ".GRAPH_ALIGN");
     delFile(sp_base + ".CUTOFF_RESULT");            
     delFile(sp_base + ".LOCAL_RESULT");
     delFile(sp_base + ".EVALUE");

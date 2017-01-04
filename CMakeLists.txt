@@ -68,7 +68,7 @@ add_executable(toppic ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
     ${PTM_SRCS} ${TDGF_SRCS} ${LOCAL_SRCS} ${PRSM_VIEW_SRCS} ${ARGU_SRCS} ${MAIN_SRCS})
 set_target_properties(toppic PROPERTIES COMPILE_FLAGS "-DTOPPIC")
 
-add_executable(topmg ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
+add_executable(topmg ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS} ${ZERO_PTM_FILTER} ${DIAG_FILTER_SRCS} ${ONE_PTM_FILTER_SRCS}
     ${GRAPH_SRCS} ${GRAPH_ALIGN_SRCS} ${ARGU_SRCS} ${ONE_PTM_SEARCH_SRCS} ${GRAPH_MAIN})
 set_target_properties(topmg PROPERTIES COMPILE_FLAGS "-DMASS_GRAPH")
 

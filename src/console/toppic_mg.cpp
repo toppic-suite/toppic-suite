@@ -32,6 +32,7 @@
 #include "base/fasta_reader.hpp"
 #include "base/fasta_util.hpp"
 #include "base/base_data.hpp"
+#include "base/file_util.hpp"
 
 #include "spec/msalign_reader.hpp"
 #include "spec/msalign_util.hpp"
@@ -47,16 +48,24 @@
 #include "prsm/prsm_species.hpp"
 #include "prsm/prsm_feature_species.hpp"
 #include "prsm/prsm_table_writer.hpp"
+#include "prsm/simple_prsm_reader.hpp"
+#include "prsm/simple_prsm_xml_writer.hpp"
+#include "prsm/simple_prsm_util.hpp"
 
 #include "console/argument.hpp"
 #include "console/summary.hpp"
 
-#include "prsmview/xml_generator.hpp"
-#include "prsmview/transformer.hpp"
+#include "zeroptmfilter/zero_ptm_filter_mng.hpp"
+#include "zeroptmfilter/zero_ptm_filter_processor.hpp"
+
+#include "oneptmfilter/one_ptm_filter_mng.hpp"
+#include "oneptmfilter/one_ptm_filter_processor.hpp"
+
+#include "diagfilter/diag_filter_mng.hpp"
+#include "diagfilter/diag_filter_processor.hpp"
 
 #include "graph/graph.hpp"
 #include "graph/proteo_graph.hpp"
-
 #include "graphalign/graph_align_mng.hpp"
 #include "graphalign/graph_align_processor.hpp"
 
@@ -64,7 +73,7 @@
 
 namespace prot {
 
-int proteoform_graph_test(int argc, char* argv[]) {
+int topmg_test(int argc, char* argv[]) {
   try {
     Argument argu_processor;
     bool success = argu_processor.parse(argc, argv);
@@ -91,9 +100,8 @@ int proteoform_graph_test(int argc, char* argv[]) {
     std::string residue_mod_file_name = arguments["residueModFileName"];
 
     int ptm_num = std::stoi(arguments["ptmNumber"]);
-
     int thread_num = std::stoi(arguments["threadNumber"]);
-
+    int filter_result_num = std::stoi(arguments["filteringResultNumber"]);
     double max_ptm_mass = std::stod(arguments["maxPtmMass"]);
 
     bool decoy = false;
@@ -109,6 +117,63 @@ int proteoform_graph_test(int argc, char* argv[]) {
 
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
 
+    std::vector<std::string> input_exts;
+
+    std::cout << "Zero PTM filtering - started." << std::endl;
+    ZeroPtmFilterMngPtr zero_filter_mng_ptr
+        = std::make_shared<ZeroPtmFilterMng>(prsm_para_ptr, "ZERO_FILTER");
+    ZeroPtmFilterProcessorPtr zero_filter_processor
+        = std::make_shared<ZeroPtmFilterProcessor>(zero_filter_mng_ptr);
+    zero_filter_processor->process();
+    std::cout << "Zero PTM filtering - finished." << std::endl;
+
+    input_exts.push_back("ZERO_FILTER_COMPLETE");
+    input_exts.push_back("ZERO_FILTER_PREFIX");
+    input_exts.push_back("ZERO_FILTER_SUFFIX");
+    input_exts.push_back("ZERO_FILTER_INTERNAL");
+
+    std::cout << "One PTM filtering - started." << std::endl;
+    OnePtmFilterMngPtr one_ptm_filter_mng_ptr
+        = std::make_shared<OnePtmFilterMng>(prsm_para_ptr, "ONE_PTM_FILTER");
+    OnePtmFilterProcessorPtr one_filter_processor
+        = std::make_shared<OnePtmFilterProcessor>(one_ptm_filter_mng_ptr);
+    one_filter_processor->process();
+    std::cout << "One PTM filtering - finished." << std::endl;
+
+    input_exts.push_back("ONE_PTM_FILTER_COMPLETE");
+    input_exts.push_back("ONE_PTM_FILTER_PREFIX");
+    input_exts.push_back("ONE_PTM_FILTER_SUFFIX");
+    input_exts.push_back("ONE_PTM_FILTER_INTERNAL");
+
+    std::cout << "Diagonal PTM filtering - started." << std::endl;
+    DiagFilterMngPtr diag_filter_mng_ptr
+        = std::make_shared<DiagFilterMng>(prsm_para_ptr, filter_result_num,
+                                          thread_num, "DIAG_FILTER");
+    DiagFilterProcessorPtr diag_filter_processor
+        = std::make_shared<DiagFilterProcessor>(diag_filter_mng_ptr);
+    diag_filter_processor->process();
+    std::cout << "Diagonal filtering - finished." << std::endl;
+
+    input_exts.push_back("DIAG_FILTER");
+
+    SimplePrsmPtrVec sim_prsm_ptrs;
+
+    for (size_t i = 0; i < input_exts.size(); i++) {
+      std::string input_file_name = FileUtil::basename(sp_file_name) + "." + input_exts[i]; 
+      SimplePrsmReaderPtr reader_ptr = std::make_shared<SimplePrsmReader>(input_file_name);
+      SimplePrsmPtr str_ptr = reader_ptr->readOnePrsm();
+      while (str_ptr != nullptr) {
+        sim_prsm_ptrs.push_back(str_ptr);  
+        str_ptr = reader_ptr->readOnePrsm();
+      }
+    }
+
+    sim_prsm_ptrs = SimplePrsmUtil::getUniqueMatches(sim_prsm_ptrs);
+    std::sort(sim_prsm_ptrs.begin(), sim_prsm_ptrs.end(), SimplePrsm::cmpIdInc);
+    SimplePrsmXmlWriter writer(FileUtil::basename(sp_file_name) + "." + "GRAPH_FILTER");
+    writer.write(sim_prsm_ptrs);
+    writer.close();
+
     std::cout << "Graph alignment started." << std::endl;
 
     int max_mod_num = 10;
@@ -118,7 +183,7 @@ int proteoform_graph_test(int argc, char* argv[]) {
                                           residue_mod_file_name,
                                           ptm_num, max_mod_num,
                                           gap, max_ptm_mass,
-                                          thread_num, "GRAPH_ALIGN");
+                                          thread_num, "GRAPH_FILTER", "GRAPH_ALIGN");
     // ga_mng_ptr->prec_error_ = 0;
     LOG_DEBUG("shift num " << ptm_num);
     GraphAlignProcessorPtr ga_processor_ptr = std::make_shared<GraphAlignProcessor>(ga_mng_ptr);
@@ -127,7 +192,7 @@ int proteoform_graph_test(int argc, char* argv[]) {
     std::cout << "Graph alignment finished." << std::endl;
 
     std::cout << "Combining PRSMs started." << std::endl;
-    std::vector<std::string> input_exts;
+    input_exts.clear();
     input_exts.push_back("GRAPH_ALIGN");
     for (int i = 1; i <=100; i++) {
       input_exts.push_back("GRAPH_ALIGN_" + std::to_string(i));
@@ -199,6 +264,15 @@ int proteoform_graph_test(int argc, char* argv[]) {
     // std::cout << "Converting xml files to html files started." << std::endl;
     // translate(arguments);
     /* std::cout << "Converting xml files to html files finished." << std::endl;*/
+
+    if (arguments["keepTempFiles"] != "true") {
+      std::cout << "Deleting temporary files - started." << std::endl;
+      FileUtil::delDir(FileUtil::basename(sp_file_name) + "_xml");
+      FileUtil::delFile(exe_dir + "/run.log");
+      FileUtil::cleanDir(ori_db_file_name, sp_file_name);
+      std::cout << "Deleting temporary files - finished." << std::endl;
+    }
+    
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
@@ -211,5 +285,5 @@ int proteoform_graph_test(int argc, char* argv[]) {
 
 int main(int argc, char* argv[]) {
   // prot::log_level = 2;
-  return prot::proteoform_graph_test(argc, argv);
+  return prot::topmg_test(argc, argv);
 }

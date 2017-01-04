@@ -42,7 +42,10 @@ class SpecGraphReader {
   SpecGraphReader(const std::string &sp_file_name,
                   int group_sp_num, double convert_ratio,
                   SpParaPtr sp_para_ptr);
+
   SpecGraphPtrVec getNextSpecGraphPtrVec(int error);
+
+  SpecGraphPtrVec getNextSpecGraphPtrVec(SpectrumSetPtr spec_set_ptr, int error);
 
  private:
   MsAlignReaderPtr ms_reader_ptr_;
@@ -53,6 +56,6 @@ class SpecGraphReader {
   MassGraphPtr getMassGraphPtr(const PrmPeakPtrVec &peak_vec);
 };
 
-} /* namespace prot */
+}  // namespace prot
 
 #endif /* SPEC_GRAPH_READER_HPP_ */
