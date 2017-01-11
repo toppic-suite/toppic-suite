@@ -50,7 +50,7 @@ file(GLOB ARGU_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/argument.cpp)
 file(GLOB MAIN_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic.cpp) 
 file(GLOB GRAPH_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/graph/*.cpp)
 file(GLOB GRAPH_ALIGN_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/graphalign/*.cpp)
-file(GLOB GRAPH_MAIN ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_mg.cpp)
+file(GLOB GRAPH_MAIN ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmg.cpp)
 file(GLOB FEATURE_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/feature/*.cpp)
 file(GLOB FEATURE_MAIN   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd.cpp)
 
