@@ -4,3 +4,6 @@
 [submodule "toppic-website"]
 	path = toppic-website
 	url = https://github.iu.edu/xwliu/toppic-website.git
+[submodule "mass_graph_website"]
+	path = mass_graph_website
+	url = https://github.iu.edu/xwliu/mass_graph_website.git
