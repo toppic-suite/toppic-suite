@@ -30,39 +30,84 @@
 
 
 
-#ifndef PROT_TAG_FILTER
-#define PROT_TAG_FILTER
+#ifndef PROT_PEAK_NODE_HPP
+#define PROT_PEAK_NODE_HPP
 
-#include "base/proteoform.hpp"
-#include "base/residue_util.hpp"
-#include "spec/prm_ms.hpp"
-#include "prsm/simple_prsm.hpp"
-#include "tag_filter_mng.hpp"
-#include "tag.hpp"
+#include <cmath>
+#include <vector>
+#include <iostream>
+#include <algorithm>
+#include <memory>
 
 namespace prot {
 
-typedef std::map<std::string, std::vector<std::vector<double> > > SeqTag;
+class PeakNode;
 
-class TagFilter {
+typedef std::shared_ptr<PeakNode> PeakNodePtr;
+
+class PeakNode {
  public:
-  TagFilter(const ProteoformPtrVec &proteo_ptrs,
-            TagFilterMngPtr mng_ptr);
+  PeakNode(double m): mono_mass(m), maxPrefix(0){};
 
-  std::vector<std::string> getBestMatch(const PrmMsPtrVec &ms_ptr_vec);
+  double getMass() {return mono_mass;}
+
+  //int getCharge() {return charge;}
+
+  int getMaxPrefix() {return maxPrefix;}
+
+  void setMaxPrefix(int m) {maxPrefix = m;}
+
+  int getComponenetId() {return componentId;}
+
+  void setComponenetId(int id) {
+    if (componentId != id) {
+      componentId = id;
+      for (size_t i = 0; i < next.size(); i++) {
+        next[i]->setComponenetId(id);
+      }
+    }
+  }
+
+  std::vector<PeakNodePtr> getNext() {return next;}
+
+  void addNext(PeakNodePtr peak) {
+    next.push_back(peak);
+    if (peak->getComponenetId() != componentId) {
+      doUpdateComponentId(peak);
+    }
+  }
+
+  double diff(PeakNodePtr prev) {return mono_mass - prev->getMass();}
+
+  void clearEdges() {
+    next.clear();
+    prev.clear();
+  }
+
+  bool updateComponentId() {
+    for (size_t i = 0; i < next.size(); i++) {
+      if (next[i]->getComponenetId() != componentId) {
+        doUpdateComponentId(next[i]);
+        return true;
+      }
+    }
+    return false;
+  }
 
  private:
-  TagFilterMngPtr mng_ptr_;
-  ProteoformPtrVec proteo_ptrs_;
-  std::vector<SeqTag> seq_tag_vec_;
-  std::vector<std::string> seq_name_vec_;
-  std::vector<std::pair<std::string, double> > residue_mass_list_;
-  std::vector<SpecTag> geneSpecTag(const PrmPeakPtrVec & prm_peaks); 
 
-  SeqTag geneSeqTag(ProteoformPtr proteoform);
+  void doUpdateComponentId(PeakNodePtr peak) {
+    int min_id = std::min(componentId, peak->getComponenetId());
+    setComponenetId(min_id);
+    peak->setComponenetId(min_id);
+  }
+
+  double mono_mass;
+  //int charge;
+  int componentId;
+  std::vector<PeakNodePtr> next, prev;
+  int maxPrefix;
 };
 
-typedef std::shared_ptr<TagFilter> TagFilterPtr;
-} /* namespace prot */
-
+}
 #endif

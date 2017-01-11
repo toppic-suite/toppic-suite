@@ -45,6 +45,7 @@ class SimplePrsmXmlWriter {
   void close();
   void write(SimplePrsmStrPtr prsm_str_ptr);
   void write(const SimplePrsmPtrVec &simple_prsm_ptrs);
+  void write(SimplePrsmPtr simple_prsm_ptrs);
 
  private:
   xercesc::DOMLSSerializer* serializer_;
@@ -52,6 +53,6 @@ class SimplePrsmXmlWriter {
   std::ofstream file_;
 };
 
-} /* namespace prot */
+}  // namespace prot
 
 #endif /* SIMPLE_PRSM_WRITER_HPP_ */

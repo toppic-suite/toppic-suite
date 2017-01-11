@@ -35,18 +35,30 @@
 
 #include "base/db_block.hpp"
 #include "tagfilter/tag_filter_mng.hpp"
+#include "peak_node.hpp"
 
 namespace prot {
 
 class TagFilterProcessor {
  public:
-  TagFilterProcessor(TagFilterMngPtr mng_ptr);
+  TagFilterProcessor(TagFilterMngPtr mng_ptr): mng_ptr_(mng_ptr) {};
+
   void process();
 
  private:
   TagFilterMngPtr mng_ptr_;
-  void processBlock(DbBlockPtr block_ptr, int total_block_num);
 
+  void processDB();
+
+  std::vector<std::pair<double, std::string> > mass_list_;
+
+  std::vector<double> getEdgeLimits(PeakNodePtr peak, PeakNodePtr next);
+
+  void generateGapEdges(std::vector<PeakNodePtr> & peaks);
+
+  std::vector<std::string> getTags(std::vector<std::vector<PeakNodePtr> > componentsFromGraph);
+
+  int compTagScore(const std::string & seq, const std::vector<std::string> & tags);
 };
 
 typedef std::shared_ptr<TagFilterProcessor> TagFilterProcessorPtr;

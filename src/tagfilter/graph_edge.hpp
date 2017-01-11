@@ -29,37 +29,33 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+#ifndef PROT_TAG_GRAPH_DEGE
+#define PROT_TAG_GRAPH_DEGE
 
-#ifndef PROT_TAG_HPP
-#define PROT_TAG_HPP
-
-#include <string>
-
-#include "base/logger.hpp"
+#include <vector>
+#include <memory>
 
 namespace prot {
 
-class SpecTag {
+class GraphEdge {
  public:
-  SpecTag (const std::string & x, const std::string & y,
-       double mass, bool ordered): acidX(x), acidY(y), 
-    mass(mass), tolerance(200), ordered(ordered){}
+  GraphEdge(int node1, int node2): Node1(node1), Node2(node2) {}
 
-  double getMinMass() {return mass - tolerance;}
+  GraphEdge(int peak1Index, int peak2Index, double peakGapDistance): Node1(peak1Index),
+    Node2(peak2Index), Mass(peakGapDistance) {}
 
-  double getMaxMass() {return mass + tolerance;}
+  void AddMatchedAminoAcid(std::pair<double, std::string> aa) {
+    AminoAcidList.push_back(aa);
+  }
 
-  bool isOrdered() {return ordered;}
+  int Node1;
+  int Node2;
+  double Mass;
 
-  std::string getSeq() {return acidX + acidY;}
-
- private:
-  std::string acidX, acidY;
-  double mass, tolerance;
-  bool ordered;
-
+  std::vector<std::pair<double, std::string> > AminoAcidList;
 };
 
-}
+typedef std::shared_ptr<GraphEdge> GraphEdgePtr;
 
+}
 #endif

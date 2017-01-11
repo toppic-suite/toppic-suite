@@ -45,7 +45,7 @@ file(GLOB POISSON_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/poisson/*.cpp)
 file(GLOB TDGF_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/tdgf/*.cpp)
 file(GLOB PRSM_VIEW_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/prsmview/*.cpp)
 file(GLOB LOCAL_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/local/*.cpp)
-file(GLOB TAG_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/tagfinder/*.cpp)
+file(GLOB TAG_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/tagfilter/*.cpp)
 file(GLOB ARGU_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/argument.cpp)
 file(GLOB MAIN_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic.cpp) 
 file(GLOB GRAPH_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/graph/*.cpp)
@@ -60,8 +60,8 @@ file(GLOB TEST_PTM_SEARCH_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_ptm_sea
 file(GLOB TEST_EVALUE_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_evalue.cpp) 
 file(GLOB TEST_PRSM_VIEW_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_prsm_view.cpp) 
 file(GLOB TEST_BSE_OPT ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_base_opt.cpp) 
-file(GLOB TEST_TAG ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_tag_finder.cpp)
 file(GLOB TEST_GRAPH ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_graph_align.cpp) 
+file(GLOB TEST_TAG_FILTER ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_tag_filter.cpp) 
 
 add_executable(toppic ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
     ${ZERO_PTM_SRCS} ${ZERO_PTM_FILTER} ${DIAG_FILTER_SRCS} ${ONE_PTM_FILTER_SRCS} ${ONE_PTM_SEARCH_SRCS}
@@ -73,6 +73,14 @@ add_executable(topmg ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS} ${ZERO_PTM_FILTER} $
 set_target_properties(topmg PROPERTIES COMPILE_FLAGS "-DMASS_GRAPH")
 
 add_executable(topfd ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS} ${FEATURE_MAIN})
+
+add_executable(test_tag_filter ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS} ${TAG_SRCS}
+    ${LOCAL_SRCS} ${ARGU_SRCS} ${TEST_TAG_FILTER})
+set_target_properties(test_tag_filter PROPERTIES COMPILE_FLAGS "-DMS_TAG")
+
+add_executable(test_ms_pathfinder_filter ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS} ${TAG_SRCS}
+    ${LOCAL_SRCS} ${ARGU_SRCS} ${TEST_TAG_FILTER})
+set_target_properties(test_ms_pathfinder_filter PROPERTIES COMPILE_FLAGS "-DMS_PATHFINDER")
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     # Windows specific code
@@ -96,6 +104,12 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
     target_link_libraries(toppic xalan-c xalanMsg xerces-c boost_program_options
         boost_filesystem boost_system boost_thread hts pthread z)
+
+    target_link_libraries(test_tag_filter xalan-c xalanMsg xerces-c boost_program_options
+        boost_filesystem boost_system boost_thread boost_regex hts pthread z)
+
+    target_link_libraries(test_ms_pathfinder_filter xalan-c xalanMsg xerces-c boost_program_options
+        boost_filesystem boost_system boost_thread boost_regex hts pthread z)
 
     target_link_libraries(topmg xalan-c xalanMsg xerces-c boost_program_options
         boost_filesystem boost_system boost_thread hts pthread z)
