@@ -86,7 +86,7 @@ int two_ptm_process(int argc, char* argv[]) {
     std::cout << "Executive file directory is: " << exe_dir << std::endl;
 
     BaseData::init(exe_dir);
-    
+
     LOG_DEBUG("Init base data completed");
 
     std::string db_file_name = arguments["databaseFileName"];
@@ -98,16 +98,16 @@ int two_ptm_process(int argc, char* argv[]) {
     int ptm_num = std::stoi(arguments["ptmNumber"]);
     double max_ptm_mass = std::stod(arguments["maxPtmMass"]);
     int filter_result_num = std::stoi(arguments["filteringResultNumber"]);
-    
+
     bool use_gf = false; 
     if (arguments["useGf"] == "true") {
       use_gf = true;
     }
     // initialize log file 
-  	//WebLog::init(log_file_name, use_gf, ptm_num);
+    //WebLog::init(log_file_name, use_gf, ptm_num);
     LOG_DEBUG("web log inited");
 
-    PrsmParaPtr prsm_para_ptr = PrsmParaPtr(new PrsmPara(arguments));
+    PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
     LOG_DEBUG("prsm para inited");
 
     bool decoy = false;
@@ -127,79 +127,23 @@ int two_ptm_process(int argc, char* argv[]) {
 
     std::vector<std::string> input_exts ;
 
-    /*
-    time(&start_s);
-    std::cout << "Zero PTM filtering started." << std::endl;
-    ZeroPtmFilterMngPtr zero_filter_mng_ptr = ZeroPtmFilterMngPtr(new ZeroPtmFilterMng (prsm_para_ptr, "ZERO_FILTER"));
-    ZeroPtmFilterProcessorPtr zero_filter_processor = ZeroPtmFilterProcessorPtr(new ZeroPtmFilterProcessor(zero_filter_mng_ptr));
-    zero_filter_processor->process();
-    //WebLog::completeFunction(WebLog::ZeroPtmTime());
-    std::cout << "Zero PTM filtering finished." << std::endl;
-    time(&stop_s);
-    std::cout <<  "Zero PTM filtering running time: " << difftime(stop_s, start_s)  << " seconds " << std::endl;
-
-    time(&start_s);
-    std::cout << "Zero PTM search started." << std::endl;
-    ZeroPtmSearchMngPtr zero_search_mng_ptr = ZeroPtmSearchMngPtr(new ZeroPtmSearchMng (prsm_para_ptr, "ZERO_FILTER", "ZERO_PTM"));
-    ZeroPtmSearch::process(zero_search_mng_ptr);
-    std::cout << "Zero PTM search finished." << std::endl;
-    time(&stop_s);
-    std::cout <<  "Zero PTM search running time: " << difftime(stop_s, start_s)  << " seconds " << std::endl;
-    */
-
     input_exts.push_back("ZERO_PTM_COMPLETE");
     input_exts.push_back("ZERO_PTM_PREFIX");
     input_exts.push_back("ZERO_PTM_SUFFIX");
     input_exts.push_back("ZERO_PTM_INTERNAL");
 
-    /*
-    time(&start_s);
-    std::cout << "One PTM filtering started." << std::endl;
-    OnePtmFilterMngPtr one_ptm_filter_mng_ptr = OnePtmFilterMngPtr(new OnePtmFilterMng (prsm_para_ptr, "ONE_PTM_FILTER"));
-    OnePtmFilterProcessorPtr one_filter_processor = OnePtmFilterProcessorPtr(new OnePtmFilterProcessor(one_ptm_filter_mng_ptr));
-    one_filter_processor->process();
-    //WebLog::completeFunction(WebLog::ZeroPtmTime());
-    std::cout << "One PTM filtering finished." << std::endl;
-    time(&stop_s);
-    std::cout <<  "One PTM filtering running time: " << difftime(stop_s, start_s)  << " seconds " << std::endl;
-
-    time(&start_s);
-    std::cout << "One PTM search started." << std::endl;
-    int shift_num = 1;
-    PtmSearchMngPtr one_search_mng_ptr 
-        = PtmSearchMngPtr(new PtmSearchMng (prsm_para_ptr, n_top, max_ptm_mass, shift_num, "ONE_PTM_FILTER", "ONE_PTM"));
-    OnePtmSearch::process(one_search_mng_ptr);
-    std::cout << "One PTM search finished." << std::endl;
-    time(&stop_s);
-    std::cout <<  "ONe PTM search running time: " << difftime(stop_s, start_s)  << " seconds " << std::endl;
-    */
     input_exts.push_back("ONE_PTM_COMPLETE");
     input_exts.push_back("ONE_PTM_PREFIX");
     input_exts.push_back("ONE_PTM_SUFFIX");
     input_exts.push_back("ONE_PTM_INTERNAL");
 
-
-    /*
-    time(&start_s);
-    std::cout << "Diagonal PTM filtering started." << std::endl;
-    DiagFilterMngPtr diag_filter_mng_ptr 
-        = DiagFilterMngPtr(new DiagFilterMng (prsm_para_ptr, filter_result_num, "DIAG_FILTER"));
-    DiagFilterProcessorPtr diag_filter_processor 
-        = DiagFilterProcessorPtr(new DiagFilterProcessor(diag_filter_mng_ptr));
-    diag_filter_processor->process();
-    //WebLog::completeFunction(WebLog::ZeroPtmTime());
-    std::cout << "Diagonal filtering finished." << std::endl;
-    time(&stop_s);
-    std::cout <<  "Diagonal filtering running time: " << difftime(stop_s, start_s)  << " seconds " << std::endl;
-    */
-
     time(&start_s);
     std::cout << "Two PTM search started." << std::endl;
     int shift_num = 2;
     PtmSearchMngPtr two_search_mng_ptr 
-        = PtmSearchMngPtr(new PtmSearchMng (prsm_para_ptr, n_top, max_ptm_mass, shift_num,
-                                            "DIAG_FILTER", "PTM"));
-    PtmSearchProcessorPtr processor = PtmSearchProcessorPtr(new PtmSearchProcessor(two_search_mng_ptr));
+        = std::make_shared<PtmSearchMng>(prsm_para_ptr, n_top, max_ptm_mass, shift_num,
+                                         1, "DIAG_FILTER", "PTM");
+    PtmSearchProcessorPtr processor = std::make_shared<PtmSearchProcessor>(two_search_mng_ptr);
     processor->process();
     std::cout << "Two PTM search finished." << std::endl;
     time(&stop_s);
@@ -213,7 +157,7 @@ int two_ptm_process(int argc, char* argv[]) {
     std::cout << "Combining PRSMs started." << std::endl;
     ptm_num = 2;
     int prsm_top_num = (ptm_num + 1) * 4;
-    PrsmStrCombinePtr combine_ptr(new PrsmStrCombine(sp_file_name, input_exts, "RAW_RESULT", prsm_top_num));
+    PrsmStrCombinePtr combine_ptr = std::make_shared<PrsmStrCombine>(sp_file_name, input_exts, "RAW_RESULT", prsm_top_num);
     combine_ptr->process();
     combine_ptr = nullptr;
     std::cout << "Combining PRSMs finished." << std::endl;
@@ -223,34 +167,33 @@ int two_ptm_process(int argc, char* argv[]) {
     time(&start_s);
     std::cout << "E-value computation started." << std::endl;
     bool variable_ptm = false;
-    TdgfMngPtr tdgf_mng_ptr = TdgfMngPtr(new TdgfMng (prsm_para_ptr, ptm_num, max_ptm_mass, use_gf,
-                                                      variable_ptm, "RAW_RESULT", "EVALUE"));
-    EValueProcessorPtr evalue_processor = EValueProcessorPtr(new EValueProcessor(tdgf_mng_ptr));
+    TdgfMngPtr tdgf_mng_ptr = std::make_shared<TdgfMng>(prsm_para_ptr, ptm_num, max_ptm_mass, use_gf,
+                                                        variable_ptm, "RAW_RESULT", "EVALUE");
+    EValueProcessorPtr evalue_processor = std::make_shared<EValueProcessor>(tdgf_mng_ptr);
     evalue_processor->init();
     // compute E-value for a set of prsms each run 
     evalue_processor->process(false);
     evalue_processor = nullptr;
     std::cout << "E-value computation finished." << std::endl;
     time(&stop_s);
-    std::cout <<  "Computing e-values running time: " << difftime(stop_s, start_s)  << " seconds " << std::endl;
+    std::cout << "Computing e-values running time: " << difftime(stop_s, start_s) << " seconds " << std::endl;
 
     time(&start_s);
     if (arguments["searchType"]=="TARGET") { 
       std::cout << "Top PRSM selecting started" << std::endl;
-      PrsmTopSelectorPtr selector = PrsmTopSelectorPtr(new PrsmTopSelector(db_file_name, sp_file_name, "EVALUE", "TOP", n_top));
+      PrsmTopSelectorPtr selector = std::make_shared<PrsmTopSelector>(db_file_name, sp_file_name, "EVALUE", "TOP", n_top);
       selector->process();
       selector = nullptr;
       std::cout << "Top PRSM selecting finished." << std::endl;
-    }
-    else {
+    } else {
       std::cout << "Top PRSM selecting started " << std::endl;
-      PrsmTopSelectorPtr selector = PrsmTopSelectorPtr(new PrsmTopSelector(db_file_name, sp_file_name, "EVALUE", "TOP_PRE", n_top));
+      PrsmTopSelectorPtr selector = std::make_shared<PrsmTopSelector>(db_file_name, sp_file_name, "EVALUE", "TOP_PRE", n_top);
       selector->process();
       selector = nullptr;
       std::cout << "Top PRSM selecting finished." << std::endl;
 
       std::cout << "FDR computation started. " << std::endl;
-      PrsmFdrPtr fdr = PrsmFdrPtr(new PrsmFdr(db_file_name, sp_file_name, "TOP_PRE", "TOP"));
+      PrsmFdrPtr fdr = std::make_shared<PrsmFdr>(db_file_name, sp_file_name, "TOP_PRE", "TOP");
       fdr->process();
       fdr = nullptr;
       std::cout << "FDR computation finished." << std::endl;
@@ -260,34 +203,34 @@ int two_ptm_process(int argc, char* argv[]) {
     std::string cutoff_type = arguments["cutoffType"];
     double cutoff_value;
     std::istringstream (arguments["cutoffValue"]) >> cutoff_value;
-    PrsmCutoffSelectorPtr cutoff_selector = PrsmCutoffSelectorPtr(
-        new PrsmCutoffSelector(db_file_name, sp_file_name, "TOP", "CUTOFF_RESULT", 
-                           cutoff_type, cutoff_value));
+    PrsmCutoffSelectorPtr cutoff_selector
+        = std::make_shared<PrsmCutoffSelector>(db_file_name, sp_file_name,
+                                               "TOP", "CUTOFF_RESULT", 
+                                               cutoff_type, cutoff_value);
     cutoff_selector->process();
     cutoff_selector = nullptr;
     std::cout << "PRSM selecting by cutoff finished." << std::endl;
 
     std::cout << "Outputting table starts " << std::endl;
-    PrsmTableWriterPtr table_out = PrsmTableWriterPtr(
-        new PrsmTableWriter(prsm_para_ptr, arguments, "CUTOFF_RESULT", "TWO_TABLE"));
+    PrsmTableWriterPtr table_out = std::make_shared<PrsmTableWriter>(prsm_para_ptr, arguments, "CUTOFF_RESULT", "TWO_TABLE");
     table_out->write();
     table_out = nullptr;
     std::cout << "Outputting table finished." << std::endl;
 
-    table_out = PrsmTableWriterPtr(new PrsmTableWriter(prsm_para_ptr, arguments, "PTM_2_COMPLETE", "PTM_2_COMPLETE_TABLE"));
+    table_out = std::make_shared<PrsmTableWriter>(prsm_para_ptr, arguments, "PTM_2_COMPLETE", "PTM_2_COMPLETE_TABLE");
     table_out->write();
-    table_out = PrsmTableWriterPtr(new PrsmTableWriter(prsm_para_ptr, arguments, "PTM_2_PREFIX", "PTM_2_PREFIX_TABLE"));
+    table_out = std::make_shared<PrsmTableWriter>(prsm_para_ptr, arguments, "PTM_2_PREFIX", "PTM_2_PREFIX_TABLE");
     table_out->write();
-    table_out = PrsmTableWriterPtr(new PrsmTableWriter(prsm_para_ptr, arguments, "PTM_2_SUFFIX", "PTM_2_SUFFIX_TABLE"));
+    table_out = std::make_shared<PrsmTableWriter>(prsm_para_ptr, arguments, "PTM_2_SUFFIX", "PTM_2_SUFFIX_TABLE");
     table_out->write();
-    table_out = PrsmTableWriterPtr(new PrsmTableWriter(prsm_para_ptr, arguments, "PTM_2_INTERNAL", "PTM_2_INTERNAL_TABLE"));
+    table_out = std::make_shared<PrsmTableWriter>(prsm_para_ptr, arguments, "PTM_2_INTERNAL", "PTM_2_INTERNAL_TABLE");
     table_out->write();
 
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
   }
-  std::cout << "TopPC finished." << std::endl;
+  std::cout << "TopPIC finished." << std::endl;
   return 0;
 }
 

@@ -30,43 +30,19 @@
 
 
 #include <iostream>
-#include <iomanip>
 
 #include "base/fasta_reader.hpp"
-#include "base/fasta_util.hpp"
 #include "base/base_data.hpp"
 #include "base/web_logger.hpp"
 
 #include "spec/msalign_reader.hpp"
-#include "spec/msalign_util.hpp"
 
 #include "prsm/prsm_para.hpp"
 #include "prsm/prsm_str_combine.hpp"
-#include "prsm/prsm_top_selector.hpp"
-#include "prsm/prsm_cutoff_selector.hpp"
 #include "prsm/prsm_species.hpp"
-#include "prsm/prsm_table_writer.hpp"
+#include "prsm/simple_prsm_str_combine.hpp"
 #include "prsm/prsm_fdr.hpp"
-
-#include "zeroptmfilter/zero_ptm_filter_mng.hpp"
-#include "zeroptmfilter/zero_ptm_filter_processor.hpp"
-
-#include "zeroptmsearch/zero_ptm_search_mng.hpp"
-#include "zeroptmsearch/zero_ptm_search.hpp"
-
-#include "oneptmfilter/one_ptm_filter_mng.hpp"
-#include "oneptmfilter/one_ptm_filter_processor.hpp"
-
-#include "oneptmsearch/ptm_search_mng.hpp"
-#include "oneptmsearch/one_ptm_search.hpp"
-
-#include "diagfilter/diag_filter_mng.hpp"
-#include "diagfilter/diag_filter_processor.hpp"
-
-#include "ptmsearch/ptm_search_processor.hpp"
-
-#include "tdgf/tdgf_mng.hpp"
-#include "tdgf/evalue_processor.hpp"
+#include "prsm/prsm_stat.hpp"
 
 #include "prsmview/xml_generator.hpp"
 #include "prsmview/transformer.hpp"
@@ -75,7 +51,7 @@
 
 namespace prot {
 
-int two_ptm_process(int argc, char* argv[]) {
+int process(int argc, char* argv[]) {
   try {
     Argument argu_processor;
     bool success = argu_processor.parse(argc, argv);
@@ -87,7 +63,6 @@ int two_ptm_process(int argc, char* argv[]) {
 
     std::string exe_dir = arguments["executiveDir"];
     std::cout << "Executive file directory is: " << exe_dir << std::endl;
-
     BaseData::init(exe_dir);
 
     LOG_DEBUG("Init base data completed");
@@ -97,44 +72,21 @@ int two_ptm_process(int argc, char* argv[]) {
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
     std::string log_file_name = arguments["logFileName"];
 
+    //int n_top = std::stoi(arguments["numOfTopPrsms"]);
+    int ptm_num = std::stoi(arguments["ptmNumber"]);
+    //double max_ptm_mass = std::stod(arguments["maxPtmMass"]);
     bool use_gf = false; 
     if (arguments["useGf"] == "true") {
       use_gf = true;
     }
-    // initialize log file 
-    //WebLog::init(log_file_name, use_gf, ptm_num);
-    LOG_DEBUG("web log inited");
+    /* initialize log file */
+    WebLog::init(log_file_name, use_gf, false, ptm_num);
 
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
-    LOG_DEBUG("prsm para inited");
 
-    bool decoy = false;
-    if (arguments["searchType"] == "TARGET+DECOY") {
-      decoy = true;
-    }
     LOG_DEBUG("block size " << arguments["databaseBlockSize"]);
-    int db_block_size = std::stoi(arguments["databaseBlockSize"]);
+    //int db_block_size = std::stoi(arguments["databaseBlockSize"]);
 
-    FastaUtil::dbPreprocess (ori_db_file_name, db_file_name, decoy, db_block_size);
-    MsAlignUtil::geneSpIndex(sp_file_name);
-
-    time_t start_s;
-    time_t stop_s;
-
-    std::vector<std::string> input_exts ;
-
-    std::cout << "Finding protein species started." << std::endl;
-    double ppo;
-    std::istringstream (arguments["errorTolerance"]) >> ppo;
-    ppo = ppo /1000000.0;
-    ModPtrVec mod_ptr_vec = prsm_para_ptr->getFixModPtrVec();
-    PrsmSpeciesPtr prsm_species
-        = std::make_shared<PrsmSpecies>(db_file_name, sp_file_name, "CUTOFF_RESULT", mod_ptr_vec, "OUTPUT_RESULT", ppo);
-    prsm_species->process();
-    prsm_species = nullptr;
-    std::cout << "Finding protein species finished." << std::endl;
-
-    time(&start_s);
     std::cout << "Generating view xml files started." << std::endl;
     XmlGeneratorPtr xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, exe_dir, "OUTPUT_RESULT");
     xml_gene->process();
@@ -144,8 +96,14 @@ int two_ptm_process(int argc, char* argv[]) {
     std::cout << "Converting xml files to html files started." << std::endl;
     translate(arguments);
     std::cout << "Converting xml files to html files finished." << std::endl;
-    time(&stop_s);
-    std::cout <<  "Html generation running time: " << difftime(stop_s, start_s) << " seconds " << std::endl;
+
+    std::cout << "Statistics started." << std::endl;
+    PrsmStatPtr stat_ptr = std::make_shared<PrsmStat>(prsm_para_ptr, "OUTPUT_RESULT", "STAT");
+    stat_ptr->process();
+    stat_ptr = nullptr;
+    std::cout << "Statistics finished." << std::endl;
+
+    WebLog::close();
 
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
@@ -158,7 +116,7 @@ int two_ptm_process(int argc, char* argv[]) {
 }
 
 int main(int argc, char* argv[]) {
-  prot::log_level = 2;
-  std::cout << std::setprecision(10);
-  return prot::two_ptm_process(argc, argv);
+  //prot::log_level = 2;
+  return prot::process(argc, argv);
 }
+

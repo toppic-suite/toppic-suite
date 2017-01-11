@@ -34,7 +34,8 @@
 
 #include "base/fasta_reader.hpp"
 #include "base/base_data.hpp"
-
+#include "base/fasta_util.hpp"
+#include "spec/msalign_util.hpp"
 #include "spec/msalign_reader.hpp"
 
 #include "prsm/prsm_para.hpp"
@@ -55,11 +56,11 @@ int diag_filter_process(int argc, char* argv[]) {
       return 1;
     }
     std::map<std::string, std::string> arguments = argu_processor.getArguments();
-    std::cout << "TopPC 0.5 " << std::endl;
+    std::cout << "TopPIC test" << std::endl;
 
     std::string exe_dir = arguments["executiveDir"];
     std::cout << "Executive file directory is: " << exe_dir << std::endl;
-    initBaseData(exe_dir);
+    BaseData::init(exe_dir);
 
     LOG_DEBUG("Init base data completed");
 
@@ -83,35 +84,26 @@ int diag_filter_process(int argc, char* argv[]) {
     LOG_DEBUG("block size " << arguments["databaseBlockSize"]);
     int db_block_size = std::stoi(arguments["databaseBlockSize"]);
 
-    dbPreprocess (ori_db_file_name, db_file_name, decoy, db_block_size);
-    generateSpIndex(sp_file_name);
+    FastaUtil::dbPreprocess(ori_db_file_name, db_file_name, decoy, db_block_size);
+    MsAlignUtil::geneSpIndex(sp_file_name);
 
     long start_s = clock();
 
     std::cout << "Fast filtering starts " << std::endl;
     DiagFilterMngPtr filter_mng_ptr 
-        = DiagFilterMngPtr(new DiagFilterMng(prsm_para_ptr, "FILTER"));
-    DiagFilterProcessorPtr filter_processor = DiagFilterProcessorPtr(new DiagFilterProcessor(filter_mng_ptr));
+        = std::make_shared<DiagFilterMng>(prsm_para_ptr, 1, 1, "FILTER");
+    DiagFilterProcessorPtr filter_processor = std::make_shared<DiagFilterProcessor>(filter_mng_ptr);
     filter_processor->process();
     filter_processor = nullptr;
 
     long stop_s = clock();
     std::cout << std::endl << "Running time: " << (stop_s-start_s) / double(CLOCKS_PER_SEC)  << " seconds " << std::endl;
 
-    /*
-    std::cout << "Outputting table starts " << std::endl;
-    SimplePrsmTableWriterPtr table_out = SimplePrsmTableWriterPtr(
-        new SimplePrsmTableWriter(prsm_para_ptr, "FILTER_COMBINED", "FILTER_TABLE"));
-    table_out->write();
-    table_out = nullptr;
-    std::cout << "Outputting table finished." << std::endl;
-    */
-
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
   }
-  std::cout << "TopPC finished." << std::endl;
+  std::cout << "TopPIC finished." << std::endl;
   return 0;
 }
 
