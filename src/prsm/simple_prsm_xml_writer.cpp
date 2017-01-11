@@ -68,12 +68,19 @@ void SimplePrsmXmlWriter::write(SimplePrsmStrPtr prsm_str_ptr) {
 }
 
 void SimplePrsmXmlWriter::write(const SimplePrsmPtrVec &simple_prsm_ptrs){
-  for(size_t i=0;i<simple_prsm_ptrs.size();i++){
+  for(size_t i = 0; i < simple_prsm_ptrs.size(); i++){
     xercesc::DOMElement* element = simple_prsm_ptrs[i]->toXml(doc_);
     std::string str = XmlDomUtil::writeToString(serializer_, element);
     XmlDomUtil::writeToStreamByRemovingDoubleLF(file_, str);
     element->release();
   }
+}
+
+void SimplePrsmXmlWriter::write(SimplePrsmPtr simple_prsm_ptr){
+  xercesc::DOMElement * element = simple_prsm_ptr->toXml(doc_);
+  std::string str = XmlDomUtil::writeToString(serializer_, element);
+  XmlDomUtil::writeToStreamByRemovingDoubleLF(file_, str);
+  element->release();
 }
 
 } /* namespace prot */

@@ -35,13 +35,30 @@
 #include "base/fasta_reader.hpp"
 #include "base/fasta_util.hpp"
 #include "base/base_data.hpp"
+#include "base/web_logger.hpp"
 
 #include "spec/msalign_reader.hpp"
 #include "spec/msalign_util.hpp"
+
 #include "prsm/prsm_para.hpp"
+#include "prsm/prsm_str_combine.hpp"
+#include "prsm/prsm_top_selector.hpp"
+#include "prsm/prsm_cutoff_selector.hpp"
+#include "prsm/prsm_species.hpp"
+#include "prsm/prsm_table_writer.hpp"
+#include "prsm/prsm_fdr.hpp"
+#include "prsm/prsm_feature_species.hpp"
+#include "prsm/prsm_form_filter.hpp"
 
 #include "tagfilter/tag_filter_mng.hpp"
 #include "tagfilter/tag_filter_processor.hpp"
+
+
+#include "local/local_mng.hpp"
+#include "local/local_processor.hpp"
+
+#include "prsmview/xml_generator.hpp"
+#include "prsmview/transformer.hpp"
 
 #include "console/argument.hpp"
 
@@ -55,10 +72,12 @@ int two_base_opt(int argc, char* argv[]) {
       return 1;
     }
     std::map<std::string, std::string> arguments = argu_processor.getArguments();
-    std::cout << "TopPIC 1.0" << std::endl;
+    std::cout << "TopPIC 1.0.0 (" << __DATE__ << ")" << std::endl;
 
     std::string exe_dir = arguments["executiveDir"];
-    argu_processor.outputArguments(std::cout, arguments);
+    time_t start = time(0);
+    arguments["start_time"] = std::string(ctime(&start));
+    Argument::outputArguments(std::cout, arguments);
 
     BaseData::init(exe_dir);
 
@@ -72,7 +91,20 @@ int two_base_opt(int argc, char* argv[]) {
     int n_top = std::stoi(arguments["numOfTopPrsms"]);
     int ptm_num = std::stoi(arguments["ptmNumber"]);
     double max_ptm_mass = std::stod(arguments["maxPtmMass"]);
-    int filter_result_num = 10;
+    int filter_result_num = std::stoi(arguments["filteringResultNumber"]);
+    int thread_num = std::stoi(arguments["threadNumber"]);
+
+    bool use_gf = false; 
+    if (arguments["useGf"] == "true") {
+      use_gf = true;
+    }
+    bool localization = false;
+    if (arguments["residueModFileName"] != "") {
+      localization = true;
+    }
+    // initialize log file 
+    WebLog::init(log_file_name, use_gf, localization, ptm_num);
+    LOG_DEBUG("web log inited");
 
     PrsmParaPtr prsm_para_ptr = PrsmParaPtr(new PrsmPara(arguments));
     LOG_DEBUG("prsm para inited");
@@ -86,16 +118,26 @@ int two_base_opt(int argc, char* argv[]) {
 
     FastaUtil::dbPreprocess (ori_db_file_name, db_file_name, decoy, db_block_size);
     MsAlignUtil::geneSpIndex(sp_file_name);
-    std::cout << "Tag filtering started." << std::endl;
-    TagFilterMngPtr diag_filter_mng_ptr 
-        = std::make_shared<TagFilterMng>(prsm_para_ptr, filter_result_num, 
-                                         arguments["residueModFileName"], 
-                                         "TAG_FILTER");
 
-    TagFilterProcessorPtr tag_filter_processor 
-        = std::make_shared<TagFilterProcessor>(diag_filter_mng_ptr);
+    std::vector<std::string> input_exts;
+
+    std::cout << "Tag filtering - started." << std::endl;
+
+#ifdef MS_TAG
+    TagFilterMngPtr tag_filter_mng_ptr =
+        std::make_shared<TagFilterMng>(prsm_para_ptr, "TAG_FILTER",
+                                       arguments["residueModFileName"]);
+#endif
+#ifdef MS_PATHFINDER
+    TagFilterMngPtr tag_filter_mng_ptr =
+        std::make_shared<TagFilterMng>(prsm_para_ptr, "MS_PATHFINDER_FILTER",
+                                       arguments["residueModFileName"]);
+#endif
+
+    TagFilterProcessorPtr tag_filter_processor = std::make_shared<TagFilterProcessor>(tag_filter_mng_ptr);
     tag_filter_processor->process();
-    std::cout << "Tag filtering finished." << std::endl;
+
+    std::cout << "Tag filtering - finished." << std::endl;
 
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
@@ -108,7 +150,7 @@ int two_base_opt(int argc, char* argv[]) {
 }
 
 int main(int argc, char* argv[]) {
-  //prot::log_level = 2;
+  // prot::log_level = 2;
   std::cout << std::setprecision(10);
   return prot::two_base_opt(argc, argv);
 }
