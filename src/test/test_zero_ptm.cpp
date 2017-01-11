@@ -69,7 +69,7 @@ int zero_ptm_process(int argc, char* argv[]) {
       return 1;
     }
     std::map<std::string, std::string> arguments = argu_processor.getArguments();
-    std::cout << "TopPIC 0.9.2" << std::endl;
+    std::cout << "TopPIC test" << std::endl;
 
     std::string exe_dir = arguments["executiveDir"];
     std::cout << "Executive file directory is: " << exe_dir << std::endl;
@@ -91,10 +91,10 @@ int zero_ptm_process(int argc, char* argv[]) {
       use_gf = true;
     }
     // initialize log file 
-  	WebLog::init(log_file_name, use_gf, ptm_num);
+  	WebLog::init(log_file_name, use_gf, false, ptm_num);
     LOG_DEBUG("web log inited");
 
-    PrsmParaPtr prsm_para_ptr = PrsmParaPtr(new PrsmPara(arguments));
+    PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
     LOG_DEBUG("prsm para inited");
 
     bool decoy = false;
@@ -122,7 +122,7 @@ int zero_ptm_process(int argc, char* argv[]) {
 
     time(&start_s);
     std::cout << "Zero PTM search started." << std::endl;
-    ZeroPtmSearchMngPtr zero_search_mng_ptr = ZeroPtmSearchMngPtr(new ZeroPtmSearchMng (prsm_para_ptr, "ZERO_FILTER", "ZERO"));
+    ZeroPtmSearchMngPtr zero_search_mng_ptr = std::make_shared<ZeroPtmSearchMng>(prsm_para_ptr, "ZERO_FILTER", "ZERO");
     ZeroPtmSearch::process(zero_search_mng_ptr);
     std::cout << "Zero PTM search finished." << std::endl;
     time(&stop_s);
@@ -131,9 +131,9 @@ int zero_ptm_process(int argc, char* argv[]) {
     time(&start_s);
     std::cout << "E-value computation started." << std::endl;
     bool variable_ptm = false;
-    TdgfMngPtr tdgf_mng_ptr = TdgfMngPtr(new TdgfMng (prsm_para_ptr, ptm_num, max_ptm_mass, use_gf,
-                                                      variable_ptm, "ZERO", "EVALUE"));
-    EValueProcessorPtr processor = EValueProcessorPtr(new EValueProcessor(tdgf_mng_ptr));
+    TdgfMngPtr tdgf_mng_ptr = std::make_shared<TdgfMng>(prsm_para_ptr, ptm_num, max_ptm_mass, use_gf,
+                                                        variable_ptm, "ZERO", "EVALUE");
+    EValueProcessorPtr processor = std::make_shared<EValueProcessor>(tdgf_mng_ptr);
     processor->init();
     // compute E-value for a set of prsms each run 
     processor->process(false);
@@ -144,57 +144,55 @@ int zero_ptm_process(int argc, char* argv[]) {
 
     if (arguments["searchType"]=="TARGET") { 
       std::cout << "Top PRSM selecting started" << std::endl;
-      PrsmTopSelectorPtr selector = PrsmTopSelectorPtr(new PrsmTopSelector(db_file_name, sp_file_name, "EVALUE", "TOP", n_top));
+      PrsmTopSelectorPtr selector = std::make_shared<PrsmTopSelector>(db_file_name, sp_file_name, "EVALUE", "TOP", n_top);
       selector->process();
       selector = nullptr;
       std::cout << "Top PRSM selecting finished." << std::endl;
-    }
-    else {
+    } else {
       std::cout << "Top PRSM selecting started " << std::endl;
-      PrsmTopSelectorPtr selector = PrsmTopSelectorPtr(new PrsmTopSelector(db_file_name, sp_file_name, "EVALUE", "TOP_PRE", n_top));
+      PrsmTopSelectorPtr selector = std::make_shared<PrsmTopSelector>(db_file_name, sp_file_name, "EVALUE", "TOP_PRE", n_top);
       selector->process();
       selector = nullptr;
       std::cout << "Top PRSM selecting finished." << std::endl;
 
       std::cout << "FDR computation started. " << std::endl;
-      PrsmFdrPtr fdr = PrsmFdrPtr(new PrsmFdr(db_file_name, sp_file_name, "TOP_PRE", "TOP"));
+      PrsmFdrPtr fdr = std::make_shared<PrsmFdr>(db_file_name, sp_file_name, "TOP_PRE", "TOP");
       fdr->process();
       fdr = nullptr;
       std::cout << "FDR computation finished." << std::endl;
-      
+
     }
 
     std::cout << "PRSM selecting by cutoff started." << std::endl;
     std::string cutoff_type = arguments["cutoffType"];
     double cutoff_value;
     std::istringstream (arguments["cutoffValue"]) >> cutoff_value;
-    PrsmCutoffSelectorPtr cutoff_selector = PrsmCutoffSelectorPtr(
-        new PrsmCutoffSelector(db_file_name, sp_file_name, "TOP", "CUTOFF_RESULT", 
-                           cutoff_type, cutoff_value));
+    PrsmCutoffSelectorPtr cutoff_selector
+        = std::make_shared<PrsmCutoffSelector>(db_file_name, sp_file_name, "TOP", "CUTOFF_RESULT", 
+                                               cutoff_type, cutoff_value);
     cutoff_selector->process();
     cutoff_selector = nullptr;
     std::cout << "PRSM selecting by cutoff finished." << std::endl;
 
     std::cout << "Outputting table starts " << std::endl;
-    PrsmTableWriterPtr table_out = PrsmTableWriterPtr(
-        new PrsmTableWriter(prsm_para_ptr, "CUTOFF_RESULT", "ZERO_TABLE"));
+    PrsmTableWriterPtr table_out = std::make_shared<PrsmTableWriter>(prsm_para_ptr, arguments, "CUTOFF_RESULT", "ZERO_TABLE");
     table_out->write();
     table_out = nullptr;
     std::cout << "Outputting table finished." << std::endl;
-    table_out = PrsmTableWriterPtr(new PrsmTableWriter(prsm_para_ptr, "ZERO_COMPLETE", "ZERO_COMPLETE_TABLE"));
+    table_out = std::make_shared<PrsmTableWriter>(prsm_para_ptr, arguments, "ZERO_COMPLETE", "ZERO_COMPLETE_TABLE");
     table_out->write();
-    table_out = PrsmTableWriterPtr(new PrsmTableWriter(prsm_para_ptr, "ZERO_PREFIX", "ZERO_PREFIX_TABLE"));
+    table_out = std::make_shared<PrsmTableWriter>(prsm_para_ptr, arguments, "ZERO_PREFIX", "ZERO_PREFIX_TABLE");
     table_out->write();
-    table_out = PrsmTableWriterPtr(new PrsmTableWriter(prsm_para_ptr, "ZERO_SUFFIX", "ZERO_SUFFIX_TABLE"));
+    table_out = std::make_shared<PrsmTableWriter>(prsm_para_ptr, arguments, "ZERO_SUFFIX", "ZERO_SUFFIX_TABLE");
     table_out->write();
-    table_out = PrsmTableWriterPtr(new PrsmTableWriter(prsm_para_ptr, "ZERO_INTERNAL", "ZERO_INTERNAL_TABLE"));
+    table_out = std::make_shared<PrsmTableWriter>(prsm_para_ptr, arguments, "ZERO_INTERNAL", "ZERO_INTERNAL_TABLE");
     table_out->write();
 
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
   }
-  std::cout << "TopPC finished." << std::endl;
+  std::cout << "TopPIC finished." << std::endl;
   return 0;
 }
 
