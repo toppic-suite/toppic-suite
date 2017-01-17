@@ -105,7 +105,7 @@ class Prsm {
 
   void setPrecFeatureId(int prec_feature_id) {prec_feature_id_ = prec_feature_id;}
 
-  void setPrecFeatureInte(double prec_feature_inte) {prec_feature_inte_ = prec_feature_inte_;}
+  void setPrecFeatureInte(double prec_feature_inte) {prec_feature_inte_ = prec_feature_inte;}
 
   void setOriPrecMass(double prec_mass) {ori_prec_mass_ = prec_mass;}
 
