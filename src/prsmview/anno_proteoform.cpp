@@ -228,7 +228,7 @@ AnnoSegmentPtrVec getSegments(ProteoformPtr proteoform_ptr, ChangePtrVec &change
       addMod(proteoform_ptr, left_db_bp, right_db_bp, change_ptrs[i], unexpected_shift_color,
              last_right, segment_ptrs, cleavage_ptrs, res_ptrs);
     }
-    unexpected_shift_color = (unexpected_shift_color) + 1 % 2;
+    unexpected_shift_color = (unexpected_shift_color + 1) % 2;
   }
 
   // last annochange
