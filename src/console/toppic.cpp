@@ -267,11 +267,13 @@ int two_base_opt(int argc, char* argv[]) {
 
     if (localization) {
       std::cout << "PTM characterization - started." << std::endl;
-      LocalMngPtr local_mng = LocalMngPtr(
-          new LocalMng(prsm_para_ptr, arguments["local_threshold"],
-                       arguments["residueModFileName"], max_ptm_mass,
-                       "CUTOFF_RESULT", "LOCAL_RESULT"));
-      LocalProcessorPtr local_ptr = LocalProcessorPtr(new LocalProcessor(local_mng));
+      LocalMngPtr local_mng
+          = std::make_shared<LocalMng>(prsm_para_ptr,
+                                       arguments["local_threshold"],
+                                       arguments["residueModFileName"],
+                                       max_ptm_mass,
+                                       "CUTOFF_RESULT", "LOCAL_RESULT");
+      LocalProcessorPtr local_ptr = std::make_shared<LocalProcessor>(local_mng);
       local_ptr->process();
       local_ptr = nullptr;
       WebLog::completeFunction(WebLog::LocalizationTime());
@@ -284,9 +286,11 @@ int two_base_opt(int argc, char* argv[]) {
     std::istringstream(arguments["errorTolerance"]) >> ppo;
     ppo = ppo / 1000000.0;
     ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();
-    PrsmFeatureSpeciesPtr prsm_forms = PrsmFeatureSpeciesPtr(
-        new PrsmFeatureSpecies(db_file_name, sp_file_name, "CUTOFF_RESULT",
-                               "FORMS", fix_mod_list));
+    PrsmFeatureSpeciesPtr prsm_forms
+        = std::make_shared<PrsmFeatureSpecies>(db_file_name,
+                                               sp_file_name,
+                                               "CUTOFF_RESULT",
+                                               "FORMS", fix_mod_list);
     prsm_forms->process();
     prsm_forms = nullptr;
     std::cout << "Finding protein species - finished." << std::endl;
@@ -297,14 +301,14 @@ int two_base_opt(int argc, char* argv[]) {
     arguments["running_time"] = std::to_string(static_cast<int>(difftime(end, start)));
 
     std::cout << "Outputting the result table - started." << std::endl;
-    PrsmTableWriterPtr table_out = PrsmTableWriterPtr(
-        new PrsmTableWriter(prsm_para_ptr, arguments, "FORMS", "OUTPUT_TABLE"));
+    PrsmTableWriterPtr table_out
+        = std::make_shared<PrsmTableWriter>(prsm_para_ptr, arguments, "FORMS", "OUTPUT_TABLE");
     table_out->write();
     table_out = nullptr;
     std::cout << "Outputting the result table - finished." << std::endl;
 
     std::cout << "Generating xml files started." << std::endl;
-    XmlGeneratorPtr xml_gene = XmlGeneratorPtr(new XmlGenerator(prsm_para_ptr, exe_dir, "FORMS"));
+    XmlGeneratorPtr xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, exe_dir, "FORMS");
     xml_gene->process();
     xml_gene = nullptr;
     std::cout << "Generating xml files - finished." << std::endl;
@@ -323,8 +327,9 @@ int two_base_opt(int argc, char* argv[]) {
     std::cout << "PRSM proteoform filtering - finished." << std::endl;
 
     std::cout << "Outputting the proteoform table - started." << std::endl;
-    PrsmTableWriterPtr form_out = PrsmTableWriterPtr(
-        new PrsmTableWriter(prsm_para_ptr, arguments, "FORM_RESULT", "FORM_OUTPUT_TABLE"));
+    PrsmTableWriterPtr form_out
+        = std::make_shared<PrsmTableWriter>(prsm_para_ptr, arguments,
+                                            "FORM_RESULT", "FORM_OUTPUT_TABLE");
     form_out->write();
     form_out = nullptr;
     std::cout << "Outputting the proteoform table - finished." << std::endl;
