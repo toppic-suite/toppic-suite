@@ -51,7 +51,7 @@ DeconvPara::DeconvPara(std::map<std::string, std::string> &arguments) {
   exec_dir_ = arguments["executiveDir"];
 }
 
-int DeconvPara::setOutputType (std::string &format) {
+int DeconvPara::setOutputType(const std::string & format) {
   if (format == "mgf") {
     output_type_ = OUTPUT_MGF;
   } else if (format == "msalign") {
@@ -64,7 +64,7 @@ int DeconvPara::setOutputType (std::string &format) {
   return 0;
 }
 
-int DeconvPara::setInputType (std::string &format) {
+int DeconvPara::setInputType(const std::string &format) {
   if (format=="mgf") {
     input_type_ = INPUT_MGF;
   } else if (format=="mzXML") {

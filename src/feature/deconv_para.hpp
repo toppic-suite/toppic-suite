@@ -46,13 +46,13 @@ class DeconvPara {
  public:
   DeconvPara(std::map<std::string, std::string> &arguments);
 
-  void setDataFileName(std::string &file_name) {data_file_name_ == file_name;}
+  void setDataFileName(const std::string & file_name) {data_file_name_ = file_name;}
 
   std::string getDataFileName() {return data_file_name_;}
 
-  int setOutputType (std::string &format);
+  int setOutputType (const std::string & format);
 
-  int setInputType (std::string &format);
+  int setInputType (const std::string & format);
 
   std::string getOutputType() {return output_type_str_[output_type_];}
 

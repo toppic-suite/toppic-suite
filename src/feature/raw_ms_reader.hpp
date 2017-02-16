@@ -49,7 +49,7 @@ typedef std::shared_ptr<pwiz::msdata::MSDataFile> MSDataFilePtr;
 
 class RawMsReader {
  public:
-  RawMsReader(std::string &file_name);
+  RawMsReader(const std::string & file_name);
   int readNext();
   PeakPtrVec getPeakList() {return peak_list_;}
   MsHeaderPtr getHeaderPtr() {return header_ptr_;}

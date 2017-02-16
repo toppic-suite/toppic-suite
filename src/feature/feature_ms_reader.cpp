@@ -36,8 +36,8 @@
 
 namespace prot {
 
-FeatureMsReader::FeatureMsReader(std::string &file_name) {
-  reader_ptr_ = RawMsReaderPtr(new RawMsReader(file_name));
+FeatureMsReader::FeatureMsReader(const std::string & file_name) {
+  reader_ptr_ = std::make_shared<RawMsReader>(file_name);
 }
 
 RawMsPtr FeatureMsReader::getNextMs(double prec_win_size) {

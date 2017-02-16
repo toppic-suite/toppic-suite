@@ -41,7 +41,7 @@
 
 namespace prot {
 
-void readSpectra(std::string &file_name, DeconvMsPtrVec &ms_ptr_vec) {
+void readSpectra(const std::string & file_name, DeconvMsPtrVec &ms_ptr_vec) {
   int sp_num_in_group = 1;
   MsAlignReader sp_reader(file_name, sp_num_in_group, nullptr);
 
@@ -55,7 +55,7 @@ void readSpectra(std::string &file_name, DeconvMsPtrVec &ms_ptr_vec) {
 //  std::cout << std::endl;
 }
 
-void readHeaders(std::string &file_name, MsHeaderPtrVec &header_ptr_vec) {
+void readHeaders(const std::string & file_name, MsHeaderPtrVec &header_ptr_vec) {
   int sp_num_in_group = 1;
   MsAlignReader sp_reader(file_name, sp_num_in_group, nullptr);
 
@@ -66,7 +66,7 @@ void readHeaders(std::string &file_name, MsHeaderPtrVec &header_ptr_vec) {
     //std::cout << std::flush <<  "reading spectrum " << header_ptr_vec.size() << "\r";
   }
   sp_reader.close();
-//  std::cout << std::endl;
+  //  std::cout << std::endl;
 }
 
 void outputHeaders(MsHeaderPtrVec &header_ptr_vec) {
@@ -269,7 +269,9 @@ void setFeatures(MsHeaderPtr2D &header_groups, FeaturePtrVec &features) {
   }
 }
 
-void writeMsalign(std::string &input_file_name, std::string &output_file_name, MsHeaderPtrVec &header_ptrs) {
+void writeMsalign(const std::string & input_file_name,
+                  const std::string & output_file_name,
+                  MsHeaderPtrVec &header_ptrs) {
   int sp_num_in_group = 1;
   MsAlignReader sp_reader(input_file_name, sp_num_in_group, nullptr);
   std::ofstream of(output_file_name, std::ofstream::out);
@@ -285,7 +287,7 @@ void writeMsalign(std::string &input_file_name, std::string &output_file_name, M
   of.close();
 }
 
-void FeatureDetect::process(std::string &xml_file_name){
+void FeatureDetect::process(const std::string & xml_file_name){
   FeatureDetectMngPtr mng_ptr(new FeatureDetectMng());
   std::string base_name = FileUtil::basename(xml_file_name);
   // read ms1 deconvoluted spectra

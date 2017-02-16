@@ -42,7 +42,7 @@ namespace prot {
 
 class FeatureMsReader {
  public:
-  FeatureMsReader(std::string &file_name);
+  FeatureMsReader(const std::string & file_name);
 
   RawMsPtr getNextMs(double prec_win_size);
 
