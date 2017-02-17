@@ -238,7 +238,8 @@ void groupHeaders(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtrVec &header_ptr_vec,
     int ms1_scan_begin = ms1_ptr_vec[ms1_id_begin]->getMsHeaderPtr()->getFirstScanNum();
     int ms1_scan_end = ms1_ptr_vec[ms1_id_end]->getMsHeaderPtr()->getFirstScanNum();
 
-    FeaturePtr feature_ptr(new Feature(feature_id, cur_mono_mass, cur_inte, ms1_scan_begin, ms1_scan_end));
+    FeaturePtr feature_ptr = std::make_shared<Feature>(feature_id, cur_mono_mass, cur_inte,
+                                                       ms1_scan_begin, ms1_scan_end);
     features.push_back(feature_ptr);
     sorted_ptrs.clear();
     for (size_t i = 0; i < remain_ptrs.size(); i++) {
@@ -287,13 +288,15 @@ void writeMsalign(const std::string & input_file_name,
   of.close();
 }
 
-void FeatureDetect::process(const std::string & xml_file_name){
-  FeatureDetectMngPtr mng_ptr(new FeatureDetectMng());
-  std::string base_name = FileUtil::basename(xml_file_name);
+void FeatureDetect::process(DeconvParaPtr para_ptr){
+  FeatureDetectMngPtr mng_ptr = std::make_shared<FeatureDetectMng>();
+  std::string sp_file_name = para_ptr->getDataFileName();
+  std::string base_name = FileUtil::basename(sp_file_name);
   // read ms1 deconvoluted spectra
   std::string ms1_file_name = base_name + ".ms1";
   DeconvMsPtrVec ms1_ptr_vec;
-  readSpectra(ms1_file_name, ms1_ptr_vec);
+  if (!para_ptr->missing_level_one_)
+    readSpectra(ms1_file_name, ms1_ptr_vec);
   // read ms2 deconvoluted header
   LOG_DEBUG("start reading ms2");
   std::string ms2_file_name = base_name + ".ms2";

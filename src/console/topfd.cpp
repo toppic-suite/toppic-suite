@@ -64,7 +64,7 @@ int deconvProcess(int argc, char* argv[]) {
     if (arguments["outputType"] == "msalign") {
       std::string spec_file_name = arguments["spectrumFileName"];
       LOG_DEBUG("file name " << spec_file_name);
-      FeatureDetect::process(spec_file_name);
+      FeatureDetect::process(para_ptr);
     }
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
