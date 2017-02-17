@@ -34,11 +34,13 @@
 
 #include <string>
 
+#include "feature/deconv_para.hpp"
+
 namespace prot {
 
 class FeatureDetect {
  public:
-  static void process(const std::string & input_file_name);
+  static void process(DeconvParaPtr para_ptr);
 };
 
 } /* namespace_prot */
