@@ -210,9 +210,15 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
       << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecCharge() << "\t"
       << prsm_ptr->getOriPrecMass()<< "\t"//"Precursor_mass"
       << prsm_ptr->getAdjustedPrecMass() << "\t"
-      << prsm_ptr->getProteoformPtr()->getSpeciesId() << "\t"
-      << prsm_ptr->getPrecFeatureInte() << "\t"
-      << prsm_ptr->getProteoformPtr()->getSeqName() << " "
+      << prsm_ptr->getProteoformPtr()->getSpeciesId() << "\t";
+
+  if (prsm_ptr->getPrecFeatureInte() > 0) {
+    file << prsm_ptr->getPrecFeatureInte() << "\t";
+  } else {
+    file << "-" << "\t";
+  }
+
+  file << prsm_ptr->getProteoformPtr()->getSeqName() << " "
       << prsm_ptr->getProteoformPtr()->getSeqDesc() << "\t"
       << (prsm_ptr->getProteoformPtr()->getStartPos() + 1) << "\t"
       << (prsm_ptr->getProteoformPtr()->getEndPos() + 1) << "\t"
@@ -241,13 +247,13 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   }
   double proteoform_fdr = prsm_ptr->getProteoformFdr();
   if (proteoform_fdr >= 0) {
-    file << proteoform_fdr << "\t";
+    file << proteoform_fdr;
   } else { 
-    file << "-" << "\t";
+    file << "-";
   }
 #endif
 #ifdef MASS_GRAPH
-  file << prsm_ptr->getProteoformPtr()->getVariablePtmNum() << "\t";
+  file << "\t" << prsm_ptr->getProteoformPtr()->getVariablePtmNum();
 #endif
   file << std::endl;
 }
