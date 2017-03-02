@@ -232,6 +232,7 @@ namespace prot {
     delFile(sp_base + ".GRAPH_ALIGN");
     delFile(sp_base + ".CUTOFF_RESULT");            
     delFile(sp_base + ".LOCAL_RESULT");
+    clean_prefix(sp, sp_base + ".EVALUE_");
     delFile(sp_base + ".EVALUE");
     delFile(sp_base + ".RAW_RESULT");      
     delFile(sp_base + ".FORMS");

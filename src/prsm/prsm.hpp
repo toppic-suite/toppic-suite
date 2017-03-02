@@ -53,6 +53,8 @@ class Prsm {
   Prsm(xercesc::DOMElement* element, FastaIndexReaderPtr reader_ptr, 
        const ModPtrVec &fix_mod_list);
 
+  Prsm(const Prsm &obj);
+
   int getPrsmId() {return prsm_id_;}
 
   int getSpectrumId() {return spectrum_id_;}

@@ -39,8 +39,8 @@ namespace prot {
 class TdgfMng {
  public:
   TdgfMng(PrsmParaPtr prsm_para_ptr, int shift_num, double max_ptm_mass, bool use_gf, 
-          bool variable_ptm, const std::string &input_file_ext, 
-          const std::string &output_file_ext);
+          bool variable_ptm, int thread_num, const std::string &input_file_ext, 
+          const std::string & output_file_ext);
 
   /*********************************
    * Common parameters
@@ -76,6 +76,7 @@ class TdgfMng {
   /** dp table */
   // number of mass shift
   int unexpected_shift_num_ = 2;
+  int thread_num_ = 1;
   double convert_ratio_ = 274.335215;
   double max_prec_mass_ = 100000;  
   int max_table_height_ = 128;

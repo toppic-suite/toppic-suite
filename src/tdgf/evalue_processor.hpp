@@ -45,7 +45,7 @@ namespace prot {
 
 class EValueProcessor {
  public:
-  EValueProcessor(TdgfMngPtr mng_ptr);
+  EValueProcessor(TdgfMngPtr mng_ptr): mng_ptr_(mng_ptr) {};
   ~EValueProcessor();
 
   void init();
@@ -61,6 +61,7 @@ class EValueProcessor {
 
  private:
   TdgfMngPtr mng_ptr_;
+  CountTestNumPtr test_num_ptr_;
   CompPValueArrayPtr comp_pvalue_ptr_;
   CompPValueLookupTablePtr comp_pvalue_table_ptr_;
   faidx_t *fai_;

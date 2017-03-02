@@ -68,6 +68,20 @@ Prsm::Prsm(xercesc::DOMElement* element, FastaIndexReaderPtr reader_ptr,
   proteoform_ptr_ = ProteoformPtr(new Proteoform(form_element, reader_ptr, fix_mod_list));
 }
 
+Prsm::Prsm(const Prsm &obj) {
+  adjusted_prec_mass_ = obj.adjusted_prec_mass_;
+  proteoform_ptr_ = obj.proteoform_ptr_;
+  deconv_ms_ptr_vec_ = obj.deconv_ms_ptr_vec_;
+  spectrum_id_ = obj.spectrum_id_; 
+  spectrum_scan_ = obj.spectrum_scan_;
+  precursor_id_ = obj.precursor_id_;
+  prec_feature_id_ = obj.prec_feature_id_;
+  prec_feature_inte_ = obj.prec_feature_inte_;
+  spectrum_num_ = obj.spectrum_num_;
+  ori_prec_mass_ = obj.ori_prec_mass_;
+  match_peak_num_ = obj.match_peak_num_;
+  match_fragment_num_ = obj.match_fragment_num_;
+}
 
 void Prsm::init(SpParaPtr sp_para_ptr) {
   refine_ms_three_vec_ 
