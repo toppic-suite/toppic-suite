@@ -88,7 +88,7 @@ void CountTestNum::init(PrsmParaPtr para_ptr) {
   ResiduePtrVec non_ptm_residue_list = ResidueBase::getBaseNonePtmResiduePtrVec();
   ModPtrVec fix_mod_list = para_ptr->getFixModPtrVec();
   ResiduePtrVec residue_list = ModUtil::geneResidueListWithMod(non_ptm_residue_list, fix_mod_list);
-  
+
   std::vector<double> residue_counts(residue_list.size(), 0.0);
 
   ResiduePtrVec n_term_residue_list;
@@ -97,7 +97,7 @@ void CountTestNum::init(PrsmParaPtr para_ptr) {
   ProtModPtrVec prot_mods = para_ptr->getProtModPtrVec();
   FastaReader reader(db_file_name);
   FastaSeqPtr seq_ptr = reader.getNextSeq();
-  
+
   while (seq_ptr != nullptr) {
     ProteoformPtr proteo_ptr = ProteoformFactory::geneDbProteoformPtr(seq_ptr, fix_mod_list);
     ProteoformPtrVec mod_proteo_ptrs = ProteoformFactory::geneProtModProteoform(proteo_ptr, prot_mods);
@@ -160,32 +160,32 @@ inline void CountTestNum::initInternalMassCnt() {
 
 double CountTestNum::compCandNum(AlignTypePtr type_ptr, int index, 
                                  double ori_mass, double ori_tolerance) {
-    double cand_num = 0;
-    if (index == 0) {
-        cand_num = compNonPtmCandNum(type_ptr, ori_mass, ori_tolerance);
-    } else if (index >= 1){ // with shifts
-        /*
-        if (max_ptm_mass_ >=10000) {
-            // max shift mass is larger than 10k, we treat it as no limitation 
-            cand_num = compPtmCandNum(type_ptr, ori_mass);
-        }
-        else {
-        }
-        */
-        cand_num = compPtmRestrictCandNum(type_ptr, index, ori_mass);
-        // multiple adjustment 
-        if (type_ptr == AlignType::PREFIX || type_ptr == AlignType::SUFFIX) {
-            cand_num = cand_num * PREFIX_SUFFIX_ADJUST();
-        }
-        else if (type_ptr == AlignType::INTERNAL) {
-            cand_num = cand_num * INTERNAL_ADJUST();
-        }
+  double cand_num = 0;
+  if (index == 0) {
+    cand_num = compNonPtmCandNum(type_ptr, ori_mass, ori_tolerance);
+  } else if (index >= 1){ // with shifts
+    /*
+       if (max_ptm_mass_ >=10000) {
+    // max shift mass is larger than 10k, we treat it as no limitation 
+    cand_num = compPtmCandNum(type_ptr, ori_mass);
     }
+    else {
+    }
+    */
+    cand_num = compPtmRestrictCandNum(type_ptr, index, ori_mass);
+    // multiple adjustment 
+    if (type_ptr == AlignType::PREFIX || type_ptr == AlignType::SUFFIX) {
+      cand_num = cand_num * PREFIX_SUFFIX_ADJUST();
+    }
+    else if (type_ptr == AlignType::INTERNAL) {
+      cand_num = cand_num * INTERNAL_ADJUST();
+    }
+  }
 
-    if (cand_num == 0.0) {
-        LOG_WARN("candidate number is ZERO");
-    }
-    return cand_num;
+  if (cand_num == 0.0) {
+    LOG_WARN("candidate number is ZERO");
+  }
+  return cand_num;
 }
 
 double CountTestNum::compNonPtmCandNum(AlignTypePtr type_ptr, 
@@ -193,11 +193,11 @@ double CountTestNum::compNonPtmCandNum(AlignTypePtr type_ptr,
   int low = std::floor((ori_mass - ori_tolerance) * convert_ratio_);
   int high = std::ceil((ori_mass + ori_tolerance) * convert_ratio_);
   double cand_num = compSeqNum(type_ptr, low, high);
-  
+
   //if (type_ptr == SemiAlignTypeFactory::getCompletePtr()) {
   //LOG_DEBUG("low " << low << " high " << high << " cand num " << cand_num);
   //}
-  
+
   return cand_num;
 }
 

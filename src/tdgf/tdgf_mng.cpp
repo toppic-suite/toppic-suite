@@ -35,7 +35,7 @@ namespace prot {
 
 TdgfMng::TdgfMng(PrsmParaPtr prsm_para_ptr, 
                  int shift_num, double max_ptm_mass, bool use_gf,
-                 bool variable_ptm,
+                 bool variable_ptm, int thread_num,
                  const std::string &input_file_ext, 
                  const std::string &output_file_ext):
     input_file_ext_(input_file_ext),
@@ -44,7 +44,8 @@ TdgfMng::TdgfMng(PrsmParaPtr prsm_para_ptr,
     use_gf_(use_gf),
     variable_ptm_(variable_ptm),
     max_ptm_mass_(max_ptm_mass),
-    unexpected_shift_num_(shift_num) {
+    unexpected_shift_num_(shift_num),
+    thread_num_(thread_num) {
     }
 
 }

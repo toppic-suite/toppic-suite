@@ -42,13 +42,12 @@ CompPValueArray::CompPValueArray(CountTestNumPtr test_num_ptr,
   residue_ptrs_ = test_num_ptr->getResFreqPtrVec();
   pep_n_term_residue_ptrs_ = residue_ptrs_;
   prot_n_term_residue_ptrs_ = test_num_ptr->getNTermResFreqPtrVec();
-  comp_prob_ptr_ = CompProbValuePtr(
-      new CompProbValue(mng_ptr_->convert_ratio_,
-                        residue_ptrs_, 
-                        test_num_ptr->getResidueAvgLen(),
-                        mng_ptr_->unexpected_shift_num_ + 1, 
-                        mng_ptr_->max_table_height_, 
-                        mng_ptr_->max_prec_mass_));
+  comp_prob_ptr_ = std::make_shared<CompProbValue>(mng_ptr_->convert_ratio_,
+                                                   residue_ptrs_, 
+                                                   test_num_ptr->getResidueAvgLen(),
+                                                   mng_ptr_->unexpected_shift_num_ + 1, 
+                                                   mng_ptr_->max_table_height_, 
+                                                   mng_ptr_->max_prec_mass_);
   LOG_DEBUG("comp prob value initialized")
 }
 
@@ -77,20 +76,17 @@ void CompPValueArray::compMultiExtremeValues(const PrmMsPtrVec &ms_six_ptr_vec,
 
     int index; 
     if (mng_ptr_->variable_ptm_) {
-        // need to be improved
-        if (unexpect_shift_num == 0) { 
-            index = 1;
-        }
-        else {
-            index = unexpect_shift_num;
-        }
-    }
-    else {
+      // need to be improved
+      if (unexpect_shift_num == 0) { 
+        index = 1;
+      } else {
         index = unexpect_shift_num;
+      }
+    } else {
+      index = unexpect_shift_num;
     }
 
-    double cand_num = test_num_ptr_->compCandNum(type_ptr, index, 
-            prec_mass, tolerance);
+    double cand_num = test_num_ptr_->compCandNum(type_ptr, index, prec_mass, tolerance);
 
     //LOG_DEBUG("Shift number " << unexpect_shift_num << " type " << type_ptr->getName() 
     //<< " one prob " << prot_probs[i] << " cand num " << cand_num);
@@ -99,11 +95,12 @@ void CompPValueArray::compMultiExtremeValues(const PrmMsPtrVec &ms_six_ptr_vec,
       LOG_WARN("Zero candidate number");
       cand_num = std::numeric_limits<double>::infinity();
     }
+
     if (type_ptr == AlignType::COMPLETE || type_ptr == AlignType::PREFIX) {
-      ExtremeValuePtr ev_ptr(new ExtremeValue(prot_probs[i], cand_num, 1));
+      ExtremeValuePtr ev_ptr = std::make_shared<ExtremeValue>(prot_probs[i], cand_num, 1);
       prsm_ptrs[i]->setExtremeValuePtr(ev_ptr);
     } else {
-      ExtremeValuePtr ev_ptr(new ExtremeValue(pep_probs[i], cand_num, 1));
+      ExtremeValuePtr ev_ptr = std::make_shared<ExtremeValue>(pep_probs[i], cand_num, 1);
       prsm_ptrs[i]->setExtremeValuePtr(ev_ptr);
     }
     //LOG_DEBUG("assignment complete");
@@ -116,11 +113,11 @@ void CompPValueArray::compSingleExtremeValue(const DeconvMsPtrVec &ms_ptr_vec,
   DeconvMsPtrVec refine_ms_ptr_vec = DeconvMsFactory::getRefineMsPtrVec(ms_ptr_vec, refine_prec_mass);
 
   /*
-  LOG_DEBUG("recalibration " << prsm_ptr->getCalibration()
-               << " original precursor "
-               << ms_ptr->getHeaderPtr()->getPrecMonoMass()
-               << " precursor " << refine_prec_mass);
-               */
+     LOG_DEBUG("recalibration " << prsm_ptr->getCalibration()
+     << " original precursor "
+     << ms_ptr->getHeaderPtr()->getPrecMonoMass()
+     << " precursor " << refine_prec_mass);
+     */
   PrmMsPtrVec prm_ms_ptr_vec = PrmMsFactory::geneMsSixPtrVec(refine_ms_ptr_vec, 
                                                              mng_ptr_->prsm_para_ptr_->getSpParaPtr(),
                                                              refine_prec_mass);
@@ -139,8 +136,7 @@ void CompPValueArray::process(SpectrumSetPtr spec_set_ptr, PrsmPtrVec &prsm_ptrs
       compSingleExtremeValue(spec_set_ptr->getDeconvMsPtrVec(), 
                              prsm_ptrs[i], ppo);
     }
-  } 
-  else {
+  } else {
     compMultiExtremeValues(spec_set_ptr->getMsSixPtrVec(), prsm_ptrs, ppo, false);
   }
 }

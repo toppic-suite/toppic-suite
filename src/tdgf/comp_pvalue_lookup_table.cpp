@@ -40,8 +40,7 @@ namespace prot {
 CompPValueLookupTable::CompPValueLookupTable(TdgfMngPtr mng_ptr) {
   mng_ptr_ = mng_ptr;
   initTable();
-
-  test_num_ptr_ = CountTestNumPtr(new CountTestNum(mng_ptr));
+  test_num_ptr_ = std::make_shared<CountTestNum>(mng_ptr);
   LOG_DEBUG("test number initialized");
 }
 
@@ -182,7 +181,7 @@ void CompPValueLookupTable::process(const DeconvMsPtrVec &deconv_ms_ptr_vec, Prs
     double cand_num = test_num_ptr_->compCandNum(type_ptr, unexpected_shift_num,
                                                  refine_prec_mass, tolerance);
 
-    ExtremeValuePtr ev_ptr(new ExtremeValue(prot_prob, cand_num, 1));
+    ExtremeValuePtr ev_ptr = std::make_shared<ExtremeValue>(prot_prob, cand_num, 1);
 
     prsm_ptrs[i]->setExtremeValuePtr(ev_ptr);
   }
