@@ -36,6 +36,8 @@
 #include "base/string_util.hpp"
 #include "spec/msalign_reader.hpp"
 
+#include <boost/algorithm/string.hpp>
+
 namespace prot {
 
 MsAlignReader::MsAlignReader(const std::string &file_name, 
@@ -51,7 +53,7 @@ std::vector<std::string> MsAlignReader::readOneSpectrum() {
   std::vector<std::string> line_list;
   while (std::getline(input_, line)) {
     line = StringUtil::trim(line);
-    if (line ==  "BEGIN IONS") {
+    if (line == "BEGIN IONS") {
       line_list.push_back(line);
     } else if (line == "END IONS") {
       if (line_list.size() != 0) {
@@ -130,7 +132,7 @@ void MsAlignReader::readNext() {
   }
   if (id < 0 || prec_charge < 0 || prec_mass < 0) {
     LOG_WARN("Input file format error: sp id " << id << " prec_chrg "
-              << prec_charge << " prec mass " << prec_mass);
+             << prec_charge << " prec mass " << prec_mass);
   }
 
   MsHeaderPtr header_ptr(new MsHeader());
@@ -169,7 +171,7 @@ void MsAlignReader::readNext() {
   header_ptr->setPrecMonoMz(prec_mass /prec_charge
                             + MassConstant::getProtonMass());
   header_ptr->setPrecCharge(prec_charge);
-  
+
   header_ptr->setPrecInte(prec_inte);
 
   header_ptr->setFeatureId(feature_id);
@@ -181,7 +183,8 @@ void MsAlignReader::readNext() {
   for (size_t i = 1; i < spectrum_str_vec_.size() - 1; i++) {
     std::string letter = spectrum_str_vec_[i].substr(0,1);
     if (letter >= "0" && letter <= "9") {
-      strs = StringUtil::split(spectrum_str_vec_[i], '\t');
+      boost::split(strs, spectrum_str_vec_[i], boost::is_any_of("\t "));
+      //strs = StringUtil::split(spectrum_str_vec_[i], '\t');
       double mass = std::stod(strs[0]);
       double inte = std::stod(strs[1]);
       int charge = std::stoi(strs[2]);
