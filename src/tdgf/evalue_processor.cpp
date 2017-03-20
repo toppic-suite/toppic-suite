@@ -149,17 +149,19 @@ void EValueProcessor::process(bool is_separate) {
   prsm_reader.close();
   writer.close();
 
-  PrsmXmlWriterPtr all_writer_ptr = std::make_shared<PrsmXmlWriter>(output_file_name);
-  for (int i = 0; i < mng_ptr_->thread_num_; i++) {
-    PrsmReaderPtr all_reader_ptr = std::make_shared<PrsmReader>(output_file_name + "_" + std::to_string(i)); 
-    PrsmPtr p = all_reader_ptr->readOnePrsm(seq_reader, fix_mod_ptr_vec);
-    while(p != nullptr) {
-      all_writer_ptr->write(p); 
-      p = all_reader_ptr->readOnePrsm(seq_reader, fix_mod_ptr_vec); 
+  if (mng_ptr_->use_gf_) {
+    PrsmXmlWriterPtr all_writer_ptr = std::make_shared<PrsmXmlWriter>(output_file_name);
+    for (int i = 0; i < mng_ptr_->thread_num_; i++) {
+      PrsmReaderPtr all_reader_ptr = std::make_shared<PrsmReader>(output_file_name + "_" + std::to_string(i)); 
+      PrsmPtr p = all_reader_ptr->readOnePrsm(seq_reader, fix_mod_ptr_vec);
+      while(p != nullptr) {
+        all_writer_ptr->write(p); 
+        p = all_reader_ptr->readOnePrsm(seq_reader, fix_mod_ptr_vec); 
+      }
+      all_reader_ptr->close();
     }
-    all_reader_ptr->close();
+    all_writer_ptr->close();
   }
-  all_writer_ptr->close();
 }
 
 bool EValueProcessor::checkPrsms(const PrsmPtrVec &prsm_ptrs) {
@@ -183,7 +185,7 @@ void EValueProcessor::compEvalues(SpectrumSetPtr spec_set_ptr, PrsmPtrVec &sele_
   if (!mng_ptr_->use_gf_ 
       && comp_pvalue_table_ptr_->inTable(spec_set_ptr->getDeconvMsPtrVec(), sele_prsm_ptrs)) {
     comp_pvalue_table_ptr_->process(spec_set_ptr->getDeconvMsPtrVec(), sele_prsm_ptrs, ppo);
-    LOG_DEBUG("Using table");
+    std::cout << "Using table" << std::endl;
   } else {
     comp_pvalue_ptr_->process(spec_set_ptr, sele_prsm_ptrs, ppo, is_separate);
   }
@@ -218,6 +220,7 @@ void EValueProcessor::processOneSpectrum(SpectrumSetPtr spec_set_ptr,
 
     //LOG_DEBUG("start sort");
     std::sort(sele_prsm_ptrs.begin(), sele_prsm_ptrs.end(), Prsm::cmpEValueInc);
+    std::cout << "sele_prsm_ptrs " << sele_prsm_ptrs.size() << std::endl;
     writer.writeVector(sele_prsm_ptrs);
     //LOG_DEBUG("writing complete");
   }
