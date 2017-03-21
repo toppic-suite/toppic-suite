@@ -185,7 +185,7 @@ void EValueProcessor::compEvalues(SpectrumSetPtr spec_set_ptr, PrsmPtrVec &sele_
   if (!mng_ptr_->use_gf_ 
       && comp_pvalue_table_ptr_->inTable(spec_set_ptr->getDeconvMsPtrVec(), sele_prsm_ptrs)) {
     comp_pvalue_table_ptr_->process(spec_set_ptr->getDeconvMsPtrVec(), sele_prsm_ptrs, ppo);
-    std::cout << "Using table" << std::endl;
+    LOG_DEBUG("Using table");
   } else {
     comp_pvalue_ptr_->process(spec_set_ptr, sele_prsm_ptrs, ppo, is_separate);
   }
@@ -220,7 +220,7 @@ void EValueProcessor::processOneSpectrum(SpectrumSetPtr spec_set_ptr,
 
     //LOG_DEBUG("start sort");
     std::sort(sele_prsm_ptrs.begin(), sele_prsm_ptrs.end(), Prsm::cmpEValueInc);
-    std::cout << "sele_prsm_ptrs " << sele_prsm_ptrs.size() << std::endl;
+    LOG_DEBUG("sele_prsm_ptrs size " << sele_prsm_ptrs.size());
     writer.writeVector(sele_prsm_ptrs);
     //LOG_DEBUG("writing complete");
   }
