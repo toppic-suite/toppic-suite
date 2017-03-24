@@ -1,3 +1,7 @@
+#TopPIC: TOP-Down Mass Spectrometry Based Proteoform Identification and Characterization
+
+For manual and refenrence, please visit http://proteomics.informatics.iupui.edu/software/toppic/
+
 ## System requirements
 * GCC version higher than 4.8.2 for C++11 support
 * cmake
@@ -42,3 +46,5 @@ export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
 export LANGUAGE=en_US.UTF-8
  ```
+
+All the static libraries included were built using GCC 4.8. You might meet the incompatibility during the linking using GCC 5 or other versions of GCC.
