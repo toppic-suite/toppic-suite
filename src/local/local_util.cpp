@@ -28,9 +28,10 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
-
 #include <algorithm>
+
+#include "boost/algorithm/string.hpp"
+
 #include "prsm/peak_ion_pair_factory.hpp"
 #include "base/acid_base.hpp"
 #include "base/activation_base.hpp"
@@ -512,6 +513,7 @@ void LocalUtil::readPtmTxt(const std::string &file_name) {
   std::ifstream infile(file_name.c_str());
   std::string line;
   while(std::getline(infile, line)) {
+    boost::trim_right(line);
     if (line == "" || line[0] == '#') continue;
 
     line = StringUtil::rmComment(line);

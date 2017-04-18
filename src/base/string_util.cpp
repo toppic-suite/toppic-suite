@@ -31,6 +31,8 @@
 
 #include <iomanip>
 
+#include "boost/algorithm/string.hpp"
+
 #include "base/logger.hpp"
 #include "base/string_util.hpp"
 
@@ -90,9 +92,9 @@ std::string StringUtil::convertToString(double value, int number) {
 }
 
 std::string StringUtil::convertToString(int value){
-    std::stringstream stream;
-    stream << value;
-    return stream.str();
+  std::stringstream stream;
+  stream << value;
+  return stream.str();
 }
 
 std::string StringUtil::convertToString(bool value) {
@@ -105,8 +107,9 @@ std::string StringUtil::rmComment(const std::string &ori_s, const std::string &c
   std::string s = ori_s;
   std::string::size_type i = s.find(comment);
 
-  if (i != std::string::npos)                                                   
-    s.erase(i);
+  if (i != std::string::npos) s.erase(i);
+
+  boost::trim_right(s);
 
   return s;
 }
