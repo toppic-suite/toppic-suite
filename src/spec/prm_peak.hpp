@@ -70,7 +70,7 @@ class PrmPeak : public Peak {
 
   double getNRelaxCStrictTolerance(){return n_relax_c_strict_tolerance_;}
 
-  int getSpecId() {return spec_id_;}
+  int getSpectrumId() {return spec_id_;}
 
   int getPeakId() {return peak_id_;}
 

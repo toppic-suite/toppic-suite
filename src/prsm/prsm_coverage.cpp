@@ -81,7 +81,7 @@ void PrsmCoverage::processSingleCoverage(){
   while((spec_set_ptr = sp_reader.getNextSpectrumSet(sp_para_ptr))!= nullptr){
     cnt+= group_spec_num;
     if(spec_set_ptr->isValid()){
-      int spec_id = spec_set_ptr->getSpecId();
+      int spec_id = spec_set_ptr->getSpectrumId();
       while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_id) {
         DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
         prsm_ptr->setDeconvMsPtrVec(deconv_ms_ptr_vec);

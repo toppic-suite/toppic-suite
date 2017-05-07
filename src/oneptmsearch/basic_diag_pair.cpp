@@ -66,7 +66,7 @@ inline BasicDiagPairPtrVec compDiagPair(const PrmPeakPtrVec &prm_peaks,
   while(i < prm_peaks.size() && j < seq_masses.size()){
     PrmPeakPtr peak = prm_peaks[i];
     BasePeakTypePtr type_ptr = peak->getBaseTypePtr();
-    int spec_id = peak->getSpecId();
+    int spec_id = peak->getSpectrumId();
     double error = 0;
     if(header_ptr->isNStrict() && !header_ptr->isCStrict()){
       error = peak->getNStrictCRelaxTolerance();

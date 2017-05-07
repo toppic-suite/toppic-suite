@@ -119,7 +119,7 @@ void EValueProcessor::process(bool is_separate) {
     cnt += group_spec_num;
     if(spec_set_ptr->isValid()){
       PrsmPtrVec selected_prsm_ptrs;
-      while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_set_ptr->getSpecId()) {
+      while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_set_ptr->getSpectrumId()) {
         selected_prsm_ptrs.push_back(prsm_ptr);
         prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
       }
