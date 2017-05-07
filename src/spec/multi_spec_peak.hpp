@@ -48,7 +48,7 @@ class MultiSpecPeak : public Peak {
 
   int getId() {return id_;}
 
-  int getSpecId() {return spec_id_;}
+  int getSpectrumId() {return spec_id_;}
 
   int getInSpecPeakId() {return in_spec_peak_id_;}
 

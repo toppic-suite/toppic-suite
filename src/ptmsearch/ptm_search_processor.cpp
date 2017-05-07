@@ -185,7 +185,7 @@ void PtmSearchProcessor::process(){
   while((spec_set_ptr = sp_reader.getNextSpectrumSet(sp_para_ptr))!= nullptr){
     cnt+= group_spec_num;
     if(spec_set_ptr->isValid()){
-      int spec_id = spec_set_ptr->getSpecId();
+      int spec_id = spec_set_ptr->getSpectrumId();
       SimplePrsmPtrVec selected_prsm_ptrs;
       while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_id) {
         selected_prsm_ptrs.push_back(prsm_ptr);

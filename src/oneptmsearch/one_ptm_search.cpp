@@ -142,7 +142,7 @@ void OnePtmSearch::process(PtmSearchMngPtr mng_ptr){
   while((spec_set_ptr = sp_reader.getNextSpectrumSet(sp_para_ptr))!= nullptr){
     cnt+= group_spec_num;
     if(spec_set_ptr->isValid()){
-      int spec_id = spec_set_ptr->getSpecId();
+      int spec_id = spec_set_ptr->getSpectrumId();
       // complete
       SimplePrsmPtrVec comp_selected_prsm_ptrs;
       while (comp_prsm_ptr != nullptr && comp_prsm_ptr->getSpectrumId() == spec_id) {
