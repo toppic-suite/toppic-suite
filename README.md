@@ -47,4 +47,9 @@ export LANG=en_US.UTF-8
 export LANGUAGE=en_US.UTF-8
  ```
 
-All the static libraries included were built using GCC 4.8. You might meet the incompatibility during the linking using GCC 5 or other versions of GCC.
+All the static libraries included were built using GCC 4.8. You might meet the incompatibility during the linking using GCC 5 or other versions of GCC. You can set the version of compiler in CMakeLists.txt as below:
+
+```
+SET(CMAKE_C_COMPILER gcc-4.8)
+SET(CMAKE_CXX_COMPILER g++-4.8)
+```

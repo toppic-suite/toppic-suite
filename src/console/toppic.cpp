@@ -289,7 +289,7 @@ int two_base_opt(int argc, char* argv[]) {
     PrsmFeatureSpeciesPtr prsm_forms
         = std::make_shared<PrsmFeatureSpecies>(db_file_name,
                                                sp_file_name,
-                                               "CUTOFF_RESULT",
+                                               suffix,
                                                "FORMS", fix_mod_list);
     prsm_forms->process();
     prsm_forms = nullptr;
