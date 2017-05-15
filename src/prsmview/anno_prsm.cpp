@@ -95,11 +95,14 @@ void addMsHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement* ms_element,
   std::string str=StringUtil::convertToString(precursor_mass, pos);
   xml_doc->addElement(ms_header_element, "precursor_mono_mass", str.c_str());
   int precursor_charge = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecCharge();
-  str=StringUtil::convertToString(precursor_charge);
+  str = StringUtil::convertToString(precursor_charge);
   xml_doc->addElement(ms_header_element, "precursor_charge", str.c_str());
   double precursor_mz = Peak::compMonoMz(precursor_mass, precursor_charge); 
-  str=StringUtil::convertToString(precursor_mz, pos);
+  str = StringUtil::convertToString(precursor_mz, pos);
   xml_doc->addElement(ms_header_element, "precursor_mz", str.c_str());
+  double precursor_inte = prsm_ptr->getPrecFeatureInte();
+  str = StringUtil::convertToString(precursor_inte, pos);
+  xml_doc->addElement(ms_header_element, "precursor_inte", str.c_str());
 }
 
 void addMsPeaks(XmlDOMDocument *xml_doc, xercesc::DOMElement* ms_element, 
