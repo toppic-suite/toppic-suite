@@ -45,7 +45,15 @@
 
 <xsl:template match="compatible_proteoform">
 <div id="p{proteoform_id}">
-	<h2><!--<xsl:value-of select="position()"/> -->Proteoform #<xsl:value-of select="proteoform_id"/></h2>
+    <xsl:variable name="tmp" select="prsm/ms/ms_header/precursor_inte"/>
+    <xsl:choose>
+        <xsl:when test="$tmp != '0'">
+	        <h2>Proteoform #<xsl:value-of select="proteoform_id"/> Feature intensity: <xsl:value-of select="$tmp"/></h2>
+        </xsl:when>
+        <xsl:otherwise>
+            <h2>Proteoform #<xsl:value-of select="proteoform_id"/></h2>
+        </xsl:otherwise>
+    </xsl:choose>
 	<xsl:apply-templates select="prsm" mode="protein"></xsl:apply-templates>
 </div>
 <br/>
@@ -57,7 +65,7 @@
     <xsl:choose>
 		<xsl:when test="count(../prsm) > 1">
             <p style="font-size:16px;">The <a href="../prsms/prsm{prsm_id}.html">best PrSM</a> has an E-value <xsl:value-of select="e_value"/>
-            and a precursor mass <xsl:value-of select="ms/ms_header/precursor_mass"/>.
+            and a precursor mass <xsl:value-of select="ms/ms_header/precursor_mono_mass"/>.
             There are <a href="../proteoforms/proteoform{../proteoform_id}.html"><xsl:value-of select="count(../prsm)"/> PrSMs</a> in total.</p>
         </xsl:when>
         <xsl:otherwise>
