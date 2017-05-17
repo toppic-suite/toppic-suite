@@ -88,22 +88,17 @@ void PrsmTableWriter::write(){
 
   file << "#matched peaks" << "\t"
       << "#matched fragment ions" << "\t"
-#ifdef TOPPIC
       << "P-value" << "\t"
       << "E-value" << "\t"
       //      << "One Protein probabilty"<< "\t"
       << "Q-value (spectral FDR)" << "\t"
-      << "Proteoform FDR"
-#endif
-#ifdef MASS_GRAPH
-      << "#Variable PTMs" << "\t"
-#endif
-      << std::endl;
+      << "Proteoform FDR" << "\t"
+      << "#Variable PTMs" << std::endl;
 
   std::string input_file_name 
       = FileUtil::basename(spectrum_file_name) + "." + input_file_ext_;
   std::string db_file_name = prsm_para_ptr_->getSearchDbFileName();
-  FastaIndexReaderPtr seq_reader(new FastaIndexReader(db_file_name));
+  FastaIndexReaderPtr seq_reader = std::make_shared<FastaIndexReader>(db_file_name);
   ModPtrVec fix_mod_ptr_vec = prsm_para_ptr_->getFixModPtrVec();
   PrsmReader prsm_reader(input_file_name);
   //LOG_DEBUG("start read prsm");
@@ -235,7 +230,6 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
 
   file << prsm_ptr->getMatchPeakNum() << "\t"
       << prsm_ptr->getMatchFragNum() << "\t";
-#ifdef TOPPIC
   file << prsm_ptr->getPValue() << "\t"
       << prsm_ptr->getEValue() << "\t";
   //      << prsm_ptr->getOneProtProb()<< "\t"
@@ -247,15 +241,12 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   }
   double proteoform_fdr = prsm_ptr->getProteoformFdr();
   if (proteoform_fdr >= 0) {
-    file << proteoform_fdr;
+    file << proteoform_fdr << "\t";
   } else { 
-    file << "-";
+    file << "-" << "\t";
   }
-#endif
-#ifdef MASS_GRAPH
-  file << "\t" << prsm_ptr->getProteoformPtr()->getVariablePtmNum();
-#endif
-  file << std::endl;
+
+  file << std::max(0, prsm_ptr->getProteoformPtr()->getVariablePtmNum()) << std::endl;
 }
 
 } /* namespace prot */

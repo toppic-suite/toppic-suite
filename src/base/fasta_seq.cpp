@@ -37,21 +37,25 @@
 namespace prot {
 
 FastaSeq::FastaSeq(const std::string &name_line, 
-                   const std::string &ori_seq) {
+                   const std::string &ori_seq,
+                   int sub_seq_start) {
   int space_pos = name_line.find(" ");
   name_ = name_line.substr(0, space_pos);
   desc_ = name_line.substr(space_pos + 1);
   //rmChar is moved to getAcidPtmPairVec  
   //seq_ = rmChar(ori_seq);
+  sub_seq_start_ = sub_seq_start;
   seq_ = ori_seq;
   compAcidPtmPairVec();
 }
 
 FastaSeq::FastaSeq(const std::string &name, 
                    const std::string &desc, 
-                   const std::string &ori_seq): 
+                   const std::string &ori_seq,
+                   int sub_seq_start): 
     name_(name),
-    desc_(desc) {
+    desc_(desc),
+    sub_seq_start_(sub_seq_start){
       //seq_ = rmChar(ori_seq);
       seq_ = ori_seq;
       compAcidPtmPairVec();
@@ -147,6 +151,7 @@ void FastaSeq::appendNameDescToXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* 
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
   xml_doc->addElement(element, "seq_name", name_.c_str());
   xml_doc->addElement(element, "seq_desc", desc_.c_str());
+  xml_doc->addElement(element, "sub_seq_start", std::to_string(sub_seq_start_).c_str());
   parent->appendChild(element);
 }
 
@@ -158,6 +163,10 @@ std::string FastaSeq::getNameFromXml(xercesc::DOMElement * element) {
 std::string FastaSeq::getDescFromXml(xercesc::DOMElement * element) {
   std::string desc = XmlDomUtil::getChildValue(element, "seq_desc", 0);
   return desc;
+}
+
+int FastaSeq::getSubSeqStartFromXml(xercesc::DOMElement * element) {
+  return XmlDomUtil::getIntChildValue(element, "sub_seq_start", 0);
 }
 
 }

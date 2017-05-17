@@ -50,6 +50,10 @@ class ZeroPtmSlowMatch {
                    ZpFastMatchPtr fast_match_ptr,
                    ZeroPtmSearchMngPtr mng_ptr);
 
+  ZeroPtmSlowMatch(const DeconvMsPtrVec &deconv_ms_ptr_vec, 
+                   ProteoformPtr proteoform_ptr,
+                   ZeroPtmSearchMngPtr mng_ptr);
+
   double getScore() {return score_;}
 
   PrsmPtr geneResult();

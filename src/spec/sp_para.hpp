@@ -72,6 +72,8 @@ class SpPara {
 
   static std::string getXmlElementName() {return "sp_para";}
 
+  std::vector<double> mod_mass_;
+
  private:
   int min_peak_num_;
 

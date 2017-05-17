@@ -40,19 +40,21 @@
 namespace prot {
 
 class DiagFilterProcessor {
-public:
-    DiagFilterProcessor(DiagFilterMngPtr mng_ptr);
-    void process();
+ public:
+  DiagFilterProcessor(DiagFilterMngPtr mng_ptr): mng_ptr_(mng_ptr) {};
 
-private:
-    DiagFilterMngPtr mng_ptr_;
+  void process();
 
-    void processBlock(DbBlockPtr block_ptr, int total_block_num);
+ private:
+  DiagFilterMngPtr mng_ptr_;
+
+  void processBlock(DbBlockPtr block_ptr, int total_block_num,
+                    const std::vector<double> & mod_mass_list);
 
 };
 
 typedef std::shared_ptr<DiagFilterProcessor> DiagFilterProcessorPtr;
 
-} /* namespace prot */
+}  // namespace prot
 
 #endif /* PROT_DIAG_FILTER_PROCESSOR_HPP_ */

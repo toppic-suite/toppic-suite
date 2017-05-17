@@ -33,28 +33,37 @@
 
 namespace prot {
 
-ExtendMsPtr ExtendMsFactory::geneMsThreePtr(
-    DeconvMsPtr deconv_ms_ptr, SpParaPtr sp_para_ptr, 
-    double new_prec_mass) {
+ExtendMsPtr ExtendMsFactory::geneMsThreePtr(DeconvMsPtr deconv_ms_ptr, SpParaPtr sp_para_ptr, 
+                                            double new_prec_mass) {
   MsHeaderPtr ori_header_ptr = deconv_ms_ptr->getMsHeaderPtr();
   MsHeaderPtr header_ptr = MsHeader::geneMsHeaderPtr(ori_header_ptr, new_prec_mass);
 
   ExtendPeakPtrVec list;
   double ext_min_mass = sp_para_ptr->getExtendMinMass();
   std::vector<double> ext_offsets = sp_para_ptr->getExtendOffsets();
-  for(size_t i =0; i < deconv_ms_ptr->size(); i++){
+  int k = static_cast<int>(sp_para_ptr->mod_mass_.size()) + 1;
+  for(size_t i = 0; i < deconv_ms_ptr->size(); i++){
     DeconvPeakPtr deconv_peak_ptr = deconv_ms_ptr->getPeakPtr(i);
     if(deconv_peak_ptr->getMonoMass() <= ext_min_mass) {
       double orig_mass = deconv_peak_ptr->getMonoMass();
+      for (int j = 1; j < k; j++) {
+        if (deconv_peak_ptr->getMonoMass() > new_prec_mass * j / k) {
+          orig_mass -= sp_para_ptr->mod_mass_[j - 1];
+        } 
+      }
       ExtendPeakPtr extend_peak_ptr 
-          = ExtendPeakPtr(new ExtendPeak(deconv_peak_ptr,orig_mass, 1.0));
+          = std::make_shared<ExtendPeak>(deconv_peak_ptr, orig_mass, 1.0);
       list.push_back(extend_peak_ptr);
-    }
-    else{
-      for(size_t j=0;j < ext_offsets.size();j++){
+    } else{
+      for(size_t j = 0;j < ext_offsets.size();j++){
         double mass = deconv_peak_ptr->getMonoMass() + ext_offsets[j];
+        for (int j = 1; j < k; j++) {
+          if (deconv_peak_ptr->getMonoMass() + ext_offsets[j] > new_prec_mass * j / k) {
+            mass -= sp_para_ptr->mod_mass_[j - 1];
+          } 
+        }
         ExtendPeakPtr extend_peak_ptr 
-            = ExtendPeakPtr(new ExtendPeak(deconv_peak_ptr, mass, 1.0));
+            = std::make_shared<ExtendPeak>(deconv_peak_ptr, mass, 1.0);
         list.push_back(extend_peak_ptr);
       }
     }
@@ -91,8 +100,7 @@ ExtendMsPtrVec ExtendMsFactory::geneMsThreePtrVec(const DeconvMsPtrVec &deconv_m
                                                   SpParaPtr sp_para_ptr, double new_prec_mass) {
   ExtendMsPtrVec extend_ms_ptr_vec;
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
-    extend_ms_ptr_vec.push_back(
-        geneMsThreePtr(deconv_ms_ptr_vec[i], sp_para_ptr, new_prec_mass));
+    extend_ms_ptr_vec.push_back(geneMsThreePtr(deconv_ms_ptr_vec[i], sp_para_ptr, new_prec_mass));
   }
   return extend_ms_ptr_vec;
 }

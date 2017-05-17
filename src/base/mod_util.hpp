@@ -46,7 +46,9 @@ class ModUtil {
 
   static ResiduePtrVec geneResidueListWithMod(ResiduePtrVec residue_list,
                                               ModPtrVec fix_mod_list);
+
+  static std::vector<double> getModMassVec(const ModPtrVec & var_mod_list);
 };
 
-}
+}  // namespace prot
 #endif

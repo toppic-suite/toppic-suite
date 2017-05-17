@@ -39,8 +39,6 @@
 #include "graph/graph_util.hpp"
 #include "graph/proteo_graph.hpp"
 
-#include <boost/timer.hpp>
-
 namespace prot {
 
 ProteoGraph::ProteoGraph(FastaSeqPtr fasta_seq_ptr, ModPtrVec fix_mod_ptr_vec,
@@ -53,13 +51,13 @@ ProteoGraph::ProteoGraph(FastaSeqPtr fasta_seq_ptr, ModPtrVec fix_mod_ptr_vec,
   node_num_ = num_vertices(*graph_ptr.get());
   LOG_DEBUG("node num " << node_num_);
   proteo_graph_gap_ = proteo_graph_gap;
-  pair_num_ = node_num_ * proteo_graph_gap_;
+  pair_num_ = node_num_ * (proteo_graph_gap_ + 1);
   compSeqMasses(convert_ratio);
-  compDistances(convert_ratio, max_mod_num, max_ptm_sum_mass);
+  compDistances(max_mod_num, max_ptm_sum_mass);
 }
 
 int ProteoGraph::getVecIndex(int v1, int v2) {
-  int index =  proteo_graph_gap_* v1 + (v2 - v1);
+  int index =  (proteo_graph_gap_ + 1) * v1 + (v2 - v1);
   return index;
 }
 
@@ -82,9 +80,7 @@ void ProteoGraph::compSeqMasses(double convert_ratio) {
   }
 }
 
-void ProteoGraph::compDistances(double convert_ratio, int max_mod_num, int max_ptm_sum_mass) {
-  boost::timer t;
-
+void ProteoGraph::compDistances(int max_mod_num, int max_ptm_sum_mass) {
   MassGraph *g_p = graph_ptr_.get();
   // get mass without ptms
 
@@ -103,7 +99,7 @@ void ProteoGraph::compDistances(double convert_ratio, int max_mod_num, int max_p
     dist_vecs[index][0].insert(0);
   }
   for (int i = 0; i < node_num_ - 1; i++) {
-    for (int j = i+1; j < node_num_ && j <= i + proteo_graph_gap_; j++) {
+    for (int j = i + 1; j < node_num_ && j <= i + proteo_graph_gap_; j++) {
       Vertex v2 = vertex(j, *g_p);
       Vertex pre_v2 = vertex(j-1, *g_p);
       int index = getVecIndex(i, j);
@@ -139,6 +135,7 @@ void ProteoGraph::compDistances(double convert_ratio, int max_mod_num, int max_p
     }
   }
 
+  dist_vec_.reserve(max_mod_num);
   DistVec tmp;
   for (int k = 0; k < max_mod_num + 1; k++) {
     dist_vec_.push_back(tmp);
@@ -147,8 +144,6 @@ void ProteoGraph::compDistances(double convert_ratio, int max_mod_num, int max_p
   for (int k = 0; k < max_mod_num + 1; k++) {
     addToDistVec(graph_ptr_, dist_vecs, node_num_, k, dist_vec_[k], proteo_graph_gap_);
   }
-
-  LOG_DEBUG("compDistances time: " << t.elapsed());
 }
 
 }  // namespace prot

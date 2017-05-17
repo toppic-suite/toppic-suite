@@ -61,7 +61,7 @@ ProteoAnno::ProteoAnno(const ModPtrVec &fix_mod_ptr_vec,
   }
 }
 
-void ProteoAnno::anno(const std::string &seq) {
+void ProteoAnno::anno(const std::string &seq, bool is_complete) {
   ResiduePtrVec residue_ptr_vec = ResidueUtil::convertStrToResiduePtrVec(seq, fix_mod_ptr_vec_);
   res_vec_2d_.clear();
   change_vec_2d_.clear();
@@ -89,7 +89,7 @@ void ProteoAnno::anno(const std::string &seq) {
       continue;
     }
     LOG_DEBUG("i " << i << " mod " << mod_ptr);
-    if (mod_ptr->getType() == ProtModBase::getType_NME()) {
+    if (is_complete && mod_ptr->getType() == ProtModBase::getType_NME()) {
       LOG_DEBUG("NME");
       // add empty residue to the first methinine residue
       is_nme_ = true;
@@ -103,8 +103,11 @@ void ProteoAnno::anno(const std::string &seq) {
       }
       res_vec_2d_[0].push_back(empty_residue_ptr);
       change_vec_2d_[0].push_back(ChangeType::PROTEIN_VARIABLE->getId());
-    }
-    else if (mod_ptr->getType() == ProtModBase::getType_NME_ACETYLATION()) {
+    } else if (is_complete && mod_ptr->getType() == ProtModBase::getType_M_ACETYLATION()) {
+      ResiduePtr mut_residue_ptr = mod_ptr->getModPtr()->getModResiduePtr();
+      res_vec_2d_[0].push_back(mut_residue_ptr);
+      change_vec_2d_[0].push_back(ChangeType::PROTEIN_VARIABLE->getId());
+    } else if (is_complete && mod_ptr->getType() == ProtModBase::getType_NME_ACETYLATION()) {
       LOG_DEBUG("NME_ACETYLATION");
       // add acetylation to the second residue
       is_nme_ = true;

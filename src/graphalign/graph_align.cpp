@@ -28,11 +28,13 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <boost/algorithm/string.hpp>
 
 #include "base/proteoform_factory.hpp"
 #include "spec/extend_ms_factory.hpp"
 #include "oneptmsearch/diagonal.hpp"
 #include "oneptmsearch/diagonal_header.hpp"
+#include "graph/graph.hpp"
 #include "graph/graph_util.hpp"
 #include "graphalign/graph_align_processor.hpp"
 #include "graphalign/graph_align.hpp"
@@ -185,7 +187,7 @@ void GraphAlign::initTable() {
   LOG_DEBUG("init table end");
 }
 
-inline GraphDpNodePtr GraphAlign::compBestVariableNode(int i, int j, int s, int m, int &best_edge_mod_num) {
+GraphDpNodePtr GraphAlign::compBestVariableNode(int i, int j, int s, int m, int &best_edge_mod_num) {
   int best_prev_score = -1;
   best_edge_mod_num = -1;
   GraphDpNodePtr best_prev_node = nullptr;
@@ -210,8 +212,7 @@ inline GraphDpNodePtr GraphAlign::compBestVariableNode(int i, int j, int s, int 
   return best_prev_node;
 }
 
-
-inline GraphDpNodePtr GraphAlign::compBestShiftNode(int i, int j, int s, int m) {
+GraphDpNodePtr GraphAlign::compBestShiftNode(int i, int j, int s, int m) {
   if (s == 0) {
     return nullptr;
   }
@@ -231,7 +232,7 @@ inline GraphDpNodePtr GraphAlign::compBestShiftNode(int i, int j, int s, int m) 
   return best_prev_node;
 }
 
-inline void GraphAlign::updateBestShiftNode(int i, int j, int s, int m) {
+void GraphAlign::updateBestShiftNode(int i, int j, int s, int m) {
   // update best node
   if (table_[i-1][j]->getBestShiftScore(s, m) > table_[i][j-1]->getBestShiftScore(s, m)) {
     table_[i][j]->updateBestShiftNode(s, m, table_[i-1][j]->getBestShiftScore(s, m), table_[i-1][j]->getBestShiftNodePtr(s,m));
@@ -411,10 +412,10 @@ void GraphAlign::getNodeDiagonals(int s, int m) {
   return; 
 }
 
-inline DiagonalHeaderPtr getFirstDiagonal(ProteoGraphPtr proteo_ptr,
-                                          GraphResultNodePtrVec nodes, 
-                                          std::vector<double> prm_masses, 
-                                          bool only_diag) {
+DiagonalHeaderPtr getFirstDiagonal(ProteoGraphPtr proteo_ptr,
+                                   GraphResultNodePtrVec nodes, 
+                                   std::vector<double> prm_masses, 
+                                   bool only_diag) {
   int prot_idx = nodes[0]->getFirstIdx();
   int spec_idx = nodes[0]->getSecondIdx();
   double prot_mass = prm_masses[prot_idx];
@@ -451,9 +452,9 @@ inline DiagonalHeaderPtr getFirstDiagonal(ProteoGraphPtr proteo_ptr,
   return header_ptr;
 }
 
-inline DiagonalHeaderPtr getLastDiagonal(GraphResultNodePtrVec nodes, 
-                                         std::vector<double> prm_masses,
-                                         PrmPeakPtrVec prm_peaks) {
+DiagonalHeaderPtr getLastDiagonal(GraphResultNodePtrVec nodes, 
+                                  std::vector<double> prm_masses,
+                                  PrmPeakPtrVec prm_peaks) {
   int last_node_idx = nodes.size() - 1;
   int last_prot_idx = nodes[last_node_idx]->getFirstIdx();
   int last_spec_idx = nodes[last_node_idx]->getSecondIdx();
@@ -480,9 +481,9 @@ inline DiagonalHeaderPtr getLastDiagonal(GraphResultNodePtrVec nodes,
   return header_ptr;
 }
 
-inline DiagonalHeaderPtr getInternalDiagonal(GraphResultNodePtrVec nodes, 
-                                             std::vector<double> prm_masses,
-                                             PrmPeakPtrVec prm_peaks) {
+DiagonalHeaderPtr getInternalDiagonal(GraphResultNodePtrVec nodes, 
+                                      std::vector<double> prm_masses,
+                                      PrmPeakPtrVec prm_peaks) {
   double shift_sum = 0.0;
   for (size_t i = 0; i < nodes.size(); i++) {
     int prot_idx = nodes[i]->getFirstIdx();
@@ -606,18 +607,18 @@ PrsmPtr GraphAlign::geneResult(int s, int m){
     }
   }
 
-  ChangePtrVec changes = getDiagonalMassChanges(refined_headers, first_pos, last_pos, 
-                                                change_types);
-  /*
-     for (size_t i = 0; i < changes.size(); i++) {
-     LOG_DEBUG("change " << i << " start " << changes[i]->getLeftBpPos() << " end " << changes[i]->getRightBpPos() << " type " << changes[i]->getChangeType());
-     }
-     */
+  ChangePtrVec changes = getDiagonalMassChanges(refined_headers, first_pos, last_pos, change_types);
+
+  /*for (size_t i = 0; i < changes.size(); i++) {*/
+  //std::cout << "change " << i << " start " << changes[i]->getLeftBpPos()
+  //<< " end " << changes[i]->getRightBpPos() << std::endl;
+  /*}*/
+
   sub_proteo_ptr->addChangePtrVec(changes);
   sub_proteo_ptr->setVariablePtmNum(m);
 
-  return PrsmPtr(new Prsm(sub_proteo_ptr, deconv_ms_ptr_vec, refine_prec_mass,
-                          mng_ptr_->prsm_para_ptr_->getSpParaPtr()));
+  return std::make_shared<Prsm>(sub_proteo_ptr, deconv_ms_ptr_vec, refine_prec_mass,
+                                mng_ptr_->prsm_para_ptr_->getSpParaPtr());
 }
 
 PrsmPtr GraphAlign::geneResult(int s){
@@ -639,6 +640,118 @@ PrsmPtr GraphAlign::geneResult(int s){
       }
     }
   }
+
+  ChangePtrVec change_vec = best_prsm_ptr->getProteoformPtr()->getChangePtrVec();
+
+  double err = best_prsm_ptr->getOriPrecMass() * mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
+  MassGraph * g_p = proteo_graph_ptr_->getMassGraphPtr().get();
+  for (size_t i = 0; i < change_vec.size(); i++) {
+    best_prsm_ptr->getProteoformPtr()->rmChangePtr(change_vec[i]);
+    if (change_vec[i]->getChangeTypePtr()->getId() != ChangeType::VARIABLE->getId()) continue;
+    std::vector<int> mass_lst;
+    std::vector<std::string> ptm_lst;
+    int left_pos = best_prsm_ptr->getProteoformPtr()->getStartPos() + change_vec[i]->getLeftBpPos();
+    int right_pos = best_prsm_ptr->getProteoformPtr()->getStartPos() + change_vec[i]->getRightBpPos();
+    int change_mass = std::round(change_vec[i]->getMassShift() * mng_ptr_->convert_ratio_);
+    std::string change_ptm = "";
+    for (int k = left_pos; k < right_pos; k++) {
+      if (change_ptm != "") break;
+
+      Vertex v = boost::vertex(k, *g_p);
+      boost::graph_traits<MassGraph>::out_edge_iterator ei, ei_end;
+      boost::tie(ei, ei_end) = out_edges(v, *g_p);
+      for ( ; ei != ei_end; ++ei) {
+        MassGraph::edge_descriptor e = *ei;
+        int edge_mod_mass = std::round((*g_p)[e].res_ptr_->getPtmPtr()->getMonoMass() * mng_ptr_->convert_ratio_);
+        ptm_lst.push_back("");
+        mass_lst.push_back(0);
+        if (edge_mod_mass == 0) continue;
+        size_t lst_size = ptm_lst.size();
+        if (k == left_pos) {
+          if (std::abs(edge_mod_mass - change_mass) <= err * mng_ptr_->convert_ratio_) {
+            change_ptm = (*g_p)[e].res_ptr_->getPtmPtr()->getAbbrName(); 
+            break;
+          } else {
+            if (std::find(mass_lst.begin(), mass_lst.end(), edge_mod_mass) == mass_lst.end()) {
+              ptm_lst.push_back((*g_p)[e].res_ptr_->getPtmPtr()->getAbbrName());
+              mass_lst.push_back(edge_mod_mass);
+            }
+          }
+        } else {
+          for (size_t j = 0; j < lst_size; j++) {
+            if (std::abs(mass_lst[j] + edge_mod_mass - change_mass) <= err * mng_ptr_->convert_ratio_) {
+              change_ptm = ptm_lst[j] + ";" + (*g_p)[e].res_ptr_->getPtmPtr()->getAbbrName();
+              break;
+            } else {
+              if (std::find(mass_lst.begin(), mass_lst.end(), mass_lst[j] + edge_mod_mass) == mass_lst.end()) {
+                ptm_lst.push_back(ptm_lst[j] + ";" + (*g_p)[e].res_ptr_->getPtmPtr()->getAbbrName());
+                mass_lst.push_back(mass_lst[j] + edge_mod_mass); 
+              }
+            }
+          }
+        }
+      }
+    }
+    std::vector<std::string> change_strs;
+    boost::split(change_strs, change_ptm, boost::is_any_of(";"));
+    change_strs.erase(std::remove(change_strs.begin(), change_strs.end(), ""),
+                      change_strs.end());
+    if (change_strs.size() == 1) {
+      PtmPtr p = prot::PtmBase::getPtmPtrByAbbrName(change_strs[0]); 
+      ResiduePtr ori_residue_ptr = change_vec[i]->getModPtr()->getOriResiduePtr();
+      ResiduePtr mod_residue_ptr
+          = std::make_shared<Residue>(change_vec[i]->getModPtr()->getModResiduePtr()->getAcidPtr(), p);
+      ModPtr mod = std::make_shared<Mod>(ori_residue_ptr, mod_residue_ptr);
+      change_vec[i] = std::make_shared<Change>(change_vec[i]->getLeftBpPos(),
+                                               change_vec[i]->getRightBpPos(),
+                                               change_vec[i]->getChangeTypePtr(),
+                                               change_vec[i]->getMassShift(),
+                                               mod);
+    } else {
+      std::sort(change_strs.begin(), change_strs.end());
+      std::string tmp = change_strs[0];
+      std::string ptm_str = "";
+      int cnt = 0;
+      for (size_t i = 0; i < change_strs.size(); i++) {
+        if (change_strs[i] == tmp) {
+          cnt++;
+        } else {
+          if (cnt > 1) {
+            ptm_str = ptm_str + " + " + std::to_string(cnt) + " " + tmp;
+          } else {
+            ptm_str = ptm_str + " + " + tmp; 
+          }
+          cnt = 1;
+          tmp = change_strs[i];
+        }
+      }
+
+      if (cnt > 1) {
+        ptm_str = ptm_str + " + " + std::to_string(cnt) + " " + tmp;
+      } else {
+        ptm_str = ptm_str + " + " + tmp; 
+      }
+
+      ptm_str = ptm_str.substr(2, ptm_str.length() - 2);
+      boost::algorithm::trim(ptm_str);
+      PtmPtr p = std::make_shared<Ptm>(ptm_str, ptm_str, change_vec[i]->getMassShift(),
+                                       -1, "", "", "");
+      p = PtmBase::getPtmPtr(p);
+      ResiduePtr ori_residue_ptr = change_vec[i]->getModPtr()->getOriResiduePtr();
+      ResiduePtr mod_residue_ptr
+          = std::make_shared<Residue>(change_vec[i]->getModPtr()->getModResiduePtr()->getAcidPtr(), p);
+      ModPtr mod = std::make_shared<Mod>(ori_residue_ptr, mod_residue_ptr);
+      change_vec[i] = std::make_shared<Change>(change_vec[i]->getLeftBpPos(),
+                                               change_vec[i]->getRightBpPos(),
+                                               change_vec[i]->getChangeTypePtr(),
+                                               change_vec[i]->getMassShift(),
+                                               mod);
+
+    }
+
+  }
+
+  best_prsm_ptr->getProteoformPtr()->addChangePtrVec(change_vec);
   return best_prsm_ptr;
 }
 

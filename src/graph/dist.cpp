@@ -35,7 +35,7 @@
 namespace prot {
 
 int getVecIndex(int v1, int v2, int gap) {
-  int index = gap * v1 + (v2 - v1);
+  int index = (gap + 1) * v1 + (v2 - v1);
   return index;
 }
 

@@ -59,17 +59,23 @@ class SpectrumSet {
 
   ExtendMsPtrVec getMsThreePtrVec() {return extend_ms_three_ptr_vec_;}
 
+  ExtendMsPtrVec getMsThreePtrVec(SpParaPtr sp_para_ptr);
+
   DeconvMsPtrVec getDeconvMsPtrVec(){return deconv_ms_ptr_vec_;}
 
   PrmMsPtrVec getMsTwoPtrVec() {return prm_ms_two_ptr_vec_;}
 
+  PrmMsPtrVec getMsTwoPtrVec(SpParaPtr sp_para_ptr);
+
   PrmMsPtrVec getSuffixMsTwoPtrVec() {return srm_ms_two_ptr_vec_;}
+
+  PrmMsPtrVec getSuffixMsTwoPtrVec(SpParaPtr sp_para_ptr);
 
   PrmMsPtrVec getMsSixPtrVec(){return prm_ms_six_ptr_vec_;}
 
   PrmMsPtrVec getMsShiftSixPtrVec(double shift){
-    return PrmMsFactory::geneShiftMsSixPtrVec(
-        deconv_ms_ptr_vec_, sp_para_ptr_, prec_mono_mass_, -shift);
+    return PrmMsFactory::geneShiftMsSixPtrVec(deconv_ms_ptr_vec_, sp_para_ptr_,
+                                              prec_mono_mass_, -shift);
   }
 
  private:
