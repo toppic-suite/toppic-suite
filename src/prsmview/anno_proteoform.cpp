@@ -83,16 +83,16 @@ void addAnnoHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement *anno_element,
 AnnoResiduePtrVec getAnnoResidues(ProteoformPtr proteoform_ptr, PrsmViewMngPtr mng_ptr) {
   AnnoResiduePtrVec res_ptrs;
   /*
-  std::string fasta_seq = proteoform_ptr->getFastaSeqPtr()->getSeq();
-  ModPtrVec fix_mod_list = mng_ptr->prsm_para_ptr_->getFixModPtrVec();
-  ResiduePtrVec fasta_residues = ResidueUtil::convertStrToResiduePtrVec(fasta_seq,fix_mod_list); 
-  */
+     std::string fasta_seq = proteoform_ptr->getFastaSeqPtr()->getSeq();
+     ModPtrVec fix_mod_list = mng_ptr->prsm_para_ptr_->getFixModPtrVec();
+     ResiduePtrVec fasta_residues = ResidueUtil::convertStrToResiduePtrVec(fasta_seq,fix_mod_list); 
+     */
   StringPairVec acid_ptm_pairs = proteoform_ptr->getFastaSeqPtr()->getAcidPtmPairVec();
   ModPtrVec fix_mod_list = mng_ptr->prsm_para_ptr_->getFixModPtrVec();
   ResiduePtrVec fasta_residues = ResidueUtil::convertStrToResiduePtrVec(acid_ptm_pairs, fix_mod_list);
   int prot_len = fasta_residues.size();
-  for(int i=0;i< prot_len;i++){
-    res_ptrs.push_back(AnnoResiduePtr(new AnnoResidue(fasta_residues[i], i)));
+  for(int i = 0;i < prot_len;i++){
+    res_ptrs.push_back(std::make_shared<AnnoResidue>(fasta_residues[i], i));
   }
   return res_ptrs;
 }
@@ -135,13 +135,13 @@ void addKnownPtms(ProteoformPtr proteoform_ptr, ChangePtrVec &change_ptrs,
     AnnoPtmPtr existing_ptr 
         = AnnoPtm::findPtm(ptm_ptrs, ptm_ptr, change_ptrs[i]->getChangeTypePtr());
     if (existing_ptr == nullptr) {
-      existing_ptr = AnnoPtmPtr(new AnnoPtm(ptm_ptr, change_ptrs[i]->getChangeTypePtr())); 
+      existing_ptr = std::make_shared<AnnoPtm>(ptm_ptr, change_ptrs[i]->getChangeTypePtr()); 
       ptm_ptrs.push_back(existing_ptr);
     }
     /*
-    std::string fasta_seq = proteoform_ptr->getFastaSeqPtr()->getSeq();
-    std::string acid_letter = fasta_seq.substr(left_db_bp, 1);
-    */
+       std::string fasta_seq = proteoform_ptr->getFastaSeqPtr()->getSeq();
+       std::string acid_letter = fasta_seq.substr(left_db_bp, 1);
+       */
     StringPairVec acid_ptm_pairs = proteoform_ptr->getFastaSeqPtr()->getAcidPtmPairVec();
     std::string acid_letter = acid_ptm_pairs[left_db_bp].first;
     existing_ptr->addOccurence(left_db_bp, acid_letter);
@@ -153,11 +153,11 @@ void addInsertion(int left_db_bp, int right_db_bp, ChangePtr change_ptr, int col
   double shift = change_ptr->getMassShift();
   int this_left = left_db_bp * 2;
   if (this_left > last_right + 1) {
-    AnnoSegmentPtr segment_ptr(new AnnoSegment("EMPTY", last_right + 1, this_left - 1, 0, -1));
+    AnnoSegmentPtr segment_ptr = std::make_shared<AnnoSegment>("EMPTY", last_right + 1, this_left - 1, 0, -1);
     segment_ptrs.push_back(segment_ptr);
   }
   int this_right = right_db_bp * 2;
-  AnnoSegmentPtr segment_ptr(new AnnoSegment("SHIFT", this_left , this_right, shift, color));
+  AnnoSegmentPtr segment_ptr = std::make_shared<AnnoSegment>("SHIFT", this_left , this_right, shift, color);
   std::string anno_info = "PTM: Unknown ";
   segment_ptrs.push_back(segment_ptr);
   last_right = this_right;
@@ -171,12 +171,12 @@ void addMod(ProteoformPtr proteoform_ptr, int left_db_bp, int right_db_bp,
             AnnoResiduePtrVec &res_ptrs) {
   int this_left = left_db_bp * 2 + 1;
   if (this_left > last_right + 1) {
-    AnnoSegmentPtr segment_ptr(new AnnoSegment("EMPTY", last_right + 1, this_left - 1, 0, -1));
+    AnnoSegmentPtr segment_ptr = std::make_shared<AnnoSegment>("EMPTY", last_right + 1, this_left - 1, 0, -1);
     segment_ptrs.push_back(segment_ptr);
   }
   int this_right = right_db_bp * 2 - 1;
   double shift = change_ptr->getMassShift();
-  AnnoSegmentPtr segment_ptr(new AnnoSegment("SHIFT", this_left , this_right, shift, color));
+  AnnoSegmentPtr segment_ptr = std::make_shared<AnnoSegment>("SHIFT", this_left , this_right, shift, color);
   std::string anno = "";
 
   StringPairVec acid_ptm_pairs = proteoform_ptr->getFastaSeqPtr()->getAcidPtmPairVec();
@@ -232,7 +232,7 @@ AnnoSegmentPtrVec getSegments(ProteoformPtr proteoform_ptr, ChangePtrVec &change
   }
 
   // last annochange
-  AnnoSegmentPtr segment_ptr(new AnnoSegment("EMPTY", last_right + 1, std::numeric_limits<int>::max(), 0, -1));
+  AnnoSegmentPtr segment_ptr = std::make_shared<AnnoSegment>("EMPTY", last_right + 1, std::numeric_limits<int>::max(), 0, -1);
   segment_ptrs.push_back(segment_ptr);
   return segment_ptrs;
 }
@@ -284,10 +284,11 @@ xercesc::DOMElement* geneAnnoProteoform(XmlDOMDocument* xml_doc,
   addKnownPtms(proteoform_ptr, change_ptrs, anno_ptm_ptrs, res_ptrs);
   change_ptrs = proteoform_ptr->getChangePtrVec(ChangeType::PROTEIN_VARIABLE);
   addKnownPtms(proteoform_ptr, change_ptrs, anno_ptm_ptrs, res_ptrs);
-  change_ptrs = proteoform_ptr->getChangePtrVec(ChangeType::VARIABLE);
-  addKnownPtms(proteoform_ptr, change_ptrs, anno_ptm_ptrs, res_ptrs);
+  ChangePtrVec var_change_ptrs = proteoform_ptr->getChangePtrVec(ChangeType::VARIABLE);
+  //addKnownPtms(proteoform_ptr, change_ptrs, anno_ptm_ptrs, res_ptrs);
 
   change_ptrs = proteoform_ptr->getChangePtrVec(ChangeType::UNEXPECTED);
+  change_ptrs.insert(change_ptrs.end(), var_change_ptrs.begin(), var_change_ptrs.end());
   std::sort(change_ptrs.begin(), change_ptrs.end(), Change::cmpPosInc);
   AnnoSegmentPtrVec segment_ptrs = getSegments(proteoform_ptr, change_ptrs,
                                                cleavage_ptrs, res_ptrs);
