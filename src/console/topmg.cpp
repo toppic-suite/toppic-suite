@@ -224,7 +224,7 @@ int topmg_test(int argc, char* argv[]) {
     bool variable_ptm = false;
     TdgfMngPtr tdgf_mng_ptr
         = std::make_shared<TdgfMng>(prsm_para_ptr, ptm_num, max_ptm_mass,
-                                    use_gf, variable_ptm, "GRAPH_ALIGN", "EVALUE");
+                                    use_gf, variable_ptm, thread_num, "GRAPH_ALIGN", "EVALUE");
     EValueProcessorPtr processor = std::make_shared<EValueProcessor>(tdgf_mng_ptr);
     processor->init();
     // compute E-value for a set of prsms each run
