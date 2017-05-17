@@ -47,7 +47,7 @@
 <div id="p{proteoform_id}">
     <xsl:variable name="tmp" select="prsm/ms/ms_header/precursor_inte"/>
     <xsl:choose>
-        <xsl:when test="$tmp != '0'">
+        <xsl:when test="$tmp &gt; '0'">
 	        <h2>Proteoform #<xsl:value-of select="proteoform_id"/> Feature intensity: <xsl:value-of select="$tmp"/></h2>
         </xsl:when>
         <xsl:otherwise>
