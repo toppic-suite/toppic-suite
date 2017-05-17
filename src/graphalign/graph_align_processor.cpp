@@ -119,8 +119,7 @@ void GraphAlignProcessor::process() {
       int spec_id = spec_set_ptr->getSpectrumId();
       SimplePrsmPtrVec selected_prsm_ptrs;
       while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_id) {
-        if (prsm_ptr->getScore() > 4)
-          selected_prsm_ptrs.push_back(prsm_ptr);
+        if (prsm_ptr->getScore() > 4) selected_prsm_ptrs.push_back(prsm_ptr);
         prsm_ptr = simple_prsm_reader.readOnePrsm();
       }
 
@@ -131,14 +130,17 @@ void GraphAlignProcessor::process() {
         for (size_t i = 0; i < simple_prsm_ptrs.size(); i++) {
           std::string seq_name = simple_prsm_ptrs[i]->getSeqName();
           std::string seq_desc = simple_prsm_ptrs[i]->getSeqDesc();
-          FastaSeqPtr seq_ptr = reader_ptr->readFastaSeq(seq_name, seq_desc);
-          ProteoGraphPtr proteo_ptr = reader.getProteoGraphPtrBySeq(seq_ptr);
-          SpecGraphPtrVec spec_ptr_vec = spec_reader.getNextSpecGraphPtrVec(spec_set_ptr, mng_ptr_->prec_error_);
-          for (size_t k = 0; k < spec_ptr_vec.size(); k++) {
-            while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ * 2) {
-              boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+          std::vector<FastaSeqPtr> seq_ptr_vec;
+          seq_ptr_vec = reader_ptr->readFastaSeqVec(seq_name, seq_desc);
+          for (size_t j = 0; j < seq_ptr_vec.size(); j++){
+            ProteoGraphPtr proteo_ptr = reader.getProteoGraphPtrBySeq(seq_ptr_vec[j]);
+            SpecGraphPtrVec spec_ptr_vec = spec_reader.getNextSpecGraphPtrVec(spec_set_ptr, mng_ptr_->prec_error_);
+            for (size_t k = 0; k < spec_ptr_vec.size(); k++) {
+              while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ + 1) {
+                boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+              }
+              pool_ptr->Enqueue(geneTask(mng_ptr_, proteo_ptr, spec_ptr_vec[k], pool_ptr));
             }
-            pool_ptr->Enqueue(geneTask(mng_ptr_, proteo_ptr,  spec_ptr_vec[k], pool_ptr));
           }
         }
       }
@@ -156,7 +158,8 @@ void GraphAlignProcessor::process() {
     std::string fname = mng_ptr_->output_file_ext_ + "_" + std::to_string(i); 
     input_exts.push_back(fname);
   }
-  int top_num = 1;
+
+  int top_num = (mng_ptr_->n_unknown_shift_ + 1) * 4;
   PrsmStrCombinePtr combine_ptr
       = std::make_shared<PrsmStrCombine>(sp_file_name, input_exts,
                                          mng_ptr_->output_file_ext_, top_num);

@@ -62,6 +62,20 @@ ZeroPtmSlowMatch::ZeroPtmSlowMatch(const DeconvMsPtrVec &deconv_ms_ptr_vec,
       compScore(refine_ms_ptr_vec_);
     }
 
+ZeroPtmSlowMatch::ZeroPtmSlowMatch(const DeconvMsPtrVec &deconv_ms_ptr_vec,                               
+                                   ProteoformPtr proteoform_ptr,                                        
+                                   ZeroPtmSearchMngPtr mng_ptr):
+    mng_ptr_(mng_ptr),
+    deconv_ms_ptr_vec_(deconv_ms_ptr_vec),
+    proteoform_ptr_(proteoform_ptr) {
+      SpParaPtr sp_para_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr();
+      refine_prec_mass_ = proteoform_ptr_->getResSeqPtr()->getSeqMass();
+      refine_ms_ptr_vec_ = ExtendMsFactory::geneMsThreePtrVec(deconv_ms_ptr_vec_, 
+                                                              sp_para_ptr, 
+                                                              refine_prec_mass_);
+      compScore(refine_ms_ptr_vec_);
+    }
+
 // compute the average ppo
 double compAvg(const std::vector<double> &ppos, double recal_ppo) {
   int cnt = 0;
@@ -98,8 +112,8 @@ void ZeroPtmSlowMatch::compScore (const ExtendMsPtrVec &refine_ms_ptr_vec) {
 // get result 
 PrsmPtr ZeroPtmSlowMatch::geneResult() {
   SpParaPtr sp_para_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr();
-  return PrsmPtr(new Prsm(proteoform_ptr_, deconv_ms_ptr_vec_, refine_prec_mass_, 
-                          sp_para_ptr));
+  return std::make_shared<Prsm>(proteoform_ptr_, deconv_ms_ptr_vec_,
+                                refine_prec_mass_, sp_para_ptr);
 }
 
 ZpSlowMatchPtrVec ZeroPtmSlowMatch::filter(const DeconvMsPtrVec &deconv_ms_ptr_vec,
@@ -108,8 +122,8 @@ ZpSlowMatchPtrVec ZeroPtmSlowMatch::filter(const DeconvMsPtrVec &deconv_ms_ptr_v
 
   ZpSlowMatchPtrVec slow_matches;
   for (size_t i = 0; i < fast_match_ptrs.size(); i++) {
-    ZpSlowMatchPtr slow_match = ZpSlowMatchPtr(
-        new ZeroPtmSlowMatch(deconv_ms_ptr_vec, fast_match_ptrs[i], mng_ptr));
+    ZpSlowMatchPtr slow_match
+        = std::make_shared<ZeroPtmSlowMatch>(deconv_ms_ptr_vec, fast_match_ptrs[i], mng_ptr);
     slow_matches.push_back(slow_match);
   }
   // sort 

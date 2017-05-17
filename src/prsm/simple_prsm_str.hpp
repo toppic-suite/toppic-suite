@@ -49,7 +49,9 @@ class SimplePrsmStr {
   std::vector<std::string> getStrVec() {return str_vec_;}
 
   int getSpectrumId() {return spectrum_id_;}
-  
+
+  std::string getSeqName() {return seq_name_;}
+
   double getScore() {return score_;}
 
   static bool cmpScoreDec(const SimplePrsmStrPtr &a, const SimplePrsmStrPtr &b) {
@@ -63,11 +65,12 @@ class SimplePrsmStr {
 
   double score_;
 
+  std::string seq_name_;
 };
 
 typedef std::vector<SimplePrsmStrPtr> SimplePrsmStrPtrVec;
 
-}
+}  // namespace prot
 
 #endif
 

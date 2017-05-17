@@ -41,11 +41,15 @@ class DiagFilterMng {
 
   DiagFilterMng(PrsmParaPtr prsm_para_ptr, int filtering_result_num,
                 int thread_num,
-                const std::string &output_file_ext) {
+                const std::string &output_file_ext,
+                const std::string & residueModFileName = "",
+                int var_num = 0) {
     prsm_para_ptr_ = prsm_para_ptr;
     filter_result_num_ = filtering_result_num;
     thread_num_ = thread_num;
     output_file_ext_ = output_file_ext;
+    residueModFileName_ = residueModFileName;
+    var_num_ = var_num;
   }
 
   PrsmParaPtr prsm_para_ptr_;
@@ -60,7 +64,9 @@ class DiagFilterMng {
   int thread_num_ = 1;
 
   std::string output_file_ext_;
+  std::string residueModFileName_;
 
+  int var_num_;
 };
 
 typedef std::shared_ptr<DiagFilterMng> DiagFilterMngPtr;

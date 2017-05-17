@@ -51,6 +51,8 @@ class PrsmStr {
 
   std::string getSeqName() {return seq_name_;}
 
+  std::string getSeqDesc() {return seq_desc_;}
+
   int getSpeciesId() {return species_id_;}
 
   double getMatchFragNum() {return match_frag_num_;}
@@ -92,6 +94,8 @@ class PrsmStr {
   int spectrum_id_;
 
   std::string seq_name_;
+
+  std::string seq_desc_;
 
   int species_id_;
 

@@ -42,6 +42,8 @@ SimplePrsmStr::SimplePrsmStr(const std::vector<std::string> &str_vec) {
   line = PrsmUtil::getXmlLine(str_vec_, "<score>"); 
   score_ = std::stod(PrsmUtil::getValueStr(line));
   //LOG_DEBUG("spectrum id " << spectrum_id_ << " score " << score_);
+  line = PrsmUtil::getXmlLine(str_vec_, "sequence_name");
+  seq_name_ = PrsmUtil::getValueStr(line);
 }
 
 }

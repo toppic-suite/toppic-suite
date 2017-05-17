@@ -34,6 +34,7 @@
 #include "base/db_block.hpp"
 #include "base/proteoform_factory.hpp"
 #include "base/file_util.hpp"
+#include "base/mod_util.hpp"
 #include "base/web_logger.hpp"
 #include "base/threadpool.hpp"
 #include "spec/msalign_util.hpp"
@@ -57,18 +58,19 @@ std::function<void()> geneTask(MassDiagFilterPtr filter_ptr,
   };
 }
 
-DiagFilterProcessor::DiagFilterProcessor(DiagFilterMngPtr mng_ptr){
-  mng_ptr_ = mng_ptr;
-}
-
 void DiagFilterProcessor::process(){
   std::string db_file_name = mng_ptr_->prsm_para_ptr_->getSearchDbFileName();
   DbBlockPtrVec db_block_ptr_vec = DbBlock::readDbBlockIndex(db_file_name);
 
-  for(size_t i=0; i< db_block_ptr_vec.size(); i++){
+  std::vector<double> mod_mass_list;
+  if (mng_ptr_->residueModFileName_ != "") {
+    mod_mass_list = ModUtil::getModMassVec(ModUtil::readModTxt(mng_ptr_->residueModFileName_)[2]);
+  }
+
+  for(size_t i = 0; i < db_block_ptr_vec.size(); i++){
     std::cout << "Diagonal filtering - block " << (i+1) << " out of " 
         << db_block_ptr_vec.size() << " started." << std::endl; 
-    processBlock(db_block_ptr_vec[i], db_block_ptr_vec.size());
+    processBlock(db_block_ptr_vec[i], db_block_ptr_vec.size(), mod_mass_list);
     std::cout << "Diagonal filtering - block " << (i +1) 
         << " finished. " << std::endl;
   }
@@ -78,22 +80,24 @@ void DiagFilterProcessor::process(){
   std::string sp_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
   int block_num = db_block_ptr_vec.size();
 
-  SimplePrsmStrCombinePtr combine_ptr(new SimplePrsmStrCombine(sp_file_name, mng_ptr_->output_file_ext_,
-                                                               block_num, mng_ptr_->output_file_ext_, 
-                                                               mng_ptr_->filter_result_num_));
+  SimplePrsmStrCombinePtr combine_ptr
+      = std::make_shared<SimplePrsmStrCombine>(sp_file_name, mng_ptr_->output_file_ext_,
+                                               block_num, mng_ptr_->output_file_ext_, 
+                                               mng_ptr_->filter_result_num_);
   combine_ptr->process();
-
+  combine_ptr = nullptr;
   std::cout << "Diagonal filtering - combining blocks finished." << std::endl; 
 }
 
-void DiagFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num) {
+void DiagFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num,
+                                       const std::vector<double> & mod_mass_list) {
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   std::string db_block_file_name = prsm_para_ptr->getSearchDbFileName() 
       + "_" + std::to_string(block_ptr->getBlockIdx());
   ProteoformPtrVec raw_forms 
       = ProteoformFactory::readFastaToProteoformPtrVec(db_block_file_name, 
                                                        prsm_para_ptr->getFixModPtrVec());
-  MassDiagFilterPtr filter_ptr(new MassDiagFilter(raw_forms, mng_ptr_));
+  MassDiagFilterPtr filter_ptr = std::make_shared<MassDiagFilter>(raw_forms, mng_ptr_);
 
   int group_spec_num = mng_ptr_->prsm_para_ptr_->getGroupSpecNum();
   SpParaPtr sp_para_ptr =  mng_ptr_->prsm_para_ptr_->getSpParaPtr();
@@ -107,22 +111,54 @@ void DiagFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num
   SimplePrsmThreadPoolPtr pool_ptr
       = std::make_shared<ThreadPool<SimplePrsmXmlWriter>>(mng_ptr_->thread_num_, output_file_name);
 
-  SpectrumSetPtr spec_set_ptr;
-  int spectrum_num = MsAlignUtil::getSpNum (prsm_para_ptr->getSpectrumFileName());
+  SpectrumSetPtr spec_set_ptr = reader.getNextSpectrumSet(sp_para_ptr);
+  int spectrum_num = MsAlignUtil::getSpNum(prsm_para_ptr->getSpectrumFileName());
   int cnt = 0;
-  while((spec_set_ptr = reader.getNextSpectrumSet(sp_para_ptr)) != nullptr){
-    cnt+= group_spec_num;
+  while(spec_set_ptr != nullptr){
+    cnt += group_spec_num;
     if(spec_set_ptr->isValid()){
-      PrmMsPtrVec ms_ptr_vec = spec_set_ptr->getMsTwoPtrVec();
-      while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ * 2) {
-        boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+      if (mng_ptr_->var_num_ == 0) {
+        PrmMsPtrVec ms_ptr_vec = spec_set_ptr->getMsTwoPtrVec();
+        while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ * 2) {
+          boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+        }
+        pool_ptr->Enqueue(geneTask(filter_ptr, ms_ptr_vec, pool_ptr));
+      } else if (mng_ptr_->var_num_ == 1) {
+        for (size_t i = 0; i < mod_mass_list.size(); i++) {
+          for (size_t k1 = 0; k1 < sp_para_ptr->mod_mass_.size(); k1++) {
+            std::fill(sp_para_ptr->mod_mass_.begin(), sp_para_ptr->mod_mass_.end(), 0.0);
+            sp_para_ptr->mod_mass_[k1] += mod_mass_list[i];
+            PrmMsPtrVec ms_ptr_vec = spec_set_ptr->getMsTwoPtrVec(sp_para_ptr);
+            while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ * 2) {
+              boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+            }
+            pool_ptr->Enqueue(geneTask(filter_ptr, ms_ptr_vec, pool_ptr));
+          }
+        }
+      } else if (mng_ptr_->var_num_ == 2) {
+        for (size_t i = 0; i < mod_mass_list.size(); i++) {
+          for (size_t j = 0; j < mod_mass_list.size(); j++) {
+            for (size_t k1 = 0; k1 < sp_para_ptr->mod_mass_.size(); k1++) {
+              for (size_t k2 = 0; k2 < sp_para_ptr->mod_mass_.size(); k2++) {
+                std::fill(sp_para_ptr->mod_mass_.begin(), sp_para_ptr->mod_mass_.end(), 0.0);
+                sp_para_ptr->mod_mass_[k1] += mod_mass_list[i];
+                sp_para_ptr->mod_mass_[k2] += mod_mass_list[j];
+                PrmMsPtrVec ms_ptr_vec = spec_set_ptr->getMsTwoPtrVec(sp_para_ptr);
+                while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ * 2) {
+                  boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+                }
+                pool_ptr->Enqueue(geneTask(filter_ptr, ms_ptr_vec, pool_ptr));
+              }
+            }
+          }
+        }
       }
-      pool_ptr->Enqueue(geneTask(filter_ptr, ms_ptr_vec, pool_ptr));
     }
     WebLog::percentLog(cnt, spectrum_num, block_ptr->getBlockIdx(), total_block_num, 
                        WebLog::DiagFilterTime());
     std::cout << std::flush << "Diagonal filtering - processing " << cnt 
         << " of " << spectrum_num << " spectra.\r";
+    spec_set_ptr = reader.getNextSpectrumSet(sp_para_ptr);
   }
   pool_ptr->ShutDown();
   std::cout << std::endl;
@@ -136,9 +172,9 @@ void DiagFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num
 
   SimplePrsmStrCombinePtr combine_ptr
       = std::make_shared<SimplePrsmStrCombine>(mng_ptr_->prsm_para_ptr_->getSpectrumFileName(),
-                                               input_exts, cur_output_ext,  INT_MAX);
+                                               input_exts, cur_output_ext, INT_MAX);
   combine_ptr->process();
   combine_ptr = nullptr; 
 }
 
-} /* namespace prot */
+}  // namespace prot

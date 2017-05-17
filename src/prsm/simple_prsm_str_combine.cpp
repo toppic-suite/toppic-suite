@@ -28,6 +28,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <set>
 
 #include "base/file_util.hpp"
 #include "prsm/simple_prsm_str_combine.hpp"
@@ -51,14 +52,14 @@ SimplePrsmStrCombine::SimplePrsmStrCombine(const std::string &spec_file_name,
                                            int in_num,
                                            const std::string &out_file_ext, 
                                            int top_num):
-  spec_file_name_(spec_file_name),
-  output_file_ext_(out_file_ext),
-  top_num_(top_num) {
-  for (int i = 0; i < in_num; i ++) {
-    std::string ext = in_file_ext + "_" + std::to_string(i);
-    input_file_exts_.push_back(ext);
-  }
-}
+    spec_file_name_(spec_file_name),
+    output_file_ext_(out_file_ext),
+    top_num_(top_num) {
+      for (int i = 0; i < in_num; i ++) {
+        std::string ext = in_file_ext + "_" + std::to_string(i);
+        input_file_exts_.push_back(ext);
+      }
+    }
 
 void SimplePrsmStrCombine::process() {
   size_t input_num = input_file_exts_.size();
@@ -68,14 +69,15 @@ void SimplePrsmStrCombine::process() {
   SimplePrsmStrPtrVec prsm_str_ptrs;
   for (size_t i = 0; i < input_num; i++) {
     std::string input_file_name = base_name + "." + input_file_exts_[i]; 
-    SimplePrsmReaderPtr reader_ptr(new SimplePrsmReader(input_file_name));
+    SimplePrsmReaderPtr reader_ptr
+        = std::make_shared<SimplePrsmReader>(input_file_name);
     LOG_DEBUG("input file name " << input_file_name);
     SimplePrsmStrPtr str_ptr = reader_ptr->readOnePrsmStr();
     reader_ptrs.push_back(reader_ptr);
     prsm_str_ptrs.push_back(str_ptr);
   }
   SimplePrsmXmlWriter writer(base_name +"."+output_file_ext_);
-  
+
   // combine
   int spec_id = 0;
   bool finish = false;
@@ -96,17 +98,21 @@ void SimplePrsmStrCombine::process() {
     //LOG_DEBUG("finish " << finish);
 
     if (cur_str_ptrs.size() > 0) {
-      std::sort(cur_str_ptrs.begin(),cur_str_ptrs.end(),SimplePrsmStr::cmpScoreDec);
-      for (int i = 0; i < top_num_; i++) {
-        if (i >= (int)cur_str_ptrs.size()) {
-          break;
+      std::sort(cur_str_ptrs.begin(), cur_str_ptrs.end(), SimplePrsmStr::cmpScoreDec);
+      int count = 0;
+      std::set<std::string> name_set;
+      for (size_t i = 0; i < cur_str_ptrs.size(); i++) {
+        if (count >= top_num_) break;
+        if (name_set.find(cur_str_ptrs[i]->getSeqName()) == name_set.end()) {
+          count++;
+          name_set.insert(cur_str_ptrs[i]->getSeqName());
+          writer.write(cur_str_ptrs[i]); 
         }
-        writer.write(cur_str_ptrs[i]);
       }
     }
     spec_id++;
   }
-  
+
   // close files
   for (size_t i = 0; i < input_num; i++) {
     reader_ptrs[i]->close();

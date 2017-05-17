@@ -41,7 +41,7 @@
 namespace prot {
 
 MassOnePtmFilter::MassOnePtmFilter(const ProteoformPtrVec &proteo_ptrs,
-                           OnePtmFilterMngPtr mng_ptr){
+                                   OnePtmFilterMngPtr mng_ptr){
   mng_ptr_ = mng_ptr;
   proteo_ptrs_ = proteo_ptrs;
   std::vector<std::vector<double>> shift_2d 
@@ -68,7 +68,7 @@ MassOnePtmFilter::MassOnePtmFilter(const ProteoformPtrVec &proteo_ptrs,
 }
 
 void MassOnePtmFilter::computeBestMatch(const PrmMsPtrVec &prm_ms_ptr_vec, 
-                                    const PrmMsPtrVec &srm_ms_ptr_vec){
+                                        const PrmMsPtrVec &srm_ms_ptr_vec){
   PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
   std::vector<std::pair<int,int>> pref_mass_errors 
       = PrmMs::getIntMassErrorList(prm_ms_ptr_vec, tole_ptr, mng_ptr_->filter_scale_, true, false);

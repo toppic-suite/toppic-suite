@@ -64,8 +64,6 @@ class FileUtil {
 
   static void delFile(const std::string &path);
 
-  static void cleanDir(const std::string &path);
-
   static void cleanDir(const std::string &fa_path, const std::string & sp_path);
 };
 

@@ -43,7 +43,7 @@ namespace prot {
 class MassOnePtmFilter {
  public:
   MassOnePtmFilter(const ProteoformPtrVec &proteo_ptrs,
-               OnePtmFilterMngPtr mng_ptr);
+                   OnePtmFilterMngPtr mng_ptr);
   void computeBestMatch(const PrmMsPtrVec &prm_ms_ptr_vec,
                         const PrmMsPtrVec &srm_ms_ptr_vec);
 
@@ -60,7 +60,7 @@ class MassOnePtmFilter {
   MassMatchPtr rev_diag_index_ptr_;
   MassMatchPtr term_index_ptr_;
   MassMatchPtr rev_term_index_ptr_;
-  
+
   SimplePrsmPtrVec comp_match_ptrs_;
   SimplePrsmPtrVec pref_match_ptrs_;
   SimplePrsmPtrVec suff_match_ptrs_;

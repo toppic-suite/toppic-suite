@@ -176,29 +176,6 @@ namespace prot {
       fs::remove(dir);
   }
 
-  void FileUtil::cleanDir(const std::string &path){
-    fs::path sp(path);
-    fs::directory_iterator end_iter;
-    std::string base = basename(absolute(sp).string());
-    std::string output_table = "OUTPUT_TABLE", fasta = "fasta", msliagn = "msalign";
-
-    for(fs::directory_iterator dir_iter(absolute(sp).parent_path()) ; dir_iter != end_iter ; ++dir_iter){
-      std::string filename = dir_iter->path().string();
-      if (filename.compare(0, base.length(), base) == 0){
-        if (filename != absolute(sp).string()&&!fs::is_directory(dir_iter->path())&&
-            filename.compare(filename.length() - output_table.length(), output_table.length(), output_table) != 0&&
-            filename.compare(filename.length() - fasta.length(), fasta.length(), fasta) != 0&&
-            filename.compare(filename.length() - msliagn.length(), msliagn.length(), msliagn) != 0){
-          fs::remove(dir_iter->path());
-        }
-      } else if (filename.compare(filename.size() - 12, 12, "target_decoy") == 0){
-        fs::remove(dir_iter->path());	
-      } else if (filename.compare(filename.size() - 6, 6, "target") == 0){
-        fs::remove(dir_iter->path());	
-      }
-    }
-  }
-
   void clean_prefix(const fs::path & sp, const std::string & prefix) {
     fs::directory_iterator end_iter;
     for(fs::directory_iterator dir_iter(absolute(sp).parent_path()) ; dir_iter != end_iter ; ++dir_iter){
@@ -229,6 +206,8 @@ namespace prot {
     delFile(sp_base + ".TOP");
     delFile(sp_base + ".GRAPH_FILTER");
     clean_prefix(sp, sp_base + ".GRAPH_ALIGN_");
+    clean_prefix(sp, sp_base + ".VAR1_");
+    clean_prefix(sp, sp_base + ".VAR2_");
     delFile(sp_base + ".GRAPH_ALIGN");
     delFile(sp_base + ".CUTOFF_RESULT");            
     delFile(sp_base + ".LOCAL_RESULT");

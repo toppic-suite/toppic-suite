@@ -66,7 +66,7 @@ void Argument::initArguments() {
   arguments_["groupSpectrumNumber"] = "1";
   arguments_["filteringResultNumber"] = "20";
   arguments_["residueModFileName"] = "";
-  arguments_["proteo_graph_dis"] = "20";
+  arguments_["proteo_graph_dis"] = "40";
   arguments_["threadNumber"] = "1";
   arguments_["useFeature"] = "false";
 }

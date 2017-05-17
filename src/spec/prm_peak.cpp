@@ -39,24 +39,9 @@
 
 namespace prot {
 
-PrmPeak::PrmPeak(int spec_id, 
-                 DeconvPeakPtr base_peak_ptr, 
-                 BasePeakTypePtr base_type,
-                 double mono_mass, double score):
-    Peak(mono_mass, base_peak_ptr->getIntensity()),
-    spec_id_(spec_id),
-    base_peak_ptr_(base_peak_ptr),
-    base_type_(base_type),
-    mono_mass_(mono_mass),
-    score_(score),
-    strict_tolerance_(0),
-    n_strict_c_relax_tolerance_(0),
-    n_relax_c_strict_tolerance_(0) {
-    }
-
 void PrmPeak::addNghbEdge(DeconvPeakPtr deconv_peak_ptr,double offset,
                           SPTypePtr peak_type_ptr,double score){
-  score_ +=score;
+  score_ += score;
   SupportPeakPtr support_peak_ptr(
       new SupportPeak(deconv_peak_ptr,offset,score, peak_type_ptr));
   neighbor_list_.push_back(support_peak_ptr);

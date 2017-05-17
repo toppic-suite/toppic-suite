@@ -129,9 +129,10 @@ void addKnownPtms(ProteoformPtr proteoform_ptr, ChangePtrVec &change_ptrs,
   std::sort(change_ptrs.begin(), change_ptrs.end(), Change::cmpPosInc);
   int start_pos = proteoform_ptr->getStartPos();
   for (size_t i = 0; i < change_ptrs.size(); i++) {
+    PtmPtr ptm_ptr = change_ptrs[i]->getModPtr()->getModResiduePtr()->getPtmPtr();
+    if (ptm_ptr->getName() == "No PTM") continue;
     int left_db_bp = change_ptrs[i]->getLeftBpPos() + start_pos;
     res_ptrs[left_db_bp]->setType(ANNO_RESIDUE_TYPE_KNOWN_CHANGE);
-    PtmPtr ptm_ptr = change_ptrs[i]->getModPtr()->getModResiduePtr()->getPtmPtr();
     AnnoPtmPtr existing_ptr 
         = AnnoPtm::findPtm(ptm_ptrs, ptm_ptr, change_ptrs[i]->getChangeTypePtr());
     if (existing_ptr == nullptr) {
@@ -156,6 +157,7 @@ void addInsertion(int left_db_bp, int right_db_bp, ChangePtr change_ptr, int col
     AnnoSegmentPtr segment_ptr = std::make_shared<AnnoSegment>("EMPTY", last_right + 1, this_left - 1, 0, -1);
     segment_ptrs.push_back(segment_ptr);
   }
+
   int this_right = right_db_bp * 2;
   AnnoSegmentPtr segment_ptr = std::make_shared<AnnoSegment>("SHIFT", this_left , this_right, shift, color);
   std::string anno_info = "PTM: Unknown ";
@@ -223,8 +225,7 @@ AnnoSegmentPtrVec getSegments(ProteoformPtr proteoform_ptr, ChangePtrVec &change
       // if the shift does not cover any amino acids, start from the cleavage
       addInsertion(left_db_bp, right_db_bp, change_ptrs[i], unexpected_shift_color,
                    last_right, segment_ptrs, cleavage_ptrs);
-    }
-    else {
+    } else {
       addMod(proteoform_ptr, left_db_bp, right_db_bp, change_ptrs[i], unexpected_shift_color,
              last_right, segment_ptrs, cleavage_ptrs, res_ptrs);
     }

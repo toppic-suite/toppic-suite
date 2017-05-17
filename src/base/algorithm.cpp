@@ -51,15 +51,14 @@ bool increaseIJ(size_t i, size_t j, double deviation,
     return false;
   }
 
-  double next_pos = ms_masses[i+1];
+  double next_pos = ms_masses[i + 1];
   bool j_is_closer;
   if (j >= theo_masses.size() - 1) {
     j_is_closer = true;
+  } else {
+    j_is_closer = std::abs(next_pos - theo_masses[j]) < std::abs(next_pos - theo_masses[j + 1]);
   }
-  else {
-    j_is_closer 
-        = std::abs(next_pos - theo_masses[j]) < std::abs(next_pos - theo_masses[j+1]);
-  }
+
   if (std::abs(next_pos - theo_masses[j]) <= tolerance  && j_is_closer) { 
     return true;
   } else {

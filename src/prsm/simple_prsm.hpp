@@ -71,22 +71,30 @@ class SimplePrsm {
 
   static std::string getXmlElementName() {return "simple_prsm";}
 
-  static bool cmpScoreDec(const SimplePrsmPtr a,SimplePrsmPtr b) {
+  static bool cmpScoreDec(const SimplePrsmPtr a, const SimplePrsmPtr b) {
     return a->getScore() > b->getScore();
   }
 
-  static bool cmpIdInc(const SimplePrsmPtr a,SimplePrsmPtr b) {
+  static bool cmpIdInc(const SimplePrsmPtr a, const SimplePrsmPtr b) {
     return a->getSpectrumId() < b->getSpectrumId();
   }
 
-  static bool cmpNameIncScoreDec(const SimplePrsmPtr a,SimplePrsmPtr b) {
+  static bool cmpIdIncScoreDec(const SimplePrsmPtr a, const SimplePrsmPtr b) {
+    if (a->getSpectrumId() < b->getSpectrumId()) {
+      return true;
+    } else if (a->getSpectrumId() > b->getSpectrumId()) {
+      return false;
+    } else {
+      return a->getScore() > b->getScore();
+    }
+  }
+
+  static bool cmpNameIncScoreDec(const SimplePrsmPtr a, const SimplePrsmPtr b) {
     if (a->getSeqName() < b->getSeqName()) {
       return true;
-    }
-    else if (a->getSeqName() > b->getSeqName()) {
+    } else if (a->getSeqName() > b->getSeqName()) {
       return false;
-    }
-    else {
+    } else {
       return a->getScore() > b->getScore();
     }
   }

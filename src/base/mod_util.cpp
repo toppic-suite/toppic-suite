@@ -149,5 +149,20 @@ ResiduePtrVec ModUtil::geneResidueListWithMod(ResiduePtrVec residue_list,
   return result;
 }
 
-} /* end namespace */
+std::vector<double> ModUtil::getModMassVec(const ModPtrVec & var_mod_list) {
+  std::vector<int> int_mass_vec;
+  for (size_t i = 0; i < var_mod_list.size(); i++) {
+    int_mass_vec.push_back(var_mod_list[i]->getShift() * 1000000);
+  }
+  std::sort(int_mass_vec.begin(), int_mass_vec.end());
+  auto last = std::unique(int_mass_vec.begin(), int_mass_vec.end());
+  int_mass_vec.erase(last, int_mass_vec.end());
+  std::vector<double> mod_mass_vec(int_mass_vec.size());
+  for (size_t i = 0; i < int_mass_vec.size(); i++) {
+    mod_mass_vec[i] = static_cast<double>(int_mass_vec[i]) / 1000000;
+  }
+  return mod_mass_vec;
+}
+
+}  // namespace prot
 

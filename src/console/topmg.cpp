@@ -47,6 +47,8 @@
 #include "prsm/prsm_cutoff_selector.hpp"
 #include "prsm/prsm_species.hpp"
 #include "prsm/prsm_feature_species.hpp"
+#include "prsm/prsm_fdr.hpp"
+#include "prsm/prsm_form_filter.hpp"
 #include "prsm/prsm_table_writer.hpp"
 #include "prsm/simple_prsm_reader.hpp"
 #include "prsm/simple_prsm_xml_writer.hpp"
@@ -69,7 +71,8 @@
 #include "graphalign/graph_align_mng.hpp"
 #include "graphalign/graph_align_processor.hpp"
 
-#include <boost/timer.hpp>
+#include "prsmview/xml_generator.hpp"
+#include "prsmview/transformer.hpp"
 
 namespace prot {
 
@@ -81,7 +84,7 @@ int topmg_test(int argc, char* argv[]) {
       return 1;
     }
     std::map<std::string, std::string> arguments = argu_processor.getArguments();
-    std::cout << "TopMG 0.1beta (" << __DATE__ << ")" << std::endl;
+    std::cout << "TopMG 1.0-beta (" << __DATE__ << ")" << std::endl;
 
     boost::filesystem::path p(arguments["residueModFileName"]);
     if (!boost::filesystem::exists(p)) {
@@ -106,10 +109,16 @@ int topmg_test(int argc, char* argv[]) {
     std::string log_file_name = arguments["logFileName"];
     std::string residue_mod_file_name = arguments["residueModFileName"];
 
+    int n_top = std::stoi(arguments["numOfTopPrsms"]);
     int ptm_num = std::stoi(arguments["ptmNumber"]);
     int thread_num = std::stoi(arguments["threadNumber"]);
     int filter_result_num = std::stoi(arguments["filteringResultNumber"]);
     double max_ptm_mass = std::stod(arguments["maxPtmMass"]);
+
+    bool use_gf = false;
+    if (arguments["useGf"] == "true") {
+      use_gf = true;
+    }
 
     bool decoy = false;
     if (arguments["searchType"] == "TARGET+DECOY") {
@@ -163,6 +172,19 @@ int topmg_test(int argc, char* argv[]) {
 
     input_exts.push_back("DIAG_FILTER");
 
+    std::cout << "Set one variable PTM" << std::endl;
+    std::cout << "Diagonal PTM filtering - started." << std::endl;
+    DiagFilterMngPtr diag_filter_mng_ptr1
+        = std::make_shared<DiagFilterMng>(prsm_para_ptr, filter_result_num,
+                                          thread_num, "VAR1_DIAG_FILTER",
+                                          arguments["residueModFileName"], 1);
+    DiagFilterProcessorPtr diag_filter_processor1
+        = std::make_shared<DiagFilterProcessor>(diag_filter_mng_ptr1);
+    diag_filter_processor1->process();
+    std::cout << "Diagonal filtering - finished." << std::endl;
+
+    input_exts.push_back("VAR1_DIAG_FILTER");
+
     SimplePrsmPtrVec sim_prsm_ptrs;
 
     for (size_t i = 0; i < input_exts.size(); i++) {
@@ -198,30 +220,51 @@ int topmg_test(int argc, char* argv[]) {
     ga_processor_ptr = nullptr;
     std::cout << "Graph alignment finished." << std::endl;
 
-    std::cout << "Combining PRSMs started." << std::endl;
-    input_exts.clear();
-    input_exts.push_back("GRAPH_ALIGN");
-    for (int i = 1; i <=100; i++) {
-      input_exts.push_back("GRAPH_ALIGN_" + std::to_string(i));
-    }
-    int prsm_top_num = 1;
-    PrsmStrCombinePtr combine_ptr
-        = std::make_shared<PrsmStrCombine>(sp_file_name, input_exts, "RAW_RESULT", prsm_top_num);
-    bool normalization = true;
-    combine_ptr->process(normalization);
-    combine_ptr = nullptr;
-    std::cout << "Combining PRSMs finished." << std::endl;
+    std::cout << "E-value computation - started." << std::endl;
+    bool variable_ptm = false;
+    TdgfMngPtr tdgf_mng_ptr
+        = std::make_shared<TdgfMng>(prsm_para_ptr, ptm_num, max_ptm_mass,
+                                    use_gf, variable_ptm, "GRAPH_ALIGN", "EVALUE");
+    EValueProcessorPtr processor = std::make_shared<EValueProcessor>(tdgf_mng_ptr);
+    processor->init();
+    // compute E-value for a set of prsms each run
+    processor->process(false);
+    processor = nullptr;
+    std::cout << "E-value computation - finished." << std::endl;
 
-    std::cout << "PRSM selecting by cutoff started." << std::endl;
-    std::string cutoff_type = "FRAG";
-    double cutoff_value = 10;
-    // std::istringstream (arguments["cutoffValue"]) >> cutoff_value;
+    if (arguments["searchType"] == "TARGET") {
+      std::cout << "Top PRSM selecting - started" << std::endl;
+      PrsmTopSelectorPtr selector
+          = std::make_shared<PrsmTopSelector>(db_file_name, sp_file_name, "EVALUE", "TOP", n_top);
+      selector->process();
+      selector = nullptr;
+      std::cout << "Top PRSM selecting - finished." << std::endl;
+    } else {
+      std::cout << "Top PRSM selecting - started " << std::endl;
+      PrsmTopSelectorPtr selector
+          = std::make_shared<PrsmTopSelector>(db_file_name, sp_file_name,
+                                              "EVALUE", "TOP_PRE", n_top);
+      selector->process();
+      selector = nullptr;
+      std::cout << "Top PRSM selecting - finished." << std::endl;
+
+      std::cout << "FDR computation - started. " << std::endl;
+      PrsmFdrPtr fdr = std::make_shared<PrsmFdr>(db_file_name, sp_file_name, "TOP_PRE", "TOP");
+      fdr->process();
+      fdr = nullptr;
+      std::cout << "FDR computation - finished." << std::endl;
+    }
+
+    std::cout << "PRSM selecting by cutoff - started." << std::endl;
+    std::string cutoff_type = arguments["cutoffType"];
+    double cutoff_value;
+    std::istringstream(arguments["cutoffValue"]) >> cutoff_value;
     PrsmCutoffSelectorPtr cutoff_selector
-        = std::make_shared<PrsmCutoffSelector>(db_file_name, sp_file_name, "RAW_RESULT",
+        = std::make_shared<PrsmCutoffSelector>(db_file_name, sp_file_name, "TOP",
                                                "CUTOFF_RESULT", cutoff_type, cutoff_value);
     cutoff_selector->process();
     cutoff_selector = nullptr;
-    std::cout << "PRSM selecting by cutoff finished." << std::endl;
+    std::cout << "PRSM selecting by cutoff - finished." << std::endl;
 
     std::cout << "Finding protein species started." << std::endl;
     double ppo;
@@ -261,16 +304,16 @@ int topmg_test(int argc, char* argv[]) {
     form_out->write();
     form_out = nullptr;
     std::cout << "Outputting the proteoform table - finished." << std::endl;
-    /*std::cout << "Generating view xml files started." << std::endl;*/
-    // XmlGeneratorPtr xml_gene
-    // = XmlGeneratorPtr(new XmlGenerator(prsm_para_ptr, exe_dir, "OUTPUT_RESULT"));
-    // xml_gene->process();
-    // xml_gene = nullptr;
-    // std::cout << "Generating view xml files finished." << std::endl;
 
-    // std::cout << "Converting xml files to html files started." << std::endl;
-    // translate(arguments);
-    /* std::cout << "Converting xml files to html files finished." << std::endl;*/
+    std::cout << "Generating view xml files started." << std::endl;
+    XmlGeneratorPtr xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, exe_dir, "FORMS");
+    xml_gene->process();
+    xml_gene = nullptr;
+    std::cout << "Generating view xml files finished." << std::endl;
+
+    std::cout << "Converting xml files to html files started." << std::endl;
+    translate(arguments);
+    std::cout << "Converting xml files to html files finished." << std::endl;
 
     if (arguments["keepTempFiles"] != "true") {
       std::cout << "Deleting temporary files - started." << std::endl;

@@ -69,7 +69,7 @@ class ProteoGraph {
   DistVec2D dist_vec_;
 
   void compSeqMasses(double convert_ratio);
-  void compDistances(double convert_ratio, int max_mod_num, int max_ptm_sum_mass);
+  void compDistances(int max_mod_num, int max_ptm_sum_mass);
 };
 
 typedef std::shared_ptr<ProteoGraph> ProteoGraphPtr;

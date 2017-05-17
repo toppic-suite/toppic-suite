@@ -104,6 +104,7 @@ void CompPValueLookupTable::initTable() {
 double CompPValueLookupTable::compProb(int peak_num, int match_frag_num,
                                        int unexpected_shift_num) {
   // add implementation.
+  unexpected_shift_num = std::min(unexpected_shift_num, 2);
   std::vector<int> idx = getFourIndex(peak_num, match_frag_num);
   double res = 0;
 

@@ -47,7 +47,7 @@ SpecGraphReader::SpecGraphReader(const std::string &sp_file_name,
 MassGraphPtr SpecGraphReader::getMassGraphPtr(const PrmPeakPtrVec &peak_vec) {
 
   LOG_DEBUG("start mass graph");
-  MassGraphPtr graph_ptr = MassGraphPtr(new MassGraph());
+  MassGraphPtr graph_ptr = std::make_shared<MassGraph>();
 
   // add mass 0/start nod
   VertexInfo v(0);
@@ -96,19 +96,19 @@ SpecGraphPtrVec SpecGraphReader::getNextSpecGraphPtrVec(SpectrumSetPtr spec_set_
   if (spec_set_ptr->isValid()) {
     LOG_DEBUG("valid");
     for (size_t i = 0; i < prec_errors.size(); i++) {
-      SpectrumSetPtr adjusted_spec_set_ptr(
-          new SpectrumSet(deconv_ms_ptr_vec, sp_para_ptr_, prec_mono_mass + prec_errors[i]));
+      SpectrumSetPtr adjusted_spec_set_ptr
+          = std::make_shared<SpectrumSet>(deconv_ms_ptr_vec, sp_para_ptr_, prec_mono_mass + prec_errors[i]);
       PrmMsPtrVec ms_six_vec = adjusted_spec_set_ptr->getMsSixPtrVec();
       PrmPeakPtrVec peak_vec = PrmMs::getPrmPeakPtrs(ms_six_vec, sp_para_ptr_->getPeakTolerancePtr());
       MassGraphPtr graph_ptr = getMassGraphPtr(peak_vec); 
       LOG_DEBUG("graph complete");
-      SpecGraphPtr spec_graph_ptr = SpecGraphPtr(new SpecGraph(adjusted_spec_set_ptr, peak_vec, graph_ptr, convert_ratio_));
+      SpecGraphPtr spec_graph_ptr
+          = std::make_shared<SpecGraph>(adjusted_spec_set_ptr, peak_vec, graph_ptr, convert_ratio_);
       graph_ptr_vec.push_back(spec_graph_ptr);
     }
-  }
-  else {
+  } else {
     LOG_DEBUG("no valid");
-    SpecGraphPtr spec_graph_ptr = SpecGraphPtr(new SpecGraph(spec_set_ptr));
+    SpecGraphPtr spec_graph_ptr = std::make_shared<SpecGraph>(spec_set_ptr);
     graph_ptr_vec.push_back(spec_graph_ptr);
   }
   LOG_DEBUG("set geneneted");

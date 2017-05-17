@@ -67,6 +67,22 @@ SpectrumSet::SpectrumSet(DeconvMsPtrVec deconv_ms_ptr_vec,
       }
     }
 
+PrmMsPtrVec SpectrumSet::getMsTwoPtrVec(SpParaPtr sp_para_ptr) {
+  return PrmMsFactory::geneMsTwoPtrVec(deconv_ms_ptr_vec_,
+                                       sp_para_ptr,
+                                       prec_mono_mass_);
+}
+
+ExtendMsPtrVec SpectrumSet::getMsThreePtrVec(SpParaPtr sp_para_ptr) {
+  return ExtendMsFactory::geneMsThreePtrVec(deconv_ms_ptr_vec_,
+                                            sp_para_ptr,
+                                            prec_mono_mass_ - std::accumulate(sp_para_ptr->mod_mass_.begin(), sp_para_ptr->mod_mass_.end(), 0.0));
+}
+
+PrmMsPtrVec SpectrumSet::getSuffixMsTwoPtrVec(SpParaPtr sp_para_ptr) {
+  return PrmMsFactory::geneSuffixMsTwoPtrVec(deconv_ms_ptr_vec_, sp_para_ptr, prec_mono_mass_);
+}
+
 bool SpectrumSet::checkValid(SpParaPtr sp_para_ptr) {
   if (prec_mono_mass_ < sp_para_ptr->getMinMass()) {
     return false;
@@ -87,4 +103,4 @@ bool SpectrumSet::checkValid(SpParaPtr sp_para_ptr) {
   return true;
 }
 
-} /* namespace prot */
+}  // namespace prot

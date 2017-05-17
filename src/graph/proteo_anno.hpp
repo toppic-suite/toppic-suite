@@ -56,7 +56,7 @@ class ProteoAnno {
              const ProtModPtrVec &prot_mod_ptr_vec, 
              const ModPtrVec &var_mod_ptr_vec);
 
-  void anno(const std::string &seq);
+  void anno(const std::string &seq, bool is_complete = true);
 
   const ResiduePtrVec2D& getResiduePtrVec() {return res_vec_2d_;}
   const std::vector<std::vector<int>>& getChangeVec() {return change_vec_2d_;}

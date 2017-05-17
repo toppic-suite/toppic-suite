@@ -47,12 +47,14 @@ SpPara::SpPara(int min_peak_num,double min_mass,
     ext_offsets_(ext_offsets),
     peak_tolerance_ptr_(peak_tolerance_ptr),
     activation_ptr_(activation_ptr) {
+      mod_mass_.resize(4);
+      std::fill(mod_mass_.begin(), mod_mass_.end(), 0.0);
     }
 
 SpPara::SpPara(xercesc::DOMElement* element){
-  min_peak_num_ = XmlDomUtil::getIntChildValue(element,"min_peak_num",0);
-  min_mass_ = XmlDomUtil::getDoubleChildValue(element,"min_mass",0);
-  extend_min_mass_ = XmlDomUtil::getDoubleChildValue(element,"extend_min_mass",0);
+  min_peak_num_ = XmlDomUtil::getIntChildValue(element, "min_peak_num", 0);
+  min_mass_ = XmlDomUtil::getDoubleChildValue(element, "min_mass", 0);
+  extend_min_mass_ = XmlDomUtil::getDoubleChildValue(element, "extend_min_mass", 0);
   xercesc::DOMElement* list_element 
       = XmlDomUtil::getChildElement(element, "extend_offset_list", 0);
   int offset_num =  XmlDomUtil::getChildCount(list_element, "extend_offset");
@@ -61,11 +63,11 @@ SpPara::SpPara(xercesc::DOMElement* element){
     ext_offsets_.push_back(offset);
   }
   std::string element_name = PeakTolerance::getXmlElementName();
-  xercesc::DOMElement* pt_element = XmlDomUtil::getChildElement(element,element_name.c_str(),0);
-  peak_tolerance_ptr_ = PeakTolerancePtr(new PeakTolerance(pt_element));
+  xercesc::DOMElement* pt_element = XmlDomUtil::getChildElement(element, element_name.c_str(), 0);
+  peak_tolerance_ptr_ = std::make_shared<PeakTolerance>(pt_element);
 
   element_name = Activation::getXmlElementName();
-  xercesc::DOMElement* ac_element = XmlDomUtil::getChildElement(element,element_name.c_str(),0);
+  xercesc::DOMElement* ac_element = XmlDomUtil::getChildElement(element, element_name.c_str(), 0);
   activation_ptr_ = ActivationBase::getActivationPtrFromXml(ac_element);
 }
 
