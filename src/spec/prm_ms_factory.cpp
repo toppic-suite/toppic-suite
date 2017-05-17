@@ -134,7 +134,7 @@ PrmMsPtr geneMsTwoPtr(DeconvMsPtr deconv_ms_ptr, int spec_id, SpParaPtr sp_para_
         m -= sp_para_ptr->mod_mass_[j - 1];
       }
     }
-    list_filtered[i] = std::make_shared<PrmPeak>(list_filtered[i]->getSpecId(),
+    list_filtered[i] = std::make_shared<PrmPeak>(list_filtered[i]->getSpectrumId(),
                                                  list_filtered[i]->getBasePeakPtr(),
                                                  list_filtered[i]->getBaseTypePtr(),
                                                  m,
@@ -172,7 +172,7 @@ PrmMsPtr geneSuffixMsTwoPtr(DeconvMsPtr deconv_ms_ptr, int spec_id, SpParaPtr sp
         m -= sp_para_ptr->mod_mass_[k - j -1]; 
       }
     }
-    list_filtered[i] = std::make_shared<PrmPeak>(list_filtered[i]->getSpecId(),
+    list_filtered[i] = std::make_shared<PrmPeak>(list_filtered[i]->getSpectrumId(),
                                                  list_filtered[i]->getBasePeakPtr(),
                                                  list_filtered[i]->getBaseTypePtr(),
                                                  m,
