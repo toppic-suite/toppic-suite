@@ -86,7 +86,7 @@ int two_base_opt(int argc, char* argv[]) {
       return 1;
     }
     std::map<std::string, std::string> arguments = argu_processor.getArguments();
-    std::cout << "TopPIC 1.1.3 (" << __DATE__ << ")" << std::endl;
+    std::cout << "TopPIC 1.1.4 (" << __DATE__ << ")" << std::endl;
 
     std::string exe_dir = arguments["executiveDir"];
     time_t start = time(0);
@@ -285,14 +285,21 @@ int two_base_opt(int argc, char* argv[]) {
     double ppo;
     std::istringstream(arguments["errorTolerance"]) >> ppo;
     ppo = ppo / 1000000.0;
-    ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();
-    PrsmFeatureSpeciesPtr prsm_forms
-        = std::make_shared<PrsmFeatureSpecies>(db_file_name,
-                                               sp_file_name,
-                                               suffix,
-                                               "FORMS", fix_mod_list);
-    prsm_forms->process();
-    prsm_forms = nullptr;
+    PrsmSpeciesPtr prsm_species
+        = std::make_shared<PrsmSpecies>(db_file_name, sp_file_name, 
+                                        suffix, prsm_para_ptr->getFixModPtrVec(),
+                                        "FORMS", ppo);
+    prsm_species->process();
+    prsm_species = nullptr;
+    // new msalign file with feature ID
+    /*ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();*/
+    //PrsmFeatureSpeciesPtr prsm_forms
+    //= std::make_shared<PrsmFeatureSpecies>(db_file_name,
+    //sp_file_name,
+    //suffix,
+    //"FORMS", fix_mod_list);
+    //prsm_forms->process();
+    /*prsm_forms = nullptr;*/
     std::cout << "Finding protein species - finished." << std::endl;
     WebLog::completeFunction(WebLog::SelectingTime());
 
