@@ -28,7 +28,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
+#include <string>
 #include "base/logger.hpp"
 #include "base/prot_mod_base.hpp"
 #include "base/xml_dom_util.hpp"
@@ -38,8 +38,8 @@ namespace prot {
 ProtModPtrVec ProtModBase::prot_mod_ptr_vec_;
 ProtModPtr ProtModBase::prot_mod_ptr_NONE_;
 ProtModPtr ProtModBase::prot_mod_ptr_M_ACETYLATION_;
-//ProtModPtr ProtModBase::prot_mod_ptr_NME_;
-//ProtModPtr ProtModBase::prot_mod_ptr_NME_ACETYLATION_;
+//  ProtModPtr ProtModBase::prot_mod_ptr_NME_;
+//  ProtModPtr ProtModBase::prot_mod_ptr_NME_ACETYLATION_;
 
 void ProtModBase::initBase(const std::string &file_name) {
   prot::XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
@@ -51,7 +51,7 @@ void ProtModBase::initBase(const std::string &file_name) {
     for (int i = 0; i < mod_num; i++) {
       xercesc::DOMElement* element = XmlDomUtil::getChildElement(parent, element_name.c_str(), i);
       ProtModPtr prot_mod_ptr(new ProtMod(element));
-      //LOG_DEBUG("ptm index " << i << " shift  " << prot_mod_ptr->getProtShift());
+      //  LOG_DEBUG("ptm index " << i << " shift  " << prot_mod_ptr->getProtShift());
       prot_mod_ptr_vec_.push_back(prot_mod_ptr);
       if (prot_mod_ptr->getName() == getName_NONE()) {
         prot_mod_ptr_NONE_ = prot_mod_ptr;
@@ -99,4 +99,4 @@ ProtModPtr ProtModBase::getProtModPtrFromXml(xercesc::DOMElement * element) {
   return prot_mod_ptr;
 }
 
-}
+}  // namespace prot

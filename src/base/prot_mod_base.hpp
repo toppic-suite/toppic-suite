@@ -81,5 +81,6 @@ class ProtModBase {
   static std::string getName_M_ACETYLATION() {return "M_ACETYLATION";}
 };
 
-}
+}  // namespace prot
+
 #endif

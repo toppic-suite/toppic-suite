@@ -28,6 +28,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <string>
 
 #include "base/align_type.hpp"
 
@@ -39,7 +40,7 @@ AlignTypePtr AlignType::SUFFIX  = AlignTypePtr(new AlignType("SUFFIX", 2));
 AlignTypePtr AlignType::INTERNAL = AlignTypePtr(new AlignType("INTERNAL", 3));
 
 AlignType::AlignType(const std::string &name, int id):
-    name_(name), 
+    name_(name),
     id_(id) {
     }
-}
+}  // namespace prot

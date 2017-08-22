@@ -41,7 +41,7 @@ class AlignType;
 typedef std::shared_ptr<AlignType> AlignTypePtr;
 
 class AlignType {
- public: 
+ public:
   static AlignTypePtr COMPLETE;
   static AlignTypePtr PREFIX;
   static AlignTypePtr SUFFIX;
@@ -59,6 +59,6 @@ class AlignType {
 };
 
 
-}
+}  // namespace prot
 
 #endif
