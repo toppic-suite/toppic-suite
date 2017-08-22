@@ -1,30 +1,35 @@
-#TopPIC: TOP-Down Mass Spectrometry Based Proteoform Identification and Characterization
+# TopPIC: TOP-Down Mass Spectrometry Based Proteoform Identification and Characterization
 
 For manual and refenrence, please visit http://proteomics.informatics.iupui.edu/software/toppic/
 
 ## System requirements
 * GCC version higher than 4.8.2 for C++11 support
-* cmake
+* CMake (>= 2.8)
 * For TopPIC-server, Java, ant and Apache Tomcat server
 
-###Linux:
+### Linux (Ubuntu):
 
 ```sh
+sudo apt-get install build-essential cmake unzip zlib1g-dev
+
 cd third_party
 unzip linux_include.zip
+cd ..
 
 mkdir build
 cd build
 cmake ..
-make -j4 
+make -j$(nproc)
 
 cd bin
 link -s ../conf ./
 ```
 
-###Windows:
+### Windows:
 
-Download [mingw64](http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/4.8.2/threads-posix/seh/x86_64-4.8.2-release-posix-seh-rt_v3-rev4.7z/download) and set it to `PATH` environment.
+* Download [CMake](https://cmake.org/) and add it to `PATH` environment;
+
+* Download [mingw64](http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/4.8.2/threads-posix/seh/x86_64-4.8.2-release-posix-seh-rt_v3-rev4.7z/download) and add it to `PATH` environment.
 
 Then
 
@@ -32,6 +37,7 @@ Then
 cd third_party
 unzip windows_include.zip
 
+cd ..
 mkdir build
 cd build
 cmake -G "MinGW Makefiles" ..
