@@ -32,17 +32,19 @@
 #ifndef PROT_BASE_BREAK_POINT_HPP_
 #define PROT_BASE_BREAK_POINT_HPP_
 
+#include <vector>
+
 #include "base/ion_type.hpp"
 
 namespace prot {
 
 class BreakPoint {
  public:
-  BreakPoint(double prm,double srm);
+  BreakPoint(double prm, double srm):prm_(prm), srm_(srm) {}
 
-  double getPrm(){return prm_;}
+  double getPrm() {return prm_;}
 
-  double getSrm(){return srm_;}
+  double getSrm() {return srm_;}
 
   double getNTermMass(IonTypePtr ion_type_ptr) {
     return prm_ + ion_type_ptr->getShift();}
@@ -58,6 +60,6 @@ class BreakPoint {
 typedef std::shared_ptr<BreakPoint> BreakPointPtr;
 typedef std::vector<BreakPointPtr> BreakPointPtrVec;
 
-} // namespace prot 
+}  // namespace prot
 
-#endif 
+#endif

@@ -34,6 +34,7 @@
 
 #include <memory>
 #include <vector>
+#include <string>
 
 #include "base/xml_dom_document.hpp"
 
@@ -53,7 +54,7 @@ class ChangeType {
   int getId() {return id_;}
   std::string getName() {return name_;}
 
-  void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+  void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
   static ChangeTypePtr getChangeTypePtrFromXml(xercesc::DOMElement * element);
 
@@ -62,12 +63,12 @@ class ChangeType {
  private:
   int id_;
   std::string name_;
-  ChangeType(int id, std::string name): id_(id), name_(name) {};
+  ChangeType(int id, std::string name): id_(id), name_(name) {}
 };
 
 typedef std::vector<ChangeTypePtr> ChangeTypePtrVec;
 
-}
+}  // namespace prot
 
 #endif
 

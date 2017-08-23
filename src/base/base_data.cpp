@@ -28,7 +28,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
+#include <string>
 #include <map>
 
 #include "base/base_data.hpp"
@@ -56,8 +56,8 @@ void BaseData::init(const std::string &exe_dir) {
   std::string base_data_dir = exe_dir + separator + BaseData::getBaseDataDir();
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
-    std::string config_file_name = base_data_dir + separator 
-        + BaseData::getBaseDataConfigFileName();
+    std::string config_file_name
+        = base_data_dir + separator + BaseData::getBaseDataConfigFileName();
     LOG_DEBUG("config_file_name: " << config_file_name);
     XmlDOMDocument doc(parser, config_file_name.c_str());
     xercesc::DOMElement* root = doc.getDocumentElement();
@@ -79,14 +79,14 @@ void BaseData::init(const std::string &exe_dir) {
     ResidueBase::initBase(residue_file_name);
     LOG_DEBUG("residue initialized");
 
-    std::string trunc_file_name 
+    std::string trunc_file_name
         = XmlDomUtil::getChildValue(root, "trunc_list_file_name", 0);
     trunc_file_name = base_data_dir + separator + trunc_file_name;
     LOG_DEBUG("trunc file name: " << trunc_file_name);
     TruncBase::initBase(trunc_file_name);
     LOG_DEBUG("trunc initialized ");
 
-    std::string mod_file_name 
+    std::string mod_file_name
         = XmlDomUtil::getChildValue(root, "mod_list_file_name", 0);
     mod_file_name = base_data_dir + separator + mod_file_name;
     LOG_DEBUG("mod file name: " << mod_file_name);
@@ -100,28 +100,28 @@ void BaseData::init(const std::string &exe_dir) {
     ProtModBase::initBase(prot_mod_file_name);
     LOG_DEBUG("prot mod initialized ");
 
-    std::string ion_type_file_name 
+    std::string ion_type_file_name
         = XmlDomUtil::getChildValue(root, "ion_type_list_file_name", 0);
     ion_type_file_name = base_data_dir + separator + ion_type_file_name;
     LOG_DEBUG("ion type file name: " << ion_type_file_name);
     IonTypeBase::initBase(ion_type_file_name);
     LOG_DEBUG("ion type initialized ");
 
-    std::string neutral_loss_file_name 
+    std::string neutral_loss_file_name
         = XmlDomUtil::getChildValue(root, "neutral_loss_list_file_name", 0);
     neutral_loss_file_name = base_data_dir + separator + neutral_loss_file_name;
     LOG_DEBUG("neutral loss file name: " << neutral_loss_file_name);
     NeutralLossBase::initBase(neutral_loss_file_name);
     LOG_DEBUG("neutral loss initialized ");
 
-    std::string activation_file_name 
+    std::string activation_file_name
         = XmlDomUtil::getChildValue(root, "activation_list_file_name", 0);
     activation_file_name = base_data_dir + separator + activation_file_name;
     LOG_DEBUG("activation file name: " << activation_file_name);
     ActivationBase::initBase(activation_file_name);
     LOG_DEBUG("activation initialized ");
 
-    std::string sp_type_file_name 
+    std::string sp_type_file_name
         = XmlDomUtil::getChildValue(root, "support_peak_type_file_name", 0);
     sp_type_file_name = base_data_dir + separator + sp_type_file_name;
     LOG_DEBUG("support_peak_type_file_name: " << sp_type_file_name);
@@ -130,5 +130,5 @@ void BaseData::init(const std::string &exe_dir) {
   }
 }
 
-}
+}  // namespace prot
 
