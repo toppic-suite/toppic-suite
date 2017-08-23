@@ -31,6 +31,7 @@
 
 #include <cmath>
 #include <limits>
+#include <string>
 
 #include "base/extreme_value.hpp"
 #include "base/string_util.hpp"
@@ -38,44 +39,42 @@
 
 namespace prot {
 
-ExtremeValue::ExtremeValue (double one_prot_prob, double test_num, 
-                            double adjust_factor) {
+ExtremeValue::ExtremeValue(double one_prot_prob, double test_num,
+                           double adjust_factor) {
   one_prot_prob_ = one_prot_prob;
   test_num_ = test_num;
   adjust_factor_ = adjust_factor;
   init();
 }
 
-void ExtremeValue::setOneProtProb (double one_prot_prob) {
+void ExtremeValue::setOneProtProb(double one_prot_prob) {
   one_prot_prob_ = one_prot_prob;
   init();
 }
 
-
-ExtremeValue::ExtremeValue (xercesc::DOMElement* element){
+ExtremeValue::ExtremeValue(xercesc::DOMElement* element) {
   one_prot_prob_ = XmlDomUtil::getDoubleChildValue(element, "one_protein_probability", 0);
   test_num_ = XmlDomUtil::getDoubleChildValue(element, "test_number", 0);
   adjust_factor_ = XmlDomUtil::getDoubleChildValue(element, "adjust_factor", 0);
   init();
 }
-    
+
 void ExtremeValue::init() {
   e_value_ = one_prot_prob_ * test_num_ * adjust_factor_;
-  if (one_prot_prob_ > 1 || test_num_ == std::numeric_limits<double>::max() ) {
+  if (one_prot_prob_ > 1 || test_num_ == std::numeric_limits<double>::max()) {
     p_value_  = 1.0;
-  }
-  else {
+  } else {
     double n = test_num_ * adjust_factor_;
     // approximation of 1 - (1- one_prot_prob)^n
-    p_value_ =  n * one_prot_prob_ 
-        - (n * (n-1))/2 * one_prot_prob_ * one_prot_prob_
-        + (n*(n-1) * (n-2))/6 * std::pow(one_prot_prob_,3);
+    p_value_ =  n * one_prot_prob_
+        - (n * (n - 1)) / 2 * one_prot_prob_ * one_prot_prob_
+        + (n * (n - 1) * (n - 2)) / 6 * std::pow(one_prot_prob_, 3);
     if (p_value_ > 1.0) {
       p_value_ = 1.0;
     }
   }
 }
-    
+
 void ExtremeValue::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   std::string element_name = getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
@@ -93,9 +92,9 @@ void ExtremeValue::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* paren
 }
 
 ExtremeValuePtr ExtremeValue::getMaxEvaluePtr() {
-  ExtremeValuePtr evalue_ptr 
-      = ExtremeValuePtr(new ExtremeValue(1.0, std::numeric_limits<double>::max(), 1.0));
+  ExtremeValuePtr evalue_ptr
+      = std::make_shared<ExtremeValue>(1.0, std::numeric_limits<double>::max(), 1.0);
   return evalue_ptr;
 }
 
-}
+}  // namespace prot

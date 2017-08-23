@@ -34,6 +34,7 @@
 
 #include <memory>
 #include <vector>
+#include <string>
 
 namespace prot {
 
@@ -55,5 +56,5 @@ class DbBlock {
   int seq_index_;
 };
 
-}
+}  // namespace prot
 #endif

@@ -32,6 +32,9 @@
 #ifndef PROT_BASE_CHANGE_HPP_
 #define PROT_BASE_CHANGE_HPP_
 
+#include <string>
+#include <vector>
+
 #include "base/change_type.hpp"
 #include "base/mod.hpp"
 #include "base/xml_dom_document.hpp"
@@ -44,11 +47,17 @@ typedef std::shared_ptr<Change> ChangePtr;
 
 class Change {
  public:
-  Change(int left_bp_pos, int right_bp_pos, 
+  Change(int left_bp_pos, int right_bp_pos,
          ChangeTypePtr change_type_ptr,
-         double mass_shift, ModPtr mod_ptr);
+         double mass_shift, ModPtr mod_ptr):
+      left_bp_pos_(left_bp_pos),
+      right_bp_pos_(right_bp_pos),
+      change_type_ptr_(change_type_ptr),
+      mass_shift_(mass_shift),
+      mod_ptr_(mod_ptr),
+      local_anno_ptr_(nullptr) {}
 
-  Change(xercesc::DOMElement* change_element);
+  explicit Change(xercesc::DOMElement* change_element);
 
   int getLeftBpPos() {return left_bp_pos_;}
 
@@ -70,7 +79,7 @@ class Change {
 
   void setLocalAnno(LocalAnnoPtr p);
 
-  void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+  void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
   static std::string getXmlElementName() {return "change";}
 
@@ -79,7 +88,7 @@ class Change {
   static ChangePtr geneChangePtr(ChangePtr ori_change_ptr, int start_pos);
 
  protected:
-  // left and right positions are based on break point positions 
+  // left and right positions are based on break point positions
   int left_bp_pos_;
   int right_bp_pos_;
   ChangeTypePtr change_type_ptr_;
@@ -90,7 +99,7 @@ class Change {
 
 typedef std::vector<ChangePtr> ChangePtrVec;
 
-}
+}  // namespace prot
 
 #endif
 

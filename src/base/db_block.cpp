@@ -28,12 +28,12 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
-#include "base/db_block.hpp"
-
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <vector>
+
+#include "base/db_block.hpp"
 #include "base/logger.hpp"
 #include "base/string_util.hpp"
 #include "base/fasta_reader.hpp"
@@ -51,7 +51,7 @@ DbBlockPtrVec DbBlock::readDbBlockIndex(const std::string &db_file_name) {
   std::string index_file_name = db_file_name + "_block_index";
   input.open(index_file_name.c_str(), std::ios::in);
   if (!input.is_open()) {
-    LOG_ERROR( "index file  " << index_file_name << " does not exist.");
+    LOG_ERROR("index file  " << index_file_name << " does not exist.");
     throw "index file does not exist.";
   }
   std::string line;
@@ -68,4 +68,4 @@ DbBlockPtrVec DbBlock::readDbBlockIndex(const std::string &db_file_name) {
   return db_block_ptr_vec;
 }
 
-}
+}  // namespace prot

@@ -45,7 +45,7 @@ class BaseData {
   static void init(const std::string &exe_dir);
 };
 
-}
+}  // namespace prot
 
 #endif
 

@@ -28,6 +28,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <string>
 
 #include "base/change_type.hpp"
 #include "base/xml_dom_util.hpp"
@@ -36,11 +37,12 @@ namespace prot {
 
 const ChangeTypePtr ChangeType::INPUT = ChangeTypePtr(new ChangeType(1, "Input"));
 const ChangeTypePtr ChangeType::FIXED = ChangeTypePtr(new ChangeType(2, "Fixed"));
-const ChangeTypePtr ChangeType::PROTEIN_VARIABLE = ChangeTypePtr(new ChangeType(3, "Protein variable"));
+const ChangeTypePtr ChangeType::PROTEIN_VARIABLE
+    = ChangeTypePtr(new ChangeType(3, "Protein variable"));
 const ChangeTypePtr ChangeType::VARIABLE = ChangeTypePtr(new ChangeType(4, "Variable"));
 const ChangeTypePtr ChangeType::UNEXPECTED = ChangeTypePtr(new ChangeType(5, "Unexpected"));
 
-void ChangeType::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
+void ChangeType::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   std::string element_name = ChangeType::getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
   xml_doc->addElement(element, "name", name_.c_str());
@@ -67,4 +69,4 @@ ChangeTypePtr ChangeType::getChangeTypePtrFromXml(xercesc::DOMElement * element)
   return nullptr;
 }
 
-}
+}  // namespace prot

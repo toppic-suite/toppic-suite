@@ -34,6 +34,8 @@
 
 #include <memory>
 #include <vector>
+#include <string>
+
 #include "base/xml_dom_document.hpp"
 
 namespace prot {
@@ -43,9 +45,9 @@ typedef std::shared_ptr<ExtremeValue> ExtremeValuePtr;
 
 class ExtremeValue {
  public:
-  ExtremeValue (double one_prot_prob, double test_num, double adjust_factor);
+  ExtremeValue(double one_prot_prob, double test_num, double adjust_factor);
 
-  ExtremeValue (xercesc::DOMElement* element);
+  explicit ExtremeValue(xercesc::DOMElement* element);
 
   double getPValue() {return p_value_;}
 
@@ -66,8 +68,8 @@ class ExtremeValue {
   static ExtremeValuePtr getMaxEvaluePtr();
 
  private:
-  // one_prot_prob is the probability that the spectrum and a randem problem 
-  // have a protein-spectrum-match with a score no less than the threshold 
+  // one_prot_prob is the probability that the spectrum and a randem problem
+  // have a protein-spectrum-match with a score no less than the threshold
   double one_prot_prob_;
   double test_num_;
   double adjust_factor_;
@@ -79,6 +81,6 @@ class ExtremeValue {
 
 typedef std::vector<ExtremeValuePtr> ExtremeValuePtrVec;
 
-}
+}  // namespace prot
 
 #endif
