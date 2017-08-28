@@ -37,6 +37,7 @@
 #include "base/proteoform.hpp"
 #include "base/fasta_reader.hpp"
 #include "prsm/prsm.hpp"
+#include "prsm/prsm_para.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 
 namespace prot {
@@ -44,17 +45,29 @@ namespace prot {
 class PrsmFeatureSpecies {
  public:
   PrsmFeatureSpecies(const std::string &db_file_name,
-              const std::string &spec_file_name,
-              const std::string &input_file_ext,
-              const std::string &output_file_ext,
-              const ModPtrVec &fix_mod_ptr_vec);
+                     const std::string &spec_file_name,
+                     const std::string &feature_file_name,
+                     const std::string &input_file_ext,
+                     const std::string &output_file_ext,
+                     const ModPtrVec &fix_mod_ptr_vec,
+                     PrsmParaPtr prsm_para_ptr): 
+      db_file_name_(db_file_name),
+      spec_file_name_(spec_file_name),
+      feature_file_name_(feature_file_name),
+      input_file_ext_(input_file_ext),
+      output_file_ext_(output_file_ext),
+      fix_mod_ptr_vec_(fix_mod_ptr_vec),
+      prsm_para_ptr_(prsm_para_ptr) {}
+
   void process();
  private:
   std::string db_file_name_;
   std::string spec_file_name_;
+  std::string feature_file_name_;
   std::string input_file_ext_;
   std::string output_file_ext_;
   ModPtrVec fix_mod_ptr_vec_;
+  PrsmParaPtr prsm_para_ptr_;
 
   void setProtId(PrsmPtrVec& prsm_ptrs);
 
@@ -63,7 +76,6 @@ class PrsmFeatureSpecies {
 
 typedef std::shared_ptr<PrsmFeatureSpecies> PrsmFeatureSpeciesPtr;
 
-
-} /* namespace prot */
+}  // namespace prot
 
 #endif 

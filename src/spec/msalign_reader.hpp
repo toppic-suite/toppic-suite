@@ -45,7 +45,7 @@ namespace prot {
 
 class MsAlignReader {
  public:
-  MsAlignReader(const std::string &file_name, int group_spec_num, 
+  MsAlignReader(const std::string &file_name, int group_spec_num,
                 ActivationPtr activation_ptr);
 
   std::vector<std::string> readOneSpectrum();
@@ -66,10 +66,9 @@ class MsAlignReader {
   int current_ = 0;
   ActivationPtr activation_ptr_;
   DeconvMsPtr deconv_ms_ptr_ = DeconvMsPtr(nullptr);
-
 };
 
 typedef std::shared_ptr<MsAlignReader> MsAlignReaderPtr;
 
-}
+}  // namespace prot
 #endif

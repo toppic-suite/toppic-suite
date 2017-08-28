@@ -28,24 +28,29 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 #include <cmath>
+#include <vector>
+#include <string>
+
+#include <boost/algorithm/string.hpp>
 
 #include "base/logger.hpp"
 #include "base/activation_base.hpp"
 #include "base/string_util.hpp"
 #include "spec/msalign_reader.hpp"
 
-#include <boost/algorithm/string.hpp>
-
 namespace prot {
 
-MsAlignReader::MsAlignReader(const std::string &file_name, 
-                             int group_spec_num, ActivationPtr act_ptr): 
+MsAlignReader::MsAlignReader(const std::string &file_name,
+                             int group_spec_num, ActivationPtr act_ptr):
     file_name_(file_name),
     group_spec_num_(group_spec_num),
     activation_ptr_(act_ptr) {
       input_.open(file_name.c_str(), std::ios::in);
+      if (!input_.is_open()) {
+        LOG_ERROR("msalign file  " << file_name << " does not exist.");
+        throw "msalign file does not exist.";
+      }
     }
 
 std::vector<std::string> MsAlignReader::readOneSpectrum() {
@@ -94,7 +99,7 @@ void MsAlignReader::readNext() {
   double feature_inte = -1;
   std::vector<std::string> strs;
   for (size_t i = 1; i < spectrum_str_vec_.size() - 1; i++) {
-    std::string letter = spectrum_str_vec_[i].substr(0,1);
+    std::string letter = spectrum_str_vec_[i].substr(0, 1);
     if (letter >= "A" && letter <= "Z") {
       strs = StringUtil::split(spectrum_str_vec_[i], '=');
       if (strs[0] == "ID") {
@@ -106,7 +111,7 @@ void MsAlignReader::readNext() {
       } else if (strs[0] == "SCANS") {
         scans = strs[1];
       } else if (strs[0] == "RETENTION_TIME") {
-        retention_time = std::stod(strs[1]);        
+        retention_time = std::stod(strs[1]);
       } else if (strs[0] == "ACTIVATION") {
         activation = strs[1];
       } else if (strs[0] == "TITLE") {
@@ -145,7 +150,7 @@ void MsAlignReader::readNext() {
     header_ptr->setScans("");
   }
   header_ptr->setRetentionTime(retention_time);
-  //LOG_DEBUG("retention time " << retention_time);
+  // LOG_DEBUG("retention time " << retention_time);
 
   if (title != "") {
     std::stringstream ss;
@@ -158,7 +163,7 @@ void MsAlignReader::readNext() {
   if (activation_ptr_ != nullptr) {
     header_ptr->setActivationPtr(activation_ptr_);
   } else if (activation != "") {
-    ActivationPtr activation_ptr = 
+    ActivationPtr activation_ptr =
         ActivationBase::getActivationPtrByName(activation);
     header_ptr->setActivationPtr(activation_ptr);
   }
@@ -181,10 +186,9 @@ void MsAlignReader::readNext() {
   std::vector<DeconvPeakPtr> peak_ptr_list;
   int idx = 0;
   for (size_t i = 1; i < spectrum_str_vec_.size() - 1; i++) {
-    std::string letter = spectrum_str_vec_[i].substr(0,1);
+    std::string letter = spectrum_str_vec_[i].substr(0, 1);
     if (letter >= "0" && letter <= "9") {
       boost::split(strs, spectrum_str_vec_[i], boost::is_any_of("\t "));
-      //strs = StringUtil::split(spectrum_str_vec_[i], '\t');
       double mass = std::stod(strs[0]);
       double inte = std::stod(strs[1]);
       int charge = std::stoi(strs[2]);
@@ -193,7 +197,7 @@ void MsAlignReader::readNext() {
       idx++;
     }
   }
-  deconv_ms_ptr_ 
+  deconv_ms_ptr_
       = DeconvMsPtr(new Ms<DeconvPeakPtr>(header_ptr, peak_ptr_list));
 
   current_++;
@@ -205,7 +209,7 @@ DeconvMsPtr MsAlignReader::getNextMs() {
 }
 
 SpectrumSetPtr MsAlignReader::getNextSpectrumSet(SpParaPtr sp_para_ptr) {
-  DeconvMsPtrVec deconv_ms_ptr_vec; 
+  DeconvMsPtrVec deconv_ms_ptr_vec;
   for (int i = 0; i < group_spec_num_; i++) {
     readNext();
     if (deconv_ms_ptr_ == nullptr) {
@@ -214,7 +218,7 @@ SpectrumSetPtr MsAlignReader::getNextSpectrumSet(SpParaPtr sp_para_ptr) {
     deconv_ms_ptr_vec.push_back(deconv_ms_ptr_);
   }
   double prec_mono_mass = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMass();
-  //LOG_DEBUG("prec mass " << prec_mono_mass);
+  // LOG_DEBUG("prec mass " << prec_mono_mass);
   int count = 1;
   for (int i = 1; i < group_spec_num_; i++) {
     double new_mass = deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getPrecMonoMass();
@@ -223,7 +227,7 @@ SpectrumSetPtr MsAlignReader::getNextSpectrumSet(SpParaPtr sp_para_ptr) {
       count++;
     }
   }
-  //LOG_DEBUG("prec mass result " << prec_mono_mass);
+  // LOG_DEBUG("prec mass result " << prec_mono_mass);
   return SpectrumSetPtr(new SpectrumSet(deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass));
 }
 
@@ -231,4 +235,4 @@ void MsAlignReader::close() {
   input_.close();
 }
 
-}
+}  // namespace prot
