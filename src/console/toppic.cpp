@@ -31,6 +31,9 @@
 
 #include <iostream>
 #include <iomanip>
+#include <map>
+#include <string>
+#include <vector>
 
 #include "base/fasta_reader.hpp"
 #include "base/fasta_util.hpp"
@@ -282,24 +285,28 @@ int two_base_opt(int argc, char* argv[]) {
     }
 
     std::cout << "Finding protein species - started." << std::endl;
-    double ppo;
-    std::istringstream(arguments["errorTolerance"]) >> ppo;
-    ppo = ppo / 1000000.0;
-    PrsmSpeciesPtr prsm_species
-        = std::make_shared<PrsmSpecies>(db_file_name, sp_file_name, 
-                                        suffix, prsm_para_ptr->getFixModPtrVec(),
-                                        "FORMS", ppo);
-    prsm_species->process();
-    prsm_species = nullptr;
-    // new msalign file with feature ID
-    /*ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();*/
-    //PrsmFeatureSpeciesPtr prsm_forms
-    //= std::make_shared<PrsmFeatureSpecies>(db_file_name,
-    //sp_file_name,
-    //suffix,
-    //"FORMS", fix_mod_list);
-    //prsm_forms->process();
-    /*prsm_forms = nullptr;*/
+    if (arguments["featureFileName"] != "") {
+      // TopFD msalign file with feature ID
+      ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();
+      PrsmFeatureSpeciesPtr prsm_forms
+          = std::make_shared<PrsmFeatureSpecies>(db_file_name,
+                                                 sp_file_name,
+                                                 arguments["featureFileName"],
+                                                 suffix,
+                                                 "FORMS", fix_mod_list, prsm_para_ptr);
+      prsm_forms->process();
+      prsm_forms = nullptr;
+    } else {
+      double ppo;
+      std::istringstream(arguments["errorTolerance"]) >> ppo;
+      ppo = ppo / 1000000.0;
+      PrsmSpeciesPtr prsm_species
+          = std::make_shared<PrsmSpecies>(db_file_name, sp_file_name,
+                                          suffix, prsm_para_ptr->getFixModPtrVec(),
+                                          "FORMS", ppo);
+      prsm_species->process();
+      prsm_species = nullptr;
+    }
     std::cout << "Finding protein species - finished." << std::endl;
     WebLog::completeFunction(WebLog::SelectingTime());
 
@@ -325,21 +332,23 @@ int two_base_opt(int argc, char* argv[]) {
     std::cout << "Converting xml files to html files - finished." << std::endl;
     WebLog::completeFunction(WebLog::OutPutTime());
 
-    std::cout << "PRSM proteoform filtering - started." << std::endl;
-    PrsmFormFilterPtr form_filter
-        = std::make_shared<PrsmFormFilter>(db_file_name, sp_file_name, "FORMS",
-                                           "FORM_FILTER_RESULT", "FORM_RESULT");
-    form_filter->process();
-    form_filter = nullptr;
-    std::cout << "PRSM proteoform filtering - finished." << std::endl;
+    if (arguments["featureFileName"] != "") {
+      std::cout << "PRSM proteoform filtering - started." << std::endl;
+      PrsmFormFilterPtr form_filter
+          = std::make_shared<PrsmFormFilter>(db_file_name, sp_file_name, "FORMS",
+                                             "FORM_FILTER_RESULT", "FORM_RESULT");
+      form_filter->process();
+      form_filter = nullptr;
+      std::cout << "PRSM proteoform filtering - finished." << std::endl;
 
-    std::cout << "Outputting the proteoform table - started." << std::endl;
-    PrsmTableWriterPtr form_out
-        = std::make_shared<PrsmTableWriter>(prsm_para_ptr, arguments,
-                                            "FORM_RESULT", "FORM_OUTPUT_TABLE");
-    form_out->write();
-    form_out = nullptr;
-    std::cout << "Outputting the proteoform table - finished." << std::endl;
+      std::cout << "Outputting the proteoform table - started." << std::endl;
+      PrsmTableWriterPtr form_out
+          = std::make_shared<PrsmTableWriter>(prsm_para_ptr, arguments,
+                                              "FORM_RESULT", "FORM_OUTPUT_TABLE");
+      form_out->write();
+      form_out = nullptr;
+      std::cout << "Outputting the proteoform table - finished." << std::endl;
+    }
 
     if (arguments["keepTempFiles"] != "true") {
       std::cout << "Deleting temporary files - started." << std::endl;

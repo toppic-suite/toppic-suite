@@ -68,7 +68,7 @@ void Argument::initArguments() {
   arguments_["residueModFileName"] = "";
   arguments_["proteo_graph_dis"] = "40";
   arguments_["threadNumber"] = "1";
-  arguments_["useFeature"] = "false";
+  arguments_["featureFileName"] = "";
 }
 
 void Argument::outputArguments(std::ostream &output, 
@@ -79,12 +79,17 @@ void Argument::outputArguments(std::ostream &output,
   output << std::setw(44) << std::left << "Number of combined spectra: " << "\t" << arguments["groupSpectrumNumber"] << std::endl;
   output << std::setw(44) << std::left << "Fragmentation method: " << "\t" << arguments["activation"] << std::endl;
   output << std::setw(44) << std::left << "Search type: " << "\t" << arguments["searchType"] << std::endl;
+
   if (arguments["fixedMod"] == "") {
     output << std::setw(44) << std::left << "Fixed modifications: " << "\t" << "None" << std::endl;
-  }
-  else {
+  } else {
     output << std::setw(44) << std::left << "Fixed modifications: " << "\t" << arguments["fixedMod"] << std::endl;
   }
+
+  if (arguments["featureFileName"] != "") {
+    output << std::setw(44) << std::left << "TopFD feature file: " << "\t" << arguments["featureFileName"] << std::endl;
+  }
+
   output << std::setw(44) << std::left << "Maximum number of unexpected modifications: " << "\t" << arguments["ptmNumber"] << std::endl;
   output << std::setw(44) << std::left << "Error tolerance: " << "\t" << arguments["errorTolerance"] << " ppm" << std::endl;
   output << std::setw(44) << std::left << "Cutoff type: " << "\t" << arguments["cutoffType"] << std::endl;
@@ -150,7 +155,7 @@ void Argument::setArgumentsByConfigFile(const std::string &filename){
       arguments_["filteringResultNumber"] = XmlDomUtil::getChildValue(root, "filtering_result_number", 0);
       arguments_["proteo_graph_dis"] = XmlDomUtil::getChildValue(root, "proteo_graph_dis", 0);
       arguments_["threadNumber"] = XmlDomUtil::getChildValue(root, "thread_number", 0);
-      arguments_["useFeature"] = XmlDomUtil::getChildValue(root, "use_feature", 0);
+      arguments_["featureFileName"] = XmlDomUtil::getChildValue(root, "use_feature", 0);
       xercesc::DOMElement* prot_mod_list = XmlDomUtil::getChildElement(root,"protein_variable_ptm_list",0);
       int allow_prot_node_number = XmlDomUtil::getChildCount(prot_mod_list,"protein_variable_ptm");
       std::string allow_mod = "";
@@ -187,6 +192,7 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string residue_mod_file_name = "";
   std::string proteo_graph_dis = "";
   std::string thread_number = "";
+  std::string feature_file_name = "";
 
   /** Define and parse the program options*/
   try {
@@ -215,7 +221,8 @@ bool Argument::parse(int argc, char* argv[]) {
 #if defined MASS_GRAPH
         ("proteo-graph-dis,j", po::value<std::string> (&proteo_graph_dis), "<positive number>. Gap in constructing proteoform graph. Default value: 20.")
 #endif        
-        ("thread-number,u", po::value<std::string> (&thread_number), "<positive number>. Number of threads used in the computation. Default value: 1.");
+        ("thread-number,u", po::value<std::string> (&thread_number), "<positive number>. Number of threads used in the computation. Default value: 1.")
+        ("use-topfd-feature,x", po::value<std::string>(&feature_file_name) , "<a msft file name with its path>. TopFD features for proteoform identification.");
     po::options_description desc("Options");
 
     desc.add_options() 
@@ -240,7 +247,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "")
         ("proteo-graph-dis,j", po::value<std::string> (&proteo_graph_dis), "<positive number>. Gap in constructing proteoform graph. Default value: 20.")
         ("thread-number,u", po::value<std::string> (&thread_number), "<positive number>. Number of threads used in the computation. Default value: 1.")
-        ("use-feature,x", "")
+        ("use-topfd-feature,x", po::value<std::string>(&feature_file_name) , "<a msft file name with its path>. TopFD features for proteoform identification.")
         ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name with its path.")
         ("spectrum-file-name", po::value<std::string>(&spectrum_file_name)->required(), "Spectrum file name with its path.");
 
@@ -344,8 +351,8 @@ bool Argument::parse(int argc, char* argv[]) {
     if (vm.count("thread-number")) {
       arguments_["threadNumber"] = thread_number;
     }
-    if (vm.count("use-feature")) {
-      arguments_["useFeature"] = "true";
+    if (vm.count("use-topfd-feature")) {
+      arguments_["featureFileName"] = feature_file_name;
     }
   }
   catch(std::exception&e ) {
@@ -366,6 +373,14 @@ bool Argument::validateArguments() {
     LOG_ERROR("Spectrum file " << arguments_["spectrumFileName"] << " does not exist!");
     return false;
   }
+
+  if (arguments_["featureFileName"] != "") {
+    if (!boost::filesystem::exists(arguments_["featureFileName"])) {
+      LOG_ERROR("TopFD feature file " << arguments_["featureFileName"] << " does not exist!");
+      return false;
+    }
+  }
+
   std::string activation = arguments_["activation"];
   if(activation != "CID" && activation != "HCD" 
      && activation != "ETD" && activation != "FILE" && activation != "UVPD") {

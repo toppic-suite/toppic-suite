@@ -28,8 +28,10 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 #include <limits>
+#include <vector>
+#include <string>
+#include <algorithm>
 
 #include "base/logger.hpp"
 #include "base/file_util.hpp"
@@ -46,13 +48,13 @@ void readSpectra(const std::string & file_name, DeconvMsPtrVec &ms_ptr_vec) {
   MsAlignReader sp_reader(file_name, sp_num_in_group, nullptr);
 
   DeconvMsPtr ms_ptr;
-  //LOG_DEBUG("Start search");
-  while((ms_ptr = sp_reader.getNextMs())!= nullptr){
+  // LOG_DEBUG("Start search");
+  while ((ms_ptr = sp_reader.getNextMs())!= nullptr) {
     ms_ptr_vec.push_back(ms_ptr);
-    //std::cout << std::flush <<  "reading spectrum " << header_ptr_vec.size() << "\r";
+    // std::cout << std::flush <<  "reading spectrum " << header_ptr_vec.size() << "\r";
   }
   sp_reader.close();
-//  std::cout << std::endl;
+  // std::cout << std::endl;
 }
 
 void readHeaders(const std::string & file_name, MsHeaderPtrVec &header_ptr_vec) {
@@ -60,26 +62,26 @@ void readHeaders(const std::string & file_name, MsHeaderPtrVec &header_ptr_vec) 
   MsAlignReader sp_reader(file_name, sp_num_in_group, nullptr);
 
   DeconvMsPtr ms_ptr;
-  //LOG_DEBUG("Start search");
-  while((ms_ptr = sp_reader.getNextMs())!= nullptr){
+  // LOG_DEBUG("Start search");
+  while ((ms_ptr = sp_reader.getNextMs()) != nullptr) {
     header_ptr_vec.push_back(ms_ptr->getMsHeaderPtr());
-    //std::cout << std::flush <<  "reading spectrum " << header_ptr_vec.size() << "\r";
+    // std::cout << std::flush <<  "reading spectrum " << header_ptr_vec.size() << "\r";
   }
   sp_reader.close();
-  //  std::cout << std::endl;
+  // std::cout << std::endl;
 }
 
-void outputHeaders(MsHeaderPtrVec &header_ptr_vec) {
+void outputHeaders(const MsHeaderPtrVec &header_ptr_vec) {
   for (size_t i = 0; i < header_ptr_vec.size(); i++) {
     MsHeaderPtr ptr = header_ptr_vec[i];
     std::cout << ptr->getId() << "\t" << ptr->getFirstScanNum() << "\t";
     std::cout <<  ptr->getRetentionTime() << "\t" << ptr->getPrecMonoMass() << "\t";
-    std::cout << ptr->getPrecMonoMz() << "\t" << ptr->getPrecCharge() << "\t" << ptr->getPrecInte() << std::endl; 
+    std::cout << ptr->getPrecMonoMz() << "\t" << ptr->getPrecCharge() << "\t"
+        << ptr->getPrecInte() << std::endl;
   }
-
 }
 
-bool isConsistent(MsHeaderPtr &a, MsHeaderPtr &b, FeatureDetectMngPtr mng_ptr) {
+bool isConsistent(MsHeaderPtr a, MsHeaderPtr b, FeatureDetectMngPtr mng_ptr) {
   double min_diff = std::numeric_limits<double>::max();
   std::vector<double> ext_masses = mng_ptr->getExtMasses(a->getPrecMonoMass());
   for (size_t i = 0; i < ext_masses.size(); i++) {
@@ -99,14 +101,14 @@ bool isConsistent(MsHeaderPtr &a, MsHeaderPtr &b, FeatureDetectMngPtr mng_ptr) {
 bool containPrecursor(DeconvMsPtr ms1_ptr, MsHeaderPtr best_ptr, FeatureDetectMngPtr mng_ptr) {
   if (ms1_ptr == nullptr) return false;
   double prec_mass = best_ptr->getPrecMonoMass();
-  //double prec_chrg = best_ptr->getPrecCharge();
+  // double prec_chrg = best_ptr->getPrecCharge();
   std::vector<double> ext_masses = mng_ptr->getExtMasses(prec_mass);
 
   double min_diff = std::numeric_limits<double>::max();
   for (size_t i = 0; i < ms1_ptr->size(); i++) {
     DeconvPeakPtr peak = ms1_ptr->getPeakPtr(i);
-    //if (peak->getCharge() == prec_chrg) {
-    // do not test charge 
+    // if (peak->getCharge() == prec_chrg) {
+    // do not test charge
     for (size_t j = 0; j < ext_masses.size(); j++) {
       double mass_diff = std::abs(ext_masses[j] - peak->getPosition());
       if (mass_diff < min_diff) {
@@ -123,35 +125,33 @@ bool containPrecursor(DeconvMsPtr ms1_ptr, MsHeaderPtr best_ptr, FeatureDetectMn
   return false;
 }
 
-int getMs1IdBegin(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtr best_ptr, 
+int getMs1IdBegin(const DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtr best_ptr,
                   FeatureDetectMngPtr mng_ptr) {
   int cur_id = best_ptr->getMsOneId();
   while (cur_id > 0) {
     if (containPrecursor(ms1_ptr_vec[cur_id-1], best_ptr, mng_ptr)) {
       cur_id--;
-    }
-    else {
+    } else {
       break;
     }
   }
   return cur_id;
 }
 
-int getMs1IdEnd(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtr best_ptr, 
+int getMs1IdEnd(const DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtr best_ptr,
                 FeatureDetectMngPtr mng_ptr) {
   int cur_id = best_ptr->getMsOneId();
-  while (cur_id < (int)ms1_ptr_vec.size()-1) {
-    if (containPrecursor(ms1_ptr_vec[cur_id+1], best_ptr, mng_ptr)) {
+  while (cur_id < static_cast<int>(ms1_ptr_vec.size()) - 1) {
+    if (containPrecursor(ms1_ptr_vec[cur_id + 1], best_ptr, mng_ptr)) {
       cur_id++;
-    }
-    else {
+    } else {
       break;
     }
   }
   return cur_id;
 }
 
-double getFeatureIntensity(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtr best_ptr, 
+double getFeatureIntensity(const DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtr best_ptr,
                            int ms1_id_begin, int ms1_id_end, FeatureDetectMngPtr mng_ptr) {
   if (ms1_ptr_vec.size() == 0) return 0.0;
   double sum = 0;
@@ -174,14 +174,13 @@ double getFeatureIntensity(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtr best_ptr,
   return sum;
 }
 
-int getMs2IdBegin(MsHeaderPtrVec &header_ptr_vec, MsHeaderPtr best_ptr, 
+int getMs2IdBegin(const MsHeaderPtrVec &header_ptr_vec, MsHeaderPtr best_ptr,
                   int ms1_id_begin) {
   int cur_id = best_ptr->getId();
   while (cur_id > 0) {
     if (header_ptr_vec[cur_id - 1]->getMsOneId() >= ms1_id_begin) {
       cur_id--;
-    }
-    else {
+    } else {
       break;
     }
   }
@@ -190,25 +189,24 @@ int getMs2IdBegin(MsHeaderPtrVec &header_ptr_vec, MsHeaderPtr best_ptr,
 
 int getMs2IdEnd(MsHeaderPtrVec &header_ptr_vec, MsHeaderPtr best_ptr, int ms1_id_end) {
   int cur_id = best_ptr->getId();
-  while (cur_id < (int)header_ptr_vec.size()-1) {
+  while (cur_id < static_cast<int>(header_ptr_vec.size()) - 1) {
     if (header_ptr_vec[cur_id + 1]->getMsOneId() <= ms1_id_end) {
       cur_id++;
-    }
-    else {
+    } else {
       break;
     }
   }
   return cur_id;
 }
 
-void groupHeaders(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtrVec &header_ptr_vec, 
+void groupHeaders(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtrVec &header_ptr_vec,
                   FeatureDetectMngPtr mng_ptr, MsHeaderPtr2D &result_groups,
                   FeaturePtrVec &features) {
   if (ms1_ptr_vec.size() == 0) return;
-  MsHeaderPtrVec remain_ptrs = header_ptr_vec; 
-  MsHeaderPtrVec sorted_ptrs = remain_ptrs; 
+  MsHeaderPtrVec remain_ptrs = header_ptr_vec;
+  MsHeaderPtrVec sorted_ptrs = remain_ptrs;
   while (sorted_ptrs.size() > 0) {
-    //LOG_DEBUG("grouping");
+    // LOG_DEBUG("grouping");
     std::sort(sorted_ptrs.begin(), sorted_ptrs.end(), MsHeader::cmpPrecInteDec);
     MsHeaderPtr best_ptr = sorted_ptrs[0];
     MsHeaderPtrVec cur_group;
@@ -247,9 +245,9 @@ void groupHeaders(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtrVec &header_ptr_vec,
         sorted_ptrs.push_back(remain_ptrs[i]);
       }
     }
-    //LOG_DEBUG("sorted ptr size " << sorted_ptrs.size());
+    // LOG_DEBUG("sorted ptr size " << sorted_ptrs.size());
   }
-  /*for (size_t i = 0; i < result_groups.size(); i++) {*/
+  /*for (size_t i = 0; i < result_groups.size(); i++) {
   //std::cout << "Group " << i << " number " << result_groups[i].size() << " ms1 scan begin " << features[i]->getScanBegin();
   //std::cout << " ms1 scan end " << features[i]->getScanEnd() << " inte " << features[i]->getIntensity() << std::endl;
   //for (size_t j = 0; j < result_groups[i].size(); j++) {
@@ -258,10 +256,10 @@ void groupHeaders(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtrVec &header_ptr_vec,
   //std::cout <<  (ptr->getRetentionTime()/60) << "\t" << ptr->getPrecMonoMass() << "\t";
   //std::cout << ptr->getPrecMonoMz() << "\t" << ptr->getPrecCharge() << "\t" << ptr->getPrecInte() << std::endl; 
   //}
-  /*}*/
+  }*/
 }
 
-void setFeatures(MsHeaderPtr2D &header_groups, FeaturePtrVec &features) {
+void setFeatures(MsHeaderPtr2D &header_groups, const FeaturePtrVec &features) {
   for (size_t i = 0; i < header_groups.size(); i++) {
     for (size_t j = 0; j < header_groups[i].size(); j++) {
       header_groups[i][j]->setFeatureId(features[i]->getId());
@@ -270,25 +268,40 @@ void setFeatures(MsHeaderPtr2D &header_groups, FeaturePtrVec &features) {
   }
 }
 
-void writeMsalign(const std::string & input_file_name,
-                  const std::string & output_file_name,
-                  MsHeaderPtrVec &header_ptrs) {
+void writeMSFT(const std::string & input_file_name,
+               const std::string & output_file_name,
+               const MsHeaderPtrVec &header_ptrs) {
   int sp_num_in_group = 1;
   MsAlignReader sp_reader(input_file_name, sp_num_in_group, nullptr);
   std::ofstream of(output_file_name, std::ofstream::out);
   of.precision(16);
   DeconvMsPtr ms_ptr;
   int cnt = 0;
-  while((ms_ptr = sp_reader.getNextMs())!= nullptr){
+  while ((ms_ptr = sp_reader.getNextMs()) != nullptr) {
     ms_ptr->setHeaderPtr(header_ptrs[cnt]);
-    MsalignWriter::writeText(of, ms_ptr);    
+    of << "BEGIN IONS" << std::endl;
+    of << "ID=" << header_ptrs[cnt]->getId() << std::endl;
+    of << "SCANS=" << header_ptrs[cnt]->getScansString() << std::endl;
+    if (header_ptrs[cnt]->getMsLevel() > 1) {
+      of << "MS_ONE_ID=" << header_ptrs[cnt]->getMsOneId() << std::endl;
+      of << "MS_ONE_SCAN=" << header_ptrs[cnt]->getMsOneScan() << std::endl;
+      of << "PRECURSOR_MASS=" <<  header_ptrs[cnt]->getPrecMonoMass() << std::endl;
+      of << "PRECURSOR_INTENSITY=" << header_ptrs[cnt]->getPrecInte() << std::endl;
+      if (header_ptrs[cnt]->getFeatureId() >= 0) {
+        of << "FEATURE_ID=" << header_ptrs[cnt]->getFeatureId() << std::endl;
+        of << "FEATURE_INTENSITY=" << header_ptrs[cnt]->getFeatureInte() << std::endl;
+      }
+    }
+
+    of << "END IONS" << std::endl;
+    of << std::endl; 
     cnt++;
   }
   sp_reader.close();
   of.close();
 }
 
-void FeatureDetect::process(DeconvParaPtr para_ptr){
+void FeatureDetect::process(DeconvParaPtr para_ptr) {
   FeatureDetectMngPtr mng_ptr = std::make_shared<FeatureDetectMng>();
   std::string sp_file_name = para_ptr->getDataFileName();
   std::string base_name = FileUtil::basename(sp_file_name);
@@ -299,7 +312,7 @@ void FeatureDetect::process(DeconvParaPtr para_ptr){
     readSpectra(ms1_file_name, ms1_ptr_vec);
   // read ms2 deconvoluted header
   LOG_DEBUG("start reading ms2");
-  std::string ms2_file_name = base_name + ".ms2";
+  std::string ms2_file_name = base_name + ".msalign";
   MsHeaderPtrVec header_ptr_vec;
   readHeaders(ms2_file_name, header_ptr_vec);
   LOG_DEBUG("start grouping");
@@ -307,10 +320,10 @@ void FeatureDetect::process(DeconvParaPtr para_ptr){
   FeaturePtrVec features;
   groupHeaders(ms1_ptr_vec, header_ptr_vec, mng_ptr, header_groups, features);
   setFeatures(header_groups, features);
-  std::string output_file_name = base_name + ".msalign";
-  writeMsalign(ms2_file_name, output_file_name, header_ptr_vec);
-  //outputHeaders(header_ptr_vec);
+  std::string output_file_name = base_name + ".msft";
+  writeMSFT(ms2_file_name, output_file_name, header_ptr_vec);
+  // outputHeaders(header_ptr_vec);
 }
 
-//std::string output_file_name = FileUtil::basename(sp_file_name)+".feature";
-}
+// std::string output_file_name = FileUtil::basename(sp_file_name)+".feature";
+}  // namespace prot
