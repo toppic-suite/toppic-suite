@@ -219,7 +219,7 @@ void groupHeaders(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtrVec &header_ptr_vec,
     int ms1_id_end = getMs1IdEnd(ms1_ptr_vec, best_ptr, mng_ptr);
     double cur_inte = getFeatureIntensity(ms1_ptr_vec, best_ptr, ms1_id_begin,
                                           ms1_id_end, mng_ptr);
-
+    if (cur_inte == 0) cur_inte = best_ptr->getPrecInte();
     int ms2_id_begin = getMs2IdBegin(header_ptr_vec, best_ptr, ms1_id_begin);
     int ms2_id_end = getMs2IdEnd(header_ptr_vec, best_ptr, ms1_id_end);
 
