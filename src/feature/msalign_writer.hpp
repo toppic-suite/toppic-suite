@@ -28,7 +28,6 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 #ifndef PROT_FEATURE_MSALIGN_WRITER_HPP_
 #define PROT_FEATURE_MSALIGN_WRITER_HPP_
 
@@ -43,11 +42,12 @@ namespace prot {
 
 class MsalignWriter {
  public:
-  static void writeText(std::ofstream &file, MatchEnvPtrVec &envs, 
-                        MsHeaderPtr header_ptr);
+  static void writeText(std::ofstream &file, MatchEnvPtrVec &envs, MsHeaderPtr header_ptr);
 
-  static void writeText(std::ofstream &file, DeconvMsPtr ms_ptr); 
+  static void writeText(std::ofstream &file, DeconvMsPtr ms_ptr);
+
+  static void writeText(std::ofstream &file, DeconvMsPtr ms_ptr, int mslevel);
 };
 
-}
+}  // namespace prot
 #endif
