@@ -217,7 +217,17 @@ void groupHeaders(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtrVec &header_ptr_vec,
     int ms1_id_end = getMs1IdEnd(ms1_ptr_vec, best_ptr, mng_ptr);
     double cur_inte = getFeatureIntensity(ms1_ptr_vec, best_ptr, ms1_id_begin,
                                           ms1_id_end, mng_ptr);
-    if (cur_inte == 0) cur_inte = best_ptr->getPrecInte();
+    if (cur_inte == 0) {
+      DeconvPeakPtrVec peak_vec = ms1_ptr_vec[ms1_id_begin]->getPeakPtrVec();
+      peak_vec.push_back(std::make_shared<prot::DeconvPeak>(peak_vec.size(),
+                                                            best_ptr->getPrecMonoMass(),
+                                                            best_ptr->getPrecInte(),
+                                                            best_ptr->getPrecCharge()));
+      ms1_ptr_vec[ms1_id_begin]
+          = std::make_shared<Ms<prot::DeconvPeakPtr> >(ms1_ptr_vec[ms1_id_begin]->getMsHeaderPtr(),
+                                                       peak_vec);
+      cur_inte = best_ptr->getPrecInte();
+    }
     int ms2_id_begin = getMs2IdBegin(header_ptr_vec, best_ptr, ms1_id_begin);
     int ms2_id_end = getMs2IdEnd(header_ptr_vec, best_ptr, ms1_id_end);
 
@@ -294,7 +304,7 @@ void writeMSFT(const std::string & input_file_name,
     }
 
     of << "END IONS" << std::endl;
-    of << std::endl; 
+    of << std::endl;
     cnt++;
   }
   sp_reader.close();
@@ -308,8 +318,7 @@ void FeatureDetect::process(DeconvParaPtr para_ptr) {
   // read ms1 deconvoluted spectra
   std::string ms1_file_name = base_name + ".ms1";
   DeconvMsPtrVec ms1_ptr_vec;
-  if (!para_ptr->missing_level_one_)
-    readSpectra(ms1_file_name, ms1_ptr_vec);
+  if (!para_ptr->missing_level_one_) readSpectra(ms1_file_name, ms1_ptr_vec);
   // read ms2 deconvoluted header
   LOG_DEBUG("start reading ms2");
   std::string ms2_file_name = base_name + ".msalign";
@@ -322,6 +331,12 @@ void FeatureDetect::process(DeconvParaPtr para_ptr) {
   setFeatures(header_groups, features);
   std::string output_file_name = base_name + ".msft";
   writeMSFT(ms2_file_name, output_file_name, header_ptr_vec);
+  std::ofstream of1(ms1_file_name, std::ofstream::out);
+  of1.precision(16);
+  for (size_t i = 0; i < ms1_ptr_vec.size(); i++) {
+    MsalignWriter::writeText(of1, ms1_ptr_vec[i], 1);
+  }
+  of1.close();
   // outputHeaders(header_ptr_vec);
 }
 

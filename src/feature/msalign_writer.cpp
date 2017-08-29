@@ -33,7 +33,7 @@
 
 namespace prot {
 
-void MsalignWriter::writeText(std::ofstream &file, MatchEnvPtrVec &envs, 
+void MsalignWriter::writeText(std::ofstream &file, MatchEnvPtrVec &envs,
                               MsHeaderPtr header_ptr) {
   file << "BEGIN IONS" << std::endl;
   file << "ID=" << header_ptr->getId() << std::endl;
@@ -65,7 +65,7 @@ void MsalignWriter::writeText(std::ofstream &file, MatchEnvPtrVec &envs,
     file << std::endl;
   }
   file << "END IONS" << std::endl;
-  file << std::endl; 
+  file << std::endl;
 }
 
 void MsalignWriter::writeText(std::ofstream &file, DeconvMsPtr ms_ptr) {
@@ -98,7 +98,41 @@ void MsalignWriter::writeText(std::ofstream &file, DeconvMsPtr ms_ptr) {
     file << std::endl;
   }
   file << "END IONS" << std::endl;
-  file << std::endl; 
+  file << std::endl;
 }
 
+void MsalignWriter::writeText(std::ofstream &file, DeconvMsPtr ms_ptr, int mslevel) {
+  MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
+  file << "BEGIN IONS" << std::endl;
+  file << "ID=" << header_ptr->getId() << std::endl;
+  file << "SCANS=" << header_ptr->getScansString() << std::endl;
+  file << "RETENTION_TIME=" << header_ptr->getRetentionTime() << std::endl;
+  if (header_ptr->getActivationPtr() != nullptr) {
+    file << "ACTIVATION=" << header_ptr->getActivationPtr()->getName() << std::endl;
+  }
+  if (mslevel > 1) {
+    file << "MS_ONE_ID=" << header_ptr->getMsOneId() << std::endl;
+    file << "MS_ONE_SCAN=" << header_ptr->getMsOneScan() << std::endl;
+    file << "PRECURSOR_MZ=" << header_ptr->getPrecMonoMz() << std::endl;
+    file << "PRECURSOR_CHARGE=" << header_ptr->getPrecCharge() << std::endl;
+    file << "PRECURSOR_MASS=" <<  header_ptr->getPrecMonoMass() << std::endl;
+    file << "PRECURSOR_INTENSITY=" << header_ptr->getPrecInte() << std::endl;
+    if (header_ptr->getFeatureId() >= 0) {
+      file << "FEATURE_ID=" << header_ptr->getFeatureId() << std::endl;
+      file << "FEATURE_INTENSITY=" << header_ptr->getFeatureInte() << std::endl;
+    }
+  }
+
+  for (size_t i = 0; i < ms_ptr->size(); i++) {
+    DeconvPeakPtr peak_ptr = ms_ptr->getPeakPtr(i);
+    file << peak_ptr->getPosition();
+    file << "\t" << peak_ptr->getIntensity();
+    file << "\t" << peak_ptr->getCharge();
+    file << std::endl;
+  }
+  file << "END IONS" << std::endl;
+  file << std::endl;
 }
+
+
+}  // namespace prot
