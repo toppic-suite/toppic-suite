@@ -37,6 +37,10 @@
 #include <string>
 #include <vector>
 
+#ifndef BOOST_SYSTEM_NO_DEPRECATED
+#define BOOST_SYSTEM_NO_DEPRECATED 1
+#endif
+
 #define BOOST_NO_CXX11_SCOPED_ENUMS
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>

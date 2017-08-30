@@ -78,6 +78,18 @@ std::function<void()> geneTask(SpectrumSetPtr spec_set_ptr, const PrsmPtrVec & s
     }
     CompPValueArrayPtr comp_pvalue_ptr = std::make_shared<CompPValueArray>(test_num_ptr, mng_ptr);
     comp_pvalue_ptr->process(spec_set_ptr, prsm_vec, ppo, is_separate);
+
+    for (unsigned i = 0; i < prsm_vec.size(); i++) {
+      if (std::round(prsm_vec[i]->getMatchFragNum()) <= std::round(mng_ptr->comp_evalue_min_match_frag_num_)) {
+        prsm_vec[i]->setExtremeValuePtr(ExtremeValue::getMaxEvaluePtr());
+      } else {
+        if (prsm_vec[i]->getEValue() == 0.0) {
+          LOG_WARN("Invalid e value!");
+          prsm_vec[i]->setExtremeValuePtr(ExtremeValue::getMaxEvaluePtr());
+        }
+      }
+    }
+
     boost::thread::id thread_id = boost::this_thread::get_id();
     PrsmXmlWriterPtr writer_ptr = pool_ptr->getWriter(thread_id);
     for (size_t i = 0; i < prsm_vec.size(); i++) {
@@ -192,8 +204,11 @@ void EValueProcessor::compEvalues(SpectrumSetPtr spec_set_ptr, PrsmPtrVec &sele_
 
   // if matched peak number is too small or E-value is 0, replace it
   // with a max evalue.
+  //std::cout << "Start checking " << std::endl;
   for (unsigned i = 0; i < sele_prsm_ptrs.size(); i++) {
-    if (sele_prsm_ptrs[i]->getMatchFragNum() <= mng_ptr_->comp_evalue_min_match_frag_num_) {
+    //std::cout << "Fragment number " << sele_prsm_ptrs[i]->getMatchFragNum() << std::endl;
+    if (std::round(sele_prsm_ptrs[i]->getMatchFragNum()) <= std::round(mng_ptr_->comp_evalue_min_match_frag_num_)) {
+      //std::cout << "Set max e value " << std::endl;
       sele_prsm_ptrs[i]->setExtremeValuePtr(ExtremeValue::getMaxEvaluePtr());
     } else {
       if (sele_prsm_ptrs[i]->getEValue() == 0.0) {
