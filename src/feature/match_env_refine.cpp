@@ -28,11 +28,12 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
+#include <vector>
+#include <limits>
 #include <algorithm>
 
 #include "base/logger.hpp"
-#include "feature/match_env_refine.hpp" 
+#include "feature/match_env_refine.hpp"
 
 namespace prot {
 
@@ -52,9 +53,9 @@ void MatchEnvRefine::mzRefine(FeatureMngPtr mng_ptr, MatchEnvPtr env) {
   int charge = real_env->getCharge();
   double prev_mz = cur_mz - 1.0 / charge;
   double next_mz = cur_mz + 1.0 / charge;
-  // check if the mass is greater than the precursor mass 
+  // check if the mass is greater than the precursor mass
   double bass_mass = cur_mz * charge - charge * MassConstant::getProtonMass();
-  // get a reference distribution based on the base mass 
+  // get a reference distribution based on the base mass
   EnvelopePtr refer_env = mng_ptr->env_base_ptr_->getEnvByBaseMass(bass_mass);
   /* add one zeros at both sides of the envelope */
   EnvelopePtr ext_refer_env = refer_env->addZero(1);
@@ -100,12 +101,11 @@ void MatchEnvRefine::mzRefine(FeatureMngPtr mng_ptr, MatchEnvPtr env) {
   if (cur_dist <= prev_dist && cur_dist <= next_dist) {
     cur_env->changeIntensity(cur_ratio);
     env->setTheoEnvPtr(cur_env);
-  } else if (prev_dist <= next_dist){
+  } else if (prev_dist <= next_dist) {
     prev_env->changeIntensity(prev_ratio);
     env->setTheoEnvPtr(prev_env);
     real_env->shift(-1);
-  }
-  else {
+  } else {
     next_env->changeIntensity(next_ratio);
     env->setTheoEnvPtr(next_env);
     real_env->shift(1);
@@ -120,7 +120,8 @@ double MatchEnvRefine::compEnvDist(EnvelopePtr real_env, EnvelopePtr theo_env) {
   }
 }
 
-double MatchEnvRefine::compDistWithNorm(std::vector<double> real, std::vector<double> theo) {
+double MatchEnvRefine::compDistWithNorm(const std::vector<double>& real,
+                                        const std::vector<double>& theo) {
   double best_dist = std::numeric_limits<double>::infinity();
   best_ratio_ = -1;
   for (size_t i = 0; i < real.size(); i++) {
@@ -141,15 +142,15 @@ double MatchEnvRefine::compDistWithNorm(std::vector<double> real, std::vector<do
   return best_dist;
 }
 
-std::vector<double> MatchEnvRefine::norm(std::vector<double> &obs, double ratio) {
-  std::vector<double> result;
+std::vector<double> MatchEnvRefine::norm(const std::vector<double> &obs, double ratio) {
+  std::vector<double> result(obs.size());
   for (size_t i = 0; i < obs.size(); i++) {
-    result.push_back(obs[i] / ratio);
+    result[i] = obs[i] / ratio;
   }
   return result;
 }
 
-double MatchEnvRefine::compDist(std::vector<double> &norm, std::vector<double> &theo) {
+double MatchEnvRefine::compDist(const std::vector<double> &norm, const std::vector<double> &theo) {
   double result = 0;
   for (size_t i = 0; i < norm.size(); i++) {
     double dist = std::abs(norm[i] - theo[i]);
@@ -167,4 +168,4 @@ double MatchEnvRefine::compDist(std::vector<double> &norm, std::vector<double> &
   return result;
 }
 
-}
+}  // namespace prot
