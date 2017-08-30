@@ -50,6 +50,7 @@ class PrsmFeatureSpecies {
                      const std::string &input_file_ext,
                      const std::string &output_file_ext,
                      const ModPtrVec &fix_mod_ptr_vec,
+                     double prec_error_tole,
                      PrsmParaPtr prsm_para_ptr): 
       db_file_name_(db_file_name),
       spec_file_name_(spec_file_name),
@@ -57,6 +58,7 @@ class PrsmFeatureSpecies {
       input_file_ext_(input_file_ext),
       output_file_ext_(output_file_ext),
       fix_mod_ptr_vec_(fix_mod_ptr_vec),
+      prec_error_tole_(prec_error_tole),
       prsm_para_ptr_(prsm_para_ptr) {}
 
   void process();
@@ -67,6 +69,7 @@ class PrsmFeatureSpecies {
   std::string input_file_ext_;
   std::string output_file_ext_;
   ModPtrVec fix_mod_ptr_vec_;
+  double prec_error_tole_;
   PrsmParaPtr prsm_para_ptr_;
 
   void setProtId(PrsmPtrVec& prsm_ptrs);

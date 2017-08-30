@@ -78,6 +78,11 @@ void PrsmFeatureSpecies::setSpeciesId(const PrsmPtrVec& prsm_ptrs){
           is_found = true;
           break;
         }
+        if (std::abs (cur_ptr->getAdjustedPrecMass() - ref_ptr->getAdjustedPrecMass()) <= prec_error_tole_) {
+          species[j].push_back(cur_ptr);
+          is_found = true;
+          break;
+        }
       }
     }
     if(!is_found){

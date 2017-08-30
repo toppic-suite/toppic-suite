@@ -287,13 +287,17 @@ int two_base_opt(int argc, char* argv[]) {
     std::cout << "Finding protein species - started." << std::endl;
     if (arguments["featureFileName"] != "") {
       // TopFD msalign file with feature ID
+      double prec_error_tole = 1.2;
       ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();
       PrsmFeatureSpeciesPtr prsm_forms
           = std::make_shared<PrsmFeatureSpecies>(db_file_name,
                                                  sp_file_name,
                                                  arguments["featureFileName"],
                                                  suffix,
-                                                 "FORMS", fix_mod_list, prsm_para_ptr);
+                                                 "FORMS",
+                                                 fix_mod_list,
+                                                 prec_error_tole,
+                                                 prsm_para_ptr);
       prsm_forms->process();
       prsm_forms = nullptr;
     } else {

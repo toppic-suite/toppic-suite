@@ -32,6 +32,10 @@
 #ifndef PROT_BASE_FILE_UTIL_HPP_
 #define PROT_BASE_FILE_UTIL_HPP_
 
+#ifndef BOOST_SYSTEM_NO_DEPRECATED
+#define BOOST_SYSTEM_NO_DEPRECATED 1
+#endif
+
 #define BOOST_NO_CXX11_SCOPED_ENUMS
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/operations.hpp>
