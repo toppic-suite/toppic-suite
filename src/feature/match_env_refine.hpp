@@ -32,6 +32,8 @@
 #ifndef PROT_FEATURE_MATCH_ENV_REFINE_HPP_
 #define PROT_FEATURE_MATCH_ENV_REFINE_HPP_
 
+#include <vector>
+
 #include "spec/peak.hpp"
 #include "feature/match_env.hpp"
 
@@ -49,13 +51,13 @@ class MatchEnvRefine {
 
   static double compEnvDist(EnvelopePtr real_env, EnvelopePtr theo_env);
 
-  static double compDistWithNorm(std::vector<double> real, std::vector<double> theo);
+  static double compDistWithNorm(const std::vector<double>& real, const std::vector<double>& theo);
 
-  static std::vector<double> norm(std::vector<double> &obs, double ratio);
+  static std::vector<double> norm(const std::vector<double> &obs, double ratio);
 
-  static double compDist(std::vector<double> &norm, std::vector<double> &theo);
+  static double compDist(const std::vector<double> &norm, const std::vector<double> &theo);
 };
 
-}
+}  // namespace prot
 
 #endif
