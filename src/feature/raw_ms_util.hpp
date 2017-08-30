@@ -42,16 +42,16 @@ namespace prot {
 
 class RawMsUtil {
  public: 
-  static double findMaxPos(PeakPtrVec &ptr_list);
+  static double findMaxPos(const PeakPtrVec &ptr_list);
 
-  static int searchPos(PeakPtrVec &ptr_list, double pos);
+  static int searchPos(const PeakPtrVec &ptr_list, double pos);
 
-  static int getNearPeakIdx(PeakPtrVec  &ptr_list, double pos, double tolerance);
+  static int getNearPeakIdx(const PeakPtrVec  &ptr_list, double pos, double tolerance);
 
-  static PeakPtrVec rmPeaks(PeakPtrVec &ptr_list, std::vector<bool> &keep);
+  static PeakPtrVec rmPeaks(const PeakPtrVec &ptr_list, std::vector<bool> &keep);
 
 };
 
-}
+}  // namespace prot
 
 #endif

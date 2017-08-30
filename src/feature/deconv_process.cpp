@@ -74,7 +74,7 @@ void DeconvProcess::updateMsg(MsHeaderPtr header_ptr, int scan, int total_scan_n
 }
 
 void DeconvProcess::process() {
-  FeatureMngPtr mng_ptr(new FeatureMng(para_ptr_->exec_dir_));
+  FeatureMngPtr mng_ptr = std::make_shared<FeatureMng>(para_ptr_->exec_dir_);
   copyParameters(mng_ptr);
   printParameter(mng_ptr);
 
@@ -97,9 +97,9 @@ void DeconvProcess::process() {
   of1.precision(16);
   of2.precision(16);
 
-  DeconvOneSpPtr deconv_ptr(new DeconvOneSp(mng_ptr));
+  DeconvOneSpPtr deconv_ptr = std::make_shared<DeconvOneSp>(mng_ptr);
 
-  FeatureMsReaderPtr reader_ptr(new FeatureMsReader(file_name));
+  FeatureMsReaderPtr reader_ptr = std::make_shared<FeatureMsReader>(file_name);
   processSp(deconv_ptr, reader_ptr, of1, of2);
   of1.close();
   of2.close();

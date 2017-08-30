@@ -39,17 +39,13 @@ namespace prot {
 
 class MatchEnvUtil {
  public:
-  static MatchEnvPtrVec sortOnMz(MatchEnvPtrVec &ori_envs);
+  static std::vector<double> getMassList(const MatchEnvPtrVec &envs);
 
-  static MatchEnvPtrVec sortOnMass(MatchEnvPtrVec &ori_envs);
+  static std::vector<int> getChargeList(const MatchEnvPtrVec &envs);
 
-  static std::vector<double> getMassList(MatchEnvPtrVec &envs);
+  static std::vector<double> getChargeOneMassList(const MatchEnvPtrVec &envs);
 
-  static std::vector<int> getChargeList(MatchEnvPtrVec &envs);
-
-  static std::vector<double> getChargeOneMassList(MatchEnvPtrVec &envs);
-
-  static std::vector<double> getIntensitySums(MatchEnvPtrVec &envs);
+  static std::vector<double> getIntensitySums(const MatchEnvPtrVec &envs);
 
   static void assignIntensity(PeakPtrVec &ms, MatchEnvPtrVec &envs);
 
@@ -62,7 +58,7 @@ class MatchEnvUtil {
 
   static MatchEnvPtrVec addMultipleMass(MatchEnvPtrVec &envs, MatchEnvPtr2D &candidates,
                                         double multi_min_mass, int multi_min_charge, double min_ratio);
-  
+
 };
 
 }

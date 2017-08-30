@@ -28,20 +28,22 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <string>
+#include <vector>
 
 #include "base/logger.hpp"
-#include "feature/env_base.hpp" 
+#include "feature/env_base.hpp"
 
 namespace prot {
 
-EnvBase::EnvBase(std::string file_name, int entry_num, 
+EnvBase::EnvBase(std::string file_name, int entry_num,
                  double mass_interval):
     entry_num_(entry_num),
     mass_interval_(mass_interval) {
       std::ifstream input;
       input.open(file_name.c_str(), std::ios::in);
       if (!input.is_open()) {
-        LOG_ERROR( "env file  " << file_name << " does not exist.");
+        LOG_ERROR("env file  " << file_name << " does not exist.");
         throw "fasta file does not exist.";
       }
       LOG_DEBUG("start reading");
@@ -56,8 +58,8 @@ EnvBase::EnvBase(std::string file_name, int entry_num,
           peak_num++;
           line_list.push_back(line);
         }
-        //LOG_DEBUG("one envelope");
-        envs_.push_back(EnvelopePtr(new Envelope(peak_num - 1, line_list)));
+        // LOG_DEBUG("one envelope");
+        envs_.push_back(std::make_shared<Envelope>(peak_num - 1, line_list));
       }
       input.close();
       initBaseMassIdx();
@@ -67,7 +69,7 @@ void EnvBase::initBaseMassIdx() {
   base_mass_idxes_.resize(entry_num_, -1);
   for (int i = 0; i < entry_num_; i++) {
     double mz = envs_[i]->getReferMz();
-    int idx = (int) (mz / mass_interval_);
+    int idx = static_cast<int>(mz / mass_interval_);
     if (idx >= 0 && idx < entry_num_) {
       base_mass_idxes_[idx] = i;
     }
@@ -82,7 +84,7 @@ void EnvBase::initBaseMassIdx() {
 
 // Get a distribution envelope based on its monoisotopic mass.
 EnvelopePtr EnvBase::getEnvByMonoMass(double mass) {
-  int idx = (int) (mass / mass_interval_);
+  int idx = static_cast<int>(mass / mass_interval_);
   if (idx < 0) {
     LOG_ERROR("Invalid mass");
     exit(1);
@@ -95,7 +97,7 @@ EnvelopePtr EnvBase::getEnvByMonoMass(double mass) {
 
 // Get a distribution envelope based on its mass of base peak.
 EnvelopePtr EnvBase::getEnvByBaseMass(double mass) {
-  int idx = (int) (mass / mass_interval_);
+  int idx = static_cast<int>(mass / mass_interval_);
   if (idx < 0) {
     LOG_ERROR("Invalid mass");
     exit(1);
@@ -106,4 +108,4 @@ EnvelopePtr EnvBase::getEnvByBaseMass(double mass) {
   return envs_[base_mass_idxes_[idx]];
 }
 
-}
+}  // namespace prot

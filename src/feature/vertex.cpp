@@ -104,7 +104,7 @@ bool Vertex::addPreEnv(MatchEnvPtr env, int max_overlap) {
       if (peak_use_cnts_[idx_list[i] - bgn_peak_] > max_overlap) {
         return false;
       }
-      EnvPeakPairPtr pair_ptr = EnvPeakPairPtr(new EnvPeakPair(env, i));
+      EnvPeakPairPtr pair_ptr = std::make_shared<EnvPeakPair>(env, i);
       pre_env_peak_pairs_[idx_list[i] - bgn_peak_].push_back(pair_ptr);
     }
   }
@@ -125,7 +125,7 @@ bool Vertex::addCurEnv(MatchEnvPtr env, int max_overlap) {
       if (peak_use_cnts_[idx_list[i] - bgn_peak_] > max_overlap) {
         return false;
       }
-      EnvPeakPairPtr pair_ptr = EnvPeakPairPtr(new EnvPeakPair(env, i));
+      EnvPeakPairPtr pair_ptr = std::make_shared<EnvPeakPair>(env, i);
       cur_env_peak_pairs_[idx_list[i] - bgn_peak_].push_back(pair_ptr);
     }
   }

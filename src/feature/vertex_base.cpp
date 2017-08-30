@@ -58,7 +58,7 @@ void VertexBase::addEmptyVertexA(FeatureMngPtr mng_ptr, VertexAPtrVec &result,
   int bgn_peak = getBgnPeak(pre_win, data);
   int pre_win_peak_num = getWinPkNum(pre_win, data);
   int cur_win_peak_num = getWinPkNum(cur_win, data);
-  VertexAPtr ptr(new VertexA(mng_ptr, bgn_peak, pre_win_peak_num, cur_win_peak_num));
+  VertexAPtr ptr = std::make_shared<VertexA>(mng_ptr, bgn_peak, pre_win_peak_num, cur_win_peak_num);
   ptr->trim();
   result.push_back(ptr);
 }
@@ -75,7 +75,7 @@ VertexAPtrVec VertexBase::getVertexAList(DeconvDataPtr data, int cur_win,
     cur_size = result.size();
     for (int j = 0; j < cur_size; j++) {
       if (result[j]->getMatchEnvSize() < mng_ptr->max_env_num_per_vertex_) {
-        VertexAPtr vertex (new VertexA(result[j]));
+        VertexAPtr vertex = std::make_shared<VertexA>(result[j]);
         if (vertex->addPreEnv(prev_match_envs[i], mng_ptr->max_env_num_per_peak_)) {
           vertex->trim();
           result.push_back(vertex);
@@ -88,7 +88,7 @@ VertexAPtrVec VertexBase::getVertexAList(DeconvDataPtr data, int cur_win,
     cur_size = result.size();
     for (int j = 0; j < cur_size; j++) {
       if (result[j]->getMatchEnvSize() < mng_ptr->max_env_num_per_vertex_) {
-        VertexAPtr vertex (new VertexA(result[j]));
+        VertexAPtr vertex = std::make_shared<VertexA>(result[j]);
         if (vertex->addCurEnv(cur_match_envs[i], mng_ptr->max_env_num_per_peak_)) {
           vertex->trim();
           result.push_back(vertex);
@@ -99,7 +99,6 @@ VertexAPtrVec VertexBase::getVertexAList(DeconvDataPtr data, int cur_win,
   return result;
 }
 
-    
 // this is a copy of the previous two methods except that env_num is added
 void VertexBase::addEmptyVertexB(FeatureMngPtr mng_ptr, VertexBPtrVec &result,
                                  DeconvDataPtr data, int cur_win, int env_num) {
@@ -107,7 +106,8 @@ void VertexBase::addEmptyVertexB(FeatureMngPtr mng_ptr, VertexBPtrVec &result,
   int bgn_peak = getBgnPeak(prev_win, data);
   int prev_win_peak_num = getWinPkNum(prev_win, data);
   int cur_win_peak_num = getWinPkNum(cur_win, data);
-  VertexBPtr vertex(new VertexB(mng_ptr, bgn_peak, prev_win_peak_num, cur_win_peak_num, env_num));
+  VertexBPtr vertex = std::make_shared<VertexB>(mng_ptr, bgn_peak,
+                                                prev_win_peak_num, cur_win_peak_num, env_num);
   vertex->trim();
   result.push_back(vertex);
 }
@@ -124,7 +124,7 @@ VertexBPtrVec VertexBase::getVertexBList(DeconvDataPtr data, int cur_win,
     cur_size = result.size();
     for (int j = 0; j < cur_size; j++) {
       if (result[j]->getMatchEnvSize() < mng_ptr->max_env_num_per_vertex_) {
-        VertexBPtr vertex(new VertexB(result[j]));
+        VertexBPtr vertex = std::make_shared<VertexB>(result[j]);
         if (vertex->addPreEnv(prev_match_envs[i], mng_ptr->max_env_num_per_peak_)) {
           vertex->trim();
           result.push_back(vertex);
@@ -137,7 +137,7 @@ VertexBPtrVec VertexBase::getVertexBList(DeconvDataPtr data, int cur_win,
     cur_size = result.size();
     for (int j = 0; j < cur_size; j++) {
       if (result[j]->getMatchEnvSize() < mng_ptr->max_env_num_per_vertex_) {
-        VertexBPtr vertex(new VertexB(result[j]));
+        VertexBPtr vertex = std::make_shared<VertexB>(result[j]);
         if (vertex->addCurEnv(cur_match_envs[i], mng_ptr->max_env_num_per_peak_)) {
           vertex->trim();
           result.push_back(vertex);

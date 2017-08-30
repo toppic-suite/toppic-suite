@@ -40,7 +40,8 @@ FeatureMng::FeatureMng(const std::string & exec_dir) {
   if (env_base_ptr_ == nullptr) {
     distr_file_name_ = exec_dir + distr_file_name_;
     LOG_DEBUG("distribution file name " << distr_file_name_);
-    env_base_ptr_ = EnvBasePtr(new EnvBase(distr_file_name_, distr_entry_num_, distr_mass_interval_));
+    env_base_ptr_
+        = std::make_shared<EnvBase>(distr_file_name_, distr_entry_num_, distr_mass_interval_);
     LOG_DEBUG("env base inited");
   }
 }

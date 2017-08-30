@@ -39,71 +39,40 @@
 
 namespace prot {
 
-MatchEnvPtrVec MatchEnvUtil::sortOnMz(MatchEnvPtrVec &ori_envs) {
-  MatchEnvPtrVec envs = ori_envs;
+std::vector<double> MatchEnvUtil::getMassList(const MatchEnvPtrVec &envs) {
+  std::vector<double> masses(envs.size());
   for (size_t i = 0; i < envs.size(); i++) {
-    for (size_t j = i + 1; j < envs.size(); j++) {
-      if (envs[i]->getRealEnvPtr()->getReferPeakIdx() > 
-          envs[j]->getRealEnvPtr()->getReferPeakIdx()) {
-        MatchEnvPtr tmp = envs[i];
-        envs[i] = envs[j];
-        envs[j] = tmp;
-      }
-    }
-  }
-  return envs;
-}
-
-MatchEnvPtrVec MatchEnvUtil::sortOnMass(MatchEnvPtrVec &ori_envs) {
-  MatchEnvPtrVec envs = ori_envs;
-  for (size_t i = 0; i < envs.size(); i++) {
-    for (size_t j = i + 1; j < envs.size(); j++) {
-      if (envs[i]->getRealEnvPtr()->getMonoMass() > 
-          envs[j]->getRealEnvPtr()->getMonoMass()) {
-        MatchEnvPtr tmp = envs[i];
-        envs[i] = envs[j];
-        envs[j] = tmp;
-      }
-    }
-  }
-  return envs;
-}
-
-std::vector<double> MatchEnvUtil::getMassList(MatchEnvPtrVec &envs) {
-  std::vector<double> masses;
-  for (size_t i = 0; i < envs.size(); i++) {
-    masses.push_back(envs[i]->getRealEnvPtr()->getMonoMass());
+    masses[i] = envs[i]->getRealEnvPtr()->getMonoMass();
   }
   return masses;
 }
 
-std::vector<int> MatchEnvUtil::getChargeList(MatchEnvPtrVec &envs) {
-  std::vector<int> charges;
+std::vector<int> MatchEnvUtil::getChargeList(const MatchEnvPtrVec &envs) {
+  std::vector<int> charges(envs.size());
   for (size_t i = 0; i < envs.size(); i++) {
-    charges.push_back(envs[i]->getRealEnvPtr()->getCharge());
+    charges[i] = envs[i]->getRealEnvPtr()->getCharge();
   }
   return charges;
 }
 
-std::vector<double> MatchEnvUtil::getChargeOneMassList(MatchEnvPtrVec &envs) {
-  std::vector<double> masses;
+std::vector<double> MatchEnvUtil::getChargeOneMassList(const MatchEnvPtrVec &envs) {
+  std::vector<double> masses(envs.size());
   for (size_t i = 0; i < envs.size(); i++) {
-    masses.push_back(envs[i]->getRealEnvPtr()->getMonoMass()
-                     + MassConstant::getProtonMass());
+    masses[i] = envs[i]->getRealEnvPtr()->getMonoMass() + MassConstant::getProtonMass();
   }
   return masses;
 }
 
-std::vector<double> MatchEnvUtil::getIntensitySums(MatchEnvPtrVec &envs) {
-  std::vector<double> intensity_sums;
+std::vector<double> MatchEnvUtil::getIntensitySums(const MatchEnvPtrVec &envs) {
+  std::vector<double> intensity_sums(envs.size());
   for (size_t i = 0; i < envs.size(); i++) {
-    intensity_sums.push_back(envs[i]->getTheoEnvPtr()->compIntensitySum());
+    intensity_sums[i] = envs[i]->getTheoEnvPtr()->compIntensitySum();
   }
   return intensity_sums;
 }
 
 void MatchEnvUtil::assignIntensity(PeakPtrVec &ms, MatchEnvPtrVec &envs) {
-  int peak_num = ms.size();
+  size_t peak_num = ms.size();
   std::vector<double> intensity_sums_(peak_num, 0);
   for (size_t i = 0; i < envs.size(); i++) {
     MatchEnvPtr env = envs[i];
@@ -178,10 +147,10 @@ MatchEnvPtr MatchEnvUtil::getNewMatchEnv(PeakPtrVec &ms, int idx, double toleran
   mzs.push_back(ms[idx]->getPosition());
   intensities.push_back(ms[idx]->getIntensity());
   LOG_DEBUG(mzs[0] << "\t" << intensities[0]);
-  EnvelopePtr theo_env(new Envelope(0, 1, mzs[0], mzs, intensities));
-  RealEnvPtr real_env(new RealEnv(ms, theo_env, tolerance, 0)); 
+  EnvelopePtr theo_env = std::make_shared<Envelope>(0, 1, mzs[0], mzs, intensities);
+  RealEnvPtr real_env = std::make_shared<RealEnv>(ms, theo_env, tolerance, 0);
   int mass_group = 0;
-  return MatchEnvPtr(new MatchEnv(mass_group, theo_env, real_env));
+  return std::make_shared<MatchEnv>(mass_group, theo_env, real_env);
 }
 
 MatchEnvPtrVec MatchEnvUtil::addMultipleMass(MatchEnvPtrVec &envs, MatchEnvPtr2D &candidates,
@@ -242,4 +211,4 @@ MatchEnvPtrVec MatchEnvUtil::addMultipleMass(MatchEnvPtrVec &envs, MatchEnvPtr2D
   return mass_envs;
 }
 
-}
+}  // namespace prot

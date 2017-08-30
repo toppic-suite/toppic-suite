@@ -28,27 +28,23 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <string>
+#include <algorithm>
+#include <vector>
+#include <functional>
 
-#include <boost/algorithm/string.hpp>
+#include "boost/algorithm/string.hpp"
 
 #include "base/logger.hpp"
 #include "base/mass_constant.hpp"
-#include "feature/envelope.hpp" 
+#include "feature/envelope.hpp"
 
 namespace prot {
-
-Envelope::Envelope(const Envelope &env) {
-  refer_idx_ = env.refer_idx_;
-  charge_ = env.charge_;
-  mono_mz_ = env.mono_mz_;
-  mzs_ = env.mzs_;
-  intensities_ = env.intensities_;
-}
 
 Envelope::Envelope(int num, std::vector<std::string> &line_list) {
   charge_ = 1;
   std::vector<std::string> words;
-  //LOG_DEBUG("line list size " << line_list.size() << " num " << num);
+  // LOG_DEBUG("line list size " << line_list.size() << " num " << num);
   boost::split(words, line_list[0], boost::is_any_of(" "));
   mono_mz_ = std::stod(words[7]);
   mzs_.resize(num);
@@ -56,29 +52,21 @@ Envelope::Envelope(int num, std::vector<std::string> &line_list) {
   for (int i = 0; i < num; i++) {
     boost::split(words, line_list[i+1], boost::is_any_of(" "));
     mzs_[i] = std::stod(words[0]);
-    intensities_[i] = std::stod(words[1])/100;
+    intensities_[i] = std::stod(words[1]) / 100;
   }
-  refer_idx_ = std::distance(intensities_.begin(), std::max_element(intensities_.begin(), intensities_.end()));
-  //EnvelopeUtil::getMaxPos(intensities_);
+  refer_idx_ = std::distance(intensities_.begin(),
+                             std::max_element(intensities_.begin(), intensities_.end()));
+  // EnvelopeUtil::getMaxPos(intensities_);
 }
-
-Envelope::Envelope(int refer_idx, int charge, double mono_mz,
-                   std::vector<double> &mzs, std::vector<double> &intensities):
-    refer_idx_(refer_idx),
-    charge_(charge),
-    mono_mz_(mono_mz),
-    mzs_(mzs),
-    intensities_(intensities) {
-    }
 
 EnvelopePtr Envelope::convertToTheo(double mass_diff, int new_charge) {
   double new_mono_mz = (mono_mz_ + mass_diff) / new_charge;
   std::vector<double> new_mzs(mzs_.size());
   for (size_t i = 0; i < mzs_.size(); i++) {
-    double new_value = (mzs_[i] + mass_diff)/ new_charge;
+    double new_value = (mzs_[i] + mass_diff) / new_charge;
     new_mzs[i] = new_value;
   }
-  return std::make_shared<Envelope>(refer_idx_, new_charge, new_mono_mz, 
+  return std::make_shared<Envelope>(refer_idx_, new_charge, new_mono_mz,
                                     new_mzs, intensities_);
 }
 
@@ -106,9 +94,8 @@ void Envelope::changeToAbsInte(double absolute_intensity) {
 }
 
 void Envelope::changeMz(double shift) {
-  for (size_t i = 0; i < mzs_.size(); i++) {
-    mzs_[i] += shift;
-  }
+  std::transform(mzs_.begin(), mzs_.end(),
+                 mzs_.begin(), std::bind2nd(std::plus<double>(), shift));
   mono_mz_ += shift;
 }
 
@@ -120,15 +107,15 @@ EnvelopePtr Envelope::getSubEnv(int n_back, int n_forw) {
     new_mzs.push_back(mzs_[i]);
     new_intes.push_back(intensities_[i]);
   }
-  EnvelopePtr env_ptr(new Envelope(new_refer_idx, charge_, mono_mz_, 
-                                   new_mzs, new_intes));
+  EnvelopePtr env_ptr = std::make_shared<Envelope>(new_refer_idx, charge_, mono_mz_,
+                                                   new_mzs, new_intes);
   return env_ptr;
 }
 
 EnvelopePtr Envelope::addZero(int num) {
   int n_peak = mzs_.size();
-  std::vector<double> new_mzs(n_peak + 2 * num, 0); 
-  std::vector<double> new_intes(n_peak + 2 * num, 0); 
+  std::vector<double> new_mzs(n_peak + 2 * num, 0);
+  std::vector<double> new_intes(n_peak + 2 * num, 0);
   for (int i = 0; i < n_peak; i++) {
     new_mzs[i + num] = mzs_[i];
     new_intes[i + num] = intensities_[i];
@@ -140,15 +127,14 @@ EnvelopePtr Envelope::addZero(int num) {
     new_mzs[i] = new_mzs[i - 1] + MassConstant::getIsotopeMass() / charge_;
   }
   int new_refer_idx = refer_idx_ + num;
-  EnvelopePtr env_ptr(new Envelope(new_refer_idx, charge_, mono_mz_, 
-                                   new_mzs, new_intes));
+  EnvelopePtr env_ptr = std::make_shared<Envelope>(new_refer_idx, charge_, mono_mz_,
+                                                   new_mzs, new_intes);
   return env_ptr;
 }
 
 EnvelopePtr Envelope::getSubEnv(double percent_bound, double absolute_min_inte,
                                 int max_back_peak_num, int max_forw_peak_num) {
-
-  std::vector<int> bounds = calcBound(percent_bound, absolute_min_inte, 
+  std::vector<int> bounds = calcBound(percent_bound, absolute_min_inte,
                                       max_back_peak_num, max_forw_peak_num);
   return getSubEnv(bounds[0], bounds[1]);
 }
@@ -158,33 +144,33 @@ std::vector<int> Envelope::calcBound(double percent_bound, double absolute_min_i
                                      int max_back_peak_num, int max_forw_peak_num) {
   double forw_inte;
   double back_inte;
-  int forw_idx; // forward index 
-  int back_idx; // backward index 
+  int forw_idx;  // forward index
+  int back_idx;  // backward index
   // current sum of intensities
   double sum = intensities_[refer_idx_];
   forw_idx = refer_idx_ + 1;
   back_idx = refer_idx_ - 1;
-  // if sum of intensity is above 85%, stop 
+  // if sum of intensity is above 85%, stop
   double intensity_sum = compIntensitySum();
   int n_peak = mzs_.size();
   while (sum / intensity_sum < percent_bound) {
-    // if all peaks are included, stop 
+    // if all peaks are included, stop
     if (back_idx == -1 && forw_idx == n_peak) {
       break;
     }
-    // compute intensity at forward index 
+    // compute intensity at forward index
     if (forw_idx == n_peak) {
       forw_inte = 0;
     } else {
       forw_inte = intensities_[forw_idx];
     }
-    // compute intensity at backward index 
+    // compute intensity at backward index
     if (back_idx == -1) {
       back_inte = 0;
     } else {
       back_inte = intensities_[back_idx];
     }
-    // if both forw and back intensities are less than a threshold, stop 
+    // if both forw and back intensities are less than a threshold, stop
     if (back_inte < absolute_min_inte && forw_inte < absolute_min_inte) {
       break;
     }
@@ -205,7 +191,7 @@ std::vector<int> Envelope::calcBound(double percent_bound, double absolute_min_i
   if (max_forw_num > max_forw_peak_num) {
     max_forw_num = max_forw_peak_num;
   }
-  // return results 
+  // return results
   std::vector<int> result;
   result.push_back(max_back_num);
   result.push_back(max_forw_num);
@@ -218,11 +204,7 @@ void Envelope::shift(int shift) {
 }
 
 double Envelope::compIntensitySum() {
-  double intensity_sum = 0;
-  for (size_t i = 0; i < intensities_.size(); i++) {
-    intensity_sum += intensities_[i];
-  }
-  return intensity_sum;
+  return std::accumulate(intensities_.begin(), intensities_.end(), 0.0);
 }
 
 double Envelope::getAvgMz() {
@@ -239,5 +221,5 @@ double Envelope::getAvgMass() {
   return getAvgMz() * charge_ - charge_ * MassConstant::getProtonMass();
 }
 
-}
+}  // namespace prot
 

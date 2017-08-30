@@ -43,7 +43,7 @@ struct PeakIntv {
 };
 
 FeatureMngPtr initMngPtr(double prec_win_size) {
-  FeatureMngPtr mng_ptr (new FeatureMng());
+  FeatureMngPtr mng_ptr = std::make_shared<FeatureMng>();
   mng_ptr->min_refer_inte_ = 0;
   mng_ptr->min_inte_ = 0;
   mng_ptr->max_miss_peak_num_ = 3;
