@@ -47,7 +47,7 @@ RawMsPtr FeatureMsReader::getNextMs(double prec_win_size) {
   if (header_ptr == nullptr) {
     return nullptr;
   }
-  RawMsPtr ms_ptr(new Ms<PeakPtr>(header_ptr, peak_list));
+  RawMsPtr ms_ptr = std::make_shared<Ms<PeakPtr> >(header_ptr, peak_list);
 
   // update ms_1 
   if (header_ptr->getMsLevel() == 1) {

@@ -31,6 +31,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <vector>
 
 #include "base/logger.hpp"
 #include "feature/deconv_util.hpp"
@@ -39,7 +40,7 @@ namespace prot {
 
 double DeconvUtil::intv_width_ = 10;
 
-IntvDensPtrVec DeconvUtil::getDensity(std::vector<double> &inte) {
+IntvDensPtrVec DeconvUtil::getDensity(const std::vector<double> &inte) {
   double max_inte = -1;
   for (size_t i = 0; i < inte.size(); i++) {
     if (inte[i] > max_inte) {
@@ -52,32 +53,33 @@ IntvDensPtrVec DeconvUtil::getDensity(std::vector<double> &inte) {
   } else if (max_inte < 100) {
     intv_width_ = max_inte / 100;
   }
-  int total_num = inte.size();
-  int intv_num = (int)std::round(max_inte / intv_width_) + 1;
-  IntvDensPtrVec dens;
+  size_t total_num = inte.size();
+  int intv_num = static_cast<int>(std::round(max_inte / intv_width_)) + 1;
+  IntvDensPtrVec dens(intv_num);
   for (int i = 0; i < intv_num; i++) {
     double bgn = i * intv_width_;
     double end = (i + 1) * intv_width_;
     int num = 0;
-    for (int j = 0; j < total_num; j++) {
+    for (size_t j = 0; j < total_num; j++) {
       if (inte[j] > bgn && inte[j] <= end) {
         num++;
       }
     }
-    IntvDensPtr cur_den(new IntvDens(bgn, end, num, num / (float) total_num));
-    dens.push_back(cur_den);
+    IntvDensPtr cur_den
+        = std::make_shared<IntvDens>(bgn, end, num, num / static_cast<float>(total_num));
+    dens[i] = cur_den;
   }
   return dens;
 }
 
-void DeconvUtil::outputDens(IntvDensPtrVec &dens) {
+void DeconvUtil::outputDens(const IntvDensPtrVec &dens) {
   for (size_t i = 0; i < dens.size(); i++) {
     std::cout << dens[i]->getBgn() << " " << dens[i]->getEnd() << " "
         << dens[i]->getNum() << " " << dens[i]->getPerc() << std::endl;
   }
 }
 
-int DeconvUtil::getMaxPos(IntvDensPtrVec &dens) {
+int DeconvUtil::getMaxPos(const IntvDensPtrVec &dens) {
   int max_pos = -1;
   int max_num = -1;
   for (size_t i = 0; i < dens.size(); i++) {
@@ -89,13 +91,13 @@ int DeconvUtil::getMaxPos(IntvDensPtrVec &dens) {
   return max_pos;
 }
 
-double DeconvUtil::getBaseLine(std::vector<double> &inte) {
-  //LOG_DEBUG("get density");
+double DeconvUtil::getBaseLine(const std::vector<double> &inte) {
+  // LOG_DEBUG("get density");
   IntvDensPtrVec dens = getDensity(inte);
-  //LOG_DEBUG("get max pos ");
+  // LOG_DEBUG("get max pos ");
   int max_pos = getMaxPos(dens);
   LOG_DEBUG("max pos " << max_pos << " inte " << dens[max_pos]->getBgn());
   return dens[max_pos]->getBgn();
 }
 
-}
+}  // namespace prot

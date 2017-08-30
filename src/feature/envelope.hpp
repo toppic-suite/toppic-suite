@@ -47,15 +47,24 @@ typedef std::shared_ptr<Envelope> EnvelopePtr;
 
 class Envelope {
  public:
-
   Envelope() {}
 
-  Envelope(const Envelope &env);
+  Envelope(const Envelope &env):
+      refer_idx_(env.refer_idx_),
+      charge_(env.charge_),
+      mono_mz_(env.mono_mz_),
+      mzs_(env.mzs_),
+      intensities_(env.intensities_) {}
 
   Envelope(int num, std::vector<std::string> &line_List);
 
   Envelope(int refer_idx, int charge, double mono_mz,
-           std::vector<double> &mzs, std::vector<double> &intensities);
+           std::vector<double> &mzs, std::vector<double> &intensities):
+      refer_idx_(refer_idx),
+      charge_(charge),
+      mono_mz_(mono_mz),
+      mzs_(mzs),
+      intensities_(intensities) {}
 
   EnvelopePtr convertToTheo(double mass_diff, int new_charge);
 
@@ -77,7 +86,7 @@ class Envelope {
                         int max_back_peak_num, int max_forw_peak_num);
 
   std::vector<int> calcBound(double percent_bound, double absolute_min_inte,
-                           int max_back_peak_num, int max_forw_peak_num);
+                             int max_back_peak_num, int max_forw_peak_num);
 
   void shift(int shift);
 
@@ -115,7 +124,7 @@ class Envelope {
   void setIntensity(int i, double intensity) {intensities_[i] = intensity;}
 
  protected:
-  
+
   int refer_idx_;
   // Charge of the envolope 
   int charge_;

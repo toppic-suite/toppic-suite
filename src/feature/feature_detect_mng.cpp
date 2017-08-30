@@ -38,8 +38,8 @@ FeatureDetectMng::FeatureDetectMng() {
   double ppo = 0.000015;
   bool use_min_tolerance = true;
   double min_tolerance = 0.01;
-  peak_tolerance_ptr_ = PeakTolerancePtr(
-      new PeakTolerance(ppo, use_min_tolerance, min_tolerance));
+  peak_tolerance_ptr_
+      = std::make_shared<PeakTolerance>(ppo, use_min_tolerance, min_tolerance);
 
   // extend sp parameter 
   double IM = MassConstant::getIsotopeMass();

@@ -31,7 +31,7 @@
 
 #include "base/logger.hpp"
 #include "feature/raw_ms_util.hpp"
-#include "feature/deconv_data_base.hpp" 
+#include "feature/deconv_data_base.hpp"
 
 namespace prot {
 
@@ -42,15 +42,14 @@ DeconvDataPtr DeconvDataBase::getDataPtr(PeakPtrVec &peak_list, FeatureMngPtr mn
     LOG_WARN("Max mz is too large: " << max_mz);
     return nullptr;
   }
-  return DeconvDataPtr(new DeconvData(peak_list, mng_ptr->max_mass_, 
-                                      mng_ptr->max_charge_, mng_ptr->window_size_));
+  return std::make_shared<DeconvData>(peak_list, mng_ptr->max_mass_,
+                                      mng_ptr->max_charge_, mng_ptr->window_size_);
 }
 
 
 // generate deconvolution data using given max mass, max charge
 DeconvDataPtr DeconvDataBase::getDataPtr(PeakPtrVec &peak_list, double max_mass,
                                          int max_charge, FeatureMngPtr mng_ptr) {
-
   if (max_charge < 1) {
     LOG_WARN("Max charge < 1");
     max_charge = mng_ptr->max_charge_;
@@ -74,8 +73,8 @@ DeconvDataPtr DeconvDataBase::getDataPtr(PeakPtrVec &peak_list, double max_mass,
       return nullptr;
     }
   }
-  return DeconvDataPtr(new DeconvData(peak_list, max_mass, 
-                                      max_charge, mng_ptr->window_size_));
+  return std::make_shared<DeconvData>(peak_list, max_mass,
+                                      max_charge, mng_ptr->window_size_);
 }
 
-}
+}  // namespace prot
