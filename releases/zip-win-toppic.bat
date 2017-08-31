@@ -11,4 +11,3 @@ copy C:\mingw64\bin\libwinpthread-1.dll toppic-win-%1
 mkdir toppic-win-%1\example_files
 copy ..\testcases\data\mzxml_test.msalign toppic-win-%1\example_files
 copy ..\testcases\data\mzxml_test.fasta toppic-win-%1\example_files
-copy ..\localization_mods.txt toppic-win-%1\example_files
