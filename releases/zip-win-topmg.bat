@@ -9,4 +9,4 @@ copy "C:\mingw64\bin\libstdc++-6.dll" topmg-win-%1
 copy C:\mingw64\bin\libwinpthread-1.dll topmg-win-%1
 
 mkdir topmg-win-%1\example_files
-copy ..\mass_graph_mods.txt topmg-win-%1\example_files
+copy .\example_files\mass_graph_mods.txt topmg-win-%1\example_files

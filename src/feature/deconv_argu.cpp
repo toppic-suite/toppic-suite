@@ -77,39 +77,38 @@ bool DeconvArgument::parse(int argc, char* argv[]) {
     po::options_description display_desc("Options");
 
     display_desc.add_options() 
-        ("help,h", "Print the help message.") 
+        ("help,h", "Print this help message.") 
         ("output,o",po::value<std::string>(&output_type),
          "<mgf|text|msalign>. Output file format: mgf, text or msalign. Default format is msalign.")
         ("level-one,l", "Report deconvolution results for MS1 spectra.")
-        ("keep,k", "Report peaks not in good isotopic envelopes.")
+        ("keep,k", "Report monoisotopic masses extracted from low quality isotopic envelopes.")
         ("max-charge,c", po::value<std::string> (&max_charge),
          "<integer value>. Set the maximum charge state of spectra. Default value is 30.")
         ("max-mass,m", po::value<std::string> (&max_mass),
-         "<float value>. Set the maximum monoisopotic mass of fragment ions. Default value is 100000.")
+         "<float value>. Set the maximum monoisopotic mass of fragment ions. Default value is 100000 Dalton.")
         ("mz-error,e", po::value<std::string> (&mz_error),
-         "<float value>. Set the error tolerance of m/z values of peaks. Default value is 0.02.")
+         "<float value>. Set the error tolerance of m/z values of peaks. Default value is 0.02 Dalton.")
         ("sn-ratio,s", po::value<std::string> (&sn_ratio),
          "<float value>. Set the signal/noise ratio. Default value is 1.")
-        ("missing-level-one,n","No MS1 spectra.")
-        ("spectrum-file-name", po::value<std::string>(&spectrum_file_name)->required(), "Spectrum file name with its path.")
+        ("missing-level-one,n","The input spectrum file does not contain MS1 spectra.")
         ;
     po::options_description desc("Options");
 
     desc.add_options() 
-        ("help,h", "Print the help message.") 
+        ("help,h", "Print this help message.") 
         ("output,o",po::value<std::string>(&output_type),
          "<mgf|text|msalign>. Output file format: mgf, text or msalign. Default format is msalign.")
         ("level-one,l", "Report deconvolution results for MS1 spectra.")
-        ("keep,k", "Report peaks not in good isotopic envelopes.")
+        ("keep,k", "Report monoisotopic masses extracted from low quality isotopic envelopes.")
         ("max-charge,c", po::value<std::string> (&max_charge),
          "<integer value>. Set the maximum charge state of spectra. Default value is 30.")
         ("max-mass,m", po::value<std::string> (&max_mass),
-         "<float value>. Set the maximum monoisopotic mass of fragment ions. Default value is 100000.")
+         "<float value>. Set the maximum monoisopotic mass of fragment ions. Default value is 100000 Dalton.")
         ("mz-error,e", po::value<std::string> (&mz_error),
-         "<float value>. Set the error tolerance of m/z values of peaks. Default value is 0.02.")
+         "<float value>. Set the error tolerance of m/z values of peaks. Default value is 0.02 Dalton.")
         ("sn-ratio,s", po::value<std::string> (&sn_ratio),
          "<float value>. Set the signal/noise ratio. Default value is 1.")
-        ("missing-level-one,n", "No MS1 spectra.")
+        ("missing-level-one,n","The input spectrum file does not contain MS1 spectra.")
         ("spectrum-file-name", po::value<std::string>(&spectrum_file_name)->required(), "Spectrum file name with its path.")
         ;
 
