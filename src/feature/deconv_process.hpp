@@ -43,8 +43,6 @@ namespace prot {
 class DeconvProcess {
  public:
   DeconvProcess(DeconvParaPtr para_ptr) {para_ptr_ = para_ptr;}
-  int getResult() {return result_;}
-  std::string getMsg() {return msg_;}
 
   void process();
 
@@ -53,13 +51,11 @@ class DeconvProcess {
 
  private:
   DeconvParaPtr para_ptr_;
-  std::string msg_ = "";
-  int result_ = 0;
 
   void copyParameters(FeatureMngPtr mng_ptr);
   void printParameter(FeatureMngPtr mng_ptr);
 
-  void updateMsg(MsHeaderPtr header_ptr, int scan, int total_scan_num);
+  std::string updateMsg(MsHeaderPtr header_ptr, int scan, int total_scan_num);
 };
 
 }

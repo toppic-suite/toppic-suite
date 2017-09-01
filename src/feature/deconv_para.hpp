@@ -62,7 +62,6 @@ class DeconvPara {
   OutputType output_type_;
 
   bool refine_prec_mass_;
-  int ms_level_; //ms level
   bool missing_level_one_;
 
   int max_charge_;

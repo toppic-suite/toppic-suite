@@ -40,7 +40,6 @@ DeconvPara::DeconvPara(std::map<std::string, std::string> &arguments) {
   setInputType(arguments["inputType"]);
   setOutputType(arguments["outputType"]);
 
-  ms_level_ = std::stoi(arguments["msLevel"]);
   missing_level_one_ = (arguments["missingLevelOne"] == "true");
   max_charge_ = std::stoi(arguments["maxCharge"]);
   max_mass_ = std::stod(arguments["maxMass"]);

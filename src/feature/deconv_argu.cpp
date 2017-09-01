@@ -47,7 +47,6 @@ void DeconvArgument::initArguments() {
   arguments_["inputType"] = "mzXML";
   arguments_["outputType"] = "msalign";
   arguments_["refinePrecMass"]="true";
-  arguments_["msLevel"] = "1";
   arguments_["missingLevelOne"] = "false";
   arguments_["maxCharge"] = "30";
   arguments_["maxMass"] = "100000";
@@ -80,10 +79,8 @@ bool DeconvArgument::parse(int argc, char* argv[]) {
         ("help,h", "Print this help message.") 
         ("output,o",po::value<std::string>(&output_type),
          "<mgf|text|msalign>. Output file format: mgf, text or msalign. Default format is msalign.")
-        ("level-one,l", "Report deconvolution results for MS1 spectra.")
-        ("keep,k", "Report monoisotopic masses extracted from low quality isotopic envelopes.")
         ("max-charge,c", po::value<std::string> (&max_charge),
-         "<integer value>. Set the maximum charge state of spectra. Default value is 30.")
+         "<integer value>. Set the maximum charge state of fragment and precursor ions. Default value is 30.")
         ("max-mass,m", po::value<std::string> (&max_mass),
          "<float value>. Set the maximum monoisopotic mass of fragment ions. Default value is 100000 Dalton.")
         ("mz-error,e", po::value<std::string> (&mz_error),
@@ -98,10 +95,8 @@ bool DeconvArgument::parse(int argc, char* argv[]) {
         ("help,h", "Print this help message.") 
         ("output,o",po::value<std::string>(&output_type),
          "<mgf|text|msalign>. Output file format: mgf, text or msalign. Default format is msalign.")
-        ("level-one,l", "Report deconvolution results for MS1 spectra.")
-        ("keep,k", "Report monoisotopic masses extracted from low quality isotopic envelopes.")
         ("max-charge,c", po::value<std::string> (&max_charge),
-         "<integer value>. Set the maximum charge state of spectra. Default value is 30.")
+         "<integer value>. Set the maximum charge state of fragment and precursor ions. Default value is 30.")
         ("max-mass,m", po::value<std::string> (&max_mass),
          "<float value>. Set the maximum monoisopotic mass of fragment ions. Default value is 100000 Dalton.")
         ("mz-error,e", po::value<std::string> (&mz_error),
@@ -110,6 +105,7 @@ bool DeconvArgument::parse(int argc, char* argv[]) {
          "<float value>. Set the signal/noise ratio. Default value is 1.")
         ("missing-level-one,n","The input spectrum file does not contain MS1 spectra.")
         ("spectrum-file-name", po::value<std::string>(&spectrum_file_name)->required(), "Spectrum file name with its path.")
+        ("keep,k", "Report monoisotopic masses extracted from low quality isotopic envelopes.")
         ;
 
     po::positional_options_description positional_options;
@@ -149,9 +145,6 @@ bool DeconvArgument::parse(int argc, char* argv[]) {
     }
     if (vm.count("keep")) {
       arguments_["keepUnusedPeaks"] = "true";
-    }
-    if (vm.count("level-one")) {
-      arguments_["msLevel"] = "1";
     }
     if (vm.count("max-mass")) {
       arguments_["maxMass"] = max_mass;
