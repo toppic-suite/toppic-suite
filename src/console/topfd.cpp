@@ -45,6 +45,7 @@ namespace prot {
 
 int deconvProcess(int argc, char* argv[]) {
   try {
+    time_t start = time(0);
     std::string exe_dir = FileUtil::getExecutiveDir(argv[0]);
     BaseData::init(exe_dir);
     DeconvArgument argu_processor;
@@ -66,6 +67,9 @@ int deconvProcess(int argc, char* argv[]) {
       LOG_DEBUG("file name " << spec_file_name);
       FeatureDetect::process(para_ptr);
     }
+
+    time_t end = time(0);
+    std::cout << "Runing time: " << std::to_string(static_cast<int>(difftime(end, start))) << " seconds." << std::endl;
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
