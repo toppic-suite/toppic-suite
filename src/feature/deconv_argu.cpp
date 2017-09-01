@@ -83,15 +83,14 @@ bool DeconvArgument::parse(int argc, char* argv[]) {
         ("output,o",po::value<std::string>(&output_type),
          "<mgf|text|msalign>. Output file format: mgf, text or msalign. Default format is msalign.")
         ("max-charge,c", po::value<std::string> (&max_charge),
-         "<integer value>. Set the maximum charge state of fragment and precursor ions. Default value is 30.")
+         "<integer value>. Set the maximum charge state of precursor and fragment ions. Default value is 30.")
         ("max-mass,m", po::value<std::string> (&max_mass),
-         "<float value>. Set the maximum monoisopotic mass of fragment ions. Default value is 100000 Dalton.")
+         "<float value>. Set the maximum monoisopotic mass of precursor and fragment ions. Default value is 100000 Dalton.")
         ("mz-error,e", po::value<std::string> (&mz_error),
          "<float value>. Set the error tolerance of m/z values of peaks. Default value is 0.02 Dalton.")
         ("sn-ratio,s", po::value<std::string> (&sn_ratio),
          "<float value>. Set the signal/noise ratio. Default value is 1.")
         ("missing-level-one,n","The input spectrum file does not contain MS1 spectra.")
-        ("multiple-mass,u", "Output multiple masses for one envelope.")
         ;
     po::options_description desc("Options");
 
@@ -100,9 +99,9 @@ bool DeconvArgument::parse(int argc, char* argv[]) {
         ("output,o",po::value<std::string>(&output_type),
          "<mgf|text|msalign>. Output file format: mgf, text or msalign. Default format is msalign.")
         ("max-charge,c", po::value<std::string> (&max_charge),
-         "<integer value>. Set the maximum charge state of fragment and precursor ions. Default value is 30.")
+         "<integer value>. Set the maximum charge state of precursor and fragment ions. Default value is 30.")
         ("max-mass,m", po::value<std::string> (&max_mass),
-         "<float value>. Set the maximum monoisopotic mass of fragment ions. Default value is 100000 Dalton.")
+         "<float value>. Set the maximum monoisopotic mass of precursor and fragment ions. Default value is 100000 Dalton.")
         ("mz-error,e", po::value<std::string> (&mz_error),
          "<float value>. Set the error tolerance of m/z values of peaks. Default value is 0.02 Dalton.")
         ("sn-ratio,s", po::value<std::string> (&sn_ratio),
