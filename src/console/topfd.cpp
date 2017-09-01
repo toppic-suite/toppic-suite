@@ -61,12 +61,7 @@ int deconvProcess(int argc, char* argv[]) {
     DeconvProcess process(para_ptr);
     LOG_DEBUG("init process");
     process.process();
-
-    if (arguments["outputType"] == "msalign") {
-      std::string spec_file_name = arguments["spectrumFileName"];
-      LOG_DEBUG("file name " << spec_file_name);
-      FeatureDetect::process(para_ptr);
-    }
+    FeatureDetect::process(para_ptr);
 
     time_t end = time(0);
     std::cout << "Runing time: " << std::to_string(static_cast<int>(difftime(end, start))) << " seconds." << std::endl;

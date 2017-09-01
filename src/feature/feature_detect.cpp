@@ -338,7 +338,7 @@ void FeatureDetect::process(DeconvParaPtr para_ptr) {
   of1.precision(16);
   DeconvProcess::outputParameter(of1, para_ptr, "#");
   for (size_t i = 0; i < ms1_ptr_vec.size(); i++) {
-    MsalignWriter::writeText(of1, ms1_ptr_vec[i], 1);
+    MsalignWriter::write(of1, ms1_ptr_vec[i], 1);
   }
   of1.close();
   // outputHeaders(header_ptr_vec);

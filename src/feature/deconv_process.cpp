@@ -34,8 +34,6 @@
 #include "base/file_util.hpp"
 #include "feature/deconv_process.hpp"
 #include "feature/msalign_writer.hpp"
-#include "feature/mgf_writer.hpp"
-#include "feature/text_writer.hpp"
 
 namespace prot {
 
@@ -53,7 +51,6 @@ void DeconvProcess::outputParameter(std::ostream &output, DeconvParaPtr para_ptr
   output << prefix << "TopFD 1.0.0 (" << __DATE__ << ")" << std::endl;
   output << prefix << "********************** Parameters **********************" << std::endl;
   output << prefix << std::setw(40) << std::left << "Input file: " << para_ptr->data_file_name_ << std::endl;
-  output << prefix << std::setw(40) << std::left << "Output file format: " << para_ptr->getOutputType() << std::endl;
   output << prefix << std::setw(40) << std::left << "Data type: " << "centroided" << std::endl;
   output << prefix << std::setw(40) << std::left << "Maximum charge: " << para_ptr->max_charge_ << std::endl;
   output << prefix << std::setw(40) << std::left << "Maximum monoisotopic mass: " << para_ptr->max_mass_ << " Dalton" << std::endl;
@@ -80,16 +77,8 @@ void DeconvProcess::process() {
   std::string file_name = para_ptr_->getDataFileName();
   // writer
   std::string ms1_name, ms2_name;
-  if (para_ptr_->output_type_ == OUTPUT_MGF) {
-    ms1_name = FileUtil::basename(file_name) + "_ms1.mgf";
-    ms2_name = FileUtil::basename(file_name) + "_ms2.mgf";
-  } else if (para_ptr_->output_type_ == OUTPUT_MSALIGN) {
-    ms1_name = FileUtil::basename(file_name) + "_ms1.msalign";
-    ms2_name = FileUtil::basename(file_name) + "_ms2.msalign";
-  } else if (para_ptr_->output_type_ == OUTPUT_TEXT) {
-    ms1_name = FileUtil::basename(file_name) + "_ms1.txt";
-    ms2_name = FileUtil::basename(file_name) + "_ms2.txt";
-  }
+  ms1_name = FileUtil::basename(file_name) + "_ms1.msalign";
+  ms2_name = FileUtil::basename(file_name) + "_ms2.msalign";
 
   std::ofstream of1(ms1_name, std::ofstream::out);
   std::ofstream of2(ms2_name, std::ofstream::out);
@@ -128,9 +117,7 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr, FeatureMsReaderPtr read
       deconv_ptr->setData(peak_list);
       deconv_ptr->run();
       MatchEnvPtrVec result_envs = deconv_ptr->getResult();
-      if (para_ptr_->output_type_ == OUTPUT_MSALIGN) {
-        MsalignWriter::writeText(of1, result_envs, header_ptr);
-      }
+      MsalignWriter::write(of1, result_envs, header_ptr);
       count1++;
     } else {
       if (para_ptr_->missing_level_one_) {
@@ -149,13 +136,7 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr, FeatureMsReaderPtr read
       }
       deconv_ptr->run();
       MatchEnvPtrVec result_envs = deconv_ptr->getResult();
-      if (para_ptr_->output_type_ == OUTPUT_MGF) {
-        MGFWriter::writeText(of2, result_envs, header_ptr);
-      } else if (para_ptr_->output_type_ == OUTPUT_MSALIGN) {
-        MsalignWriter::writeText(of2, result_envs, header_ptr);
-      } else if (para_ptr_->output_type_ == OUTPUT_TEXT) {
-        TextWriter::writeText(of2, result_envs, header_ptr);
-      }
+      MsalignWriter::write(of2, result_envs, header_ptr);
       count2++;
     }
   }

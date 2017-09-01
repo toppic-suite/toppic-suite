@@ -39,7 +39,6 @@ namespace prot {
 DeconvPara::DeconvPara(std::map<std::string, std::string> &arguments) {
   data_file_name_ = arguments["spectrumFileName"];
   setInputType(arguments["inputType"]);
-  setOutputType(arguments["outputType"]);
 
   missing_level_one_ = (arguments["missingLevelOne"] == "true");
   max_charge_ = std::stoi(arguments["maxCharge"]);
@@ -50,19 +49,6 @@ DeconvPara::DeconvPara(std::map<std::string, std::string> &arguments) {
   prec_window_ = std::stod(arguments["precWindow"]);
   exec_dir_ = arguments["executiveDir"];
   output_multiple_mass_ = (arguments["outMultipleMass"] == "true");
-}
-
-int DeconvPara::setOutputType(const std::string & format) {
-  if (format == "mgf") {
-    output_type_ = OUTPUT_MGF;
-  } else if (format == "msalign") {
-    output_type_ = OUTPUT_MSALIGN;
-  } else if (format == "text") {
-    output_type_ = OUTPUT_TEXT;
-  } else {
-    return 1;
-  }
-  return 0;
 }
 
 int DeconvPara::setInputType(const std::string &format) {

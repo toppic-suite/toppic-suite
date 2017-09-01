@@ -42,11 +42,11 @@ namespace prot {
 
 class MsalignWriter {
  public:
-  static void writeText(std::ofstream &file, MatchEnvPtrVec &envs, MsHeaderPtr header_ptr);
+  static void write(std::ofstream &file, MatchEnvPtrVec &envs, MsHeaderPtr header_ptr);
 
-  static void writeText(std::ofstream &file, DeconvMsPtr ms_ptr);
+  static void write(std::ofstream &file, DeconvMsPtr ms_ptr);
 
-  static void writeText(std::ofstream &file, DeconvMsPtr ms_ptr, int mslevel);
+  static void write(std::ofstream &file, DeconvMsPtr ms_ptr, int mslevel);
 };
 
 }  // namespace prot

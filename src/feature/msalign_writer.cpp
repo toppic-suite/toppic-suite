@@ -33,7 +33,7 @@
 
 namespace prot {
 
-void MsalignWriter::writeText(std::ofstream &file, MatchEnvPtrVec &envs,
+void MsalignWriter::write(std::ofstream &file, MatchEnvPtrVec &envs,
                               MsHeaderPtr header_ptr) {
   file << "BEGIN IONS" << std::endl;
   file << "ID=" << header_ptr->getId() << std::endl;
@@ -68,7 +68,7 @@ void MsalignWriter::writeText(std::ofstream &file, MatchEnvPtrVec &envs,
   file << std::endl;
 }
 
-void MsalignWriter::writeText(std::ofstream &file, DeconvMsPtr ms_ptr) {
+void MsalignWriter::write(std::ofstream &file, DeconvMsPtr ms_ptr) {
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
   file << "BEGIN IONS" << std::endl;
   file << "ID=" << header_ptr->getId() << std::endl;
@@ -101,7 +101,7 @@ void MsalignWriter::writeText(std::ofstream &file, DeconvMsPtr ms_ptr) {
   file << std::endl;
 }
 
-void MsalignWriter::writeText(std::ofstream &file, DeconvMsPtr ms_ptr, int mslevel) {
+void MsalignWriter::write(std::ofstream &file, DeconvMsPtr ms_ptr, int mslevel) {
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
   file << "BEGIN IONS" << std::endl;
   file << "ID=" << header_ptr->getId() << std::endl;
