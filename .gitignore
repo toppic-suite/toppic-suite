@@ -1,7 +1,13 @@
 build/*
 thirdparty/*
 bin/*
-releases/*
+releases/topmg-linux-*
+releases/toppic-linux-*
+releases/topfd-linux-*
+releases/topmg-win-*
+releases/toppic-win-*
+releases/topfd-win-*
+releases/win-lib/*
 
 *.o
 *.so
