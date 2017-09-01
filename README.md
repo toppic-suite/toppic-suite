@@ -22,7 +22,7 @@ cmake ..
 make -j$(nproc)
 
 cd bin
-link -s ../conf ./
+ln -s ../toppic_resources .
 ```
 
 ### Windows:
