@@ -40,6 +40,7 @@
 #include "feature/feature_detect_mng.hpp"
 #include "feature/feature_detect.hpp"
 #include "feature/msalign_writer.hpp"
+#include "feature/deconv_process.hpp"
 
 namespace prot {
 
@@ -280,11 +281,13 @@ void setFeatures(MsHeaderPtr2D &header_groups, const FeaturePtrVec &features) {
 
 void writeMSFT(const std::string & input_file_name,
                const std::string & output_file_name,
-               const MsHeaderPtrVec &header_ptrs) {
+               const MsHeaderPtrVec &header_ptrs,
+               DeconvParaPtr para_ptr) {
   int sp_num_in_group = 1;
   MsAlignReader sp_reader(input_file_name, sp_num_in_group, nullptr);
   std::ofstream of(output_file_name, std::ofstream::out);
   of.precision(16);
+  DeconvProcess::outputParameter(of, para_ptr, "#"); 
   DeconvMsPtr ms_ptr;
   int cnt = 0;
   while ((ms_ptr = sp_reader.getNextMs()) != nullptr) {
@@ -330,9 +333,10 @@ void FeatureDetect::process(DeconvParaPtr para_ptr) {
   groupHeaders(ms1_ptr_vec, header_ptr_vec, mng_ptr, header_groups, features);
   setFeatures(header_groups, features);
   std::string output_file_name = base_name + ".msft";
-  writeMSFT(ms2_file_name, output_file_name, header_ptr_vec);
+  writeMSFT(ms2_file_name, output_file_name, header_ptr_vec, para_ptr);
   std::ofstream of1(ms1_file_name, std::ofstream::out);
   of1.precision(16);
+  DeconvProcess::outputParameter(of1, para_ptr, "#");
   for (size_t i = 0; i < ms1_ptr_vec.size(); i++) {
     MsalignWriter::writeText(of1, ms1_ptr_vec[i], 1);
   }

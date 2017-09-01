@@ -32,7 +32,7 @@
 #include <vector>
 #include <string>
 
-#include <boost/algorithm/string.hpp>
+#include "boost/algorithm/string.hpp"
 
 #include "base/logger.hpp"
 #include "base/activation_base.hpp"
@@ -65,7 +65,7 @@ std::vector<std::string> MsAlignReader::readOneSpectrum() {
         line_list.push_back(line);
       }
       return line_list;
-    } else if (line == "") {
+    } else if (line == "" || line[0] == '#') {
       continue;
     } else {
       if (line_list.size() > 0) {
