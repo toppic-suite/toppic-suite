@@ -48,7 +48,6 @@ void DeconvArgument::initArguments() {
   arguments_["executiveDir"] = "";
   arguments_["spectrumFileName"] = "";
   arguments_["inputType"] = "mzXML";
-  arguments_["outputType"] = "msalign";
   arguments_["refinePrecMass"]="true";
   arguments_["missingLevelOne"] = "false";
   arguments_["maxCharge"] = "30";
@@ -67,7 +66,6 @@ void DeconvArgument::showUsage(boost::program_options::options_description &desc
 
 bool DeconvArgument::parse(int argc, char* argv[]) {
   std::string spectrum_file_name = "";
-  std::string output_type = "";
   std::string max_charge = "";
   std::string max_mass = "";
   std::string mz_error = "";
@@ -80,8 +78,6 @@ bool DeconvArgument::parse(int argc, char* argv[]) {
 
     display_desc.add_options()
         ("help,h", "Print this help message.")
-        ("output,o",po::value<std::string>(&output_type),
-         "<mgf|text|msalign>. Output file format: mgf, text or msalign. Default format is msalign.")
         ("max-charge,c", po::value<std::string> (&max_charge),
          "<integer value>. Set the maximum charge state of precursor and fragment ions. Default value is 30.")
         ("max-mass,m", po::value<std::string> (&max_mass),
@@ -96,8 +92,6 @@ bool DeconvArgument::parse(int argc, char* argv[]) {
 
     desc.add_options() 
         ("help,h", "Print this help message.") 
-        ("output,o",po::value<std::string>(&output_type),
-         "<mgf|text|msalign>. Output file format: mgf, text or msalign. Default format is msalign.")
         ("max-charge,c", po::value<std::string> (&max_charge),
          "<integer value>. Set the maximum charge state of precursor and fragment ions. Default value is 30.")
         ("max-mass,m", po::value<std::string> (&max_mass),
@@ -141,9 +135,6 @@ bool DeconvArgument::parse(int argc, char* argv[]) {
     std::string argv_0(argv[0]);
     arguments_["executiveDir"] = FileUtil::getExecutiveDir(argv_0);
     arguments_["spectrumFileName"] = spectrum_file_name;
-    if (vm.count("output")) {
-      arguments_["outputType"] = output_type;
-    }
     if (vm.count("max-charge")) {
       arguments_["maxCharge"] = max_charge;
     }
@@ -178,12 +169,6 @@ bool DeconvArgument::parse(int argc, char* argv[]) {
 bool DeconvArgument::validateArguments() {
   if (!boost::filesystem::exists(arguments_["spectrumFileName"])) {
     LOG_ERROR("Spectrum file " << arguments_["spectrumFileName"] << " does not exist!");
-    return false;
-  }
-  std::string output_type = arguments_["outputType"];
-  std::transform(output_type.begin(), output_type.end(), output_type.begin(), ::tolower);
-  if (output_type != "msalign" && output_type != "mgf" && output_type != "text") {
-    LOG_ERROR("Output type " << output_type << " error! The value should be mgf|text|msalign!");
     return false;
   }
   return true;

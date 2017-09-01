@@ -39,7 +39,6 @@
 
 namespace prot {
 
-enum OutputType {OUTPUT_MGF, OUTPUT_MSALIGN, OUTPUT_TEXT};
 enum InputType {INPUT_MGF, INPUT_MZXML};
 
 class DeconvPara {
@@ -50,16 +49,11 @@ class DeconvPara {
 
   std::string getDataFileName() {return data_file_name_;}
 
-  int setOutputType (const std::string & format);
-
   int setInputType (const std::string & format);
-
-  std::string getOutputType() {return output_type_str_[output_type_];}
 
   std::string data_file_name_;
   std::string exec_dir_;
   InputType input_type_;
-  OutputType output_type_;
 
   bool refine_prec_mass_;
   bool missing_level_one_;
@@ -73,8 +67,6 @@ class DeconvPara {
   bool output_multiple_mass_ = false; 
 
   double prec_window_;
-
-  std::vector<std::string> output_type_str_ = {"mgf", "msalign", "text"};
 };
 
 typedef std::shared_ptr<DeconvPara> DeconvParaPtr;
