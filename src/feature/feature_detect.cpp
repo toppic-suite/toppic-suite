@@ -316,12 +316,12 @@ void FeatureDetect::process(DeconvParaPtr para_ptr) {
   std::string sp_file_name = para_ptr->getDataFileName();
   std::string base_name = FileUtil::basename(sp_file_name);
   // read ms1 deconvoluted spectra
-  std::string ms1_file_name = base_name + ".ms1";
+  std::string ms1_file_name = base_name + "_ms1.msalign";
   DeconvMsPtrVec ms1_ptr_vec;
   if (!para_ptr->missing_level_one_) readSpectra(ms1_file_name, ms1_ptr_vec);
   // read ms2 deconvoluted header
   LOG_DEBUG("start reading ms2");
-  std::string ms2_file_name = base_name + ".msalign";
+  std::string ms2_file_name = base_name + "_ms2.msalign";
   MsHeaderPtrVec header_ptr_vec;
   readHeaders(ms2_file_name, header_ptr_vec);
   LOG_DEBUG("start grouping");

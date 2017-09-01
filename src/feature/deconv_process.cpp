@@ -56,21 +56,21 @@ void DeconvProcess::printParameter(FeatureMngPtr mng_ptr) {
   std::cout << std::setw(40) << std::left << "Output file format: " << para_ptr_->getOutputType() << std::endl;
   std::cout << std::setw(40) << std::left << "Data type: " << "centroided" << std::endl;
   std::cout << std::setw(40) << std::left << "Maximum charge: " << mng_ptr->max_charge_ << std::endl;
-  std::cout << std::setw(40) << std::left << "Maximum mass: " << mng_ptr->max_mass_ << std::endl;
-  std::cout << std::setw(40) << std::left << "m/z error tolerance: " << mng_ptr->mz_tolerance_ << std::endl;
-  std::cout << std::setw(40) << std::left << "sn ratio: " << mng_ptr->sn_ratio_ << std::endl;
-  std::cout << std::setw(40) << std::left << "Keep unused peak: " << (mng_ptr->keep_unused_peaks_? "True":"False") << std::endl;
-  std::cout << std::setw(40) << std::left << "Output multiple mass: " << (mng_ptr->output_multiple_mass_? "True":"False") << std::endl;
+  std::cout << std::setw(40) << std::left << "Maximum monoisotopic mass: " << mng_ptr->max_mass_ << " Dalton" << std::endl;
+  std::cout << std::setw(40) << std::left << "Error tolerance: " << mng_ptr->mz_tolerance_ << " Dalton" << std::endl;
+  std::cout << std::setw(40) << std::left << "Signal/noise ratio: " << mng_ptr->sn_ratio_ << std::endl;
   std::cout << "********************** Parameters **********************" << std::endl;
 }
+//std::cout << std::setw(40) << std::left << "Keep low quality isopotic envelops: " << (mng_ptr->keep_unused_peaks_? "True":"False") << std::endl;
 
-void DeconvProcess::updateMsg(MsHeaderPtr header_ptr, int scan, int total_scan_num) {
+std::string DeconvProcess::updateMsg(MsHeaderPtr header_ptr, int scan, int total_scan_num) {
   std::string percentage = std::to_string(scan * 100 / total_scan_num);
-  msg_ = "Processing spectrum " + header_ptr->getTitle() + "...";
-  while (msg_.length() < 40) {
-    msg_ += " ";
+  std::string msg = "Processing spectrum " + header_ptr->getTitle() + "...";
+  while (msg.length() < 40) {
+    msg += " ";
   }
-  msg_ = msg_ + percentage + "% finished.";
+  msg = msg + percentage + "% finished.";
+  return msg;
 }
 
 void DeconvProcess::process() {
@@ -82,14 +82,14 @@ void DeconvProcess::process() {
   // writer
   std::string ms1_name, ms2_name;
   if (para_ptr_->output_type_ == OUTPUT_MGF) {
-    ms1_name = FileUtil::basename(file_name) + ".mgf";
-    ms2_name = FileUtil::basename(file_name) + ".mgf";
+    ms1_name = FileUtil::basename(file_name) + "_ms1.mgf";
+    ms2_name = FileUtil::basename(file_name) + "_ms2.mgf";
   } else if (para_ptr_->output_type_ == OUTPUT_MSALIGN) {
-    ms1_name = FileUtil::basename(file_name) + ".ms1";
-    ms2_name = FileUtil::basename(file_name) + ".msalign";
+    ms1_name = FileUtil::basename(file_name) + "_ms1.msalign";
+    ms2_name = FileUtil::basename(file_name) + "_ms2.msalign";
   } else if (para_ptr_->output_type_ == OUTPUT_TEXT) {
-    ms1_name = FileUtil::basename(file_name) + ".txt";
-    ms2_name = FileUtil::basename(file_name) + ".txt";
+    ms1_name = FileUtil::basename(file_name) + "_ms1.txt";
+    ms2_name = FileUtil::basename(file_name) + "_ms2.txt";
   }
 
   std::ofstream of1(ms1_name, std::ofstream::out);
@@ -115,17 +115,13 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr, FeatureMsReaderPtr read
   while ((ms_ptr = reader_ptr->getNextMs(para_ptr_->prec_window_)) != nullptr) {
     PeakPtrVec peak_list = ms_ptr->getPeakPtrVec();
     LOG_DEBUG("peak list size " << peak_list.size());
-    /*if (peak_list.size() == 0) {*/
-    // continue;
-    /*}*/
+
     MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
     LOG_DEBUG("ms level " << header_ptr->getMsLevel() );
-    if (header_ptr->getMsLevel() == 1 &&  para_ptr_->ms_level_ != 1) {
-      continue;
-    }
+
     // int scan_num_ = header_ptr->getFirstScanNum();
-    updateMsg(header_ptr, count1 + count2 + 1, total_scan_num);
-    std::cout << "\r" << msg_;
+    std::string msg = updateMsg(header_ptr, count1 + count2 + 1, total_scan_num);
+    std::cout << "\r" << msg;
     LOG_DEBUG("set data....");
     if (header_ptr->getMsLevel() == 1) {
       deconv_ptr->setData(peak_list);
@@ -162,7 +158,7 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr, FeatureMsReaderPtr read
       count2++;
     }
   }
-  // std::cout << "Deconvolution finished." << std::endl;
+  std::cout << std::endl << "Deconvolution finished." << std::endl;
 }
 
 }  // namespace prot
