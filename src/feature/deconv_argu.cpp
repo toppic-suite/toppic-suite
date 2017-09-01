@@ -28,9 +28,12 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 #include <iomanip>
-#include <boost/algorithm/string.hpp>
+#include <string>
+#include <algorithm>
+
+#include "boost/algorithm/string.hpp"
+
 #include "base/file_util.hpp"
 #include "base/xml_dom_util.hpp"
 #include "feature/deconv_argu.hpp"
@@ -59,8 +62,8 @@ void DeconvArgument::initArguments() {
 }
 
 void DeconvArgument::showUsage(boost::program_options::options_description &desc) {
-  std::cout << "Usage: toppfd [options] spectrum-file-name" << std::endl; 
-  std::cout << desc << std::endl; 
+  std::cout << "Usage: toppfd [options] spectrum-file-name" << std::endl;
+  std::cout << desc << std::endl;
 }
 
 bool DeconvArgument::parse(int argc, char* argv[]) {
@@ -76,8 +79,8 @@ bool DeconvArgument::parse(int argc, char* argv[]) {
     namespace po = boost::program_options;
     po::options_description display_desc("Options");
 
-    display_desc.add_options() 
-        ("help,h", "Print this help message.") 
+    display_desc.add_options()
+        ("help,h", "Print this help message.")
         ("output,o",po::value<std::string>(&output_type),
          "<mgf|text|msalign>. Output file format: mgf, text or msalign. Default format is msalign.")
         ("level-one,l", "Report deconvolution results for MS1 spectra.")
@@ -91,6 +94,7 @@ bool DeconvArgument::parse(int argc, char* argv[]) {
         ("sn-ratio,s", po::value<std::string> (&sn_ratio),
          "<float value>. Set the signal/noise ratio. Default value is 1.")
         ("missing-level-one,n","The input spectrum file does not contain MS1 spectra.")
+        ("multiple-mass,u", "Output multiple masses for one envelope.")
         ;
     po::options_description desc("Options");
 
@@ -109,6 +113,7 @@ bool DeconvArgument::parse(int argc, char* argv[]) {
         ("sn-ratio,s", po::value<std::string> (&sn_ratio),
          "<float value>. Set the signal/noise ratio. Default value is 1.")
         ("missing-level-one,n","The input spectrum file does not contain MS1 spectra.")
+        ("multiple-mass,u", "Output multiple masses for one envelope.")
         ("spectrum-file-name", po::value<std::string>(&spectrum_file_name)->required(), "Spectrum file name with its path.")
         ;
 
@@ -120,14 +125,14 @@ bool DeconvArgument::parse(int argc, char* argv[]) {
     //= boost::filesystem::basename(argv[0]);
     po::variables_map vm;
     try {
-      po::store(po::command_line_parser(argc, argv).options(desc).positional(positional_options).run(),vm); 
+      po::store(po::command_line_parser(argc, argv).options(desc).positional(positional_options).run(), vm);
       if ( vm.count("help") ) {
         showUsage(display_desc);
         return false;
       }
-      po::notify(vm); 
+      po::notify(vm);
       // throws on error, so do after help in case there are any problems
-    } 
+    }
     catch(boost::program_options::required_option& e) {
       std::cerr << "ERROR: " << e.what() << std::endl << std::endl;
       showUsage(display_desc);
@@ -138,7 +143,7 @@ bool DeconvArgument::parse(int argc, char* argv[]) {
       showUsage(display_desc);
       return false;
     }
-    std::string argv_0 (argv[0]);
+    std::string argv_0(argv[0]);
     arguments_["executiveDir"] = FileUtil::getExecutiveDir(argv_0);
     arguments_["spectrumFileName"] = spectrum_file_name;
     if (vm.count("output")) {
@@ -165,10 +170,13 @@ bool DeconvArgument::parse(int argc, char* argv[]) {
     if (vm.count("missing-level-one")) {
       arguments_["missingLevelOne"] = "true";
     }
-
+    if (vm.count("multiple-mass")) {
+      arguments_["outMultipleMass"] = "true";
+    }
   }
-  catch(std::exception&e ) {
-    std::cerr << "Unhandled Exception in parsing command line"<<e.what()<<", application will now exit"<<std::endl;
+  catch(std::exception& e) {
+    std::cerr << "Unhandled Exception in parsing command line "
+        << e.what() << ", application will now exit" << std::endl;
     return false;
   }
 
@@ -177,16 +185,16 @@ bool DeconvArgument::parse(int argc, char* argv[]) {
 
 bool DeconvArgument::validateArguments() {
   if (!boost::filesystem::exists(arguments_["spectrumFileName"])) {
-    LOG_ERROR("Database file " << arguments_["spectrumFileName"] << " does not exist!");
+    LOG_ERROR("Spectrum file " << arguments_["spectrumFileName"] << " does not exist!");
     return false;
   }
   std::string output_type = arguments_["outputType"];
   std::transform(output_type.begin(), output_type.end(), output_type.begin(), ::tolower);
-  if(output_type != "msalign" && output_type != "mgf" && output_type != "text") {
+  if (output_type != "msalign" && output_type != "mgf" && output_type != "text") {
     LOG_ERROR("Output type " << output_type << " error! The value should be mgf|text|msalign!");
     return false;
   }
   return true;
 }
 
-} /* namespace prot */
+}  // namespace prot

@@ -28,9 +28,10 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
-
 #include <iostream>
+#include <map>
+#include <string>
+
 #include "feature/deconv_para.hpp"
 
 namespace prot {
@@ -49,6 +50,7 @@ DeconvPara::DeconvPara(std::map<std::string, std::string> &arguments) {
   keep_unused_peaks_ = (arguments["keepUnusedPeaks"] == "true");
   prec_window_ = std::stod(arguments["precWindow"]);
   exec_dir_ = arguments["executiveDir"];
+  output_multiple_mass_ = (arguments["outMultipleMass"] == "true");
 }
 
 int DeconvPara::setOutputType(const std::string & format) {
@@ -65,9 +67,9 @@ int DeconvPara::setOutputType(const std::string & format) {
 }
 
 int DeconvPara::setInputType(const std::string &format) {
-  if (format=="mgf") {
+  if (format == "mgf") {
     input_type_ = INPUT_MGF;
-  } else if (format=="mzXML") {
+  } else if (format == "mzXML") {
     input_type_ = INPUT_MZXML;
   } else {
     return 1;
@@ -75,5 +77,4 @@ int DeconvPara::setInputType(const std::string &format) {
   return 0;
 }
 
-
-}
+}  // namespace prot

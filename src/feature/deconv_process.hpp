@@ -50,6 +50,7 @@ class DeconvProcess {
 
   void processSp(DeconvOneSpPtr deconv_ptr, FeatureMsReaderPtr reader_ptr, 
                  std::ofstream &os1, std::ofstream &os2);
+  static void outputParameter(std::ostream &output, DeconvParaPtr para_ptr, const std::string & prefix = "");
 
  private:
   DeconvParaPtr para_ptr_;
@@ -57,7 +58,6 @@ class DeconvProcess {
   int result_ = 0;
 
   void copyParameters(FeatureMngPtr mng_ptr);
-  void printParameter(FeatureMngPtr mng_ptr);
 
   void updateMsg(MsHeaderPtr header_ptr, int scan, int total_scan_num);
 };

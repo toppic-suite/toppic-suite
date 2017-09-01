@@ -49,19 +49,19 @@ void DeconvProcess::copyParameters(FeatureMngPtr mng_ptr) {
   mng_ptr->prec_deconv_interval_ = para_ptr_->prec_window_;
 }
 
-void DeconvProcess::printParameter(FeatureMngPtr mng_ptr) {
-  std::cout << "TopFD 1.0.0 (" << __DATE__ << ")" << std::endl;
-  std::cout << "********************** Parameters **********************" << std::endl;
-  std::cout << std::setw(40) << std::left << "Input file: " << para_ptr_->data_file_name_ << std::endl;
-  std::cout << std::setw(40) << std::left << "Output file format: " << para_ptr_->getOutputType() << std::endl;
-  std::cout << std::setw(40) << std::left << "Data type: " << "centroided" << std::endl;
-  std::cout << std::setw(40) << std::left << "Maximum charge: " << mng_ptr->max_charge_ << std::endl;
-  std::cout << std::setw(40) << std::left << "Maximum mass: " << mng_ptr->max_mass_ << std::endl;
-  std::cout << std::setw(40) << std::left << "m/z error tolerance: " << mng_ptr->mz_tolerance_ << std::endl;
-  std::cout << std::setw(40) << std::left << "sn ratio: " << mng_ptr->sn_ratio_ << std::endl;
-  std::cout << std::setw(40) << std::left << "Keep unused peak: " << (mng_ptr->keep_unused_peaks_? "True":"False") << std::endl;
-  std::cout << std::setw(40) << std::left << "Output multiple mass: " << (mng_ptr->output_multiple_mass_? "True":"False") << std::endl;
-  std::cout << "********************** Parameters **********************" << std::endl;
+void DeconvProcess::outputParameter(std::ostream &output, DeconvParaPtr para_ptr, const std::string & prefix) {
+  output << prefix << "TopFD 1.0.0 (" << __DATE__ << ")" << std::endl;
+  output << prefix << "********************** Parameters **********************" << std::endl;
+  output << prefix << std::setw(40) << std::left << "Input file: " << para_ptr->data_file_name_ << std::endl;
+  output << prefix << std::setw(40) << std::left << "Output file format: " << para_ptr->getOutputType() << std::endl;
+  output << prefix << std::setw(40) << std::left << "Data type: " << "centroided" << std::endl;
+  output << prefix << std::setw(40) << std::left << "Maximum charge: " << para_ptr->max_charge_ << std::endl;
+  output << prefix << std::setw(40) << std::left << "Maximum mass: " << para_ptr->max_mass_ << std::endl;
+  output << prefix << std::setw(40) << std::left << "m/z error tolerance: " << para_ptr->tolerance_ << std::endl;
+  output << prefix << std::setw(40) << std::left << "sn ratio: " << para_ptr->sn_ratio_ << std::endl;
+  output << prefix << std::setw(40) << std::left << "Keep unused peak: " << (para_ptr->keep_unused_peaks_? "True":"False") << std::endl;
+  output << prefix << std::setw(40) << std::left << "Output multiple mass: " << (para_ptr->output_multiple_mass_? "True":"False") << std::endl;
+  output << prefix << "********************** Parameters **********************" << std::endl;
 }
 
 void DeconvProcess::updateMsg(MsHeaderPtr header_ptr, int scan, int total_scan_num) {
@@ -76,7 +76,7 @@ void DeconvProcess::updateMsg(MsHeaderPtr header_ptr, int scan, int total_scan_n
 void DeconvProcess::process() {
   FeatureMngPtr mng_ptr = std::make_shared<FeatureMng>(para_ptr_->exec_dir_);
   copyParameters(mng_ptr);
-  printParameter(mng_ptr);
+  outputParameter(std::cout, para_ptr_);
 
   std::string file_name = para_ptr_->getDataFileName();
   // writer
@@ -96,6 +96,8 @@ void DeconvProcess::process() {
   std::ofstream of2(ms2_name, std::ofstream::out);
   of1.precision(16);
   of2.precision(16);
+  outputParameter(of1, para_ptr_, "#");
+  outputParameter(of2, para_ptr_, "#");
 
   DeconvOneSpPtr deconv_ptr = std::make_shared<DeconvOneSp>(mng_ptr);
 
