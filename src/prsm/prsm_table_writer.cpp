@@ -32,14 +32,14 @@
 #include <iomanip>
 #include <ctime>
 
-#include <boost/algorithm/string.hpp>
+#include "boost/algorithm/string.hpp"
 
 #include "base/file_util.hpp"
 #include "spec/msalign_reader.hpp"
 #include "spec/extend_ms_factory.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_table_writer.hpp"
-#include "console/argument.hpp"
+#include "console/toppic_argument.hpp"
 
 namespace prot {
 
@@ -52,7 +52,6 @@ PrsmTableWriter::PrsmTableWriter(PrsmParaPtr prsm_para_ptr,
   arguments_ = arguments;
   output_file_ext_ = output_file_ext;
 }
-
 
 void PrsmTableWriter::write(){
   std::string spectrum_file_name  = prsm_para_ptr_->getSpectrumFileName(); 

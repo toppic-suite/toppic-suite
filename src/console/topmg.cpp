@@ -54,8 +54,7 @@
 #include "prsm/simple_prsm_xml_writer.hpp"
 #include "prsm/simple_prsm_util.hpp"
 
-#include "console/argument.hpp"
-#include "console/summary.hpp"
+#include "console/toppic_argument.hpp"
 
 #include "zeroptmfilter/zero_ptm_filter_mng.hpp"
 #include "zeroptmfilter/zero_ptm_filter_processor.hpp"
@@ -266,16 +265,34 @@ int topmg_test(int argc, char* argv[]) {
     cutoff_selector = nullptr;
     std::cout << "PRSM selecting by cutoff - finished." << std::endl;
 
-    std::cout << "Finding protein species started." << std::endl;
-    double ppo;
-    std::istringstream(arguments["errorTolerance"]) >> ppo;
-    ppo = ppo / 1000000.0;
-    ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();
-    PrsmFeatureSpeciesPtr prsm_forms
-        = std::make_shared<PrsmFeatureSpecies>(db_file_name, sp_file_name,
-                                               "CUTOFF_RESULT", "FORMS", fix_mod_list);
-    prsm_forms->process();
-    prsm_forms = nullptr;
+    std::cout << "Finding protein species started." << std::endl;  
+    if (arguments["featureFileName"] != "") {
+      // TopFD msalign file with feature ID
+      double prec_error_tole = 1.2;
+      ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();
+      PrsmFeatureSpeciesPtr prsm_forms
+          = std::make_shared<PrsmFeatureSpecies>(db_file_name,
+                                                 sp_file_name,
+                                                 arguments["featureFileName"],
+                                                 "CUTOFF_RESULT",
+                                                 "FORMS",
+                                                 fix_mod_list,
+                                                 prec_error_tole,
+                                                 prsm_para_ptr);
+      prsm_forms->process();
+      prsm_forms = nullptr;
+    } else {
+      double ppo;
+      std::istringstream(arguments["errorTolerance"]) >> ppo;
+      ppo = ppo / 1000000.0;
+      PrsmSpeciesPtr prsm_species
+          = std::make_shared<PrsmSpecies>(db_file_name, sp_file_name,
+                                          "CUTOFF_RESULT", prsm_para_ptr->getFixModPtrVec(),
+                                          "FORMS", ppo);
+      prsm_species->process();
+      prsm_species = nullptr;
+    }
+
     std::cout << "Finding protein species finished." << std::endl;
 
     time_t end = time(0);

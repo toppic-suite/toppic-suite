@@ -29,9 +29,8 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-#ifndef PROT_ARGUMENT_HPP_
-#define PROT_ARGUMENT_HPP_
-
+#ifndef PROT_TOPPIC_ARGUMENT_HPP_
+#define PROT_TOPPIC_ARGUMENT_HPP_
 
 #include <map>
 #include <iostream>
