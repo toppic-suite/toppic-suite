@@ -77,7 +77,7 @@
 #include "prsmview/xml_generator.hpp"
 #include "prsmview/transformer.hpp"
 
-#include "console/argument.hpp"
+#include "console/toppic_argument.hpp"
 
 namespace prot {
 
