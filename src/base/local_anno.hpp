@@ -34,6 +34,8 @@
 
 #include <vector>
 #include <algorithm>
+#include <numeric>
+
 #include "base/ptm.hpp"
 #include "base/ptm_base.hpp"
 #include "base/xml_dom_document.hpp"

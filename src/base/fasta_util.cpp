@@ -29,8 +29,9 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+#include <random>
+
 #include "base/logger.hpp"
-//#include "base/db_block.hpp"
 #include "base/fasta_util.hpp"
 
 namespace prot {
