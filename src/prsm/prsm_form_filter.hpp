@@ -33,6 +33,7 @@
 #define PROT_PRSM_PRSM_FORM_FILTER_HPP_
 
 #include <map>
+#include <string>
 
 #include "base/proteoform.hpp"
 #include "base/fasta_reader.hpp"
@@ -59,6 +60,6 @@ class PrsmFormFilter {
 
 typedef std::shared_ptr<PrsmFormFilter> PrsmFormFilterPtr;
 
-} /* namespace prot */
+}  // namespace prot
 
-#endif 
+#endif
