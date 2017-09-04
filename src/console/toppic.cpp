@@ -336,23 +336,21 @@ int two_base_opt(int argc, char* argv[]) {
     std::cout << "Converting xml files to html files - finished." << std::endl;
     WebLog::completeFunction(WebLog::OutPutTime());
 
-    if (arguments["featureFileName"] != "") {
-      std::cout << "PRSM proteoform filtering - started." << std::endl;
-      PrsmFormFilterPtr form_filter
-          = std::make_shared<PrsmFormFilter>(db_file_name, sp_file_name, "FORMS",
-                                             "FORM_FILTER_RESULT", "FORM_RESULT");
-      form_filter->process();
-      form_filter = nullptr;
-      std::cout << "PRSM proteoform filtering - finished." << std::endl;
+    std::cout << "PRSM proteoform filtering - started." << std::endl;
+    PrsmFormFilterPtr form_filter
+        = std::make_shared<PrsmFormFilter>(db_file_name, sp_file_name, "FORMS",
+                                           "FORM_FILTER_RESULT", "FORM_RESULT");
+    form_filter->process();
+    form_filter = nullptr;
+    std::cout << "PRSM proteoform filtering - finished." << std::endl;
 
-      std::cout << "Outputting the proteoform table - started." << std::endl;
-      PrsmTableWriterPtr form_out
-          = std::make_shared<PrsmTableWriter>(prsm_para_ptr, arguments,
-                                              "FORM_RESULT", "FORM_OUTPUT_TABLE");
-      form_out->write();
-      form_out = nullptr;
-      std::cout << "Outputting the proteoform table - finished." << std::endl;
-    }
+    std::cout << "Outputting the proteoform table - started." << std::endl;
+    PrsmTableWriterPtr form_out
+        = std::make_shared<PrsmTableWriter>(prsm_para_ptr, arguments,
+                                            "FORM_RESULT", "FORM_OUTPUT_TABLE");
+    form_out->write();
+    form_out = nullptr;
+    std::cout << "Outputting the proteoform table - finished." << std::endl;
 
     if (arguments["keepTempFiles"] != "true") {
       std::cout << "Deleting temporary files - started." << std::endl;
