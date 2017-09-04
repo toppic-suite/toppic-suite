@@ -32,6 +32,7 @@
 #include <algorithm>
 #include <vector>
 #include <functional>
+#include <numeric>
 
 #include "boost/algorithm/string.hpp"
 

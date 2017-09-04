@@ -13,7 +13,7 @@ message(STATUS "system name " ${CMAKE_SYSTEM_NAME})
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   # Linux specific code
-  SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DPROT_LINUX")
+  SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DPROT_LINUX -D_GLIBCXX_USE_CXX11_ABI=0")
   SET(CMAKE_EXE_LINKER_FLAGS  "-static")
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src
         ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/linux_include)
@@ -99,7 +99,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
         boost_filesystem boost_system boost_thread hts pthread z)
 
     target_link_libraries(topfd pwiz xalan-c xalanMsg xerces-c boost_program_options
-        boost_filesystem boost_system boost_thread boost_iostreams boost_regex hts pthread z)
+        boost_filesystem boost_system boost_thread boost_iostreams boost_regex boost_chrono hts pthread z)
 
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
 

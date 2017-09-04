@@ -1,0 +1,13 @@
+--- src/xalanc/Makefile	2017-09-04 14:13:20.533053115 -0400
++++ src/xalanc/Makefile	2017-09-01 10:44:56.290642979 -0400
+@@ -232,7 +232,9 @@
+ 	$(MAKE) -C Utils $@
+ 
+ $(XSL_LIB_DIR)/$(LIB): $(ALL_OBJECTS)
+-	$(MAKE_SHARED) $(PLATFORM_LIBRARIES) $(EXTRA_LINK_OPTIONS) $(LINK_SONAME) $^ -o $@ $(ALLLIBS) $(OTHER_LINK_LIB_PARAMERES)
++#	$(MAKE_SHARED) $(PLATFORM_LIBRARIES) $(EXTRA_LINK_OPTIONS) $(LINK_SONAME) $^ -o $@ $(ALLLIBS) $(OTHER_LINK_LIB_PARAMERES)
++	 ar -cq $@ $^ $(PLATFORM_LIBRARIES)
++	 cp $@ $(XSL_LIB_DIR)/libxalan-c.a
+ ifeq ($(PLATFORM), OS390)
+ 	mv *.x  ${XSL_LIB_DIR}        
+ else

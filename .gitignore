@@ -1,5 +1,6 @@
 build/*
-thirdparty/*
+thirdparty/linux_include/*
+thirdparty/windows_include/*
 bin/*
 releases/topmg-linux-*
 releases/toppic-linux-*
