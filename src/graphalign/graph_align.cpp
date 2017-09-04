@@ -28,7 +28,13 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <boost/algorithm/string.hpp>
+#include <string>
+#include <vector>
+#include <algorithm>
+#include <utility>
+#include <limits>
+
+#include "boost/algorithm/string.hpp"
 
 #include "base/proteoform_factory.hpp"
 #include "spec/extend_ms_factory.hpp"
@@ -172,8 +178,8 @@ void GraphAlign::initTable() {
   for (int i = 0; i < proteo_ver_num_; i++) {
     GraphDpNodePtrVec node_vec; 
     for (int j = 0; j < spec_ver_num_; j++) {
-      GraphDpNodePtr node_ptr(
-          new GraphDpNode(i,j,node_score,mng_ptr_->n_unknown_shift_, mng_ptr_->max_known_mods_));
+      GraphDpNodePtr node_ptr
+          = std::make_shared<GraphDpNode>(i,j,node_score,mng_ptr_->n_unknown_shift_, mng_ptr_->max_known_mods_);
       node_vec.push_back(node_ptr);
     }
     table_.push_back(node_vec);
@@ -281,7 +287,7 @@ void GraphAlign::dp() {
           if (var_score >= shift_score) {
             if (var_score ==  - std::numeric_limits<double>::max()) {
               table_[i][j]->updateTable(s, m, GRAPH_ALIGN_TYPE_NULL, 
-                                        0, nullptr, -std::numeric_limits<double>::max());
+                                        0, nullptr, -std::numeric_limits<int>::max());
             } else {
               table_[i][j]->updateTable(s, m, GRAPH_ALIGN_TYPE_VARIABLE,
                                         edge_mod_num, best_var_node, var_score + new_score);
@@ -318,7 +324,7 @@ GraphResultNodePtrVec GraphAlign::backtrace(int s, int m) {
     GraphDpNodePtr cur_node_ptr = best_node_ptr;
     while (cur_node_ptr != nullptr) {
       LOG_DEBUG("cur node " << cur_node_ptr);
-      results.push_back(GraphResultNodePtr(new GraphResultNode(cur_node_ptr, shift, mod)));
+      results.push_back(std::make_shared<GraphResultNode>(cur_node_ptr, shift, mod));
       int type = cur_node_ptr->getPrevEdgeType(shift, mod);
       LOG_DEBUG("type " << type << " shift " << shift << " first index " << cur_node_ptr->getFirstIdx() << " second index " << cur_node_ptr->getSecondIdx());
       int prev_edge_mod_num = cur_node_ptr->getPrevEdgeModNum(shift, mod);
@@ -443,9 +449,9 @@ DiagonalHeaderPtr getFirstDiagonal(ProteoGraphPtr proteo_ptr,
       pep_c_term = true;
     }
   }
-  DiagonalHeaderPtr header_ptr(new DiagonalHeader(shift, true, false, 
-                                                  prot_n_term, prot_c_term, 
-                                                  pep_n_term, pep_c_term));
+  DiagonalHeaderPtr header_ptr = std::make_shared<DiagonalHeader>(shift, true, false, 
+                                                                  prot_n_term, prot_c_term, 
+                                                                  pep_n_term, pep_c_term);
   LOG_DEBUG("first diagonal first " << prot_idx << " last " << last_prot_idx);
   header_ptr->setMatchFirstBpPos(prot_idx);
   header_ptr->setMatchLastBpPos(last_prot_idx);
@@ -471,9 +477,9 @@ DiagonalHeaderPtr getLastDiagonal(GraphResultNodePtrVec nodes,
   } else {
     pep_c_term = true;
   }
-  DiagonalHeaderPtr header_ptr(new DiagonalHeader(shift, false, true, 
-                                                  false, prot_c_term, 
-                                                  false, pep_c_term));
+  DiagonalHeaderPtr header_ptr = std::make_shared<DiagonalHeader>(shift, false, true, 
+                                                                  false, prot_c_term, 
+                                                                  false, pep_c_term);
   int first_prot_idx = nodes[0]->getFirstIdx();
   LOG_DEBUG("last digaonal first " << first_prot_idx << " last " << last_prot_idx);
   header_ptr->setMatchFirstBpPos(first_prot_idx);
@@ -494,8 +500,8 @@ DiagonalHeaderPtr getInternalDiagonal(GraphResultNodePtrVec nodes,
     shift_sum += shift;
   }
   double average_shift = shift_sum / nodes.size();
-  DiagonalHeaderPtr header_ptr(new DiagonalHeader(average_shift, true, false,  
-                                                  false, false, false, false));
+  DiagonalHeaderPtr header_ptr = std::make_shared<DiagonalHeader>(average_shift, true, false,  
+                                                                  false, false, false, false);
   int first_prot_idx = nodes[0]->getFirstIdx();
   header_ptr->setMatchFirstBpPos(first_prot_idx);
   int last_prot_idx = nodes[nodes.size()-1]->getFirstIdx();
