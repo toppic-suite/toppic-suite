@@ -48,7 +48,9 @@ void DeconvProcess::copyParameters(FeatureMngPtr mng_ptr) {
 }
 
 void DeconvProcess::outputParameter(std::ostream &output, DeconvParaPtr para_ptr, const std::string & prefix) {
-  output << prefix << "TopFD 1.0.0 (" << __DATE__ << ")" << std::endl;
+  time_t cur_time = std::time(0);
+  output << prefix << "TopFD 1.0.0 " << std::endl;
+  output << prefix << "Timestamp: " << asctime(localtime(&cur_time)); 
   output << prefix << "********************** Parameters **********************" << std::endl;
   output << prefix << std::setw(40) << std::left << "Input file: " << para_ptr->data_file_name_ << std::endl;
   output << prefix << std::setw(40) << std::left << "Data type: " << "centroided" << std::endl;
