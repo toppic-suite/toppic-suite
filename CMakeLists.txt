@@ -52,7 +52,6 @@ file(GLOB GRAPH_ALIGN_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/graphalign/*.cpp)
 file(GLOB TOPMG_ARGU_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmg_argument.cpp)
 file(GLOB GRAPH_MAIN ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmg.cpp)
 file(GLOB FEATURE_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/feature/*.cpp)
-file(GLOB FEATURE_MAIN   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd.cpp)
 
 file(GLOB TEST_ZERO_PTM_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_zero_ptm.cpp) 
 file(GLOB TEST_DIAG_FILTER_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_diag_filter.cpp) 
@@ -70,7 +69,7 @@ add_executable(topmg ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS} ${ZERO_PTM_FILTER} $
     ${ONE_PTM_FILTER_SRCS} ${ZERO_PTM_SRCS} ${GRAPH_SRCS} ${GRAPH_ALIGN_SRCS} ${TDGF_SRCS}
     ${TOPMG_ARGU_SRCS} ${ONE_PTM_SEARCH_SRCS} ${PRSM_VIEW_SRCS} ${GRAPH_MAIN})
 
-add_executable(topfd ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS} ${FEATURE_MAIN})
+add_executable(topfd ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS})
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     # Windows specific code
