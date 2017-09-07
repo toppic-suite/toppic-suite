@@ -204,6 +204,7 @@ namespace prot {
     delFile(sp_base + ".PTM");
     clean_prefix(sp, sp_base + ".PTM_");
     delFile(sp_base + ".TOP");
+    delFile(sp_base + ".TOP_PRE");
     delFile(sp_base + ".GRAPH_FILTER");
     clean_prefix(sp, sp_base + ".GRAPH_ALIGN_");
     clean_prefix(sp, sp_base + ".VAR1_");
@@ -217,6 +218,5 @@ namespace prot {
     delFile(sp_base + ".FORMS");
     delFile(sp_base + ".FORM_RESULT");
     delFile(sp_base + ".FORM_FILTER_RESULT");
-
   }
 }
