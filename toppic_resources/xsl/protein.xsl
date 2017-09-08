@@ -70,7 +70,7 @@
         </xsl:when>
         <xsl:otherwise>
             <p style="font-size:16px;">There is only <a href="../prsms/prsm{prsm_id}.html">1 PrSM</a>
-            with an E-value <xsl:value-of select="e_value"/> and a precursor mass <xsl:value-of select="ms/ms_header/precursor_mass"/>.</p>
+            with an E-value <xsl:value-of select="e_value"/> and a precursor mass <xsl:value-of select="ms/ms_header/precursor_mono_mass"/>.</p>
         </xsl:otherwise>
     </xsl:choose>
     </p>
