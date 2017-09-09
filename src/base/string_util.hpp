@@ -35,8 +35,8 @@
 #include <sstream>
 #include <string>
 #include <vector>
-#include <algorithm> 
-#include <functional> 
+#include <algorithm>
+#include <functional>
 #include <cctype>
 #include <locale>
 
@@ -46,13 +46,15 @@ namespace prot {
 
 class StringUtil {
  public:
-  static std::string trim(std::string &ori_s);
+  static std::string trim(const std::string &ori_s);
 
   static std::vector<std::string> split(const std::string &ori_s, char delim);
 
   static std::string convertToString(double value);
 
   static std::string convertToString(double value, int number);
+
+  static std::string convertToScientificStr(double value, int number);
 
   static std::string convertToString(int value);
 
@@ -61,6 +63,6 @@ class StringUtil {
   static std::string rmComment(const std::string &ori_s, const std::string &comment = "#");
 };
 
-}
+}  // namespace prot
 
 #endif

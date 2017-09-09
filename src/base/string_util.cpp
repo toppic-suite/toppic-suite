@@ -30,6 +30,10 @@
 
 
 #include <iomanip>
+#include <string>
+#include <vector>
+#include <functional>
+#include <algorithm>
 
 #include "boost/algorithm/string.hpp"
 
@@ -38,13 +42,12 @@
 
 namespace prot {
 
-std::string StringUtil::trim(std::string &ori_s) {
+std::string StringUtil::trim(const std::string &ori_s) {
   std::string s = ori_s;
-  s.erase(s.begin(), 
-          std::find_if(s.begin(), s.end(), 
-                       std::not1(std::ptr_fun<int, int>(std::isspace))));
+  s.erase(s.begin(), std::find_if(s.begin(), s.end(),
+                                  std::not1(std::ptr_fun<int, int>(std::isspace))));
   s.erase(std::find_if(s.rbegin(), s.rend(),
-                       std::not1(std::ptr_fun<int, int>(std::isspace))).base(), 
+                       std::not1(std::ptr_fun<int, int>(std::isspace))).base(),
           s.end());
   return s;
 }
@@ -62,11 +65,10 @@ std::vector<std::string> StringUtil::split(const std::string &s, char delim) {
 std::string StringUtil::convertToString(double value) {
   std::stringstream stream;
 
-  if(value < 1 && value > -1 && value !=0){
+  if (value < 1 && value > -1 && value !=0) {
     stream << std::scientific << std::setprecision(10);
-  }
-  else{
-    stream << std::fixed<<std::setprecision(10);
+  } else {
+    stream << std::fixed << std::setprecision(10);
   }
   stream << value;
   return stream.str();
@@ -74,14 +76,12 @@ std::string StringUtil::convertToString(double value) {
 
 std::string StringUtil::convertToString(double value, int number) {
   std::stringstream stream;
-  if(value ==0) {
+  if (value == 0) {
     stream << std::fixed << std::setprecision(0);
-  }
-  else if (value < 0.01 && value > -0.01 && value != 0) {
-    if(number>2){
+  } else if (value < 0.01 && value > -0.01 && value != 0) {
+    if (number > 2) {
       stream << std::scientific << std::setprecision(2);
-    }
-    else{
+    } else {
       stream << std::scientific << std::setprecision(number);
     }
   } else {
@@ -91,7 +91,18 @@ std::string StringUtil::convertToString(double value, int number) {
   return stream.str();
 }
 
-std::string StringUtil::convertToString(int value){
+std::string StringUtil::convertToScientificStr(double value, int number) {
+  std::stringstream stream;
+  if (value == 0) {
+    stream << std::fixed << std::setprecision(0);
+  } else {
+    stream << std::scientific << std::setprecision(std::min(2, number));
+  }
+  stream << value;
+  return stream.str();
+}
+
+std::string StringUtil::convertToString(int value) {
   std::stringstream stream;
   stream << value;
   return stream.str();
@@ -114,5 +125,5 @@ std::string StringUtil::rmComment(const std::string &ori_s, const std::string &c
   return s;
 }
 
-}
+}  // namespace prot
 
