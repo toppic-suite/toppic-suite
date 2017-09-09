@@ -615,11 +615,6 @@ PrsmPtr GraphAlign::geneResult(int s, int m){
 
   ChangePtrVec changes = getDiagonalMassChanges(refined_headers, first_pos, last_pos, change_types);
 
-  /*for (size_t i = 0; i < changes.size(); i++) {*/
-  //std::cout << "change " << i << " start " << changes[i]->getLeftBpPos()
-  //<< " end " << changes[i]->getRightBpPos() << std::endl;
-  /*}*/
-
   sub_proteo_ptr->addChangePtrVec(changes);
   sub_proteo_ptr->setVariablePtmNum(m);
 
@@ -627,7 +622,7 @@ PrsmPtr GraphAlign::geneResult(int s, int m){
                                 mng_ptr_->prsm_para_ptr_->getSpParaPtr());
 }
 
-PrsmPtr GraphAlign::geneResult(int s){
+PrsmPtr GraphAlign::geneResult(int s) {
   PrsmPtr best_prsm_ptr(nullptr);
   for (int m = 0; m <= mng_ptr_->max_known_mods_; m++) {
     PrsmPtr cur_prsm_ptr = geneResult(s, m);
@@ -646,120 +641,7 @@ PrsmPtr GraphAlign::geneResult(int s){
       }
     }
   }
-
-  ChangePtrVec change_vec = best_prsm_ptr->getProteoformPtr()->getChangePtrVec();
-
-  double err = best_prsm_ptr->getOriPrecMass() * mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
-  MassGraph * g_p = proteo_graph_ptr_->getMassGraphPtr().get();
-  for (size_t i = 0; i < change_vec.size(); i++) {
-    best_prsm_ptr->getProteoformPtr()->rmChangePtr(change_vec[i]);
-    if (change_vec[i]->getChangeTypePtr()->getId() != ChangeType::VARIABLE->getId()) continue;
-    std::vector<int> mass_lst;
-    std::vector<std::string> ptm_lst;
-    int left_pos = best_prsm_ptr->getProteoformPtr()->getStartPos() + change_vec[i]->getLeftBpPos();
-    int right_pos = best_prsm_ptr->getProteoformPtr()->getStartPos() + change_vec[i]->getRightBpPos();
-    int change_mass = std::round(change_vec[i]->getMassShift() * mng_ptr_->convert_ratio_);
-    std::string change_ptm = "";
-    for (int k = left_pos; k < right_pos; k++) {
-      if (change_ptm != "") break;
-
-      Vertex v = boost::vertex(k, *g_p);
-      boost::graph_traits<MassGraph>::out_edge_iterator ei, ei_end;
-      boost::tie(ei, ei_end) = out_edges(v, *g_p);
-      for ( ; ei != ei_end; ++ei) {
-        MassGraph::edge_descriptor e = *ei;
-        int edge_mod_mass = std::round((*g_p)[e].res_ptr_->getPtmPtr()->getMonoMass() * mng_ptr_->convert_ratio_);
-        ptm_lst.push_back("");
-        mass_lst.push_back(0);
-        if (edge_mod_mass == 0) continue;
-        size_t lst_size = ptm_lst.size();
-        if (k == left_pos) {
-          if (std::abs(edge_mod_mass - change_mass) <= err * mng_ptr_->convert_ratio_) {
-            change_ptm = (*g_p)[e].res_ptr_->getPtmPtr()->getAbbrName(); 
-            break;
-          } else {
-            if (std::find(mass_lst.begin(), mass_lst.end(), edge_mod_mass) == mass_lst.end()) {
-              ptm_lst.push_back((*g_p)[e].res_ptr_->getPtmPtr()->getAbbrName());
-              mass_lst.push_back(edge_mod_mass);
-            }
-          }
-        } else {
-          for (size_t j = 0; j < lst_size; j++) {
-            if (std::abs(mass_lst[j] + edge_mod_mass - change_mass) <= err * mng_ptr_->convert_ratio_) {
-              change_ptm = ptm_lst[j] + ";" + (*g_p)[e].res_ptr_->getPtmPtr()->getAbbrName();
-              break;
-            } else {
-              if (std::find(mass_lst.begin(), mass_lst.end(), mass_lst[j] + edge_mod_mass) == mass_lst.end()) {
-                ptm_lst.push_back(ptm_lst[j] + ";" + (*g_p)[e].res_ptr_->getPtmPtr()->getAbbrName());
-                mass_lst.push_back(mass_lst[j] + edge_mod_mass); 
-              }
-            }
-          }
-        }
-      }
-    }
-    std::vector<std::string> change_strs;
-    boost::split(change_strs, change_ptm, boost::is_any_of(";"));
-    change_strs.erase(std::remove(change_strs.begin(), change_strs.end(), ""),
-                      change_strs.end());
-    if (change_strs.size() == 1) {
-      PtmPtr p = prot::PtmBase::getPtmPtrByAbbrName(change_strs[0]); 
-      ResiduePtr ori_residue_ptr = change_vec[i]->getModPtr()->getOriResiduePtr();
-      ResiduePtr mod_residue_ptr
-          = std::make_shared<Residue>(change_vec[i]->getModPtr()->getModResiduePtr()->getAcidPtr(), p);
-      ModPtr mod = std::make_shared<Mod>(ori_residue_ptr, mod_residue_ptr);
-      change_vec[i] = std::make_shared<Change>(change_vec[i]->getLeftBpPos(),
-                                               change_vec[i]->getRightBpPos(),
-                                               change_vec[i]->getChangeTypePtr(),
-                                               change_vec[i]->getMassShift(),
-                                               mod);
-    } else {
-      std::sort(change_strs.begin(), change_strs.end());
-      std::string tmp = change_strs[0];
-      std::string ptm_str = "";
-      int cnt = 0;
-      for (size_t i = 0; i < change_strs.size(); i++) {
-        if (change_strs[i] == tmp) {
-          cnt++;
-        } else {
-          if (cnt > 1) {
-            ptm_str = ptm_str + " + " + std::to_string(cnt) + " " + tmp;
-          } else {
-            ptm_str = ptm_str + " + " + tmp; 
-          }
-          cnt = 1;
-          tmp = change_strs[i];
-        }
-      }
-
-      if (cnt > 1) {
-        ptm_str = ptm_str + " + " + std::to_string(cnt) + " " + tmp;
-      } else {
-        ptm_str = ptm_str + " + " + tmp; 
-      }
-
-      ptm_str = ptm_str.substr(2, ptm_str.length() - 2);
-      boost::algorithm::trim(ptm_str);
-      PtmPtr p = std::make_shared<Ptm>(ptm_str, ptm_str, change_vec[i]->getMassShift(),
-                                       -1, "", "", "");
-      p = PtmBase::getPtmPtr(p);
-      ResiduePtr ori_residue_ptr = change_vec[i]->getModPtr()->getOriResiduePtr();
-      ResiduePtr mod_residue_ptr
-          = std::make_shared<Residue>(change_vec[i]->getModPtr()->getModResiduePtr()->getAcidPtr(), p);
-      ModPtr mod = std::make_shared<Mod>(ori_residue_ptr, mod_residue_ptr);
-      change_vec[i] = std::make_shared<Change>(change_vec[i]->getLeftBpPos(),
-                                               change_vec[i]->getRightBpPos(),
-                                               change_vec[i]->getChangeTypePtr(),
-                                               change_vec[i]->getMassShift(),
-                                               mod);
-
-    }
-
-  }
-
-  best_prsm_ptr->getProteoformPtr()->addChangePtrVec(change_vec);
   return best_prsm_ptr;
 }
 
-}
-
+}  // namespace prot
