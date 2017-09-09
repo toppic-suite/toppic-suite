@@ -101,8 +101,10 @@ void addMsHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement* ms_element,
   str = StringUtil::convertToString(precursor_mz, pos);
   xml_doc->addElement(ms_header_element, "precursor_mz", str.c_str());
   double precursor_inte = prsm_ptr->getPrecFeatureInte();
-  str = StringUtil::convertToString(precursor_inte, pos);
-  xml_doc->addElement(ms_header_element, "precursor_inte", str.c_str());
+  if (precursor_inte > 0) {
+    str = StringUtil::convertToScientificStr(precursor_inte, pos);
+    xml_doc->addElement(ms_header_element, "precursor_inte", str.c_str());
+  }
 }
 
 void addMsPeaks(XmlDOMDocument *xml_doc, xercesc::DOMElement* ms_element, 

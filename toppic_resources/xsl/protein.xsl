@@ -45,15 +45,12 @@
 
 <xsl:template match="compatible_proteoform">
 <div id="p{proteoform_id}">
-    <xsl:variable name="tmp" select="prsm/ms/ms_header/precursor_inte"/>
-    <xsl:choose>
-        <xsl:when test="$tmp &gt; '0'">
-	        <h2>Proteoform #<xsl:value-of select="proteoform_id"/> Feature intensity: <xsl:value-of select="$tmp"/></h2>
-        </xsl:when>
-        <xsl:otherwise>
-            <h2>Proteoform #<xsl:value-of select="proteoform_id"/></h2>
-        </xsl:otherwise>
-    </xsl:choose>
+	<xsl:if test="prsm/ms/ms_header/precursor_inte">
+		<h2>Proteoform #<xsl:value-of select="proteoform_id"/> Feature intensity: <xsl:value-of select="prsm/ms/ms_header/precursor_inte"/></h2>
+	</xsl:if>
+	<xsl:if test="not(prsm/ms/ms_header/precursor_inte)">
+		<h2>Proteoform #<xsl:value-of select="proteoform_id"/></h2>
+	</xsl:if>
 	<xsl:apply-templates select="prsm" mode="protein"></xsl:apply-templates>
 </div>
 <br/>
