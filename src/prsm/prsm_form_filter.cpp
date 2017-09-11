@@ -39,18 +39,6 @@
 
 namespace prot {
 
-PrsmFormFilter::PrsmFormFilter(const std::string &db_file_name,
-                               const std::string &spec_file_name,
-                               const std::string &input_file_ext,
-                               const std::string &output_file_ext,
-                               const std::string &output_file_ext_2):
-    db_file_name_(db_file_name),
-    spec_file_name_(spec_file_name),
-    input_file_ext_(input_file_ext),
-    output_file_ext_(output_file_ext),
-    output_file_ext_2_(output_file_ext_2) {
-    }
-
 void PrsmFormFilter::process() {
   std::string base_name = FileUtil::basename(spec_file_name_);
   std::string input_file_name = base_name + "." + input_file_ext_;
@@ -81,8 +69,7 @@ void PrsmFormFilter::process() {
       bool keep = true;
       std::string form = prsms[i]->getProteoformPtr()->getProteinMatchSeq();
       for (size_t j = 0; j < selected_forms.size(); j++) {
-        if (prsms[i]->getPrecFeatureId() != -1
-            && selected_forms[j]->getPrecFeatureId() == prsms[i]->getPrecFeatureId()) {
+        if (selected_forms[j]->getProteoformPtr()->getSpeciesId() == prsms[i]->getProteoformPtr()->getSpeciesId()) {
           // std::cout << "scan " << prsms[i]->getSpectrumScan() << " removed by scan " << selected_forms[j]->getSpectrumScan() << std::endl;
           keep = false;
           break;

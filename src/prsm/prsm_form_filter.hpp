@@ -48,7 +48,12 @@ class PrsmFormFilter {
                  const std::string &spec_file_name,
                  const std::string &input_file_ext,
                  const std::string &output_file_ext,
-                 const std::string &output_file_ext_2);
+                 const std::string &output_file_ext_2):
+    db_file_name_(db_file_name),
+    spec_file_name_(spec_file_name),
+    input_file_ext_(input_file_ext),
+    output_file_ext_(output_file_ext),
+    output_file_ext_2_(output_file_ext_2) {}
   void process();
  private:
   std::string db_file_name_;
