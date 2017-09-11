@@ -190,7 +190,6 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string local_threshold = "";
   std::string filtering_result_num = "";
   std::string residue_mod_file_name = "";
-  std::string proteo_graph_dis = "";
   std::string thread_number = "";
   std::string feature_file_name = "";
 
@@ -242,7 +241,6 @@ bool Argument::parse(int argc, char* argv[]) {
         ("full-binary-path,b", "Full binary path.")
         ("num-combined-spectra,r", po::value<std::string> (&group_num), "")
         ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "")
-        ("proteo-graph-dis,j", po::value<std::string> (&proteo_graph_dis), "<positive number>. Gap in constructing proteoform graph. Default value: 20.")
         ("thread-number,u", po::value<std::string> (&thread_number), "<positive number>. Number of threads used in the computation. Default value: 1.")
         ("use-topfd-feature,x", po::value<std::string>(&feature_file_name) , "<a msft file name with its path>. TopFD features for proteoform identification.")
         ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name with its path.")
@@ -341,9 +339,6 @@ bool Argument::parse(int argc, char* argv[]) {
     }
     if (vm.count("mod-file-name")) {
       arguments_["residueModFileName"] = residue_mod_file_name;
-    }
-    if (vm.count("proteo-graph-dis")) {
-      arguments_["proteo_graph_dis"] = proteo_graph_dis;
     }
     if (vm.count("thread-number")) {
       arguments_["threadNumber"] = thread_number;
