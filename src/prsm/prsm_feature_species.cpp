@@ -117,7 +117,7 @@ void PrsmFeatureSpecies::process() {
     prsm_ptrs[i]->setPrecFeatureId(spec_set_ptr->getDeconvMsPtrVec()[0]->getMsHeaderPtr()->getFeatureId());
     prsm_ptrs[i]->setPrecFeatureInte(spec_set_ptr->getDeconvMsPtrVec()[0]->getMsHeaderPtr()->getFeatureInte());
   } 
-  sort(prsm_ptrs.begin(), prsm_ptrs.end(), Prsm::cmpMatchFragmentDecMatchPeakDec);
+  sort(prsm_ptrs.begin(), prsm_ptrs.end(), Prsm::cmpEValueInc);
   setProtId(prsm_ptrs);
   setSpeciesId(prsm_ptrs);
   sort(prsm_ptrs.begin(), prsm_ptrs.end(), Prsm::cmpSpectrumIdIncPrecursorIdInc);
