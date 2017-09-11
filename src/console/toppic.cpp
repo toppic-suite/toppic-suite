@@ -232,10 +232,40 @@ int two_base_opt(int argc, char* argv[]) {
     }
     std::cout << "E-value computation - finished." << std::endl;
 
+    std::cout << "Finding protein species - started." << std::endl;
+    if (arguments["featureFileName"] != "") {
+      // TopFD msalign file with feature ID
+      double prec_error_tole = 1.2;
+      ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();
+      PrsmFeatureSpeciesPtr prsm_forms
+          = std::make_shared<PrsmFeatureSpecies>(db_file_name,
+                                                 sp_file_name,
+                                                 arguments["featureFileName"],
+                                                 "EVALUE",
+                                                 "FORMS",
+                                                 fix_mod_list,
+                                                 prec_error_tole,
+                                                 prsm_para_ptr);
+      prsm_forms->process();
+      prsm_forms = nullptr;
+    } else {
+      double ppo;
+      std::istringstream(arguments["errorTolerance"]) >> ppo;
+      ppo = ppo / 1000000.0;
+      PrsmSpeciesPtr prsm_species
+          = std::make_shared<PrsmSpecies>(db_file_name, sp_file_name,
+                                          "EVALUE", prsm_para_ptr->getFixModPtrVec(),
+                                          "FORMS", ppo);
+      prsm_species->process();
+      prsm_species = nullptr;
+    }
+    std::cout << "Finding protein species - finished." << std::endl;
+    WebLog::completeFunction(WebLog::SelectingTime());
+
     if (arguments["searchType"] == "TARGET") {
       std::cout << "Top PRSM selecting - started" << std::endl;
       PrsmTopSelectorPtr selector
-          = std::make_shared<PrsmTopSelector>(db_file_name, sp_file_name, "EVALUE", "TOP", n_top);
+          = std::make_shared<PrsmTopSelector>(db_file_name, sp_file_name, "FORMS", "TOP", n_top);
       selector->process();
       selector = nullptr;
       std::cout << "Top PRSM selecting - finished." << std::endl;
@@ -243,7 +273,7 @@ int two_base_opt(int argc, char* argv[]) {
       std::cout << "Top PRSM selecting - started " << std::endl;
       PrsmTopSelectorPtr selector
           = std::make_shared<PrsmTopSelector>(db_file_name, sp_file_name,
-                                              "EVALUE", "TOP_PRE", n_top);
+                                              "FORMS", "TOP_PRE", n_top);
       selector->process();
       selector = nullptr;
       std::cout << "Top PRSM selecting - finished." << std::endl;
@@ -284,49 +314,19 @@ int two_base_opt(int argc, char* argv[]) {
       suffix = "LOCAL_RESULT";
     }
 
-    std::cout << "Finding protein species - started." << std::endl;
-    if (arguments["featureFileName"] != "") {
-      // TopFD msalign file with feature ID
-      double prec_error_tole = 1.2;
-      ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();
-      PrsmFeatureSpeciesPtr prsm_forms
-          = std::make_shared<PrsmFeatureSpecies>(db_file_name,
-                                                 sp_file_name,
-                                                 arguments["featureFileName"],
-                                                 suffix,
-                                                 "FORMS",
-                                                 fix_mod_list,
-                                                 prec_error_tole,
-                                                 prsm_para_ptr);
-      prsm_forms->process();
-      prsm_forms = nullptr;
-    } else {
-      double ppo;
-      std::istringstream(arguments["errorTolerance"]) >> ppo;
-      ppo = ppo / 1000000.0;
-      PrsmSpeciesPtr prsm_species
-          = std::make_shared<PrsmSpecies>(db_file_name, sp_file_name,
-                                          suffix, prsm_para_ptr->getFixModPtrVec(),
-                                          "FORMS", ppo);
-      prsm_species->process();
-      prsm_species = nullptr;
-    }
-    std::cout << "Finding protein species - finished." << std::endl;
-    WebLog::completeFunction(WebLog::SelectingTime());
-
     time_t end = time(0);
     arguments["end_time"] = std::string(ctime_r(&end, buf));
     arguments["running_time"] = std::to_string(static_cast<int>(difftime(end, start)));
 
     std::cout << "Outputting the result table - started." << std::endl;
     PrsmTableWriterPtr table_out
-        = std::make_shared<PrsmTableWriter>(prsm_para_ptr, arguments, "FORMS", "OUTPUT_TABLE");
+        = std::make_shared<PrsmTableWriter>(prsm_para_ptr, arguments, suffix, "OUTPUT_TABLE");
     table_out->write();
     table_out = nullptr;
     std::cout << "Outputting the result table - finished." << std::endl;
 
     std::cout << "Generating xml files started." << std::endl;
-    XmlGeneratorPtr xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, exe_dir, "FORMS");
+    XmlGeneratorPtr xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, exe_dir, suffix);
     xml_gene->process();
     xml_gene = nullptr;
     std::cout << "Generating xml files - finished." << std::endl;
@@ -338,7 +338,7 @@ int two_base_opt(int argc, char* argv[]) {
 
     std::cout << "PRSM proteoform filtering - started." << std::endl;
     PrsmFormFilterPtr form_filter
-        = std::make_shared<PrsmFormFilter>(db_file_name, sp_file_name, "FORMS",
+        = std::make_shared<PrsmFormFilter>(db_file_name, sp_file_name, suffix,
                                            "FORM_FILTER_RESULT", "FORM_RESULT");
     form_filter->process();
     form_filter = nullptr;

@@ -67,10 +67,10 @@ void PrsmFeatureSpecies::setProtId(PrsmPtrVec& prsm_ptrs){
 
 void PrsmFeatureSpecies::setSpeciesId(const PrsmPtrVec& prsm_ptrs){
   PrsmPtrVec2D species;
-  for(size_t i = 0; i < prsm_ptrs.size(); i++){
+  for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     bool is_found = false;
     PrsmPtr cur_ptr = prsm_ptrs[i];
-    for(size_t j = 0; j < species.size(); j++){
+    for (size_t j = 0; j < species.size(); j++) {
       PrsmPtr ref_ptr = species[j][0];
       if (cur_ptr->getProteoformPtr()->getProtId() == ref_ptr->getProteoformPtr()->getProtId()) {
         if (cur_ptr->getPrecFeatureId() == ref_ptr->getPrecFeatureId()) {
@@ -85,7 +85,7 @@ void PrsmFeatureSpecies::setSpeciesId(const PrsmPtrVec& prsm_ptrs){
         }
       }
     }
-    if(!is_found){
+    if (!is_found) {
       PrsmPtrVec new_species;
       new_species.push_back(prsm_ptrs[i]);
       species.push_back(new_species);
