@@ -161,7 +161,8 @@ void PrsmSpecies::process(){
   PrsmPtrVec prsm_ptrs = PrsmReader::readAllPrsms(input_file_name, db_file_name_,
                                                   fix_mod_ptr_vec_);
   //sort(prsm_ptrs.begin(),prsm_ptrs.end(),Prsm::cmpSpectrumIdIncPrecursorIdInc);
-  sort(prsm_ptrs.begin(),prsm_ptrs.end(),Prsm::cmpMatchFragmentDecMatchPeakDec);
+  //sort(prsm_ptrs.begin(),prsm_ptrs.end(),Prsm::cmpMatchFragmentDecMatchPeakDec);
+  sort(prsm_ptrs.begin(), prsm_ptrs.end(), Prsm::cmpEValueInc);
   setProtId(prsm_ptrs);
   setSpeciesId(prsm_ptrs,ppo_);
   sort(prsm_ptrs.begin(),prsm_ptrs.end(),Prsm::cmpSpectrumIdIncPrecursorIdInc);
