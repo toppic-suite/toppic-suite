@@ -33,6 +33,7 @@
 #define PROT_PRSM_PRSM_SPECIES_HPP_
 
 #include <map>
+#include <string>
 
 #include "base/proteoform.hpp"
 #include "base/fasta_reader.hpp"
@@ -47,9 +48,17 @@ class PrsmSpecies {
               const std::string &spec_file_name,
               const std::string &input_file_ext,
               const ModPtrVec &fix_mod_ptr_vec,
-              const std::string &output_file_ext, 
-              double ppo);
+              const std::string &output_file_ext,
+              double ppo):
+      db_file_name_(db_file_name),
+      spec_file_name_(spec_file_name),
+      input_file_ext_(input_file_ext),
+      fix_mod_ptr_vec_(fix_mod_ptr_vec),
+      output_file_ext_(output_file_ext),
+      ppo_(ppo) {}
+
   void process();
+
  private:
   std::string db_file_name_;
   std::string spec_file_name_;
@@ -65,12 +74,11 @@ class PrsmSpecies {
 
   void setProtId(PrsmPtrVec& prsm_ptrs);
 
-  void setSpeciesId(PrsmPtrVec& prsm_ptrs,double ppo);
+  void setSpeciesId(PrsmPtrVec& prsm_ptrs, double ppo);
 };
 
 typedef std::shared_ptr<PrsmSpecies> PrsmSpeciesPtr;
 
-
-} /* namespace prot */
+}  // namespace prot
 
 #endif /* PRSM_SPECIES_HPP_ */

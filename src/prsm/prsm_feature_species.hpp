@@ -33,12 +33,14 @@
 #define PROT_PRSM_PRSM_FEATURE_SPECIES_HPP_
 
 #include <map>
+#include <string>
 
 #include "base/proteoform.hpp"
 #include "base/fasta_reader.hpp"
 #include "prsm/prsm.hpp"
 #include "prsm/prsm_para.hpp"
 #include "prsm/prsm_xml_writer.hpp"
+#include "prsm/prsm_str.hpp"
 
 namespace prot {
 
@@ -51,7 +53,7 @@ class PrsmFeatureSpecies {
                      const std::string &output_file_ext,
                      const ModPtrVec &fix_mod_ptr_vec,
                      double prec_error_tole,
-                     PrsmParaPtr prsm_para_ptr): 
+                     PrsmParaPtr prsm_para_ptr):
       db_file_name_(db_file_name),
       spec_file_name_(spec_file_name),
       feature_file_name_(feature_file_name),
@@ -62,6 +64,7 @@ class PrsmFeatureSpecies {
       prsm_para_ptr_(prsm_para_ptr) {}
 
   void process();
+
  private:
   std::string db_file_name_;
   std::string spec_file_name_;
@@ -72,13 +75,13 @@ class PrsmFeatureSpecies {
   double prec_error_tole_;
   PrsmParaPtr prsm_para_ptr_;
 
-  void setProtId(PrsmPtrVec& prsm_ptrs);
+  void setProtId(PrsmStrPtrVec & prsm_ptrs);
 
-  void setSpeciesId(const PrsmPtrVec& prsm_ptrs);
+  void setSpeciesId(PrsmStrPtrVec & prsm_ptrs);
 };
 
 typedef std::shared_ptr<PrsmFeatureSpecies> PrsmFeatureSpeciesPtr;
 
 }  // namespace prot
 
-#endif 
+#endif

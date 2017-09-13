@@ -43,7 +43,7 @@ typedef std::shared_ptr<PrsmStr> PrsmStrPtr;
 
 class PrsmStr {
  public:
-  PrsmStr(const std::vector<std::string> &str_vec);
+  explicit PrsmStr(const std::vector<std::string> &str_vec);
 
   std::vector<std::string> getStrVec() {return str_vec_;}
 
@@ -55,6 +55,14 @@ class PrsmStr {
 
   int getSpeciesId() {return species_id_;}
 
+  int getProtId() {return prot_id_;}
+
+  int getPrecursorId() {return precursor_id_;}
+
+  int getPrecFeatureId() {return precursor_feature_id_;}
+
+  double getPrecFeatureInte() {return precursor_feature_inte_;}
+
   double getMatchFragNum() {return match_frag_num_;}
 
   double getNormMatchFragNum() {return norm_match_frag_num_;}
@@ -65,13 +73,22 @@ class PrsmStr {
 
   double getProteoformFdr() {return proteoform_fdr_;}
 
-  void setId(int id);
+  double getAdjustedPrecMass() {return adjusted_prec_mass_;}
+
+  void setSpectrumId(int id);
+
+  void setSpeciesId(int id);
+
+  void setProtId(int id);
+
+  void setPrecFeatureId(int id);
+
+  void setPrecFeatureInte(double inte);
 
   void setFdr(double fdr);
 
   void setProteoformFdr(double proteoform_fdr);
 
-  //comparison 
   static bool cmpEValueInc(const PrsmStrPtr &a, const PrsmStrPtr &b) {
     return a->getEValue() < b->getEValue();
   }
@@ -88,6 +105,19 @@ class PrsmStr {
     return a->getSpectrumId() < b->getSpectrumId();
   }
 
+  static bool cmpSpectrumIdIncPrecursorIdInc(const PrsmStrPtr &a, const PrsmStrPtr &b) {
+    if (a->getSpectrumId() < b->getSpectrumId()) {
+      return true;
+    } else if (a->getSpectrumId() > b->getSpectrumId()) {
+      return false;
+    } else {
+      if (a->getPrecursorId() < b->getPrecursorId()) {
+        return true;
+      }
+      return false;
+    }
+  }
+
  private:
   std::vector<std::string> str_vec_;
 
@@ -98,6 +128,16 @@ class PrsmStr {
   std::string seq_desc_;
 
   int species_id_;
+
+  int prot_id_;
+
+  int precursor_id_;
+
+  int precursor_feature_id_;
+
+  double precursor_feature_inte_;
+
+  double adjusted_prec_mass_;
 
   double match_frag_num_;
 
@@ -114,7 +154,6 @@ class PrsmStr {
 typedef std::vector<PrsmStrPtr> PrsmStrPtrVec;
 typedef std::vector<PrsmStrPtrVec> PrsmStrPtr2D;
 
-}
+}  // namespace prot
 
 #endif
-
