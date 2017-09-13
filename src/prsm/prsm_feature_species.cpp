@@ -28,6 +28,9 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <string>
+#include <algorithm>
+#include <vector>
 
 #include "base/file_util.hpp"
 #include "base/proteoform_util.hpp"
@@ -37,48 +40,48 @@
 
 namespace prot {
 
-void PrsmFeatureSpecies::setProtId(PrsmPtrVec& prsm_ptrs){
-  PrsmPtrVec2D proteins;
+void PrsmFeatureSpecies::setProtId(PrsmStrPtrVec& prsm_ptrs) {
+  std::vector<PrsmStrPtrVec> proteins;
   std::vector<std::string> protein_names;
-  for(size_t i = 0; i < prsm_ptrs.size(); i++) {
-    std::string name = prsm_ptrs[i]->getProteoformPtr()->getSeqName();
+  for (size_t i = 0; i < prsm_ptrs.size(); i++) {
+    std::string name = prsm_ptrs[i]->getSeqName();
     bool is_found = false;
-    for(size_t j = 0; j < protein_names.size(); j++){
-      if(protein_names[j] == name) {
+    for (size_t j = 0; j < protein_names.size(); j++) {
+      if (protein_names[j] == name) {
         proteins[j].push_back(prsm_ptrs[i]);
         is_found = true;
         break;
       }
     }
-    if(!is_found){
-      PrsmPtrVec new_protein;
+    if (!is_found) {
+      PrsmStrPtrVec new_protein;
       new_protein.push_back(prsm_ptrs[i]);
       proteins.push_back(new_protein);
       protein_names.push_back(name);
     }
   }
 
-  for(size_t i = 0; i < proteins.size(); i++){
+  for (size_t i = 0; i < proteins.size(); i++) {
     for (size_t j = 0; j < proteins[i].size(); j++) {
-      proteins[i][j]->getProteoformPtr()->setProtId(i);
+      proteins[i][j]->setProtId(i);
     }
   }
 }
 
-void PrsmFeatureSpecies::setSpeciesId(const PrsmPtrVec& prsm_ptrs){
-  PrsmPtrVec2D species;
+void PrsmFeatureSpecies::setSpeciesId(PrsmStrPtrVec& prsm_ptrs) {
+  std::vector<PrsmStrPtrVec> species;
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     bool is_found = false;
-    PrsmPtr cur_ptr = prsm_ptrs[i];
+    PrsmStrPtr cur_ptr = prsm_ptrs[i];
     for (size_t j = 0; j < species.size(); j++) {
-      PrsmPtr ref_ptr = species[j][0];
-      if (cur_ptr->getProteoformPtr()->getProtId() == ref_ptr->getProteoformPtr()->getProtId()) {
+      PrsmStrPtr ref_ptr = species[j][0];
+      if (cur_ptr->getProtId() == ref_ptr->getProtId()) {
         if (cur_ptr->getPrecFeatureId() == ref_ptr->getPrecFeatureId()) {
           species[j].push_back(cur_ptr);
           is_found = true;
           break;
         }
-        if (std::abs (cur_ptr->getAdjustedPrecMass() - ref_ptr->getAdjustedPrecMass()) <= prec_error_tole_) {
+        if (std::abs(cur_ptr->getAdjustedPrecMass() - ref_ptr->getAdjustedPrecMass()) <= prec_error_tole_) {
           species[j].push_back(cur_ptr);
           is_found = true;
           break;
@@ -86,14 +89,14 @@ void PrsmFeatureSpecies::setSpeciesId(const PrsmPtrVec& prsm_ptrs){
       }
     }
     if (!is_found) {
-      PrsmPtrVec new_species;
+      PrsmStrPtrVec new_species;
       new_species.push_back(prsm_ptrs[i]);
       species.push_back(new_species);
     }
   }
-  for(size_t i = 0; i < species.size(); i++){
+  for (size_t i = 0; i < species.size(); i++) {
     for (size_t j = 0; j < species[i].size(); j++) {
-      species[i][j]->getProteoformPtr()->setSpeciesId(i);
+      species[i][j]->setSpeciesId(i);
     }
   }
 }
@@ -101,8 +104,7 @@ void PrsmFeatureSpecies::setSpeciesId(const PrsmPtrVec& prsm_ptrs){
 void PrsmFeatureSpecies::process() {
   std::string base_name = FileUtil::basename(spec_file_name_);
   std::string input_file_name = base_name + "." + input_file_ext_;
-  PrsmPtrVec prsm_ptrs = PrsmReader::readAllPrsms(input_file_name, db_file_name_,
-                                                  fix_mod_ptr_vec_);
+  PrsmStrPtrVec prsm_ptrs = PrsmReader::readAllPrsmStrs(input_file_name);
   MsAlignReaderPtr msreader
       = std::make_shared<MsAlignReader>(feature_file_name_,
                                         prsm_para_ptr_->getGroupSpecNum(),
@@ -112,16 +114,16 @@ void PrsmFeatureSpecies::process() {
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     int spec_id = prsm_ptrs[i]->getSpectrumId();
     while (spec_set_ptr->getDeconvMsPtrVec()[0]->getMsHeaderPtr()->getId() != spec_id) {
-      spec_set_ptr = msreader->getNextSpectrumSet(prsm_para_ptr_->getSpParaPtr()); 
+      spec_set_ptr = msreader->getNextSpectrumSet(prsm_para_ptr_->getSpParaPtr());
     }
     prsm_ptrs[i]->setPrecFeatureId(spec_set_ptr->getDeconvMsPtrVec()[0]->getMsHeaderPtr()->getFeatureId());
     prsm_ptrs[i]->setPrecFeatureInte(spec_set_ptr->getDeconvMsPtrVec()[0]->getMsHeaderPtr()->getFeatureInte());
-  } 
-  sort(prsm_ptrs.begin(), prsm_ptrs.end(), Prsm::cmpEValueInc);
+  }
+  sort(prsm_ptrs.begin(), prsm_ptrs.end(), PrsmStr::cmpEValueInc);
   setProtId(prsm_ptrs);
   setSpeciesId(prsm_ptrs);
-  sort(prsm_ptrs.begin(), prsm_ptrs.end(), Prsm::cmpSpectrumIdIncPrecursorIdInc);
-  //output
+  sort(prsm_ptrs.begin(), prsm_ptrs.end(), prot::PrsmStr::cmpSpectrumIdIncPrecursorIdInc);
+  // output
   std::string output_file_name = base_name + "." + output_file_ext_;
   PrsmXmlWriter writer(output_file_name);
   writer.writeVector(prsm_ptrs);
