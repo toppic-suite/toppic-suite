@@ -33,7 +33,10 @@
 #define PROT_XML_GENERATOR_HPP_
 
 #include <map>
-#include <xercesc/util/PlatformUtils.hpp>
+#include <string>
+#include <vector>
+
+#include "xercesc/util/PlatformUtils.hpp"
 
 #include "base/proteoform.hpp"
 #include "base/fasta_reader.hpp"
@@ -47,24 +50,33 @@ namespace prot {
 
 class XmlGenerator {
  public:
-  XmlGenerator(PrsmParaPtr prsm_para_ptr, const std::string &exec_dir, 
+  XmlGenerator(PrsmParaPtr prsm_para_ptr, const std::string &exec_dir,
                const std::string &input_file_name);
   void process();
-  void outputPrsms(const PrsmPtrVec &prsm_ptrs);
-  void outputAllPrsms(const PrsmPtrVec &prsm_ptrs);
-  void outputProteoforms(const PrsmPtrVec &prsm_ptrs);
-  void outputProteins(const PrsmPtrVec &prsm_ptrs);
-  void outputAllProteins(const PrsmPtrVec &prsm_ptrs);
-  void outputFileList();
 
  private:
+  void outputPrsms();
+  void outputProteoforms();
+  void outputProteins();
+  void outputAllProteins();
+  void outputFileList();
+  void splitBySpeciesId();
+  void splitByProtId();
+
   std::string input_file_ext_;
   PrsmViewMngPtr mng_ptr_;
   AnnoViewPtr anno_view_ptr_;
+  FastaIndexReaderPtr fasta_reader_ptr_;
+  std::vector<int> species_ids_;
+  std::vector<int> prot_ids_;
+  int writer_block_size_;
+  std::vector<ExtendMsPtrVec> extend_ms_vec2d_;
+  std::vector<DeconvMsPtrVec> deconv_ms_vec2d_;
+  std::map<int, size_t> spec_id_extend_ms_map_;  
 };
 
 typedef std::shared_ptr<XmlGenerator> XmlGeneratorPtr;
 
-} /* namespace prot */
+}  // namespace prot
 
 #endif /* PROT_XML_GENERATOR_HPP_ */

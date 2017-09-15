@@ -31,6 +31,8 @@
 
 #include <iostream>
 #include <sstream>
+#include <string>
+#include <algorithm>
 
 #include "base/logger.hpp"
 #include "base/file_util.hpp"
@@ -213,6 +215,8 @@ namespace prot {
     delFile(sp_base + ".CUTOFF_RESULT");            
     delFile(sp_base + ".LOCAL_RESULT");
     clean_prefix(sp, sp_base + ".EVALUE_");
+    clean_prefix(sp, sp_base + ".SPECIES_");
+    clean_prefix(sp, sp_base + ".PROT_");
     delFile(sp_base + ".EVALUE");
     delFile(sp_base + ".RAW_RESULT");      
     delFile(sp_base + ".FORMS");
