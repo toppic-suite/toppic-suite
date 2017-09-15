@@ -286,17 +286,17 @@ int two_base_opt(int argc, char* argv[]) {
     }
 
     std::cout << "PRSM selecting by cutoff - started." << std::endl;
-    std::string cutoff_type = arguments["cutoffType"];
+    std::string cutoff_type = arguments["cutoffSpectralType"];
     double cutoff_value;
-    std::istringstream(arguments["cutoffValue"]) >> cutoff_value;
+    std::istringstream(arguments["cutoffSpectralValue"]) >> cutoff_value;
     PrsmCutoffSelectorPtr cutoff_selector
         = std::make_shared<PrsmCutoffSelector>(db_file_name, sp_file_name, "TOP",
-                                               "CUTOFF_RESULT", cutoff_type, cutoff_value);
+                                               "CUTOFF_RESULT_SPEC", cutoff_type, cutoff_value);
     cutoff_selector->process();
     cutoff_selector = nullptr;
     std::cout << "PRSM selecting by cutoff - finished." << std::endl;
 
-    std::string suffix = "CUTOFF_RESULT";
+    std::string suffix = "CUTOFF_RESULT_SPEC";
 
     if (localization) {
       std::cout << "PTM characterization - started." << std::endl;
@@ -336,9 +336,19 @@ int two_base_opt(int argc, char* argv[]) {
     std::cout << "Converting xml files to html files - finished." << std::endl;
     WebLog::completeFunction(WebLog::OutPutTime());
 
+    std::cout << "PRSM proteoform selecting by cutoff - started." << std::endl;
+    cutoff_type = (arguments["cutoffProteoformType"] == "FDR") ? "FORMFDR": "EVALUE";
+    std::istringstream(arguments["cutoffProteoformValue"]) >> cutoff_value;
+    cutoff_selector = std::make_shared<PrsmCutoffSelector>(db_file_name, sp_file_name, "TOP",
+                                                           "CUTOFF_RESULT_FORM", cutoff_type,
+                                                           cutoff_value);
+    cutoff_selector->process();
+    cutoff_selector = nullptr;
+    std::cout << "PRSM proteoform selecting by cutoff - finished." << std::endl;
+
     std::cout << "PRSM proteoform filtering - started." << std::endl;
     PrsmFormFilterPtr form_filter
-        = std::make_shared<PrsmFormFilter>(db_file_name, sp_file_name, suffix,
+        = std::make_shared<PrsmFormFilter>(db_file_name, sp_file_name, "CUTOFF_RESULT_FORM",
                                            "FORM_FILTER_RESULT", "FORM_RESULT");
     form_filter->process();
     form_filter = nullptr;
