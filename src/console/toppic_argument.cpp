@@ -57,8 +57,10 @@ void Argument::initArguments() {
   arguments_["fixedMod"] = "";
   arguments_["ptmNumber"] = "1";
   arguments_["errorTolerance"] = "15";
-  arguments_["cutoffType"] = "EVALUE";
-  arguments_["cutoffValue"] = "0.01";
+  arguments_["cutoffSpectralType"] = "EVALUE";
+  arguments_["cutoffSpectralValue"] = "0.01";
+  arguments_["cutoffProteoformType"] = "EVALUE";
+  arguments_["cutoffProteoformValue"] = "0.01";
   arguments_["allowProtMod"] = "NONE,NME,NME_ACETYLATION,M_ACETYLATION";
   arguments_["numOfTopPrsms"] = "1";
   arguments_["maxPtmMass"] = "500";
@@ -71,7 +73,6 @@ void Argument::initArguments() {
   arguments_["groupSpectrumNumber"] = "1";
   arguments_["filteringResultNumber"] = "20";
   arguments_["residueModFileName"] = "";
-  arguments_["proteo_graph_dis"] = "40";
   arguments_["threadNumber"] = "1";
   arguments_["featureFileName"] = "";
 }
@@ -97,8 +98,10 @@ void Argument::outputArguments(std::ostream &output,
 
   output << std::setw(44) << std::left << "Maximum number of unexpected modifications: " << "\t" << arguments["ptmNumber"] << std::endl;
   output << std::setw(44) << std::left << "Error tolerance: " << "\t" << arguments["errorTolerance"] << " ppm" << std::endl;
-  output << std::setw(44) << std::left << "Cutoff type: " << "\t" << arguments["cutoffType"] << std::endl;
-  output << std::setw(44) << std::left << "Cutoff value: " << "\t" << arguments["cutoffValue"] << std::endl;
+  output << std::setw(44) << std::left << "Spectrum-level cutoff type: " << "\t" << arguments["cutoffSpectralType"] << std::endl;
+  output << std::setw(44) << std::left << "Spectrum-level cutoff value: " << "\t" << arguments["cutoffSpectralValue"] << std::endl;
+  output << std::setw(44) << std::left << "Proteoform cutoff type: " << "\t" << arguments["cutoffProteoformType"] << std::endl;
+  output << std::setw(44) << std::left << "Proteoform cutoff value: " << "\t" << arguments["cutoffProteoformValue"] << std::endl;
   output << std::setw(44) << std::left << "Allowed N-terminal forms: " << "\t" << arguments["allowProtMod"] << std::endl;
   output << std::setw(44) << std::left << "Maximum mass shift of modifications: " << "\t" << arguments["maxPtmMass"] << " Da" << std::endl;
   output << std::setw(44) << std::left << "Thread number: " << "\t" << arguments["threadNumber"] << std::endl;
@@ -153,7 +156,6 @@ void Argument::setArgumentsByConfigFile(const std::string &filename){
       arguments_["residueModFileName"] = XmlDomUtil::getChildValue(root, "residueModFileName", 0);
       arguments_["local_threshold"] = XmlDomUtil::getChildValue(root, "local_threshold", 0);
       arguments_["filteringResultNumber"] = XmlDomUtil::getChildValue(root, "filtering_result_number", 0);
-      arguments_["proteo_graph_dis"] = XmlDomUtil::getChildValue(root, "proteo_graph_dis", 0);
       arguments_["threadNumber"] = XmlDomUtil::getChildValue(root, "thread_number", 0);
       arguments_["featureFileName"] = XmlDomUtil::getChildValue(root, "use_feature", 0);
       xercesc::DOMElement* prot_mod_list = XmlDomUtil::getChildElement(root,"protein_variable_ptm_list",0);
@@ -182,8 +184,10 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string ptm_num = "";
   std::string error_tole = "";
   std::string max_ptm_mass = "";
-  std::string cutoff_type = "";
-  std::string cutoff_value = "";
+  std::string cutoff_spectral_type = "";
+  std::string cutoff_spectral_value = "";
+  std::string cutoff_proteoform_type = "";
+  std::string cutoff_proteoform_value = "";
   std::string log_file_name = "";
   std::string use_table = "";
   std::string group_num = "";
@@ -210,8 +214,10 @@ bool Argument::parse(int argc, char* argv[]) {
         ("error-tolerance,e", po::value<std::string> (&error_tole), "<a positive integer>. Error tolerance for precursor and fragment masses in PPM. Default value: 15.")
         ("max-mod,m", po::value<std::string> (&max_ptm_mass), "<a positive number>. Maximum absolute value of the mass shift (in Dalton) of an unexpected modification. Default value: 500.")
         ("num-mod,p", po::value<std::string> (&ptm_num), "<0|1|2>. Maximum number of unexpected modifications in a proteoform spectrum-match. Default value: 1.")
-        ("cutoff-type,t", po::value<std::string> (&cutoff_type), "<EVALUE|FDR|FORMFDR>. Cutoff type for filtering identified proteoform spectrum-matches. Default value: EVALUE.")
-        ("cutoff-value,v", po::value<std::string> (&cutoff_value), "<a positive number>. Cutoff value for filtering identified proteoform spectrum-matches. Default value: 0.01.")
+        ("cutoff-spectral-type,t", po::value<std::string> (&cutoff_spectral_type), "<EVALUE|FDR>. Spectrum-level cutoff type for filtering identified proteoform spectrum-matches. Default value: EVALUE.")
+        ("cutoff-spectral-value,v", po::value<std::string> (&cutoff_spectral_value), "<a positive number>. Spectrum-level cutoff value for filtering identified proteoform spectrum-matches. Default value: 0.01.")
+        ("cutoff-proteoform-type,q", po::value<std::string> (&cutoff_proteoform_type), "<EVALUE|FDR>. Proteoform-level cutoff type for filtering identified proteoform spectrum-matches. Default value: EVALUE.")
+        ("cutoff-proteoform-value,w", po::value<std::string> (&cutoff_proteoform_value), "<a positive number>. Proteoform-level cutoff value for filtering identified proteoform spectrum-matches. Default value: 0.01.")
         ("generating-function,g", "Use the generating function approach to compute p-values and E-values.")
         ("num-combined-spectra,r", po::value<std::string> (&group_num), 
          "<a positive integer>. Number of combined spectra. The parameter is set as 2 (or 3) for combining spectral pairs (or triplets) generated by the alternating fragmentation mode. Default value: 1")
@@ -231,8 +237,10 @@ bool Argument::parse(int argc, char* argv[]) {
         ("error-tolerance,e", po::value<std::string> (&error_tole), "")
         ("max-mod,m", po::value<std::string> (&max_ptm_mass), "")
         ("num-mod,p", po::value<std::string> (&ptm_num), "")
-        ("cutoff-type,t", po::value<std::string> (&cutoff_type), "")
-        ("cutoff-value,v", po::value<std::string> (&cutoff_value), "")
+        ("cutoff-spectral-type,t", po::value<std::string> (&cutoff_spectral_type), "")
+        ("cutoff-spectral-value,v", po::value<std::string> (&cutoff_spectral_value), "")
+        ("cutoff-proteoform-type,q", po::value<std::string> (&cutoff_proteoform_type), "")
+        ("cutoff-proteoform-value,w", po::value<std::string> (&cutoff_proteoform_value), "")
         ("filtering-result-number,o", po::value<std::string>(&filtering_result_num), "Filtering result number. Default value: 20.")
         ("log-file-name,l", po::value<std::string>(&log_file_name), "Log file name with its path.")
         ("keep-temp-files,k", "Keep temporary files.")
@@ -310,11 +318,17 @@ bool Argument::parse(int argc, char* argv[]) {
     if (vm.count("max-mod")) {
       arguments_["maxPtmMass"] = max_ptm_mass;
     }
-    if (vm.count("cutoff-type")) {
-      arguments_["cutoffType"] = cutoff_type;
+    if (vm.count("cutoff-spectral-type")) {
+      arguments_["cutoffSpectralType"] = cutoff_spectral_type;
     }
-    if (vm.count("cutoff-value")) {
-      arguments_["cutoffValue"] = cutoff_value;
+    if (vm.count("cutoff-spectral-value")) {
+      arguments_["cutoffSpectralValue"] = cutoff_spectral_value;
+    }
+    if (vm.count("cutoff-proteoform-type")) {
+      arguments_["cutoffProteoformType"] = cutoff_proteoform_type;
+    }
+    if (vm.count("cutoff-proteoform-value")) {
+      arguments_["cutoffProteoformValue"] = cutoff_proteoform_value;
     }
     if (vm.count("log-file-name")) {
       arguments_["logFileName"] = log_file_name;
@@ -401,14 +415,25 @@ bool Argument::validateArguments() {
     }
   }
 
-  std::string cutoff_type = arguments_["cutoffType"];
-  if (cutoff_type != "EVALUE" && cutoff_type != "FDR" && cutoff_type != "FORMFDR") {
-    LOG_ERROR("Cutoff type " << cutoff_type << " error! The value should be EVALUE|FDR");
+  std::string cutoff_spectral_type = arguments_["cutoffSpectralType"];
+  if (cutoff_spectral_type != "EVALUE" && cutoff_spectral_type != "FDR") {
+    LOG_ERROR("Spectrum-level cutoff type " << cutoff_spectral_type << " error! The value should be EVALUE|FDR");
     return false;
   }
 
-  if (cutoff_type == "FDR" && search_type != "TARGET+DECOY"){
-    LOG_ERROR("Cutoff type "<< cutoff_type << " error! FDR cutoff cannot be used when no decoy database is used! Please add argument '-d' in the command.");
+  std::string cutoff_proteoform_type = arguments_["cutoffProteoformType"];
+  if (cutoff_proteoform_type != "EVALUE" && cutoff_proteoform_type != "FDR") {
+    LOG_ERROR("Proteoform-level cutoff type " << cutoff_proteoform_type << " error! The value should be EVALUE|FDR");
+    return false;
+  }
+
+  if (cutoff_spectral_type == "FDR" && search_type != "TARGET+DECOY"){
+    LOG_ERROR("Spectrum-level cutoff type "<< cutoff_spectral_type << " error! FDR cutoff cannot be used when no decoy database is used! Please add argument '-d' in the command.");
+    return false;
+  }
+
+  if (cutoff_proteoform_type == "FDR" && search_type != "TARGET+DECOY"){
+    LOG_ERROR("Proteoform-level cutoff type "<< cutoff_proteoform_type << " error! FDR cutoff cannot be used when no decoy database is used! Please add argument '-d' in the command.");
     return false;
   }
 
@@ -436,23 +461,34 @@ bool Argument::validateArguments() {
     return false;
   }
 
-  std::string cutoff_value = arguments_["cutoffValue"];
+  std::string cutoff_spectral_value = arguments_["cutoffSpectralValue"];
   try {
-    double th = std::stod(cutoff_value.c_str());
-    if(th < 0){
-      LOG_ERROR("Cutoff value " << cutoff_value << " error! The value should be positive.");
+    double th = std::stod(cutoff_spectral_value);
+    if (th < 0) {
+      LOG_ERROR("Spectrum-level cutoff value " << cutoff_spectral_value << " error! The value should be positive.");
       return false;
     }
+  } catch (int e) {
+    LOG_ERROR("Spectrum-level cutoff value " << cutoff_spectral_value << " should be a number.");
+    return false;
   }
-  catch (int e) {
-    LOG_ERROR("Cutoff value " << cutoff_value << " should be a number.");
+
+  std::string cutoff_proteoform_value = arguments_["cutoffSpectralValue"];
+  try {
+    double th = std::stod(cutoff_proteoform_value);
+    if (th < 0) {
+      LOG_ERROR("Proteoform-level cutoff value " << cutoff_proteoform_value << " error! The value should be positive.");
+      return false;
+    }
+  } catch (int e) {
+    LOG_ERROR("Proteoform-level cutoff value " << cutoff_proteoform_value << " should be a number.");
     return false;
   }
 
   std::string thread_number = arguments_["threadNumber"];
   try {
     int num = std::stoi(thread_number.c_str());
-    if(num <= 0){
+    if (num <= 0) {
       LOG_ERROR("Thread number " << thread_number << " error! The value should be positive.");
       return false;
     }
@@ -461,13 +497,12 @@ bool Argument::validateArguments() {
       LOG_ERROR("Thread number " << thread_number << " error! The value is too large. Only " << n << " threads are supported.");
       return false;
     }
-  }
-  catch (int e) {
-    LOG_ERROR("Cutoff value " << cutoff_value << " should be a number.");
+  } catch (int e) {
+    LOG_ERROR("Thread number " << thread_number << " should be a number.");
     return false;
   }
 
   return true;
 }
 
-} /* namespace prot */
+}  // namespace prot

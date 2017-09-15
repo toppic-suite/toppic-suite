@@ -212,7 +212,8 @@ namespace prot {
     clean_prefix(sp, sp_base + ".VAR1_");
     clean_prefix(sp, sp_base + ".VAR2_");
     delFile(sp_base + ".GRAPH_ALIGN");
-    delFile(sp_base + ".CUTOFF_RESULT");            
+    delFile(sp_base + ".CUTOFF_RESULT_SPEC");
+    delFile(sp_base + ".CUTOFF_RESULT_FORM");
     delFile(sp_base + ".LOCAL_RESULT");
     clean_prefix(sp, sp_base + ".EVALUE_");
     clean_prefix(sp, sp_base + ".SPECIES_");
