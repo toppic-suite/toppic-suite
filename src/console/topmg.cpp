@@ -28,6 +28,10 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <map>
+#include <string>
+#include <algorithm>
+#include <vector>
 
 #include "base/fasta_reader.hpp"
 #include "base/fasta_util.hpp"
@@ -134,45 +138,21 @@ int topmg_test(int argc, char* argv[]) {
 
     std::vector<std::string> input_exts;
 
-    std::cout << "Zero PTM filtering - started." << std::endl;
-    ZeroPtmFilterMngPtr zero_filter_mng_ptr
-        = std::make_shared<ZeroPtmFilterMng>(prsm_para_ptr, "ZERO_FILTER");
-    ZeroPtmFilterProcessorPtr zero_filter_processor
-        = std::make_shared<ZeroPtmFilterProcessor>(zero_filter_mng_ptr);
-    zero_filter_processor->process();
-    std::cout << "Zero PTM filtering - finished." << std::endl;
-
-    input_exts.push_back("ZERO_FILTER_COMPLETE");
-    input_exts.push_back("ZERO_FILTER_PREFIX");
-    input_exts.push_back("ZERO_FILTER_SUFFIX");
-    input_exts.push_back("ZERO_FILTER_INTERNAL");
-
-    std::cout << "One PTM filtering - started." << std::endl;
-    OnePtmFilterMngPtr one_ptm_filter_mng_ptr
-        = std::make_shared<OnePtmFilterMng>(prsm_para_ptr, "ONE_PTM_FILTER");
-    OnePtmFilterProcessorPtr one_filter_processor
-        = std::make_shared<OnePtmFilterProcessor>(one_ptm_filter_mng_ptr);
+    std::cout << "ASF-One PTM filtering - started." << std::endl;
+    OnePtmFilterMngPtr one_ptm_filter_mng_ptr =
+        std::make_shared<OnePtmFilterMng>(prsm_para_ptr, "VAR1_ONE_PTM_FILTER",
+                                          arguments["residueModFileName"], 1);
+    OnePtmFilterProcessorPtr one_filter_processor =
+        std::make_shared<OnePtmFilterProcessor>(one_ptm_filter_mng_ptr);
     one_filter_processor->process();
-    std::cout << "One PTM filtering - finished." << std::endl;
+    std::cout << "ASF-One PTM filtering - finished." << std::endl;
 
-    input_exts.push_back("ONE_PTM_FILTER_COMPLETE");
-    input_exts.push_back("ONE_PTM_FILTER_PREFIX");
-    input_exts.push_back("ONE_PTM_FILTER_SUFFIX");
-    input_exts.push_back("ONE_PTM_FILTER_INTERNAL");
+    input_exts.push_back("VAR1_ONE_PTM_COMPLETE");
+    input_exts.push_back("VAR1_ONE_PTM_PREFIX");
+    input_exts.push_back("VAR1_ONE_PTM_SUFFIX");
+    input_exts.push_back("VAR1_ONE_PTM_INTERNAL");
 
-    std::cout << "Diagonal PTM filtering - started." << std::endl;
-    DiagFilterMngPtr diag_filter_mng_ptr
-        = std::make_shared<DiagFilterMng>(prsm_para_ptr, filter_result_num,
-                                          thread_num, "DIAG_FILTER");
-    DiagFilterProcessorPtr diag_filter_processor
-        = std::make_shared<DiagFilterProcessor>(diag_filter_mng_ptr);
-    diag_filter_processor->process();
-    std::cout << "Diagonal filtering - finished." << std::endl;
-
-    input_exts.push_back("DIAG_FILTER");
-
-    std::cout << "Set one variable PTM" << std::endl;
-    std::cout << "Diagonal PTM filtering - started." << std::endl;
+    std::cout << "ASF-Diagonal PTM filtering - started." << std::endl;
     DiagFilterMngPtr diag_filter_mng_ptr1
         = std::make_shared<DiagFilterMng>(prsm_para_ptr, filter_result_num,
                                           thread_num, "VAR1_DIAG_FILTER",
@@ -180,18 +160,18 @@ int topmg_test(int argc, char* argv[]) {
     DiagFilterProcessorPtr diag_filter_processor1
         = std::make_shared<DiagFilterProcessor>(diag_filter_mng_ptr1);
     diag_filter_processor1->process();
-    std::cout << "Diagonal filtering - finished." << std::endl;
+    std::cout << "ASF-Diagonal filtering - finished." << std::endl;
 
     input_exts.push_back("VAR1_DIAG_FILTER");
 
     SimplePrsmPtrVec sim_prsm_ptrs;
 
     for (size_t i = 0; i < input_exts.size(); i++) {
-      std::string input_file_name = FileUtil::basename(sp_file_name) + "." + input_exts[i]; 
+      std::string input_file_name = FileUtil::basename(sp_file_name) + "." + input_exts[i];
       SimplePrsmReaderPtr reader_ptr = std::make_shared<SimplePrsmReader>(input_file_name);
       SimplePrsmPtr str_ptr = reader_ptr->readOnePrsm();
       while (str_ptr != nullptr) {
-        sim_prsm_ptrs.push_back(str_ptr);  
+        sim_prsm_ptrs.push_back(str_ptr);
         str_ptr = reader_ptr->readOnePrsm();
       }
     }
@@ -265,7 +245,7 @@ int topmg_test(int argc, char* argv[]) {
     cutoff_selector = nullptr;
     std::cout << "PRSM selecting by cutoff - finished." << std::endl;
 
-    std::cout << "Finding protein species started." << std::endl;  
+    std::cout << "Finding protein species started." << std::endl;
     if (arguments["featureFileName"] != "") {
       // TopFD msalign file with feature ID
       double prec_error_tole = 1.2;
@@ -339,7 +319,6 @@ int topmg_test(int argc, char* argv[]) {
       FileUtil::cleanDir(ori_db_file_name, sp_file_name);
       std::cout << "Deleting temporary files - finished." << std::endl;
     }
-
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;

@@ -32,24 +32,29 @@
 #ifndef PROT_ONE_PTM_FILTER_MNG_HPP_
 #define PROT_ONE_PTM_FILTER_MNG_HPP_
 
+#include <string>
+
 #include "prsm/prsm_para.hpp"
 
 namespace prot {
 
 class OnePtmFilterMng {
  public:
-  OnePtmFilterMng(PrsmParaPtr prsm_para_ptr, 
-                  std::string output_file_ext): 
+  OnePtmFilterMng(PrsmParaPtr prsm_para_ptr,
+                  const std::string & output_file_ext,
+                  const std::string & residueModFileName = "",
+                  int var_num = 0):
       prsm_para_ptr_(prsm_para_ptr),
-      output_file_ext_(output_file_ext) {
-      }
+      output_file_ext_(output_file_ext),
+      residueModFileName_(residueModFileName),
+      var_num_(var_num) {}
 
   PrsmParaPtr prsm_para_ptr_;
 
-  /** parameters for fast filteration */
+  // parameters for fast filteration
   int max_proteoform_mass_ = 20000;
 
-  //Candidate protein number for each spectrum
+  // Candidate protein number for each spectrum
   unsigned int comp_num_ = 10;
   unsigned int pref_suff_num_ = 5;
   unsigned int inte_num_ = 10;
@@ -57,11 +62,13 @@ class OnePtmFilterMng {
   int filter_scale_ = 100;
 
   std::string output_file_ext_;
+  std::string residueModFileName_;
 
+  int var_num_;
 };
 
 typedef std::shared_ptr<OnePtmFilterMng> OnePtmFilterMngPtr;
 
-} /* namespace tools */
+}  // namespace prot
 
 #endif /* ONE_PTM_FILTER_MNG_HPP_ */
