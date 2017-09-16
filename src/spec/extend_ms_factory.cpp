@@ -28,12 +28,14 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <algorithm>
+#include <vector>
 
 #include "spec/extend_ms_factory.hpp"
 
 namespace prot {
 
-ExtendMsPtr ExtendMsFactory::geneMsThreePtr(DeconvMsPtr deconv_ms_ptr, SpParaPtr sp_para_ptr, 
+ExtendMsPtr ExtendMsFactory::geneMsThreePtr(DeconvMsPtr deconv_ms_ptr, SpParaPtr sp_para_ptr,
                                             double new_prec_mass) {
   MsHeaderPtr ori_header_ptr = deconv_ms_ptr->getMsHeaderPtr();
   MsHeaderPtr header_ptr = MsHeader::geneMsHeaderPtr(ori_header_ptr, new_prec_mass);
@@ -41,62 +43,63 @@ ExtendMsPtr ExtendMsFactory::geneMsThreePtr(DeconvMsPtr deconv_ms_ptr, SpParaPtr
   ExtendPeakPtrVec list;
   double ext_min_mass = sp_para_ptr->getExtendMinMass();
   std::vector<double> ext_offsets = sp_para_ptr->getExtendOffsets();
-  int k = static_cast<int>(sp_para_ptr->mod_mass_.size()) + 1;
-  for(size_t i = 0; i < deconv_ms_ptr->size(); i++){
+  for (size_t i = 0; i < deconv_ms_ptr->size(); i++) {
     DeconvPeakPtr deconv_peak_ptr = deconv_ms_ptr->getPeakPtr(i);
-    if(deconv_peak_ptr->getMonoMass() <= ext_min_mass) {
+    if (deconv_peak_ptr->getMonoMass() <= ext_min_mass) {
       double orig_mass = deconv_peak_ptr->getMonoMass();
-      for (int j = 1; j < k; j++) {
-        if (deconv_peak_ptr->getMonoMass() > new_prec_mass * j / k) {
-          orig_mass -= sp_para_ptr->mod_mass_[j - 1];
-        } 
+      if (deconv_peak_ptr->getMonoMass() > new_prec_mass / 4) {
+        orig_mass -= sp_para_ptr->mod_mass_[0];
       }
-      ExtendPeakPtr extend_peak_ptr 
+
+      if (deconv_peak_ptr->getMonoMass() > new_prec_mass * 3 / 4) {
+        orig_mass -= sp_para_ptr->mod_mass_[1];
+      }
+      ExtendPeakPtr extend_peak_ptr
           = std::make_shared<ExtendPeak>(deconv_peak_ptr, orig_mass, 1.0);
       list.push_back(extend_peak_ptr);
-    } else{
-      for(size_t j = 0;j < ext_offsets.size();j++){
+    } else {
+      for (size_t j = 0; j < ext_offsets.size(); j++) {
         double mass = deconv_peak_ptr->getMonoMass() + ext_offsets[j];
-        for (int j = 1; j < k; j++) {
-          if (deconv_peak_ptr->getMonoMass() + ext_offsets[j] > new_prec_mass * j / k) {
-            mass -= sp_para_ptr->mod_mass_[j - 1];
-          } 
+        if (deconv_peak_ptr->getMonoMass() + ext_offsets[j] > new_prec_mass / 4) {
+          mass -= sp_para_ptr->mod_mass_[0];
         }
-        ExtendPeakPtr extend_peak_ptr 
+
+        if (deconv_peak_ptr->getMonoMass() + ext_offsets[j] > new_prec_mass * 3 / 4) {
+          mass -= sp_para_ptr->mod_mass_[1];
+        }
+        ExtendPeakPtr extend_peak_ptr
             = std::make_shared<ExtendPeak>(deconv_peak_ptr, mass, 1.0);
         list.push_back(extend_peak_ptr);
       }
     }
   }
 
-  //filter extend_peak
+  // filter extend_peak
   ExtendPeakPtrVec list_filtered;
   double min_mass = sp_para_ptr->getMinMass();
   double prec_mono_mass = header_ptr->getPrecMonoMass();
-  for(size_t i =0; i < list.size();i++){
+  for (size_t i = 0; i < list.size(); i++) {
     double mass = list[i]->getPosition();
-    if(mass >= min_mass && mass <= prec_mono_mass - min_mass){
+    if (mass >= min_mass && mass <= prec_mono_mass - min_mass) {
       list_filtered.push_back(list[i]);
     }
   }
 
-  // sort 
-  std::sort(list_filtered.begin(),list_filtered.end(),ExtendPeak::cmpPosIncrease);
+  std::sort(list_filtered.begin(), list_filtered.end(), ExtendPeak::cmpPosIncrease);
 
-  //set error tolerance
+  // set error tolerance
   PeakTolerancePtr peak_tole_ptr = sp_para_ptr->getPeakTolerancePtr();
-  for (size_t i = 0; i < list_filtered.size();i++){
+  for (size_t i = 0; i < list_filtered.size(); i++) {
     double mass = list_filtered[i]->getBasePeakPtr()->getMonoMass();
     double ori_tole = peak_tole_ptr->compStrictErrorTole(mass);
     list_filtered[i]->setOrigTolerance(ori_tole);
-    double reve_tole 
-        = peak_tole_ptr->compRelaxErrorTole(mass, prec_mono_mass);
+    double reve_tole = peak_tole_ptr->compRelaxErrorTole(mass, prec_mono_mass);
     list_filtered[i]->setReverseTolerance(reve_tole);
   }
-  return ExtendMsPtr(new Ms<ExtendPeakPtr>(header_ptr,list_filtered));
+  return std::make_shared<Ms<ExtendPeakPtr>>(header_ptr, list_filtered);
 }
 
-ExtendMsPtrVec ExtendMsFactory::geneMsThreePtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, 
+ExtendMsPtrVec ExtendMsFactory::geneMsThreePtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
                                                   SpParaPtr sp_para_ptr, double new_prec_mass) {
   ExtendMsPtrVec extend_ms_ptr_vec;
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
