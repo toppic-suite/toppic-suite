@@ -48,10 +48,13 @@ class PrsmUtil {
   static std::string getXmlLine(const std::vector<std::string> &str_vec,
                                 const std::string &property);
 
-  static PrsmPtrVec selectSpeciesPrsms(const PrsmPtrVec &prsm_ptrs,int species_id);
+  static std::vector<std::string> getXmlLineVec(const std::vector<std::string> &str_vec,
+                                                const std::string &property);
+
+  static PrsmPtrVec selectSpeciesPrsms(const PrsmPtrVec &prsm_ptrs, int species_id);
 
   static std::vector<int> getSpeciesIds(const PrsmPtrVec &prsm_ptrs, std::string &seq_name);
-  
+
   static int getProteinId(const PrsmPtrVec &prsm_ptrs, std::string &seq_name);
 
   static std::vector<int> getSpeciesIds(const PrsmPtrVec &prsm_ptrs);
@@ -59,6 +62,6 @@ class PrsmUtil {
   static void addSpectrumPtrsToPrsms(PrsmPtrVec &prsm_ptrs, PrsmParaPtr prsm_para_ptr);
 };
 
-}
+}  // namespace prot
 #endif
 

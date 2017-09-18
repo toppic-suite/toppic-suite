@@ -62,7 +62,7 @@ Proteoform::Proteoform(xercesc::DOMElement* element, FastaIndexReaderPtr reader_
                        const ModPtrVec &fix_mod_list) {
 
   std::string seq_element_name = FastaSeq::getXmlElementName();
-  xercesc::DOMElement* seq_element= XmlDomUtil::getChildElement(element,seq_element_name.c_str(),0);
+  xercesc::DOMElement* seq_element= XmlDomUtil::getChildElement(element, seq_element_name.c_str(), 0);
   std::string seq_name = FastaSeq::getNameFromXml(seq_element);
   int sub_seq_start = FastaSeq::getSubSeqStartFromXml(seq_element);
   std::string seq_desc = FastaSeq::getDescFromXml(seq_element);
@@ -251,7 +251,7 @@ std::string Proteoform::getProteinMatchSeq() {
   //LOG_DEBUG("string_pairs length " << string_pairs.size() << " string " << FastaSeq::getString(string_pairs));
   std::string mid_string = residue_seq_ptr_->toAcidString();
   //LOG_DEBUG("mid string lenth " << mid_string.length() << " string " << mid_string);
-  std::sort(change_list_.begin(),change_list_.end(),Change::cmpPosInc);
+  std::sort(change_list_.begin(), change_list_.end(), Change::cmpPosInc);
 
   std::vector<std::string> left_strings(mid_string.size() + 1, "");
   std::vector<std::string> right_strings(mid_string.size() + 1, "");
@@ -269,7 +269,7 @@ std::string Proteoform::getProteinMatchSeq() {
   updateMatchSeq(unexpected_changes, left_strings, right_strings);
   //LOG_DEBUG("change update completed");
 
-  std::string result="";
+  std::string result = "";
   for (size_t i = 0; i < mid_string.length(); i++) {
     result = result + right_strings[i] + left_strings[i] + mid_string.substr(i, 1);
   }
@@ -277,71 +277,27 @@ std::string Proteoform::getProteinMatchSeq() {
   result = result + right_strings[mid_string.length()];
 
   std::string prefix = "";
-  if(start_pos_>0) {
+  if (start_pos_ > 0) {
     prefix = string_pairs[start_pos_-1].first;
   }
   std::string suffix = "";
-  if(end_pos_< (int)string_pairs.size()-1) {
+  if (end_pos_ < static_cast<int>(string_pairs.size()) - 1) {
     suffix = string_pairs[end_pos_+1].first;
   }
 
   //LOG_DEBUG("Prefix " << prefix << " result " << result << " suffix length " << suffix.length() << " suffix " << suffix);
-  return prefix+"."+result+"."+suffix;
+  return prefix + "." + result + "." + suffix;
 }
-
-/*
-   std::string Proteoform::getProteinMatchSeq() {
-   std::string protein_string = fasta_seq_ptr_->getSeq();
-//LOG_DEBUG("protein string lenth " << protein_string.length() << " string " << protein_string);
-std::string mid_string = residue_seq_ptr_->toAcidString();
-//LOG_DEBUG("mid string lenth " << mid_string.length() << " string " << mid_string);
-std::sort(change_list_.begin(),change_list_.end(),Change::cmpPosInc);
-
-std::vector<std::string> left_strings(mid_string.length() + 1, "");
-std::vector<std::string> right_strings(mid_string.length() + 1, "");
-
-ChangePtrVec input_changes = getChangePtrVec(ChangeType::INPUT);
-updateMatchSeq(input_changes, left_strings, right_strings);
-ChangePtrVec fixed_changes = getChangePtrVec(ChangeType::FIXED);
-updateMatchSeq(fixed_changes, left_strings, right_strings);
-ChangePtrVec protein_var_changes = getChangePtrVec(ChangeType::PROTEIN_VARIABLE);
-updateMatchSeq(protein_var_changes, left_strings, right_strings);
-ChangePtrVec var_changes = getChangePtrVec(ChangeType::VARIABLE);
-updateMatchSeq(var_changes, left_strings, right_strings);
-ChangePtrVec unexpected_changes = getChangePtrVec(ChangeType::UNEXPECTED);
-updateMatchSeq(unexpected_changes, left_strings, right_strings);
-
-std::string result="";
-for (size_t i = 0; i < mid_string.length(); i++) {
-result = result + right_strings[i] + left_strings[i] + mid_string.substr(i, 1);
-}
-// last break;
-result = result + right_strings[mid_string.length()];
-
-std::string prefix = "";
-if(start_pos_>0) {
-prefix = protein_string.substr(start_pos_-1,1);
-}
-std::string suffix = "";
-if(end_pos_< (int)protein_string.length()-1) {
-suffix = protein_string.substr(end_pos_+1,1);
-}
-
-//LOG_DEBUG("Prefix " << prefix << " result " << result << " suffix length " << suffix.length() << " suffix " << suffix);
-return prefix+"."+result+"."+suffix;
-}
-*/
-
 
 std::string Proteoform::toString() {
   std::stringstream s;
-  s<< "Begin pos: " << start_pos_ << std::endl;
-  s<< "End pos: " << end_pos_ << std::endl;
-  s<< "String: " << residue_seq_ptr_->toString();
+  s << "Begin pos: " << start_pos_ << std::endl;
+  s << "End pos: " << end_pos_ << std::endl;
+  s << "String: " << residue_seq_ptr_->toString();
   return s.str();
 }
 
-void Proteoform::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent) {
+void Proteoform::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   std::string element_name = getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
   fasta_seq_ptr_->appendNameDescToXml(xml_doc,element);
@@ -354,14 +310,14 @@ void Proteoform::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent) 
   xml_doc->addElement(element, "species_id", str.c_str());
   str = StringUtil::convertToString(prot_id_);
   xml_doc->addElement(element, "prot_id", str.c_str());
-
-  // ptm number for testing mass graphs 
   str = StringUtil::convertToString(variable_ptm_num_);
   xml_doc->addElement(element, "variable_ptm_num", str.c_str());
+  str = StringUtil::convertToString(getChangeNum(ChangeType::UNEXPECTED));
+  xml_doc->addElement(element, "unexpected_ptm_num", str.c_str());
 
   element_name = Change::getXmlElementName() + "_list";
   xercesc::DOMElement* cl = xml_doc->createElement(element_name.c_str());
-  for(size_t i=0; i<change_list_.size(); i++) {
+  for (size_t i = 0; i < change_list_.size(); i++) {
     change_list_[i]->appendXml(xml_doc,cl);
   }
   element->appendChild(cl);

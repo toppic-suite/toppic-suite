@@ -32,12 +32,24 @@
 #include <limits>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 #include "base/logger.hpp"
 #include "prsm/prsm_util.hpp"
 #include "prsm/prsm_str.hpp"
 
 namespace prot {
+
+bool ChangeStr::cmpPosInc(const std::shared_ptr<ChangeStr> &a,
+                          const std::shared_ptr<ChangeStr> &b) {
+  if (a->left_pos_ < b->left_pos_) {
+    return true;
+  } else if (a->left_pos_ > b->left_pos_) {
+    return false;
+  } else {
+    return a->right_pos_ < b->right_pos_;
+  }
+}
 
 PrsmStr::PrsmStr(const std::vector<std::string> &str_vec) {
   str_vec_ = str_vec;
@@ -69,10 +81,26 @@ PrsmStr::PrsmStr(const std::vector<std::string> &str_vec) {
   fdr_ = std::stod(PrsmUtil::getValueStr(line));
   line = PrsmUtil::getXmlLine(str_vec_, "<proteoform_fdr>");
   proteoform_fdr_ = std::stod(PrsmUtil::getValueStr(line));
+  line = PrsmUtil::getXmlLine(str_vec_, "<start_pos>");
+  proteoform_start_pos_ = std::stoi(PrsmUtil::getValueStr(line));
+  line = PrsmUtil::getXmlLine(str_vec_, "<end_pos>");
+  proteoform_end_pos_ = std::stoi(PrsmUtil::getValueStr(line));
   line = PrsmUtil::getXmlLine(str_vec_, "<species_id>");
   species_id_ = std::stoi(PrsmUtil::getValueStr(line));
   line = PrsmUtil::getXmlLine(str_vec_, "<prot_id>");
   prot_id_ = std::stoi(PrsmUtil::getValueStr(line));
+  line = PrsmUtil::getXmlLine(str_vec_, "<unexpected_ptm_num>");
+  unexpected_ptm_num_ = std::stoi(PrsmUtil::getValueStr(line));
+
+  std::vector<std::string> mass_lines = PrsmUtil::getXmlLineVec(str_vec_, "<mass_shift>");
+  std::vector<std::string> left_pos_lines = PrsmUtil::getXmlLineVec(str_vec_, "<left_bp_pos>");
+  std::vector<std::string> right_pos_lines = PrsmUtil::getXmlLineVec(str_vec_, "<right_bp_pos>");
+
+  for (size_t i = 0; i < mass_lines.size(); i++) {
+    change_vec_.push_back(std::make_shared<ChangeStr>(std::stod(PrsmUtil::getValueStr(mass_lines[i])),
+                                                      std::stoi(PrsmUtil::getValueStr(left_pos_lines[i])),
+                                                      std::stoi(PrsmUtil::getValueStr(right_pos_lines[i]))));
+  }
 }
 
 int getXmlLineIndex(const std::vector<std::string> &str_vec,
@@ -126,6 +154,50 @@ void PrsmStr::setProtId(int id) {
   int i = getXmlLineIndex(str_vec_, "prot_id");
   str_vec_[i] = "<prot_id>" + std::to_string(id) + "</prot_id>";
   prot_id_ = id;
+}
+
+bool PrsmStr::isSameSeqAndMass(const PrsmStrPtr &a, const PrsmStrPtr &b, double ppo) {
+  if (a->getSeqName() != b->getSeqName()) {
+    return false;
+  }
+  if (a->getProteoformStartPos() != b->getProteoformStartPos()) {
+    return false;
+  }
+  if (a->getProteoformEndPos() != b->getProteoformEndPos()) {
+    return false;
+  }
+  double thresh = a->getAdjustedPrecMass() * ppo;
+  if (std::abs(a->getAdjustedPrecMass() - b->getAdjustedPrecMass()) > thresh) {
+    return false;
+  }
+  return true;
+}
+
+bool PrsmStr::isStrictCompatiablePtmSpecies(const PrsmStrPtr & a, const PrsmStrPtr & b, double ppo) {
+  if (!isSameSeqAndMass(a, b, ppo)) {
+    return false;
+  }
+
+  if (a->getChangeStrVec().size() != b->getChangeStrVec().size()) {
+    return false;
+  }
+
+  double shift_tolerance = a->getAdjustedPrecMass() * ppo;
+  std::vector<std::shared_ptr<ChangeStr> > a_change_vec = a->getChangeStrVec();
+  std::vector<std::shared_ptr<ChangeStr> > b_change_vec = b->getChangeStrVec();
+  std::sort(a_change_vec.begin(), a_change_vec.end(), ChangeStr::cmpPosInc);
+  std::sort(b_change_vec.begin(), b_change_vec.end(), ChangeStr::cmpPosInc);
+  for (size_t i = 0; i < a->getChangeStrVec().size(); i++) {
+    ChangeStrPtr ac = a_change_vec[i];
+    ChangeStrPtr bc = b_change_vec[i];
+    if (ac->right_pos_ <= bc->left_pos_ || bc->right_pos_ <= ac->left_pos_) {
+      return false;
+    }
+    if (std::abs(ac->mass_shift_ - bc->mass_shift_) > shift_tolerance) {
+      return false;
+    }
+  }
+  return true;
 }
 
 }  // namespace prot

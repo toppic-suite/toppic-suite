@@ -34,11 +34,13 @@
 
 #include <map>
 #include <string>
+#include <vector>
 
 #include "base/proteoform.hpp"
 #include "base/fasta_reader.hpp"
 #include "prsm/prsm.hpp"
 #include "prsm/prsm_xml_writer.hpp"
+#include "prsm/prsm_str.hpp"
 
 namespace prot {
 
@@ -68,13 +70,13 @@ class PrsmSpecies {
   ResiduePtrVec residue_ptr_vec_;
   double ppo_;
 
-  ProteoformPtrVec2D groupProteins(const PrsmPtrVec &prsm_ptrs);
+  std::vector<PrsmStrPtrVec> groupProteins(const PrsmStrPtrVec &prsm_ptrs);
 
-  ProteoformPtrVec2D getZeroPtmList(const ProteoformPtrVec& proteo_ptrs, double ppo);
+  std::vector<PrsmStrPtrVec> getZeroPtmList(const PrsmStrPtrVec& proteo_ptrs, double ppo);
 
-  void setProtId(PrsmPtrVec& prsm_ptrs);
+  void setProtId(PrsmStrPtrVec& prsm_ptrs);
 
-  void setSpeciesId(PrsmPtrVec& prsm_ptrs, double ppo);
+  void setSpeciesId(PrsmStrPtrVec& prsm_ptrs, double ppo);
 };
 
 typedef std::shared_ptr<PrsmSpecies> PrsmSpeciesPtr;

@@ -38,6 +38,21 @@
 
 namespace prot {
 
+class ChangeStr {
+ public:
+  ChangeStr(double mass_shift, int left_pos, int right_pos):
+      mass_shift_(mass_shift),
+      left_pos_(left_pos),
+      right_pos_(right_pos) {}
+
+  double mass_shift_;
+  int left_pos_, right_pos_;
+  static bool cmpPosInc(const std::shared_ptr<ChangeStr> &a,
+                        const std::shared_ptr<ChangeStr> &b);
+};
+
+typedef std::shared_ptr<ChangeStr> ChangeStrPtr;
+
 class PrsmStr;
 typedef std::shared_ptr<PrsmStr> PrsmStrPtr;
 
@@ -53,6 +68,10 @@ class PrsmStr {
 
   std::string getSeqDesc() {return seq_desc_;}
 
+  int getProteoformStartPos() {return proteoform_start_pos_;}
+
+  int getProteoformEndPos() {return proteoform_end_pos_;}
+
   int getSpeciesId() {return species_id_;}
 
   int getProtId() {return prot_id_;}
@@ -60,6 +79,8 @@ class PrsmStr {
   int getPrecursorId() {return precursor_id_;}
 
   int getPrecFeatureId() {return precursor_feature_id_;}
+
+  int getUnexpectedPtmNum() {return unexpected_ptm_num_;}
 
   double getPrecFeatureInte() {return precursor_feature_inte_;}
 
@@ -74,6 +95,8 @@ class PrsmStr {
   double getProteoformFdr() {return proteoform_fdr_;}
 
   double getAdjustedPrecMass() {return adjusted_prec_mass_;}
+
+  std::vector<std::shared_ptr<ChangeStr> > getChangeStrVec() {return change_vec_;}
 
   void setSpectrumId(int id);
 
@@ -118,6 +141,10 @@ class PrsmStr {
     }
   }
 
+  static bool isSameSeqAndMass(const PrsmStrPtr &a, const PrsmStrPtr &b, double ppo);
+
+  static bool isStrictCompatiablePtmSpecies(const PrsmStrPtr & a, const PrsmStrPtr & b, double ppo);
+
  private:
   std::vector<std::string> str_vec_;
 
@@ -135,6 +162,12 @@ class PrsmStr {
 
   int precursor_feature_id_;
 
+  int unexpected_ptm_num_;
+
+  int proteoform_start_pos_;
+
+  int proteoform_end_pos_;
+
   double precursor_feature_inte_;
 
   double adjusted_prec_mass_;
@@ -149,6 +182,8 @@ class PrsmStr {
   double fdr_;
 
   double proteoform_fdr_;
+
+  std::vector<std::shared_ptr<ChangeStr> > change_vec_;
 };
 
 typedef std::vector<PrsmStrPtr> PrsmStrPtrVec;

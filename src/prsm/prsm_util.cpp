@@ -60,6 +60,19 @@ std::string PrsmUtil::getXmlLine(const std::vector<std::string> &str_vec,
   return "";
 }
 
+std::vector<std::string> PrsmUtil::getXmlLineVec(const std::vector<std::string> &str_vec,
+                                                 const std::string &property) {
+  std::vector<std::string> res;
+  for (size_t i = 0; i < str_vec.size(); i++) {
+    size_t found = str_vec[i].find(property);
+    if (found != std::string::npos) {
+      res.push_back(str_vec[i]);
+    }
+  }
+  return res;
+}
+
+
 PrsmPtrVec PrsmUtil::selectSpeciesPrsms(const PrsmPtrVec &prsm_ptrs, int species_id) {
   PrsmPtrVec select_prsm_ptrs;
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
