@@ -1,9 +1,5 @@
-Windows toolset:
-1. download mingw64 with posix support 
-2. add <mingw64 path>/bin to PATH
-
 Boost: 
-1. download boost 1.60.0
+1. download boost 1.65.0 from https://dl.bintray.com/boostorg/release/1.65.0/source/boost_1_65_0.zip
 2. cd boost_1.60.0/tools/build/
 3. bootstrap.sh mingw
 4. cd boost_1.60.0
@@ -34,7 +30,6 @@ Proteomics Wizards
 Download links:
 
 1. mingw64 (x86_64-4.8.2-release-posix-seh-rt_v3-rev4.7z): http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/4.8.2/threads-posix/seh/
-2. msys64: http://sourceforge.net/projects/msys2/files/Base/x86_64/msys2-x86_64-20140910.exe
-3. boost (boost_1_60_0.zip): https://sourceforge.net/projects/boost/files/boost/1.60.0/
-4. xerces-c (xerces-c-3.1.1.zip): http://xerces.apache.org/xerces-c/download.cgi
-5. xalan (xalan_c-1.11-src.zip): http://xalan.apache.org/xalan-c/download.html
+2. boost (boost_1_60_0.zip): https://sourceforge.net/projects/boost/files/boost/1.60.0/
+3. xerces-c (xerces-c-3.1.1.zip): http://xerces.apache.org/xerces-c/download.cgi
+4. xalan (xalan_c-1.11-src.zip): http://xalan.apache.org/xalan-c/download.html
