@@ -122,7 +122,7 @@ void PrsmFeatureSpecies::process() {
   sort(prsm_ptrs.begin(), prsm_ptrs.end(), PrsmStr::cmpEValueInc);
   setProtId(prsm_ptrs);
   setSpeciesId(prsm_ptrs);
-  sort(prsm_ptrs.begin(), prsm_ptrs.end(), prot::PrsmStr::cmpSpectrumIdIncPrecursorIdInc);
+  sort(prsm_ptrs.begin(), prsm_ptrs.end(), PrsmStr::cmpSpectrumIdIncPrecursorIdInc);
   // output
   std::string output_file_name = base_name + "." + output_file_ext_;
   PrsmXmlWriter writer(output_file_name);
