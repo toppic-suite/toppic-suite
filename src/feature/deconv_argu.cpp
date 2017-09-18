@@ -47,7 +47,6 @@ DeconvArgument::DeconvArgument() {
 void DeconvArgument::initArguments() {
   arguments_["executiveDir"] = "";
   arguments_["spectrumFileName"] = "";
-  arguments_["inputType"] = "mzXML";
   arguments_["refinePrecMass"]="true";
   arguments_["missingLevelOne"] = "false";
   arguments_["maxCharge"] = "30";
@@ -56,7 +55,7 @@ void DeconvArgument::initArguments() {
   arguments_["snRatio"] = "1.0";
   arguments_["keepUnusedPeaks"] = "false";
   arguments_["outMultipleMass"] = "false";
-  arguments_["precWindow"] = "2.0";
+  arguments_["precWindow"] = "1.0";
 }
 
 void DeconvArgument::showUsage(boost::program_options::options_description &desc) {
@@ -70,6 +69,7 @@ bool DeconvArgument::parse(int argc, char* argv[]) {
   std::string max_mass = "";
   std::string mz_error = "";
   std::string sn_ratio = "";
+  std::string precWindow = "";
 
   // Define and parse the program options
   try {
@@ -86,21 +86,20 @@ bool DeconvArgument::parse(int argc, char* argv[]) {
          "<a positive number>. Set the error tolerance of m/z values of spectral peaks. The default value is 0.02 thomson.")
         ("sn-ratio,s", po::value<std::string> (&sn_ratio),
          "<a positive number>. Set the signal/noise ratio. The default value is 1.")
+        ("precursor-window,w", po::value<std::string> (&precWindow),
+         "<a positive number>. Set precursor window size. The default value is 1.0 thomson.")
         ("missing-level-one,n","The input spectrum file does not contain MS1 spectra.")
         ;
     po::options_description desc("Options");
 
     desc.add_options() 
         ("help,h", "Print this help message.") 
-        ("max-charge,c", po::value<std::string> (&max_charge),
-         "<integer value>. Set the maximum charge state of precursor and fragment ions. Default value is 30.")
-        ("max-mass,m", po::value<std::string> (&max_mass),
-         "<float value>. Set the maximum monoisopotic mass of precursor and fragment ions. Default value is 100000 Dalton.")
-        ("mz-error,e", po::value<std::string> (&mz_error),
-         "<float value>. Set the error tolerance of m/z values of peaks. Default value is 0.02 Dalton.")
-        ("sn-ratio,s", po::value<std::string> (&sn_ratio),
-         "<float value>. Set the signal/noise ratio. Default value is 1.")
-        ("missing-level-one,n","The input spectrum file does not contain MS1 spectra.")
+        ("max-charge,c", po::value<std::string> (&max_charge), "")
+        ("max-mass,m", po::value<std::string> (&max_mass), "")
+        ("mz-error,e", po::value<std::string> (&mz_error), "")
+        ("sn-ratio,s", po::value<std::string> (&sn_ratio), "")
+        ("precursor-window,w", po::value<std::string> (&precWindow), "")
+        ("missing-level-one,n", "")
         ("multiple-mass,u", "Output multiple masses for one envelope.")
         ("spectrum-file-name", po::value<std::string>(&spectrum_file_name)->required(), "Spectrum file name with its path.")
         ("keep,k", "Report monoisotopic masses extracted from low quality isotopic envelopes.")
@@ -115,7 +114,7 @@ bool DeconvArgument::parse(int argc, char* argv[]) {
     po::variables_map vm;
     try {
       po::store(po::command_line_parser(argc, argv).options(desc).positional(positional_options).run(), vm);
-      if ( vm.count("help") ) {
+      if (vm.count("help")) {
         showUsage(display_desc);
         return false;
       }
@@ -156,6 +155,10 @@ bool DeconvArgument::parse(int argc, char* argv[]) {
     if (vm.count("multiple-mass")) {
       arguments_["outMultipleMass"] = "true";
     }
+    if (vm.count("precursor-window")) {
+      arguments_["precWindow"] = precWindow;
+    }
+
   }
   catch(std::exception& e) {
     std::cerr << "Unhandled Exception in parsing command line "
