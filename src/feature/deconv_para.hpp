@@ -39,8 +39,6 @@
 
 namespace prot {
 
-enum InputType {INPUT_MGF, INPUT_MZXML};
-
 class DeconvPara {
  public:
   DeconvPara(std::map<std::string, std::string> &arguments);
@@ -49,11 +47,8 @@ class DeconvPara {
 
   std::string getDataFileName() {return data_file_name_;}
 
-  int setInputType (const std::string & format);
-
   std::string data_file_name_;
   std::string exec_dir_;
-  InputType input_type_;
 
   bool refine_prec_mass_;
   bool missing_level_one_;
