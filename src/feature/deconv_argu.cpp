@@ -55,7 +55,7 @@ void DeconvArgument::initArguments() {
   arguments_["snRatio"] = "1.0";
   arguments_["keepUnusedPeaks"] = "false";
   arguments_["outMultipleMass"] = "false";
-  arguments_["precWindow"] = "1.0";
+  arguments_["precWindow"] = "2.0";
 }
 
 void DeconvArgument::showUsage(boost::program_options::options_description &desc) {
@@ -87,7 +87,7 @@ bool DeconvArgument::parse(int argc, char* argv[]) {
         ("sn-ratio,s", po::value<std::string> (&sn_ratio),
          "<a positive number>. Set the signal/noise ratio. The default value is 1.")
         ("precursor-window,w", po::value<std::string> (&precWindow),
-         "<a positive number>. Set precursor window size. The default value is 1.0 thomson.")
+         "<a positive number>. Set precursor window size. The default value is 2.0 thomson.")
         ("missing-level-one,n","The input spectrum file does not contain MS1 spectra.")
         ;
     po::options_description desc("Options");
