@@ -56,7 +56,7 @@
 #include "zeroptmfilter/zero_ptm_filter_mng.hpp"
 #include "zeroptmfilter/zero_ptm_filter_processor.hpp"
 #include "zeroptmsearch/zero_ptm_search_mng.hpp"
-#include "zeroptmsearch/zero_ptm_search.hpp"
+#include "zeroptmsearch/zero_ptm_search_processor.hpp"
 
 #include "oneptmfilter/one_ptm_filter_mng.hpp"
 #include "oneptmfilter/one_ptm_filter_processor.hpp"
@@ -151,7 +151,10 @@ int two_base_opt(int argc, char* argv[]) {
     std::cout << "Zero PTM search - started." << std::endl;
     ZeroPtmSearchMngPtr zero_search_mng_ptr
         = std::make_shared<ZeroPtmSearchMng>(prsm_para_ptr, "ZERO_FILTER", "ZERO_PTM");
-    ZeroPtmSearch::process(zero_search_mng_ptr);
+    ZeroPtmSearchProcessorPtr zero_search_processor
+        = std::make_shared<ZeroPtmSearchProcessor>(zero_search_mng_ptr);
+    zero_search_processor->process();
+    zero_search_processor = nullptr;
     WebLog::completeFunction(WebLog::ZeroPtmSearchTime());
     std::cout << "Zero PTM search - finished." << std::endl;
 
