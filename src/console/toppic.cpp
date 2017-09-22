@@ -61,7 +61,7 @@
 #include "oneptmfilter/one_ptm_filter_mng.hpp"
 #include "oneptmfilter/one_ptm_filter_processor.hpp"
 #include "oneptmsearch/ptm_search_mng.hpp"
-#include "oneptmsearch/one_ptm_search.hpp"
+#include "oneptmsearch/one_ptm_search_processor.hpp"
 
 #include "diagfilter/diag_filter_mng.hpp"
 #include "diagfilter/diag_filter_processor.hpp"
@@ -178,7 +178,10 @@ int two_base_opt(int argc, char* argv[]) {
       PtmSearchMngPtr one_search_mng_ptr
           = std::make_shared<PtmSearchMng>(prsm_para_ptr, n_top, max_ptm_mass,
                                            shift_num, thread_num, "ONE_PTM_FILTER", "ONE_PTM");
-      OnePtmSearch::process(one_search_mng_ptr);
+      OnePtmSearchProcessorPtr one_search_processor
+          = std::make_shared<OnePtmSearchProcessor>(one_search_mng_ptr);
+      one_search_processor->process();
+      one_search_processor = nullptr;
       WebLog::completeFunction(WebLog::OnePtmSearchTime());
       std::cout << "One PTM search - finished." << std::endl;
 

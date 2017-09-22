@@ -32,19 +32,29 @@
 #ifndef PROT_ONE_PTM_SEARCH_HPP_
 #define PROT_ONE_PTM_SEARCH_HPP_
 
-#include <array>
-
 #include "spec/spectrum_set.hpp"
 #include "prsm/prsm.hpp"
 #include "oneptmsearch/ptm_search_mng.hpp"
 
 namespace prot {
 
-class OnePtmSearch {
+class OnePtmSearchProcessor {
  public:
-  static void process(PtmSearchMngPtr mng_ptr);
+  explicit OnePtmSearchProcessor(PtmSearchMngPtr mng_ptr): mng_ptr_(mng_ptr) {}
+  void process();
+
+ private:
+  PrsmPtrVec onePtmSearchOneSpec(SpectrumSetPtr spec_set_ptr,
+                                 const SimplePrsmPtrVec &simple_prsm_ptr_vec,
+                                 FastaIndexReaderPtr reader_ptr,
+                                 PtmSearchMngPtr mng_ptr,
+                                 AlignTypePtr type_ptr);
+
+  PtmSearchMngPtr mng_ptr_;
 };
 
-} /* namespace_prot */
+typedef std::shared_ptr<OnePtmSearchProcessor> OnePtmSearchProcessorPtr;
+
+}  // namespace prot
 
 #endif

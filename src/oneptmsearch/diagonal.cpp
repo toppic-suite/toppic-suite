@@ -46,7 +46,7 @@ inline TheoPeakPtrVec getDiagonalTheoPeak(ProteoformPtr proteo_ptr,
   int first_res_pos = first_header_ptr->getTruncFirstResPos();
   int last_res_pos = last_header_ptr->getTruncLastResPos();
   ResSeqPtr subseq_ptr = proteo_ptr->getResSeqPtr()->getSubResidueSeq(first_res_pos,last_res_pos);
-  BpSpecPtr pep_ptr = BpSpecPtr(new BpSpec(subseq_ptr));
+  BpSpecPtr pep_ptr = std::make_shared<BpSpec>(subseq_ptr);
   double pep_n_term_shift = header_ptrs[i]->getProtNTermShift()
       -first_header_ptr->getProtNTermShift()
       +first_header_ptr->getPepNTermShift();
@@ -223,16 +223,14 @@ DiagonalHeaderPtrVec refineHeadersBgnEnd(
                 header_ptrs[i]->setMatchFirstBpPos(new_bgn);
                 header_ptrs[i]->setMatchLastBpPos(new_end);
                 result_list.push_back(header_ptrs[i]);
-            }
-            else if (i == header_ptrs.size() - 1) {
+            } else if (i == header_ptrs.size() - 1) {
                 int new_bgn = last_res_pos + 1;
                 int new_end = last_res_pos + 1;
                 header_ptrs[i]->setMatchFirstBpPos(new_bgn);
                 header_ptrs[i]->setMatchLastBpPos(new_end);
                 result_list.push_back(header_ptrs[i]);
             }
-        }
-        else{
+        } else{
             int new_bgn = first_res_pos + getNewBgn(pair_ptrs);
             int new_end = first_res_pos + getNewEnd(pair_ptrs);
             header_ptrs[i]->setMatchFirstBpPos(new_bgn);
@@ -243,185 +241,82 @@ DiagonalHeaderPtrVec refineHeadersBgnEnd(
     return result_list;
 }
 
-DiagonalHeaderPtrVec2D refineHeadersBgnEnd(
-        ProteoformPtr proteo_ptr,
-        const ExtendMsPtrVec &ms_three_ptr_vec,
-        const DiagonalHeaderPtrVec2D& header_ptrs_2d,
-        const DiagonalHeaderPtrVec& header_ptrs_1d,
-        double min_mass) {
+DiagonalHeaderPtrVec2D refineHeadersBgnEnd(ProteoformPtr proteo_ptr,
+                                           const ExtendMsPtrVec &ms_three_ptr_vec,
+                                           const DiagonalHeaderPtrVec2D& header_ptrs_2d,
+                                           const DiagonalHeaderPtrVec& header_ptrs_1d,
+                                           double min_mass) {
 
-    DiagonalHeaderPtrVec2D result_list;
-    DiagonalHeaderPtr first_header = header_ptrs_1d[0];
-    DiagonalHeaderPtr last_header = header_ptrs_1d[header_ptrs_1d.size()-1];
-    int first_res_pos = first_header->getTruncFirstResPos();
-    int last_res_pos = last_header->getTruncLastResPos();
-    int index = 0;
-    for(size_t i=0; i<header_ptrs_2d.size();i++){
-        DiagonalHeaderPtrVec cur_vec;
-        for (size_t j=0; j < header_ptrs_2d[i].size(); j++) {
-            int bgn = header_ptrs_2d[i][j]->getMatchFirstBpPos()-first_res_pos;
-            int end = header_ptrs_2d[i][j]->getMatchLastBpPos()-first_res_pos;
-            PeakIonPairPtrVec pair_ptrs; 
-            for (size_t k = 0; k < ms_three_ptr_vec.size(); k++) {
-                TheoPeakPtrVec theo_peak_ptrs = getDiagonalTheoPeak(
-                        proteo_ptr,
-                        ms_three_ptr_vec[k]->getMsHeaderPtr()->getActivationPtr(),
-                        header_ptrs_1d,
-                        index, min_mass);
-                PeakIonPairPtrVec cur_pair_ptrs 
-                    = PeakIonPairFactory::findPairs(ms_three_ptr_vec[k], theo_peak_ptrs, bgn, end, 0);
-                pair_ptrs.insert(pair_ptrs.end(), cur_pair_ptrs.begin(), cur_pair_ptrs.end());
-            }
-            index++;
-            if(pair_ptrs.size() < 1){
-                int pair_size = pair_ptrs.size();
-                LOG_TRACE("Empty Segment is found "+ StringUtil::convertToString(pair_size));
-                if (header_ptrs_2d[i][j] == first_header) {
-                    int new_bgn = first_res_pos;
-                    int new_end = first_res_pos;
-                    header_ptrs_2d[i][j]->setMatchFirstBpPos(new_bgn);
-                    header_ptrs_2d[i][j]->setMatchLastBpPos(new_end);
-                    cur_vec.push_back(header_ptrs_2d[i][j]);
-                }
-                else if (header_ptrs_2d[i][j] == last_header) {
-                    int new_bgn = last_res_pos + 1;
-                    int new_end = last_res_pos + 1;
-                    header_ptrs_2d[i][j]->setMatchFirstBpPos(new_bgn);
-                    header_ptrs_2d[i][j]->setMatchLastBpPos(new_end);
-                    cur_vec.push_back(header_ptrs_2d[i][j]);
-                }
-            }
-            else{
-                int new_bgn = first_res_pos + getNewBgn(pair_ptrs);
-                int new_end = first_res_pos + getNewEnd(pair_ptrs);
-                header_ptrs_2d[i][j]->setMatchFirstBpPos(new_bgn);
-                header_ptrs_2d[i][j]->setMatchLastBpPos(new_end);
-                cur_vec.push_back(header_ptrs_2d[i][j]);
-            }
+  DiagonalHeaderPtrVec2D result_list;
+  DiagonalHeaderPtr first_header = header_ptrs_1d[0];
+  DiagonalHeaderPtr last_header = header_ptrs_1d[header_ptrs_1d.size()-1];
+  int first_res_pos = first_header->getTruncFirstResPos();
+  int last_res_pos = last_header->getTruncLastResPos();
+  int index = 0;
+  for(size_t i=0; i<header_ptrs_2d.size();i++){
+    DiagonalHeaderPtrVec cur_vec;
+    for (size_t j=0; j < header_ptrs_2d[i].size(); j++) {
+      int bgn = header_ptrs_2d[i][j]->getMatchFirstBpPos()-first_res_pos;
+      int end = header_ptrs_2d[i][j]->getMatchLastBpPos()-first_res_pos;
+      PeakIonPairPtrVec pair_ptrs; 
+      for (size_t k = 0; k < ms_three_ptr_vec.size(); k++) {
+        TheoPeakPtrVec theo_peak_ptrs = getDiagonalTheoPeak(
+            proteo_ptr,
+            ms_three_ptr_vec[k]->getMsHeaderPtr()->getActivationPtr(),
+            header_ptrs_1d,
+            index, min_mass);
+        PeakIonPairPtrVec cur_pair_ptrs 
+            = PeakIonPairFactory::findPairs(ms_three_ptr_vec[k], theo_peak_ptrs, bgn, end, 0);
+        pair_ptrs.insert(pair_ptrs.end(), cur_pair_ptrs.begin(), cur_pair_ptrs.end());
+      }
+      index++;
+      if(pair_ptrs.size() < 1){
+        int pair_size = pair_ptrs.size();
+        LOG_TRACE("Empty Segment is found "+ StringUtil::convertToString(pair_size));
+        if (header_ptrs_2d[i][j] == first_header) {
+          int new_bgn = first_res_pos;
+          int new_end = first_res_pos;
+          header_ptrs_2d[i][j]->setMatchFirstBpPos(new_bgn);
+          header_ptrs_2d[i][j]->setMatchLastBpPos(new_end);
+          cur_vec.push_back(header_ptrs_2d[i][j]);
+        } else if (header_ptrs_2d[i][j] == last_header) {
+          int new_bgn = last_res_pos + 1;
+          int new_end = last_res_pos + 1;
+          header_ptrs_2d[i][j]->setMatchFirstBpPos(new_bgn);
+          header_ptrs_2d[i][j]->setMatchLastBpPos(new_end);
+          cur_vec.push_back(header_ptrs_2d[i][j]);
         }
-        if (cur_vec.size() > 0) {
-            result_list.push_back(cur_vec);
-        }
+      } else{
+        int new_bgn = first_res_pos + getNewBgn(pair_ptrs);
+        int new_end = first_res_pos + getNewEnd(pair_ptrs);
+        header_ptrs_2d[i][j]->setMatchFirstBpPos(new_bgn);
+        header_ptrs_2d[i][j]->setMatchLastBpPos(new_end);
+        cur_vec.push_back(header_ptrs_2d[i][j]);
+      }
     }
-    return result_list;
+    if (cur_vec.size() > 0) {
+      result_list.push_back(cur_vec);
+    }
+  }
+  return result_list;
 }
-
 
 int getNewBgn(const PeakIonPairPtrVec &pair_ptrs){
-    int new_bgn = std::numeric_limits<int>::max();
-    for(size_t i=0;i<pair_ptrs.size();i++) {
-        if(pair_ptrs[i]->getTheoPeakPtr()->getIonPtr()->getPos() < new_bgn){
-            new_bgn = pair_ptrs[i]->getTheoPeakPtr()->getIonPtr()->getPos();
-        }
+  int new_bgn = std::numeric_limits<int>::max();
+  for(size_t i=0;i<pair_ptrs.size();i++) {
+    if(pair_ptrs[i]->getTheoPeakPtr()->getIonPtr()->getPos() < new_bgn){
+      new_bgn = pair_ptrs[i]->getTheoPeakPtr()->getIonPtr()->getPos();
     }
-    return new_bgn;
+  }
+  return new_bgn;
 }
 int getNewEnd(const PeakIonPairPtrVec &pair_ptrs){
-    int new_end = 0;
-    for(size_t i=0;i<pair_ptrs.size();i++) {
-        if(pair_ptrs[i]->getTheoPeakPtr()->getIonPtr()->getPos() > new_end){
-            new_end = pair_ptrs[i]->getTheoPeakPtr()->getIonPtr()->getPos();
-        }
+  int new_end = 0;
+  for(size_t i=0;i<pair_ptrs.size();i++) {
+    if(pair_ptrs[i]->getTheoPeakPtr()->getIonPtr()->getPos() > new_end){
+      new_end = pair_ptrs[i]->getTheoPeakPtr()->getIonPtr()->getPos();
     }
-    return new_end;
+  }
+  return new_end;
 }
-
-/*double oldRefinePrecursorAndHeaderShift(ProteoformPtr proteo_ptr,*/
-//ExtendMsPtr ms_three_ptr, 
-//DiagonalHeaderPtrVec &header_ptrs,
-//PtmMngPtr mng_ptr) {
-//double prec_mass = ms_three_ptr->getHeaderPtr()->getPrecMonoMass();
-//if (header_ptrs.size() == 0) {
-//return prec_mass;
-//}
-//double tole = ms_three_ptr->getHeaderPtr()->getErrorTolerance();
-//int one_side_step_num = 0;
-//if (tole > 0) {
-//one_side_step_num = (int)std::floor(tole/mng_ptr->refine_prec_step_width_);
-//}
-//int step_num = 1 + 2 * one_side_step_num;
-//DiagonalHeaderPtrVec test_ptrs;
-//for (size_t i = 0; i < header_ptrs.size(); i++) {
-//test_ptrs.push_back(header_ptrs[i]->clone());
-//}
-//for (size_t i = 0; i < header_ptrs.size() - 1; i++) {
-//int middle = (test_ptrs[i]->getMatchLastBpPos() + test_ptrs[i+1]->getMatchFirstBpPos())/2;
-//test_ptrs[i]->setMatchLastBpPos(middle);
-//test_ptrs[i+1]->setMatchFirstBpPos(middle);
-//}
-//test_ptrs[0]->setMatchFirstBpPos(test_ptrs[0]->getTruncFirstResPos());
-//DiagonalHeaderPtr last_test_ptr = test_ptrs[test_ptrs.size()-1];
-//last_test_ptr->setMatchLastBpPos(last_test_ptr->getTruncLastResPos());
-////LOG_DEBUG("TEST PTR SIZE" << test_ptrs.size());
-//double change = - one_side_step_num * mng_ptr->refine_prec_step_width_;
-/* for the first test_ptrs.size() - 1 headers, change C-term shift,
- * for the last header, change N-term shift */
-//for (size_t i = 0; i < test_ptrs.size() - 1; i++) {
-//test_ptrs[i]->changeOnlyCTermShift(change);
-//}
-//last_test_ptr->changeOnlyNTermShift(change);
-//int first_res_pos = header_ptrs[0]->getTruncFirstResPos();
-//double best_score = -1;
-//int best_i_start = -1;
-//int best_i_end = -1;
-//bool continuous = false;
-//[>
-//for (size_t i = 0; i < ms_three_ptr->size(); i++) {
-//std::cout << "ms " << ms_three_ptr->getPeakPtr(i)->getPosition() << std::endl;
-//}
-//*/
-//for (int i = 0; i < step_num; i++) {
-////double delta = (i - one_side_step_num) * mng_ptr->refine_prec_step_width_;
-//double cur_score = 0;
-//for(size_t j=0; j< test_ptrs.size(); j++){
-//TheoPeakPtrVec theo_peak_ptrs = getDiagonalTheoPeak(
-//proteo_ptr,
-//ms_three_ptr->getHeaderPtr()->getActivationPtr(),
-//test_ptrs,
-//j,
-//mng_ptr->prsm_para_ptr_->getSpParaPtr()->getMinMass());
-
-//int bgn = test_ptrs[j]->getMatchFirstBpPos()-first_res_pos;
-//int end = test_ptrs[j]->getMatchLastBpPos()-first_res_pos;
-//PeakIonPairPtrVec pair_ptrs = findPairs(ms_three_ptr, theo_peak_ptrs, bgn, end, 0 );
-//cur_score += pair_ptrs.size();
-//}
-////LOG_DEBUG("i " << i << " header number "<<  test_ptrs.size() << " delta " << delta << " cur score " << cur_score);
-//if (cur_score > best_score) {
-//best_score = cur_score;
-//best_i_start = i;
-//best_i_end = i;
-//continuous = true;
-//}
-//else if (cur_score == best_score) {
-//if (continuous) {
-//best_i_end = i;
-//}
-//}
-//else {
-//continuous = false;
-//}
-
-//change = mng_ptr->refine_prec_step_width_;
-//for (size_t j = 0; j < test_ptrs.size() - 1; j++) {
-//test_ptrs[j]->changeOnlyCTermShift(change);
-//}
-//last_test_ptr->changeOnlyNTermShift(change);
-//}
-//for (size_t i = 0; i < header_ptrs.size(); i++) {
-//header_ptrs[i]->setMatchFirstBpPos(test_ptrs[i]->getMatchFirstBpPos());
-//header_ptrs[i]->setMatchLastBpPos(test_ptrs[i]->getMatchLastBpPos());
-//}
-//double best_i = (best_i_end + best_i_start) /2; 
-//double best_delta = (best_i - one_side_step_num) * mng_ptr->refine_prec_step_width_;
-////LOG_DEBUG("best_delta " << best_delta);
-//for (size_t i = 0; i < header_ptrs.size() - 1; i++) {
-//header_ptrs[i]->changeOnlyCTermShift(best_delta);
-//}
-//DiagonalHeaderPtr last_header_ptr = header_ptrs[header_ptrs.size()-1];
-//last_header_ptr->changeOnlyNTermShift(best_delta);
-
-//return prec_mass + best_delta;
-/*}  */
-
-} /* namespace prot */
+}  // namespace prot

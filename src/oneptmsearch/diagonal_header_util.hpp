@@ -46,8 +46,7 @@ class DiagonalHeaderUtil {
     double shift = 0;
     // n_term strict; c_term nostrict; prot n_term match; prot c_term no_match
     // pep n_term no_match; pep c_term no_match
-    return DiagonalHeaderPtr(
-        new DiagonalHeader(shift, true, false, true, false, false, false));
+    return std::make_shared<DiagonalHeader>(shift, true, false, true, false, false, false);
   }
 
   static DiagonalHeaderPtr getBottomRightCornerHeader(double seq_mass,
@@ -55,8 +54,7 @@ class DiagonalHeaderUtil {
     double shift = prec_mass - seq_mass;
     // n term nostrict, c_term strict, prot n_term no match ; prot c_term match
     // pep n_term no match, pep c_term no match 
-    return DiagonalHeaderPtr(
-        new DiagonalHeader(shift, false, true, false, true, false, false));
+    return std::make_shared<DiagonalHeader>(shift, false, true, false, true, false, false);
   }
 
   static void addCornerDiagonals(DiagonalHeaderPtrVec &n_extend_header_ptrs,
