@@ -61,7 +61,7 @@ class OnePtmSlowMatch {
 
   void init();
 
-  PrsmPtr compute(AlignTypePtr align_type_ptr, int shift_num);
+  PrsmPtr compute(int shift_num);
 
  private:
   PtmSearchMngPtr mng_ptr_;

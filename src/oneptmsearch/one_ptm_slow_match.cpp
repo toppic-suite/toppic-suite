@@ -188,7 +188,7 @@ void OnePtmSlowMatch::init(){
   //LOG_DEBUG("Init ps time: " << std::chrono::duration_cast<std::chrono::nanoseconds>(step_3-step_2).count());
 }
 
-PrsmPtr OnePtmSlowMatch::compute(AlignTypePtr align_type_ptr, int shift_num) {
+PrsmPtr OnePtmSlowMatch::compute(int shift_num) {
   ps_align_ptr_->compute(align_type_ptr_);
   return ps_align_ptr_->geneResult(shift_num, proteo_ptr_, deconv_ms_ptr_vec_, 
                                    ms_three_ptr_vec_, mng_ptr_->prsm_para_ptr_);
