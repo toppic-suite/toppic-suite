@@ -35,21 +35,19 @@
 
 namespace prot {
 
-PSAlign::PSAlign() {};
-
 PSAlign::PSAlign(const std::vector<double> &ms_masses, 
                  const std::vector<double> &seq_masses,
                  const BasicDiagonalPtrVec &diagonal_ptrs, 
-                 PsAlignParaPtr para_ptr) {
-  para_ptr_ = para_ptr;
-  ms_masses_ = ms_masses;
-  seq_masses_ = seq_masses;
-  diagonal_ptrs_ = diagonal_ptrs;
-  //int start_s = clock();
-  initDPPair();
-  //int stop_s = clock();
-  //std::cout <<  "init dp pair running time: " << (stop_s-start_s) / double(CLOCKS_PER_SEC)  << " seconds " << std::endl;
-}
+                 PsAlignParaPtr para_ptr):
+    para_ptr_(para_ptr),
+    ms_masses_(ms_masses),
+    seq_masses_(seq_masses),
+    diagonal_ptrs_(diagonal_ptrs) {
+      //int start_s = clock();
+      initDPPair();
+      //int stop_s = clock();
+      //std::cout <<  "init dp pair running time: " << (stop_s-start_s) / double(CLOCKS_PER_SEC)  << " seconds " << std::endl;
+    }
 
 
 void PSAlign::compute(AlignTypePtr align_type_ptr) {
@@ -77,9 +75,9 @@ void PSAlign::initDPPair() {
       int y = diagonal_ptrs_[i]->getDiagPair(j)->getY();
       double score = diagonal_ptrs_[i]->getDiagPair(j)->getScore();
       double diff = diagonal_ptrs_[i]->getDiagPair(j)->getDiff();
-      DPPairPtr dp_pair_ptr(new DPPair(x, y, score, diff, j, 
-                                       para_ptr_->n_unknown_shift_,
-                                       diagonal_ptrs_[i]->getHeader()));
+      DPPairPtr dp_pair_ptr = std::make_shared<DPPair>(x, y, score, diff, j, 
+                                                       para_ptr_->n_unknown_shift_,
+                                                       diagonal_ptrs_[i]->getHeader());
       dp_2d_pair_ptrs_[i].push_back(dp_pair_ptr);
     }
     segment_bgn_pair_ptrs_.push_back(dp_2d_pair_ptrs_[i][0]);
@@ -88,8 +86,7 @@ void PSAlign::initDPPair() {
 
   // init 1d dp pairs 
   dp_pair_ptrs_.clear();
-  first_pair_ptr_ = DPPairPtr(
-      new DPPair(-1, -1, 0, 0, -1, para_ptr_->n_unknown_shift_, nullptr));
+  first_pair_ptr_ = std::make_shared<DPPair>(-1, -1, 0, 0, -1, para_ptr_->n_unknown_shift_, nullptr);
   first_pair_ptr_->setDiagPrevPairPtr(nullptr);
   dp_pair_ptrs_.push_back(first_pair_ptr_);
   for (size_t i = 0; i < dp_2d_pair_ptrs_.size(); i++) {
@@ -125,24 +122,24 @@ void PSAlign::initDPPair() {
     // cur pair is not last pair
     // first pair can not shift, so q starts from 1
     for (size_t j = 1; j < i; j++) {
-        DPPairPtr prev_pair_ptr = dp_pair_ptrs_[j];
-        int prev_x = prev_pair_ptr->getX();
-        int prev_y = prev_pair_ptr->getY();
-        double prev_pair_nterm_shift = prev_pair_ptr->getDiagonalHeader()
-            ->getProtNTermShift();
-        double cur_pair_nterm_shift = cur_pair_ptr->getDiagonalHeader()
-            ->getProtNTermShift();
-        double abs_shift = std::abs(prev_pair_nterm_shift - cur_pair_nterm_shift);
-        if (prev_x >= cur_x || prev_y >= cur_y
-                || prev_pair_ptr->getDiagonalHeader() == cur_pair_ptr->getDiagonalHeader()
-                || abs_shift > para_ptr_->align_max_shift_) {
-            continue;
-        }
-        int diag_id = prev_pair_ptr->getDiagonalHeader()->getId();
-        ends[diag_id] = j;
-        if (abs_shift > para_ptr_-> align_large_shift_thresh_) {
-            large_shifts[diag_id] = true;
-        }
+      DPPairPtr prev_pair_ptr = dp_pair_ptrs_[j];
+      int prev_x = prev_pair_ptr->getX();
+      int prev_y = prev_pair_ptr->getY();
+      double prev_pair_nterm_shift = prev_pair_ptr->getDiagonalHeader()
+          ->getProtNTermShift();
+      double cur_pair_nterm_shift = cur_pair_ptr->getDiagonalHeader()
+          ->getProtNTermShift();
+      double abs_shift = std::abs(prev_pair_nterm_shift - cur_pair_nterm_shift);
+      if (prev_x >= cur_x || prev_y >= cur_y
+          || prev_pair_ptr->getDiagonalHeader() == cur_pair_ptr->getDiagonalHeader()
+          || abs_shift > para_ptr_->align_max_shift_) {
+        continue;
+      }
+      int diag_id = prev_pair_ptr->getDiagonalHeader()->getId();
+      ends[diag_id] = j;
+      if (abs_shift > para_ptr_-> align_large_shift_thresh_) {
+        large_shifts[diag_id] = true;
+      }
     }
     idxes_.push_back(ends);
     penalties_.push_back(large_shifts);
@@ -270,27 +267,27 @@ void PSAlign::dp(AlignTypePtr align_type_ptr) {
       if (trunc_score >= diag_score && trunc_score >= shift_score) {
         if (trunc_score ==  - std::numeric_limits<double>::max()) {
           dp_pair_ptrs_[p]->updateTable(s, -std::numeric_limits<double>::max(), 
-                                    PATH_TYPE_NULL, nullptr);
+                                        PATH_TYPE_NULL, nullptr);
         } else {
           dp_pair_ptrs_[p]->updateTable(s, trunc_score + new_score, PATH_TYPE_TRUNC,
-                                    trunc_prev_ptr);
+                                        trunc_prev_ptr);
         }
       } else if (diag_score >= shift_score) {
         dp_pair_ptrs_[p]->updateTable(s, diag_score + new_score, PATH_TYPE_DIAGONAL,
-                                  diag_prev);
+                                      diag_prev);
       } else {
         dp_pair_ptrs_[p]->updateTable(s, shift_score + new_score, PATH_TYPE_SHIFT,
-                                  shift_prev);
+                                      shift_prev);
       }
       //stop_s = clock();
       //update_time = update_time + stop_s - start_s;
     }
   }
   /*
-  std::cout << "trunc time: " << (trunc_time) / double(CLOCKS_PER_SEC)  << " shift time  " 
-      << (shift_time) / double (CLOCKS_PER_SEC) << " update time " 
-      << (update_time) /double (CLOCKS_PER_SEC) << std::endl;
-      */
+     std::cout << "trunc time: " << (trunc_time) / double(CLOCKS_PER_SEC)  << " shift time  " 
+     << (shift_time) / double (CLOCKS_PER_SEC) << " update time " 
+     << (update_time) /double (CLOCKS_PER_SEC) << std::endl;
+     */
 }
 
 void PSAlign::backtrace() {
@@ -341,43 +338,43 @@ DiagonalHeaderPtrVec PSAlign::backtrace(int s) {
 }
 
 PrsmPtr PSAlign::geneResult(int shift_num, ProteoformPtr proteo_ptr, 
-        DeconvMsPtrVec &deconv_ms_ptr_vec,
-        ExtendMsPtrVec &ms_three_ptr_vec, 
-        PrsmParaPtr prsm_para_ptr) {
-    DiagonalHeaderPtrVec header_ptrs= getDiagonalHeaders(shift_num);
-    //double score = ps_align_ptr_->getAlignScr(shift_num);
-    //LOG_DEBUG("Shift " << shift_num << " score " << score);
-    if(header_ptrs.size()==0) {
-        return nullptr;
-    }
-    int first_pos = header_ptrs[0]->getTruncFirstResPos();
-    int last_pos = header_ptrs[header_ptrs.size()-1]->getTruncLastResPos();
-    ProteoformPtr sub_proteo_ptr  = ProteoformFactory::geneSubProteoform(proteo_ptr, first_pos, last_pos);
+                            DeconvMsPtrVec &deconv_ms_ptr_vec,
+                            ExtendMsPtrVec &ms_three_ptr_vec, 
+                            PrsmParaPtr prsm_para_ptr) {
+  DiagonalHeaderPtrVec header_ptrs= getDiagonalHeaders(shift_num);
+  //double score = ps_align_ptr_->getAlignScr(shift_num);
+  //LOG_DEBUG("Shift " << shift_num << " score " << score);
+  if(header_ptrs.size()==0) {
+    return nullptr;
+  }
+  int first_pos = header_ptrs[0]->getTruncFirstResPos();
+  int last_pos = header_ptrs[header_ptrs.size()-1]->getTruncLastResPos();
+  ProteoformPtr sub_proteo_ptr  = ProteoformFactory::geneSubProteoform(proteo_ptr, first_pos, last_pos);
 
-    double min_mass = prsm_para_ptr->getSpParaPtr()->getMinMass();
-    double ppo = prsm_para_ptr->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
+  double min_mass = prsm_para_ptr->getSpParaPtr()->getMinMass();
+  double ppo = prsm_para_ptr->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
 
-    double refine_prec_mass = refinePrecursorAndHeaderShift(proteo_ptr, ms_three_ptr_vec, 
-                                                            header_ptrs, ppo, min_mass, 
-                                                            para_ptr_->refine_prec_step_width_);
+  double refine_prec_mass = refinePrecursorAndHeaderShift(proteo_ptr, ms_three_ptr_vec, 
+                                                          header_ptrs, ppo, min_mass, 
+                                                          para_ptr_->refine_prec_step_width_);
 
-    SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
-    ExtendMsPtrVec refine_ms_ptr_vec = ExtendMsFactory::geneMsThreePtrVec(deconv_ms_ptr_vec,  
-                                                                          sp_para_ptr, refine_prec_mass);
+  SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
+  ExtendMsPtrVec refine_ms_ptr_vec = ExtendMsFactory::geneMsThreePtrVec(deconv_ms_ptr_vec,  
+                                                                        sp_para_ptr, refine_prec_mass);
 
-    DiagonalHeaderPtrVec refined_header_ptrs = refineHeadersBgnEnd(
-            proteo_ptr, refine_ms_ptr_vec, header_ptrs, min_mass);
+  DiagonalHeaderPtrVec refined_header_ptrs = refineHeadersBgnEnd(proteo_ptr, refine_ms_ptr_vec,
+                                                                 header_ptrs, min_mass);
 
-    if(refined_header_ptrs.size()==0){
-        return nullptr;
-    }
+  if (refined_header_ptrs.size() == 0) {
+    return nullptr;
+  }
 
-    ChangePtrVec changes = getDiagonalMassChanges(refined_header_ptrs, first_pos, 
-            last_pos, ChangeType::UNEXPECTED);
-    sub_proteo_ptr->addChangePtrVec(changes);
+  ChangePtrVec changes = getDiagonalMassChanges(refined_header_ptrs, first_pos, 
+                                                last_pos, ChangeType::UNEXPECTED);
+  sub_proteo_ptr->addChangePtrVec(changes);
 
-    return PrsmPtr(new Prsm(sub_proteo_ptr, deconv_ms_ptr_vec, refine_prec_mass,
-                prsm_para_ptr->getSpParaPtr()));
+  return std::make_shared<Prsm>(sub_proteo_ptr, deconv_ms_ptr_vec, refine_prec_mass,
+                                prsm_para_ptr->getSpParaPtr());
 }
 
 } /* namespace prot */

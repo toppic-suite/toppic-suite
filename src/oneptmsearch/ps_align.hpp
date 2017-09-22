@@ -41,7 +41,7 @@ namespace prot {
 
 class PSAlign {
  public:
-  PSAlign();
+  PSAlign() {}
   PSAlign(const std::vector<double> &ms_masses,
           const std::vector<double> &seq_masses,
           const BasicDiagonalPtrVec &diagonal_ptrs,
@@ -56,7 +56,7 @@ class PSAlign {
   DiagonalHeaderPtrVec getDiagonalHeaders(int s){return backtrack_diagonal_ptrs_[s];};
 
   PrsmPtr geneResult(int shift_num, ProteoformPtr proteo_ptr, DeconvMsPtrVec &deconv_ms_ptr_vec,
-          ExtendMsPtrVec &ms_three_ptr_vec, PrsmParaPtr prsm_para_ptr);
+                     ExtendMsPtrVec &ms_three_ptr_vec, PrsmParaPtr prsm_para_ptr);
 
  protected:
   PsAlignParaPtr para_ptr_;;
