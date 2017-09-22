@@ -32,6 +32,8 @@
 #ifndef ZERO_PTM_FAST_MATCH_HPP_
 #define ZERO_PTM_FAST_MATCH_HPP_
 
+#include <vector>
+
 #include "base/proteoform.hpp"
 #include "spec/extend_ms.hpp"
 
@@ -43,8 +45,11 @@ typedef std::vector<ZpFastMatchPtr> ZpFastMatchPtrVec;
 
 class ZeroPtmFastMatch {
  public:
-  ZeroPtmFastMatch (ProteoformPtr proteoform_ptr, double score, 
-                    int begin, int end);
+  ZeroPtmFastMatch(ProteoformPtr proteo_ptr, double score, int begin, int end):
+      proteo_ptr_(proteo_ptr),
+      score_(score),
+      begin_(begin),
+      end_(end) {}
 
   double getScore() {return score_;}
 
@@ -54,8 +59,7 @@ class ZeroPtmFastMatch {
 
   int getEnd() {return end_;}
 
-  static bool cmpScoreDec(const ZpFastMatchPtr &a, 
-                          const ZpFastMatchPtr &b) {
+  static bool cmpScoreDec(const ZpFastMatchPtr &a, const ZpFastMatchPtr &b) {
     return a->getScore() > b->getScore();
   }
 
@@ -63,6 +67,7 @@ class ZeroPtmFastMatch {
                                   const ExtendMsPtrVec &ms_ptr_ptr,
                                   const ProteoformPtrVec &proteo_ptrs,
                                   int report_num, double ppo);
+
  private:
   ProteoformPtr proteo_ptr_;
   double score_;
@@ -70,6 +75,6 @@ class ZeroPtmFastMatch {
   int end_;
 };
 
-}
+}  // namespace prot
 #endif
 

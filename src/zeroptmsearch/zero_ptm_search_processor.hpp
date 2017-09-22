@@ -40,11 +40,22 @@
 
 namespace prot {
 
-class ZeroPtmSearch {
+class ZeroPtmSearchProcessor {
  public:
-  static void process(ZeroPtmSearchMngPtr mng_ptr);
+  explicit ZeroPtmSearchProcessor(ZeroPtmSearchMngPtr mng_ptr):mng_ptr_(mng_ptr) {}
+  void process();
+
+ private:
+  PrsmPtrVec zeroPtmSearchOneSpec(SpectrumSetPtr spec_set_ptr,
+                                  const SimplePrsmPtrVec &simple_prsm_ptr_vec,
+                                  FastaIndexReaderPtr reader_ptr,
+                                  ZeroPtmSearchMngPtr mng_ptr,
+                                  AlignTypePtr type_ptr);
+  ZeroPtmSearchMngPtr mng_ptr_;
 };
 
-} /* namespace_prot */
+typedef std::shared_ptr<ZeroPtmSearchProcessor> ZeroPtmSearchProcessorPtr;
+
+}  // namespace prot
 
 #endif

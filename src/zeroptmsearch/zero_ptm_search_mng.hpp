@@ -40,13 +40,12 @@ namespace prot {
 
 class ZeroPtmSearchMng {
  public:
-  ZeroPtmSearchMng(PrsmParaPtr prsm_para_ptr, 
+  ZeroPtmSearchMng(PrsmParaPtr prsm_para_ptr,
                    const std::string & input_file_ext,
-                   const std::string & output_file_ext): 
-      prsm_para_ptr_(prsm_para_ptr), 
+                   const std::string & output_file_ext):
+      prsm_para_ptr_(prsm_para_ptr),
       input_file_ext_(input_file_ext),
-      output_file_ext_(output_file_ext) {
-      }
+      output_file_ext_(output_file_ext) {}
 
   PrsmParaPtr prsm_para_ptr_;
 
@@ -59,7 +58,7 @@ class ZeroPtmSearchMng {
 
   /** recalibration is used in ZeroPtmSlowMatch */
   bool   do_recalibration_ = false;
-  double recal_ppo_ = 0.000015; // 15 ppm
+  double recal_ppo_ = 0.000015;  // 15 ppm
   bool   ms_one_ms_two_same_recal_ = true;
 
   std::string input_file_ext_;
@@ -69,6 +68,6 @@ class ZeroPtmSearchMng {
 
 typedef std::shared_ptr<ZeroPtmSearchMng> ZeroPtmSearchMngPtr;
 
-} /* namespace_prot */
+}  // namespace prot
 
 #endif
