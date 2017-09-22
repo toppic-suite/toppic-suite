@@ -89,7 +89,7 @@ void onePtmSearchOneSpec(SpectrumSetPtr spec_set_ptr,
                                prsm_vec[i], type_ptr, mng_ptr);
     //auto step_1 = std::chrono::high_resolution_clock::now();
     //LOG_DEBUG("Init time: " << std::chrono::duration_cast<std::chrono::nanoseconds>(step_1-start).count());
-    PrsmPtr tmp = slow_match.compute(type_ptr, 1);
+    PrsmPtr tmp = slow_match.compute(1);
     //auto step_2 = std::chrono::high_resolution_clock::now();
     //LOG_DEBUG("Alignment time: " << std::chrono::duration_cast<std::chrono::nanoseconds>(step_2-step_1).count());
 
