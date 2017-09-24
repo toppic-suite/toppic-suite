@@ -79,8 +79,7 @@ void PrsmCutoffSelector::process(){
       selected_prsms.push_back(prsms[i]);
       id++;
     }   
-    else if (form_fdr_cutoff && prsms[i]->getFdr() <= cutoff_value_ 
-             && prsms[i]->getProteoformFdr() <= cutoff_value_) {
+    else if (form_fdr_cutoff && prsms[i]->getProteoformFdr() <= cutoff_value_) {
       prsms[i]->setPrsmId(id);
       selected_prsms.push_back(prsms[i]);
       id++;
