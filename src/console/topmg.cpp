@@ -147,10 +147,10 @@ int topmg_test(int argc, char* argv[]) {
     one_filter_processor->process();
     std::cout << "ASF-One PTM filtering - finished." << std::endl;
 
-    input_exts.push_back("VAR1_ONE_PTM_COMPLETE");
-    input_exts.push_back("VAR1_ONE_PTM_PREFIX");
-    input_exts.push_back("VAR1_ONE_PTM_SUFFIX");
-    input_exts.push_back("VAR1_ONE_PTM_INTERNAL");
+    input_exts.push_back("VAR1_ONE_PTM_FILTER_COMPLETE");
+    input_exts.push_back("VAR1_ONE_PTM_FILTER_PREFIX");
+    input_exts.push_back("VAR1_ONE_PTM_FILTER_SUFFIX");
+    input_exts.push_back("VAR1_ONE_PTM_FILTER_INTERNAL");
 
     std::cout << "ASF-Diagonal PTM filtering - started." << std::endl;
     DiagFilterMngPtr diag_filter_mng_ptr1
