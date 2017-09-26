@@ -111,7 +111,7 @@ void ProteoGraph::compDistances(int max_mod_num, int max_ptm_sum_mass) {
           MassGraph::edge_descriptor e = *ei;
           int d =(*g_p)[e].int_mass_;
           int change = (*g_p)[e].change_type_;
-          for (int k = 0; k < max_mod_num + 1; k++) {
+          for (int k = 0; k < max_mod_num / 2 + 1; k++) {
             if (k == max_mod_num &&
                 (change == ChangeType::PROTEIN_VARIABLE->getId()
                  || change == ChangeType::VARIABLE->getId())) {

@@ -63,6 +63,7 @@ class GraphAlign {
   MassGraphPtr sg_;
   int spec_ver_num_;
   int n_unknown_shift_;
+  DistVec spec_dist_;
   DistVec2D dist_vec_;
   ConsistentPairs cons_pairs_;
   GraphDpNodePtrVec2D table_;
@@ -73,6 +74,8 @@ class GraphAlign {
   DiagonalHeaderPtrVec2D diag_headers_2d_; 
 
   void getConsistentPairs();
+  void addToConsistentPairs(int m, const std::vector<std::pair<int, int>> & sp_pair_ij,
+                            const std::vector<std::pair<int, int>> & pg_pair_ij);
   void initTable();
 
   GraphDpNodePtr compBestVariableNode(int i, int j, int s, int m, int &best_edge_mod_num);
