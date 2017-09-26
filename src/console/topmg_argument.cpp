@@ -71,9 +71,11 @@ void Argument::initArguments() {
   arguments_["groupSpectrumNumber"] = "1";
   arguments_["filteringResultNumber"] = "20";
   arguments_["residueModFileName"] = "";
-  arguments_["proteo_graph_dis"] = "40";
   arguments_["threadNumber"] = "1";
   arguments_["featureFileName"] = "";
+
+  arguments_["proteo_graph_dis"] = "40";
+  arguments_["varPtmNumber"] = "10";
 }
 
 void Argument::outputArguments(std::ostream &output, 
@@ -112,6 +114,7 @@ void Argument::outputArguments(std::ostream &output,
     output << std::setw(44) << std::left << "Common modification file name: " << "\t" << arguments["residueModFileName"] << std::endl;
   }
   output << std::setw(44) << std::left << "Gap in proteoform graph: " << "\t" << arguments["proteo_graph_dis"] << std::endl;
+  output << std::setw(44) << std::left << "Maximum number of unexpected modifications: " << "\t" << arguments["varPtmNumber"] << std::endl;
   output << std::setw(44) << std::left << "Executable file directory: " << "\t" << arguments["executiveDir"] << std::endl;
   output << std::setw(44) << std::left << "Start time: " << "\t" << arguments["start_time"];
   if (arguments["end_time"] != "") {
@@ -190,6 +193,7 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string proteo_graph_dis = "";
   std::string thread_number = "";
   std::string feature_file_name = "";
+  std::string var_ptm_num = "";
 
   /** Define and parse the program options*/
   try {
@@ -215,7 +219,9 @@ bool Argument::parse(int argc, char* argv[]) {
         ("miscore-threshold,s", po::value<std::string> (&local_threshold), "<a positive number between 0 and 1>. Score threshold (modification identification score) for filtering results of PTM characterization. Default value: 0.45.")
         ("proteo-graph-dis,j", po::value<std::string> (&proteo_graph_dis), "<positive number>. Gap in constructing proteoform graph. Default value: 40.")
         ("thread-number,u", po::value<std::string> (&thread_number), "<positive number>. Number of threads used in the computation. Default value: 1.")
-        ("use-topfd-feature,x", po::value<std::string>(&feature_file_name) , "<a msft file name with its path>. TopFD features for proteoform identification.");
+        ("use-topfd-feature,x", po::value<std::string>(&feature_file_name) , "<a msft file name with its path>. TopFD features for proteoform identification.")
+        ("max-var-ptm", po::value<std::string>(&var_ptm_num) , "<a positive number>. Maximum number of variable PTMs in proteform graph. Default value: 10.");
+
     po::options_description desc("Options");
 
     desc.add_options() 
@@ -240,6 +246,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("proteo-graph-dis,j", po::value<std::string> (&proteo_graph_dis), "")
         ("thread-number,u", po::value<std::string> (&thread_number), "")
         ("use-topfd-feature,x", po::value<std::string>(&feature_file_name) , "<a msft file name with its path>. TopFD features for proteoform identification.")
+        ("max-var-ptm", po::value<std::string>(&var_ptm_num) , "")
         ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name with its path.")
         ("spectrum-file-name", po::value<std::string>(&spectrum_file_name)->required(), "Spectrum file name with its path.");
 
@@ -342,6 +349,9 @@ bool Argument::parse(int argc, char* argv[]) {
     }
     if (vm.count("use-topfd-feature")) {
       arguments_["featureFileName"] = feature_file_name;
+    }
+    if (vm.count("max-var-ptm")) {
+      arguments_["varPtmNumber"] = var_ptm_num;
     }
   }
   catch(std::exception&e ) {

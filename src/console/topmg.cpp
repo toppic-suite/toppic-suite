@@ -184,7 +184,7 @@ int topmg_test(int argc, char* argv[]) {
 
     std::cout << "Graph alignment started." << std::endl;
 
-    int max_mod_num = 10;
+    int max_mod_num = std::stoi(arguments["varPtmNumber"]);
     int gap = std::stoi(arguments["proteo_graph_dis"]);
     GraphAlignMngPtr ga_mng_ptr
         = std::make_shared<GraphAlignMng>(prsm_para_ptr,
@@ -236,8 +236,7 @@ int topmg_test(int argc, char* argv[]) {
 
     std::cout << "PRSM selecting by cutoff - started." << std::endl;
     std::string cutoff_type = arguments["cutoffType"];
-    double cutoff_value;
-    std::istringstream(arguments["cutoffValue"]) >> cutoff_value;
+    double cutoff_value = std::stod(arguments["cutoffValue"]);
     PrsmCutoffSelectorPtr cutoff_selector
         = std::make_shared<PrsmCutoffSelector>(db_file_name, sp_file_name, "TOP",
                                                "CUTOFF_RESULT", cutoff_type, cutoff_value);
