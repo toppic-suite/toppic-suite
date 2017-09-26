@@ -86,7 +86,7 @@ class GraphAlignMng {
 
   int n_unknown_shift_ =2;
 
-  int prec_error_ = 2;
+  int prec_error_ = 1;
 
   int thread_num_ = 1;
 
