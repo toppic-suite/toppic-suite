@@ -33,6 +33,8 @@
 #endif
 
 #include <iomanip>
+#include <vector>
+#include <string>
 
 #include "boost/thread/thread.hpp"
 #include "boost/algorithm/string.hpp"
@@ -114,7 +116,7 @@ void Argument::outputArguments(std::ostream &output,
     output << std::setw(44) << std::left << "Common modification file name: " << "\t" << arguments["residueModFileName"] << std::endl;
   }
   output << std::setw(44) << std::left << "Gap in proteoform graph: " << "\t" << arguments["proteo_graph_dis"] << std::endl;
-  output << std::setw(44) << std::left << "Maximum number of unexpected modifications: " << "\t" << arguments["varPtmNumber"] << std::endl;
+  output << std::setw(44) << std::left << "Maximum number of variable PTMs: " << "\t" << arguments["varPtmNumber"] << std::endl;
   output << std::setw(44) << std::left << "Executable file directory: " << "\t" << arguments["executiveDir"] << std::endl;
   output << std::setw(44) << std::left << "Start time: " << "\t" << arguments["start_time"];
   if (arguments["end_time"] != "") {

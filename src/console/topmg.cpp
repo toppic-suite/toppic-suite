@@ -57,6 +57,7 @@
 #include "prsm/simple_prsm_reader.hpp"
 #include "prsm/simple_prsm_xml_writer.hpp"
 #include "prsm/simple_prsm_util.hpp"
+#include "prsm/simple_prsm.hpp"
 
 #include "console/toppic_argument.hpp"
 
@@ -79,7 +80,7 @@
 
 namespace prot {
 
-int topmg_test(int argc, char* argv[]) {
+int topmg_process(int argc, char* argv[]) {
   try {
     Argument argu_processor;
     bool success = argu_processor.parse(argc, argv);
@@ -164,10 +165,44 @@ int topmg_test(int argc, char* argv[]) {
 
     input_exts.push_back("VAR1_DIAG_FILTER");
 
+    for (size_t i = 0; i < input_exts.size(); i++) {
+      size_t k = 5;
+      if (i == input_exts.size() - 1) k = 20;
+      std::string input_file_name = FileUtil::basename(sp_file_name) + "." + input_exts[i];
+      SimplePrsmReaderPtr reader_ptr = std::make_shared<SimplePrsmReader>(input_file_name);
+      SimplePrsmStrPtr prsm_ptr = reader_ptr->readOnePrsmStr();
+      int cur_id = prsm_ptr->getSpectrumId();
+      std::shared_ptr<SimplePrsmXmlWriter> prsm_writer_ptr
+          = std::make_shared<SimplePrsmXmlWriter>(FileUtil::basename(sp_file_name) + ".GRAPH_FILTER_" + std::to_string(i));
+      std::vector<SimplePrsmStrPtr> prsm_vec;
+      while (prsm_ptr != nullptr) {
+        if (prsm_ptr->getSpectrumId() == cur_id) {
+          prsm_vec.push_back(prsm_ptr);
+        } else {
+          std::sort(prsm_vec.begin(), prsm_vec.end(), SimplePrsmStr::cmpScoreDec);
+          for (size_t j = 0; j < prsm_vec.size() && j < k; j++) {
+            prsm_writer_ptr->write(prsm_vec[j]);
+          }
+          cur_id = prsm_ptr->getSpectrumId();
+          prsm_vec.clear();
+          prsm_vec.push_back(prsm_ptr);
+        }
+        prsm_ptr = reader_ptr->readOnePrsmStr();
+      }
+      std::sort(prsm_vec.begin(), prsm_vec.end(), SimplePrsmStr::cmpScoreDec);
+      for (size_t j = 0; j < prsm_vec.size() && j < k; j++) {
+        prsm_writer_ptr->write(prsm_vec[j]);
+      }
+
+      reader_ptr->close();
+      prsm_writer_ptr->close();
+    }
+
     SimplePrsmPtrVec sim_prsm_ptrs;
 
     for (size_t i = 0; i < input_exts.size(); i++) {
-      std::string input_file_name = FileUtil::basename(sp_file_name) + "." + input_exts[i];
+      std::string input_file_name
+          = FileUtil::basename(sp_file_name) + ".GRAPH_FILTER_" + std::to_string(i);
       SimplePrsmReaderPtr reader_ptr = std::make_shared<SimplePrsmReader>(input_file_name);
       SimplePrsmPtr str_ptr = reader_ptr->readOnePrsm();
       while (str_ptr != nullptr) {
@@ -192,7 +227,6 @@ int topmg_test(int argc, char* argv[]) {
                                           ptm_num, max_mod_num,
                                           gap, max_ptm_mass,
                                           thread_num, "GRAPH_FILTER", "GRAPH_ALIGN");
-    // ga_mng_ptr->prec_error_ = 0;
     LOG_DEBUG("shift num " << ptm_num);
     GraphAlignProcessorPtr ga_processor_ptr = std::make_shared<GraphAlignProcessor>(ga_mng_ptr);
     ga_processor_ptr->process();
@@ -261,8 +295,7 @@ int topmg_test(int argc, char* argv[]) {
       prsm_forms->process();
       prsm_forms = nullptr;
     } else {
-      double ppo;
-      std::istringstream(arguments["errorTolerance"]) >> ppo;
+      double ppo = std::stod(arguments["errorTolerance"]);
       ppo = ppo / 1000000.0;
       PrsmSpeciesPtr prsm_species
           = std::make_shared<PrsmSpecies>(db_file_name, sp_file_name,
@@ -330,5 +363,5 @@ int topmg_test(int argc, char* argv[]) {
 
 int main(int argc, char* argv[]) {
   // prot::log_level = 2;
-  return prot::topmg_test(argc, argv);
+  return prot::topmg_process(argc, argv);
 }
