@@ -32,6 +32,7 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
 message(STATUS "cmake cxx flags " ${CMAKE_CXX_FLAGS})
 
+file(GLOB HTS_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/htslib/*.c)
 file(GLOB BASE_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/base/*.cpp)
 file(GLOB SPEC_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/spec/*.cpp)
 file(GLOB PRSM_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/prsm/*.cpp)
@@ -61,30 +62,30 @@ file(GLOB TEST_PRSM_VIEW_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_prsm_vie
 file(GLOB TEST_BSE_OPT ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_base_opt.cpp) 
 file(GLOB TEST_GRAPH ${CMAKE_CURRENT_SOURCE_DIR}/src/test/test_graph_align.cpp) 
 
-add_executable(toppic ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
+add_executable(toppic ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
     ${ZERO_PTM_SRCS} ${ZERO_PTM_FILTER} ${DIAG_FILTER_SRCS} ${ONE_PTM_FILTER_SRCS} ${ONE_PTM_SEARCH_SRCS}
     ${PTM_SRCS} ${TDGF_SRCS} ${LOCAL_SRCS} ${PRSM_VIEW_SRCS} ${TOPPIC_ARGU_SRCS} ${TOPPIC_MAIN_SRCS})
 
-add_executable(topmg ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS} ${ZERO_PTM_FILTER} ${DIAG_FILTER_SRCS}
+add_executable(topmg ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS} ${ZERO_PTM_FILTER} ${DIAG_FILTER_SRCS}
     ${ONE_PTM_FILTER_SRCS} ${ZERO_PTM_SRCS} ${GRAPH_SRCS} ${GRAPH_ALIGN_SRCS} ${TDGF_SRCS}
     ${TOPMG_ARGU_SRCS} ${ONE_PTM_SEARCH_SRCS} ${PRSM_VIEW_SRCS} ${GRAPH_MAIN})
 
-add_executable(topfd ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS})
+add_executable(topfd ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS})
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     # Windows specific code
     target_link_libraries(toppic xalan-c xalanMsg xerces-c
         boost_filesystem-mgw48-mt-s-1_60 boost_system-mgw48-mt-s-1_60
-        boost_program_options-mgw48-mt-s-1_60 boost_thread-mgw48-mt-s-1_60 hts pthread z Ws2_32)
+        boost_program_options-mgw48-mt-s-1_60 boost_thread-mgw48-mt-s-1_60 pthread z Ws2_32)
 
     target_link_libraries(topmg xalan-c xalanMsg xerces-c
         boost_filesystem-mgw48-mt-s-1_60 boost_system-mgw48-mt-s-1_60
-        boost_program_options-mgw48-mt-s-1_60 boost_thread-mgw48-mt-s-1_60 hts pthread z Ws2_32)
+        boost_program_options-mgw48-mt-s-1_60 boost_thread-mgw48-mt-s-1_60 pthread z Ws2_32)
 
     target_link_libraries(topfd pwiz xalan-c xalanMsg xerces-c
 		boost_program_options-mgw48-mt-s-1_60 boost_filesystem-mgw48-mt-s-1_60
 		boost_system-mgw48-mt-s-1_60 boost_thread-mgw48-mt-s-1_60
-		boost_iostreams-mgw48-mt-s-1_60 boost_regex-mgw48-mt-s-1_60 hts pthread z Ws2_32)
+		boost_iostreams-mgw48-mt-s-1_60 boost_regex-mgw48-mt-s-1_60 pthread z Ws2_32)
 		
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows") 
 
@@ -92,13 +93,13 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     # Linux specific code
 
     target_link_libraries(toppic xalan-c xalanMsg xerces-c boost_program_options
-        boost_filesystem boost_system boost_thread hts pthread z)
+        boost_filesystem boost_system boost_thread pthread z)
 
     target_link_libraries(topmg xalan-c xalanMsg xerces-c boost_program_options
-        boost_filesystem boost_system boost_thread hts pthread z)
+        boost_filesystem boost_system boost_thread pthread z)
 
     target_link_libraries(topfd pwiz xalan-c xalanMsg xerces-c boost_program_options
-        boost_filesystem boost_system boost_thread boost_iostreams boost_regex boost_chrono hts pthread z)
+        boost_filesystem boost_system boost_thread boost_iostreams boost_regex boost_chrono pthread z)
 
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
 
