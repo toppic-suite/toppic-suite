@@ -24,11 +24,6 @@ Xalan
 8. see the Makefile and patch in the directory
 9. make
 
-Htslib
-1. git clone https://github.iu.edu/xwliu/htslib.git
-1. cd htslib
-2. make
-
 Proteomics Wizards
 1. download pwiz
 2. cp library/boost_aux/ to src/pwiz/boost 
@@ -38,5 +33,4 @@ Download links:
 1. boost 1.65.0 (boost_1_65_0.tar.gz): https://dl.bintray.com/boostorg/release/1.65.0/source/boost_1_65_0.tar.gz
 2. xerces-c-3.2.0 (xerces-c-3.2.0.tar.gz): http://ftp.wayne.edu/apache//xerces/c/3/sources/xerces-c-3.2.0.tar.gz
 3. xalan 1.11 (xalan_c-1.11-src.zip): http://apache.cs.utah.edu/xalan/xalan-c/sources/xalan_c-1.11-src.tar.gz
-4. htslib: https://github.iu.edu/xwliu/htslib
-5. pwiz: http://proteowizard.sourceforge.net/downloads.shtml
+4. pwiz: http://proteowizard.sourceforge.net/downloads.shtml
