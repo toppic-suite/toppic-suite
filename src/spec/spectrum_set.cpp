@@ -91,7 +91,7 @@ bool SpectrumSet::checkValid(SpParaPtr sp_para_ptr) {
   for (size_t i = 0; i < deconv_ms_ptr_vec_.size(); i++) {
     peak_num += deconv_ms_ptr_vec_[i]->size();
   }
-  LOG_DEBUG(std::endl << "peak_num " << peak_num << std::endl);
+  LOG_DEBUG("peak_num " << peak_num);
   if(peak_num < sp_para_ptr->getMinPeakNum()){
     return false;
   }
