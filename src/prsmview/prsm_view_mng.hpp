@@ -41,13 +41,16 @@ namespace prot {
 
 class PrsmViewMng {
  public:
-  PrsmViewMng(PrsmParaPtr prsm_para_ptr, std::string exec_dir): prsm_para_ptr_(prsm_para_ptr) {
-    std::string spectrum_file_name = prsm_para_ptr_->getSpectrumFileName();
-    xml_path_ = FileUtil::basename(spectrum_file_name) + "_xml";
-    html_path_ = FileUtil::basename(spectrum_file_name) + "_html";
-    executive_dir_ = exec_dir;
-    min_mass_ = prsm_para_ptr_->getSpParaPtr()->getMinMass();
-  }
+  PrsmViewMng(PrsmParaPtr prsm_para_ptr,
+              const std::string & exec_dir,
+              const std::string & fname_suffix):
+      prsm_para_ptr_(prsm_para_ptr) {
+        std::string spectrum_file_name = prsm_para_ptr_->getSpectrumFileName();
+        xml_path_ = FileUtil::basename(spectrum_file_name) + "_" + fname_suffix + "_xml";
+        html_path_ = FileUtil::basename(spectrum_file_name) + "_" + fname_suffix + "_html";
+        executive_dir_ = exec_dir;
+        min_mass_ = prsm_para_ptr_->getSpParaPtr()->getMinMass();
+      }
 
   PrsmParaPtr prsm_para_ptr_;
 

@@ -50,9 +50,10 @@ namespace prot {
 
 XmlGenerator::XmlGenerator(PrsmParaPtr prsm_para_ptr,
                            const std::string &exec_dir,
-                           const std::string &input_file_ext) {
+                           const std::string &input_file_ext,
+                           const std::string &fname_suffix) {
   input_file_ext_ = input_file_ext;
-  mng_ptr_ = std::make_shared<PrsmViewMng>(prsm_para_ptr, exec_dir);
+  mng_ptr_ = std::make_shared<PrsmViewMng>(prsm_para_ptr, exec_dir, fname_suffix);
   anno_view_ptr_ = std::make_shared<AnnoView>();
   fasta_reader_ptr_ = std::make_shared<FastaIndexReader>(prsm_para_ptr->getSearchDbFileName());
   writer_block_size_ = 300;

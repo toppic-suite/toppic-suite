@@ -50,8 +50,10 @@ namespace prot {
 
 class XmlGenerator {
  public:
-  XmlGenerator(PrsmParaPtr prsm_para_ptr, const std::string &exec_dir,
-               const std::string &input_file_name);
+  XmlGenerator(PrsmParaPtr prsm_para_ptr,
+               const std::string &exec_dir,
+               const std::string &input_file_name,
+               const std::string &fname_suffix);
   void process();
 
  private:
@@ -72,7 +74,7 @@ class XmlGenerator {
   int writer_block_size_;
   std::vector<ExtendMsPtrVec> extend_ms_vec2d_;
   std::vector<DeconvMsPtrVec> deconv_ms_vec2d_;
-  std::map<int, size_t> spec_id_extend_ms_map_;  
+  std::map<int, size_t> spec_id_extend_ms_map_;
 };
 
 typedef std::shared_ptr<XmlGenerator> XmlGeneratorPtr;

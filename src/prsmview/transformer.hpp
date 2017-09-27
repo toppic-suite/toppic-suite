@@ -41,7 +41,8 @@
 
 namespace prot {
 
-void translate(std::map<std::string,std::string> &arguments);
+void translate(std::map<std::string, std::string> &arguments,
+               const std::string & fname_suffix);
 
 }
 

@@ -324,25 +324,25 @@ int two_base_opt(int argc, char* argv[]) {
     arguments["end_time"] = std::string(ctime_r(&end, buf));
     arguments["running_time"] = std::to_string(static_cast<int>(difftime(end, start)));
 
-    std::cout << "Outputting the result table - started." << std::endl;
+    std::cout << "Outputting the PRSM result table - started." << std::endl;
     PrsmTableWriterPtr table_out
         = std::make_shared<PrsmTableWriter>(prsm_para_ptr, arguments, suffix, "OUTPUT_TABLE");
     table_out->write();
     table_out = nullptr;
-    std::cout << "Outputting the result table - finished." << std::endl;
+    std::cout << "Outputting the PRSM result table - finished." << std::endl;
 
-    std::cout << "Generating xml files started." << std::endl;
-    XmlGeneratorPtr xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, exe_dir, suffix);
+    std::cout << "Generating the PRSM xml files - started." << std::endl;
+    XmlGeneratorPtr xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, exe_dir, suffix, "prsm_cutoff");
     xml_gene->process();
     xml_gene = nullptr;
-    std::cout << "Generating xml files - finished." << std::endl;
+    std::cout << "Generating the PRSM xml files - finished." << std::endl;
 
-    std::cout << "Converting xml files to html files - started." << std::endl;
-    translate(arguments);
-    std::cout << "Converting xml files to html files - finished." << std::endl;
+    std::cout << "Converting the PRSM xml files to html files - started." << std::endl;
+    translate(arguments, "prsm_cutoff");
+    std::cout << "Converting the PRSM xml files to html files - finished." << std::endl;
     WebLog::completeFunction(WebLog::OutPutTime());
 
-    std::cout << "PRSM proteoform selecting by cutoff - started." << std::endl;
+    std::cout << "Proteoform selecting by cutoff - started." << std::endl;
     cutoff_type = (arguments["cutoffProteoformType"] == "FDR") ? "FORMFDR": "EVALUE";
     std::istringstream(arguments["cutoffProteoformValue"]) >> cutoff_value;
     cutoff_selector = std::make_shared<PrsmCutoffSelector>(db_file_name, sp_file_name, "TOP",
@@ -350,27 +350,40 @@ int two_base_opt(int argc, char* argv[]) {
                                                            cutoff_value);
     cutoff_selector->process();
     cutoff_selector = nullptr;
-    std::cout << "PRSM proteoform selecting by cutoff - finished." << std::endl;
+    std::cout << "Proteoform selecting by cutoff - finished." << std::endl;
 
-    std::cout << "PRSM proteoform filtering - started." << std::endl;
+    std::cout << "Proteoform filtering - started." << std::endl;
     PrsmFormFilterPtr form_filter
         = std::make_shared<PrsmFormFilter>(db_file_name, sp_file_name, "CUTOFF_RESULT_FORM",
                                            "FORM_FILTER_RESULT", "FORM_RESULT");
     form_filter->process();
     form_filter = nullptr;
-    std::cout << "PRSM proteoform filtering - finished." << std::endl;
+    std::cout << "Proteoform filtering - finished." << std::endl;
 
-    std::cout << "Outputting the proteoform table - started." << std::endl;
+    std::cout << "Outputting the proteoform result table - started." << std::endl;
     PrsmTableWriterPtr form_out
         = std::make_shared<PrsmTableWriter>(prsm_para_ptr, arguments,
                                             "FORM_RESULT", "FORM_OUTPUT_TABLE");
     form_out->write();
     form_out = nullptr;
-    std::cout << "Outputting the proteoform table - finished." << std::endl;
+    std::cout << "Outputting the proteoform result table - finished." << std::endl;
+
+    std::cout << "Generating the proteoform xml files - started." << std::endl;
+    xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, exe_dir, "CUTOFF_RESULT_FORM",
+                                              "proteoform_cutoff");
+    xml_gene->process();
+    xml_gene = nullptr;
+    std::cout << "Generating the proteoform xml files - finished." << std::endl;
+
+    std::cout << "Converting the proteoform xml files to html files - started." << std::endl;
+    translate(arguments, "proteoform_cutoff");
+    std::cout << "Converting the proteoform xml files to html files - finished." << std::endl;
+    WebLog::completeFunction(WebLog::OutPutTime());
 
     if (arguments["keepTempFiles"] != "true") {
       std::cout << "Deleting temporary files - started." << std::endl;
-      FileUtil::delDir(FileUtil::basename(sp_file_name) + "_xml");
+      FileUtil::delDir(FileUtil::basename(sp_file_name) + "_proteoform_cutoff_xml");
+      FileUtil::delDir(FileUtil::basename(sp_file_name) + "_prsm_cutoff_xml");
       FileUtil::delFile(exe_dir + "/run.log");
       FileUtil::cleanDir(ori_db_file_name, sp_file_name);
       std::cout << "Deleting temporary files - finished." << std::endl;
