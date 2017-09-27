@@ -28,19 +28,19 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <vector>
 
 #include "base/file_util.hpp"
 #include "prsmview/transformer.hpp"
 #include "prsmview/anno_view.hpp"
 
-namespace prot
-{
+namespace prot {
 
-void translate(std::map<std::string,std::string> &arguments){
-
+void translate(std::map<std::string, std::string> &arguments,
+               const std::string &fname_suffix) {
   std::string spectrum_file_name_ = arguments["spectrumFileName"];
-  std::string xml_dir = FileUtil::basename(spectrum_file_name_) + "_xml";
-  std::string html_dir = FileUtil::basename(spectrum_file_name_) + "_html";
+  std::string xml_dir = FileUtil::basename(spectrum_file_name_) + "_" + fname_suffix + "_xml";
+  std::string html_dir = FileUtil::basename(spectrum_file_name_) + "_" + fname_suffix + "_html";
   std::string exec_dir = arguments["executiveDir"];
 
   FileUtil::createFolder(html_dir + FileUtil::getFileSeparator() +"proteoforms");
@@ -50,18 +50,18 @@ void translate(std::map<std::string,std::string> &arguments){
   boost::filesystem::path to_path(html_dir + FileUtil::getFileSeparator() + "resources");
   FileUtil::copyDir(from_path, to_path);
 
-  //std::cout<<"trans start!XMLPlatformUtils::Initialize()"<<std::endl;
+  LOG_DEBUG("trans start!XMLPlatformUtils::Initialize()");
   xercesc::XMLPlatformUtils::Initialize();
-  //std::cout<<"trans start! XalanTransformer::initialize()"<<std::endl;
+  LOG_DEBUG("trans start! XalanTransformer::initialize()");
   xalanc::XalanTransformer::initialize();
-  //std::cout<<"trans start ! XalanTransformer"<<std::endl;
+  LOG_DEBUG("trans start ! XalanTransformer");
   xalanc::XalanTransformer theXanlanTransformer;
 
   std::string xml_file_list = xml_dir + FileUtil::getFileSeparator() + "files.xml";
   std::vector<std::vector<std::string>> anno_view = readViewXmlFiles(xml_file_list);
 
-  for(size_t i = 0; i < anno_view.size(); i++) {
-    std::cout << std::flush << "Converting xml files to html files - processing " << i + 1 << " of " << anno_view.size() << " files.\r";
+  for (size_t i = 0; i < anno_view.size(); i++) {
+    std::cout << "Converting xml files to html files - processing " << i + 1 << " of " << anno_view.size() << " files.\r";
     const char* xml_in = anno_view[i][0].c_str();
     const char* xsl_in = anno_view[i][1].c_str();
     const char* xml_out = anno_view[i][2].c_str();
@@ -77,4 +77,4 @@ void translate(std::map<std::string,std::string> &arguments){
   xalanc::XalanTransformer::ICUCleanUp();
 }
 
-}
+}  // namespace prot
