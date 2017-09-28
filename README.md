@@ -1,20 +1,27 @@
 # TopPIC: TOP-Down Mass Spectrometry Based Proteoform Identification and Characterization
 
-For manual and refenrence, please visit http://proteomics.informatics.iupui.edu/software/toppic/
+For manual and reference, please visit http://proteomics.informatics.iupui.edu/software/toppic/
 
 ## System requirements
+
 * GCC version higher than 4.8.2 for C++11 support
 * CMake (>= 2.8)
-* For TopPIC-server, Java, ant and Apache Tomcat server
 
 ### Linux (Ubuntu):
 
 ```sh
-sudo apt-get install build-essential cmake unzip zlib1g-dev
+# install compiling tools
+sudo apt-get install build-essential cmake
 
-cd third_party
-unzip linux_include.zip
-cd ..
+# install the pwiz lib to read proteomics data
+sudo apt-get install libpwiz-dev
+
+# install other dependencies
+sudo apt-get install zlib1g-dev libboost-filesystem-dev \
+                     libboost-program-options-dev \
+                     libboost-system-dev \
+                     libboost-thread-dev \
+                     libxalan-c-dev
 
 mkdir build
 cd build
@@ -53,9 +60,3 @@ export LANG=en_US.UTF-8
 export LANGUAGE=en_US.UTF-8
  ```
 
-On Linux, all the static libraries included were built using GCC 5.4. You might meet the incompatibility during the linking using other versions of GCC. You can set the version of compiler in CMakeLists.txt as below:
-
-```
-SET(CMAKE_C_COMPILER gcc-5.4)
-SET(CMAKE_CXX_COMPILER g++-5.4)
-```
