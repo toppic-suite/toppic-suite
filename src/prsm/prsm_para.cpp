@@ -42,7 +42,6 @@ namespace prot {
 PrsmPara::PrsmPara(std::map<std::string, std::string> &arguments) {
   search_db_file_name_ = arguments["databaseFileName"];
   spec_file_name_ = arguments["spectrumFileName"];
-  log_file_name_ = arguments["logFileName"];
   exe_dir_ = arguments["executiveDir"];
   errorTolerance_=std::stoi(arguments["errorTolerance"]);
 
@@ -66,8 +65,8 @@ PrsmPara::PrsmPara(std::map<std::string, std::string> &arguments) {
   double ppo = std::stod(arguments["errorTolerance"])*0.000001;
   bool use_min_tolerance = true;
   double min_tolerance = 0.01;
-  PeakTolerancePtr peak_tolerance_ptr = PeakTolerancePtr(
-      new PeakTolerance(ppo, use_min_tolerance, min_tolerance));
+  PeakTolerancePtr peak_tolerance_ptr
+      = std::make_shared<PeakTolerance>(ppo, use_min_tolerance, min_tolerance);
 
   // extend sp parameter 
   double IM = MassConstant::getIsotopeMass();
@@ -84,9 +83,8 @@ PrsmPara::PrsmPara(std::map<std::string, std::string> &arguments) {
     localization_ = false;
   }
 
-  sp_para_ptr_ = SpParaPtr(new SpPara(min_peak_num, min_mass, extend_min_mass,
-                                      ext_offsets, peak_tolerance_ptr, activation_ptr));
-
+  sp_para_ptr_ = std::make_shared<SpPara>(min_peak_num, min_mass, extend_min_mass,
+                                          ext_offsets, peak_tolerance_ptr, activation_ptr);
 }
 
 } /* namespace prot */

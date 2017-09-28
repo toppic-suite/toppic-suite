@@ -32,7 +32,6 @@
 #include <algorithm>
 
 #include "base/logger.hpp"
-#include "base/web_logger.hpp"
 #include "base/file_util.hpp"
 #include "base/proteoform.hpp"
 #include "base/proteoform_factory.hpp"
@@ -190,7 +189,6 @@ void OnePtmSearchProcessor::process() {
     }
     std::cout << std::flush <<  "One PTM search - processing " << cnt
         << " of " << spectrum_num << " spectra.\r";
-    WebLog::percentLog(cnt, spectrum_num, WebLog::OnePtmSearchTime());
   }
   sp_reader.close();
   comp_prsm_reader.close();

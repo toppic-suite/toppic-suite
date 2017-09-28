@@ -35,7 +35,6 @@
 #include "base/fasta_reader.hpp"
 #include "base/fasta_util.hpp"
 #include "base/base_data.hpp"
-#include "base/web_logger.hpp"
 
 #include "spec/msalign_reader.hpp"
 #include "spec/msalign_util.hpp"

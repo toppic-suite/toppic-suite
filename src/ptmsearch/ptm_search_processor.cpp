@@ -32,7 +32,6 @@
 #include "base/prot_mod.hpp"
 #include "base/fasta_reader.hpp"
 #include "base/file_util.hpp"
-#include "base/web_logger.hpp"
 #include "base/threadpool.hpp"
 #include "spec/deconv_ms.hpp"
 #include "spec/spectrum_set.hpp"
@@ -201,8 +200,6 @@ void PtmSearchProcessor::process(){
     }
     std::cout << std::flush <<  "PTM search - processing " << cnt 
         << " of " << spectrum_num << " spectra.\r";
-
-    WebLog::percentLog(cnt, spectrum_num, WebLog::TwoPtmSearchTime());
   }
   pool_ptr->ShutDown();
   LOG_DEBUG("Search completed");

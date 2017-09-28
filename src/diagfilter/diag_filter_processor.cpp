@@ -37,7 +37,6 @@
 #include "base/proteoform_factory.hpp"
 #include "base/file_util.hpp"
 #include "base/mod_util.hpp"
-#include "base/web_logger.hpp"
 #include "base/threadpool.hpp"
 #include "spec/msalign_util.hpp"
 #include "prsm/simple_prsm_xml_writer.hpp"
@@ -138,8 +137,6 @@ void DiagFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num
         }
       }
     }
-    WebLog::percentLog(cnt, spectrum_num, block_ptr->getBlockIdx(), total_block_num,
-                       WebLog::DiagFilterTime());
     std::cout << std::flush << "Diagonal filtering - processing " << cnt
         << " of " << spectrum_num << " spectra.\r";
     spec_set_ptr = reader.getNextSpectrumSet(sp_para_ptr);

@@ -38,7 +38,6 @@
 #include "base/fasta_reader.hpp"
 #include "base/fasta_util.hpp"
 #include "base/base_data.hpp"
-#include "base/web_logger.hpp"
 
 #include "spec/msalign_reader.hpp"
 #include "spec/msalign_util.hpp"
@@ -104,7 +103,6 @@ int two_base_opt(int argc, char* argv[]) {
     std::string db_file_name = arguments["databaseFileName"];
     std::string sp_file_name = arguments["spectrumFileName"];
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
-    std::string log_file_name = arguments["logFileName"];
 
     int n_top = std::stoi(arguments["numOfTopPrsms"]);
     int ptm_num = std::stoi(arguments["ptmNumber"]);
@@ -120,9 +118,6 @@ int two_base_opt(int argc, char* argv[]) {
     if (arguments["residueModFileName"] != "") {
       localization = true;
     }
-    // initialize log file
-    WebLog::init(log_file_name, use_gf, localization, ptm_num);
-    LOG_DEBUG("web log inited");
 
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
     LOG_DEBUG("prsm para inited");
@@ -145,7 +140,6 @@ int two_base_opt(int argc, char* argv[]) {
     ZeroPtmFilterProcessorPtr zero_filter_processor
         = std::make_shared<ZeroPtmFilterProcessor>(zero_filter_mng_ptr);
     zero_filter_processor->process();
-    WebLog::completeFunction(WebLog::ZeroPtmFilterTime());
     std::cout << "Zero PTM filtering - finished." << std::endl;
 
     std::cout << "Zero PTM search - started." << std::endl;
@@ -155,7 +149,6 @@ int two_base_opt(int argc, char* argv[]) {
         = std::make_shared<ZeroPtmSearchProcessor>(zero_search_mng_ptr);
     zero_search_processor->process();
     zero_search_processor = nullptr;
-    WebLog::completeFunction(WebLog::ZeroPtmSearchTime());
     std::cout << "Zero PTM search - finished." << std::endl;
 
     input_exts.push_back("ZERO_PTM_COMPLETE");
@@ -170,7 +163,6 @@ int two_base_opt(int argc, char* argv[]) {
       OnePtmFilterProcessorPtr one_filter_processor
           = std::make_shared<OnePtmFilterProcessor>(one_ptm_filter_mng_ptr);
       one_filter_processor->process();
-      WebLog::completeFunction(WebLog::OnePtmFilterTime());
       std::cout << "One PTM filtering - finished." << std::endl;
 
       std::cout << "One PTM search - started." << std::endl;
@@ -182,7 +174,6 @@ int two_base_opt(int argc, char* argv[]) {
           = std::make_shared<OnePtmSearchProcessor>(one_search_mng_ptr);
       one_search_processor->process();
       one_search_processor = nullptr;
-      WebLog::completeFunction(WebLog::OnePtmSearchTime());
       std::cout << "One PTM search - finished." << std::endl;
 
       input_exts.push_back("ONE_PTM_COMPLETE");
@@ -199,7 +190,6 @@ int two_base_opt(int argc, char* argv[]) {
       DiagFilterProcessorPtr diag_filter_processor
           = std::make_shared<DiagFilterProcessor>(diag_filter_mng_ptr);
       diag_filter_processor->process();
-      WebLog::completeFunction(WebLog::DiagFilterTime());
       std::cout << "Diagonal filtering - finished." << std::endl;
 
       std::cout << "Two PTM search - started." << std::endl;
@@ -208,7 +198,6 @@ int two_base_opt(int argc, char* argv[]) {
                                            thread_num, "DIAG_FILTER", "PTM");
       PtmSearchProcessorPtr processor = std::make_shared<PtmSearchProcessor>(two_search_mng_ptr);
       processor->process();
-      WebLog::completeFunction(WebLog::TwoPtmSearchTime());
       std::cout << "Two PTM search - finished." << std::endl;
       input_exts.push_back("PTM");
     }
@@ -231,11 +220,6 @@ int two_base_opt(int argc, char* argv[]) {
     // compute E-value for a set of prsms each run
     processor->process(false);
     processor = nullptr;
-    if (use_gf) {
-      WebLog::completeFunction(WebLog::GfEvalueTime());
-    } else {
-      WebLog::completeFunction(WebLog::TableEvalueTime());
-    }
     std::cout << "E-value computation - finished." << std::endl;
 
     std::cout << "Finding protein species - started." << std::endl;
@@ -266,7 +250,6 @@ int two_base_opt(int argc, char* argv[]) {
       prsm_species = nullptr;
     }
     std::cout << "Finding protein species - finished." << std::endl;
-    WebLog::completeFunction(WebLog::SelectingTime());
 
     if (arguments["searchType"] == "TARGET") {
       std::cout << "Top PRSM selecting - started" << std::endl;
@@ -315,7 +298,6 @@ int two_base_opt(int argc, char* argv[]) {
       LocalProcessorPtr local_ptr = std::make_shared<LocalProcessor>(local_mng);
       local_ptr->process();
       local_ptr = nullptr;
-      WebLog::completeFunction(WebLog::LocalizationTime());
       std::cout << "PTM characterization - finished." << std::endl;
       suffix = "LOCAL_RESULT";
     }
@@ -340,7 +322,6 @@ int two_base_opt(int argc, char* argv[]) {
     std::cout << "Converting the PRSM xml files to html files - started." << std::endl;
     translate(arguments, "prsm_cutoff");
     std::cout << "Converting the PRSM xml files to html files - finished." << std::endl;
-    WebLog::completeFunction(WebLog::OutPutTime());
 
     std::cout << "Proteoform selecting by cutoff - started." << std::endl;
     cutoff_type = (arguments["cutoffProteoformType"] == "FDR") ? "FORMFDR": "EVALUE";
@@ -378,13 +359,11 @@ int two_base_opt(int argc, char* argv[]) {
     std::cout << "Converting the proteoform xml files to html files - started." << std::endl;
     translate(arguments, "proteoform_cutoff");
     std::cout << "Converting the proteoform xml files to html files - finished." << std::endl;
-    WebLog::completeFunction(WebLog::OutPutTime());
 
     if (arguments["keepTempFiles"] != "true") {
       std::cout << "Deleting temporary files - started." << std::endl;
       FileUtil::delDir(FileUtil::basename(sp_file_name) + "_proteoform_cutoff_xml");
       FileUtil::delDir(FileUtil::basename(sp_file_name) + "_prsm_cutoff_xml");
-      FileUtil::delFile(exe_dir + "/run.log");
       FileUtil::cleanDir(ori_db_file_name, sp_file_name);
       std::cout << "Deleting temporary files - finished." << std::endl;
     }

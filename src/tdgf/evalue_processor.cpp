@@ -30,7 +30,6 @@
 
 
 #include "base/logger.hpp"
-#include "base/web_logger.hpp"
 #include "base/file_util.hpp"
 #include "base/proteoform.hpp"
 #include "base/fasta_reader.hpp"
@@ -148,12 +147,6 @@ void EValueProcessor::process(bool is_separate) {
 
     std::cout << std::flush << "E-value computation - processing " << cnt << " of " 
         << spectrum_num << " spectra.\r";
-
-    if (mng_ptr_->use_gf_){
-      WebLog::percentLog(cnt, spectrum_num, WebLog::GfEvalueTime());
-    } else {
-      WebLog::percentLog(cnt, spectrum_num, WebLog::TableEvalueTime());	
-    }
   }
   pool_ptr->ShutDown();
   std::cout << std::endl;
