@@ -13,11 +13,10 @@ message(STATUS "system name " ${CMAKE_SYSTEM_NAME})
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   # Linux specific code
-  SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DPROT_LINUX -D_GLIBCXX_USE_CXX11_ABI=0")
-  SET(CMAKE_EXE_LINKER_FLAGS  "-static")
+  SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DPROT_LINUX")
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src
-        ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/linux_include)
-  link_directories(${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/linux_lib/)
+                      /usr/include/libpwiz
+                      /usr/include/libpwiz/libraries/boost_aux)
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
@@ -92,14 +91,14 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     # Linux specific code
 
-    target_link_libraries(toppic xalan-c xalanMsg xerces-c boost_program_options
+    target_link_libraries(toppic xalan-c xerces-c boost_program_options
         boost_filesystem boost_system boost_thread pthread z)
 
-    target_link_libraries(topmg xalan-c xalanMsg xerces-c boost_program_options
+    target_link_libraries(topmg xalan-c xerces-c boost_program_options
         boost_filesystem boost_system boost_thread pthread z)
 
-    target_link_libraries(topfd pwiz xalan-c xalanMsg xerces-c boost_program_options
-        boost_filesystem boost_system boost_thread boost_iostreams boost_regex boost_chrono pthread z)
+    target_link_libraries(topfd pwiz xalan-c xerces-c boost_program_options
+        boost_filesystem boost_system boost_thread pthread z)
 
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
 
