@@ -48,7 +48,6 @@ class PrsmPara {
   PrsmPara(std::map<std::string,std::string> &arguments);
   std::string getSearchDbFileName() {return search_db_file_name_;}
   std::string getSpectrumFileName() {return spec_file_name_;}
-  std::string getLogFileName() {return log_file_name_;}
   std::string getExeDir(){return exe_dir_;}
   int getErrorTolerance(){return errorTolerance_;}
   int getGroupSpecNum() {return group_spec_num_;}
@@ -60,7 +59,6 @@ class PrsmPara {
  private:
   std::string search_db_file_name_;
   std::string spec_file_name_;
-  std::string log_file_name_;
   std::string exe_dir_;
   int errorTolerance_;
 

@@ -66,7 +66,6 @@ void Argument::initArguments() {
   arguments_["maxPtmMass"] = "500";
   arguments_["useGf"] = "false";
   arguments_["executiveDir"] = ".";
-  arguments_["logFileName"] = "";
   arguments_["keepTempFiles"] = "false";
   arguments_["fullBinaryPath"] = "false";
   arguments_["local_threshold"] = "0.45";
@@ -141,7 +140,6 @@ void Argument::setArgumentsByConfigFile(const std::string &filename){
       arguments_["oriDatabaseFileName"] = XmlDomUtil::getChildValue(root, "database_file_name", 0);
       arguments_["databaseBlockSize"] = XmlDomUtil::getChildValue(root, "database_blocksize", 0);
       arguments_["spectrumFileName"] = XmlDomUtil::getChildValue(root, "spectrum_file_name", 0);
-      arguments_["logFileName"] = XmlDomUtil::getChildValue(root, "log_file_name", 0);
       arguments_["activation"] = XmlDomUtil::getChildValue(root, "fragmentation_method", 0);
       arguments_["fixedMod"] = XmlDomUtil::getChildValue(root, "fixed_mod", 0);
       arguments_["searchType"] = XmlDomUtil::getChildValue(root, "search_type", 0);
@@ -188,7 +186,6 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string cutoff_spectral_value = "";
   std::string cutoff_proteoform_type = "";
   std::string cutoff_proteoform_value = "";
-  std::string log_file_name = "";
   std::string use_table = "";
   std::string group_num = "";
   std::string local_threshold = "";
@@ -242,7 +239,6 @@ bool Argument::parse(int argc, char* argv[]) {
         ("cutoff-proteoform-type,q", po::value<std::string> (&cutoff_proteoform_type), "")
         ("cutoff-proteoform-value,w", po::value<std::string> (&cutoff_proteoform_value), "")
         ("filtering-result-number,o", po::value<std::string>(&filtering_result_num), "Filtering result number. Default value: 20.")
-        ("log-file-name,l", po::value<std::string>(&log_file_name), "Log file name with its path.")
         ("keep-temp-files,k", "Keep temporary files.")
         ("generating-function,g", "")
         ("local-threshold,s", po::value<std::string> (&local_threshold), "")
@@ -329,9 +325,6 @@ bool Argument::parse(int argc, char* argv[]) {
     }
     if (vm.count("cutoff-proteoform-value")) {
       arguments_["cutoffProteoformValue"] = cutoff_proteoform_value;
-    }
-    if (vm.count("log-file-name")) {
-      arguments_["logFileName"] = log_file_name;
     }
     if (vm.count("keep-temp-files")) {
       arguments_["keepTempFiles"] = "true";

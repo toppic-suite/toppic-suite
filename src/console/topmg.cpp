@@ -110,7 +110,6 @@ int topmg_process(int argc, char* argv[]) {
     std::string db_file_name = arguments["databaseFileName"];
     std::string sp_file_name = arguments["spectrumFileName"];
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
-    std::string log_file_name = arguments["logFileName"];
     std::string residue_mod_file_name = arguments["residueModFileName"];
 
     int n_top = std::stoi(arguments["numOfTopPrsms"]);
@@ -335,13 +334,13 @@ int topmg_process(int argc, char* argv[]) {
     std::cout << "Outputting the proteoform table - finished." << std::endl;
 
     std::cout << "Generating view xml files started." << std::endl;
-    XmlGeneratorPtr xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, exe_dir, "FORMS");
+    XmlGeneratorPtr xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, exe_dir, "FORMS", "prsm_cutoff");
     xml_gene->process();
     xml_gene = nullptr;
     std::cout << "Generating view xml files finished." << std::endl;
 
     std::cout << "Converting xml files to html files started." << std::endl;
-    translate(arguments);
+    translate(arguments, "prsm_cutoff");
     std::cout << "Converting xml files to html files finished." << std::endl;
 
     if (arguments["keepTempFiles"] != "true") {

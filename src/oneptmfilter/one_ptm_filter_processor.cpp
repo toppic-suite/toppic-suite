@@ -34,7 +34,6 @@
 #include "base/proteoform.hpp"
 #include "base/proteoform_factory.hpp"
 #include "base/file_util.hpp"
-#include "base/web_logger.hpp"
 #include "base/mod_util.hpp"
 #include "spec/msalign_util.hpp"
 #include "spec/spectrum_set.hpp"
@@ -143,9 +142,6 @@ void OnePtmFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_n
         }
       }
     }
-    WebLog::percentLog(cnt, spectrum_num, block_ptr->getBlockIdx(), total_block_num,
-                       WebLog::OnePtmFilterTime());
-
     std::cout << std::flush << "One PTM filtering - processing " << cnt
         << " of " << spectrum_num << " spectra.\r";
   }

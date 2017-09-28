@@ -32,7 +32,6 @@
 #include "base/proteoform.hpp"
 #include "base/proteoform_factory.hpp"
 #include "base/file_util.hpp"
-#include "base/web_logger.hpp"
 #include "spec/msalign_reader.hpp"
 #include "spec/msalign_util.hpp"
 #include "spec/spectrum_set.hpp"
@@ -121,8 +120,6 @@ void ZeroPtmFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_
       suff_writer.write(filter_ptr->getSuffMatchPtrs());
       internal_writer.write(filter_ptr->getInternalMatchPtrs());
     }
-    WebLog::percentLog(cnt, spectrum_num, block_ptr->getBlockIdx(), total_block_num,
-                       WebLog::ZeroPtmFilterTime());
     std::cout << std::flush << "Zero PTM filtering - processing " << cnt
         << " of " << spectrum_num << " spectra.\r";
   }

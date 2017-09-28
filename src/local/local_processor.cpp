@@ -33,7 +33,6 @@
 #include "base/ptm.hpp"
 #include "base/mod_util.hpp"
 #include "base/algorithm.hpp"
-#include "base/web_logger.hpp"
 #include "base/local_anno.hpp"
 #include "spec/msalign_reader.hpp"
 #include "spec/spectrum_set.hpp"
@@ -99,7 +98,6 @@ void LocalProcessor::process() {
     }
     std::cout << std::flush << "PTM characterization is processing " << cnt 
         << " of " << spectrum_num << " spectra.\r";
-    WebLog::percentLog(cnt, spectrum_num, WebLog::LocalizationTime());
   }
   sp_reader.close();
   prsm_reader.close();

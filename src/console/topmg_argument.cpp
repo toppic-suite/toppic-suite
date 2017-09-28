@@ -66,7 +66,6 @@ void Argument::initArguments() {
   arguments_["maxPtmMass"] = "500";
   arguments_["useGf"] = "false";
   arguments_["executiveDir"] = ".";
-  arguments_["logFileName"] = "";
   arguments_["keepTempFiles"] = "false";
   arguments_["fullBinaryPath"] = "false";
   arguments_["local_threshold"] = "0.45";
@@ -142,7 +141,6 @@ void Argument::setArgumentsByConfigFile(const std::string &filename){
       arguments_["oriDatabaseFileName"] = XmlDomUtil::getChildValue(root, "database_file_name", 0);
       arguments_["databaseBlockSize"] = XmlDomUtil::getChildValue(root, "database_blocksize", 0);
       arguments_["spectrumFileName"] = XmlDomUtil::getChildValue(root, "spectrum_file_name", 0);
-      arguments_["logFileName"] = XmlDomUtil::getChildValue(root, "log_file_name", 0);
       arguments_["activation"] = XmlDomUtil::getChildValue(root, "fragmentation_method", 0);
       arguments_["fixedMod"] = XmlDomUtil::getChildValue(root, "fixed_mod", 0);
       arguments_["searchType"] = XmlDomUtil::getChildValue(root, "search_type", 0);
@@ -187,7 +185,6 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string max_ptm_mass = "";
   std::string cutoff_type = "";
   std::string cutoff_value = "";
-  std::string log_file_name = "";
   std::string use_table = "";
   std::string local_threshold = "";
   std::string filtering_result_num = "";
@@ -239,7 +236,6 @@ bool Argument::parse(int argc, char* argv[]) {
         ("cutoff-type,t", po::value<std::string> (&cutoff_type), "")
         ("cutoff-value,v", po::value<std::string> (&cutoff_value), "")
         ("filtering-result-number,o", po::value<std::string>(&filtering_result_num), "Filtering result number. Default value: 20.")
-        ("log-file-name,l", po::value<std::string>(&log_file_name), "Log file name with its path.")
         ("keep-temp-files,k", "Keep temporary files.")
         ("generating-function,g", "")
         ("local-threshold,s", po::value<std::string> (&local_threshold), "")
@@ -321,9 +317,6 @@ bool Argument::parse(int argc, char* argv[]) {
     }
     if (vm.count("cutoff-value")) {
       arguments_["cutoffValue"] = cutoff_value;
-    }
-    if (vm.count("log-file-name")) {
-      arguments_["logFileName"] = log_file_name;
     }
     if (vm.count("keep-temp-files")) {
       arguments_["keepTempFiles"] = "true";
