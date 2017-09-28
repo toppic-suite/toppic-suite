@@ -37,24 +37,17 @@
 #include "base/file_util.hpp"
 #include "base/base_data.hpp"
 #include "feature/deconv_argu.hpp"
-#include "feature/deconv_para.hpp"
 #include "feature/deconv_process.hpp"
 #include "feature/feature_detect.hpp"
 
 namespace prot {
 
-int deconvProcess(int argc, char* argv[]) {
+int TopFDProcess(std::map<std::string, std::string> arguments,
+                 const std::string & exe_dir) {
   try {
     time_t start = time(0);
-    std::string exe_dir = FileUtil::getExecutiveDir(argv[0]);
+
     BaseData::init(exe_dir);
-    DeconvArgument argu_processor;
-    bool success = argu_processor.parse(argc, argv);
-    if (!success) {
-      return 1;
-    }
-    std::map<std::string, std::string> arguments = argu_processor.getArguments();
-    LOG_DEBUG("parse complete");
 
     DeconvParaPtr para_ptr = std::make_shared<DeconvPara>(arguments);
     LOG_DEBUG("deconv para");
@@ -69,13 +62,9 @@ int deconvProcess(int argc, char* argv[]) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
   }
-  std::cout << std::endl << "TopFD finished." << std::endl;
+  std::cout << "TopFD finished." << std::endl;
   return 0;
 }
 
 }  // namespace prot
 
-int main(int argc, char* argv[]) {
-  // prot::log_level = 2;
-  return prot::deconvProcess(argc, argv);
-}
