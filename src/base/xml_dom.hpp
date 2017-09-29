@@ -43,7 +43,7 @@
 
 namespace prot {
 
-/* DOM parser */
+// DOM parser
 class XmlDOMParser {
  public:
   XmlDOMParser();
@@ -85,43 +85,12 @@ class XmlDOMImplFactory {
   static XmlDOMImpl* getXmlDOMImplInstance();
 };
 
- 
-class XStr {
- public:
-  XStr(const char*  str) {
-    // Call the private transcoding method
-    unicode_form_ = xercesc::XMLString::transcode(str);
-  }
-
-  ~XStr() {
-    xercesc::XMLString::release(&unicode_form_);
-  }
-
-  const XMLCh* unicodeForm() {return unicode_form_;}
-
- private:
-  XMLCh* unicode_form_;
-};
-
-class YStr {
- public:
-  YStr(const XMLCh* xml_ch) {
-    // Call the private transcoding method
-    ch_ = xercesc::XMLString::transcode(xml_ch);
-  }
-
-  ~YStr() {
-    delete ch_;
-  }
-
-  std::string  getString() {return std::string(ch_);}
-
- private:
-  char* ch_;
-};
-
-#define X(str) XStr(str).unicodeForm()
-#define Y(str) YStr(str).getString()
-
+inline const XMLCh* X(const char*  str) {
+  return xercesc::XMLString::transcode(str);
 }
+
+inline std::string Y(const XMLCh* xml_ch) {
+  return std::string(xercesc::XMLString::transcode(xml_ch));
+}
+}  // namespace prot
 #endif
