@@ -48,7 +48,14 @@ class PrsmCutoffSelector {
                      const std::string &input_file_ext,
                      const std::string &output_file_ext,
                      const std::string &cutoff_type,
-                     double cutoff_value);
+                     double cutoff_value): 
+      db_file_name_(db_file_name),
+      spec_file_name_(spec_file_name),
+      input_file_ext_(input_file_ext),
+      output_file_ext_(output_file_ext),
+      cutoff_type_(cutoff_type),
+      cutoff_value_(cutoff_value) {}
+
   void process();
  private:
   std::string db_file_name_;
