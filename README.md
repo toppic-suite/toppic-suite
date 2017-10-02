@@ -23,6 +23,10 @@ sudo apt-get install zlib1g-dev libboost-filesystem-dev \
                      libboost-thread-dev \
                      libxalan-c-dev
 
+# install the catch unit test framework (https://github.com/philsquared/Catch)
+sudo apt-get install catch
+
+# building
 mkdir build
 cd build
 cmake ..
