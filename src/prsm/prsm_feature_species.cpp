@@ -109,12 +109,12 @@ void PrsmFeatureSpecies::process() {
       = std::make_shared<MsAlignReader>(feature_file_name_,
                                         prsm_para_ptr_->getGroupSpecNum(),
                                         prsm_para_ptr_->getSpParaPtr()->getActivationPtr());
-  SpectrumSetPtr spec_set_ptr = msreader->getNextSpectrumSet(prsm_para_ptr_->getSpParaPtr());
+  SpectrumSetPtr spec_set_ptr = msreader->getNextSpectrumSet(prsm_para_ptr_->getSpParaPtr())[0];
   LOG_DEBUG("prsm_ptrs.size() " << prsm_ptrs.size());
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     int spec_id = prsm_ptrs[i]->getSpectrumId();
     while (spec_set_ptr->getDeconvMsPtrVec()[0]->getMsHeaderPtr()->getId() != spec_id) {
-      spec_set_ptr = msreader->getNextSpectrumSet(prsm_para_ptr_->getSpParaPtr());
+      spec_set_ptr = msreader->getNextSpectrumSet(prsm_para_ptr_->getSpParaPtr())[0];
     }
     prsm_ptrs[i]->setPrecFeatureId(spec_set_ptr->getDeconvMsPtrVec()[0]->getMsHeaderPtr()->getFeatureId());
     prsm_ptrs[i]->setPrecFeatureInte(spec_set_ptr->getDeconvMsPtrVec()[0]->getMsHeaderPtr()->getFeatureInte());

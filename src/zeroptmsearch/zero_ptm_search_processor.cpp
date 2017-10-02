@@ -61,6 +61,8 @@ PrsmPtrVec ZeroPtmSearchProcessor::zeroPtmSearchOneSpec(SpectrumSetPtr spec_set_
   // LOG_DEBUG("ms three vector size " << ms_three_vec.size());
   ProteoformPtrVec proteoform_ptr_vec;
   for (size_t i = 0; i < simple_prsm_ptr_vec.size(); i++) {
+    if (std::abs(spec_set_ptr->getPrecMonoMass() - simple_prsm_ptr_vec[i]->getPrecMass()) > std::pow(10, -4))
+      continue;
     std::string seq_name = simple_prsm_ptr_vec[i]->getSeqName();
     std::string seq_desc = simple_prsm_ptr_vec[i]->getSeqDesc();
     ProteoformPtr proteo_ptr = ProteoformFactory::readFastaToProteoformPtr(reader_ptr, seq_name,
@@ -128,12 +130,12 @@ void ZeroPtmSearchProcessor::process() {
   MsAlignReader sp_reader(sp_file_name, group_spec_num,
                           sp_para_ptr->getActivationPtr());
   int cnt = 0;
-  SpectrumSetPtr spec_set_ptr;
+  std::vector<SpectrumSetPtr> spec_set_vec = sp_reader.getNextSpectrumSet(sp_para_ptr);
   // LOG_DEBUG("Start search");
-  while ((spec_set_ptr = sp_reader.getNextSpectrumSet(sp_para_ptr))!= nullptr) {
+  while (spec_set_vec[0] != nullptr) {
     cnt+= group_spec_num;
-    if (spec_set_ptr->isValid()) {
-      int spec_id = spec_set_ptr->getSpectrumId();
+    if (spec_set_vec[0]->isValid()) {
+      int spec_id = spec_set_vec[0]->getSpectrumId();
       // complete
       SimplePrsmPtrVec comp_selected_prsm_ptrs;
       while (comp_prsm_ptr != nullptr && comp_prsm_ptr->getSpectrumId() == spec_id) {
@@ -143,10 +145,12 @@ void ZeroPtmSearchProcessor::process() {
       }
       if (comp_selected_prsm_ptrs.size() > 0) {
         // LOG_DEBUG("start processing one spectrum.");
-        PrsmPtrVec prsms = zeroPtmSearchOneSpec(spec_set_ptr, comp_selected_prsm_ptrs, reader_ptr,
-                                                mng_ptr_, AlignType::COMPLETE);
-        comp_writer.writeVector(prsms);
-        all_writer.writeVector(prsms);
+        for (size_t k = 0; k < spec_set_vec.size(); k++) {
+          PrsmPtrVec prsms = zeroPtmSearchOneSpec(spec_set_vec[k], comp_selected_prsm_ptrs, reader_ptr,
+                                                  mng_ptr_, AlignType::COMPLETE);
+          comp_writer.writeVector(prsms);
+          all_writer.writeVector(prsms);
+        }
       }
 
       // prefix
@@ -158,10 +162,12 @@ void ZeroPtmSearchProcessor::process() {
       }
       if (pref_selected_prsm_ptrs.size() > 0) {
         // LOG_DEBUG("start processing one spectrum.");
-        PrsmPtrVec prsms = zeroPtmSearchOneSpec(spec_set_ptr, pref_selected_prsm_ptrs, reader_ptr,
-                                                mng_ptr_, AlignType::PREFIX);
-        pref_writer.writeVector(prsms);
-        all_writer.writeVector(prsms);
+        for (size_t k = 0; k < spec_set_vec.size(); k++) {
+          PrsmPtrVec prsms = zeroPtmSearchOneSpec(spec_set_vec[k], pref_selected_prsm_ptrs, reader_ptr,
+                                                  mng_ptr_, AlignType::PREFIX);
+          pref_writer.writeVector(prsms);
+          all_writer.writeVector(prsms);
+        }
       }
 
       // suffix
@@ -173,10 +179,12 @@ void ZeroPtmSearchProcessor::process() {
       }
       if (suff_selected_prsm_ptrs.size() > 0) {
         // LOG_DEBUG("start processing one spectrum.");
-        PrsmPtrVec prsms = zeroPtmSearchOneSpec(spec_set_ptr, suff_selected_prsm_ptrs, reader_ptr,
-                                                mng_ptr_, AlignType::SUFFIX);
-        suff_writer.writeVector(prsms);
-        all_writer.writeVector(prsms);
+        for (size_t k = 0; k < spec_set_vec.size(); k++) {
+          PrsmPtrVec prsms = zeroPtmSearchOneSpec(spec_set_vec[k], suff_selected_prsm_ptrs, reader_ptr,
+                                                  mng_ptr_, AlignType::SUFFIX);
+          suff_writer.writeVector(prsms);
+          all_writer.writeVector(prsms);
+        }
       }
 
       // internal
@@ -188,12 +196,15 @@ void ZeroPtmSearchProcessor::process() {
       }
       if (internal_selected_prsm_ptrs.size() > 0) {
         // LOG_DEBUG("start processing one spectrum.");
-        PrsmPtrVec prsms = zeroPtmSearchOneSpec(spec_set_ptr, internal_selected_prsm_ptrs, reader_ptr,
-                                                mng_ptr_, AlignType::INTERNAL);
-        internal_writer.writeVector(prsms);
-        all_writer.writeVector(prsms);
+        for (size_t k = 0; k < spec_set_vec.size(); k++) {
+          PrsmPtrVec prsms = zeroPtmSearchOneSpec(spec_set_vec[k], internal_selected_prsm_ptrs, reader_ptr,
+                                                  mng_ptr_, AlignType::INTERNAL);
+          internal_writer.writeVector(prsms);
+          all_writer.writeVector(prsms);
+        }
       }
     }
+    spec_set_vec = sp_reader.getNextSpectrumSet(sp_para_ptr);
     std::cout << std::flush <<  "Zero PTM search - processing " << cnt
         << " of " << spectrum_num << " spectra.\r";
   }

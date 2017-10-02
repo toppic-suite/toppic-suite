@@ -208,12 +208,14 @@ DeconvMsPtr MsAlignReader::getNextMs() {
   return deconv_ms_ptr_;
 }
 
-SpectrumSetPtr MsAlignReader::getNextSpectrumSet(SpParaPtr sp_para_ptr) {
+std::vector<SpectrumSetPtr> MsAlignReader::getNextSpectrumSet(SpParaPtr sp_para_ptr) {
+  std::vector<SpectrumSetPtr> spec_set_vec; 
   DeconvMsPtrVec deconv_ms_ptr_vec;
   for (int i = 0; i < group_spec_num_; i++) {
     readNext();
     if (deconv_ms_ptr_ == nullptr) {
-      return SpectrumSetPtr(nullptr);
+      spec_set_vec.push_back(nullptr);
+      return spec_set_vec;
     }
     deconv_ms_ptr_vec.push_back(deconv_ms_ptr_);
   }
@@ -228,7 +230,18 @@ SpectrumSetPtr MsAlignReader::getNextSpectrumSet(SpParaPtr sp_para_ptr) {
     }
   }
   // LOG_DEBUG("prec mass result " << prec_mono_mass);
-  return SpectrumSetPtr(new SpectrumSet(deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass));
+  std::vector<double> prec_errors;
+  prec_errors.push_back(0);
+  for (int i = 1; i <= sp_para_ptr->prec_error_; i++) {
+    prec_errors.push_back(- i * MassConstant::getIsotopeMass());
+    prec_errors.push_back(i * MassConstant::getIsotopeMass());
+  }
+  for (size_t i = 0; i< prec_errors.size(); i++) {
+    spec_set_vec.push_back(std::make_shared<SpectrumSet>(deconv_ms_ptr_vec,
+                                                         sp_para_ptr,
+                                                         prec_mono_mass + prec_errors[i]));
+  }
+  return spec_set_vec;
 }
 
 void MsAlignReader::close() {

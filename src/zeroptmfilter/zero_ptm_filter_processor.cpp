@@ -106,22 +106,25 @@ void ZeroPtmFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_
   SimplePrsmXmlWriter suff_writer(output_file_name + "_SUFFIX_" + block_str);
   SimplePrsmXmlWriter internal_writer(output_file_name + "_INTERNAL_" + block_str);
 
-  SpectrumSetPtr spec_set_ptr;
+  std::vector<SpectrumSetPtr> spec_set_vec = reader.getNextSpectrumSet(sp_para_ptr);
   int spectrum_num = MsAlignUtil::getSpNum(prsm_para_ptr->getSpectrumFileName());
   int cnt = 0;
-  while ((spec_set_ptr = reader.getNextSpectrumSet(sp_para_ptr)) != nullptr) {
+  while (spec_set_vec[0] != nullptr) {
     cnt+= group_spec_num;
-    LOG_DEBUG("spec set ptr valid " << spec_set_ptr->isValid());
-    if (spec_set_ptr->isValid()) {
-      ExtendMsPtrVec ms_ptr_vec = spec_set_ptr->getMsThreePtrVec();
-      filter_ptr->computeBestMatch(ms_ptr_vec);
-      comp_writer.write(filter_ptr->getCompMatchPtrs());
-      pref_writer.write(filter_ptr->getPrefMatchPtrs());
-      suff_writer.write(filter_ptr->getSuffMatchPtrs());
-      internal_writer.write(filter_ptr->getInternalMatchPtrs());
+    for (size_t k = 0; k < spec_set_vec.size(); k++) {
+      LOG_DEBUG("spec set ptr valid " << spec_set_vec[k]->isValid());
+      if (spec_set_vec[k]->isValid()) {
+        ExtendMsPtrVec ms_ptr_vec = spec_set_vec[k]->getMsThreePtrVec();
+        filter_ptr->computeBestMatch(ms_ptr_vec);
+        comp_writer.write(filter_ptr->getCompMatchPtrs());
+        pref_writer.write(filter_ptr->getPrefMatchPtrs());
+        suff_writer.write(filter_ptr->getSuffMatchPtrs());
+        internal_writer.write(filter_ptr->getInternalMatchPtrs());
+      }
     }
     std::cout << std::flush << "Zero PTM filtering - processing " << cnt
         << " of " << spectrum_num << " spectra.\r";
+    spec_set_vec = reader.getNextSpectrumSet(sp_para_ptr);
   }
   std::cout << std::endl;
   reader.close();

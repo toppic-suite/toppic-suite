@@ -126,7 +126,7 @@ void EValueProcessor::process(bool is_separate) {
   SpectrumSetPtr spec_set_ptr;
 
   LOG_DEBUG("Start search");
-  while((spec_set_ptr = sp_reader.getNextSpectrumSet(sp_para_ptr))!= nullptr){
+  while((spec_set_ptr = sp_reader.getNextSpectrumSet(sp_para_ptr)[0])!= nullptr){
     cnt += group_spec_num;
     if(spec_set_ptr->isValid()){
       PrsmPtrVec selected_prsm_ptrs;

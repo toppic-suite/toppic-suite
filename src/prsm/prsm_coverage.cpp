@@ -59,7 +59,7 @@ void PrsmCoverage::processSingleCoverage(){
   std::string sp_file_name = prsm_para_ptr_->getSpectrumFileName();
   std::string input_file_name = FileUtil::basename(sp_file_name)+"." + input_file_ext_;
   std::string db_file_name = prsm_para_ptr_->getSearchDbFileName();
-  FastaIndexReaderPtr seq_reader(new FastaIndexReader(db_file_name));
+  FastaIndexReaderPtr seq_reader = std::make_shared<FastaIndexReader>(db_file_name);
   ModPtrVec fix_mod_ptr_vec = prsm_para_ptr_->getFixModPtrVec();
   PrsmReader prsm_reader(input_file_name);
   PrsmPtr prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
@@ -78,7 +78,7 @@ void PrsmCoverage::processSingleCoverage(){
   //write title
   printTitle(out_stream);
   SpParaPtr sp_para_ptr = prsm_para_ptr_->getSpParaPtr();
-  while((spec_set_ptr = sp_reader.getNextSpectrumSet(sp_para_ptr))!= nullptr){
+  while((spec_set_ptr = sp_reader.getNextSpectrumSet(sp_para_ptr)[0])!= nullptr){
     cnt+= group_spec_num;
     if(spec_set_ptr->isValid()){
       int spec_id = spec_set_ptr->getSpectrumId();

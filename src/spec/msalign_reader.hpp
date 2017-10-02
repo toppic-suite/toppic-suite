@@ -54,7 +54,7 @@ class MsAlignReader {
 
   DeconvMsPtr getNextMs();
 
-  SpectrumSetPtr getNextSpectrumSet(SpParaPtr sp_para_ptr);
+  std::vector<SpectrumSetPtr> getNextSpectrumSet(SpParaPtr sp_para_ptr);
 
   void close();
 

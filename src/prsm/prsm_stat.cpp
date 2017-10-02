@@ -337,21 +337,22 @@ void PrsmStat::process() {
   ModPtrVec fix_mod_ptr_vec = prsm_para_ptr_->getFixModPtrVec();
 
   std::string sp_file_name = prsm_para_ptr_->getSpectrumFileName();
-  FastaIndexReaderPtr seq_reader(new FastaIndexReader(db_file_name));
+  FastaIndexReaderPtr seq_reader = std::make_shared<FastaIndexReader>(db_file_name);
   PrsmReader prsm_reader(input_file_name);
   PrsmPtr prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
 
   //init variables
   MsAlignReader sp_reader(sp_file_name, group_spec_num,
                           prsm_para_ptr_->getSpParaPtr()->getActivationPtr());
-  SpectrumSetPtr spec_set_ptr;
 
   SpParaPtr sp_para_ptr = prsm_para_ptr_->getSpParaPtr();
-  while((spec_set_ptr = sp_reader.getNextSpectrumSet(sp_para_ptr))!= nullptr){
-    if(spec_set_ptr->isValid()){
-      int spec_id = spec_set_ptr->getSpectrumId();
+  std::vector<SpectrumSetPtr> spec_set_vec = sp_reader.getNextSpectrumSet(sp_para_ptr);
+
+  while (spec_set_vec[0] != nullptr) {
+    if(spec_set_vec[0]->isValid()){
+      int spec_id = spec_set_vec[0]->getSpectrumId();
       while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_id) {
-        DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
+        DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_vec[0]->getDeconvMsPtrVec();
         prsm_ptr->setDeconvMsPtrVec(deconv_ms_ptr_vec);
         double new_prec_mass = prsm_ptr->getAdjustedPrecMass();
         ExtendMsPtrVec extend_ms_ptr_vec 
@@ -361,6 +362,7 @@ void PrsmStat::process() {
         prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
       }
     }
+    spec_set_vec = sp_reader.getNextSpectrumSet(sp_para_ptr);
   }
 
   sp_reader.close();
