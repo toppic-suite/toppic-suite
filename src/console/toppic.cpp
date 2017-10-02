@@ -156,6 +156,8 @@ int two_base_opt(int argc, char* argv[]) {
     input_exts.push_back("ZERO_PTM_SUFFIX");
     input_exts.push_back("ZERO_PTM_INTERNAL");
 
+    prsm_para_ptr->getSpParaPtr()->prec_error_ = 0;
+
     if (ptm_num >= 1) {
       std::cout << "One PTM filtering - started." << std::endl;
       OnePtmFilterMngPtr one_ptm_filter_mng_ptr

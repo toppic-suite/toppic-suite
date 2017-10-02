@@ -111,7 +111,7 @@ void DiagFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num
   SimplePrsmThreadPoolPtr pool_ptr
       = std::make_shared<ThreadPool<SimplePrsmXmlWriter>>(mng_ptr_->thread_num_, output_file_name);
 
-  SpectrumSetPtr spec_set_ptr = reader.getNextSpectrumSet(sp_para_ptr);
+  SpectrumSetPtr spec_set_ptr = reader.getNextSpectrumSet(sp_para_ptr)[0];
   int spectrum_num = MsAlignUtil::getSpNum(prsm_para_ptr->getSpectrumFileName());
   int cnt = 0;
   while (spec_set_ptr != nullptr) {
@@ -139,7 +139,7 @@ void DiagFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num
     }
     std::cout << std::flush << "Diagonal filtering - processing " << cnt
         << " of " << spectrum_num << " spectra.\r";
-    spec_set_ptr = reader.getNextSpectrumSet(sp_para_ptr);
+    spec_set_ptr = reader.getNextSpectrumSet(sp_para_ptr)[0];
   }
   pool_ptr->ShutDown();
   std::cout << std::endl;

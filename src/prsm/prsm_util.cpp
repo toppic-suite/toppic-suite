@@ -135,7 +135,7 @@ void PrsmUtil::addSpectrumPtrsToPrsms(PrsmPtrVec &prsm_ptrs, PrsmParaPtr prsm_pa
                        prsm_para_ptr->getGroupSpecNum(),
                        prsm_para_ptr->getSpParaPtr()->getActivationPtr());
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
-  SpectrumSetPtr spec_set_ptr = reader.getNextSpectrumSet(sp_para_ptr);
+  SpectrumSetPtr spec_set_ptr = reader.getNextSpectrumSet(sp_para_ptr)[0];
   // use prsm order information (ordered by spectrum id then prec id)
   int start_prsm = 0;
   while (spec_set_ptr != nullptr) {
@@ -159,7 +159,7 @@ void PrsmUtil::addSpectrumPtrsToPrsms(PrsmPtrVec &prsm_ptrs, PrsmParaPtr prsm_pa
         }
       }
     }
-    spec_set_ptr = reader.getNextSpectrumSet(sp_para_ptr);
+    spec_set_ptr = reader.getNextSpectrumSet(sp_para_ptr)[0];
   }
   reader.close();
 }

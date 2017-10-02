@@ -87,6 +87,9 @@ class SpPara {
 
   std::vector<double> mod_mass_;
 
+  // the 1 Da error in precursor mass used in zeroptm searching
+  int prec_error_ = 1;
+
  private:
   int min_peak_num_;
 

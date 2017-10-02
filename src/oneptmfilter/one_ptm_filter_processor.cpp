@@ -115,7 +115,7 @@ void OnePtmFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_n
   SpectrumSetPtr spec_set_ptr;
   int spectrum_num = MsAlignUtil::getSpNum(prsm_para_ptr->getSpectrumFileName());
   int cnt = 0;
-  while ((spec_set_ptr = reader.getNextSpectrumSet(sp_para_ptr)) != nullptr) {
+  while ((spec_set_ptr = reader.getNextSpectrumSet(sp_para_ptr)[0]) != nullptr) {
     cnt+= group_spec_num;
     if (spec_set_ptr->isValid()) {
       if (mng_ptr_->var_num_ == 0) {

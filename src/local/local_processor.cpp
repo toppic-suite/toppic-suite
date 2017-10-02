@@ -65,7 +65,7 @@ void LocalProcessor::process() {
   PrsmXmlWriter writer(output_file_name);
   std::string db_file_name = mng_ptr_->prsm_para_ptr_->getSearchDbFileName();
 
-  FastaIndexReaderPtr seq_reader(new FastaIndexReader(db_file_name));
+  FastaIndexReaderPtr seq_reader = std::make_shared<FastaIndexReader>(db_file_name);
   PrsmReader prsm_reader(input_file_name);
   ModPtrVec fix_mod_list = mng_ptr_->prsm_para_ptr_->getFixModPtrVec();
   PrsmPtr prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_list);
@@ -77,7 +77,7 @@ void LocalProcessor::process() {
 
   int spectrum_num = MsAlignUtil::getSpNum (mng_ptr_->prsm_para_ptr_->getSpectrumFileName());
   int cnt = 0;
-  while((spec_set_ptr = sp_reader.getNextSpectrumSet(sp_para_ptr))!= nullptr){
+  while((spec_set_ptr = sp_reader.getNextSpectrumSet(sp_para_ptr)[0])!= nullptr){
     cnt += group_spec_num;
     if(spec_set_ptr->isValid()){
       int spec_id = spec_set_ptr->getSpectrumId();
