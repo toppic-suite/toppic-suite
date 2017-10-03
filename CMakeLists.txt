@@ -49,24 +49,24 @@ file(GLOB PRSM_VIEW_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/prsmview/*.cpp)
 file(GLOB LOCAL_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/local/*.cpp)
 file(GLOB TOPPIC_ARGU_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_argument.cpp)
 file(GLOB TOPPIC_MAIN_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic.cpp)
-file(GLOB TOPFD_MAIN_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/feature/topfd_cmd.cpp)
+file(GLOB TOPFD_ARGU_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd_argument.cpp)
+file(GLOB TOPFD_MAIN_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd.cpp)
 file(GLOB GRAPH_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/graph/*.cpp)
 file(GLOB GRAPH_ALIGN_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/graphalign/*.cpp)
 file(GLOB TOPMG_ARGU_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmg_argument.cpp)
-file(GLOB GRAPH_MAIN ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmg.cpp)
+file(GLOB TOPMG_MAIN_SRC ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmg.cpp)
 file(GLOB FEATURE_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/feature/*.cpp)
-list(REMOVE_ITEM FEATURE_SRCS ${TOPFD_MAIN_SRCS})
 file(GLOB UNIT_TEST_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/*.cpp) 
 
-add_executable(toppic ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
+add_executable(toppic ${TOPPIC_MAIN_SRCS} ${TOPPIC_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
     ${ZERO_PTM_SRCS} ${ZERO_PTM_FILTER} ${DIAG_FILTER_SRCS} ${ONE_PTM_FILTER_SRCS} ${ONE_PTM_SEARCH_SRCS}
-    ${PTM_SRCS} ${TDGF_SRCS} ${LOCAL_SRCS} ${PRSM_VIEW_SRCS} ${TOPPIC_ARGU_SRCS} ${TOPPIC_MAIN_SRCS})
+    ${PTM_SRCS} ${TDGF_SRCS} ${LOCAL_SRCS} ${PRSM_VIEW_SRCS})
 
-add_executable(topmg ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS} ${ZERO_PTM_FILTER} ${DIAG_FILTER_SRCS}
-    ${ONE_PTM_FILTER_SRCS} ${ZERO_PTM_SRCS} ${GRAPH_SRCS} ${GRAPH_ALIGN_SRCS} ${TDGF_SRCS}
-    ${TOPMG_ARGU_SRCS} ${ONE_PTM_SEARCH_SRCS} ${PRSM_VIEW_SRCS} ${GRAPH_MAIN})
+add_executable(topmg ${TOPMG_MAIN_SRC} ${TOPMG_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
+    ${ZERO_PTM_FILTER} ${DIAG_FILTER_SRCS} ${ONE_PTM_FILTER_SRCS} ${ZERO_PTM_SRCS} ${GRAPH_SRCS}
+    ${GRAPH_ALIGN_SRCS} ${TDGF_SRCS} ${ONE_PTM_SEARCH_SRCS} ${PRSM_VIEW_SRCS})
 
-add_executable(topfd ${TOPFD_MAIN_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS})
+add_executable(topfd ${TOPFD_MAIN_SRCS} ${TOPFD_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS})
 
 add_library(topfd-dev SHARED ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS})
 
@@ -101,11 +101,11 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     target_link_libraries(topfd pwiz xalan-c xerces-c boost_program_options
         boost_filesystem boost_system boost_thread pthread z)
 
-    target_link_libraries(topfd-dev pwiz xalan-c xerces-c boost_program_options
-        boost_filesystem boost_system boost_thread pthread z)
+    target_link_libraries(topfd-dev pwiz xalan-c xerces-c boost_filesystem
+        boost_system boost_thread pthread z)
 
-    target_link_libraries(toppic-test xalan-c xerces-c boost_program_options
-        boost_filesystem boost_system boost_thread pthread z)
+    target_link_libraries(toppic-test xalan-c xerces-c boost_filesystem
+        boost_system pthread z)
 
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
 

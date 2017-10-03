@@ -36,15 +36,15 @@
 
 #include "base/file_util.hpp"
 #include "base/xml_dom_util.hpp"
-#include "feature/deconv_argu.hpp"
+#include "console/topfd_argument.hpp"
 
 namespace prot {
 
-DeconvArgument::DeconvArgument() {
+Argument::Argument() {
   initArguments();
 }
 
-void DeconvArgument::initArguments() {
+void Argument::initArguments() {
   arguments_["executiveDir"] = "";
   arguments_["spectrumFileName"] = "";
   arguments_["refinePrecMass"]="true";
@@ -58,12 +58,12 @@ void DeconvArgument::initArguments() {
   arguments_["precWindow"] = "2.0";
 }
 
-void DeconvArgument::showUsage(boost::program_options::options_description &desc) {
+void Argument::showUsage(boost::program_options::options_description &desc) {
   std::cout << "Usage: toppfd [options] spectrum-file-name" << std::endl;
   std::cout << desc << std::endl;
 }
 
-bool DeconvArgument::parse(int argc, char* argv[]) {
+bool Argument::parse(int argc, char* argv[]) {
   std::string spectrum_file_name = "";
   std::string max_charge = "";
   std::string max_mass = "";
@@ -169,7 +169,7 @@ bool DeconvArgument::parse(int argc, char* argv[]) {
   return validateArguments();
 }
 
-bool DeconvArgument::validateArguments() {
+bool Argument::validateArguments() {
   if (!boost::filesystem::exists(arguments_["spectrumFileName"])) {
     LOG_ERROR("Spectrum file " << arguments_["spectrumFileName"] << " does not exist!");
     return false;
