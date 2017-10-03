@@ -28,22 +28,22 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <map>
+#include <iostream>
 
-#ifndef PROT_SUMMARY_HPP_
-#define PROT_SUMMARY_HPP_
+#include "base/file_util.hpp"
+#include "console/topfd_argument.hpp"
 
-#include "boost/date_time/posix_time/posix_time.hpp"
+#include "feature/topfd_process.hpp"
 
-#include "console/argument.hpp"
+int main(int argc, char* argv[]) {
+  prot::Argument argu_processor;
+  bool success = argu_processor.parse(argc, argv);
+  if (!success) {
+    return 1;
+  }
+  std::map<std::string, std::string> arguments = argu_processor.getArguments();
+  std::string exe_dir = prot::FileUtil::getExecutiveDir(argv[0]);
 
-namespace prot {
-
-class Summary {
- public:
-  static void outputSummary(Argument arguments, 
-                            boost::posix_time::ptime start_time,
-                            boost::posix_time::ptime stop_time);
-};
+  return prot::TopFDProcess(arguments, exe_dir);
 }
-
-#endif /* ARGUMENT_HPP_ */

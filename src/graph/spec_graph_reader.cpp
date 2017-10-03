@@ -72,7 +72,7 @@ MassGraphPtr SpecGraphReader::getMassGraphPtr(const PrmPeakPtrVec &peak_vec) {
 }
 
 SpecGraphPtrVec SpecGraphReader::getNextSpecGraphPtrVec(int error) {
-  SpectrumSetPtr spec_set_ptr = ms_reader_ptr_->getNextSpectrumSet(sp_para_ptr_);
+  SpectrumSetPtr spec_set_ptr = ms_reader_ptr_->getNextSpectrumSet(sp_para_ptr_)[0];
   return getNextSpecGraphPtrVec(spec_set_ptr, error);
 }
 

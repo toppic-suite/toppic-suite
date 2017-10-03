@@ -113,7 +113,7 @@ void GraphAlignProcessor::process() {
   int cnt = 0;
   SpectrumSetPtr spec_set_ptr;
 
-  while((spec_set_ptr = sp_reader.getNextSpectrumSet(sp_para_ptr))!= nullptr){
+  while((spec_set_ptr = sp_reader.getNextSpectrumSet(sp_para_ptr)[0])!= nullptr){
     cnt += group_spec_num;
     if(spec_set_ptr->isValid()){
       int spec_id = spec_set_ptr->getSpectrumId();

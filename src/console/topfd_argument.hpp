@@ -46,9 +46,9 @@
 
 namespace prot {
 
-class DeconvArgument {
+class Argument {
  public:
-  DeconvArgument();
+  Argument();
   bool parse(int argc, char* argv[]);
   std::map<std::string,std::string> getArguments(){return arguments_;}
 
