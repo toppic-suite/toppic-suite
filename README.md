@@ -26,6 +26,9 @@ sudo apt-get install zlib1g-dev libboost-filesystem-dev \
 # install the catch unit test framework (https://github.com/philsquared/Catch)
 sudo apt-get install catch
 
+# Qt5 for GUI
+sudo apt-get install qtbase5-dev
+
 # building
 mkdir build
 cd build
