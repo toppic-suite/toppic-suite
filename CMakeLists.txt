@@ -83,7 +83,7 @@ add_executable(topfd_gui ${TOPFD_GUI_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS}
 
 add_library(topfd-dev SHARED ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS})
 
-add_executable(toppic-test ${UNIT_TEST_SRCS} ${HTS_SRCS} ${BASE_SRCS})
+#add_executable(toppic-test ${UNIT_TEST_SRCS} ${HTS_SRCS} ${BASE_SRCS})
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     # Windows specific code
@@ -120,8 +120,8 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     target_link_libraries(topfd_gui Qt5Widgets Qt5Core Qt5Gui GL pwiz
         xalan-c xerces-c boost_filesystem boost_system boost_thread pthread z)
 
-    target_link_libraries(toppic-test xalan-c xerces-c boost_filesystem
-        boost_system pthread z)
+    #target_link_libraries(toppic-test xalan-c xerces-c boost_filesystem
+    #    boost_system pthread z)
 
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
 
