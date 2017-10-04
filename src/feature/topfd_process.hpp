@@ -36,8 +36,7 @@
 
 namespace prot {
 
-int TopFDProcess(std::map<std::string, std::string> arguments,
-                 const std::string & exe_dir);
+int TopFDProcess(std::map<std::string, std::string> arguments);
 
 }
 

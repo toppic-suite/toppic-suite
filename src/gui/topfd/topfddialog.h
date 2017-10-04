@@ -28,44 +28,53 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#ifndef PROT_GUI_TOPFDDIALOG_H
+#define PROT_GUI_TOPFDDIALOG_H
 
-#include <iostream>
-#include <iomanip>
 #include <map>
 #include <string>
 
-#include "base/file_util.hpp"
-#include "base/logger.hpp"
-#include "base/base_data.hpp"
-#include "feature/deconv_process.hpp"
-#include "feature/feature_detect.hpp"
+#include <QDialog>
 
-namespace prot {
+#include "threadtopfd.h"
 
-int TopFDProcess(std::map<std::string, std::string> arguments) {
-  try {
-    time_t start = time(0);
-
-    std::string exe_dir = arguments["executiveDir"];
-
-    BaseData::init(exe_dir);
-
-    DeconvParaPtr para_ptr = std::make_shared<DeconvPara>(arguments);
-    LOG_DEBUG("deconv para");
-    DeconvProcess process(para_ptr);
-    LOG_DEBUG("init process");
-    process.process();
-    FeatureDetect::process(para_ptr);
-
-    time_t end = time(0);
-    std::cout << "Runing time: " << std::to_string(static_cast<int>(difftime(end, start))) << " seconds." << std::endl;
-  } catch (const char* e) {
-    std::cout << "[Exception]" << std::endl;
-    std::cout << e << std::endl;
-  }
-  std::cout << "TopFD finished." << std::endl;
-  return 0;
+namespace Ui {
+class TopFDDialog;
 }
 
-}  // namespace prot
+class TopFDDialog : public QDialog {
+  Q_OBJECT
 
+ public:
+  explicit TopFDDialog(QWidget *parent = 0);
+  ~TopFDDialog();
+
+  private slots:
+    void on_clearButton_clicked();
+
+  void on_defaultButton_clicked();
+
+  void on_fileButton_clicked();
+
+  void on_startButton_clicked();
+
+  void on_exitButton_clicked();
+
+ private:
+  QString lastDir_;
+  int percentage_;
+  std::map<std::string, std::string> arguments_;
+  Ui::TopFDDialog *ui;
+  void initArguments();
+  std::map<std::string, std::string> getArguments();
+  std::string getInfo(int i);
+  void lockDialog();
+  void unlockDialog();
+  bool checkError();
+  QString updatePercentage(QString s);
+  void updateMsg(std::string msg);
+  void sleep(int wait);
+  ThreadTopFD* thread_;
+};
+
+#endif
