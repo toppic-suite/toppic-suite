@@ -5,7 +5,7 @@ For manual and reference, please visit http://proteomics.informatics.iupui.edu/s
 ## System requirements
 
 * GCC version higher than 4.8.2 for C++11 support
-* CMake (>= 2.8)
+* CMake (>= 3.1)
 
 ### Linux (Ubuntu):
 
@@ -13,7 +13,7 @@ For manual and reference, please visit http://proteomics.informatics.iupui.edu/s
 # install compiling tools
 sudo apt-get install build-essential cmake
 
-# install the pwiz lib to read proteomics data
+# install the pwiz lib to process proteomics data
 sudo apt-get install libpwiz-dev
 
 # install other dependencies
@@ -39,25 +39,6 @@ cd bin
 ln -s ../toppic_resources .
 ```
 
-### Windows:
-
-* Download [CMake](https://cmake.org/) and add it to `PATH` environment;
-
-* Download [mingw64](http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/4.8.2/threads-posix/seh/x86_64-4.8.2-release-posix-seh-rt_v3-rev4.7z/download) and add it to `PATH` environment.
-
-Then
-
-```sh
-cd third_party
-unzip windows_include.zip
-
-cd ..
-mkdir build
-cd build
-cmake -G "MinGW Makefiles" ..
-mingw32-make
-```
-
 On some Linux distributions, you might meet the problem "Could not loading a transcoding service".
 To fix this, please add following lines into your `.bashrc`.
 
@@ -65,5 +46,8 @@ To fix this, please add following lines into your `.bashrc`.
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
 export LANGUAGE=en_US.UTF-8
- ```
+```
 
+### Windows:
+
+[MSYS2](http://www.msys2.org/) is used for Windows building. Please follow the instructions from [here](doc/windows_build.md).
