@@ -32,6 +32,8 @@
 #ifndef PROT_BASE_FILE_UTIL_HPP_
 #define PROT_BASE_FILE_UTIL_HPP_
 
+#include <string>
+
 #ifndef BOOST_SYSTEM_NO_DEPRECATED
 #define BOOST_SYSTEM_NO_DEPRECATED 1
 #endif
@@ -42,35 +44,29 @@
 #include <boost/filesystem/path.hpp>
 #undef BOOST_NO_CXX11_SCOPED_ENUMS
 
-#include <string>
-
 namespace prot {
+namespace FileUtil {
+std::string getFileSeparator();
 
-class FileUtil {
- public:
-  static std::string getFileSeparator();
+std::string getExecutiveDir(const std::string &argv_0);
 
-  static std::string getExecutiveDir(const std::string &argv_0);
+std::string basename(const std::string &s);
 
-  static std::string basename(const std::string &s);
+std::string directory(const std::string &s);
 
-  static std::string directory(const std::string &s);
+void createFolder(const std::string &folder_name);
 
-  static void createFolder(const std::string &folder_name);
+void copyFile(const std::string &file_name, const std::string &path,
+              bool over_write);
 
-  static void copyFile(const std::string &file_name, const std::string &path,
-                       bool over_write);
+bool copyDir(boost::filesystem::path const & source,
+             boost::filesystem::path const & destination);
 
-  static bool copyDir(boost::filesystem::path const & source, 
-                      boost::filesystem::path const & destination);
+void delDir(const std::string &path);
 
-  static void delDir(const std::string &path);
+void delFile(const std::string &path);
 
-  static void delFile(const std::string &path);
-
-  static void cleanDir(const std::string &fa_path, const std::string & sp_path);
-};
-
-}
-
+void cleanDir(const std::string &fa_path, const std::string & sp_path);
+}  // namespace FileUtil
+}  // namespace prot
 #endif

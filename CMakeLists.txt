@@ -21,7 +21,6 @@ find_package(Qt5Gui)
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   # Linux specific code
-  SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DPROT_LINUX")
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src
                       /usr/include/libpwiz
                       /usr/include/libpwiz/libraries/boost_aux

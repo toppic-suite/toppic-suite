@@ -6,7 +6,7 @@ xcopy /S ..\toppic_resources topmg-win-cmd-%1\toppic_resources
 
 copy C:\msys64\mingw64\bin\libwinpthread-1.dll topmg-win-cmd-%1
 copy C:\msys64\mingw64\bin\libgcc_s_seh-1.dll topmg-win-cmd-%1
-copy C:\msys64\mingw64\bin\libstdc++-6.dll topmg-win-cmd-%1
+copy "C:\msys64\mingw64\bin\libstdc++-6.dll" topmg-win-cmd-%1
 copy C:\msys64\mingw64\bin\zlib1.dll topmg-win-cmd-%1
 
 copy C:\msys64\mingw64\bin\libboost_program_options-mt.dll topmg-win-cmd-%1
