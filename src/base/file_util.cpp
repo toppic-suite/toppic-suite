@@ -71,7 +71,6 @@ std::string FileUtil::getExecutiveDir(const std::string &argv_0) {
 #endif
   fs::path full_path(file_name);
   std::string exe_dir = full_path.remove_filename().string();
-  std::cout << "exe_dir " << exe_dir << std::endl;
   return exe_dir;
 }
 
