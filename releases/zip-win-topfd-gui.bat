@@ -1,7 +1,7 @@
 rmdir /S topfd-win-gui-%1
 mkdir topfd-win-gui-%1
 copy ..\bin\topfd_gui.exe topfd-win-gui-%1\topfd.exe 
-copy ..\LICENSE topfd-win-gui-%1
+copy LICENSE topfd-win-gui-%1
 xcopy /S ..\toppic_resources topfd-win-gui-%1\toppic_resources
 
 copy C:\msys64\mingw64\bin\libgcc_s_seh-1.dll topfd-win-gui-%1

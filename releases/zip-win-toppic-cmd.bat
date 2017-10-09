@@ -1,7 +1,7 @@
 rmdir /S toppic-win-cmd-%1
 mkdir toppic-win-cmd-%1
 copy ..\bin\toppic.exe toppic-win-cmd-%1 
-copy ..\LICENSE toppic-win-cmd-%1
+copy LICENSE toppic-win-cmd-%1
 xcopy /S ..\toppic_resources toppic-win-cmd-%1\toppic_resources
 
 copy C:\msys64\mingw64\bin\libwinpthread-1.dll toppic-win-cmd-%1

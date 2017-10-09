@@ -1,7 +1,7 @@
 rmdir /S topfd-win-cmd-%1
 mkdir topfd-win-cmd-%1
 copy ..\bin\topfd.exe topfd-win-cmd-%1 
-copy ..\LICENSE topfd-win-cmd-%1
+copy LICENSE topfd-win-cmd-%1
 xcopy /S ..\toppic_resources topfd-win-cmd-%1\toppic_resources
 
 copy C:\msys64\mingw64\bin\libwinpthread-1.dll topfd-win-cmd-%1
