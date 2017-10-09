@@ -34,8 +34,8 @@
 
 namespace prot {
 
-int MsAlignUtil::countSpNum(const std::string &spectrum_file_name) {
-  MsAlignReader reader(spectrum_file_name, 1, nullptr);
+int MsAlignUtil::countSpNum(const std::string &spectrum_file_name, SpParaPtr sp_para_ptr) {
+  MsAlignReader reader(spectrum_file_name, 1, nullptr, sp_para_ptr->getSkipList());
   int cnt = 0;
   DeconvMsPtr deconv_ms_ptr;
   while ((deconv_ms_ptr = reader.getNextMs()) != nullptr) {
@@ -45,8 +45,8 @@ int MsAlignUtil::countSpNum(const std::string &spectrum_file_name) {
   return cnt;
 }
 
-void MsAlignUtil::geneSpIndex(const std::string &spectrum_file_name) {
-  int sp_num = countSpNum(spectrum_file_name); 
+void MsAlignUtil::geneSpIndex(const std::string &spectrum_file_name, SpParaPtr sp_para_ptr) {
+  int sp_num = countSpNum(spectrum_file_name, sp_para_ptr); 
   std::ofstream index_output;
   std::string index_file_name = spectrum_file_name + "_index";
   index_output.open(index_file_name.c_str(), std::ios::out);

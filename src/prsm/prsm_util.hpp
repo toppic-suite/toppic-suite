@@ -40,28 +40,25 @@
 #include "prsm/prsm_para.hpp"
 
 namespace prot {
+namespace PrsmUtil {
+std::string getValueStr(std::string line);
 
-class PrsmUtil {
- public:
-  static std::string getValueStr(std::string line);
+std::string getXmlLine(const std::vector<std::string> &str_vec,
+                       const std::string &property);
 
-  static std::string getXmlLine(const std::vector<std::string> &str_vec,
-                                const std::string &property);
+std::vector<std::string> getXmlLineVec(const std::vector<std::string> &str_vec,
+                                       const std::string &property);
 
-  static std::vector<std::string> getXmlLineVec(const std::vector<std::string> &str_vec,
-                                                const std::string &property);
+PrsmPtrVec selectSpeciesPrsms(const PrsmPtrVec &prsm_ptrs, int species_id);
 
-  static PrsmPtrVec selectSpeciesPrsms(const PrsmPtrVec &prsm_ptrs, int species_id);
+std::vector<int> getSpeciesIds(const PrsmPtrVec &prsm_ptrs, std::string &seq_name);
 
-  static std::vector<int> getSpeciesIds(const PrsmPtrVec &prsm_ptrs, std::string &seq_name);
+int getProteinId(const PrsmPtrVec &prsm_ptrs, std::string &seq_name);
 
-  static int getProteinId(const PrsmPtrVec &prsm_ptrs, std::string &seq_name);
+std::vector<int> getSpeciesIds(const PrsmPtrVec &prsm_ptrs);
 
-  static std::vector<int> getSpeciesIds(const PrsmPtrVec &prsm_ptrs);
-
-  static void addSpectrumPtrsToPrsms(PrsmPtrVec &prsm_ptrs, PrsmParaPtr prsm_para_ptr);
-};
-
+void addSpectrumPtrsToPrsms(PrsmPtrVec &prsm_ptrs, PrsmParaPtr prsm_para_ptr);
+}  // namesace PrsmUtil
 }  // namespace prot
 #endif
 

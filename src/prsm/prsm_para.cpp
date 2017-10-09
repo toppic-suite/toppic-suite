@@ -83,8 +83,24 @@ PrsmPara::PrsmPara(std::map<std::string, std::string> &arguments) {
     localization_ = false;
   }
 
+  std::set<std::string> skip_list;
+
+  if (arguments["skipList"] != "") {
+    std::ifstream infile(arguments["skipList"]);
+    std::string line;
+    while (std::getline(infile, line)) {
+      std::vector<std::string> strs; 
+      boost::split(strs, line, boost::is_any_of(" "));
+      for (size_t i = 0; i < strs.size(); i++) {
+        skip_list.insert(strs[i]);
+      }
+    }
+    infile.close();
+  }
+
   sp_para_ptr_ = std::make_shared<SpPara>(min_peak_num, min_mass, extend_min_mass,
-                                          ext_offsets, peak_tolerance_ptr, activation_ptr);
+                                          ext_offsets, peak_tolerance_ptr,
+                                          activation_ptr, skip_list);
 }
 
 } /* namespace prot */

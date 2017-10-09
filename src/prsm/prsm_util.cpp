@@ -133,7 +133,8 @@ bool isMatchMs(PrsmPtr prsm_ptr, MsHeaderPtr header_ptr) {
 void PrsmUtil::addSpectrumPtrsToPrsms(PrsmPtrVec &prsm_ptrs, PrsmParaPtr prsm_para_ptr) {
   MsAlignReader reader(prsm_para_ptr->getSpectrumFileName(),
                        prsm_para_ptr->getGroupSpecNum(),
-                       prsm_para_ptr->getSpParaPtr()->getActivationPtr());
+                       prsm_para_ptr->getSpParaPtr()->getActivationPtr(),
+                       prsm_para_ptr->getSpParaPtr()->getSkipList());
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
   SpectrumSetPtr spec_set_ptr = reader.getNextSpectrumSet(sp_para_ptr)[0];
   // use prsm order information (ordered by spectrum id then prec id)

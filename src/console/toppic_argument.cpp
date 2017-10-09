@@ -74,6 +74,7 @@ void Argument::initArguments() {
   arguments_["residueModFileName"] = "";
   arguments_["threadNumber"] = "1";
   arguments_["featureFileName"] = "";
+  arguments_["skipList"] = "";
 }
 
 void Argument::outputArguments(std::ostream &output, 
@@ -193,6 +194,7 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string residue_mod_file_name = "";
   std::string thread_number = "";
   std::string feature_file_name = "";
+  std::string skip_list = "";
 
   /** Define and parse the program options*/
   try {
@@ -221,7 +223,9 @@ bool Argument::parse(int argc, char* argv[]) {
         ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "<a common modification file>. Specify a text file containing the information of common PTMs for characterization of PTMs in proteoform spectrum-matches.")
         ("miscore-threshold,s", po::value<std::string> (&local_threshold), "<a positive number between 0 and 1>. Score threshold (modification identification score) for filtering results of PTM characterization. Default value: 0.45.")
         ("thread-number,u", po::value<std::string> (&thread_number), "<positive number>. Number of threads used in the computation. Default value: 1.")
-        ("use-topfd-feature,x", po::value<std::string>(&feature_file_name) , "<a msft file name with its path>. TopFD features for proteoform identification.");
+        ("use-topfd-feature,x", po::value<std::string>(&feature_file_name) , "<a msft file with its path>. TopFD features for proteoform identification.")
+        ("skip-list,l", po::value<std::string>(&skip_list) , "<a text file with its path>. The scans in this file will be skipped.");
+
     po::options_description desc("Options");
 
     desc.add_options() 
@@ -245,8 +249,9 @@ bool Argument::parse(int argc, char* argv[]) {
         ("full-binary-path,b", "Full binary path.")
         ("num-combined-spectra,r", po::value<std::string> (&group_num), "")
         ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "")
-        ("thread-number,u", po::value<std::string> (&thread_number), "<positive number>. Number of threads used in the computation. Default value: 1.")
-        ("use-topfd-feature,x", po::value<std::string>(&feature_file_name) , "<a msft file name with its path>. TopFD features for proteoform identification.")
+        ("thread-number,u", po::value<std::string> (&thread_number), "")
+        ("use-topfd-feature,x", po::value<std::string>(&feature_file_name) , "")
+        ("skip-list,l", po::value<std::string>(&skip_list) , "")
         ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name with its path.")
         ("spectrum-file-name", po::value<std::string>(&spectrum_file_name)->required(), "Spectrum file name with its path.");
 
@@ -353,6 +358,9 @@ bool Argument::parse(int argc, char* argv[]) {
     if (vm.count("use-topfd-feature")) {
       arguments_["featureFileName"] = feature_file_name;
     }
+    if (vm.count("skip-list")) {
+      arguments_["skipList"] = skip_list;
+    }    
   }
   catch(std::exception&e ) {
     std::cerr << "Unhandled Exception in parsing command line"<<e.what()<<", application will now exit"<<std::endl;
@@ -376,6 +384,13 @@ bool Argument::validateArguments() {
   if (arguments_["featureFileName"] != "") {
     if (!boost::filesystem::exists(arguments_["featureFileName"])) {
       LOG_ERROR("TopFD feature file " << arguments_["featureFileName"] << " does not exist!");
+      return false;
+    }
+  }
+
+  if (arguments_["skipList"] != "") {
+    if (!boost::filesystem::exists(arguments_["skipList"])) {
+      LOG_ERROR("Skip list " << arguments_["skipList"] << " does not exist!");
       return false;
     }
   }

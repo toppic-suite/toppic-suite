@@ -123,7 +123,8 @@ void OnePtmSearchProcessor::process() {
 
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
   MsAlignReader sp_reader(sp_file_name, group_spec_num,
-                          sp_para_ptr->getActivationPtr());
+                          sp_para_ptr->getActivationPtr(),
+                          sp_para_ptr->getSkipList());
   int cnt = 0;
   SpectrumSetPtr spec_set_ptr;
   // LOG_DEBUG("Start search");

@@ -112,12 +112,14 @@ void EValueProcessor::process(bool is_separate) {
   LOG_DEBUG("start read prsm");
   PrsmPtr prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
 
-  //init variables
+  // init variables
   int spectrum_num = MsAlignUtil::getSpNum(spectrum_file_name);
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
   double ppo = sp_para_ptr->getPeakTolerancePtr()->getPpo();
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
-  MsAlignReader sp_reader(spectrum_file_name, group_spec_num, sp_para_ptr->getActivationPtr());
+  MsAlignReader sp_reader(spectrum_file_name, group_spec_num,
+                          sp_para_ptr->getActivationPtr(),
+                          sp_para_ptr->getSkipList());
 
   std::shared_ptr<ThreadPool<PrsmXmlWriter>> pool_ptr 
       = std::make_shared<ThreadPool<PrsmXmlWriter>>(mng_ptr_->thread_num_ , output_file_name);

@@ -74,6 +74,7 @@ void Argument::initArguments() {
   arguments_["residueModFileName"] = "";
   arguments_["threadNumber"] = "1";
   arguments_["featureFileName"] = "";
+  arguments_["skipList"] = "";
 
   arguments_["proteo_graph_dis"] = "40";
   arguments_["varPtmNumber"] = "10";
@@ -192,6 +193,7 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string proteo_graph_dis = "";
   std::string thread_number = "";
   std::string feature_file_name = "";
+  std::string skip_list = "";
   std::string var_ptm_num = "";
 
   /** Define and parse the program options*/
@@ -218,7 +220,8 @@ bool Argument::parse(int argc, char* argv[]) {
         ("miscore-threshold,s", po::value<std::string> (&local_threshold), "<a positive number between 0 and 1>. Score threshold (modification identification score) for filtering results of PTM characterization. Default value: 0.45.")
         ("proteo-graph-dis,j", po::value<std::string> (&proteo_graph_dis), "<positive number>. Gap in constructing proteoform graph. Default value: 40.")
         ("thread-number,u", po::value<std::string> (&thread_number), "<positive number>. Number of threads used in the computation. Default value: 1.")
-        ("use-topfd-feature,x", po::value<std::string>(&feature_file_name) , "<a msft file name with its path>. TopFD features for proteoform identification.")
+        ("use-topfd-feature,x", po::value<std::string>(&feature_file_name) , "<a msft file with its path>. TopFD features for proteoform identification.")
+        ("skip-list,l", po::value<std::string>(&skip_list) , "<a text file with its path>. The scans in this file will be skipped.")
         ("max-var-ptm", po::value<std::string>(&var_ptm_num) , "<a positive number>. Maximum number of variable PTMs in proteform graph. Default value: 10.");
 
     po::options_description desc("Options");
@@ -243,7 +246,8 @@ bool Argument::parse(int argc, char* argv[]) {
         ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "")
         ("proteo-graph-dis,j", po::value<std::string> (&proteo_graph_dis), "")
         ("thread-number,u", po::value<std::string> (&thread_number), "")
-        ("use-topfd-feature,x", po::value<std::string>(&feature_file_name) , "<a msft file name with its path>. TopFD features for proteoform identification.")
+        ("use-topfd-feature,x", po::value<std::string>(&feature_file_name) , "")
+        ("skip-list,l", po::value<std::string>(&skip_list) , "")
         ("max-var-ptm", po::value<std::string>(&var_ptm_num) , "")
         ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name with its path.")
         ("spectrum-file-name", po::value<std::string>(&spectrum_file_name)->required(), "Spectrum file name with its path.");
@@ -345,6 +349,9 @@ bool Argument::parse(int argc, char* argv[]) {
     if (vm.count("use-topfd-feature")) {
       arguments_["featureFileName"] = feature_file_name;
     }
+    if (vm.count("skip-list")) {
+      arguments_["skipList"] = skip_list;
+    }    
     if (vm.count("max-var-ptm")) {
       arguments_["varPtmNumber"] = var_ptm_num;
     }
@@ -371,6 +378,13 @@ bool Argument::validateArguments() {
   if (arguments_["featureFileName"] != "") {
     if (!boost::filesystem::exists(arguments_["featureFileName"])) {
       LOG_ERROR("TopFD feature file " << arguments_["featureFileName"] << " does not exist!");
+      return false;
+    }
+  }
+
+  if (arguments_["skipList"] != "") {
+    if (!boost::filesystem::exists(arguments_["skipList"])) {
+      LOG_ERROR("Skip list " << arguments_["skipList"] << " does not exist!");
       return false;
     }
   }

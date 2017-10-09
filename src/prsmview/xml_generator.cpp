@@ -73,7 +73,8 @@ void XmlGenerator::outputPrsms() {
   std::string sp_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
   int group_spec_num = mng_ptr_->prsm_para_ptr_->getGroupSpecNum();
   MsAlignReader sp_reader(sp_file_name, group_spec_num,
-                          mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getActivationPtr());
+                          mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getActivationPtr(),
+                          mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getSkipList());
   SpectrumSetPtr spec_set_ptr;
   SpParaPtr sp_para_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr();
 

@@ -49,7 +49,7 @@ namespace prot {
 
 template <int N>
 PrsmXmlWriterSet<N>::PrsmXmlWriterSet(const std::string & output_file_name){
-  all_writer_ptr_ = PrsmXmlWriterPtr(new PrsmXmlWriter (output_file_name));
+  all_writer_ptr_ = std::make_shared<PrsmXmlWriter>(output_file_name);
   for (int s = 2; s <= N; s++) {
     std::string file_name = output_file_name+"_"+ StringUtil::StringUtil::convertToString(s)
         +"_"+ AlignType::COMPLETE->getName();
@@ -160,9 +160,9 @@ void PtmSearchProcessor::process(){
   SimplePrsmReader simple_prsm_reader(input_file_name);
   SimplePrsmPtr prsm_ptr = simple_prsm_reader.readOnePrsm();
 
-  //init variables
+  // init variables
   std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
-  FastaIndexReaderPtr reader_ptr(new FastaIndexReader(db_file_name));
+  FastaIndexReaderPtr reader_ptr = std::make_shared<FastaIndexReader>(db_file_name);
   int spectrum_num = MsAlignUtil::getSpNum (sp_file_name);
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
   ModPtrVec fix_mod_ptr_vec = prsm_para_ptr->getFixModPtrVec();
@@ -171,7 +171,8 @@ void PtmSearchProcessor::process(){
 
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
   MsAlignReader sp_reader(sp_file_name, group_spec_num,
-                          sp_para_ptr->getActivationPtr());
+                          sp_para_ptr->getActivationPtr(),
+                          sp_para_ptr->getSkipList());
 
   const int n_unknonw_shift = 2;
 

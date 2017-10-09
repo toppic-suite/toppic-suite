@@ -35,6 +35,7 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include <set>
 
 #include "base/activation.hpp"
 #include "base/xml_dom_document.hpp"
@@ -47,13 +48,15 @@ class SpPara {
   SpPara(int min_peak_num, double min_mass, double min_extend_mass,
          const std::vector<double> &ext_offsets,
          PeakTolerancePtr peak_tolerance_ptr,
-         ActivationPtr activation_ptr):
+         ActivationPtr activation_ptr,
+         const std::set<std::string> & skip_list):
       min_peak_num_(min_peak_num),
       min_mass_(min_mass),
       extend_min_mass_(min_extend_mass),
       ext_offsets_(ext_offsets),
       peak_tolerance_ptr_(peak_tolerance_ptr),
-      activation_ptr_(activation_ptr) {
+      activation_ptr_(activation_ptr),
+      skip_list_(skip_list) {
         mod_mass_.resize(2);
         std::fill(mod_mass_.begin(), mod_mass_.end(), 0.0);
       }
@@ -74,8 +77,9 @@ class SpPara {
 
   ActivationPtr getActivationPtr() {return activation_ptr_;}
 
-  void setActivationPtr(ActivationPtr activation_ptr) {
-    activation_ptr_ = activation_ptr;}
+  void setActivationPtr(ActivationPtr activation_ptr) {activation_ptr_ = activation_ptr;}
+
+  std::set<std::string> getSkipList() {return skip_list_;}
 
   int getMinPeakNum() {return min_peak_num_;}
 
@@ -101,6 +105,8 @@ class SpPara {
 
   PeakTolerancePtr peak_tolerance_ptr_;
   ActivationPtr activation_ptr_;
+
+  std::set<std::string> skip_list_;
 };
 
 typedef std::shared_ptr<SpPara> SpParaPtr;
