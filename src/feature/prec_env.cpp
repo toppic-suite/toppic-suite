@@ -28,12 +28,13 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <vector>
 
 #include "base/logger.hpp"
-#include "feature/match_env.hpp" 
-#include "feature/env_detect.hpp" 
-#include "feature/env_filter.hpp" 
-#include "feature/prec_env.hpp" 
+#include "feature/match_env.hpp"
+#include "feature/env_detect.hpp"
+#include "feature/env_filter.hpp"
+#include "feature/prec_env.hpp"
 
 namespace prot {
 
@@ -47,29 +48,27 @@ FeatureMngPtr initMngPtr(double prec_win_size) {
   mng_ptr->min_refer_inte_ = 0;
   mng_ptr->min_inte_ = 0;
   mng_ptr->max_miss_peak_num_ = 3;
-  std::vector<int> num = {1,1,1};
+  std::vector<int> num = {1, 1, 1};
   mng_ptr->min_match_peak_num_ = num;
   mng_ptr->min_consecutive_peak_num_ = num;
   mng_ptr->prec_deconv_interval_ = prec_win_size;
   return mng_ptr;
 }
 
-
-PeakIntv initPeakIntv(FeatureMngPtr mng_ptr, PeakPtrVec &peak_list, 
-                      double prec_mz) {
+PeakIntv initPeakIntv(FeatureMngPtr mng_ptr, PeakPtrVec &peak_list, double prec_mz) {
   double base_mz  = prec_mz;
-  double bgn_mz = base_mz - mng_ptr->prec_deconv_interval_;
-  double end_mz = base_mz + mng_ptr->prec_deconv_interval_;
+  double bgn_mz = base_mz - mng_ptr->prec_deconv_interval_ / 2;
+  double end_mz = base_mz + mng_ptr->prec_deconv_interval_ / 2;
   PeakIntv peak_intv;
   peak_intv.bgn = peak_list.size();
   peak_intv.end = -1;
   for (size_t i = 0; i < peak_list.size(); i++) {
-    if (peak_list[i]->getPosition() >= bgn_mz && 
-        peak_list[i]->getPosition() <= end_mz) {
-      if ((int)i < peak_intv.bgn) {
+    if (peak_list[i]->getPosition() >= bgn_mz
+        && peak_list[i]->getPosition() <= end_mz) {
+      if (static_cast<int>(i) < peak_intv.bgn) {
         peak_intv.bgn = i;
       }
-      if ((int)i > peak_intv.end) {
+      if (static_cast<int>(i) > peak_intv.end) {
         peak_intv.end = i;
       }
     }
@@ -94,45 +93,44 @@ int initMaxChrg(PeakPtrVec &peak_list, PeakIntv peak_intv) {
       continue;
     }
     double cur_mz = peak_list[i]->getPosition();
-    if (i + 1 >= (int)peak_list.size()) {
+    if (i + 1 >= static_cast<int>(peak_list.size())) {
       continue;
     }
     double next_mz = peak_list[i+1]->getPosition();
     double dist = next_mz - cur_mz;
     if (dist < min_dist) {
-      min_dist = dist; 
+      min_dist = dist;
     }
   }
-  int max_charge = (int) std::round(1.0 / min_dist);
-  //LOG_DEBUG("maximum charge: " << max_charge);
+  int max_charge = static_cast<int>(std::round(1.0 / min_dist));
+  // LOG_DEBUG("maximum charge: " << max_charge);
   return max_charge;
 }
 
-MatchEnvPtr2D initMatchEnv(FeatureMngPtr mng_ptr, PeakPtrVec &peak_list, 
+MatchEnvPtr2D initMatchEnv(FeatureMngPtr mng_ptr, PeakPtrVec &peak_list,
                            PeakIntv peak_intv, int peak_num, int max_charge) {
   MatchEnvPtr2D result;
-  //LOG_DEBUG("peak intv bgn " << peak_intv.bgn << " end " << peak_intv.end);
+  // LOG_DEBUG("peak intv bgn " << peak_intv.bgn << " end " << peak_intv.end);
   for (int idx = peak_intv.bgn; idx <= peak_intv.end; idx++) {
     MatchEnvPtrVec env_ptrs;
-    //LOG_DEBUG("idx " << idx << " mz " << peak_list[idx]->getPosition());
+    // LOG_DEBUG("idx " << idx << " mz " << peak_list[idx]->getPosition());
     for (int charge = 1; charge <= max_charge; charge++) {
       double max_mass = peak_list[idx]->getPosition() * charge + 1;
-      //LOG_DEBUG("max_mass " << max_mass);
+      // LOG_DEBUG("max_mass " << max_mass);
       MatchEnvPtr env_ptr;
       if (max_mass > mng_ptr->max_mass_) {
         max_mass = mng_ptr->max_mass_;
-      }
-      else {
+      } else {
         env_ptr  = EnvDetect::detectEnv(peak_list, idx, charge, max_mass, mng_ptr);
       }
-      //LOG_DEBUG("env detection complete");
+      // LOG_DEBUG("env detection complete");
       if (env_ptr != nullptr) {
-        //LOG_DEBUG("FILTER REAL ENVELOPE!!!");
+        // LOG_DEBUG("FILTER REAL ENVELOPE!!!");
         if (!EnvFilter::testRealEnvValid(env_ptr, mng_ptr)) {
           env_ptr = nullptr;
         } else {
           env_ptr->compScr(mng_ptr);
-          //LOG_DEBUG("GOOD ENVELOPE FOUNDER!!!");
+          // LOG_DEBUG("GOOD ENVELOPE FOUNDER!!!");
         }
       }
       env_ptrs.push_back(env_ptr);
@@ -156,7 +154,7 @@ MatchEnvPtr findBest(MatchEnvPtr2D &env_ptrs) {
   return best_env;
 }
 
-RealEnvPtr PrecEnv::deconv(double prec_win_size, PeakPtrVec &peak_list, 
+RealEnvPtr PrecEnv::deconv(double prec_win_size, PeakPtrVec &peak_list,
                            double prec_mz, int prec_charge) {
   LOG_DEBUG("Prec: " << prec_mz << " charge: " << prec_charge);
   if (prec_mz <= 0) {
@@ -170,16 +168,14 @@ RealEnvPtr PrecEnv::deconv(double prec_win_size, PeakPtrVec &peak_list,
   }
   int max_charge = initMaxChrg(peak_list, peak_intv);
   LOG_DEBUG("Calcate match envelopes...");
-  MatchEnvPtr2D match_envs = initMatchEnv(mng_ptr, peak_list, peak_intv, 
+  MatchEnvPtr2D match_envs = initMatchEnv(mng_ptr, peak_list, peak_intv,
                                           peak_num, max_charge);
   LOG_DEBUG("Do filtering...");
   MatchEnvPtr env_ptr = findBest(match_envs);
   if (env_ptr != nullptr) {
-    return env_ptr->getRealEnvPtr(); 
-  }
-  else {
+    return env_ptr->getRealEnvPtr();
+  } else {
     return nullptr;
   }
 }
-
-}
+}  // namespace prot
