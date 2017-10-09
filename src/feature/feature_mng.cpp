@@ -28,6 +28,9 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <fstream>
+
+#include <boost/algorithm/string.hpp>
 
 #include "base/logger.hpp"
 #include "feature/feature_mng.hpp" 
@@ -43,6 +46,19 @@ FeatureMng::FeatureMng(const std::string & exec_dir) {
     env_base_ptr_
         = std::make_shared<EnvBase>(distr_file_name_, distr_entry_num_, distr_mass_interval_);
     LOG_DEBUG("env base inited");
+    env_rescore_para_file_name_ = exec_dir + env_rescore_para_file_name_;
+    std::ifstream infile(env_rescore_para_file_name_);
+    std::string line;
+    while (std::getline(infile, line)) {
+      std::vector<std::string> strs;
+      boost::split(strs, line, boost::is_any_of("\t"));
+      std::vector<double> scr;
+      for (size_t i = 0; i < strs.size(); i++) {
+        scr.push_back(std::stod(strs[i]));
+      }
+      env_rescore_para_.push_back(scr);
+    }
+    infile.close();
   }
 }
 
