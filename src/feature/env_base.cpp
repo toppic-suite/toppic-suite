@@ -36,15 +36,14 @@
 
 namespace prot {
 
-EnvBase::EnvBase(std::string file_name, int entry_num,
-                 double mass_interval):
+EnvBase::EnvBase(std::string file_name, int entry_num, double mass_interval):
     entry_num_(entry_num),
     mass_interval_(mass_interval) {
       std::ifstream input;
       input.open(file_name.c_str(), std::ios::in);
       if (!input.is_open()) {
         LOG_ERROR("env file  " << file_name << " does not exist.");
-        throw "fasta file does not exist.";
+        throw "env file does not exist.";
       }
       LOG_DEBUG("start reading");
       for (int i = 0; i < entry_num_; i++) {

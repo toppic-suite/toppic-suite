@@ -28,6 +28,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <vector>
 
 #include "base/logger.hpp"
 #include "feature/deconv_data_base.hpp"
@@ -38,6 +39,7 @@
 #include "feature/match_env_filter.hpp"
 #include "feature/env_detect.hpp"
 #include "feature/env_filter.hpp"
+#include "feature/env_rescore.hpp"
 #include "feature/env_assign.hpp"
 #include "feature/co_table.hpp"
 #include "feature/dp_a.hpp"
@@ -60,24 +62,28 @@ void DeconvOneSp::run() {
 
   preprocess();
   LOG_DEBUG("preprocess complete");
-  // envelope detection 
+  // envelope detection
   MatchEnvPtr2D cand_envs = EnvDetect::getCandidate(data_ptr_, mng_ptr_);
   LOG_DEBUG("candidate complete");
-  // envelope filter 
+  // envelope filter
   EnvFilter::filter(cand_envs, data_ptr_, mng_ptr_);
-  // assign envelopes to 1 Da windows 
+  // envelope rescoring
+  if (ms_level_ > 1) {
+    EnvRescore::rescore(cand_envs, mng_ptr_->env_rescore_para_);
+  }
+  // assign envelopes to 1 Da windows
   MatchEnvPtr2D win_envs = EnvAssign::assignWinEnv(cand_envs, data_ptr_,
                                                    mng_ptr_->env_num_per_window_);
 
-  // prepare table for dp 
+  // prepare table for dp
   if (mng_ptr_->check_double_increase_) {
     LOG_DEBUG("Generating coexisting table...");
     mng_ptr_->coexist_table_ = CoTable::initCoexistTable(win_envs,
                                                          mng_ptr_->score_error_tolerance_);
   }
-  // dp 
+  // dp
   LOG_DEBUG("Generating Graph and DP...");
-  DpA dp (data_ptr_, win_envs, mng_ptr_);
+  DpA dp(data_ptr_, win_envs, mng_ptr_);
   MatchEnvPtrVec dp_envs = dp.getResult();
 
   result_envs_ = postprocess(dp_envs);
@@ -117,17 +123,17 @@ MatchEnvPtrVec DeconvOneSp::postprocess(MatchEnvPtrVec  &dp_envs) {
   MatchEnvUtil::assignIntensity(peak_list, result_envs_);
 
   if (mng_ptr_->output_multiple_mass_) {
-    // envelope detection 
+    // envelope detection
     MatchEnvPtr2D cand_envs = EnvDetect::getCandidate(data_ptr_, mng_ptr_);
-    // envelope filter 
+    // envelope filter
     EnvFilter::multipleMassFilter(cand_envs, data_ptr_, mng_ptr_);
     result_envs_ = MatchEnvUtil::addMultipleMass(result_envs_, cand_envs,
-                                                 mng_ptr_->multiple_min_mass_, 
-                                                 mng_ptr_->multiple_min_charge_, 
+                                                 mng_ptr_->multiple_min_mass_,
+                                                 mng_ptr_->multiple_min_charge_,
                                                  mng_ptr_->multiple_min_ratio_);
   }
 
   return result_envs_;
 }
 
-}
+}  // namespace prot

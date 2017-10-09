@@ -78,7 +78,9 @@ class FeatureMng {
 
   static EnvBasePtr env_base_ptr_;
   std::string distr_file_name_ = "/toppic_resources/base_data/theo_patt.txt";
-  int distr_entry_num_ =  11000;
+  std::string env_rescore_para_file_name_ = "/toppic_resources/base_data/env_rescore_para.txt";
+  std::vector<std::vector<double> > env_rescore_para_;
+  int distr_entry_num_ = 11000;
   double distr_mass_interval_ = 10;
   // the minimum monoisotopic envelope for an envelope 
   double min_mass_ = 50;

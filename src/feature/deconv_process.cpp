@@ -117,6 +117,7 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr, FeatureMsReaderPtr read
     std::string msg = updateMsg(header_ptr, count1 + count2 + 1, total_scan_num);
     std::cout << "\r" << msg;
     LOG_DEBUG("set data....");
+    deconv_ptr->setMsLevel(header_ptr->getMsLevel());
     if (header_ptr->getMsLevel() == 1) {
       deconv_ptr->setData(peak_list);
       deconv_ptr->run();
