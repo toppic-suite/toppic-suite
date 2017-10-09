@@ -32,18 +32,16 @@
 #ifndef PROT_SPEC_MSALIGN_UTIL_HPP_
 #define PROT_SPEC_MSALIGN_UTIL_HPP_
 
+#include "spec/sp_para.hpp"
 #include "spec/msalign_reader.hpp"
 
 namespace prot {
+namespace MsAlignUtil {
+int countSpNum(const std::string &spectrum_file, SpParaPtr sp_para_ptr);
 
-class MsAlignUtil {
- public:
-  static int countSpNum(const std::string &spectrum_file);
+void geneSpIndex(const std::string &spectrum_file_name, SpParaPtr sp_para_ptr);
 
-  static void geneSpIndex(const std::string &spectrum_file_name);
-
-  static int getSpNum(const std::string &spectrum_file_name);
-};
-
-}
+int getSpNum(const std::string &spectrum_file_name);
+}  // namespace MsAlignUtil
+}  // namespace prot
 #endif

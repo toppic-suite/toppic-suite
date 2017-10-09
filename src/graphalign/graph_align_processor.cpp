@@ -100,7 +100,8 @@ void GraphAlignProcessor::process() {
 
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
   MsAlignReader sp_reader(sp_file_name, group_spec_num,
-                          sp_para_ptr->getActivationPtr());
+                          sp_para_ptr->getActivationPtr(),
+                          sp_para_ptr->getSkipList());
 
   SpecGraphReader spec_reader(sp_file_name, 
                               prsm_para_ptr->getGroupSpecNum(),

@@ -341,9 +341,10 @@ void PrsmStat::process() {
   PrsmReader prsm_reader(input_file_name);
   PrsmPtr prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
 
-  //init variables
+  // init variables
   MsAlignReader sp_reader(sp_file_name, group_spec_num,
-                          prsm_para_ptr_->getSpParaPtr()->getActivationPtr());
+                          prsm_para_ptr_->getSpParaPtr()->getActivationPtr(),
+                          prsm_para_ptr_->getSpParaPtr()->getSkipList());
 
   SpParaPtr sp_para_ptr = prsm_para_ptr_->getSpParaPtr();
   std::vector<SpectrumSetPtr> spec_set_vec = sp_reader.getNextSpectrumSet(sp_para_ptr);

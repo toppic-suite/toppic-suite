@@ -34,24 +34,11 @@
 
 #include "boost/algorithm/string.hpp"
 
-#include "base/logger.hpp"
 #include "base/activation_base.hpp"
 #include "base/string_util.hpp"
 #include "spec/msalign_reader.hpp"
 
 namespace prot {
-
-MsAlignReader::MsAlignReader(const std::string &file_name,
-                             int group_spec_num, ActivationPtr act_ptr):
-    file_name_(file_name),
-    group_spec_num_(group_spec_num),
-    activation_ptr_(act_ptr) {
-      input_.open(file_name.c_str(), std::ios::in);
-      if (!input_.is_open()) {
-        LOG_ERROR("msalign file  " << file_name << " does not exist.");
-        throw "msalign file does not exist.";
-      }
-    }
 
 std::vector<std::string> MsAlignReader::readOneSpectrum() {
   std::string line;
@@ -77,7 +64,7 @@ std::vector<std::string> MsAlignReader::readOneSpectrum() {
 }
 
 void MsAlignReader::readNext() {
-  deconv_ms_ptr_ = DeconvMsPtr(nullptr);
+  deconv_ms_ptr_ = nullptr;
   spectrum_str_vec_ = readOneSpectrum();
   if (spectrum_str_vec_.size() == 0) {
     input_.close();
@@ -140,7 +127,7 @@ void MsAlignReader::readNext() {
              << prec_charge << " prec mass " << prec_mass);
   }
 
-  MsHeaderPtr header_ptr(new MsHeader());
+  MsHeaderPtr header_ptr = std::make_shared<MsHeader>();
   header_ptr->setFileName(file_name_);
   header_ptr->setId(id);
   header_ptr->setPrecId(prec_id);
@@ -192,19 +179,22 @@ void MsAlignReader::readNext() {
       double mass = std::stod(strs[0]);
       double inte = std::stod(strs[1]);
       int charge = std::stoi(strs[2]);
-      DeconvPeakPtr peak_ptr(new DeconvPeak(idx, mass, inte, charge));
+      DeconvPeakPtr peak_ptr = std::make_shared<DeconvPeak>(idx, mass, inte, charge);
       peak_ptr_list.push_back(peak_ptr);
       idx++;
     }
   }
-  deconv_ms_ptr_
-      = DeconvMsPtr(new Ms<DeconvPeakPtr>(header_ptr, peak_ptr_list));
+  deconv_ms_ptr_ = std::make_shared<Ms<DeconvPeakPtr>>(header_ptr, peak_ptr_list);
 
   current_++;
 }
 
 DeconvMsPtr MsAlignReader::getNextMs() {
   readNext();
+  while (deconv_ms_ptr_ != nullptr
+         && skip_list_.find(deconv_ms_ptr_->getMsHeaderPtr()->getScansString()) != skip_list_.end()) {
+    readNext();
+  }
   return deconv_ms_ptr_;
 }
 
@@ -213,6 +203,10 @@ std::vector<SpectrumSetPtr> MsAlignReader::getNextSpectrumSet(SpParaPtr sp_para_
   DeconvMsPtrVec deconv_ms_ptr_vec;
   for (int i = 0; i < group_spec_num_; i++) {
     readNext();
+    while (deconv_ms_ptr_ != nullptr
+           && skip_list_.find(deconv_ms_ptr_->getMsHeaderPtr()->getScansString()) != skip_list_.end()) {
+      readNext();
+    }
     if (deconv_ms_ptr_ == nullptr) {
       spec_set_vec.push_back(nullptr);
       return spec_set_vec;

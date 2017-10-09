@@ -71,11 +71,12 @@ void LocalProcessor::process() {
   PrsmPtr prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_list);
   int group_spec_num = mng_ptr_->prsm_para_ptr_->getGroupSpecNum();
   MsAlignReader sp_reader(spec_file_name, group_spec_num,
-                          mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getActivationPtr());
+                          mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getActivationPtr(),
+                          mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getSkipList());
   SpectrumSetPtr spec_set_ptr;
   SpParaPtr sp_para_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr();
 
-  int spectrum_num = MsAlignUtil::getSpNum (mng_ptr_->prsm_para_ptr_->getSpectrumFileName());
+  int spectrum_num = MsAlignUtil::getSpNum(mng_ptr_->prsm_para_ptr_->getSpectrumFileName());
   int cnt = 0;
   while((spec_set_ptr = sp_reader.getNextSpectrumSet(sp_para_ptr)[0])!= nullptr){
     cnt += group_spec_num;

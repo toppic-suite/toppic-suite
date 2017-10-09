@@ -37,7 +37,9 @@
 #include <iostream>
 #include <fstream>
 #include <memory>
+#include <set>
 
+#include "base/logger.hpp"
 #include "spec/deconv_ms.hpp"
 #include "spec/spectrum_set.hpp"
 
@@ -46,11 +48,19 @@ namespace prot {
 class MsAlignReader {
  public:
   MsAlignReader(const std::string &file_name, int group_spec_num,
-                ActivationPtr activation_ptr);
+                ActivationPtr act_ptr, const std::set<std::string> skip_list):
+      file_name_(file_name),
+      group_spec_num_(group_spec_num),
+      activation_ptr_(act_ptr),
+      skip_list_(skip_list) {
+        input_.open(file_name.c_str(), std::ios::in);
+        if (!input_.is_open()) {
+          LOG_ERROR("msalign file  " << file_name << " does not exist.");
+          throw "msalign file does not exist.";
+        }
+      }
 
   std::vector<std::string> readOneSpectrum();
-
-  void readNext();
 
   DeconvMsPtr getNextMs();
 
@@ -65,7 +75,10 @@ class MsAlignReader {
   std::vector<std::string> spectrum_str_vec_;
   int current_ = 0;
   ActivationPtr activation_ptr_;
-  DeconvMsPtr deconv_ms_ptr_ = DeconvMsPtr(nullptr);
+  DeconvMsPtr deconv_ms_ptr_ = nullptr;
+  std::set<std::string> skip_list_;
+
+  void readNext();
 };
 
 typedef std::shared_ptr<MsAlignReader> MsAlignReaderPtr;

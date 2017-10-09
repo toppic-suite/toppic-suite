@@ -38,7 +38,8 @@ SpecGraphReader::SpecGraphReader(const std::string &sp_file_name,
                                  double convert_ratio,
                                  SpParaPtr sp_para_ptr) {
   ms_reader_ptr_ = std::make_shared<MsAlignReader>(sp_file_name, group_sp_num,
-                                                   sp_para_ptr->getActivationPtr());
+                                                   sp_para_ptr->getActivationPtr(),
+                                                   sp_para_ptr->getSkipList());
   group_sp_num_ = group_sp_num;
   convert_ratio_ = convert_ratio;
   sp_para_ptr_ = sp_para_ptr;

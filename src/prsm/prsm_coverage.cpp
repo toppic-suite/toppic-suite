@@ -31,6 +31,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <string>
 
 #include <boost/algorithm/string.hpp>
 
@@ -47,14 +48,6 @@
 
 namespace prot {
 
-PrsmCoverage::PrsmCoverage(PrsmParaPtr prsm_para_ptr,
-                           const std::string &input_file_ext,
-                           const std::string &output_file_ext): 
-    prsm_para_ptr_(prsm_para_ptr), 
-    input_file_ext_(input_file_ext),
-    output_file_ext_(output_file_ext) {
-    }
-
 void PrsmCoverage::processSingleCoverage(){
   std::string sp_file_name = prsm_para_ptr_->getSpectrumFileName();
   std::string input_file_name = FileUtil::basename(sp_file_name)+"." + input_file_ext_;
@@ -64,11 +57,12 @@ void PrsmCoverage::processSingleCoverage(){
   PrsmReader prsm_reader(input_file_name);
   PrsmPtr prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
 
-  //init variables
+  // init variables
   int spectrum_num = MsAlignUtil::getSpNum (sp_file_name);
   int group_spec_num = prsm_para_ptr_->getGroupSpecNum();
   MsAlignReader sp_reader(sp_file_name, group_spec_num,
-                          prsm_para_ptr_->getSpParaPtr()->getActivationPtr());
+                          prsm_para_ptr_->getSpParaPtr()->getActivationPtr(),
+                          prsm_para_ptr_->getSpParaPtr()->getSkipList());
   int cnt = 0;
   SpectrumSetPtr spec_set_ptr;
 
@@ -381,57 +375,5 @@ void PrsmCoverage::processTwoPrsms(std::ofstream &file, PrsmPtr prsm_ptr_1, Prsm
     compTwoCoverage(file, prsm_ptr_2, pair_ptrs_21, pair_ptrs_22, pair_ptrs_2, prsm_para_ptr);
   }
 }
-
-/*
-   void PrsmCoverage::processCombineCoverage(){
-
-   ProteoformPtrVec raw_forms 
-   = readFastaToProteoform(prsm_para_ptr_->getSearchDbFileName(), 
-   prsm_para_ptr_->getFixModResiduePtrVec());
-
-   LOG_DEBUG("protein data set loaded");
-   std::string base_name = basename(prsm_para_ptr_->getSpectrumFileName());
-   std::string input_file_name = base_name + "." + input_file_ext_;
-   PrsmPtrVec prsm_ptrs = readPrsm(input_file_name, raw_forms);
-   LOG_DEBUG("read prsm_ptr complete ");
-   addSpectrumPtrsToPrsms(prsm_ptrs, prsm_para_ptr_);
-   LOG_DEBUG("prsm_ptrs loaded");
-
-   std::string output_file_name = base_name+".COMBINE_"+output_file_ext_;
-   std::ofstream file; 
-   file.open(output_file_name.c_str());
-   printTwoTitle(file);
-
-   std::string spectrum_file_name = prsm_para_ptr_->getSpectrumFileName();
-   MsAlignReader reader (spectrum_file_name, prsm_para_ptr_->getGroupSpecNum());
-
-   DeconvMsPtr ms_ptr_1 = reader.getNextMs();
-   DeconvMsPtr ms_ptr_2 = reader.getNextMs();
-   while (ms_ptr_1.get() != nullptr && ms_ptr_2.get() != nullptr) {
-   PrsmPtrVec sele_prsm_ptrs_1;
-   PrsmPtrVec sele_prsm_ptrs_2;
-   filterPrsms(prsm_ptrs, ms_ptr_1->getHeaderPtr(), sele_prsm_ptrs_1);
-   filterPrsms(prsm_ptrs, ms_ptr_2->getHeaderPtr(), sele_prsm_ptrs_2);
-   if (sele_prsm_ptrs_1.size() >= 1 || sele_prsm_ptrs_2.size() >= 1) {
-   if (sele_prsm_ptrs_1.size() == 0) {
-   processTwoPrsms(file, PrsmPtr(nullptr), sele_prsm_ptrs_2[0], prsm_para_ptr_);
-   }
-   else {
-   if (sele_prsm_ptrs_2.size() == 0) {
-   processTwoPrsms(file, sele_prsm_ptrs_1[0], PrsmPtr(nullptr), prsm_para_ptr_);
-   }
-   else {
-   processTwoPrsms(file, sele_prsm_ptrs_1[0], sele_prsm_ptrs_2[0], prsm_para_ptr_);
-   }
-   }
-   }
-   ms_ptr_1 = reader.getNextMs();
-   ms_ptr_2 = reader.getNextMs();
-   }
-   reader.close();
-   file.close();
-   }
-   */
-
-}
+}  // namespace prot
 

@@ -46,7 +46,8 @@ namespace prot {
 
 void readSpectra(const std::string & file_name, DeconvMsPtrVec &ms_ptr_vec) {
   int sp_num_in_group = 1;
-  MsAlignReader sp_reader(file_name, sp_num_in_group, nullptr);
+  MsAlignReader sp_reader(file_name, sp_num_in_group,
+                          nullptr, std::set<std::string>());
 
   DeconvMsPtr ms_ptr;
   // LOG_DEBUG("Start search");
@@ -60,7 +61,8 @@ void readSpectra(const std::string & file_name, DeconvMsPtrVec &ms_ptr_vec) {
 
 void readHeaders(const std::string & file_name, MsHeaderPtrVec &header_ptr_vec) {
   int sp_num_in_group = 1;
-  MsAlignReader sp_reader(file_name, sp_num_in_group, nullptr);
+  MsAlignReader sp_reader(file_name, sp_num_in_group, nullptr,
+                          std::set<std::string>());
 
   DeconvMsPtr ms_ptr;
   // LOG_DEBUG("Start search");
@@ -284,7 +286,7 @@ void writeMSFT(const std::string & input_file_name,
                const MsHeaderPtrVec &header_ptrs,
                DeconvParaPtr para_ptr) {
   int sp_num_in_group = 1;
-  MsAlignReader sp_reader(input_file_name, sp_num_in_group, nullptr);
+  MsAlignReader sp_reader(input_file_name, sp_num_in_group, nullptr, std::set<std::string>());
   std::ofstream of(output_file_name, std::ofstream::out);
   of.precision(16);
   DeconvProcess::outputParameter(of, para_ptr, "#"); 

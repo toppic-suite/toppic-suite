@@ -128,7 +128,8 @@ void ZeroPtmSearchProcessor::process() {
 
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
   MsAlignReader sp_reader(sp_file_name, group_spec_num,
-                          sp_para_ptr->getActivationPtr());
+                          sp_para_ptr->getActivationPtr(),
+                          sp_para_ptr->getSkipList());
   int cnt = 0;
   std::vector<SpectrumSetPtr> spec_set_vec = sp_reader.getNextSpectrumSet(sp_para_ptr);
   // LOG_DEBUG("Start search");

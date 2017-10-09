@@ -104,15 +104,16 @@ void PrsmTableWriter::write(){
   PrsmPtr prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
   //LOG_DEBUG("end read prsm");
 
-  //init variables
+  // init variables
   std::string sp_file_name = prsm_para_ptr_->getSpectrumFileName();
   int group_spec_num = prsm_para_ptr_->getGroupSpecNum();
   MsAlignReader sp_reader(sp_file_name, group_spec_num,
-                          prsm_para_ptr_->getSpParaPtr()->getActivationPtr());
+                          prsm_para_ptr_->getSpParaPtr()->getActivationPtr(),
+                          prsm_para_ptr_->getSpParaPtr()->getSkipList());
   SpectrumSetPtr spec_set_ptr;
   SpParaPtr sp_para_ptr = prsm_para_ptr_->getSpParaPtr();
   while((spec_set_ptr = sp_reader.getNextSpectrumSet(sp_para_ptr)[0])!= nullptr){
-    if(spec_set_ptr->isValid()){
+    if (spec_set_ptr->isValid()) {
       int spec_id = spec_set_ptr->getSpectrumId();
       while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_id) {
         DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();

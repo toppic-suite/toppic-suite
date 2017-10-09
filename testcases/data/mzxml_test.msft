@@ -1,11 +1,13 @@
-#TopFD 1.0.0 (Sep  4 2017)
+#TopFD 1.0.0 
+#Timestamp: Mon Oct  9 14:21:55 2017
 #********************** Parameters **********************
-#Input file:                             testcases/data/mzxml_test.mzXML
+#Input file:                             ../testcases/data/mzxml_test.mzXML
 #Data type:                              centroided
 #Maximum charge:                         30
 #Maximum monoisotopic mass:              100000 Dalton
-#Error tolerance:                        0.02 Dalton
+#Error tolerance:                        0.02 thomson
 #Signal/noise ratio:                     1
+#Precursor window size:                  2 thomson
 #********************** Parameters **********************
 BEGIN IONS
 ID=0
