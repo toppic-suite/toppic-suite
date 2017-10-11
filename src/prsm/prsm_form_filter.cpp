@@ -36,7 +36,6 @@
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_form_filter.hpp"
 
-
 namespace prot {
 
 void PrsmFormFilter::process() {
@@ -67,15 +66,8 @@ void PrsmFormFilter::process() {
       selected_prsms.push_back(prsms[i]);
     } else {
       bool keep = true;
-      std::string form = prsms[i]->getProteoformPtr()->getProteinMatchSeq();
       for (size_t j = 0; j < selected_forms.size(); j++) {
         if (selected_forms[j]->getProteoformPtr()->getSpeciesId() == prsms[i]->getProteoformPtr()->getSpeciesId()) {
-          // std::cout << "scan " << prsms[i]->getSpectrumScan() << " removed by scan " << selected_forms[j]->getSpectrumScan() << std::endl;
-          keep = false;
-          break;
-        }
-        if (selected_forms[j]->getProteoformPtr()->getProteinMatchSeq() == form) {
-          // std::cout << "scan " << prsms[i]->getSpectrumScan() << " removed by scan " << selected_forms[j]->getSpectrumScan() << std::endl;
           keep = false;
           break;
         }

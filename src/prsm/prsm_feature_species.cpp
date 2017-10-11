@@ -86,6 +86,10 @@ void PrsmFeatureSpecies::setSpeciesId(PrsmStrPtrVec& prsm_ptrs) {
           is_found = true;
           break;
         }
+      } else if (cur_ptr->getProteinMatchSeq() == ref_ptr->getProteinMatchSeq()) {
+        species[j].push_back(cur_ptr);
+        is_found = true;
+        break;
       }
     }
     if (!is_found) {
@@ -105,6 +109,8 @@ void PrsmFeatureSpecies::process() {
   std::string base_name = FileUtil::basename(spec_file_name_);
   std::string input_file_name = base_name + "." + input_file_ext_;
   PrsmStrPtrVec prsm_ptrs = PrsmReader::readAllPrsmStrs(input_file_name);
+  PrsmReaderPtr prsm_reader = std::make_shared<PrsmReader>(input_file_name);
+  FastaIndexReaderPtr seq_reader = std::make_shared<FastaIndexReader>(db_file_name_);
   MsAlignReaderPtr msreader
       = std::make_shared<MsAlignReader>(feature_file_name_,
                                         prsm_para_ptr_->getGroupSpecNum(),
@@ -118,7 +124,13 @@ void PrsmFeatureSpecies::process() {
     }
     prsm_ptrs[i]->setPrecFeatureId(spec_set_ptr->getDeconvMsPtrVec()[0]->getMsHeaderPtr()->getFeatureId());
     prsm_ptrs[i]->setPrecFeatureInte(spec_set_ptr->getDeconvMsPtrVec()[0]->getMsHeaderPtr()->getFeatureInte());
+    PrsmPtr prsm_ptr = prsm_reader->readOnePrsm(seq_reader, fix_mod_ptr_vec_);
+    if (prsm_ptr != nullptr) {
+      prsm_ptrs[i]->setProteinMatchSeq(prsm_ptr->getProteoformPtr()->getProteinMatchSeq());
+    }
   }
+  prsm_reader->close();
+  prsm_reader = nullptr;
   sort(prsm_ptrs.begin(), prsm_ptrs.end(), PrsmStr::cmpEValueInc);
   setProtId(prsm_ptrs);
   setSpeciesId(prsm_ptrs);
