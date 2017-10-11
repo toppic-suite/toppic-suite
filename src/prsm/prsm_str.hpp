@@ -98,6 +98,8 @@ class PrsmStr {
 
   std::vector<std::shared_ptr<ChangeStr> > getChangeStrVec() {return change_vec_;}
 
+  std::string getProteinMatchSeq() {return protein_match_seq_;}
+
   void setSpectrumId(int id);
 
   void setSpeciesId(int id);
@@ -111,6 +113,8 @@ class PrsmStr {
   void setFdr(double fdr);
 
   void setProteoformFdr(double proteoform_fdr);
+
+  void setProteinMatchSeq(const std::string & seq) {protein_match_seq_ = seq;}
 
   static bool cmpEValueInc(const PrsmStrPtr &a, const PrsmStrPtr &b) {
     return a->getEValue() < b->getEValue();
@@ -174,7 +178,6 @@ class PrsmStr {
 
   double match_frag_num_;
 
-  /* a tempory variable for testing mass graph alignment */
   double norm_match_frag_num_;
 
   double e_value_;
@@ -184,6 +187,8 @@ class PrsmStr {
   double proteoform_fdr_;
 
   std::vector<std::shared_ptr<ChangeStr> > change_vec_;
+
+  std::string protein_match_seq_;
 };
 
 typedef std::vector<PrsmStrPtr> PrsmStrPtrVec;
