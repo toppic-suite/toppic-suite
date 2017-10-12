@@ -56,14 +56,13 @@ class XmlDOMParser {
  private:
   xercesc::XercesDOMParser* parser_;
   xercesc::ErrorHandler*    err_handler_;
-
 };
 
 class XmlDOMParserFactory {
  private:
   static XmlDOMParser* dom_parser_;
  public:
-  static XmlDOMParser* getXmlDOMParserInstance(); 
+  static XmlDOMParser* getXmlDOMParserInstance();
 };
 
 /* DOM Implementation */
@@ -85,12 +84,42 @@ class XmlDOMImplFactory {
   static XmlDOMImpl* getXmlDOMImplInstance();
 };
 
-inline const XMLCh* X(const char*  str) {
-  return xercesc::XMLString::transcode(str);
-}
+class XStr {
+ public:
+  explicit XStr(const char*  str) {
+    // Call the private transcoding method
+    unicode_form_ = xercesc::XMLString::transcode(str);
+  }
 
-inline std::string Y(const XMLCh* xml_ch) {
-  return std::string(xercesc::XMLString::transcode(xml_ch));
-}
+  ~XStr() {
+    xercesc::XMLString::release(&unicode_form_);
+  }
+
+  const XMLCh* unicodeForm() {return unicode_form_;}
+
+ private:
+  XMLCh* unicode_form_;
+};
+
+class YStr {
+ public:
+  explicit YStr(const XMLCh* xml_ch) {
+    // Call the private transcoding method
+    ch_ = xercesc::XMLString::transcode(xml_ch);
+  }
+
+  ~YStr() {
+    delete ch_;
+  }
+
+  std::string  getString() {return std::string(ch_);}
+
+ private:
+  char* ch_;
+};
+
+#define X(str) XStr(str).unicodeForm()
+#define Y(str) YStr(str).getString()
+
 }  // namespace prot
 #endif

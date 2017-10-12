@@ -48,7 +48,7 @@ typedef std::shared_ptr<PrmPeak> PrmPeakPtr;
 class PrmPeak : public Peak {
  public:
   PrmPeak(int spec_id, DeconvPeakPtr base_peak_ptr,
-          BasePeakTypePtr base_type, 
+          BasePeakTypePtr base_type,
           double mono_mass, double score,
           double strict_tolerance = 0.0,
           double n_strict_c_relax_tolerance = 0.0,
@@ -66,21 +66,26 @@ class PrmPeak : public Peak {
   void addNghbEdge(DeconvPeakPtr deconv_peak_ptr, double offset,
                    SPTypePtr peak_type, double score);
 
-  int getNeighborSize(){return neighbor_list_.size();}
+  int getNeighborSize() {return neighbor_list_.size();}
 
-  DeconvPeakPtr getBasePeakPtr(){return base_peak_ptr_;}
+  DeconvPeakPtr getBasePeakPtr() {return base_peak_ptr_;}
 
-  double getMonoMass(){return mono_mass_;}
+  double getMonoMass() {return mono_mass_;}
 
-  double getScore(){return score_;}
+  void setMonoMass(double m) {
+    mono_mass_ = m;
+    setPosition(m);
+  }
 
-  double getStrictTolerance(){return strict_tolerance_;}
+  double getScore() {return score_;}
 
-  BasePeakTypePtr getBaseTypePtr(){return base_type_;}
+  double getStrictTolerance() {return strict_tolerance_;}
 
-  double getNStrictCRelaxTolerance(){return n_strict_c_relax_tolerance_;}
+  BasePeakTypePtr getBaseTypePtr() {return base_type_;}
 
-  double getNRelaxCStrictTolerance(){return n_relax_c_strict_tolerance_;}
+  double getNStrictCRelaxTolerance() {return n_strict_c_relax_tolerance_;}
+
+  double getNRelaxCStrictTolerance() {return n_relax_c_strict_tolerance_;}
 
   int getSpectrumId() {return spec_id_;}
 
@@ -88,17 +93,19 @@ class PrmPeak : public Peak {
 
   RmBreakTypePtr getBreakType();
 
-  void setStrictTolerance(double tolerance){strict_tolerance_ = tolerance;}
+  void setStrictTolerance(double tolerance) {strict_tolerance_ = tolerance;}
 
-  void setNStrictCRelacTolerance(double tolerance){
-    n_strict_c_relax_tolerance_ = tolerance;}
+  void setNStrictCRelacTolerance(double tolerance) {
+    n_strict_c_relax_tolerance_ = tolerance;
+  }
 
-  void setNRelaxCStrictTolerance(double tolerance){
-    n_relax_c_strict_tolerance_ = tolerance;}
+  void setNRelaxCStrictTolerance(double tolerance) {
+    n_relax_c_strict_tolerance_ = tolerance;
+  }
 
   void setPeakId(int peak_id) {peak_id_ = peak_id;}
 
-  static bool cmpPosInc(const PrmPeakPtr &a, const PrmPeakPtr &b){
+  static bool cmpPosInc(const PrmPeakPtr &a, const PrmPeakPtr &b) {
     return a->getPosition() < b->getPosition();
   }
 
