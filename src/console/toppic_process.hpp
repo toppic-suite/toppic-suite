@@ -29,43 +29,12 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-#include <iostream>
-#include <iomanip>
-#include <map>
 #include <string>
-
-#include "base/file_util.hpp"
-#include "base/logger.hpp"
-#include "base/base_data.hpp"
-#include "feature/deconv_process.hpp"
-#include "feature/feature_detect.hpp"
+#include <map>
 
 namespace prot {
 
-int TopFDProcess(std::map<std::string, std::string> arguments) {
-  try {
-    time_t start = time(0);
-
-    std::string exe_dir = arguments["executiveDir"];
-
-    BaseData::init(exe_dir);
-
-    DeconvParaPtr para_ptr = std::make_shared<DeconvPara>(arguments);
-    LOG_DEBUG("deconv para");
-    DeconvProcess process(para_ptr);
-    LOG_DEBUG("init process");
-    process.process();
-    FeatureDetect::process(para_ptr);
-
-    time_t end = time(0);
-    std::cout << "Runing time: " << std::to_string(static_cast<int>(difftime(end, start))) << " seconds." << std::endl;
-  } catch (const char* e) {
-    std::cout << "[Exception]" << std::endl;
-    std::cout << e << std::endl;
-  }
-  std::cout << "TopFD finished." << std::endl;
-  return EXIT_SUCCESS;
-}
+int TopPICProgress(std::map<std::string, std::string> arguments);
 
 }  // namespace prot
 
