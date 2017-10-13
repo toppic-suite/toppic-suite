@@ -32,7 +32,10 @@ releases/win-lib/*
 *.fa
 *.msalign
 toppic
-topmg
 topfd
+topmg
 *.ms1
 *.ms2
+
+!src/gui/topfd*
+!src/gui/toppic*

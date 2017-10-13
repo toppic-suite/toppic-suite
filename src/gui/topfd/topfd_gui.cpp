@@ -29,10 +29,16 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QApplication>
+#include <QFontDatabase>
 
 #include "topfddialog.h"
 
 int main(int argc, char *argv[]) {
+#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
+  QFont font("Calibri");
+  font.setPointSize(12);
+  QApplication::setFont(font);
+#endif
   QApplication a(argc, argv);
   TopFDDialog td;
   td.show();

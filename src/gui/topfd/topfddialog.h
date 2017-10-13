@@ -50,7 +50,7 @@ class TopFDDialog : public QDialog {
   ~TopFDDialog();
 
   private slots:
-    void on_clearButton_clicked();
+  void on_clearButton_clicked();
 
   void on_defaultButton_clicked();
 
@@ -75,6 +75,9 @@ class TopFDDialog : public QDialog {
   void updateMsg(std::string msg);
   void sleep(int wait);
   ThreadTopFD* thread_;
+  QString showInfo;
+  void closeEvent(QCloseEvent *event);
+  bool continueToClose();
 };
 
 #endif

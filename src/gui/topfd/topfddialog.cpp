@@ -34,6 +34,8 @@
 #include <QFileDialog>
 #include <QElapsedTimer>
 #include <QMessageBox>
+#include <QCloseEvent>
+
 
 #include "base/file_util.hpp"
 #include "base/base_data.hpp"
@@ -46,30 +48,50 @@
 #include "threadtopfd.h"
 
 TopFDDialog::TopFDDialog(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::TopFDDialog) {
-      initArguments();
-      ui->setupUi(this);
-      lastDir_ = "/";
-      percentage_ = 0;
-      ui->maxChargeEdit->setValidator(new QIntValidator(0, 2147483647, this));
-      ui->maxMassEdit->setValidator(new QIntValidator(0, 100000, this));
-      ui->mzErrorEdit->setValidator(new QDoubleValidator(0.00, 2147483647.00, 2, this));
-      ui->snRatioEdit->setValidator(new QDoubleValidator(0.0, 2147483647.0, 1, this));
-      thread_ = new ThreadTopFD(this);
-    }
+  QDialog(parent),
+  ui(new Ui::TopFDDialog) {
+  initArguments();
+  ui->setupUi(this);
+  lastDir_ = "/";
+  percentage_ = 0;
+  ui->maxChargeEdit->setValidator(new QIntValidator(1, 100, this));
+  ui->maxMassEdit->setValidator(new QIntValidator(1, 1000000, this));
+  ui->mzErrorEdit->setValidator(new QDoubleValidator(0.0001, 0.1, 4, this));
+  ui->snRatioEdit->setValidator(new QDoubleValidator(0.1, 2147483647.0, 2, this));
+  ui->windowSizeEdit->setValidator(new QDoubleValidator(0.1, 10000, 2, this));
+  QFont font;
+#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
+  font.setFamily(QStringLiteral("Courier New"));
+#else
+  font.setFamily(QStringLiteral("Monospace"));
+#endif
+  ui->outputTextBrowser->setFont(font);
+  thread_ = new ThreadTopFD(this);
+  showInfo = "";
+}
 
 TopFDDialog::~TopFDDialog() {
   thread_->terminate();
   thread_->wait();
   delete ui;
 }
-
+void TopFDDialog::closeEvent(QCloseEvent *event){
+  if (thread_->isRunning()){
+    if (!continueToClose()){
+      event->ignore();
+      return;
+    }
+  }
+  thread_->terminate();
+  thread_->wait();
+  event->accept();
+  return;
+}
 void TopFDDialog::initArguments() {
   arguments_["executiveDir"] = "";
   arguments_["spectrumFileName"] = "";
   arguments_["inputType"] = "mzXML";
-  arguments_["refinePrecMass"]="true";
+  arguments_["refinePrecMass"] = "true";
   arguments_["missingLevelOne"] = "false";
   arguments_["maxCharge"] = "30";
   arguments_["maxMass"] = "100000";
@@ -86,9 +108,10 @@ void TopFDDialog::on_clearButton_clicked() {
   ui->maxMassEdit->clear();
   ui->mzErrorEdit->clear();
   ui->snRatioEdit->clear();
+  ui->windowSizeEdit->clear();
   ui->missLevelOneCheckBox->setChecked(false);
-  ui->infolabel->clear();
-  ui->infolabel->setText("Press start to process the speatra.");
+  ui->outputTextBrowser->clear();
+  ui->outputTextBrowser->setText("Press start to process the speatra.");
   lastDir_ = "/";
 }
 
@@ -97,17 +120,18 @@ void TopFDDialog::on_defaultButton_clicked() {
   ui->maxMassEdit->setText("100000");
   ui->mzErrorEdit->setText("0.02");
   ui->snRatioEdit->setText("1.0");
+  ui->windowSizeEdit->setText("2.0");
   ui->missLevelOneCheckBox->setChecked(false);
-  ui->infolabel->clear();
-  ui->infolabel->setText("Press start to process the speatra.");
+  ui->outputTextBrowser->clear();
+  ui->outputTextBrowser->setText("Press start to process the speatra.");
 }
 
 void TopFDDialog::on_fileButton_clicked() {
   QString s = QFileDialog::getOpenFileName(
-      this,
-      "Select a spectra file",
-      lastDir_,
-      "Spectra files(*.mzXML *.mzML);;mzXML files(*.mzXML);;mzML files(*.mzML)");
+                this,
+                "Select a spectra file",
+                lastDir_,
+                "Spectra files(*.mzXML *.mzML *.mzxml *.mzml);;mzXML files(*.mzXML *.mzxml);;mzML files(*.mzML *.mzml)");
   if (!s.isEmpty()) {
     lastDir_ = s;
   }
@@ -121,6 +145,7 @@ void TopFDDialog::on_startButton_clicked() {
     return;
   }
   lockDialog();
+  ui->outputTextBrowser->setText(showInfo);
   // prot::log_level = 2;
   std::map<std::string, std::string> argument = this->getArguments();
   thread_->setPar(argument);
@@ -134,7 +159,7 @@ void TopFDDialog::on_startButton_clicked() {
     // info = getInfo(i);      // Here is the infomation been shown in the infoBox.
     nowinfo = buffer.str();
     info = nowinfo.substr(lastinfo.length());
-    info = info.erase(info.find_last_not_of(" \n\r\t")+1);
+    info = info.erase(info.find_last_not_of(" \n\r\t") + 1);
     lastinfo = nowinfo;
     if (info != "") {
       updateMsg(info);
@@ -146,14 +171,26 @@ void TopFDDialog::on_startButton_clicked() {
     sleep(10);
   }
   unlockDialog();
+  showInfo = "";
   thread_->exit();
   std::cout.rdbuf(oldbuf);
 }
 
 void TopFDDialog::on_exitButton_clicked() {
-  thread_->terminate();
-  thread_->wait();
   close();
+}
+
+bool TopFDDialog::continueToClose(){
+  if(QMessageBox::question(this,
+                      tr("Quit"),
+                      tr("TopPIC is still running. Are you sure to quit it?"),
+                      QMessageBox::Yes|QMessageBox::No,
+                      QMessageBox::No)
+    == QMessageBox::Yes){
+    return true;
+  }else{
+    return false;
+  }
 }
 
 std::map<std::string, std::string> TopFDDialog::getArguments() {
@@ -166,6 +203,7 @@ std::map<std::string, std::string> TopFDDialog::getArguments() {
   arguments_["maxMass"] = ui->maxMassEdit->text().toStdString();
   arguments_["mzError"] = ui->mzErrorEdit->text().toStdString();
   arguments_["snRatio"] = ui->snRatioEdit->text().toStdString();
+  arguments_["precWindow"] = ui->windowSizeEdit->text().toStdString();
   return arguments_;
 }
 
@@ -180,6 +218,7 @@ void TopFDDialog::lockDialog() {
   ui->startButton->setEnabled(false);
   ui->fileButton->setEnabled(false);
   ui->missLevelOneCheckBox->setEnabled(false);
+  ui->windowSizeEdit->setEnabled(false);
 }
 
 void TopFDDialog::unlockDialog() {
@@ -193,6 +232,7 @@ void TopFDDialog::unlockDialog() {
   ui->startButton->setEnabled(true);
   ui->fileButton->setEnabled(true);
   ui->missLevelOneCheckBox->setEnabled(true);
+  ui->windowSizeEdit->setEnabled(true);
 }
 
 bool TopFDDialog::checkError() {
@@ -226,15 +266,21 @@ bool TopFDDialog::checkError() {
                          QMessageBox::Yes);
     return true;
   }
+  if (ui->windowSizeEdit->text().isEmpty()) {
+    QMessageBox::warning(this, tr("Waring"),
+                         tr("Precursor Windows size is empty!"),
+                         QMessageBox::Yes);
+    return true;
+  }
   return false;
 }
 
 QString TopFDDialog::updatePercentage(QString s) {
   QString per = "wait.";
-  if (s == "TopFD finished.") {
+  if (s.left(6) == "Runing") {
     percentage_ = 100;
   } else if (s.right(9) == "finished.") {
-    per = s.mid((s.size()-13));
+    per = s.mid((s.size() - 13));
     if (per.at(0) == tr("\t") || per.at(0) == tr(" ")) {
       per = per.mid(1, 1);
     } else {
@@ -251,17 +297,28 @@ QString TopFDDialog::updatePercentage(QString s) {
 }
 
 void TopFDDialog::updateMsg(std::string msg) {
+  if (msg.substr(0,6) == "Runing"){msg = "\n" + msg;}
   QString info = msg.c_str();
+  if (msg.at(0) == '\r'){
+    int lastloc = info.lastIndexOf("\r");
+    info = info.right(info.size()-lastloc);
+  }
   updatePercentage(info);
-  ui->infolabel->setText(info);
-  if (info == "TopFD finished.") {
+  ui->outputTextBrowser->setText(showInfo + info);
+  if (msg.at(0) != '\r'){
+    showInfo = ui->outputTextBrowser->toPlainText();
+  }
+  QTextCursor cursor = ui->outputTextBrowser->textCursor();
+  cursor.movePosition(QTextCursor::End);
+  ui->outputTextBrowser->setTextCursor(cursor);
+  if (msg.substr(0,6) == "Runing") {
     unlockDialog();
     percentage_ = 0;
     return;
   }
-  if (percentage_ == 0) {
-    ui->infolabel->setText("Prepairing...");
-  }
+  // if (percentage_ == 0) {
+  //   ui->outputTextBrowser->setText("Prepairing...");
+  // }
 }
 
 std::string TopFDDialog::getInfo(int i) {
@@ -270,7 +327,7 @@ std::string TopFDDialog::getInfo(int i) {
   if (i < 0) {
     return "************************** Parameters *********************";
   } else if (i < 100) {
-    return QString("Processing spectrum_"+s+"0...\t"+s+"% finished.").toStdString();
+    return QString("Processing spectrum_" + s + "0...\t" + s + "% finished.").toStdString();
   } else {
     return "TopFD finished.";
   }
