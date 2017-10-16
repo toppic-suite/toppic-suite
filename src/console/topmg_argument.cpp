@@ -207,7 +207,7 @@ bool Argument::parse(int argc, char* argv[]) {
          "<CID|HCD|ETD|UVPD|FILE>. Fragmentation method of tandem mass spectra. When FILE is used, fragmentation methods of spectra are given in the input spectral data file. Default value: FILE.")
         ("fixed-mod,f", po::value<std::string> (&fixed_mod), 
          "<C57|C58|a fixed modification file>. Fixed modifications. Three available options: C57, C58, or the name of a text file containing the information of fixed modifications. When C57 is selected, carbamidomethylation on cysteine is the only fixed modification. When C58 is selected, carboxymethylation on cysteine is the only fixed modification.")
-        ("n-termimal-form,n", po::value<std::string> (&allow_mod), 
+        ("n-terminal-form,n", po::value<std::string> (&allow_mod), 
          "<a list of allowed N-terminal forms>. N-terminal forms of proteins. Four N-terminal forms can be selected: NONE, NME, NME_ACETYLATION, and M_ACETYLATION. NONE stands for no modifications, NME for N-terminal methionine excision, NME_ACETYLATION for N-terminal acetylation after the initiator methionine is removed, and M_ACETYLATION for N-terminal methionine acetylation. When multiple forms are allowed, they are separated by commas. Default value: NONE,NME,NME_ACETYLATION,M_ACETYLATION.")
         ("decoy,d", "Use a decoy protein database to estimate false discovery rates.")
         ("error-tolerance,e", po::value<std::string> (&error_tole), "<a positive integer>. Error tolerance for precursor and fragment masses in PPM. Default value: 15.")
@@ -231,7 +231,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("argument-file,c",po::value<std::string>(&argument_file_name),"Argument file name.")
         ("activation,a", po::value<std::string>(&activation), "")
         ("fixed-mod,f", po::value<std::string> (&fixed_mod), "")
-        ("n-termimal-form,n", po::value<std::string> (&allow_mod), "")
+        ("n-terminal-form,n", po::value<std::string> (&allow_mod), "")
         ("decoy,d", "")
         ("error-tolerance,e", po::value<std::string> (&error_tole), "")
         ("max-mod,m", po::value<std::string> (&max_ptm_mass), "")
@@ -304,7 +304,7 @@ bool Argument::parse(int argc, char* argv[]) {
     if (vm.count("fixed-mod")) {
       arguments_["fixedMod"] = fixed_mod;
     }
-    if (vm.count("n-termimal-form")) {
+    if (vm.count("n-terminal-form")) {
       arguments_["allowProtMod"] = allow_mod;
     }    
     if (vm.count("num-mod")) {
