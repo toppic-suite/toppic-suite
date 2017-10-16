@@ -307,7 +307,7 @@ bool Argument::parse(int argc, char* argv[]) {
     if (vm.count("fixed-mod")) {
       arguments_["fixedMod"] = fixed_mod;
     }
-    if (vm.count("n-termimal-form")) {
+    if (vm.count("n-terminal-form")) {
       arguments_["allowProtMod"] = allow_mod;
     }    
     if (vm.count("num-mod")) {
