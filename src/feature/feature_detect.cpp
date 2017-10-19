@@ -290,26 +290,39 @@ void writeMSFT(const std::string & input_file_name,
   std::ofstream of(output_file_name, std::ofstream::out);
   of.precision(16);
   DeconvProcess::outputParameter(of, para_ptr, "#"); 
+  of << "ID" << "\t"
+      << "SCANS" << "\t"
+      << "MS_ONE_ID" << "\t"
+      << "MS_ONE_SCAN" << "\t"
+      << "PRECURSOR_MASS" << "\t"
+      << "PRECURSOR_INTENSITY" << "\t"
+      << "FEATURE_ID" << "\t"
+      << "FEATURE_INTENSITY" << std::endl;
   DeconvMsPtr ms_ptr;
   int cnt = 0;
   while ((ms_ptr = sp_reader.getNextMs()) != nullptr) {
     ms_ptr->setHeaderPtr(header_ptrs[cnt]);
-    of << "BEGIN IONS" << std::endl;
-    of << "ID=" << header_ptrs[cnt]->getId() << std::endl;
-    of << "SCANS=" << header_ptrs[cnt]->getScansString() << std::endl;
+    of << header_ptrs[cnt]->getId() << "\t"
+        << header_ptrs[cnt]->getScansString() << "\t";
     if (header_ptrs[cnt]->getMsLevel() > 1) {
-      of << "MS_ONE_ID=" << header_ptrs[cnt]->getMsOneId() << std::endl;
-      of << "MS_ONE_SCAN=" << header_ptrs[cnt]->getMsOneScan() << std::endl;
-      of << "PRECURSOR_MASS=" <<  header_ptrs[cnt]->getPrecMonoMass() << std::endl;
-      of << "PRECURSOR_INTENSITY=" << header_ptrs[cnt]->getPrecInte() << std::endl;
+      of << header_ptrs[cnt]->getMsOneId() << "\t"
+          << header_ptrs[cnt]->getMsOneScan() << "\t"
+          <<  header_ptrs[cnt]->getPrecMonoMass() << "\t"
+          << header_ptrs[cnt]->getPrecInte() << "\t";
       if (header_ptrs[cnt]->getFeatureId() >= 0) {
-        of << "FEATURE_ID=" << header_ptrs[cnt]->getFeatureId() << std::endl;
-        of << "FEATURE_INTENSITY=" << header_ptrs[cnt]->getFeatureInte() << std::endl;
+        of << header_ptrs[cnt]->getFeatureId() << "\t"
+            << header_ptrs[cnt]->getFeatureInte() << std::endl;
+      } else {
+        of << "-" << "\t" << "-" << std::endl;
       }
+    } else {
+      of << "-" << "\t"
+          << "-" << "\t"
+          << "-" << "\t"
+          << "-" << "\t"
+          << "-" << "\t"
+          << "-" << std::endl;
     }
-
-    of << "END IONS" << std::endl;
-    of << std::endl;
     cnt++;
   }
   sp_reader.close();
