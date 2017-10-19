@@ -55,7 +55,7 @@ void Argument::initArguments() {
   arguments_["snRatio"] = "1.0";
   arguments_["keepUnusedPeaks"] = "false";
   arguments_["outMultipleMass"] = "false";
-  arguments_["precWindow"] = "2.0";
+  arguments_["precWindow"] = "3.0";
 }
 
 void Argument::showUsage(boost::program_options::options_description &desc) {
@@ -83,11 +83,11 @@ bool Argument::parse(int argc, char* argv[]) {
         ("max-mass,m", po::value<std::string> (&max_mass),
          "<a positive number>. Set the maximum monoisotopic mass of precursor and fragment ions. The default value is 100000 Dalton.")
         ("mz-error,e", po::value<std::string> (&mz_error),
-         "<a positive number>. Set the error tolerance of m/z values of spectral peaks. The default value is 0.02 thomson.")
+         "<a positive number>. Set the error tolerance of m/z values of spectral peaks. The default value is 0.02 m/z.")
         ("sn-ratio,s", po::value<std::string> (&sn_ratio),
          "<a positive number>. Set the signal/noise ratio. The default value is 1.")
         ("precursor-window,w", po::value<std::string> (&precWindow),
-         "<a positive number>. Set precursor window size. The default value is 2.0 thomson.")
+         "<a positive number>. Set the precursor window size. The default value is 3.0 m/z.")
         ("missing-level-one,n","The input spectrum file does not contain MS1 spectra.")
         ;
     po::options_description desc("Options");
