@@ -135,12 +135,16 @@ PrmMsPtr geneMsTwoPtr(DeconvMsPtr deconv_ms_ptr, int spec_id, SpParaPtr sp_para_
   for (size_t i = 0; i < list_filtered.size(); i++) {
     double m = list_filtered[i]->getMonoMass();
 
-    if (list_filtered[i]->getMonoMass() > prec_mono_mass / 4) {
+    if (list_filtered[i]->getMonoMass() > prec_mono_mass / 1) {
       m -= sp_para_ptr->mod_mass_[0];
     }
 
-    if (list_filtered[i]->getMonoMass() > prec_mono_mass * 3 / 4) {
+    if (list_filtered[i]->getMonoMass() > prec_mono_mass * 3 / 6) {
       m -= sp_para_ptr->mod_mass_[1];
+    }
+
+    if (list_filtered[i]->getMonoMass() > prec_mono_mass * 5 / 6) {
+      m -= sp_para_ptr->mod_mass_[2];
     }
 
     list_filtered[i] = std::make_shared<PrmPeak>(list_filtered[i]->getSpectrumId(),
@@ -175,11 +179,15 @@ PrmMsPtr geneSuffixMsTwoPtr(DeconvMsPtr deconv_ms_ptr, int spec_id, SpParaPtr sp
   for (size_t i = 0; i < list_filtered.size(); i++) {
     double m = list_filtered[i]->getMonoMass();
 
-    if (list_filtered[i]->getMonoMass() > prec_mono_mass * 1 / 4) {
+    if (list_filtered[i]->getMonoMass() > prec_mono_mass * 1 / 6) {
+      m -= sp_para_ptr->mod_mass_[2];
+    }
+
+    if (list_filtered[i]->getMonoMass() > prec_mono_mass * 3 / 6) {
       m -= sp_para_ptr->mod_mass_[1];
     }
 
-    if (list_filtered[i]->getMonoMass() > prec_mono_mass * 3 / 4) {
+    if (list_filtered[i]->getMonoMass() > prec_mono_mass * 5 / 6) {
       m -= sp_para_ptr->mod_mass_[0];
     }
 

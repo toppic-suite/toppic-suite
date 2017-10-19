@@ -59,8 +59,6 @@ class SpectrumSet {
 
   ExtendMsPtrVec getMsThreePtrVec() {return extend_ms_three_ptr_vec_;}
 
-  ExtendMsPtrVec getMsThreePtrVec(SpParaPtr sp_para_ptr);
-
   DeconvMsPtrVec getDeconvMsPtrVec(){return deconv_ms_ptr_vec_;}
 
   PrmMsPtrVec getMsTwoPtrVec() {return prm_ms_two_ptr_vec_;}
