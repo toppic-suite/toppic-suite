@@ -35,19 +35,14 @@
 #include "base/mass_constant.hpp"
 
 namespace prot {
-
-class PeakUtil {
- public:
-  static double compPeakMass(double mono_mz, int charge) {
-    return mono_mz * charge - charge * MassConstant::getProtonMass();
-  }
-
-  static double compMonoMz(double mono_mass, int charge) {
-    return mono_mass / charge + MassConstant::getProtonMass();
-  }
-
-};
-
-
+namespace PeakUtil {
+inline double compPeakMass(double mono_mz, int charge) {
+  return mono_mz * charge - charge * MassConstant::getProtonMass();
 }
+
+inline double compMonoMz(double mono_mass, int charge) {
+  return mono_mass / charge + MassConstant::getProtonMass();
+}
+}  // namespace PeakUtil
+}  // namespace prot
 #endif
