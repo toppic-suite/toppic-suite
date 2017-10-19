@@ -176,7 +176,7 @@ class FeatureMng {
   double multiple_min_ratio_ = 0.9;
 
   // PrecDeconv
-  double prec_deconv_interval_ = 2;
+  double prec_deconv_interval_ = 3.0;
 };
 
 typedef std::shared_ptr<FeatureMng> FeatureMngPtr;
