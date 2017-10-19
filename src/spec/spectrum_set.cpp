@@ -59,11 +59,11 @@ SpectrumSet::SpectrumSet(DeconvMsPtrVec deconv_ms_ptr_vec,
         extend_ms_three_ptr_vec_ 
             = ExtendMsFactory::geneMsThreePtrVec(deconv_ms_ptr_vec_, sp_para_ptr, prec_mono_mass);
         prm_ms_two_ptr_vec_ 
-            = PrmMsFactory::geneMsTwoPtrVec(deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass);
+            = PrmMsFactory::geneMsTwoPtrVec(deconv_ms_ptr_vec_, sp_para_ptr, prec_mono_mass);
         srm_ms_two_ptr_vec_ 
-            = PrmMsFactory::geneSuffixMsTwoPtrVec(deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass);
+            = PrmMsFactory::geneSuffixMsTwoPtrVec(deconv_ms_ptr_vec_, sp_para_ptr, prec_mono_mass);
         prm_ms_six_ptr_vec_ 
-            = PrmMsFactory::geneMsSixPtrVec(deconv_ms_ptr_vec, sp_para_ptr, prec_mono_mass);
+            = PrmMsFactory::geneMsSixPtrVec(deconv_ms_ptr_vec_, sp_para_ptr, prec_mono_mass);
       }
     }
 
@@ -71,12 +71,6 @@ PrmMsPtrVec SpectrumSet::getMsTwoPtrVec(SpParaPtr sp_para_ptr) {
   return PrmMsFactory::geneMsTwoPtrVec(deconv_ms_ptr_vec_,
                                        sp_para_ptr,
                                        prec_mono_mass_);
-}
-
-ExtendMsPtrVec SpectrumSet::getMsThreePtrVec(SpParaPtr sp_para_ptr) {
-  return ExtendMsFactory::geneMsThreePtrVec(deconv_ms_ptr_vec_,
-                                            sp_para_ptr,
-                                            prec_mono_mass_ - std::accumulate(sp_para_ptr->mod_mass_.begin(), sp_para_ptr->mod_mass_.end(), 0.0));
 }
 
 PrmMsPtrVec SpectrumSet::getSuffixMsTwoPtrVec(SpParaPtr sp_para_ptr) {

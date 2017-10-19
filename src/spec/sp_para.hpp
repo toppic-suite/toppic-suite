@@ -57,7 +57,7 @@ class SpPara {
       peak_tolerance_ptr_(peak_tolerance_ptr),
       activation_ptr_(activation_ptr),
       skip_list_(skip_list) {
-        mod_mass_.resize(2);
+        mod_mass_.resize(3);
         std::fill(mod_mass_.begin(), mod_mass_.end(), 0.0);
       }
 
