@@ -101,6 +101,10 @@ add_library(topfd-dev SHARED ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRC
 
 #add_executable(toppic-test ${UNIT_TEST_SRCS} ${HTS_SRCS} ${BASE_SRCS})
 
+file(GLOB MSALIGN_MERGE_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/tools/msalign_merge.cpp)
+
+add_executable(msalign_merge ${MSALIGN_MERGE_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS})
+
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     target_link_libraries(toppic xalan-c xalanMsg xerces-c
         boost_filesystem-mt boost_system-mt 
@@ -131,6 +135,9 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
     target_link_libraries(topfd pwiz xalan-c xerces-c boost_program_options
         boost_filesystem boost_system boost_thread pthread z)
+
+    target_link_libraries(msalign_merge pwiz xerces-c boost_program_options
+        boost_filesystem boost_system pthread z)
 
     target_link_libraries(topfd-dev pwiz xalan-c xerces-c boost_filesystem
         boost_system boost_thread pthread z)
