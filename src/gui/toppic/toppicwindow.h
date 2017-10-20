@@ -28,58 +28,69 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef PROT_GUI_TOPFDDIALOG_H
-#define PROT_GUI_TOPFDDIALOG_H
+#ifndef PROT_GUI_TOPPICWINDOW_H
+#define PROT_GUI_TOPPICWINDOW_H
 
+#include <QMainWindow>
+#include <QMouseEvent>
+#include "threadtoppic.h"
 #include <map>
 #include <string>
 
-#include <QDialog>
-
-#include "threadtopfd.h"
-
 namespace Ui {
-class TopFDDialog;
+class toppicWindow;
 }
 
-class TopFDDialog : public QDialog {
-  Q_OBJECT
+class toppicWindow : public QMainWindow {
+ Q_OBJECT
 
-public:
-  explicit TopFDDialog(QWidget *parent = 0);
-  ~TopFDDialog();
+ public:
+  explicit toppicWindow(QWidget *parent = 0);
+  ~toppicWindow();
 
-private slots:
+  private slots:
+      void on_databaseFileButton_clicked();
+  void on_spectrumFileButton_clicked();
+  void on_fixedModFileButton_clicked();
+  void on_modFileButton_clicked();
+  void on_topfdFeatureFileButton_clicked();
   void on_clearButton_clicked();
-
   void on_defaultButton_clicked();
-
-  void on_fileButton_clicked();
-
   void on_startButton_clicked();
-
   void on_exitButton_clicked();
-
   void on_outputButton_clicked();
+  void on_fixedModComboBox_currentIndexChanged(int index);
+  void on_topfdFeatureCheckBox_clicked(bool checked);
+  void on_errorToleranceEdit_textChanged(QString string);
+  void on_generatingFunctionCheckBox_clicked(bool checked);
+  void on_NONECheckBox_clicked(bool checked);
+  void on_NMECheckBox_clicked(bool checked);
+  void on_NMEACCheckBox_clicked(bool checked);
+  void on_MACCheckBox_clicked(bool checked);
+  void on_numModComboBox_currentIndexChanged(int index);
+  void on_cutoffSpectralTypeComboBox_currentIndexChanged(int index);
+  void on_cutoffProteoformTypeComboBox_currentIndexChanged(int index);
+  void on_decoyCheckBox_clicked(bool checked);
 
-private:
+ private:
+  Ui::toppicWindow *ui;
   QString lastDir_;
-  int percentage_;
   std::map<std::string, std::string> arguments_;
-  Ui::TopFDDialog *ui;
   void initArguments();
   std::map<std::string, std::string> getArguments();
-  std::string getInfo(int i);
   void lockDialog();
   void unlockDialog();
   bool checkError();
-  QString updatePercentage(QString s);
   void updateMsg(std::string msg);
+  void updatedir(QString s);
+  void showArguments();
   void sleep(int wait);
-  ThreadTopFD* thread_;
+  threadtoppic* thread_;
   QString showInfo;
   void closeEvent(QCloseEvent *event);
   bool continueToClose();
+  bool nterminalerror();
+  bool event(QEvent *event);
 };
 
-#endif
+#endif  // PROT_GUI_TOPPICWINDOW_H
