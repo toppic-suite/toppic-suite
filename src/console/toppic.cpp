@@ -47,7 +47,6 @@ int main(int argc, char* argv[]) {
     return 1;
   }
   std::map<std::string, std::string> arguments = argu_processor.getArguments();
-  std::cout << "TopPIC 1.1.4 (" << __DATE__ << ")" << std::endl;
 
   return prot::TopPICProgress(arguments);
 }

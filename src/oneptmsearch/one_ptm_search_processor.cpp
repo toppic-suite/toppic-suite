@@ -119,6 +119,7 @@ void OnePtmSearchProcessor::process() {
   FastaIndexReaderPtr reader_ptr = std::make_shared<FastaIndexReader>(db_file_name);
   int spectrum_num = MsAlignUtil::getSpNum(sp_file_name);
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
+  sp_para_ptr->prec_error_ = 0;
   ModPtrVec fix_mod_ptr_vec = prsm_para_ptr->getFixModPtrVec();
 
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();

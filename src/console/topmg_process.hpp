@@ -28,24 +28,17 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <map>
-#include <iostream>
+#ifndef PROT_TOPMG_PROCESS_HPP
+#define PROT_TOPMG_PROCESS_HPP
+
 #include <string>
+#include <map>
 
-#include "base/file_util.hpp"
-#include "console/topfd_argument.hpp"
+namespace prot {
 
-#include "feature/topfd_process.hpp"
+int TopMGProcess(std::map<std::string, std::string> arguments);
 
-int main(int argc, char* argv[]) {
-  prot::Argument argu_processor;
-  bool success = argu_processor.parse(argc, argv);
-  if (!success) {
-    return EXIT_FAILURE;
-  }
-  std::map<std::string, std::string> arguments = argu_processor.getArguments();
-  std::string exe_dir = prot::FileUtil::getExecutiveDir(argv[0]);
-  arguments["executiveDir"] = exe_dir;
+}  // namespace prot
 
-  return prot::TopFDProcess(arguments);
-}
+#endif
+

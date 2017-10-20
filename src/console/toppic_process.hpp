@@ -28,6 +28,8 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#ifndef PROT_TOPPIC_PROCESS_HPP
+#define PROT_TOPPIC_PROCESS_HPP
 
 #include <string>
 #include <map>
@@ -38,3 +40,4 @@ int TopPICProgress(std::map<std::string, std::string> arguments);
 
 }  // namespace prot
 
+#endif
