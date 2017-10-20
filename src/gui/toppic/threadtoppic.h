@@ -28,24 +28,29 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <QApplication>
-#include <QFontDatabase>
-#include <QDesktopWidget>
+#ifndef PROT_GUI_THREADTOPPIC_H
+#define PROT_GUI_THREADTOPPIC_H
 
-#include "topfddialog.h"
+#include <map>
+#include <string>
 
-int main(int argc, char *argv[]) {
-#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
-  QFont font("Calibri");
-  font.setPointSize(12);
-  QApplication::setFont(font);
-#endif
-  QApplication a(argc, argv);
-  TopFDDialog td;
-  QDesktopWidget *desk = QApplication::desktop();
-  QRect deskRect = desk->availableGeometry();
-  td.show();
-  td.move((deskRect.width() - td.width()) / 2, (deskRect.height() - td.height()) / 2);
+#include <QThread>
 
-  return a.exec();
+namespace Ui {
+class threadtoppic;
 }
+
+class threadtoppic : public QThread {
+ Q_OBJECT
+ public:
+  explicit threadtoppic(QObject* par);
+  ~threadtoppic() {}
+  void run();
+  void setPar(std::map<std::string, std::string> arguments) {
+    arguments_ = arguments;
+  }
+ private:
+  std::map<std::string, std::string> arguments_;
+};
+
+#endif  // PROT_GUI_THREADTOPPIC_H

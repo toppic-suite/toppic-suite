@@ -35,6 +35,7 @@
 #include <QElapsedTimer>
 #include <QMessageBox>
 #include <QCloseEvent>
+#include <QDesktopServices>
 
 
 #include "base/file_util.hpp"
@@ -42,6 +43,8 @@
 #include "feature/deconv_para.hpp"
 #include "feature/deconv_process.hpp"
 #include "feature/feature_detect.hpp"
+#include <boost/filesystem.hpp>
+namespace fs = boost::filesystem;
 
 #include "topfddialog.h"
 #include "ui_topfddialog.h"
@@ -56,9 +59,15 @@ TopFDDialog::TopFDDialog(QWidget *parent) :
   percentage_ = 0;
   ui->maxChargeEdit->setValidator(new QIntValidator(1, 100, this));
   ui->maxMassEdit->setValidator(new QIntValidator(1, 1000000, this));
-  ui->mzErrorEdit->setValidator(new QDoubleValidator(0.0001, 0.1, 4, this));
-  ui->snRatioEdit->setValidator(new QDoubleValidator(0.1, 2147483647.0, 2, this));
-  ui->windowSizeEdit->setValidator(new QDoubleValidator(0.1, 10000, 2, this));
+  QRegExp rx1("^0\\.[0]\\d{0,2}[1-9]|0.1$");
+  QRegExpValidator *validator1 = new QRegExpValidator(rx1, this);
+  ui->mzErrorEdit->setValidator(validator1);
+  QRegExp rx2("^\\d{1,6}\\.\\d{0,2}$");
+  QRegExpValidator *validator2 = new QRegExpValidator(rx2, this);
+  ui->snRatioEdit->setValidator(validator2);
+  QRegExp rx3("^\\d{1,4}\\.\\d{0,2}|10000$");
+  QRegExpValidator *validator3 = new QRegExpValidator(rx3, this);
+  ui->windowSizeEdit->setValidator(validator3);
   QFont font;
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
   font.setFamily(QStringLiteral("Courier New"));
@@ -68,6 +77,7 @@ TopFDDialog::TopFDDialog(QWidget *parent) :
   ui->outputTextBrowser->setFont(font);
   thread_ = new ThreadTopFD(this);
   showInfo = "";
+  TopFDDialog::on_defaultButton_clicked();
 }
 
 TopFDDialog::~TopFDDialog() {
@@ -75,9 +85,9 @@ TopFDDialog::~TopFDDialog() {
   thread_->wait();
   delete ui;
 }
-void TopFDDialog::closeEvent(QCloseEvent *event){
-  if (thread_->isRunning()){
-    if (!continueToClose()){
+void TopFDDialog::closeEvent(QCloseEvent *event) {
+  if (thread_->isRunning()) {
+    if (!continueToClose()) {
       event->ignore();
       return;
     }
@@ -99,7 +109,7 @@ void TopFDDialog::initArguments() {
   arguments_["snRatio"] = "1.0";
   arguments_["keepUnusedPeaks"] = "false";
   arguments_["outMultipleMass"] = "false";
-  arguments_["precWindow"] = "2.0";
+  arguments_["precWindow"] = "3.0";
 }
 
 void TopFDDialog::on_clearButton_clicked() {
@@ -111,7 +121,7 @@ void TopFDDialog::on_clearButton_clicked() {
   ui->windowSizeEdit->clear();
   ui->missLevelOneCheckBox->setChecked(false);
   ui->outputTextBrowser->clear();
-  ui->outputTextBrowser->setText("Press start to process the speatra.");
+  ui->outputTextBrowser->setText("Click the Start button to process the spectrum file.");
   lastDir_ = "/";
 }
 
@@ -120,16 +130,16 @@ void TopFDDialog::on_defaultButton_clicked() {
   ui->maxMassEdit->setText("100000");
   ui->mzErrorEdit->setText("0.02");
   ui->snRatioEdit->setText("1.0");
-  ui->windowSizeEdit->setText("2.0");
+  ui->windowSizeEdit->setText("3.0");
   ui->missLevelOneCheckBox->setChecked(false);
   ui->outputTextBrowser->clear();
-  ui->outputTextBrowser->setText("Press start to process the speatra.");
+  ui->outputTextBrowser->setText("Click the Start button to process the spectrum file.");
 }
 
 void TopFDDialog::on_fileButton_clicked() {
   QString s = QFileDialog::getOpenFileName(
                 this,
-                "Select a spectra file",
+                "Select a spectrum file",
                 lastDir_,
                 "Spectra files(*.mzXML *.mzML *.mzxml *.mzml);;mzXML files(*.mzXML *.mzxml);;mzML files(*.mzML *.mzml)");
   if (!s.isEmpty()) {
@@ -180,24 +190,29 @@ void TopFDDialog::on_exitButton_clicked() {
   close();
 }
 
-bool TopFDDialog::continueToClose(){
-  if(QMessageBox::question(this,
-                      tr("Quit"),
-                      tr("TopPIC is still running. Are you sure to quit it?"),
-                      QMessageBox::Yes|QMessageBox::No,
-                      QMessageBox::No)
-    == QMessageBox::Yes){
+bool TopFDDialog::continueToClose() {
+  if (QMessageBox::question(this,
+                            tr("Quit"),
+                            tr("TopFD is still running. Are you sure you want to quit?"),
+                            QMessageBox::Yes | QMessageBox::No,
+                            QMessageBox::No)
+      == QMessageBox::Yes) {
     return true;
-  }else{
+  } else {
     return false;
   }
 }
 
+void TopFDDialog::on_outputButton_clicked()
+{
+  fs::path full_path(arguments_["spectrumFileName"].c_str());
+  QString outPath = full_path.remove_filename().string().c_str();
+  QDesktopServices::openUrl(QUrl(outPath, QUrl::TolerantMode));
+}
 std::map<std::string, std::string> TopFDDialog::getArguments() {
-  QString path;
-  QDir dir;
-  path = dir.currentPath();
-  arguments_["executiveDir"] = path.toStdString();
+  QString path = QCoreApplication::applicationFilePath();
+  std::string exe_dir = prot::FileUtil::getExecutiveDir(path.toStdString());
+  arguments_["executiveDir"] = exe_dir;
   arguments_["spectrumFileName"] = ui->fileEdit->text().toStdString();
   arguments_["maxCharge"] = ui->maxChargeEdit->text().toStdString();
   arguments_["maxMass"] = ui->maxMassEdit->text().toStdString();
@@ -219,6 +234,7 @@ void TopFDDialog::lockDialog() {
   ui->fileButton->setEnabled(false);
   ui->missLevelOneCheckBox->setEnabled(false);
   ui->windowSizeEdit->setEnabled(false);
+  ui->outputButton->setEnabled(false);
 }
 
 void TopFDDialog::unlockDialog() {
@@ -233,42 +249,44 @@ void TopFDDialog::unlockDialog() {
   ui->fileButton->setEnabled(true);
   ui->missLevelOneCheckBox->setEnabled(true);
   ui->windowSizeEdit->setEnabled(true);
+  ui->outputButton->setEnabled(true);
+  ui->outputButton->setDefault(true);
 }
 
 bool TopFDDialog::checkError() {
   if (ui->fileEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Waring"),
-                         tr("Please select a spectra file!"),
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("Please select a spectrum file!"),
                          QMessageBox::Yes);
     return true;
   }
   if (ui->maxChargeEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Waring"),
-                         tr("Max charge is empty!"),
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("Maximum charge is empty!"),
                          QMessageBox::Yes);
     return true;
   }
   if (ui->maxMassEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Waring"),
-                         tr("Max mass is empty!"),
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("Maximum mass is empty!"),
                          QMessageBox::Yes);
     return true;
   }
   if (ui->mzErrorEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Waring"),
-                         tr("Mz errror is empty!"),
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("M/z error tolerance is empty!"),
                          QMessageBox::Yes);
     return true;
   }
   if (ui->snRatioEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Waring"),
+    QMessageBox::warning(this, tr("Warning"),
                          tr("S/N ratio is empty!"),
                          QMessageBox::Yes);
     return true;
   }
   if (ui->windowSizeEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Waring"),
-                         tr("Precursor Windows size is empty!"),
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("Precursor window size is empty!"),
                          QMessageBox::Yes);
     return true;
   }
@@ -277,7 +295,7 @@ bool TopFDDialog::checkError() {
 
 QString TopFDDialog::updatePercentage(QString s) {
   QString per = "wait.";
-  if (s.left(6) == "Runing") {
+  if (s.left(6) == "Running") {
     percentage_ = 100;
   } else if (s.right(9) == "finished.") {
     per = s.mid((s.size() - 13));
@@ -297,21 +315,21 @@ QString TopFDDialog::updatePercentage(QString s) {
 }
 
 void TopFDDialog::updateMsg(std::string msg) {
-  if (msg.substr(0,6) == "Runing"){msg = "\n" + msg;}
+  if (msg.substr(0, 6) == "Running") {msg = "\n" + msg;}
   QString info = msg.c_str();
-  if (msg.at(0) == '\r'){
+  if (msg.at(0) == '\r') {
     int lastloc = info.lastIndexOf("\r");
-    info = info.right(info.size()-lastloc);
+    info = info.right(info.size() - lastloc);
   }
   updatePercentage(info);
   ui->outputTextBrowser->setText(showInfo + info);
-  if (msg.at(0) != '\r'){
+  if (msg.at(0) != '\r') {
     showInfo = ui->outputTextBrowser->toPlainText();
   }
   QTextCursor cursor = ui->outputTextBrowser->textCursor();
   cursor.movePosition(QTextCursor::End);
   ui->outputTextBrowser->setTextCursor(cursor);
-  if (msg.substr(0,6) == "Runing") {
+  if (msg.substr(0, 6) == "Running") {
     unlockDialog();
     percentage_ = 0;
     return;

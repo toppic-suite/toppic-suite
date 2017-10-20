@@ -83,10 +83,18 @@ file(GLOB TOPFD_MAIN_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd.cpp)
 # GUI
 file(GLOB TOPFD_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topfd/*.cpp)
 file(GLOB TOPFD_GUI_QRC   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topfd/*.qrc)
+file(GLOB TOPPIC_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/toppic/*.cpp)
+file(GLOB TOPPIC_GUI_QRC   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/toppic/*.qrc)
+
 
 file(GLOB UNIT_TEST_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/*.cpp) 
 
 add_executable(toppic ${TOPPIC_MAIN_SRCS} ${TOPPIC_PROCESS_SRCS} ${TOPPIC_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
+    ${ZERO_PTM_SRCS} ${ZERO_PTM_FILTER} ${DIAG_FILTER_SRCS} ${ONE_PTM_FILTER_SRCS} ${ONE_PTM_SEARCH_SRCS}
+    ${PTM_SRCS} ${TDGF_SRCS} ${LOCAL_SRCS} ${PRSM_VIEW_SRCS})
+
+add_executable(toppic_gui ${TOPPIC_GUI_SRCS} ${TOPPIC_GUI_QRC} ${TOPPIC_PROCESS_SRCS} ${TOPPIC_ARGU_SRCS} 
+    ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
     ${ZERO_PTM_SRCS} ${ZERO_PTM_FILTER} ${DIAG_FILTER_SRCS} ${ONE_PTM_FILTER_SRCS} ${ONE_PTM_SEARCH_SRCS}
     ${PTM_SRCS} ${TDGF_SRCS} ${LOCAL_SRCS} ${PRSM_VIEW_SRCS})
 
@@ -122,6 +130,9 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
     # for Qt
     SET(QTOPTION -Wl,-subsystem,windows)
+    target_link_libraries(toppic_gui ${QTOPTION} Qt5Widgets Qt5Core Qt5Gui xalan-c xalanMsg xerces-c
+        boost_filesystem-mt boost_system-mt 
+        boost_program_options-mt boost_thread-mt pthread z Ws2_32)
     target_link_libraries(topfd_gui ${QTOPTION} Qt5Widgets Qt5Core Qt5Gui pwiz
         xalan-c xerces-c boost_filesystem-mt boost_system-mt boost_thread-mt pthread z Ws2_32)
 		
@@ -129,6 +140,9 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     target_link_libraries(toppic xalan-c xerces-c boost_program_options
+        boost_filesystem boost_system boost_thread pthread z)
+
+    target_link_libraries(toppic_gui Qt5Widgets Qt5Core Qt5Gui xalan-c xerces-c boost_program_options
         boost_filesystem boost_system boost_thread pthread z)
 
     target_link_libraries(topmg xalan-c xerces-c boost_program_options

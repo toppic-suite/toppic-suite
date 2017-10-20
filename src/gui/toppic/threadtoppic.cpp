@@ -28,24 +28,11 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <QApplication>
-#include <QFontDatabase>
-#include <QDesktopWidget>
+#include "threadtoppic.h"
+#include "console/toppic_process.hpp"
 
-#include "topfddialog.h"
+threadtoppic::threadtoppic(QObject* par):QThread(par) {}
 
-int main(int argc, char *argv[]) {
-#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
-  QFont font("Calibri");
-  font.setPointSize(12);
-  QApplication::setFont(font);
-#endif
-  QApplication a(argc, argv);
-  TopFDDialog td;
-  QDesktopWidget *desk = QApplication::desktop();
-  QRect deskRect = desk->availableGeometry();
-  td.show();
-  td.move((deskRect.width() - td.width()) / 2, (deskRect.height() - td.height()) / 2);
-
-  return a.exec();
+void threadtoppic::run() {
+  prot::TopPICProgress(arguments_);
 }

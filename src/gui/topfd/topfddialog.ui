@@ -51,7 +51,7 @@
     <item>
      <widget class="QLabel" name="label">
       <property name="text">
-       <string>Spectrum file : </string>
+       <string>Spectrum file: </string>
       </property>
      </widget>
     </item>
@@ -76,7 +76,7 @@
     <rect>
      <x>40</x>
      <y>100</y>
-     <width>251</width>
+     <width>291</width>
      <height>32</height>
     </rect>
    </property>
@@ -99,7 +99,7 @@
        <enum>Qt::LeftToRight</enum>
       </property>
       <property name="text">
-       <string>Max charge : </string>
+       <string>Maximum charge: </string>
       </property>
      </widget>
     </item>
@@ -116,7 +116,7 @@
       </property>
       <property name="maximumSize">
        <size>
-        <width>70</width>
+        <width>95</width>
         <height>16777215</height>
        </size>
       </property>
@@ -132,7 +132,7 @@
     <rect>
      <x>40</x>
      <y>160</y>
-     <width>251</width>
+     <width>291</width>
      <height>32</height>
     </rect>
    </property>
@@ -146,7 +146,7 @@
        </size>
       </property>
       <property name="text">
-       <string>Max mass (Da) : </string>
+       <string>Maximum mass (Da): </string>
       </property>
      </widget>
     </item>
@@ -160,7 +160,7 @@
       </property>
       <property name="maximumSize">
        <size>
-        <width>70</width>
+        <width>95</width>
         <height>16777215</height>
        </size>
       </property>
@@ -174,9 +174,9 @@
   <widget class="QWidget" name="horizontalLayoutWidget_4">
    <property name="geometry">
     <rect>
-     <x>330</x>
+     <x>360</x>
      <y>160</y>
-     <width>331</width>
+     <width>181</width>
      <height>32</height>
     </rect>
    </property>
@@ -190,7 +190,7 @@
        </size>
       </property>
       <property name="text">
-       <string>M/Z error (th) : </string>
+       <string>M/Z error: </string>
       </property>
      </widget>
     </item>
@@ -218,9 +218,9 @@
   <widget class="QWidget" name="horizontalLayoutWidget_5">
    <property name="geometry">
     <rect>
-     <x>700</x>
+     <x>360</x>
      <y>100</y>
-     <width>198</width>
+     <width>181</width>
      <height>32</height>
     </rect>
    </property>
@@ -234,7 +234,7 @@
        </size>
       </property>
       <property name="text">
-       <string>S/N ratio : </string>
+       <string>S/N ratio: </string>
       </property>
      </widget>
     </item>
@@ -262,9 +262,9 @@
   <widget class="QWidget" name="horizontalLayoutWidget_6">
    <property name="geometry">
     <rect>
-     <x>700</x>
+     <x>570</x>
      <y>160</y>
-     <width>201</width>
+     <width>331</width>
      <height>31</height>
     </rect>
    </property>
@@ -275,7 +275,7 @@
        <bool>false</bool>
       </property>
       <property name="text">
-       <string>Missing level one</string>
+       <string>Missing MS1 spectra</string>
       </property>
       <property name="checkable">
        <bool>true</bool>
@@ -322,6 +322,16 @@
      </widget>
     </item>
     <item>
+     <widget class="QPushButton" name="outputButton">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="text">
+       <string>Output folder</string>
+      </property>
+     </widget>
+    </item>
+    <item>
      <widget class="QPushButton" name="startButton">
       <property name="enabled">
        <bool>true</bool>
@@ -339,7 +349,7 @@
        <bool>true</bool>
       </property>
       <property name="default">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
       <property name="flat">
        <bool>false</bool>
@@ -351,7 +361,7 @@
   <widget class="QWidget" name="horizontalLayoutWidget_8">
    <property name="geometry">
     <rect>
-     <x>330</x>
+     <x>570</x>
      <y>100</y>
      <width>331</width>
      <height>32</height>
@@ -367,7 +377,7 @@
        </size>
       </property>
       <property name="text">
-       <string>Precursor window size (th) : </string>
+       <string>Precursor window size (m/z): </string>
       </property>
      </widget>
     </item>
@@ -386,7 +396,7 @@
        </size>
       </property>
       <property name="text">
-       <string>2.0</string>
+       <string>3.0</string>
       </property>
      </widget>
     </item>
@@ -406,7 +416,7 @@
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Cantarell'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Cantarell';&quot;&gt;Press start to process the spectra.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Click the Start button to process the spectrum file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
   <widget class="QProgressBar" name="progressBar">
