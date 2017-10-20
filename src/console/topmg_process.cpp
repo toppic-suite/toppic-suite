@@ -181,11 +181,12 @@ int TopMGProcess(std::map<std::string, std::string> arguments) {
 
     int max_mod_num = std::stoi(arguments["varPtmNumber"]);
     int gap = std::stoi(arguments["proteo_graph_dis"]);
+    int var_ptm_in_gap = std::min(std::stoi(arguments["varPtmNumInGap"]), max_mod_num);
     GraphAlignMngPtr ga_mng_ptr
         = std::make_shared<GraphAlignMng>(prsm_para_ptr,
                                           residue_mod_file_name,
                                           ptm_num, max_mod_num,
-                                          gap, max_ptm_mass,
+                                          gap, var_ptm_in_gap, max_ptm_mass,
                                           thread_num, "GRAPH_FILTER", "GRAPH_ALIGN");
     LOG_DEBUG("shift num " << ptm_num);
     GraphAlignProcessorPtr ga_processor_ptr = std::make_shared<GraphAlignProcessor>(ga_mng_ptr);

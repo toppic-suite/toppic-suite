@@ -89,7 +89,8 @@ void GraphAlignProcessor::process() {
                            mng_ptr_->convert_ratio_,
                            mng_ptr_->max_known_mods_,
                            mng_ptr_->getIntMaxPtmSumMass(),
-                           mng_ptr_->proteo_graph_gap_);
+                           mng_ptr_->proteo_graph_gap_,
+                           mng_ptr_->var_ptm_in_gap_);
   LOG_DEBUG("init reader complete");
 
   int spectrum_num = MsAlignUtil::getSpNum (prsm_para_ptr->getSpectrumFileName());

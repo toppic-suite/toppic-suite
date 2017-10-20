@@ -44,13 +44,15 @@ namespace prot {
 ProteoGraph::ProteoGraph(FastaSeqPtr fasta_seq_ptr, ModPtrVec fix_mod_ptr_vec,
                          MassGraphPtr graph_ptr, bool is_nme,
                          double convert_ratio, int max_mod_num,
-                         int max_ptm_sum_mass, int proteo_graph_gap) {
+                         int max_ptm_sum_mass, int proteo_graph_gap,
+                         int var_ptm_in_gap) {
   db_proteo_ptr_ = ProteoformFactory::geneDbProteoformPtr(fasta_seq_ptr, fix_mod_ptr_vec);
   graph_ptr_ = graph_ptr;
   is_nme_ = is_nme;
   node_num_ = num_vertices(*graph_ptr.get());
   LOG_DEBUG("node num " << node_num_);
   proteo_graph_gap_ = proteo_graph_gap;
+  var_ptm_in_gap_ = var_ptm_in_gap;
   pair_num_ = node_num_ * (proteo_graph_gap_ + 1);
   compSeqMasses(convert_ratio);
   compDistances(max_mod_num, max_ptm_sum_mass);
@@ -111,7 +113,7 @@ void ProteoGraph::compDistances(int max_mod_num, int max_ptm_sum_mass) {
           MassGraph::edge_descriptor e = *ei;
           int d =(*g_p)[e].int_mass_;
           int change = (*g_p)[e].change_type_;
-          for (int k = 0; k < max_mod_num / 2 + 1; k++) {
+          for (int k = 0; k < var_ptm_in_gap_ + 1; k++) {
             if (k == max_mod_num &&
                 (change == ChangeType::PROTEIN_VARIABLE->getId()
                  || change == ChangeType::VARIABLE->getId())) {

@@ -44,8 +44,11 @@ class ProteoGraphReader {
                     const ModPtrVec &fix_mod_ptr_vec, 
                     const ProtModPtrVec &prot_mod_ptr_vec,
                     const ModPtrVec &var_mod_ptr_vec,
-                    double convert_ratio, int max_mod_num,
-                    int max_ptm_sum_mass, int proteo_graph_gap);
+                    double convert_ratio,
+                    int max_mod_num,
+                    int max_ptm_sum_mass,
+                    int proteo_graph_gap,
+                    int var_ptm_in_gap);
 
   ProteoGraphPtr getNextProteoGraphPtr();
 
@@ -59,6 +62,7 @@ class ProteoGraphReader {
   ProteoAnnoPtr proteo_anno_ptr_;
   FastaReaderPtr reader_ptr_;
   int proteo_graph_gap_;
+  int var_ptm_in_gap_;
 
   MassGraphPtr getMassGraphPtr();
 };
