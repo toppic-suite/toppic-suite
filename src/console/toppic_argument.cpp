@@ -223,7 +223,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "<a common modification file>. Specify a text file containing the information of common PTMs for characterization of PTMs in proteoform spectrum-matches.")
         ("miscore-threshold,s", po::value<std::string> (&local_threshold), "<a positive number between 0 and 1>. Score threshold (modification identification score) for filtering results of PTM characterization. Default value: 0.45.")
         ("thread-number,u", po::value<std::string> (&thread_number), "<positive number>. Number of threads used in the computation. Default value: 1.")
-        ("use-topfd-feature,x", po::value<std::string>(&feature_file_name) , "<a msft file with its path>. TopFD features for proteoform identification.")
+        ("use-topfd-feature,x", po::value<std::string>(&feature_file_name) , "<a TopFD feature file with its path>. TopFD features for proteoform identification.")
         ("skip-list,l", po::value<std::string>(&skip_list) , "<a text file with its path>. The scans in this file will be skipped.");
 
     po::options_description desc("Options");
