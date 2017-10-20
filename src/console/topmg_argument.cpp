@@ -61,8 +61,10 @@ void Argument::initArguments() {
   arguments_["fixedMod"] = "";
   arguments_["ptmNumber"] = "0";
   arguments_["errorTolerance"] = "15";
-  arguments_["cutoffType"] = "EVALUE";
-  arguments_["cutoffValue"] = "0.01";
+  arguments_["cutoffSpectralType"] = "EVALUE";
+  arguments_["cutoffSpectralValue"] = "0.01";
+  arguments_["cutoffProteoformType"] = "EVALUE";
+  arguments_["cutoffProteoformValue"] = "0.01";
   arguments_["allowProtMod"] = "NONE,NME,NME_ACETYLATION,M_ACETYLATION";
   arguments_["numOfTopPrsms"] = "1";
   arguments_["maxPtmMass"] = "500";
@@ -77,6 +79,7 @@ void Argument::initArguments() {
   arguments_["featureFileName"] = "";
   arguments_["skipList"] = "";
   arguments_["proteo_graph_dis"] = "40";
+  arguments_["useASFDiag"] = "false";  
   arguments_["varPtmNumber"] = "10";
 }
 
@@ -98,8 +101,10 @@ void Argument::outputArguments(std::ostream &output, std::map<std::string, std::
   }
 
   output << std::setw(44) << std::left << "Error tolerance: " << "\t" << arguments["errorTolerance"] << " ppm" << std::endl;
-  output << std::setw(44) << std::left << "Cutoff type: " << "\t" << arguments["cutoffType"] << std::endl;
-  output << std::setw(44) << std::left << "Cutoff value: " << "\t" << arguments["cutoffValue"] << std::endl;
+  output << std::setw(44) << std::left << "Spectrum-level cutoff type: " << "\t" << arguments["cutoffSpectralType"] << std::endl;
+  output << std::setw(44) << std::left << "Spectrum-level cutoff value: " << "\t" << arguments["cutoffSpectralValue"] << std::endl;
+  output << std::setw(44) << std::left << "Proteoform-level cutoff type: " << "\t" << arguments["cutoffProteoformType"] << std::endl;
+  output << std::setw(44) << std::left << "Proteoform-level cutoff value: " << "\t" << arguments["cutoffProteoformValue"] << std::endl;
   output << std::setw(44) << std::left << "Allowed N-terminal forms: " << "\t" << arguments["allowProtMod"] << std::endl;
   output << std::setw(44) << std::left << "Maximum mass shift of modifications: " << "\t" << arguments["maxPtmMass"] << " Da" << std::endl;
   output << std::setw(44) << std::left << "Thread number: " << "\t" << arguments["threadNumber"] << std::endl;
@@ -141,6 +146,7 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string cutoff_proteoform_type = "";
   std::string cutoff_proteoform_value = "";
   std::string use_table = "";
+  std::string use_asf_diag = "";
   std::string filtering_result_num = "";
   std::string residue_mod_file_name = "";
   std::string proteo_graph_dis = "";
@@ -175,6 +181,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("thread-number,u", po::value<std::string> (&thread_number), "<positive number>. Number of threads used in the computation. Default value: 1.")
         ("use-topfd-feature,x", po::value<std::string>(&feature_file_name) , "<a msft file with its path>. TopFD features for proteoform identification.")
         ("skip-list,l", po::value<std::string>(&skip_list) , "<a text file with its path>. The scans in this file will be skipped.")
+        ("use-asf-diagonal,D", "Use the ASF-DIAGONAL method for protein filtering.")
         ("var-ptm,P", po::value<std::string>(&var_ptm_num) , "<a positive number>. Maximum number of variable PTMs. Default value: 10.");
 
     po::options_description desc("Options");
@@ -200,6 +207,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("thread-number,u", po::value<std::string> (&thread_number), "")
         ("use-topfd-feature,x", po::value<std::string>(&feature_file_name) , "")
         ("skip-list,l", po::value<std::string>(&skip_list) , "")
+        ("use-asf-diagonal,D", "")
         ("var-ptm,P", po::value<std::string>(&var_ptm_num) , "")
         ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name with its path.")
         ("spectrum-file-name", po::value<std::string>(&spectrum_file_name)->required(), "Spectrum file name with its path.");
@@ -299,6 +307,9 @@ bool Argument::parse(int argc, char* argv[]) {
     if (vm.count("skip-list")) {
       arguments_["skipList"] = skip_list;
     }
+    if (vm.count("use-asf-diagonal")) {
+      arguments_["useASFDiag"] = "true";
+    }
     if (vm.count("var-ptm")) {
       arguments_["varPtmNumber"] = var_ptm_num;
     }
@@ -343,7 +354,7 @@ bool Argument::validateArguments() {
 
   std::string activation = arguments_["activation"];
   if (activation != "CID" && activation != "HCD"
-     && activation != "ETD" && activation != "FILE" && activation != "UVPD") {
+      && activation != "ETD" && activation != "FILE" && activation != "UVPD") {
     LOG_ERROR("Activation type " << activation << " error! The value should be CID|HCD|ETD|UVPD|FILE!");
     return false;
   }

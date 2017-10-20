@@ -139,56 +139,30 @@ int TopMGProcess(std::map<std::string, std::string> arguments) {
     input_exts.push_back("VAR1_ONE_PTM_FILTER_SUFFIX");
     input_exts.push_back("VAR1_ONE_PTM_FILTER_INTERNAL");
 
-    std::cout << "ASF-Diagonal PTM filtering - started." << std::endl;
-    DiagFilterMngPtr diag_filter_mng_ptr1
-        = std::make_shared<DiagFilterMng>(prsm_para_ptr, filter_result_num,
-                                          thread_num, "VAR1_DIAG_FILTER",
-                                          arguments["residueModFileName"], 1);
-    DiagFilterProcessorPtr diag_filter_processor1
-        = std::make_shared<DiagFilterProcessor>(diag_filter_mng_ptr1);
-    diag_filter_processor1->process();
-    std::cout << "ASF-Diagonal filtering - finished." << std::endl;
+    bool use_asf_diag = false;
+    if (arguments["useASFDiag"] == "true") {
+      use_asf_diag = true;
+    }
 
-    input_exts.push_back("VAR1_DIAG_FILTER");
+    if (use_asf_diag) {
+      std::cout << "ASF-Diagonal PTM filtering - started." << std::endl;
+      DiagFilterMngPtr diag_filter_mng_ptr1
+          = std::make_shared<DiagFilterMng>(prsm_para_ptr, filter_result_num,
+                                            thread_num, "VAR1_DIAG_FILTER",
+                                            arguments["residueModFileName"], 1);
+      DiagFilterProcessorPtr diag_filter_processor1
+          = std::make_shared<DiagFilterProcessor>(diag_filter_mng_ptr1);
+      diag_filter_processor1->process();
+      std::cout << "ASF-Diagonal filtering - finished." << std::endl;
 
-    for (size_t i = 0; i < input_exts.size(); i++) {
-      size_t k = 5;
-      if (i == input_exts.size() - 1) k = 20;
-      std::string input_file_name = FileUtil::basename(sp_file_name) + "." + input_exts[i];
-      SimplePrsmReaderPtr reader_ptr = std::make_shared<SimplePrsmReader>(input_file_name);
-      SimplePrsmStrPtr prsm_ptr = reader_ptr->readOnePrsmStr();
-      int cur_id = prsm_ptr->getSpectrumId();
-      std::shared_ptr<SimplePrsmXmlWriter> prsm_writer_ptr
-          = std::make_shared<SimplePrsmXmlWriter>(FileUtil::basename(sp_file_name) + ".GRAPH_FILTER_" + std::to_string(i));
-      std::vector<SimplePrsmStrPtr> prsm_vec;
-      while (prsm_ptr != nullptr) {
-        if (prsm_ptr->getSpectrumId() == cur_id) {
-          prsm_vec.push_back(prsm_ptr);
-        } else {
-          std::sort(prsm_vec.begin(), prsm_vec.end(), SimplePrsmStr::cmpScoreDec);
-          for (size_t j = 0; j < prsm_vec.size() && j < k; j++) {
-            prsm_writer_ptr->write(prsm_vec[j]);
-          }
-          cur_id = prsm_ptr->getSpectrumId();
-          prsm_vec.clear();
-          prsm_vec.push_back(prsm_ptr);
-        }
-        prsm_ptr = reader_ptr->readOnePrsmStr();
-      }
-      std::sort(prsm_vec.begin(), prsm_vec.end(), SimplePrsmStr::cmpScoreDec);
-      for (size_t j = 0; j < prsm_vec.size() && j < k; j++) {
-        prsm_writer_ptr->write(prsm_vec[j]);
-      }
-
-      reader_ptr->close();
-      prsm_writer_ptr->close();
+      input_exts.push_back("VAR1_DIAG_FILTER");
     }
 
     SimplePrsmPtrVec sim_prsm_ptrs;
 
     for (size_t i = 0; i < input_exts.size(); i++) {
       std::string input_file_name
-          = FileUtil::basename(sp_file_name) + ".GRAPH_FILTER_" + std::to_string(i);
+          = FileUtil::basename(sp_file_name) + "." + input_exts[i];
       SimplePrsmReaderPtr reader_ptr = std::make_shared<SimplePrsmReader>(input_file_name);
       SimplePrsmPtr str_ptr = reader_ptr->readOnePrsm();
       while (str_ptr != nullptr) {
