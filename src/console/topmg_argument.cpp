@@ -81,6 +81,7 @@ void Argument::initArguments() {
   arguments_["proteo_graph_dis"] = "40";
   arguments_["useASFDiag"] = "false";  
   arguments_["varPtmNumber"] = "10";
+  arguments_["varPtmNumInGap"] = "5";
 }
 
 void Argument::outputArguments(std::ostream &output, std::map<std::string, std::string> arguments) {
@@ -154,6 +155,7 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string feature_file_name = "";
   std::string skip_list = "";
   std::string var_ptm_num = "";
+  std::string var_ptm_in_gap = "";
 
   // Define and parse the program options
   try {
@@ -177,10 +179,11 @@ bool Argument::parse(int argc, char* argv[]) {
         ("cutoff-proteoform-value,V", po::value<std::string> (&cutoff_proteoform_value), "<a positive number>. Proteoform-level cutoff value for filtering identified proteoform spectrum-matches. Default value: 0.01.")
         ("generating-function,g", "Use the generating function approach to compute p-values and E-values.")
         ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "<a common modification file>. Specify a text file containing the information of common PTMs for characterization of PTMs in proteoform spectrum-matches.")
-        ("proteo-graph-dis,j", po::value<std::string> (&proteo_graph_dis), "<positive number>. Gap in constructing proteoform graph. Default value: 40.")
         ("thread-number,u", po::value<std::string> (&thread_number), "<positive number>. Number of threads used in the computation. Default value: 1.")
         ("use-topfd-feature,x", po::value<std::string>(&feature_file_name) , "<a TopFD feature file with its path>. TopFD features for proteoform identification.")
         ("skip-list,l", po::value<std::string>(&skip_list) , "<a text file with its path>. The scans in this file will be skipped.")
+        ("proteo-graph-dis,j", po::value<std::string> (&proteo_graph_dis), "<positive number>. Gap in constructing proteoform graph. Default value: 40.")        
+        ("var-ptm-in-gap,G", po::value<std::string>(&var_ptm_in_gap) , "<a positive number>. Maximum number of variable PTMs in a proteform graph gap. Default value: 5.")
         ("use-asf-diagonal,D", "Use the ASF-DIAGONAL method for protein filtering.")
         ("var-ptm,P", po::value<std::string>(&var_ptm_num) , "<a positive number>. Maximum number of variable PTMs. Default value: 10.");
 
@@ -203,10 +206,11 @@ bool Argument::parse(int argc, char* argv[]) {
         ("generating-function,g", "")
         ("full-binary-path,b", "Full binary path.")
         ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "")
-        ("proteo-graph-dis,j", po::value<std::string> (&proteo_graph_dis), "")
         ("thread-number,u", po::value<std::string> (&thread_number), "")
         ("use-topfd-feature,x", po::value<std::string>(&feature_file_name) , "")
         ("skip-list,l", po::value<std::string>(&skip_list) , "")
+        ("proteo-graph-dis,j", po::value<std::string> (&proteo_graph_dis), "")
+        ("var-ptm-in-gap,G", po::value<std::string>(&var_ptm_in_gap) , "")
         ("use-asf-diagonal,D", "")
         ("var-ptm,P", po::value<std::string>(&var_ptm_num) , "")
         ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name with its path.")
@@ -312,6 +316,9 @@ bool Argument::parse(int argc, char* argv[]) {
     }
     if (vm.count("var-ptm")) {
       arguments_["varPtmNumber"] = var_ptm_num;
+    }
+    if (vm.count("var-ptm-in-gap")) {
+      arguments_["varPtmNumInGap"] = var_ptm_in_gap;
     }
   }
   catch(std::exception & e) {
