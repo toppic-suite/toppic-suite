@@ -190,7 +190,7 @@
        </size>
       </property>
       <property name="text">
-       <string>M/Z error: </string>
+       <string>M/z error: </string>
       </property>
      </widget>
     </item>
