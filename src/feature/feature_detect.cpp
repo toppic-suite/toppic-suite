@@ -347,7 +347,7 @@ void FeatureDetect::process(DeconvParaPtr para_ptr) {
   FeaturePtrVec features;
   groupHeaders(ms1_ptr_vec, header_ptr_vec, mng_ptr, header_groups, features);
   setFeatures(header_groups, features);
-  std::string output_file_name = base_name + ".msft";
+  std::string output_file_name = base_name + ".feature";
   writeMSFT(ms2_file_name, output_file_name, header_ptr_vec, para_ptr);
   std::ofstream of1(ms1_file_name, std::ofstream::out);
   of1.precision(16);
