@@ -433,16 +433,27 @@ bool Argument::validateArguments() {
     return false;
   }
 
-  std::string cutoff_value = arguments_["cutoffValue"];
+  std::string cutoff_spectral_value = arguments_["cutoffSpectralValue"];
   try {
-    double th = std::stod(cutoff_value.c_str());
+    double th = std::stod(cutoff_spectral_value);
     if (th < 0) {
-      LOG_ERROR("Cutoff value " << cutoff_value << " error! The value should be positive.");
+      LOG_ERROR("Spectrum-level cutoff value " << cutoff_spectral_value << " error! The value should be positive.");
       return false;
     }
+  } catch (int e) {
+    LOG_ERROR("Spectrum-level cutoff value " << cutoff_spectral_value << " should be a number.");
+    return false;
   }
-  catch (int e) {
-    LOG_ERROR("Cutoff value " << cutoff_value << " should be a number.");
+
+  std::string cutoff_proteoform_value = arguments_["cutoffSpectralValue"];
+  try {
+    double th = std::stod(cutoff_proteoform_value);
+    if (th < 0) {
+      LOG_ERROR("Proteoform-level cutoff value " << cutoff_proteoform_value << " error! The value should be positive.");
+      return false;
+    }
+  } catch (int e) {
+    LOG_ERROR("Proteoform-level cutoff value " << cutoff_proteoform_value << " should be a number.");
     return false;
   }
 
@@ -460,7 +471,7 @@ bool Argument::validateArguments() {
     }
   }
   catch (int e) {
-    LOG_ERROR("Cutoff value " << cutoff_value << " should be a number.");
+    LOG_ERROR("Thread number " << thread_number << " should be a number.");
     return false;
   }
   return true;
