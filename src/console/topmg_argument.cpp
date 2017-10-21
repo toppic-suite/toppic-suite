@@ -86,44 +86,45 @@ void Argument::initArguments() {
 
 void Argument::outputArguments(std::ostream &output, std::map<std::string, std::string> arguments) {
   output << "********************** Parameters **********************" << std::endl;
-  output << std::setw(44) << std::left << "Protein database file: " << "\t" << arguments["oriDatabaseFileName"] << std::endl;
-  output << std::setw(44) << std::left << "Spectrum file: " << "\t" << arguments["spectrumFileName"] << std::endl;
-  output << std::setw(44) << std::left << "Fragmentation method: " << "\t" << arguments["activation"] << std::endl;
-  output << std::setw(44) << std::left << "Search type: " << "\t" << arguments["searchType"] << std::endl;
+  output << std::setw(50) << std::left << "Protein database file: " << "\t" << arguments["oriDatabaseFileName"] << std::endl;
+  output << std::setw(50) << std::left << "Spectrum file: " << "\t" << arguments["spectrumFileName"] << std::endl;
+  output << std::setw(50) << std::left << "Fragmentation method: " << "\t" << arguments["activation"] << std::endl;
+  output << std::setw(50) << std::left << "Search type: " << "\t" << arguments["searchType"] << std::endl;
 
   if (arguments["fixedMod"] == "") {
-    output << std::setw(44) << std::left << "Fixed modifications: " << "\t" << "None" << std::endl;
+    output << std::setw(50) << std::left << "Fixed modifications: " << "\t" << "None" << std::endl;
   } else {
-    output << std::setw(44) << std::left << "Fixed modifications: " << "\t" << arguments["fixedMod"] << std::endl;
+    output << std::setw(50) << std::left << "Fixed modifications: " << "\t" << arguments["fixedMod"] << std::endl;
   }
 
   if (arguments["featureFileName"] != "") {
-    output << std::setw(44) << std::left << "TopFD feature file: " << "\t" << arguments["featureFileName"] << std::endl;
+    output << std::setw(50) << std::left << "TopFD feature file: " << "\t" << arguments["featureFileName"] << std::endl;
   }
 
-  output << std::setw(44) << std::left << "Error tolerance: " << "\t" << arguments["errorTolerance"] << " ppm" << std::endl;
-  output << std::setw(44) << std::left << "Spectrum-level cutoff type: " << "\t" << arguments["cutoffSpectralType"] << std::endl;
-  output << std::setw(44) << std::left << "Spectrum-level cutoff value: " << "\t" << arguments["cutoffSpectralValue"] << std::endl;
-  output << std::setw(44) << std::left << "Proteoform-level cutoff type: " << "\t" << arguments["cutoffProteoformType"] << std::endl;
-  output << std::setw(44) << std::left << "Proteoform-level cutoff value: " << "\t" << arguments["cutoffProteoformValue"] << std::endl;
-  output << std::setw(44) << std::left << "Allowed N-terminal forms: " << "\t" << arguments["allowProtMod"] << std::endl;
-  output << std::setw(44) << std::left << "Maximum mass shift of modifications: " << "\t" << arguments["maxPtmMass"] << " Da" << std::endl;
-  output << std::setw(44) << std::left << "Thread number: " << "\t" << arguments["threadNumber"] << std::endl;
+  output << std::setw(50) << std::left << "Error tolerance: " << "\t" << arguments["errorTolerance"] << " ppm" << std::endl;
+  output << std::setw(50) << std::left << "Spectrum-level cutoff type: " << "\t" << arguments["cutoffSpectralType"] << std::endl;
+  output << std::setw(50) << std::left << "Spectrum-level cutoff value: " << "\t" << arguments["cutoffSpectralValue"] << std::endl;
+  output << std::setw(50) << std::left << "Proteoform-level cutoff type: " << "\t" << arguments["cutoffProteoformType"] << std::endl;
+  output << std::setw(50) << std::left << "Proteoform-level cutoff value: " << "\t" << arguments["cutoffProteoformValue"] << std::endl;
+  output << std::setw(50) << std::left << "Allowed N-terminal forms: " << "\t" << arguments["allowProtMod"] << std::endl;
+  output << std::setw(50) << std::left << "Maximum mass shift of modifications: " << "\t" << arguments["maxPtmMass"] << " Da" << std::endl;
+  output << std::setw(50) << std::left << "Thread number: " << "\t" << arguments["threadNumber"] << std::endl;
 
   if (arguments["useGf"] == "true") {
-    output << std::setw(44) << std::left << "E-value computation: " << "\t" << "Generating function" << std::endl;
+    output << std::setw(50) << std::left << "E-value computation: " << "\t" << "Generating function" << std::endl;
   } else {
-    output << std::setw(44) << std::left << "E-value computation: " << "\t" << "Lookup table" << std::endl;
+    output << std::setw(50) << std::left << "E-value computation: " << "\t" << "Lookup table" << std::endl;
   }
 
-  output << std::setw(44) << std::left << "Modification file name: " << "\t" << arguments["residueModFileName"] << std::endl;
-  output << std::setw(44) << std::left << "Gap in proteoform graph: " << "\t" << arguments["proteo_graph_dis"] << std::endl;
-  output << std::setw(44) << std::left << "Maximum number of variable PTMs: " << "\t" << arguments["varPtmNumber"] << std::endl;
-  output << std::setw(44) << std::left << "Executable file directory: " << "\t" << arguments["executiveDir"] << std::endl;
-  output << std::setw(44) << std::left << "Start time: " << "\t" << arguments["start_time"];
+  output << std::setw(50) << std::left << "Modification file name: " << "\t" << arguments["residueModFileName"] << std::endl;
+  output << std::setw(50) << std::left << "Gap in proteoform graph: " << "\t" << arguments["proteo_graph_dis"] << std::endl;
+  output << std::setw(50) << std::left << "Maximum number of variable PTMs: " << "\t" << arguments["varPtmNumber"] << std::endl;
+  output << std::setw(50) << std::left << "Maximum number of variable PTMs in a graph gap: " << "\t" << arguments["varPtmNumInGap"] << std::endl;
+  output << std::setw(50) << std::left << "Executable file directory: " << "\t" << arguments["executiveDir"] << std::endl;
+  output << std::setw(50) << std::left << "Start time: " << "\t" << arguments["start_time"];
   if (arguments["end_time"] != "") {
-    output << std::setw(44) << std::left << "End time: " << "\t" << arguments["end_time"];
-    output << std::setw(44) << std::left << "Running time: " << "\t" << arguments["running_time"] << " seconds" << std::endl;
+    output << std::setw(50) << std::left << "End time: " << "\t" << arguments["end_time"];
+    output << std::setw(50) << std::left << "Running time: " << "\t" << arguments["running_time"] << " seconds" << std::endl;
   }
   output << "********************** Parameters **********************" << std::endl;
 }

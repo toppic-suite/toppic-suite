@@ -121,7 +121,7 @@ void GraphAlignProcessor::process() {
       int spec_id = spec_set_ptr->getSpectrumId();
       SimplePrsmPtrVec selected_prsm_ptrs;
       while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_id) {
-        if (prsm_ptr->getScore() > 4) selected_prsm_ptrs.push_back(prsm_ptr);
+        if (prsm_ptr->getScore() >= 10) selected_prsm_ptrs.push_back(prsm_ptr);
         prsm_ptr = simple_prsm_reader.readOnePrsm();
       }
 
