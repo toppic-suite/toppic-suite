@@ -29,6 +29,9 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+#include <string>
+#include <vector>
+
 #include "base/xml_dom.hpp"
 #include "base/change_type.hpp"
 #include "base/prot_mod_base.hpp"
@@ -42,7 +45,7 @@
 namespace prot {
 
 ProteoAnno::ProteoAnno(const ModPtrVec &fix_mod_ptr_vec,
-                       const ProtModPtrVec &prot_mod_ptr_vec, 
+                       const ProtModPtrVec &prot_mod_ptr_vec,
                        const ModPtrVec &var_mod_ptr_vec) {
   fix_mod_ptr_vec_ = fix_mod_ptr_vec;
   prot_mod_ptr_vec_ = prot_mod_ptr_vec;
@@ -73,8 +76,7 @@ void ProteoAnno::anno(const std::string &seq, bool is_complete) {
     cur_res_vec.push_back(res_ptr);
     if (PtmBase::isEmptyPtmPtr(res_ptr->getPtmPtr())) {
       cur_change_vec.push_back(ChangeType::INPUT->getId());
-    }
-    else {
+    } else {
       cur_change_vec.push_back(ChangeType::FIXED->getId());
     }
     res_vec_2d_.push_back(cur_res_vec);
@@ -94,11 +96,11 @@ void ProteoAnno::anno(const std::string &seq, bool is_complete) {
       // add empty residue to the first methinine residue
       is_nme_ = true;
       ResiduePtr empty_residue_ptr = ResidueBase::getEmptyResiduePtr();
-      //LOG_DEBUG("empty acid mass " << acid_ptr->getMonoMass());
-      //LOG_DEBUG("empty ptm mass " << ptm_ptr->getMonoMass());
+      // LOG_DEBUG("empty acid mass " << acid_ptr->getMonoMass());
+      // LOG_DEBUG("empty ptm mass " << ptm_ptr->getMonoMass());
       LOG_DEBUG("empty residue mass " << empty_residue_ptr->getMass());
       if (empty_residue_ptr == nullptr) {
-        LOG_ERROR( "Proteoform:: residue not found");
+        LOG_ERROR("Proteoform:: residue not found");
         throw("Residue not found");
       }
       res_vec_2d_[0].push_back(empty_residue_ptr);
@@ -119,13 +121,13 @@ void ProteoAnno::anno(const std::string &seq, bool is_complete) {
   }
   LOG_DEBUG("protein mod complete");
 
-  //variable ptms
+  // variable ptms
   for (size_t i = 0; i < residue_ptr_vec.size(); i++) {
     AcidPtr acid_ptr = residue_ptr_vec[i]->getAcidPtr();
     // if exist modified residues
-    if(ptm_map_.count(acid_ptr)) {
+    if (ptm_map_.count(acid_ptr)) {
       ResiduePtrVec mod_res_vec = ptm_map_[acid_ptr];
-      //remove duplications
+      // remove duplications
       ResiduePtrVec exist_res_vec = res_vec_2d_[i];
       for (size_t j = 0; j < mod_res_vec.size(); j++) {
         bool found = false;
@@ -139,11 +141,9 @@ void ProteoAnno::anno(const std::string &seq, bool is_complete) {
           res_vec_2d_[i].push_back(mod_res_vec[j]);
           change_vec_2d_[i].push_back(ChangeType::VARIABLE->getId());
         }
-
       }
     }
   }
   LOG_DEBUG("variable mod complete");
 }
-
-}
+}  // namespace prot

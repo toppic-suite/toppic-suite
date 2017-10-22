@@ -29,13 +29,16 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+#include <string>
+#include <vector>
+
 #include "base/logger.hpp"
 #include "graph/proteo_graph_reader.hpp"
 
 namespace prot {
 
 ProteoGraphReader::ProteoGraphReader(const std::string &db_file_name,
-                                     const ModPtrVec &fix_mod_ptr_vec, 
+                                     const ModPtrVec &fix_mod_ptr_vec,
                                      const ProtModPtrVec &prot_mod_ptr_vec,
                                      const ModPtrVec &var_mod_ptr_vec,
                                      double convert_ratio,
@@ -48,14 +51,15 @@ ProteoGraphReader::ProteoGraphReader(const std::string &db_file_name,
   max_mod_num_ = max_mod_num;
   max_ptm_sum_mass_ = max_ptm_sum_mass;
   reader_ptr_ = std::make_shared<FastaReader>(db_file_name);
-  proteo_anno_ptr_ = std::make_shared<ProteoAnno>(fix_mod_ptr_vec, prot_mod_ptr_vec, var_mod_ptr_vec);
+  proteo_anno_ptr_
+      = std::make_shared<ProteoAnno>(fix_mod_ptr_vec, prot_mod_ptr_vec, var_mod_ptr_vec);
   proteo_graph_gap_ = proteo_graph_gap;
-  var_ptm_in_gap_ = var_ptm_in_gap; 
+  var_ptm_in_gap_ = var_ptm_in_gap;
 }
 
-MassGraphPtr ProteoGraphReader::getMassGraphPtr() {
+MassGraphPtr getMassGraphPtr(ProteoAnnoPtr proteo_anno_ptr, double convert_ratio) {
   MassGraphPtr graph_ptr = std::make_shared<MassGraph>();
-  int seq_len  = proteo_anno_ptr_->getLen();
+  int seq_len  = proteo_anno_ptr->getLen();
   for (int i = 0; i < seq_len + 1; i++) {
     VertexInfo v(i);
     add_vertex(v, *graph_ptr.get());
@@ -65,10 +69,10 @@ MassGraphPtr ProteoGraphReader::getMassGraphPtr() {
     Vertex v1, v2;
     v1 = vertex(i, *graph_ptr.get());
     v2 = vertex(i + 1, *graph_ptr.get());
-    ResiduePtrVec res_ptr_vec = proteo_anno_ptr_->getResiduePtrVec(i);
-    std::vector<int> change_vec = proteo_anno_ptr_->getChangeVec(i);
-    for (size_t j=0; j < res_ptr_vec.size(); j++) { 
-      EdgeInfo edge_info(res_ptr_vec[j], change_vec[j], convert_ratio_);
+    ResiduePtrVec res_ptr_vec = proteo_anno_ptr->getResiduePtrVec(i);
+    std::vector<int> change_vec = proteo_anno_ptr->getChangeVec(i);
+    for (size_t j=0; j < res_ptr_vec.size(); j++) {
+      EdgeInfo edge_info(res_ptr_vec[j], change_vec[j], convert_ratio);
       add_edge(v1, v2, edge_info , *graph_ptr.get());
     }
   }
@@ -77,14 +81,14 @@ MassGraphPtr ProteoGraphReader::getMassGraphPtr() {
 
 ProteoGraphPtr ProteoGraphReader::getNextProteoGraphPtr() {
   FastaSeqPtr seq_ptr = reader_ptr_->getNextSeq();
-  if (seq_ptr.get() == nullptr) {
-    return ProteoGraphPtr(nullptr);
+  if (seq_ptr == nullptr) {
+    return nullptr;
   }
   LOG_DEBUG("name " << seq_ptr->getName() << " seq " << seq_ptr->getRawSeq());
   proteo_anno_ptr_->anno(seq_ptr->getRawSeq());
-  MassGraphPtr graph_ptr = getMassGraphPtr(); 
+  MassGraphPtr graph_ptr = getMassGraphPtr(proteo_anno_ptr_, convert_ratio_);
 
-  return std::make_shared<ProteoGraph>(seq_ptr, fix_mod_ptr_vec_, graph_ptr, 
+  return std::make_shared<ProteoGraph>(seq_ptr, fix_mod_ptr_vec_, graph_ptr,
                                        proteo_anno_ptr_->isNme(),
                                        convert_ratio_, max_mod_num_,
                                        max_ptm_sum_mass_, proteo_graph_gap_,
@@ -93,13 +97,12 @@ ProteoGraphPtr ProteoGraphReader::getNextProteoGraphPtr() {
 
 ProteoGraphPtr ProteoGraphReader::getProteoGraphPtrBySeq(FastaSeqPtr seq_ptr) {
   proteo_anno_ptr_->anno(seq_ptr->getRawSeq(), seq_ptr->getSubSeqStart() == 0);
-  MassGraphPtr graph_ptr = getMassGraphPtr(); 
-  return std::make_shared<ProteoGraph>(seq_ptr, fix_mod_ptr_vec_, graph_ptr, 
+  MassGraphPtr graph_ptr = getMassGraphPtr(proteo_anno_ptr_, convert_ratio_);
+  return std::make_shared<ProteoGraph>(seq_ptr, fix_mod_ptr_vec_, graph_ptr,
                                        proteo_anno_ptr_->isNme(),
                                        convert_ratio_, max_mod_num_,
                                        max_ptm_sum_mass_, proteo_graph_gap_,
                                        var_ptm_in_gap_);
 }
-
-}
+}  // namespace prot
 

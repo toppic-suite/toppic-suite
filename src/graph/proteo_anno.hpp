@@ -50,10 +50,9 @@
 namespace prot {
 
 class ProteoAnno {
-
  public:
-  ProteoAnno(const ModPtrVec &fix_mod_ptr_vec, 
-             const ProtModPtrVec &prot_mod_ptr_vec, 
+  ProteoAnno(const ModPtrVec &fix_mod_ptr_vec,
+             const ProtModPtrVec &prot_mod_ptr_vec,
              const ModPtrVec &var_mod_ptr_vec);
 
   void anno(const std::string &seq, bool is_complete = true);
@@ -77,11 +76,10 @@ class ProteoAnno {
 
   std::map<AcidPtr, ResiduePtrVec> ptm_map_;
   bool is_nme_;
-
 };
 
 typedef std::shared_ptr<ProteoAnno> ProteoAnnoPtr;
 
-}
+}  // namespace prot
 
 #endif

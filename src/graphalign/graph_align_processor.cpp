@@ -53,11 +53,28 @@ namespace prot {
 
 typedef std::shared_ptr<ThreadPool<PrsmXmlWriter>> PrsmXmlThreadPoolPtr;
 
-std::function<void()> geneTask(GraphAlignMngPtr mng_ptr,
-                               ProteoGraphPtr proteo_ptr,
+std::function<void()> geneTask(PrsmParaPtr prsm_para_ptr,
+                               ModPtrVec var_mod_ptr_vec,
+                               FastaSeqPtr seq_ptr,
+                               GraphAlignMngPtr mng_ptr,
                                SpecGraphPtr spec_ptr,
                                PrsmXmlThreadPoolPtr pool_ptr) {
-  return [mng_ptr, proteo_ptr, spec_ptr, pool_ptr]() {
+  return [prsm_para_ptr, var_mod_ptr_vec, seq_ptr, mng_ptr, spec_ptr, pool_ptr]() {
+    ProteoAnnoPtr proteo_anno_ptr
+        = std::make_shared<ProteoAnno>(prsm_para_ptr->getFixModPtrVec(),
+                                       prsm_para_ptr->getProtModPtrVec(),
+                                       var_mod_ptr_vec);
+    proteo_anno_ptr->anno(seq_ptr->getRawSeq(), seq_ptr->getSubSeqStart() == 0);
+    MassGraphPtr graph_ptr = getMassGraphPtr(proteo_anno_ptr, mng_ptr->convert_ratio_);
+    ProteoGraphPtr proteo_ptr = std::make_shared<ProteoGraph>(seq_ptr,
+                                                              prsm_para_ptr->getFixModPtrVec(),
+                                                              graph_ptr,
+                                                              proteo_anno_ptr->isNme(),
+                                                              mng_ptr->convert_ratio_,
+                                                              mng_ptr->max_known_mods_,
+                                                              mng_ptr->getIntMaxPtmSumMass(),
+                                                              mng_ptr->proteo_graph_gap_,
+                                                              mng_ptr->var_ptm_in_gap_);
     GraphAlignPtr graph_align
         = std::make_shared<GraphAlign>(mng_ptr, proteo_ptr, spec_ptr);
     graph_align->process();
@@ -83,17 +100,6 @@ void GraphAlignProcessor::process() {
   LOG_DEBUG("start reading " << var_mod_file_name);
   ModPtrVec var_mod_ptr_vec = ModUtil::readModTxt(var_mod_file_name)[2];
   LOG_DEBUG("end reading " << var_mod_file_name);
-
-  ProteoGraphReader reader(db_file_name,
-                           prsm_para_ptr->getFixModPtrVec(),
-                           prsm_para_ptr->getProtModPtrVec(),
-                           var_mod_ptr_vec,
-                           mng_ptr_->convert_ratio_,
-                           mng_ptr_->max_known_mods_,
-                           mng_ptr_->getIntMaxPtmSumMass(),
-                           mng_ptr_->proteo_graph_gap_,
-                           mng_ptr_->var_ptm_in_gap_);
-  LOG_DEBUG("init reader complete");
 
   int spectrum_num = MsAlignUtil::getSpNum(prsm_para_ptr->getSpectrumFileName());
   std::string input_file_name
@@ -141,12 +147,13 @@ void GraphAlignProcessor::process() {
           std::string seq_desc = simple_prsm_ptrs[i]->getSeqDesc();
           std::vector<FastaSeqPtr> seq_ptr_vec = reader_ptr->readFastaSeqVec(seq_name, seq_desc);
           for (size_t j = 0; j < seq_ptr_vec.size(); j++) {
-            ProteoGraphPtr proteo_ptr = reader.getProteoGraphPtrBySeq(seq_ptr_vec[j]);
             for (size_t k = 0; k < spec_ptr_vec.size(); k++) {
               while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ + 1) {
                 boost::this_thread::sleep(boost::posix_time::milliseconds(100));
               }
-              pool_ptr->Enqueue(geneTask(mng_ptr_, proteo_ptr, spec_ptr_vec[k], pool_ptr));
+              pool_ptr->Enqueue(geneTask(prsm_para_ptr, var_mod_ptr_vec,
+                                         seq_ptr_vec[j], mng_ptr_,
+                                         spec_ptr_vec[k], pool_ptr));
             }
           }
         }
@@ -158,6 +165,7 @@ void GraphAlignProcessor::process() {
 
   pool_ptr->ShutDown();
   std::cout << std::endl;
+  simple_prsm_reader.close();
 
   // combine result files
   std::vector<std::string> input_exts;
