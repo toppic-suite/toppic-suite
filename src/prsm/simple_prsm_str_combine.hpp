@@ -46,18 +46,31 @@ namespace prot {
 
 class SimplePrsmStrCombine {
  public:
-  SimplePrsmStrCombine(const std::string &spec_file_name, 
+  SimplePrsmStrCombine(const std::string &spec_file_name,
                        const std::vector<std::string> &in_file_exts,
                        const std::string &out_file_ext,
-                       int top_num);
+                       int top_num):
+      spec_file_name_(spec_file_name),
+      input_file_exts_(in_file_exts),
+      output_file_ext_(out_file_ext),
+      top_num_(top_num) {}
 
-  SimplePrsmStrCombine(const std::string &spec_file_name, 
+  SimplePrsmStrCombine(const std::string &spec_file_name,
                        const std::string &in_file_ext,
                        int in_num,
-                       const std::string &out_file_ext, 
-                       int top_num);
+                       const std::string &out_file_ext,
+                       int top_num):
+      spec_file_name_(spec_file_name),
+      output_file_ext_(out_file_ext),
+      top_num_(top_num) {
+        for (int i = 0; i < in_num; i ++) {
+          std::string ext = in_file_ext + "_" + std::to_string(i);
+          input_file_exts_.push_back(ext);
+        }
+      }
 
   void process();
+
  private:
   std::string spec_file_name_;
   std::vector<std::string> input_file_exts_;
@@ -68,4 +81,4 @@ class SimplePrsmStrCombine {
 typedef std::shared_ptr<SimplePrsmStrCombine> SimplePrsmStrCombinePtr;
 } /* namespace prot */
 
-#endif 
+#endif

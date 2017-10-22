@@ -35,12 +35,11 @@
 #include "prsm/simple_prsm.hpp"
 
 namespace prot {
+namespace SimplePrsmUtil {
 
-class SimplePrsmUtil {
- public:
-  static SimplePrsmPtrVec getUniqueMatches(SimplePrsmPtrVec match_ptrs);
-};
+SimplePrsmPtrVec getUniqueMatches(SimplePrsmPtrVec match_ptrs);
 
-} /* namespace prot */
+}  // namesapce SimplePrsmUtil
+}  // namespace prot
 
 #endif /* SIMPLE_PRSM_HPP_ */
