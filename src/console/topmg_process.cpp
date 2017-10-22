@@ -58,6 +58,7 @@
 #include "prsm/simple_prsm_xml_writer.hpp"
 #include "prsm/simple_prsm_util.hpp"
 #include "prsm/simple_prsm.hpp"
+#include "prsm/simple_prsm_str_combine.hpp"
 
 #include "zeroptmfilter/zero_ptm_filter_mng.hpp"
 #include "zeroptmfilter/zero_ptm_filter_processor.hpp"
@@ -132,12 +133,22 @@ int TopMGProcess(std::map<std::string, std::string> arguments) {
     OnePtmFilterProcessorPtr one_filter_processor =
         std::make_shared<OnePtmFilterProcessor>(one_ptm_filter_mng_ptr);
     one_filter_processor->process();
-    std::cout << "ASF-One PTM filtering - finished." << std::endl;
 
     input_exts.push_back("VAR1_ONE_PTM_FILTER_COMPLETE");
     input_exts.push_back("VAR1_ONE_PTM_FILTER_PREFIX");
     input_exts.push_back("VAR1_ONE_PTM_FILTER_SUFFIX");
     input_exts.push_back("VAR1_ONE_PTM_FILTER_INTERNAL");
+
+    SimplePrsmStrCombinePtr var_one_ptm_combiner
+        = std::make_shared<SimplePrsmStrCombine>(sp_file_name, 
+                                                 input_exts,
+                                                 "VAR1_ONE_PTM_FILTER", 20);
+
+    var_one_ptm_combiner->process();
+    var_one_ptm_combiner = nullptr;
+    input_exts.clear();
+    input_exts.push_back("VAR1_ONE_PTM_FILTER");
+    std::cout << "ASF-One PTM filtering - finished." << std::endl;
 
     bool use_asf_diag = false;
     if (arguments["useASFDiag"] == "true") {
@@ -171,7 +182,25 @@ int TopMGProcess(std::map<std::string, std::string> arguments) {
       }
     }
 
-    sim_prsm_ptrs = SimplePrsmUtil::getUniqueMatches(sim_prsm_ptrs);
+    std::sort(sim_prsm_ptrs.begin(), sim_prsm_ptrs.end(),
+              [] (const SimplePrsmPtr & a, const SimplePrsmPtr & b) {
+                if (a->getSpectrumId() == b->getSpectrumId()) {
+                  if (a->getSeqName() == b->getSeqName()) {
+                    return a->getScore() > b->getScore();
+                  } else {
+                    return a->getSeqName() < b->getSeqName();
+                  }
+                } else {
+                  return a->getSpectrumId() < b->getSpectrumId();
+                }
+              });
+
+    auto it = std::unique(sim_prsm_ptrs.begin(), sim_prsm_ptrs.end(),
+                          [] (const SimplePrsmPtr & a, const SimplePrsmPtr & b) {
+                            return a->getSpectrumId() == b->getSpectrumId() && a->getSeqName() == b->getSeqName();
+                          });
+
+    sim_prsm_ptrs.erase(it, sim_prsm_ptrs.end());
     std::sort(sim_prsm_ptrs.begin(), sim_prsm_ptrs.end(), SimplePrsm::cmpIdInc);
     SimplePrsmXmlWriter writer(FileUtil::basename(sp_file_name) + "." + "GRAPH_FILTER");
     writer.write(sim_prsm_ptrs);
