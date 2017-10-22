@@ -29,11 +29,13 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+#include <vector>
+
 #include "spec/theo_peak_util.hpp"
 
 namespace prot {
 
-std::vector<double> TheoPeakUtil::getTheoMassVec (const TheoPeakPtrVec &theo_peak_list) {
+std::vector<double> TheoPeakUtil::getTheoMassVec(const TheoPeakPtrVec &theo_peak_list) {
   std::vector<double> masses;
   for (size_t i = 0; i < theo_peak_list.size(); i++) {
     masses.push_back(theo_peak_list[i]->getModMass());
@@ -41,4 +43,4 @@ std::vector<double> TheoPeakUtil::getTheoMassVec (const TheoPeakPtrVec &theo_pea
   return masses;
 }
 
-}
+}  // namespace prot

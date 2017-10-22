@@ -32,15 +32,17 @@
 #ifndef PROT_SPEC_THEO_PEAK_UTIL_HPP_
 #define PROT_SPEC_THEO_PEAK_UTIL_HPP_
 
+#include <vector>
+
 #include "spec/theo_peak.hpp"
 
 namespace prot {
+namespace TheoPeakUtil {
 
-class TheoPeakUtil {
- public:
-  static std::vector<double> getTheoMassVec (const TheoPeakPtrVec &theo_peak_list);
-};
+std::vector<double> getTheoMassVec(const TheoPeakPtrVec &theo_peak_list);
 
-} /* namespace prot */
+}  // namespace TheoPeakUtil
+}  // namespace prot
 
-#endif 
+#endif
+
