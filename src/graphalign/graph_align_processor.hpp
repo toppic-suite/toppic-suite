@@ -39,7 +39,7 @@ namespace prot {
 
 class GraphAlignProcessor {
  public:
-  GraphAlignProcessor(GraphAlignMngPtr mng_ptr): mng_ptr_(mng_ptr) {};
+  explicit GraphAlignProcessor(GraphAlignMngPtr mng_ptr): mng_ptr_(mng_ptr) {}
   void process();
  private:
   GraphAlignMngPtr mng_ptr_;
@@ -47,7 +47,7 @@ class GraphAlignProcessor {
 
 typedef std::shared_ptr<GraphAlignProcessor> GraphAlignProcessorPtr;
 
-}
+}  // namespace prot
 
 #endif
 
