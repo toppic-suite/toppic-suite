@@ -46,12 +46,13 @@ typedef std::shared_ptr<Ptm> PtmPtr;
 class Ptm {
  public:
   Ptm(const std::string &name, const std::string &abbr_name,
-      double mono_mass, int unimod_id, 
-      const std::string &n_term_residue_str,
-      const std::string &c_term_residue_str, 
-      const std::string &anywhere_residue_str);
+      double mono_mass, int unimod_id):
+      name_(name),
+      abbr_name_(abbr_name),
+      mono_mass_(mono_mass),
+      unimod_id_(unimod_id) {}
 
-  Ptm(xercesc::DOMElement* element); 
+  explicit Ptm(xercesc::DOMElement* element);
 
   const std::string& getName() {return name_;}
 
@@ -62,7 +63,7 @@ class Ptm {
 
   int getUnimodId() {return unimod_id_;}
 
-  void appendAbbrNameToXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+  void appendAbbrNameToXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
   static std::string getAbbrNameFromXml(xercesc::DOMElement * element);
 
@@ -78,7 +79,7 @@ class Ptm {
  private:
   /* Full name */
   std::string name_;
-  // abbrevation name 
+  // abbrevation name
   std::string abbr_name_;
   /* monoisotopic mass */
   double mono_mass_;
@@ -88,6 +89,6 @@ class Ptm {
 
 typedef std::vector<PtmPtr> PtmPtrVec;
 
-}
+}  // namespace prot
 
 #endif

@@ -28,6 +28,10 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <cmath>
+#include <string>
+#include <algorithm>
+#include <vector>
 
 #include "base/logger.hpp"
 #include "base/mod_base.hpp"
@@ -51,7 +55,7 @@ ModPtrVec ModUtil::readModXml(const std::string &file_name) {
     int mod_num = XmlDomUtil::getChildCount(parent, element_name.c_str());
     LOG_DEBUG("mod num " << mod_num);
     for (int i = 0; i < mod_num; i++) {
-      xercesc::DOMElement* element 
+      xercesc::DOMElement* element
           = XmlDomUtil::getChildElement(parent, element_name.c_str(), i);
       ModPtr ptr = ModBase::getModPtrFromXml(element);
       mod_ptr_vec.push_back(ptr);
@@ -65,16 +69,16 @@ std::vector<ModPtrVec> ModUtil::readModTxt(const std::string &file_name) {
   std::vector<ModPtrVec> mod_ptr_vec2d(3);
   std::ifstream infile(file_name.c_str());
   if (!infile.is_open()) {
-    std::cerr << "Error: variable PTM file "  
+    std::cerr << "Error: variable PTM file "
         << file_name <<  "can not be opened" << std::endl;
-    exit (EXIT_FAILURE);
+    exit(EXIT_FAILURE);
   }
   std::string line;
-  while(std::getline(infile, line)) {
+  while (std::getline(infile, line)) {
     if (line[0] == '#') continue;
     line = StringUtil::rmComment(line);
     if (line == "") continue;
-    try { 
+    try {
       std::vector<std::string> l = StringUtil::split(line, ',');
       if (l.size() != 5) throw line;
 
@@ -82,7 +86,9 @@ std::vector<ModPtrVec> ModUtil::readModTxt(const std::string &file_name) {
 
       if (l[2] == "*") l[2] = "ARNDCEQGHILKMFPSTWYV";
 
-      PtmPtr p = std::make_shared<Ptm>(l[0], l[0], std::stod(l[1]), std::stoi(l[4]), "", "", "");
+      PtmPtr p = std::make_shared<Ptm>(l[0], l[0],
+                                       std::round(std::stod(l[1]) * 10000.0) / 10000.0,
+                                       std::stoi(l[4]));
 
       p = PtmBase::getPtmPtr(p);
 
@@ -104,11 +110,11 @@ std::vector<ModPtrVec> ModUtil::readModTxt(const std::string &file_name) {
         }
       }
     } catch (char const* e) {
-      std::cerr << "Errors in the Variable PTM file: " 
+      std::cerr << "Errors in the Variable PTM file: "
           << file_name << std::endl
           << "Please check the line" << std::endl
           << "\t" << e << std::endl;
-      exit (EXIT_FAILURE);
+      exit(EXIT_FAILURE);
     }
   }
   infile.close();
@@ -120,8 +126,7 @@ ModPtrVec ModUtil::geneFixedModList(const std::string &str) {
     ModPtrVec mod_ptr_vec;
     if (str == "C57") {
       mod_ptr_vec.push_back(ModBase::getC57ModPtr());
-    }
-    else if (str == "C58") {
+    } else if (str == "C58") {
       mod_ptr_vec.push_back(ModBase::getC58ModPtr());
     }
     return mod_ptr_vec;
@@ -139,7 +144,7 @@ ResiduePtrVec ModUtil::geneResidueListWithMod(ResiduePtrVec residue_list,
       if (fix_mod_list[j]->getOriResiduePtr() == residue_list[i]) {
         mod = true;
         result.push_back(fix_mod_list[j]->getModResiduePtr());
-        break;                 
+        break;
       }
     }
     if (!mod) {
@@ -152,14 +157,14 @@ ResiduePtrVec ModUtil::geneResidueListWithMod(ResiduePtrVec residue_list,
 std::vector<double> ModUtil::getModMassVec(const ModPtrVec & var_mod_list) {
   std::vector<int> int_mass_vec;
   for (size_t i = 0; i < var_mod_list.size(); i++) {
-    int_mass_vec.push_back(var_mod_list[i]->getShift() * 1000000);
+    int_mass_vec.push_back(std::round(var_mod_list[i]->getShift() * 10000));
   }
   std::sort(int_mass_vec.begin(), int_mass_vec.end());
   auto last = std::unique(int_mass_vec.begin(), int_mass_vec.end());
   int_mass_vec.erase(last, int_mass_vec.end());
   std::vector<double> mod_mass_vec(int_mass_vec.size());
   for (size_t i = 0; i < int_mass_vec.size(); i++) {
-    mod_mass_vec[i] = static_cast<double>(int_mass_vec[i]) / 1000000;
+    mod_mass_vec[i] = static_cast<double>(int_mass_vec[i]) / 10000;
   }
   return mod_mass_vec;
 }
