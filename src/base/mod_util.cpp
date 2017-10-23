@@ -86,9 +86,7 @@ std::vector<ModPtrVec> ModUtil::readModTxt(const std::string &file_name) {
 
       if (l[2] == "*") l[2] = "ARNDCEQGHILKMFPSTWYV";
 
-      PtmPtr p = std::make_shared<Ptm>(l[0], l[0],
-                                       std::round(std::stod(l[1]) * 10000.0) / 10000.0,
-                                       std::stoi(l[4]));
+      PtmPtr p = std::make_shared<Ptm>(l[0], l[0], std::stod(l[1]), std::stoi(l[4]));
 
       p = PtmBase::getPtmPtr(p);
 
@@ -155,17 +153,17 @@ ResiduePtrVec ModUtil::geneResidueListWithMod(ResiduePtrVec residue_list,
 }
 
 std::vector<double> ModUtil::getModMassVec(const ModPtrVec & var_mod_list) {
-  std::vector<int> int_mass_vec;
+  std::vector<double> mod_mass_vec;
   for (size_t i = 0; i < var_mod_list.size(); i++) {
-    int_mass_vec.push_back(std::round(var_mod_list[i]->getShift() * 10000));
+    mod_mass_vec.push_back(var_mod_list[i]->getShift());
   }
-  std::sort(int_mass_vec.begin(), int_mass_vec.end());
-  auto last = std::unique(int_mass_vec.begin(), int_mass_vec.end());
-  int_mass_vec.erase(last, int_mass_vec.end());
-  std::vector<double> mod_mass_vec(int_mass_vec.size());
-  for (size_t i = 0; i < int_mass_vec.size(); i++) {
-    mod_mass_vec[i] = static_cast<double>(int_mass_vec[i]) / 10000;
-  }
+  std::sort(mod_mass_vec.begin(), mod_mass_vec.end());
+  auto last = std::unique(mod_mass_vec.begin(), mod_mass_vec.end(),
+                          [] (double a, double b) {
+                            return std::abs(a - b) <= std::pow(10, -4);
+                          });
+  mod_mass_vec.erase(last, mod_mass_vec.end());
+  std::sort(mod_mass_vec.begin(), mod_mass_vec.end());
   return mod_mass_vec;
 }
 
