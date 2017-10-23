@@ -29,18 +29,17 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+#include <utility>
+#include <algorithm>
+#include <vector>
+#include <set>
+
 #include "base/logger.hpp"
-#include "graph/graph_util.hpp"
 #include "graph/spec_graph.hpp"
 
 namespace prot {
 
-SpecGraph::SpecGraph(SpectrumSetPtr spec_set_ptr) {
-  spec_set_ptr_ = spec_set_ptr;
-}
-
-
-SpecGraph::SpecGraph(SpectrumSetPtr spec_set_ptr, PrmPeakPtrVec peak_vec, 
+SpecGraph::SpecGraph(SpectrumSetPtr spec_set_ptr, PrmPeakPtrVec peak_vec,
                      MassGraphPtr graph_ptr, double convert_ratio) {
   spec_set_ptr_ = spec_set_ptr;
   peak_vec_ = peak_vec;
@@ -88,5 +87,4 @@ void SpecGraph::compSpecDistances(double convert_ratio) {
   std::copy(dist_set.begin(), dist_set.end(), std::back_inserter(dist_));
 }
 
-}
-
+}  // namespace prot

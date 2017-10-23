@@ -43,7 +43,6 @@
 #include "prsm/prsm_str_combine.hpp"
 #include "prsm/simple_prsm_reader.hpp"
 #include "prsm/simple_prsm_util.hpp"
-#include "graph/graph_util.hpp"
 #include "graph/proteo_graph_reader.hpp"
 #include "graph/spec_graph_reader.hpp"
 #include "graphalign/graph_align.hpp"

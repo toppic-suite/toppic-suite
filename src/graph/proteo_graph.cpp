@@ -36,7 +36,6 @@
 #include "base/fasta_reader.hpp"
 #include "base/residue_seq.hpp"
 #include "base/proteoform_factory.hpp"
-#include "graph/graph_util.hpp"
 #include "graph/proteo_graph.hpp"
 
 namespace prot {

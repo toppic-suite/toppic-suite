@@ -41,7 +41,6 @@
 #include "oneptmsearch/diagonal.hpp"
 #include "oneptmsearch/diagonal_header.hpp"
 #include "graph/graph.hpp"
-#include "graph/graph_util.hpp"
 #include "graphalign/graph_align_processor.hpp"
 #include "graphalign/graph_align.hpp"
 
