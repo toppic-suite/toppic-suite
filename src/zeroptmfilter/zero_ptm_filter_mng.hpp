@@ -40,10 +40,12 @@ namespace prot {
 class ZeroPtmFilterMng {
  public:
 
-  ZeroPtmFilterMng(PrsmParaPtr prsm_para_ptr, std::string output_file_ext) {
-    prsm_para_ptr_ = prsm_para_ptr;
-    output_file_ext_ = output_file_ext;
-  }
+  ZeroPtmFilterMng(PrsmParaPtr prsm_para_ptr,
+                   const std::string & output_file_ext,
+                   int thread_num):
+      prsm_para_ptr_(prsm_para_ptr),
+      output_file_ext_(output_file_ext),
+      thread_num_(thread_num) {}
 
   PrsmParaPtr prsm_para_ptr_;
 
@@ -58,6 +60,7 @@ class ZeroPtmFilterMng {
 
   std::string output_file_ext_;
 
+  int thread_num_;
 };
 
 typedef std::shared_ptr<ZeroPtmFilterMng> ZeroPtmFilterMngPtr;
