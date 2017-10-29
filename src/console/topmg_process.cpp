@@ -130,6 +130,9 @@ int TopMGProcess(std::map<std::string, std::string> arguments) {
     OnePtmFilterMngPtr one_ptm_filter_mng_ptr =
         std::make_shared<OnePtmFilterMng>(prsm_para_ptr, "VAR1_ONE_PTM_FILTER",
                                           arguments["residueModFileName"], 1);
+    one_ptm_filter_mng_ptr->inte_num_ = 5;
+    one_ptm_filter_mng_ptr->pref_suff_num_ = 5;
+    one_ptm_filter_mng_ptr->comp_num_ = 5;
     OnePtmFilterProcessorPtr one_filter_processor =
         std::make_shared<OnePtmFilterProcessor>(one_ptm_filter_mng_ptr);
     one_filter_processor->process();
@@ -169,42 +172,12 @@ int TopMGProcess(std::map<std::string, std::string> arguments) {
       input_exts.push_back("VAR1_DIAG_FILTER");
     }
 
-    SimplePrsmPtrVec sim_prsm_ptrs;
-
-    for (size_t i = 0; i < input_exts.size(); i++) {
-      std::string input_file_name
-          = FileUtil::basename(sp_file_name) + "." + input_exts[i];
-      SimplePrsmReaderPtr reader_ptr = std::make_shared<SimplePrsmReader>(input_file_name);
-      SimplePrsmPtr str_ptr = reader_ptr->readOnePrsm();
-      while (str_ptr != nullptr) {
-        sim_prsm_ptrs.push_back(str_ptr);
-        str_ptr = reader_ptr->readOnePrsm();
-      }
-    }
-
-    std::sort(sim_prsm_ptrs.begin(), sim_prsm_ptrs.end(),
-              [] (const SimplePrsmPtr & a, const SimplePrsmPtr & b) {
-                if (a->getSpectrumId() == b->getSpectrumId()) {
-                  if (a->getSeqName() == b->getSeqName()) {
-                    return a->getScore() > b->getScore();
-                  } else {
-                    return a->getSeqName() < b->getSeqName();
-                  }
-                } else {
-                  return a->getSpectrumId() < b->getSpectrumId();
-                }
-              });
-
-    auto it = std::unique(sim_prsm_ptrs.begin(), sim_prsm_ptrs.end(),
-                          [] (const SimplePrsmPtr & a, const SimplePrsmPtr & b) {
-                            return a->getSpectrumId() == b->getSpectrumId() && a->getSeqName() == b->getSeqName();
-                          });
-
-    sim_prsm_ptrs.erase(it, sim_prsm_ptrs.end());
-    std::sort(sim_prsm_ptrs.begin(), sim_prsm_ptrs.end(), SimplePrsm::cmpIdInc);
-    SimplePrsmXmlWriter writer(FileUtil::basename(sp_file_name) + "." + "GRAPH_FILTER");
-    writer.write(sim_prsm_ptrs);
-    writer.close();
+    SimplePrsmStrCombinePtr asf_filter_combiner
+        = std::make_shared<SimplePrsmStrCombine>(sp_file_name, 
+                                                 input_exts,
+                                                 "GRAPH_FILTER", 20 * input_exts.size());
+    asf_filter_combiner->process();
+    asf_filter_combiner = nullptr;
 
     std::cout << "Graph alignment started." << std::endl;
 
