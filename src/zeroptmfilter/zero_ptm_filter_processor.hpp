@@ -45,6 +45,8 @@ class ZeroPtmFilterProcessor {
 
  private:
   ZeroPtmFilterMngPtr mng_ptr_;
+
+  void processBlock(DbBlockPtr block_ptr, int total_block_num);
 };
 
 typedef std::shared_ptr<ZeroPtmFilterProcessor> ZeroPtmFilterProcessorPtr;
