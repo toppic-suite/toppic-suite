@@ -36,11 +36,9 @@
 #include <vector>
 #include <queue>
 #include <iostream>
-
-#include <boost/thread/thread.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/atomic.hpp>
-#include <boost/thread/condition_variable.hpp>
+#include "boost/thread/thread.hpp"
+#include "boost/thread/mutex.hpp"
+#include "boost/thread/condition_variable.hpp"
 
 #include "prsm/prsm_xml_writer.hpp"
 
@@ -70,10 +68,6 @@ class ThreadPool {
 
   std::shared_ptr<T> getWriter(boost::thread::id thread_id);
 
-  boost::atomic<long> cnt{0};
-
-  boost::mutex coutMutex;
-
  private:
   // Thread pool storage.
   std::vector<ThreadPtr> threadPool;
@@ -102,6 +96,7 @@ class ThreadPool {
   //boost::mutex mtx;
 
   //int index = 0;
+
 };
 
 //typedef std::shared_ptr<ThreadPool> ThreadPoolPtr;
