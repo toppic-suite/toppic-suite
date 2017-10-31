@@ -28,17 +28,18 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <utility>
+#include <string>
 
 #include "threadpool.hpp"
 
 namespace prot {
 
 template <typename T>
-ThreadPool<T>::ThreadPool(int threads, std::string file_name) : 
+ThreadPool<T>::ThreadPool(int threads, std::string file_name) :
     terminate(false), stopped(false) {
-
-      for(int i = 0; i < threads; i++) {
-        ThreadPtr thread_ptr(new boost::thread(&ThreadPool::Invoke, this));
+      for (int i = 0; i < threads; i++) {
+        ThreadPtr thread_ptr = std::make_shared<boost::thread>(&ThreadPool::Invoke, this);
         threadPool.emplace_back(thread_ptr);
         std::string thread_file_name = file_name + "_" + std::to_string(i);
         std::shared_ptr<T> writer_ptr = std::make_shared<T>(thread_file_name);
@@ -64,14 +65,8 @@ void ThreadPool<T>::Enqueue(std::function<void()> f) {
 
 template <typename T>
 void ThreadPool<T>::Invoke() {
-  /*
-     mtx.lock();
-     index ++;
-     std::cout << "Thread started index " << index << std::endl; 
-     mtx.unlock();
-     */
   std::function<void()> task;
-  while(true) {
+  while (true) {
     // Scope based locking.
     {
       // Put unique lock on task mutex.
@@ -112,7 +107,7 @@ void ThreadPool<T>::ShutDown() {
   condition.notify_all();
 
   // Join all threads.
-  for(ThreadPtr thread_ptr : threadPool){
+  for (ThreadPtr thread_ptr : threadPool) {
     if (thread_ptr->joinable()) thread_ptr->join();
   }
 
@@ -123,7 +118,7 @@ void ThreadPool<T>::ShutDown() {
   stopped = true;
 
   for (size_t i = 0; i < writerPool.size(); i++) {
-    std::shared_ptr<T> writer_ptr = writerPool[i].second; 
+    std::shared_ptr<T> writer_ptr = writerPool[i].second;
     writer_ptr->close();
   }
 }
@@ -135,16 +130,16 @@ std::shared_ptr<T> ThreadPool<T>::getWriter(boost::thread::id thread_id) {
       return writerPool[i].second;
     }
   }
-  std::cout << "Thread Error: no writer found" << std::endl;
+  std::cerr << "Thread Error: no writer found" << std::endl;
   return nullptr;
 }
 
 // Destructor.
 template <typename T>
 ThreadPool<T>::~ThreadPool() {
-  if (!stopped){
+  if (!stopped) {
     ShutDown();
   }
 }
 
-}
+}  // namespace prot

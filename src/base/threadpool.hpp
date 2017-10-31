@@ -36,9 +36,12 @@
 #include <vector>
 #include <queue>
 #include <iostream>
-#include "boost/thread/thread.hpp"
-#include "boost/thread/mutex.hpp"
-#include "boost/thread/condition_variable.hpp"
+#include <utility>
+#include <string>
+
+#include <boost/thread/thread.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/condition_variable.hpp>
 
 #include "prsm/prsm_xml_writer.hpp"
 
@@ -49,7 +52,6 @@ typedef std::shared_ptr<boost::thread> ThreadPtr;
 template <typename T>
 class ThreadPool {
  public:
-
   // Constructor.
   ThreadPool(int threads, std::string output_file_name);
 
@@ -92,16 +94,9 @@ class ThreadPool {
 
   // Function that will be invoked by our threads.
   void Invoke();
-
-  //boost::mutex mtx;
-
-  //int index = 0;
-
 };
 
-//typedef std::shared_ptr<ThreadPool> ThreadPoolPtr;
-
-}
+}  // namespace prot
 
 #include "threadpool_impl.hpp"
 

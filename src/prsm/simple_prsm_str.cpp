@@ -28,6 +28,8 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <string>
+#include <vector>
 
 #include "base/logger.hpp"
 #include "prsm/prsm_util.hpp"
@@ -37,13 +39,14 @@ namespace prot {
 
 SimplePrsmStr::SimplePrsmStr(const std::vector<std::string> &str_vec) {
   str_vec_ = str_vec;
-  std::string line = PrsmUtil::getXmlLine(str_vec_,"<spectrum_id>"); 
+  std::string line = PrsmUtil::getXmlLine(str_vec_, "<spectrum_id>");
   spectrum_id_ = std::stoi(PrsmUtil::getValueStr(line));
-  line = PrsmUtil::getXmlLine(str_vec_, "<score>"); 
+  line = PrsmUtil::getXmlLine(str_vec_, "<score>");
   score_ = std::stod(PrsmUtil::getValueStr(line));
-  //LOG_DEBUG("spectrum id " << spectrum_id_ << " score " << score_);
-  line = PrsmUtil::getXmlLine(str_vec_, "sequence_name");
+  line = PrsmUtil::getXmlLine(str_vec_, "<sequence_name>");
   seq_name_ = PrsmUtil::getValueStr(line);
+  line = PrsmUtil::getXmlLine(str_vec_, "<sequence_desc>");
+  seq_desc_ = PrsmUtil::getValueStr(line);
 }
 
-}
+}  // namespace prot

@@ -44,13 +44,15 @@ typedef std::shared_ptr<SimplePrsmStr> SimplePrsmStrPtr;
 
 class SimplePrsmStr {
  public:
-  SimplePrsmStr(const std::vector<std::string> &str_vec);
+  explicit SimplePrsmStr(const std::vector<std::string> &str_vec);
 
   std::vector<std::string> getStrVec() {return str_vec_;}
 
   int getSpectrumId() {return spectrum_id_;}
 
   std::string getSeqName() {return seq_name_;}
+
+  std::string getSeqDesc() {return seq_desc_;}
 
   double getScore() {return score_;}
 
@@ -66,6 +68,8 @@ class SimplePrsmStr {
   double score_;
 
   std::string seq_name_;
+
+  std::string seq_desc_;
 };
 
 typedef std::vector<SimplePrsmStrPtr> SimplePrsmStrPtrVec;
