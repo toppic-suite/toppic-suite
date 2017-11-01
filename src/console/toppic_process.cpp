@@ -129,7 +129,7 @@ int TopPICProgress(std::map<std::string, std::string> arguments) {
 
     std::cout << "Zero PTM filtering - started." << std::endl;
     ZeroPtmFilterMngPtr zero_filter_mng_ptr
-        = std::make_shared<ZeroPtmFilterMng>(prsm_para_ptr, "ZERO_FILTER");
+        = std::make_shared<ZeroPtmFilterMng>(prsm_para_ptr, thread_num, "ZERO_FILTER");
     ZeroPtmFilterProcessorPtr zero_filter_processor
         = std::make_shared<ZeroPtmFilterProcessor>(zero_filter_mng_ptr);
     zero_filter_processor->process();

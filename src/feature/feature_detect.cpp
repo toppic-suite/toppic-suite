@@ -36,10 +36,10 @@
 #include "base/logger.hpp"
 #include "base/file_util.hpp"
 #include "spec/msalign_reader.hpp"
+#include "spec/msalign_writer.hpp"
 #include "feature/feature.hpp"
 #include "feature/feature_detect_mng.hpp"
 #include "feature/feature_detect.hpp"
-#include "feature/msalign_writer.hpp"
 #include "feature/deconv_process.hpp"
 
 namespace prot {

@@ -51,8 +51,6 @@
 
 namespace prot {
 
-typedef std::shared_ptr<ThreadPool<PrsmXmlWriter> > PrsmXmlThreadPoolPtr;
-
 std::function<void()> geneTask(FastaIndexReaderPtr reader_ptr,
                                GraphAlignMngPtr mng_ptr,
                                ModPtrVec var_mod_ptr_vec,
@@ -213,9 +211,6 @@ void GraphAlignProcessor::process() {
     simple_prsm_writer_vec[i]->close();
   }
 
-  std::string output_file_name
-      = FileUtil::basename(sp_file_name) + "." + mng_ptr_->output_file_ext_;
-
   FastaIndexReaderPtr reader_ptr = std::make_shared<FastaIndexReader>(db_file_name);
 
   std::vector<ThreadPtr> thread_vec;
@@ -230,7 +225,7 @@ void GraphAlignProcessor::process() {
   mg_align_task();
 
   for (size_t i = 0; i < thread_vec.size(); i++) {
-    thread_vec[i]->join();
+    if (thread_vec[i]->joinable()) thread_vec[i]->join();
   }
 
   std::cout << std::flush << "Mass graph - processing " << spectrum_num
