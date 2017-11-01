@@ -36,18 +36,13 @@
 
 #include "spec/ms_header.hpp"
 #include "spec/deconv_ms.hpp"
-#include "feature/match_env.hpp"
 
 namespace prot {
+namespace MsalignWriter {
 
-class MsalignWriter {
- public:
-  static void write(std::ofstream &file, MatchEnvPtrVec &envs, MsHeaderPtr header_ptr);
+void write(std::ofstream &file, DeconvMsPtr ms_ptr);
 
-  static void write(std::ofstream &file, DeconvMsPtr ms_ptr);
-
-  static void write(std::ofstream &file, DeconvMsPtr ms_ptr, int mslevel);
-};
-
+void write(std::ofstream &file, DeconvMsPtr ms_ptr, int mslevel);
+}  // namespace MsalignWriter
 }  // namespace prot
 #endif

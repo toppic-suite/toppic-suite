@@ -35,6 +35,7 @@
 #include <memory>
 #include <vector>
 
+#include "spec/ms_header.hpp"
 #include "feature/feature_mng.hpp" 
 #include "feature/envelope.hpp" 
 #include "feature/real_env.hpp" 
@@ -99,6 +100,11 @@ class MatchEnv {
 typedef std::vector<MatchEnvPtr> MatchEnvPtrVec;
 typedef std::vector<MatchEnvPtrVec> MatchEnvPtr2D;
 
-}
+namespace MsalignWriter {
+
+void write(std::ofstream &file, MatchEnvPtrVec &envs, MsHeaderPtr header_ptr);
+
+}  // namespace MsalignWriter
+}  // namespace prot
 
 #endif
