@@ -1,40 +1,17 @@
-// Copyright (c) 2014 - 2017, The Trustees of Indiana University.
-// All rights reserved.
+//Copyright (c) 2014 - 2017, The Trustees of Indiana University.
 //
-// Redistribution and use in source and binary forms, with or without modification,
-// are permitted provided that the following conditions are met:
+//Licensed under the Apache License, Version 2.0 (the "License");
+//you may not use this file except in compliance with the License.
+//You may obtain a copy of the License at
 //
-// 1. Redistributions of source code must retain the above copyright notice, this
-// list of conditions and the following disclaimer.
+//    http://www.apache.org/licenses/LICENSE-2.0
 //
-// 2. Redistributions in binary form must reproduce the above copyright notice,
-// this list of conditions and the following disclaimer in the documentation and/or
-// other materials provided with the distribution.
-//
-// Indiana University provides no reassurances that the source code provided does
-// not infringe the patent or any other intellectual property rights of any other
-// entity. Indiana University disclaims any liability to any recipient for claims
-// brought by any other entity based on infringement of intellectual property
-// rights or otherwise.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-// ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
-// ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-// ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//Unless required by applicable law or agreed to in writing, software
+//distributed under the License is distributed on an "AS IS" BASIS,
+//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//See the License for the specific language governing permissions and
+//limitations under the License.
 
-
-/*
- * simple_table_writer.cpp
- *
- *  Created on: Aug 11, 2014
- *      Author: qkou
- */
 
 #include <iomanip>
 
@@ -60,12 +37,12 @@ void SimplePrsmTableWriter::write() {
   file_.open(output_file_name.c_str());
   //write title
   file_ << "Spectrum_ID" << "\t"
-        << "Scan(s)" << "\t"
-        << "Precursor_ID" << "\t"
-        << "Precursor_mass" << "\t"
-        << "Score" << "\t"
-        << "Protein_name"
-        << std::endl;
+      << "Scan(s)" << "\t"
+      << "Precursor_ID" << "\t"
+      << "Precursor_mass" << "\t"
+      << "Score" << "\t"
+      << "Protein_name"
+      << std::endl;
 
   std::string input_file_name = base_name + "." + input_file_ext_;
   LOG_DEBUG("input file_name " << input_file_name);
@@ -75,12 +52,12 @@ void SimplePrsmTableWriter::write() {
   file_ << std::setprecision(10);
   while (prsm_ptr != nullptr) {
     file_ << prsm_ptr->getSpectrumId() << "\t"
-          << prsm_ptr->getSpectrumScan() << "\t"
-          << prsm_ptr->getPrecursorId() << "\t"
-          << prsm_ptr->getPrecMass() << "\t"
-          << prsm_ptr->getScore() << "\t"
-          << prsm_ptr->getSeqName()
-          << std::endl;
+        << prsm_ptr->getSpectrumScan() << "\t"
+        << prsm_ptr->getPrecursorId() << "\t"
+        << prsm_ptr->getPrecMass() << "\t"
+        << prsm_ptr->getScore() << "\t"
+        << prsm_ptr->getSeqName()
+        << std::endl;
     prsm_ptr = reader.readOnePrsm();
   }
 
