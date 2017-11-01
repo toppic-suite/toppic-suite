@@ -271,7 +271,7 @@ int TopPICProgress(std::map<std::string, std::string> arguments) {
                                        arguments["local_threshold"],
                                        arguments["residueModFileName"],
                                        max_ptm_mass,
-                                       "CUTOFF_RESULT", "LOCAL_RESULT");
+                                       suffix, "LOCAL_RESULT");
       LocalProcessorPtr local_ptr = std::make_shared<LocalProcessor>(local_mng);
       local_ptr->process();
       local_ptr = nullptr;
