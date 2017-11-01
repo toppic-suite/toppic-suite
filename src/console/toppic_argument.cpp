@@ -229,7 +229,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("filtering-result-number,o", po::value<std::string>(&filtering_result_num), "Filtering result number. Default value: 20.")
         ("keep-temp-files,k", "Keep temporary files.")
         ("generating-function,g", "")
-        ("local-threshold,s", po::value<std::string> (&local_threshold), "")
+        ("miscore-threshold,s", po::value<std::string> (&local_threshold), "")
         ("full-binary-path,b", "Full binary path.")
         ("num-combined-spectra,r", po::value<std::string> (&group_num), "")
         ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "")
