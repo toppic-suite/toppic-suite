@@ -26,7 +26,7 @@ After installing, please add `C:\msys64\mingw64\bin` into your PATH environmenta
 
 [Xerces-C++](https://xerces.apache.org/xerces-c/) is used to process XML files.
 
-**We use Windows CMD to build the Xerces-c.**
+**We use Windows CMD to build Xerces-c.**
 
 ```sh
 cd xerces-c-3.2.0
@@ -44,7 +44,7 @@ mingw32-make install
 
 [Xalan-C++](https://xml.apache.org/xalan-c/) is used for transforming XML documents into HTML.
 
-**We use MSYS2 shell to build the Xerces-c.**
+**We use MSYS2 shell to build Xalan-c.**
 
 ```sh
 cd xalan-c-1.11/c
@@ -60,7 +60,7 @@ mingw32-make
 
 [ProteoWizard](http://proteowizard.sourceforge.net) is used to handle different file formats in proteomics data analysis.
 
-**We use Windows CMD to build the ProteoWizard.**
+**We use Windows CMD to build ProteoWizard.**
 
 Since we only use a small part of the ProteoWizard library, we use our own Makefile to build a patched version. Please see the [Makefile.pwiz](Makefile.pwiz) and [pwiz.patch](pwiz.patch) in this folder.
 
