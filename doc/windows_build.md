@@ -60,13 +60,13 @@ mingw32-make
 
 [ProteoWizard](http://proteowizard.sourceforge.net) is used to handle different file formats in proteomics data analysis.
 
-**We use Windows CMD to build the Xerces-c.**
+**We use Windows CMD to build the ProteoWizard.**
 
 Since we only use a small part of the ProteoWizard library, we use our own Makefile to build a patched version. Please see the [Makefile.pwiz](Makefile.pwiz) and [pwiz.patch](pwiz.patch) in this folder.
 
 # TopPIC suite
 
-**We use Windows CMD to build the Xerces-c.**
+**We use Windows CMD to build TopPIC suite.**
 
 ```sh
 git clone https://github.com/toppic-suite/toppic-suite.git
