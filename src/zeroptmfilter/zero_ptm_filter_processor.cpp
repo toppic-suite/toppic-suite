@@ -147,7 +147,6 @@ std::function<void()> geneTask(const ProteoformPtrVec & raw_forms,
     pref_writer.close();
     suff_writer.close();
     internal_writer.close();
-
   };
 }
 
@@ -167,8 +166,6 @@ void ZeroPtmFilterProcessor::processBlock(DbBlockPtr block_ptr) {
     ThreadPtr thread_ptr = std::make_shared<boost::thread>(geneTask(raw_forms, block_str, mng_ptr_, i));
     thread_vec.push_back(thread_ptr);
   }
-
-  std::cout << std::flush << "Zero PTM filtering - processing 1 of " << spectrum_num << " spectra.\r";
 
   std::function<void()> task = geneTask(raw_forms, block_str, mng_ptr_, 0);
   task();

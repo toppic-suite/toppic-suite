@@ -136,7 +136,7 @@ int TopPICProgress(std::map<std::string, std::string> arguments) {
     if (ptm_num >= 1) {
       std::cout << "One PTM filtering - started." << std::endl;
       OnePtmFilterMngPtr one_ptm_filter_mng_ptr
-          = std::make_shared<OnePtmFilterMng>(prsm_para_ptr, "ONE_PTM_FILTER");
+          = std::make_shared<OnePtmFilterMng>(prsm_para_ptr, "ONE_PTM_FILTER", thread_num);
       OnePtmFilterProcessorPtr one_filter_processor
           = std::make_shared<OnePtmFilterProcessor>(one_ptm_filter_mng_ptr);
       one_filter_processor->process();

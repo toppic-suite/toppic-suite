@@ -32,8 +32,7 @@ class OnePtmFilterProcessor {
  private:
   OnePtmFilterMngPtr mng_ptr_;
 
-  void processBlock(DbBlockPtr block_ptr, int total_block_num,
-                    const std::vector<double> & mod_mass_list);
+  void processBlock(DbBlockPtr block_ptr, const std::vector<double> & mod_mass_list);
 };
 
 typedef std::shared_ptr<OnePtmFilterProcessor> OnePtmFilterProcessorPtr;

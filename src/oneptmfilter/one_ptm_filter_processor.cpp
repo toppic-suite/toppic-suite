@@ -14,6 +14,7 @@
 
 #include <string>
 #include <vector>
+#include <boost/thread/thread.hpp>
 
 #include "base/proteoform.hpp"
 #include "base/proteoform_factory.hpp"
@@ -29,7 +30,9 @@
 namespace prot {
 
 void OnePtmFilterProcessor::process() {
-  std::string db_file_name = mng_ptr_->prsm_para_ptr_->getSearchDbFileName();
+  PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
+  std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
+  std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
   DbBlockPtrVec db_block_ptr_vec = DbBlock::readDbBlockIndex(db_file_name);
 
   std::vector<double> mod_mass_list;
@@ -37,16 +40,48 @@ void OnePtmFilterProcessor::process() {
     mod_mass_list = ModUtil::getModMassVec(ModUtil::readModTxt(mng_ptr_->residueModFileName_)[2]);
   }
 
+  int group_spec_num = prsm_para_ptr->getGroupSpecNum();
+  MsAlignReader ms_reader(prsm_para_ptr->getSpectrumFileName(),
+                          group_spec_num,
+                          prsm_para_ptr->getSpParaPtr()->getActivationPtr(),
+                          prsm_para_ptr->getSpParaPtr()->getSkipList());
+  int thread_num = mng_ptr_->thread_num_;
+  std::vector<std::ofstream *> output_vec;
+  for (int i = 0; i < thread_num; i++) {
+    output_vec.push_back(new std::ofstream(sp_file_name + "_" + std::to_string(i)));
+  }
+
+  std::vector<std::string> ms_lines = ms_reader.readOneSpectrum();
+  int cnt = 0;
+  while (ms_lines.size() > 0) {
+    cnt = cnt % thread_num;
+    for (int i = 0; i < group_spec_num; i++) {
+      (*output_vec[cnt]) << std::endl;
+      for (size_t k = 0; k < ms_lines.size(); k++) {
+        (*output_vec[cnt]) << ms_lines[k] << std::endl;
+      }
+      (*output_vec[cnt]) << std::endl;
+      ms_lines = ms_reader.readOneSpectrum();
+    }
+    cnt++;
+  }
+
+  ms_reader.close();
+
+  for (size_t i = 0; i < output_vec.size(); i++) {
+    output_vec[i]->close();
+  }
+
+
   for (size_t i = 0; i < db_block_ptr_vec.size(); i++) {
     std::cout << "One PTM filtering - block " << (i + 1) << " out of "
         << db_block_ptr_vec.size() << " started." << std::endl;
-    processBlock(db_block_ptr_vec[i], db_block_ptr_vec.size(), mod_mass_list);
+    processBlock(db_block_ptr_vec[i], mod_mass_list);
     std::cout << "One PTM filtering - block " << (i + 1) << " finished. " << std::endl;
   }
 
   std::cout << "One PTM filtering - combining blocks started." << std::endl;
 
-  std::string sp_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
   int block_num = db_block_ptr_vec.size();
 
   LOG_DEBUG("comp number " << mng_ptr_->comp_num_);
@@ -73,71 +108,133 @@ void OnePtmFilterProcessor::process() {
   std::cout << "One PTM filtering - combining blocks finished." << std::endl;
 }
 
-void OnePtmFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num,
-                                         const std::vector<double> & mod_mass_list) {
+std::function<void()> geneTask(const ProteoformPtrVec & raw_forms,
+                               const std::string & block_str,
+                               OnePtmFilterMngPtr mng_ptr, int idx,
+                               const std::vector<double> & mod_mass_list) {
+  return[raw_forms, block_str, mng_ptr, idx, mod_mass_list] () {
+    MassOnePtmFilterPtr filter_ptr = std::make_shared<MassOnePtmFilter>(raw_forms, mng_ptr);
+    int group_spec_num = mng_ptr->prsm_para_ptr_->getGroupSpecNum();
+    PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
+    SpParaPtr sp_para_ptr
+        = std::make_shared<SpPara>(prsm_para_ptr->getSpParaPtr()->getMinPeakNum(),
+                                   prsm_para_ptr->getSpParaPtr()->getMinMass(),
+                                   prsm_para_ptr->getSpParaPtr()->getExtendMinMass(),
+                                   prsm_para_ptr->getSpParaPtr()->getExtendOffsets(),
+                                   prsm_para_ptr->getSpParaPtr()->getPeakTolerancePtr(),
+                                   prsm_para_ptr->getSpParaPtr()->getActivationPtr(),
+                                   prsm_para_ptr->getSpParaPtr()->getSkipList());
+    MsAlignReader reader(prsm_para_ptr->getSpectrumFileName() + "_" + std::to_string(idx),
+                         group_spec_num,
+                         prsm_para_ptr->getSpParaPtr()->getActivationPtr(),
+                         prsm_para_ptr->getSpParaPtr()->getSkipList());
+    std::string output_file_name = FileUtil::basename(prsm_para_ptr->getSpectrumFileName())
+        + "." + mng_ptr->output_file_ext_;
+
+    SimplePrsmXmlWriter comp_writer(output_file_name + "_COMPLETE_" + block_str + "_" + std::to_string(idx));
+    SimplePrsmXmlWriter pref_writer(output_file_name + "_PREFIX_" + block_str + "_" + std::to_string(idx));
+    SimplePrsmXmlWriter suff_writer(output_file_name + "_SUFFIX_" + block_str + "_" + std::to_string(idx));
+    SimplePrsmXmlWriter internal_writer(output_file_name + "_INTERNAL_" + block_str + "_" + std::to_string(idx));
+
+    std::vector<SpectrumSetPtr> spec_set_vec = reader.getNextSpectrumSet(sp_para_ptr);
+    int spectrum_num = MsAlignUtil::getSpNum(prsm_para_ptr->getSpectrumFileName());
+    int cnt = 0;
+    while (spec_set_vec[0] != nullptr) {
+      cnt += group_spec_num * mng_ptr->thread_num_; 
+      if (spec_set_vec[0]->isValid()) {
+        if (mng_ptr->var_num_ == 0) {
+          PrmMsPtrVec prm_ms_ptr_vec = spec_set_vec[0]->getMsTwoPtrVec();
+          PrmMsPtrVec srm_ms_ptr_vec = spec_set_vec[0]->getSuffixMsTwoPtrVec();
+          filter_ptr->computeBestMatch(prm_ms_ptr_vec, srm_ms_ptr_vec);
+          comp_writer.write(filter_ptr->getCompMatchPtrs());
+          pref_writer.write(filter_ptr->getPrefMatchPtrs());
+          suff_writer.write(filter_ptr->getSuffMatchPtrs());
+          internal_writer.write(filter_ptr->getInternalMatchPtrs());
+        } else {
+          for (size_t i = 0; i < mod_mass_list.size(); i++) {
+            for (size_t k1 = 0; k1 < sp_para_ptr->mod_mass_.size(); k1++) {
+              std::fill(sp_para_ptr->mod_mass_.begin(), sp_para_ptr->mod_mass_.end(), 0.0);
+              sp_para_ptr->mod_mass_[k1] += mod_mass_list[i];
+              PrmMsPtrVec prm_ms_ptr_vec = spec_set_vec[0]->getMsTwoPtrVec(sp_para_ptr);
+              PrmMsPtrVec srm_ms_ptr_vec = spec_set_vec[0]->getSuffixMsTwoPtrVec(sp_para_ptr);
+              filter_ptr->computeBestMatch(prm_ms_ptr_vec, srm_ms_ptr_vec);
+              comp_writer.write(filter_ptr->getCompMatchPtrs());
+              pref_writer.write(filter_ptr->getPrefMatchPtrs());
+              suff_writer.write(filter_ptr->getSuffMatchPtrs());
+              internal_writer.write(filter_ptr->getInternalMatchPtrs());
+            }
+          }
+        }
+      }
+      if (idx == 0) {
+        std::cout << std::flush << "One PTM filtering - processing " << cnt
+            << " of " << spectrum_num << " spectra.\r";
+      }
+      spec_set_vec = reader.getNextSpectrumSet(sp_para_ptr);
+    }
+    reader.close();
+    comp_writer.close();
+    pref_writer.close();
+    suff_writer.close();
+    internal_writer.close();
+  };
+}
+
+
+void OnePtmFilterProcessor::processBlock(DbBlockPtr block_ptr, const std::vector<double> & mod_mass_list) {
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
+  std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
+  int spectrum_num = MsAlignUtil::getSpNum(prsm_para_ptr->getSpectrumFileName());
   std::string db_block_file_name = prsm_para_ptr->getSearchDbFileName()
       + "_" + std::to_string(block_ptr->getBlockIdx());
   ProteoformPtrVec raw_forms
       = ProteoformFactory::readFastaToProteoformPtrVec(db_block_file_name,
                                                        prsm_para_ptr->getFixModPtrVec());
-  MassOnePtmFilterPtr filter_ptr = std::make_shared<MassOnePtmFilter>(raw_forms, mng_ptr_);
+  std::string block_str = std::to_string(block_ptr->getBlockIdx());      
 
-  int group_spec_num = mng_ptr_->prsm_para_ptr_->getGroupSpecNum();
-  SpParaPtr sp_para_ptr =  mng_ptr_->prsm_para_ptr_->getSpParaPtr();
-  sp_para_ptr->prec_error_ = 0;
-  MsAlignReader reader(prsm_para_ptr->getSpectrumFileName(), group_spec_num,
-                       sp_para_ptr->getActivationPtr(),
-                       sp_para_ptr->getSkipList());
-  std::string output_file_name = FileUtil::basename(prsm_para_ptr->getSpectrumFileName())
-      + "." + mng_ptr_->output_file_ext_;
-  std::string block_str = std::to_string(block_ptr->getBlockIdx());
-
-  SimplePrsmXmlWriter comp_writer(output_file_name + "_COMPLETE_" + block_str);
-  SimplePrsmXmlWriter pref_writer(output_file_name + "_PREFIX_" + block_str);
-  SimplePrsmXmlWriter suff_writer(output_file_name + "_SUFFIX_" + block_str);
-  SimplePrsmXmlWriter internal_writer(output_file_name + "_INTERNAL_" + block_str);
-
-  SpectrumSetPtr spec_set_ptr;
-  int spectrum_num = MsAlignUtil::getSpNum(prsm_para_ptr->getSpectrumFileName());
-  int cnt = 0;
-  while ((spec_set_ptr = reader.getNextSpectrumSet(sp_para_ptr)[0]) != nullptr) {
-    cnt+= group_spec_num;
-    if (spec_set_ptr->isValid()) {
-      if (mng_ptr_->var_num_ == 0) {
-        PrmMsPtrVec prm_ms_ptr_vec = spec_set_ptr->getMsTwoPtrVec();
-        PrmMsPtrVec srm_ms_ptr_vec = spec_set_ptr->getSuffixMsTwoPtrVec();
-        filter_ptr->computeBestMatch(prm_ms_ptr_vec, srm_ms_ptr_vec);
-        comp_writer.write(filter_ptr->getCompMatchPtrs());
-        pref_writer.write(filter_ptr->getPrefMatchPtrs());
-        suff_writer.write(filter_ptr->getSuffMatchPtrs());
-        internal_writer.write(filter_ptr->getInternalMatchPtrs());
-      } else {
-        for (size_t i = 0; i < mod_mass_list.size(); i++) {
-          for (size_t k1 = 0; k1 < sp_para_ptr->mod_mass_.size(); k1++) {
-            std::fill(sp_para_ptr->mod_mass_.begin(), sp_para_ptr->mod_mass_.end(), 0.0);
-            sp_para_ptr->mod_mass_[k1] += mod_mass_list[i];
-            PrmMsPtrVec prm_ms_ptr_vec = spec_set_ptr->getMsTwoPtrVec(sp_para_ptr);
-            PrmMsPtrVec srm_ms_ptr_vec = spec_set_ptr->getSuffixMsTwoPtrVec(sp_para_ptr);
-            filter_ptr->computeBestMatch(prm_ms_ptr_vec, srm_ms_ptr_vec);
-            comp_writer.write(filter_ptr->getCompMatchPtrs());
-            pref_writer.write(filter_ptr->getPrefMatchPtrs());
-            suff_writer.write(filter_ptr->getSuffMatchPtrs());
-            internal_writer.write(filter_ptr->getInternalMatchPtrs());
-          }
-        }
-      }
-    }
-    std::cout << std::flush << "One PTM filtering - processing " << cnt
-        << " of " << spectrum_num << " spectra.\r";
+  std::vector<std::shared_ptr<boost::thread> > thread_vec;
+  for (int i = 1; i < mng_ptr_->thread_num_; i++) {
+    std::shared_ptr<boost::thread> thread_ptr = std::make_shared<boost::thread>(geneTask(raw_forms, block_str, mng_ptr_, i, mod_mass_list));
+    thread_vec.push_back(thread_ptr);
   }
-  std::cout << std::endl;
-  reader.close();
-  comp_writer.close();
-  pref_writer.close();
-  suff_writer.close();
-  internal_writer.close();
-  LOG_DEBUG("block end");
+
+  std::function<void()> task = geneTask(raw_forms, block_str, mng_ptr_, 0, mod_mass_list);
+  task();
+
+  for (size_t i = 0; i < thread_vec.size(); i++) {
+    if (thread_vec[i]->joinable()) thread_vec[i]->join();
+  }
+
+  std::cout << std::flush << "One PTM filtering - processing " << spectrum_num
+      << " of " << spectrum_num << " spectra." << std::endl;
+
+  SimplePrsmStrCombine comp_combine(sp_file_name,
+                                    mng_ptr_->output_file_ext_ + "_COMPLETE_" + block_str,
+                                    mng_ptr_->thread_num_,
+                                    mng_ptr_->output_file_ext_ + "_COMPLETE_" + block_str,
+                                    mng_ptr_->comp_num_);
+  comp_combine.process();
+
+  SimplePrsmStrCombine pref_combine(sp_file_name,
+                                    mng_ptr_->output_file_ext_ + "_PREFIX_" + block_str,
+                                    mng_ptr_->thread_num_,
+                                    mng_ptr_->output_file_ext_ + "_PREFIX_" + block_str,
+                                    mng_ptr_->pref_suff_num_);
+  pref_combine.process();
+
+  SimplePrsmStrCombine suff_combine(sp_file_name,
+                                    mng_ptr_->output_file_ext_ + "_SUFFIX_" + block_str,
+                                    mng_ptr_->thread_num_,
+                                    mng_ptr_->output_file_ext_ + "_SUFFIX_" + block_str,
+                                    mng_ptr_->pref_suff_num_);
+  suff_combine.process();
+
+  SimplePrsmStrCombine internal_combine(sp_file_name,
+                                        mng_ptr_->output_file_ext_ + "_INTERNAL_" + block_str,
+                                        mng_ptr_->thread_num_,
+                                        mng_ptr_->output_file_ext_ + "_INTERNAL_" + block_str,
+                                        mng_ptr_->inte_num_);
+  internal_combine.process();
 }
 
 } /* namespace prot */
