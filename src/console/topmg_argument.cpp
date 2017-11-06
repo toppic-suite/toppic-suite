@@ -164,10 +164,10 @@ bool Argument::parse(int argc, char* argv[]) {
         ("cutoff-proteoform-value,V", po::value<std::string> (&cutoff_proteoform_value), "<a positive number>. Proteoform-level cutoff value for filtering identified proteoform spectrum-matches. Default value: 0.01.")
         ("generating-function,g", "Use the generating function approach to compute p-values and E-values.")
         ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "<a common modification file>. Specify a text file containing the information of common PTMs for characterization of PTMs in proteoform spectrum-matches.")
-        ("thread-number,u", po::value<std::string> (&thread_number), "<positive number>. Number of threads used in the computation. Default value: 1.")
+        ("thread-number,u", po::value<std::string> (&thread_number), "<a positive number>. Number of threads used in the computation. Default value: 1.")
         ("use-topfd-feature,x", po::value<std::string>(&feature_file_name) , "<a TopFD feature file with its path>. TopFD features for proteoform identification.")
         ("skip-list,l", po::value<std::string>(&skip_list) , "<a text file with its path>. The scans in this file will be skipped.")
-        ("proteo-graph-dis,j", po::value<std::string> (&proteo_graph_dis), "<positive number>. Gap in constructing proteoform graph. Default value: 40.")        
+        ("proteo-graph-dis,j", po::value<std::string> (&proteo_graph_dis), "<a positive number>. Gap in constructing proteoform graph. Default value: 40.")        
         ("var-ptm-in-gap,G", po::value<std::string>(&var_ptm_in_gap) , "<a positive number>. Maximum number of variable PTMs in a proteform graph gap. Default value: 5.")
         ("use-asf-diagonal,D", "Use the ASF-DIAGONAL method for protein filtering.")
         ("var-ptm,P", po::value<std::string>(&var_ptm_num) , "<a positive number>. Maximum number of variable PTMs. Default value: 10.");
