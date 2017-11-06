@@ -155,6 +155,7 @@ void clean_prefix(const fs::path & sp, const std::string & prefix) {
   for (fs::directory_iterator dir_iter(absolute(sp).parent_path());
        dir_iter != end_iter ; ++dir_iter) {
     std::string filename = dir_iter->path().string();
+	std::replace(filename.begin(), filename.end(), '\\', '/');
     if (filename.compare(0, prefix.length(), prefix) == 0) {
       fs::remove(dir_iter->path());
     }
@@ -165,7 +166,9 @@ void FileUtil::cleanDir(const std::string &fa_path, const std::string & sp_path)
   fs::path fa(fa_path);
   fs::path sp(sp_path);
   std::string fa_base = absolute(fa).string();
+  std::replace(fa_base.begin(), fa_base.end(), '\\', '/');
   std::string sp_base = basename(absolute(sp).string());
+  std::replace(sp_base.begin(), sp_base.end(), '\\', '/');
 
   clean_prefix(fa, fa_base + "_");
   delFile(absolute(sp).string() + "_index");
