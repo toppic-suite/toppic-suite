@@ -155,9 +155,10 @@ void clean_prefix(const fs::path & sp, const std::string & prefix) {
   for (fs::directory_iterator dir_iter(absolute(sp).parent_path());
        dir_iter != end_iter ; ++dir_iter) {
     std::string filename = dir_iter->path().string();
-	std::replace(filename.begin(), filename.end(), '\\', '/');
+    std::replace(filename.begin(), filename.end(), '\\', '/');
     if (filename.compare(0, prefix.length(), prefix) == 0) {
-      fs::remove(dir_iter->path());
+      if (!fs::is_directory(fs::status(dir_iter->path())))
+        fs::remove(dir_iter->path());
     }
   }
 }
@@ -171,6 +172,7 @@ void FileUtil::cleanDir(const std::string &fa_path, const std::string & sp_path)
   std::replace(sp_base.begin(), sp_base.end(), '\\', '/');
 
   clean_prefix(fa, fa_base + "_");
+  clean_prefix(sp, sp_base + ".msalign_");
   delFile(absolute(sp).string() + "_index");
   delFile(sp_base + ".ZERO_PTM");
   clean_prefix(sp, sp_base + ".ZERO_PTM_");
@@ -185,6 +187,8 @@ void FileUtil::cleanDir(const std::string &fa_path, const std::string & sp_path)
   delFile(sp_base + ".TOP_PRE");
   delFile(sp_base + ".GRAPH_FILTER");
   clean_prefix(sp, sp_base + ".GRAPH_ALIGN_");
+  clean_prefix(sp, sp_base + ".GRAPH_FILTER_");
+  clean_prefix(sp, sp_base + ".GRAPH");
   clean_prefix(sp, sp_base + ".VAR1_");
   clean_prefix(sp, sp_base + ".VAR2_");
   delFile(sp_base + ".GRAPH_ALIGN");
