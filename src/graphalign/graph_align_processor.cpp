@@ -12,15 +12,19 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
 
+#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
+#include <boost/thread/thread.hpp>
+#else
+#include <sys/wait.h>
+#endif
+
 #include "base/file_util.hpp"
 #include "base/mod_util.hpp"
-#include "base/threadpool.hpp"
 #include "spec/msalign_util.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_reader.hpp"
@@ -160,15 +164,11 @@ void GraphAlignProcessor::process() {
   int spectrum_num = MsAlignUtil::getSpNum(prsm_para_ptr->getSpectrumFileName());
   std::string input_file_name
       = FileUtil::basename(sp_file_name) + "." + mng_ptr_->input_file_ext_;
-  std::vector<std::shared_ptr<SimplePrsmXmlWriter> > simple_prsm_writer_vec;
 
-  for (int i = 0; i < mng_ptr_->thread_num_; i++) {
-    simple_prsm_writer_vec.push_back(std::make_shared<SimplePrsmXmlWriter>(input_file_name + "_" + std::to_string(i)));
-  }
-
-  SimplePrsmReader simple_prsm_reader(input_file_name);
-  SimplePrsmPtr prsm_ptr = simple_prsm_reader.readOnePrsm();
-  int cnt = 0;
+  SimplePrsmReaderPtr simple_prsm_reader = std::make_shared<prot::SimplePrsmReader>(input_file_name);
+  std::shared_ptr<SimplePrsmXmlWriter> graph_filter_writer
+      = std::make_shared<SimplePrsmXmlWriter>(FileUtil::basename(sp_file_name) + ".GRAPH");
+  SimplePrsmPtr prsm_ptr = simple_prsm_reader->readOnePrsm();
   int spec_id = -1;
   SimplePrsmPtrVec selected_prsm_ptrs;
   while (prsm_ptr != nullptr) {
@@ -176,42 +176,72 @@ void GraphAlignProcessor::process() {
       selected_prsm_ptrs.push_back(prsm_ptr); 
     } else {
       SimplePrsmFilter(selected_prsm_ptrs);
-      cnt = cnt % mng_ptr_->thread_num_;
-      simple_prsm_writer_vec[cnt]->write(selected_prsm_ptrs); 
+      graph_filter_writer->write(selected_prsm_ptrs); 
       selected_prsm_ptrs.clear();
-      cnt++;
       spec_id = prsm_ptr->getSpectrumId();
       selected_prsm_ptrs.push_back(prsm_ptr);
     }
-    prsm_ptr = simple_prsm_reader.readOnePrsm(); 
+    prsm_ptr = simple_prsm_reader->readOnePrsm(); 
   }
-  simple_prsm_reader.close();
-
+  simple_prsm_reader->close();
   SimplePrsmFilter(selected_prsm_ptrs);
-  cnt = cnt % mng_ptr_->thread_num_;
-  simple_prsm_writer_vec[cnt]->write(selected_prsm_ptrs); 
+  graph_filter_writer->write(selected_prsm_ptrs); 
+  graph_filter_writer->close();
 
+  std::vector<std::shared_ptr<SimplePrsmXmlWriter> > simple_prsm_writer_vec;
+  for (int i = 0; i < mng_ptr_->thread_num_; i++) {
+    simple_prsm_writer_vec.push_back(std::make_shared<SimplePrsmXmlWriter>(input_file_name + "_" + std::to_string(i)));
+  }
+
+  int cnt = 0;
+  simple_prsm_reader
+      = std::make_shared<prot::SimplePrsmReader>(FileUtil::basename(sp_file_name) + ".GRAPH");
+  prsm_ptr = simple_prsm_reader->readOnePrsm();
+  while (prsm_ptr != nullptr) {
+    cnt = cnt % mng_ptr_->thread_num_;
+    simple_prsm_writer_vec[cnt]->write(prsm_ptr);
+    cnt++;
+    prsm_ptr = simple_prsm_reader->readOnePrsm();
+  }
+  simple_prsm_reader->close();
   for (size_t i = 0; i < simple_prsm_writer_vec.size(); i++) {
     simple_prsm_writer_vec[i]->close();
   }
 
   FastaIndexReaderPtr reader_ptr = std::make_shared<FastaIndexReader>(db_file_name);
 
+#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
   std::vector<ThreadPtr> thread_vec;
-  for (int i = 1; i < mng_ptr_->thread_num_; i++) {
+  for (int i = 0; i < mng_ptr_->thread_num_; i++) {
     ThreadPtr thread_ptr = std::make_shared<boost::thread>(geneTask(reader_ptr, mng_ptr_, var_mod_ptr_vec, spectrum_num, i));
     thread_vec.push_back(thread_ptr);
   }
 
-  std::cout << std::flush << "Mass graph - processing 1 of " << spectrum_num << " spectra.\r";
-
-  std::function<void()> mg_align_task = geneTask(reader_ptr, mng_ptr_, var_mod_ptr_vec, spectrum_num, 0);
-  mg_align_task();
-
   for (size_t i = 0; i < thread_vec.size(); i++) {
     if (thread_vec[i]->joinable()) thread_vec[i]->join();
   }
+#else
+  int n = mng_ptr_->thread_num_;
 
+  pid_t pids;
+
+  for (int i = 0; i < n; i++) {
+    pids = fork();
+    if (pids < 0) {
+      std::abort();
+    } else if (pids == 0) {
+      auto task = geneTask(reader_ptr, mng_ptr_, var_mod_ptr_vec, spectrum_num, i);
+      task();
+      exit(0);
+    }
+  }
+
+  int status;
+  while (n > 0) {
+    wait(&status);
+    --n;
+  }
+#endif
   std::cout << std::flush << "Mass graph - processing " << spectrum_num
       << " of " << spectrum_num << " spectra." << std::endl;
 
