@@ -112,7 +112,7 @@ int TopMGProcess(std::map<std::string, std::string> arguments) {
 
     std::cout << "ASF-One PTM filtering - started." << std::endl;
     OnePtmFilterMngPtr one_ptm_filter_mng_ptr =
-        std::make_shared<OnePtmFilterMng>(prsm_para_ptr, "VAR1_ONE_PTM_FILTER",
+        std::make_shared<OnePtmFilterMng>(prsm_para_ptr, "VAR1_ONE_PTM_FILTER", thread_num,
                                           arguments["residueModFileName"], 1);
     one_ptm_filter_mng_ptr->inte_num_ = 5;
     one_ptm_filter_mng_ptr->pref_suff_num_ = 5;

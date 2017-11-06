@@ -26,10 +26,12 @@ class OnePtmFilterMng {
  public:
   OnePtmFilterMng(PrsmParaPtr prsm_para_ptr,
                   const std::string & output_file_ext,
+                  int thread_num,
                   const std::string & residueModFileName = "",
                   int var_num = 0):
       prsm_para_ptr_(prsm_para_ptr),
       output_file_ext_(output_file_ext),
+      thread_num_(thread_num),
       residueModFileName_(residueModFileName),
       var_num_(var_num) {}
 
@@ -46,6 +48,9 @@ class OnePtmFilterMng {
   int filter_scale_ = 100;
 
   std::string output_file_ext_;
+
+  int thread_num_;
+
   std::string residueModFileName_;
 
   int var_num_;
