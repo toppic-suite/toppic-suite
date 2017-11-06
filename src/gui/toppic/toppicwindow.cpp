@@ -318,7 +318,7 @@ std::map<std::string, std::string> toppicWindow::getArguments() {
   } else {
     arguments_["featureFileName"] = "";
   }
-  showArguments();
+  //showArguments();
   return arguments_;
 }
 

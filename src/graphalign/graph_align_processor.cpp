@@ -18,7 +18,7 @@
 #include <vector>
 
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
-#include <boost/thread/thread.hpp>
+#include "base/threadpool.hpp"
 #else
 #include <sys/wait.h>
 #endif
