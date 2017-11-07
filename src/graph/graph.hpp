@@ -90,31 +90,6 @@ typedef std::vector<MassGraphPtr> MassGraphPtrVec;
 typedef boost::graph_traits<MassGraph>::vertex_descriptor Vertex;
 typedef boost::graph_traits<MassGraph>::edge_descriptor Edge;
 
-template<class T>
-class EdgeInfoWriter {
- public:
-  EdgeInfoWriter(T _e): e(_e) {}
-
-  template<class VertexOrEdge>
-void operator()(std::ostream& out, const VertexOrEdge& v) const {
-  out << "[label=\"";
-  if (e[v].res_ptr_ != nullptr) {
-    out << e[v].res_ptr_->getAcidPtr()->getOneLetter();
-    PtmPtr ptm_ptr = e[v].res_ptr_->getPtmPtr();
-    if (!PtmBase::isEmptyPtmPtr(ptm_ptr)) {
-      out << "[" << ptm_ptr->getAbbrName() << "]";
-    }
-    out << ":";
-    out << e[v].res_ptr_->getMass() << "\"]";
-  }
-  else {
-    out << e[v].int_mass_ << "\"]";
-  }
-}
-private:
-T e;
-};
-
 }
 
 #endif
