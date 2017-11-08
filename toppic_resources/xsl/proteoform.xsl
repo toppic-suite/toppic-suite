@@ -28,6 +28,7 @@
 <table class="table table-hover table-bordered table-striped table-nonfluid">
 <tr>
 <th>Scan</th>
+<th>Protein</th>
 <th>E-value</th>
 <th># all peaks</th>
 <th># matched peaks</th>
@@ -48,6 +49,7 @@
 <xsl:template match="prsm">
 <tr>
 <td align="center"> <xsl:value-of select="ms/ms_header/scans"/> </td>
+<td align="center"> <xsl:value-of select="annotated_protein/sequence_name"/> </td>
 <td align="center"> <xsl:value-of select="e_value"/> </td>
 <td align="center"><xsl:value-of select="count(ms/peaks/peak)"/></td>
 <td align="center"><xsl:value-of select="matched_peak_number"/></td>
