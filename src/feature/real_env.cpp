@@ -22,21 +22,20 @@ namespace prot {
 
 RealEnv::RealEnv(std::vector<PeakPtr> &peak_list, EnvelopePtr theo_env, 
                  double tolerance, double min_inte) {
-		// copy 
-		refer_idx_ = theo_env->getReferIdx();
-		charge_ = theo_env->getCharge();
-		mono_mz_ = theo_env->getMonoMz();
+  // copy 
+  refer_idx_ = theo_env->getReferIdx();
+  charge_ = theo_env->getCharge();
+  mono_mz_ = theo_env->getMonoMz();
 
-		// map peaks in theo_env to the peaks in sp 
-		mapPeakList(peak_list, theo_env, tolerance, min_inte);
-		// remove duplicated matches 
-		remvDuplMatch(theo_env);
-		// count missing peak number 
-		cntMissPeakNum();
-		// count maximum consecutive peak number 
-		cntMaxConsPeakNum();
-	}
-
+  // map peaks in theo_env to the peaks in sp 
+  mapPeakList(peak_list, theo_env, tolerance, min_inte);
+  // remove duplicated matches 
+  remvDuplMatch(theo_env);
+  // count missing peak number 
+  cntMissPeakNum();
+  // count maximum consecutive peak number 
+  cntMaxConsPeakNum();
+}
 
 // map peaks in theo_env to the peaks in sp 
 void RealEnv::mapPeakList(std::vector<PeakPtr> &peak_list, EnvelopePtr theo_env, 
