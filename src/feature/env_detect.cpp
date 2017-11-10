@@ -61,6 +61,10 @@ MatchEnvPtr EnvDetect::detectEnv(PeakPtrVec &peak_list, int base_peak,
   // convert the reference distribution to a theoretical distribution
   // based on the base mz and charge state
   EnvelopePtr theo_env = ref_env->distrToTheoBase(base_mz, charge);
+  int peak_idx = RawMsUtil::getNearPeakIdx(peak_list, theo_env->getReferMz(), mng_ptr->mz_tolerance_);
+  if (peak_idx < 0 || peak_list[peak_idx]->getIntensity() < mng_ptr->min_refer_inte_) {
+    return nullptr; 
+  }
   // LOG_DEBUG("get theo env");
   // scale theoretical distribution
   double ratio = calcInteRatio(theo_env, peak_list, mng_ptr->mz_tolerance_);
