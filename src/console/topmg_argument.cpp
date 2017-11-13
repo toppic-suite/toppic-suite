@@ -157,11 +157,11 @@ bool Argument::parse(int argc, char* argv[]) {
          "<a list of allowed N-terminal forms>. N-terminal forms of proteins. Four N-terminal forms can be selected: NONE, NME, NME_ACETYLATION, and M_ACETYLATION. NONE stands for no modifications, NME for N-terminal methionine excision, NME_ACETYLATION for N-terminal acetylation after the initiator methionine is removed, and M_ACETYLATION for N-terminal methionine acetylation. When multiple forms are allowed, they are separated by commas. Default value: NONE,NME,NME_ACETYLATION,M_ACETYLATION.")
         ("decoy,d", "Use a decoy protein database to estimate false discovery rates.")
         ("error-tolerance,e", po::value<std::string> (&error_tole), "<a positive integer>. Error tolerance for precursor and fragment masses in PPM. Default value: 15.")
-        ("max-mod,m", po::value<std::string> (&max_ptm_mass), "<a positive number>. Maximum absolute value of the mass shift (in Dalton) of an unexpected modification. Default value: 500.")
-        ("cutoff-spectral-type,t", po::value<std::string> (&cutoff_spectral_type), "<EVALUE|FDR>. Spectrum-level cutoff type for filtering identified proteoform spectrum-matches. Default value: EVALUE.")
-        ("cutoff-spectral-value,v", po::value<std::string> (&cutoff_spectral_value), "<a positive number>. Spectrum-level cutoff value for filtering identified proteoform spectrum-matches. Default value: 0.01.")
-        ("cutoff-proteoform-type,T", po::value<std::string> (&cutoff_proteoform_type), "<EVALUE|FDR>. Proteoform-level cutoff type for filtering identified proteoform spectrum-matches. Default value: EVALUE.")
-        ("cutoff-proteoform-value,V", po::value<std::string> (&cutoff_proteoform_value), "<a positive number>. Proteoform-level cutoff value for filtering identified proteoform spectrum-matches. Default value: 0.01.")
+        ("max-shift,m", po::value<std::string> (&max_ptm_mass), "<a positive number>. Maximum absolute value of the mass shift (in Dalton) of an unexpected modification. Default value: 500.")
+        ("spectrum-cutoff-type,t", po::value<std::string> (&cutoff_spectral_type), "<EVALUE|FDR>. Spectrum-level cutoff type for filtering identified proteoform spectrum-matches. Default value: EVALUE.")
+        ("spectrum-cutoff-value,v", po::value<std::string> (&cutoff_spectral_value), "<a positive number>. Spectrum-level cutoff value for filtering identified proteoform spectrum-matches. Default value: 0.01.")
+        ("proteoform-cutoff-type,T", po::value<std::string> (&cutoff_proteoform_type), "<EVALUE|FDR>. Proteoform-level cutoff type for filtering identified proteoform spectrum-matches. Default value: EVALUE.")
+        ("proteoform-cutoff-value,V", po::value<std::string> (&cutoff_proteoform_value), "<a positive number>. Proteoform-level cutoff value for filtering identified proteoform spectrum-matches. Default value: 0.01.")
         ("generating-function,g", "Use the generating function approach to compute p-values and E-values.")
         ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "<a common modification file>. Specify a text file containing the information of common PTMs for characterization of PTMs in proteoform spectrum-matches.")
         ("thread-number,u", po::value<std::string> (&thread_number), "<a positive number>. Number of threads used in the computation. Default value: 1.")
@@ -181,11 +181,11 @@ bool Argument::parse(int argc, char* argv[]) {
         ("n-terminal-form,n", po::value<std::string> (&allow_mod), "")
         ("decoy,d", "")
         ("error-tolerance,e", po::value<std::string> (&error_tole), "")
-        ("max-mod,m", po::value<std::string> (&max_ptm_mass), "")
-        ("cutoff-spectral-type,t", po::value<std::string> (&cutoff_spectral_type), "")
-        ("cutoff-spectral-value,v", po::value<std::string> (&cutoff_spectral_value), "")
-        ("cutoff-proteoform-type,T", po::value<std::string> (&cutoff_proteoform_type), "")
-        ("cutoff-proteoform-value,V", po::value<std::string> (&cutoff_proteoform_value), "")
+        ("max-shift,m", po::value<std::string> (&max_ptm_mass), "")
+        ("spectrum-cutoff-type,t", po::value<std::string> (&cutoff_spectral_type), "")
+        ("spectrum-cutoff-value,v", po::value<std::string> (&cutoff_spectral_value), "")
+        ("proteoform-cutoff-type,T", po::value<std::string> (&cutoff_proteoform_type), "")
+        ("proteoform-cutoff-value,V", po::value<std::string> (&cutoff_proteoform_value), "")
         ("filtering-result-number,o", po::value<std::string>(&filtering_result_num), "Filtering result number. Default value: 20.")
         ("keep-temp-files,k", "Keep temporary files.")
         ("generating-function,g", "")
@@ -254,19 +254,19 @@ bool Argument::parse(int argc, char* argv[]) {
     if (vm.count("error-tolerance")) {
       arguments_["errorTolerance"] = error_tole;
     }
-    if (vm.count("max-mod")) {
+    if (vm.count("max-shift")) {
       arguments_["maxPtmMass"] = max_ptm_mass;
     }
-    if (vm.count("cutoff-spectral-type")) {
+    if (vm.count("spectrum-cutoff-type")) {
       arguments_["cutoffSpectralType"] = cutoff_spectral_type;
     }
-    if (vm.count("cutoff-spectral-value")) {
+    if (vm.count("spectrum-cutoff-value")) {
       arguments_["cutoffSpectralValue"] = cutoff_spectral_value;
     }
-    if (vm.count("cutoff-proteoform-type")) {
+    if (vm.count("proteoform-cutoff-type")) {
       arguments_["cutoffProteoformType"] = cutoff_proteoform_type;
     }
-    if (vm.count("cutoff-proteoform-value")) {
+    if (vm.count("proteoform-cutoff-value")) {
       arguments_["cutoffProteoformValue"] = cutoff_proteoform_value;
     }
     if (vm.count("keep-temp-files")) {

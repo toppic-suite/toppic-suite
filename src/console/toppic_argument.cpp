@@ -294,25 +294,25 @@ bool Argument::parse(int argc, char* argv[]) {
     if (vm.count("n-terminal-form")) {
       arguments_["allowProtMod"] = allow_mod;
     }    
-    if (vm.count("num-mod")) {
+    if (vm.count("num-shift")) {
       arguments_["ptmNumber"] = ptm_num;
     }
     if (vm.count("error-tolerance")) {
       arguments_["errorTolerance"] = error_tole;
     }
-    if (vm.count("max-mod")) {
+    if (vm.count("max-shift")) {
       arguments_["maxPtmMass"] = max_ptm_mass;
     }
-    if (vm.count("cutoff-spectral-type")) {
+    if (vm.count("spectrum-cutoff-type")) {
       arguments_["cutoffSpectralType"] = cutoff_spectral_type;
     }
-    if (vm.count("cutoff-spectral-value")) {
+    if (vm.count("spectrum-cutoff-value")) {
       arguments_["cutoffSpectralValue"] = cutoff_spectral_value;
     }
-    if (vm.count("cutoff-proteoform-type")) {
+    if (vm.count("proteoform-cutoff-type")) {
       arguments_["cutoffProteoformType"] = cutoff_proteoform_type;
     }
-    if (vm.count("cutoff-proteoform-value")) {
+    if (vm.count("proteoform-cutoff-value")) {
       arguments_["cutoffProteoformValue"] = cutoff_proteoform_value;
     }
     if (vm.count("keep-temp-files")) {
