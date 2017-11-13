@@ -152,11 +152,6 @@ class Prsm {
 
   static std::string getXmlElementName() {return "prsm";}
 
-  /*
-     void initMatchNum(double min_mass);
-
-     bool isMatchMs(MsHeaderPtr header_ptr);
-     */
  private:
   int prsm_id_ = -1;
   /* spectrum information */
