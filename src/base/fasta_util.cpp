@@ -12,7 +12,7 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
+#include <string>
 #include <random>
 
 #include "base/logger.hpp"
@@ -20,7 +20,7 @@
 
 namespace prot {
 
-void FastaUtil::generateShuffleDb(const std::string &file_name, 
+void FastaUtil::generateShuffleDb(const std::string &file_name,
                                   const std::string &target_decoy_file_name) {
   std::ofstream output;
   output.open(target_decoy_file_name.c_str(), std::ios::out);
@@ -29,7 +29,7 @@ void FastaUtil::generateShuffleDb(const std::string &file_name,
   FastaSeqPtr seq_info = reader.getNextSeq();
   std::mt19937 r{std::random_device{}()};
   r.seed(std::mt19937::default_seed);
-  while (seq_info!=nullptr) {
+  while (seq_info != nullptr) {
     std::string name = seq_info->getName();
     std::string seq = seq_info->getRawSeq();
     StringPairVec str_pair_vec = seq_info->getAcidPtmPairVec();
@@ -37,21 +37,20 @@ void FastaUtil::generateShuffleDb(const std::string &file_name,
     std::string decoy_name = "DECOY_" + name;
     std::string decoy_seq;
     /*
-    if (seq.length() > 2) {
-      std::string temp = seq.substr(2, seq.length() - 2);
-      std::shuffle(temp.begin(), temp.end(), r);
-      //std::random_shuffle(temp.begin(), temp.end());
-      decoy_seq = seq.substr(0,2) + temp;
+       if (seq.length() > 2) {
+       std::string temp = seq.substr(2, seq.length() - 2);
+       std::shuffle(temp.begin(), temp.end(), r);
+    //std::random_shuffle(temp.begin(), temp.end());
+    decoy_seq = seq.substr(0,2) + temp;
     }
     else {
-      decoy_seq = seq;
+    decoy_seq = seq;
     }
     */
     if (str_pair_vec.size() > 2) {
       std::shuffle(str_pair_vec.begin() + 2, str_pair_vec.end(), r);
-      decoy_seq = FastaSeq::getString(str_pair_vec); 
-    }
-    else {
+      decoy_seq = FastaSeq::getString(str_pair_vec);
+    } else {
       decoy_seq = seq;
     }
     output << ">" << decoy_name << " " << desc <<  std::endl;
@@ -64,25 +63,23 @@ void FastaUtil::generateShuffleDb(const std::string &file_name,
   output.close();
 }
 
-void generateStandardDb(const std::string &ori_file_name, 
+void generateStandardDb(const std::string &ori_file_name,
                         const std::string &st_file_name) {
-
   std::ifstream ori_db(ori_file_name);
   std::string line;
   std::ofstream standard_db;
   standard_db.open(st_file_name.c_str(), std::ios::out);
 
   while (std::getline(ori_db, line)) {
-    if(line.length() > 0){
+    if (line.length() > 0) {
       standard_db << line << std::endl;
-    }  
+    }
   }
   ori_db.close();
   standard_db.close();
 }
 
-void generateDbBlock(const std::string &db_file_name, 
-                     int block_size) {
+void generateDbBlock(const std::string &db_file_name, int block_size) {
   int block_idx = 0;
   int seq_idx = 0;
 
@@ -97,7 +94,7 @@ void generateDbBlock(const std::string &db_file_name,
   FastaSeqPtr seq_info = reader.getNextSeq();
   index_output << block_idx << "\t" << seq_idx << std::endl;
   int seq_size = 0;
-  while (seq_info!=nullptr) {
+  while (seq_info != nullptr) {
     std::string name = seq_info->getName();
     std::string desc = seq_info->getDesc();
     std::string seq = seq_info->getRawSeq();
@@ -120,21 +117,18 @@ void generateDbBlock(const std::string &db_file_name,
   block_output.close();
 }
 
-
-void FastaUtil::dbPreprocess(const std::string &ori_db_file_name, 
-                             const std::string &db_file_name, 
+void FastaUtil::dbPreprocess(const std::string &ori_db_file_name,
+                             const std::string &db_file_name,
                              bool decoy, int block_size) {
-
   std::string standard_db_file_name = ori_db_file_name + "_standard";
   generateStandardDb(ori_db_file_name, standard_db_file_name);
 
   if (decoy) {
     generateShuffleDb(standard_db_file_name, db_file_name);
-  }
-  else {
+  } else {
     boost::filesystem::path ori_path(standard_db_file_name);
     boost::filesystem::path db_path(db_file_name);
-    boost::filesystem::copy_file(ori_path, db_path, 
+    boost::filesystem::copy_file(ori_path, db_path,
                                  boost::filesystem::copy_option::overwrite_if_exists);
   }
   generateDbBlock(db_file_name, block_size);
@@ -151,5 +145,4 @@ int FastaUtil::countProteinNum(const std::string &fasta_file) {
   return cnt;
 }
 
-}
-
+}  // namespace prot
