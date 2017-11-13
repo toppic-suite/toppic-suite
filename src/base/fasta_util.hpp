@@ -34,19 +34,16 @@
 #include "base/fasta_reader.hpp"
 
 namespace prot {
+namespace FastaUtil {
+void generateShuffleDb(const std::string &file_name,
+                       const std::string &target_decoy_file_name);
 
-class FastaUtil {
- public:
-  static void generateShuffleDb(const std::string &file_name, 
-                                const std::string &target_decoy_file_name);
+void dbPreprocess(const std::string &ori_db_file_name,
+                  const std::string &db_file_name,
+                  bool decoy, int block_size);
 
-  static void dbPreprocess(const std::string &ori_db_file_name, 
-                           const std::string &db_file_name, 
-                           bool decoy, int block_size);
-
-  static int countProteinNum(const std::string &fasta_file);
-};
-
-}  //namepace prot
+int countProteinNum(const std::string &fasta_file);
+}  // namespace FastaUtil
+}  // namespace prot
 
 #endif
