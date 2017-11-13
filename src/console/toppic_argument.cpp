@@ -114,49 +114,6 @@ void Argument::showUsage(boost::program_options::options_description &desc) {
   std::cout << desc << std::endl; 
 }
 
-void Argument::setArgumentsByConfigFile(const std::string &filename){
-  initArguments();
-  XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
-  if(parser){
-    XmlDOMDocument* doc = new XmlDOMDocument(parser, filename.c_str());
-    if (doc) {
-      xercesc::DOMElement* root = doc->getDocumentElement();
-      arguments_["executiveDir"] = XmlDomUtil::getChildValue(root, "executiveDir", 0);
-      arguments_["oriDatabaseFileName"] = XmlDomUtil::getChildValue(root, "database_file_name", 0);
-      arguments_["databaseBlockSize"] = XmlDomUtil::getChildValue(root, "database_blocksize", 0);
-      arguments_["spectrumFileName"] = XmlDomUtil::getChildValue(root, "spectrum_file_name", 0);
-      arguments_["activation"] = XmlDomUtil::getChildValue(root, "fragmentation_method", 0);
-      arguments_["fixedMod"] = XmlDomUtil::getChildValue(root, "fixed_mod", 0);
-      arguments_["searchType"] = XmlDomUtil::getChildValue(root, "search_type", 0);
-      arguments_["ptmNumber"] = XmlDomUtil::getChildValue(root, "shift_number", 0);
-      arguments_["errorTolerance"] = XmlDomUtil::getChildValue(root, "error_tolerance", 0);
-      arguments_["cutoffType"] = XmlDomUtil::getChildValue(root, "cutoff_type", 0);
-      arguments_["cutoffValue"] = XmlDomUtil::getChildValue(root, "cutoff_value", 0);
-      arguments_["numOfTopPrsms"] = XmlDomUtil::getChildValue(root, "num_of_top_prsms", 0);
-      arguments_["maxPtmMass"] = XmlDomUtil::getChildValue(root, "max_ptm_mass", 0);
-      arguments_["useGf"] = XmlDomUtil::getChildValue(root, "use_gf", 0);
-      arguments_["groupSpectrumNumber"] = XmlDomUtil::getChildValue(root, "groupSpectrumNumber", 0);
-      arguments_["residueModFileName"] = XmlDomUtil::getChildValue(root, "residueModFileName", 0);
-      arguments_["local_threshold"] = XmlDomUtil::getChildValue(root, "local_threshold", 0);
-      arguments_["filteringResultNumber"] = XmlDomUtil::getChildValue(root, "filtering_result_number", 0);
-      arguments_["threadNumber"] = XmlDomUtil::getChildValue(root, "thread_number", 0);
-      arguments_["featureFileName"] = XmlDomUtil::getChildValue(root, "use_feature", 0);
-      xercesc::DOMElement* prot_mod_list = XmlDomUtil::getChildElement(root,"protein_variable_ptm_list",0);
-      int allow_prot_node_number = XmlDomUtil::getChildCount(prot_mod_list,"protein_variable_ptm");
-      std::string allow_mod = "";
-      for(int i = 0; i < allow_prot_node_number; i++){
-        if(i == 0) {
-          allow_mod = XmlDomUtil::getChildValue(prot_mod_list, "protein_variable_ptm", i);
-        } else{
-          allow_mod = allow_mod + "," + XmlDomUtil::getChildValue(prot_mod_list, "protein_variable_ptm", i);
-        }
-      }
-      arguments_["allowProtMod"] = allow_mod;
-    }
-    delete doc;
-  }
-}
-
 bool Argument::parse(int argc, char* argv[]) {
   std::string database_file_name = "";
   std::string spectrum_file_name = "";
@@ -214,7 +171,6 @@ bool Argument::parse(int argc, char* argv[]) {
 
     desc.add_options() 
         ("help,h", "") 
-        ("argument-file,c",po::value<std::string>(&argument_file_name),"Argument file name.")
         ("activation,a", po::value<std::string>(&activation), "")
         ("fixed-mod,f", po::value<std::string> (&fixed_mod), "")
         ("n-terminal-form,n", po::value<std::string> (&allow_mod), "")
@@ -272,9 +228,6 @@ bool Argument::parse(int argc, char* argv[]) {
       arguments_["executiveDir"] = FileUtil::getExecutiveDir(argv_0);
     }
     LOG_DEBUG("Executive Dir " << arguments_["executiveDir"]);
-    if (vm.count("argument-file")) {
-      setArgumentsByConfigFile(argument_file_name);
-    }
     arguments_["oriDatabaseFileName"] = database_file_name;
     arguments_["spectrumFileName"] = spectrum_file_name;
     if (vm.count("activation")) {
