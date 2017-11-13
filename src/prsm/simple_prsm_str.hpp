@@ -41,7 +41,11 @@ class SimplePrsmStr {
   double getScore() {return score_;}
 
   static bool cmpScoreDec(const SimplePrsmStrPtr &a, const SimplePrsmStrPtr &b) {
-    return a->getScore() > b->getScore();
+    if (a->getScore() == b->getScore()) {
+      return a->getSeqName() < b->getSeqName();
+    } else {
+      return a->getScore() > b->getScore();
+    }
   }
 
  private:
