@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 
+#include "base/version.hpp"
 #include "base/fasta_reader.hpp"
 #include "base/fasta_util.hpp"
 #include "base/base_data.hpp"
@@ -66,7 +67,7 @@ namespace prot {
 
 int TopPICProgress(std::map<std::string, std::string> arguments) {
   try {
-    std::cout << "TopPIC 1.1.4 (" << __DATE__ << ")" << std::endl;
+    std::cout << "TopPIC " << version_number << std::endl;
     std::string exe_dir = arguments["executiveDir"];
     time_t start = time(0);
     char buf[50];
