@@ -134,10 +134,6 @@ void SimplePrsmFilter(SimplePrsmPtrVec & selected_prsm_ptrs) {
     return;
   }
   std::sort(selected_prsm_ptrs.begin(), selected_prsm_ptrs.end(), SimplePrsm::cmpScoreDec);
-  double scr = selected_prsm_ptrs[0]->getScore() * 2 / 3;
-  selected_prsm_ptrs.erase(std::remove_if(selected_prsm_ptrs.begin(), selected_prsm_ptrs.end(),
-                                          [scr] (const SimplePrsmPtr & p) {return p->getScore() < scr;}),
-                           selected_prsm_ptrs.end());
   selected_prsm_ptrs.erase(std::remove_if(selected_prsm_ptrs.begin(), selected_prsm_ptrs.end(),
                                           [] (const SimplePrsmPtr & p) {return p->getScore() < 10;}),
                            selected_prsm_ptrs.end());

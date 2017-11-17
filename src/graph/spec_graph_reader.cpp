@@ -30,7 +30,6 @@ SpecGraphReader::SpecGraphReader(const std::string &sp_file_name,
 }
 
 MassGraphPtr SpecGraphReader::getMassGraphPtr(const PrmPeakPtrVec &peak_vec) {
-
   LOG_DEBUG("start mass graph");
   MassGraphPtr graph_ptr = std::make_shared<MassGraph>();
 

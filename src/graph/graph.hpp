@@ -32,9 +32,6 @@
 
 namespace prot {
 
-//#define CONVERT_RATIO 274.335215
-//#define CONVERT_RATIO 1
-
 struct EdgeInfo {
   ResiduePtr res_ptr_;
   int change_type_;
@@ -50,7 +47,7 @@ struct EdgeInfo {
     res_ptr_ = res_ptr;
     change_type_ = change_type;
     int_mass_ = (int)std::round(res_ptr->getMass() * convert_ratio);
-    //LOG_DEBUG("int mass " << int_mass_ << " res mass " << res_ptr->getMass() << " convert_ratio " << convert_ratio);
+    // LOG_DEBUG("int mass " << int_mass_ << " res mass " << res_ptr->getMass() << " convert_ratio " << convert_ratio);
   }
 
   EdgeInfo (double mass, double convert_ratio) {
