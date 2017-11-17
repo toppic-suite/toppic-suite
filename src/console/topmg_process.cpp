@@ -67,7 +67,7 @@ namespace prot {
 
 int TopMGProcess(std::map<std::string, std::string> arguments) {
   try {
-    std::cout << "TopMG 1.0-beta (" << __DATE__ << ")" << std::endl;
+    std::cout << "TopMG 1.0-beta" << std::endl;
 
     std::string exe_dir = arguments["executiveDir"];
     time_t start = time(0);
@@ -114,9 +114,9 @@ int TopMGProcess(std::map<std::string, std::string> arguments) {
     OnePtmFilterMngPtr one_ptm_filter_mng_ptr =
         std::make_shared<OnePtmFilterMng>(prsm_para_ptr, "VAR1_ONE_PTM_FILTER", thread_num,
                                           arguments["residueModFileName"], 1);
-    one_ptm_filter_mng_ptr->inte_num_ = 5;
-    one_ptm_filter_mng_ptr->pref_suff_num_ = 5;
-    one_ptm_filter_mng_ptr->comp_num_ = 5;
+    one_ptm_filter_mng_ptr->inte_num_ = 4;
+    one_ptm_filter_mng_ptr->pref_suff_num_ = 4;
+    one_ptm_filter_mng_ptr->comp_num_ = 4;
     OnePtmFilterProcessorPtr one_filter_processor =
         std::make_shared<OnePtmFilterProcessor>(one_ptm_filter_mng_ptr);
     one_filter_processor->process();
@@ -144,12 +144,13 @@ int TopMGProcess(std::map<std::string, std::string> arguments) {
 
     if (use_asf_diag) {
       std::cout << "ASF-Diagonal PTM filtering - started." << std::endl;
-      DiagFilterMngPtr diag_filter_mng_ptr1
+      filter_result_num = 15;
+      DiagFilterMngPtr diag_filter_mng_ptr
           = std::make_shared<DiagFilterMng>(prsm_para_ptr, filter_result_num,
                                             thread_num, "VAR1_DIAG_FILTER",
                                             arguments["residueModFileName"], 1);
       DiagFilterProcessorPtr diag_filter_processor1
-          = std::make_shared<DiagFilterProcessor>(diag_filter_mng_ptr1);
+          = std::make_shared<DiagFilterProcessor>(diag_filter_mng_ptr);
       diag_filter_processor1->process();
       std::cout << "ASF-Diagonal filtering - finished." << std::endl;
 

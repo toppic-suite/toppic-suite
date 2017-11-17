@@ -37,7 +37,6 @@ class GraphAlign {
 
   PrsmPtr geneResult(int s, int m);
   PrsmPtr geneResult(int s);
-
  private:
   GraphAlignMngPtr mng_ptr_;
   ProteoGraphPtr proteo_graph_ptr_;
@@ -73,18 +72,11 @@ class GraphAlign {
   void getNodeDiagonals(int s, int m);
 
   void geneHeaders();
-
-  /*
-
-  //tempary
-
-
-*/
 };
 
 typedef std::shared_ptr<GraphAlign> GraphAlignPtr;
 
-}
+}  // namespace prot
 
 #endif
 
