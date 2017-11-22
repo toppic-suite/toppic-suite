@@ -17,7 +17,9 @@
 
 namespace prot {
 
-void MsalignWriter::write(std::ofstream &file, DeconvMsPtr ms_ptr) {
+namespace msalign_writer {
+
+void write(std::ofstream &file, DeconvMsPtr ms_ptr) {
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
   file << "BEGIN IONS" << std::endl;
   file << "ID=" << header_ptr->getId() << std::endl;
@@ -50,7 +52,8 @@ void MsalignWriter::write(std::ofstream &file, DeconvMsPtr ms_ptr) {
   file << std::endl;
 }
 
-void MsalignWriter::write(std::ofstream &file, DeconvMsPtr ms_ptr, int mslevel) {
+/*
+void write(std::ofstream &file, DeconvMsPtr ms_ptr, int mslevel) {
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
   file << "BEGIN IONS" << std::endl;
   file << "ID=" << header_ptr->getId() << std::endl;
@@ -82,6 +85,8 @@ void MsalignWriter::write(std::ofstream &file, DeconvMsPtr ms_ptr, int mslevel) 
   file << "END IONS" << std::endl;
   file << std::endl;
 }
+*/
 
+} //namespace msalign_writer
 
 }  // namespace prot

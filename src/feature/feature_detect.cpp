@@ -36,6 +36,7 @@ void readSpectra(const std::string & file_name, DeconvMsPtrVec &ms_ptr_vec) {
   DeconvMsPtr ms_ptr;
   // LOG_DEBUG("Start search");
   while ((ms_ptr = sp_reader.getNextMs())!= nullptr) {
+    ms_ptr->getMsHeaderPtr()->setMsLevel(1);
     ms_ptr_vec.push_back(ms_ptr);
     // std::cout << std::flush <<  "reading spectrum " << header_ptr_vec.size() << "\r";
   }
@@ -337,7 +338,7 @@ void FeatureDetect::process(DeconvParaPtr para_ptr) {
   of1.precision(16);
   DeconvProcess::outputParameter(of1, para_ptr, "#");
   for (size_t i = 0; i < ms1_ptr_vec.size(); i++) {
-    MsalignWriter::write(of1, ms1_ptr_vec[i], 1);
+    msalign_writer::write(of1, ms1_ptr_vec[i]);
   }
   of1.close();
   // outputHeaders(header_ptr_vec);

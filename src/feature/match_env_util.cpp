@@ -196,6 +196,21 @@ MatchEnvPtrVec addMultipleMass(MatchEnvPtrVec &envs, MatchEnvPtr2D &candidates,
   return mass_envs;
 }
 
+DeconvMsPtr getDeconvMsPtr(MsHeaderPtr header_ptr, MatchEnvPtrVec &envs) {
+  DeconvPeakPtrVec peak_list;
+  for (size_t i = 0; i < envs.size(); i++) {
+    EnvelopePtr theo_env = envs[i]->getTheoEnvPtr();
+    RealEnvPtr real_env = envs[i]->getRealEnvPtr();
+    double pos = real_env->getMonoMass();
+    double inte = theo_env->compIntensitySum();
+    int charge = theo_env->getCharge();
+    DeconvPeakPtr peak_ptr = std::make_shared<DeconvPeak>(i, pos, inte, charge); 
+    peak_list.push_back(peak_ptr);
+  }
+  DeconvMsPtr ms_ptr = std::make_shared<DeconvMs>(header_ptr, peak_list);
+  return ms_ptr;
 }
+
+}  // namespace match_env_util
 
 }  // namespace prot

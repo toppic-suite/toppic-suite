@@ -22,11 +22,14 @@
 #include "spec/deconv_ms.hpp"
 
 namespace prot {
-namespace MsalignWriter {
+
+namespace msalign_writer {
 
 void write(std::ofstream &file, DeconvMsPtr ms_ptr);
 
-void write(std::ofstream &file, DeconvMsPtr ms_ptr, int mslevel);
+//void write(std::ofstream &file, DeconvMsPtr ms_ptr, int mslevel);
+
 }  // namespace MsalignWriter
+
 }  // namespace prot
 #endif

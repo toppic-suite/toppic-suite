@@ -17,6 +17,8 @@
 #define PROT_FEATURE_MATCH_ENV_UTIL_HPP_
 
 #include "spec/peak.hpp"
+#include "spec/ms_header.hpp"
+#include "spec/deconv_ms.hpp"
 #include "feature/match_env.hpp"
 
 namespace prot {
@@ -42,6 +44,8 @@ MatchEnvPtr getNewMatchEnv(PeakPtrVec &ms, int idx, double tolerance);
 
 MatchEnvPtrVec addMultipleMass(MatchEnvPtrVec &envs, MatchEnvPtr2D &candidates,
                                double multi_min_mass, int multi_min_charge, double min_ratio);
+
+DeconvMsPtr getDeconvMsPtr(MsHeaderPtr header_ptr, MatchEnvPtrVec &envs);
 
 }
 
