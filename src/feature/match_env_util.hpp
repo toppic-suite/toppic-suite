@@ -21,29 +21,29 @@
 
 namespace prot {
 
-class MatchEnvUtil {
- public:
-  static std::vector<double> getMassList(const MatchEnvPtrVec &envs);
+namespace match_env_util {
 
-  static std::vector<int> getChargeList(const MatchEnvPtrVec &envs);
+std::vector<double> getMassList(const MatchEnvPtrVec &envs);
 
-  static std::vector<double> getChargeOneMassList(const MatchEnvPtrVec &envs);
+std::vector<int> getChargeList(const MatchEnvPtrVec &envs);
 
-  static std::vector<double> getIntensitySums(const MatchEnvPtrVec &envs);
+std::vector<double> getChargeOneMassList(const MatchEnvPtrVec &envs);
 
-  static void assignIntensity(PeakPtrVec &ms, MatchEnvPtrVec &envs);
+std::vector<double> getIntensitySums(const MatchEnvPtrVec &envs);
 
-  static PeakPtrVec rmAnnoPeak(PeakPtrVec &ms, MatchEnvPtrVec &envs);
+void assignIntensity(PeakPtrVec &ms, MatchEnvPtrVec &envs);
 
-  static MatchEnvPtrVec addLowMassPeak(MatchEnvPtrVec &envs, std::vector<PeakPtr> &ms, 
-                                       double tolerance);
+PeakPtrVec rmAnnoPeak(PeakPtrVec &ms, MatchEnvPtrVec &envs);
 
-  static MatchEnvPtr getNewMatchEnv(PeakPtrVec &ms, int idx, double tolerance);
+MatchEnvPtrVec addLowMassPeak(MatchEnvPtrVec &envs, std::vector<PeakPtr> &ms, 
+                              double tolerance);
 
-  static MatchEnvPtrVec addMultipleMass(MatchEnvPtrVec &envs, MatchEnvPtr2D &candidates,
-                                        double multi_min_mass, int multi_min_charge, double min_ratio);
+MatchEnvPtr getNewMatchEnv(PeakPtrVec &ms, int idx, double tolerance);
 
-};
+MatchEnvPtrVec addMultipleMass(MatchEnvPtrVec &envs, MatchEnvPtr2D &candidates,
+                               double multi_min_mass, int multi_min_charge, double min_ratio);
+
+}
 
 }
 

@@ -23,7 +23,9 @@
 
 namespace prot {
 
-std::vector<double> MatchEnvUtil::getMassList(const MatchEnvPtrVec &envs) {
+namespace match_env_util {
+
+std::vector<double> getMassList(const MatchEnvPtrVec &envs) {
   std::vector<double> masses(envs.size());
   for (size_t i = 0; i < envs.size(); i++) {
     masses[i] = envs[i]->getRealEnvPtr()->getMonoMass();
@@ -31,7 +33,7 @@ std::vector<double> MatchEnvUtil::getMassList(const MatchEnvPtrVec &envs) {
   return masses;
 }
 
-std::vector<int> MatchEnvUtil::getChargeList(const MatchEnvPtrVec &envs) {
+std::vector<int> getChargeList(const MatchEnvPtrVec &envs) {
   std::vector<int> charges(envs.size());
   for (size_t i = 0; i < envs.size(); i++) {
     charges[i] = envs[i]->getRealEnvPtr()->getCharge();
@@ -39,7 +41,7 @@ std::vector<int> MatchEnvUtil::getChargeList(const MatchEnvPtrVec &envs) {
   return charges;
 }
 
-std::vector<double> MatchEnvUtil::getChargeOneMassList(const MatchEnvPtrVec &envs) {
+std::vector<double> getChargeOneMassList(const MatchEnvPtrVec &envs) {
   std::vector<double> masses(envs.size());
   for (size_t i = 0; i < envs.size(); i++) {
     masses[i] = envs[i]->getRealEnvPtr()->getMonoMass() + MassConstant::getProtonMass();
@@ -47,7 +49,7 @@ std::vector<double> MatchEnvUtil::getChargeOneMassList(const MatchEnvPtrVec &env
   return masses;
 }
 
-std::vector<double> MatchEnvUtil::getIntensitySums(const MatchEnvPtrVec &envs) {
+std::vector<double> getIntensitySums(const MatchEnvPtrVec &envs) {
   std::vector<double> intensity_sums(envs.size());
   for (size_t i = 0; i < envs.size(); i++) {
     intensity_sums[i] = envs[i]->getTheoEnvPtr()->compIntensitySum();
@@ -55,7 +57,7 @@ std::vector<double> MatchEnvUtil::getIntensitySums(const MatchEnvPtrVec &envs) {
   return intensity_sums;
 }
 
-void MatchEnvUtil::assignIntensity(PeakPtrVec &ms, MatchEnvPtrVec &envs) {
+void assignIntensity(PeakPtrVec &ms, MatchEnvPtrVec &envs) {
   size_t peak_num = ms.size();
   std::vector<double> intensity_sums_(peak_num, 0);
   for (size_t i = 0; i < envs.size(); i++) {
@@ -81,7 +83,7 @@ void MatchEnvUtil::assignIntensity(PeakPtrVec &ms, MatchEnvPtrVec &envs) {
   }
 }
 
-PeakPtrVec  MatchEnvUtil::rmAnnoPeak(PeakPtrVec &ms, MatchEnvPtrVec &envs) {
+PeakPtrVec  rmAnnoPeak(PeakPtrVec &ms, MatchEnvPtrVec &envs) {
   PeakPtrVec new_list = ms;
   int peak_num = new_list.size();
   std::vector<bool> is_keeps(peak_num, true);
@@ -98,8 +100,8 @@ PeakPtrVec  MatchEnvUtil::rmAnnoPeak(PeakPtrVec &ms, MatchEnvPtrVec &envs) {
 }
 
 
-MatchEnvPtrVec MatchEnvUtil::addLowMassPeak(MatchEnvPtrVec &envs, PeakPtrVec &ms, 
-                                            double tolerance) {
+MatchEnvPtrVec addLowMassPeak(MatchEnvPtrVec &envs, PeakPtrVec &ms, 
+                              double tolerance) {
   std::vector<bool> is_uses(ms.size(), false);
   for (size_t i = 0; i < envs.size(); i++) {
     MatchEnvPtr env = envs[i];
@@ -125,7 +127,7 @@ MatchEnvPtrVec MatchEnvUtil::addLowMassPeak(MatchEnvPtrVec &envs, PeakPtrVec &ms
   return result;
 }
 
-MatchEnvPtr MatchEnvUtil::getNewMatchEnv(PeakPtrVec &ms, int idx, double tolerance) {
+MatchEnvPtr getNewMatchEnv(PeakPtrVec &ms, int idx, double tolerance) {
   std::vector<double> mzs; 
   std::vector<double> intensities;
   mzs.push_back(ms[idx]->getPosition());
@@ -137,8 +139,8 @@ MatchEnvPtr MatchEnvUtil::getNewMatchEnv(PeakPtrVec &ms, int idx, double toleran
   return std::make_shared<MatchEnv>(mass_group, theo_env, real_env);
 }
 
-MatchEnvPtrVec MatchEnvUtil::addMultipleMass(MatchEnvPtrVec &envs, MatchEnvPtr2D &candidates,
-                                             double multi_min_mass, int multi_min_charge, double min_ratio) {
+MatchEnvPtrVec addMultipleMass(MatchEnvPtrVec &envs, MatchEnvPtr2D &candidates,
+                               double multi_min_mass, int multi_min_charge, double min_ratio) {
   MatchEnvPtrVec mass_envs;
   for (size_t i = 0; i < envs.size(); i++) {
     // check if we can use another charge state 
@@ -191,8 +193,9 @@ MatchEnvPtrVec MatchEnvUtil::addMultipleMass(MatchEnvPtrVec &envs, MatchEnvPtr2D
       }
     }
   }
-
   return mass_envs;
+}
+
 }
 
 }  // namespace prot

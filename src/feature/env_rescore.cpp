@@ -14,9 +14,11 @@
 
 #include <algorithm>
 
-#include "env_rescore.hpp"
+#include "base/mass_constant.hpp"
+#include "feature/env_rescore.hpp"
 
 namespace prot {
+
 namespace EnvRescore {
 
 std::vector<double> diff(MatchEnvPtr env, MatchEnvPtr2D &match_envs) {
@@ -30,9 +32,9 @@ std::vector<double> diff(MatchEnvPtr env, MatchEnvPtr2D &match_envs) {
         sum.push_back(match_envs[i][j]->getRealEnvPtr()->compIntensitySum()); 
         temp = std::abs(env->getRealEnvPtr()->getMonoMass()
                         - match_envs[i][j]->getRealEnvPtr()->getMonoMass());
-        if (std::abs(temp - 18) < 0.01) {
+        if (std::abs(temp - MassConstant::getWaterMass()) < 0.01) {
           res++;
-        } else if (std::abs(temp - 17) < 0.01) {
+        } else if (std::abs(temp - MassConstant::getAmmoniaMass()) < 0.01) {
           res++;
         }
         if (std::abs(env->getRealEnvPtr()->getMonoMass()
@@ -144,6 +146,7 @@ void rescore(MatchEnvPtr2D &match_envs, const std::vector<std::vector<double> > 
     }
   }
 }
+
 }  // namespace EnvRescore
 }  // namespace prot
 
