@@ -167,6 +167,7 @@ double MatchEnv::calcShareInteAccu(int id_x, double inte_sum) {
   return intensity_factor;
 }
 
+/*
 void MsalignWriter::write(std::ofstream &file, MatchEnvPtrVec &envs,
                               MsHeaderPtr header_ptr) {
   file << "BEGIN IONS" << std::endl;
@@ -201,5 +202,6 @@ void MsalignWriter::write(std::ofstream &file, MatchEnvPtrVec &envs,
   file << "END IONS" << std::endl;
   file << std::endl;
 }
+*/
 
 }

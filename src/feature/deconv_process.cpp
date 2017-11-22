@@ -18,8 +18,11 @@
 #include "base/logger.hpp"
 #include "base/file_util.hpp"
 #include "base/version.hpp"
+#include "spec/deconv_ms.hpp"
+#include "spec/msalign_writer.hpp"
 #include "feature/deconv_process.hpp"
 #include "feature/match_env.hpp"
+#include "feature/match_env_util.hpp"
 
 namespace prot {
 
@@ -107,7 +110,8 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr, FeatureMsReaderPtr read
       deconv_ptr->setData(peak_list);
       deconv_ptr->run();
       MatchEnvPtrVec result_envs = deconv_ptr->getResult();
-      MsalignWriter::write(of1, result_envs, header_ptr);
+      DeconvMsPtr ms_ptr = match_env_util::getDeconvMsPtr(header_ptr, result_envs);
+      msalign_writer::write(of1, ms_ptr);
       count1++;
     } else {
       if (para_ptr_->missing_level_one_) {
@@ -126,7 +130,8 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr, FeatureMsReaderPtr read
       }
       deconv_ptr->run();
       MatchEnvPtrVec result_envs = deconv_ptr->getResult();
-      MsalignWriter::write(of2, result_envs, header_ptr);
+      DeconvMsPtr ms_ptr = match_env_util::getDeconvMsPtr(header_ptr, result_envs);
+      msalign_writer::write(of2, ms_ptr);
       count2++;
     }
   }

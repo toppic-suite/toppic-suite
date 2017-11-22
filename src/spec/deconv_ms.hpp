@@ -21,6 +21,8 @@
 
 namespace prot {
 
+typedef Ms<DeconvPeakPtr> DeconvMs;
+
 typedef std::shared_ptr<Ms<DeconvPeakPtr>> DeconvMsPtr;
 
 typedef std::vector<DeconvMsPtr> DeconvMsPtrVec;
