@@ -88,30 +88,33 @@ void DeconvOneSp::preprocess() {
 MatchEnvPtrVec DeconvOneSp::postprocess(MatchEnvPtrVec  &dp_envs) {
   // assign intensity
   PeakPtrVec peak_list = data_ptr_->getPeakList();
-  MatchEnvUtil::assignIntensity(peak_list, dp_envs);
+  match_env_util::assignIntensity(peak_list, dp_envs);
   // refinement
   if (!mng_ptr_->output_multiple_mass_) {
     MatchEnvRefine::mzRefine(mng_ptr_, dp_envs);
   }
 
-  MatchEnvPtrVec result_envs_ = dp_envs;
+  // filtering 
   if (mng_ptr_->do_final_filtering_) {
     result_envs_ = MatchEnvFilter::filter(dp_envs, data_ptr_->getMaxMass(),
                                           mng_ptr_);
   }
+  else {
+    result_envs_ = dp_envs;
+  }
 
   if (mng_ptr_->keep_unused_peaks_) {
-    MatchEnvUtil::addLowMassPeak(result_envs_, peak_list, mng_ptr_->mz_tolerance_);
+    match_env_util::addLowMassPeak(result_envs_, peak_list, mng_ptr_->mz_tolerance_);
   }
   // reassign intensity
-  MatchEnvUtil::assignIntensity(peak_list, result_envs_);
+  match_env_util::assignIntensity(peak_list, result_envs_);
 
   if (mng_ptr_->output_multiple_mass_) {
     // envelope detection
     MatchEnvPtr2D cand_envs = EnvDetect::getCandidate(data_ptr_, mng_ptr_);
     // envelope filter
     EnvFilter::multipleMassFilter(cand_envs, data_ptr_, mng_ptr_);
-    result_envs_ = MatchEnvUtil::addMultipleMass(result_envs_, cand_envs,
+    result_envs_ = match_env_util::addMultipleMass(result_envs_, cand_envs,
                                                  mng_ptr_->multiple_min_mass_,
                                                  mng_ptr_->multiple_min_charge_,
                                                  mng_ptr_->multiple_min_ratio_);

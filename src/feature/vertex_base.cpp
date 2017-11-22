@@ -55,6 +55,7 @@ VertexAPtrVec VertexBase::getVertexAList(DeconvDataPtr data, int cur_win,
   addEmptyVertexA(mng_ptr, result, data, cur_win);
   int cur_size = 1;
   // add envelopes in previous window 
+  // Each vertex contains a combination of envelops
   for (size_t i = 0; i < prev_match_envs.size(); i++) {
     cur_size = result.size();
     for (int j = 0; j < cur_size; j++) {

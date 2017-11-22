@@ -41,6 +41,7 @@ class FeatureMng {
   // using input parameters to assign: max_chrg, max_mass 
   int max_charge_ = 30;
   double max_mass_ = 100000;
+  // window size 1 m/z
   double window_size_ = 1.0;
 
   // preprocessing
@@ -127,7 +128,7 @@ class FeatureMng {
   double rank_peak_distance_ = 12;
   int max_similar_mz_env_rank_ = 0;
 
-  // Envelope assigned to 1 Da intervals
+  // Envelope assigned to 1 m/z intervals
   // number of envelopes per window 
   int env_num_per_window_ = 5;
 

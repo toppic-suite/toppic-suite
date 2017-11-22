@@ -89,6 +89,7 @@ namespace MsalignWriter {
 void write(std::ofstream &file, MatchEnvPtrVec &envs, MsHeaderPtr header_ptr);
 
 }  // namespace MsalignWriter
+
 }  // namespace prot
 
 #endif
