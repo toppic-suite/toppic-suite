@@ -17,6 +17,7 @@
 #define PROT_BASE_RESIDUE_SEQ_HPP_
 
 #include <string>
+#include <vector>
 
 #include "base/mass_constant.hpp"
 #include "base/residue.hpp"
@@ -30,7 +31,7 @@ typedef std::vector<ResSeqPtr> ResSeqPtrVec;
 
 class ResidueSeq {
  public:
-  ResidueSeq(const ResiduePtrVec &residues);
+  explicit ResidueSeq(const ResiduePtrVec &residues);
 
   /**
    * Returns a sub-peptide of the original peptide.
@@ -71,6 +72,5 @@ class ResidueSeq {
   static ResSeqPtr getEmptyResidueSeq();
 };
 
-
-}
+}  // namespace prot
 #endif

@@ -13,6 +13,8 @@
 //limitations under the License.
 
 
+#include <string>
+
 #include "base/logger.hpp"
 #include "base/trunc_base.hpp"
 #include "base/xml_dom_util.hpp"
@@ -29,9 +31,8 @@ void TruncBase::initBase(const std::string &file_name) {
     std::string element_name = Trunc::getXmlElementName();
     int trunc_num = XmlDomUtil::getChildCount(parent, element_name.c_str());
     for (int i = 0; i < trunc_num; i++) {
-      xercesc::DOMElement* element 
-          = XmlDomUtil::getChildElement(parent, element_name.c_str(), i);
-      TruncPtr trunc_ptr(new Trunc(element));
+      xercesc::DOMElement* element = XmlDomUtil::getChildElement(parent, element_name.c_str(), i);
+      TruncPtr trunc_ptr = std::make_shared<Trunc>(element);
       trunc_ptr_vec_.push_back(trunc_ptr);
     }
   }
@@ -53,4 +54,5 @@ TruncPtr TruncBase::getTruncPtrFromXml(xercesc::DOMElement * element) {
   return trunc_ptr;
 }
 
-}
+}  // namespace prot
+

@@ -18,13 +18,11 @@
 
 namespace prot {
 
-AlignTypePtr AlignType::COMPLETE = AlignTypePtr(new AlignType("COMPLETE", 0));
-AlignTypePtr AlignType::PREFIX = AlignTypePtr(new AlignType("PREFIX", 1));
-AlignTypePtr AlignType::SUFFIX  = AlignTypePtr(new AlignType("SUFFIX", 2));
-AlignTypePtr AlignType::INTERNAL = AlignTypePtr(new AlignType("INTERNAL", 3));
+AlignTypePtr AlignType::COMPLETE = std::make_shared<AlignType>("COMPLETE", 0);
 
-AlignType::AlignType(const std::string &name, int id):
-    name_(name),
-    id_(id) {
-    }
+AlignTypePtr AlignType::PREFIX = std::make_shared<AlignType>("PREFIX", 1);
+
+AlignTypePtr AlignType::SUFFIX = std::make_shared<AlignType>("SUFFIX", 2);
+
+AlignTypePtr AlignType::INTERNAL = std::make_shared<AlignType>("INTERNAL", 3);
 }  // namespace prot

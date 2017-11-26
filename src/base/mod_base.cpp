@@ -17,6 +17,7 @@
 #include <vector>
 #include <memory>
 #include <algorithm>
+#include <string>
 
 #include "base/ptm_base.hpp"
 #include "base/mod_base.hpp"
@@ -28,8 +29,11 @@
 namespace prot {
 
 ModPtrVec ModBase::mod_ptr_vec_;
+
 ModPtr ModBase::none_mod_ptr_;
+
 ModPtr ModBase::c57_mod_ptr_;
+
 ModPtr ModBase::c58_mod_ptr_;
 
 void ModBase::initBase(const std::string &file_name) {
@@ -41,10 +45,10 @@ void ModBase::initBase(const std::string &file_name) {
     int mod_num = XmlDomUtil::getChildCount(parent, element_name.c_str());
     for (int i = 0; i < mod_num; i++) {
       xercesc::DOMElement* element = XmlDomUtil::getChildElement(parent, element_name.c_str(), i);
-      ModPtr mod_ptr(new Mod(element));
+      ModPtr mod_ptr = std::make_shared<Mod>(element);
       mod_ptr_vec_.push_back(mod_ptr);
       // check empty ptr
-      if (mod_ptr->getOriResiduePtr() == ResidueBase::getEmptyResiduePtr() 
+      if (mod_ptr->getOriResiduePtr() == ResidueBase::getEmptyResiduePtr()
           && mod_ptr->getModResiduePtr() ==ResidueBase::getEmptyResiduePtr()) {
         none_mod_ptr_ = mod_ptr;
       }
@@ -74,13 +78,14 @@ ModPtr ModBase::getBaseModPtr(ModPtr mod_ptr) {
 }
 
 ModPtr ModBase::getBaseModPtr(ResiduePtr ori_residue, ResiduePtr mod_residue) {
-  ModPtr mod_ptr(new Mod(ori_residue, mod_residue));
+  ModPtr mod_ptr = std::make_shared<Mod>(ori_residue, mod_residue);
   return getBaseModPtr(mod_ptr);
 }
 
 ModPtr ModBase::getModPtrFromXml(xercesc::DOMElement * element) {
-  ModPtr ptr(new Mod(element));
+  ModPtr ptr = std::make_shared<Mod>(element);
   return getBaseModPtr(ptr);
 }
-}
+
+}  // namespace prot
 

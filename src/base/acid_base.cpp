@@ -36,7 +36,7 @@ void AcidBase::initBase(const std::string &file_name) {
     for (int i = 0; i < acid_num; i++) {
       xercesc::DOMElement* element
           = XmlDomUtil::getChildElement(parent, element_name.c_str(), i);
-      AcidPtr ptr(new Acid(element));
+      AcidPtr ptr = std::make_shared<Acid>(element);
       acid_ptr_vec_.push_back(ptr);
       // check if it is an empty acid
       if (ptr->getMonoMass() == 0.0) {

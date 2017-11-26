@@ -31,7 +31,7 @@ class AlignType {
   static AlignTypePtr SUFFIX;
   static AlignTypePtr INTERNAL;
 
-  AlignType(const std::string &name, int id);
+  AlignType(const std::string &name, int id): name_(name), id_(id) {}
 
   std::string getName() {return name_;}
 
@@ -41,7 +41,6 @@ class AlignType {
   std::string name_;
   int id_;
 };
-
 
 }  // namespace prot
 

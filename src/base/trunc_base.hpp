@@ -24,7 +24,9 @@ namespace prot {
 class TruncBase {
  public:
   static void initBase(const std::string &file_name);
+
   static const TruncPtrVec& getBaseTruncPtrVec() {return trunc_ptr_vec_;}
+
   static TruncPtr getTruncPtrByName(const std::string &name);
 
   static TruncPtr getTruncPtrFromXml(xercesc::DOMElement * element);
@@ -33,6 +35,6 @@ class TruncBase {
   static TruncPtrVec trunc_ptr_vec_;
 };
 
-}
+}  // namespace prot
 
 #endif
