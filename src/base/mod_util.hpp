@@ -16,23 +16,23 @@
 #ifndef PROT_BASE_MOD_UTIL_HPP_
 #define PROT_BASE_MOD_UTIL_HPP_
 
+#include <string>
+#include <vector>
+
 #include "base/mod.hpp"
 
 namespace prot {
+namespace ModUtil {
+ModPtrVec readModXml(const std::string &file_name);
 
-class ModUtil {
- public:
-  static ModPtrVec readModXml(const std::string &file_name);
+std::vector<ModPtrVec> readModTxt(const std::string &file_name);
 
-  static std::vector<ModPtrVec> readModTxt(const std::string &file_name);
+ModPtrVec geneFixedModList(const std::string &str);
 
-  static ModPtrVec geneFixedModList(const std::string &str);
+ResiduePtrVec geneResidueListWithMod(const ResiduePtrVec & residue_list,
+                                     const ModPtrVec & fix_mod_list);
 
-  static ResiduePtrVec geneResidueListWithMod(ResiduePtrVec residue_list,
-                                              ModPtrVec fix_mod_list);
-
-  static std::vector<double> getModMassVec(const ModPtrVec & var_mod_list);
-};
-
+std::vector<double> getModMassVec(const ModPtrVec & var_mod_list);
+}  // namespace ModUtil
 }  // namespace prot
 #endif

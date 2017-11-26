@@ -22,18 +22,14 @@
 #include "prsm/peak_ion_pair.hpp"
 
 namespace prot {
+namespace PeakIonPairUtil {
+PeakIonPairPtrVec getMatchedPairs(const PeakIonPairPtrVec &pair_ptrs,
+                                  int spec_id, int peak_id);
 
-class PeakIonPairUtil {
- public:
-  static PeakIonPairPtrVec getMatchedPairs(const PeakIonPairPtrVec &pair_ptrs, 
-                                           int spec_id, int peak_id);
+int getPeakIonPairNum(PeakIonPairPtrVec pair_ptrs);
 
-  static int getPeakIonPairNum(PeakIonPairPtrVec pair_ptrs); 
-
-  static double computePairConverage(const PeakIonPairPtrVec &pair_ptrs, int begin, 
-                                     int end, RmBreakTypePtr type_ptr);
-
-};
-
-}
+double computePairConverage(const PeakIonPairPtrVec &pair_ptrs, int begin,
+                            int end, RmBreakTypePtr type_ptr);
+}  // namespace PeakIonPairUtil
+}  // namespace prot
 #endif
