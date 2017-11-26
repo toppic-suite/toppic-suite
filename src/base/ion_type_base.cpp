@@ -12,17 +12,20 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include <string>
 
 #include "base/ion_type_base.hpp"
 #include "base/xml_dom_util.hpp"
 
 namespace prot {
 
-IonTypePtrVec IonTypeBase::ion_type_ptr_vec_; 
-IonTypePtr IonTypeBase::ion_type_ptr_B_; 
-IonTypePtr IonTypeBase::ion_type_ptr_PREC_; 
+IonTypePtrVec IonTypeBase::ion_type_ptr_vec_;
 
-void IonTypeBase::initBase(const std::string &file_name){
+IonTypePtr IonTypeBase::ion_type_ptr_B_;
+
+IonTypePtr IonTypeBase::ion_type_ptr_PREC_;
+
+void IonTypeBase::initBase(const std::string &file_name) {
   prot::XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
     prot::XmlDOMDocument doc(parser, file_name.c_str());
@@ -31,7 +34,7 @@ void IonTypeBase::initBase(const std::string &file_name){
     int ion_type_num = XmlDomUtil::getChildCount(parent, element_name.c_str());
     for (int i = 0; i < ion_type_num; i++) {
       xercesc::DOMElement* element = XmlDomUtil::getChildElement(parent, element_name.c_str(), i);
-      IonTypePtr ion_type_ptr(new IonType(element));
+      IonTypePtr ion_type_ptr = std::make_shared<IonType>(element);
       ion_type_ptr_vec_.push_back(ion_type_ptr);
       if (ion_type_ptr->getName() == getName_B()) {
         ion_type_ptr_B_ = ion_type_ptr;
@@ -43,7 +46,7 @@ void IonTypeBase::initBase(const std::string &file_name){
   }
 }
 
-IonTypePtr IonTypeBase::getIonTypePtrByName(const std::string &name){
+IonTypePtr IonTypeBase::getIonTypePtrByName(const std::string &name) {
   for (size_t i = 0; i < ion_type_ptr_vec_.size(); i++) {
     std::string n = ion_type_ptr_vec_[i]->getName();
     if (n == name) {
@@ -53,4 +56,4 @@ IonTypePtr IonTypeBase::getIonTypePtrByName(const std::string &name){
   return IonTypePtr(nullptr);
 }
 
-}
+}  // namespace prot

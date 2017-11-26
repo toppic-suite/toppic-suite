@@ -41,7 +41,7 @@ Change::Change(xercesc::DOMElement* element) {
   if (local_count != 0) {
     xercesc::DOMElement * local_element
         = XmlDomUtil::getChildElement(element, local_element_name.c_str(), 0);
-    local_anno_ptr_ = LocalAnnoPtr(new LocalAnno(local_element));
+    local_anno_ptr_ = std::make_shared<LocalAnno>(local_element);
   }
 }
 
@@ -80,8 +80,8 @@ ChangePtr Change::geneChangePtr(ChangePtr ori_ptr, int start_pos) {
   ChangeTypePtr change_type_ptr = ori_ptr->change_type_ptr_;
   double mass_shift = ori_ptr->mass_shift_;
   ModPtr mod_ptr = ori_ptr->mod_ptr_;
-  ChangePtr change_ptr(
-      new Change(left_bp_pos, right_bp_pos, change_type_ptr, mass_shift, mod_ptr));
+  ChangePtr change_ptr
+      = std::make_shared<Change>(left_bp_pos, right_bp_pos, change_type_ptr, mass_shift, mod_ptr);
   return change_ptr;
 }
 

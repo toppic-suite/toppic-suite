@@ -31,7 +31,7 @@ void ActivationBase::initBase(const std::string &file_name) {
     for (int i = 0; i < activation_num; i++) {
       xercesc::DOMElement* element
           = XmlDomUtil::getChildElement(parent, element_name.c_str(), i);
-      ActivationPtr ptr(new Activation(element));
+      ActivationPtr ptr = std::make_shared<Activation>(element);
       activation_ptr_vec_.push_back(ptr);
     }
   }

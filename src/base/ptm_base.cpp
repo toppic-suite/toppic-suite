@@ -17,6 +17,7 @@
 #include <vector>
 #include <memory>
 #include <algorithm>
+#include <string>
 
 #include "base/ptm_base.hpp"
 #include "base/logger.hpp"
@@ -43,7 +44,7 @@ void PtmBase::initBase(const std::string &file_name) {
     int ptm_num = XmlDomUtil::getChildCount(parent, element_name.c_str());
     for (int i = 0; i < ptm_num; i++) {
       xercesc::DOMElement* element = XmlDomUtil::getChildElement(parent, element_name.c_str(), i);
-      PtmPtr ptm_ptr(new Ptm(element));
+      PtmPtr ptm_ptr = std::make_shared<Ptm>(element);
       ptm_ptr_vec_.push_back(ptm_ptr);
       // check empty ptr
       if (ptm_ptr->getMonoMass() == 0.0) {
@@ -61,7 +62,7 @@ void PtmBase::initBase(const std::string &file_name) {
       }
     }
   }
-  if (empty_ptm_ptr_ == nullptr || acetylation_ptr_ == nullptr 
+  if (empty_ptm_ptr_ == nullptr || acetylation_ptr_ == nullptr
       || c57_ptr_ == nullptr || c58_ptr_ == nullptr) {
     LOG_WARN("ptm missing!");
   }
@@ -101,5 +102,5 @@ PtmPtr PtmBase::getPtmPtrFromXml(xercesc::DOMElement * element) {
   return ptm_ptr;
 }
 
-}
+}  // namespace prot
 

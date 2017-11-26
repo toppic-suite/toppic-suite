@@ -13,6 +13,8 @@
 //limitations under the License.
 
 
+#include <string>
+
 #include "base/logger.hpp"
 #include "base/acid_base.hpp"
 #include "base/ptm_base.hpp"
@@ -32,12 +34,12 @@ void ResidueBase::initBase(const std::string &file_name) {
     xercesc::DOMElement* parent = doc.getDocumentElement();
     std::string element_name = Residue::getXmlElementName();
     int residue_num = XmlDomUtil::getChildCount(parent, element_name.c_str());
-    LOG_DEBUG( "residue num " << residue_num);
+    LOG_DEBUG("residue num " << residue_num);
     for (int i = 0; i < residue_num; i++) {
       xercesc::DOMElement* element
           = XmlDomUtil::getChildElement(parent, element_name.c_str(), i);
-      ResiduePtr residue_ptr(new Residue(element));
-      if (residue_ptr->getAcidPtr() == AcidBase::getEmptyAcidPtr() 
+      ResiduePtr residue_ptr = std::make_shared<Residue>(element);
+      if (residue_ptr->getAcidPtr() == AcidBase::getEmptyAcidPtr()
           && residue_ptr->getPtmPtr() == PtmBase::getEmptyPtmPtr()) {
         empty_residue_ptr_ = residue_ptr;
       }
@@ -69,18 +71,18 @@ ResiduePtrVec ResidueBase::getBaseNonePtmResiduePtrVec() {
 }
 
 ResiduePtr ResidueBase::getBaseResiduePtr(AcidPtr acid_ptr, PtmPtr ptm_ptr) {
-  ResiduePtr residue_ptr = ResiduePtr(new Residue(acid_ptr, ptm_ptr));
+  ResiduePtr residue_ptr = std::make_shared<Residue>(acid_ptr, ptm_ptr);
   return getBaseResiduePtr(residue_ptr);
 }
 
 ResiduePtr ResidueBase::getBaseResiduePtr(AcidPtr acid_ptr) {
-  ResiduePtr residue_ptr = ResiduePtr(new Residue(acid_ptr, PtmBase::getEmptyPtmPtr()));
+  ResiduePtr residue_ptr = std::make_shared<Residue>(acid_ptr, PtmBase::getEmptyPtmPtr());
   return getBaseResiduePtr(residue_ptr);
 }
 
 ResiduePtr ResidueBase::getResiduePtrFromXml(xercesc::DOMElement * element) {
-  ResiduePtr ptr(new Residue(element));
+  ResiduePtr ptr = std::make_shared<Residue>(element);
   return getBaseResiduePtr(ptr);
 }
 
-}
+}  // namespace prot

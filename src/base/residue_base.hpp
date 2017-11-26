@@ -42,13 +42,12 @@ class ResidueBase {
   static ResiduePtr getBaseResiduePtr(AcidPtr acid_ptr);
 
   static ResiduePtrVec getBaseNonePtmResiduePtrVec();
-  
+
  private:
   static ResiduePtrVec residue_ptr_vec_;
   static ResiduePtr empty_residue_ptr_;
-
 };
 
-}
+}  // namespace prot
 
 #endif

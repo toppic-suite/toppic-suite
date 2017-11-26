@@ -13,6 +13,7 @@
 //limitations under the License.
 
 
+#include <string>
 
 #include "base/support_peak_type_base.hpp"
 #include "base/xml_dom_util.hpp"
@@ -20,9 +21,10 @@
 namespace prot {
 
 SPTypePtrVec SPTypeBase::sp_type_ptr_vec_;
+
 SPTypePtr SPTypeBase::sp_type_ptr_N_TERM_;
 
-void SPTypeBase::initBase(const std::string &file_name){
+void SPTypeBase::initBase(const std::string &file_name) {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
     XmlDOMDocument doc(parser, file_name.c_str());
@@ -30,9 +32,8 @@ void SPTypeBase::initBase(const std::string &file_name){
     std::string element_name = SupportPeakType::getXmlElementName();
     int prm_peak_type_num = XmlDomUtil::getChildCount(parent, element_name.c_str());
     for (int i = 0; i < prm_peak_type_num; i++) {
-      xercesc::DOMElement* element 
-          = XmlDomUtil::getChildElement(parent, element_name.c_str(), i);
-      SPTypePtr sp_type_ptr(new SupportPeakType(element));
+      xercesc::DOMElement* element = XmlDomUtil::getChildElement(parent, element_name.c_str(), i);
+      SPTypePtr sp_type_ptr = std::make_shared<SupportPeakType>(element);
       sp_type_ptr_vec_.push_back(sp_type_ptr);
       if (sp_type_ptr->getName() == getName_N_TERM()) {
         sp_type_ptr_N_TERM_ = sp_type_ptr;
@@ -41,7 +42,7 @@ void SPTypeBase::initBase(const std::string &file_name){
   }
 }
 
-SPTypePtr SPTypeBase::getSPTypePtrByName(const std::string &name){
+SPTypePtr SPTypeBase::getSPTypePtrByName(const std::string &name) {
   for (size_t i = 0; i < sp_type_ptr_vec_.size(); i++) {
     std::string n = sp_type_ptr_vec_[i]->getName();
     if (n == name) {
@@ -51,7 +52,7 @@ SPTypePtr SPTypeBase::getSPTypePtrByName(const std::string &name){
   return SPTypePtr(nullptr);
 }
 
-SPTypePtr SPTypeBase::getSPTypePtrById(int id){
+SPTypePtr SPTypeBase::getSPTypePtrById(int id) {
   for (size_t i = 0; i < sp_type_ptr_vec_.size(); i++) {
     int n = sp_type_ptr_vec_[i]->getId();
     if (n == id) {
@@ -61,4 +62,4 @@ SPTypePtr SPTypeBase::getSPTypePtrById(int id){
   return SPTypePtr(nullptr);
 }
 
-} /* namespace prot */
+}  // namespace prot

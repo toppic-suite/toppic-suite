@@ -27,12 +27,14 @@ namespace prot {
 class NeutralLossBase {
  public:
   static void initBase(const std::string &file_name);
+
   static NeutralLossPtrVec getBaseNeutralLossPtrVec() {
-    return neutral_loss_ptr_vec_;}
+    return neutral_loss_ptr_vec_;
+  }
 
   static NeutralLossPtr getNeutralLossPtrByName(const std::string &name);
 
-  static NeutralLossPtr getNeutralLossPtr_NONE () {
+  static NeutralLossPtr getNeutralLossPtr_NONE() {
     return neutral_loss_ptr_NONE_;
   }
 
@@ -40,9 +42,10 @@ class NeutralLossBase {
 
  private:
   static NeutralLossPtrVec neutral_loss_ptr_vec_;
+
   static NeutralLossPtr neutral_loss_ptr_NONE_;
 };
 
-} /* namespace prot */
+}  // namespace prot
 
 #endif /* NEUTRALLOSS_HPP_ */
