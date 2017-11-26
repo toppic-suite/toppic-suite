@@ -23,36 +23,26 @@
 #include "base/xml_dom_document.hpp"
 
 namespace prot {
+namespace XmlDomUtil {
+xercesc::DOMNodeList* getChildElements(xercesc::DOMElement *parent, const char* tag);
 
-class XmlDomUtil {
- public:
-  static xercesc::DOMNodeList* getChildElements(xercesc::DOMElement *parent,
-                                                const char* tag);
+xercesc::DOMElement* getChildElement(xercesc::DOMElement* parent, const char* tag, int index);
 
-  static xercesc::DOMElement* getChildElement(xercesc::DOMElement* parent, 
-                                              const char* tag, int index);
+std::string getChildValue(xercesc::DOMElement* parent, const char* child_tag, int index);
 
-  static std::string getChildValue(xercesc::DOMElement* parent, 
-                                   const char* child_tag, int index);
+double getDoubleChildValue(xercesc::DOMElement* parent, const char* child_tag, int index);
 
-  static double getDoubleChildValue(xercesc::DOMElement* parent, 
-                                    const char* child_tag, int index);
+int getIntChildValue(xercesc::DOMElement* parent, const char* child_tag, int index);
 
-  static int getIntChildValue(xercesc::DOMElement* parent,  
-                              const char* child_tag, int index);
+bool getBoolChildValue(xercesc::DOMElement* parent, const char* child_tag, int index);
 
-  static bool getBoolChildValue(xercesc::DOMElement* parent,
-                                const char* child_tag, int index);
+int getChildCount(xercesc::DOMElement * parent, const char* child_tag);
 
-  static int getChildCount(xercesc::DOMElement * parent, const char* child_tag);
+std::string getAttributeValue(xercesc::DOMElement * parent, const char* attribute_tag);
 
-  static std::string getAttributeValue(xercesc::DOMElement * parent,
-                                       const char* attribute_tag);
+std::string writeToString(xercesc::DOMLSSerializer* serializer, xercesc::DOMNode *node);
 
-  static std::string writeToString(xercesc::DOMLSSerializer* serializer, xercesc::DOMNode *node);
-
-  static void writeToStreamByRemovingDoubleLF(std::ofstream &file, std::string &str);
-};
-
-}
+void writeToStreamByRemovingDoubleLF(std::ofstream & file, std::string &str);
+}  // namespace XmlDomUtil
+}  // namespace prot
 #endif

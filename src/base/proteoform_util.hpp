@@ -16,41 +16,40 @@
 #ifndef PROT_BASE_PROTEOFORM_UTIL_HPP_
 #define PROT_BASE_PROTEOFORM_UTIL_HPP_
 
+#include <vector>
+
 #include "base/proteoform.hpp"
 
-
 namespace prot {
+namespace ProteoformUtil {
 
-class ProteoformUtil {
- public:
-  /* calculate frequencies for n_terminal_residues */
-  static ResFreqPtrVec compNTermResidueFreq(const ProteoformPtrVec &prot_mod_forms);
+// calculate frequencies for n_terminal_residues
+ResFreqPtrVec compNTermResidueFreq(const ProteoformPtrVec &prot_mod_forms);
 
-  /* calculater frequences for all residues */
-  static ResFreqPtrVec compResidueFreq(const ResiduePtrVec &residue_list,
-                                       const ProteoformPtrVec &raw_mods);
+// calculater frequences for all residues
+ResFreqPtrVec compResidueFreq(const ResiduePtrVec &residue_list,
+                              const ProteoformPtrVec &raw_mods);
 
-  static bool isSameSeqAndMass(ProteoformPtr a, ProteoformPtr b, double ppo);
+bool isSameSeqAndMass(ProteoformPtr a, ProteoformPtr b, double ppo);
 
-  static bool isStrictCompatiablePtmSpecies(ProteoformPtr a, ProteoformPtr b, double ppo);
+bool isStrictCompatiablePtmSpecies(ProteoformPtr a, ProteoformPtr b, double ppo);
 
-  static ProteoformPtrVec2D divideProteoIntoBlocks(const ProteoformPtrVec &proteo_ptrs, 
-                                                   int db_block_size);
+ProteoformPtrVec2D divideProteoIntoBlocks(const ProteoformPtrVec &proteo_ptrs,
+                                          int db_block_size);
 
-  static std::vector<double> getNTermShift(ProteoformPtr db_form_ptr,
-                                        const ProtModPtrVec &prot_mod_ptrs);
+std::vector<double> getNTermShift(ProteoformPtr db_form_ptr,
+                                  const ProtModPtrVec &prot_mod_ptrs);
 
-  static std::vector<std::vector<double>> getNTermShift2D(
-      ProteoformPtrVec db_form_ptr_vec, const ProtModPtrVec &prot_mod_ptrs);
+std::vector<std::vector<double> > getNTermShift2D(const ProteoformPtrVec & db_form_ptr_vec,
+                                                  const ProtModPtrVec & prot_mod_ptrs);
 
-  static std::vector<double> getNTermAcets(ProteoformPtr db_form_ptr,
-                                        const ProtModPtrVec &prot_mod_ptrs);
+std::vector<double> getNTermAcets(ProteoformPtr db_form_ptr,
+                                  const ProtModPtrVec & prot_mod_ptrs);
 
-  static std::vector<std::vector<double>> getNTermAcet2D(
-      ProteoformPtrVec db_form_ptr_vec, const ProtModPtrVec &prot_mod_ptrs);
+std::vector<std::vector<double> > getNTermAcet2D(const ProteoformPtrVec & db_form_ptr_vec,
+                                                 const ProtModPtrVec & prot_mod_ptrs);
 
-};
+}  // namespace ProteoformUtil
+}  // namespace prot
 
-} /* namespace prot */
-
-#endif 
+#endif

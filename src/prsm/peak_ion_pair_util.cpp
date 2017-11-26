@@ -12,7 +12,7 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
+#include <vector>
 #include <algorithm>
 
 #include "base/logger.hpp"
@@ -22,7 +22,7 @@
 
 namespace prot {
 
-PeakIonPairPtrVec PeakIonPairUtil::getMatchedPairs(const PeakIonPairPtrVec &pair_ptrs, 
+PeakIonPairPtrVec PeakIonPairUtil::getMatchedPairs(const PeakIonPairPtrVec &pair_ptrs,
                                                    int spec_id, int peak_id) {
   PeakIonPairPtrVec selected_pair_ptrs;
   for (size_t i = 0; i < pair_ptrs.size(); i++) {
@@ -47,7 +47,7 @@ int PeakIonPairUtil::getPeakIonPairNum(PeakIonPairPtrVec pairs) {
   return match_peak_num;
 }
 
-double PeakIonPairUtil::computePairConverage(const PeakIonPairPtrVec &pair_ptrs, int begin, 
+double PeakIonPairUtil::computePairConverage(const PeakIonPairPtrVec &pair_ptrs, int begin,
                                              int end, RmBreakTypePtr type_ptr) {
   int total_num = end - begin  + 1;
   if (total_num <= 0) {
@@ -61,13 +61,11 @@ double PeakIonPairUtil::computePairConverage(const PeakIonPairPtrVec &pair_ptrs,
       if (ion_ptr->getIonTypePtr()->isNTerm()) {
         cov = true;
       }
-    }
-    else if (type_ptr == RmBreakType::C_TERM) {
+    } else if (type_ptr == RmBreakType::C_TERM) {
       if (!ion_ptr->getIonTypePtr()->isNTerm()) {
         cov = true;
       }
-    }
-    else if (type_ptr == RmBreakType::BOTH) {
+    } else if (type_ptr == RmBreakType::BOTH) {
       cov = true;
     }
     if (cov) {
@@ -83,7 +81,6 @@ double PeakIonPairUtil::computePairConverage(const PeakIonPairPtrVec &pair_ptrs,
       cov_num++;
     }
   }
-  return cov_num/(double)total_num;
+  return cov_num / static_cast<double>(total_num);
 }
-
-}
+}  // namespace prot

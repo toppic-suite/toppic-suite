@@ -19,16 +19,13 @@
 #include <string>
 
 namespace prot {
+namespace BaseData {
+inline std::string getBaseDataDir() {return "toppic_resources/base_data";}
 
-class BaseData {
- public:
-  static std::string getBaseDataDir() {return "toppic_resources/base_data";}
+inline std::string getBaseDataConfigFileName() {return "base_data_config.xml";}
 
-  static std::string getBaseDataConfigFileName() {return "base_data_config.xml";}
-
-  static void init(const std::string &exe_dir);
-};
-
+void init(const std::string &exe_dir);
+}  // namespace BaseData
 }  // namespace prot
 
 #endif

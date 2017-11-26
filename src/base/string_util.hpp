@@ -27,26 +27,24 @@
 #include "base/logger.hpp"
 
 namespace prot {
+namespace StringUtil {
 
-class StringUtil {
- public:
-  static std::string trim(const std::string &ori_s);
+std::string trim(const std::string & ori_s);
 
-  static std::vector<std::string> split(const std::string &ori_s, char delim);
+std::vector<std::string> split(const std::string & ori_s, char delim);
 
-  static std::string convertToString(double value);
+std::string convertToString(double value);
 
-  static std::string convertToString(double value, int number);
+std::string convertToString(double value, int number);
 
-  static std::string convertToScientificStr(double value, int number);
+std::string convertToScientificStr(double value, int number);
 
-  static std::string convertToString(int value);
+std::string convertToString(int value);
 
-  static std::string convertToString(bool value);
+std::string convertToString(bool value);
 
-  static std::string rmComment(const std::string &ori_s, const std::string &comment = "#");
-};
-
+std::string rmComment(const std::string &ori_s, const std::string & comment = "#");
+}  // namespace StringUtil
 }  // namespace prot
 
 #endif

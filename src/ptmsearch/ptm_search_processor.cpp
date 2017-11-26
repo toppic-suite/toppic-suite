@@ -35,8 +35,8 @@ template <int N>
 PrsmXmlWriterSet<N>::PrsmXmlWriterSet(const std::string & output_file_name){
   all_writer_ptr_ = std::make_shared<PrsmXmlWriter>(output_file_name);
   for (int s = 2; s <= N; s++) {
-    std::string file_name = output_file_name+"_"+ StringUtil::StringUtil::convertToString(s)
-        +"_"+ AlignType::COMPLETE->getName();
+    std::string file_name = output_file_name + "_" + StringUtil::convertToString(s)
+        + "_" + AlignType::COMPLETE->getName();
     PrsmXmlWriterPtr complete_writer_ptr = std::make_shared<PrsmXmlWriter>(file_name);
     complete_writer_ptrs_.push_back(complete_writer_ptr);
     file_name = output_file_name+"_"+ StringUtil::convertToString(s)

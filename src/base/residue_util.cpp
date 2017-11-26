@@ -13,6 +13,8 @@
 //limitations under the License.
 
 
+#include <string>
+
 #include "base/logger.hpp"
 #include "base/acid_base.hpp"
 #include "base/ptm_base.hpp"
@@ -45,7 +47,7 @@ void applyFixedMod(ResiduePtrVec &residue_ptrs, const ModPtrVec &fix_mod_ptr_vec
   }
 }
 
-ResiduePtrVec ResidueUtil::convertStrToResiduePtrVec(const std::string &seq, 
+ResiduePtrVec ResidueUtil::convertStrToResiduePtrVec(const std::string & seq,
                                                      const ModPtrVec &fix_mod_ptr_vec) {
   ResiduePtrVec residue_ptrs = ResidueUtil::convertStrToResiduePtrVec(seq);
   applyFixedMod(residue_ptrs, fix_mod_ptr_vec);
@@ -65,15 +67,14 @@ ResiduePtrVec ResidueUtil::convertStrToResiduePtrVec(const StringPairVec &string
   return residue_ptr_vec;
 }
 
-ResiduePtrVec ResidueUtil::convertStrToResiduePtrVec(const StringPairVec &string_pair_vec,  
+ResiduePtrVec ResidueUtil::convertStrToResiduePtrVec(const StringPairVec &string_pair_vec,
                                                      const ModPtrVec &fix_mod_ptr_vec) {
   ResiduePtrVec residue_ptrs = ResidueUtil::convertStrToResiduePtrVec(string_pair_vec);
   applyFixedMod(residue_ptrs, fix_mod_ptr_vec);
   return residue_ptrs;
 }
 
-int ResidueUtil::findResidue(const ResiduePtrVec &residue_list, 
-                             ResiduePtr residue_ptr) {
+int ResidueUtil::findResidue(const ResiduePtrVec &residue_list, ResiduePtr residue_ptr) {
   for (size_t i = 0; i < residue_list.size(); i++) {
     if (residue_list[i] == residue_ptr) {
       return i;
@@ -90,4 +91,4 @@ double ResidueUtil::compResiduePtrVecMass(const ResiduePtrVec &ptr_vec) {
   return mass;
 }
 
-}
+}  // namespace prot

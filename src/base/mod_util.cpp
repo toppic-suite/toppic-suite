@@ -117,8 +117,8 @@ ModPtrVec ModUtil::geneFixedModList(const std::string &str) {
   }
 }
 
-ResiduePtrVec ModUtil::geneResidueListWithMod(ResiduePtrVec residue_list,
-                                              ModPtrVec fix_mod_list) {
+ResiduePtrVec ModUtil::geneResidueListWithMod(const ResiduePtrVec & residue_list,
+                                              const ModPtrVec & fix_mod_list) {
   ResiduePtrVec result;
   for (size_t i = 0; i < residue_list.size(); i++) {
     bool mod = false;

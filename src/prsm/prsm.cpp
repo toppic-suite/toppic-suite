@@ -178,7 +178,7 @@ void Prsm::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
 }
 
 void Prsm::parseXml(xercesc::DOMElement *element) {
-  prsm_id_=XmlDomUtil::XmlDomUtil::getIntChildValue(element, "prsm_id", 0);
+  prsm_id_ = XmlDomUtil::getIntChildValue(element, "prsm_id", 0);
   spectrum_id_=XmlDomUtil::getIntChildValue(element, "spectrum_id", 0);
   spectrum_scan_=XmlDomUtil::getChildValue(element, "spectrum_scan", 0);
   precursor_id_=XmlDomUtil::getIntChildValue(element, "precursor_id", 0);
