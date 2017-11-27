@@ -17,7 +17,8 @@
 
 namespace prot {
 
-const BasePeakTypePtr BasePeakType::ORIGINAL = BasePeakTypePtr(new BasePeakType("Original"));
-const BasePeakTypePtr BasePeakType::REVERSED = BasePeakTypePtr(new BasePeakType("Reversed"));
+const BasePeakTypePtr BasePeakType::ORIGINAL = std::make_shared<BasePeakType>("Original");
+
+const BasePeakTypePtr BasePeakType::REVERSED = std::make_shared<BasePeakType>("Reversed");
 
 }

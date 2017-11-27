@@ -29,18 +29,22 @@ class ZeroPtmFilter {
  public:
   ZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
                 ZeroPtmFilterMngPtr mng_ptr);
+
   void computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec);
 
   SimplePrsmPtrVec getCompMatchPtrs() {return comp_match_ptrs_;}
+
   SimplePrsmPtrVec getPrefMatchPtrs() {return pref_match_ptrs_;}
+
   SimplePrsmPtrVec getSuffMatchPtrs() {return suff_match_ptrs_;}
+
   SimplePrsmPtrVec getInternalMatchPtrs() {return internal_match_ptrs_;}
 
  private:
   ZeroPtmFilterMngPtr mng_ptr_;
   ProteoformPtrVec proteo_ptrs_;
   CompShiftPtr index_ptr_;
-  
+
   SimplePrsmPtrVec comp_match_ptrs_;
   SimplePrsmPtrVec pref_match_ptrs_;
   SimplePrsmPtrVec suff_match_ptrs_;

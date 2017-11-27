@@ -13,6 +13,10 @@
 //limitations under the License.
 
 
+#include <vector>
+#include <algorithm>
+#include <string>
+
 #include "base/logger.hpp"
 #include "base/proteoform_factory.hpp"
 #include "base/string_util.hpp"
@@ -27,7 +31,7 @@
 
 namespace prot {
 
-Prsm::Prsm(ProteoformPtr proteoform_ptr, const DeconvMsPtrVec &deconv_ms_ptr_vec, 
+Prsm::Prsm(ProteoformPtr proteoform_ptr, const DeconvMsPtrVec &deconv_ms_ptr_vec,
            double adjusted_prec_mass, SpParaPtr sp_para_ptr):
     adjusted_prec_mass_(adjusted_prec_mass),
     proteoform_ptr_(proteoform_ptr),
@@ -43,20 +47,20 @@ Prsm::Prsm(ProteoformPtr proteoform_ptr, const DeconvMsPtrVec &deconv_ms_ptr_vec
       init(sp_para_ptr);
     }
 
-Prsm::Prsm(xercesc::DOMElement* element, FastaIndexReaderPtr reader_ptr, 
+Prsm::Prsm(xercesc::DOMElement* element, FastaIndexReaderPtr reader_ptr,
            const ModPtrVec &fix_mod_list) {
   parseXml(element);
   std::string form_elem_name = Proteoform::getXmlElementName();
   xercesc::DOMElement* form_element
-      = XmlDomUtil::getChildElement(element, form_elem_name.c_str(),0);
-  proteoform_ptr_ = ProteoformPtr(new Proteoform(form_element, reader_ptr, fix_mod_list));
+      = XmlDomUtil::getChildElement(element, form_elem_name.c_str(), 0);
+  proteoform_ptr_ = std::make_shared<Proteoform>(form_element, reader_ptr, fix_mod_list);
 }
 
 Prsm::Prsm(const Prsm &obj) {
   adjusted_prec_mass_ = obj.adjusted_prec_mass_;
   proteoform_ptr_ = obj.proteoform_ptr_;
   deconv_ms_ptr_vec_ = obj.deconv_ms_ptr_vec_;
-  spectrum_id_ = obj.spectrum_id_; 
+  spectrum_id_ = obj.spectrum_id_;
   spectrum_scan_ = obj.spectrum_scan_;
   precursor_id_ = obj.precursor_id_;
   prec_feature_id_ = obj.prec_feature_id_;
@@ -68,7 +72,7 @@ Prsm::Prsm(const Prsm &obj) {
 }
 
 void Prsm::init(SpParaPtr sp_para_ptr) {
-  refine_ms_three_vec_ 
+  refine_ms_three_vec_
       = ExtendMsFactory::geneMsThreePtrVec(deconv_ms_ptr_vec_, sp_para_ptr, adjusted_prec_mass_);
   initScores(sp_para_ptr);
 }
@@ -87,7 +91,7 @@ inline double compMatchFragNum(const PeakIonPairPtrVec &pairs) {
 
 inline double compMatchPeakNum(PeakIonPairPtrVec &pairs) {
   double match_peak_num = 0;
-  std::sort(pairs.begin(),pairs.end(),PeakIonPair::cmpRealPeakPosInc);
+  std::sort(pairs.begin(), pairs.end(), PeakIonPair::cmpRealPeakPosInc);
   DeconvPeakPtr prev_deconv_peak(nullptr);
   //  LOG_DEBUG("total peak number " << pairs.size());
   for (size_t i = 0; i < pairs.size(); i++) {
@@ -100,7 +104,7 @@ inline double compMatchPeakNum(PeakIonPairPtrVec &pairs) {
 }
 
 void Prsm::initMatchNum(double min_mass) {
-  PeakIonPairPtrVec pairs = 
+  PeakIonPairPtrVec pairs =
       PeakIonPairFactory::genePeakIonPairs(proteoform_ptr_, refine_ms_three_vec_,
                                            min_mass);
   match_peak_num_ = 0;
@@ -126,16 +130,16 @@ void Prsm::initScores(SpParaPtr sp_para_ptr) {
   match_fragment_num_ = 0;
   match_peak_num_ = 0;
   for (size_t i = 0; i < refine_ms_three_vec_.size(); i++) {
-    // refined one 
-    PeakIonPairPtrVec pairs = 
-        PeakIonPairFactory::genePeakIonPairs(proteoform_ptr_, refine_ms_three_vec_[i], 
+    // refined one
+    PeakIonPairPtrVec pairs =
+        PeakIonPairFactory::genePeakIonPairs(proteoform_ptr_, refine_ms_three_vec_[i],
                                              sp_para_ptr->getMinMass());
     match_fragment_num_ += compMatchFragNum(pairs);
     match_peak_num_ += compMatchPeakNum(pairs);
   }
 }
 
-xercesc::DOMElement* Prsm::toXmlElement(XmlDOMDocument* xml_doc){
+xercesc::DOMElement* Prsm::toXmlElement(XmlDOMDocument* xml_doc) {
   std::string element_name = Prsm::getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
   std::string str = StringUtil::convertToString(prsm_id_);
@@ -148,7 +152,7 @@ xercesc::DOMElement* Prsm::toXmlElement(XmlDOMDocument* xml_doc){
   str = StringUtil::convertToString(prec_feature_id_);
   xml_doc->addElement(element, "precursor_feature_id", str.c_str());
   str = StringUtil::convertToString(prec_feature_inte_);
-  xml_doc->addElement(element, "precursor_feature_inte", str.c_str());	
+  xml_doc->addElement(element, "precursor_feature_inte", str.c_str());
   str = StringUtil::convertToString(spectrum_num_);
   xml_doc->addElement(element, "spectrum_number", str.c_str());
   str = StringUtil::convertToString(ori_prec_mass_);
@@ -165,38 +169,38 @@ xercesc::DOMElement* Prsm::toXmlElement(XmlDOMDocument* xml_doc){
   xml_doc->addElement(element, "match_fragment_num", str.c_str());
   str = StringUtil::convertToString(getNormMatchFragNum());
   xml_doc->addElement(element, "norm_match_fragment_num", str.c_str());
-  proteoform_ptr_->appendXml(xml_doc,element);
-  if(extreme_value_ptr_!=nullptr){
-    extreme_value_ptr_->appendXml(xml_doc,element);
+  proteoform_ptr_->appendXml(xml_doc, element);
+  if (extreme_value_ptr_ != nullptr) {
+    extreme_value_ptr_->appendXml(xml_doc, element);
   }
   return element;
 }
 
-void Prsm::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
+void Prsm::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   xercesc::DOMElement* element = toXmlElement(xml_doc);
   parent->appendChild(element);
 }
 
 void Prsm::parseXml(xercesc::DOMElement *element) {
   prsm_id_ = XmlDomUtil::getIntChildValue(element, "prsm_id", 0);
-  spectrum_id_=XmlDomUtil::getIntChildValue(element, "spectrum_id", 0);
-  spectrum_scan_=XmlDomUtil::getChildValue(element, "spectrum_scan", 0);
-  precursor_id_=XmlDomUtil::getIntChildValue(element, "precursor_id", 0);
+  spectrum_id_ = XmlDomUtil::getIntChildValue(element, "spectrum_id", 0);
+  spectrum_scan_ = XmlDomUtil::getChildValue(element, "spectrum_scan", 0);
+  precursor_id_ = XmlDomUtil::getIntChildValue(element, "precursor_id", 0);
   prec_feature_id_ = XmlDomUtil::getIntChildValue(element, "precursor_feature_id", 0);
   prec_feature_inte_ = XmlDomUtil::getDoubleChildValue(element, "precursor_feature_inte", 0);
   spectrum_num_ = XmlDomUtil::getIntChildValue(element, "spectrum_number", 0);
-  ori_prec_mass_=XmlDomUtil::getDoubleChildValue(element, "ori_prec_mass", 0);
-  adjusted_prec_mass_=XmlDomUtil::getDoubleChildValue(element, "adjusted_prec_mass", 0);
-  fdr_=XmlDomUtil::getDoubleChildValue(element, "fdr", 0);
+  ori_prec_mass_ = XmlDomUtil::getDoubleChildValue(element, "ori_prec_mass", 0);
+  adjusted_prec_mass_ = XmlDomUtil::getDoubleChildValue(element, "adjusted_prec_mass", 0);
+  fdr_ = XmlDomUtil::getDoubleChildValue(element, "fdr", 0);
   proteoform_fdr_ = XmlDomUtil::getDoubleChildValue(element, "proteoform_fdr", 0);
-  match_peak_num_=XmlDomUtil::getDoubleChildValue(element, "match_peak_num", 0);
-  match_fragment_num_=XmlDomUtil::getDoubleChildValue(element, "match_fragment_num", 0);
+  match_peak_num_ = XmlDomUtil::getDoubleChildValue(element, "match_peak_num", 0);
+  match_fragment_num_ = XmlDomUtil::getDoubleChildValue(element, "match_fragment_num", 0);
 
-  int prob_count = XmlDomUtil::getChildCount(element,"extreme_value");
-  if(prob_count!=0){
-    xercesc::DOMElement* prob_element 
-        = XmlDomUtil::getChildElement(element,"extreme_value",0);
-    extreme_value_ptr_ = ExtremeValuePtr(new ExtremeValue(prob_element));
+  int prob_count = XmlDomUtil::getChildCount(element, "extreme_value");
+  if (prob_count != 0) {
+    xercesc::DOMElement* prob_element
+        = XmlDomUtil::getChildElement(element, "extreme_value", 0);
+    extreme_value_ptr_ = std::make_shared<ExtremeValue>(prob_element);
   }
 }
 
@@ -204,8 +208,7 @@ double Prsm::getEValue() {
   if (extreme_value_ptr_ == nullptr) {
     LOG_WARN("Probability pointer is null.");
     return -1;
-  }
-  else {
+  } else {
     return extreme_value_ptr_->getEValue();
   }
 }
@@ -214,8 +217,7 @@ double Prsm::getPValue() {
   if (extreme_value_ptr_ == nullptr) {
     LOG_WARN("Probability pointer is null.");
     return -1;
-  }
-  else {
+  } else {
     return extreme_value_ptr_->getPValue();
   }
 }
@@ -224,8 +226,7 @@ double Prsm::getOneProtProb() {
   if (extreme_value_ptr_ == nullptr) {
     LOG_WARN("Probability pointer is null.");
     return -1;
-  }
-  else {
+  } else {
     return extreme_value_ptr_->getOneProtProb();
   }
 }
@@ -240,7 +241,7 @@ double Prsm::getNormMatchFragNum() {
   if (start_pos == 0 || start_pos == 1) {
     score = score + 2;
   }
-  if (end_pos == (int)proteoform_ptr_->getFastaSeqPtr()->getRawSeq().length() - 1) {
+  if (end_pos == static_cast<int>(proteoform_ptr_->getFastaSeqPtr()->getRawSeq().length()) - 1) {
     score = score + 2;
   }
   return score;
@@ -248,37 +249,32 @@ double Prsm::getNormMatchFragNum() {
 
 // sort by the number of matched fragments, then the number of matched peaks
 bool Prsm::cmpMatchFragmentDecMatchPeakDec(const PrsmPtr &a, const PrsmPtr &b) {
-  if(a->getMatchFragNum() > b->getMatchFragNum()){
+  if (a->getMatchFragNum() > b->getMatchFragNum()) {
     return true;
-  }
-  else if(a->getMatchFragNum() < b->getMatchFragNum()){
+  } else if (a->getMatchFragNum() < b->getMatchFragNum()) {
     return false;
   }
   return a->getMatchPeakNum() > b->getMatchPeakNum();
 }
 
-
-// sort by number of matched fragment ions, then start position 
+// sort by number of matched fragment ions, then start position
 bool Prsm::cmpMatchFragDecStartPosInc(const PrsmPtr &a, const PrsmPtr &b) {
-  if(a->getMatchFragNum() > b->getMatchFragNum()){
+  if (a->getMatchFragNum() > b->getMatchFragNum()) {
     return true;
-  }
-  else if(a->getMatchFragNum() == b->getMatchFragNum()){
-    return a->getProteoformPtr()->getStartPos()<b->getProteoformPtr()->getStartPos();
+  } else if (a->getMatchFragNum() == b->getMatchFragNum()) {
+    return a->getProteoformPtr()->getStartPos() < b->getProteoformPtr()->getStartPos();
   }
   return false;
 }
 
 // sort by the order of spectrum id, the precursor id
-bool Prsm::cmpSpectrumIdIncPrecursorIdInc(const PrsmPtr &a, const PrsmPtr &b){
-  if(a->getSpectrumId() < b->getSpectrumId()){
+bool Prsm::cmpSpectrumIdIncPrecursorIdInc(const PrsmPtr &a, const PrsmPtr &b) {
+  if (a->getSpectrumId() < b->getSpectrumId()) {
     return true;
-  }
-  else if(a->getSpectrumId() > b->getSpectrumId()){
+  } else if (a->getSpectrumId() > b->getSpectrumId()) {
     return false;
-  }
-  else{
-    if(a->getPrecursorId() < b->getPrecursorId()){
+  } else {
+    if (a->getPrecursorId() < b->getPrecursorId()) {
       return true;
     }
     return false;
@@ -286,15 +282,13 @@ bool Prsm::cmpSpectrumIdIncPrecursorIdInc(const PrsmPtr &a, const PrsmPtr &b){
 }
 
 // sort by spectrum id then match ions
-bool Prsm::cmpSpectrumIdIncMatchFragDec(const PrsmPtr &a, const PrsmPtr &b){
-  if(a->getSpectrumId() < b->getSpectrumId()){
+bool Prsm::cmpSpectrumIdIncMatchFragDec(const PrsmPtr &a, const PrsmPtr &b) {
+  if (a->getSpectrumId() < b->getSpectrumId()) {
     return true;
-  }
-  else if(a->getSpectrumId() > b->getSpectrumId()){
+  } else if (a->getSpectrumId() > b->getSpectrumId()) {
     return false;
-  }
-  else{
-    if(a->getMatchFragNum() > b->getMatchFragNum()){
+  } else {
+    if (a->getMatchFragNum() > b->getMatchFragNum()) {
       return true;
     }
     return false;
@@ -302,19 +296,17 @@ bool Prsm::cmpSpectrumIdIncMatchFragDec(const PrsmPtr &a, const PrsmPtr &b){
 }
 
 // sort by spectrum id then evalue
-bool Prsm::cmpSpectrumIdIncEvalueInc(const PrsmPtr &a, const PrsmPtr &b){
-  if(a->getSpectrumId() < b->getSpectrumId()){
+bool Prsm::cmpSpectrumIdIncEvalueInc(const PrsmPtr &a, const PrsmPtr &b) {
+  if (a->getSpectrumId() < b->getSpectrumId()) {
     return true;
-  }
-  else if(a->getSpectrumId() > b->getSpectrumId()){
+  } else if (a->getSpectrumId() > b->getSpectrumId()) {
     return false;
-  }
-  else{
-    if(a->getEValue() < b->getEValue()){
+  } else {
+    if (a->getEValue() < b->getEValue()) {
       return true;
     }
     return false;
   }
 }
 
-}
+}  // namespace prot

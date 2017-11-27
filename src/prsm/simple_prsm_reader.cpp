@@ -13,6 +13,9 @@
 //limitations under the License.
 
 
+#include <string>
+#include <vector>
+
 #include <xercesc/framework/MemBufInputSource.hpp>
 
 #include "base/logger.hpp"
@@ -32,17 +35,14 @@ std::vector<std::string> SimplePrsmReader::readOnePrsmLines() {
     line = StringUtil::trim(line);
     if (line ==  "<simple_prsm>") {
       line_list.push_back(line);
-    }
-    else if (line == "</simple_prsm>") {
+    } else if (line == "</simple_prsm>") {
       if (line_list.size() != 0) {
         line_list.push_back(line);
       }
       return line_list;
-    }
-    else if (line == "") {
+    } else if (line == "") {
       continue;
-    }
-    else {
+    } else {
       if (line_list.size() > 0) {
         line_list.push_back(line);
       }
@@ -53,11 +53,11 @@ std::vector<std::string> SimplePrsmReader::readOnePrsmLines() {
 
 SimplePrsmStrPtr SimplePrsmReader::readOnePrsmStr() {
   std::vector<std::string> prsm_str_vec = readOnePrsmLines();
-  //LOG_DEBUG("prsm str size " << prsm_str_vec.size());
+  // LOG_DEBUG("prsm str size " << prsm_str_vec.size());
   if (prsm_str_vec.size() == 0) {
     return SimplePrsmStrPtr(nullptr);
   }
-  return SimplePrsmStrPtr(new SimplePrsmStr(prsm_str_vec));
+  return std::make_shared<SimplePrsmStr>(prsm_str_vec);
 }
 
 SimplePrsmPtr SimplePrsmReader::readOnePrsm() {
@@ -74,12 +74,12 @@ SimplePrsmPtr SimplePrsmReader::readOnePrsm() {
 
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   SimplePrsmPtr ptr;
-  if(parser){
+  if (parser) {
     XmlDOMDocument doc(parser, prsm_buf);
     xercesc::DOMElement* root = doc.getDocumentElement();
-    ptr = SimplePrsmPtr(new SimplePrsm(root));
+    ptr = std::make_shared<SimplePrsm>(root);
   }
-  //LOG_DEBUG("simple prsm spectrum id " << ptr->getSpectrumId() << " seq name " << ptr->getSeqName());
+  // LOG_DEBUG("simple prsm spectrum id " << ptr->getSpectrumId() << " seq name " << ptr->getSeqName());
   return ptr;
 }
 
@@ -88,7 +88,7 @@ void SimplePrsmReader::close() {
   input_.close();
 }
 
-SimplePrsmPtrVec SimplePrsmReader::readSimplePrsms(const std::string &file_name){
+SimplePrsmPtrVec SimplePrsmReader::readSimplePrsms(const std::string &file_name) {
   SimplePrsmPtrVec result_ptrs;
   SimplePrsmReader reader(file_name);
   SimplePrsmPtr prsm_ptr = reader.readOnePrsm();
@@ -98,6 +98,5 @@ SimplePrsmPtrVec SimplePrsmReader::readSimplePrsms(const std::string &file_name)
   }
   return result_ptrs;
 }
-
 
 } /* namespace prot */
