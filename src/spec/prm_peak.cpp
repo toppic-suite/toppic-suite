@@ -23,31 +23,27 @@
 
 namespace prot {
 
-void PrmPeak::addNghbEdge(DeconvPeakPtr deconv_peak_ptr,double offset,
-                          SPTypePtr peak_type_ptr,double score){
+void PrmPeak::addNghbEdge(DeconvPeakPtr deconv_peak_ptr, double offset,
+                          SPTypePtr peak_type_ptr, double score) {
   score_ += score;
-  SupportPeakPtr support_peak_ptr(
-      new SupportPeak(deconv_peak_ptr,offset,score, peak_type_ptr));
+  SupportPeakPtr support_peak_ptr
+      = std::make_shared<SupportPeak>(deconv_peak_ptr, offset, score, peak_type_ptr);
   neighbor_list_.push_back(support_peak_ptr);
 }
 
 RmBreakTypePtr PrmPeak::getBreakType() {
   RmBreakTypePtr bt_ptr = RmBreakType::NONE;
-  for(size_t i=0; i<neighbor_list_.size(); i++){
-    if(neighbor_list_[i]->getPeakTypePtr() == 
-       SPTypeBase::getSPTypePtr_N_TERM()) {
-      if(bt_ptr == RmBreakType::NONE) {
+  for (size_t i = 0; i < neighbor_list_.size(); i++) {
+    if (neighbor_list_[i]->getPeakTypePtr() == SPTypeBase::getSPTypePtr_N_TERM()) {
+      if (bt_ptr == RmBreakType::NONE) {
         bt_ptr = RmBreakType::N_TERM;
-      }
-      else if(bt_ptr == RmBreakType::C_TERM){
+      } else if (bt_ptr == RmBreakType::C_TERM) {
         bt_ptr = RmBreakType::BOTH;
       }
-    }
-    else{
-      if(bt_ptr == RmBreakType::NONE){
+    } else {
+      if (bt_ptr == RmBreakType::NONE) {
         bt_ptr = RmBreakType::C_TERM;
-      }
-      else if(bt_ptr == RmBreakType::N_TERM){
+      } else if (bt_ptr == RmBreakType::N_TERM) {
         bt_ptr = RmBreakType::BOTH;
       }
     }

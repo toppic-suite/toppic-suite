@@ -15,6 +15,9 @@
 
 #include <sstream>
 #include <cmath>
+#include <utility>
+#include <string>
+#include <vector>
 
 #include "base/activation_base.hpp"
 #include "base/logger.hpp"
@@ -25,35 +28,34 @@
 
 namespace prot {
 
-MsHeader::MsHeader(xercesc::DOMElement* element){
-  file_name_ = XmlDomUtil::getChildValue(element,"file_name",0);
-  id_ = XmlDomUtil::getIntChildValue(element,"id",0);
-  prec_id_ = XmlDomUtil::getIntChildValue(element,"prec_id",0);
-  title_= XmlDomUtil::getChildValue(element,"title",0);
-  level_ = XmlDomUtil::getIntChildValue(element,"level",0);
+MsHeader::MsHeader(xercesc::DOMElement* element) {
+  file_name_ = XmlDomUtil::getChildValue(element, "file_name", 0);
+  id_ = XmlDomUtil::getIntChildValue(element, "id", 0);
+  prec_id_ = XmlDomUtil::getIntChildValue(element, "prec_id", 0);
+  title_ = XmlDomUtil::getChildValue(element, "title", 0);
+  level_ = XmlDomUtil::getIntChildValue(element, "level", 0);
 
-  xercesc::DOMElement* scan_element 
-      = XmlDomUtil::getChildElement(element,"scan_list",0);
-  int scans = XmlDomUtil::getChildCount(scan_element,"scan");
-  for(int i=0;i<scans;i++){
-    scans_.push_back(XmlDomUtil::getIntChildValue(scan_element,"scan",i));
+  xercesc::DOMElement* scan_element
+      = XmlDomUtil::getChildElement(element, "scan_list", 0);
+  int scans = XmlDomUtil::getChildCount(scan_element, "scan");
+  for (int i = 0; i < scans; i++) {
+    scans_.push_back(XmlDomUtil::getIntChildValue(scan_element, "scan", i));
   }
-  retention_time_ = XmlDomUtil::getDoubleChildValue(element,"retention_time",0);
-  prec_sp_mz_ = XmlDomUtil::getDoubleChildValue(element,"prec_sp_mz",0);
-  prec_mono_mz_ = XmlDomUtil::getDoubleChildValue(element,"prec_mono_mz",0);
-  prec_charge_ = XmlDomUtil::getIntChildValue(element,"prec_charge",0);
+  retention_time_ = XmlDomUtil::getDoubleChildValue(element, "retention_time", 0);
+  prec_sp_mz_ = XmlDomUtil::getDoubleChildValue(element, "prec_sp_mz", 0);
+  prec_mono_mz_ = XmlDomUtil::getDoubleChildValue(element, "prec_mono_mz", 0);
+  prec_charge_ = XmlDomUtil::getIntChildValue(element, "prec_charge", 0);
   std::string element_name = Activation::getXmlElementName();
-  xercesc::DOMElement* ac_element 
-      = XmlDomUtil::getChildElement(element,element_name.c_str(),0);
-  activation_ptr_= ActivationBase::getActivationPtrFromXml(ac_element);
+  xercesc::DOMElement* ac_element
+      = XmlDomUtil::getChildElement(element, element_name.c_str(), 0);
+  activation_ptr_ = ActivationBase::getActivationPtrFromXml(ac_element);
 }
 
 double MsHeader::getPrecMonoMass() {
   if (prec_mono_mz_ < 0 || std::isnan(prec_mono_mz_)) {
     LOG_WARN("monoisotopic mass is not initialized");
     return 0.0;
-  } 
-  else {
+  } else {
     return PeakUtil::compPeakMass(prec_mono_mz_, prec_charge_);
   }
 }
@@ -77,16 +79,13 @@ double MsHeader::getPrecMonoMassMinusWater() {
   }
 }
 
-
-std::pair<int,int> MsHeader::getPrecMonoMassMinusWaterError(double ppo, 
-                                                            double scale) {
-  int mass = (int) std::round(getPrecMonoMassMinusWater() * scale);
+std::pair<int, int> MsHeader::getPrecMonoMassMinusWaterError(double ppo, double scale) {
+  int mass = static_cast<int>(std::round(getPrecMonoMassMinusWater() * scale));
   double error_tolerance = getErrorTolerance(ppo);
-  int error = (int) std::ceil(error_tolerance*scale);
-  std::pair<int,int> result (mass,error);
+  int error = static_cast<int>(std::ceil(error_tolerance*scale));
+  std::pair<int, int> result(mass, error);
   return result;
 }
-
 
 std::string MsHeader::toString() {
   std::stringstream tmp;
@@ -117,7 +116,7 @@ void MsHeader::setScans(const std::string &s) {
     scans_.push_back(-1);
     return;
   }
-  std::vector<std::string> strs = StringUtil::split(s,' '); 
+  std::vector<std::string> strs = StringUtil::split(s, ' ');
   for (size_t i = 0; i < strs.size(); i++) {
     scans_.push_back(std::stoi(strs[i]));
   }
@@ -155,12 +154,12 @@ xercesc::DOMElement* MsHeader::getHeaderXml(XmlDOMDocument* xml_doc) {
   return element;
 }
 
-void MsHeader::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
+void MsHeader::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   parent->appendChild(getHeaderXml(xml_doc));
 }
 
 MsHeaderPtr MsHeader::geneMsHeaderPtr(MsHeaderPtr ori_ptr, double new_prec_mass) {
-  MsHeaderPtr new_header_ptr(new MsHeader(*ori_ptr.get()));
+  MsHeaderPtr new_header_ptr = std::make_shared<MsHeader>(*ori_ptr.get());
   double mono_mz = PeakUtil::compMonoMz(new_prec_mass, ori_ptr->getPrecCharge());
   new_header_ptr->setPrecMonoMz(mono_mz);
   return new_header_ptr;
@@ -170,4 +169,4 @@ bool MsHeader::cmpPrecInteDec(const MsHeaderPtr &a, const MsHeaderPtr &b) {
   return a->getPrecInte() > b->getPrecInte();
 }
 
-}
+}  // namespace prot

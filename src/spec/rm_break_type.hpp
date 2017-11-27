@@ -28,18 +28,22 @@ typedef std::shared_ptr<RmBreakType> RmBreakTypePtr;
 class RmBreakType {
  public:
   static const RmBreakTypePtr NONE;
+
   static const RmBreakTypePtr N_TERM;
+
   static const RmBreakTypePtr C_TERM;
+
   static const RmBreakTypePtr BOTH;
 
   std::string getName() {return name_;}
 
+  explicit RmBreakType(std::string name): name_(name) {}
+
  private:
   std::string name_;
-  RmBreakType(std::string name): name_(name) {};
 };
 
-}
+}  // namespace prot
 
 #endif
 

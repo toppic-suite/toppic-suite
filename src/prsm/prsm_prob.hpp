@@ -31,15 +31,25 @@ namespace prot {
 
 class PrsmProb {
  public:
-  PrsmProb(const std::string &db_file_name, 
-           const std::string &spec_file_name, 
+  PrsmProb(const std::string &db_file_name,
+           const std::string &spec_file_name,
            const ModPtrVec &fix_mod_ptr_vec,
            const std::string &in_file_ext,
            const std::string &out_file_ext,
            double K1, double K2,
-           double pref, double inte);
+           double pref, double inte):
+      db_file_name_(db_file_name),
+      spec_file_name_(spec_file_name),
+      fix_mod_ptr_vec_(fix_mod_ptr_vec),
+      input_file_ext_(in_file_ext),
+      output_file_ext_(out_file_ext),
+      K1_(K1),
+      K2_(K2),
+      pref_(pref),
+      inte_(inte) {}
 
   void process();
+
  private:
   std::string db_file_name_;
   std::string spec_file_name_;
@@ -50,7 +60,6 @@ class PrsmProb {
   double K2_;
   double pref_;
   double inte_;
-
 };
 
 typedef std::shared_ptr<PrsmProb> PrsmProbPtr;

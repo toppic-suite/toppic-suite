@@ -14,6 +14,7 @@
 
 
 #include <memory>
+#include <vector>
 
 #include "spec/peak.hpp"
 #include "spec/ms.hpp"
@@ -22,7 +23,7 @@
 namespace prot {
 
 
-DeconvMsPtrVec DeconvMsFactory::getRefineMsPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, 
+DeconvMsPtrVec DeconvMsFactory::getRefineMsPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
                                                   double new_prec_mass) {
   DeconvMsPtrVec result_ptrs;
   for (size_t m = 0; m < deconv_ms_ptr_vec.size(); m++) {
@@ -33,14 +34,14 @@ DeconvMsPtrVec DeconvMsFactory::getRefineMsPtrVec(const DeconvMsPtrVec &deconv_m
     for (size_t p = 0; p < deconv_ms_ptr->size(); p++) {
       DeconvPeakPtr ori_peak_ptr = deconv_ms_ptr->getPeakPtr(p);
       // * is a dereference operator
-      DeconvPeakPtr new_peak_ptr(new DeconvPeak(*ori_peak_ptr.get()));
-      //new_peak_ptr->setPosition(new_peak_ptr->getPosition() * (1 + calibration));
+      DeconvPeakPtr new_peak_ptr = std::make_shared<DeconvPeak>(*ori_peak_ptr.get());
+      // new_peak_ptr->setPosition(new_peak_ptr->getPosition() * (1 + calibration));
       peak_ptr_list.push_back(new_peak_ptr);
     }
-    DeconvMsPtr ms_ptr(new Ms<DeconvPeakPtr>(header_ptr, peak_ptr_list));
+    DeconvMsPtr ms_ptr = std::make_shared<Ms<DeconvPeakPtr> >(header_ptr, peak_ptr_list);
     result_ptrs.push_back(ms_ptr);
   }
   return result_ptrs;
 }
 
-}
+}  // namespace prot

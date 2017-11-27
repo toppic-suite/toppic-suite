@@ -13,6 +13,10 @@
 //limitations under the License.
 
 
+#include <string>
+#include <algorithm>
+#include <vector>
+
 #include "base/file_util.hpp"
 #include "prsm/prsm_str_combine.hpp"
 #include "prsm/prsm_reader.hpp"
@@ -20,20 +24,10 @@
 
 namespace prot {
 
-PrsmStrCombine::PrsmStrCombine(const std::string &spec_file_name, 
-                               const std::vector<std::string> &in_file_exts,
-                               const std::string &out_file_ext, 
-                               int top_num) {
-  input_file_exts_ = in_file_exts;
-  output_file_ext_ = out_file_ext;
-  spec_file_name_ = spec_file_name;
-  top_num_ = top_num;
-}
-
-PrsmStrCombine::PrsmStrCombine(const std::string &spec_file_name, 
+PrsmStrCombine::PrsmStrCombine(const std::string &spec_file_name,
                                const std::string &in_file_ext,
                                int in_num,
-                               const std::string &out_file_ext, 
+                               const std::string &out_file_ext,
                                int top_num) {
   output_file_ext_ = out_file_ext;
   spec_file_name_ = spec_file_name;
@@ -46,19 +40,19 @@ PrsmStrCombine::PrsmStrCombine(const std::string &spec_file_name,
 
 void PrsmStrCombine::process(bool norm) {
   size_t input_num = input_file_exts_.size();
-  std::string base_name = FileUtil::basename(spec_file_name_); 
+  std::string base_name = FileUtil::basename(spec_file_name_);
   // open files
   PrsmReaderPtrVec reader_ptrs;
   PrsmStrPtrVec prsm_str_ptrs;
   for (size_t i = 0; i < input_num; i++) {
-    std::string input_file_name = base_name + "." + input_file_exts_[i]; 
-    PrsmReaderPtr reader_ptr(new PrsmReader(input_file_name));
+    std::string input_file_name = base_name + "." + input_file_exts_[i];
+    PrsmReaderPtr reader_ptr = std::make_shared<PrsmReader>(input_file_name);
     PrsmStrPtr str_ptr = reader_ptr->readOnePrsmStr();
     reader_ptrs.push_back(reader_ptr);
     prsm_str_ptrs.push_back(str_ptr);
   }
-  PrsmXmlWriter writer(base_name +"."+output_file_ext_);
-  
+  PrsmXmlWriter writer(base_name + "." + output_file_ext_);
+
   // combine
   int spec_id = 0;
   bool finish = false;
@@ -76,13 +70,12 @@ void PrsmStrCombine::process(bool norm) {
     }
     if (cur_str_ptrs.size() > 0) {
       if (!norm) {
-        std::sort(cur_str_ptrs.begin(),cur_str_ptrs.end(), PrsmStr::cmpMatchFragmentDec);
-      }
-      else {
-        std::sort(cur_str_ptrs.begin(),cur_str_ptrs.end(), PrsmStr::cmpNormMatchFragmentDec);
+        std::sort(cur_str_ptrs.begin(), cur_str_ptrs.end(), PrsmStr::cmpMatchFragmentDec);
+      } else {
+        std::sort(cur_str_ptrs.begin(), cur_str_ptrs.end(), PrsmStr::cmpNormMatchFragmentDec);
       }
       for (int i = 0; i < top_num_; i++) {
-        if (i >= (int)cur_str_ptrs.size()) {
+        if (i >= static_cast<int>(cur_str_ptrs.size())) {
           break;
         }
         writer.write(cur_str_ptrs[i]);
@@ -90,7 +83,7 @@ void PrsmStrCombine::process(bool norm) {
     }
     spec_id++;
   }
-  
+
   // close files
   for (size_t i = 0; i < input_num; i++) {
     reader_ptrs[i]->close();

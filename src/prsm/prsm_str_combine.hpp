@@ -33,12 +33,16 @@ class PrsmStrCombine {
   PrsmStrCombine(const std::string &spec_file_name, 
                  const std::vector<std::string> &in_file_exts,
                  const std::string &out_file_ext,
-                 int top_num);
+                 int top_num):
+      spec_file_name_(spec_file_name),
+      input_file_exts_(in_file_exts),
+      output_file_ext_(out_file_ext),
+      top_num_(top_num) {}
 
-  PrsmStrCombine(const std::string &spec_file_name, 
+  PrsmStrCombine(const std::string &spec_file_name,
                  const std::string &in_file_ext,
                  int in_num,
-                 const std::string &out_file_ext, 
+                 const std::string &out_file_ext,
                  int top_num);
 
   void process(bool norm);
@@ -55,4 +59,4 @@ class PrsmStrCombine {
 typedef std::shared_ptr<PrsmStrCombine> PrsmStrCombinePtr;
 } /* namespace prot */
 
-#endif 
+#endif

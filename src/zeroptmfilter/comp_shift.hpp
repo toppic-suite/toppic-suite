@@ -32,7 +32,7 @@ class CompShift {
             double max_proteoform_mass, ProtModPtrVec prot_mod_ptr_vec, 
             bool use_rev);
 
-  ~CompShift();
+  ~CompShift() {}
 
   void compZeroPtmConvolution(const std::vector<std::pair<int,int>> &pref_mass_errors, 
                               const std::vector<std::pair<int,int>> &suff_mass_errors,
