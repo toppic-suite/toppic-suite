@@ -41,7 +41,7 @@ class PtmSlowMatch {
                CompShiftLowMem comp_shift,
                PtmSearchMngPtr mng_ptr);
 
-  ProteoformPtr getProteoform(){return proteo_ptr_;};
+  ProteoformPtr getProteoform(){return proteo_ptr_;}
 
   void init();
 
@@ -76,4 +76,4 @@ typedef std::vector<PtmSlowMatchPtr> PtmSlowMatchPtrVec;
 
 } /* namespace prot */
 
-#endif 
+#endif

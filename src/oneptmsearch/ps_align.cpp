@@ -13,37 +13,31 @@
 //limitations under the License.
 
 
+#include <limits>
+#include <algorithm>
+#include <vector>
+
 #include "base/proteoform_factory.hpp"
 #include "spec/extend_ms_factory.hpp"
 #include "oneptmsearch/ps_align.hpp"
 
 namespace prot {
 
-PSAlign::PSAlign(const std::vector<double> &ms_masses, 
+PSAlign::PSAlign(const std::vector<double> &ms_masses,
                  const std::vector<double> &seq_masses,
-                 const BasicDiagonalPtrVec &diagonal_ptrs, 
+                 const BasicDiagonalPtrVec &diagonal_ptrs,
                  PsAlignParaPtr para_ptr):
     para_ptr_(para_ptr),
     ms_masses_(ms_masses),
     seq_masses_(seq_masses),
     diagonal_ptrs_(diagonal_ptrs) {
-      //int start_s = clock();
       initDPPair();
-      //int stop_s = clock();
-      //std::cout <<  "init dp pair running time: " << (stop_s-start_s) / double(CLOCKS_PER_SEC)  << " seconds " << std::endl;
     }
 
 
 void PSAlign::compute(AlignTypePtr align_type_ptr) {
-  //int start_s = clock();
   dp(align_type_ptr);
-  //int stop_s = clock();
-  //std::cout <<  "dp running time: " << (stop_s-start_s) / double(CLOCKS_PER_SEC)  << " seconds " << std::endl;
-
-  //start_s = clock();
   backtrace();
-  //stop_s = clock();
-  //std::cout << "backtrace running time: " << (stop_s-start_s) / double(CLOCKS_PER_SEC)  << " seconds " << std::endl;
 }
 
 void PSAlign::initDPPair() {
@@ -59,7 +53,7 @@ void PSAlign::initDPPair() {
       int y = diagonal_ptrs_[i]->getDiagPair(j)->getY();
       double score = diagonal_ptrs_[i]->getDiagPair(j)->getScore();
       double diff = diagonal_ptrs_[i]->getDiagPair(j)->getDiff();
-      DPPairPtr dp_pair_ptr = std::make_shared<DPPair>(x, y, score, diff, j, 
+      DPPairPtr dp_pair_ptr = std::make_shared<DPPair>(x, y, score, diff, j,
                                                        para_ptr_->n_unknown_shift_,
                                                        diagonal_ptrs_[i]->getHeader());
       dp_2d_pair_ptrs_[i].push_back(dp_pair_ptr);
@@ -68,7 +62,7 @@ void PSAlign::initDPPair() {
     segment_end_pair_ptrs_.push_back(dp_2d_pair_ptrs_[i][diagonal_ptrs_[i]->size() - 1]);
   }
 
-  // init 1d dp pairs 
+  // init 1d dp pairs
   dp_pair_ptrs_.clear();
   first_pair_ptr_ = std::make_shared<DPPair>(-1, -1, 0, 0, -1, para_ptr_->n_unknown_shift_, nullptr);
   first_pair_ptr_->setDiagPrevPairPtr(nullptr);
@@ -84,16 +78,15 @@ void PSAlign::initDPPair() {
   // last pair
   double diff = ms_masses_[ms_masses_.size() - 1]
       - seq_masses_[seq_masses_.size() - 1];
-  last_pair_ptr_ = DPPairPtr(
-      new DPPair(ms_masses_.size(), seq_masses_.size(), 0, diff, -1,
-                 para_ptr_->n_unknown_shift_, nullptr));
+  last_pair_ptr_ = std::make_shared<DPPair>(ms_masses_.size(), seq_masses_.size(), 0, diff, -1,
+                                            para_ptr_->n_unknown_shift_, nullptr);
   last_pair_ptr_->setDiagPrevPairPtr(nullptr);
   dp_pair_ptrs_.push_back(last_pair_ptr_);
   std::sort(dp_pair_ptrs_.begin(), dp_pair_ptrs_.end(), Pair::cmpPosInc);
-  // init indexes 
+  // init indexes
   for (size_t i = 0; i < dp_pair_ptrs_.size(); i++) {
-    std::vector<int> ends (diagonal_ptrs_.size(), -1);
-    std::vector<bool> large_shifts (diagonal_ptrs_.size(), false);
+    std::vector<int> ends(diagonal_ptrs_.size(), -1);
+    std::vector<bool> large_shifts(diagonal_ptrs_.size(), false);
     DPPairPtr cur_pair_ptr = dp_pair_ptrs_[i];
     if (cur_pair_ptr == last_pair_ptr_ || cur_pair_ptr == first_pair_ptr_) {
       idxes_.push_back(ends);
@@ -131,7 +124,7 @@ void PSAlign::initDPPair() {
 }
 
 void PSAlign::dpPrep() {
-  std::sort(dp_pair_ptrs_.begin(),dp_pair_ptrs_.end(),Pair::cmpPosInc);
+  std::sort(dp_pair_ptrs_.begin(), dp_pair_ptrs_.end(), Pair::cmpPosInc);
   for (int s = 0; s < para_ptr_->n_unknown_shift_ + 1; s++) {
     dp_pair_ptrs_[0]->updateTable(s, 0, PATH_TYPE_NULL, nullptr);
   }
@@ -151,8 +144,7 @@ inline DPPairPtr PSAlign::getTruncPre(DPPairPtr cur_pair_ptr, int s,
             trunc_score = prev_pair_ptr->getScore(s);
           }
         }
-      }
-      else {
+      } else {
         if (prev_pair_ptr->getDiagonalHeader()->isPepCTermMatch()) {
           if (prev_pair_ptr->getScore(s) > trunc_score) {
             trunc_prev_ptr = prev_pair_ptr;
@@ -161,9 +153,8 @@ inline DPPairPtr PSAlign::getTruncPre(DPPairPtr cur_pair_ptr, int s,
         }
       }
     }
-  } 
-  else {
-    // if cur_pair_ptr is the first in a diagonal 
+  } else {
+    // if cur_pair_ptr is the first in a diagonal
     if (cur_pair_ptr->getDiagOrder() == 0) {
       if (align_type_ptr == AlignType::COMPLETE
           || align_type_ptr == AlignType::PREFIX) {
@@ -202,23 +193,15 @@ inline DPPairPtr PSAlign::getShiftPre(DPPairPtr cur_pair_ptr, int p, int s,
         shift_prev = prev_pair_ptr;
         shift_score = prev_score;
       }
-
     }
   }
   return shift_prev;
 }
 
 void PSAlign::dp(AlignTypePtr align_type_ptr) {
-  //int pre_start = clock();
   dpPrep();
-  //int pre_stop = clock();
-  //std::cout << "pre time: " << (pre_stop - pre_start) / double(CLOCKS_PER_SEC)  << std::endl;
-  //int trunc_time = 0;
-  //int shift_time = 0;
-  //int update_time = 0;
   for (size_t p = 1; p < dp_pair_ptrs_.size(); p++) {
     for (int s = 0; s <= para_ptr_->n_unknown_shift_; s++) {
-      //int start_s = clock();
       DPPairPtr trunc_prev_ptr = getTruncPre(dp_pair_ptrs_[p], s, align_type_ptr);
       double trunc_score;
       if (trunc_prev_ptr == nullptr) {
@@ -234,9 +217,6 @@ void PSAlign::dp(AlignTypePtr align_type_ptr) {
       } else {
         diag_score = - std::numeric_limits<double>::max();
       }
-      //int stop_s = clock();
-      //trunc_time = trunc_time + stop_s - start_s;
-      //start_s = clock();
       DPPairPtr shift_prev = getShiftPre(dp_pair_ptrs_[p], p, s, align_type_ptr);
       double shift_score;
       if (shift_prev == nullptr) {
@@ -244,13 +224,10 @@ void PSAlign::dp(AlignTypePtr align_type_ptr) {
       } else {
         shift_score = shift_prev->getScore(s - 1);
       }
-      //stop_s = clock();
-      //shift_time = shift_time + stop_s - start_s;
-      //start_s = clock();
       double new_score = dp_pair_ptrs_[p]->getPairScore();
       if (trunc_score >= diag_score && trunc_score >= shift_score) {
         if (trunc_score ==  - std::numeric_limits<double>::max()) {
-          dp_pair_ptrs_[p]->updateTable(s, -std::numeric_limits<double>::max(), 
+          dp_pair_ptrs_[p]->updateTable(s, -std::numeric_limits<double>::max(),
                                         PATH_TYPE_NULL, nullptr);
         } else {
           dp_pair_ptrs_[p]->updateTable(s, trunc_score + new_score, PATH_TYPE_TRUNC,
@@ -263,15 +240,8 @@ void PSAlign::dp(AlignTypePtr align_type_ptr) {
         dp_pair_ptrs_[p]->updateTable(s, shift_score + new_score, PATH_TYPE_SHIFT,
                                       shift_prev);
       }
-      //stop_s = clock();
-      //update_time = update_time + stop_s - start_s;
     }
   }
-  /*
-     std::cout << "trunc time: " << (trunc_time) / double(CLOCKS_PER_SEC)  << " shift time  " 
-     << (shift_time) / double (CLOCKS_PER_SEC) << " update time " 
-     << (update_time) /double (CLOCKS_PER_SEC) << std::endl;
-     */
 }
 
 void PSAlign::backtrace() {
@@ -289,15 +259,15 @@ DiagonalHeaderPtrVec PSAlign::backtrace(int s) {
   int cur_end = -1;
   int cur_bgn = -1;
   DPPairPtr p = last_pair_ptr_;
-  if (p->getPrevPairPtr(s) == nullptr || p->getPrevPairPtr(s) == first_pair_ptr_ 
+  if (p->getPrevPairPtr(s) == nullptr || p->getPrevPairPtr(s) == first_pair_ptr_
       || p->getScore(s) <= 0) {
     return list;
   }
 
-  //LOG_DEBUG("backtrace start ");
+  // LOG_DEBUG("backtrace start ");
   while (p != first_pair_ptr_) {
     DPPairPtr pre = p->getPrevPairPtr(s);
-    //LOG_DEBUG("p " << p << " pre ptr " << pre);
+    // LOG_DEBUG("p " << p << " pre ptr " << pre);
     if (p == last_pair_ptr_) {
       cur_header = pre->getDiagonalHeader();
       cur_end = pre->getY();
@@ -321,14 +291,14 @@ DiagonalHeaderPtrVec PSAlign::backtrace(int s) {
   return list;
 }
 
-PrsmPtr PSAlign::geneResult(int shift_num, ProteoformPtr proteo_ptr, 
+PrsmPtr PSAlign::geneResult(int shift_num, ProteoformPtr proteo_ptr,
                             DeconvMsPtrVec &deconv_ms_ptr_vec,
-                            ExtendMsPtrVec &ms_three_ptr_vec, 
+                            ExtendMsPtrVec &ms_three_ptr_vec,
                             PrsmParaPtr prsm_para_ptr) {
-  DiagonalHeaderPtrVec header_ptrs= getDiagonalHeaders(shift_num);
-  //double score = ps_align_ptr_->getAlignScr(shift_num);
-  //LOG_DEBUG("Shift " << shift_num << " score " << score);
-  if(header_ptrs.size()==0) {
+  DiagonalHeaderPtrVec header_ptrs = getDiagonalHeaders(shift_num);
+  // double score = ps_align_ptr_->getAlignScr(shift_num);
+  // LOG_DEBUG("Shift " << shift_num << " score " << score);
+  if (header_ptrs.size() == 0) {
     return nullptr;
   }
   int first_pos = header_ptrs[0]->getTruncFirstResPos();
@@ -338,12 +308,12 @@ PrsmPtr PSAlign::geneResult(int shift_num, ProteoformPtr proteo_ptr,
   double min_mass = prsm_para_ptr->getSpParaPtr()->getMinMass();
   double ppo = prsm_para_ptr->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
 
-  double refine_prec_mass = refinePrecursorAndHeaderShift(proteo_ptr, ms_three_ptr_vec, 
-                                                          header_ptrs, ppo, min_mass, 
+  double refine_prec_mass = refinePrecursorAndHeaderShift(proteo_ptr, ms_three_ptr_vec,
+                                                          header_ptrs, ppo, min_mass,
                                                           para_ptr_->refine_prec_step_width_);
 
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
-  ExtendMsPtrVec refine_ms_ptr_vec = ExtendMsFactory::geneMsThreePtrVec(deconv_ms_ptr_vec,  
+  ExtendMsPtrVec refine_ms_ptr_vec = ExtendMsFactory::geneMsThreePtrVec(deconv_ms_ptr_vec,
                                                                         sp_para_ptr, refine_prec_mass);
 
   DiagonalHeaderPtrVec refined_header_ptrs = refineHeadersBgnEnd(proteo_ptr, refine_ms_ptr_vec,
@@ -353,7 +323,7 @@ PrsmPtr PSAlign::geneResult(int shift_num, ProteoformPtr proteo_ptr,
     return nullptr;
   }
 
-  ChangePtrVec changes = getDiagonalMassChanges(refined_header_ptrs, first_pos, 
+  ChangePtrVec changes = getDiagonalMassChanges(refined_header_ptrs, first_pos,
                                                 last_pos, ChangeType::UNEXPECTED);
   sub_proteo_ptr->addChangePtrVec(changes);
 
