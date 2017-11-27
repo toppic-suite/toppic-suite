@@ -15,6 +15,8 @@
 #ifndef PROT_MASS_DIAG_FILTER_H_
 #define PROT_MASS_DIAG_FILTER_H_
 
+#include <vector>
+
 #include "base/proteoform.hpp"
 #include "spec/prm_ms.hpp"
 #include "prsm/simple_prsm.hpp"
@@ -25,8 +27,8 @@ namespace prot {
 
 class MassDiagFilter {
  public:
-  MassDiagFilter(const ProteoformPtrVec &proteo_ptrs, 
-                 DiagFilterMngPtr mng_ptr);
+  MassDiagFilter(const ProteoformPtrVec &proteo_ptrs, DiagFilterMngPtr mng_ptr);
+
   SimplePrsmPtrVec getBestMatch(const PrmMsPtrVec &ms_ptr_vec);
 
  private:
