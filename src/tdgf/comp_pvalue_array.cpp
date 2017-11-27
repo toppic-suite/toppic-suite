@@ -77,7 +77,7 @@ void CompPValueArray::compMultiExtremeValues(const PrmMsPtrVec &ms_six_ptr_vec,
     //LOG_DEBUG("candidate number " << cand_num);
     if (cand_num == 0.0) {
       LOG_WARN("Zero candidate number");
-      cand_num = std::numeric_limits<double>::infinity();
+      cand_num = std::numeric_limits<double>::max();
     }
 
     if (type_ptr == AlignType::COMPLETE || type_ptr == AlignType::PREFIX) {
