@@ -44,6 +44,8 @@ std::string convertToString(int value);
 std::string convertToString(bool value);
 
 std::string rmComment(const std::string &ori_s, const std::string & comment = "#");
+
+bool endsWith(const std::string &str, const std::string &suffix);
 }  // namespace StringUtil
 }  // namespace prot
 

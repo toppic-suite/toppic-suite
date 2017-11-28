@@ -244,6 +244,14 @@ bool TopFDDialog::checkError() {
                          QMessageBox::Yes);
     return true;
   }
+
+  if (ui->fileEdit->text().toStdString().length() > 200) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("The spectrum file path is too long!"),
+                         QMessageBox::Yes);
+    return true;
+  }
+
   if (ui->maxChargeEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
                          tr("Maximum charge is empty!"),
