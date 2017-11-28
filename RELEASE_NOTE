@@ -1,3 +1,12 @@
+Version 1.1.1 (Nov, 2017)
+    * Fixed the locale problem on non-English system
+
+Version 1.1.0 (Nov, 2017)
+    * Added TopFD
+    * Added a GUI wrapper for TopPIC
+    * Added a filtration method based on proteoform-level FDR
+    * Added proteoform identification using LC/MS features 
+
 Version 1.0.0 (May, 2016)
 
     * UVPD support
