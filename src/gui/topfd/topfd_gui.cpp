@@ -12,6 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+
+#include <QLocale>
 #include <QApplication>
 #include <QFontDatabase>
 #include <QDesktopWidget>
@@ -19,6 +21,7 @@
 #include "topfddialog.h"
 
 int main(int argc, char *argv[]) {
+  QLocale::setDefault(QLocale::c());
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
   QFont font("Calibri");
   font.setPointSize(12);
