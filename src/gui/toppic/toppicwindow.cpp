@@ -402,12 +402,28 @@ bool toppicWindow::checkError() {
                          QMessageBox::Yes);
     return true;
   }
+
+  if (ui->databaseFileEdit->text().toStdString().length() > 200) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("The protein database file path is too long!"),
+                         QMessageBox::Yes);
+    return true;
+  }
+
   if (ui->spectrumFileEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
                          tr("Please select a deconvoluted spectrum file!"),
                          QMessageBox::Yes);
     return true;
   }
+
+  if (ui->spectrumFileEdit->text().toStdString().length() > 200) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("The deconvoluted spectrum file path is too long!"),
+                         QMessageBox::Yes);
+    return true;
+  }
+
   // if (ui->modFileEdit->text().isEmpty() && ui->numModComboBox->currentIndex() > 0) {
   //   QMessageBox::warning(this, tr("Warning"),
   //              tr("Please select a mod file!"),

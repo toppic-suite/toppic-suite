@@ -23,6 +23,8 @@
 
 #include "base/file_util.hpp"
 #include "base/xml_dom_util.hpp"
+#include "base/string_util.hpp"
+
 #include "console/toppic_argument.hpp"
 
 namespace prot {
@@ -204,7 +206,7 @@ bool Argument::parse(int argc, char* argv[]) {
     po::variables_map vm;
     try {
       po::store(po::command_line_parser(argc, argv).options(desc).positional(positional_options).run(),vm); 
-      if ( vm.count("help") ) {
+      if (vm.count("help")) {
         showUsage(display_desc);
         return false;
       }
@@ -313,8 +315,29 @@ bool Argument::validateArguments() {
     return false;
   }
 
+  if (!StringUtil::endsWith(arguments_["oriDatabaseFileName"], ".fasta") &&
+      !StringUtil::endsWith(arguments_["oriDatabaseFileName"], ".fa")) {
+    LOG_ERROR("Database file " << arguments_["oriDatabaseFileName"] << " is not a fasta file!");
+    return false;
+  }
+
+  if (arguments_["oriDatabaseFileName"].length() > 200) {
+    LOG_ERROR("Database file " << arguments_["oriDatabaseFileName"] << " path is too long!");
+    return false;
+  }
+
   if (!boost::filesystem::exists(arguments_["spectrumFileName"])) {
     LOG_ERROR("Spectrum file " << arguments_["spectrumFileName"] << " does not exist!");
+    return false;
+  }
+
+  if (!StringUtil::endsWith(arguments_["spectrumFileName"], ".msalign")) {
+    LOG_ERROR("Spectrum file " << arguments_["spectrumFileName"] << " is not a msalign file!");
+    return false;
+  }
+
+  if (arguments_["spectrumFileName"].length() > 200) {
+    LOG_ERROR("Spectrum file " << arguments_["spectrumFileName"] << " path is too long!");
     return false;
   }
 
