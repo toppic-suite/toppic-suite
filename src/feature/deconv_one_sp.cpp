@@ -52,9 +52,9 @@ void DeconvOneSp::run() {
   // envelope filter
   EnvFilter::filter(cand_envs, data_ptr_, mng_ptr_);
   // envelope rescoring
-  if (ms_level_ > 1) {
-    EnvRescore::rescore(cand_envs, mng_ptr_->env_rescore_para_);
-  }
+  /*if (ms_level_ > 1) {*/
+    //EnvRescore::rescore(cand_envs, mng_ptr_->env_rescore_para_);
+  /*}*/
   // assign envelopes to 1 Da windows
   MatchEnvPtr2D win_envs = EnvAssign::assignWinEnv(cand_envs, data_ptr_,
                                                    mng_ptr_->env_num_per_window_);
