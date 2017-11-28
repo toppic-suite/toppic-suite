@@ -142,14 +142,19 @@ void EValueProcessor::process(bool is_separate) {
 
   if (mng_ptr_->use_gf_) {
     PrsmXmlWriterPtr all_writer_ptr = std::make_shared<PrsmXmlWriter>(output_file_name);
+    PrsmPtrVec prsm_vec;
     for (int i = 0; i < mng_ptr_->thread_num_; i++) {
       PrsmReaderPtr all_reader_ptr = std::make_shared<PrsmReader>(output_file_name + "_" + std::to_string(i)); 
       PrsmPtr p = all_reader_ptr->readOnePrsm(seq_reader, fix_mod_ptr_vec);
-      while(p != nullptr) {
-        all_writer_ptr->write(p); 
+      while (p != nullptr) {
+        prsm_vec.push_back(p);
         p = all_reader_ptr->readOnePrsm(seq_reader, fix_mod_ptr_vec); 
       }
       all_reader_ptr->close();
+    }
+    std::sort(prsm_vec.begin(), prsm_vec.end(), prot::Prsm::cmpSpectrumIdIncEvalueInc);
+    for (size_t i = 0; i < prsm_vec.size(); i++) {
+      all_writer_ptr->write(prsm_vec[i]);
     }
     all_writer_ptr->close();
   }
