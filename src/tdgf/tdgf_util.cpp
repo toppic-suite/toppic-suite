@@ -27,7 +27,7 @@ void TdgfUtil::updateResidueCounts(const ResiduePtrVec &residue_list,
   ResSeqPtr seq_ptr = prot_ptr->getResSeqPtr();
   for (int i = 0; i < seq_ptr->getLen(); i++) {
     ResiduePtr res_ptr = seq_ptr->getResiduePtr(i);
-    int pos = ResidueUtil::findResidue(residue_list, res_ptr);
+    int pos = residue_util::findResidue(residue_list, res_ptr);
     if (pos >= 0) {
       // found
       counts[pos] = counts[pos]+1;
@@ -57,7 +57,7 @@ void TdgfUtil::updateNTermResidueCounts(ResiduePtrVec &residue_list, std::vector
     ResSeqPtr seq_ptr = mod_proteo_ptrs[i]->getResSeqPtr();
     if (seq_ptr->getLen() >= 1) {
       ResiduePtr res_ptr = seq_ptr->getResiduePtr(0);
-      int pos = ResidueUtil::findResidue(residue_list, res_ptr);
+      int pos = residue_util::findResidue(residue_list, res_ptr);
       if (pos >= 0) {
         // found
         counts[pos] = counts[pos]+1;

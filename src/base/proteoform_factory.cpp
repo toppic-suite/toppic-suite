@@ -36,7 +36,7 @@ ProteoformPtr ProteoformFactory::geneDbProteoformPtr(FastaSeqPtr fasta_seq_ptr, 
     return ProteoformPtr(nullptr);
   }
   ProtModPtr none_prot_mod_ptr = ProtModBase::getProtModPtr_NONE();
-  ResiduePtrVec residue_ptrs = ResidueUtil::convertStrToResiduePtrVec(fasta_seq_ptr->getAcidPtmPairVec());
+  ResiduePtrVec residue_ptrs = residue_util::convertStrToResiduePtrVec(fasta_seq_ptr->getAcidPtmPairVec());
   int start_pos = 0;
   int end_pos = static_cast<int>(residue_ptrs.size()) - 1;
 
