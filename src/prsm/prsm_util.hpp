@@ -24,7 +24,9 @@
 #include "prsm/prsm_para.hpp"
 
 namespace prot {
-namespace PrsmUtil {
+
+namespace prsm_util {
+
 std::string getValueStr(std::string line);
 
 std::string getXmlLine(const std::vector<std::string> &str_vec,
@@ -42,7 +44,9 @@ int getProteinId(const PrsmPtrVec &prsm_ptrs, std::string &seq_name);
 std::vector<int> getSpeciesIds(const PrsmPtrVec &prsm_ptrs);
 
 void addSpectrumPtrsToPrsms(PrsmPtrVec &prsm_ptrs, PrsmParaPtr prsm_para_ptr);
-}  // namesace PrsmUtil
+
+}  // namesace prsm_util
+
 }  // namespace prot
 #endif
 

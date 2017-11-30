@@ -37,53 +37,53 @@ bool ChangeStr::cmpPosInc(const std::shared_ptr<ChangeStr> &a,
 
 PrsmStr::PrsmStr(const std::vector<std::string> &str_vec) {
   str_vec_ = str_vec;
-  std::string line = PrsmUtil::getXmlLine(str_vec_, "<spectrum_id>");
-  spectrum_id_ = std::stoi(PrsmUtil::getValueStr(line));
-  line = PrsmUtil::getXmlLine(str_vec_, "<precursor_id>");
-  precursor_id_ = std::stoi(PrsmUtil::getValueStr(line));
-  line = PrsmUtil::getXmlLine(str_vec_, "<precursor_feature_id>");
-  precursor_feature_id_ = std::stoi(PrsmUtil::getValueStr(line));
-  line = PrsmUtil::getXmlLine(str_vec_, "<precursor_feature_inte>");
-  precursor_feature_inte_ = std::stod(PrsmUtil::getValueStr(line));
-  line = PrsmUtil::getXmlLine(str_vec_, "<adjusted_prec_mass>");
-  adjusted_prec_mass_ = std::stod(PrsmUtil::getValueStr(line));
-  line = PrsmUtil::getXmlLine(str_vec_, "<seq_name>");
-  seq_name_ = PrsmUtil::getValueStr(line);
-  line = PrsmUtil::getXmlLine(str_vec_, "<seq_desc>");
-  seq_desc_ = PrsmUtil::getValueStr(line);
-  line = PrsmUtil::getXmlLine(str_vec_, "<match_fragment_num>");
-  match_frag_num_ = std::stod(PrsmUtil::getValueStr(line));
-  line = PrsmUtil::getXmlLine(str_vec_, "<norm_match_fragment_num>");
-  norm_match_frag_num_ = std::stod(PrsmUtil::getValueStr(line));
-  line = PrsmUtil::getXmlLine(str_vec_, "<e_value>");
+  std::string line = prsm_util::getXmlLine(str_vec_, "<spectrum_id>");
+  spectrum_id_ = std::stoi(prsm_util::getValueStr(line));
+  line = prsm_util::getXmlLine(str_vec_, "<precursor_id>");
+  precursor_id_ = std::stoi(prsm_util::getValueStr(line));
+  line = prsm_util::getXmlLine(str_vec_, "<precursor_feature_id>");
+  precursor_feature_id_ = std::stoi(prsm_util::getValueStr(line));
+  line = prsm_util::getXmlLine(str_vec_, "<precursor_feature_inte>");
+  precursor_feature_inte_ = std::stod(prsm_util::getValueStr(line));
+  line = prsm_util::getXmlLine(str_vec_, "<adjusted_prec_mass>");
+  adjusted_prec_mass_ = std::stod(prsm_util::getValueStr(line));
+  line = prsm_util::getXmlLine(str_vec_, "<seq_name>");
+  seq_name_ = prsm_util::getValueStr(line);
+  line = prsm_util::getXmlLine(str_vec_, "<seq_desc>");
+  seq_desc_ = prsm_util::getValueStr(line);
+  line = prsm_util::getXmlLine(str_vec_, "<match_fragment_num>");
+  match_frag_num_ = std::stod(prsm_util::getValueStr(line));
+  line = prsm_util::getXmlLine(str_vec_, "<norm_match_fragment_num>");
+  norm_match_frag_num_ = std::stod(prsm_util::getValueStr(line));
+  line = prsm_util::getXmlLine(str_vec_, "<e_value>");
   if (line == "") {
     e_value_ = 0.0;
   } else {
-    e_value_ = std::stod(PrsmUtil::getValueStr(line));
+    e_value_ = std::stod(prsm_util::getValueStr(line));
   }
-  line = PrsmUtil::getXmlLine(str_vec_, "<fdr>");
-  fdr_ = std::stod(PrsmUtil::getValueStr(line));
-  line = PrsmUtil::getXmlLine(str_vec_, "<proteoform_fdr>");
-  proteoform_fdr_ = std::stod(PrsmUtil::getValueStr(line));
-  line = PrsmUtil::getXmlLine(str_vec_, "<start_pos>");
-  proteoform_start_pos_ = std::stoi(PrsmUtil::getValueStr(line));
-  line = PrsmUtil::getXmlLine(str_vec_, "<end_pos>");
-  proteoform_end_pos_ = std::stoi(PrsmUtil::getValueStr(line));
-  line = PrsmUtil::getXmlLine(str_vec_, "<species_id>");
-  species_id_ = std::stoi(PrsmUtil::getValueStr(line));
-  line = PrsmUtil::getXmlLine(str_vec_, "<prot_id>");
-  prot_id_ = std::stoi(PrsmUtil::getValueStr(line));
-  line = PrsmUtil::getXmlLine(str_vec_, "<unexpected_ptm_num>");
-  unexpected_ptm_num_ = std::stoi(PrsmUtil::getValueStr(line));
+  line = prsm_util::getXmlLine(str_vec_, "<fdr>");
+  fdr_ = std::stod(prsm_util::getValueStr(line));
+  line = prsm_util::getXmlLine(str_vec_, "<proteoform_fdr>");
+  proteoform_fdr_ = std::stod(prsm_util::getValueStr(line));
+  line = prsm_util::getXmlLine(str_vec_, "<start_pos>");
+  proteoform_start_pos_ = std::stoi(prsm_util::getValueStr(line));
+  line = prsm_util::getXmlLine(str_vec_, "<end_pos>");
+  proteoform_end_pos_ = std::stoi(prsm_util::getValueStr(line));
+  line = prsm_util::getXmlLine(str_vec_, "<species_id>");
+  species_id_ = std::stoi(prsm_util::getValueStr(line));
+  line = prsm_util::getXmlLine(str_vec_, "<prot_id>");
+  prot_id_ = std::stoi(prsm_util::getValueStr(line));
+  line = prsm_util::getXmlLine(str_vec_, "<unexpected_ptm_num>");
+  unexpected_ptm_num_ = std::stoi(prsm_util::getValueStr(line));
 
-  std::vector<std::string> mass_lines = PrsmUtil::getXmlLineVec(str_vec_, "<mass_shift>");
-  std::vector<std::string> left_pos_lines = PrsmUtil::getXmlLineVec(str_vec_, "<left_bp_pos>");
-  std::vector<std::string> right_pos_lines = PrsmUtil::getXmlLineVec(str_vec_, "<right_bp_pos>");
+  std::vector<std::string> mass_lines = prsm_util::getXmlLineVec(str_vec_, "<mass_shift>");
+  std::vector<std::string> left_pos_lines = prsm_util::getXmlLineVec(str_vec_, "<left_bp_pos>");
+  std::vector<std::string> right_pos_lines = prsm_util::getXmlLineVec(str_vec_, "<right_bp_pos>");
 
   for (size_t i = 0; i < mass_lines.size(); i++) {
-    change_vec_.push_back(std::make_shared<ChangeStr>(std::stod(PrsmUtil::getValueStr(mass_lines[i])),
-                                                      std::stoi(PrsmUtil::getValueStr(left_pos_lines[i])),
-                                                      std::stoi(PrsmUtil::getValueStr(right_pos_lines[i]))));
+    change_vec_.push_back(std::make_shared<ChangeStr>(std::stod(prsm_util::getValueStr(mass_lines[i])),
+                                                      std::stoi(prsm_util::getValueStr(left_pos_lines[i])),
+                                                      std::stoi(prsm_util::getValueStr(right_pos_lines[i]))));
   }
 }
 

@@ -25,7 +25,9 @@
 
 namespace prot {
 
-std::string PrsmUtil::getValueStr(std::string line) {
+namespace prsm_util {
+
+std::string getValueStr(std::string line) {
   int start = line.find(">");
   int end = line.find("<", start);
   std::string num_str = line.substr(start + 1, end - start - 1);
@@ -33,8 +35,8 @@ std::string PrsmUtil::getValueStr(std::string line) {
   return num_str;
 }
 
-std::string PrsmUtil::getXmlLine(const std::vector<std::string> &str_vec,
-                                 const std::string &property) {
+std::string getXmlLine(const std::vector<std::string> &str_vec,
+                       const std::string &property) {
   for (size_t i = 0; i < str_vec.size(); i++) {
     size_t found = str_vec[i].find(property);
     if (found != std::string::npos) {
@@ -44,7 +46,7 @@ std::string PrsmUtil::getXmlLine(const std::vector<std::string> &str_vec,
   return "";
 }
 
-std::vector<std::string> PrsmUtil::getXmlLineVec(const std::vector<std::string> &str_vec,
+std::vector<std::string> getXmlLineVec(const std::vector<std::string> &str_vec,
                                                  const std::string &property) {
   std::vector<std::string> res;
   for (size_t i = 0; i < str_vec.size(); i++) {
@@ -57,7 +59,7 @@ std::vector<std::string> PrsmUtil::getXmlLineVec(const std::vector<std::string> 
 }
 
 
-PrsmPtrVec PrsmUtil::selectSpeciesPrsms(const PrsmPtrVec &prsm_ptrs, int species_id) {
+PrsmPtrVec selectSpeciesPrsms(const PrsmPtrVec &prsm_ptrs, int species_id) {
   PrsmPtrVec select_prsm_ptrs;
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     if (species_id == prsm_ptrs[i]->getProteoformPtr()->getSpeciesId()) {
@@ -67,7 +69,7 @@ PrsmPtrVec PrsmUtil::selectSpeciesPrsms(const PrsmPtrVec &prsm_ptrs, int species
   return select_prsm_ptrs;
 }
 
-std::vector<int> PrsmUtil::getSpeciesIds(const PrsmPtrVec &prsm_ptrs, std::string &seq_name) {
+std::vector<int> getSpeciesIds(const PrsmPtrVec &prsm_ptrs, std::string &seq_name) {
   std::set<int> species_id_set;
   std::vector<int> species_ids;
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
@@ -79,7 +81,7 @@ std::vector<int> PrsmUtil::getSpeciesIds(const PrsmPtrVec &prsm_ptrs, std::strin
   return species_ids;
 }
 
-int PrsmUtil::getProteinId(const PrsmPtrVec &prsm_ptrs, std::string &seq_name) {
+int getProteinId(const PrsmPtrVec &prsm_ptrs, std::string &seq_name) {
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     if (prsm_ptrs[i]->getProteoformPtr()->getSeqName() == seq_name) {
       return prsm_ptrs[i]->getProteoformPtr()->getProtId();
@@ -88,7 +90,7 @@ int PrsmUtil::getProteinId(const PrsmPtrVec &prsm_ptrs, std::string &seq_name) {
   return -1;
 }
 
-std::vector<int> PrsmUtil::getSpeciesIds(const PrsmPtrVec &prsm_ptrs) {
+std::vector<int> getSpeciesIds(const PrsmPtrVec &prsm_ptrs) {
   std::set<int> species_id_set;
   std::vector<int> species_ids;
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
@@ -114,7 +116,7 @@ bool isMatchMs(PrsmPtr prsm_ptr, MsHeaderPtr header_ptr) {
   }
 }
 
-void PrsmUtil::addSpectrumPtrsToPrsms(PrsmPtrVec &prsm_ptrs, PrsmParaPtr prsm_para_ptr) {
+void addSpectrumPtrsToPrsms(PrsmPtrVec &prsm_ptrs, PrsmParaPtr prsm_para_ptr) {
   MsAlignReader reader(prsm_para_ptr->getSpectrumFileName(),
                        prsm_para_ptr->getGroupSpecNum(),
                        prsm_para_ptr->getSpParaPtr()->getActivationPtr(),
@@ -133,11 +135,13 @@ void PrsmUtil::addSpectrumPtrsToPrsms(PrsmPtrVec &prsm_ptrs, PrsmParaPtr prsm_pa
         if (isMatchMs(prsm_ptrs[i], deconv_ms_ptr_vec[0]->getMsHeaderPtr())) {
           prsm_ptrs[i]->setDeconvMsPtrVec(deconv_ms_ptr_vec);
           double new_prec_mass = prsm_ptrs[i]->getAdjustedPrecMass();
-          prsm_ptrs[i]->setRefineMsVec(ExtendMsFactory::geneMsThreePtrVec(deconv_ms_ptr_vec,
-                                                                          prsm_para_ptr->getSpParaPtr(),
-                                                                          new_prec_mass));
+          prsm_ptrs[i]->setRefineMsVec(
+              ExtendMsFactory::geneMsThreePtrVec(deconv_ms_ptr_vec,
+                                                 prsm_para_ptr->getSpParaPtr(),
+                                                 new_prec_mass));
         }
-        if ((spectrum_id == prsm_ptrs[i]->getSpectrumId() && prec_id < prsm_ptrs[i]->getPrecursorId()) ||
+        if ((spectrum_id == prsm_ptrs[i]->getSpectrumId() 
+             && prec_id < prsm_ptrs[i]->getPrecursorId()) ||
             spectrum_id < prsm_ptrs[i]->getSpectrumId()) {
           start_prsm = i;
           break;
@@ -148,5 +152,7 @@ void PrsmUtil::addSpectrumPtrsToPrsms(PrsmPtrVec &prsm_ptrs, PrsmParaPtr prsm_pa
   }
   reader.close();
 }
+
+} // namespace prsm_util
 
 }  // namespace prot

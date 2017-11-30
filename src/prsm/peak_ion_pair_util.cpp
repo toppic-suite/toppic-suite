@@ -21,9 +21,10 @@
 
 namespace prot {
 
-PeakIonPairPtrVec 
-    PeakIonPairUtil::getMatchedPairs(const PeakIonPairPtrVec &pair_ptrs,
-                                     int spec_id, int peak_id) {
+namespace peak_ion_pair_util {
+
+PeakIonPairPtrVec getMatchedPairs(const PeakIonPairPtrVec &pair_ptrs,
+                                  int spec_id, int peak_id) {
   PeakIonPairPtrVec selected_pair_ptrs;
   for (size_t i = 0; i < pair_ptrs.size(); i++) {
     if (pair_ptrs[i]->getMsHeaderPtr()->getId() == spec_id &&
@@ -34,7 +35,7 @@ PeakIonPairPtrVec
   return selected_pair_ptrs;
 }
 
-int PeakIonPairUtil::getPeakIonPairNum(PeakIonPairPtrVec pairs) {
+int getPeakIonPairNum(PeakIonPairPtrVec pairs) {
   int match_peak_num = 0;
   DeconvPeakPtr prev_deconv_peak(nullptr);
   std::sort(pairs.begin(), pairs.end(), PeakIonPair::cmpRealPeakPosInc);
@@ -47,8 +48,8 @@ int PeakIonPairUtil::getPeakIonPairNum(PeakIonPairPtrVec pairs) {
   return match_peak_num;
 }
 
-double PeakIonPairUtil::computePairConverage(const PeakIonPairPtrVec &pair_ptrs, int begin,
-                                             int end, RmBreakTypePtr type_ptr) {
+double computePairConverage(const PeakIonPairPtrVec &pair_ptrs, int begin,
+                            int end, RmBreakTypePtr type_ptr) {
   int total_num = end - begin  + 1;
   if (total_num <= 0) {
     return 0.0;
@@ -83,4 +84,7 @@ double PeakIonPairUtil::computePairConverage(const PeakIonPairPtrVec &pair_ptrs,
   }
   return cov_num / static_cast<double>(total_num);
 }
+
+} // namespace peak_ion_pair_util
+
 }  // namespace prot

@@ -90,7 +90,7 @@ std::function<void()> geneTask(SpectrumSetPtr spectrum_set_ptr,
 
   return [spectrum_set_ptr, ori_simple_prsm_ptrs, mng_ptr, comp_shift, pool_ptr]() {
     SimplePrsmPtrVec simple_prsm_ptrs = 
-        SimplePrsmUtil::getUniqueMatches(ori_simple_prsm_ptrs);
+        simple_prsm_util::getUniqueMatches(ori_simple_prsm_ptrs);
     PtmSearchSlowFilterPtr slow_filter_ptr = 
         std::make_shared<PtmSearchSlowFilter>(spectrum_set_ptr, simple_prsm_ptrs,
                                               comp_shift, mng_ptr);

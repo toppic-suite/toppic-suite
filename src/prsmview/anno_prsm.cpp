@@ -125,7 +125,7 @@ void addMsPeaks(XmlDOMDocument *xml_doc, xercesc::DOMElement* ms_element,
       xml_doc->addElement(peak_element, "charge", str.c_str());
       int spec_id = deconv_ms_ptr_vec[s]->getMsHeaderPtr()->getId(); 
       PeakIonPairPtrVec selected_pair_ptrs 
-          = PeakIonPairUtil::getMatchedPairs(pair_ptrs, spec_id, peak_ptr->getId());
+          = peak_ion_pair_util::getMatchedPairs(pair_ptrs, spec_id, peak_ptr->getId());
       if(selected_pair_ptrs.size()>0){
         int match_ions_number = selected_pair_ptrs.size();
         str=string_util::convertToString(match_ions_number);
