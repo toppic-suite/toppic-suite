@@ -56,7 +56,7 @@ double MsHeader::getPrecMonoMass() {
     LOG_WARN("monoisotopic mass is not initialized");
     return 0.0;
   } else {
-    return PeakUtil::compPeakMass(prec_mono_mz_, prec_charge_);
+    return peak_util::compPeakMass(prec_mono_mz_, prec_charge_);
   }
 }
 
@@ -65,7 +65,7 @@ double MsHeader::getPrecSpMass() {
     LOG_WARN("precursor spectrum mass is not initialized");
     return 0.0;
   } else {
-    return PeakUtil::compPeakMass(prec_sp_mz_, prec_charge_);
+    return peak_util::compPeakMass(prec_sp_mz_, prec_charge_);
   }
 }
 
@@ -74,7 +74,7 @@ double MsHeader::getPrecMonoMassMinusWater() {
     LOG_WARN("monoisotopic mass is not initialized");
     return 0.0;
   } else {
-    return PeakUtil::compPeakMass(prec_mono_mz_, prec_charge_)
+    return peak_util::compPeakMass(prec_mono_mz_, prec_charge_)
         - mass_constant::getWaterMass();
   }
 }
@@ -160,7 +160,7 @@ void MsHeader::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
 
 MsHeaderPtr MsHeader::geneMsHeaderPtr(MsHeaderPtr ori_ptr, double new_prec_mass) {
   MsHeaderPtr new_header_ptr = std::make_shared<MsHeader>(*ori_ptr.get());
-  double mono_mz = PeakUtil::compMonoMz(new_prec_mass, ori_ptr->getPrecCharge());
+  double mono_mz = peak_util::compMonoMz(new_prec_mass, ori_ptr->getPrecCharge());
   new_header_ptr->setPrecMonoMz(mono_mz);
   return new_header_ptr;
 }

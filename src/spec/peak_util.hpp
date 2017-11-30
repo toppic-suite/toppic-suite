@@ -19,7 +19,9 @@
 #include "base/mass_constant.hpp"
 
 namespace prot {
-namespace PeakUtil {
+
+namespace peak_util {
+
 inline double compPeakMass(double mono_mz, int charge) {
   return mono_mz * charge - charge * mass_constant::getProtonMass();
 }
@@ -27,6 +29,7 @@ inline double compPeakMass(double mono_mz, int charge) {
 inline double compMonoMz(double mono_mass, int charge) {
   return mono_mass / charge + mass_constant::getProtonMass();
 }
-}  // namespace PeakUtil
+
+}  // namespace peak_util
 }  // namespace prot
 #endif
