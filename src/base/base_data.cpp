@@ -35,13 +35,15 @@
 
 namespace prot {
 
-void BaseData::init(const std::string &exe_dir) {
+namespace base_data {
+
+void init(const std::string &exe_dir) {
   std::string separator = FileUtil::getFileSeparator();
-  std::string base_data_dir = exe_dir + separator + BaseData::getBaseDataDir();
+  std::string base_data_dir = exe_dir + separator + base_data::getBaseDataDir();
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
     std::string config_file_name
-        = base_data_dir + separator + BaseData::getBaseDataConfigFileName();
+        = base_data_dir + separator + base_data::getBaseDataConfigFileName();
     LOG_DEBUG("config_file_name: " << config_file_name);
     XmlDOMDocument doc(parser, config_file_name.c_str());
     xercesc::DOMElement* root = doc.getDocumentElement();
@@ -114,5 +116,7 @@ void BaseData::init(const std::string &exe_dir) {
   }
 }
 
-}  // namespace prot
+} // namespace base_data
+
+} // namespace prot
 

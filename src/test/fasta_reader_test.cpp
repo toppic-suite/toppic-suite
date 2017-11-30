@@ -29,7 +29,7 @@ TEST_CASE("fasta reader") {
   test_file << "MSGRGKBGGXKGJLGAKG" << std::endl;
   test_file.close();
 
-  BaseData::init("./");
+  base_data::init("./");
   FastaReader f_reader("test.fa");
   FastaSeqPtr seq = f_reader.getNextSeq();
   REQUIRE(seq->getName() == "sp|test|test");

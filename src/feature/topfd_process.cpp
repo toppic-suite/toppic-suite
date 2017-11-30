@@ -32,7 +32,7 @@ int TopFDProcess(std::map<std::string, std::string> arguments) {
 
     std::string exe_dir = arguments["executiveDir"];
 
-    BaseData::init(exe_dir);
+    base_data::init(exe_dir);
 
     DeconvParaPtr para_ptr = std::make_shared<DeconvPara>(arguments);
     LOG_DEBUG("deconv para");
