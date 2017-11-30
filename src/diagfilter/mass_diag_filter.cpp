@@ -69,7 +69,7 @@ SimplePrsmPtrVec MassDiagFilter::compute(const PrmMsPtrVec &ms_ptr_vec) {
     std::vector<short> scores(row_num, 0);
     index_ptr_->compScores(mass_errors, i, -mass_errors[i].first, scores);
     FilterProteinPtrVec results
-        = MassMatchUtil::findTopProteins(scores, proteo_row_begins, proteo_row_ends, threshold,
+        = mass_match_util::findTopProteins(scores, proteo_row_begins, proteo_row_ends, threshold,
                                          mng_ptr_->filter_result_num_);
     // LOG_DEBUG("result size " << results.size());
     for (size_t j = 0; j < results.size(); j++) {
