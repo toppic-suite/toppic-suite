@@ -29,7 +29,9 @@
 
 namespace prot {
 
-ModPtrVec ModUtil::readModXml(const std::string &file_name) {
+namespace mod_util {
+
+ModPtrVec readModXml(const std::string &file_name) {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   ModPtrVec mod_ptr_vec;
   if (parser) {
@@ -48,7 +50,7 @@ ModPtrVec ModUtil::readModXml(const std::string &file_name) {
   return mod_ptr_vec;
 }
 
-std::vector<ModPtrVec> ModUtil::readModTxt(const std::string &file_name) {
+std::vector<ModPtrVec> readModTxt(const std::string &file_name) {
   LOG_DEBUG("mod txt file " << file_name);
   std::vector<ModPtrVec> mod_ptr_vec2d(3);
   std::ifstream infile(file_name.c_str());
@@ -76,9 +78,13 @@ std::vector<ModPtrVec> ModUtil::readModTxt(const std::string &file_name) {
 
       for (size_t i = 0; i < l[2].length(); i++) {
         AcidPtr a = AcidBase::getAcidPtrByOneLetter(l[2].substr(i, 1));
-        ResiduePtr ori_residue_ptr = ResidueBase::getBaseResiduePtr(std::make_shared<Residue>(a, PtmBase::getEmptyPtmPtr()));
-        ResiduePtr mod_residue_ptr = ResidueBase::getBaseResiduePtr(std::make_shared<Residue>(a, p));
-        ModPtr m = ModBase::getBaseModPtr(std::make_shared<Mod>(ori_residue_ptr, mod_residue_ptr));
+        ResiduePtr ori_residue_ptr 
+            = ResidueBase::getBaseResiduePtr(
+                std::make_shared<Residue>(a, PtmBase::getEmptyPtmPtr()));
+        ResiduePtr mod_residue_ptr 
+            = ResidueBase::getBaseResiduePtr(std::make_shared<Residue>(a, p));
+        ModPtr m 
+            = ModBase::getBaseModPtr(std::make_shared<Mod>(ori_residue_ptr, mod_residue_ptr));
         if (l[3] == "N-term") {
           mod_ptr_vec2d[0].push_back(m);
         } else if (l[3] == "C-term") {
@@ -103,7 +109,7 @@ std::vector<ModPtrVec> ModUtil::readModTxt(const std::string &file_name) {
   return mod_ptr_vec2d;
 }
 
-ModPtrVec ModUtil::geneFixedModList(const std::string &str) {
+ModPtrVec geneFixedModList(const std::string &str) {
   if (str == "" || str == "C57" || str == "C58") {
     ModPtrVec mod_ptr_vec;
     if (str == "C57") {
@@ -117,8 +123,8 @@ ModPtrVec ModUtil::geneFixedModList(const std::string &str) {
   }
 }
 
-ResiduePtrVec ModUtil::geneResidueListWithMod(const ResiduePtrVec & residue_list,
-                                              const ModPtrVec & fix_mod_list) {
+ResiduePtrVec geneResidueListWithMod(const ResiduePtrVec & residue_list,
+                                     const ModPtrVec & fix_mod_list) {
   ResiduePtrVec result;
   for (size_t i = 0; i < residue_list.size(); i++) {
     bool mod = false;
@@ -136,7 +142,7 @@ ResiduePtrVec ModUtil::geneResidueListWithMod(const ResiduePtrVec & residue_list
   return result;
 }
 
-std::vector<double> ModUtil::getModMassVec(const ModPtrVec & var_mod_list) {
+std::vector<double> getModMassVec(const ModPtrVec & var_mod_list) {
   std::vector<double> mod_mass_vec;
   for (size_t i = 0; i < var_mod_list.size(); i++) {
     mod_mass_vec.push_back(var_mod_list[i]->getShift());
@@ -150,6 +156,8 @@ std::vector<double> ModUtil::getModMassVec(const ModPtrVec & var_mod_list) {
   std::sort(mod_mass_vec.begin(), mod_mass_vec.end());
   return mod_mass_vec;
 }
+
+} // namespace mod_util
 
 }  // namespace prot
 

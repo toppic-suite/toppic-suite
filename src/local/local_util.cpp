@@ -36,7 +36,7 @@ double LocalUtil::ppm_;
 double LocalUtil::p1_, LocalUtil::p2_;
 
 void LocalUtil::init(LocalMngPtr mng_ptr) {
-  std::vector<ModPtrVec> mod_ptr_vec2d = ModUtil::readModTxt(mng_ptr->residueModFileName_);
+  std::vector<ModPtrVec> mod_ptr_vec2d = mod_util::readModTxt(mng_ptr->residueModFileName_);
   mod_list_N_ = mod_ptr_vec2d[0];
   mod_list_C_ = mod_ptr_vec2d[1];
   mod_list_any_ = mod_ptr_vec2d[2];

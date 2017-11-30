@@ -48,7 +48,7 @@ void DiagFilterProcessor::process() {
 
   std::vector<double> mod_mass_list;
   if (mng_ptr_->residueModFileName_ != "") {
-    mod_mass_list = ModUtil::getModMassVec(ModUtil::readModTxt(mng_ptr_->residueModFileName_)[2]);
+    mod_mass_list = mod_util::getModMassVec(mod_util::readModTxt(mng_ptr_->residueModFileName_)[2]);
   }
 
   for (size_t i = 0; i < db_block_ptr_vec.size(); i++) {

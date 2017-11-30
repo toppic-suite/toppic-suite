@@ -62,7 +62,7 @@ inline void CompShift::initProteoformBeginEnds(const ProteoformPtrVec &proteo_pt
     proteo_row_begins_[i] = pnt;
     int len = proteo_ptrs[i]->getResSeqPtr()->getLen();
     ResiduePtrVec res_ptr_vec = proteo_ptrs[i]->getResSeqPtr()->getResidues();
-    ProtModPtr prot_mod_ptr = ProtModUtil::findNME_Acetylation(prot_mod_ptr_vec_, res_ptr_vec);
+    ProtModPtr prot_mod_ptr = prot_mod_util::findNME_Acetylation(prot_mod_ptr_vec_, res_ptr_vec);
     acet_mods_.push_back(prot_mod_ptr);
     if (acet_mods_[i] != nullptr) {
       len++;

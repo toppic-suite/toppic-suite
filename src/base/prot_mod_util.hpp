@@ -22,14 +22,17 @@
 #include "base/residue.hpp"
 
 namespace prot {
-namespace ProtModUtil {
+
+namespace prot_mod_util {
 
 bool allowMod(ProtModPtr prot_mod_ptr, const ResiduePtrVec &residues);
 
 ProtModPtrVec readProtMod(const std::string &file_name);
 
-ProtModPtr findNME_Acetylation(const ProtModPtrVec &prot_mod_ptrs, const ResiduePtrVec &residues);
+ProtModPtr findNME_Acetylation(const ProtModPtrVec &prot_mod_ptrs, 
+                               const ResiduePtrVec &residues);
 
-}  // namespace ProtModUtil
+}  // namespace prot_mod_util
+
 }  // namespace prot
 #endif
