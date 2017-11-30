@@ -18,15 +18,16 @@
 #include "base/prot_mod.hpp"
 #include "base/mod_base.hpp"
 #include "base/change.hpp"
-#include "base/algorithm.hpp"
+#include "base/base_algo.hpp"
 #include "oneptmsearch/diagonal_header.hpp"
 
 namespace prot {
 
 DiagonalHeaderPtr DiagonalHeader::clone() {
-  DiagonalHeaderPtr cloned = std::make_shared<DiagonalHeader>(prot_N_term_shift_, n_strict_, c_strict_, 
-                                                              prot_N_term_match_, prot_C_term_match_,
-                                                              pep_N_term_match_, pep_C_term_match_);
+  DiagonalHeaderPtr cloned 
+      = std::make_shared<DiagonalHeader>(prot_N_term_shift_, n_strict_, c_strict_, 
+                                         prot_N_term_match_, prot_C_term_match_,
+                                         pep_N_term_match_, pep_C_term_match_);
   cloned->setId(id_);
   cloned->setTruncFirstResPos(trunc_first_res_pos_);
   cloned->setMatchFirstBpPos(match_first_bp_pos_);
@@ -55,10 +56,10 @@ void DiagonalHeader::initHeader(double c_shift, ProteoformPtr proteo_ptr,
   prot_C_term_shift_ = c_shift;
   std::vector<double> prm_masses = proteo_ptr->getBpSpecPtr()->getPrmMasses();
 
-  trunc_first_res_pos_ = getFirstResPos(prot_N_term_shift_,
+  trunc_first_res_pos_ = base_algo::getFirstResPos(prot_N_term_shift_,
                                         prm_masses);
 
-  trunc_last_res_pos_ = getLastResPos(prot_C_term_shift_, prm_masses);
+  trunc_last_res_pos_ = base_algo::getLastResPos(prot_C_term_shift_, prm_masses);
   pep_N_term_shift_ = prot_N_term_shift_ + prm_masses[trunc_first_res_pos_];
   pep_C_term_shift_ = prot_C_term_shift_ + prm_masses[prm_masses.size() - 1]
       - prm_masses[trunc_last_res_pos_ + 1];

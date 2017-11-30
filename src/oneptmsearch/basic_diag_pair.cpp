@@ -16,6 +16,7 @@
 #include <algorithm>
 #include <vector>
 
+#include "base/base_algo.hpp"
 #include "oneptmsearch/basic_diag_pair.hpp"
 
 namespace prot {
@@ -79,7 +80,7 @@ inline BasicDiagPairPtrVec compDiagPair(const PrmPeakPtrVec &prm_peaks,
       }
     }
     // LOG_DEBUG("start increase  peak " << peak.get());
-    if (increaseIJ(i, j, deviation, peak->getNRelaxCStrictTolerance(),
+    if (base_algo::increaseIJ(i, j, deviation, peak->getNRelaxCStrictTolerance(),
                    real_masses, seq_masses)) {
       i++;
     } else {

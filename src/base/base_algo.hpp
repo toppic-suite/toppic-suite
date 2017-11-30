@@ -21,6 +21,8 @@
 
 namespace prot {
 
+namespace base_algo {
+
 // used in find matched mass pairs
 bool increaseIJ(size_t i, size_t j, double deviation, double tolerance,
                 const std::vector<double> &ms_masses,
@@ -43,6 +45,8 @@ int getFirstResPos(double n_term_shift, const std::vector<double> &prm_masses);
 // compute the position of the last residue of a proteoform based
 // on its c term shift
 int getLastResPos(double c_term_shift, const std::vector<double> &prm_masses);
+
+} // namespace base_algo
 
 }  // namespace prot
 
