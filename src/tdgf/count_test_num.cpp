@@ -71,7 +71,7 @@ void CountTestNum::init(PrsmParaPtr para_ptr) {
 
   ResiduePtrVec non_ptm_residue_list = ResidueBase::getBaseNonePtmResiduePtrVec();
   ModPtrVec fix_mod_list = para_ptr->getFixModPtrVec();
-  ResiduePtrVec residue_list = ModUtil::geneResidueListWithMod(non_ptm_residue_list, fix_mod_list);
+  ResiduePtrVec residue_list = mod_util::geneResidueListWithMod(non_ptm_residue_list, fix_mod_list);
 
   std::vector<double> residue_counts(residue_list.size(), 0.0);
 

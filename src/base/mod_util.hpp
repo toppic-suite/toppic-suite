@@ -22,7 +22,9 @@
 #include "base/mod.hpp"
 
 namespace prot {
-namespace ModUtil {
+
+namespace mod_util {
+
 ModPtrVec readModXml(const std::string &file_name);
 
 std::vector<ModPtrVec> readModTxt(const std::string &file_name);
@@ -33,6 +35,9 @@ ResiduePtrVec geneResidueListWithMod(const ResiduePtrVec & residue_list,
                                      const ModPtrVec & fix_mod_list);
 
 std::vector<double> getModMassVec(const ModPtrVec & var_mod_list);
+
 }  // namespace ModUtil
+
 }  // namespace prot
+
 #endif

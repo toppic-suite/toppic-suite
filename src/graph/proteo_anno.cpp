@@ -71,7 +71,7 @@ void ProteoAnno::anno(const std::string &seq, bool is_complete) {
   // protein mod
   for (size_t i = 0; i < prot_mod_ptr_vec_.size(); i++) {
     ProtModPtr mod_ptr = prot_mod_ptr_vec_[i];
-    if (!ProtModUtil::allowMod(mod_ptr, residue_ptr_vec)) {
+    if (!prot_mod_util::allowMod(mod_ptr, residue_ptr_vec)) {
       continue;
     }
     LOG_DEBUG("i " << i << " mod " << mod_ptr);

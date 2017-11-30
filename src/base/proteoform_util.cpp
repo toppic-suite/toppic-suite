@@ -168,7 +168,7 @@ std::vector<double> ProteoformUtil::getNTermShift(ProteoformPtr db_form_ptr,
   std::vector<double> shifts;
   for (size_t i = 0; i < prot_mod_ptrs.size(); i++) {
     ResSeqPtr db_res_seq_ptr = db_form_ptr->getResSeqPtr();
-    bool valid = ProtModUtil::allowMod(prot_mod_ptrs[i], db_res_seq_ptr->getResidues());
+    bool valid = prot_mod_util::allowMod(prot_mod_ptrs[i], db_res_seq_ptr->getResidues());
     // LOG_DEBUG("valid " << valid << " shift " << prot_mod_ptrs[i]->getProtShift());
     if (valid) {
       shifts.push_back(prot_mod_ptrs[i]->getProtShift());
@@ -185,7 +185,7 @@ std::vector<double> ProteoformUtil::getNTermAcets(ProteoformPtr db_form_ptr,
     if (prot_mod_ptrs[i]->getModPtr()->getModResiduePtr()->getPtmPtr()
         == PtmBase::getPtmPtr_Acetylation()) {
       ResSeqPtr db_res_seq_ptr = db_form_ptr->getResSeqPtr();
-      bool valid = ProtModUtil::allowMod(prot_mod_ptrs[i], db_res_seq_ptr->getResidues());
+      bool valid = prot_mod_util::allowMod(prot_mod_ptrs[i], db_res_seq_ptr->getResidues());
       if (valid) {
         shifts.push_back(prot_mod_ptrs[i]->getProtShift());
       }

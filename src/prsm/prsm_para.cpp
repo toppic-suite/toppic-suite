@@ -31,7 +31,7 @@ PrsmPara::PrsmPara(std::map<std::string, std::string> &arguments) {
 
   group_spec_num_ = std::stoi(arguments["groupSpectrumNumber"]);
 
-  fix_mod_list_ = ModUtil::geneFixedModList(arguments["fixedMod"]);
+  fix_mod_list_ = mod_util::geneFixedModList(arguments["fixedMod"]);
 
   std::string prot_mod_str = arguments["allowProtMod"];
   std::vector<std::string> strs;

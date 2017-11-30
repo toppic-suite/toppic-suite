@@ -24,7 +24,9 @@
 
 namespace prot {
 
-bool ProtModUtil::allowMod(ProtModPtr prot_mod_ptr, const ResiduePtrVec &residues) {
+namespace prot_mod_util {
+
+bool allowMod(ProtModPtr prot_mod_ptr, const ResiduePtrVec &residues) {
   if (prot_mod_ptr == ProtModBase::getProtModPtr_NONE()) {
     return true;
   } else if (prot_mod_ptr == ProtModBase::getProtModPtr_M_ACETYLATION()) {
@@ -61,7 +63,7 @@ bool ProtModUtil::allowMod(ProtModPtr prot_mod_ptr, const ResiduePtrVec &residue
   }
 }
 
-ProtModPtrVec ProtModUtil::readProtMod(const std::string &file_name) {
+ProtModPtrVec readProtMod(const std::string &file_name) {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   ProtModPtrVec mod_ptr_vec;
   if (parser) {
@@ -80,8 +82,8 @@ ProtModPtrVec ProtModUtil::readProtMod(const std::string &file_name) {
   return mod_ptr_vec;
 }
 
-ProtModPtr ProtModUtil::findNME_Acetylation(const ProtModPtrVec &prot_mod_ptrs,
-                                            const ResiduePtrVec &residues) {
+ProtModPtr findNME_Acetylation(const ProtModPtrVec &prot_mod_ptrs,
+                               const ResiduePtrVec &residues) {
   for (size_t i = 0; i < prot_mod_ptrs.size(); i++) {
     PtmPtr ptm_ptr = prot_mod_ptrs[i]->getModPtr()->getModResiduePtr()->getPtmPtr();
     // LOG_DEBUG("ptm ptr " << ptm_ptr->getAbbrName() <<
@@ -93,5 +95,7 @@ ProtModPtr ProtModUtil::findNME_Acetylation(const ProtModPtrVec &prot_mod_ptrs,
   }
   return nullptr;
 }
+
+} // namespace prot_mod_util
 
 }  // namespace prot
