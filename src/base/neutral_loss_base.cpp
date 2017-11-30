@@ -30,9 +30,9 @@ void NeutralLossBase::initBase(const std::string &file_name) {
     prot::XmlDOMDocument doc(parser, file_name.c_str());
     xercesc::DOMElement* parent = doc.getDocumentElement();
     std::string element_name = NeutralLoss::getXmlElementName();
-    int neutral_loss_num = XmlDomUtil::getChildCount(parent, element_name.c_str());
+    int neutral_loss_num = xml_dom_util::getChildCount(parent, element_name.c_str());
     for (int i = 0; i < neutral_loss_num; i++) {
-      xercesc::DOMElement* element = XmlDomUtil::getChildElement(parent, element_name.c_str(), i);
+      xercesc::DOMElement* element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
       NeutralLossPtr neutral_loss_ptr = std::make_shared<NeutralLoss>(element);
       neutral_loss_ptr_vec_.push_back(neutral_loss_ptr);
       if (neutral_loss_ptr->getName() == getName_NONE()) {

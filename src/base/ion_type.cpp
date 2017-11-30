@@ -34,9 +34,9 @@ IonType::IonType(const std::string &name, bool n_term, double shift):
     }
 
 IonType::IonType(xercesc::DOMElement* element) { 
-  name_ = XmlDomUtil::getChildValue(element, "name", 0);
-  n_term_ = XmlDomUtil::getBoolChildValue(element, "n_term", 0);
-  shift_ = XmlDomUtil::getDoubleChildValue(element, "shift", 0);
+  name_ = xml_dom_util::getChildValue(element, "name", 0);
+  n_term_ = xml_dom_util::getBoolChildValue(element, "n_term", 0);
+  shift_ = xml_dom_util::getDoubleChildValue(element, "shift", 0);
   if (n_term_) {
     b_y_shift_ = shift_;
   }

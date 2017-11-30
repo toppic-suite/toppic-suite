@@ -29,25 +29,25 @@
 namespace prot {
 
 MsHeader::MsHeader(xercesc::DOMElement* element) {
-  file_name_ = XmlDomUtil::getChildValue(element, "file_name", 0);
-  id_ = XmlDomUtil::getIntChildValue(element, "id", 0);
-  prec_id_ = XmlDomUtil::getIntChildValue(element, "prec_id", 0);
-  title_ = XmlDomUtil::getChildValue(element, "title", 0);
-  level_ = XmlDomUtil::getIntChildValue(element, "level", 0);
+  file_name_ = xml_dom_util::getChildValue(element, "file_name", 0);
+  id_ = xml_dom_util::getIntChildValue(element, "id", 0);
+  prec_id_ = xml_dom_util::getIntChildValue(element, "prec_id", 0);
+  title_ = xml_dom_util::getChildValue(element, "title", 0);
+  level_ = xml_dom_util::getIntChildValue(element, "level", 0);
 
   xercesc::DOMElement* scan_element
-      = XmlDomUtil::getChildElement(element, "scan_list", 0);
-  int scans = XmlDomUtil::getChildCount(scan_element, "scan");
+      = xml_dom_util::getChildElement(element, "scan_list", 0);
+  int scans = xml_dom_util::getChildCount(scan_element, "scan");
   for (int i = 0; i < scans; i++) {
-    scans_.push_back(XmlDomUtil::getIntChildValue(scan_element, "scan", i));
+    scans_.push_back(xml_dom_util::getIntChildValue(scan_element, "scan", i));
   }
-  retention_time_ = XmlDomUtil::getDoubleChildValue(element, "retention_time", 0);
-  prec_sp_mz_ = XmlDomUtil::getDoubleChildValue(element, "prec_sp_mz", 0);
-  prec_mono_mz_ = XmlDomUtil::getDoubleChildValue(element, "prec_mono_mz", 0);
-  prec_charge_ = XmlDomUtil::getIntChildValue(element, "prec_charge", 0);
+  retention_time_ = xml_dom_util::getDoubleChildValue(element, "retention_time", 0);
+  prec_sp_mz_ = xml_dom_util::getDoubleChildValue(element, "prec_sp_mz", 0);
+  prec_mono_mz_ = xml_dom_util::getDoubleChildValue(element, "prec_mono_mz", 0);
+  prec_charge_ = xml_dom_util::getIntChildValue(element, "prec_charge", 0);
   std::string element_name = Activation::getXmlElementName();
   xercesc::DOMElement* ac_element
-      = XmlDomUtil::getChildElement(element, element_name.c_str(), 0);
+      = xml_dom_util::getChildElement(element, element_name.c_str(), 0);
   activation_ptr_ = ActivationBase::getActivationPtrFromXml(ac_element);
 }
 

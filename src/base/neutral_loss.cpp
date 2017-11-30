@@ -25,8 +25,8 @@ NeutralLoss::NeutralLoss(const std::string &name, double mass):
     }
 
 NeutralLoss::NeutralLoss(xercesc::DOMElement* element) {
-  name_ = XmlDomUtil::getChildValue(element,"name", 0);
-  mass_ = XmlDomUtil::getDoubleChildValue(element,"mass", 0);
+  name_ = xml_dom_util::getChildValue(element,"name", 0);
+  mass_ = xml_dom_util::getDoubleChildValue(element,"mass", 0);
 }
 
 } /* namespace prot */

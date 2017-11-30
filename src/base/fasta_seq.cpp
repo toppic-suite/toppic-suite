@@ -140,17 +140,17 @@ void FastaSeq::appendNameDescToXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* 
 }
 
 std::string FastaSeq::getNameFromXml(xercesc::DOMElement * element) {
-  std::string name = XmlDomUtil::getChildValue(element, "seq_name", 0);
+  std::string name = xml_dom_util::getChildValue(element, "seq_name", 0);
   return name;
 }
 
 std::string FastaSeq::getDescFromXml(xercesc::DOMElement * element) {
-  std::string desc = XmlDomUtil::getChildValue(element, "seq_desc", 0);
+  std::string desc = xml_dom_util::getChildValue(element, "seq_desc", 0);
   return desc;
 }
 
 int FastaSeq::getSubSeqStartFromXml(xercesc::DOMElement * element) {
-  return XmlDomUtil::getIntChildValue(element, "sub_seq_start", 0);
+  return xml_dom_util::getIntChildValue(element, "sub_seq_start", 0);
 }
 
 }

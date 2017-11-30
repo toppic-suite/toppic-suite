@@ -28,11 +28,11 @@ DeconvPeak::DeconvPeak (int id, double mono_mass,
     }
 
 DeconvPeak::DeconvPeak(xercesc::DOMElement* element):
-    Peak (XmlDomUtil::getDoubleChildValue(element,"position",0), 
-          XmlDomUtil::getDoubleChildValue(element,"intensity",0)) {
-      id_ = XmlDomUtil::getIntChildValue(element,"id",0);
-      charge_ = XmlDomUtil::getIntChildValue(element,"charge",0);
-      score_ = XmlDomUtil::getDoubleChildValue(element,"score",0);
+    Peak (xml_dom_util::getDoubleChildValue(element,"position",0), 
+          xml_dom_util::getDoubleChildValue(element,"intensity",0)) {
+      id_ = xml_dom_util::getIntChildValue(element,"id",0);
+      charge_ = xml_dom_util::getIntChildValue(element,"charge",0);
+      score_ = xml_dom_util::getDoubleChildValue(element,"score",0);
     }
 
 void DeconvPeak::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){

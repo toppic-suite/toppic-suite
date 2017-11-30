@@ -28,10 +28,10 @@
 namespace prot {
 
 Ptm::Ptm(xercesc::DOMElement* element) {
-  name_ = XmlDomUtil::getChildValue(element, "name", 0);
-  abbr_name_ = XmlDomUtil::getChildValue(element, "abbreviation", 0);
-  mono_mass_ = XmlDomUtil::getDoubleChildValue(element, "mono_mass", 0);
-  unimod_id_ = XmlDomUtil::getIntChildValue(element, "unimod", 0);
+  name_ = xml_dom_util::getChildValue(element, "name", 0);
+  abbr_name_ = xml_dom_util::getChildValue(element, "abbreviation", 0);
+  mono_mass_ = xml_dom_util::getDoubleChildValue(element, "mono_mass", 0);
+  unimod_id_ = xml_dom_util::getIntChildValue(element, "unimod", 0);
 }
 
 void Ptm::appendAbbrNameToXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
@@ -43,7 +43,7 @@ void Ptm::appendAbbrNameToXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* pare
 }
 
 std::string Ptm::getAbbrNameFromXml(xercesc::DOMElement * element) {
-  std::string abbr_name = XmlDomUtil::getChildValue(element, "abbreviation", 0);
+  std::string abbr_name = xml_dom_util::getChildValue(element, "abbreviation", 0);
   return abbr_name;
 }
 

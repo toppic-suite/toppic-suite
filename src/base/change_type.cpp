@@ -37,7 +37,7 @@ void ChangeType::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent)
 }
 
 ChangeTypePtr ChangeType::getChangeTypePtrFromXml(xercesc::DOMElement * element) {
-  std::string name = XmlDomUtil::getChildValue(element, "name", 0);
+  std::string name = xml_dom_util::getChildValue(element, "name", 0);
   if (name == ChangeType::INPUT->getName()) {
     return ChangeType::INPUT;
   }

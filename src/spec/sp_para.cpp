@@ -22,21 +22,21 @@
 namespace prot {
 
 SpPara::SpPara(xercesc::DOMElement* element) {
-  min_peak_num_ = XmlDomUtil::getIntChildValue(element, "min_peak_num", 0);
-  min_mass_ = XmlDomUtil::getDoubleChildValue(element, "min_mass", 0);
-  extend_min_mass_ = XmlDomUtil::getDoubleChildValue(element, "extend_min_mass", 0);
-  xercesc::DOMElement* list_element = XmlDomUtil::getChildElement(element, "extend_offset_list", 0);
-  int offset_num =  XmlDomUtil::getChildCount(list_element, "extend_offset");
+  min_peak_num_ = xml_dom_util::getIntChildValue(element, "min_peak_num", 0);
+  min_mass_ = xml_dom_util::getDoubleChildValue(element, "min_mass", 0);
+  extend_min_mass_ = xml_dom_util::getDoubleChildValue(element, "extend_min_mass", 0);
+  xercesc::DOMElement* list_element = xml_dom_util::getChildElement(element, "extend_offset_list", 0);
+  int offset_num =  xml_dom_util::getChildCount(list_element, "extend_offset");
   for (int i = 0; i < offset_num; i++) {
-    double offset = XmlDomUtil::getDoubleChildValue(list_element, "extend_offset", i);
+    double offset = xml_dom_util::getDoubleChildValue(list_element, "extend_offset", i);
     ext_offsets_.push_back(offset);
   }
   std::string element_name = PeakTolerance::getXmlElementName();
-  xercesc::DOMElement* pt_element = XmlDomUtil::getChildElement(element, element_name.c_str(), 0);
+  xercesc::DOMElement* pt_element = xml_dom_util::getChildElement(element, element_name.c_str(), 0);
   peak_tolerance_ptr_ = std::make_shared<PeakTolerance>(pt_element);
 
   element_name = Activation::getXmlElementName();
-  xercesc::DOMElement* ac_element = XmlDomUtil::getChildElement(element, element_name.c_str(), 0);
+  xercesc::DOMElement* ac_element = xml_dom_util::getChildElement(element, element_name.c_str(), 0);
   activation_ptr_ = ActivationBase::getActivationPtrFromXml(ac_element);
 }
 

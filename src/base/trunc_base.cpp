@@ -29,9 +29,9 @@ void TruncBase::initBase(const std::string &file_name) {
     prot::XmlDOMDocument doc(parser, file_name.c_str());
     xercesc::DOMElement* parent = doc.getDocumentElement();
     std::string element_name = Trunc::getXmlElementName();
-    int trunc_num = XmlDomUtil::getChildCount(parent, element_name.c_str());
+    int trunc_num = xml_dom_util::getChildCount(parent, element_name.c_str());
     for (int i = 0; i < trunc_num; i++) {
-      xercesc::DOMElement* element = XmlDomUtil::getChildElement(parent, element_name.c_str(), i);
+      xercesc::DOMElement* element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
       TruncPtr trunc_ptr = std::make_shared<Trunc>(element);
       trunc_ptr_vec_.push_back(trunc_ptr);
     }

@@ -31,18 +31,18 @@ Trunc::Trunc(const std::string &name, int trunc_len,
 }
 
 Trunc::Trunc(xercesc::DOMElement* element) { 
-  name_ = XmlDomUtil::getChildValue(element, "name", 0);
-  trunc_len_ = XmlDomUtil::getIntChildValue(element, "trunc_len", 0);
-  std::string trunc_residues = XmlDomUtil::getChildValue(element, "trunc_residues", 0);
+  name_ = xml_dom_util::getChildValue(element, "name", 0);
+  trunc_len_ = xml_dom_util::getIntChildValue(element, "trunc_len", 0);
+  std::string trunc_residues = xml_dom_util::getChildValue(element, "trunc_residues", 0);
   LOG_DEBUG( "name " << name_ << " str " << trunc_residues << " trunc len " << trunc_len_);
   trunc_residue_ptr_vec_ = residue_util::convertStrToResiduePtrVec(trunc_residues);
-  std::string allow_first_remain_residues = XmlDomUtil::getChildValue(element, "allow_first_remain_residues", 0);
+  std::string allow_first_remain_residues = xml_dom_util::getChildValue(element, "allow_first_remain_residues", 0);
   allow_first_remain_residue_ptrs_ = residue_util::convertStrToResiduePtrVec(allow_first_remain_residues);
   shift_ = -residue_util::compResiduePtrVecMass(trunc_residue_ptr_vec_);
 }
 
 std::string Trunc::getNameFromXml(xercesc::DOMElement * element) {
-  std::string name = XmlDomUtil::getChildValue(element, "name", 0);
+  std::string name = xml_dom_util::getChildValue(element, "name", 0);
   return name;
 }
 

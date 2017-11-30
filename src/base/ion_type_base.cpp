@@ -31,9 +31,9 @@ void IonTypeBase::initBase(const std::string &file_name) {
     prot::XmlDOMDocument doc(parser, file_name.c_str());
     xercesc::DOMElement* parent = doc.getDocumentElement();
     std::string element_name = IonType::getXmlElementName();
-    int ion_type_num = XmlDomUtil::getChildCount(parent, element_name.c_str());
+    int ion_type_num = xml_dom_util::getChildCount(parent, element_name.c_str());
     for (int i = 0; i < ion_type_num; i++) {
-      xercesc::DOMElement* element = XmlDomUtil::getChildElement(parent, element_name.c_str(), i);
+      xercesc::DOMElement* element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
       IonTypePtr ion_type_ptr = std::make_shared<IonType>(element);
       ion_type_ptr_vec_.push_back(ion_type_ptr);
       if (ion_type_ptr->getName() == getName_B()) {

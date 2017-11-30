@@ -27,10 +27,10 @@ Mod::Mod(ResiduePtr ori_residue_ptr, ResiduePtr mod_residue_ptr):
 
 Mod::Mod(xercesc::DOMElement* element) { 
   xercesc::DOMElement* ori_residue_element 
-      = XmlDomUtil::getChildElement(element, "ori_residue", 0);
+      = xml_dom_util::getChildElement(element, "ori_residue", 0);
   ori_residue_ptr_ = ResidueBase::getResiduePtrFromXml(ori_residue_element);
   xercesc::DOMElement* mod_residue_element 
-      = XmlDomUtil::getChildElement(element, "mod_residue", 0);
+      = xml_dom_util::getChildElement(element, "mod_residue", 0);
   mod_residue_ptr_ = ResidueBase::getResiduePtrFromXml(mod_residue_element);
 }
 

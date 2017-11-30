@@ -52,9 +52,9 @@ void PrsmXmlWriter::write(PrsmPtr prsm_ptr) {
     XmlDOMDocument doc (impl->createDoc("prsm_list"));
     xercesc::DOMElement* element = prsm_ptr->toXmlElement(&doc);
     //LOG_DEBUG("Element generated");
-    std::string str = XmlDomUtil::writeToString(serializer, element);
+    std::string str = xml_dom_util::writeToString(serializer, element);
     //LOG_DEBUG("String generated");
-    XmlDomUtil::writeToStreamByRemovingDoubleLF(file_, str);
+    xml_dom_util::writeToStreamByRemovingDoubleLF(file_, str);
     element->release();
     serializer->release();
   }

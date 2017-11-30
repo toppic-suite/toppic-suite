@@ -46,7 +46,7 @@ Proteoform::Proteoform(xercesc::DOMElement* element, FastaIndexReaderPtr reader_
                        const ModPtrVec &fix_mod_list) {
 
   std::string seq_element_name = FastaSeq::getXmlElementName();
-  xercesc::DOMElement* seq_element= XmlDomUtil::getChildElement(element, seq_element_name.c_str(), 0);
+  xercesc::DOMElement* seq_element= xml_dom_util::getChildElement(element, seq_element_name.c_str(), 0);
   std::string seq_name = FastaSeq::getNameFromXml(seq_element);
   int sub_seq_start = FastaSeq::getSubSeqStartFromXml(seq_element);
   std::string seq_desc = FastaSeq::getDescFromXml(seq_element);
@@ -58,15 +58,15 @@ Proteoform::Proteoform(xercesc::DOMElement* element, FastaIndexReaderPtr reader_
 
 void Proteoform::parseXml(xercesc::DOMElement* element, ProteoformPtr form_ptr, int sub_seq_start) {
   //LOG_DEBUG("start parse proteoform");
-  start_pos_ = sub_seq_start + XmlDomUtil::getIntChildValue(element, "start_pos", 0);
-  end_pos_ = sub_seq_start + XmlDomUtil::getIntChildValue(element, "end_pos", 0);
-  species_id_ = XmlDomUtil::getIntChildValue(element, "species_id", 0);
-  prot_id_ = XmlDomUtil::getIntChildValue(element, "prot_id", 0);
-  variable_ptm_num_ = XmlDomUtil::getIntChildValue(element, "variable_ptm_num", 0);
+  start_pos_ = sub_seq_start + xml_dom_util::getIntChildValue(element, "start_pos", 0);
+  end_pos_ = sub_seq_start + xml_dom_util::getIntChildValue(element, "end_pos", 0);
+  species_id_ = xml_dom_util::getIntChildValue(element, "species_id", 0);
+  prot_id_ = xml_dom_util::getIntChildValue(element, "prot_id", 0);
+  variable_ptm_num_ = xml_dom_util::getIntChildValue(element, "variable_ptm_num", 0);
 
   //LOG_DEBUG("start parse prot mod");
   std::string pm_element_name = ProtMod::getXmlElementName();
-  xercesc::DOMElement* pm_element= XmlDomUtil::getChildElement(element,pm_element_name.c_str(),0);
+  xercesc::DOMElement* pm_element= xml_dom_util::getChildElement(element,pm_element_name.c_str(),0);
   prot_mod_ptr_ = ProtModBase::getProtModPtrFromXml(pm_element);
 
   fasta_seq_ptr_ = form_ptr->getFastaSeqPtr();
@@ -87,12 +87,12 @@ void Proteoform::parseXml(xercesc::DOMElement* element, ProteoformPtr form_ptr, 
   //LOG_DEBUG("start parse changes");
   std::string change_element_name = Change::getXmlElementName();
 
-  xercesc::DOMElement* change_list_element= XmlDomUtil::getChildElement(element, "change_list", 0);
-  int change_len = XmlDomUtil::getChildCount(change_list_element, change_element_name.c_str());
+  xercesc::DOMElement* change_list_element= xml_dom_util::getChildElement(element, "change_list", 0);
+  int change_len = xml_dom_util::getChildCount(change_list_element, change_element_name.c_str());
 
   for(int i = 0; i < change_len; i++) {
     xercesc::DOMElement* change_element 
-        = XmlDomUtil::getChildElement(change_list_element, change_element_name.c_str(), i);
+        = xml_dom_util::getChildElement(change_list_element, change_element_name.c_str(), i);
     change_list_.push_back(std::make_shared<Change>(change_element));
   }
   //LOG_DEBUG("end parse proteoform");
