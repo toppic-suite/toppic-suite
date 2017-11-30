@@ -80,7 +80,7 @@ void DeconvOneSp::preprocess() {
     for (size_t i = 0; i < peak_list.size(); i++) {
       intes.push_back(peak_list[i]->getIntensity());
     }
-    double min_inte = DeconvUtil::getBaseLine(intes);
+    double min_inte = deconv_util::getBaseLine(intes);
     mng_ptr_->setMinInte(min_inte);
   }
 }
