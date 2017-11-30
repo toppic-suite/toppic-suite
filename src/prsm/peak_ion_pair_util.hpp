@@ -22,7 +22,9 @@
 #include "prsm/peak_ion_pair.hpp"
 
 namespace prot {
-namespace PeakIonPairUtil {
+
+namespace peak_ion_pair_util {
+
 PeakIonPairPtrVec getMatchedPairs(const PeakIonPairPtrVec &pair_ptrs,
                                   int spec_id, int peak_id);
 
@@ -30,6 +32,7 @@ int getPeakIonPairNum(PeakIonPairPtrVec pair_ptrs);
 
 double computePairConverage(const PeakIonPairPtrVec &pair_ptrs, int begin,
                             int end, RmBreakTypePtr type_ptr);
-}  // namespace PeakIonPairUtil
+
+}  // namespace peak_ion_pair_util
 }  // namespace prot
 #endif

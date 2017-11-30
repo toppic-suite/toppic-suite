@@ -18,7 +18,9 @@
 
 namespace prot {
 
-SimplePrsmPtrVec SimplePrsmUtil::getUniqueMatches(SimplePrsmPtrVec match_ptrs) {
+namespace simple_prsm_util {
+
+SimplePrsmPtrVec getUniqueMatches(SimplePrsmPtrVec match_ptrs) {
   std::sort(match_ptrs.begin(), match_ptrs.end(), SimplePrsm::cmpNameIncScoreDec);
   SimplePrsmPtrVec unique_match_ptrs;
   std::string prev_name = "";
@@ -36,5 +38,6 @@ SimplePrsmPtrVec SimplePrsmUtil::getUniqueMatches(SimplePrsmPtrVec match_ptrs) {
   return unique_match_ptrs;
 }
 
+} // namespace simple_prsm_util
 
-} /* namespace prot */
+} // namespace prot 

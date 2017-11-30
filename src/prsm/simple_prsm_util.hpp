@@ -19,11 +19,13 @@
 #include "prsm/simple_prsm.hpp"
 
 namespace prot {
-namespace SimplePrsmUtil {
+
+namespace simple_prsm_util {
 
 SimplePrsmPtrVec getUniqueMatches(SimplePrsmPtrVec match_ptrs);
 
-}  // namesapce SimplePrsmUtil
+}  // namesapce simple_prsm_util
+
 }  // namespace prot
 
-#endif /* SIMPLE_PRSM_HPP_ */
+#endif /* PROT_PRSM_SIMPLE_PRSM_UTIL_HPP_ */
