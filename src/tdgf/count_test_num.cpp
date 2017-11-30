@@ -108,22 +108,22 @@ void CountTestNum::init(PrsmParaPtr para_ptr) {
     }
 
     // update residue counts 
-    TdgfUtil::updateResidueCounts(residue_list,residue_counts, proteo_ptr);
+    tdgf_util::updateResidueCounts(residue_list,residue_counts, proteo_ptr);
 
     // update n terminal residue counts
-    TdgfUtil::updateNTermResidueCounts(n_term_residue_list, n_term_residue_counts, mod_proteo_ptrs);
+    tdgf_util::updateNTermResidueCounts(n_term_residue_list, n_term_residue_counts, mod_proteo_ptrs);
 
     // next protein 
     seq_ptr = reader.getNextSeq();
   }
   // compute residue freq;
-  residue_ptrs_ =  TdgfUtil::compResidueFreq(residue_list, residue_counts);
+  residue_ptrs_ =  tdgf_util::compResidueFreq(residue_list, residue_counts);
 
   // compute residue average length
-  residue_avg_len_ = TdgfUtil::computeAvgLength(residue_ptrs_, convert_ratio_);
+  residue_avg_len_ = tdgf_util::computeAvgLength(residue_ptrs_, convert_ratio_);
 
   // compute n term residue freq;
-  prot_n_term_residue_ptrs_ =  TdgfUtil::compResidueFreq(n_term_residue_list, n_term_residue_counts);
+  prot_n_term_residue_ptrs_ =  tdgf_util::compResidueFreq(n_term_residue_list, n_term_residue_counts);
 
   // internal 
   initInternalMassCnt();
