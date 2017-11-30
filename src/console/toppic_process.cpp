@@ -74,7 +74,7 @@ int TopPICProgress(std::map<std::string, std::string> arguments) {
     arguments["start_time"] = std::string(ctime_r(&start, buf));
     Argument::outputArguments(std::cout, arguments);
 
-    BaseData::init(exe_dir);
+    base_data::init(exe_dir);
 
     LOG_DEBUG("Init base data completed");
 
