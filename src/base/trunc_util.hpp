@@ -20,10 +20,12 @@
 #include "base/residue.hpp"
 
 namespace prot {
-namespace TruncUtil {
+
+namespace trunc_util {
 
 bool isValidTrunc(TruncPtr trunc_ptr, const ResiduePtrVec & res_ptr_vec);
 
-}  // namespace TruncUtil
+}  // namespace trunc_util
+
 }  // namespace prot
 #endif
