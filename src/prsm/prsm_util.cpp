@@ -17,11 +17,14 @@
 #include <string>
 #include <algorithm>
 
+#include <boost/algorithm/string.hpp>
+
 #include "base/logger.hpp"
 #include "spec/extend_ms_factory.hpp"
 #include "spec/msalign_reader.hpp"
 #include "prsm/prsm_para.hpp"
 #include "prsm/prsm_util.hpp"
+#include "prsm/prsm_str.hpp"
 
 namespace prot {
 
@@ -47,7 +50,7 @@ std::string getXmlLine(const std::vector<std::string> &str_vec,
 }
 
 std::vector<std::string> getXmlLineVec(const std::vector<std::string> &str_vec,
-                                                 const std::string &property) {
+                                       const std::string &property) {
   std::vector<std::string> res;
   for (size_t i = 0; i < str_vec.size(); i++) {
     size_t found = str_vec[i].find(property);
@@ -81,7 +84,7 @@ std::vector<int> getSpeciesIds(const PrsmPtrVec &prsm_ptrs, std::string &seq_nam
   return species_ids;
 }
 
-int getProteinId(const PrsmPtrVec &prsm_ptrs, std::string &seq_name) {
+int getProteinId(const PrsmPtrVec &prsm_ptrs, const std::string &seq_name) {
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     if (prsm_ptrs[i]->getProteoformPtr()->getSeqName() == seq_name) {
       return prsm_ptrs[i]->getProteoformPtr()->getProtId();
@@ -130,7 +133,7 @@ void addSpectrumPtrsToPrsms(PrsmPtrVec &prsm_ptrs, PrsmParaPtr prsm_para_ptr) {
       DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
       int spectrum_id = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getId();
       int prec_id = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecId();
-      LOG_TRACE("spectrum id " << spectrum_id);
+      LOG_DEBUG("spectrum id " << spectrum_id);
       for (size_t i = start_prsm; i < prsm_ptrs.size(); i++) {
         if (isMatchMs(prsm_ptrs[i], deconv_ms_ptr_vec[0]->getMsHeaderPtr())) {
           prsm_ptrs[i]->setDeconvMsPtrVec(deconv_ms_ptr_vec);
@@ -140,7 +143,7 @@ void addSpectrumPtrsToPrsms(PrsmPtrVec &prsm_ptrs, PrsmParaPtr prsm_para_ptr) {
                                                  prsm_para_ptr->getSpParaPtr(),
                                                  new_prec_mass));
         }
-        if ((spectrum_id == prsm_ptrs[i]->getSpectrumId() 
+        if ((spectrum_id == prsm_ptrs[i]->getSpectrumId()
              && prec_id < prsm_ptrs[i]->getPrecursorId()) ||
             spectrum_id < prsm_ptrs[i]->getSpectrumId()) {
           start_prsm = i;
@@ -153,6 +156,37 @@ void addSpectrumPtrsToPrsms(PrsmPtrVec &prsm_ptrs, PrsmParaPtr prsm_para_ptr) {
   reader.close();
 }
 
-} // namespace prsm_util
+void addFeatureIDToPrsms(PrsmStrPtrVec &prsm_ptrs, const std::string & feature_file_name) {
+  // read TopFD featuers
+  std::vector<int> feature_spec_ids;
+  std::vector<int> feature_ids;
+  std::vector<double> feature_intens;
+  std::ifstream infile(feature_file_name);
+  std::string line;
+  while (std::getline(infile, line)) {
+    if (line[0] == '#' || line == "" || line[0] == 'I') {
+      continue;
+    }
+    std::vector<std::string> strs;
+    boost::split(strs, line, boost::is_any_of("\t "));
+    feature_spec_ids.push_back(std::stoi(strs[0]));
+    feature_ids.push_back(std::stoi(strs[6]));
+    feature_intens.push_back(std::stod(strs[7]));
+  }
+  infile.close();
+
+  // make sure prsms sorted by spectrum id
+  std::sort(prsm_ptrs.begin(), prsm_ptrs.end(), PrsmStr::cmpSpectrumIdInc);
+
+  size_t k = 0;
+  for (size_t i = 0; i < prsm_ptrs.size(); i++) {
+    int spec_id = prsm_ptrs[i]->getSpectrumId();
+    while (feature_spec_ids[k] != spec_id) {k++;}
+    prsm_ptrs[i]->setPrecFeatureId(feature_ids[k]);
+    prsm_ptrs[i]->setPrecFeatureInte(feature_intens[k]);
+  }
+}
+
+}  // namespace prsm_util
 
 }  // namespace prot

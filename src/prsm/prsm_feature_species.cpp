@@ -22,6 +22,7 @@
 #include "base/proteoform_util.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_feature_species.hpp"
+#include "prsm/prsm_util.hpp"
 #include "spec/msalign_reader.hpp"
 
 namespace prot {
@@ -94,43 +95,13 @@ void PrsmFeatureSpecies::setSpeciesId(PrsmStrPtrVec& prsm_ptrs) {
 void PrsmFeatureSpecies::process() {
   std::string base_name = file_util::basename(spec_file_name_);
   std::string input_file_name = base_name + "." + input_file_ext_;
-  PrsmStrPtrVec prsm_ptrs = PrsmReader::readAllPrsmStrs(input_file_name);
-  PrsmReaderPtr prsm_reader = std::make_shared<PrsmReader>(input_file_name);
   FastaIndexReaderPtr seq_reader = std::make_shared<FastaIndexReader>(db_file_name_);
+  PrsmStrPtrVec prsm_ptrs = PrsmReader::readAllPrsmStrsMatchSeq(input_file_name, seq_reader,
+                                                                fix_mod_ptr_vec_);
 
-  // read TopFD featuers
-  std::vector<int> feature_spec_ids;
-  std::vector<int> feature_ids;
-  std::vector<double> feature_intens;
-  std::ifstream infile(feature_file_name_);
-  std::string line;
-  while (std::getline(infile, line)) {
-    if (line[0] == '#' || line == "" || line[0] == 'I') {
-      continue;
-    }
-    std::vector<std::string> strs; 
-    boost::split(strs, line, boost::is_any_of("\t "));
-    feature_spec_ids.push_back(std::stoi(strs[0]));
-    feature_ids.push_back(std::stoi(strs[6]));
-    feature_intens.push_back(std::stod(strs[7]));
-  }
-  infile.close();
+  prsm_util::addFeatureIDToPrsms(prsm_ptrs, feature_file_name_);
 
-  size_t k = 0;
-  for (size_t i = 0; i < prsm_ptrs.size(); i++) {
-    int spec_id = prsm_ptrs[i]->getSpectrumId();
-    while (feature_spec_ids[k] != spec_id) {k++;}
-    prsm_ptrs[i]->setPrecFeatureId(feature_ids[k]);
-    prsm_ptrs[i]->setPrecFeatureInte(feature_intens[k]);
-
-    PrsmPtr prsm_ptr = prsm_reader->readOnePrsm(seq_reader, fix_mod_ptr_vec_);
-    if (prsm_ptr != nullptr) {
-      prsm_ptrs[i]->setProteinMatchSeq(prsm_ptr->getProteoformPtr()->getProteinMatchSeq());
-    }
-  }
-  prsm_reader->close();
-  prsm_reader = nullptr;
-  sort(prsm_ptrs.begin(), prsm_ptrs.end(), PrsmStr::cmpEValueInc);
+  std::sort(prsm_ptrs.begin(), prsm_ptrs.end(), PrsmStr::cmpEValueInc);
   setProtId(prsm_ptrs);
   setSpeciesId(prsm_ptrs);
   sort(prsm_ptrs.begin(), prsm_ptrs.end(), PrsmStr::cmpSpectrumIdIncPrecursorIdInc);
