@@ -33,7 +33,7 @@ ResFreqPtrVec compNTermResidueFreq(
     ResSeqPtr seq_ptr = prot_mod_forms[i]->getResSeqPtr();
     if (seq_ptr->getLen() >= 1) {
       ResiduePtr res_ptr = seq_ptr->getResiduePtr(0);
-      int pos = ResidueUtil::findResidue(residue_list, res_ptr);
+      int pos = residue_util::findResidue(residue_list, res_ptr);
       if (pos >= 0) {
         // found
         counts[pos] = counts[pos]+1;
@@ -66,7 +66,7 @@ ResFreqPtrVec compResidueFreq(const ResiduePtrVec &residue_list,
     ResSeqPtr seq_ptr = prot_mod_forms[i]->getResSeqPtr();
     for (int j = 0; j < seq_ptr->getLen(); j++) {
       ResiduePtr res_ptr = seq_ptr->getResiduePtr(j);
-      int pos = ResidueUtil::findResidue(residue_list, res_ptr);
+      int pos = residue_util::findResidue(residue_list, res_ptr);
       if (pos >= 0) {
         // found
         counts[pos] = counts[pos]+1;

@@ -282,7 +282,7 @@ ProteoformPtr geneProteoform(ProteoformPtr proteoform, int start_pos, int end_po
                              const ChangePtrVec &change_ptr_vec, const ModPtrVec & mod_ptr_vec) {
 
   ResSeqPtr new_res_seq = std::make_shared<ResidueSeq>(
-      ResidueUtil::convertStrToResiduePtrVec(
+      residue_util::convertStrToResiduePtrVec(
           proteoform->getFastaSeqPtr()->getRawSeq().substr(start_pos, end_pos - start_pos + 1), 
           mod_ptr_vec));
 

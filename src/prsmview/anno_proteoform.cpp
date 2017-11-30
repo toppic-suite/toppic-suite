@@ -69,11 +69,11 @@ AnnoResiduePtrVec getAnnoResidues(ProteoformPtr proteoform_ptr, PrsmViewMngPtr m
   /*
      std::string fasta_seq = proteoform_ptr->getFastaSeqPtr()->getSeq();
      ModPtrVec fix_mod_list = mng_ptr->prsm_para_ptr_->getFixModPtrVec();
-     ResiduePtrVec fasta_residues = ResidueUtil::convertStrToResiduePtrVec(fasta_seq,fix_mod_list); 
+     ResiduePtrVec fasta_residues = residue_util::convertStrToResiduePtrVec(fasta_seq,fix_mod_list); 
      */
   StringPairVec acid_ptm_pairs = proteoform_ptr->getFastaSeqPtr()->getAcidPtmPairVec();
   ModPtrVec fix_mod_list = mng_ptr->prsm_para_ptr_->getFixModPtrVec();
-  ResiduePtrVec fasta_residues = ResidueUtil::convertStrToResiduePtrVec(acid_ptm_pairs, fix_mod_list);
+  ResiduePtrVec fasta_residues = residue_util::convertStrToResiduePtrVec(acid_ptm_pairs, fix_mod_list);
   int prot_len = fasta_residues.size();
   for(int i = 0;i < prot_len;i++){
     res_ptrs.push_back(std::make_shared<AnnoResidue>(fasta_residues[i], i));

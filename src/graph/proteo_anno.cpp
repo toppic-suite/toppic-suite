@@ -49,7 +49,7 @@ ProteoAnno::ProteoAnno(const ModPtrVec &fix_mod_ptr_vec,
 }
 
 void ProteoAnno::anno(const std::string &seq, bool is_complete) {
-  ResiduePtrVec residue_ptr_vec = ResidueUtil::convertStrToResiduePtrVec(seq, fix_mod_ptr_vec_);
+  ResiduePtrVec residue_ptr_vec = residue_util::convertStrToResiduePtrVec(seq, fix_mod_ptr_vec_);
   res_vec_2d_.clear();
   change_vec_2d_.clear();
   // input and fixed mod

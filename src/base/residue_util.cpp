@@ -24,7 +24,9 @@
 
 namespace prot {
 
-ResiduePtrVec ResidueUtil::convertStrToResiduePtrVec(const std::string &seq) {
+namespace residue_util {
+
+ResiduePtrVec convertStrToResiduePtrVec(const std::string &seq) {
   ResiduePtrVec residue_ptr_vec;
   std::string seq2 = FastaSeq::rmChar(seq);
   for (size_t i = 0; i < seq2.length(); i++) {
@@ -47,14 +49,14 @@ void applyFixedMod(ResiduePtrVec &residue_ptrs, const ModPtrVec &fix_mod_ptr_vec
   }
 }
 
-ResiduePtrVec ResidueUtil::convertStrToResiduePtrVec(const std::string & seq,
-                                                     const ModPtrVec &fix_mod_ptr_vec) {
-  ResiduePtrVec residue_ptrs = ResidueUtil::convertStrToResiduePtrVec(seq);
+ResiduePtrVec convertStrToResiduePtrVec(const std::string & seq,
+                                        const ModPtrVec &fix_mod_ptr_vec) {
+  ResiduePtrVec residue_ptrs = convertStrToResiduePtrVec(seq);
   applyFixedMod(residue_ptrs, fix_mod_ptr_vec);
   return residue_ptrs;
 }
 
-ResiduePtrVec ResidueUtil::convertStrToResiduePtrVec(const StringPairVec &string_pair_vec) {
+ResiduePtrVec convertStrToResiduePtrVec(const StringPairVec &string_pair_vec) {
   ResiduePtrVec residue_ptr_vec;
   for (size_t i = 0; i < string_pair_vec.size(); i++) {
     std::string acid_str = string_pair_vec[i].first;
@@ -67,14 +69,14 @@ ResiduePtrVec ResidueUtil::convertStrToResiduePtrVec(const StringPairVec &string
   return residue_ptr_vec;
 }
 
-ResiduePtrVec ResidueUtil::convertStrToResiduePtrVec(const StringPairVec &string_pair_vec,
+ResiduePtrVec convertStrToResiduePtrVec(const StringPairVec &string_pair_vec,
                                                      const ModPtrVec &fix_mod_ptr_vec) {
-  ResiduePtrVec residue_ptrs = ResidueUtil::convertStrToResiduePtrVec(string_pair_vec);
+  ResiduePtrVec residue_ptrs = convertStrToResiduePtrVec(string_pair_vec);
   applyFixedMod(residue_ptrs, fix_mod_ptr_vec);
   return residue_ptrs;
 }
 
-int ResidueUtil::findResidue(const ResiduePtrVec &residue_list, ResiduePtr residue_ptr) {
+int findResidue(const ResiduePtrVec &residue_list, ResiduePtr residue_ptr) {
   for (size_t i = 0; i < residue_list.size(); i++) {
     if (residue_list[i] == residue_ptr) {
       return i;
@@ -83,12 +85,14 @@ int ResidueUtil::findResidue(const ResiduePtrVec &residue_list, ResiduePtr resid
   return -1;
 }
 
-double ResidueUtil::compResiduePtrVecMass(const ResiduePtrVec &ptr_vec) {
+double compResiduePtrVecMass(const ResiduePtrVec &ptr_vec) {
   double mass = 0;
   for (size_t i = 0; i < ptr_vec.size(); i++) {
     mass += ptr_vec[i]->getMass();
   }
   return mass;
 }
+
+} // namespace residue_util
 
 }  // namespace prot

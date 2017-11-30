@@ -26,10 +26,13 @@
 #include "base/logger.hpp"
 
 namespace prot {
-namespace ResidueUtil {
+
+namespace residue_util {
+
 ResiduePtrVec convertStrToResiduePtrVec(const std::string &seq);
 
-ResiduePtrVec convertStrToResiduePtrVec(const std::string &seq, const ModPtrVec &fix_mod_ptr_vec);
+ResiduePtrVec convertStrToResiduePtrVec(const std::string &seq, 
+                                        const ModPtrVec &fix_mod_ptr_vec);
 
 ResiduePtrVec convertStrToResiduePtrVec(const StringPairVec &string_pair_vec);
 
@@ -39,6 +42,8 @@ ResiduePtrVec convertStrToResiduePtrVec(const StringPairVec &string_pair_vec,
 int findResidue(const ResiduePtrVec &residue_list, ResiduePtr residue_ptr);
 
 double compResiduePtrVecMass(const ResiduePtrVec &ptr_vec);
-}  // namespace ResidueUtil
+
+}  // namespace residue_util
+
 }  // namespace prot
 #endif
