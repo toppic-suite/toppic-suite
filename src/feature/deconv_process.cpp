@@ -41,13 +41,20 @@ void DeconvProcess::outputParameter(std::ostream &output, DeconvParaPtr para_ptr
   output << prefix << "TopFD " << version_number << std::endl;
   output << prefix << "Timestamp: " << asctime(localtime(&cur_time)); 
   output << prefix << "********************** Parameters **********************" << std::endl;
-  output << prefix << std::setw(40) << std::left << "Input file: " << para_ptr->data_file_name_ << std::endl;
-  output << prefix << std::setw(40) << std::left << "Data type: " << "centroided" << std::endl;
-  output << prefix << std::setw(40) << std::left << "Maximum charge: " << para_ptr->max_charge_ << std::endl;
-  output << prefix << std::setw(40) << std::left << "Maximum monoisotopic mass: " << para_ptr->max_mass_ << " Dalton" << std::endl;
-  output << prefix << std::setw(40) << std::left << "Error tolerance: " << para_ptr->tolerance_ << " m/z" << std::endl;
-  output << prefix << std::setw(40) << std::left << "Signal/noise ratio: " << para_ptr->sn_ratio_ << std::endl;
-  output << prefix << std::setw(40) << std::left << "Precursor window size: " << para_ptr->prec_window_ << " m/z" << std::endl;
+  output << prefix << std::setw(40) << std::left 
+      << "Input file: " << para_ptr->data_file_name_ << std::endl;
+  output << prefix << std::setw(40) << std::left 
+      << "Data type: " << "centroided" << std::endl;
+  output << prefix << std::setw(40) << std::left 
+      << "Maximum charge: " << para_ptr->max_charge_ << std::endl;
+  output << prefix << std::setw(40) << std::left 
+      << "Maximum monoisotopic mass: " << para_ptr->max_mass_ << " Dalton" << std::endl;
+  output << prefix << std::setw(40) << std::left 
+      << "Error tolerance: " << para_ptr->tolerance_ << " m/z" << std::endl;
+  output << prefix << std::setw(40) << std::left 
+      << "Signal/noise ratio: " << para_ptr->sn_ratio_ << std::endl;
+  output << prefix << std::setw(40) << std::left 
+      << "Precursor window size: " << para_ptr->prec_window_ << " m/z" << std::endl;
   output << prefix << "********************** Parameters **********************" << std::endl;
 }
 

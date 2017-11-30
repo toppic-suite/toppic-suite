@@ -46,9 +46,14 @@ FeatureMng::FeatureMng(const std::string & exec_dir) {
   }
 }
 
-void FeatureMng::setMinInte(double min_inte) {
+void FeatureMng::setMinInte(double min_inte, int ms_level) {
   min_inte_ = min_inte;
-  min_refer_inte_ = min_inte * sn_ratio_;
+  if (ms_level == 1) {
+    min_refer_inte_ = min_inte * ms_one_sn_ratio_;
+  }
+  else {
+    min_refer_inte_ = min_inte * sn_ratio_;
+  }
 }
 
 // get the mass group based on mass value 
