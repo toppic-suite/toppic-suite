@@ -19,12 +19,16 @@
 
 namespace prot {
 
-std::vector<double> Theopeak_util::getTheoMassVec(const TheoPeakPtrVec &theo_peak_list) {
+namespace theo_peak_util {
+
+std::vector<double> getTheoMassVec(const TheoPeakPtrVec &theo_peak_list) {
   std::vector<double> masses;
   for (size_t i = 0; i < theo_peak_list.size(); i++) {
     masses.push_back(theo_peak_list[i]->getModMass());
   }
   return masses;
 }
+
+}  // namespace theo_peak_util
 
 }  // namespace prot
