@@ -13,6 +13,10 @@
 //limitations under the License.
 
 
+#include <string>
+#include <algorithm>
+#include <vector>
+
 #include <boost/algorithm/string.hpp>
 
 #include "base/logger.hpp"
@@ -82,7 +86,6 @@ void CompPValueLookupTable::initTable() {
 
   input_.close();
   LOG_DEBUG("table initialized");
-
 }
 
 double CompPValueLookupTable::compProb(int peak_num, int match_frag_num,
@@ -131,7 +134,7 @@ double CompPValueLookupTable::compProb(int peak_num, int match_frag_num,
 
   res = exp(res);
 
-  //LOG_DEBUG("prob " << res);
+  LOG_DEBUG("prob " << res);
 
   return res;
 }
@@ -139,17 +142,29 @@ double CompPValueLookupTable::compProb(int peak_num, int match_frag_num,
 /* set alignment */
 void CompPValueLookupTable::process(const DeconvMsPtrVec &deconv_ms_ptr_vec, PrsmPtrVec &prsm_ptrs,
                                     double ppo) {
-  //int ppo = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
-  int peak_num = 0; 
+  // int ppo = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
+  int peak_num = 0;
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
     peak_num += deconv_ms_ptr_vec[i]->size();
   }
   double tolerance = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getErrorTolerance(ppo);
-  double refine_prec_mass = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMassMinusWater();
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
-
+    double refine_prec_mass = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMassMinusWater();
     int match_frag_num = prsm_ptrs[i]->getMatchFragNum();
     int unexpected_shift_num = prsm_ptrs[i]->getProteoformPtr()->getChangeNum(ChangeType::UNEXPECTED);
+    if (unexpected_shift_num == 0) {
+      // in ZERO PTM searching, +/-1 Da was allowed.
+      // We need to adjust the prec mass for candidate number computation
+      // if there was 1 Da difference between original prec mass and adjusted
+      // prec mass.
+      if (std::abs(prsm_ptrs[i]->getOriPrecMass() - prsm_ptrs[i]->getAdjustedPrecMass()) > tolerance) {
+        if (prsm_ptrs[i]->getOriPrecMass() < prsm_ptrs[i]->getAdjustedPrecMass()) {
+          refine_prec_mass += 1;;
+        } else {
+          refine_prec_mass -= 1;
+        }
+      }
+    }
 
     double prot_prob = 1.0;
 
@@ -174,7 +189,6 @@ void CompPValueLookupTable::process(const DeconvMsPtrVec &deconv_ms_ptr_vec, Prs
 
 bool CompPValueLookupTable::inTable(const DeconvMsPtrVec &deconv_ms_ptr_vec,
                                     const PrsmPtrVec &prsm_ptrs) {
-
   int peak_num = 0;
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
     peak_num += deconv_ms_ptr_vec[i]->size();
@@ -299,7 +313,6 @@ std::vector<int> getFourIndex(int peak_num, int frag_num) {
     idx[2] = 0;
     idx[3] = 1;
   } else {
-
     k = frag_num / 5;
 
     idx[2] = k - 1;
@@ -320,4 +333,4 @@ int getPeakNumFromIndex(int idx) {
   }
 }
 
-}
+}  // namespace prot

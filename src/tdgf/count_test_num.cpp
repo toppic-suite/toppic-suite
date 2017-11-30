@@ -30,7 +30,7 @@ namespace prot {
 CountTestNum::CountTestNum(TdgfMngPtr mng_ptr) {
   convert_ratio_ = mng_ptr->convert_ratio_;
   max_ptm_mass_ = mng_ptr->max_ptm_mass_;
-  max_sp_len_ = (int)std::round(mng_ptr->max_prec_mass_ * convert_ratio_);
+  max_sp_len_ = static_cast<int>(std::round(mng_ptr->max_prec_mass_ * convert_ratio_));
   init(mng_ptr->prsm_para_ptr_);
   LOG_DEBUG("count numbers initialized");
 }
@@ -51,7 +51,7 @@ CountTestNum::~CountTestNum() {
 }
 
 inline int CountTestNum::convertMass(double m) {
-  int n = (int) std::round(m * convert_ratio_);
+  int n = static_cast<int>(std::round(m * convert_ratio_));
   if (n < 0) {
     LOG_WARN("Negative mass value: " << m);
     return 0;
@@ -61,7 +61,6 @@ inline int CountTestNum::convertMass(double m) {
   }
   return n;
 }
-
 
 void CountTestNum::init(PrsmParaPtr para_ptr) {
   std::string db_file_name = para_ptr->getSearchDbFileName();
@@ -95,7 +94,7 @@ void CountTestNum::init(PrsmParaPtr para_ptr) {
         pref_mass_cnts_[convertMass(prm_masses[j])] += 1.0;
       }
     }
-    //suffix
+    // suffix
     BreakPointPtrVec break_points = proteo_ptr->getBpSpecPtr()->getBreakPointPtrVec();
     for (size_t i = 1; i < break_points.size() - 1; i++) {
       suff_mass_cnts_[convertMass(break_points[i]->getSrm())] += 1.0;
@@ -160,19 +159,18 @@ double CountTestNum::compCandNum(AlignTypePtr type_ptr, int index,
     // multiple adjustment 
     if (type_ptr == AlignType::PREFIX || type_ptr == AlignType::SUFFIX) {
       cand_num = cand_num * PREFIX_SUFFIX_ADJUST();
-    }
-    else if (type_ptr == AlignType::INTERNAL) {
+    } else if (type_ptr == AlignType::INTERNAL) {
       cand_num = cand_num * INTERNAL_ADJUST();
     }
   }
 
   if (cand_num == 0.0) {
-    LOG_WARN("candidate number is ZERO");
+    LOG_ERROR("candidate number is ZERO");
   }
   return cand_num;
 }
 
-double CountTestNum::compNonPtmCandNum(AlignTypePtr type_ptr, 
+double CountTestNum::compNonPtmCandNum(AlignTypePtr type_ptr,
                                        double ori_mass, double ori_tolerance) {
   int low = std::floor((ori_mass - ori_tolerance) * convert_ratio_);
   int high = std::ceil((ori_mass + ori_tolerance) * convert_ratio_);
@@ -185,7 +183,7 @@ double CountTestNum::compNonPtmCandNum(AlignTypePtr type_ptr,
   return cand_num;
 }
 
-double CountTestNum::compPtmCandNum (AlignTypePtr type_ptr, double ori_mass) {
+double CountTestNum::compPtmCandNum(AlignTypePtr type_ptr, double ori_mass) {
   double cand_num = 0;
   if (type_ptr == AlignType::COMPLETE) {
     cand_num = mod_proteo_lens_.size();
@@ -205,8 +203,8 @@ double CountTestNum::compPtmCandNum (AlignTypePtr type_ptr, double ori_mass) {
   return cand_num;
 }
 
-double CountTestNum::compPtmRestrictCandNum (AlignTypePtr type_ptr, 
-                                             int shift_num, double ori_mass) {
+double CountTestNum::compPtmRestrictCandNum(AlignTypePtr type_ptr,
+                                            int shift_num, double ori_mass) {
   double shift = max_ptm_mass_ * shift_num;
   int low = std::floor((ori_mass - shift) * convert_ratio_);
   int high = std::ceil((ori_mass + shift) * convert_ratio_);
@@ -245,4 +243,4 @@ double CountTestNum::compMassNum(double *cnts, int low, int high) {
   return cnt;
 }
 
-}
+}  // namespace prot

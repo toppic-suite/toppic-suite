@@ -28,7 +28,7 @@ class CompPValueArray {
   CompPValueArray(CountTestNumPtr test_num_ptr,
                   TdgfMngPtr mng_ptr);
 
-  void compMultiExtremeValues(const PrmMsPtrVec &ms_six_ptr_vec, PrsmPtrVec &prsm_ptrs, 
+  void compMultiExtremeValues(const PrmMsPtrVec &ms_six_ptr_vec, PrsmPtrVec &prsm_ptrs,
                               double ppo, bool strict);
 
   void compSingleExtremeValue(const DeconvMsPtrVec &ms_ptr_vec, PrsmPtr prsm_ptr, double ppo);
@@ -37,16 +37,18 @@ class CompPValueArray {
 
  private:
   TdgfMngPtr mng_ptr_;
+
   CompProbValuePtr comp_prob_ptr_;
+
   CountTestNumPtr test_num_ptr_;
+
   ResFreqPtrVec residue_ptrs_;
   ResFreqPtrVec pep_n_term_residue_ptrs_;
   ResFreqPtrVec prot_n_term_residue_ptrs_;
-
 };
 
 typedef std::shared_ptr<CompPValueArray> CompPValueArrayPtr;
 
-}
+}  // namespace prot
 
 #endif

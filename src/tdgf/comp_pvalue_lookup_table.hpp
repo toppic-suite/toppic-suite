@@ -16,6 +16,8 @@
 #ifndef PROT_COMP_PVALUE_LOOKUP_TABLE_HPP_
 #define PROT_COMP_PVALUE_LOOKUP_TABLE_HPP_
 
+#include <vector>
+
 #include "tdgf/tdgf_mng.hpp"
 #include "tdgf/comp_prob_value.hpp"
 #include "tdgf/count_test_num.hpp"
@@ -24,14 +26,13 @@ namespace prot {
 
 class CompPValueLookupTable {
  public:
-  CompPValueLookupTable(TdgfMngPtr mng_ptr);
+  explicit CompPValueLookupTable(TdgfMngPtr mng_ptr);
 
   bool inTable(const DeconvMsPtrVec &deconv_ms_ptr_vec, const PrsmPtrVec &prsm_ptrs);
 
   void process(const DeconvMsPtrVec &deconv_ms_ptr_vec, PrsmPtrVec &prsm_ptrs, double ppo);
 
  private:
-
   void initTable();
 
   TdgfMngPtr mng_ptr_;
@@ -56,6 +57,6 @@ std::vector<int> getFourIndex(int peak_num, int frag_num);
 
 int getPeakNumFromIndex(int idx);
 
-}
+}  // namespace prot
 
 #endif
