@@ -140,7 +140,7 @@ PtmSearchProcessor::PtmSearchProcessor(PtmSearchMngPtr mng_ptr){
 void PtmSearchProcessor::process(){
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
-  std::string input_file_name = FileUtil::basename(sp_file_name)+"."+mng_ptr_->input_file_ext_;
+  std::string input_file_name = file_util::basename(sp_file_name)+"."+mng_ptr_->input_file_ext_;
   SimplePrsmReader simple_prsm_reader(input_file_name);
   SimplePrsmPtr prsm_ptr = simple_prsm_reader.readOnePrsm();
 
@@ -152,7 +152,7 @@ void PtmSearchProcessor::process(){
   sp_para_ptr->prec_error_ = 0;
   ModPtrVec fix_mod_ptr_vec = prsm_para_ptr->getFixModPtrVec();
 
-  std::string output_file_name = FileUtil::basename(sp_file_name) + "." + mng_ptr_->output_file_ext_;
+  std::string output_file_name = file_util::basename(sp_file_name) + "." + mng_ptr_->output_file_ext_;
 
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
   MsAlignReader sp_reader(sp_file_name, group_spec_num,

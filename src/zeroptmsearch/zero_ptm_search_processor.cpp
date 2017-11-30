@@ -85,7 +85,7 @@ PrsmPtrVec ZeroPtmSearchProcessor::zeroPtmSearchOneSpec(SpectrumSetPtr spec_set_
 void ZeroPtmSearchProcessor::process() {
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
-  std::string input_file_name = FileUtil::basename(sp_file_name) + "." + mng_ptr_->input_file_ext_;
+  std::string input_file_name = file_util::basename(sp_file_name) + "." + mng_ptr_->input_file_ext_;
   SimplePrsmReader comp_prsm_reader(input_file_name + "_" + AlignType::COMPLETE->getName());
   SimplePrsmReader pref_prsm_reader(input_file_name + "_" + AlignType::PREFIX->getName());
   SimplePrsmReader suff_prsm_reader(input_file_name + "_" + AlignType::SUFFIX->getName());
@@ -95,7 +95,7 @@ void ZeroPtmSearchProcessor::process() {
   SimplePrsmPtr suff_prsm_ptr = suff_prsm_reader.readOnePrsm();
   SimplePrsmPtr internal_prsm_ptr = internal_prsm_reader.readOnePrsm();
 
-  std::string output_file_name = FileUtil::basename(prsm_para_ptr->getSpectrumFileName())
+  std::string output_file_name = file_util::basename(prsm_para_ptr->getSpectrumFileName())
       + "." + mng_ptr_->output_file_ext_;
   PrsmXmlWriter comp_writer(output_file_name + "_" + AlignType::COMPLETE->getName());
   PrsmXmlWriter pref_writer(output_file_name + "_" + AlignType::PREFIX->getName());

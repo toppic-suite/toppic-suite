@@ -231,7 +231,7 @@ void PrsmStat::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
 
 void PrsmStat::process() {
   std::string spectrum_file_name  = prsm_para_ptr_->getSpectrumFileName(); 
-  std::string base_name = FileUtil::basename(spectrum_file_name);
+  std::string base_name = file_util::basename(spectrum_file_name);
   std::string output_file_name = base_name + "." + output_file_ext_;
   std::ofstream file; 
   file.open(output_file_name.c_str());
@@ -316,7 +316,7 @@ void PrsmStat::process() {
 
   file << std::endl;
 
-  std::string input_file_name = FileUtil::basename(spectrum_file_name) + "." + input_file_ext_;
+  std::string input_file_name = file_util::basename(spectrum_file_name) + "." + input_file_ext_;
   std::string db_file_name = prsm_para_ptr_->getSearchDbFileName();
   ModPtrVec fix_mod_ptr_vec = prsm_para_ptr_->getFixModPtrVec();
 

@@ -90,7 +90,7 @@ void DiagFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num
                        sp_para_ptr->getActivationPtr(),
                        sp_para_ptr->getSkipList());
 
-  std::string output_file_name = FileUtil::basename(prsm_para_ptr->getSpectrumFileName())
+  std::string output_file_name = file_util::basename(prsm_para_ptr->getSpectrumFileName())
       + "." + mng_ptr_->output_file_ext_+"_"+ std::to_string(block_ptr->getBlockIdx());
 
   SimplePrsmThreadPoolPtr pool_ptr

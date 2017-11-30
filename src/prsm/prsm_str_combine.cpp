@@ -40,7 +40,7 @@ PrsmStrCombine::PrsmStrCombine(const std::string &spec_file_name,
 
 void PrsmStrCombine::process(bool norm) {
   size_t input_num = input_file_exts_.size();
-  std::string base_name = FileUtil::basename(spec_file_name_);
+  std::string base_name = file_util::basename(spec_file_name_);
   // open files
   PrsmReaderPtrVec reader_ptrs;
   PrsmStrPtrVec prsm_str_ptrs;

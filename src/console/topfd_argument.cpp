@@ -116,7 +116,7 @@ bool Argument::parse(int argc, char* argv[]) {
       return false;
     }
     std::string argv_0(argv[0]);
-    arguments_["executiveDir"] = FileUtil::getExecutiveDir(argv_0);
+    arguments_["executiveDir"] = file_util::getExecutiveDir(argv_0);
     arguments_["spectrumFileName"] = spectrum_file_name;
     if (vm.count("max-charge")) {
       arguments_["maxCharge"] = max_charge;

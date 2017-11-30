@@ -48,6 +48,7 @@ inline double getWaterMass() {return 18.010565; }
  * and its corresponding suffix residue mass. 
  */
 inline double getYIonShift() {return 18.010565; }
+
 }  // namespace mass_constant
 
 }  // namespace prot

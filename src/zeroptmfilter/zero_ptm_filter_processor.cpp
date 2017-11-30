@@ -112,7 +112,7 @@ std::function<void()> geneTask(const ProteoformPtrVec & raw_forms,
                          group_spec_num,
                          prsm_para_ptr->getSpParaPtr()->getActivationPtr(),
                          prsm_para_ptr->getSpParaPtr()->getSkipList());
-    std::string output_file_name = FileUtil::basename(prsm_para_ptr->getSpectrumFileName())
+    std::string output_file_name = file_util::basename(prsm_para_ptr->getSpectrumFileName())
         + "." + mng_ptr->output_file_ext_;
 
     SimplePrsmXmlWriter comp_writer(output_file_name + "_COMPLETE_" + block_str + "_" + std::to_string(idx));

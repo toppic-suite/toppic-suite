@@ -21,7 +21,7 @@
 namespace prot {
 
 void PrsmCutoffSelector::process(){
-  std::string base_name = FileUtil::basename(spec_file_name_);
+  std::string base_name = file_util::basename(spec_file_name_);
   std::string input_file_name = base_name + "." + input_file_ext_;
 
   ModPtrVec fix_mod_list;

@@ -69,8 +69,8 @@ void DeconvProcess::process() {
   std::string file_name = para_ptr_->getDataFileName();
   // writer
   std::string ms1_name, ms2_name;
-  ms1_name = FileUtil::basename(file_name) + "_ms1.msalign";
-  ms2_name = FileUtil::basename(file_name) + "_ms2.msalign";
+  ms1_name = file_util::basename(file_name) + "_ms1.msalign";
+  ms2_name = file_util::basename(file_name) + "_ms2.msalign";
 
   std::ofstream of1(ms1_name, std::ofstream::out);
   std::ofstream of2(ms2_name, std::ofstream::out);

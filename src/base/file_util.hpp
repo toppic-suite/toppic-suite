@@ -29,7 +29,9 @@
 #undef BOOST_NO_CXX11_SCOPED_ENUMS
 
 namespace prot {
-namespace FileUtil {
+
+namespace file_util {
+
 std::string getFileSeparator();
 
 std::string getExecutiveDir(const std::string &argv_0);
@@ -51,6 +53,8 @@ void delDir(const std::string &path);
 void delFile(const std::string &path);
 
 void cleanDir(const std::string &fa_path, const std::string & sp_path);
-}  // namespace FileUtil
+
+}  // namespace file_util
+
 }  // namespace prot
 #endif

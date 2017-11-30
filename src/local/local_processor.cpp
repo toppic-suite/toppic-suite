@@ -43,8 +43,8 @@ LocalProcessor::LocalProcessor(LocalMngPtr mng_ptr) {
 
 void LocalProcessor::process() {
   std::string spec_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
-  std::string input_file_name = FileUtil::basename(spec_file_name) + "." + mng_ptr_->input_file_ext_;
-  std::string output_file_name = FileUtil::basename(spec_file_name) + "." + mng_ptr_->output_file_ext_;
+  std::string input_file_name = file_util::basename(spec_file_name) + "." + mng_ptr_->input_file_ext_;
+  std::string output_file_name = file_util::basename(spec_file_name) + "." + mng_ptr_->output_file_ext_;
   PrsmXmlWriter writer(output_file_name);
   std::string db_file_name = mng_ptr_->prsm_para_ptr_->getSearchDbFileName();
 

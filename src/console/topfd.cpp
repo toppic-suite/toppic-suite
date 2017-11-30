@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
     return EXIT_FAILURE;
   }
   std::map<std::string, std::string> arguments = argu_processor.getArguments();
-  std::string exe_dir = prot::FileUtil::getExecutiveDir(argv[0]);
+  std::string exe_dir = prot::file_util::getExecutiveDir(argv[0]);
   arguments["executiveDir"] = exe_dir;
 
   return prot::TopFDProcess(arguments);

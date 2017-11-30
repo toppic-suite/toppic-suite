@@ -41,7 +41,7 @@ inline PrsmStrPtr2D getGroups(PrsmStrPtrVec &prsm_ptrs) {
 }
 
 void PrsmFdr::process(){
-  std::string base_name = FileUtil::basename(spec_file_name_);
+  std::string base_name = file_util::basename(spec_file_name_);
   std::string input_file_name = base_name + "." + input_file_ext_;
 
   PrsmStrPtrVec prsm_str_ptrs = PrsmReader::readAllPrsmStrs(input_file_name);

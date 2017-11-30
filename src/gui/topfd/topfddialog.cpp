@@ -195,7 +195,7 @@ void TopFDDialog::on_outputButton_clicked()
 }
 std::map<std::string, std::string> TopFDDialog::getArguments() {
   QString path = QCoreApplication::applicationFilePath();
-  std::string exe_dir = prot::FileUtil::getExecutiveDir(path.toStdString());
+  std::string exe_dir = prot::file_util::getExecutiveDir(path.toStdString());
   arguments_["executiveDir"] = exe_dir;
   arguments_["spectrumFileName"] = ui->fileEdit->text().toStdString();
   arguments_["maxCharge"] = ui->maxChargeEdit->text().toStdString();

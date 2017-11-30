@@ -126,7 +126,7 @@ void PrsmSpecies::setSpeciesId(PrsmStrPtrVec& prsm_ptrs, double ppo) {
 }
 
 void PrsmSpecies::process() {
-  std::string base_name = FileUtil::basename(spec_file_name_);
+  std::string base_name = file_util::basename(spec_file_name_);
   std::string input_file_name = base_name + "." + input_file_ext_;
   PrsmStrPtrVec prsm_ptrs = PrsmReader::readAllPrsmStrs(input_file_name);
   sort(prsm_ptrs.begin(), prsm_ptrs.end(), PrsmStr::cmpEValueInc);
