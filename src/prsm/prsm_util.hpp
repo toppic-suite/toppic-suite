@@ -21,6 +21,7 @@
 #include <string>
 
 #include "prsm/prsm.hpp"
+#include "prsm/prsm_str.hpp"
 #include "prsm/prsm_para.hpp"
 
 namespace prot {
@@ -37,7 +38,7 @@ std::vector<std::string> getXmlLineVec(const std::vector<std::string> &str_vec,
 
 PrsmPtrVec selectSpeciesPrsms(const PrsmPtrVec &prsm_ptrs, int species_id);
 
-std::vector<int> getSpeciesIds(const PrsmPtrVec &prsm_ptrs, std::string &seq_name);
+std::vector<int> getSpeciesIds(const PrsmPtrVec &prsm_ptrs, const std::string & seq_name);
 
 int getProteinId(const PrsmPtrVec &prsm_ptrs, std::string &seq_name);
 
@@ -45,7 +46,9 @@ std::vector<int> getSpeciesIds(const PrsmPtrVec &prsm_ptrs);
 
 void addSpectrumPtrsToPrsms(PrsmPtrVec &prsm_ptrs, PrsmParaPtr prsm_para_ptr);
 
-}  // namesace prsm_util
+void addFeatureIDToPrsms(PrsmStrPtrVec &prsm_ptrs, const std::string & feature_file_name);
+
+}  // namespace prsm_util
 
 }  // namespace prot
 #endif
