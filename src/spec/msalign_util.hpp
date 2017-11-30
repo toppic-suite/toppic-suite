@@ -20,12 +20,16 @@
 #include "spec/msalign_reader.hpp"
 
 namespace prot {
-namespace MsAlignUtil {
+
+namespace msalign_util {
+
 int countSpNum(const std::string &spectrum_file, SpParaPtr sp_para_ptr);
 
 void geneSpIndex(const std::string &spectrum_file_name, SpParaPtr sp_para_ptr);
 
 int getSpNum(const std::string &spectrum_file_name);
-}  // namespace MsAlignUtil
+
+}  // namespace msalign_util
+
 }  // namespace prot
 #endif

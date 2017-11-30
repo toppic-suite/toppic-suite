@@ -121,7 +121,7 @@ std::function<void()> geneTask(const ProteoformPtrVec & raw_forms,
     SimplePrsmXmlWriter internal_writer(output_file_name + "_INTERNAL_" + block_str + "_" + std::to_string(idx));
 
     std::vector<SpectrumSetPtr> spec_set_vec = reader.getNextSpectrumSet(sp_para_ptr);
-    int spectrum_num = MsAlignUtil::getSpNum(prsm_para_ptr->getSpectrumFileName());
+    int spectrum_num = msalign_util::getSpNum(prsm_para_ptr->getSpectrumFileName());
     int cnt = 0;
     while (spec_set_vec[0] != nullptr) {
       cnt+= group_spec_num * mng_ptr->thread_num_;
@@ -152,7 +152,7 @@ std::function<void()> geneTask(const ProteoformPtrVec & raw_forms,
 
 void ZeroPtmFilterProcessor::processBlock(DbBlockPtr block_ptr) {
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
-  int spectrum_num = MsAlignUtil::getSpNum(prsm_para_ptr->getSpectrumFileName());
+  int spectrum_num = msalign_util::getSpNum(prsm_para_ptr->getSpectrumFileName());
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
   std::string db_block_file_name = prsm_para_ptr->getSearchDbFileName()
       + "_" + std::to_string(block_ptr->getBlockIdx());

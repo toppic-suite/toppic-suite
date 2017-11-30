@@ -59,7 +59,7 @@ void LocalProcessor::process() {
   SpectrumSetPtr spec_set_ptr;
   SpParaPtr sp_para_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr();
 
-  int spectrum_num = MsAlignUtil::getSpNum(mng_ptr_->prsm_para_ptr_->getSpectrumFileName());
+  int spectrum_num = msalign_util::getSpNum(mng_ptr_->prsm_para_ptr_->getSpectrumFileName());
   int cnt = 0;
   while((spec_set_ptr = sp_reader.getNextSpectrumSet(sp_para_ptr)[0])!= nullptr){
     cnt += group_spec_num;

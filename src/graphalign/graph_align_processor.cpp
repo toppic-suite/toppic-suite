@@ -157,7 +157,7 @@ void GraphAlignProcessor::process() {
   ModPtrVec var_mod_ptr_vec = mod_util::readModTxt(var_mod_file_name)[2];
   LOG_DEBUG("end reading " << var_mod_file_name);
 
-  int spectrum_num = MsAlignUtil::getSpNum(prsm_para_ptr->getSpectrumFileName());
+  int spectrum_num = msalign_util::getSpNum(prsm_para_ptr->getSpectrumFileName());
   std::string input_file_name
       = file_util::basename(sp_file_name) + "." + mng_ptr_->input_file_ext_;
 
