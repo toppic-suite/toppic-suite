@@ -34,7 +34,9 @@
 #include "base/fasta_reader.hpp"
 
 namespace prot {
-namespace FastaUtil {
+
+namespace fasta_util {
+
 void generateShuffleDb(const std::string &file_name,
                        const std::string &target_decoy_file_name);
 
@@ -43,7 +45,9 @@ void dbPreprocess(const std::string &ori_db_file_name,
                   bool decoy, int block_size);
 
 int countProteinNum(const std::string &fasta_file);
+
 }  // namespace FastaUtil
+
 }  // namespace prot
 
 #endif

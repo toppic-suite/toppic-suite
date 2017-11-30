@@ -20,8 +20,10 @@
 
 namespace prot {
 
-void FastaUtil::generateShuffleDb(const std::string &file_name,
-                                  const std::string &target_decoy_file_name) {
+namespace fasta_util {
+
+void generateShuffleDb(const std::string &file_name,
+                       const std::string &target_decoy_file_name) {
   std::ofstream output;
   output.open(target_decoy_file_name.c_str(), std::ios::out);
   FastaReader reader(file_name);
@@ -117,9 +119,9 @@ void generateDbBlock(const std::string &db_file_name, int block_size) {
   block_output.close();
 }
 
-void FastaUtil::dbPreprocess(const std::string &ori_db_file_name,
-                             const std::string &db_file_name,
-                             bool decoy, int block_size) {
+void dbPreprocess(const std::string &ori_db_file_name,
+                  const std::string &db_file_name,
+                  bool decoy, int block_size) {
   std::string standard_db_file_name = ori_db_file_name + "_standard";
   generateStandardDb(ori_db_file_name, standard_db_file_name);
 
@@ -135,7 +137,7 @@ void FastaUtil::dbPreprocess(const std::string &ori_db_file_name,
   fai_build(db_file_name.c_str());
 }
 
-int FastaUtil::countProteinNum(const std::string &fasta_file) {
+int countProteinNum(const std::string &fasta_file) {
   FastaReader reader(fasta_file);
   int cnt = 0;
   while (reader.getNextSeq() != nullptr) {
@@ -144,5 +146,7 @@ int FastaUtil::countProteinNum(const std::string &fasta_file) {
   reader.close();
   return cnt;
 }
+
+} // namespace fasta_util
 
 }  // namespace prot
