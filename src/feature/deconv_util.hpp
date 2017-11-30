@@ -21,6 +21,8 @@
 
 namespace prot {
 
+namespace deconv_util {
+
 class IntvDens {
  public:
   IntvDens(double bgn, double end, int num, double perc):
@@ -45,19 +47,15 @@ class IntvDens {
 typedef std::shared_ptr<IntvDens> IntvDensPtr;
 typedef std::vector<IntvDensPtr> IntvDensPtrVec;
 
-class DeconvUtil {
- public:
-  static IntvDensPtrVec getDensity(const std::vector<double> &inte);
+IntvDensPtrVec getDensity(const std::vector<double> &inte);
 
-  static void outputDens(const IntvDensPtrVec &dens);
+void outputDens(const IntvDensPtrVec &dens);
 
-  static int getMaxPos(const IntvDensPtrVec &dens);
+int getMaxPos(const IntvDensPtrVec &dens);
 
-  static double getBaseLine(const std::vector<double> &inte);
+double getBaseLine(const std::vector<double> &inte);
 
- private:
-  static double intv_width_;
-};
+}  // namespace deconv_util 
 
 }  // namespace prot
 #endif
