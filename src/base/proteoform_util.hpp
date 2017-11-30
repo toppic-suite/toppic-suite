@@ -21,7 +21,8 @@
 #include "base/proteoform.hpp"
 
 namespace prot {
-namespace ProteoformUtil {
+
+namespace proteoform_util {
 
 // calculate frequencies for n_terminal_residues
 ResFreqPtrVec compNTermResidueFreq(const ProteoformPtrVec &prot_mod_forms);
@@ -49,7 +50,8 @@ std::vector<double> getNTermAcets(ProteoformPtr db_form_ptr,
 std::vector<std::vector<double> > getNTermAcet2D(const ProteoformPtrVec & db_form_ptr_vec,
                                                  const ProtModPtrVec & prot_mod_ptrs);
 
-}  // namespace ProteoformUtil
+}  // namespace proteoform_util
+
 }  // namespace prot
 
 #endif

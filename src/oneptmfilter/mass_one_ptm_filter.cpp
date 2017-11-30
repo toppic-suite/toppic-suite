@@ -32,9 +32,9 @@ MassOnePtmFilter::MassOnePtmFilter(const ProteoformPtrVec &proteo_ptrs,
   mng_ptr_ = mng_ptr;
   proteo_ptrs_ = proteo_ptrs;
   std::vector<std::vector<double>> shift_2d
-      = ProteoformUtil::getNTermShift2D(proteo_ptrs, mng_ptr->prsm_para_ptr_->getProtModPtrVec());
+      = proteoform_util::getNTermShift2D(proteo_ptrs, mng_ptr->prsm_para_ptr_->getProtModPtrVec());
   std::vector<std::vector<double>> n_term_acet_2d
-      = ProteoformUtil::getNTermAcet2D(proteo_ptrs, mng_ptr->prsm_para_ptr_->getProtModPtrVec());
+      = proteoform_util::getNTermAcet2D(proteo_ptrs, mng_ptr->prsm_para_ptr_->getProtModPtrVec());
   term_index_ptr_ = MassMatchFactory::getPrmTermMassMatchPtr(proteo_ptrs, shift_2d,
                                                              mng_ptr->max_proteoform_mass_,
                                                              mng_ptr->filter_scale_);
