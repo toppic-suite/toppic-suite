@@ -145,7 +145,7 @@ void MsAlignReader::readNext() {
   header_ptr->setMsOneScan(ms_one_scan);
 
   header_ptr->setPrecMonoMz(prec_mass /prec_charge
-                            + MassConstant::getProtonMass());
+                            + mass_constant::getProtonMass());
   header_ptr->setPrecCharge(prec_charge);
 
   header_ptr->setPrecInte(prec_inte);
@@ -211,8 +211,8 @@ std::vector<SpectrumSetPtr> MsAlignReader::getNextSpectrumSet(SpParaPtr sp_para_
   std::vector<double> prec_errors;
   prec_errors.push_back(0);
   for (int i = 1; i <= sp_para_ptr->prec_error_; i++) {
-    prec_errors.push_back(- i * MassConstant::getIsotopeMass());
-    prec_errors.push_back(i * MassConstant::getIsotopeMass());
+    prec_errors.push_back(- i * mass_constant::getIsotopeMass());
+    prec_errors.push_back(i * mass_constant::getIsotopeMass());
   }
   for (size_t i = 0; i< prec_errors.size(); i++) {
     spec_set_vec.push_back(std::make_shared<SpectrumSet>(deconv_ms_ptr_vec,

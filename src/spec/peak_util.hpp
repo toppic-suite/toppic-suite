@@ -21,11 +21,11 @@
 namespace prot {
 namespace PeakUtil {
 inline double compPeakMass(double mono_mz, int charge) {
-  return mono_mz * charge - charge * MassConstant::getProtonMass();
+  return mono_mz * charge - charge * mass_constant::getProtonMass();
 }
 
 inline double compMonoMz(double mono_mass, int charge) {
-  return mono_mass / charge + MassConstant::getProtonMass();
+  return mono_mass / charge + mass_constant::getProtonMass();
 }
 }  // namespace PeakUtil
 }  // namespace prot

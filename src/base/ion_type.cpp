@@ -29,7 +29,7 @@ IonType::IonType(const std::string &name, bool n_term, double shift):
         b_y_shift_ = shift_;
       }
       else {
-        b_y_shift_ = shift_ - MassConstant::getYIonShift();
+        b_y_shift_ = shift_ - mass_constant::getYIonShift();
       }
     }
 
@@ -41,7 +41,7 @@ IonType::IonType(xercesc::DOMElement* element) {
     b_y_shift_ = shift_;
   }
   else {
-    b_y_shift_ = shift_ - MassConstant::getYIonShift();
+    b_y_shift_ = shift_ - mass_constant::getYIonShift();
   }
 }
 

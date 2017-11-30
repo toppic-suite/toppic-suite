@@ -53,7 +53,7 @@ PrsmPara::PrsmPara(std::map<std::string, std::string> &arguments) {
       = std::make_shared<PeakTolerance>(ppo, use_min_tolerance, min_tolerance);
 
   // extend sp parameter 
-  double IM = MassConstant::getIsotopeMass();
+  double IM = mass_constant::getIsotopeMass();
   // the set of offsets used to expand the monoisotopic mass list 
   std::vector<double> ext_offsets {{0, -IM, IM}};
   double extend_min_mass = 5000;

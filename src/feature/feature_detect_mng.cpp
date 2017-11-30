@@ -26,7 +26,7 @@ FeatureDetectMng::FeatureDetectMng() {
       = std::make_shared<PeakTolerance>(ppo, use_min_tolerance, min_tolerance);
 
   // extend sp parameter 
-  double IM = MassConstant::getIsotopeMass();
+  double IM = mass_constant::getIsotopeMass();
   // the set of offsets used to expand the monoisotopic mass list 
   std::vector<double> offsets {{0, -IM, IM, -2 * IM, 2 * IM}};
   ext_offsets_ = offsets;

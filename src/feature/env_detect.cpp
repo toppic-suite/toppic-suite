@@ -41,7 +41,7 @@ MatchEnvPtr EnvDetect::detectEnv(PeakPtrVec &peak_list, int base_peak,
                                  int charge, double max_mass, FeatureMngPtr mng_ptr) {
   double base_mz = peak_list[base_peak]->getPosition();
   // check if the mass is greater than the precursor mass
-  double base_mass = base_mz * charge - charge * MassConstant::getProtonMass();
+  double base_mass = base_mz * charge - charge * mass_constant::getProtonMass();
   // LOG_DEBUG("peak idx " << base_peak << " base mz " << base_mz << " base mass " << base_mass << " max mass " << max_mass);
   if (base_mass >= max_mass || base_mass < mng_ptr->min_mass_) {
     return nullptr;
@@ -99,7 +99,7 @@ MatchEnvPtr EnvDetect::detectEnv(PeakPtrVec &peak_list, double mono_mass,
 
   // convert the reference distribution to a theoretical distribution
   // based on the mono mz and charge state
-  double mono_mz = mono_mass /charge + MassConstant::getProtonMass();
+  double mono_mz = mono_mass /charge + mass_constant::getProtonMass();
   EnvelopePtr theo_env = ref_env->distrToTheoMono(mono_mz, charge);
   // LOG_DEBUG("get theo env");
   // scale theoretical distribution

@@ -44,7 +44,7 @@ std::vector<int> getChargeList(const MatchEnvPtrVec &envs) {
 std::vector<double> getChargeOneMassList(const MatchEnvPtrVec &envs) {
   std::vector<double> masses(envs.size());
   for (size_t i = 0; i < envs.size(); i++) {
-    masses[i] = envs[i]->getRealEnvPtr()->getMonoMass() + MassConstant::getProtonMass();
+    masses[i] = envs[i]->getRealEnvPtr()->getMonoMass() + mass_constant::getProtonMass();
   }
   return masses;
 }

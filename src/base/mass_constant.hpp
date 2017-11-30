@@ -17,7 +17,7 @@
 #define PROT_MASS_CONSTANT_HPP_
 
 namespace prot {
-namespace MassConstant {
+namespace mass_constant {
 /**
  * Returns the mass of an ammonia (NH3).
  */
@@ -48,6 +48,8 @@ inline double getWaterMass() {return 18.010565; }
  * and its corresponding suffix residue mass. 
  */
 inline double getYIonShift() {return 18.010565; }
-}  // namespace MassConstant
+}  // namespace mass_constant
+
 }  // namespace prot
+
 #endif

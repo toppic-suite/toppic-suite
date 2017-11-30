@@ -47,7 +47,7 @@ void addSuffixTwoMasses(PrmPeakPtrVec &list, int spec_id, DeconvPeakPtr deconv_p
                         double prec_mono_mass, ActivationPtr active_type_ptr,
                         PeakTolerancePtr tole_ptr) {
   double ori_mass = deconv_peak_ptr->getMonoMass();
-  double c_res_mass = ori_mass - active_type_ptr->getCShift() - MassConstant::getWaterMass();
+  double c_res_mass = ori_mass - active_type_ptr->getCShift() - mass_constant::getWaterMass();
   PrmPeakPtr new_peak_ptr
       = std::make_shared<PrmPeak>(spec_id, deconv_peak_ptr, BasePeakType::ORIGINAL, c_res_mass, 1);
   new_peak_ptr->setStrictTolerance(tole_ptr->compStrictErrorTole(ori_mass));
@@ -55,7 +55,7 @@ void addSuffixTwoMasses(PrmPeakPtrVec &list, int spec_id, DeconvPeakPtr deconv_p
   new_peak_ptr->setNRelaxCStrictTolerance(tole_ptr->compStrictErrorTole(ori_mass));
   list.push_back(new_peak_ptr);
   double reverse_mass = prec_mono_mass - (deconv_peak_ptr->getMonoMass()-active_type_ptr->getNShift())
-      - MassConstant::getWaterMass();
+      - mass_constant::getWaterMass();
   PrmPeakPtr reverse_peak_ptr
       = std::make_shared<PrmPeak>(spec_id, deconv_peak_ptr,
                                   BasePeakType::REVERSED, reverse_mass, 1);

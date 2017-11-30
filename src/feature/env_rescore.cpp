@@ -32,9 +32,9 @@ std::vector<double> diff(MatchEnvPtr env, MatchEnvPtr2D &match_envs) {
         sum.push_back(match_envs[i][j]->getRealEnvPtr()->compIntensitySum()); 
         temp = std::abs(env->getRealEnvPtr()->getMonoMass()
                         - match_envs[i][j]->getRealEnvPtr()->getMonoMass());
-        if (std::abs(temp - MassConstant::getWaterMass()) < 0.01) {
+        if (std::abs(temp - mass_constant::getWaterMass()) < 0.01) {
           res++;
-        } else if (std::abs(temp - MassConstant::getAmmoniaMass()) < 0.01) {
+        } else if (std::abs(temp - mass_constant::getAmmoniaMass()) < 0.01) {
           res++;
         }
         if (std::abs(env->getRealEnvPtr()->getMonoMass()

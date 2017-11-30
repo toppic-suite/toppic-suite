@@ -106,10 +106,10 @@ EnvelopePtr Envelope::addZero(int num) {
     new_intes[i + num] = intensities_[i];
   }
   for (int i = num - 1; i >= 0; i--) {
-    new_mzs[i] = new_mzs[i+1] - MassConstant::getIsotopeMass() / charge_;
+    new_mzs[i] = new_mzs[i+1] - mass_constant::getIsotopeMass() / charge_;
   }
   for (int i = n_peak + num; i < n_peak + num * 2; i++) {
-    new_mzs[i] = new_mzs[i - 1] + MassConstant::getIsotopeMass() / charge_;
+    new_mzs[i] = new_mzs[i - 1] + mass_constant::getIsotopeMass() / charge_;
   }
   int new_refer_idx = refer_idx_ + num;
   EnvelopePtr env_ptr = std::make_shared<Envelope>(new_refer_idx, charge_, mono_mz_,
@@ -185,7 +185,7 @@ std::vector<int> Envelope::calcBound(double percent_bound, double absolute_min_i
 
 void Envelope::shift(int shift) {
   refer_idx_ += shift;
-  mono_mz_ += shift * MassConstant::getIsotopeMass() / charge_;
+  mono_mz_ += shift * mass_constant::getIsotopeMass() / charge_;
 }
 
 double Envelope::compIntensitySum() {
@@ -203,7 +203,7 @@ double Envelope::getAvgMz() {
 }
 
 double Envelope::getAvgMass() {
-  return getAvgMz() * charge_ - charge_ * MassConstant::getProtonMass();
+  return getAvgMz() * charge_ - charge_ * mass_constant::getProtonMass();
 }
 
 }  // namespace prot

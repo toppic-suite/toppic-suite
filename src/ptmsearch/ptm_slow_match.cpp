@@ -92,7 +92,7 @@ void PtmSlowMatch::addPrefixDiagonals(DiagonalHeaderPtrVec &common_header_ptrs,
 
 void PtmSlowMatch::addSuffixDiagonals(DiagonalHeaderPtrVec &common_header_ptrs,
                                       DiagonalHeaderPtrVec &c_extend_header_ptrs) {
-  double prec_mass_minus_water = prec_mono_mass_ - MassConstant::getWaterMass();
+  double prec_mass_minus_water = prec_mono_mass_ - mass_constant::getWaterMass();
   std::vector<double> prm_masses = proteo_ptr_->getBpSpecPtr()->getPrmMasses();
   // shifts for c_term matches
   std::vector<double> c_term_match_shifts;
