@@ -87,7 +87,7 @@ void ZeroPtmSlowMatch::compScore (const ExtendMsPtrVec &refine_ms_ptr_vec) {
     TheoPeakPtrVec theo_peak_ptrs = TheoPeakFactory::geneProteoformTheoPeak(proteoform_ptr_, 
                                                                             activation_ptr, min_mass);
 
-    std::vector<double> theo_masses = Theopeak_util::getTheoMassVec(theo_peak_ptrs);
+    std::vector<double> theo_masses = theo_peak_util::getTheoMassVec(theo_peak_ptrs);
     std::vector<double> ms_masses = ExtendMs::getExtendMassVec(refine_ms_ptr_vec[i]);
     score_ += base_algo::compNumMatchedTheoMasses(ms_masses, theo_masses, ppo);
   }

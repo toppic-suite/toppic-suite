@@ -32,7 +32,7 @@ PeakIonPairPtrVec PeakIonPairFactory::findPairs(ExtendMsPtr ms_three_ptr,
                                                 int bgn, int end, double add_tolerance) {
   std::sort(theo_peak_ptrs.begin(), theo_peak_ptrs.end(), TheoPeak::cmpPosInc);
   std::vector<double> ms_masses = ExtendMs::getExtendMassVec(ms_three_ptr);
-  std::vector<double> theo_masses = Theopeak_util::getTheoMassVec(theo_peak_ptrs);
+  std::vector<double> theo_masses = theo_peak_util::getTheoMassVec(theo_peak_ptrs);
 
   PeakIonPairPtrVec pair_ptrs;
   size_t i = 0;

@@ -21,11 +21,13 @@
 #include "spec/theo_peak.hpp"
 
 namespace prot {
-namespace TheoPeakUtil {
+
+namespace theo_peak_util {
 
 std::vector<double> getTheoMassVec(const TheoPeakPtrVec &theo_peak_list);
 
 }  // namespace TheoPeakUtil
+
 }  // namespace prot
 
 #endif
