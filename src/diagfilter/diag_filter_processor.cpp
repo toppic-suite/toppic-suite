@@ -97,7 +97,7 @@ void DiagFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num
       = std::make_shared<ThreadPool<SimplePrsmXmlWriter>>(mng_ptr_->thread_num_, output_file_name);
 
   SpectrumSetPtr spec_set_ptr = reader.getNextSpectrumSet(sp_para_ptr)[0];
-  int spectrum_num = MsAlignUtil::getSpNum(prsm_para_ptr->getSpectrumFileName());
+  int spectrum_num = msalign_util::getSpNum(prsm_para_ptr->getSpectrumFileName());
   int cnt = 0;
   while (spec_set_ptr != nullptr) {
     cnt += group_spec_num;

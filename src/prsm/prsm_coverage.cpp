@@ -42,7 +42,7 @@ void PrsmCoverage::processSingleCoverage(){
   PrsmPtr prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
 
   // init variables
-  int spectrum_num = MsAlignUtil::getSpNum (sp_file_name);
+  int spectrum_num = msalign_util::getSpNum (sp_file_name);
   int group_spec_num = prsm_para_ptr_->getGroupSpecNum();
   MsAlignReader sp_reader(sp_file_name, group_spec_num,
                           prsm_para_ptr_->getSpParaPtr()->getActivationPtr(),

@@ -97,7 +97,7 @@ void EValueProcessor::process(bool is_separate) {
   PrsmPtr prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
 
   // init variables
-  int spectrum_num = MsAlignUtil::getSpNum(spectrum_file_name);
+  int spectrum_num = msalign_util::getSpNum(spectrum_file_name);
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
   double ppo = sp_para_ptr->getPeakTolerancePtr()->getPpo();
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();

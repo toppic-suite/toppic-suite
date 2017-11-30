@@ -106,7 +106,7 @@ void ZeroPtmSearchProcessor::process() {
   // init variables
   std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
   FastaIndexReaderPtr reader_ptr = std::make_shared<FastaIndexReader>(db_file_name);
-  int spectrum_num = MsAlignUtil::getSpNum(sp_file_name);
+  int spectrum_num = msalign_util::getSpNum(sp_file_name);
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
   ModPtrVec fix_mod_ptr_vec = prsm_para_ptr->getFixModPtrVec();
 
