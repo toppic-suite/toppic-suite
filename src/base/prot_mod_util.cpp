@@ -43,7 +43,7 @@ bool allowMod(ProtModPtr prot_mod_ptr, const ResiduePtrVec &residues) {
     return true;
   } else {
     // check trunc
-    if (!TruncUtil::isValidTrunc(prot_mod_ptr->getTruncPtr(), residues)) {
+    if (!trunc_util::isValidTrunc(prot_mod_ptr->getTruncPtr(), residues)) {
       return false;
     }
     ModPtr mod_ptr = prot_mod_ptr->getModPtr();

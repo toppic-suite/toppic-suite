@@ -18,7 +18,9 @@
 
 namespace prot {
 
-bool TruncUtil::isValidTrunc(TruncPtr trunc_ptr, const ResiduePtrVec & res_ptr_vec) {
+namespace trunc_util {
+
+bool isValidTrunc(TruncPtr trunc_ptr, const ResiduePtrVec & res_ptr_vec) {
   //check if trunc acids match N-terminal acids of the protein 
   int trunc_len = trunc_ptr->getTruncLen();
   if (trunc_len >= (int)res_ptr_vec.size()) {
@@ -40,5 +42,7 @@ bool TruncUtil::isValidTrunc(TruncPtr trunc_ptr, const ResiduePtrVec & res_ptr_v
   }
   return false;
 }
+
+} // namespace trunc_util
 
 }  // namespace prot
