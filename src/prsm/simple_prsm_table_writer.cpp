@@ -31,7 +31,7 @@ SimplePrsmTableWriter::SimplePrsmTableWriter(PrsmParaPtr prsm_para_ptr,
 
 void SimplePrsmTableWriter::write() {
   std::string spectrum_file_name  = prsm_para_ptr_->getSpectrumFileName(); 
-  std::string base_name = FileUtil::basename(spectrum_file_name);
+  std::string base_name = file_util::basename(spectrum_file_name);
   std::string output_file_name = base_name + "." + output_file_ext_;
   std::ofstream file_; 
   file_.open(output_file_name.c_str());

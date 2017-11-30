@@ -317,7 +317,7 @@ void writeMSFT(const std::string & input_file_name,
 void FeatureDetect::process(DeconvParaPtr para_ptr) {
   FeatureDetectMngPtr mng_ptr = std::make_shared<FeatureDetectMng>();
   std::string sp_file_name = para_ptr->getDataFileName();
-  std::string base_name = FileUtil::basename(sp_file_name);
+  std::string base_name = file_util::basename(sp_file_name);
   // read ms1 deconvoluted spectra
   std::string ms1_file_name = base_name + "_ms1.msalign";
   DeconvMsPtrVec ms1_ptr_vec;
@@ -344,5 +344,5 @@ void FeatureDetect::process(DeconvParaPtr para_ptr) {
   // outputHeaders(header_ptr_vec);
 }
 
-// std::string output_file_name = FileUtil::basename(sp_file_name)+".feature";
+// std::string output_file_name = file_util::basename(sp_file_name)+".feature";
 }  // namespace prot

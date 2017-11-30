@@ -30,8 +30,8 @@ class PrsmViewMng {
               const std::string & fname_suffix):
       prsm_para_ptr_(prsm_para_ptr) {
         std::string spectrum_file_name = prsm_para_ptr_->getSpectrumFileName();
-        xml_path_ = FileUtil::basename(spectrum_file_name) + "_" + fname_suffix + "_xml";
-        html_path_ = FileUtil::basename(spectrum_file_name) + "_" + fname_suffix + "_html";
+        xml_path_ = file_util::basename(spectrum_file_name) + "_" + fname_suffix + "_xml";
+        html_path_ = file_util::basename(spectrum_file_name) + "_" + fname_suffix + "_html";
         executive_dir_ = exec_dir;
         min_mass_ = prsm_para_ptr_->getSpParaPtr()->getMinMass();
       }

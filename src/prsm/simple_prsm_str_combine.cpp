@@ -25,7 +25,7 @@ namespace prot {
 
 void SimplePrsmStrCombine::process() {
   size_t input_num = input_file_exts_.size();
-  std::string base_name = FileUtil::basename(spec_file_name_);
+  std::string base_name = file_util::basename(spec_file_name_);
   // open files
   SimplePrsmReaderPtrVec reader_ptrs;
   SimplePrsmStrPtrVec prsm_str_ptrs;

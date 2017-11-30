@@ -85,13 +85,13 @@ std::function<void()> geneTask(SpectrumSetPtr spec_set_ptr, const PrsmPtrVec & s
 void EValueProcessor::process(bool is_separate) {
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   std::string spectrum_file_name = prsm_para_ptr->getSpectrumFileName();
-  std::string output_file_name = FileUtil::basename(spectrum_file_name) + "." + mng_ptr_->output_file_ext_;
+  std::string output_file_name = file_util::basename(spectrum_file_name) + "." + mng_ptr_->output_file_ext_;
   PrsmXmlWriter writer(output_file_name);
 
   std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
   FastaIndexReaderPtr seq_reader = std::make_shared<FastaIndexReader>(db_file_name);
   ModPtrVec fix_mod_ptr_vec = prsm_para_ptr->getFixModPtrVec();
-  std::string input_file_name = FileUtil::basename(spectrum_file_name) + "." + mng_ptr_->input_file_ext_;
+  std::string input_file_name = file_util::basename(spectrum_file_name) + "." + mng_ptr_->input_file_ext_;
   PrsmReader prsm_reader(input_file_name);
   LOG_DEBUG("start read prsm");
   PrsmPtr prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);

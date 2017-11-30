@@ -34,7 +34,7 @@ namespace prot {
 
 void PrsmCoverage::processSingleCoverage(){
   std::string sp_file_name = prsm_para_ptr_->getSpectrumFileName();
-  std::string input_file_name = FileUtil::basename(sp_file_name)+"." + input_file_ext_;
+  std::string input_file_name = file_util::basename(sp_file_name)+"." + input_file_ext_;
   std::string db_file_name = prsm_para_ptr_->getSearchDbFileName();
   FastaIndexReaderPtr seq_reader = std::make_shared<FastaIndexReader>(db_file_name);
   ModPtrVec fix_mod_ptr_vec = prsm_para_ptr_->getFixModPtrVec();
@@ -50,7 +50,7 @@ void PrsmCoverage::processSingleCoverage(){
   int cnt = 0;
   SpectrumSetPtr spec_set_ptr;
 
-  std::string output_file_name = FileUtil::basename(sp_file_name)+"."+output_file_ext_;
+  std::string output_file_name = file_util::basename(sp_file_name)+"."+output_file_ext_;
   std::ofstream out_stream; 
   out_stream.open(output_file_name.c_str());
   //write title

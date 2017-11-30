@@ -340,9 +340,9 @@ int TopPICProgress(std::map<std::string, std::string> arguments) {
 
     if (arguments["keepTempFiles"] != "true") {
       std::cout << "Deleting temporary files - started." << std::endl;
-      FileUtil::delDir(FileUtil::basename(sp_file_name) + "_proteoform_cutoff_xml");
-      FileUtil::delDir(FileUtil::basename(sp_file_name) + "_prsm_cutoff_xml");
-      FileUtil::cleanDir(ori_db_file_name, sp_file_name);
+      file_util::delDir(file_util::basename(sp_file_name) + "_proteoform_cutoff_xml");
+      file_util::delDir(file_util::basename(sp_file_name) + "_prsm_cutoff_xml");
+      file_util::cleanDir(ori_db_file_name, sp_file_name);
       std::cout << "Deleting temporary files - finished." << std::endl;
     }
   } catch (const char* e) {

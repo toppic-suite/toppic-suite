@@ -50,7 +50,7 @@ std::function<void()> geneTask(FastaIndexReaderPtr reader_ptr,
     std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
 
     std::string input_file_name
-        = FileUtil::basename(sp_file_name) + "." + mng_ptr->input_file_ext_ + "_" + std::to_string(idx);
+        = file_util::basename(sp_file_name) + "." + mng_ptr->input_file_ext_ + "_" + std::to_string(idx);
     SimplePrsmReader simple_prsm_reader(input_file_name);
     SimplePrsmStrPtr prsm_ptr = simple_prsm_reader.readOnePrsmStr();
     int group_spec_num = prsm_para_ptr->getGroupSpecNum();
@@ -64,7 +64,7 @@ std::function<void()> geneTask(FastaIndexReaderPtr reader_ptr,
                                 sp_para_ptr);
 
     PrsmXmlWriterPtr writer_ptr
-        = std::make_shared<PrsmXmlWriter>(FileUtil::basename(sp_file_name) + "." + mng_ptr->output_file_ext_ + "_" + std::to_string(idx));
+        = std::make_shared<PrsmXmlWriter>(file_util::basename(sp_file_name) + "." + mng_ptr->output_file_ext_ + "_" + std::to_string(idx));
     SpectrumSetPtr spec_set_ptr = sp_reader.getNextSpectrumSet(sp_para_ptr)[0];
     ProteoAnnoPtr proteo_anno_ptr
         = std::make_shared<ProteoAnno>(prsm_para_ptr->getFixModPtrVec(),
@@ -159,11 +159,11 @@ void GraphAlignProcessor::process() {
 
   int spectrum_num = MsAlignUtil::getSpNum(prsm_para_ptr->getSpectrumFileName());
   std::string input_file_name
-      = FileUtil::basename(sp_file_name) + "." + mng_ptr_->input_file_ext_;
+      = file_util::basename(sp_file_name) + "." + mng_ptr_->input_file_ext_;
 
   SimplePrsmReaderPtr simple_prsm_reader = std::make_shared<prot::SimplePrsmReader>(input_file_name);
   std::shared_ptr<SimplePrsmXmlWriter> graph_filter_writer
-      = std::make_shared<SimplePrsmXmlWriter>(FileUtil::basename(sp_file_name) + ".GRAPH");
+      = std::make_shared<SimplePrsmXmlWriter>(file_util::basename(sp_file_name) + ".GRAPH");
   SimplePrsmPtr prsm_ptr = simple_prsm_reader->readOnePrsm();
   int spec_id = -1;
   SimplePrsmPtrVec selected_prsm_ptrs;
@@ -191,7 +191,7 @@ void GraphAlignProcessor::process() {
 
   int cnt = 0;
   simple_prsm_reader
-      = std::make_shared<prot::SimplePrsmReader>(FileUtil::basename(sp_file_name) + ".GRAPH");
+      = std::make_shared<prot::SimplePrsmReader>(file_util::basename(sp_file_name) + ".GRAPH");
   prsm_ptr = simple_prsm_reader->readOnePrsm();
   while (prsm_ptr != nullptr) {
     cnt = cnt % mng_ptr_->thread_num_;

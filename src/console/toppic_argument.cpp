@@ -227,7 +227,7 @@ bool Argument::parse(int argc, char* argv[]) {
     if (vm.count("full-binary-path")) {
       arguments_["executiveDir"] = argv[0];
     } else {
-      arguments_["executiveDir"] = FileUtil::getExecutiveDir(argv_0);
+      arguments_["executiveDir"] = file_util::getExecutiveDir(argv_0);
     }
     LOG_DEBUG("Executive Dir " << arguments_["executiveDir"]);
     arguments_["oriDatabaseFileName"] = database_file_name;

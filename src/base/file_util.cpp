@@ -31,7 +31,9 @@ namespace fs = boost::filesystem;
 
 namespace prot {
 
-std::string FileUtil::getFileSeparator() {
+namespace file_util {
+
+std::string getFileSeparator() {
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
   return "\\";
 #else
@@ -39,7 +41,7 @@ std::string FileUtil::getFileSeparator() {
 #endif
 }
 
-std::string FileUtil::getExecutiveDir(const std::string &argv_0) {
+std::string getExecutiveDir(const std::string &argv_0) {
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
   LPSTR lpFilePart;
   char file_name[MAX_PATH];
@@ -58,7 +60,7 @@ std::string FileUtil::getExecutiveDir(const std::string &argv_0) {
   return exe_dir;
 }
 
-std::string FileUtil::basename(const std::string &s) {
+std::string basename(const std::string &s) {
   size_t dot_pos = s.find_last_of(".");
   if (dot_pos < s.length()) {
     return s.substr(0, dot_pos);
@@ -66,18 +68,18 @@ std::string FileUtil::basename(const std::string &s) {
   return s;
 }
 
-std::string FileUtil::directory(const std::string &s) {
+std::string directory(const std::string &s) {
   fs::path path(s);
   std::string parent_dir = path.parent_path().string();
   return parent_dir;
 }
 
-void FileUtil::createFolder(const std::string &folder_name) {
+void createFolder(const std::string &folder_name) {
   boost::filesystem::path path(folder_name);
   boost::filesystem::create_directories(path);
 }
 
-void FileUtil::copyFile(const std::string &file_name,
+void copyFile(const std::string &file_name,
                         const std::string &to_file, bool over_write) {
   boost::filesystem::path from_path(file_name);
   boost::filesystem::path to_path(to_file);
@@ -97,7 +99,7 @@ void FileUtil::copyFile(const std::string &file_name,
   boost::filesystem::copy(from_path, to_path);
 }
 
-bool FileUtil::copyDir(boost::filesystem::path const & source,
+bool copyDir(boost::filesystem::path const & source,
                        boost::filesystem::path const & destination) {
   try {
     if (!fs::exists(source) || !fs::is_directory(source)) {
@@ -136,14 +138,14 @@ bool FileUtil::copyDir(boost::filesystem::path const & source,
   return true;
 }
 
-void FileUtil::delDir(const std::string &path) {
+void delDir(const std::string &path) {
   fs::path dir(path);
 
   if (fs::exists(dir))
     fs::remove_all(dir);
 }
 
-void FileUtil::delFile(const std::string &path) {
+void delFile(const std::string &path) {
   fs::path dir(path);
 
   if (fs::exists(dir))
@@ -163,7 +165,7 @@ void clean_prefix(const fs::path & sp, const std::string & prefix) {
   }
 }
 
-void FileUtil::cleanDir(const std::string &fa_path, const std::string & sp_path) {
+void cleanDir(const std::string &fa_path, const std::string & sp_path) {
   fs::path fa(fa_path);
   fs::path sp(sp_path);
   std::string fa_base = absolute(fa).string();
@@ -204,4 +206,7 @@ void FileUtil::cleanDir(const std::string &fa_path, const std::string & sp_path)
   delFile(sp_base + ".FORM_RESULT");
   delFile(sp_base + ".FORM_FILTER_RESULT");
 }
+
+} // namespace file_util
+
 }  // namespace prot

@@ -22,12 +22,12 @@
 namespace prot {
 
 void PrsmProb::process() {
-  std::string input_file_name = FileUtil::basename(spec_file_name_)+ "." + input_file_ext_;
+  std::string input_file_name = file_util::basename(spec_file_name_)+ "." + input_file_ext_;
   FastaIndexReaderPtr seq_reader = std::make_shared<FastaIndexReader>(db_file_name_);
   PrsmReader prsm_reader(input_file_name);
   PrsmPtr prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec_);
 
-  PrsmXmlWriter all_writer(FileUtil::basename(spec_file_name_) + "." + output_file_ext_);
+  PrsmXmlWriter all_writer(file_util::basename(spec_file_name_) + "." + output_file_ext_);
 
   while (prsm_ptr != nullptr) {
     int shift_num = prsm_ptr->getProteoformPtr()->getChangeNum(ChangeType::UNEXPECTED);
