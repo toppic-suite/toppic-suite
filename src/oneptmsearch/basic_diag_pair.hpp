@@ -18,7 +18,6 @@
 
 #include <memory>
 #include <vector>
-#include "base/algorithm.hpp"
 #include "spec/prm_peak.hpp"
 #include "oneptmsearch/pair.hpp"
 #include "oneptmsearch/diagonal.hpp"

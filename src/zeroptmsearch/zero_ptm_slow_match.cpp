@@ -17,7 +17,7 @@
 #include "base/proteoform.hpp"
 #include "base/proteoform_factory.hpp"
 #include "base/activation.hpp"
-#include "base/algorithm.hpp"
+#include "base/base_algo.hpp"
 #include "spec/extend_ms_factory.hpp"
 #include "spec/theo_peak.hpp"
 #include "spec/theo_peak_factory.hpp"
@@ -89,7 +89,7 @@ void ZeroPtmSlowMatch::compScore (const ExtendMsPtrVec &refine_ms_ptr_vec) {
 
     std::vector<double> theo_masses = TheoPeakUtil::getTheoMassVec(theo_peak_ptrs);
     std::vector<double> ms_masses = ExtendMs::getExtendMassVec(refine_ms_ptr_vec[i]);
-    score_ += compNumMatchedTheoMasses(ms_masses, theo_masses, ppo);
+    score_ += base_algo::compNumMatchedTheoMasses(ms_masses, theo_masses, ppo);
   }
 }
 

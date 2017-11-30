@@ -16,14 +16,14 @@
 #include <algorithm>
 
 #include "base/logger.hpp"
-#include "base/algorithm.hpp"
 #include "spec/theo_peak.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
 
 namespace prot {
 
-PeakIonPairPtrVec PeakIonPairUtil::getMatchedPairs(const PeakIonPairPtrVec &pair_ptrs,
-                                                   int spec_id, int peak_id) {
+PeakIonPairPtrVec 
+    PeakIonPairUtil::getMatchedPairs(const PeakIonPairPtrVec &pair_ptrs,
+                                     int spec_id, int peak_id) {
   PeakIonPairPtrVec selected_pair_ptrs;
   for (size_t i = 0; i < pair_ptrs.size(); i++) {
     if (pair_ptrs[i]->getMsHeaderPtr()->getId() == spec_id &&

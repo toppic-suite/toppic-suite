@@ -18,7 +18,7 @@
 #include <vector>
 
 #include "base/logger.hpp"
-#include "base/algorithm.hpp"
+#include "base/base_algo.hpp"
 #include "spec/extend_ms.hpp"
 #include "spec/theo_peak.hpp"
 #include "spec/theo_peak_factory.hpp"
@@ -40,7 +40,8 @@ PeakIonPairPtrVec PeakIonPairFactory::findPairs(ExtendMsPtr ms_three_ptr,
   while (i < ms_masses.size() && j < theo_masses.size()) {
     double deviation = ms_masses[i] - theo_masses[j];
     IonPtr ion_ptr = theo_peak_ptrs[j]->getIonPtr();
-    double err = ms_three_ptr->getPeakPtr(i)->getOrigTolerance() + add_tolerance;
+    double err = ms_three_ptr->getPeakPtr(i)->getOrigTolerance() 
+        + add_tolerance;
     if (ion_ptr->getPos() >= bgn && ion_ptr->getPos() <= end) {
       if (std::abs(deviation) <= err) {
         PeakIonPairPtr pair_ptr
@@ -50,7 +51,7 @@ PeakIonPairPtrVec PeakIonPairFactory::findPairs(ExtendMsPtr ms_three_ptr,
         pair_ptrs.push_back(pair_ptr);
       }
     }
-    if (increaseIJ(i, j, deviation, err, ms_masses, theo_masses)) {
+    if (base_algo::increaseIJ(i, j, deviation, err, ms_masses, theo_masses)) {
       i++;
     } else {
       j++;

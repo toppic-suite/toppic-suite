@@ -17,7 +17,6 @@
 #define PROT_LOCAL_UTIL_HPP_
 
 #include "base/ptm.hpp"
-#include "base/algorithm.hpp"
 #include "base/acid_base.hpp"
 #include "base/change.hpp"
 #include "prsm/prsm.hpp"
