@@ -18,6 +18,8 @@
 
 #include <iostream>
 #include <fstream>
+#include <string>
+#include <vector>
 
 #include "base/xml_dom_document.hpp"
 #include "prsm/prsm.hpp"
@@ -27,20 +29,23 @@ namespace prot {
 
 class PrsmReader {
  public:
-  PrsmReader(const std::string &file_name);
+  explicit PrsmReader(const std::string &file_name);
 
   std::vector<std::string> readOnePrsmLines();
 
   PrsmStrPtr readOnePrsmStr();
-  
-  PrsmPtr readOnePrsm(FastaIndexReaderPtr reader_ptr, 
-                      const ModPtrVec fix_mod_list);
+
+  PrsmPtr readOnePrsm(FastaIndexReaderPtr reader_ptr, const ModPtrVec fix_mod_list);
 
   void close();
 
   static PrsmStrPtrVec readAllPrsmStrs(const std::string &input_file_name);
 
-  static PrsmPtrVec readAllPrsms(const std::string &prsm_file_name, 
+  static PrsmStrPtrVec readAllPrsmStrsMatchSeq(const std::string &input_file_name,
+                                               FastaIndexReaderPtr fasta_reader_ptr,
+                                               const ModPtrVec fix_mod_list);
+
+  static PrsmPtrVec readAllPrsms(const std::string &prsm_file_name,
                                  const std::string &db_file_name,
                                  const ModPtrVec  &fix_mod_list);
 

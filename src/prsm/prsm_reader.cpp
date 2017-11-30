@@ -102,6 +102,25 @@ PrsmStrPtrVec PrsmReader::readAllPrsmStrs(const std::string &input_file_name) {
   return prsm_str_ptrs;
 }
 
+PrsmStrPtrVec PrsmReader::readAllPrsmStrsMatchSeq(const std::string &input_file_name,
+                                                  FastaIndexReaderPtr fasta_reader_ptr,
+                                                  const ModPtrVec fix_mod_list) {
+  PrsmReaderPtr str_reader = std::make_shared<PrsmReader>(input_file_name);
+  PrsmReaderPtr prsm_reader = std::make_shared<PrsmReader>(input_file_name);
+  PrsmStrPtrVec prsm_str_ptrs;
+  PrsmStrPtr prsm_str_ptr = str_reader->readOnePrsmStr();
+  PrsmPtr prsm_ptr = prsm_reader->readOnePrsm(fasta_reader_ptr, fix_mod_list);
+  while (prsm_str_ptr != nullptr) {
+    prsm_str_ptr->setProteinMatchSeq(prsm_ptr->getProteoformPtr()->getProteinMatchSeq());
+    prsm_str_ptrs.push_back(prsm_str_ptr);
+    prsm_str_ptr = str_reader->readOnePrsmStr();
+    prsm_ptr = prsm_reader->readOnePrsm(fasta_reader_ptr, fix_mod_list);
+  }
+  str_reader->close();
+  prsm_reader->close();
+  return prsm_str_ptrs;
+}
+
 PrsmPtrVec PrsmReader::readAllPrsms(const std::string &prsm_file_name,
                                     const std::string &db_file_name,
                                     const ModPtrVec  &fix_mod_list) {
