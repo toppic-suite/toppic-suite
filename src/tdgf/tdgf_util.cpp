@@ -21,9 +21,11 @@
 
 namespace prot {
 
-void TdgfUtil::updateResidueCounts(const ResiduePtrVec &residue_list,
-                                   std::vector<double> &counts,
-                                   ProteoformPtr prot_ptr) {
+namespace tdgf_util {
+
+void updateResidueCounts(const ResiduePtrVec &residue_list,
+                         std::vector<double> &counts,
+                         ProteoformPtr prot_ptr) {
   ResSeqPtr seq_ptr = prot_ptr->getResSeqPtr();
   for (int i = 0; i < seq_ptr->getLen(); i++) {
     ResiduePtr res_ptr = seq_ptr->getResiduePtr(i);
@@ -35,8 +37,8 @@ void TdgfUtil::updateResidueCounts(const ResiduePtrVec &residue_list,
   }
 }
 
-ResFreqPtrVec TdgfUtil::compResidueFreq(const ResiduePtrVec &residue_list,
-                                        const std::vector<double> &counts) {
+ResFreqPtrVec compResidueFreq(const ResiduePtrVec &residue_list,
+                              const std::vector<double> &counts) {
   double sum = 0;
   for (size_t i = 0; i < counts.size(); i++) {
     sum = sum + counts[i];
@@ -51,8 +53,8 @@ ResFreqPtrVec TdgfUtil::compResidueFreq(const ResiduePtrVec &residue_list,
   return res_freq_list;
 }
 
-void TdgfUtil::updateNTermResidueCounts(ResiduePtrVec &residue_list, std::vector<double> &counts,
-                                        const ProteoformPtrVec &mod_proteo_ptrs) {
+void updateNTermResidueCounts(ResiduePtrVec &residue_list, std::vector<double> &counts,
+                              const ProteoformPtrVec &mod_proteo_ptrs) {
   for (size_t i = 0; i < mod_proteo_ptrs.size(); i++) {
     ResSeqPtr seq_ptr = mod_proteo_ptrs[i]->getResSeqPtr();
     if (seq_ptr->getLen() >= 1) {
@@ -69,7 +71,7 @@ void TdgfUtil::updateNTermResidueCounts(ResiduePtrVec &residue_list, std::vector
   }
 }
 
-int TdgfUtil::computeAvgLength(const ResFreqPtrVec &residue_ptrs, double convert_ratio) {
+int computeAvgLength(const ResFreqPtrVec &residue_ptrs, double convert_ratio) {
   double mass_sum = 0;
   double freq_sum = 0;
   for (size_t i = 0; i < residue_ptrs.size(); i++) {
@@ -78,5 +80,7 @@ int TdgfUtil::computeAvgLength(const ResFreqPtrVec &residue_ptrs, double convert
   }
   return static_cast<int>(std::round(mass_sum / freq_sum * convert_ratio));
 }
+
+} // namespace tdgf_util
 
 }  // namespace prot

@@ -24,7 +24,9 @@
 #include "tdgf/tdgf_mng.hpp"
 
 namespace prot {
-namespace TdgfUtil {
+
+namespace tdgf_util {
+
 void updateNTermResidueCounts(ResiduePtrVec &residue_list, std::vector<double> &counts,
                               const ProteoformPtrVec &mod_proteo_ptrs);
 
@@ -36,7 +38,9 @@ ResFreqPtrVec compResidueFreq(const ResiduePtrVec &residue_list,
                               const std::vector<double> &counts);
 
 int computeAvgLength(const ResFreqPtrVec &residue_ptrs, double convert_ratio);
-}  // namespace TdgfUtil
+
+}  // namespace tdgf_util
+
 }  // namespace prot
 
 #endif
