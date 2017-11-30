@@ -90,8 +90,9 @@ void CoTable::compTableEntry(MatchEnvPtrVec &env_list, MatchEnvPtr2D &win_envs,
 }
 
 // initialize coexist table 
-std::vector<std::vector<bool>> CoTable::initCoexistTable(MatchEnvPtr2D &win_envs, 
-                                                         double tolerance) {
+std::vector<std::vector<bool>> 
+CoTable::initCoexistTable(MatchEnvPtr2D &win_envs, double tolerance) {
+
   MatchEnvPtrVec env_list;
   for (size_t i = 0; i < win_envs.size(); i++) {
     for (size_t j = 0; j < win_envs[i].size(); j++) {
