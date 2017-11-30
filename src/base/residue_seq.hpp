@@ -49,7 +49,7 @@ class ResidueSeq {
 
   /** Gets sequence molecular mass */
   double getSeqMass() {
-    return residue_mass_sum_ + MassConstant::getWaterMass();
+    return residue_mass_sum_ + mass_constant::getWaterMass();
   }
 
   /** Gets the sum of residue masses */

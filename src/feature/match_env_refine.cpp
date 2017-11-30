@@ -38,7 +38,7 @@ void MatchEnvRefine::mzRefine(FeatureMngPtr mng_ptr, MatchEnvPtr env) {
   double prev_mz = cur_mz - 1.0 / charge;
   double next_mz = cur_mz + 1.0 / charge;
   // check if the mass is greater than the precursor mass
-  double bass_mass = cur_mz * charge - charge * MassConstant::getProtonMass();
+  double bass_mass = cur_mz * charge - charge * mass_constant::getProtonMass();
   // get a reference distribution based on the base mass
   EnvelopePtr refer_env = mng_ptr->env_base_ptr_->getEnvByBaseMass(bass_mass);
   /* add one zeros at both sides of the envelope */

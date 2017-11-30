@@ -75,7 +75,7 @@ double MsHeader::getPrecMonoMassMinusWater() {
     return 0.0;
   } else {
     return PeakUtil::compPeakMass(prec_mono_mz_, prec_charge_)
-        - MassConstant::getWaterMass();
+        - mass_constant::getWaterMass();
   }
 }
 

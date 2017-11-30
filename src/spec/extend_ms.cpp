@@ -46,7 +46,7 @@ std::vector<std::pair<int, int>> ExtendMs::getExtendIntMassErrorList(
     }
     else {
       shift = ext_ms_ptr->getMsHeaderPtr()->getActivationPtr()->getCShift() 
-          + MassConstant::getWaterMass();
+          + mass_constant::getWaterMass();
     }
     std::pair<int,int> last_mass_error(-1, 0);
     for(size_t j=0; j<ext_ms_ptr->size(); j++){

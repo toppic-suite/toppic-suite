@@ -331,7 +331,7 @@ void CompShift::compRevScores(const std::vector<std::pair<int, int>> &suff_mass_
    int end_index;
    int m;
    for(size_t i = 0; i < mass_errors.size(); i++){
-   m = mass_errors[i].first - MassConstant::getWaterMass() * scale_;
+   m = mass_errors[i].first - mass_constant::getWaterMass() * scale_;
 //LOG_DEBUG("REV_SP MASS " << m);
 int left = m-mass_errors[i].second;
 //LOG_DEBUG("LEFT " << left);

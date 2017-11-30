@@ -144,7 +144,7 @@ PtmPairVec LocalUtil::getPtmPairVecByMass(double mass1, double mass2, double err
         + ptm_pair_vec_[i].second->getMonoMass();
 
     if (std::abs(pair_mass - mass) < err
-        || std::abs(std::abs(pair_mass - mass) - MassConstant::getIsotopeMass() ) < err)
+        || std::abs(std::abs(pair_mass - mass) - mass_constant::getIsotopeMass() ) < err)
       res.push_back(ptm_pair_vec_[i]);
   }
 
@@ -335,7 +335,7 @@ void LocalUtil::onePtmTermAdjust(ProteoformPtr & proteoform, const ExtendMsPtrVe
       if (std::abs(mass) > mng_ptr_->max_ptm_mass_ && (i != 0 || j != 0))
         continue;
 
-      if (std::abs(mass) < MassConstant::getIsotopeMass() + err) {
+      if (std::abs(mass) < mass_constant::getIsotopeMass() + err) {
         change_ptr->setMassShift(mass);
         fix_change_vec.push_back(change_ptr);
         proteoform = geneProteoform(proteoform, ori_start + i, ori_end + j, 
@@ -562,16 +562,16 @@ void LocalUtil::compOnePtmScr(ProteoformPtr proteoform, const ExtendMsPtrVec & e
 void two_ptm_mass_adjust(double & mass1, double & mass2, PtmPtr p1, PtmPtr p2) {
   if (p1 == nullptr || p2 == nullptr) return; 
   double err = mass1 + mass2 - p1->getMonoMass() - p2->getMonoMass();
-  if (std::abs(err) < MassConstant::getIsotopeMass()) {
+  if (std::abs(err) < mass_constant::getIsotopeMass()) {
     mass1 = p1->getMonoMass() + err / 2;
     mass2 = p2->getMonoMass() + err / 2;
-  } else if (err > MassConstant::getIsotopeMass()) {
-    err = err - MassConstant::getIsotopeMass();
-    mass1 = p1->getMonoMass() + MassConstant::getIsotopeMass() + err / 2;
+  } else if (err > mass_constant::getIsotopeMass()) {
+    err = err - mass_constant::getIsotopeMass();
+    mass1 = p1->getMonoMass() + mass_constant::getIsotopeMass() + err / 2;
     mass2 = p2->getMonoMass() + err / 2; 
   } else {
-    err = err + MassConstant::getIsotopeMass();
-    mass1 = p1->getMonoMass() - MassConstant::getIsotopeMass() + err / 2;
+    err = err + mass_constant::getIsotopeMass();
+    mass1 = p1->getMonoMass() - mass_constant::getIsotopeMass() + err / 2;
     mass2 = p2->getMonoMass() + err / 2;
   }
 }

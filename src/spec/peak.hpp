@@ -41,11 +41,11 @@ class Peak {
   static std::string getXmlElementName() {return "peak";}
 
   static double compPeakMass(double mono_mz, int charge) {
-    return mono_mz * charge - charge * MassConstant::getProtonMass();
+    return mono_mz * charge - charge * mass_constant::getProtonMass();
   }
 
   static double compMonoMz(double mono_mass, int charge) {
-    return mono_mass / charge + MassConstant::getProtonMass();
+    return mono_mass / charge + mass_constant::getProtonMass();
   }
 
  private:

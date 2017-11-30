@@ -69,8 +69,8 @@ SpecGraphPtrVec SpecGraphReader::getNextSpecGraphPtrVec(SpectrumSetPtr spec_set_
   std::vector<double> prec_errors;
   prec_errors.push_back(0);
   for (int i = 1; i <= error; i++) {
-    prec_errors.push_back(- i * MassConstant::getIsotopeMass());
-    prec_errors.push_back(i * MassConstant::getIsotopeMass());
+    prec_errors.push_back(- i * mass_constant::getIsotopeMass());
+    prec_errors.push_back(i * mass_constant::getIsotopeMass());
   }
 
   DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();

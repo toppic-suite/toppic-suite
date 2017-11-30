@@ -73,7 +73,7 @@ inline void OnePtmSlowMatch::addComplementDiagonals(DiagonalHeaderPtrVec &n_exte
     }
   }
 
-  double prec_mass_minus_water = prec_mono_mass_ - MassConstant::getWaterMass();
+  double prec_mass_minus_water = prec_mono_mass_ - mass_constant::getWaterMass();
   // shifts for c_term matches
   std::vector<double> c_term_match_shifts;
   for(size_t i=1;i< prm_masses.size();i++){
