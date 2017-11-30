@@ -107,7 +107,7 @@ int TopPICProgress(std::map<std::string, std::string> arguments) {
     LOG_DEBUG("block size " << arguments["databaseBlockSize"]);
     int db_block_size = std::stoi(arguments["databaseBlockSize"]);
 
-    FastaUtil::dbPreprocess(ori_db_file_name, db_file_name, decoy, db_block_size);
+    fasta_util::dbPreprocess(ori_db_file_name, db_file_name, decoy, db_block_size);
     MsAlignUtil::geneSpIndex(sp_file_name, prsm_para_ptr->getSpParaPtr());
 
     std::vector<std::string> input_exts;
