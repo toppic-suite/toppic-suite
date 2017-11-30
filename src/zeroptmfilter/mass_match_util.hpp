@@ -23,7 +23,9 @@
 #include "zeroptmfilter/mass_match.hpp"
 
 namespace prot {
-namespace MassMatchUtil {
+
+namespace mass_match_util {
+
 FilterProteinPtrVec findTopProteins(std::vector<short> &scores, 
                                     std::vector<int> &proteo_row_begins,
                                     std::vector<int> &proteo_row_ends,
@@ -35,7 +37,8 @@ FilterProteinPtrVec findTopProteins(std::vector<short> &scores,
                                     MassMatchPtr rev_index_ptr,
                                     double threshold, int num,
                                     bool add_shifts, int shift_num);
-}  // namespace MassMatchUtil
+}  // namespace mass_match_util
+
 }  // namespace prot
 
 #endif 

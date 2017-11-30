@@ -81,7 +81,7 @@ void MassOnePtmFilter::computeBestMatch(const PrmMsPtrVec &prm_ms_ptr_vec,
   int threshold = 4;
   bool add_shifts = true;
   FilterProteinPtrVec comp_prots
-      = MassMatchUtil::findTopProteins(term_scores, rev_term_scores, term_index_ptr_, rev_term_index_ptr_,
+      = mass_match_util::findTopProteins(term_scores, rev_term_scores, term_index_ptr_, rev_term_index_ptr_,
                                        threshold, mng_ptr_->comp_num_, add_shifts, mng_ptr_->shift_num_);
   comp_match_ptrs_.clear();
   int group_spec_num = prm_ms_ptr_vec.size();
@@ -94,7 +94,7 @@ void MassOnePtmFilter::computeBestMatch(const PrmMsPtrVec &prm_ms_ptr_vec,
   }
 
   FilterProteinPtrVec pref_prots
-      = MassMatchUtil::findTopProteins(term_scores, rev_diag_scores, term_index_ptr_, rev_diag_index_ptr_,
+      = mass_match_util::findTopProteins(term_scores, rev_diag_scores, term_index_ptr_, rev_diag_index_ptr_,
                                        threshold, mng_ptr_->pref_suff_num_, add_shifts, mng_ptr_->shift_num_);
   pref_match_ptrs_.clear();
   for (size_t i = 0; i < pref_prots.size(); i++) {
@@ -109,7 +109,7 @@ void MassOnePtmFilter::computeBestMatch(const PrmMsPtrVec &prm_ms_ptr_vec,
   }
 
   FilterProteinPtrVec suff_prots
-      = MassMatchUtil::findTopProteins(diag_scores, rev_term_scores, diag_index_ptr_, rev_term_index_ptr_,
+      = mass_match_util::findTopProteins(diag_scores, rev_term_scores, diag_index_ptr_, rev_term_index_ptr_,
                                        threshold, mng_ptr_->pref_suff_num_, add_shifts, mng_ptr_->shift_num_);
   suff_match_ptrs_.clear();
   for (size_t i = 0; i < suff_prots.size(); i++) {
@@ -123,7 +123,7 @@ void MassOnePtmFilter::computeBestMatch(const PrmMsPtrVec &prm_ms_ptr_vec,
   }
 
   FilterProteinPtrVec internal_prots
-      = MassMatchUtil::findTopProteins(diag_scores, rev_diag_scores, diag_index_ptr_, rev_diag_index_ptr_,
+      = mass_match_util::findTopProteins(diag_scores, rev_diag_scores, diag_index_ptr_, rev_diag_index_ptr_,
                                        threshold, mng_ptr_->inte_num_, add_shifts, mng_ptr_->shift_num_);
   internal_match_ptrs_.clear();
   for (size_t i = 0; i < internal_prots.size(); i++) {

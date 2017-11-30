@@ -22,10 +22,12 @@
 
 namespace prot {
 
-FilterProteinPtrVec MassMatchUtil::findTopProteins(std::vector<short> &scores,
-                                                   std::vector<int> &proteo_row_begins,
-                                                   std::vector<int> &proteo_row_ends,
-                                                   int threshold, int num) {
+namespace mass_match_util {
+
+FilterProteinPtrVec findTopProteins(std::vector<short> &scores,
+                                    std::vector<int> &proteo_row_begins,
+                                    std::vector<int> &proteo_row_ends,
+                                    int threshold, int num) {
   std::vector<std::pair<int, int>> diag_scores;
   for (size_t i = 0; i < proteo_row_begins.size(); i++) {
     int bgn = proteo_row_begins[i];
@@ -87,12 +89,12 @@ void addTruncShifts(FilterProteinPtrVec &prot_ptrs, MassMatchPtr index_ptr,
   }
 }
 
-FilterProteinPtrVec MassMatchUtil::findTopProteins(std::vector<short> &scores,
-                                                   std::vector<short> &rev_scores,
-                                                   MassMatchPtr index_ptr,
-                                                   MassMatchPtr rev_index_ptr,
-                                                   double threshold, int num,
-                                                   bool add_shifts, int shift_num) {
+FilterProteinPtrVec findTopProteins(std::vector<short> &scores,
+                                    std::vector<short> &rev_scores,
+                                    MassMatchPtr index_ptr,
+                                    MassMatchPtr rev_index_ptr,
+                                    double threshold, int num,
+                                    bool add_shifts, int shift_num) {
   std::vector<int> row_begins = index_ptr->getProteoRowBegins();
   std::vector<int> row_ends = index_ptr->getProteoRowEnds();
   std::vector<int> rev_row_begins = rev_index_ptr->getProteoRowBegins();
@@ -134,4 +136,6 @@ FilterProteinPtrVec MassMatchUtil::findTopProteins(std::vector<short> &scores,
   return proteins;
 }
 
-} /* namespace prot */
+} // namespace mass_match_util
+
+} // namespace prot 
