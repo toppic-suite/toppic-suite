@@ -23,7 +23,9 @@
 #include "base/xml_dom_document.hpp"
 
 namespace prot {
-namespace XmlDomUtil {
+
+namespace xml_dom_util {
+
 xercesc::DOMNodeList* getChildElements(xercesc::DOMElement *parent, const char* tag);
 
 xercesc::DOMElement* getChildElement(xercesc::DOMElement* parent, const char* tag, int index);
@@ -43,6 +45,8 @@ std::string getAttributeValue(xercesc::DOMElement * parent, const char* attribut
 std::string writeToString(xercesc::DOMLSSerializer* serializer, xercesc::DOMNode *node);
 
 void writeToStreamByRemovingDoubleLF(std::ofstream & file, std::string &str);
-}  // namespace XmlDomUtil
+
+}  // namespace xml_dom_util
+
 }  // namespace prot
 #endif

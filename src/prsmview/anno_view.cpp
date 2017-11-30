@@ -55,13 +55,13 @@ std::vector<std::vector<std::string>> readViewXmlFiles(const std::string &file_n
     XmlDOMDocument* doc = new XmlDOMDocument(parser, file_name.c_str());
     if (doc) {
       xercesc::DOMElement* root = doc->getDocumentElement();
-      int file_num = XmlDomUtil::getChildCount(root, "file");
+      int file_num = xml_dom_util::getChildCount(root, "file");
       for (int i = 0; i < file_num; i++) {
-        xercesc::DOMElement* file_element = XmlDomUtil::getChildElement(root, "file", i);
+        xercesc::DOMElement* file_element = xml_dom_util::getChildElement(root, "file", i);
         std::vector<std::string> file_info;
-        file_info.push_back(XmlDomUtil::getChildValue(file_element, "xml", 0));
-        file_info.push_back(XmlDomUtil::getChildValue(file_element, "xsl", 0));
-        file_info.push_back(XmlDomUtil::getChildValue(file_element, "html", 0));
+        file_info.push_back(xml_dom_util::getChildValue(file_element, "xml", 0));
+        file_info.push_back(xml_dom_util::getChildValue(file_element, "xsl", 0));
+        file_info.push_back(xml_dom_util::getChildValue(file_element, "html", 0));
         file_list.push_back(file_info);
       }
     }

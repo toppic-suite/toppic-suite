@@ -31,9 +31,9 @@ void ProtModBase::initBase(const std::string &file_name) {
     prot::XmlDOMDocument doc(parser, file_name.c_str());
     xercesc::DOMElement* parent = doc.getDocumentElement();
     std::string element_name = ProtMod::getXmlElementName();
-    int mod_num = XmlDomUtil::getChildCount(parent, element_name.c_str());
+    int mod_num = xml_dom_util::getChildCount(parent, element_name.c_str());
     for (int i = 0; i < mod_num; i++) {
-      xercesc::DOMElement* element = XmlDomUtil::getChildElement(parent, element_name.c_str(), i);
+      xercesc::DOMElement* element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
       ProtModPtr prot_mod_ptr = std::make_shared<ProtMod>(element);
       //  LOG_DEBUG("ptm index " << i << " shift  " << prot_mod_ptr->getProtShift());
       prot_mod_ptr_vec_.push_back(prot_mod_ptr);

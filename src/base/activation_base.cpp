@@ -27,10 +27,10 @@ void ActivationBase::initBase(const std::string &file_name) {
     XmlDOMDocument doc(parser, file_name.c_str());
     xercesc::DOMElement* parent = doc.getDocumentElement();
     std::string element_name = Activation::getXmlElementName();
-    int activation_num = XmlDomUtil::getChildCount(parent, element_name.c_str());
+    int activation_num = xml_dom_util::getChildCount(parent, element_name.c_str());
     for (int i = 0; i < activation_num; i++) {
       xercesc::DOMElement* element
-          = XmlDomUtil::getChildElement(parent, element_name.c_str(), i);
+          = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
       ActivationPtr ptr = std::make_shared<Activation>(element);
       activation_ptr_vec_.push_back(ptr);
     }

@@ -40,11 +40,11 @@ Residue::Residue(const std::string &acid_name,
 Residue::Residue(xercesc::DOMElement* element) { 
   std::string acid_element_name = Acid::getXmlElementName();
   xercesc::DOMElement* acid_element 
-      = XmlDomUtil::getChildElement(element, acid_element_name.c_str(), 0);
+      = xml_dom_util::getChildElement(element, acid_element_name.c_str(), 0);
   acid_ptr_ = AcidBase::getAcidPtrFromXml(acid_element);
   std::string ptm_element_name = Ptm::getXmlElementName();
   xercesc::DOMElement* ptm_element 
-      = XmlDomUtil::getChildElement(element, ptm_element_name.c_str(), 0);
+      = xml_dom_util::getChildElement(element, ptm_element_name.c_str(), 0);
   ptm_ptr_ = PtmBase::getPtmPtrFromXml(ptm_element);  
   mass_ = acid_ptr_->getMonoMass() + ptm_ptr_->getMonoMass();
 }

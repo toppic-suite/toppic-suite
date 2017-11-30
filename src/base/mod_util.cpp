@@ -38,11 +38,11 @@ ModPtrVec readModXml(const std::string &file_name) {
     XmlDOMDocument doc(parser, file_name.c_str());
     xercesc::DOMElement* parent = doc.getDocumentElement();
     std::string element_name = Mod::getXmlElementName();
-    int mod_num = XmlDomUtil::getChildCount(parent, element_name.c_str());
+    int mod_num = xml_dom_util::getChildCount(parent, element_name.c_str());
     LOG_DEBUG("mod num " << mod_num);
     for (int i = 0; i < mod_num; i++) {
       xercesc::DOMElement* element
-          = XmlDomUtil::getChildElement(parent, element_name.c_str(), i);
+          = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
       ModPtr ptr = ModBase::getModPtrFromXml(element);
       mod_ptr_vec.push_back(ptr);
     }

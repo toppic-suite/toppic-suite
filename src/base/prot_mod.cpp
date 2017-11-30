@@ -34,15 +34,15 @@ ProtMod::ProtMod(const std::string &name, const std::string &type,
     }
 
 ProtMod::ProtMod(xercesc::DOMElement* element) { 
-  name_ = XmlDomUtil::getChildValue(element, "name", 0);
-  type_ = XmlDomUtil::getChildValue(element, "type", 0);
+  name_ = xml_dom_util::getChildValue(element, "name", 0);
+  type_ = xml_dom_util::getChildValue(element, "type", 0);
   std::string trunc_element_name = Trunc::getXmlElementName();
   xercesc::DOMElement* trunc_element 
-      = XmlDomUtil::getChildElement(element, trunc_element_name.c_str(), 0);
+      = xml_dom_util::getChildElement(element, trunc_element_name.c_str(), 0);
   trunc_ptr_ = TruncBase::getTruncPtrFromXml(trunc_element);
   std::string mod_element_name = Mod::getXmlElementName();
   xercesc::DOMElement* mod_element 
-      = XmlDomUtil::getChildElement(element, mod_element_name.c_str(), 0);
+      = xml_dom_util::getChildElement(element, mod_element_name.c_str(), 0);
   mod_ptr_= ModBase::getModPtrFromXml(mod_element); 
   mod_pos_ = trunc_ptr_->getTruncLen();
   prot_shift_ = trunc_ptr_->getShift() + mod_ptr_->getShift();
@@ -58,7 +58,7 @@ void ProtMod::appendNameToXml(XmlDOMDocument* xml_doc,
 }
 
 std::string ProtMod::getNameFromXml(xercesc::DOMElement * element) {
-  std::string name = XmlDomUtil::getChildValue(element, "name", 0);
+  std::string name = xml_dom_util::getChildValue(element, "name", 0);
   return name;
 }
 

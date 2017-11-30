@@ -52,7 +52,7 @@ Prsm::Prsm(xercesc::DOMElement* element, FastaIndexReaderPtr reader_ptr,
   parseXml(element);
   std::string form_elem_name = Proteoform::getXmlElementName();
   xercesc::DOMElement* form_element
-      = XmlDomUtil::getChildElement(element, form_elem_name.c_str(), 0);
+      = xml_dom_util::getChildElement(element, form_elem_name.c_str(), 0);
   proteoform_ptr_ = std::make_shared<Proteoform>(form_element, reader_ptr, fix_mod_list);
 }
 
@@ -182,24 +182,24 @@ void Prsm::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
 }
 
 void Prsm::parseXml(xercesc::DOMElement *element) {
-  prsm_id_ = XmlDomUtil::getIntChildValue(element, "prsm_id", 0);
-  spectrum_id_ = XmlDomUtil::getIntChildValue(element, "spectrum_id", 0);
-  spectrum_scan_ = XmlDomUtil::getChildValue(element, "spectrum_scan", 0);
-  precursor_id_ = XmlDomUtil::getIntChildValue(element, "precursor_id", 0);
-  prec_feature_id_ = XmlDomUtil::getIntChildValue(element, "precursor_feature_id", 0);
-  prec_feature_inte_ = XmlDomUtil::getDoubleChildValue(element, "precursor_feature_inte", 0);
-  spectrum_num_ = XmlDomUtil::getIntChildValue(element, "spectrum_number", 0);
-  ori_prec_mass_ = XmlDomUtil::getDoubleChildValue(element, "ori_prec_mass", 0);
-  adjusted_prec_mass_ = XmlDomUtil::getDoubleChildValue(element, "adjusted_prec_mass", 0);
-  fdr_ = XmlDomUtil::getDoubleChildValue(element, "fdr", 0);
-  proteoform_fdr_ = XmlDomUtil::getDoubleChildValue(element, "proteoform_fdr", 0);
-  match_peak_num_ = XmlDomUtil::getDoubleChildValue(element, "match_peak_num", 0);
-  match_fragment_num_ = XmlDomUtil::getDoubleChildValue(element, "match_fragment_num", 0);
+  prsm_id_ = xml_dom_util::getIntChildValue(element, "prsm_id", 0);
+  spectrum_id_ = xml_dom_util::getIntChildValue(element, "spectrum_id", 0);
+  spectrum_scan_ = xml_dom_util::getChildValue(element, "spectrum_scan", 0);
+  precursor_id_ = xml_dom_util::getIntChildValue(element, "precursor_id", 0);
+  prec_feature_id_ = xml_dom_util::getIntChildValue(element, "precursor_feature_id", 0);
+  prec_feature_inte_ = xml_dom_util::getDoubleChildValue(element, "precursor_feature_inte", 0);
+  spectrum_num_ = xml_dom_util::getIntChildValue(element, "spectrum_number", 0);
+  ori_prec_mass_ = xml_dom_util::getDoubleChildValue(element, "ori_prec_mass", 0);
+  adjusted_prec_mass_ = xml_dom_util::getDoubleChildValue(element, "adjusted_prec_mass", 0);
+  fdr_ = xml_dom_util::getDoubleChildValue(element, "fdr", 0);
+  proteoform_fdr_ = xml_dom_util::getDoubleChildValue(element, "proteoform_fdr", 0);
+  match_peak_num_ = xml_dom_util::getDoubleChildValue(element, "match_peak_num", 0);
+  match_fragment_num_ = xml_dom_util::getDoubleChildValue(element, "match_fragment_num", 0);
 
-  int prob_count = XmlDomUtil::getChildCount(element, "extreme_value");
+  int prob_count = xml_dom_util::getChildCount(element, "extreme_value");
   if (prob_count != 0) {
     xercesc::DOMElement* prob_element
-        = XmlDomUtil::getChildElement(element, "extreme_value", 0);
+        = xml_dom_util::getChildElement(element, "extreme_value", 0);
     extreme_value_ptr_ = std::make_shared<ExtremeValue>(prob_element);
   }
 }

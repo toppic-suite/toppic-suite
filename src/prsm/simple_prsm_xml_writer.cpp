@@ -60,8 +60,8 @@ void SimplePrsmXmlWriter::write(const SimplePrsmPtrVec &simple_prsm_ptrs) {
 
 void SimplePrsmXmlWriter::write(SimplePrsmPtr simple_prsm_ptr) {
   xercesc::DOMElement * element = simple_prsm_ptr->toXml(doc_);
-  std::string str = XmlDomUtil::writeToString(serializer_, element);
-  XmlDomUtil::writeToStreamByRemovingDoubleLF(file_, str);
+  std::string str = xml_dom_util::writeToString(serializer_, element);
+  xml_dom_util::writeToStreamByRemovingDoubleLF(file_, str);
   element->release();
 }
 

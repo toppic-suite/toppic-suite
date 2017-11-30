@@ -37,9 +37,9 @@ void ExtremeValue::setOneProtProb(double one_prot_prob) {
 }
 
 ExtremeValue::ExtremeValue(xercesc::DOMElement* element) {
-  one_prot_prob_ = XmlDomUtil::getDoubleChildValue(element, "one_protein_probability", 0);
-  test_num_ = XmlDomUtil::getDoubleChildValue(element, "test_number", 0);
-  adjust_factor_ = XmlDomUtil::getDoubleChildValue(element, "adjust_factor", 0);
+  one_prot_prob_ = xml_dom_util::getDoubleChildValue(element, "one_protein_probability", 0);
+  test_num_ = xml_dom_util::getDoubleChildValue(element, "test_number", 0);
+  adjust_factor_ = xml_dom_util::getDoubleChildValue(element, "adjust_factor", 0);
   init();
 }
 

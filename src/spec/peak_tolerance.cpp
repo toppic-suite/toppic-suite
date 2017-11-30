@@ -28,9 +28,9 @@ PeakTolerance::PeakTolerance(double ppo, bool use_min_tolerance,
     }
 
 PeakTolerance::PeakTolerance(xercesc::DOMElement* element){
-  ppo_ = XmlDomUtil::getDoubleChildValue(element,"ppo",0);
-  use_min_tolerance_ = XmlDomUtil::getDoubleChildValue(element,"use_min_tolerance",0);
-  min_tolerance_ = XmlDomUtil::getDoubleChildValue(element,"min_tolerance",0);
+  ppo_ = xml_dom_util::getDoubleChildValue(element,"ppo",0);
+  use_min_tolerance_ = xml_dom_util::getDoubleChildValue(element,"use_min_tolerance",0);
+  min_tolerance_ = xml_dom_util::getDoubleChildValue(element,"min_tolerance",0);
 }
 
 double PeakTolerance::compStrictErrorTole(double mass) {

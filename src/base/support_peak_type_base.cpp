@@ -30,9 +30,9 @@ void SPTypeBase::initBase(const std::string &file_name) {
     XmlDOMDocument doc(parser, file_name.c_str());
     xercesc::DOMElement* parent = doc.getDocumentElement();
     std::string element_name = SupportPeakType::getXmlElementName();
-    int prm_peak_type_num = XmlDomUtil::getChildCount(parent, element_name.c_str());
+    int prm_peak_type_num = xml_dom_util::getChildCount(parent, element_name.c_str());
     for (int i = 0; i < prm_peak_type_num; i++) {
-      xercesc::DOMElement* element = XmlDomUtil::getChildElement(parent, element_name.c_str(), i);
+      xercesc::DOMElement* element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
       SPTypePtr sp_type_ptr = std::make_shared<SupportPeakType>(element);
       sp_type_ptr_vec_.push_back(sp_type_ptr);
       if (sp_type_ptr->getName() == getName_N_TERM()) {

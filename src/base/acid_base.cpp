@@ -31,11 +31,11 @@ void AcidBase::initBase(const std::string &file_name) {
     XmlDOMDocument doc(parser, file_name.c_str());
     xercesc::DOMElement* parent = doc.getDocumentElement();
     std::string element_name = Acid::getXmlElementName();
-    int acid_num = XmlDomUtil::getChildCount(parent, element_name.c_str());
+    int acid_num = xml_dom_util::getChildCount(parent, element_name.c_str());
     LOG_DEBUG("acid num " << acid_num);
     for (int i = 0; i < acid_num; i++) {
       xercesc::DOMElement* element
-          = XmlDomUtil::getChildElement(parent, element_name.c_str(), i);
+          = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
       AcidPtr ptr = std::make_shared<Acid>(element);
       acid_ptr_vec_.push_back(ptr);
       // check if it is an empty acid

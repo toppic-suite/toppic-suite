@@ -33,11 +33,11 @@ void ResidueBase::initBase(const std::string &file_name) {
     XmlDOMDocument doc(parser, file_name.c_str());
     xercesc::DOMElement* parent = doc.getDocumentElement();
     std::string element_name = Residue::getXmlElementName();
-    int residue_num = XmlDomUtil::getChildCount(parent, element_name.c_str());
+    int residue_num = xml_dom_util::getChildCount(parent, element_name.c_str());
     LOG_DEBUG("residue num " << residue_num);
     for (int i = 0; i < residue_num; i++) {
       xercesc::DOMElement* element
-          = XmlDomUtil::getChildElement(parent, element_name.c_str(), i);
+          = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
       ResiduePtr residue_ptr = std::make_shared<Residue>(element);
       if (residue_ptr->getAcidPtr() == AcidBase::getEmptyAcidPtr()
           && residue_ptr->getPtmPtr() == PtmBase::getEmptyPtmPtr()) {

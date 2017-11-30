@@ -41,9 +41,9 @@ void PtmBase::initBase(const std::string &file_name) {
     XmlDOMDocument doc(parser, file_name.c_str());
     xercesc::DOMElement* parent = doc.getDocumentElement();
     std::string element_name = Ptm::getXmlElementName();
-    int ptm_num = XmlDomUtil::getChildCount(parent, element_name.c_str());
+    int ptm_num = xml_dom_util::getChildCount(parent, element_name.c_str());
     for (int i = 0; i < ptm_num; i++) {
-      xercesc::DOMElement* element = XmlDomUtil::getChildElement(parent, element_name.c_str(), i);
+      xercesc::DOMElement* element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
       PtmPtr ptm_ptr = std::make_shared<Ptm>(element);
       ptm_ptr_vec_.push_back(ptm_ptr);
       // check empty ptr

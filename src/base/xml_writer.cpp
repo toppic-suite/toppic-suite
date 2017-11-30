@@ -38,8 +38,8 @@ XmlWriter::~XmlWriter(){
 }
 
 void XmlWriter::write(xercesc::DOMElement* element){
-  std::string str = XmlDomUtil::writeToString(serializer_, element);
-  XmlDomUtil::writeToStreamByRemovingDoubleLF(file_, str);
+  std::string str = xml_dom_util::writeToString(serializer_, element);
+  xml_dom_util::writeToStreamByRemovingDoubleLF(file_, str);
   element->release();
 }
 

@@ -44,31 +44,31 @@ SimplePrsm::SimplePrsm(MsHeaderPtr header_ptr, int spectrum_num,
     }
 
 SimplePrsm::SimplePrsm(xercesc::DOMElement* element) {
-  spectrum_id_ = XmlDomUtil::getIntChildValue(element, "spectrum_id", 0);
-  spectrum_scan_ = XmlDomUtil::getChildValue(element, "spectrum_scan", 0);
-  precursor_id_ = XmlDomUtil::getIntChildValue(element, "precursor_id", 0);
-  prec_mass_ = XmlDomUtil::getDoubleChildValue(element, "precursor_mass", 0);
-  spectrum_num_ = XmlDomUtil::getDoubleChildValue(element, "spectrum_number", 0);
-  seq_name_ = XmlDomUtil::getChildValue(element, "sequence_name", 0);
-  seq_desc_ = XmlDomUtil::getChildValue(element, "sequence_desc", 0);
-  prot_mass_ = XmlDomUtil::getDoubleChildValue(element, "proteoform_mass", 0);
-  score_ = XmlDomUtil::getDoubleChildValue(element, "score", 0);
+  spectrum_id_ = xml_dom_util::getIntChildValue(element, "spectrum_id", 0);
+  spectrum_scan_ = xml_dom_util::getChildValue(element, "spectrum_scan", 0);
+  precursor_id_ = xml_dom_util::getIntChildValue(element, "precursor_id", 0);
+  prec_mass_ = xml_dom_util::getDoubleChildValue(element, "precursor_mass", 0);
+  spectrum_num_ = xml_dom_util::getDoubleChildValue(element, "spectrum_number", 0);
+  seq_name_ = xml_dom_util::getChildValue(element, "sequence_name", 0);
+  seq_desc_ = xml_dom_util::getChildValue(element, "sequence_desc", 0);
+  prot_mass_ = xml_dom_util::getDoubleChildValue(element, "proteoform_mass", 0);
+  score_ = xml_dom_util::getDoubleChildValue(element, "score", 0);
   // n trunc shifts
   xercesc::DOMElement* n_shift_list_element
-      = XmlDomUtil::getChildElement(element, "n_trunc_shift_list", 0);
-  int n_shift_num = XmlDomUtil::getChildCount(n_shift_list_element, "shift");
+      = xml_dom_util::getChildElement(element, "n_trunc_shift_list", 0);
+  int n_shift_num = xml_dom_util::getChildCount(n_shift_list_element, "shift");
   // LOG_DEBUG("n shift _num " << n_shift_num);
   for (int i = 0; i < n_shift_num; i++) {
-    double shift = XmlDomUtil::getDoubleChildValue(n_shift_list_element, "shift", i);
+    double shift = xml_dom_util::getDoubleChildValue(n_shift_list_element, "shift", i);
     n_trunc_shifts_.push_back(shift);
   }
   // c trunc shifts
   xercesc::DOMElement* c_shift_list_element
-      = XmlDomUtil::getChildElement(element, "c_trunc_shift_list", 0);
-  int c_shift_num = XmlDomUtil::getChildCount(c_shift_list_element, "shift");
+      = xml_dom_util::getChildElement(element, "c_trunc_shift_list", 0);
+  int c_shift_num = xml_dom_util::getChildCount(c_shift_list_element, "shift");
   // LOG_DEBUG("c shift _num " << c_shift_num);
   for (int i = 0; i < c_shift_num; i++) {
-    double shift = XmlDomUtil::getDoubleChildValue(c_shift_list_element, "shift", i);
+    double shift = xml_dom_util::getDoubleChildValue(c_shift_list_element, "shift", i);
     c_trunc_shifts_.push_back(shift);
   }
 }

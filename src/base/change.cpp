@@ -22,25 +22,25 @@
 namespace prot {
 
 Change::Change(xercesc::DOMElement* element) {
-  left_bp_pos_ = XmlDomUtil::getIntChildValue(element, "left_bp_pos", 0);
-  right_bp_pos_ = XmlDomUtil::getIntChildValue(element, "right_bp_pos", 0);
+  left_bp_pos_ = xml_dom_util::getIntChildValue(element, "left_bp_pos", 0);
+  right_bp_pos_ = xml_dom_util::getIntChildValue(element, "right_bp_pos", 0);
   std::string ct_element_name = ChangeType::getXmlElementName();
   xercesc::DOMElement* ct_element
-      = XmlDomUtil::getChildElement(element, ct_element_name.c_str(), 0);
+      = xml_dom_util::getChildElement(element, ct_element_name.c_str(), 0);
   change_type_ptr_ = ChangeType::getChangeTypePtrFromXml(ct_element);
-  mass_shift_ = XmlDomUtil::getDoubleChildValue(element, "mass_shift", 0);
+  mass_shift_ = xml_dom_util::getDoubleChildValue(element, "mass_shift", 0);
   std::string mod_element_name = Mod::getXmlElementName();
-  int mod_count = XmlDomUtil::getChildCount(element, mod_element_name.c_str());
+  int mod_count = xml_dom_util::getChildCount(element, mod_element_name.c_str());
   if (mod_count != 0) {
     xercesc::DOMElement* mod_element
-        = XmlDomUtil::getChildElement(element, mod_element_name.c_str(), 0);
+        = xml_dom_util::getChildElement(element, mod_element_name.c_str(), 0);
     mod_ptr_ = ModBase::getModPtrFromXml(mod_element);
   }
   std::string local_element_name = LocalAnno::getXmlElementName();;
-  int local_count = XmlDomUtil::getChildCount(element, local_element_name.c_str());
+  int local_count = xml_dom_util::getChildCount(element, local_element_name.c_str());
   if (local_count != 0) {
     xercesc::DOMElement * local_element
-        = XmlDomUtil::getChildElement(element, local_element_name.c_str(), 0);
+        = xml_dom_util::getChildElement(element, local_element_name.c_str(), 0);
     local_anno_ptr_ = std::make_shared<LocalAnno>(local_element);
   }
 }
