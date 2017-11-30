@@ -43,16 +43,16 @@ SpPara::SpPara(xercesc::DOMElement* element) {
 void SpPara::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   std::string element_name = SpPara::getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
-  std::string str = StringUtil::convertToString(min_peak_num_);
+  std::string str = string_util::convertToString(min_peak_num_);
   xml_doc->addElement(element, "min_peak_num", str.c_str());
-  str = StringUtil::convertToString(min_mass_);
+  str = string_util::convertToString(min_mass_);
   xml_doc->addElement(element, "min_mass", str.c_str());
-  str = StringUtil::convertToString(extend_min_mass_).c_str();
+  str = string_util::convertToString(extend_min_mass_).c_str();
   xml_doc->addElement(element, "extend_min_mass", str.c_str());
   xercesc::DOMElement* list_element = xml_doc->createElement("extend_offset_list");
   element->appendChild(list_element);
   for (size_t i = 0; i < ext_offsets_.size(); i++) {
-    str = StringUtil::convertToString(ext_offsets_[i]);
+    str = string_util::convertToString(ext_offsets_[i]);
     xml_doc->addElement(list_element, "extend_offset", str.c_str());
   }
   element->appendChild(list_element);

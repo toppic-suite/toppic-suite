@@ -62,7 +62,7 @@ std::string Residue::toString(const std::string &delim_bgn,
 void Residue::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent,
                         const std::string &element_name){
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
-  std::string str = StringUtil::convertToString(mass_);
+  std::string str = string_util::convertToString(mass_);
   acid_ptr_->appendNameToXml(xml_doc,element);
   ptm_ptr_->appendAbbrNameToXml(xml_doc,element);
   parent->appendChild(element);

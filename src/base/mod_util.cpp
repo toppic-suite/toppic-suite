@@ -62,10 +62,10 @@ std::vector<ModPtrVec> readModTxt(const std::string &file_name) {
   std::string line;
   while (std::getline(infile, line)) {
     if (line[0] == '#') continue;
-    line = StringUtil::rmComment(line);
+    line = string_util::rmComment(line);
     if (line == "") continue;
     try {
-      std::vector<std::string> l = StringUtil::split(line, ',');
+      std::vector<std::string> l = string_util::split(line, ',');
       if (l.size() != 5) throw line;
 
       if (l[2] == "*" && l[3] == "any") throw line;

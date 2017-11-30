@@ -73,16 +73,16 @@ std::vector<std::vector<std::string>> readViewXmlFiles(const std::string &file_n
 xercesc::DOMElement* proteoformToXml(XmlDOMDocument* xml_doc, const PrsmPtrVec &prsm_ptrs,
                                      PrsmViewMngPtr mng_ptr, bool detail) {
   xercesc::DOMElement* proteoform_element = xml_doc->createElement("compatible_proteoform");
-  std::string str = StringUtil::convertToString(prsm_ptrs[0]->getProteoformPtr()->getProtId());
+  std::string str = string_util::convertToString(prsm_ptrs[0]->getProteoformPtr()->getProtId());
   xml_doc->addElement(proteoform_element, "sequence_id", str.c_str());
   str = prsm_ptrs[0]->getProteoformPtr()->getSeqName();
   xml_doc->addElement(proteoform_element, "sequence_name", str.c_str());
   str = prsm_ptrs[0]->getProteoformPtr()->getSeqDesc();
   xml_doc->addElement(proteoform_element, "sequence_description", str.c_str());
-  str = StringUtil::convertToString(prsm_ptrs[0]->getProteoformPtr()->getSpeciesId());
+  str = string_util::convertToString(prsm_ptrs[0]->getProteoformPtr()->getSpeciesId());
   xml_doc->addElement(proteoform_element, "proteoform_id", str.c_str());
   int count = prsm_ptrs.size();
-  str = StringUtil::convertToString(count);
+  str = string_util::convertToString(count);
   xml_doc->addElement(proteoform_element, "prsm_number", str.c_str());
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     proteoform_element->appendChild(geneAnnoPrsm(xml_doc, prsm_ptrs[i], mng_ptr, detail));
@@ -97,14 +97,14 @@ xercesc::DOMElement* proteinToXml(XmlDOMDocument* xml_doc,
                                   PrsmViewMngPtr mng_ptr,
                                   bool detail) {
   xercesc::DOMElement* prot_element = xml_doc->createElement("protein");
-  std::string str = StringUtil::convertToString(prot_id);
+  std::string str = string_util::convertToString(prot_id);
   xml_doc->addElement(prot_element, "sequence_id", str.c_str());
   str = prsm_ptrs[0]->getProteoformPtr()->getSeqName();
   xml_doc->addElement(prot_element, "sequence_name", str.c_str());
   str = prsm_ptrs[0]->getProteoformPtr()->getSeqDesc();
   xml_doc->addElement(prot_element, "sequence_description", str.c_str());
   int count = species_ids.size();
-  str = StringUtil::convertToString(count);
+  str = string_util::convertToString(count);
   xml_doc->addElement(prot_element, "compatible_proteoform_number", str.c_str());
   for (size_t i = 0; i < species_ids.size(); i++) {
     PrsmPtrVec select_prsm_ptrs = PrsmUtil::selectSpeciesPrsms(prsm_ptrs, species_ids[i]);

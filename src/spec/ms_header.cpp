@@ -116,7 +116,7 @@ void MsHeader::setScans(const std::string &s) {
     scans_.push_back(-1);
     return;
   }
-  std::vector<std::string> strs = StringUtil::split(s, ' ');
+  std::vector<std::string> strs = string_util::split(s, ' ');
   for (size_t i = 0; i < strs.size(); i++) {
     scans_.push_back(std::stoi(strs[i]));
   }
@@ -127,28 +127,28 @@ xercesc::DOMElement* MsHeader::getHeaderXml(XmlDOMDocument* xml_doc) {
   int precison = 4;
   xercesc::DOMElement* element = xml_doc->createElement("ms_header");
   xml_doc->addElement(element, "file_name", file_name_.c_str());
-  std::string str = StringUtil::convertToString(id_);
+  std::string str = string_util::convertToString(id_);
   xml_doc->addElement(element, "id", str.c_str());
-  str = StringUtil::convertToString(prec_id_);
+  str = string_util::convertToString(prec_id_);
   xml_doc->addElement(element, "prec_id", str.c_str());
   xml_doc->addElement(element, "title", title_.c_str());
-  str = StringUtil::convertToString(level_);
+  str = string_util::convertToString(level_);
   xml_doc->addElement(element, "level", str.c_str());
   str = getScansString();
   xml_doc->addElement(element, "scans", str.c_str());
   xercesc::DOMElement* scans = xml_doc->createElement("scan_list");
   for (size_t i = 0; i < scans_.size(); i++) {
-    str = StringUtil::convertToString(scans_[i]);
+    str = string_util::convertToString(scans_[i]);
     xml_doc->addElement(scans, "scan", str.c_str());
   }
   element->appendChild(scans);
-  str = StringUtil::convertToString(retention_time_);
+  str = string_util::convertToString(retention_time_);
   xml_doc->addElement(element, "retention_time", str.c_str());
-  str = StringUtil::convertToString(prec_sp_mz_);
+  str = string_util::convertToString(prec_sp_mz_);
   xml_doc->addElement(element, "prec_sp_mz", str.c_str());
-  str = StringUtil::convertToString(prec_mono_mz_, precison);
+  str = string_util::convertToString(prec_mono_mz_, precison);
   xml_doc->addElement(element, "prec_mono_mz", str.c_str());
-  str = StringUtil::convertToString(prec_charge_);
+  str = string_util::convertToString(prec_charge_);
   xml_doc->addElement(element, "prec_charge", str.c_str());
   activation_ptr_->appendNameToXml(xml_doc, element);
   return element;

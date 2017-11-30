@@ -29,17 +29,17 @@ AnnoResidue::AnnoResidue(ResiduePtr residue_ptr, int pos):
 void AnnoResidue::appendViewXml(XmlDOMDocument* xml_doc,
                                 xercesc::DOMElement* parent){
   xercesc::DOMElement* element = xml_doc->createElement("residue");
-  std::string str = StringUtil::convertToString(pos_);
+  std::string str = string_util::convertToString(pos_);
   xml_doc->addElement(element, "position", str.c_str());
   str = getAcidPtr()->getOneLetter();
   xml_doc->addElement(element, "acid", str.c_str());
   str = type_;
   xml_doc->addElement(element, "residue_type", str.c_str());
-  str = StringUtil::convertToString(is_unexpected_change_);
+  str = string_util::convertToString(is_unexpected_change_);
   xml_doc->addElement(element, "is_unexpected_change", str.c_str());
-  str = StringUtil::convertToString(unexpected_change_color_);
+  str = string_util::convertToString(unexpected_change_color_);
   xml_doc->addElement(element, "unexpected_change_color", str.c_str());
-  str = StringUtil::convertToString(possible_pos_color_);
+  str = string_util::convertToString(possible_pos_color_);
   xml_doc->addElement(element, "possible_pos_color", str.c_str());
   xml_doc->addElement(element, "anno", anno_.c_str());
   parent->appendChild(element);

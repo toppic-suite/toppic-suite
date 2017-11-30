@@ -31,17 +31,17 @@ AnnoCleavage::AnnoCleavage(int pos, const PeakIonPairPtrVec &pairs,
 
 void AnnoCleavage::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
   xercesc::DOMElement* element = xml_doc->createElement("cleavage");
-  std::string str = StringUtil::convertToString(pos_);
+  std::string str = string_util::convertToString(pos_);
   xml_doc->addElement(element, "position", str.c_str());
   str = type_;
   xml_doc->addElement(element, "cleavage_type", str.c_str());
-  str = StringUtil::convertToString(is_unexpected_change_);
+  str = string_util::convertToString(is_unexpected_change_);
   xml_doc->addElement(element, "is_unexpected_change", str.c_str());
-  str = StringUtil::convertToString(unexpected_change_color_);
+  str = string_util::convertToString(unexpected_change_color_);
   xml_doc->addElement(element, "unexpected_change_color", str.c_str());
-  str = StringUtil::convertToString(exist_n_ion_);
+  str = string_util::convertToString(exist_n_ion_);
   xml_doc->addElement(element, "exist_n_ion", str.c_str());
-  str = StringUtil::convertToString(exist_c_ion_);
+  str = string_util::convertToString(exist_c_ion_);
   xml_doc->addElement(element, "exist_c_ion", str.c_str());
   xercesc::DOMElement* peaks = xml_doc->createElement("matched_peaks");
   for(size_t i=0;i<pairs_.size();i++){

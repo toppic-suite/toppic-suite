@@ -48,10 +48,10 @@ std::string AnnoSegment::getResidueAnno() {
 
       score_[i] = std::floor(score_[i] * 1000) / 10;
 
-      anno_ += "Site: " + occurences_[i].second + StringUtil::convertToString(occurences_[i].first) + " ";
-      anno_ += "Confidence: " + StringUtil::convertToString(score_[i], 1) + "%\n";
-      occu_ += occurences_[i].second + StringUtil::convertToString(occurences_[i].first) 
-          + ":" + StringUtil::convertToString(score_[i], 1) + "%";
+      anno_ += "Site: " + occurences_[i].second + string_util::convertToString(occurences_[i].first) + " ";
+      anno_ += "Confidence: " + string_util::convertToString(score_[i], 1) + "%\n";
+      occu_ += occurences_[i].second + string_util::convertToString(occurences_[i].first) 
+          + ":" + string_util::convertToString(score_[i], 1) + "%";
       if (i != occurences_.size() - 1) {
         occu_ += "; ";
       } 
@@ -63,13 +63,13 @@ std::string AnnoSegment::getResidueAnno() {
 void AnnoSegment::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent,
                             int precison){
   xercesc::DOMElement* element = xml_doc->createElement("unexpected_change");
-  std::string str = StringUtil::convertToString(left_pos_);
+  std::string str = string_util::convertToString(left_pos_);
   xml_doc->addElement(element, "left_position", str.c_str());
-  str = StringUtil::convertToString(right_pos_);
+  str = string_util::convertToString(right_pos_);
   xml_doc->addElement(element, "right_position", str.c_str());
-  str = StringUtil::convertToString(mass_shift_, precison);
+  str = string_util::convertToString(mass_shift_, precison);
   xml_doc->addElement(element, "mass_shift", str.c_str());
-  str = StringUtil::convertToString(color_);
+  str = string_util::convertToString(color_);
   xml_doc->addElement(element, "unexpected_change_color", str.c_str());
   xml_doc->addElement(element, "segment_type", segment_type_.c_str());
   if (ptm_ptr_ != nullptr) {

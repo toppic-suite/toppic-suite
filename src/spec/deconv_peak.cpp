@@ -38,15 +38,15 @@ DeconvPeak::DeconvPeak(xercesc::DOMElement* element):
 void DeconvPeak::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
   std::string element_name = DeconvPeak::getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
-  std::string str = StringUtil::convertToString(getPosition());
+  std::string str = string_util::convertToString(getPosition());
   xml_doc->addElement(element, "position", str.c_str());
-  str = StringUtil::convertToString(getIntensity());
+  str = string_util::convertToString(getIntensity());
   xml_doc->addElement(element, "intensity", str.c_str());
-  str = StringUtil::convertToString(id_);
+  str = string_util::convertToString(id_);
   xml_doc->addElement(element, "id", str.c_str());
-  str = StringUtil::convertToString(charge_);
+  str = string_util::convertToString(charge_);
   xml_doc->addElement(element, "charge", str.c_str());
-  str = StringUtil::convertToString(score_);
+  str = string_util::convertToString(score_);
   xml_doc->addElement(element, "score", str.c_str());
   parent->appendChild(element);
 }

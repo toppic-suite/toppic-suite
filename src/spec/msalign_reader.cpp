@@ -28,7 +28,7 @@ std::vector<std::string> MsAlignReader::readOneSpectrum() {
   std::string line;
   std::vector<std::string> line_list;
   while (std::getline(input_, line)) {
-    line = StringUtil::trim(line);
+    line = string_util::trim(line);
     if (line == "BEGIN IONS") {
       line_list.push_back(line);
     } else if (line == "END IONS") {
@@ -72,7 +72,7 @@ void MsAlignReader::readNext() {
   for (size_t i = 1; i < spectrum_str_vec_.size() - 1; i++) {
     std::string letter = spectrum_str_vec_[i].substr(0, 1);
     if (letter >= "A" && letter <= "Z") {
-      strs = StringUtil::split(spectrum_str_vec_[i], '=');
+      strs = string_util::split(spectrum_str_vec_[i], '=');
       if (strs[0] == "ID") {
         id = std::stoi(strs[1]);
       }

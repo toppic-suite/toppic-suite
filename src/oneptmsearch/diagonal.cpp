@@ -200,7 +200,7 @@ DiagonalHeaderPtrVec refineHeadersBgnEnd(
         }
         if(pair_ptrs.size()<1){
             int pair_size = pair_ptrs.size();
-            LOG_TRACE("Empty Segment is found "+StringUtil::convertToString(pair_size));
+            LOG_TRACE("Empty Segment is found "+string_util::convertToString(pair_size));
             if (i == 0 ) {
                 int new_bgn = first_res_pos;
                 int new_end = first_res_pos;
@@ -256,7 +256,7 @@ DiagonalHeaderPtrVec2D refineHeadersBgnEnd(ProteoformPtr proteo_ptr,
       index++;
       if(pair_ptrs.size() < 1){
         int pair_size = pair_ptrs.size();
-        LOG_TRACE("Empty Segment is found "+ StringUtil::convertToString(pair_size));
+        LOG_TRACE("Empty Segment is found "+ string_util::convertToString(pair_size));
         if (header_ptrs_2d[i][j] == first_header) {
           int new_bgn = first_res_pos;
           int new_end = first_res_pos;

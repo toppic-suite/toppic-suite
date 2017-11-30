@@ -26,7 +26,9 @@
 
 namespace prot {
 
-std::string StringUtil::trim(const std::string &ori_s) {
+namespace string_util {
+
+std::string trim(const std::string &ori_s) {
   std::string s = ori_s;
   s.erase(s.begin(), std::find_if(s.begin(), s.end(),
                                   std::not1(std::ptr_fun<int, int>(std::isspace))));
@@ -36,7 +38,7 @@ std::string StringUtil::trim(const std::string &ori_s) {
   return s;
 }
 
-std::vector<std::string> StringUtil::split(const std::string &s, char delim) {
+std::vector<std::string> split(const std::string &s, char delim) {
   std::stringstream ss(s);
   std::string item;
   std::vector<std::string> elems;
@@ -46,7 +48,7 @@ std::vector<std::string> StringUtil::split(const std::string &s, char delim) {
   return elems;
 }
 
-std::string StringUtil::convertToString(double value) {
+std::string convertToString(double value) {
   std::stringstream stream;
 
   if (value < 1 && value > -1 && value !=0) {
@@ -58,7 +60,7 @@ std::string StringUtil::convertToString(double value) {
   return stream.str();
 }
 
-std::string StringUtil::convertToString(double value, int number) {
+std::string convertToString(double value, int number) {
   std::stringstream stream;
   if (value == 0) {
     stream << std::fixed << std::setprecision(0);
@@ -75,7 +77,7 @@ std::string StringUtil::convertToString(double value, int number) {
   return stream.str();
 }
 
-std::string StringUtil::convertToScientificStr(double value, int number) {
+std::string convertToScientificStr(double value, int number) {
   std::stringstream stream;
   if (value == 0) {
     stream << std::fixed << std::setprecision(0);
@@ -86,19 +88,19 @@ std::string StringUtil::convertToScientificStr(double value, int number) {
   return stream.str();
 }
 
-std::string StringUtil::convertToString(int value) {
+std::string convertToString(int value) {
   std::stringstream stream;
   stream << value;
   return stream.str();
 }
 
-std::string StringUtil::convertToString(bool value) {
+std::string convertToString(bool value) {
   std::stringstream stream;
   stream << value;
   return stream.str();
 }
 
-std::string StringUtil::rmComment(const std::string &ori_s, const std::string &comment) {
+std::string rmComment(const std::string &ori_s, const std::string &comment) {
   std::string s = ori_s;
   std::string::size_type i = s.find(comment);
 
@@ -109,10 +111,12 @@ std::string StringUtil::rmComment(const std::string &ori_s, const std::string &c
   return s;
 }
 
-bool StringUtil::endsWith(const std::string &str, const std::string &suffix) {
+bool endsWith(const std::string &str, const std::string &suffix) {
   return str.size() >= suffix.size() &&
       str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
 }
+
+} // namespace string_util
 
 }  // namespace prot
 

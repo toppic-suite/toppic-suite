@@ -62,15 +62,15 @@ void ExtremeValue::init() {
 void ExtremeValue::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   std::string element_name = getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
-  std::string str = StringUtil::convertToString(one_prot_prob_);
+  std::string str = string_util::convertToString(one_prot_prob_);
   xml_doc->addElement(element, "one_protein_probability", str.c_str());
-  str = StringUtil::convertToString(test_num_);
+  str = string_util::convertToString(test_num_);
   xml_doc->addElement(element, "test_number", str.c_str());
-  str = StringUtil::convertToString(adjust_factor_);
+  str = string_util::convertToString(adjust_factor_);
   xml_doc->addElement(element, "adjust_factor", str.c_str());
-  str = StringUtil::convertToString(p_value_);
+  str = string_util::convertToString(p_value_);
   xml_doc->addElement(element, "p_value", str.c_str());
-  str = StringUtil::convertToString(e_value_);
+  str = string_util::convertToString(e_value_);
   xml_doc->addElement(element, "e_value", str.c_str());
   parent->appendChild(element);
 }

@@ -322,8 +322,8 @@ bool Argument::validateArguments() {
     return false;
   }
 
-  if (!StringUtil::endsWith(arguments_["oriDatabaseFileName"], ".fasta") &&
-      !StringUtil::endsWith(arguments_["oriDatabaseFileName"], ".fa")) {
+  if (!string_util::endsWith(arguments_["oriDatabaseFileName"], ".fasta") &&
+      !string_util::endsWith(arguments_["oriDatabaseFileName"], ".fa")) {
     LOG_ERROR("Database file " << arguments_["oriDatabaseFileName"] << " is not a fasta file!");
     return false;
   }
@@ -338,7 +338,7 @@ bool Argument::validateArguments() {
     return false;
   }
 
-  if (!StringUtil::endsWith(arguments_["spectrumFileName"], ".msalign")) {
+  if (!string_util::endsWith(arguments_["spectrumFileName"], ".msalign")) {
     LOG_ERROR("Spectrum file " << arguments_["spectrumFileName"] << " is not a msalign file!");
     return false;
   }

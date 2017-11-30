@@ -500,8 +500,8 @@ void LocalUtil::readPtmTxt(const std::string &file_name) {
     boost::trim_right(line);
     if (line == "" || line[0] == '#') continue;
 
-    line = StringUtil::rmComment(line);
-    std::vector<std::string> l = StringUtil::split(line, ',');
+    line = string_util::rmComment(line);
+    std::vector<std::string> l = string_util::split(line, ',');
     PtmPtr p = std::make_shared<Ptm>(l[0], l[0], std::stod(l[1]), std::stoi(l[4]));
     p = PtmBase::getPtmPtr(p);
     var_ptm_list_.push_back(p);
