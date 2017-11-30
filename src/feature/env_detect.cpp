@@ -61,7 +61,7 @@ MatchEnvPtr EnvDetect::detectEnv(PeakPtrVec &peak_list, int base_peak,
   // convert the reference distribution to a theoretical distribution
   // based on the base mz and charge state
   EnvelopePtr theo_env = ref_env->distrToTheoBase(base_mz, charge);
-  int peak_idx = RawMsUtil::getNearPeakIdx(peak_list, theo_env->getReferMz(), mng_ptr->mz_tolerance_);
+  int peak_idx = raw_ms_util::getNearPeakIdx(peak_list, theo_env->getReferMz(), mng_ptr->mz_tolerance_);
   if (peak_idx < 0 || peak_list[peak_idx]->getIntensity() < mng_ptr->min_refer_inte_) {
     return nullptr; 
   }
@@ -129,7 +129,7 @@ double EnvDetect::calcInteRatio(EnvelopePtr theo_env, PeakPtrVec &peak_list,
   int refer_idx = theo_env->getReferIdx();
   double mz = theo_env->getMz(refer_idx);
   // LOG_DEBUG("step 1");
-  int peak_idx = RawMsUtil::getNearPeakIdx(peak_list, mz, tolerance);
+  int peak_idx = raw_ms_util::getNearPeakIdx(peak_list, mz, tolerance);
   if (peak_idx >= 0) {
     theo_sum += theo_intes[refer_idx];
     obs_sum += peak_list[peak_idx]->getIntensity();
@@ -138,7 +138,7 @@ double EnvDetect::calcInteRatio(EnvelopePtr theo_env, PeakPtrVec &peak_list,
   if (refer_idx - 1 >= 0) {
     theo_sum += theo_intes[refer_idx - 1];
     mz = theo_env->getMz(refer_idx-1);
-    peak_idx = RawMsUtil::getNearPeakIdx(peak_list, mz, tolerance);
+    peak_idx = raw_ms_util::getNearPeakIdx(peak_list, mz, tolerance);
     if (peak_idx >= 0) {
       obs_sum += peak_list[peak_idx]->getIntensity();
     }
@@ -147,7 +147,7 @@ double EnvDetect::calcInteRatio(EnvelopePtr theo_env, PeakPtrVec &peak_list,
   if (refer_idx + 1 < theo_env->getPeakNum()) {
     theo_sum += theo_intes[refer_idx + 1];
     mz = theo_env->getMz(refer_idx + 1);
-    peak_idx = RawMsUtil::getNearPeakIdx(peak_list, mz, tolerance);
+    peak_idx = raw_ms_util::getNearPeakIdx(peak_list, mz, tolerance);
     if (peak_idx >= 0) {
       obs_sum += peak_list[peak_idx]->getIntensity();
     }

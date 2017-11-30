@@ -95,7 +95,7 @@ PeakPtrVec  rmAnnoPeak(PeakPtrVec &ms, MatchEnvPtrVec &envs) {
       }
     }
   }
-  RawMsUtil::rmPeaks(new_list, is_keeps);
+  raw_ms_util::rmPeaks(new_list, is_keeps);
   return new_list;
 }
 

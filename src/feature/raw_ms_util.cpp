@@ -25,11 +25,13 @@
 
 namespace prot {
 
-double RawMsUtil::findMaxPos(const PeakPtrVec &ptr_list) {
+namespace raw_ms_util {
+
+double findMaxPos(const PeakPtrVec &ptr_list) {
   return ptr_list[ptr_list.size() -1]->getPosition();
 }
 
-int RawMsUtil::searchPos(const PeakPtrVec &ptr_list, double pos) {
+int searchPos(const PeakPtrVec &ptr_list, double pos) {
   if (ptr_list.size() == 0) {
     return -1;
   }
@@ -61,7 +63,7 @@ int RawMsUtil::searchPos(const PeakPtrVec &ptr_list, double pos) {
 }
 
 // Finds the nearest peak for a specific position with error tolerance.
-int RawMsUtil::getNearPeakIdx(const PeakPtrVec &ptr_list, double pos, double tolerance) {
+int getNearPeakIdx(const PeakPtrVec &ptr_list, double pos, double tolerance) {
   // find the peak nearest to pos 
   int idx = searchPos(ptr_list, pos);
   //LOG_DEBUG("pos " << pos << " peak pos " << ptr_list[idx]->getPosition());
@@ -73,7 +75,7 @@ int RawMsUtil::getNearPeakIdx(const PeakPtrVec &ptr_list, double pos, double tol
 }
 
 // Removes a list of peaks.
-PeakPtrVec RawMsUtil::rmPeaks(const PeakPtrVec &ptr_list, std::vector<bool> &keep) {
+PeakPtrVec rmPeaks(const PeakPtrVec &ptr_list, std::vector<bool> &keep) {
   PeakPtrVec new_list;
   for (size_t i = 0; i < ptr_list.size(); i++) {
     if (keep[i]) {
@@ -82,6 +84,8 @@ PeakPtrVec RawMsUtil::rmPeaks(const PeakPtrVec &ptr_list, std::vector<bool> &kee
   }
   return new_list;
 }
+
+}  // namespace raw_ms_util
 
 }  // namespace prot
 

@@ -24,17 +24,17 @@
 
 namespace prot {
 
-class RawMsUtil {
- public: 
-  static double findMaxPos(const PeakPtrVec &ptr_list);
+namespace raw_ms_util {
 
-  static int searchPos(const PeakPtrVec &ptr_list, double pos);
+double findMaxPos(const PeakPtrVec &ptr_list);
 
-  static int getNearPeakIdx(const PeakPtrVec  &ptr_list, double pos, double tolerance);
+int searchPos(const PeakPtrVec &ptr_list, double pos);
 
-  static PeakPtrVec rmPeaks(const PeakPtrVec &ptr_list, std::vector<bool> &keep);
+int getNearPeakIdx(const PeakPtrVec  &ptr_list, double pos, double tolerance);
 
-};
+PeakPtrVec rmPeaks(const PeakPtrVec &ptr_list, std::vector<bool> &keep);
+
+}  // namespace raw_ms_util
 
 }  // namespace prot
 

@@ -26,7 +26,7 @@ DeconvData::DeconvData(PeakPtrVec &peak_list, double max_mass, int max_charge,
     max_mass_(max_mass),
     max_charge_(max_charge),
     win_size_(win_size) {
-      win_num_ = (int) std::ceil(RawMsUtil::findMaxPos(peak_list_) / win_size_) + 2;
+      win_num_ = (int) std::ceil(raw_ms_util::findMaxPos(peak_list_) / win_size_) + 2;
       initWinId();
       initWinBgnEnd();
     }
