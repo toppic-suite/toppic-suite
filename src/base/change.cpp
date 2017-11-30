@@ -48,12 +48,12 @@ Change::Change(xercesc::DOMElement* element) {
 void Change::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   std::string element_name = Change::getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
-  std::string str = StringUtil::convertToString(left_bp_pos_);
+  std::string str = string_util::convertToString(left_bp_pos_);
   xml_doc->addElement(element, "left_bp_pos", str.c_str());
-  str = StringUtil::convertToString(right_bp_pos_);
+  str = string_util::convertToString(right_bp_pos_);
   xml_doc->addElement(element, "right_bp_pos", str.c_str());
   change_type_ptr_->appendXml(xml_doc, element);
-  str = StringUtil::convertToString(mass_shift_);
+  str = string_util::convertToString(mass_shift_);
   xml_doc->addElement(element, "mass_shift", str.c_str());
   if (mod_ptr_ != nullptr) {
     mod_ptr_->appendToXml(xml_doc, element);

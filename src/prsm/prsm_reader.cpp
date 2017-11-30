@@ -32,7 +32,7 @@ std::vector<std::string> PrsmReader::readOnePrsmLines() {
   std::string line;
   std::vector<std::string> line_list;
   while (std::getline(input_, line)) {
-    line = StringUtil::trim(line);
+    line = string_util::trim(line);
     // LOG_DEBUG("line " << line);
     if (line ==  "<prsm>") {
       line_list.push_back(line);

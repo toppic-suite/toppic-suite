@@ -16,18 +16,13 @@
 #ifndef PROT_BASE_STRING_UTIL_HPP_
 #define PROT_BASE_STRING_UTIL_HPP_
 
-#include <sstream>
 #include <string>
 #include <vector>
-#include <algorithm>
-#include <functional>
-#include <cctype>
-#include <locale>
-
-#include "base/logger.hpp"
+#include <sstream>
 
 namespace prot {
-namespace StringUtil {
+
+namespace string_util {
 
 std::string trim(const std::string & ori_s);
 
@@ -46,7 +41,9 @@ std::string convertToString(bool value);
 std::string rmComment(const std::string &ori_s, const std::string & comment = "#");
 
 bool endsWith(const std::string &str, const std::string &suffix);
-}  // namespace StringUtil
+
+}  // namespace string_util
+
 }  // namespace prot
 
 #endif

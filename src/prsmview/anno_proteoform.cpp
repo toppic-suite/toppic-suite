@@ -33,35 +33,35 @@ namespace prot{
 
 void addSummary(XmlDOMDocument* xml_doc, xercesc::DOMElement *prot_element, 
                 ProteoformPtr proteoform_ptr, PrsmViewMngPtr mng_ptr) {
-  std::string str=StringUtil::convertToString(proteoform_ptr->getProtId());
+  std::string str=string_util::convertToString(proteoform_ptr->getProtId());
   xml_doc->addElement(prot_element, "sequence_id", str.c_str());
-  str=StringUtil::convertToString(proteoform_ptr->getSpeciesId());
+  str=string_util::convertToString(proteoform_ptr->getSpeciesId());
   xml_doc->addElement(prot_element, "proteoform_id", str.c_str());
   str=proteoform_ptr->getSeqName();
   xml_doc->addElement(prot_element, "sequence_name", str.c_str());
   str=proteoform_ptr->getSeqDesc();
   xml_doc->addElement(prot_element, "sequence_description", str.c_str());
   double mass = proteoform_ptr->getMass();
-  str=StringUtil::convertToString(mass, mng_ptr->precise_point_num_);
+  str=string_util::convertToString(mass, mng_ptr->precise_point_num_);
   xml_doc->addElement(prot_element, "proteoform_mass", str.c_str());
-  str=StringUtil::convertToString(proteoform_ptr->getProtModPtr()->isAcetylation());
+  str=string_util::convertToString(proteoform_ptr->getProtModPtr()->isAcetylation());
   xml_doc->addElement(prot_element, "n_acetylation", str.c_str());
   int unexpected_change_number = proteoform_ptr->getChangeNum(ChangeType::UNEXPECTED);
-  str=StringUtil::convertToString(unexpected_change_number);
+  str=string_util::convertToString(unexpected_change_number);
   xml_doc->addElement(prot_element, "unexpected_change_number", str.c_str());
 }
 
 void addAnnoHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement *anno_element, 
                    ProteoformPtr proteoform_ptr, PrsmViewMngPtr mng_ptr) {
 
-  std::string str=StringUtil::convertToString(proteoform_ptr->getFastaSeqPtr()->getAcidPtmPairLen());
+  std::string str=string_util::convertToString(proteoform_ptr->getFastaSeqPtr()->getAcidPtmPairLen());
   xml_doc->addElement(anno_element, "protein_length", str.c_str());
 
-  str=StringUtil::convertToString(proteoform_ptr->getStartPos());
+  str=string_util::convertToString(proteoform_ptr->getStartPos());
   xml_doc->addElement(anno_element, "first_residue_position", str.c_str());
-  str=StringUtil::convertToString(proteoform_ptr->getEndPos());
+  str=string_util::convertToString(proteoform_ptr->getEndPos());
   xml_doc->addElement(anno_element, "last_residue_position", str.c_str());
-  str=StringUtil::convertToString(proteoform_ptr->getProtModPtr()->isAcetylation());
+  str=string_util::convertToString(proteoform_ptr->getProtModPtr()->isAcetylation());
 }
 
 AnnoResiduePtrVec getAnnoResidues(ProteoformPtr proteoform_ptr, PrsmViewMngPtr mng_ptr) {

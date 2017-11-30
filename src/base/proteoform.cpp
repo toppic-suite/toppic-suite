@@ -222,7 +222,7 @@ inline void updateMatchSeq(const ChangePtrVec &changes,
           + "["+changes[i]->getLocalAnno()->getPtmPtr()->getAbbrName()+"]";
     } else if (ModBase::isNoneModPtr(changes[i]->getModPtr())) {
       right_strings[right_pos] = right_strings[right_pos] 
-          + "["+StringUtil::convertToString(shift,5)+"]";
+          + "["+string_util::convertToString(shift,5)+"]";
     } else {
       right_strings[right_pos] = right_strings[right_pos] 
           + "["+changes[i]->getModPtr()->getModResiduePtr()->getPtmPtr()->getAbbrName()+"]";
@@ -286,17 +286,17 @@ void Proteoform::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent)
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
   fasta_seq_ptr_->appendNameDescToXml(xml_doc,element);
   prot_mod_ptr_->appendNameToXml(xml_doc,element);
-  std::string str = StringUtil::convertToString(start_pos_);
+  std::string str = string_util::convertToString(start_pos_);
   xml_doc->addElement(element, "start_pos", str.c_str());
-  str = StringUtil::convertToString(end_pos_);
+  str = string_util::convertToString(end_pos_);
   xml_doc->addElement(element, "end_pos", str.c_str());
-  str = StringUtil::convertToString(species_id_);
+  str = string_util::convertToString(species_id_);
   xml_doc->addElement(element, "species_id", str.c_str());
-  str = StringUtil::convertToString(prot_id_);
+  str = string_util::convertToString(prot_id_);
   xml_doc->addElement(element, "prot_id", str.c_str());
-  str = StringUtil::convertToString(variable_ptm_num_);
+  str = string_util::convertToString(variable_ptm_num_);
   xml_doc->addElement(element, "variable_ptm_num", str.c_str());
-  str = StringUtil::convertToString(getChangeNum(ChangeType::UNEXPECTED));
+  str = string_util::convertToString(getChangeNum(ChangeType::UNEXPECTED));
   xml_doc->addElement(element, "unexpected_ptm_num", str.c_str());
 
   element_name = Change::getXmlElementName() + "_list";

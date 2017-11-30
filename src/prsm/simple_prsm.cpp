@@ -76,32 +76,32 @@ SimplePrsm::SimplePrsm(xercesc::DOMElement* element) {
 xercesc::DOMElement* SimplePrsm::toXml(XmlDOMDocument* xml_doc) {
   std::string element_name = SimplePrsm::getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
-  std::string str = StringUtil::convertToString(spectrum_id_);
+  std::string str = string_util::convertToString(spectrum_id_);
   xml_doc->addElement(element, "spectrum_id", str.c_str());
   xml_doc->addElement(element, "spectrum_scan", spectrum_scan_.c_str());
-  str = StringUtil::convertToString(precursor_id_);
+  str = string_util::convertToString(precursor_id_);
   xml_doc->addElement(element, "precursor_id", str.c_str());
-  str = StringUtil::convertToString(prec_mass_);
+  str = string_util::convertToString(prec_mass_);
   xml_doc->addElement(element, "precursor_mass", str.c_str());
-  str = StringUtil::convertToString(spectrum_num_);
+  str = string_util::convertToString(spectrum_num_);
   xml_doc->addElement(element, "spectrum_number", str.c_str());
   xml_doc->addElement(element, "sequence_name", seq_name_.c_str());
   xml_doc->addElement(element, "sequence_desc", seq_desc_.c_str());
-  str = StringUtil::convertToString(prot_mass_);
+  str = string_util::convertToString(prot_mass_);
   xml_doc->addElement(element, "proteoform_mass", str.c_str());
-  str = StringUtil::convertToString(score_);
+  str = string_util::convertToString(score_);
   xml_doc->addElement(element, "score", str.c_str());
 
   xercesc::DOMElement* n_shift_list = xml_doc->createElement("n_trunc_shift_list");
   for (size_t i = 0; i < n_trunc_shifts_.size(); i++) {
-    str = StringUtil::convertToString(n_trunc_shifts_[i]);
+    str = string_util::convertToString(n_trunc_shifts_[i]);
     xml_doc->addElement(n_shift_list, "shift", str.c_str());
   }
   element->appendChild(n_shift_list);
 
   xercesc::DOMElement* c_shift_list = xml_doc->createElement("c_trunc_shift_list");
   for (size_t i = 0; i < c_trunc_shifts_.size(); i++) {
-    str = StringUtil::convertToString(c_trunc_shifts_[i]);
+    str = string_util::convertToString(c_trunc_shifts_[i]);
     xml_doc->addElement(c_shift_list, "shift", str.c_str());
   }
   element->appendChild(c_shift_list);
