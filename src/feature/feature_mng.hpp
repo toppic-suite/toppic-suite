@@ -26,7 +26,7 @@ class FeatureMng {
 
   int getMassGroup(double base_mass);
 
-  void setMinInte(double min_inte);
+  void setMinInte(double min_inte, int ms_level);
 
   int compMinConsPeakNum(int peak_num, int mass_group);
 
@@ -49,6 +49,8 @@ class FeatureMng {
   bool estimate_min_inte_ = true;
   // signal noise ratio 
   double sn_ratio_ = 1;
+  // ms one signal noise ratio
+  double ms_one_sn_ratio_ = 5;
   // minimum peak intensity 
   double min_inte_ = 0;
   // minimum base peak intensity 

@@ -42,7 +42,8 @@ MatchEnvPtr EnvDetect::detectEnv(PeakPtrVec &peak_list, int base_peak,
   double base_mz = peak_list[base_peak]->getPosition();
   // check if the mass is greater than the precursor mass
   double base_mass = base_mz * charge - charge * mass_constant::getProtonMass();
-  // LOG_DEBUG("peak idx " << base_peak << " base mz " << base_mz << " base mass " << base_mass << " max mass " << max_mass);
+  // LOG_DEBUG("peak idx " << base_peak << " base mz " << base_mz 
+  // << " base mass " << base_mass << " max mass " << max_mass);
   if (base_mass >= max_mass || base_mass < mng_ptr->min_mass_) {
     return nullptr;
   }
@@ -54,14 +55,16 @@ MatchEnvPtr EnvDetect::detectEnv(PeakPtrVec &peak_list, int base_peak,
     return nullptr;
   }
 
-  // LOG_DEBUG("intensity " << peak_list[base_peak]->getIntensity() << " min refer inte " << mng_ptr->min_refer_inte_);
+  // LOG_DEBUG("intensity " << peak_list[base_peak]->getIntensity() 
+  // << " min refer inte " << mng_ptr->min_refer_inte_);
   if (peak_list[base_peak]->getIntensity() < mng_ptr->min_refer_inte_) {
     return nullptr;
   }
   // convert the reference distribution to a theoretical distribution
   // based on the base mz and charge state
   EnvelopePtr theo_env = ref_env->distrToTheoBase(base_mz, charge);
-  int peak_idx = raw_ms_util::getNearPeakIdx(peak_list, theo_env->getReferMz(), mng_ptr->mz_tolerance_);
+  int peak_idx = raw_ms_util::getNearPeakIdx(peak_list, theo_env->getReferMz(), 
+                                             mng_ptr->mz_tolerance_);
   if (peak_idx < 0 || peak_list[peak_idx]->getIntensity() < mng_ptr->min_refer_inte_) {
     return nullptr; 
   }
