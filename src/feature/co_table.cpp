@@ -13,6 +13,8 @@
 //limitations under the License.
 
 
+#include <vector>
+
 #include "feature/co_table.hpp"
 
 namespace prot {
@@ -30,7 +32,7 @@ int CoTable::cntTableSize(MatchEnvPtr2D &win_envs, int win, int pnt) {
 }
 
 // When pos_a in env_a and pos_b in env_b are from the same peak,
-// check if splitting the peak intensity can increase the peak similarity score. 
+// check if splitting the peak intensity can increase the peak similarity score.
 bool CoTable::checkCoexist(MatchEnvPtr env_a, MatchEnvPtr env_b, int pos_a,
                            int pos_b, double tolerance) {
   double inte_a = env_a->getTheoEnvPtr()->getIntensity(pos_a);
@@ -74,7 +76,7 @@ bool CoTable::checkCoexist(MatchEnvPtr env_a, MatchEnvPtr env_b,
   }
 }
 
-void CoTable::compTableEntry(MatchEnvPtrVec &env_list, MatchEnvPtr2D &win_envs, 
+void CoTable::compTableEntry(MatchEnvPtrVec &env_list, MatchEnvPtr2D &win_envs,
                              std::vector<bool> &rows, int id, int win,
                              double tolerance) {
   if (win < 0) {
@@ -89,10 +91,9 @@ void CoTable::compTableEntry(MatchEnvPtrVec &env_list, MatchEnvPtr2D &win_envs,
   }
 }
 
-// initialize coexist table 
-std::vector<std::vector<bool>> 
-CoTable::initCoexistTable(MatchEnvPtr2D &win_envs, double tolerance) {
-
+// initialize coexist table
+std::vector<std::vector<bool> >  CoTable::initCoexistTable(MatchEnvPtr2D &win_envs,
+                                                           double tolerance) {
   MatchEnvPtrVec env_list;
   for (size_t i = 0; i < win_envs.size(); i++) {
     for (size_t j = 0; j < win_envs[i].size(); j++) {
@@ -116,4 +117,5 @@ CoTable::initCoexistTable(MatchEnvPtr2D &win_envs, double tolerance) {
   return co_table;
 }
 
-}
+}  // namespace prot
+

@@ -16,10 +16,11 @@
 #include <algorithm>
 #include <cstddef>
 #include <limits>
+#include <vector>
 
 #include "base/logger.hpp"
-#include "feature/raw_ms_util.hpp" 
-#include "feature/match_env_util.hpp" 
+#include "feature/raw_ms_util.hpp"
+#include "feature/match_env_util.hpp"
 
 namespace prot {
 
@@ -99,9 +100,7 @@ PeakPtrVec  rmAnnoPeak(PeakPtrVec &ms, MatchEnvPtrVec &envs) {
   return new_list;
 }
 
-
-MatchEnvPtrVec addLowMassPeak(MatchEnvPtrVec &envs, PeakPtrVec &ms, 
-                              double tolerance) {
+MatchEnvPtrVec addLowMassPeak(MatchEnvPtrVec &envs, PeakPtrVec &ms, double tolerance) {
   std::vector<bool> is_uses(ms.size(), false);
   for (size_t i = 0; i < envs.size(); i++) {
     MatchEnvPtr env = envs[i];
@@ -120,15 +119,15 @@ MatchEnvPtrVec addLowMassPeak(MatchEnvPtrVec &envs, PeakPtrVec &ms,
     }
   }
 
-  MatchEnvPtrVec result; 
+  MatchEnvPtrVec result;
   result.insert(std::end(result), std::begin(low_mass_envs), std::end(low_mass_envs));
   result.insert(std::end(result), std::begin(envs), std::end(envs));
-  std::sort(result.begin(), result.end(), MatchEnv::cmpScoreDec); 
+  std::sort(result.begin(), result.end(), MatchEnv::cmpScoreDec);
   return result;
 }
 
 MatchEnvPtr getNewMatchEnv(PeakPtrVec &ms, int idx, double tolerance) {
-  std::vector<double> mzs; 
+  std::vector<double> mzs;
   std::vector<double> intensities;
   mzs.push_back(ms[idx]->getPosition());
   intensities.push_back(ms[idx]->getIntensity());
@@ -143,11 +142,11 @@ MatchEnvPtrVec addMultipleMass(MatchEnvPtrVec &envs, MatchEnvPtr2D &candidates,
                                double multi_min_mass, int multi_min_charge, double min_ratio) {
   MatchEnvPtrVec mass_envs;
   for (size_t i = 0; i < envs.size(); i++) {
-    // check if we can use another charge state 
+    // check if we can use another charge state
     int charge = envs[i]->getRealEnvPtr()->getCharge();
     int refer_peak = envs[i]->getRealEnvPtr()->getReferPeakIdx();
     MatchEnvPtrVec charge_envs(2, nullptr);
-    // we use non-overlapping envelopes here 
+    // we use non-overlapping envelopes here
     charge_envs[0] = candidates[refer_peak][charge-1];
     double min_score = charge_envs[0]->getScore() * min_ratio;
     if (charge >= multi_min_charge) {
@@ -156,13 +155,12 @@ MatchEnvPtrVec addMultipleMass(MatchEnvPtrVec &envs, MatchEnvPtr2D &candidates,
         score_minus_one = candidates[refer_peak][charge-2]->getScore();
       }
       double score_plus_one = 0;
-      if (charge < (int)candidates[0].size() && candidates[refer_peak][charge] != nullptr) {
+      if (charge < static_cast<int>(candidates[0].size()) && candidates[refer_peak][charge] != nullptr) {
         score_plus_one = candidates[refer_peak][charge]->getScore();
       }
       if (score_minus_one > score_plus_one && score_minus_one >= min_score) {
         charge_envs[1] = candidates[refer_peak][charge-2];
-      }
-      else if (score_plus_one >= min_score) {
+      } else if (score_plus_one >= min_score) {
         charge_envs[1] = candidates[refer_peak][charge];
       }
     }
@@ -178,14 +176,14 @@ MatchEnvPtrVec addMultipleMass(MatchEnvPtrVec &envs, MatchEnvPtr2D &candidates,
         /* check left shift */
         if (refer_idx > 0) {
           int p = peaks[refer_idx-1];
-          if (p >=0 && candidates[p][charge-1] != nullptr && 
+          if (p >=0 && candidates[p][charge-1] != nullptr &&
               candidates[p][charge-1]->getScore() >= min_score) {
             mass_envs.push_back(candidates[p][charge-1]);
           }
         }
-        if (refer_idx < (int)peaks.size() - 1) {
+        if (refer_idx < static_cast<int>(peaks.size()) - 1) {
           int p = peaks[refer_idx+1];
-          if (p >=0 && candidates[p][charge-1] != nullptr && 
+          if (p >=0 && candidates[p][charge-1] != nullptr &&
               candidates[p][charge-1]->getScore() >= min_score) {
             mass_envs.push_back(candidates[p][charge-1]);
           }
@@ -204,7 +202,8 @@ DeconvMsPtr getDeconvMsPtr(MsHeaderPtr header_ptr, MatchEnvPtrVec &envs) {
     double pos = real_env->getMonoMass();
     double inte = theo_env->compIntensitySum();
     int charge = theo_env->getCharge();
-    DeconvPeakPtr peak_ptr = std::make_shared<DeconvPeak>(i, pos, inte, charge); 
+    double score = envs[i]->getScore();
+    DeconvPeakPtr peak_ptr = std::make_shared<DeconvPeak>(i, pos, inte, charge, score);
     peak_list.push_back(peak_ptr);
   }
   DeconvMsPtr ms_ptr = std::make_shared<DeconvMs>(header_ptr, peak_list);

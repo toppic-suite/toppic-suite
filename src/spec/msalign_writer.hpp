@@ -27,9 +27,7 @@ namespace msalign_writer {
 
 void write(std::ofstream &file, DeconvMsPtr ms_ptr);
 
-//void write(std::ofstream &file, DeconvMsPtr ms_ptr, int mslevel);
-
-}  // namespace MsalignWriter
+}  // namespace msalign_writer
 
 }  // namespace prot
 #endif

@@ -16,8 +16,11 @@
 #ifndef PROT_SPEC_DECONV_PEAK_HPP_
 #define PROT_SPEC_DECONV_PEAK_HPP_
 
+
 #include <memory>
 #include <vector>
+#include <string>
+
 #include "spec/peak.hpp"
 
 namespace prot {
@@ -27,9 +30,19 @@ typedef std::shared_ptr<DeconvPeak> DeconvPeakPtr;
 
 class DeconvPeak : public Peak {
  public:
-  DeconvPeak (int id, double mono_mass, double intensity, int charge);
+  DeconvPeak(int id, double mono_mass, double intensity, int charge):
+      Peak(mono_mass, intensity),
+      id_(id),
+      charge_(charge),
+      score_(1.0) {}
 
-  DeconvPeak(xercesc::DOMElement* element);
+  DeconvPeak(int id, double mono_mass, double intensity, int charge, double score):
+      Peak(mono_mass, intensity),
+      id_(id),
+      charge_(charge),
+      score_(score) {}
+
+  explicit DeconvPeak(xercesc::DOMElement* element);
 
   int getCharge() {return charge_;}
 
@@ -43,9 +56,9 @@ class DeconvPeak : public Peak {
 
   void setId(int id) {id_ = id;}
 
-  void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+  void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
-  static bool cmpPosIncreasep(const DeconvPeakPtr &a, const DeconvPeakPtr &b){
+  static bool cmpPosIncreasep(const DeconvPeakPtr &a, const DeconvPeakPtr &b) {
     return a->getPosition() < b->getPosition();
   }
 
@@ -59,5 +72,5 @@ class DeconvPeak : public Peak {
 
 typedef std::vector<DeconvPeakPtr> DeconvPeakPtrVec;
 
-}
+}  // namespace prot
 #endif
