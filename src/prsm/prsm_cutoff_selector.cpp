@@ -27,7 +27,7 @@ void PrsmCutoffSelector::process(){
   ModPtrVec fix_mod_list;
   PrsmPtrVec prsms = PrsmReader::readAllPrsms(input_file_name, db_file_name_, fix_mod_list );
 
-  sort(prsms.begin(), prsms.end(), Prsm::cmpSpectrumIdIncPrecursorIdInc);
+  std::sort(prsms.begin(), prsms.end(), Prsm::cmpSpectrumIdIncPrecursorIdInc);
 
   bool evalue_cutoff = (cutoff_type_ == "EVALUE");
   bool fdr_cutoff = (cutoff_type_ == "FDR");
