@@ -154,7 +154,7 @@ std::vector<SuffixPosition *> SuffixTree::search(std::string target) {
     stack = childNodes;
   }
 
-  sort(startPosList.begin(), startPosList.end(), comparesp);
+  std::sort(startPosList.begin(), startPosList.end(), comparesp);
   return startPosList;
 }
 

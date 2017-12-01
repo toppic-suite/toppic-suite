@@ -30,7 +30,7 @@ void PrsmFormFilter::process() {
   ModPtrVec fix_mod_list;
   PrsmPtrVec prsms = PrsmReader::readAllPrsms(input_file_name, db_file_name_, fix_mod_list);
 
-  sort(prsms.begin(), prsms.end(), Prsm::cmpEValueInc);
+  std::sort(prsms.begin(), prsms.end(), Prsm::cmpEValueInc);
 
   PrsmPtrVec selected_prsms;
 
@@ -66,13 +66,13 @@ void PrsmFormFilter::process() {
   // output
   std::string output_file_name = base_name + "." + output_file_ext_;
   PrsmXmlWriter writer(output_file_name);
-  sort(selected_prsms.begin(), selected_prsms.end(), Prsm::cmpSpectrumIdIncPrecursorIdInc);
+  std::sort(selected_prsms.begin(), selected_prsms.end(), Prsm::cmpSpectrumIdIncPrecursorIdInc);
   writer.writeVector(selected_prsms);
   writer.close();
 
   output_file_name = base_name + "." + output_file_ext_2_;
   PrsmXmlWriter writer2(output_file_name);
-  sort(selected_forms.begin(), selected_forms.end(), Prsm::cmpSpectrumIdIncPrecursorIdInc);
+  std::sort(selected_forms.begin(), selected_forms.end(), Prsm::cmpSpectrumIdIncPrecursorIdInc);
   writer2.writeVector(selected_forms);
   writer2.close();
 }
