@@ -86,7 +86,7 @@ void CompPValueArray::compMultiExtremeValues(const PrmMsPtrVec &ms_six_ptr_vec,
       index = unexpect_shift_num;
     }
 
-    std::cout << std::endl << "prec_mass " << prec_mass << std::endl;
+    LOG_DEBUG("prec_mass " << prec_mass);
     double cand_num = test_num_ptr_->compCandNum(type_ptr, index, prec_mass, tolerance);
 
     // LOG_DEBUG("Shift number " << unexpect_shift_num << " type " << type_ptr->getName()

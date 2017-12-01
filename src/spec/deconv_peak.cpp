@@ -13,29 +13,23 @@
 //limitations under the License.
 
 
+#include <string>
+
 #include "base/string_util.hpp"
 #include "base/xml_dom_util.hpp"
 #include "spec/deconv_peak.hpp"
 
 namespace prot {
 
-DeconvPeak::DeconvPeak (int id, double mono_mass, 
-                        double intensity, int charge):
-    Peak (mono_mass, intensity),
-    id_(id),
-    charge_(charge),
-    score_(1.0) {
-    }
-
 DeconvPeak::DeconvPeak(xercesc::DOMElement* element):
-    Peak (xml_dom_util::getDoubleChildValue(element,"position",0), 
-          xml_dom_util::getDoubleChildValue(element,"intensity",0)) {
-      id_ = xml_dom_util::getIntChildValue(element,"id",0);
-      charge_ = xml_dom_util::getIntChildValue(element,"charge",0);
-      score_ = xml_dom_util::getDoubleChildValue(element,"score",0);
+    Peak(xml_dom_util::getDoubleChildValue(element, "position", 0),
+         xml_dom_util::getDoubleChildValue(element, "intensity", 0)) {
+      id_ = xml_dom_util::getIntChildValue(element, "id", 0);
+      charge_ = xml_dom_util::getIntChildValue(element, "charge", 0);
+      score_ = xml_dom_util::getDoubleChildValue(element, "score", 0);
     }
 
-void DeconvPeak::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
+void DeconvPeak::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   std::string element_name = DeconvPeak::getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
   std::string str = string_util::convertToString(getPosition());
@@ -51,5 +45,5 @@ void DeconvPeak::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
   parent->appendChild(element);
 }
 
-}
+}  // namespace prot
 

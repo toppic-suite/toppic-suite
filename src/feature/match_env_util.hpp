@@ -16,6 +16,8 @@
 #ifndef PROT_FEATURE_MATCH_ENV_UTIL_HPP_
 #define PROT_FEATURE_MATCH_ENV_UTIL_HPP_
 
+#include <vector>
+
 #include "spec/peak.hpp"
 #include "spec/ms_header.hpp"
 #include "spec/deconv_ms.hpp"
@@ -37,8 +39,7 @@ void assignIntensity(PeakPtrVec &ms, MatchEnvPtrVec &envs);
 
 PeakPtrVec rmAnnoPeak(PeakPtrVec &ms, MatchEnvPtrVec &envs);
 
-MatchEnvPtrVec addLowMassPeak(MatchEnvPtrVec &envs, std::vector<PeakPtr> &ms, 
-                              double tolerance);
+MatchEnvPtrVec addLowMassPeak(MatchEnvPtrVec &envs, std::vector<PeakPtr> &ms, double tolerance);
 
 MatchEnvPtr getNewMatchEnv(PeakPtrVec &ms, int idx, double tolerance);
 
@@ -47,8 +48,8 @@ MatchEnvPtrVec addMultipleMass(MatchEnvPtrVec &envs, MatchEnvPtr2D &candidates,
 
 DeconvMsPtr getDeconvMsPtr(MsHeaderPtr header_ptr, MatchEnvPtrVec &envs);
 
-}
+}  // namespace match_env_util
 
-}
+}  // namespace prot
 
 #endif
