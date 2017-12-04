@@ -46,7 +46,7 @@ void dbPreprocess(const std::string &ori_db_file_name,
 
 int countProteinNum(const std::string &fasta_file);
 
-}  // namespace FastaUtil
+}  // namespace fasta_util
 
 }  // namespace prot
 

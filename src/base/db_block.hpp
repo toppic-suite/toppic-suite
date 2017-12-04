@@ -28,9 +28,12 @@ typedef std::vector<DbBlockPtr> DbBlockPtrVec;
 
 class DbBlock {
  public:
-  DbBlock(int block_index, int seq_index);
+  DbBlock(int block_index, int seq_index):
+      block_index_(block_index),
+      seq_index_(seq_index) {}
 
   int getBlockIdx() {return block_index_;}
+
   int getSeqIdx() {return seq_index_;}
 
   static DbBlockPtrVec readDbBlockIndex(const std::string &index_file_name);

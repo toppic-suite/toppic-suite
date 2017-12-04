@@ -29,7 +29,8 @@ namespace prot {
 
 class FastaIndexReader {
  public:
-  FastaIndexReader(const std::string &file_name);
+  explicit FastaIndexReader(const std::string &file_name);
+  
   ~FastaIndexReader();
 
   FastaSeqPtr readFastaSeq(const std::string &name,
@@ -44,6 +45,6 @@ class FastaIndexReader {
 
 typedef std::shared_ptr<FastaIndexReader> FastaIndexReaderPtr;
 
-}  //namepace prot
+}  // namespace prot
 
 #endif

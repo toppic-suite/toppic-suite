@@ -24,12 +24,12 @@
 namespace prot {
 
 ExtremeValue::ExtremeValue(double one_prot_prob, double test_num,
-                           double adjust_factor) {
-  one_prot_prob_ = one_prot_prob;
-  test_num_ = test_num;
-  adjust_factor_ = adjust_factor;
-  init();
-}
+                           double adjust_factor):
+    one_prot_prob_(one_prot_prob),
+    test_num_(test_num),
+    adjust_factor_(adjust_factor) {
+      init();
+    }
 
 void ExtremeValue::setOneProtProb(double one_prot_prob) {
   one_prot_prob_ = one_prot_prob;

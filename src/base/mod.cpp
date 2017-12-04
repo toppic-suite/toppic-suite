@@ -13,6 +13,8 @@
 //limitations under the License.
 
 
+#include <string>
+
 #include "base/logger.hpp"
 #include "base/mod.hpp"
 #include "base/residue_base.hpp"
@@ -20,21 +22,16 @@
 
 namespace prot {
 
-Mod::Mod(ResiduePtr ori_residue_ptr, ResiduePtr mod_residue_ptr):
-    ori_residue_ptr_(ori_residue_ptr),
-    mod_residue_ptr_(mod_residue_ptr) {
-    }
-
-Mod::Mod(xercesc::DOMElement* element) { 
-  xercesc::DOMElement* ori_residue_element 
+Mod::Mod(xercesc::DOMElement* element) {
+  xercesc::DOMElement* ori_residue_element
       = xml_dom_util::getChildElement(element, "ori_residue", 0);
   ori_residue_ptr_ = ResidueBase::getResiduePtrFromXml(ori_residue_element);
-  xercesc::DOMElement* mod_residue_element 
+  xercesc::DOMElement* mod_residue_element
       = xml_dom_util::getChildElement(element, "mod_residue", 0);
   mod_residue_ptr_ = ResidueBase::getResiduePtrFromXml(mod_residue_element);
 }
 
-void Mod::appendToXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent){
+void Mod::appendToXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   std::string element_name = Mod::getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
   ori_residue_ptr_->appendXml(xml_doc, element, "ori_residue");
@@ -42,4 +39,4 @@ void Mod::appendToXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent){
   parent->appendChild(element);
 }
 
-}
+}  // namespace prot

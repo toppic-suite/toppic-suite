@@ -24,10 +24,10 @@
 namespace prot {
 
 class IonType {
- public: 
+ public:
   IonType(const std::string &name, bool n_term, double shift);
 
-  IonType(xercesc::DOMElement* element); 
+  explicit IonType(xercesc::DOMElement* element);
 
   std::string getName() {return name_;}
 
@@ -37,14 +37,14 @@ class IonType {
 
   double getBYShift() {return b_y_shift_;}
 
-  void appendNameToXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+  void appendNameToXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
   static std::string getXmlElementName() {return "ion_type";}
 
  private:
   // ion name
   std::string name_;
-  // A B C are n-terminal ions and X Y Z are non-n-terminal ions 
+  // A B C are n-terminal ions and X Y Z are non-n-terminal ions
   bool n_term_;
   /**
    * Shift stands for the shift of the ion compared to residue mass. For example, the
@@ -59,6 +59,6 @@ class IonType {
 typedef std::shared_ptr<IonType> IonTypePtr;
 typedef std::vector<IonTypePtr> IonTypePtrVec;
 
-}
+}  // namespace prot
 
 #endif

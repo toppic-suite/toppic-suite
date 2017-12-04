@@ -172,6 +172,6 @@ int getLastResPos(double c_term_shift, const std::vector<double> &prm_masses) {
   return best_pos - 1;
 }
 
-} // namespace base_algo
+}  // namespace base_algo
 
-} // namespace prot
+}  // namespace prot

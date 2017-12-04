@@ -21,14 +21,6 @@
 
 namespace prot {
 
-Activation::Activation(const std::string &name,
-                       IonTypePtr n_ion_type_ptr,
-                       IonTypePtr c_ion_type_ptr):
-    name_(name),
-    n_ion_type_ptr_(n_ion_type_ptr),
-    c_ion_type_ptr_(c_ion_type_ptr) {
-    }
-
 Activation::Activation(xercesc::DOMElement * element) {
   name_ = xml_dom_util::getChildValue(element, "name", 0);
   std::string ion_type_name = xml_dom_util::getChildValue(element, "n_ion_type", 0);

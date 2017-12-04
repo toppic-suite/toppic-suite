@@ -46,7 +46,7 @@ int getFirstResPos(double n_term_shift, const std::vector<double> &prm_masses);
 // on its c term shift
 int getLastResPos(double c_term_shift, const std::vector<double> &prm_masses);
 
-} // namespace base_algo
+}  // namespace base_algo
 
 }  // namespace prot
 

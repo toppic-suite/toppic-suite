@@ -24,11 +24,6 @@
 
 namespace prot {
 
-DbBlock::DbBlock(int block_index, int seq_index) {
-  block_index_ = block_index;
-  seq_index_ = seq_index;
-}
-
 DbBlockPtrVec DbBlock::readDbBlockIndex(const std::string &db_file_name) {
   DbBlockPtrVec db_block_ptr_vec;
   std::ifstream input;

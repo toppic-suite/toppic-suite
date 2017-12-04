@@ -24,17 +24,19 @@ namespace prot {
 
 class BreakPoint {
  public:
-  BreakPoint(double prm, double srm):prm_(prm), srm_(srm) {}
+  BreakPoint(double prm, double srm): prm_(prm), srm_(srm) {}
 
   double getPrm() {return prm_;}
 
   double getSrm() {return srm_;}
 
   double getNTermMass(IonTypePtr ion_type_ptr) {
-    return prm_ + ion_type_ptr->getShift();}
+    return prm_ + ion_type_ptr->getShift();
+  }
 
   double getCTermMass(IonTypePtr ion_type_ptr) {
-    return srm_ + ion_type_ptr->getShift();}
+    return srm_ + ion_type_ptr->getShift();
+  }
 
  private:
   double prm_;

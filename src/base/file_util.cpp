@@ -207,6 +207,6 @@ void cleanDir(const std::string &fa_path, const std::string & sp_path) {
   delFile(sp_base + ".FORM_FILTER_RESULT");
 }
 
-} // namespace file_util
+}  // namespace file_util
 
 }  // namespace prot

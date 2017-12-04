@@ -19,6 +19,7 @@
 #include <vector>
 #include <algorithm>
 #include <numeric>
+#include <string>
 
 #include "base/ptm.hpp"
 #include "base/ptm_base.hpp"
@@ -28,12 +29,12 @@ namespace prot {
 
 class LocalAnno {
  public:
-  LocalAnno(xercesc::DOMElement* element);
+  explicit LocalAnno(xercesc::DOMElement* element);
 
-  LocalAnno(int left_pos, int right_pos, double conf, 
+  LocalAnno(int left_pos, int right_pos, double conf,
             std::vector<double> scr_vec, double raw_scr, PtmPtr p):
-      left_pos_(left_pos), right_pos_(right_pos), 
-      conf_(conf), scr_vec_(scr_vec), raw_scr_(raw_scr), ptm_ptr_(p){}
+      left_pos_(left_pos), right_pos_(right_pos),
+      conf_(conf), scr_vec_(scr_vec), raw_scr_(raw_scr), ptm_ptr_(p) {}
 
   int getLeftBpPos() {return left_pos_;}
 
@@ -47,9 +48,9 @@ class LocalAnno {
 
   PtmPtr getPtmPtr() {return ptm_ptr_;}
 
-  double getRawScr() {return raw_scr_;};
+  double getRawScr() {return raw_scr_;}
 
-  void getRawScr(double s) {raw_scr_ = s;};
+  void getRawScr(double s) {raw_scr_ = s;}
 
   double getMassShift() {return mass_shift_;}
 
@@ -57,7 +58,7 @@ class LocalAnno {
 
   static std::string getXmlElementName() {return "localization_annotation";}
 
-  void appendToXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+  void appendToXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
  private:
   // left and right position filtered by thredshould
@@ -77,6 +78,6 @@ class LocalAnno {
 typedef std::shared_ptr<LocalAnno> LocalAnnoPtr;
 typedef std::vector<LocalAnnoPtr> LocalAnnoPtrVec;
 
-} // namespace prot
+}  // namespace prot
 
 #endif
