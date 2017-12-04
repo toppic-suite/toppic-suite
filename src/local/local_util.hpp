@@ -20,6 +20,7 @@
 #include "base/acid_base.hpp"
 #include "base/change.hpp"
 #include "prsm/prsm.hpp"
+#include "prsm/peak_ion_pair_util.hpp"
 #include "local_mng.hpp"
 
 namespace prot {
@@ -64,8 +65,8 @@ class LocalUtil {
   static void compSplitPoint(ProteoformPtr & proteoform, int num_match, const ExtendMsPtrVec & extend_ms_ptr_vec,
                              double prec_mass);
 
-  static int compNumPeakIonPairs(const ProteoformPtr &proteoform_ptr, const ExtendMsPtrVec &ms_ptr_vec){
-    return PeakIonPairFactory::genePeakIonPairs(proteoform_ptr, ms_ptr_vec, mng_ptr_->min_mass_).size();
+  static int compNumPeakIonPairs(const ProteoformPtr &proteoform_ptr, const ExtendMsPtrVec &ms_ptr_vec) {
+    return peak_ion_pair_util::genePeakIonPairs(proteoform_ptr, ms_ptr_vec, mng_ptr_->min_mass_).size();
   }
 
  private:

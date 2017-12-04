@@ -14,13 +14,13 @@
 
 #include <algorithm>
 
-#include "boost/algorithm/string.hpp"
+#include <boost/algorithm/string.hpp>
 
-#include "prsm/peak_ion_pair_factory.hpp"
 #include "base/acid_base.hpp"
 #include "base/activation_base.hpp"
 #include "base/mod_util.hpp"
 #include "base/residue_util.hpp"
+#include "prsm/peak_ion_pair_util.hpp"
 #include "spec/theo_peak_factory.hpp"
 #include "local_util.hpp"
 
@@ -99,7 +99,7 @@ void LocalUtil::compSupPeakNum(ProteoformPtr proteoform, const ExtendMsPtrVec & 
                                ChangePtr change, double min_mass, int & left, int & right) {
   left = right = 0;
   PeakIonPairPtrVec pair_ptrs = 
-      PeakIonPairFactory::genePeakIonPairs(proteoform, extend_ms_ptr_vec, mng_ptr_->min_mass_);
+      peak_ion_pair_util::genePeakIonPairs(proteoform, extend_ms_ptr_vec, mng_ptr_->min_mass_);
 
   for (size_t i = 0; i < pair_ptrs.size(); i++) {
     std::string ion_name = 

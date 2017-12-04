@@ -19,7 +19,6 @@
 #include "base/residue_util.hpp"
 #include "base/xml_dom_util.hpp"
 #include "spec/peak.hpp"
-#include "prsm/peak_ion_pair_factory.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
 #include "prsmview/anno_residue.hpp"
 #include "prsmview/anno_prsm.hpp"
@@ -34,8 +33,7 @@ void addPrsmHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement* element,
   if(prsm_ptr->getExtremeValuePtr().get()!=nullptr){
     str=string_util::convertToString(prsm_ptr->getExtremeValuePtr()->getPValue(), mng_ptr->decimal_point_num_);
     xml_doc->addElement(element, "p_value", str.c_str());
-  }
-  else{
+  } else {
     xml_doc->addElement(element, "p_value", "N/A");
   }
   if(prsm_ptr->getExtremeValuePtr().get()!=nullptr){
@@ -100,9 +98,10 @@ void addMsPeaks(XmlDOMDocument *xml_doc, xercesc::DOMElement* ms_element,
   ms_element->appendChild(peaks);
   for (size_t s = 0; s < deconv_ms_ptr_vec.size(); s++) {
     //get ion_pair
-    PeakIonPairPtrVec pair_ptrs = PeakIonPairFactory::genePeakIonPairs(prsm_ptr->getProteoformPtr(), 
-                                                                       refine_ms_ptr_vec[s],
-                                                                       mng_ptr->min_mass_);
+    PeakIonPairPtrVec pair_ptrs
+        = peak_ion_pair_util::genePeakIonPairs(prsm_ptr->getProteoformPtr(), 
+                                               refine_ms_ptr_vec[s],
+                                               mng_ptr->min_mass_);
     //LOG_DEBUG("pair completed");
     for(size_t i=0;i< deconv_ms_ptr_vec[s]->size();i++){
       xercesc::DOMElement* peak_element = xml_doc->createElement("peak");

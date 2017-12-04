@@ -26,7 +26,6 @@
 #include "spec/msalign_util.hpp"
 #include "spec/extend_ms_factory.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
-#include "prsm/peak_ion_pair_factory.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_coverage.hpp"
 
@@ -317,8 +316,9 @@ void PrsmCoverage::compTwoCoverage(std::ofstream &file, PrsmPtr prsm_ptr,
 void PrsmCoverage::processOnePrsm(std::ofstream &file, PrsmPtr prsm_ptr, 
                                   PrsmParaPtr prsm_para_ptr) {
   double min_mass = prsm_para_ptr_->getSpParaPtr()->getMinMass();
-  PeakIonPairPtrVec pair_ptrs =  PeakIonPairFactory::genePeakIonPairs (prsm_ptr->getProteoformPtr(), 
-                                                                       prsm_ptr->getRefineMsPtrVec(), min_mass);
+  PeakIonPairPtrVec pair_ptrs = peak_ion_pair_util::genePeakIonPairs(prsm_ptr->getProteoformPtr(), 
+                                                                     prsm_ptr->getRefineMsPtrVec(),
+                                                                     min_mass);
   compOneCoverage(file, prsm_ptr, pair_ptrs, prsm_para_ptr);
 }
 
@@ -327,14 +327,16 @@ void PrsmCoverage::processTwoPrsms(std::ofstream &file, PrsmPtr prsm_ptr_1, Prsm
   double min_mass = prsm_para_ptr_->getSpParaPtr()->getMinMass();
   PeakIonPairPtrVec pair_ptrs_11;
   if (prsm_ptr_1 != nullptr) {
-    pair_ptrs_11 =  PeakIonPairFactory::genePeakIonPairs (prsm_ptr_1->getProteoformPtr(), 
-                                                          prsm_ptr_1->getRefineMsPtrVec(), min_mass);
+    pair_ptrs_11 = peak_ion_pair_util::genePeakIonPairs(prsm_ptr_1->getProteoformPtr(), 
+                                                        prsm_ptr_1->getRefineMsPtrVec(), min_mass);
   }
+
   PeakIonPairPtrVec pair_ptrs_12;
   if (prsm_ptr_1 != nullptr && prsm_ptr_2 != nullptr) {
-    pair_ptrs_12 =  PeakIonPairFactory::genePeakIonPairs (prsm_ptr_1->getProteoformPtr(), 
-                                                          prsm_ptr_2->getRefineMsPtrVec(), min_mass);
+    pair_ptrs_12 = peak_ion_pair_util::genePeakIonPairs(prsm_ptr_1->getProteoformPtr(), 
+                                                        prsm_ptr_2->getRefineMsPtrVec(), min_mass);
   }
+
   PeakIonPairPtrVec pair_ptrs_1;
   pair_ptrs_1.insert(pair_ptrs_1.begin(), pair_ptrs_11.begin(), pair_ptrs_11.end());
   pair_ptrs_1.insert(pair_ptrs_1.begin(), pair_ptrs_12.begin(), pair_ptrs_12.end());
@@ -344,14 +346,16 @@ void PrsmCoverage::processTwoPrsms(std::ofstream &file, PrsmPtr prsm_ptr_1, Prsm
 
   PeakIonPairPtrVec pair_ptrs_21;
   if (prsm_ptr_1 != nullptr && prsm_ptr_2 != nullptr) {
-    pair_ptrs_21 =  PeakIonPairFactory::genePeakIonPairs (prsm_ptr_2->getProteoformPtr(), 
-                                                          prsm_ptr_1->getRefineMsPtrVec(), min_mass);
+    pair_ptrs_21 = peak_ion_pair_util::genePeakIonPairs(prsm_ptr_2->getProteoformPtr(), 
+                                                        prsm_ptr_1->getRefineMsPtrVec(), min_mass);
   }
+
   PeakIonPairPtrVec pair_ptrs_22;
   if (prsm_ptr_2 != nullptr) {
-    pair_ptrs_22 =  PeakIonPairFactory::genePeakIonPairs (prsm_ptr_2->getProteoformPtr(), 
-                                                          prsm_ptr_2->getRefineMsPtrVec(), min_mass);
+    pair_ptrs_22 = peak_ion_pair_util::genePeakIonPairs(prsm_ptr_2->getProteoformPtr(), 
+                                                        prsm_ptr_2->getRefineMsPtrVec(), min_mass);
   }
+
   PeakIonPairPtrVec pair_ptrs_2;
   pair_ptrs_2.insert(pair_ptrs_2.begin(), pair_ptrs_21.begin(), pair_ptrs_21.end());
   pair_ptrs_2.insert(pair_ptrs_2.begin(), pair_ptrs_22.begin(), pair_ptrs_22.end());

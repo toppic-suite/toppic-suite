@@ -26,7 +26,7 @@
 #include "spec/msalign_reader.hpp"
 #include "spec/spectrum_set.hpp"
 #include "prsm/peak_ion_pair.hpp"
-#include "prsm/peak_ion_pair_factory.hpp"
+#include "prsm/peak_ion_pair_util.hpp"
 #include "prsm/prsm.hpp"
 
 namespace prot {
@@ -77,36 +77,10 @@ void Prsm::init(SpParaPtr sp_para_ptr) {
   initScores(sp_para_ptr);
 }
 
-inline double compMatchFragNum(const PeakIonPairPtrVec &pairs) {
-  double match_fragment_num = 0;
-  TheoPeakPtr prev_ion(nullptr);;
-  for (size_t i = 0; i < pairs.size(); i++) {
-    if (pairs[i]->getTheoPeakPtr() != prev_ion) {
-      prev_ion = pairs[i]->getTheoPeakPtr();
-      match_fragment_num += pairs[i]->getRealPeakPtr()->getScore();
-    }
-  }
-  return match_fragment_num;
-}
-
-inline double compMatchPeakNum(PeakIonPairPtrVec &pairs) {
-  double match_peak_num = 0;
-  std::sort(pairs.begin(), pairs.end(), PeakIonPair::cmpRealPeakPosInc);
-  DeconvPeakPtr prev_deconv_peak(nullptr);
-  //  LOG_DEBUG("total peak number " << pairs.size());
-  for (size_t i = 0; i < pairs.size(); i++) {
-    if (pairs[i]->getRealPeakPtr()->getBasePeakPtr() != prev_deconv_peak) {
-      prev_deconv_peak = pairs[i]->getRealPeakPtr()->getBasePeakPtr();
-      match_peak_num += pairs[i]->getRealPeakPtr()->getScore();
-    }
-  }
-  return match_peak_num;
-}
-
 void Prsm::initMatchNum(double min_mass) {
   PeakIonPairPtrVec pairs =
-      PeakIonPairFactory::genePeakIonPairs(proteoform_ptr_, refine_ms_three_vec_,
-                                           min_mass);
+      peak_ion_pair_util::genePeakIonPairs(proteoform_ptr_, refine_ms_three_vec_, min_mass);
+
   match_peak_num_ = 0;
   match_fragment_num_ = 0;
   TheoPeakPtr prev_ion(nullptr);
@@ -132,10 +106,10 @@ void Prsm::initScores(SpParaPtr sp_para_ptr) {
   for (size_t i = 0; i < refine_ms_three_vec_.size(); i++) {
     // refined one
     PeakIonPairPtrVec pairs =
-        PeakIonPairFactory::genePeakIonPairs(proteoform_ptr_, refine_ms_three_vec_[i],
+        peak_ion_pair_util::genePeakIonPairs(proteoform_ptr_, refine_ms_three_vec_[i],
                                              sp_para_ptr->getMinMass());
-    match_fragment_num_ += compMatchFragNum(pairs);
-    match_peak_num_ += compMatchPeakNum(pairs);
+    match_fragment_num_ += peak_ion_pair_util::compMatchFragNum(pairs);
+    match_peak_num_ += peak_ion_pair_util::compMatchPeakNum(pairs);
   }
 }
 
