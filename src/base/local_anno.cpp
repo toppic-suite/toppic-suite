@@ -13,6 +13,9 @@
 //limitations under the License.
 
 
+#include <string>
+#include <vector>
+
 #include "base/string_util.hpp"
 #include "base/xml_dom_util.hpp"
 #include "base/ptm_base.hpp"
@@ -32,13 +35,13 @@ LocalAnno::LocalAnno(xercesc::DOMElement* element) {
   if (ptm_count == 0) {
     ptm_ptr_ = nullptr;
   } else {
-    xercesc::DOMElement* ptm_element 
+    xercesc::DOMElement* ptm_element
         = xml_dom_util::getChildElement(element, ptm_element_name.c_str(), 0);
-    ptm_ptr_ = PtmBase::getPtmPtrFromXml(ptm_element);        
+    ptm_ptr_ = PtmBase::getPtmPtrFromXml(ptm_element);
   }
 }
 
-void LocalAnno::appendToXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent) {
+void LocalAnno::appendToXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   std::string element_name = getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
   std::string str = string_util::convertToString(conf_);
@@ -57,4 +60,4 @@ void LocalAnno::appendToXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent)
   parent->appendChild(element);
 }
 
-}
+}  // namespace prot

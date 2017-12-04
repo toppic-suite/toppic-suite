@@ -23,9 +23,6 @@
 namespace prot {
 
 class ActivationBase {
- private:
-  static ActivationPtrVec activation_ptr_vec_;
-
  public:
   static void initBase(const std::string &file_name);
 
@@ -34,6 +31,9 @@ class ActivationBase {
   static ActivationPtr getActivationPtrByName(const std::string &name);
 
   static ActivationPtr getActivationPtrFromXml(xercesc::DOMElement * element);
+
+ private:
+  static ActivationPtrVec activation_ptr_vec_;
 };
 
 }  // namespace prot

@@ -19,18 +19,18 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <utility>
 
 #include "base/residue.hpp"
 #include "base/xml_dom_document.hpp"
 
 namespace prot {
 
-
 class FastaSeq {
  public:
   FastaSeq(const std::string &name_line, const std::string &ori_seq, int sub_seq_start = 0);
 
-  FastaSeq(const std::string &name, const std::string &desc, 
+  FastaSeq(const std::string &name, const std::string &desc,
            const std::string &ori_seq, int sub_seq_start = 0);
 
   std::string getName() {return name_;}
@@ -46,11 +46,10 @@ class FastaSeq {
   int getSubSeqStart() {return sub_seq_start_;}
 
   void setSubSeqStart(int m) {sub_seq_start_ = m;}
-  //int getLen() {return seq_.length();}
 
   static std::string getXmlElementName() {return "fasta_seq";}
 
-  void appendNameDescToXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+  void appendNameDescToXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
   static std::string getNameFromXml(xercesc::DOMElement* element);
 
@@ -58,7 +57,7 @@ class FastaSeq {
 
   static int getSubSeqStartFromXml(xercesc::DOMElement* element);
 
-  static std::string getString(const std::pair<std::string,std::string> &str_pair);
+  static std::string getString(const std::pair<std::string, std::string> &str_pair);
 
   static std::string getString(const StringPairVec &str_pair_vec);
 
@@ -72,10 +71,10 @@ class FastaSeq {
   int sub_seq_start_ = 0;
 
   void compAcidPtmPairVec();
-}; 
+};
 
 typedef std::shared_ptr<FastaSeq> FastaSeqPtr;
 
-}
+}  // namespace prot
 
 #endif

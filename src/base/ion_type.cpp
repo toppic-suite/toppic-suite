@@ -13,6 +13,8 @@
 //limitations under the License.
 
 
+#include <string>
+
 #include "base/mass_constant.hpp"
 #include "base/ion_type.hpp"
 #include "base/string_util.hpp"
@@ -21,34 +23,32 @@
 
 namespace prot {
 
-IonType::IonType(const std::string &name, bool n_term, double shift): 
+IonType::IonType(const std::string &name, bool n_term, double shift):
     name_(name),
     n_term_(n_term),
     shift_(shift) {
       if (n_term_) {
         b_y_shift_ = shift_;
-      }
-      else {
+      } else {
         b_y_shift_ = shift_ - mass_constant::getYIonShift();
       }
     }
 
-IonType::IonType(xercesc::DOMElement* element) { 
+IonType::IonType(xercesc::DOMElement* element) {
   name_ = xml_dom_util::getChildValue(element, "name", 0);
   n_term_ = xml_dom_util::getBoolChildValue(element, "n_term", 0);
   shift_ = xml_dom_util::getDoubleChildValue(element, "shift", 0);
   if (n_term_) {
     b_y_shift_ = shift_;
-  }
-  else {
+  } else {
     b_y_shift_ = shift_ - mass_constant::getYIonShift();
   }
 }
 
-void IonType::appendNameToXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
+void IonType::appendNameToXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   xercesc::DOMElement* element = xml_doc->createElement("ion_type");
   xml_doc->addElement(element, "name", name_.c_str());
   parent->appendChild(element);
 }
 
-}
+}  // namespace prot

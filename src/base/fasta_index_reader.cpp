@@ -13,6 +13,9 @@
 //limitations under the License.
 
 
+#include <string>
+#include <vector>
+
 #include "base/logger.hpp"
 #include "base/fasta_index_reader.hpp"
 
@@ -26,23 +29,25 @@ FastaIndexReader::~FastaIndexReader() {
   fai_destroy(fai_);
 }
 
-FastaSeqPtr FastaIndexReader::readFastaSeq(const std::string &name, 
+FastaSeqPtr FastaIndexReader::readFastaSeq(const std::string &name,
                                            const std::string &desc) {
   int seq_len;
   char *seq = fai_fetch(fai_, name.c_str(), &seq_len);
-  if ( seq_len < 0 ) {
+  if (seq_len < 0) {
     LOG_ERROR("Failed to fetch sequence " << name);
   }
   std::string ori_seq(seq);
+
   free(seq);
-  return  std::make_shared<FastaSeq>(name, desc, ori_seq);
+
+  return std::make_shared<FastaSeq>(name, desc, ori_seq);
 }
 
-std::vector<FastaSeqPtr> FastaIndexReader::readFastaSeqVec(const std::string & name, 
+std::vector<FastaSeqPtr> FastaIndexReader::readFastaSeqVec(const std::string & name,
                                                            const std::string & desc) {
   int seq_len;
   char * seq = fai_fetch(fai_, name.c_str(), &seq_len);
-  if ( seq_len < 0 ) {
+  if (seq_len < 0) {
     LOG_ERROR("Failed to fetch sequence " << name);
   }
 
@@ -54,7 +59,7 @@ std::vector<FastaSeqPtr> FastaIndexReader::readFastaSeqVec(const std::string & n
   if (seq_len < N) {
     fasta_seq_vec.push_back(std::make_shared<FastaSeq>(name, desc, ori_seq));
   } else {
-    int k = seq_len / N; 
+    int k = seq_len / N;
     for (int i = 0; i <= k; i++) {
       std::string sub_seq;
       if (N * (i + 1) > seq_len) {
@@ -75,4 +80,4 @@ std::vector<FastaSeqPtr> FastaIndexReader::readFastaSeqVec(const std::string & n
   return fasta_seq_vec;
 }
 
-}
+}  // namespace prot

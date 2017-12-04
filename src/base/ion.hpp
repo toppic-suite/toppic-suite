@@ -17,6 +17,7 @@
 #define PROT_BASE_ION_HPP_
 
 #include <string>
+#include <vector>
 
 #include "base/ion_type.hpp"
 #include "base/neutral_loss.hpp"
@@ -25,17 +26,24 @@ namespace prot {
 
 class Ion {
  public:
-  Ion(int charge, int pos, int display_pos, 
-      IonTypePtr ion_type_ptr, 
-      NeutralLossPtr neutral_loss_ptr);
+  Ion(int charge, int pos, int display_pos,
+      IonTypePtr ion_type_ptr,
+      NeutralLossPtr neutral_loss_ptr):
+      charge_(charge),
+      pos_(pos),
+      display_pos_(display_pos),
+      ion_type_ptr_(ion_type_ptr),
+      neutral_loss_ptr_(neutral_loss_ptr) {}
 
   int getCharge() {return charge_;}
+
   int getPos() {return pos_;}
+
   int getDisplayPos() {return display_pos_;}
 
   IonTypePtr getIonTypePtr() {return ion_type_ptr_;}
 
-  std::string getDisplayName(){
+  std::string getDisplayName() {
     return ion_type_ptr_->getName() + std::to_string(display_pos_);
   }
 

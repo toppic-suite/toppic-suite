@@ -74,10 +74,15 @@ class Change {
  protected:
   // left and right positions are based on break point positions
   int left_bp_pos_;
+
   int right_bp_pos_;
+
   ChangeTypePtr change_type_ptr_;
+
   double mass_shift_;
+
   ModPtr mod_ptr_;
+
   LocalAnnoPtr local_anno_ptr_;
 };
 
