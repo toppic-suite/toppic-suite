@@ -16,7 +16,7 @@
 #include "base/logger.hpp"
 #include "base/neutral_loss_base.hpp"
 #include "spec/theo_peak_factory.hpp"
-#include "prsm/peak_ion_pair_factory.hpp"
+#include "prsm/peak_ion_pair_util.hpp"
 #include "oneptmsearch/diagonal.hpp"
 
 namespace prot {
@@ -100,7 +100,7 @@ double refinePrecursorAndHeaderShift(ProteoformPtr proteo_ptr,
       int bgn = header_ptrs[i]->getMatchFirstBpPos()-first_res_pos;
       int end = header_ptrs[i]->getMatchLastBpPos()-first_res_pos;
 
-      PeakIonPairPtrVec pair_ptrs = PeakIonPairFactory::findPairs(ms_three_ptr_vec[j], c_term_peak_ptrs, bgn, end, tole);
+      PeakIonPairPtrVec pair_ptrs = peak_ion_pair_util::findPairs(ms_three_ptr_vec[j], c_term_peak_ptrs, bgn, end, tole);
       matched_pair_ptrs.insert(matched_pair_ptrs.end(), pair_ptrs.begin(), pair_ptrs.end());
       /*
       if (header_ptrs.size() == 2) {
@@ -127,7 +127,7 @@ double refinePrecursorAndHeaderShift(ProteoformPtr proteo_ptr,
     int bgn = header_ptrs[header_ptrs.size()-1]->getMatchFirstBpPos()-first_res_pos;
     int end = header_ptrs[header_ptrs.size()-1]->getMatchLastBpPos()-first_res_pos;
 
-    PeakIonPairPtrVec pair_ptrs = PeakIonPairFactory::findPairs(ms_three_ptr_vec[j], n_term_peak_ptrs, bgn, end, tole);
+    PeakIonPairPtrVec pair_ptrs = peak_ion_pair_util::findPairs(ms_three_ptr_vec[j], n_term_peak_ptrs, bgn, end, tole);
     matched_pair_ptrs.insert(matched_pair_ptrs.end(), pair_ptrs.begin(), pair_ptrs.end());
     /*
     if (header_ptrs.size() == 2) {
@@ -155,17 +155,17 @@ double refinePrecursorAndHeaderShift(ProteoformPtr proteo_ptr,
   int best_pos = one_side_step_num;
   for (size_t i = 0; i < counts.size(); i++) {
     int next_sum = sum + counts[i];
-    //LOG_DEBUG("pos " << i << " count " << counts[i]);
+    // LOG_DEBUG("pos " << i << " count " << counts[i]);
     if (sum <= median && median <= next_sum) {
       best_pos = i;
-      //LOG_DEBUG("best pos " << best_pos << " count " << counts[best_pos]);
+      // LOG_DEBUG("best pos " << best_pos << " count " << counts[best_pos]);
       break;
     }
     sum = next_sum;
   }
 
   double best_delta = - (best_pos - one_side_step_num) * refine_prec_step_width;
-  //LOG_DEBUG("best delta " << best_delta);
+  // LOG_DEBUG("best delta " << best_delta);
 
   for (size_t i = 0; i < header_ptrs.size() - 1; i++) {
     header_ptrs[i]->changeOnlyCTermShift(best_delta);
@@ -176,53 +176,52 @@ double refinePrecursorAndHeaderShift(ProteoformPtr proteo_ptr,
   return prec_mass + best_delta;
 }
 
-DiagonalHeaderPtrVec refineHeadersBgnEnd(
-        ProteoformPtr proteo_ptr,
-        const ExtendMsPtrVec &ms_three_ptr_vec,
-        const DiagonalHeaderPtrVec& header_ptrs,
-        double min_mass){
-    DiagonalHeaderPtrVec result_list;
-    int first_res_pos = header_ptrs[0]->getTruncFirstResPos();
-    int last_res_pos = header_ptrs[header_ptrs.size()-1]->getTruncLastResPos();
-    for(size_t i=0; i<header_ptrs.size();i++){
-        int bgn = header_ptrs[i]->getMatchFirstBpPos()-first_res_pos;
-        int end = header_ptrs[i]->getMatchLastBpPos()-first_res_pos;
-        PeakIonPairPtrVec pair_ptrs; 
-        for (size_t j = 0; j < ms_three_ptr_vec.size(); j++) {
-            TheoPeakPtrVec theo_peak_ptrs = getDiagonalTheoPeak(
-                    proteo_ptr,
-                    ms_three_ptr_vec[j]->getMsHeaderPtr()->getActivationPtr(),
-                    header_ptrs,
-                    i, min_mass);
-            PeakIonPairPtrVec cur_pair_ptrs = 
-                PeakIonPairFactory::findPairs(ms_three_ptr_vec[j], theo_peak_ptrs, bgn, end, 0);
-            pair_ptrs.insert(pair_ptrs.end(), cur_pair_ptrs.begin(), cur_pair_ptrs.end());
-        }
-        if(pair_ptrs.size()<1){
-            int pair_size = pair_ptrs.size();
-            LOG_TRACE("Empty Segment is found "+string_util::convertToString(pair_size));
-            if (i == 0 ) {
-                int new_bgn = first_res_pos;
-                int new_end = first_res_pos;
-                header_ptrs[i]->setMatchFirstBpPos(new_bgn);
-                header_ptrs[i]->setMatchLastBpPos(new_end);
-                result_list.push_back(header_ptrs[i]);
-            } else if (i == header_ptrs.size() - 1) {
-                int new_bgn = last_res_pos + 1;
-                int new_end = last_res_pos + 1;
-                header_ptrs[i]->setMatchFirstBpPos(new_bgn);
-                header_ptrs[i]->setMatchLastBpPos(new_end);
-                result_list.push_back(header_ptrs[i]);
-            }
-        } else{
-            int new_bgn = first_res_pos + getNewBgn(pair_ptrs);
-            int new_end = first_res_pos + getNewEnd(pair_ptrs);
-            header_ptrs[i]->setMatchFirstBpPos(new_bgn);
-            header_ptrs[i]->setMatchLastBpPos(new_end);
-            result_list.push_back(header_ptrs[i]);
-        }
+DiagonalHeaderPtrVec refineHeadersBgnEnd(ProteoformPtr proteo_ptr,
+                                         const ExtendMsPtrVec &ms_three_ptr_vec,
+                                         const DiagonalHeaderPtrVec& header_ptrs,
+                                         double min_mass) {
+  DiagonalHeaderPtrVec result_list;
+  int first_res_pos = header_ptrs[0]->getTruncFirstResPos();
+  int last_res_pos = header_ptrs[header_ptrs.size()-1]->getTruncLastResPos();
+  for(size_t i=0; i<header_ptrs.size();i++){
+    int bgn = header_ptrs[i]->getMatchFirstBpPos()-first_res_pos;
+    int end = header_ptrs[i]->getMatchLastBpPos()-first_res_pos;
+    PeakIonPairPtrVec pair_ptrs; 
+    for (size_t j = 0; j < ms_three_ptr_vec.size(); j++) {
+      TheoPeakPtrVec theo_peak_ptrs = getDiagonalTheoPeak(
+          proteo_ptr,
+          ms_three_ptr_vec[j]->getMsHeaderPtr()->getActivationPtr(),
+          header_ptrs,
+          i, min_mass);
+      PeakIonPairPtrVec cur_pair_ptrs = 
+          peak_ion_pair_util::findPairs(ms_three_ptr_vec[j], theo_peak_ptrs, bgn, end, 0);
+      pair_ptrs.insert(pair_ptrs.end(), cur_pair_ptrs.begin(), cur_pair_ptrs.end());
     }
-    return result_list;
+    if (pair_ptrs.size() < 1) {
+      int pair_size = pair_ptrs.size();
+      LOG_TRACE("Empty Segment is found "+string_util::convertToString(pair_size));
+      if (i == 0) {
+        int new_bgn = first_res_pos;
+        int new_end = first_res_pos;
+        header_ptrs[i]->setMatchFirstBpPos(new_bgn);
+        header_ptrs[i]->setMatchLastBpPos(new_end);
+        result_list.push_back(header_ptrs[i]);
+      } else if (i == header_ptrs.size() - 1) {
+        int new_bgn = last_res_pos + 1;
+        int new_end = last_res_pos + 1;
+        header_ptrs[i]->setMatchFirstBpPos(new_bgn);
+        header_ptrs[i]->setMatchLastBpPos(new_end);
+        result_list.push_back(header_ptrs[i]);
+      }
+    } else{
+      int new_bgn = first_res_pos + getNewBgn(pair_ptrs);
+      int new_end = first_res_pos + getNewEnd(pair_ptrs);
+      header_ptrs[i]->setMatchFirstBpPos(new_bgn);
+      header_ptrs[i]->setMatchLastBpPos(new_end);
+      result_list.push_back(header_ptrs[i]);
+    }
+  }
+  return result_list;
 }
 
 DiagonalHeaderPtrVec2D refineHeadersBgnEnd(ProteoformPtr proteo_ptr,
@@ -250,7 +249,7 @@ DiagonalHeaderPtrVec2D refineHeadersBgnEnd(ProteoformPtr proteo_ptr,
             header_ptrs_1d,
             index, min_mass);
         PeakIonPairPtrVec cur_pair_ptrs 
-            = PeakIonPairFactory::findPairs(ms_three_ptr_vec[k], theo_peak_ptrs, bgn, end, 0);
+            = peak_ion_pair_util::findPairs(ms_three_ptr_vec[k], theo_peak_ptrs, bgn, end, 0);
         pair_ptrs.insert(pair_ptrs.end(), cur_pair_ptrs.begin(), cur_pair_ptrs.end());
       }
       index++;

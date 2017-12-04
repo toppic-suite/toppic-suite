@@ -27,7 +27,6 @@
 #include "base/fasta_reader.hpp"
 #include "base/proteoform_factory.hpp"
 #include "spec/peak.hpp"
-#include "prsm/peak_ion_pair_factory.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
 #include "prsm/prsm_util.hpp"
 #include "prsmview/anno_residue.hpp"

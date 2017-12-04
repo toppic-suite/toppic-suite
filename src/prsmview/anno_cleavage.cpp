@@ -13,7 +13,7 @@
 //limitations under the License.
 
 
-#include "prsm/peak_ion_pair_factory.hpp"
+#include "prsm/peak_ion_pair_util.hpp"
 #include "prsmview/anno_cleavage.hpp"
 
 namespace prot {
@@ -62,7 +62,7 @@ AnnoCleavagePtrVec getProteoCleavage(PrsmPtr prsm_ptr, double min_mass){
 
   for (size_t m = 0; m < refine_ms_ptr_vec.size(); m++) {
     PeakIonPairPtrVec pairs 
-        = PeakIonPairFactory::genePeakIonPairs(proteo_ptr, refine_ms_ptr_vec[m], min_mass);
+        = peak_ion_pair_util::genePeakIonPairs(proteo_ptr, refine_ms_ptr_vec[m], min_mass);
     for(size_t i=0; i<pairs.size(); i++){
       int pos = pairs[i]->getTheoPeakPtr()->getIonPtr()->getPos()+ proteo_ptr->getStartPos();
       //LOG_DEBUG("start pos " << prot_ptr->getStartPos() << " pos " << pos);

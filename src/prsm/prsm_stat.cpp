@@ -26,7 +26,7 @@
 #include "spec/msalign_reader.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/peak_ion_pair.hpp"
-#include "prsm/peak_ion_pair_factory.hpp"
+#include "prsm/peak_ion_pair_util.hpp"
 #include "prsm/prsm_stat.hpp"
 
 namespace prot {
@@ -134,16 +134,16 @@ void PrsmStat::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   file << (third_second - third_first) << "\t";
   file << (third_end - third_second) << "\t";
 
-  std::vector<bool> comb_n_ion (proteo_len + 1, false);
-  std::vector<bool> comb_c_ion (proteo_len + 1, false);
-  std::vector<bool> comb_both_ion (proteo_len + 1, false);
+  std::vector<bool> comb_n_ion(proteo_len + 1, false);
+  std::vector<bool> comb_c_ion(proteo_len + 1, false);
+  std::vector<bool> comb_both_ion(proteo_len + 1, false);
 
   std::vector<std::vector<bool>> n_ion_2d;
   std::vector<std::vector<bool>> c_ion_2d;
   std::vector<std::vector<bool>> both_ion_2d;
   for (size_t s = 0; s < deconv_ms_ptr_vec.size(); s++) {
     //get ion_pair
-    PeakIonPairPtrVec pair_ptrs = PeakIonPairFactory::genePeakIonPairs(prsm_ptr->getProteoformPtr(), 
+    PeakIonPairPtrVec pair_ptrs = peak_ion_pair_util::genePeakIonPairs(prsm_ptr->getProteoformPtr(), 
                                                                        refine_ms_ptr_vec[s],
                                                                        min_mass_);
     std::vector<bool> n_ion (proteo_len + 1, false);

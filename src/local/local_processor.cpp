@@ -22,7 +22,7 @@
 #include "spec/extend_ms_factory.hpp"
 #include "prsm/prsm.hpp"
 #include "prsm/peak_ion_pair.hpp"
-#include "prsm/peak_ion_pair_factory.hpp"
+#include "prsm/peak_ion_pair_util.hpp"
 #include "spec/msalign_util.hpp"
 #include "local_processor.hpp"
 #include "local_util.hpp"

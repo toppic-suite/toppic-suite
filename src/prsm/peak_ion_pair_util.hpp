@@ -16,10 +16,17 @@
 #ifndef PROT_PRSM_PEAK_ION_PAIR_UTIL_HPP_
 #define PROT_PRSM_PEAK_ION_PAIR_UTIL_HPP_
 
+
+#include <vector>
+
+#include "base/proteoform.hpp"
 #include "spec/rm_break_type.hpp"
 #include "spec/extend_peak.hpp"
 #include "spec/theo_peak.hpp"
+#include "spec/extend_ms.hpp"
+#include "spec/theo_peak.hpp"
 #include "prsm/peak_ion_pair.hpp"
+
 
 namespace prot {
 
@@ -33,6 +40,20 @@ int getPeakIonPairNum(PeakIonPairPtrVec pair_ptrs);
 double computePairConverage(const PeakIonPairPtrVec &pair_ptrs, int begin,
                             int end, RmBreakTypePtr type_ptr);
 
+PeakIonPairPtrVec findPairs(ExtendMsPtr ms_three_ptr, TheoPeakPtrVec &theo_peak_ptrs, 
+                            int bgn, int end, double add_tolerance);
+
+PeakIonPairPtrVec genePeakIonPairs(const ProteoformPtr &proteoform_ptr, 
+                                   const ExtendMsPtr &ms_three_ptr, double min_mass);
+
+PeakIonPairPtrVec genePeakIonPairs(const ProteoformPtr &proteoform_ptr, 
+                                   const ExtendMsPtrVec &ms_ptr_vec, double min_mass);
+
+double compMatchFragNum(const PeakIonPairPtrVec &pairs);
+
+double compMatchPeakNum(PeakIonPairPtrVec &pairs);
+
 }  // namespace peak_ion_pair_util
+
 }  // namespace prot
 #endif
