@@ -18,7 +18,6 @@
 #include "base/logger.hpp"
 #include "base/base_algo.hpp"
 #include "spec/theo_peak.hpp"
-#include "spec/theo_peak_factory.hpp"
 #include "spec/theo_peak_util.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
 
@@ -101,8 +100,7 @@ PeakIonPairPtrVec findPairs(ExtendMsPtr ms_three_ptr,
   while (i < ms_masses.size() && j < theo_masses.size()) {
     double deviation = ms_masses[i] - theo_masses[j];
     IonPtr ion_ptr = theo_peak_ptrs[j]->getIonPtr();
-    double err = ms_three_ptr->getPeakPtr(i)->getOrigTolerance() 
-        + add_tolerance;
+    double err = ms_three_ptr->getPeakPtr(i)->getOrigTolerance() + add_tolerance;
     if (ion_ptr->getPos() >= bgn && ion_ptr->getPos() <= end) {
       if (std::abs(deviation) <= err) {
         PeakIonPairPtr pair_ptr
@@ -128,9 +126,9 @@ PeakIonPairPtrVec genePeakIonPairs(const ProteoformPtr &proteoform_ptr,
   ActivationPtr activation_ptr
       = ms_three_ptr->getMsHeaderPtr()->getActivationPtr();
 
-  TheoPeakPtrVec theo_peaks = TheoPeakFactory::geneProteoformTheoPeak(proteoform_ptr,
-                                                                      activation_ptr,
-                                                                      min_mass);
+  TheoPeakPtrVec theo_peaks = theo_peak_util::geneProteoformTheoPeak(proteoform_ptr,
+                                                                     activation_ptr,
+                                                                     min_mass);
 
   return findPairs(ms_three_ptr, theo_peaks, 0, proteoform_ptr->getLen(), 0);
 }
@@ -173,6 +171,6 @@ double compMatchPeakNum(PeakIonPairPtrVec &pairs) {
   return match_peak_num;
 }
 
-} // namespace peak_ion_pair_util
+}  // namespace peak_ion_pair_util
 
 }  // namespace prot

@@ -21,7 +21,7 @@
 #include "base/mod_util.hpp"
 #include "base/residue_util.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
-#include "spec/theo_peak_factory.hpp"
+#include "spec/theo_peak_util.hpp"
 #include "local_util.hpp"
 
 namespace prot {
@@ -656,9 +656,9 @@ void fillTableB(std::vector<std::vector<double>> & b_table, double mass1, double
 std::vector<double> geneNTheoMass(ProteoformPtr proteoform, const ExtendMsPtrVec & extend_ms_ptr_vec,
                                   double min_mass){
   TheoPeakPtrVec theo_peaks =
-      TheoPeakFactory::geneProteoformTheoPeak(proteoform, 
-                                              ActivationBase::getActivationPtrByName("HCD"),
-                                              min_mass);
+      theo_peak_util::geneProteoformTheoPeak(proteoform, 
+                                             ActivationBase::getActivationPtrByName("HCD"),
+                                             min_mass);
 
   std::vector<double> res;
   for (size_t i = 0; i < theo_peaks.size(); i++) {
