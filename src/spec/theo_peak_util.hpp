@@ -16,8 +16,12 @@
 #ifndef PROT_SPEC_THEO_PEAK_UTIL_HPP_
 #define PROT_SPEC_THEO_PEAK_UTIL_HPP_
 
+
 #include <vector>
 
+#include "base/activation.hpp"
+#include "base/bp_spec.hpp"
+#include "base/proteoform.hpp"
 #include "spec/theo_peak.hpp"
 
 namespace prot {
@@ -26,7 +30,16 @@ namespace theo_peak_util {
 
 std::vector<double> getTheoMassVec(const TheoPeakPtrVec &theo_peak_list);
 
-}  // namespace TheoPeakUtil
+TheoPeakPtrVec geneTheoPeak(BpSpecPtr bp_spec_ptr, ActivationPtr activation_ptr,
+                            NeutralLossPtr neutral_loss_ptr,
+                            double n_term_shift, double c_term_shift,
+                            int bgn, int end, double min_mass, double max_mass);
+
+TheoPeakPtrVec geneProteoformTheoPeak(ProteoformPtr proteoform_ptr,
+                                      ActivationPtr activation_ptr,
+                                      double min_mass);
+
+}  // namespace theo_peak_util
 
 }  // namespace prot
 

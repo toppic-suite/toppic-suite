@@ -13,6 +13,9 @@
 //limitations under the License.
 
 
+#include <algorithm>
+#include <vector>
+
 #include "base/logger.hpp"
 #include "base/proteoform.hpp"
 #include "base/proteoform_factory.hpp"
@@ -20,7 +23,6 @@
 #include "base/base_algo.hpp"
 #include "spec/extend_ms_factory.hpp"
 #include "spec/theo_peak.hpp"
-#include "spec/theo_peak_factory.hpp"
 #include "spec/theo_peak_util.hpp"
 #include "zeroptmsearch/zero_ptm_slow_match.hpp"
 
@@ -84,8 +86,9 @@ void ZeroPtmSlowMatch::compScore (const ExtendMsPtrVec &refine_ms_ptr_vec) {
   double ppo = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
   for (size_t i = 0; i < refine_ms_ptr_vec.size(); i++) {
     ActivationPtr activation_ptr = refine_ms_ptr_vec[i]->getMsHeaderPtr()->getActivationPtr();
-    TheoPeakPtrVec theo_peak_ptrs = TheoPeakFactory::geneProteoformTheoPeak(proteoform_ptr_, 
-                                                                            activation_ptr, min_mass);
+    TheoPeakPtrVec theo_peak_ptrs
+        = theo_peak_util::geneProteoformTheoPeak(proteoform_ptr_, 
+                                                 activation_ptr, min_mass);
 
     std::vector<double> theo_masses = theo_peak_util::getTheoMassVec(theo_peak_ptrs);
     std::vector<double> ms_masses = ExtendMs::getExtendMassVec(refine_ms_ptr_vec[i]);
@@ -103,7 +106,6 @@ PrsmPtr ZeroPtmSlowMatch::geneResult() {
 ZpSlowMatchPtrVec ZeroPtmSlowMatch::filter(const DeconvMsPtrVec &deconv_ms_ptr_vec,
                                            const ZpFastMatchPtrVec &fast_match_ptrs,
                                            ZeroPtmSearchMngPtr mng_ptr) {
-
   ZpSlowMatchPtrVec slow_matches;
   for (size_t i = 0; i < fast_match_ptrs.size(); i++) {
     ZpSlowMatchPtr slow_match
@@ -116,4 +118,4 @@ ZpSlowMatchPtrVec ZeroPtmSlowMatch::filter(const DeconvMsPtrVec &deconv_ms_ptr_v
   return slow_matches;
 }
 
-}
+}  // namespace prot

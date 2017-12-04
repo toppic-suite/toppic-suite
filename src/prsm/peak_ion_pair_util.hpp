@@ -40,13 +40,13 @@ int getPeakIonPairNum(PeakIonPairPtrVec pair_ptrs);
 double computePairConverage(const PeakIonPairPtrVec &pair_ptrs, int begin,
                             int end, RmBreakTypePtr type_ptr);
 
-PeakIonPairPtrVec findPairs(ExtendMsPtr ms_three_ptr, TheoPeakPtrVec &theo_peak_ptrs, 
+PeakIonPairPtrVec findPairs(ExtendMsPtr ms_three_ptr, TheoPeakPtrVec &theo_peak_ptrs,
                             int bgn, int end, double add_tolerance);
 
-PeakIonPairPtrVec genePeakIonPairs(const ProteoformPtr &proteoform_ptr, 
+PeakIonPairPtrVec genePeakIonPairs(const ProteoformPtr &proteoform_ptr,
                                    const ExtendMsPtr &ms_three_ptr, double min_mass);
 
-PeakIonPairPtrVec genePeakIonPairs(const ProteoformPtr &proteoform_ptr, 
+PeakIonPairPtrVec genePeakIonPairs(const ProteoformPtr &proteoform_ptr,
                                    const ExtendMsPtrVec &ms_ptr_vec, double min_mass);
 
 double compMatchFragNum(const PeakIonPairPtrVec &pairs);
