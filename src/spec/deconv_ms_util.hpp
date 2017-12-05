@@ -20,12 +20,12 @@
 
 namespace prot {
 
-class DeconvMsFactory {
- public:
-  static DeconvMsPtrVec  getRefineMsPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, 
-                                           double new_prec_mass);
-};
+namespace deconv_ms_util {
 
-}
+DeconvMsPtrVec  getRefineMsPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, double new_prec_mass);
+
+}  // namespace deconv_ms_util
+
+}  // namespace prot
 
 #endif

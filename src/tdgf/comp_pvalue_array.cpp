@@ -17,7 +17,7 @@
 #include <vector>
 
 #include "base/logger.hpp"
-#include "spec/deconv_ms_factory.hpp"
+#include "spec/deconv_ms_util.hpp"
 #include "tdgf/comp_pvalue_array.hpp"
 
 namespace prot {
@@ -111,7 +111,7 @@ void CompPValueArray::compMultiExtremeValues(const PrmMsPtrVec &ms_six_ptr_vec,
 void CompPValueArray::compSingleExtremeValue(const DeconvMsPtrVec &ms_ptr_vec,
                                              PrsmPtr prsm_ptr, double ppo) {
   double refine_prec_mass = prsm_ptr->getAdjustedPrecMass();
-  DeconvMsPtrVec refine_ms_ptr_vec = DeconvMsFactory::getRefineMsPtrVec(ms_ptr_vec, refine_prec_mass);
+  DeconvMsPtrVec refine_ms_ptr_vec = deconv_ms_util::getRefineMsPtrVec(ms_ptr_vec, refine_prec_mass);
 
   /*
      LOG_DEBUG("recalibration " << prsm_ptr->getCalibration()
