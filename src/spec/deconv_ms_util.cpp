@@ -18,13 +18,13 @@
 
 #include "spec/peak.hpp"
 #include "spec/ms.hpp"
-#include "spec/deconv_ms_factory.hpp"
+#include "spec/deconv_ms_util.hpp"
 
 namespace prot {
 
+namespace deconv_ms_util {
 
-DeconvMsPtrVec DeconvMsFactory::getRefineMsPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
-                                                  double new_prec_mass) {
+DeconvMsPtrVec getRefineMsPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, double new_prec_mass) {
   DeconvMsPtrVec result_ptrs;
   for (size_t m = 0; m < deconv_ms_ptr_vec.size(); m++) {
     DeconvMsPtr deconv_ms_ptr = deconv_ms_ptr_vec[m];
@@ -43,5 +43,7 @@ DeconvMsPtrVec DeconvMsFactory::getRefineMsPtrVec(const DeconvMsPtrVec &deconv_m
   }
   return result_ptrs;
 }
+
+}  // namespace deconv_ms_util
 
 }  // namespace prot
