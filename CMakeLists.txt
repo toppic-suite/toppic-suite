@@ -113,11 +113,15 @@ add_executable(toppic-test ${UNIT_TEST_SRCS} ${HTS_SRCS} ${BASE_SRCS})
 # util tools
 file(GLOB MSALIGN_MERGE_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/tools/msalign_merge.cpp)
 
-add_executable(msalign_merge ${MSALIGN_MERGE_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS})
+add_executable(msalign_merge ${MSALIGN_MERGE_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS})
 
 file(GLOB MSALIGN_SPLIT_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/tools/msalign_split.cpp)
 
-add_executable(msalign_split ${MSALIGN_SPLIT_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS})
+add_executable(msalign_split ${MSALIGN_SPLIT_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS})
+
+file(GLOB PRSM_MERGE_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/tools/prsm_xml_merge.cpp)
+
+add_executable(prsm_xml_merge ${PRSM_MERGE_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS} ${TOPPIC_ARGU_SRCS})
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     target_link_libraries(toppic xalan-c xalanMsg xerces-c
@@ -129,9 +133,9 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
         boost_program_options-mt boost_thread-mt pthread z Ws2_32)
 
     target_link_libraries(topfd pwiz xalan-c xalanMsg xerces-c
-		boost_program_options-mt boost_filesystem-mt
-		boost_system-mt boost_thread-mt
-		boost_iostreams-mt pthread z Ws2_32)
+        boost_program_options-mt boost_filesystem-mt
+        boost_system-mt boost_thread-mt
+        boost_iostreams-mt pthread z Ws2_32)
 
     # for Qt
     SET(QTOPTION -Wl,-subsystem,windows)
@@ -140,7 +144,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
         boost_program_options-mt boost_thread-mt pthread z Ws2_32)
     target_link_libraries(topfd_gui ${QTOPTION} Qt5Widgets Qt5Core Qt5Gui pwiz
         xalan-c xerces-c boost_filesystem-mt boost_system-mt boost_thread-mt pthread z Ws2_32)
-		
+
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows") 
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
@@ -162,14 +166,17 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     target_link_libraries(msalign_split pwiz xerces-c boost_program_options
         boost_filesystem boost_system pthread z)
 
+    target_link_libraries(prsm_xml_merge pwiz xerces-c boost_program_options
+        boost_filesystem boost_system boost_thread pthread z)
+
     #target_link_libraries(topfd-dev pwiz xalan-c xerces-c boost_filesystem
     #    boost_system boost_thread pthread z)
 
     target_link_libraries(topfd_gui Qt5Widgets Qt5Core Qt5Gui pwiz
         xalan-c xerces-c boost_filesystem boost_system boost_thread pthread z)
 
-    #target_link_libraries(toppic-test xalan-c xerces-c boost_filesystem
-    #    boost_system pthread z)
+    target_link_libraries(toppic-test xalan-c xerces-c boost_filesystem
+        boost_system pthread z)
 
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
 

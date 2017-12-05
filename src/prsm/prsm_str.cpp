@@ -136,6 +136,12 @@ void PrsmStr::setPrecFeatureInte(double inte) {
   precursor_feature_inte_ = inte;
 }
 
+void PrsmStr::setPrecursorId(int id) {
+  int i = getXmlLineIndex(str_vec_, "precursor_id");
+  str_vec_[i] = "<precursor_id>" + std::to_string(id) + "</precursor_id>";
+  precursor_id_ = id;
+}
+
 void PrsmStr::setSpeciesId(int id) {
   int i = getXmlLineIndex(str_vec_, "species_id");
   str_vec_[i] = "<species_id>" + std::to_string(id) + "</species_id>";
