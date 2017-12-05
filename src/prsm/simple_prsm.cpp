@@ -44,6 +44,7 @@ SimplePrsm::SimplePrsm(MsHeaderPtr header_ptr, int spectrum_num,
     }
 
 SimplePrsm::SimplePrsm(xercesc::DOMElement* element) {
+  file_name_ = xml_dom_util::getChildValue(element, "file_name", 0);
   spectrum_id_ = xml_dom_util::getIntChildValue(element, "spectrum_id", 0);
   spectrum_scan_ = xml_dom_util::getChildValue(element, "spectrum_scan", 0);
   precursor_id_ = xml_dom_util::getIntChildValue(element, "precursor_id", 0);
@@ -76,6 +77,7 @@ SimplePrsm::SimplePrsm(xercesc::DOMElement* element) {
 xercesc::DOMElement* SimplePrsm::toXml(XmlDOMDocument* xml_doc) {
   std::string element_name = SimplePrsm::getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
+  xml_doc->addElement(element, "file_name", file_name_.c_str());
   std::string str = string_util::convertToString(spectrum_id_);
   xml_doc->addElement(element, "spectrum_id", str.c_str());
   xml_doc->addElement(element, "spectrum_scan", spectrum_scan_.c_str());
@@ -111,6 +113,7 @@ xercesc::DOMElement* SimplePrsm::toXml(XmlDOMDocument* xml_doc) {
 std::vector<std::string> SimplePrsm::toStrVec() {
   std::vector<std::string> str_vec;
   str_vec.push_back("<simple_prsm>");
+  str_vec.push_back("<file_name>" + file_name_ + "</file_name>");
   str_vec.push_back("<spectrum_id>" + std::to_string(getSpectrumId()) + "</spectrum_id>");
   str_vec.push_back("<spectrum_scan>" + getSpectrumScan() + "</spectrum_scan>");
   str_vec.push_back("<precursor_id>" + std::to_string(getPrecursorId()) + "</precursor_id>");

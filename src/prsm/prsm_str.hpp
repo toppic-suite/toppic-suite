@@ -46,6 +46,8 @@ class PrsmStr {
 
   std::vector<std::string> getStrVec() {return str_vec_;}
 
+  std::string getFileName() {return file_name_;}
+
   int getSpectrumId() {return spectrum_id_;}
 
   std::string getSeqName() {return seq_name_;}
@@ -83,6 +85,8 @@ class PrsmStr {
   std::vector<std::shared_ptr<ChangeStr> > getChangeStrVec() {return change_vec_;}
 
   std::string getProteinMatchSeq() {return protein_match_seq_;}
+
+  void setFileName(const std::string & fname);
 
   void setSpectrumId(int id);
 
@@ -135,6 +139,8 @@ class PrsmStr {
 
  private:
   std::vector<std::string> str_vec_;
+
+  std::string file_name_;
 
   int spectrum_id_;
 

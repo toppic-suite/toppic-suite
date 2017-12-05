@@ -13,6 +13,11 @@
 //limitations under the License.
 
 
+#include <string>
+#include <vector>
+
+#include <boost/filesystem.hpp>
+
 #include "base/logger.hpp"
 #include "base/xml_dom_util.hpp"
 #include "prsm/prsm_xml_writer.hpp"
@@ -24,36 +29,41 @@ PrsmXmlWriter::PrsmXmlWriter(const std::string &file_name) {
   LOG_DEBUG("file_name " << file_name);
   file_ << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << std::endl;
   file_ << "<prsm_list>" << std::endl;
+
+  boost::filesystem::path p(file_name);
+  file_name_ = p.stem().string() + ".msalign";
 }
 
-void PrsmXmlWriter::close(){
+void PrsmXmlWriter::close() {
   file_ << "</prsm_list>" << std::endl;
   file_.close();
 }
 
 void PrsmXmlWriter::write(PrsmStrPtr prsm_str_ptr) {
   std::vector<std::string> strs = prsm_str_ptr->getStrVec();
-  for(size_t i = 0; i < strs.size(); i++) {
+  for (size_t i = 0; i < strs.size(); i++) {
     file_ << strs[i] << std::endl;
   }
 }
 
 void PrsmXmlWriter::writeVector(const PrsmStrPtrVec &prsm_str_ptr_vec) {
-  for(size_t i = 0; i < prsm_str_ptr_vec.size(); i++) {
+  for (size_t i = 0; i < prsm_str_ptr_vec.size(); i++) {
     write(prsm_str_ptr_vec[i]);
   }
 }
 
-
 void PrsmXmlWriter::write(PrsmPtr prsm_ptr) {
-  if(prsm_ptr!=nullptr){
+  if (prsm_ptr != nullptr) {
     XmlDOMImpl* impl = XmlDOMImplFactory::getXmlDOMImplInstance();
     xercesc::DOMLSSerializer* serializer = impl->createSerializer();
-    XmlDOMDocument doc (impl->createDoc("prsm_list"));
+    XmlDOMDocument doc(impl->createDoc("prsm_list"));
+    if (prsm_ptr->getFileName() == "") {
+      prsm_ptr->setFileName(file_name_);
+    }
     xercesc::DOMElement* element = prsm_ptr->toXmlElement(&doc);
-    //LOG_DEBUG("Element generated");
+    // LOG_DEBUG("Element generated");
     std::string str = xml_dom_util::writeToString(serializer, element);
-    //LOG_DEBUG("String generated");
+    // LOG_DEBUG("String generated");
     xml_dom_util::writeToStreamByRemovingDoubleLF(file_, str);
     element->release();
     serializer->release();
@@ -66,13 +76,13 @@ void PrsmXmlWriter::writeVector(const PrsmPtrVec &prsm_ptrs) {
   }
 }
 
-void PrsmXmlWriter::writeVector2D(const PrsmPtrVec2D &prsm_ptrs){
+void PrsmXmlWriter::writeVector2D(const PrsmPtrVec2D &prsm_ptrs) {
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     writeVector(prsm_ptrs[i]);
   }
 }
 
-void PrsmXmlWriter::writeVector3D(const PrsmPtrVec3D &prsm_ptrs){
+void PrsmXmlWriter::writeVector3D(const PrsmPtrVec3D &prsm_ptrs) {
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     writeVector2D(prsm_ptrs[i]);
   }
