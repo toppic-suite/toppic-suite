@@ -38,6 +38,8 @@ bool ChangeStr::cmpPosInc(const std::shared_ptr<ChangeStr> &a,
 PrsmStr::PrsmStr(const std::vector<std::string> &str_vec) {
   str_vec_ = str_vec;
   std::string line = prsm_util::getXmlLine(str_vec_, "<spectrum_id>");
+  file_name_ = prsm_util::getValueStr(line);
+  line = prsm_util::getXmlLine(str_vec_, "<spectrum_id>");
   spectrum_id_ = std::stoi(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<precursor_id>");
   precursor_id_ = std::stoi(prsm_util::getValueStr(line));
@@ -108,6 +110,12 @@ void PrsmStr::setProteoformFdr(double proteoform_fdr) {
   int i = getXmlLineIndex(str_vec_, "proteoform_fdr");
   str_vec_[i] = "<proteoform_fdr>" + std::to_string(proteoform_fdr) + "</proteoform_fdr>";
   proteoform_fdr_ = proteoform_fdr;
+}
+
+void PrsmStr::setFileName(const std::string & fname) {
+  int i = getXmlLineIndex(str_vec_, "file_name");
+  str_vec_[i] = "<file_name>" + fname + "</file_name>";
+  file_name_ = fname;
 }
 
 void PrsmStr::setSpectrumId(int id) {

@@ -15,8 +15,13 @@
 
 #include <iomanip>
 #include <ctime>
+#include <map>
+#include <string>
+#include <algorithm>
+#include <vector>
 
-#include "boost/algorithm/string.hpp"
+
+#include <boost/algorithm/string.hpp>
 
 #include "base/file_util.hpp"
 #include "spec/msalign_reader.hpp"
@@ -27,9 +32,9 @@
 
 namespace prot {
 
-PrsmTableWriter::PrsmTableWriter(PrsmParaPtr prsm_para_ptr, 
+PrsmTableWriter::PrsmTableWriter(PrsmParaPtr prsm_para_ptr,
                                  std::map<std::string, std::string> arguments,
-                                 const std::string &input_file_ext, 
+                                 const std::string &input_file_ext,
                                  const std::string &output_file_ext) {
   prsm_para_ptr_ = prsm_para_ptr;
   input_file_ext_ = input_file_ext;
@@ -37,17 +42,14 @@ PrsmTableWriter::PrsmTableWriter(PrsmParaPtr prsm_para_ptr,
   output_file_ext_ = output_file_ext;
 }
 
-void PrsmTableWriter::write(){
-  std::string spectrum_file_name  = prsm_para_ptr_->getSpectrumFileName(); 
+void PrsmTableWriter::write() {
+  std::string spectrum_file_name  = prsm_para_ptr_->getSpectrumFileName();
   std::string base_name = file_util::basename(spectrum_file_name);
   std::string output_file_name = base_name + "." + output_file_ext_;
-  std::ofstream file; 
+  std::ofstream file;
   file.open(output_file_name.c_str());
-  /*time_t ctt = time(0);*/
-  //file << "Time: ";
-  /*file << asctime(localtime(&ctt));*/
   Argument::outputArguments(file, arguments_);
-  //write title
+  // write title
   file << "Data file name" << "\t"
       << "Prsm ID" << "\t"
       << "Spectrum ID"<< "\t"
@@ -78,15 +80,14 @@ void PrsmTableWriter::write(){
       << "Proteoform FDR" << "\t"
       << "#Variable PTMs" << std::endl;
 
-  std::string input_file_name 
-      = file_util::basename(spectrum_file_name) + "." + input_file_ext_;
+  std::string input_file_name = file_util::basename(spectrum_file_name) + "." + input_file_ext_;
   std::string db_file_name = prsm_para_ptr_->getSearchDbFileName();
   FastaIndexReaderPtr seq_reader = std::make_shared<FastaIndexReader>(db_file_name);
   ModPtrVec fix_mod_ptr_vec = prsm_para_ptr_->getFixModPtrVec();
   PrsmReader prsm_reader(input_file_name);
-  //LOG_DEBUG("start read prsm");
+  // LOG_DEBUG("start read prsm");
   PrsmPtr prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
-  //LOG_DEBUG("end read prsm");
+  // LOG_DEBUG("end read prsm");
 
   // init variables
   std::string sp_file_name = prsm_para_ptr_->getSpectrumFileName();
@@ -96,26 +97,26 @@ void PrsmTableWriter::write(){
                           prsm_para_ptr_->getSpParaPtr()->getSkipList());
   SpectrumSetPtr spec_set_ptr;
   SpParaPtr sp_para_ptr = prsm_para_ptr_->getSpParaPtr();
-  while((spec_set_ptr = sp_reader.getNextSpectrumSet(sp_para_ptr)[0])!= nullptr){
+  while ((spec_set_ptr = sp_reader.getNextSpectrumSet(sp_para_ptr)[0]) != nullptr) {
     if (spec_set_ptr->isValid()) {
       int spec_id = spec_set_ptr->getSpectrumId();
       while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_id) {
         DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
         prsm_ptr->setDeconvMsPtrVec(deconv_ms_ptr_vec);
         double new_prec_mass = prsm_ptr->getAdjustedPrecMass();
-        ExtendMsPtrVec extend_ms_ptr_vec 
+        ExtendMsPtrVec extend_ms_ptr_vec
             = ExtendMsFactory::geneMsThreePtrVec(deconv_ms_ptr_vec, sp_para_ptr, new_prec_mass);
         prsm_ptr->setRefineMsVec(extend_ms_ptr_vec);
         writePrsm(file, prsm_ptr);
-        //LOG_DEBUG("start read prsm");
+        // LOG_DEBUG("start read prsm");
         prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
-        //LOG_DEBUG("end read prsm");
+        // LOG_DEBUG("end read prsm");
       }
     }
   }
   sp_reader.close();
   prsm_reader.close();
-  //write end;
+  // write end;
   file.close();
 }
 
@@ -125,7 +126,7 @@ std::string outputChangePtr(ProteoformPtr proteoform_ptr) {
   ChangePtrVec change_vec = proteoform_ptr->getChangePtrVec(ChangeType::UNEXPECTED);
   std::string res = "";
   for (size_t i = 0; i < change_vec.size(); i++) {
-    if (change_vec[i]->getLocalAnno() == nullptr) 
+    if (change_vec[i]->getLocalAnno() == nullptr)
       continue;
 
     if (change_vec[i]->getLocalAnno()->getPtmPtr() != nullptr) {
@@ -134,7 +135,7 @@ std::string outputChangePtr(ProteoformPtr proteoform_ptr) {
       int right_db_bp = change_vec[i]->getRightBpPos() + start_pos;
       res = res + change_vec[i]->getLocalAnno()->getPtmPtr()->getAbbrName() + "[";
       for (int j = left_db_bp; j < right_db_bp; j++) {
-        //std::string acid_letter = fasta_seq.substr(j, 1);
+        // std::string acid_letter = fasta_seq.substr(j, 1);
         std::string acid_letter = string_pairs[j].first;
         double scr = std::floor(scr_vec[j - left_db_bp] * 1000) / 10;
         if (scr == 100) scr = 99.9;
@@ -180,14 +181,14 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
 
   file << std::setprecision(10);
   LOG_DEBUG("start output prsm ");
-  file << prsm_para_ptr_->getSpectrumFileName() << "\t"
+  file << prsm_ptr->getFileName() << "\t"
       << prsm_ptr->getPrsmId() << "\t"
       << spec_ids << "\t"
       << spec_activations<< "\t"
       << spec_scans << "\t"
       << peak_num << "\t"
       << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecCharge() << "\t"
-      << prsm_ptr->getOriPrecMass()<< "\t"//"Precursor_mass"
+      << prsm_ptr->getOriPrecMass()<< "\t"
       << prsm_ptr->getAdjustedPrecMass() << "\t"
       << prsm_ptr->getProteoformPtr()->getSpeciesId() << "\t";
 
@@ -210,23 +211,23 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
     } else {
       file << outputChangePtr(prsm_ptr->getProteoformPtr()) << "\t";
     }
-  } 
+  }
 
   file << prsm_ptr->getMatchPeakNum() << "\t"
       << prsm_ptr->getMatchFragNum() << "\t";
   file << prsm_ptr->getPValue() << "\t"
       << prsm_ptr->getEValue() << "\t";
-  //      << prsm_ptr->getOneProtProb()<< "\t"
+
   double fdr = prsm_ptr->getFdr();
   if (fdr >= 0) {
     file << fdr << "\t";
-  } else { 
+  } else {
     file << "-" << "\t";
   }
   double proteoform_fdr = prsm_ptr->getProteoformFdr();
   if (proteoform_fdr >= 0) {
     file << proteoform_fdr << "\t";
-  } else { 
+  } else {
     file << "-" << "\t";
   }
 

@@ -28,8 +28,8 @@
 namespace prot {
 
 class SimplePrsm;
-typedef std::shared_ptr<SimplePrsm> SimplePrsmPtr;
-typedef std::vector<SimplePrsmPtr> SimplePrsmPtrVec;
+typedef std::shared_ptr<SimplePrsm>   SimplePrsmPtr;
+typedef std::vector<SimplePrsmPtr>    SimplePrsmPtrVec;
 typedef std::vector<SimplePrsmPtrVec> SimplePrsmPtrVec2D;
 
 class SimplePrsm {
@@ -38,6 +38,10 @@ class SimplePrsm {
              ProteoformPtr proteo_ptr, int score);
 
   explicit SimplePrsm(xercesc::DOMElement* element);
+
+  std::string getFileName () {return file_name_;}
+
+  void setFileName(const std::string & fname) {file_name_ = fname;}
 
   std::string getSeqName() {return seq_name_;}
 
@@ -114,6 +118,7 @@ class SimplePrsm {
   }
 
  private:
+  std::string file_name_;
   int spectrum_id_;
   std::string spectrum_scan_;
   int precursor_id_;

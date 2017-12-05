@@ -23,7 +23,9 @@ namespace prot {
 
 SimplePrsmStr::SimplePrsmStr(const std::vector<std::string> &str_vec) {
   str_vec_ = str_vec;
-  std::string line = prsm_util::getXmlLine(str_vec_, "<spectrum_id>");
+  std::string line = prsm_util::getXmlLine(str_vec_, "<file_name>");
+  file_name_ = prsm_util::getValueStr(line);
+  line = prsm_util::getXmlLine(str_vec_, "<spectrum_id>");
   spectrum_id_ = std::stoi(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<score>");
   score_ = std::stod(prsm_util::getValueStr(line));

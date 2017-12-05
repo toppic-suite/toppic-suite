@@ -16,7 +16,9 @@
 #ifndef PROT_PRSM_PRSM_HPP_
 #define PROT_PRSM_PRSM_HPP_
 
+
 #include <string>
+#include <vector>
 
 #include "base/extreme_value.hpp"
 #include "base/proteoform.hpp"
@@ -31,13 +33,15 @@ typedef std::shared_ptr<Prsm> PrsmPtr;
 
 class Prsm {
  public:
-  Prsm(ProteoformPtr proteoform_ptr, const DeconvMsPtrVec &deconv_ms_ptr_vec, 
+  Prsm(ProteoformPtr proteoform_ptr, const DeconvMsPtrVec &deconv_ms_ptr_vec,
        double adjusted_prec_mass, SpParaPtr sp_para_ptr);
 
-  Prsm(xercesc::DOMElement* element, FastaIndexReaderPtr reader_ptr, 
+  Prsm(xercesc::DOMElement* element, FastaIndexReaderPtr reader_ptr,
        const ModPtrVec &fix_mod_list);
 
   Prsm(const Prsm &obj);
+
+  std::string getFileName() {return file_name_;}
 
   int getPrsmId() {return prsm_id_;}
 
@@ -48,7 +52,7 @@ class Prsm {
   int getPrecursorId() {return precursor_id_;}
 
   int getPrecFeatureId() {return prec_feature_id_;}
-  
+
   double getPrecFeatureInte() {return prec_feature_inte_;}
 
   double getOriPrecMass() {return ori_prec_mass_;}
@@ -57,7 +61,7 @@ class Prsm {
 
   ProteoformPtr getProteoformPtr() {return proteoform_ptr_;}
 
-  ExtremeValuePtr getExtremeValuePtr() {return extreme_value_ptr_;} 
+  ExtremeValuePtr getExtremeValuePtr() {return extreme_value_ptr_;}
 
   double getFdr() {return fdr_;}
 
@@ -80,7 +84,9 @@ class Prsm {
 
   double getOneProtProb();
 
-  // set 
+  // setter
+  void setFileName(const std::string & fname) {file_name_ = fname;}
+
   void setPrsmId(int id) {prsm_id_ = id;}
 
   void setSpectrumId(int spectrum_id) {spectrum_id_ = spectrum_id;}
@@ -95,7 +101,7 @@ class Prsm {
 
   void setOriPrecMass(double prec_mass) {ori_prec_mass_ = prec_mass;}
 
-  void setProteoformPtr(ProteoformPtr proteoform) {proteoform_ptr_=proteoform;}
+  void setProteoformPtr(ProteoformPtr proteoform) {proteoform_ptr_ = proteoform;}
 
   void setExtremeValuePtr(ExtremeValuePtr ev_ptr) {extreme_value_ptr_ = ev_ptr;}
 
@@ -103,9 +109,11 @@ class Prsm {
 
   void setProteoformFdr(double proteoform_fdr) {proteoform_fdr_ = proteoform_fdr;}
 
-  void setDeconvMsPtrVec(DeconvMsPtrVec ms_vec) {deconv_ms_ptr_vec_=ms_vec;}
+  void setDeconvMsPtrVec(DeconvMsPtrVec ms_vec) {deconv_ms_ptr_vec_ = ms_vec;}
 
-  void setRefineMsVec(ExtendMsPtrVec refine_ms_three_vec){refine_ms_three_vec_ = refine_ms_three_vec;}
+  void setRefineMsVec(ExtendMsPtrVec refine_ms_three_vec) {
+    refine_ms_three_vec_ = refine_ms_three_vec;
+  }
 
   // comparion
   static bool cmpEValueInc(const PrsmPtr &a, const PrsmPtr &b) {
@@ -122,8 +130,7 @@ class Prsm {
 
   static bool cmpNormMatchFragmentDec(const PrsmPtr &a, const PrsmPtr &b) {
     if (a->getNormMatchFragNum() == b->getNormMatchFragNum()) {
-      return a->getProteoformPtr()->getVariablePtmNum() <
-          b->getProteoformPtr()->getVariablePtmNum(); 
+      return a->getProteoformPtr()->getVariablePtmNum() < b->getProteoformPtr()->getVariablePtmNum();
     } else {
       return a->getNormMatchFragNum() > b->getNormMatchFragNum();
     }
@@ -131,7 +138,7 @@ class Prsm {
 
   static bool cmpMatchFragmentDecMatchPeakDec(const PrsmPtr &a, const PrsmPtr &b);
 
-  // sort by number of matched fragment ions, then start position 
+  // sort by number of matched fragment ions, then start position
   static bool cmpMatchFragDecStartPosInc(const PrsmPtr &a, const PrsmPtr &b);
 
   // sort by the order of spectrum id, the precursor id
@@ -146,13 +153,15 @@ class Prsm {
   // other functions
   xercesc::DOMElement* toXmlElement(XmlDOMDocument* xml_doc);
 
-  void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+  void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
   void parseXml(xercesc::DOMElement *element);
 
   static std::string getXmlElementName() {return "prsm";}
 
  private:
+  std::string file_name_;
+
   int prsm_id_ = -1;
   /* spectrum information */
   int spectrum_id_;
@@ -198,6 +207,6 @@ typedef std::vector<PrsmPtr> PrsmPtrVec;
 typedef std::vector<PrsmPtrVec> PrsmPtrVec2D;
 typedef std::vector<PrsmPtrVec2D> PrsmPtrVec3D;
 
-}
+}  // namespace prot
 #endif
 

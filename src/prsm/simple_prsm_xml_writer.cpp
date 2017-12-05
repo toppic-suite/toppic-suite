@@ -17,6 +17,8 @@
 #include <algorithm>
 #include <vector>
 
+#include <boost/filesystem.hpp>
+
 #include "base/xml_dom_document.hpp"
 #include "base/xml_dom.hpp"
 #include "base/xml_dom_util.hpp"
@@ -33,6 +35,9 @@ SimplePrsmXmlWriter::SimplePrsmXmlWriter(const std::string &file_name) {
   XmlDOMImpl* impl = XmlDOMImplFactory::getXmlDOMImplInstance();
   doc_ = new XmlDOMDocument(impl->createDoc("simple_prsm_list"));
   serializer_ = impl->createSerializer();
+
+  boost::filesystem::path p(file_name);
+  file_name_ = p.stem().string() + ".msalign";
 }
 
 SimplePrsmXmlWriter::~SimplePrsmXmlWriter() {
@@ -59,10 +64,13 @@ void SimplePrsmXmlWriter::write(const SimplePrsmPtrVec &simple_prsm_ptrs) {
 }
 
 void SimplePrsmXmlWriter::write(SimplePrsmPtr simple_prsm_ptr) {
+  if (simple_prsm_ptr->getFileName() == "") {
+    simple_prsm_ptr->setFileName(file_name_);
+  }
   xercesc::DOMElement * element = simple_prsm_ptr->toXml(doc_);
   std::string str = xml_dom_util::writeToString(serializer_, element);
   xml_dom_util::writeToStreamByRemovingDoubleLF(file_, str);
   element->release();
 }
 
-} /* namespace prot */
+}  // namespace prot

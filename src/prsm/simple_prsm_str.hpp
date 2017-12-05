@@ -32,6 +32,8 @@ class SimplePrsmStr {
 
   std::vector<std::string> getStrVec() {return str_vec_;}
 
+  std::string getFileName() {return file_name_;}
+
   int getSpectrumId() {return spectrum_id_;}
 
   std::string getSeqName() {return seq_name_;}
@@ -50,6 +52,8 @@ class SimplePrsmStr {
 
  private:
   std::vector<std::string> str_vec_;
+
+  std::string file_name_;
 
   int spectrum_id_;
 

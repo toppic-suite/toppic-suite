@@ -14,6 +14,7 @@
 
 
 #include <iomanip>
+#include <string>
 
 #include "base/file_util.hpp"
 #include "prsm/simple_prsm_reader.hpp"
@@ -21,21 +22,13 @@
 
 namespace prot {
 
-SimplePrsmTableWriter::SimplePrsmTableWriter(PrsmParaPtr prsm_para_ptr, 
-                                             const std::string &input_file_ext, 
-                                             const std::string &output_file_ext):
-    prsm_para_ptr_(prsm_para_ptr),
-    input_file_ext_(input_file_ext),
-    output_file_ext_(output_file_ext) {
-    }
-
 void SimplePrsmTableWriter::write() {
-  std::string spectrum_file_name  = prsm_para_ptr_->getSpectrumFileName(); 
+  std::string spectrum_file_name  = prsm_para_ptr_->getSpectrumFileName();
   std::string base_name = file_util::basename(spectrum_file_name);
   std::string output_file_name = base_name + "." + output_file_ext_;
-  std::ofstream file_; 
+  std::ofstream file_;
   file_.open(output_file_name.c_str());
-  //write title
+  // write title
   file_ << "Spectrum_ID" << "\t"
       << "Scan(s)" << "\t"
       << "Precursor_ID" << "\t"
@@ -61,8 +54,8 @@ void SimplePrsmTableWriter::write() {
     prsm_ptr = reader.readOnePrsm();
   }
 
-  //write end;
+  // write end;
   file_.close();
 }
 
-}
+}  // namespace prot

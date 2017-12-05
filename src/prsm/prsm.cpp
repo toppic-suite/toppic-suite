@@ -60,6 +60,7 @@ Prsm::Prsm(const Prsm &obj) {
   adjusted_prec_mass_ = obj.adjusted_prec_mass_;
   proteoform_ptr_ = obj.proteoform_ptr_;
   deconv_ms_ptr_vec_ = obj.deconv_ms_ptr_vec_;
+  file_name_ = obj.file_name_;
   spectrum_id_ = obj.spectrum_id_;
   spectrum_scan_ = obj.spectrum_scan_;
   precursor_id_ = obj.precursor_id_;
@@ -116,6 +117,7 @@ void Prsm::initScores(SpParaPtr sp_para_ptr) {
 xercesc::DOMElement* Prsm::toXmlElement(XmlDOMDocument* xml_doc) {
   std::string element_name = Prsm::getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
+  xml_doc->addElement(element, "file_name", file_name_.c_str());
   std::string str = string_util::convertToString(prsm_id_);
   xml_doc->addElement(element, "prsm_id", str.c_str());
   str = string_util::convertToString(spectrum_id_);
@@ -156,6 +158,7 @@ void Prsm::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
 }
 
 void Prsm::parseXml(xercesc::DOMElement *element) {
+  file_name_ = xml_dom_util::getChildValue(element, "file_name", 0);
   prsm_id_ = xml_dom_util::getIntChildValue(element, "prsm_id", 0);
   spectrum_id_ = xml_dom_util::getIntChildValue(element, "spectrum_id", 0);
   spectrum_scan_ = xml_dom_util::getChildValue(element, "spectrum_scan", 0);

@@ -26,17 +26,27 @@ namespace prot {
 class SimplePrsmXmlWriter {
  public:
   SimplePrsmXmlWriter();
+
   explicit SimplePrsmXmlWriter(const std::string &file_name);
+
   ~SimplePrsmXmlWriter();
+
   void close();
+
   void write(SimplePrsmStrPtr prsm_str_ptr);
+
   void write(const SimplePrsmPtrVec &simple_prsm_ptrs);
+
   void write(SimplePrsmPtr simple_prsm_ptrs);
 
  private:
   std::ofstream file_;
+
   xercesc::DOMLSSerializer* serializer_;
+
   XmlDOMDocument* doc_;
+
+  std::string file_name_;
 };
 
 }  // namespace prot
