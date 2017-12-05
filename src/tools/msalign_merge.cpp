@@ -24,7 +24,6 @@
 #include "spec/ms_header.hpp"
 #include "spec/deconv_ms.hpp"
 #include "spec/msalign_reader.hpp"
-#include "feature/msalign_writer.hpp"
 
 int main(int argc, const char *argv[]) {
   try {
@@ -35,7 +34,7 @@ int main(int argc, const char *argv[]) {
     std::vector<std::string> msalign_file_list;
     desc.add_options()
         ("help,h", "Help message")
-        ("N", po::value<int>(&N), "N")
+        ("num,N", po::value<int>(&N), "N")
         ("msalign,m", po::value<std::vector<std::string> >()->multitoken()->required(), "msalign file list")
         ("output,o", po::value<std::string>(&output_filename)->required(), "output msalign file name");
     po::variables_map vm;
@@ -64,24 +63,23 @@ int main(int argc, const char *argv[]) {
     }
 
     std::ofstream outfile(output_filename); 
-    outfile.precision(16);
 
     for (int i = 0; i < static_cast<int>(msalign_file_list.size()); i++) {
-      prot::MsAlignReader sp_reader(msalign_file_list[i], 1,
-                                    nullptr, std::set<std::string>());
-      prot::DeconvMsPtr ms_ptr = sp_reader.getNextMs();
-      while (ms_ptr != nullptr) {
-        prot::MsHeaderPtr header = ms_ptr->getMsHeaderPtr();
-        header->setId(header->getId() + i * N);
-        if (header->getMsOneId() > 0) {
-          header->setMsOneId(header->getMsOneId() + i * N);
+      prot::MsAlignReader sp_reader(msalign_file_list[i], 1, nullptr, std::set<std::string>());
+      std::vector<std::string> ms_lines = sp_reader.readOneSpectrum();
+      while (ms_lines.size() > 0) {
+        for (size_t k = 0; k < ms_lines.size(); k++) {
+          if (ms_lines[k].substr(0, 3) == "ID=") {
+            outfile << "ID=" << (N * i + std::stoi(ms_lines[k].substr(3))) << std::endl;
+          } else if (ms_lines[k].substr(0, 10) == "MS_ONE_ID=") {
+            outfile << "MS_ONE_ID=" << (N * i + std::stoi(ms_lines[k].substr(10))) << std::endl;
+          } else if (ms_lines[k].substr(0, 6) == "SCANS=") {
+            outfile << "SCANS=" << (N * i + std::stoi(ms_lines[k].substr(6))) << std::endl;
+          } else {
+            outfile << ms_lines[k] << std::endl;
+          }
         }
-        if (header->getFeatureId() > 0) {
-          header->setFeatureId(header->getFeatureId() + i * N); 
-        }
-        ms_ptr->setHeaderPtr(header);
-        prot::MsalignWriter::write(outfile, ms_ptr);
-        ms_ptr = sp_reader.getNextMs();
+        ms_lines = sp_reader.readOneSpectrum();
       }
       sp_reader.close();
     }
