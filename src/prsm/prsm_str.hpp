@@ -96,6 +96,8 @@ class PrsmStr {
 
   void setPrecFeatureId(int id);
 
+  void setPrecursorId(int id);
+
   void setPrecFeatureInte(double inte);
 
   void setFdr(double fdr);
