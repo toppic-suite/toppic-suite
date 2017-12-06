@@ -49,11 +49,11 @@ PrsmPtrVec ZeroPtmSearchProcessor::zeroPtmSearchOneSpec(SpectrumSetPtr spec_set_
       continue;
     std::string seq_name = simple_prsm_ptr_vec[i]->getSeqName();
     std::string seq_desc = simple_prsm_ptr_vec[i]->getSeqDesc();
-    ProteoformPtr proteo_ptr = ProteoformFactory::readFastaToProteoformPtr(reader_ptr, seq_name,
-                                                                           seq_desc, fix_mod_list);
+    ProteoformPtr proteo_ptr = proteoform_factory::readFastaToProteoformPtr(reader_ptr, seq_name,
+                                                                            seq_desc, fix_mod_list);
     if (type_ptr == AlignType::COMPLETE || type_ptr == AlignType::PREFIX) {
       ProteoformPtrVec mod_form_ptr_vec
-          = ProteoformFactory::geneProtModProteoform(proteo_ptr, prot_mod_ptr_vec);
+          = proteoform_factory::geneProtModProteoform(proteo_ptr, prot_mod_ptr_vec);
       proteoform_ptr_vec.insert(proteoform_ptr_vec.end(), mod_form_ptr_vec.begin(),
                                 mod_form_ptr_vec.end());
     } else {

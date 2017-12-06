@@ -34,9 +34,9 @@ PtmSearchSlowFilter::PtmSearchSlowFilter(SpectrumSetPtr spectrum_set_ptr,
     std::string seq_name = simple_prsm_ptrs[i]->getSeqName();
     std::string seq_desc = simple_prsm_ptrs[i]->getSeqDesc();
     ProteoformPtr proteo_ptr
-        = ProteoformFactory::readFastaToProteoformPtr(reader_ptr, seq_name, seq_desc, fix_mod_list);
+        = proteoform_factory::readFastaToProteoformPtr(reader_ptr, seq_name, seq_desc, fix_mod_list);
     ProteoformPtrVec mod_form_ptr_vec
-        = ProteoformFactory::geneProtModProteoform(proteo_ptr, prot_mod_ptr_vec);
+        = proteoform_factory::geneProtModProteoform(proteo_ptr, prot_mod_ptr_vec);
     for (size_t j = 0; j < mod_form_ptr_vec.size(); j++) {
       // this slow match is used for four type of alignment, INTERNAL is used to
       // include more diagonals.

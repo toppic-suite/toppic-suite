@@ -180,7 +180,6 @@ std::function<void()> geneTask(const ProteoformPtrVec & raw_forms,
   };
 }
 
-
 void OnePtmFilterProcessor::processBlock(DbBlockPtr block_ptr, const std::vector<double> & mod_mass_list) {
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
@@ -188,8 +187,8 @@ void OnePtmFilterProcessor::processBlock(DbBlockPtr block_ptr, const std::vector
   std::string db_block_file_name = prsm_para_ptr->getSearchDbFileName()
       + "_" + std::to_string(block_ptr->getBlockIdx());
   ProteoformPtrVec raw_forms
-      = ProteoformFactory::readFastaToProteoformPtrVec(db_block_file_name,
-                                                       prsm_para_ptr->getFixModPtrVec());
+      = proteoform_factory::readFastaToProteoformPtrVec(db_block_file_name,
+                                                        prsm_para_ptr->getFixModPtrVec());
   std::string block_str = std::to_string(block_ptr->getBlockIdx());      
 
   std::vector<std::shared_ptr<boost::thread> > thread_vec;

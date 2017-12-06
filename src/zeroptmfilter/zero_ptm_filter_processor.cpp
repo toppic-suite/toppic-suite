@@ -157,8 +157,8 @@ void ZeroPtmFilterProcessor::processBlock(DbBlockPtr block_ptr) {
   std::string db_block_file_name = prsm_para_ptr->getSearchDbFileName()
       + "_" + std::to_string(block_ptr->getBlockIdx());
   ProteoformPtrVec raw_forms
-      = ProteoformFactory::readFastaToProteoformPtrVec(db_block_file_name,
-                                                       prsm_para_ptr->getFixModPtrVec());
+      = proteoform_factory::readFastaToProteoformPtrVec(db_block_file_name,
+                                                        prsm_para_ptr->getFixModPtrVec());
   std::string block_str = std::to_string(block_ptr->getBlockIdx());
 
   std::vector<ThreadPtr> thread_vec;
