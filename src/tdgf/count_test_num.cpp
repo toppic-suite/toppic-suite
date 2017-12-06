@@ -82,8 +82,8 @@ void CountTestNum::init(PrsmParaPtr para_ptr) {
   FastaSeqPtr seq_ptr = reader.getNextSeq();
 
   while (seq_ptr != nullptr) {
-    ProteoformPtr proteo_ptr = ProteoformFactory::geneDbProteoformPtr(seq_ptr, fix_mod_list);
-    ProteoformPtrVec mod_proteo_ptrs = ProteoformFactory::geneProtModProteoform(proteo_ptr, prot_mods);
+    ProteoformPtr proteo_ptr = proteoform_factory::geneDbProteoformPtr(seq_ptr, fix_mod_list);
+    ProteoformPtrVec mod_proteo_ptrs = proteoform_factory::geneProtModProteoform(proteo_ptr, prot_mods);
     for (size_t i = 0; i < mod_proteo_ptrs.size(); i++) {
       // complete
       double m = mod_proteo_ptrs[i]->getResSeqPtr()->getResMassSum();

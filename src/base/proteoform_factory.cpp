@@ -31,7 +31,9 @@
 
 namespace prot {
 
-ProteoformPtr ProteoformFactory::geneDbProteoformPtr(FastaSeqPtr fasta_seq_ptr, ModPtrVec fix_mod_list) {
+namespace proteoform_factory {
+
+ProteoformPtr geneDbProteoformPtr(FastaSeqPtr fasta_seq_ptr, ModPtrVec fix_mod_list) {
   if (fasta_seq_ptr == nullptr) {
     return ProteoformPtr(nullptr);
   }
@@ -69,8 +71,7 @@ ProteoformPtr ProteoformFactory::geneDbProteoformPtr(FastaSeqPtr fasta_seq_ptr, 
                                       end_pos, res_seq_ptr, change_list);
 }
 
-ProteoformPtr ProteoformFactory::geneProtModProteoform(ProteoformPtr db_form_ptr,
-                                                       ProtModPtr prot_mod_ptr) {
+ProteoformPtr geneProtModProteoform(ProteoformPtr db_form_ptr, ProtModPtr prot_mod_ptr) {
   // check if the proteoform can be truncated
   ResSeqPtr db_res_seq_ptr = db_form_ptr->getResSeqPtr();
   bool valid_mod = prot_mod_util::allowMod(prot_mod_ptr, db_res_seq_ptr->getResidues());
@@ -113,8 +114,7 @@ ProteoformPtr ProteoformFactory::geneProtModProteoform(ProteoformPtr db_form_ptr
                                       db_res_seq_ptr->getLen()-1, seq_ptr, change_ptrs);
 }
 
-ProteoformPtr ProteoformFactory::geneSubProteoform(ProteoformPtr proteoform_ptr,
-                                                   int local_start, int local_end) {
+ProteoformPtr geneSubProteoform(ProteoformPtr proteoform_ptr, int local_start, int local_end) {
   ResiduePtrVec residues;
   ResSeqPtr res_seq_ptr = proteoform_ptr->getResSeqPtr();
   for (int i = local_start; i <= local_end; i++) {
@@ -137,8 +137,7 @@ ProteoformPtr ProteoformFactory::geneSubProteoform(ProteoformPtr proteoform_ptr,
                                       seq_ptr, change_list);
 }
 
-ProteoformPtrVec ProteoformFactory::geneProtModProteoform(ProteoformPtr proteo_ptr,
-                                                          const ProtModPtrVec &prot_mods) {
+ProteoformPtrVec geneProtModProteoform(ProteoformPtr proteo_ptr, const ProtModPtrVec &prot_mods) {
   ProteoformPtrVec new_forms;
   for (size_t j = 0; j < prot_mods.size(); j++) {
     ProteoformPtr ptr = geneProtModProteoform(proteo_ptr, prot_mods[j]);
@@ -149,8 +148,8 @@ ProteoformPtrVec ProteoformFactory::geneProtModProteoform(ProteoformPtr proteo_p
   return new_forms;
 }
 
-ProteoformPtrVec ProteoformFactory::geneProtModProteoform(const ProteoformPtrVec &ori_forms,
-                                                          const ProtModPtrVec &prot_mods) {
+ProteoformPtrVec geneProtModProteoform(const ProteoformPtrVec &ori_forms,
+                                       const ProtModPtrVec &prot_mods) {
   ProteoformPtrVec new_forms;
   for (size_t i = 0; i < ori_forms.size(); i++) {
     for (size_t j = 0; j < prot_mods.size(); j++) {
@@ -163,8 +162,8 @@ ProteoformPtrVec ProteoformFactory::geneProtModProteoform(const ProteoformPtrVec
   return new_forms;
 }
 
-ProteoformPtrVec2D ProteoformFactory::gene2DProtModProteoform(const ProteoformPtrVec &ori_forms,
-                                                              const ProtModPtrVec &prot_mods) {
+ProteoformPtrVec2D gene2DProtModProteoform(const ProteoformPtrVec &ori_forms,
+                                           const ProtModPtrVec &prot_mods) {
   ProteoformPtrVec2D new_forms;
   for (size_t i = 0; i < ori_forms.size(); i++) {
     ProteoformPtrVec mod_forms;
@@ -179,8 +178,8 @@ ProteoformPtrVec2D ProteoformFactory::gene2DProtModProteoform(const ProteoformPt
   return new_forms;
 }
 
-ProteoformPtrVec ProteoformFactory::readFastaToProteoformPtrVec(const std::string &file_name,
-                                                                const ModPtrVec &fix_mod_list) {
+ProteoformPtrVec readFastaToProteoformPtrVec(const std::string &file_name,
+                                             const ModPtrVec &fix_mod_list) {
   LOG_DEBUG("start open file " << file_name);
   FastaReader reader(file_name);
   LOG_DEBUG("open file done " << file_name);
@@ -189,7 +188,7 @@ ProteoformPtrVec ProteoformFactory::readFastaToProteoformPtrVec(const std::strin
   FastaSeqPtr seq_ptr = reader.getNextSeq();
   int count = 0;
   while (seq_ptr != nullptr) {
-    ProteoformPtr proteo_ptr = ProteoformFactory::geneDbProteoformPtr(seq_ptr, fix_mod_list);
+    ProteoformPtr proteo_ptr = geneDbProteoformPtr(seq_ptr, fix_mod_list);
     list.push_back(proteo_ptr);
     seq_ptr = reader.getNextSeq();
     count++;
@@ -197,10 +196,10 @@ ProteoformPtrVec ProteoformFactory::readFastaToProteoformPtrVec(const std::strin
   return list;
 }
 
-ProteoformPtr ProteoformFactory::readFastaToProteoformPtr(FastaIndexReaderPtr reader_ptr,
-                                                          const std::string &seq_name,
-                                                          const std::string &seq_desc,
-                                                          const ModPtrVec &fix_mod_list) {
+ProteoformPtr readFastaToProteoformPtr(FastaIndexReaderPtr reader_ptr,
+                                       const std::string &seq_name,
+                                       const std::string &seq_desc,
+                                       const ModPtrVec &fix_mod_list) {
   FastaSeqPtr seq_ptr = reader_ptr->readFastaSeq(seq_name, seq_desc);
   if (seq_ptr != nullptr) {
     return geneDbProteoformPtr(seq_ptr, fix_mod_list);
@@ -209,5 +208,7 @@ ProteoformPtr ProteoformFactory::readFastaToProteoformPtr(FastaIndexReaderPtr re
   }
 }
 
-} /* namespace prot */
+}  // namespace proteoform_factory
+
+}  // namespace prot
 

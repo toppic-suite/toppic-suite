@@ -35,9 +35,9 @@ ZeroPtmSlowMatch::ZeroPtmSlowMatch(const DeconvMsPtrVec &deconv_ms_ptr_vec,
     deconv_ms_ptr_vec_(deconv_ms_ptr_vec),
     fast_match_ptr_(fast_match_ptr) {
 
-      proteoform_ptr_ = ProteoformFactory::geneSubProteoform(fast_match_ptr->getProteoformPtr(), 
-                                                             fast_match_ptr->getBegin(), 
-                                                             fast_match_ptr->getEnd());
+      proteoform_ptr_ = proteoform_factory::geneSubProteoform(fast_match_ptr->getProteoformPtr(), 
+                                                              fast_match_ptr->getBegin(), 
+                                                              fast_match_ptr->getEnd());
 
       SpParaPtr sp_para_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr();
       refine_prec_mass_ = proteoform_ptr_->getResSeqPtr()->getSeqMass();

@@ -303,7 +303,7 @@ PrsmPtr PSAlign::geneResult(int shift_num, ProteoformPtr proteo_ptr,
   }
   int first_pos = header_ptrs[0]->getTruncFirstResPos();
   int last_pos = header_ptrs[header_ptrs.size()-1]->getTruncLastResPos();
-  ProteoformPtr sub_proteo_ptr  = ProteoformFactory::geneSubProteoform(proteo_ptr, first_pos, last_pos);
+  ProteoformPtr sub_proteo_ptr = proteoform_factory::geneSubProteoform(proteo_ptr, first_pos, last_pos);
 
   double min_mass = prsm_para_ptr->getSpParaPtr()->getMinMass();
   double ppo = prsm_para_ptr->getSpParaPtr()->getPeakTolerancePtr()->getPpo();

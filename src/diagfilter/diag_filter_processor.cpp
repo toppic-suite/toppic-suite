@@ -78,8 +78,8 @@ void DiagFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num
   std::string db_block_file_name = prsm_para_ptr->getSearchDbFileName()
       + "_" + std::to_string(block_ptr->getBlockIdx());
   ProteoformPtrVec raw_forms
-      = ProteoformFactory::readFastaToProteoformPtrVec(db_block_file_name,
-                                                       prsm_para_ptr->getFixModPtrVec());
+      = proteoform_factory::readFastaToProteoformPtrVec(db_block_file_name,
+                                                        prsm_para_ptr->getFixModPtrVec());
   MassDiagFilterPtr filter_ptr = std::make_shared<MassDiagFilter>(raw_forms, mng_ptr_);
 
   int group_spec_num = mng_ptr_->prsm_para_ptr_->getGroupSpecNum();
