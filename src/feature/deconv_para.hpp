@@ -48,6 +48,8 @@ class DeconvPara {
   double prec_window_;
   
   bool do_final_filtering_ = true;
+
+  bool output_match_env_ = false;
 };
 
 typedef std::shared_ptr<DeconvPara> DeconvParaPtr;

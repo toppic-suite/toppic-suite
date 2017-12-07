@@ -23,6 +23,7 @@
 #include "feature/deconv_process.hpp"
 #include "feature/match_env.hpp"
 #include "feature/match_env_util.hpp"
+#include "feature/match_env_writer.hpp"
 
 namespace prot {
 
@@ -142,6 +143,9 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr, FeatureMsReaderPtr read
       MatchEnvPtrVec result_envs = deconv_ptr->getResult();
       DeconvMsPtr ms_ptr = match_env_util::getDeconvMsPtr(header_ptr, result_envs);
       msalign_writer::write(of2, ms_ptr);
+      if (para_ptr_->output_match_env_) {
+        match_env_writer::write(header_ptr, result_envs);
+      }
       count2++;
     }
   }

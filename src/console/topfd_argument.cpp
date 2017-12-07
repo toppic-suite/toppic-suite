@@ -41,6 +41,7 @@ void Argument::initArguments() {
   arguments_["outMultipleMass"] = "false";
   arguments_["precWindow"] = "3.0";
   arguments_["doFinalFiltering"] = "true";
+  arguments_["outputMatchEnv"] = "true";
 }
 
 void Argument::showUsage(boost::program_options::options_description &desc) {
