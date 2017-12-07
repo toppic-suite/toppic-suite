@@ -27,8 +27,13 @@ typedef std::shared_ptr<MultiSpecPeak> MultiSpecPeakPtr;
 
 class MultiSpecPeak : public Peak {
  public:
-  MultiSpecPeak (double mono_mass, double intensity, int spec_id, 
-                 int in_spec_peak_id, int base_type, double score);
+  MultiSpecPeak(double mono_mass, double intensity, int spec_id, 
+                int in_spec_peak_id, int base_type, double score):
+      Peak(mono_mass, intensity),
+      spec_id_(spec_id),
+      in_spec_peak_id_(in_spec_peak_id),
+      base_type_(base_type),
+      score_(score) {}
 
   int getId() {return id_;}
 
@@ -44,7 +49,7 @@ class MultiSpecPeak : public Peak {
 
   void setId(int id) {id_ = id;}
 
-  static bool cmpPosIncrease(const MultiSpecPeakPtr &a, const MultiSpecPeakPtr &b){
+  static bool cmpPosIncrease(const MultiSpecPeakPtr &a, const MultiSpecPeakPtr &b) {
     return a->getPosition() < b->getPosition();
   }
 
@@ -58,5 +63,5 @@ class MultiSpecPeak : public Peak {
 
 typedef std::vector<MultiSpecPeakPtr> MultiSpecPeakPtrVec;
 
-}
+}  // namespace prot
 #endif

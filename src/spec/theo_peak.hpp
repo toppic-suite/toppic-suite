@@ -16,6 +16,8 @@
 #ifndef PROT_SPEC_THEO_PEAK_HPP_
 #define PROT_SPEC_THEO_PEAK_HPP_
 
+#include <vector>
+
 #include "base/ion.hpp"
 #include "spec/peak.hpp"
 
@@ -26,7 +28,10 @@ typedef std::shared_ptr<TheoPeak> TheoPeakPtr;
 
 class TheoPeak : public Peak {
  public:
-  TheoPeak(IonPtr ion_ptr,double unmode_mass,double shift);
+  TheoPeak(IonPtr ion_ptr, double unmod_mass, double shift):
+    Peak(unmod_mass + shift, 1.0),
+    ion_ptr_(ion_ptr),
+    shift_(shift) {}
 
   IonPtr getIonPtr() {return ion_ptr_;}
 
@@ -34,7 +39,7 @@ class TheoPeak : public Peak {
 
   double getShift() {return shift_;}
 
-  static bool cmpPosInc(const TheoPeakPtr &a, const TheoPeakPtr &b){
+  static bool cmpPosInc(const TheoPeakPtr &a, const TheoPeakPtr &b) {
     return a->getPosition() < b->getPosition();
 }
 

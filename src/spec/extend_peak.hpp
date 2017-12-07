@@ -19,6 +19,7 @@
 #include <vector>
 #include <memory>
 #include <algorithm>
+#include <string>
 
 #include "spec/deconv_peak.hpp"
 
@@ -27,31 +28,39 @@ namespace prot {
 class ExtendPeak;
 typedef std::shared_ptr<ExtendPeak> ExtendPeakPtr;
 
-class ExtendPeak : public Peak{
+class ExtendPeak : public Peak {
  public:
   ExtendPeak();
 
-  ExtendPeak(DeconvPeakPtr base_peak_ptr, double mono_mass, double score);
+  ExtendPeak(DeconvPeakPtr base_peak_ptr, double mono_mass, double score):
+      Peak(mono_mass, 1.0),
+      base_peak_ptr_(base_peak_ptr),
+      mono_mass_(mono_mass),
+      score_(score),
+      orig_tolerance_(0.0),
+      reverse_tolerance_(0.0) {}
 
-  DeconvPeakPtr getBasePeakPtr(){return base_peak_ptr_;}
+  DeconvPeakPtr getBasePeakPtr() {return base_peak_ptr_;}
 
-  double getMonoMass(){return mono_mass_;}
+  double getMonoMass() {return mono_mass_;}
 
-  double getScore(){return score_;}
+  double getScore() {return score_;}
 
-  double getOrigTolerance(){return orig_tolerance_;}
+  double getOrigTolerance() {return orig_tolerance_;}
 
-  double getReverseTolerance(){return reverse_tolerance_;}
+  double getReverseTolerance() {return reverse_tolerance_;}
 
   void setOrigTolerance(double orig_tolerance) {
-    orig_tolerance_ = orig_tolerance;}
+    orig_tolerance_ = orig_tolerance;
+  }
 
   void setReverseTolerance(double reverse_tolerance) {
-    reverse_tolerance_ = reverse_tolerance;}
+    reverse_tolerance_ = reverse_tolerance;
+  }
 
-  void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+  void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
-  static bool cmpPosIncrease(const ExtendPeakPtr &a, const ExtendPeakPtr &b){
+  static bool cmpPosIncrease(const ExtendPeakPtr &a, const ExtendPeakPtr &b) {
     return a->getPosition() < b->getPosition();
   }
 

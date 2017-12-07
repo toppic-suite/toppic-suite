@@ -13,17 +13,14 @@
 //limitations under the License.
 
 
+#include <string>
+
 #include "base/string_util.hpp"
 #include "spec/peak.hpp"
 
 namespace prot {
 
-Peak::Peak(double position, double intensity):
-    position_(position),
-    intensity_(intensity) {
-    }
-
-void Peak::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
+void Peak::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   std::string element_name = Peak::getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
   std::string str = string_util::convertToString(getPosition());
@@ -33,4 +30,4 @@ void Peak::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
   parent->appendChild(element);
 }
 
-}
+}  // namespace prot

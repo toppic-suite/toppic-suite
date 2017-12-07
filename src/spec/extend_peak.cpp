@@ -13,20 +13,12 @@
 //limitations under the License.
 
 
+#include <string>
+
 #include "base/string_util.hpp"
 #include "spec/extend_peak.hpp"
 
 namespace prot {
-
-ExtendPeak::ExtendPeak(DeconvPeakPtr base_peak_ptr, 
-                       double mono_mass,double score):
-    Peak(mono_mass,1.0),
-    base_peak_ptr_(base_peak_ptr),
-    mono_mass_(mono_mass),
-    score_(score),
-    orig_tolerance_(0.0),
-    reverse_tolerance_(0.0) {
-    }
 
 void ExtendPeak::appendXml(XmlDOMDocument* xml_doc,
                            xercesc::DOMElement* parent) {
@@ -44,7 +36,7 @@ void ExtendPeak::appendXml(XmlDOMDocument* xml_doc,
   xml_doc->addElement(element, "orig_tolerance", str.c_str());
   str = string_util::convertToString(reverse_tolerance_);
   xml_doc->addElement(element, "reverse_tolerance", str.c_str());
-  base_peak_ptr_->appendXml(xml_doc,element);
+  base_peak_ptr_->appendXml(xml_doc, element);
   parent->appendChild(element);
 }
 

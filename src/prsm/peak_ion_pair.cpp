@@ -13,19 +13,14 @@
 //limitations under the License.
 
 
+#include <string>
+
 #include "base/logger.hpp"
 #include "base/string_util.hpp"
 #include "spec/theo_peak.hpp"
 #include "prsm/peak_ion_pair.hpp"
 
 namespace prot {
-
-PeakIonPair::PeakIonPair(MsHeaderPtr ms_header_ptr, ExtendPeakPtr real_peak_ptr, 
-                         TheoPeakPtr theo_peak_ptr): 
-    ms_header_ptr_(ms_header_ptr),
-    real_peak_ptr_(real_peak_ptr),
-    theo_peak_ptr_(theo_peak_ptr) {
-    }
 
 void PeakIonPair::appendRealPeakToXml(XmlDOMDocument* xml_doc, 
                                       xercesc::DOMElement* parent) {
@@ -47,7 +42,7 @@ void PeakIonPair::appendRealPeakToXml(XmlDOMDocument* xml_doc,
 
 void PeakIonPair::appendTheoPeakToXml(XmlDOMDocument* xml_doc, 
                                       xercesc::DOMElement* parent) {
-  int precison=4;
+  int precison = 4;
   xercesc::DOMElement* element = xml_doc->createElement("matched_ion");
   std::string str 
       = theo_peak_ptr_->getIonPtr()->getIonTypePtr()->getName();
@@ -71,9 +66,9 @@ void PeakIonPair::appendTheoPeakToXml(XmlDOMDocument* xml_doc,
   str = string_util::convertToString(theo_peak_ptr_->getIonPtr()->getPos());
   xml_doc->addElement(element, "ion_left_position", str.c_str());
   double error = real_peak_ptr_->getMonoMass() - theo_peak_ptr_->getModMass();
-  str = string_util::convertToString(error,precison);
+  str = string_util::convertToString(error, precison);
   xml_doc->addElement(element, "mass_error", str.c_str()); 
-  str = string_util::convertToString(error * 1000000 / real_peak_ptr_->getMonoMass(),precison-2);
+  str = string_util::convertToString(error * 1000000 / real_peak_ptr_->getMonoMass(), precison - 2);
   xml_doc->addElement(element, "ppm", str.c_str()); 
   parent->appendChild(element);
 }
@@ -82,7 +77,6 @@ bool PeakIonPair::cmpRealPeakPosInc(const PeakIonPairPtr &a,
                                     const PeakIonPairPtr &b) {
   return a->getRealPeakPtr()->getBasePeakPtr()->getPosition() 
       < b->getRealPeakPtr()->getBasePeakPtr()->getPosition();
-
 }
 
-}
+}  // namespace prot
