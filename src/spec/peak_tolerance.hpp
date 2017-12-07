@@ -17,6 +17,7 @@
 #define PROT_SPEC_PEAK_TOLERANCE_HPP_
 
 #include <memory>
+#include <string>
 
 #include "base/xml_dom_document.hpp"
 
@@ -25,9 +26,12 @@ namespace prot {
 class PeakTolerance {
  public:
   PeakTolerance(double ppo, bool use_min_tolerance,
-                double min_tolerance);
+                double min_tolerance):
+      ppo_(ppo), 
+      use_min_tolerance_(use_min_tolerance),
+      min_tolerance_(min_tolerance) {}
 
-  PeakTolerance(xercesc::DOMElement* element);
+  explicit PeakTolerance(xercesc::DOMElement* element);
 
   double compStrictErrorTole(double mass);
 

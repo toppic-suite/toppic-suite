@@ -13,24 +13,18 @@
 //limitations under the License.
 
 
+#include <string>
+
 #include "base/string_util.hpp"
 #include "base/xml_dom_util.hpp"
 #include "spec/peak_tolerance.hpp"
 
-
 namespace prot {
 
-PeakTolerance::PeakTolerance(double ppo, bool use_min_tolerance,
-                             double min_tolerance):
-    ppo_(ppo), 
-    use_min_tolerance_(use_min_tolerance),
-    min_tolerance_(min_tolerance) {
-    }
-
-PeakTolerance::PeakTolerance(xercesc::DOMElement* element){
-  ppo_ = xml_dom_util::getDoubleChildValue(element,"ppo",0);
-  use_min_tolerance_ = xml_dom_util::getDoubleChildValue(element,"use_min_tolerance",0);
-  min_tolerance_ = xml_dom_util::getDoubleChildValue(element,"min_tolerance",0);
+PeakTolerance::PeakTolerance(xercesc::DOMElement* element) {
+  ppo_ = xml_dom_util::getDoubleChildValue(element, "ppo", 0);
+  use_min_tolerance_ = xml_dom_util::getDoubleChildValue(element, "use_min_tolerance", 0);
+  min_tolerance_ = xml_dom_util::getDoubleChildValue(element, "min_tolerance", 0);
 }
 
 double PeakTolerance::compStrictErrorTole(double mass) {
