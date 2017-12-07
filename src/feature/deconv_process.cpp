@@ -34,6 +34,7 @@ void DeconvProcess::copyParameters(FeatureMngPtr mng_ptr) {
   mng_ptr->keep_unused_peaks_ = para_ptr_->keep_unused_peaks_;
   mng_ptr->output_multiple_mass_ = para_ptr_->output_multiple_mass_;
   mng_ptr->prec_deconv_interval_ = para_ptr_->prec_window_;
+  mng_ptr->do_final_filtering_ = para_ptr_->do_final_filtering_;
 }
 
 void DeconvProcess::outputParameter(std::ostream &output, DeconvParaPtr para_ptr, const std::string & prefix) {
@@ -55,6 +56,8 @@ void DeconvProcess::outputParameter(std::ostream &output, DeconvParaPtr para_ptr
       << "Signal/noise ratio: " << para_ptr->sn_ratio_ << std::endl;
   output << prefix << std::setw(40) << std::left 
       << "Precursor window size: " << para_ptr->prec_window_ << " m/z" << std::endl;
+  //output << prefix << std::setw(40) << std::left 
+  //    << "Do final filtering: " << para_ptr->do_final_filtering_ << std::endl;
   output << prefix << "********************** Parameters **********************" << std::endl;
 }
 
