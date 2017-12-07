@@ -16,6 +16,8 @@
 #ifndef PROT_PRSM_PEAK_ION_PAIR_HPP_
 #define PROT_PRSM_PEAK_ION_PAIR_HPP_
 
+#include <vector>
+
 #include "base/xml_dom_document.hpp"
 #include "spec/ms_header.hpp"
 #include "spec/extend_peak.hpp"
@@ -28,8 +30,11 @@ typedef std::shared_ptr<PeakIonPair> PeakIonPairPtr;
 
 class PeakIonPair {
  public:
-  PeakIonPair(MsHeaderPtr ms_header_ptr, ExtendPeakPtr real_peak_ptr, 
-              TheoPeakPtr theo_peak_ptr); 
+  PeakIonPair(MsHeaderPtr ms_header_ptr, ExtendPeakPtr real_peak_ptr,
+              TheoPeakPtr theo_peak_ptr): 
+      ms_header_ptr_(ms_header_ptr),
+      real_peak_ptr_(real_peak_ptr),
+      theo_peak_ptr_(theo_peak_ptr) {}
 
   MsHeaderPtr getMsHeaderPtr() {return ms_header_ptr_;}
 
@@ -49,13 +54,16 @@ class PeakIonPair {
 
  private:
   int id_;
+
   MsHeaderPtr ms_header_ptr_;
+
   ExtendPeakPtr real_peak_ptr_;
+
   TheoPeakPtr theo_peak_ptr_;
 };
 typedef std::vector<PeakIonPairPtr> PeakIonPairPtrVec;
 typedef std::vector<PeakIonPairPtrVec> PeakIonPairPtrVec2D;
 
-}
+}  // namespace prot
 
 #endif

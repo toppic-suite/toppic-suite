@@ -18,6 +18,7 @@
 
 #include <memory>
 #include <vector>
+#include <string>
 
 #include "base/mass_constant.hpp"
 #include "base/xml_dom_document.hpp"
@@ -26,7 +27,9 @@ namespace prot {
 
 class Peak {
  public:
-  Peak(double position, double intensity);
+  Peak(double position, double intensity):
+      position_(position),
+      intensity_(intensity) {}
 
   double getIntensity() {return intensity_;}
 
@@ -36,7 +39,7 @@ class Peak {
 
   void setPosition(double position) {position_ = position;}
 
-  void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+  void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
   static std::string getXmlElementName() {return "peak";}
 
@@ -56,5 +59,5 @@ class Peak {
 typedef std::shared_ptr<Peak> PeakPtr;
 typedef std::vector<PeakPtr> PeakPtrVec;
 
-}
+}  // namespace prot
 #endif
