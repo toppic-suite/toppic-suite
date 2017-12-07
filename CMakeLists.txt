@@ -79,6 +79,8 @@ file(GLOB FEATURE_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/feature/*.cpp)
 file(GLOB TOPFD_ARGU_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd_argument.cpp)
 file(GLOB TOPFD_MAIN_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd.cpp)
 
+file(GLOB TOPFD_TRAIN_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd_train.cpp)
+
 # GUI
 file(GLOB TOPFD_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topfd/*.cpp)
 file(GLOB TOPFD_GUI_QRC   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topfd/*.qrc)
@@ -102,6 +104,10 @@ add_executable(topmg ${TOPMG_MAIN_SRC} ${TOPMG_PROCESS_SRCS} ${TOPMG_ARGU_SRCS} 
     ${GRAPH_ALIGN_SRCS} ${TDGF_SRCS} ${ONE_PTM_SEARCH_SRCS} ${PRSM_VIEW_SRCS})
 
 add_executable(topfd ${TOPFD_MAIN_SRCS} ${TOPFD_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS})
+
+add_executable(topfd_train ${TOPFD_TRAIN_SRCS} ${TOPFD_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS})
+
+add_executable(console ${TOPFD_MAIN_SRCS} ${TOPFD_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS})
 
 add_executable(topfd_gui ${TOPFD_GUI_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS} ${TOPFD_GUI_QRC})
 
@@ -157,6 +163,9 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
         boost_filesystem boost_system boost_thread pthread z)
 
     target_link_libraries(topfd pwiz xalan-c xerces-c boost_program_options
+        boost_filesystem boost_system boost_thread pthread z)
+
+    target_link_libraries(topfd_train pwiz xalan-c xerces-c boost_program_options
         boost_filesystem boost_system boost_thread pthread z)
 
     target_link_libraries(msalign_merge pwiz xerces-c boost_program_options
