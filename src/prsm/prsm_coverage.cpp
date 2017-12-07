@@ -67,6 +67,7 @@ void PrsmCoverage::processSingleCoverage(){
             = ExtendMsFactory::geneMsThreePtrVec(deconv_ms_ptr_vec, sp_para_ptr, new_prec_mass);
         prsm_ptr->setRefineMsVec(extend_ms_ptr_vec);
         processOnePrsm(out_stream, prsm_ptr, prsm_para_ptr_);
+        outputMatchPeaks(prsm_ptr, prsm_para_ptr_);
         prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
       }
     }
@@ -311,6 +312,24 @@ void PrsmCoverage::compTwoCoverage(std::ofstream &file, PrsmPtr prsm_ptr,
   computeCoverage(file, prsm_ptr, pair_ptrs_2, prsm_para_ptr);
   computeCoverage(file, prsm_ptr, pair_ptrs_3, prsm_para_ptr);
   file << std::endl;
+}
+
+void PrsmCoverage::outputMatchPeaks(PrsmPtr prsm_ptr, PrsmParaPtr prsm_para_ptr) {
+  double min_mass = prsm_para_ptr_->getSpParaPtr()->getMinMass();
+  PeakIonPairPtrVec pair_ptrs = peak_ion_pair_util::genePeakIonPairs(prsm_ptr->getProteoformPtr(), 
+                                                                     prsm_ptr->getRefineMsPtrVec(),
+                                                                     min_mass);
+  std::string file_name = "scan_" 
+      + prsm_ptr->getDeconvMsPtrVec()[0]->getMsHeaderPtr()->getScansString() + ".peak";
+  std::ofstream ps(file_name, std::ofstream::out); 
+  for (size_t i = 0; i < pair_ptrs.size(); i++) {
+    ExtendPeakPtr ex_peak = pair_ptrs[i]->getRealPeakPtr();
+    TheoPeakPtr theo_peak = pair_ptrs[i]->getTheoPeakPtr();
+    ps << ex_peak->getMonoMass() << "\t" 
+        << ex_peak->getBasePeakPtr()->getMonoMass() << "\t"
+        << theo_peak->getModMass() << std::endl;
+  }
+  ps.close();
 }
 
 void PrsmCoverage::processOnePrsm(std::ofstream &file, PrsmPtr prsm_ptr, 
