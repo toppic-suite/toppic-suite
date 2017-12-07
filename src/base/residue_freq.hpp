@@ -16,13 +16,17 @@
 #ifndef PROT_BASE_RESIDUE_FREQ_HPP_
 #define PROT_BASE_RESIDUE_FREQ_HPP_
 
+#include <vector>
+
 #include "base/residue.hpp"
 
 namespace prot {
 
 class ResidueFreq: public Residue {
  public:
-  ResidueFreq(AcidPtr acid_ptr, PtmPtr ptm_ptr, double freq);
+  ResidueFreq(AcidPtr acid_ptr, PtmPtr ptm_ptr, double freq):
+      Residue(acid_ptr, ptm_ptr),
+      freq_(freq) {}
 
   double getFreq() {return freq_;}
 
@@ -33,5 +37,5 @@ class ResidueFreq: public Residue {
 typedef std::shared_ptr<ResidueFreq> ResFreqPtr;
 typedef std::vector<ResFreqPtr> ResFreqPtrVec;
 
-}
+}  // namespace prot
 #endif

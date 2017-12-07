@@ -29,7 +29,7 @@ ProteoGraph::ProteoGraph(FastaSeqPtr fasta_seq_ptr, ModPtrVec fix_mod_ptr_vec,
                          double convert_ratio, int max_mod_num,
                          int max_ptm_sum_mass, int proteo_graph_gap,
                          int var_ptm_in_gap) {
-  db_proteo_ptr_ = ProteoformFactory::geneDbProteoformPtr(fasta_seq_ptr, fix_mod_ptr_vec);
+  db_proteo_ptr_ = proteoform_factory::geneDbProteoformPtr(fasta_seq_ptr, fix_mod_ptr_vec);
   graph_ptr_ = graph_ptr;
   is_nme_ = is_nme;
   node_num_ = num_vertices(*graph_ptr.get());

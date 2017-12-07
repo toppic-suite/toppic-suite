@@ -17,6 +17,7 @@
 #define PROT_PRSM_PRSM_TOP_SELECTOR_HPP_
 
 #include <map>
+#include <string>
 
 #include "base/string_util.hpp"
 #include "base/proteoform.hpp"
@@ -31,15 +32,24 @@ class PrsmTopSelector {
   PrsmTopSelector(const std::string &db_file_name,
                   const std::string &spec_file_name,
                   const std::string &in_file_ext, 
-                  const std::string &out_file_ext, int n_top);
+                  const std::string &out_file_ext, int n_top): 
+      spec_file_name_(spec_file_name), 
+      db_file_name_(db_file_name),
+      input_file_ext_(in_file_ext),
+      output_file_ext_(out_file_ext),
+      n_top_(n_top) {}
+
   void process();
  private:
   std::string spec_file_name_;
-  std::string db_file_name_;
-  std::string input_file_ext_;
-  std::string output_file_ext_;
-  int n_top_;
 
+  std::string db_file_name_;
+
+  std::string input_file_ext_;
+
+  std::string output_file_ext_;
+
+  int n_top_;
 };
 
 typedef std::shared_ptr<PrsmTopSelector> PrsmTopSelectorPtr;
