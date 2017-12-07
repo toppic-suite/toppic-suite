@@ -62,6 +62,7 @@ file(GLOB LOCAL_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/local/*.cpp)
 file(GLOB TOPPIC_ARGU_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_argument.cpp)
 file(GLOB TOPPIC_PROCESS_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_process.cpp)
 file(GLOB TOPPIC_MAIN_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic.cpp)
+file(GLOB TOPPIC_MATCH_PEAK_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_match_peak.cpp)
 
 # mass graph
 file(GLOB GRAPH_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/graph/*.cpp)
@@ -98,6 +99,9 @@ add_executable(toppic_gui ${TOPPIC_GUI_SRCS} ${TOPPIC_GUI_QRC} ${TOPPIC_PROCESS_
     ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
     ${ZERO_PTM_SRCS} ${ZERO_PTM_FILTER} ${DIAG_FILTER_SRCS} ${ONE_PTM_FILTER_SRCS} ${ONE_PTM_SEARCH_SRCS}
     ${PTM_SRCS} ${TDGF_SRCS} ${LOCAL_SRCS} ${PRSM_VIEW_SRCS})
+
+  add_executable(toppic_match_peak ${TOPPIC_MATCH_PEAK_SRCS} ${TOPPIC_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
+    ${PRSM_VIEW_SRCS})
 
 add_executable(topmg ${TOPMG_MAIN_SRC} ${TOPMG_PROCESS_SRCS} ${TOPMG_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
     ${ZERO_PTM_FILTER} ${DIAG_FILTER_SRCS} ${ONE_PTM_FILTER_SRCS} ${ZERO_PTM_SRCS} ${GRAPH_SRCS}
@@ -157,6 +161,9 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
         boost_filesystem boost_system boost_thread pthread z)
 
     target_link_libraries(toppic_gui Qt5Widgets Qt5Core Qt5Gui xalan-c xerces-c boost_program_options
+        boost_filesystem boost_system boost_thread pthread z)
+
+    target_link_libraries(toppic_match_peak xalan-c xerces-c boost_program_options
         boost_filesystem boost_system boost_thread pthread z)
 
     target_link_libraries(topmg xalan-c xerces-c boost_program_options

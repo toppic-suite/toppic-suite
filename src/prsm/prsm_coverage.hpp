@@ -55,6 +55,8 @@ class PrsmCoverage {
                       PrsmParaPtr prsm_para_ptr);
   void processTwoPrsms(std::ofstream &file, PrsmPtr prsm_ptr_1,
                        PrsmPtr prsm_ptr_2, PrsmParaPtr prsm_para_ptr);
+
+  void outputMatchPeaks(PrsmPtr prsm_ptr, PrsmParaPtr prsm_para_ptr);
 };
 
 typedef std::shared_ptr<PrsmCoverage> PrsmCoveragePtr;
