@@ -337,12 +337,6 @@ void XmlGenerator::process() {
   file_util::createFolder(mng_ptr_->xml_path_ + file_util::getFileSeparator() + "proteins");
   LOG_DEBUG("fold created");
 
-  PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
-  std::string spectrum_file_name = prsm_para_ptr->getSpectrumFileName();
-  std::string input_file_name = file_util::basename(spectrum_file_name) + "." + input_file_ext_;
-  std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
-  ModPtrVec fix_mod_ptr_vec = prsm_para_ptr->getFixModPtrVec();
-
   outputPrsms();
   splitBySpeciesId();
   outputProteoforms();
@@ -353,5 +347,7 @@ void XmlGenerator::process() {
 
   outputFileList();
 }
+
+}  // namespace prot
 
 }  // namespace prot
