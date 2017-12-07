@@ -349,5 +349,3 @@ void XmlGenerator::process() {
 }
 
 }  // namespace prot
-
-}  // namespace prot
