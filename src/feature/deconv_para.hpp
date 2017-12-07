@@ -46,6 +46,8 @@ class DeconvPara {
   bool output_multiple_mass_ = false; 
 
   double prec_window_;
+  
+  bool do_final_filtering_ = true;
 };
 
 typedef std::shared_ptr<DeconvPara> DeconvParaPtr;

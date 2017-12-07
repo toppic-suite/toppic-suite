@@ -40,6 +40,7 @@ void Argument::initArguments() {
   arguments_["keepUnusedPeaks"] = "false";
   arguments_["outMultipleMass"] = "false";
   arguments_["precWindow"] = "3.0";
+  arguments_["doFinalFiltering"] = "true";
 }
 
 void Argument::showUsage(boost::program_options::options_description &desc) {

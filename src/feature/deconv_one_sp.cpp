@@ -102,7 +102,6 @@ MatchEnvPtrVec DeconvOneSp::postprocess(MatchEnvPtrVec  &dp_envs) {
   else {
     result_envs_ = dp_envs;
   }
-
   if (mng_ptr_->keep_unused_peaks_) {
     match_env_util::addLowMassPeak(result_envs_, peak_list, mng_ptr_->mz_tolerance_);
   }

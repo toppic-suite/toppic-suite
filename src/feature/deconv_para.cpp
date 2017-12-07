@@ -32,6 +32,8 @@ DeconvPara::DeconvPara(std::map<std::string, std::string> &arguments) {
   prec_window_ = std::stod(arguments["precWindow"]);
   exec_dir_ = arguments["executiveDir"];
   output_multiple_mass_ = (arguments["outMultipleMass"] == "true");
+  do_final_filtering_ = (arguments["doFinalFiltering"] == "true");
+  std::cout << "Do final filtering " << do_final_filtering_;
 }
 
 }  // namespace prot
