@@ -16,6 +16,9 @@
 #ifndef PROT_TDGF_MNG_HPP_
 #define PROT_TDGF_MNG_HPP_
 
+
+#include <string>
+
 #include "prsm/prsm_para.hpp"
 
 namespace prot {
@@ -24,12 +27,18 @@ class TdgfMng {
  public:
   TdgfMng(PrsmParaPtr prsm_para_ptr, int shift_num, double max_ptm_mass, bool use_gf, 
           bool variable_ptm, int thread_num, const std::string &input_file_ext, 
-          const std::string & output_file_ext);
+          const std::string & output_file_ext):
+      input_file_ext_(input_file_ext),
+      output_file_ext_(output_file_ext),
+      prsm_para_ptr_(prsm_para_ptr),
+      use_gf_(use_gf),
+      variable_ptm_(variable_ptm),
+      max_ptm_mass_(max_ptm_mass),
+      unexpected_shift_num_(shift_num),
+      thread_num_(thread_num) {}
 
-  /*********************************
-   * Common parameters
-   * *******************************/
   std::string input_file_ext_;
+
   std::string output_file_ext_;
 
   PrsmParaPtr prsm_para_ptr_;
@@ -41,34 +50,32 @@ class TdgfMng {
 
   bool variable_ptm_ = false;
 
-  /**********************************
-   * Tdgf Table parameters 
-   * ********************************/
-
-
-  /**********************************
-   * Tdgf parameters 
-   * ********************************/
   /* max ptm mass is used in the function for counting sequence numbers*/
   double max_ptm_mass_ = 1000000;
 
   /** do tdgf computation if poisson report evalue > 10^-8 
    * or match frag num < 25 */
   double computation_evalue_cutoff = 0.00000001;
+
   int computation_frag_num_cutoff = 25;
 
   /** dp table */
   // number of mass shift
   int unexpected_shift_num_ = 2;
-  int thread_num_ = 1;
-  double convert_ratio_ = 274.335215;
-  double max_prec_mass_ = 100000;  
-  int max_table_height_ = 128;
-  int min_height_ = 10;
 
+  int thread_num_ = 1;
+
+  double convert_ratio_ = 274.335215;
+
+  double max_prec_mass_ = 100000;  
+
+  int max_table_height_ = 128;
+
+  int min_height_ = 10;
 };
 
 typedef std::shared_ptr<TdgfMng> TdgfMngPtr;
 
-}
+}  // namespace prot
+
 #endif
