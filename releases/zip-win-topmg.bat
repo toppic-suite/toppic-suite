@@ -1,7 +1,7 @@
 rmdir /S topmg-win-cmd-%1
 mkdir topmg-win-cmd-%1
 copy ..\bin\topmg.exe topmg-win-cmd-%1 
-copy LICENSE topmg-win-cmd-%1
+copy ..\LICENSE topmg-win-cmd-%1
 xcopy /S ..\toppic_resources topmg-win-cmd-%1\toppic_resources
 
 copy C:\msys64\mingw64\bin\libwinpthread-1.dll topmg-win-cmd-%1
