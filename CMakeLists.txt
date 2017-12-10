@@ -92,6 +92,11 @@ file(GLOB TOPPIC_GUI_QRC   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/toppic/*.qrc)
 file(GLOB MCMC_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/mcmc/*.cpp)
 file(GLOB TEST_MCMC_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/test_mcmc.cpp)
 
+# Tag generation
+file(GLOB TAG_LONG_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/taglong/*.cpp)
+file(GLOB TAG_LONG_MAIN  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/tag_long_filter.cpp)
+
+# unit test using catch
 file(GLOB UNIT_TEST_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/*.cpp)
 
 add_executable(toppic ${TOPPIC_MAIN_SRCS} ${TOPPIC_PROCESS_SRCS} ${TOPPIC_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
@@ -119,6 +124,9 @@ add_executable(topfd ${TOPFD_MAIN_SRCS} ${TOPFD_ARGU_SRCS} ${HTS_SRCS} ${BASE_SR
 add_executable(topfd_train ${TOPFD_TRAIN_SRCS} ${TOPFD_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS})
 
 add_executable(topfd_gui ${TOPFD_GUI_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS} ${TOPFD_GUI_QRC})
+
+add_executable(taglong_filter ${TAG_LONG_MAIN} ${TOPPIC_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
+    ${TAG_LONG_SRCS})
 
 #add_library(topfd-dev SHARED ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS})
 
@@ -199,6 +207,9 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
         boost_system pthread z)
 
     target_link_libraries(test_mcmc xalan-c xerces-c boost_program_options
+        boost_filesystem boost_system boost_thread pthread z)
+
+    target_link_libraries(taglong_filter xalan-c xerces-c boost_program_options
         boost_filesystem boost_system boost_thread pthread z)
 
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 

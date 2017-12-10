@@ -74,7 +74,7 @@ std::string FastaSeq::rmChar(const std::string &ori_seq) {
 }
 
 void FastaSeq::compAcidPtmPairVec() {
-  LOG_DEBUG("start get acid ptm pair");
+  // LOG_DEBUG("start get acid ptm pair");
   size_t pos = 0;
   int count = 0;
   while (pos < seq_.length()) {
