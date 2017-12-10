@@ -88,8 +88,11 @@ file(GLOB TOPFD_GUI_QRC   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topfd/*.qrc)
 file(GLOB TOPPIC_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/toppic/*.cpp)
 file(GLOB TOPPIC_GUI_QRC   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/toppic/*.qrc)
 
+# MCMC
+file(GLOB MCMC_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/mcmc/*.cpp)
+file(GLOB TEST_MCMC_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/test_mcmc.cpp)
 
-file(GLOB UNIT_TEST_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/*.cpp) 
+file(GLOB UNIT_TEST_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/*.cpp)
 
 add_executable(toppic ${TOPPIC_MAIN_SRCS} ${TOPPIC_PROCESS_SRCS} ${TOPPIC_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
     ${ZERO_PTM_SRCS} ${ZERO_PTM_FILTER} ${DIAG_FILTER_SRCS} ${ONE_PTM_FILTER_SRCS} ${ONE_PTM_SEARCH_SRCS}
@@ -100,18 +103,20 @@ add_executable(toppic_gui ${TOPPIC_GUI_SRCS} ${TOPPIC_GUI_QRC} ${TOPPIC_PROCESS_
     ${ZERO_PTM_SRCS} ${ZERO_PTM_FILTER} ${DIAG_FILTER_SRCS} ${ONE_PTM_FILTER_SRCS} ${ONE_PTM_SEARCH_SRCS}
     ${PTM_SRCS} ${TDGF_SRCS} ${LOCAL_SRCS} ${PRSM_VIEW_SRCS})
 
-  add_executable(toppic_match_peak ${TOPPIC_MATCH_PEAK_SRCS} ${TOPPIC_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
+add_executable(toppic_match_peak ${TOPPIC_MATCH_PEAK_SRCS} ${TOPPIC_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
     ${PRSM_VIEW_SRCS})
 
 add_executable(topmg ${TOPMG_MAIN_SRC} ${TOPMG_PROCESS_SRCS} ${TOPMG_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
     ${ZERO_PTM_FILTER} ${DIAG_FILTER_SRCS} ${ONE_PTM_FILTER_SRCS} ${ZERO_PTM_SRCS} ${GRAPH_SRCS}
     ${GRAPH_ALIGN_SRCS} ${TDGF_SRCS} ${ONE_PTM_SEARCH_SRCS} ${PRSM_VIEW_SRCS})
 
+add_executable(test_mcmc ${TEST_MCMC_SRCS} ${TOPMG_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
+    ${ZERO_PTM_FILTER} ${DIAG_FILTER_SRCS} ${ONE_PTM_FILTER_SRCS} ${ZERO_PTM_SRCS} ${GRAPH_SRCS}
+    ${GRAPH_ALIGN_SRCS} ${MCMC_SRCS} ${ONE_PTM_SEARCH_SRCS} ${PRSM_VIEW_SRCS})
+
 add_executable(topfd ${TOPFD_MAIN_SRCS} ${TOPFD_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS})
 
 add_executable(topfd_train ${TOPFD_TRAIN_SRCS} ${TOPFD_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS})
-
-add_executable(console ${TOPFD_MAIN_SRCS} ${TOPFD_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS})
 
 add_executable(topfd_gui ${TOPFD_GUI_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS} ${TOPFD_GUI_QRC})
 
@@ -192,6 +197,9 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
     target_link_libraries(toppic-test xalan-c xerces-c boost_filesystem
         boost_system pthread z)
+
+    target_link_libraries(test_mcmc xalan-c xerces-c boost_program_options
+        boost_filesystem boost_system boost_thread pthread z)
 
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
 

@@ -50,8 +50,6 @@ class XmlGenerator {
 
   void outputAllProteins();
 
-  void outputPrsmMatchPeaks();
-
   void outputFileList();
 
   void splitBySpeciesId();
