@@ -17,6 +17,8 @@
 #include <algorithm>
 #include <vector>
 
+#include "base/logger.hpp"
+
 #include "node.hpp"
 #include "edge.hpp"
 #include "leaf_edge.hpp"
@@ -43,7 +45,7 @@ SuffixTree::SuffixTree(std::string text, ProteinDatabase *database) {
   root = new Node(this, NULL);
   this->database = database;
   Suffix * active = new Suffix(root, 0, -1);
-  std::cout << "text.length() " << text.length() << std::endl;
+  LOG_DEBUG("text length " << text.length());
   for (size_t i = 0; i < text.length(); i++) {
     addPrefix(active, i);
   }

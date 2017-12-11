@@ -22,22 +22,28 @@
 #include "suffix_tree.hpp"
 
 namespace prot {
+
 namespace suffix {
+
 class Node {
  public:
-  Node(Node * node, Node * suffixNode);
-
   Node(SuffixTree * suffixTree, Node * suffixNode);
 
   explicit Node(Node * node);
 
-  char charAt(int index) {return suffixTree->text.at(index);}
+  char charAt(int index);
 
-  void addEdge(int charIndex, Edge * edge) {edges[getCharacterIndex(charAt(charIndex))] = edge;}
+  void addEdge(int charIndex, Edge * edge) {
+    edges[getCharacterIndex(charAt(charIndex))] = edge;
+  }
 
-  void removeEdge(int charIndex) {edges[getCharacterIndex(charAt(charIndex))] = NULL;}
+  void removeEdge(int charIndex) {
+    edges[getCharacterIndex(charAt(charIndex))] = NULL;
+  }
 
-  void removeEdge(char ch) {edges[getCharacterIndex(ch)] = NULL;}
+  void removeEdge(char ch) {
+    edges[getCharacterIndex(ch)] = NULL;
+  }
 
   void removeAll();
 
@@ -57,9 +63,13 @@ class Node {
 
  private:
   SuffixTree * suffixTree;
+
   Node * suffixNode;
+
   Edge ** edges;
 };
+
 }  // namespace suffix
+
 }  // namespace prot
 #endif

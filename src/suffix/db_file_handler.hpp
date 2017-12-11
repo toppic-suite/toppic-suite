@@ -23,15 +23,18 @@
 #include "protein_db.hpp"
 
 namespace prot {
+
 namespace suffix {
 
 class DatabaseFileHandler {
  public:
   ProteinDatabase * loadDatabase(const std::string & proteinDatabaseFile);
+
  private:
   std::string handleUndefinedCharacter(std::string text);
-  std::string removeFirstAminoAcid(std::string text);
 };
+
 }  // namespace suffix
+
 }  // namespace prot
 #endif

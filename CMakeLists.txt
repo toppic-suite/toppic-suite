@@ -57,6 +57,7 @@ file(GLOB PTM_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/ptmsearch/*.cpp)
 file(GLOB TDGF_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/tdgf/*.cpp)
 file(GLOB PRSM_VIEW_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/prsmview/*.cpp)
 file(GLOB LOCAL_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/local/*.cpp)
+file(GLOB SUFFIX_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/suffix/*.cpp)
 
 # toppic
 file(GLOB TOPPIC_ARGU_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_argument.cpp)
@@ -130,7 +131,7 @@ add_executable(taglong_filter ${TAG_LONG_MAIN} ${TOPPIC_ARGU_SRCS} ${HTS_SRCS} $
 
 #add_library(topfd-dev SHARED ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS})
 
-add_executable(toppic-test ${UNIT_TEST_SRCS} ${HTS_SRCS} ${BASE_SRCS})
+add_executable(toppic-test ${UNIT_TEST_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SUFFIX_SRCS})
 
 # util tools
 file(GLOB MSALIGN_MERGE_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/tools/msalign_merge.cpp)

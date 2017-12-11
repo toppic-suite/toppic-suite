@@ -18,12 +18,8 @@
 namespace prot {
 namespace suffix {
 
-const  int aminoAcidIndex[26] = {0, -1, 4, 3, 5, 12, 7, 8, 9, -1, 10,
+const int aminoAcidIndex[26] = {0, -1, 4, 3, 5, 12, 7, 8, 9, -1, 10,
   9, 11, 2, -1, 13, 6, 1, 14, 15, -1, 18, 16, -1, 17, -1};
-
-Node::Node(Node *node, Node *suffixNode) {
-  new (this)Node(node->suffixTree, suffixNode);
-}
 
 Node::Node(SuffixTree *suffixTree, Node *suffixNode) {
   this->suffixTree = suffixTree;
@@ -32,6 +28,10 @@ Node::Node(SuffixTree *suffixTree, Node *suffixNode) {
   for (int i = 0; i < 21; i++) {
     edges[i] = NULL;
   }
+}
+
+char Node::charAt(int index) {
+  return suffixTree->text.at(index);
 }
 
 Node::Node(Node *node) {
