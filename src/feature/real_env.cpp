@@ -41,6 +41,7 @@ RealEnv::RealEnv(std::vector<PeakPtr> &peak_list, EnvelopePtr theo_env,
 void RealEnv::mapPeakList(std::vector<PeakPtr> &peak_list, EnvelopePtr theo_env, 
                           double tolerance, double min_inte) {
   int peak_num = theo_env->getPeakNum();
+  peaks_.clear();
   for (int i = 0; i < peak_num; i++) {
     //PeakPtr peak_ptr(new Peak(theo_env->getMz(i), 0));
     int idx = raw_ms_util::getNearPeakIdx(peak_list, theo_env->getMz(i), tolerance);
@@ -69,11 +70,13 @@ void RealEnv::remvDuplMatch(EnvelopePtr theo_env) {
       if (std::abs(theo_env->getMz(i) - peaks_[i]->getPosition()) 
           < std::abs(theo_env->getMz(i + 1) - peaks_[i + 1]->getPosition())) {
         peaks_[i+1]->setIdx(EnvPeak::getNonExistPeakIdx());
+        //peaks_[i+1]->setPosition(EnvPeak::getNonExistPeakIdx());
         //mzs_[i + 1] = getNonExistPeakIdx();
         peaks_[i+1]->setIntensity(0.0);
       } else {
         peaks_[i]->setIdx(EnvPeak::getNonExistPeakIdx());
-        //mzs_[i + 1] = getNonExistPeakIdx();
+        //peaks_[i]->setPosition(EnvPeak::getNonExistPeakIdx());
+        //mzs_[i] = getNonExistPeakIdx();
         peaks_[i]->setIntensity(0.0);
       }
     }

@@ -216,7 +216,7 @@ void Envelope::shift(int shift) {
 double Envelope::compIntensitySum() {
   double sum = 0;
   for (size_t i = 0; i < peaks_.size(); i++) {
-    sum = peaks_[i]->getIntensity();
+    sum = sum + peaks_[i]->getIntensity();
   }
   return sum;
 }
