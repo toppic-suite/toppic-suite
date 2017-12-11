@@ -57,6 +57,7 @@ file(GLOB PTM_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/ptmsearch/*.cpp)
 file(GLOB TDGF_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/tdgf/*.cpp)
 file(GLOB PRSM_VIEW_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/prsmview/*.cpp)
 file(GLOB LOCAL_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/local/*.cpp)
+file(GLOB SUFFIX_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/suffix/*.cpp)
 
 # toppic
 file(GLOB TOPPIC_ARGU_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_argument.cpp)
@@ -88,8 +89,19 @@ file(GLOB TOPFD_GUI_QRC   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topfd/*.qrc)
 file(GLOB TOPPIC_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/toppic/*.cpp)
 file(GLOB TOPPIC_GUI_QRC   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/toppic/*.qrc)
 
+# MCMC
+file(GLOB MCMC_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/mcmc/*.cpp)
+file(GLOB TEST_MCMC_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/test_mcmc.cpp)
 
-file(GLOB UNIT_TEST_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/*.cpp) 
+# Tag generation
+file(GLOB TAG_LONG_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/taglong/*.cpp)
+file(GLOB TAG_LONG_MAIN  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/tag_long_filter.cpp)
+
+file(GLOB TAG_VAR_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/tagvar/*.cpp)
+file(GLOB TAG_VAR_MAIN  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/tag_var_filter.cpp)
+
+# unit test using catch
+file(GLOB UNIT_TEST_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/*.cpp)
 
 add_executable(toppic ${TOPPIC_MAIN_SRCS} ${TOPPIC_PROCESS_SRCS} ${TOPPIC_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
     ${ZERO_PTM_SRCS} ${ZERO_PTM_FILTER} ${DIAG_FILTER_SRCS} ${ONE_PTM_FILTER_SRCS} ${ONE_PTM_SEARCH_SRCS}
@@ -100,24 +112,32 @@ add_executable(toppic_gui ${TOPPIC_GUI_SRCS} ${TOPPIC_GUI_QRC} ${TOPPIC_PROCESS_
     ${ZERO_PTM_SRCS} ${ZERO_PTM_FILTER} ${DIAG_FILTER_SRCS} ${ONE_PTM_FILTER_SRCS} ${ONE_PTM_SEARCH_SRCS}
     ${PTM_SRCS} ${TDGF_SRCS} ${LOCAL_SRCS} ${PRSM_VIEW_SRCS})
 
-  add_executable(toppic_match_peak ${TOPPIC_MATCH_PEAK_SRCS} ${TOPPIC_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
+add_executable(toppic_match_peak ${TOPPIC_MATCH_PEAK_SRCS} ${TOPPIC_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
     ${PRSM_VIEW_SRCS})
 
 add_executable(topmg ${TOPMG_MAIN_SRC} ${TOPMG_PROCESS_SRCS} ${TOPMG_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
     ${ZERO_PTM_FILTER} ${DIAG_FILTER_SRCS} ${ONE_PTM_FILTER_SRCS} ${ZERO_PTM_SRCS} ${GRAPH_SRCS}
     ${GRAPH_ALIGN_SRCS} ${TDGF_SRCS} ${ONE_PTM_SEARCH_SRCS} ${PRSM_VIEW_SRCS})
 
+add_executable(test_mcmc ${TEST_MCMC_SRCS} ${TOPMG_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
+    ${ZERO_PTM_FILTER} ${DIAG_FILTER_SRCS} ${ONE_PTM_FILTER_SRCS} ${ZERO_PTM_SRCS} ${GRAPH_SRCS}
+    ${GRAPH_ALIGN_SRCS} ${MCMC_SRCS} ${ONE_PTM_SEARCH_SRCS} ${PRSM_VIEW_SRCS})
+
 add_executable(topfd ${TOPFD_MAIN_SRCS} ${TOPFD_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS})
 
 add_executable(topfd_train ${TOPFD_TRAIN_SRCS} ${TOPFD_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS})
 
-add_executable(console ${TOPFD_MAIN_SRCS} ${TOPFD_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS})
-
 add_executable(topfd_gui ${TOPFD_GUI_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS} ${TOPFD_GUI_QRC})
+
+add_executable(taglong_filter ${TAG_LONG_MAIN} ${TOPPIC_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
+    ${TAG_LONG_SRCS} ${SUFFIX_SRCS})
+
+add_executable(tagvar_filter ${TAG_VAR_MAIN} ${TOPPIC_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
+    ${TAG_VAR_SRCS} ${SUFFIX_SRCS})
 
 #add_library(topfd-dev SHARED ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS})
 
-add_executable(toppic-test ${UNIT_TEST_SRCS} ${HTS_SRCS} ${BASE_SRCS})
+add_executable(toppic-test ${UNIT_TEST_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SUFFIX_SRCS})
 
 # util tools
 file(GLOB MSALIGN_MERGE_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/tools/msalign_merge.cpp)
@@ -192,6 +212,15 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
     target_link_libraries(toppic-test xalan-c xerces-c boost_filesystem
         boost_system pthread z)
+
+    target_link_libraries(test_mcmc xalan-c xerces-c boost_program_options
+        boost_filesystem boost_system boost_thread pthread z)
+
+    target_link_libraries(taglong_filter xalan-c xerces-c boost_program_options
+        boost_filesystem boost_system boost_thread pthread z)
+
+    target_link_libraries(tagvar_filter xalan-c xerces-c boost_program_options
+        boost_filesystem boost_system boost_thread pthread z)
 
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
 

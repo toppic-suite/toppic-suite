@@ -34,7 +34,7 @@ DeconvPara::DeconvPara(std::map<std::string, std::string> &arguments) {
   output_multiple_mass_ = (arguments["outMultipleMass"] == "true");
   do_final_filtering_ = (arguments["doFinalFiltering"] == "true");
   output_match_env_ = (arguments["outputMatchEnv"] == "true");
-  std::cout << "Do final filtering " << do_final_filtering_;
+  //std::cout << "Do final filtering " << do_final_filtering_;
 }
 
 }  // namespace prot

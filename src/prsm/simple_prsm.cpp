@@ -43,6 +43,21 @@ SimplePrsm::SimplePrsm(MsHeaderPtr header_ptr, int spectrum_num,
       prot_mass_ = proteo_ptr->getResSeqPtr()->getSeqMass();
     }
 
+SimplePrsm::SimplePrsm(MsHeaderPtr header_ptr, int spectrum_num,
+                       const std::string & seq_name,
+                       const std::string & seq_desc,
+                       int score):
+    spectrum_num_(spectrum_num),
+    score_(score) {
+      spectrum_id_ = header_ptr->getId();
+      spectrum_scan_ = header_ptr->getScansString();
+      precursor_id_ = header_ptr->getPrecId();
+      prec_mass_ = header_ptr->getPrecMonoMass();
+      seq_name_ = seq_name;
+      seq_desc_ = seq_desc;
+      prot_mass_ = header_ptr->getPrecMonoMass();
+    }
+
 SimplePrsm::SimplePrsm(xercesc::DOMElement* element) {
   file_name_ = xml_dom_util::getChildValue(element, "file_name", 0);
   spectrum_id_ = xml_dom_util::getIntChildValue(element, "spectrum_id", 0);

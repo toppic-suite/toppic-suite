@@ -22,11 +22,12 @@
 #include <vector>
 
 namespace prot {
+
 namespace suffix {
 
 class ProteinDatabase {
  public:
-  ProteinDatabase() {sequence = "";}
+  ProteinDatabase(): sequence("") {}
 
   size_t getsize() {return seqSet.size();}
 
@@ -45,14 +46,23 @@ class ProteinDatabase {
 
   std::string getProteinID(int index) {return proteinID[index];}
 
+  std::string getProteinDesc(int index) {return proteinDesc[index];}
+
   void addProteinID(const std::string & proteinName);
 
  private:
   std::string sequence;  // combined sequence
+
   std::vector<std::string> proteinID;
+
+  std::vector<std::string> proteinDesc;
+
   std::vector<std::string> seqSet;  // store each individual sequence
+
   std::vector<size_t> seqLen;
 };
+
 }  // namespace suffix
+
 }  // namespace prot
 #endif
