@@ -21,7 +21,7 @@
 #include <string>
 #include <cmath>
 
-#include "spec/peak.hpp"
+#include "spec/env_peak.hpp"
 
 namespace prot {
 
@@ -33,22 +33,12 @@ class Envelope {
  public:
   Envelope() {}
 
-  Envelope(const Envelope &env):
-      refer_idx_(env.refer_idx_),
-      charge_(env.charge_),
-      mono_mz_(env.mono_mz_),
-      mzs_(env.mzs_),
-      intensities_(env.intensities_) {}
+  Envelope(Envelope &env); 
 
   Envelope(int num, std::vector<std::string> &line_List);
 
   Envelope(int refer_idx, int charge, double mono_mz,
-           std::vector<double> &mzs, std::vector<double> &intensities):
-      refer_idx_(refer_idx),
-      charge_(charge),
-      mono_mz_(mono_mz),
-      mzs_(mzs),
-      intensities_(intensities) {}
+           std::vector<double> &mzs, std::vector<double> &intensities);
 
   EnvelopePtr convertToTheo(double mass_diff, int new_charge);
 
@@ -82,30 +72,35 @@ class Envelope {
 
   int getCharge() {return charge_;}
 
-  int getLabel(int i) {return (int)std::round((mzs_[i] - mono_mz_) * charge_);}
+  int getLabel(int i) {return (int)std::round((peaks_[i]->getPosition() - mono_mz_) * charge_);}
 
-  double getIntensity(int i) {return intensities_[i];}
+  double getIntensity(int i) {return peaks_[i]->getIntensity();}
 
-  std::vector<double> getIntensities() {return intensities_;}
+  std::vector<double> getIntensities();
+  //{return intensities_;}
 
   double getMonoMass() {return Peak::compPeakMass(mono_mz_, charge_);}
 
   double getMonoMz() {return mono_mz_;}
 
   // get the m/z difference between mono_mz and reference peak 
-  double getMonoReferDistance() {return mzs_[refer_idx_] - mono_mz_;}
+  double getMonoReferDistance() {return peaks_[refer_idx_]->getPosition() - mono_mz_;}
 
-  double getMz(int i) {return mzs_[i];}
+  double getMz(int i) {return peaks_[i]->getPosition();}
 
-  int getPeakNum() {return mzs_.size();}
+  int getPeakNum() {return peaks_.size();}
+
+  EnvPeakPtr getPeakPtr(int i) {return peaks_[i];}
 
   int getReferIdx() {return refer_idx_;}
 
-  double getReferIntensity() {return intensities_[refer_idx_];}
+  double getReferIntensity() {return peaks_[refer_idx_]->getIntensity();}
 
-  double getReferMz() {return mzs_[refer_idx_];}
+  double getReferMz() {return peaks_[refer_idx_]->getPosition();}
 
-  void setIntensity(int i, double intensity) {intensities_[i] = intensity;}
+  void setIntensity(int i, double intensity) {peaks_[i]->setIntensity(intensity);}
+
+  void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
  protected:
 
@@ -114,10 +109,15 @@ class Envelope {
   int charge_;
   // Theoretical m/z value of monoisotopic ion 
   double mono_mz_;
+  // peak list
+  EnvPeakPtrVec peaks_;
+
+  /*
   // m/z list of all peaks in this envelope 
   std::vector<double> mzs_;
   // intensity list of all peaks in this envelope 
   std::vector<double> intensities_;
+  */
 };
 
 typedef std::vector<EnvelopePtr> EnvelopePtrVec;

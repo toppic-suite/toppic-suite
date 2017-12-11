@@ -25,6 +25,11 @@
 
 namespace prot {
 
+class Peak;
+
+typedef std::shared_ptr<Peak> PeakPtr;
+typedef std::vector<PeakPtr> PeakPtrVec;
+
 class Peak {
  public:
   Peak(double position, double intensity):
@@ -38,6 +43,10 @@ class Peak {
   void setIntensity(double intensity) {intensity_ = intensity;}
 
   void setPosition(double position) {position_ = position;}
+
+  void changeIntensity(double ratio) {intensity_ = intensity_ * ratio;}
+
+  void shiftPosition(double shift) {position_ = position_ + shift;}
 
   void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
@@ -56,8 +65,6 @@ class Peak {
   double intensity_;
 };
 
-typedef std::shared_ptr<Peak> PeakPtr;
-typedef std::vector<PeakPtr> PeakPtrVec;
 
 }  // namespace prot
 #endif
