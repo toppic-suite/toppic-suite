@@ -127,12 +127,14 @@ MatchEnvPtrVec addLowMassPeak(MatchEnvPtrVec &envs, PeakPtrVec &ms, double toler
 }
 
 MatchEnvPtr getNewMatchEnv(PeakPtrVec &ms, int idx, double tolerance) {
-  std::vector<double> mzs;
-  std::vector<double> intensities;
-  mzs.push_back(ms[idx]->getPosition());
-  intensities.push_back(ms[idx]->getIntensity());
-  LOG_DEBUG(mzs[0] << "\t" << intensities[0]);
-  EnvelopePtr theo_env = std::make_shared<Envelope>(0, 1, mzs[0], mzs, intensities);
+  double mz = ms[idx]->getPosition();
+  double inte = ms[idx]->getIntensity();
+  EnvPeakPtrVec peaks;
+  EnvPeakPtr peak_ptr = std::make_shared<EnvPeak>(mz, inte);
+  peaks.push_back(peak_ptr);
+  int ref_idx = 0;
+  int charge = 1;
+  EnvelopePtr theo_env = std::make_shared<Envelope>(ref_idx, charge, mz, peaks);
   RealEnvPtr real_env = std::make_shared<RealEnv>(ms, theo_env, tolerance, 0);
   int mass_group = 0;
   return std::make_shared<MatchEnv>(mass_group, theo_env, real_env);
