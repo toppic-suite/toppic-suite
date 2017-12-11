@@ -57,26 +57,25 @@ Envelope::Envelope(int num, std::vector<std::string> &line_list) {
 }
 
 Envelope::Envelope(int refer_idx, int charge, double mono_mz,
-                   std::vector<double> &mzs, std::vector<double> &intensities):
+                   EnvPeakPtrVec &peaks):
     refer_idx_(refer_idx),
     charge_(charge),
     mono_mz_(mono_mz) {
-      for (size_t i = 0; i < mzs.size(); i++) {
-        EnvPeakPtr peak_ptr = std::make_shared<EnvPeak>(mzs[i], intensities[i]);
+      for (size_t i = 0; i < peaks.size(); i++) {
+        EnvPeakPtr peak_ptr = std::make_shared<EnvPeak>(peaks[i]);
         peaks_.push_back(peak_ptr);
       }
     }
 
 EnvelopePtr Envelope::convertToTheo(double mass_diff, int new_charge) {
   double new_mono_mz = (mono_mz_ + mass_diff) / new_charge;
-  std::vector<double> new_mzs(peaks_.size());
+  EnvPeakPtrVec new_peaks(peaks_.size());
   for (size_t i = 0; i < peaks_.size(); i++) {
-    double new_value = (peaks_[i]->getPosition() + mass_diff) / new_charge;
-    new_mzs[i] = new_value;
+    double new_mz = (peaks_[i]->getPosition() + mass_diff) / new_charge;
+    new_peaks[i] = std::make_shared<EnvPeak>(new_mz, peaks_[i]->getIntensity());
   }
-  std::vector<double> intensities = getIntensities();
   return std::make_shared<Envelope>(refer_idx_, new_charge, new_mono_mz,
-                                    new_mzs, intensities);
+                                    new_peaks);
 }
 
 // Convert a theoretical distribution to a theoretical envelope
@@ -111,34 +110,41 @@ void Envelope::changeMz(double shift) {
 
 EnvelopePtr Envelope::getSubEnv(int n_back, int n_forw) {
   int new_refer_idx = n_back;
-  std::vector<double> new_mzs;
-  std::vector<double> new_intes;
+  EnvPeakPtrVec new_peaks;
   for (int i = refer_idx_ - n_back; i <= refer_idx_ + n_forw; i++) {
-    new_mzs.push_back(peaks_[i]->getPosition());
-    new_intes.push_back(peaks_[i]->getIntensity());
+    new_peaks.push_back(peaks_[i]);
   }
   EnvelopePtr env_ptr = std::make_shared<Envelope>(new_refer_idx, charge_, mono_mz_,
-                                                   new_mzs, new_intes);
+                                                   new_peaks);
   return env_ptr;
 }
 
 EnvelopePtr Envelope::addZero(int num) {
   int n_peak = peaks_.size();
-  std::vector<double> new_mzs(n_peak + 2 * num, 0);
-  std::vector<double> new_intes(n_peak + 2 * num, 0);
+  EnvPeakPtrVec new_peaks; 
+  for (int i = 0; i < n_peak + 2 * num; i++) {
+    EnvPeakPtr peak_ptr = std::make_shared<EnvPeak>(0 , 0);
+    new_peaks.push_back(peak_ptr);
+  }
   for (int i = 0; i < n_peak; i++) {
-    new_mzs[i + num] = peaks_[i]->getPosition();
-    new_intes[i + num] = peaks_[i]->getIntensity();
+    new_peaks[i + num]->setPosition(peaks_[i]->getPosition());
+    new_peaks[i + num]->setIntensity(peaks_[i]->getIntensity());
+    //new_mzs[i + num] = peaks_[i]->getPosition();
+    //new_intes[i + num] = peaks_[i]->getIntensity();
   }
   for (int i = num - 1; i >= 0; i--) {
-    new_mzs[i] = new_mzs[i+1] - mass_constant::getIsotopeMass() / charge_;
+    double pos = new_peaks[i+1]->getPosition() 
+        - mass_constant::getIsotopeMass() / charge_;
+    new_peaks[i]->setPosition(pos);
   }
   for (int i = n_peak + num; i < n_peak + num * 2; i++) {
-    new_mzs[i] = new_mzs[i - 1] + mass_constant::getIsotopeMass() / charge_;
+    double pos = new_peaks[i-1]->getPosition() 
+        + mass_constant::getIsotopeMass() / charge_;
+    new_peaks[i]->setPosition(pos);
   }
   int new_refer_idx = refer_idx_ + num;
   EnvelopePtr env_ptr = std::make_shared<Envelope>(new_refer_idx, charge_, mono_mz_,
-                                                   new_mzs, new_intes);
+                                                   new_peaks);
   return env_ptr;
 }
 

@@ -37,8 +37,7 @@ class Envelope {
 
   Envelope(int num, std::vector<std::string> &line_List);
 
-  Envelope(int refer_idx, int charge, double mono_mz,
-           std::vector<double> &mzs, std::vector<double> &intensities);
+  Envelope(int refer_idx, int charge, double mono_mz, EnvPeakPtrVec &peaks);
 
   EnvelopePtr convertToTheo(double mass_diff, int new_charge);
 
