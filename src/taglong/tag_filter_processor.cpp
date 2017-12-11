@@ -13,7 +13,6 @@
 // limitations under the License.
 
 
-#include <regex>
 #include <utility>
 #include <string>
 #include <algorithm>
@@ -25,12 +24,17 @@
 #include "base/proteoform_factory.hpp"
 #include "base/residue_util.hpp"
 #include "base/fasta_reader.hpp"
+
 #include "prsm/simple_prsm_xml_writer.hpp"
 #include "prsm/simple_prsm_reader.hpp"
 #include "prsm/simple_prsm.hpp"
 #include "prsm/simple_prsm_str_combine.hpp"
 #include "prsm/simple_prsm_table_writer.hpp"
+
 #include "spec/msalign_util.hpp"
+
+#include "suffix/db_file_handler.hpp"
+#include "suffix/suffix_tree.hpp"
 
 #include "tag_filter_processor.hpp"
 #include "peak_node.hpp"
@@ -41,7 +45,7 @@ namespace prot {
 void TagFilterProcessor::process() {
   ModPtrVec fix_mod = mng_ptr_->prsm_para_ptr_->getFixModPtrVec();
   ResiduePtrVec residue_list
-      = residue_util::convertStrToResiduePtrVec("ARNDCEQGHILKMFPSTWYVUO", fix_mod);
+      = residue_util::convertStrToResiduePtrVec("ARNDCEQGHIKMFPSTWYV", fix_mod);
 
   // generate mass list with variable ptms
   for (size_t i = 0; i < residue_list.size(); i++) {
@@ -234,15 +238,11 @@ std::vector<std::string> TagFilterProcessor::getTags(std::vector<std::vector<Pea
   return break_tags;
 }
 
-int TagFilterProcessor::compTagScore(const std::string & seq, const std::vector<std::string> & tags) {
+int TagFilterProcessor::compTagScore(const std::string & seq, const std::vector<int> & pos) {
   std::vector<int> hit_list(seq.length());
   std::fill(hit_list.begin(), hit_list.end(), 0);
-  for (size_t i = 0; i < tags.size(); i++) {
-    std::regex rx(tags[i]);
-    for (auto it = std::sregex_iterator(seq.begin(), seq.end(), rx);
-         it != std::sregex_iterator(); ++it) {
-      hit_list[it->position()]++;
-    }
+  for (size_t i = 0; i < pos.size(); i++) {
+    hit_list[pos[i]]++;
   }
 
   if (hit_list.size() < mng_ptr_->L) {
@@ -258,6 +258,47 @@ int TagFilterProcessor::compTagScore(const std::string & seq, const std::vector<
   return max_scr;
 }
 
+std::map<int, int> TagFilterProcessor::getHighScoreSeq(const std::vector<std::string> & tags,
+                                                       suffix::SuffixTree *st,
+                                                       suffix::ProteinDatabase *pd,
+                                                       FastaIndexReaderPtr reader_ptr) {
+  std::vector<suffix::SuffixPosition*> startPosList;
+  for (size_t i = 0; i < tags.size(); i++) {
+    LOG_DEBUG("searching tag " << tags[i]);
+    std::vector<suffix::SuffixPosition*> tmp = st->search(tags[i]);
+    startPosList.insert(startPosList.end(), tmp.begin(), tmp.end());
+  }
+  std::sort(startPosList.begin(), startPosList.end(),
+            [] (suffix::SuffixPosition * a, suffix::SuffixPosition * b) {
+              if (a->getSeqNum() == b->getSeqNum()) {
+                return a->getPosInSeq() < b->getPosInSeq();
+              }
+              
+              return a->getSeqNum() < b->getSeqNum();
+            });
+
+  std::map<int, int> seq_score_map;
+
+  if (startPosList.empty()) return seq_score_map;
+
+  int seq_num = startPosList[0]->getSeqNum();
+  std::vector<int> pos;
+
+  for (size_t i = 0; i < startPosList.size(); i++) {
+    if (seq_num == startPosList[i]->getSeqNum()) {
+      pos.push_back(startPosList[i]->getPosInSeq());
+    } else {
+      std::string seq
+          = reader_ptr->readFastaSeq(pd->getProteinID(seq_num), pd->getProteinDesc(seq_num))->getRawSeq();
+      seq_score_map[seq_num] = compTagScore(seq, pos);
+      pos.clear();
+      pos.push_back(startPosList[i]->getPosInSeq());
+      seq_num = startPosList[i]->getSeqNum(); 
+    }
+  }
+  return seq_score_map;
+}
+
 void TagFilterProcessor::processDB() {
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
@@ -265,9 +306,11 @@ void TagFilterProcessor::processDB() {
 
   LOG_DEBUG("db_file_name " << db_file_name);
 
-  ProteoformPtrVec raw_forms
-      = proteoform_factory::readFastaToProteoformPtrVec(db_file_name,
-                                                        prsm_para_ptr->getFixModPtrVec());
+  suffix::DatabaseFileHandler *df = new suffix::DatabaseFileHandler();
+  suffix::ProteinDatabase *pd = df->loadDatabase(db_file_name);
+  suffix::SuffixTree *st = new suffix::SuffixTree(pd->getSequence(), pd);
+
+  FastaIndexReaderPtr reader_ptr = std::make_shared<FastaIndexReader>(db_file_name);
 
   int group_spec_num = mng_ptr_->prsm_para_ptr_->getGroupSpecNum();
   SpParaPtr sp_para_ptr =  mng_ptr_->prsm_para_ptr_->getSpParaPtr();
@@ -305,13 +348,15 @@ void TagFilterProcessor::processDB() {
       for (size_t i = 0; i < seq_tag_set.size(); i++) {
         LOG_DEBUG("Tag " << i << ": " << seq_tag_set[i]);
       }
-
-      for (size_t k = 0; k < raw_forms.size(); k++) {
-        int score = compTagScore(raw_forms[k]->getFastaSeqPtr()->getRawSeq(), seq_tag_set);
-        if (score > 0) {
-          SimplePrsmPtr simple_prsm = std::make_shared<SimplePrsm>(deconv_ms_ptr_vec[0]->getMsHeaderPtr(),
-                                                                   group_spec_num,
-                                                                   raw_forms[k], score);
+      if (seq_tag_set.size() > 0) {
+        std::map<int, int> seq_res = getHighScoreSeq(seq_tag_set, st, pd, reader_ptr);
+        for (auto it = seq_res.begin(); it != seq_res.end(); it++) {
+          SimplePrsmPtr simple_prsm
+              = std::make_shared<SimplePrsm>(deconv_ms_ptr_vec[0]->getMsHeaderPtr(),
+                                             group_spec_num,
+                                             pd->getProteinID(it->first),
+                                             pd->getProteinDesc(it->first),
+                                             it->second);
           writer.write(simple_prsm);
         }
       }
