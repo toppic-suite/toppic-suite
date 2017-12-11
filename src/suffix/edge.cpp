@@ -25,7 +25,7 @@ Edge::Edge(int beginIndex, int endIndex, Node *startNode) {
   this->beginIndex = beginIndex;
   this->endIndex = endIndex;
   this->startNode = startNode;
-  this->endNode = new Node(startNode, NULL);
+  this->endNode = new Node(startNode->getSuffixTree(), NULL);
   isleaf = false;
 }
 
@@ -44,7 +44,7 @@ Edge::Edge(int beginIndex, int endIndex, Node *startNode) {
  */
 Node * Edge::splitEdge(Suffix * suffix) {
   remove();
-  Node *breakNode = new Node(suffix->getOriginNode(), NULL);
+  Node *breakNode = new Node(suffix->getOriginNode()->getSuffixTree(), NULL);
   Edge *newEdge = new Edge(beginIndex, beginIndex + suffix->getSpan(),
                            suffix->getOriginNode(), breakNode);
   newEdge->insert();

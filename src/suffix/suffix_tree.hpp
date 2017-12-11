@@ -23,6 +23,7 @@
 
 #include "protein_db.hpp"
 #include "suffix_position.hpp"
+#include "node.hpp"
 
 namespace prot {
 namespace suffix {

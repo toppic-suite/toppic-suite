@@ -30,7 +30,6 @@ ProteinDatabase * DatabaseFileHandler::loadDatabase(const std::string & proteinD
   }
 
   bool isFirstSeq = true;
-  bool isFirstAminoAcid = true;
   std::string sequence;
   std::string individualSeq;
   std::string line;
@@ -42,14 +41,9 @@ ProteinDatabase * DatabaseFileHandler::loadDatabase(const std::string & proteinD
         sequence.append("#");
         database->addIndividualSeq(individualSeq);
         individualSeq = "";
-        isFirstAminoAcid = true;
       }
       isFirstSeq = false;
     } else {
-      if (isFirstAminoAcid) {
-        line = removeFirstAminoAcid(line);
-        isFirstAminoAcid = false;
-      }
       line = handleUndefinedCharacter(line);
       individualSeq.append(line);
       sequence.append(line);
@@ -57,9 +51,8 @@ ProteinDatabase * DatabaseFileHandler::loadDatabase(const std::string & proteinD
   }
   sequence.append("$");
   sequence.erase(std::remove(sequence.begin(), sequence.end(), '\r'), sequence.end());
-  std::string text = sequence;
-  std::replace(text.begin(), text.end(), 'L', 'I');
-  database->setSequence(text);
+  std::replace(sequence.begin(), sequence.end(), 'L', 'I');
+  database->setSequence(sequence);
   database->addIndividualSeq(individualSeq);
 
   sequence = "";
@@ -75,12 +68,6 @@ std::string DatabaseFileHandler::handleUndefinedCharacter(std::string text) {
   std::replace(text.begin(), text.end(), 'U', 'A');
   std::replace(text.begin(), text.end(), 'X', 'A');
   std::replace(text.begin(), text.end(), 'Z', 'A');
-  return text;
-}
-
-std::string DatabaseFileHandler::removeFirstAminoAcid(std::string text) {
-  if (text[0] == 'M')
-    text = text.substr(1);
   return text;
 }
 
