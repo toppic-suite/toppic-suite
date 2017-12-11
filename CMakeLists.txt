@@ -127,7 +127,7 @@ add_executable(topfd_train ${TOPFD_TRAIN_SRCS} ${TOPFD_ARGU_SRCS} ${HTS_SRCS} ${
 add_executable(topfd_gui ${TOPFD_GUI_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS} ${TOPFD_GUI_QRC})
 
 add_executable(taglong_filter ${TAG_LONG_MAIN} ${TOPPIC_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
-    ${TAG_LONG_SRCS})
+    ${TAG_LONG_SRCS} ${SUFFIX_SRCS})
 
 #add_library(topfd-dev SHARED ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS})
 

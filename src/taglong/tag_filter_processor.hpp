@@ -21,6 +21,10 @@
 #include <string>
 #include <vector>
 
+#include "base/fasta_index_reader.hpp"
+#include "suffix/db_file_handler.hpp"
+#include "suffix/suffix_tree.hpp"
+
 #include "taglong/tag_filter_mng.hpp"
 #include "peak_node.hpp"
 
@@ -45,7 +49,12 @@ class TagFilterProcessor {
 
   std::vector<std::string> getTags(std::vector<std::vector<PeakNodePtr> > componentsFromGraph);
 
-  int compTagScore(const std::string & seq, const std::vector<std::string> & tags);
+  int compTagScore(const std::string & seq, const std::vector<int> & pos);
+
+  std::map<int, int> getHighScoreSeq(const std::vector<std::string> & tags,
+                                     suffix::SuffixTree *st,
+                                     suffix::ProteinDatabase *pd,
+                                     FastaIndexReaderPtr reader_ptr);
 };
 
 typedef std::shared_ptr<TagFilterProcessor> TagFilterProcessorPtr;
