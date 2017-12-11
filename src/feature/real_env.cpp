@@ -41,17 +41,22 @@ RealEnv::RealEnv(std::vector<PeakPtr> &peak_list, EnvelopePtr theo_env,
 void RealEnv::mapPeakList(std::vector<PeakPtr> &peak_list, EnvelopePtr theo_env, 
                           double tolerance, double min_inte) {
   int peak_num = theo_env->getPeakNum();
-  mzs_.resize(peak_num, getNonExistPeakIdx());
-  intensities_.resize(peak_num, 0.0);
-  peak_idxes_.resize(peak_num, getNonExistPeakIdx());
   for (int i = 0; i < peak_num; i++) {
     //PeakPtr peak_ptr(new Peak(theo_env->getMz(i), 0));
     int idx = raw_ms_util::getNearPeakIdx(peak_list, theo_env->getMz(i), tolerance);
     //LOG_DEBUG("peak list size " << peak_list.size() << " theo mz " << theo_env->getMz(i) << " idx " << idx << " tolerance " << tolerance);
     if (idx >= 0 && peak_list[idx]->getIntensity() >= min_inte) {
-      peak_idxes_[i] = idx;
-      mzs_[i] = peak_list[idx]->getPosition();
-      intensities_[i] = peak_list[idx]->getIntensity();
+      double mz = peak_list[idx]->getPosition();
+      double inte = peak_list[idx]->getIntensity();
+      EnvPeakPtr peak_ptr = std::make_shared<EnvPeak>(mz, inte, idx); 
+      peaks_.push_back(peak_ptr);
+    }
+    else {
+      idx = EnvPeak::getNonExistPeakIdx();
+      double mz = theo_env->getMz(i);
+      double inte = 0.0;
+      EnvPeakPtr peak_ptr = std::make_shared<EnvPeak>(mz, inte, idx); 
+      peaks_.push_back(peak_ptr);
     }
   }
 }
@@ -60,15 +65,16 @@ void RealEnv::mapPeakList(std::vector<PeakPtr> &peak_list, EnvelopePtr theo_env,
 // same real peak, only the one with less mz error is kept.
 void RealEnv::remvDuplMatch(EnvelopePtr theo_env) {
   for (int i = 0; i < getPeakNum() - 1; i++) {
-    if (isExist(i) && peak_idxes_[i] == peak_idxes_[i + 1]) {
-      if (std::abs(theo_env->getMz(i) - mzs_[i]) < std::abs(theo_env->getMz(i + 1) - mzs_[i + 1])) {
-        peak_idxes_[i + 1] = getNonExistPeakIdx();
-        mzs_[i + 1] = getNonExistPeakIdx();
-        intensities_[i + 1] = 0;
+    if (isExist(i) && peaks_[i]->getIdx() == peaks_[i + 1]->getIdx()) {
+      if (std::abs(theo_env->getMz(i) - peaks_[i]->getPosition()) 
+          < std::abs(theo_env->getMz(i + 1) - peaks_[i + 1]->getPosition())) {
+        peaks_[i+1]->setIdx(EnvPeak::getNonExistPeakIdx());
+        //mzs_[i + 1] = getNonExistPeakIdx();
+        peaks_[i+1]->setIntensity(0.0);
       } else {
-        peak_idxes_[i] = getNonExistPeakIdx();
-        mzs_[i] = getNonExistPeakIdx();
-        intensities_[i] = 0;
+        peaks_[i]->setIdx(EnvPeak::getNonExistPeakIdx());
+        //mzs_[i + 1] = getNonExistPeakIdx();
+        peaks_[i]->setIntensity(0.0);
       }
     }
   }
@@ -101,11 +107,15 @@ void RealEnv::cntMaxConsPeakNum() {
 }
 
 bool RealEnv::isExist(int i) {
-  if (peak_idxes_[i] != getNonExistPeakIdx()) {
-    return true;
-  } else {
-    return false;
+  return peaks_[i]->isExist();
+}
+
+std::vector<int> RealEnv::getPeakIdxList() {
+  std::vector<int> idxes;
+  for (size_t i = 0; i < peaks_.size(); i++) {
+    idxes.push_back(peaks_[i]->getIdx());
   }
+  return idxes;
 }
 
 bool RealEnv::testPeakShare(RealEnvPtr a, RealEnvPtr  b) {

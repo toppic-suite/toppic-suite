@@ -34,19 +34,18 @@ class RealEnv : public Envelope {
   RealEnv(std::vector<PeakPtr> &peak_list, EnvelopePtr theo_env, 
           double tolerance, double min_inte);
 
-  int getNonExistPeakIdx() {return -1;}
-
   int getMissPeakNum() {return miss_peak_num_;}
 
   int getMatchPeakNum() {return getPeakNum() - miss_peak_num_;}
 
   int getMaxConsPeakNum() {return max_consecutive_peak_num_;}
 
-  int getPeakIdx(int i) {return peak_idxes_[i];}
+  int getPeakIdx(int i) {return peaks_[i]->getIdx();}
 
-  std::vector<int> getPeakIdxList() {return peak_idxes_;}
+  std::vector<int> getPeakIdxList();
+  //{return peak_idxes_;}
 
-  int getReferPeakIdx() {return peak_idxes_[refer_idx_];}
+  int getReferPeakIdx() {return peaks_[refer_idx_]->getIdx();}
 
   static bool testPeakShare(RealEnvPtr a, RealEnvPtr b);
 
@@ -55,7 +54,7 @@ class RealEnv : public Envelope {
  private:
   // peak index in the spectrum 
   // if peak_idx[i] == NO_EXIST_PEAK, it does not exist 
-  std::vector<int> peak_idxes_;
+  // std::vector<int> peak_idxes_;
   // number of missing peaks 
   int miss_peak_num_;
   // maximum number of consecutive peaks 
