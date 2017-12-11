@@ -26,8 +26,8 @@
 #include "spec/msalign_reader.hpp"
 #include "spec/msalign_util.hpp"
 
-#include "taglong/tag_filter_mng.hpp"
-#include "taglong/tag_filter_processor.hpp"
+#include "tagvar/tag_filter_mng.hpp"
+#include "tagvar/tag_filter_processor.hpp"
 
 #include "console/toppic_argument.hpp"
 
@@ -41,7 +41,7 @@ int two_base_opt(int argc, char* argv[]) {
       return 1;
     }
     std::map<std::string, std::string> arguments = argu_processor.getArguments();
-    std::cout << "TAG-LONG filter" << std::endl;
+    std::cout << "TAG-VAR filter" << std::endl;
 
     std::string exe_dir = arguments["executiveDir"];
     Argument::outputArguments(std::cout, arguments);

@@ -97,6 +97,9 @@ file(GLOB TEST_MCMC_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/test_mcmc.cpp)
 file(GLOB TAG_LONG_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/taglong/*.cpp)
 file(GLOB TAG_LONG_MAIN  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/tag_long_filter.cpp)
 
+file(GLOB TAG_VAR_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/tagvar/*.cpp)
+file(GLOB TAG_VAR_MAIN  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/tag_var_filter.cpp)
+
 # unit test using catch
 file(GLOB UNIT_TEST_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/*.cpp)
 
@@ -128,6 +131,9 @@ add_executable(topfd_gui ${TOPFD_GUI_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS}
 
 add_executable(taglong_filter ${TAG_LONG_MAIN} ${TOPPIC_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
     ${TAG_LONG_SRCS} ${SUFFIX_SRCS})
+
+add_executable(tagvar_filter ${TAG_VAR_MAIN} ${TOPPIC_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
+    ${TAG_VAR_SRCS} ${SUFFIX_SRCS})
 
 #add_library(topfd-dev SHARED ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS})
 
@@ -211,6 +217,9 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
         boost_filesystem boost_system boost_thread pthread z)
 
     target_link_libraries(taglong_filter xalan-c xerces-c boost_program_options
+        boost_filesystem boost_system boost_thread pthread z)
+
+    target_link_libraries(tagvar_filter xalan-c xerces-c boost_program_options
         boost_filesystem boost_system boost_thread pthread z)
 
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
