@@ -37,6 +37,11 @@ class SimplePrsm {
   SimplePrsm(MsHeaderPtr header_ptr, int spectrum_num,
              ProteoformPtr proteo_ptr, int score);
 
+  SimplePrsm(MsHeaderPtr header_ptr, int spectrum_num,
+             const std::string & seq_name,
+             const std::string & seq_desc,
+             int score);
+
   explicit SimplePrsm(xercesc::DOMElement* element);
 
   std::string getFileName () {return file_name_;}

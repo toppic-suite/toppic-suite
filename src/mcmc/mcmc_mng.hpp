@@ -13,28 +13,36 @@
 //limitations under the License.
 
 
-#ifndef PROT_SUFFIX_DB_FILEHANDLER_HPP
-#define PROT_SUFFIX_DB_FILEHANDLER_HPP
+#ifndef PROT_MCMC_MNG_HPP_
+#define PROT_MCMC_MNG_HPP_
 
-#include <fstream>
-#include <iostream>
-#include <string>
-
-#include "protein_db.hpp"
+#include "prsm/prsm_para.hpp"
 
 namespace prot {
 
-namespace suffix {
-
-class DatabaseFileHandler {
+class MCMCMng {
  public:
-  ProteinDatabase * loadDatabase(const std::string & proteinDatabaseFile);
+  MCMCMng(PrsmParaPtr prsm_para_ptr, 
+          const std::string & input_file_ext, 
+          const std::string & output_file_ext,
+          const std::string & residue_mod_file):
+      prsm_para_ptr_(prsm_para_ptr),
+      input_file_ext_(input_file_ext),
+      output_file_ext_(output_file_ext),
+      residue_mod_file_(residue_mod_file) {};
 
- private:
-  std::string handleUndefinedCharacter(std::string text);
+  PrsmParaPtr prsm_para_ptr_;
+  std::string input_file_ext_;
+  std::string output_file_ext_;
+  std::string residue_mod_file_;
+
+  int N_ = 1000000;
+
+  int k_ = 30;
 };
 
-}  // namespace suffix
+typedef std::shared_ptr<MCMCMng> MCMCMngPtr;
 
 }  // namespace prot
+
 #endif

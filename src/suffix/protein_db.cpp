@@ -18,14 +18,19 @@
 #include "protein_db.hpp"
 
 namespace prot {
+
 namespace suffix {
 
 void ProteinDatabase::addProteinID(const std::string & proteinName) {
   std::string res = proteinName;
   int index = proteinName.find_first_of(" ", 0);
-  if (index != -1) res = proteinName.substr(0, index);
-  proteinID.push_back(res.substr(1));
+  if (index != -1) {
+    res = proteinName.substr(0, index);
+    proteinID.push_back(res.substr(1));
+    proteinDesc.push_back(proteinName.substr(index + 1));
+  }
 }
 
 }  // namespace suffix
+
 }  // namespace prot
