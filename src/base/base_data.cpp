@@ -22,7 +22,7 @@
 #include "base/xml_dom_util.hpp"
 #include "base/file_util.hpp"
 
-#include "base/acid_base.hpp"
+#include "base/amino_acid_base.hpp"
 #include "base/ptm_base.hpp"
 #include "base/residue_base.hpp"
 #include "base/trunc_base.hpp"
@@ -51,7 +51,7 @@ void init(const std::string &exe_dir) {
     std::string acid_file_name = xml_dom_util::getChildValue(root, "acid_list_file_name", 0);
     acid_file_name = base_data_dir + separator + acid_file_name;
     LOG_DEBUG("acid file name: " << acid_file_name);
-    AcidBase::initBase(acid_file_name);
+    AminoAcidBase::initBase(acid_file_name);
     LOG_DEBUG("acid initialized ");
 
     std::string ptm_file_name = xml_dom_util::getChildValue(root, "ptm_list_file_name", 0);

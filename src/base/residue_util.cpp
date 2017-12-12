@@ -16,7 +16,7 @@
 #include <string>
 
 #include "base/logger.hpp"
-#include "base/acid_base.hpp"
+#include "base/amino_acid_base.hpp"
 #include "base/ptm_base.hpp"
 #include "base/fasta_seq.hpp"
 #include "base/residue_base.hpp"
@@ -30,7 +30,7 @@ ResiduePtrVec convertStrToResiduePtrVec(const std::string &seq) {
   ResiduePtrVec residue_ptr_vec;
   std::string seq2 = FastaSeq::rmChar(seq);
   for (size_t i = 0; i < seq2.length(); i++) {
-    AminoAcidPtr acid_ptr = AcidBase::getAminoAcidPtrByOneLetter(seq2.substr(i, 1));
+    AminoAcidPtr acid_ptr = AminoAcidBase::getAminoAcidPtrByOneLetter(seq2.substr(i, 1));
     PtmPtr ptm_ptr = PtmBase::getEmptyPtmPtr();
     ResiduePtr residue_ptr = ResidueBase::getBaseResiduePtr(acid_ptr, ptm_ptr);
     residue_ptr_vec.push_back(residue_ptr);
@@ -60,7 +60,7 @@ ResiduePtrVec convertStrToResiduePtrVec(const StringPairVec &string_pair_vec) {
   ResiduePtrVec residue_ptr_vec;
   for (size_t i = 0; i < string_pair_vec.size(); i++) {
     std::string acid_str = string_pair_vec[i].first;
-    AminoAcidPtr acid_ptr = AcidBase::getAminoAcidPtrByOneLetter(acid_str);
+    AminoAcidPtr acid_ptr = AminoAcidBase::getAminoAcidPtrByOneLetter(acid_str);
     std::string ptm_str = string_pair_vec[i].second;
     PtmPtr ptm_ptr = PtmBase::getPtmPtrByAbbrName(ptm_str);
     ResiduePtr residue_ptr = ResidueBase::getBaseResiduePtr(acid_ptr, ptm_ptr);

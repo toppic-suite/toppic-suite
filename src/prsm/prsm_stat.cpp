@@ -19,7 +19,7 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "base/acid_base.hpp"
+#include "base/amino_acid_base.hpp"
 #include "base/file_util.hpp"
 #include "spec/peak.hpp"
 #include "spec/extend_ms_factory.hpp"
@@ -38,7 +38,7 @@ PrsmStat::PrsmStat(PrsmParaPtr prsm_para_ptr,
   min_mass_ = prsm_para_ptr_->getSpParaPtr()->getMinMass();
   input_file_ext_ = input_file_ext;
   output_file_ext_ = output_file_ext;
-  acid_ptr_vec_ = AcidBase::getBaseAminoAcidPtrVec();
+  acid_ptr_vec_ = AminoAcidBase::getBaseAminoAcidPtrVec();
 }
 
 int countCoverage(const std::vector<bool> &match_ion_vec, int start, int end) {

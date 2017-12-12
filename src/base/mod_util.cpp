@@ -21,7 +21,7 @@
 #include "base/mod_base.hpp"
 #include "base/mod_util.hpp"
 #include "base/ptm_base.hpp"
-#include "base/acid_base.hpp"
+#include "base/amino_acid_base.hpp"
 #include "base/string_util.hpp"
 #include "base/xml_dom.hpp"
 #include "base/xml_dom_document.hpp"
@@ -77,7 +77,7 @@ std::vector<ModPtrVec> readModTxt(const std::string &file_name) {
       p = PtmBase::getPtmPtr(p);
 
       for (size_t i = 0; i < l[2].length(); i++) {
-        AminoAcidPtr a = AcidBase::getAminoAcidPtrByOneLetter(l[2].substr(i, 1));
+        AminoAcidPtr a = AminoAcidBase::getAminoAcidPtrByOneLetter(l[2].substr(i, 1));
         ResiduePtr ori_residue_ptr 
             = ResidueBase::getBaseResiduePtr(
                 std::make_shared<Residue>(a, PtmBase::getEmptyPtmPtr()));
