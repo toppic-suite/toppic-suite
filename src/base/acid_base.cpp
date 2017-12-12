@@ -22,78 +22,78 @@
 
 namespace prot {
 
-AcidPtrVec AcidBase::acid_ptr_vec_;
-AcidPtr AcidBase::empty_acid_ptr_;
+AminoAcidPtrVec AcidBase::amino_acid_ptr_vec_;
+AminoAcidPtr AcidBase::empty_amino_acid_ptr_;
 
 void AcidBase::initBase(const std::string &file_name) {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
     XmlDOMDocument doc(parser, file_name.c_str());
     xercesc::DOMElement* parent = doc.getDocumentElement();
-    std::string element_name = Acid::getXmlElementName();
+    std::string element_name = AminoAcid::getXmlElementName();
     int acid_num = xml_dom_util::getChildCount(parent, element_name.c_str());
     LOG_DEBUG("acid num " << acid_num);
     for (int i = 0; i < acid_num; i++) {
       xercesc::DOMElement* element
           = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
-      AcidPtr ptr = std::make_shared<Acid>(element);
-      acid_ptr_vec_.push_back(ptr);
+      AminoAcidPtr ptr = std::make_shared<AminoAcid>(element);
+      amino_acid_ptr_vec_.push_back(ptr);
       // check if it is an empty acid
       if (ptr->getMonoMass() == 0.0) {
-        empty_acid_ptr_ = ptr;
+        empty_amino_acid_ptr_ = ptr;
       }
     }
   }
 }
 
-AcidPtr AcidBase::getAcidPtrByName(const std::string &name) {
-  for (size_t i = 0; i < acid_ptr_vec_.size(); i++) {
-    std::string n = acid_ptr_vec_[i]->getName();
+AminoAcidPtr AcidBase::getAminoAcidPtrByName(const std::string &name) {
+  for (size_t i = 0; i < amino_acid_ptr_vec_.size(); i++) {
+    std::string n = amino_acid_ptr_vec_[i]->getName();
     if (n == name) {
-      return acid_ptr_vec_[i];
+      return amino_acid_ptr_vec_[i];
     }
   }
-  LOG_DEBUG("Acid not found: " + name);
-  return AcidPtr(nullptr);
+  LOG_DEBUG("Amino acid not found: " + name);
+  return AminoAcidPtr(nullptr);
 }
 
-AcidPtr AcidBase::getAcidPtrByOneLetter(const std::string &one_letter) {
-  for (size_t i = 0; i < acid_ptr_vec_.size(); i++) {
-    std::string l = acid_ptr_vec_[i]->getOneLetter();
+AminoAcidPtr AcidBase::getAminoAcidPtrByOneLetter(const std::string &one_letter) {
+  for (size_t i = 0; i < amino_acid_ptr_vec_.size(); i++) {
+    std::string l = amino_acid_ptr_vec_[i]->getOneLetter();
     if (l == one_letter)  {
-      return acid_ptr_vec_[i];
+      return amino_acid_ptr_vec_[i];
     }
   }
-  LOG_DEBUG("Acid not found " + one_letter);
-  return AcidPtr(nullptr);
+  LOG_DEBUG("Amino acid not found " + one_letter);
+  return AminoAcidPtr(nullptr);
 }
 
-AcidPtr AcidBase::getAcidPtrByThreeLetter(const std::string &three_letter) {
-  for (size_t i = 0; i < acid_ptr_vec_.size(); i++) {
-    std::string l = acid_ptr_vec_[i]->getThreeLetter();
+AminoAcidPtr AcidBase::getAminoAcidPtrByThreeLetter(const std::string &three_letter) {
+  for (size_t i = 0; i < amino_acid_ptr_vec_.size(); i++) {
+    std::string l = amino_acid_ptr_vec_[i]->getThreeLetter();
     if (l == three_letter) {
-      return acid_ptr_vec_[i];
+      return amino_acid_ptr_vec_[i];
     }
   }
-  LOG_DEBUG("Acid not found " + three_letter);
-  return AcidPtr(nullptr);
+  LOG_DEBUG("Amino acid not found " + three_letter);
+  return AminoAcidPtr(nullptr);
 }
 
 bool AcidBase::containsName(const std::string &name) {
-  return getAcidPtrByName(name).get() != nullptr;
+  return getAminoAcidPtrByName(name).get() != nullptr;
 }
 
 bool AcidBase::containsOneLetter(const std::string &one_letter) {
-  return getAcidPtrByOneLetter(one_letter).get() != nullptr;
+  return getAminoAcidPtrByOneLetter(one_letter).get() != nullptr;
 }
 
 bool AcidBase::containsThreeLetter(const std::string &three_letter) {
-  return getAcidPtrByThreeLetter(three_letter).get() != nullptr;
+  return getAminoAcidPtrByThreeLetter(three_letter).get() != nullptr;
 }
 
-AcidPtr AcidBase::getAcidPtrFromXml(xercesc::DOMElement * element) {
-  std::string name = Acid::getNameFromXml(element);
-  AcidPtr acid_ptr = getAcidPtrByName(name);
+AminoAcidPtr AcidBase::getAminoAcidPtrFromXml(xercesc::DOMElement * element) {
+  std::string name = AminoAcid::getNameFromXml(element);
+  AminoAcidPtr acid_ptr = getAminoAcidPtrByName(name);
   return acid_ptr;
 }
 

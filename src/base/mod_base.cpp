@@ -52,11 +52,11 @@ void ModBase::initBase(const std::string &file_name) {
           && mod_ptr->getModResiduePtr() ==ResidueBase::getEmptyResiduePtr()) {
         none_mod_ptr_ = mod_ptr;
       }
-      if (mod_ptr->getModResiduePtr()->getAcidPtr()->getOneLetter() == "C"
+      if (mod_ptr->getModResiduePtr()->getAminoAcidPtr()->getOneLetter() == "C"
           && mod_ptr->getModResiduePtr()->getPtmPtr() == PtmBase::getPtmPtr_C57()) {
         c57_mod_ptr_ = mod_ptr;
       }
-      if (mod_ptr->getModResiduePtr()->getAcidPtr()->getOneLetter() == "C"
+      if (mod_ptr->getModResiduePtr()->getAminoAcidPtr()->getOneLetter() == "C"
           && mod_ptr->getModResiduePtr()->getPtmPtr() == PtmBase::getPtmPtr_C58()) {
         c58_mod_ptr_ = mod_ptr;
       }

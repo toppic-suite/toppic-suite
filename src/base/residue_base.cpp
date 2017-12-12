@@ -39,7 +39,7 @@ void ResidueBase::initBase(const std::string &file_name) {
       xercesc::DOMElement* element
           = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
       ResiduePtr residue_ptr = std::make_shared<Residue>(element);
-      if (residue_ptr->getAcidPtr() == AcidBase::getEmptyAcidPtr()
+      if (residue_ptr->getAminoAcidPtr() == AcidBase::getEmptyAminoAcidPtr()
           && residue_ptr->getPtmPtr() == PtmBase::getEmptyPtmPtr()) {
         empty_residue_ptr_ = residue_ptr;
       }
@@ -70,12 +70,12 @@ ResiduePtrVec ResidueBase::getBaseNonePtmResiduePtrVec() {
   return result;
 }
 
-ResiduePtr ResidueBase::getBaseResiduePtr(AcidPtr acid_ptr, PtmPtr ptm_ptr) {
+ResiduePtr ResidueBase::getBaseResiduePtr(AminoAcidPtr acid_ptr, PtmPtr ptm_ptr) {
   ResiduePtr residue_ptr = std::make_shared<Residue>(acid_ptr, ptm_ptr);
   return getBaseResiduePtr(residue_ptr);
 }
 
-ResiduePtr ResidueBase::getBaseResiduePtr(AcidPtr acid_ptr) {
+ResiduePtr ResidueBase::getBaseResiduePtr(AminoAcidPtr acid_ptr) {
   ResiduePtr residue_ptr = std::make_shared<Residue>(acid_ptr, PtmBase::getEmptyPtmPtr());
   return getBaseResiduePtr(residue_ptr);
 }

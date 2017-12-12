@@ -50,7 +50,7 @@ void TagFilterProcessor::process() {
   // generate mass list with variable ptms
   for (size_t i = 0; i < residue_list.size(); i++) {
     mass_list_.push_back(std::make_pair(residue_list[i]->getMass(),
-                                        residue_list[i]->getAcidPtr()->getOneLetter()));
+                                        residue_list[i]->getAminoAcidPtr()->getOneLetter()));
   }
 
   std::sort(mass_list_.begin(), mass_list_.end(),

@@ -24,7 +24,7 @@ namespace prot {
 
 class ResidueFreq: public Residue {
  public:
-  ResidueFreq(AcidPtr acid_ptr, PtmPtr ptm_ptr, double freq):
+  ResidueFreq(AminoAcidPtr acid_ptr, PtmPtr ptm_ptr, double freq):
       Residue(acid_ptr, ptm_ptr),
       freq_(freq) {}
 

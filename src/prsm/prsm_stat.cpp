@@ -38,7 +38,7 @@ PrsmStat::PrsmStat(PrsmParaPtr prsm_para_ptr,
   min_mass_ = prsm_para_ptr_->getSpParaPtr()->getMinMass();
   input_file_ext_ = input_file_ext;
   output_file_ext_ = output_file_ext;
-  acid_ptr_vec_ = AcidBase::getBaseAcidPtrVec();
+  acid_ptr_vec_ = AcidBase::getBaseAminoAcidPtrVec();
 }
 
 int countCoverage(const std::vector<bool> &match_ion_vec, int start, int end) {
@@ -51,32 +51,32 @@ int countCoverage(const std::vector<bool> &match_ion_vec, int start, int end) {
   return count;
 }
 
-int countAcid(ResSeqPtr res_seq_ptr, AcidPtr acid_ptr) {
+int countAcid(ResSeqPtr res_seq_ptr, AminoAcidPtr acid_ptr) {
   int count = 0;
   for (int i = 0; i < res_seq_ptr->getLen(); i++) {
-    if (res_seq_ptr->getResiduePtr(i)->getAcidPtr() == acid_ptr) {
+    if (res_seq_ptr->getResiduePtr(i)->getAminoAcidPtr() == acid_ptr) {
       count++;
     }
   }
   return count;
 }
 
-int countAcidLeftCoverage(ResSeqPtr res_seq_ptr, AcidPtr acid_ptr, 
+int countAcidLeftCoverage(ResSeqPtr res_seq_ptr, AminoAcidPtr acid_ptr, 
                           const std::vector<bool> &match_ion_vec) {
   int count = 0;
   for (int i = 0; i < res_seq_ptr->getLen(); i++) {
-    if (res_seq_ptr->getResiduePtr(i)->getAcidPtr() == acid_ptr && match_ion_vec[i]) {
+    if (res_seq_ptr->getResiduePtr(i)->getAminoAcidPtr() == acid_ptr && match_ion_vec[i]) {
       count++;
     }
   }
   return count;
 }
 
-int countAcidRightCoverage(ResSeqPtr res_seq_ptr, AcidPtr acid_ptr, 
+int countAcidRightCoverage(ResSeqPtr res_seq_ptr, AminoAcidPtr acid_ptr, 
                           const std::vector<bool> &match_ion_vec) {
   int count = 0;
   for (int i = 0; i < res_seq_ptr->getLen(); i++) {
-    if (res_seq_ptr->getResiduePtr(i)->getAcidPtr() == acid_ptr && match_ion_vec[i+1]) {
+    if (res_seq_ptr->getResiduePtr(i)->getAminoAcidPtr() == acid_ptr && match_ion_vec[i+1]) {
       count++;
     }
   }
@@ -205,7 +205,7 @@ void PrsmStat::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   ResSeqPtr res_seq_ptr = proteo_ptr->getResSeqPtr();
 
   for (size_t i = 0; i < acid_ptr_vec_.size(); i++) {
-    AcidPtr acid = acid_ptr_vec_[i];
+    AminoAcidPtr acid = acid_ptr_vec_[i];
     file << countAcid(res_seq_ptr, acid) << "\t";
     for (size_t j = 0; j < deconv_ms_ptr_vec.size(); j++) {
       file << countAcidLeftCoverage(res_seq_ptr, acid, n_ion_2d[j]) << "\t";

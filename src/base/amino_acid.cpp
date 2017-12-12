@@ -15,7 +15,7 @@
 #include <string>
 
 #include "base/logger.hpp"
-#include "base/acid.hpp"
+#include "base/amino_acid.hpp"
 #include "base/string_util.hpp"
 #include "base/xml_dom.hpp"
 #include "base/xml_dom_document.hpp"
@@ -23,7 +23,7 @@
 
 namespace prot {
 
-Acid::Acid(xercesc::DOMElement* element) {
+AminoAcid::AminoAcid(xercesc::DOMElement* element) {
   name_ = xml_dom_util::getChildValue(element, "name", 0);
   one_letter_ = xml_dom_util::getChildValue(element, "one_letter", 0);
   three_letter_ = xml_dom_util::getChildValue(element, "three_letter", 0);
@@ -32,14 +32,14 @@ Acid::Acid(xercesc::DOMElement* element) {
   average_mass_ = xml_dom_util::getDoubleChildValue(element, "average_mass", 0);
 }
 
-void Acid::appendNameToXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
-  std::string element_name = Acid::getXmlElementName();
+void AminoAcid::appendNameToXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
+  std::string element_name = AminoAcid::getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
   xml_doc->addElement(element, "name", name_.c_str());
   parent->appendChild(element);
 }
 
-std::string Acid::getNameFromXml(xercesc::DOMElement * element) {
+std::string AminoAcid::getNameFromXml(xercesc::DOMElement * element) {
   std::string name = xml_dom_util::getChildValue(element, "name", 0);
   return name;
 }

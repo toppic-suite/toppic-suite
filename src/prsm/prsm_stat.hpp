@@ -40,7 +40,7 @@ class PrsmStat {
   double min_mass_;
   std::string input_file_ext_;
   std::string output_file_ext_;
-  AcidPtrVec acid_ptr_vec_;
+  AminoAcidPtrVec acid_ptr_vec_;
 };
 
 typedef std::shared_ptr<PrsmStat> PrsmStatPtr;
