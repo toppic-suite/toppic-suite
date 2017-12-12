@@ -22,6 +22,7 @@
 
 #include "base/logger.hpp"
 #include "base/mass_constant.hpp"
+#include "base/string_util.hpp"
 #include "spec/peak.hpp"
 #include "feature/envelope.hpp"
 
@@ -249,6 +250,22 @@ std::vector<double> Envelope::getIntensities() {
   }
   return intensities;
 }
+
+void Envelope::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
+  std::string element_name = Envelope::getXmlElementName();
+  xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
+  std::string str = string_util::convertToString(refer_idx_);
+  xml_doc->addElement(element, "refer_idx", str.c_str());
+  str = string_util::convertToString(charge_);
+  xml_doc->addElement(element, "charge", str.c_str());
+  str = string_util::convertToString(mono_mz_);
+  xml_doc->addElement(element, "mono_mz", str.c_str());
+  for (size_t i = 0; i < peaks_.size(); i++) {
+    peaks_[i]->appendXml(xml_doc, element);
+  }
+  parent->appendChild(element);
+}
+
 
 }  // namespace prot
 

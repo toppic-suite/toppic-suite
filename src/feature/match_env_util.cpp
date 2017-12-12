@@ -90,7 +90,7 @@ PeakPtrVec  rmAnnoPeak(PeakPtrVec &ms, MatchEnvPtrVec &envs) {
   std::vector<bool> is_keeps(peak_num, true);
   for (size_t i = 0; i < envs.size(); i++) {
     RealEnvPtr real_env_ptr = envs[i]->getRealEnvPtr();
-    for (size_t j = 0; j < real_env_ptr->getPeakNum(); j++) {
+    for (int j = 0; j < real_env_ptr->getPeakNum(); j++) {
       int peak_idx = real_env_ptr->getPeakIdx(j);
       if (peak_idx >= 0) {
         is_keeps[peak_idx] = false;

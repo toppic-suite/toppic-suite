@@ -58,6 +58,10 @@ class MatchEnv {
 
   void setTheoEnvPtr(EnvelopePtr theo_env_ptr) {theo_env_ptr_ = theo_env_ptr;}
 
+  void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+
+  static std::string getXmlElementName() {return "match_env";}
+
  private:
   int id_;
   // we divide envelopes into several groups based on monoisotopic  masses  
