@@ -48,6 +48,10 @@ class RealEnv : public Envelope {
 
   bool isExist(int i);
 
+  void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
+
+  static std::string getXmlElementName() {return "real_env";}
+
  private:
   // peak index in the spectrum 
   // if peak_idx[i] == NO_EXIST_PEAK, it does not exist 

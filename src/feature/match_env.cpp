@@ -16,6 +16,7 @@
 #include <cstddef>
 #include <limits>
 
+#include "base/string_util.hpp"
 #include "feature/match_env.hpp" 
 
 namespace prot {
@@ -167,41 +168,18 @@ double MatchEnv::calcShareInteAccu(int id_x, double inte_sum) {
   return intensity_factor;
 }
 
-/*
-void MsalignWriter::write(std::ofstream &file, MatchEnvPtrVec &envs,
-                              MsHeaderPtr header_ptr) {
-  file << "BEGIN IONS" << std::endl;
-  file << "ID=" << header_ptr->getId() << std::endl;
-  file << "SCANS=" << header_ptr->getScansString() << std::endl;
-  file << "RETENTION_TIME=" << header_ptr->getRetentionTime() << std::endl;
-  if (header_ptr->getActivationPtr() != nullptr) {
-    file << "ACTIVATION=" << header_ptr->getActivationPtr()->getName() << std::endl;
-  }
-  if (header_ptr->getMsLevel() > 1) {
-    file << "MS_ONE_ID=" << header_ptr->getMsOneId() << std::endl;
-    file << "MS_ONE_SCAN=" << header_ptr->getMsOneScan() << std::endl;
-    file << "PRECURSOR_MZ=" << header_ptr->getPrecMonoMz() << std::endl;
-    file << "PRECURSOR_CHARGE=" << header_ptr->getPrecCharge() << std::endl;
-    file << "PRECURSOR_MASS=" <<  header_ptr->getPrecMonoMass() << std::endl;
-    file << "PRECURSOR_INTENSITY=" << header_ptr->getPrecInte() << std::endl;
-    if (header_ptr->getFeatureId() >= 0) {
-      file << "FEATURE_ID=" << header_ptr->getFeatureId() << std::endl;
-      file << "FEATURE_INTENSITY=" << header_ptr->getFeatureInte() << std::endl;
-    }
-  }
-
-  for (size_t i = 0; i < envs.size(); i++) {
-    MatchEnvPtr env = envs[i];
-    EnvelopePtr theo_env = env->getTheoEnvPtr();
-    RealEnvPtr real_env = env->getRealEnvPtr();
-    file << real_env->getMonoMass();
-    file << "\t" << theo_env->compIntensitySum();
-    file << "\t" << theo_env->getCharge();
-    file << std::endl;
-  }
-  file << "END IONS" << std::endl;
-  file << std::endl;
+void MatchEnv::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
+  std::string element_name = MatchEnv::getXmlElementName();
+  xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
+  std::string str = string_util::convertToString(id_);
+  xml_doc->addElement(element, "id", str.c_str());
+  str = string_util::convertToString(mass_group_);
+  xml_doc->addElement(element, "mass_group", str.c_str());
+  str = string_util::convertToString(score_);
+  xml_doc->addElement(element, "score", str.c_str());
+  theo_env_ptr_->appendXml(xml_doc, element);
+  real_env_ptr_->appendXml(xml_doc, element);
+  parent->appendChild(element);
 }
-*/
 
 }

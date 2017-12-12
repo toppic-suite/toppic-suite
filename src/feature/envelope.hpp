@@ -102,6 +102,8 @@ class Envelope {
 
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
+  static std::string getXmlElementName() {return "envelope";}
+
  protected:
 
   int refer_idx_;
