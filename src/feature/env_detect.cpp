@@ -126,7 +126,6 @@ MatchEnvPtr EnvDetect::detectEnv(PeakPtrVec &peak_list, double mono_mass,
 // compute the intensity ratio based on the top three peaks
 double EnvDetect::calcInteRatio(EnvelopePtr theo_env, PeakPtrVec &peak_list,
                                 double tolerance) {
-  std::vector<double> theo_intes = theo_env->getIntensities();
   double theo_sum = 0;
   double obs_sum = 0;
   int refer_idx = theo_env->getReferIdx();
@@ -134,12 +133,12 @@ double EnvDetect::calcInteRatio(EnvelopePtr theo_env, PeakPtrVec &peak_list,
   // LOG_DEBUG("step 1");
   int peak_idx = raw_ms_util::getNearPeakIdx(peak_list, mz, tolerance);
   if (peak_idx >= 0) {
-    theo_sum += theo_intes[refer_idx];
+    theo_sum += theo_env->getIntensity(refer_idx);
     obs_sum += peak_list[peak_idx]->getIntensity();
   }
   // LOG_DEBUG("step 2");
   if (refer_idx - 1 >= 0) {
-    theo_sum += theo_intes[refer_idx - 1];
+    theo_sum += theo_env->getIntensity(refer_idx - 1);
     mz = theo_env->getMz(refer_idx-1);
     peak_idx = raw_ms_util::getNearPeakIdx(peak_list, mz, tolerance);
     if (peak_idx >= 0) {
@@ -148,7 +147,7 @@ double EnvDetect::calcInteRatio(EnvelopePtr theo_env, PeakPtrVec &peak_list,
   }
   // LOG_DEBUG("step 3 refer idx " << refer_idx << " peak num " << theo_env->getPeakNum());
   if (refer_idx + 1 < theo_env->getPeakNum()) {
-    theo_sum += theo_intes[refer_idx + 1];
+    theo_sum += theo_env->getIntensity(refer_idx + 1);
     mz = theo_env->getMz(refer_idx + 1);
     peak_idx = raw_ms_util::getNearPeakIdx(peak_list, mz, tolerance);
     if (peak_idx >= 0) {

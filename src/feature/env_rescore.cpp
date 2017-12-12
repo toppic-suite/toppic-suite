@@ -79,24 +79,25 @@ double diffMZ(MatchEnvPtr env) {
 
 double intenDis(MatchEnvPtr env) {
   double result = 0;
-  int n = env->getTheoEnvPtr()->getPeakNum();
-  std::vector<double> theo = env->getTheoEnvPtr()->getIntensities();
-  std::vector<double> real = env->getRealEnvPtr()->getIntensities();
-  std::vector<double> intensities;
-  for (double d : theo) intensities.push_back(d);
-  double max = *std::max_element(intensities.begin(), intensities.end()) / 2;
+  EnvelopePtr theo_env = env->getTheoEnvPtr();
+  RealEnvPtr real_env = env->getRealEnvPtr();
+  int n = theo_env->getPeakNum();
+  int idx = theo_env->getHighestPeakIdx();
+  double max = theo_env->getIntensity(idx) / 2;
   for (int i = 0; i < n; i++) {
-    if (real[i] > theo[i]) {
-      if (real[i] - theo[i] > max) {
+    double real = real_env->getIntensity(i);
+    double theo = theo_env->getIntensity(i);
+    if (real > theo) {
+      if (real - theo > max) {
         result += std::pow(max, 2);
       } else {
-        result += std::pow(real[i] - theo[i], 2);
+        result += std::pow(real - theo, 2);
       }
     } else {
-      if (theo[i] - real[i] > max) {
+      if (theo - real > max) {
         result += 2 * std::pow(max, 2);
       } else {
-        result += 2 * std::pow(theo[i] - real[i], 2);
+        result += 2 * std::pow(theo - real, 2);
       }
     }
   }

@@ -35,7 +35,8 @@ class MatchEnvRefine {
 
   static double compEnvDist(EnvelopePtr real_env, EnvelopePtr theo_env);
 
-  static double compDistWithNorm(const std::vector<double>& real, const std::vector<double>& theo);
+  static double compDistWithNorm(const std::vector<double>& real,
+                                 const std::vector<double>& theo);
 
   static std::vector<double> norm(const std::vector<double> &obs, double ratio);
 
