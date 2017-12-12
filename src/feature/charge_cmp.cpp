@@ -17,18 +17,16 @@
 
 namespace prot {
 
-
-
 // get common peaks in two peak lists 
 std::vector<int> getCommonPeak(RealEnvPtr env_a, RealEnvPtr env_b) {
-  std::vector<int> list_a = env_a->getPeakIdxList();
-  std::vector<int> list_b = env_b->getPeakIdxList();
-  int len = list_a.size();
+  int len = env_a->getPeakNum();
   std::vector<int> common_peaks(len, -1);
   for (int i = 0; i < len; i++) {
-    for (size_t j = 0; j < list_b.size(); j++) {
-      if (env_a->isExist(i) && list_a[i] == list_b[j]) {
-        common_peaks[i] = list_a[i];
+    int a_idx = env_a->getPeakIdx(i);
+    for (int j = 0; j < env_b->getPeakNum(); j++) {
+      int b_idx = env_b->getPeakIdx(j);
+      if (env_a->isExist(i) && a_idx == b_idx) {
+        common_peaks[i] = a_idx;
       }
     }
   }

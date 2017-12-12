@@ -89,10 +89,11 @@ PeakPtrVec  rmAnnoPeak(PeakPtrVec &ms, MatchEnvPtrVec &envs) {
   int peak_num = new_list.size();
   std::vector<bool> is_keeps(peak_num, true);
   for (size_t i = 0; i < envs.size(); i++) {
-    std::vector<int> peaks = envs[i]->getRealEnvPtr()->getPeakIdxList();
-    for (size_t j = 0; j < peaks.size(); j++) {
-      if (peaks[j] >= 0) {
-        is_keeps[peaks[j]] = false;
+    RealEnvPtr real_env_ptr = envs[i]->getRealEnvPtr();
+    for (size_t j = 0; j < real_env_ptr->getPeakNum(); j++) {
+      int peak_idx = real_env_ptr->getPeakIdx(j);
+      if (peak_idx >= 0) {
+        is_keeps[peak_idx] = false;
       }
     }
   }
@@ -172,19 +173,19 @@ MatchEnvPtrVec addMultipleMass(MatchEnvPtrVec &envs, MatchEnvPtr2D &candidates,
       }
       mass_envs.push_back(charge_envs[j]);
       double mono_mass = charge_envs[j]->getRealEnvPtr()->getMonoMass();
-      std::vector<int> peaks = charge_envs[j]->getRealEnvPtr()->getPeakIdxList();
-      int refer_idx = charge_envs[j]->getRealEnvPtr()->getReferIdx();
+      RealEnvPtr real_env_ptr = charge_envs[j]->getRealEnvPtr();
+      int refer_idx = real_env_ptr->getReferIdx();
       if (mono_mass >= multi_min_mass) {
         /* check left shift */
         if (refer_idx > 0) {
-          int p = peaks[refer_idx-1];
+          int p = real_env_ptr->getPeakIdx(refer_idx-1);
           if (p >=0 && candidates[p][charge-1] != nullptr &&
               candidates[p][charge-1]->getScore() >= min_score) {
             mass_envs.push_back(candidates[p][charge-1]);
           }
         }
-        if (refer_idx < static_cast<int>(peaks.size()) - 1) {
-          int p = peaks[refer_idx+1];
+        if (refer_idx < real_env_ptr->getPeakNum() - 1) {
+          int p = real_env_ptr->getPeakIdx(refer_idx+1);
           if (p >=0 && candidates[p][charge-1] != nullptr &&
               candidates[p][charge-1]->getScore() >= min_score) {
             mass_envs.push_back(candidates[p][charge-1]);

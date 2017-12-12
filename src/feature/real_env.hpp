@@ -42,9 +42,6 @@ class RealEnv : public Envelope {
 
   int getPeakIdx(int i) {return peaks_[i]->getIdx();}
 
-  std::vector<int> getPeakIdxList();
-  //{return peak_idxes_;}
-
   int getReferPeakIdx() {return peaks_[refer_idx_]->getIdx();}
 
   static bool testPeakShare(RealEnvPtr a, RealEnvPtr b);
