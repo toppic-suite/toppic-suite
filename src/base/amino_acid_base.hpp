@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_ACID_BASE_HPP_
-#define PROT_BASE_ACID_BASE_HPP_
+#ifndef PROT_BASE_AMINO_ACID_BASE_HPP_
+#define PROT_BASE_AMINO_ACID_BASE_HPP_
 
 #include <string>
 
@@ -22,7 +22,7 @@
 
 namespace prot {
 
-class AcidBase {
+class AminoAcidBase {
  public:
   static void initBase(const std::string &file_name);
 

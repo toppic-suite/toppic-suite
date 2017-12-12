@@ -16,7 +16,7 @@
 #include <string>
 
 #include "base/logger.hpp"
-#include "base/acid_base.hpp"
+#include "base/amino_acid_base.hpp"
 #include "base/ptm_base.hpp"
 #include "base/residue_base.hpp"
 #include "base/file_util.hpp"
@@ -39,7 +39,7 @@ void ResidueBase::initBase(const std::string &file_name) {
       xercesc::DOMElement* element
           = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
       ResiduePtr residue_ptr = std::make_shared<Residue>(element);
-      if (residue_ptr->getAminoAcidPtr() == AcidBase::getEmptyAminoAcidPtr()
+      if (residue_ptr->getAminoAcidPtr() == AminoAcidBase::getEmptyAminoAcidPtr()
           && residue_ptr->getPtmPtr() == PtmBase::getEmptyPtmPtr()) {
         empty_residue_ptr_ = residue_ptr;
       }

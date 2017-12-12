@@ -16,13 +16,13 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "base/acid_base.hpp"
+#include "base/amino_acid_base.hpp"
 #include "base/activation_base.hpp"
 #include "base/mod_util.hpp"
 #include "base/residue_util.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
 #include "spec/theo_peak_util.hpp"
-#include "local_util.hpp"
+#include "local/local_util.hpp"
 
 namespace prot {
 

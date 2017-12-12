@@ -19,7 +19,7 @@
 #include "base/string_util.hpp"
 #include "base/xml_dom_util.hpp"
 #include "base/ptm_base.hpp"
-#include "local_anno.hpp"
+#include "base/local_anno.hpp"
 
 namespace prot {
 

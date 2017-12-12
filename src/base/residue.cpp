@@ -15,7 +15,7 @@
 
 #include <base/logger.hpp>
 
-#include "base/acid_base.hpp"
+#include "base/amino_acid_base.hpp"
 #include "base/ptm_base.hpp"
 #include "base/residue.hpp"
 #include "base/file_util.hpp"
@@ -32,7 +32,7 @@ Residue::Residue(AminoAcidPtr acid_ptr, PtmPtr ptm_ptr):
 
 Residue::Residue(const std::string &acid_name, 
                  const std::string &ptm_abbr_name) {
-  acid_ptr_ = AcidBase::getAminoAcidPtrByName(acid_name);
+  acid_ptr_ = AminoAcidBase::getAminoAcidPtrByName(acid_name);
   ptm_ptr_ = PtmBase::getPtmPtrByAbbrName(ptm_abbr_name);
   mass_ = acid_ptr_->getMonoMass() + ptm_ptr_->getMonoMass();
 }
@@ -41,7 +41,7 @@ Residue::Residue(xercesc::DOMElement* element) {
   std::string acid_element_name = AminoAcid::getXmlElementName();
   xercesc::DOMElement* acid_element 
       = xml_dom_util::getChildElement(element, acid_element_name.c_str(), 0);
-  acid_ptr_ = AcidBase::getAminoAcidPtrFromXml(acid_element);
+  acid_ptr_ = AminoAcidBase::getAminoAcidPtrFromXml(acid_element);
   std::string ptm_element_name = Ptm::getXmlElementName();
   xercesc::DOMElement* ptm_element 
       = xml_dom_util::getChildElement(element, ptm_element_name.c_str(), 0);

@@ -16,12 +16,12 @@
 #ifndef PROT_LOCAL_UTIL_HPP_
 #define PROT_LOCAL_UTIL_HPP_
 
+#include "base/amino_acid_base.hpp"
 #include "base/ptm.hpp"
-#include "base/acid_base.hpp"
 #include "base/change.hpp"
 #include "prsm/prsm.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
-#include "local_mng.hpp"
+#include "local/local_mng.hpp"
 
 namespace prot {
 
@@ -100,7 +100,7 @@ inline ChangePtr geneUnexpectedChange(ChangePtr change, double mass) {
 inline double getPeptideMass(const std::string & seq) {
   double m = 0;
   for (size_t i = 0; i < seq.length(); i++) {
-    m += AcidBase::getAminoAcidPtrByOneLetter(seq.substr(i, 1))->getMonoMass();
+    m += AminoAcidBase::getAminoAcidPtrByOneLetter(seq.substr(i, 1))->getMonoMass();
   }
   return m;
 }

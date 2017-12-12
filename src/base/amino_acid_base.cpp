@@ -15,17 +15,17 @@
 #include <string>
 
 #include "base/logger.hpp"
-#include "base/acid_base.hpp"
+#include "base/amino_acid_base.hpp"
 #include "base/xml_dom.hpp"
 #include "base/xml_dom_document.hpp"
 #include "base/xml_dom_util.hpp"
 
 namespace prot {
 
-AminoAcidPtrVec AcidBase::amino_acid_ptr_vec_;
-AminoAcidPtr AcidBase::empty_amino_acid_ptr_;
+AminoAcidPtrVec AminoAcidBase::amino_acid_ptr_vec_;
+AminoAcidPtr AminoAcidBase::empty_amino_acid_ptr_;
 
-void AcidBase::initBase(const std::string &file_name) {
+void AminoAcidBase::initBase(const std::string &file_name) {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
     XmlDOMDocument doc(parser, file_name.c_str());
@@ -46,7 +46,7 @@ void AcidBase::initBase(const std::string &file_name) {
   }
 }
 
-AminoAcidPtr AcidBase::getAminoAcidPtrByName(const std::string &name) {
+AminoAcidPtr AminoAcidBase::getAminoAcidPtrByName(const std::string &name) {
   for (size_t i = 0; i < amino_acid_ptr_vec_.size(); i++) {
     std::string n = amino_acid_ptr_vec_[i]->getName();
     if (n == name) {
@@ -57,7 +57,7 @@ AminoAcidPtr AcidBase::getAminoAcidPtrByName(const std::string &name) {
   return AminoAcidPtr(nullptr);
 }
 
-AminoAcidPtr AcidBase::getAminoAcidPtrByOneLetter(const std::string &one_letter) {
+AminoAcidPtr AminoAcidBase::getAminoAcidPtrByOneLetter(const std::string &one_letter) {
   for (size_t i = 0; i < amino_acid_ptr_vec_.size(); i++) {
     std::string l = amino_acid_ptr_vec_[i]->getOneLetter();
     if (l == one_letter)  {
@@ -68,7 +68,7 @@ AminoAcidPtr AcidBase::getAminoAcidPtrByOneLetter(const std::string &one_letter)
   return AminoAcidPtr(nullptr);
 }
 
-AminoAcidPtr AcidBase::getAminoAcidPtrByThreeLetter(const std::string &three_letter) {
+AminoAcidPtr AminoAcidBase::getAminoAcidPtrByThreeLetter(const std::string &three_letter) {
   for (size_t i = 0; i < amino_acid_ptr_vec_.size(); i++) {
     std::string l = amino_acid_ptr_vec_[i]->getThreeLetter();
     if (l == three_letter) {
@@ -79,19 +79,19 @@ AminoAcidPtr AcidBase::getAminoAcidPtrByThreeLetter(const std::string &three_let
   return AminoAcidPtr(nullptr);
 }
 
-bool AcidBase::containsName(const std::string &name) {
+bool AminoAcidBase::containsName(const std::string &name) {
   return getAminoAcidPtrByName(name).get() != nullptr;
 }
 
-bool AcidBase::containsOneLetter(const std::string &one_letter) {
+bool AminoAcidBase::containsOneLetter(const std::string &one_letter) {
   return getAminoAcidPtrByOneLetter(one_letter).get() != nullptr;
 }
 
-bool AcidBase::containsThreeLetter(const std::string &three_letter) {
+bool AminoAcidBase::containsThreeLetter(const std::string &three_letter) {
   return getAminoAcidPtrByThreeLetter(three_letter).get() != nullptr;
 }
 
-AminoAcidPtr AcidBase::getAminoAcidPtrFromXml(xercesc::DOMElement * element) {
+AminoAcidPtr AminoAcidBase::getAminoAcidPtrFromXml(xercesc::DOMElement * element) {
   std::string name = AminoAcid::getNameFromXml(element);
   AminoAcidPtr acid_ptr = getAminoAcidPtrByName(name);
   return acid_ptr;
