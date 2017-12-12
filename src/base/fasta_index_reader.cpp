@@ -43,8 +43,8 @@ FastaSeqPtr FastaIndexReader::readFastaSeq(const std::string &name,
   return std::make_shared<FastaSeq>(name, desc, ori_seq);
 }
 
-std::vector<FastaSeqPtr> FastaIndexReader::readFastaSeqVec(const std::string & name,
-                                                           const std::string & desc) {
+std::vector<FastaSubSeqPtr> FastaIndexReader::readFastaSubSeqVec(const std::string & name,
+                                                                 const std::string & desc) {
   int seq_len;
   char * seq = fai_fetch(fai_, name.c_str(), &seq_len);
   if (seq_len < 0) {
@@ -55,24 +55,24 @@ std::vector<FastaSeqPtr> FastaIndexReader::readFastaSeqVec(const std::string & n
   free(seq);
 
   int N = 2000;
-  std::vector<FastaSeqPtr> fasta_seq_vec;
+  std::vector<FastaSubSeqPtr> fasta_seq_vec;
   if (seq_len < N) {
-    fasta_seq_vec.push_back(std::make_shared<FastaSeq>(name, desc, ori_seq));
+    fasta_seq_vec.push_back(std::make_shared<FastaSubSeq>(name, desc, ori_seq, 0));
   } else {
     int k = seq_len / N;
     for (int i = 0; i <= k; i++) {
       std::string sub_seq;
       if (N * (i + 1) > seq_len) {
         sub_seq = ori_seq.substr(seq_len - N, N);
-        fasta_seq_vec.push_back(std::make_shared<FastaSeq>(name, desc, sub_seq, seq_len - N));
+        fasta_seq_vec.push_back(std::make_shared<FastaSubSeq>(name, desc, sub_seq, seq_len - N));
       } else {
         sub_seq = ori_seq.substr(i * N, N);
-        fasta_seq_vec.push_back(std::make_shared<FastaSeq>(name, desc, sub_seq, i * N));
+        fasta_seq_vec.push_back(std::make_shared<FastaSubSeq>(name, desc, sub_seq, i * N));
       }
       if (i != k) {
         if (N * (i + 1.5) < seq_len) {
           sub_seq = ori_seq.substr((i + 0.5) * N, N);
-          fasta_seq_vec.push_back(std::make_shared<FastaSeq>(name, desc, sub_seq, (i + 0.5) * N));
+          fasta_seq_vec.push_back(std::make_shared<FastaSubSeq>(name, desc, sub_seq, (i + 0.5) * N));
         }
       }
     }

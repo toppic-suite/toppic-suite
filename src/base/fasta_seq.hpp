@@ -28,10 +28,10 @@ namespace prot {
 
 class FastaSeq {
  public:
-  FastaSeq(const std::string &name_line, const std::string &ori_seq, int sub_seq_start = 0);
+  FastaSeq(const std::string &name_line, const std::string &ori_seq);
 
   FastaSeq(const std::string &name, const std::string &desc,
-           const std::string &ori_seq, int sub_seq_start = 0);
+           const std::string &ori_seq);
 
   std::string getName() {return name_;}
 
@@ -43,10 +43,6 @@ class FastaSeq {
 
   int getAcidPtmPairLen() {return acid_ptm_pair_vec_.size();}
 
-  int getSubSeqStart() {return sub_seq_start_;}
-
-  void setSubSeqStart(int m) {sub_seq_start_ = m;}
-
   static std::string getXmlElementName() {return "fasta_seq";}
 
   void appendNameDescToXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
@@ -54,8 +50,6 @@ class FastaSeq {
   static std::string getNameFromXml(xercesc::DOMElement* element);
 
   static std::string getDescFromXml(xercesc::DOMElement* element);
-
-  static int getSubSeqStartFromXml(xercesc::DOMElement* element);
 
   static std::string getString(const std::pair<std::string, std::string> &str_pair);
 
@@ -65,10 +59,12 @@ class FastaSeq {
 
  private:
   std::string name_;
+
   std::string desc_;
+
   std::string seq_;
+
   StringPairVec acid_ptm_pair_vec_;
-  int sub_seq_start_ = 0;
 
   void compAcidPtmPairVec();
 };

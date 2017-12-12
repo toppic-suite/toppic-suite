@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include "base/acid_base.hpp"
 #include "base/mod_util.hpp"
 #include "base/file_util.hpp"
 #include "base/residue_util.hpp"

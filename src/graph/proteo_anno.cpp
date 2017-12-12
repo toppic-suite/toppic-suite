@@ -37,7 +37,7 @@ ProteoAnno::ProteoAnno(const ModPtrVec &fix_mod_ptr_vec,
   is_nme_ = false;
   for (size_t i = 0; i < var_mod_ptr_vec_.size(); i++) {
     ResiduePtr res_ptr = var_mod_ptr_vec[i]->getModResiduePtr();
-    AcidPtr acid_ptr = res_ptr->getAminoAcidPtr();
+    AminoAcidPtr acid_ptr = res_ptr->getAminoAcidPtr();
     if (ptm_map_.find(acid_ptr) == ptm_map_.end()) {
       ResiduePtrVec cur_vec;
       cur_vec.push_back(res_ptr);
@@ -107,7 +107,7 @@ void ProteoAnno::anno(const std::string &seq, bool is_complete) {
 
   // variable ptms
   for (size_t i = 0; i < residue_ptr_vec.size(); i++) {
-    AcidPtr acid_ptr = residue_ptr_vec[i]->getAminoAcidPtr();
+    AminoAcidPtr acid_ptr = residue_ptr_vec[i]->getAminoAcidPtr();
     // if exist modified residues
     if (ptm_map_.count(acid_ptr)) {
       ResiduePtrVec mod_res_vec = ptm_map_[acid_ptr];

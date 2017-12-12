@@ -63,30 +63,5 @@ MassGraphPtr getMassGraphPtr(ProteoAnnoPtr proteo_anno_ptr, double convert_ratio
   return graph_ptr;
 }
 
-ProteoGraphPtr ProteoGraphReader::getNextProteoGraphPtr() {
-  FastaSeqPtr seq_ptr = reader_ptr_->getNextSeq();
-  if (seq_ptr == nullptr) {
-    return nullptr;
-  }
-  LOG_DEBUG("name " << seq_ptr->getName() << " seq " << seq_ptr->getRawSeq());
-  proteo_anno_ptr_->anno(seq_ptr->getRawSeq());
-  MassGraphPtr graph_ptr = getMassGraphPtr(proteo_anno_ptr_, convert_ratio_);
-
-  return std::make_shared<ProteoGraph>(seq_ptr, fix_mod_ptr_vec_, graph_ptr,
-                                       proteo_anno_ptr_->isNme(),
-                                       convert_ratio_, max_mod_num_,
-                                       max_ptm_sum_mass_, proteo_graph_gap_,
-                                       var_ptm_in_gap_);
-}
-
-ProteoGraphPtr ProteoGraphReader::getProteoGraphPtrBySeq(FastaSeqPtr seq_ptr) {
-  proteo_anno_ptr_->anno(seq_ptr->getRawSeq(), seq_ptr->getSubSeqStart() == 0);
-  MassGraphPtr graph_ptr = getMassGraphPtr(proteo_anno_ptr_, convert_ratio_);
-  return std::make_shared<ProteoGraph>(seq_ptr, fix_mod_ptr_vec_, graph_ptr,
-                                       proteo_anno_ptr_->isNme(),
-                                       convert_ratio_, max_mod_num_,
-                                       max_ptm_sum_mass_, proteo_graph_gap_,
-                                       var_ptm_in_gap_);
-}
 }  // namespace prot
 
