@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_ACID_HPP_
-#define PROT_BASE_ACID_HPP_
+#ifndef PROT_BASE_AMINO_ACID_HPP_
+#define PROT_BASE_AMINO_ACID_HPP_
 
 #include <memory>
 #include <string>
@@ -24,11 +24,11 @@
 
 namespace prot {
 
-class Acid {
+class AminoAcid {
  public:
-  Acid(const std::string &name, const std::string &one_letter,
-       const std::string &three_letter, const std::string &composition,
-       double mono_mass, double avg_mass):
+  AminoAcid(const std::string &name, const std::string &one_letter,
+            const std::string &three_letter, const std::string &composition,
+            double mono_mass, double avg_mass):
       name_(name),
       one_letter_(one_letter),
       three_letter_(three_letter),
@@ -36,10 +36,10 @@ class Acid {
       mono_mass_(mono_mass),
       average_mass_(avg_mass) {}
 
-  explicit Acid(xercesc::DOMElement* element);
+  explicit AminoAcid(xercesc::DOMElement* element);
 
   // Get amino acid composition
-  std::string getAcidComposition() {return composition_;}
+  std::string getComposition() {return composition_;}
 
   // Get average mass
   double getAvgMass() {return average_mass_;}
@@ -77,8 +77,8 @@ class Acid {
   double average_mass_;
 };
 
-typedef std::shared_ptr<Acid> AcidPtr;
-typedef std::vector<AcidPtr> AcidPtrVec;
+typedef std::shared_ptr<AminoAcid> AminoAcidPtr;
+typedef std::vector<AminoAcidPtr> AminoAcidPtrVec;
 
 }  // namespace prot
 

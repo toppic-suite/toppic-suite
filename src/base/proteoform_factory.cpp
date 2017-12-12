@@ -46,7 +46,7 @@ ProteoformPtr geneDbProteoformPtr(FastaSeqPtr fasta_seq_ptr, ModPtrVec fix_mod_l
   // add input ptms;
   for (size_t i = 0; i < residue_ptrs.size(); i++) {
     if (residue_ptrs[i]->getPtmPtr() != PtmBase::getEmptyPtmPtr()) {
-      ResiduePtr ori_residue = ResidueBase::getBaseResiduePtr(residue_ptrs[i]->getAcidPtr());
+      ResiduePtr ori_residue = ResidueBase::getBaseResiduePtr(residue_ptrs[i]->getAminoAcidPtr());
       ModPtr mod_ptr = ModBase::getBaseModPtr(ori_residue, residue_ptrs[i]);
       ChangePtr change_ptr
           = std::make_shared<Change>(i, i + 1, ChangeType::INPUT, mod_ptr->getShift(), mod_ptr);

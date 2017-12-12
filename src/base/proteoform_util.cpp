@@ -50,7 +50,7 @@ ResFreqPtrVec compNTermResidueFreq(
   }
   ResFreqPtrVec res_freq_list;
   for (size_t i = 0; i < residue_list.size(); i++) {
-    ResFreqPtr res_freq_ptr(new ResidueFreq(residue_list[i]->getAcidPtr(),
+    ResFreqPtr res_freq_ptr(new ResidueFreq(residue_list[i]->getAminoAcidPtr(),
                                             residue_list[i]->getPtmPtr(),
                                             counts[i]/sum));
     res_freq_list.push_back(res_freq_ptr);
@@ -80,7 +80,7 @@ ResFreqPtrVec compResidueFreq(const ResiduePtrVec &residue_list,
   }
   ResFreqPtrVec res_freq_list;
   for (size_t i = 0; i < residue_list.size(); i++) {
-    ResFreqPtr res_freq_ptr(new ResidueFreq(residue_list[i]->getAcidPtr(),
+    ResFreqPtr res_freq_ptr(new ResidueFreq(residue_list[i]->getAminoAcidPtr(),
                                             residue_list[i]->getPtmPtr(),
                                             counts[i]/sum));
     res_freq_list.push_back(res_freq_ptr);

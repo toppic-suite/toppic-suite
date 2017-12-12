@@ -54,7 +54,7 @@ std::string ResidueSeq::toString() {
 std::string ResidueSeq::toAcidString() {
   std::stringstream s;
   for (size_t i = 0; i < residues_.size(); i++) {
-    s << residues_[i]->getAcidPtr()->getOneLetter();
+    s << residues_[i]->getAminoAcidPtr()->getOneLetter();
   }
   return s.str();
 }

@@ -24,7 +24,7 @@
 
 namespace prot {
 
-Residue::Residue(AcidPtr acid_ptr, PtmPtr ptm_ptr):
+Residue::Residue(AminoAcidPtr acid_ptr, PtmPtr ptm_ptr):
     acid_ptr_(acid_ptr),
     ptm_ptr_(ptm_ptr) {
       mass_ = acid_ptr_->getMonoMass() + ptm_ptr_->getMonoMass();
@@ -32,16 +32,16 @@ Residue::Residue(AcidPtr acid_ptr, PtmPtr ptm_ptr):
 
 Residue::Residue(const std::string &acid_name, 
                  const std::string &ptm_abbr_name) {
-  acid_ptr_ = AcidBase::getAcidPtrByName(acid_name);
+  acid_ptr_ = AcidBase::getAminoAcidPtrByName(acid_name);
   ptm_ptr_ = PtmBase::getPtmPtrByAbbrName(ptm_abbr_name);
   mass_ = acid_ptr_->getMonoMass() + ptm_ptr_->getMonoMass();
 }
 
 Residue::Residue(xercesc::DOMElement* element) { 
-  std::string acid_element_name = Acid::getXmlElementName();
+  std::string acid_element_name = AminoAcid::getXmlElementName();
   xercesc::DOMElement* acid_element 
       = xml_dom_util::getChildElement(element, acid_element_name.c_str(), 0);
-  acid_ptr_ = AcidBase::getAcidPtrFromXml(acid_element);
+  acid_ptr_ = AcidBase::getAminoAcidPtrFromXml(acid_element);
   std::string ptm_element_name = Ptm::getXmlElementName();
   xercesc::DOMElement* ptm_element 
       = xml_dom_util::getChildElement(element, ptm_element_name.c_str(), 0);

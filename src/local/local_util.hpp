@@ -100,7 +100,7 @@ inline ChangePtr geneUnexpectedChange(ChangePtr change, double mass) {
 inline double getPeptideMass(const std::string & seq) {
   double m = 0;
   for (size_t i = 0; i < seq.length(); i++) {
-    m += AcidBase::getAcidPtrByOneLetter(seq.substr(i, 1))->getMonoMass();
+    m += AcidBase::getAminoAcidPtrByOneLetter(seq.substr(i, 1))->getMonoMass();
   }
   return m;
 }

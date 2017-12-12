@@ -20,7 +20,7 @@
 #include <memory>
 #include <map>
 
-#include "base/acid.hpp"
+#include "base/amino_acid.hpp"
 #include "base/ptm.hpp"
 #include "base/logger.hpp"
 
@@ -31,14 +31,14 @@ typedef std::shared_ptr<Residue> ResiduePtr;
 
 class Residue {
  public:
-  Residue(AcidPtr acid_ptr, PtmPtr ptm_ptr); 
+  Residue(AminoAcidPtr acid_ptr, PtmPtr ptm_ptr); 
 
   Residue(const std::string &acid_name, const std::string &abbr_name);
 
   Residue(xercesc::DOMElement* element); 
 
   /** Get amino acid. */
-  AcidPtr getAcidPtr() {return acid_ptr_; }
+  AminoAcidPtr getAminoAcidPtr() {return acid_ptr_; }
 
   /** Get residue mass. */
   double getMass() { return mass_; }
@@ -50,7 +50,7 @@ class Residue {
    * Checks if the residue contains the same amino acid and ptm.
    */
   bool isSame(ResiduePtr residue_ptr) {
-    return acid_ptr_ == residue_ptr->getAcidPtr() 
+    return acid_ptr_ == residue_ptr->getAminoAcidPtr() 
         && ptm_ptr_ == residue_ptr->getPtmPtr();
   }
 
@@ -69,7 +69,7 @@ class Residue {
 
 private:
   /** amino acid */
-  AcidPtr acid_ptr_;
+  AminoAcidPtr acid_ptr_;
   /** post-translational modification */
   PtmPtr ptm_ptr_;
   /** residue mass */

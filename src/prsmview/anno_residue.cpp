@@ -19,7 +19,7 @@
 namespace prot {
 
 AnnoResidue::AnnoResidue(ResiduePtr residue_ptr, int pos):
-    Residue(residue_ptr->getAcidPtr(),residue_ptr->getPtmPtr()) {
+    Residue(residue_ptr->getAminoAcidPtr(),residue_ptr->getPtmPtr()) {
       pos_= pos;
       type_= ANNO_RESIDUE_TYPE_NORMAL;
       is_unexpected_change_ = false;
@@ -31,7 +31,7 @@ void AnnoResidue::appendViewXml(XmlDOMDocument* xml_doc,
   xercesc::DOMElement* element = xml_doc->createElement("residue");
   std::string str = string_util::convertToString(pos_);
   xml_doc->addElement(element, "position", str.c_str());
-  str = getAcidPtr()->getOneLetter();
+  str = getAminoAcidPtr()->getOneLetter();
   xml_doc->addElement(element, "acid", str.c_str());
   str = type_;
   xml_doc->addElement(element, "residue_type", str.c_str());
