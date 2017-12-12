@@ -20,7 +20,7 @@
 #include "base/proteoform_factory.hpp"
 #include "base/file_util.hpp"
 #include "base/mod_util.hpp"
-#include "base/threadpool.hpp"
+#include "base/thread_pool.hpp"
 #include "spec/msalign_util.hpp"
 #include "prsm/simple_prsm_xml_writer.hpp"
 #include "prsm/simple_prsm_str_combine.hpp"

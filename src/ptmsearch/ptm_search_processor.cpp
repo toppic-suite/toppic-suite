@@ -16,7 +16,7 @@
 #include "base/prot_mod.hpp"
 #include "base/fasta_reader.hpp"
 #include "base/file_util.hpp"
-#include "base/threadpool.hpp"
+#include "base/thread_pool.hpp"
 #include "spec/deconv_ms.hpp"
 #include "spec/spectrum_set.hpp"
 #include "spec/msalign_util.hpp"
