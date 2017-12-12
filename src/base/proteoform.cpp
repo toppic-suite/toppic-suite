@@ -41,7 +41,7 @@ Proteoform::Proteoform(FastaSeqPtr fasta_seq_ptr, ProtModPtr prot_mod_ptr,
     change_list_(change_ptr_vec) {
       bp_spec_ptr_ = std::make_shared<BpSpec>(res_seq_ptr);
       std::sort(change_list_.begin(), change_list_.end(), Change::cmpPosInc);
-      species_id_ = 0;
+      proteo_cluster_id_ = -1;
     }
 
 Proteoform::Proteoform(xercesc::DOMElement* element, FastaIndexReaderPtr reader_ptr,
@@ -61,7 +61,7 @@ void Proteoform::parseXml(xercesc::DOMElement* element, ProteoformPtr form_ptr, 
   // LOG_DEBUG("start parse proteoform");
   start_pos_ = sub_seq_start + xml_dom_util::getIntChildValue(element, "start_pos", 0);
   end_pos_ = sub_seq_start + xml_dom_util::getIntChildValue(element, "end_pos", 0);
-  species_id_ = xml_dom_util::getIntChildValue(element, "species_id", 0);
+  proteo_cluster_id_ = xml_dom_util::getIntChildValue(element, "proteo_cluster_id", 0);
   prot_id_ = xml_dom_util::getIntChildValue(element, "prot_id", 0);
   variable_ptm_num_ = xml_dom_util::getIntChildValue(element, "variable_ptm_num", 0);
 
@@ -290,8 +290,8 @@ void Proteoform::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent)
   xml_doc->addElement(element, "start_pos", str.c_str());
   str = string_util::convertToString(end_pos_);
   xml_doc->addElement(element, "end_pos", str.c_str());
-  str = string_util::convertToString(species_id_);
-  xml_doc->addElement(element, "species_id", str.c_str());
+  str = string_util::convertToString(proteo_cluster_id_);
+  xml_doc->addElement(element, "proteo_cluster_id", str.c_str());
   str = string_util::convertToString(prot_id_);
   xml_doc->addElement(element, "prot_id", str.c_str());
   str = string_util::convertToString(variable_ptm_num_);
