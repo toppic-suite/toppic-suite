@@ -17,7 +17,7 @@
 #include "base/file_util.hpp"
 #include "base/proteoform.hpp"
 #include "base/fasta_reader.hpp"
-#include "base/threadpool.hpp"
+#include "base/thread_pool.hpp"
 #include "spec/msalign_reader.hpp"
 #include "spec/msalign_util.hpp"
 #include "spec/spectrum_set.hpp"
