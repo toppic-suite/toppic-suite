@@ -69,14 +69,15 @@ class Envelope {
 
   double getAvgMass();
 
+  int getHighestPeakIdx();
+
+  std::vector<double> getIntensities();
+
   int getCharge() {return charge_;}
 
   int getLabel(int i) {return (int)std::round((peaks_[i]->getPosition() - mono_mz_) * charge_);}
 
   double getIntensity(int i) {return peaks_[i]->getIntensity();}
-
-  std::vector<double> getIntensities();
-  //{return intensities_;}
 
   double getMonoMass() {return Peak::compPeakMass(mono_mz_, charge_);}
 
@@ -110,13 +111,6 @@ class Envelope {
   double mono_mz_;
   // peak list
   EnvPeakPtrVec peaks_;
-
-  /*
-  // m/z list of all peaks in this envelope 
-  std::vector<double> mzs_;
-  // intensity list of all peaks in this envelope 
-  std::vector<double> intensities_;
-  */
 };
 
 typedef std::vector<EnvelopePtr> EnvelopePtrVec;

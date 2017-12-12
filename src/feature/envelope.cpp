@@ -51,9 +51,7 @@ Envelope::Envelope(int num, std::vector<std::string> &line_list) {
     EnvPeakPtr peak_ptr = std::make_shared<EnvPeak>(mz, inte);
     peaks_[i] = peak_ptr;
   }
-  refer_idx_ = std::distance(peaks_.begin(), 
-                             std::max_element(peaks_.begin(), peaks_.end(), EnvPeak::cmpInteInc)); 
-  // EnvelopeUtil::getMaxPos(intensities_);
+  refer_idx_ = getHighestPeakIdx();
 }
 
 Envelope::Envelope(int refer_idx, int charge, double mono_mz,
@@ -129,8 +127,6 @@ EnvelopePtr Envelope::addZero(int num) {
   for (int i = 0; i < n_peak; i++) {
     new_peaks[i + num]->setPosition(peaks_[i]->getPosition());
     new_peaks[i + num]->setIntensity(peaks_[i]->getIntensity());
-    //new_mzs[i + num] = peaks_[i]->getPosition();
-    //new_intes[i + num] = peaks_[i]->getIntensity();
   }
   for (int i = num - 1; i >= 0; i--) {
     double pos = new_peaks[i+1]->getPosition() 
@@ -239,6 +235,11 @@ double Envelope::getAvgMz() {
 
 double Envelope::getAvgMass() {
   return getAvgMz() * charge_ - charge_ * mass_constant::getProtonMass();
+}
+
+int Envelope::getHighestPeakIdx() {
+  return std::distance(peaks_.begin(), 
+                       std::max_element(peaks_.begin(), peaks_.end(), EnvPeak::cmpInteInc)); 
 }
 
 std::vector<double> Envelope::getIntensities() {
