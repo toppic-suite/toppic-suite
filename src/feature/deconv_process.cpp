@@ -46,7 +46,7 @@ void DeconvProcess::outputParameter(std::ostream &output, DeconvParaPtr para_ptr
   output << prefix << std::setw(40) << std::left 
       << "Input file: " << para_ptr->data_file_name_ << std::endl;
   output << prefix << std::setw(40) << std::left 
-      << "Data type: " << "centroided" << std::endl;
+      << "Data type: " << "centroid" << std::endl;
   output << prefix << std::setw(40) << std::left 
       << "Maximum charge: " << para_ptr->max_charge_ << std::endl;
   output << prefix << std::setw(40) << std::left 
