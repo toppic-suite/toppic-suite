@@ -53,15 +53,15 @@ bool CoTable::checkCoexist(MatchEnvPtr env_a, MatchEnvPtr env_b, int pos_a,
 
 bool CoTable::checkCoexist(MatchEnvPtr env_a, MatchEnvPtr env_b,
                            double tolerance) {
-  std::vector<int> list_a = env_a->getRealEnvPtr()->getPeakIdxList();
-  std::vector<int> list_b = env_b->getRealEnvPtr()->getPeakIdxList();
   int cnt_share = 0;
   int cnt_coexist = 0;
-  for (size_t i = 0; i < list_a.size(); i++) {
-    int peak_a = list_a[i];
-    for (size_t j = 0; j < list_b.size(); j++) {
-      int peak_b = list_b[j];
-      if (env_a->getRealEnvPtr()->isExist(i) && peak_a == peak_b) {
+  RealEnvPtr real_env_a = env_a->getRealEnvPtr();
+  RealEnvPtr real_env_b = env_b->getRealEnvPtr();
+  for (int i = 0; i < real_env_a->getPeakNum(); i++) {
+    int a_idx = real_env_a->getPeakIdx(i);
+    for (size_t j = 0; j < real_env_b->getPeakNum(); j++) {
+      int b_idx = real_env_b->getPeakIdx(j);
+      if (real_env_a->isExist(i) && a_idx == b_idx) {
         cnt_share++;
         if (checkCoexist(env_a, env_b, i, j, tolerance)) {
           cnt_coexist++;

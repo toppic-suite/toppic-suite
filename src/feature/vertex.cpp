@@ -79,17 +79,19 @@ bool Vertex::addPreEnv(MatchEnvPtr env, int max_overlap) {
   if (mng_ptr_->check_double_increase_ && !passDblIncrCheck(env)) {
     return false;
   }
-  std::vector<int> idx_list = env->getRealEnvPtr()->getPeakIdxList();
-  for (size_t i = 0; i < idx_list.size(); i++) {
-    if (env->getRealEnvPtr()->isExist(i) && idx_list[i] >= bgn_peak_
-        && idx_list[i] - bgn_peak_ < peak_num_) {
+  RealEnvPtr real_env_ptr = env->getRealEnvPtr();
+  //std::vector<int> idx_list = env->getRealEnvPtr()->getPeakIdxList();
+  for (int i = 0; i < real_env_ptr->getPeakNum(); i++) {
+    int peak_idx = real_env_ptr->getPeakIdx(i);
+    if (real_env_ptr->isExist(i) && peak_idx >= bgn_peak_
+        && peak_idx - bgn_peak_ < peak_num_) {
 
-      peak_use_cnts_[idx_list[i] - bgn_peak_]++;
-      if (peak_use_cnts_[idx_list[i] - bgn_peak_] > max_overlap) {
+      peak_use_cnts_[peak_idx - bgn_peak_]++;
+      if (peak_use_cnts_[peak_idx - bgn_peak_] > max_overlap) {
         return false;
       }
       EnvPeakPairPtr pair_ptr = std::make_shared<EnvPeakPair>(env, i);
-      pre_env_peak_pairs_[idx_list[i] - bgn_peak_].push_back(pair_ptr);
+      pre_env_peak_pairs_[peak_idx - bgn_peak_].push_back(pair_ptr);
     }
   }
   prec_match_envs_.push_back(env);
@@ -101,16 +103,17 @@ bool Vertex::addCurEnv(MatchEnvPtr env, int max_overlap) {
   if (mng_ptr_->check_double_increase_ && !passDblIncrCheck(env)) {
     return false;
   }
-  std::vector<int> idx_list = env->getRealEnvPtr()->getPeakIdxList();
-  for (size_t i = 0; i < idx_list.size(); i++) {
-    if (env->getRealEnvPtr()->isExist(i) && idx_list[i] >= bgn_peak_
-        && idx_list[i] - bgn_peak_ < peak_num_) {
-      peak_use_cnts_[idx_list[i] - bgn_peak_]++;
-      if (peak_use_cnts_[idx_list[i] - bgn_peak_] > max_overlap) {
+  RealEnvPtr real_env_ptr = env->getRealEnvPtr();
+  for (int i = 0; i < real_env_ptr->getPeakNum(); i++) {
+    int peak_idx = real_env_ptr->getPeakIdx(i);
+    if (real_env_ptr->isExist(i) && peak_idx >= bgn_peak_
+        && peak_idx - bgn_peak_ < peak_num_) {
+      peak_use_cnts_[peak_idx - bgn_peak_]++;
+      if (peak_use_cnts_[peak_idx - bgn_peak_] > max_overlap) {
         return false;
       }
       EnvPeakPairPtr pair_ptr = std::make_shared<EnvPeakPair>(env, i);
-      cur_env_peak_pairs_[idx_list[i] - bgn_peak_].push_back(pair_ptr);
+      cur_env_peak_pairs_[peak_idx - bgn_peak_].push_back(pair_ptr);
     }
   }
   cur_match_envs_.push_back(env);

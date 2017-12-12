@@ -113,20 +113,12 @@ bool RealEnv::isExist(int i) {
   return peaks_[i]->isExist();
 }
 
-std::vector<int> RealEnv::getPeakIdxList() {
-  std::vector<int> idxes;
-  for (size_t i = 0; i < peaks_.size(); i++) {
-    idxes.push_back(peaks_[i]->getIdx());
-  }
-  return idxes;
-}
-
 bool RealEnv::testPeakShare(RealEnvPtr a, RealEnvPtr  b) {
-  std::vector<int> peak_A = a->getPeakIdxList();
-  std::vector<int> peak_B = b->getPeakIdxList();
-  for (size_t i = 0; i < peak_A.size(); i++) {
-    for (size_t j = 0; j < peak_B.size(); j++) {
-      if (peak_A[i] >= 0 && peak_B[j] == peak_A[i]) {
+  for (int i = 0; i < a->getPeakNum(); i++) {
+    int a_idx = a->getPeakIdx(i);
+    for (int j = 0; j < b->getPeakNum(); j++) {
+      int b_idx = b->getPeakIdx(j);
+      if (a_idx >= 0 && b_idx == a_idx) {
         return true;
       }
     }
