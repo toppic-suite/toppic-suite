@@ -36,18 +36,21 @@ class ProteoGraphReader {
                     int proteo_graph_gap,
                     int var_ptm_in_gap);
 
-  ProteoGraphPtr getNextProteoGraphPtr();
-
-  ProteoGraphPtr getProteoGraphPtrBySeq(FastaSeqPtr seq_ptr);
-
  private:
   ModPtrVec fix_mod_ptr_vec_;
+
   double convert_ratio_;
+
   int max_mod_num_;
+
   int max_ptm_sum_mass_;
+
   ProteoAnnoPtr proteo_anno_ptr_;
+
   FastaReaderPtr reader_ptr_;
+
   int proteo_graph_gap_;
+
   int var_ptm_in_gap_;
 };
 

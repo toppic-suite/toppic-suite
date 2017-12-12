@@ -92,8 +92,7 @@ class Proteoform {
 
   void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
 
-  void parseXml(xercesc::DOMElement* element, ProteoformPtr db_proteoform,
-                int adjust = 0);
+  void parseXml(xercesc::DOMElement* element, ProteoformPtr db_proteoform);
 
   static std::string getXmlElementName() {return "proteoform";}
 

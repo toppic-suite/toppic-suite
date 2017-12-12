@@ -23,6 +23,7 @@
 
 #include "htslib/faidx.h"
 #include "base/fasta_seq.hpp"
+#include "base/fasta_sub_seq.hpp"
 #include "base/string_util.hpp"
 
 namespace prot {
@@ -36,8 +37,8 @@ class FastaIndexReader {
   FastaSeqPtr readFastaSeq(const std::string &name,
                            const std::string &desc);
 
-  std::vector<FastaSeqPtr> readFastaSeqVec(const std::string & name,
-                                           const std::string & desc);
+  std::vector<FastaSubSeqPtr> readFastaSubSeqVec(const std::string & name,
+                                                 const std::string & desc);
 
  private:
   faidx_t *fai_;

@@ -25,36 +25,45 @@ namespace prot {
 
 class ProteoGraph {
  public:
-  ProteoGraph(FastaSeqPtr seq_ptr, ModPtrVec fix_mod_ptr_vec,
+  ProteoGraph(FastaSubSeqPtr seq_ptr, ModPtrVec fix_mod_ptr_vec,
               MassGraphPtr graph_ptr, bool is_nme, 
               double convert_ratio, int max_mod_num,
               int max_ptm_sum_mass, int proteo_graph_gap,
               int var_ptm_in_gap);
 
   int getVecIndex(int v1, int v2);
+
   int getSeqMass(int v1, int v2);
 
   ProteoformPtr getProteoformPtr() {return db_proteo_ptr_;}
-  FastaSeqPtr getFastaSeqPtr() {return db_proteo_ptr_->getFastaSeqPtr();}
+
   MassGraphPtr getMassGraphPtr() {return graph_ptr_;}
+
   bool isNme() {return is_nme_;}
 
   const DistVec2D& getDistVec2D() {return dist_vec_;}
 
  private:
   ProteoformPtr db_proteo_ptr_;
+
   int node_num_;
+
   int pair_num_;
+
   std::vector<int> seq_masses_;
+
   MassGraphPtr graph_ptr_;
+
   bool is_nme_;
 
   int proteo_graph_gap_;
+
   int var_ptm_in_gap_;
 
   DistVec2D dist_vec_;
 
   void compSeqMasses(double convert_ratio);
+
   void compDistances(int max_mod_num, int max_ptm_sum_mass);
 };
 

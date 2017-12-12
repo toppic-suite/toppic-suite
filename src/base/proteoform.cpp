@@ -49,18 +49,17 @@ Proteoform::Proteoform(xercesc::DOMElement* element, FastaIndexReaderPtr reader_
   std::string seq_element_name = FastaSeq::getXmlElementName();
   xercesc::DOMElement* seq_element = xml_dom_util::getChildElement(element, seq_element_name.c_str(), 0);
   std::string seq_name = FastaSeq::getNameFromXml(seq_element);
-  int sub_seq_start = FastaSeq::getSubSeqStartFromXml(seq_element);
   std::string seq_desc = FastaSeq::getDescFromXml(seq_element);
 
   ProteoformPtr form_ptr = proteoform_factory::readFastaToProteoformPtr(reader_ptr, seq_name,
                                                                         seq_desc, fix_mod_list);
-  parseXml(element, form_ptr, sub_seq_start);
+  parseXml(element, form_ptr);
 }
 
-void Proteoform::parseXml(xercesc::DOMElement* element, ProteoformPtr form_ptr, int sub_seq_start) {
+void Proteoform::parseXml(xercesc::DOMElement* element, ProteoformPtr form_ptr) {
   // LOG_DEBUG("start parse proteoform");
-  start_pos_ = sub_seq_start + xml_dom_util::getIntChildValue(element, "start_pos", 0);
-  end_pos_ = sub_seq_start + xml_dom_util::getIntChildValue(element, "end_pos", 0);
+  start_pos_ = xml_dom_util::getIntChildValue(element, "start_pos", 0);
+  end_pos_ = xml_dom_util::getIntChildValue(element, "end_pos", 0);
   species_id_ = xml_dom_util::getIntChildValue(element, "species_id", 0);
   prot_id_ = xml_dom_util::getIntChildValue(element, "prot_id", 0);
   variable_ptm_num_ = xml_dom_util::getIntChildValue(element, "variable_ptm_num", 0);

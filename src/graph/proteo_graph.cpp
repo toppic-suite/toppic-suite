@@ -19,17 +19,56 @@
 #include "base/change_type.hpp"
 #include "base/fasta_reader.hpp"
 #include "base/residue_seq.hpp"
-#include "base/proteoform_factory.hpp"
+#include "base/mod_base.hpp"
+#include "base/prot_mod_base.hpp"
+#include "base/residue_util.hpp"
 #include "graph/proteo_graph.hpp"
 
 namespace prot {
 
-ProteoGraph::ProteoGraph(FastaSeqPtr fasta_seq_ptr, ModPtrVec fix_mod_ptr_vec,
+ProteoformPtr geneDbProteoformPtr(FastaSubSeqPtr fasta_seq_ptr, ModPtrVec fix_mod_list, int start_pos) {
+  if (fasta_seq_ptr == nullptr) {
+    return nullptr;
+  }
+  ProtModPtr none_prot_mod_ptr = ProtModBase::getProtModPtr_NONE();
+  ResiduePtrVec residue_ptrs = residue_util::convertStrToResiduePtrVec(fasta_seq_ptr->getAcidPtmPairVec());
+  int end_pos = start_pos + static_cast<int>(residue_ptrs.size()) - 1;
+
+  ChangePtrVec change_list;
+  // add input ptms;
+  for (size_t i = 0; i < residue_ptrs.size(); i++) {
+    if (residue_ptrs[i]->getPtmPtr() != PtmBase::getEmptyPtmPtr()) {
+      ResiduePtr ori_residue = ResidueBase::getBaseResiduePtr(residue_ptrs[i]->getAminoAcidPtr());
+      ModPtr mod_ptr = ModBase::getBaseModPtr(ori_residue, residue_ptrs[i]);
+      ChangePtr change_ptr
+          = std::make_shared<Change>(i, i + 1, ChangeType::INPUT, mod_ptr->getShift(), mod_ptr);
+      change_list.push_back(change_ptr);
+    }
+  }
+
+  // add fixed ptms;
+  for (size_t i = 0; i < residue_ptrs.size(); i++) {
+    for (size_t j = 0; j < fix_mod_list.size(); j++) {
+      if (residue_ptrs[i] == fix_mod_list[j]->getOriResiduePtr()) {
+        residue_ptrs[i] = fix_mod_list[j]->getModResiduePtr();
+        ChangePtr change_ptr
+            = std::make_shared<Change>(i, i + 1, ChangeType::FIXED, fix_mod_list[j]->getShift(), fix_mod_list[j]);
+        change_list.push_back(change_ptr);
+        break;
+      }
+    }
+  }
+  ResSeqPtr res_seq_ptr = std::make_shared<ResidueSeq>(residue_ptrs);
+  return std::make_shared<Proteoform>(fasta_seq_ptr, none_prot_mod_ptr, start_pos,
+                                      end_pos, res_seq_ptr, change_list);
+}
+
+ProteoGraph::ProteoGraph(FastaSubSeqPtr fasta_seq_ptr, ModPtrVec fix_mod_ptr_vec,
                          MassGraphPtr graph_ptr, bool is_nme,
                          double convert_ratio, int max_mod_num,
                          int max_ptm_sum_mass, int proteo_graph_gap,
                          int var_ptm_in_gap) {
-  db_proteo_ptr_ = proteoform_factory::geneDbProteoformPtr(fasta_seq_ptr, fix_mod_ptr_vec);
+  db_proteo_ptr_ = geneDbProteoformPtr(fasta_seq_ptr, fix_mod_ptr_vec, fasta_seq_ptr->getSubSeqStart());
   graph_ptr_ = graph_ptr;
   is_nme_ = is_nme;
   node_num_ = num_vertices(*graph_ptr.get());
