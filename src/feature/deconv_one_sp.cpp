@@ -91,7 +91,7 @@ MatchEnvPtrVec DeconvOneSp::postprocess(MatchEnvPtrVec  &dp_envs) {
   match_env_util::assignIntensity(peak_list, dp_envs);
   // refinement
   if (!mng_ptr_->output_multiple_mass_) {
-    MatchEnvRefine::mzRefine(mng_ptr_, dp_envs);
+    match_env_refine::mzRefine(mng_ptr_, dp_envs);
   }
 
   // filtering 

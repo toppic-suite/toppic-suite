@@ -21,17 +21,19 @@
 
 namespace prot {
 
-double MatchEnvRefine::max_distance_a_ = 1.0;
-double MatchEnvRefine::max_distance_b_ = 1.0;
-double MatchEnvRefine::best_ratio_;
+namespace match_env_refine {
 
-void MatchEnvRefine::mzRefine(FeatureMngPtr mng_ptr, MatchEnvPtrVec &envs) {
+double max_distance_a_ = 1.0;
+double max_distance_b_ = 1.0;
+double best_ratio_;
+
+void mzRefine(FeatureMngPtr mng_ptr, MatchEnvPtrVec &envs) {
   for (size_t i = 0; i < envs.size(); i++) {
     mzRefine(mng_ptr, envs[i]);
   }
 }
 
-void MatchEnvRefine::mzRefine(FeatureMngPtr mng_ptr, MatchEnvPtr env) {
+void mzRefine(FeatureMngPtr mng_ptr, MatchEnvPtr env) {
   RealEnvPtr real_env = env->getRealEnvPtr();
   double cur_mz = real_env->getReferMz();
   int charge = real_env->getCharge();
@@ -96,7 +98,7 @@ void MatchEnvRefine::mzRefine(FeatureMngPtr mng_ptr, MatchEnvPtr env) {
   }
 }
 
-double MatchEnvRefine::compEnvDist(EnvelopePtr real_env, EnvelopePtr theo_env) {
+double compEnvDist(EnvelopePtr real_env, EnvelopePtr theo_env) {
   if (theo_env == nullptr) {
     return std::numeric_limits<double>::infinity();
   } else {
@@ -104,7 +106,7 @@ double MatchEnvRefine::compEnvDist(EnvelopePtr real_env, EnvelopePtr theo_env) {
   }
 }
 
-double MatchEnvRefine::compDistWithNorm(const std::vector<double>& real,
+double compDistWithNorm(const std::vector<double>& real,
                                         const std::vector<double>& theo) {
   double best_dist = std::numeric_limits<double>::infinity();
   best_ratio_ = -1;
@@ -126,7 +128,7 @@ double MatchEnvRefine::compDistWithNorm(const std::vector<double>& real,
   return best_dist;
 }
 
-std::vector<double> MatchEnvRefine::norm(const std::vector<double> &obs, double ratio) {
+std::vector<double> norm(const std::vector<double> &obs, double ratio) {
   std::vector<double> result(obs.size());
   for (size_t i = 0; i < obs.size(); i++) {
     result[i] = obs[i] / ratio;
@@ -134,7 +136,7 @@ std::vector<double> MatchEnvRefine::norm(const std::vector<double> &obs, double 
   return result;
 }
 
-double MatchEnvRefine::compDist(const std::vector<double> &norm, const std::vector<double> &theo) {
+double compDist(const std::vector<double> &norm, const std::vector<double> &theo) {
   double result = 0;
   for (size_t i = 0; i < norm.size(); i++) {
     double dist = std::abs(norm[i] - theo[i]);
@@ -151,5 +153,7 @@ double MatchEnvRefine::compDist(const std::vector<double> &norm, const std::vect
   }
   return result;
 }
+
+}  // namespace match_env_refine
 
 }  // namespace prot
