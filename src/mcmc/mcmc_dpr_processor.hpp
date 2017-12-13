@@ -23,6 +23,7 @@
 #include "base/proteoform.hpp"
 #include "base/activation.hpp"
 #include "spec/deconv_ms.hpp"
+#include "prsm/prsm.hpp"
 
 #include "mcmc/mcmc_mng.hpp"
 
@@ -35,25 +36,30 @@ class DprProcessor {
   void process();
 
  private:
-  void simulateDPR(ProteoformPtr p, const DeconvMsPtrVec & deconv_ms_vec,
-                   const std::vector<double> & ms_masses,
-                   long omega, int N, const std::vector<double> & mu);
+  void processOnePrsm(PrsmPtr prsm_ptr, ActivationPtr act, const std::vector<double> & ms_masses);
 
-  ProteoformPtr randomTrans(ProteoformPtr p); 
+  void simulateDPR(ResiduePtrVec &residues, const std::vector<double> & ms_masses,
+                   ActivationPtr act, const PtmPtrVec & ptm_vec,
+                   long omega, const std::vector<double> & mu);
+
+  ResiduePtrVec randomTrans(ResiduePtrVec &residues); 
+
+  int getMaxScore(const ResiduePtrVec &residues, const std::vector<double> & ms_masses,
+                  ActivationPtr act, const PtmPtrVec & ptm_vec);
 
   MCMCMngPtr mng_ptr_;
 
   std::mt19937 mt_;
 
-  std::uniform_int_distribution<int> pos_dist_;
-
-  std::uniform_int_distribution<int> residue_dist_;
+  SpParaPtr sp_para_ptr_;
 
   ResiduePtrVec residue_vec_;
 
-  std::map<ResiduePtr, ResiduePtr> pos_residue_;
+  std::map<std::string, size_t> residue_idx_map_;
 
-  std::map<ResiduePtr, ResiduePtr> neg_residue_;
+  PtmPtrVec ptm_vec_;
+
+  std::map<PtmPtr, std::vector<ResiduePtr> > ptm_residue_map_;
 
   std::vector<int> score_vec_;
 
@@ -62,6 +68,8 @@ class DprProcessor {
   double ppo_;
 
   double prec_mass_;
+
+  double pep_mass_;
 };
 
 typedef std::shared_ptr<DprProcessor> DprProcessorPtr;
