@@ -84,12 +84,6 @@ int TopMGProcess(std::map<std::string, std::string> arguments) {
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
     std::string residue_mod_file_name = arguments["residueModFileName"];
 
-    int n_top = std::stoi(arguments["numOfTopPrsms"]);
-    int ptm_num = std::stoi(arguments["ptmNumber"]);
-    int thread_num = std::stoi(arguments["threadNumber"]);
-    int filter_result_num = std::stoi(arguments["filteringResultNumber"]);
-    double max_ptm_mass = std::stod(arguments["maxPtmMass"]);
-
     bool decoy = false;
     if (arguments["searchType"] == "TARGET+DECOY") {
       decoy = true;
@@ -124,7 +118,7 @@ int TopMGProcess(std::map<std::string, std::string> arguments) {
 
 
 int main(int argc, char* argv[]) {
-  // prot::log_level = 2;
+  prot::log_level = 2;
   std::cout << std::setprecision(10);
   prot::Argument argu_processor;
   bool success = argu_processor.parse(argc, argv);

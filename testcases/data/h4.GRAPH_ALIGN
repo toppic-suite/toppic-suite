@@ -36,7 +36,7 @@
 <left_bp_pos>0</left_bp_pos>
 <right_bp_pos>1</right_bp_pos>
 <change_type>
-<name>Protein variable</name>
+<name>Variable</name>
 </change_type>
 <mass_shift>42.0150232461</mass_shift>
 <mod>

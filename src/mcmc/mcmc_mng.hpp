@@ -36,9 +36,13 @@ class MCMCMng {
   std::string output_file_ext_;
   std::string residue_mod_file_;
 
+  int n_ = 300;
+
   int N_ = 1000000;
 
   int k_ = 30;
+
+  double mass_limit_ = 150.0;
 };
 
 typedef std::shared_ptr<MCMCMng> MCMCMngPtr;
