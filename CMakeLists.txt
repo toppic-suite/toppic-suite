@@ -152,6 +152,10 @@ file(GLOB PRSM_MERGE_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/tools/prsm_xml_merge
 
 add_executable(prsm_xml_merge ${PRSM_MERGE_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS} ${TOPPIC_ARGU_SRCS})
 
+file(GLOB MGF_COVERSION_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/tools/mgf2msalign.cpp)
+
+add_executable(mgf2msalign ${MGF_COVERSION_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS})
+
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     target_link_libraries(toppic xalan-c xalanMsg xerces-c
         boost_filesystem-mt boost_system-mt 
@@ -203,6 +207,8 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
     target_link_libraries(prsm_xml_merge pwiz xerces-c boost_program_options
         boost_filesystem boost_system boost_thread pthread z)
+
+    target_link_libraries(mgf2msalign xerces-c boost_filesystem boost_system pwiz pthread z)
 
     #target_link_libraries(topfd-dev pwiz xalan-c xerces-c boost_filesystem
     #    boost_system boost_thread pthread z)
