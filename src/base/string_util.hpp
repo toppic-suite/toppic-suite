@@ -40,6 +40,8 @@ std::string convertToString(bool value);
 
 std::string rmComment(const std::string &ori_s, const std::string & comment = "#");
 
+double convertScientificToDouble(std::string str);
+
 bool endsWith(const std::string &str, const std::string &suffix);
 
 }  // namespace string_util

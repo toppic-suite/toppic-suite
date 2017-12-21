@@ -26,6 +26,8 @@ inline std::string getBaseDataDir() {return "toppic_resources/base_data";}
 
 inline std::string getBaseDataConfigFileName() {return "base_data_config.xml";}
 
+inline double getMaxDouble() {return 1e+300;}
+
 void init(const std::string &exe_dir);
 
 }  // namespace base_data

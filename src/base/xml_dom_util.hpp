@@ -32,6 +32,8 @@ xercesc::DOMElement* getChildElement(xercesc::DOMElement* parent, const char* ta
 
 std::string getChildValue(xercesc::DOMElement* parent, const char* child_tag, int index);
 
+double getScientificChildValue(xercesc::DOMElement* parent, const char* child_tag, int index);
+
 double getDoubleChildValue(xercesc::DOMElement* parent, const char* child_tag, int index);
 
 int getIntChildValue(xercesc::DOMElement* parent, const char* child_tag, int index);
