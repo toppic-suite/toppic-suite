@@ -52,7 +52,7 @@ void FeatureMng::setMinInte(double min_inte, int ms_level) {
     min_refer_inte_ = min_inte * ms_one_sn_ratio_;
   }
   else {
-    min_refer_inte_ = min_inte * sn_ratio_;
+    min_refer_inte_ = min_inte * ms_two_sn_ratio_;
   }
 }
 

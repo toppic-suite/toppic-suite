@@ -27,7 +27,8 @@ DeconvPara::DeconvPara(std::map<std::string, std::string> &arguments) {
   max_charge_ = std::stoi(arguments["maxCharge"]);
   max_mass_ = std::stod(arguments["maxMass"]);
   tolerance_ = std::stod(arguments["mzError"]);
-  sn_ratio_ = std::stod(arguments["snRatio"]);
+  ms_two_sn_ratio_ = std::stod(arguments["msTwoSnRatio"]);
+  ms_one_sn_ratio_ = std::stod(arguments["msOneSnRatio"]);
   keep_unused_peaks_ = (arguments["keepUnusedPeaks"] == "true");
   prec_window_ = std::stod(arguments["precWindow"]);
   exec_dir_ = arguments["executiveDir"];
