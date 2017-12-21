@@ -19,6 +19,7 @@
 #include <algorithm>
 
 #include "base/logger.hpp"
+#include "base/string_util.hpp"
 #include "base/xml_dom_util.hpp"
 
 namespace prot {
@@ -64,13 +65,22 @@ std::string getChildValue(xercesc::DOMElement* parent,
   return value;
 }
 
-double getDoubleChildValue(xercesc::DOMElement* parent, const char* child_tag, int i) {
+double getScientificChildValue(xercesc::DOMElement* parent, 
+                               const char* child_tag, int i) {
+  std::string value = getChildValue(parent, child_tag, i);
+  //LOG_DEBUG("tag " << child_tag << "double value " << value);
+  return string_util::convertScientificToDouble(value);
+}
+
+double getDoubleChildValue(xercesc::DOMElement* parent, 
+                           const char* child_tag, int i) {
   std::string value = getChildValue(parent, child_tag, i);
   //LOG_DEBUG("tag " << child_tag << "double value " << value);
   return std::stod(value);
 }
 
-int getIntChildValue(xercesc::DOMElement* parent, const char* child_tag, int i) {
+int getIntChildValue(xercesc::DOMElement* parent, 
+                     const char* child_tag, int i) {
   try {
     std::string value = getChildValue(parent, child_tag, i);
     return std::stoi(value);

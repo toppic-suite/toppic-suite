@@ -130,7 +130,9 @@ void PrsmCluster::setClusterId(PrsmStrPtrVec& prsm_ptrs, double ppo) {
 void PrsmCluster::process() {
   std::string base_name = file_util::basename(spec_file_name_);
   std::string input_file_name = base_name + "." + input_file_ext_;
+  LOG_DEBUG("Reading prsm strings started");
   PrsmStrPtrVec prsm_ptrs = PrsmReader::readAllPrsmStrs(input_file_name);
+  LOG_DEBUG("Reading prsm strings finished");
   sort(prsm_ptrs.begin(), prsm_ptrs.end(), PrsmStr::cmpEValueInc);
   setProtId(prsm_ptrs);
   setClusterId(prsm_ptrs, ppo_);

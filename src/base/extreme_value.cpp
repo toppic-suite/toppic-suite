@@ -17,6 +17,7 @@
 #include <limits>
 #include <string>
 
+#include "base/base_data.hpp"
 #include "base/extreme_value.hpp"
 #include "base/string_util.hpp"
 #include "base/xml_dom_util.hpp"
@@ -37,15 +38,15 @@ void ExtremeValue::setOneProtProb(double one_prot_prob) {
 }
 
 ExtremeValue::ExtremeValue(xercesc::DOMElement* element) {
-  one_prot_prob_ = xml_dom_util::getDoubleChildValue(element, "one_protein_probability", 0);
-  test_num_ = xml_dom_util::getDoubleChildValue(element, "test_number", 0);
+  one_prot_prob_ = xml_dom_util::getScientificChildValue(element, "one_protein_probability", 0);
+  test_num_ = xml_dom_util::getScientificChildValue(element, "test_number", 0);
   adjust_factor_ = xml_dom_util::getDoubleChildValue(element, "adjust_factor", 0);
   init();
 }
 
 void ExtremeValue::init() {
   e_value_ = one_prot_prob_ * test_num_ * adjust_factor_;
-  if (one_prot_prob_ > 1 || test_num_ == std::numeric_limits<double>::max()) {
+  if (one_prot_prob_ > 1 || test_num_ == base_data::getMaxDouble()) {
     p_value_  = 1.0;
   } else {
     double n = test_num_ * adjust_factor_;
@@ -62,22 +63,22 @@ void ExtremeValue::init() {
 void ExtremeValue::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   std::string element_name = getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
-  std::string str = string_util::convertToString(one_prot_prob_);
+  std::string str = string_util::convertToScientificStr(one_prot_prob_, 4);
   xml_doc->addElement(element, "one_protein_probability", str.c_str());
-  str = string_util::convertToString(test_num_);
+  str = string_util::convertToScientificStr(test_num_, 4 );
   xml_doc->addElement(element, "test_number", str.c_str());
   str = string_util::convertToString(adjust_factor_);
   xml_doc->addElement(element, "adjust_factor", str.c_str());
-  str = string_util::convertToString(p_value_);
+  str = string_util::convertToScientificStr(p_value_, 4);
   xml_doc->addElement(element, "p_value", str.c_str());
-  str = string_util::convertToString(e_value_);
+  str = string_util::convertToScientificStr(e_value_, 4);
   xml_doc->addElement(element, "e_value", str.c_str());
   parent->appendChild(element);
 }
 
 ExtremeValuePtr ExtremeValue::getMaxEvaluePtr() {
   ExtremeValuePtr evalue_ptr
-      = std::make_shared<ExtremeValue>(1.0, std::numeric_limits<double>::max(), 1.0);
+      = std::make_shared<ExtremeValue>(1.0, base_data::getMaxDouble(), 1.0);
   return evalue_ptr;
 }
 

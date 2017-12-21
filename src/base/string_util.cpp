@@ -111,6 +111,20 @@ std::string rmComment(const std::string &ori_s, const std::string &comment) {
   return s;
 }
 
+double convertScientificToDouble(std::string str) {
+  std::stringstream ss(str);
+  double d = 0;
+  ss >> d;
+  if (ss.fail()) {
+    std::string s = "Unable to format ";
+    s += str;
+    s += " as a number!";
+    throw (s);
+  }
+
+  return (d);
+}
+
 bool endsWith(const std::string &str, const std::string &suffix) {
   return str.size() >= suffix.size() &&
       str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;

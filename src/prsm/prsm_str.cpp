@@ -61,7 +61,10 @@ PrsmStr::PrsmStr(const std::vector<std::string> &str_vec) {
   if (line == "") {
     e_value_ = 0.0;
   } else {
-    e_value_ = std::stod(prsm_util::getValueStr(line));
+    std::string str = prsm_util::getValueStr(line);
+    LOG_DEBUG("e value string " << str);
+    e_value_ = string_util::convertScientificToDouble(str);
+    LOG_DEBUG("e value value " << e_value_);
   }
   line = prsm_util::getXmlLine(str_vec_, "<fdr>");
   fdr_ = std::stod(prsm_util::getValueStr(line));
@@ -102,13 +105,13 @@ int getXmlLineIndex(const std::vector<std::string> &str_vec,
 
 void PrsmStr::setFdr(double fdr) {
   int i = getXmlLineIndex(str_vec_, "fdr");
-  str_vec_[i] = "<fdr>" + std::to_string(fdr) + "</fdr>";
+  str_vec_[i] = "<fdr>" + string_util::convertToString(fdr) + "</fdr>";
   fdr_ = fdr;
 }
 
 void PrsmStr::setProteoformFdr(double proteoform_fdr) {
   int i = getXmlLineIndex(str_vec_, "proteoform_fdr");
-  str_vec_[i] = "<proteoform_fdr>" + std::to_string(proteoform_fdr) + "</proteoform_fdr>";
+  str_vec_[i] = "<proteoform_fdr>" + string_util::convertToString(proteoform_fdr) + "</proteoform_fdr>";
   proteoform_fdr_ = proteoform_fdr;
 }
 
@@ -132,7 +135,7 @@ void PrsmStr::setPrecFeatureId(int id) {
 
 void PrsmStr::setPrecFeatureInte(double inte) {
   int i = getXmlLineIndex(str_vec_, "precursor_feature_inte");
-  str_vec_[i] = "<precursor_feature_inte>" + std::to_string(inte) + "</precursor_feature_inte>";
+  str_vec_[i] = "<precursor_feature_inte>" + string_util::convertToString(inte) + "</precursor_feature_inte>";
   precursor_feature_inte_ = inte;
 }
 

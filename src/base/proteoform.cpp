@@ -58,8 +58,8 @@ Proteoform::Proteoform(xercesc::DOMElement* element, FastaIndexReaderPtr reader_
 
 void Proteoform::parseXml(xercesc::DOMElement* element, ProteoformPtr form_ptr) {
   // LOG_DEBUG("start parse proteoform");
-  start_pos_ = sub_seq_start + xml_dom_util::getIntChildValue(element, "start_pos", 0);
-  end_pos_ = sub_seq_start + xml_dom_util::getIntChildValue(element, "end_pos", 0);
+  start_pos_ = xml_dom_util::getIntChildValue(element, "start_pos", 0);
+  end_pos_ = xml_dom_util::getIntChildValue(element, "end_pos", 0);
   proteo_cluster_id_ = xml_dom_util::getIntChildValue(element, "proteo_cluster_id", 0);
   prot_id_ = xml_dom_util::getIntChildValue(element, "prot_id", 0);
   variable_ptm_num_ = xml_dom_util::getIntChildValue(element, "variable_ptm_num", 0);
