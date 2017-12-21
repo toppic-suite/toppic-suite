@@ -38,7 +38,7 @@ std::vector<std::string> getXmlLineVec(const std::vector<std::string> &str_vec,
 
 PrsmPtrVec selectSpeciesPrsms(const PrsmPtrVec &prsm_ptrs, int species_id);
 
-std::vector<int> getSpeciesIds(const PrsmPtrVec &prsm_ptrs, const std::string & seq_name);
+std::vector<int> getProteoClusterIds(const PrsmPtrVec &prsm_ptrs, const std::string & seq_name);
 
 int getProteinId(const PrsmPtrVec &prsm_ptrs, std::string &seq_name);
 
