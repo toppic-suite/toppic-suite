@@ -190,7 +190,7 @@ void ZeroPtmSearchProcessor::process() {
       }
     }
     spec_set_vec = sp_reader.getNextSpectrumSet(sp_para_ptr);
-    std::cout << std::flush <<  "Zero PTM search - processing " << cnt
+    std::cout << std::flush <<  "Non PTM search - processing " << cnt
         << " of " << spectrum_num << " spectra.\r";
   }
   sp_reader.close();
