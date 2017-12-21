@@ -40,8 +40,8 @@ void PrsmFormFilter::process() {
     // std::cout << "prsm " << i << std::endl;
     bool found = false;
     for (size_t j = 0; j < selected_forms.size(); j++) {
-      if (selected_forms[j]->getProteoformPtr()->getSpeciesId()
-          == prsms[i]->getProteoformPtr()->getSpeciesId()) {
+      if (selected_forms[j]->getProteoformPtr()->getProteoClusterId()
+          == prsms[i]->getProteoformPtr()->getProteoClusterId()) {
         found = true;
         break;
       }
@@ -51,7 +51,8 @@ void PrsmFormFilter::process() {
     } else {
       bool keep = true;
       for (size_t j = 0; j < selected_forms.size(); j++) {
-        if (selected_forms[j]->getProteoformPtr()->getSpeciesId() == prsms[i]->getProteoformPtr()->getSpeciesId()) {
+        if (selected_forms[j]->getProteoformPtr()->getProteoClusterId() 
+            == prsms[i]->getProteoformPtr()->getProteoClusterId()) {
           keep = false;
           break;
         }

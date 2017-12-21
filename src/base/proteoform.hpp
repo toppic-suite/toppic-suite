@@ -62,9 +62,9 @@ class Proteoform {
 
   ChangePtrVec getChangePtrVec() {return change_list_;}
 
-  int getSpeciesId() {return proteo_cluster_id_;}
+  int getProteoClusterId() {return proteo_cluster_id_;}
 
-  void setSpeciesId(int id) {proteo_cluster_id_ = id;}
+  void setProteoClusterId(int id) {proteo_cluster_id_ = id;}
 
   int getProtId() {return prot_id_;}
 

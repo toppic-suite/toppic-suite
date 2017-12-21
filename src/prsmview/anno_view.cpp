@@ -78,7 +78,7 @@ xercesc::DOMElement* proteoformToXml(XmlDOMDocument* xml_doc, const PrsmPtrVec &
   xml_doc->addElement(proteoform_element, "sequence_name", str.c_str());
   str = prsm_ptrs[0]->getProteoformPtr()->getSeqDesc();
   xml_doc->addElement(proteoform_element, "sequence_description", str.c_str());
-  str = string_util::convertToString(prsm_ptrs[0]->getProteoformPtr()->getSpeciesId());
+  str = string_util::convertToString(prsm_ptrs[0]->getProteoformPtr()->getProteoClusterId());
   xml_doc->addElement(proteoform_element, "proteoform_id", str.c_str());
   int count = prsm_ptrs.size();
   str = string_util::convertToString(count);
