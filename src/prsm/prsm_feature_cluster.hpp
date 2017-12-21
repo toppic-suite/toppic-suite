@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_PRSM_PRSM_FEATURE_SPECIES_HPP_
-#define PROT_PRSM_PRSM_FEATURE_SPECIES_HPP_
+#ifndef PROT_PRSM_PRSM_FEATURE_CLUSTER_HPP_
+#define PROT_PRSM_PRSM_FEATURE_CLUSTER_HPP_
 
 #include <map>
 #include <string>

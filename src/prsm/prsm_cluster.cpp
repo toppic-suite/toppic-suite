@@ -19,11 +19,12 @@
 #include "base/file_util.hpp"
 #include "base/proteoform_util.hpp"
 #include "prsm/prsm_reader.hpp"
-#include "prsm/prsm_species.hpp"
+#include "prsm/prsm_cluster.hpp"
 
 namespace prot {
 
-std::vector<PrsmStrPtrVec> PrsmSpecies::groupProteins(const PrsmStrPtrVec &prsm_ptrs) {
+std::vector<PrsmStrPtrVec> 
+    PrsmCluster::groupProteins(const PrsmStrPtrVec &prsm_ptrs) {
   // get max shift number
   int max_shift_number = 0;
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
@@ -46,27 +47,28 @@ std::vector<PrsmStrPtrVec> PrsmSpecies::groupProteins(const PrsmStrPtrVec &prsm_
   return proteogroups;
 }
 
-std::vector<PrsmStrPtrVec> PrsmSpecies::getZeroPtmList(const PrsmStrPtrVec& proteo_ptrs, double ppo) {
-  std::vector<PrsmStrPtrVec> species;
+std::vector<PrsmStrPtrVec> 
+PrsmCluster::getZeroPtmList(const PrsmStrPtrVec& proteo_ptrs, double ppo) {
+  std::vector<PrsmStrPtrVec> clusters;
   for (size_t i = 0; i < proteo_ptrs.size(); i++) {
     bool is_found = false;
-    for (size_t j = 0; j < species.size(); j++) {
-      if (PrsmStr::isSameSeqAndMass(proteo_ptrs[i], species[j][0], ppo)) {
-        species[j].push_back(proteo_ptrs[i]);
+    for (size_t j = 0; j < clusters.size(); j++) {
+      if (PrsmStr::isSameSeqAndMass(proteo_ptrs[i], clusters[j][0], ppo)) {
+        clusters[j].push_back(proteo_ptrs[i]);
         is_found = true;
         break;
       }
     }
     if (!is_found) {
-      PrsmStrPtrVec new_species;
-      new_species.push_back(proteo_ptrs[i]);
-      species.push_back(new_species);
+      PrsmStrPtrVec new_clusters;
+      new_clusters.push_back(proteo_ptrs[i]);
+      clusters.push_back(new_clusters);
     }
   }
-  return species;
+  return clusters;
 }
 
-void PrsmSpecies::setProtId(PrsmStrPtrVec& prsm_ptrs) {
+void PrsmCluster::setProtId(PrsmStrPtrVec& prsm_ptrs) {
   std::vector<PrsmStrPtrVec> proteins;
   std::vector<std::string> protein_names;
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
@@ -94,44 +96,44 @@ void PrsmSpecies::setProtId(PrsmStrPtrVec& prsm_ptrs) {
   }
 }
 
-void PrsmSpecies::setSpeciesId(PrsmStrPtrVec& prsm_ptrs, double ppo) {
+void PrsmCluster::setClusterId(PrsmStrPtrVec& prsm_ptrs, double ppo) {
   std::vector<PrsmStrPtrVec> proteo_groups = groupProteins(prsm_ptrs);
 
-  // find zero ptm species
-  std::vector<PrsmStrPtrVec> species = getZeroPtmList(proteo_groups[0], ppo);
+  // find zero ptm clusters
+  std::vector<PrsmStrPtrVec> clusters = getZeroPtmList(proteo_groups[0], ppo);
 
   for (size_t i = 1; i < proteo_groups.size(); i++) {
     for (size_t j = 0; j < proteo_groups[i].size(); j++) {
       bool is_found = false;
-      for (size_t m = 0; m < species.size(); m++) {
-        if (PrsmStr::isStrictCompatiablePtmSpecies(proteo_groups[i][j], species[m][0], ppo)) {
-          species[m].push_back(proteo_groups[i][j]);
+      for (size_t m = 0; m < clusters.size(); m++) {
+        if (PrsmStr::isStrictCompatiablePtmSpecies(proteo_groups[i][j], clusters[m][0], ppo)) {
+          clusters[m].push_back(proteo_groups[i][j]);
           is_found = true;
           break;
         }
       }
       if (!is_found) {
-        PrsmStrPtrVec new_species;
-        new_species.push_back(proteo_groups[i][j]);
-        species.push_back(new_species);
+        PrsmStrPtrVec new_clusters;
+        new_clusters.push_back(proteo_groups[i][j]);
+        clusters.push_back(new_clusters);
       }
     }
   }
 
-  for (size_t i = 0; i < species.size(); i++) {
-    for (size_t j = 0; j < species[i].size(); j++) {
-      species[i][j]->setClusterId(i);
+  for (size_t i = 0; i < clusters.size(); i++) {
+    for (size_t j = 0; j < clusters[i].size(); j++) {
+      clusters[i][j]->setClusterId(i);
     }
   }
 }
 
-void PrsmSpecies::process() {
+void PrsmCluster::process() {
   std::string base_name = file_util::basename(spec_file_name_);
   std::string input_file_name = base_name + "." + input_file_ext_;
   PrsmStrPtrVec prsm_ptrs = PrsmReader::readAllPrsmStrs(input_file_name);
   sort(prsm_ptrs.begin(), prsm_ptrs.end(), PrsmStr::cmpEValueInc);
   setProtId(prsm_ptrs);
-  setSpeciesId(prsm_ptrs, ppo_);
+  setClusterId(prsm_ptrs, ppo_);
   sort(prsm_ptrs.begin(), prsm_ptrs.end(), PrsmStr::cmpSpectrumIdIncPrecursorIdInc);
   // output
   std::string output_file_name = base_name + "." + output_file_ext_;
