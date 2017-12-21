@@ -62,9 +62,9 @@ class Proteoform {
 
   ChangePtrVec getChangePtrVec() {return change_list_;}
 
-  int getSpeciesId() {return species_id_;}
+  int getProteoClusterId() {return proteo_cluster_id_;}
 
-  void setSpeciesId(int id) {species_id_ = id;}
+  void setProteoClusterId(int id) {proteo_cluster_id_ = id;}
 
   int getProtId() {return prot_id_;}
 
@@ -117,9 +117,9 @@ class Proteoform {
   /* bp_spec is generated from residue_seq */
   BpSpecPtr bp_spec_ptr_;
 
-  int species_id_ = 0;
+  int proteo_cluster_id_ = -1;
 
-  int prot_id_ = 0;
+  int prot_id_ = -1;
 
   ChangePtrVec change_list_;
 

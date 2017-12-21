@@ -107,7 +107,7 @@ void PrsmStat::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
       << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecCharge() << "\t"
       << prsm_ptr->getOriPrecMass()<< "\t"//"Precursor_mass"
       << prsm_ptr->getAdjustedPrecMass() << "\t"
-      << prsm_ptr->getProteoformPtr()->getSpeciesId() << "\t"
+      << prsm_ptr->getProteoformPtr()->getProteoClusterId() << "\t"
       << prsm_ptr->getProteoformPtr()->getSeqName() << " "
       << prsm_ptr->getProteoformPtr()->getSeqDesc() << "\t"
       << prsm_ptr->getProteoformPtr()->getStartPos() << "\t"

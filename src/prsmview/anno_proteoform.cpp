@@ -34,7 +34,7 @@ void addSummary(XmlDOMDocument* xml_doc, xercesc::DOMElement *prot_element,
                 ProteoformPtr proteoform_ptr, PrsmViewMngPtr mng_ptr) {
   std::string str=string_util::convertToString(proteoform_ptr->getProtId());
   xml_doc->addElement(prot_element, "sequence_id", str.c_str());
-  str=string_util::convertToString(proteoform_ptr->getSpeciesId());
+  str=string_util::convertToString(proteoform_ptr->getProteoClusterId());
   xml_doc->addElement(prot_element, "proteoform_id", str.c_str());
   str=proteoform_ptr->getSeqName();
   xml_doc->addElement(prot_element, "sequence_name", str.c_str());

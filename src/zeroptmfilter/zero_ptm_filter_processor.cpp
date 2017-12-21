@@ -67,13 +67,13 @@ void ZeroPtmFilterProcessor::process() {
   }
 
   for (size_t i = 0; i < db_block_ptr_vec.size(); i++) {
-    std::cout << "Zero PTM filtering - block " << (i + 1) << " out of "
+    std::cout << "Non PTM filtering - block " << (i + 1) << " out of "
         << db_block_ptr_vec.size() << " started." << std::endl;
     processBlock(db_block_ptr_vec[i]);
-    std::cout << "Zero PTM filtering - block " << (i + 1) << " finished. " << std::endl;
+    std::cout << "Non PTM filtering - block " << (i + 1) << " finished. " << std::endl;
   }
 
-  std::cout << "Zero PTM filtering - combining blocks started." << std::endl;
+  std::cout << "Non PTM filtering - combining blocks started." << std::endl;
 
   int block_num = db_block_ptr_vec.size();
 
@@ -97,7 +97,7 @@ void ZeroPtmFilterProcessor::process() {
                                         mng_ptr_->inte_num_);
   internal_combine.process();
 
-  std::cout << "Zero PTM filtering - combining blocks finished." << std::endl;
+  std::cout << "Non PTM filtering - combining blocks finished." << std::endl;
 }
 
 std::function<void()> geneTask(const ProteoformPtrVec & raw_forms,
@@ -137,7 +137,7 @@ std::function<void()> geneTask(const ProteoformPtrVec & raw_forms,
         }
       }
       if (idx == 0) {
-        std::cout << std::flush << "Zero PTM filtering - processing " << cnt
+        std::cout << std::flush << "Non PTM filtering - processing " << cnt
             << " of " << spectrum_num << " spectra.\r";
       }
       spec_set_vec = reader.getNextSpectrumSet(sp_para_ptr);
@@ -174,7 +174,7 @@ void ZeroPtmFilterProcessor::processBlock(DbBlockPtr block_ptr) {
     if (thread_vec[i]->joinable()) thread_vec[i]->join();
   }
 
-  std::cout << std::flush << "Zero PTM filtering - processing " << spectrum_num
+  std::cout << std::flush << "Non PTM filtering - processing " << spectrum_num
       << " of " << spectrum_num << " spectra." << std::endl;
 
   SimplePrsmStrCombine comp_combine(sp_file_name,

@@ -190,7 +190,7 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
       << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecCharge() << "\t"
       << prsm_ptr->getOriPrecMass()<< "\t"
       << prsm_ptr->getAdjustedPrecMass() << "\t"
-      << prsm_ptr->getProteoformPtr()->getSpeciesId() << "\t";
+      << prsm_ptr->getProteoformPtr()->getProteoClusterId() << "\t";
 
   if (prsm_ptr->getPrecFeatureInte() > 0) {
     file << prsm_ptr->getPrecFeatureInte() << "\t";
