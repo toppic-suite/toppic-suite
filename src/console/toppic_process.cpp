@@ -180,13 +180,13 @@ int TopPICProgress(std::map<std::string, std::string> arguments) {
       input_exts.push_back("PTM");
     }
 
-    std::cout << "Combining PRSMs - started." << std::endl;
+    std::cout << "Combining PrSMs - started." << std::endl;
     int prsm_top_num = (ptm_num + 1) * 4;
     PrsmStrCombinePtr combine_ptr
         = std::make_shared<PrsmStrCombine>(sp_file_name, input_exts, "RAW_RESULT", prsm_top_num);
     combine_ptr->process();
     combine_ptr = nullptr;
-    std::cout << "Combining PRSMs - finished." << std::endl;
+    std::cout << "Combining PrSMs - finished." << std::endl;
 
     std::cout << "E-value computation - started." << std::endl;
     bool variable_ptm = false;
@@ -252,8 +252,8 @@ int TopPICProgress(std::map<std::string, std::string> arguments) {
       std::cout << "FDR computation - finished." << std::endl;
     }
 
-    std::cout << "PrSM selecting by cutoff - started." << std::endl;
     std::string cutoff_type = arguments["cutoffSpectralType"];
+    std::cout << "PrSM filtering by " << cutoff_type << "- started." << std::endl;
     double cutoff_value;
     std::istringstream(arguments["cutoffSpectralValue"]) >> cutoff_value;
     PrsmCutoffSelectorPtr cutoff_selector
@@ -261,7 +261,7 @@ int TopPICProgress(std::map<std::string, std::string> arguments) {
                                                "CUTOFF_RESULT_SPEC", cutoff_type, cutoff_value);
     cutoff_selector->process();
     cutoff_selector = nullptr;
-    std::cout << "PrSM selecting by cutoff - finished." << std::endl;
+    std::cout << "PrSM filtering by " << cutoff_type << "- started." << std::endl;
 
     std::string suffix = "CUTOFF_RESULT_SPEC";
 
@@ -284,59 +284,59 @@ int TopPICProgress(std::map<std::string, std::string> arguments) {
     arguments["end_time"] = std::string(ctime_r(&end, buf));
     arguments["running_time"] = std::to_string(static_cast<int>(difftime(end, start)));
 
-    std::cout << "Outputting the PrSM result table - started." << std::endl;
+    std::cout << "Outputting PrSM table - started." << std::endl;
     PrsmTableWriterPtr table_out
         = std::make_shared<PrsmTableWriter>(prsm_para_ptr, arguments, suffix, "OUTPUT_TABLE");
     table_out->write();
     table_out = nullptr;
-    std::cout << "Outputting the PrSM result table - finished." << std::endl;
+    std::cout << "Outputting PrSM table - finished." << std::endl;
 
-    std::cout << "Generating the PrSM xml files - started." << std::endl;
+    std::cout << "Generating PrSM xml files - started." << std::endl;
     XmlGeneratorPtr xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, exe_dir, suffix, "prsm_cutoff");
     xml_gene->process();
     xml_gene = nullptr;
-    std::cout << "Generating the PrSM xml files - finished." << std::endl;
+    std::cout << "Generating PrSM xml files - finished." << std::endl;
 
-    std::cout << "Converting the PrSM xml files to html files - started." << std::endl;
+    std::cout << "Converting PrSM xml files to html files - started." << std::endl;
     translate(arguments, "prsm_cutoff");
-    std::cout << "Converting the PrSM xml files to html files - finished." << std::endl;
+    std::cout << "Converting PrSM xml files to html files - finished." << std::endl;
 
-    std::cout << "Proteoform selecting by cutoff - started." << std::endl;
     cutoff_type = (arguments["cutoffProteoformType"] == "FDR") ? "FORMFDR": "EVALUE";
+    std::cout << "PrSM filtering by " << cutoff_type << " - started." << std::endl;
     std::istringstream(arguments["cutoffProteoformValue"]) >> cutoff_value;
     cutoff_selector = std::make_shared<PrsmCutoffSelector>(db_file_name, sp_file_name, "TOP",
                                                            "CUTOFF_RESULT_FORM", cutoff_type,
                                                            cutoff_value);
     cutoff_selector->process();
     cutoff_selector = nullptr;
-    std::cout << "Proteoform selecting by cutoff - finished." << std::endl;
+    std::cout << "PrSM filtering by " << cutoff_type << " - finished." << std::endl;
 
-    std::cout << "Proteoform filtering - started." << std::endl;
+    std::cout << "Selecting top PrSMs for proteoforms - started." << std::endl;
     PrsmFormFilterPtr form_filter
         = std::make_shared<PrsmFormFilter>(db_file_name, sp_file_name, "CUTOFF_RESULT_FORM",
                                            "FORM_FILTER_RESULT", "FORM_RESULT");
     form_filter->process();
     form_filter = nullptr;
-    std::cout << "Proteoform filtering - finished." << std::endl;
+    std::cout << "Selecting top PrSMs for proteoforms - finished." << std::endl;
 
-    std::cout << "Outputting the proteoform result table - started." << std::endl;
+    std::cout << "Outputting proteoform table - started." << std::endl;
     PrsmTableWriterPtr form_out
         = std::make_shared<PrsmTableWriter>(prsm_para_ptr, arguments,
                                             "FORM_RESULT", "FORM_OUTPUT_TABLE");
     form_out->write();
     form_out = nullptr;
-    std::cout << "Outputting the proteoform result table - finished." << std::endl;
+    std::cout << "Outputting proteoform table - finished." << std::endl;
 
-    std::cout << "Generating the proteoform xml files - started." << std::endl;
+    std::cout << "Generating proteoform xml files - started." << std::endl;
     xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, exe_dir, "CUTOFF_RESULT_FORM",
                                               "proteoform_cutoff");
     xml_gene->process();
     xml_gene = nullptr;
-    std::cout << "Generating the proteoform xml files - finished." << std::endl;
+    std::cout << "Generating proteoform xml files - finished." << std::endl;
 
-    std::cout << "Converting the proteoform xml files to html files - started." << std::endl;
+    std::cout << "Converting proteoform xml files to html files - started." << std::endl;
     translate(arguments, "proteoform_cutoff");
-    std::cout << "Converting the proteoform xml files to html files - finished." << std::endl;
+    std::cout << "Converting proteoform xml files to html files - finished." << std::endl;
 
     if (arguments["keepTempFiles"] != "true") {
       std::cout << "Deleting temporary files - started." << std::endl;
