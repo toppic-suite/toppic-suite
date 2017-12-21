@@ -65,7 +65,7 @@ std::vector<std::string> getXmlLineVec(const std::vector<std::string> &str_vec,
 PrsmPtrVec selectSpeciesPrsms(const PrsmPtrVec &prsm_ptrs, int species_id) {
   PrsmPtrVec select_prsm_ptrs;
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
-    if (species_id == prsm_ptrs[i]->getProteoformPtr()->getSpeciesId()) {
+    if (species_id == prsm_ptrs[i]->getProteoformPtr()->getProteoClusterId()) {
       select_prsm_ptrs.push_back(prsm_ptrs[i]);
     }
   }
@@ -77,7 +77,7 @@ std::vector<int> getSpeciesIds(const PrsmPtrVec &prsm_ptrs, std::string &seq_nam
   std::vector<int> species_ids;
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     if (prsm_ptrs[i]->getProteoformPtr()->getSeqName() == seq_name)
-      species_id_set.insert(prsm_ptrs[i]->getProteoformPtr()->getSpeciesId());
+      species_id_set.insert(prsm_ptrs[i]->getProteoformPtr()->getProteoClusterId());
   }
   std::copy(species_id_set.begin(), species_id_set.end(), std::back_inserter(species_ids));
   std::sort(species_ids.begin(), species_ids.end());
@@ -97,7 +97,7 @@ std::vector<int> getSpeciesIds(const PrsmPtrVec &prsm_ptrs) {
   std::set<int> species_id_set;
   std::vector<int> species_ids;
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
-    species_id_set.insert(prsm_ptrs[i]->getProteoformPtr()->getSpeciesId());
+    species_id_set.insert(prsm_ptrs[i]->getProteoformPtr()->getProteoClusterId());
   }
   std::copy(species_id_set.begin(), species_id_set.end(), std::back_inserter(species_ids));
   std::sort(species_ids.begin(), species_ids.end());

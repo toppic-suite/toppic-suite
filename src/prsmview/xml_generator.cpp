@@ -68,7 +68,7 @@ void XmlGenerator::outputPrsms() {
     if (spec_set_ptr->isValid()) {
       int spec_id = spec_set_ptr->getSpectrumId();
       while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_id) {
-        species_id_set.insert(prsm_ptr->getProteoformPtr()->getSpeciesId());
+        species_id_set.insert(prsm_ptr->getProteoformPtr()->getProteoClusterId());
         prot_id_set.insert(prsm_ptr->getProteoformPtr()->getProtId());
 
         DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
@@ -270,8 +270,8 @@ void XmlGenerator::splitBySpeciesId() {
                                                mng_ptr_->prsm_para_ptr_->getFixModPtrVec());
 
     while (prsm_ptr != nullptr) {
-      if (species_id_map.find(prsm_ptr->getProteoformPtr()->getSpeciesId()) != species_id_map.end()) {
-        prsm_writer_vec[species_id_map[prsm_ptr->getProteoformPtr()->getSpeciesId()]]->write(prsm_ptr);
+      if (species_id_map.find(prsm_ptr->getProteoformPtr()->getProteoClusterId()) != species_id_map.end()) {
+        prsm_writer_vec[species_id_map[prsm_ptr->getProteoformPtr()->getProteoClusterId()]]->write(prsm_ptr);
       }
       prsm_ptr = prsm_reader.readOnePrsm(fasta_reader_ptr_,
                                          mng_ptr_->prsm_para_ptr_->getFixModPtrVec());
