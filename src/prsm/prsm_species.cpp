@@ -120,7 +120,7 @@ void PrsmSpecies::setSpeciesId(PrsmStrPtrVec& prsm_ptrs, double ppo) {
 
   for (size_t i = 0; i < species.size(); i++) {
     for (size_t j = 0; j < species[i].size(); j++) {
-      species[i][j]->setSpeciesId(i);
+      species[i][j]->setClusterId(i);
     }
   }
 }

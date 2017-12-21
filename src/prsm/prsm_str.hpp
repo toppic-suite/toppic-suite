@@ -58,7 +58,7 @@ class PrsmStr {
 
   int getProteoformEndPos() {return proteoform_end_pos_;}
 
-  int getSpeciesId() {return species_id_;}
+  int getClusterId() {return cluster_id_;}
 
   int getProtId() {return prot_id_;}
 
@@ -90,7 +90,7 @@ class PrsmStr {
 
   void setSpectrumId(int id);
 
-  void setSpeciesId(int id);
+  void setClusterId(int id);
 
   void setProtId(int id);
 
@@ -150,7 +150,7 @@ class PrsmStr {
 
   std::string seq_desc_;
 
-  int species_id_;
+  int cluster_id_;
 
   int prot_id_;
 
