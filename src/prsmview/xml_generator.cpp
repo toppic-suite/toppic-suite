@@ -167,7 +167,7 @@ void XmlGenerator::outputProteins() {
       prsm_ptrs[k]->setDeconvMsPtrVec(deconv_ms_vec2d_[spec_id_extend_ms_map_[prsm_ptrs[k]->getSpectrumId()]]);
       prsm_ptrs[k]->setRefineMsVec(extend_ms_vec2d_[spec_id_extend_ms_map_[prsm_ptrs[k]->getSpectrumId()]]);
     }
-    std::vector<int> species = prsm_util::getSpeciesIds(prsm_ptrs);
+    std::vector<int> species = prsm_util::getClusterIds(prsm_ptrs);
     if (!species.empty()) {
       std::string file_name = mng_ptr_->xml_path_ + file_util::getFileSeparator() + "proteins" 
           + file_util::getFileSeparator() + "protein" + string_util::convertToString(prot_id) + ".xml";
@@ -216,7 +216,7 @@ void XmlGenerator::outputAllProteins() {
     int prot_id = best_prsm_vec[i]->getProteoformPtr()->getProtId();
     std::string input_file_name = file_util::basename(spectrum_file_name) + ".PROT_" + std::to_string(prot_id);
     PrsmPtrVec prsm_ptrs = PrsmReader::readAllPrsms(input_file_name, db_file_name, fix_mod_ptr_vec);
-    std::vector<int> species = prsm_util::getSpeciesIds(prsm_ptrs);
+    std::vector<int> species = prsm_util::getClusterIds(prsm_ptrs);
     if (!species.empty()) {
       prot_elements->appendChild(proteinToXml(writer.getDoc(), prsm_ptrs, prot_id, species, mng_ptr_, false));
     }
