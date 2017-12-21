@@ -198,11 +198,11 @@ void cleanDir(const std::string &fa_path, const std::string & sp_path) {
   delFile(sp_base + ".CUTOFF_RESULT_FORM");
   delFile(sp_base + ".LOCAL_RESULT");
   clean_prefix(sp, sp_base + ".EVALUE_");
-  clean_prefix(sp, sp_base + ".SPECIES_");
+  clean_prefix(sp, sp_base + ".PROTEOFORM_");
   clean_prefix(sp, sp_base + ".PROT_");
   delFile(sp_base + ".EVALUE");
   delFile(sp_base + ".RAW_RESULT");
-  delFile(sp_base + ".FORMS");
+  delFile(sp_base + ".CLUSTERS");
   delFile(sp_base + ".FORM_RESULT");
   delFile(sp_base + ".FORM_FILTER_RESULT");
 }
