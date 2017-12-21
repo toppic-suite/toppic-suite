@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_PRSM_PRSM_SPECIES_HPP_
-#define PROT_PRSM_PRSM_SPECIES_HPP_
+#ifndef PROT_PRSM_PRSM_CLUSTER_HPP_
+#define PROT_PRSM_PRSM_CLUSTER_HPP_
 
 #include <map>
 #include <string>
@@ -28,9 +28,9 @@
 
 namespace prot {
 
-class PrsmSpecies {
+class PrsmCluster {
  public:
-  PrsmSpecies(const std::string &db_file_name,
+  PrsmCluster(const std::string &db_file_name,
               const std::string &spec_file_name,
               const std::string &input_file_ext,
               const ModPtrVec &fix_mod_ptr_vec,
@@ -60,11 +60,11 @@ class PrsmSpecies {
 
   void setProtId(PrsmStrPtrVec& prsm_ptrs);
 
-  void setSpeciesId(PrsmStrPtrVec& prsm_ptrs, double ppo);
+  void setClusterId(PrsmStrPtrVec& prsm_ptrs, double ppo);
 };
 
-typedef std::shared_ptr<PrsmSpecies> PrsmSpeciesPtr;
+typedef std::shared_ptr<PrsmCluster> PrsmClusterPtr;
 
 }  // namespace prot
 
-#endif /* PRSM_SPECIES_HPP_ */
+#endif /* PRSM_CLUSTER_HPP_ */

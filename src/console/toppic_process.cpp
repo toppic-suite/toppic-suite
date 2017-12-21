@@ -31,7 +31,7 @@
 #include "prsm/prsm_str_combine.hpp"
 #include "prsm/prsm_top_selector.hpp"
 #include "prsm/prsm_cutoff_selector.hpp"
-#include "prsm/prsm_species.hpp"
+#include "prsm/prsm_cluster.hpp"
 #include "prsm/prsm_table_writer.hpp"
 #include "prsm/prsm_fdr.hpp"
 #include "prsm/prsm_feature_cluster.hpp"
@@ -220,12 +220,12 @@ int TopPICProgress(std::map<std::string, std::string> arguments) {
       double ppo;
       std::istringstream(arguments["errorTolerance"]) >> ppo;
       ppo = ppo / 1000000.0;
-      PrsmSpeciesPtr prsm_species
-          = std::make_shared<PrsmSpecies>(db_file_name, sp_file_name,
+      PrsmClusterPtr prsm_clusters
+          = std::make_shared<PrsmCluster>(db_file_name, sp_file_name,
                                           "EVALUE", prsm_para_ptr->getFixModPtrVec(),
                                           "CLUSTERS", ppo);
-      prsm_species->process();
-      prsm_species = nullptr;
+      prsm_clusters->process();
+      prsm_clusters = nullptr;
     }
     std::cout << "Finding PrSM clusters - finished." << std::endl;
 
