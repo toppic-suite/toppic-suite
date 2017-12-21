@@ -36,7 +36,8 @@ void Argument::initArguments() {
   arguments_["maxCharge"] = "30";
   arguments_["maxMass"] = "100000";
   arguments_["mzError"] = "0.02";
-  arguments_["snRatio"] = "1.0";
+  arguments_["msTwoSnRatio"] = "1.0";
+  arguments_["msOneSnRatio"] = "3.0";
   arguments_["keepUnusedPeaks"] = "false";
   arguments_["outMultipleMass"] = "false";
   arguments_["precWindow"] = "3.0";
@@ -54,8 +55,9 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string max_charge = "";
   std::string max_mass = "";
   std::string mz_error = "";
-  std::string sn_ratio = "";
-  std::string precWindow = "";
+  std::string ms_two_sn_ratio = "";
+  std::string ms_one_sn_ratio = "";
+  std::string prec_window = "";
 
   // Define and parse the program options
   try {
@@ -70,9 +72,11 @@ bool Argument::parse(int argc, char* argv[]) {
          "<a positive number>. Set the maximum monoisotopic mass of precursor and fragment ions. The default value is 100000 Dalton.")
         ("mz-error,e", po::value<std::string> (&mz_error),
          "<a positive number>. Set the error tolerance of m/z values of spectral peaks. The default value is 0.02 m/z.")
-        ("sn-ratio,s", po::value<std::string> (&sn_ratio),
-         "<a positive number>. Set the signal/noise ratio. The default value is 1.")
-        ("precursor-window,w", po::value<std::string> (&precWindow),
+        ("ms-two-sn-ratio,s", po::value<std::string> (&ms_two_sn_ratio),
+         "<a positive number>. Set the signal/noise ratio for MS/MS spectra. The default value is 1.")
+        ("ms-one-sn-ratio,r", po::value<std::string> (&ms_one_sn_ratio),
+         "<a positive number>. Set the signal/noise ratio for MS1 spectra. The default value is 3.")
+        ("precursor-window,w", po::value<std::string> (&prec_window),
          "<a positive number>. Set the precursor window size. The default value is 3.0 m/z.")
         ("missing-level-one,n","The input spectrum file does not contain MS1 spectra.")
         ;
@@ -83,8 +87,9 @@ bool Argument::parse(int argc, char* argv[]) {
         ("max-charge,c", po::value<std::string> (&max_charge), "")
         ("max-mass,m", po::value<std::string> (&max_mass), "")
         ("mz-error,e", po::value<std::string> (&mz_error), "")
-        ("sn-ratio,s", po::value<std::string> (&sn_ratio), "")
-        ("precursor-window,w", po::value<std::string> (&precWindow), "")
+        ("ms-two-sn-ratio,s", po::value<std::string> (&ms_two_sn_ratio), "")
+        ("ms-one-sn-ratio,r", po::value<std::string> (&ms_one_sn_ratio), "")
+        ("precursor-window,w", po::value<std::string> (&prec_window), "")
         ("missing-level-one,n", "")
         ("multiple-mass,u", "Output multiple masses for one envelope.")
         ("spectrum-file-name", po::value<std::string>(&spectrum_file_name)->required(), "Spectrum file name with its path.")
@@ -132,8 +137,11 @@ bool Argument::parse(int argc, char* argv[]) {
     if (vm.count("mz-error")) {
       arguments_["mzError"] = mz_error;
     }
-    if (vm.count("sn-ratio")) {
-      arguments_["snRatio"] = sn_ratio;
+    if (vm.count("ms-two-sn-ratio")) {
+      arguments_["msTwoSnRatio"] = ms_two_sn_ratio;
+    }
+    if (vm.count("ms-one-sn-ratio")) {
+      arguments_["msOneSnRatio"] = ms_one_sn_ratio;
     }
     if (vm.count("missing-level-one")) {
       arguments_["missingLevelOne"] = "true";
@@ -142,7 +150,7 @@ bool Argument::parse(int argc, char* argv[]) {
       arguments_["outMultipleMass"] = "true";
     }
     if (vm.count("precursor-window")) {
-      arguments_["precWindow"] = precWindow;
+      arguments_["precWindow"] = prec_window;
     }
 
   }

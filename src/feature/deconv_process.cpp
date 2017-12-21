@@ -31,7 +31,8 @@ void DeconvProcess::copyParameters(FeatureMngPtr mng_ptr) {
   mng_ptr->max_charge_ = para_ptr_->max_charge_;
   mng_ptr->max_mass_ = para_ptr_->max_mass_;
   mng_ptr->setTolerance(para_ptr_->tolerance_);
-  mng_ptr->sn_ratio_ = para_ptr_->sn_ratio_;
+  mng_ptr->ms_two_sn_ratio_ = para_ptr_->ms_two_sn_ratio_;
+  mng_ptr->ms_one_sn_ratio_ = para_ptr_->ms_one_sn_ratio_;
   mng_ptr->keep_unused_peaks_ = para_ptr_->keep_unused_peaks_;
   mng_ptr->output_multiple_mass_ = para_ptr_->output_multiple_mass_;
   mng_ptr->prec_deconv_interval_ = para_ptr_->prec_window_;
@@ -54,7 +55,9 @@ void DeconvProcess::outputParameter(std::ostream &output, DeconvParaPtr para_ptr
   output << prefix << std::setw(40) << std::left 
       << "Error tolerance: " << para_ptr->tolerance_ << " m/z" << std::endl;
   output << prefix << std::setw(40) << std::left 
-      << "Signal/noise ratio: " << para_ptr->sn_ratio_ << std::endl;
+      << "MS1 Signal/noise ratio: " << para_ptr->ms_one_sn_ratio_ << std::endl;
+  output << prefix << std::setw(40) << std::left 
+      << "MS/MS Signal/noise ratio: " << para_ptr->ms_two_sn_ratio_ << std::endl;
   output << prefix << std::setw(40) << std::left 
       << "Precursor window size: " << para_ptr->prec_window_ << " m/z" << std::endl;
   //output << prefix << std::setw(40) << std::left 

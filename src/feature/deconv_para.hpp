@@ -40,7 +40,8 @@ class DeconvPara {
   int max_charge_;
   double max_mass_;
   double tolerance_;
-  double sn_ratio_;
+  double ms_two_sn_ratio_;
+  double ms_one_sn_ratio_;
   bool keep_unused_peaks_;
 
   bool output_multiple_mass_ = false; 

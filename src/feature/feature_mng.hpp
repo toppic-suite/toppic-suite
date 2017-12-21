@@ -48,7 +48,7 @@ class FeatureMng {
   // estimate min intensity using thrash method. 
   bool estimate_min_inte_ = true;
   // signal noise ratio 
-  double sn_ratio_ = 1;
+  double ms_two_sn_ratio_ = 1;
   // ms one signal noise ratio
   double ms_one_sn_ratio_ = 3;
   // minimum peak intensity 
