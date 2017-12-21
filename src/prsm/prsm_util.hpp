@@ -36,13 +36,13 @@ std::string getXmlLine(const std::vector<std::string> &str_vec,
 std::vector<std::string> getXmlLineVec(const std::vector<std::string> &str_vec,
                                        const std::string &property);
 
-PrsmPtrVec selectSpeciesPrsms(const PrsmPtrVec &prsm_ptrs, int species_id);
+PrsmPtrVec selectClusterPrsms(const PrsmPtrVec &prsm_ptrs, int cluster_id);
 
 std::vector<int> getProteoClusterIds(const PrsmPtrVec &prsm_ptrs, const std::string & seq_name);
 
 int getProteinId(const PrsmPtrVec &prsm_ptrs, std::string &seq_name);
 
-std::vector<int> getSpeciesIds(const PrsmPtrVec &prsm_ptrs);
+std::vector<int> getClusterIds(const PrsmPtrVec &prsm_ptrs);
 
 void addSpectrumPtrsToPrsms(PrsmPtrVec &prsm_ptrs, PrsmParaPtr prsm_para_ptr);
 
