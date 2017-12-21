@@ -64,7 +64,7 @@ class XmlGenerator {
 
   FastaIndexReaderPtr fasta_reader_ptr_;
 
-  std::vector<int> species_ids_;
+  std::vector<int> cluster_ids_;
 
   std::vector<int> prot_ids_;
 

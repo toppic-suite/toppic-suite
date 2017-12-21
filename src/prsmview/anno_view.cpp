@@ -92,7 +92,7 @@ xercesc::DOMElement* proteoformToXml(XmlDOMDocument* xml_doc, const PrsmPtrVec &
 xercesc::DOMElement* proteinToXml(XmlDOMDocument* xml_doc,
                                   const PrsmPtrVec &prsm_ptrs,
                                   int prot_id,
-                                  const std::vector<int> &species_ids,
+                                  const std::vector<int> &cluster_ids,
                                   PrsmViewMngPtr mng_ptr,
                                   bool detail) {
   xercesc::DOMElement* prot_element = xml_doc->createElement("protein");
@@ -102,11 +102,11 @@ xercesc::DOMElement* proteinToXml(XmlDOMDocument* xml_doc,
   xml_doc->addElement(prot_element, "sequence_name", str.c_str());
   str = prsm_ptrs[0]->getProteoformPtr()->getSeqDesc();
   xml_doc->addElement(prot_element, "sequence_description", str.c_str());
-  int count = species_ids.size();
+  int count = cluster_ids.size();
   str = string_util::convertToString(count);
   xml_doc->addElement(prot_element, "compatible_proteoform_number", str.c_str());
-  for (size_t i = 0; i < species_ids.size(); i++) {
-    PrsmPtrVec select_prsm_ptrs = prsm_util::selectClusterPrsms(prsm_ptrs, species_ids[i]);
+  for (size_t i = 0; i < cluster_ids.size(); i++) {
+    PrsmPtrVec select_prsm_ptrs = prsm_util::selectClusterPrsms(prsm_ptrs, cluster_ids[i]);
     std::sort(select_prsm_ptrs.begin(), select_prsm_ptrs.end(), Prsm::cmpEValueInc);
     prot_element->appendChild(proteoformToXml(xml_doc, select_prsm_ptrs, mng_ptr, detail));
   }

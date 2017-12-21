@@ -49,7 +49,7 @@ xercesc::DOMElement* proteoformToXml(XmlDOMDocument* xml_doc, const PrsmPtrVec &
 xercesc::DOMElement* proteinToXml(XmlDOMDocument* xml_doc,
                                   const PrsmPtrVec &prsm_ptrs,
                                   int prot_id,
-                                  const std::vector<int> &species_ids,
+                                  const std::vector<int> &cluster_ids,
                                   PrsmViewMngPtr mng_ptr, bool detail = true);
 
 }  // namespace prot
