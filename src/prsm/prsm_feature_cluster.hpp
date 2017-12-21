@@ -28,9 +28,9 @@
 
 namespace prot {
 
-class PrsmFeatureSpecies {
+class PrsmFeatureCluster {
  public:
-  PrsmFeatureSpecies(const std::string &db_file_name,
+  PrsmFeatureCluster(const std::string &db_file_name,
                      const std::string &spec_file_name,
                      const std::string &feature_file_name,
                      const std::string &input_file_ext,
@@ -61,10 +61,10 @@ class PrsmFeatureSpecies {
 
   void setProtId(PrsmStrPtrVec & prsm_ptrs);
 
-  void setSpeciesId(PrsmStrPtrVec & prsm_ptrs);
+  void setProteoClusterId(PrsmStrPtrVec & prsm_ptrs);
 };
 
-typedef std::shared_ptr<PrsmFeatureSpecies> PrsmFeatureSpeciesPtr;
+typedef std::shared_ptr<PrsmFeatureCluster> PrsmFeatureClusterPtr;
 
 }  // namespace prot
 

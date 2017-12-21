@@ -34,7 +34,7 @@
 #include "prsm/prsm_species.hpp"
 #include "prsm/prsm_table_writer.hpp"
 #include "prsm/prsm_fdr.hpp"
-#include "prsm/prsm_feature_species.hpp"
+#include "prsm/prsm_feature_cluster.hpp"
 #include "prsm/prsm_form_filter.hpp"
 
 #include "zeroptmfilter/zero_ptm_filter_mng.hpp"
@@ -112,22 +112,22 @@ int TopPICProgress(std::map<std::string, std::string> arguments) {
 
     std::vector<std::string> input_exts;
 
-    std::cout << "Zero PTM filtering - started." << std::endl;
+    std::cout << "Non PTM filtering - started." << std::endl;
     ZeroPtmFilterMngPtr zero_filter_mng_ptr
         = std::make_shared<ZeroPtmFilterMng>(prsm_para_ptr, thread_num, "ZERO_FILTER");
     ZeroPtmFilterProcessorPtr zero_filter_processor
         = std::make_shared<ZeroPtmFilterProcessor>(zero_filter_mng_ptr);
     zero_filter_processor->process();
-    std::cout << "Zero PTM filtering - finished." << std::endl;
+    std::cout << "Non PTM filtering - finished." << std::endl;
 
-    std::cout << "Zero PTM search - started." << std::endl;
+    std::cout << "Non PTM search - started." << std::endl;
     ZeroPtmSearchMngPtr zero_search_mng_ptr
         = std::make_shared<ZeroPtmSearchMng>(prsm_para_ptr, "ZERO_FILTER", "ZERO_PTM");
     ZeroPtmSearchProcessorPtr zero_search_processor
         = std::make_shared<ZeroPtmSearchProcessor>(zero_search_mng_ptr);
     zero_search_processor->process();
     zero_search_processor = nullptr;
-    std::cout << "Zero PTM search - finished." << std::endl;
+    std::cout << "Non PTM search - finished." << std::endl;
 
     input_exts.push_back("ZERO_PTM_COMPLETE");
     input_exts.push_back("ZERO_PTM_PREFIX");
@@ -200,22 +200,22 @@ int TopPICProgress(std::map<std::string, std::string> arguments) {
     processor = nullptr;
     std::cout << "E-value computation - finished." << std::endl;
 
-    std::cout << "Finding protein species - started." << std::endl;
+    std::cout << "Finding PrSM clusters - started." << std::endl;
     if (arguments["featureFileName"] != "") {
       // TopFD msalign file with feature ID
       double prec_error_tole = 1.2;
       ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();
-      PrsmFeatureSpeciesPtr prsm_forms
-          = std::make_shared<PrsmFeatureSpecies>(db_file_name,
+      PrsmFeatureClusterPtr prsm_clusters
+          = std::make_shared<PrsmFeatureCluster>(db_file_name,
                                                  sp_file_name,
                                                  arguments["featureFileName"],
                                                  "EVALUE",
-                                                 "FORMS",
+                                                 "CLUSTERS",
                                                  fix_mod_list,
                                                  prec_error_tole,
                                                  prsm_para_ptr);
-      prsm_forms->process();
-      prsm_forms = nullptr;
+      prsm_clusters->process();
+      prsm_clusters = nullptr;
     } else {
       double ppo;
       std::istringstream(arguments["errorTolerance"]) >> ppo;
@@ -223,27 +223,27 @@ int TopPICProgress(std::map<std::string, std::string> arguments) {
       PrsmSpeciesPtr prsm_species
           = std::make_shared<PrsmSpecies>(db_file_name, sp_file_name,
                                           "EVALUE", prsm_para_ptr->getFixModPtrVec(),
-                                          "FORMS", ppo);
+                                          "CLUSTERS", ppo);
       prsm_species->process();
       prsm_species = nullptr;
     }
-    std::cout << "Finding protein species - finished." << std::endl;
+    std::cout << "Finding PrSM clusters - finished." << std::endl;
 
     if (arguments["searchType"] == "TARGET") {
-      std::cout << "Top PRSM selecting - started" << std::endl;
+      std::cout << "Top PrSM selecting - started" << std::endl;
       PrsmTopSelectorPtr selector
-          = std::make_shared<PrsmTopSelector>(db_file_name, sp_file_name, "FORMS", "TOP", n_top);
+          = std::make_shared<PrsmTopSelector>(db_file_name, sp_file_name, "CLUSTERS", "TOP", n_top);
       selector->process();
       selector = nullptr;
-      std::cout << "Top PRSM selecting - finished." << std::endl;
+      std::cout << "Top PrSM selecting - finished." << std::endl;
     } else {
-      std::cout << "Top PRSM selecting - started " << std::endl;
+      std::cout << "Top PrSM selecting - started " << std::endl;
       PrsmTopSelectorPtr selector
           = std::make_shared<PrsmTopSelector>(db_file_name, sp_file_name,
-                                              "FORMS", "TOP_PRE", n_top);
+                                              "CLUSTERS", "TOP_PRE", n_top);
       selector->process();
       selector = nullptr;
-      std::cout << "Top PRSM selecting - finished." << std::endl;
+      std::cout << "Top PrSM selecting - finished." << std::endl;
 
       std::cout << "FDR computation - started. " << std::endl;
       PrsmFdrPtr fdr = std::make_shared<PrsmFdr>(db_file_name, sp_file_name, "TOP_PRE", "TOP");
@@ -252,7 +252,7 @@ int TopPICProgress(std::map<std::string, std::string> arguments) {
       std::cout << "FDR computation - finished." << std::endl;
     }
 
-    std::cout << "PRSM selecting by cutoff - started." << std::endl;
+    std::cout << "PrSM selecting by cutoff - started." << std::endl;
     std::string cutoff_type = arguments["cutoffSpectralType"];
     double cutoff_value;
     std::istringstream(arguments["cutoffSpectralValue"]) >> cutoff_value;
@@ -261,7 +261,7 @@ int TopPICProgress(std::map<std::string, std::string> arguments) {
                                                "CUTOFF_RESULT_SPEC", cutoff_type, cutoff_value);
     cutoff_selector->process();
     cutoff_selector = nullptr;
-    std::cout << "PRSM selecting by cutoff - finished." << std::endl;
+    std::cout << "PrSM selecting by cutoff - finished." << std::endl;
 
     std::string suffix = "CUTOFF_RESULT_SPEC";
 
@@ -284,22 +284,22 @@ int TopPICProgress(std::map<std::string, std::string> arguments) {
     arguments["end_time"] = std::string(ctime_r(&end, buf));
     arguments["running_time"] = std::to_string(static_cast<int>(difftime(end, start)));
 
-    std::cout << "Outputting the PRSM result table - started." << std::endl;
+    std::cout << "Outputting the PrSM result table - started." << std::endl;
     PrsmTableWriterPtr table_out
         = std::make_shared<PrsmTableWriter>(prsm_para_ptr, arguments, suffix, "OUTPUT_TABLE");
     table_out->write();
     table_out = nullptr;
-    std::cout << "Outputting the PRSM result table - finished." << std::endl;
+    std::cout << "Outputting the PrSM result table - finished." << std::endl;
 
-    std::cout << "Generating the PRSM xml files - started." << std::endl;
+    std::cout << "Generating the PrSM xml files - started." << std::endl;
     XmlGeneratorPtr xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, exe_dir, suffix, "prsm_cutoff");
     xml_gene->process();
     xml_gene = nullptr;
-    std::cout << "Generating the PRSM xml files - finished." << std::endl;
+    std::cout << "Generating the PrSM xml files - finished." << std::endl;
 
-    std::cout << "Converting the PRSM xml files to html files - started." << std::endl;
+    std::cout << "Converting the PrSM xml files to html files - started." << std::endl;
     translate(arguments, "prsm_cutoff");
-    std::cout << "Converting the PRSM xml files to html files - finished." << std::endl;
+    std::cout << "Converting the PrSM xml files to html files - finished." << std::endl;
 
     std::cout << "Proteoform selecting by cutoff - started." << std::endl;
     cutoff_type = (arguments["cutoffProteoformType"] == "FDR") ? "FORMFDR": "EVALUE";
