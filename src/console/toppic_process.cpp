@@ -261,7 +261,7 @@ int TopPICProgress(std::map<std::string, std::string> arguments) {
                                                "CUTOFF_RESULT_SPEC", cutoff_type, cutoff_value);
     cutoff_selector->process();
     cutoff_selector = nullptr;
-    std::cout << "PrSM filtering by " << cutoff_type << "- started." << std::endl;
+    std::cout << "PrSM filtering by " << cutoff_type << "- finished." << std::endl;
 
     std::string suffix = "CUTOFF_RESULT_SPEC";
 
