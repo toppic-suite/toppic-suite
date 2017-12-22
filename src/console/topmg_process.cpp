@@ -33,8 +33,8 @@
 #include "prsm/prsm_form_filter.hpp"
 #include "prsm/prsm_top_selector.hpp"
 #include "prsm/prsm_cutoff_selector.hpp"
-#include "prsm/prsm_species.hpp"
-#include "prsm/prsm_feature_species.hpp"
+#include "prsm/prsm_cluster.hpp"
+#include "prsm/prsm_feature_cluster.hpp"
 #include "prsm/prsm_fdr.hpp"
 #include "prsm/prsm_form_filter.hpp"
 #include "prsm/prsm_table_writer.hpp"
@@ -165,7 +165,6 @@ int TopMGProcess(std::map<std::string, std::string> arguments) {
     asf_filter_combiner = nullptr;
 
     std::cout << "Graph alignment started." << std::endl;
-
     int max_mod_num = std::stoi(arguments["varPtmNumber"]);
     int gap = std::stoi(arguments["proteo_graph_dis"]);
     int var_ptm_in_gap = std::min(std::stoi(arguments["varPtmNumInGap"]), max_mod_num);
@@ -193,50 +192,50 @@ int TopMGProcess(std::map<std::string, std::string> arguments) {
     processor = nullptr;
     std::cout << "E-value computation - finished." << std::endl;
 
-    std::cout << "Finding protein species - started." << std::endl;
+    std::cout << "Finding protein clusters - started." << std::endl;
     if (arguments["featureFileName"] != "") {
       // TopFD msalign file with feature ID
       double prec_error_tole = 1.2;
       ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();
-      PrsmFeatureSpeciesPtr prsm_forms
-          = std::make_shared<PrsmFeatureSpecies>(db_file_name,
+      PrsmFeatureClusterPtr prsm_clusters
+          = std::make_shared<PrsmFeatureCluster>(db_file_name,
                                                  sp_file_name,
                                                  arguments["featureFileName"],
                                                  "EVALUE",
-                                                 "FORMS",
+                                                 "CLUSTERS",
                                                  fix_mod_list,
                                                  prec_error_tole,
                                                  prsm_para_ptr);
-      prsm_forms->process();
-      prsm_forms = nullptr;
+      prsm_clusters->process();
+      prsm_clusters = nullptr;
     } else {
       double ppo;
       std::istringstream(arguments["errorTolerance"]) >> ppo;
       ppo = ppo / 1000000.0;
-      PrsmSpeciesPtr prsm_species
-          = std::make_shared<PrsmSpecies>(db_file_name, sp_file_name,
+      PrsmClusterPtr prsm_clusters
+          = std::make_shared<PrsmCluster>(db_file_name, sp_file_name,
                                           "EVALUE", prsm_para_ptr->getFixModPtrVec(),
-                                          "FORMS", ppo);
-      prsm_species->process();
-      prsm_species = nullptr;
+                                          "CLUSTERS", ppo);
+      prsm_clusters->process();
+      prsm_clusters = nullptr;
     }
-    std::cout << "Finding protein species - finished." << std::endl;
+    std::cout << "Finding protein clusters - finished." << std::endl;
 
     if (arguments["searchType"] == "TARGET") {
-      std::cout << "Top PRSM selecting - started" << std::endl;
+      std::cout << "Top PrSM selecting - started" << std::endl;
       PrsmTopSelectorPtr selector
-          = std::make_shared<PrsmTopSelector>(db_file_name, sp_file_name, "FORMS", "TOP", n_top);
+          = std::make_shared<PrsmTopSelector>(db_file_name, sp_file_name, "CLUSTERS", "TOP", n_top);
       selector->process();
       selector = nullptr;
-      std::cout << "Top PRSM selecting - finished." << std::endl;
+      std::cout << "Top PrSM selecting - finished." << std::endl;
     } else {
-      std::cout << "Top PRSM selecting - started " << std::endl;
+      std::cout << "Top PrSM selecting - started " << std::endl;
       PrsmTopSelectorPtr selector
           = std::make_shared<PrsmTopSelector>(db_file_name, sp_file_name,
-                                              "FORMS", "TOP_PRE", n_top);
+                                              "CLUSTERS", "TOP_PRE", n_top);
       selector->process();
       selector = nullptr;
-      std::cout << "Top PRSM selecting - finished." << std::endl;
+      std::cout << "Top PrSM selecting - finished." << std::endl;
 
       std::cout << "FDR computation - started. " << std::endl;
       PrsmFdrPtr fdr = std::make_shared<PrsmFdr>(db_file_name, sp_file_name, "TOP_PRE", "TOP");
@@ -245,73 +244,73 @@ int TopMGProcess(std::map<std::string, std::string> arguments) {
       std::cout << "FDR computation - finished." << std::endl;
     }
 
-    std::cout << "PRSM selecting by cutoff - started." << std::endl;
     std::string cutoff_type = arguments["cutoffSpectralType"];
+    std::cout << "PrSM filtering by " << cutoff_type << "- started." << std::endl;
     double cutoff_value = std::stod(arguments["cutoffSpectralValue"]);
     PrsmCutoffSelectorPtr cutoff_selector
         = std::make_shared<PrsmCutoffSelector>(db_file_name, sp_file_name, "TOP",
                                                "CUTOFF_RESULT_SPEC", cutoff_type, cutoff_value);
     cutoff_selector->process();
     cutoff_selector = nullptr;
-    std::cout << "PRSM selecting by cutoff - finished." << std::endl;
+    std::cout << "PrSM filtering by " << cutoff_type << "- finished." << std::endl;
 
     time_t end = time(0);
     arguments["end_time"] = std::string(ctime_r(&end, buf));
     arguments["running_time"] = std::to_string(static_cast<int>(difftime(end, start)));
 
-    std::cout << "Outputting table starts " << std::endl;
+    std::cout << "Outputting PrSM table - started." << std::endl;
     PrsmTableWriterPtr table_out
         = std::make_shared<PrsmTableWriter>(prsm_para_ptr, arguments, "CUTOFF_RESULT_SPEC", "OUTPUT_TABLE");
     table_out->write();
     table_out = nullptr;
-    std::cout << "Outputting table finished." << std::endl;
+    std::cout << "Outputting PrSM table - finished." << std::endl;
 
-    std::cout << "Generating the PRSM xml files - started." << std::endl;
+    std::cout << "Generating PrSM xml files - started." << std::endl;
     XmlGeneratorPtr xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, exe_dir, "CUTOFF_RESULT_SPEC", "prsm_cutoff");
     xml_gene->process();
     xml_gene = nullptr;
-    std::cout << "Generating the PRSM xml files - finished." << std::endl;
+    std::cout << "Generating PrSM xml files - finished." << std::endl;
 
-    std::cout << "Converting the PRSM xml files to html files - started." << std::endl;
+    std::cout << "Converting PrSM xml files to html files - started." << std::endl;
     translate(arguments, "prsm_cutoff");
-    std::cout << "Converting the PRSM xml files to html files - finished." << std::endl;
+    std::cout << "Converting PrSM xml files to html files - finished." << std::endl;
 
-    std::cout << "Proteoform selecting by cutoff - started." << std::endl;
     cutoff_type = (arguments["cutoffProteoformType"] == "FDR") ? "FORMFDR": "EVALUE";
+    std::cout << "PrSM filtering by " << cutoff_type << " - started." << std::endl;
     std::istringstream(arguments["cutoffProteoformValue"]) >> cutoff_value;
     cutoff_selector = std::make_shared<PrsmCutoffSelector>(db_file_name, sp_file_name, "TOP",
                                                            "CUTOFF_RESULT_FORM", cutoff_type,
                                                            cutoff_value);
     cutoff_selector->process();
     cutoff_selector = nullptr;
-    std::cout << "Proteoform selecting by cutoff - finished." << std::endl;
+    std::cout << "PrSM filtering by " << cutoff_type << " - finished." << std::endl;
 
-    std::cout << "Proteoform filtering - started." << std::endl;
+    std::cout << "Selecting top PrSMs for proteoforms - started." << std::endl;
     PrsmFormFilterPtr form_filter
         = std::make_shared<PrsmFormFilter>(db_file_name, sp_file_name, "CUTOFF_RESULT_FORM",
                                            "FORM_FILTER_RESULT", "FORM_RESULT");
     form_filter->process();
     form_filter = nullptr;
-    std::cout << "Proteoform filtering - finished." << std::endl;
+    std::cout << "Selecting top PrSMs for proteoforms - finished." << std::endl;
 
-    std::cout << "Outputting the proteoform result table - started." << std::endl;
+    std::cout << "Outputting proteoform table - started." << std::endl;
     PrsmTableWriterPtr form_out
         = std::make_shared<PrsmTableWriter>(prsm_para_ptr, arguments,
                                             "FORM_RESULT", "FORM_OUTPUT_TABLE");
     form_out->write();
     form_out = nullptr;
-    std::cout << "Outputting the proteoform result table - finished." << std::endl;
+    std::cout << "Outputting proteoform table - finished." << std::endl;
 
-    std::cout << "Generating the proteoform xml files - started." << std::endl;
+    std::cout << "Generating proteoform xml files - started." << std::endl;
     xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, exe_dir, "CUTOFF_RESULT_FORM",
                                               "proteoform_cutoff");
     xml_gene->process();
     xml_gene = nullptr;
-    std::cout << "Generating the proteoform xml files - finished." << std::endl;
+    std::cout << "Generating proteoform xml files - finished." << std::endl;
 
-    std::cout << "Converting the proteoform xml files to html files - started." << std::endl;
+    std::cout << "Converting proteoform xml files to html files - started." << std::endl;
     translate(arguments, "proteoform_cutoff");
-    std::cout << "Converting the proteoform xml files to html files - finished." << std::endl;
+    std::cout << "Converting proteoform xml files to html files - finished." << std::endl;
 
     if (arguments["keepTempFiles"] != "true") {
       std::cout << "Deleting temporary files - started." << std::endl;
