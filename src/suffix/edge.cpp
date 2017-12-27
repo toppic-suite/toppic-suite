@@ -21,12 +21,12 @@
 namespace prot {
 namespace suffix {
 
-Edge::Edge(int beginIndex, int endIndex, Node *startNode) {
-  this->beginIndex = beginIndex;
-  this->endIndex = endIndex;
-  this->startNode = startNode;
-  this->endNode = new Node(startNode->getSuffixTree(), NULL);
-  isleaf = false;
+Edge::Edge(int beginIndex, int endIndex, NodePtr startNode) {
+  bgn_idx_ = beginIndex;
+  end_idx_ = endIndex;
+  start_node_ = startNode;
+  end_node_ = std::make_shared<Node>(startNode->getSuffixTree(), nullptr);
+  is_leaf_ = false;
 }
 
 /**
@@ -42,15 +42,14 @@ Edge::Edge(int beginIndex, int endIndex, Node *startNode) {
  * The number of characters stolen from the original node and given to the new node is equal to the number
  * of characters in the suffix argument, which is last - first + 1;
  */
-Node * Edge::splitEdge(Suffix * suffix) {
+NodePtr Edge::splitEdge(SuffixPtr suffix) {
   remove();
-  Node *breakNode = new Node(suffix->getOriginNode()->getSuffixTree(), NULL);
-  Edge *newEdge = new Edge(beginIndex, beginIndex + suffix->getSpan(),
-                           suffix->getOriginNode(), breakNode);
+  NodePtr breakNode = std::make_shared<Node>(suffix->getOriginNode()->getSuffixTree(), nullptr);
+  EdgePtr newEdge = std::make_shared<Edge>(bgn_idx_, bgn_idx_ + suffix->getSpan(), suffix->getOriginNode(), breakNode);
   newEdge->insert();
   breakNode->setSuffixNode(suffix->getOriginNode());
-  beginIndex += suffix->getSpan() + 1;
-  startNode = breakNode;
+  bgn_idx_ += suffix->getSpan() + 1;
+  start_node_ = breakNode;
   insert();
   return breakNode;
 }
@@ -60,54 +59,39 @@ Node * Edge::splitEdge(Suffix * suffix) {
  * Each (internal) node maintains a set of edges starting from it
  * */
 void Edge::insert() {
-  startNode->addEdge(beginIndex, this);
+  start_node_->addEdge(bgn_idx_, shared_from_this());
 }
 
-/**
- * remove the edge from the set of edges associated with the startNode
- * */
+// remove the edge from the set of edges associated with the startNode
 void Edge::remove() {
-  startNode->removeEdge(beginIndex);
+  start_node_->removeEdge(bgn_idx_);
 }
 
-/**
- * get the startNode (incoming node) of an edge
- * */
-Node * Edge::getStartNode() {
-  return startNode;
+// get the startNode (incoming node) of an edge
+NodePtr Edge::getStartNode() {
+  return start_node_;
 }
 
-/**
- * set the startNode of an edge
- * */
-void Edge::setStartNode(Node * startNode) {
-  this->startNode = startNode;
+// get the endNode of an edge
+NodePtr Edge::getEndNode() {
+  return end_node_;
 }
 
-/**
- * get the endNode of an edge
- * */
-Node * Edge::getEndNode() {
-  return endNode;
-}
-
-/**
- * newly added, test if an edge has an edge node (internal node if yes)
- * */
+// newly added, test if an edge has an edge node (internal node if yes)
 bool Edge::hasEndNode() {
-  return endNode != NULL;
+  return end_node_ != nullptr;
 }
 
-/**
- * newly added, get an element on the edge
- * */
+// newly added, get an element on the edge
 char Edge::getItemAt(int j) {
-  return startNode->getSuffixTree()->text.at(j);
+  return start_node_->getSuffixTree()->charAt(j);
 }
 
 void Edge::setLeafEdge() {
-  isleaf = true;
-  leaf = new LeafEdge(beginIndex,  endIndex,  startNode);
+  is_leaf_ = true;
+  leaf_ = std::make_shared<LeafEdge>(bgn_idx_,  end_idx_,  start_node_);
 }
+
 }  // namespace suffix
+
 }  // namespace prot

@@ -20,6 +20,7 @@
 #include <string>
 #include <fstream>
 #include <vector>
+#include <memory>
 
 namespace prot {
 
@@ -27,40 +28,49 @@ namespace suffix {
 
 class ProteinDatabase {
  public:
-  ProteinDatabase(): sequence("") {}
+  ProteinDatabase(): seq_("") {}
 
-  size_t getsize() {return seqSet.size();}
+  size_t getsize() {return seq_set_.size();}
 
-  size_t getSeqLength(int seqIndex) {return seqLen[seqIndex];}
+  size_t getSeqLength(int seqIndex) {return seq_len_[seqIndex];}
 
-  std::string getIndividualSeq(int index) {return seqSet[index];}
+  std::string getIndividualSeq(int index) {return seq_set_[index];}
 
   void addIndividualSeq(const std::string & seq) {
-    seqLen.push_back(seq.length());
-    seqSet.push_back(seq);
+    seq_len_.push_back(seq.length());
+    seq_set_.push_back(seq);
   }
 
-  std::string getSequence() {return sequence;}
+  std::string getSequence() {return seq_;}
 
-  void setSequence(const std::string & seq) {sequence = seq;}
+  void setSequence(const std::string & seq) {seq_ = seq;}
 
-  std::string getProteinID(int index) {return proteinID[index];}
+  std::string getProteinID(int index) {return protein_id_[index];}
 
-  std::string getProteinDesc(int index) {return proteinDesc[index];}
+  std::string getProteinDesc(int index) {return protein_desc_[index];}
 
-  void addProteinID(const std::string & proteinName);
+  void addProteinID(const std::string & proteinName) {
+    int index = proteinName.find_first_of(" ", 0);
+    if (index != -1) {
+      std::string res = proteinName.substr(0, index);
+      protein_id_.push_back(res.substr(1));
+      protein_desc_.push_back(proteinName.substr(index + 1));
+    }
+  }
 
  private:
-  std::string sequence;  // combined sequence
+  std::string seq_;  // combined sequence
 
-  std::vector<std::string> proteinID;
+  std::vector<std::string> protein_id_;
 
-  std::vector<std::string> proteinDesc;
+  std::vector<std::string> protein_desc_;
 
-  std::vector<std::string> seqSet;  // store each individual sequence
+  std::vector<std::string> seq_set_;  // store each individual sequence
 
-  std::vector<size_t> seqLen;
+  std::vector<size_t> seq_len_;
 };
+
+typedef std::shared_ptr<ProteinDatabase> ProteinDBPtr;
 
 }  // namespace suffix
 

@@ -28,7 +28,7 @@ namespace suffix {
 
 class DatabaseFileHandler {
  public:
-  ProteinDatabase * loadDatabase(const std::string & proteinDatabaseFile);
+  ProteinDBPtr loadDatabase(const std::string & db_file);
 
  private:
   std::string handleUndefinedCharacter(std::string text);

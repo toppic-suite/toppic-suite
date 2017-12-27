@@ -18,61 +18,107 @@
 
 #include <string>
 
+#include "suffix_position.hpp"
+
 namespace prot {
+
 namespace suffix {
 
 class Node;
+typedef std::shared_ptr<Node> NodePtr;
+
 class LeafEdge;
+typedef std::shared_ptr<LeafEdge> LeafEdgePtr;
+
 class Suffix;
-class Edge {
+typedef std::shared_ptr<Suffix> SuffixPtr;
+
+class Edge;
+
+class Edge : public std::enable_shared_from_this<Edge> {
  public:
-  Edge(int beginIndex, int endIndex, Node *startNode);
+  Edge(int beginIndex, int endIndex, NodePtr startNode);
 
-  Edge(int beginIndex, int endIndex, Node *startNode, Node *endNode):
-    beginIndex(beginIndex),
-    endIndex(endIndex),
-    startNode(startNode),
-    endNode(endNode) {isleaf = false;}
+  Edge(int beginIndex, int endIndex, NodePtr startNode, NodePtr endNode):
+      bgn_idx_(beginIndex),
+      end_idx_(endIndex),
+      start_node_(startNode),
+      end_node_(endNode),
+      is_leaf_(false) {}
 
-  Node *splitEdge(Suffix *suffix);
+  NodePtr splitEdge(SuffixPtr suffix);
 
   void insert();
 
   void remove();
 
-  int getSpan() {return endIndex - beginIndex;}
+  int getSpan() {return end_idx_ - bgn_idx_;}
 
-  int getLength() {return endIndex - beginIndex + 1;}
+  int getBeginIndex() {return bgn_idx_;}
 
-  int getBeginIndex() {return beginIndex;}
+  int getEndIndex() {return end_idx_;}
 
-  int getEndIndex() {return endIndex;}
+  void setEndIndex(int endIndex) {end_idx_ = endIndex;}
 
-  void setEndIndex(int endIndex) {this->endIndex = endIndex;}
+  NodePtr getStartNode();
 
-  Node * getStartNode();
-
-  void setStartNode(Node * startNode);
-
-  Node * getEndNode();
+  NodePtr getEndNode();
 
   bool hasEndNode();
 
   char getItemAt(int j);
 
-  bool isleaf;
-
-  LeafEdge * leaf;
+  LeafEdgePtr leaf_;
 
   void setLeafEdge();
 
  protected:
-  int beginIndex;
-  int endIndex;
-  int span;
-  Node * startNode;
-  Node * endNode;
+  int bgn_idx_;
+
+  int end_idx_;
+
+  NodePtr start_node_;
+
+  NodePtr end_node_;
+
+  bool is_leaf_;
 };
+
+typedef std::shared_ptr<Edge> EdgePtr;
+
+class LeafEdge: public Edge {
+ public:
+  LeafEdge(int beginIndex, int endIndex, NodePtr startNode):
+      Edge(beginIndex, endIndex, startNode),
+      leaf_idx_(-1),
+      seq_num_(-1) {}
+
+  LeafEdge(int beginIndex, int endIndex, NodePtr startNode, NodePtr endNode):
+      Edge(beginIndex, endIndex, startNode, endNode),
+      leaf_idx_(-1),
+      seq_num_(-1) {}
+
+  void setLeafIndex(int index) {leaf_idx_ = index;}
+
+  int getSeqNum() {return seq_num_;}
+
+  void setSeqNum(int num) {seq_num_ = num;}
+
+  SuffixPosPtr getSuffixPosition() {
+    if (leaf_idx_ == -1) {
+      return nullptr;
+    }
+    return std::make_shared<SuffixPosition>(seq_num_, leaf_idx_);
+  }
+
+ private:
+  int leaf_idx_;
+
+  int seq_num_;
+};
+
 }  // namespace suffix
+
 }  // namespace prot
+
 #endif
