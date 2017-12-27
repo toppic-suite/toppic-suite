@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_SUFFIX_TREE_HPP
-#define PROT_SUFFIX_TREE_HPP
+#ifndef PROT_SUFFIX_SUFFIX_TREE_HPP
+#define PROT_SUFFIX_SUFFIX_TREE_HPP
 
 #include <string>
 #include <vector>
@@ -23,46 +23,67 @@
 
 #include "protein_db.hpp"
 #include "suffix_position.hpp"
-#include "node.hpp"
 
 namespace prot {
+
 namespace suffix {
 
 class Edge;
-class LeafEdge;
+typedef std::shared_ptr<Edge> EdgePtr;
+
 class Suffix;
-class SuffixTree {
+typedef std::shared_ptr<Suffix> SuffixPtr;
+
+class Node;
+typedef std::shared_ptr<Node> NodePtr;
+
+class SuffixTree;
+
+class SuffixTree : public std::enable_shared_from_this<SuffixTree> {
  public:
-  explicit SuffixTree(std::string text);
+  SuffixTree(std::string text, ProteinDBPtr database):
+      seq_idx_(0),
+      leaf_created_this_step_(0),
+      text_(text),
+      database_(database) {}
 
-  SuffixTree(std::string text, ProteinDatabase *database);
+  void init();
 
-  Node * getRoot();
+  NodePtr getRoot();
 
-  int getSeqIndex() {return seqIndex;}
+  int getSeqIndex() {return seq_idx_;}
 
-  int getLeafCreatedThisStep() {return leafCreatedThisStep;}
+  int getLeafCreatedThisStep() {return leaf_created_this_step_;}
 
-  void increaseLeafCreated() {leafCreatedThisStep++;}
+  void increaseLeafCreated() {leaf_created_this_step_++;}
 
-  std::vector<SuffixPosition *> search(std::string target);
+  std::vector<SuffixPosPtr> search(std::string target);
 
-  Edge * findMatchEdge(std::string target);
+  EdgePtr findMatchEdge(std::string target);
 
-  std::string getstring(char c);
-
-  std::string text;
+  char charAt(size_t idx) {return text_.at(idx);}
 
  private:
-  Node * root;
-  int seqIndex;
-  int leafCreatedThisStep;
-  ProteinDatabase * database;
-  void addPrefix(Suffix * active, int endIndex);
-  void updateSuffixNode(Node * node, Node * suffixNode);
+  NodePtr root;
+
+  int seq_idx_;
+
+  int leaf_created_this_step_;
+
+  std::string text_;
+
+  ProteinDBPtr database_;
+
+  void addPrefix(SuffixPtr active, int endIndex);
+
+  void updateSuffixNode(NodePtr node, NodePtr suffixNode);
+
   void determineSuffixPos();
 };
 
+typedef std::shared_ptr<SuffixTree> SuffixTreePtr;
+
 }  // namespace suffix
+
 }  // namespace prot
 #endif

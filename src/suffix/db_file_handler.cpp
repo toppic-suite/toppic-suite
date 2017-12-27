@@ -18,15 +18,16 @@
 #include "db_file_handler.hpp"
 
 namespace prot {
+
 namespace suffix {
 
-ProteinDatabase * DatabaseFileHandler::loadDatabase(const std::string & proteinDatabaseFile) {
-  ProteinDatabase * database = new ProteinDatabase();
+ProteinDBPtr DatabaseFileHandler::loadDatabase(const std::string & db_file) {
+  ProteinDBPtr database = std::make_shared<ProteinDatabase>();
   std::ifstream fis;
-  fis.open(proteinDatabaseFile.c_str());
+  fis.open(db_file.c_str());
   if (!fis) {
-    std::cerr << "Unable to open loadDatabase" << std::endl;
-    exit(1);  // terminate with error
+    std::cerr << "Unable to open Database " << db_file << std::endl;
+    exit(EXIT_FAILURE);
   }
 
   bool isFirstSeq = true;
@@ -72,4 +73,5 @@ std::string DatabaseFileHandler::handleUndefinedCharacter(std::string text) {
 }
 
 }  // namespace suffix
+
 }  // namespace prot

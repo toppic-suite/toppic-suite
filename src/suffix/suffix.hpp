@@ -13,43 +13,53 @@
 //limitations under the License.
 
 
-#ifndef PROT_SUFFIX_HPP
-#define PROT_SUFFIX_HPP
+#ifndef PROT_SUFFIX_SUFFIX_HPP
+#define PROT_SUFFIX_SUFFIX_HPP
 
 #include "node.hpp"
 
 namespace prot {
+
 namespace suffix {
 
 class Suffix {
  public:
-  Suffix(Node * originNode, int beginIndex, int endIndex);
+  Suffix(NodePtr originNode, int beginIndex, int endIndex):
+      origin_node_(originNode),
+      bgn_idx_(beginIndex),
+      end_idx_(endIndex) {}
 
-  bool isExplicit() {return beginIndex > endIndex;}
+  bool isExplicit() {return bgn_idx_ > end_idx_;}
 
-  bool isImplicit() {return endIndex >= beginIndex;}
+  bool isImplicit() {return end_idx_ >= bgn_idx_;}
 
   void canonize();
 
-  int getSpan() {return endIndex - beginIndex;}
+  int getSpan() {return end_idx_ - bgn_idx_;}
 
-  Node * getOriginNode() {return originNode;}
+  NodePtr getOriginNode() {return origin_node_;}
 
-  int getBeginIndex() {return beginIndex;}
+  int getBeginIndex() {return bgn_idx_;}
 
-  void incBeginIndex() {beginIndex++;}
+  void incBeginIndex() {bgn_idx_++;}
 
-  void changeOriginNode();
+  void changeOriginNode() {origin_node_ = origin_node_->getSuffixNode();}
 
-  int getEndIndex() {return endIndex;}
+  int getEndIndex() {return end_idx_;}
 
-  void incEndIndex() {endIndex++;}
+  void incEndIndex() {end_idx_++;}
 
  private:
-  Node * originNode;
-  int beginIndex;
-  int endIndex;
+  NodePtr origin_node_;
+
+  int bgn_idx_;
+
+  int end_idx_;
 };
+
+typedef std::shared_ptr<Suffix> SuffixPtr;
+
 }  // namespace suffix
+
 }  // namespace prot
 #endif

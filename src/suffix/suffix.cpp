@@ -13,46 +13,31 @@
 //limitations under the License.
 
 
-#include "node.hpp"
 #include "edge.hpp"
-#include "leaf_edge.hpp"
 #include "suffix.hpp"
-#include "suffix_tree.hpp"
 
 namespace prot {
+
 namespace suffix {
 
-Suffix::Suffix(Node *originNode, int beginIndex, int endIndex) {
-  this->originNode = originNode;
-  this->beginIndex = beginIndex;
-  this->endIndex = endIndex;
-}
-
-/**
- * match the suffix along the tree from Suffix.originNode
- * */
+// match the suffix along the tree from Suffix.originNode
 void Suffix::canonize() {
   if (!isExplicit()) {
-    Edge *edge = originNode->findEdge(originNode->charAt(beginIndex));
+    EdgePtr edge = origin_node_->findEdge(origin_node_->charAt(bgn_idx_));
 
     int edgeSpan = edge->getSpan();
     while (edgeSpan <= getSpan()) {
-      beginIndex += edgeSpan + 1;
-      originNode = edge->getEndNode();
-      if (beginIndex <= endIndex) {
-        edge = edge->getEndNode()->findEdge(originNode->charAt(beginIndex));
+      bgn_idx_ += edgeSpan + 1;
+      origin_node_ = edge->getEndNode();
+      if (bgn_idx_ <= end_idx_) {
+        edge = edge->getEndNode()->findEdge(origin_node_->charAt(bgn_idx_));
         edgeSpan = edge->getSpan();
       }
     }
   }
 }
 
-/**
- * change the origin node of the suffix
- * */
-void Suffix::changeOriginNode() {
-  originNode = originNode->getSuffixNode();
-}
 }  // namespace suffix
+
 }  // namespace prot
 

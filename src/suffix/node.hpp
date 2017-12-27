@@ -16,57 +16,56 @@
 #ifndef PROT_SUFFIX_NODE_HPP
 #define PROT_SUFFIX_NODE_HPP
 
+#include <vector>
+
 #include "edge.hpp"
-#include "leaf_edge.hpp"
-#include "suffix.hpp"
 #include "suffix_tree.hpp"
 
 namespace prot {
 
 namespace suffix {
 
+class Node;
+typedef std::shared_ptr<Node> NodePtr;
+
 class Node {
  public:
-  Node(SuffixTree * suffixTree, Node * suffixNode);
-
-  explicit Node(Node * node);
+  Node(SuffixTreePtr suffixTree, NodePtr suffixNode);
 
   char charAt(int index);
 
-  void addEdge(int charIndex, Edge * edge) {
-    edges[getCharacterIndex(charAt(charIndex))] = edge;
+  void addEdge(int charIndex, EdgePtr edge) {
+    edges_[getCharacterIndex(charAt(charIndex))] = edge;
   }
 
   void removeEdge(int charIndex) {
-    edges[getCharacterIndex(charAt(charIndex))] = NULL;
+    edges_[getCharacterIndex(charAt(charIndex))] = nullptr;
   }
 
   void removeEdge(char ch) {
-    edges[getCharacterIndex(ch)] = NULL;
+    edges_[getCharacterIndex(ch)] = nullptr;
   }
 
-  void removeAll();
+  EdgePtr findEdge(char ch) {return edges_[getCharacterIndex(ch)];}
 
-  Edge * findEdge(char ch) {return edges[getCharacterIndex(ch)];}
-
-  Edge * getEdge(int index);
+  EdgePtr getEdge(int index);
 
   int getCharacterIndex(char ch);
 
-  Node * getSuffixNode() {return suffixNode;}
+  NodePtr getSuffixNode() {return suffixNode;}
 
-  void setSuffixNode(Node * suffixNode) {this->suffixNode = suffixNode;}
+  void setSuffixNode(NodePtr suffixNode) {this->suffixNode = suffixNode;}
 
-  bool hasSuffixNode() {return suffixNode != NULL;}
+  bool hasSuffixNode() {return suffixNode != nullptr;}
 
-  SuffixTree * getSuffixTree() {return suffixTree;}
+  SuffixTreePtr getSuffixTree() {return suffixTree;}
 
  private:
-  SuffixTree * suffixTree;
+  SuffixTreePtr suffixTree;
 
-  Node * suffixNode;
+  NodePtr suffixNode;
 
-  Edge ** edges;
+  std::vector<EdgePtr> edges_;
 };
 
 }  // namespace suffix

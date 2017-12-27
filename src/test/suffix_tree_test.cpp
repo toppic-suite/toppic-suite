@@ -34,15 +34,16 @@ TEST_CASE("suffix tree") {
   test_file.close();
 
   std::shared_ptr<DatabaseFileHandler> df = std::make_shared<DatabaseFileHandler>();
-  ProteinDatabase * pd = df->loadDatabase("test.fa");
+  ProteinDBPtr pd = df->loadDatabase("test.fa");
   REQUIRE(pd->getsize() == 2);
   REQUIRE(pd->getProteinID(0) == "sp|test1|test1");
   REQUIRE(pd->getProteinDesc(1) == "test2_desc");
   REQUIRE(pd->getSequence() == "MSGRGKAGGAKGAIGAKG#MSKGRGKGKIRAKGAIGAKG$");
 
   std::shared_ptr<SuffixTree> st = std::make_shared<SuffixTree>(pd->getSequence(), pd);
+  st->init();
 
-  std::vector<SuffixPosition*> startPosList = st->search("GRG");
+  std::vector<SuffixPosPtr> startPosList = st->search("GRG");
 
   REQUIRE(startPosList.size() == 2);
   REQUIRE(startPosList[0]->getSeqNum() == 0);
