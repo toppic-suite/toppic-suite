@@ -26,8 +26,6 @@ namespace prot {
 // break point spectrum
 class BpSpec {
  public:
-  BpSpec() {}
-
   explicit BpSpec(const ResSeqPtr &res_seq_ptr);
 
   const BreakPointPtrVec& getBreakPointPtrVec() {return break_point_ptr_vec_;}

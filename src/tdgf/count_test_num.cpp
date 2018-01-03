@@ -147,14 +147,6 @@ double CountTestNum::compCandNum(AlignTypePtr type_ptr, int index,
   if (index == 0) {
     cand_num = compNonPtmCandNum(type_ptr, ori_mass, ori_tolerance);
   } else if (index >= 1){ // with shifts
-    /*
-       if (max_ptm_mass_ >=10000) {
-    // max shift mass is larger than 10k, we treat it as no limitation 
-    cand_num = compPtmCandNum(type_ptr, ori_mass);
-    }
-    else {
-    }
-    */
     cand_num = compPtmRestrictCandNum(type_ptr, index, ori_mass);
     // multiple adjustment 
     if (type_ptr == AlignType::PREFIX || type_ptr == AlignType::SUFFIX) {
@@ -165,7 +157,7 @@ double CountTestNum::compCandNum(AlignTypePtr type_ptr, int index,
   }
 
   if (cand_num == 0.0) {
-    LOG_ERROR("candidate number is ZERO");
+    LOG_DEBUG("candidate number is ZERO");
   }
   return cand_num;
 }
@@ -176,14 +168,10 @@ double CountTestNum::compNonPtmCandNum(AlignTypePtr type_ptr,
   int high = std::ceil((ori_mass + ori_tolerance) * convert_ratio_);
   double cand_num = compSeqNum(type_ptr, low, high);
 
-  //if (type_ptr == SemiAlignTypeFactory::getCompletePtr()) {
-  //LOG_DEBUG("low " << low << " high " << high << " cand num " << cand_num);
-  //}
-
   return cand_num;
 }
 
-double CountTestNum::compPtmCandNum(AlignTypePtr type_ptr, double ori_mass) {
+double CountTestNum::compPtmCandNum(AlignTypePtr type_ptr) {
   double cand_num = 0;
   if (type_ptr == AlignType::COMPLETE) {
     cand_num = mod_proteo_lens_.size();

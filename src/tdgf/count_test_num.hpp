@@ -76,7 +76,7 @@ class CountTestNum {
 
   double compNonPtmCandNum(AlignTypePtr type_ptr, 
                            double ori_mass, double ori_tolerance);
-  double compPtmCandNum (AlignTypePtr type_ptr, double ori_mass);
+  double compPtmCandNum(AlignTypePtr type_ptr);
   double compPtmRestrictCandNum (AlignTypePtr type_ptr, int shift_num, double ori_mass);
   double compSeqNum(AlignTypePtr type_ptr, int low, int high);
   double compMassNum(double *cnts, int low, int high);

@@ -45,9 +45,6 @@ MassMatch::MassMatch(std::vector<std::vector<int>> &mass_2d,
   initIndexes(mass_2d, real_shift_2d, pos_2d);
 }
 
-MassMatch::~MassMatch(){
-}
-
 inline void MassMatch::initProteoformBeginEnds(std::vector<std::vector<int>> &mass_2d,
                                                std::vector<std::vector<double>> &shift_2d) {
   //no need to init

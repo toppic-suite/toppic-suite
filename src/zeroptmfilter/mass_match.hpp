@@ -30,8 +30,6 @@ class MassMatch {
             std::vector<std::vector<int>> &pos_2d,
             double max_proteoform_mass, double scale);  
 
-  ~MassMatch();
-
   void compScores(const std::vector<std::pair<int,int>> &pref_mass_errors,
                   std::vector<short> &scores);
 
@@ -47,18 +45,23 @@ class MassMatch {
   static int getPrecursorMatchScore() {return 10000;}
 
   std::vector<int>& getProteoRowBegins() {return proteo_row_begins_;}
+
   std::vector<int>& getProteoRowEnds() {return proteo_row_ends_;}
+
   std::vector<double>& getTruncShifts() {return trunc_shifts_;}
 
  private:
   double scale_;
+
   int proteo_num_;
+
   int col_num_;
   int row_num_;
 
   // the first row of each proteoform  
   std::vector<int> proteo_row_begins_;
   std::vector<int> proteo_row_ends_;
+
   // the proteoform id of each row
   std::vector<int> row_proteo_ids_;
   std::vector<double> trunc_shifts_;
@@ -89,4 +92,4 @@ typedef std::shared_ptr<MassMatch> MassMatchPtr;
 
 } /* namespace prot */
 
-#endif /* COMP_SHIFT_HPP_ */
+#endif
