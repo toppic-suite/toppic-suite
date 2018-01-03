@@ -33,8 +33,6 @@ void EValueProcessor::init() {
   test_num_ptr_ = std::make_shared<CountTestNum>(mng_ptr_);
   LOG_DEBUG("Count test number initialized.");
 
-  fai_ = fai_load(mng_ptr_->prsm_para_ptr_->getSearchDbFileName().c_str());
-
   ResFreqPtrVec residue_freqs = test_num_ptr_->getResFreqPtrVec();
   if (!mng_ptr_->use_gf_) {
     comp_pvalue_table_ptr_ = std::make_shared<CompPValueLookupTable>(mng_ptr_);
@@ -43,10 +41,6 @@ void EValueProcessor::init() {
   comp_pvalue_ptr_ = std::make_shared<CompPValueArray>(test_num_ptr_, mng_ptr_);
   LOG_DEBUG("comp pvalue array initialized");
 
-}
-
-EValueProcessor::~EValueProcessor() {
-  fai_destroy(fai_);
 }
 
 std::function<void()> geneTask(SpectrumSetPtr spec_set_ptr, const PrsmPtrVec & sele_prsm_ptrs,
@@ -177,7 +171,6 @@ bool EValueProcessor::checkPrsms(const PrsmPtrVec &prsm_ptrs) {
 
 void EValueProcessor::compEvalues(SpectrumSetPtr spec_set_ptr, PrsmPtrVec &sele_prsm_ptrs,
                                   double ppo, bool is_separate) {
-
   if (!mng_ptr_->use_gf_ 
       && comp_pvalue_table_ptr_->inTable(spec_set_ptr->getDeconvMsPtrVec(), sele_prsm_ptrs)) {
     comp_pvalue_table_ptr_->process(spec_set_ptr->getDeconvMsPtrVec(), sele_prsm_ptrs, ppo);
@@ -188,11 +181,10 @@ void EValueProcessor::compEvalues(SpectrumSetPtr spec_set_ptr, PrsmPtrVec &sele_
 
   // if matched peak number is too small or E-value is 0, replace it
   // with a max evalue.
-  //std::cout << "Start checking " << std::endl;
   for (unsigned i = 0; i < sele_prsm_ptrs.size(); i++) {
-    //std::cout << "Fragment number " << sele_prsm_ptrs[i]->getMatchFragNum() << std::endl;
+    LOG_DEBUG("Fragment number " << sele_prsm_ptrs[i]->getMatchFragNum());
     if (std::round(sele_prsm_ptrs[i]->getMatchFragNum()) <= std::round(mng_ptr_->comp_evalue_min_match_frag_num_)) {
-      //std::cout << "Set max e value " << std::endl;
+      LOG_DEBUG("Set max e value ");
       sele_prsm_ptrs[i]->setExtremeValuePtr(ExtremeValue::getMaxEvaluePtr());
     } else {
       if (sele_prsm_ptrs[i]->getEValue() == 0.0) {
