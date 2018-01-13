@@ -33,11 +33,11 @@
 namespace prot {
 
 XmlGenerator::XmlGenerator(PrsmParaPtr prsm_para_ptr,
-                           const std::string &exec_dir,
+                           const std::string &resource_dir,
                            const std::string &input_file_ext,
                            const std::string &fname_suffix) {
   input_file_ext_ = input_file_ext;
-  mng_ptr_ = std::make_shared<PrsmViewMng>(prsm_para_ptr, exec_dir, fname_suffix);
+  mng_ptr_ = std::make_shared<PrsmViewMng>(prsm_para_ptr, resource_dir, fname_suffix);
   anno_view_ptr_ = std::make_shared<AnnoView>();
   fasta_reader_ptr_ = std::make_shared<FastaIndexReader>(prsm_para_ptr->getSearchDbFileName());
   writer_block_size_ = 300;
@@ -89,8 +89,7 @@ void XmlGenerator::outputPrsms() {
 
         std::vector<std::string> file_info;
         file_info.push_back(file_name);
-        file_info.push_back(mng_ptr_->executive_dir_ + file_util::getFileSeparator() + "toppic_resources"
-                            + file_util::getFileSeparator() + "xsl" + file_util::getFileSeparator() + "prsm.xsl");
+        file_info.push_back(mng_ptr_->resource_dir_ + file_util::getFileSeparator() + "xsl" + file_util::getFileSeparator() + "prsm.xsl");
         file_info.push_back(mng_ptr_->html_path_+ file_util::getFileSeparator() + "prsms" + file_util::getFileSeparator()
                             + "prsm" + string_util::convertToString(prsm_ptr->getPrsmId()) + ".html");
         anno_view_ptr_->file_list_.push_back(file_info); 
@@ -141,8 +140,7 @@ void XmlGenerator::outputProteoforms(){
 
       std::vector<std::string> file_info;
       file_info.push_back(file_name);
-      file_info.push_back(mng_ptr_->executive_dir_ + file_util::getFileSeparator() + 
-                          "toppic_resources" + file_util::getFileSeparator() + "xsl" + file_util::getFileSeparator() + "proteoform.xsl");
+      file_info.push_back(mng_ptr_->resource_dir_ + file_util::getFileSeparator() + "xsl" + file_util::getFileSeparator() + "proteoform.xsl");
       file_info.push_back(mng_ptr_->html_path_+ file_util::getFileSeparator()+ "proteoforms" + file_util::getFileSeparator() 
                           + "proteoform"+string_util::convertToString(cluster_ids_[i])+".html");
       anno_view_ptr_->file_list_.push_back(file_info);
@@ -176,8 +174,7 @@ void XmlGenerator::outputProteins() {
       writer.close();
       std::vector<std::string> file_info;
       file_info.push_back(file_name);
-      file_info.push_back(mng_ptr_->executive_dir_ + file_util::getFileSeparator() + "toppic_resources" 
-                          + file_util::getFileSeparator() + "xsl" + file_util::getFileSeparator() + "protein.xsl");
+      file_info.push_back(mng_ptr_->resource_dir_ + file_util::getFileSeparator() + "xsl" + file_util::getFileSeparator() + "protein.xsl");
       file_info.push_back(mng_ptr_->html_path_+ file_util::getFileSeparator() + "proteins" + file_util::getFileSeparator() 
                           + "protein"+string_util::convertToString(prot_id)+".html");
       anno_view_ptr_->file_list_.push_back(file_info);
@@ -226,8 +223,7 @@ void XmlGenerator::outputAllProteins() {
   writer.close();
   std::vector<std::string> file_info;
   file_info.push_back(file_name);
-  file_info.push_back(mng_ptr_->executive_dir_ + file_util::getFileSeparator() +
-                      "toppic_resources" + file_util::getFileSeparator() + 
+  file_info.push_back(mng_ptr_->resource_dir_ + file_util::getFileSeparator() + 
                       "xsl" + file_util::getFileSeparator() +"proteins.xsl");
   file_info.push_back(mng_ptr_->html_path_+ file_util::getFileSeparator() + "proteins.html");
   anno_view_ptr_->file_list_.push_back(file_info);

@@ -76,7 +76,7 @@ std::string DeconvProcess::updateMsg(MsHeaderPtr header_ptr, int scan, int total
 }
 
 void DeconvProcess::process() {
-  FeatureMngPtr mng_ptr = std::make_shared<FeatureMng>(para_ptr_->exec_dir_);
+  FeatureMngPtr mng_ptr = std::make_shared<FeatureMng>(para_ptr_->resource_dir_);
   copyParameters(mng_ptr);
   outputParameter(std::cout, para_ptr_);
 

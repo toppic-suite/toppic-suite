@@ -33,14 +33,20 @@ namespace prot {
 class Argument {
  public:
   Argument();
+
   bool parse(int argc, char* argv[]);
+
   std::map<std::string,std::string> getArguments(){return arguments_;}
 
  private:
   void initArguments();
+
   void setArgumentsByConfigFile(const std::string &file_name);
+
   bool validateArguments();
+
   void showUsage(boost::program_options::options_description &desc);
+
   std::map<std::string,std::string> arguments_;
 };
 

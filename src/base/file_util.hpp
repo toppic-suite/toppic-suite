@@ -36,6 +36,8 @@ std::string getFileSeparator();
 
 std::string getExecutiveDir(const std::string &argv_0);
 
+inline std::string getResourceDirName() {return "toppic_resources";}
+
 std::string basename(const std::string &s);
 
 std::string directory(const std::string &s);

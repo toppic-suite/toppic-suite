@@ -69,13 +69,14 @@ int TopMGProcess(std::map<std::string, std::string> arguments) {
   try {
     std::cout << "TopMG 1.0-beta" << std::endl;
 
-    std::string exe_dir = arguments["executiveDir"];
     time_t start = time(0);
     char buf[50];
     arguments["start_time"] = std::string(ctime_r(&start, buf));
     Argument::outputArguments(std::cout, arguments);
 
-    base_data::init(exe_dir);
+    std::string resource_dir = arguments["resourceDir"];
+
+    base_data::init(resource_dir);
 
     LOG_DEBUG("Init base data completed");
 
@@ -266,7 +267,7 @@ int TopMGProcess(std::map<std::string, std::string> arguments) {
     std::cout << "Outputting PrSM table - finished." << std::endl;
 
     std::cout << "Generating PrSM xml files - started." << std::endl;
-    XmlGeneratorPtr xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, exe_dir, "CUTOFF_RESULT_SPEC", "prsm_cutoff");
+    XmlGeneratorPtr xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, "CUTOFF_RESULT_SPEC", "prsm_cutoff");
     xml_gene->process();
     xml_gene = nullptr;
     std::cout << "Generating PrSM xml files - finished." << std::endl;
@@ -302,8 +303,7 @@ int TopMGProcess(std::map<std::string, std::string> arguments) {
     std::cout << "Outputting proteoform table - finished." << std::endl;
 
     std::cout << "Generating proteoform xml files - started." << std::endl;
-    xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, exe_dir, "CUTOFF_RESULT_FORM",
-                                              "proteoform_cutoff");
+    xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, "CUTOFF_RESULT_FORM", "proteoform_cutoff");
     xml_gene->process();
     xml_gene = nullptr;
     std::cout << "Generating proteoform xml files - finished." << std::endl;

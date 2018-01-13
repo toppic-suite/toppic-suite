@@ -30,23 +30,36 @@ namespace prot {
 class PrsmPara {
  public:
   PrsmPara(std::map<std::string,std::string> &arguments);
+
   std::string getSearchDbFileName() {return search_db_file_name_;}
+
   std::string getSpectrumFileName() {return spec_file_name_;}
-  std::string getExeDir(){return exe_dir_;}
-  int getErrorTolerance(){return errorTolerance_;}
+
+  std::string getResourceDir() {return resource_dir_;}
+
+  int getErrorTolerance() {return errorTolerance_;}
+
   int getGroupSpecNum() {return group_spec_num_;}
+
   const ModPtrVec& getFixModPtrVec() {return fix_mod_list_;}
+
   const ProtModPtrVec& getProtModPtrVec() {return prot_mod_list_;}
+
   SpParaPtr getSpParaPtr() {return sp_para_ptr_;}
+
   bool doLocaliztion() {return localization_;}
 
  private:
   std::string search_db_file_name_;
+
   std::string spec_file_name_;
-  std::string exe_dir_;
+
+  std::string resource_dir_;
+
   int errorTolerance_;
 
   ModPtrVec fix_mod_list_;
+
   ProtModPtrVec prot_mod_list_;
 
   int group_spec_num_;

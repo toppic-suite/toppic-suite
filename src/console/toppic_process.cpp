@@ -68,13 +68,15 @@ namespace prot {
 int TopPICProgress(std::map<std::string, std::string> arguments) {
   try {
     std::cout << "TopPIC " << version_number << std::endl;
-    std::string exe_dir = arguments["executiveDir"];
+    
     time_t start = time(0);
     char buf[50];
     arguments["start_time"] = std::string(ctime_r(&start, buf));
     Argument::outputArguments(std::cout, arguments);
 
-    base_data::init(exe_dir);
+    std::string resource_dir = arguments["resourceDir"];
+
+    base_data::init(resource_dir);
 
     LOG_DEBUG("Init base data completed");
 
@@ -253,7 +255,7 @@ int TopPICProgress(std::map<std::string, std::string> arguments) {
     }
 
     std::string cutoff_type = arguments["cutoffSpectralType"];
-    std::cout << "PrSM filtering by " << cutoff_type << "- started." << std::endl;
+    std::cout << "PrSM filtering by " << cutoff_type << " - started." << std::endl;
     double cutoff_value;
     std::istringstream(arguments["cutoffSpectralValue"]) >> cutoff_value;
     PrsmCutoffSelectorPtr cutoff_selector
@@ -261,7 +263,7 @@ int TopPICProgress(std::map<std::string, std::string> arguments) {
                                                "CUTOFF_RESULT_SPEC", cutoff_type, cutoff_value);
     cutoff_selector->process();
     cutoff_selector = nullptr;
-    std::cout << "PrSM filtering by " << cutoff_type << "- finished." << std::endl;
+    std::cout << "PrSM filtering by " << cutoff_type << " - finished." << std::endl;
 
     std::string suffix = "CUTOFF_RESULT_SPEC";
 
@@ -292,7 +294,7 @@ int TopPICProgress(std::map<std::string, std::string> arguments) {
     std::cout << "Outputting PrSM table - finished." << std::endl;
 
     std::cout << "Generating PrSM xml files - started." << std::endl;
-    XmlGeneratorPtr xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, exe_dir, suffix, "prsm_cutoff");
+    XmlGeneratorPtr xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, suffix, "prsm_cutoff");
     xml_gene->process();
     xml_gene = nullptr;
     std::cout << "Generating PrSM xml files - finished." << std::endl;
@@ -328,8 +330,7 @@ int TopPICProgress(std::map<std::string, std::string> arguments) {
     std::cout << "Outputting proteoform table - finished." << std::endl;
 
     std::cout << "Generating proteoform xml files - started." << std::endl;
-    xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, exe_dir, "CUTOFF_RESULT_FORM",
-                                              "proteoform_cutoff");
+    xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, "CUTOFF_RESULT_FORM", "proteoform_cutoff");
     xml_gene->process();
     xml_gene = nullptr;
     std::cout << "Generating proteoform xml files - finished." << std::endl;
