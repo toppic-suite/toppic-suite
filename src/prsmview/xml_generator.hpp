@@ -35,7 +35,7 @@ namespace prot {
 class XmlGenerator {
  public:
   XmlGenerator(PrsmParaPtr prsm_para_ptr,
-               const std::string &exec_dir,
+               const std::string &resource_dir,
                const std::string &input_file_name,
                const std::string &fname_suffix);
 

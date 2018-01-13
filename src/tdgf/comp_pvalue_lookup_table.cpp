@@ -45,8 +45,7 @@ void CompPValueLookupTable::initTable() {
   std::vector<std::string> strs;
 
   input_.open(
-      mng_ptr_->prsm_para_ptr_->getExeDir() + file_util::getFileSeparator()
-      + "toppic_resources" + file_util::getFileSeparator() + "p_value_table"
+      mng_ptr_->prsm_para_ptr_->getResourceDir() + file_util::getFileSeparator() + "p_value_table"
       + file_util::getFileSeparator() + "ppm" + std::to_string(ppo) + "_ptm0.txt",
       std::ios::in);
 
@@ -59,8 +58,7 @@ void CompPValueLookupTable::initTable() {
   input_.close();
 
   input_.open(
-      mng_ptr_->prsm_para_ptr_->getExeDir() + file_util::getFileSeparator()
-      + "toppic_resources" + file_util::getFileSeparator() + "p_value_table"
+      mng_ptr_->prsm_para_ptr_->getResourceDir() + file_util::getFileSeparator() + "p_value_table"
       + file_util::getFileSeparator() + "ppm" + std::to_string(ppo) + "_ptm1.txt",
       std::ios::in);
 
@@ -73,8 +71,7 @@ void CompPValueLookupTable::initTable() {
   input_.close();
 
   input_.open(
-      mng_ptr_->prsm_para_ptr_->getExeDir() + file_util::getFileSeparator()
-      + "toppic_resources" + file_util::getFileSeparator() + "p_value_table"
+      mng_ptr_->prsm_para_ptr_->getResourceDir() + file_util::getFileSeparator() + "p_value_table"
       + file_util::getFileSeparator() + "ppm" + std::to_string(ppo) + "_ptm2.txt",
       std::ios::in);
 

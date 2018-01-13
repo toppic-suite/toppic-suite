@@ -26,13 +26,13 @@ namespace prot {
 class PrsmViewMng {
  public:
   PrsmViewMng(PrsmParaPtr prsm_para_ptr,
-              const std::string & exec_dir,
+              const std::string & resource_dir,
               const std::string & fname_suffix):
       prsm_para_ptr_(prsm_para_ptr) {
         std::string spectrum_file_name = prsm_para_ptr_->getSpectrumFileName();
         xml_path_ = file_util::basename(spectrum_file_name) + "_" + fname_suffix + "_xml";
         html_path_ = file_util::basename(spectrum_file_name) + "_" + fname_suffix + "_html";
-        executive_dir_ = exec_dir;
+        resource_dir_ = resource_dir;
         min_mass_ = prsm_para_ptr_->getSpParaPtr()->getMinMass();
       }
 
@@ -40,7 +40,7 @@ class PrsmViewMng {
 
   std::string html_path_;
   std::string xml_path_;
-  std::string executive_dir_;
+  std::string resource_dir_;
 
   int decimal_point_num_ = 2;
   int precise_point_num_ = 4;

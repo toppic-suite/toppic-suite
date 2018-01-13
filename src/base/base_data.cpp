@@ -37,9 +37,9 @@ namespace prot {
 
 namespace base_data {
 
-void init(const std::string &exe_dir) {
+void init(const std::string & resource_dir) {
   std::string separator = file_util::getFileSeparator();
-  std::string base_data_dir = exe_dir + separator + base_data::getBaseDataDir();
+  std::string base_data_dir = resource_dir + separator + base_data::getBaseDataDirName();
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
     std::string config_file_name

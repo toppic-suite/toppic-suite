@@ -52,6 +52,7 @@ void Argument::initArguments() {
   arguments_["maxPtmMass"] = "500";
   arguments_["useGf"] = "false";
   arguments_["executiveDir"] = ".";
+  arguments_["resourceDir"] = "";
   arguments_["keepTempFiles"] = "false";
   arguments_["fullBinaryPath"] = "false";
   arguments_["local_threshold"] = "0.45";
@@ -230,73 +231,99 @@ bool Argument::parse(int argc, char* argv[]) {
       arguments_["executiveDir"] = file_util::getExecutiveDir(argv_0);
     }
     LOG_DEBUG("Executive Dir " << arguments_["executiveDir"]);
+
+    arguments_["resourceDir"] = arguments_["executiveDir"] + file_util::getFileSeparator() + file_util::getResourceDirName();
+
     arguments_["oriDatabaseFileName"] = database_file_name;
+
     arguments_["spectrumFileName"] = spectrum_file_name;
+
     if (vm.count("activation")) {
       arguments_["activation"] = activation;
     }
+
     if (vm.count("decoy")) {
       arguments_["searchType"] = "TARGET+DECOY";
     }
+
     if (arguments_["searchType"] == "TARGET+DECOY") {
       arguments_["databaseFileName"]=arguments_["oriDatabaseFileName"] + "_target_decoy";
     } else {
       arguments_["databaseFileName"]=arguments_["oriDatabaseFileName"] + "_target";
     }
+
     if (vm.count("fixed-mod")) {
       arguments_["fixedMod"] = fixed_mod;
     }
+
     if (vm.count("n-terminal-form")) {
       arguments_["allowProtMod"] = allow_mod;
     }    
+
     if (vm.count("num-shift")) {
       arguments_["ptmNumber"] = ptm_num;
     }
+
     if (vm.count("error-tolerance")) {
       arguments_["errorTolerance"] = error_tole;
     }
+
     if (vm.count("max-shift")) {
       arguments_["maxPtmMass"] = max_ptm_mass;
     }
+
     if (vm.count("spectrum-cutoff-type")) {
       arguments_["cutoffSpectralType"] = cutoff_spectral_type;
     }
+
     if (vm.count("spectrum-cutoff-value")) {
       arguments_["cutoffSpectralValue"] = cutoff_spectral_value;
     }
+
     if (vm.count("proteoform-cutoff-type")) {
       arguments_["cutoffProteoformType"] = cutoff_proteoform_type;
     }
+
     if (vm.count("proteoform-cutoff-value")) {
       arguments_["cutoffProteoformValue"] = cutoff_proteoform_value;
     }
+
     if (vm.count("keep-temp-files")) {
       arguments_["keepTempFiles"] = "true";
     }
+
     if (vm.count("full-binary-path")) {
       arguments_["fullBinaryPath"] = "true";
     }
+
     if (vm.count("generating-function")) {
       arguments_["useGf"] = "true";
     }
+
     if (vm.count("miscore-threshold")) {
       arguments_["local_threshold"] = local_threshold;
     }
+
     if (vm.count("num-combined-spectra")) {
       arguments_["groupSpectrumNumber"] = group_num;
     }
+
     if (vm.count("filtering-result-number")) {
       arguments_["filteringResultNumber"] = filtering_result_num;
     }
+
     if (vm.count("mod-file-name")) {
       arguments_["residueModFileName"] = residue_mod_file_name;
     }
+
     if (vm.count("thread-number")) {
       arguments_["threadNumber"] = thread_number;
     }
+
     if (vm.count("use-topfd-feature")) {
       arguments_["featureFileName"] = feature_file_name;
     }
+
     if (vm.count("skip-list")) {
       arguments_["skipList"] = skip_list;
     }    
@@ -310,6 +337,12 @@ bool Argument::parse(int argc, char* argv[]) {
 }
 
 bool Argument::validateArguments() {
+  if (!boost::filesystem::exists(arguments_["resourceDir"])) {
+    boost::filesystem::path p(arguments_["executiveDir"]);
+    arguments_["resourceDir"]
+        = p.parent_path().string() + file_util::getFileSeparator() + "etc" + file_util::getFileSeparator() + file_util::getResourceDirName(); 
+  }
+
   if (!boost::filesystem::exists(arguments_["oriDatabaseFileName"])) {
     LOG_ERROR("Database file " << arguments_["databaseFileName"] << " does not exist!");
     return false;

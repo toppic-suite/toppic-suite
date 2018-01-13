@@ -25,12 +25,12 @@ void translate(std::map<std::string, std::string> &arguments,
   std::string spectrum_file_name_ = arguments["spectrumFileName"];
   std::string xml_dir = file_util::basename(spectrum_file_name_) + "_" + fname_suffix + "_xml";
   std::string html_dir = file_util::basename(spectrum_file_name_) + "_" + fname_suffix + "_html";
-  std::string exec_dir = arguments["executiveDir"];
+  std::string resource_dir = arguments["resourceDir"];
 
   file_util::createFolder(html_dir + file_util::getFileSeparator() +"proteoforms");
   file_util::createFolder(html_dir + file_util::getFileSeparator() +"prsms");
   file_util::createFolder(html_dir + file_util::getFileSeparator() +"proteins");
-  boost::filesystem::path from_path(exec_dir + file_util::getFileSeparator() + "toppic_resources" + file_util::getFileSeparator() + "web");
+  boost::filesystem::path from_path(resource_dir + file_util::getFileSeparator() + "web");
   boost::filesystem::path to_path(html_dir + file_util::getFileSeparator() + "resources");
   file_util::copyDir(from_path, to_path);
 

@@ -30,6 +30,7 @@ Argument::Argument() {
 
 void Argument::initArguments() {
   arguments_["executiveDir"] = "";
+  arguments_["resourceDir"] = "";
   arguments_["spectrumFileName"] = "";
   arguments_["refinePrecMass"]="true";
   arguments_["missingLevelOne"] = "false";
@@ -122,33 +123,47 @@ bool Argument::parse(int argc, char* argv[]) {
       showUsage(display_desc);
       return false;
     }
+
+    // get the execution directory
     std::string argv_0(argv[0]);
     arguments_["executiveDir"] = file_util::getExecutiveDir(argv_0);
+
+    arguments_["resourceDir"] = arguments_["executiveDir"] + file_util::getFileSeparator() + file_util::getResourceDirName();
+
     arguments_["spectrumFileName"] = spectrum_file_name;
+
     if (vm.count("max-charge")) {
       arguments_["maxCharge"] = max_charge;
     }
+
     if (vm.count("keep")) {
       arguments_["keepUnusedPeaks"] = "true";
     }
+
     if (vm.count("max-mass")) {
       arguments_["maxMass"] = max_mass;
     }
+
     if (vm.count("mz-error")) {
       arguments_["mzError"] = mz_error;
     }
+
     if (vm.count("ms-two-sn-ratio")) {
       arguments_["msTwoSnRatio"] = ms_two_sn_ratio;
     }
+
     if (vm.count("ms-one-sn-ratio")) {
       arguments_["msOneSnRatio"] = ms_one_sn_ratio;
     }
+
     if (vm.count("missing-level-one")) {
       arguments_["missingLevelOne"] = "true";
     }
+
     if (vm.count("multiple-mass")) {
       arguments_["outMultipleMass"] = "true";
     }
+
     if (vm.count("precursor-window")) {
       arguments_["precWindow"] = prec_window;
     }
@@ -164,6 +179,12 @@ bool Argument::parse(int argc, char* argv[]) {
 }
 
 bool Argument::validateArguments() {
+  if (!boost::filesystem::exists(arguments_["resourceDir"])) {
+    boost::filesystem::path p(arguments_["executiveDir"]);
+    arguments_["resourceDir"]
+        = p.parent_path().string() + file_util::getFileSeparator() + "etc" + file_util::getFileSeparator() + file_util::getResourceDirName();
+  }
+
   if (!boost::filesystem::exists(arguments_["spectrumFileName"])) {
     LOG_ERROR("Spectrum file " << arguments_["spectrumFileName"] << " does not exist!");
     return false;

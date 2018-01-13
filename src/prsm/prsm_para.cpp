@@ -25,8 +25,11 @@ namespace prot {
 
 PrsmPara::PrsmPara(std::map<std::string, std::string> &arguments) {
   search_db_file_name_ = arguments["databaseFileName"];
+
   spec_file_name_ = arguments["spectrumFileName"];
-  exe_dir_ = arguments["executiveDir"];
+
+  resource_dir_ = arguments["resourceDir"];
+
   errorTolerance_=std::stoi(arguments["errorTolerance"]);
 
   group_spec_num_ = std::stoi(arguments["groupSpectrumNumber"]);

@@ -30,9 +30,7 @@ int TopFDProcess(std::map<std::string, std::string> arguments) {
   try {
     time_t start = time(0);
 
-    std::string exe_dir = arguments["executiveDir"];
-
-    base_data::init(exe_dir);
+    base_data::init(arguments["resourceDir"]);
 
     DeconvParaPtr para_ptr = std::make_shared<DeconvPara>(arguments);
     LOG_DEBUG("deconv para");
@@ -42,7 +40,9 @@ int TopFDProcess(std::map<std::string, std::string> arguments) {
     FeatureDetect::process(para_ptr);
 
     time_t end = time(0);
-    std::cout << "Runing time: " << std::to_string(static_cast<int>(difftime(end, start))) << " seconds." << std::endl;
+    std::cout << "Runing time: "
+        << std::to_string(static_cast<int>(difftime(end, start)))
+        << " seconds." << std::endl;
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;

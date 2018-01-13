@@ -16,13 +16,14 @@
 #ifndef PROT_FEATURE_MNG_HPP_
 #define PROT_FEATURE_MNG_HPP_
 
+#include "base/file_util.hpp"
 #include "feature/env_base.hpp"
 
 namespace prot {
 
 class FeatureMng {
  public:
-  FeatureMng(const std::string & exec_dir = "");
+  FeatureMng(const std::string & resource_dir = "");
 
   int getMassGroup(double base_mass);
 
@@ -64,11 +65,17 @@ class FeatureMng {
   // initialized before deconvolution 
 
   static EnvBasePtr env_base_ptr_;
-  std::string distr_file_name_ = "/toppic_resources/base_data/theo_patt.txt";
-  std::string env_rescore_para_file_name_ = "/toppic_resources/base_data/env_rescore_para.txt";
+
+  std::string distr_file_name_ = "/base_data/theo_patt.txt";
+
+  std::string env_rescore_para_file_name_ = "/base_data/env_rescore_para.txt";
+
   std::vector<std::vector<double> > env_rescore_para_;
+
   int distr_entry_num_ = 11000;
+
   double distr_mass_interval_ = 10;
+
   // the minimum monoisotopic envelope for an envelope 
   double min_mass_ = 50;
 

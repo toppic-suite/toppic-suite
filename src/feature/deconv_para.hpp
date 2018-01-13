@@ -32,16 +32,23 @@ class DeconvPara {
   std::string getDataFileName() {return data_file_name_;}
 
   std::string data_file_name_;
-  std::string exec_dir_;
+
+  std::string resource_dir_;
 
   bool refine_prec_mass_;
+
   bool missing_level_one_;
 
   int max_charge_;
+
   double max_mass_;
+
   double tolerance_;
+
   double ms_two_sn_ratio_;
+
   double ms_one_sn_ratio_;
+
   bool keep_unused_peaks_;
 
   bool output_multiple_mass_ = false; 
