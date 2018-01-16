@@ -31,7 +31,8 @@ class DeconvProcess {
   void process();
 
   void processSp(DeconvOneSpPtr deconv_ptr, FeatureMsReaderPtr reader_ptr, 
-                 std::ofstream &os1, std::ofstream &os2);
+                 std::ofstream & ms1_msalign_of, std::ofstream & ms2_msalign_of);
+
   static void outputParameter(std::ostream &output, DeconvParaPtr para_ptr, const std::string & prefix = "");
 
  private:

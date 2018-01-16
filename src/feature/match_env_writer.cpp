@@ -23,51 +23,45 @@ namespace prot {
 
 namespace match_env_writer {
 
-void write_env(std::ofstream &file, MatchEnvPtr match_env) {
+void write_env(std::ofstream &file, MsHeaderPtr header, MatchEnvPtr match_env) {
   EnvelopePtr theo_env = match_env->getTheoEnvPtr();
   RealEnvPtr real_env = match_env->getRealEnvPtr();
   file << std::endl;
   file << "BEGIN ENVELOPE" << std::endl;
-  file << "REF_IDX " << theo_env->getReferIdx() << std::endl;
-  file << "CHARGE " << theo_env->getCharge() << std::endl;
-  file << "SCORE " << match_env->getScore() << std::endl;
-  file << "THEO_PEAK_NUM " << theo_env->getPeakNum() 
-      << " REAL_PEAK_NUM " << (real_env->getPeakNum() - real_env->getMissPeakNum()) 
-      << std::endl;
-  file << "THEO_MONO_MZ " << theo_env->getMonoMz() << " REAL_MONO_MZ "
-      << real_env->getMonoMz() << std::endl;
-  file << "THEO_MONO_MASS " << theo_env->getMonoMass()
-      << " REAL_MONO_MASS " << real_env->getMonoMass() << std::endl;
-  file << "THEO_INTE_SUM " << theo_env->compIntensitySum()
-      << " REAL_INTE_SUM " << real_env->compIntensitySum()
-      << std::endl;
+  file << "SPEC_ID=" << header->getId() << std::endl;
+  file << "SPEC_SCAN=" << header->getScansString() << std::endl;
+  file << "MS_LEVEL=" << header->getMsLevel() << std::endl;
+  file << "REF_IDX=" << theo_env->getReferIdx() << std::endl;
+  file << "CHARGE=" << theo_env->getCharge() << std::endl;
+  file << "SCORE=" << match_env->getScore() << std::endl;
+  file << "THEO_PEAK_NUM=" << theo_env->getPeakNum() << std::endl;
+  file << "REAL_PEAK_NUM=" << (real_env->getPeakNum() - real_env->getMissPeakNum()) << std::endl;
+  file << "THEO_MONO_MZ=" << theo_env->getMonoMz() << std::endl;
+  file << "REAL_MONO_MZ=" << real_env->getMonoMz() << std::endl;
+  file << "THEO_MONO_MASS=" << theo_env->getMonoMass() << std::endl;
+  file << "REAL_MONO_MASS=" << real_env->getMonoMass() << std::endl;
+  file << "THEO_INTE_SUM=" << theo_env->compIntensitySum() << std::endl;
+  file << "REAL_INTE_SUM=" << real_env->compIntensitySum() << std::endl;
+
   for (int i = 0; i < theo_env->getPeakNum(); i++) {
     file << theo_env->getMz(i) << " " << theo_env->getIntensity(i) << " "
         << real_env->isExist(i) << " " << real_env->getPeakIdx(i) << " "
         << real_env->getMz(i) << " " << real_env->getIntensity(i) << std::endl;
   }
+
   file << "END ENVELOPE" << std::endl;
 }
 
-void write_spectrum(std::ofstream &file, MsHeaderPtr header, 
-                    MatchEnvPtrVec &envs) {
-  file << "BEGIN SPECTRUM" << std::endl;
-  file << "ID " << header->getId() << std::endl;
-  file << "SCANS " << header->getScansString() << std::endl;
-  file << "Ms_LEVEL " << header->getMsLevel() << std::endl;
-  file << "ENVELOPE_NUMBER " << envs.size() << std::endl;
-  file << "MONOISOTOPIC_MASS " << header->getPrecMonoMass();
-  file << "CHARGE " << header->getPrecCharge();
+void write_env_vec(std::ofstream &file, MsHeaderPtr header, const MatchEnvPtrVec & envs) {
   for (size_t i = 0; i < envs.size(); i++) {
-    write_env(file, envs[i]);
+    write_env(file, header, envs[i]);
   }
-  file << "END SPECTRUM" << std::endl;
+  file << std::endl;
 }
 
-void write(MsHeaderPtr header, MatchEnvPtrVec &envs) {
-  std::string file_name = "scan_" + header->getScansString() + ".env";
-  std::ofstream of(file_name, std::ofstream::out);
-  write_spectrum(of, header, envs);
+void write(const std::string & file, MsHeaderPtr header, const MatchEnvPtrVec & envs) {
+  std::ofstream of(file, std::ofstream::out|std::ofstream::app);
+  write_env_vec(of, header, envs);
   of.close();
 }
 

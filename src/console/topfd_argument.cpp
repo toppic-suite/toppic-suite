@@ -95,6 +95,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("multiple-mass,u", "Output multiple masses for one envelope.")
         ("spectrum-file-name", po::value<std::string>(&spectrum_file_name)->required(), "Spectrum file name with its path.")
         ("keep,k", "Report monoisotopic masses extracted from low quality isotopic envelopes.")
+        ("output-envelope-details,d", "Output env files for detailed info on envelopes.")
         ;
 
     po::positional_options_description positional_options;
@@ -158,6 +159,10 @@ bool Argument::parse(int argc, char* argv[]) {
 
     if (vm.count("missing-level-one")) {
       arguments_["missingLevelOne"] = "true";
+    }
+
+    if (vm.count("output-envelope-details")) {
+      arguments_["outputMatchEnv"] = "true";
     }
 
     if (vm.count("multiple-mass")) {

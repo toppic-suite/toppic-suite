@@ -22,12 +22,12 @@ namespace prot {
 
 namespace match_env_writer {
 
-void write_env(std::ofstream &file, MatchEnvPtr match_env); 
+void write_env(std::ofstream &file, MsHeaderPtr header, MatchEnvPtr match_env); 
 
-void write_spectrum(std::ofstream &file, MsHeaderPtr header, 
-                    MatchEnvPtrVec &envs); 
+void write_env_vec(std::ofstream &file, MsHeaderPtr header, const MatchEnvPtrVec & envs); 
 
-void write(MsHeaderPtr header, MatchEnvPtrVec &envs); 
+void write(const std::string & file, MsHeaderPtr header, const MatchEnvPtrVec & envs); 
+
 
 }  // namespace msalign_writer
 
