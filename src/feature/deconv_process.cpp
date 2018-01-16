@@ -82,27 +82,28 @@ void DeconvProcess::process() {
 
   std::string file_name = para_ptr_->getDataFileName();
   // writer
-  std::string ms1_name, ms2_name;
-  ms1_name = file_util::basename(file_name) + "_ms1.msalign";
-  ms2_name = file_util::basename(file_name) + "_ms2.msalign";
+  std::string ms1_msalign_name, ms2_msalign_name;
+  ms1_msalign_name = file_util::basename(file_name) + "_ms1.msalign";
+  ms2_msalign_name = file_util::basename(file_name) + "_ms2.msalign";
 
-  std::ofstream of1(ms1_name, std::ofstream::out);
-  std::ofstream of2(ms2_name, std::ofstream::out);
-  of1.precision(16);
-  of2.precision(16);
-  outputParameter(of1, para_ptr_, "#");
-  outputParameter(of2, para_ptr_, "#");
+  std::ofstream ms1_msalign_of(ms1_msalign_name, std::ofstream::out);
+  std::ofstream ms2_msalign_of(ms2_msalign_name, std::ofstream::out);
+  ms1_msalign_of.precision(16);
+  ms2_msalign_of.precision(16);
+  outputParameter(ms1_msalign_of, para_ptr_, "#");
+  outputParameter(ms2_msalign_of, para_ptr_, "#");
 
   DeconvOneSpPtr deconv_ptr = std::make_shared<DeconvOneSp>(mng_ptr);
 
   FeatureMsReaderPtr reader_ptr = std::make_shared<FeatureMsReader>(file_name);
-  processSp(deconv_ptr, reader_ptr, of1, of2);
-  of1.close();
-  of2.close();
+  processSp(deconv_ptr, reader_ptr, ms1_msalign_of, ms2_msalign_of);
+
+  ms1_msalign_of.close();
+  ms2_msalign_of.close();
 }
 
 void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr, FeatureMsReaderPtr reader_ptr,
-                              std::ofstream &of1, std::ofstream &of2) {
+                              std::ofstream & ms1_msalign_of, std::ofstream & ms2_msalign_of) {
   // reader_ptr
   int total_scan_num = reader_ptr->getInputSpNum();
   RawMsPtr ms_ptr;
@@ -125,7 +126,10 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr, FeatureMsReaderPtr read
       deconv_ptr->run();
       MatchEnvPtrVec result_envs = deconv_ptr->getResult();
       DeconvMsPtr ms_ptr = match_env_util::getDeconvMsPtr(header_ptr, result_envs);
-      msalign_writer::write(of1, ms_ptr);
+      msalign_writer::write(ms1_msalign_of, ms_ptr);
+      if (para_ptr_->output_match_env_) {
+        match_env_writer::write(file_util::basename(para_ptr_->getDataFileName()) + "_ms1.env", header_ptr, result_envs);
+      }
       count1++;
     } else {
       if (para_ptr_->missing_level_one_) {
@@ -145,9 +149,9 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr, FeatureMsReaderPtr read
       deconv_ptr->run();
       MatchEnvPtrVec result_envs = deconv_ptr->getResult();
       DeconvMsPtr ms_ptr = match_env_util::getDeconvMsPtr(header_ptr, result_envs);
-      msalign_writer::write(of2, ms_ptr);
+      msalign_writer::write(ms2_msalign_of, ms_ptr);
       if (para_ptr_->output_match_env_) {
-        match_env_writer::write(header_ptr, result_envs);
+        match_env_writer::write(file_util::basename(para_ptr_->getDataFileName()) + "_ms2.env", header_ptr, result_envs);
       }
       count2++;
     }
