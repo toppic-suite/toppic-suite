@@ -1,3 +1,6 @@
+Version 1.1.2 (Jan, 2018)
+    * Reduced memory usage in xml generation.
+
 Version 1.1.1 (Nov, 2017)
     * Fixed the locale problem on non-English system
 
