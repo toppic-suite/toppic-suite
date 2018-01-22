@@ -167,13 +167,13 @@ void XmlGenerator::outputProteins() {
       prsm_ptrs[k]->setDeconvMsPtrVec(deconv_ms_vec2d_[spec_id_extend_ms_map_[prsm_ptrs[k]->getSpectrumId()]]);
       prsm_ptrs[k]->setRefineMsVec(extend_ms_vec2d_[spec_id_extend_ms_map_[prsm_ptrs[k]->getSpectrumId()]]);
     }
-    std::vector<int> species = PrsmUtil::getSpeciesIds(prsm_ptrs);
-    if (!species.empty()) {
+    std::vector<int> cluster = PrsmUtil::getSpeciesIds(prsm_ptrs);
+    if (!cluster.empty()) {
       std::string file_name = mng_ptr_->xml_path_ + FileUtil::getFileSeparator() + "proteins" 
           + FileUtil::getFileSeparator() + "protein" + StringUtil::convertToString(prot_id) + ".xml";
-      XmlWriter writer(file_name,"");
-      writer.write(proteinToXml(writer.getDoc(), prsm_ptrs, prot_id, species, mng_ptr_));
-      writer.close();
+      XmlWriterPtr writer = std::make_shared<XmlWriter>(file_name, "");
+      writeProteinToXml(writer, prsm_ptrs, prot_id, cluster, mng_ptr_, true, false);
+      writer->close();
       std::vector<std::string> file_info;
       file_info.push_back(file_name);
       file_info.push_back(mng_ptr_->executive_dir_ + FileUtil::getFileSeparator() + "toppic_resources" 

@@ -18,6 +18,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <memory>
 
 #include "base/xml_dom_document.hpp"
 #include "base/logger.hpp"
@@ -28,17 +29,28 @@ class XmlWriter {
  public:
   XmlWriter(const std::string &file_name,
             const std::string &root);
+
   ~XmlWriter();
+
   XmlDOMDocument* getDoc(){return doc_;}
+
   void write(xercesc::DOMElement* element);
+
+  void write_str(const std::string & str);
+
   void close();
 
  private:
-  xercesc::DOMLSSerializer* serializer_;
-  XmlDOMDocument* doc_;
+  xercesc::DOMLSSerializer * serializer_;
+
+  XmlDOMDocument * doc_;
+
   std::ofstream file_;
-  std::string root_="";
+
+  std::string root_ = "";
 };
+
+typedef std::shared_ptr<XmlWriter> XmlWriterPtr;
 
 } /* namespace prot */
 

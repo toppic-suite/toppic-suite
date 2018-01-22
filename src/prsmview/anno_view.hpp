@@ -22,6 +22,7 @@
 
 #include "base/extreme_value.hpp"
 #include "base/proteoform.hpp"
+#include "base/xml_writer.hpp"
 #include "spec/deconv_peak.hpp"
 #include "spec/extend_peak.hpp"
 #include "spec/sp_para.hpp"
@@ -44,13 +45,19 @@ typedef std::shared_ptr<AnnoView> AnnoViewPtr;
 std::vector<std::vector<std::string>> readViewXmlFiles(const std::string &file_name);
 
 xercesc::DOMElement* proteoformToXml(XmlDOMDocument* xml_doc, const PrsmPtrVec &prsm_ptrs,
-                                     PrsmViewMngPtr mng_ptr, bool detail = true);
+                                     PrsmViewMngPtr mng_ptr, bool detail = true, bool add_ms = true);
 
 xercesc::DOMElement* proteinToXml(XmlDOMDocument* xml_doc,
                                   const PrsmPtrVec &prsm_ptrs,
                                   int prot_id,
-                                  const std::vector<int> &species_ids,
-                                  PrsmViewMngPtr mng_ptr, bool detail = true);
+                                  const std::vector<int> &cluster_ids,
+                                  PrsmViewMngPtr mng_ptr, bool detail = true, bool add_ms = true);
+
+void writeProteinToXml(XmlWriterPtr xml_writer,
+                       const PrsmPtrVec &prsm_ptrs,
+                       int prot_id,
+                       const std::vector<int> &species_ids,
+                       PrsmViewMngPtr mng_ptr, bool detail = true, bool add_ms = true);
 
 }  // namespace prot
 

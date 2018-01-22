@@ -18,8 +18,7 @@
 
 namespace prot {
 
-XmlWriter::XmlWriter(const std::string &file_name,
-                     const std::string &root){
+XmlWriter::XmlWriter(const std::string &file_name, const std::string &root) {
   file_.open(file_name.c_str());
   root_ = root;
   LOG_DEBUG("file_name " << file_name);
@@ -32,18 +31,22 @@ XmlWriter::XmlWriter(const std::string &file_name,
   serializer_ = impl->createSerializer();
 }
 
-XmlWriter::~XmlWriter(){
+XmlWriter::~XmlWriter() {
   serializer_->release();
   delete doc_;
 }
 
-void XmlWriter::write(xercesc::DOMElement* element){
+void XmlWriter::write(xercesc::DOMElement* element) {
   std::string str = XmlDomUtil::writeToString(serializer_, element);
   XmlDomUtil::writeToStreamByRemovingDoubleLF(file_, str);
   element->release();
 }
 
-void XmlWriter::close(){
+void XmlWriter::write_str(const std::string & str) {
+  file_ << str << std::endl;
+}
+
+void XmlWriter::close() {
   if(root_.compare("")!=0){
     file_ << "</"+root_+">" << std::endl;
   }
