@@ -169,9 +169,9 @@ void XmlGenerator::outputProteins() {
     if (!cluster.empty()) {
       std::string file_name = mng_ptr_->xml_path_ + file_util::getFileSeparator() + "proteins" 
           + file_util::getFileSeparator() + "protein" + string_util::convertToString(prot_id) + ".xml";
-      XmlWriter writer(file_name,"");
-      writer.write(proteinToXml(writer.getDoc(), prsm_ptrs, prot_id, cluster, mng_ptr_));
-      writer.close();
+      XmlWriterPtr writer = std::make_shared<XmlWriter>(file_name, "");
+      writeProteinToXml(writer, prsm_ptrs, prot_id, cluster, mng_ptr_, true, false);
+      writer->close();
       std::vector<std::string> file_info;
       file_info.push_back(file_name);
       file_info.push_back(mng_ptr_->resource_dir_ + file_util::getFileSeparator() + "xsl" + file_util::getFileSeparator() + "protein.xsl");
