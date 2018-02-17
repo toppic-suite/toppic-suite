@@ -120,53 +120,53 @@ void PrsmTableWriter::write() {
   file.close();
 }
 
-std::string outputChangePtr(ProteoformPtr proteoform_ptr) {
-  StringPairVec string_pairs = proteoform_ptr->getFastaSeqPtr()->getAcidPtmPairVec();
-  int start_pos = proteoform_ptr->getStartPos();
-  ChangePtrVec change_vec = proteoform_ptr->getChangePtrVec(ChangeType::UNEXPECTED);
-  std::string res = "";
-  for (size_t i = 0; i < change_vec.size(); i++) {
-    if (change_vec[i]->getLocalAnno() == nullptr)
-      continue;
+/*std::string outputChangePtr(ProteoformPtr proteoform_ptr) {*/
+  //StringPairVec string_pairs = proteoform_ptr->getFastaSeqPtr()->getAcidPtmPairVec();
+  //int start_pos = proteoform_ptr->getStartPos();
+  //ChangePtrVec change_vec = proteoform_ptr->getChangePtrVec(ChangeType::UNEXPECTED);
+  //std::string res = "";
+  //for (size_t i = 0; i < change_vec.size(); i++) {
+    //if (change_vec[i]->getLocalAnno() == nullptr)
+      //continue;
 
-    if (change_vec[i]->getLocalAnno()->getPtmPtr() != nullptr) {
-      std::vector<double> scr_vec = change_vec[i]->getLocalAnno()->getScrVec();
-      int left_db_bp = change_vec[i]->getLeftBpPos() + start_pos;
-      int right_db_bp = change_vec[i]->getRightBpPos() + start_pos;
-      res = res + change_vec[i]->getLocalAnno()->getPtmPtr()->getAbbrName() + "[";
-      for (int j = left_db_bp; j < right_db_bp; j++) {
-        // std::string acid_letter = fasta_seq.substr(j, 1);
-        std::string acid_letter = string_pairs[j].first;
-        double scr = std::floor(scr_vec[j - left_db_bp] * 1000) / 10;
-        if (scr == 100) scr = 99.9;
-        if (scr == 0) continue;
+    //if (change_vec[i]->getLocalAnno()->getPtmPtr() != nullptr) {
+      //std::vector<double> scr_vec = change_vec[i]->getLocalAnno()->getScrVec();
+      //int left_db_bp = change_vec[i]->getLeftBpPos() + start_pos;
+      //int right_db_bp = change_vec[i]->getRightBpPos() + start_pos;
+      //res = res + change_vec[i]->getLocalAnno()->getPtmPtr()->getAbbrName() + "[";
+      //for (int j = left_db_bp; j < right_db_bp; j++) {
+        //// std::string acid_letter = fasta_seq.substr(j, 1);
+        //std::string acid_letter = string_pairs[j].first;
+        //double scr = std::floor(scr_vec[j - left_db_bp] * 1000) / 10;
+        //if (scr == 100) scr = 99.9;
+        //if (scr == 0) continue;
 
-        res = res + acid_letter + std::to_string(j + 1) + ":";
-        std::stringstream ss;
-        ss << std::fixed << std::setprecision(1) << scr;
-        res  = res + ss.str() + "%";
-        if (j != right_db_bp - 1) {
-          res = res + "; ";
-        }
-      }
-      res = res + "]";
-    }
+        //res = res + acid_letter + std::to_string(j + 1) + ":";
+        //std::stringstream ss;
+        //ss << std::fixed << std::setprecision(1) << scr;
+        //res  = res + ss.str() + "%";
+        //if (j != right_db_bp - 1) {
+          //res = res + "; ";
+        //}
+      //}
+      //res = res + "]";
+    //}
 
-    if (i != change_vec.size() - 1) {
-      res = res + "; ";
-    }
-  }
-  if (res == "") {
-    res = "-";
-  }
-  return res;
-}
+    //if (i != change_vec.size() - 1) {
+      //res = res + "; ";
+    //}
+  //}
+  //if (res == "") {
+    //res = "-";
+  //}
+  //return res;
+/*}*/
 
 void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   std::string spec_ids;
   std::string spec_activations;
   std::string spec_scans;
-  int ptm_num = prsm_ptr->getProteoformPtr()->getChangeNum(ChangeType::UNEXPECTED);
+  int ptm_num = prsm_ptr->getProteoformPtr()->getMassShiftNum(MassShiftType::UNEXPECTED);
   int peak_num = 0;
   DeconvMsPtrVec deconv_ms_ptr_vec = prsm_ptr->getDeconvMsPtrVec();
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
@@ -209,7 +209,7 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
     if (ptm_num == 0) {
       file << "-\t";
     } else {
-      file << outputChangePtr(prsm_ptr->getProteoformPtr()) << "\t";
+      //file << outputChangePtr(prsm_ptr->getProteoformPtr()) << "\t";
     }
   }
 

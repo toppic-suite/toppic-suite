@@ -25,8 +25,7 @@ namespace prot {
 
 namespace proteoform_util {
 
-ResFreqPtrVec compNTermResidueFreq(
-    const ProteoformPtrVec &prot_mod_forms) {
+ResFreqPtrVec compNTermResidueFreq(const ProteoformPtrVec &prot_mod_forms) {
   std::vector<double> counts;
   ResiduePtrVec residue_list;
   for (size_t i = 0; i < prot_mod_forms.size(); i++) {
@@ -36,7 +35,7 @@ ResFreqPtrVec compNTermResidueFreq(
       int pos = residue_util::findResidue(residue_list, res_ptr);
       if (pos >= 0) {
         // found
-        counts[pos] = counts[pos]+1;
+        counts[pos] = counts[pos] + 1;
       } else {
         residue_list.push_back(res_ptr);
         counts.push_back(1);
@@ -50,9 +49,9 @@ ResFreqPtrVec compNTermResidueFreq(
   }
   ResFreqPtrVec res_freq_list;
   for (size_t i = 0; i < residue_list.size(); i++) {
-    ResFreqPtr res_freq_ptr(new ResidueFreq(residue_list[i]->getAminoAcidPtr(),
-                                            residue_list[i]->getPtmPtr(),
-                                            counts[i]/sum));
+    ResFreqPtr res_freq_ptr = std::make_shared<ResidueFreq>(residue_list[i]->getAminoAcidPtr(),
+                                                            residue_list[i]->getPtmPtr(),
+                                                            counts[i] / sum);
     res_freq_list.push_back(res_freq_ptr);
   }
   return res_freq_list;
@@ -60,7 +59,7 @@ ResFreqPtrVec compNTermResidueFreq(
 
 
 ResFreqPtrVec compResidueFreq(const ResiduePtrVec &residue_list,
-                                              const ProteoformPtrVec &prot_mod_forms) {
+                              const ProteoformPtrVec &prot_mod_forms) {
   std::vector<double> counts(residue_list.size(), 0.0);
   for (size_t i = 0; i < prot_mod_forms.size(); i++) {
     ResSeqPtr seq_ptr = prot_mod_forms[i]->getResSeqPtr();
@@ -80,9 +79,9 @@ ResFreqPtrVec compResidueFreq(const ResiduePtrVec &residue_list,
   }
   ResFreqPtrVec res_freq_list;
   for (size_t i = 0; i < residue_list.size(); i++) {
-    ResFreqPtr res_freq_ptr(new ResidueFreq(residue_list[i]->getAminoAcidPtr(),
-                                            residue_list[i]->getPtmPtr(),
-                                            counts[i]/sum));
+    ResFreqPtr res_freq_ptr = std::make_shared<ResidueFreq>(residue_list[i]->getAminoAcidPtr(),
+                                                            residue_list[i]->getPtmPtr(),
+                                                            counts[i] / sum);
     res_freq_list.push_back(res_freq_ptr);
   }
   return res_freq_list;
@@ -109,18 +108,18 @@ bool isStrictCompatiablePtmSpecies(ProteoformPtr a, ProteoformPtr b, double ppo)
   if (!isSameSeqAndMass(a, b, ppo)) {
     return false;
   }
-  if (a->getChangePtrVec().size() != b->getChangePtrVec().size()) {
+  if (a->getMassShiftNum() != b->getMassShiftNum()) {
     return false;
   }
   double shift_tolerance = a->getResSeqPtr()->getSeqMass() * ppo;
-  // sort changes
-  ChangePtrVec a_change_vec = a->getChangePtrVec();
-  ChangePtrVec b_change_vec = b->getChangePtrVec();
-  std::sort(a_change_vec.begin(), a_change_vec.end(), Change::cmpPosInc);
-  std::sort(b_change_vec.begin(), b_change_vec.end(), Change::cmpPosInc);
-  for (size_t i = 0; i < a->getChangePtrVec().size(); i++) {
-    ChangePtr ac = a_change_vec[i];
-    ChangePtr bc = b_change_vec[i];
+  // sort mass shifts
+  MassShiftPtrVec a_shift_vec = a->getMassShiftPtrVec();
+  MassShiftPtrVec b_shift_vec = b->getMassShiftPtrVec();
+  std::sort(a_shift_vec.begin(), a_shift_vec.end(), MassShift::cmpPosInc);
+  std::sort(b_shift_vec.begin(), b_shift_vec.end(), MassShift::cmpPosInc);
+  for (int i = 0; i < a->getMassShiftNum(); i++) {
+    MassShiftPtr ac = a_shift_vec[i];
+    MassShiftPtr bc = b_shift_vec[i];
     if (ac->getRightBpPos() <= bc->getLeftBpPos() || bc->getRightBpPos() <= ac->getLeftBpPos()) {
       return false;
     }
@@ -196,9 +195,9 @@ std::vector<double> getNTermAcets(ProteoformPtr db_form_ptr,
   return shifts;
 }
 
-std::vector<std::vector<double>> getNTermShift2D(const ProteoformPtrVec & db_form_ptr_vec,
-                                                 const ProtModPtrVec &prot_mod_ptrs) {
-  std::vector<std::vector<double>> shifts_2d;
+std::vector<std::vector<double> > getNTermShift2D(const ProteoformPtrVec & db_form_ptr_vec,
+                                                  const ProtModPtrVec &prot_mod_ptrs) {
+  std::vector<std::vector<double> > shifts_2d;
   for (size_t i = 0; i < db_form_ptr_vec.size(); i++) {
     std::vector<double> shifts = getNTermShift(db_form_ptr_vec[i], prot_mod_ptrs);
     shifts_2d.push_back(shifts);
@@ -206,9 +205,9 @@ std::vector<std::vector<double>> getNTermShift2D(const ProteoformPtrVec & db_for
   return shifts_2d;
 }
 
-std::vector<std::vector<double>> getNTermAcet2D(const ProteoformPtrVec & db_form_ptr_vec,
-                                                const ProtModPtrVec &prot_mod_ptrs) {
-  std::vector<std::vector<double>> shifts_2d;
+std::vector<std::vector<double> > getNTermAcet2D(const ProteoformPtrVec & db_form_ptr_vec,
+                                                 const ProtModPtrVec &prot_mod_ptrs) {
+  std::vector<std::vector<double> > shifts_2d;
   for (size_t i = 0; i < db_form_ptr_vec.size(); i++) {
     std::vector<double> shifts = getNTermAcets(db_form_ptr_vec[i], prot_mod_ptrs);
     shifts_2d.push_back(shifts);

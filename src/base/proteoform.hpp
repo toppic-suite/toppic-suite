@@ -20,7 +20,7 @@
 #include "base/fasta_seq.hpp"
 #include "base/fasta_index_reader.hpp"
 #include "base/bp_spec.hpp"
-#include "base/change.hpp"
+#include "base/mass_shift.hpp"
 #include "base/segment.hpp"
 #include "base/prot_mod.hpp"
 #include "base/align_type.hpp"
@@ -33,9 +33,11 @@ typedef std::shared_ptr<Proteoform> ProteoformPtr;
 
 class Proteoform {
  public:
-  Proteoform(FastaSeqPtr fasta_seq_ptr, ProtModPtr prot_mod_ptr, 
-             int start_pos, int end_pos, ResSeqPtr res_seq_ptr, 
-             const ChangePtrVec &change_ptr_vec);
+  Proteoform(FastaSeqPtr fasta_seq_ptr,
+             ProtModPtr prot_mod_ptr, 
+             int start_pos, int end_pos,
+             ResSeqPtr res_seq_ptr, 
+             const MassShiftPtrVec & mass_shift_ptr_vec);
 
   Proteoform(xercesc::DOMElement* element, FastaIndexReaderPtr reader_ptr,
              const ModPtrVec &fix_mod_list);
@@ -58,9 +60,13 @@ class Proteoform {
 
   int getLen() { return end_pos_ - start_pos_ + 1; }
 
-  int getChangeNum() {return change_list_.size();}
+  int getMassShiftNum() {return static_cast<int>(mass_shift_list_.size());}
 
-  ChangePtrVec getChangePtrVec() {return change_list_;}
+  int getMassShiftNum(MassShiftTypePtr ct_ptr);
+
+  MassShiftPtrVec getMassShiftPtrVec() {return mass_shift_list_;}
+
+  MassShiftPtrVec getMassShiftPtrVec(MassShiftTypePtr ct_ptr);
 
   int getProteoClusterId() {return proteo_cluster_id_;}
 
@@ -74,15 +80,11 @@ class Proteoform {
 
   AlignTypePtr getAlignType();
 
-  int getChangeNum(ChangeTypePtr ct_ptr);
+  void addMassShiftPtrVec(MassShiftPtrVec & shift_ptr_vec);
 
-  ChangePtrVec getChangePtrVec(ChangeTypePtr ct_ptr);
+  //void addChangePtr(ChangePtr &change_ptr);
 
-  void addChangePtrVec(ChangePtrVec &change_ptr_vec);
-
-  void addChangePtr(ChangePtr &change_ptr);
-
-  void rmChangePtr(ChangePtr &change_ptr);
+  //void rmChangePtr(ChangePtr &change_ptr);
 
   SegmentPtrVec getSegmentPtrVec();
 
@@ -121,7 +123,7 @@ class Proteoform {
 
   int prot_id_ = -1;
 
-  ChangePtrVec change_list_;
+  MassShiftPtrVec mass_shift_list_;
 
   // Number of variable ptms is used for the test of the mass graph approach
   int variable_ptm_num_ = 0;

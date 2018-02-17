@@ -30,7 +30,7 @@ void PrsmProb::process() {
   PrsmXmlWriter all_writer(file_util::basename(spec_file_name_) + "." + output_file_ext_);
 
   while (prsm_ptr != nullptr) {
-    int shift_num = prsm_ptr->getProteoformPtr()->getChangeNum(ChangeType::UNEXPECTED);
+    int shift_num = prsm_ptr->getProteoformPtr()->getMassShiftNum(MassShiftType::UNEXPECTED);
     AlignTypePtr type_ptr = prsm_ptr->getProteoformPtr()->getAlignType();
     ExtremeValuePtr prob_ptr = prsm_ptr->getExtremeValuePtr();
     if (shift_num == 1) {

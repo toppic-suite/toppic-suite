@@ -19,10 +19,10 @@
 #include <string>
 #include <vector>
 
-#include "base/change_type.hpp"
+#include "base/mass_shift_type.hpp"
 #include "base/mod.hpp"
 #include "base/xml_dom_document.hpp"
-#include "base/local_anno.hpp"
+//#include "base/local_anno.hpp"
 
 namespace prot {
 
@@ -32,14 +32,12 @@ typedef std::shared_ptr<Change> ChangePtr;
 class Change {
  public:
   Change(int left_bp_pos, int right_bp_pos,
-         ChangeTypePtr change_type_ptr,
-         double mass_shift, ModPtr mod_ptr):
+         MassShiftTypePtr type_ptr,
+         double mass, ModPtr mod_ptr):
       left_bp_pos_(left_bp_pos),
       right_bp_pos_(right_bp_pos),
-      change_type_ptr_(change_type_ptr),
-      mass_shift_(mass_shift),
-      mod_ptr_(mod_ptr),
-      local_anno_ptr_(nullptr) {}
+      type_ptr_(type_ptr),
+      mass_(mass), mod_ptr_(mod_ptr) {}
 
   explicit Change(xercesc::DOMElement* change_element);
 
@@ -51,23 +49,21 @@ class Change {
 
   void setRightBpPos(int p) {right_bp_pos_ = p;}
 
-  ChangeTypePtr getChangeTypePtr() {return change_type_ptr_;}
+  MassShiftTypePtr getTypePtr() {return type_ptr_;}
 
-  double getMassShift() {return mass_shift_;}
+  double getMass() {return mass_;}
 
-  void setMassShift(double m) {mass_shift_ = m;}
+  void setMass(double m) {mass_ = m;}
 
   ModPtr getModPtr() {return mod_ptr_;}
 
-  LocalAnnoPtr getLocalAnno() {return local_anno_ptr_;}
+  /*LocalAnnoPtr getLocalAnno() {return local_anno_ptr_;}*/
 
-  void setLocalAnno(LocalAnnoPtr p);
+  /*void setLocalAnno(LocalAnnoPtr p);*/
 
   void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
   static std::string getXmlElementName() {return "change";}
-
-  static bool cmpPosInc(const ChangePtr &a, const ChangePtr &b);
 
   static ChangePtr geneChangePtr(ChangePtr ori_change_ptr, int start_pos);
 
@@ -77,13 +73,13 @@ class Change {
 
   int right_bp_pos_;
 
-  ChangeTypePtr change_type_ptr_;
+  MassShiftTypePtr type_ptr_;
 
-  double mass_shift_;
+  double mass_;
 
   ModPtr mod_ptr_;
 
-  LocalAnnoPtr local_anno_ptr_;
+  //LocalAnnoPtr local_anno_ptr_;
 };
 
 typedef std::vector<ChangePtr> ChangePtrVec;

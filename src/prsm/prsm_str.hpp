@@ -22,20 +22,20 @@
 
 namespace prot {
 
-class ChangeStr {
+class MassShiftStr {
  public:
-  ChangeStr(double mass_shift, int left_pos, int right_pos):
+  MassShiftStr(double mass_shift, int left_pos, int right_pos):
       mass_shift_(mass_shift),
       left_pos_(left_pos),
       right_pos_(right_pos) {}
 
   double mass_shift_;
   int left_pos_, right_pos_;
-  static bool cmpPosInc(const std::shared_ptr<ChangeStr> &a,
-                        const std::shared_ptr<ChangeStr> &b);
+  static bool cmpPosInc(const std::shared_ptr<MassShiftStr> &a,
+                        const std::shared_ptr<MassShiftStr> &b);
 };
 
-typedef std::shared_ptr<ChangeStr> ChangeStrPtr;
+typedef std::shared_ptr<MassShiftStr> MassShiftStrPtr;
 
 class PrsmStr;
 typedef std::shared_ptr<PrsmStr> PrsmStrPtr;
@@ -82,7 +82,7 @@ class PrsmStr {
 
   double getAdjustedPrecMass() {return adjusted_prec_mass_;}
 
-  std::vector<std::shared_ptr<ChangeStr> > getChangeStrVec() {return change_vec_;}
+  std::vector<MassShiftStrPtr> getChangeStrVec() {return mass_shift_vec_;}
 
   std::string getProteinMatchSeq() {return protein_match_seq_;}
 
@@ -178,7 +178,7 @@ class PrsmStr {
 
   double proteoform_fdr_;
 
-  std::vector<std::shared_ptr<ChangeStr> > change_vec_;
+  std::vector<MassShiftStrPtr> mass_shift_vec_;
 
   std::string protein_match_seq_;
 };

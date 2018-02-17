@@ -19,7 +19,7 @@
 #include <vector>
 
 #include "base/logger.hpp"
-#include "base/change_type.hpp"
+#include "base/mass_shift_type.hpp"
 #include "base/mod_base.hpp"
 #include "base/prot_mod_base.hpp"
 #include "base/string_util.hpp"
@@ -30,9 +30,11 @@
 
 namespace prot {
 
-Proteoform::Proteoform(FastaSeqPtr fasta_seq_ptr, ProtModPtr prot_mod_ptr, 
-                       int start_pos, int end_pos, ResSeqPtr res_seq_ptr, 
-                       const ChangePtrVec &change_ptr_vec):
+Proteoform::Proteoform(FastaSeqPtr fasta_seq_ptr,
+                       ProtModPtr prot_mod_ptr, 
+                       int start_pos, int end_pos,
+                       ResSeqPtr res_seq_ptr, 
+                       const MassShiftPtrVec & mass_shift_ptr_vec):
     fasta_seq_ptr_(fasta_seq_ptr),
     prot_mod_ptr_(prot_mod_ptr),
     start_pos_(start_pos),
@@ -40,9 +42,9 @@ Proteoform::Proteoform(FastaSeqPtr fasta_seq_ptr, ProtModPtr prot_mod_ptr,
     residue_seq_ptr_(res_seq_ptr),
     proteo_cluster_id_(-1),
     prot_id_(-1),
-    change_list_(change_ptr_vec) {
+    mass_shift_list_(mass_shift_ptr_vec) {
       bp_spec_ptr_ = std::make_shared<BpSpec>(res_seq_ptr);
-      std::sort(change_list_.begin(), change_list_.end(), Change::cmpPosInc);
+      std::sort(mass_shift_list_.begin(), mass_shift_list_.end(), MassShift::cmpPosInc);
     }
 
 Proteoform::Proteoform(xercesc::DOMElement* element, FastaIndexReaderPtr reader_ptr,
@@ -86,15 +88,15 @@ void Proteoform::parseXml(xercesc::DOMElement* element, ProteoformPtr form_ptr) 
   bp_spec_ptr_ = std::make_shared<BpSpec>(residue_seq_ptr_);
 
   // LOG_DEBUG("start parse changes");
-  std::string change_element_name = Change::getXmlElementName();
+  std::string shift_element_name = MassShift::getXmlElementName();
 
-  xercesc::DOMElement* change_list_element = xml_dom_util::getChildElement(element, "change_list", 0);
-  int change_len = xml_dom_util::getChildCount(change_list_element, change_element_name.c_str());
+  xercesc::DOMElement* change_list_element = xml_dom_util::getChildElement(element, "mass_shift_list", 0);
+  int shift_len = xml_dom_util::getChildCount(change_list_element, shift_element_name.c_str());
 
-  for (int i = 0; i < change_len; i++) {
-    xercesc::DOMElement* change_element 
-        = xml_dom_util::getChildElement(change_list_element, change_element_name.c_str(), i);
-    change_list_.push_back(std::make_shared<Change>(change_element));
+  for (int i = 0; i < shift_len; i++) {
+    xercesc::DOMElement* shift_element 
+        = xml_dom_util::getChildElement(change_list_element, shift_element_name.c_str(), i);
+    mass_shift_list_.push_back(std::make_shared<MassShift>(shift_element));
   }
   // LOG_DEBUG("end parse proteoform");
 }
@@ -102,11 +104,11 @@ void Proteoform::parseXml(xercesc::DOMElement* element, ProteoformPtr form_ptr) 
 // get mass of the modified proteoform
 double Proteoform::getMass() {
   double mass = getResSeqPtr()->getSeqMass();
-  for (size_t i = 0; i < change_list_.size(); i++) {
+  for (size_t i = 0; i < mass_shift_list_.size(); i++) {
     // only unexpected and variable changes need to to added
-    if (change_list_[i]->getChangeTypePtr() == ChangeType::UNEXPECTED
-        || change_list_[i]->getChangeTypePtr() == ChangeType::VARIABLE) {
-      mass += change_list_[i]->getMassShift();
+    if (mass_shift_list_[i]->getTypePtr() == MassShiftType::UNEXPECTED
+        || mass_shift_list_[i]->getTypePtr() == MassShiftType::VARIABLE) {
+      mass += mass_shift_list_[i]->getMassShift();
     }
   }
   return mass;
@@ -140,66 +142,66 @@ AlignTypePtr Proteoform::getAlignType() {
   }
 }
 
-int Proteoform::getChangeNum(ChangeTypePtr ct_ptr) {
+int Proteoform::getMassShiftNum(MassShiftTypePtr ct_ptr){
   int n = 0;
-  for (size_t i = 0; i < change_list_.size(); i++) {
-    if (change_list_[i]->getChangeTypePtr() == ct_ptr) {
+  for (size_t i = 0; i < mass_shift_list_.size(); i++) {
+    if (mass_shift_list_[i]->getTypePtr() == ct_ptr) {
       n++;
     }
   }
   return n;
 }
 
-ChangePtrVec Proteoform::getChangePtrVec(ChangeTypePtr ct_ptr) {
-  ChangePtrVec change_ptr_vec;
-  for (size_t i = 0; i < change_list_.size(); i++) {
-    if (change_list_[i]->getChangeTypePtr() == ct_ptr) {
-      change_ptr_vec.push_back(change_list_[i]);
+MassShiftPtrVec Proteoform::getMassShiftPtrVec(MassShiftTypePtr ct_ptr) {
+  MassShiftPtrVec shift_ptr_vec;
+  for (size_t i = 0; i < mass_shift_list_.size(); i++) {
+    if (mass_shift_list_[i]->getTypePtr() == ct_ptr) {
+      shift_ptr_vec.push_back(mass_shift_list_[i]);
     }
   }
-  return change_ptr_vec;
+  return shift_ptr_vec;
 }
 
-void Proteoform::addChangePtrVec(ChangePtrVec &new_changes) {
-  change_list_.insert(change_list_.end(), new_changes.begin(), new_changes.end());
+void Proteoform::addMassShiftPtrVec(MassShiftPtrVec & new_shift_ptr_vec) {
+  mass_shift_list_.insert(mass_shift_list_.end(), new_shift_ptr_vec.begin(), new_shift_ptr_vec.end());
 }
 
-void Proteoform::addChangePtr(ChangePtr &change_ptr) {
-  change_list_.push_back(change_ptr);
-}
+/*void Proteoform::addChangePtr(ChangePtr &change_ptr) {*/
+//change_list_.push_back(change_ptr);
+/*}*/
 
-void Proteoform::rmChangePtr(ChangePtr &change_ptr) {
-  for (auto iter = change_list_.begin(); iter != change_list_.end(); iter++) {
-    if (*iter == change_ptr) {
-      change_list_.erase(iter);
-      return;
-    }
-  }
-}
+/*void Proteoform::rmChangePtr(ChangePtr &change_ptr) {*/
+//for (auto iter = change_list_.begin(); iter != change_list_.end(); iter++) {
+//if (*iter == change_ptr) {
+//change_list_.erase(iter);
+//return;
+//}
+//}
+/*}*/
 
 // get several segments without unexpected PTMs from a proteoform 
 SegmentPtrVec Proteoform::getSegmentPtrVec() {
-  ChangePtrVec changes;
+  MassShiftPtrVec shifts;
   double mass_shift_sum = 0;
-  for (size_t i = 0; i < change_list_.size(); i++) {
-    ChangeTypePtr change_type_ptr = change_list_[i]->getChangeTypePtr();
-    if (change_type_ptr == ChangeType::UNEXPECTED
-        || change_type_ptr == ChangeType::VARIABLE) {
-      changes.push_back(change_list_[i]);
-      mass_shift_sum += change_list_[i]->getMassShift();
+  for (size_t i = 0; i < mass_shift_list_.size(); i++) {
+    MassShiftTypePtr type_ptr = mass_shift_list_[i]->getTypePtr();
+    if (type_ptr == MassShiftType::UNEXPECTED || type_ptr == MassShiftType::VARIABLE) {
+      shifts.push_back(mass_shift_list_[i]);
+      mass_shift_sum += mass_shift_list_[i]->getMassShift();
     }
   }
+
   SegmentPtrVec segments;
   double n_shift = 0;
   double c_shift = mass_shift_sum;
   int left = 0;
-  for (size_t i = 0; i < changes.size(); i++) {
-    int right = changes[i]->getLeftBpPos();
+  for (size_t i = 0; i < shifts.size(); i++) {
+    int right = shifts[i]->getLeftBpPos();
     SegmentPtr segment_ptr = std::make_shared<Segment>(left, right, n_shift, c_shift);
     segments.push_back(segment_ptr);
-    left = changes[i]->getRightBpPos();
-    n_shift = n_shift + changes[i]->getMassShift();
-    c_shift = c_shift - changes[i]->getMassShift();
+    left = shifts[i]->getRightBpPos();
+    n_shift = n_shift + shifts[i]->getMassShift();
+    c_shift = c_shift - shifts[i]->getMassShift();
   }
   int right = residue_seq_ptr_->getLen();
   SegmentPtr segment_ptr = std::make_shared<Segment>(left, right, n_shift, c_shift);
@@ -207,26 +209,29 @@ SegmentPtrVec Proteoform::getSegmentPtrVec() {
   return segments;
 }
 
-inline void updateMatchSeq(const ChangePtrVec &changes,
-                           std::vector<std::string> &left_strings,
-                           std::vector<std::string> &right_strings) {
-  for (size_t i = 0; i < changes.size(); i++) {
-    int left_pos = changes[i]->getLeftBpPos();
+void updateMatchSeq(const MassShiftPtrVec & shifts,
+                    std::vector<std::string> &left_strings,
+                    std::vector<std::string> &right_strings) {
+  for (size_t i = 0; i < shifts.size(); i++) {
+    int left_pos = shifts[i]->getLeftBpPos();
     left_strings[left_pos] = "(" + left_strings[left_pos];
-    int right_pos = changes[i]->getRightBpPos();
-    double shift = changes[i]->getMassShift();
+    int right_pos = shifts[i]->getRightBpPos();
+    //double shift = shifts[i]->getMassShift();
     right_strings[right_pos] +=  ")";
-    if (changes[i]->getLocalAnno() != nullptr 
-        && changes[i]->getLocalAnno()->getPtmPtr() != nullptr) {
-      right_strings[right_pos] = right_strings[right_pos] 
-          + "["+changes[i]->getLocalAnno()->getPtmPtr()->getAbbrName()+"]";
-    } else if (ModBase::isNoneModPtr(changes[i]->getModPtr())) {
-      right_strings[right_pos] = right_strings[right_pos] 
-          + "["+string_util::convertToString(shift, 5)+"]";
-    } else {
-      right_strings[right_pos] = right_strings[right_pos]
-          + "["+changes[i]->getModPtr()->getModResiduePtr()->getPtmPtr()->getAbbrName()+"]";
-    }
+    /*if (changes[i]->getLocalAnno() != nullptr */
+    //&& changes[i]->getLocalAnno()->getPtmPtr() != nullptr) {
+    //right_strings[right_pos] = right_strings[right_pos] 
+    //+ "["+changes[i]->getLocalAnno()->getPtmPtr()->getAbbrName()+"]";
+    /*} else*/
+
+    /*if (ModBase::isNoneModPtr(shifts[i]->getModPtr())) {*/
+    //right_strings[right_pos] = right_strings[right_pos] 
+    //+ "["+string_util::convertToString(shift, 5)+"]";
+    //} else {
+    //right_strings[right_pos] = right_strings[right_pos]
+    //+ "["+changes[i]->getModPtr()->getModResiduePtr()->getPtmPtr()->getAbbrName()+"]";
+    /*}*/
+    right_strings[right_pos] = right_strings[right_pos] + "[" + shifts[i]->getSeqStr() + "]";
   }
 }
 
@@ -235,23 +240,27 @@ std::string Proteoform::getProteinMatchSeq() {
   // LOG_DEBUG("string_pairs length " << string_pairs.size() << " string " << FastaSeq::getString(string_pairs));
   std::string mid_string = residue_seq_ptr_->toAcidString();
   // LOG_DEBUG("mid string lenth " << mid_string.length() << " string " << mid_string);
-  std::sort(change_list_.begin(), change_list_.end(), Change::cmpPosInc);
+  std::sort(mass_shift_list_.begin(), mass_shift_list_.end(), MassShift::cmpPosInc);
 
   std::vector<std::string> left_strings(mid_string.size() + 1, "");
   std::vector<std::string> right_strings(mid_string.size() + 1, "");
 
-  // LOG_DEBUG("change update started");
-  ChangePtrVec input_changes = getChangePtrVec(ChangeType::INPUT);
-  updateMatchSeq(input_changes, left_strings, right_strings);
-  ChangePtrVec fixed_changes = getChangePtrVec(ChangeType::FIXED);
-  updateMatchSeq(fixed_changes, left_strings, right_strings);
-  ChangePtrVec protein_var_changes = getChangePtrVec(ChangeType::PROTEIN_VARIABLE);
-  updateMatchSeq(protein_var_changes, left_strings, right_strings);
-  ChangePtrVec var_changes = getChangePtrVec(ChangeType::VARIABLE);
-  updateMatchSeq(var_changes, left_strings, right_strings);
-  ChangePtrVec unexpected_changes = getChangePtrVec(ChangeType::UNEXPECTED);
-  updateMatchSeq(unexpected_changes, left_strings, right_strings);
-  // LOG_DEBUG("change update completed");
+  // LOG_DEBUG("mass shift update started");
+  MassShiftPtrVec input_shifts = getMassShiftPtrVec(MassShiftType::INPUT);
+  updateMatchSeq(input_shifts, left_strings, right_strings);
+
+  MassShiftPtrVec fixed_shifts = getMassShiftPtrVec(MassShiftType::FIXED);
+  updateMatchSeq(fixed_shifts, left_strings, right_strings);
+
+  MassShiftPtrVec protein_var_shifts = getMassShiftPtrVec(MassShiftType::PROTEIN_VARIABLE);
+  updateMatchSeq(protein_var_shifts, left_strings, right_strings);
+
+  MassShiftPtrVec var_shifts = getMassShiftPtrVec(MassShiftType::VARIABLE);
+  updateMatchSeq(var_shifts, left_strings, right_strings);
+
+  MassShiftPtrVec unexpected_shifts = getMassShiftPtrVec(MassShiftType::UNEXPECTED);
+  updateMatchSeq(unexpected_shifts, left_strings, right_strings);
+  // LOG_DEBUG("mass shift update completed");
 
   std::string result = "";
   for (size_t i = 0; i < mid_string.length(); i++) {
@@ -296,13 +305,13 @@ void Proteoform::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent)
   xml_doc->addElement(element, "prot_id", str.c_str());
   str = string_util::convertToString(variable_ptm_num_);
   xml_doc->addElement(element, "variable_ptm_num", str.c_str());
-  str = string_util::convertToString(getChangeNum(ChangeType::UNEXPECTED));
+  str = string_util::convertToString(getMassShiftNum(MassShiftType::UNEXPECTED));
   xml_doc->addElement(element, "unexpected_ptm_num", str.c_str());
 
-  element_name = Change::getXmlElementName() + "_list";
+  element_name = MassShift::getXmlElementName() + "_list";
   xercesc::DOMElement* cl = xml_doc->createElement(element_name.c_str());
-  for (size_t i = 0; i < change_list_.size(); i++) {
-    change_list_[i]->appendXml(xml_doc, cl);
+  for (size_t i = 0; i < mass_shift_list_.size(); i++) {
+    mass_shift_list_[i]->appendXml(xml_doc, cl);
   }
   element->appendChild(cl);
   parent->appendChild(element);

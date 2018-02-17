@@ -42,15 +42,18 @@ ProteoformPtr geneDbProteoformPtr(FastaSeqPtr fasta_seq_ptr, ModPtrVec fix_mod_l
   int start_pos = 0;
   int end_pos = static_cast<int>(residue_ptrs.size()) - 1;
 
-  ChangePtrVec change_list;
+  MassShiftPtrVec shift_list;
   // add input ptms;
   for (size_t i = 0; i < residue_ptrs.size(); i++) {
     if (residue_ptrs[i]->getPtmPtr() != PtmBase::getEmptyPtmPtr()) {
       ResiduePtr ori_residue = ResidueBase::getBaseResiduePtr(residue_ptrs[i]->getAminoAcidPtr());
       ModPtr mod_ptr = ModBase::getBaseModPtr(ori_residue, residue_ptrs[i]);
       ChangePtr change_ptr
-          = std::make_shared<Change>(i, i + 1, ChangeType::INPUT, mod_ptr->getShift(), mod_ptr);
-      change_list.push_back(change_ptr);
+          = std::make_shared<Change>(i, i + 1, MassShiftType::INPUT, mod_ptr->getShift(), mod_ptr);
+      MassShiftPtr shift_ptr
+          = std::make_shared<MassShift>(i, i + 1, change_ptr->getTypePtr());
+      shift_ptr->setChangePtr(change_ptr);
+      shift_list.push_back(shift_ptr);
     }
   }
 
@@ -60,15 +63,19 @@ ProteoformPtr geneDbProteoformPtr(FastaSeqPtr fasta_seq_ptr, ModPtrVec fix_mod_l
       if (residue_ptrs[i] == fix_mod_list[j]->getOriResiduePtr()) {
         residue_ptrs[i] = fix_mod_list[j]->getModResiduePtr();
         ChangePtr change_ptr
-            = std::make_shared<Change>(i, i + 1, ChangeType::FIXED, fix_mod_list[j]->getShift(), fix_mod_list[j]);
-        change_list.push_back(change_ptr);
+            = std::make_shared<Change>(i, i + 1, MassShiftType::FIXED, fix_mod_list[j]->getShift(), fix_mod_list[j]);
+        MassShiftPtr shift_ptr
+            = std::make_shared<MassShift>(i, i + 1, change_ptr->getTypePtr());
+        shift_ptr->setChangePtr(change_ptr);
+        shift_list.push_back(shift_ptr);
         break;
       }
     }
   }
+
   ResSeqPtr res_seq_ptr = std::make_shared<ResidueSeq>(residue_ptrs);
   return std::make_shared<Proteoform>(fasta_seq_ptr, none_prot_mod_ptr, start_pos,
-                                      end_pos, res_seq_ptr, change_list);
+                                      end_pos, res_seq_ptr, shift_list);
 }
 
 ProteoformPtr geneProtModProteoform(ProteoformPtr db_form_ptr, ProtModPtr prot_mod_ptr) {
@@ -85,14 +92,21 @@ ProteoformPtr geneProtModProteoform(ProteoformPtr db_form_ptr, ProtModPtr prot_m
   /* last bp index */
   int end = db_form_ptr->getLen();
   // copy input changes
-  ChangePtrVec ori_change_ptrs = db_form_ptr->getChangePtrVec();
-  ChangePtrVec change_ptrs;
-  for (size_t i = 0; i < ori_change_ptrs.size(); i++) {
-    if (ori_change_ptrs[i]->getLeftBpPos() >= start
-        && ori_change_ptrs[i]->getRightBpPos() <= end + 1) {
-      ChangePtr change_ptr = Change::geneChangePtr(ori_change_ptrs[i], start);
-      change_ptrs.push_back(change_ptr);
-    }
+  MassShiftPtrVec ori_shift_ptrs = db_form_ptr->getMassShiftPtrVec();
+  MassShiftPtrVec shift_ptrs;
+  for (size_t i = 0; i < ori_shift_ptrs.size(); i++) {
+    if (ori_shift_ptrs[i]->getLeftBpPos() >= start
+        && ori_shift_ptrs[i]->getRightBpPos() <= end + 1) {
+      MassShiftPtr shift_ptr = std::make_shared<MassShift>(ori_shift_ptrs[i]->getLeftBpPos(),
+                                                           ori_shift_ptrs[i]->getRightBpPos(),
+                                                           ori_shift_ptrs[i]->getTypePtr());
+      ChangePtrVec change_ptrs = ori_shift_ptrs[i]->getChangePtrVec();
+      for (size_t k = 0; k < change_ptrs.size(); k++) {
+        ChangePtr change_ptr = Change::geneChangePtr(change_ptrs[k], start); 
+        shift_ptr->setChangePtr(change_ptr);
+      }
+      shift_ptrs.push_back(shift_ptr);
+    } 
   }
 
   ResiduePtrVec ori_vec = db_res_seq_ptr->getResidues();
@@ -103,15 +117,21 @@ ProteoformPtr geneProtModProteoform(ProteoformPtr db_form_ptr, ProtModPtr prot_m
     int mod_pos = prot_mod_ptr->getModPos();
     int new_pos = mod_pos - start;
     new_vec[new_pos] = prot_mod_ptr->getModPtr()->getModResiduePtr();
-    change_ptrs.push_back(std::make_shared<Change>(new_pos, new_pos+1, ChangeType::PROTEIN_VARIABLE,
-                                                   mod_ptr->getShift(), mod_ptr));
+    ChangePtr change_ptr
+        = std::make_shared<Change>(new_pos, new_pos + 1, MassShiftType::PROTEIN_VARIABLE,
+                                   mod_ptr->getShift(), mod_ptr);
+    MassShiftPtr shift_ptr = std::make_shared<MassShift>(change_ptr->getLeftBpPos(),
+                                                         change_ptr->getRightBpPos(),
+                                                         change_ptr->getTypePtr());
+    shift_ptr->setChangePtr(change_ptr);
+    shift_ptrs.push_back(shift_ptr);
   }
   ResSeqPtr seq_ptr = std::make_shared<ResidueSeq>(new_vec);
 
   FastaSeqPtr fasta_seq_ptr = db_form_ptr->getFastaSeqPtr();
 
   return std::make_shared<Proteoform>(db_form_ptr->getFastaSeqPtr(), prot_mod_ptr, start,
-                                      db_res_seq_ptr->getLen()-1, seq_ptr, change_ptrs);
+                                      db_res_seq_ptr->getLen() - 1, seq_ptr, shift_ptrs);
 }
 
 ProteoformPtr geneSubProteoform(ProteoformPtr proteoform_ptr, int local_start, int local_end) {
@@ -121,20 +141,30 @@ ProteoformPtr geneSubProteoform(ProteoformPtr proteoform_ptr, int local_start, i
     residues.push_back(res_seq_ptr->getResiduePtr(i));
   }
   ResSeqPtr seq_ptr = std::make_shared<ResidueSeq>(residues);
-  ChangePtrVec change_list;
-  ChangePtrVec ori_change_list = proteoform_ptr->getChangePtrVec();
-  for (size_t i = 0; i < ori_change_list.size(); i++) {
-    if (ori_change_list[i]->getLeftBpPos() >= local_start
-        && ori_change_list[i]->getRightBpPos() <= local_end + 1) {
-      ChangePtr change_ptr = Change::geneChangePtr(ori_change_list[i], local_start);
-      change_list.push_back(change_ptr);
-    }
+  MassShiftPtrVec shift_list;
+  MassShiftPtrVec ori_shift_list = proteoform_ptr->getMassShiftPtrVec();
+
+  for (size_t i = 0; i < ori_shift_list.size(); i++) {
+    if (ori_shift_list[i]->getLeftBpPos() >= local_start
+        && ori_shift_list[i]->getRightBpPos() <= local_end + 1) {
+      MassShiftPtr shift_ptr = std::make_shared<MassShift>(ori_shift_list[i]->getLeftBpPos(),
+                                                           ori_shift_list[i]->getRightBpPos(),
+                                                           ori_shift_list[i]->getTypePtr());
+      ChangePtrVec change_ptrs = ori_shift_list[i]->getChangePtrVec();
+      for (size_t k = 0; k < change_ptrs.size(); k++) {
+        ChangePtr change_ptr = Change::geneChangePtr(change_ptrs[k], local_start); 
+        shift_ptr->setChangePtr(change_ptr);
+      }
+      shift_list.push_back(shift_ptr);
+    } 
   }
+
   ProtModPtr prot_mod_ptr = proteoform_ptr->getProtModPtr();
+
   return std::make_shared<Proteoform>(proteoform_ptr->getFastaSeqPtr(), prot_mod_ptr,
                                       local_start + proteoform_ptr->getStartPos(),
                                       local_end + proteoform_ptr->getStartPos(),
-                                      seq_ptr, change_list);
+                                      seq_ptr, shift_list);
 }
 
 ProteoformPtrVec geneProtModProteoform(ProteoformPtr proteo_ptr, const ProtModPtrVec &prot_mods) {

@@ -24,8 +24,8 @@
 
 namespace prot {
 
-bool ChangeStr::cmpPosInc(const std::shared_ptr<ChangeStr> &a,
-                          const std::shared_ptr<ChangeStr> &b) {
+bool MassShiftStr::cmpPosInc(const std::shared_ptr<MassShiftStr> &a,
+                             const std::shared_ptr<MassShiftStr> &b) {
   if (a->left_pos_ < b->left_pos_) {
     return true;
   } else if (a->left_pos_ > b->left_pos_) {
@@ -81,14 +81,14 @@ PrsmStr::PrsmStr(const std::vector<std::string> &str_vec) {
   line = prsm_util::getXmlLine(str_vec_, "<unexpected_ptm_num>");
   unexpected_ptm_num_ = std::stoi(prsm_util::getValueStr(line));
 
-  std::vector<std::string> mass_lines = prsm_util::getXmlLineVec(str_vec_, "<mass_shift>");
-  std::vector<std::string> left_pos_lines = prsm_util::getXmlLineVec(str_vec_, "<left_bp_pos>");
-  std::vector<std::string> right_pos_lines = prsm_util::getXmlLineVec(str_vec_, "<right_bp_pos>");
+  std::vector<std::string> mass_lines = prsm_util::getXmlLineVec(str_vec_, "<shift>");
+  std::vector<std::string> left_pos_lines = prsm_util::getXmlLineVec(str_vec_, "<shift_left_bp_pos>");
+  std::vector<std::string> right_pos_lines = prsm_util::getXmlLineVec(str_vec_, "<shift_right_bp_pos>");
 
   for (size_t i = 0; i < mass_lines.size(); i++) {
-    change_vec_.push_back(std::make_shared<ChangeStr>(std::stod(prsm_util::getValueStr(mass_lines[i])),
-                                                      std::stoi(prsm_util::getValueStr(left_pos_lines[i])),
-                                                      std::stoi(prsm_util::getValueStr(right_pos_lines[i]))));
+    mass_shift_vec_.push_back(std::make_shared<MassShiftStr>(std::stod(prsm_util::getValueStr(mass_lines[i])),
+                                                             std::stoi(prsm_util::getValueStr(left_pos_lines[i])),
+                                                             std::stoi(prsm_util::getValueStr(right_pos_lines[i]))));
   }
 }
 
@@ -184,13 +184,13 @@ bool PrsmStr::isStrictCompatiablePtmSpecies(const PrsmStrPtr & a, const PrsmStrP
   }
 
   double shift_tolerance = a->getAdjustedPrecMass() * ppo;
-  std::vector<std::shared_ptr<ChangeStr> > a_change_vec = a->getChangeStrVec();
-  std::vector<std::shared_ptr<ChangeStr> > b_change_vec = b->getChangeStrVec();
-  std::sort(a_change_vec.begin(), a_change_vec.end(), ChangeStr::cmpPosInc);
-  std::sort(b_change_vec.begin(), b_change_vec.end(), ChangeStr::cmpPosInc);
+  std::vector<MassShiftStrPtr> a_shift_vec = a->getChangeStrVec();
+  std::vector<MassShiftStrPtr> b_shift_vec = b->getChangeStrVec();
+  std::sort(a_shift_vec.begin(), a_shift_vec.end(), MassShiftStr::cmpPosInc);
+  std::sort(b_shift_vec.begin(), b_shift_vec.end(), MassShiftStr::cmpPosInc);
   for (size_t i = 0; i < a->getChangeStrVec().size(); i++) {
-    ChangeStrPtr ac = a_change_vec[i];
-    ChangeStrPtr bc = b_change_vec[i];
+    MassShiftStrPtr ac = a_shift_vec[i];
+    MassShiftStrPtr bc = b_shift_vec[i];
     if (ac->right_pos_ <= bc->left_pos_ || bc->right_pos_ <= ac->left_pos_) {
       return false;
     }

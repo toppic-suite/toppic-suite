@@ -24,11 +24,11 @@ namespace prot {
 Change::Change(xercesc::DOMElement* element) {
   left_bp_pos_ = xml_dom_util::getIntChildValue(element, "left_bp_pos", 0);
   right_bp_pos_ = xml_dom_util::getIntChildValue(element, "right_bp_pos", 0);
-  std::string ct_element_name = ChangeType::getXmlElementName();
+  std::string ct_element_name = MassShiftType::getXmlElementName();
   xercesc::DOMElement* ct_element
       = xml_dom_util::getChildElement(element, ct_element_name.c_str(), 0);
-  change_type_ptr_ = ChangeType::getChangeTypePtrFromXml(ct_element);
-  mass_shift_ = xml_dom_util::getDoubleChildValue(element, "mass_shift", 0);
+  type_ptr_ = MassShiftType::getChangeTypePtrFromXml(ct_element);
+  mass_ = xml_dom_util::getDoubleChildValue(element, "mass", 0);
   std::string mod_element_name = Mod::getXmlElementName();
   int mod_count = xml_dom_util::getChildCount(element, mod_element_name.c_str());
   if (mod_count != 0) {
@@ -36,13 +36,13 @@ Change::Change(xercesc::DOMElement* element) {
         = xml_dom_util::getChildElement(element, mod_element_name.c_str(), 0);
     mod_ptr_ = ModBase::getModPtrFromXml(mod_element);
   }
-  std::string local_element_name = LocalAnno::getXmlElementName();;
-  int local_count = xml_dom_util::getChildCount(element, local_element_name.c_str());
-  if (local_count != 0) {
-    xercesc::DOMElement * local_element
-        = xml_dom_util::getChildElement(element, local_element_name.c_str(), 0);
-    local_anno_ptr_ = std::make_shared<LocalAnno>(local_element);
-  }
+  /*std::string local_element_name = LocalAnno::getXmlElementName();;*/
+  //int local_count = xml_dom_util::getChildCount(element, local_element_name.c_str());
+  //if (local_count != 0) {
+  //xercesc::DOMElement * local_element
+  //= xml_dom_util::getChildElement(element, local_element_name.c_str(), 0);
+  //local_anno_ptr_ = std::make_shared<LocalAnno>(local_element);
+  /*}*/
 }
 
 void Change::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
@@ -52,45 +52,34 @@ void Change::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   xml_doc->addElement(element, "left_bp_pos", str.c_str());
   str = string_util::convertToString(right_bp_pos_);
   xml_doc->addElement(element, "right_bp_pos", str.c_str());
-  change_type_ptr_->appendXml(xml_doc, element);
-  str = string_util::convertToString(mass_shift_);
-  xml_doc->addElement(element, "mass_shift", str.c_str());
+  type_ptr_->appendXml(xml_doc, element);
+  str = string_util::convertToString(mass_);
+  xml_doc->addElement(element, "mass", str.c_str());
   if (mod_ptr_ != nullptr) {
     mod_ptr_->appendToXml(xml_doc, element);
   }
-  if (local_anno_ptr_ != nullptr) {
-    local_anno_ptr_->appendToXml(xml_doc, element);
-  }
+  /*if (local_anno_ptr_ != nullptr) {*/
+  //local_anno_ptr_->appendToXml(xml_doc, element);
+  /*}*/
   parent->appendChild(element);
-}
-
-bool Change::cmpPosInc(const ChangePtr &a, const ChangePtr &b) {
-  if (a->getLeftBpPos() < b->getLeftBpPos()) {
-    return true;
-  } else if (a->getLeftBpPos() > b->getLeftBpPos()) {
-    return false;
-  } else {
-    return a->getRightBpPos() < b->getRightBpPos();
-  }
 }
 
 ChangePtr Change::geneChangePtr(ChangePtr ori_ptr, int start_pos) {
   int left_bp_pos = ori_ptr->left_bp_pos_ - start_pos;
   int right_bp_pos = ori_ptr->right_bp_pos_ - start_pos;
-  ChangeTypePtr change_type_ptr = ori_ptr->change_type_ptr_;
-  double mass_shift = ori_ptr->mass_shift_;
+  MassShiftTypePtr type_ptr = ori_ptr->type_ptr_;
+  double mass = ori_ptr->getMass();
   ModPtr mod_ptr = ori_ptr->mod_ptr_;
-  ChangePtr change_ptr
-      = std::make_shared<Change>(left_bp_pos, right_bp_pos, change_type_ptr, mass_shift, mod_ptr);
+  ChangePtr change_ptr = std::make_shared<Change>(left_bp_pos, right_bp_pos, type_ptr, mass, mod_ptr);
   return change_ptr;
 }
 
-void Change::setLocalAnno(LocalAnnoPtr p) {
-  local_anno_ptr_ = p;
-  if (p != nullptr) {
-    left_bp_pos_ = p->getLeftBpPos();
-    right_bp_pos_ = p->getRightBpPos() + 1;
-  }
-}
+/*void Change::setLocalAnno(LocalAnnoPtr p) {*/
+//local_anno_ptr_ = p;
+//if (p != nullptr) {
+//left_bp_pos_ = p->getLeftBpPos();
+//right_bp_pos_ = p->getRightBpPos() + 1;
+//}
+/*}*/
 
 }  // namespace prot
