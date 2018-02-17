@@ -211,7 +211,7 @@ double Prsm::getOneProtProb() {
 /* this function is tempory for testing mass graph alignment */
 double Prsm::getNormMatchFragNum() {
   int var_change_num = proteoform_ptr_->getVariablePtmNum();
-  int unexp_change_num = proteoform_ptr_->getChangeNum(ChangeType::UNEXPECTED);
+  int unexp_change_num = proteoform_ptr_->getMassShiftNum(MassShiftType::UNEXPECTED);
   int start_pos = proteoform_ptr_->getStartPos();
   int end_pos = proteoform_ptr_->getEndPos();
   double score = match_fragment_num_ - 2 * var_change_num - 4 * unexp_change_num;

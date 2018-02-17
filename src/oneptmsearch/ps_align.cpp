@@ -323,9 +323,9 @@ PrsmPtr PSAlign::geneResult(int shift_num, ProteoformPtr proteo_ptr,
     return nullptr;
   }
 
-  ChangePtrVec changes = getDiagonalMassChanges(refined_header_ptrs, first_pos,
-                                                last_pos, ChangeType::UNEXPECTED);
-  sub_proteo_ptr->addChangePtrVec(changes);
+  MassShiftPtrVec shifts = getDiagonalMassChanges(refined_header_ptrs, first_pos,
+                                                  last_pos, MassShiftType::UNEXPECTED);
+  sub_proteo_ptr->addMassShiftPtrVec(shifts);
 
   return std::make_shared<Prsm>(sub_proteo_ptr, deconv_ms_ptr_vec, refine_prec_mass,
                                 prsm_para_ptr->getSpParaPtr());

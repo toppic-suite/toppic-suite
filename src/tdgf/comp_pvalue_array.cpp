@@ -58,7 +58,7 @@ void CompPValueArray::compMultiExtremeValues(const PrmMsPtrVec &ms_six_ptr_vec,
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     double prec_mass = ms_six_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMassMinusWater();
     // LOG_DEBUG("prsm " << i << " prsm size " << prsm_ptrs.size());
-    int unexpect_shift_num = prsm_ptrs[i]->getProteoformPtr()->getChangeNum(ChangeType::UNEXPECTED);
+    int unexpect_shift_num = prsm_ptrs[i]->getProteoformPtr()->getMassShiftNum(MassShiftType::UNEXPECTED);
     AlignTypePtr type_ptr = prsm_ptrs[i]->getProteoformPtr()->getAlignType();
 
     if (unexpect_shift_num == 0) {

@@ -55,8 +55,8 @@
 #include "tdgf/tdgf_mng.hpp"
 #include "tdgf/evalue_processor.hpp"
 
-#include "local/local_mng.hpp"
-#include "local/local_processor.hpp"
+//#include "local/local_mng.hpp"
+//#include "local/local_processor.hpp"
 
 #include "prsmview/xml_generator.hpp"
 #include "prsmview/transformer.hpp"
@@ -267,20 +267,20 @@ int TopPICProgress(std::map<std::string, std::string> arguments) {
 
     std::string suffix = "CUTOFF_RESULT_SPEC";
 
-    if (localization) {
-      std::cout << "PTM characterization - started." << std::endl;
-      LocalMngPtr local_mng
-          = std::make_shared<LocalMng>(prsm_para_ptr,
-                                       arguments["local_threshold"],
-                                       arguments["residueModFileName"],
-                                       max_ptm_mass,
-                                       suffix, "LOCAL_RESULT");
-      LocalProcessorPtr local_ptr = std::make_shared<LocalProcessor>(local_mng);
-      local_ptr->process();
-      local_ptr = nullptr;
-      std::cout << "PTM characterization - finished." << std::endl;
-      suffix = "LOCAL_RESULT";
-    }
+    /*if (localization) {*/
+    //std::cout << "PTM characterization - started." << std::endl;
+    //LocalMngPtr local_mng
+    //= std::make_shared<LocalMng>(prsm_para_ptr,
+    //arguments["local_threshold"],
+    //arguments["residueModFileName"],
+    //max_ptm_mass,
+    //suffix, "LOCAL_RESULT");
+    //LocalProcessorPtr local_ptr = std::make_shared<LocalProcessor>(local_mng);
+    //local_ptr->process();
+    //local_ptr = nullptr;
+    //std::cout << "PTM characterization - finished." << std::endl;
+    //suffix = "LOCAL_RESULT";
+    /*}*/
 
     time_t end = time(0);
     arguments["end_time"] = std::string(ctime_r(&end, buf));
@@ -293,15 +293,15 @@ int TopPICProgress(std::map<std::string, std::string> arguments) {
     table_out = nullptr;
     std::cout << "Outputting PrSM table - finished." << std::endl;
 
-    std::cout << "Generating PrSM xml files - started." << std::endl;
-    XmlGeneratorPtr xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, suffix, "prsm_cutoff");
-    xml_gene->process();
-    xml_gene = nullptr;
-    std::cout << "Generating PrSM xml files - finished." << std::endl;
+    /*std::cout << "Generating PrSM xml files - started." << std::endl;*/
+    //XmlGeneratorPtr xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, suffix, "prsm_cutoff");
+    //xml_gene->process();
+    //xml_gene = nullptr;
+    //std::cout << "Generating PrSM xml files - finished." << std::endl;
 
-    std::cout << "Converting PrSM xml files to html files - started." << std::endl;
-    translate(arguments, "prsm_cutoff");
-    std::cout << "Converting PrSM xml files to html files - finished." << std::endl;
+    //std::cout << "Converting PrSM xml files to html files - started." << std::endl;
+    //translate(arguments, "prsm_cutoff");
+    /*std::cout << "Converting PrSM xml files to html files - finished." << std::endl;*/
 
     cutoff_type = (arguments["cutoffProteoformType"] == "FDR") ? "FORMFDR": "EVALUE";
     std::cout << "PrSM filtering by " << cutoff_type << " - started." << std::endl;
@@ -329,15 +329,15 @@ int TopPICProgress(std::map<std::string, std::string> arguments) {
     form_out = nullptr;
     std::cout << "Outputting proteoform table - finished." << std::endl;
 
-    std::cout << "Generating proteoform xml files - started." << std::endl;
-    xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, "CUTOFF_RESULT_FORM", "proteoform_cutoff");
-    xml_gene->process();
-    xml_gene = nullptr;
-    std::cout << "Generating proteoform xml files - finished." << std::endl;
+    /*std::cout << "Generating proteoform xml files - started." << std::endl;*/
+    //xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, "CUTOFF_RESULT_FORM", "proteoform_cutoff");
+    //xml_gene->process();
+    //xml_gene = nullptr;
+    //std::cout << "Generating proteoform xml files - finished." << std::endl;
 
-    std::cout << "Converting proteoform xml files to html files - started." << std::endl;
-    translate(arguments, "proteoform_cutoff");
-    std::cout << "Converting proteoform xml files to html files - finished." << std::endl;
+    //std::cout << "Converting proteoform xml files to html files - started." << std::endl;
+    //translate(arguments, "proteoform_cutoff");
+    /*std::cout << "Converting proteoform xml files to html files - finished." << std::endl;*/
 
     if (arguments["keepTempFiles"] != "true") {
       std::cout << "Deleting temporary files - started." << std::endl;

@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_CHANGE_TYPE_HPP_
-#define PROT_BASE_CHANGE_TYPE_HPP_
+#ifndef PROT_BASE_MASS_SHIFT_TYPE_HPP_
+#define PROT_BASE_MASS_SHIFT_TYPE_HPP_
 
 #include <memory>
 #include <vector>
@@ -24,22 +24,22 @@
 
 namespace prot {
 
-class ChangeType;
-typedef std::shared_ptr<ChangeType> ChangeTypePtr;
+class MassShiftType;
+typedef std::shared_ptr<MassShiftType> MassShiftTypePtr;
 
-class ChangeType {
+class MassShiftType {
  public:
-  static const ChangeTypePtr INPUT;
+  static const MassShiftTypePtr INPUT;
 
-  static const ChangeTypePtr FIXED;
+  static const MassShiftTypePtr FIXED;
 
-  static const ChangeTypePtr PROTEIN_VARIABLE;
+  static const MassShiftTypePtr PROTEIN_VARIABLE;
 
-  static const ChangeTypePtr VARIABLE;
+  static const MassShiftTypePtr VARIABLE;
 
-  static const ChangeTypePtr UNEXPECTED;
+  static const MassShiftTypePtr UNEXPECTED;
 
-  ChangeType(int id, std::string name): id_(id), name_(name) {}
+  MassShiftType(int id, std::string name): id_(id), name_(name) {}
 
   int getId() {return id_;}
 
@@ -47,16 +47,16 @@ class ChangeType {
 
   void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
-  static ChangeTypePtr getChangeTypePtrFromXml(xercesc::DOMElement * element);
+  static MassShiftTypePtr getChangeTypePtrFromXml(xercesc::DOMElement * element);
 
-  static std::string getXmlElementName() {return "change_type";}
+  static std::string getXmlElementName() {return "mass_shift_type";}
 
  private:
   int id_;
   std::string name_;
 };
 
-typedef std::vector<ChangeTypePtr> ChangeTypePtrVec;
+typedef std::vector<MassShiftTypePtr> MassShiftTypePtrVec;
 
 }  // namespace prot
 
