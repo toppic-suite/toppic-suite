@@ -168,7 +168,8 @@ bool Argument::parse(int argc, char* argv[]) {
         ("miscore-threshold,s", po::value<std::string> (&local_threshold), "<a positive number between 0 and 1>. Score threshold (modification identification score) for filtering results of PTM characterization. Default value: 0.45.")
         ("thread-number,u", po::value<std::string> (&thread_number), "<positive number>. Number of threads used in the computation. Default value: 1.")
         ("use-topfd-feature,x", po::value<std::string>(&feature_file_name) , "<a TopFD feature file with its path>. TopFD features for proteoform identification.")
-        ("skip-list,l", po::value<std::string>(&skip_list) , "<a text file with its path>. The scans in this file will be skipped.");
+        ("skip-list,l", po::value<std::string>(&skip_list) , "<a text file with its path>. The scans in this file will be skipped.")
+        ("keep-temp-files,k", "Keep temporary files.");
 
     po::options_description desc("Options");
 
@@ -186,7 +187,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("proteoform-cutoff-type,T", po::value<std::string> (&cutoff_proteoform_type), "")
         ("proteoform-cutoff-value,V", po::value<std::string> (&cutoff_proteoform_value), "")
         ("filtering-result-number,o", po::value<std::string>(&filtering_result_num), "Filtering result number. Default value: 20.")
-        ("keep-temp-files,k", "Keep temporary files.")
+        ("keep-temp-files,k", "")
         ("generating-function,g", "")
         ("miscore-threshold,s", po::value<std::string> (&local_threshold), "")
         ("full-binary-path,b", "Full binary path.")
