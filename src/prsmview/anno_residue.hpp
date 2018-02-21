@@ -16,20 +16,31 @@
 #ifndef PROT_ANNO_RESIDUE_HPP_
 #define PROT_ANNO_RESIDUE_HPP_
 
-#include "base/residue.hpp"
+#include <string>
+#include <vector>
 
+#include "base/residue.hpp"
 
 namespace prot {
 
-#define ANNO_RESIDUE_TYPE_NORMAL "normal"
-#define ANNO_RESIDUE_TYPE_N_TRUNCATION "n_truncation"
-#define ANNO_RESIDUE_TYPE_C_TRUNCATION "c_truncation"
-#define ANNO_RESIDUE_TYPE_KNOWN_CHANGE "known_change"
-#define ANNO_RESIDUE_TYPE_UNKNOWN_CHANGE "unknown_change"
+const std::string ANNO_RESIDUE_TYPE_NORMAL         = "normal";
+
+const std::string ANNO_RESIDUE_TYPE_N_TRUNCATION   = "n_truncation";
+
+const std::string ANNO_RESIDUE_TYPE_C_TRUNCATION   = "c_truncation";
+
+const std::string ANNO_RESIDUE_TYPE_KNOWN_CHANGE   = "known_change";
+
+const std::string ANNO_RESIDUE_TYPE_UNKNOWN_CHANGE = "unknown_change";
 
 class AnnoResidue : public Residue {
  public:
-  AnnoResidue(ResiduePtr residue_ptr, int pos);
+  AnnoResidue(ResiduePtr residue_ptr, int pos):
+      Residue(residue_ptr->getAminoAcidPtr(), residue_ptr->getPtmPtr()),
+      pos_(pos),
+      type_(ANNO_RESIDUE_TYPE_NORMAL),
+      is_unexpected_change_(false),
+      unexpected_change_color_(0) {}
 
   void setType(const std::string &type) {type_ = type;}
 
@@ -61,6 +72,6 @@ class AnnoResidue : public Residue {
 typedef std::shared_ptr<AnnoResidue> AnnoResiduePtr;
 typedef std::vector<AnnoResiduePtr> AnnoResiduePtrVec;
 
-}
+}  // namespace prot
 
 #endif /* PROT_ANNO_RESIDUE_HPP_ */

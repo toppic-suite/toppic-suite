@@ -13,6 +13,8 @@
 //limitations under the License.
 
 #include <vector>
+#include <map>
+#include <string>
 
 #include "base/file_util.hpp"
 #include "prsmview/transformer.hpp"
