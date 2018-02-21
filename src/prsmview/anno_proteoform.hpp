@@ -21,7 +21,7 @@
 #include "prsm/prsm.hpp"
 #include "prsmview/prsm_view_mng.hpp"
 
-namespace prot{
+namespace prot {
 
 xercesc::DOMElement* geneAnnoProteoform(XmlDOMDocument* xml_doc, PrsmPtr prsm_ptr,
                                         PrsmViewMngPtr mng_ptr);

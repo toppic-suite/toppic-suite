@@ -13,14 +13,17 @@
 //limitations under the License.
 
 
+#include <utility>
+#include <string>
+
 #include "base/string_util.hpp"
 #include "prsmview/anno_ptm.hpp"
 
 namespace prot {
 
-AnnoPtm::AnnoPtm(PtmPtr ptm_ptr, ChangeTypePtr change_type_ptr) {
+AnnoPtm::AnnoPtm(PtmPtr ptm_ptr, MassShiftTypePtr type_ptr) {
   ptm_ptr_ = ptm_ptr;
-  change_type_ptr_ = change_type_ptr;
+  type_ptr_ = type_ptr;
 }
 
 void AnnoPtm::addOccurence(int pos, const std::string &acid_letter) {
@@ -28,11 +31,11 @@ void AnnoPtm::addOccurence(int pos, const std::string &acid_letter) {
   occurences_.push_back(new_occurence);
 }
 
-void AnnoPtm::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
+void AnnoPtm::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   xercesc::DOMElement* element = xml_doc->createElement("expected_change");
-  std::string str = change_type_ptr_->getName();
+  std::string str = type_ptr_->getName();
   xml_doc->addElement(element, "change_type", str.c_str());
-  ptm_ptr_->appendAbbrNameToXml(xml_doc,element);
+  ptm_ptr_->appendAbbrNameToXml(xml_doc, element);
 
   for (size_t i = 0; i < occurences_.size(); i++) {
     xercesc::DOMElement* position_element = xml_doc->createElement("occurence");
@@ -44,10 +47,10 @@ void AnnoPtm::appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent){
   parent->appendChild(element);
 }
 
-AnnoPtmPtr AnnoPtm::findPtm(const AnnoPtmPtrVec &ptm_ptrs, PtmPtr ptm_ptr, 
-                            ChangeTypePtr change_type_ptr) {
+AnnoPtmPtr AnnoPtm::findPtm(const AnnoPtmPtrVec &ptm_ptrs, PtmPtr ptm_ptr,
+                            MassShiftTypePtr type_ptr) {
   for (size_t i = 0; i < ptm_ptrs.size(); i++) {
-    if ((ptm_ptrs[i]->getChangeTypePtr() == change_type_ptr) &&
+    if ((ptm_ptrs[i]->getTypePtr() == type_ptr) &&
         (ptm_ptrs[i]->getPtmPtr() == ptm_ptr)) {
       return ptm_ptrs[i];
     }
@@ -55,4 +58,4 @@ AnnoPtmPtr AnnoPtm::findPtm(const AnnoPtmPtrVec &ptm_ptrs, PtmPtr ptm_ptr,
   return nullptr;
 }
 
-}
+}  // namespace prot

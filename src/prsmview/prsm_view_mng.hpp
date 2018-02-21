@@ -39,11 +39,15 @@ class PrsmViewMng {
   PrsmParaPtr prsm_para_ptr_;
 
   std::string html_path_;
+
   std::string xml_path_;
+
   std::string resource_dir_;
 
   int decimal_point_num_ = 2;
+
   int precise_point_num_ = 4;
+
   double min_mass_;
 };
 

@@ -16,6 +16,9 @@
 #ifndef PROT_ANNO_CLEAVAGE_HPP_
 #define PROT_ANNO_CLEAVAGE_HPP_
 
+#include <string>
+#include <vector>
+
 #include "base/proteoform.hpp"
 #include "spec/extend_peak.hpp"
 #include "prsm/peak_ion_pair.hpp"
@@ -31,32 +34,45 @@ namespace prot {
 
 class AnnoCleavage {
  public:
-  AnnoCleavage(int pos, const PeakIonPairPtrVec &pairs, bool exist_n_ion, bool exist_c_ion);
+  AnnoCleavage(int pos, const PeakIonPairPtrVec &pairs, bool exist_n_ion, bool exist_c_ion):
+      pos_(pos),
+      pairs_(pairs),
+      exist_n_ion_(exist_n_ion),
+      exist_c_ion_(exist_c_ion),
+      is_unexpected_change_(false),
+      unexpected_change_color_(0),
+      type_(CLEAVAGE_TYPE_NORMAL) {}
 
-  void setPairs(PeakIonPairPtrVec pairs) {pairs_ = pairs;} 
+  void setPairs(PeakIonPairPtrVec pairs) {pairs_ = pairs;}
 
-  void setExistNIon(bool n) {exist_n_ion_ = n;};
+  void setExistNIon(bool n) {exist_n_ion_ = n;}
 
-  void setExistCIon(bool c) {exist_c_ion_ = c;};
+  void setExistCIon(bool c) {exist_c_ion_ = c;}
 
-  void setType(const std::string &type) {type_=type;}
+  void setType(const std::string &type) {type_ = type;}
 
   void setUnexpectedChange(bool u) {is_unexpected_change_ = u;}
-  
+
   void setUnexpectedChangeColor(int color) {unexpected_change_color_ = color;}
 
-  std::string getType(){return type_;}
+  std::string getType() {return type_;}
 
-  void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+  void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
  private:
   int pos_;
-  bool exist_n_ion_;
-  bool exist_c_ion_;
-  std::string type_;
+
   PeakIonPairPtrVec pairs_;
+
+  bool exist_n_ion_;
+
+  bool exist_c_ion_;
+
   bool is_unexpected_change_;
+
   int unexpected_change_color_;
+
+  std::string type_;
 };
 
 typedef std::shared_ptr<AnnoCleavage> AnnoCleavagePtr;
