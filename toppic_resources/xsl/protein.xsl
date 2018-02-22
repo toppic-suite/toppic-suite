@@ -1,81 +1,81 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
-<xsl:output encoding="UTF-8" method="html" omit-xml-declaration="yes" indent="yes"/>
-   
-<xsl:include href="prsm_anno.xsl"/>
+  <xsl:output encoding="UTF-8" method="html" omit-xml-declaration="yes" indent="yes"/>
 
-<xsl:template match="protein">
-<html>
-  <title>Proteoforms for protein <xsl:value-of select="sequence_name"/><xsl:text> </xsl:text>
-		<xsl:value-of select="sequence_description"/>
-  </title>
-<link rel="stylesheet" type="text/css" href="../resources/media/css/jquery.dataTables.css"></link>
-<link rel="stylesheet" type="text/css" href="../resources/bootstrap.min.css"></link>
-<link rel="stylesheet" type="text/css" href="../resources/prsm.css"></link>
-<script type="text/javascript" language="javascript" src="../resources/media/js/jquery.js"></script>
-<script type="text/javascript" language="javascript" src="../resources/media/js/jquery.dataTables.js"></script>
-<style type="text/css">
-	@font-face {
-		font-family: "FreeMono";
-		src: url("../resources/FreeMono.ttf")
-	}
-</style>
-<body>
-<div class="container">
-<xsl:call-template name="navigation"/>
-<p style="font-size:16px;"><xsl:value-of select="compatible_proteoform_number"/> proteoforms for protein <xsl:value-of select="sequence_name"/><xsl:text> </xsl:text>
-		<xsl:value-of select="sequence_description"/>
-</p>
+  <xsl:include href="prsm_anno.xsl"/>
 
-<xsl:apply-templates select="compatible_proteoform">
-	<!-- sort not working  <xsl:sort select="min(proteoform_id)" order="ascending" data-type="number"/> -->
-</xsl:apply-templates>
-<br/>
-<xsl:call-template name="navigation"/>
-</div>
-</body>
-</html>
-</xsl:template>
+  <xsl:template match="protein">
+    <html>
+      <title>Proteoforms for protein <xsl:value-of select="sequence_name"/><xsl:text> </xsl:text>
+        <xsl:value-of select="sequence_description"/>
+      </title>
+      <link rel="stylesheet" type="text/css" href="../resources/media/css/jquery.dataTables.css"></link>
+      <link rel="stylesheet" type="text/css" href="../resources/bootstrap.min.css"></link>
+      <link rel="stylesheet" type="text/css" href="../resources/prsm.css"></link>
+      <script type="text/javascript" language="javascript" src="../resources/media/js/jquery.js"></script>
+      <script type="text/javascript" language="javascript" src="../resources/media/js/jquery.dataTables.js"></script>
+      <style type="text/css">
+        @font-face {
+          font-family: "FreeMono";
+          src: url("../resources/FreeMono.ttf")
+        }
+      </style>
+      <body>
+        <div class="container">
+          <xsl:call-template name="navigation"/>
+          <p style="font-size:16px;"><xsl:value-of select="compatible_proteoform_number"/> proteoforms for protein <xsl:value-of select="sequence_name"/><xsl:text> </xsl:text>
+            <xsl:value-of select="sequence_description"/>
+          </p>
 
-<xsl:template name="navigation">
-<p style="font-size:16px;">
-	<a href="../proteins.html">All proteins</a>&#160;
-</p>
-</xsl:template>
+          <xsl:apply-templates select="compatible_proteoform">
+            <!-- sort not working  <xsl:sort select="min(proteoform_id)" order="ascending" data-type="number"/> -->
+          </xsl:apply-templates>
+          <br/>
+          <xsl:call-template name="navigation"/>
+        </div>
+      </body>
+    </html>
+  </xsl:template>
 
-<xsl:template match="compatible_proteoform">
-<div id="p{proteoform_id}">
-	<xsl:if test="prsm/ms/ms_header/precursor_inte">
-		<h2>Proteoform #<xsl:value-of select="proteoform_id"/> Feature intensity: <xsl:value-of select="prsm/ms/ms_header/precursor_inte"/></h2>
-	</xsl:if>
-	<xsl:if test="not(prsm/ms/ms_header/precursor_inte)">
-		<h2>Proteoform #<xsl:value-of select="proteoform_id"/></h2>
-	</xsl:if>
-	<xsl:apply-templates select="prsm" mode="protein"></xsl:apply-templates>
-</div>
-<br/>
-</xsl:template>
-
-<xsl:template match="prsm" mode="protein">
-	<xsl:if test="position()=1">
-    <p>
-    <xsl:choose>
-		<xsl:when test="count(../prsm) > 1">
-            <p style="font-size:16px;">The <a href="../prsms/prsm{prsm_id}.html">best PrSM</a> has an E-value <xsl:value-of select="e_value"/>
-            and a precursor mass <xsl:value-of select="ms/ms_header/precursor_mono_mass"/>.
-            There are <a href="../proteoforms/proteoform{../proteoform_id}.html"><xsl:value-of select="count(../prsm)"/> PrSMs</a> in total.</p>
-        </xsl:when>
-        <xsl:otherwise>
-            <p style="font-size:16px;">There is only <a href="../prsms/prsm{prsm_id}.html">1 PrSM</a>
-            with an E-value <xsl:value-of select="e_value"/> and a precursor mass <xsl:value-of select="ms/ms_header/precursor_mono_mass"/>.</p>
-        </xsl:otherwise>
-    </xsl:choose>
+  <xsl:template name="navigation">
+    <p style="font-size:16px;">
+      <a href="../proteins.html">All proteins</a>&#160;
     </p>
-    <xsl:apply-templates select="annotated_protein/annotation" mode="protein">
-    <!--<xsl:sort select="min(e-value)" order="ascending" data-type="number"/> -->
-    </xsl:apply-templates>
-	</xsl:if>
-</xsl:template>
+  </xsl:template>
+
+  <xsl:template match="compatible_proteoform">
+    <div id="p{proteoform_id}">
+      <xsl:if test="prsm/ms/ms_header/precursor_inte">
+        <h2>Proteoform #<xsl:value-of select="proteoform_id"/> Feature intensity: <xsl:value-of select="prsm/ms/ms_header/precursor_inte"/></h2>
+      </xsl:if>
+      <xsl:if test="not(prsm/ms/ms_header/precursor_inte)">
+        <h2>Proteoform #<xsl:value-of select="proteoform_id"/></h2>
+      </xsl:if>
+      <xsl:apply-templates select="prsm" mode="protein"></xsl:apply-templates>
+    </div>
+    <br/>
+  </xsl:template>
+
+  <xsl:template match="prsm" mode="protein">
+    <xsl:if test="position()=1">
+      <p>
+        <xsl:choose>
+          <xsl:when test="count(../prsm) > 1">
+            <p style="font-size:16px;">The <a href="../prsms/prsm{prsm_id}.html">best PrSM</a> has an E-value <xsl:value-of select="e_value"/>
+              and a precursor mass <xsl:value-of select="ms/ms_header/precursor_mono_mass"/>.
+              There are <a href="../proteoforms/proteoform{../proteoform_id}.html"><xsl:value-of select="count(../prsm)"/> PrSMs</a> in total.</p>
+          </xsl:when>
+          <xsl:otherwise>
+            <p style="font-size:16px;">There is only <a href="../prsms/prsm{prsm_id}.html">1 PrSM</a>
+              with an E-value <xsl:value-of select="e_value"/> and a precursor mass <xsl:value-of select="ms/ms_header/precursor_mono_mass"/>.</p>
+          </xsl:otherwise>
+        </xsl:choose>
+      </p>
+      <xsl:apply-templates select="annotated_protein/annotation" mode="protein">
+        <!--<xsl:sort select="min(e-value)" order="ascending" data-type="number"/> -->
+      </xsl:apply-templates>
+    </xsl:if>
+  </xsl:template>
 
   <xsl:template match="annotated_protein/annotation" mode="protein">
     <div id="alignment" style="font-family: 'FreeMono', Miltonian, monospace; font-size:16;line-height:2.5;background-color:#FFF;width:800px;">

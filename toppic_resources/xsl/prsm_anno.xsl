@@ -1,74 +1,74 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0">
-<xsl:output encoding="UTF-8" method="html" omit-xml-declaration="yes" indent="yes"/>
+  <xsl:output encoding="UTF-8" method="html" omit-xml-declaration="yes" indent="yes"/>
 
-<xsl:template match="residue">
-  <xsl:text disable-output-escaping="yes"><![CDATA[ style="]]></xsl:text>
-  <xsl:if test="residue_type = 'known_change'">
-    <xsl:text>font-weight:bold;color:red;</xsl:text>
-  </xsl:if>
-  <xsl:if test="residue_type = 'n_truncation'">
-    <xsl:text>color:grey;</xsl:text>
-  </xsl:if>
-  <xsl:if test="residue_type = 'c_truncation'">
-    <xsl:text>color:grey;</xsl:text>
-  </xsl:if>
-  <xsl:if test="is_unexpected_change = '1'">
-    <xsl:if test="unexpected_change_color = 0">
-      <xsl:text>background:#DFFFFF;</xsl:text>
-    </xsl:if>
-    <xsl:if test="unexpected_change_color = 1">
-      <xsl:text>background:#CECEF6;</xsl:text>
-    </xsl:if>
-  </xsl:if>
-  <xsl:text disable-output-escaping="yes"><![CDATA[">]]></xsl:text>
-  <xsl:if test="is_unexpected_change = '1'">
-    <a style="text-decoration:none" href="#">
-    <xsl:attribute name="title">
-      <xsl:value-of select="anno" />
-    </xsl:attribute>
-    <xsl:if test="not(residue_type = 'known_change')">
-      <xsl:if test="possible_pos_color = 1">
-        <font color="red">
-          <xsl:value-of select="acid" />
-        </font>
-      </xsl:if>
-      <xsl:if test="possible_pos_color = 0">
-        <font color="black">
-          <xsl:value-of select="acid" />
-        </font>
-      </xsl:if>					
-    </xsl:if>
+  <xsl:template match="residue">
+    <xsl:text disable-output-escaping="yes"><![CDATA[ style="]]></xsl:text>
     <xsl:if test="residue_type = 'known_change'">
-      <font color="red">
-        <xsl:value-of select="acid" />
-      </font>					
+      <xsl:text>font-weight:bold;color:red;</xsl:text>
     </xsl:if>
-    </a>
-  </xsl:if>
-  <xsl:if test="not(is_unexpected_change = '1')">
-    <xsl:value-of select="acid" />
-  </xsl:if>
-  <xsl:text disable-output-escaping="yes"><![CDATA[]]></xsl:text>
-</xsl:template>
+    <xsl:if test="residue_type = 'n_truncation'">
+      <xsl:text>color:grey;</xsl:text>
+    </xsl:if>
+    <xsl:if test="residue_type = 'c_truncation'">
+      <xsl:text>color:grey;</xsl:text>
+    </xsl:if>
+    <xsl:if test="is_unexpected_change = '1'">
+      <xsl:if test="unexpected_change_color = 0">
+        <xsl:text>background:#DFFFFF;</xsl:text>
+      </xsl:if>
+      <xsl:if test="unexpected_change_color = 1">
+        <xsl:text>background:#CECEF6;</xsl:text>
+      </xsl:if>
+    </xsl:if>
+    <xsl:text disable-output-escaping="yes"><![CDATA[">]]></xsl:text>
+    <xsl:if test="is_unexpected_change = '1'">
+      <a style="text-decoration:none" href="#">
+        <xsl:attribute name="title">
+          <xsl:value-of select="anno" />
+        </xsl:attribute>
+        <xsl:if test="not(residue_type = 'known_change')">
+          <xsl:if test="possible_pos_color = 1">
+            <font color="red">
+              <xsl:value-of select="acid" />
+            </font>
+          </xsl:if>
+          <xsl:if test="possible_pos_color = 0">
+            <font color="black">
+              <xsl:value-of select="acid" />
+            </font>
+          </xsl:if>					
+        </xsl:if>
+        <xsl:if test="residue_type = 'known_change'">
+          <font color="red">
+            <xsl:value-of select="acid" />
+          </font>					
+        </xsl:if>
+      </a>
+    </xsl:if>
+    <xsl:if test="not(is_unexpected_change = '1')">
+      <xsl:value-of select="acid" />
+    </xsl:if>
+    <xsl:text disable-output-escaping="yes"><![CDATA[]]></xsl:text>
+  </xsl:template>
 
-<xsl:template match="matched_peaks" mode="prsm">
-  <xsl:for-each select="matched_peak">
-    <xsl:value-of select="ion_position"/><xsl:text>,</xsl:text>
-  </xsl:for-each>
-</xsl:template>
-
-<xsl:template match="matched_peaks" mode="title">
-	<xsl:for-each select="matched_peak">
-		<xsl:value-of select="ion_type"/>
-		<xsl:value-of select="ion_display_position"/>
-		<xsl:text>&#160;</xsl:text>
-		<xsl:value-of select="peak_charge"/>
-		<xsl:text>+&#160;</xsl:text>
+  <xsl:template match="matched_peaks" mode="prsm">
+    <xsl:for-each select="matched_peak">
+      <xsl:value-of select="ion_position"/><xsl:text>,</xsl:text>
     </xsl:for-each>
-</xsl:template>
+  </xsl:template>
 
-<xsl:template name="add_one_letter">
+  <xsl:template match="matched_peaks" mode="title">
+    <xsl:for-each select="matched_peak">
+      <xsl:value-of select="ion_type"/>
+      <xsl:value-of select="ion_display_position"/>
+      <xsl:text>&#160;</xsl:text>
+      <xsl:value-of select="peak_charge"/>
+      <xsl:text>+&#160;</xsl:text>
+    </xsl:for-each>
+  </xsl:template>
+
+  <xsl:template name="add_one_letter">
     <xsl:param name="i" />
     <xsl:param name="j" />
     <xsl:param name="k" />
@@ -281,7 +281,7 @@
       <xsl:text>&#10;</xsl:text>
 
       <tr>
-      <xsl:text>&#10;</xsl:text>
+        <xsl:text>&#10;</xsl:text>
         <xsl:variable name="row_residue_num" select="30"/>
         <xsl:variable name="begin_pos" select="$i * $row_residue_num"/>
 
@@ -338,7 +338,7 @@
     </xsl:element>
     <xsl:text>&#160;</xsl:text>
   </xsl:template>
-      
+
   <xsl:template match="unexpected_change">
     <xsl:text>&#160;</xsl:text>
     <xsl:variable name="s_type" select="segment_type" />
@@ -359,7 +359,7 @@
             <xsl:value-of select="occurence" />
             <xsl:text>]&#160;&#160;</xsl:text>
           </font>
-          </xsl:element>
+        </xsl:element>
       </xsl:if>
       <xsl:if test="$known_ptm = 0">
         <xsl:choose>
@@ -377,7 +377,7 @@
               <xsl:text>]</xsl:text>  
             </font>  
           </xsl:otherwise>
-      </xsl:choose>
+        </xsl:choose>
       </xsl:if>
       <xsl:text>&#160;</xsl:text>			
     </xsl:if>
