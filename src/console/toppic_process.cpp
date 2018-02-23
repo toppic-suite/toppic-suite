@@ -203,14 +203,13 @@ int TopPICProgress(std::map<std::string, std::string> arguments) {
     std::cout << "E-value computation - finished." << std::endl;
 
     std::cout << "Finding PrSM clusters - started." << std::endl;
-    if (arguments["featureFileName"] != "") {
+    if (arguments["useFeatureFileName"] == "true") {
       // TopFD msalign file with feature ID
       double prec_error_tole = 1.2;
       ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();
       PrsmFeatureClusterPtr prsm_clusters
           = std::make_shared<PrsmFeatureCluster>(db_file_name,
                                                  sp_file_name,
-                                                 arguments["featureFileName"],
                                                  "EVALUE",
                                                  "CLUSTERS",
                                                  fix_mod_list,

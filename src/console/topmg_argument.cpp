@@ -63,7 +63,7 @@ void Argument::initArguments() {
   arguments_["filteringResultNumber"] = "20";
   arguments_["residueModFileName"] = "";
   arguments_["threadNumber"] = "1";
-  arguments_["featureFileName"] = "";
+  arguments_["useFeatureFileName"] = "false";
   arguments_["skipList"] = "";
   arguments_["proteo_graph_dis"] = "40";
   arguments_["useASFDiag"] = "false";  
@@ -84,9 +84,7 @@ void Argument::outputArguments(std::ostream &output, std::map<std::string, std::
     output << std::setw(50) << std::left << "Fixed modifications: " << "\t" << arguments["fixedMod"] << std::endl;
   }
 
-  if (arguments["featureFileName"] != "") {
-    output << std::setw(50) << std::left << "TopFD feature file: " << "\t" << arguments["featureFileName"] << std::endl;
-  }
+  output << std::setw(50) << std::left << "Use TopFD feature file: " << "\t" << arguments["useFeatureFileName"] << std::endl;
 
   output << std::setw(50) << std::left << "Error tolerance: " << "\t" << arguments["errorTolerance"] << " ppm" << std::endl;
   output << std::setw(50) << std::left << "Spectrum-level cutoff type: " << "\t" << arguments["cutoffSpectralType"] << std::endl;
@@ -140,7 +138,6 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string residue_mod_file_name = "";
   std::string proteo_graph_dis = "";
   std::string thread_number = "";
-  std::string feature_file_name = "";
   std::string skip_list = "";
   std::string var_ptm_num = "";
   std::string var_ptm_in_gap = "";
@@ -168,7 +165,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("generating-function,g", "Use the generating function approach to compute p-values and E-values.")
         ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "<a common modification file>. Specify a text file containing the information of common PTMs for characterization of PTMs in proteoform spectrum-matches.")
         ("thread-number,u", po::value<std::string> (&thread_number), "<a positive number>. Number of threads used in the computation. Default value: 1.")
-        ("use-topfd-feature,x", po::value<std::string>(&feature_file_name) , "<a TopFD feature file with its path>. TopFD features for proteoform identification.")
+        ("use-topfd-feature,x", "Use TopFD feature file for proteoform identification.")
         ("skip-list,l", po::value<std::string>(&skip_list) , "<a text file with its path>. The scans in this file will be skipped.")
         ("proteo-graph-dis,j", po::value<std::string> (&proteo_graph_dis), "<a positive number>. Gap in constructing proteoform graph. Default value: 40.")        
         ("var-ptm-in-gap,G", po::value<std::string>(&var_ptm_in_gap) , "<a positive number>. Maximum number of variable PTMs in a proteform graph gap. Default value: 5.")
@@ -196,7 +193,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("full-binary-path,b", "Full binary path.")
         ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "")
         ("thread-number,u", po::value<std::string> (&thread_number), "")
-        ("use-topfd-feature,x", po::value<std::string>(&feature_file_name) , "")
+        ("use-topfd-feature,x", "")
         ("skip-list,l", po::value<std::string>(&skip_list) , "")
         ("proteo-graph-dis,j", po::value<std::string> (&proteo_graph_dis), "")
         ("var-ptm-in-gap,G", po::value<std::string>(&var_ptm_in_gap) , "")
@@ -319,7 +316,7 @@ bool Argument::parse(int argc, char* argv[]) {
     }
 
     if (vm.count("use-topfd-feature")) {
-      arguments_["featureFileName"] = feature_file_name;
+      arguments_["useFeatureFileName"] = "true";
     }
 
     if (vm.count("skip-list")) {
@@ -389,9 +386,13 @@ bool Argument::validateArguments() {
     return false;
   }
 
-  if (arguments_["featureFileName"] != "") {
-    if (!boost::filesystem::exists(arguments_["featureFileName"])) {
-      LOG_ERROR("TopFD feature file " << arguments_["featureFileName"] << " does not exist!");
+  if (arguments_["useFeatureFileName"] == "true") {
+    std::string spec_file_name = arguments_["spectrumFileName"];
+
+    std::string feature_file_name = spec_file_name.substr(0, spec_file_name.length() - 12) + ".feature";
+
+    if (!boost::filesystem::exists(feature_file_name)) {
+      LOG_ERROR("TopFD feature file " << feature_file_name << " does not exist!");
       return false;
     }
   }
