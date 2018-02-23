@@ -15,21 +15,59 @@
 #include <map>
 #include <iostream>
 #include <string>
+#include <algorithm>
+
+#include <boost/filesystem.hpp>
 
 #include "base/file_util.hpp"
 #include "console/topfd_argument.hpp"
 
 #include "feature/topfd_process.hpp"
 
+namespace fs = boost::filesystem;
+
+bool endswith(const std::string & a, const std::string & b) {
+  if (b.size() > a.size())
+    return false;
+  return std::equal(a.begin() + a.size() - b.size(), a.end(), b.begin());
+}
+
 int main(int argc, char* argv[]) {
   prot::Argument argu_processor;
   bool success = argu_processor.parse(argc, argv);
+
   if (!success) {
     return EXIT_FAILURE;
   }
+
   std::map<std::string, std::string> arguments = argu_processor.getArguments();
+
   std::string exe_dir = prot::file_util::getExecutiveDir(argv[0]);
+
   arguments["executiveDir"] = exe_dir;
 
-  return prot::TopFDProcess(arguments);
+  fs::path spec_path(arguments["spectrumFileName"]);
+
+  std::vector<std::string> spec_file_lst;
+
+  if (fs::is_regular_file(spec_path)) {
+    spec_file_lst.push_back(arguments["spectrumFileName"]);
+  } else {
+    fs::directory_iterator end_iter;
+    for (fs::directory_iterator dir_iter(fs::absolute(spec_path));
+         dir_iter != end_iter; ++dir_iter) {
+      std::string fname = dir_iter->path().string();
+      if (endswith(fname, ".mzML") || endswith(fname, ".mzXML")
+          || endswith(fname, ".mzml") || endswith(fname, ".mzxml")) {
+        spec_file_lst.push_back(fname);
+      }
+    }
+  }
+
+  for (size_t k = 0; k < spec_file_lst.size(); k++) {
+    arguments["spectrumFileName"] = spec_file_lst[k];
+    prot::TopFDProcess(arguments);
+  }
+
+  return EXIT_SUCCESS;
 }
