@@ -57,6 +57,7 @@
 #include "graph/proteo_graph.hpp"
 #include "graphalign/graph_align_mng.hpp"
 #include "graphalign/graph_align_processor.hpp"
+#include "graphalign/graph_post_processor.hpp"
 
 #include "prsmview/xml_generator.hpp"
 #include "prsmview/transformer.hpp"
@@ -181,11 +182,18 @@ int TopMGProcess(std::map<std::string, std::string> arguments) {
     ga_processor_ptr = nullptr;
     std::cout << "Graph alignment finished." << std::endl;
 
+    std::cout << "Graph alignment post-processing started." << std::endl;
+    GraphPostProcessorPtr ga_post_processor_ptr
+        = std::make_shared<GraphPostProcessor>(ga_mng_ptr, "GRAPH_ALIGN", "GRAPH_POST");
+    ga_post_processor_ptr->process();
+    ga_post_processor_ptr = nullptr;
+    std::cout << "Graph alignment post-processing finished." << std::endl;
+
     std::cout << "E-value computation - started." << std::endl;
     bool variable_ptm = false;
     TdgfMngPtr tdgf_mng_ptr
         = std::make_shared<TdgfMng>(prsm_para_ptr, ptm_num, max_ptm_mass,
-                                    use_gf, variable_ptm, thread_num, "GRAPH_ALIGN", "EVALUE");
+                                    use_gf, variable_ptm, thread_num, "GRAPH_POST", "EVALUE");
     EValueProcessorPtr processor = std::make_shared<EValueProcessor>(tdgf_mng_ptr);
     processor->init();
     // compute E-value for a set of prsms each run
@@ -266,15 +274,15 @@ int TopMGProcess(std::map<std::string, std::string> arguments) {
     table_out = nullptr;
     std::cout << "Outputting PrSM table - finished." << std::endl;
 
-    std::cout << "Generating PrSM xml files - started." << std::endl;
-    XmlGeneratorPtr xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, "CUTOFF_RESULT_SPEC", "prsm_cutoff");
-    xml_gene->process();
-    xml_gene = nullptr;
-    std::cout << "Generating PrSM xml files - finished." << std::endl;
+    /*std::cout << "Generating PrSM xml files - started." << std::endl;*/
+    //XmlGeneratorPtr xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, "CUTOFF_RESULT_SPEC", "prsm_cutoff");
+    //xml_gene->process();
+    //xml_gene = nullptr;
+    //std::cout << "Generating PrSM xml files - finished." << std::endl;
 
-    std::cout << "Converting PrSM xml files to html files - started." << std::endl;
-    translate(arguments, "prsm_cutoff");
-    std::cout << "Converting PrSM xml files to html files - finished." << std::endl;
+    //std::cout << "Converting PrSM xml files to html files - started." << std::endl;
+    //translate(arguments, "prsm_cutoff");
+    /*std::cout << "Converting PrSM xml files to html files - finished." << std::endl;*/
 
     cutoff_type = (arguments["cutoffProteoformType"] == "FDR") ? "FORMFDR": "EVALUE";
     std::cout << "PrSM filtering by " << cutoff_type << " - started." << std::endl;
@@ -302,15 +310,15 @@ int TopMGProcess(std::map<std::string, std::string> arguments) {
     form_out = nullptr;
     std::cout << "Outputting proteoform table - finished." << std::endl;
 
-    std::cout << "Generating proteoform xml files - started." << std::endl;
-    xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, "CUTOFF_RESULT_FORM", "proteoform_cutoff");
-    xml_gene->process();
-    xml_gene = nullptr;
-    std::cout << "Generating proteoform xml files - finished." << std::endl;
+    /*std::cout << "Generating proteoform xml files - started." << std::endl;*/
+    //xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, "CUTOFF_RESULT_FORM", "proteoform_cutoff");
+    //xml_gene->process();
+    //xml_gene = nullptr;
+    //std::cout << "Generating proteoform xml files - finished." << std::endl;
 
-    std::cout << "Converting proteoform xml files to html files - started." << std::endl;
-    translate(arguments, "proteoform_cutoff");
-    std::cout << "Converting proteoform xml files to html files - finished." << std::endl;
+    //std::cout << "Converting proteoform xml files to html files - started." << std::endl;
+    //translate(arguments, "proteoform_cutoff");
+    /*std::cout << "Converting proteoform xml files to html files - finished." << std::endl;*/
 
     if (arguments["keepTempFiles"] != "true") {
       std::cout << "Deleting temporary files - started." << std::endl;

@@ -17,7 +17,7 @@
 #include <vector>
 
 #include "base/xml_dom.hpp"
-#include "base/change_type.hpp"
+#include "base/mass_shift_type.hpp"
 #include "base/prot_mod_base.hpp"
 #include "base/prot_mod_util.hpp"
 #include "base/ptm_base.hpp"
@@ -51,20 +51,20 @@ ProteoAnno::ProteoAnno(const ModPtrVec &fix_mod_ptr_vec,
 void ProteoAnno::anno(const std::string &seq, bool is_complete) {
   ResiduePtrVec residue_ptr_vec = residue_util::convertStrToResiduePtrVec(seq, fix_mod_ptr_vec_);
   res_vec_2d_.clear();
-  change_vec_2d_.clear();
+  shift_vec_2d_.clear();
   // input and fixed mod
   for (size_t i = 0; i < residue_ptr_vec.size(); i++) {
     ResiduePtrVec cur_res_vec;
-    std::vector<int> cur_change_vec;
+    std::vector<int> cur_shift_vec;
     ResiduePtr res_ptr = residue_ptr_vec[i];
     cur_res_vec.push_back(res_ptr);
     if (PtmBase::isEmptyPtmPtr(res_ptr->getPtmPtr())) {
-      cur_change_vec.push_back(ChangeType::INPUT->getId());
+      cur_shift_vec.push_back(MassShiftType::INPUT->getId());
     } else {
-      cur_change_vec.push_back(ChangeType::FIXED->getId());
+      cur_shift_vec.push_back(MassShiftType::FIXED->getId());
     }
     res_vec_2d_.push_back(cur_res_vec);
-    change_vec_2d_.push_back(cur_change_vec);
+    shift_vec_2d_.push_back(cur_shift_vec);
   }
   LOG_DEBUG("input complete");
 
@@ -88,18 +88,18 @@ void ProteoAnno::anno(const std::string &seq, bool is_complete) {
         throw("Residue not found");
       }
       res_vec_2d_[0].push_back(empty_residue_ptr);
-      change_vec_2d_[0].push_back(ChangeType::PROTEIN_VARIABLE->getId());
+      shift_vec_2d_[0].push_back(MassShiftType::PROTEIN_VARIABLE->getId());
     } else if (is_complete && mod_ptr->getType() == ProtModBase::getType_M_ACETYLATION()) {
       ResiduePtr mut_residue_ptr = mod_ptr->getModPtr()->getModResiduePtr();
       res_vec_2d_[0].push_back(mut_residue_ptr);
-      change_vec_2d_[0].push_back(ChangeType::PROTEIN_VARIABLE->getId());
+      shift_vec_2d_[0].push_back(MassShiftType::PROTEIN_VARIABLE->getId());
     } else if (is_complete && mod_ptr->getType() == ProtModBase::getType_NME_ACETYLATION()) {
       LOG_DEBUG("NME_ACETYLATION");
       // add acetylation to the second residue
       is_nme_ = true;
       ResiduePtr mut_residue_ptr = mod_ptr->getModPtr()->getModResiduePtr();
       res_vec_2d_[1].push_back(mut_residue_ptr);
-      change_vec_2d_[1].push_back(ChangeType::PROTEIN_VARIABLE->getId());
+      shift_vec_2d_[1].push_back(MassShiftType::PROTEIN_VARIABLE->getId());
     }
     LOG_DEBUG("round complete");
   }
@@ -123,7 +123,7 @@ void ProteoAnno::anno(const std::string &seq, bool is_complete) {
         }
         if (!found) {
           res_vec_2d_[i].push_back(mod_res_vec[j]);
-          change_vec_2d_[i].push_back(ChangeType::VARIABLE->getId());
+          shift_vec_2d_[i].push_back(MassShiftType::VARIABLE->getId());
         }
       }
     }

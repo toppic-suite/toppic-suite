@@ -16,7 +16,7 @@
 #include <vector>
 
 #include "base/logger.hpp"
-#include "base/change_type.hpp"
+#include "base/mass_shift_type.hpp"
 #include "base/fasta_reader.hpp"
 #include "base/residue_seq.hpp"
 #include "base/mod_base.hpp"
@@ -34,15 +34,18 @@ ProteoformPtr geneDbProteoformPtr(FastaSubSeqPtr fasta_seq_ptr, ModPtrVec fix_mo
   ResiduePtrVec residue_ptrs = residue_util::convertStrToResiduePtrVec(fasta_seq_ptr->getAcidPtmPairVec());
   int end_pos = start_pos + static_cast<int>(residue_ptrs.size()) - 1;
 
-  ChangePtrVec change_list;
+  MassShiftPtrVec shift_list;
   // add input ptms;
   for (size_t i = 0; i < residue_ptrs.size(); i++) {
     if (residue_ptrs[i]->getPtmPtr() != PtmBase::getEmptyPtmPtr()) {
       ResiduePtr ori_residue = ResidueBase::getBaseResiduePtr(residue_ptrs[i]->getAminoAcidPtr());
       ModPtr mod_ptr = ModBase::getBaseModPtr(ori_residue, residue_ptrs[i]);
       ChangePtr change_ptr
-          = std::make_shared<Change>(i, i + 1, ChangeType::INPUT, mod_ptr->getShift(), mod_ptr);
-      change_list.push_back(change_ptr);
+          = std::make_shared<Change>(i, i + 1, MassShiftType::INPUT, mod_ptr->getShift(), mod_ptr);
+      MassShiftPtr shift_ptr
+          = std::make_shared<MassShift>(i, i + 1, change_ptr->getTypePtr());
+      shift_ptr->setChangePtr(change_ptr);
+      shift_list.push_back(shift_ptr);
     }
   }
 
@@ -52,15 +55,18 @@ ProteoformPtr geneDbProteoformPtr(FastaSubSeqPtr fasta_seq_ptr, ModPtrVec fix_mo
       if (residue_ptrs[i] == fix_mod_list[j]->getOriResiduePtr()) {
         residue_ptrs[i] = fix_mod_list[j]->getModResiduePtr();
         ChangePtr change_ptr
-            = std::make_shared<Change>(i, i + 1, ChangeType::FIXED, fix_mod_list[j]->getShift(), fix_mod_list[j]);
-        change_list.push_back(change_ptr);
+            = std::make_shared<Change>(i, i + 1, MassShiftType::FIXED, fix_mod_list[j]->getShift(), fix_mod_list[j]);
+        MassShiftPtr shift_ptr
+            = std::make_shared<MassShift>(i, i + 1, change_ptr->getTypePtr());
+        shift_ptr->setChangePtr(change_ptr);
+        shift_list.push_back(shift_ptr);
         break;
       }
     }
   }
   ResSeqPtr res_seq_ptr = std::make_shared<ResidueSeq>(residue_ptrs);
   return std::make_shared<Proteoform>(fasta_seq_ptr, none_prot_mod_ptr, start_pos,
-                                      end_pos, res_seq_ptr, change_list);
+                                      end_pos, res_seq_ptr, shift_list);
 }
 
 ProteoGraph::ProteoGraph(FastaSubSeqPtr fasta_seq_ptr, ModPtrVec fix_mod_ptr_vec,
@@ -108,10 +114,10 @@ void ProteoGraph::compDistances(int max_mod_num, int max_ptm_sum_mass) {
   MassGraph *g_p = graph_ptr_.get();
   // get mass without ptms
 
-  std::vector<std::vector<std::set<int>>> dist_vecs;
+  std::vector<std::vector<std::set<int> > > dist_vecs;
   for (int i = 0; i < pair_num_; i++) {
     std::set<int> empty_set;
-    std::vector<std::set<int>> one_pair_vec;
+    std::vector<std::set<int> > one_pair_vec;
     for (int j = 0; j < max_mod_num + 1; j ++) {
       one_pair_vec.push_back(empty_set);
     }
@@ -137,16 +143,16 @@ void ProteoGraph::compDistances(int max_mod_num, int max_ptm_sum_mass) {
           int change = (*g_p)[e].change_type_;
           for (int k = 0; k < var_ptm_in_gap_ + 1; k++) {
             if (k == max_mod_num &&
-                (change == ChangeType::PROTEIN_VARIABLE->getId()
-                 || change == ChangeType::VARIABLE->getId())) {
+                (change == MassShiftType::PROTEIN_VARIABLE->getId()
+                 || change == MassShiftType::VARIABLE->getId())) {
               continue;
             }
             for (std::set<int>::iterator it=dist_vecs[pre_index][k].begin();
                  it != dist_vecs[pre_index][k].end(); it++) {
               int new_d = d + *it;
               if (std::abs(new_d - seq_masses_[index]) <= max_ptm_sum_mass) {
-                if (change == ChangeType::PROTEIN_VARIABLE->getId()
-                    || change == ChangeType::VARIABLE->getId()) {
+                if (change == MassShiftType::PROTEIN_VARIABLE->getId()
+                    || change == MassShiftType::VARIABLE->getId()) {
                   dist_vecs[index][k+1].insert(new_d);
                 } else {
                   dist_vecs[index][k].insert(new_d);
