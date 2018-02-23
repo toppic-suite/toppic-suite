@@ -60,7 +60,7 @@ void Argument::initArguments() {
   arguments_["filteringResultNumber"] = "20";
   arguments_["residueModFileName"] = "";
   arguments_["threadNumber"] = "1";
-  arguments_["featureFileName"] = "";
+  arguments_["useFeatureFile"] = "false";
   arguments_["skipList"] = "";
 }
 
@@ -79,9 +79,7 @@ void Argument::outputArguments(std::ostream &output,
     output << std::setw(44) << std::left << "Fixed modifications: " << "\t" << arguments["fixedMod"] << std::endl;
   }
 
-  if (arguments["featureFileName"] != "") {
-    output << std::setw(44) << std::left << "TopFD feature file: " << "\t" << arguments["featureFileName"] << std::endl;
-  }
+  output << std::setw(44) << std::left << "Use TopFD feature file: " << "\t" << arguments["useFeatureFileName"] << std::endl;
 
   output << std::setw(44) << std::left << "Maximum number of unexpected modifications: " << "\t" << arguments["ptmNumber"] << std::endl;
   output << std::setw(44) << std::left << "Error tolerance: " << "\t" << arguments["errorTolerance"] << " ppm" << std::endl;
@@ -137,7 +135,6 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string filtering_result_num = "";
   std::string residue_mod_file_name = "";
   std::string thread_number = "";
-  std::string feature_file_name = "";
   std::string skip_list = "";
 
   /** Define and parse the program options*/
@@ -167,7 +164,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "<a common modification file>. Specify a text file containing the information of common PTMs for characterization of PTMs in proteoform spectrum-matches.")
         ("miscore-threshold,s", po::value<std::string> (&local_threshold), "<a positive number between 0 and 1>. Score threshold (modification identification score) for filtering results of PTM characterization. Default value: 0.45.")
         ("thread-number,u", po::value<std::string> (&thread_number), "<positive number>. Number of threads used in the computation. Default value: 1.")
-        ("use-topfd-feature,x", po::value<std::string>(&feature_file_name) , "<a TopFD feature file with its path>. TopFD features for proteoform identification.")
+        ("use-topfd-feature,x", "Use TopFD feature file for proteoform identification.")
         ("skip-list,l", po::value<std::string>(&skip_list) , "<a text file with its path>. The scans in this file will be skipped.")
         ("keep-temp-files,k", "Keep temporary files.");
 
@@ -194,7 +191,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("num-combined-spectra,r", po::value<std::string> (&group_num), "")
         ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "")
         ("thread-number,u", po::value<std::string> (&thread_number), "")
-        ("use-topfd-feature,x", po::value<std::string>(&feature_file_name) , "")
+        ("use-topfd-feature,x", "")
         ("skip-list,l", po::value<std::string>(&skip_list) , "")
         ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name with its path.")
         ("spectrum-file-name", po::value<std::string>(&spectrum_file_name)->required(), "Spectrum file name with its path.");
@@ -322,7 +319,7 @@ bool Argument::parse(int argc, char* argv[]) {
     }
 
     if (vm.count("use-topfd-feature")) {
-      arguments_["featureFileName"] = feature_file_name;
+      arguments_["useFeatureFileName"] = "true";
     }
 
     if (vm.count("skip-list")) {
@@ -375,9 +372,13 @@ bool Argument::validateArguments() {
     return false;
   }
 
-  if (arguments_["featureFileName"] != "") {
-    if (!boost::filesystem::exists(arguments_["featureFileName"])) {
-      LOG_ERROR("TopFD feature file " << arguments_["featureFileName"] << " does not exist!");
+  if (arguments_["useFeatureFileName"] == "true") {
+    std::string spectrum_file_name = arguments_["spectrumFileName"];
+
+    std::string feature_file_name = spectrum_file_name.substr(0, spectrum_file_name.length() - 12) + ".feature";
+
+    if (!boost::filesystem::exists(feature_file_name)) {
+      LOG_ERROR("TopFD feature file " << feature_file_name << " does not exist!");
       return false;
     }
   }

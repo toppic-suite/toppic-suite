@@ -23,8 +23,7 @@
 
 namespace prot {
 
-std::vector<PrsmStrPtrVec> 
-    PrsmCluster::groupProteins(const PrsmStrPtrVec &prsm_ptrs) {
+std::vector<PrsmStrPtrVec> PrsmCluster::groupProteins(const PrsmStrPtrVec &prsm_ptrs) {
   // get max shift number
   int max_shift_number = 0;
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
@@ -47,8 +46,7 @@ std::vector<PrsmStrPtrVec>
   return proteogroups;
 }
 
-std::vector<PrsmStrPtrVec> 
-PrsmCluster::getZeroPtmList(const PrsmStrPtrVec& proteo_ptrs, double ppo) {
+std::vector<PrsmStrPtrVec> PrsmCluster::getZeroPtmList(const PrsmStrPtrVec& proteo_ptrs, double ppo) {
   std::vector<PrsmStrPtrVec> clusters;
   for (size_t i = 0; i < proteo_ptrs.size(); i++) {
     bool is_found = false;
