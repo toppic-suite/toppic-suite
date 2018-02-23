@@ -42,23 +42,30 @@ class ProteoAnno {
   void anno(const std::string &seq, bool is_complete = true);
 
   const ResiduePtrVec2D& getResiduePtrVec() {return res_vec_2d_;}
-  const std::vector<std::vector<int> >& getChangeVec() {return change_vec_2d_;}
+
+  const std::vector<std::vector<int> >& getChangeVec() {return shift_vec_2d_;}
 
   const ResiduePtrVec& getResiduePtrVec(int i) {return res_vec_2d_[i];}
-  const std::vector<int>& getChangeVec(int i) {return change_vec_2d_[i];}
+
+  const std::vector<int>& getChangeVec(int i) {return shift_vec_2d_[i];}
 
   int getLen() {return res_vec_2d_.size();}
+
   bool isNme() {return is_nme_;}
 
  private:
   ResiduePtrVec2D res_vec_2d_;
-  std::vector<std::vector<int> > change_vec_2d_;
+
+  std::vector<std::vector<int> > shift_vec_2d_;
 
   ModPtrVec fix_mod_ptr_vec_;
+
   ProtModPtrVec prot_mod_ptr_vec_;
+
   ModPtrVec var_mod_ptr_vec_;
 
   std::map<AminoAcidPtr, ResiduePtrVec> ptm_map_;
+
   bool is_nme_;
 };
 
