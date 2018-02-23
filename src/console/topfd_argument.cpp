@@ -47,7 +47,7 @@ void Argument::initArguments() {
 }
 
 void Argument::showUsage(boost::program_options::options_description &desc) {
-  std::cout << "Usage: toppfd [options] spectrum-file-name" << std::endl;
+  std::cout << "Usage: toppfd [options] spectrum-file" << std::endl;
   std::cout << desc << std::endl;
 }
 
@@ -93,17 +93,14 @@ bool Argument::parse(int argc, char* argv[]) {
         ("precursor-window,w", po::value<std::string> (&prec_window), "")
         ("missing-level-one,n", "")
         ("multiple-mass,u", "Output multiple masses for one envelope.")
-        ("spectrum-file-name", po::value<std::string>(&spectrum_file_name)->required(), "Spectrum file name with its path.")
+        ("spectrum-file", po::value<std::string>(&spectrum_file_name)->required(), "Spectrum file name with its path or a folder containing spectrum files.")
         ("keep,k", "Report monoisotopic masses extracted from low quality isotopic envelopes.")
         ("output-envelope-details,d", "Output env files for detailed info on envelopes.")
         ;
 
     po::positional_options_description positional_options;
-    positional_options.add("spectrum-file-name", 1);
+    positional_options.add("spectrum-file", 1);
 
-
-    std::string app_name;
-    //= boost::filesystem::basename(argv[0]);
     po::variables_map vm;
     try {
       po::store(po::command_line_parser(argc, argv).options(desc).positional(positional_options).run(), vm);
@@ -191,7 +188,7 @@ bool Argument::validateArguments() {
   }
 
   if (!boost::filesystem::exists(arguments_["spectrumFileName"])) {
-    LOG_ERROR("Spectrum file " << arguments_["spectrumFileName"] << " does not exist!");
+    LOG_ERROR(arguments_["spectrumFileName"] << " does not exist!");
     return false;
   }
   return true;
