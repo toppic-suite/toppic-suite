@@ -70,8 +70,7 @@ class MassMatch {
   std::vector<int> col_index_ends_;
   std::vector<int> col_indexes_;
 
-  void initProteoformBeginEnds(std::vector<std::vector<int>> &mass_2d,
-                               std::vector<std::vector<double>> &shift_2d);
+  void initProteoformBeginEnds(std::vector<std::vector<double>> &shift_2d);
 
   void initIndexes(std::vector<std::vector<int>> &mass_2d,
                    std::vector<std::vector<double>> &real_shift_2d,

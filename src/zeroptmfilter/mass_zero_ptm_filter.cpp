@@ -36,29 +36,30 @@ MassZeroPtmFilter::MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
   std::vector<std::vector<double> > n_term_acet_2d
       = proteoform_util::getNTermAcet2D(proteo_ptrs, mng_ptr->prsm_para_ptr_->getProtModPtrVec());
   LOG_DEBUG("get shifts complete");
+  // N-terminal indexes
   term_index_ptr_ = MassMatchFactory::getPrmTermMassMatchPtr(proteo_ptrs, shift_2d,
                                                              mng_ptr->max_proteoform_mass_,
                                                              mng_ptr->filter_scale_);
-  LOG_DEBUG("term index");
+  // Prm indexes
   diag_index_ptr_ = MassMatchFactory::getPrmDiagMassMatchPtr(proteo_ptrs,
                                                              mng_ptr->max_proteoform_mass_,
                                                              mng_ptr->filter_scale_);
-  LOG_DEBUG("diag index");
+  LOG_DEBUG("iag index");
   std::vector<std::vector<double> > rev_shift_2d;
   std::vector<double> shift_1d(1, 0);
   for (size_t i = 0; i < proteo_ptrs.size(); i++) {
     rev_shift_2d.push_back(shift_1d);
   }
+  // C-terminal indexes
   rev_term_index_ptr_ = MassMatchFactory::getSrmTermMassMatchPtr(proteo_ptrs, rev_shift_2d,
                                                                  n_term_acet_2d,
                                                                  mng_ptr->max_proteoform_mass_,
                                                                  mng_ptr->filter_scale_);
 
-  LOG_DEBUG("rev term index");
+  // To generate SRM indexes, n terminal acetylation shifts are added into the SRM list. 
   rev_diag_index_ptr_ = MassMatchFactory::getSrmDiagMassMatchPtr(proteo_ptrs, n_term_acet_2d,
                                                                  mng_ptr->max_proteoform_mass_,
                                                                  mng_ptr->filter_scale_);
-  LOG_DEBUG("rev diag index");
 }
 
 void MassZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec) {
@@ -101,8 +102,8 @@ void MassZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec) {
   bool add_shifts = false;
   int shift_num = 0;
   FilterProteinPtrVec comp_prots
-      = mass_match_util::findTopProteins(term_scores, rev_term_scores, term_index_ptr_, rev_term_index_ptr_,
-                                       threshold, mng_ptr_->comp_num_, add_shifts, shift_num);
+	  = mass_match_util::findTopProteins(term_scores, rev_term_scores, term_index_ptr_, rev_term_index_ptr_,
+			  threshold, mng_ptr_->comp_num_, add_shifts, shift_num);
   comp_match_ptrs_.clear();
   int group_spec_num = ms_ptr_vec.size();
   for (size_t i = 0; i < comp_prots.size(); i++) {
