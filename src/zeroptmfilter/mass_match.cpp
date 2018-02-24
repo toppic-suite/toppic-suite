@@ -25,6 +25,10 @@
 
 namespace prot {
 
+/* mass_2d[i]: a vector containing prefix residue masses of the ith proteoform 
+ * real_shift_2d[i]: a vector containing all possible shifts of the ith proteoform
+ * pos_2d[i]: a vector containing the first residue position for each shift. 
+ */
 MassMatch::MassMatch(std::vector<std::vector<int>> &mass_2d, 
                      std::vector<std::vector<double>> &real_shift_2d,
                      std::vector<std::vector<int>> &pos_2d,
@@ -34,19 +38,18 @@ MassMatch::MassMatch(std::vector<std::vector<int>> &mass_2d,
   LOG_DEBUG("Proteoform number: " << mass_2d.size());
 
   col_num_ = max_proteoform_mass * scale_;
-  proteo_num_ = mass_2d.size();
+  proteo_num_ = real_shift_2d.size();
   LOG_DEBUG("column number: " << col_num_);
 
   LOG_DEBUG("start init");
-  initProteoformBeginEnds(mass_2d, real_shift_2d);
+  initProteoformBeginEnds(real_shift_2d);
   LOG_DEBUG("row number: " << row_num_);
 
   LOG_DEBUG("init indexes");
   initIndexes(mass_2d, real_shift_2d, pos_2d);
 }
 
-inline void MassMatch::initProteoformBeginEnds(std::vector<std::vector<int>> &mass_2d,
-                                               std::vector<std::vector<double>> &shift_2d) {
+inline void MassMatch::initProteoformBeginEnds(std::vector<std::vector<double>> &shift_2d) {
   //no need to init
   proteo_row_begins_.resize(proteo_num_);
   proteo_row_ends_.resize(proteo_num_);
@@ -88,17 +91,13 @@ inline void MassMatch::compColumnMatchNums(std::vector<std::vector<int>> &mass_2
                                            std::vector<std::vector<int>> &shift_2d,     
                                            std::vector<std::vector<int>> &pos_2d,     
                                            std::vector<int> &col_match_nums) {
-  for (size_t i = 0; i < mass_2d.size(); i++) {
+  size_t proteo_num = mass_2d.size();
+  for (size_t i = 0; i < proteo_num; i++) {
     for (size_t s = 0; s < shift_2d[i].size(); s++)  {
       for (size_t cur = pos_2d[i][s]; cur < mass_2d[i].size(); cur++) {
         int shift_mass = mass_2d[i][cur] + shift_2d[i][s];
         if (shift_mass > 0) {
           if (shift_mass < col_num_) {
-            /*
-            if (shift_mass >= 545694 && shift_mass <= 545712) {
-              LOG_DEBUG("i " << i << " s " << s << " cur " << cur << " cur mass " << mass_2d[i][cur] << " shift mass " << shift_2d[i][s]);
-            }
-            */
             col_match_nums[shift_mass]++;
           }
           else {
