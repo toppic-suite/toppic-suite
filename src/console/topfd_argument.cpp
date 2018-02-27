@@ -52,7 +52,6 @@ void Argument::showUsage(boost::program_options::options_description &desc) {
 }
 
 bool Argument::parse(int argc, char* argv[]) {
-  std::string spectrum_file_name = "";
   std::string max_charge = "";
   std::string max_mass = "";
   std::string mz_error = "";
@@ -93,13 +92,13 @@ bool Argument::parse(int argc, char* argv[]) {
         ("precursor-window,w", po::value<std::string> (&prec_window), "")
         ("missing-level-one,n", "")
         ("multiple-mass,u", "Output multiple masses for one envelope.")
-        ("spectrum-file", po::value<std::string>(&spectrum_file_name)->required(), "Spectrum file name with its path or a folder containing spectrum files.")
+        ("spectrum-file", po::value<std::vector<std::string> >()->multitoken()->required(), "Spectrum file name with its path.")
         ("keep,k", "Report monoisotopic masses extracted from low quality isotopic envelopes.")
         ("output-envelope-details,d", "Output env files for detailed info on envelopes.")
         ;
 
     po::positional_options_description positional_options;
-    positional_options.add("spectrum-file", 1);
+    positional_options.add("spectrum-file", -1);
 
     po::variables_map vm;
     try {
@@ -127,8 +126,6 @@ bool Argument::parse(int argc, char* argv[]) {
     arguments_["executiveDir"] = file_util::getExecutiveDir(argv_0);
 
     arguments_["resourceDir"] = arguments_["executiveDir"] + file_util::getFileSeparator() + file_util::getResourceDirName();
-
-    arguments_["spectrumFileName"] = spectrum_file_name;
 
     if (vm.count("max-charge")) {
       arguments_["maxCharge"] = max_charge;
@@ -170,6 +167,10 @@ bool Argument::parse(int argc, char* argv[]) {
       arguments_["precWindow"] = prec_window;
     }
 
+    if (vm.count("spectrum-file")) {
+      spec_file_list_ = vm["spectrum-file"].as<std::vector<std::string> >(); 
+    }
+
   }
   catch(std::exception& e) {
     std::cerr << "Unhandled Exception in parsing command line "
@@ -187,9 +188,11 @@ bool Argument::validateArguments() {
         = p.parent_path().string() + file_util::getFileSeparator() + "etc" + file_util::getFileSeparator() + file_util::getResourceDirName();
   }
 
-  if (!boost::filesystem::exists(arguments_["spectrumFileName"])) {
-    LOG_ERROR(arguments_["spectrumFileName"] << " does not exist!");
-    return false;
+  for (size_t k = 0; k < spec_file_list_.size(); k++) {
+    if (!boost::filesystem::exists(spec_file_list_[k])) {
+      LOG_ERROR(spec_file_list_[k] << " does not exist!");
+      return false;
+    }
   }
   return true;
 }
