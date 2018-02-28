@@ -17,15 +17,11 @@
 #include <string>
 #include <algorithm>
 
-#include <boost/filesystem.hpp>
-
 #include "base/file_util.hpp"
 #include "base/string_util.hpp"
 #include "console/topfd_argument.hpp"
 
 #include "feature/topfd_process.hpp"
-
-namespace fs = boost::filesystem;
 
 int main(int argc, char* argv[]) {
   prot::Argument argu_processor;

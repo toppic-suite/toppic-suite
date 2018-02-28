@@ -14,7 +14,9 @@
 
 
 #include "base/logger.hpp"
+
 #include "spec/msalign_util.hpp"
+#include "spec/msalign_reader.hpp"
 
 namespace prot {
 
@@ -49,6 +51,35 @@ int getSpNum(const std::string &spectrum_file_name) {
   int sp_num = std::stoi(line);
   LOG_DEBUG("Get sp number " << sp_num);
   return sp_num;
+}
+
+void merge_msalign_files(const std::vector<std::string> & spec_file_lst,
+                         int N, const std::string & output_file) {
+  std::ofstream outfile(output_file);
+
+  for (size_t i = 0; i < spec_file_lst.size(); i++) {
+    MsAlignReader sp_reader(spec_file_lst[i], 1, nullptr, std::set<std::string>());
+    std::vector<std::string> ms_lines = sp_reader.readOneSpectrum();
+    while (ms_lines.size() > 0) {
+      for (size_t k = 0; k< ms_lines.size(); k++) {
+        if (ms_lines[k].substr(0, 3) == "ID=") {
+          outfile << "ID=" << (N * i + std::stoi(ms_lines[k].substr(3))) << std::endl;
+        } else if (ms_lines[k].substr(0, 6) == "SCANS=") {
+          outfile << "SCANS=" << (N * i + std::stoi(ms_lines[k].substr(6))) << std::endl;
+        } else if (ms_lines[k].substr(0, 10) == "MS_ONE_ID=") {
+          outfile << "MS_ONE_ID=" << (N * i + std::stoi(ms_lines[k].substr(10))) << std::endl;
+        } else if (ms_lines[k].substr(0, 12) == "MS_ONE_SCAN=") {
+          outfile << "MS_ONE_SCAN=" << (N * i + std::stoi(ms_lines[k].substr(12))) << std::endl;
+        } else {
+          outfile << ms_lines[k] << std::endl;
+        }
+      }
+      ms_lines = sp_reader.readOneSpectrum();
+    }
+    sp_reader.close();
+  }
+
+  outfile.close();
 }
 
 } // namespace msalign_util

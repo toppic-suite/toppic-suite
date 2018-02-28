@@ -20,11 +20,15 @@
 #include <boost/algorithm/string.hpp>
 
 #include "base/logger.hpp"
+
 #include "spec/extend_ms_factory.hpp"
 #include "spec/msalign_reader.hpp"
+
 #include "prsm/prsm_para.hpp"
 #include "prsm/prsm_util.hpp"
 #include "prsm/prsm_str.hpp"
+#include "prsm/prsm_xml_writer.hpp"
+#include "prsm/prsm_reader.hpp"
 
 namespace prot {
 
@@ -185,6 +189,27 @@ void addFeatureIDToPrsms(PrsmStrPtrVec &prsm_ptrs, const std::string & feature_f
     prsm_ptrs[i]->setPrecFeatureId(feature_ids[k]);
     prsm_ptrs[i]->setPrecFeatureInte(feature_intens[k]);
   }
+}
+
+void merge_prsm_files(const std::vector<std::string> & prsm_file_lst, int N,
+                      const std::string & output_file) {
+  PrsmXmlWriterPtr prsm_writer = std::make_shared<PrsmXmlWriter>(output_file);
+
+  for (size_t i = 0; i < prsm_file_lst.size(); i++) {
+    PrsmReaderPtr prsm_reader = std::make_shared<PrsmReader>(prsm_file_lst[i]); 
+    PrsmStrPtr prsm = prsm_reader->readOnePrsmStr();
+    while (prsm != nullptr) {
+      prsm->setSpectrumId(N * i + prsm->getSpectrumId());
+
+      prsm->setPrecursorId(N * i + prsm->getPrecursorId());
+
+      prsm_writer->write(prsm);
+
+      prsm = prsm_reader->readOnePrsmStr();
+    }
+  }
+
+  prsm_writer->close();
 }
 
 }  // namespace prsm_util

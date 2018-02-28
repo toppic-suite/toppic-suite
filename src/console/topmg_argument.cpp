@@ -63,7 +63,7 @@ void Argument::initArguments() {
   arguments_["filteringResultNumber"] = "20";
   arguments_["residueModFileName"] = "";
   arguments_["threadNumber"] = "1";
-  arguments_["useFeatureFileName"] = "false";
+  arguments_["useFeatureFile"] = "false";
   arguments_["skipList"] = "";
   arguments_["proteo_graph_dis"] = "40";
   arguments_["useASFDiag"] = "false";  
@@ -84,7 +84,7 @@ void Argument::outputArguments(std::ostream &output, std::map<std::string, std::
     output << std::setw(50) << std::left << "Fixed modifications: " << "\t" << arguments["fixedMod"] << std::endl;
   }
 
-  output << std::setw(50) << std::left << "Use TopFD feature file: " << "\t" << arguments["useFeatureFileName"] << std::endl;
+  output << std::setw(50) << std::left << "Use TopFD feature file: " << "\t" << arguments["useFeatureFile"] << std::endl;
 
   output << std::setw(50) << std::left << "Error tolerance: " << "\t" << arguments["errorTolerance"] << " ppm" << std::endl;
   output << std::setw(50) << std::left << "Spectrum-level cutoff type: " << "\t" << arguments["cutoffSpectralType"] << std::endl;
@@ -316,7 +316,7 @@ bool Argument::parse(int argc, char* argv[]) {
     }
 
     if (vm.count("use-topfd-feature")) {
-      arguments_["useFeatureFileName"] = "true";
+      arguments_["useFeatureFile"] = "true";
     }
 
     if (vm.count("skip-list")) {
@@ -386,7 +386,7 @@ bool Argument::validateArguments() {
     return false;
   }
 
-  if (arguments_["useFeatureFileName"] == "true") {
+  if (arguments_["useFeatureFile"] == "true") {
     std::string spec_file_name = arguments_["spectrumFileName"];
 
     std::string feature_file_name = spec_file_name.substr(0, spec_file_name.length() - 12) + ".feature";

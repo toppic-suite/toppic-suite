@@ -29,6 +29,9 @@ void geneSpIndex(const std::string &spectrum_file_name, SpParaPtr sp_para_ptr);
 
 int getSpNum(const std::string &spectrum_file_name);
 
+void merge_msalign_files(const std::vector<std::string> & spec_file_lst, int N,
+                         const std::string & output_file);
+
 }  // namespace msalign_util
 
 }  // namespace prot

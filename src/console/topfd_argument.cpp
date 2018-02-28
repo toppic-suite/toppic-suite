@@ -47,7 +47,7 @@ void Argument::initArguments() {
 }
 
 void Argument::showUsage(boost::program_options::options_description &desc) {
-  std::cout << "Usage: toppfd [options] spectrum-file" << std::endl;
+  std::cout << "Usage: toppfd [options] spectrum-file-name" << std::endl;
   std::cout << desc << std::endl;
 }
 
@@ -98,7 +98,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ;
 
     po::positional_options_description positional_options;
-    positional_options.add("spectrum-file", -1);
+    positional_options.add("spectrum-file-name", -1);
 
     po::variables_map vm;
     try {
@@ -167,7 +167,7 @@ bool Argument::parse(int argc, char* argv[]) {
       arguments_["precWindow"] = prec_window;
     }
 
-    if (vm.count("spectrum-file")) {
+    if (vm.count("spectrum-file-name")) {
       spec_file_list_ = vm["spectrum-file"].as<std::vector<std::string> >(); 
     }
 
