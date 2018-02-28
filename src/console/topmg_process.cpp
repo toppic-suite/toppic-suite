@@ -202,7 +202,7 @@ int TopMGProcess(std::map<std::string, std::string> arguments) {
     std::cout << "E-value computation - finished." << std::endl;
 
     std::cout << "Finding protein clusters - started." << std::endl;
-    if (arguments["useFeatureFileName"] == "true") {
+    if (arguments["useFeatureFile"] == "true") {
       // TopFD msalign file with feature ID
       double prec_error_tole = 1.2;
       ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();

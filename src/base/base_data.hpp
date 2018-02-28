@@ -30,6 +30,8 @@ inline double getMaxDouble() {return 1e+300;}
 
 void init(const std::string & resource_dir);
 
+extern bool init_;
+
 }  // namespace base_data
 
 }  // namespace prot

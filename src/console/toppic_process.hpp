@@ -20,7 +20,13 @@
 
 namespace prot {
 
-int TopPICProgress(std::map<std::string, std::string> arguments);
+int TopPICProgress(std::map<std::string, std::string> & arguments);
+
+// protein filtering + database searching + E-value computation
+int TopPIC_identify(std::map<std::string, std::string> & arguments);
+
+// proteoform clustering + FDR + HTML generation
+int TopPIC_post(std::map<std::string, std::string> & arguments);
 
 }  // namespace prot
 

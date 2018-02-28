@@ -18,8 +18,8 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <ctime>
 
-#include "base/version.hpp"
 #include "base/fasta_reader.hpp"
 #include "base/fasta_util.hpp"
 #include "base/base_data.hpp"
@@ -65,13 +65,14 @@
 
 namespace prot {
 
-int TopPICProgress(std::map<std::string, std::string> arguments) {
+// protein filtering + database searching + E-value computation
+int TopPIC_identify(std::map<std::string, std::string> & arguments) {
   try {
-    std::cout << "TopPIC " << version_number << std::endl;
-    
-    time_t start = time(0);
+    std::time_t start = time(nullptr);
     char buf[50];
-    arguments["start_time"] = std::string(ctime_r(&start, buf));
+    std::strftime(buf, 50, "%a %b %d %T %Y", std::localtime(&start));
+
+    arguments["start_time"] = buf;
     Argument::outputArguments(std::cout, arguments);
 
     std::string resource_dir = arguments["resourceDir"];
@@ -83,6 +84,14 @@ int TopPICProgress(std::map<std::string, std::string> arguments) {
     std::string db_file_name = arguments["databaseFileName"];
     std::string sp_file_name = arguments["spectrumFileName"];
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
+    std::string feature_file_name = sp_file_name.substr(0, sp_file_name.length() - 12) + ".feature";
+
+    if (arguments["useFeatureFile"] == "true") {
+      if (!boost::filesystem::exists(feature_file_name)) {
+        LOG_ERROR("TopFD feature file " << feature_file_name << " does not exist!");
+        exit(EXIT_FAILURE);
+      }
+    }
 
     int n_top = std::stoi(arguments["numOfTopPrsms"]);
     int ptm_num = std::stoi(arguments["ptmNumber"]);
@@ -93,10 +102,6 @@ int TopPICProgress(std::map<std::string, std::string> arguments) {
     bool use_gf = false;
     if (arguments["useGf"] == "true") {
       use_gf = true;
-    }
-    bool localization = false;
-    if (arguments["residueModFileName"] != "") {
-      localization = true;
     }
 
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
@@ -201,9 +206,46 @@ int TopPICProgress(std::map<std::string, std::string> arguments) {
     processor->process(false);
     processor = nullptr;
     std::cout << "E-value computation - finished." << std::endl;
+  } catch (const char* e) {
+    std::cout << "[Exception]" << std::endl;
+    std::cout << e << std::endl;
+  }
+  return EXIT_SUCCESS;
+}
+
+// proteoform clustering + FDR + HTML generation
+int TopPIC_post(std::map<std::string, std::string> & arguments) {
+  try {
+    std::string resource_dir = arguments["resourceDir"];
+
+    LOG_DEBUG("Init base data completed");
+
+    std::string db_file_name = arguments["databaseFileName"];
+    std::string sp_file_name = arguments["spectrumFileName"];
+    std::string ori_db_file_name = arguments["oriDatabaseFileName"];
+
+    int n_top = std::stoi(arguments["numOfTopPrsms"]);
+
+    bool localization = false;
+    if (arguments["residueModFileName"] != "") {
+      localization = true;
+    }
+
+    PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
+    LOG_DEBUG("prsm para inited");
+
+    bool decoy = false;
+    if (arguments["searchType"] == "TARGET+DECOY") {
+      decoy = true;
+    }
+    LOG_DEBUG("block size " << arguments["databaseBlockSize"]);
+    int db_block_size = std::stoi(arguments["databaseBlockSize"]);
+
+    fasta_util::dbPreprocess(ori_db_file_name, db_file_name, decoy, db_block_size);
+    msalign_util::geneSpIndex(sp_file_name, prsm_para_ptr->getSpParaPtr());
 
     std::cout << "Finding PrSM clusters - started." << std::endl;
-    if (arguments["useFeatureFileName"] == "true") {
+    if (arguments["useFeatureFile"] == "true") {
       // TopFD msalign file with feature ID
       double prec_error_tole = 1.2;
       ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();
@@ -281,9 +323,16 @@ int TopPICProgress(std::map<std::string, std::string> arguments) {
     //suffix = "LOCAL_RESULT";
     /*}*/
 
-    time_t end = time(0);
-    arguments["end_time"] = std::string(ctime_r(&end, buf));
-    arguments["running_time"] = std::to_string(static_cast<int>(difftime(end, start)));
+    std::time_t end = time(nullptr);
+    char buf[50];
+    std::strftime(buf, 50, "%a %b %d %T %Y", std::localtime(&end));
+    arguments["end_time"] = buf;
+
+    std::tm t = {};
+    std::istringstream ss(arguments["start_time"]);
+    ss >> std::get_time(&t, "%a %b %d %T %Y");
+    arguments["running_time"] = std::to_string(static_cast<int>(difftime(end, std::mktime(&t))));
+
 
     std::cout << "Outputting PrSM table - started." << std::endl;
     PrsmTableWriterPtr table_out
@@ -337,19 +386,19 @@ int TopPICProgress(std::map<std::string, std::string> arguments) {
     std::cout << "Converting proteoform xml files to html files - started." << std::endl;
     translate(arguments, "proteoform_cutoff");
     std::cout << "Converting proteoform xml files to html files - finished." << std::endl;
-
-    if (arguments["keepTempFiles"] != "true") {
-      std::cout << "Deleting temporary files - started." << std::endl;
-      file_util::delDir(file_util::basename(sp_file_name) + "_proteoform_cutoff_xml");
-      file_util::delDir(file_util::basename(sp_file_name) + "_prsm_cutoff_xml");
-      file_util::cleanDir(ori_db_file_name, sp_file_name);
-      std::cout << "Deleting temporary files - finished." << std::endl;
-    }
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
   }
   std::cout << "TopPIC finished." << std::endl;
+  return EXIT_SUCCESS;
+}
+
+int TopPICProgress(std::map<std::string, std::string> & arguments) {
+  TopPIC_identify(arguments);
+
+  TopPIC_post(arguments);
+
   return EXIT_SUCCESS;
 }
 

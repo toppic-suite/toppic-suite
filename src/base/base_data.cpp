@@ -37,7 +37,11 @@ namespace prot {
 
 namespace base_data {
 
+bool init_ = false;
+
 void init(const std::string & resource_dir) {
+  // base data only need to be init once
+  if (init_) { return; }
   std::string separator = file_util::getFileSeparator();
   std::string base_data_dir = resource_dir + separator + base_data::getBaseDataDirName();
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
@@ -114,6 +118,7 @@ void init(const std::string & resource_dir) {
     SPTypeBase::initBase(sp_type_file_name);
     LOG_DEBUG("support peak type initialized ");
   }
+  init_ = true;
 }
 
 } // namespace base_data

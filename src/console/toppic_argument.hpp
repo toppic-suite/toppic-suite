@@ -21,6 +21,8 @@
 #include <fstream>
 #include <algorithm>
 #include <memory>
+#include <vector>
+#include <string>
 
 #include "boost/program_options.hpp" 
 
@@ -33,16 +35,26 @@ namespace prot {
 class Argument {
  public:
   Argument();
+
   static void outputArguments(std::ostream &output, 
                               std::map<std::string, std::string> arguments);
+
   bool parse(int argc, char* argv[]);
+
   std::map<std::string, std::string> getArguments() {return arguments_;}
+
+  std::vector<std::string> getSpecFileList() { return spec_file_list_;}
 
  private:
   void initArguments();
+
   bool validateArguments();
+
   void showUsage(boost::program_options::options_description &desc);
+
   std::map<std::string, std::string> arguments_;
+
+  std::vector<std::string> spec_file_list_;
 };
 
 }  // namespace prot

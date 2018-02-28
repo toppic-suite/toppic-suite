@@ -38,6 +38,7 @@ void Argument::initArguments() {
   arguments_["databaseFileName"] = "";
   arguments_["databaseBlockSize"] = "1000000";
   arguments_["spectrumFileName"] = "";
+  arguments_["combinedOutputName"] = "combined";
   arguments_["activation"] = "FILE";
   arguments_["searchType"] = "TARGET";
   arguments_["fixedMod"] = "";
@@ -60,7 +61,7 @@ void Argument::initArguments() {
   arguments_["filteringResultNumber"] = "20";
   arguments_["residueModFileName"] = "";
   arguments_["threadNumber"] = "1";
-  arguments_["useFeatureFile"] = "false";
+  arguments_["useFeature"] = "false";
   arguments_["skipList"] = "";
 }
 
@@ -79,7 +80,7 @@ void Argument::outputArguments(std::ostream &output,
     output << std::setw(44) << std::left << "Fixed modifications: " << "\t" << arguments["fixedMod"] << std::endl;
   }
 
-  output << std::setw(44) << std::left << "Use TopFD feature file: " << "\t" << arguments["useFeatureFileName"] << std::endl;
+  output << std::setw(44) << std::left << "Use TopFD feature file: " << "\t" << arguments["useFeatureFile"] << std::endl;
 
   output << std::setw(44) << std::left << "Maximum number of unexpected modifications: " << "\t" << arguments["ptmNumber"] << std::endl;
   output << std::setw(44) << std::left << "Error tolerance: " << "\t" << arguments["errorTolerance"] << " ppm" << std::endl;
@@ -102,9 +103,9 @@ void Argument::outputArguments(std::ostream &output,
     output << std::setw(44) << std::left << "MIScore threshold: " << "\t" << arguments["local_threshold"] << std::endl;
   }
   output << std::setw(44) << std::left << "Executable file directory: " << "\t" << arguments["executiveDir"] << std::endl;
-  output << std::setw(44) << std::left << "Start time: " << "\t" << arguments["start_time"];
+  output << std::setw(44) << std::left << "Start time: " << "\t" << arguments["start_time"] << std::endl;
   if (arguments["end_time"] != "") {
-    output << std::setw(44) << std::left << "End time: " << "\t" << arguments["end_time"];
+    output << std::setw(44) << std::left << "End time: " << "\t" << arguments["end_time"] << std::endl;
     output << std::setw(44) << std::left << "Running time: " << "\t" << arguments["running_time"] << " seconds" << std::endl;
   }
   output << "********************** Parameters **********************" << std::endl;
@@ -117,7 +118,6 @@ void Argument::showUsage(boost::program_options::options_description &desc) {
 
 bool Argument::parse(int argc, char* argv[]) {
   std::string database_file_name = "";
-  std::string spectrum_file_name = "";
   std::string argument_file_name = "";
   std::string activation = "";
   std::string fixed_mod = "";
@@ -136,6 +136,7 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string residue_mod_file_name = "";
   std::string thread_number = "";
   std::string skip_list = "";
+  std::string combined_output_name = "";
 
   /** Define and parse the program options*/
   try {
@@ -166,6 +167,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("thread-number,u", po::value<std::string> (&thread_number), "<positive number>. Number of threads used in the computation. Default value: 1.")
         ("use-topfd-feature,x", "Use TopFD feature file for proteoform identification.")
         ("skip-list,l", po::value<std::string>(&skip_list) , "<a text file with its path>. The scans in this file will be skipped.")
+        ("output,o", po::value<std::string>(&combined_output_name) , "The output file name for the combined results. Default: combined.")
         ("keep-temp-files,k", "Keep temporary files.");
 
     po::options_description desc("Options");
@@ -183,7 +185,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("spectrum-cutoff-value,v", po::value<std::string> (&cutoff_spectral_value), "")
         ("proteoform-cutoff-type,T", po::value<std::string> (&cutoff_proteoform_type), "")
         ("proteoform-cutoff-value,V", po::value<std::string> (&cutoff_proteoform_value), "")
-        ("filtering-result-number,o", po::value<std::string>(&filtering_result_num), "Filtering result number. Default value: 20.")
+        ("filtering-result-number", po::value<std::string>(&filtering_result_num), "Filtering result number. Default value: 20.")
         ("keep-temp-files,k", "")
         ("generating-function,g", "")
         ("miscore-threshold,s", po::value<std::string> (&local_threshold), "")
@@ -192,16 +194,15 @@ bool Argument::parse(int argc, char* argv[]) {
         ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "")
         ("thread-number,u", po::value<std::string> (&thread_number), "")
         ("use-topfd-feature,x", "")
+        ("output,o", po::value<std::string>(&combined_output_name) , "")
         ("skip-list,l", po::value<std::string>(&skip_list) , "")
         ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name with its path.")
-        ("spectrum-file-name", po::value<std::string>(&spectrum_file_name)->required(), "Spectrum file name with its path.");
+        ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), "Spectrum file name with its path.");
 
     po::positional_options_description positional_options;
     positional_options.add("database-file-name", 1);
-    positional_options.add("spectrum-file-name", 1);
+    positional_options.add("spectrum-file-name", -1);
 
-    std::string app_name;
-    //= boost::filesystem::basename(argv[0]);
     po::variables_map vm;
     try {
       po::store(po::command_line_parser(argc, argv).options(desc).positional(positional_options).run(),vm); 
@@ -234,7 +235,13 @@ bool Argument::parse(int argc, char* argv[]) {
 
     arguments_["oriDatabaseFileName"] = database_file_name;
 
-    arguments_["spectrumFileName"] = spectrum_file_name;
+    if (vm.count("spectrum-file-name")) {
+      spec_file_list_ = vm["spectrum-file-name"].as<std::vector<std::string> >(); 
+    }
+
+    if (vm.count("output")) {
+      arguments_["combinedOutputName"] = combined_output_name; 
+    }
 
     if (vm.count("activation")) {
       arguments_["activation"] = activation;
@@ -319,7 +326,7 @@ bool Argument::parse(int argc, char* argv[]) {
     }
 
     if (vm.count("use-topfd-feature")) {
-      arguments_["useFeatureFileName"] = "true";
+      arguments_["useFeatureFile"] = "true";
     }
 
     if (vm.count("skip-list")) {
@@ -357,28 +364,9 @@ bool Argument::validateArguments() {
     return false;
   }
 
-  if (!boost::filesystem::exists(arguments_["spectrumFileName"])) {
-    LOG_ERROR("Spectrum file " << arguments_["spectrumFileName"] << " does not exist!");
-    return false;
-  }
-
-  if (!string_util::endsWith(arguments_["spectrumFileName"], ".msalign")) {
-    LOG_ERROR("Spectrum file " << arguments_["spectrumFileName"] << " is not a msalign file!");
-    return false;
-  }
-
-  if (arguments_["spectrumFileName"].length() > 200) {
-    LOG_ERROR("Spectrum file " << arguments_["spectrumFileName"] << " path is too long!");
-    return false;
-  }
-
-  if (arguments_["useFeatureFileName"] == "true") {
-    std::string spectrum_file_name = arguments_["spectrumFileName"];
-
-    std::string feature_file_name = spectrum_file_name.substr(0, spectrum_file_name.length() - 12) + ".feature";
-
-    if (!boost::filesystem::exists(feature_file_name)) {
-      LOG_ERROR("TopFD feature file " << feature_file_name << " does not exist!");
+  for (size_t k = 0; k < spec_file_list_.size(); k++) {
+    if (!boost::filesystem::exists(spec_file_list_[k])) {
+      LOG_ERROR(spec_file_list_[k] << " does not exist!");
       return false;
     }
   }

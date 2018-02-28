@@ -61,7 +61,7 @@ void MassShift::setChangePtr(ChangePtr change) {
 std::string MassShift::getSeqStr() {
   std::string seq_str;
 
-  if (ModBase::isNoneModPtr(change_vec_[0]->getModPtr())) {
+  if (getTypePtr() == MassShiftType::UNEXPECTED) {
     seq_str = string_util::convertToString(shift_, 5); 
   } else {
     for (size_t i = 0; i < change_vec_.size(); i++) {

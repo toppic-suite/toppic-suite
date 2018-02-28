@@ -126,23 +126,6 @@ add_executable(topfd_gui ${TOPFD_GUI_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS}
 
 add_executable(toppic-test ${UNIT_TEST_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SUFFIX_SRCS})
 
-# util tools
-file(GLOB MSALIGN_MERGE_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/tools/msalign_merge.cpp)
-
-add_executable(msalign_merge ${MSALIGN_MERGE_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS})
-
-file(GLOB MSALIGN_SPLIT_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/tools/msalign_split.cpp)
-
-add_executable(msalign_split ${MSALIGN_SPLIT_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS})
-
-file(GLOB PRSM_MERGE_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/tools/prsm_xml_merge.cpp)
-
-add_executable(prsm_xml_merge ${PRSM_MERGE_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS} ${TOPPIC_ARGU_SRCS})
-
-file(GLOB MGF_COVERSION_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/tools/mgf2msalign.cpp)
-
-add_executable(mgf2msalign ${MGF_COVERSION_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS})
-
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     target_link_libraries(toppic xalan-c xalanMsg xerces-c
         boost_filesystem-mt boost_system-mt 
@@ -185,17 +168,6 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
     target_link_libraries(topfd_train pwiz xalan-c xerces-c boost_program_options
         boost_filesystem boost_system boost_thread pthread z)
-
-    target_link_libraries(msalign_merge pwiz xerces-c boost_program_options
-        boost_filesystem boost_system pthread z)
-
-    target_link_libraries(msalign_split pwiz xerces-c boost_program_options
-        boost_filesystem boost_system pthread z)
-
-    target_link_libraries(prsm_xml_merge pwiz xerces-c boost_program_options
-        boost_filesystem boost_system boost_thread pthread z)
-
-    target_link_libraries(mgf2msalign xerces-c boost_filesystem boost_system pwiz pthread z)
 
     #target_link_libraries(topfd-dev pwiz xalan-c xerces-c boost_filesystem
     #    boost_system boost_thread pthread z)
