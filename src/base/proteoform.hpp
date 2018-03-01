@@ -24,6 +24,7 @@
 #include "base/segment.hpp"
 #include "base/prot_mod.hpp"
 #include "base/align_type.hpp"
+#include "base/ptm.hpp"
 
 namespace prot {
 
@@ -101,6 +102,8 @@ class Proteoform {
   void setVariablePtmNum(int n) {variable_ptm_num_ = n;}
 
   int getVariablePtmNum() {return variable_ptm_num_;}
+
+  PtmPtrVec getPtmVec();
 
  private:
   FastaSeqPtr fasta_seq_ptr_;
