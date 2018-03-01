@@ -234,6 +234,14 @@
         <br/>
       </xsl:if>
 
+      <xsl:variable name="var_change_num" select="count(variable_change)"/>
+      <xsl:if test="$var_change_num &gt; 0">
+        <br/>
+        <xsl:text>&#160;&#160;&#160;&#160;&#160;Variable PTMs: </xsl:text> 
+        <xsl:apply-templates select="variable_change[segment_type = 'SHIFT']"/>
+        <br/>
+      </xsl:if>
+
       <xsl:variable name="variable_ptm_num" select="count(unexpected_change/ptm)"/>
       <xsl:if test="$variable_ptm_num &gt; 0">
         <br/>
@@ -246,7 +254,7 @@
       <xsl:if test="$unexpected_ptm_num &gt; $variable_ptm_num">
         <br/>
         <xsl:text>&#160;&#160;&#160;&#160;&#160;Unexpected modifications: </xsl:text>
-        <xsl:apply-templates select="unexpected_change[not(ptm)]"/>
+        <xsl:apply-templates select="unexpected_change[segment_type = 'SHIFT']"/>
         <br/>
       </xsl:if>
     </div>

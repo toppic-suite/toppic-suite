@@ -30,14 +30,17 @@ namespace prot {
 class AnnoSegment {
  public:
   AnnoSegment(std::string segment_type, int left_pos, int right_pos,
-              double mass_shift, int color):
+              const std::string & match_seq, int color):
       segment_type_(segment_type),
       left_pos_(left_pos),
       right_pos_(right_pos),
-      mass_shift_(mass_shift),
-      color_(color) {}
+      match_seq_(match_seq),
+      color_(color),
+      mass_shift_type_(MassShiftType::UNEXPECTED) {}
 
   std::string getType() {return segment_type_;}
+
+  void setMassShiftType(MassShiftTypePtr shift_type) {mass_shift_type_ = shift_type;} 
 
   int getRightPos() {return right_pos_;}
 
@@ -54,6 +57,7 @@ class AnnoSegment {
   void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent, int precison);
 
  private:
+  // EMPTY or SHIFT
   std::string segment_type_;
 
   std::string anno_;
@@ -64,7 +68,7 @@ class AnnoSegment {
 
   int right_pos_;
 
-  double mass_shift_;
+  std::string match_seq_;
 
   int color_;
 
@@ -73,9 +77,12 @@ class AnnoSegment {
   std::vector<std::pair<int, std::string> > occurences_;
 
   std::vector<double> score_;
+
+  MassShiftTypePtr mass_shift_type_;
 };
 
 typedef std::shared_ptr<AnnoSegment> AnnoSegmentPtr;
+
 typedef std::vector<AnnoSegmentPtr> AnnoSegmentPtrVec;
 
 }  // namespace prot

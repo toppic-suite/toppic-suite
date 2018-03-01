@@ -54,25 +54,51 @@ std::string AnnoSegment::getResidueAnno() {
 }
 
 void AnnoSegment::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent, int precison) {
-  xercesc::DOMElement* element = xml_doc->createElement("unexpected_change");
-  std::string str = string_util::convertToString(left_pos_);
-  xml_doc->addElement(element, "left_position", str.c_str());
+  xercesc::DOMElement* element;
+  if (mass_shift_type_ == prot::MassShiftType::UNEXPECTED) {
+    element = xml_doc->createElement("unexpected_change");
+    std::string str = string_util::convertToString(left_pos_);
+    xml_doc->addElement(element, "left_position", str.c_str());
 
-  str = string_util::convertToString(right_pos_);
-  xml_doc->addElement(element, "right_position", str.c_str());
+    str = string_util::convertToString(right_pos_);
+    xml_doc->addElement(element, "right_position", str.c_str());
 
-  str = string_util::convertToString(mass_shift_, precison);
-  xml_doc->addElement(element, "mass_shift", str.c_str());
+    xml_doc->addElement(element, "match_seq", match_seq_.c_str());
 
-  str = string_util::convertToString(color_);
-  xml_doc->addElement(element, "unexpected_change_color", str.c_str());
+    str = string_util::convertToString(color_);
+    xml_doc->addElement(element, "unexpected_change_color", str.c_str());
 
-  xml_doc->addElement(element, "segment_type", segment_type_.c_str());
+    xml_doc->addElement(element, "segment_type", segment_type_.c_str());
 
-  if (ptm_ptr_ != nullptr) {
-    ptm_ptr_->appendAbbrNameToXml(xml_doc, element);
+    xml_doc->addElement(element, "occurence", occu_.c_str());
+  } else {
+    element = xml_doc->createElement("variable_change");
+    std::string str = string_util::convertToString(left_pos_);
+    xml_doc->addElement(element, "left_position", str.c_str());
+
+    str = string_util::convertToString(right_pos_);
+    xml_doc->addElement(element, "right_position", str.c_str());
+
+    xml_doc->addElement(element, "match_seq", match_seq_.c_str());
+
+    str = string_util::convertToString(color_);
+    xml_doc->addElement(element, "unexpected_change_color", str.c_str());
+
+    xml_doc->addElement(element, "segment_type", segment_type_.c_str());
+
+    std::string occu;
+
+    if (occurences_.size() == 1) {
+      occu = occurences_[0].second + std::to_string(occurences_[0].first); 
+    } else if (occurences_.size() > 1) {
+      occu = occurences_[0].second + std::to_string(occurences_[0].first); 
+      occu += " - ";
+      occu += occurences_[occurences_.size() - 1].second
+          + std::to_string(occurences_[occurences_.size() - 1].first); 
+    }
+
+    xml_doc->addElement(element, "occurence", occu.c_str());
   }
-  xml_doc->addElement(element, "occurence", occu_.c_str());
   parent->appendChild(element);
 }
 
