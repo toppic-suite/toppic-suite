@@ -186,9 +186,15 @@ void GraphPostProcessor::process() {
           shift_vec[k] = shfit_ptr;
         }
 
+        ProtModPtr prot_mod = prsm_ptr->getProteoformPtr()->getProtModPtr();
+
+        if (prsm_ptr->getProteoformPtr()->getStartPos() == 1) {
+          prot_mod = ProtModBase::getProtModPtrByName(ProtModBase::getType_NME());
+        }
+
         ProteoformPtr new_form
             = std::make_shared<Proteoform>(prsm_ptr->getProteoformPtr()->getFastaSeqPtr(),
-                                           prsm_ptr->getProteoformPtr()->getProtModPtr(),
+                                           prot_mod,
                                            prsm_ptr->getProteoformPtr()->getStartPos(),
                                            prsm_ptr->getProteoformPtr()->getEndPos(),
                                            prsm_ptr->getProteoformPtr()->getResSeqPtr(),

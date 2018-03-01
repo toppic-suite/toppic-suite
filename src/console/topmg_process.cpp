@@ -273,15 +273,15 @@ int TopMGProcess(std::map<std::string, std::string> arguments) {
     table_out = nullptr;
     std::cout << "Outputting PrSM table - finished." << std::endl;
 
-    /*std::cout << "Generating PrSM xml files - started." << std::endl;*/
-    //XmlGeneratorPtr xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, "CUTOFF_RESULT_SPEC", "prsm_cutoff");
-    //xml_gene->process();
-    //xml_gene = nullptr;
-    //std::cout << "Generating PrSM xml files - finished." << std::endl;
+    std::cout << "Generating PrSM xml files - started." << std::endl;
+    XmlGeneratorPtr xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, "CUTOFF_RESULT_SPEC", "prsm_cutoff");
+    xml_gene->process();
+    xml_gene = nullptr;
+    std::cout << "Generating PrSM xml files - finished." << std::endl;
 
-    //std::cout << "Converting PrSM xml files to html files - started." << std::endl;
-    //translate(arguments, "prsm_cutoff");
-    /*std::cout << "Converting PrSM xml files to html files - finished." << std::endl;*/
+    std::cout << "Converting PrSM xml files to html files - started." << std::endl;
+    translate(arguments, "prsm_cutoff");
+    std::cout << "Converting PrSM xml files to html files - finished." << std::endl;
 
     cutoff_type = (arguments["cutoffProteoformType"] == "FDR") ? "FORMFDR": "EVALUE";
     std::cout << "PrSM filtering by " << cutoff_type << " - started." << std::endl;
@@ -309,15 +309,15 @@ int TopMGProcess(std::map<std::string, std::string> arguments) {
     form_out = nullptr;
     std::cout << "Outputting proteoform table - finished." << std::endl;
 
-    /*std::cout << "Generating proteoform xml files - started." << std::endl;*/
-    //xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, "CUTOFF_RESULT_FORM", "proteoform_cutoff");
-    //xml_gene->process();
-    //xml_gene = nullptr;
-    //std::cout << "Generating proteoform xml files - finished." << std::endl;
+    std::cout << "Generating proteoform xml files - started." << std::endl;
+    xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, "CUTOFF_RESULT_FORM", "proteoform_cutoff");
+    xml_gene->process();
+    xml_gene = nullptr;
+    std::cout << "Generating proteoform xml files - finished." << std::endl;
 
-    //std::cout << "Converting proteoform xml files to html files - started." << std::endl;
-    //translate(arguments, "proteoform_cutoff");
-    /*std::cout << "Converting proteoform xml files to html files - finished." << std::endl;*/
+    std::cout << "Converting proteoform xml files to html files - started." << std::endl;
+    translate(arguments, "proteoform_cutoff");
+    std::cout << "Converting proteoform xml files to html files - finished." << std::endl;
 
     if (arguments["keepTempFiles"] != "true") {
       std::cout << "Deleting temporary files - started." << std::endl;
