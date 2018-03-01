@@ -16,6 +16,8 @@
 #ifndef PROT_MCMC_MNG_HPP_
 #define PROT_MCMC_MNG_HPP_
 
+#include <cmath>
+
 #include "prsm/prsm_para.hpp"
 
 namespace prot {
@@ -32,17 +34,26 @@ class MCMCMng {
       residue_mod_file_(residue_mod_file) {};
 
   PrsmParaPtr prsm_para_ptr_;
+
   std::string input_file_ext_;
+
   std::string output_file_ext_;
+
   std::string residue_mod_file_;
 
-  int n_ = 300;
+  int n_ = 100;
 
-  int N_ = 1000000;
+  int N_ = 15000;
 
-  int k_ = 30;
+  int k_ = 3;
 
   double mass_limit_ = 150.0;
+
+  double convert_ratio_ = 274.335215;
+
+  double error_tolerance_ = 0.1;
+
+  int getIntTolerance() {return std::ceil(error_tolerance_ * convert_ratio_);}
 };
 
 typedef std::shared_ptr<MCMCMng> MCMCMngPtr;

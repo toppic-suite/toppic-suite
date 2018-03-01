@@ -68,17 +68,26 @@ class CountTestNum {
   
 
   int convertMass(double m);
+
   void init(PrsmParaPtr para_ptr);
+
   void initCompMassCnt(const ProteoformPtrVec &prot_mod_forms);
+
   void initPrefMassCnt(const ProteoformPtrVec &prot_mod_forms);
+
   void initSuffMassCnt(const ProteoformPtrVec &raw_forms);
+
   void initInternalMassCnt();
 
   double compNonPtmCandNum(AlignTypePtr type_ptr, 
                            double ori_mass, double ori_tolerance);
+
   double compPtmCandNum(AlignTypePtr type_ptr);
+
   double compPtmRestrictCandNum (AlignTypePtr type_ptr, int shift_num, double ori_mass);
+
   double compSeqNum(AlignTypePtr type_ptr, int low, int high);
+
   double compMassNum(double *cnts, int low, int high);
 };
 

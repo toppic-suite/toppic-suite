@@ -25,9 +25,6 @@
 #include "spec/msalign_reader.hpp"
 #include "spec/msalign_util.hpp"
 
-#include "tdgf/evalue_processor.hpp"
-#include "tdgf/tdgf_mng.hpp"
-
 #include "prsm/prsm_para.hpp"
 #include "prsm/prsm_str_combine.hpp"
 #include "prsm/prsm_form_filter.hpp"
@@ -58,6 +55,9 @@
 #include "graphalign/graph_align_mng.hpp"
 #include "graphalign/graph_align_processor.hpp"
 #include "graphalign/graph_post_processor.hpp"
+
+#include "mcmc/mcmc_mng.hpp"
+#include "mcmc/mcmc_dpr_processor.hpp"
 
 #include "prsmview/xml_generator.hpp"
 #include "prsmview/transformer.hpp"
@@ -91,11 +91,6 @@ int TopMGProcess(std::map<std::string, std::string> arguments) {
     int thread_num = std::stoi(arguments["threadNumber"]);
     int filter_result_num = std::stoi(arguments["filteringResultNumber"]);
     double max_ptm_mass = std::stod(arguments["maxPtmMass"]);
-
-    bool use_gf = false;
-    if (arguments["useGf"] == "true") {
-      use_gf = true;
-    }
 
     bool decoy = false;
     if (arguments["searchType"] == "TARGET+DECOY") {
@@ -189,17 +184,14 @@ int TopMGProcess(std::map<std::string, std::string> arguments) {
     ga_post_processor_ptr = nullptr;
     std::cout << "Graph alignment post-processing finished." << std::endl;
 
-    std::cout << "E-value computation - started." << std::endl;
-    bool variable_ptm = false;
-    TdgfMngPtr tdgf_mng_ptr
-        = std::make_shared<TdgfMng>(prsm_para_ptr, ptm_num, max_ptm_mass,
-                                    use_gf, variable_ptm, thread_num, "GRAPH_POST", "EVALUE");
-    EValueProcessorPtr processor = std::make_shared<EValueProcessor>(tdgf_mng_ptr);
-    processor->init();
-    // compute E-value for a set of prsms each run
-    processor->process(false);
+    std::cout << "E-value computation using MCMC - started." << std::endl;
+    MCMCMngPtr mcmc_mng_ptr   
+        = std::make_shared<MCMCMng>(prsm_para_ptr, "GRAPH_POST", "EVALUE",   
+                                    residue_mod_file_name);    
+    DprProcessorPtr processor = std::make_shared<DprProcessor>(mcmc_mng_ptr);   
+    processor->process();    
     processor = nullptr;
-    std::cout << "E-value computation - finished." << std::endl;
+    std::cout << "E-value computation using MCMC - finished." << std::endl;
 
     std::cout << "Finding protein clusters - started." << std::endl;
     if (arguments["useFeatureFile"] == "true") {
