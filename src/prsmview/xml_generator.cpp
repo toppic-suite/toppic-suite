@@ -76,7 +76,7 @@ void XmlGenerator::outputPrsms() {
         prsm_ptr->setDeconvMsPtrVec(deconv_ms_ptr_vec);
         double new_prec_mass = prsm_ptr->getAdjustedPrecMass();
         ExtendMsPtrVec extend_ms_ptr_vec
-            = ExtendMsFactory::geneMsThreePtrVec(deconv_ms_ptr_vec, sp_para_ptr, new_prec_mass);
+            = extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec, sp_para_ptr, new_prec_mass);
         extend_ms_vec2d_.push_back(extend_ms_ptr_vec);
         spec_id_extend_ms_map_[spec_id] = idx;
         prsm_ptr->setRefineMsVec(extend_ms_ptr_vec);

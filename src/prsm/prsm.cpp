@@ -74,7 +74,7 @@ Prsm::Prsm(const Prsm &obj) {
 
 void Prsm::init(SpParaPtr sp_para_ptr) {
   refine_ms_three_vec_
-      = ExtendMsFactory::geneMsThreePtrVec(deconv_ms_ptr_vec_, sp_para_ptr, adjusted_prec_mass_);
+      = extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec_, sp_para_ptr, adjusted_prec_mass_);
   initScores(sp_para_ptr);
 }
 

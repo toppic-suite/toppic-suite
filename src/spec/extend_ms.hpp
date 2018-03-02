@@ -18,6 +18,7 @@
 
 #include <vector>
 #include <memory>
+#include <utility>
 
 #include "spec/extend_peak.hpp"
 #include "spec/ms.hpp"
@@ -25,17 +26,18 @@
 namespace prot {
 
 typedef std::shared_ptr<Ms<ExtendPeakPtr>> ExtendMsPtr;
+
 typedef std::vector<ExtendMsPtr> ExtendMsPtrVec;
 
-class ExtendMs {
- public:
-  static std::vector<double> getExtendMassVec(ExtendMsPtr extend_ms_ptr);
+namespace extend_ms {
 
-  static std::vector<std::pair<int, int>> getExtendIntMassErrorList(
-      const ExtendMsPtrVec &ext_ms_ptr_vec, bool pref, double scale);
+std::vector<double> getExtendMassVec(ExtendMsPtr extend_ms_ptr);
 
-};
+std::vector<std::pair<int, int>> getExtendIntMassErrorList(const ExtendMsPtrVec &ext_ms_ptr_vec,
+                                                           bool pref, double scale);
 
-} /* namespace prot */
+}  // namespace extend_ms
 
-#endif 
+}  // namespace prot
+
+#endif

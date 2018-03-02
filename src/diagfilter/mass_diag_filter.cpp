@@ -58,7 +58,7 @@ SimplePrsmPtrVec MassDiagFilter::getBestMatch(const PrmMsPtrVec &ms_ptr_vec) {
 SimplePrsmPtrVec MassDiagFilter::compute(const PrmMsPtrVec &ms_ptr_vec) {
   PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
   std::vector<std::pair<int, int> > mass_errors
-      = PrmMs::getIntMassErrorList(ms_ptr_vec, tole_ptr, mng_ptr_->filter_scale_, true, false);
+      = prm_ms::getIntMassErrorList(ms_ptr_vec, tole_ptr, mng_ptr_->filter_scale_, true, false);
   // LOG_DEBUG("mass error size " << mass_errors.size() << " filter result number " << mng_ptr_->filter_result_num_);
   SimplePrsmPtrVec match_ptrs;
   int row_num = index_ptr_->getRowNum();
@@ -70,7 +70,7 @@ SimplePrsmPtrVec MassDiagFilter::compute(const PrmMsPtrVec &ms_ptr_vec) {
     index_ptr_->compScores(mass_errors, i, -mass_errors[i].first, scores);
     FilterProteinPtrVec results
         = mass_match_util::findTopProteins(scores, proteo_row_begins, proteo_row_ends, threshold,
-                                         mng_ptr_->filter_result_num_);
+                                           mng_ptr_->filter_result_num_);
     // LOG_DEBUG("result size " << results.size());
     for (size_t j = 0; j < results.size(); j++) {
       int id = results[j]->getProteinId();

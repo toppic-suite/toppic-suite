@@ -39,9 +39,9 @@ void OnePtmFilter::computeBestMatch(const PrmMsPtrVec &prm_ms_ptr_vec,
                                     const PrmMsPtrVec &srm_ms_ptr_vec) {
   PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
   std::vector<std::pair<int, int>> pref_mass_errors
-      = PrmMs::getIntMassErrorList(prm_ms_ptr_vec, tole_ptr, mng_ptr_->filter_scale_, true, false);
+      = prm_ms::getIntMassErrorList(prm_ms_ptr_vec, tole_ptr, mng_ptr_->filter_scale_, true, false);
   std::vector<std::pair<int, int>> suff_mass_errors
-      = PrmMs::getIntMassErrorList(srm_ms_ptr_vec, tole_ptr, mng_ptr_->filter_scale_, false, true);
+      = prm_ms::getIntMassErrorList(srm_ms_ptr_vec, tole_ptr, mng_ptr_->filter_scale_, false, true);
   // LOG_DEBUG("start convolution");
   index_ptr_->compOnePtmConvolution(pref_mass_errors, suff_mass_errors,
                                     mng_ptr_->comp_num_, mng_ptr_->pref_suff_num_,

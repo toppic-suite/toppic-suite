@@ -32,7 +32,7 @@ typedef std::shared_ptr<SpectrumSet> SpectrumSetPtr;
 
 class SpectrumSet {
  public:
-  SpectrumSet(DeconvMsPtrVec deconv_ms_ptr_vec, SpParaPtr sp_para_ptr, 
+  SpectrumSet(DeconvMsPtrVec deconv_ms_ptr_vec, SpParaPtr sp_para_ptr,
               double prec_mono_mass);
 
   double getPrecMonoMass() {return prec_mono_mass_;}
@@ -43,7 +43,7 @@ class SpectrumSet {
 
   ExtendMsPtrVec getMsThreePtrVec() {return extend_ms_three_ptr_vec_;}
 
-  DeconvMsPtrVec getDeconvMsPtrVec(){return deconv_ms_ptr_vec_;}
+  DeconvMsPtrVec getDeconvMsPtrVec() {return deconv_ms_ptr_vec_;}
 
   PrmMsPtrVec getMsTwoPtrVec() {return prm_ms_two_ptr_vec_;}
 
@@ -53,11 +53,11 @@ class SpectrumSet {
 
   PrmMsPtrVec getSuffixMsTwoPtrVec(SpParaPtr sp_para_ptr);
 
-  PrmMsPtrVec getMsSixPtrVec(){return prm_ms_six_ptr_vec_;}
+  PrmMsPtrVec getMsSixPtrVec() {return prm_ms_six_ptr_vec_;}
 
-  PrmMsPtrVec getMsShiftSixPtrVec(double shift){
-    return PrmMsFactory::geneShiftMsSixPtrVec(deconv_ms_ptr_vec_, sp_para_ptr_,
-                                              prec_mono_mass_, -shift);
+  PrmMsPtrVec getMsShiftSixPtrVec(double shift) {
+    return prm_ms_factory::geneShiftMsSixPtrVec(deconv_ms_ptr_vec_, sp_para_ptr_,
+                                                prec_mono_mass_, -shift);
   }
 
  private:

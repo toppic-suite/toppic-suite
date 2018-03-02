@@ -19,8 +19,10 @@
 
 namespace prot {
 
-PrmPeakPtr PrmPeakFactory::getZeroPeakPtr(int spec_id, double prec_mono_mass,
-                                          PeakTolerancePtr tole_ptr, double score) {
+namespace prm_peak_factory {
+
+PrmPeakPtr getZeroPeakPtr(int spec_id, double prec_mono_mass,
+                          PeakTolerancePtr tole_ptr, double score) {
   // zero_peak
   DeconvPeakPtr zero_peak_ptr = std::make_shared<DeconvPeak>(-1, 0, 0, 0);
   PrmPeakPtr prm_peak_ptr = std::make_shared<PrmPeak>(spec_id, zero_peak_ptr,
@@ -32,8 +34,8 @@ PrmPeakPtr PrmPeakFactory::getZeroPeakPtr(int spec_id, double prec_mono_mass,
   return prm_peak_ptr;
 }
 
-PrmPeakPtr PrmPeakFactory::getPrecPeakPtr(int spec_id, double prec_mono_mass,
-                                          PeakTolerancePtr tole_ptr, double score) {
+PrmPeakPtr getPrecPeakPtr(int spec_id, double prec_mono_mass,
+                          PeakTolerancePtr tole_ptr, double score) {
   // prec_peak
   double prec_peak_shift = IonTypeBase::getIonTypePtr_PREC()->getShift();
   double prec_peak_mass = prec_mono_mass - prec_peak_shift;
@@ -48,4 +50,6 @@ PrmPeakPtr PrmPeakFactory::getPrecPeakPtr(int spec_id, double prec_mono_mass,
   return prm_peak_ptr;
 }
 
-} /* namespace prot */
+}  // namespace prm_peak_factory
+
+}  // namespace prot
