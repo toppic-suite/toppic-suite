@@ -21,15 +21,15 @@
 
 namespace prot {
 
-class PrmPeakFactory {
- public:
-  static PrmPeakPtr getZeroPeakPtr(int spec_id, double prec_mono_mass, 
-                                   PeakTolerancePtr tole_ptr, double score);
+namespace prm_peak_factory {
 
-  static PrmPeakPtr getPrecPeakPtr(int spec_id, double prec_mono_mass, 
-                                   PeakTolerancePtr tole_ptr, double score);
-};
+PrmPeakPtr getZeroPeakPtr(int spec_id, double prec_mono_mass,
+                          PeakTolerancePtr tole_ptr, double score);
 
-} /* namespace prot */
+PrmPeakPtr getPrecPeakPtr(int spec_id, double prec_mono_mass,
+                          PeakTolerancePtr tole_ptr, double score);
+}  // namespace prm_peak_factory
 
-#endif 
+}  // namespace prot
+
+#endif

@@ -18,6 +18,7 @@
 
 #include <memory>
 #include <vector>
+#include <utility>
 
 #include "spec/prm_peak.hpp"
 #include "spec/ms.hpp"
@@ -25,18 +26,20 @@
 
 namespace prot {
 
-typedef std::shared_ptr<Ms<PrmPeakPtr>> PrmMsPtr;
+typedef std::shared_ptr<Ms<PrmPeakPtr> > PrmMsPtr;
+
 typedef std::vector<PrmMsPtr> PrmMsPtrVec;
 
-class PrmMs {
- public:
-  static std::vector<std::pair<int, int>> getIntMassErrorList(const PrmMsPtrVec &prm_ms_ptr_vec, 
-                                                              PeakTolerancePtr tole_ptr,
-                                                              double scale, bool n_strict, bool c_strict);
+namespace prm_ms {
 
-  static PrmPeakPtrVec getPrmPeakPtrs(const PrmMsPtrVec &prm_ms_ptr_vec, PeakTolerancePtr tole_ptr);
-};
+std::vector<std::pair<int, int> > getIntMassErrorList(const PrmMsPtrVec &prm_ms_ptr_vec,
+                                                      PeakTolerancePtr tole_ptr,
+                                                      double scale, bool n_strict, bool c_strict);
 
-} /* namespace prot */
+PrmPeakPtrVec getPrmPeakPtrs(const PrmMsPtrVec &prm_ms_ptr_vec, PeakTolerancePtr tole_ptr);
 
-#endif 
+}  // namespace prm_ms
+
+}  // namespace prot
+
+#endif

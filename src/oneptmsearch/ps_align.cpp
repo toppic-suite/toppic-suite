@@ -313,8 +313,8 @@ PrsmPtr PSAlign::geneResult(int shift_num, ProteoformPtr proteo_ptr,
                                                           para_ptr_->refine_prec_step_width_);
 
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
-  ExtendMsPtrVec refine_ms_ptr_vec = ExtendMsFactory::geneMsThreePtrVec(deconv_ms_ptr_vec,
-                                                                        sp_para_ptr, refine_prec_mass);
+  ExtendMsPtrVec refine_ms_ptr_vec = extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec,
+                                                                          sp_para_ptr, refine_prec_mass);
 
   DiagonalHeaderPtrVec refined_header_ptrs = refineHeadersBgnEnd(proteo_ptr, refine_ms_ptr_vec,
                                                                  header_ptrs, min_mass);

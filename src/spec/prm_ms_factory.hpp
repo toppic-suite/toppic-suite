@@ -22,25 +22,25 @@
 
 namespace prot {
 
-class PrmMsFactory {
- public:
-  static PrmMsPtrVec geneMsTwoPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, 
-                                     SpParaPtr sp_para_ptr,
-                                     double prec_mono_mass);
+namespace prm_ms_factory {
 
-  static PrmMsPtrVec geneSuffixMsTwoPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, 
-                                           SpParaPtr sp_para_ptr,
-                                           double prec_mono_mass);
+PrmMsPtrVec geneMsTwoPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
+                            SpParaPtr sp_para_ptr,
+                            double prec_mono_mass);
 
-  static PrmMsPtrVec geneMsSixPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, 
-                                     SpParaPtr sp_para_ptr,
-                                     double prec_mono_mass);
+PrmMsPtrVec geneSuffixMsTwoPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
+                                  SpParaPtr sp_para_ptr,
+                                  double prec_mono_mass);
 
-  static PrmMsPtrVec geneShiftMsSixPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, 
-                                          SpParaPtr sp_para_ptr, 
-                                          double prec_mono_mass, double shift);
-};
+PrmMsPtrVec geneMsSixPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
+                            SpParaPtr sp_para_ptr,
+                            double prec_mono_mass);
 
-} /* namespace prot */
+PrmMsPtrVec geneShiftMsSixPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
+                                 SpParaPtr sp_para_ptr,
+                                 double prec_mono_mass, double shift);
+}  // namespace prm_ms_factory
+
+}  // namespace prot
 
 #endif /* PRM_PEAK_HPP_ */

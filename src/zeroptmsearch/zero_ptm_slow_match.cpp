@@ -41,9 +41,9 @@ ZeroPtmSlowMatch::ZeroPtmSlowMatch(const DeconvMsPtrVec &deconv_ms_ptr_vec,
 
       SpParaPtr sp_para_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr();
       refine_prec_mass_ = proteoform_ptr_->getResSeqPtr()->getSeqMass();
-      refine_ms_ptr_vec_ = ExtendMsFactory::geneMsThreePtrVec(deconv_ms_ptr_vec_, 
-                                                              sp_para_ptr, 
-                                                              refine_prec_mass_);
+      refine_ms_ptr_vec_ = extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec_, 
+                                                                sp_para_ptr, 
+                                                                refine_prec_mass_);
 
       compScore(refine_ms_ptr_vec_);
     }
@@ -56,9 +56,9 @@ ZeroPtmSlowMatch::ZeroPtmSlowMatch(const DeconvMsPtrVec &deconv_ms_ptr_vec,
     proteoform_ptr_(proteoform_ptr) {
       SpParaPtr sp_para_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr();
       refine_prec_mass_ = proteoform_ptr_->getResSeqPtr()->getSeqMass();
-      refine_ms_ptr_vec_ = ExtendMsFactory::geneMsThreePtrVec(deconv_ms_ptr_vec_, 
-                                                              sp_para_ptr, 
-                                                              refine_prec_mass_);
+      refine_ms_ptr_vec_ = extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec_, 
+                                                                sp_para_ptr, 
+                                                                refine_prec_mass_);
       compScore(refine_ms_ptr_vec_);
     }
 
@@ -91,7 +91,7 @@ void ZeroPtmSlowMatch::compScore (const ExtendMsPtrVec &refine_ms_ptr_vec) {
                                                  activation_ptr, min_mass);
 
     std::vector<double> theo_masses = theo_peak_util::getTheoMassVec(theo_peak_ptrs);
-    std::vector<double> ms_masses = ExtendMs::getExtendMassVec(refine_ms_ptr_vec[i]);
+    std::vector<double> ms_masses = extend_ms::getExtendMassVec(refine_ms_ptr_vec[i]);
     score_ += base_algo::compNumMatchedTheoMasses(ms_masses, theo_masses, ppo);
   }
 }

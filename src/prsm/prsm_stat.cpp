@@ -16,6 +16,8 @@
 #include <iostream>
 #include <fstream>
 #include <iomanip>
+#include <string>
+#include <vector>
 
 #include <boost/algorithm/string.hpp>
 
@@ -31,8 +33,8 @@
 
 namespace prot {
 
-PrsmStat::PrsmStat(PrsmParaPtr prsm_para_ptr, 
-                   const std::string &input_file_ext, 
+PrsmStat::PrsmStat(PrsmParaPtr prsm_para_ptr,
+                   const std::string &input_file_ext,
                    const std::string &output_file_ext) {
   prsm_para_ptr_ = prsm_para_ptr;
   min_mass_ = prsm_para_ptr_->getSpParaPtr()->getMinMass();
@@ -44,7 +46,7 @@ PrsmStat::PrsmStat(PrsmParaPtr prsm_para_ptr,
 int countCoverage(const std::vector<bool> &match_ion_vec, int start, int end) {
   int count = 0;
   for (size_t i = 0; i < match_ion_vec.size(); i++) {
-    if ((int)i >= start && (int)i < end && match_ion_vec[i]) {
+    if (static_cast<int>(i) >= start && static_cast<int>(i) < end && match_ion_vec[i]) {
       count++;
     }
   }
@@ -61,7 +63,7 @@ int countAcid(ResSeqPtr res_seq_ptr, AminoAcidPtr acid_ptr) {
   return count;
 }
 
-int countAcidLeftCoverage(ResSeqPtr res_seq_ptr, AminoAcidPtr acid_ptr, 
+int countAcidLeftCoverage(ResSeqPtr res_seq_ptr, AminoAcidPtr acid_ptr,
                           const std::vector<bool> &match_ion_vec) {
   int count = 0;
   for (int i = 0; i < res_seq_ptr->getLen(); i++) {
@@ -72,8 +74,8 @@ int countAcidLeftCoverage(ResSeqPtr res_seq_ptr, AminoAcidPtr acid_ptr,
   return count;
 }
 
-int countAcidRightCoverage(ResSeqPtr res_seq_ptr, AminoAcidPtr acid_ptr, 
-                          const std::vector<bool> &match_ion_vec) {
+int countAcidRightCoverage(ResSeqPtr res_seq_ptr, AminoAcidPtr acid_ptr,
+                           const std::vector<bool> &match_ion_vec) {
   int count = 0;
   for (int i = 0; i < res_seq_ptr->getLen(); i++) {
     if (res_seq_ptr->getResiduePtr(i)->getAminoAcidPtr() == acid_ptr && match_ion_vec[i+1]) {
@@ -105,7 +107,7 @@ void PrsmStat::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
       << spec_scans << "\t"
       << peak_num << "\t"
       << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecCharge() << "\t"
-      << prsm_ptr->getOriPrecMass()<< "\t"//"Precursor_mass"
+      << prsm_ptr->getOriPrecMass()<< "\t"  // "Precursor_mass"
       << prsm_ptr->getAdjustedPrecMass() << "\t"
       << prsm_ptr->getProteoformPtr()->getProteoClusterId() << "\t"
       << prsm_ptr->getProteoformPtr()->getSeqName() << " "
@@ -142,23 +144,23 @@ void PrsmStat::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   std::vector<std::vector<bool>> c_ion_2d;
   std::vector<std::vector<bool>> both_ion_2d;
   for (size_t s = 0; s < deconv_ms_ptr_vec.size(); s++) {
-    //get ion_pair
-    PeakIonPairPtrVec pair_ptrs = peak_ion_pair_util::genePeakIonPairs(prsm_ptr->getProteoformPtr(), 
-                                                                       refine_ms_ptr_vec[s],
-                                                                       min_mass_);
-    std::vector<bool> n_ion (proteo_len + 1, false);
-    std::vector<bool> c_ion (proteo_len + 1, false);
-    std::vector<bool> both_ion (proteo_len + 1, false);
-    for(size_t p = 0; p<pair_ptrs.size(); p++){
+    // get ion_pair
+    PeakIonPairPtrVec pair_ptrs
+        = peak_ion_pair_util::genePeakIonPairs(prsm_ptr->getProteoformPtr(),
+                                               refine_ms_ptr_vec[s],
+                                               min_mass_);
+    std::vector<bool> n_ion(proteo_len + 1, false);
+    std::vector<bool> c_ion(proteo_len + 1, false);
+    std::vector<bool> both_ion(proteo_len + 1, false);
+    for (size_t p = 0; p < pair_ptrs.size(); p++) {
       int pos = pair_ptrs[p]->getTheoPeakPtr()->getIonPtr()->getPos();
-      //LOG_DEBUG("start pos " << prot_ptr->getStartPos() << " pos " << pos);
-      if(pair_ptrs[p]->getTheoPeakPtr()->getIonPtr()->getIonTypePtr()->isNTerm()){
+      // LOG_DEBUG("start pos " << prot_ptr->getStartPos() << " pos " << pos);
+      if (pair_ptrs[p]->getTheoPeakPtr()->getIonPtr()->getIonTypePtr()->isNTerm()) {
         n_ion[pos] = true;
         both_ion[pos] = true;
         comb_n_ion[pos] = true;
         comb_both_ion[pos] = true;
-      }
-      else{
+      } else {
         c_ion[pos] = true;
         both_ion[pos] = true;
         comb_c_ion[pos] = true;
@@ -230,12 +232,12 @@ void PrsmStat::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
 }
 
 void PrsmStat::process() {
-  std::string spectrum_file_name  = prsm_para_ptr_->getSpectrumFileName(); 
+  std::string spectrum_file_name  = prsm_para_ptr_->getSpectrumFileName();
   std::string base_name = file_util::basename(spectrum_file_name);
   std::string output_file_name = base_name + "." + output_file_ext_;
-  std::ofstream file; 
+  std::ofstream file;
   file.open(output_file_name.c_str());
-  //write title
+  // write title
   file << "Data_file_name" << "\t"
       << "Prsm_ID" << "\t"
       << "Spectrum_ID"<< "\t"
@@ -334,14 +336,14 @@ void PrsmStat::process() {
   std::vector<SpectrumSetPtr> spec_set_vec = sp_reader.getNextSpectrumSet(sp_para_ptr);
 
   while (spec_set_vec[0] != nullptr) {
-    if(spec_set_vec[0]->isValid()){
+    if (spec_set_vec[0]->isValid()) {
       int spec_id = spec_set_vec[0]->getSpectrumId();
       while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_id) {
         DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_vec[0]->getDeconvMsPtrVec();
         prsm_ptr->setDeconvMsPtrVec(deconv_ms_ptr_vec);
         double new_prec_mass = prsm_ptr->getAdjustedPrecMass();
-        ExtendMsPtrVec extend_ms_ptr_vec 
-            = ExtendMsFactory::geneMsThreePtrVec(deconv_ms_ptr_vec, sp_para_ptr, new_prec_mass);
+        ExtendMsPtrVec extend_ms_ptr_vec
+            = extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec, sp_para_ptr, new_prec_mass);
         prsm_ptr->setRefineMsVec(extend_ms_ptr_vec);
         writePrsm(file, prsm_ptr);
         prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
@@ -352,8 +354,8 @@ void PrsmStat::process() {
 
   sp_reader.close();
   prsm_reader.close();
-  //write end;
+  // write end;
   file.close();
 }
 
-} /* namespace prot */
+}  // namespace prot

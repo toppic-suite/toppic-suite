@@ -143,9 +143,9 @@ void addSpectrumPtrsToPrsms(PrsmPtrVec &prsm_ptrs, PrsmParaPtr prsm_para_ptr) {
           prsm_ptrs[i]->setDeconvMsPtrVec(deconv_ms_ptr_vec);
           double new_prec_mass = prsm_ptrs[i]->getAdjustedPrecMass();
           prsm_ptrs[i]->setRefineMsVec(
-              ExtendMsFactory::geneMsThreePtrVec(deconv_ms_ptr_vec,
-                                                 prsm_para_ptr->getSpParaPtr(),
-                                                 new_prec_mass));
+              extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec,
+                                                   prsm_para_ptr->getSpParaPtr(),
+                                                   new_prec_mass));
         }
         if ((spectrum_id == prsm_ptrs[i]->getSpectrumId()
              && prec_id < prsm_ptrs[i]->getPrecursorId()) ||

@@ -22,15 +22,16 @@
 
 namespace prot {
 
-class ExtendMsFactory {
- public:
-  static ExtendMsPtr geneMsThreePtr(DeconvMsPtr deconv_ms_ptr, SpParaPtr sp_para_ptr,
-                                    double new_prec_mass);
+namespace extend_ms_factory {
 
-  static ExtendMsPtrVec geneMsThreePtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, 
-                                          SpParaPtr sp_para_ptr, double new_prec_mass);
-};
+ExtendMsPtr geneMsThreePtr(DeconvMsPtr deconv_ms_ptr, SpParaPtr sp_para_ptr,
+                           double new_prec_mass);
 
-} /* namespace prot */
+ExtendMsPtrVec geneMsThreePtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, 
+                                 SpParaPtr sp_para_ptr, double new_prec_mass);
+
+}  // namespace extend_ms_factory
+
+}  // namespace prot
 
 #endif 

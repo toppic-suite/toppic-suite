@@ -22,6 +22,8 @@
 
 namespace prot {
 
+namespace prm_ms_factory {
+
 void addTwoMasses(PrmPeakPtrVec &list, int spec_id, DeconvPeakPtr deconv_peak_ptr,
                   double prec_mono_mass, ActivationPtr active_type_ptr, PeakTolerancePtr tole_ptr) {
   double ori_mass = deconv_peak_ptr->getMonoMass();
@@ -232,9 +234,8 @@ PrmMsPtr geneShiftMsSixPtr(DeconvMsPtr deconv_ms_ptr, int spec_id, SpParaPtr sp_
   return std::make_shared<Ms<PrmPeakPtr>>(header_ptr, prm_peak_list);
 }
 
-PrmMsPtrVec PrmMsFactory::geneMsTwoPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
-                                          SpParaPtr sp_para_ptr,
-                                          double prec_mono_mass) {
+PrmMsPtrVec geneMsTwoPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
+                            SpParaPtr sp_para_ptr, double prec_mono_mass) {
   PrmMsPtrVec prm_ms_ptr_vec;
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
     prm_ms_ptr_vec.push_back(geneMsTwoPtr(deconv_ms_ptr_vec[i], i,
@@ -243,9 +244,8 @@ PrmMsPtrVec PrmMsFactory::geneMsTwoPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_ve
   return prm_ms_ptr_vec;
 }
 
-PrmMsPtrVec PrmMsFactory::geneSuffixMsTwoPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
-                                                SpParaPtr sp_para_ptr,
-                                                double prec_mono_mass) {
+PrmMsPtrVec geneSuffixMsTwoPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
+                                  SpParaPtr sp_para_ptr, double prec_mono_mass) {
   PrmMsPtrVec prm_ms_ptr_vec;
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
     prm_ms_ptr_vec.push_back(geneSuffixMsTwoPtr(deconv_ms_ptr_vec[i], i,
@@ -254,9 +254,8 @@ PrmMsPtrVec PrmMsFactory::geneSuffixMsTwoPtrVec(const DeconvMsPtrVec &deconv_ms_
   return prm_ms_ptr_vec;
 }
 
-PrmMsPtrVec PrmMsFactory::geneMsSixPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
-                                          SpParaPtr sp_para_ptr,
-                                          double prec_mono_mass) {
+PrmMsPtrVec geneMsSixPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
+                            SpParaPtr sp_para_ptr, double prec_mono_mass) {
   PrmMsPtrVec prm_ms_ptr_vec;
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
     prm_ms_ptr_vec.push_back(geneMsSixPtr(deconv_ms_ptr_vec[i], i,
@@ -265,9 +264,9 @@ PrmMsPtrVec PrmMsFactory::geneMsSixPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_ve
   return prm_ms_ptr_vec;
 }
 
-PrmMsPtrVec PrmMsFactory::geneShiftMsSixPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
-                                               SpParaPtr sp_para_ptr, double prec_mono_mass,
-                                               double shift) {
+PrmMsPtrVec geneShiftMsSixPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
+                                 SpParaPtr sp_para_ptr, double prec_mono_mass,
+                                 double shift) {
   PrmMsPtrVec prm_ms_ptr_vec;
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
     prm_ms_ptr_vec.push_back(geneShiftMsSixPtr(deconv_ms_ptr_vec[i], i, sp_para_ptr,
@@ -276,4 +275,5 @@ PrmMsPtrVec PrmMsFactory::geneShiftMsSixPtrVec(const DeconvMsPtrVec &deconv_ms_p
   return prm_ms_ptr_vec;
 }
 
-} /* namespace prot */
+}  // namespace prm_ms_factory
+}  // namespace prot

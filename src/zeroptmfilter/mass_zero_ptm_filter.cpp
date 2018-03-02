@@ -66,10 +66,10 @@ void MassZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec) {
   PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
   bool pref = true;
   std::vector<std::pair<int, int> > pref_mass_errors
-      = ExtendMs::getExtendIntMassErrorList(ms_ptr_vec, pref, mng_ptr_->filter_scale_);
+      = extend_ms::getExtendIntMassErrorList(ms_ptr_vec, pref, mng_ptr_->filter_scale_);
   pref = false;
   std::vector<std::pair<int, int> > suff_mass_errors
-      = ExtendMs::getExtendIntMassErrorList(ms_ptr_vec, pref, mng_ptr_->filter_scale_);
+      = extend_ms::getExtendIntMassErrorList(ms_ptr_vec, pref, mng_ptr_->filter_scale_);
   std::pair<int, int> prec_minus_water_mass_error
       = ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMassMinusWaterError(tole_ptr->getPpo(),
                                                                         mng_ptr_->filter_scale_);
@@ -102,8 +102,8 @@ void MassZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec) {
   bool add_shifts = false;
   int shift_num = 0;
   FilterProteinPtrVec comp_prots
-	  = mass_match_util::findTopProteins(term_scores, rev_term_scores, term_index_ptr_, rev_term_index_ptr_,
-			  threshold, mng_ptr_->comp_num_, add_shifts, shift_num);
+      = mass_match_util::findTopProteins(term_scores, rev_term_scores, term_index_ptr_, rev_term_index_ptr_,
+                                         threshold, mng_ptr_->comp_num_, add_shifts, shift_num);
   comp_match_ptrs_.clear();
   int group_spec_num = ms_ptr_vec.size();
   for (size_t i = 0; i < comp_prots.size(); i++) {
@@ -116,7 +116,7 @@ void MassZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec) {
 
   FilterProteinPtrVec pref_prots
       = mass_match_util::findTopProteins(term_scores, rev_diag_scores, term_index_ptr_, rev_diag_index_ptr_,
-                                       threshold, mng_ptr_->pref_suff_num_, add_shifts, shift_num);
+                                         threshold, mng_ptr_->pref_suff_num_, add_shifts, shift_num);
   pref_match_ptrs_.clear();
   for (size_t i = 0; i < pref_prots.size(); i++) {
     int id = pref_prots[i]->getProteinId();
@@ -128,7 +128,7 @@ void MassZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec) {
 
   FilterProteinPtrVec suff_prots
       = mass_match_util::findTopProteins(diag_scores, rev_term_scores, diag_index_ptr_, rev_term_index_ptr_,
-                                       threshold, mng_ptr_->pref_suff_num_, add_shifts, shift_num);
+                                         threshold, mng_ptr_->pref_suff_num_, add_shifts, shift_num);
   suff_match_ptrs_.clear();
   for (size_t i = 0; i < suff_prots.size(); i++) {
     int id = suff_prots[i]->getProteinId();
@@ -140,7 +140,7 @@ void MassZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec) {
 
   FilterProteinPtrVec internal_prots
       = mass_match_util::findTopProteins(diag_scores, rev_diag_scores, diag_index_ptr_, rev_diag_index_ptr_,
-                                       threshold, mng_ptr_->inte_num_, add_shifts, shift_num);
+                                         threshold, mng_ptr_->inte_num_, add_shifts, shift_num);
   internal_match_ptrs_.clear();
   for (size_t i = 0; i < internal_prots.size(); i++) {
     int id = internal_prots[i]->getProteinId();

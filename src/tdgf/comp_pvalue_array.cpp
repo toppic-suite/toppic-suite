@@ -120,9 +120,9 @@ void CompPValueArray::compSingleExtremeValue(const DeconvMsPtrVec &ms_ptr_vec,
      << ms_ptr->getHeaderPtr()->getPrecMonoMass()
      << " precursor " << refine_prec_mass);
      */
-  PrmMsPtrVec prm_ms_ptr_vec = PrmMsFactory::geneMsSixPtrVec(refine_ms_ptr_vec,
-                                                             mng_ptr_->prsm_para_ptr_->getSpParaPtr(),
-                                                             refine_prec_mass);
+  PrmMsPtrVec prm_ms_ptr_vec = prm_ms_factory::geneMsSixPtrVec(refine_ms_ptr_vec,
+                                                               mng_ptr_->prsm_para_ptr_->getSpParaPtr(),
+                                                               refine_prec_mass);
 
   PrsmPtrVec prsm_ptrs;
   prsm_ptrs.push_back(prsm_ptr);

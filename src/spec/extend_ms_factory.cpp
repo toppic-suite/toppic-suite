@@ -19,8 +19,10 @@
 
 namespace prot {
 
-ExtendMsPtr ExtendMsFactory::geneMsThreePtr(DeconvMsPtr deconv_ms_ptr, SpParaPtr sp_para_ptr,
-                                            double new_prec_mass) {
+namespace extend_ms_factory {
+
+ExtendMsPtr geneMsThreePtr(DeconvMsPtr deconv_ms_ptr, SpParaPtr sp_para_ptr,
+                           double new_prec_mass) {
   MsHeaderPtr ori_header_ptr = deconv_ms_ptr->getMsHeaderPtr();
   MsHeaderPtr header_ptr = MsHeader::geneMsHeaderPtr(ori_header_ptr, new_prec_mass);
 
@@ -83,8 +85,8 @@ ExtendMsPtr ExtendMsFactory::geneMsThreePtr(DeconvMsPtr deconv_ms_ptr, SpParaPtr
   return std::make_shared<Ms<ExtendPeakPtr>>(header_ptr, list_filtered);
 }
 
-ExtendMsPtrVec ExtendMsFactory::geneMsThreePtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
-                                                  SpParaPtr sp_para_ptr, double new_prec_mass) {
+ExtendMsPtrVec geneMsThreePtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
+                                 SpParaPtr sp_para_ptr, double new_prec_mass) {
   ExtendMsPtrVec extend_ms_ptr_vec;
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
     extend_ms_ptr_vec.push_back(geneMsThreePtr(deconv_ms_ptr_vec[i], sp_para_ptr, new_prec_mass));
@@ -92,4 +94,6 @@ ExtendMsPtrVec ExtendMsFactory::geneMsThreePtrVec(const DeconvMsPtrVec &deconv_m
   return extend_ms_ptr_vec;
 }
 
-} /* namespace prot */
+}  // namespace extend_ms_factory
+
+}  // namespace prot
