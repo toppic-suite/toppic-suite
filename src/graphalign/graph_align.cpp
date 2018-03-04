@@ -520,7 +520,7 @@ PrsmPtr GraphAlign::geneResult(int s, int m) {
 
   DeconvMsPtrVec deconv_ms_ptr_vec = spec_graph_ptr_->getSpectrumSetPtr()->getDeconvMsPtrVec();
   ExtendMsPtrVec refine_ms_ptr_vec
-      = ExtendMsFactory::geneMsThreePtrVec(deconv_ms_ptr_vec,  sp_para_ptr, refine_prec_mass);
+      = extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec,  sp_para_ptr, refine_prec_mass);
 
   DiagonalHeaderPtrVec2D refined_headers_2d = refineHeadersBgnEnd(
       proteo_ptr, refine_ms_ptr_vec, diag_headers_2d_, diag_headers_, min_mass);

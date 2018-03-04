@@ -26,11 +26,13 @@ namespace prm_ms_factory {
 
 PrmMsPtrVec geneMsTwoPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
                             SpParaPtr sp_para_ptr,
-                            double prec_mono_mass);
+                            double prec_mono_mass,
+                            const std::vector<double> & mod_mass = std::vector<double>());
 
 PrmMsPtrVec geneSuffixMsTwoPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
                                   SpParaPtr sp_para_ptr,
-                                  double prec_mono_mass);
+                                  double prec_mono_mass,
+                                  const std::vector<double> & mod_mass = std::vector<double>());
 
 PrmMsPtrVec geneMsSixPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
                             SpParaPtr sp_para_ptr,
