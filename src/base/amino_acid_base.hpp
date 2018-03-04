@@ -17,6 +17,7 @@
 #define PROT_BASE_AMINO_ACID_BASE_HPP_
 
 #include <string>
+#include <unordered_map>
 
 #include "base/amino_acid.hpp"
 
@@ -57,6 +58,13 @@ class AminoAcidBase {
 
  private:
   static AminoAcidPtrVec amino_acid_ptr_vec_;
+
+  static std::unordered_map<std::string, AminoAcidPtr> amino_acid_one_letter_map_;
+
+  static std::unordered_map<std::string, AminoAcidPtr> amino_acid_three_letter_map_;
+
+  static std::unordered_map<std::string, AminoAcidPtr> amino_acid_name_map_;
+
   static AminoAcidPtr empty_amino_acid_ptr_;
 };
 

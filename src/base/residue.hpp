@@ -19,6 +19,8 @@
 #include <string>
 #include <memory>
 #include <map>
+#include <utility>
+#include <vector>
 
 #include "base/amino_acid.hpp"
 #include "base/ptm.hpp"
@@ -31,11 +33,13 @@ typedef std::shared_ptr<Residue> ResiduePtr;
 
 class Residue {
  public:
-  Residue(AminoAcidPtr acid_ptr, PtmPtr ptm_ptr); 
+  Residue(AminoAcidPtr acid_ptr, PtmPtr ptm_ptr):
+      acid_ptr_(acid_ptr),
+      ptm_ptr_(ptm_ptr) {
+        mass_ = acid_ptr_->getMonoMass() + ptm_ptr_->getMonoMass();
+      }
 
-  Residue(const std::string &acid_name, const std::string &abbr_name);
-
-  Residue(xercesc::DOMElement* element); 
+  explicit Residue(xercesc::DOMElement* element);
 
   /** Get amino acid. */
   AminoAcidPtr getAminoAcidPtr() {return acid_ptr_; }
@@ -50,24 +54,23 @@ class Residue {
    * Checks if the residue contains the same amino acid and ptm.
    */
   bool isSame(ResiduePtr residue_ptr) {
-    return acid_ptr_ == residue_ptr->getAminoAcidPtr() 
+    return acid_ptr_ == residue_ptr->getAminoAcidPtr()
         && ptm_ptr_ == residue_ptr->getPtmPtr();
   }
 
   /** Get string representation */
-  std::string toString(const std::string &delim_bgn, 
-                       const std::string &delim_end);
+  std::string toString(const std::string &delim_bgn, const std::string &delim_end);
 
   std::string toString() {return toString("[", "]");}
 
-  void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent,
+  void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent,
                  const std::string &element_name);
 
-  void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+  void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
   static std::string getXmlElementName() {return "residue";}
 
-private:
+ private:
   /** amino acid */
   AminoAcidPtr acid_ptr_;
   /** post-translational modification */
@@ -77,10 +80,11 @@ private:
 };
 
 typedef std::vector<ResiduePtr> ResiduePtrVec;
+
 typedef std::vector<ResiduePtrVec> ResiduePtrVec2D;
 
-typedef std::vector<std::pair<std::string,std::string>> StringPairVec;
+typedef std::vector<std::pair<std::string, std::string> > StringPairVec;
 
-}
+}  // namespace prot
 
 #endif
