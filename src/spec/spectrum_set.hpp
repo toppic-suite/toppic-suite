@@ -47,11 +47,11 @@ class SpectrumSet {
 
   PrmMsPtrVec getMsTwoPtrVec() {return prm_ms_two_ptr_vec_;}
 
-  PrmMsPtrVec getMsTwoPtrVec(SpParaPtr sp_para_ptr);
+  PrmMsPtrVec getMsTwoPtrVec(SpParaPtr sp_para_ptr, const std::vector<double> & mod_mass);
 
   PrmMsPtrVec getSuffixMsTwoPtrVec() {return srm_ms_two_ptr_vec_;}
 
-  PrmMsPtrVec getSuffixMsTwoPtrVec(SpParaPtr sp_para_ptr);
+  PrmMsPtrVec getSuffixMsTwoPtrVec(SpParaPtr sp_para_ptr, const std::vector<double> & mod_mass);
 
   PrmMsPtrVec getMsSixPtrVec() {return prm_ms_six_ptr_vec_;}
 
@@ -62,12 +62,19 @@ class SpectrumSet {
 
  private:
   DeconvMsPtrVec deconv_ms_ptr_vec_;
+
   SpParaPtr sp_para_ptr_;
+
   double prec_mono_mass_;
+
   bool valid_ = true;
+
   ExtendMsPtrVec extend_ms_three_ptr_vec_;
+
   PrmMsPtrVec prm_ms_two_ptr_vec_;
+
   PrmMsPtrVec srm_ms_two_ptr_vec_;
+
   PrmMsPtrVec prm_ms_six_ptr_vec_;
 
   bool checkValid(SpParaPtr sp_para_ptr);

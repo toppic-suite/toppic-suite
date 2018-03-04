@@ -97,8 +97,11 @@ void DiagFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num
       = std::make_shared<ThreadPool<SimplePrsmXmlWriter>>(mng_ptr_->thread_num_, output_file_name);
 
   SpectrumSetPtr spec_set_ptr = reader.getNextSpectrumSet(sp_para_ptr)[0];
+
   int spectrum_num = msalign_util::getSpNum(prsm_para_ptr->getSpectrumFileName());
+
   int cnt = 0;
+
   while (spec_set_ptr != nullptr) {
     cnt += group_spec_num;
     if (spec_set_ptr->isValid()) {
@@ -109,11 +112,13 @@ void DiagFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num
         }
         pool_ptr->Enqueue(geneTask(filter_ptr, ms_ptr_vec, pool_ptr));
       } else {
+        std::vector<double> mod_mass(3);
+
         for (size_t i = 0; i < mod_mass_list.size(); i++) {
-          for (size_t k1 = 0; k1 < sp_para_ptr->mod_mass_.size(); k1++) {
-            std::fill(sp_para_ptr->mod_mass_.begin(), sp_para_ptr->mod_mass_.end(), 0.0);
-            sp_para_ptr->mod_mass_[k1] += mod_mass_list[i];
-            PrmMsPtrVec ms_ptr_vec = spec_set_ptr->getMsTwoPtrVec(sp_para_ptr);
+          for (size_t k1 = 0; k1 < mod_mass.size(); k1++) {
+            std::fill(mod_mass.begin(), mod_mass.end(), 0.0);
+            mod_mass[k1] += mod_mass_list[i];
+            PrmMsPtrVec ms_ptr_vec = spec_set_ptr->getMsTwoPtrVec(sp_para_ptr, mod_mass);
             while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ * 2) {
               boost::this_thread::sleep(boost::posix_time::milliseconds(100));
             }

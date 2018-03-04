@@ -40,10 +40,7 @@ class SpPara {
       ext_offsets_(ext_offsets),
       peak_tolerance_ptr_(peak_tolerance_ptr),
       activation_ptr_(activation_ptr),
-      skip_list_(skip_list) {
-        mod_mass_.resize(3);
-        std::fill(mod_mass_.begin(), mod_mass_.end(), 0.0);
-      }
+      skip_list_(skip_list) {}
 
   explicit SpPara(xercesc::DOMElement* element);
 
@@ -73,8 +70,6 @@ class SpPara {
 
   static std::string getXmlElementName() {return "sp_para";}
 
-  std::vector<double> mod_mass_;
-
   // the 1 Da error in precursor mass used in zeroptm searching
   int prec_error_ = 1;
 
@@ -85,9 +80,11 @@ class SpPara {
   double min_mass_;
   // if the mass is smaller than extend_min_mass, the peak is not extended
   double extend_min_mass_;
+
   std::vector<double> ext_offsets_;
 
   PeakTolerancePtr peak_tolerance_ptr_;
+
   ActivationPtr activation_ptr_;
 
   std::set<std::string> skip_list_;

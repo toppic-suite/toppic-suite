@@ -137,8 +137,11 @@ std::function<void()> geneTask(const ProteoformPtrVec & raw_forms,
     SimplePrsmXmlWriter internal_writer(output_file_name + "_INTERNAL_" + block_str + "_" + std::to_string(idx));
 
     std::vector<SpectrumSetPtr> spec_set_vec = reader.getNextSpectrumSet(sp_para_ptr);
+
     int spectrum_num = msalign_util::getSpNum(prsm_para_ptr->getSpectrumFileName());
+
     int cnt = 0;
+
     while (spec_set_vec[0] != nullptr) {
       cnt += group_spec_num * mng_ptr->thread_num_; 
       if (spec_set_vec[0]->isValid()) {
@@ -151,12 +154,14 @@ std::function<void()> geneTask(const ProteoformPtrVec & raw_forms,
           suff_writer.write(filter_ptr->getSuffMatchPtrs());
           internal_writer.write(filter_ptr->getInternalMatchPtrs());
         } else {
+          std::vector<double> mod_mass(3);
+
           for (size_t i = 0; i < mod_mass_list.size(); i++) {
-            for (size_t k1 = 0; k1 < sp_para_ptr->mod_mass_.size(); k1++) {
-              std::fill(sp_para_ptr->mod_mass_.begin(), sp_para_ptr->mod_mass_.end(), 0.0);
-              sp_para_ptr->mod_mass_[k1] += mod_mass_list[i];
-              PrmMsPtrVec prm_ms_ptr_vec = spec_set_vec[0]->getMsTwoPtrVec(sp_para_ptr);
-              PrmMsPtrVec srm_ms_ptr_vec = spec_set_vec[0]->getSuffixMsTwoPtrVec(sp_para_ptr);
+            for (size_t k1 = 0; k1 < mod_mass.size(); k1++) {
+              std::fill(mod_mass.begin(), mod_mass.end(), 0.0);
+              mod_mass[k1] += mod_mass_list[i];
+              PrmMsPtrVec prm_ms_ptr_vec = spec_set_vec[0]->getMsTwoPtrVec(sp_para_ptr, mod_mass);
+              PrmMsPtrVec srm_ms_ptr_vec = spec_set_vec[0]->getSuffixMsTwoPtrVec(sp_para_ptr, mod_mass);
               filter_ptr->computeBestMatch(prm_ms_ptr_vec, srm_ms_ptr_vec);
               comp_writer.write(filter_ptr->getCompMatchPtrs());
               pref_writer.write(filter_ptr->getPrefMatchPtrs());

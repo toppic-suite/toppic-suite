@@ -33,26 +33,14 @@ ExtendMsPtr geneMsThreePtr(DeconvMsPtr deconv_ms_ptr, SpParaPtr sp_para_ptr,
     DeconvPeakPtr deconv_peak_ptr = deconv_ms_ptr->getPeakPtr(i);
     if (deconv_peak_ptr->getMonoMass() <= ext_min_mass) {
       double orig_mass = deconv_peak_ptr->getMonoMass();
-      if (deconv_peak_ptr->getMonoMass() > new_prec_mass / 4) {
-        orig_mass -= sp_para_ptr->mod_mass_[0];
-      }
 
-      if (deconv_peak_ptr->getMonoMass() > new_prec_mass * 3 / 4) {
-        orig_mass -= sp_para_ptr->mod_mass_[1];
-      }
       ExtendPeakPtr extend_peak_ptr
           = std::make_shared<ExtendPeak>(deconv_peak_ptr, orig_mass, 1.0);
       list.push_back(extend_peak_ptr);
     } else {
       for (size_t j = 0; j < ext_offsets.size(); j++) {
         double mass = deconv_peak_ptr->getMonoMass() + ext_offsets[j];
-        if (deconv_peak_ptr->getMonoMass() + ext_offsets[j] > new_prec_mass / 4) {
-          mass -= sp_para_ptr->mod_mass_[0];
-        }
 
-        if (deconv_peak_ptr->getMonoMass() + ext_offsets[j] > new_prec_mass * 3 / 4) {
-          mass -= sp_para_ptr->mod_mass_[1];
-        }
         ExtendPeakPtr extend_peak_ptr
             = std::make_shared<ExtendPeak>(deconv_peak_ptr, mass, 1.0);
         list.push_back(extend_peak_ptr);
@@ -82,7 +70,7 @@ ExtendMsPtr geneMsThreePtr(DeconvMsPtr deconv_ms_ptr, SpParaPtr sp_para_ptr,
     double reve_tole = peak_tole_ptr->compRelaxErrorTole(mass, prec_mono_mass);
     list_filtered[i]->setReverseTolerance(reve_tole);
   }
-  return std::make_shared<Ms<ExtendPeakPtr>>(header_ptr, list_filtered);
+  return std::make_shared<Ms<ExtendPeakPtr> >(header_ptr, list_filtered);
 }
 
 ExtendMsPtrVec geneMsThreePtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,

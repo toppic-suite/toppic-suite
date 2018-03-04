@@ -220,10 +220,10 @@ void DprProcessor::process() {
       while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_id) {
         DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
         LOG_DEBUG("mass " << getResidueVecMass(prsm_ptr->getProteoformPtr()->getResSeqPtr()->getResidues()));
-        ExtendMsPtrVec refine_ms_ptr_vec = ExtendMsFactory::geneMsThreePtrVec(deconv_ms_ptr_vec, 
-                                                                              sp_para_ptr_, 
-                                                                              prsm_ptr->getAdjustedPrecMass());
-        std::vector<double> ms_masses = ExtendMs::getExtendMassVec(refine_ms_ptr_vec[0]);
+        ExtendMsPtrVec refine_ms_ptr_vec = extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec, 
+                                                                                sp_para_ptr_, 
+                                                                                prsm_ptr->getAdjustedPrecMass());
+        std::vector<double> ms_masses = extend_ms::getExtendMassVec(refine_ms_ptr_vec[0]);
         double tolerance = refine_ms_ptr_vec[0]->getMsHeaderPtr()->getErrorTolerance(mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getPpo());
         std::sort(ms_masses.begin(), ms_masses.end());
 
