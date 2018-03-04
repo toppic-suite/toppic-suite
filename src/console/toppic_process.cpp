@@ -70,7 +70,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
   try {
     std::time_t start = time(nullptr);
     char buf[50];
-    std::strftime(buf, 50, "%a %b %d %T %Y", std::localtime(&start));
+    std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
 
     arguments["start_time"] = buf;
     Argument::outputArguments(std::cout, arguments);
@@ -330,7 +330,7 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
 
     std::tm t = {};
     std::istringstream ss(arguments["start_time"]);
-    ss >> std::get_time(&t, "%a %b %d %T %Y");
+    ss >> std::get_time(&t, "%a %b %d %H:%M:%S %Y");
     arguments["running_time"] = std::to_string(static_cast<int>(difftime(end, std::mktime(&t))));
 
 
