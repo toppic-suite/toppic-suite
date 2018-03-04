@@ -19,14 +19,9 @@
 
 namespace prot {
 
-NeutralLoss::NeutralLoss(const std::string &name, double mass): 
-    name_(name),
-    mass_(mass) {
-    }
-
 NeutralLoss::NeutralLoss(xercesc::DOMElement* element) {
-  name_ = xml_dom_util::getChildValue(element,"name", 0);
-  mass_ = xml_dom_util::getDoubleChildValue(element,"mass", 0);
+  name_ = xml_dom_util::getChildValue(element, "name", 0);
+  mass_ = xml_dom_util::getDoubleChildValue(element, "mass", 0);
 }
 
-} /* namespace prot */
+}  // namespace prot

@@ -23,7 +23,14 @@
 namespace prot {
 
 AminoAcidPtrVec AminoAcidBase::amino_acid_ptr_vec_;
+
 AminoAcidPtr AminoAcidBase::empty_amino_acid_ptr_;
+
+std::unordered_map<std::string, AminoAcidPtr> AminoAcidBase::amino_acid_one_letter_map_;
+
+std::unordered_map<std::string, AminoAcidPtr> AminoAcidBase::amino_acid_three_letter_map_;
+
+std::unordered_map<std::string, AminoAcidPtr> AminoAcidBase::amino_acid_name_map_;
 
 void AminoAcidBase::initBase(const std::string &file_name) {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
@@ -34,10 +41,14 @@ void AminoAcidBase::initBase(const std::string &file_name) {
     int acid_num = xml_dom_util::getChildCount(parent, element_name.c_str());
     LOG_DEBUG("acid num " << acid_num);
     for (int i = 0; i < acid_num; i++) {
-      xercesc::DOMElement* element
-          = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
+      xercesc::DOMElement* element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
       AminoAcidPtr ptr = std::make_shared<AminoAcid>(element);
       amino_acid_ptr_vec_.push_back(ptr);
+
+      amino_acid_one_letter_map_[ptr->getOneLetter()]     = ptr;
+      amino_acid_three_letter_map_[ptr->getThreeLetter()] = ptr;
+      amino_acid_name_map_[ptr->getName()]                = ptr;
+
       // check if it is an empty acid
       if (ptr->getMonoMass() == 0.0) {
         empty_amino_acid_ptr_ = ptr;
@@ -47,36 +58,15 @@ void AminoAcidBase::initBase(const std::string &file_name) {
 }
 
 AminoAcidPtr AminoAcidBase::getAminoAcidPtrByName(const std::string &name) {
-  for (size_t i = 0; i < amino_acid_ptr_vec_.size(); i++) {
-    std::string n = amino_acid_ptr_vec_[i]->getName();
-    if (n == name) {
-      return amino_acid_ptr_vec_[i];
-    }
-  }
-  LOG_DEBUG("Amino acid not found: " + name);
-  return AminoAcidPtr(nullptr);
+  return amino_acid_name_map_[name];
 }
 
 AminoAcidPtr AminoAcidBase::getAminoAcidPtrByOneLetter(const std::string &one_letter) {
-  for (size_t i = 0; i < amino_acid_ptr_vec_.size(); i++) {
-    std::string l = amino_acid_ptr_vec_[i]->getOneLetter();
-    if (l == one_letter)  {
-      return amino_acid_ptr_vec_[i];
-    }
-  }
-  LOG_DEBUG("Amino acid not found " + one_letter);
-  return AminoAcidPtr(nullptr);
+  return amino_acid_one_letter_map_[one_letter];
 }
 
 AminoAcidPtr AminoAcidBase::getAminoAcidPtrByThreeLetter(const std::string &three_letter) {
-  for (size_t i = 0; i < amino_acid_ptr_vec_.size(); i++) {
-    std::string l = amino_acid_ptr_vec_[i]->getThreeLetter();
-    if (l == three_letter) {
-      return amino_acid_ptr_vec_[i];
-    }
-  }
-  LOG_DEBUG("Amino acid not found " + three_letter);
-  return AminoAcidPtr(nullptr);
+  return amino_acid_three_letter_map_[three_letter];
 }
 
 bool AminoAcidBase::containsName(const std::string &name) {
