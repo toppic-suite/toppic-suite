@@ -68,11 +68,17 @@ void PrsmStrCombine::process(bool norm) {
         }
       }
     }
+
     if (cur_str_ptrs.size() > 0) {
       if (!norm) {
         std::sort(cur_str_ptrs.begin(), cur_str_ptrs.end(), PrsmStr::cmpMatchFragmentDec);
       } else {
         std::sort(cur_str_ptrs.begin(), cur_str_ptrs.end(), PrsmStr::cmpNormMatchFragmentDec);
+        auto it = std::unique(cur_str_ptrs.begin(), cur_str_ptrs.end(),
+                              [](const PrsmStrPtr & a, const PrsmStrPtr & b) {
+                                return a->getSeqName() == b->getSeqName();
+                              });
+        cur_str_ptrs.erase(it, cur_str_ptrs.end());
       }
       for (int i = 0; i < top_num_; i++) {
         if (i >= static_cast<int>(cur_str_ptrs.size())) {

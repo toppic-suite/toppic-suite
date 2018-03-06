@@ -95,6 +95,7 @@ void GraphAlign::getConsistentPairs() {
   int min_dist = mng_ptr_->getIntMinConsistentDist();
   for (size_t m = 0; m < dist_vec_.size(); m++) {
     if (dist_vec_[m].size() == 0) continue;
+
     size_t prot_idx_min = 0, prot_idx_max = 0;
     for (size_t spec_idx = 0; spec_idx < spec_dist_.size(); spec_idx++) {
       Dist distance = spec_dist_[spec_idx];
@@ -109,8 +110,13 @@ void GraphAlign::getConsistentPairs() {
           prot_idx_min++;
         }
       }
-      prot_idx_max = prot_idx_min;
+
+      if (prot_idx_min >= dist_vec_[m].size()) continue;
+
+      prot_idx_max = std::max(prot_idx_min, prot_idx_max);
+
       flag = true;
+
       while (prot_idx_max < dist_vec_[m].size() && flag) {
         if (dist_vec_[m][prot_idx_max].dist_ > sp_dist + tole) {
           flag = false;
@@ -118,6 +124,7 @@ void GraphAlign::getConsistentPairs() {
           prot_idx_max++;
         }
       }
+
       for (size_t t = prot_idx_min; t < prot_idx_max; t++) {
         Dist new_distance = dist_vec_[m][t];
         if (std::abs(sp_dist - new_distance.dist_) <= tole)
@@ -176,8 +183,9 @@ GraphDpNodePtr GraphAlign::compBestVariableNode(int i, int j, int s, int m, int 
       int pi = pair.first;
       int pj = pair.second;
       // LOG_DEBUG("pi " << pi << " pj " << pj);
-      if (table_[pi][pj]->getBestScore(s, m-p) > best_prev_score) {
-        best_prev_score = table_[pi][pj]->getBestScore(s, m-p);
+      int score = table_[pi][pj]->getBestScore(s, m-p);
+      if (score > best_prev_score) {
+        best_prev_score = score;
         best_prev_node = table_[pi][pj];
         best_edge_mod_num = p;
       }
@@ -193,14 +201,16 @@ GraphDpNodePtr GraphAlign::compBestShiftNode(int i, int j, int s, int m) {
   int best_prev_score = -1;
   GraphDpNodePtr best_prev_node = nullptr;
   GraphDpNodePtr up_node = table_[i-1][j];
-  if (up_node->getBestShiftScore(s-1, m) > best_prev_score) {
-    best_prev_score = up_node->getBestShiftScore(s-1, m);
+  int score = up_node->getBestShiftScore(s-1, m);
+  if (score > best_prev_score) {
+    best_prev_score = score;
     best_prev_node = up_node->getBestShiftNodePtr(s-1, m);
   }
 
   GraphDpNodePtr left_node = table_[i][j-1];
-  if (left_node->getBestShiftScore(s-1, m) > best_prev_score) {
-    best_prev_score = left_node->getBestShiftScore(s-1, m);
+  score = left_node->getBestShiftScore(s-1, m);
+  if (score > best_prev_score) {
+    best_prev_score = score;
     best_prev_node = left_node->getBestShiftNodePtr(s-1, m);
   }
   return best_prev_node;
@@ -347,8 +357,8 @@ void GraphAlign::getNodeDiagonals(int s, int m) {
 }
 
 DiagonalHeaderPtr getFirstDiagonal(ProteoGraphPtr proteo_ptr,
-                                   GraphResultNodePtrVec nodes,
-                                   std::vector<double> prm_masses,
+                                   const GraphResultNodePtrVec & nodes,
+                                   const std::vector<double> & prm_masses,
                                    bool only_diag) {
   int prot_idx = nodes[0]->getFirstIdx();
   int spec_idx = nodes[0]->getSecondIdx();
@@ -386,9 +396,9 @@ DiagonalHeaderPtr getFirstDiagonal(ProteoGraphPtr proteo_ptr,
   return header_ptr;
 }
 
-DiagonalHeaderPtr getLastDiagonal(GraphResultNodePtrVec nodes,
-                                  std::vector<double> prm_masses,
-                                  PrmPeakPtrVec prm_peaks) {
+DiagonalHeaderPtr getLastDiagonal(const GraphResultNodePtrVec & nodes,
+                                  const std::vector<double> & prm_masses,
+                                  const PrmPeakPtrVec & prm_peaks) {
   int last_node_idx = nodes.size() - 1;
   int last_prot_idx = nodes[last_node_idx]->getFirstIdx();
   int last_spec_idx = nodes[last_node_idx]->getSecondIdx();
@@ -415,9 +425,9 @@ DiagonalHeaderPtr getLastDiagonal(GraphResultNodePtrVec nodes,
   return header_ptr;
 }
 
-DiagonalHeaderPtr getInternalDiagonal(GraphResultNodePtrVec nodes,
-                                      std::vector<double> prm_masses,
-                                      PrmPeakPtrVec prm_peaks) {
+DiagonalHeaderPtr getInternalDiagonal(const GraphResultNodePtrVec & nodes,
+                                      const std::vector<double> & prm_masses,
+                                      const PrmPeakPtrVec & prm_peaks) {
   double shift_sum = 0.0;
   for (size_t i = 0; i < nodes.size(); i++) {
     int prot_idx = nodes[i]->getFirstIdx();
@@ -439,7 +449,7 @@ DiagonalHeaderPtr getInternalDiagonal(GraphResultNodePtrVec nodes,
   return header_ptr;
 }
 
-void  GraphAlign::geneHeaders() {
+void GraphAlign::geneHeaders() {
   diag_headers_.clear();
   diag_headers_2d_.clear();
   std::vector<double> prm_masses
