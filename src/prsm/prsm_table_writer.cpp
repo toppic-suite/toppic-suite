@@ -32,16 +32,6 @@
 
 namespace prot {
 
-PrsmTableWriter::PrsmTableWriter(PrsmParaPtr prsm_para_ptr,
-                                 std::map<std::string, std::string> arguments,
-                                 const std::string &input_file_ext,
-                                 const std::string &output_file_ext) {
-  prsm_para_ptr_ = prsm_para_ptr;
-  input_file_ext_ = input_file_ext;
-  arguments_ = arguments;
-  output_file_ext_ = output_file_ext;
-}
-
 void PrsmTableWriter::write() {
   std::string spectrum_file_name  = prsm_para_ptr_->getSpectrumFileName();
   std::string base_name = file_util::basename(spectrum_file_name);
@@ -55,6 +45,7 @@ void PrsmTableWriter::write() {
       << "Spectrum ID"<< "\t"
       << "Fragmentation" << "\t"
       << "Scan(s)" << "\t"
+      << "Retention time" << "\t"
       << "#peaks"<< "\t"
       << "Charge" << "\t"
       << "Precursor mass" << "\t"
@@ -75,7 +66,6 @@ void PrsmTableWriter::write() {
       << "#matched fragment ions" << "\t"
       << "P-value" << "\t"
       << "E-value" << "\t"
-      //      << "One Protein probabilty"<< "\t"
       << "Q-value (spectral FDR)" << "\t"
       << "Proteoform FDR" << "\t"
       << "#Variable PTMs" << std::endl;
@@ -166,6 +156,7 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   std::string spec_ids;
   std::string spec_activations;
   std::string spec_scans;
+  std::string retention_time;
   int ptm_num = prsm_ptr->getProteoformPtr()->getMassShiftNum(MassShiftType::UNEXPECTED);
   int peak_num = 0;
   DeconvMsPtrVec deconv_ms_ptr_vec = prsm_ptr->getDeconvMsPtrVec();
@@ -174,10 +165,15 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
     spec_activations = spec_activations + deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getActivationPtr()->getName() + " ";
     spec_scans = spec_scans + deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getScansString() + " ";
     peak_num += deconv_ms_ptr_vec[i]->size();
+    retention_time = retention_time + string_util::convertToString(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getRetentionTime(), 2) + " ";
   }
+
   boost::algorithm::trim(spec_ids);
   boost::algorithm::trim(spec_activations);
   boost::algorithm::trim(spec_scans);
+  boost::algorithm::trim(retention_time);
+
+  if (deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getRetentionTime() <= 0.0) retention_time = "-";
 
   file << std::setprecision(10);
   LOG_DEBUG("start output prsm ");
@@ -186,6 +182,7 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
       << spec_ids << "\t"
       << spec_activations<< "\t"
       << spec_scans << "\t"
+      << retention_time << "\t"
       << peak_num << "\t"
       << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecCharge() << "\t"
       << prsm_ptr->getOriPrecMass()<< "\t"

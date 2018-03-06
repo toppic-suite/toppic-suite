@@ -35,15 +35,23 @@ class PrsmTableWriter {
   PrsmTableWriter(PrsmParaPtr prsm_para_ptr, 
                   std::map<std::string, std::string> arguments,
                   const std::string &input_file_ext, 
-                  const std::string &output_file_ext);
+                  const std::string &output_file_ext):
+      prsm_para_ptr_(prsm_para_ptr),
+      input_file_ext_(input_file_ext),
+      arguments_(arguments),
+      output_file_ext_(output_file_ext) {}
+
   void write();
 
   void writePrsm(std::ofstream &file, PrsmPtr prsm_ptr);
 
  private:
   PrsmParaPtr prsm_para_ptr_;
-  std::map<std::string, std::string> arguments_;
+
   std::string input_file_ext_;
+
+  std::map<std::string, std::string> arguments_;
+
   std::string output_file_ext_;
 };
 

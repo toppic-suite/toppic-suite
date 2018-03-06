@@ -92,7 +92,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("precursor-window,w", po::value<std::string> (&prec_window), "")
         ("missing-level-one,n", "")
         ("multiple-mass,u", "Output multiple masses for one envelope.")
-        ("spectrum-file", po::value<std::vector<std::string> >()->multitoken()->required(), "Spectrum file name with its path.")
+        ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), "Spectrum file name with its path.")
         ("keep,k", "Report monoisotopic masses extracted from low quality isotopic envelopes.")
         ("output-envelope-details,d", "Output env files for detailed info on envelopes.")
         ;
@@ -168,7 +168,7 @@ bool Argument::parse(int argc, char* argv[]) {
     }
 
     if (vm.count("spectrum-file-name")) {
-      spec_file_list_ = vm["spectrum-file"].as<std::vector<std::string> >(); 
+      spec_file_list_ = vm["spectrum-file-name"].as<std::vector<std::string> >(); 
     }
 
   }
