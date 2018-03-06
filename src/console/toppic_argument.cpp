@@ -61,7 +61,7 @@ void Argument::initArguments() {
   arguments_["filteringResultNumber"] = "20";
   arguments_["residueModFileName"] = "";
   arguments_["threadNumber"] = "1";
-  arguments_["useFeature"] = "false";
+  arguments_["useFeatureFile"] = "false";
   arguments_["skipList"] = "";
 }
 
