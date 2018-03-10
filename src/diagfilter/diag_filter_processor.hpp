@@ -18,7 +18,7 @@
 #include "base/db_block.hpp"
 #include "prsm/simple_prsm.hpp"
 #include "diagfilter/diag_filter_mng.hpp"
-#include "diagfilter/diag_filter.hpp"
+#include "diagfilter/mass_diag_filter.hpp"
 
 namespace prot {
 
