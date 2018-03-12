@@ -37,8 +37,8 @@ PeakIonPairPtrVec getMatchedPairs(const PeakIonPairPtrVec &pair_ptrs,
 
 int getPeakIonPairNum(PeakIonPairPtrVec pair_ptrs);
 
-double computePairConverage(const PeakIonPairPtrVec &pair_ptrs, int begin,
-                            int end, RmBreakTypePtr type_ptr);
+double computePairCoverage(const PeakIonPairPtrVec &pair_ptrs, int begin,
+                           int end, RmBreakTypePtr type_ptr);
 
 PeakIonPairPtrVec findPairs(ExtendMsPtr ms_three_ptr, TheoPeakPtrVec &theo_peak_ptrs,
                             int bgn, int end, double add_tolerance);
@@ -51,8 +51,20 @@ PeakIonPairPtrVec genePeakIonPairs(const ProteoformPtr &proteoform_ptr,
 
 double compMatchFragNum(const PeakIonPairPtrVec &pairs);
 
+// helper functions
+double compMatchFragNum(const ProteoformPtr &proteoform_ptr,
+                        const ExtendMsPtr &ms_three_ptr, double min_mass);
+
+double compMatchFragNum(const ProteoformPtr &proteoform_ptr,
+                        const ExtendMsPtrVec &ms_ptr_vec, double min_mass);
+
 double compMatchPeakNum(PeakIonPairPtrVec &pairs);
 
+double compMatchPeakNum(const ProteoformPtr &proteoform_ptr,
+                        const ExtendMsPtr &ms_three_ptr, double min_mass);
+
+double compMatchPeakNum(const ProteoformPtr &proteoform_ptr,
+                        const ExtendMsPtrVec &ms_ptr_vec, double min_mass);
 }  // namespace peak_ion_pair_util
 
 }  // namespace prot
