@@ -50,8 +50,8 @@ int getPeakIonPairNum(PeakIonPairPtrVec pairs) {
   return match_peak_num;
 }
 
-double computePairConverage(const PeakIonPairPtrVec &pair_ptrs, int begin,
-                            int end, RmBreakTypePtr type_ptr) {
+double computePairCoverage(const PeakIonPairPtrVec &pair_ptrs, int begin,
+                           int end, RmBreakTypePtr type_ptr) {
   int total_num = end - begin  + 1;
   if (total_num <= 0) {
     return 0.0;
@@ -157,6 +157,16 @@ double compMatchFragNum(const PeakIonPairPtrVec &pairs) {
   return match_fragment_num;
 }
 
+double compMatchFragNum(const ProteoformPtr &proteoform_ptr,
+                        const ExtendMsPtr &ms_three_ptr, double min_mass) {
+  return compMatchFragNum(genePeakIonPairs(proteoform_ptr, ms_three_ptr, min_mass));
+}
+
+double compMatchFragNum(const ProteoformPtr &proteoform_ptr,
+                        const ExtendMsPtrVec &ms_ptr_vec, double min_mass) {
+  return compMatchFragNum(genePeakIonPairs(proteoform_ptr, ms_ptr_vec, min_mass));
+}
+
 double compMatchPeakNum(PeakIonPairPtrVec &pairs) {
   double match_peak_num = 0;
   std::sort(pairs.begin(), pairs.end(), PeakIonPair::cmpRealPeakPosInc);
@@ -169,6 +179,18 @@ double compMatchPeakNum(PeakIonPairPtrVec &pairs) {
     }
   }
   return match_peak_num;
+}
+
+double compMatchPeakNum(const ProteoformPtr &proteoform_ptr,
+                        const ExtendMsPtr &ms_three_ptr, double min_mass) {
+  PeakIonPairPtrVec pairs = genePeakIonPairs(proteoform_ptr, ms_three_ptr, min_mass);
+  return compMatchPeakNum(pairs);
+}
+
+double compMatchPeakNum(const ProteoformPtr &proteoform_ptr,
+                        const ExtendMsPtrVec &ms_ptr_vec, double min_mass) {
+  PeakIonPairPtrVec pairs = genePeakIonPairs(proteoform_ptr, ms_ptr_vec, min_mass);
+  return compMatchPeakNum(pairs);
 }
 
 }  // namespace peak_ion_pair_util
