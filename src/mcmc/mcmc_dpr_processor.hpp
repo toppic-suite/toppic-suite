@@ -43,18 +43,28 @@ class DprProcessor {
  private:
   void init();
 
+  void read_mass_table();
+
+  std::vector<std::vector<double> > compPtmComb();
+
   void processOnePrsm(PrsmPtr prsm_ptr, ActivationPtr act,
-                      const std::vector<double> & ms_masses,
+                      const std::vector<int> & ms_masses,
                       double tolerance);
 
-  void simulateDPR(ResiduePtrVec &residues, const std::vector<double> & ms_masses,
+  void simulateDPR(ResiduePtrVec &residues, const std::vector<int> & ms_masses,
                    ActivationPtr act, const PtmPtrVec & ptm_vec,
                    long omega, const std::vector<long long> & mu);
 
   ResiduePtrVec randomTrans(ResiduePtrVec residues); 
 
-  int getMaxScore(const ResiduePtrVec &residues, const std::vector<double> & ms_masses,
+  int getMaxScore(const ResiduePtrVec &residues, const std::vector<int> & ms_masses,
                   ActivationPtr act, const PtmPtrVec & ptm_vec);
+
+  int compScore(const std::vector<int> & ms_masses,
+                std::vector<double> n_theo_masses, std::vector<double> c_theo_masses,
+                const std::vector<size_t> & change_pos, const PtmPtrVec & ptm_vec);
+
+  int compNumMatched(const std::vector<int> &ms_masses, const std::vector<double> &theo_masses);
 
   MCMCMngPtr mng_ptr_;
 
@@ -68,7 +78,7 @@ class DprProcessor {
 
   PtmPtrVec ptm_vec_;
 
-  std::vector<std::vector<int> > mass_ptm_vec2d_;
+  std::vector<std::vector<double> > ptm_mass_vec2d_;
 
   std::map<PtmPtr, std::vector<ResiduePtr> > ptm_residue_map_;
 
@@ -77,8 +87,6 @@ class DprProcessor {
   std::vector<int> score_vec_;
 
   int z_;
-
-  double ppo_;
 
   double pep_mass_;
 };
