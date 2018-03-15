@@ -22,10 +22,10 @@ namespace prot {
 
 class PsAlignPara {
  public :
-  PsAlignPara(int shift_num, double align_max_shift) { 
-    n_unknown_shift_ = shift_num;
-    align_max_shift_ = align_max_shift;
-  }
+  PsAlignPara(int shift_num, double align_max_shift, double align_min_shift): 
+      n_unknown_shift_(shift_num),
+      align_max_shift_(align_max_shift),
+      align_min_shift_(align_min_shift) { }
 
   int getUnknownShiftNum() {return n_unknown_shift_;}
 
@@ -34,10 +34,9 @@ class PsAlignPara {
 
   /* parameters for ps alignment */
   double align_max_shift_ = 1000000;
-  // remove min shift so that large errors in precursor mass can be treated 
-  // a as small shift
-  //double align_min_shift_ = 0.5;
-  
+
+  double align_min_shift_ = -1000000;
+
   // shift thresh for penalty
   double align_large_shift_thresh_ = 300;
   // set panelty to 3

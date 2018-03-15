@@ -27,12 +27,16 @@ namespace prot {
 
 class PSAlign {
  public:
-  PSAlign() {}
-
   PSAlign(const std::vector<double> &ms_masses,
           const std::vector<double> &seq_masses,
           const BasicDiagonalPtrVec &diagonal_ptrs,
-          PsAlignParaPtr para_ptr);
+          PsAlignParaPtr para_ptr):
+      para_ptr_(para_ptr),
+      ms_masses_(ms_masses),
+      seq_masses_(seq_masses),
+      diagonal_ptrs_(diagonal_ptrs) {
+        initDPPair();
+      }
 
   void compute(AlignTypePtr type_ptr);
 
@@ -53,29 +57,43 @@ class PSAlign {
 
  protected:
   PsAlignParaPtr para_ptr_;;
+
   std::vector<double> ms_masses_;
+
   std::vector<double> seq_masses_;
+
   BasicDiagonalPtrVec diagonal_ptrs_;
+
   std::vector<std::vector<int>> idxes_;
+
   std::vector<std::vector<bool>> penalties_;
 
   std::vector<DPPairPtrVec> dp_2d_pair_ptrs_;
+
   DPPairPtr first_pair_ptr_;
+
   DPPairPtr last_pair_ptr_;
+
   DPPairPtrVec segment_bgn_pair_ptrs_;
+
   DPPairPtrVec segment_end_pair_ptrs_;
+
   DPPairPtrVec dp_pair_ptrs_;
+
   DiagonalHeaderPtrVec2D backtrack_diagonal_ptrs_;
+
   std::vector<double> align_scores_;
 
   void dpPrep();
 
   DPPairPtr getTruncPre(DPPairPtr cur_pair_ptr, int s, AlignTypePtr type_ptr);
-  DPPairPtr getShiftPre(DPPairPtr cur_pair_ptr, int p,int s,AlignTypePtr type_ptr);
+
+  DPPairPtr getShiftPre(int p, int s);
 };
 
 typedef std::shared_ptr<PSAlign> PSAlignPtr;
 typedef std::vector<PSAlignPtr> PSAlignPtrVec;
+
 } /* namespace prot */
 
 #endif /* PS_ALIGN_HPP_ */

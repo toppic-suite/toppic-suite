@@ -95,7 +95,10 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
 
     int n_top = std::stoi(arguments["numOfTopPrsms"]);
     int ptm_num = std::stoi(arguments["ptmNumber"]);
+    
     double max_ptm_mass = std::stod(arguments["maxPtmMass"]);
+    double min_ptm_mass = std::stod(arguments["minPtmMass"]);
+
     int filter_result_num = std::stoi(arguments["filteringResultNumber"]);
     int thread_num = std::stoi(arguments["threadNumber"]);
 
@@ -153,7 +156,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
       std::cout << "One PTM search - started." << std::endl;
       int shift_num = 1;
       PtmSearchMngPtr one_search_mng_ptr
-          = std::make_shared<PtmSearchMng>(prsm_para_ptr, n_top, max_ptm_mass,
+          = std::make_shared<PtmSearchMng>(prsm_para_ptr, n_top, max_ptm_mass, min_ptm_mass,
                                            shift_num, thread_num, "ONE_PTM_FILTER", "ONE_PTM");
       OnePtmSearchProcessorPtr one_search_processor
           = std::make_shared<OnePtmSearchProcessor>(one_search_mng_ptr);
@@ -179,8 +182,8 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
 
       std::cout << "Two PTM search - started." << std::endl;
       PtmSearchMngPtr two_search_mng_ptr
-          = std::make_shared<PtmSearchMng>(prsm_para_ptr, n_top, max_ptm_mass, ptm_num,
-                                           thread_num, "DIAG_FILTER", "PTM");
+          = std::make_shared<PtmSearchMng>(prsm_para_ptr, n_top, max_ptm_mass, min_ptm_mass,
+                                           ptm_num, thread_num, "DIAG_FILTER", "PTM");
       PtmSearchProcessorPtr processor = std::make_shared<PtmSearchProcessor>(two_search_mng_ptr);
       processor->process();
       std::cout << "Two PTM search - finished." << std::endl;
