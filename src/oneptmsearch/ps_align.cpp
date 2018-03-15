@@ -23,18 +23,6 @@
 
 namespace prot {
 
-PSAlign::PSAlign(const std::vector<double> &ms_masses,
-                 const std::vector<double> &seq_masses,
-                 const BasicDiagonalPtrVec &diagonal_ptrs,
-                 PsAlignParaPtr para_ptr):
-    para_ptr_(para_ptr),
-    ms_masses_(ms_masses),
-    seq_masses_(seq_masses),
-    diagonal_ptrs_(diagonal_ptrs) {
-      initDPPair();
-    }
-
-
 void PSAlign::compute(AlignTypePtr align_type_ptr) {
   dp(align_type_ptr);
   backtrace();
@@ -100,21 +88,28 @@ void PSAlign::initDPPair() {
     // first pair can not shift, so q starts from 1
     for (size_t j = 1; j < i; j++) {
       DPPairPtr prev_pair_ptr = dp_pair_ptrs_[j];
+
       int prev_x = prev_pair_ptr->getX();
+
       int prev_y = prev_pair_ptr->getY();
-      double prev_pair_nterm_shift = prev_pair_ptr->getDiagonalHeader()
-          ->getProtNTermShift();
-      double cur_pair_nterm_shift = cur_pair_ptr->getDiagonalHeader()
-          ->getProtNTermShift();
-      double abs_shift = std::abs(prev_pair_nterm_shift - cur_pair_nterm_shift);
+
+      double prev_pair_nterm_shift = prev_pair_ptr->getDiagonalHeader()->getProtNTermShift();
+
+      double cur_pair_nterm_shift = cur_pair_ptr->getDiagonalHeader()->getProtNTermShift();
+
+      double shift = cur_pair_nterm_shift - prev_pair_nterm_shift;
+
       if (prev_x >= cur_x || prev_y >= cur_y
           || prev_pair_ptr->getDiagonalHeader() == cur_pair_ptr->getDiagonalHeader()
-          || abs_shift > para_ptr_->align_max_shift_) {
+          || shift > para_ptr_->align_max_shift_ || shift < para_ptr_->align_min_shift_) {
         continue;
       }
+
       int diag_id = prev_pair_ptr->getDiagonalHeader()->getId();
+
       ends[diag_id] = j;
-      if (abs_shift > para_ptr_-> align_large_shift_thresh_) {
+
+      if (std::abs(shift) > para_ptr_-> align_large_shift_thresh_) {
         large_shifts[diag_id] = true;
       }
     }
@@ -171,8 +166,7 @@ inline DPPairPtr PSAlign::getTruncPre(DPPairPtr cur_pair_ptr, int s,
   return trunc_prev_ptr;
 }
 
-inline DPPairPtr PSAlign::getShiftPre(DPPairPtr cur_pair_ptr, int p, int s,
-                                      AlignTypePtr align_type_ptr) {
+DPPairPtr PSAlign::getShiftPre(int p, int s) {
   if (s < 1) {
     return nullptr;
   }
@@ -217,7 +211,7 @@ void PSAlign::dp(AlignTypePtr align_type_ptr) {
       } else {
         diag_score = - std::numeric_limits<double>::max();
       }
-      DPPairPtr shift_prev = getShiftPre(dp_pair_ptrs_[p], p, s, align_type_ptr);
+      DPPairPtr shift_prev = getShiftPre(p, s);
       double shift_score;
       if (shift_prev == nullptr) {
         shift_score =  - std::numeric_limits<double>::max();

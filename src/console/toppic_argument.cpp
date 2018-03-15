@@ -51,6 +51,7 @@ void Argument::initArguments() {
   arguments_["allowProtMod"] = "NONE,NME,NME_ACETYLATION,M_ACETYLATION";
   arguments_["numOfTopPrsms"] = "1";
   arguments_["maxPtmMass"] = "500";
+  arguments_["minPtmMass"] = "-500";
   arguments_["useGf"] = "false";
   arguments_["executiveDir"] = ".";
   arguments_["resourceDir"] = "";
@@ -90,6 +91,7 @@ void Argument::outputArguments(std::ostream &output,
   output << std::setw(44) << std::left << "Proteoform-level cutoff value: " << "\t" << arguments["cutoffProteoformValue"] << std::endl;
   output << std::setw(44) << std::left << "Allowed N-terminal forms: " << "\t" << arguments["allowProtMod"] << std::endl;
   output << std::setw(44) << std::left << "Maximum mass shift of modifications: " << "\t" << arguments["maxPtmMass"] << " Da" << std::endl;
+  output << std::setw(44) << std::left << "Minimum mass shift of modifications: " << "\t" << arguments["minPtmMass"] << " Da" << std::endl;
   output << std::setw(44) << std::left << "Thread number: " << "\t" << arguments["threadNumber"] << std::endl;
 
   if (arguments["useGf"] == "true") {
@@ -125,6 +127,7 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string ptm_num = "";
   std::string error_tole = "";
   std::string max_ptm_mass = "";
+  std::string min_ptm_mass = "";
   std::string cutoff_spectral_type = "";
   std::string cutoff_spectral_value = "";
   std::string cutoff_proteoform_type = "";
@@ -153,7 +156,8 @@ bool Argument::parse(int argc, char* argv[]) {
          "<a list of allowed N-terminal forms>. N-terminal forms of proteins. Four N-terminal forms can be selected: NONE, NME, NME_ACETYLATION, and M_ACETYLATION. NONE stands for no modifications, NME for N-terminal methionine excision, NME_ACETYLATION for N-terminal acetylation after the initiator methionine is removed, and M_ACETYLATION for N-terminal methionine acetylation. When multiple forms are allowed, they are separated by commas. Default value: NONE,NME,NME_ACETYLATION,M_ACETYLATION.")
         ("decoy,d", "Use a decoy protein database to estimate false discovery rates.")
         ("error-tolerance,e", po::value<std::string> (&error_tole), "<a positive integer>. Error tolerance for precursor and fragment masses in PPM. Default value: 15.")
-        ("max-shift,m", po::value<std::string> (&max_ptm_mass), "<a positive number>. Maximum absolute value of the mass shift (in Dalton) of an unexpected modification. Default value: 500.")
+        ("max-shift,m", po::value<std::string> (&max_ptm_mass), "Maximum value of the mass shift (in Dalton) of an unexpected modification. Default value: 500.")
+        ("min-shift,M", po::value<std::string> (&min_ptm_mass), "Minimum value of the mass shift (in Dalton) of an unexpected modification. Default value: -500.")
         ("num-shift,p", po::value<std::string> (&ptm_num), "<0|1|2>. Maximum number of unexpected modifications in a proteoform spectrum-match. Default value: 1.")
         ("spectrum-cutoff-type,t", po::value<std::string> (&cutoff_spectral_type), "<EVALUE|FDR>. Spectrum-level cutoff type for filtering identified proteoform spectrum-matches. Default value: EVALUE.")
         ("spectrum-cutoff-value,v", po::value<std::string> (&cutoff_spectral_value), "<a positive number>. Spectrum-level cutoff value for filtering identified proteoform spectrum-matches. Default value: 0.01.")
@@ -180,6 +184,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("decoy,d", "")
         ("error-tolerance,e", po::value<std::string> (&error_tole), "")
         ("max-shift,m", po::value<std::string> (&max_ptm_mass), "")
+        ("min-shift,M", po::value<std::string> (&min_ptm_mass), "")
         ("num-shift,p", po::value<std::string> (&ptm_num), "")
         ("spectrum-cutoff-type,t", po::value<std::string> (&cutoff_spectral_type), "")
         ("spectrum-cutoff-value,v", po::value<std::string> (&cutoff_spectral_value), "")
@@ -275,6 +280,10 @@ bool Argument::parse(int argc, char* argv[]) {
 
     if (vm.count("max-shift")) {
       arguments_["maxPtmMass"] = max_ptm_mass;
+    }
+
+    if (vm.count("min-shift")) {
+      arguments_["minPtmMass"] = min_ptm_mass;
     }
 
     if (vm.count("spectrum-cutoff-type")) {
