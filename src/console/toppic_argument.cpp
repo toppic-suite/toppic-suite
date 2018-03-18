@@ -108,7 +108,6 @@ void Argument::outputArguments(std::ostream &output,
   output << std::setw(44) << std::left << "Start time: " << "\t" << arguments["start_time"] << std::endl;
   if (arguments["end_time"] != "") {
     output << std::setw(44) << std::left << "End time: " << "\t" << arguments["end_time"] << std::endl;
-    output << std::setw(44) << std::left << "Running time: " << "\t" << arguments["running_time"] << " seconds" << std::endl;
   }
   output << "********************** Parameters **********************" << std::endl;
 }

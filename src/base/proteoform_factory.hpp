@@ -19,6 +19,7 @@
 
 #include <string>
 
+#include "base/mass_shift.hpp"
 #include "base/proteoform.hpp"
 #include "base/fasta_index_reader.hpp"
 
@@ -43,6 +44,10 @@ ProteoformPtrVec2D gene2DProtModProteoform(const ProteoformPtrVec &db_form_ptrs,
  */
 ProteoformPtr geneSubProteoform(ProteoformPtr proteoform_ptr,
                                 int local_start, int local_end);
+
+ProteoformPtr geneProteoform(ProteoformPtr proteoform, int start_pos, int end_pos,
+                             const MassShiftPtrVec & mass_shift_vec,
+                             const ModPtrVec & mod_ptr_vec);
 
 /* generate a proteoform vector with protein mod */
 ProteoformPtrVec geneProtModProteoform(const ProteoformPtrVec &ori_forms,

@@ -167,6 +167,25 @@ ProteoformPtr geneSubProteoform(ProteoformPtr proteoform_ptr, int local_start, i
                                       seq_ptr, shift_list);
 }
 
+ProteoformPtr geneProteoform(ProteoformPtr proteoform, int start_pos, int end_pos,
+                             const MassShiftPtrVec & mass_shift_vec,
+                             const ModPtrVec & mod_ptr_vec) {
+  ResSeqPtr new_res_seq = std::make_shared<ResidueSeq>(
+      residue_util::convertStrToResiduePtrVec(
+          proteoform->getFastaSeqPtr()->getRawSeq().substr(start_pos, end_pos - start_pos + 1), 
+          mod_ptr_vec));
+  for (size_t i = 0; i < mass_shift_vec.size(); i++) {
+    int left = proteoform->getStartPos() + mass_shift_vec[i]->getLeftBpPos() - start_pos;
+    int right = proteoform->getStartPos() + mass_shift_vec[i]->getRightBpPos() - start_pos;
+    mass_shift_vec[i]->setLeftBpPos(left);
+    mass_shift_vec[i]->setRightBpPos(right);
+  }
+
+  return std::make_shared<Proteoform>(proteoform->getFastaSeqPtr(),
+                                      proteoform->getProtModPtr(), start_pos, end_pos, 
+                                      new_res_seq, mass_shift_vec);
+}
+
 ProteoformPtrVec geneProtModProteoform(ProteoformPtr proteo_ptr, const ProtModPtrVec &prot_mods) {
   ProteoformPtrVec new_forms;
   for (size_t j = 0; j < prot_mods.size(); j++) {

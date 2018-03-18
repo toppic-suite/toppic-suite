@@ -22,7 +22,7 @@
 #include "base/mass_shift_type.hpp"
 #include "base/mod.hpp"
 #include "base/xml_dom_document.hpp"
-//#include "base/local_anno.hpp"
+#include "base/local_anno.hpp"
 
 namespace prot {
 
@@ -57,9 +57,9 @@ class Change {
 
   ModPtr getModPtr() {return mod_ptr_;}
 
-  /*LocalAnnoPtr getLocalAnno() {return local_anno_ptr_;}*/
+  LocalAnnoPtr getLocalAnno() {return local_anno_ptr_;}
 
-  /*void setLocalAnno(LocalAnnoPtr p);*/
+  void setLocalAnno(LocalAnnoPtr p);
 
   void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
@@ -79,7 +79,7 @@ class Change {
 
   ModPtr mod_ptr_;
 
-  //LocalAnnoPtr local_anno_ptr_;
+  LocalAnnoPtr local_anno_ptr_;
 };
 
 typedef std::vector<ChangePtr> ChangePtrVec;

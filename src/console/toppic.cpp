@@ -46,7 +46,7 @@ int main(int argc, char* argv[]) {
 
   std::time_t start = time(nullptr);
   char buf[50];
-  std::strftime(buf, 50, "%a %b %d %T %Y", std::localtime(&start));
+  std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
 
   std::string start_time_bak = buf;
 

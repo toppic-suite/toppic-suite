@@ -16,7 +16,8 @@
 #ifndef PROT_LOCAL_PROCESSOR_HPP_
 #define PROT_LOCAL_PROCESSOR_HPP_
 
-#include "htslib/faidx.h"
+#include <vector>
+
 #include "base/ptm.hpp"
 #include "base/local_anno.hpp"
 #include "prsm/prsm_xml_writer.hpp"
@@ -28,31 +29,89 @@
 namespace prot {
 
 class LocalProcessor {
-
  public:
-  LocalProcessor(LocalMngPtr mng_ptr);
+  explicit LocalProcessor(LocalMngPtr mng_ptr):
+      mng_ptr_(mng_ptr),
+      ppo_(mng_ptr->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getPpo()),
+      theta_(mng_ptr->theta_),
+      threshold_(mng_ptr->threshold_),
+      beta_(mng_ptr->beta_),
+      min_mass_(mng_ptr->min_mass_),
+      p1_(mng_ptr->p1_),
+      p2_(mng_ptr->p2_) {
+        init();
+      }
+
   void process();
 
  private:
-  void processOneSpectrum(PrsmPtr prsm);
+  void init();
 
-  void processOnePtm(PrsmPtr prsm);
-  ProteoformPtr processOneKnown(const PrsmPtr & prsm);
-  ProteoformPtr processOneUnknown(const PrsmPtr & prsm);
+  PrsmPtr processOnePrsm(PrsmPtr prsm);
 
-  void processTwoPtm(PrsmPtr prsm);
-  ProteoformPtr processTwoKnown(const PrsmPtr & prsm);
-  ProteoformPtr processTwoUnknown(const PrsmPtr & prsm);
+  PrsmPtr processOnePtm(PrsmPtr prsm);
+
+  PrsmPtr processTwoPtm(PrsmPtr prsm);
+
+  ProteoformPtr processOneKnownPtm(PrsmPtr prsm);
+
+  ProteoformPtr processTwoKnownPtm(PrsmPtr prsm);
+
+  bool modifiable(ProteoformPtr proteoform_ptr, int i, PtmPtr ptm_ptr);
+
+  void compOnePtmScr(ProteoformPtr proteoform, const ExtendMsPtrVec & extend_ms_ptr_vec,
+                     std::vector<double> &scr_vec, double & raw_scr, PtmPtrVec & ptm_vec);
+
+  void compTwoPtmScr(ProteoformPtr proteoform, int num_match,
+                     const ExtendMsPtrVec & extend_ms_ptr_vec, double prec_mass,
+                     double & raw_scr, PtmPairVec & ptm_pair_vec);
+
+  double dpTwoPtmScr(ProteoformPtr proteoform, int h, const ExtendMsPtrVec & extend_ms_ptr_vec,
+                     double prec_mass, double mass1, double mass2, PtmPtr ptm1, PtmPtr ptm2);
+
+  ProteoformPtr onePtmTermAdjust(ProteoformPtr proteoform, const ExtendMsPtrVec & extend_ms_ptr_vec,
+                                 double & shift_mass, double err);
+
+  ProteoformPtr twoPtmTermAdjust(ProteoformPtr proteoform, int num_match,
+                                 const ExtendMsPtrVec & extend_ms_ptr_vec, double prec_mass,
+                                 double & mass1, double & mass2);
+
+  ProteoformPtr compSplitPoint(ProteoformPtr proteoform, int h, const ExtendMsPtrVec & extend_ms_ptr_vec,
+                               double prec_mass);
+
+  void getNtermTruncRange(ProteoformPtr proteoform, const ExtendMsPtrVec & extend_ms_ptr_vec,
+                          int & min, int & max);
+
+  void getCtermTruncRange(ProteoformPtr proteoform, const ExtendMsPtrVec & extend_ms_ptr_vec,
+                          int & min, int & max);
 
   LocalMngPtr mng_ptr_;
-  double p1_, p2_, ppm_;
-  double threshold_; // threshold for MIScore;
-  double theta_; // the weight for known/unknown ptm
-  double beta_; // the weight for one/two ptm
+
+  double ppo_;
+
+  double theta_;  // the weight for known/unknown ptm
+
+  double threshold_;  // threshold for MIScore
+
+  double beta_;  // the weight for one/two ptm
+
   double min_mass_;
+
+  double p1_, p2_;
+
+  PtmPtrVec ptm_vec_;
+
+  PtmPairVec ptm_pair_vec_;
+
+  ModPtrVec mod_list_N_;
+
+  ModPtrVec mod_list_C_;
+
+  ModPtrVec mod_list_any_;
 };
 
 typedef std::shared_ptr<LocalProcessor> LocalProcessorPtr;
 
-}
+}  // namespace prot
+
 #endif

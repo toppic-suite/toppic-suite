@@ -16,109 +16,57 @@
 #ifndef PROT_LOCAL_UTIL_HPP_
 #define PROT_LOCAL_UTIL_HPP_
 
+#include <vector>
+
 #include "base/amino_acid_base.hpp"
 #include "base/ptm.hpp"
-#include "base/change.hpp"
+#include "base/mass_shift.hpp"
+#include "base/ptm.hpp"
+
 #include "prsm/prsm.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
+
 #include "local/local_mng.hpp"
 
 namespace prot {
 
-class LocalUtil {
- public:
-  static void init(LocalMngPtr mng_ptr);
+namespace local_util {
 
-  static std::vector<double> normalize(const std::vector<double> & scr);
+void scrFilter(std::vector<double> & scr, int & bgn, int & end, double & conf, double threshold);
 
-  static void scr_filter(std::vector<double> & scr, int & bgn, int & end,
-                         double & conf, double thread);
+PtmPtrVec getPtmPtrVecByMass(double mass, double err, const PtmPtrVec & ptm_vec);
 
-  // compute the number of supporting peaks at the left and right of the change
-  static void compSupPeakNum(ProteoformPtr proteoform, const ExtendMsPtrVec & extend_ms_ptr_vec,
-                             ChangePtr change, double min_mass, int & left, int & right);
+PtmPairVec getPtmPairVecByMass(double mass1, double mass2, double err, const PtmPairVec & ptm_pair_vec);
 
-  static PtmPtrVec getPtmPtrVecByMass(double mass, double err);
+void compSupPeakNum(ProteoformPtr proteoform, const ExtendMsPtrVec & extend_ms_ptr_vec,
+                    MassShiftPtr mass_shift, double min_mass, int & left, int & right);
 
-  static PtmPairVec getPtmPairVecByMass(double mass1, double mass2, double err);
+void ptmMassAdjust(double & mass1, double & mass2, PtmPtr p1, PtmPtr p2);
 
-  static bool modifiable(ProteoformPtr proteoform_ptr, int i, PtmPtr ptm_ptr);
+void fillTableB(std::vector<std::vector<double>> & b_table, double mass1, double mass2);
 
-  static void compOnePtmScr(ProteoformPtr proteoform, const ExtendMsPtrVec & extend_ms_ptr_vec, 
-                            std::vector<double> &scr_vec, double & raw_scr, PtmPtrVec & ptm_vec);
+void compNumMatch(const std::vector<double> & b, std::vector<int> & s,
+                  const ExtendMsPtr & extend_ms_ptr, double prec_mass);
 
-  static void compTwoPtmScr(ProteoformPtr proteoform, int num_match, 
-                            const ExtendMsPtrVec & extend_ms_ptr_vec, double prec_mass,
-                            double & raw_scr, PtmPairVec & ptm_pair_vec);
+void fillTableS(std::vector<std::vector<double> > & b_table,
+                std::vector<std::vector<int> > & s_table,
+                ExtendMsPtr extend_ms_ptr, double prec_mass);
 
-  static double dpTwoPtmScr(ProteoformPtr proteoform, int num_match, 
-                            const ExtendMsPtrVec & extend_ms_ptr_vec, double prec_mass,
-                            double mass1, double mass2, PtmPtr p1, PtmPtr p2);
+std::vector<double> geneNTheoMass(ProteoformPtr proteoform, ExtendMsPtr extend_ms_ptr_vec,
+                                  double min_mass);
 
-  static void onePtmTermAdjust(ProteoformPtr & proteoform, const ExtendMsPtrVec & extend_ms_ptr_vec,
-                               double & mass, double err);
+MassShiftPtrVec massShiftFilter(const MassShiftPtrVec & mass_shift_vec, MassShiftTypePtr type);
 
-  static void twoPtmTermAdjust(ProteoformPtr & proteoform, int num_match, 
-                               const ExtendMsPtrVec & extend_ms_ptr_vec, double prec_mass,
-                               double & mass1, double & mass2);
+double compMassShift(const MassShiftPtrVec & mass_shift_vec);
 
-  static void compSplitPoint(ProteoformPtr & proteoform, int num_match, const ExtendMsPtrVec & extend_ms_ptr_vec,
-                             double prec_mass);
+MassShiftPtr geneMassShift(MassShiftPtr shift, double mass, MassShiftTypePtr type);
 
-  static int compNumPeakIonPairs(const ProteoformPtr &proteoform_ptr, const ExtendMsPtrVec &ms_ptr_vec) {
-    return peak_ion_pair_util::genePeakIonPairs(proteoform_ptr, ms_ptr_vec, mng_ptr_->min_mass_).size();
-  }
+void normalize(std::vector<double> & scr);
 
- private:
-  static void readPtmTxt(const std::string &file_name);
+int compMatchFragNum(ProteoformPtr proteoform_ptr, const ExtendMsPtrVec &ms_ptr_vec, double min_mass);
 
-  static void getNtermTruncRange(ProteoformPtr proteoform, const ExtendMsPtrVec &ms_ptr_vec, 
-                                 int & min, int & max);
+}  // namespace local_util
 
-  static void getCtermTruncRange(ProteoformPtr proteoform, const ExtendMsPtrVec &ms_ptr_vec,
-                                 int & min, int & max);
-
-  static LocalMngPtr mng_ptr_;
-  static PtmPtrVec var_ptm_list_;
-  static PtmPairVec ptm_pair_vec_;
-  static ModPtrVec mod_list_N_;
-  static ModPtrVec mod_list_C_;
-  static ModPtrVec mod_list_any_;
-
-  static double ppm_, p1_, p2_;
-
-};
-
-inline ChangePtr geneUnexpectedChange(ChangePtr change, double mass) {
-  return std::make_shared<Change>(change->getLeftBpPos(), 
-                                  change->getRightBpPos(), 
-                                  ChangeType::UNEXPECTED, mass, 
-                                  std::make_shared<Mod>(ResidueBase::getEmptyResiduePtr(), 
-                                                        ResidueBase::getEmptyResiduePtr()));
-}
-
-inline double getPeptideMass(const std::string & seq) {
-  double m = 0;
-  for (size_t i = 0; i < seq.length(); i++) {
-    m += AminoAcidBase::getAminoAcidPtrByOneLetter(seq.substr(i, 1))->getMonoMass();
-  }
-  return m;
-}
-
-inline ChangePtrVec getExpectedChangeVec(ProteoformPtr proteoform) {
-  ChangePtrVec res;
-  for (size_t i = 0; i < proteoform->getChangePtrVec().size(); i++) {
-    if (proteoform->getChangePtrVec()[i]->getChangeTypePtr() != ChangeType::UNEXPECTED) {
-      ChangePtr tmp = proteoform->getChangePtrVec()[i];
-      res.push_back(std::make_shared<Change>(tmp->getLeftBpPos(), 
-                                             tmp->getRightBpPos(), 
-                                             tmp->getChangeTypePtr(), tmp->getMassShift(), 
-                                             tmp->getModPtr()));
-    }
-  }
-  return res;
-}
-
-} // namespace prot
+}  // namespace prot
 
 #endif

@@ -32,9 +32,15 @@ class LocalAnno {
   explicit LocalAnno(xercesc::DOMElement* element);
 
   LocalAnno(int left_pos, int right_pos, double conf,
-            std::vector<double> scr_vec, double raw_scr, PtmPtr p):
-      left_pos_(left_pos), right_pos_(right_pos),
-      conf_(conf), scr_vec_(scr_vec), raw_scr_(raw_scr), ptm_ptr_(p) {}
+            const std::vector<double> & scr_vec,
+            double raw_scr,
+            PtmPtr p):
+      left_pos_(left_pos),
+      right_pos_(right_pos),
+      conf_(conf),
+      scr_vec_(scr_vec),
+      raw_scr_(raw_scr),
+      ptm_ptr_(p) {}
 
   int getLeftBpPos() {return left_pos_;}
 

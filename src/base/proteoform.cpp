@@ -14,9 +14,11 @@
 
 
 #include <sstream>
+#include <iomanip>
 #include <algorithm>
 #include <string>
 #include <vector>
+#include <cmath>
 
 #include "base/logger.hpp"
 #include "base/mass_shift_type.hpp"
@@ -94,7 +96,7 @@ void Proteoform::parseXml(xercesc::DOMElement* element, ProteoformPtr form_ptr) 
   int shift_len = xml_dom_util::getChildCount(change_list_element, shift_element_name.c_str());
 
   for (int i = 0; i < shift_len; i++) {
-    xercesc::DOMElement* shift_element 
+    xercesc::DOMElement* shift_element
         = xml_dom_util::getChildElement(change_list_element, shift_element_name.c_str(), i);
     mass_shift_list_.push_back(std::make_shared<MassShift>(shift_element));
   }
@@ -123,7 +125,7 @@ PtmPtrVec Proteoform::getPtmVec() {
     for (size_t k = 0; k < change_vec.size(); k++) {
       PtmPtr p = change_vec[k]->getModPtr()->getModResiduePtr()->getPtmPtr();
       if (p != nullptr) {
-        ptm_vec.push_back(p); 
+        ptm_vec.push_back(p);
       }
     }
   }
@@ -159,7 +161,7 @@ AlignTypePtr Proteoform::getAlignType() {
   }
 }
 
-int Proteoform::getMassShiftNum(MassShiftTypePtr ct_ptr){
+int Proteoform::getMassShiftNum(MassShiftTypePtr ct_ptr) {
   int n = 0;
   for (size_t i = 0; i < mass_shift_list_.size(); i++) {
     if (mass_shift_list_[i]->getTypePtr() == ct_ptr) {
@@ -179,24 +181,11 @@ MassShiftPtrVec Proteoform::getMassShiftPtrVec(MassShiftTypePtr ct_ptr) {
   return shift_ptr_vec;
 }
 
-void Proteoform::addMassShiftPtrVec(MassShiftPtrVec & new_shift_ptr_vec) {
+void Proteoform::addMassShiftPtrVec(const MassShiftPtrVec & new_shift_ptr_vec) {
   mass_shift_list_.insert(mass_shift_list_.end(), new_shift_ptr_vec.begin(), new_shift_ptr_vec.end());
 }
 
-/*void Proteoform::addChangePtr(ChangePtr &change_ptr) {*/
-//change_list_.push_back(change_ptr);
-/*}*/
-
-/*void Proteoform::rmChangePtr(ChangePtr &change_ptr) {*/
-//for (auto iter = change_list_.begin(); iter != change_list_.end(); iter++) {
-//if (*iter == change_ptr) {
-//change_list_.erase(iter);
-//return;
-//}
-//}
-/*}*/
-
-// get several segments without unexpected PTMs from a proteoform 
+// get several segments without unexpected PTMs from a proteoform
 SegmentPtrVec Proteoform::getSegmentPtrVec() {
   MassShiftPtrVec shifts;
   double mass_shift_sum = 0;
@@ -232,22 +221,9 @@ void updateMatchSeq(const MassShiftPtrVec & shifts,
   for (size_t i = 0; i < shifts.size(); i++) {
     int left_pos = shifts[i]->getLeftBpPos();
     left_strings[left_pos] = "(" + left_strings[left_pos];
-    int right_pos = shifts[i]->getRightBpPos();
-    //double shift = shifts[i]->getMassShift();
-    right_strings[right_pos] +=  ")";
-    /*if (changes[i]->getLocalAnno() != nullptr */
-    //&& changes[i]->getLocalAnno()->getPtmPtr() != nullptr) {
-    //right_strings[right_pos] = right_strings[right_pos] 
-    //+ "["+changes[i]->getLocalAnno()->getPtmPtr()->getAbbrName()+"]";
-    /*} else*/
 
-    /*if (ModBase::isNoneModPtr(shifts[i]->getModPtr())) {*/
-    //right_strings[right_pos] = right_strings[right_pos] 
-    //+ "["+string_util::convertToString(shift, 5)+"]";
-    //} else {
-    //right_strings[right_pos] = right_strings[right_pos]
-    //+ "["+changes[i]->getModPtr()->getModResiduePtr()->getPtmPtr()->getAbbrName()+"]";
-    /*}*/
+    int right_pos = shifts[i]->getRightBpPos();
+    right_strings[right_pos] +=  ")";
     right_strings[right_pos] = right_strings[right_pos] + "[" + shifts[i]->getSeqStr() + "]";
   }
 }
@@ -334,5 +310,48 @@ void Proteoform::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent)
   parent->appendChild(element);
 }
 
-} /* namespace prot */
+std::string Proteoform::getMIScore() {
+  mi_score_ = "";
+
+  StringPairVec string_pairs = fasta_seq_ptr_->getAcidPtmPairVec();
+
+  MassShiftPtrVec mass_shift_vec = getMassShiftPtrVec(MassShiftType::UNEXPECTED);
+
+  for (size_t i = 0; i < mass_shift_vec.size(); i++) {
+    if (mass_shift_vec[i]->getChangePtr(0)->getLocalAnno() == nullptr)
+      continue;
+
+    std::vector<double> scr_vec = mass_shift_vec[i]->getChangePtr(0)->getLocalAnno()->getScrVec();
+    int left_db_bp = mass_shift_vec[i]->getLeftBpPos() + start_pos_;
+    int right_db_bp = mass_shift_vec[i]->getRightBpPos() + start_pos_;
+    mi_score_ = mi_score_ + mass_shift_vec[i]->getChangePtr(0)->getLocalAnno()->getPtmPtr()->getAbbrName() + "[";
+
+    for (int j = left_db_bp; j < right_db_bp; j++) {
+      std::string acid_letter = string_pairs[j].first;
+      double scr = std::floor(scr_vec[j - left_db_bp] * 1000) / 10;
+      if (scr == 100) scr = 99.9;
+      if (scr == 0) continue;
+
+      mi_score_ = mi_score_ + acid_letter + std::to_string(j + 1) + ":";
+      std::stringstream ss;
+      ss << std::fixed << std::setprecision(1) << scr;
+      mi_score_ = mi_score_ + ss.str() + "%";
+      if (j != right_db_bp - 1) {
+        mi_score_ += ";";
+      }
+    }
+    mi_score_ += "]";
+
+    if (i != mass_shift_vec.size() - 1) {
+      mi_score_ += ";";
+    }
+  }
+
+  if (mi_score_ == "") {
+    mi_score_ = "-";
+  }
+  return mi_score_;
+}
+
+}  // namespace prot
 

@@ -93,6 +93,15 @@ double compResiduePtrVecMass(const ResiduePtrVec &ptr_vec) {
   return mass;
 }
 
-} // namespace residue_util
+double compResiduePtrVecMass(const std::string & seq) {
+  return compResiduePtrVecMass(convertStrToResiduePtrVec(seq));
+}
+
+double compResiduePtrVecMass(const std::string & seq,
+                             const ModPtrVec &fix_mod_ptr_vec) {
+  return compResiduePtrVecMass(convertStrToResiduePtrVec(seq, fix_mod_ptr_vec));
+}
+
+}  // namespace residue_util
 
 }  // namespace prot

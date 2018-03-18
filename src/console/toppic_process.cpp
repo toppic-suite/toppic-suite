@@ -55,8 +55,8 @@
 #include "tdgf/tdgf_mng.hpp"
 #include "tdgf/evalue_processor.hpp"
 
-//#include "local/local_mng.hpp"
-//#include "local/local_processor.hpp"
+#include "local/local_mng.hpp"
+#include "local/local_processor.hpp"
 
 #include "prsmview/xml_generator.hpp"
 #include "prsmview/transformer.hpp"
@@ -227,6 +227,9 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     std::string sp_file_name = arguments["spectrumFileName"];
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
 
+    double max_ptm_mass = std::stod(arguments["maxPtmMass"]);
+    double min_ptm_mass = std::stod(arguments["minPtmMass"]);
+
     int n_top = std::stoi(arguments["numOfTopPrsms"]);
 
     bool localization = false;
@@ -311,31 +314,26 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
 
     std::string suffix = "CUTOFF_RESULT_SPEC";
 
-    /*if (localization) {*/
-    //std::cout << "PTM characterization - started." << std::endl;
-    //LocalMngPtr local_mng
-    //= std::make_shared<LocalMng>(prsm_para_ptr,
-    //arguments["local_threshold"],
-    //arguments["residueModFileName"],
-    //max_ptm_mass,
-    //suffix, "LOCAL_RESULT");
-    //LocalProcessorPtr local_ptr = std::make_shared<LocalProcessor>(local_mng);
-    //local_ptr->process();
-    //local_ptr = nullptr;
-    //std::cout << "PTM characterization - finished." << std::endl;
-    //suffix = "LOCAL_RESULT";
-    /*}*/
+    if (localization) {
+      std::cout << "PTM characterization - started." << std::endl;
+      LocalMngPtr local_mng
+          = std::make_shared<LocalMng>(prsm_para_ptr,
+                                       std::stod(arguments["local_threshold"]),
+                                       arguments["residueModFileName"],
+                                       max_ptm_mass,
+                                       min_ptm_mass,
+                                       suffix, "LOCAL_RESULT_SPEC");
+      LocalProcessorPtr local_ptr = std::make_shared<LocalProcessor>(local_mng);
+      local_ptr->process();
+      local_ptr = nullptr;
+      std::cout << "PTM characterization - finished." << std::endl;
+      suffix = "LOCAL_RESULT_SPEC";
+    }
 
     std::time_t end = time(nullptr);
     char buf[50];
-    std::strftime(buf, 50, "%a %b %d %T %Y", std::localtime(&end));
+    std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&end));
     arguments["end_time"] = buf;
-
-    std::tm t = {};
-    std::istringstream ss(arguments["start_time"]);
-    ss >> std::get_time(&t, "%a %b %d %H:%M:%S %Y");
-    arguments["running_time"] = std::to_string(static_cast<int>(difftime(end, std::mktime(&t))));
-
 
     std::cout << "Outputting PrSM table - started." << std::endl;
     PrsmTableWriterPtr table_out
@@ -364,9 +362,27 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     cutoff_selector = nullptr;
     std::cout << "PrSM filtering by " << cutoff_type << " - finished." << std::endl;
 
+    suffix = "CUTOFF_RESULT_FORM";
+
+    if (localization) {
+      std::cout << "PTM characterization - started." << std::endl;
+      LocalMngPtr local_mng
+          = std::make_shared<LocalMng>(prsm_para_ptr,
+                                       std::stod(arguments["local_threshold"]),
+                                       arguments["residueModFileName"],
+                                       max_ptm_mass,
+                                       min_ptm_mass,
+                                       suffix, "LOCAL_RESULT_FORM");
+      LocalProcessorPtr local_ptr = std::make_shared<LocalProcessor>(local_mng);
+      local_ptr->process();
+      local_ptr = nullptr;
+      std::cout << "PTM characterization - finished." << std::endl;
+      suffix = "LOCAL_RESULT_FORM";
+    }
+
     std::cout << "Selecting top PrSMs for proteoforms - started." << std::endl;
     PrsmFormFilterPtr form_filter
-        = std::make_shared<PrsmFormFilter>(db_file_name, sp_file_name, "CUTOFF_RESULT_FORM",
+        = std::make_shared<PrsmFormFilter>(db_file_name, sp_file_name, suffix,
                                            "FORM_FILTER_RESULT", "FORM_RESULT");
     form_filter->process();
     form_filter = nullptr;

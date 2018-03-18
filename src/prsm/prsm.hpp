@@ -103,6 +103,11 @@ class Prsm {
 
   void setProteoformPtr(ProteoformPtr proteoform) {proteoform_ptr_ = proteoform;}
 
+  void setProteoformPtr(ProteoformPtr proteoform, SpParaPtr sp_para_ptr) {
+    proteoform_ptr_ = proteoform;
+    init(sp_para_ptr); 
+  }
+
   void setExtremeValuePtr(ExtremeValuePtr ev_ptr) {extreme_value_ptr_ = ev_ptr;}
 
   void setFdr(double fdr) {fdr_ = fdr;}

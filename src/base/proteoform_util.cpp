@@ -91,16 +91,21 @@ bool isSameSeqAndMass(ProteoformPtr a, ProteoformPtr b, double ppo) {
   if (a->getSeqName() != b->getSeqName()) {
     return false;
   }
+
   if (a->getStartPos() != b->getStartPos()) {
     return false;
   }
+
   if (a->getEndPos() != b->getEndPos()) {
     return false;
   }
+
   double thresh = a->getMass() * ppo;
+
   if (std::abs(a->getMass() -b->getMass())> thresh) {
     return false;
   }
+
   return true;
 }
 
@@ -108,9 +113,11 @@ bool isStrictCompatiablePtmSpecies(ProteoformPtr a, ProteoformPtr b, double ppo)
   if (!isSameSeqAndMass(a, b, ppo)) {
     return false;
   }
+
   if (a->getMassShiftNum() != b->getMassShiftNum()) {
     return false;
   }
+
   double shift_tolerance = a->getResSeqPtr()->getSeqMass() * ppo;
   // sort mass shifts
   MassShiftPtrVec a_shift_vec = a->getMassShiftPtrVec();
@@ -130,8 +137,7 @@ bool isStrictCompatiablePtmSpecies(ProteoformPtr a, ProteoformPtr b, double ppo)
   return true;
 }
 
-ProteoformPtrVec2D divideProteoIntoBlocks(
-    const ProteoformPtrVec &proteo_ptrs, int db_block_size) {
+ProteoformPtrVec2D divideProteoIntoBlocks(const ProteoformPtrVec &proteo_ptrs, int db_block_size) {
   size_t start_idx = 0;
   size_t proteo_idx = 0;
   int block_len = 0;

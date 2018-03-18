@@ -17,6 +17,7 @@
 
 #include <memory>
 #include <vector>
+#include <string>
 
 #include "base/change.hpp"
 
@@ -49,9 +50,9 @@ class MassShift {
 
   void setChangePtr(ChangePtr change);
 
-  MassShiftTypePtr getTypePtr() {return type_ptr_;};
+  MassShiftTypePtr getTypePtr() {return type_ptr_;}
 
-  double getMassShift() {return shift_;};
+  double getMassShift() {return shift_;}
 
   std::string getSeqStr();
 

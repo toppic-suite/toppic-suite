@@ -196,7 +196,8 @@ void cleanDir(const std::string &fa_path, const std::string & sp_path) {
   delFile(sp_base + ".GRAPH_ALIGN");
   delFile(sp_base + ".CUTOFF_RESULT_SPEC");
   delFile(sp_base + ".CUTOFF_RESULT_FORM");
-  delFile(sp_base + ".LOCAL_RESULT");
+  delFile(sp_base + ".LOCAL_RESULT_SPEC");
+  delFile(sp_base + ".LOCAL_RESULT_FORM");
   clean_prefix(sp, sp_base + ".EVALUE_");
   clean_prefix(sp, sp_base + ".PROTEOFORM_");
   clean_prefix(sp, sp_base + ".PROT_");

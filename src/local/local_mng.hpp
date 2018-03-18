@@ -30,26 +30,30 @@
 namespace prot {
 
 const int LEFT_SUP_LIMIT = 10;
-const int RIGHT_SUP_LIMIT = 10;
-const int DESC_MATCH_LIMIT = 5;
 
-typedef std::pair<PtmPtr, PtmPtr> PtmPair;
-typedef std::vector<PtmPair> PtmPairVec;
+const int RIGHT_SUP_LIMIT = 10;
+
+const int DESC_MATCH_LIMIT = 15;
 
 class LocalMng {
  public:
-  LocalMng(PrsmParaPtr prsm_para_ptr, const std::string& local_threshold,
-           const std::string& residueModFileName, double max_ptm_mass,
-           const std::string &input_file_ext, const std::string &output_file_ext):
+  LocalMng(PrsmParaPtr prsm_para_ptr,
+           double local_threshold,
+           const std::string& residueModFileName,
+           double max_ptm_mass,
+           double min_ptm_mass,
+           const std::string &input_file_ext,
+           const std::string &output_file_ext):
       prsm_para_ptr_(prsm_para_ptr),
       input_file_ext_(input_file_ext),
       output_file_ext_(output_file_ext),
       residueModFileName_(residueModFileName),
-      threshold_(std::stod(local_threshold)),
+      threshold_(local_threshold),
       theta_(0.994),
       beta_(0.8),
       min_mass_(prsm_para_ptr->getSpParaPtr()->getMinMass()),
       max_ptm_mass_(max_ptm_mass),
+      min_ptm_mass_(min_ptm_mass),
       p1_(0.915258),
       p2_(21.1822) {}
 
@@ -59,8 +63,16 @@ class LocalMng {
   std::string output_file_ext_;
   std::string residueModFileName_;
 
-  double threshold_, theta_, beta_;
-  double min_mass_, max_ptm_mass_;
+  double threshold_;
+
+  double theta_, beta_;
+
+  double min_mass_;
+
+  double max_ptm_mass_;
+
+  double min_ptm_mass_;
+
   double p1_, p2_;
 };
 

@@ -16,6 +16,9 @@
 #ifndef PROT_BASE_PROTEOFORM_HPP_
 #define PROT_BASE_PROTEOFORM_HPP_
 
+#include <string>
+#include <vector>
+
 #include "base/residue_freq.hpp"
 #include "base/fasta_seq.hpp"
 #include "base/fasta_index_reader.hpp"
@@ -35,9 +38,9 @@ typedef std::shared_ptr<Proteoform> ProteoformPtr;
 class Proteoform {
  public:
   Proteoform(FastaSeqPtr fasta_seq_ptr,
-             ProtModPtr prot_mod_ptr, 
+             ProtModPtr prot_mod_ptr,
              int start_pos, int end_pos,
-             ResSeqPtr res_seq_ptr, 
+             ResSeqPtr res_seq_ptr,
              const MassShiftPtrVec & mass_shift_ptr_vec);
 
   Proteoform(xercesc::DOMElement* element, FastaIndexReaderPtr reader_ptr,
@@ -81,11 +84,7 @@ class Proteoform {
 
   AlignTypePtr getAlignType();
 
-  void addMassShiftPtrVec(MassShiftPtrVec & shift_ptr_vec);
-
-  //void addChangePtr(ChangePtr &change_ptr);
-
-  //void rmChangePtr(ChangePtr &change_ptr);
+  void addMassShiftPtrVec(const MassShiftPtrVec & shift_ptr_vec);
 
   SegmentPtrVec getSegmentPtrVec();
 
@@ -93,7 +92,7 @@ class Proteoform {
 
   std::string toString();
 
-  void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+  void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
   void parseXml(xercesc::DOMElement* element, ProteoformPtr db_proteoform);
 
@@ -102,6 +101,8 @@ class Proteoform {
   void setVariablePtmNum(int n) {variable_ptm_num_ = n;}
 
   int getVariablePtmNum() {return variable_ptm_num_;}
+
+  std::string getMIScore();
 
   PtmPtrVec getPtmVec();
 
@@ -130,6 +131,8 @@ class Proteoform {
 
   // Number of variable ptms is used for the test of the mass graph approach
   int variable_ptm_num_ = 0;
+
+  std::string mi_score_ = "";
 };
 
 typedef std::vector<ProteoformPtr> ProteoformPtrVec;

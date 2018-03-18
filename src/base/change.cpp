@@ -30,19 +30,21 @@ Change::Change(xercesc::DOMElement* element) {
   type_ptr_ = MassShiftType::getChangeTypePtrFromXml(ct_element);
   mass_ = xml_dom_util::getDoubleChildValue(element, "mass", 0);
   std::string mod_element_name = Mod::getXmlElementName();
+
   int mod_count = xml_dom_util::getChildCount(element, mod_element_name.c_str());
   if (mod_count != 0) {
     xercesc::DOMElement* mod_element
         = xml_dom_util::getChildElement(element, mod_element_name.c_str(), 0);
     mod_ptr_ = ModBase::getModPtrFromXml(mod_element);
   }
-  /*std::string local_element_name = LocalAnno::getXmlElementName();;*/
-  //int local_count = xml_dom_util::getChildCount(element, local_element_name.c_str());
-  //if (local_count != 0) {
-  //xercesc::DOMElement * local_element
-  //= xml_dom_util::getChildElement(element, local_element_name.c_str(), 0);
-  //local_anno_ptr_ = std::make_shared<LocalAnno>(local_element);
-  /*}*/
+
+  std::string local_element_name = LocalAnno::getXmlElementName();;
+  int local_count = xml_dom_util::getChildCount(element, local_element_name.c_str());
+  if (local_count != 0) {
+    xercesc::DOMElement * local_element
+        = xml_dom_util::getChildElement(element, local_element_name.c_str(), 0);
+    local_anno_ptr_ = std::make_shared<LocalAnno>(local_element);
+  }
 }
 
 void Change::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
@@ -58,9 +60,9 @@ void Change::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   if (mod_ptr_ != nullptr) {
     mod_ptr_->appendToXml(xml_doc, element);
   }
-  /*if (local_anno_ptr_ != nullptr) {*/
-  //local_anno_ptr_->appendToXml(xml_doc, element);
-  /*}*/
+  if (local_anno_ptr_ != nullptr) {
+    local_anno_ptr_->appendToXml(xml_doc, element);
+  }
   parent->appendChild(element);
 }
 
@@ -74,12 +76,12 @@ ChangePtr Change::geneChangePtr(ChangePtr ori_ptr, int start_pos) {
   return change_ptr;
 }
 
-/*void Change::setLocalAnno(LocalAnnoPtr p) {*/
-//local_anno_ptr_ = p;
-//if (p != nullptr) {
-//left_bp_pos_ = p->getLeftBpPos();
-//right_bp_pos_ = p->getRightBpPos() + 1;
-//}
-/*}*/
+void Change::setLocalAnno(LocalAnnoPtr p) {
+  local_anno_ptr_ = p;
+  if (p != nullptr) {
+    left_bp_pos_ = p->getLeftBpPos();
+    right_bp_pos_ = p->getRightBpPos() + 1;
+  }
+}
 
 }  // namespace prot
