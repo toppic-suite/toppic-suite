@@ -31,7 +31,6 @@ std::string AnnoSegment::getResidueAnno() {
     return anno_;
   }
 
-  occu_ = "";
   if (ptm_ptr_ != nullptr) {
     anno_ += "PTM: " + ptm_ptr_->getName() + "\n";
     for (size_t i = 0; i < occurences_.size(); i++) {
@@ -43,20 +42,19 @@ std::string AnnoSegment::getResidueAnno() {
 
       anno_ += "Site: " + occurences_[i].second + string_util::convertToString(occurences_[i].first) + " ";
       anno_ += "Confidence: " + string_util::convertToString(score_[i], 1) + "%\n";
-      occu_ += occurences_[i].second + string_util::convertToString(occurences_[i].first)
-          + ":" + string_util::convertToString(score_[i], 1) + "%";
-      if (i != occurences_.size() - 1) {
-        occu_ += "; ";
-      }
     }
   }
   return anno_;
 }
 
-void AnnoSegment::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent, int precison) {
+void AnnoSegment::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   xercesc::DOMElement* element;
   if (mass_shift_type_ == prot::MassShiftType::UNEXPECTED) {
-    element = xml_doc->createElement("unexpected_change");
+    if (ptm_ptr_ != nullptr) {
+      element = xml_doc->createElement("characterized_change");
+    } else {
+      element = xml_doc->createElement("unexpected_change");
+    }
     std::string str = string_util::convertToString(left_pos_);
     xml_doc->addElement(element, "left_position", str.c_str());
 
@@ -70,7 +68,24 @@ void AnnoSegment::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent
 
     xml_doc->addElement(element, "segment_type", segment_type_.c_str());
 
-    xml_doc->addElement(element, "occurence", occu_.c_str());
+    xml_doc->addElement(element, "anno", getResidueAnno().c_str());
+
+    if (ptm_ptr_ != nullptr) {
+      ptm_ptr_->appendAbbrNameToXml(xml_doc, element);
+    }
+
+    std::string occu;
+
+    if (occurences_.size() == 1) {
+      occu = occurences_[0].second + std::to_string(occurences_[0].first);
+    } else if (occurences_.size() > 1) {
+      occu = occurences_[0].second + std::to_string(occurences_[0].first);
+      occu += " - ";
+      occu += occurences_[occurences_.size() - 1].second
+          + std::to_string(occurences_[occurences_.size() - 1].first);
+    }
+
+    xml_doc->addElement(element, "occurence", occu.c_str());
   } else {
     element = xml_doc->createElement("variable_change");
     std::string str = string_util::convertToString(left_pos_);
@@ -89,15 +104,17 @@ void AnnoSegment::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent
     std::string occu;
 
     if (occurences_.size() == 1) {
-      occu = occurences_[0].second + std::to_string(occurences_[0].first); 
+      occu = occurences_[0].second + std::to_string(occurences_[0].first);
     } else if (occurences_.size() > 1) {
-      occu = occurences_[0].second + std::to_string(occurences_[0].first); 
+      occu = occurences_[0].second + std::to_string(occurences_[0].first);
       occu += " - ";
       occu += occurences_[occurences_.size() - 1].second
-          + std::to_string(occurences_[occurences_.size() - 1].first); 
+          + std::to_string(occurences_[occurences_.size() - 1].first);
     }
 
     xml_doc->addElement(element, "occurence", occu.c_str());
+
+    xml_doc->addElement(element, "anno", getResidueAnno().c_str());
   }
   parent->appendChild(element);
 }

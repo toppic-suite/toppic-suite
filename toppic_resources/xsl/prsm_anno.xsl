@@ -141,7 +141,7 @@
   </xsl:template>
 
 
-  <xsl:template match="variable_change | unexpected_change" mode="first_column">
+  <xsl:template match="variable_change | unexpected_change | characterized_change" mode="first_column">
     <xsl:param name="pos" />
 
     <xsl:text disable-output-escaping="yes"><![CDATA[<td align="left"; colspan="]]></xsl:text>
@@ -185,7 +185,7 @@
 
   </xsl:template>
 
-  <xsl:template match="variable_change | unexpected_change" mode="non_first_column">
+  <xsl:template match="variable_change | unexpected_change | characterized_change" mode="non_first_column">
     <xsl:param name="pos" />
     <xsl:param name="row_start_pos" />
 
@@ -242,6 +242,9 @@
           <xsl:apply-templates select="unexpected_change[left_position &lt;= $pos and right_position &gt;= $pos ]" mode="first_column">
             <xsl:with-param name="pos" select="$pos"/>
           </xsl:apply-templates>
+          <xsl:apply-templates select="characterized_change[left_position &lt;= $pos and right_position &gt;= $pos ]" mode="first_column">
+            <xsl:with-param name="pos" select="$pos"/>
+          </xsl:apply-templates>
           <xsl:apply-templates select="variable_change[left_position &lt;= $pos and right_position &gt;= $pos ]" mode="first_column">
             <xsl:with-param name="pos" select="$pos"/>
           </xsl:apply-templates>
@@ -249,6 +252,10 @@
 
         <xsl:when test="$j &gt; 0">
           <xsl:apply-templates select="unexpected_change[left_position = $pos]" mode="non_first_column">
+            <xsl:with-param name="pos" select="$pos"/>
+            <xsl:with-param name="row_start_pos" select="$i * 60"/>
+          </xsl:apply-templates>
+          <xsl:apply-templates select="characterized_change[left_position = $pos]" mode="non_first_column">
             <xsl:with-param name="pos" select="$pos"/>
             <xsl:with-param name="row_start_pos" select="$i * 60"/>
           </xsl:apply-templates>
@@ -354,6 +361,26 @@
         <xsl:text>]</xsl:text>  
       </font>
       <xsl:text>&#160;</xsl:text>			
+  </xsl:template>
+
+  <xsl:template match="characterized_change">
+    <xsl:text>&#160;</xsl:text>
+    <xsl:element name="a">
+      <xsl:attribute name="href">
+        <xsl:text>http://www.unimod.org/modifications_view.php?editid1=</xsl:text>
+        <xsl:value-of select="ptm/unimod" />
+      </xsl:attribute>
+      <xsl:attribute name="target">
+        <xsl:text>_blank</xsl:text>
+      </xsl:attribute>
+      <font color="red">
+        <xsl:value-of select="match_seq"/>
+        <xsl:text> [</xsl:text>
+        <xsl:value-of select="occurence"/>
+        <xsl:text>]</xsl:text>
+      </font>
+    </xsl:element>
+      <xsl:text>&#160;</xsl:text>     
   </xsl:template>
 
   <xsl:template match="variable_change">
