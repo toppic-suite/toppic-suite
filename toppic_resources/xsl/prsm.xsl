@@ -242,16 +242,16 @@
         <br/>
       </xsl:if>
 
-      <xsl:variable name="variable_ptm_num" select="count(unexpected_change/ptm)"/>
+      <xsl:variable name="variable_ptm_num" select="count(characterized_change[segment_type = 'SHIFT'])"/>
       <xsl:if test="$variable_ptm_num &gt; 0">
         <br/>
         <xsl:text>&#160;&#160;&#160;&#160;&#160;Characterization modifications: </xsl:text> 
-        <xsl:apply-templates select="unexpected_change[ptm]"/>
+        <xsl:apply-templates select="characterized_change[segment_type = 'SHIFT']"/>
         <br/>
       </xsl:if>
 
       <xsl:variable name="unexpected_ptm_num" select="count(unexpected_change[segment_type = 'SHIFT'])"/>
-      <xsl:if test="$unexpected_ptm_num &gt; $variable_ptm_num">
+      <xsl:if test="$unexpected_ptm_num &gt; 0">
         <br/>
         <xsl:text>&#160;&#160;&#160;&#160;&#160;Unexpected modifications: </xsl:text>
         <xsl:apply-templates select="unexpected_change[segment_type = 'SHIFT']"/>

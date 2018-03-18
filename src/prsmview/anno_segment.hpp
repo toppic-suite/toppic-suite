@@ -40,7 +40,9 @@ class AnnoSegment {
 
   std::string getType() {return segment_type_;}
 
-  void setMassShiftType(MassShiftTypePtr shift_type) {mass_shift_type_ = shift_type;} 
+  void setMassShiftType(MassShiftTypePtr shift_type) {
+    mass_shift_type_ = shift_type;
+  }
 
   int getRightPos() {return right_pos_;}
 
@@ -54,15 +56,13 @@ class AnnoSegment {
 
   std::string getResidueAnno();
 
-  void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent, int precison);
+  void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
  private:
   // EMPTY or SHIFT
   std::string segment_type_;
 
   std::string anno_;
-
-  std::string occu_;
 
   int left_pos_;
 
