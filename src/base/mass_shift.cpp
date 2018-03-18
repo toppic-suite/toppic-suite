@@ -12,6 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include <string>
+
 #include "base/mass_shift.hpp"
 #include "base/mod_base.hpp"
 #include "base/string_util.hpp"
@@ -37,7 +39,7 @@ MassShift::MassShift(xercesc::DOMElement* element) {
   int change_len = xml_dom_util::getChildCount(change_list_element, change_element_name.c_str());
 
   for (int i = 0; i < change_len; i++) {
-    xercesc::DOMElement* change_element 
+    xercesc::DOMElement* change_element
         = xml_dom_util::getChildElement(change_list_element, change_element_name.c_str(), i);
     change_vec_.push_back(std::make_shared<Change>(change_element));
   }
@@ -50,10 +52,10 @@ void MassShift::setChangePtr(ChangePtr change) {
   right_bp_pos_ = change_vec_[0]->getRightBpPos();
   for (size_t k = 0; k < change_vec_.size(); k++) {
     if (change_vec_[k]->getLeftBpPos() < left_bp_pos_) {
-      left_bp_pos_ = change_vec_[0]->getLeftBpPos();
+      left_bp_pos_ = change_vec_[k]->getLeftBpPos();
     }
     if (change_vec_[k]->getRightBpPos() > right_bp_pos_) {
-      right_bp_pos_ = change_vec_[0]->getRightBpPos();
+      right_bp_pos_ = change_vec_[k]->getRightBpPos();
     }
   }
 }
@@ -62,7 +64,11 @@ std::string MassShift::getSeqStr() {
   std::string seq_str;
 
   if (getTypePtr() == MassShiftType::UNEXPECTED) {
-    seq_str = string_util::convertToString(shift_, 5); 
+    if (change_vec_[0]->getLocalAnno() != nullptr) {
+      seq_str = change_vec_[0]->getLocalAnno()->getPtmPtr()->getAbbrName();
+    } else {
+      seq_str = string_util::convertToString(shift_, 5);
+    }
   } else {
     for (size_t i = 0; i < change_vec_.size(); i++) {
       seq_str += change_vec_[i]->getModPtr()->getModResiduePtr()->getPtmPtr()->getAbbrName();

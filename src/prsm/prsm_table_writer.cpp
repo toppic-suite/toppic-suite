@@ -56,19 +56,15 @@ void PrsmTableWriter::write() {
       << "First residue" << "\t"
       << "Last residue" << "\t"
       << "Proteoform" << "\t"
-      << "#unexpected modifications" << "\t";
-
-  if (prsm_para_ptr_->doLocaliztion()) {
-    file << "MIScore" << "\t";
-  }
-
-  file << "#matched peaks" << "\t"
+      << "#unexpected modifications" << "\t"
+      << "MIScore" << "\t"
+      << "#matched peaks" << "\t"
       << "#matched fragment ions" << "\t"
       << "P-value" << "\t"
       << "E-value" << "\t"
       << "Q-value (spectral FDR)" << "\t"
       << "Proteoform FDR" << "\t"
-      << "#Variable PTMs" << std::endl;
+      << "#variable PTMs" << std::endl;
 
   std::string input_file_name = file_util::basename(spectrum_file_name) + "." + input_file_ext_;
   std::string db_file_name = prsm_para_ptr_->getSearchDbFileName();
@@ -109,48 +105,6 @@ void PrsmTableWriter::write() {
   // write end;
   file.close();
 }
-
-/*std::string outputChangePtr(ProteoformPtr proteoform_ptr) {*/
-  //StringPairVec string_pairs = proteoform_ptr->getFastaSeqPtr()->getAcidPtmPairVec();
-  //int start_pos = proteoform_ptr->getStartPos();
-  //ChangePtrVec change_vec = proteoform_ptr->getChangePtrVec(ChangeType::UNEXPECTED);
-  //std::string res = "";
-  //for (size_t i = 0; i < change_vec.size(); i++) {
-    //if (change_vec[i]->getLocalAnno() == nullptr)
-      //continue;
-
-    //if (change_vec[i]->getLocalAnno()->getPtmPtr() != nullptr) {
-      //std::vector<double> scr_vec = change_vec[i]->getLocalAnno()->getScrVec();
-      //int left_db_bp = change_vec[i]->getLeftBpPos() + start_pos;
-      //int right_db_bp = change_vec[i]->getRightBpPos() + start_pos;
-      //res = res + change_vec[i]->getLocalAnno()->getPtmPtr()->getAbbrName() + "[";
-      //for (int j = left_db_bp; j < right_db_bp; j++) {
-        //// std::string acid_letter = fasta_seq.substr(j, 1);
-        //std::string acid_letter = string_pairs[j].first;
-        //double scr = std::floor(scr_vec[j - left_db_bp] * 1000) / 10;
-        //if (scr == 100) scr = 99.9;
-        //if (scr == 0) continue;
-
-        //res = res + acid_letter + std::to_string(j + 1) + ":";
-        //std::stringstream ss;
-        //ss << std::fixed << std::setprecision(1) << scr;
-        //res  = res + ss.str() + "%";
-        //if (j != right_db_bp - 1) {
-          //res = res + "; ";
-        //}
-      //}
-      //res = res + "]";
-    //}
-
-    //if (i != change_vec.size() - 1) {
-      //res = res + "; ";
-    //}
-  //}
-  //if (res == "") {
-    //res = "-";
-  //}
-  //return res;
-/*}*/
 
 void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   std::string spec_ids;
@@ -200,19 +154,11 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
       << (prsm_ptr->getProteoformPtr()->getStartPos() + 1) << "\t"
       << (prsm_ptr->getProteoformPtr()->getEndPos() + 1) << "\t"
       << prsm_ptr->getProteoformPtr()->getProteinMatchSeq() << "\t"
-      << ptm_num << "\t";
-
-  if (prsm_para_ptr_->doLocaliztion()) {
-    if (ptm_num == 0) {
-      file << "-\t";
-    } else {
-      //file << outputChangePtr(prsm_ptr->getProteoformPtr()) << "\t";
-    }
-  }
-
-  file << prsm_ptr->getMatchPeakNum() << "\t"
-      << prsm_ptr->getMatchFragNum() << "\t";
-  file << prsm_ptr->getPValue() << "\t"
+      << ptm_num << "\t"
+      << prsm_ptr->getProteoformPtr()->getMIScore() << "\t"
+      << prsm_ptr->getMatchPeakNum() << "\t"
+      << prsm_ptr->getMatchFragNum() << "\t"
+      << prsm_ptr->getPValue() << "\t"
       << prsm_ptr->getEValue() << "\t";
 
   double fdr = prsm_ptr->getFdr();
@@ -228,7 +174,7 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
     file << "-" << "\t";
   }
 
-  file << std::max(0, prsm_ptr->getProteoformPtr()->getVariablePtmNum()) << std::endl;
+  file << prsm_ptr->getProteoformPtr()->getVariablePtmNum() << std::endl;
 }
 
-} /* namespace prot */
+}  // namespace prot

@@ -35,8 +35,6 @@ namespace peak_ion_pair_util {
 PeakIonPairPtrVec getMatchedPairs(const PeakIonPairPtrVec &pair_ptrs,
                                   int spec_id, int peak_id);
 
-int getPeakIonPairNum(PeakIonPairPtrVec pair_ptrs);
-
 double computePairCoverage(const PeakIonPairPtrVec &pair_ptrs, int begin,
                            int end, RmBreakTypePtr type_ptr);
 
@@ -51,20 +49,8 @@ PeakIonPairPtrVec genePeakIonPairs(const ProteoformPtr &proteoform_ptr,
 
 double compMatchFragNum(const PeakIonPairPtrVec &pairs);
 
-// helper functions
-double compMatchFragNum(const ProteoformPtr &proteoform_ptr,
-                        const ExtendMsPtr &ms_three_ptr, double min_mass);
-
-double compMatchFragNum(const ProteoformPtr &proteoform_ptr,
-                        const ExtendMsPtrVec &ms_ptr_vec, double min_mass);
-
 double compMatchPeakNum(PeakIonPairPtrVec &pairs);
 
-double compMatchPeakNum(const ProteoformPtr &proteoform_ptr,
-                        const ExtendMsPtr &ms_three_ptr, double min_mass);
-
-double compMatchPeakNum(const ProteoformPtr &proteoform_ptr,
-                        const ExtendMsPtrVec &ms_ptr_vec, double min_mass);
 }  // namespace peak_ion_pair_util
 
 }  // namespace prot

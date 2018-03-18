@@ -72,7 +72,8 @@ class Ptm {
 };
 
 typedef std::vector<PtmPtr> PtmPtrVec;
-
+typedef std::pair<PtmPtr, PtmPtr> PtmPair;
+typedef std::vector<PtmPair> PtmPairVec;
 }  // namespace prot
 
 #endif

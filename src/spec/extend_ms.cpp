@@ -71,6 +71,17 @@ std::vector<std::pair<int, int>> getExtendIntMassErrorList(const ExtendMsPtrVec 
   return mass_errors;
 }
 
+std::vector<std::pair<double, double> > getExtendMassToleranceList(ExtendMsPtr extend_ms_ptr) {
+  std::vector<std::pair<double, double> > mass_tole_list(extend_ms_ptr->getPeakPtrVec().size());
+
+  for (size_t j = 0; j < extend_ms_ptr->getPeakPtrVec().size(); j++) {
+    mass_tole_list[j] = std::make_pair(extend_ms_ptr->getPeakPtr(j)->getMonoMass(),
+                                       extend_ms_ptr->getPeakPtr(j)->getOrigTolerance());
+  }
+
+  return mass_tole_list;
+}
+
 }  // namespace extend_ms
 
 }  // namespace prot

@@ -25,7 +25,7 @@
 
 namespace prot {
 
-typedef std::shared_ptr<Ms<ExtendPeakPtr>> ExtendMsPtr;
+typedef std::shared_ptr<Ms<ExtendPeakPtr> > ExtendMsPtr;
 
 typedef std::vector<ExtendMsPtr> ExtendMsPtrVec;
 
@@ -33,8 +33,10 @@ namespace extend_ms {
 
 std::vector<double> getExtendMassVec(ExtendMsPtr extend_ms_ptr);
 
-std::vector<std::pair<int, int>> getExtendIntMassErrorList(const ExtendMsPtrVec &ext_ms_ptr_vec,
-                                                           bool pref, double scale);
+std::vector<std::pair<int, int> > getExtendIntMassErrorList(const ExtendMsPtrVec &ext_ms_ptr_vec,
+                                                            bool pref, double scale);
+
+std::vector<std::pair<double, double> > getExtendMassToleranceList(ExtendMsPtr extend_ms_ptr);
 
 }  // namespace extend_ms
 

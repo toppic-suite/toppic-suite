@@ -43,6 +43,11 @@ int findResidue(const ResiduePtrVec &residue_list, ResiduePtr residue_ptr);
 
 double compResiduePtrVecMass(const ResiduePtrVec &ptr_vec);
 
+double compResiduePtrVecMass(const std::string & seq);
+
+double compResiduePtrVecMass(const std::string & seq,
+                             const ModPtrVec &fix_mod_ptr_vec);
+
 }  // namespace residue_util
 
 }  // namespace prot

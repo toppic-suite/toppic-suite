@@ -26,12 +26,15 @@ namespace prot {
 LocalAnno::LocalAnno(xercesc::DOMElement* element) {
   conf_ = xml_dom_util::getDoubleChildValue(element, "confidence", 0);
   std::string scr_str = xml_dom_util::getChildValue(element, "score_list", 0);
+
   std::vector<std::string> tmp = string_util::split(scr_str, ' ');
   for (size_t i = 0; i < tmp.size(); i++) {
     scr_vec_.push_back(std::stod(tmp[i]));
   }
+
   std::string ptm_element_name = Ptm::getXmlElementName();
   int ptm_count = xml_dom_util::getChildCount(element, ptm_element_name.c_str());
+
   if (ptm_count == 0) {
     ptm_ptr_ = nullptr;
   } else {
@@ -44,12 +47,12 @@ LocalAnno::LocalAnno(xercesc::DOMElement* element) {
 void LocalAnno::appendToXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   std::string element_name = getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
-  std::string str = string_util::convertToString(conf_);
+  std::string str = string_util::convertToString(conf_, 4);
   xml_doc->addElement(element, "confidence", str.c_str());
 
-  str = string_util::convertToString(scr_vec_[0]);
+  str = string_util::convertToString(scr_vec_[0], 4);
   for (size_t i = 1; i < scr_vec_.size(); i++) {
-    str = str + " " + string_util::convertToString(scr_vec_[i]);
+    str = str + " " + string_util::convertToString(scr_vec_[i], 4);
   }
 
   xml_doc->addElement(element, "score_list", str.c_str());
