@@ -20,12 +20,17 @@
 #include <vector>
 #include <map>
 #include <unordered_map>
+#include <string>
 
 #include "base/proteoform.hpp"
 #include "base/activation.hpp"
+
 #include "spec/deconv_ms.hpp"
+
 #include "prsm/prsm.hpp"
+
 #include "tdgf/count_test_num.hpp"
+#include "tdgf/comp_pvalue_lookup_table.hpp"
 
 #include "mcmc/mcmc_mng.hpp"
 
@@ -33,10 +38,10 @@ namespace prot {
 
 class DprProcessor {
  public:
-  DprProcessor(MCMCMngPtr mng_ptr):
+  explicit DprProcessor(MCMCMngPtr mng_ptr):
       mng_ptr_(mng_ptr), mt_(42) {
         init();
-      };
+      }
 
   void process();
 
@@ -47,15 +52,16 @@ class DprProcessor {
 
   std::vector<std::vector<double> > compPtmComb();
 
-  void processOnePrsm(PrsmPtr prsm_ptr, ActivationPtr act,
-                      const std::vector<int> & ms_masses,
-                      double tolerance);
+  void processOnePrsm(PrsmPtr prsm_ptr, SpectrumSetPtr spec_set_ptr, double tolerance);
+
+  double compPValueMCMC(PrsmPtr prsm_ptr, ActivationPtr act,
+                        const std::vector<int> & ms_masses);
 
   void simulateDPR(ResiduePtrVec &residues, const std::vector<int> & ms_masses,
                    ActivationPtr act, const PtmPtrVec & ptm_vec,
                    long omega, const std::vector<long long> & mu);
 
-  ResiduePtrVec randomTrans(ResiduePtrVec residues); 
+  ResiduePtrVec randomTrans(ResiduePtrVec residues);
 
   int getMaxScore(const ResiduePtrVec &residues, const std::vector<int> & ms_masses,
                   ActivationPtr act, const PtmPtrVec & ptm_vec);
@@ -69,6 +75,8 @@ class DprProcessor {
   MCMCMngPtr mng_ptr_;
 
   CountTestNumPtr test_num_ptr_;
+
+  CompPValueLookupTablePtr comp_pvalue_table_ptr_;
 
   std::random_device rd_;
 
@@ -93,6 +101,6 @@ class DprProcessor {
 
 typedef std::shared_ptr<DprProcessor> DprProcessorPtr;
 
-}
+}  // namespace prot
 
 #endif

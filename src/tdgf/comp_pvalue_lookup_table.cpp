@@ -184,6 +184,30 @@ void CompPValueLookupTable::process(const DeconvMsPtrVec &deconv_ms_ptr_vec, Prs
   }
 }
 
+bool CompPValueLookupTable::inTable(int peak_num, int match_frag_num, int unexpected_shift_num) {
+  if (peak_num > 850 || peak_num < 10) return false;
+
+  if (match_frag_num <= 5 || match_frag_num >= 100) return false;
+
+  std::vector<int> idx = getFourIndex(peak_num, match_frag_num);
+
+  if (unexpected_shift_num == 0) {
+    if (ptm0_[idx[0]][idx[2]] == 0 || ptm0_[idx[0]][idx[3]] == 0
+        || ptm0_[idx[1]][idx[2]] == 0 || ptm0_[idx[1]][idx[3]] == 0)
+      return false;
+  } else if (unexpected_shift_num == 1) {
+    if (ptm1_[idx[0]][idx[2]] == 0 || ptm1_[idx[0]][idx[3]] == 0
+        || ptm1_[idx[1]][idx[2]] == 0 || ptm1_[idx[1]][idx[3]] == 0)
+      return false;
+  } else {
+    if (ptm2_[idx[0]][idx[2]] == 0 || ptm2_[idx[0]][idx[3]] == 0
+        || ptm2_[idx[1]][idx[2]] == 0 || ptm2_[idx[1]][idx[3]] == 0)
+      return false;
+  }
+
+  return true;
+}
+
 bool CompPValueLookupTable::inTable(const DeconvMsPtrVec &deconv_ms_ptr_vec,
                                     const PrsmPtrVec &prsm_ptrs) {
   int peak_num = 0;
@@ -197,25 +221,9 @@ bool CompPValueLookupTable::inTable(const DeconvMsPtrVec &deconv_ms_ptr_vec,
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     int match_frag_num = prsm_ptrs[i]->getMatchFragNum();
 
-    if (match_frag_num <= 5 || match_frag_num >= 100) continue;
-
-    std::vector<int> idx = getFourIndex(peak_num, match_frag_num);
-
     int unexpected_shift_num = prsm_ptrs[i]->getProteoformPtr()->getMassShiftNum(MassShiftType::UNEXPECTED);
 
-    if (unexpected_shift_num == 0) {
-      if (ptm0_[idx[0]][idx[2]] == 0 || ptm0_[idx[0]][idx[3]] == 0
-          || ptm0_[idx[1]][idx[2]] == 0 || ptm0_[idx[1]][idx[3]] == 0)
-        return false;
-    } else if (unexpected_shift_num == 1) {
-      if (ptm1_[idx[0]][idx[2]] == 0 || ptm1_[idx[0]][idx[3]] == 0
-          || ptm1_[idx[1]][idx[2]] == 0 || ptm1_[idx[1]][idx[3]] == 0)
-        return false;
-    } else {
-      if (ptm2_[idx[0]][idx[2]] == 0 || ptm2_[idx[0]][idx[3]] == 0
-          || ptm2_[idx[1]][idx[2]] == 0 || ptm2_[idx[1]][idx[3]] == 0)
-        return false;
-    }
+    if (!inTable(peak_num, match_frag_num, unexpected_shift_num)) return false;
   }
 
   return true;

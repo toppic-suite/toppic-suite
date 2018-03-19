@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <vector>
 
+#include "base/version.hpp"
 #include "base/fasta_reader.hpp"
 #include "base/fasta_util.hpp"
 #include "base/base_data.hpp"
@@ -68,7 +69,7 @@ namespace prot {
 
 int TopMGProcess(std::map<std::string, std::string> arguments) {
   try {
-    std::cout << "TopMG 1.0-beta" << std::endl;
+    std::cout << "TopMG " << prot::version_number << std::endl;
 
     time_t start = time(0);
     char buf[50];
