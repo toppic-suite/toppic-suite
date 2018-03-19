@@ -30,20 +30,26 @@ class CompPValueLookupTable {
 
   bool inTable(const DeconvMsPtrVec &deconv_ms_ptr_vec, const PrsmPtrVec &prsm_ptrs);
 
+  bool inTable(int peak_num, int match_frag_num, int unexpected_shift_num);
+
   void process(const DeconvMsPtrVec &deconv_ms_ptr_vec, PrsmPtrVec &prsm_ptrs, double ppo);
+
+  double compProb(int peak_num, int match_frag_num, int unexpected_shift_num);
 
  private:
   void initTable();
 
   TdgfMngPtr mng_ptr_;
+
   CountTestNumPtr test_num_ptr_;
+
   std::ifstream input_;
 
   double ptm0_[48][20];
-  double ptm1_[48][20];
-  double ptm2_[48][20];
 
-  double compProb(int peak_num, int match_frag_num, int unexpected_shift_num);
+  double ptm1_[48][20];
+
+  double ptm2_[48][20];
 };
 
 typedef std::shared_ptr<CompPValueLookupTable> CompPValueLookupTablePtr;
