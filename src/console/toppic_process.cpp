@@ -201,7 +201,8 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     std::cout << "E-value computation - started." << std::endl;
     bool variable_ptm = false;
     TdgfMngPtr tdgf_mng_ptr
-        = std::make_shared<TdgfMng>(prsm_para_ptr, ptm_num, max_ptm_mass,
+        = std::make_shared<TdgfMng>(prsm_para_ptr, ptm_num,
+                                    std::max(std::abs(max_ptm_mass), std::abs(min_ptm_mass)),
                                     use_gf, variable_ptm, thread_num, "RAW_RESULT", "EVALUE");
     EValueProcessorPtr processor = std::make_shared<EValueProcessor>(tdgf_mng_ptr);
     processor->init();
