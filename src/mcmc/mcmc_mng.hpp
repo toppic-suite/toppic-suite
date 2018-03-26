@@ -28,12 +28,14 @@ class MCMCMng {
           const std::string & input_file_ext, 
           const std::string & output_file_ext,
           const std::string & residue_mod_file,
-          int max_known_mods):
+          int max_known_mods,
+          int thread_num):
       prsm_para_ptr_(prsm_para_ptr),
       input_file_ext_(input_file_ext),
       output_file_ext_(output_file_ext),
       residue_mod_file_(residue_mod_file),
-      max_known_mods_(max_known_mods) {};
+      max_known_mods_(max_known_mods),
+      thread_num_(thread_num) {};
 
   PrsmParaPtr prsm_para_ptr_;
 
@@ -50,6 +52,8 @@ class MCMCMng {
   int k_ = 3;
 
   int max_known_mods_ = 10;
+
+  int thread_num_ = 1;
 
   double mass_limit_ = 150.0;
 
