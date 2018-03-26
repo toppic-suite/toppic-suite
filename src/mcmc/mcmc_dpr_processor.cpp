@@ -16,6 +16,7 @@
 #include <string>
 #include <algorithm>
 #include <vector>
+#include <map>
 
 #include <boost/algorithm/string.hpp>
 
@@ -26,6 +27,7 @@
 #include "base/neutral_loss.hpp"
 #include "base/base_algo.hpp"
 #include "base/extreme_value.hpp"
+#include "base/thread_pool.hpp"
 
 #include "spec/msalign_reader.hpp"
 #include "spec/msalign_util.hpp"
@@ -41,91 +43,9 @@
 #include "tdgf/count_test_num.hpp"
 
 #include "mcmc/mcmc_dpr_processor.hpp"
+#include "mcmc/comp_pvalue_mcmc.hpp"
 
 namespace prot {
-
-std::vector<double> getNTheoMassVec(const ResiduePtrVec &residues, IonTypePtr n_ion_type_ptr, double min_mass) {
-  std::vector<double> theo_masses;
-  ResSeqPtr res_seq = std::make_shared<ResidueSeq>(residues);
-  BpSpecPtr bp_spec = std::make_shared<BpSpec>(res_seq);
-  BreakPointPtrVec bps = bp_spec->getBreakPointPtrVec();
-  double max_mass = res_seq->getSeqMass() - min_mass;
-  for (size_t i = 0; i < bps.size(); i++) {
-    double n_mass = bps[i]->getNTermMass(n_ion_type_ptr);
-    if (min_mass <= n_mass && n_mass <= max_mass) {
-      theo_masses.push_back(n_mass);
-    }
-  }
-  return theo_masses;
-}
-
-std::vector<double> getCTheoMassVec(const ResiduePtrVec &residues, IonTypePtr c_ion_type_ptr, double min_mass) {
-  std::vector<double> theo_masses;
-  ResSeqPtr res_seq = std::make_shared<ResidueSeq>(residues);
-  BpSpecPtr bp_spec = std::make_shared<BpSpec>(res_seq);
-  BreakPointPtrVec bps = bp_spec->getBreakPointPtrVec();
-  double max_mass = res_seq->getSeqMass() - min_mass;
-  for (size_t i = 0; i < bps.size(); i++) {
-    double n_mass = bps[i]->getCTermMass(c_ion_type_ptr);
-    if (min_mass <= n_mass && n_mass <= max_mass) {
-      theo_masses.push_back(n_mass);
-    }
-  }
-  return theo_masses;
-}
-
-ResiduePtrVec DprProcessor::randomTrans(ResiduePtrVec residues) {
-  double mass = 0.0;
-  bool is_small = (residue_util::compResiduePtrVecMass(residues) < this->pep_mass_);
-  std::uniform_int_distribution<int> res_dist(0, residues.size() / 2 - 1);
-  int pos1 = res_dist(mt_);
-  mass += residues[pos1]->getMass();
-
-  int pos2 = pos1 + 1;
-
-  mass += residues[pos2]->getMass();
-
-  res_dist = std::uniform_int_distribution<int>(residues.size() / 2 + 1, residues.size() - 1);
-
-  int pos3 = res_dist(mt_);
-
-  mass += residues[pos3]->getMass();
-
-  ResiduePtrVec ori_res = {residues[pos1], residues[pos2], residues[pos3]};
-
-  std::random_shuffle(ori_res.begin(), ori_res.end());
-
-  std::vector<std::string> res_vec = mass_table_[std::round(mass * mng_ptr_->convert_ratio_)];
-
-  ResiduePtrVec new_res_vec;
-
-  if (res_vec.size() > 1) {
-    res_dist = std::uniform_int_distribution<int>(0, res_vec.size() - 1);
-    std::string res_seq = res_vec[res_dist(mt_)];
-    std::random_shuffle(res_seq.begin(), res_seq.end());
-    new_res_vec = residue_util::convertStrToResiduePtrVec(res_seq);
-  } else {
-    new_res_vec = ori_res;
-  }
-
-  double new_mass = residue_util::compResiduePtrVecMass(new_res_vec);
-
-  if (is_small) {
-    if (new_mass < mass) {
-      new_res_vec = ori_res;
-    }
-  } else {
-    if (new_mass > mass) {
-      new_res_vec = ori_res;
-    }
-  }
-
-  residues[pos1] = new_res_vec[0];
-  residues[pos2] = new_res_vec[1];
-  residues[pos3] = new_res_vec[2];
-
-  return residues;
-}
 
 void DprProcessor::init() {
   std::string var_mod_file_name = mng_ptr_->residue_mod_file_;
@@ -231,12 +151,15 @@ void DprProcessor::process() {
 
   std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
+  std::string input_file_name = file_util::basename(sp_file_name) + "." + mng_ptr_->input_file_ext_;
+  std::string output_file_name = file_util::basename(sp_file_name) + "." + mng_ptr_->output_file_ext_;
 
-  PrsmReaderPtr prsm_reader
-      = std::make_shared<PrsmReader>(file_util::basename(sp_file_name) + "." + mng_ptr_->input_file_ext_);
+  PrsmReaderPtr prsm_reader = std::make_shared<PrsmReader>(input_file_name);
 
   PrsmXmlWriterPtr prsm_writer
-      = std::make_shared<PrsmXmlWriter>(file_util::basename(sp_file_name) + "." + mng_ptr_->output_file_ext_);
+      = std::make_shared<PrsmXmlWriter>(output_file_name + "_" + std::to_string(mng_ptr_->thread_num_));
+
+  pool_ptr_ = std::make_shared<ThreadPool<PrsmXmlWriter> >(mng_ptr_->thread_num_ , output_file_name);
 
   FastaIndexReaderPtr fasta_reader_ptr = std::make_shared<FastaIndexReader>(db_file_name);
 
@@ -270,9 +193,7 @@ void DprProcessor::process() {
 
         double tolerance = refine_ms_ptr_vec[0]->getMsHeaderPtr()->getErrorTolerance(ppo);
 
-        processOnePrsm(prsm_ptr, spec_set_ptr, tolerance);
-
-        prsm_writer->write(prsm_ptr);
+        processOnePrsm(prsm_ptr, spec_set_ptr, tolerance, prsm_writer);
 
         prsm_ptr = prsm_reader->readOnePrsm(fasta_reader_ptr, prsm_para_ptr->getFixModPtrVec());
       }
@@ -282,17 +203,103 @@ void DprProcessor::process() {
     std::cout << std::flush << "E-value computation - processing " << cnt << " of "
         << spectrum_num << " spectra.\r";
   }
+  pool_ptr_->ShutDown();
   std::cout << std::endl;
   sp_reader_ptr->close();
   prsm_reader->close();
   prsm_writer->close();
+
+  PrsmXmlWriterPtr all_writer_ptr = std::make_shared<PrsmXmlWriter>(output_file_name);
+  PrsmPtrVec prsm_vec;
+
+  for (int i = 0; i <= mng_ptr_->thread_num_; i++) {
+    PrsmReaderPtr all_reader_ptr = std::make_shared<PrsmReader>(output_file_name + "_" + std::to_string(i));
+    PrsmPtr p = all_reader_ptr->readOnePrsm(fasta_reader_ptr, prsm_para_ptr->getFixModPtrVec());
+
+    while (p != nullptr) {
+      prsm_vec.push_back(p);
+      p = all_reader_ptr->readOnePrsm(fasta_reader_ptr, prsm_para_ptr->getFixModPtrVec());
+    }
+
+    all_reader_ptr->close();
+  }
+
+  std::sort(prsm_vec.begin(), prsm_vec.end(), Prsm::cmpSpectrumIdIncEvalueInc);
+
+  all_writer_ptr->writeVector(prsm_vec);
+
+  all_writer_ptr->close();
 }
 
-void DprProcessor::processOnePrsm(PrsmPtr prsm_ptr, SpectrumSetPtr spec_set_ptr, double tolerance) {
+std::function<void()> geneTask(SpectrumSetPtr spec_set_ptr,
+                               PrsmPtr prsm_ptr,
+                               MCMCMngPtr mng_ptr,
+                               const std::map<PtmPtr, std::vector<ResiduePtr> > & ptm_residue_map,
+                               const std::map<int, std::vector<std::string> > & mass_table,
+                               CountTestNumPtr test_num_ptr,
+                               const std::vector<std::vector<double> > & ptm_mass_vec2d,
+                               std::shared_ptr<ThreadPool<PrsmXmlWriter> > pool_ptr) {
+  return [spec_set_ptr, prsm_ptr, mng_ptr, ptm_residue_map, mass_table, test_num_ptr, ptm_mass_vec2d, pool_ptr]() {
+    CompPValueMCMCPtr comp_mcmc_ptr
+        = std::make_shared<prot::CompPValueMCMC>(mng_ptr, ptm_residue_map, mass_table);
+    DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
+    ExtendMsPtrVec refine_ms_ptr_vec
+        = extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec,
+                                               mng_ptr->prsm_para_ptr_->getSpParaPtr(),
+                                               prsm_ptr->getAdjustedPrecMass());
+
+    double ppo = mng_ptr->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
+
+    double tolerance = refine_ms_ptr_vec[0]->getMsHeaderPtr()->getErrorTolerance(ppo);
+
+    std::vector<double> ms_masses = extend_ms::getExtendMassVec(refine_ms_ptr_vec[0]);
+
+    std::vector<int> ms_mass_int(ms_masses.size());
+
+    for (size_t k = 0; k < ms_masses.size(); k++) {
+      ms_mass_int[k] = static_cast<int>(ms_masses[k] * mng_ptr->convert_ratio_) >> 5;
+    }
+
+    std::sort(ms_mass_int.begin(), ms_mass_int.end());
+    ms_mass_int.erase(std::unique(ms_mass_int.begin(), ms_mass_int.end()), ms_mass_int.end());
+
+    ActivationPtr act = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getActivationPtr();
+
+    double p_value = comp_mcmc_ptr->compPValueMCMC(prsm_ptr, act, ms_mass_int);
+
+    AlignTypePtr type_ptr = prsm_ptr->getProteoformPtr()->getAlignType();
+
+    double cand_num = test_num_ptr->compCandNum(type_ptr, 0, prsm_ptr->getAdjustedPrecMass() - mass_constant::getWaterMass(),
+                                                tolerance);
+
+    std::vector<double> mass_ptm_vec = ptm_mass_vec2d[prsm_ptr->getProteoformPtr()->getVariablePtmNum()];
+
+    for (size_t k = 0; k < mass_ptm_vec.size(); k++) {
+      cand_num += test_num_ptr->compCandNum(type_ptr, 0,
+                                            prsm_ptr->getAdjustedPrecMass() - mass_constant::getWaterMass() - mass_ptm_vec[k],
+                                            tolerance);
+    }
+
+    if (cand_num == 0) {cand_num = 1;}
+
+    LOG_DEBUG("cand_num " << cand_num);
+    ExtremeValuePtr evalue = std::make_shared<ExtremeValue>(p_value, cand_num, 2);
+    prsm_ptr->setExtremeValuePtr(evalue);
+
+    boost::thread::id thread_id = boost::this_thread::get_id();
+    PrsmXmlWriterPtr writer_ptr = pool_ptr->getWriter(thread_id);
+
+    writer_ptr->write(prsm_ptr);
+  };
+}
+
+void DprProcessor::processOnePrsm(PrsmPtr prsm_ptr, SpectrumSetPtr spec_set_ptr,
+                                  double tolerance, PrsmXmlWriterPtr prsm_writer) {
   if (prsm_ptr->getMatchFragNum() <= 5) {
     AlignTypePtr type_ptr = prsm_ptr->getProteoformPtr()->getAlignType();
     ExtremeValuePtr evalue = std::make_shared<ExtremeValue>(1.0, 1.0, 1.0);
     prsm_ptr->setExtremeValuePtr(evalue);
+    prsm_writer->write(prsm_ptr);
     return;
   }
 
@@ -314,262 +321,34 @@ void DprProcessor::processOnePrsm(PrsmPtr prsm_ptr, SpectrumSetPtr spec_set_ptr,
     LOG_DEBUG("p_value " << p_value);
   }
 
-  if (p_value < 0 || (p_value > std::pow(10, -8) && p_value < 0.02)) {
-    DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
-    ExtendMsPtrVec refine_ms_ptr_vec
-        = extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec,
-                                               sp_para_ptr_,
-                                               prsm_ptr->getAdjustedPrecMass());
-    std::vector<double> ms_masses = extend_ms::getExtendMassVec(refine_ms_ptr_vec[0]);
+  if (p_value < 0 || (p_value > std::pow(10, -8) && p_value < 0.01)) {
+    while (pool_ptr_->getQueueSize() >= mng_ptr_->thread_num_ + 2) {
+      boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+    }
+    pool_ptr_->Enqueue(geneTask(spec_set_ptr, prsm_ptr, mng_ptr_,
+                                ptm_residue_map_, mass_table_,
+                                test_num_ptr_, ptm_mass_vec2d_, pool_ptr_));
+  } else {
+    LOG_DEBUG("tolerance " << tolerance);
+    AlignTypePtr type_ptr = prsm_ptr->getProteoformPtr()->getAlignType();
+    LOG_DEBUG("type " << type_ptr->getName());
+    double cand_num = test_num_ptr_->compCandNum(type_ptr, 0, prsm_ptr->getAdjustedPrecMass() - mass_constant::getWaterMass(),
+                                                 tolerance);
 
-    std::vector<int> ms_mass_int(ms_masses.size());
+    std::vector<double> mass_ptm_vec = ptm_mass_vec2d_[prsm_ptr->getProteoformPtr()->getVariablePtmNum()];
 
-    for (size_t k = 0; k < ms_masses.size(); k++) {
-      ms_mass_int[k] = static_cast<int>(ms_masses[k] * mng_ptr_->convert_ratio_) >> 5;
+    for (size_t k = 0; k < mass_ptm_vec.size(); k++) {
+      cand_num += test_num_ptr_->compCandNum(type_ptr, 0,
+                                             prsm_ptr->getAdjustedPrecMass() - mass_constant::getWaterMass() - mass_ptm_vec[k],
+                                             tolerance);
     }
 
-    std::sort(ms_mass_int.begin(), ms_mass_int.end());
-    ms_mass_int.erase(std::unique(ms_mass_int.begin(), ms_mass_int.end()), ms_mass_int.end());
+    if (cand_num == 0) {cand_num = 1;}
 
-    ActivationPtr act = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getActivationPtr();
-    p_value = compPValueMCMC(prsm_ptr, act, ms_mass_int);
-  }
-
-  LOG_DEBUG("tolerance " << tolerance);
-  AlignTypePtr type_ptr = prsm_ptr->getProteoformPtr()->getAlignType();
-  LOG_DEBUG("type " << type_ptr->getName());
-  double cand_num = test_num_ptr_->compCandNum(type_ptr, 0, prsm_ptr->getAdjustedPrecMass() - mass_constant::getWaterMass(),
-                                               tolerance);
-
-  std::vector<double> mass_ptm_vec = ptm_mass_vec2d_[prsm_ptr->getProteoformPtr()->getVariablePtmNum()];
-
-  for (size_t k = 0; k < mass_ptm_vec.size(); k++) {
-    cand_num += test_num_ptr_->compCandNum(type_ptr, 0,
-                                           prsm_ptr->getAdjustedPrecMass() - mass_constant::getWaterMass() - mass_ptm_vec[k],
-                                           tolerance);
-  }
-
-  if (cand_num == 0) {cand_num = 1;}
-
-  LOG_DEBUG("cand_num " << cand_num);
-  ExtremeValuePtr evalue = std::make_shared<ExtremeValue>(p_value, cand_num, 2);
-  prsm_ptr->setExtremeValuePtr(evalue);
-}
-
-double DprProcessor::compPValueMCMC(PrsmPtr prsm_ptr, ActivationPtr act,
-                                    const std::vector<int> & ms_masses) {
-  ProteoformPtr prot_form = prsm_ptr->getProteoformPtr();
-
-  pep_mass_ = residue_util::compResiduePtrVecMass(prot_form->getResSeqPtr()->getResidues());
-  PtmPtrVec ptm_vec = prot_form->getPtmVec();
-
-  ResiduePtrVec residues = prot_form->getResSeqPtr()->getResidues();
-
-  int scr = getMaxScore(residues, ms_masses, act, ptm_vec);
-
-  LOG_DEBUG("matching score: " << scr);
-
-  score_vec_.resize(mng_ptr_->N_ + 1);
-  std::fill(score_vec_.begin(), score_vec_.end(), 0);
-
-  std::vector<long long> mu(mng_ptr_->n_, 1);
-  std::vector<double> p(mng_ptr_->n_, 1.0);
-  std::vector<int> n(mng_ptr_->n_, 0);
-  double p_value = 0.0;
-
-  for (int k = 0; k < mng_ptr_->k_; k++) {
-    std::fill(n.begin(), n.end(), 0);
-    std::fill(score_vec_.begin(), score_vec_.end(), 0);
-    score_vec_[0] = scr;
-    residues = prot_form->getResSeqPtr()->getResidues();
-
-    if (k != 0) {
-      for (size_t i = 0; i < mu.size(); i++) {
-        if (p[i] != 0.0) {
-          mu[i] = static_cast<long long>(1 / p[i]);
-        } else {
-          mu[i] = mu[i - 1];
-        }
-      }
-    }
-    this->z_ = 0;
-    LOG_DEBUG("mu min " << *std::min_element(mu.begin(), mu.end()));
-
-    long mu_min = std::round(*std::min_element(mu.begin(), mu.end()));
-
-    simulateDPR(residues, ms_masses, act, ptm_vec, mu_min, mu);
-
-    for (size_t i = 0; i < score_vec_.size(); i++) {
-      n[score_vec_[i]]++;
-    }
-
-    for (size_t i = 0; i < n.size(); i++) {
-      p[i] = n[i] * 1.0 / mu[i];
-      // LOG_DEBUG("n[" << i << "] " << n[i]);
-    }
-
-    double sum = std::accumulate(p.begin(), p.end(), 0.0);
-    for (size_t i = 0; i < p.size(); i++) {
-      p[i] = p[i] / sum;
-      // LOG_DEBUG("p[" << i << "] " << p[i]);
-    }
-
-    p_value = std::accumulate(p.begin() + scr, p.end(), 0.0);
-
-    LOG_DEBUG("k " << k << " p-value: " << p_value);
-
-    if (p_value > 0.5) {
-      return 1.0;
-    }
-  }
-
-  return p_value;
-}
-
-int DprProcessor::compNumMatched(const std::vector<int> &ms_masses,
-                                 const std::vector<double> &theo_masses) {
-  std::vector<int> theo_mass_int(theo_masses.size());
-
-  for (size_t k = 0; k < theo_masses.size(); k++) {
-    theo_mass_int[k] = static_cast<int>(theo_masses[k] * mng_ptr_->convert_ratio_) >> 5;
-  }
-
-  std::sort(theo_mass_int.begin(), theo_mass_int.end());
-  theo_mass_int.erase(std::unique(theo_mass_int.begin(), theo_mass_int.end()), theo_mass_int.end());
-
-  std::vector<int> match;
-
-  std::set_intersection(ms_masses.begin(), ms_masses.end(),
-                        theo_mass_int.begin(), theo_mass_int.end(),
-                        std::back_inserter(match));
-
-  return static_cast<int>(match.size());
-}
-
-int DprProcessor::compScore(const std::vector<int> & ms_masses,
-                            std::vector<double> n_theo_masses,
-                            std::vector<double> c_theo_masses,
-                            const std::vector<size_t> & change_pos,
-                            const PtmPtrVec & ptm_vec) {
-  std::vector<double> change_masses(n_theo_masses.size(), 0.0);
-  for (size_t i = 0; i < ptm_vec.size(); i++) {
-    double m = ptm_vec[i]->getMonoMass();
-    std::for_each(change_masses.begin() + change_pos[i],
-                  change_masses.end(), [m](double& d) { d += m;});
-  }
-
-  for (size_t i = 0; i < n_theo_masses.size(); i++) {
-    n_theo_masses[i] += change_masses[i];
-  }
-
-  int scr = compNumMatched(ms_masses, n_theo_masses);
-
-  change_masses.resize(c_theo_masses.size());
-  std::fill(change_masses.begin(), change_masses.end(), 0.0);
-  for (size_t i = 0; i < ptm_vec.size(); i++) {
-    double m = ptm_vec[i]->getMonoMass();
-    std::for_each(change_masses.begin() + change_masses.size() - change_pos[i],
-                  change_masses.end(), [m](double& d) { d += m;});
-  }
-
-  for (size_t i = 0; i < c_theo_masses.size(); i++) {
-    c_theo_masses[i] += change_masses[i];
-  }
-
-  scr += compNumMatched(ms_masses, c_theo_masses);
-
-  return scr;
-}
-
-int DprProcessor::getMaxScore(const ResiduePtrVec &residues,
-                              const std::vector<int> & ms_masses,
-                              ActivationPtr act, const PtmPtrVec & ptm_vec) {
-  std::vector<double> n_theo_masses = getNTheoMassVec(residues, act->getNIonTypePtr(),
-                                                      sp_para_ptr_->getMinMass());
-  std::sort(n_theo_masses.begin(), n_theo_masses.end());
-
-  std::vector<double> c_theo_masses = getCTheoMassVec(residues, act->getCIonTypePtr(),
-                                                      sp_para_ptr_->getMinMass());
-  std::sort(c_theo_masses.begin(), c_theo_masses.end());
-
-  std::vector<std::vector<size_t> > possible_change_pos(ptm_vec.size());
-  std::vector<size_t> change_pos(ptm_vec.size());
-
-  if (ptm_vec.size() == 0) {
-    return compScore(ms_masses, n_theo_masses, c_theo_masses, change_pos, ptm_vec);
-  }
-
-  for (size_t i = 0; i < ptm_vec.size(); i++) {
-    ResiduePtrVec possible_res = ptm_residue_map_[ptm_vec[i]];
-    for (size_t k = 0; k < residues.size(); k++) {
-      if (std::find(possible_res.begin(), possible_res.end(), residues[k]) != possible_res.end()) {
-        possible_change_pos[i].push_back(k);
-      }
-    }
-  }
-
-  // random init positions
-  for (size_t i = 0; i < possible_change_pos.size(); i++) {
-    if (possible_change_pos[i].size() == 0) {
-      return 0;
-    } else {
-      std::uniform_int_distribution<size_t> dis(0, possible_change_pos[i].size() - 1);
-      change_pos[i] = dis(mt_);
-    }
-  }
-
-  int max_scr = compScore(ms_masses, n_theo_masses, c_theo_masses, change_pos, ptm_vec);
-
-  // search the max score using greedy method
-  for (size_t i = 0; i < possible_change_pos.size(); i++) {
-    size_t max_idx = change_pos[i];
-    for (size_t k = 0; k < possible_change_pos[i].size(); k++) {
-      change_pos[i] = possible_change_pos[i][k];
-      int scr = compScore(ms_masses, n_theo_masses, c_theo_masses, change_pos, ptm_vec);
-      if (scr > max_scr) {
-        max_idx = possible_change_pos[i][k];
-        max_scr = scr;
-      }
-    }
-    change_pos[i] = max_idx;
-  }
-
-  return max_scr;
-}
-
-void DprProcessor::simulateDPR(ResiduePtrVec &residues, const std::vector<int> & ms_masses,
-                               ActivationPtr act, const PtmPtrVec & ptm_vec,
-                               long omega, const std::vector<long long> & mu) {
-  int score = getMaxScore(residues, ms_masses, act, ptm_vec);
-  while (this->z_ < mng_ptr_->N_) {
-    ResiduePtrVec residues2 = randomTrans(residues);
-
-    int score2 = getMaxScore(residues2, ms_masses, act, ptm_vec);
-
-    if (mu[score2] < omega) return;
-
-    if (mu[score2] > mu[score]) {
-      long Y = std::round(mu[score2] / mu[score]);
-      Y = std::min(Y, 100L);
-      std::uniform_int_distribution<long> omega_dist(static_cast<long>(mu[score]), static_cast<long>(mu[score2]));
-      for (long i = 1; i < Y; i++) {
-        long omega2 = omega_dist(mt_);
-        ResiduePtrVec residues3 = residues2;
-        simulateDPR(residues3, ms_masses, act, ptm_vec, omega2, mu);
-      }
-    }
-
-    if (this->z_ > mng_ptr_->N_) {
-      return;
-    }
-
-    this->z_++;
-
-    this->score_vec_[this->z_] = score2;
-
-    residues = residues2;
-
-    score = score2;
+    LOG_DEBUG("cand_num " << cand_num);
+    ExtremeValuePtr evalue = std::make_shared<ExtremeValue>(p_value, cand_num, 2);
+    prsm_ptr->setExtremeValuePtr(evalue);
+    prsm_writer->write(prsm_ptr);
   }
 }
 

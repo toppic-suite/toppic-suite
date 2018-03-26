@@ -188,7 +188,7 @@ int TopMGProcess(std::map<std::string, std::string> arguments) {
     std::cout << "E-value computation using MCMC - started." << std::endl;
     MCMCMngPtr mcmc_mng_ptr   
         = std::make_shared<MCMCMng>(prsm_para_ptr, "GRAPH_POST", "EVALUE",   
-                                    residue_mod_file_name, max_mod_num);    
+                                    residue_mod_file_name, max_mod_num, thread_num);
     DprProcessorPtr processor = std::make_shared<DprProcessor>(mcmc_mng_ptr);   
     processor->process();    
     processor = nullptr;
