@@ -158,18 +158,20 @@ void addMsPeaks(XmlDOMDocument *xml_doc, xercesc::DOMElement* ms_element,
 }
 
 xercesc::DOMElement* geneAnnoPrsm(XmlDOMDocument* xml_doc, PrsmPtr prsm_ptr,
-                                  PrsmViewMngPtr mng_ptr, bool detail, bool add_ms) {
+                                  PrsmViewMngPtr mng_ptr, bool detail, bool add_ms_peaks) {
   xercesc::DOMElement* prsm_element = xml_doc->createElement("prsm");
   addPrsmHeader(xml_doc, prsm_element, prsm_ptr, mng_ptr);
 
   if (detail) {
-    if (add_ms) {
-      // add ms
-      xercesc::DOMElement* ms_element = xml_doc->createElement("ms");
-      addMsHeader(xml_doc, ms_element, prsm_ptr);
+    xercesc::DOMElement* ms_element = xml_doc->createElement("ms");
+    addMsHeader(xml_doc, ms_element, prsm_ptr);
+
+    if (add_ms_peaks) {
+      // add ms peaks
       addMsPeaks(xml_doc, ms_element, prsm_ptr, mng_ptr);
-      prsm_element->appendChild(ms_element);
     }
+
+    prsm_element->appendChild(ms_element);
 
     // proteoform to view
     xercesc::DOMElement* prot_element = geneAnnoProteoform(xml_doc, prsm_ptr, mng_ptr);
