@@ -222,6 +222,7 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
   try {
     std::string resource_dir = arguments["resourceDir"];
 
+    base_data::init(resource_dir);
     LOG_DEBUG("Init base data completed");
 
     std::string db_file_name = arguments["databaseFileName"];
