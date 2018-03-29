@@ -66,7 +66,7 @@ void Argument::initArguments() {
   arguments_["useFeatureFile"] = "false";
   arguments_["skipList"] = "";
   arguments_["proteo_graph_dis"] = "40";
-  arguments_["useASFDiag"] = "false";  
+  arguments_["useASFDiag"] = "false";
   arguments_["varPtmNumber"] = "10";
   arguments_["varPtmNumInGap"] = "5";
 }
@@ -94,13 +94,6 @@ void Argument::outputArguments(std::ostream &output, std::map<std::string, std::
   output << std::setw(50) << std::left << "Allowed N-terminal forms: " << "\t" << arguments["allowProtMod"] << std::endl;
   output << std::setw(50) << std::left << "Maximum mass shift of modifications: " << "\t" << arguments["maxPtmMass"] << " Da" << std::endl;
   output << std::setw(50) << std::left << "Thread number: " << "\t" << arguments["threadNumber"] << std::endl;
-
-  if (arguments["useGf"] == "true") {
-    output << std::setw(50) << std::left << "E-value computation: " << "\t" << "Generating function" << std::endl;
-  } else {
-    output << std::setw(50) << std::left << "E-value computation: " << "\t" << "Lookup table" << std::endl;
-  }
-
   output << std::setw(50) << std::left << "Modification file name: " << "\t" << arguments["residueModFileName"] << std::endl;
   output << std::setw(50) << std::left << "Gap in proteoform graph: " << "\t" << arguments["proteo_graph_dis"] << std::endl;
   output << std::setw(50) << std::left << "Maximum number of variable PTMs: " << "\t" << arguments["varPtmNumber"] << std::endl;
@@ -116,7 +109,7 @@ void Argument::outputArguments(std::ostream &output, std::map<std::string, std::
 
 void Argument::showUsage(boost::program_options::options_description &desc) {
   std::cout << "Usage: topmg [options] database-file-name spectrum-file-name" << std::endl;
-  std::cout << desc << std::endl; 
+  std::cout << desc << std::endl;
 }
 
 bool Argument::parse(int argc, char* argv[]) {
@@ -147,27 +140,26 @@ bool Argument::parse(int argc, char* argv[]) {
     namespace po = boost::program_options;
     po::options_description display_desc("Options");
 
-    display_desc.add_options() 
-        ("help,h", "Print the help message.") 
+    display_desc.add_options()
+        ("help,h", "Print the help message.")
         ("activation,a", po::value<std::string>(&activation),
          "<CID|HCD|ETD|UVPD|FILE>. Fragmentation method of tandem mass spectra. When FILE is used, fragmentation methods of spectra are given in the input spectral data file. Default value: FILE.")
-        ("fixed-mod,f", po::value<std::string> (&fixed_mod), 
+        ("fixed-mod,f", po::value<std::string> (&fixed_mod),
          "<C57|C58|a fixed modification file>. Fixed modifications. Three available options: C57, C58, or the name of a text file containing the information of fixed modifications. When C57 is selected, carbamidomethylation on cysteine is the only fixed modification. When C58 is selected, carboxymethylation on cysteine is the only fixed modification.")
         ("n-terminal-form,n", po::value<std::string> (&allow_mod),
          "<a list of allowed N-terminal forms>. N-terminal forms of proteins. Four N-terminal forms can be selected: NONE, NME, NME_ACETYLATION, and M_ACETYLATION. NONE stands for no modifications, NME for N-terminal methionine excision, NME_ACETYLATION for N-terminal acetylation after the initiator methionine is removed, and M_ACETYLATION for N-terminal methionine acetylation. When multiple forms are allowed, they are separated by commas. Default value: NONE,NME,NME_ACETYLATION,M_ACETYLATION.")
         ("decoy,d", "Use a decoy protein database to estimate false discovery rates.")
         ("error-tolerance,e", po::value<std::string> (&error_tole), "<a positive integer>. Error tolerance for precursor and fragment masses in PPM. Default value: 15.")
-        ("max-shift,m", po::value<std::string> (&max_ptm_mass), "<a positive number>. Maximum absolute value of the mass shift (in Dalton) of an unexpected modification. Default value: 500.")
+        ("max-shift,m", po::value<std::string> (&max_ptm_mass), "<a positive number>. Maximum absolute value of the mass shift (in Dalton). Default value: 500.")
         ("spectrum-cutoff-type,t", po::value<std::string> (&cutoff_spectral_type), "<EVALUE|FDR>. Spectrum-level cutoff type for filtering identified proteoform spectrum-matches. Default value: EVALUE.")
         ("spectrum-cutoff-value,v", po::value<std::string> (&cutoff_spectral_value), "<a positive number>. Spectrum-level cutoff value for filtering identified proteoform spectrum-matches. Default value: 0.01.")
         ("proteoform-cutoff-type,T", po::value<std::string> (&cutoff_proteoform_type), "<EVALUE|FDR>. Proteoform-level cutoff type for filtering identified proteoform spectrum-matches. Default value: EVALUE.")
         ("proteoform-cutoff-value,V", po::value<std::string> (&cutoff_proteoform_value), "<a positive number>. Proteoform-level cutoff value for filtering identified proteoform spectrum-matches. Default value: 0.01.")
-        ("generating-function,g", "Use the generating function approach to compute p-values and E-values.")
-        ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "<a common modification file>. Specify a text file containing the information of common PTMs for characterization of PTMs in proteoform spectrum-matches.")
+        ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "<a common modification file>. Specify a text file containing the information of common PTMs for constructing proteoform graphs.")
         ("thread-number,u", po::value<std::string> (&thread_number), "<a positive number>. Number of threads used in the computation. Default value: 1.")
         ("use-topfd-feature,x", "Use TopFD feature file for proteoform identification.")
         ("skip-list,l", po::value<std::string>(&skip_list) , "<a text file with its path>. The scans in this file will be skipped.")
-        ("proteo-graph-dis,j", po::value<std::string> (&proteo_graph_dis), "<a positive number>. Gap in constructing proteoform graph. Default value: 40.")        
+        ("proteo-graph-dis,j", po::value<std::string> (&proteo_graph_dis), "<a positive number>. Gap in constructing proteoform graph. Default value: 40.")
         ("var-ptm-in-gap,G", po::value<std::string>(&var_ptm_in_gap) , "<a positive number>. Maximum number of variable PTMs in a proteform graph gap. Default value: 5.")
         ("use-asf-diagonal,D", "Use the ASF-DIAGONAL method for protein filtering.")
         ("var-ptm,P", po::value<std::string>(&var_ptm_num) , "<a positive number>. Maximum number of variable PTMs. Default value: 10.")
@@ -189,7 +181,6 @@ bool Argument::parse(int argc, char* argv[]) {
         ("proteoform-cutoff-value,V", po::value<std::string> (&cutoff_proteoform_value), "")
         ("filtering-result-number,o", po::value<std::string>(&filtering_result_num), "Filtering result number. Default value: 20.")
         ("keep-temp-files,k", "")
-        ("generating-function,g", "")
         ("full-binary-path,b", "Full binary path.")
         ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "")
         ("thread-number,u", po::value<std::string> (&thread_number), "")
@@ -295,10 +286,6 @@ bool Argument::parse(int argc, char* argv[]) {
       arguments_["fullBinaryPath"] = "true";
     }
 
-    if (vm.count("generating-function")) {
-      arguments_["useGf"] = "true";
-    }
-
     if (vm.count("filtering-result-number")) {
       arguments_["filteringResultNumber"] = filtering_result_num;
     }
@@ -347,7 +334,7 @@ bool Argument::validateArguments() {
   if (!boost::filesystem::exists(arguments_["resourceDir"])) {
     boost::filesystem::path p(arguments_["executiveDir"]);
     arguments_["resourceDir"]
-        = p.parent_path().string() + file_util::getFileSeparator() + "etc" + file_util::getFileSeparator() + file_util::getResourceDirName(); 
+        = p.parent_path().string() + file_util::getFileSeparator() + "etc" + file_util::getFileSeparator() + file_util::getResourceDirName();
   }
 
   if (!boost::filesystem::exists(arguments_["oriDatabaseFileName"])) {
