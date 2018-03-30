@@ -93,7 +93,7 @@ void GraphPostProcessor::process() {
     }
   }
 
-  for (int k = 2; k <= mng_ptr_->var_ptm_in_gap_; k++) {
+  for (int k = 2; k <= mng_ptr_->max_known_mods_; k++) {
     std::vector<int> cur_map_mass;
     for (auto it = mass_ptm_map_.begin(); it != mass_ptm_map_.end(); it++) {
       cur_map_mass.push_back(it->first);
