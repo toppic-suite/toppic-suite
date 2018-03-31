@@ -204,7 +204,7 @@ void GraphPostProcessor::process() {
 
         prsm_ptr->setProteoformPtr(new_form);
 
-        prsm_writer->write(prsm_ptr);
+        if (prsm_ptr->getMatchFragNum() > 0) prsm_writer->write(prsm_ptr);
 
         prsm_ptr = prsm_reader->readOnePrsm(fasta_reader,
                                             mng_ptr_->prsm_para_ptr_->getFixModPtrVec());
