@@ -187,8 +187,6 @@ void CompPValueLookupTable::process(const DeconvMsPtrVec &deconv_ms_ptr_vec, Prs
 bool CompPValueLookupTable::inTable(int peak_num, int match_frag_num, int unexpected_shift_num) {
   if (peak_num > 850 || peak_num < 10) return false;
 
-  if (match_frag_num <= 5 || match_frag_num >= 100) return false;
-
   std::vector<int> idx = getFourIndex(peak_num, match_frag_num);
 
   if (unexpected_shift_num == 0) {
@@ -220,6 +218,8 @@ bool CompPValueLookupTable::inTable(const DeconvMsPtrVec &deconv_ms_ptr_vec,
 
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     int match_frag_num = prsm_ptrs[i]->getMatchFragNum();
+    
+    if (match_frag_num <= 5 || match_frag_num >= 100) continue;
 
     int unexpected_shift_num = prsm_ptrs[i]->getProteoformPtr()->getMassShiftNum(MassShiftType::UNEXPECTED);
 
