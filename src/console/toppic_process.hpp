@@ -17,6 +17,7 @@
 
 #include <string>
 #include <map>
+#include <vector>
 
 namespace prot {
 
@@ -27,6 +28,9 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments);
 
 // proteoform clustering + FDR + HTML generation
 int TopPIC_post(std::map<std::string, std::string> & arguments);
+
+int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
+                              const std::vector<std::string> & spec_file_lst);
 
 }  // namespace prot
 
