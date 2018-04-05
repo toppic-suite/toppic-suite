@@ -19,6 +19,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 #include "base/activation.hpp"
 
@@ -37,24 +38,23 @@ class CompPValueMCMC{
       mt_(42),
       min_mass_(mng_ptr->prsm_para_ptr_->getSpParaPtr()->getMinMass()),
       ptm_residue_map_(ptm_residue_map),
-      mass_table_(mass_table) {}
+      mass_table_(mass_table) {
+        mu_.resize(mng_ptr_->n_);
+        std::fill(mu_.begin(), mu_.end(), 1);
+      }
 
   double compPValueMCMC(PrsmPtr prsm_ptr, ActivationPtr act,
                         const std::vector<int> & ms_masses);
 
  private:
-  void simulateDPR(ResiduePtrVec &residues, const std::vector<int> & ms_masses,
-                   ActivationPtr act, const PtmPtrVec & ptm_vec,
-                   long omega, const std::vector<long long> & mu);
+  void simulateDPR(ResiduePtrVec &residues, long omega);
 
   ResiduePtrVec randomTrans(ResiduePtrVec residues);
 
-  int getMaxScore(const ResiduePtrVec &residues, const std::vector<int> & ms_masses,
-                  ActivationPtr act, const PtmPtrVec & ptm_vec);
+  int getMaxScore(const ResiduePtrVec &residues);
 
-  int compScore(const std::vector<int> & ms_masses,
-                std::vector<double> n_theo_masses, std::vector<double> c_theo_masses,
-                const std::vector<size_t> & change_pos, const PtmPtrVec & ptm_vec);
+  int compScore(std::vector<double> n_theo_masses, std::vector<double> c_theo_masses,
+                const std::vector<size_t> & change_pos);
 
   int compNumMatched(const std::vector<int> &ms_masses, const std::vector<double> &theo_masses);
 
@@ -73,6 +73,14 @@ class CompPValueMCMC{
   int z_;
 
   double pep_mass_;
+
+  std::vector<long long> mu_;
+
+  ActivationPtr act_;
+
+  PtmPtrVec ptm_vec_;
+
+  std::vector<int> ms_masses_;
 };
 
 typedef std::shared_ptr<CompPValueMCMC> CompPValueMCMCPtr;

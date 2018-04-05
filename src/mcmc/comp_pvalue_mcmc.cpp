@@ -22,39 +22,37 @@
 
 namespace prot {
 
-std::vector<double> getNTheoMassVec(const ResiduePtrVec &residues,
-                                    IonTypePtr n_ion_type_ptr,
-                                    double min_mass) {
-  std::vector<double> theo_masses;
-  ResSeqPtr res_seq = std::make_shared<ResidueSeq>(residues);
-  BpSpecPtr bp_spec = std::make_shared<BpSpec>(res_seq);
-  BreakPointPtrVec bps = bp_spec->getBreakPointPtrVec();
-  double max_mass = res_seq->getSeqMass() - min_mass;
-  for (size_t i = 0; i < bps.size(); i++) {
-    double n_mass = bps[i]->getNTermMass(n_ion_type_ptr);
+void getTheoMassVec(const ResiduePtrVec &residues,
+                    IonTypePtr n_ion_type_ptr,
+                    IonTypePtr c_ion_type_ptr,
+                    double min_mass,
+                    std::vector<double> & n_theo_masses,
+                    std::vector<double> & c_theo_masses) {
+  double res_mass = residue_util::compResiduePtrVecMass(residues);
+  double max_mass = res_mass + mass_constant::getWaterMass() - min_mass;
+
+  double prm = 0;
+
+  for (size_t i = 0; i < residues.size(); i++) {
+    prm += residues[i]->getMass();
+    double srm = res_mass - prm;
+
+    double n_mass = prm + n_ion_type_ptr->getShift();
     if (min_mass <= n_mass && n_mass <= max_mass) {
-      theo_masses.push_back(n_mass);
+      n_theo_masses.push_back(n_mass);
+    }
+
+    double c_mass = srm + c_ion_type_ptr->getShift();
+    if (min_mass <= c_mass && c_mass <= max_mass) {
+      c_theo_masses.push_back(c_mass);
     }
   }
-  return theo_masses;
+
+  std::sort(n_theo_masses.begin(), n_theo_masses.end());
+
+  std::sort(c_theo_masses.begin(), c_theo_masses.end());
 }
 
-std::vector<double> getCTheoMassVec(const ResiduePtrVec &residues,
-                                    IonTypePtr c_ion_type_ptr,
-                                    double min_mass) {
-  std::vector<double> theo_masses;
-  ResSeqPtr res_seq = std::make_shared<ResidueSeq>(residues);
-  BpSpecPtr bp_spec = std::make_shared<BpSpec>(res_seq);
-  BreakPointPtrVec bps = bp_spec->getBreakPointPtrVec();
-  double max_mass = res_seq->getSeqMass() - min_mass;
-  for (size_t i = 0; i < bps.size(); i++) {
-    double n_mass = bps[i]->getCTermMass(c_ion_type_ptr);
-    if (min_mass <= n_mass && n_mass <= max_mass) {
-      theo_masses.push_back(n_mass);
-    }
-  }
-  return theo_masses;
-}
 
 ResiduePtrVec CompPValueMCMC::randomTrans(ResiduePtrVec residues) {
   double mass = 0.0;
@@ -131,21 +129,25 @@ int CompPValueMCMC::compNumMatched(const std::vector<int> &ms_masses,
 
 double CompPValueMCMC::compPValueMCMC(PrsmPtr prsm_ptr, ActivationPtr act,
                                       const std::vector<int> & ms_masses) {
+  this->act_ = act;
+
+  this->ms_masses_ = ms_masses;
+
   ProteoformPtr prot_form = prsm_ptr->getProteoformPtr();
 
   pep_mass_ = residue_util::compResiduePtrVecMass(prot_form->getResSeqPtr()->getResidues());
-  PtmPtrVec ptm_vec = prot_form->getPtmVec();
+
+  this->ptm_vec_ = prot_form->getPtmVec();
 
   ResiduePtrVec residues = prot_form->getResSeqPtr()->getResidues();
 
-  int scr = getMaxScore(residues, ms_masses, act, ptm_vec);
+  int scr = getMaxScore(residues);
 
   LOG_DEBUG("matching score: " << scr);
 
   score_vec_.resize(mng_ptr_->N_ + 1);
   std::fill(score_vec_.begin(), score_vec_.end(), 0);
 
-  std::vector<long long> mu(mng_ptr_->n_, 1);
   std::vector<double> p(mng_ptr_->n_, 1.0);
   std::vector<int> n(mng_ptr_->n_, 0);
   double p_value = 0.0;
@@ -157,27 +159,27 @@ double CompPValueMCMC::compPValueMCMC(PrsmPtr prsm_ptr, ActivationPtr act,
     residues = prot_form->getResSeqPtr()->getResidues();
 
     if (k != 0) {
-      for (size_t i = 0; i < mu.size(); i++) {
+      for (size_t i = 0; i < mu_.size(); i++) {
         if (p[i] != 0.0) {
-          mu[i] = static_cast<long long>(1 / p[i]);
+          mu_[i] = static_cast<long long>(1 / p[i]);
         } else {
-          mu[i] = mu[i - 1];
+          mu_[i] = mu_[i - 1];
         }
       }
     }
     this->z_ = 0;
-    LOG_DEBUG("mu min " << *std::min_element(mu.begin(), mu.end()));
+    LOG_DEBUG("mu min " << *std::min_element(mu_.begin(), mu_.end()));
 
-    long mu_min = std::round(*std::min_element(mu.begin(), mu.end()));
+    long mu_min = std::round(*std::min_element(mu_.begin(), mu_.end()));
 
-    simulateDPR(residues, ms_masses, act, ptm_vec, mu_min, mu);
+    simulateDPR(residues, mu_min);
 
     for (size_t i = 0; i < score_vec_.size(); i++) {
       n[score_vec_[i]]++;
     }
 
     for (size_t i = 0; i < n.size(); i++) {
-      p[i] = n[i] * 1.0 / mu[i];
+      p[i] = n[i] * 1.0 / mu_[i];
     }
 
     double sum = std::accumulate(p.begin(), p.end(), 0.0);
@@ -197,59 +199,60 @@ double CompPValueMCMC::compPValueMCMC(PrsmPtr prsm_ptr, ActivationPtr act,
   return p_value;
 }
 
-int CompPValueMCMC::compScore(const std::vector<int> & ms_masses,
-                              std::vector<double> n_theo_masses,
+int CompPValueMCMC::compScore(std::vector<double> n_theo_masses,
                               std::vector<double> c_theo_masses,
-                              const std::vector<size_t> & change_pos,
-                              const PtmPtrVec & ptm_vec) {
+                              const std::vector<size_t> & change_pos) {
   std::vector<double> change_masses(n_theo_masses.size(), 0.0);
-  for (size_t i = 0; i < ptm_vec.size(); i++) {
-    double m = ptm_vec[i]->getMonoMass();
-    std::for_each(change_masses.begin() + change_pos[i],
-                  change_masses.end(), [m](double& d) { d += m;});
+
+  for (size_t i = 0; i < ptm_vec_.size(); i++) {
+    if (change_pos[i] <= change_masses.size()) {
+      double m = ptm_vec_[i]->getMonoMass();
+      std::for_each(change_masses.begin() + change_pos[i],
+                    change_masses.end(), [m](double& d) { d += m;});
+    }
   }
 
   for (size_t i = 0; i < n_theo_masses.size(); i++) {
     n_theo_masses[i] += change_masses[i];
   }
 
-  int scr = compNumMatched(ms_masses, n_theo_masses);
+  int scr = compNumMatched(ms_masses_, n_theo_masses);
 
   change_masses.resize(c_theo_masses.size());
   std::fill(change_masses.begin(), change_masses.end(), 0.0);
-  for (size_t i = 0; i < ptm_vec.size(); i++) {
-    double m = ptm_vec[i]->getMonoMass();
-    std::for_each(change_masses.begin() + change_masses.size() - change_pos[i],
-                  change_masses.end(), [m](double& d) { d += m;});
+  for (size_t i = 0; i < ptm_vec_.size(); i++) {
+    if (change_pos[i] <= change_masses.size()) {
+      double m = ptm_vec_[i]->getMonoMass();
+      std::for_each(change_masses.begin() + change_masses.size() - change_pos[i],
+                    change_masses.end(), [m](double& d) { d += m;});
+    }
   }
 
   for (size_t i = 0; i < c_theo_masses.size(); i++) {
     c_theo_masses[i] += change_masses[i];
   }
 
-  scr += compNumMatched(ms_masses, c_theo_masses);
+  scr += compNumMatched(ms_masses_, c_theo_masses);
 
   return scr;
 }
 
-int CompPValueMCMC::getMaxScore(const ResiduePtrVec &residues,
-                                const std::vector<int> & ms_masses,
-                                ActivationPtr act, const PtmPtrVec & ptm_vec) {
-  std::vector<double> n_theo_masses = getNTheoMassVec(residues, act->getNIonTypePtr(), min_mass_);
-  std::sort(n_theo_masses.begin(), n_theo_masses.end());
+int CompPValueMCMC::getMaxScore(const ResiduePtrVec &residues) {
+  std::vector<double> n_theo_masses;
+  std::vector<double> c_theo_masses;
 
-  std::vector<double> c_theo_masses = getCTheoMassVec(residues, act->getCIonTypePtr(), min_mass_);
-  std::sort(c_theo_masses.begin(), c_theo_masses.end());
+  getTheoMassVec(residues, act_->getNIonTypePtr(), act_->getCIonTypePtr(),
+                 min_mass_, n_theo_masses, c_theo_masses);
 
-  std::vector<std::vector<size_t> > possible_change_pos(ptm_vec.size());
-  std::vector<size_t> change_pos(ptm_vec.size());
+  std::vector<std::vector<size_t> > possible_change_pos(ptm_vec_.size());
+  std::vector<size_t> change_pos(ptm_vec_.size());
 
-  if (ptm_vec.size() == 0) {
-    return compScore(ms_masses, n_theo_masses, c_theo_masses, change_pos, ptm_vec);
+  if (ptm_vec_.size() == 0) {
+    return compScore(n_theo_masses, c_theo_masses, change_pos);
   }
 
-  for (size_t i = 0; i < ptm_vec.size(); i++) {
-    ResiduePtrVec possible_res = ptm_residue_map_[ptm_vec[i]];
+  for (size_t i = 0; i < ptm_vec_.size(); i++) {
+    ResiduePtrVec possible_res = ptm_residue_map_[ptm_vec_[i]];
     for (size_t k = 0; k < residues.size(); k++) {
       if (std::find(possible_res.begin(), possible_res.end(), residues[k]) != possible_res.end()) {
         possible_change_pos[i].push_back(k);
@@ -262,19 +265,18 @@ int CompPValueMCMC::getMaxScore(const ResiduePtrVec &residues,
     if (possible_change_pos[i].size() == 0) {
       return 0;
     } else {
-      std::uniform_int_distribution<size_t> dis(0, possible_change_pos[i].size() - 1);
-      change_pos[i] = dis(mt_);
+      change_pos[i] = possible_change_pos[i][0];
     }
   }
 
-  int max_scr = compScore(ms_masses, n_theo_masses, c_theo_masses, change_pos, ptm_vec);
+  int max_scr = compScore(n_theo_masses, c_theo_masses, change_pos);
 
   // search the max score using greedy method
   for (size_t i = 0; i < possible_change_pos.size(); i++) {
     size_t max_idx = change_pos[i];
     for (size_t k = 0; k < possible_change_pos[i].size(); k++) {
       change_pos[i] = possible_change_pos[i][k];
-      int scr = compScore(ms_masses, n_theo_masses, c_theo_masses, change_pos, ptm_vec);
+      int scr = compScore(n_theo_masses, c_theo_masses, change_pos);
       if (scr > max_scr) {
         max_idx = possible_change_pos[i][k];
         max_scr = scr;
@@ -286,25 +288,23 @@ int CompPValueMCMC::getMaxScore(const ResiduePtrVec &residues,
   return max_scr;
 }
 
-void CompPValueMCMC::simulateDPR(ResiduePtrVec &residues, const std::vector<int> & ms_masses,
-                                 ActivationPtr act, const PtmPtrVec & ptm_vec,
-                                 long omega, const std::vector<long long> & mu) {
-  int score = getMaxScore(residues, ms_masses, act, ptm_vec);
+void CompPValueMCMC::simulateDPR(ResiduePtrVec &residues, long omega) {
+  int score = getMaxScore(residues);
   while (this->z_ < mng_ptr_->N_) {
     ResiduePtrVec residues2 = randomTrans(residues);
 
-    int score2 = getMaxScore(residues2, ms_masses, act, ptm_vec);
+    int score2 = getMaxScore(residues2);
 
-    if (mu[score2] < omega) return;
+    if (mu_[score2] < omega) return;
 
-    if (mu[score2] > mu[score]) {
-      long Y = std::round(mu[score2] / mu[score]);
+    if (mu_[score2] > mu_[score]) {
+      long Y = std::round(mu_[score2] / mu_[score]);
       Y = std::min(Y, 100L);
-      std::uniform_int_distribution<long> omega_dist(static_cast<long>(mu[score]), static_cast<long>(mu[score2]));
+      std::uniform_int_distribution<long> omega_dist(static_cast<long>(mu_[score]), static_cast<long>(mu_[score2]));
       for (long i = 1; i < Y; i++) {
         long omega2 = omega_dist(mt_);
         ResiduePtrVec residues3 = residues2;
-        simulateDPR(residues3, ms_masses, act, ptm_vec, omega2, mu);
+        simulateDPR(residues3, omega2);
       }
     }
 
