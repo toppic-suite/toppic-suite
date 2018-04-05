@@ -63,7 +63,7 @@ void Argument::initArguments() {
   arguments_["filteringResultNumber"] = "20";
   arguments_["residueModFileName"] = "";
   arguments_["threadNumber"] = "1";
-  arguments_["useFeatureFile"] = "false";
+  arguments_["useFeatureFile"] = "true";
   arguments_["skipList"] = "";
   arguments_["proteo_graph_dis"] = "40";
   arguments_["useASFDiag"] = "false";
@@ -157,7 +157,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("proteoform-cutoff-value,V", po::value<std::string> (&cutoff_proteoform_value), "<a positive number>. Proteoform-level cutoff value for filtering identified proteoform spectrum-matches. Default value: 0.01.")
         ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "<a common modification file>. Specify a text file containing the information of common PTMs for constructing proteoform graphs.")
         ("thread-number,u", po::value<std::string> (&thread_number), "<a positive number>. Number of threads used in the computation. Default value: 1.")
-        ("use-topfd-feature,x", "Use TopFD feature file for proteoform identification.")
+        ("no-topfd-feature,x", "No TopFD feature file for proteoform identification.")
         ("skip-list,l", po::value<std::string>(&skip_list) , "<a text file with its path>. The scans in this file will be skipped.")
         ("proteo-graph-dis,j", po::value<std::string> (&proteo_graph_dis), "<a positive number>. Gap in constructing proteoform graph. Default value: 40.")
         ("var-ptm-in-gap,G", po::value<std::string>(&var_ptm_in_gap) , "<a positive number>. Maximum number of variable PTMs in a proteform graph gap. Default value: 5.")
@@ -184,7 +184,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("full-binary-path,b", "Full binary path.")
         ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "")
         ("thread-number,u", po::value<std::string> (&thread_number), "")
-        ("use-topfd-feature,x", "")
+        ("no-topfd-feature,x", "")
         ("skip-list,l", po::value<std::string>(&skip_list) , "")
         ("proteo-graph-dis,j", po::value<std::string> (&proteo_graph_dis), "")
         ("var-ptm-in-gap,G", po::value<std::string>(&var_ptm_in_gap) , "")
@@ -302,8 +302,8 @@ bool Argument::parse(int argc, char* argv[]) {
       arguments_["threadNumber"] = thread_number;
     }
 
-    if (vm.count("use-topfd-feature")) {
-      arguments_["useFeatureFile"] = "true";
+    if (vm.count("no-topfd-feature")) {
+      arguments_["useFeatureFile"] = "false";
     }
 
     if (vm.count("skip-list")) {
@@ -379,7 +379,7 @@ bool Argument::validateArguments() {
     std::string feature_file_name = spec_file_name.substr(0, spec_file_name.length() - 12) + ".feature";
 
     if (!boost::filesystem::exists(feature_file_name)) {
-      LOG_ERROR("TopFD feature file " << feature_file_name << " does not exist!");
+      LOG_ERROR("TopFD feature file does not exist! Please use -x option.");
       return false;
     }
   }

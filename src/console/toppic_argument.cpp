@@ -62,7 +62,7 @@ void Argument::initArguments() {
   arguments_["filteringResultNumber"] = "20";
   arguments_["residueModFileName"] = "";
   arguments_["threadNumber"] = "1";
-  arguments_["useFeatureFile"] = "false";
+  arguments_["useFeatureFile"] = "true";
   arguments_["skipList"] = "";
 }
 
@@ -168,7 +168,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "<a common modification file>. Specify a text file containing the information of common PTMs for characterization of PTMs in proteoform spectrum-matches.")
         ("miscore-threshold,s", po::value<std::string> (&local_threshold), "<a positive number between 0 and 1>. Score threshold (modification identification score) for filtering results of PTM characterization. Default value: 0.45.")
         ("thread-number,u", po::value<std::string> (&thread_number), "<positive number>. Number of threads used in the computation. Default value: 1.")
-        ("use-topfd-feature,x", "Use TopFD feature file for proteoform identification.")
+        ("no-topfd-feature,x", "No TopFD feature file for proteoform identification.")
         ("skip-list,l", po::value<std::string>(&skip_list) , "<a text file with its path>. The scans in this file will be skipped.")
         ("output,o", po::value<std::string>(&combined_output_name) , "The output file name for the combined results. Default: combined.")
         ("keep-temp-files,k", "Keep temporary files.");
@@ -197,7 +197,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("num-combined-spectra,r", po::value<std::string> (&group_num), "")
         ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "")
         ("thread-number,u", po::value<std::string> (&thread_number), "")
-        ("use-topfd-feature,x", "")
+        ("no-topfd-feature,x", "")
         ("output,o", po::value<std::string>(&combined_output_name) , "")
         ("skip-list,l", po::value<std::string>(&skip_list) , "")
         ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name with its path.")
@@ -333,8 +333,8 @@ bool Argument::parse(int argc, char* argv[]) {
       arguments_["threadNumber"] = thread_number;
     }
 
-    if (vm.count("use-topfd-feature")) {
-      arguments_["useFeatureFile"] = "true";
+    if (vm.count("no-topfd-feature")) {
+      arguments_["useFeatureFile"] = "false";
     }
 
     if (vm.count("skip-list")) {
