@@ -162,8 +162,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("proteo-graph-dis,j", po::value<std::string> (&proteo_graph_dis), "<a positive number>. Gap in constructing proteoform graph. Default value: 40.")
         ("var-ptm-in-gap,G", po::value<std::string>(&var_ptm_in_gap) , "<a positive number>. Maximum number of variable PTMs in a proteform graph gap. Default value: 5.")
         ("use-asf-diagonal,D", "Use the ASF-DIAGONAL method for protein filtering.")
-        ("var-ptm,P", po::value<std::string>(&var_ptm_num) , "<a positive number>. Maximum number of variable PTMs. Default value: 10.")
-        ("keep-temp-files,k", "Keep temporary files.");
+        ("var-ptm,P", po::value<std::string>(&var_ptm_num) , "<a positive number>. Maximum number of variable PTMs. Default value: 10.");
 
     po::options_description desc("Options");
 
@@ -180,7 +179,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("proteoform-cutoff-type,T", po::value<std::string> (&cutoff_proteoform_type), "")
         ("proteoform-cutoff-value,V", po::value<std::string> (&cutoff_proteoform_value), "")
         ("filtering-result-number,o", po::value<std::string>(&filtering_result_num), "Filtering result number. Default value: 20.")
-        ("keep-temp-files,k", "")
+        ("keep-temp-files,k", "Keep temporary files.")
         ("full-binary-path,b", "Full binary path.")
         ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "")
         ("thread-number,u", po::value<std::string> (&thread_number), "")

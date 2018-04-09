@@ -283,7 +283,7 @@ std::function<void()> geneTask(SpectrumSetPtr spec_set_ptr,
     if (cand_num == 0) {cand_num = 1;}
 
     LOG_DEBUG("cand_num " << cand_num);
-    ExtremeValuePtr evalue = std::make_shared<ExtremeValue>(p_value, cand_num, 2);
+    ExtremeValuePtr evalue = std::make_shared<ExtremeValue>(p_value, cand_num, 3.15);
     prsm_ptr->setExtremeValuePtr(evalue);
 
     boost::thread::id thread_id = boost::this_thread::get_id();
@@ -346,7 +346,7 @@ void DprProcessor::processOnePrsm(PrsmPtr prsm_ptr, SpectrumSetPtr spec_set_ptr,
     if (cand_num == 0) {cand_num = 1;}
 
     LOG_DEBUG("cand_num " << cand_num);
-    ExtremeValuePtr evalue = std::make_shared<ExtremeValue>(p_value, cand_num, 2);
+    ExtremeValuePtr evalue = std::make_shared<ExtremeValue>(p_value, cand_num, 3.15);
     prsm_ptr->setExtremeValuePtr(evalue);
     prsm_writer->write(prsm_ptr);
   }
