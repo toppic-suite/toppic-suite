@@ -47,7 +47,7 @@ class MCMCMng {
 
   int n_ = 100;
 
-  int N_ = 15000;
+  int N_ = 10000;
 
   int k_ = 3;
 

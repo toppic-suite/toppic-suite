@@ -265,7 +265,8 @@ int CompPValueMCMC::getMaxScore(const ResiduePtrVec &residues) {
     if (possible_change_pos[i].size() == 0) {
       return 0;
     } else {
-      change_pos[i] = possible_change_pos[i][0];
+      std::uniform_int_distribution<size_t> dis(0, possible_change_pos[i].size() - 1);
+      change_pos[i] = possible_change_pos[i][dis(mt_)];
     }
   }
 

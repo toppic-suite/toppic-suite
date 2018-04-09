@@ -58,13 +58,13 @@ void PrsmTableWriter::write() {
       << "Proteoform" << "\t"
       << "#unexpected modifications" << "\t"
       << "MIScore" << "\t"
+      << "#variable PTMs" << "\t"
       << "#matched peaks" << "\t"
       << "#matched fragment ions" << "\t"
       << "P-value" << "\t"
       << "E-value" << "\t"
       << "Q-value (spectral FDR)" << "\t"
-      << "Proteoform FDR" << "\t"
-      << "#variable PTMs" << std::endl;
+      << "Proteoform FDR" << std::endl;
 
   std::string input_file_name = file_util::basename(spectrum_file_name) + "." + input_file_ext_;
   std::string db_file_name = prsm_para_ptr_->getSearchDbFileName();
@@ -156,6 +156,7 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
       << prsm_ptr->getProteoformPtr()->getProteinMatchSeq() << "\t"
       << ptm_num << "\t"
       << prsm_ptr->getProteoformPtr()->getMIScore() << "\t"
+      << prsm_ptr->getProteoformPtr()->getVariablePtmNum() << "\t"
       << prsm_ptr->getMatchPeakNum() << "\t"
       << prsm_ptr->getMatchFragNum() << "\t"
       << prsm_ptr->getPValue() << "\t"
@@ -167,14 +168,13 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   } else {
     file << "-" << "\t";
   }
+
   double proteoform_fdr = prsm_ptr->getProteoformFdr();
   if (proteoform_fdr >= 0) {
-    file << proteoform_fdr << "\t";
+    file << proteoform_fdr << std::endl;
   } else {
-    file << "-" << "\t";
+    file << "-" << std::endl;
   }
-
-  file << prsm_ptr->getProteoformPtr()->getVariablePtmNum() << std::endl;
 }
 
 }  // namespace prot
