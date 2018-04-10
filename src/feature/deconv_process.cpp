@@ -15,6 +15,8 @@
 #include <string>
 #include <iomanip>
 
+#include <boost/filesystem.hpp>
+
 #include "base/logger.hpp"
 #include "base/file_util.hpp"
 #include "base/version.hpp"
@@ -85,6 +87,14 @@ void DeconvProcess::process() {
   std::string ms1_msalign_name, ms2_msalign_name;
   ms1_msalign_name = file_util::basename(file_name) + "_ms1.msalign";
   ms2_msalign_name = file_util::basename(file_name) + "_ms2.msalign";
+
+  if (boost::filesystem::exists(file_util::basename(file_name) + "_ms1.env")) {
+    boost::filesystem::remove(file_util::basename(file_name) + "_ms1.env"); 
+  }
+
+  if (boost::filesystem::exists(file_util::basename(file_name) + "_ms2.env")) {
+    boost::filesystem::remove(file_util::basename(file_name) + "_ms2.env"); 
+  }
 
   std::ofstream ms1_msalign_of(ms1_msalign_name, std::ofstream::out);
   std::ofstream ms2_msalign_of(ms2_msalign_name, std::ofstream::out);
