@@ -43,7 +43,7 @@ void Argument::initArguments() {
   arguments_["outMultipleMass"] = "false";
   arguments_["precWindow"] = "3.0";
   arguments_["doFinalFiltering"] = "true";
-  arguments_["outputMatchEnv"] = "false";
+  arguments_["outputMatchEnv"] = "true";
 }
 
 void Argument::showUsage(boost::program_options::options_description &desc) {
@@ -92,9 +92,8 @@ bool Argument::parse(int argc, char* argv[]) {
         ("precursor-window,w", po::value<std::string> (&prec_window), "")
         ("missing-level-one,n", "")
         ("multiple-mass,u", "Output multiple masses for one envelope.")
-        ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), "Spectrum file name with its path.")
         ("keep,k", "Report monoisotopic masses extracted from low quality isotopic envelopes.")
-        ("output-envelope-details,d", "Output env files for detailed info on envelopes.")
+        ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), "Spectrum file name with its path.")
         ;
 
     po::positional_options_description positional_options;
@@ -153,10 +152,6 @@ bool Argument::parse(int argc, char* argv[]) {
 
     if (vm.count("missing-level-one")) {
       arguments_["missingLevelOne"] = "true";
-    }
-
-    if (vm.count("output-envelope-details")) {
-      arguments_["outputMatchEnv"] = "true";
     }
 
     if (vm.count("multiple-mass")) {

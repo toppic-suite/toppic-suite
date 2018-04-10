@@ -45,7 +45,7 @@ void write_env(std::ofstream &file, MsHeaderPtr header, MatchEnvPtr match_env) {
 
   for (int i = 0; i < theo_env->getPeakNum(); i++) {
     file << theo_env->getMz(i) << " " << theo_env->getIntensity(i) << " "
-        << real_env->isExist(i) << " " << real_env->getPeakIdx(i) << " "
+        << (real_env->isExist(i) ? "True" : "False") << " " << real_env->getPeakIdx(i) << " "
         << real_env->getMz(i) << " " << real_env->getIntensity(i) << std::endl;
   }
 
