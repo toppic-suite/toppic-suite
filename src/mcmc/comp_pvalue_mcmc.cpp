@@ -107,8 +107,7 @@ ResiduePtrVec CompPValueMCMC::randomTrans(ResiduePtrVec residues) {
   return residues;
 }
 
-int CompPValueMCMC::compNumMatched(const std::vector<int> &ms_masses,
-                                   const std::vector<double> &theo_masses) {
+int CompPValueMCMC::compNumMatched(const std::vector<double> &theo_masses) {
   std::vector<int> theo_mass_int(theo_masses.size());
 
   for (size_t k = 0; k < theo_masses.size(); k++) {
@@ -120,7 +119,7 @@ int CompPValueMCMC::compNumMatched(const std::vector<int> &ms_masses,
 
   std::vector<int> match;
 
-  std::set_intersection(ms_masses.begin(), ms_masses.end(),
+  std::set_intersection(ms_masses_.begin(), ms_masses_.end(),
                         theo_mass_int.begin(), theo_mass_int.end(),
                         std::back_inserter(match));
 
@@ -191,7 +190,7 @@ double CompPValueMCMC::compPValueMCMC(PrsmPtr prsm_ptr, ActivationPtr act,
 
     LOG_DEBUG("k " << k << " p-value: " << p_value);
 
-    if (p_value > 0.5) {
+    if (p_value > 0.2) {
       return 1.0;
     }
   }
@@ -199,8 +198,59 @@ double CompPValueMCMC::compPValueMCMC(PrsmPtr prsm_ptr, ActivationPtr act,
   return p_value;
 }
 
-int CompPValueMCMC::compScore(std::vector<double> n_theo_masses,
-                              std::vector<double> c_theo_masses,
+int CompPValueMCMC::updateScore(std::vector<double> & n_theo_masses,
+                                std::vector<double> & c_theo_masses,
+                                int pos_prev, int pos_curr, int k, int scr) {
+  if (pos_prev == pos_curr) return scr;
+  double ptm_mass = ptm_vec_[k]->getMonoMass();
+  int old_scr = 0;
+  int update_scr = 0;
+  int len = std::abs(pos_curr - pos_prev);
+  std::vector<double> old_n_theo(len, 0);
+  std::vector<double> old_c_theo(len, 0);
+  std::vector<double> update_n_theo(len, 0);
+  std::vector<double> update_c_theo(len, 0);
+
+  if (pos_curr > pos_prev) {
+    // update N
+    for (int i = pos_prev; i < pos_curr; i++) {
+      old_n_theo[i - pos_prev] = n_theo_masses[i];
+      n_theo_masses[i] -= ptm_mass;
+      update_n_theo[i - pos_prev] = n_theo_masses[i];
+    }
+    // update C
+    for (int i = pos_prev; i < pos_curr; i++) {
+      old_c_theo[i - pos_prev] = c_theo_masses[c_theo_masses.size() - 1 - i];
+      c_theo_masses[c_theo_masses.size() - 1 - i] += ptm_mass;
+      update_c_theo[i - pos_prev] = c_theo_masses[c_theo_masses.size() - 1 - i];
+    }
+  } else if (pos_curr < pos_prev) {
+    // udpate N
+    for (int i = pos_curr; i < pos_prev; i++) {
+      old_n_theo[i - pos_curr] = n_theo_masses[i];
+      n_theo_masses[i] += ptm_mass;
+      update_n_theo[i - pos_curr] = n_theo_masses[i];
+    }
+    // udpate C
+    for (int i = pos_curr; i < pos_prev; i++) {
+      old_c_theo[i - pos_curr] = c_theo_masses[c_theo_masses.size() - 1 - i];
+      c_theo_masses[c_theo_masses.size() - 1 - i] -= ptm_mass;
+      update_c_theo[i - pos_curr] = c_theo_masses[c_theo_masses.size() - 1 - i];
+    }
+  }
+
+  old_scr += compNumMatched(old_n_theo);
+  old_scr += compNumMatched(old_c_theo);
+
+  update_scr += compNumMatched(update_n_theo);
+  update_scr += compNumMatched(update_c_theo);
+
+  return scr - old_scr + update_scr;
+}
+
+// call this first
+int CompPValueMCMC::compScore(std::vector<double> & n_theo_masses,
+                              std::vector<double> & c_theo_masses,
                               const std::vector<size_t> & change_pos) {
   std::vector<double> change_masses(n_theo_masses.size(), 0.0);
 
@@ -216,7 +266,7 @@ int CompPValueMCMC::compScore(std::vector<double> n_theo_masses,
     n_theo_masses[i] += change_masses[i];
   }
 
-  int scr = compNumMatched(ms_masses_, n_theo_masses);
+  int scr = compNumMatched(n_theo_masses);
 
   change_masses.resize(c_theo_masses.size());
   std::fill(change_masses.begin(), change_masses.end(), 0.0);
@@ -232,7 +282,7 @@ int CompPValueMCMC::compScore(std::vector<double> n_theo_masses,
     c_theo_masses[i] += change_masses[i];
   }
 
-  scr += compNumMatched(ms_masses_, c_theo_masses);
+  scr += compNumMatched(c_theo_masses);
 
   return scr;
 }
@@ -270,20 +320,27 @@ int CompPValueMCMC::getMaxScore(const ResiduePtrVec &residues) {
     }
   }
 
+  // this compute the score and adjust the theoretical masses
   int max_scr = compScore(n_theo_masses, c_theo_masses, change_pos);
+
+  int scr = max_scr;
 
   // search the max score using greedy method
   for (size_t i = 0; i < possible_change_pos.size(); i++) {
     size_t max_idx = change_pos[i];
+    size_t pos_prev = change_pos[i];
     for (size_t k = 0; k < possible_change_pos[i].size(); k++) {
-      change_pos[i] = possible_change_pos[i][k];
-      int scr = compScore(n_theo_masses, c_theo_masses, change_pos);
+      scr = updateScore(n_theo_masses, c_theo_masses,
+                        pos_prev, possible_change_pos[i][k], i, scr);
+      pos_prev = possible_change_pos[i][k];
       if (scr > max_scr) {
         max_idx = possible_change_pos[i][k];
         max_scr = scr;
       }
     }
-    change_pos[i] = max_idx;
+    updateScore(n_theo_masses, c_theo_masses,
+                pos_prev, max_idx, i, scr);
+    scr = max_scr;
   }
 
   return max_scr;
@@ -311,6 +368,10 @@ void CompPValueMCMC::simulateDPR(ResiduePtrVec &residues, long omega) {
 
     if (this->z_ > mng_ptr_->N_) {
       return;
+    }
+
+    if (this->z_ % 500 == 0) {
+      LOG_DEBUG("z " << this->z_);
     }
 
     this->z_++;

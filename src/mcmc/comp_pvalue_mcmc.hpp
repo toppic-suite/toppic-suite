@@ -53,10 +53,15 @@ class CompPValueMCMC{
 
   int getMaxScore(const ResiduePtrVec &residues);
 
-  int compScore(std::vector<double> n_theo_masses, std::vector<double> c_theo_masses,
+  int compScore(std::vector<double> & n_theo_masses,
+                std::vector<double> &c_theo_masses,
                 const std::vector<size_t> & change_pos);
 
-  int compNumMatched(const std::vector<int> &ms_masses, const std::vector<double> &theo_masses);
+  int updateScore(std::vector<double> & n_theo_masses,
+                  std::vector<double> & c_theo_masses,
+                  int pos_prev, int pos_curr, int k, int scr);
+
+  int compNumMatched(const std::vector<double> &theo_masses);
 
   MCMCMngPtr mng_ptr_;
 
