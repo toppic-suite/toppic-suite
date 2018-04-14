@@ -246,14 +246,14 @@ int TopMGProcess(std::map<std::string, std::string> arguments) {
     }
 
     std::string cutoff_type = arguments["cutoffSpectralType"];
-    std::cout << "PrSM filtering by " << cutoff_type << "- started." << std::endl;
+    std::cout << "PrSM filtering by " << cutoff_type << " - started." << std::endl;
     double cutoff_value = std::stod(arguments["cutoffSpectralValue"]);
     PrsmCutoffSelectorPtr cutoff_selector
         = std::make_shared<PrsmCutoffSelector>(db_file_name, sp_file_name, "TOP",
                                                "CUTOFF_RESULT_SPEC", cutoff_type, cutoff_value);
     cutoff_selector->process();
     cutoff_selector = nullptr;
-    std::cout << "PrSM filtering by " << cutoff_type << "- finished." << std::endl;
+    std::cout << "PrSM filtering by " << cutoff_type << " - finished." << std::endl;
 
     time_t end = time(0);
     arguments["end_time"] = std::string(ctime_r(&end, buf));
