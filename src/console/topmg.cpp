@@ -30,5 +30,10 @@ int main(int argc, char* argv[]) {
     return EXIT_FAILURE;
   }
   std::map<std::string, std::string> arguments = argu_processor.getArguments();
-  return prot::TopMGProcess(arguments);
+  
+  std::vector<std::string> spec_file_lst = argu_processor.getSpecFileList();
+
+  std::sort(spec_file_lst.begin(), spec_file_lst.end());
+
+  return prot::TopMGProgress_multi_file(arguments, spec_file_lst);
 }
