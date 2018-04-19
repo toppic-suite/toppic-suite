@@ -39,7 +39,7 @@ TopFDDialog::TopFDDialog(QWidget *parent) :
   ui(new Ui::TopFDDialog) {
   initArguments();
   ui->setupUi(this);
-  lastDir_ = "/";
+  lastDir_ = ".";
   percentage_ = 0;
   ui->maxChargeEdit->setValidator(new QIntValidator(1, 100, this));
   ui->maxMassEdit->setValidator(new QIntValidator(1, 1000000, this));
@@ -48,7 +48,8 @@ TopFDDialog::TopFDDialog(QWidget *parent) :
   ui->mzErrorEdit->setValidator(validator1);
   QRegExp rx2("^\\d{1,6}\\.\\d{0,2}$");
   QRegExpValidator *validator2 = new QRegExpValidator(rx2, this);
-  ui->snRatioEdit->setValidator(validator2);
+  ui->ms1snRatioEdit->setValidator(validator2);
+  ui->ms2snRatioEdit->setValidator(validator2);
   QRegExp rx3("^\\d{1,4}\\.\\d{0,2}|10000$");
   QRegExpValidator *validator3 = new QRegExpValidator(rx3, this);
   ui->windowSizeEdit->setValidator(validator3);
@@ -83,25 +84,28 @@ void TopFDDialog::closeEvent(QCloseEvent *event) {
 }
 void TopFDDialog::initArguments() {
   arguments_["executiveDir"] = "";
+  arguments_["resourceDir"] = "";
   arguments_["spectrumFileName"] = "";
-  arguments_["inputType"] = "mzXML";
-  arguments_["refinePrecMass"] = "true";
+  arguments_["refinePrecMass"]="true";
   arguments_["missingLevelOne"] = "false";
   arguments_["maxCharge"] = "30";
   arguments_["maxMass"] = "100000";
   arguments_["mzError"] = "0.02";
-  arguments_["snRatio"] = "1.0";
+  arguments_["msTwoSnRatio"] = "1.0";
+  arguments_["msOneSnRatio"] = "3.0";
   arguments_["keepUnusedPeaks"] = "false";
   arguments_["outMultipleMass"] = "false";
   arguments_["precWindow"] = "3.0";
+  arguments_["doFinalFiltering"] = "true";
+  arguments_["outputMatchEnv"] = "true";
 }
 
 void TopFDDialog::on_clearButton_clicked() {
-  ui->fileEdit->clear();
   ui->maxChargeEdit->clear();
   ui->maxMassEdit->clear();
   ui->mzErrorEdit->clear();
-  ui->snRatioEdit->clear();
+  ui->ms1snRatioEdit->clear();
+  ui->ms2snRatioEdit->clear();
   ui->windowSizeEdit->clear();
   ui->missLevelOneCheckBox->setChecked(false);
   ui->outputTextBrowser->clear();
@@ -113,24 +117,69 @@ void TopFDDialog::on_defaultButton_clicked() {
   ui->maxChargeEdit->setText("30");
   ui->maxMassEdit->setText("100000");
   ui->mzErrorEdit->setText("0.02");
-  ui->snRatioEdit->setText("1.0");
+  ui->ms1snRatioEdit->setText("3.0");
+  ui->ms2snRatioEdit->setText("1.0");
   ui->windowSizeEdit->setText("3.0");
   ui->missLevelOneCheckBox->setChecked(false);
   ui->outputTextBrowser->clear();
   ui->outputTextBrowser->setText("Click the Start button to process the spectrum file.");
 }
 
-void TopFDDialog::on_fileButton_clicked() {
-  QString s = QFileDialog::getOpenFileName(
-                this,
-                "Select a spectrum file",
-                lastDir_,
-                "Spectra files(*.mzXML *.mzML *.mzxml *.mzml);;mzXML files(*.mzXML *.mzxml);;mzML files(*.mzML *.mzml)");
+std::vector<std::string> TopFDDialog::getSpecFileList() {
+  spec_file_lst_.clear();
+  for (int i = 0; i < ui->listWidget->count(); i++) {
+    spec_file_lst_.push_back(ui->listWidget->item(i)->text().toStdString());
+  }
+  return spec_file_lst_;
+}
+
+void TopFDDialog::on_addButton_clicked() {
+  QStringList spfiles = QFileDialog::getOpenFileNames(
+      this,
+      "Select spectrum files",
+      lastDir_,
+      "Spectra files(*.mzXML *.mzML *.mzxml *.mzml);;mzXML files(*.mzXML *.mzxml);;mzML files(*.mzML *.mzml)");
+  for (int i = 0; i < spfiles.size(); i++) {
+    QString spfile = spfiles.at(i);
+    updatedir(spfile);
+    if (ableToAdd(spfile)) {
+      ui->listWidget->addItem(new QListWidgetItem(spfile));
+    }
+
+  }
+};
+
+void TopFDDialog::updatedir(QString s) {
   if (!s.isEmpty()) {
     lastDir_ = s;
   }
-  ui->fileEdit->setText(s);
 }
+bool TopFDDialog::ableToAdd(QString spfile) {
+  bool able = true;
+  if (spfile != "") {
+    if (spfile.toStdString().length() > 200) {
+      QMessageBox::warning(this, tr("Warning"),
+                           tr("The spectrum file path is too long!"),
+                           QMessageBox::Yes);
+      able = false;
+    } else {
+      for (int i = 0; i < ui->listWidget->count(); i++) {
+        if (spfile == ui->listWidget->item(i)->text()) {
+          able = false;
+        }
+      }
+    }
+  } else {
+    able = false;
+  }
+  return able;
+}
+
+void TopFDDialog::on_delButton_clicked() {
+  QListWidgetItem *delItem = ui->listWidget->currentItem();
+  ui->listWidget->removeItemWidget(delItem);
+  delete delItem;
+};
 
 void TopFDDialog::on_startButton_clicked() {
   std::stringstream buffer;
@@ -140,17 +189,16 @@ void TopFDDialog::on_startButton_clicked() {
   }
   lockDialog();
   ui->outputTextBrowser->setText(showInfo);
-  // prot::log_level = 2;
   std::map<std::string, std::string> argument = this->getArguments();
-  thread_->setPar(argument);
+  std::vector<std::string> spec_file_lst = this->getSpecFileList();
+  thread_->setPar(argument, spec_file_lst);
   thread_->start();
-  // prot::deconvProcess(argument);
 
   std::string lastinfo = "";
   std::string nowinfo = "";
   std::string info;
   while (true) {
-    // info = getInfo(i);      // Here is the infomation been shown in the infoBox.
+    // Here is the infomation been shown in the infoBox.
     nowinfo = buffer.str();
     info = nowinfo.substr(lastinfo.length());
     info = info.erase(info.find_last_not_of(" \n\r\t") + 1);
@@ -159,7 +207,6 @@ void TopFDDialog::on_startButton_clicked() {
       updateMsg(info);
     }
     if (thread_->isFinished()) {
-      ui->progressBar->setValue(100);
       break;
     }
     sleep(10);
@@ -197,11 +244,12 @@ std::map<std::string, std::string> TopFDDialog::getArguments() {
   QString path = QCoreApplication::applicationFilePath();
   std::string exe_dir = prot::file_util::getExecutiveDir(path.toStdString());
   arguments_["executiveDir"] = exe_dir;
-  arguments_["spectrumFileName"] = ui->fileEdit->text().toStdString();
+  arguments_["resourceDir"] = arguments_["executiveDir"] + prot::file_util::getFileSeparator() + prot::file_util::getResourceDirName();
   arguments_["maxCharge"] = ui->maxChargeEdit->text().toStdString();
   arguments_["maxMass"] = ui->maxMassEdit->text().toStdString();
   arguments_["mzError"] = ui->mzErrorEdit->text().toStdString();
-  arguments_["snRatio"] = ui->snRatioEdit->text().toStdString();
+  arguments_["msOneSnRatio"] = ui->ms1snRatioEdit->text().toStdString();
+  arguments_["msTwoSnRatio"] = ui->ms2snRatioEdit->text().toStdString();
   arguments_["precWindow"] = ui->windowSizeEdit->text().toStdString();
   return arguments_;
 }
@@ -210,12 +258,11 @@ void TopFDDialog::lockDialog() {
   ui->maxChargeEdit->setEnabled(false);
   ui->maxMassEdit->setEnabled(false);
   ui->mzErrorEdit->setEnabled(false);
-  ui->snRatioEdit->setEnabled(false);
-  ui->fileEdit->setEnabled(false);
+  ui->ms1snRatioEdit->setEnabled(false);
+  ui->ms2snRatioEdit->setEnabled(false);
   ui->clearButton->setEnabled(false);
   ui->defaultButton->setEnabled(false);
   ui->startButton->setEnabled(false);
-  ui->fileButton->setEnabled(false);
   ui->missLevelOneCheckBox->setEnabled(false);
   ui->windowSizeEdit->setEnabled(false);
   ui->outputButton->setEnabled(false);
@@ -225,12 +272,11 @@ void TopFDDialog::unlockDialog() {
   ui->maxChargeEdit->setEnabled(true);
   ui->maxMassEdit->setEnabled(true);
   ui->mzErrorEdit->setEnabled(true);
-  ui->snRatioEdit->setEnabled(true);
-  ui->fileEdit->setEnabled(true);
+  ui->ms1snRatioEdit->setEnabled(true);
+  ui->ms2snRatioEdit->setEnabled(true);
   ui->clearButton->setEnabled(true);
   ui->defaultButton->setEnabled(true);
   ui->startButton->setEnabled(true);
-  ui->fileButton->setEnabled(true);
   ui->missLevelOneCheckBox->setEnabled(true);
   ui->windowSizeEdit->setEnabled(true);
   ui->outputButton->setEnabled(true);
@@ -238,20 +284,6 @@ void TopFDDialog::unlockDialog() {
 }
 
 bool TopFDDialog::checkError() {
-  if (ui->fileEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Please select a spectrum file!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-
-  if (ui->fileEdit->text().toStdString().length() > 200) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("The spectrum file path is too long!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-
   if (ui->maxChargeEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
                          tr("Maximum charge is empty!"),
@@ -270,9 +302,15 @@ bool TopFDDialog::checkError() {
                          QMessageBox::Yes);
     return true;
   }
-  if (ui->snRatioEdit->text().isEmpty()) {
+  if (ui->ms1snRatioEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
-                         tr("S/N ratio is empty!"),
+                         tr("MS1 S/N ratio is empty!"),
+                         QMessageBox::Yes);
+    return true;
+  }
+  if (ui->ms2snRatioEdit->text().isEmpty()) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("MS2 S/N ratio is empty!"),
                          QMessageBox::Yes);
     return true;
   }
@@ -285,27 +323,6 @@ bool TopFDDialog::checkError() {
   return false;
 }
 
-QString TopFDDialog::updatePercentage(QString s) {
-  QString per = "wait.";
-  if (s.left(6) == "Running") {
-    percentage_ = 100;
-  } else if (s.right(9) == "finished.") {
-    per = s.mid((s.size() - 13));
-    if (per.at(0) == tr("\t") || per.at(0) == tr(" ")) {
-      per = per.mid(1, 1);
-    } else {
-      per = per.mid(0, 2);
-    }
-    if (percentage_ < per.toInt()) {
-      percentage_ = per.toInt();
-    }
-  }
-  if (percentage_ > -1 && percentage_ < 101) {
-    ui->progressBar->setValue(percentage_);
-  }
-  return per;
-}
-
 void TopFDDialog::updateMsg(std::string msg) {
   if (msg.substr(0, 6) == "Running") {msg = "\n" + msg;}
   QString info = msg.c_str();
@@ -313,7 +330,6 @@ void TopFDDialog::updateMsg(std::string msg) {
     int lastloc = info.lastIndexOf("\r");
     info = info.right(info.size() - lastloc);
   }
-  updatePercentage(info);
   ui->outputTextBrowser->setText(showInfo + info);
   if (msg.at(0) != '\r') {
     showInfo = ui->outputTextBrowser->toPlainText();
@@ -325,21 +341,6 @@ void TopFDDialog::updateMsg(std::string msg) {
     unlockDialog();
     percentage_ = 0;
     return;
-  }
-  // if (percentage_ == 0) {
-  //   ui->outputTextBrowser->setText("Prepairing...");
-  // }
-}
-
-std::string TopFDDialog::getInfo(int i) {
-  QString s = QString::number(i);
-  sleep(20);
-  if (i < 0) {
-    return "************************** Parameters *********************";
-  } else if (i < 100) {
-    return QString("Processing spectrum_" + s + "0...\t" + s + "% finished.").toStdString();
-  } else {
-    return "TopFD finished.";
   }
 }
 

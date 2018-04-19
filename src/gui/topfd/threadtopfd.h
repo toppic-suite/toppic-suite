@@ -18,8 +18,16 @@
 
 #include <map>
 #include <string>
+#include <iostream>
+#include <algorithm>
 
 #include <QThread>
+
+#include "base/file_util.hpp"
+#include "base/string_util.hpp"
+#include "console/topfd_argument.hpp"
+
+#include "feature/topfd_process.hpp"
 
 namespace Ui {
 class ThreadTopFD;
@@ -32,12 +40,14 @@ class ThreadTopFD : public QThread {
   explicit ThreadTopFD(QObject* par);
   ~ThreadTopFD() {}
   void run();
-  void setPar(std::map<std::string, std::string> arguments) {
-    arguments_ = arguments;
+  void setPar(std::map<std::string, std::string> arguments_, std::vector<std::string> spec_file_lst_) {
+    arguments = arguments_;
+    spec_file_lst = spec_file_lst_;
   }
 
  private:
-  std::map<std::string, std::string> arguments_;
+  std::map<std::string, std::string> arguments;
+  std::vector<std::string> spec_file_lst;
 };
 
 #endif
