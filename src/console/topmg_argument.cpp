@@ -99,10 +99,9 @@ void Argument::outputArguments(std::ostream &output, std::map<std::string, std::
   output << std::setw(50) << std::left << "Maximum number of variable PTMs: " << "\t" << arguments["varPtmNumber"] << std::endl;
   output << std::setw(50) << std::left << "Maximum number of variable PTMs in a graph gap: " << "\t" << arguments["varPtmNumInGap"] << std::endl;
   output << std::setw(50) << std::left << "Executable file directory: " << "\t" << arguments["executiveDir"] << std::endl;
-  output << std::setw(50) << std::left << "Start time: " << "\t" << arguments["start_time"];
+  output << std::setw(50) << std::left << "Start time: " << "\t" << arguments["start_time"] << std::endl;
   if (arguments["end_time"] != "") {
-    output << std::setw(50) << std::left << "End time: " << "\t" << arguments["end_time"];
-    output << std::setw(50) << std::left << "Running time: " << "\t" << arguments["running_time"] << " seconds" << std::endl;
+    output << std::setw(50) << std::left << "End time: " << "\t" << arguments["end_time"] << std::endl;
   }
   output << "********************** Parameters **********************" << std::endl;
 }
@@ -114,7 +113,6 @@ void Argument::showUsage(boost::program_options::options_description &desc) {
 
 bool Argument::parse(int argc, char* argv[]) {
   std::string database_file_name = "";
-  std::string spectrum_file_name = "";
   std::string activation = "";
   std::string fixed_mod = "";
   std::string allow_mod = "";
@@ -134,6 +132,7 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string skip_list = "";
   std::string var_ptm_num = "";
   std::string var_ptm_in_gap = "";
+  std::string combined_output_name = "";
 
   // Define and parse the program options
   try {
@@ -159,6 +158,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("thread-number,u", po::value<std::string> (&thread_number), "<a positive number>. Number of threads used in the computation. Default value: 1.")
         ("no-topfd-feature,x", "No TopFD feature file for proteoform identification.")
         ("skip-list,l", po::value<std::string>(&skip_list) , "<a text file with its path>. The scans in this file will be skipped.")
+        ("output,o", po::value<std::string>(&combined_output_name) , "The output file name for the combined results. Default: combined.")
         ("proteo-graph-dis,j", po::value<std::string> (&proteo_graph_dis), "<a positive number>. Gap in constructing proteoform graph. Default value: 40.")
         ("var-ptm-in-gap,G", po::value<std::string>(&var_ptm_in_gap) , "<a positive number>. Maximum number of variable PTMs in a proteform graph gap. Default value: 5.")
         ("use-asf-diagonal,D", "Use the ASF-DIAGONAL method for protein filtering.")
@@ -178,23 +178,24 @@ bool Argument::parse(int argc, char* argv[]) {
         ("spectrum-cutoff-value,v", po::value<std::string> (&cutoff_spectral_value), "")
         ("proteoform-cutoff-type,T", po::value<std::string> (&cutoff_proteoform_type), "")
         ("proteoform-cutoff-value,V", po::value<std::string> (&cutoff_proteoform_value), "")
-        ("filtering-result-number,o", po::value<std::string>(&filtering_result_num), "Filtering result number. Default value: 20.")
+        ("filtering-result-number", po::value<std::string>(&filtering_result_num), "Filtering result number. Default value: 20.")
         ("keep-temp-files,k", "Keep temporary files.")
         ("full-binary-path,b", "Full binary path.")
         ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "")
         ("thread-number,u", po::value<std::string> (&thread_number), "")
         ("no-topfd-feature,x", "")
         ("skip-list,l", po::value<std::string>(&skip_list) , "")
+        ("output,o", po::value<std::string>(&combined_output_name) , "")
         ("proteo-graph-dis,j", po::value<std::string> (&proteo_graph_dis), "")
         ("var-ptm-in-gap,G", po::value<std::string>(&var_ptm_in_gap) , "")
         ("use-asf-diagonal,D", "")
         ("var-ptm,P", po::value<std::string>(&var_ptm_num) , "")
         ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name with its path.")
-        ("spectrum-file-name", po::value<std::string>(&spectrum_file_name)->required(), "Spectrum file name with its path.");
+        ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), "Spectrum file name with its path.");
 
     po::positional_options_description positional_options;
     positional_options.add("database-file-name", 1);
-    positional_options.add("spectrum-file-name", 1);
+    positional_options.add("spectrum-file-name", -1);
 
     po::variables_map vm;
     try {
@@ -229,7 +230,13 @@ bool Argument::parse(int argc, char* argv[]) {
 
     arguments_["oriDatabaseFileName"] = database_file_name;
 
-    arguments_["spectrumFileName"] = spectrum_file_name;
+    if (vm.count("spectrum-file-name")) {
+      spec_file_list_ = vm["spectrum-file-name"].as<std::vector<std::string> >(); 
+    }
+
+    if (vm.count("output")) {
+      arguments_["combinedOutputName"] = combined_output_name;
+    }
 
     if (vm.count("activation")) {
       arguments_["activation"] = activation;
@@ -352,19 +359,21 @@ bool Argument::validateArguments() {
     return false;
   }
 
-  if (!boost::filesystem::exists(arguments_["spectrumFileName"])) {
-    LOG_ERROR("Spectrum file " << arguments_["spectrumFileName"] << " does not exist!");
-    return false;
-  }
+  for (size_t k = 0; k < spec_file_list_.size(); k++) {
+    if (!boost::filesystem::exists(spec_file_list_[k])) {
+      LOG_ERROR("Spectrum file " << spec_file_list_[k] << " does not exist!");
+      return false;
+    }
 
-  if (!string_util::endsWith(arguments_["spectrumFileName"], ".msalign")) {
-    LOG_ERROR("Spectrum file " << arguments_["spectrumFileName"] << " is not a msalign file!");
-    return false;
-  }
+    if (!string_util::endsWith(spec_file_list_[k], ".msalign")) {
+      LOG_ERROR("Spectrum file " << spec_file_list_[k] << " is not a msalign file!");
+      return false;
+    }
 
-  if (arguments_["spectrumFileName"].length() > 200) {
-    LOG_ERROR("Spectrum file " << arguments_["spectrumFileName"] << " path is too long!");
-    return false;
+    if (spec_file_list_[k].length() > 200) {
+      LOG_ERROR("Spectrum file " << spec_file_list_[k] << " path is too long!");
+      return false;
+    }
   }
 
   if (!boost::filesystem::exists(arguments_["residueModFileName"])) {

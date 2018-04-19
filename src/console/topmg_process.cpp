@@ -25,6 +25,7 @@
 
 #include "spec/msalign_reader.hpp"
 #include "spec/msalign_util.hpp"
+#include "spec/feature_util.hpp"
 
 #include "prsm/prsm_para.hpp"
 #include "prsm/prsm_str_combine.hpp"
@@ -36,6 +37,7 @@
 #include "prsm/prsm_fdr.hpp"
 #include "prsm/prsm_form_filter.hpp"
 #include "prsm/prsm_table_writer.hpp"
+#include "prsm/prsm_util.hpp"
 #include "prsm/simple_prsm_reader.hpp"
 #include "prsm/simple_prsm_xml_writer.hpp"
 #include "prsm/simple_prsm_util.hpp"
@@ -64,16 +66,17 @@
 #include "prsmview/transformer.hpp"
 
 #include "console/topmg_argument.hpp"
+#include "console/topmg_process.hpp"
 
 namespace prot {
 
-int TopMGProcess(std::map<std::string, std::string> arguments) {
+int TopMG_identify(std::map<std::string, std::string> arguments) {
   try {
-    std::cout << "TopMG " << prot::version_number << std::endl;
-
-    time_t start = time(0);
+    std::time_t start = time(nullptr);
     char buf[50];
-    arguments["start_time"] = std::string(ctime_r(&start, buf));
+    std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
+
+    arguments["start_time"] = buf;
     Argument::outputArguments(std::cout, arguments);
 
     std::string resource_dir = arguments["resourceDir"];
@@ -87,7 +90,6 @@ int TopMGProcess(std::map<std::string, std::string> arguments) {
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
     std::string residue_mod_file_name = arguments["residueModFileName"];
 
-    int n_top = std::stoi(arguments["numOfTopPrsms"]);
     int ptm_num = std::stoi(arguments["ptmNumber"]);
     int thread_num = std::stoi(arguments["threadNumber"]);
     int filter_result_num = std::stoi(arguments["filteringResultNumber"]);
@@ -193,6 +195,41 @@ int TopMGProcess(std::map<std::string, std::string> arguments) {
     processor->process();    
     processor = nullptr;
     std::cout << "E-value computation using MCMC - finished." << std::endl;
+  } catch (const char* e) {
+    std::cout << "[Exception]" << std::endl;
+    std::cout << e << std::endl;
+  }
+  std::cout << "TopMG finished." << std::endl;
+  return EXIT_SUCCESS;
+}
+
+int TopMG_post(std::map<std::string, std::string> arguments) {
+  try {
+    std::string resource_dir = arguments["resourceDir"];
+
+    base_data::init(resource_dir);
+
+    LOG_DEBUG("Init base data completed");
+
+    std::string db_file_name = arguments["databaseFileName"];
+    std::string sp_file_name = arguments["spectrumFileName"];
+    std::string ori_db_file_name = arguments["oriDatabaseFileName"];
+    std::string residue_mod_file_name = arguments["residueModFileName"];
+
+    int n_top = std::stoi(arguments["numOfTopPrsms"]);
+
+    bool decoy = false;
+    if (arguments["searchType"] == "TARGET+DECOY") {
+      decoy = true;
+    }
+    LOG_DEBUG("Decoy " << decoy);
+    LOG_DEBUG("block size " << arguments["databaseBlockSize"]);
+    int db_block_size = std::stoi(arguments["databaseBlockSize"]);
+
+    PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
+
+    fasta_util::dbPreprocess(ori_db_file_name, db_file_name, decoy, db_block_size);
+    msalign_util::geneSpIndex(sp_file_name, prsm_para_ptr->getSpParaPtr());
 
     std::cout << "Finding protein clusters - started." << std::endl;
     if (arguments["useFeatureFile"] == "true") {
@@ -255,9 +292,10 @@ int TopMGProcess(std::map<std::string, std::string> arguments) {
     cutoff_selector = nullptr;
     std::cout << "PrSM filtering by " << cutoff_type << " - finished." << std::endl;
 
-    time_t end = time(0);
-    arguments["end_time"] = std::string(ctime_r(&end, buf));
-    arguments["running_time"] = std::to_string(static_cast<int>(difftime(end, start)));
+    std::time_t end = time(nullptr);
+    char buf[50];
+    std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&end));
+    arguments["end_time"] = buf;
 
     std::cout << "Outputting PrSM table - started." << std::endl;
     PrsmTableWriterPtr table_out
@@ -325,6 +363,81 @@ int TopMGProcess(std::map<std::string, std::string> arguments) {
   }
   std::cout << "TopMG finished." << std::endl;
   return EXIT_SUCCESS;
+}
+
+int TopMGProcess(std::map<std::string, std::string> arguments) {
+  TopMG_identify(arguments);
+
+  TopMG_post(arguments);
+
+  return EXIT_SUCCESS;
+}
+
+int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
+                             const std::vector<std::string> & spec_file_lst) {
+
+  std::string base_name = arguments["combinedOutputName"];
+
+  std::time_t start = time(nullptr);
+  char buf[50];
+  std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
+
+  std::string start_time_bak = buf;
+
+  std::cout << "TopMG " << prot::version_number << std::endl;
+
+  for (size_t k = 0; k < spec_file_lst.size(); k++) {
+    arguments["spectrumFileName"] = spec_file_lst[k];
+    prot::TopMGProcess(arguments);
+  }
+
+  if (spec_file_lst.size() > 1) {
+    arguments["start_time"] = start_time_bak;
+    std::cout << "Merging files - started." << std::endl;
+    int N = 100000;
+    // merge msalign files
+    prot::msalign_util::merge_msalign_files(spec_file_lst, N, base_name + "_ms2.msalign");
+    // merge feature files
+    std::vector<std::string> feature_file_lst(spec_file_lst.size());
+    for (size_t i = 0; i < spec_file_lst.size(); i++) {
+      std::string sp_file_name = spec_file_lst[i];
+      feature_file_lst[i] = sp_file_name.substr(0, sp_file_name.length() - 12) + ".feature";
+    }
+    prot::feature_util::merge_feature_files(feature_file_lst, N, base_name + ".feature");
+    // merge EVALUE files
+    std::vector<std::string> prsm_file_lst(spec_file_lst.size());
+    for (size_t i = 0; i < spec_file_lst.size(); i++) {
+      prsm_file_lst[i] = prot::file_util::basename(spec_file_lst[i]) + ".EVALUE"; 
+    }
+    prot::prsm_util::merge_prsm_files(prsm_file_lst, N, base_name + "_ms2.EVALUE");
+    std::cout << "Merging files - finished." << std::endl;
+
+    std::string sp_file_name = base_name + "_ms2.msalign";
+    arguments["spectrumFileName"] = sp_file_name;
+
+    prot::TopMG_post(arguments);
+  }
+
+  if (arguments["keepTempFiles"] != "true") {
+    std::cout << "Deleting temporary files - started." << std::endl;
+    std::string ori_db_file_name = arguments["oriDatabaseFileName"];
+
+    for (size_t k = 0; k < spec_file_lst.size(); k++) {
+      std::string sp_file_name = spec_file_lst[k];
+      prot::file_util::delDir(prot::file_util::basename(sp_file_name) + "_proteoform_cutoff_xml");
+      prot::file_util::delDir(prot::file_util::basename(sp_file_name) + "_prsm_cutoff_xml");
+      prot::file_util::cleanDir(ori_db_file_name, sp_file_name);
+    }
+
+    std::string sp_file_name = base_name + "_ms2.msalign";
+    prot::file_util::delDir(prot::file_util::basename(sp_file_name) + "_proteoform_cutoff_xml");
+    prot::file_util::delDir(prot::file_util::basename(sp_file_name) + "_prsm_cutoff_xml");
+    prot::file_util::cleanDir(ori_db_file_name, sp_file_name);
+
+    std::cout << "Deleting temporary files - finished." << std::endl; 
+  }
+
+  return EXIT_SUCCESS; 
 }
 
 }  // namespace prot
