@@ -35,35 +35,33 @@ public:
 
 private slots:
   void on_clearButton_clicked();
-
   void on_defaultButton_clicked();
-
-  void on_fileButton_clicked();
-
   void on_startButton_clicked();
-
   void on_exitButton_clicked();
-
   void on_outputButton_clicked();
+  void on_addButton_clicked();
+  void on_delButton_clicked();
 
 private:
   QString lastDir_;
   int percentage_;
   std::map<std::string, std::string> arguments_;
+  std::vector<std::string> spec_file_lst_;
   Ui::TopFDDialog *ui;
   void initArguments();
   std::map<std::string, std::string> getArguments();
-  std::string getInfo(int i);
+  std::vector<std::string> getSpecFileList();
   void lockDialog();
   void unlockDialog();
   bool checkError();
-  QString updatePercentage(QString s);
-  void updateMsg(std::string msg);
+  void updateMsg(std::string msg);  
+  void updatedir(QString s);
   void sleep(int wait);
   ThreadTopFD* thread_;
   QString showInfo;
   void closeEvent(QCloseEvent *event);
   bool continueToClose();
+  bool ableToAdd(QString spfile);
 };
 
 #endif

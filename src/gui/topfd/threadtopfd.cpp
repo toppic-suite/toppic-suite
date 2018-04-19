@@ -12,15 +12,20 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include "base/file_util.hpp"
-#include "base/base_data.hpp"
-#include "base/logger.hpp"
-#include "feature/topfd_process.hpp"
-
 #include "threadtopfd.h"
 
 ThreadTopFD::ThreadTopFD(QObject* par):QThread(par) {}
 
 void ThreadTopFD::run() {
-  prot::TopFDProcess(arguments_);
+  // prot::TopFDProcess(arguments_);
+
+  for (size_t k = 0; k < spec_file_lst.size(); k++) {
+    if (prot::string_util::endsWith(spec_file_lst[k], "mzML")
+        || prot::string_util::endsWith(spec_file_lst[k], "mzXML")
+        || prot::string_util::endsWith(spec_file_lst[k], "mzml")
+        || prot::string_util::endsWith(spec_file_lst[k], "mzxml")) {
+      arguments["spectrumFileName"] = spec_file_lst[k];
+      prot::TopFDProcess(arguments);
+    }
+  }
 }

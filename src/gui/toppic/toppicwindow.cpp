@@ -12,12 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <map>
-#include <string>
-#include <iostream>
-#include <sstream>
-
-#include <boost/filesystem.hpp>
 
 #include <QFileDialog>
 #include <QElapsedTimer>
@@ -27,19 +21,18 @@
 #include <QToolTip>
 #include <QDesktopServices>
 
-#include "base/file_util.hpp"
-
 #include "toppicwindow.h"
 #include "ui_toppicwindow.h"
 #include "threadtoppic.h"
 
+#include <boost/filesystem.hpp>
 namespace fs = boost::filesystem;
 
 toppicWindow::toppicWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::toppicWindow) {
       ui->setupUi(this);
-      lastDir_ = "/";
+      lastDir_ = ".";
       QRegExp rx1("^\\d{1,8}\\.\\d{0,2}$");
       QRegExpValidator *validator1 = new QRegExpValidator(rx1, this);
       ui->maxModEdit->setValidator(validator1);
@@ -51,17 +44,27 @@ toppicWindow::toppicWindow(QWidget *parent) :
       ui->miscoreThresholdEdit->setValidator(validator2);
       ui->threadNumberEdit->setValidator(new QIntValidator(0, 2147483647, this));
       ui->errorToleranceEdit->setValidator(new QIntValidator(0, 2147483647, this));
+      QRegExp rx3("^-?\\d{1,8}\\.\\d{0,2}$");
+      QRegExpValidator *validator3 = new QRegExpValidator(rx3, this);
+      ui->minModEdit->setValidator(validator3);
       QFont font;
+      QFont fontTable;
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
       font.setFamily(QStringLiteral("Courier New"));
+      fontTable.setFamily(QStringLiteral("Courier New"));
 #else
       font.setFamily(QStringLiteral("Monospace"));
+      fontTable.setFamily(QStringLiteral("Monospace"));
 #endif
       ui->outputTextBrowser->setFont(font);
       thread_ = new threadtoppic(this);
       showInfo = "";
       setToolTip("");
       setToolTipDuration(100);
+
+      fontTable.setPointSize(9);
+      ui->listWidget->setFont(fontTable);
+
       on_defaultButton_clicked();
     }
 
@@ -70,10 +73,11 @@ toppicWindow::~toppicWindow() {
 }
 
 void toppicWindow::initArguments() {
-  arguments_["oriDatabaseFileName"] = "";
+  arguments_["oriDatabaseFileName"]="";
   arguments_["databaseFileName"] = "";
   arguments_["databaseBlockSize"] = "1000000";
   arguments_["spectrumFileName"] = "";
+  arguments_["combinedOutputName"] = "combined";
   arguments_["activation"] = "FILE";
   arguments_["searchType"] = "TARGET";
   arguments_["fixedMod"] = "";
@@ -86,8 +90,10 @@ void toppicWindow::initArguments() {
   arguments_["allowProtMod"] = "NONE,NME,NME_ACETYLATION,M_ACETYLATION";
   arguments_["numOfTopPrsms"] = "1";
   arguments_["maxPtmMass"] = "500";
+  arguments_["minPtmMass"] = "-500";
   arguments_["useGf"] = "false";
   arguments_["executiveDir"] = ".";
+  arguments_["resourceDir"] = "";
   arguments_["keepTempFiles"] = "false";
   arguments_["fullBinaryPath"] = "false";
   arguments_["local_threshold"] = "0.45";
@@ -95,22 +101,22 @@ void toppicWindow::initArguments() {
   arguments_["filteringResultNumber"] = "20";
   arguments_["residueModFileName"] = "";
   arguments_["threadNumber"] = "1";
-  arguments_["featureFileName"] = "";
+  arguments_["useFeatureFile"] = "true";
+  arguments_["skipList"] = "";
 }
 
 void toppicWindow::on_clearButton_clicked() {
   ui->databaseFileEdit->clear();
-  ui->spectrumFileEdit->clear();
   ui->fixedModFileEdit->clear();
   ui->errorToleranceEdit->setText("15");
   ui->maxModEdit->clear();
+  ui->minModEdit->clear();
   ui->cutoffSpectralValueEdit->clear();
   ui->cutoffProteoformValueEdit->clear();
   ui->numCombinedEdit->clear();
   ui->modFileEdit->clear();
   ui->miscoreThresholdEdit->clear();
   ui->threadNumberEdit->clear();
-  ui->topfdFeatureFileEdit->clear();
   ui->outputTextBrowser->setText("Click the Start button to process the spectrum file.");
   ui->fixedModComboBox->setCurrentIndex(0);
   on_fixedModComboBox_currentIndexChanged(0);
@@ -126,14 +132,13 @@ void toppicWindow::on_clearButton_clicked() {
   ui->decoyCheckBox->setChecked(false);
   ui->generatingFunctionCheckBox->setChecked(false);
   ui->topfdFeatureCheckBox->setChecked(false);
-  on_topfdFeatureCheckBox_clicked(false);
 }
 
 void toppicWindow::on_defaultButton_clicked() {
   ui->fixedModFileEdit->clear();
-  ui->topfdFeatureFileEdit->clear();
   ui->errorToleranceEdit->setText("15");
   ui->maxModEdit->setText("500");
+  ui->minModEdit->setText("-500");
   ui->cutoffSpectralValueEdit->setText("0.01");
   ui->cutoffProteoformValueEdit->setText("0.01");
   ui->numCombinedEdit->setText("1");
@@ -154,13 +159,11 @@ void toppicWindow::on_defaultButton_clicked() {
   ui->decoyCheckBox->setChecked(false);
   ui->generatingFunctionCheckBox->setChecked(false);
   ui->topfdFeatureCheckBox->setChecked(false);
-  on_topfdFeatureCheckBox_clicked(false);
 }
 
 void toppicWindow::updatedir(QString s) {
   if (!s.isEmpty()) {
-    int loc = s.indexOf("\\", -1);
-    lastDir_ = s.left(loc + 1);
+    lastDir_ = s;
   }
 }
 
@@ -175,15 +178,6 @@ void toppicWindow::toppicWindow::on_databaseFileButton_clicked() {
   ui->databaseFileEdit->setText(s);
 }
 
-void toppicWindow::on_spectrumFileButton_clicked() {
-  QString s = QFileDialog::getOpenFileName(
-      this,
-      "Select a deconvoluted spectrum file",
-      lastDir_,
-      "Spectrum files(*.msalign)");
-  updatedir(s);
-  ui->spectrumFileEdit->setText(s);
-}
 
 void toppicWindow::on_fixedModFileButton_clicked() {
   QString s = QFileDialog::getOpenFileName(
@@ -205,16 +199,6 @@ void toppicWindow::on_modFileButton_clicked() {
   ui->modFileEdit->setText(s);
 }
 
-void toppicWindow::on_topfdFeatureFileButton_clicked() {
-  QString s = QFileDialog::getOpenFileName(
-      this,
-      "Select an MS feature file",
-      lastDir_,
-      "All files(*.*)");
-  updatedir(s);
-  ui->topfdFeatureFileEdit->setText(s);
-}
-
 void toppicWindow::on_startButton_clicked() {
   std::stringstream buffer;
   std::streambuf *oldbuf = std::cout.rdbuf(buffer.rdbuf());
@@ -222,21 +206,19 @@ void toppicWindow::on_startButton_clicked() {
     return;
   }
   lockDialog();
-  ui->outputTextBrowser->setText(showInfo);
-  // prot::log_level = 2;
-  std::map<std::string, std::string> argument = this->getArguments();
-  thread_->setPar(argument);
-  thread_->start();
-  // prot::deconvProcess(argument);
 
+  ui->outputTextBrowser->setText(showInfo);
+  std::map<std::string, std::string> argument = this->getArguments();
+  std::vector<std::string> spec_file_lst = this->getSpecFileList();
+  thread_->setPar(argument, spec_file_lst);
+  thread_->start();
   std::string lastinfo = "";
   std::string nowinfo = "";
   std::string info;
   while (true) {
-    // info = getInfo(i);    // Here is the infomation been shown in the infoBox.
+    // Here is the infomation been shown in the infoBox.
     nowinfo = buffer.str();
     info = nowinfo.substr(lastinfo.length());
-    // info = info.erase(info.find_last_not_of(" \n\r\t") + 1);
     lastinfo = nowinfo;
     if (info != "") {
       updateMsg(info);
@@ -247,6 +229,7 @@ void toppicWindow::on_startButton_clicked() {
     sleep(10);
   }
   unlockDialog();
+
   showInfo = "";
   thread_->exit();
   std::cout.rdbuf(oldbuf);
@@ -262,9 +245,9 @@ std::map<std::string, std::string> toppicWindow::getArguments() {
   QString path = QCoreApplication::applicationFilePath();
   std::string exe_dir = prot::file_util::getExecutiveDir(path.toStdString());
   arguments_["executiveDir"] = exe_dir;
+  arguments_["resourceDir"] = arguments_["executiveDir"] + prot::file_util::getFileSeparator() + prot::file_util::getResourceDirName();
   arguments_["oriDatabaseFileName"] = ui->databaseFileEdit->text().toStdString();
   arguments_["databaseBlockSize"] = "1000000";
-  arguments_["spectrumFileName"] = ui->spectrumFileEdit->text().toStdString();
   arguments_["activation"] = ui->activationComboBox->currentText().toStdString();
   if (ui->decoyCheckBox->isChecked()) {
     arguments_["searchType"] = "TARGET+DECOY";
@@ -301,6 +284,7 @@ std::map<std::string, std::string> toppicWindow::getArguments() {
   }
   arguments_["numOfTopPrsms"] = "1";
   arguments_["maxPtmMass"] = ui->maxModEdit->text().toStdString();
+  arguments_["minPtmMass"] = ui->minModEdit->text().toStdString();
   if (ui->generatingFunctionCheckBox->isChecked()) {
     arguments_["useGf"] = "true";
   } else {
@@ -314,30 +298,78 @@ std::map<std::string, std::string> toppicWindow::getArguments() {
   arguments_["residueModFileName"] = ui->modFileEdit->text().toStdString();
   arguments_["threadNumber"] = ui->threadNumberEdit->text().toStdString();
   if (ui->topfdFeatureCheckBox->isChecked()) {
-    arguments_["featureFileName"] = ui->topfdFeatureFileEdit->text().toStdString();
+    arguments_["useFeatureFile"] = "false";
   } else {
-    arguments_["featureFileName"] = "";
+    arguments_["useFeatureFile"] = "true";
   }
-  //showArguments();
+  // showArguments();
   return arguments_;
 }
+std::vector<std::string> toppicWindow::getSpecFileList() {
+  spec_file_lst_.clear();
+  for (int i = 0; i < ui->listWidget->count(); i++) {
+    spec_file_lst_.push_back(ui->listWidget->item(i)->text().toStdString());
+  }
+  return spec_file_lst_;
+}
+
+void toppicWindow::on_addButton_clicked() {
+  QStringList spfiles = QFileDialog::getOpenFileNames(
+      this,
+      "Select deconvoluted spectrum files",
+      lastDir_,
+      "Spectrum files(*.msalign)");
+  for (int i = 0; i < spfiles.size(); i++) {
+    QString spfile = spfiles.at(i);
+    updatedir(spfile);
+    if (ableToAdd(spfile)) {
+      ui->listWidget->addItem(new QListWidgetItem(spfile));
+    }
+
+  }
+};
+
+bool toppicWindow::ableToAdd(QString spfile) {
+  bool able = true;
+  if (spfile != "") {
+    if (spfile.toStdString().length() > 200) {
+      QMessageBox::warning(this, tr("Warning"),
+                           tr("The deconvoluted spectrum file path is too long!"),
+                           QMessageBox::Yes);
+      able = false;
+    } else {
+      for (int i = 0; i < ui->listWidget->count(); i++) {
+        if (spfile == ui->listWidget->item(i)->text()) {
+          able = false;
+        }
+      }
+    }
+  } else {
+    able = false;
+  }
+  return able;
+}
+
+void toppicWindow::on_delButton_clicked() {
+  QListWidgetItem *delItem = ui->listWidget->currentItem();
+  ui->listWidget->removeItemWidget(delItem);
+  delete delItem;
+};
 
 void toppicWindow::lockDialog() {
   ui->databaseFileButton->setEnabled(false);
-  ui->spectrumFileButton->setEnabled(false);
   ui->modFileButton->setEnabled(false);
   ui->databaseFileEdit->setEnabled(false);
-  ui->spectrumFileEdit->setEnabled(false);
   ui->fixedModFileEdit->setEnabled(false);
   ui->errorToleranceEdit->setEnabled(false);
   ui->maxModEdit->setEnabled(false);
+  ui->minModEdit->setEnabled(false);
   ui->cutoffSpectralValueEdit->setEnabled(false);
   ui->cutoffProteoformValueEdit->setEnabled(false);
   ui->numCombinedEdit->setEnabled(false);
   ui->modFileEdit->setEnabled(false);
   ui->miscoreThresholdEdit->setEnabled(false);
   ui->threadNumberEdit->setEnabled(false);
-  ui->topfdFeatureFileEdit->setEnabled(false);
   ui->fixedModComboBox->setEnabled(false);
   on_fixedModComboBox_currentIndexChanged(0);
   ui->activationComboBox->setEnabled(false);
@@ -351,29 +383,28 @@ void toppicWindow::lockDialog() {
   ui->decoyCheckBox->setEnabled(false);
   ui->generatingFunctionCheckBox->setEnabled(false);
   ui->topfdFeatureCheckBox->setEnabled(false);
-  on_topfdFeatureCheckBox_clicked(false);
   ui->clearButton->setEnabled(false);
   ui->defaultButton->setEnabled(false);
   ui->startButton->setEnabled(false);
   ui->outputButton->setEnabled(false);
+  ui->addButton->setEnabled(false);
+  ui->delButton->setEnabled(false);
 }
 
 void toppicWindow::unlockDialog() {
   ui->databaseFileButton->setEnabled(true);
-  ui->spectrumFileButton->setEnabled(true);
   ui->modFileButton->setEnabled(true);
   ui->databaseFileEdit->setEnabled(true);
-  ui->spectrumFileEdit->setEnabled(true);
   ui->fixedModFileEdit->setEnabled(true);
   ui->errorToleranceEdit->setEnabled(true);
   ui->maxModEdit->setEnabled(true);
+  ui->minModEdit->setEnabled(true);
   ui->cutoffSpectralValueEdit->setEnabled(true);
   ui->cutoffProteoformValueEdit->setEnabled(true);
   ui->numCombinedEdit->setEnabled(true);
   ui->modFileEdit->setEnabled(true);
   ui->miscoreThresholdEdit->setEnabled(true);
   ui->threadNumberEdit->setEnabled(true);
-  ui->topfdFeatureFileEdit->setEnabled(true);
   ui->fixedModComboBox->setEnabled(true);
   on_fixedModComboBox_currentIndexChanged(ui->fixedModComboBox->currentIndex());
   ui->activationComboBox->setEnabled(true);
@@ -387,12 +418,13 @@ void toppicWindow::unlockDialog() {
   ui->decoyCheckBox->setEnabled(true);
   ui->generatingFunctionCheckBox->setEnabled(true);
   ui->topfdFeatureCheckBox->setEnabled(true);
-  on_topfdFeatureCheckBox_clicked(ui->topfdFeatureCheckBox->isChecked());
   ui->clearButton->setEnabled(true);
   ui->defaultButton->setEnabled(true);
   ui->startButton->setEnabled(true);
   ui->outputButton->setEnabled(true);
   ui->outputButton->setDefault(true);
+  ui->addButton->setEnabled(true);
+  ui->delButton->setEnabled(true);
 }
 
 bool toppicWindow::checkError() {
@@ -410,26 +442,6 @@ bool toppicWindow::checkError() {
     return true;
   }
 
-  if (ui->spectrumFileEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Please select a deconvoluted spectrum file!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-
-  if (ui->spectrumFileEdit->text().toStdString().length() > 200) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("The deconvoluted spectrum file path is too long!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-
-  // if (ui->modFileEdit->text().isEmpty() && ui->numModComboBox->currentIndex() > 0) {
-  //   QMessageBox::warning(this, tr("Warning"),
-  //              tr("Please select a mod file!"),
-  //              QMessageBox::Yes);
-  //   return true;
-  // }
   QString currentText = ui->errorToleranceEdit->text();
   if (!ui->generatingFunctionCheckBox->isChecked() && currentText != "5" && currentText != "10" && currentText != "15") {
     QMessageBox::warning(this, tr("Warning"),
@@ -443,12 +455,6 @@ bool toppicWindow::checkError() {
                          QMessageBox::Yes);
     return true;
   }
-  if (ui->topfdFeatureFileEdit->text().isEmpty() && ui->topfdFeatureCheckBox->isChecked()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Please select an MS feature file!"),
-                         QMessageBox::Yes);
-    return true;
-  }
   if (ui->errorToleranceEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
                          tr("Error tolerance is empty!"),
@@ -458,6 +464,12 @@ bool toppicWindow::checkError() {
   if (ui->maxModEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
                          tr("Maximum mass shift is empty!"),
+                         QMessageBox::Yes);
+    return true;
+  }
+  if (ui->minModEdit->text().isEmpty()) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("Minimum mass shift is empty!"),
                          QMessageBox::Yes);
     return true;
   }
@@ -514,10 +526,12 @@ void toppicWindow::updateMsg(std::string msg) {
 
 void toppicWindow::showArguments() {
   QMessageBox::warning(0, "Arguments", ("executiveDir:" + arguments_["executiveDir"] +
+                                        "\nresourceDir:" + arguments_["resourceDir"] +
                                         "\noriDatabaseFileName:" + arguments_["oriDatabaseFileName"] +
                                         "\ndatabaseFileName:" + arguments_["databaseFileName"] +
                                         "\ndatabaseBlockSize:" + arguments_["databaseBlockSize"] +
-                                        "\nspectrumFileName:" + arguments_["spectrumFileName"] +
+                                        "\nspectrumFileName:" + arguments_["combinedOutputName"] +
+                                        "\ncombinedOutputName:" + arguments_["spectrumFileName"] +
                                         "\nactivation:" + arguments_["activation"] +
                                         "\nsearchType:" + arguments_["searchType"] +
                                         "\nfixedMod:" + arguments_["fixedMod"] +
@@ -530,6 +544,7 @@ void toppicWindow::showArguments() {
                                         "\nallowProtMod:" + arguments_["allowProtMod"] +
                                         "\nnumOfTopPrsms:" + arguments_["numOfTopPrsms"] +
                                         "\nmaxPtmMass:" + arguments_["maxPtmMass"] +
+                                        "\nminPtmMass:" + arguments_["minPtmMass"] +
                                         "\nuseGf:" + arguments_["useGf"] +
                                         "\nkeepTempFiles:" + arguments_["keepTempFiles"] +
                                         "\nfullBinaryPath:" + arguments_["fullBinaryPath"] +
@@ -538,7 +553,8 @@ void toppicWindow::showArguments() {
                                         "\nfilteringResultNumber:" + arguments_["filteringResultNumber"] +
                                         "\nresidueModFileName:" + arguments_["residueModFileName"] +
                                         "\nthreadNumber:" + arguments_["threadNumber"] +
-                                        "\nfeatureFileName:" + arguments_["featureFileName"]).c_str(), QMessageBox::Yes);
+                                        "\nuseFeatureFile:" + arguments_["useFeatureFile"] +
+                                        "\nskipList:" + arguments_["skipList"]).c_str(), QMessageBox::Yes);
 }
 
 void toppicWindow::sleep(int wait) {
@@ -562,26 +578,18 @@ void toppicWindow::on_fixedModComboBox_currentIndexChanged(int index) {
   }
 }
 
-void toppicWindow::on_topfdFeatureCheckBox_clicked(bool checked) {
-  if (checked) {
-    ui->topfdFeatureFileEdit->setEnabled(true);
-    ui->topfdFeatureFileButton->setEnabled(true);
-  } else {
-    ui->topfdFeatureFileEdit->setEnabled(false);
-    ui->topfdFeatureFileButton->setEnabled(false);
-  }
-}
-
 void toppicWindow::on_numModComboBox_currentIndexChanged(int index) {
   if (index == 0) {
     ui->modFileEdit->setEnabled(false);
     ui->modFileButton->setEnabled(false);
     ui->maxModEdit->setEnabled(false);
+    ui->minModEdit->setEnabled(false);
     ui->miscoreThresholdEdit->setEnabled(false);
   } else {
     ui->modFileEdit->setEnabled(true);
     ui->modFileButton->setEnabled(true);
     ui->maxModEdit->setEnabled(true);
+    ui->minModEdit->setEnabled(true);
     ui->miscoreThresholdEdit->setEnabled(true);
   }
 }
@@ -696,7 +704,7 @@ bool toppicWindow::continueToClose() {
 bool toppicWindow::event(QEvent *event) {
   if (event->type() == QEvent::ToolTip) {
     QHelpEvent *helpEvent = static_cast<QHelpEvent *>(event);
-    if (QRect(790, 320, 70, 70).contains(helpEvent->pos())) {
+    if (QRect(800, 230, 60, 60).contains(helpEvent->pos()) && ui->tabWidget->currentIndex() == 1) {
       QToolTip::showText(helpEvent->globalPos(), "To use an error tolerance other than \n5, 10, and 15 ppm, the checkbox \n\"generating function\" should be selected!");
     } else {
       QToolTip::hideText();

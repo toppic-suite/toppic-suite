@@ -18,5 +18,9 @@
 threadtoppic::threadtoppic(QObject* par):QThread(par) {}
 
 void threadtoppic::run() {
-  prot::TopPICProgress(arguments_);
+  // prot::TopPICProgress(arguments);
+
+  std::sort(spec_file_lst.begin(), spec_file_lst.end());
+
+  prot::TopPICProgress_multi_file(arguments, spec_file_lst);  
 }

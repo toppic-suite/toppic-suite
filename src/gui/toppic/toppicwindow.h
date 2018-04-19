@@ -33,35 +33,36 @@ class toppicWindow : public QMainWindow {
   ~toppicWindow();
 
   private slots:
-      void on_databaseFileButton_clicked();
-  void on_spectrumFileButton_clicked();
-  void on_fixedModFileButton_clicked();
-  void on_modFileButton_clicked();
-  void on_topfdFeatureFileButton_clicked();
-  void on_clearButton_clicked();
-  void on_defaultButton_clicked();
-  void on_startButton_clicked();
-  void on_exitButton_clicked();
-  void on_outputButton_clicked();
-  void on_fixedModComboBox_currentIndexChanged(int index);
-  void on_topfdFeatureCheckBox_clicked(bool checked);
-  void on_errorToleranceEdit_textChanged(QString string);
-  void on_generatingFunctionCheckBox_clicked(bool checked);
-  void on_NONECheckBox_clicked(bool checked);
-  void on_NMECheckBox_clicked(bool checked);
-  void on_NMEACCheckBox_clicked(bool checked);
-  void on_MACCheckBox_clicked(bool checked);
-  void on_numModComboBox_currentIndexChanged(int index);
-  void on_cutoffSpectralTypeComboBox_currentIndexChanged(int index);
-  void on_cutoffProteoformTypeComboBox_currentIndexChanged(int index);
-  void on_decoyCheckBox_clicked(bool checked);
+    void on_databaseFileButton_clicked();
+    void on_fixedModFileButton_clicked();
+    void on_modFileButton_clicked();
+    void on_clearButton_clicked();
+    void on_defaultButton_clicked();
+    void on_startButton_clicked();
+    void on_exitButton_clicked();
+    void on_outputButton_clicked();
+    void on_fixedModComboBox_currentIndexChanged(int index);
+    void on_errorToleranceEdit_textChanged(QString string);
+    void on_generatingFunctionCheckBox_clicked(bool checked);
+    void on_NONECheckBox_clicked(bool checked);
+    void on_NMECheckBox_clicked(bool checked);
+    void on_NMEACCheckBox_clicked(bool checked);
+    void on_MACCheckBox_clicked(bool checked);
+    void on_numModComboBox_currentIndexChanged(int index);
+    void on_cutoffSpectralTypeComboBox_currentIndexChanged(int index);
+    void on_cutoffProteoformTypeComboBox_currentIndexChanged(int index);
+    void on_decoyCheckBox_clicked(bool checked);
+    void on_addButton_clicked();
+    void on_delButton_clicked();
 
  private:
   Ui::toppicWindow *ui;
   QString lastDir_;
   std::map<std::string, std::string> arguments_;
+  std::vector<std::string> spec_file_lst_;
   void initArguments();
   std::map<std::string, std::string> getArguments();
+  std::vector<std::string> getSpecFileList();
   void lockDialog();
   void unlockDialog();
   bool checkError();
@@ -75,6 +76,7 @@ class toppicWindow : public QMainWindow {
   bool continueToClose();
   bool nterminalerror();
   bool event(QEvent *event);
+  bool ableToAdd(QString spfile);
 };
 
 #endif  // PROT_GUI_TOPPICWINDOW_H
