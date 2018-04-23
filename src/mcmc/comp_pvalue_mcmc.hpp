@@ -35,7 +35,7 @@ class CompPValueMCMC{
                  std::map<PtmPtr, std::vector<ResiduePtr> > ptm_residue_map,
                  std::map<int, std::vector<std::string> > mass_table):
       mng_ptr_(mng_ptr),
-      mt_(42),
+      mt_(new std::mt19937(42)),
       min_mass_(mng_ptr->prsm_para_ptr_->getSpParaPtr()->getMinMass()),
       ptm_residue_map_(ptm_residue_map),
       mass_table_(mass_table) {
@@ -43,15 +43,17 @@ class CompPValueMCMC{
         std::fill(mu_.begin(), mu_.end(), 1);
       }
 
-  double compPValueMCMC(PrsmPtr prsm_ptr, ActivationPtr act,
-                        const std::vector<int> & ms_masses);
+  double compOneProbMCMC(PrsmPtr prsm_ptr, ActivationPtr act,
+                         const std::vector<int> & ms_masses);
 
  private:
-  void simulateDPR(ResiduePtrVec &residues, long omega);
+  void simulateDPR(ResiduePtrVec &residues, long omega, int scr_init, int k);
 
   ResiduePtrVec randomTrans(ResiduePtrVec residues);
 
   int getMaxScore(const ResiduePtrVec &residues);
+
+  int getMaxScoreN(const ResiduePtrVec &residues);
 
   int compScore(std::vector<double> & n_theo_masses,
                 std::vector<double> &c_theo_masses,
@@ -65,7 +67,7 @@ class CompPValueMCMC{
 
   MCMCMngPtr mng_ptr_;
 
-  std::mt19937 mt_;
+  std::mt19937 * mt_;
 
   double min_mass_;
 
@@ -86,6 +88,12 @@ class CompPValueMCMC{
   PtmPtrVec ptm_vec_;
 
   std::vector<int> ms_masses_;
+
+  std::vector<ResiduePtrVec> residues_stack_;
+
+  std::vector<long> omega_stack_;
+
+  std::vector<int> score_stack_;
 };
 
 typedef std::shared_ptr<CompPValueMCMC> CompPValueMCMCPtr;

@@ -65,8 +65,6 @@ void DprProcessor::init() {
 
   test_num_ptr_ = std::make_shared<CountTestNum>(tdgf_mng_ptr);
 
-  comp_pvalue_table_ptr_ = std::make_shared<CompPValueLookupTable>(tdgf_mng_ptr);
-
   ptm_mass_vec2d_ = compPtmComb();
 }
 
@@ -189,11 +187,7 @@ void DprProcessor::process() {
                                                    sp_para_ptr_,
                                                    prsm_ptr->getAdjustedPrecMass());
 
-        double ppo = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getPpo();
-
-        double tolerance = refine_ms_ptr_vec[0]->getMsHeaderPtr()->getErrorTolerance(ppo);
-
-        processOnePrsm(prsm_ptr, spec_set_ptr, tolerance, prsm_writer);
+        processOnePrsm(prsm_ptr, spec_set_ptr, prsm_writer);
 
         prsm_ptr = prsm_reader->readOnePrsm(fasta_reader_ptr, prsm_para_ptr->getFixModPtrVec());
       }
@@ -265,12 +259,14 @@ std::function<void()> geneTask(SpectrumSetPtr spec_set_ptr,
 
     ActivationPtr act = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getActivationPtr();
 
-    double p_value = comp_mcmc_ptr->compPValueMCMC(prsm_ptr, act, ms_mass_int);
+    double one_prob = comp_mcmc_ptr->compOneProbMCMC(prsm_ptr, act, ms_mass_int);
+
+    double cand_num;
 
     AlignTypePtr type_ptr = prsm_ptr->getProteoformPtr()->getAlignType();
 
-    double cand_num = test_num_ptr->compCandNum(type_ptr, 0, prsm_ptr->getAdjustedPrecMass() - mass_constant::getWaterMass(),
-                                                tolerance);
+    cand_num = test_num_ptr->compCandNum(type_ptr, 0, prsm_ptr->getAdjustedPrecMass() - mass_constant::getWaterMass(),
+                                         tolerance);
 
     std::vector<double> mass_ptm_vec = ptm_mass_vec2d[prsm_ptr->getProteoformPtr()->getVariablePtmNum()];
 
@@ -283,7 +279,7 @@ std::function<void()> geneTask(SpectrumSetPtr spec_set_ptr,
     if (cand_num == 0) {cand_num = 1;}
 
     LOG_DEBUG("cand_num " << cand_num);
-    ExtremeValuePtr evalue = std::make_shared<ExtremeValue>(p_value, cand_num, 3.15);
+    ExtremeValuePtr evalue = std::make_shared<ExtremeValue>(one_prob, cand_num, 1);
     prsm_ptr->setExtremeValuePtr(evalue);
 
     boost::thread::id thread_id = boost::this_thread::get_id();
@@ -294,11 +290,9 @@ std::function<void()> geneTask(SpectrumSetPtr spec_set_ptr,
 }
 
 void DprProcessor::processOnePrsm(PrsmPtr prsm_ptr, SpectrumSetPtr spec_set_ptr,
-                                  double tolerance, PrsmXmlWriterPtr prsm_writer) {
-  if (prsm_ptr->getMatchFragNum() <= 5) {
-    AlignTypePtr type_ptr = prsm_ptr->getProteoformPtr()->getAlignType();
-    ExtremeValuePtr evalue = std::make_shared<ExtremeValue>(1.0, 1.0, 1.0);
-    prsm_ptr->setExtremeValuePtr(evalue);
+                                  PrsmXmlWriterPtr prsm_writer) {
+  if (prsm_ptr->getMatchFragNum() < 4) {
+    prsm_ptr->setExtremeValuePtr(ExtremeValue::getMaxEvaluePtr());
     prsm_writer->write(prsm_ptr);
     return;
   }
@@ -311,45 +305,20 @@ void DprProcessor::processOnePrsm(PrsmPtr prsm_ptr, SpectrumSetPtr spec_set_ptr,
     peak_num += deconv_ms_ptr_vec[k]->size();
   }
 
-  double p_value = -1;
-
-  int norm_match_frag_num = prsm_ptr->getNormMatchFragNum();
-
-  if (comp_pvalue_table_ptr_->inTable(peak_num, norm_match_frag_num, 0)) {
-    LOG_DEBUG("peak_num " << peak_num << " norm_match_frag_num " << norm_match_frag_num);
-    p_value = comp_pvalue_table_ptr_->compProb(peak_num, norm_match_frag_num, 0);
-    LOG_DEBUG("p_value " << p_value);
+  if (peak_num > 500) {
+    if (prsm_ptr->getProteoformPtr()->getVariablePtmNum() > 0 && prsm_ptr->getMatchFragNum() < peak_num / 10.0) {
+      prsm_ptr->setExtremeValuePtr(ExtremeValue::getMaxEvaluePtr());
+      prsm_writer->write(prsm_ptr);
+      return;
+    }
   }
 
-  if (p_value < 0 || (p_value > std::pow(10, -8) && p_value < 0.01)) {
-    while (pool_ptr_->getQueueSize() >= mng_ptr_->thread_num_ + 2) {
-      boost::this_thread::sleep(boost::posix_time::milliseconds(100));
-    }
-    pool_ptr_->Enqueue(geneTask(spec_set_ptr, prsm_ptr, mng_ptr_,
-                                ptm_residue_map_, mass_table_,
-                                test_num_ptr_, ptm_mass_vec2d_, pool_ptr_));
-  } else {
-    LOG_DEBUG("tolerance " << tolerance);
-    AlignTypePtr type_ptr = prsm_ptr->getProteoformPtr()->getAlignType();
-    LOG_DEBUG("type " << type_ptr->getName());
-    double cand_num = test_num_ptr_->compCandNum(type_ptr, 0, prsm_ptr->getAdjustedPrecMass() - mass_constant::getWaterMass(),
-                                                 tolerance);
-
-    std::vector<double> mass_ptm_vec = ptm_mass_vec2d_[prsm_ptr->getProteoformPtr()->getVariablePtmNum()];
-
-    for (size_t k = 0; k < mass_ptm_vec.size(); k++) {
-      cand_num += test_num_ptr_->compCandNum(type_ptr, 0,
-                                             prsm_ptr->getAdjustedPrecMass() - mass_constant::getWaterMass() - mass_ptm_vec[k],
-                                             tolerance);
-    }
-
-    if (cand_num == 0) {cand_num = 1;}
-
-    LOG_DEBUG("cand_num " << cand_num);
-    ExtremeValuePtr evalue = std::make_shared<ExtremeValue>(p_value, cand_num, 3.15);
-    prsm_ptr->setExtremeValuePtr(evalue);
-    prsm_writer->write(prsm_ptr);
+  while (pool_ptr_->getQueueSize() >= mng_ptr_->thread_num_ + 2) {
+    boost::this_thread::sleep(boost::posix_time::milliseconds(100));
   }
+  pool_ptr_->Enqueue(geneTask(spec_set_ptr, prsm_ptr, mng_ptr_,
+                              ptm_residue_map_, mass_table_,
+                              test_num_ptr_, ptm_mass_vec2d_, pool_ptr_));
 }
 
 }  // namespace prot

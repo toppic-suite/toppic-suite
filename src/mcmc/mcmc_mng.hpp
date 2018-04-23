@@ -35,7 +35,11 @@ class MCMCMng {
       output_file_ext_(output_file_ext),
       residue_mod_file_(residue_mod_file),
       max_known_mods_(max_known_mods),
-      thread_num_(thread_num) {};
+      thread_num_(thread_num) {
+        convert_ratio_ = 274.335215;
+        error_tolerance_ = 0.1;
+        int_tolerance_ = std::ceil(error_tolerance_ * convert_ratio_);
+      };
 
   PrsmParaPtr prsm_para_ptr_;
 
@@ -55,13 +59,13 @@ class MCMCMng {
 
   int thread_num_ = 1;
 
-  double mass_limit_ = 150.0;
+  double convert_ratio_;
 
-  double convert_ratio_ = 274.335215;
+  double error_tolerance_;
 
-  double error_tolerance_ = 0.1;
+  int int_tolerance_;
 
-  int getIntTolerance() {return std::ceil(error_tolerance_ * convert_ratio_);}
+  int getIntTolerance() {return int_tolerance_;}
 };
 
 typedef std::shared_ptr<MCMCMng> MCMCMngPtr;
