@@ -53,14 +53,11 @@ class DprProcessor {
 
   std::vector<std::vector<double> > compPtmComb();
 
-  void processOnePrsm(PrsmPtr prsm_ptr, SpectrumSetPtr spec_set_ptr,
-                      double tolerance, PrsmXmlWriterPtr prsm_writer);
+  void processOnePrsm(PrsmPtr prsm_ptr, SpectrumSetPtr spec_set_ptr, PrsmXmlWriterPtr prsm_writer);
 
   MCMCMngPtr mng_ptr_;
 
   CountTestNumPtr test_num_ptr_;
-
-  CompPValueLookupTablePtr comp_pvalue_table_ptr_;
 
   std::mt19937 mt_;
 

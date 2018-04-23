@@ -58,7 +58,7 @@ ResiduePtrVec CompPValueMCMC::randomTrans(ResiduePtrVec residues) {
   double mass = 0.0;
   bool is_small = (residue_util::compResiduePtrVecMass(residues) < this->pep_mass_);
   std::uniform_int_distribution<int> res_dist(0, residues.size() / 2 - 1);
-  int pos1 = res_dist(mt_);
+  int pos1 = res_dist(*mt_);
   mass += residues[pos1]->getMass();
 
   int pos2 = pos1 + 1;
@@ -67,7 +67,7 @@ ResiduePtrVec CompPValueMCMC::randomTrans(ResiduePtrVec residues) {
 
   res_dist = std::uniform_int_distribution<int>(residues.size() / 2 + 1, residues.size() - 1);
 
-  int pos3 = res_dist(mt_);
+  int pos3 = res_dist(*mt_);
 
   mass += residues[pos3]->getMass();
 
@@ -81,7 +81,7 @@ ResiduePtrVec CompPValueMCMC::randomTrans(ResiduePtrVec residues) {
 
   if (res_vec.size() > 1) {
     res_dist = std::uniform_int_distribution<int>(0, res_vec.size() - 1);
-    std::string res_seq = res_vec[res_dist(mt_)];
+    std::string res_seq = res_vec[res_dist(*mt_)];
     std::random_shuffle(res_seq.begin(), res_seq.end());
     new_res_vec = residue_util::convertStrToResiduePtrVec(res_seq);
   } else {
@@ -126,8 +126,8 @@ int CompPValueMCMC::compNumMatched(const std::vector<double> &theo_masses) {
   return static_cast<int>(match.size());
 }
 
-double CompPValueMCMC::compPValueMCMC(PrsmPtr prsm_ptr, ActivationPtr act,
-                                      const std::vector<int> & ms_masses) {
+double CompPValueMCMC::compOneProbMCMC(PrsmPtr prsm_ptr, ActivationPtr act,
+                                       const std::vector<int> & ms_masses) {
   this->act_ = act;
 
   this->ms_masses_ = ms_masses;
@@ -149,9 +149,10 @@ double CompPValueMCMC::compPValueMCMC(PrsmPtr prsm_ptr, ActivationPtr act,
 
   std::vector<double> p(mng_ptr_->n_, 1.0);
   std::vector<int> n(mng_ptr_->n_, 0);
-  double p_value = 0.0;
+  double one_prob = 0.0;
 
   for (int k = 0; k < mng_ptr_->k_; k++) {
+    this->mt_ = new std::mt19937(42);
     std::fill(n.begin(), n.end(), 0);
     std::fill(score_vec_.begin(), score_vec_.end(), 0);
     score_vec_[0] = scr;
@@ -164,6 +165,7 @@ double CompPValueMCMC::compPValueMCMC(PrsmPtr prsm_ptr, ActivationPtr act,
         } else {
           mu_[i] = mu_[i - 1];
         }
+        //LOG_DEBUG("mu[" << i << "] " << mu_[i]);
       }
     }
     this->z_ = 0;
@@ -171,7 +173,7 @@ double CompPValueMCMC::compPValueMCMC(PrsmPtr prsm_ptr, ActivationPtr act,
 
     long mu_min = std::round(*std::min_element(mu_.begin(), mu_.end()));
 
-    simulateDPR(residues, mu_min);
+    simulateDPR(residues, mu_min, scr, k);
 
     for (size_t i = 0; i < score_vec_.size(); i++) {
       n[score_vec_[i]]++;
@@ -184,18 +186,27 @@ double CompPValueMCMC::compPValueMCMC(PrsmPtr prsm_ptr, ActivationPtr act,
     double sum = std::accumulate(p.begin(), p.end(), 0.0);
     for (size_t i = 0; i < p.size(); i++) {
       p[i] = p[i] / sum;
+      LOG_DEBUG("p[" << i << "] " << p[i]);
     }
 
-    p_value = std::accumulate(p.begin() + scr, p.end(), 0.0);
+    if (prsm_ptr->getMatchFragNum() > 25 && prsm_ptr->getProteoformPtr()->getVariablePtmNum() > 0) {
+      int corrected_scr = (scr + prsm_ptr->getMatchFragNum()) / 2;
+      one_prob = std::accumulate(p.begin() + corrected_scr, p.end(), 0.0);
+    } else if (prsm_ptr->getMatchFragNum() < 10) {
+      int corrected_scr = std::min(scr, static_cast<int>(prsm_ptr->getMatchFragNum()));
+      one_prob = std::accumulate(p.begin() + corrected_scr, p.end(), 0.0);
+    } else {
+      one_prob = std::accumulate(p.begin() + scr, p.end(), 0.0);
+    }
 
-    LOG_DEBUG("k " << k << " p-value: " << p_value);
+    LOG_DEBUG("k " << k << " one prob: " << one_prob);
 
-    if (p_value > 0.2) {
-      return 1.0;
+    if (one_prob > 0.01) {
+      return one_prob;
     }
   }
 
-  return p_value;
+  return std::max(one_prob, std::pow(10, -20));
 }
 
 int CompPValueMCMC::updateScore(std::vector<double> & n_theo_masses,
@@ -288,6 +299,15 @@ int CompPValueMCMC::compScore(std::vector<double> & n_theo_masses,
 }
 
 int CompPValueMCMC::getMaxScore(const ResiduePtrVec &residues) {
+  int max_scr = 0;
+  int N = 3;
+  for (int i = 0; i < N; i++) {
+    max_scr = std::max(getMaxScoreN(residues), max_scr);
+  }
+  return max_scr;
+}
+
+int CompPValueMCMC::getMaxScoreN(const ResiduePtrVec &residues) {
   std::vector<double> n_theo_masses;
   std::vector<double> c_theo_masses;
 
@@ -316,7 +336,7 @@ int CompPValueMCMC::getMaxScore(const ResiduePtrVec &residues) {
       return 0;
     } else {
       std::uniform_int_distribution<size_t> dis(0, possible_change_pos[i].size() - 1);
-      change_pos[i] = possible_change_pos[i][dis(mt_)];
+      change_pos[i] = possible_change_pos[i][dis(*mt_)];
     }
   }
 
@@ -346,41 +366,72 @@ int CompPValueMCMC::getMaxScore(const ResiduePtrVec &residues) {
   return max_scr;
 }
 
-void CompPValueMCMC::simulateDPR(ResiduePtrVec &residues, long omega) {
-  int score = getMaxScore(residues);
+void CompPValueMCMC::simulateDPR(ResiduePtrVec &residues, long omega, int scr_init, int k) {
+  size_t CT_LIMIT = 50000;
+
+  if (k >= 2) {
+    CT_LIMIT = 30000;
+  }
+
+  residues_stack_.reserve(CT_LIMIT);
+  omega_stack_.reserve(CT_LIMIT);
+  score_stack_.reserve(CT_LIMIT);
+
+  residues_stack_.push_back(residues);
+  omega_stack_.push_back(omega);
+  score_stack_.push_back(scr_init);
+
   while (this->z_ < mng_ptr_->N_) {
-    ResiduePtrVec residues2 = randomTrans(residues);
+    while (!residues_stack_.empty()) {
+      ResiduePtrVec residues1 = residues_stack_.back();
+      residues_stack_.pop_back();
+      long omega1 = omega_stack_.back();
+      omega_stack_.pop_back();
+      int score1 = score_stack_.back();
+      score_stack_.pop_back();
 
-    int score2 = getMaxScore(residues2);
+      ResiduePtrVec residues2 = randomTrans(residues1);
 
-    if (mu_[score2] < omega) return;
+      int score2 = getMaxScore(residues2);
 
-    if (mu_[score2] > mu_[score]) {
-      long Y = std::round(mu_[score2] / mu_[score]);
-      Y = std::min(Y, 100L);
-      std::uniform_int_distribution<long> omega_dist(static_cast<long>(mu_[score]), static_cast<long>(mu_[score2]));
-      for (long i = 1; i < Y; i++) {
-        long omega2 = omega_dist(mt_);
-        ResiduePtrVec residues3 = residues2;
-        simulateDPR(residues3, omega2);
+      if (mu_[score2] < omega1) {
+        continue;
+      }
+
+      if (mu_[score2] > mu_[score1] && residues_stack_.size() < CT_LIMIT) {
+        long Y = std::round(mu_[score2] / mu_[score1]);
+        Y = std::min(Y, 100L);
+        std::uniform_int_distribution<long> omega_dist(static_cast<long>(mu_[score1]), static_cast<long>(mu_[score2]));
+        for (long i = 1; i < Y; i++) {
+          long omega2 = omega_dist(*mt_);
+          residues_stack_.push_back(residues2);
+          omega_stack_.push_back(omega2);
+          score_stack_.push_back(getMaxScore(residues2));
+        }
+      } else {
+        this->z_++;
+
+        if (this->z_ > mng_ptr_->N_) {
+          residues_stack_.clear();
+          omega_stack_.clear();
+          score_stack_.clear();
+          return;
+        }
+
+        this->score_vec_[this->z_] = score2;
+
+        residues_stack_.push_back(residues2);
+
+        omega_stack_.push_back(omega1);
+
+        score_stack_.push_back(score2);
       }
     }
 
-    if (this->z_ > mng_ptr_->N_) {
-      return;
-    }
-
-    if (this->z_ % 500 == 0) {
-      LOG_DEBUG("z " << this->z_);
-    }
-
-    this->z_++;
-
-    this->score_vec_[this->z_] = score2;
-
-    residues = residues2;
-
-    score = score2;
+    ResiduePtrVec residues3 = randomTrans(residues);
+    residues_stack_.push_back(residues3);
+    omega_stack_.push_back(omega);
+    score_stack_.push_back(getMaxScore(residues3));
   }
 }
 
