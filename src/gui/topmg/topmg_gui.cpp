@@ -12,14 +12,25 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include "threadtoppic.h"
 
-threadtoppic::threadtoppic(QObject* par):QThread(par) {}
+#include <QLocale>
+#include <QApplication>
+#include <QDesktopWidget>
 
-void threadtoppic::run() {
-  // prot::TopPICProgress(arguments);
+#include "topmgwindow.h"
 
-  std::sort(spec_file_lst.begin(), spec_file_lst.end());
-
-  prot::TopPICProgress_multi_file(arguments, spec_file_lst);  
+int main(int argc, char *argv[]) {
+  QLocale::setDefault(QLocale::c());
+#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
+  QFont font("Calibri");
+  font.setPointSize(12);
+  QApplication::setFont(font);
+#endif
+  QApplication a(argc, argv);
+  topmgWindow w;
+  QDesktopWidget *desk = QApplication::desktop();
+  QRect deskRect = desk->availableGeometry();
+  w.show();
+  w.move((deskRect.width() - w.width()) / 2, (deskRect.height() - w.height()) / 2);
+  return a.exec();
 }

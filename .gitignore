@@ -40,3 +40,4 @@ topmg
 
 !src/gui/topfd*
 !src/gui/toppic*
+!src/gui/topmg*
