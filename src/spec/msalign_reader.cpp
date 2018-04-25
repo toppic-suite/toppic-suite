@@ -115,6 +115,7 @@ void MsAlignReader::readNext() {
   header_ptr->setFileName(file_name_);
   header_ptr->setId(id);
   header_ptr->setPrecId(prec_id);
+
   if (scans != "") {
     header_ptr->setScans(scans);
   } else {
@@ -134,8 +135,8 @@ void MsAlignReader::readNext() {
   if (activation_ptr_ != nullptr) {
     header_ptr->setActivationPtr(activation_ptr_);
   } else if (activation != "") {
-    ActivationPtr activation_ptr =
-        ActivationBase::getActivationPtrByName(activation);
+    ActivationPtr activation_ptr = ActivationBase::getActivationPtrByName(activation);
+
     header_ptr->setActivationPtr(activation_ptr);
   }
   header_ptr->setMsLevel(level);
@@ -144,8 +145,8 @@ void MsAlignReader::readNext() {
 
   header_ptr->setMsOneScan(ms_one_scan);
 
-  header_ptr->setPrecMonoMz(prec_mass /prec_charge
-                            + mass_constant::getProtonMass());
+  header_ptr->setPrecMonoMz(prec_mass /prec_charge + mass_constant::getProtonMass());
+
   header_ptr->setPrecCharge(prec_charge);
 
   header_ptr->setPrecInte(prec_inte);
@@ -166,9 +167,11 @@ void MsAlignReader::readNext() {
       DeconvPeakPtr peak_ptr = std::make_shared<DeconvPeak>(idx, mass, inte, charge);
       peak_ptr_list.push_back(peak_ptr);
       idx++;
+      if (static_cast<int>(peak_ptr_list.size()) >= this->peak_num_limit_) break;
     }
   }
-  deconv_ms_ptr_ = std::make_shared<Ms<DeconvPeakPtr>>(header_ptr, peak_ptr_list);
+
+  deconv_ms_ptr_ = std::make_shared<Ms<DeconvPeakPtr> >(header_ptr, peak_ptr_list);
 
   current_++;
 }
@@ -183,7 +186,7 @@ DeconvMsPtr MsAlignReader::getNextMs() {
 }
 
 std::vector<SpectrumSetPtr> MsAlignReader::getNextSpectrumSet(SpParaPtr sp_para_ptr) {
-  std::vector<SpectrumSetPtr> spec_set_vec; 
+  std::vector<SpectrumSetPtr> spec_set_vec;
   DeconvMsPtrVec deconv_ms_ptr_vec;
   for (int i = 0; i < group_spec_num_; i++) {
     readNext();
