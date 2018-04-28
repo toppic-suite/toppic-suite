@@ -250,14 +250,15 @@ std::function<void()> geneTask(SpectrumSetPtr spec_set_ptr,
 
     std::vector<int> ms_mass_int(ms_masses.size());
 
+    ActivationPtr act = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getActivationPtr();
+
     for (size_t k = 0; k < ms_masses.size(); k++) {
       ms_mass_int[k] = static_cast<int>(ms_masses[k] * mng_ptr->convert_ratio_) >> 5;
     }
 
     std::sort(ms_mass_int.begin(), ms_mass_int.end());
-    ms_mass_int.erase(std::unique(ms_mass_int.begin(), ms_mass_int.end()), ms_mass_int.end());
 
-    ActivationPtr act = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getActivationPtr();
+    ms_mass_int.erase(std::unique(ms_mass_int.begin(), ms_mass_int.end()), ms_mass_int.end());
 
     double one_prob = comp_mcmc_ptr->compOneProbMCMC(prsm_ptr, act, ms_mass_int);
 
