@@ -35,16 +35,17 @@ class CompPValueMCMC{
                  std::map<PtmPtr, std::vector<ResiduePtr> > ptm_residue_map,
                  std::map<int, std::vector<std::string> > mass_table):
       mng_ptr_(mng_ptr),
-      mt_(new std::mt19937(42)),
+      generator_(new std::default_random_engine(42)),
       min_mass_(mng_ptr->prsm_para_ptr_->getSpParaPtr()->getMinMass()),
       ptm_residue_map_(ptm_residue_map),
-      mass_table_(mass_table) {
+      mass_table_(mass_table),
+      ppo_(mng_ptr->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr()->getPpo()) {
         mu_.resize(mng_ptr_->n_);
         std::fill(mu_.begin(), mu_.end(), 1);
       }
 
   double compOneProbMCMC(PrsmPtr prsm_ptr, ActivationPtr act,
-                         const std::vector<int> & ms_masses);
+                         const std::vector<int> & ms_mass_int);
 
  private:
   void simulateDPR(ResiduePtrVec &residues, long omega, int scr_init, int k);
@@ -53,21 +54,29 @@ class CompPValueMCMC{
 
   int getMaxScore(const ResiduePtrVec &residues);
 
+  // if no ptm in the prsm
+  int compScoreNoPtm();
+
   int getMaxScoreN(const ResiduePtrVec &residues);
 
-  int compScore(std::vector<double> & n_theo_masses,
-                std::vector<double> &c_theo_masses,
-                const std::vector<size_t> & change_pos);
+  // this should be called first
+  void initTheoMassWithPtm(const std::vector<size_t> & change_pos);
 
-  int updateScore(std::vector<double> & n_theo_masses,
-                  std::vector<double> & c_theo_masses,
-                  int pos_prev, int pos_curr, int k, int scr);
+  void geneScrVec(std::vector<int> & n_scr_no_ptm,
+                  std::vector<int> & n_scr_with_ptm,
+                  std::vector<int> & c_scr_no_ptm,
+                  std::vector<int> & c_scr_with_ptm,
+                  double mass);
 
-  int compNumMatched(const std::vector<double> &theo_masses);
+  void rmMassTheoMass(size_t pos, double mass);
+
+  void addMassTheoMass(size_t pos, double mass);
+
+  std::vector<int> compTheoMassPpos(const std::vector<double> &theo_masses);
 
   MCMCMngPtr mng_ptr_;
 
-  std::mt19937 * mt_;
+  std::default_random_engine * generator_;
 
   double min_mass_;
 
@@ -81,13 +90,21 @@ class CompPValueMCMC{
 
   double pep_mass_;
 
+  double ppo_;
+
   std::vector<long long> mu_;
 
   ActivationPtr act_;
 
   PtmPtrVec ptm_vec_;
 
-  std::vector<int> ms_masses_;
+  std::vector<double> ptm_mass_vec_;
+
+  std::vector<int> ms_mass_int_;
+
+  std::vector<double> n_theo_masses_;
+
+  std::vector<double> c_theo_masses_;
 
   std::vector<ResiduePtrVec> residues_stack_;
 
