@@ -381,17 +381,6 @@ bool Argument::validateArguments() {
     return false;
   }
 
-  if (arguments_["useFeatureFile"] == "true") {
-    std::string spec_file_name = arguments_["spectrumFileName"];
-
-    std::string feature_file_name = spec_file_name.substr(0, spec_file_name.length() - 12) + ".feature";
-
-    if (!boost::filesystem::exists(feature_file_name)) {
-      LOG_ERROR("TopFD feature file does not exist! Please use -x option.");
-      return false;
-    }
-  }
-
   if (arguments_["skipList"] != "") {
     if (!boost::filesystem::exists(arguments_["skipList"])) {
       LOG_ERROR("Skip list " << arguments_["skipList"] << " does not exist!");

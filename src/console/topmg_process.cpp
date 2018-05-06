@@ -90,6 +90,15 @@ int TopMG_identify(std::map<std::string, std::string> arguments) {
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
     std::string residue_mod_file_name = arguments["residueModFileName"];
 
+    std::string feature_file_name = sp_file_name.substr(0, sp_file_name.length() - 12) + ".feature";
+
+    if (arguments["useFeatureFile"] == "true") {
+      if (!boost::filesystem::exists(feature_file_name)) {
+        LOG_ERROR("TopFD feature file does not exist!. Please use -x option.");
+        exit(EXIT_FAILURE);
+      }
+    }
+
     int ptm_num = std::stoi(arguments["ptmNumber"]);
     int thread_num = std::stoi(arguments["threadNumber"]);
     int filter_result_num = std::stoi(arguments["filteringResultNumber"]);
