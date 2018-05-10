@@ -262,22 +262,26 @@ std::function<void()> geneTask(SpectrumSetPtr spec_set_ptr,
 
     double one_prob = comp_mcmc_ptr->compOneProbMCMC(prsm_ptr, act, ms_mass_int);
 
-    double cand_num;
+    double cand_num = 0;
 
     AlignTypePtr type_ptr = prsm_ptr->getProteoformPtr()->getAlignType();
 
-    cand_num = test_num_ptr->compCandNum(type_ptr, 0, prsm_ptr->getAdjustedPrecMass() - mass_constant::getWaterMass(),
-                                         tolerance);
+    if (prsm_ptr->getProteoformPtr()->getVariablePtmNum() == 0) {
+      cand_num = test_num_ptr->compCandNum(type_ptr, 0, prsm_ptr->getAdjustedPrecMass() - mass_constant::getWaterMass(),
+                                           tolerance);
+    } else {
+      std::vector<double> mass_ptm_vec = ptm_mass_vec2d[prsm_ptr->getProteoformPtr()->getVariablePtmNum()];
 
-    std::vector<double> mass_ptm_vec = ptm_mass_vec2d[prsm_ptr->getProteoformPtr()->getVariablePtmNum()];
+      for (size_t k = 0; k < mass_ptm_vec.size(); k++) {
+        cand_num += test_num_ptr->compCandNum(type_ptr, 0,
+                                              prsm_ptr->getAdjustedPrecMass() - mass_constant::getWaterMass() - mass_ptm_vec[k],
+                                              tolerance);
+      }
 
-    for (size_t k = 0; k < mass_ptm_vec.size(); k++) {
-      cand_num += test_num_ptr->compCandNum(type_ptr, 0,
-                                            prsm_ptr->getAdjustedPrecMass() - mass_constant::getWaterMass() - mass_ptm_vec[k],
-                                            tolerance);
+      cand_num = cand_num / 300;
+      
+      if (cand_num < 1) {cand_num = 1;}
     }
-
-    if (cand_num == 0) {cand_num = 1;}
 
     LOG_DEBUG("cand_num " << cand_num);
     ExtremeValuePtr evalue = std::make_shared<ExtremeValue>(one_prob, cand_num, 1);
@@ -296,22 +300,6 @@ void DprProcessor::processOnePrsm(PrsmPtr prsm_ptr, SpectrumSetPtr spec_set_ptr,
     prsm_ptr->setExtremeValuePtr(ExtremeValue::getMaxEvaluePtr());
     prsm_writer->write(prsm_ptr);
     return;
-  }
-
-  int peak_num = 0;
-
-  DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
-
-  for (size_t k = 0; k < deconv_ms_ptr_vec.size(); k++) {
-    peak_num += deconv_ms_ptr_vec[k]->size();
-  }
-
-  if (peak_num > 500) {
-    if (prsm_ptr->getProteoformPtr()->getVariablePtmNum() > 0 && prsm_ptr->getMatchFragNum() < peak_num / 10.0) {
-      prsm_ptr->setExtremeValuePtr(ExtremeValue::getMaxEvaluePtr());
-      prsm_writer->write(prsm_ptr);
-      return;
-    }
   }
 
   while (pool_ptr_->getQueueSize() >= mng_ptr_->thread_num_ + 2) {
