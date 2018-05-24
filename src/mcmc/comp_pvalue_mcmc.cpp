@@ -133,8 +133,6 @@ double CompPValueMCMC::compOneProbMCMC(PrsmPtr prsm_ptr, ActivationPtr act,
 
   int scr = getMaxScore(residues);
 
-  // LOG_DEBUG("matching score: " << scr);
-
   score_vec_.resize(mng_ptr_->N_ + 1);
   std::fill(score_vec_.begin(), score_vec_.end(), 0);
 
@@ -150,7 +148,6 @@ double CompPValueMCMC::compOneProbMCMC(PrsmPtr prsm_ptr, ActivationPtr act,
     residues = prot_form->getResSeqPtr()->getResidues();
 
     if (k != 0) {
-      mng_ptr_->N_ = 6000;
       for (size_t i = 0; i < mu_.size(); i++) {
         if (p[i] != 0.0) {
           mu_[i] = static_cast<long long>(1 / p[i]);
@@ -170,6 +167,8 @@ double CompPValueMCMC::compOneProbMCMC(PrsmPtr prsm_ptr, ActivationPtr act,
     for (size_t i = 0; i < score_vec_.size(); i++) {
       n[score_vec_[i]]++;
     }
+
+    std::fill(p.begin(), p.end(), 0);
 
     for (size_t i = 0; i < n.size(); i++) {
       p[i] = n[i] * 1.0 / mu_[i];
@@ -459,11 +458,7 @@ int CompPValueMCMC::getMaxScoreN(const ResiduePtrVec &residues) {
 }
 
 void CompPValueMCMC::simulateDPR(ResiduePtrVec &residues, long omega, int scr_init, int k) {
-  size_t CT_LIMIT = 50000;
-
-  if (k >= 2) {
-    CT_LIMIT = 30000;
-  }
+  size_t CT_LIMIT = 20000;
 
   residues_stack_.reserve(CT_LIMIT);
   omega_stack_.reserve(CT_LIMIT);
