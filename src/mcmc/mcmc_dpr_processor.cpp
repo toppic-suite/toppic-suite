@@ -279,9 +279,9 @@ std::function<void()> geneTask(SpectrumSetPtr spec_set_ptr,
       }
 
       cand_num = cand_num / 300;
-      
-      if (cand_num < 1) {cand_num = 1;}
     }
+
+    if (cand_num < 1) {cand_num = 1;}
 
     LOG_DEBUG("cand_num " << cand_num);
     ExtremeValuePtr evalue = std::make_shared<ExtremeValue>(one_prob, cand_num, 1);
