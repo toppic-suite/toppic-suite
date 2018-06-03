@@ -262,6 +262,8 @@ std::function<void()> geneTask(SpectrumSetPtr spec_set_ptr,
 
     double one_prob = comp_mcmc_ptr->compOneProbMCMC(prsm_ptr, act, ms_mass_int);
 
+    if (one_prob <= 0.01) one_prob = std::sqrt(one_prob / 100.0);
+
     double cand_num = 0;
 
     AlignTypePtr type_ptr = prsm_ptr->getProteoformPtr()->getAlignType();
@@ -277,9 +279,9 @@ std::function<void()> geneTask(SpectrumSetPtr spec_set_ptr,
                                               prsm_ptr->getAdjustedPrecMass() - mass_constant::getWaterMass() - mass_ptm_vec[k],
                                               tolerance);
       }
-
-      cand_num = cand_num / 300;
     }
+
+    cand_num = std::sqrt(cand_num / 100.0);
 
     if (cand_num < 1) {cand_num = 1;}
 
