@@ -189,7 +189,7 @@ double CompPValueMCMC::compOneProbMCMC(PrsmPtr prsm_ptr, ActivationPtr act,
 
     // LOG_DEBUG("k " << k << " one prob: " << one_prob);
 
-    if (one_prob > 0.01) {
+    if (one_prob > 0.005 || one_prob < std::pow(10, -6)) {
       return one_prob;
     }
   }
