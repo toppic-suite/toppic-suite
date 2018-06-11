@@ -1,4 +1,4 @@
-To run TopPIC suite, a computer with at least 4 GB memory and a 64-bit Linux or Windows operating system is required. TopFD provides a command line interface and a graphical user interface (GUI) for both Linux and Windows users.
+To run TopFD, a computer with at least 4 GB memory and a 64-bit Linux or Windows operating system is required. TopFD provides a command line interface and a graphical user interface (GUI) for both Linux and Windows users.
 
 # TopFD
 
