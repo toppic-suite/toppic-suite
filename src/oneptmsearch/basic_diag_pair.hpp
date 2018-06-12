@@ -27,15 +27,19 @@ namespace prot {
 
 class BasicDiagPair;
 typedef std::shared_ptr<BasicDiagPair> BasicDiagPairPtr;
-typedef std::vector<BasicDiagPairPtr> BasicDiagPairPtrVec;
-typedef Diagonal<BasicDiagPairPtr> BasicDiagonal;
+typedef std::vector<BasicDiagPairPtr>  BasicDiagPairPtrVec;
+typedef Diagonal<BasicDiagPairPtr>     BasicDiagonal;
 typedef std::shared_ptr<BasicDiagonal> BasicDiagonalPtr;
-typedef std::weak_ptr<BasicDiagonal> BasicDiagonalWeakPtr;
-typedef std::vector<BasicDiagonalPtr> BasicDiagonalPtrVec;
+typedef std::weak_ptr<BasicDiagonal>   BasicDiagonalWeakPtr;
+typedef std::vector<BasicDiagonalPtr>  BasicDiagonalPtrVec;
 
 class BasicDiagPair:public Pair {
  public:
-  BasicDiagPair(int x,int y,double score,int diag_order, double diff);
+  BasicDiagPair(int x, int y, double score, int diag_order, double diff):
+      Pair(x, y),
+      score_(score),
+      diag_order_(diag_order),
+      diff_(diff) {}
 
   int getDiagOrder() {return diag_order_;}
 
@@ -48,15 +52,17 @@ class BasicDiagPair:public Pair {
   double getScore() {return score_;}
 
  protected:
-  int diag_order_;
-  double diff_;
-  BasicDiagonalWeakPtr diagonal_ptr_;
   double score_;
+
+  int diag_order_;
+
+  double diff_;
+
+  BasicDiagonalWeakPtr diagonal_ptr_;
 };
 
-
 BasicDiagonalPtrVec geneDiagonals(const DiagonalHeaderPtrVec& header_ptr_vec,
-                                  const PrmPeakPtrVec &prm_peaks, 
+                                  const PrmPeakPtrVec &prm_peaks,
                                   int group_spec_num, ProteoformPtr proteo_ptr);
 } /* namespace prot */
 
