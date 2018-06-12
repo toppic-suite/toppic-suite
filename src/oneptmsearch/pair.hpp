@@ -26,26 +26,27 @@ typedef std::shared_ptr<Pair> PairPtr;
 
 class Pair {
  public:
-  Pair(int x,int y);
+  Pair(int x, int y): x_(x), y_(y) {}
 
-  int getX(){return x_;}
+  int getX() {return x_;}
 
-  int getY(){return y_;}
+  int getY() {return y_;}
 
-  void setX(int x){x_=x;}
+  void setX(int x) {x_ = x;}
 
-  void setY(int y){y_=y;}
-  
+  void setY(int y) {y_ = y;}
+
   static bool cmpPosInc(const PairPtr &a, const PairPtr &b) {
-    if(a->getY() != b->getY()){
+    if (a->getY() != b->getY()) {
       return a->getY() < b->getY();
     }
     return a->getX() < b->getX();
   }
 
  protected:
-  int x_=0;
-  int y_=0;
+  int x_ = 0;
+
+  int y_ = 0;
 };
 
 

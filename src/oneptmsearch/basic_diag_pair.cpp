@@ -21,14 +21,6 @@
 
 namespace prot {
 
-BasicDiagPair::BasicDiagPair(int x, int y, double score,
-                             int diag_order, double diff):
-    Pair(x, y) {
-      score_ = score;
-      diag_order_ = diag_order;
-      diff_ = diff;
-    }
-
 inline BasicDiagPairPtrVec compDiagPair(const PrmPeakPtrVec &prm_peaks,
                                         int group_spec_num,
                                         const std::vector<double> &seq_masses,
@@ -81,7 +73,7 @@ inline BasicDiagPairPtrVec compDiagPair(const PrmPeakPtrVec &prm_peaks,
     }
     // LOG_DEBUG("start increase  peak " << peak.get());
     if (base_algo::increaseIJ(i, j, deviation, peak->getNRelaxCStrictTolerance(),
-                   real_masses, seq_masses)) {
+                              real_masses, seq_masses)) {
       i++;
     } else {
       j++;
