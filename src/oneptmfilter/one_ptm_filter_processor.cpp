@@ -14,16 +14,22 @@
 
 #include <string>
 #include <vector>
+#include <algorithm>
+
 #include <boost/thread/thread.hpp>
 
 #include "base/proteoform.hpp"
 #include "base/proteoform_factory.hpp"
 #include "base/file_util.hpp"
 #include "base/mod_util.hpp"
+
 #include "spec/msalign_util.hpp"
 #include "spec/spectrum_set.hpp"
+#include "spec/msalign_writer.hpp"
+
 #include "prsm/simple_prsm_xml_writer.hpp"
 #include "prsm/simple_prsm_str_combine.hpp"
+
 #include "oneptmfilter/one_ptm_filter_processor.hpp"
 #include "oneptmfilter/mass_one_ptm_filter.hpp"
 
@@ -51,18 +57,16 @@ void OnePtmFilterProcessor::process() {
     output_vec.push_back(new std::ofstream(sp_file_name + "_" + std::to_string(i)));
   }
 
-  std::vector<std::string> ms_lines = ms_reader.readOneSpectrum();
+  std::vector<SpectrumSetPtr> spec_set_vec = ms_reader.getNextSpectrumSet(prsm_para_ptr->getSpParaPtr());
+
   int cnt = 0;
-  while (ms_lines.size() > 0) {
+  while (spec_set_vec[0] != nullptr) {
     cnt = cnt % thread_num;
-    for (int i = 0; i < group_spec_num; i++) {
-      (*output_vec[cnt]) << std::endl;
-      for (size_t k = 0; k < ms_lines.size(); k++) {
-        (*output_vec[cnt]) << ms_lines[k] << std::endl;
-      }
-      (*output_vec[cnt]) << std::endl;
-      ms_lines = ms_reader.readOneSpectrum();
+    DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_vec[0]->getDeconvMsPtrVec();
+    for (size_t k = 0; k < deconv_ms_ptr_vec.size(); k++) {
+      msalign_writer::write((*output_vec[cnt]), deconv_ms_ptr_vec[k]);
     }
+    spec_set_vec = ms_reader.getNextSpectrumSet(prsm_para_ptr->getSpParaPtr());
     cnt++;
   }
 
@@ -172,7 +176,7 @@ std::function<void()> geneTask(const ProteoformPtrVec & raw_forms,
         }
       }
       if (idx == 0) {
-        std::cout << std::flush << "One PTM filtering - processing " << cnt
+        std::cout << std::flush << "One PTM filtering - processing " << std::min(cnt, spectrum_num)
             << " of " << spectrum_num << " spectra.\r";
       }
       spec_set_vec = reader.getNextSpectrumSet(sp_para_ptr);
@@ -194,7 +198,7 @@ void OnePtmFilterProcessor::processBlock(DbBlockPtr block_ptr, const std::vector
   ProteoformPtrVec raw_forms
       = proteoform_factory::readFastaToProteoformPtrVec(db_block_file_name,
                                                         prsm_para_ptr->getFixModPtrVec());
-  std::string block_str = std::to_string(block_ptr->getBlockIdx());      
+  std::string block_str = std::to_string(block_ptr->getBlockIdx());
 
   std::vector<std::shared_ptr<boost::thread> > thread_vec;
   for (int i = 1; i < mng_ptr_->thread_num_; i++) {
