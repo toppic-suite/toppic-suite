@@ -49,8 +49,6 @@ class DprProcessor {
  private:
   void init();
 
-  void read_mass_table();
-
   std::vector<std::vector<double> > compPtmComb();
 
   void processOnePrsm(PrsmPtr prsm_ptr, SpectrumSetPtr spec_set_ptr, PrsmXmlWriterPtr prsm_writer);

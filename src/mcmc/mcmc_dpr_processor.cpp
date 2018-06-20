@@ -44,6 +44,7 @@
 
 #include "mcmc/mcmc_dpr_processor.hpp"
 #include "mcmc/comp_pvalue_mcmc.hpp"
+#include "mcmc/mcmc_mass_table_util.hpp"
 
 namespace prot {
 
@@ -58,7 +59,7 @@ void DprProcessor::init() {
     ptm_residue_map_[var_mod_ptr_vec[i]->getModResiduePtr()->getPtmPtr()].push_back(var_mod_ptr_vec[i]->getOriResiduePtr());
   }
 
-  read_mass_table();
+  mass_table_ = mass_table_util::geneMassTable(mng_ptr_);
 
   TdgfMngPtr tdgf_mng_ptr
       = std::make_shared<TdgfMng>(mng_ptr_->prsm_para_ptr_, 0, 0.0, false, false, 1, "", "");
@@ -121,23 +122,6 @@ std::vector<std::vector<double> > DprProcessor::compPtmComb() {
   }
 
   return ptm_mass_vec2d;
-}
-
-void DprProcessor::read_mass_table() {
-  std::string mass_table_file
-      = mng_ptr_->prsm_para_ptr_->getResourceDir() + "/base_data/mass_table.txt";
-
-  std::ifstream infile(mass_table_file);
-  std::string line;
-  while (std::getline(infile, line)) {
-    std::vector<std::string> strs;
-    boost::split(strs, line, boost::is_any_of("\t"));
-    int m = std::stoi(strs[0]);
-    for (size_t i = 1; i < strs.size(); i++) {
-      mass_table_[m].push_back(strs[i]);
-    }
-  }
-  infile.close();
 }
 
 void DprProcessor::process() {

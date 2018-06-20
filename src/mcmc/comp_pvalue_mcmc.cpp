@@ -87,7 +87,8 @@ ResiduePtrVec CompPValueMCMC::randomTrans(ResiduePtrVec residues) {
     res_dist = std::uniform_int_distribution<int>(0, res_vec.size() - 1);
     std::string res_seq = res_vec[res_dist(*generator_)];
     std::random_shuffle(res_seq.begin(), res_seq.end());
-    new_res_vec = residue_util::convertStrToResiduePtrVec(res_seq);
+    new_res_vec
+        = residue_util::convertStrToResiduePtrVec(res_seq, mng_ptr_->prsm_para_ptr_->getFixModPtrVec());
   } else {
     new_res_vec = ori_res;
   }
