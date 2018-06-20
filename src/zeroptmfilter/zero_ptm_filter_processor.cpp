@@ -13,16 +13,22 @@
 //limitations under the License.
 
 #include <string>
+#include <algorithm>
+#include <vector>
 
 #include "base/proteoform.hpp"
 #include "base/proteoform_factory.hpp"
 #include "base/file_util.hpp"
 #include "base/thread_pool.hpp"
+
 #include "spec/msalign_reader.hpp"
+#include "spec/msalign_writer.hpp"
 #include "spec/msalign_util.hpp"
 #include "spec/spectrum_set.hpp"
+
 #include "prsm/simple_prsm_xml_writer.hpp"
 #include "prsm/simple_prsm_str_combine.hpp"
+
 #include "zeroptmfilter/zero_ptm_filter_processor.hpp"
 #include "zeroptmfilter/mass_zero_ptm_filter.hpp"
 
@@ -45,18 +51,15 @@ void ZeroPtmFilterProcessor::process() {
     output_vec.push_back(new std::ofstream(sp_file_name + "_" + std::to_string(i)));
   }
 
-  std::vector<std::string> ms_lines = ms_reader.readOneSpectrum();
+  std::vector<SpectrumSetPtr> spec_set_vec = ms_reader.getNextSpectrumSet(prsm_para_ptr->getSpParaPtr());
   int cnt = 0;
-  while (ms_lines.size() > 0) {
+  while (spec_set_vec[0] != nullptr) {
     cnt = cnt % thread_num;
-    for (int i = 0; i < group_spec_num; i++) {
-      (*output_vec[cnt]) << std::endl;
-      for (size_t k = 0; k < ms_lines.size(); k++) {
-        (*output_vec[cnt]) << ms_lines[k] << std::endl;
-      }
-      (*output_vec[cnt]) << std::endl;
-      ms_lines = ms_reader.readOneSpectrum();
+    DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_vec[0]->getDeconvMsPtrVec();
+    for (size_t k = 0; k < deconv_ms_ptr_vec.size(); k++) {
+      msalign_writer::write((*output_vec[cnt]), deconv_ms_ptr_vec[k]);
     }
+    spec_set_vec = ms_reader.getNextSpectrumSet(prsm_para_ptr->getSpParaPtr());
     cnt++;
   }
 
@@ -137,7 +140,7 @@ std::function<void()> geneTask(const ProteoformPtrVec & raw_forms,
         }
       }
       if (idx == 0) {
-        std::cout << std::flush << "Non PTM filtering - processing " << cnt
+        std::cout << std::flush << "Non PTM filtering - processing " << std::min(cnt, spectrum_num)
             << " of " << spectrum_num << " spectra.\r";
       }
       spec_set_vec = reader.getNextSpectrumSet(sp_para_ptr);
@@ -204,7 +207,6 @@ void ZeroPtmFilterProcessor::processBlock(DbBlockPtr block_ptr) {
                                         mng_ptr_->output_file_ext_ + "_INTERNAL_" + block_str,
                                         mng_ptr_->inte_num_);
   internal_combine.process();
-
 }
 
-} /* namespace prot */
+}  // namespace prot
