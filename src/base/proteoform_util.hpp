@@ -50,6 +50,8 @@ std::vector<double> getNTermAcets(ProteoformPtr db_form_ptr,
 std::vector<std::vector<double> > getNTermAcet2D(const ProteoformPtrVec & db_form_ptr_vec,
                                                  const ProtModPtrVec & prot_mod_ptrs);
 
+ProteoformPtr geneDbProteoformPtr(FastaSubSeqPtr fasta_seq_ptr, ModPtrVec fix_mod_list, int start_pos);
+
 }  // namespace proteoform_util
 
 }  // namespace prot

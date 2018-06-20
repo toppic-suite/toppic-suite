@@ -192,13 +192,17 @@ void GraphPostProcessor::process() {
           prot_mod = ProtModBase::getProtModPtrByName(ProtModBase::getType_NME());
         }
 
+        MassShiftPtrVec fix_shift_vec = prsm_ptr->getProteoformPtr()->getMassShiftPtrVec(MassShiftType::FIXED);
+
+        fix_shift_vec.insert(fix_shift_vec.end(), shift_vec.begin(), shift_vec.end());
+
         ProteoformPtr new_form
             = std::make_shared<Proteoform>(prsm_ptr->getProteoformPtr()->getFastaSeqPtr(),
                                            prot_mod,
                                            prsm_ptr->getProteoformPtr()->getStartPos(),
                                            prsm_ptr->getProteoformPtr()->getEndPos(),
                                            prsm_ptr->getProteoformPtr()->getResSeqPtr(),
-                                           shift_vec);
+                                           fix_shift_vec);
 
         new_form->setVariablePtmNum(prsm_ptr->getProteoformPtr()->getVariablePtmNum());
 
