@@ -170,7 +170,8 @@ bool Argument::parse(int argc, char* argv[]) {
         ("thread-number,u", po::value<std::string> (&thread_number), "<a positive integer>. Number of threads used in the computation. Default value: 1.")
         ("no-topfd-feature,x", "No TopFD feature file for proteoform identification.")
         ("skip-list,l", po::value<std::string>(&skip_list) , "<a text file with its path>. The scans in this file will be skipped.")
-        ("output,o", po::value<std::string>(&combined_output_name) , "<a filename with its path>. The output file name for the combined results. Default: combined.");
+        ("output,o", po::value<std::string>(&combined_output_name) , "<a filename with its path>. The output file name for the combined results. Default: combined.")
+        ("keep-temp-files,k", "Keep temporary files.");
 
     po::options_description desc("Options");
 
@@ -189,7 +190,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("proteoform-cutoff-type,T", po::value<std::string> (&cutoff_proteoform_type), "")
         ("proteoform-cutoff-value,V", po::value<std::string> (&cutoff_proteoform_value), "")
         ("filtering-result-number", po::value<std::string>(&filtering_result_num), "Filtering result number. Default value: 20.")
-        ("keep-temp-files,k", "Keep temporary files.")
+        ("keep-temp-files,k", "")
         ("generating-function,g", "")
         ("miscore-threshold,s", po::value<std::string> (&local_threshold), "")
         ("full-binary-path,b", "Full binary path.")
