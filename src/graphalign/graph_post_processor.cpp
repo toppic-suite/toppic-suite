@@ -192,6 +192,12 @@ void GraphPostProcessor::process() {
           prot_mod = ProtModBase::getProtModPtrByName(ProtModBase::getType_NME());
         }
 
+        MassShiftPtrVec unknown_shift_vec = prsm_ptr->getProteoformPtr()->getMassShiftPtrVec(MassShiftType::UNEXPECTED);
+
+        shift_vec.insert(shift_vec.end(), unknown_shift_vec.begin(), unknown_shift_vec.end());
+
+        std::sort(shift_vec.begin(), shift_vec.end(), MassShift::cmpPosInc);
+
         MassShiftPtrVec fix_shift_vec = prsm_ptr->getProteoformPtr()->getMassShiftPtrVec(MassShiftType::FIXED);
 
         fix_shift_vec.insert(fix_shift_vec.end(), shift_vec.begin(), shift_vec.end());

@@ -130,6 +130,15 @@ double CompPValueMCMC::compOneProbMCMC(PrsmPtr prsm_ptr, ActivationPtr act,
     ptm_mass_vec_[i] = ptm_vec_[i]->getMonoMass();
   }
 
+  MassShiftPtrVec unknown_shift_vec = prot_form->getMassShiftPtrVec(MassShiftType::UNEXPECTED);
+
+  if (unknown_shift_vec.size() > 0) {
+    for (size_t k = 0; k < unknown_shift_vec.size(); k++) {
+      ptm_vec_.push_back(nullptr);
+      ptm_mass_vec_.push_back(unknown_shift_vec[k]->getMassShift());
+    }
+  }
+
   ResiduePtrVec residues = prot_form->getResSeqPtr()->getResidues();
 
   int scr = getMaxScore(residues);
@@ -406,9 +415,15 @@ int CompPValueMCMC::getMaxScoreN(const ResiduePtrVec &residues) {
   std::vector<size_t> change_pos(ptm_vec_.size());
 
   for (size_t i = 0; i < ptm_vec_.size(); i++) {
-    ResiduePtrVec possible_res = ptm_residue_map_[ptm_vec_[i]];
-    for (size_t k = 0; k < residues.size(); k++) {
-      if (std::find(possible_res.begin(), possible_res.end(), residues[k]) != possible_res.end()) {
+    if (ptm_vec_[i] != nullptr) {
+      ResiduePtrVec possible_res = ptm_residue_map_[ptm_vec_[i]];
+      for (size_t k = 0; k < residues.size(); k++) {
+        if (std::find(possible_res.begin(), possible_res.end(), residues[k]) != possible_res.end()) {
+          possible_change_pos[i].push_back(k);
+        }
+      }
+    } else {
+      for (size_t k = 0; k < residues.size(); k++) {
         possible_change_pos[i].push_back(k);
       }
     }

@@ -100,6 +100,7 @@ int TopMG_identify(std::map<std::string, std::string> arguments) {
     }
 
     int ptm_num = std::stoi(arguments["ptmNumber"]);
+    LOG_DEBUG("num of unknown shfit " << ptm_num);
     int thread_num = std::stoi(arguments["threadNumber"]);
     int filter_result_num = std::stoi(arguments["filteringResultNumber"]);
     double max_ptm_mass = std::stod(arguments["maxPtmMass"]);
@@ -183,7 +184,6 @@ int TopMG_identify(std::map<std::string, std::string> arguments) {
                                           ptm_num, max_mod_num,
                                           gap, var_ptm_in_gap, max_ptm_mass,
                                           thread_num, "GRAPH_FILTER", "GRAPH_ALIGN");
-    LOG_DEBUG("shift num " << ptm_num);
     GraphAlignProcessorPtr ga_processor_ptr = std::make_shared<GraphAlignProcessor>(ga_mng_ptr);
     ga_processor_ptr->process();
     ga_processor_ptr = nullptr;
