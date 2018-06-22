@@ -35,8 +35,6 @@
 #include "console/toppic_argument.hpp"
 #include "console/toppic_process.hpp"
 
-
-
 #include <QThread>
 
 namespace Ui {
@@ -46,16 +44,22 @@ class threadtoppic;
 class threadtoppic : public QThread {
  Q_OBJECT
  public:
-  explicit threadtoppic(QObject* par);
+  explicit threadtoppic(QObject* par) : QThread(par) {}
+
   ~threadtoppic() {}
+
   void run();
-  void setPar(std::map<std::string, std::string> arguments_, std::vector<std::string> spec_file_lst_) {
-    arguments = arguments_;
-    spec_file_lst = spec_file_lst_;
+
+  void setPar(std::map<std::string, std::string> arguments,
+              const std::vector<std::string> & spec_file_lst) {
+    arguments_ = arguments;
+    spec_file_lst_ = spec_file_lst;
   }
+
  private:
-  std::map<std::string, std::string> arguments;
-  std::vector<std::string> spec_file_lst;
+  std::map<std::string, std::string> arguments_;
+
+  std::vector<std::string> spec_file_lst_;
 };
 
 #endif  // PROT_GUI_THREADTOPPIC_H

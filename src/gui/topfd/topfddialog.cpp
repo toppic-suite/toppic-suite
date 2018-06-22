@@ -14,6 +14,7 @@
 
 #include <map>
 #include <string>
+#include <vector>
 
 #include <QFileDialog>
 #include <QElapsedTimer>
@@ -21,55 +22,56 @@
 #include <QCloseEvent>
 #include <QDesktopServices>
 
+#include <boost/filesystem.hpp>
+namespace fs = boost::filesystem;
 
 #include "base/file_util.hpp"
 #include "base/base_data.hpp"
 #include "feature/deconv_para.hpp"
 #include "feature/deconv_process.hpp"
 #include "feature/feature_detect.hpp"
-#include <boost/filesystem.hpp>
-namespace fs = boost::filesystem;
 
 #include "topfddialog.h"
 #include "ui_topfddialog.h"
 #include "threadtopfd.h"
 
 TopFDDialog::TopFDDialog(QWidget *parent) :
-  QDialog(parent),
-  ui(new Ui::TopFDDialog) {
-  initArguments();
-  ui->setupUi(this);
-  lastDir_ = ".";
-  percentage_ = 0;
-  ui->maxChargeEdit->setValidator(new QIntValidator(1, 100, this));
-  ui->maxMassEdit->setValidator(new QIntValidator(1, 1000000, this));
-  QRegExp rx1("^0\\.[0]\\d{0,2}[1-9]|0.1$");
-  QRegExpValidator *validator1 = new QRegExpValidator(rx1, this);
-  ui->mzErrorEdit->setValidator(validator1);
-  QRegExp rx2("^\\d{1,6}\\.\\d{0,2}$");
-  QRegExpValidator *validator2 = new QRegExpValidator(rx2, this);
-  ui->ms1snRatioEdit->setValidator(validator2);
-  ui->ms2snRatioEdit->setValidator(validator2);
-  QRegExp rx3("^\\d{1,4}\\.\\d{0,2}|10000$");
-  QRegExpValidator *validator3 = new QRegExpValidator(rx3, this);
-  ui->windowSizeEdit->setValidator(validator3);
-  QFont font;
+    QDialog(parent),
+    ui(new Ui::TopFDDialog) {
+      initArguments();
+      ui->setupUi(this);
+      lastDir_ = ".";
+      percentage_ = 0;
+      ui->maxChargeEdit->setValidator(new QIntValidator(1, 100, this));
+      ui->maxMassEdit->setValidator(new QIntValidator(1, 1000000, this));
+      QRegExp rx1("^0\\.[0]\\d{0,2}[1-9]|0.1$");
+      QRegExpValidator *validator1 = new QRegExpValidator(rx1, this);
+      ui->mzErrorEdit->setValidator(validator1);
+      QRegExp rx2("^\\d{1,6}\\.\\d{0,2}$");
+      QRegExpValidator *validator2 = new QRegExpValidator(rx2, this);
+      ui->ms1snRatioEdit->setValidator(validator2);
+      ui->ms2snRatioEdit->setValidator(validator2);
+      QRegExp rx3("^\\d{1,4}\\.\\d{0,2}|10000$");
+      QRegExpValidator *validator3 = new QRegExpValidator(rx3, this);
+      ui->windowSizeEdit->setValidator(validator3);
+      QFont font;
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
-  font.setFamily(QStringLiteral("Courier New"));
+      font.setFamily(QStringLiteral("Courier New"));
 #else
-  font.setFamily(QStringLiteral("Monospace"));
+      font.setFamily(QStringLiteral("Monospace"));
 #endif
-  ui->outputTextBrowser->setFont(font);
-  thread_ = new ThreadTopFD(this);
-  showInfo = "";
-  TopFDDialog::on_defaultButton_clicked();
-}
+      ui->outputTextBrowser->setFont(font);
+      thread_ = new ThreadTopFD(this);
+      showInfo = "";
+      TopFDDialog::on_defaultButton_clicked();
+    }
 
 TopFDDialog::~TopFDDialog() {
   thread_->terminate();
   thread_->wait();
   delete ui;
 }
+
 void TopFDDialog::closeEvent(QCloseEvent *event) {
   if (thread_->isRunning()) {
     if (!continueToClose()) {
@@ -82,6 +84,7 @@ void TopFDDialog::closeEvent(QCloseEvent *event) {
   event->accept();
   return;
 }
+
 void TopFDDialog::initArguments() {
   arguments_["executiveDir"] = "";
   arguments_["resourceDir"] = "";
@@ -97,7 +100,7 @@ void TopFDDialog::initArguments() {
   arguments_["outMultipleMass"] = "false";
   arguments_["precWindow"] = "3.0";
   arguments_["doFinalFiltering"] = "true";
-  arguments_["outputMatchEnv"] = "true";
+  arguments_["outputMatchEnv"] = "false";
 }
 
 void TopFDDialog::on_clearButton_clicked() {
@@ -138,16 +141,15 @@ void TopFDDialog::on_addButton_clicked() {
       this,
       "Select spectrum files",
       lastDir_,
-      "Spectra files(*.mzXML *.mzML *.mzxml *.mzml);;mzXML files(*.mzXML *.mzxml);;mzML files(*.mzML *.mzml)");
+      "Spectra files(*.mzXML *.mzML *.mzxml *.mzml)");
   for (int i = 0; i < spfiles.size(); i++) {
     QString spfile = spfiles.at(i);
     updatedir(spfile);
     if (ableToAdd(spfile)) {
       ui->listWidget->addItem(new QListWidgetItem(spfile));
     }
-
   }
-};
+}
 
 void TopFDDialog::updatedir(QString s) {
   if (!s.isEmpty()) {
@@ -179,7 +181,7 @@ void TopFDDialog::on_delButton_clicked() {
   QListWidgetItem *delItem = ui->listWidget->currentItem();
   ui->listWidget->removeItemWidget(delItem);
   delete delItem;
-};
+}
 
 void TopFDDialog::on_startButton_clicked() {
   std::stringstream buffer;
@@ -234,12 +236,12 @@ bool TopFDDialog::continueToClose() {
   }
 }
 
-void TopFDDialog::on_outputButton_clicked()
-{
+void TopFDDialog::on_outputButton_clicked() {
   fs::path full_path(arguments_["spectrumFileName"].c_str());
   QString outPath = full_path.remove_filename().string().c_str();
   QDesktopServices::openUrl(QUrl(outPath, QUrl::TolerantMode));
 }
+
 std::map<std::string, std::string> TopFDDialog::getArguments() {
   QString path = QCoreApplication::applicationFilePath();
   std::string exe_dir = prot::file_util::getExecutiveDir(path.toStdString());
@@ -290,30 +292,35 @@ bool TopFDDialog::checkError() {
                          QMessageBox::Yes);
     return true;
   }
+
   if (ui->maxMassEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
                          tr("Maximum mass is empty!"),
                          QMessageBox::Yes);
     return true;
   }
+
   if (ui->mzErrorEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
                          tr("M/z error tolerance is empty!"),
                          QMessageBox::Yes);
     return true;
   }
+
   if (ui->ms1snRatioEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
                          tr("MS1 S/N ratio is empty!"),
                          QMessageBox::Yes);
     return true;
   }
+
   if (ui->ms2snRatioEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
                          tr("MS2 S/N ratio is empty!"),
                          QMessageBox::Yes);
     return true;
   }
+
   if (ui->windowSizeEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
                          tr("Precursor window size is empty!"),
@@ -325,18 +332,26 @@ bool TopFDDialog::checkError() {
 
 void TopFDDialog::updateMsg(std::string msg) {
   if (msg.substr(0, 6) == "Running") {msg = "\n" + msg;}
+
   QString info = msg.c_str();
+
   if (msg.at(0) == '\r') {
     int lastloc = info.lastIndexOf("\r");
     info = info.right(info.size() - lastloc);
   }
+
   ui->outputTextBrowser->setText(showInfo + info);
+
   if (msg.at(0) != '\r') {
     showInfo = ui->outputTextBrowser->toPlainText();
   }
+
   QTextCursor cursor = ui->outputTextBrowser->textCursor();
+
   cursor.movePosition(QTextCursor::End);
+
   ui->outputTextBrowser->setTextCursor(cursor);
+
   if (msg.substr(0, 6) == "Running") {
     unlockDialog();
     percentage_ = 0;
@@ -351,5 +366,4 @@ void TopFDDialog::sleep(int wait) {
     QCoreApplication::processEvents();
   }
 }
-
 
