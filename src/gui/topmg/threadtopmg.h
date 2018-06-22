@@ -15,7 +15,6 @@
 #ifndef PROT_GUI_THREADTOPMG_H
 #define PROT_GUI_THREADTOPMG_H
 
-
 #include <iostream>
 #include <iomanip>
 #include <map>
@@ -35,8 +34,6 @@
 #include "console/topmg_argument.hpp"
 #include "console/topmg_process.hpp"
 
-
-
 #include <QThread>
 
 namespace Ui {
@@ -46,16 +43,22 @@ class threadtopmg;
 class threadtopmg : public QThread {
  Q_OBJECT
  public:
-  explicit threadtopmg(QObject* par);
+  explicit threadtopmg(QObject* par) : QThread(par) {}
+
   ~threadtopmg() {}
+
   void run();
-  void setPar(std::map<std::string, std::string> arguments_, std::vector<std::string> spec_file_lst_) {
-    arguments = arguments_;
-    spec_file_lst = spec_file_lst_;
+
+  void setPar(std::map<std::string, std::string> arguments,
+             const std::vector<std::string> & spec_file_lst) {
+    arguments_ = arguments;
+    spec_file_lst_ = spec_file_lst;
   }
+
  private:
-  std::map<std::string, std::string> arguments;
-  std::vector<std::string> spec_file_lst;
+  std::map<std::string, std::string> arguments_;
+
+  std::vector<std::string> spec_file_lst_;
 };
 
 #endif  // PROT_GUI_THREADTOPMG_H

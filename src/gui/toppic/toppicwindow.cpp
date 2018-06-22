@@ -12,6 +12,9 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include <map>
+#include <string>
+#include <vector>
 
 #include <QFileDialog>
 #include <QElapsedTimer>
@@ -21,12 +24,12 @@
 #include <QToolTip>
 #include <QDesktopServices>
 
+#include <boost/filesystem.hpp>
+namespace fs = boost::filesystem;
+
 #include "toppicwindow.h"
 #include "ui_toppicwindow.h"
 #include "threadtoppic.h"
-
-#include <boost/filesystem.hpp>
-namespace fs = boost::filesystem;
 
 toppicWindow::toppicWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -173,11 +176,10 @@ void toppicWindow::toppicWindow::on_databaseFileButton_clicked() {
       this,
       "Select a protein database file",
       lastDir_,
-      "Database files(*.fasta)");
+      "Database files(*.fasta *.fa)");
   updatedir(s);
   ui->databaseFileEdit->setText(s);
 }
-
 
 void toppicWindow::on_fixedModFileButton_clicked() {
   QString s = QFileDialog::getOpenFileName(
@@ -305,6 +307,7 @@ std::map<std::string, std::string> toppicWindow::getArguments() {
   // showArguments();
   return arguments_;
 }
+
 std::vector<std::string> toppicWindow::getSpecFileList() {
   spec_file_lst_.clear();
   for (int i = 0; i < ui->listWidget->count(); i++) {
@@ -319,15 +322,15 @@ void toppicWindow::on_addButton_clicked() {
       "Select deconvoluted spectrum files",
       lastDir_,
       "Spectrum files(*.msalign)");
+
   for (int i = 0; i < spfiles.size(); i++) {
     QString spfile = spfiles.at(i);
     updatedir(spfile);
     if (ableToAdd(spfile)) {
       ui->listWidget->addItem(new QListWidgetItem(spfile));
     }
-
   }
-};
+}
 
 bool toppicWindow::ableToAdd(QString spfile) {
   bool able = true;
@@ -354,7 +357,7 @@ void toppicWindow::on_delButton_clicked() {
   QListWidgetItem *delItem = ui->listWidget->currentItem();
   ui->listWidget->removeItemWidget(delItem);
   delete delItem;
-};
+}
 
 void toppicWindow::lockDialog() {
   ui->databaseFileButton->setEnabled(false);

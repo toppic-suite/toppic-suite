@@ -12,20 +12,19 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include <algorithm>
+
 #include "threadtopfd.h"
 
-ThreadTopFD::ThreadTopFD(QObject* par):QThread(par) {}
-
 void ThreadTopFD::run() {
-  // prot::TopFDProcess(arguments_);
-
-  for (size_t k = 0; k < spec_file_lst.size(); k++) {
-    if (prot::string_util::endsWith(spec_file_lst[k], "mzML")
-        || prot::string_util::endsWith(spec_file_lst[k], "mzXML")
-        || prot::string_util::endsWith(spec_file_lst[k], "mzml")
-        || prot::string_util::endsWith(spec_file_lst[k], "mzxml")) {
-      arguments["spectrumFileName"] = spec_file_lst[k];
-      prot::TopFDProcess(arguments);
+  std::sort(spec_file_lst_.begin(), spec_file_lst_.end());
+  for (size_t k = 0; k < spec_file_lst_.size(); k++) {
+    if (prot::string_util::endsWith(spec_file_lst_[k], "mzML")
+        || prot::string_util::endsWith(spec_file_lst_[k], "mzXML")
+        || prot::string_util::endsWith(spec_file_lst_[k], "mzml")
+        || prot::string_util::endsWith(spec_file_lst_[k], "mzxml")) {
+      arguments_["spectrumFileName"] = spec_file_lst_[k];
+      prot::TopFDProcess(arguments_);
     }
   }
 }

@@ -27,10 +27,16 @@ int main(int argc, char *argv[]) {
   QApplication::setFont(font);
 #endif
   QApplication a(argc, argv);
+
   topmgWindow w;
+
   QDesktopWidget *desk = QApplication::desktop();
+
   QRect deskRect = desk->availableGeometry();
+
   w.show();
+
   w.move((deskRect.width() - w.width()) / 2, (deskRect.height() - w.height()) / 2);
+
   return a.exec();
 }

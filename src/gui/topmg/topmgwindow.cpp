@@ -12,6 +12,9 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include <map>
+#include <string>
+#include <vector>
 
 #include <QFileDialog>
 #include <QElapsedTimer>
@@ -21,12 +24,12 @@
 #include <QToolTip>
 #include <QDesktopServices>
 
+#include <boost/filesystem.hpp>
+namespace fs = boost::filesystem;
+
 #include "topmgwindow.h"
 #include "ui_topmgwindow.h"
 #include "threadtopmg.h"
-
-#include <boost/filesystem.hpp>
-namespace fs = boost::filesystem;
 
 topmgWindow::topmgWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -186,6 +189,7 @@ void topmgWindow::on_modFileButton_clicked() {
   updatedir(s);
   ui->modFileEdit->setText(s);
 }
+
 void topmgWindow::on_skipListButton_clicked() {
   QString s = QFileDialog::getOpenFileName(
       this,
@@ -239,8 +243,6 @@ void topmgWindow::on_outputButton_clicked() {
 }
 
 std::map<std::string, std::string> topmgWindow::getArguments() {
-
-
   QString path = QCoreApplication::applicationFilePath();
   std::string exe_dir = prot::file_util::getExecutiveDir(path.toStdString());
   arguments_["executiveDir"] = exe_dir;
@@ -304,8 +306,8 @@ std::map<std::string, std::string> topmgWindow::getArguments() {
   }
   // showArguments();
   return arguments_;
-
 }
+
 std::vector<std::string> topmgWindow::getSpecFileList() {
   spec_file_lst_.clear();
   for (int i = 0; i < ui->listWidget->count(); i++) {
@@ -355,7 +357,7 @@ void topmgWindow::on_delButton_clicked() {
   QListWidgetItem *delItem = ui->listWidget->currentItem();
   ui->listWidget->removeItemWidget(delItem);
   delete delItem;
-};
+}
 
 void topmgWindow::lockDialog() {
   ui->databaseFileButton->setEnabled(false);
@@ -630,6 +632,7 @@ void topmgWindow::closeEvent(QCloseEvent *event) {
   event->accept();
   return;
 }
+
 bool topmgWindow::continueToClose() {
   if (QMessageBox::question(this,
                             tr("Quit"),

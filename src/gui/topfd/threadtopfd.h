@@ -20,6 +20,7 @@
 #include <string>
 #include <iostream>
 #include <algorithm>
+#include <vector>
 
 #include <QThread>
 
@@ -37,17 +38,22 @@ class ThreadTopFD : public QThread {
   Q_OBJECT
 
  public:
-  explicit ThreadTopFD(QObject* par);
+  explicit ThreadTopFD(QObject* par) : QThread(par) {}
+
   ~ThreadTopFD() {}
+
   void run();
-  void setPar(std::map<std::string, std::string> arguments_, std::vector<std::string> spec_file_lst_) {
-    arguments = arguments_;
-    spec_file_lst = spec_file_lst_;
+
+  void setPar(std::map<std::string, std::string> arguments,
+              const std::vector<std::string> & spec_file_lst) {
+    arguments_ = arguments;
+    spec_file_lst_ = spec_file_lst;
   }
 
  private:
-  std::map<std::string, std::string> arguments;
-  std::vector<std::string> spec_file_lst;
+  std::map<std::string, std::string> arguments_;
+
+  std::vector<std::string> spec_file_lst_;
 };
 
 #endif

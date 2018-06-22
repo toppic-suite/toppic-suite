@@ -12,14 +12,12 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include <algorithm>
+
 #include "threadtoppic.h"
 
-threadtoppic::threadtoppic(QObject* par):QThread(par) {}
-
 void threadtoppic::run() {
-  // prot::TopPICProgress(arguments);
+  std::sort(spec_file_lst_.begin(), spec_file_lst_.end());
 
-  std::sort(spec_file_lst.begin(), spec_file_lst.end());
-
-  prot::TopPICProgress_multi_file(arguments, spec_file_lst);  
+  prot::TopPICProgress_multi_file(arguments_, spec_file_lst_);
 }
