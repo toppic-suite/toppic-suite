@@ -116,6 +116,7 @@ void topmgWindow::on_clearButton_clicked() {
   ui->cutoffSpectralTypeComboBox->setCurrentIndex(0);
   ui->cutoffProteoformTypeComboBox->setCurrentIndex(0);
   ui->numModComboBox->setCurrentIndex(4);
+  ui->numUnknownShiftComboBox->setCurrentIndex(0);
   ui->NONECheckBox->setChecked(false);
   ui->NMECheckBox->setChecked(false);
   ui->NMEACCheckBox->setChecked(false);
@@ -139,6 +140,7 @@ void topmgWindow::on_defaultButton_clicked() {
   ui->cutoffSpectralTypeComboBox->setCurrentIndex(0);
   ui->cutoffProteoformTypeComboBox->setCurrentIndex(0);
   ui->numModComboBox->setCurrentIndex(4);
+  ui->numUnknownShiftComboBox->setCurrentIndex(0);
   ui->NONECheckBox->setChecked(true);
   ui->NMECheckBox->setChecked(true);
   ui->NMEACCheckBox->setChecked(true);
@@ -159,7 +161,7 @@ void topmgWindow::topmgWindow::on_databaseFileButton_clicked() {
       this,
       "Select a protein database file",
       lastDir_,
-      "Database files(*.fasta)");
+      "Database files(*.fasta *.fa)");
   updatedir(s);
   ui->databaseFileEdit->setText(s);
 }
@@ -257,7 +259,8 @@ std::map<std::string, std::string> topmgWindow::getArguments() {
   if (arguments_["fixedMod"] == "NONE") {
     arguments_["fixedMod"] = "";
   }
-  arguments_["ptmNumber"] = ui->numModComboBox->currentText().toStdString();
+  arguments_["varPtmNumber"] = ui->numModComboBox->currentText().toStdString();
+  arguments_["ptmNumber"] = ui->numUnknownShiftComboBox->currentText().toStdString();
   arguments_["errorTolerance"] = ui->errorToleranceEdit->text().toStdString();
   arguments_["cutoffSpectralType"] = ui->cutoffSpectralTypeComboBox->currentText().toStdString();
   arguments_["cutoffSpectralValue"] = ui->cutoffSpectralValueEdit->text().toStdString();
@@ -290,6 +293,7 @@ std::map<std::string, std::string> topmgWindow::getArguments() {
   arguments_["proteo_graph_dis"] = "40";  // default
   arguments_["useASFDiag"] = "false";  // default
   arguments_["varPtmNumber"] = ui->numModComboBox->currentText().toStdString();
+  arguments_["ptmNumber"] = ui->numUnknownShiftComboBox->currentText().toStdString();
   arguments_["varPtmNumInGap"] = "5";  // default
   arguments_["residueModFileName"] = ui->modFileEdit->text().toStdString();
   arguments_["threadNumber"] = ui->threadNumberEdit->text().toStdString();
@@ -371,6 +375,7 @@ void topmgWindow::lockDialog() {
   ui->cutoffSpectralTypeComboBox->setEnabled(false);
   ui->cutoffProteoformTypeComboBox->setEnabled(false);
   ui->numModComboBox->setEnabled(false);
+  ui->numUnknownShiftComboBox->setEnabled(false);
   ui->NONECheckBox->setEnabled(false);
   ui->NMECheckBox->setEnabled(false);
   ui->NMEACCheckBox->setEnabled(false);
@@ -403,6 +408,7 @@ void topmgWindow::unlockDialog() {
   ui->cutoffSpectralTypeComboBox->setEnabled(true);
   ui->cutoffProteoformTypeComboBox->setEnabled(true);
   ui->numModComboBox->setEnabled(true);
+  ui->numUnknownShiftComboBox->setEnabled(true);
   ui->NONECheckBox->setEnabled(true);
   ui->NMECheckBox->setEnabled(true);
   ui->NMEACCheckBox->setEnabled(true);
@@ -627,7 +633,7 @@ void topmgWindow::closeEvent(QCloseEvent *event) {
 bool topmgWindow::continueToClose() {
   if (QMessageBox::question(this,
                             tr("Quit"),
-                            tr("TopPIC is still running. Are you sure you want to quit?"),
+                            tr("TopMG is still running. Are you sure you want to quit?"),
                             QMessageBox::Yes | QMessageBox::No,
                             QMessageBox::No)
       == QMessageBox::Yes) {

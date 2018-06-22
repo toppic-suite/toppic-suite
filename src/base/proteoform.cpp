@@ -124,7 +124,7 @@ PtmPtrVec Proteoform::getPtmVec() {
 
     for (size_t k = 0; k < change_vec.size(); k++) {
       PtmPtr p = change_vec[k]->getModPtr()->getModResiduePtr()->getPtmPtr();
-      if (p != nullptr) {
+      if (p != nullptr && !PtmBase::isEmptyPtmPtr(p)) {
         ptm_vec.push_back(p);
       }
     }

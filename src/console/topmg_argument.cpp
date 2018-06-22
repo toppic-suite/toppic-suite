@@ -99,6 +99,7 @@ void Argument::outputArguments(std::ostream &output, std::map<std::string, std::
   output << std::setw(50) << std::left << "Gap in proteoform graph: " << "\t" << arguments["proteo_graph_dis"] << std::endl;
   output << std::setw(50) << std::left << "Maximum number of variable PTMs: " << "\t" << arguments["varPtmNumber"] << std::endl;
   output << std::setw(50) << std::left << "Maximum number of variable PTMs in a graph gap: " << "\t" << arguments["varPtmNumInGap"] << std::endl;
+  output << std::setw(50) << std::left << "Maximum number of unexpected modifications: " << "\t" << arguments["ptmNumber"] << std::endl;
   output << std::setw(50) << std::left << "Executable file directory: " << "\t" << arguments["executiveDir"] << std::endl;
   output << std::setw(50) << std::left << "Start time: " << "\t" << arguments["start_time"] << std::endl;
   if (arguments["end_time"] != "") {
@@ -163,6 +164,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("var-ptm-in-gap,G", po::value<std::string>(&var_ptm_in_gap) , "<a positive number>. Maximum number of variable PTMs in a proteform graph gap. Default value: 5.")
         ("use-asf-diagonal,D", "Use the ASF-DIAGONAL method for protein filtering.")
         ("var-ptm,P", po::value<std::string>(&var_ptm_num) , "<a positive number>. Maximum number of variable PTMs. Default value: 5.")
+        ("num-shift,p", po::value<std::string> (&ptm_num), "<0|1|2>. Maximum number of unexpected modifications in a proteoform spectrum-match. Default value: 0.")
         ("output,o", po::value<std::string>(&combined_output_name) , "<a filename with its path>. The output file name for the combined results. Default: combined.")
         ("keep-temp-files,k", "Keep temporary files.");
 
@@ -192,6 +194,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("var-ptm-in-gap,G", po::value<std::string>(&var_ptm_in_gap) , "")
         ("use-asf-diagonal,D", "")
         ("var-ptm,P", po::value<std::string>(&var_ptm_num) , "")
+        ("num-shift,p", po::value<std::string> (&ptm_num), "")
         ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name with its path.")
         ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), "Spectrum file name with its path.");
 
@@ -324,6 +327,10 @@ bool Argument::parse(int argc, char* argv[]) {
 
     if (vm.count("var-ptm")) {
       arguments_["varPtmNumber"] = var_ptm_num;
+    }
+
+    if (vm.count("num-shift")) {
+      arguments_["ptmNumber"] = ptm_num;
     }
 
     if (vm.count("var-ptm-in-gap")) {
