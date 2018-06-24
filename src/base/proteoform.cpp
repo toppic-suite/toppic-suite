@@ -133,6 +133,26 @@ PtmPtrVec Proteoform::getPtmVec() {
   return ptm_vec;
 }
 
+PtmPtrVec Proteoform::getPtmVec(MassShiftTypePtr type) {
+  PtmPtrVec ptm_vec;
+
+  for (size_t i = 0; i < mass_shift_list_.size(); i++) {
+    if (mass_shift_list_[i]->getTypePtr() != type) continue;
+
+    ChangePtrVec change_vec = mass_shift_list_[i]->getChangePtrVec();
+
+    for (size_t k = 0; k < change_vec.size(); k++) {
+      PtmPtr p = change_vec[k]->getModPtr()->getModResiduePtr()->getPtmPtr();
+      if (p != nullptr && !PtmBase::isEmptyPtmPtr(p)) {
+        ptm_vec.push_back(p);
+      }
+    }
+  }
+
+  return ptm_vec;
+}
+
+
 AlignTypePtr Proteoform::getAlignType() {
   int trunc_len = prot_mod_ptr_->getTruncPtr()->getTruncLen();
   // LOG_DEBUG("seq " << getProteinMatchSeq() << " trunc len " << trunc_len << " start pos " << start_pos_);
