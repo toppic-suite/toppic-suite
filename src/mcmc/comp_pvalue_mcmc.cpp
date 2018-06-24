@@ -122,7 +122,7 @@ double CompPValueMCMC::compOneProbMCMC(PrsmPtr prsm_ptr, ActivationPtr act,
 
   pep_mass_ = residue_util::compResiduePtrVecMass(prot_form->getResSeqPtr()->getResidues());
 
-  ptm_vec_ = prot_form->getPtmVec();
+  ptm_vec_ = prot_form->getPtmVec(MassShiftType::VARIABLE);
 
   ptm_mass_vec_.resize(ptm_vec_.size());
 

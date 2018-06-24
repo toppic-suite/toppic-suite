@@ -106,6 +106,8 @@ class Proteoform {
 
   PtmPtrVec getPtmVec();
 
+  PtmPtrVec getPtmVec(MassShiftTypePtr type);
+
  private:
   FastaSeqPtr fasta_seq_ptr_;
 
