@@ -91,7 +91,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
 
     if (arguments["useFeatureFile"] == "true") {
       if (!boost::filesystem::exists(feature_file_name)) {
-        LOG_ERROR("TopFD feature file does not exist!. Please use -x option.");
+        LOG_ERROR("TopFD feature file does not exist!. Please use -x option in command line or select 'Missing MS1 feature file in GUI'.");
         exit(EXIT_FAILURE);
       }
     }
