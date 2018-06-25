@@ -92,7 +92,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     if (arguments["useFeatureFile"] == "true") {
       if (!boost::filesystem::exists(feature_file_name)) {
         LOG_ERROR("TopFD feature file does not exist!. Please use -x option in command line or select 'Missing MS1 feature file in GUI'.");
-        exit(EXIT_FAILURE);
+        return 1;
       }
     }
 
@@ -217,7 +217,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
   }
-  return EXIT_SUCCESS;
+  return 0;
 }
 
 // proteoform clustering + FDR + HTML generation
@@ -415,15 +415,15 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     std::cout << e << std::endl;
   }
   std::cout << "TopPIC finished." << std::endl;
-  return EXIT_SUCCESS;
+  return 0;
 }
 
 int TopPICProgress(std::map<std::string, std::string> & arguments) {
-  TopPIC_identify(arguments);
+  if (TopPIC_identify(arguments) != 0) {
+    return 1;
+  }
 
-  TopPIC_post(arguments);
-
-  return EXIT_SUCCESS;
+  return TopPIC_post(arguments);
 }
 
 int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
@@ -440,7 +440,9 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
 
   for (size_t k = 0; k < spec_file_lst.size(); k++) {
     arguments["spectrumFileName"] = spec_file_lst[k];
-    prot::TopPICProgress(arguments);
+    if (prot::TopPICProgress(arguments) != 0) {
+      return 1;
+    }
   }
 
   if (spec_file_lst.size() > 1) {
@@ -489,7 +491,7 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
     std::cout << "Deleting temporary files - finished." << std::endl; 
   }
 
-  return EXIT_SUCCESS;
+  return 0;
 }
 
 }  // namespace prot

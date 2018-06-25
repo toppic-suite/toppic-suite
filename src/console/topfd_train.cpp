@@ -24,7 +24,7 @@ int main(int argc, char* argv[]) {
   prot::Argument argu_processor;
   bool success = argu_processor.parse(argc, argv);
   if (!success) {
-    return EXIT_FAILURE;
+    return 1;
   }
   std::map<std::string, std::string> arguments = argu_processor.getArguments();
   

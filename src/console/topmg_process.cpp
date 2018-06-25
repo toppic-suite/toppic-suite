@@ -95,7 +95,7 @@ int TopMG_identify(std::map<std::string, std::string> arguments) {
     if (arguments["useFeatureFile"] == "true") {
       if (!boost::filesystem::exists(feature_file_name)) {
         LOG_ERROR("TopFD feature file does not exist!. Please use -x option in command line or select 'Missing MS1 feature file in GUI'.");
-        exit(EXIT_FAILURE);
+        return 1;
       }
     }
 
@@ -209,7 +209,7 @@ int TopMG_identify(std::map<std::string, std::string> arguments) {
     std::cout << e << std::endl;
   }
 
-  return EXIT_SUCCESS;
+  return 0;
 }
 
 int TopMG_post(std::map<std::string, std::string> arguments) {
@@ -371,15 +371,15 @@ int TopMG_post(std::map<std::string, std::string> arguments) {
     std::cout << e << std::endl;
   }
   std::cout << "TopMG finished." << std::endl;
-  return EXIT_SUCCESS;
+  return 0;
 }
 
 int TopMGProcess(std::map<std::string, std::string> arguments) {
-  TopMG_identify(arguments);
+  if (TopMG_identify(arguments) != 0) {
+    return 1;
+  }
 
-  TopMG_post(arguments);
-
-  return EXIT_SUCCESS;
+  return TopMG_post(arguments);
 }
 
 int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
@@ -397,7 +397,9 @@ int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
 
   for (size_t k = 0; k < spec_file_lst.size(); k++) {
     arguments["spectrumFileName"] = spec_file_lst[k];
-    prot::TopMGProcess(arguments);
+    if (prot::TopMGProcess(arguments) != 0) {
+      return 1;
+    }
   }
 
   if (spec_file_lst.size() > 1) {
@@ -446,7 +448,7 @@ int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
     std::cout << "Deleting temporary files - finished." << std::endl; 
   }
 
-  return EXIT_SUCCESS; 
+  return 0; 
 }
 
 }  // namespace prot
