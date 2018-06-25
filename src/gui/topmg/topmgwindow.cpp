@@ -73,6 +73,7 @@ void topmgWindow::initArguments() {
   arguments_["databaseFileName"] = "";
   arguments_["databaseBlockSize"] = "1000000";
   arguments_["spectrumFileName"] = "";
+  arguments_["combinedOutputName"] = "combined";
   arguments_["activation"] = "FILE";
   arguments_["searchType"] = "TARGET";
   arguments_["fixedMod"] = "";
@@ -104,6 +105,7 @@ void topmgWindow::initArguments() {
 
 void topmgWindow::on_clearButton_clicked() {
   ui->databaseFileEdit->clear();
+  ui->combinedOutputEdit->clear();
   ui->fixedModFileEdit->clear();
   ui->errorToleranceEdit->setText("15");
   ui->maxModEdit->clear();
@@ -158,7 +160,6 @@ void topmgWindow::updatedir(QString s) {
   }
 }
 
-// single file
 void topmgWindow::topmgWindow::on_databaseFileButton_clicked() {
   QString s = QFileDialog::getOpenFileName(
       this,
@@ -169,13 +170,22 @@ void topmgWindow::topmgWindow::on_databaseFileButton_clicked() {
   ui->databaseFileEdit->setText(s);
 }
 
+void topmgWindow::topmgWindow::on_combinedOutputButton_clicked() {
+  QString dir = QFileDialog::getExistingDirectory(this,
+                                                  tr("Open Directory"),
+                                                  lastDir_,
+                                                  QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+
+  updatedir(dir);
+  ui->combinedOutputEdit->setText(dir);
+}
 
 void topmgWindow::on_fixedModFileButton_clicked() {
   QString s = QFileDialog::getOpenFileName(
       this,
       "Select a fixed modification file",
       lastDir_,
-      "Fixed modification files(*.txt);;All files(*.*)");
+      "Modification files(*.txt);;All files(*.*)");
   updatedir(s);
   ui->fixedModFileEdit->setText(s);
 }
@@ -195,7 +205,7 @@ void topmgWindow::on_skipListButton_clicked() {
       this,
       "Select a modification file for skip list",
       lastDir_,
-      "Modification files(*.txt);;All files(*.*)");
+      "Text files(*.txt);;All files(*.*)");
   updatedir(s);
   ui->skipListEdit->setText(s);
 }
@@ -248,6 +258,7 @@ std::map<std::string, std::string> topmgWindow::getArguments() {
   arguments_["executiveDir"] = exe_dir;
   arguments_["resourceDir"] = arguments_["executiveDir"] + prot::file_util::getFileSeparator() + prot::file_util::getResourceDirName();
   arguments_["oriDatabaseFileName"] = ui->databaseFileEdit->text().toStdString();
+  arguments_["combinedOutputName"] = ui->combinedOutputEdit->text().toStdString() + "/combined";
   arguments_["databaseBlockSize"] = "1000000";
   arguments_["activation"] = ui->activationComboBox->currentText().toStdString();
   if (ui->decoyCheckBox->isChecked()) {
@@ -328,9 +339,8 @@ void topmgWindow::on_addButton_clicked() {
     if (ableToAdd(spfile)) {
       ui->listWidget->addItem(new QListWidgetItem(spfile));
     }
-
   }
-};
+}
 
 bool topmgWindow::ableToAdd(QString spfile) {
   bool able = true;
@@ -363,6 +373,7 @@ void topmgWindow::lockDialog() {
   ui->databaseFileButton->setEnabled(false);
   ui->modFileButton->setEnabled(false);
   ui->databaseFileEdit->setEnabled(false);
+  ui->combinedOutputEdit->setEnabled(false);
   ui->fixedModFileEdit->setEnabled(false);
   ui->errorToleranceEdit->setEnabled(false);
   ui->maxModEdit->setEnabled(false);
@@ -396,6 +407,7 @@ void topmgWindow::unlockDialog() {
   ui->databaseFileButton->setEnabled(true);
   ui->modFileButton->setEnabled(true);
   ui->databaseFileEdit->setEnabled(true);
+  ui->combinedOutputEdit->setEnabled(true);
   ui->fixedModFileEdit->setEnabled(true);
   ui->errorToleranceEdit->setEnabled(true);
   ui->maxModEdit->setEnabled(true);
@@ -437,6 +449,29 @@ bool topmgWindow::checkError() {
   if (ui->databaseFileEdit->text().toStdString().length() > 200) {
     QMessageBox::warning(this, tr("Warning"),
                          tr("The protein database file path is too long!"),
+                         QMessageBox::Yes);
+    return true;
+  }
+
+  for (int i = 0; i < ui->listWidget->count(); i++) {
+    if (ui->listWidget->item(i)->text().toStdString().length() > 200) {
+      QMessageBox::warning(this, tr("Warning"),
+                           tr("The sepctrum file path is too long!"),
+                           QMessageBox::Yes);
+      return true;
+    }
+  }
+
+  if (ui->listWidget->count() > 1 && ui->combinedOutputEdit->text().toStdString().length() == 0) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("Please select a folder for the combined output!"),
+                         QMessageBox::Yes);
+    return true;
+  }
+
+  if (ui->combinedOutputEdit->text().toStdString().length() > 200) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("The output folder path is too long!"),
                          QMessageBox::Yes);
     return true;
   }

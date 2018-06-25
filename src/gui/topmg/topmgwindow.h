@@ -30,49 +30,89 @@ class topmgWindow : public QMainWindow {
 
  public:
   explicit topmgWindow(QWidget *parent = 0);
+
   ~topmgWindow();
 
-  private slots:
-    void on_databaseFileButton_clicked();
-    void on_fixedModFileButton_clicked();
-    void on_modFileButton_clicked();
-    void on_skipListButton_clicked();
-    void on_clearButton_clicked();
-    void on_defaultButton_clicked();
-    void on_startButton_clicked();
-    void on_exitButton_clicked();
-    void on_outputButton_clicked();
-    void on_fixedModComboBox_currentIndexChanged(int index);
-    void on_NONECheckBox_clicked(bool checked);
-    void on_NMECheckBox_clicked(bool checked);
-    void on_NMEACCheckBox_clicked(bool checked);
-    void on_MACCheckBox_clicked(bool checked);
-    void on_cutoffSpectralTypeComboBox_currentIndexChanged(int index);
-    void on_cutoffProteoformTypeComboBox_currentIndexChanged(int index);
-    void on_decoyCheckBox_clicked(bool checked);
-    void on_addButton_clicked();
-    void on_delButton_clicked();
+ private slots:
+  void on_databaseFileButton_clicked();
+
+  void on_combinedOutputButton_clicked();
+
+  void on_fixedModFileButton_clicked();
+  
+  void on_modFileButton_clicked();
+  
+  void on_skipListButton_clicked();
+
+  void on_clearButton_clicked();
+
+  void on_defaultButton_clicked();
+
+  void on_startButton_clicked();
+
+  void on_exitButton_clicked();
+
+  void on_outputButton_clicked();
+
+  void on_fixedModComboBox_currentIndexChanged(int index);
+    
+  void on_NONECheckBox_clicked(bool checked);
+    
+  void on_NMECheckBox_clicked(bool checked);
+    
+  void on_NMEACCheckBox_clicked(bool checked);
+    
+  void on_MACCheckBox_clicked(bool checked);
+    
+  void on_cutoffSpectralTypeComboBox_currentIndexChanged(int index);
+    
+  void on_cutoffProteoformTypeComboBox_currentIndexChanged(int index);
+    
+  void on_decoyCheckBox_clicked(bool checked);
+    
+  void on_addButton_clicked();
+    
+  void on_delButton_clicked();
 
  private:
   Ui::topmgWindow *ui;
+  
   QString lastDir_;
+  
   std::map<std::string, std::string> arguments_;
+  
   std::vector<std::string> spec_file_lst_;
+  
   void initArguments();
+  
   std::map<std::string, std::string> getArguments();
+  
   std::vector<std::string> getSpecFileList();
+  
   void lockDialog();
+  
   void unlockDialog();
+  
   bool checkError();
+  
   void updateMsg(std::string msg);
+  
   void updatedir(QString s);
+  
   void showArguments();
+  
   void sleep(int wait);
+  
   threadtopmg* thread_;
+  
   QString showInfo;
+  
   void closeEvent(QCloseEvent *event);
+  
   bool continueToClose();
+  
   bool nterminalerror();
+  
   bool ableToAdd(QString spfile);
 };
 

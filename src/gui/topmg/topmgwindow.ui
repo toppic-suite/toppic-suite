@@ -40,9 +40,9 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>330</y>
+      <y>340</y>
       <width>861</width>
-      <height>201</height>
+      <height>191</height>
      </rect>
     </property>
     <property name="font">
@@ -163,7 +163,7 @@ p, li { white-space: pre-wrap; }
       <x>20</x>
       <y>10</y>
       <width>881</width>
-      <height>311</height>
+      <height>321</height>
      </rect>
     </property>
     <property name="font">
@@ -230,7 +230,7 @@ p, li { white-space: pre-wrap; }
           </size>
          </property>
          <property name="text">
-          <string>File</string>
+          <string>Select</string>
          </property>
         </widget>
        </item>
@@ -274,6 +274,54 @@ p, li { white-space: pre-wrap; }
         <widget class="QPushButton" name="delButton">
          <property name="text">
           <string>Remove</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget_5">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>250</y>
+        <width>861</width>
+        <height>33</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <item>
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>Combined output folder: </string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="combinedOutputEdit">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>650</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="combinedOutputButton">
+         <property name="maximumSize">
+          <size>
+           <width>85</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Select</string>
          </property>
         </widget>
        </item>
