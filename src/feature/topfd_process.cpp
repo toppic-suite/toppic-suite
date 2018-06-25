@@ -48,7 +48,7 @@ int TopFDProcess(std::map<std::string, std::string> arguments) {
     std::cout << e << std::endl;
   }
   std::cout << "TopFD finished." << std::endl;
-  return EXIT_SUCCESS;
+  return 0;
 }
 
 }  // namespace prot

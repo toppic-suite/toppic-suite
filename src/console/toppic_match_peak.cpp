@@ -57,7 +57,7 @@ int outputMatchPeaks(std::map<std::string, std::string> arguments) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
   }
-  return EXIT_SUCCESS;
+  return 0;
 }
 
 }
@@ -72,4 +72,5 @@ int main(int argc, char* argv[]) {
   }
   std::map<std::string, std::string> arguments = argu_processor.getArguments();
   prot::outputMatchPeaks(arguments);
+  return 0;
 }

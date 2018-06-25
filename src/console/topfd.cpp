@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
   bool success = argu_processor.parse(argc, argv);
 
   if (!success) {
-    return EXIT_FAILURE;
+    return 1;
   }
 
   std::map<std::string, std::string> arguments = argu_processor.getArguments();
@@ -45,9 +45,11 @@ int main(int argc, char* argv[]) {
         || prot::string_util::endsWith(spec_file_lst[k], "mzml")
         || prot::string_util::endsWith(spec_file_lst[k], "mzxml")) {
       arguments["spectrumFileName"] = spec_file_lst[k];
-      prot::TopFDProcess(arguments);
+      if (prot::TopFDProcess(arguments) != 0) {
+        return 1;
+      }
     }
   }
 
-  return EXIT_SUCCESS;
+  return 0;
 }

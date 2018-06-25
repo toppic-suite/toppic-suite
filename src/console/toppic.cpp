@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
   bool success = argu_processor.parse(argc, argv);
 
   if (!success) {
-    return EXIT_FAILURE;
+    return 1;
   }
 
   std::map<std::string, std::string> arguments = argu_processor.getArguments();
@@ -43,5 +43,5 @@ int main(int argc, char* argv[]) {
 
   prot::TopPICProgress_multi_file(arguments, spec_file_lst);  
 
-  return EXIT_SUCCESS;
+  return 0;
 }
