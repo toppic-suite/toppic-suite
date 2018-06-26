@@ -188,6 +188,8 @@ void addMod(ProteoformPtr proteoform_ptr, int left_db_bp, int right_db_bp,
     anno = segment_ptr->getResidueAnno();
   }
 
+  segment_ptr->setMassShiftType(shift_ptr->getTypePtr());
+
   segment_ptrs.push_back(segment_ptr);
   last_right = this_right;
 
@@ -219,10 +221,6 @@ AnnoSegmentPtrVec getSegments(ProteoformPtr proteoform_ptr, MassShiftPtrVec & sh
     } else {
       addMod(proteoform_ptr, left_db_bp, right_db_bp, shift_ptrs[i], unexpected_shift_color,
              last_right, segment_ptrs, cleavage_ptrs, res_ptrs);
-    }
-
-    for (size_t k = 0; k < segment_ptrs.size(); k++) {
-      segment_ptrs[k]->setMassShiftType(shift_ptrs[i]->getTypePtr());
     }
 
     unexpected_shift_color = (unexpected_shift_color + 1) % 2;
