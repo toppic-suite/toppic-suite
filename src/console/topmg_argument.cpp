@@ -76,6 +76,11 @@ void Argument::outputArguments(std::ostream &output, std::map<std::string, std::
   output << "********************** Parameters **********************" << std::endl;
   output << std::setw(50) << std::left << "Protein database file: " << "\t" << arguments["oriDatabaseFileName"] << std::endl;
   output << std::setw(50) << std::left << "Spectrum file: " << "\t" << arguments["spectrumFileName"] << std::endl;
+
+  if (arguments["skipList"] != "") {
+    output << std::setw(50) << std::left << "Skip list: " << "\t" << arguments["skipList"] << std::endl;
+  }
+
   output << std::setw(50) << std::left << "Fragmentation method: " << "\t" << arguments["activation"] << std::endl;
   output << std::setw(50) << std::left << "Search type: " << "\t" << arguments["searchType"] << std::endl;
 
