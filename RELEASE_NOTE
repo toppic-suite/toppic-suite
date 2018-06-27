@@ -1,5 +1,8 @@
-Version 1.1.3 (May, 2018)
+Version 1.2.0 (Jun, 2018)
     * TopFD/TopPIC now can accept multiple files as input
+    * Added TopMG
+    * Added a GUI wrapper for TopMG
+    * E-value computation using MCMC in TopMG
 
 Version 1.1.2 (Jan, 2018)
     * Reduced memory usage in xml generation.

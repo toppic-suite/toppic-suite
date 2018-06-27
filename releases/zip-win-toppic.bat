@@ -1,9 +1,15 @@
 rmdir /S toppic-windows-%1
 mkdir toppic-windows-%1
+
 copy ..\bin\toppic_gui.exe toppic-windows-%1
 copy ..\bin\toppic.exe toppic-windows-%1
+
 copy ..\bin\topfd_gui.exe toppic-windows-%1
 copy ..\bin\topfd.exe toppic-windows-%1
+
+copy ..\bin\topmg_gui.exe toppic-windows-%1
+copy ..\bin\topmg.exe toppic-windows-%1
+
 copy ..\LICENSE toppic-windows-%1
 xcopy /S ..\toppic_resources toppic-windows-%1\toppic_resources
 
