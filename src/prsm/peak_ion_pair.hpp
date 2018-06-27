@@ -52,6 +52,8 @@ class PeakIonPair {
 
   static bool cmpRealPeakPosInc(const PeakIonPairPtr &a, const PeakIonPairPtr &b);
 
+  static bool cmpTheoPeakPosInc(const PeakIonPairPtr &a, const PeakIonPairPtr &b);
+
  private:
   int id_;
 

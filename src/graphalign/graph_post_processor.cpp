@@ -23,10 +23,12 @@
 #include "base/file_util.hpp"
 #include "base/mass_shift.hpp"
 
+#include "spec/extend_ms_factory.hpp"
 #include "spec/msalign_util.hpp"
 #include "spec/msalign_reader.hpp"
 
 #include "prsm/prsm_reader.hpp"
+#include "prsm/peak_ion_pair_util.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 
 #include "graphalign/graph_align_mng.hpp"
@@ -51,13 +53,10 @@ std::vector<double> mass_split(double mass, const std::vector<PtmPtr> & ptm_vec)
   return mass_vec;
 }
 
-void GraphPostProcessor::process() {
+void GraphPostProcessor::geneMassPtmMap() {
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
-  SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
-  std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
-  LOG_DEBUG("Search db file name " << db_file_name);
-  std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
   std::string var_mod_file_name = mng_ptr_->var_mod_file_name_;
+
   std::vector<PtmPtr> ptm_vec = prot::ptm_util::readPtmTxt(var_mod_file_name);
 
   ProtModPtrVec prot_mod_vec = prsm_para_ptr->getProtModPtrVec();
@@ -120,6 +119,16 @@ void GraphPostProcessor::process() {
       }
     }
   }
+}
+
+void GraphPostProcessor::process() {
+  PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
+  SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
+  std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
+  LOG_DEBUG("Search db file name " << db_file_name);
+  std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
+
+  geneMassPtmMap();
 
   int spectrum_num = msalign_util::getSpNum(prsm_para_ptr->getSpectrumFileName());
   std::string input_file_name = file_util::basename(sp_file_name)+ "." + input_ext_;
@@ -140,6 +149,7 @@ void GraphPostProcessor::process() {
                           sp_para_ptr->getSkipList());
 
   int cnt = 0;
+
   SpectrumSetPtr spec_set_ptr = sp_reader.getNextSpectrumSet(sp_para_ptr)[0];
 
   while (spec_set_ptr != nullptr) {
@@ -148,7 +158,17 @@ void GraphPostProcessor::process() {
       int spec_id = spec_set_ptr->getSpectrumId();
       while (prsm_ptr != nullptr && prsm_ptr->getSpectrumId() == spec_id) {
         DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
-        MassShiftPtrVec shift_vec = prsm_ptr->getProteoformPtr()->getMassShiftPtrVec(MassShiftType::VARIABLE);
+        double adjusted_prec_mass = prsm_ptr->getAdjustedPrecMass();
+        ExtendMsPtrVec refine_ms_ptr_vec
+            = extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec, sp_para_ptr, adjusted_prec_mass);
+        PeakIonPairPtrVec pair_vec
+            = peak_ion_pair_util::genePeakIonPairs(prsm_ptr->getProteoformPtr(),
+                                                   refine_ms_ptr_vec[0], 
+                                                   sp_para_ptr->getMinMass());
+        std::sort(pair_vec.begin(), pair_vec.end(), PeakIonPair::cmpTheoPeakPosInc);
+
+        MassShiftPtrVec shift_vec
+            = prsm_ptr->getProteoformPtr()->getMassShiftPtrVec(MassShiftType::VARIABLE);
 
         for (size_t k = 0; k < shift_vec.size(); k++) {
           int mass = std::ceil(shift_vec[k]->getMassShift() * mng_ptr_->convert_ratio_);
@@ -192,13 +212,39 @@ void GraphPostProcessor::process() {
           prot_mod = ProtModBase::getProtModPtrByName(ProtModBase::getType_NME());
         }
 
-        MassShiftPtrVec unknown_shift_vec = prsm_ptr->getProteoformPtr()->getMassShiftPtrVec(MassShiftType::UNEXPECTED);
+        MassShiftPtrVec unknown_shift_vec
+            = prsm_ptr->getProteoformPtr()->getMassShiftPtrVec(MassShiftType::UNEXPECTED);
+
+        for (size_t k = 0; k < unknown_shift_vec.size(); k++) {
+          if (unknown_shift_vec[k]->getRightBpPos() == unknown_shift_vec[k]->getLeftBpPos()) {
+            int right_pos = unknown_shift_vec[k]->getRightBpPos();
+            int left_pos = unknown_shift_vec[k]->getLeftBpPos();
+            if (pair_vec[pair_vec.size() - 1]->getTheoPeakPtr()->getIonPtr()->getPos() > right_pos) {
+              for (size_t i = 0; i < pair_vec.size(); i++) {
+                if (pair_vec[i]->getTheoPeakPtr()->getIonPtr()->getPos() > right_pos) {
+                  right_pos = pair_vec[i]->getTheoPeakPtr()->getIonPtr()->getPos();
+                  break; 
+                }
+              }
+              unknown_shift_vec[k]->setRightBpPos(right_pos);
+            } else {
+              for (int i = static_cast<int>(pair_vec.size() - 1); i >= 0; i--) {
+                if (pair_vec[i]->getTheoPeakPtr()->getIonPtr()->getPos() < left_pos) {
+                  left_pos = pair_vec[i]->getTheoPeakPtr()->getIonPtr()->getPos();
+                  break; 
+                }
+              }
+              unknown_shift_vec[k]->setLeftBpPos(left_pos);
+            }
+          }
+        }
 
         shift_vec.insert(shift_vec.end(), unknown_shift_vec.begin(), unknown_shift_vec.end());
 
         std::sort(shift_vec.begin(), shift_vec.end(), MassShift::cmpPosInc);
 
-        MassShiftPtrVec fix_shift_vec = prsm_ptr->getProteoformPtr()->getMassShiftPtrVec(MassShiftType::FIXED);
+        MassShiftPtrVec fix_shift_vec
+            = prsm_ptr->getProteoformPtr()->getMassShiftPtrVec(MassShiftType::FIXED);
 
         fix_shift_vec.insert(fix_shift_vec.end(), shift_vec.begin(), shift_vec.end());
 
@@ -212,9 +258,11 @@ void GraphPostProcessor::process() {
 
         new_form->setVariablePtmNum(prsm_ptr->getProteoformPtr()->getVariablePtmNum());
 
-        prsm_ptr->setProteoformPtr(new_form);
+        PrsmPtr new_prsm = std::make_shared<Prsm>(new_form, spec_set_ptr->getDeconvMsPtrVec(),
+                                                  adjusted_prec_mass,
+                                                  prsm_para_ptr->getSpParaPtr());
 
-        if (prsm_ptr->getMatchFragNum() > 0) prsm_writer->write(prsm_ptr);
+        if (new_prsm->getMatchFragNum() > 0) prsm_writer->write(new_prsm);
 
         prsm_ptr = prsm_reader->readOnePrsm(fasta_reader,
                                             mng_ptr_->prsm_para_ptr_->getFixModPtrVec());
