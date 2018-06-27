@@ -202,7 +202,7 @@ double Prsm::getNormMatchFragNum() {
 
   int end_pos = proteoform_ptr_->getEndPos();
 
-  double score = match_fragment_num_ - 2 * var_change_num - 4 * unexp_change_num;
+  double score = match_fragment_num_ - 2 * var_change_num - 6 * unexp_change_num;
 
   int trunc_len = getProteoformPtr()->getProtModPtr()->getTruncPtr()->getTruncLen();
 

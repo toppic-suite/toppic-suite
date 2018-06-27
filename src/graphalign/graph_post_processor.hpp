@@ -34,6 +34,8 @@ class GraphPostProcessor {
 
   void process();
 
+  void geneMassPtmMap();
+
  private:
   GraphAlignMngPtr mng_ptr_;
 

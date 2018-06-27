@@ -73,10 +73,14 @@ void PeakIonPair::appendTheoPeakToXml(XmlDOMDocument* xml_doc,
   parent->appendChild(element);
 }
 
-bool PeakIonPair::cmpRealPeakPosInc(const PeakIonPairPtr &a, 
-                                    const PeakIonPairPtr &b) {
+bool PeakIonPair::cmpRealPeakPosInc(const PeakIonPairPtr &a, const PeakIonPairPtr &b) {
   return a->getRealPeakPtr()->getBasePeakPtr()->getPosition() 
       < b->getRealPeakPtr()->getBasePeakPtr()->getPosition();
+}
+
+bool PeakIonPair::cmpTheoPeakPosInc(const PeakIonPairPtr &a, const PeakIonPairPtr &b) {
+  return a->getTheoPeakPtr()->getIonPtr()->getPos() 
+      < b->getTheoPeakPtr()->getIonPtr()->getPos();
 }
 
 }  // namespace prot
