@@ -382,6 +382,20 @@ bool Argument::validateArguments() {
       LOG_ERROR(spec_file_list_[k] << " does not exist!");
       return false;
     }
+
+    if (!string_util::endsWith(spec_file_list_[k], ".msalign")) {
+      LOG_ERROR("Spectrum file " << spec_file_list_[k] << " is not a msalign file!");
+      return false;
+    }
+
+    if (spec_file_list_[k].length() > 200) {
+      LOG_ERROR("Spectrum file " << spec_file_list_[k] << " path is too long!");
+      return false;
+    }
+
+    if (string_util::endsWith(spec_file_list_[k], "_ms1.msalign")) {
+      std::cerr << "Warning: Please make sure " << spec_file_list_[k] << " is the ms2 spectral file." << std::endl;
+    }
   }
 
   if (arguments_["skipList"] != "") {
