@@ -388,6 +388,10 @@ bool Argument::validateArguments() {
       LOG_ERROR("Spectrum file " << spec_file_list_[k] << " path is too long!");
       return false;
     }
+
+    if (string_util::endsWith(spec_file_list_[k], "_ms1.msalign")) {
+      std::cerr << "Warning: Please make sure " << spec_file_list_[k] << " is the ms2 spectral file." << std::endl;
+    }
   }
 
   if (!boost::filesystem::exists(arguments_["residueModFileName"])) {
