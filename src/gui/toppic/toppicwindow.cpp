@@ -249,9 +249,17 @@ void toppicWindow::on_startButton_clicked() {
 }
 
 void toppicWindow::on_outputButton_clicked() {
-  fs::path full_path(arguments_["spectrumFileName"].c_str());
-  QString outPath = full_path.remove_filename().string().c_str();
-  QDesktopServices::openUrl(QUrl(outPath, QUrl::TolerantMode));
+  std::vector<std::string> spec_file_lst = this->getSpecFileList();
+  if (spec_file_lst.size() > 1) {
+    std::string output_file_name = arguments_["combinedOutputName"] + "_ms2.msalign";
+    fs::path full_path(output_file_name.c_str());
+    QString outPath = full_path.remove_filename().string().c_str();
+    QDesktopServices::openUrl(QUrl(outPath, QUrl::TolerantMode));
+  } else {
+    fs::path full_path(spec_file_lst[0].c_str());
+    QString outPath = full_path.remove_filename().string().c_str();
+    QDesktopServices::openUrl(QUrl(outPath, QUrl::TolerantMode));
+  }
 }
 
 std::map<std::string, std::string> toppicWindow::getArguments() {
