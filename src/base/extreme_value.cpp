@@ -16,6 +16,7 @@
 #include <cmath>
 #include <limits>
 #include <string>
+#include <algorithm>
 
 #include "base/base_data.hpp"
 #include "base/extreme_value.hpp"
@@ -23,14 +24,6 @@
 #include "base/xml_dom_util.hpp"
 
 namespace prot {
-
-ExtremeValue::ExtremeValue(double one_prot_prob, double test_num,
-                           double adjust_factor):
-    one_prot_prob_(one_prot_prob),
-    test_num_(test_num),
-    adjust_factor_(adjust_factor) {
-      init();
-    }
 
 void ExtremeValue::setOneProtProb(double one_prot_prob) {
   one_prot_prob_ = one_prot_prob;
@@ -46,10 +39,10 @@ ExtremeValue::ExtremeValue(xercesc::DOMElement* element) {
 
 void ExtremeValue::init() {
   e_value_ = one_prot_prob_ * test_num_ * adjust_factor_;
-  if (one_prot_prob_ > 1 || test_num_ == base_data::getMaxDouble()) {
+  if (one_prot_prob_ >= 1 || test_num_ == base_data::getMaxDouble()) {
     p_value_  = 1.0;
   } else {
-    double n = test_num_ * adjust_factor_;
+    double n = std::max(test_num_ * adjust_factor_, 1.0);
     // approximation of 1 - (1- one_prot_prob)^n
     p_value_ =  n * one_prot_prob_
         - (n * (n - 1)) / 2 * one_prot_prob_ * one_prot_prob_
@@ -65,7 +58,7 @@ void ExtremeValue::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* paren
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
   std::string str = string_util::convertToScientificStr(one_prot_prob_, 4);
   xml_doc->addElement(element, "one_protein_probability", str.c_str());
-  str = string_util::convertToScientificStr(test_num_, 4 );
+  str = string_util::convertToScientificStr(test_num_, 4);
   xml_doc->addElement(element, "test_number", str.c_str());
   str = string_util::convertToString(adjust_factor_);
   xml_doc->addElement(element, "adjust_factor", str.c_str());

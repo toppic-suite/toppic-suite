@@ -29,7 +29,12 @@ typedef std::shared_ptr<ExtremeValue> ExtremeValuePtr;
 
 class ExtremeValue {
  public:
-  ExtremeValue(double one_prot_prob, double test_num, double adjust_factor);
+  ExtremeValue(double one_prot_prob, double test_num, double adjust_factor):
+      one_prot_prob_(one_prot_prob),
+      test_num_(test_num),
+      adjust_factor_(adjust_factor) {
+        init();
+      }
 
   explicit ExtremeValue(xercesc::DOMElement* element);
 
@@ -55,9 +60,13 @@ class ExtremeValue {
   // one_prot_prob is the probability that the spectrum and a randem problem
   // have a protein-spectrum-match with a score no less than the threshold
   double one_prot_prob_;
+
   double test_num_;
+
   double adjust_factor_;
+
   double p_value_;
+
   double e_value_;
 
   void init();
