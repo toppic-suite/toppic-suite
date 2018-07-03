@@ -246,8 +246,6 @@ std::function<void()> geneTask(SpectrumSetPtr spec_set_ptr,
 
     double one_prob = comp_mcmc_ptr->compOneProbMCMC(prsm_ptr, act, ms_mass_int);
 
-    if (one_prob <= 0.01) one_prob = std::sqrt(one_prob / 100.0);
-
     double cand_num = 0;
 
     AlignTypePtr type_ptr = prsm_ptr->getProteoformPtr()->getAlignType();
@@ -268,12 +266,10 @@ std::function<void()> geneTask(SpectrumSetPtr spec_set_ptr,
       }
     }
 
-    cand_num = std::sqrt(cand_num / 100.0);
-
     if (cand_num < 1) {cand_num = 1;}
 
     LOG_DEBUG("cand_num " << cand_num);
-    ExtremeValuePtr evalue = std::make_shared<ExtremeValue>(one_prob, cand_num, 1);
+    ExtremeValuePtr evalue = std::make_shared<ExtremeValue>(one_prob, cand_num, 0.005);
     prsm_ptr->setExtremeValuePtr(evalue);
 
     boost::thread::id thread_id = boost::this_thread::get_id();
