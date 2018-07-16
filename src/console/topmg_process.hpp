@@ -21,11 +21,11 @@
 
 namespace prot {
 
-int TopMG_identify(std::map<std::string, std::string> arguments);
+int TopMG_identify(std::map<std::string, std::string> & arguments);
 
-int TopMG_post(std::map<std::string, std::string> arguments);
+int TopMG_post(std::map<std::string, std::string> & arguments);
 
-int TopMGProcess(std::map<std::string, std::string> arguments);
+int TopMGProcess(std::map<std::string, std::string> & arguments);
 
 int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
                              const std::vector<std::string> & spec_file_lst);

@@ -70,7 +70,7 @@
 
 namespace prot {
 
-int TopMG_identify(std::map<std::string, std::string> arguments) {
+int TopMG_identify(std::map<std::string, std::string> & arguments) {
   try {
     std::time_t start = time(nullptr);
     char buf[50];
@@ -212,7 +212,7 @@ int TopMG_identify(std::map<std::string, std::string> arguments) {
   return 0;
 }
 
-int TopMG_post(std::map<std::string, std::string> arguments) {
+int TopMG_post(std::map<std::string, std::string> & arguments) {
   try {
     std::string resource_dir = arguments["resourceDir"];
 
@@ -374,7 +374,7 @@ int TopMG_post(std::map<std::string, std::string> arguments) {
   return 0;
 }
 
-int TopMGProcess(std::map<std::string, std::string> arguments) {
+int TopMGProcess(std::map<std::string, std::string> & arguments) {
   if (TopMG_identify(arguments) != 0) {
     return 1;
   }
