@@ -35,7 +35,7 @@ cd build
 cmake ..
 make -j$(nproc)
 
-cd bin
+cd ../bin
 ln -s ../toppic_resources .
 ```
 
