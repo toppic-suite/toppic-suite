@@ -16,6 +16,10 @@ pacman -S mingw-w64-x86_64-cmake
 pacman -S mingw-w64-x86_64-boost
 
 pacman -S mingw-w64-x86_64-qt5
+
+pacman -S mingw-w64-x86_64-xerces-c
+
+pacman -S mingw-w64-x86_64-xalan-c
 ```
 
 Thanks to MSYS2, we can install them very easily. Now we have `C:\msys64\mingw64\include` and `C:\msys64\mingw64\lib` for include and linking.
@@ -23,44 +27,6 @@ Thanks to MSYS2, we can install them very easily. Now we have `C:\msys64\mingw64
 After installing, please add `C:\msys64\mingw64\bin` into your PATH environmental variable. In the following instructions, we will use both the MSYS2 shell and Windows CMD.
 
 **Please make sure you can use `g++` in both MSYS2 shell and Windows CMD.**
-
-# Xerces-C++
-
-[Xerces-C++](https://xerces.apache.org/xerces-c/) is used to process XML files.
-
-**We use Windows CMD to build Xerces-c.**
-
-This instruction used [Xerces-C++ 3.2.0](https://archive.apache.org/dist/xerces/c/3/sources/xerces-c-3.2.0.zip).
-
-```sh
-cd xerces-c-3.2.0
-
-mkdir build
-
-cd build
-
-cmake -DCMAKE_INSTALL_PREFIX=C:/msys64/mingw64 -G "MinGW Makefiles" ..
-
-mingw32-make install
-```
-
-# Xalan-C++
-
-[Xalan-C++](http://xalan.apache.org/xalan-c/index.html) is used for transforming XML documents into HTML.
-
-**We use MSYS2 shell to build Xalan-c.**
-
-This instruction used [Xalan-C++ 1.11](https://archive.apache.org/dist/xalan/xalan-c/sources/xalan_c-1.11-src.zip).
-
-```sh
-cd xalan-c-1.11/c
-
-export XALANCROOT=<path>/xalan-c-1.11/c
-
-./runConfigure -p mingw-msys -c gcc -x g++ -r none -b 64 
-
-mingw32-make
-```
 
 # ProteoWizard
 
