@@ -57,6 +57,8 @@ std::vector<double> geneNTheoMass(ProteoformPtr proteoform, ExtendMsPtr extend_m
 
 MassShiftPtrVec massShiftFilter(const MassShiftPtrVec & mass_shift_vec, MassShiftTypePtr type);
 
+MassShiftPtrVec copyMassShiftVec(const MassShiftPtrVec & mass_shift_vec);
+
 double compMassShift(const MassShiftPtrVec & mass_shift_vec);
 
 MassShiftPtr geneMassShift(MassShiftPtr shift, double mass, MassShiftTypePtr type);
