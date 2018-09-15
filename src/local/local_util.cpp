@@ -225,6 +225,21 @@ MassShiftPtrVec massShiftFilter(const MassShiftPtrVec & mass_shift_vec,
   return res;
 }
 
+MassShiftPtrVec copyMassShiftVec(const MassShiftPtrVec & mass_shift_vec) {
+  MassShiftPtrVec new_mass_shift_vec;
+  for (size_t k = 0; k < mass_shift_vec.size(); k++) {
+    MassShiftPtr mass_shift
+        = std::make_shared<MassShift>(mass_shift_vec[k]->getLeftBpPos(),
+                                      mass_shift_vec[k]->getRightBpPos(),
+                                      mass_shift_vec[k]->getTypePtr());
+
+    mass_shift->setChangePtr(mass_shift_vec[k]->getChangePtr(0));
+
+    new_mass_shift_vec.push_back(mass_shift);
+  }
+  return new_mass_shift_vec;
+}
+
 double compMassShift(const MassShiftPtrVec & mass_shift_vec) {
   double mass = 0.0;
   for (size_t k = 0; k < mass_shift_vec.size(); k++) {
