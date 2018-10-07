@@ -13,14 +13,13 @@ For manual and reference, please visit http://proteomics.informatics.iupui.edu/s
 # install compiling tools
 sudo apt-get install build-essential cmake
 
-# install the pwiz lib to process proteomics data
-sudo apt-get install libpwiz-dev
-
 # install other dependencies
 sudo apt-get install zlib1g-dev libboost-filesystem-dev \
                      libboost-program-options-dev \
                      libboost-system-dev \
                      libboost-thread-dev \
+                     libboost-iostreams-dev \
+                     libboost-chrono-dev \
                      libxalan-c-dev
 
 # install the catch unit test framework (https://github.com/philsquared/Catch)
