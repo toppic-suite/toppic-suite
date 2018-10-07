@@ -9,7 +9,7 @@ SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../bin)
 
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/../lib)
 
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++11 -O3 -fPIC")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++11 -O3 -DWITHOUT_MZ5 -fPIC")
 #SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -std=c++11 -O2 -pg -fPIC")
 message(STATUS "system name " ${CMAKE_SYSTEM_NAME})
 
@@ -26,8 +26,6 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   # Linux specific code
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-rpath,./toppic_resources/lib")
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src
-                      /usr/include/libpwiz
-                      /usr/include/libpwiz/libraries/boost_aux
                       ${Qt5Widgets_INCLUDE_DIRS}
                       ${Qt5Core_INCLUDE_DIRS}
                       ${Qt5Gui_INCLUDE_DIRS})
@@ -35,6 +33,7 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   # Windows specific code
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DWIN32")
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src
                       ${Qt5Widgets_INCLUDE_DIRS}
                       ${Qt5Core_INCLUDE_DIRS}
@@ -42,6 +41,12 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
 message(STATUS "cmake cxx flags " ${CMAKE_CXX_FLAGS})
+
+# pwiz
+file(GLOB PWIZ_SRC ${CMAKE_CURRENT_SOURCE_DIR}/src/pwiz/utility/minimxml/*.cpp
+                   ${CMAKE_CURRENT_SOURCE_DIR}/src/pwiz/utility/misc/*.cpp
+                   ${CMAKE_CURRENT_SOURCE_DIR}/src/pwiz/data/common/*.cpp
+                   ${CMAKE_CURRENT_SOURCE_DIR}/src/pwiz/data/msdata/*.cpp)
 
 # common
 file(GLOB HTS_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/htslib/*.c)
@@ -119,9 +124,9 @@ add_executable(topmg_gui ${TOPMG_GUI_SRCS} ${TOPMG_GUI_QRC} ${TOPMG_PROCESS_SRCS
     ${ZERO_PTM_FILTER} ${DIAG_FILTER_SRCS} ${ONE_PTM_FILTER_SRCS} ${ZERO_PTM_SRCS} ${GRAPH_SRCS}
     ${GRAPH_ALIGN_SRCS} ${TDGF_SRCS} ${MCMC_SRCS} ${ONE_PTM_SEARCH_SRCS} ${PRSM_VIEW_SRCS})
 
-add_executable(topfd ${TOPFD_MAIN_SRCS} ${TOPFD_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS})
+add_executable(topfd ${TOPFD_MAIN_SRCS} ${TOPFD_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS} ${PWIZ_SRC})
 
-add_executable(topfd_gui ${TOPFD_GUI_SRCS} ${TOPFD_GUI_QRC} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS})
+add_executable(topfd_gui ${TOPFD_GUI_SRCS} ${TOPFD_GUI_QRC} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS} ${PWIZ_SRC})
 
 add_executable(topquant ${TOPQUANT_MAIN_SRCS} ${TOPQUANT_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS})
 
@@ -134,10 +139,10 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
         boost_filesystem-mt boost_system-mt
         boost_program_options-mt boost_thread-mt pthread z Ws2_32)
 
-    target_link_libraries(topfd pwiz xalan-c xalanMsg xerces-c
+    target_link_libraries(topfd xalan-c xalanMsg xerces-c
         boost_program_options-mt boost_filesystem-mt
         boost_system-mt boost_thread-mt
-        boost_iostreams-mt pthread z Ws2_32)
+        boost_iostreams-mt boost_chrono-mt pthread z Ws2_32)
 
     # for Qt
     SET(QTOPTION -Wl,-subsystem,windows)
@@ -145,14 +150,16 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
         boost_filesystem-mt boost_system-mt 
         boost_program_options-mt boost_thread-mt pthread z Ws2_32)
 
-    target_link_libraries(topfd_gui ${QTOPTION} Qt5Widgets Qt5Core Qt5Gui pwiz
-        xalan-c xerces-c boost_filesystem-mt boost_system-mt boost_thread-mt pthread z Ws2_32)
+    target_link_libraries(topfd_gui ${QTOPTION} Qt5Widgets Qt5Core Qt5Gui
+        xalan-c xerces-c boost_filesystem-mt
+		boost_system-mt boost_thread-mt 
+		boost_iostreams-mt boost_chrono-mt pthread z Ws2_32)
 
     target_link_libraries(topmg_gui ${QTOPTION} Qt5Widgets Qt5Core Qt5Gui xalan-c xalanMsg xerces-c
         boost_filesystem-mt boost_system-mt
         boost_program_options-mt boost_thread-mt pthread z Ws2_32)
 
-    target_link_libraries(topquant pwiz xalan-c xerces-c boost_program_options-mt
+    target_link_libraries(topquant xalan-c xerces-c boost_program_options-mt
         boost_filesystem-mt boost_system-mt boost_thread-mt pthread z Ws2_32)
 
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows") 
@@ -160,7 +167,7 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     add_executable(toppic-test ${UNIT_TEST_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SUFFIX_SRCS})
 
-    add_executable(topfd_train ${TOPFD_TRAIN_SRCS} ${TOPFD_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS})
+    add_executable(topfd_train ${TOPFD_TRAIN_SRCS} ${TOPFD_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS} ${PWIZ_SRC})
 
     add_executable(toppic_match_peak ${TOPPIC_MATCH_PEAK_SRCS} ${TOPPIC_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS} ${PRSM_VIEW_SRCS})
 
@@ -176,14 +183,14 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     target_link_libraries(topmg xalan-c xerces-c boost_program_options
         boost_filesystem boost_system boost_thread pthread z)
 
-    target_link_libraries(topfd pwiz xalan-c xerces-c boost_program_options
-        boost_filesystem boost_system boost_thread pthread z)
+    target_link_libraries(topfd xalan-c xerces-c boost_program_options
+        boost_filesystem boost_system boost_thread boost_iostreams boost_chrono pthread z)
 
-    target_link_libraries(topfd_train pwiz xalan-c xerces-c boost_program_options
-        boost_filesystem boost_system boost_thread pthread z)
+    target_link_libraries(topfd_train xalan-c xerces-c boost_program_options
+        boost_filesystem boost_system boost_thread boost_iostreams boost_chrono pthread z)
 
-    target_link_libraries(topfd_gui Qt5Widgets Qt5Core Qt5Gui pwiz
-        xalan-c xerces-c boost_filesystem boost_system boost_thread pthread z)
+    target_link_libraries(topfd_gui Qt5Widgets Qt5Core Qt5Gui
+        xalan-c xerces-c boost_filesystem boost_system boost_thread boost_iostreams boost_chrono pthread z)
 
     target_link_libraries(topmg_gui Qt5Widgets Qt5Core Qt5Gui xalan-c xerces-c boost_program_options
         boost_filesystem boost_system boost_thread pthread z)
@@ -191,7 +198,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     target_link_libraries(toppic-test xalan-c xerces-c boost_filesystem
         boost_system pthread z)
 
-    target_link_libraries(topquant pwiz xalan-c xerces-c boost_program_options
+    target_link_libraries(topquant xalan-c xerces-c boost_program_options
         boost_filesystem boost_system boost_thread pthread z)
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
 

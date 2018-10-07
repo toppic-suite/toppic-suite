@@ -28,14 +28,6 @@ After installing, please add `C:\msys64\mingw64\bin` into your PATH environmenta
 
 **Please make sure you can use `g++` in both MSYS2 shell and Windows CMD.**
 
-# ProteoWizard
-
-[ProteoWizard](http://proteowizard.sourceforge.net) is used to handle different file formats in proteomics data analysis.
-
-**We use Windows CMD to build ProteoWizard.**
-
-Since we only use a small part of the ProteoWizard library, we use our own Makefile to build a patched version. Please see the [Makefile.pwiz](Makefile.pwiz) and [pwiz.patch](pwiz.patch) in this folder.
-
 # TopPIC suite
 
 **We use Windows CMD to build TopPIC suite.**
