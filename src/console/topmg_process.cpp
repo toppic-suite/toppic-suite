@@ -308,7 +308,7 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
 
     std::cout << "Outputting PrSM table - started." << std::endl;
     PrsmTableWriterPtr table_out
-        = std::make_shared<PrsmTableWriter>(prsm_para_ptr, arguments, "CUTOFF_RESULT_SPEC", "OUTPUT_TABLE");
+        = std::make_shared<PrsmTableWriter>(prsm_para_ptr, arguments, "CUTOFF_RESULT_SPEC", "_topmg_prsm.tsv");
     table_out->write();
     table_out = nullptr;
     std::cout << "Outputting PrSM table - finished." << std::endl;
@@ -320,7 +320,7 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
     std::cout << "Generating PrSM xml files - finished." << std::endl;
 
     std::cout << "Converting PrSM xml files to html files - started." << std::endl;
-    translate(arguments, "prsm_cutoff");
+    translate(arguments, "topmg_prsm_cutoff");
     std::cout << "Converting PrSM xml files to html files - finished." << std::endl;
 
     cutoff_type = (arguments["cutoffProteoformType"] == "FDR") ? "FORMFDR": "EVALUE";
@@ -344,7 +344,7 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
     std::cout << "Outputting proteoform table - started." << std::endl;
     PrsmTableWriterPtr form_out
         = std::make_shared<PrsmTableWriter>(prsm_para_ptr, arguments,
-                                            "FORM_RESULT", "FORM_OUTPUT_TABLE");
+                                            "FORM_RESULT", "_topmg_proteoform.tsv");
     form_out->write();
     form_out = nullptr;
     std::cout << "Outputting proteoform table - finished." << std::endl;
@@ -356,7 +356,7 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
     std::cout << "Generating proteoform xml files - finished." << std::endl;
 
     std::cout << "Converting proteoform xml files to html files - started." << std::endl;
-    translate(arguments, "proteoform_cutoff");
+    translate(arguments, "topmg_proteoform_cutoff");
     std::cout << "Converting proteoform xml files to html files - finished." << std::endl;
 
     if (arguments["keepTempFiles"] != "true") {
