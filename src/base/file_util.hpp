@@ -58,6 +58,9 @@ void cleanTopmgDir(const std::string &fa_path, const std::string & sp_path);
 
 void cleanToppicDir(const std::string &fa_path, const std::string & sp_path);
 
+void cleanTempFiles(const std::string & sp_path, 
+                    const std::string & ext_prefix);
+
 }  // namespace file_util
 
 }  // namespace prot

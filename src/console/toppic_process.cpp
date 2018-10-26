@@ -222,6 +222,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     processor->process(false);
     processor = nullptr;
     std::cout << "E-value computation - finished." << std::endl;
+
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
@@ -402,9 +403,9 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
 }
 
 int TopPICProgress(std::map<std::string, std::string> & arguments) {
-  if (TopPIC_identify(arguments) != 0) {
-    return 1;
-  }
+  //if (TopPIC_identify(arguments) != 0) {
+  //  return 1;
+  //}
 
   return TopPIC_post(arguments);
 }

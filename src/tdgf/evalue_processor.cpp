@@ -78,24 +78,24 @@ std::function<void()> geneTask(SpectrumSetPtr spec_set_ptr, const PrsmPtrVec & s
 /* compute E-value. Separate: compute E-value separately or not */
 void EValueProcessor::process(bool is_separate) {
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
-  std::string spectrum_file_name = prsm_para_ptr->getSpectrumFileName();
-  std::string output_file_name = file_util::basename(spectrum_file_name) + "." + mng_ptr_->output_file_ext_;
+  std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
+  std::string output_file_name = file_util::basename(sp_file_name) + "." + mng_ptr_->output_file_ext_;
   PrsmXmlWriter writer(output_file_name);
 
   std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
   FastaIndexReaderPtr seq_reader = std::make_shared<FastaIndexReader>(db_file_name);
   ModPtrVec fix_mod_ptr_vec = prsm_para_ptr->getFixModPtrVec();
-  std::string input_file_name = file_util::basename(spectrum_file_name) + "." + mng_ptr_->input_file_ext_;
+  std::string input_file_name = file_util::basename(sp_file_name) + "." + mng_ptr_->input_file_ext_;
   PrsmReader prsm_reader(input_file_name);
   LOG_DEBUG("start read prsm");
   PrsmPtr prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
 
   // init variables
-  int spectrum_num = msalign_util::getSpNum(spectrum_file_name);
+  int spectrum_num = msalign_util::getSpNum(sp_file_name);
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
   double ppo = sp_para_ptr->getPeakTolerancePtr()->getPpo();
   int group_spec_num = prsm_para_ptr->getGroupSpecNum();
-  MsAlignReader sp_reader(spectrum_file_name, group_spec_num,
+  MsAlignReader sp_reader(sp_file_name, group_spec_num,
                           sp_para_ptr->getActivationPtr(),
                           sp_para_ptr->getSkipList());
 
@@ -152,6 +152,9 @@ void EValueProcessor::process(bool is_separate) {
     }
     all_writer_ptr->close();
   }
+
+  // remove tempory files
+  file_util::cleanTempFiles(sp_file_name, mng_ptr_->output_file_ext_ + "_");
 }
 
 bool EValueProcessor::checkPrsms(const PrsmPtrVec &prsm_ptrs) {

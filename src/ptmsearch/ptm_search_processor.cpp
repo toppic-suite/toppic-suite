@@ -248,6 +248,14 @@ void PtmSearchProcessor::process(){
                                            internal_output_ext, prsm_top_num);
     combine_ptr->process();
     combine_ptr = nullptr;
+
+    //remove temporary files
+    for (int t = 0; t < mng_ptr_->thread_num_; t++) {
+      file_util::cleanTempFiles(sp_file_name, complete_input_exts[t]);
+      file_util::cleanTempFiles(sp_file_name, prefix_input_exts[t]);
+      file_util::cleanTempFiles(sp_file_name, suffix_input_exts[t]);
+      file_util::cleanTempFiles(sp_file_name, internal_input_exts[t]);
+    }
   }
 
 }

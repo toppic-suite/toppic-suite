@@ -232,6 +232,16 @@ void cleanToppicDir(const std::string &fa_path, const std::string & sp_path) {
   clean_prefix(sp, sp_base + ".prot_");
 }
 
+void cleanTempFiles(const std::string & sp_path, 
+                    const std::string & ext_prefix) {
+
+  fs::path sp(sp_path);
+  std::string sp_base = basename(absolute(sp).string());
+  std::replace(sp_base.begin(), sp_base.end(), '\\', '/');
+  clean_prefix(sp, sp_base + "." + ext_prefix);
+}
+
+
 }  // namespace file_util
 
 }  // namespace prot
