@@ -165,7 +165,7 @@ void clean_prefix(const fs::path & sp, const std::string & prefix) {
   }
 }
 
-void cleanDir(const std::string &fa_path, const std::string & sp_path) {
+void cleanTopmgDir(const std::string &fa_path, const std::string & sp_path) {
   fs::path fa(fa_path);
   fs::path sp(sp_path);
   std::string fa_base = absolute(fa).string();
@@ -176,36 +176,61 @@ void cleanDir(const std::string &fa_path, const std::string & sp_path) {
   clean_prefix(fa, fa_base + "_");
   clean_prefix(sp, sp_base + ".msalign_");
   delFile(absolute(sp).string() + "_index");
-  delFile(sp_base + ".ZERO_PTM");
-  clean_prefix(sp, sp_base + ".ZERO_PTM_");
-  clean_prefix(sp, sp_base + ".ZERO_FILTER_");
-  delFile(sp_base + ".ONE_PTM");
-  clean_prefix(sp, sp_base + ".ONE_PTM_");
-  delFile(sp_base + ".DIAG_FILTER");
-  clean_prefix(sp, sp_base + ".DIAG_FILTER_");
-  delFile(sp_base + ".PTM");
-  clean_prefix(sp, sp_base + ".PTM_");
-  delFile(sp_base + ".TOP");
-  delFile(sp_base + ".TOP_PRE");
-  delFile(sp_base + ".GRAPH_FILTER");
-  clean_prefix(sp, sp_base + ".GRAPH_ALIGN_");
-  clean_prefix(sp, sp_base + ".GRAPH_FILTER_");
-  clean_prefix(sp, sp_base + ".GRAPH");
-  clean_prefix(sp, sp_base + ".VAR1_");
-  clean_prefix(sp, sp_base + ".VAR2_");
-  delFile(sp_base + ".GRAPH_ALIGN");
-  delFile(sp_base + ".CUTOFF_RESULT_SPEC");
-  delFile(sp_base + ".CUTOFF_RESULT_FORM");
-  delFile(sp_base + ".LOCAL_RESULT_SPEC");
-  delFile(sp_base + ".LOCAL_RESULT_FORM");
-  clean_prefix(sp, sp_base + ".EVALUE_");
-  clean_prefix(sp, sp_base + ".PROTEOFORM_");
-  clean_prefix(sp, sp_base + ".PROT_");
-  delFile(sp_base + ".EVALUE");
-  delFile(sp_base + ".RAW_RESULT");
-  delFile(sp_base + ".CLUSTERS");
-  delFile(sp_base + ".FORM_RESULT");
-  delFile(sp_base + ".FORM_FILTER_RESULT");
+  delFile(sp_base + ".topmg_one_filter");
+  clean_prefix(sp, sp_base + ".topmg_one_filter_");
+  delFile(sp_base + ".topmg_multi_filter");
+  clean_prefix(sp, sp_base + ".topmg_multi_filter_");
+  delFile(sp_base + ".topmg_graph_filter");
+  delFile(sp_base + ".topmg_graph_align");
+  clean_prefix(sp, sp_base + ".topmg_graph_align_");
+  delFile(sp_base + ".topmg_graph_post");
+
+  delFile(sp_base + ".toppic_evalue");
+  clean_prefix(sp, sp_base + ".toppic_evalue_");
+  delFile(sp_base + ".toppic_cluster");
+  delFile(sp_base + ".toppic_top");
+  delFile(sp_base + ".toppic_top_pre");
+  delFile(sp_base + ".toppic_prsm_cutoff");
+  delFile(sp_base + ".toppic_prsm_cutoff_localization");
+  delFile(sp_base + ".toppic_form_cutoff");
+  delFile(sp_base + ".toppic_form_cutoff_form");
+  clean_prefix(sp, sp_base + ".proteoform_");
+  clean_prefix(sp, sp_base + ".prot_");
+}
+
+void cleanToppicDir(const std::string &fa_path, const std::string & sp_path) {
+  fs::path fa(fa_path);
+  fs::path sp(sp_path);
+  std::string fa_base = absolute(fa).string();
+  std::replace(fa_base.begin(), fa_base.end(), '\\', '/');
+  std::string sp_base = basename(absolute(sp).string());
+  std::replace(sp_base.begin(), sp_base.end(), '\\', '/');
+
+  clean_prefix(fa, fa_base + "_");
+  clean_prefix(sp, sp_base + ".msalign_");
+  delFile(absolute(sp).string() + "_index");
+  clean_prefix(sp, sp_base + ".toppic_zero_filter_");
+  delFile(sp_base + ".toppic_zero_ptm");
+  clean_prefix(sp, sp_base + ".toppic_zero_ptm_");
+  clean_prefix(sp, sp_base + ".toppic_one_filter_");
+  delFile(sp_base + ".toppic_one_ptm");
+  clean_prefix(sp, sp_base + ".toppic_one_ptm_");
+  delFile(sp_base + ".toppic_multi_filter");
+  clean_prefix(sp, sp_base + ".toppic_multi_filter_");
+  delFile(sp_base + ".toppic_multi_ptm");
+  clean_prefix(sp, sp_base + ".toppic_multi_ptm_");
+  delFile(sp_base + ".toppic_combined");
+  delFile(sp_base + ".toppic_evalue");
+  clean_prefix(sp, sp_base + ".toppic_evalue_");
+  delFile(sp_base + ".toppic_cluster");
+  delFile(sp_base + ".toppic_top");
+  delFile(sp_base + ".toppic_top_pre");
+  delFile(sp_base + ".toppic_prsm_cutoff");
+  delFile(sp_base + ".toppic_prsm_cutoff_localization");
+  delFile(sp_base + ".toppic_form_cutoff");
+  delFile(sp_base + ".toppic_form_cutoff_form");
+  clean_prefix(sp, sp_base + ".proteoform_");
+  clean_prefix(sp, sp_base + ".prot_");
 }
 
 }  // namespace file_util

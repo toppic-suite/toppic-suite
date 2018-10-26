@@ -54,7 +54,9 @@ void delDir(const std::string &path);
 
 void delFile(const std::string &path);
 
-void cleanDir(const std::string &fa_path, const std::string & sp_path);
+void cleanTopmgDir(const std::string &fa_path, const std::string & sp_path);
+
+void cleanToppicDir(const std::string &fa_path, const std::string & sp_path);
 
 }  // namespace file_util
 

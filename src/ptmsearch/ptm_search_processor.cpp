@@ -184,7 +184,7 @@ void PtmSearchProcessor::process(){
                                    mng_ptr_, comp_shift_, pool_ptr));
       }
     }
-    std::cout << std::flush <<  "PTM search - processing " << cnt 
+    std::cout << std::flush <<  "Multiple PTM search - processing " << cnt 
         << " of " << spectrum_num << " spectra.\r";
   }
   pool_ptr->ShutDown();

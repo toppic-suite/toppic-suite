@@ -78,25 +78,38 @@ void ZeroPtmFilterProcessor::process() {
 
   std::cout << "Non PTM filtering - combining blocks started." << std::endl;
 
+  std::string complete = AlignType::COMPLETE->getName();
+  std::string prefix = AlignType::PREFIX->getName();
+  std::string suffix = AlignType::SUFFIX->getName();
+  std::string internal = AlignType::INTERNAL->getName();
+
   int block_num = db_block_ptr_vec.size();
 
-  SimplePrsmStrCombine comp_combine(sp_file_name, mng_ptr_->output_file_ext_ + "_complete",
-                                    block_num, mng_ptr_->output_file_ext_ + "_complete",
+  SimplePrsmStrCombine comp_combine(sp_file_name, 
+                                    mng_ptr_->output_file_ext_ + "_" + complete,
+                                    block_num, 
+                                    mng_ptr_->output_file_ext_ + "_" + complete,
                                     mng_ptr_->comp_num_);
   comp_combine.process();
 
-  SimplePrsmStrCombine pref_combine(sp_file_name, mng_ptr_->output_file_ext_ + "_prefix",
-                                    block_num, mng_ptr_->output_file_ext_ + "_prefix",
+  SimplePrsmStrCombine pref_combine(sp_file_name, 
+                                    mng_ptr_->output_file_ext_ + "_" + prefix,
+                                    block_num, 
+                                    mng_ptr_->output_file_ext_ + "_" + prefix,
                                     mng_ptr_->pref_suff_num_);
   pref_combine.process();
 
-  SimplePrsmStrCombine suff_combine(sp_file_name, mng_ptr_->output_file_ext_ + "_suffix",
-                                    block_num, mng_ptr_->output_file_ext_ + "_suffix",
+  SimplePrsmStrCombine suff_combine(sp_file_name, 
+                                    mng_ptr_->output_file_ext_ + "_" + suffix,
+                                    block_num, 
+                                    mng_ptr_->output_file_ext_ + "_" + suffix,
                                     mng_ptr_->pref_suff_num_);
   suff_combine.process();
 
-  SimplePrsmStrCombine internal_combine(sp_file_name, mng_ptr_->output_file_ext_ + "_internal",
-                                        block_num, mng_ptr_->output_file_ext_ + "_internal",
+  SimplePrsmStrCombine internal_combine(sp_file_name, 
+                                        mng_ptr_->output_file_ext_ + "_" + internal,
+                                        block_num, 
+                                        mng_ptr_->output_file_ext_ + "_" + internal,
                                         mng_ptr_->inte_num_);
   internal_combine.process();
 
@@ -118,10 +131,19 @@ std::function<void()> geneTask(const ProteoformPtrVec & raw_forms,
     std::string output_file_name = file_util::basename(prsm_para_ptr->getSpectrumFileName())
         + "." + mng_ptr->output_file_ext_;
 
-    SimplePrsmXmlWriter comp_writer(output_file_name + "_complete_" + block_str + "_" + std::to_string(idx));
-    SimplePrsmXmlWriter pref_writer(output_file_name + "_prefix_" + block_str + "_" + std::to_string(idx));
-    SimplePrsmXmlWriter suff_writer(output_file_name + "_suffix_" + block_str + "_" + std::to_string(idx));
-    SimplePrsmXmlWriter internal_writer(output_file_name + "_internal_" + block_str + "_" + std::to_string(idx));
+    std::string complete = AlignType::COMPLETE->getName();
+    std::string prefix = AlignType::PREFIX->getName();
+    std::string suffix = AlignType::SUFFIX->getName();
+    std::string internal = AlignType::INTERNAL->getName();
+
+    SimplePrsmXmlWriter comp_writer(output_file_name + "_" + complete + "_" 
+                                    + block_str + "_" + std::to_string(idx));
+    SimplePrsmXmlWriter pref_writer(output_file_name + "_" + prefix + "_" 
+                                    + block_str + "_" + std::to_string(idx));
+    SimplePrsmXmlWriter suff_writer(output_file_name + "_" + suffix + "_" 
+                                    + block_str + "_" + std::to_string(idx));
+    SimplePrsmXmlWriter internal_writer(output_file_name + "_" + internal + "_" 
+                                        + block_str + "_" + std::to_string(idx));
 
     std::vector<SpectrumSetPtr> spec_set_vec = reader.getNextSpectrumSet(sp_para_ptr);
     int spectrum_num = msalign_util::getSpNum(prsm_para_ptr->getSpectrumFileName());
@@ -180,31 +202,36 @@ void ZeroPtmFilterProcessor::processBlock(DbBlockPtr block_ptr) {
   std::cout << std::flush << "Non PTM filtering - processing " << spectrum_num
       << " of " << spectrum_num << " spectra." << std::endl;
 
+  std::string complete = AlignType::COMPLETE->getName();
+  std::string prefix = AlignType::PREFIX->getName();
+  std::string suffix = AlignType::SUFFIX->getName();
+  std::string internal = AlignType::INTERNAL->getName();
+
   SimplePrsmStrCombine comp_combine(sp_file_name,
-                                    mng_ptr_->output_file_ext_ + "_complete_" + block_str,
+                                    mng_ptr_->output_file_ext_ + "_" + complete + "_" + block_str,
                                     mng_ptr_->thread_num_,
-                                    mng_ptr_->output_file_ext_ + "_complete_" + block_str,
+                                    mng_ptr_->output_file_ext_ + "_" + complete + "_" + block_str,
                                     mng_ptr_->comp_num_);
   comp_combine.process();
 
   SimplePrsmStrCombine pref_combine(sp_file_name,
-                                    mng_ptr_->output_file_ext_ + "_prefix_" + block_str,
+                                    mng_ptr_->output_file_ext_ + "_" + prefix + "_" + block_str,
                                     mng_ptr_->thread_num_,
-                                    mng_ptr_->output_file_ext_ + "_prefix_" + block_str,
+                                    mng_ptr_->output_file_ext_ + "_" + prefix + "_" + block_str,
                                     mng_ptr_->pref_suff_num_);
   pref_combine.process();
 
   SimplePrsmStrCombine suff_combine(sp_file_name,
-                                    mng_ptr_->output_file_ext_ + "_suffix_" + block_str,
+                                    mng_ptr_->output_file_ext_ + "_" + suffix + "_" + block_str,
                                     mng_ptr_->thread_num_,
-                                    mng_ptr_->output_file_ext_ + "_suffix_" + block_str,
+                                    mng_ptr_->output_file_ext_ + "_" + suffix + "_" + block_str,
                                     mng_ptr_->pref_suff_num_);
   suff_combine.process();
 
   SimplePrsmStrCombine internal_combine(sp_file_name,
-                                        mng_ptr_->output_file_ext_ + "_internal_" + block_str,
+                                        mng_ptr_->output_file_ext_ + "_" + internal + "_" + block_str,
                                         mng_ptr_->thread_num_,
-                                        mng_ptr_->output_file_ext_ + "_internal_" + block_str,
+                                        mng_ptr_->output_file_ext_ + "_" + internal + "_" + block_str,
                                         mng_ptr_->inte_num_);
   internal_combine.process();
 }

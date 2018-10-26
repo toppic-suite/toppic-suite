@@ -32,8 +32,6 @@ void PrsmFormFilter::process() {
 
   std::sort(prsms.begin(), prsms.end(), Prsm::cmpEValueInc);
 
-  PrsmPtrVec selected_prsms;
-
   PrsmPtrVec selected_forms;
 
   for (size_t i = 0; i < prsms.size(); i++) {
@@ -46,36 +44,17 @@ void PrsmFormFilter::process() {
         break;
       }
     }
-    if (found) {
-      selected_prsms.push_back(prsms[i]);
-    } else {
-      bool keep = true;
-      for (size_t j = 0; j < selected_forms.size(); j++) {
-        if (selected_forms[j]->getProteoformPtr()->getProteoClusterId() 
-            == prsms[i]->getProteoformPtr()->getProteoClusterId()) {
-          keep = false;
-          break;
-        }
-      }
-      if (keep) {
-        selected_forms.push_back(prsms[i]);
-        selected_prsms.push_back(prsms[i]);
-      }
+    if (!found) {
+      selected_forms.push_back(prsms[i]);
     }
   }
 
   // output
   std::string output_file_name = base_name + "." + output_file_ext_;
   PrsmXmlWriter writer(output_file_name);
-  std::sort(selected_prsms.begin(), selected_prsms.end(), Prsm::cmpSpectrumIdIncPrecursorIdInc);
-  writer.writeVector(selected_prsms);
-  writer.close();
-
-  output_file_name = base_name + "." + output_file_ext_2_;
-  PrsmXmlWriter writer2(output_file_name);
   std::sort(selected_forms.begin(), selected_forms.end(), Prsm::cmpSpectrumIdIncPrecursorIdInc);
-  writer2.writeVector(selected_forms);
-  writer2.close();
+  writer.writeVector(selected_forms);
+  writer.close();
 }
 
 } /* namespace prot */

@@ -101,7 +101,6 @@ void ZeroPtmSearchProcessor::process() {
   PrsmXmlWriter pref_writer(output_file_name + "_" + AlignType::PREFIX->getName());
   PrsmXmlWriter suff_writer(output_file_name + "_" + AlignType::SUFFIX->getName());
   PrsmXmlWriter internal_writer(output_file_name + "_" + AlignType::INTERNAL->getName());
-  PrsmXmlWriter all_writer(output_file_name);
 
   // init variables
   std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
@@ -134,7 +133,6 @@ void ZeroPtmSearchProcessor::process() {
           PrsmPtrVec prsms = zeroPtmSearchOneSpec(spec_set_vec[k], comp_selected_prsm_ptrs, reader_ptr,
                                                   mng_ptr_, AlignType::COMPLETE);
           comp_writer.writeVector(prsms);
-          all_writer.writeVector(prsms);
         }
       }
 
@@ -151,7 +149,6 @@ void ZeroPtmSearchProcessor::process() {
           PrsmPtrVec prsms = zeroPtmSearchOneSpec(spec_set_vec[k], pref_selected_prsm_ptrs, reader_ptr,
                                                   mng_ptr_, AlignType::PREFIX);
           pref_writer.writeVector(prsms);
-          all_writer.writeVector(prsms);
         }
       }
 
@@ -168,7 +165,6 @@ void ZeroPtmSearchProcessor::process() {
           PrsmPtrVec prsms = zeroPtmSearchOneSpec(spec_set_vec[k], suff_selected_prsm_ptrs, reader_ptr,
                                                   mng_ptr_, AlignType::SUFFIX);
           suff_writer.writeVector(prsms);
-          all_writer.writeVector(prsms);
         }
       }
 
@@ -185,7 +181,6 @@ void ZeroPtmSearchProcessor::process() {
           PrsmPtrVec prsms = zeroPtmSearchOneSpec(spec_set_vec[k], internal_selected_prsm_ptrs, reader_ptr,
                                                   mng_ptr_, AlignType::INTERNAL);
           internal_writer.writeVector(prsms);
-          all_writer.writeVector(prsms);
         }
       }
     }
@@ -202,7 +197,6 @@ void ZeroPtmSearchProcessor::process() {
   pref_writer.close();
   suff_writer.close();
   internal_writer.close();
-  all_writer.close();
   std::cout << std::endl;
 }
 }  // namespace prot

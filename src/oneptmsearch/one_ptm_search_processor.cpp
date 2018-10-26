@@ -95,7 +95,6 @@ void OnePtmSearchProcessor::process() {
   PrsmXmlWriter pref_writer(output_file_name + "_" + AlignType::PREFIX->getName());
   PrsmXmlWriter suff_writer(output_file_name + "_" + AlignType::SUFFIX->getName());
   PrsmXmlWriter internal_writer(output_file_name + "_" + AlignType::INTERNAL->getName());
-  PrsmXmlWriter all_writer(output_file_name);
 
   // init variables
   std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
@@ -127,7 +126,6 @@ void OnePtmSearchProcessor::process() {
         PrsmPtrVec prsms = onePtmSearchOneSpec(spec_set_ptr, comp_selected_prsm_ptrs,
                                                reader_ptr, mng_ptr_, AlignType::COMPLETE);
         comp_writer.writeVector(prsms);
-        all_writer.writeVector(prsms);
       }
 
       // prefix
@@ -141,7 +139,6 @@ void OnePtmSearchProcessor::process() {
         PrsmPtrVec prsms = onePtmSearchOneSpec(spec_set_ptr, pref_selected_prsm_ptrs,
                                                reader_ptr, mng_ptr_, AlignType::PREFIX);
         pref_writer.writeVector(prsms);
-        all_writer.writeVector(prsms);
       }
 
       // suffix
@@ -155,7 +152,6 @@ void OnePtmSearchProcessor::process() {
         PrsmPtrVec prsms = onePtmSearchOneSpec(spec_set_ptr, suff_selected_prsm_ptrs,
                                                reader_ptr, mng_ptr_, AlignType::SUFFIX);
         suff_writer.writeVector(prsms);
-        all_writer.writeVector(prsms);
       }
 
       // internal
@@ -169,7 +165,6 @@ void OnePtmSearchProcessor::process() {
         PrsmPtrVec prsms = onePtmSearchOneSpec(spec_set_ptr, internal_selected_prsm_ptrs,
                                                reader_ptr, mng_ptr_, AlignType::INTERNAL);
         internal_writer.writeVector(prsms);
-        all_writer.writeVector(prsms);
       }
     }
     std::cout << std::flush <<  "One PTM search - processing " << cnt
@@ -184,7 +179,6 @@ void OnePtmSearchProcessor::process() {
   pref_writer.close();
   suff_writer.close();
   internal_writer.close();
-  all_writer.close();
   std::cout << std::endl;
 }
 
