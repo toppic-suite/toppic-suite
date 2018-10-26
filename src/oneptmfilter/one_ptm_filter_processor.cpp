@@ -122,6 +122,18 @@ void OnePtmFilterProcessor::process() {
                                         mng_ptr_->inte_num_);
   internal_combine.process();
 
+  //Remove temporary files
+  std::string end_str = "_";
+  file_util::cleanTempFiles(sp_file_name, mng_ptr_->output_file_ext_ + "_" +  complete + end_str);
+  file_util::cleanTempFiles(sp_file_name, mng_ptr_->output_file_ext_ + "_" + prefix + end_str);
+  file_util::cleanTempFiles(sp_file_name, mng_ptr_->output_file_ext_ + "_" + suffix + end_str);
+  file_util::cleanTempFiles(sp_file_name, mng_ptr_->output_file_ext_ + "_" + internal + end_str);
+
+  for (int t = 0; t < thread_num; t++) {
+    std::string t_str = std::to_string(t);
+    file_util::delFile(sp_file_name + "_" + t_str);
+  }
+
   std::cout << "One PTM filtering - combining blocks finished." << std::endl;
 }
 
@@ -270,6 +282,13 @@ void OnePtmFilterProcessor::processBlock(DbBlockPtr block_ptr, const std::vector
                                         mng_ptr_->output_file_ext_ + "_" + internal + "_" + block_str,
                                         mng_ptr_->inte_num_);
   internal_combine.process();
+
+  //Remove temporary files
+  std::string end_str = "_" + block_str + "_";
+  file_util::cleanTempFiles(sp_file_name, mng_ptr_->output_file_ext_ + "_" +  complete + end_str);
+  file_util::cleanTempFiles(sp_file_name, mng_ptr_->output_file_ext_ + "_" + prefix + end_str);
+  file_util::cleanTempFiles(sp_file_name, mng_ptr_->output_file_ext_ + "_" + suffix + end_str);
+  file_util::cleanTempFiles(sp_file_name, mng_ptr_->output_file_ext_ + "_" + internal + end_str);
 }
 
 } /* namespace prot */
