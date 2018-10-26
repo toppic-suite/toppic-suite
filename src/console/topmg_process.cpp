@@ -122,7 +122,7 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
 
     std::cout << "ASF-One PTM filtering - started." << std::endl;
     OnePtmFilterMngPtr one_ptm_filter_mng_ptr =
-        std::make_shared<OnePtmFilterMng>(prsm_para_ptr, "VAR1_ONE_PTM_FILTER", thread_num,
+        std::make_shared<OnePtmFilterMng>(prsm_para_ptr, "topmg_one_filter", thread_num,
                                           arguments["residueModFileName"], 1);
     one_ptm_filter_mng_ptr->inte_num_ = 4;
     one_ptm_filter_mng_ptr->pref_suff_num_ = 4;
@@ -131,20 +131,20 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
         std::make_shared<OnePtmFilterProcessor>(one_ptm_filter_mng_ptr);
     one_filter_processor->process();
 
-    input_exts.push_back("VAR1_ONE_PTM_FILTER_COMPLETE");
-    input_exts.push_back("VAR1_ONE_PTM_FILTER_PREFIX");
-    input_exts.push_back("VAR1_ONE_PTM_FILTER_SUFFIX");
-    input_exts.push_back("VAR1_ONE_PTM_FILTER_INTERNAL");
+    input_exts.push_back("topmg_one_filter_complete");
+    input_exts.push_back("topmg_one_filter_prefix");
+    input_exts.push_back("topmg_one_filter_suffix");
+    input_exts.push_back("topmg_one_filter_internal");
 
     SimplePrsmStrCombinePtr var_one_ptm_combiner
         = std::make_shared<SimplePrsmStrCombine>(sp_file_name, 
                                                  input_exts,
-                                                 "VAR1_ONE_PTM_FILTER", 20);
+                                                 "topmg_one_filter", 20);
 
     var_one_ptm_combiner->process();
     var_one_ptm_combiner = nullptr;
     input_exts.clear();
-    input_exts.push_back("VAR1_ONE_PTM_FILTER");
+    input_exts.push_back("topmg_one_filter");
     std::cout << "ASF-One PTM filtering - finished." << std::endl;
 
     bool use_asf_diag = false;
@@ -157,20 +157,20 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
       filter_result_num = 15;
       DiagFilterMngPtr diag_filter_mng_ptr
           = std::make_shared<DiagFilterMng>(prsm_para_ptr, filter_result_num,
-                                            thread_num, "VAR1_DIAG_FILTER",
+                                            thread_num, "topmg_multi_filter",
                                             arguments["residueModFileName"], 1);
       DiagFilterProcessorPtr diag_filter_processor1
           = std::make_shared<DiagFilterProcessor>(diag_filter_mng_ptr);
       diag_filter_processor1->process();
       std::cout << "ASF-Diagonal filtering - finished." << std::endl;
 
-      input_exts.push_back("VAR1_DIAG_FILTER");
+      input_exts.push_back("topmg_multi_filter");
     }
 
     SimplePrsmStrCombinePtr asf_filter_combiner
         = std::make_shared<SimplePrsmStrCombine>(sp_file_name, 
                                                  input_exts,
-                                                 "GRAPH_FILTER", 20 * input_exts.size());
+                                                 "topmg_graph_filter", 20 * input_exts.size());
     asf_filter_combiner->process();
     asf_filter_combiner = nullptr;
 
@@ -183,7 +183,7 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
                                           residue_mod_file_name,
                                           ptm_num, max_mod_num,
                                           gap, var_ptm_in_gap, max_ptm_mass,
-                                          thread_num, "GRAPH_FILTER", "GRAPH_ALIGN");
+                                          thread_num, "topmg_graph_filter", "topmg_graph_align");
     GraphAlignProcessorPtr ga_processor_ptr = std::make_shared<GraphAlignProcessor>(ga_mng_ptr);
     ga_processor_ptr->process();
     ga_processor_ptr = nullptr;
@@ -191,14 +191,14 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
 
     std::cout << "Graph alignment post-processing started." << std::endl;
     GraphPostProcessorPtr ga_post_processor_ptr
-        = std::make_shared<GraphPostProcessor>(ga_mng_ptr, "GRAPH_ALIGN", "GRAPH_POST");
+        = std::make_shared<GraphPostProcessor>(ga_mng_ptr, "topmg_graph_align", "topmg_graph_post");
     ga_post_processor_ptr->process();
     ga_post_processor_ptr = nullptr;
     std::cout << "Graph alignment post-processing finished." << std::endl;
 
     std::cout << "E-value computation using MCMC - started." << std::endl;
     MCMCMngPtr mcmc_mng_ptr   
-        = std::make_shared<MCMCMng>(prsm_para_ptr, "GRAPH_POST", "EVALUE",   
+        = std::make_shared<MCMCMng>(prsm_para_ptr, "topmg_graph_post", "topmg_evalue",   
                                     residue_mod_file_name, max_mod_num, thread_num);
     DprProcessorPtr processor = std::make_shared<DprProcessor>(mcmc_mng_ptr);   
     processor->process();    
@@ -227,18 +227,7 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
 
     int n_top = std::stoi(arguments["numOfTopPrsms"]);
 
-    bool decoy = false;
-    if (arguments["searchType"] == "TARGET+DECOY") {
-      decoy = true;
-    }
-    LOG_DEBUG("Decoy " << decoy);
-    LOG_DEBUG("block size " << arguments["databaseBlockSize"]);
-    int db_block_size = std::stoi(arguments["databaseBlockSize"]);
-
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
-
-    fasta_util::dbPreprocess(ori_db_file_name, db_file_name, decoy, db_block_size);
-    msalign_util::geneSpIndex(sp_file_name, prsm_para_ptr->getSpParaPtr());
 
     std::cout << "Finding protein clusters - started." << std::endl;
     if (arguments["useFeatureFile"] == "true") {
@@ -248,8 +237,8 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
       PrsmFeatureClusterPtr prsm_clusters
           = std::make_shared<PrsmFeatureCluster>(db_file_name,
                                                  sp_file_name,
-                                                 "EVALUE",
-                                                 "CLUSTERS",
+                                                 "topmg_evalue",
+                                                 "topmg_cluster",
                                                  fix_mod_list,
                                                  prec_error_tole,
                                                  prsm_para_ptr);
@@ -261,8 +250,8 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
       ppo = ppo / 1000000.0;
       PrsmClusterPtr prsm_clusters
           = std::make_shared<PrsmCluster>(db_file_name, sp_file_name,
-                                          "EVALUE", prsm_para_ptr->getFixModPtrVec(),
-                                          "CLUSTERS", ppo);
+                                          "topmg_evalue", prsm_para_ptr->getFixModPtrVec(),
+                                          "topmg_cluster", ppo);
       prsm_clusters->process();
       prsm_clusters = nullptr;
     }
@@ -271,7 +260,7 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
     if (arguments["searchType"] == "TARGET") {
       std::cout << "Top PrSM selecting - started" << std::endl;
       PrsmTopSelectorPtr selector
-          = std::make_shared<PrsmTopSelector>(db_file_name, sp_file_name, "CLUSTERS", "TOP", n_top);
+          = std::make_shared<PrsmTopSelector>(db_file_name, sp_file_name, "topmg_cluster", "topmg_top", n_top);
       selector->process();
       selector = nullptr;
       std::cout << "Top PrSM selecting - finished." << std::endl;
@@ -279,13 +268,13 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
       std::cout << "Top PrSM selecting - started " << std::endl;
       PrsmTopSelectorPtr selector
           = std::make_shared<PrsmTopSelector>(db_file_name, sp_file_name,
-                                              "CLUSTERS", "TOP_PRE", n_top);
+                                              "topmg_cluster", "topmg_top_pre", n_top);
       selector->process();
       selector = nullptr;
       std::cout << "Top PrSM selecting - finished." << std::endl;
 
       std::cout << "FDR computation - started. " << std::endl;
-      PrsmFdrPtr fdr = std::make_shared<PrsmFdr>(db_file_name, sp_file_name, "TOP_PRE", "TOP");
+      PrsmFdrPtr fdr = std::make_shared<PrsmFdr>(db_file_name, sp_file_name, "topmg_top_pre", "topmg_top");
       fdr->process();
       fdr = nullptr;
       std::cout << "FDR computation - finished." << std::endl;
@@ -295,8 +284,8 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
     std::cout << "PrSM filtering by " << cutoff_type << " - started." << std::endl;
     double cutoff_value = std::stod(arguments["cutoffSpectralValue"]);
     PrsmCutoffSelectorPtr cutoff_selector
-        = std::make_shared<PrsmCutoffSelector>(db_file_name, sp_file_name, "TOP",
-                                               "CUTOFF_RESULT_SPEC", cutoff_type, cutoff_value);
+        = std::make_shared<PrsmCutoffSelector>(db_file_name, sp_file_name, "topmg_top",
+                                               "topmg_prsm_cutoff", cutoff_type, cutoff_value);
     cutoff_selector->process();
     cutoff_selector = nullptr;
     std::cout << "PrSM filtering by " << cutoff_type << " - finished." << std::endl;
@@ -308,13 +297,14 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
 
     std::cout << "Outputting PrSM table - started." << std::endl;
     PrsmTableWriterPtr table_out
-        = std::make_shared<PrsmTableWriter>(prsm_para_ptr, arguments, "CUTOFF_RESULT_SPEC", "_topmg_prsm.tsv");
+        = std::make_shared<PrsmTableWriter>(prsm_para_ptr, arguments, "topmg_prsm_cutoff", "_topmg_prsm.tsv");
     table_out->write();
     table_out = nullptr;
     std::cout << "Outputting PrSM table - finished." << std::endl;
 
     std::cout << "Generating PrSM xml files - started." << std::endl;
-    XmlGeneratorPtr xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, "CUTOFF_RESULT_SPEC", "prsm_cutoff");
+    XmlGeneratorPtr xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, "topmg_prsm_cutoff", "topmg_prsm_cutoff");
+
     xml_gene->process();
     xml_gene = nullptr;
     std::cout << "Generating PrSM xml files - finished." << std::endl;
@@ -326,17 +316,16 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
     cutoff_type = (arguments["cutoffProteoformType"] == "FDR") ? "FORMFDR": "EVALUE";
     std::cout << "PrSM filtering by " << cutoff_type << " - started." << std::endl;
     std::istringstream(arguments["cutoffProteoformValue"]) >> cutoff_value;
-    cutoff_selector = std::make_shared<PrsmCutoffSelector>(db_file_name, sp_file_name, "TOP",
-                                                           "CUTOFF_RESULT_FORM", cutoff_type,
-                                                           cutoff_value);
+    cutoff_selector = std::make_shared<PrsmCutoffSelector>(db_file_name, sp_file_name, "topmg_top",
+                                                           "topmg_form_cutoff", cutoff_type, cutoff_value);
     cutoff_selector->process();
     cutoff_selector = nullptr;
     std::cout << "PrSM filtering by " << cutoff_type << " - finished." << std::endl;
 
     std::cout << "Selecting top PrSMs for proteoforms - started." << std::endl;
     PrsmFormFilterPtr form_filter
-        = std::make_shared<PrsmFormFilter>(db_file_name, sp_file_name, "CUTOFF_RESULT_FORM",
-                                           "FORM_FILTER_RESULT", "FORM_RESULT");
+        = std::make_shared<PrsmFormFilter>(db_file_name, sp_file_name, "topmg_form_cutoff",
+                                           "topmg_form_cutoff_form");
     form_filter->process();
     form_filter = nullptr;
     std::cout << "Selecting top PrSMs for proteoforms - finished." << std::endl;
@@ -344,13 +333,13 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
     std::cout << "Outputting proteoform table - started." << std::endl;
     PrsmTableWriterPtr form_out
         = std::make_shared<PrsmTableWriter>(prsm_para_ptr, arguments,
-                                            "FORM_RESULT", "_topmg_proteoform.tsv");
+                                            "topmg_form_cutoff_form", "_topmg_proteoform.tsv");
     form_out->write();
     form_out = nullptr;
     std::cout << "Outputting proteoform table - finished." << std::endl;
 
     std::cout << "Generating proteoform xml files - started." << std::endl;
-    xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, "CUTOFF_RESULT_FORM", "proteoform_cutoff");
+    xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, "topmg_form_cutoff", "topmg_proteoform_cutoff");
     xml_gene->process();
     xml_gene = nullptr;
     std::cout << "Generating proteoform xml files - finished." << std::endl;
@@ -359,18 +348,10 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
     translate(arguments, "topmg_proteoform_cutoff");
     std::cout << "Converting proteoform xml files to html files - finished." << std::endl;
 
-    if (arguments["keepTempFiles"] != "true") {
-      std::cout << "Deleting temporary files - started." << std::endl;
-      file_util::delDir(file_util::basename(sp_file_name) + "_proteoform_cutoff_xml");
-      file_util::delDir(file_util::basename(sp_file_name) + "_prsm_cutoff_xml");
-      file_util::cleanDir(ori_db_file_name, sp_file_name);
-      std::cout << "Deleting temporary files - finished." << std::endl;
-    }
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
   }
-  std::cout << "TopMG finished." << std::endl;
   return 0;
 }
 
@@ -418,9 +399,9 @@ int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
     // merge EVALUE files
     std::vector<std::string> prsm_file_lst(spec_file_lst.size());
     for (size_t i = 0; i < spec_file_lst.size(); i++) {
-      prsm_file_lst[i] = prot::file_util::basename(spec_file_lst[i]) + ".EVALUE"; 
+      prsm_file_lst[i] = prot::file_util::basename(spec_file_lst[i]) + ".evalue"; 
     }
-    prot::prsm_util::merge_prsm_files(prsm_file_lst, N, base_name + "_ms2.EVALUE");
+    prot::prsm_util::merge_prsm_files(prsm_file_lst, N, base_name + "_ms2.evalue");
     std::cout << "Merging files - finished." << std::endl;
 
     std::string sp_file_name = base_name + "_ms2.msalign";
@@ -435,18 +416,21 @@ int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
 
     for (size_t k = 0; k < spec_file_lst.size(); k++) {
       std::string sp_file_name = spec_file_lst[k];
-      prot::file_util::delDir(prot::file_util::basename(sp_file_name) + "_proteoform_cutoff_xml");
-      prot::file_util::delDir(prot::file_util::basename(sp_file_name) + "_prsm_cutoff_xml");
-      prot::file_util::cleanDir(ori_db_file_name, sp_file_name);
+      prot::file_util::delDir(prot::file_util::basename(sp_file_name) + "_topmg_proteoform_cutoff_xml");
+      prot::file_util::delDir(prot::file_util::basename(sp_file_name) + "_topmg_prsm_cutoff_xml");
+      prot::file_util::cleanTopmgDir(ori_db_file_name, sp_file_name);
     }
 
     std::string sp_file_name = base_name + "_ms2.msalign";
-    prot::file_util::delDir(prot::file_util::basename(sp_file_name) + "_proteoform_cutoff_xml");
-    prot::file_util::delDir(prot::file_util::basename(sp_file_name) + "_prsm_cutoff_xml");
-    prot::file_util::cleanDir(ori_db_file_name, sp_file_name);
+    prot::file_util::delDir(prot::file_util::basename(sp_file_name) + "_topmg_proteoform_cutoff_xml");
+    prot::file_util::delDir(prot::file_util::basename(sp_file_name) + "_topmg_prsm_cutoff_xml");
+    prot::file_util::cleanTopmgDir(ori_db_file_name, sp_file_name);
 
     std::cout << "Deleting temporary files - finished." << std::endl; 
   }
+
+
+  std::cout << "TopMG finished." << std::endl;
 
   return 0; 
 }
