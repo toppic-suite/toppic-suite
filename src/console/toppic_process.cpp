@@ -192,7 +192,10 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
       processor->process();
       std::cout << "Multiple PTM search - finished." << std::endl;
 
-      input_exts.push_back("toppic_multi_ptm");
+      input_exts.push_back("toppic_multi_ptm_complete_2");
+      input_exts.push_back("toppic_multi_ptm_prefix_2");
+      input_exts.push_back("toppic_multi_ptm_suffix_2");
+      input_exts.push_back("toppic_multi_ptm_internal_2");
     }
 
     std::cout << "Combining PrSMs - started." << std::endl;

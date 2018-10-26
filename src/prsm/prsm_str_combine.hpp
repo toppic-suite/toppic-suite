@@ -53,7 +53,7 @@ class PrsmStrCombine {
   std::string spec_file_name_;
   std::vector<std::string> input_file_exts_;
   std::string output_file_ext_;
-  int top_num_;
+  unsigned top_num_;
 };
 
 typedef std::shared_ptr<PrsmStrCombine> PrsmStrCombinePtr;

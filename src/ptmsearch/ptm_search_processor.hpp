@@ -34,7 +34,6 @@ class PrsmXmlWriterSet {
   std::vector<PrsmXmlWriterPtr> prefix_writer_ptrs_;
   std::vector<PrsmXmlWriterPtr> suffix_writer_ptrs_;
   std::vector<PrsmXmlWriterPtr> internal_writer_ptrs_;
-  PrsmXmlWriterPtr all_writer_ptr_;
   void close();
 };
 

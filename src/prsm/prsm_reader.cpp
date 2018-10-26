@@ -63,7 +63,6 @@ PrsmStrPtr PrsmReader::readOnePrsmStr() {
 PrsmPtr PrsmReader::readOnePrsm(FastaIndexReaderPtr reader_ptr,
                                 const ModPtrVec fix_mod_list) {
   std::vector<std::string> prsm_str_vec = readOnePrsmLines();
-  // LOG_DEBUG("prsm str vec size " << prsm_str_vec.size());
   if (prsm_str_vec.size() == 0) {
     return PrsmPtr(nullptr);
   }
@@ -82,7 +81,6 @@ PrsmPtr PrsmReader::readOnePrsm(FastaIndexReaderPtr reader_ptr,
     xercesc::DOMElement* root = doc.getDocumentElement();
     ptr = std::make_shared<Prsm>(root, reader_ptr, fix_mod_list);
   }
-  // LOG_DEBUG("simple prsm spectrum id " << ptr->getSpectrumId() << " seq name " << ptr->getSeqName());
   return ptr;
 }
 
