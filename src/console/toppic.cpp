@@ -24,7 +24,7 @@
 #include "console/toppic_process.hpp"
 
 int main(int argc, char* argv[]) {
-  //prot::log_level = 2;
+  //prot::log_level = 3;
   std::cout << std::setprecision(10);
 
   prot::Argument argu_processor;

@@ -21,6 +21,7 @@
 #include "spec/spectrum_set.hpp"
 #include "spec/msalign_util.hpp"
 #include "prsm/prsm_reader.hpp"
+#include "prsm/prsm_str_combine.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 #include "prsm/simple_prsm.hpp"
 #include "prsm/simple_prsm_reader.hpp"
@@ -33,22 +34,18 @@ namespace prot {
 
 template <int N>
 PrsmXmlWriterSet<N>::PrsmXmlWriterSet(const std::string & output_file_name){
-  all_writer_ptr_ = std::make_shared<PrsmXmlWriter>(output_file_name);
   for (int s = 2; s <= N; s++) {
-    std::string file_name = output_file_name + "_" + string_util::convertToString(s)
-        + "_" + AlignType::COMPLETE->getName();
+    std::string end_str = "_" + string_util::convertToString(s);
+    std::string file_name = output_file_name + "_" + AlignType::COMPLETE->getName() + end_str;
     PrsmXmlWriterPtr complete_writer_ptr = std::make_shared<PrsmXmlWriter>(file_name);
     complete_writer_ptrs_.push_back(complete_writer_ptr);
-    file_name = output_file_name+"_"+ string_util::convertToString(s)
-        +"_"+ AlignType::PREFIX->getName();
+    file_name = output_file_name + "_" + AlignType::PREFIX->getName() + end_str;
     PrsmXmlWriterPtr prefix_writer_ptr = std::make_shared<PrsmXmlWriter>(file_name);
     prefix_writer_ptrs_.push_back(prefix_writer_ptr);
-    file_name = output_file_name+"_"+ string_util::convertToString(s)
-        +"_"+ AlignType::SUFFIX->getName();
+    file_name = output_file_name + "_" + AlignType::SUFFIX->getName() + end_str;
     PrsmXmlWriterPtr suffix_writer_ptr = std::make_shared<PrsmXmlWriter>(file_name);
     suffix_writer_ptrs_.push_back(suffix_writer_ptr);
-    file_name = output_file_name+"_"+ string_util::convertToString(s)
-        +"_"+ AlignType::INTERNAL->getName();
+    file_name = output_file_name + "_" + AlignType::INTERNAL->getName() + end_str;
     PrsmXmlWriterPtr internal_writer_ptr = std::make_shared<PrsmXmlWriter>(file_name);
     internal_writer_ptrs_.push_back(internal_writer_ptr);
   }
@@ -56,7 +53,6 @@ PrsmXmlWriterSet<N>::PrsmXmlWriterSet(const std::string & output_file_name){
 
 template<int N>
 void PrsmXmlWriterSet<N>::close() {
-  all_writer_ptr_->close();
   for (int s = 2; s <= N; s++) {
     complete_writer_ptrs_[s-2]->close();
     prefix_writer_ptrs_[s-2]->close();
@@ -103,7 +99,6 @@ std::function<void()> geneTask(SpectrumSetPtr spectrum_set_ptr,
       PrsmPtrVec sele_complete_prsm_ptrs;
       seleTopPrsms(complete_prsm_ptrs, sele_complete_prsm_ptrs, mng_ptr->n_report_);
       writer_ptr->complete_writer_ptrs_[s-2]->writeVector(sele_complete_prsm_ptrs);
-      writer_ptr->all_writer_ptr_->writeVector(sele_complete_prsm_ptrs);
 
       PrsmPtrVec prefix_prsm_ptrs = slow_filter_ptr->getPrsms(s-2, AlignType::PREFIX);
       std::sort(prefix_prsm_ptrs.begin(), prefix_prsm_ptrs.end(), 
@@ -111,21 +106,18 @@ std::function<void()> geneTask(SpectrumSetPtr spectrum_set_ptr,
       PrsmPtrVec sele_prefix_prsm_ptrs;
       seleTopPrsms(prefix_prsm_ptrs, sele_prefix_prsm_ptrs, mng_ptr->n_report_);
       writer_ptr->prefix_writer_ptrs_[s-2]->writeVector(sele_prefix_prsm_ptrs);
-      writer_ptr->all_writer_ptr_->writeVector(sele_prefix_prsm_ptrs);
 
       PrsmPtrVec suffix_prsm_ptrs = slow_filter_ptr->getPrsms(s-2, AlignType::SUFFIX);
       std::sort(suffix_prsm_ptrs.begin(), suffix_prsm_ptrs.end(), Prsm::cmpMatchFragmentDec);
       PrsmPtrVec sele_suffix_prsm_ptrs;
       seleTopPrsms(suffix_prsm_ptrs, sele_suffix_prsm_ptrs, mng_ptr->n_report_);
       writer_ptr->suffix_writer_ptrs_[s-2]->writeVector(sele_suffix_prsm_ptrs);
-      writer_ptr->all_writer_ptr_->writeVector(sele_suffix_prsm_ptrs);
 
       PrsmPtrVec internal_prsm_ptrs = slow_filter_ptr->getPrsms(s-2, AlignType::INTERNAL);
       std::sort(internal_prsm_ptrs.begin(), internal_prsm_ptrs.end(), Prsm::cmpMatchFragmentDec);
       PrsmPtrVec sele_internal_prsm_ptrs;
       seleTopPrsms(internal_prsm_ptrs, sele_internal_prsm_ptrs, mng_ptr->n_report_);
       writer_ptr->internal_writer_ptrs_[s-2]->writeVector(sele_internal_prsm_ptrs);
-      writer_ptr->all_writer_ptr_->writeVector(sele_internal_prsm_ptrs);
     }
   };
 }
@@ -159,10 +151,10 @@ void PtmSearchProcessor::process(){
                           sp_para_ptr->getActivationPtr(),
                           sp_para_ptr->getSkipList());
 
-  const int n_unknonw_shift = 2;
+  const int n_unknown_shift = 2;
 
-  std::shared_ptr<ThreadPool<PrsmXmlWriterSet<n_unknonw_shift>>> pool_ptr 
-      = std::make_shared<ThreadPool<PrsmXmlWriterSet<n_unknonw_shift>>>(mng_ptr_->thread_num_ , output_file_name);
+  std::shared_ptr<ThreadPool<PrsmXmlWriterSet<n_unknown_shift>>> pool_ptr 
+      = std::make_shared<ThreadPool<PrsmXmlWriterSet<n_unknown_shift>>>(mng_ptr_->thread_num_ , output_file_name);
 
   int cnt = 0;
   SpectrumSetPtr spec_set_ptr;
@@ -191,19 +183,73 @@ void PtmSearchProcessor::process(){
   LOG_DEBUG("Search completed");
   sp_reader.close();
   simple_prsm_reader.close();
-
   std::cout << std::endl;
-  PrsmXmlWriterPtr all_writer_ptr = std::make_shared<PrsmXmlWriter>(output_file_name);
-  for (int i = 0; i < mng_ptr_->thread_num_; i++) {
-    PrsmReaderPtr all_reader_ptr = std::make_shared<PrsmReader>(output_file_name + "_" + std::to_string(i)); 
-    PrsmPtr p = all_reader_ptr->readOnePrsm(reader_ptr, fix_mod_ptr_vec);
-    while(p != nullptr) {
-      all_writer_ptr->write(p); 
-      p = all_reader_ptr->readOnePrsm(reader_ptr, fix_mod_ptr_vec); 
+
+  // Combine results
+  int prsm_top_num = mng_ptr_->thread_num_ * mng_ptr_->n_report_;
+  for (int s = 2; s <= n_unknown_shift; s++) {
+    std::string end_str = "_" + std::to_string(s);
+    // Complete prsms
+    std::string complete_output_ext = mng_ptr_->output_file_ext_ + "_" 
+        + AlignType::COMPLETE->getName() + end_str;
+    std::vector<std::string> complete_input_exts;
+    for (int t = 0; t < mng_ptr_->thread_num_; t++) {
+      std::string input_ext = mng_ptr_->output_file_ext_ + "_" 
+          + std::to_string(t) + "_" + AlignType::COMPLETE->getName() + end_str;
+      complete_input_exts.push_back(input_ext);
     }
-    all_reader_ptr->close();
+    PrsmStrCombinePtr combine_ptr
+        = std::make_shared<PrsmStrCombine>(sp_file_name, complete_input_exts, 
+                                           complete_output_ext, prsm_top_num);
+    combine_ptr->process();
+    combine_ptr = nullptr;
+
+    // Prefix prsms
+    std::string prefix_output_ext = mng_ptr_->output_file_ext_ + "_" 
+        + AlignType::PREFIX->getName() + end_str;
+    std::vector<std::string> prefix_input_exts;
+    for (int t = 0; t < mng_ptr_->thread_num_; t++) {
+      std::string input_ext = mng_ptr_->output_file_ext_ + "_" 
+          + std::to_string(t) + "_" + AlignType::PREFIX->getName() + end_str;
+      prefix_input_exts.push_back(input_ext);
+    }
+    combine_ptr
+        = std::make_shared<PrsmStrCombine>(sp_file_name, prefix_input_exts, 
+                                           prefix_output_ext, prsm_top_num);
+    combine_ptr->process();
+    combine_ptr = nullptr;
+
+    // Suffix prsms
+    std::string suffix_output_ext = mng_ptr_->output_file_ext_ + "_" 
+        + AlignType::SUFFIX->getName() + end_str;
+    std::vector<std::string> suffix_input_exts;
+    for (int t = 0; t < mng_ptr_->thread_num_; t++) {
+      std::string input_ext = mng_ptr_->output_file_ext_ + "_" 
+          + std::to_string(t) + "_" + AlignType::SUFFIX->getName() + end_str;
+      suffix_input_exts.push_back(input_ext);
+    }
+    combine_ptr
+        = std::make_shared<PrsmStrCombine>(sp_file_name, suffix_input_exts, 
+                                           suffix_output_ext, prsm_top_num);
+    combine_ptr->process();
+    combine_ptr = nullptr;
+
+    // internal prsms
+    std::string internal_output_ext = mng_ptr_->output_file_ext_ + "_" 
+        + AlignType::INTERNAL->getName() + end_str;
+    std::vector<std::string> internal_input_exts;
+    for (int t = 0; t < mng_ptr_->thread_num_; t++) {
+      std::string input_ext = mng_ptr_->output_file_ext_ + "_" 
+          + std::to_string(t) + "_" + AlignType::INTERNAL->getName() + end_str;
+      internal_input_exts.push_back(input_ext);
+    }
+    combine_ptr
+        = std::make_shared<PrsmStrCombine>(sp_file_name, internal_input_exts, 
+                                           internal_output_ext, prsm_top_num);
+    combine_ptr->process();
+    combine_ptr = nullptr;
   }
-  all_writer_ptr->close();
+
 }
 
 } /* namespace prot */

@@ -62,7 +62,13 @@ void PrsmStrCombine::process(bool norm) {
     for (size_t i = 0; i < input_num; i++) {
       if (prsm_str_ptrs[i] != nullptr) {
         finish = false;
-        while (prsm_str_ptrs[i] != nullptr && prsm_str_ptrs[i]->getSpectrumId() == spec_id) {
+        if (prsm_str_ptrs[i] != nullptr 
+            && prsm_str_ptrs[i]->getSpectrumId() < spec_id) {
+          LOG_ERROR("Error in the order of reported PrSMs!");
+          exit(1);
+        }
+        while (prsm_str_ptrs[i] != nullptr 
+               && prsm_str_ptrs[i]->getSpectrumId() == spec_id) {
           cur_str_ptrs.push_back(prsm_str_ptrs[i]);
           prsm_str_ptrs[i] = reader_ptrs[i]->readOnePrsmStr();
         }
@@ -80,14 +86,15 @@ void PrsmStrCombine::process(bool norm) {
                               });
         cur_str_ptrs.erase(it, cur_str_ptrs.end());
       }
-      for (int i = 0; i < top_num_; i++) {
-        if (i >= static_cast<int>(cur_str_ptrs.size())) {
+      for (unsigned i = 0; i < top_num_; i++) {
+        if (i >= cur_str_ptrs.size()) {
           break;
         }
         writer.write(cur_str_ptrs[i]);
       }
     }
     spec_id++;
+    LOG_DEBUG("spec id " << spec_id);
   }
 
   // close files
