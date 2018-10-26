@@ -106,6 +106,10 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     int filter_result_num = std::stoi(arguments["filteringResultNumber"]);
     int thread_num = std::stoi(arguments["threadNumber"]);
 
+    // Filter steps requires a large amount of memory. 
+    // We use only one thread to reduce the memory requirement.
+    int filter_thread_num = 1;
+
     bool use_gf = false;
     if (arguments["useGf"] == "true") {
       use_gf = true;
@@ -128,7 +132,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
 
     std::cout << "Non PTM filtering - started." << std::endl;
     ZeroPtmFilterMngPtr zero_filter_mng_ptr
-        = std::make_shared<ZeroPtmFilterMng>(prsm_para_ptr, thread_num, "toppic_zero_filter");
+        = std::make_shared<ZeroPtmFilterMng>(prsm_para_ptr, filter_thread_num, "toppic_zero_filter");
     ZeroPtmFilterProcessorPtr zero_filter_processor
         = std::make_shared<ZeroPtmFilterProcessor>(zero_filter_mng_ptr);
     zero_filter_processor->process();
@@ -151,7 +155,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     if (ptm_num >= 1) {
       std::cout << "One PTM filtering - started." << std::endl;
       OnePtmFilterMngPtr one_ptm_filter_mng_ptr
-          = std::make_shared<OnePtmFilterMng>(prsm_para_ptr, "toppic_one_filter", thread_num);
+          = std::make_shared<OnePtmFilterMng>(prsm_para_ptr, "toppic_one_filter", filter_thread_num);
       OnePtmFilterProcessorPtr one_filter_processor
           = std::make_shared<OnePtmFilterProcessor>(one_ptm_filter_mng_ptr);
       one_filter_processor->process();
@@ -178,7 +182,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
       std::cout << "Multiple PTM filtering - started." << std::endl;
       DiagFilterMngPtr diag_filter_mng_ptr
           = std::make_shared<DiagFilterMng>(prsm_para_ptr, filter_result_num,
-                                            thread_num, "toppic_multi_filter");
+                                            filter_thread_num, "toppic_multi_filter");
       DiagFilterProcessorPtr diag_filter_processor
           = std::make_shared<DiagFilterProcessor>(diag_filter_mng_ptr);
       diag_filter_processor->process();
