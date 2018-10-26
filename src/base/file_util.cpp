@@ -185,15 +185,14 @@ void cleanTopmgDir(const std::string &fa_path, const std::string & sp_path) {
   clean_prefix(sp, sp_base + ".topmg_graph_align_");
   delFile(sp_base + ".topmg_graph_post");
 
-  delFile(sp_base + ".toppic_evalue");
+  delFile(sp_base + ".topmg_evalue");
   clean_prefix(sp, sp_base + ".toppic_evalue_");
-  delFile(sp_base + ".toppic_cluster");
-  delFile(sp_base + ".toppic_top");
-  delFile(sp_base + ".toppic_top_pre");
-  delFile(sp_base + ".toppic_prsm_cutoff");
-  delFile(sp_base + ".toppic_prsm_cutoff_localization");
-  delFile(sp_base + ".toppic_form_cutoff");
-  delFile(sp_base + ".toppic_form_cutoff_form");
+  delFile(sp_base + ".topmg_cluster");
+  delFile(sp_base + ".topmg_top");
+  delFile(sp_base + ".topmg_top_pre");
+  delFile(sp_base + ".topmg_prsm_cutoff");
+  delFile(sp_base + ".topmg_form_cutoff");
+  delFile(sp_base + ".topmg_form_cutoff_form");
   clean_prefix(sp, sp_base + ".proteoform_");
   clean_prefix(sp, sp_base + ".prot_");
 }
@@ -226,7 +225,7 @@ void cleanToppicDir(const std::string &fa_path, const std::string & sp_path) {
   delFile(sp_base + ".toppic_top");
   delFile(sp_base + ".toppic_top_pre");
   delFile(sp_base + ".toppic_prsm_cutoff");
-  delFile(sp_base + ".toppic_prsm_cutoff_localization");
+  delFile(sp_base + ".toppic_prsm_cutoff_local");
   delFile(sp_base + ".toppic_form_cutoff");
   delFile(sp_base + ".toppic_form_cutoff_form");
   clean_prefix(sp, sp_base + ".proteoform_");

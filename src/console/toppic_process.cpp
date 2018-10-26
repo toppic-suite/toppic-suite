@@ -320,12 +320,12 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
                                        arguments["residueModFileName"],
                                        max_ptm_mass,
                                        min_ptm_mass,
-                                       suffix, "toppic_prsm_cutoff_localization");
+                                       suffix, "toppic_prsm_cutoff_local");
       LocalProcessorPtr local_ptr = std::make_shared<LocalProcessor>(local_mng);
       local_ptr->process();
       local_ptr = nullptr;
       std::cout << "PTM characterization - finished." << std::endl;
-      suffix = "toppic_prsm_cutff_localization";
+      suffix = "toppic_prsm_cutoff_local";
     }
 
 
