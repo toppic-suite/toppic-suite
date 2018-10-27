@@ -180,9 +180,10 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
 
     if (ptm_num >= 2) {
       std::cout << "Multiple PTM filtering - started." << std::endl;
+      // thread number is used because diagonal filter uses only one index
       DiagFilterMngPtr diag_filter_mng_ptr
           = std::make_shared<DiagFilterMng>(prsm_para_ptr, filter_result_num,
-                                            filter_thread_num, "toppic_multi_filter");
+                                            thread_num, "toppic_multi_filter");
       DiagFilterProcessorPtr diag_filter_processor
           = std::make_shared<DiagFilterProcessor>(diag_filter_mng_ptr);
       diag_filter_processor->process();
@@ -403,9 +404,9 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
 }
 
 int TopPICProgress(std::map<std::string, std::string> & arguments) {
-  //if (TopPIC_identify(arguments) != 0) {
-  //  return 1;
-  //}
+  if (TopPIC_identify(arguments) != 0) {
+    return 1;
+  }
 
   return TopPIC_post(arguments);
 }

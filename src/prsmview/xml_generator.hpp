@@ -56,6 +56,8 @@ class XmlGenerator {
 
   void splitByProtId();
 
+  void removeTempFiles();
+
   std::string input_file_ext_;
 
   PrsmViewMngPtr mng_ptr_;

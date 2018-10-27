@@ -333,6 +333,12 @@ void XmlGenerator::splitByProtId() {
   } while (flag);
 }
 
+void XmlGenerator::removeTempFiles() {
+  std::string sp_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
+  file_util::cleanTempFiles(sp_file_name, "proteoform_");
+  file_util::cleanTempFiles(sp_file_name, "prot_");
+}
+
 void XmlGenerator::process() {
   LOG_DEBUG("process start");
   file_util::createFolder(mng_ptr_->xml_path_ + file_util::getFileSeparator() + "proteoforms");
@@ -349,6 +355,7 @@ void XmlGenerator::process() {
   outputAllProteins();
 
   outputFileList();
+  removeTempFiles();
 }
 
 }  // namespace prot
