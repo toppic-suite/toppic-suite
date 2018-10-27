@@ -292,7 +292,7 @@ p, li { white-space: pre-wrap; }
        <item>
         <widget class="QLabel" name="label_5">
          <property name="text">
-          <string>Combined output folder: </string>
+          <string>Combined output filename: </string>
          </property>
         </widget>
        </item>
