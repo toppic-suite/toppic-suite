@@ -12,6 +12,7 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include <climits>
 
 #include "base/logger.hpp"
 #include "base/file_util.hpp"
@@ -23,6 +24,7 @@
 #include "spec/spectrum_set.hpp"
 #include "prsm/prsm.hpp"
 #include "prsm/prsm_reader.hpp"
+#include "prsm/prsm_str_combine.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 #include "tdgf/evalue_processor.hpp"
 
@@ -135,22 +137,16 @@ void EValueProcessor::process(bool is_separate) {
   writer.close();
 
   if (mng_ptr_->use_gf_) {
-    PrsmXmlWriterPtr all_writer_ptr = std::make_shared<PrsmXmlWriter>(output_file_name);
-    PrsmPtrVec prsm_vec;
-    for (int i = 0; i < mng_ptr_->thread_num_; i++) {
-      PrsmReaderPtr all_reader_ptr = std::make_shared<PrsmReader>(output_file_name + "_" + std::to_string(i)); 
-      PrsmPtr p = all_reader_ptr->readOnePrsm(seq_reader, fix_mod_ptr_vec);
-      while (p != nullptr) {
-        prsm_vec.push_back(p);
-        p = all_reader_ptr->readOnePrsm(seq_reader, fix_mod_ptr_vec); 
-      }
-      all_reader_ptr->close();
+    int prsm_top_num = INT_MAX; 
+    std::vector<std::string> input_exts;
+    for (int t = 0; t < mng_ptr_->thread_num_; t++) {
+      input_exts.push_back(mng_ptr_->output_file_ext_ + "_" + std::to_string(t));
     }
-    std::sort(prsm_vec.begin(), prsm_vec.end(), prot::Prsm::cmpSpectrumIdIncEvalueInc);
-    for (size_t i = 0; i < prsm_vec.size(); i++) {
-      all_writer_ptr->write(prsm_vec[i]);
-    }
-    all_writer_ptr->close();
+    PrsmStrCombinePtr combine_ptr
+        = std::make_shared<PrsmStrCombine>(sp_file_name, input_exts, 
+                                           mng_ptr_->output_file_ext_, prsm_top_num);
+    combine_ptr->process();
+    combine_ptr = nullptr;
   }
 
   // remove tempory files
