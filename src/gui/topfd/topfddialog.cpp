@@ -196,22 +196,45 @@ void TopFDDialog::on_startButton_clicked() {
   thread_->setPar(argument, spec_file_lst);
   thread_->start();
 
-  std::string lastinfo = "";
-  std::string nowinfo = "";
   std::string info;
+  int processed_len = 0;
+  std::string processed_str = ""; 
+  std::string current_str = "";
+  unsigned cursor_pos = 0;
+
   while (true) {
     // Here is the infomation been shown in the infoBox.
-    nowinfo = buffer.str();
-    info = nowinfo.substr(lastinfo.length());
-    info = info.erase(info.find_last_not_of(" \n\r\t") + 1);
-    lastinfo = nowinfo;
-    if (info != "") {
-      updateMsg(info);
+    info = buffer.str();
+    std::string new_info = info.substr(processed_len);
+    processed_len = info.length();
+    
+    for (unsigned i = 0; i < new_info.size(); i++) {
+      // new line
+      if (new_info.at(i) == '\n') {
+        processed_str = processed_str + current_str + '\n';
+        current_str = "";
+        cursor_pos = 0;
+      }
+      // CF
+      if (new_info.at(i) == '\r') {
+        cursor_pos = 0;
+      }
+      // add a new charactor
+      if (new_info.at(i) != '\n' && new_info.at(i) != '\r') {
+        if (cursor_pos < current_str.length()) {
+          current_str[cursor_pos] = new_info.at(i);
+        }
+        else {
+          current_str = current_str + new_info.at(i);
+        }
+        cursor_pos++;
+      }
     }
+    updateMsg(processed_str + current_str);
     if (thread_->isFinished()) {
       break;
     }
-    sleep(10);
+    sleep(100);
   }
   unlockDialog();
   showInfo = "";
@@ -331,32 +354,17 @@ bool TopFDDialog::checkError() {
 }
 
 void TopFDDialog::updateMsg(std::string msg) {
-  if (msg.substr(0, 6) == "Running") {msg = "\n" + msg;}
 
-  QString info = msg.c_str();
+  showInfo = msg.c_str();
 
-  if (msg.at(0) == '\r') {
-    int lastloc = info.lastIndexOf("\r");
-    info = info.right(info.size() - lastloc);
-  }
-
-  ui->outputTextBrowser->setText(showInfo + info);
-
-  if (msg.at(0) != '\r') {
-    showInfo = ui->outputTextBrowser->toPlainText();
-  }
-
+  ui->outputTextBrowser->setText(showInfo);
+  
   QTextCursor cursor = ui->outputTextBrowser->textCursor();
 
   cursor.movePosition(QTextCursor::End);
 
   ui->outputTextBrowser->setTextCursor(cursor);
 
-  if (msg.substr(0, 6) == "Running") {
-    unlockDialog();
-    percentage_ = 0;
-    return;
-  }
 }
 
 void TopFDDialog::sleep(int wait) {
