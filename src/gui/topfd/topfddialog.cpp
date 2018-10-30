@@ -193,13 +193,14 @@ void TopFDDialog::on_startButton_clicked() {
   ui->outputTextBrowser->setText(showInfo);
   std::map<std::string, std::string> argument = this->getArguments();
   std::vector<std::string> spec_file_lst = this->getSpecFileList();
+  /*
   thread_->setPar(argument, spec_file_lst);
   thread_->start();
 
   std::string info;
   int processed_len = 0;
-  std::string processed_str = ""; 
-  std::string current_str = "";
+  std::string processed_lines = ""; 
+  std::string current_line = "";
   unsigned cursor_pos = 0;
 
   while (true) {
@@ -211,8 +212,8 @@ void TopFDDialog::on_startButton_clicked() {
     for (unsigned i = 0; i < new_info.size(); i++) {
       // new line
       if (new_info.at(i) == '\n') {
-        processed_str = processed_str + current_str + '\n';
-        current_str = "";
+        processed_lines = processed_lines + current_str + '\n';
+        current_line = "";
         cursor_pos = 0;
       }
       // CF
@@ -221,11 +222,11 @@ void TopFDDialog::on_startButton_clicked() {
       }
       // add a new charactor
       if (new_info.at(i) != '\n' && new_info.at(i) != '\r') {
-        if (cursor_pos < current_str.length()) {
-          current_str[cursor_pos] = new_info.at(i);
+        if (cursor_pos < current_line.length()) {
+          current_line[cursor_pos] = new_info.at(i);
         }
         else {
-          current_str = current_str + new_info.at(i);
+          current_line = current_line + new_info.at(i);
         }
         cursor_pos++;
       }
@@ -236,6 +237,7 @@ void TopFDDialog::on_startButton_clicked() {
     }
     sleep(100);
   }
+  */
   unlockDialog();
   showInfo = "";
   thread_->exit();
@@ -260,7 +262,11 @@ bool TopFDDialog::continueToClose() {
 }
 
 void TopFDDialog::on_outputButton_clicked() {
-  fs::path full_path(arguments_["spectrumFileName"].c_str());
+  std::string sp_file_name = "";
+  if (spec_file_lst_.size() > 0) {
+    sp_file_name = spec_file_lst_[0];
+  }
+  fs::path full_path(sp_file_name.c_str());
   QString outPath = full_path.remove_filename().string().c_str();
   QDesktopServices::openUrl(QUrl(outPath, QUrl::TolerantMode));
 }
