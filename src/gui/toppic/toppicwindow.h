@@ -80,6 +80,8 @@ class toppicWindow : public QMainWindow {
 
   void on_delButton_clicked();
 
+  void on_combinedOutputCheckBox_clicked(bool checked);
+
  private:
   Ui::toppicWindow *ui;
 

@@ -108,7 +108,7 @@ p, li { white-space: pre-wrap; }
         </font>
        </property>
        <property name="text">
-        <string>Default</string>
+        <string>Default parameters</string>
        </property>
       </widget>
      </item>
@@ -284,13 +284,32 @@ p, li { white-space: pre-wrap; }
        <rect>
         <x>10</x>
         <y>250</y>
-        <width>861</width>
+        <width>311</width>
         <height>33</height>
        </rect>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_5">
        <item>
-        <widget class="QLabel" name="label_6">
+        <widget class="QCheckBox" name="combinedOutputCheckBox">
+         <property name="text">
+          <string>Combine identifications</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget_6">
+      <property name="geometry">
+       <rect>
+        <x>490</x>
+        <y>250</y>
+        <width>371</width>
+        <height>33</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_6">
+       <item>
+        <widget class="QLabel" name="label_7">
          <property name="text">
           <string>Combined output filename: </string>
          </property>
@@ -307,21 +326,11 @@ p, li { white-space: pre-wrap; }
            <height>16777215</height>
           </size>
          </property>
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="combinedOutputButton">
-         <property name="maximumSize">
-          <size>
-           <width>85</width>
-           <height>16777215</height>
-          </size>
-         </property>
          <property name="text">
-          <string>Select</string>
+          <string>combined</string>
+         </property>
+         <property name="readOnly">
+          <bool>false</bool>
          </property>
         </widget>
        </item>

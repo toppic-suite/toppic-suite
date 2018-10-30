@@ -110,35 +110,18 @@ void toppicWindow::initArguments() {
 
 void toppicWindow::on_clearButton_clicked() {
   ui->databaseFileEdit->clear();
-  ui->combinedOutputEdit->clear();
-  ui->fixedModFileEdit->clear();
-  ui->errorToleranceEdit->setText("15");
-  ui->maxModEdit->clear();
-  ui->minModEdit->clear();
-  ui->cutoffSpectralValueEdit->clear();
-  ui->cutoffProteoformValueEdit->clear();
-  ui->numCombinedEdit->clear();
-  ui->modFileEdit->clear();
-  ui->miscoreThresholdEdit->clear();
-  ui->threadNumberEdit->clear();
+  ui->listWidget->clear();
   ui->outputTextBrowser->setText("Click the Start button to process the spectrum file.");
-  ui->fixedModComboBox->setCurrentIndex(0);
-  on_fixedModComboBox_currentIndexChanged(0);
-  ui->activationComboBox->setCurrentIndex(0);
-  ui->cutoffSpectralTypeComboBox->setCurrentIndex(0);
-  ui->cutoffProteoformTypeComboBox->setCurrentIndex(0);
-  ui->numModComboBox->setCurrentIndex(1);
-  on_numModComboBox_currentIndexChanged(1);
-  ui->NONECheckBox->setChecked(false);
-  ui->NMECheckBox->setChecked(false);
-  ui->NMEACCheckBox->setChecked(false);
-  ui->MACCheckBox->setChecked(false);
-  ui->decoyCheckBox->setChecked(false);
-  ui->generatingFunctionCheckBox->setChecked(false);
-  ui->topfdFeatureCheckBox->setChecked(false);
+  ui->combinedOutputCheckBox->setChecked(false);
+  ui->combinedOutputEdit->setText("combined");
+  ui->combinedOutputEdit->setEnabled(false);
+  ui->outputButton->setEnabled(false);
 }
 
 void toppicWindow::on_defaultButton_clicked() {
+  ui->combinedOutputCheckBox->setChecked(false);
+  ui->combinedOutputEdit->setText("combined");
+  ui->combinedOutputEdit->setEnabled(false);
   ui->fixedModFileEdit->clear();
   ui->errorToleranceEdit->setText("15");
   ui->maxModEdit->setText("500");
@@ -213,13 +196,15 @@ void toppicWindow::on_modFileButton_clicked() {
 }
 
 void toppicWindow::on_startButton_clicked() {
+  
   std::stringstream buffer;
   std::streambuf *oldbuf = std::cout.rdbuf(buffer.rdbuf());
   if (checkError()) {
     return;
   }
-  lockDialog();
 
+  lockDialog();
+  /*
   ui->outputTextBrowser->setText(showInfo);
   std::map<std::string, std::string> argument = this->getArguments();
   std::vector<std::string> spec_file_lst = this->getSpecFileList();
@@ -241,6 +226,7 @@ void toppicWindow::on_startButton_clicked() {
     }
     sleep(10);
   }
+  */
   unlockDialog();
 
   showInfo = "";
@@ -250,12 +236,15 @@ void toppicWindow::on_startButton_clicked() {
 
 void toppicWindow::on_outputButton_clicked() {
   std::vector<std::string> spec_file_lst = this->getSpecFileList();
+  /*
   if (spec_file_lst.size() > 1) {
     std::string output_file_name = arguments_["combinedOutputName"] + "_ms2.msalign";
     fs::path full_path(output_file_name.c_str());
     QString outPath = full_path.remove_filename().string().c_str();
     QDesktopServices::openUrl(QUrl(outPath, QUrl::TolerantMode));
   } else {
+  */
+  if (spec_file_lst.size() > 0) {
     fs::path full_path(spec_file_lst[0].c_str());
     QString outPath = full_path.remove_filename().string().c_str();
     QDesktopServices::openUrl(QUrl(outPath, QUrl::TolerantMode));
@@ -268,7 +257,8 @@ std::map<std::string, std::string> toppicWindow::getArguments() {
   arguments_["executiveDir"] = exe_dir;
   arguments_["resourceDir"] = arguments_["executiveDir"] + prot::file_util::getFileSeparator() + prot::file_util::getResourceDirName();
   arguments_["oriDatabaseFileName"] = ui->databaseFileEdit->text().toStdString();
-  arguments_["combinedOutputName"] = ui->combinedOutputEdit->text().toStdString() + "/combined";
+  
+  arguments_["combinedOutputName"] = ui->combinedOutputEdit->text().toStdString();
   arguments_["databaseBlockSize"] = "1000000";
   arguments_["activation"] = ui->activationComboBox->currentText().toStdString();
   if (ui->decoyCheckBox->isChecked()) {
@@ -383,6 +373,7 @@ void toppicWindow::lockDialog() {
   ui->databaseFileButton->setEnabled(false);
   ui->modFileButton->setEnabled(false);
   ui->databaseFileEdit->setEnabled(false);
+  ui->combinedOutputCheckBox->setEnabled(false);
   ui->combinedOutputEdit->setEnabled(false);
   ui->fixedModFileEdit->setEnabled(false);
   ui->errorToleranceEdit->setEnabled(false);
@@ -419,7 +410,10 @@ void toppicWindow::unlockDialog() {
   ui->databaseFileButton->setEnabled(true);
   ui->modFileButton->setEnabled(true);
   ui->databaseFileEdit->setEnabled(true);
-  ui->combinedOutputEdit->setEnabled(true);
+  ui->combinedOutputCheckBox->setEnabled(true);
+  if (ui->combinedOutputCheckBox->isChecked()) {
+    ui->combinedOutputEdit->setEnabled(true);
+  }
   ui->fixedModFileEdit->setEnabled(true);
   ui->errorToleranceEdit->setEnabled(true);
   ui->maxModEdit->setEnabled(true);
@@ -476,16 +470,16 @@ bool toppicWindow::checkError() {
     }
   }
 
-  if (ui->listWidget->count() > 1 && ui->combinedOutputEdit->text().toStdString().length() == 0) {
+  if (ui->combinedOutputCheckBox->isChecked() && ui->combinedOutputEdit->text().trimmed().toStdString().length() == 0) {
     QMessageBox::warning(this, tr("Warning"),
-                         tr("Please select a folder for the combined output!"),
+                         tr("Please input a combined output filename!"),
                          QMessageBox::Yes);
     return true;
   }
 
   if (ui->combinedOutputEdit->text().toStdString().length() > 200) {
     QMessageBox::warning(this, tr("Warning"),
-                         tr("The output folder path is too long!"),
+                         tr("The combined output filename is too long!"),
                          QMessageBox::Yes);
     return true;
   }
@@ -659,6 +653,23 @@ void toppicWindow::on_generatingFunctionCheckBox_clicked(bool checked) {
                          tr("To use an error tolerance other than 5, 10, and 15 ppm, the checkbox \"generating function\" should be checked!"),
                          QMessageBox::Yes);
     ui->generatingFunctionCheckBox->setChecked(true);
+  }
+}
+
+void toppicWindow::on_combinedOutputCheckBox_clicked(bool checked) {
+  //ui->combinedOutputEdit->setText("Test");
+  if (ui->listWidget->count() < 2 && checked) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("The option can be selected only when two or more spectral data files are analyzed!"),
+                         QMessageBox::Yes);
+    ui->combinedOutputCheckBox->setChecked(false);
+    checked = false;
+  }
+  if (checked) {
+    ui->combinedOutputEdit->setEnabled(true);
+  }
+  else {
+    ui->combinedOutputEdit->setEnabled(false);
   }
 }
 
