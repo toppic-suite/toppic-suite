@@ -193,7 +193,6 @@ void TopFDDialog::on_startButton_clicked() {
   ui->outputTextBrowser->setText(showInfo);
   std::map<std::string, std::string> argument = this->getArguments();
   std::vector<std::string> spec_file_lst = this->getSpecFileList();
-  /*
   thread_->setPar(argument, spec_file_lst);
   thread_->start();
 
@@ -237,7 +236,6 @@ void TopFDDialog::on_startButton_clicked() {
     }
     sleep(100);
   }
-  */
   unlockDialog();
   showInfo = "";
   thread_->exit();
