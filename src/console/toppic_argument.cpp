@@ -38,7 +38,7 @@ void Argument::initArguments() {
   arguments_["databaseFileName"] = "";
   arguments_["databaseBlockSize"] = "1000000";
   arguments_["spectrumFileName"] = "";
-  arguments_["combinedOutputName"] = "combined";
+  arguments_["combinedOutputName"] = "";
   arguments_["activation"] = "FILE";
   arguments_["searchType"] = "TARGET";
   arguments_["fixedMod"] = "";
