@@ -42,7 +42,7 @@ void Argument::initArguments() {
   arguments_["databaseFileName"] = "";
   arguments_["databaseBlockSize"] = "1000000";
   arguments_["spectrumFileName"] = "";
-  arguments_["combinedOutputName"] = "combined";
+  arguments_["combinedOutputName"] = "";
   arguments_["activation"] = "FILE";
   arguments_["searchType"] = "TARGET";
   arguments_["fixedMod"] = "";
@@ -170,7 +170,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("use-asf-diagonal,D", "Use the ASF-DIAGONAL method for protein filtering.")
         ("var-ptm,P", po::value<std::string>(&var_ptm_num) , "<a positive number>. Maximum number of variable PTMs. Default value: 5.")
         ("num-shift,p", po::value<std::string> (&ptm_num), "<0|1|2>. Maximum number of unexpected modifications in a proteoform spectrum-match. Default value: 0.")
-        ("output,o", po::value<std::string>(&combined_output_name) , "<a filename with its path>. The output file name for the combined results. Default: combined.")
+        ("combined-file-name, c", po::value<std::string>(&combined_output_name) , "Specify a file name for the combined spectrum data file and analysis results.")
         ("keep-temp-files,k", "Keep temporary files.");
 
     po::options_description desc("Options");
@@ -194,7 +194,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("thread-number,u", po::value<std::string> (&thread_number), "")
         ("no-topfd-feature,x", "")
         ("skip-list,l", po::value<std::string>(&skip_list) , "")
-        ("output,o", po::value<std::string>(&combined_output_name) , "")
+        ("combined-file-name,c", po::value<std::string>(&combined_output_name) , "")
         ("proteo-graph-dis,j", po::value<std::string> (&proteo_graph_dis), "")
         ("var-ptm-in-gap,G", po::value<std::string>(&var_ptm_in_gap) , "")
         ("use-asf-diagonal,D", "")
@@ -244,7 +244,7 @@ bool Argument::parse(int argc, char* argv[]) {
       spec_file_list_ = vm["spectrum-file-name"].as<std::vector<std::string> >(); 
     }
 
-    if (vm.count("output")) {
+    if (vm.count("combined-file-name")) {
       arguments_["combinedOutputName"] = combined_output_name;
     }
 
