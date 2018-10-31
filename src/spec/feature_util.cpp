@@ -25,8 +25,8 @@ namespace prot {
 
 namespace feature_util {
 
-void merge_feature_files(const std::vector<std::string> & feature_file_lst,                                       
-                         int N, const std::string & output_file) {
+void mergeFeatureFiles(const std::vector<std::string> & feature_file_lst,                                       
+                       int N, const std::string & output_file) {
   std::ofstream outfile(output_file);
   for (size_t i = 0; i < feature_file_lst.size(); i++) {
     std::ifstream infile(feature_file_lst[i]);
@@ -40,9 +40,9 @@ void merge_feature_files(const std::vector<std::string> & feature_file_lst,
       std::vector<std::string> strs;
       boost::split(strs, line, boost::is_any_of("\t "));
       outfile << N * i + std::stoi(strs[0]) << "\t";
-      outfile << N * i + std::stoi(strs[1]) << "\t";
+      outfile << strs[1] << "\t";
       outfile << N * i + std::stoi(strs[2]) << "\t";
-      outfile << N * i + std::stoi(strs[3]) << "\t";
+      outfile << strs[3] << "\t";
       for (size_t k = 4; k < strs.size(); k++) {
         outfile << strs[k] << "\t";
       }

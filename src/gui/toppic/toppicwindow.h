@@ -38,8 +38,6 @@ class toppicWindow : public QMainWindow {
  private slots:
   void on_databaseFileButton_clicked();
 
-  void on_combinedOutputButton_clicked();
-
   void on_fixedModFileButton_clicked();
 
   void on_modFileButton_clicked();
@@ -79,8 +77,6 @@ class toppicWindow : public QMainWindow {
   void on_addButton_clicked();
 
   void on_delButton_clicked();
-
-  void on_combinedOutputCheckBox_clicked(bool checked);
 
  private:
   Ui::toppicWindow *ui;

@@ -68,6 +68,7 @@ toppicWindow::toppicWindow(QWidget *parent) :
       fontTable.setPointSize(9);
       ui->listWidget->setFont(fontTable);
 
+      on_clearButton_clicked();
       on_defaultButton_clicked();
     }
 
@@ -79,8 +80,7 @@ void toppicWindow::initArguments() {
   arguments_["oriDatabaseFileName"]="";
   arguments_["databaseFileName"] = "";
   arguments_["databaseBlockSize"] = "1000000";
-  arguments_["spectrumFileName"] = "";
-  arguments_["combinedOutputName"] = "combined";
+  arguments_["combinedOutputName"] = "";
   arguments_["activation"] = "FILE";
   arguments_["searchType"] = "TARGET";
   arguments_["fixedMod"] = "";
@@ -112,16 +112,13 @@ void toppicWindow::on_clearButton_clicked() {
   ui->databaseFileEdit->clear();
   ui->listWidget->clear();
   ui->outputTextBrowser->setText("Click the Start button to process the spectrum file.");
-  ui->combinedOutputCheckBox->setChecked(false);
-  ui->combinedOutputEdit->setText("combined");
+  ui->combinedOutputEdit->setText("");
   ui->combinedOutputEdit->setEnabled(false);
   ui->outputButton->setEnabled(false);
 }
 
 void toppicWindow::on_defaultButton_clicked() {
-  ui->combinedOutputCheckBox->setChecked(false);
-  ui->combinedOutputEdit->setText("combined");
-  ui->combinedOutputEdit->setEnabled(false);
+  ui->combinedOutputEdit->setText("");
   ui->fixedModFileEdit->clear();
   ui->errorToleranceEdit->setText("15");
   ui->maxModEdit->setText("500");
@@ -165,16 +162,6 @@ void toppicWindow::toppicWindow::on_databaseFileButton_clicked() {
   ui->databaseFileEdit->setText(s);
 }
 
-void toppicWindow::toppicWindow::on_combinedOutputButton_clicked() {
-  QString dir = QFileDialog::getExistingDirectory(this,
-                                                  tr("Open Directory"),
-                                                  lastDir_,
-                                                  QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-
-  updatedir(dir);
-  ui->combinedOutputEdit->setText(dir);  
-}
-
 void toppicWindow::on_fixedModFileButton_clicked() {
   QString s = QFileDialog::getOpenFileName(
       this,
@@ -204,7 +191,6 @@ void toppicWindow::on_startButton_clicked() {
   }
 
   lockDialog();
-  /*
   ui->outputTextBrowser->setText(showInfo);
   std::map<std::string, std::string> argument = this->getArguments();
   std::vector<std::string> spec_file_lst = this->getSpecFileList();
@@ -226,7 +212,6 @@ void toppicWindow::on_startButton_clicked() {
     }
     sleep(10);
   }
-  */
   unlockDialog();
 
   showInfo = "";
@@ -236,14 +221,6 @@ void toppicWindow::on_startButton_clicked() {
 
 void toppicWindow::on_outputButton_clicked() {
   std::vector<std::string> spec_file_lst = this->getSpecFileList();
-  /*
-  if (spec_file_lst.size() > 1) {
-    std::string output_file_name = arguments_["combinedOutputName"] + "_ms2.msalign";
-    fs::path full_path(output_file_name.c_str());
-    QString outPath = full_path.remove_filename().string().c_str();
-    QDesktopServices::openUrl(QUrl(outPath, QUrl::TolerantMode));
-  } else {
-  */
   if (spec_file_lst.size() > 0) {
     fs::path full_path(spec_file_lst[0].c_str());
     QString outPath = full_path.remove_filename().string().c_str();
@@ -258,7 +235,7 @@ std::map<std::string, std::string> toppicWindow::getArguments() {
   arguments_["resourceDir"] = arguments_["executiveDir"] + prot::file_util::getFileSeparator() + prot::file_util::getResourceDirName();
   arguments_["oriDatabaseFileName"] = ui->databaseFileEdit->text().toStdString();
   
-  arguments_["combinedOutputName"] = ui->combinedOutputEdit->text().toStdString();
+  arguments_["combinedOutputName"] = ui->combinedOutputEdit->text().trimmed().toStdString();
   arguments_["databaseBlockSize"] = "1000000";
   arguments_["activation"] = ui->activationComboBox->currentText().toStdString();
   if (ui->decoyCheckBox->isChecked()) {
@@ -314,7 +291,7 @@ std::map<std::string, std::string> toppicWindow::getArguments() {
   } else {
     arguments_["useFeatureFile"] = "true";
   }
-  // showArguments();
+  //showArguments();
   return arguments_;
 }
 
@@ -339,6 +316,10 @@ void toppicWindow::on_addButton_clicked() {
     if (ableToAdd(spfile)) {
       ui->listWidget->addItem(new QListWidgetItem(spfile));
     }
+  }
+  
+  if (ui->listWidget->count() > 1) {
+    ui->combinedOutputEdit->setEnabled(true);
   }
 }
 
@@ -367,13 +348,15 @@ void toppicWindow::on_delButton_clicked() {
   QListWidgetItem *delItem = ui->listWidget->currentItem();
   ui->listWidget->removeItemWidget(delItem);
   delete delItem;
+  if (ui->listWidget->count() < 2) {
+    ui->combinedOutputEdit->setEnabled(false);
+  }
 }
 
 void toppicWindow::lockDialog() {
   ui->databaseFileButton->setEnabled(false);
   ui->modFileButton->setEnabled(false);
   ui->databaseFileEdit->setEnabled(false);
-  ui->combinedOutputCheckBox->setEnabled(false);
   ui->combinedOutputEdit->setEnabled(false);
   ui->fixedModFileEdit->setEnabled(false);
   ui->errorToleranceEdit->setEnabled(false);
@@ -410,8 +393,7 @@ void toppicWindow::unlockDialog() {
   ui->databaseFileButton->setEnabled(true);
   ui->modFileButton->setEnabled(true);
   ui->databaseFileEdit->setEnabled(true);
-  ui->combinedOutputCheckBox->setEnabled(true);
-  if (ui->combinedOutputCheckBox->isChecked()) {
+  if (ui->listWidget->count() > 1) {
     ui->combinedOutputEdit->setEnabled(true);
   }
   ui->fixedModFileEdit->setEnabled(true);
@@ -468,13 +450,6 @@ bool toppicWindow::checkError() {
                            QMessageBox::Yes);
       return true;
     }
-  }
-
-  if (ui->combinedOutputCheckBox->isChecked() && ui->combinedOutputEdit->text().trimmed().toStdString().length() == 0) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Please input a combined output filename!"),
-                         QMessageBox::Yes);
-    return true;
   }
 
   if (ui->combinedOutputEdit->text().toStdString().length() > 200) {
@@ -572,8 +547,7 @@ void toppicWindow::showArguments() {
                                         "\noriDatabaseFileName:" + arguments_["oriDatabaseFileName"] +
                                         "\ndatabaseFileName:" + arguments_["databaseFileName"] +
                                         "\ndatabaseBlockSize:" + arguments_["databaseBlockSize"] +
-                                        "\nspectrumFileName:" + arguments_["combinedOutputName"] +
-                                        "\ncombinedOutputName:" + arguments_["spectrumFileName"] +
+                                        "\ncombinedOutputName:" + arguments_["combinedOutputName"] +
                                         "\nactivation:" + arguments_["activation"] +
                                         "\nsearchType:" + arguments_["searchType"] +
                                         "\nfixedMod:" + arguments_["fixedMod"] +
@@ -653,23 +627,6 @@ void toppicWindow::on_generatingFunctionCheckBox_clicked(bool checked) {
                          tr("To use an error tolerance other than 5, 10, and 15 ppm, the checkbox \"generating function\" should be checked!"),
                          QMessageBox::Yes);
     ui->generatingFunctionCheckBox->setChecked(true);
-  }
-}
-
-void toppicWindow::on_combinedOutputCheckBox_clicked(bool checked) {
-  //ui->combinedOutputEdit->setText("Test");
-  if (ui->listWidget->count() < 2 && checked) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("The option can be selected only when two or more spectral data files are analyzed!"),
-                         QMessageBox::Yes);
-    ui->combinedOutputCheckBox->setChecked(false);
-    checked = false;
-  }
-  if (checked) {
-    ui->combinedOutputEdit->setEnabled(true);
-  }
-  else {
-    ui->combinedOutputEdit->setEnabled(false);
   }
 }
 

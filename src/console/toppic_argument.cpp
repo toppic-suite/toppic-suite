@@ -175,7 +175,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("thread-number,u", po::value<std::string> (&thread_number), "<a positive integer>. Number of threads used in the computation. Default value: 1.")
         ("no-topfd-feature,x", "No TopFD feature file for proteoform identification.")
         ("skip-list,l", po::value<std::string>(&skip_list) , "<a text file with its path>. The scans in this file will be skipped.")
-        ("output,o", po::value<std::string>(&combined_output_name) , "<a filename with its path>. The output file name for the combined results. Default: combined.")
+        ("combined-file-name,c", po::value<std::string>(&combined_output_name) , "Specify a file name for the combined spectrum data file and analysis results.")
         ("keep-temp-files,k", "Keep temporary files.");
 
     po::options_description desc("Options");
@@ -203,7 +203,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "")
         ("thread-number,u", po::value<std::string> (&thread_number), "")
         ("no-topfd-feature,x", "")
-        ("output,o", po::value<std::string>(&combined_output_name) , "")
+        ("combined-file-name,c", po::value<std::string>(&combined_output_name) , "")
         ("skip-list,l", po::value<std::string>(&skip_list) , "")
         ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name with its path.")
         ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), "Spectrum file name with its path.");
@@ -248,7 +248,7 @@ bool Argument::parse(int argc, char* argv[]) {
       spec_file_list_ = vm["spectrum-file-name"].as<std::vector<std::string> >(); 
     }
 
-    if (vm.count("output")) {
+    if (vm.count("combined-file-name")) {
       arguments_["combinedOutputName"] = combined_output_name; 
     }
 

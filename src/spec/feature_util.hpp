@@ -23,8 +23,8 @@ namespace prot {
 
 namespace feature_util {
 
-void merge_feature_files(const std::vector<std::string> & feature_file_lst,
-                         int N, const std::string & output_file);
+void mergeFeatureFiles(const std::vector<std::string> & feature_file_lst,
+                       int N, const std::string & output_file);
 
 }  // namespace feature_util
 
