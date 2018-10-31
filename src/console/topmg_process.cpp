@@ -130,29 +130,15 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
     OnePtmFilterProcessorPtr one_filter_processor =
         std::make_shared<OnePtmFilterProcessor>(one_ptm_filter_mng_ptr);
     one_filter_processor->process();
+    std::cout << "ASF-One PTM filtering - finished." << std::endl;
 
     input_exts.push_back("topmg_one_filter_complete");
     input_exts.push_back("topmg_one_filter_prefix");
     input_exts.push_back("topmg_one_filter_suffix");
     input_exts.push_back("topmg_one_filter_internal");
 
-    SimplePrsmStrCombinePtr var_one_ptm_combiner
-        = std::make_shared<SimplePrsmStrCombine>(sp_file_name, 
-                                                 input_exts,
-                                                 "topmg_one_filter", 20);
 
-    var_one_ptm_combiner->process();
-    var_one_ptm_combiner = nullptr;
-    input_exts.clear();
-    input_exts.push_back("topmg_one_filter");
-    std::cout << "ASF-One PTM filtering - finished." << std::endl;
-
-    bool use_asf_diag = false;
     if (arguments["useASFDiag"] == "true") {
-      use_asf_diag = true;
-    }
-
-    if (use_asf_diag) {
       std::cout << "ASF-Diagonal PTM filtering - started." << std::endl;
       filter_result_num = 15;
       DiagFilterMngPtr diag_filter_mng_ptr
@@ -167,14 +153,15 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
       input_exts.push_back("topmg_multi_filter");
     }
 
+    std::cout << "Combining filtering results - started." << std::endl;
     SimplePrsmStrCombinePtr asf_filter_combiner
         = std::make_shared<SimplePrsmStrCombine>(sp_file_name, 
                                                  input_exts,
                                                  "topmg_graph_filter", 20 * input_exts.size());
     asf_filter_combiner->process();
     asf_filter_combiner = nullptr;
+    std::cout << "Combining filtering results - finished." << std::endl;
 
-    std::cout << "Graph alignment started." << std::endl;
     int max_mod_num = std::stoi(arguments["varPtmNumber"]);
     int gap = std::stoi(arguments["proteo_graph_dis"]);
     int var_ptm_in_gap = std::min(std::stoi(arguments["varPtmNumInGap"]), max_mod_num);
@@ -184,17 +171,18 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
                                           ptm_num, max_mod_num,
                                           gap, var_ptm_in_gap, max_ptm_mass,
                                           thread_num, "topmg_graph_filter", "topmg_graph_align");
+    std::cout << "Graph alignment - started." << std::endl;
     GraphAlignProcessorPtr ga_processor_ptr = std::make_shared<GraphAlignProcessor>(ga_mng_ptr);
     ga_processor_ptr->process();
     ga_processor_ptr = nullptr;
-    std::cout << "Graph alignment finished." << std::endl;
+    std::cout << "Graph alignment - finished." << std::endl;
 
-    std::cout << "Graph alignment post-processing started." << std::endl;
+    std::cout << "Graph alignment post-processing - started." << std::endl;
     GraphPostProcessorPtr ga_post_processor_ptr
         = std::make_shared<GraphPostProcessor>(ga_mng_ptr, "topmg_graph_align", "topmg_graph_post");
     ga_post_processor_ptr->process();
     ga_post_processor_ptr = nullptr;
-    std::cout << "Graph alignment post-processing finished." << std::endl;
+    std::cout << "Graph alignment post-processing - finished." << std::endl;
 
     std::cout << "E-value computation using MCMC - started." << std::endl;
     MCMCMngPtr mcmc_mng_ptr   
@@ -218,7 +206,7 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
 
     base_data::init(resource_dir);
 
-    LOG_DEBUG("Init base data completed");
+    LOG_DEBUG("Initialization completed");
 
     std::string db_file_name = arguments["databaseFileName"];
     std::string sp_file_name = arguments["spectrumFileName"];
@@ -229,7 +217,7 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
 
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
 
-    std::cout << "Finding protein clusters - started." << std::endl;
+    std::cout << "Finding PrSM clusters - started." << std::endl;
     if (arguments["useFeatureFile"] == "true") {
       // TopFD msalign file with feature ID
       double prec_error_tole = 1.2;
@@ -255,7 +243,7 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
       prsm_clusters->process();
       prsm_clusters = nullptr;
     }
-    std::cout << "Finding protein clusters - finished." << std::endl;
+    std::cout << "Finding PrSM clusters - finished." << std::endl;
 
     if (arguments["searchType"] == "TARGET") {
       std::cout << "Top PrSM selecting - started" << std::endl;
@@ -366,7 +354,9 @@ int TopMGProcess(std::map<std::string, std::string> & arguments) {
 int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
                              const std::vector<std::string> & spec_file_lst) {
 
-  std::string base_name = arguments["combinedOutputName"];
+  std::string base_path = file_util::absoluteDir(spec_file_lst[0]);
+  std::string base_name = base_path + file_util::getFileSeparator() 
+      +  arguments["combinedOutputName"];
 
   std::time_t start = time(nullptr);
   char buf[50];
@@ -383,25 +373,25 @@ int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
     }
   }
 
-  if (spec_file_lst.size() > 1) {
+  if (spec_file_lst.size() > 1 && arguments["combinedOutputName"] != "") {
     arguments["start_time"] = start_time_bak;
     std::cout << "Merging files - started." << std::endl;
-    int N = 100000;
+    int N = 1000000;
     // merge msalign files
-    prot::msalign_util::merge_msalign_files(spec_file_lst, N, base_name + "_ms2.msalign");
+    prot::msalign_util::mergeMsalignFiles(spec_file_lst, N, base_name + "_ms2.msalign");
     // merge feature files
     std::vector<std::string> feature_file_lst(spec_file_lst.size());
     for (size_t i = 0; i < spec_file_lst.size(); i++) {
       std::string sp_file_name = spec_file_lst[i];
       feature_file_lst[i] = sp_file_name.substr(0, sp_file_name.length() - 12) + ".feature";
     }
-    prot::feature_util::merge_feature_files(feature_file_lst, N, base_name + ".feature");
+    prot::feature_util::mergeFeatureFiles(feature_file_lst, N, base_name + ".feature");
     // merge EVALUE files
     std::vector<std::string> prsm_file_lst(spec_file_lst.size());
     for (size_t i = 0; i < spec_file_lst.size(); i++) {
       prsm_file_lst[i] = prot::file_util::basename(spec_file_lst[i]) + ".evalue"; 
     }
-    prot::prsm_util::merge_prsm_files(prsm_file_lst, N, base_name + "_ms2.evalue");
+    prot::prsm_util::mergePrsmFiles(prsm_file_lst, N, base_name + "_ms2.evalue");
     std::cout << "Merging files - finished." << std::endl;
 
     std::string sp_file_name = base_name + "_ms2.msalign";
@@ -421,10 +411,12 @@ int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
       prot::file_util::cleanTopmgDir(ori_db_file_name, sp_file_name);
     }
 
-    std::string sp_file_name = base_name + "_ms2.msalign";
-    prot::file_util::delDir(prot::file_util::basename(sp_file_name) + "_topmg_proteoform_cutoff_xml");
-    prot::file_util::delDir(prot::file_util::basename(sp_file_name) + "_topmg_prsm_cutoff_xml");
-    prot::file_util::cleanTopmgDir(ori_db_file_name, sp_file_name);
+    if (spec_file_lst.size() > 1 && arguments["combinedOutputName"] != "") {
+      std::string sp_file_name = base_name + "_ms2.msalign";
+      prot::file_util::delDir(prot::file_util::basename(sp_file_name) + "_topmg_proteoform_cutoff_xml");
+      prot::file_util::delDir(prot::file_util::basename(sp_file_name) + "_topmg_prsm_cutoff_xml");
+      prot::file_util::cleanTopmgDir(ori_db_file_name, sp_file_name);
+    }
 
     std::cout << "Deleting temporary files - finished." << std::endl; 
   }

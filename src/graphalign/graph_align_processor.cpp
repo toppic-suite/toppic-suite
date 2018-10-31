@@ -118,7 +118,7 @@ std::function<void()> geneTask(FastaIndexReaderPtr reader_ptr,
         }
       }
       if (idx == 0) {
-        std::cout << std::flush << "Mass graph - processing " << cnt
+        std::cout << std::flush << "Mass graph alignment - processing " << cnt
             << " of " << spectrum_num << " spectra.\r";
       }
       spec_set_ptr = sp_reader.getNextSpectrumSet(sp_para_ptr)[0];
@@ -163,7 +163,7 @@ void GraphAlignProcessor::process() {
 
   SimplePrsmReaderPtr simple_prsm_reader = std::make_shared<prot::SimplePrsmReader>(input_file_name);
   std::shared_ptr<SimplePrsmXmlWriter> graph_filter_writer
-      = std::make_shared<SimplePrsmXmlWriter>(file_util::basename(sp_file_name) + ".GRAPH");
+      = std::make_shared<SimplePrsmXmlWriter>(file_util::basename(sp_file_name) + ".topmg_graph");
   SimplePrsmPtr prsm_ptr = simple_prsm_reader->readOnePrsm();
   int spec_id = -1;
   SimplePrsmPtrVec selected_prsm_ptrs;
@@ -191,7 +191,7 @@ void GraphAlignProcessor::process() {
 
   int cnt = 0;
   simple_prsm_reader
-      = std::make_shared<prot::SimplePrsmReader>(file_util::basename(sp_file_name) + ".GRAPH");
+      = std::make_shared<prot::SimplePrsmReader>(file_util::basename(sp_file_name) + ".topmg_graph");
   prsm_ptr = simple_prsm_reader->readOnePrsm();
   while (prsm_ptr != nullptr) {
     cnt = cnt % mng_ptr_->thread_num_;
@@ -238,7 +238,7 @@ void GraphAlignProcessor::process() {
     --n;
   }
 #endif
-  std::cout << std::flush << "Mass graph - processing " << spectrum_num
+  std::cout << std::flush << "Mass graph alignment - processing " << spectrum_num
       << " of " << spectrum_num << " spectra." << std::endl;
 
   // combine result files
@@ -255,6 +255,12 @@ void GraphAlignProcessor::process() {
   bool normalization = true;
   combine_ptr->process(normalization);
   combine_ptr = nullptr;
+
+  // remove temporary files
+  for (int t = 0; t < mng_ptr_->thread_num_; t++) {
+    file_util::cleanTempFiles(sp_file_name, mng_ptr_->input_file_ext_ + "_" + std::to_string(t));
+    file_util::cleanTempFiles(sp_file_name, mng_ptr_->output_file_ext_ + "_" + std::to_string(t));
+  }
 }
 }  // namespace prot
 

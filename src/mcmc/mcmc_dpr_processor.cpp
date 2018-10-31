@@ -36,6 +36,7 @@
 #include "spec/extend_ms_factory.hpp"
 
 #include "prsm/prsm_reader.hpp"
+#include "prsm/prsm_str_combine.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 
@@ -187,26 +188,21 @@ void DprProcessor::process() {
   prsm_reader->close();
   prsm_writer->close();
 
-  PrsmXmlWriterPtr all_writer_ptr = std::make_shared<PrsmXmlWriter>(output_file_name);
-  PrsmPtrVec prsm_vec;
 
-  for (int i = 0; i <= mng_ptr_->thread_num_; i++) {
-    PrsmReaderPtr all_reader_ptr = std::make_shared<PrsmReader>(output_file_name + "_" + std::to_string(i));
-    PrsmPtr p = all_reader_ptr->readOnePrsm(fasta_reader_ptr, prsm_para_ptr->getFixModPtrVec());
-
-    while (p != nullptr) {
-      prsm_vec.push_back(p);
-      p = all_reader_ptr->readOnePrsm(fasta_reader_ptr, prsm_para_ptr->getFixModPtrVec());
-    }
-
-    all_reader_ptr->close();
+  // combine results
+  int prsm_top_num = INT_MAX; 
+  std::vector<std::string> input_exts;
+  for (int t = 0; t < mng_ptr_->thread_num_; t++) {
+    input_exts.push_back(mng_ptr_->output_file_ext_ + "_" + std::to_string(t));
   }
+  PrsmStrCombinePtr combine_ptr
+      = std::make_shared<PrsmStrCombine>(sp_file_name, input_exts, 
+                                         mng_ptr_->output_file_ext_, prsm_top_num);
+  combine_ptr->process();
+  combine_ptr = nullptr;
 
-  std::sort(prsm_vec.begin(), prsm_vec.end(), Prsm::cmpSpectrumIdIncEvalueInc);
-
-  all_writer_ptr->writeVector(prsm_vec);
-
-  all_writer_ptr->close();
+  // remove tempory files
+  file_util::cleanTempFiles(sp_file_name, mng_ptr_->output_file_ext_ + "_");
 }
 
 std::function<void()> geneTask(SpectrumSetPtr spec_set_ptr,
