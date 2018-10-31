@@ -413,7 +413,10 @@ int TopPICProgress(std::map<std::string, std::string> & arguments) {
 
 int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
                               const std::vector<std::string> & spec_file_lst) {
-  std::string base_name = arguments["combinedOutputName"];
+
+  std::string base_path = file_util::absoluteDir(spec_file_lst[0]);
+  std::string base_name = base_path + file_util::getFileSeparator() 
+      +  arguments["combinedOutputName"];
 
   std::time_t start = time(nullptr);
   char buf[50];
@@ -430,25 +433,26 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
     }
   }
 
-  if (spec_file_lst.size() > 1) {
+  if (spec_file_lst.size() > 1 && arguments["combinedOutputName"] != "") {
     arguments["start_time"] = start_time_bak;
     std::cout << "Merging files - started." << std::endl;
-    int N = 100000;
+    int N = 1000000;
     // merge msalign files
-    prot::msalign_util::merge_msalign_files(spec_file_lst, N, base_name + "_ms2.msalign");
+    prot::msalign_util::mergeMsalignFiles(spec_file_lst, N, base_name + "_ms2.msalign");
     // merge feature files
     std::vector<std::string> feature_file_lst(spec_file_lst.size());
     for (size_t i = 0; i < spec_file_lst.size(); i++) {
       std::string sp_file_name = spec_file_lst[i];
       feature_file_lst[i] = sp_file_name.substr(0, sp_file_name.length() - 12) + ".feature";
     }
-    prot::feature_util::merge_feature_files(feature_file_lst, N, base_name + ".feature");
+    prot::feature_util::mergeFeatureFiles(feature_file_lst, N, base_name + ".feature");
     // merge EVALUE files
     std::vector<std::string> prsm_file_lst(spec_file_lst.size());
     for (size_t i = 0; i < spec_file_lst.size(); i++) {
-      prsm_file_lst[i] = prot::file_util::basename(spec_file_lst[i]) + ".evalue"; 
+      prsm_file_lst[i] = prot::file_util::basename(spec_file_lst[i]) + ".toppic_evalue"; 
+      std::cout << "Evalue file: " << prsm_file_lst[i] << std::endl;
     }
-    prot::prsm_util::merge_prsm_files(prsm_file_lst, N, base_name + "_ms2.evalue");
+    prot::prsm_util::mergePrsmFiles(prsm_file_lst, N, base_name + "_ms2.toppic_evalue");
     std::cout << "Merging files - finished." << std::endl;
 
     std::string sp_file_name = base_name + "_ms2.msalign";
@@ -468,10 +472,12 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
       prot::file_util::cleanToppicDir(ori_db_file_name, sp_file_name);
     }
 
-    std::string sp_file_name = base_name + "_ms2.msalign";
-    prot::file_util::delDir(prot::file_util::basename(sp_file_name) + "_toppic_proteoform_cutoff_xml");
-    prot::file_util::delDir(prot::file_util::basename(sp_file_name) + "_toppic_prsm_cutoff_xml");
-    prot::file_util::cleanToppicDir(ori_db_file_name, sp_file_name);
+    if (spec_file_lst.size() > 1 && arguments["combinedOutputName"] != "") {
+      std::string sp_file_name = base_name + "_ms2.msalign";
+      prot::file_util::delDir(prot::file_util::basename(sp_file_name) + "_toppic_proteoform_cutoff_xml");
+      prot::file_util::delDir(prot::file_util::basename(sp_file_name) + "_toppic_prsm_cutoff_xml");
+      prot::file_util::cleanToppicDir(ori_db_file_name, sp_file_name);
+    }
 
     std::cout << "Deleting temporary files - finished." << std::endl; 
   }

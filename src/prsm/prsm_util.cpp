@@ -191,8 +191,8 @@ void addFeatureIDToPrsms(PrsmStrPtrVec &prsm_ptrs, const std::string & feature_f
   }
 }
 
-void merge_prsm_files(const std::vector<std::string> & prsm_file_lst, int N,
-                      const std::string & output_file) {
+void mergePrsmFiles(const std::vector<std::string> & prsm_file_lst, int N, 
+                    const std::string & output_file) {
   PrsmXmlWriterPtr prsm_writer = std::make_shared<PrsmXmlWriter>(output_file);
 
   for (size_t i = 0; i < prsm_file_lst.size(); i++) {
@@ -200,8 +200,6 @@ void merge_prsm_files(const std::vector<std::string> & prsm_file_lst, int N,
     PrsmStrPtr prsm = prsm_reader->readOnePrsmStr();
     while (prsm != nullptr) {
       prsm->setSpectrumId(N * i + prsm->getSpectrumId());
-
-      prsm->setPrecursorId(N * i + prsm->getPrecursorId());
 
       prsm_writer->write(prsm);
 

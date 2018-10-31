@@ -68,6 +68,12 @@ std::string basename(const std::string &s) {
   return s;
 }
 
+std::string absoluteDir(const std::string &s) {
+  fs::path path(s);
+  std::string parent_dir = absolute(path).parent_path().string();
+  return parent_dir;
+}
+
 std::string directory(const std::string &s) {
   fs::path path(s);
   std::string parent_dir = path.parent_path().string();

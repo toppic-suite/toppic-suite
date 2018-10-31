@@ -77,6 +77,7 @@ void addMsHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement* ms_element, PrsmP
   boost::algorithm::trim(spec_ids);
   boost::algorithm::trim(spec_scans);
   xml_doc->addElement(ms_header_element, "ids", spec_ids.c_str());
+  xml_doc->addElement(ms_header_element, "spectrum_file_name", prsm_ptr->getFileName().c_str());
   xml_doc->addElement(ms_header_element, "scans", spec_scans.c_str());
 
   int pos = 4;

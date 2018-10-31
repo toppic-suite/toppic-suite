@@ -42,6 +42,8 @@ std::string basename(const std::string &s);
 
 std::string directory(const std::string &s);
 
+std::string absoluteDir(const std::string &s);
+
 void createFolder(const std::string &folder_name);
 
 void copyFile(const std::string &file_name, const std::string &path,

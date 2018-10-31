@@ -98,6 +98,9 @@
           <h2>Protein-Spectrum-Match #<xsl:value-of select="prsm_id"/> for Spectrum #<xsl:value-of select="ms/ms_header/ids"/></h2>
           <table class="table table-borderless" style="font-size:15px">
             <tr>
+              <td>File name:</td><td> <xsl:value-of select="ms/ms_header/spectrum_file_name"/> </td>
+            </tr>
+            <tr>
               <td>PrSM ID: </td><td> <xsl:value-of select="prsm_id"/> </td>
               <td>Scan(s): </td><td> <xsl:value-of select="ms/ms_header/scans"/> </td>
               <td>Precursor charge:</td><td> <xsl:value-of select="ms/ms_header/precursor_charge"/> </td>
