@@ -195,24 +195,49 @@ void toppicWindow::on_startButton_clicked() {
   std::vector<std::string> spec_file_lst = this->getSpecFileList();
   thread_->setPar(argument, spec_file_lst);
   thread_->start();
-  std::string lastinfo = "";
-  std::string nowinfo = "";
+
   std::string info;
+  int processed_len = 0;
+  std::string processed_lines = ""; 
+  std::string current_line = "";
+  unsigned cursor_pos = 0;
+
   while (true) {
     // Here is the infomation been shown in the infoBox.
-    nowinfo = buffer.str();
-    info = nowinfo.substr(lastinfo.length());
-    lastinfo = nowinfo;
-    if (info != "") {
-      updateMsg(info);
+    info = buffer.str();
+    std::string new_info = info.substr(processed_len);
+    processed_len = info.length();
+    
+    for (unsigned i = 0; i < new_info.size(); i++) {
+      // new line
+      if (new_info.at(i) == '\n') {
+        processed_lines = processed_lines + current_line + '\n';
+        current_line = "";
+        cursor_pos = 0;
+      }
+      // CF
+      if (new_info.at(i) == '\r') {
+        cursor_pos = 0;
+      }
+      // add a new charactor
+      if (new_info.at(i) != '\n' && new_info.at(i) != '\r') {
+        if (cursor_pos < current_line.length()) {
+          current_line[cursor_pos] = new_info.at(i);
+        }
+        else {
+          current_line = current_line + new_info.at(i);
+        }
+        cursor_pos++;
+      }
     }
+    updateMsg(processed_lines + current_line);
     if (thread_->isFinished()) {
       break;
     }
-    sleep(10);
+    sleep(100);
   }
-  unlockDialog();
 
+  unlockDialog();
   showInfo = "";
   thread_->exit();
   std::cout.rdbuf(oldbuf);
@@ -522,21 +547,12 @@ bool toppicWindow::checkError() {
 }
 
 void toppicWindow::updateMsg(std::string msg) {
-  QString info = msg.c_str();
-  int lastloc = info.lastIndexOf("\r", info.size() - 2);
-  if (lastloc > 0) {
-    info = info.right(info.size() - lastloc - 1);
-  }
-  if (info.at(0) == '\n') {
-    info = info.right(info.size() - 1);
-  }
-  ui->outputTextBrowser->setText(showInfo + info);
-  if (msg.at(msg.size() - 1) != '\r' && info != "\n") {
-    showInfo = ui->outputTextBrowser->toPlainText();
-  }
+  showInfo = msg.c_str();
+  ui->outputTextBrowser->setText(showInfo);
   QTextCursor cursor = ui->outputTextBrowser->textCursor();
   cursor.movePosition(QTextCursor::End);
   ui->outputTextBrowser->setTextCursor(cursor);
+  QString info = msg.c_str();
 }
 
 void toppicWindow::showArguments() {

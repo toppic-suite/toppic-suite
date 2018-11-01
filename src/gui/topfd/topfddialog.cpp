@@ -211,7 +211,7 @@ void TopFDDialog::on_startButton_clicked() {
     for (unsigned i = 0; i < new_info.size(); i++) {
       // new line
       if (new_info.at(i) == '\n') {
-        processed_lines = processed_lines + current_str + '\n';
+        processed_lines = processed_lines + current_line + '\n';
         current_line = "";
         cursor_pos = 0;
       }
@@ -230,7 +230,7 @@ void TopFDDialog::on_startButton_clicked() {
         cursor_pos++;
       }
     }
-    updateMsg(processed_str + current_str);
+    updateMsg(processed_lines + current_line);
     if (thread_->isFinished()) {
       break;
     }
@@ -358,17 +358,11 @@ bool TopFDDialog::checkError() {
 }
 
 void TopFDDialog::updateMsg(std::string msg) {
-
   showInfo = msg.c_str();
-
   ui->outputTextBrowser->setText(showInfo);
-  
   QTextCursor cursor = ui->outputTextBrowser->textCursor();
-
   cursor.movePosition(QTextCursor::End);
-
   ui->outputTextBrowser->setTextCursor(cursor);
-
 }
 
 void TopFDDialog::sleep(int wait) {
