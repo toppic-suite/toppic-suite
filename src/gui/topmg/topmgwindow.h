@@ -36,8 +36,6 @@ class topmgWindow : public QMainWindow {
  private slots:
   void on_databaseFileButton_clicked();
 
-  void on_combinedOutputButton_clicked();
-
   void on_fixedModFileButton_clicked();
   
   void on_modFileButton_clicked();

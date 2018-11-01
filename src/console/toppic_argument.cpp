@@ -56,7 +56,7 @@ void Argument::initArguments() {
   arguments_["executiveDir"] = ".";
   arguments_["resourceDir"] = "";
   arguments_["keepTempFiles"] = "false";
-  arguments_["local_threshold"] = "0.45";
+  arguments_["localThreshold"] = "0.45";
   arguments_["groupSpectrumNumber"] = "1";
   arguments_["filteringResultNumber"] = "20";
   arguments_["residueModFileName"] = "";
@@ -106,12 +106,12 @@ void Argument::outputArguments(std::ostream &output,
 
   if (arguments["residueModFileName"] != "") {
     output << std::setw(44) << std::left << "Common modification file name: " << "\t" << arguments["residueModFileName"] << std::endl;
-    output << std::setw(44) << std::left << "MIScore threshold: " << "\t" << arguments["local_threshold"] << std::endl;
+    output << std::setw(44) << std::left << "MIScore threshold: " << "\t" << arguments["localThreshold"] << std::endl;
   }
   output << std::setw(44) << std::left << "Executable file directory: " << "\t" << arguments["executiveDir"] << std::endl;
-  output << std::setw(44) << std::left << "Start time: " << "\t" << arguments["start_time"] << std::endl;
-  if (arguments["end_time"] != "") {
-    output << std::setw(44) << std::left << "End time: " << "\t" << arguments["end_time"] << std::endl;
+  output << std::setw(44) << std::left << "Start time: " << "\t" << arguments["startTime"] << std::endl;
+  if (arguments["endTime"] != "") {
+    output << std::setw(44) << std::left << "End time: " << "\t" << arguments["endTime"] << std::endl;
   }
   output << "********************** Parameters **********************" << std::endl;
 }
@@ -313,7 +313,7 @@ bool Argument::parse(int argc, char* argv[]) {
     }
 
     if (vm.count("miscore-threshold")) {
-      arguments_["local_threshold"] = local_threshold;
+      arguments_["localThreshold"] = local_threshold;
     }
 
     if (vm.count("num-combined-spectra")) {

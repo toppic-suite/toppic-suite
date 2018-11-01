@@ -63,6 +63,7 @@ topmgWindow::topmgWindow(QWidget *parent) :
 
       on_clearButton_clicked();
       on_defaultButton_clicked();
+      ui->tabWidget->setCurrentIndex(0);
     }
 
 topmgWindow::~topmgWindow() {
@@ -92,41 +93,23 @@ void topmgWindow::initArguments() {
   arguments_["keepTempFiles"] = "false";
   arguments_["groupSpectrumNumber"] = "1";
   arguments_["filteringResultNumber"] = "20";
-  arguments_["residueModFileName"] = "";
+  arguments_["varModFileName"] = "";
   arguments_["threadNumber"] = "1";
   arguments_["useFeatureFile"] = "true";
   arguments_["skipList"] = "";
-  arguments_["proteo_graph_dis"] = "40";
-  arguments_["useASFDiag"] = "false";
+  arguments_["proteoGraphGap"] = "40";
+  arguments_["useAsfDiag"] = "false";
   arguments_["varPtmNumber"] = "10";
   arguments_["varPtmNumInGap"] = "5";
 }
 
 void topmgWindow::on_clearButton_clicked() {
   ui->databaseFileEdit->clear();
+  ui->listWidget->clear();
   ui->combinedOutputEdit->clear();
-  ui->fixedModFileEdit->clear();
-  ui->errorToleranceEdit->setText("15");
-  ui->maxModEdit->clear();
-  ui->cutoffSpectralValueEdit->clear();
-  ui->cutoffProteoformValueEdit->clear();
-  ui->modFileEdit->clear();
-  ui->threadNumberEdit->clear();
+  ui->combinedOutputEdit->setEnabled(false);
   ui->skipListEdit->clear();
   ui->outputTextBrowser->setText("Click the Start button to process the spectrum file.");
-  ui->fixedModComboBox->setCurrentIndex(0);
-  on_fixedModComboBox_currentIndexChanged(0);
-  ui->activationComboBox->setCurrentIndex(0);
-  ui->cutoffSpectralTypeComboBox->setCurrentIndex(0);
-  ui->cutoffProteoformTypeComboBox->setCurrentIndex(0);
-  ui->numModComboBox->setCurrentIndex(4);
-  ui->numUnknownShiftComboBox->setCurrentIndex(0);
-  ui->NONECheckBox->setChecked(false);
-  ui->NMECheckBox->setChecked(false);
-  ui->NMEACCheckBox->setChecked(false);
-  ui->MACCheckBox->setChecked(false);
-  ui->decoyCheckBox->setChecked(false);
-  ui->topfdFeatureCheckBox->setChecked(false);
 }
 
 void topmgWindow::on_defaultButton_clicked() {
@@ -136,10 +119,9 @@ void topmgWindow::on_defaultButton_clicked() {
   ui->cutoffSpectralValueEdit->setText("0.01");
   ui->cutoffProteoformValueEdit->setText("0.01");
   ui->threadNumberEdit->setText("1");
-  ui->skipListEdit->clear();
-  ui->outputTextBrowser->setText("Click the Start button to process the spectrum file.");
   ui->fixedModComboBox->setCurrentIndex(0);
-  on_fixedModComboBox_currentIndexChanged(0);
+  ui->fixedModFileEdit->setEnabled(false);
+  ui->fixedModFileButton->setEnabled(false);
   ui->activationComboBox->setCurrentIndex(0);
   ui->cutoffSpectralTypeComboBox->setCurrentIndex(0);
   ui->cutoffProteoformTypeComboBox->setCurrentIndex(0);
@@ -151,6 +133,7 @@ void topmgWindow::on_defaultButton_clicked() {
   ui->MACCheckBox->setChecked(true);
   ui->decoyCheckBox->setChecked(false);
   ui->topfdFeatureCheckBox->setChecked(false);
+  ui->asfDiagCheckBox->setChecked(false);
 }
 
 void topmgWindow::updatedir(QString s) {
@@ -167,16 +150,6 @@ void topmgWindow::topmgWindow::on_databaseFileButton_clicked() {
       "Database files(*.fasta *.fa)");
   updatedir(s);
   ui->databaseFileEdit->setText(s);
-}
-
-void topmgWindow::topmgWindow::on_combinedOutputButton_clicked() {
-  QString dir = QFileDialog::getExistingDirectory(this,
-                                                  tr("Open Directory"),
-                                                  lastDir_,
-                                                  QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-
-  updatedir(dir);
-  ui->combinedOutputEdit->setText(dir);
 }
 
 void topmgWindow::on_fixedModFileButton_clicked() {
@@ -235,35 +208,36 @@ void topmgWindow::on_startButton_clicked() {
     std::string new_info = info.substr(processed_len);
     processed_len = info.length();
     
-    for (unsigned i = 0; i < new_info.size(); i++) {
-      // new line
-      if (new_info.at(i) == '\n') {
-        processed_lines = processed_lines + current_line + '\n';
-        current_line = "";
-        cursor_pos = 0;
-      }
-      // CF
-      if (new_info.at(i) == '\r') {
-        cursor_pos = 0;
-      }
-      // add a new charactor
-      if (new_info.at(i) != '\n' && new_info.at(i) != '\r') {
-        if (cursor_pos < current_line.length()) {
-          current_line[cursor_pos] = new_info.at(i);
+    if (new_info.size() > 0) {
+      for (unsigned i = 0; i < new_info.size(); i++) {
+        // new line
+        if (new_info.at(i) == '\n') {
+          processed_lines = processed_lines + current_line + '\n';
+          current_line = "";
+          cursor_pos = 0;
         }
-        else {
-          current_line = current_line + new_info.at(i);
+        // CF
+        if (new_info.at(i) == '\r') {
+          cursor_pos = 0;
         }
-        cursor_pos++;
+        // add a new charactor
+        if (new_info.at(i) != '\n' && new_info.at(i) != '\r') {
+          if (cursor_pos < current_line.length()) {
+            current_line[cursor_pos] = new_info.at(i);
+          }
+          else {
+            current_line = current_line + new_info.at(i);
+          }
+          cursor_pos++;
+        }
       }
+      updateMsg(processed_lines + current_line);
     }
-    updateMsg(processed_lines + current_line);
     if (thread_->isFinished()) {
       break;
     }
     sleep(100);
   }
-
   unlockDialog();
   showInfo = "";
   thread_->exit();
@@ -272,12 +246,7 @@ void topmgWindow::on_startButton_clicked() {
 
 void topmgWindow::on_outputButton_clicked() {
   std::vector<std::string> spec_file_lst = this->getSpecFileList();
-  if (spec_file_lst.size() > 1) {
-    std::string output_file_name = arguments_["combinedOutputName"] + "_ms2.msalign";
-    fs::path full_path(output_file_name.c_str());
-    QString outPath = full_path.remove_filename().string().c_str();
-    QDesktopServices::openUrl(QUrl(outPath, QUrl::TolerantMode));
-  } else {
+  if (spec_file_lst.size() > 0) {
     fs::path full_path(spec_file_lst[0].c_str());
     QString outPath = full_path.remove_filename().string().c_str();
     QDesktopServices::openUrl(QUrl(outPath, QUrl::TolerantMode));
@@ -290,7 +259,7 @@ std::map<std::string, std::string> topmgWindow::getArguments() {
   arguments_["executiveDir"] = exe_dir;
   arguments_["resourceDir"] = arguments_["executiveDir"] + prot::file_util::getFileSeparator() + prot::file_util::getResourceDirName();
   arguments_["oriDatabaseFileName"] = ui->databaseFileEdit->text().toStdString();
-  arguments_["combinedOutputName"] = ui->combinedOutputEdit->text().toStdString() + "/combined";
+  arguments_["combinedOutputName"] = ui->combinedOutputEdit->text().trimmed().toStdString();
   arguments_["databaseBlockSize"] = "1000000";
   arguments_["activation"] = ui->activationComboBox->currentText().toStdString();
   if (ui->decoyCheckBox->isChecked()) {
@@ -303,6 +272,9 @@ std::map<std::string, std::string> topmgWindow::getArguments() {
   arguments_["fixedMod"] = ui->fixedModComboBox->currentText().toStdString();
   if (arguments_["fixedMod"] == "NONE") {
     arguments_["fixedMod"] = "";
+  }
+  if (ui->fixedModComboBox->currentIndex() == 3) {
+    arguments_["fixedMod"] = ui->fixedModFileEdit->text().toStdString();
   }
   arguments_["varPtmNumber"] = ui->numModComboBox->currentText().toStdString();
   arguments_["ptmNumber"] = ui->numUnknownShiftComboBox->currentText().toStdString();
@@ -334,19 +306,24 @@ std::map<std::string, std::string> topmgWindow::getArguments() {
   arguments_["useGf"] = "false";  // default
   arguments_["groupSpectrumNumber"] = "1";  // default
   arguments_["skipList"] = ui->skipListEdit->text().toStdString();
-  arguments_["proteo_graph_dis"] = "40";  // default
-  arguments_["useASFDiag"] = "false";  // default
+  arguments_["proteoGraphGap"] = "40";  // default
+  arguments_["useAsfDiag"] = "false";  // default
   arguments_["varPtmNumber"] = ui->numModComboBox->currentText().toStdString();
   arguments_["ptmNumber"] = ui->numUnknownShiftComboBox->currentText().toStdString();
   arguments_["varPtmNumInGap"] = "5";  // default
-  arguments_["residueModFileName"] = ui->modFileEdit->text().toStdString();
+  arguments_["varModFileName"] = ui->modFileEdit->text().toStdString();
   arguments_["threadNumber"] = ui->threadNumberEdit->text().toStdString();
   if (ui->topfdFeatureCheckBox->isChecked()) {
     arguments_["useFeatureFile"] = "false";
   } else {
     arguments_["useFeatureFile"] = "true";
   }
-  // showArguments();
+  if (ui->asfDiagCheckBox->isChecked()) {
+    arguments_["useAsfDiag"] = "true";
+  } else {
+    arguments_["useAsfDiag"] = "false";
+  }
+  //showArguments();
   return arguments_;
 }
 
@@ -370,6 +347,10 @@ void topmgWindow::on_addButton_clicked() {
     if (ableToAdd(spfile)) {
       ui->listWidget->addItem(new QListWidgetItem(spfile));
     }
+  }
+
+  if (ui->listWidget->count() > 1) {
+    ui->combinedOutputEdit->setEnabled(true);
   }
 }
 
@@ -398,6 +379,9 @@ void topmgWindow::on_delButton_clicked() {
   QListWidgetItem *delItem = ui->listWidget->currentItem();
   ui->listWidget->removeItemWidget(delItem);
   delete delItem;
+  if (ui->listWidget->count() < 2) {
+    ui->combinedOutputEdit->setEnabled(false);
+  }
 }
 
 void topmgWindow::lockDialog() {
@@ -405,7 +389,9 @@ void topmgWindow::lockDialog() {
   ui->modFileButton->setEnabled(false);
   ui->databaseFileEdit->setEnabled(false);
   ui->combinedOutputEdit->setEnabled(false);
+  ui->fixedModComboBox->setEnabled(false);
   ui->fixedModFileEdit->setEnabled(false);
+  ui->fixedModFileButton->setEnabled(false);
   ui->errorToleranceEdit->setEnabled(false);
   ui->maxModEdit->setEnabled(false);
   ui->cutoffSpectralValueEdit->setEnabled(false);
@@ -414,7 +400,6 @@ void topmgWindow::lockDialog() {
   ui->threadNumberEdit->setEnabled(false);
   ui->skipListEdit->setEnabled(false);
   ui->fixedModComboBox->setEnabled(false);
-  on_fixedModComboBox_currentIndexChanged(0);
   ui->activationComboBox->setEnabled(false);
   ui->cutoffSpectralTypeComboBox->setEnabled(false);
   ui->cutoffProteoformTypeComboBox->setEnabled(false);
@@ -438,7 +423,9 @@ void topmgWindow::unlockDialog() {
   ui->databaseFileButton->setEnabled(true);
   ui->modFileButton->setEnabled(true);
   ui->databaseFileEdit->setEnabled(true);
-  ui->combinedOutputEdit->setEnabled(true);
+  if (ui->listWidget->count() > 1) {
+    ui->combinedOutputEdit->setEnabled(true);
+  }
   ui->fixedModFileEdit->setEnabled(true);
   ui->errorToleranceEdit->setEnabled(true);
   ui->maxModEdit->setEnabled(true);
@@ -493,13 +480,6 @@ bool topmgWindow::checkError() {
     }
   }
 
-  if (ui->listWidget->count() > 1 && ui->combinedOutputEdit->text().toStdString().length() == 0) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Please select a folder for the combined output!"),
-                         QMessageBox::Yes);
-    return true;
-  }
-
   if (ui->combinedOutputEdit->text().toStdString().length() > 200) {
     QMessageBox::warning(this, tr("Warning"),
                          tr("The output folder path is too long!"),
@@ -513,6 +493,14 @@ bool topmgWindow::checkError() {
                          QMessageBox::Yes);
     return true;
   }
+
+  if (ui->modFileEdit->text().isEmpty()) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("Please select a variable modification file!"),
+                         QMessageBox::Yes);
+    return true;
+  }
+
   if (ui->errorToleranceEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
                          tr("Error tolerance is empty!"),
@@ -543,12 +531,6 @@ bool topmgWindow::checkError() {
                          QMessageBox::Yes);
     return true;
   }
-  if (ui->modFileEdit->text().isEmpty()) {
-    QMessageBox::warning(this, tr("Warning"),
-                         tr("Please select a modification file for variable PTMs!"),
-                         QMessageBox::Yes);
-    return true;
-  }
   return false;
 }
 
@@ -568,8 +550,8 @@ void topmgWindow::showArguments() {
                                         "\noriDatabaseFileName:" + arguments_["oriDatabaseFileName"] +
                                         "\ndatabaseFileName:" + arguments_["databaseFileName"] +
                                         "\ndatabaseBlockSize:" + arguments_["databaseBlockSize"] +
-                                        "\nspectrumFileName:" + arguments_["combinedOutputName"] +
-                                        "\ncombinedOutputName:" + arguments_["spectrumFileName"] +
+                                        "\nspectrumFileName:" + arguments_["spectrumFileName"] +
+                                        "\ncombinedOutputName:" + arguments_["combinedOutputName"] +
                                         "\nactivation:" + arguments_["activation"] +
                                         "\nsearchType:" + arguments_["searchType"] +
                                         "\nfixedMod:" + arguments_["fixedMod"] +
@@ -582,16 +564,17 @@ void topmgWindow::showArguments() {
                                         "\nallowProtMod:" + arguments_["allowProtMod"] +
                                         "\nnumOfTopPrsms:" + arguments_["numOfTopPrsms"] +
                                         "\nmaxPtmMass:" + arguments_["maxPtmMass"] +
-                                        "\nminPtmMass:" + arguments_["minPtmMass"] +
-                                        "\nuseGf:" + arguments_["useGf"] +
                                         "\nkeepTempFiles:" + arguments_["keepTempFiles"] +
-                                        "\nlocal_threshold:" + arguments_["local_threshold"] +
                                         "\ngroupSpectrumNumber:" + arguments_["groupSpectrumNumber"] +
                                         "\nfilteringResultNumber:" + arguments_["filteringResultNumber"] +
-                                        "\nresidueModFileName:" + arguments_["residueModFileName"] +
+                                        "\nvarModFileName:" + arguments_["varModFileName"] +
                                         "\nthreadNumber:" + arguments_["threadNumber"] +
                                         "\nuseFeatureFile:" + arguments_["useFeatureFile"] +
-                                        "\nskipList:" + arguments_["skipList"]).c_str(), QMessageBox::Yes);
+                                        "\nskipList:" + arguments_["skipList"] +
+                                        "\nproteoGraphGap:" + arguments_["proteoGraphGap"] +
+                                        "\nuseAsfDiag:" + arguments_["useAsfDiag"] +
+                                        "\nvarPtmNumber:" + arguments_["varPtmNumber"] +
+                                        "\nvarPtmNumInGap:" + arguments_["varPtmNumInGap"]).c_str(), QMessageBox::Yes);
 }
 
 void topmgWindow::sleep(int wait) {

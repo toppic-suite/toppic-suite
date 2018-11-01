@@ -52,7 +52,7 @@ void Argument::initArguments() {
   arguments_["executiveDir"] = ".";
   arguments_["resourceDir"] = "";
   arguments_["keepTempFiles"] = "false";
-  arguments_["local_threshold"] = "0.45";
+  arguments_["localThreshold"] = "0.45";
   arguments_["groupSpectrumNumber"] = "1";
   arguments_["filteringResultNumber"] = "20";
   arguments_["residueModFileName"] = "";

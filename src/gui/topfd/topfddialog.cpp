@@ -208,29 +208,31 @@ void TopFDDialog::on_startButton_clicked() {
     std::string new_info = info.substr(processed_len);
     processed_len = info.length();
     
-    for (unsigned i = 0; i < new_info.size(); i++) {
-      // new line
-      if (new_info.at(i) == '\n') {
-        processed_lines = processed_lines + current_line + '\n';
-        current_line = "";
-        cursor_pos = 0;
-      }
-      // CF
-      if (new_info.at(i) == '\r') {
-        cursor_pos = 0;
-      }
-      // add a new charactor
-      if (new_info.at(i) != '\n' && new_info.at(i) != '\r') {
-        if (cursor_pos < current_line.length()) {
-          current_line[cursor_pos] = new_info.at(i);
+    if (new_info.size() > 0) {
+      for (unsigned i = 0; i < new_info.size(); i++) {
+        // new line
+        if (new_info.at(i) == '\n') {
+          processed_lines = processed_lines + current_line + '\n';
+          current_line = "";
+          cursor_pos = 0;
         }
-        else {
-          current_line = current_line + new_info.at(i);
+        // CF
+        if (new_info.at(i) == '\r') {
+          cursor_pos = 0;
         }
-        cursor_pos++;
+        // add a new charactor
+        if (new_info.at(i) != '\n' && new_info.at(i) != '\r') {
+          if (cursor_pos < current_line.length()) {
+            current_line[cursor_pos] = new_info.at(i);
+          }
+          else {
+            current_line = current_line + new_info.at(i);
+          }
+          cursor_pos++;
+        }
       }
+      updateMsg(processed_lines + current_line);
     }
-    updateMsg(processed_lines + current_line);
     if (thread_->isFinished()) {
       break;
     }

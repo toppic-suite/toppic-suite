@@ -32,7 +32,7 @@ int outputMatchPeaks(std::map<std::string, std::string> arguments) {
     std::string exe_dir = arguments["executiveDir"];
     time_t start = time(0);
     char buf[50];
-    arguments["start_time"] = std::string(ctime_r(&start, buf));
+    arguments["startTime"] = std::string(ctime_r(&start, buf));
     Argument::outputArguments(std::cout, arguments);
 
     base_data::init(exe_dir);
