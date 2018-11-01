@@ -347,7 +347,6 @@ int TopMGProcess(std::map<std::string, std::string> & arguments) {
   if (TopMG_identify(arguments) != 0) {
     return 1;
   }
-
   return TopMG_post(arguments);
 }
 
