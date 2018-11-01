@@ -56,7 +56,6 @@ void Argument::initArguments() {
   arguments_["executiveDir"] = ".";
   arguments_["resourceDir"] = "";
   arguments_["keepTempFiles"] = "false";
-  arguments_["fullBinaryPath"] = "false";
   arguments_["local_threshold"] = "0.45";
   arguments_["groupSpectrumNumber"] = "1";
   arguments_["filteringResultNumber"] = "20";
@@ -198,7 +197,6 @@ bool Argument::parse(int argc, char* argv[]) {
         ("keep-temp-files,k", "")
         ("generating-function,g", "")
         ("miscore-threshold,s", po::value<std::string> (&local_threshold), "")
-        ("full-binary-path,b", "Full binary path.")
         ("num-combined-spectra,r", po::value<std::string> (&group_num), "")
         ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "")
         ("thread-number,u", po::value<std::string> (&thread_number), "")
@@ -308,10 +306,6 @@ bool Argument::parse(int argc, char* argv[]) {
 
     if (vm.count("keep-temp-files")) {
       arguments_["keepTempFiles"] = "true";
-    }
-
-    if (vm.count("full-binary-path")) {
-      arguments_["fullBinaryPath"] = "true";
     }
 
     if (vm.count("generating-function")) {

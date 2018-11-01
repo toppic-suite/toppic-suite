@@ -59,7 +59,6 @@ void Argument::initArguments() {
   arguments_["executiveDir"] = ".";
   arguments_["resourceDir"] = "";
   arguments_["keepTempFiles"] = "false";
-  arguments_["fullBinaryPath"] = "false";
   arguments_["groupSpectrumNumber"] = "1";
   arguments_["filteringResultNumber"] = "20";
   arguments_["residueModFileName"] = "";
@@ -296,10 +295,6 @@ bool Argument::parse(int argc, char* argv[]) {
 
     if (vm.count("keep-temp-files")) {
       arguments_["keepTempFiles"] = "true";
-    }
-
-    if (vm.count("full-binary-path")) {
-      arguments_["fullBinaryPath"] = "true";
     }
 
     if (vm.count("filtering-result-number")) {

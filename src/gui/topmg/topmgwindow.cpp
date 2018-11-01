@@ -61,6 +61,7 @@ topmgWindow::topmgWindow(QWidget *parent) :
       fontTable.setPointSize(9);
       ui->listWidget->setFont(fontTable);
 
+      on_clearButton_clicked();
       on_defaultButton_clicked();
     }
 
@@ -73,7 +74,7 @@ void topmgWindow::initArguments() {
   arguments_["databaseFileName"] = "";
   arguments_["databaseBlockSize"] = "1000000";
   arguments_["spectrumFileName"] = "";
-  arguments_["combinedOutputName"] = "combined";
+  arguments_["combinedOutputName"] = "";
   arguments_["activation"] = "FILE";
   arguments_["searchType"] = "TARGET";
   arguments_["fixedMod"] = "";
@@ -86,11 +87,9 @@ void topmgWindow::initArguments() {
   arguments_["allowProtMod"] = "NONE,NME,NME_ACETYLATION,M_ACETYLATION";
   arguments_["numOfTopPrsms"] = "1";
   arguments_["maxPtmMass"] = "500";
-  arguments_["useGf"] = "false";
   arguments_["executiveDir"] = ".";
   arguments_["resourceDir"] = "";
   arguments_["keepTempFiles"] = "false";
-  arguments_["fullBinaryPath"] = "false";
   arguments_["groupSpectrumNumber"] = "1";
   arguments_["filteringResultNumber"] = "20";
   arguments_["residueModFileName"] = "";
@@ -306,7 +305,6 @@ std::map<std::string, std::string> topmgWindow::getArguments() {
   arguments_["numOfTopPrsms"] = "1";
   arguments_["maxPtmMass"] = ui->maxModEdit->text().toStdString();
   arguments_["keepTempFiles"] = "false";   // default
-  arguments_["fullBinaryPath"] = "false";  // default
   arguments_["filteringResultNumber"] = "20";  // default
   arguments_["useGf"] = "false";  // default
   arguments_["groupSpectrumNumber"] = "1";  // default
@@ -570,7 +568,6 @@ void topmgWindow::showArguments() {
                                         "\nminPtmMass:" + arguments_["minPtmMass"] +
                                         "\nuseGf:" + arguments_["useGf"] +
                                         "\nkeepTempFiles:" + arguments_["keepTempFiles"] +
-                                        "\nfullBinaryPath:" + arguments_["fullBinaryPath"] +
                                         "\nlocal_threshold:" + arguments_["local_threshold"] +
                                         "\ngroupSpectrumNumber:" + arguments_["groupSpectrumNumber"] +
                                         "\nfilteringResultNumber:" + arguments_["filteringResultNumber"] +
