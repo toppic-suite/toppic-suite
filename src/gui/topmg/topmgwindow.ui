@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>920</width>
-    <height>600</height>
+    <height>800</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -19,13 +19,13 @@
   <property name="minimumSize">
    <size>
     <width>920</width>
-    <height>600</height>
+    <height>800</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>920</width>
-    <height>600</height>
+    <height>800</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -40,9 +40,9 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>340</y>
+      <y>380</y>
       <width>861</width>
-      <height>191</height>
+      <height>341</height>
      </rect>
     </property>
     <property name="font">
@@ -62,7 +62,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>530</y>
+      <y>730</y>
       <width>861</width>
       <height>55</height>
      </rect>
@@ -108,7 +108,7 @@ p, li { white-space: pre-wrap; }
         </font>
        </property>
        <property name="text">
-        <string>Default</string>
+        <string>Default Parameters</string>
        </property>
       </widget>
      </item>
@@ -163,7 +163,7 @@ p, li { white-space: pre-wrap; }
       <x>20</x>
       <y>10</y>
       <width>881</width>
-      <height>321</height>
+      <height>361</height>
      </rect>
     </property>
     <property name="font">
@@ -283,7 +283,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>250</y>
+        <y>290</y>
         <width>861</width>
         <height>33</height>
        </rect>
@@ -319,6 +319,65 @@ p, li { white-space: pre-wrap; }
            <width>85</width>
            <height>16777215</height>
           </size>
+         </property>
+         <property name="text">
+          <string>Select</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget_17">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>250</y>
+        <width>861</width>
+        <height>33</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_17">
+       <item>
+        <widget class="QLabel" name="label_18">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Variable PTM file:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="modFileEdit">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="modFileButton">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
          </property>
          <property name="text">
           <string>Select</string>
@@ -920,7 +979,7 @@ QGroupBox::title {
           </font>
          </property>
          <property name="text">
-          <string>Maximum number of variablr PTMs:</string>
+          <string>Maximum number of variable PTMs:</string>
          </property>
         </widget>
        </item>
@@ -1105,70 +1164,11 @@ QGroupBox::title {
        </layout>
       </widget>
      </widget>
-     <widget class="QWidget" name="horizontalLayoutWidget_17">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>180</y>
-        <width>831</width>
-        <height>33</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_17">
-       <item>
-        <widget class="QLabel" name="label_18">
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Modification file for variable PTMs:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="modFileEdit">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="modFileButton">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>File</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
      <widget class="QWidget" name="horizontalLayoutWidget_18">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>230</y>
+        <y>180</y>
         <width>831</width>
         <height>33</height>
        </rect>
@@ -1246,7 +1246,7 @@ QGroupBox::title {
           </font>
          </property>
          <property name="text">
-          <string>Maximum number of unknown mass shift:</string>
+          <string>Maximum number of unknown mass shifts:</string>
          </property>
         </widget>
        </item>
