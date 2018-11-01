@@ -312,19 +312,6 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="QPushButton" name="combinedOutputButton">
-         <property name="maximumSize">
-          <size>
-           <width>85</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Select</string>
-         </property>
-        </widget>
-       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="horizontalLayoutWidget_17">

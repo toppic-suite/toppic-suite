@@ -98,7 +98,6 @@ void toppicWindow::initArguments() {
   arguments_["executiveDir"] = ".";
   arguments_["resourceDir"] = "";
   arguments_["keepTempFiles"] = "false";
-  arguments_["fullBinaryPath"] = "false";
   arguments_["local_threshold"] = "0.45";
   arguments_["groupSpectrumNumber"] = "1";
   arguments_["filteringResultNumber"] = "20";
@@ -280,7 +279,6 @@ std::map<std::string, std::string> toppicWindow::getArguments() {
     arguments_["useGf"] = "false";
   }
   arguments_["keepTempFiles"] = "false";   // default
-  arguments_["fullBinaryPath"] = "false";  // default
   arguments_["local_threshold"] = ui->miscoreThresholdEdit->text().toStdString();
   arguments_["groupSpectrumNumber"] = ui->numCombinedEdit->text().toStdString();
   arguments_["filteringResultNumber"] = "20";  // default
@@ -563,7 +561,6 @@ void toppicWindow::showArguments() {
                                         "\nminPtmMass:" + arguments_["minPtmMass"] +
                                         "\nuseGf:" + arguments_["useGf"] +
                                         "\nkeepTempFiles:" + arguments_["keepTempFiles"] +
-                                        "\nfullBinaryPath:" + arguments_["fullBinaryPath"] +
                                         "\nlocal_threshold:" + arguments_["local_threshold"] +
                                         "\ngroupSpectrumNumber:" + arguments_["groupSpectrumNumber"] +
                                         "\nfilteringResultNumber:" + arguments_["filteringResultNumber"] +
