@@ -9,13 +9,8 @@
       <link rel="stylesheet" type="text/css" href="./resources/bootstrap.min.css"></link>
       <link rel="stylesheet" type="text/css" href="./resources/prsm.css"></link>
       <script type="text/javascript" language="javascript" src="./resources/media/js/jquery.js"></script>
+      <xsl:text>&#xa;</xsl:text>
       <script type="text/javascript" language="javascript" src="./resources/media/js/jquery.dataTables.js"></script>
-      <style type="text/css">
-        @font-face {
-          font-family: "FreeMono";
-          src: url("./resources/FreeMono.ttf")
-        }
-      </style>
       <body>
         <div class="container">
           <h2><xsl:value-of select="count(protein)"/> proteins were identified.</h2>

@@ -451,7 +451,6 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
     std::vector<std::string> prsm_file_lst(spec_file_lst.size());
     for (size_t i = 0; i < spec_file_lst.size(); i++) {
       prsm_file_lst[i] = prot::file_util::basename(spec_file_lst[i]) + ".toppic_evalue"; 
-      std::cout << "Evalue file: " << prsm_file_lst[i] << std::endl;
     }
     prot::prsm_util::mergePrsmFiles(prsm_file_lst, N, base_name + "_ms2.toppic_evalue");
     std::cout << "Merging files - finished." << std::endl;

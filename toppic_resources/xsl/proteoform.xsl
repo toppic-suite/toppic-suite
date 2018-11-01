@@ -6,20 +6,14 @@
     <html>
       <title>Proteoform #<xsl:value-of select="proteoform_id"/> from <xsl:value-of select="sequence_name"/><xsl:text> </xsl:text>
         <xsl:value-of select="sequence_description"/>
-
-
       </title>
+
       <link rel="stylesheet" type="text/css" href="../resources/media/css/jquery.dataTables.css"></link>
       <link rel="stylesheet" type="text/css" href="../resources/bootstrap.min.css"></link>
       <link rel="stylesheet" type="text/css" href="../resources/prsm.css"></link>
       <script type="text/javascript" language="javascript" src="../resources/media/js/jquery.js"></script>
+      <xsl:text>&#xa;</xsl:text>
       <script type="text/javascript" language="javascript" src="../resources/media/js/jquery.dataTables.js"></script>
-      <style type="text/css">
-        @font-face {
-          font-family: "FreeMono";
-          src: url("../resources/FreeMono.ttf")
-        }
-      </style>
       <body>
         <div class="container">
           <xsl:call-template name="navigation"/>
