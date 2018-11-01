@@ -75,7 +75,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     char buf[50];
     std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
 
-    arguments["start_time"] = buf;
+    arguments["startTime"] = buf;
     Argument::outputArguments(std::cout, arguments);
 
     std::string resource_dir = arguments["resourceDir"];
@@ -325,7 +325,7 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
       std::cout << "PTM characterization - started." << std::endl;
       LocalMngPtr local_mng
           = std::make_shared<LocalMng>(prsm_para_ptr,
-                                       std::stod(arguments["local_threshold"]),
+                                       std::stod(arguments["localThreshold"]),
                                        arguments["residueModFileName"],
                                        max_ptm_mass,
                                        min_ptm_mass,
@@ -341,7 +341,7 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     std::time_t end = time(nullptr);
     char buf[50];
     std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&end));
-    arguments["end_time"] = buf;
+    arguments["endTime"] = buf;
 
     std::cout << "Outputting PrSM table - started." << std::endl;
     PrsmTableWriterPtr table_out
@@ -421,12 +421,14 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
   std::time_t start = time(nullptr);
   char buf[50];
   std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
-
-  std::string start_time_bak = buf;
+  std::string combined_start_time = buf;
 
   std::cout << "TopPIC " << prot::version_number << std::endl;
 
   for (size_t k = 0; k < spec_file_lst.size(); k++) {
+    std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
+    std::string start_time = buf;
+    arguments["startTime"] = start_time;
     arguments["spectrumFileName"] = spec_file_lst[k];
     if (prot::TopPICProgress(arguments) != 0) {
       return 1;
@@ -434,7 +436,6 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
   }
 
   if (spec_file_lst.size() > 1 && arguments["combinedOutputName"] != "") {
-    arguments["start_time"] = start_time_bak;
     std::cout << "Merging files - started." << std::endl;
     int N = 1000000;
     // merge msalign files
@@ -457,7 +458,7 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
 
     std::string sp_file_name = base_name + "_ms2.msalign";
     arguments["spectrumFileName"] = sp_file_name;
-
+    arguments["startTime"] = combined_start_time;
     prot::TopPIC_post(arguments);
   }
 

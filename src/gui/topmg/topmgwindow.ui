@@ -96,7 +96,7 @@ p, li { white-space: pre-wrap; }
         </font>
        </property>
        <property name="text">
-        <string>Clear</string>
+        <string>Clear Input Files</string>
        </property>
       </widget>
      </item>
@@ -297,20 +297,7 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="combinedOutputEdit">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>650</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
+        <widget class="QLineEdit" name="combinedOutputEdit"/>
        </item>
       </layout>
      </widget>
@@ -1155,7 +1142,7 @@ QGroupBox::title {
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>180</y>
+        <y>210</y>
         <width>831</width>
         <height>33</height>
        </rect>
@@ -1265,6 +1252,30 @@ QGroupBox::title {
            <string>2</string>
           </property>
          </item>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget_23">
+      <property name="geometry">
+       <rect>
+        <x>480</x>
+        <y>170</y>
+        <width>361</width>
+        <height>33</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_23">
+       <item>
+        <widget class="QCheckBox" name="asfDiagCheckBox">
+         <property name="text">
+          <string>Use ASF-diagonal filtering</string>
+         </property>
         </widget>
        </item>
       </layout>

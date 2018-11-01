@@ -76,7 +76,7 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
     char buf[50];
     std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
 
-    arguments["start_time"] = buf;
+    arguments["startTime"] = buf;
     Argument::outputArguments(std::cout, arguments);
 
     std::string resource_dir = arguments["resourceDir"];
@@ -88,7 +88,7 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
     std::string db_file_name = arguments["databaseFileName"];
     std::string sp_file_name = arguments["spectrumFileName"];
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
-    std::string residue_mod_file_name = arguments["residueModFileName"];
+    std::string var_mod_file_name = arguments["varModFileName"];
 
     std::string feature_file_name = sp_file_name.substr(0, sp_file_name.length() - 12) + ".feature";
 
@@ -123,7 +123,7 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
     std::cout << "ASF-One PTM filtering - started." << std::endl;
     OnePtmFilterMngPtr one_ptm_filter_mng_ptr =
         std::make_shared<OnePtmFilterMng>(prsm_para_ptr, "topmg_one_filter", thread_num,
-                                          arguments["residueModFileName"], 1);
+                                          var_mod_file_name, 1);
     one_ptm_filter_mng_ptr->inte_num_ = 4;
     one_ptm_filter_mng_ptr->pref_suff_num_ = 4;
     one_ptm_filter_mng_ptr->comp_num_ = 4;
@@ -138,13 +138,13 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
     input_exts.push_back("topmg_one_filter_internal");
 
 
-    if (arguments["useASFDiag"] == "true") {
+    if (arguments["useAsfDiag"] == "true") {
       std::cout << "ASF-Diagonal PTM filtering - started." << std::endl;
       filter_result_num = 15;
       DiagFilterMngPtr diag_filter_mng_ptr
           = std::make_shared<DiagFilterMng>(prsm_para_ptr, filter_result_num,
                                             thread_num, "topmg_multi_filter",
-                                            arguments["residueModFileName"], 1);
+                                            var_mod_file_name, 1);
       DiagFilterProcessorPtr diag_filter_processor1
           = std::make_shared<DiagFilterProcessor>(diag_filter_mng_ptr);
       diag_filter_processor1->process();
@@ -163,11 +163,11 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
     std::cout << "Combining filtering results - finished." << std::endl;
 
     int max_mod_num = std::stoi(arguments["varPtmNumber"]);
-    int gap = std::stoi(arguments["proteo_graph_dis"]);
+    int gap = std::stoi(arguments["proteoGraphGap"]);
     int var_ptm_in_gap = std::min(std::stoi(arguments["varPtmNumInGap"]), max_mod_num);
     GraphAlignMngPtr ga_mng_ptr
         = std::make_shared<GraphAlignMng>(prsm_para_ptr,
-                                          residue_mod_file_name,
+                                          var_mod_file_name,
                                           ptm_num, max_mod_num,
                                           gap, var_ptm_in_gap, max_ptm_mass,
                                           thread_num, "topmg_graph_filter", "topmg_graph_align");
@@ -187,7 +187,7 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
     std::cout << "E-value computation using MCMC - started." << std::endl;
     MCMCMngPtr mcmc_mng_ptr   
         = std::make_shared<MCMCMng>(prsm_para_ptr, "topmg_graph_post", "topmg_evalue",   
-                                    residue_mod_file_name, max_mod_num, thread_num);
+                                    var_mod_file_name, max_mod_num, thread_num);
     DprProcessorPtr processor = std::make_shared<DprProcessor>(mcmc_mng_ptr);   
     processor->process();    
     processor = nullptr;
@@ -211,7 +211,7 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
     std::string db_file_name = arguments["databaseFileName"];
     std::string sp_file_name = arguments["spectrumFileName"];
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
-    std::string residue_mod_file_name = arguments["residueModFileName"];
+    std::string var_mod_file_name = arguments["varModFileName"];
 
     int n_top = std::stoi(arguments["numOfTopPrsms"]);
 
@@ -281,7 +281,7 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
     std::time_t end = time(nullptr);
     char buf[50];
     std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&end));
-    arguments["end_time"] = buf;
+    arguments["endTime"] = buf;
 
     std::cout << "Outputting PrSM table - started." << std::endl;
     PrsmTableWriterPtr table_out
@@ -360,12 +360,14 @@ int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
   std::time_t start = time(nullptr);
   char buf[50];
   std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
-
-  std::string start_time_bak = buf;
+  std::string combined_start_time = buf;
 
   std::cout << "TopMG " << prot::version_number << std::endl;
 
   for (size_t k = 0; k < spec_file_lst.size(); k++) {
+    std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
+    std::string start_time = buf;
+    arguments["startTime"] = start_time;
     arguments["spectrumFileName"] = spec_file_lst[k];
     if (prot::TopMGProcess(arguments) != 0) {
       return 1;
@@ -373,7 +375,6 @@ int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
   }
 
   if (spec_file_lst.size() > 1 && arguments["combinedOutputName"] != "") {
-    arguments["start_time"] = start_time_bak;
     std::cout << "Merging files - started." << std::endl;
     int N = 1000000;
     // merge msalign files
@@ -388,14 +389,15 @@ int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
     // merge EVALUE files
     std::vector<std::string> prsm_file_lst(spec_file_lst.size());
     for (size_t i = 0; i < spec_file_lst.size(); i++) {
-      prsm_file_lst[i] = prot::file_util::basename(spec_file_lst[i]) + ".evalue"; 
+      prsm_file_lst[i] = prot::file_util::basename(spec_file_lst[i]) + ".topmg_evalue"; 
+      std::cout << "Evalue file: " << prsm_file_lst[i] << std::endl;
     }
-    prot::prsm_util::mergePrsmFiles(prsm_file_lst, N, base_name + "_ms2.evalue");
+    prot::prsm_util::mergePrsmFiles(prsm_file_lst, N, base_name + "_ms2.topmg_evalue");
     std::cout << "Merging files - finished." << std::endl;
 
     std::string sp_file_name = base_name + "_ms2.msalign";
     arguments["spectrumFileName"] = sp_file_name;
-
+    arguments["startTime"] = combined_start_time;
     prot::TopMG_post(arguments);
   }
 
@@ -416,13 +418,10 @@ int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
       prot::file_util::delDir(prot::file_util::basename(sp_file_name) + "_topmg_prsm_cutoff_xml");
       prot::file_util::cleanTopmgDir(ori_db_file_name, sp_file_name);
     }
-
     std::cout << "Deleting temporary files - finished." << std::endl; 
   }
 
-
   std::cout << "TopMG finished." << std::endl;
-
   return 0; 
 }
 

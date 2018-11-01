@@ -55,18 +55,17 @@ void Argument::initArguments() {
   arguments_["allowProtMod"] = "NONE,NME,NME_ACETYLATION,M_ACETYLATION";
   arguments_["numOfTopPrsms"] = "1";
   arguments_["maxPtmMass"] = "500";
-  arguments_["useGf"] = "false";
   arguments_["executiveDir"] = ".";
   arguments_["resourceDir"] = "";
   arguments_["keepTempFiles"] = "false";
   arguments_["groupSpectrumNumber"] = "1";
   arguments_["filteringResultNumber"] = "20";
-  arguments_["residueModFileName"] = "";
+  arguments_["varModFileName"] = "";
   arguments_["threadNumber"] = "1";
   arguments_["useFeatureFile"] = "true";
   arguments_["skipList"] = "";
-  arguments_["proteo_graph_dis"] = "40";
-  arguments_["useASFDiag"] = "false";
+  arguments_["proteoGraphGap"] = "40";
+  arguments_["useAsfDiag"] = "false";
   arguments_["varPtmNumber"] = "5";
   arguments_["varPtmNumInGap"] = "5";
 }
@@ -99,15 +98,15 @@ void Argument::outputArguments(std::ostream &output, std::map<std::string, std::
   output << std::setw(50) << std::left << "Allowed N-terminal forms: " << "\t" << arguments["allowProtMod"] << std::endl;
   output << std::setw(50) << std::left << "Maximum mass shift of modifications: " << "\t" << arguments["maxPtmMass"] << " Da" << std::endl;
   output << std::setw(50) << std::left << "Thread number: " << "\t" << arguments["threadNumber"] << std::endl;
-  output << std::setw(50) << std::left << "Modification file name: " << "\t" << arguments["residueModFileName"] << std::endl;
-  output << std::setw(50) << std::left << "Gap in proteoform graph: " << "\t" << arguments["proteo_graph_dis"] << std::endl;
+  output << std::setw(50) << std::left << "Modification file name: " << "\t" << arguments["varModFileName"] << std::endl;
+  output << std::setw(50) << std::left << "Gap in proteoform graph: " << "\t" << arguments["proteoGraphGap"] << std::endl;
   output << std::setw(50) << std::left << "Maximum number of variable PTMs: " << "\t" << arguments["varPtmNumber"] << std::endl;
   output << std::setw(50) << std::left << "Maximum number of variable PTMs in a graph gap: " << "\t" << arguments["varPtmNumInGap"] << std::endl;
   output << std::setw(50) << std::left << "Maximum number of unexpected modifications: " << "\t" << arguments["ptmNumber"] << std::endl;
   output << std::setw(50) << std::left << "Executable file directory: " << "\t" << arguments["executiveDir"] << std::endl;
-  output << std::setw(50) << std::left << "Start time: " << "\t" << arguments["start_time"] << std::endl;
-  if (arguments["end_time"] != "") {
-    output << std::setw(50) << std::left << "End time: " << "\t" << arguments["end_time"] << std::endl;
+  output << std::setw(50) << std::left << "Start time: " << "\t" << arguments["startTime"] << std::endl;
+  if (arguments["endTime"] != "") {
+    output << std::setw(50) << std::left << "End time: " << "\t" << arguments["endTime"] << std::endl;
   }
   output << "********************** Parameters **********************" << std::endl;
 }
@@ -132,8 +131,8 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string use_table = "";
   std::string use_asf_diag = "";
   std::string filtering_result_num = "";
-  std::string residue_mod_file_name = "";
-  std::string proteo_graph_dis = "";
+  std::string var_mod_file_name = "";
+  std::string proteo_graph_gap = "";
   std::string thread_number = "";
   std::string skip_list = "";
   std::string var_ptm_num = "";
@@ -160,11 +159,11 @@ bool Argument::parse(int argc, char* argv[]) {
         ("spectrum-cutoff-value,v", po::value<std::string> (&cutoff_spectral_value), "<a positive number>. Spectrum-level cutoff value for filtering identified proteoform spectrum-matches. Default value: 0.01.")
         ("proteoform-cutoff-type,T", po::value<std::string> (&cutoff_proteoform_type), "<EVALUE|FDR>. Proteoform-level cutoff type for filtering identified proteoform spectrum-matches. Default value: EVALUE.")
         ("proteoform-cutoff-value,V", po::value<std::string> (&cutoff_proteoform_value), "<a positive number>. Proteoform-level cutoff value for filtering identified proteoform spectrum-matches. Default value: 0.01.")
-        ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "<a common modification file>. Specify a text file containing the information of common PTMs for constructing proteoform graphs.")
+        ("mod-file-name,i", po::value<std::string>(&var_mod_file_name), "<a common modification file>. Specify a text file containing the information of common PTMs for constructing proteoform graphs.")
         ("thread-number,u", po::value<std::string> (&thread_number), "<a positive integer>. Number of threads used in the computation. Default value: 1.")
         ("no-topfd-feature,x", "No TopFD feature file for proteoform identification.")
         ("skip-list,l", po::value<std::string>(&skip_list) , "<a text file with its path>. The scans in this file will be skipped.")
-        ("proteo-graph-dis,j", po::value<std::string> (&proteo_graph_dis), "<a positive number>. Gap in constructing proteoform graph. Default value: 40.")
+        ("proteo-graph-gap,j", po::value<std::string> (&proteo_graph_gap), "<a positive number>. Gap in constructing proteoform graph. Default value: 40.")
         ("var-ptm-in-gap,G", po::value<std::string>(&var_ptm_in_gap) , "<a positive number>. Maximum number of variable PTMs in a proteform graph gap. Default value: 5.")
         ("use-asf-diagonal,D", "Use the ASF-DIAGONAL method for protein filtering.")
         ("var-ptm,P", po::value<std::string>(&var_ptm_num) , "<a positive number>. Maximum number of variable PTMs. Default value: 5.")
@@ -189,12 +188,12 @@ bool Argument::parse(int argc, char* argv[]) {
         ("filtering-result-number", po::value<std::string>(&filtering_result_num), "Filtering result number. Default value: 20.")
         ("keep-temp-files,k", "")
         ("full-binary-path,b", "Full binary path.")
-        ("mod-file-name,i", po::value<std::string>(&residue_mod_file_name), "")
+        ("mod-file-name,i", po::value<std::string>(&var_mod_file_name), "")
         ("thread-number,u", po::value<std::string> (&thread_number), "")
         ("no-topfd-feature,x", "")
         ("skip-list,l", po::value<std::string>(&skip_list) , "")
         ("combined-file-name,c", po::value<std::string>(&combined_output_name) , "")
-        ("proteo-graph-dis,j", po::value<std::string> (&proteo_graph_dis), "")
+        ("proteo-graph-gap,j", po::value<std::string> (&proteo_graph_gap), "")
         ("var-ptm-in-gap,G", po::value<std::string>(&var_ptm_in_gap) , "")
         ("use-asf-diagonal,D", "")
         ("var-ptm,P", po::value<std::string>(&var_ptm_num) , "")
@@ -302,11 +301,11 @@ bool Argument::parse(int argc, char* argv[]) {
     }
 
     if (vm.count("mod-file-name")) {
-      arguments_["residueModFileName"] = residue_mod_file_name;
+      arguments_["varModFileName"] = var_mod_file_name;
     }
 
-    if (vm.count("proteo-graph-dis")) {
-      arguments_["proteo_graph_dis"] = proteo_graph_dis;
+    if (vm.count("proteo-graph-gap")) {
+      arguments_["proteoGraphGap"] = proteo_graph_gap;
     }
 
     if (vm.count("thread-number")) {
@@ -322,7 +321,7 @@ bool Argument::parse(int argc, char* argv[]) {
     }
 
     if (vm.count("use-asf-diagonal")) {
-      arguments_["useASFDiag"] = "true";
+      arguments_["useAsfDiag"] = "true";
     }
 
     if (vm.count("var-ptm")) {
@@ -389,8 +388,8 @@ bool Argument::validateArguments() {
     }
   }
 
-  if (!boost::filesystem::exists(arguments_["residueModFileName"])) {
-    LOG_ERROR("Modification file " << arguments_["residueModFileName"] << " does not exist!");
+  if (!boost::filesystem::exists(arguments_["varModFileName"])) {
+    LOG_ERROR("Modification file " << arguments_["varModFileName"] << " does not exist!");
     return false;
   }
 
@@ -448,17 +447,6 @@ bool Argument::validateArguments() {
 
   if (cutoff_proteoform_type == "FDR" && search_type != "TARGET+DECOY") {
     LOG_ERROR("Proteoform-level cutoff type "<< cutoff_proteoform_type << " error! FDR cutoff cannot be used when no decoy database is used! Please add argument '-d' in the command.");
-    return false;
-  }
-
-  std::string use_gf = arguments_["useGf"];
-  if (use_gf != "true" && use_gf != "false") {
-    LOG_ERROR("Use gf " << use_gf << " error! The value should be true|false!");
-    return false;
-  }
-
-  if (use_gf == "false" && arguments_["errorTolerance"] != "5" && arguments_["errorTolerance"] != "10" && arguments_["errorTolerance"] != "15") {
-    LOG_ERROR("Error tolerance can only be 5, 10 or 15 when the generation function approach for E-value computation is not selected!");
     return false;
   }
 

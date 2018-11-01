@@ -96,7 +96,7 @@ p, li { white-space: pre-wrap; }
         </font>
        </property>
        <property name="text">
-        <string>Clear</string>
+        <string>Clear input files</string>
        </property>
       </widget>
      </item>

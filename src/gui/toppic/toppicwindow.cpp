@@ -208,29 +208,31 @@ void toppicWindow::on_startButton_clicked() {
     std::string new_info = info.substr(processed_len);
     processed_len = info.length();
     
-    for (unsigned i = 0; i < new_info.size(); i++) {
-      // new line
-      if (new_info.at(i) == '\n') {
-        processed_lines = processed_lines + current_line + '\n';
-        current_line = "";
-        cursor_pos = 0;
-      }
-      // CF
-      if (new_info.at(i) == '\r') {
-        cursor_pos = 0;
-      }
-      // add a new charactor
-      if (new_info.at(i) != '\n' && new_info.at(i) != '\r') {
-        if (cursor_pos < current_line.length()) {
-          current_line[cursor_pos] = new_info.at(i);
+    if (new_info.size() > 0) {
+      for (unsigned i = 0; i < new_info.size(); i++) {
+        // new line
+        if (new_info.at(i) == '\n') {
+          processed_lines = processed_lines + current_line + '\n';
+          current_line = "";
+          cursor_pos = 0;
         }
-        else {
-          current_line = current_line + new_info.at(i);
+        // CF
+        if (new_info.at(i) == '\r') {
+          cursor_pos = 0;
         }
-        cursor_pos++;
+        // add a new charactor
+        if (new_info.at(i) != '\n' && new_info.at(i) != '\r') {
+          if (cursor_pos < current_line.length()) {
+            current_line[cursor_pos] = new_info.at(i);
+          }
+          else {
+            current_line = current_line + new_info.at(i);
+          }
+          cursor_pos++;
+        }
       }
+      updateMsg(processed_lines + current_line);
     }
-    updateMsg(processed_lines + current_line);
     if (thread_->isFinished()) {
       break;
     }
@@ -272,6 +274,9 @@ std::map<std::string, std::string> toppicWindow::getArguments() {
   arguments_["fixedMod"] = ui->fixedModComboBox->currentText().toStdString();
   if (arguments_["fixedMod"] == "NONE") {
     arguments_["fixedMod"] = "";
+  }
+  if (ui->fixedModComboBox->currentIndex() == 3) {
+    arguments_["fixedMod"] = ui->fixedModFileEdit->text().toStdString();
   }
   arguments_["ptmNumber"] = ui->numModComboBox->currentText().toStdString();
   arguments_["errorTolerance"] = ui->errorToleranceEdit->text().toStdString();
@@ -381,7 +386,9 @@ void toppicWindow::lockDialog() {
   ui->modFileButton->setEnabled(false);
   ui->databaseFileEdit->setEnabled(false);
   ui->combinedOutputEdit->setEnabled(false);
+  ui->fixedModComboBox->setEnabled(false);
   ui->fixedModFileEdit->setEnabled(false);
+  ui->fixedModFileButton->setEnabled(false);
   ui->errorToleranceEdit->setEnabled(false);
   ui->maxModEdit->setEnabled(false);
   ui->minModEdit->setEnabled(false);
@@ -392,7 +399,6 @@ void toppicWindow::lockDialog() {
   ui->miscoreThresholdEdit->setEnabled(false);
   ui->threadNumberEdit->setEnabled(false);
   ui->fixedModComboBox->setEnabled(false);
-  on_fixedModComboBox_currentIndexChanged(0);
   ui->activationComboBox->setEnabled(false);
   ui->cutoffSpectralTypeComboBox->setEnabled(false);
   ui->cutoffProteoformTypeComboBox->setEnabled(false);
