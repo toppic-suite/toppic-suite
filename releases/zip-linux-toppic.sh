@@ -1,4 +1,5 @@
 #!/bin/sh
+set -x
 if [ "$#" -ne 1 ];then
   echo "Usage: $0 version_number" >&2
   exit 1
@@ -36,4 +37,4 @@ cp /usr/lib/x86_64-linux-gnu/libicuuc.so.55 toppic-linux-${1}/toppic_resources/l
 cp /usr/lib/x86_64-linux-gnu/libicudata.so.55 toppic-linux-${1}/toppic_resources/lib/
 cp /lib/x86_64-linux-gnu/libbz2.so.1.0 toppic-linux-${1}/toppic_resources/lib/
 
-zip -r toppic-linux-${1}.zip toppic-linux-${1}
+#zip -r toppic-linux-${1}.zip toppic-linux-${1}
