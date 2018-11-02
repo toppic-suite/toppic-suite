@@ -56,7 +56,7 @@ class toppicWindow : public QMainWindow {
 
   void on_errorToleranceEdit_textChanged(QString string);
 
-  void on_generatingFunctionCheckBox_clicked(bool checked);
+  void on_lookupTableCheckBox_clicked(bool checked);
 
   void on_NONECheckBox_clicked(bool checked);
 

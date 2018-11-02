@@ -110,9 +110,9 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     // We use only one thread to reduce the memory requirement.
     int filter_thread_num = 1;
 
-    bool use_gf = false;
-    if (arguments["useGf"] == "true") {
-      use_gf = true;
+    bool use_gf = true;
+    if (arguments["useLookupTable"] == "true") {
+      use_gf = false;
     }
 
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
@@ -128,6 +128,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     fasta_util::dbPreprocess(ori_db_file_name, db_file_name, decoy, db_block_size);
     msalign_util::geneSpIndex(sp_file_name, prsm_para_ptr->getSpParaPtr());
 
+    /*
     std::vector<std::string> input_exts;
 
     std::cout << "Non PTM filtering - started." << std::endl;
@@ -210,6 +211,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     combine_ptr->process();
     combine_ptr = nullptr;
     std::cout << "Combining PrSMs - finished." << std::endl;
+    */
     
     std::cout << "E-value computation - started." << std::endl;
     bool variable_ptm = false;
