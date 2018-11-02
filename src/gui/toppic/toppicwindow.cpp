@@ -337,7 +337,7 @@ void toppicWindow::on_addButton_clicked() {
       this,
       "Select deconvoluted spectrum files",
       lastDir_,
-      "Spectrum files(*.msalign)");
+      "Spectrum files(*ms2.msalign)");
 
   for (int i = 0; i < spfiles.size(); i++) {
     QString spfile = spfiles.at(i);
