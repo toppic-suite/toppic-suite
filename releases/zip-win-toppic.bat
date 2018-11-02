@@ -26,9 +26,9 @@ copy C:\msys64\mingw64\bin\libboost_iostreams-mt.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libboost_thread-mt.dll toppic-windows-%1
 
 copy C:\msys64\mingw64\bin\libxerces-c.dll toppic-windows-%1
-copy C:\msys64\mingw64\bin\libxalan-c1_11_0.dll toppic-windows-%1
+copy C:\msys64\mingw64\bin\libxalan-c.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libicuuc58.dll toppic-windows-%1
-copy C:\msys64\mingw64\bin\libxalanMsg1_11_0.dll toppic-windows-%1
+copy C:\msys64\mingw64\bin\libxalanMsg.dll toppic-windows-%1
 copy C:\msys64\mingw64\bin\libicudt58.dll toppic-windows-%1
 
 copy C:\msys64\mingw64\bin\Qt5Core.dll toppic-windows-%1
