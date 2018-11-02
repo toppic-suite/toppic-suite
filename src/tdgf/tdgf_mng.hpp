@@ -65,7 +65,7 @@ class TdgfMng {
 
   int thread_num_ = 1;
 
-  double convert_ratio_ = 274.335215;
+  double convert_ratio_ = 27.4335215;
 
   double max_prec_mass_ = 100000;  
 
