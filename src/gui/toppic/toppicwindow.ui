@@ -172,7 +172,7 @@ p, li { white-space: pre-wrap; }
      </font>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab_4">
      <attribute name="title">
@@ -466,7 +466,7 @@ p, li { white-space: pre-wrap; }
         <x>440</x>
         <y>210</y>
         <width>341</width>
-        <height>33</height>
+        <height>31</height>
        </rect>
       </property>
       <property name="font">
@@ -501,7 +501,7 @@ p, li { white-space: pre-wrap; }
        <rect>
         <x>10</x>
         <y>210</y>
-        <width>341</width>
+        <width>381</width>
         <height>31</height>
        </rect>
       </property>
@@ -512,14 +512,14 @@ p, li { white-space: pre-wrap; }
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_16">
        <item>
-        <widget class="QCheckBox" name="generatingFunctionCheckBox">
+        <widget class="QCheckBox" name="lookupTableCheckBox">
          <property name="font">
           <font>
            <pointsize>12</pointsize>
           </font>
          </property>
          <property name="text">
-          <string>Generating function</string>
+          <string>Lookup table for E-value computation</string>
          </property>
         </widget>
        </item>

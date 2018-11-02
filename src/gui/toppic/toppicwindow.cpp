@@ -70,6 +70,7 @@ toppicWindow::toppicWindow(QWidget *parent) :
 
       on_clearButton_clicked();
       on_defaultButton_clicked();
+      ui->tabWidget->setCurrentIndex(0);
     }
 
 toppicWindow::~toppicWindow() {
@@ -94,11 +95,11 @@ void toppicWindow::initArguments() {
   arguments_["numOfTopPrsms"] = "1";
   arguments_["maxPtmMass"] = "500";
   arguments_["minPtmMass"] = "-500";
-  arguments_["useGf"] = "false";
+  arguments_["useLookupTable"] = "false";
   arguments_["executiveDir"] = ".";
   arguments_["resourceDir"] = "";
   arguments_["keepTempFiles"] = "false";
-  arguments_["local_threshold"] = "0.45";
+  arguments_["localThreshold"] = "0.45";
   arguments_["groupSpectrumNumber"] = "1";
   arguments_["filteringResultNumber"] = "20";
   arguments_["residueModFileName"] = "";
@@ -140,7 +141,7 @@ void toppicWindow::on_defaultButton_clicked() {
   ui->NMEACCheckBox->setChecked(true);
   ui->MACCheckBox->setChecked(true);
   ui->decoyCheckBox->setChecked(false);
-  ui->generatingFunctionCheckBox->setChecked(false);
+  ui->lookupTableCheckBox->setChecked(false);
   ui->topfdFeatureCheckBox->setChecked(false);
 }
 
@@ -303,13 +304,13 @@ std::map<std::string, std::string> toppicWindow::getArguments() {
   arguments_["numOfTopPrsms"] = "1";
   arguments_["maxPtmMass"] = ui->maxModEdit->text().toStdString();
   arguments_["minPtmMass"] = ui->minModEdit->text().toStdString();
-  if (ui->generatingFunctionCheckBox->isChecked()) {
-    arguments_["useGf"] = "true";
+  if (ui->lookupTableCheckBox->isChecked()) {
+    arguments_["useLookupTable"] = "true";
   } else {
-    arguments_["useGf"] = "false";
+    arguments_["useLookupTable"] = "false";
   }
   arguments_["keepTempFiles"] = "false";   // default
-  arguments_["local_threshold"] = ui->miscoreThresholdEdit->text().toStdString();
+  arguments_["localThreshold"] = ui->miscoreThresholdEdit->text().toStdString();
   arguments_["groupSpectrumNumber"] = ui->numCombinedEdit->text().toStdString();
   arguments_["filteringResultNumber"] = "20";  // default
   arguments_["residueModFileName"] = ui->modFileEdit->text().toStdString();
@@ -408,7 +409,7 @@ void toppicWindow::lockDialog() {
   ui->NMEACCheckBox->setEnabled(false);
   ui->MACCheckBox->setEnabled(false);
   ui->decoyCheckBox->setEnabled(false);
-  ui->generatingFunctionCheckBox->setEnabled(false);
+  ui->lookupTableCheckBox->setEnabled(false);
   ui->topfdFeatureCheckBox->setEnabled(false);
   ui->clearButton->setEnabled(false);
   ui->defaultButton->setEnabled(false);
@@ -446,7 +447,7 @@ void toppicWindow::unlockDialog() {
   ui->NMEACCheckBox->setEnabled(true);
   ui->MACCheckBox->setEnabled(true);
   ui->decoyCheckBox->setEnabled(true);
-  ui->generatingFunctionCheckBox->setEnabled(true);
+  ui->lookupTableCheckBox->setEnabled(true);
   ui->topfdFeatureCheckBox->setEnabled(true);
   ui->clearButton->setEnabled(true);
   ui->defaultButton->setEnabled(true);
@@ -489,9 +490,9 @@ bool toppicWindow::checkError() {
   }
 
   QString currentText = ui->errorToleranceEdit->text();
-  if (!ui->generatingFunctionCheckBox->isChecked() && currentText != "5" && currentText != "10" && currentText != "15") {
+  if (ui->lookupTableCheckBox->isChecked() && currentText != "5" && currentText != "10" && currentText != "15") {
     QMessageBox::warning(this, tr("Warning"),
-                         tr("To use an error tolerance other than 5, 10, and 15 ppm, the checkbox \"generating function\" should be selected!"),
+                         tr("To use an error tolerance other than 5, 10, and 15 ppm, the checkbox \"Lookup table for E-value computation\" should be not selected!"),
                          QMessageBox::Yes);
     return true;
   }
@@ -581,9 +582,9 @@ void toppicWindow::showArguments() {
                                         "\nnumOfTopPrsms:" + arguments_["numOfTopPrsms"] +
                                         "\nmaxPtmMass:" + arguments_["maxPtmMass"] +
                                         "\nminPtmMass:" + arguments_["minPtmMass"] +
-                                        "\nuseGf:" + arguments_["useGf"] +
+                                        "\nuseLookupTable:" + arguments_["useLookupTable"] +
                                         "\nkeepTempFiles:" + arguments_["keepTempFiles"] +
-                                        "\nlocal_threshold:" + arguments_["local_threshold"] +
+                                        "\nlocalThreshold:" + arguments_["localThreshold"] +
                                         "\ngroupSpectrumNumber:" + arguments_["groupSpectrumNumber"] +
                                         "\nfilteringResultNumber:" + arguments_["filteringResultNumber"] +
                                         "\nresidueModFileName:" + arguments_["residueModFileName"] +
@@ -631,21 +632,21 @@ void toppicWindow::on_numModComboBox_currentIndexChanged(int index) {
 
 void toppicWindow::on_errorToleranceEdit_textChanged(QString string) {
   QString currentText = ui->errorToleranceEdit->text();
-  if (!ui->generatingFunctionCheckBox->isChecked() && currentText != "5" && currentText != "10" && currentText != "15" && currentText != "1") {
+  if (ui->lookupTableCheckBox->isChecked() && currentText != "5" && currentText != "10" && currentText != "15" && currentText != "1") {
     QMessageBox::warning(this, tr("Warning"),
-                         tr("To use an error tolerance other than 5, 10, and 15 ppm, the checkbox \"generating function\" should be checked!"),
+                         tr("To use an error tolerance other than 5, 10, and 15 ppm, the checkbox \"Lookup table for E-value computation\" should not be checked!"),
                          QMessageBox::Yes);
     ui->errorToleranceEdit->setText("15");
   }
 }
 
-void toppicWindow::on_generatingFunctionCheckBox_clicked(bool checked) {
+void toppicWindow::on_lookupTableCheckBox_clicked(bool checked) {
   QString currentText = ui->errorToleranceEdit->text();
-  if (!checked && currentText != "5" && currentText != "10" && currentText != "15") {
+  if (checked && currentText != "5" && currentText != "10" && currentText != "15") {
     QMessageBox::warning(this, tr("Warning"),
-                         tr("To use an error tolerance other than 5, 10, and 15 ppm, the checkbox \"generating function\" should be checked!"),
+                         tr("To use an error tolerance other than 5, 10, and 15 ppm, the checkbox \"Lookup table for E-value computation\" should not be checked!"),
                          QMessageBox::Yes);
-    ui->generatingFunctionCheckBox->setChecked(true);
+    ui->lookupTableCheckBox->setChecked(true);
   }
 }
 
@@ -740,7 +741,7 @@ bool toppicWindow::event(QEvent *event) {
   if (event->type() == QEvent::ToolTip) {
     QHelpEvent *helpEvent = static_cast<QHelpEvent *>(event);
     if (QRect(800, 230, 60, 60).contains(helpEvent->pos()) && ui->tabWidget->currentIndex() == 1) {
-      QToolTip::showText(helpEvent->globalPos(), "To use an error tolerance other than \n5, 10, and 15 ppm, the checkbox \n\"generating function\" should be selected!");
+      QToolTip::showText(helpEvent->globalPos(), "To use an error tolerance other than \n5, 10, and 15 ppm, the checkbox \n\"Lookup table for E-value computation\" should not be selected!");
     } else {
       QToolTip::hideText();
       event->ignore();

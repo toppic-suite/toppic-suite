@@ -286,6 +286,8 @@ std::map<std::string, std::string> TopFDDialog::getArguments() {
 }
 
 void TopFDDialog::lockDialog() {
+  ui->addButton->setEnabled(false);
+  ui->delButton->setEnabled(false);
   ui->maxChargeEdit->setEnabled(false);
   ui->maxMassEdit->setEnabled(false);
   ui->mzErrorEdit->setEnabled(false);
@@ -300,6 +302,8 @@ void TopFDDialog::lockDialog() {
 }
 
 void TopFDDialog::unlockDialog() {
+  ui->addButton->setEnabled(true);
+  ui->delButton->setEnabled(true);
   ui->maxChargeEdit->setEnabled(true);
   ui->maxMassEdit->setEnabled(true);
   ui->mzErrorEdit->setEnabled(true);
