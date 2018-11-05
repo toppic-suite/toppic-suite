@@ -198,9 +198,10 @@ void cleanTopmgDir(const std::string &fa_path, const std::string & sp_path) {
   delFile(sp_base + ".topmg_top_pre");
   delFile(sp_base + ".topmg_prsm_cutoff");
   delFile(sp_base + ".topmg_form_cutoff");
-  delFile(sp_base + ".topmg_form_cutoff_form");
-//  clean_prefix(sp, sp_base + ".proteoform_");
-//  clean_prefix(sp, sp_base + ".prot_");
+  //delFile(sp_base + ".topmg_form_cutoff_form");
+  delFile(sp_base + "_topmg_proteoform.xml");
+  fs::path form_path(sp_base + ".topmg_form_cutoff_form");
+  fs::rename(form_path, sp_base + "_topmg_proteoform.xml");
 }
 
 void cleanToppicDir(const std::string &fa_path, const std::string & sp_path) {
@@ -233,9 +234,10 @@ void cleanToppicDir(const std::string &fa_path, const std::string & sp_path) {
   delFile(sp_base + ".toppic_prsm_cutoff");
   delFile(sp_base + ".toppic_prsm_cutoff_local");
   delFile(sp_base + ".toppic_form_cutoff");
-  delFile(sp_base + ".toppic_form_cutoff_form");
-//  clean_prefix(sp, sp_base + ".proteoform_");
-//  clean_prefix(sp, sp_base + ".prot_");
+  //delFile(sp_base + ".toppic_form_cutoff_form");
+  delFile(sp_base + "_toppic_proteoform.xml");
+  fs::path form_path(sp_base + ".toppic_form_cutoff_form");
+  fs::rename(form_path, sp_base + "_toppic_proteoform.xml");
 }
 
 void cleanTempFiles(const std::string & sp_path, 

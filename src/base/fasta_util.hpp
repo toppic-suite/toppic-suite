@@ -40,6 +40,9 @@ namespace fasta_util {
 void generateShuffleDb(const std::string &file_name,
                        const std::string &target_decoy_file_name);
 
+void dbSimplePreprocess(const std::string &ori_db_file_name,
+                        const std::string &db_file_name);
+
 void dbPreprocess(const std::string &ori_db_file_name,
                   const std::string &db_file_name,
                   bool decoy, int block_size);

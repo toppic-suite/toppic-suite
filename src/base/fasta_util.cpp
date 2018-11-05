@@ -108,6 +108,12 @@ void generateDbBlock(const std::string &db_file_name, int block_size) {
   block_output.close();
 }
 
+void dbSimplePreprocess(const std::string &ori_db_file_name,
+                        const std::string &db_file_name) {
+  generateStandardDb(ori_db_file_name, db_file_name);
+  fai_build(db_file_name.c_str());
+}
+
 void dbPreprocess(const std::string &ori_db_file_name,
                   const std::string &db_file_name,
                   bool decoy, int block_size) {
