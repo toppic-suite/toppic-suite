@@ -23,6 +23,7 @@
 #include "base/fasta_util.hpp"
 
 #include "prsm/prsm_reader.hpp"
+#include "prsm/prsm_sample_merge.hpp"
 #include "prsm/prsm_stat.hpp"
 
 #include "spec/msalign_util.hpp"
@@ -99,6 +100,22 @@ int main(int argc, char* argv[]) {
   std::string ori_db_file_name = arguments["databaseFileName"];
   std::string db_file_name = ori_db_file_name + "_target";
   fasta_util::dbSimplePreprocess(ori_db_file_name, db_file_name);
+
+  std::vector<std::string> proteoform_file_list = argu_processor.getProteoformFileList();
+  double error_tole = std::stod(arguments["errorTolerance"]);
+  std::string output_file_name = arguments["outputFileName"];
+  std::string fixed_mod = arguments["fixedMod"];
+
+  std::cout << "Merging files - started." << std::endl;
+  PrsmSampleMergePtr merge_ptr 
+      = std::make_shared<PrsmSampleMerge>(db_file_name, 
+                                          proteoform_file_list,
+                                          output_file_name,
+                                          fixed_mod,
+                                          error_tole);
+  merge_ptr->process();
+  merge_ptr = nullptr;
+  std::cout << "Merging files - finished." << std::endl;
 
   /*
   FastaIndexReaderPtr seq_reader = std::make_shared<FastaIndexReader>(db_file_name);
