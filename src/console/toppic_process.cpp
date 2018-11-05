@@ -136,6 +136,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     ZeroPtmFilterProcessorPtr zero_filter_processor
         = std::make_shared<ZeroPtmFilterProcessor>(zero_filter_mng_ptr);
     zero_filter_processor->process();
+    zero_filter_processor = nullptr;
     std::cout << "Non PTM filtering - finished." << std::endl;
 
     std::cout << "Non PTM search - started." << std::endl;
@@ -159,6 +160,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
       OnePtmFilterProcessorPtr one_filter_processor
           = std::make_shared<OnePtmFilterProcessor>(one_ptm_filter_mng_ptr);
       one_filter_processor->process();
+      one_filter_processor = nullptr;
       std::cout << "One PTM filtering - finished." << std::endl;
 
       std::cout << "One PTM search - started." << std::endl;
@@ -187,6 +189,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
       DiagFilterProcessorPtr diag_filter_processor
           = std::make_shared<DiagFilterProcessor>(diag_filter_mng_ptr);
       diag_filter_processor->process();
+      diag_filter_processor = nullptr;
       std::cout << "Multiple PTM filtering - finished." << std::endl;
 
       std::cout << "Multiple PTM search - started." << std::endl;
@@ -195,6 +198,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
                                            ptm_num, thread_num, "toppic_multi_filter", "toppic_multi_ptm");
       PtmSearchProcessorPtr processor = std::make_shared<PtmSearchProcessor>(multi_search_mng_ptr);
       processor->process();
+      processor = nullptr;
       std::cout << "Multiple PTM search - finished." << std::endl;
 
       input_exts.push_back("toppic_multi_ptm_complete_2");

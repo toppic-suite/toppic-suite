@@ -130,6 +130,7 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
     OnePtmFilterProcessorPtr one_filter_processor =
         std::make_shared<OnePtmFilterProcessor>(one_ptm_filter_mng_ptr);
     one_filter_processor->process();
+    one_filter_processor = nullptr;
     std::cout << "ASF-One PTM filtering - finished." << std::endl;
 
     input_exts.push_back("topmg_one_filter_complete");
@@ -145,9 +146,10 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
           = std::make_shared<DiagFilterMng>(prsm_para_ptr, filter_result_num,
                                             thread_num, "topmg_multi_filter",
                                             var_mod_file_name, 1);
-      DiagFilterProcessorPtr diag_filter_processor1
+      DiagFilterProcessorPtr diag_filter_processor
           = std::make_shared<DiagFilterProcessor>(diag_filter_mng_ptr);
-      diag_filter_processor1->process();
+      diag_filter_processor->process();
+      diag_filter_processor = nullptr;
       std::cout << "ASF-Diagonal filtering - finished." << std::endl;
 
       input_exts.push_back("topmg_multi_filter");
