@@ -102,6 +102,10 @@ file(GLOB MCMC_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/mcmc/*.cpp)
 # unit test using catch
 file(GLOB UNIT_TEST_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/*.cpp)
 
+# merge
+file(GLOB TOPMERGE_MAIN_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmerge.cpp)
+file(GLOB TOPMERGE_ARGU_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmerge_argument.cpp)
+
 # quant
 file(GLOB TOPQUANT_MAIN_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topquant.cpp)
 file(GLOB TOPQUANT_ARGU_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topquant_argument.cpp)
@@ -129,6 +133,8 @@ add_executable(topfd ${TOPFD_MAIN_SRCS} ${TOPFD_ARGU_SRCS} ${HTS_SRCS} ${BASE_SR
 add_executable(topfd_gui ${TOPFD_GUI_SRCS} ${TOPFD_GUI_QRC} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS} ${PWIZ_SRC})
 
 add_executable(topquant ${TOPQUANT_MAIN_SRCS} ${TOPQUANT_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS})
+
+add_executable(topmerge ${TOPMERGE_MAIN_SRCS} ${TOPMERGE_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS})
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     target_link_libraries(toppic xalan-c xalanMsg xerces-c
@@ -160,6 +166,9 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
         boost_program_options-mt boost_thread-mt pthread z Ws2_32)
 
     target_link_libraries(topquant xalan-c xerces-c boost_program_options-mt
+        boost_filesystem-mt boost_system-mt boost_thread-mt pthread z Ws2_32)
+
+    target_link_libraries(topmerge xalan-c xerces-c boost_program_options-mt
         boost_filesystem-mt boost_system-mt boost_thread-mt pthread z Ws2_32)
 
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows") 
@@ -199,6 +208,9 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
         boost_system pthread z)
 
     target_link_libraries(topquant xalan-c xerces-c boost_program_options
+        boost_filesystem boost_system boost_thread pthread z)
+
+    target_link_libraries(topmerge xalan-c xerces-c boost_program_options
         boost_filesystem boost_system boost_thread pthread z)
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
 
