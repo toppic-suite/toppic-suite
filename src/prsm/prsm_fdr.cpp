@@ -20,8 +20,8 @@
 
 namespace prot {
 
-inline PrsmStrPtr2D getGroups(PrsmStrPtrVec &prsm_ptrs) {
-  PrsmStrPtr2D results;
+inline PrsmStrPtrVec2D getGroups(PrsmStrPtrVec &prsm_ptrs) {
+  PrsmStrPtrVec2D results;
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     bool found = false;
     for (size_t j = 0; j < results.size(); j++) {
@@ -66,8 +66,8 @@ void PrsmFdr::process(){
 
   computeFdr(target_ptrs,decoy_ptrs);
 
-  PrsmStrPtr2D target_proteoforms = getGroups(target_ptrs);
-  PrsmStrPtr2D decoy_proteoforms = getGroups(decoy_ptrs);
+  PrsmStrPtrVec2D target_proteoforms = getGroups(target_ptrs);
+  PrsmStrPtrVec2D decoy_proteoforms = getGroups(decoy_ptrs);
 
   computeProteoformFdr(target_proteoforms, decoy_proteoforms);
 
@@ -98,8 +98,8 @@ void PrsmFdr::computeFdr(PrsmStrPtrVec &target_ptrs, PrsmStrPtrVec &decoy_ptrs){
   }
 }
 
-void PrsmFdr::computeProteoformFdr(PrsmStrPtr2D &target_proteoforms,
-                                   PrsmStrPtr2D &decoy_proteoforms) {
+void PrsmFdr::computeProteoformFdr(PrsmStrPtrVec2D &target_proteoforms,
+                                   PrsmStrPtrVec2D &decoy_proteoforms) {
   for(size_t i = 0; i < target_proteoforms.size(); i++) {
     int n_target= i + 1;
     double target_evalue = target_proteoforms[i][0]->getEValue();

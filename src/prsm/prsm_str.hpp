@@ -68,6 +68,8 @@ class PrsmStr {
 
   int getUnexpectedPtmNum() {return unexpected_ptm_num_;}
 
+  int getVariablePtmNum() {return variable_ptm_num_;}
+
   double getPrecFeatureInte() {return precursor_feature_inte_;}
 
   double getMatchFragNum() {return match_frag_num_;}
@@ -85,6 +87,8 @@ class PrsmStr {
   std::vector<MassShiftStrPtr> getChangeStrVec() {return mass_shift_vec_;}
 
   std::string getProteinMatchSeq() {return protein_match_seq_;}
+
+  int getSampleId() {return sample_id_;}
 
   void setFileName(const std::string & fname);
 
@@ -105,6 +109,8 @@ class PrsmStr {
   void setProteoformFdr(double proteoform_fdr);
 
   void setProteinMatchSeq(const std::string & seq) {protein_match_seq_ = seq;}
+
+  void setSampleId(int sample_id) {sample_id_ = sample_id;}
 
   static bool cmpEValueInc(const PrsmStrPtr &a, const PrsmStrPtr &b) {
     return a->getEValue() < b->getEValue();
@@ -160,6 +166,8 @@ class PrsmStr {
 
   int unexpected_ptm_num_;
 
+  int variable_ptm_num_;
+
   int proteoform_start_pos_;
 
   int proteoform_end_pos_;
@@ -181,10 +189,12 @@ class PrsmStr {
   std::vector<MassShiftStrPtr> mass_shift_vec_;
 
   std::string protein_match_seq_;
+
+  int sample_id_;
 };
 
 typedef std::vector<PrsmStrPtr> PrsmStrPtrVec;
-typedef std::vector<PrsmStrPtrVec> PrsmStrPtr2D;
+typedef std::vector<PrsmStrPtrVec> PrsmStrPtrVec2D;
 
 }  // namespace prot
 

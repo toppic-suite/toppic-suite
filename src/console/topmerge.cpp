@@ -32,67 +32,21 @@
 
 using namespace prot;
 
-/*
-void writeCurSeq(std::vector<PrsmPtr> & prsm_vec,
-                 const std::vector<std::string> & spec_file_lst,
-                 std::ofstream & quant_output) {
-  std::sort(prsm_vec.begin(), prsm_vec.end(), [] (PrsmPtr a, PrsmPtr b) { 
-              return a->getPrecFeatureInte() > b->getPrecFeatureInte();
-            });
-
-  std::vector<std::vector<PrsmPtr> > clusters;
-
-  for (size_t k = 0; k < prsm_vec.size(); k++) {
-    bool is_found = false;
-    PrsmPtr cur_prsm = prsm_vec[k];
-
-    for (size_t i = 0; i < clusters.size(); i++) {
-      PrsmPtr ref_prsm = clusters[i][0]; 
-      if (std::abs(cur_prsm->getAdjustedPrecMass() - ref_prsm->getAdjustedPrecMass()) < 1.2) {
-        clusters[i].push_back(prsm_vec[k]);
-        is_found = true;
-        break; 
-      }
-    }
-
-    if (!is_found) {
-      std::vector<PrsmPtr> new_cluster;
-      new_cluster.push_back(cur_prsm); 
-      clusters.push_back(new_cluster);
-    }
-  }
-
-  for (size_t k = 0; k < clusters.size(); k++) {
-    quant_output << clusters[k][0]->getProteoformPtr()->getSeqName() << "\t"
-        << clusters[k][0]->getProteoformPtr()->getProteinMatchSeq() << "\t"
-        << clusters[k][0]->getAdjustedPrecMass();
-    std::map<std::string, double> inten_map;
-    for (size_t i = 0; i < clusters[k].size(); i++) {
-      inten_map[clusters[k][i]->getFileName()] = clusters[k][i]->getPrecFeatureInte();
-    }
-
-    for (size_t i = 0; i < spec_file_lst.size(); i++) {
-      if (inten_map[spec_file_lst[i]] > 0 ) {
-        quant_output << "\t" << inten_map[spec_file_lst[i]];
-      } else {
-        quant_output << "\t" << "-" ;
-      }
-    }
-
-    quant_output << std::endl;
-  }
-}
-*/
-
 int main(int argc, char* argv[]) {
+  //prot::log_level = 2;
+  LOG_DEBUG("Parsing start!");
   Argument argu_processor;
   bool success = argu_processor.parse(argc, argv);
+  
+  LOG_DEBUG("Parsing success!");
 
   if (!success) {
     return 1;
   }
 
   std::map<std::string, std::string> arguments = argu_processor.getArguments();
+
+  Argument::outputArguments(std::cout, arguments);
 
   std::string resource_dir = arguments["resourceDir"];
   base_data::init(resource_dir);
@@ -103,7 +57,8 @@ int main(int argc, char* argv[]) {
 
   std::vector<std::string> proteoform_file_list = argu_processor.getProteoformFileList();
   double error_tole = std::stod(arguments["errorTolerance"]);
-  std::string output_file_name = arguments["outputFileName"];
+  std::string output_file_name = arguments["mergedOutputFileName"];
+  LOG_DEBUG("Output file name " << output_file_name);
   std::string fixed_mod = arguments["fixedMod"];
 
   std::cout << "Merging files - started." << std::endl;
@@ -116,76 +71,6 @@ int main(int argc, char* argv[]) {
   merge_ptr->process();
   merge_ptr = nullptr;
   std::cout << "Merging files - finished." << std::endl;
-
-  /*
-  FastaIndexReaderPtr seq_reader = std::make_shared<FastaIndexReader>(db_file_name);
-
-  ModPtrVec fix_mod_ptr_vec_ = mod_util::geneFixedModList(arguments["fixedMod"]);
-
-  std::vector<PrsmPtr> prsm_vec;
-
-  for (size_t k = 0; k < proteoform_file_list.size(); k++) {
-    std::string input_file_name = proteoform_file_list[k];
-    PrsmReader prsm_reader(input_file_name);
-    PrsmPtr prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
-    while (prsm_ptr != nullptr) {
-      prsm_vec.push_back(prsm_ptr); 
-      prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
-    }
-    prsm_reader.close();
-  }
-
-  std::sort(prsm_vec.begin(), prsm_vec.end(), [] (PrsmPtr a, PrsmPtr b) { 
-              if (a->getProteoformPtr()->getSeqName() < b->getProteoformPtr()->getSeqName()) {
-                return true; 
-              } else if (a->getProteoformPtr()->getSeqName() > b->getProteoformPtr()->getSeqName()) {
-                return false;
-              }
-
-              if (a->getAdjustedPrecMass() < b->getAdjustedPrecMass()) {
-                return true;
-              } else if (a->getAdjustedPrecMass() > b->getAdjustedPrecMass()) {
-                return false;
-              }
-
-              return a->getFileName() < b->getFileName();
-            });
-
-  std::ofstream quant_output;
-  quant_output.open(arguments["combinedOutputName"] + ".QUANT_OUTPUT_TABLE");
-
-  quant_output << "Protein name" << "\t"
-      << "Proteoform" << "\t"
-      << "Proteoform mass";
-
-  for (size_t k = 0; k < spec_file_lst.size(); k++) {
-    boost::filesystem::path p(spec_file_lst[k]);
-    spec_file_lst[k] = p.stem().string();
-    spec_file_lst[k] += p.extension().string();
-    quant_output << "\t" << spec_file_lst[k];
-  }
-
-  quant_output << std::endl;
-
-  std::string cur_seq_name = prsm_vec[0]->getProteoformPtr()->getSeqName();
-
-  std::vector<PrsmPtr> cur_prsm_vec;
-
-  for (size_t k = 0; k < prsm_vec.size(); k++) {
-    if (prsm_vec[k]->getProteoformPtr()->getSeqName() == cur_seq_name) {
-      cur_prsm_vec.push_back(prsm_vec[k]);
-    } else {
-      writeCurSeq(cur_prsm_vec, spec_file_lst, quant_output);
-      cur_prsm_vec.clear();
-      cur_seq_name = prsm_vec[k]->getProteoformPtr()->getSeqName();
-      cur_prsm_vec.push_back(prsm_vec[k]);
-    } 
-  }
-
-  writeCurSeq(cur_prsm_vec, spec_file_lst, quant_output);
-
-  quant_output.close();
-  */
 
   return 0;
 }
