@@ -259,7 +259,7 @@ p, li { white-space: pre-wrap; }
           </font>
          </property>
          <property name="text">
-          <string>Spectrum file: </string>
+          <string>Spectrum files: </string>
          </property>
         </widget>
        </item>
