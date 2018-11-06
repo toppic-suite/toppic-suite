@@ -33,7 +33,7 @@ void Argument::initArguments() {
   arguments_["databaseFileName"] = "";
   arguments_["fixedMod"] = "";
   arguments_["errorTolerance"] = "1.2";
-  arguments_["mergedOutputName"] = "merged";
+  arguments_["mergedOutputFileName"] = "sample_merged.tsv";
 }
 
 void Argument::outputArguments(std::ostream &output, std::map<std::string, std::string> arguments) {
@@ -45,20 +45,21 @@ void Argument::outputArguments(std::ostream &output, std::map<std::string, std::
     output << std::setw(44) << std::left << "Fixed modifications: " << "\t" << arguments["fixedMod"] << std::endl;
   }
   output << std::setw(44) << std::left << "Error tolerance: " << "\t" << arguments["errorTolerance"] << " Dalton " << std::endl;
-  output << std::setw(44) << std::left << "Merged output file name: " << "\t" << arguments["mergedOutputName"] << std::endl;
+  output << std::setw(44) << std::left << "Merged output file name: " << "\t" << arguments["mergedOutputFileName"] << std::endl;
   output << "******************** Parameters ********************" << std::endl;
 }
 
 void Argument::showUsage(boost::program_options::options_description &desc) {
-  std::cout << "Usage: topmerge [options] database-file-name proteoform-file-name" << std::endl; 
+  std::cout << "Usage: topmerge [options] database-file-name proteoform-file-names" << std::endl; 
   std::cout << desc << std::endl; 
 }
 
 bool Argument::parse(int argc, char* argv[]) {
-  std::string database_file_name = "";
   std::string fixed_mod = "";
   std::string error_tole = "1.2";
   std::string merged_output_name = "merged.tsv";
+  std::string database_file_name = "";
+  std::vector<std::string> proteoform_file_names;
 
   /** Define and parse the program options*/
   try {
@@ -69,7 +70,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("fixed-mod,f", po::value<std::string> (&fixed_mod), 
          "<C57|C58|a fixed modification file>. Fixed modifications. Three available options: C57, C58, or the name of a text file containing the information of fixed modifications. When C57 is selected, carbamidomethylation on cysteine is the only fixed modification. When C58 is selected, carboxymethylation on cysteine is the only fixed modification.")
         ("error-tolerance,e", po::value<std::string>(&error_tole) , "Specify the error tolerance of precursor masses for mapping identified proteoforms. Default: 1.2 Dalton.")
-        ("output,o", po::value<std::string>(&merged_output_name) , "Specifiy the output file name for the merged results. Default: merged.tsv.");
+        ("output,o", po::value<std::string>(&merged_output_name) , "Specifiy the output file name for the merged results. Default: sample_merged.tsv.");
     po::options_description desc("Options");
 
     desc.add_options() 
@@ -77,7 +78,8 @@ bool Argument::parse(int argc, char* argv[]) {
         ("fixed-mod,f", po::value<std::string> (&fixed_mod), "")
         ("error-tolerance,e", po::value<std::string>(&error_tole) , "")
         ("output,o", po::value<std::string>(&merged_output_name) , "")
-        ("input-file-name", po::value<std::string>(&database_file_name)->required(), "Input file names.");
+        ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name.")
+        ("proteoform-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), "Spectrum file name with its path.");
 
     po::positional_options_description positional_options;
     positional_options.add("database-file-name", 1);
@@ -105,14 +107,14 @@ bool Argument::parse(int argc, char* argv[]) {
     }
     std::string argv_0 (argv[0]);
 
-    arguments_["executiveDir"] = argv[0];
+    arguments_["executiveDir"] = file_util::getExecutiveDir(argv_0);
     LOG_DEBUG("Executive Dir " << arguments_["executiveDir"]);
     arguments_["resourceDir"] = arguments_["executiveDir"] + file_util::getFileSeparator() + file_util::getResourceDirName();
 
     arguments_["databaseFileName"] = database_file_name;
 
     if (vm.count("proteoform-file-name")) {
-      proteoform_file_list_ = vm["input-file-name"].as<std::vector<std::string> >(); 
+      proteoform_file_list_ = vm["proteoform-file-name"].as<std::vector<std::string> >(); 
     }
 
     if (vm.count("fixed-mod")) {
@@ -124,7 +126,7 @@ bool Argument::parse(int argc, char* argv[]) {
     }
 
     if (vm.count("output")) {
-      arguments_["mergedOutputName"] = merged_output_name; 
+      arguments_["mergedOutputFileName"] = merged_output_name; 
     }
   }
   catch(std::exception&e ) {

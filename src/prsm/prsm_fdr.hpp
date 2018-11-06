@@ -44,7 +44,7 @@ class PrsmFdr {
 
   void computeFdr(PrsmStrPtrVec &target, PrsmStrPtrVec &decoy);
 
-  void computeProteoformFdr(PrsmStrPtr2D &target, PrsmStrPtr2D &decoy);
+  void computeProteoformFdr(PrsmStrPtrVec2D &target, PrsmStrPtrVec2D &decoy);
 };
 typedef std::shared_ptr<PrsmFdr> PrsmFdrPtr;
 

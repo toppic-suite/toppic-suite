@@ -30,12 +30,12 @@ namespace prot {
 
 class PrsmSampleMerge {
  public:
-  PrsmSampleMerge(const std::string &database_file_name,
+  PrsmSampleMerge(const std::string &db_file_name,
                   const std::vector<std::string> &input_file_names,
                   const std::string &output_file_name,
                   const std::string &fix_mod,
                   double error_tole):
-      database_file_name_(database_file_name),
+      db_file_name_(db_file_name),
       input_file_names_(input_file_names),
       output_file_name_(output_file_name),
       fix_mod_(fix_mod),
@@ -43,8 +43,18 @@ class PrsmSampleMerge {
 
   void process();
 
+  void getPrsmClusters(PrsmStrPtrVec& prsm_ptrs, PrsmStrPtrVec2D& clusters);
+
+  void convertClustersToTable(PrsmStrPtrVec2D &clusters, 
+                              PrsmStrPtrVec2D &table_prsms,
+                              int sample_num);
+
+  void outputTable(PrsmStrPtrVec2D &cluster,
+                   PrsmStrPtrVec2D &table_prsms,
+                   int sample_num);
+
  private:
-  std::string database_file_name_;
+  std::string db_file_name_;
   std::vector<std::string> input_file_names_;
   std::string output_file_name_;
   std::string fix_mod_;

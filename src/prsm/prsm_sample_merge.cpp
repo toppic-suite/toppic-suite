@@ -18,139 +18,128 @@
 
 #include "base/file_util.hpp"
 #include "base/proteoform_util.hpp"
+#include "base/mod_util.hpp"
+#include "base/fasta_index_reader.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_sample_merge.hpp"
 
 namespace prot {
 
-/*
-std::vector<PrsmStrPtrVec> PrsmCluster::groupProteins(const PrsmStrPtrVec &prsm_ptrs) {
-  // get max shift number
-  int max_shift_number = 0;
+void PrsmSampleMerge::getPrsmClusters(PrsmStrPtrVec& prsm_ptrs,
+                                      PrsmStrPtrVec2D& clusters) {
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
-    int cur_shift_number = prsm_ptrs[i]->getUnexpectedPtmNum();
-    if (max_shift_number < cur_shift_number) {
-      max_shift_number = cur_shift_number;
-    }
-  }
-  // get proteoform groups
-  std::vector<PrsmStrPtrVec> proteogroups;
-  for (int shift = 0; shift <= max_shift_number; shift++) {
-    PrsmStrPtrVec proteo_ptrs;
-    for (size_t i = 0; i < prsm_ptrs.size(); i++) {
-      if (shift == prsm_ptrs[i]->getUnexpectedPtmNum()) {
-        proteo_ptrs.push_back(prsm_ptrs[i]);
-      }
-    }
-    proteogroups.push_back(proteo_ptrs);
-  }
-  return proteogroups;
-}
-
-std::vector<PrsmStrPtrVec> PrsmCluster::getZeroPtmList(const PrsmStrPtrVec& proteo_ptrs, double ppo) {
-  std::vector<PrsmStrPtrVec> clusters;
-  for (size_t i = 0; i < proteo_ptrs.size(); i++) {
     bool is_found = false;
+    PrsmStrPtr cur_ptr = prsm_ptrs[i];
     for (size_t j = 0; j < clusters.size(); j++) {
-      if (PrsmStr::isSameSeqAndMass(proteo_ptrs[i], clusters[j][0], ppo)) {
-        clusters[j].push_back(proteo_ptrs[i]);
+      PrsmStrPtr ref_ptr = clusters[j][0];
+      if (cur_ptr->getProtId() == ref_ptr->getProtId()) {
+        if (std::abs(cur_ptr->getAdjustedPrecMass() - ref_ptr->getAdjustedPrecMass()) 
+            <= error_tole_) {
+          clusters[j].push_back(cur_ptr);
+          is_found = true;
+          break;
+        }
+      } else if (cur_ptr->getProteinMatchSeq() == ref_ptr->getProteinMatchSeq()) {
+        clusters[j].push_back(cur_ptr);
         is_found = true;
         break;
       }
     }
     if (!is_found) {
       PrsmStrPtrVec new_clusters;
-      new_clusters.push_back(proteo_ptrs[i]);
+      new_clusters.push_back(prsm_ptrs[i]);
       clusters.push_back(new_clusters);
     }
   }
-  return clusters;
 }
 
-void PrsmCluster::setProtId(PrsmStrPtrVec& prsm_ptrs) {
-  std::vector<PrsmStrPtrVec> proteins;
-  std::vector<std::string> protein_names;
-  for (size_t i = 0; i < prsm_ptrs.size(); i++) {
-    std::string name = prsm_ptrs[i]->getSeqName();
-    bool is_found = false;
-    for (size_t j = 0; j < protein_names.size(); j++) {
-      if (protein_names[j] == name) {
-        proteins[j].push_back(prsm_ptrs[i]);
-        is_found = true;
-        break;
-      }
-    }
-    if (!is_found) {
-      PrsmStrPtrVec new_protein;
-      new_protein.push_back(prsm_ptrs[i]);
-      proteins.push_back(new_protein);
-      protein_names.push_back(name);
-    }
-  }
 
-  for (size_t i = 0; i < proteins.size(); i++) {
-    for (size_t j = 0; j < proteins[i].size(); j++) {
-      proteins[i][j]->setProtId(i);
-    }
-  }
-}
-
-void PrsmCluster::setClusterId(PrsmStrPtrVec& prsm_ptrs, double ppo) {
-  std::vector<PrsmStrPtrVec> proteo_groups = groupProteins(prsm_ptrs);
-
-  // find zero ptm clusters
-  std::vector<PrsmStrPtrVec> clusters = getZeroPtmList(proteo_groups[0], ppo);
-
-  for (size_t i = 1; i < proteo_groups.size(); i++) {
-    for (size_t j = 0; j < proteo_groups[i].size(); j++) {
-      bool is_found = false;
-      for (size_t m = 0; m < clusters.size(); m++) {
-        if (PrsmStr::isStrictCompatiablePtmSpecies(proteo_groups[i][j], clusters[m][0], ppo)) {
-          clusters[m].push_back(proteo_groups[i][j]);
-          is_found = true;
-          break;
-        }
-      }
-      if (!is_found) {
-        PrsmStrPtrVec new_clusters;
-        new_clusters.push_back(proteo_groups[i][j]);
-        clusters.push_back(new_clusters);
-      }
-    }
-  }
-
-  for (size_t i = 0; i < clusters.size(); i++) {
+void PrsmSampleMerge::convertClustersToTable(PrsmStrPtrVec2D &clusters, 
+                                             PrsmStrPtrVec2D &table_prsms,
+                                             int sample_num) {
+  int cluster_num = clusters.size();
+  PrsmStrPtr null_prsm = nullptr;
+  for (int i = 0; i < cluster_num; i++) {
+    PrsmStrPtrVec cur_prsms(sample_num);
     for (size_t j = 0; j < clusters[i].size(); j++) {
-      clusters[i][j]->setClusterId(i);
+      PrsmStrPtr cur_prsm = clusters[i][j];
+      int sample_id = cur_prsm->getSampleId();
+      cur_prsms[sample_id] = cur_prsm;
     }
+    table_prsms.push_back(cur_prsms);
   }
 }
-*/
+
+void PrsmSampleMerge::outputTable(PrsmStrPtrVec2D &clusters,
+                                  PrsmStrPtrVec2D &table_prsms,
+                                  int sample_num) {
+  std::ofstream file;
+  file.open(output_file_name_.c_str());
+  // write title
+  file << "Protein name" << "\t"
+      << "Adjusted precursor mass" << "\t"
+      << "First residue" << "\t"
+      << "Last residue" << "\t"
+      << "Proteoform" << "\t"
+      << "#variable PTMs" << "\t"
+      << "#unexpected modifications" << "\t";
+
+  for (int i = 0; i < sample_num; i++) {
+    file << input_file_names_[i] << " abundance" << "\t"
+        << input_file_names_[i] << " E-value" << "\t";
+  }
+  file << std::endl;
+  int cluster_num = clusters.size();
+  for (int i = 0; i < cluster_num; i++) {
+    PrsmStrPtr prsm_ptr = clusters[i][0];
+    file << prsm_ptr->getSeqName() << " "
+        << prsm_ptr->getSeqDesc() << "\t"
+        << prsm_ptr->getAdjustedPrecMass() << "\t"
+        << (prsm_ptr->getProteoformStartPos() + 1) << "\t"
+        << (prsm_ptr->getProteoformEndPos() + 1) << "\t"
+        << prsm_ptr->getProteinMatchSeq() << "\t"
+        << prsm_ptr->getVariablePtmNum() << "\t"
+        << prsm_ptr->getUnexpectedPtmNum() << "\t";
+    for (int j = 0; j < sample_num; j++) {
+      PrsmStrPtr sample_prsm = table_prsms[i][j];
+      if (sample_prsm == nullptr) {
+        file << "\t" << "\t";
+      }
+      else {
+        if (sample_prsm->getPrecFeatureInte() > 0) {
+          file << sample_prsm->getPrecFeatureInte() << "\t";
+        } else {
+          file << "-" << "\t";
+        }
+        file << sample_prsm->getEValue() << "\t";
+      }
+    }
+    file << std::endl;
+  }
+  file.close();
+}
 
 void PrsmSampleMerge::process() {
-  /*
-  PrsmStrPtr2D all_prsms; 
-  for (int i = 0; i < input_file_names_.size(); i++) {
-    std::string input_file_name = input_file_names[i];
-    LOG_DEBUG("Reading prsm strings started");
-    PrsmStrPtrVec prsm_ptrs = PrsmReader::readAllPrsmStrs(input_file_name);
-    LOG_DEBUG("Reading prsm strings finished");
+  FastaIndexReaderPtr seq_reader = std::make_shared<FastaIndexReader>(db_file_name_);
+  ModPtrVec fix_mod_ptr_vec = mod_util::geneFixedModList(fix_mod_);
+  PrsmStrPtrVec all_prsms; 
+  size_t sample_num = input_file_names_.size();
+  for (size_t k = 0; k < sample_num; k++) {
+    std::string input_file_name = input_file_names_[k];
+    PrsmStrPtrVec prsms = PrsmReader::readAllPrsmStrsMatchSeq(input_file_name, seq_reader,
+                                                              fix_mod_ptr_vec);
+    for (size_t i = 0; i < prsms.size(); i++) {
+      prsms[i]->setSampleId(k);
+    }
+    all_prsms.insert(all_prsms.end(), prsms.begin(), prsms.end());
   }
-  std::string base_name = file_util::basename(spec_file_name_);
-  std::string input_file_name = base_name + "." + input_file_ext_;
-  LOG_DEBUG("Reading prsm strings started");
-  PrsmStrPtrVec prsm_ptrs = PrsmReader::readAllPrsmStrs(input_file_name);
-  LOG_DEBUG("Reading prsm strings finished");
-  sort(prsm_ptrs.begin(), prsm_ptrs.end(), PrsmStr::cmpEValueInc);
-  setProtId(prsm_ptrs);
-  setClusterId(prsm_ptrs, ppo_);
-  sort(prsm_ptrs.begin(), prsm_ptrs.end(), PrsmStr::cmpSpectrumIdIncPrecursorIdInc);
-  // output
-  std::string output_file_name = base_name + "." + output_file_ext_;
-  PrsmXmlWriter writer(output_file_name);
-  writer.writeVector(prsm_ptrs);
-  writer.close();
-  */
+  std::sort(all_prsms.begin(), all_prsms.end(), PrsmStr::cmpEValueInc);
+  PrsmStrPtrVec2D clusters; 
+  getPrsmClusters(all_prsms, clusters);
+  
+  PrsmStrPtrVec2D table_prsms; 
+  convertClustersToTable(clusters, table_prsms, sample_num);
+  outputTable(clusters, table_prsms, sample_num);
 }
 
 }  // namespace prot
