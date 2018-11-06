@@ -22,7 +22,6 @@
 
 int main(int argc, char *argv[]) {
   // make sure we are using the c locale
-
   QLocale::setDefault(QLocale::c());
 
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
