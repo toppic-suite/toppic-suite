@@ -12,33 +12,12 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <map>
-#include <iostream>
-#include <string>
 #include <algorithm>
 
-#include "console/topmerge_argument.hpp"
 #include "console/topmerge_process.hpp"
+#include "gui/topmerge/threadtopmerge.h"
 
-using namespace prot;
-
-int main(int argc, char* argv[]) {
-  //prot::log_level = 2;
-  LOG_DEBUG("Parsing start!");
-  Argument argu_processor;
-  bool success = argu_processor.parse(argc, argv);
-  
-  LOG_DEBUG("Parsing success!");
-
-  if (!success) {
-    return 1;
-  }
-
-  std::map<std::string, std::string> arguments = argu_processor.getArguments();
-
-  std::vector<std::string> proteo_file_list = argu_processor.getProteoformFileList();
-
-  topMergeProcess(arguments, proteo_file_list);
-
-  return 0;
+void ThreadTopMerge::run() {
+  std::sort(proteoform_file_lst_.begin(), proteoform_file_lst_.end());
+  prot::topMergeProcess(arguments_, proteoform_file_lst_);
 }

@@ -15,6 +15,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <sstream>
 
 #include <QFileDialog>
 #include <QElapsedTimer>

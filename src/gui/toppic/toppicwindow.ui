@@ -160,7 +160,7 @@ p, li { white-space: pre-wrap; }
    <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
-      <x>20</x>
+      <x>30</x>
       <y>10</y>
       <width>881</width>
       <height>321</height>
@@ -172,7 +172,7 @@ p, li { white-space: pre-wrap; }
      </font>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_4">
      <attribute name="title">
@@ -259,7 +259,7 @@ p, li { white-space: pre-wrap; }
           </font>
          </property>
          <property name="text">
-          <string>Spectrum file: </string>
+          <string>Spectrum files: </string>
          </property>
         </widget>
        </item>

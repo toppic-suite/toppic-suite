@@ -12,33 +12,43 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+
+#ifndef PROT_GUI_THREADTOPMERGE_H
+#define PROT_GUI_THREADTOPMERGE_H
+
 #include <map>
-#include <iostream>
 #include <string>
+#include <iostream>
 #include <algorithm>
+#include <vector>
 
-#include "console/topmerge_argument.hpp"
-#include "console/topmerge_process.hpp"
+#include <QThread>
 
-using namespace prot;
+namespace Ui {
+class ThreadTopMerge;
+}
 
-int main(int argc, char* argv[]) {
-  //prot::log_level = 2;
-  LOG_DEBUG("Parsing start!");
-  Argument argu_processor;
-  bool success = argu_processor.parse(argc, argv);
-  
-  LOG_DEBUG("Parsing success!");
+class ThreadTopMerge : public QThread {
+  Q_OBJECT
 
-  if (!success) {
-    return 1;
+ public:
+  explicit ThreadTopMerge(QObject* par) : QThread(par) {}
+
+  ~ThreadTopMerge() {}
+
+  void run();
+
+  void setPar(std::map<std::string, std::string> arguments,
+              const std::vector<std::string> & proteoform_file_lst) {
+    arguments_ = arguments;
+    proteoform_file_lst_ = proteoform_file_lst;
   }
 
-  std::map<std::string, std::string> arguments = argu_processor.getArguments();
+ private:
+  std::map<std::string, std::string> arguments_;
 
-  std::vector<std::string> proteo_file_list = argu_processor.getProteoformFileList();
+  std::vector<std::string> proteoform_file_lst_;
+};
 
-  topMergeProcess(arguments, proteo_file_list);
+#endif
 
-  return 0;
-}

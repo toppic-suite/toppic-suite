@@ -95,6 +95,8 @@ file(GLOB TOPPIC_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/toppic/*.cpp)
 file(GLOB TOPPIC_GUI_QRC   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/toppic/*.qrc)
 file(GLOB TOPMG_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topmg/*.cpp)
 file(GLOB TOPMG_GUI_QRC   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topmg/*.qrc)
+file(GLOB TOPMERGE_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topmerge/*.cpp)
+file(GLOB TOPMERGE_GUI_QRC   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topmerge/*.qrc)
 
 # MCMC
 file(GLOB MCMC_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/mcmc/*.cpp)
@@ -104,6 +106,7 @@ file(GLOB UNIT_TEST_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/*.cpp)
 
 # merge
 file(GLOB TOPMERGE_MAIN_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmerge.cpp)
+file(GLOB TOPMERGE_PROCESS_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmerge_process.cpp)
 file(GLOB TOPMERGE_ARGU_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmerge_argument.cpp)
 
 # quant
@@ -134,7 +137,9 @@ add_executable(topfd_gui ${TOPFD_GUI_SRCS} ${TOPFD_GUI_QRC} ${HTS_SRCS} ${BASE_S
 
 add_executable(topquant ${TOPQUANT_MAIN_SRCS} ${TOPQUANT_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS})
 
-add_executable(topmerge ${TOPMERGE_MAIN_SRCS} ${TOPMERGE_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS})
+add_executable(topmerge ${TOPMERGE_MAIN_SRCS} ${TOPMERGE_PROCESS_SRCS} ${TOPMERGE_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS})
+
+add_executable(topmerge_gui ${TOPMERGE_GUI_SRCS} ${TOPMERGE_GUI_QRC} ${TOPMERGE_PROCESS_SRCS} ${TOPMERGE_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS})
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     target_link_libraries(toppic xalan-c xalanMsg xerces-c
@@ -149,6 +154,9 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
         boost_program_options-mt boost_filesystem-mt
         boost_system-mt boost_thread-mt
         boost_iostreams-mt boost_chrono-mt pthread z Ws2_32)
+
+    target_link_libraries(topmerge xalan-c xerces-c boost_program_options-mt
+        boost_filesystem-mt boost_system-mt boost_thread-mt pthread z Ws2_32)
 
     # for Qt
     SET(QTOPTION -Wl,-subsystem,windows)
@@ -165,11 +173,13 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
         boost_filesystem-mt boost_system-mt
         boost_program_options-mt boost_thread-mt pthread z Ws2_32)
 
+    target_link_libraries(topmerge_gui ${QTOPTION} Qt5Widgets Qt5Core Qt5Gui xalan-c xalanMsg xerces-c
+        boost_filesystem-mt boost_system-mt 
+        boost_program_options-mt boost_thread-mt pthread z Ws2_32)
+
     target_link_libraries(topquant xalan-c xerces-c boost_program_options-mt
         boost_filesystem-mt boost_system-mt boost_thread-mt pthread z Ws2_32)
 
-    target_link_libraries(topmerge xalan-c xerces-c boost_program_options-mt
-        boost_filesystem-mt boost_system-mt boost_thread-mt pthread z Ws2_32)
 
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows") 
 
@@ -212,5 +222,8 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
     target_link_libraries(topmerge xalan-c xerces-c boost_program_options
         boost_filesystem boost_system boost_thread pthread z)
+
+    target_link_libraries(topmerge_gui Qt5Widgets Qt5Core Qt5Gui
+        xalan-c xerces-c boost_program_options boost_filesystem boost_system boost_thread boost_iostreams pthread z)
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
 
