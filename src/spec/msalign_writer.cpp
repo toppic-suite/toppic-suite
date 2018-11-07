@@ -55,7 +55,7 @@ void write(std::ofstream &file, DeconvMsPtr ms_ptr) {
     file << std::setprecision(5) << peak_ptr->getPosition();
     file << "\t" << std::setprecision(2) << peak_ptr->getIntensity();
     file << "\t" << peak_ptr->getCharge();
-    file << "\t" << std::setprecision(2) << peak_ptr->getScore();
+    //file << "\t" << std::setprecision(2) << peak_ptr->getScore();
     file << std::endl;
   }
   file << "END IONS" << std::endl;
