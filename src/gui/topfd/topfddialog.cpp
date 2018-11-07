@@ -113,7 +113,7 @@ void TopFDDialog::on_clearButton_clicked() {
   ui->windowSizeEdit->clear();
   ui->missLevelOneCheckBox->setChecked(false);
   ui->outputTextBrowser->clear();
-  ui->outputTextBrowser->setText("Click the Start button to process the spectrum file.");
+  ui->outputTextBrowser->setText("Click the Start button to process the spectrum files.");
   lastDir_ = "/";
 }
 
@@ -126,7 +126,7 @@ void TopFDDialog::on_defaultButton_clicked() {
   ui->windowSizeEdit->setText("3.0");
   ui->missLevelOneCheckBox->setChecked(false);
   ui->outputTextBrowser->clear();
-  ui->outputTextBrowser->setText("Click the Start button to process the spectrum file.");
+  ui->outputTextBrowser->setText("Click the Start button to process the spectrum files.");
 }
 
 std::vector<std::string> TopFDDialog::getSpecFileList() {
