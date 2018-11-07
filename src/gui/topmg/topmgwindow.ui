@@ -42,7 +42,7 @@
       <x>30</x>
       <y>380</y>
       <width>861</width>
-      <height>251</height>
+      <height>271</height>
      </rect>
     </property>
     <property name="font">
@@ -62,7 +62,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>630</y>
+      <y>650</y>
       <width>861</width>
       <height>55</height>
      </rect>
@@ -1286,7 +1286,6 @@ QGroupBox::title {
    <zorder>outputTextBrowser</zorder>
    <zorder>horizontalLayoutWidget_7</zorder>
   </widget>
-  <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
