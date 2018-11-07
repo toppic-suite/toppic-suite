@@ -37,7 +37,7 @@ namespace fs = boost::filesystem;
 #include "threadtopfd.h"
 
 TopFDDialog::TopFDDialog(QWidget *parent) :
-    QDialog(parent),
+    QMainWindow(parent),
     ui(new Ui::TopFDDialog) {
       initArguments();
       ui->setupUi(this);

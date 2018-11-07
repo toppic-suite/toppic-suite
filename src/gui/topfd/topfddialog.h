@@ -18,7 +18,7 @@
 #include <map>
 #include <string>
 
-#include <QDialog>
+#include <QMainWindow>
 
 #include "threadtopfd.h"
 
@@ -26,7 +26,7 @@ namespace Ui {
 class TopFDDialog;
 }
 
-class TopFDDialog : public QDialog {
+class TopFDDialog : public QMainWindow {
   Q_OBJECT
 
 public:
