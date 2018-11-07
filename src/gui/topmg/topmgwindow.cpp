@@ -109,7 +109,7 @@ void topmgWindow::on_clearButton_clicked() {
   ui->combinedOutputEdit->clear();
   ui->combinedOutputEdit->setEnabled(false);
   ui->skipListEdit->clear();
-  ui->outputTextBrowser->setText("Click the Start button to process the spectrum file.");
+  ui->outputTextBrowser->setText("Click the Start button to process the spectrum files.");
 }
 
 void topmgWindow::on_defaultButton_clicked() {

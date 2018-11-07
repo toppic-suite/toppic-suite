@@ -111,7 +111,7 @@ void toppicWindow::initArguments() {
 void toppicWindow::on_clearButton_clicked() {
   ui->databaseFileEdit->clear();
   ui->listWidget->clear();
-  ui->outputTextBrowser->setText("Click the Start button to process the spectrum file.");
+  ui->outputTextBrowser->setText("Click the Start button to process the spectrum files.");
   ui->combinedOutputEdit->setText("");
   ui->combinedOutputEdit->setEnabled(false);
   ui->outputButton->setEnabled(false);
@@ -128,7 +128,7 @@ void toppicWindow::on_defaultButton_clicked() {
   ui->numCombinedEdit->setText("1");
   ui->miscoreThresholdEdit->setText("0.45");
   ui->threadNumberEdit->setText("1");
-  ui->outputTextBrowser->setText("Click the Start button to process the spectrum file.");
+  ui->outputTextBrowser->setText("Click the Start button to process the spectrum files.");
   ui->fixedModComboBox->setCurrentIndex(0);
   on_fixedModComboBox_currentIndexChanged(0);
   ui->activationComboBox->setCurrentIndex(0);
