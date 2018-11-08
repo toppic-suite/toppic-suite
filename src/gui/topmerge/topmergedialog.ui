@@ -177,7 +177,7 @@
         <bool>false</bool>
        </property>
        <property name="text">
-        <string>Output folder</string>
+        <string>Output Folder</string>
        </property>
       </widget>
      </item>
