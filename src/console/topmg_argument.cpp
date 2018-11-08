@@ -113,7 +113,7 @@ void Argument::outputArguments(std::ostream &output, std::map<std::string, std::
 
 std::string Argument::outputCsvArguments(std::map<std::string, std::string> arguments) {
   std::stringstream output;
-  std::string comma = ",,,,,";
+  std::string comma = ",";
   output << "********************** Parameters **********************" << std::endl;
   output << "Protein database file:" << comma << arguments["oriDatabaseFileName"] << std::endl;
   output << "Spectrum file:" << comma << arguments["spectrumFileName"] << std::endl;
