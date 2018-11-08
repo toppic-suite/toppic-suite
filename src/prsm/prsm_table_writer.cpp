@@ -38,7 +38,7 @@ void PrsmTableWriter::write() {
   std::string output_file_name = base_name + output_file_ext_;
   std::ofstream file;
   file.open(output_file_name.c_str());
-  Argument::outputArguments(file, arguments_);
+  file << argu_str_;
   // write title
   file << "Data file name" << ","
       << "Prsm ID" << ","
