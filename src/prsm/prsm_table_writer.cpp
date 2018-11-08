@@ -40,30 +40,31 @@ void PrsmTableWriter::write() {
   file.open(output_file_name.c_str());
   Argument::outputArguments(file, arguments_);
   // write title
-  file << "Data file name" << "\t"
-      << "Prsm ID" << "\t"
-      << "Spectrum ID"<< "\t"
-      << "Fragmentation" << "\t"
-      << "Scan(s)" << "\t"
-      << "Retention time" << "\t"
-      << "#peaks"<< "\t"
-      << "Charge" << "\t"
-      << "Precursor mass" << "\t"
-      << "Adjusted precursor mass" << "\t"
-      << "Proteoform ID" << "\t"
-      << "Feature intensity" << "\t"
-      << "Protein name" << "\t"
-      << "First residue" << "\t"
-      << "Last residue" << "\t"
-      << "Proteoform" << "\t"
-      << "#unexpected modifications" << "\t"
-      << "MIScore" << "\t"
-      << "#variable PTMs" << "\t"
-      << "#matched peaks" << "\t"
-      << "#matched fragment ions" << "\t"
-      << "P-value" << "\t"
-      << "E-value" << "\t"
-      << "Q-value (spectral FDR)" << "\t"
+  file << "Data file name" << ","
+      << "Prsm ID" << ","
+      << "Spectrum ID"<< ","
+      << "Fragmentation" << ","
+      << "Scan(s)" << ","
+      << "Retention time" << ","
+      << "#peaks"<< ","
+      << "Charge" << ","
+      << "Precursor mass" << ","
+      << "Adjusted precursor mass" << ","
+      << "Proteoform ID" << ","
+      << "Feature intensity" << ","
+      << "Protein accession" << ","
+      << "Protein description" << ","
+      << "First residue" << ","
+      << "Last residue" << ","
+      << "Proteoform" << ","
+      << "#unexpected modifications" << ","
+      << "MIScore" << ","
+      << "#variable PTMs" << ","
+      << "#matched peaks" << ","
+      << "#matched fragment ions" << ","
+      << "P-value" << ","
+      << "E-value" << ","
+      << "Q-value (spectral FDR)" << ","
       << "Proteoform FDR" << std::endl;
 
   std::string input_file_name = file_util::basename(spectrum_file_name) + "." + input_file_ext_;
@@ -131,42 +132,42 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
 
   file << std::setprecision(10);
   LOG_DEBUG("start output prsm ");
-  file << prsm_ptr->getFileName() << "\t"
-      << prsm_ptr->getPrsmId() << "\t"
-      << spec_ids << "\t"
-      << spec_activations<< "\t"
-      << spec_scans << "\t"
-      << retention_time << "\t"
-      << peak_num << "\t"
-      << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecCharge() << "\t"
-      << prsm_ptr->getOriPrecMass()<< "\t"
-      << prsm_ptr->getAdjustedPrecMass() << "\t"
-      << prsm_ptr->getProteoformPtr()->getProteoClusterId() << "\t";
+  file << prsm_ptr->getFileName() << ","
+      << prsm_ptr->getPrsmId() << ","
+      << spec_ids << ","
+      << spec_activations<< ","
+      << spec_scans << ","
+      << retention_time << ","
+      << peak_num << ","
+      << deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecCharge() << ","
+      << prsm_ptr->getOriPrecMass()<< ","
+      << prsm_ptr->getAdjustedPrecMass() << ","
+      << prsm_ptr->getProteoformPtr()->getProteoClusterId() << ",";
 
   if (prsm_ptr->getPrecFeatureInte() > 0) {
-    file << prsm_ptr->getPrecFeatureInte() << "\t";
+    file << prsm_ptr->getPrecFeatureInte() << ",";
   } else {
-    file << "-" << "\t";
+    file << "-" << ",";
   }
 
-  file << prsm_ptr->getProteoformPtr()->getSeqName() << " "
-      << prsm_ptr->getProteoformPtr()->getSeqDesc() << "\t"
-      << (prsm_ptr->getProteoformPtr()->getStartPos() + 1) << "\t"
-      << (prsm_ptr->getProteoformPtr()->getEndPos() + 1) << "\t"
-      << prsm_ptr->getProteoformPtr()->getProteinMatchSeq() << "\t"
-      << ptm_num << "\t"
-      << prsm_ptr->getProteoformPtr()->getMIScore() << "\t"
-      << prsm_ptr->getProteoformPtr()->getVariablePtmNum() << "\t"
-      << prsm_ptr->getMatchPeakNum() << "\t"
-      << prsm_ptr->getMatchFragNum() << "\t"
-      << prsm_ptr->getPValue() << "\t"
-      << prsm_ptr->getEValue() << "\t";
+  file << prsm_ptr->getProteoformPtr()->getSeqName() << ","
+      << prsm_ptr->getProteoformPtr()->getSeqDesc() << ","
+      << (prsm_ptr->getProteoformPtr()->getStartPos() + 1) << ","
+      << (prsm_ptr->getProteoformPtr()->getEndPos() + 1) << ","
+      << prsm_ptr->getProteoformPtr()->getProteinMatchSeq() << ","
+      << ptm_num << ","
+      << prsm_ptr->getProteoformPtr()->getMIScore() << ","
+      << prsm_ptr->getProteoformPtr()->getVariablePtmNum() << ","
+      << prsm_ptr->getMatchPeakNum() << ","
+      << prsm_ptr->getMatchFragNum() << ","
+      << prsm_ptr->getPValue() << ","
+      << prsm_ptr->getEValue() << ",";
 
   double fdr = prsm_ptr->getFdr();
   if (fdr >= 0) {
-    file << fdr << "\t";
+    file << fdr << ",";
   } else {
-    file << "-" << "\t";
+    file << "-" << ",";
   }
 
   double proteoform_fdr = prsm_ptr->getProteoformFdr();
