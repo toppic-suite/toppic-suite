@@ -18,7 +18,7 @@
 #include <map>
 #include <string>
 
-#include <QDialog>
+#include <QMainWindow>
 
 #include "threadtopmerge.h"
 
@@ -26,7 +26,7 @@ namespace Ui {
 class TopMergeDialog;
 }
 
-class TopMergeDialog : public QDialog {
+class TopMergeDialog : public QMainWindow {
   Q_OBJECT
 
 public:

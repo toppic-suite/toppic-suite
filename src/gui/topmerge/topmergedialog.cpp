@@ -35,7 +35,7 @@
 namespace fs = boost::filesystem;
 
 TopMergeDialog::TopMergeDialog(QWidget *parent) :
-    QDialog(parent),
+    QMainWindow(parent),
     ui(new Ui::TopMergeDialog) {
       initArguments();
       ui->setupUi(this);
@@ -108,7 +108,7 @@ void TopMergeDialog::initArguments() {
   arguments_["databaseFileName"] = "";
   arguments_["fixedMod"] = "";
   arguments_["errorTolerance"] = "1.2";
-  arguments_["mergedOutputFileName"] = "sample_merged.tsv";
+  arguments_["mergedOutputFileName"] = "sample_merged.csv";
 }
 
 void TopMergeDialog::on_clearButton_clicked() {
@@ -123,7 +123,7 @@ void TopMergeDialog::on_defaultButton_clicked() {
   ui->fixedModComboBox->setCurrentIndex(0);
   on_fixedModComboBox_currentIndexChanged(0);
   ui->precErrorEdit->setText("1.2");
-  ui->outputEdit->setText("sample_merged.tsv");
+  ui->outputEdit->setText("sample_merged.csv");
   ui->outputTextBrowser->setText("Click the Start button to merge identification files.");
 }
 

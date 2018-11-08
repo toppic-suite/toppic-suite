@@ -287,7 +287,7 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
 
     std::cout << "Outputting PrSM table - started." << std::endl;
     PrsmTableWriterPtr table_out
-        = std::make_shared<PrsmTableWriter>(prsm_para_ptr, arguments, "topmg_prsm_cutoff", "_topmg_prsm.tsv");
+        = std::make_shared<PrsmTableWriter>(prsm_para_ptr, arguments, "topmg_prsm_cutoff", "_topmg_prsm.csv");
     table_out->write();
     table_out = nullptr;
     std::cout << "Outputting PrSM table - finished." << std::endl;
@@ -323,7 +323,7 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
     std::cout << "Outputting proteoform table - started." << std::endl;
     PrsmTableWriterPtr form_out
         = std::make_shared<PrsmTableWriter>(prsm_para_ptr, arguments,
-                                            "topmg_form_cutoff_form", "_topmg_proteoform.tsv");
+                                            "topmg_form_cutoff_form", "_topmg_proteoform.csv");
     form_out->write();
     form_out = nullptr;
     std::cout << "Outputting proteoform table - finished." << std::endl;

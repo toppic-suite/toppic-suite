@@ -76,42 +76,43 @@ void PrsmSampleMerge::outputTable(PrsmStrPtrVec2D &clusters,
   std::ofstream file;
   file.open(output_file_name_.c_str());
   // write title
-  file << "Protein name" << "\t"
-      << "Adjusted precursor mass" << "\t"
-      << "First residue" << "\t"
-      << "Last residue" << "\t"
-      << "Proteoform" << "\t"
-      << "#variable PTMs" << "\t"
-      << "#unexpected modifications" << "\t";
+  file << "Protein accession" << ","
+      << "Protein description" << ","
+      << "Adjusted precursor mass" << ","
+      << "First residue" << ","
+      << "Last residue" << ","
+      << "Proteoform" << ","
+      << "#variable PTMs" << ","
+      << "#unexpected modifications" << ",";
 
   for (int i = 0; i < sample_num; i++) {
-    file << input_file_names_[i] << " abundance" << "\t"
-        << input_file_names_[i] << " E-value" << "\t";
+    file << input_file_names_[i] << " abundance" << ","
+        << input_file_names_[i] << " E-value" << ",";
   }
   file << std::endl;
   int cluster_num = clusters.size();
   for (int i = 0; i < cluster_num; i++) {
     PrsmStrPtr prsm_ptr = clusters[i][0];
-    file << prsm_ptr->getSeqName() << " "
-        << prsm_ptr->getSeqDesc() << "\t"
-        << prsm_ptr->getAdjustedPrecMass() << "\t"
-        << (prsm_ptr->getProteoformStartPos() + 1) << "\t"
-        << (prsm_ptr->getProteoformEndPos() + 1) << "\t"
-        << prsm_ptr->getProteinMatchSeq() << "\t"
-        << prsm_ptr->getVariablePtmNum() << "\t"
-        << prsm_ptr->getUnexpectedPtmNum() << "\t";
+    file << prsm_ptr->getSeqName() << ","
+        << prsm_ptr->getSeqDesc() << ","
+        << prsm_ptr->getAdjustedPrecMass() << ","
+        << (prsm_ptr->getProteoformStartPos() + 1) << ","
+        << (prsm_ptr->getProteoformEndPos() + 1) << ","
+        << prsm_ptr->getProteinMatchSeq() << ","
+        << prsm_ptr->getVariablePtmNum() << ","
+        << prsm_ptr->getUnexpectedPtmNum() << ",";
     for (int j = 0; j < sample_num; j++) {
       PrsmStrPtr sample_prsm = table_prsms[i][j];
       if (sample_prsm == nullptr) {
-        file << "\t" << "\t";
+        file << "," << ",";
       }
       else {
         if (sample_prsm->getPrecFeatureInte() > 0) {
-          file << sample_prsm->getPrecFeatureInte() << "\t";
+          file << sample_prsm->getPrecFeatureInte() << ",";
         } else {
-          file << "-" << "\t";
+          file << "-" << ",";
         }
-        file << sample_prsm->getEValue() << "\t";
+        file << sample_prsm->getEValue() << ",";
       }
     }
     file << std::endl;

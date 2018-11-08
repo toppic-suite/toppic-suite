@@ -33,7 +33,7 @@ void Argument::initArguments() {
   arguments_["databaseFileName"] = "";
   arguments_["fixedMod"] = "";
   arguments_["errorTolerance"] = "1.2";
-  arguments_["mergedOutputFileName"] = "sample_merged.tsv";
+  arguments_["mergedOutputFileName"] = "sample_merged.csv";
 }
 
 void Argument::outputArguments(std::ostream &output, std::map<std::string, std::string> arguments) {
@@ -70,7 +70,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("fixed-mod,f", po::value<std::string> (&fixed_mod), 
          "<C57|C58|a fixed modification file>. Fixed modifications. Three available options: C57, C58, or the name of a text file containing the information of fixed modifications. When C57 is selected, carbamidomethylation on cysteine is the only fixed modification. When C58 is selected, carboxymethylation on cysteine is the only fixed modification.")
         ("error-tolerance,e", po::value<std::string>(&error_tole) , "Specify the error tolerance of precursor masses for mapping identified proteoforms. Default: 1.2 Dalton.")
-        ("output,o", po::value<std::string>(&merged_output_name) , "Specifiy the output file name for the merged results. Default: sample_merged.tsv.");
+        ("output,o", po::value<std::string>(&merged_output_name) , "Specifiy the output file name for the merged results. Default: sample_merged.csv.");
     po::options_description desc("Options");
 
     desc.add_options() 
