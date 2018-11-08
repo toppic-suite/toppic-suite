@@ -27,7 +27,8 @@ namespace feature_util {
 
 void mergeFeatureFiles(const std::vector<std::string> & feature_file_lst,                                       
                        int N, const std::string & output_file) {
-  std::ofstream outfile(output_file);
+  std::ofstream outfile;
+  outfile.open(output_file.c_str());
   for (size_t i = 0; i < feature_file_lst.size(); i++) {
     std::ifstream infile(feature_file_lst[i]);
     std::string line;
