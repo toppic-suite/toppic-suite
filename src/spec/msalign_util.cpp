@@ -55,7 +55,8 @@ int getSpNum(const std::string &spectrum_file_name) {
 
 void mergeMsalignFiles(const std::vector<std::string> & spec_file_lst,
                        int N, const std::string & output_file) {
-  std::ofstream outfile(output_file);
+  std::ofstream outfile; 
+  outfile.open(output_file.c_str());
 
   for (size_t i = 0; i < spec_file_lst.size(); i++) {
     MsAlignReader sp_reader(spec_file_lst[i], 1, nullptr, std::set<std::string>());
