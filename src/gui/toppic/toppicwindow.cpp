@@ -634,7 +634,7 @@ void toppicWindow::on_errorToleranceEdit_textChanged(QString string) {
   QString currentText = ui->errorToleranceEdit->text();
   if (ui->lookupTableCheckBox->isChecked() && currentText != "5" && currentText != "10" && currentText != "15" && currentText != "1") {
     QMessageBox::warning(this, tr("Warning"),
-                         tr("To use an error tolerance other than 5, 10, and 15 ppm, the checkbox \"Lookup table for E-value computation\" should not be checked!"),
+                         tr("When the checkbox \"Lookup table for E-value computation\" is checked, only three error tolerance values 5, 10, and 15 ppm can be used!"),
                          QMessageBox::Yes);
     ui->errorToleranceEdit->setText("15");
   }
