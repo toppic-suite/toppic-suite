@@ -111,6 +111,50 @@ void Argument::outputArguments(std::ostream &output, std::map<std::string, std::
   output << "********************** Parameters **********************" << std::endl;
 }
 
+std::string Argument::outputCsvArguments(std::map<std::string, std::string> arguments) {
+  std::stringstream output;
+  std::string comma = ",,,,,";
+  output << "********************** Parameters **********************" << std::endl;
+  output << "Protein database file:" << comma << arguments["oriDatabaseFileName"] << std::endl;
+  output << "Spectrum file:" << comma << arguments["spectrumFileName"] << std::endl;
+
+  if (arguments["skipList"] != "") {
+    output << "Skip list:" << comma << arguments["skipList"] << std::endl;
+  }
+
+  output << "Fragmentation method:" << comma << arguments["activation"] << std::endl;
+  output << "Search type:" << comma << arguments["searchType"] << std::endl;
+
+  if (arguments["fixedMod"] == "") {
+    output << std::left << "Fixed modifications:" << comma << "None" << std::endl;
+  } else {
+    output << "Fixed modifications:" << comma << arguments["fixedMod"] << std::endl;
+  }
+
+  output << "Use TopFD feature file:" << comma << arguments["useFeatureFile"] << std::endl;
+
+  output << "Error tolerance:" << comma << arguments["errorTolerance"] << " ppm" << std::endl;
+  output << "Spectrum-level cutoff type:" << comma << arguments["cutoffSpectralType"] << std::endl;
+  output << "Spectrum-level cutoff value:" << comma << arguments["cutoffSpectralValue"] << std::endl;
+  output << "Proteoform-level cutoff type:" << comma << arguments["cutoffProteoformType"] << std::endl;
+  output << "Proteoform-level cutoff value:" << comma << arguments["cutoffProteoformValue"] << std::endl;
+  output << "Allowed N-terminal forms:" << comma << "\"" << arguments["allowProtMod"] << "\""  << std::endl;
+  output << "Maximum mass shift of modifications:"  << comma << arguments["maxPtmMass"] << " Da" << std::endl;
+  output << "Thread number:" << comma << arguments["threadNumber"] << std::endl;
+  output << "Modification file name:" << comma << arguments["varModFileName"] << std::endl;
+  output << "Gap in proteoform graph:" << comma << arguments["proteoGraphGap"] << std::endl;
+  output << "Maximum number of variable PTMs:" << comma << arguments["varPtmNumber"] << std::endl;
+  output << "Maximum number of variable PTMs in a graph gap:" << comma << arguments["varPtmNumInGap"] << std::endl;
+  output << "Maximum number of unexpected modifications:" << comma << arguments["ptmNumber"] << std::endl;
+  output << "Executable file directory:" << comma << arguments["executiveDir"] << std::endl;
+  output << "Start time:" << comma << arguments["startTime"] << std::endl;
+  if (arguments["endTime"] != "") {
+    output << "End time:" << comma << arguments["endTime"] << std::endl;
+  }
+  output << "********************** Parameters **********************" << std::endl;
+  return output.str();
+}
+
 void Argument::showUsage(boost::program_options::options_description &desc) {
   std::cout << "Usage: topmg [options] database-file-name spectrum-file-name" << std::endl;
   std::cout << desc << std::endl;

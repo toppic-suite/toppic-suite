@@ -38,6 +38,8 @@ class Argument {
   static void outputArguments(std::ostream &output,
                               std::map<std::string, std::string> arguments);
 
+  static std::string outputCsvArguments(std::map<std::string, std::string> arguments);
+
   bool parse(int argc, char* argv[]);
 
   std::map<std::string, std::string> getArguments() {return arguments_;}

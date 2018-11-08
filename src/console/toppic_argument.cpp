@@ -93,7 +93,7 @@ void Argument::outputArguments(std::ostream &output,
   output << std::setw(44) << std::left << "Spectrum-level cutoff value: " << "\t" << arguments["cutoffSpectralValue"] << std::endl;
   output << std::setw(44) << std::left << "Proteoform-level cutoff type: " << "\t" << arguments["cutoffProteoformType"] << std::endl;
   output << std::setw(44) << std::left << "Proteoform-level cutoff value: " << "\t" << arguments["cutoffProteoformValue"] << std::endl;
-  output << std::setw(44) << std::left << "Allowed N-terminal forms: " << "\t" << arguments["allowProtMod"] << std::endl;
+  output << std::setw(44) << std::left << "Allowed N-terminal forms: " << "\t" <<  arguments["allowProtMod"] << std::endl;
   output << std::setw(44) << std::left << "Maximum mass shift of modifications: " << "\t" << arguments["maxPtmMass"] << " Da" << std::endl;
   output << std::setw(44) << std::left << "Minimum mass shift of modifications: " << "\t" << arguments["minPtmMass"] << " Da" << std::endl;
   output << std::setw(44) << std::left << "Thread number: " << "\t" << arguments["threadNumber"] << std::endl;
@@ -114,6 +114,57 @@ void Argument::outputArguments(std::ostream &output,
     output << std::setw(44) << std::left << "End time: " << "\t" << arguments["endTime"] << std::endl;
   }
   output << "********************** Parameters **********************" << std::endl;
+}
+
+std::string Argument::outputCsvArguments(std::map<std::string, std::string> arguments) {
+  std::stringstream output;
+  output << "********************** Parameters **********************" << std::endl;
+  output << "Protein database file:,,,,," << arguments["oriDatabaseFileName"] << std::endl;
+  output << "Spectrum file:,,,,," << arguments["spectrumFileName"] << std::endl;
+  if (arguments["skipList"] != "") {
+    output << "Skip list:,,,,," << arguments["skipList"] << std::endl;
+  }
+
+  output << "Number of combined spectra:,,,,," << arguments["groupSpectrumNumber"] << std::endl;
+  output << "Fragmentation method:,,,,," << arguments["activation"] << std::endl;
+  output << "Search type:,,,,," << arguments["searchType"] << std::endl;
+
+  if (arguments["fixedMod"] == "") {
+    output << "Fixed modifications:,,,,," << "None" << std::endl;
+  } else {
+    output << "Fixed modifications:,,,,," << arguments["fixedMod"] << std::endl;
+  }
+
+  output << "Use TopFD feature file:,,,,," << arguments["useFeatureFile"] << std::endl;
+
+  output << "Maximum number of unexpected modifications:,,,,," << arguments["ptmNumber"] << std::endl;
+  output << "Error tolerance:,,,,," << arguments["errorTolerance"] << " ppm" << std::endl;
+  output << "Spectrum-level cutoff type:,,,,,"  << arguments["cutoffSpectralType"] << std::endl;
+  output << "Spectrum-level cutoff value:,,,,," << arguments["cutoffSpectralValue"] << std::endl;
+  output << "Proteoform-level cutoff type:,,,,," << arguments["cutoffProteoformType"] << std::endl;
+  output << "Proteoform-level cutoff value:,,,,," << arguments["cutoffProteoformValue"] << std::endl;
+  output << "Allowed N-terminal forms:,,,,," << "\"" << arguments["allowProtMod"] << "\"" << std::endl;
+  output << "Maximum mass shift of modifications:,,,,," << arguments["maxPtmMass"] << " Da" << std::endl;
+  output << "Minimum mass shift of modifications:,,,,," << arguments["minPtmMass"] << " Da" << std::endl;
+  output << "Thread number:,,,,,"  << arguments["threadNumber"] << std::endl;
+
+  if (arguments["useLookupTable"] == "true") {
+    output << "E-value computation:,,,,," << "Lookup table" << std::endl;
+  } else {
+    output << "E-value computation:,,,,," << "Generating function" << std::endl;
+  }
+
+  if (arguments["residueModFileName"] != "") {
+    output << "Common modification file name:,,,,," << arguments["residueModFileName"] << std::endl;
+    output << "MIScore threshold:,,,,," <<  arguments["localThreshold"] << std::endl;
+  }
+  output << "Executable file directory:,,,,," << arguments["executiveDir"] << std::endl;
+  output << "Start time:,,,,," << arguments["startTime"] << std::endl;
+  if (arguments["endTime"] != "") {
+    output << "End time:,,,,," << arguments["endTime"] << std::endl;
+  }
+  output << "********************** Parameters **********************" << std::endl;
+  return output.str();
 }
 
 void Argument::showUsage(boost::program_options::options_description &desc) {

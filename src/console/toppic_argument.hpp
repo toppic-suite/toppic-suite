@@ -19,6 +19,7 @@
 #include <map>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <algorithm>
 #include <memory>
 #include <vector>
@@ -38,6 +39,8 @@ class Argument {
 
   static void outputArguments(std::ostream &output, 
                               std::map<std::string, std::string> arguments);
+
+  static std::string outputCsvArguments(std::map<std::string, std::string> arguments);
 
   bool parse(int argc, char* argv[]);
 
