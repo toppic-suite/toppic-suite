@@ -24,16 +24,8 @@ namespace prot {
 
 namespace deconv_util {
 
-IntvDensPtrVec getDensity(const std::vector<double> &inte) {
-  double max_inte = -1;
-  for (size_t i = 0; i < inte.size(); i++) {
-    if (inte[i] > max_inte) {
-      max_inte = inte[i];
-    }
-  }
-
+IntvDensPtrVec getDensity(const std::vector<double> &inte, double max_inte) {
   double intv_width = 10;
-
   if (max_inte > 10000) {
     intv_width = max_inte / 1000;
   } else if (max_inte < 100) {
@@ -77,12 +69,33 @@ int getMaxPos(const IntvDensPtrVec &dens) {
   return max_pos;
 }
 
+
+double getMaxInte(const std::vector<double> &inte) {
+    double max_inte = -1;
+      for (size_t i = 0; i < inte.size(); i++) {
+            if (inte[i] > max_inte) {
+                    max_inte = inte[i];
+                        }
+              }
+        return max_inte;
+}
+
 double getBaseLine(const std::vector<double> &inte) {
-  // LOG_DEBUG("get density");
-  IntvDensPtrVec dens = getDensity(inte);
-  // LOG_DEBUG("get max pos ");
-  int max_pos = getMaxPos(dens);
-  LOG_DEBUG("max pos " << max_pos << " inte " << dens[max_pos]->getBgn());
+  double max_inte = getMaxInte(inte);
+  int max_pos;
+  IntvDensPtrVec dens;
+  do {    
+    // LOG_DEBUG("get density");
+    dens = getDensity(inte, max_inte);
+    // LOG_DEBUG("get max pos ");
+    max_pos = getMaxPos(dens);
+    //LOG_DEBUG("max pos " << max_pos << " inte " << dens[max_pos]->getBgn());
+    if (max_pos == 0) {
+      max_inte = dens[max_pos]->getEnd();
+    }
+  }
+  while (max_pos == 0);
+
   return dens[max_pos]->getBgn();
 }
 

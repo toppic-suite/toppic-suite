@@ -70,7 +70,7 @@ int initPeakNum(PeakIntv peak_intv) {
   return peak_num;
 }
 
-int initMaxChrg(PeakPtrVec &peak_list, PeakIntv peak_intv) {
+int initMaxChrg(PeakPtrVec &peak_list, PeakIntv peak_intv, int argu_max_charge) {
   double min_dist = 1;
   for (int i = peak_intv.bgn - 1; i <= peak_intv.end; i++) {
     if (i < 0) {
@@ -87,6 +87,9 @@ int initMaxChrg(PeakPtrVec &peak_list, PeakIntv peak_intv) {
     }
   }
   int max_charge = static_cast<int>(std::round(1.0 / min_dist));
+  if (max_charge > argu_max_charge) {
+    max_charge = argu_max_charge;
+  }
   // LOG_DEBUG("maximum charge: " << max_charge);
   return max_charge;
 }
@@ -139,7 +142,7 @@ MatchEnvPtr findBest(MatchEnvPtr2D &env_ptrs) {
 }
 
 RealEnvPtr PrecEnv::deconv(double prec_win_size, PeakPtrVec &peak_list,
-                           double prec_mz, int prec_charge) {
+                           double prec_mz, int prec_charge, int argu_max_charge) {
   LOG_DEBUG("Prec: " << prec_mz << " charge: " << prec_charge);
   if (prec_mz <= 0) {
     return nullptr;
@@ -150,7 +153,7 @@ RealEnvPtr PrecEnv::deconv(double prec_win_size, PeakPtrVec &peak_list,
   if (peak_num  == 0) {
     return nullptr;
   }
-  int max_charge = initMaxChrg(peak_list, peak_intv);
+  int max_charge = initMaxChrg(peak_list, peak_intv, argu_max_charge);
   LOG_DEBUG("Calcate match envelopes...");
   MatchEnvPtr2D match_envs = initMatchEnv(mng_ptr, peak_list, peak_intv,
                                           peak_num, max_charge);
