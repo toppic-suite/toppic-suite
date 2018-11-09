@@ -24,7 +24,8 @@
 
 namespace prot {
 namespace PrecEnv {
-RealEnvPtr deconv(double prec_win_size, PeakPtrVec &peak_list, double prec_mz, int prec_charge);
+RealEnvPtr deconv(double prec_win_size, PeakPtrVec &peak_list, 
+                  double prec_mz, int prec_charge, int argu_max_charge);
 }  // namespace PrecEnv
 }  // namespace prot
 

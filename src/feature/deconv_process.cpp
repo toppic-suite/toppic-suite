@@ -119,7 +119,8 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr, FeatureMsReaderPtr read
   RawMsPtr ms_ptr;
   int count1 = 0;
   int count2 = 0;
-  while ((ms_ptr = reader_ptr->getNextMs(para_ptr_->prec_window_)) != nullptr) {
+  while ((ms_ptr = reader_ptr->getNextMs(para_ptr_->prec_window_, para_ptr_->max_charge_)) 
+         != nullptr) {
     PeakPtrVec peak_list = ms_ptr->getPeakPtrVec();
     LOG_DEBUG("peak list size " << peak_list.size());
 

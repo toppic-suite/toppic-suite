@@ -28,10 +28,10 @@ class FeatureMsReader {
  public:
   FeatureMsReader(const std::string & file_name);
 
-  RawMsPtr getNextMs(double prec_win_size);
+  RawMsPtr getNextMs(double prec_win_size, int max_charge);
 
   void refinePrecChrg(RawMsPtr ms_one, RawMsPtr ms_two, 
-                      double prec_win_size);
+                      double prec_win_size, int max_charge);
 
   int getInputSpNum() {return reader_ptr_->getInputSpNum();}
 
