@@ -60,7 +60,11 @@ class Peak {
     return mono_mass / charge + mass_constant::getProtonMass();
   }
 
- private:
+  static bool cmpInteDec(const PeakPtr &a, const PeakPtr &b) { 
+    return a->getIntensity() > b->getIntensity();
+  }
+
+private:
   double position_;
   double intensity_;
 };
