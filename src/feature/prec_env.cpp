@@ -27,6 +27,8 @@ struct PeakIntv {
   int end;
 };
 
+const int PRECURSOR_TOP_PEAK_NUM = 20;
+
 FeatureMngPtr initMngPtr(double prec_win_size) {
   FeatureMngPtr mng_ptr = std::make_shared<FeatureMng>();
   mng_ptr->min_refer_inte_ = 0;
@@ -94,33 +96,52 @@ int initMaxChrg(PeakPtrVec &peak_list, PeakIntv peak_intv, int argu_max_charge) 
   return max_charge;
 }
 
+double initMinInte(PeakPtrVec &peak_list, 
+                   PeakIntv peak_intv) { 
+  int peak_num = peak_intv.end - peak_intv.bgn + 1;
+  if (peak_num < PRECURSOR_TOP_PEAK_NUM) {
+    return 0;
+  }
+  else {
+    std::vector<PeakPtr>::const_iterator first = peak_list.begin() + peak_intv.bgn;
+    std::vector<PeakPtr>::const_iterator last = peak_list.begin() + peak_intv.end;
+    PeakPtrVec new_peak_list(first, last);
+    std::sort(new_peak_list.begin(), new_peak_list.end(), Peak::cmpInteDec);
+    return new_peak_list[PRECURSOR_TOP_PEAK_NUM-1]->getIntensity();
+
+  }
+}
+
 MatchEnvPtr2D initMatchEnv(FeatureMngPtr mng_ptr, PeakPtrVec &peak_list,
-                           PeakIntv peak_intv, int peak_num, int max_charge) {
+                           PeakIntv peak_intv, int peak_num, 
+                           int max_charge, double min_inte) {
   MatchEnvPtr2D result;
   // LOG_DEBUG("peak intv bgn " << peak_intv.bgn << " end " << peak_intv.end);
   for (int idx = peak_intv.bgn; idx <= peak_intv.end; idx++) {
-    MatchEnvPtrVec env_ptrs;
+    MatchEnvPtrVec env_ptrs(max_charge);
     // LOG_DEBUG("idx " << idx << " mz " << peak_list[idx]->getPosition());
-    for (int charge = 1; charge <= max_charge; charge++) {
-      double max_mass = peak_list[idx]->getPosition() * charge + 1;
-      // LOG_DEBUG("max_mass " << max_mass);
-      MatchEnvPtr env_ptr;
-      if (max_mass > mng_ptr->max_mass_) {
-        max_mass = mng_ptr->max_mass_;
-      } else {
-        env_ptr  = EnvDetect::detectEnv(peak_list, idx, charge, max_mass, mng_ptr);
-      }
-      // LOG_DEBUG("env detection complete");
-      if (env_ptr != nullptr) {
-        // LOG_DEBUG("FILTER REAL ENVELOPE!!!");
-        if (!EnvFilter::testRealEnvValid(env_ptr, mng_ptr)) {
-          env_ptr = nullptr;
+    if (peak_list[idx]->getIntensity() >= min_inte) {
+      for (int charge = 1; charge <= max_charge; charge++) {
+        double max_mass = peak_list[idx]->getPosition() * charge + 1;
+        // LOG_DEBUG("max_mass " << max_mass);
+        MatchEnvPtr env_ptr;
+        if (max_mass > mng_ptr->max_mass_) {
+          max_mass = mng_ptr->max_mass_;
         } else {
-          env_ptr->compScr(mng_ptr);
-          // LOG_DEBUG("GOOD ENVELOPE FOUNDER!!!");
+          env_ptr  = EnvDetect::detectEnv(peak_list, idx, charge, max_mass, mng_ptr);
         }
+        // LOG_DEBUG("env detection complete");
+        if (env_ptr != nullptr) {
+          // LOG_DEBUG("FILTER REAL ENVELOPE!!!");
+          if (!EnvFilter::testRealEnvValid(env_ptr, mng_ptr)) {
+            env_ptr = nullptr;
+          } else {
+            env_ptr->compScr(mng_ptr);
+            // LOG_DEBUG("GOOD ENVELOPE FOUNDER!!!");
+          }
+        }
+        env_ptrs[charge-1] = env_ptr;
       }
-      env_ptrs.push_back(env_ptr);
     }
     result.push_back(env_ptrs);
   }
@@ -154,9 +175,10 @@ RealEnvPtr PrecEnv::deconv(double prec_win_size, PeakPtrVec &peak_list,
     return nullptr;
   }
   int max_charge = initMaxChrg(peak_list, peak_intv, argu_max_charge);
+  double min_inte = initMinInte(peak_list, peak_intv);
   LOG_DEBUG("Calcate match envelopes...");
   MatchEnvPtr2D match_envs = initMatchEnv(mng_ptr, peak_list, peak_intv,
-                                          peak_num, max_charge);
+                                          peak_num, max_charge, min_inte);
   LOG_DEBUG("Do filtering...");
   MatchEnvPtr env_ptr = findBest(match_envs);
   if (env_ptr != nullptr) {

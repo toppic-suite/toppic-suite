@@ -14,6 +14,7 @@
 
 #include <string>
 #include <iomanip>
+#include <chrono>
 
 #include <boost/filesystem.hpp>
 
@@ -119,8 +120,9 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr, FeatureMsReaderPtr read
   RawMsPtr ms_ptr;
   int count1 = 0;
   int count2 = 0;
-  while ((ms_ptr = reader_ptr->getNextMs(para_ptr_->prec_window_, para_ptr_->max_charge_)) 
-         != nullptr) {
+  ms_ptr = reader_ptr->getNextMs(para_ptr_->prec_window_, para_ptr_->max_charge_); 
+  while (ms_ptr!= nullptr) {
+    //auto proc_start = std::chrono::high_resolution_clock::now();
     PeakPtrVec peak_list = ms_ptr->getPeakPtrVec();
     LOG_DEBUG("peak list size " << peak_list.size());
 
@@ -166,6 +168,16 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr, FeatureMsReaderPtr read
       }
       count2++;
     }
+
+    //auto proc_end = std::chrono::high_resolution_clock::now();
+    //auto proc_duration = std::chrono::duration_cast<std::chrono::microseconds>(proc_end-proc_start);
+    //std::cout << std::endl << "Process " << proc_duration.count() << std::endl;
+
+    //auto start = std::chrono::high_resolution_clock::now();
+    ms_ptr = reader_ptr->getNextMs(para_ptr_->prec_window_, para_ptr_->max_charge_);
+    //auto end = std::chrono::high_resolution_clock::now();
+    //auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end-start);
+    //std::cout << std::endl << "Read file " << duration.count() << std::endl;
   }
   std::cout << std::endl << "Deconvolution finished." << std::endl;
 }
