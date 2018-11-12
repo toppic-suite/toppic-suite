@@ -34,22 +34,6 @@ class Ms {
     peak_ptr_list_ = peak_ptr_list;
   }
 
-  /**
-   * Removes precursor mass. In ETD data, MSMS may contain a high precursor
-   * mass peak. So we use the following to remove it.
-   */
-  void rmPrec(double tolerance) {
-    peak_ptr_list_ = rmPeaks(peak_ptr_list_, header_ptr_->getPrecSpMz(), 
-                             tolerance);
-  }
-
-  void recalibrate(double recal) {
-    for (size_t i = 0; i < peak_ptr_list_.size(); i++) {
-      double new_mass = (1 + recal) * peak_ptr_list_[i]->getPosition();
-      peak_ptr_list_[i]->setPosition(new_mass);
-    }
-  }
-
   std::string toString() {
     std::string header_str = header_ptr_->toString();
     std::stringstream tmp;
