@@ -105,13 +105,14 @@ void TopFDDialog::initArguments() {
 }
 
 void TopFDDialog::on_clearButton_clicked() {
-  ui->maxChargeEdit->clear();
-  ui->maxMassEdit->clear();
-  ui->mzErrorEdit->clear();
-  ui->ms1snRatioEdit->clear();
-  ui->ms2snRatioEdit->clear();
-  ui->windowSizeEdit->clear();
-  ui->missLevelOneCheckBox->setChecked(false);
+  //ui->maxChargeEdit->clear();
+  //ui->maxMassEdit->clear();
+  //ui->mzErrorEdit->clear();
+  //ui->ms1snRatioEdit->clear();
+  //ui->ms2snRatioEdit->clear();
+  //ui->windowSizeEdit->clear();
+  //ui->missLevelOneCheckBox->setChecked(false);
+  ui->listWidget->clear();
   ui->outputTextBrowser->clear();
   ui->outputTextBrowser->setText("Click the Start button to process the spectrum files.");
   lastDir_ = "/";
