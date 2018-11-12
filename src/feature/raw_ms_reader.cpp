@@ -64,11 +64,11 @@ int RawMsReader::readNext() {
             });
 
   pwiz::msdata::SpectrumInfo spec_info(*cur_spec_ptr);
-  peak_list_.resize(pairs.size());
+  peak_list_.empty();
   for (size_t i = 0; i < pairs.size(); i++) {
     if (pairs[i].intensity > 0.0) {
       PeakPtr peak_ptr = std::make_shared<Peak>(pairs[i].mz, pairs[i].intensity);
-      peak_list_[i] = peak_ptr;
+      peak_list_.push_back(peak_ptr);
     }
   }
   int ms_level = spec_info.msLevel;
