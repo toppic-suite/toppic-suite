@@ -104,7 +104,7 @@ double initMinInte(PeakPtrVec &peak_list,
   }
   else {
     std::vector<PeakPtr>::const_iterator first = peak_list.begin() + peak_intv.bgn;
-    std::vector<PeakPtr>::const_iterator last = peak_list.begin() + peak_intv.end;
+    std::vector<PeakPtr>::const_iterator last = peak_list.begin() + peak_intv.end + 1;
     PeakPtrVec new_peak_list(first, last);
     std::sort(new_peak_list.begin(), new_peak_list.end(), Peak::cmpInteDec);
     return new_peak_list[PRECURSOR_TOP_PEAK_NUM-1]->getIntensity();
@@ -175,7 +175,8 @@ RealEnvPtr PrecEnv::deconv(double prec_win_size, PeakPtrVec &peak_list,
     return nullptr;
   }
   int max_charge = initMaxChrg(peak_list, peak_intv, argu_max_charge);
-  double min_inte = initMinInte(peak_list, peak_intv);
+  //double min_inte = initMinInte(peak_list, peak_intv);
+  double min_inte = 0;
   LOG_DEBUG("Calcate match envelopes...");
   MatchEnvPtr2D match_envs = initMatchEnv(mng_ptr, peak_list, peak_intv,
                                           peak_num, max_charge, min_inte);
