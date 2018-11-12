@@ -94,7 +94,7 @@ void PrsmSampleMerge::outputTable(PrsmStrPtrVec2D &clusters,
   for (int i = 0; i < cluster_num; i++) {
     PrsmStrPtr prsm_ptr = clusters[i][0];
     file << prsm_ptr->getSeqName() << ","
-        << prsm_ptr->getSeqDesc() << ","
+        << "\"" << prsm_ptr->getSeqDesc() << "\"" << ","
         << prsm_ptr->getAdjustedPrecMass() << ","
         << (prsm_ptr->getProteoformStartPos() + 1) << ","
         << (prsm_ptr->getProteoformEndPos() + 1) << ","
