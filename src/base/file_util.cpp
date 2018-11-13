@@ -187,6 +187,7 @@ void cleanTopmgDir(const std::string &fa_path, const std::string & sp_path) {
   delFile(sp_base + ".topmg_multi_filter");
   clean_prefix(sp, sp_base + ".topmg_multi_filter_");
   delFile(sp_base + ".topmg_graph_filter");
+  clean_prefix(sp, sp_base + ".topmg_graph_filter_");
   delFile(sp_base + ".topmg_graph_align");
   clean_prefix(sp, sp_base + ".topmg_graph_align_");
   delFile(sp_base + ".topmg_graph_post");
