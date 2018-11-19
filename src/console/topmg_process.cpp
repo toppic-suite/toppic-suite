@@ -424,7 +424,7 @@ int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
     std::cout << "Deleting temporary files - finished." << std::endl; 
   }
 
-  std::cout << "TopMG finished." << std::endl;
+  std::cout << "TopMG finished." << std::endl << std::flush;
   return 0; 
 }
 

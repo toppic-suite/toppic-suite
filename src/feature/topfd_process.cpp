@@ -47,7 +47,7 @@ int TopFDProcess(std::map<std::string, std::string> arguments) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
   }
-  std::cout << "TopFD finished." << std::endl;
+  std::cout << "TopFD finished." << std::endl << std::flush;
   return 0;
 }
 
