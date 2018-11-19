@@ -488,7 +488,7 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
     std::cout << "Deleting temporary files - finished." << std::endl; 
   }
 
-  std::cout << "TopPIC finished." << std::endl;
+  std::cout << "TopPIC finished." << std::endl << std::flush;
 
   return 0;
 }
