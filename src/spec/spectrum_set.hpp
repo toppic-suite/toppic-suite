@@ -25,7 +25,7 @@
 #include "spec/prm_ms_factory.hpp"
 #include "spec/sp_para.hpp"
 
-namespace prot {
+namespace toppic {
 
 class SpectrumSet;
 typedef std::shared_ptr<SpectrumSet> SpectrumSetPtr;
@@ -80,6 +80,6 @@ class SpectrumSet {
   bool checkValid(SpParaPtr sp_para_ptr);
 };
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* SPECTRUM_SET_HPP_ */

@@ -17,7 +17,7 @@
 #include "base/ion_type_base.hpp"
 #include "spec/prm_peak_factory.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace prm_peak_factory {
 
@@ -52,4 +52,4 @@ PrmPeakPtr getPrecPeakPtr(int spec_id, double prec_mono_mass,
 
 }  // namespace prm_peak_factory
 
-}  // namespace prot
+}  // namespace toppic

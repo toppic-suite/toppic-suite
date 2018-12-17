@@ -24,7 +24,7 @@
 #include "base/xml_dom.hpp"
 #include "base/xml_dom_document.hpp"
 
-namespace prot {
+namespace toppic {
 
 XmlDOMDocument::XmlDOMDocument(XmlDOMParser* parser, 
                                const char* xml_file) : doc_(NULL) {

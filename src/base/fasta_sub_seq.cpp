@@ -17,7 +17,7 @@
 
 #include "fasta_sub_seq.hpp"
 
-namespace prot {
+namespace toppic {
 
 FastaSubSeq::FastaSubSeq(const std::string &name_line, const std::string &ori_seq,
                          int sub_seq_start):
@@ -35,4 +35,4 @@ FastaSubSeq::FastaSubSeq(const std::string &name, const std::string &desc,
       sub_seq_end_ = sub_seq_start_ + length_ - 1;
     }
 
-}  // namespace prot
+}  // namespace toppic

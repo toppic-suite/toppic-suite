@@ -22,7 +22,7 @@
 #include "base/base_algo.hpp"
 #include "oneptmsearch/diagonal_header.hpp"
 
-namespace prot {
+namespace toppic {
 
 DiagonalHeaderPtr DiagonalHeader::clone() {
   DiagonalHeaderPtr cloned
@@ -178,4 +178,4 @@ MassShiftPtrVec getDiagonalMassChanges(const DiagonalHeaderPtrVec &header_ptrs,
   return shift_list;
 }
 
-}  // namespace prot
+}  // namespace toppic

@@ -17,7 +17,7 @@
 
 #include "feature/co_table.hpp"
 
-namespace prot {
+namespace toppic {
 
 int CoTable::cntTableSize(MatchEnvPtr2D &win_envs, int win, int pnt) {
   int size = 0;
@@ -117,5 +117,5 @@ std::vector<std::vector<bool> >  CoTable::initCoexistTable(MatchEnvPtr2D &win_en
   return co_table;
 }
 
-}  // namespace prot
+}  // namespace toppic
 

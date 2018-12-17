@@ -13,14 +13,14 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_TRUNC_HPP_
-#define PROT_BASE_TRUNC_HPP_
+#ifndef TOPPIC_BASE_TRUNC_HPP_
+#define TOPPIC_BASE_TRUNC_HPP_
 
 #include <string>
 #include "base/residue.hpp"
 #include "base/xml_dom_document.hpp"
 
-namespace prot {
+namespace toppic {
 
 class Trunc {
  public:

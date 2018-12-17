@@ -34,7 +34,7 @@
 #include "graphalign/graph_align_mng.hpp"
 #include "graphalign/graph_post_processor.hpp"
 
-namespace prot {
+namespace toppic {
 
 std::vector<double> mass_split(double mass, const std::vector<PtmPtr> & ptm_vec) {
   std::vector<double> mass_vec(ptm_vec.size());
@@ -278,4 +278,4 @@ void GraphPostProcessor::process() {
   std::cout << std::endl;
 }
 
-}  // namespace prot
+}  // namespace toppic

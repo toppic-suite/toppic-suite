@@ -21,7 +21,7 @@
 #include "tdgf/comp_prob_value.hpp"
 #include "tdgf/count_test_num.hpp"
 
-namespace prot {
+namespace toppic {
 
 class CompPValueArray {
  public:
@@ -49,6 +49,6 @@ class CompPValueArray {
 
 typedef std::shared_ptr<CompPValueArray> CompPValueArrayPtr;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

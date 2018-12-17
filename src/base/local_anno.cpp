@@ -21,7 +21,7 @@
 #include "base/ptm_base.hpp"
 #include "base/local_anno.hpp"
 
-namespace prot {
+namespace toppic {
 
 LocalAnno::LocalAnno(xercesc::DOMElement* element) {
   conf_ = xml_dom_util::getDoubleChildValue(element, "confidence", 0);
@@ -63,4 +63,4 @@ void LocalAnno::appendToXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent
   parent->appendChild(element);
 }
 
-}  // namespace prot
+}  // namespace toppic

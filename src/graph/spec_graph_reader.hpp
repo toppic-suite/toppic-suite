@@ -19,7 +19,7 @@
 #include "spec/msalign_reader.hpp"
 #include "graph/spec_graph.hpp"
 
-namespace prot {
+namespace toppic {
 
 class SpecGraphReader {
  public:
@@ -40,6 +40,6 @@ class SpecGraphReader {
   MassGraphPtr getMassGraphPtr(const PrmPeakPtrVec &peak_vec);
 };
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif /* SPEC_GRAPH_READER_HPP_ */

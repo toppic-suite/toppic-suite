@@ -30,7 +30,7 @@
 #include "base/change.hpp"
 #include "base/logger.hpp"
 
-namespace prot {
+namespace toppic {
 
 struct EdgeInfo {
   ResiduePtr res_ptr_;
@@ -80,6 +80,6 @@ typedef boost::graph_traits<MassGraph>::vertex_descriptor Vertex;
 
 typedef boost::graph_traits<MassGraph>::edge_descriptor Edge;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

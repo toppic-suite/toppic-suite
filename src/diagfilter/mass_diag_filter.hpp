@@ -23,7 +23,7 @@
 #include "zeroptmfilter/mass_match.hpp"
 #include "diagfilter/diag_filter_mng.hpp"
 
-namespace prot {
+namespace toppic {
 
 class MassDiagFilter {
  public:
@@ -40,6 +40,6 @@ class MassDiagFilter {
 };
 
 typedef std::shared_ptr<MassDiagFilter> MassDiagFilterPtr;
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* PROT_DIAG_FILTER_H_ */

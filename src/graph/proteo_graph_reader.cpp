@@ -19,7 +19,7 @@
 #include "base/logger.hpp"
 #include "graph/proteo_graph_reader.hpp"
 
-namespace prot {
+namespace toppic {
 
 ProteoGraphReader::ProteoGraphReader(const std::string &db_file_name,
                                      const ModPtrVec &fix_mod_ptr_vec,
@@ -72,5 +72,5 @@ MassGraphPtr getMassGraphPtr(ProteoAnnoPtr proteo_anno_ptr, double convert_ratio
   return graph_ptr;
 }
 
-}  // namespace prot
+}  // namespace toppic
 

@@ -31,7 +31,7 @@
 
 #include "console/topmg_argument.hpp"
 
-namespace prot {
+namespace toppic {
 
 Argument::Argument() {
   initArguments();
@@ -550,4 +550,4 @@ bool Argument::validateArguments() {
   }
   return true;
 }
-} /* namespace prot */
+} /* namespace toppic */

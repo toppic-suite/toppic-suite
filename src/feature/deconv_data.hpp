@@ -21,7 +21,7 @@
 
 #include "spec/peak.hpp"
 
-namespace prot {
+namespace toppic {
 
 class DeconvData {
  public:

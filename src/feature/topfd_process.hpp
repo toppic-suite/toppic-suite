@@ -18,7 +18,7 @@
 #include <string>
 #include <map>
 
-namespace prot {
+namespace toppic {
 
 int TopFDProcess(std::map<std::string, std::string> arguments);
 

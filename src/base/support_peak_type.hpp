@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_SUPPORT_PEAK_TYPE_HPP_
-#define PROT_BASE_SUPPORT_PEAK_TYPE_HPP_
+#ifndef TOPPIC_BASE_SUPPORT_PEAK_TYPE_HPP_
+#define TOPPIC_BASE_SUPPORT_PEAK_TYPE_HPP_
 
 #include <memory>
 #include <string>
@@ -22,7 +22,7 @@
 
 #include "base/xml_dom_document.hpp"
 
-namespace prot {
+namespace toppic {
 
 class SupportPeakType {
  public:
@@ -46,6 +46,6 @@ typedef std::shared_ptr<SupportPeakType> SPTypePtr;
 
 typedef std::vector<SPTypePtr> SPTypePtrVec;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif /* SUPPORT_PEAK_TYPE_HPP_ */

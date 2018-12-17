@@ -19,7 +19,7 @@
 #include <memory>
 #include <vector>
 
-namespace prot {
+namespace toppic {
 
 class Feature {
  public:

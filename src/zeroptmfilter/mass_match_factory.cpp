@@ -24,7 +24,7 @@
 #include "base/mass_constant.hpp"
 #include "zeroptmfilter/mass_match_factory.hpp"
 
-namespace prot {
+namespace toppic {
 
 inline std::vector<int> getScaledSrmMasses(ProteoformPtr proteo_ptr,
                                            std::vector<double> &n_ace_shifts,
@@ -194,4 +194,4 @@ MassMatchPtr MassMatchFactory::getSrmTermMassMatchPtr(const ProteoformPtrVec &pr
   return index_ptr;
 }
 
-}  // namespace prot
+}  // namespace toppic

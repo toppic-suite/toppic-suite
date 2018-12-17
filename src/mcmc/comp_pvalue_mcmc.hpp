@@ -27,7 +27,7 @@
 
 #include "mcmc_mng.hpp"
 
-namespace prot {
+namespace toppic {
 
 class CompPValueMCMC{
  public:
@@ -115,6 +115,6 @@ class CompPValueMCMC{
 
 typedef std::shared_ptr<CompPValueMCMC> CompPValueMCMCPtr;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

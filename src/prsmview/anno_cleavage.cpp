@@ -18,7 +18,7 @@
 #include "prsm/peak_ion_pair_util.hpp"
 #include "prsmview/anno_cleavage.hpp"
 
-namespace prot {
+namespace toppic {
 
 void AnnoCleavage::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   xercesc::DOMElement* element = xml_doc->createElement("cleavage");
@@ -82,4 +82,4 @@ AnnoCleavagePtrVec getProteoCleavage(PrsmPtr prsm_ptr, double min_mass) {
 }
 
 
-} /* namespace prot */
+} /* namespace toppic */

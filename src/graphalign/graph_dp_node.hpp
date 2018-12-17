@@ -19,7 +19,7 @@
 #include <memory>
 #include <vector>
 
-namespace prot {
+namespace toppic {
 
 #define GRAPH_ALIGN_TYPE_NULL -1
 #define GRAPH_ALIGN_TYPE_VARIABLE 0 
@@ -78,6 +78,6 @@ class GraphDpNode {
 };
 
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* GRAPH_DP_NODE_HPP_ */

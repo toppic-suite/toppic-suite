@@ -22,7 +22,7 @@
 #include "spec/raw_ms.hpp"
 #include "feature/raw_ms_reader.hpp"
 
-namespace prot {
+namespace toppic {
 
 class FeatureMsReader {
  public:

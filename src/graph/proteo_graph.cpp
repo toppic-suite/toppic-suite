@@ -26,7 +26,7 @@
 
 #include "graph/proteo_graph.hpp"
 
-namespace prot {
+namespace toppic {
 
 ProteoGraph::ProteoGraph(FastaSubSeqPtr fasta_seq_ptr, ModPtrVec fix_mod_ptr_vec,
                          MassGraphPtr graph_ptr, bool is_nme,
@@ -136,5 +136,5 @@ void ProteoGraph::compDistances(int max_mod_num, int max_ptm_sum_mass) {
   }
 }
 
-}  // namespace prot
+}  // namespace toppic
 

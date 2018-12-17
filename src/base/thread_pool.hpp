@@ -29,7 +29,7 @@
 
 #include "prsm/prsm_xml_writer.hpp"
 
-namespace prot {
+namespace toppic {
 
 typedef std::shared_ptr<boost::thread> ThreadPtr;
 
@@ -80,7 +80,7 @@ class ThreadPool {
   void Invoke();
 };
 
-}  // namespace prot
+}  // namespace toppic
 
 #include "thread_pool_impl.hpp"
 

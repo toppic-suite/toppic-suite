@@ -15,7 +15,7 @@
 
 #include "feature/vertex_base.hpp"
 
-namespace prot {
+namespace toppic {
 
 int VertexBase::getBgnPeak(int pre_win, DeconvDataPtr data) {
   int bgn_peak;

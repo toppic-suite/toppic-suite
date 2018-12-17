@@ -19,7 +19,7 @@
 #include "prsm/prsm_util.hpp"
 #include "prsm/simple_prsm_str.hpp"
 
-namespace prot {
+namespace toppic {
 
 SimplePrsmStr::SimplePrsmStr(const std::vector<std::string> &str_vec) {
   str_vec_ = str_vec;
@@ -35,4 +35,4 @@ SimplePrsmStr::SimplePrsmStr(const std::vector<std::string> &str_vec) {
   seq_desc_ = prsm_util::getValueStr(line);
 }
 
-}  // namespace prot
+}  // namespace toppic

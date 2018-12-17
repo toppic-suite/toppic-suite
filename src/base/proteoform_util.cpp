@@ -22,8 +22,8 @@
 #include "base/proteoform_util.hpp"
 #include "base/mod_base.hpp"
 
-namespace prot {
-namespace proteoform_util {
+namespace toppic {
+namespace toppiceoform_util {
 
 ResFreqPtrVec compNTermResidueFreq(const ProteoformPtrVec &prot_mod_forms) {
   std::vector<double> counts;
@@ -263,6 +263,6 @@ ProteoformPtr geneDbProteoformPtr(FastaSubSeqPtr fasta_seq_ptr, ModPtrVec fix_mo
                                       end_pos, res_seq_ptr, shift_list);
 }
 
-}  // namespace proteoform_util
-}  // namespace prot
+}  // namespace toppiceoform_util
+}  // namespace toppic
 

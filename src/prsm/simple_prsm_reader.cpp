@@ -22,7 +22,7 @@
 #include "base/string_util.hpp"
 #include "prsm/simple_prsm_reader.hpp"
 
-namespace prot {
+namespace toppic {
 
 SimplePrsmReader::SimplePrsmReader(const std::string &file_name) {
   input_.open(file_name.c_str(), std::ios::in);
@@ -99,4 +99,4 @@ SimplePrsmPtrVec SimplePrsmReader::readSimplePrsms(const std::string &file_name)
   return result_ptrs;
 }
 
-} /* namespace prot */
+} /* namespace toppic */

@@ -20,7 +20,7 @@
 
 #include "base/activation.hpp"
 
-namespace prot {
+namespace toppic {
 
 class MsHeader;
 typedef std::shared_ptr<MsHeader> MsHeaderPtr;

@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_EXTREME_VALUE_HPP_
-#define PROT_BASE_EXTREME_VALUE_HPP_
+#ifndef TOPPIC_BASE_EXTREME_VALUE_HPP_
+#define TOPPIC_BASE_EXTREME_VALUE_HPP_
 
 #include <memory>
 #include <vector>
@@ -22,7 +22,7 @@
 
 #include "base/xml_dom_document.hpp"
 
-namespace prot {
+namespace toppic {
 
 class ExtremeValue;
 typedef std::shared_ptr<ExtremeValue> ExtremeValuePtr;
@@ -74,6 +74,6 @@ class ExtremeValue {
 
 typedef std::vector<ExtremeValuePtr> ExtremeValuePtrVec;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

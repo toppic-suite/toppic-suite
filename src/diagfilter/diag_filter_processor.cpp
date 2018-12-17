@@ -27,7 +27,7 @@
 #include "diagfilter/mass_diag_filter.hpp"
 #include "diagfilter/diag_filter_processor.hpp"
 
-namespace prot {
+namespace toppic {
 
 typedef std::shared_ptr<ThreadPool<SimplePrsmXmlWriter>> SimplePrsmThreadPoolPtr;
 
@@ -158,4 +158,4 @@ void DiagFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num
   file_util::cleanTempFiles(sp_file_name, cur_output_ext + "_");
 }
 
-}  // namespace prot
+}  // namespace toppic

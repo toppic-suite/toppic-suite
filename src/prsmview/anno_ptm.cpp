@@ -19,7 +19,7 @@
 #include "base/string_util.hpp"
 #include "prsmview/anno_ptm.hpp"
 
-namespace prot {
+namespace toppic {
 
 AnnoPtm::AnnoPtm(PtmPtr ptm_ptr, MassShiftTypePtr type_ptr) {
   ptm_ptr_ = ptm_ptr;
@@ -58,4 +58,4 @@ AnnoPtmPtr AnnoPtm::findPtm(const AnnoPtmPtrVec &ptm_ptrs, PtmPtr ptm_ptr,
   return nullptr;
 }
 
-}  // namespace prot
+}  // namespace toppic

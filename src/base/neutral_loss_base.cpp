@@ -18,7 +18,7 @@
 #include "base/neutral_loss_base.hpp"
 #include "base/xml_dom_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 NeutralLossPtrVec NeutralLossBase::neutral_loss_ptr_vec_;
 
@@ -52,4 +52,4 @@ NeutralLossPtr NeutralLossBase::getNeutralLossPtrByName(const std::string &name)
   return NeutralLossPtr(nullptr);
 }
 
-} /* namespace prot */
+} /* namespace toppic */

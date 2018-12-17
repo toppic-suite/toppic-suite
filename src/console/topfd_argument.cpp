@@ -22,7 +22,7 @@
 #include "base/xml_dom_util.hpp"
 #include "console/topfd_argument.hpp"
 
-namespace prot {
+namespace toppic {
 
 Argument::Argument() {
   initArguments();
@@ -192,4 +192,4 @@ bool Argument::validateArguments() {
   return true;
 }
 
-}  // namespace prot
+}  // namespace toppic

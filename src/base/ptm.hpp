@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_PTM_HPP_
-#define PROT_BASE_PTM_HPP_
+#ifndef TOPPIC_BASE_PTM_HPP_
+#define TOPPIC_BASE_PTM_HPP_
 
 #include <string>
 #include <vector>
@@ -22,7 +22,7 @@
 #include "base/amino_acid.hpp"
 #include "base/xml_dom_document.hpp"
 
-namespace prot {
+namespace toppic {
 
 class Ptm;
 typedef std::shared_ptr<Ptm> PtmPtr;
@@ -74,6 +74,6 @@ class Ptm {
 typedef std::vector<PtmPtr> PtmPtrVec;
 typedef std::pair<PtmPtr, PtmPtr> PtmPair;
 typedef std::vector<PtmPair> PtmPairVec;
-}  // namespace prot
+}  // namespace toppic
 
 #endif

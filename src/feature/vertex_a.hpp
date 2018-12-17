@@ -18,7 +18,7 @@
 
 #include "feature/vertex.hpp"
 
-namespace prot {
+namespace toppic {
 
 class VertexA;
 typedef std::shared_ptr<VertexA> VertexAPtr;

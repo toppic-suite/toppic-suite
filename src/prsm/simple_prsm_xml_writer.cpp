@@ -26,7 +26,7 @@
 #include "spec/msalign_reader.hpp"
 #include "prsm/simple_prsm_xml_writer.hpp"
 
-namespace prot {
+namespace toppic {
 
 SimplePrsmXmlWriter::SimplePrsmXmlWriter(const std::string &file_name) {
   file_.open(file_name.c_str());
@@ -73,4 +73,4 @@ void SimplePrsmXmlWriter::write(SimplePrsmPtr simple_prsm_ptr) {
   element->release();
 }
 
-}  // namespace prot
+}  // namespace toppic

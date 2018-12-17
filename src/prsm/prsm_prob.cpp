@@ -19,7 +19,7 @@
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_prob.hpp"
 
-namespace prot {
+namespace toppic {
 
 void PrsmProb::process() {
   std::string input_file_name = file_util::basename(spec_file_name_)+ "." + input_file_ext_;
@@ -54,4 +54,4 @@ void PrsmProb::process() {
   all_writer.close();
 }
 
-} /* namespace prot */
+} /* namespace toppic */

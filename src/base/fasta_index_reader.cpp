@@ -19,7 +19,7 @@
 #include "base/logger.hpp"
 #include "base/fasta_index_reader.hpp"
 
-namespace prot {
+namespace toppic {
 
 FastaIndexReader::FastaIndexReader(const std::string &file_name) {
   fai_ = fai_load(file_name.c_str());
@@ -80,4 +80,4 @@ std::vector<FastaSubSeqPtr> FastaIndexReader::readFastaSubSeqVec(const std::stri
   return fasta_seq_vec;
 }
 
-}  // namespace prot
+}  // namespace toppic

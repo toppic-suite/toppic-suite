@@ -20,7 +20,7 @@
 #include "feature/deconv_data.hpp"
 #include "feature/match_env.hpp"
 
-namespace prot {
+namespace toppic {
 
 class DeconvOneSp {
  public:
@@ -49,5 +49,5 @@ class DeconvOneSp {
 
 typedef std::shared_ptr<DeconvOneSp> DeconvOneSpPtr;
 
-}  // namespace prot
+}  // namespace toppic
 #endif

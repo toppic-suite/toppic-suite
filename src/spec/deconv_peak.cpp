@@ -19,7 +19,7 @@
 #include "base/xml_dom_util.hpp"
 #include "spec/deconv_peak.hpp"
 
-namespace prot {
+namespace toppic {
 
 DeconvPeak::DeconvPeak(xercesc::DOMElement* element):
     Peak(xml_dom_util::getDoubleChildValue(element, "position", 0),
@@ -45,5 +45,5 @@ void DeconvPeak::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent)
   parent->appendChild(element);
 }
 
-}  // namespace prot
+}  // namespace toppic
 

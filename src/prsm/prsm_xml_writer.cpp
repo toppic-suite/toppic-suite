@@ -22,7 +22,7 @@
 #include "base/xml_dom_util.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 
-namespace prot {
+namespace toppic {
 
 PrsmXmlWriter::PrsmXmlWriter(const std::string &file_name) {
   file_.open(file_name.c_str());
@@ -88,4 +88,4 @@ void PrsmXmlWriter::writeVector3D(const PrsmPtrVec3D &prsm_ptrs) {
   }
 }
 
-} /* namespace prot */
+} /* namespace toppic */

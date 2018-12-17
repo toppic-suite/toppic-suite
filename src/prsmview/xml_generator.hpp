@@ -30,7 +30,7 @@
 #include "prsmview/prsm_view_mng.hpp"
 #include "prsmview/anno_view.hpp"
 
-namespace prot {
+namespace toppic {
 
 class XmlGenerator {
  public:
@@ -81,6 +81,6 @@ class XmlGenerator {
 
 typedef std::shared_ptr<XmlGenerator> XmlGeneratorPtr;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif /* PROT_XML_GENERATOR_HPP_ */

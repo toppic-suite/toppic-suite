@@ -18,7 +18,7 @@
 #include "feature/raw_ms_util.hpp"
 #include "feature/env_detect.hpp"
 
-namespace prot {
+namespace toppic {
 
 MatchEnvPtr2D EnvDetect::getCandidate(DeconvDataPtr data_ptr, FeatureMngPtr mng_ptr) {
   PeakPtrVec peak_list = data_ptr->getPeakList();
@@ -161,4 +161,4 @@ double EnvDetect::calcInteRatio(EnvelopePtr theo_env, PeakPtrVec &peak_list,
   }
 }
 
-}  // namespace prot
+}  // namespace toppic

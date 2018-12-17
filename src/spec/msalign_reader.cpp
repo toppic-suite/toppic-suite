@@ -22,7 +22,7 @@
 #include "base/string_util.hpp"
 #include "spec/msalign_reader.hpp"
 
-namespace prot {
+namespace toppic {
 
 std::vector<std::string> MsAlignReader::readOneSpectrum() {
   std::string line;
@@ -229,4 +229,4 @@ void MsAlignReader::close() {
   input_.close();
 }
 
-}  // namespace prot
+}  // namespace toppic

@@ -24,7 +24,7 @@
 #include "prsm/prsm.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 
-namespace prot {
+namespace toppic {
 
 class PrsmFormFilter {
  public:
@@ -47,6 +47,6 @@ class PrsmFormFilter {
 
 typedef std::shared_ptr<PrsmFormFilter> PrsmFormFilterPtr;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

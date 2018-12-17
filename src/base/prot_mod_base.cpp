@@ -17,7 +17,7 @@
 #include "base/prot_mod_base.hpp"
 #include "base/xml_dom_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 ProtModPtrVec ProtModBase::prot_mod_ptr_vec_;
 ProtModPtr ProtModBase::prot_mod_ptr_NONE_;
@@ -83,4 +83,4 @@ ProtModPtr ProtModBase::getProtModPtrFromXml(xercesc::DOMElement * element) {
   return prot_mod_ptr;
 }
 
-}  // namespace prot
+}  // namespace toppic

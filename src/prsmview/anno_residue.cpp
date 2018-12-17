@@ -18,7 +18,7 @@
 #include "base/string_util.hpp"
 #include "prsmview/anno_residue.hpp"
 
-namespace prot {
+namespace toppic {
 
 void AnnoResidue::appendViewXml(XmlDOMDocument* xml_doc,
                                 xercesc::DOMElement* parent) {
@@ -45,5 +45,5 @@ void AnnoResidue::appendViewXml(XmlDOMDocument* xml_doc,
   parent->appendChild(element);
 }
 
-}  // namespace prot
+}  // namespace toppic
 

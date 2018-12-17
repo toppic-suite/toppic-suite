@@ -22,7 +22,7 @@
 #include "base/base_data.hpp"
 #include "zeroptmfilter/mass_match.hpp"
 
-namespace prot {
+namespace toppic {
 
 class MassMatchFactory {
  public:
@@ -45,6 +45,6 @@ class MassMatchFactory {
                                              double max_proteoform_mass, double scale);
 };
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif 

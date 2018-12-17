@@ -29,7 +29,7 @@
 
 #include "console/topquant_argument.hpp"
 
-using namespace prot;
+using namespace toppic;
 
 void writeCurSeq(std::vector<PrsmPtr> & prsm_vec,
                  const std::vector<std::string> & spec_file_lst,

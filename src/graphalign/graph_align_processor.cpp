@@ -37,7 +37,7 @@
 #include "graphalign/graph_align.hpp"
 #include "graphalign/graph_align_processor.hpp"
 
-namespace prot {
+namespace toppic {
 
 std::function<void()> geneTask(FastaIndexReaderPtr reader_ptr,
                                GraphAlignMngPtr mng_ptr,
@@ -262,5 +262,5 @@ void GraphAlignProcessor::process() {
     file_util::cleanTempFiles(sp_file_name, mng_ptr_->output_file_ext_ + "_" + std::to_string(t));
   }
 }
-}  // namespace prot
+}  // namespace toppic
 

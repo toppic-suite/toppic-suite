@@ -31,7 +31,7 @@
 #include "oneptmsearch/basic_diag_pair.hpp"
 #include "oneptmsearch/ps_align.hpp"
 
-namespace prot {
+namespace toppic {
 
 class OnePtmSlowMatch {
  public:
@@ -71,6 +71,6 @@ class OnePtmSlowMatch {
 typedef std::shared_ptr<OnePtmSlowMatch> OnePtmSlowMatchPtr;
 typedef std::vector<OnePtmSlowMatchPtr> OnePtmSlowMatchPtrVec;
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif 

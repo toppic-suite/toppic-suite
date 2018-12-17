@@ -29,7 +29,7 @@
 #include "prsm/peak_ion_pair_util.hpp"
 #include "prsm/prsm.hpp"
 
-namespace prot {
+namespace toppic {
 
 Prsm::Prsm(xercesc::DOMElement* element, FastaIndexReaderPtr reader_ptr,
            const ModPtrVec &fix_mod_list) {
@@ -282,4 +282,4 @@ bool Prsm::cmpSpectrumIdIncEvalueInc(const PrsmPtr &a, const PrsmPtr &b) {
   }
 }
 
-}  // namespace prot
+}  // namespace toppic

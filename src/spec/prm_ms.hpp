@@ -24,7 +24,7 @@
 #include "spec/ms.hpp"
 #include "spec/peak_tolerance.hpp"
 
-namespace prot {
+namespace toppic {
 
 typedef std::shared_ptr<Ms<PrmPeakPtr> > PrmMsPtr;
 
@@ -40,6 +40,6 @@ PrmPeakPtrVec getPrmPeakPtrs(const PrmMsPtrVec &prm_ms_ptr_vec, PeakTolerancePtr
 
 }  // namespace prm_ms
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

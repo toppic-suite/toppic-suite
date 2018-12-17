@@ -21,7 +21,7 @@
 #include "base/support_peak_type.hpp"
 #include "spec/deconv_peak.hpp"
 
-namespace prot {
+namespace toppic {
 
 class SupportPeak {
  public:
@@ -52,6 +52,6 @@ class SupportPeak {
 typedef std::shared_ptr<SupportPeak> SupportPeakPtr;
 typedef std::vector<SupportPeakPtr> SupportPeakPtrVec;
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* SUPPORT_PEAK_HPP_ */

@@ -20,7 +20,7 @@
 
 #include "prsm/prsm_para.hpp"
 
-namespace prot {
+namespace toppic {
 
 class ZeroPtmSearchMng {
  public:
@@ -52,6 +52,6 @@ class ZeroPtmSearchMng {
 
 typedef std::shared_ptr<ZeroPtmSearchMng> ZeroPtmSearchMngPtr;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

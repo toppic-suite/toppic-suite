@@ -18,7 +18,7 @@
 #include "spec/ms_header.hpp"
 #include "feature/match_env.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace match_env_writer {
 
@@ -31,4 +31,4 @@ void write(const std::string & file, MsHeaderPtr header, const MatchEnvPtrVec & 
 
 }  // namespace msalign_writer
 
-}  // namespace prot
+}  // namespace toppic

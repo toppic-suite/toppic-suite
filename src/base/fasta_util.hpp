@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_FASTA_UTIL_HPP_
-#define PROT_BASE_FASTA_UTIL_HPP_
+#ifndef TOPPIC_BASE_FASTA_UTIL_HPP_
+#define TOPPIC_BASE_FASTA_UTIL_HPP_
 
 #include <iostream>
 #include <fstream>
@@ -33,7 +33,7 @@
 #include "htslib/faidx.h"
 #include "base/fasta_reader.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace fasta_util {
 
@@ -51,6 +51,6 @@ int countProteinNum(const std::string &fasta_file);
 
 }  // namespace fasta_util
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

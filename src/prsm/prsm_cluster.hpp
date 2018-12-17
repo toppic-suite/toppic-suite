@@ -26,7 +26,7 @@
 #include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_str.hpp"
 
-namespace prot {
+namespace toppic {
 
 class PrsmCluster {
  public:
@@ -65,6 +65,6 @@ class PrsmCluster {
 
 typedef std::shared_ptr<PrsmCluster> PrsmClusterPtr;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif /* PRSM_CLUSTER_HPP_ */

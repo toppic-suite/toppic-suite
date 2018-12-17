@@ -19,7 +19,7 @@
 #include "oneptmsearch/diagonal_header_util.hpp"
 #include "ptmsearch/ptm_slow_match.hpp"
 
-namespace prot {
+namespace toppic {
 
 PtmSlowMatch::PtmSlowMatch(ProteoformPtr proteo_ptr,
                            SpectrumSetPtr spectrum_set_ptr,
@@ -191,4 +191,4 @@ PrsmPtr PtmSlowMatch::compute(AlignTypePtr align_type_ptr, int shift_num) {
                                    ms_three_ptr_vec_, mng_ptr_->prsm_para_ptr_);
 }
 
-} /* namespace prot */
+} /* namespace toppic */

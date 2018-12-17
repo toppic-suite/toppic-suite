@@ -18,7 +18,7 @@
 #include "base/logger.hpp"
 #include "base/fasta_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace fasta_util {
 
@@ -144,4 +144,4 @@ int countProteinNum(const std::string &fasta_file) {
 
 }  // namespace fasta_util
 
-}  // namespace prot
+}  // namespace toppic

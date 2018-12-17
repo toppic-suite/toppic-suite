@@ -18,7 +18,7 @@
 #include "base/logger.hpp"
 #include "feature/env_base.hpp"
 
-namespace prot {
+namespace toppic {
 
 EnvBase::EnvBase(std::string file_name, int entry_num, double mass_interval):
     entry_num_(entry_num),
@@ -91,4 +91,4 @@ EnvelopePtr EnvBase::getEnvByBaseMass(double mass) {
   return envs_[base_mass_idxes_[idx]];
 }
 
-}  // namespace prot
+}  // namespace toppic

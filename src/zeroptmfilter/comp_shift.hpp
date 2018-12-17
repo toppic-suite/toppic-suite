@@ -22,7 +22,7 @@
 #include "base/base_data.hpp"
 #include "zeroptmfilter/filter_protein.hpp"
 
-namespace prot {
+namespace toppic {
 
 #define PRECURSOR_MATCH_SCORE 10000
 
@@ -117,6 +117,6 @@ class CompShift {
 
 typedef std::shared_ptr<CompShift> CompShiftPtr;
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* COMP_SHIFT_HPP_ */

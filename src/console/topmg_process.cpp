@@ -68,7 +68,7 @@
 #include "console/topmg_argument.hpp"
 #include "console/topmg_process.hpp"
 
-namespace prot {
+namespace toppic {
 
 int TopMG_identify(std::map<std::string, std::string> & arguments) {
   try {
@@ -428,4 +428,4 @@ int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
   return 0; 
 }
 
-}  // namespace prot
+}  // namespace toppic

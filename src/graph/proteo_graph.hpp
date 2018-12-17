@@ -21,7 +21,7 @@
 #include "graph/dist.hpp"
 #include "graph/graph.hpp"
 
-namespace prot {
+namespace toppic {
 
 class ProteoGraph {
  public:
@@ -70,6 +70,6 @@ class ProteoGraph {
 typedef std::shared_ptr<ProteoGraph> ProteoGraphPtr;
 typedef std::vector<ProteoGraphPtr> ProteoGraphPtrVec;
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* PROTEO_GRAPH_HPP_ */

@@ -21,7 +21,7 @@
 
 #include "mcmc/comp_pvalue_mcmc.hpp"
 
-namespace prot {
+namespace toppic {
 
 void getTheoMassVec(const ResiduePtrVec &residues,
                     IonTypePtr n_ion_type_ptr,
@@ -541,4 +541,4 @@ void CompPValueMCMC::simulateDPR(ResiduePtrVec &residues, long omega, int scr_in
   }
 }
 
-}  // namespace prot
+}  // namespace toppic

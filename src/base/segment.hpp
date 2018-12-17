@@ -13,14 +13,14 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_SEGMENT_HPP_
-#define PROT_BASE_SEGMENT_HPP_
+#ifndef TOPPIC_BASE_SEGMENT_HPP_
+#define TOPPIC_BASE_SEGMENT_HPP_
 
 #include <vector>
 
 #include "base/trunc.hpp"
 
-namespace prot {
+namespace toppic {
 
 class Segment {
  public:
@@ -49,5 +49,5 @@ class Segment {
 typedef std::shared_ptr<Segment> SegmentPtr;
 typedef std::vector<SegmentPtr> SegmentPtrVec;
 
-}  // namespace prot
+}  // namespace toppic
 #endif

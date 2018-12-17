@@ -23,7 +23,7 @@
 #include "base/file_util.hpp"
 #include "tdgf/comp_pvalue_lookup_table.hpp"
 
-namespace prot {
+namespace toppic {
 
 CompPValueLookupTable::CompPValueLookupTable(TdgfMngPtr mng_ptr) {
   mng_ptr_ = mng_ptr;
@@ -338,4 +338,4 @@ int getPeakNumFromIndex(int idx) {
   }
 }
 
-}  // namespace prot
+}  // namespace toppic

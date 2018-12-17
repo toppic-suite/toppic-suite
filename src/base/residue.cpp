@@ -24,7 +24,7 @@
 #include "base/string_util.hpp"
 #include "base/xml_dom_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 Residue::Residue(xercesc::DOMElement* element) { 
   std::string acid_element_name = AminoAcid::getXmlElementName();
@@ -62,4 +62,4 @@ void Residue::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   appendXml(xml_doc, parent, element_name);
 }
 
-}  // namespace prot
+}  // namespace toppic

@@ -23,7 +23,7 @@
 #include "base/mass_constant.hpp"
 #include "base/xml_dom_document.hpp"
 
-namespace prot {
+namespace toppic {
 
 class Peak;
 
@@ -70,5 +70,5 @@ private:
 };
 
 
-}  // namespace prot
+}  // namespace toppic
 #endif

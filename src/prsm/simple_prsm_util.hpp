@@ -18,7 +18,7 @@
 
 #include "prsm/simple_prsm.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace simple_prsm_util {
 
@@ -26,6 +26,6 @@ SimplePrsmPtrVec getUniqueMatches(SimplePrsmPtrVec match_ptrs);
 
 }  // namesapce simple_prsm_util
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif /* PROT_PRSM_SIMPLE_PRSM_UTIL_HPP_ */

@@ -18,7 +18,7 @@
 #include "base/logger.hpp"
 #include "feature/match_env_filter.hpp" 
 
-namespace prot {
+namespace toppic {
 
 MatchEnvPtrVec MatchEnvFilter::filter(MatchEnvPtrVec &ori_envs, double prec_mass,
                                       FeatureMngPtr mng_ptr) {

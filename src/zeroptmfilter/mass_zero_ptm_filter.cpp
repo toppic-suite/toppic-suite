@@ -24,7 +24,7 @@
 #include "zeroptmfilter/mass_match_util.hpp"
 #include "zeroptmfilter/mass_zero_ptm_filter.hpp"
 
-namespace prot {
+namespace toppic {
 
 MassZeroPtmFilter::MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
                                      ZeroPtmFilterMngPtr mng_ptr) {
@@ -154,4 +154,4 @@ void MassZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec) {
   }
 }
 
-} /* namespace prot */
+} /* namespace toppic */

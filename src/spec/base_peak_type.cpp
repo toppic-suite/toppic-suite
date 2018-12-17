@@ -15,7 +15,7 @@
 
 #include "spec/base_peak_type.hpp"
 
-namespace prot {
+namespace toppic {
 
 const BasePeakTypePtr BasePeakType::ORIGINAL = std::make_shared<BasePeakType>("Original");
 

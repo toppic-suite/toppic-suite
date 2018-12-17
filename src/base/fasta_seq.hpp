@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_FASTA_SEQ_HPP_
-#define PROT_BASE_FASTA_SEQ_HPP_
+#ifndef TOPPIC_BASE_FASTA_SEQ_HPP_
+#define TOPPIC_BASE_FASTA_SEQ_HPP_
 
 #include <memory>
 #include <string>
@@ -24,7 +24,7 @@
 #include "base/residue.hpp"
 #include "base/xml_dom_document.hpp"
 
-namespace prot {
+namespace toppic {
 
 class FastaSeq {
  public:
@@ -71,6 +71,6 @@ class FastaSeq {
 
 typedef std::shared_ptr<FastaSeq> FastaSeqPtr;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_PTM_BASE_HPP_
-#define PROT_BASE_PTM_BASE_HPP_
+#ifndef TOPPIC_BASE_PTM_BASE_HPP_
+#define TOPPIC_BASE_PTM_BASE_HPP_
 
 #include <string>
 #include <vector>
@@ -23,7 +23,7 @@
 #include "base/xml_dom.hpp"
 #include "base/xml_dom_document.hpp"
 
-namespace prot {
+namespace toppic {
 
 class PtmBase {
  public:

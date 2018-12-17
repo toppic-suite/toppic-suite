@@ -23,7 +23,7 @@
 
 #include "spec/deconv_peak.hpp"
 
-namespace prot {
+namespace toppic {
 
 class ExtendPeak;
 typedef std::shared_ptr<ExtendPeak> ExtendPeakPtr;
@@ -78,6 +78,6 @@ typedef std::vector<ExtendPeakPtr> ExtendPeakPtrVec;
 
 
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* EXTEND_PEAK_HPP_ */

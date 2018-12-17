@@ -20,7 +20,7 @@
 #include "feature/env_filter.hpp"
 #include "feature/prec_env.hpp"
 
-namespace prot {
+namespace toppic {
 
 struct PeakIntv {
   int bgn;
@@ -188,4 +188,4 @@ RealEnvPtr PrecEnv::deconv(double prec_win_size, PeakPtrVec &peak_list,
     return nullptr;
   }
 }
-}  // namespace prot
+}  // namespace toppic

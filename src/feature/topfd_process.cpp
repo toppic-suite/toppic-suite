@@ -24,7 +24,7 @@
 #include "feature/deconv_process.hpp"
 #include "feature/feature_detect.hpp"
 
-namespace prot {
+namespace toppic {
 
 int TopFDProcess(std::map<std::string, std::string> arguments) {
   try {
@@ -51,5 +51,5 @@ int TopFDProcess(std::map<std::string, std::string> arguments) {
   return 0;
 }
 
-}  // namespace prot
+}  // namespace toppic
 

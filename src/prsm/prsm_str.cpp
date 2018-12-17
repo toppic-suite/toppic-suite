@@ -22,7 +22,7 @@
 #include "prsm/prsm_util.hpp"
 #include "prsm/prsm_str.hpp"
 
-namespace prot {
+namespace toppic {
 
 bool MassShiftStr::cmpPosInc(const std::shared_ptr<MassShiftStr> &a,
                              const std::shared_ptr<MassShiftStr> &b) {
@@ -203,4 +203,4 @@ bool PrsmStr::isStrictCompatiablePtmSpecies(const PrsmStrPtr & a, const PrsmStrP
   return true;
 }
 
-}  // namespace prot
+}  // namespace toppic

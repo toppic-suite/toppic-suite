@@ -35,7 +35,7 @@
 
 #include "mcmc/mcmc_mng.hpp"
 
-namespace prot {
+namespace toppic {
 
 class DprProcessor {
  public:
@@ -74,6 +74,6 @@ class DprProcessor {
 
 typedef std::shared_ptr<DprProcessor> DprProcessorPtr;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

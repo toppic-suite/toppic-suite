@@ -30,7 +30,7 @@
 #include "ptmsearch/ptm_search_processor.hpp"
 #include "ptmsearch/ptm_search_slow_filter.hpp"
 
-namespace prot {
+namespace toppic {
 
 template <int N>
 PrsmXmlWriterSet<N>::PrsmXmlWriterSet(const std::string & output_file_name){
@@ -260,4 +260,4 @@ void PtmSearchProcessor::process(){
 
 }
 
-} /* namespace prot */
+} /* namespace toppic */

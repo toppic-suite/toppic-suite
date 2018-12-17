@@ -28,7 +28,7 @@
 #include "feature/match_env_util.hpp"
 #include "feature/match_env_writer.hpp"
 
-namespace prot {
+namespace toppic {
 
 void DeconvProcess::copyParameters(FeatureMngPtr mng_ptr) {
   mng_ptr->max_charge_ = para_ptr_->max_charge_;
@@ -182,4 +182,4 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr, FeatureMsReaderPtr read
   std::cout << std::endl << "Deconvolution finished." << std::endl;
 }
 
-}  // namespace prot
+}  // namespace toppic

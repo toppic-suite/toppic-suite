@@ -23,7 +23,7 @@
 
 #include "spec/env_peak.hpp"
 
-namespace prot {
+namespace toppic {
 
 class Envelope;
 

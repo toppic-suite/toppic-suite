@@ -20,7 +20,7 @@
 #include <vector>
 #include "spec/peak.hpp"
 
-namespace prot {
+namespace toppic {
 
 class MultiSpecPeak;
 typedef std::shared_ptr<MultiSpecPeak> MultiSpecPeakPtr;
@@ -63,5 +63,5 @@ class MultiSpecPeak : public Peak {
 
 typedef std::vector<MultiSpecPeakPtr> MultiSpecPeakPtrVec;
 
-}  // namespace prot
+}  // namespace toppic
 #endif

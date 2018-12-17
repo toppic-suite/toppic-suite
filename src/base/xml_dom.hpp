@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_XML_DOM_HPP_
-#define PROT_BASE_XML_DOM_HPP_
+#ifndef TOPPIC_BASE_XML_DOM_HPP_
+#define TOPPIC_BASE_XML_DOM_HPP_
 
 #include <string>
 
@@ -25,7 +25,7 @@
 #include <xercesc/sax/HandlerBase.hpp>
 #include <xercesc/framework/MemBufInputSource.hpp>
 
-namespace prot {
+namespace toppic {
 
 // DOM parser
 class XmlDOMParser {
@@ -105,5 +105,5 @@ class YStr {
 #define X(str) XStr(str).unicodeForm()
 #define Y(str) YStr(str).getString()
 
-}  // namespace prot
+}  // namespace toppic
 #endif

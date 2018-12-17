@@ -20,7 +20,7 @@
 #include "base/prot_mod.hpp"
 #include "base/xml_dom_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 ProtMod::ProtMod(const std::string &name, const std::string &type,
                  TruncPtr trunc_ptr, ModPtr mod_ptr): 

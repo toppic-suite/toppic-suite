@@ -20,7 +20,7 @@
 #include "base/xml_dom_document.hpp"
 #include "base/xml_dom_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 AminoAcidPtrVec AminoAcidBase::amino_acid_ptr_vec_;
 
@@ -87,4 +87,4 @@ AminoAcidPtr AminoAcidBase::getAminoAcidPtrFromXml(xercesc::DOMElement * element
   return acid_ptr;
 }
 
-}  // namespace prot
+}  // namespace toppic

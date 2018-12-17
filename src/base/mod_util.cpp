@@ -27,7 +27,7 @@
 #include "base/xml_dom_document.hpp"
 #include "base/xml_dom_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace mod_util {
 
@@ -159,5 +159,5 @@ std::vector<double> getModMassVec(const ModPtrVec & var_mod_list) {
 
 } // namespace mod_util
 
-}  // namespace prot
+}  // namespace toppic
 

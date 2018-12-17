@@ -15,7 +15,7 @@
 
 #include "feature/vertex_b.hpp"
 
-namespace prot {
+namespace toppic {
 
 VertexB::VertexB(FeatureMngPtr mng_ptr, int bgn_peak, 
                  int pre_win_peak_num, int cur_win_peak_num, int env_num) {

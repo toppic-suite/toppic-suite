@@ -20,7 +20,7 @@
 #include "spec/theo_peak.hpp"
 #include "prsm/peak_ion_pair.hpp"
 
-namespace prot {
+namespace toppic {
 
 void PeakIonPair::appendRealPeakToXml(XmlDOMDocument* xml_doc, 
                                       xercesc::DOMElement* parent) {
@@ -83,4 +83,4 @@ bool PeakIonPair::cmpTheoPeakPosInc(const PeakIonPairPtr &a, const PeakIonPairPt
       < b->getTheoPeakPtr()->getIonPtr()->getPos();
 }
 
-}  // namespace prot
+}  // namespace toppic

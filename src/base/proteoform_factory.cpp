@@ -29,9 +29,9 @@
 #include "base/prot_mod_util.hpp"
 #include "base/proteoform_factory.hpp"
 
-namespace prot {
+namespace toppic {
 
-namespace proteoform_factory {
+namespace toppiceoform_factory {
 
 ProteoformPtr geneDbProteoformPtr(FastaSeqPtr fasta_seq_ptr, ModPtrVec fix_mod_list) {
   if (fasta_seq_ptr == nullptr) {
@@ -257,7 +257,7 @@ ProteoformPtr readFastaToProteoformPtr(FastaIndexReaderPtr reader_ptr,
   }
 }
 
-}  // namespace proteoform_factory
+}  // namespace toppiceoform_factory
 
-}  // namespace prot
+}  // namespace toppic
 

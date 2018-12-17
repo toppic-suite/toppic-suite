@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_SUPPORT_PEAK_TYPE_BASE_HPP_
-#define PROT_BASE_SUPPORT_PEAK_TYPE_BASE_HPP_
+#ifndef TOPPIC_BASE_SUPPORT_PEAK_TYPE_BASE_HPP_
+#define TOPPIC_BASE_SUPPORT_PEAK_TYPE_BASE_HPP_
 
 #include <memory>
 #include <string>
@@ -22,7 +22,7 @@
 
 #include "base/support_peak_type.hpp"
 
-namespace prot {
+namespace toppic {
 
 class SPTypeBase {
  public:
@@ -45,6 +45,6 @@ class SPTypeBase {
   static SPTypePtr sp_type_ptr_N_TERM_;
 };
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* SUPPORT_PEAK_TYPE_HPP_ */

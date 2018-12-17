@@ -26,7 +26,7 @@
 #include "base/xml_dom_document.hpp"
 #include "graph/proteo_anno.hpp"
 
-namespace prot {
+namespace toppic {
 
 ProteoAnno::ProteoAnno(const ModPtrVec &fix_mod_ptr_vec,
                        const ProtModPtrVec &prot_mod_ptr_vec,
@@ -130,4 +130,4 @@ void ProteoAnno::anno(const std::string &seq, bool is_complete) {
   }
   LOG_DEBUG("variable mod complete");
 }
-}  // namespace prot
+}  // namespace toppic

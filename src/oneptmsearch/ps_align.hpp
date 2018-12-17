@@ -23,7 +23,7 @@
 #include "oneptmsearch/dp_pair.hpp"
 #include "oneptmsearch/basic_diag_pair.hpp"
 
-namespace prot {
+namespace toppic {
 
 class PSAlign {
  public:
@@ -94,6 +94,6 @@ class PSAlign {
 typedef std::shared_ptr<PSAlign> PSAlignPtr;
 typedef std::vector<PSAlignPtr> PSAlignPtrVec;
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* PS_ALIGN_HPP_ */

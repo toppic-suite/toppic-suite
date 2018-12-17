@@ -19,7 +19,7 @@
 #include "base/string_util.hpp"
 #include "base/xml_dom_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 MassShift::MassShift(xercesc::DOMElement* element) {
   left_bp_pos_ = xml_dom_util::getIntChildValue(element, "shift_left_bp_pos", 0);
@@ -110,4 +110,4 @@ bool MassShift::cmpPosInc(const MassShiftPtr & a, const MassShiftPtr & b) {
   }
 }
 
-}  // namespace prot
+}  // namespace toppic

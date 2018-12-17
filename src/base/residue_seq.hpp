@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_RESIDUE_SEQ_HPP_
-#define PROT_BASE_RESIDUE_SEQ_HPP_
+#ifndef TOPPIC_BASE_RESIDUE_SEQ_HPP_
+#define TOPPIC_BASE_RESIDUE_SEQ_HPP_
 
 #include <string>
 #include <vector>
@@ -22,7 +22,7 @@
 #include "base/mass_constant.hpp"
 #include "base/residue.hpp"
 
-namespace prot {
+namespace toppic {
 
 class ResidueSeq;
 
@@ -72,5 +72,5 @@ class ResidueSeq {
   static ResSeqPtr getEmptyResidueSeq();
 };
 
-}  // namespace prot
+}  // namespace toppic
 #endif

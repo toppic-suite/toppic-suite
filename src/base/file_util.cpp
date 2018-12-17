@@ -29,7 +29,7 @@
 
 namespace fs = boost::filesystem;
 
-namespace prot {
+namespace toppic {
 
 namespace file_util {
 
@@ -253,4 +253,4 @@ void cleanTempFiles(const std::string & sp_path,
 
 }  // namespace file_util
 
-}  // namespace prot
+}  // namespace toppic

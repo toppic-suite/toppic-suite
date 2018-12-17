@@ -15,7 +15,7 @@
 
 #include "base/xml_dom_err_handler.hpp"
 
-namespace prot {
+namespace toppic {
 
 void XmlDOMErrorHandler::fatalError(const xercesc::SAXParseException &ex) {
   std::cerr << "Fatal parsing error at line" << ex.getLineNumber() << "\n"; 

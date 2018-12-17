@@ -21,7 +21,7 @@
 
 #include "spec/feature_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace feature_util {
 
@@ -55,4 +55,4 @@ void mergeFeatureFiles(const std::vector<std::string> & feature_file_lst,
 
 }  // namespace feature_util
 
-}  // namespace prot
+}  // namespace toppic

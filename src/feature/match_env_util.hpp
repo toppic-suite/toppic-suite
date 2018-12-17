@@ -23,7 +23,7 @@
 #include "spec/deconv_ms.hpp"
 #include "feature/match_env.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace match_env_util {
 
@@ -50,6 +50,6 @@ DeconvMsPtr getDeconvMsPtr(MsHeaderPtr header_ptr, MatchEnvPtrVec &envs);
 
 }  // namespace match_env_util
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

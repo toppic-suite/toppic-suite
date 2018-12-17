@@ -21,7 +21,7 @@
 #include "base/file_util.hpp"
 #include "prsm/prsm_para.hpp"
 
-namespace prot {
+namespace toppic {
 
 class PrsmViewMng {
  public:
@@ -53,7 +53,7 @@ class PrsmViewMng {
 
 typedef std::shared_ptr<PrsmViewMng> PrsmViewMngPtr;
 
-} /* namespace prot */
+} /* namespace toppic */
 
 
 #endif /* PROT_PRSM_VIEW_MNG_HPP_ */

@@ -22,7 +22,7 @@
 #include "tdgf/comp_prob_value.hpp"
 #include "tdgf/count_test_num.hpp"
 
-namespace prot {
+namespace toppic {
 
 class CompPValueLookupTable {
  public:
@@ -63,6 +63,6 @@ std::vector<int> getFourIndex(int peak_num, int frag_num);
 
 int getPeakNumFromIndex(int idx);
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

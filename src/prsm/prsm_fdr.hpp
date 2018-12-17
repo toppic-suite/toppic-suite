@@ -23,7 +23,7 @@
 #include "base/fasta_reader.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 
-namespace prot {
+namespace toppic {
 
 class PrsmFdr {
  public:
@@ -48,6 +48,6 @@ class PrsmFdr {
 };
 typedef std::shared_ptr<PrsmFdr> PrsmFdrPtr;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif /* PRSMFDR_HPP_ */

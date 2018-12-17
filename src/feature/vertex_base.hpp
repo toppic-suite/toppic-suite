@@ -21,7 +21,7 @@
 #include "feature/vertex_a.hpp"
 #include "feature/vertex_b.hpp"
 
-namespace prot {
+namespace toppic {
 
 class VertexBase {
  public:

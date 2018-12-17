@@ -18,7 +18,7 @@
 
 #include "prsm/prsm_para.hpp"
 
-namespace prot {
+namespace toppic {
 
 class PsAlignPara {
  public :
@@ -48,6 +48,6 @@ class PsAlignPara {
 
 typedef std::shared_ptr<PsAlignPara> PsAlignParaPtr;
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* PS_ALIGN_PARA_HPP_ */

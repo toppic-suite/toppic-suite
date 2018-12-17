@@ -23,7 +23,7 @@
 #include "base/string_util.hpp"
 #include "base/xml_dom_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 void ExtremeValue::setOneProtProb(double one_prot_prob) {
   one_prot_prob_ = one_prot_prob;
@@ -75,4 +75,4 @@ ExtremeValuePtr ExtremeValue::getMaxEvaluePtr() {
   return evalue_ptr;
 }
 
-}  // namespace prot
+}  // namespace toppic

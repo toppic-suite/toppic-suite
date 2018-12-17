@@ -20,7 +20,7 @@
 #include "base/logger.hpp"
 #include "zeroptmfilter/filter_protein.hpp"
 
-namespace prot {
+namespace toppic {
 
 inline bool cmpScore(const std::pair<int, int> &a, const std::pair<int, int> &b) {
   return a.second > b.second;
@@ -51,5 +51,5 @@ FilterProteinPtrVec FilterProtein::geneResults(std::vector<std::pair<int, int>> 
   return prot_results;
 }
 
-} /* namespace prot */
+} /* namespace toppic */
 

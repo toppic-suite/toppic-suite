@@ -26,7 +26,7 @@
 #include "prsmview/anno_prsm.hpp"
 #include "prsmview/anno_proteoform.hpp"
 
-namespace prot {
+namespace toppic {
 
 void addPrsmHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement* element,
                    PrsmPtr prsm_ptr, PrsmViewMngPtr mng_ptr) {
@@ -182,4 +182,4 @@ xercesc::DOMElement* geneAnnoPrsm(XmlDOMDocument* xml_doc, PrsmPtr prsm_ptr,
   return prsm_element;
 }
 
-}  // namespace prot
+}  // namespace toppic

@@ -23,7 +23,7 @@
 #include "oneptmsearch/diagonal.hpp"
 #include "oneptmsearch/diagonal_header.hpp"
 
-namespace prot {
+namespace toppic {
 
 class BasicDiagPair;
 typedef std::shared_ptr<BasicDiagPair> BasicDiagPairPtr;
@@ -64,6 +64,6 @@ class BasicDiagPair:public Pair {
 BasicDiagonalPtrVec geneDiagonals(const DiagonalHeaderPtrVec& header_ptr_vec,
                                   const PrmPeakPtrVec &prm_peaks,
                                   int group_spec_num, ProteoformPtr proteo_ptr);
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* BASIC_DIAG_PAIR_HPP_ */

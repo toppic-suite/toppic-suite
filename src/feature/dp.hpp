@@ -20,7 +20,7 @@
 #include "feature/feature_mng.hpp"
 #include "feature/match_env.hpp"
 
-namespace prot {
+namespace toppic {
 
 class Dp {
  public:

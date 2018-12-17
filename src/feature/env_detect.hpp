@@ -24,7 +24,7 @@
 #include "feature/feature_mng.hpp"
 #include "feature/deconv_data.hpp"
 
-namespace prot {
+namespace toppic {
 
 class EnvDetect {
  public:

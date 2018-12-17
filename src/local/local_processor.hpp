@@ -26,7 +26,7 @@
 #include "tdgf/tdgf_mng.hpp"
 #include "local_mng.hpp"
 
-namespace prot {
+namespace toppic {
 
 class LocalProcessor {
  public:
@@ -112,6 +112,6 @@ class LocalProcessor {
 
 typedef std::shared_ptr<LocalProcessor> LocalProcessorPtr;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

@@ -21,7 +21,7 @@
 #include "prsm/simple_prsm.hpp"
 #include "prsm/simple_prsm_str.hpp"
 
-namespace prot {
+namespace toppic {
 
 class SimplePrsmXmlWriter {
  public:
@@ -49,6 +49,6 @@ class SimplePrsmXmlWriter {
   std::string file_name_;
 };
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif /* SIMPLE_PRSM_WRITER_HPP_ */

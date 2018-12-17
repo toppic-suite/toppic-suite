@@ -24,7 +24,7 @@
 #include "feature/envelope.hpp" 
 #include "feature/real_env.hpp" 
 
-namespace prot {
+namespace toppic {
 
 class MatchEnv;
 
@@ -96,6 +96,6 @@ void write(std::ofstream &file, MatchEnvPtrVec &envs, MsHeaderPtr header_ptr);
 }  // namespace MsalignWriter
 */
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

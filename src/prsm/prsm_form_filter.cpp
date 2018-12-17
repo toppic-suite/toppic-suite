@@ -20,7 +20,7 @@
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_form_filter.hpp"
 
-namespace prot {
+namespace toppic {
 
 void PrsmFormFilter::process() {
   std::string base_name = file_util::basename(spec_file_name_);
@@ -57,4 +57,4 @@ void PrsmFormFilter::process() {
   writer.close();
 }
 
-} /* namespace prot */
+} /* namespace toppic */

@@ -23,7 +23,7 @@
 #include "spec/prm_peak_factory.hpp"
 #include "spec/prm_ms.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace prm_ms {
 
@@ -104,4 +104,4 @@ PrmPeakPtrVec getPrmPeakPtrs(const PrmMsPtrVec &prm_ms_ptr_vec,
 
 }  // namespace prm_ms 
 
-}  // namespace prot
+}  // namespace toppic

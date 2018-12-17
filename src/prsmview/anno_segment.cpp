@@ -19,7 +19,7 @@
 #include "base/string_util.hpp"
 #include "prsmview/anno_segment.hpp"
 
-namespace prot {
+namespace toppic {
 
 void AnnoSegment::addOccurence(int pos, const std::string &acid_letter) {
   std::pair<int, std::string> new_occurence(pos + 1, acid_letter);
@@ -119,5 +119,5 @@ void AnnoSegment::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent
   parent->appendChild(element);
 }
 
-}  // namespace prot
+}  // namespace toppic
 

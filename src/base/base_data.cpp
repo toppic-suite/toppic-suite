@@ -33,7 +33,7 @@
 #include "base/activation_base.hpp"
 #include "base/support_peak_type_base.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace base_data {
 
@@ -123,5 +123,5 @@ void init(const std::string & resource_dir) {
 
 } // namespace base_data
 
-} // namespace prot
+} // namespace toppic
 

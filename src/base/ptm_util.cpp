@@ -19,7 +19,7 @@
 #include "base/ptm_base.hpp"
 #include "base/ptm_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace ptm_util {
 
@@ -60,4 +60,4 @@ PtmPtrVec readPtmTxt(const std::string &file_name) {
 
 }  // namespace ModUtil
 
-}  // namespace prot
+}  // namespace toppic

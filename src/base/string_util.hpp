@@ -13,14 +13,14 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_STRING_UTIL_HPP_
-#define PROT_BASE_STRING_UTIL_HPP_
+#ifndef TOPPIC_BASE_STRING_UTIL_HPP_
+#define TOPPIC_BASE_STRING_UTIL_HPP_
 
 #include <string>
 #include <vector>
 #include <sstream>
 
-namespace prot {
+namespace toppic {
 
 namespace string_util {
 
@@ -46,6 +46,6 @@ bool endsWith(const std::string &str, const std::string &suffix);
 
 }  // namespace string_util
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

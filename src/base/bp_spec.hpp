@@ -13,15 +13,15 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_BP_SPEC_HPP_
-#define PROT_BASE_BP_SPEC_HPP_
+#ifndef TOPPIC_BASE_BP_SPEC_HPP_
+#define TOPPIC_BASE_BP_SPEC_HPP_
 
 #include <vector>
 
 #include "base/residue_seq.hpp"
 #include "base/break_point.hpp"
 
-namespace prot {
+namespace toppic {
 
 // break point spectrum
 class BpSpec {
@@ -55,6 +55,6 @@ class BpSpec {
 typedef std::shared_ptr<BpSpec> BpSpecPtr;
 typedef std::vector<BpSpecPtr> BpSpecPtrVec;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

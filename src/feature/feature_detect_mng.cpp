@@ -16,7 +16,7 @@
 #include "base/mass_constant.hpp"
 #include "feature/feature_detect_mng.hpp"
 
-namespace prot {
+namespace toppic {
 
 FeatureDetectMng::FeatureDetectMng() {
   double ppo = 0.000015;

@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_MOD_HPP_
-#define PROT_BASE_MOD_HPP_
+#ifndef TOPPIC_BASE_MOD_HPP_
+#define TOPPIC_BASE_MOD_HPP_
 
 #include <string>
 #include <vector>
@@ -23,7 +23,7 @@
 #include "base/residue_base.hpp"
 #include "base/xml_dom_document.hpp"
 
-namespace prot {
+namespace toppic {
 
 class Mod;
 typedef std::shared_ptr<Mod> ModPtr;
@@ -60,5 +60,5 @@ class Mod {
 
 typedef std::vector<ModPtr> ModPtrVec;
 
-}  // namespace prot
+}  // namespace toppic
 #endif

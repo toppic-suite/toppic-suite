@@ -24,7 +24,7 @@
 
 #include "mcmc/mcmc_mass_table_util.hpp"
 
-namespace prot {
+namespace toppic {
 namespace mass_table_util {
 
 std::map<int, std::vector<std::string> > readMassTable(MCMCMngPtr mng_ptr) {
@@ -124,4 +124,4 @@ std::map<int, std::vector<std::string> > geneMassTableFixMod(MCMCMngPtr mng_ptr)
 }
 
 }  // namespace mass_table_util
-}  // namespace prot
+}  // namespace toppic

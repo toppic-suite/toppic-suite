@@ -15,7 +15,7 @@
 
 #include "base/logger.hpp"
 
-namespace prot {
+namespace toppic {
 
 int log_level = 5;
 

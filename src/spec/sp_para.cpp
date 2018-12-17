@@ -19,7 +19,7 @@
 #include "base/xml_dom_util.hpp"
 #include "spec/sp_para.hpp"
 
-namespace prot {
+namespace toppic {
 
 SpPara::SpPara(xercesc::DOMElement* element) {
   min_peak_num_ = xml_dom_util::getIntChildValue(element, "min_peak_num", 0);
@@ -61,4 +61,4 @@ void SpPara::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   parent->appendChild(element);
 }
 
-}  // namespace prot
+}  // namespace toppic

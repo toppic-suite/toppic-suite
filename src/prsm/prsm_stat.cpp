@@ -31,7 +31,7 @@
 #include "prsm/peak_ion_pair_util.hpp"
 #include "prsm/prsm_stat.hpp"
 
-namespace prot {
+namespace toppic {
 
 PrsmStat::PrsmStat(PrsmParaPtr prsm_para_ptr,
                    const std::string &input_file_ext,
@@ -358,4 +358,4 @@ void PrsmStat::process() {
   file.close();
 }
 
-}  // namespace prot
+}  // namespace toppic

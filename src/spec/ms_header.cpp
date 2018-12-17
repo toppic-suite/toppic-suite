@@ -26,7 +26,7 @@
 #include "spec/peak_util.hpp"
 #include "spec/ms_header.hpp"
 
-namespace prot {
+namespace toppic {
 
 MsHeader::MsHeader(xercesc::DOMElement* element) {
   file_name_ = xml_dom_util::getChildValue(element, "file_name", 0);
@@ -169,4 +169,4 @@ bool MsHeader::cmpPrecInteDec(const MsHeaderPtr &a, const MsHeaderPtr &b) {
   return a->getPrecInte() > b->getPrecInte();
 }
 
-}  // namespace prot
+}  // namespace toppic

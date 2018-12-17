@@ -22,7 +22,7 @@
 #include "prsm/simple_prsm.hpp"
 #include "oneptmfilter/one_ptm_filter_mng.hpp"
 
-namespace prot {
+namespace toppic {
 
 class OnePtmFilterProcessor {
  public:
@@ -37,6 +37,6 @@ class OnePtmFilterProcessor {
 
 typedef std::shared_ptr<OnePtmFilterProcessor> OnePtmFilterProcessorPtr;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif /* PTM_FAST_FILTER_PROCESSOR_HPP_ */

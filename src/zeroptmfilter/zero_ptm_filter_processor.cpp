@@ -32,7 +32,7 @@
 #include "zeroptmfilter/zero_ptm_filter_processor.hpp"
 #include "zeroptmfilter/mass_zero_ptm_filter.hpp"
 
-namespace prot {
+namespace toppic {
 
 void ZeroPtmFilterProcessor::process() {
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
@@ -256,4 +256,4 @@ void ZeroPtmFilterProcessor::processBlock(DbBlockPtr block_ptr) {
   file_util::cleanTempFiles(sp_file_name, mng_ptr_->output_file_ext_ + "_" + internal + end_str);
 }
 
-}  // namespace prot
+}  // namespace toppic

@@ -19,7 +19,7 @@
 #include "base/logger.hpp"
 #include "feature/match_env_refine.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace match_env_refine {
 
@@ -156,4 +156,4 @@ double compDist(const std::vector<double> &norm, const std::vector<double> &theo
 
 }  // namespace match_env_refine
 
-}  // namespace prot
+}  // namespace toppic

@@ -18,7 +18,7 @@
 #include "feature/raw_ms_util.hpp" 
 #include "feature/deconv_data.hpp" 
 
-namespace prot {
+namespace toppic {
 
 DeconvData::DeconvData(PeakPtrVec &peak_list, double max_mass, int max_charge,
                        double win_size): 

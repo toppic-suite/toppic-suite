@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_FILE_UTIL_HPP_
-#define PROT_BASE_FILE_UTIL_HPP_
+#ifndef TOPPIC_BASE_FILE_UTIL_HPP_
+#define TOPPIC_BASE_FILE_UTIL_HPP_
 
 #include <string>
 
@@ -28,7 +28,7 @@
 #include <boost/filesystem/path.hpp>
 #undef BOOST_NO_CXX11_SCOPED_ENUMS
 
-namespace prot {
+namespace toppic {
 
 namespace file_util {
 
@@ -65,5 +65,5 @@ void cleanTempFiles(const std::string & sp_path,
 
 }  // namespace file_util
 
-}  // namespace prot
+}  // namespace toppic
 #endif

@@ -19,7 +19,7 @@
 #include "base/proteoform_factory.hpp"
 #include "ptmsearch/ptm_search_slow_filter.hpp"
 
-namespace prot {
+namespace toppic {
 
 PtmSearchSlowFilter::PtmSearchSlowFilter(SpectrumSetPtr spectrum_set_ptr,
                                          SimplePrsmPtrVec simple_prsm_ptrs,
@@ -113,4 +113,4 @@ PrsmPtrVec PtmSearchSlowFilter::getPrsms(int shift_num, AlignTypePtr type_ptr) {
   return prsm_ptrs;
 }
 
-} /* namespace prot */
+} /* namespace toppic */

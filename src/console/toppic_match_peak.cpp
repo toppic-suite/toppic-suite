@@ -25,7 +25,7 @@
 
 #include "console/toppic_argument.hpp"
 
-namespace prot {
+namespace toppic {
 
 int outputMatchPeaks(std::map<std::string, std::string> arguments) {
   try {

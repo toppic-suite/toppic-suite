@@ -23,7 +23,7 @@
 #include "spec/peak.hpp"
 #include "feature/envelope.hpp" 
 
-namespace prot {
+namespace toppic {
 
 class RealEnv;
 

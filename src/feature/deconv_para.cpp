@@ -18,7 +18,7 @@
 
 #include "feature/deconv_para.hpp"
 
-namespace prot {
+namespace toppic {
 
 DeconvPara::DeconvPara(std::map<std::string, std::string> &arguments) {
   data_file_name_ = arguments["spectrumFileName"];
@@ -48,4 +48,4 @@ DeconvPara::DeconvPara(std::map<std::string, std::string> &arguments) {
   output_match_env_ = (arguments["outputMatchEnv"] == "true");
 }
 
-}  // namespace prot
+}  // namespace toppic

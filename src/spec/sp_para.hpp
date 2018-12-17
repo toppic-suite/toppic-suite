@@ -25,7 +25,7 @@
 #include "base/xml_dom_document.hpp"
 #include "spec/peak_tolerance.hpp"
 
-namespace prot {
+namespace toppic {
 
 class SpPara {
  public:
@@ -92,6 +92,6 @@ class SpPara {
 
 typedef std::shared_ptr<SpPara> SpParaPtr;
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* SP_PARA_HPP_ */

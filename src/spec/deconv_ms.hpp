@@ -19,7 +19,7 @@
 #include "spec/ms.hpp"
 #include "spec/deconv_peak.hpp"
 
-namespace prot {
+namespace toppic {
 
 typedef Ms<DeconvPeakPtr> DeconvMs;
 

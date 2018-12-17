@@ -26,7 +26,7 @@
 #include "spec/extend_ms.hpp"
 #include "spec/sp_para.hpp"
 
-namespace prot {
+namespace toppic {
 
 class Prsm;
 typedef std::shared_ptr<Prsm> PrsmPtr;
@@ -225,6 +225,6 @@ typedef std::vector<PrsmPtr> PrsmPtrVec;
 typedef std::vector<PrsmPtrVec> PrsmPtrVec2D;
 typedef std::vector<PrsmPtrVec2D> PrsmPtrVec3D;
 
-}  // namespace prot
+}  // namespace toppic
 #endif
 

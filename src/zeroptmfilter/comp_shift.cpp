@@ -25,7 +25,7 @@
 #include "base/mass_constant.hpp"
 #include "zeroptmfilter/comp_shift.hpp"
 
-namespace prot {
+namespace toppic {
 
 CompShift::CompShift(const ProteoformPtrVec &proteo_ptrs, int scale,
                      double max_proteoform_mass, ProtModPtrVec prot_mod_ptr_vec,
@@ -576,4 +576,4 @@ inline void CompShift::findTopDiagScores(std::vector<short> &scores, int num) {
   // LOG_DEBUG("top diag size " << top_diag_prots_.size());
 }
 
-} /* namespace prot */
+} /* namespace toppic */

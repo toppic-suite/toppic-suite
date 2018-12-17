@@ -20,7 +20,7 @@
 #include "spec/base_peak_type.hpp"
 #include "spec/prm_ms_factory.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace prm_ms_factory {
 
@@ -282,4 +282,4 @@ PrmMsPtrVec geneShiftMsSixPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
 }
 
 }  // namespace prm_ms_factory
-}  // namespace prot
+}  // namespace toppic

@@ -21,7 +21,7 @@
 #include "base/ion.hpp"
 #include "spec/peak.hpp"
 
-namespace prot {
+namespace toppic {
 
 class TheoPeak;
 typedef std::shared_ptr<TheoPeak> TheoPeakPtr;
@@ -50,6 +50,6 @@ class TheoPeak : public Peak {
 
 typedef std::vector<TheoPeakPtr> TheoPeakPtrVec;
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* THEO_PEAK_HPP_ */

@@ -22,7 +22,7 @@
 
 #include "protein_db.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace suffix {
 
@@ -73,6 +73,6 @@ typedef std::shared_ptr<SuffixPosition> SuffixPosPtr;
 
 }  // namespace suffix
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

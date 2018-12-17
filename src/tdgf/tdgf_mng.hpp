@@ -21,7 +21,7 @@
 
 #include "prsm/prsm_para.hpp"
 
-namespace prot {
+namespace toppic {
 
 class TdgfMng {
  public:
@@ -76,6 +76,6 @@ class TdgfMng {
 
 typedef std::shared_ptr<TdgfMng> TdgfMngPtr;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

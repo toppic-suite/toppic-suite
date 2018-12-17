@@ -20,7 +20,7 @@
 
 #include "feature/match_env.hpp"
 
-namespace prot {
+namespace toppic {
 
 class CoTable {
  public:
@@ -39,5 +39,5 @@ class CoTable {
   static std::vector<std::vector<bool>> initCoexistTable(MatchEnvPtr2D &win_envs, double tolerance);
 };
 
-}  // namespace prot
+}  // namespace toppic
 #endif

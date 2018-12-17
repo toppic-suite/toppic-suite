@@ -21,7 +21,7 @@
 #include "base/xml_dom_document.hpp"
 #include "base/xml_dom_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 IonType::IonType(const std::string &name, bool n_term, double shift):
     name_(name),
@@ -51,4 +51,4 @@ void IonType::appendNameToXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* pare
   parent->appendChild(element);
 }
 
-}  // namespace prot
+}  // namespace toppic

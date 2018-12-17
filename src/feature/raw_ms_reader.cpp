@@ -23,7 +23,7 @@
 #include "pwiz/data/common/ParamTypes.hpp"
 #include "feature/raw_ms_reader.hpp"
 
-namespace prot {
+namespace toppic {
 
 RawMsReader::RawMsReader(const std::string & file_name):
     file_name_(file_name),
@@ -146,4 +146,4 @@ int RawMsReader::readNext() {
   return 1;
 }
 
-}  // namespace prot
+}  // namespace toppic

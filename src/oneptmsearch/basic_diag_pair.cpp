@@ -19,7 +19,7 @@
 #include "base/base_algo.hpp"
 #include "oneptmsearch/basic_diag_pair.hpp"
 
-namespace prot {
+namespace toppic {
 
 inline BasicDiagPairPtrVec compDiagPair(const PrmPeakPtrVec &prm_peaks,
                                         int group_spec_num,
@@ -146,4 +146,4 @@ BasicDiagonalPtrVec geneDiagonals(const DiagonalHeaderPtrVec& header_ptr_vec,
   return diagonal_list;
 }
 
-} /* namespace prot */
+} /* namespace toppic */

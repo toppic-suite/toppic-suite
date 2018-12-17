@@ -21,7 +21,7 @@
 #include "base/proteoform.hpp"
 #include "spec/prm_peak.hpp"
 
-namespace prot {
+namespace toppic {
 
 class DiagonalHeader;
 
@@ -170,6 +170,6 @@ MassShiftPtrVec getDiagonalMassChanges(const DiagonalHeaderPtrVec &header_ptrs,
                                        int first_res_pos, int last_res_pos,
                                        const MassShiftTypePtrVec & type_ptrs);
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* DIAGONAL_HEADER_HPP_ */

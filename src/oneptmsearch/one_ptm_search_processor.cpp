@@ -29,7 +29,7 @@
 #include "oneptmsearch/one_ptm_slow_match.hpp"
 #include "oneptmsearch/one_ptm_search_processor.hpp"
 
-namespace prot {
+namespace toppic {
 
 PrsmPtrVec OnePtmSearchProcessor::onePtmSearchOneSpec(SpectrumSetPtr spec_set_ptr,
                                                       const SimplePrsmPtrVec &simple_prsm_ptr_vec,
@@ -182,4 +182,4 @@ void OnePtmSearchProcessor::process() {
   std::cout << std::endl;
 }
 
-}  // namespace prot
+}  // namespace toppic

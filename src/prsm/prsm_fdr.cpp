@@ -18,7 +18,7 @@
 #include "prsm/prsm_str.hpp"
 #include "prsm/prsm_fdr.hpp"
 
-namespace prot {
+namespace toppic {
 
 inline PrsmStrPtrVec2D getGroups(PrsmStrPtrVec &prsm_ptrs) {
   PrsmStrPtrVec2D results;
@@ -121,4 +121,4 @@ void PrsmFdr::computeProteoformFdr(PrsmStrPtrVec2D &target_proteoforms,
   }
 }
 
-}  // namespace prot
+}  // namespace toppic

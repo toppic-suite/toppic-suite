@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_RESIDUE_BASE_HPP_
-#define PROT_BASE_RESIDUE_BASE_HPP_
+#ifndef TOPPIC_BASE_RESIDUE_BASE_HPP_
+#define TOPPIC_BASE_RESIDUE_BASE_HPP_
 
 #include <string>
 #include <memory>
@@ -23,7 +23,7 @@
 #include "base/residue.hpp"
 #include "base/logger.hpp"
 
-namespace prot {
+namespace toppic {
 
 class ResidueBase {
  public:
@@ -48,6 +48,6 @@ class ResidueBase {
   static ResiduePtr empty_residue_ptr_;
 };
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

@@ -25,7 +25,7 @@
 #include "prsm/prsm_util.hpp"
 #include "spec/msalign_reader.hpp"
 
-namespace prot {
+namespace toppic {
 
 void PrsmFeatureCluster::setProtId(PrsmStrPtrVec& prsm_ptrs) {
   std::vector<PrsmStrPtrVec> proteins;
@@ -112,4 +112,4 @@ void PrsmFeatureCluster::process() {
   writer.close();
 }
 
-}  // namespace prot
+}  // namespace toppic

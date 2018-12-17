@@ -29,7 +29,7 @@
 #include "base/xml_dom.hpp"
 #include "base/xml_dom_err_handler.hpp"
  
-namespace prot {
+namespace toppic {
 
 XmlDOMParser* XmlDOMParserFactory::dom_parser_ = nullptr;
 

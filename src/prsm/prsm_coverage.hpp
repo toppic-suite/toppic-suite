@@ -24,7 +24,7 @@
 #include "prsm/prsm.hpp"
 #include "prsm/prsm_para.hpp"
 
-namespace prot {
+namespace toppic {
 
 class PrsmCoverage {
  public:
@@ -61,7 +61,7 @@ class PrsmCoverage {
 
 typedef std::shared_ptr<PrsmCoverage> PrsmCoveragePtr;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif
 

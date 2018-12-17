@@ -29,7 +29,7 @@
 #include "tdgf/evalue_processor.hpp"
 
 
-namespace prot {
+namespace toppic {
 
 void EValueProcessor::init() {
   test_num_ptr_ = std::make_shared<CountTestNum>(mng_ptr_);

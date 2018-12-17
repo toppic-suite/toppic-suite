@@ -15,7 +15,7 @@
 
 #include "feature/charge_cmp.hpp" 
 
-namespace prot {
+namespace toppic {
 
 // get common peaks in two peak lists 
 std::vector<int> getCommonPeak(RealEnvPtr env_a, RealEnvPtr env_b) {

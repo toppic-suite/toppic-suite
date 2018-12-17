@@ -22,7 +22,7 @@
 #include "base/string_util.hpp"
 #include "base/fasta_reader.hpp"
 
-namespace prot {
+namespace toppic {
 
 DbBlockPtrVec DbBlock::readDbBlockIndex(const std::string &db_file_name) {
   DbBlockPtrVec db_block_ptr_vec;
@@ -47,4 +47,4 @@ DbBlockPtrVec DbBlock::readDbBlockIndex(const std::string &db_file_name) {
   return db_block_ptr_vec;
 }
 
-}  // namespace prot
+}  // namespace toppic

@@ -28,7 +28,7 @@
 #include "prsm/peak_ion_pair.hpp"
 
 
-namespace prot {
+namespace toppic {
 
 namespace peak_ion_pair_util {
 
@@ -53,5 +53,5 @@ double compMatchPeakNum(PeakIonPairPtrVec &pairs);
 
 }  // namespace peak_ion_pair_util
 
-}  // namespace prot
+}  // namespace toppic
 #endif

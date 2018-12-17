@@ -26,7 +26,7 @@
 #include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_str.hpp"
 
-namespace prot {
+namespace toppic {
 
 class PrsmSampleMerge {
  public:
@@ -63,6 +63,6 @@ class PrsmSampleMerge {
 
 typedef std::shared_ptr<PrsmSampleMerge> PrsmSampleMergePtr;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif /* PRSM_SAMPLE_MERGE_HPP_ */

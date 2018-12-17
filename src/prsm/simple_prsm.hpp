@@ -25,7 +25,7 @@
 #include "base/xml_dom_document.hpp"
 #include "spec/ms_header.hpp"
 
-namespace prot {
+namespace toppic {
 
 class SimplePrsm;
 typedef std::shared_ptr<SimplePrsm>   SimplePrsmPtr;
@@ -140,6 +140,6 @@ class SimplePrsm {
   std::vector<double> c_trunc_shifts_;
 };
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* SIMPLE_PRSM_HPP_ */

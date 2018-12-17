@@ -21,7 +21,7 @@
 
 #include "base/residue.hpp"
 
-namespace prot {
+namespace toppic {
 
 const std::string ANNO_RESIDUE_TYPE_NORMAL         = "normal";
 
@@ -72,6 +72,6 @@ class AnnoResidue : public Residue {
 typedef std::shared_ptr<AnnoResidue> AnnoResiduePtr;
 typedef std::vector<AnnoResiduePtr> AnnoResiduePtrVec;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif /* PROT_ANNO_RESIDUE_HPP_ */

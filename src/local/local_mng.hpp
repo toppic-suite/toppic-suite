@@ -27,7 +27,7 @@
 #include "base/fasta_reader.hpp"
 #include "base/file_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 const int LEFT_SUP_LIMIT = 10;
 
@@ -78,6 +78,6 @@ class LocalMng {
 
 typedef std::shared_ptr<LocalMng> LocalMngPtr;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif /* PROT_LOCAL_MNG_HPP_ */

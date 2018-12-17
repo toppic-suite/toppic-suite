@@ -13,15 +13,15 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_ION_TYPE_HPP_
-#define PROT_BASE_ION_TYPE_HPP_
+#ifndef TOPPIC_BASE_ION_TYPE_HPP_
+#define TOPPIC_BASE_ION_TYPE_HPP_
 
 #include <string>
 #include <vector>
 #include <memory>
 #include "base/xml_dom_document.hpp"
 
-namespace prot {
+namespace toppic {
 
 class IonType {
  public:
@@ -59,6 +59,6 @@ class IonType {
 typedef std::shared_ptr<IonType> IonTypePtr;
 typedef std::vector<IonTypePtr> IonTypePtrVec;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif
