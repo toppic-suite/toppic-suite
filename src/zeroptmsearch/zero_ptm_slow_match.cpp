@@ -20,10 +20,10 @@
 #include "base/proteoform.hpp"
 #include "base/proteoform_factory.hpp"
 #include "base/activation.hpp"
-#include "base/base_algo.hpp"
 #include "spec/extend_ms_factory.hpp"
 #include "spec/theo_peak.hpp"
 #include "spec/theo_peak_util.hpp"
+#include "prsm/base_algo.hpp"
 #include "zeroptmsearch/zero_ptm_slow_match.hpp"
 
 namespace toppic {

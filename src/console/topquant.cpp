@@ -117,7 +117,7 @@ int main(int argc, char* argv[]) {
   std::vector<PrsmPtr> prsm_vec;
 
   for (size_t k = 0; k < spec_file_lst.size(); k++) {
-    std::string input_file_name = prot::file_util::basename(spec_file_lst[k]) + ".FORM_RESULT";
+    std::string input_file_name = toppic::file_util::basename(spec_file_lst[k]) + ".FORM_RESULT";
     PrsmReader prsm_reader(input_file_name);
     PrsmPtr prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
     while (prsm_ptr != nullptr) {

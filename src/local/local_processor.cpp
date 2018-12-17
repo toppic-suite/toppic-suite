@@ -223,7 +223,7 @@ ProteoformPtr LocalProcessor::processOneKnownPtm(PrsmPtr prsm) {
 
       one_shift_proteoform
           = std::make_shared<Proteoform>(ori_prot_form->getFastaSeqPtr(),
-                                         prot::ProtModBase::getProtModPtr_NONE(),
+                                         toppic::ProtModBase::getProtModPtr_NONE(),
                                          ori_prot_form->getStartPos(),
                                          ori_prot_form->getEndPos(),
                                          ori_prot_form->getResSeqPtr(),

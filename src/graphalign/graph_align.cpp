@@ -515,7 +515,7 @@ PrsmPtr GraphAlign::geneResult(int s, int m) {
   ProteoformPtr proteo_ptr = proteo_graph_ptr_->getProteoformPtr();
 
   ProteoformPtr sub_proteo_ptr
-      = prot::proteoform_factory::geneSubProteoform(proteo_ptr, first_pos, last_pos);
+      = toppic::proteoform_factory::geneSubProteoform(proteo_ptr, first_pos, last_pos);
 
   LOG_DEBUG("get sub proteo first pos " << first_pos << " last pos " << last_pos);
   SpParaPtr sp_para_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr();

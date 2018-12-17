@@ -24,10 +24,10 @@
 #include "console/toppic_process.hpp"
 
 int main(int argc, char* argv[]) {
-  //prot::log_level = 3;
+  //toppic::log_level = 3;
   std::cout << std::setprecision(10);
 
-  prot::Argument argu_processor;
+  toppic::Argument argu_processor;
 
   bool success = argu_processor.parse(argc, argv);
 
@@ -41,7 +41,7 @@ int main(int argc, char* argv[]) {
 
   std::sort(spec_file_lst.begin(), spec_file_lst.end());
 
-  prot::TopPICProgress_multi_file(arguments, spec_file_lst);  
+  toppic::TopPICProgress_multi_file(arguments, spec_file_lst);  
 
   return 0;
 }

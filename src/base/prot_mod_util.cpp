@@ -24,7 +24,7 @@
 
 namespace toppic {
 
-namespace toppic_mod_util {
+namespace prot_mod_util {
 
 bool allowMod(ProtModPtr prot_mod_ptr, const ResiduePtrVec &residues) {
   if (prot_mod_ptr == ProtModBase::getProtModPtr_NONE()) {

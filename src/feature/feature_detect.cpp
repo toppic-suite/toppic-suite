@@ -207,12 +207,12 @@ void groupHeaders(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtrVec &header_ptr_vec,
                                           ms1_id_end, mng_ptr);
     if (cur_inte == 0) {
       DeconvPeakPtrVec peak_vec = ms1_ptr_vec[ms1_id_begin]->getPeakPtrVec();
-      peak_vec.push_back(std::make_shared<prot::DeconvPeak>(peak_vec.size(),
+      peak_vec.push_back(std::make_shared<toppic::DeconvPeak>(peak_vec.size(),
                                                             best_ptr->getPrecMonoMass(),
                                                             best_ptr->getPrecInte(),
                                                             best_ptr->getPrecCharge()));
       ms1_ptr_vec[ms1_id_begin]
-          = std::make_shared<Ms<prot::DeconvPeakPtr> >(ms1_ptr_vec[ms1_id_begin]->getMsHeaderPtr(),
+          = std::make_shared<Ms<toppic::DeconvPeakPtr> >(ms1_ptr_vec[ms1_id_begin]->getMsHeaderPtr(),
                                                        peak_vec);
       cur_inte = best_ptr->getPrecInte();
     }

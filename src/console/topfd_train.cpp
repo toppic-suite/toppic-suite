@@ -21,18 +21,18 @@
 #include "feature/topfd_process.hpp"
 
 int main(int argc, char* argv[]) {
-  prot::Argument argu_processor;
+  toppic::Argument argu_processor;
   bool success = argu_processor.parse(argc, argv);
   if (!success) {
     return 1;
   }
   std::map<std::string, std::string> arguments = argu_processor.getArguments();
   
-  std::string exe_dir = prot::file_util::getExecutiveDir(argv[0]);
+  std::string exe_dir = toppic::file_util::getExecutiveDir(argv[0]);
   arguments["executiveDir"] = exe_dir;
 
   arguments["doFinalFiltering"] = "false";
   arguments["outputMatchEnv"] = "true";
 
-  return prot::TopFDProcess(arguments);
+  return toppic::TopFDProcess(arguments);
 }

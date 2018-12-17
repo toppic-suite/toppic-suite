@@ -26,9 +26,9 @@ IonTypePtr IonTypeBase::ion_type_ptr_B_;
 IonTypePtr IonTypeBase::ion_type_ptr_PREC_;
 
 void IonTypeBase::initBase(const std::string &file_name) {
-  prot::XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
+  toppic::XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
-    prot::XmlDOMDocument doc(parser, file_name.c_str());
+    toppic::XmlDOMDocument doc(parser, file_name.c_str());
     xercesc::DOMElement* parent = doc.getDocumentElement();
     std::string element_name = IonType::getXmlElementName();
     int ion_type_num = xml_dom_util::getChildCount(parent, element_name.c_str());

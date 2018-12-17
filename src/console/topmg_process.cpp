@@ -366,14 +366,14 @@ int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
   std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
   std::string combined_start_time = buf;
 
-  std::cout << "TopMG " << prot::version_number << std::endl;
+  std::cout << "TopMG " << toppic::version_number << std::endl;
 
   for (size_t k = 0; k < spec_file_lst.size(); k++) {
     std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
     std::string start_time = buf;
     arguments["startTime"] = start_time;
     arguments["spectrumFileName"] = spec_file_lst[k];
-    if (prot::TopMGProcess(arguments) != 0) {
+    if (toppic::TopMGProcess(arguments) != 0) {
       return 1;
     }
   }
@@ -382,26 +382,26 @@ int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
     std::cout << "Merging files - started." << std::endl;
     int N = 1000000;
     // merge msalign files
-    prot::msalign_util::mergeMsalignFiles(spec_file_lst, N, base_name + "_ms2.msalign");
+    toppic::msalign_util::mergeMsalignFiles(spec_file_lst, N, base_name + "_ms2.msalign");
     // merge feature files
     std::vector<std::string> feature_file_lst(spec_file_lst.size());
     for (size_t i = 0; i < spec_file_lst.size(); i++) {
       std::string sp_file_name = spec_file_lst[i];
       feature_file_lst[i] = sp_file_name.substr(0, sp_file_name.length() - 12) + ".feature";
     }
-    prot::feature_util::mergeFeatureFiles(feature_file_lst, N, base_name + ".feature");
+    toppic::feature_util::mergeFeatureFiles(feature_file_lst, N, base_name + ".feature");
     // merge EVALUE files
     std::vector<std::string> prsm_file_lst(spec_file_lst.size());
     for (size_t i = 0; i < spec_file_lst.size(); i++) {
-      prsm_file_lst[i] = prot::file_util::basename(spec_file_lst[i]) + ".topmg_evalue"; 
+      prsm_file_lst[i] = toppic::file_util::basename(spec_file_lst[i]) + ".topmg_evalue"; 
     }
-    prot::prsm_util::mergePrsmFiles(prsm_file_lst, N, base_name + "_ms2.topmg_evalue");
+    toppic::prsm_util::mergePrsmFiles(prsm_file_lst, N, base_name + "_ms2.topmg_evalue");
     std::cout << "Merging files - finished." << std::endl;
 
     std::string sp_file_name = base_name + "_ms2.msalign";
     arguments["spectrumFileName"] = sp_file_name;
     arguments["startTime"] = combined_start_time;
-    prot::TopMG_post(arguments);
+    toppic::TopMG_post(arguments);
   }
 
   if (arguments["keepTempFiles"] != "true") {
@@ -410,16 +410,16 @@ int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
 
     for (size_t k = 0; k < spec_file_lst.size(); k++) {
       std::string sp_file_name = spec_file_lst[k];
-      prot::file_util::delDir(prot::file_util::basename(sp_file_name) + "_topmg_proteoform_cutoff_xml");
-      prot::file_util::delDir(prot::file_util::basename(sp_file_name) + "_topmg_prsm_cutoff_xml");
-      prot::file_util::cleanTopmgDir(ori_db_file_name, sp_file_name);
+      toppic::file_util::delDir(toppic::file_util::basename(sp_file_name) + "_topmg_proteoform_cutoff_xml");
+      toppic::file_util::delDir(toppic::file_util::basename(sp_file_name) + "_topmg_prsm_cutoff_xml");
+      toppic::file_util::cleanTopmgDir(ori_db_file_name, sp_file_name);
     }
 
     if (spec_file_lst.size() > 1 && arguments["combinedOutputName"] != "") {
       std::string sp_file_name = base_name + "_ms2.msalign";
-      prot::file_util::delDir(prot::file_util::basename(sp_file_name) + "_topmg_proteoform_cutoff_xml");
-      prot::file_util::delDir(prot::file_util::basename(sp_file_name) + "_topmg_prsm_cutoff_xml");
-      prot::file_util::cleanTopmgDir(ori_db_file_name, sp_file_name);
+      toppic::file_util::delDir(toppic::file_util::basename(sp_file_name) + "_topmg_proteoform_cutoff_xml");
+      toppic::file_util::delDir(toppic::file_util::basename(sp_file_name) + "_topmg_prsm_cutoff_xml");
+      toppic::file_util::cleanTopmgDir(ori_db_file_name, sp_file_name);
     }
     std::cout << "Deleting temporary files - finished." << std::endl; 
   }

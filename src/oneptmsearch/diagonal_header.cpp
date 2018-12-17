@@ -19,7 +19,7 @@
 #include "base/prot_mod.hpp"
 #include "base/mod_base.hpp"
 #include "base/change.hpp"
-#include "base/base_algo.hpp"
+#include "prsm/base_algo.hpp"
 #include "oneptmsearch/diagonal_header.hpp"
 
 namespace toppic {

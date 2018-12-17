@@ -20,9 +20,11 @@
 #include <string>
 #include <vector>
 
-#include "base/xml_dom_document.hpp"
+#include <xercesc/dom/DOM.hpp>
 
 namespace toppic {
+
+class XmlDOMDocument;
 
 class AminoAcid {
  public:

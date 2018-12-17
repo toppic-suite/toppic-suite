@@ -22,7 +22,7 @@
 
 namespace toppic {
 
-namespace toppiceoform_util {
+namespace proteoform_util {
 
 // calculate frequencies for n_terminal_residues
 ResFreqPtrVec compNTermResidueFreq(const ProteoformPtrVec &prot_mod_forms);

@@ -21,6 +21,7 @@ namespace toppic {
 
 ActivationPtrVec ActivationBase::activation_ptr_vec_;
 
+// initialize activation database using an xml file
 void ActivationBase::initBase(const std::string &file_name) {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {

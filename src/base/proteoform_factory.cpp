@@ -31,7 +31,7 @@
 
 namespace toppic {
 
-namespace toppiceoform_factory {
+namespace proteoform_factory {
 
 ProteoformPtr geneDbProteoformPtr(FastaSeqPtr fasta_seq_ptr, ModPtrVec fix_mod_list) {
   if (fasta_seq_ptr == nullptr) {

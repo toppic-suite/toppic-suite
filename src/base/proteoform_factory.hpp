@@ -25,7 +25,7 @@
 
 namespace toppic {
 
-namespace toppiceoform_factory {
+namespace proteoform_factory {
 
 ProteoformPtr geneDbProteoformPtr(FastaSeqPtr seq_ptr, ModPtrVec fix_mod_list);
 

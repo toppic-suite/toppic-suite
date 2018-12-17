@@ -26,9 +26,9 @@ ProtModPtr ProtModBase::prot_mod_ptr_M_ACETYLATION_;
 //  ProtModPtr ProtModBase::prot_mod_ptr_NME_ACETYLATION_;
 
 void ProtModBase::initBase(const std::string &file_name) {
-  prot::XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
+  toppic::XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
-    prot::XmlDOMDocument doc(parser, file_name.c_str());
+    toppic::XmlDOMDocument doc(parser, file_name.c_str());
     xercesc::DOMElement* parent = doc.getDocumentElement();
     std::string element_name = ProtMod::getXmlElementName();
     int mod_num = xml_dom_util::getChildCount(parent, element_name.c_str());

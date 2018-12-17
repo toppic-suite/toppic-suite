@@ -16,7 +16,6 @@
 
 #include "base/logger.hpp"
 #include "base/amino_acid_base.hpp"
-#include "base/xml_dom.hpp"
 #include "base/xml_dom_document.hpp"
 #include "base/xml_dom_util.hpp"
 

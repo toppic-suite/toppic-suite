@@ -27,7 +27,7 @@ NeutralLossPtr NeutralLossBase::neutral_loss_ptr_NONE_;
 void NeutralLossBase::initBase(const std::string &file_name) {
   XmlDOMParser * parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
-    prot::XmlDOMDocument doc(parser, file_name.c_str());
+    toppic::XmlDOMDocument doc(parser, file_name.c_str());
     xercesc::DOMElement* parent = doc.getDocumentElement();
     std::string element_name = NeutralLoss::getXmlElementName();
     int neutral_loss_num = xml_dom_util::getChildCount(parent, element_name.c_str());

@@ -17,7 +17,7 @@
 #include <algorithm>
 
 #include "base/residue_util.hpp"
-#include "base/base_algo.hpp"
+#include "prsm/base_algo.hpp"
 
 #include "mcmc/comp_pvalue_mcmc.hpp"
 

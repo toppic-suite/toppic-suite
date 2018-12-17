@@ -49,7 +49,7 @@ std::string AnnoSegment::getResidueAnno() {
 
 void AnnoSegment::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   xercesc::DOMElement* element;
-  if (mass_shift_type_ == prot::MassShiftType::UNEXPECTED) {
+  if (mass_shift_type_ == toppic::MassShiftType::UNEXPECTED) {
     if (ptm_ptr_ != nullptr) {
       element = xml_doc->createElement("characterized_change");
     } else {
