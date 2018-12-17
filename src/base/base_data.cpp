@@ -15,6 +15,10 @@
 #include <string>
 #include <map>
 
+#define BOOST_NO_CXX11_SCOPED_ENUMS
+#include <boost/filesystem.hpp>
+#undef BOOST_NO_CXX11_SCOPED_ENUMS
+
 #include "base/base_data.hpp"
 #include "base/logger.hpp"
 #include "base/xml_dom_document.hpp"
@@ -44,6 +48,10 @@ void init(const std::string & resource_dir) {
   if (init_) { return; }
   std::string separator = file_util::getFileSeparator();
   std::string base_data_dir = resource_dir + separator + base_data::getBaseDataDirName();
+  if (!boost::filesystem::exists(base_data_dir)) {
+    LOG_ERROR("The directory " << base_data_dir << " does not exist!");
+    exit (1);
+  }
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
     std::string config_file_name

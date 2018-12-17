@@ -25,7 +25,6 @@
 #include "base/file_util.hpp"
 #include "base/residue_util.hpp"
 #include "base/neutral_loss.hpp"
-#include "base/base_algo.hpp"
 #include "base/extreme_value.hpp"
 #include "base/thread_pool.hpp"
 
@@ -35,6 +34,7 @@
 #include "spec/theo_peak_util.hpp"
 #include "spec/extend_ms_factory.hpp"
 
+#include "prsm/base_algo.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_str_combine.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
@@ -215,7 +215,7 @@ std::function<void()> geneTask(SpectrumSetPtr spec_set_ptr,
                                std::shared_ptr<ThreadPool<PrsmXmlWriter> > pool_ptr) {
   return [spec_set_ptr, prsm_ptr, mng_ptr, ptm_residue_map, mass_table, test_num_ptr, ptm_mass_vec2d, pool_ptr]() {
     CompPValueMCMCPtr comp_mcmc_ptr
-        = std::make_shared<prot::CompPValueMCMC>(mng_ptr, ptm_residue_map, mass_table);
+        = std::make_shared<toppic::CompPValueMCMC>(mng_ptr, ptm_residue_map, mass_table);
     DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
     ExtendMsPtrVec refine_ms_ptr_vec
         = extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec,

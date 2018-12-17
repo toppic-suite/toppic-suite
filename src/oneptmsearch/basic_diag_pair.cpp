@@ -16,7 +16,7 @@
 #include <algorithm>
 #include <vector>
 
-#include "base/base_algo.hpp"
+#include "prsm/base_algo.hpp"
 #include "oneptmsearch/basic_diag_pair.hpp"
 
 namespace toppic {

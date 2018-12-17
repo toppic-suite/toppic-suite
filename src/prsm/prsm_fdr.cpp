@@ -50,7 +50,7 @@ void PrsmFdr::process(){
   PrsmStrPtrVec decoy_ptrs;
   for(size_t i = 0; i < prsm_str_ptrs.size(); i++){
     if (prsm_str_ptrs[i]->getEValue() == 0.0) {
-      LOG_ERROR("prot::PRSMFdr zero E value is reported");
+      LOG_ERROR("toppic::PRSMFdr zero E value is reported");
     } else {
       std::string seq_name  = prsm_str_ptrs[i]->getSeqName();
       //LOG_DEBUG("seq name " << seq_name);

@@ -260,7 +260,7 @@ void XmlGenerator::splitBySpeciesId() {
       cluster_id_map[sub_cluster_ids_[i]] = i;
       std::string file_name = file_util::basename(spectrum_file_name) 
           + ".proteoform_" + std::to_string(sub_cluster_ids_[i]);
-      PrsmXmlWriterPtr writer_ptr = std::make_shared<prot::PrsmXmlWriter>(file_name);
+      PrsmXmlWriterPtr writer_ptr = std::make_shared<toppic::PrsmXmlWriter>(file_name);
       prsm_writer_vec.push_back(writer_ptr);
     }
 
@@ -309,7 +309,7 @@ void XmlGenerator::splitByProtId() {
       prot_id_map[sub_prot_ids_[i]] = i;
       std::string file_name = file_util::basename(spectrum_file_name) 
           + ".prot_" + std::to_string(sub_prot_ids_[i]);
-      PrsmXmlWriterPtr writer_ptr = std::make_shared<prot::PrsmXmlWriter>(file_name);
+      PrsmXmlWriterPtr writer_ptr = std::make_shared<toppic::PrsmXmlWriter>(file_name);
       prsm_writer_vec.push_back(writer_ptr);
     }
 

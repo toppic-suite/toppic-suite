@@ -23,7 +23,7 @@
 #include "base/mod_base.hpp"
 
 namespace toppic {
-namespace toppiceoform_util {
+namespace proteoform_util {
 
 ResFreqPtrVec compNTermResidueFreq(const ProteoformPtrVec &prot_mod_forms) {
   std::vector<double> counts;

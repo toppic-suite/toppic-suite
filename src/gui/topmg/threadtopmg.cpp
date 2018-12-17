@@ -19,5 +19,5 @@
 void threadtopmg::run() {
   std::sort(spec_file_lst_.begin(), spec_file_lst_.end());
 
-  prot::TopMGProgress_multi_file(arguments_, spec_file_lst_);
+  toppic::TopMGProgress_multi_file(arguments_, spec_file_lst_);
 }

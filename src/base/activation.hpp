@@ -20,9 +20,10 @@
 #include <vector>
 
 #include "base/ion_type.hpp"
-#include "base/xml_dom_document.hpp"
 
 namespace toppic {
+
+class XmlDOMDocument;
 
 class Activation {
  public:

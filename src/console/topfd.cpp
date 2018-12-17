@@ -24,7 +24,7 @@
 #include "feature/topfd_process.hpp"
 
 int main(int argc, char* argv[]) {
-  prot::Argument argu_processor;
+  toppic::Argument argu_processor;
   bool success = argu_processor.parse(argc, argv);
 
   if (!success) {
@@ -33,19 +33,19 @@ int main(int argc, char* argv[]) {
 
   std::map<std::string, std::string> arguments = argu_processor.getArguments();
 
-  std::string exe_dir = prot::file_util::getExecutiveDir(argv[0]);
+  std::string exe_dir = toppic::file_util::getExecutiveDir(argv[0]);
 
   arguments["executiveDir"] = exe_dir;
 
   std::vector<std::string> spec_file_lst = argu_processor.getSpecFileList();
 
   for (size_t k = 0; k < spec_file_lst.size(); k++) {
-    if (prot::string_util::endsWith(spec_file_lst[k], "mzML")
-        || prot::string_util::endsWith(spec_file_lst[k], "mzXML")
-        || prot::string_util::endsWith(spec_file_lst[k], "mzml")
-        || prot::string_util::endsWith(spec_file_lst[k], "mzxml")) {
+    if (toppic::string_util::endsWith(spec_file_lst[k], "mzML")
+        || toppic::string_util::endsWith(spec_file_lst[k], "mzXML")
+        || toppic::string_util::endsWith(spec_file_lst[k], "mzml")
+        || toppic::string_util::endsWith(spec_file_lst[k], "mzxml")) {
       arguments["spectrumFileName"] = spec_file_lst[k];
-      if (prot::TopFDProcess(arguments) != 0) {
+      if (toppic::TopFDProcess(arguments) != 0) {
         return 1;
       }
     }

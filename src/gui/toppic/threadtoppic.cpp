@@ -19,5 +19,5 @@
 void threadtoppic::run() {
   std::sort(spec_file_lst_.begin(), spec_file_lst_.end());
 
-  prot::TopPICProgress_multi_file(arguments_, spec_file_lst_);
+  toppic::TopPICProgress_multi_file(arguments_, spec_file_lst_);
 }

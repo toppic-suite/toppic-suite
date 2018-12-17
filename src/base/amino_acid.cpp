@@ -14,10 +14,7 @@
 
 #include <string>
 
-#include "base/logger.hpp"
 #include "base/amino_acid.hpp"
-#include "base/string_util.hpp"
-#include "base/xml_dom.hpp"
 #include "base/xml_dom_document.hpp"
 #include "base/xml_dom_util.hpp"
 

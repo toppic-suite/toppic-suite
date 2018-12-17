@@ -57,7 +57,7 @@ void GraphPostProcessor::geneMassPtmMap() {
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   std::string var_mod_file_name = mng_ptr_->var_mod_file_name_;
 
-  std::vector<PtmPtr> ptm_vec = prot::ptm_util::readPtmTxt(var_mod_file_name);
+  std::vector<PtmPtr> ptm_vec = toppic::ptm_util::readPtmTxt(var_mod_file_name);
 
   ProtModPtrVec prot_mod_vec = prsm_para_ptr->getProtModPtrVec();
   for (size_t i = 0; i < prot_mod_vec.size(); i++) {
@@ -182,7 +182,7 @@ void GraphPostProcessor::process() {
           }
 
           MassShiftPtr shfit_ptr
-              = std::make_shared<prot::MassShift>(shift_vec[k]->getLeftBpPos(),
+              = std::make_shared<toppic::MassShift>(shift_vec[k]->getLeftBpPos(),
                                                   shift_vec[k]->getRightBpPos(),
                                                   shift_vec[k]->getTypePtr());
 

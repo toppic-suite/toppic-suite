@@ -161,7 +161,7 @@ void GraphAlignProcessor::process() {
   std::string input_file_name
       = file_util::basename(sp_file_name) + "." + mng_ptr_->input_file_ext_;
 
-  SimplePrsmReaderPtr simple_prsm_reader = std::make_shared<prot::SimplePrsmReader>(input_file_name);
+  SimplePrsmReaderPtr simple_prsm_reader = std::make_shared<toppic::SimplePrsmReader>(input_file_name);
   std::shared_ptr<SimplePrsmXmlWriter> graph_filter_writer
       = std::make_shared<SimplePrsmXmlWriter>(file_util::basename(sp_file_name) + ".topmg_graph");
   SimplePrsmPtr prsm_ptr = simple_prsm_reader->readOnePrsm();
@@ -191,7 +191,7 @@ void GraphAlignProcessor::process() {
 
   int cnt = 0;
   simple_prsm_reader
-      = std::make_shared<prot::SimplePrsmReader>(file_util::basename(sp_file_name) + ".topmg_graph");
+      = std::make_shared<toppic::SimplePrsmReader>(file_util::basename(sp_file_name) + ".topmg_graph");
   prsm_ptr = simple_prsm_reader->readOnePrsm();
   while (prsm_ptr != nullptr) {
     cnt = cnt % mng_ptr_->thread_num_;

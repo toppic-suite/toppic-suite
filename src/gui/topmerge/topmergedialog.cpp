@@ -272,9 +272,9 @@ void TopMergeDialog::on_outputButton_clicked() {
 
 std::map<std::string, std::string> TopMergeDialog::getArguments() {
   QString path = QCoreApplication::applicationFilePath();
-  std::string exe_dir = prot::file_util::getExecutiveDir(path.toStdString());
+  std::string exe_dir = toppic::file_util::getExecutiveDir(path.toStdString());
   arguments_["executiveDir"] = exe_dir;
-  arguments_["resourceDir"] = arguments_["executiveDir"] + prot::file_util::getFileSeparator() + prot::file_util::getResourceDirName();
+  arguments_["resourceDir"] = arguments_["executiveDir"] + toppic::file_util::getFileSeparator() + toppic::file_util::getResourceDirName();
   arguments_["databaseFileName"] = ui->databaseFileEdit->text().toStdString();
 
   arguments_["fixedMod"] = ui->fixedModComboBox->currentText().toStdString();
