@@ -28,7 +28,7 @@
 
 #include "prsm/simple_prsm.hpp"
 
-namespace prot {
+namespace toppic {
 
 SimplePrsm::SimplePrsm(MsHeaderPtr header_ptr, int spectrum_num,
                        ProteoformPtr proteo_ptr, int score):
@@ -170,4 +170,4 @@ void SimplePrsm::setCTruncShifts(const std::vector<double> &c_term_shifts) {
   }
 }
 
-} /* namespace prot */
+} /* namespace toppic */

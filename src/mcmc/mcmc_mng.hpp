@@ -20,7 +20,7 @@
 
 #include "prsm/prsm_para.hpp"
 
-namespace prot {
+namespace toppic {
 
 class MCMCMng {
  public:
@@ -70,6 +70,6 @@ class MCMCMng {
 
 typedef std::shared_ptr<MCMCMng> MCMCMngPtr;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

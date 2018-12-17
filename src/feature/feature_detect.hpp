@@ -20,7 +20,7 @@
 
 #include "feature/deconv_para.hpp"
 
-namespace prot {
+namespace toppic {
 
 class FeatureDetect {
  public:

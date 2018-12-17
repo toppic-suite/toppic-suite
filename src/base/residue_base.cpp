@@ -22,7 +22,7 @@
 #include "base/file_util.hpp"
 #include "base/xml_dom_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 ResiduePtrVec ResidueBase::residue_ptr_vec_;
 ResiduePtr ResidueBase::empty_residue_ptr_;
@@ -85,4 +85,4 @@ ResiduePtr ResidueBase::getResiduePtrFromXml(xercesc::DOMElement * element) {
   return getBaseResiduePtr(ptr);
 }
 
-}  // namespace prot
+}  // namespace toppic

@@ -19,7 +19,7 @@
 #include "base/xml_dom_util.hpp"
 #include "spec/peak_tolerance.hpp"
 
-namespace prot {
+namespace toppic {
 
 PeakTolerance::PeakTolerance(xercesc::DOMElement* element) {
   ppo_ = xml_dom_util::getDoubleChildValue(element, "ppo", 0);
@@ -48,4 +48,4 @@ void PeakTolerance::appendXml(XmlDOMDocument* xml_doc,
   parent->appendChild(element);
 }
 
-} /* namespace prot */
+} /* namespace toppic */

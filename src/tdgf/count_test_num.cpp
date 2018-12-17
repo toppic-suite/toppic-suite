@@ -25,7 +25,7 @@
 #include "tdgf/count_test_num.hpp"
 #include "tdgf/comp_prob_value.hpp"
 
-namespace prot {
+namespace toppic {
 
 CountTestNum::CountTestNum(TdgfMngPtr mng_ptr) {
   convert_ratio_ = mng_ptr->convert_ratio_;
@@ -231,4 +231,4 @@ double CountTestNum::compMassNum(double *cnts, int low, int high) {
   return cnt;
 }
 
-}  // namespace prot
+}  // namespace toppic

@@ -23,7 +23,7 @@
 #include "base/xml_dom_document.hpp"
 #include "base/logger.hpp"
 
-namespace prot {
+namespace toppic {
 
 class XmlWriter {
  public:
@@ -52,6 +52,6 @@ class XmlWriter {
 
 typedef std::shared_ptr<XmlWriter> XmlWriterPtr;
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* XML_WRITER_HPP_ */

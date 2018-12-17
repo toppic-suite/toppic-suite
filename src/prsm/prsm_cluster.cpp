@@ -21,7 +21,7 @@
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_cluster.hpp"
 
-namespace prot {
+namespace toppic {
 
 std::vector<PrsmStrPtrVec> PrsmCluster::groupProteins(const PrsmStrPtrVec &prsm_ptrs) {
   // get max shift number
@@ -142,6 +142,6 @@ void PrsmCluster::process() {
   writer.close();
 }
 
-}  // namespace prot
+}  // namespace toppic
 
 

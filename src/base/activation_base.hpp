@@ -13,14 +13,14 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_ACTIVATION_BASE_HPP_
-#define PROT_BASE_ACTIVATION_BASE_HPP_
+#ifndef TOPPIC_BASE_ACTIVATION_BASE_HPP_
+#define TOPPIC_BASE_ACTIVATION_BASE_HPP_
 
 #include <string>
 
 #include "base/activation.hpp"
 
-namespace prot {
+namespace toppic {
 
 class ActivationBase {
  public:
@@ -36,6 +36,6 @@ class ActivationBase {
   static ActivationPtrVec activation_ptr_vec_;
 };
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

@@ -24,7 +24,7 @@
 #include "spec/base_peak_type.hpp"
 #include "spec/rm_break_type.hpp"
 
-namespace prot {
+namespace toppic {
 
 class PrmPeak;
 typedef std::shared_ptr<PrmPeak> PrmPeakPtr;
@@ -110,6 +110,6 @@ typedef std::vector<PrmPeakPtr> PrmPeakPtrVec;
 typedef std::vector<PrmPeakPtrVec> PrmPeakPtrVec2D;
 
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* PRM_PEAK_HPP_ */

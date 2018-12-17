@@ -18,7 +18,7 @@
 #include "base/string_util.hpp"
 #include "spec/extend_peak.hpp"
 
-namespace prot {
+namespace toppic {
 
 void ExtendPeak::appendXml(XmlDOMDocument* xml_doc,
                            xercesc::DOMElement* parent) {
@@ -40,4 +40,4 @@ void ExtendPeak::appendXml(XmlDOMDocument* xml_doc,
   parent->appendChild(element);
 }
 
-} /* namespace prot */
+} /* namespace toppic */

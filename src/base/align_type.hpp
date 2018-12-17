@@ -13,13 +13,13 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_ALIGN_TYPE_HPP_
-#define PROT_BASE_ALIGN_TYPE_HPP_
+#ifndef TOPPIC_BASE_ALIGN_TYPE_HPP_
+#define TOPPIC_BASE_ALIGN_TYPE_HPP_
 
 #include <string>
 #include <memory>
 
-namespace prot {
+namespace toppic {
 
 class AlignType;
 typedef std::shared_ptr<AlignType> AlignTypePtr;
@@ -42,6 +42,6 @@ class AlignType {
   int id_;
 };
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

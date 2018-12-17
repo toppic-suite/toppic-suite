@@ -13,13 +13,13 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_RM_BREAK_TYPE_HPP_
-#define PROT_BASE_RM_BREAK_TYPE_HPP_
+#ifndef TOPPIC_BASE_RM_BREAK_TYPE_HPP_
+#define TOPPIC_BASE_RM_BREAK_TYPE_HPP_
 
 #include <memory>
 #include <string>
 
-namespace prot {
+namespace toppic {
 
 // residue mass break type
 class RmBreakType;
@@ -43,7 +43,7 @@ class RmBreakType {
   std::string name_;
 };
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif
 

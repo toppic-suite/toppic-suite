@@ -19,7 +19,7 @@
 #include "base/base_data.hpp"
 #include "zeroptmsearch/zero_ptm_fast_match.hpp"
 
-namespace prot {
+namespace toppic {
 
 /*
  * in the computing of diagonal score in fast filtering, we allow to use n
@@ -242,4 +242,4 @@ ZpFastMatchPtrVec ZeroPtmFastMatch::filter(AlignTypePtr align_type_ptr,
   return report_vec;
 }
 
-}  // namespace prot
+}  // namespace toppic

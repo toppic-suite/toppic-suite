@@ -28,7 +28,7 @@
 
 #include "local/local_mng.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace local_util {
 
@@ -69,6 +69,6 @@ int compMatchFragNum(ProteoformPtr proteoform_ptr, const ExtendMsPtrVec &ms_ptr_
 
 }  // namespace local_util
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

@@ -19,7 +19,7 @@
 #include "spec/peak_tolerance.hpp"
 #include "spec/prm_peak.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace prm_peak_factory {
 
@@ -30,6 +30,6 @@ PrmPeakPtr getPrecPeakPtr(int spec_id, double prec_mono_mass,
                           PeakTolerancePtr tole_ptr, double score);
 }  // namespace prm_peak_factory
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

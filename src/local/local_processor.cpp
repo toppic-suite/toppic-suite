@@ -39,7 +39,7 @@
 #include "local_processor.hpp"
 #include "local_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 void LocalProcessor::init() {
   ptm_vec_ = ptm_util::readPtmTxt(mng_ptr_->residueModFileName_);
@@ -1141,5 +1141,5 @@ ProteoformPtr LocalProcessor::compSplitPoint(ProteoformPtr proteoform, int h,
   return proteoform;
 }
 
-}  // namespace prot
+}  // namespace toppic
 

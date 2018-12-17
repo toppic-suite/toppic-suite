@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_PROTEOFORM_FACTORY_HPP_
-#define PROT_BASE_PROTEOFORM_FACTORY_HPP_
+#ifndef TOPPIC_BASE_PROTEOFORM_FACTORY_HPP_
+#define TOPPIC_BASE_PROTEOFORM_FACTORY_HPP_
 
 
 #include <string>
@@ -23,9 +23,9 @@
 #include "base/proteoform.hpp"
 #include "base/fasta_index_reader.hpp"
 
-namespace prot {
+namespace toppic {
 
-namespace proteoform_factory {
+namespace toppiceoform_factory {
 
 ProteoformPtr geneDbProteoformPtr(FastaSeqPtr seq_ptr, ModPtrVec fix_mod_list);
 
@@ -61,8 +61,8 @@ ProteoformPtr readFastaToProteoformPtr(FastaIndexReaderPtr reader_ptr,
                                        const std::string &seq_desc,
                                        const ModPtrVec &fix_mod_list);
 
-}  // namespace proteoform_factory 
+}  // namespace toppiceoform_factory 
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif /* PROTEOFORM_HPP_ */

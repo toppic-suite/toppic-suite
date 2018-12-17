@@ -22,7 +22,7 @@
 #include "prsm/peak_ion_pair_util.hpp"
 #include "oneptmsearch/diagonal.hpp"
 
-namespace prot {
+namespace toppic {
 
 inline TheoPeakPtrVec getDiagonalTheoPeak(ProteoformPtr proteo_ptr,
                                           ActivationPtr activation_ptr,
@@ -288,4 +288,4 @@ int getNewEnd(const PeakIonPairPtrVec &pair_ptrs) {
   return new_end;
 }
 
-}  // namespace prot
+}  // namespace toppic

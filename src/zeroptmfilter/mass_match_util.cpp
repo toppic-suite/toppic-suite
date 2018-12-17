@@ -20,7 +20,7 @@
 #include "base/logger.hpp"
 #include "zeroptmfilter/mass_match_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace mass_match_util {
 
@@ -138,4 +138,4 @@ FilterProteinPtrVec findTopProteins(std::vector<short> &scores,
 
 } // namespace mass_match_util
 
-} // namespace prot 
+} // namespace toppic 

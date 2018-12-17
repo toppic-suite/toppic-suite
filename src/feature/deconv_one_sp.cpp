@@ -28,7 +28,7 @@
 #include "feature/co_table.hpp"
 #include "feature/dp_a.hpp"
 
-namespace prot {
+namespace toppic {
 
 void DeconvOneSp::setData(PeakPtrVec &peak_list) {
   data_ptr_ = DeconvDataBase::getDataPtr(peak_list, mng_ptr_);
@@ -122,4 +122,4 @@ MatchEnvPtrVec DeconvOneSp::postprocess(MatchEnvPtrVec  &dp_envs) {
   return result_envs_;
 }
 
-}  // namespace prot
+}  // namespace toppic

@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_CHANGE_HPP_
-#define PROT_BASE_CHANGE_HPP_
+#ifndef TOPPIC_BASE_CHANGE_HPP_
+#define TOPPIC_BASE_CHANGE_HPP_
 
 #include <string>
 #include <vector>
@@ -24,7 +24,7 @@
 #include "base/xml_dom_document.hpp"
 #include "base/local_anno.hpp"
 
-namespace prot {
+namespace toppic {
 
 class Change;
 typedef std::shared_ptr<Change> ChangePtr;
@@ -84,7 +84,7 @@ class Change {
 
 typedef std::vector<ChangePtr> ChangePtrVec;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif
 

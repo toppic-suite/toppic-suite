@@ -23,7 +23,7 @@
 #include "prsm/prsm.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 
-namespace prot {
+namespace toppic {
 
 class PrsmCutoffSelector {
  public:
@@ -52,6 +52,6 @@ class PrsmCutoffSelector {
 
 typedef std::shared_ptr<PrsmCutoffSelector> PrsmCutoffSelectorPtr;
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* OUTPUT_SELECTOR_HPP_ */

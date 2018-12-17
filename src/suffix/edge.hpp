@@ -20,7 +20,7 @@
 
 #include "suffix_position.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace suffix {
 
@@ -119,6 +119,6 @@ class LeafEdge: public Edge {
 
 }  // namespace suffix
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

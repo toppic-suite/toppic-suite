@@ -25,7 +25,7 @@
 #include "base/xml_dom_util.hpp"
 #include "base/string_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 Ptm::Ptm(xercesc::DOMElement* element) {
   name_ = xml_dom_util::getChildValue(element, "name", 0);
@@ -47,5 +47,5 @@ std::string Ptm::getAbbrNameFromXml(xercesc::DOMElement * element) {
   return abbr_name;
 }
 
-}  // namespace prot
+}  // namespace toppic
 

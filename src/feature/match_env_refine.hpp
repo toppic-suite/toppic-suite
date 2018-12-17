@@ -21,7 +21,7 @@
 #include "spec/peak.hpp"
 #include "feature/match_env.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace match_env_refine {
 
@@ -40,6 +40,6 @@ namespace match_env_refine {
 
 } // match_env_refine
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

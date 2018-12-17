@@ -21,7 +21,7 @@
 #include "feature/vertex_base.hpp"
 #include "feature/dp_a.hpp"
 
-namespace prot {
+namespace toppic {
 
 DpA::DpA(DeconvDataPtr data_ptr, MatchEnvPtr2D &win_envs_, FeatureMngPtr mng_ptr):
     Dp(data_ptr, win_envs_, mng_ptr) {
@@ -103,4 +103,4 @@ void DpA::backtrace() {
   std::sort(results_.begin(), results_.end(), MatchEnv::cmpScoreDec);
 }
 
-}  // namespace prot
+}  // namespace toppic

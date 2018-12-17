@@ -19,7 +19,7 @@
 #include "oneptmsearch/pair.hpp"
 #include "oneptmsearch/diagonal_header.hpp"
 
-namespace prot {
+namespace toppic {
 
 #define PATH_TYPE_NULL -1
 #define PATH_TYPE_DIAGONAL 0
@@ -69,6 +69,6 @@ class DPPair : public Pair{
   std::vector<int> types_;
 };
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* DP_PAIR_HPP_ */

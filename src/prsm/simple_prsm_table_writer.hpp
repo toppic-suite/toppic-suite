@@ -20,7 +20,7 @@
 #include "prsm/prsm_para.hpp"
 #include "prsm/simple_prsm.hpp"
 
-namespace prot {
+namespace toppic {
 
 class SimplePrsmTableWriter {
  public:
@@ -41,6 +41,6 @@ class SimplePrsmTableWriter {
 
 typedef std::shared_ptr<SimplePrsmTableWriter> SimplePrsmTableWriterPtr;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif /* SIMPLE_TABLE_WRITER_HPP_ */

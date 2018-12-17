@@ -21,7 +21,7 @@
 #include "spec/extend_ms_factory.hpp"
 #include "oneptmsearch/ps_align.hpp"
 
-namespace prot {
+namespace toppic {
 
 void PSAlign::compute(AlignTypePtr align_type_ptr) {
   dp(align_type_ptr);
@@ -325,4 +325,4 @@ PrsmPtr PSAlign::geneResult(int shift_num, ProteoformPtr proteo_ptr,
                                 prsm_para_ptr->getSpParaPtr());
 }
 
-} /* namespace prot */
+} /* namespace toppic */

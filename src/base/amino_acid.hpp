@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_AMINO_ACID_HPP_
-#define PROT_BASE_AMINO_ACID_HPP_
+#ifndef TOPPIC_BASE_AMINO_ACID_HPP_
+#define TOPPIC_BASE_AMINO_ACID_HPP_
 
 #include <memory>
 #include <string>
@@ -22,7 +22,7 @@
 
 #include "base/xml_dom_document.hpp"
 
-namespace prot {
+namespace toppic {
 
 class AminoAcid {
  public:
@@ -80,7 +80,7 @@ class AminoAcid {
 typedef std::shared_ptr<AminoAcid> AminoAcidPtr;
 typedef std::vector<AminoAcidPtr> AminoAcidPtrVec;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif
 

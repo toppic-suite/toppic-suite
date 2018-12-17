@@ -29,7 +29,7 @@
 #include "base/xml_dom_document.hpp"
 #include "base/string_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 class Argument {
  public:
@@ -57,6 +57,6 @@ class Argument {
   std::vector<std::string> spec_file_list_;
 };
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif /* ARGUMENT_HPP_ */

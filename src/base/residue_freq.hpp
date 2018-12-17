@@ -13,14 +13,14 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_RESIDUE_FREQ_HPP_
-#define PROT_BASE_RESIDUE_FREQ_HPP_
+#ifndef TOPPIC_BASE_RESIDUE_FREQ_HPP_
+#define TOPPIC_BASE_RESIDUE_FREQ_HPP_
 
 #include <vector>
 
 #include "base/residue.hpp"
 
-namespace prot {
+namespace toppic {
 
 class ResidueFreq: public Residue {
  public:
@@ -37,5 +37,5 @@ class ResidueFreq: public Residue {
 typedef std::shared_ptr<ResidueFreq> ResFreqPtr;
 typedef std::vector<ResFreqPtr> ResFreqPtrVec;
 
-}  // namespace prot
+}  // namespace toppic
 #endif

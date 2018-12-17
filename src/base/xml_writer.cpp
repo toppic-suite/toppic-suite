@@ -16,7 +16,7 @@
 #include "base/xml_writer.hpp"
 #include "base/xml_dom_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 XmlWriter::XmlWriter(const std::string &file_name, const std::string &root) {
   file_.open(file_name.c_str());
@@ -53,4 +53,4 @@ void XmlWriter::close() {
   file_.close();
 }
 
-} /* namespace prot */
+} /* namespace toppic */

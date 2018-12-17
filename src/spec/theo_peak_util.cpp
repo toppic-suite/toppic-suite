@@ -20,7 +20,7 @@
 #include "base/neutral_loss_base.hpp"
 #include "spec/theo_peak_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace theo_peak_util {
 
@@ -93,4 +93,4 @@ TheoPeakPtrVec geneProteoformTheoPeak(ProteoformPtr proteoform_ptr,
 
 }  // namespace theo_peak_util
 
-}  // namespace prot
+}  // namespace toppic

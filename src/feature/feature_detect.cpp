@@ -26,7 +26,7 @@
 #include "feature/feature_detect.hpp"
 #include "feature/deconv_process.hpp"
 
-namespace prot {
+namespace toppic {
 
 void readSpectra(const std::string & file_name, DeconvMsPtrVec &ms_ptr_vec) {
   int sp_num_in_group = 1;
@@ -345,4 +345,4 @@ void FeatureDetect::process(DeconvParaPtr para_ptr) {
 }
 
 // std::string output_file_name = file_util::basename(sp_file_name)+".feature";
-}  // namespace prot
+}  // namespace toppic

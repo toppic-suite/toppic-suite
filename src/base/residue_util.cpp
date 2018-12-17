@@ -22,7 +22,7 @@
 #include "base/residue_base.hpp"
 #include "base/residue_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace residue_util {
 
@@ -104,4 +104,4 @@ double compResiduePtrVecMass(const std::string & seq,
 
 }  // namespace residue_util
 
-}  // namespace prot
+}  // namespace toppic

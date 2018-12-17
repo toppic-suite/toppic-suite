@@ -17,7 +17,7 @@
 #include "base/mass_constant.hpp"
 #include "feature/env_rescore.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace EnvRescore {
 
@@ -149,5 +149,5 @@ void rescore(MatchEnvPtr2D &match_envs, const std::vector<std::vector<double> > 
 }
 
 }  // namespace EnvRescore
-}  // namespace prot
+}  // namespace toppic
 

@@ -25,7 +25,7 @@
 #include "base/mass_shift_type.hpp"
 #include "base/xml_dom_document.hpp"
 
-namespace prot {
+namespace toppic {
 
 class AnnoSegment {
  public:
@@ -85,7 +85,7 @@ typedef std::shared_ptr<AnnoSegment> AnnoSegmentPtr;
 
 typedef std::vector<AnnoSegmentPtr> AnnoSegmentPtrVec;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif
 

@@ -21,7 +21,7 @@
 #include "feature/vertex_base.hpp"
 #include "feature/dp_b.hpp"
 
-namespace prot {
+namespace toppic {
 
 DpB::DpB(DeconvDataPtr data_ptr, MatchEnvPtr2D &win_envs_, FeatureMngPtr mng_ptr):
     Dp(data_ptr, win_envs_, mng_ptr) {

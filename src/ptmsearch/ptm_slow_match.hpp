@@ -31,7 +31,7 @@
 
 #include "ptmsearch/comp_shift_low_mem.hpp"
 
-namespace prot {
+namespace toppic {
 
 class PtmSlowMatch {
  public:
@@ -74,6 +74,6 @@ class PtmSlowMatch {
 typedef std::shared_ptr<PtmSlowMatch> PtmSlowMatchPtr;
 typedef std::vector<PtmSlowMatchPtr> PtmSlowMatchPtrVec;
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif

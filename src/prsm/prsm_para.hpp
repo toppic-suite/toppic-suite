@@ -25,7 +25,7 @@
 #include "spec/peak_tolerance.hpp"
 #include "spec/sp_para.hpp"
 
-namespace prot {
+namespace toppic {
 
 class PrsmPara {
  public:
@@ -72,6 +72,6 @@ class PrsmPara {
 
 typedef std::shared_ptr<PrsmPara> PrsmParaPtr;
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* PRSM_PARA_HPP_ */

@@ -21,7 +21,7 @@
 #include "base/base_data.hpp"
 #include "spec/prm_peak.hpp"
 
-namespace prot {
+namespace toppic {
 
 void PrmPeak::addNghbEdge(DeconvPeakPtr deconv_peak_ptr, double offset,
                           SPTypePtr peak_type_ptr, double score) {
@@ -51,4 +51,4 @@ RmBreakTypePtr PrmPeak::getBreakType() {
   return bt_ptr;
 }
 
-} /* namespace prot */
+} /* namespace toppic */

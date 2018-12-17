@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_LOCAL_ANNO_HPP_
-#define PROT_BASE_LOCAL_ANNO_HPP_
+#ifndef TOPPIC_BASE_LOCAL_ANNO_HPP_
+#define TOPPIC_BASE_LOCAL_ANNO_HPP_
 
 #include <vector>
 #include <algorithm>
@@ -25,7 +25,7 @@
 #include "base/ptm_base.hpp"
 #include "base/xml_dom_document.hpp"
 
-namespace prot {
+namespace toppic {
 
 class LocalAnno {
  public:
@@ -84,6 +84,6 @@ class LocalAnno {
 typedef std::shared_ptr<LocalAnno> LocalAnnoPtr;
 typedef std::vector<LocalAnnoPtr> LocalAnnoPtrVec;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_FASTA_READER_HPP_
-#define PROT_BASE_FASTA_READER_HPP_
+#ifndef TOPPIC_BASE_FASTA_READER_HPP_
+#define TOPPIC_BASE_FASTA_READER_HPP_
 
 #include <iostream>
 #include <fstream>
@@ -24,7 +24,7 @@
 #include "base/fasta_seq.hpp"
 #include "base/string_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 class FastaReader {
  public:

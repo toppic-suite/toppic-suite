@@ -20,7 +20,7 @@
 #include "base/residue_base.hpp"
 #include "base/xml_dom_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 Mod::Mod(xercesc::DOMElement* element) {
   xercesc::DOMElement* ori_residue_element
@@ -39,4 +39,4 @@ void Mod::appendToXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   parent->appendChild(element);
 }
 
-}  // namespace prot
+}  // namespace toppic

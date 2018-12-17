@@ -32,7 +32,7 @@
 #include "prsmview/anno_segment.hpp"
 #include "prsmview/prsm_view_mng.hpp"
 
-namespace prot {
+namespace toppic {
 
 void addSummary(XmlDOMDocument* xml_doc, xercesc::DOMElement *prot_element,
                 ProteoformPtr proteoform_ptr, PrsmViewMngPtr mng_ptr) {
@@ -315,4 +315,4 @@ xercesc::DOMElement* geneAnnoProteoform(XmlDOMDocument* xml_doc,
   return prot_element;
 }
 
-}  // namespace prot
+}  // namespace toppic

@@ -20,7 +20,7 @@
 #include "spec/extend_ms.hpp"
 #include "spec/sp_para.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace extend_ms_factory {
 
@@ -32,6 +32,6 @@ ExtendMsPtrVec geneMsThreePtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
 
 }  // namespace extend_ms_factory
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif 

@@ -24,7 +24,7 @@
 #include "base/proteoform.hpp"
 #include "spec/theo_peak.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace theo_peak_util {
 
@@ -41,7 +41,7 @@ TheoPeakPtrVec geneProteoformTheoPeak(ProteoformPtr proteoform_ptr,
 
 }  // namespace theo_peak_util
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif
 

@@ -22,7 +22,7 @@
 #include "zeroptmfilter/mass_match.hpp"
 #include "oneptmfilter/one_ptm_filter_mng.hpp"
 
-namespace prot {
+namespace toppic {
 
 class MassOnePtmFilter {
  public:
@@ -52,6 +52,6 @@ class MassOnePtmFilter {
 };
 
 typedef std::shared_ptr<MassOnePtmFilter> MassOnePtmFilterPtr;
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* ONE_PTM_FILTER_H_ */

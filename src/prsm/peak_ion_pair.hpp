@@ -23,7 +23,7 @@
 #include "spec/extend_peak.hpp"
 #include "spec/theo_peak.hpp"
 
-namespace prot {
+namespace toppic {
 
 class PeakIonPair;
 typedef std::shared_ptr<PeakIonPair> PeakIonPairPtr;
@@ -66,6 +66,6 @@ class PeakIonPair {
 typedef std::vector<PeakIonPairPtr> PeakIonPairPtrVec;
 typedef std::vector<PeakIonPairPtrVec> PeakIonPairPtrVec2D;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

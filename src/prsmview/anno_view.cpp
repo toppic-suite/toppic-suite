@@ -33,7 +33,7 @@
 #include "prsmview/anno_prsm.hpp"
 #include "prsmview/anno_view.hpp"
 
-namespace prot {
+namespace toppic {
 
 xercesc::DOMElement* AnnoView::geneFileList(XmlDOMDocument* xml_doc) {
   xercesc::DOMElement* element = xml_doc->createElement("file_list");
@@ -132,4 +132,4 @@ void writeProteinToXml(XmlWriterPtr xml_writer,
   xml_writer->write_str("</protein>");
 }
 
-}  // namespace prot
+}  // namespace toppic

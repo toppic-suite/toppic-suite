@@ -13,15 +13,15 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_ION_TYPE_BASE_HPP_
-#define PROT_BASE_ION_TYPE_BASE_HPP_
+#ifndef TOPPIC_BASE_ION_TYPE_BASE_HPP_
+#define TOPPIC_BASE_ION_TYPE_BASE_HPP_
 
 
 #include <string>
 
 #include "base/ion_type.hpp"
 
-namespace prot {
+namespace toppic {
 
 class IonTypeBase {
  public:
@@ -45,6 +45,6 @@ class IonTypeBase {
   static IonTypePtr ion_type_ptr_PREC_;
 };
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

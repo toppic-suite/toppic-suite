@@ -28,7 +28,7 @@
 #include "graphalign/graph_align_processor.hpp"
 #include "graphalign/graph_align.hpp"
 
-namespace prot {
+namespace toppic {
 
 std::vector<int> getMinMaxProtDist(DistVec2D dist_vec) {
   std::vector<int> min_dist, max_dist;
@@ -591,4 +591,4 @@ PrsmPtr GraphAlign::geneResult(int s) {
   return best_prsm_ptr;
 }
 
-}  // namespace prot
+}  // namespace toppic

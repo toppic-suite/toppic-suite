@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_XML_DOM_DOCUMENT_HPP_
-#define PROT_BASE_XML_DOM_DOCUMENT_HPP_
+#ifndef TOPPIC_BASE_XML_DOM_DOCUMENT_HPP_
+#define TOPPIC_BASE_XML_DOM_DOCUMENT_HPP_
 
 #include <iostream>
 #include <fstream>
@@ -29,7 +29,7 @@
 
 #include "base/xml_dom.hpp"
 
-namespace prot {
+namespace toppic {
 
 class XmlDOMDocument {
 

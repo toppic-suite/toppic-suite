@@ -20,7 +20,7 @@
 #include "base/base_algo.hpp"
 #include "base/logger.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace base_algo {
 
@@ -174,4 +174,4 @@ int getLastResPos(double c_term_shift, const std::vector<double> &prm_masses) {
 
 }  // namespace base_algo
 
-}  // namespace prot
+}  // namespace toppic

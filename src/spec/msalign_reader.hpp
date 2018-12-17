@@ -27,7 +27,7 @@
 #include "spec/deconv_ms.hpp"
 #include "spec/spectrum_set.hpp"
 
-namespace prot {
+namespace toppic {
 
 class MsAlignReader {
  public:
@@ -78,5 +78,5 @@ class MsAlignReader {
 
 typedef std::shared_ptr<MsAlignReader> MsAlignReaderPtr;
 
-}  // namespace prot
+}  // namespace toppic
 #endif

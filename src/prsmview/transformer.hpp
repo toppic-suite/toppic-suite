@@ -23,7 +23,7 @@
 #include <xalanc/Include/PlatformDefinitions.hpp>
 #include <xalanc/XalanTransformer/XalanTransformer.hpp>
 
-namespace prot {
+namespace toppic {
 
 void translate(std::map<std::string, std::string> &arguments,
                const std::string & fname_suffix);

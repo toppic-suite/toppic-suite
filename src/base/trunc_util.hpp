@@ -13,13 +13,13 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_TRUNC_UTIL_HPP_
-#define PROT_BASE_TRUNC_UTIL_HPP_
+#ifndef TOPPIC_BASE_TRUNC_UTIL_HPP_
+#define TOPPIC_BASE_TRUNC_UTIL_HPP_
 
 #include "base/trunc.hpp"
 #include "base/residue.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace trunc_util {
 
@@ -27,5 +27,5 @@ bool isValidTrunc(TruncPtr trunc_ptr, const ResiduePtrVec & res_ptr_vec);
 
 }  // namespace trunc_util
 
-}  // namespace prot
+}  // namespace toppic
 #endif

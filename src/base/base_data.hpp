@@ -13,12 +13,12 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_BASE_DATA_HPP_
-#define PROT_BASE_BASE_DATA_HPP_
+#ifndef TOPPIC_BASE_BASE_DATA_HPP_
+#define TOPPIC_BASE_BASE_DATA_HPP_
 
 #include <string>
 
-namespace prot {
+namespace toppic {
 
 namespace base_data {
 
@@ -34,7 +34,7 @@ extern bool init_;
 
 }  // namespace base_data
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif
 

@@ -19,7 +19,7 @@
 #include "base/xml_dom_document.hpp"
 #include "base/xml_dom_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 Activation::Activation(xercesc::DOMElement * element) {
   name_ = xml_dom_util::getChildValue(element, "name", 0);
@@ -42,4 +42,4 @@ std::string Activation::getNameFromXml(xercesc::DOMElement * element) {
   return name;
 }
 
-}  // namespace prot
+}  // namespace toppic

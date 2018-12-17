@@ -24,7 +24,7 @@
 #include "zeroptmfilter/mass_match_util.hpp"
 #include "diagfilter/mass_diag_filter.hpp"
 
-namespace prot {
+namespace toppic {
 
 MassDiagFilter::MassDiagFilter(const ProteoformPtrVec &proteo_ptrs,
                                DiagFilterMngPtr mng_ptr) {
@@ -83,4 +83,4 @@ SimplePrsmPtrVec MassDiagFilter::compute(const PrmMsPtrVec &ms_ptr_vec) {
   return match_ptrs;
 }
 
-} /* namespace prot */
+} /* namespace toppic */

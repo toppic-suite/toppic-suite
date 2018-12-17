@@ -22,7 +22,7 @@
 #include "zeroptmsearch/zero_ptm_fast_match.hpp"
 #include "prsm/prsm.hpp"
 
-namespace prot {
+namespace toppic {
 
 class ZeroPtmSlowMatch;
 typedef std::shared_ptr<ZeroPtmSlowMatch> ZpSlowMatchPtr;

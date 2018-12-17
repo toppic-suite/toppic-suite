@@ -16,11 +16,11 @@
 #include "base/support_peak_type.hpp"
 #include "base/xml_dom_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 SupportPeakType::SupportPeakType(xercesc::DOMElement* element) {
   id_ = xml_dom_util::getIntChildValue(element, "id", 0);
   name_ = xml_dom_util::getChildValue(element, "name", 0);
 }
 
-}  // namespace prot
+}  // namespace toppic

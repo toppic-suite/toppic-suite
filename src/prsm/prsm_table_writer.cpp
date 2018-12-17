@@ -30,7 +30,7 @@
 #include "prsm/prsm_table_writer.hpp"
 #include "console/toppic_argument.hpp"
 
-namespace prot {
+namespace toppic {
 
 void PrsmTableWriter::write() {
   std::string spectrum_file_name  = prsm_para_ptr_->getSpectrumFileName();
@@ -178,4 +178,4 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   }
 }
 
-}  // namespace prot
+}  // namespace toppic

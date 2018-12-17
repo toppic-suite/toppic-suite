@@ -20,7 +20,7 @@
 #include <vector>
 #include <string>
 
-namespace prot {
+namespace toppic {
 
 class MassShiftStr {
  public:
@@ -196,6 +196,6 @@ class PrsmStr {
 typedef std::vector<PrsmStrPtr> PrsmStrPtrVec;
 typedef std::vector<PrsmStrPtrVec> PrsmStrPtrVec2D;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

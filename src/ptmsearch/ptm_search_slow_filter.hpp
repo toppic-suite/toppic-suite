@@ -24,7 +24,7 @@
 #include "ptmsearch/ptm_slow_match.hpp"
 #include "ptmsearch/comp_shift_low_mem.hpp"
 
-namespace prot {
+namespace toppic {
 
 class PtmSearchSlowFilter {
  public:
@@ -45,6 +45,6 @@ class PtmSearchSlowFilter {
 
 typedef std::shared_ptr<PtmSearchSlowFilter> PtmSearchSlowFilterPtr;
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* PTM_SEARCH_SLOW_FILTER_HPP_ */

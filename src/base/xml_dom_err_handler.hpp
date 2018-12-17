@@ -13,14 +13,14 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_XML_DOM_ERR_HANDLER_HPP_
-#define PROT_BASE_XML_DOM_ERR_HANDLER_HPP_
+#ifndef TOPPIC_BASE_XML_DOM_ERR_HANDLER_HPP_
+#define TOPPIC_BASE_XML_DOM_ERR_HANDLER_HPP_
 
 #include <iostream>
 
 #include <xercesc/sax/HandlerBase.hpp>
 
-namespace prot {
+namespace toppic {
 
 class XmlDOMErrorHandler : public xercesc::HandlerBase {
  public:

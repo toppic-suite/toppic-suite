@@ -22,7 +22,7 @@
 #include <vector>
 #include <memory>
 
-namespace prot {
+namespace toppic {
 
 namespace suffix {
 
@@ -74,5 +74,5 @@ typedef std::shared_ptr<ProteinDatabase> ProteinDBPtr;
 
 }  // namespace suffix
 
-}  // namespace prot
+}  // namespace toppic
 #endif

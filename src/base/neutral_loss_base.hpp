@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_NEUTRAL_LOSS_BASE_HPP_
-#define PROT_BASE_NEUTRAL_LOSS_BASE_HPP_
+#ifndef TOPPIC_BASE_NEUTRAL_LOSS_BASE_HPP_
+#define TOPPIC_BASE_NEUTRAL_LOSS_BASE_HPP_
 
 #include <string>
 #include <vector>
@@ -22,7 +22,7 @@
 
 #include "base/neutral_loss.hpp"
 
-namespace prot {
+namespace toppic {
 
 class NeutralLossBase {
  public:
@@ -46,6 +46,6 @@ class NeutralLossBase {
   static NeutralLossPtr neutral_loss_ptr_NONE_;
 };
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif /* NEUTRALLOSS_HPP_ */

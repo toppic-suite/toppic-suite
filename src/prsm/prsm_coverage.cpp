@@ -29,7 +29,7 @@
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_coverage.hpp"
 
-namespace prot {
+namespace toppic {
 
 void PrsmCoverage::processSingleCoverage() {
   std::string sp_file_name = prsm_para_ptr_->getSpectrumFileName();
@@ -378,5 +378,5 @@ void PrsmCoverage::processTwoPrsms(std::ofstream &file, PrsmPtr prsm_ptr_1, Prsm
     compTwoCoverage(file, prsm_ptr_2, pair_ptrs_21, pair_ptrs_22, pair_ptrs_2, prsm_para_ptr);
   }
 }
-}  // namespace prot
+}  // namespace toppic
 

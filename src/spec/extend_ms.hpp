@@ -23,7 +23,7 @@
 #include "spec/extend_peak.hpp"
 #include "spec/ms.hpp"
 
-namespace prot {
+namespace toppic {
 
 typedef std::shared_ptr<Ms<ExtendPeakPtr> > ExtendMsPtr;
 
@@ -40,6 +40,6 @@ std::vector<std::pair<double, double> > getExtendMassToleranceList(ExtendMsPtr e
 
 }  // namespace extend_ms
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

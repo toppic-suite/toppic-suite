@@ -24,7 +24,7 @@
 #include "base/logger.hpp"
 #include "base/string_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace string_util {
 
@@ -132,5 +132,5 @@ bool endsWith(const std::string &str, const std::string &suffix) {
 
 } // namespace string_util
 
-}  // namespace prot
+}  // namespace toppic
 

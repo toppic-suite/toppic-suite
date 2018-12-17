@@ -13,15 +13,15 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_VERSION_HPP_
-#define PROT_BASE_VERSION_HPP_
+#ifndef TOPPIC_BASE_VERSION_HPP_
+#define TOPPIC_BASE_VERSION_HPP_
 
 #include <string>
 
-namespace prot {
+namespace toppic {
 
 const std::string version_number = "1.2.2";
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

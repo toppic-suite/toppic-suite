@@ -31,7 +31,7 @@
 #include "base/fasta_reader.hpp"
 #include "base/file_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 class ProteoAnno {
  public:
@@ -71,6 +71,6 @@ class ProteoAnno {
 
 typedef std::shared_ptr<ProteoAnno> ProteoAnnoPtr;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

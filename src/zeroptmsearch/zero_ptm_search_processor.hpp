@@ -22,7 +22,7 @@
 #include "prsm/prsm.hpp"
 #include "zeroptmsearch/zero_ptm_search_mng.hpp"
 
-namespace prot {
+namespace toppic {
 
 class ZeroPtmSearchProcessor {
  public:
@@ -40,6 +40,6 @@ class ZeroPtmSearchProcessor {
 
 typedef std::shared_ptr<ZeroPtmSearchProcessor> ZeroPtmSearchProcessorPtr;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

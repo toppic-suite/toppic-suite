@@ -18,7 +18,7 @@
 #include "base/residue_util.hpp"
 #include "base/xml_dom_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 Trunc::Trunc(const std::string &name, int trunc_len, 
              const std::string &trunc_residues,

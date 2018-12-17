@@ -19,7 +19,7 @@
 #include "graph/graph.hpp"
 #include "graphalign/graph_align_mng.hpp"
 
-namespace prot {
+namespace toppic {
 
 class GraphAlignProcessor {
  public:
@@ -31,7 +31,7 @@ class GraphAlignProcessor {
 
 typedef std::shared_ptr<GraphAlignProcessor> GraphAlignProcessorPtr;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif
 

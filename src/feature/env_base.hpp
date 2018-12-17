@@ -20,7 +20,7 @@
 
 #include "feature/envelope.hpp"
 
-namespace prot {
+namespace toppic {
 
 class EnvBase {
  public:

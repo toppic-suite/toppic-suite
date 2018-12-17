@@ -20,7 +20,7 @@
 #include "base/logger.hpp"
 #include "feature/deconv_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace deconv_util {
 
@@ -101,4 +101,4 @@ double getBaseLine(const std::vector<double> &inte) {
 
 } // namespace deconv_util
 
-}  // namespace prot
+}  // namespace toppic

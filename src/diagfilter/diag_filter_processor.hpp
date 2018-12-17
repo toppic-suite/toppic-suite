@@ -20,7 +20,7 @@
 #include "diagfilter/diag_filter_mng.hpp"
 #include "diagfilter/mass_diag_filter.hpp"
 
-namespace prot {
+namespace toppic {
 
 class DiagFilterProcessor {
  public:
@@ -38,6 +38,6 @@ class DiagFilterProcessor {
 
 typedef std::shared_ptr<DiagFilterProcessor> DiagFilterProcessorPtr;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif /* PROT_DIAG_FILTER_PROCESSOR_HPP_ */

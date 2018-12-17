@@ -21,7 +21,7 @@
 #include "base/proteoform.hpp"
 #include "spec/extend_ms.hpp"
 
-namespace prot {
+namespace toppic {
 
 class ZeroPtmFastMatch;
 typedef std::shared_ptr<ZeroPtmFastMatch> ZpFastMatchPtr;
@@ -59,6 +59,6 @@ class ZeroPtmFastMatch {
   int end_;
 };
 
-}  // namespace prot
+}  // namespace toppic
 #endif
 

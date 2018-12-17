@@ -13,14 +13,14 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_DB_BLOCK_HPP_
-#define PROT_BASE_DB_BLOCK_HPP_
+#ifndef TOPPIC_BASE_DB_BLOCK_HPP_
+#define TOPPIC_BASE_DB_BLOCK_HPP_
 
 #include <memory>
 #include <vector>
 #include <string>
 
-namespace prot {
+namespace toppic {
 
 class DbBlock;
 typedef std::shared_ptr<DbBlock> DbBlockPtr;
@@ -43,5 +43,5 @@ class DbBlock {
   int seq_index_;
 };
 
-}  // namespace prot
+}  // namespace toppic
 #endif

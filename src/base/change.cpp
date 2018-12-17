@@ -19,7 +19,7 @@
 #include "base/string_util.hpp"
 #include "base/xml_dom_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 Change::Change(xercesc::DOMElement* element) {
   left_bp_pos_ = xml_dom_util::getIntChildValue(element, "left_bp_pos", 0);
@@ -84,4 +84,4 @@ void Change::setLocalAnno(LocalAnnoPtr p) {
   }
 }
 
-}  // namespace prot
+}  // namespace toppic

@@ -19,7 +19,7 @@
 #include <vector>
 #include "spec/peak_tolerance.hpp"
 
-namespace prot {
+namespace toppic {
 
 class FeatureDetectMng {
  public:

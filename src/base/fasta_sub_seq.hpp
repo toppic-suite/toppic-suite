@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef PROT_BASE_FASTA_SUB_SEQ_HPP_
-#define PROT_BASE_FASTA_SUB_SEQ_HPP_
+#ifndef TOPPIC_BASE_FASTA_SUB_SEQ_HPP_
+#define TOPPIC_BASE_FASTA_SUB_SEQ_HPP_
 
 
 #include <string>
 
 #include "base/fasta_seq.hpp"
 
-namespace prot {
+namespace toppic {
 
 class FastaSubSeq : public FastaSeq {
  public:
@@ -47,6 +47,6 @@ class FastaSubSeq : public FastaSeq {
 
 typedef std::shared_ptr<FastaSubSeq> FastaSubSeqPtr;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

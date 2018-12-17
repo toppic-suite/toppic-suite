@@ -19,7 +19,7 @@
 #include "base/string_util.hpp"
 #include "feature/match_env.hpp" 
 
-namespace prot {
+namespace toppic {
 
 MatchEnv::MatchEnv(int mass_group, EnvelopePtr theo_env_ptr, 
                    RealEnvPtr real_env_ptr):

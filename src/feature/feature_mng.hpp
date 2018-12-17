@@ -19,7 +19,7 @@
 #include "base/file_util.hpp"
 #include "feature/env_base.hpp"
 
-namespace prot {
+namespace toppic {
 
 class FeatureMng {
  public:

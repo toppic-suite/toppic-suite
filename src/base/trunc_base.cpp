@@ -19,7 +19,7 @@
 #include "base/trunc_base.hpp"
 #include "base/xml_dom_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 TruncPtrVec TruncBase::trunc_ptr_vec_;
 
@@ -54,5 +54,5 @@ TruncPtr TruncBase::getTruncPtrFromXml(xercesc::DOMElement * element) {
   return trunc_ptr;
 }
 
-}  // namespace prot
+}  // namespace toppic
 

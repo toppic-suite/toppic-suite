@@ -13,16 +13,16 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_PROTEOFORM_UTIL_HPP_
-#define PROT_BASE_PROTEOFORM_UTIL_HPP_
+#ifndef TOPPIC_BASE_PROTEOFORM_UTIL_HPP_
+#define TOPPIC_BASE_PROTEOFORM_UTIL_HPP_
 
 #include <vector>
 
 #include "base/proteoform.hpp"
 
-namespace prot {
+namespace toppic {
 
-namespace proteoform_util {
+namespace toppiceoform_util {
 
 // calculate frequencies for n_terminal_residues
 ResFreqPtrVec compNTermResidueFreq(const ProteoformPtrVec &prot_mod_forms);
@@ -52,8 +52,8 @@ std::vector<std::vector<double> > getNTermAcet2D(const ProteoformPtrVec & db_for
 
 ProteoformPtr geneDbProteoformPtr(FastaSubSeqPtr fasta_seq_ptr, ModPtrVec fix_mod_list, int start_pos);
 
-}  // namespace proteoform_util
+}  // namespace toppiceoform_util
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

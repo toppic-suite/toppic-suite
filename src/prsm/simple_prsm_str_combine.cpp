@@ -21,7 +21,7 @@
 #include "prsm/simple_prsm_reader.hpp"
 #include "prsm/simple_prsm_str.hpp"
 
-namespace prot {
+namespace toppic {
 
 void SimplePrsmStrCombine::process() {
   size_t input_num = input_file_exts_.size();
@@ -83,4 +83,4 @@ void SimplePrsmStrCombine::process() {
   writer.close();
 }
 
-} /* namespace prot */
+} /* namespace toppic */

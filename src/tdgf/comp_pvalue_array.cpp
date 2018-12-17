@@ -21,7 +21,7 @@
 #include "spec/deconv_ms_util.hpp"
 #include "tdgf/comp_pvalue_array.hpp"
 
-namespace prot {
+namespace toppic {
 
 CompPValueArray::CompPValueArray(CountTestNumPtr test_num_ptr, TdgfMngPtr mng_ptr) {
   mng_ptr_ = mng_ptr;
@@ -140,4 +140,4 @@ void CompPValueArray::process(SpectrumSetPtr spec_set_ptr, PrsmPtrVec &prsm_ptrs
   }
 }
 
-}  // namespace prot
+}  // namespace toppic

@@ -13,15 +13,15 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_AMINO_ACID_BASE_HPP_
-#define PROT_BASE_AMINO_ACID_BASE_HPP_
+#ifndef TOPPIC_BASE_AMINO_ACID_BASE_HPP_
+#define TOPPIC_BASE_AMINO_ACID_BASE_HPP_
 
 #include <string>
 #include <unordered_map>
 
 #include "base/amino_acid.hpp"
 
-namespace prot {
+namespace toppic {
 
 class AminoAcidBase {
  public:
@@ -68,5 +68,5 @@ class AminoAcidBase {
   static AminoAcidPtr empty_amino_acid_ptr_;
 };
 
-}  // namespace prot
+}  // namespace toppic
 #endif

@@ -19,7 +19,7 @@
 #include "base/logger.hpp"
 #include "feature/feature_mng.hpp" 
 
-namespace prot {
+namespace toppic {
 
 EnvBasePtr FeatureMng::env_base_ptr_ = nullptr;
 

@@ -24,7 +24,7 @@
 #include "oneptmsearch/ptm_search_mng.hpp"
 #include "ptmsearch/comp_shift_low_mem.hpp"
 
-namespace prot {
+namespace toppic {
 
 template <int N>
 class PrsmXmlWriterSet {
@@ -55,6 +55,6 @@ class PtmSearchProcessor {
 
 typedef std::shared_ptr<PtmSearchProcessor> PtmSearchProcessorPtr;
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* PTM_PROCESSOR_HPP_ */

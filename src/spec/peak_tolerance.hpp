@@ -21,7 +21,7 @@
 
 #include "base/xml_dom_document.hpp"
 
-namespace prot {
+namespace toppic {
 
 class PeakTolerance {
  public:
@@ -69,6 +69,6 @@ class PeakTolerance {
 
 typedef std::shared_ptr<PeakTolerance> PeakTolerancePtr;
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif    

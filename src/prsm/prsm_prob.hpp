@@ -27,7 +27,7 @@
 #include "prsm/prsm_para.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 
-namespace prot {
+namespace toppic {
 
 class PrsmProb {
  public:
@@ -63,6 +63,6 @@ class PrsmProb {
 };
 
 typedef std::shared_ptr<PrsmProb> PrsmProbPtr;
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* PROT_PRSM_PROB_HPP_ */

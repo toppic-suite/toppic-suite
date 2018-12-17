@@ -20,7 +20,7 @@
 #include "prsmview/transformer.hpp"
 #include "prsmview/anno_view.hpp"
 
-namespace prot {
+namespace toppic {
 
 void translate(std::map<std::string, std::string> &arguments,
                const std::string &fname_suffix) {
@@ -63,4 +63,4 @@ void translate(std::map<std::string, std::string> &arguments,
   xalanc::XalanTransformer::ICUCleanUp();
 }
 
-}  // namespace prot
+}  // namespace toppic

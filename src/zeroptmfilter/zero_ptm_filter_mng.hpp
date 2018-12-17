@@ -19,7 +19,7 @@
 
 #include "prsm/prsm_para.hpp"
 
-namespace prot {
+namespace toppic {
 
 class ZeroPtmFilterMng {
  public:

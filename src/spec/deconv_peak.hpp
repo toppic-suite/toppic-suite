@@ -23,7 +23,7 @@
 
 #include "spec/peak.hpp"
 
-namespace prot {
+namespace toppic {
 
 class DeconvPeak;
 typedef std::shared_ptr<DeconvPeak> DeconvPeakPtr;
@@ -72,5 +72,5 @@ class DeconvPeak : public Peak {
 
 typedef std::vector<DeconvPeakPtr> DeconvPeakPtrVec;
 
-}  // namespace prot
+}  // namespace toppic
 #endif

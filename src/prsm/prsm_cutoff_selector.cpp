@@ -18,7 +18,7 @@
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_cutoff_selector.hpp"
 
-namespace prot {
+namespace toppic {
 
 void PrsmCutoffSelector::process(){
   std::string base_name = file_util::basename(spec_file_name_);
@@ -66,4 +66,4 @@ void PrsmCutoffSelector::process(){
   writer.close();
 }
 
-} /* namespace prot */
+} /* namespace toppic */

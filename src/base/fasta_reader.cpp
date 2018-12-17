@@ -17,7 +17,7 @@
 #include "base/logger.hpp"
 #include "base/fasta_reader.hpp"
 
-namespace prot {
+namespace toppic {
 
 FastaReader::FastaReader(const std::string &file_name) {
   input_.open(file_name.c_str(), std::ios::in);
@@ -62,4 +62,4 @@ void FastaReader::close() {
   input_.close();
 }
 
-}  // namespace prot
+}  // namespace toppic

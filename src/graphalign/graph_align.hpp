@@ -25,7 +25,7 @@
 #include "graphalign/graph_result_node.hpp"
 #include "graphalign/graph_align_mng.hpp"
 
-namespace prot {
+namespace toppic {
 
 typedef std::vector<std::vector<std::vector<std::vector<std::pair<int, int>>>>> ConsistentPairs;
 
@@ -99,7 +99,7 @@ class GraphAlign {
 
 typedef std::shared_ptr<GraphAlign> GraphAlignPtr;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif
 

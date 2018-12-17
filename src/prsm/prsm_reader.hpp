@@ -25,7 +25,7 @@
 #include "prsm/prsm.hpp"
 #include "prsm/prsm_str.hpp"
 
-namespace prot {
+namespace toppic {
 
 class PrsmReader {
  public:
@@ -56,6 +56,6 @@ class PrsmReader {
 typedef std::shared_ptr<PrsmReader> PrsmReaderPtr;
 typedef std::vector<PrsmReaderPtr> PrsmReaderPtrVec;
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* PROT_PRSM_READER_HPP_ */

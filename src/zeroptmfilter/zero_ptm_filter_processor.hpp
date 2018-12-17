@@ -20,7 +20,7 @@
 #include "prsm/simple_prsm.hpp"
 #include "zeroptmfilter/zero_ptm_filter_mng.hpp"
 
-namespace prot {
+namespace toppic {
 
 class ZeroPtmFilterProcessor {
  public:
@@ -35,6 +35,6 @@ class ZeroPtmFilterProcessor {
 
 typedef std::shared_ptr<ZeroPtmFilterProcessor> ZeroPtmFilterProcessorPtr;
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* ZERO_PTM_FILTER_PROCESSOR_HPP_ */

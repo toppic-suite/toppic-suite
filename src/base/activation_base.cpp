@@ -17,7 +17,7 @@
 #include "base/activation_base.hpp"
 #include "base/xml_dom_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 ActivationPtrVec ActivationBase::activation_ptr_vec_;
 
@@ -53,4 +53,4 @@ ActivationPtr ActivationBase::getActivationPtrFromXml(xercesc::DOMElement * elem
   return activation_ptr;
 }
 
-}  // namespace prot
+}  // namespace toppic

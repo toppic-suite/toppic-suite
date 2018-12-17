@@ -23,7 +23,7 @@
 #include "base/residue_freq.hpp"
 #include "tdgf/tdgf_mng.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace tdgf_util {
 
@@ -41,6 +41,6 @@ int computeAvgLength(const ResFreqPtrVec &residue_ptrs, double convert_ratio);
 
 }  // namespace tdgf_util
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

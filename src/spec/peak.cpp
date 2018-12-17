@@ -18,7 +18,7 @@
 #include "base/string_util.hpp"
 #include "spec/peak.hpp"
 
-namespace prot {
+namespace toppic {
 
 void Peak::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   std::string element_name = Peak::getXmlElementName();
@@ -30,4 +30,4 @@ void Peak::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   parent->appendChild(element);
 }
 
-}  // namespace prot
+}  // namespace toppic

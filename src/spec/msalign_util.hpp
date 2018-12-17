@@ -19,7 +19,7 @@
 #include "spec/sp_para.hpp"
 #include "spec/msalign_reader.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace msalign_util {
 
@@ -34,5 +34,5 @@ void mergeMsalignFiles(const std::vector<std::string> & spec_file_lst, int N,
 
 }  // namespace msalign_util
 
-}  // namespace prot
+}  // namespace toppic
 #endif

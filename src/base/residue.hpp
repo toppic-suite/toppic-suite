@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_RESIDUE_HPP_
-#define PROT_BASE_RESIDUE_HPP_
+#ifndef TOPPIC_BASE_RESIDUE_HPP_
+#define TOPPIC_BASE_RESIDUE_HPP_
 
 #include <string>
 #include <memory>
@@ -26,7 +26,7 @@
 #include "base/ptm.hpp"
 #include "base/logger.hpp"
 
-namespace prot {
+namespace toppic {
 
 class Residue;
 typedef std::shared_ptr<Residue> ResiduePtr;
@@ -85,6 +85,6 @@ typedef std::vector<ResiduePtrVec> ResiduePtrVec2D;
 
 typedef std::vector<std::pair<std::string, std::string> > StringPairVec;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

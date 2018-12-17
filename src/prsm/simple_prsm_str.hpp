@@ -20,7 +20,7 @@
 #include <vector>
 #include <string>
 
-namespace prot {
+namespace toppic {
 
 class SimplePrsmStr;
 
@@ -66,7 +66,7 @@ class SimplePrsmStr {
 
 typedef std::vector<SimplePrsmStrPtr> SimplePrsmStrPtrVec;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif
 

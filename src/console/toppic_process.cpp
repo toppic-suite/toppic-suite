@@ -66,7 +66,7 @@
 
 #include "console/toppic_argument.hpp"
 
-namespace prot {
+namespace toppic {
 
 // protein filtering + database searching + E-value computation
 int TopPIC_identify(std::map<std::string, std::string> & arguments) {
@@ -493,5 +493,5 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
   return 0;
 }
 
-}  // namespace prot
+}  // namespace toppic
 

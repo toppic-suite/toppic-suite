@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_FASTA_INDEX_READER_HPP_
-#define PROT_BASE_FASTA_INDEX_READER_HPP_
+#ifndef TOPPIC_BASE_FASTA_INDEX_READER_HPP_
+#define TOPPIC_BASE_FASTA_INDEX_READER_HPP_
 
 #include <iostream>
 #include <fstream>
@@ -26,7 +26,7 @@
 #include "base/fasta_sub_seq.hpp"
 #include "base/string_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 class FastaIndexReader {
  public:
@@ -46,6 +46,6 @@ class FastaIndexReader {
 
 typedef std::shared_ptr<FastaIndexReader> FastaIndexReaderPtr;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

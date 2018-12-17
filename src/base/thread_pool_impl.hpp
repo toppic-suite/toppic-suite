@@ -17,7 +17,7 @@
 
 #include "thread_pool.hpp"
 
-namespace prot {
+namespace toppic {
 
 template <typename T>
 ThreadPool<T>::ThreadPool(int threads, std::string file_name) :
@@ -126,4 +126,4 @@ ThreadPool<T>::~ThreadPool() {
   }
 }
 
-}  // namespace prot
+}  // namespace toppic

@@ -24,7 +24,7 @@
 #include "prsm/prsm_para.hpp"
 #include "prsm/prsm.hpp"
 
-namespace prot {
+namespace toppic {
 
 class PrsmStat {
  public:
@@ -46,6 +46,6 @@ class PrsmStat {
 typedef std::shared_ptr<PrsmStat> PrsmStatPtr;
 
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* PRSM_STAT_HPP_ */

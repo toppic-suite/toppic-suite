@@ -19,7 +19,7 @@
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_top_selector.hpp"
 
-namespace prot {
+namespace toppic {
 
 bool containsSameFastaSeq(const PrsmStrPtrVec prsm_ptrs, PrsmStrPtr target_prsm_ptr) {
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
@@ -70,4 +70,4 @@ void PrsmTopSelector::process() {
   writer.close();
 }
 
-} /* namespace prot */
+} /* namespace toppic */

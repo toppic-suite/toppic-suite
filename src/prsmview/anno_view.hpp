@@ -31,7 +31,7 @@
 #include "prsmview/anno_cleavage.hpp"
 #include "prsmview/prsm_view_mng.hpp"
 
-namespace prot {
+namespace toppic {
 
 class AnnoView {
  public:
@@ -59,6 +59,6 @@ void writeProteinToXml(XmlWriterPtr xml_writer,
                        const std::vector<int> &species_ids,
                        PrsmViewMngPtr mng_ptr, bool detail = true, bool add_ms = true);
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif /* PROT_ANNO_VIEW_HPP_ */

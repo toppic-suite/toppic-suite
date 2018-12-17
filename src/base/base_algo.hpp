@@ -13,13 +13,13 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_ALGORITHM_HPP_
-#define PROT_BASE_ALGORITHM_HPP_
+#ifndef TOPPIC_BASE_ALGORITHM_HPP_
+#define TOPPIC_BASE_ALGORITHM_HPP_
 
 #include <cstddef>
 #include <vector>
 
-namespace prot {
+namespace toppic {
 
 namespace base_algo {
 
@@ -48,6 +48,6 @@ int getLastResPos(double c_term_shift, const std::vector<double> &prm_masses);
 
 }  // namespace base_algo
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

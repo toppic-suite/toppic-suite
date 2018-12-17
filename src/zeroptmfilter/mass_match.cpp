@@ -25,7 +25,7 @@
 #include "zeroptmfilter/filter_protein.hpp"
 #include "zeroptmfilter/mass_match.hpp"
 
-namespace prot {
+namespace toppic {
 
 /* mass_2d[i]: a vector containing prefix residue masses of the ith proteoform 
  * real_shift_2d[i]: a vector containing all possible shifts of the ith proteoform
@@ -217,4 +217,4 @@ void MassMatch::compMatchScores(const std::vector<std::pair<int, int>> &pref_mas
   }
 }
 
-} /* namespace prot */
+} /* namespace toppic */

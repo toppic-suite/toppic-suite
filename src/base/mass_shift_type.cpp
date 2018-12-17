@@ -17,7 +17,7 @@
 #include "base/mass_shift_type.hpp"
 #include "base/xml_dom_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 const MassShiftTypePtr MassShiftType::INPUT            = std::make_shared<MassShiftType>(1, "Input");
 
@@ -56,4 +56,4 @@ MassShiftTypePtr MassShiftType::getChangeTypePtrFromXml(xercesc::DOMElement * el
   return nullptr;
 }
 
-}  // namespace prot
+}  // namespace toppic

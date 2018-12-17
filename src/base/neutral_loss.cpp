@@ -17,11 +17,11 @@
 #include "base/neutral_loss.hpp"
 #include "base/xml_dom_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 NeutralLoss::NeutralLoss(xercesc::DOMElement* element) {
   name_ = xml_dom_util::getChildValue(element, "name", 0);
   mass_ = xml_dom_util::getDoubleChildValue(element, "mass", 0);
 }
 
-}  // namespace prot
+}  // namespace toppic

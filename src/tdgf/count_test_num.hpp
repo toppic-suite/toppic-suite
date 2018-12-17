@@ -20,7 +20,7 @@
 #include "base/residue_freq.hpp"
 #include "tdgf/tdgf_mng.hpp"
 
-namespace prot {
+namespace toppic {
 
 class CountTestNum {
  public:

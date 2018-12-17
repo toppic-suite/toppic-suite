@@ -23,7 +23,7 @@
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_sample_merge.hpp"
 
-namespace prot {
+namespace toppic {
 
 void PrsmSampleMerge::getPrsmClusters(PrsmStrPtrVec& prsm_ptrs,
                                       PrsmStrPtrVec2D& clusters) {
@@ -143,6 +143,6 @@ void PrsmSampleMerge::process() {
   outputTable(clusters, table_prsms, sample_num);
 }
 
-}  // namespace prot
+}  // namespace toppic
 
 

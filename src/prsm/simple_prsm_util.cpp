@@ -17,7 +17,7 @@
 #include "prsm/simple_prsm.hpp"
 #include "prsm/simple_prsm_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace simple_prsm_util {
 
@@ -41,4 +41,4 @@ SimplePrsmPtrVec getUniqueMatches(SimplePrsmPtrVec match_ptrs) {
 
 } // namespace simple_prsm_util
 
-} // namespace prot 
+} // namespace toppic 

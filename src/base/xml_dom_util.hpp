@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_XML_DOM_UTIL_HPP_
-#define PROT_BASE_XML_DOM_UTIL_HPP_
+#ifndef TOPPIC_BASE_XML_DOM_UTIL_HPP_
+#define TOPPIC_BASE_XML_DOM_UTIL_HPP_
 
 #include <iostream>
 #include <fstream>
@@ -22,7 +22,7 @@
 
 #include "base/xml_dom_document.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace xml_dom_util {
 
@@ -50,5 +50,5 @@ void writeToStreamByRemovingDoubleLF(std::ofstream & file, std::string &str);
 
 }  // namespace xml_dom_util
 
-}  // namespace prot
+}  // namespace toppic
 #endif

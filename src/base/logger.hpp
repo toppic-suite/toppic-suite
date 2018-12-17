@@ -13,14 +13,14 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_LOGGER_HPP_
-#define PROT_BASE_LOGGER_HPP_
+#ifndef TOPPIC_BASE_LOGGER_HPP_
+#define TOPPIC_BASE_LOGGER_HPP_
 
 #include <string>
 #include <iostream>
 #include <fstream>
 
-namespace prot {
+namespace toppic {
 
 extern int log_level;
 

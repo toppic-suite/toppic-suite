@@ -20,7 +20,7 @@
 #include "base/residue_seq.hpp"
 #include "base/string_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 ResidueSeq::ResidueSeq(const ResiduePtrVec &residues): residues_(residues) {
   /* get residue mass sum */
@@ -64,4 +64,4 @@ ResSeqPtr ResidueSeq::getEmptyResidueSeq() {
   return std::make_shared<ResidueSeq>(residues);
 }
 
-}  // namespace prot
+}  // namespace toppic

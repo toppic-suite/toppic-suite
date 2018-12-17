@@ -21,7 +21,7 @@
 
 #include "feature/match_env.hpp"
 
-namespace prot {
+namespace toppic {
 
 class EnvPeakPair;
 typedef std::shared_ptr<EnvPeakPair> EnvPeakPairPtr;

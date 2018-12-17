@@ -22,7 +22,7 @@
 #include "feature/feature_mng.hpp"
 #include "feature/feature_ms_reader.hpp"
 
-namespace prot {
+namespace toppic {
 
 class DeconvProcess {
  public:

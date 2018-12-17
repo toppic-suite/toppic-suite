@@ -20,7 +20,7 @@
 #include "prsm/prsm.hpp"
 #include "prsmview/prsm_view_mng.hpp"
 
-namespace prot{
+namespace toppic{
 
 xercesc::DOMElement* geneAnnoPrsm(XmlDOMDocument* xml_doc, PrsmPtr prsm_ptr,
                                   PrsmViewMngPtr mng_ptr, bool detail = true,

@@ -15,7 +15,7 @@
 
 #include "feature/vertex_a.hpp"
 
-namespace prot {
+namespace toppic {
 
 bool VertexA::addPreEnv(MatchEnvPtr env, int max_overlap) {
   bool result = Vertex::addPreEnv(env, max_overlap);

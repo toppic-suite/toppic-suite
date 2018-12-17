@@ -18,7 +18,7 @@
 #include "feature/prec_env.hpp"
 #include "feature/feature_ms_reader.hpp" 
 
-namespace prot {
+namespace toppic {
 
 FeatureMsReader::FeatureMsReader(const std::string & file_name) {
   reader_ptr_ = std::make_shared<RawMsReader>(file_name);

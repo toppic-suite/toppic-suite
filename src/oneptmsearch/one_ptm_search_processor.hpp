@@ -20,7 +20,7 @@
 #include "prsm/prsm.hpp"
 #include "oneptmsearch/ptm_search_mng.hpp"
 
-namespace prot {
+namespace toppic {
 
 class OnePtmSearchProcessor {
  public:
@@ -39,6 +39,6 @@ class OnePtmSearchProcessor {
 
 typedef std::shared_ptr<OnePtmSearchProcessor> OnePtmSearchProcessorPtr;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

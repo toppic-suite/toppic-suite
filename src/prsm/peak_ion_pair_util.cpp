@@ -21,7 +21,7 @@
 #include "spec/theo_peak_util.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace peak_ion_pair_util {
 
@@ -160,4 +160,4 @@ double compMatchPeakNum(PeakIonPairPtrVec &pairs) {
 
 }  // namespace peak_ion_pair_util
 
-}  // namespace prot
+}  // namespace toppic

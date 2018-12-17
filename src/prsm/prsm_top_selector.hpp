@@ -25,7 +25,7 @@
 #include "prsm/prsm.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 
-namespace prot {
+namespace toppic {
 
 class PrsmTopSelector {
  public:
@@ -54,6 +54,6 @@ class PrsmTopSelector {
 
 typedef std::shared_ptr<PrsmTopSelector> PrsmTopSelectorPtr;
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* PRSM_SELECTOR_HPP_ */

@@ -19,7 +19,7 @@
 #include "feature/raw_ms_util.hpp"
 #include "feature/real_env.hpp" 
 
-namespace prot {
+namespace toppic {
 
 RealEnv::RealEnv(std::vector<PeakPtr> &peak_list, EnvelopePtr theo_env, 
                  double tolerance, double min_inte) {

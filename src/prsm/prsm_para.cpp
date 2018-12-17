@@ -21,7 +21,7 @@
 #include "base/prot_mod_base.hpp"
 #include "prsm/prsm_para.hpp"
 
-namespace prot {
+namespace toppic {
 
 PrsmPara::PrsmPara(std::map<std::string, std::string> &arguments) {
   search_db_file_name_ = arguments["databaseFileName"];
@@ -90,4 +90,4 @@ PrsmPara::PrsmPara(std::map<std::string, std::string> &arguments) {
                                           activation_ptr, skip_list);
 }
 
-} /* namespace prot */
+} /* namespace toppic */

@@ -17,7 +17,7 @@
 
 #include "db_file_handler.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace suffix {
 
@@ -74,4 +74,4 @@ std::string DatabaseFileHandler::handleUndefinedCharacter(std::string text) {
 
 }  // namespace suffix
 
-}  // namespace prot
+}  // namespace toppic

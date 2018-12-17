@@ -19,7 +19,7 @@
 #include <memory>
 #include <vector>
 
-namespace prot {
+namespace toppic {
 
 class FilterProtein;
 typedef std::shared_ptr<FilterProtein> FilterProteinPtr;
@@ -49,6 +49,6 @@ class FilterProtein {
   std::vector<double> c_term_shifts_;
 };
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif 

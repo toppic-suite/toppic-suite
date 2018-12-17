@@ -22,7 +22,7 @@
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_str.hpp"
 
-namespace prot {
+namespace toppic {
 
 PrsmStrCombine::PrsmStrCombine(const std::string &spec_file_name,
                                const std::string &in_file_ext,
@@ -105,4 +105,4 @@ void PrsmStrCombine::process(bool norm) {
   writer.close();
 }
 
-} /* namespace prot */
+} /* namespace toppic */

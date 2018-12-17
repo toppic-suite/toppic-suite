@@ -27,7 +27,7 @@
 
 #include "spec/raw_ms.hpp"
 
-namespace prot {
+namespace toppic {
 
 typedef std::shared_ptr<pwiz::msdata::MSDataFile> MSDataFilePtr;
 
@@ -58,6 +58,6 @@ class RawMsReader {
 
 typedef std::shared_ptr<RawMsReader> RawMsReaderPtr;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

@@ -15,7 +15,7 @@
 
 #include "feature/env_peak_pair.hpp"
 
-namespace prot {
+namespace toppic {
 
 EnvPeakPair::EnvPeakPair(MatchEnvPtr env_ptr, int pos_idx) {
   env_ptr_ = env_ptr;

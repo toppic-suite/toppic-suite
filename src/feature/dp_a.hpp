@@ -19,7 +19,7 @@
 #include "feature/dp.hpp"
 #include "feature/vertex_a.hpp"
 
-namespace prot {
+namespace toppic {
 
 class DpA : public Dp {
  public:

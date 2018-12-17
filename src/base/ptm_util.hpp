@@ -13,15 +13,15 @@
 // limitations under the License.
 
 
-#ifndef PROT_BASE_PROT_UTIL_HPP_
-#define PROT_BASE_PROT_UTIL_HPP_
+#ifndef TOPPIC_BASE_PROT_UTIL_HPP_
+#define TOPPIC_BASE_PROT_UTIL_HPP_
 
 #include <string>
 #include <vector>
 
 #include "base/ptm.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace ptm_util {
 
@@ -29,6 +29,6 @@ PtmPtrVec readPtmTxt(const std::string &file_name);
 
 }  // namespace ModUtil
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

@@ -13,15 +13,15 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_NEUTRAL_LOSS_HPP_
-#define PROT_BASE_NEUTRAL_LOSS_HPP_
+#ifndef TOPPIC_BASE_NEUTRAL_LOSS_HPP_
+#define TOPPIC_BASE_NEUTRAL_LOSS_HPP_
 
 #include <string>
 #include <vector>
 #include <memory>
 #include "base/xml_dom_document.hpp"
 
-namespace prot {
+namespace toppic {
 
 class NeutralLoss {
  public:
@@ -45,6 +45,6 @@ typedef std::shared_ptr<NeutralLoss> NeutralLossPtr;
 
 typedef std::vector<NeutralLossPtr> NeutralLossPtrVec;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif /* NEUTRALLOSS_HPP_ */

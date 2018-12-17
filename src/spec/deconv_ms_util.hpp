@@ -18,7 +18,7 @@
 
 #include "spec/deconv_ms.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace deconv_ms_util {
 
@@ -26,6 +26,6 @@ DeconvMsPtrVec  getRefineMsPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, doubl
 
 }  // namespace deconv_ms_util
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

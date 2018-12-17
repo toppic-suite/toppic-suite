@@ -20,7 +20,7 @@
 #include "prsm/simple_prsm_reader.hpp"
 #include "prsm/simple_prsm_table_writer.hpp"
 
-namespace prot {
+namespace toppic {
 
 void SimplePrsmTableWriter::write() {
   std::string spectrum_file_name  = prsm_para_ptr_->getSpectrumFileName();
@@ -58,4 +58,4 @@ void SimplePrsmTableWriter::write() {
   file_.close();
 }
 
-}  // namespace prot
+}  // namespace toppic

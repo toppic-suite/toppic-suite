@@ -13,14 +13,14 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_BREAK_POINT_HPP_
-#define PROT_BASE_BREAK_POINT_HPP_
+#ifndef TOPPIC_BASE_BREAK_POINT_HPP_
+#define TOPPIC_BASE_BREAK_POINT_HPP_
 
 #include <vector>
 
 #include "base/ion_type.hpp"
 
-namespace prot {
+namespace toppic {
 
 class BreakPoint {
  public:
@@ -46,6 +46,6 @@ class BreakPoint {
 typedef std::shared_ptr<BreakPoint> BreakPointPtr;
 typedef std::vector<BreakPointPtr> BreakPointPtrVec;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

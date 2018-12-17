@@ -25,7 +25,7 @@
 #include "base/xml_dom_document.hpp"
 #include "base/xml_dom_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 PtmPtrVec PtmBase::ptm_ptr_vec_;
 
@@ -102,5 +102,5 @@ PtmPtr PtmBase::getPtmPtrFromXml(xercesc::DOMElement * element) {
   return ptm_ptr;
 }
 
-}  // namespace prot
+}  // namespace toppic
 

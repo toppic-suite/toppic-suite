@@ -22,9 +22,9 @@
 #include "base/trunc_util.hpp"
 #include "base/xml_dom_util.hpp"
 
-namespace prot {
+namespace toppic {
 
-namespace prot_mod_util {
+namespace toppic_mod_util {
 
 bool allowMod(ProtModPtr prot_mod_ptr, const ResiduePtrVec &residues) {
   if (prot_mod_ptr == ProtModBase::getProtModPtr_NONE()) {
@@ -96,6 +96,6 @@ ProtModPtr findNME_Acetylation(const ProtModPtrVec &prot_mod_ptrs,
   return nullptr;
 }
 
-} // namespace prot_mod_util
+} // namespace toppic_mod_util
 
-}  // namespace prot
+}  // namespace toppic

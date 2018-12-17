@@ -15,7 +15,7 @@
 
 #include "graph/spec_graph_reader.hpp"
 
-namespace prot {
+namespace toppic {
 
 SpecGraphReader::SpecGraphReader(const std::string &sp_file_name,
                                  int group_sp_num,

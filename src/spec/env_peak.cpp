@@ -19,7 +19,7 @@
 #include "base/xml_dom_util.hpp"
 #include "spec/env_peak.hpp"
 
-namespace prot {
+namespace toppic {
 
 EnvPeak::EnvPeak(double mz, double intensity):
     Peak(mz, intensity) {
@@ -53,5 +53,5 @@ bool EnvPeak::isExist() {
   }
 }
 
-}  // namespace prot
+}  // namespace toppic
 

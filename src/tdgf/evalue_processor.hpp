@@ -23,7 +23,7 @@
 #include "tdgf/comp_pvalue_array.hpp"
 #include "tdgf/comp_pvalue_lookup_table.hpp"
 
-namespace prot {
+namespace toppic {
 
 class EValueProcessor {
  public:

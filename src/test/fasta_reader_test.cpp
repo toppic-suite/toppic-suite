@@ -20,7 +20,7 @@
 #include "base/base_data.hpp"
 #include "base/fasta_reader.hpp"
 
-using namespace prot;
+using namespace toppic;
 
 TEST_CASE("fasta reader") {
   std::ofstream test_file;

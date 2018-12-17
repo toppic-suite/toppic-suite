@@ -20,7 +20,7 @@
 
 #include "prsm/prsm_para.hpp"
 
-namespace prot {
+namespace toppic {
 
 class OnePtmFilterMng {
  public:
@@ -58,6 +58,6 @@ class OnePtmFilterMng {
 
 typedef std::shared_ptr<OnePtmFilterMng> OnePtmFilterMngPtr;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif /* ONE_PTM_FILTER_MNG_HPP_ */

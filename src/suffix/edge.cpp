@@ -18,7 +18,7 @@
 #include "suffix.hpp"
 #include "suffix_tree.hpp"
 
-namespace prot {
+namespace toppic {
 namespace suffix {
 
 Edge::Edge(int beginIndex, int endIndex, NodePtr startNode) {
@@ -94,4 +94,4 @@ void Edge::setLeafEdge() {
 
 }  // namespace suffix
 
-}  // namespace prot
+}  // namespace toppic

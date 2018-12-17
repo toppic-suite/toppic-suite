@@ -17,7 +17,7 @@
 #include "base/ion_type_base.hpp"
 #include "base/xml_dom_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 IonTypePtrVec IonTypeBase::ion_type_ptr_vec_;
 
@@ -56,4 +56,4 @@ IonTypePtr IonTypeBase::getIonTypePtrByName(const std::string &name) {
   return IonTypePtr(nullptr);
 }
 
-}  // namespace prot
+}  // namespace toppic

@@ -20,7 +20,7 @@
 #include "console/topmerge_argument.hpp"
 #include "console/topmerge_process.hpp"
 
-using namespace prot;
+using namespace toppic;
 
 int main(int argc, char* argv[]) {
   //prot::log_level = 2;

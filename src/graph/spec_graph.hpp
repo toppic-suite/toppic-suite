@@ -23,7 +23,7 @@
 #include "graph/dist.hpp"
 #include "graph/graph.hpp"
 
-namespace prot {
+namespace toppic {
 
 class SpecGraph {
  public:
@@ -67,6 +67,6 @@ class SpecGraph {
 typedef std::shared_ptr<SpecGraph> SpecGraphPtr;
 typedef std::vector<SpecGraphPtr> SpecGraphPtrVec;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif /* SPEC_GRAPH_HPP_ */

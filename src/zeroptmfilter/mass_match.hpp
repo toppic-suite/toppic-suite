@@ -23,7 +23,7 @@
 #include "base/proteoform.hpp"
 #include "base/base_data.hpp"
 
-namespace prot {
+namespace toppic {
 
 class MassMatch {
  public:
@@ -91,6 +91,6 @@ class MassMatch {
 
 typedef std::shared_ptr<MassMatch> MassMatchPtr;
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif

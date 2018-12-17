@@ -22,7 +22,7 @@
 #include "base/logger.hpp"
 #include "base/bp_spec.hpp"
 
-namespace prot {
+namespace toppic {
 
 BpSpec::BpSpec(const ResSeqPtr &res_seq_ptr) {
   initBreakPoints(res_seq_ptr);
@@ -120,4 +120,4 @@ std::vector<int> BpSpec::getScaledSrmMasses(double scale) {
   return result;
 }
 
-} /* namespace prot */
+} /* namespace toppic */

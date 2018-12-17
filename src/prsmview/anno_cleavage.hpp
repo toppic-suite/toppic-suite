@@ -24,7 +24,7 @@
 #include "prsm/peak_ion_pair.hpp"
 #include "prsm/prsm.hpp"
 
-namespace prot {
+namespace toppic {
 
 #define CLEAVAGE_TYPE_NORMAL "normal"
 #define CLEAVAGE_TYPE_N_TRUNCATION "n_truncation"
@@ -79,6 +79,6 @@ typedef std::shared_ptr<AnnoCleavage> AnnoCleavagePtr;
 typedef std::vector<AnnoCleavagePtr> AnnoCleavagePtrVec;
 
 AnnoCleavagePtrVec getProteoCleavage(PrsmPtr prsm_ptr, double min_mass);
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* PROT_ANNO_CLEAVAGE_HPP_ */

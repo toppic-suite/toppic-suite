@@ -30,7 +30,7 @@
 #include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_reader.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace prsm_util {
 
@@ -212,4 +212,4 @@ void mergePrsmFiles(const std::vector<std::string> & prsm_file_lst, int N,
 
 }  // namespace prsm_util
 
-}  // namespace prot
+}  // namespace toppic

@@ -13,13 +13,13 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_TRUNC_BASE_HPP_
-#define PROT_BASE_TRUNC_BASE_HPP_
+#ifndef TOPPIC_BASE_TRUNC_BASE_HPP_
+#define TOPPIC_BASE_TRUNC_BASE_HPP_
 
 #include <string>
 #include "base/trunc.hpp"
 
-namespace prot {
+namespace toppic {
 
 class TruncBase {
  public:
@@ -35,6 +35,6 @@ class TruncBase {
   static TruncPtrVec trunc_ptr_vec_;
 };
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

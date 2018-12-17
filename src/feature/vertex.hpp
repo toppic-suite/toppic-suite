@@ -20,7 +20,7 @@
 #include "feature/match_env.hpp"
 #include "feature/env_peak_pair.hpp"
 
-namespace prot {
+namespace toppic {
 
 class Vertex;
 typedef std::shared_ptr<Vertex> VertexPtr;

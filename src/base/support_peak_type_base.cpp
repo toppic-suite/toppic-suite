@@ -18,7 +18,7 @@
 #include "base/support_peak_type_base.hpp"
 #include "base/xml_dom_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 SPTypePtrVec SPTypeBase::sp_type_ptr_vec_;
 
@@ -62,4 +62,4 @@ SPTypePtr SPTypeBase::getSPTypePtrById(int id) {
   return SPTypePtr(nullptr);
 }
 
-}  // namespace prot
+}  // namespace toppic

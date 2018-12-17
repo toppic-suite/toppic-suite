@@ -16,7 +16,7 @@
 #ifndef PROT_MASS_CONSTANT_HPP_
 #define PROT_MASS_CONSTANT_HPP_
 
-namespace prot {
+namespace toppic {
 namespace mass_constant {
 /**
  * Returns the mass of an ammonia (NH3).
@@ -51,6 +51,6 @@ inline double getYIonShift() {return 18.010565; }
 
 }  // namespace mass_constant
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

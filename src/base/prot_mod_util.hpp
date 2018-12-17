@@ -13,17 +13,17 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_PROT_MOD_UTIL_HPP_
-#define PROT_BASE_PROT_MOD_UTIL_HPP_
+#ifndef TOPPIC_BASE_PROT_MOD_UTIL_HPP_
+#define TOPPIC_BASE_PROT_MOD_UTIL_HPP_
 
 #include <string>
 
 #include "base/prot_mod.hpp"
 #include "base/residue.hpp"
 
-namespace prot {
+namespace toppic {
 
-namespace prot_mod_util {
+namespace toppic_mod_util {
 
 bool allowMod(ProtModPtr prot_mod_ptr, const ResiduePtrVec &residues);
 
@@ -32,7 +32,7 @@ ProtModPtrVec readProtMod(const std::string &file_name);
 ProtModPtr findNME_Acetylation(const ProtModPtrVec &prot_mod_ptrs, 
                                const ResiduePtrVec &residues);
 
-}  // namespace prot_mod_util
+}  // namespace toppic_mod_util
 
-}  // namespace prot
+}  // namespace toppic
 #endif

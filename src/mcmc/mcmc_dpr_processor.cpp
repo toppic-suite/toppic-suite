@@ -47,7 +47,7 @@
 #include "mcmc/comp_pvalue_mcmc.hpp"
 #include "mcmc/mcmc_mass_table_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 void DprProcessor::init() {
   std::string var_mod_file_name = mng_ptr_->residue_mod_file_;
@@ -291,4 +291,4 @@ void DprProcessor::processOnePrsm(PrsmPtr prsm_ptr, SpectrumSetPtr spec_set_ptr,
                               test_num_ptr_, ptm_mass_vec2d_, pool_ptr_));
 }
 
-}  // namespace prot
+}  // namespace toppic

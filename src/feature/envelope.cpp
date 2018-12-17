@@ -26,7 +26,7 @@
 #include "spec/peak.hpp"
 #include "feature/envelope.hpp"
 
-namespace prot {
+namespace toppic {
 
 Envelope::Envelope(Envelope &env): 
     refer_idx_(env.refer_idx_),
@@ -267,5 +267,5 @@ void Envelope::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
 }
 
 
-}  // namespace prot
+}  // namespace toppic
 

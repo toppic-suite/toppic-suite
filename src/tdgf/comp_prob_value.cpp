@@ -20,7 +20,7 @@
 #include "base/logger.hpp"
 #include "tdgf/comp_prob_value.hpp"
 
-namespace prot {
+namespace toppic {
 
 ProbPeak::ProbPeak(PrmPeakPtr peak_ptr, int spectrum_id, int height, 
                    bool strict, double convert_ratio) {

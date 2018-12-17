@@ -23,7 +23,7 @@
 #include "spec/base_peak_type.hpp"
 #include "prsm/prsm.hpp"
 
-namespace prot {
+namespace toppic {
 
 class ProbPeak {
  public:

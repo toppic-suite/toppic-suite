@@ -13,15 +13,15 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_PROT_MOD_HPP_
-#define PROT_BASE_PROT_MOD_HPP_
+#ifndef TOPPIC_BASE_PROT_MOD_HPP_
+#define TOPPIC_BASE_PROT_MOD_HPP_
 
 #include "base/ptm_base.hpp"
 #include "base/mod.hpp"
 #include "base/trunc.hpp"
 #include "base/xml_dom_document.hpp"
 
-namespace prot {
+namespace toppic {
 
 class ProtMod {
  public:

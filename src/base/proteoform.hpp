@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_PROTEOFORM_HPP_
-#define PROT_BASE_PROTEOFORM_HPP_
+#ifndef TOPPIC_BASE_PROTEOFORM_HPP_
+#define TOPPIC_BASE_PROTEOFORM_HPP_
 
 #include <string>
 #include <vector>
@@ -29,7 +29,7 @@
 #include "base/align_type.hpp"
 #include "base/ptm.hpp"
 
-namespace prot {
+namespace toppic {
 
 class Proteoform;
 
@@ -140,6 +140,6 @@ class Proteoform {
 typedef std::vector<ProteoformPtr> ProteoformPtrVec;
 typedef std::vector<ProteoformPtrVec> ProteoformPtrVec2D;
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* PROTEOFORM_HPP_ */

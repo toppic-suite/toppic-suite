@@ -16,7 +16,7 @@
 #include "base/logger.hpp"
 #include "base/trunc_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace trunc_util {
 
@@ -45,4 +45,4 @@ bool isValidTrunc(TruncPtr trunc_ptr, const ResiduePtrVec & res_ptr_vec) {
 
 } // namespace trunc_util
 
-}  // namespace prot
+}  // namespace toppic

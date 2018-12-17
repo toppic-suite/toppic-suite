@@ -23,7 +23,7 @@
 
 #include "spec/peak.hpp"
 
-namespace prot {
+namespace toppic {
 
 class EnvPeak;
 typedef std::shared_ptr<EnvPeak> EnvPeakPtr;
@@ -68,6 +68,6 @@ class EnvPeak : public Peak {
 
 typedef std::vector<EnvPeakPtr> EnvPeakPtrVec;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

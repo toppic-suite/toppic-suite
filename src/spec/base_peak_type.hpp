@@ -19,7 +19,7 @@
 #include <memory>
 #include <string>
 
-namespace prot {
+namespace toppic {
 
 class BasePeakType;
 typedef std::shared_ptr<BasePeakType> BasePeakTypePtr;

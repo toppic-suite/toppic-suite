@@ -18,7 +18,7 @@
 
 #include "node.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace suffix {
 
@@ -61,5 +61,5 @@ typedef std::shared_ptr<Suffix> SuffixPtr;
 
 }  // namespace suffix
 
-}  // namespace prot
+}  // namespace toppic
 #endif

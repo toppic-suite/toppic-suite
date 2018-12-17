@@ -20,7 +20,7 @@
 
 #include "spec/ms_header.hpp"
 
-namespace prot {
+namespace toppic {
 
 template <class T>
 class Ms {

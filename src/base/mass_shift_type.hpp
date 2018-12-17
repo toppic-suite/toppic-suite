@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_MASS_SHIFT_TYPE_HPP_
-#define PROT_BASE_MASS_SHIFT_TYPE_HPP_
+#ifndef TOPPIC_BASE_MASS_SHIFT_TYPE_HPP_
+#define TOPPIC_BASE_MASS_SHIFT_TYPE_HPP_
 
 #include <memory>
 #include <vector>
@@ -22,7 +22,7 @@
 
 #include "base/xml_dom_document.hpp"
 
-namespace prot {
+namespace toppic {
 
 class MassShiftType;
 typedef std::shared_ptr<MassShiftType> MassShiftTypePtr;
@@ -58,7 +58,7 @@ class MassShiftType {
 
 typedef std::vector<MassShiftTypePtr> MassShiftTypePtrVec;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif
 

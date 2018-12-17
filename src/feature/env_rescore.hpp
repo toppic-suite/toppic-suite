@@ -20,9 +20,9 @@
 
 #include "feature/match_env.hpp"
 
-namespace prot {
+namespace toppic {
 namespace EnvRescore {
 void rescore(MatchEnvPtr2D &match_envs, const std::vector<std::vector<double> > para);
 }  // namespace EnvRescore
-}  // namespace prot
+}  // namespace toppic
 #endif

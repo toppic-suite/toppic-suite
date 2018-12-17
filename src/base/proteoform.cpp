@@ -30,7 +30,7 @@
 #include "base/proteoform_factory.hpp"
 #include "base/xml_dom_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 Proteoform::Proteoform(FastaSeqPtr fasta_seq_ptr,
                        ProtModPtr prot_mod_ptr, 
@@ -373,5 +373,5 @@ std::string Proteoform::getMIScore() {
   return mi_score_;
 }
 
-}  // namespace prot
+}  // namespace toppic
 

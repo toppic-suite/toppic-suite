@@ -30,7 +30,7 @@
 #include "console/topmerge_argument.hpp"
 #include "console/topmerge_process.hpp"
 
-namespace prot {
+namespace toppic {
 
 int topMergeProcess(std::map<std::string, std::string> &arguments,
                     std::vector<std::string> &proteo_file_list) {

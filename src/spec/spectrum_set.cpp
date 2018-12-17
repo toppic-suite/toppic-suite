@@ -20,7 +20,7 @@
 #include "spec/prm_ms_factory.hpp"
 #include "spec/spectrum_set.hpp"
 
-namespace prot {
+namespace toppic {
 
 SpectrumSet::SpectrumSet(DeconvMsPtrVec deconv_ms_ptr_vec,
                          SpParaPtr sp_para_ptr,
@@ -84,4 +84,4 @@ bool SpectrumSet::checkValid(SpParaPtr sp_para_ptr) {
   return true;
 }
 
-}  // namespace prot
+}  // namespace toppic

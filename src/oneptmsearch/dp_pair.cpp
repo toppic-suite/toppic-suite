@@ -16,7 +16,7 @@
 
 #include "oneptmsearch/dp_pair.hpp"
 
-namespace prot {
+namespace toppic {
 DPPair::DPPair(int x,int y,double pair_score,double diff,
                int order,int n_shift,DiagonalHeaderPtr header_ptr):Pair(x,y){
   diff_ = diff;
@@ -36,4 +36,4 @@ void DPPair::updateTable(int s,double score,int path_type,DPPairPtr prev_pair_pt
     prev_pair_ptrs_[s] = prev_pair_ptr;
 }
 
-} /* namespace prot */
+} /* namespace toppic */

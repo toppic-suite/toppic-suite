@@ -22,7 +22,7 @@
 #include "base/string_util.hpp"
 #include "base/xml_dom_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace xml_dom_util {
 
@@ -136,4 +136,4 @@ void writeToStreamByRemovingDoubleLF(std::ofstream &file, std::string &str) {
 
 } // namespace xml_dom_util
 
-}  // namespace prot
+}  // namespace toppic

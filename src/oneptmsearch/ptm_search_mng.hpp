@@ -21,7 +21,7 @@
 #include "prsm/prsm_para.hpp"
 #include "oneptmsearch/ps_align_para.hpp"
 
-namespace prot {
+namespace toppic {
 
 class PtmSearchMng {
  public :
@@ -68,6 +68,6 @@ class PtmSearchMng {
 
 typedef std::shared_ptr<PtmSearchMng> PtmSearchMngPtr;
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* ONE_PTM_SEARCH_MNG_HPP_ */

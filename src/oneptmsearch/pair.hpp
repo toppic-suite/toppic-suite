@@ -18,7 +18,7 @@
 
 #include <memory>
 
-namespace prot {
+namespace toppic {
 
 class Pair;
 
@@ -50,6 +50,6 @@ class Pair {
 };
 
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* PAIR_HPP_ */

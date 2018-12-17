@@ -22,7 +22,7 @@
 
 #include "spec/peak.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace raw_ms_util {
 
@@ -36,6 +36,6 @@ PeakPtrVec rmPeaks(const PeakPtrVec &ptr_list, std::vector<bool> &keep);
 
 }  // namespace raw_ms_util
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

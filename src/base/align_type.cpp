@@ -16,7 +16,7 @@
 
 #include "base/align_type.hpp"
 
-namespace prot {
+namespace toppic {
 
 AlignTypePtr AlignType::COMPLETE = std::make_shared<AlignType>("complete", 0);
 
@@ -25,4 +25,4 @@ AlignTypePtr AlignType::PREFIX = std::make_shared<AlignType>("prefix", 1);
 AlignTypePtr AlignType::SUFFIX = std::make_shared<AlignType>("suffix", 2);
 
 AlignTypePtr AlignType::INTERNAL = std::make_shared<AlignType>("internal", 3);
-}  // namespace prot
+}  // namespace toppic

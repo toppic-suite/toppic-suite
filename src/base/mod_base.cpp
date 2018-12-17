@@ -26,7 +26,7 @@
 #include "base/xml_dom_document.hpp"
 #include "base/xml_dom_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 ModPtrVec ModBase::mod_ptr_vec_;
 
@@ -87,5 +87,5 @@ ModPtr ModBase::getModPtrFromXml(xercesc::DOMElement * element) {
   return getBaseModPtr(ptr);
 }
 
-}  // namespace prot
+}  // namespace toppic
 

@@ -24,7 +24,7 @@
 #include "prsm/prsm_str.hpp"
 #include "prsm/prsm_para.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace prsm_util {
 
@@ -53,6 +53,6 @@ void mergePrsmFiles(const std::vector<std::string> & prsm_file_lst, int N,
 
 }  // namespace prsm_util
 
-}  // namespace prot
+}  // namespace toppic
 #endif
 

@@ -30,7 +30,7 @@
 #include "prsmview/xml_generator.hpp"
 #include "spec/extend_ms_factory.hpp"
 
-namespace prot {
+namespace toppic {
 
 XmlGenerator::XmlGenerator(PrsmParaPtr prsm_para_ptr,
                            const std::string &resource_dir,
@@ -358,4 +358,4 @@ void XmlGenerator::process() {
   removeTempFiles();
 }
 
-}  // namespace prot
+}  // namespace toppic

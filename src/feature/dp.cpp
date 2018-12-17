@@ -15,7 +15,7 @@
 
 #include "feature/dp.hpp"
 
-namespace prot {
+namespace toppic {
 
 Dp::Dp (DeconvDataPtr data_ptr, MatchEnvPtr2D &win_envs, 
         FeatureMngPtr mng_ptr):

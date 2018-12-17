@@ -18,7 +18,7 @@
 
 #include "base/mass_constant.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace peak_util {
 
@@ -31,5 +31,5 @@ inline double compMonoMz(double mono_mass, int charge) {
 }
 
 }  // namespace peak_util
-}  // namespace prot
+}  // namespace toppic
 #endif

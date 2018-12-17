@@ -32,7 +32,7 @@
 #include "zeroptmsearch/zero_ptm_slow_match.hpp"
 #include "zeroptmsearch/zero_ptm_search_processor.hpp"
 
-namespace prot {
+namespace toppic {
 
 PrsmPtrVec ZeroPtmSearchProcessor::zeroPtmSearchOneSpec(SpectrumSetPtr spec_set_ptr,
                                                         const SimplePrsmPtrVec &simple_prsm_ptr_vec,
@@ -199,4 +199,4 @@ void ZeroPtmSearchProcessor::process() {
   internal_writer.close();
   std::cout << std::endl;
 }
-}  // namespace prot
+}  // namespace toppic

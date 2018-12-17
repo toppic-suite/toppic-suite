@@ -19,11 +19,11 @@
 #include <map>
 #include <vector>
 
-namespace prot {
+namespace toppic {
 
 int topMergeProcess(std::map<std::string, std::string> &arguments,
                     std::vector<std::string> &proteo_file_list);
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

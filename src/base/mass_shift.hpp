@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef PROT_BASE_MASS_SHIFT_HPP_
-#define PROT_BASE_MASS_SHIFT_HPP_
+#ifndef TOPPIC_BASE_MASS_SHIFT_HPP_
+#define TOPPIC_BASE_MASS_SHIFT_HPP_
 
 #include <memory>
 #include <vector>
@@ -21,7 +21,7 @@
 
 #include "base/change.hpp"
 
-namespace prot {
+namespace toppic {
 
 class MassShift;
 typedef std::shared_ptr<MassShift> MassShiftPtr;
@@ -76,6 +76,6 @@ class MassShift {
 
 typedef std::vector<MassShiftPtr> MassShiftPtrVec;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

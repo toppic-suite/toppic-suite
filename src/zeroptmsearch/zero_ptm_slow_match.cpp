@@ -26,7 +26,7 @@
 #include "spec/theo_peak_util.hpp"
 #include "zeroptmsearch/zero_ptm_slow_match.hpp"
 
-namespace prot {
+namespace toppic {
 
 ZeroPtmSlowMatch::ZeroPtmSlowMatch(const DeconvMsPtrVec &deconv_ms_ptr_vec, 
                                    ZpFastMatchPtr fast_match_ptr,
@@ -118,4 +118,4 @@ ZpSlowMatchPtrVec ZeroPtmSlowMatch::filter(const DeconvMsPtrVec &deconv_ms_ptr_v
   return slow_matches;
 }
 
-}  // namespace prot
+}  // namespace toppic

@@ -26,7 +26,7 @@
 #include "prsm/prsm_para.hpp"
 #include "prsm/simple_prsm_xml_writer.hpp"
 
-namespace prot {
+namespace toppic {
 
 class SimplePrsmStrCombine {
  public:
@@ -63,6 +63,6 @@ class SimplePrsmStrCombine {
 };
 
 typedef std::shared_ptr<SimplePrsmStrCombine> SimplePrsmStrCombinePtr;
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif

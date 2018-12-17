@@ -24,7 +24,7 @@
 #include "prsm/peak_ion_pair.hpp"
 #include "oneptmsearch/diagonal_header.hpp"
 
-namespace prot {
+namespace toppic {
 
 template <class T>
 class Diagonal {
@@ -76,6 +76,6 @@ int getNewBgn(const PeakIonPairPtrVec& pair_ptrs);
 
 int getNewEnd(const PeakIonPairPtrVec& pair_ptrs);
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* DIAGONAL_HPP_ */

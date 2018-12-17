@@ -17,7 +17,7 @@
 #include "feature/raw_ms_util.hpp"
 #include "feature/deconv_data_base.hpp"
 
-namespace prot {
+namespace toppic {
 
 DeconvDataPtr DeconvDataBase::getDataPtr(PeakPtrVec &peak_list, FeatureMngPtr mng_ptr) {
   if (peak_list.size() == 0) return nullptr;
@@ -61,4 +61,4 @@ DeconvDataPtr DeconvDataBase::getDataPtr(PeakPtrVec &peak_list, double max_mass,
                                       max_charge, mng_ptr->window_size_);
 }
 
-}  // namespace prot
+}  // namespace toppic

@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_RESIDUE_UTIL_HPP_
-#define PROT_BASE_RESIDUE_UTIL_HPP_
+#ifndef TOPPIC_BASE_RESIDUE_UTIL_HPP_
+#define TOPPIC_BASE_RESIDUE_UTIL_HPP_
 
 #include <string>
 #include <vector>
@@ -25,7 +25,7 @@
 #include "base/residue.hpp"
 #include "base/logger.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace residue_util {
 
@@ -50,5 +50,5 @@ double compResiduePtrVecMass(const std::string & seq,
 
 }  // namespace residue_util
 
-}  // namespace prot
+}  // namespace toppic
 #endif

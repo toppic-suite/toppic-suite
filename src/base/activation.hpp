@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASE_ACTIVATION_HPP_
-#define PROT_BASE_ACTIVATION_HPP_
+#ifndef TOPPIC_BASE_ACTIVATION_HPP_
+#define TOPPIC_BASE_ACTIVATION_HPP_
 
 #include <string>
 #include <vector>
@@ -22,7 +22,7 @@
 #include "base/ion_type.hpp"
 #include "base/xml_dom_document.hpp"
 
-namespace prot {
+namespace toppic {
 
 class Activation {
  public:
@@ -62,6 +62,6 @@ class Activation {
 typedef std::shared_ptr<Activation> ActivationPtr;
 typedef std::vector<ActivationPtr> ActivationPtrVec;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

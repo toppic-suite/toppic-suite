@@ -19,7 +19,7 @@
 #include "feature/match_env.hpp"
 #include "feature/deconv_data.hpp"
 
-namespace prot {
+namespace toppic {
 
 class EnvFilter {
  public:

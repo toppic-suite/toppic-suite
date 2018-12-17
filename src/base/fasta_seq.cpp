@@ -21,7 +21,7 @@
 #include "base/fasta_seq.hpp"
 #include "base/xml_dom_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 FastaSeq::FastaSeq(const std::string &name_line,
                    const std::string &ori_seq) {
@@ -144,4 +144,4 @@ std::string FastaSeq::getDescFromXml(xercesc::DOMElement * element) {
   return desc;
 }
 
-}  // namespace prot
+}  // namespace toppic

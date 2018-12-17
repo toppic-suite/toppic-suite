@@ -25,7 +25,7 @@
 #include "prsm/prsm.hpp"
 #include "prsm/prsm_str.hpp"
 
-namespace prot {
+namespace toppic {
 
 class PrsmXmlWriter {
  public:
@@ -55,6 +55,6 @@ class PrsmXmlWriter {
 typedef std::shared_ptr<PrsmXmlWriter> PrsmXmlWriterPtr;
 typedef std::vector<PrsmXmlWriterPtr> PrsmXmlWriterPtrVec;
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* PRSM_WRITER_HPP_ */

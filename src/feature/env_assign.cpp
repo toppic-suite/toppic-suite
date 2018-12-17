@@ -17,7 +17,7 @@
 
 #include "feature/env_assign.hpp" 
 
-namespace prot {
+namespace toppic {
 
 MatchEnvPtr2D EnvAssign::assignWinEnv(MatchEnvPtr2D &match_envs, DeconvDataPtr data_ptr,
                           int env_num_per_win) {

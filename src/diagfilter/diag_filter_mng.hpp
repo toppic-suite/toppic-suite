@@ -19,7 +19,7 @@
 
 #include "prsm/prsm_para.hpp"
 
-namespace prot {
+namespace toppic {
 
 class DiagFilterMng {
  public:
@@ -55,6 +55,6 @@ class DiagFilterMng {
 
 typedef std::shared_ptr<DiagFilterMng> DiagFilterMngPtr;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif /* DIAG_FILTER_MNG_HPP_ */
