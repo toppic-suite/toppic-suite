@@ -28,12 +28,7 @@ class Ion {
  public:
   Ion(int charge, int pos, int display_pos,
       IonTypePtr ion_type_ptr,
-      NeutralLossPtr neutral_loss_ptr):
-      charge_(charge),
-      pos_(pos),
-      display_pos_(display_pos),
-      ion_type_ptr_(ion_type_ptr),
-      neutral_loss_ptr_(neutral_loss_ptr) {}
+      NeutralLossPtr neutral_loss_ptr);
 
   int getCharge() {return charge_;}
 
@@ -43,9 +38,7 @@ class Ion {
 
   IonTypePtr getIonTypePtr() {return ion_type_ptr_;}
 
-  std::string getDisplayName() {
-    return ion_type_ptr_->getName() + std::to_string(display_pos_);
-  }
+  std::string getDisplayName();
 
  private:
   int charge_;

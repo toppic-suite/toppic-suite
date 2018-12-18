@@ -21,7 +21,7 @@
 #include <map>
 
 #include "base/proteoform.hpp"
-#include "base/fasta_reader.hpp"
+#include "seq/fasta_reader.hpp"
 #include "base/proteoform_factory.hpp"
 #include "prsm/prsm.hpp"
 #include "prsm/prsm_para.hpp"

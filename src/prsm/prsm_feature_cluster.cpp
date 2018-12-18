@@ -18,7 +18,7 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "base/file_util.hpp"
+#include "util/file_util.hpp"
 #include "base/proteoform_util.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_feature_cluster.hpp"

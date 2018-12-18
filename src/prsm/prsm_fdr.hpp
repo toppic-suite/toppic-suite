@@ -20,7 +20,7 @@
 #include <string>
 
 #include "base/string_util.hpp"
-#include "base/fasta_reader.hpp"
+#include "seq/fasta_reader.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 
 namespace toppic {

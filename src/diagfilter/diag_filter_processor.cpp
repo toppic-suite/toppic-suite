@@ -16,9 +16,9 @@
 
 #include "base/proteoform.hpp"
 #include "base/base_data.hpp"
-#include "base/db_block.hpp"
+#include "seq/db_block.hpp"
 #include "base/proteoform_factory.hpp"
-#include "base/file_util.hpp"
+#include "util/file_util.hpp"
 #include "base/mod_util.hpp"
 #include "base/thread_pool.hpp"
 #include "spec/msalign_util.hpp"

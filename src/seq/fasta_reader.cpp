@@ -15,7 +15,7 @@
 #include <string>
 
 #include "base/logger.hpp"
-#include "base/fasta_reader.hpp"
+#include "seq/fasta_reader.hpp"
 
 namespace toppic {
 

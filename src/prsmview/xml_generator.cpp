@@ -19,9 +19,9 @@
 #include <algorithm>
 #include <vector>
 
-#include "base/file_util.hpp"
-#include "base/fasta_reader.hpp"
-#include "base/fasta_util.hpp"
+#include "util/file_util.hpp"
+#include "seq/fasta_reader.hpp"
+#include "seq/fasta_util.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_util.hpp"
 #include "prsm/prsm_cluster.hpp"

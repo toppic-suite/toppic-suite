@@ -19,7 +19,7 @@
 #include <boost/filesystem.hpp>
 
 #include "base/logger.hpp"
-#include "base/file_util.hpp"
+#include "util/file_util.hpp"
 #include "base/version.hpp"
 #include "spec/deconv_ms.hpp"
 #include "spec/msalign_writer.hpp"

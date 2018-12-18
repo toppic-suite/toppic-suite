@@ -26,7 +26,7 @@
 #include <boost/filesystem.hpp>
 namespace fs = boost::filesystem;
 
-#include "base/file_util.hpp"
+#include "util/file_util.hpp"
 #include "base/base_data.hpp"
 #include "feature/deconv_para.hpp"
 #include "feature/deconv_process.hpp"

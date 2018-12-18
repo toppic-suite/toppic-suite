@@ -20,8 +20,8 @@
 #include <vector>
 #include <ctime>
 
-#include "base/fasta_reader.hpp"
-#include "base/fasta_util.hpp"
+#include "seq/fasta_reader.hpp"
+#include "seq/fasta_util.hpp"
 #include "base/base_data.hpp"
 #include "base/version.hpp"
 

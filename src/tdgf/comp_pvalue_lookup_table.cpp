@@ -20,7 +20,7 @@
 #include <boost/algorithm/string.hpp>
 
 #include "base/logger.hpp"
-#include "base/file_util.hpp"
+#include "util/file_util.hpp"
 #include "tdgf/comp_pvalue_lookup_table.hpp"
 
 namespace toppic {

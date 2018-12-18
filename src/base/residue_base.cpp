@@ -19,7 +19,7 @@
 #include "base/amino_acid_base.hpp"
 #include "base/ptm_base.hpp"
 #include "base/residue_base.hpp"
-#include "base/file_util.hpp"
+#include "util/file_util.hpp"
 #include "base/xml_dom_util.hpp"
 
 namespace toppic {

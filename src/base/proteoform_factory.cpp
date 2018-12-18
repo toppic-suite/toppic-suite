@@ -18,7 +18,7 @@
 #include <string>
 
 #include "base/logger.hpp"
-#include "base/fasta_reader.hpp"
+#include "seq/fasta_reader.hpp"
 #include "base/ptm_base.hpp"
 #include "base/residue_base.hpp"
 #include "base/residue_util.hpp"

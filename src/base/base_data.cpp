@@ -24,7 +24,7 @@
 #include "base/xml_dom_document.hpp"
 #include "base/string_util.hpp"
 #include "base/xml_dom_util.hpp"
-#include "base/file_util.hpp"
+#include "util/file_util.hpp"
 
 #include "base/amino_acid_base.hpp"
 #include "base/ptm_base.hpp"

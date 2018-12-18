@@ -20,13 +20,13 @@
 #include <vector>
 
 #include "base/residue_freq.hpp"
-#include "base/fasta_seq.hpp"
-#include "base/fasta_index_reader.hpp"
-#include "base/bp_spec.hpp"
+#include "seq/fasta_seq.hpp"
+#include "seq/fasta_index_reader.hpp"
+#include "seq/bp_spec.hpp"
 #include "base/mass_shift.hpp"
 #include "base/segment.hpp"
 #include "base/prot_mod.hpp"
-#include "base/align_type.hpp"
+#include "prsm/align_type.hpp"
 #include "base/ptm.hpp"
 
 namespace toppic {

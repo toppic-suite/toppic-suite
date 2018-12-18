@@ -22,7 +22,7 @@
 #include "base/xml_dom_document.hpp"
 #include "base/xml_dom.hpp"
 #include "base/xml_dom_util.hpp"
-#include "base/file_util.hpp"
+#include "util/file_util.hpp"
 #include "spec/msalign_reader.hpp"
 #include "prsm/simple_prsm_xml_writer.hpp"
 

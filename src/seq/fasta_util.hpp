@@ -31,7 +31,7 @@
 #undef BOOST_NO_CXX11_SCOPED_ENUMS
 
 #include "htslib/faidx.h"
-#include "base/fasta_reader.hpp"
+#include "seq/fasta_reader.hpp"
 
 namespace toppic {
 

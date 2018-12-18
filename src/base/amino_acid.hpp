@@ -30,39 +30,28 @@ class AminoAcid {
  public:
   AminoAcid(const std::string &name, const std::string &one_letter,
             const std::string &three_letter, const std::string &composition,
-            double mono_mass, double avg_mass):
-      name_(name),
-      one_letter_(one_letter),
-      three_letter_(three_letter),
-      composition_(composition),
-      mono_mass_(mono_mass),
-      average_mass_(avg_mass) {}
+            double mono_mass, double avg_mass);
 
   explicit AminoAcid(xercesc::DOMElement* element);
 
   // Get amino acid composition
   std::string getComposition() {return composition_;}
-
   // Get average mass
   double getAvgMass() {return average_mass_;}
-
   // Get monoisotopic mass
   double getMonoMass() {return mono_mass_;}
-
   // Get amino acid name
   std::string getName() {return name_;}
-
   // Get amino acid one letter representation
   std::string getOneLetter() {return one_letter_;}
-
   // Get amino acid three letter representation
   std::string getThreeLetter() {return three_letter_;}
+
+  static std::string getXmlElementName() {return "amino_acid";}
 
   void appendNameToXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
   static std::string getNameFromXml(xercesc::DOMElement * element);
-
-  static std::string getXmlElementName() {return "amino_acid";}
 
  private:
   // Name of amino acid

@@ -16,7 +16,7 @@
 #ifndef PROT_FEATURE_MNG_HPP_
 #define PROT_FEATURE_MNG_HPP_
 
-#include "base/file_util.hpp"
+#include "util/file_util.hpp"
 #include "feature/env_base.hpp"
 
 namespace toppic {

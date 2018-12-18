@@ -25,7 +25,7 @@
 #include "base/mod_base.hpp"
 #include "base/prot_mod_base.hpp"
 #include "base/string_util.hpp"
-#include "base/fasta_index_reader.hpp"
+#include "seq/fasta_index_reader.hpp"
 #include "base/proteoform.hpp"
 #include "base/proteoform_factory.hpp"
 #include "base/xml_dom_util.hpp"

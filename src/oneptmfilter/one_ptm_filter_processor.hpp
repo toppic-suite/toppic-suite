@@ -18,7 +18,7 @@
 
 #include <vector>
 
-#include "base/db_block.hpp"
+#include "seq/db_block.hpp"
 #include "prsm/simple_prsm.hpp"
 #include "oneptmfilter/one_ptm_filter_mng.hpp"
 

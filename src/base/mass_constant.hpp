@@ -17,6 +17,7 @@
 #define PROT_MASS_CONSTANT_HPP_
 
 namespace toppic {
+
 namespace mass_constant {
 /**
  * Returns the mass of an ammonia (NH3).

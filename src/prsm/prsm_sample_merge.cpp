@@ -16,10 +16,10 @@
 #include <algorithm>
 #include <vector>
 
-#include "base/file_util.hpp"
+#include "util/file_util.hpp"
 #include "base/proteoform_util.hpp"
 #include "base/mod_util.hpp"
-#include "base/fasta_index_reader.hpp"
+#include "seq/fasta_index_reader.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_sample_merge.hpp"
 

@@ -12,37 +12,15 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#ifndef TOPPIC_BASE_FASTA_READER_HPP_
-#define TOPPIC_BASE_FASTA_READER_HPP_
-
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <vector>
-
-#include "base/fasta_seq.hpp"
-#include "base/string_util.hpp"
+#include "prsm/align_type.hpp"
 
 namespace toppic {
 
-class FastaReader {
- public:
-  FastaReader(const std::string &file_name);
+AlignTypePtr AlignType::COMPLETE = std::make_shared<AlignType>("complete", 0);
 
-  // Read FASTA file and return next protein
-  // name and sequence. 
-  FastaSeqPtr getNextSeq();
+AlignTypePtr AlignType::PREFIX = std::make_shared<AlignType>("prefix", 1);
 
-  void close();
+AlignTypePtr AlignType::SUFFIX = std::make_shared<AlignType>("suffix", 2);
 
- private:
-  std::ifstream input_;
-  std::string ori_name_;
-};
-
-typedef std::shared_ptr<FastaReader> FastaReaderPtr;
-
-}  //namepace prot
-
-#endif
+AlignTypePtr AlignType::INTERNAL = std::make_shared<AlignType>("internal", 3);
+}  // namespace toppic

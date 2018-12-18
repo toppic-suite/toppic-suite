@@ -17,10 +17,10 @@
 #include <string>
 #include <vector>
 
-#include "base/db_block.hpp"
+#include "seq/db_block.hpp"
 #include "base/logger.hpp"
 #include "base/string_util.hpp"
-#include "base/fasta_reader.hpp"
+#include "seq/fasta_reader.hpp"
 
 namespace toppic {
 

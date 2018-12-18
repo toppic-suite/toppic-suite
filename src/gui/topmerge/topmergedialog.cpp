@@ -25,7 +25,7 @@
 
 #include <boost/filesystem.hpp>
 
-#include "base/file_util.hpp"
+#include "util/file_util.hpp"
 #include "base/base_data.hpp"
 
 #include "topmergedialog.h"

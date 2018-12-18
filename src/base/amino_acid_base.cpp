@@ -31,6 +31,8 @@ std::unordered_map<std::string, AminoAcidPtr> AminoAcidBase::amino_acid_three_le
 
 std::unordered_map<std::string, AminoAcidPtr> AminoAcidBase::amino_acid_name_map_;
 
+
+// class functions
 void AminoAcidBase::initBase(const std::string &file_name) {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
