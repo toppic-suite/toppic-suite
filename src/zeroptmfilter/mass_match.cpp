@@ -18,7 +18,7 @@
 #include <utility>
 #include <vector>
 
-#include "base/logger.hpp"
+#include "util/logger.hpp"
 #include "base/prot_mod.hpp"
 #include "base/prot_mod_util.hpp"
 #include "base/mass_constant.hpp"

@@ -20,7 +20,7 @@
 #undef BOOST_NO_CXX11_SCOPED_ENUMS
 
 #include "base/base_data.hpp"
-#include "base/logger.hpp"
+#include "util/logger.hpp"
 #include "base/xml_dom_document.hpp"
 #include "base/string_util.hpp"
 #include "base/xml_dom_util.hpp"
@@ -41,17 +41,36 @@ namespace toppic {
 
 namespace base_data {
 
-bool init_ = false;
+bool base_data_init_ = false;
+
+// The shared resource directory is provided in the cmake configuration file
+std::string shared_resource_dir = "/usr/share/toppic";
+
+std::string getBaseDir(const std::string &resource_dir, const std::string &separator) {
+  std::string base_data_dir = resource_dir + separator + base_data::getBaseDataDirName();
+  if (boost::filesystem::exists(base_data_dir)) {
+    return base_data_dir;
+  }
+// TOPPIC_LINUX is defined in the cmake configuration file
+#if defined (TOPPIC_LINUX) 
+  std::string base_data_dir_2 = shared_resource_dir + separator + base_data::getBaseDataDirName();
+  if (boost::filesystem::exists(base_data_dir_2)) {
+    return base_data_dir_2;
+  }
+  LOG_ERROR("The directories " << base_data_dir << " and " << base_data_dir_2 << " do not exist!");
+#else
+  LOG_ERROR("The directory " << base_data_dir << " does not exist!");
+#endif
+  exit (1);
+}
 
 void init(const std::string & resource_dir) {
   // base data only need to be init once
-  if (init_) { return; }
+  if (base_data_init_) { return; }
+
   std::string separator = file_util::getFileSeparator();
-  std::string base_data_dir = resource_dir + separator + base_data::getBaseDataDirName();
-  if (!boost::filesystem::exists(base_data_dir)) {
-    LOG_ERROR("The directory " << base_data_dir << " does not exist!");
-    exit (1);
-  }
+  std::string base_data_dir = getBaseDir(resource_dir, separator);
+
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
     std::string config_file_name
@@ -126,7 +145,7 @@ void init(const std::string & resource_dir) {
     SPTypeBase::initBase(sp_type_file_name);
     LOG_DEBUG("support peak type initialized ");
   }
-  init_ = true;
+  base_data_init_ = true;
 }
 
 } // namespace base_data

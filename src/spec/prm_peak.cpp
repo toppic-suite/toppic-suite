@@ -16,7 +16,7 @@
 #include <algorithm>
 #include <iostream>
 
-#include "base/logger.hpp"
+#include "util/logger.hpp"
 #include "base/support_peak_type_base.hpp"
 #include "base/base_data.hpp"
 #include "spec/prm_peak.hpp"

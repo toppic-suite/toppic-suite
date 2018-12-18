@@ -19,10 +19,10 @@
 #include <string>
 #include <vector>
 
-#include "base/mass_shift_type.hpp"
+#include "seq/mass_shift_type.hpp"
 #include "base/mod.hpp"
 #include "base/xml_dom_document.hpp"
-#include "base/local_anno.hpp"
+#include "seq/local_anno.hpp"
 
 namespace toppic {
 

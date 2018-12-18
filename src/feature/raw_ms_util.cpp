@@ -20,7 +20,7 @@
 #include <vector>
 #include <cmath>
 
-#include "base/logger.hpp"
+#include "util/logger.hpp"
 #include "feature/raw_ms_util.hpp"
 
 namespace toppic {

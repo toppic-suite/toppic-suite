@@ -15,7 +15,7 @@
 #include <string>
 #include <vector>
 
-#include "base/logger.hpp"
+#include "util/logger.hpp"
 #include "feature/env_base.hpp"
 
 namespace toppic {

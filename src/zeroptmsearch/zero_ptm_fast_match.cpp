@@ -15,7 +15,7 @@
 #include <algorithm>
 #include <vector>
 
-#include "base/logger.hpp"
+#include "util/logger.hpp"
 #include "base/base_data.hpp"
 #include "zeroptmsearch/zero_ptm_fast_match.hpp"
 

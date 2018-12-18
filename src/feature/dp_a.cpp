@@ -17,7 +17,7 @@
 #include <cstddef>
 #include <algorithm>
 
-#include "base/logger.hpp"
+#include "util/logger.hpp"
 #include "feature/vertex_base.hpp"
 #include "feature/dp_a.hpp"
 

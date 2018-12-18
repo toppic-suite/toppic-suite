@@ -23,7 +23,7 @@
 #include "seq/fasta_seq.hpp"
 #include "seq/fasta_index_reader.hpp"
 #include "seq/bp_spec.hpp"
-#include "base/mass_shift.hpp"
+#include "seq/mass_shift.hpp"
 #include "base/segment.hpp"
 #include "base/prot_mod.hpp"
 #include "prsm/align_type.hpp"

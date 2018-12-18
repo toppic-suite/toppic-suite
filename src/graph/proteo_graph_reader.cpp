@@ -16,7 +16,7 @@
 #include <string>
 #include <vector>
 
-#include "base/logger.hpp"
+#include "util/logger.hpp"
 #include "graph/proteo_graph_reader.hpp"
 
 namespace toppic {

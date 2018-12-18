@@ -17,7 +17,7 @@
 #include <limits>
 #include <vector>
 
-#include "base/logger.hpp"
+#include "util/logger.hpp"
 #include "prsm/base_algo.hpp"
 
 namespace toppic {

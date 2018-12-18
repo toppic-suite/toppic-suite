@@ -28,9 +28,11 @@ inline std::string getBaseDataConfigFileName() {return "base_data_config.xml";}
 
 inline double getMaxDouble() {return 1e+300;}
 
+std::string getBaseDir(const std::string &resource_dir, const std::string &separator);
+
 void init(const std::string & resource_dir);
 
-extern bool init_;
+extern bool base_data_init_;
 
 }  // namespace base_data
 

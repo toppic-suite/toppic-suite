@@ -24,7 +24,7 @@
 #include <unistd.h>
 #endif
 
-#include "base/logger.hpp"
+#include "util/logger.hpp"
 #include "util/file_util.hpp"
 
 namespace fs = boost::filesystem;

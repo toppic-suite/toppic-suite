@@ -16,7 +16,7 @@
 #include <limits>
 #include <algorithm>
 
-#include "base/logger.hpp"
+#include "util/logger.hpp"
 #include "feature/match_env_refine.hpp"
 
 namespace toppic {

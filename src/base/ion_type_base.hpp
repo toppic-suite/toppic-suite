@@ -37,6 +37,9 @@ class IonTypeBase {
   static IonTypePtrVec ion_type_ptr_vec_;
   static IonTypePtr ion_type_ptr_B_;
   static IonTypePtr ion_type_ptr_PREC_;
+
+  static std::string getName_B() {return "B";}
+  static std::string getName_PREC() {return "PREC";}
 };
 
 }  // namespace toppic

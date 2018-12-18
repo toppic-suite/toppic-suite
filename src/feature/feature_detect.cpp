@@ -17,7 +17,7 @@
 #include <string>
 #include <algorithm>
 
-#include "base/logger.hpp"
+#include "util/logger.hpp"
 #include "util/file_util.hpp"
 #include "spec/msalign_reader.hpp"
 #include "spec/msalign_writer.hpp"

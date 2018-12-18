@@ -18,7 +18,7 @@
 
 #include <xercesc/framework/MemBufInputSource.hpp>
 
-#include "base/logger.hpp"
+#include "util/logger.hpp"
 #include "base/string_util.hpp"
 #include "prsm/simple_prsm_reader.hpp"
 

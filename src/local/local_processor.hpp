@@ -19,7 +19,7 @@
 #include <vector>
 
 #include "base/ptm.hpp"
-#include "base/local_anno.hpp"
+#include "seq/local_anno.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "spec/theo_peak.hpp"

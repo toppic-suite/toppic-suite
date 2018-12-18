@@ -24,7 +24,7 @@ find_package(Qt5Gui)
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   # Linux specific code
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-rpath,./toppic_resources/lib")
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTOPPIC_LINUX")
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src
                       ${Qt5Widgets_INCLUDE_DIRS}
                       ${Qt5Core_INCLUDE_DIRS}
@@ -33,7 +33,7 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   # Windows specific code
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DWIN32")
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTOPPIC_WINDOWS")
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src
                       ${Qt5Widgets_INCLUDE_DIRS}
                       ${Qt5Core_INCLUDE_DIRS}
@@ -52,7 +52,9 @@ file(GLOB PWIZ_SRC ${CMAKE_CURRENT_SOURCE_DIR}/src/pwiz/utility/minimxml/*.cpp
 file(GLOB HTS_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/htslib/*.c)
 
 # common
+file(GLOB UTIL_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/util/*.cpp)
 file(GLOB BASE_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/base/*.cpp)
+file(GLOB SEQ_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/seq/*.cpp)
 file(GLOB SPEC_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/spec/*.cpp)
 file(GLOB PRSM_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/prsm/*.cpp)
 
@@ -116,7 +118,8 @@ file(GLOB TOPMERGE_ARGU_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmerge_
 file(GLOB TOPQUANT_MAIN_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topquant.cpp)
 file(GLOB TOPQUANT_ARGU_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topquant_argument.cpp)
 
-add_executable(toppic ${TOPPIC_MAIN_SRCS} ${TOPPIC_PROCESS_SRCS} ${TOPPIC_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
+add_executable(toppic ${TOPPIC_MAIN_SRCS} ${TOPPIC_PROCESS_SRCS}
+  ${TOPPIC_ARGU_SRCS} ${HTS_SRCS} ${UTIL_SRCS} ${BASE_SRCS} ${SEQ_SRCS} ${SPEC_SRCS} ${PRSM_SRCS}
     ${ZERO_PTM_SRCS} ${ZERO_PTM_FILTER} ${DIAG_FILTER_SRCS} ${ONE_PTM_FILTER_SRCS} ${ONE_PTM_SEARCH_SRCS}
     ${PTM_SRCS} ${TDGF_SRCS} ${LOCAL_SRCS} ${PRSM_VIEW_SRCS})
 
@@ -170,8 +173,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
         boost_program_options-mt boost_thread-mt pthread z Ws2_32)
 
     target_link_libraries(topfd_gui ${QTOPTION} Qt5Widgets Qt5Core Qt5Gui
-        xalan-c xerces-c boost_filesystem-mt
-		boost_system-mt boost_thread-mt 
+        xalan-c xerces-c boost_filesystem-mt boost_system-mt boost_thread-mt 
 		boost_iostreams-mt boost_chrono-mt pthread z Ws2_32)
 
     target_link_libraries(topmg_gui ${QTOPTION} Qt5Widgets Qt5Core Qt5Gui xalan-c xalanMsg xerces-c

@@ -17,8 +17,9 @@
 #include <algorithm>
 #include <vector>
 
-#include "base/logger.hpp"
+#include "util/logger.hpp"
 #include "base/mod_base.hpp"
+#include "base/residue_base.hpp"
 #include "base/mod_util.hpp"
 #include "base/ptm_base.hpp"
 #include "base/amino_acid_base.hpp"

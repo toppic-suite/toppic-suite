@@ -15,7 +15,7 @@
 
 #include <string>
 
-#include <base/logger.hpp>
+#include <util/logger.hpp>
 
 #include "base/amino_acid_base.hpp"
 #include "base/ptm_base.hpp"

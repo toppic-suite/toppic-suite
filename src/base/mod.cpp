@@ -15,12 +15,16 @@
 
 #include <string>
 
-#include "base/logger.hpp"
+#include "util/logger.hpp"
 #include "base/mod.hpp"
 #include "base/residue_base.hpp"
 #include "base/xml_dom_util.hpp"
 
 namespace toppic {
+
+Mod::Mod(ResiduePtr ori_residue_ptr, ResiduePtr mod_residue_ptr):
+    ori_residue_ptr_(ori_residue_ptr),
+    mod_residue_ptr_(mod_residue_ptr) {}
 
 Mod::Mod(xercesc::DOMElement* element) {
   xercesc::DOMElement* ori_residue_element
@@ -29,6 +33,15 @@ Mod::Mod(xercesc::DOMElement* element) {
   xercesc::DOMElement* mod_residue_element
       = xml_dom_util::getChildElement(element, "mod_residue", 0);
   mod_residue_ptr_ = ResidueBase::getResiduePtrFromXml(mod_residue_element);
+}
+
+bool Mod::isSame(ModPtr mod_ptr) {
+  return ori_residue_ptr_ == mod_ptr->getOriResiduePtr()
+      && mod_residue_ptr_ == mod_ptr->getModResiduePtr();
+}
+
+double Mod::getShift() {
+  return mod_residue_ptr_->getMass() - ori_residue_ptr_->getMass();
 }
 
 void Mod::appendToXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {

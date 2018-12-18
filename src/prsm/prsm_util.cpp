@@ -19,7 +19,7 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "base/logger.hpp"
+#include "util/logger.hpp"
 
 #include "spec/extend_ms_factory.hpp"
 #include "spec/msalign_reader.hpp"

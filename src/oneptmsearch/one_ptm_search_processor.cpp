@@ -15,7 +15,7 @@
 #include <string>
 #include <algorithm>
 
-#include "base/logger.hpp"
+#include "util/logger.hpp"
 #include "util/file_util.hpp"
 #include "base/proteoform.hpp"
 #include "base/proteoform_factory.hpp"

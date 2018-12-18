@@ -16,7 +16,7 @@
 #include <string>
 #include <vector>
 
-#include "base/logger.hpp"
+#include "util/logger.hpp"
 #include "seq/fasta_index_reader.hpp"
 
 namespace toppic {

@@ -14,7 +14,7 @@
 
 #include <string>
 
-#include "base/logger.hpp"
+#include "util/logger.hpp"
 #include "base/ptm_base.hpp"
 #include "base/mod_base.hpp"
 #include "base/prot_mod_base.hpp"

@@ -20,7 +20,7 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "base/mass_shift_type.hpp"
+#include "seq/mass_shift_type.hpp"
 #include "base/residue_util.hpp"
 #include "base/xml_dom_util.hpp"
 #include "base/proteoform_factory.hpp"

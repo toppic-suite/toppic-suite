@@ -16,7 +16,7 @@
 #include <limits>
 #include <vector>
 
-#include "base/logger.hpp"
+#include "util/logger.hpp"
 #include "base/base_data.hpp"
 #include "spec/deconv_ms_util.hpp"
 #include "tdgf/comp_pvalue_array.hpp"

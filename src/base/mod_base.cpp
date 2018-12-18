@@ -21,7 +21,8 @@
 
 #include "base/ptm_base.hpp"
 #include "base/mod_base.hpp"
-#include "base/logger.hpp"
+#include "base/residue_base.hpp"
+#include "util/logger.hpp"
 #include "base/xml_dom.hpp"
 #include "base/xml_dom_document.hpp"
 #include "base/xml_dom_util.hpp"

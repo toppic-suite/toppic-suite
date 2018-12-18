@@ -16,7 +16,7 @@
 #include <algorithm>
 #include <vector>
 
-#include "base/logger.hpp"
+#include "util/logger.hpp"
 #include "base/proteoform.hpp"
 #include "base/proteoform_factory.hpp"
 #include "base/activation.hpp"

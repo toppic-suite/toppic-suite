@@ -18,7 +18,7 @@
 #include <exception>
 #include <algorithm>
 
-#include "base/logger.hpp"
+#include "util/logger.hpp"
 #include "base/string_util.hpp"
 #include "base/xml_dom_util.hpp"
 
