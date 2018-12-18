@@ -18,7 +18,7 @@
 
 #include <string>
 
-#include "base/fasta_seq.hpp"
+#include "seq/fasta_seq.hpp"
 
 namespace toppic {
 

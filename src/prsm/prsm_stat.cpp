@@ -22,7 +22,7 @@
 #include <boost/algorithm/string.hpp>
 
 #include "base/amino_acid_base.hpp"
-#include "base/file_util.hpp"
+#include "util/file_util.hpp"
 #include "spec/peak.hpp"
 #include "spec/extend_ms_factory.hpp"
 #include "spec/msalign_reader.hpp"

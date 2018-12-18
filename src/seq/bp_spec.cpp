@@ -20,7 +20,7 @@
 #include <functional>
 
 #include "base/logger.hpp"
-#include "base/bp_spec.hpp"
+#include "seq/bp_spec.hpp"
 
 namespace toppic {
 

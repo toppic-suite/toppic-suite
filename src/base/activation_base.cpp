@@ -14,8 +14,8 @@
 
 #include <string>
 
-#include "base/activation_base.hpp"
 #include "base/xml_dom_util.hpp"
+#include "base/activation_base.hpp"
 
 namespace toppic {
 

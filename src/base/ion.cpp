@@ -12,15 +12,26 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include "base/align_type.hpp"
+
+#include <string>
+#include <vector>
+
+#include "base/ion.hpp"
 
 namespace toppic {
 
-AlignTypePtr AlignType::COMPLETE = std::make_shared<AlignType>("complete", 0);
+Ion::Ion(int charge, int pos, int display_pos,
+         IonTypePtr ion_type_ptr,
+         NeutralLossPtr neutral_loss_ptr):
+    charge_(charge),
+    pos_(pos),
+    display_pos_(display_pos),
+    ion_type_ptr_(ion_type_ptr),
+    neutral_loss_ptr_(neutral_loss_ptr) {}
 
-AlignTypePtr AlignType::PREFIX = std::make_shared<AlignType>("prefix", 1);
+std::string Ion::getDisplayName() {
+  return ion_type_ptr_->getName() + std::to_string(display_pos_);
+}
 
-AlignTypePtr AlignType::SUFFIX = std::make_shared<AlignType>("suffix", 2);
+} /* namespace toppic */
 
-AlignTypePtr AlignType::INTERNAL = std::make_shared<AlignType>("internal", 3);
-}  // namespace toppic

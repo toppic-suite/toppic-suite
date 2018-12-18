@@ -20,6 +20,16 @@
 
 namespace toppic {
 
+AminoAcid::AminoAcid(const std::string &name, const std::string &one_letter,
+                     const std::string &three_letter, const std::string &composition,
+                     double mono_mass, double avg_mass):
+    name_(name),
+    one_letter_(one_letter),
+    three_letter_(three_letter),
+    composition_(composition),
+    mono_mass_(mono_mass),
+    average_mass_(avg_mass) {}
+
 AminoAcid::AminoAcid(xercesc::DOMElement* element) {
   name_ = xml_dom_util::getChildValue(element, "name", 0);
   one_letter_ = xml_dom_util::getChildValue(element, "one_letter", 0);
@@ -28,6 +38,7 @@ AminoAcid::AminoAcid(xercesc::DOMElement* element) {
   mono_mass_ = xml_dom_util::getDoubleChildValue(element, "mono_mass", 0);
   average_mass_ = xml_dom_util::getDoubleChildValue(element, "average_mass", 0);
 }
+
 
 void AminoAcid::appendNameToXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   std::string element_name = AminoAcid::getXmlElementName();
@@ -40,5 +51,6 @@ std::string AminoAcid::getNameFromXml(xercesc::DOMElement * element) {
   std::string name = xml_dom_util::getChildValue(element, "name", 0);
   return name;
 }
+
 
 }  // namespace toppic

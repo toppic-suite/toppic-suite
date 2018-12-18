@@ -25,7 +25,7 @@
 #endif
 
 #include "base/logger.hpp"
-#include "base/file_util.hpp"
+#include "util/file_util.hpp"
 
 namespace fs = boost::filesystem;
 

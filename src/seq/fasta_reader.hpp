@@ -13,27 +13,36 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_BASE_ACTIVATION_BASE_HPP_
-#define TOPPIC_BASE_ACTIVATION_BASE_HPP_
+#ifndef TOPPIC_BASE_FASTA_READER_HPP_
+#define TOPPIC_BASE_FASTA_READER_HPP_
 
+#include <iostream>
+#include <fstream>
 #include <string>
+#include <vector>
 
-#include "base/activation.hpp"
+#include "seq/fasta_seq.hpp"
+#include "base/string_util.hpp"
 
 namespace toppic {
 
-class ActivationBase {
+class FastaReader {
  public:
-  static void initBase(const std::string &file_name);
+  FastaReader(const std::string &file_name);
 
-  static ActivationPtr getActivationPtrByName(const std::string &name);
+  // Read FASTA file and return next protein
+  // name and sequence. 
+  FastaSeqPtr getNextSeq();
 
-  static ActivationPtr getActivationPtrFromXml(xercesc::DOMElement * element);
+  void close();
 
  private:
-  static ActivationPtrVec activation_ptr_vec_;
+  std::ifstream input_;
+  std::string ori_name_;
 };
 
-}  // namespace toppic
+typedef std::shared_ptr<FastaReader> FastaReaderPtr;
+
+}  //namepace prot
 
 #endif

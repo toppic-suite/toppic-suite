@@ -18,8 +18,8 @@
 
 #include <vector>
 
+#include "seq/break_point.hpp"
 #include "base/residue_seq.hpp"
-#include "base/break_point.hpp"
 
 namespace toppic {
 

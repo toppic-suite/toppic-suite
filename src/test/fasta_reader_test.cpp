@@ -18,7 +18,7 @@
 #include <catch.hpp>
 
 #include "base/base_data.hpp"
-#include "base/fasta_reader.hpp"
+#include "seq/fasta_reader.hpp"
 
 using namespace toppic;
 

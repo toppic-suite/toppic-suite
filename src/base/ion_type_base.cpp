@@ -25,6 +25,12 @@ IonTypePtr IonTypeBase::ion_type_ptr_B_;
 
 IonTypePtr IonTypeBase::ion_type_ptr_PREC_;
 
+// functions
+std::string getName_B() {return "B";}
+
+std::string getName_PREC() {return "PREC";}
+
+// class functions
 void IonTypeBase::initBase(const std::string &file_name) {
   toppic::XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {

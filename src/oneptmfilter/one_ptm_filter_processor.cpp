@@ -20,7 +20,7 @@
 
 #include "base/proteoform.hpp"
 #include "base/proteoform_factory.hpp"
-#include "base/file_util.hpp"
+#include "util/file_util.hpp"
 #include "base/mod_util.hpp"
 
 #include "spec/msalign_util.hpp"

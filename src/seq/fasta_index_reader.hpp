@@ -22,8 +22,8 @@
 #include <vector>
 
 #include "htslib/faidx.h"
-#include "base/fasta_seq.hpp"
-#include "base/fasta_sub_seq.hpp"
+#include "seq/fasta_seq.hpp"
+#include "seq/fasta_sub_seq.hpp"
 #include "base/string_util.hpp"
 
 namespace toppic {

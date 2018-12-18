@@ -16,7 +16,7 @@
 #include <random>
 
 #include "base/logger.hpp"
-#include "base/fasta_util.hpp"
+#include "seq/fasta_util.hpp"
 
 namespace toppic {
 

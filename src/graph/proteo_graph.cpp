@@ -17,7 +17,7 @@
 
 #include "base/logger.hpp"
 #include "base/mass_shift_type.hpp"
-#include "base/fasta_reader.hpp"
+#include "seq/fasta_reader.hpp"
 #include "base/residue_seq.hpp"
 #include "base/mod_base.hpp"
 #include "base/prot_mod_base.hpp"

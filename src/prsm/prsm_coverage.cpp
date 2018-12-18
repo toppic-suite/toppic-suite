@@ -20,7 +20,7 @@
 #include <boost/algorithm/string.hpp>
 
 #include "base/proteoform.hpp"
-#include "base/file_util.hpp"
+#include "util/file_util.hpp"
 #include "spec/rm_break_type.hpp"
 #include "spec/msalign_reader.hpp"
 #include "spec/msalign_util.hpp"

@@ -16,10 +16,10 @@
 #include <algorithm>
 
 #include "base/logger.hpp"
-#include "base/file_util.hpp"
+#include "util/file_util.hpp"
 #include "base/proteoform.hpp"
 #include "base/proteoform_factory.hpp"
-#include "base/db_block.hpp"
+#include "seq/db_block.hpp"
 #include "spec/msalign_reader.hpp"
 #include "spec/msalign_util.hpp"
 #include "prsm/simple_prsm.hpp"

@@ -19,7 +19,7 @@
 #include <string>
 
 #include "base/string_util.hpp"
-#include "base/fasta_reader.hpp"
+#include "seq/fasta_reader.hpp"
 #include "prsm/peak_ion_pair.hpp"
 #include "prsm/prsm.hpp"
 #include "prsm/prsm_para.hpp"

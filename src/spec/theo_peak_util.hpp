@@ -20,7 +20,7 @@
 #include <vector>
 
 #include "base/activation.hpp"
-#include "base/bp_spec.hpp"
+#include "seq/bp_spec.hpp"
 #include "base/proteoform.hpp"
 #include "spec/theo_peak.hpp"
 

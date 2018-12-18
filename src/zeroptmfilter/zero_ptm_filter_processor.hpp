@@ -16,7 +16,7 @@
 #ifndef ZERO_PTM_FILTER_PROCESSOR_HPP_
 #define ZERO_PTM_FILTER_PROCESSOR_HPP_
 
-#include "base/db_block.hpp"
+#include "seq/db_block.hpp"
 #include "prsm/simple_prsm.hpp"
 #include "zeroptmfilter/zero_ptm_filter_mng.hpp"
 

@@ -20,7 +20,7 @@
 #include <string>
 #include <vector>
 
-#include "base/extreme_value.hpp"
+#include "prsm/extreme_value.hpp"
 #include "base/proteoform.hpp"
 #include "base/xml_writer.hpp"
 #include "spec/deconv_peak.hpp"

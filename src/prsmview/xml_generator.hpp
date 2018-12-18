@@ -23,7 +23,7 @@
 #include "xercesc/util/PlatformUtils.hpp"
 
 #include "base/proteoform.hpp"
-#include "base/fasta_reader.hpp"
+#include "seq/fasta_reader.hpp"
 #include "base/xml_writer.hpp"
 #include "spec/msalign_reader.hpp"
 #include "prsm/prsm.hpp"

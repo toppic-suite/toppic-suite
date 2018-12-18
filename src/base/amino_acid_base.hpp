@@ -27,8 +27,6 @@ class AminoAcidBase {
  public:
   static void initBase(const std::string &file_name);
 
-  static const AminoAcidPtrVec& getBaseAminoAcidPtrVec() {return amino_acid_ptr_vec_;}
-
   static AminoAcidPtr getEmptyAminoAcidPtr() {return empty_amino_acid_ptr_;}
 
   // Returns an amino acid based on the the name. Returns null if the amino

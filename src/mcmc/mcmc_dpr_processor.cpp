@@ -22,10 +22,10 @@
 
 #include "base/ptm_util.hpp"
 #include "base/mod_util.hpp"
-#include "base/file_util.hpp"
+#include "util/file_util.hpp"
 #include "base/residue_util.hpp"
 #include "base/neutral_loss.hpp"
-#include "base/extreme_value.hpp"
+#include "prsm/extreme_value.hpp"
 #include "base/thread_pool.hpp"
 
 #include "spec/msalign_reader.hpp"

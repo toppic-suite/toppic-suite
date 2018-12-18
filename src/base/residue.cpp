@@ -20,7 +20,7 @@
 #include "base/amino_acid_base.hpp"
 #include "base/ptm_base.hpp"
 #include "base/residue.hpp"
-#include "base/file_util.hpp"
+#include "util/file_util.hpp"
 #include "base/string_util.hpp"
 #include "base/xml_dom_util.hpp"
 

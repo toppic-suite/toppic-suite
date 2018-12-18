@@ -16,7 +16,7 @@
 #include <vector>
 #include <algorithm>
 
-#include "base/bp_spec.hpp"
+#include "seq/bp_spec.hpp"
 #include "base/neutral_loss_base.hpp"
 #include "spec/theo_peak_util.hpp"
 

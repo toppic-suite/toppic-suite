@@ -18,7 +18,7 @@
 #include "base/logger.hpp"
 #include "base/amino_acid_base.hpp"
 #include "base/ptm_base.hpp"
-#include "base/fasta_seq.hpp"
+#include "seq/fasta_seq.hpp"
 #include "base/residue_base.hpp"
 #include "base/residue_util.hpp"
 
