@@ -17,7 +17,7 @@
 #include <vector>
 
 #include "base/xml_dom.hpp"
-#include "base/mass_shift_type.hpp"
+#include "seq/mass_shift_type.hpp"
 #include "base/prot_mod_base.hpp"
 #include "base/prot_mod_util.hpp"
 #include "base/ptm_base.hpp"

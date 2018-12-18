@@ -20,8 +20,8 @@
 #include <vector>
 #include <cmath>
 
-#include "base/logger.hpp"
-#include "base/mass_shift_type.hpp"
+#include "util/logger.hpp"
+#include "seq/mass_shift_type.hpp"
 #include "base/mod_base.hpp"
 #include "base/prot_mod_base.hpp"
 #include "base/string_util.hpp"

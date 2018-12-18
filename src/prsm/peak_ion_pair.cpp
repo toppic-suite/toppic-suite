@@ -15,7 +15,7 @@
 
 #include <string>
 
-#include "base/logger.hpp"
+#include "util/logger.hpp"
 #include "base/string_util.hpp"
 #include "spec/theo_peak.hpp"
 #include "prsm/peak_ion_pair.hpp"

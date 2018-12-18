@@ -20,7 +20,6 @@
 #include <vector>
 
 #include "base/residue.hpp"
-#include "base/residue_base.hpp"
 #include "base/xml_dom_document.hpp"
 
 namespace toppic {
@@ -30,9 +29,7 @@ typedef std::shared_ptr<Mod> ModPtr;
 
 class Mod {
  public:
-  Mod(ResiduePtr ori_residue_ptr, ResiduePtr mod_residue_ptr):
-    ori_residue_ptr_(ori_residue_ptr),
-    mod_residue_ptr_(mod_residue_ptr) {}
+  Mod(ResiduePtr ori_residue_ptr, ResiduePtr mod_residue_ptr);
 
   explicit Mod(xercesc::DOMElement* element);
 
@@ -40,14 +37,9 @@ class Mod {
 
   ResiduePtr getModResiduePtr() { return mod_residue_ptr_;}
 
-  bool isSame(ModPtr mod_ptr) {
-    return ori_residue_ptr_ == mod_ptr->getOriResiduePtr()
-        && mod_residue_ptr_ == mod_ptr->getModResiduePtr();
-  }
+  bool isSame(ModPtr mod_ptr);
 
-  double getShift() {
-    return mod_residue_ptr_->getMass() - ori_residue_ptr_->getMass();
-  }
+  double getShift();
 
   void appendToXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 

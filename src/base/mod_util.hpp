@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "base/mod.hpp"
+#include "base/residue.hpp"
 
 namespace toppic {
 

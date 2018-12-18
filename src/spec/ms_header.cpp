@@ -20,7 +20,7 @@
 #include <vector>
 
 #include "base/activation_base.hpp"
-#include "base/logger.hpp"
+#include "util/logger.hpp"
 #include "base/string_util.hpp"
 #include "base/xml_dom_util.hpp"
 #include "spec/peak_util.hpp"

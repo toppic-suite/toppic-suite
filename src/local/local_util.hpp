@@ -20,7 +20,7 @@
 
 #include "base/amino_acid_base.hpp"
 #include "base/ptm.hpp"
-#include "base/mass_shift.hpp"
+#include "seq/mass_shift.hpp"
 #include "base/ptm.hpp"
 
 #include "prsm/prsm.hpp"

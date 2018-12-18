@@ -14,7 +14,7 @@
 
 #include <vector>
 
-#include "base/logger.hpp"
+#include "util/logger.hpp"
 #include "feature/deconv_data_base.hpp"
 #include "feature/deconv_util.hpp"
 #include "feature/deconv_one_sp.hpp"

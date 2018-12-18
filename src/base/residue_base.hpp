@@ -21,7 +21,7 @@
 #include <map>
 
 #include "base/residue.hpp"
-#include "base/logger.hpp"
+#include "util/logger.hpp"
 
 namespace toppic {
 

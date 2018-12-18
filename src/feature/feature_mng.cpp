@@ -16,7 +16,7 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "base/logger.hpp"
+#include "util/logger.hpp"
 #include "feature/feature_mng.hpp" 
 
 namespace toppic {

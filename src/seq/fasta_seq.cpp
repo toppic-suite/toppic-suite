@@ -16,7 +16,7 @@
 #include <utility>
 #include <string>
 
-#include "base/logger.hpp"
+#include "util/logger.hpp"
 #include "base/ptm_base.hpp"
 #include "seq/fasta_seq.hpp"
 #include "base/xml_dom_util.hpp"

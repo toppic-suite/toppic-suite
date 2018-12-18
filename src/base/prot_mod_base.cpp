@@ -13,7 +13,7 @@
 //limitations under the License.
 
 #include <string>
-#include "base/logger.hpp"
+#include "util/logger.hpp"
 #include "base/prot_mod_base.hpp"
 #include "base/xml_dom_util.hpp"
 

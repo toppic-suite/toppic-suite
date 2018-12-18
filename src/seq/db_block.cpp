@@ -18,7 +18,7 @@
 #include <vector>
 
 #include "seq/db_block.hpp"
-#include "base/logger.hpp"
+#include "util/logger.hpp"
 #include "base/string_util.hpp"
 #include "seq/fasta_reader.hpp"
 

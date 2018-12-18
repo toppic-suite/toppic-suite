@@ -17,7 +17,7 @@
 #include <iostream>
 #include <vector>
 
-#include "base/logger.hpp"
+#include "util/logger.hpp"
 #include "feature/deconv_util.hpp"
 
 namespace toppic {

@@ -17,7 +17,7 @@
 #include <utility>
 #include <vector>
 
-#include "base/logger.hpp"
+#include "util/logger.hpp"
 #include "zeroptmfilter/filter_protein.hpp"
 
 namespace toppic {

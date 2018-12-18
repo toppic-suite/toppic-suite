@@ -24,7 +24,7 @@
 
 #include "base/amino_acid.hpp"
 #include "base/ptm.hpp"
-#include "base/logger.hpp"
+#include "util/logger.hpp"
 
 namespace toppic {
 

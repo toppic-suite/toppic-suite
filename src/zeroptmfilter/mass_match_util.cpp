@@ -17,7 +17,7 @@
 #include <utility>
 #include <vector>
 
-#include "base/logger.hpp"
+#include "util/logger.hpp"
 #include "zeroptmfilter/mass_match_util.hpp"
 
 namespace toppic {

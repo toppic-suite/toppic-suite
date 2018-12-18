@@ -14,7 +14,7 @@
 
 #include <climits>
 
-#include "base/logger.hpp"
+#include "util/logger.hpp"
 #include "util/file_util.hpp"
 #include "base/proteoform.hpp"
 #include "seq/fasta_reader.hpp"

@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_MASS_CONSTANT_HPP_
-#define PROT_MASS_CONSTANT_HPP_
+#ifndef TOPPIC_BASE_MASS_CONSTANT_HPP_
+#define TOPPIC_BASE_MASS_CONSTANT_HPP_
 
 namespace toppic {
 

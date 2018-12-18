@@ -15,7 +15,7 @@
 
 #include <cmath>
 
-#include "base/logger.hpp"
+#include "util/logger.hpp"
 #include "seq/fasta_reader.hpp"
 #include "base/mod_util.hpp"
 #include "base/residue_base.hpp"

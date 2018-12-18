@@ -22,6 +22,7 @@
 #include "base/amino_acid_base.hpp"
 #include "base/activation_base.hpp"
 #include "base/mod_util.hpp"
+#include "base/residue_base.hpp"
 #include "base/residue_util.hpp"
 #include "base/proteoform_factory.hpp"
 #include "base/mass_constant.hpp"

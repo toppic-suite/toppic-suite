@@ -19,7 +19,7 @@
 #include <vector>
 #include <functional>
 
-#include "base/logger.hpp"
+#include "util/logger.hpp"
 #include "seq/bp_spec.hpp"
 
 namespace toppic {

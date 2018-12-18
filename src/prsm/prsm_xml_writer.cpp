@@ -18,7 +18,7 @@
 
 #include <boost/filesystem.hpp>
 
-#include "base/logger.hpp"
+#include "util/logger.hpp"
 #include "base/xml_dom_util.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 

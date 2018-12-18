@@ -17,7 +17,7 @@
 
 #include <cstring>
 
-#include "base/logger.hpp"
+#include "util/logger.hpp"
 #include "tdgf/comp_prob_value.hpp"
 
 namespace toppic {
