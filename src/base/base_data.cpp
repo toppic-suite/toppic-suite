@@ -13,18 +13,12 @@
 //limitations under the License.
 
 #include <string>
-#include <map>
 
-#define BOOST_NO_CXX11_SCOPED_ENUMS
-#include <boost/filesystem.hpp>
-#undef BOOST_NO_CXX11_SCOPED_ENUMS
-
-#include "base/base_data.hpp"
 #include "util/logger.hpp"
-#include "base/xml_dom_document.hpp"
-#include "base/string_util.hpp"
-#include "base/xml_dom_util.hpp"
 #include "util/file_util.hpp"
+
+#include "xml/xml_dom_document.hpp"
+#include "xml/xml_dom_util.hpp"
 
 #include "base/amino_acid_base.hpp"
 #include "base/ptm_base.hpp"
@@ -36,6 +30,7 @@
 #include "base/neutral_loss_base.hpp"
 #include "base/activation_base.hpp"
 #include "base/support_peak_type_base.hpp"
+#include "base/base_data.hpp"
 
 namespace toppic {
 
@@ -49,9 +44,9 @@ void init(const std::string & resource_dir) {
 
   std::string separator = file_util::getFileSeparator();
   std::string base_data_dir = resource_dir + separator + base_data::getBaseDataDirName();
-  if (!boost::filesystem::exists(base_data_dir)) {
+  if (!file_util::existDir(base_data_dir)) {
     LOG_ERROR("The directory " << base_data_dir << " does not exist!");
-    exit (1);
+    exit (EXIT_FAILURE);
   }
 
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();

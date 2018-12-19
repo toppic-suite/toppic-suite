@@ -16,11 +16,11 @@
 #include <string>
 
 #include "util/logger.hpp"
+#include "xml/xml_dom_document.hpp"
+#include "xml/xml_dom_util.hpp"
 #include "base/amino_acid_base.hpp"
 #include "base/ptm_base.hpp"
 #include "base/residue_base.hpp"
-#include "util/file_util.hpp"
-#include "base/xml_dom_util.hpp"
 
 namespace toppic {
 

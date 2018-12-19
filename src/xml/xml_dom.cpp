@@ -26,8 +26,8 @@
 #include <xercesc/dom/DOMLSSerializer.hpp>
 #include <xercesc/dom/DOMLSOutput.hpp>
 
-#include "base/xml_dom.hpp"
-#include "base/xml_dom_err_handler.hpp"
+#include "xml/xml_dom.hpp"
+#include "xml/xml_dom_err_handler.hpp"
  
 namespace toppic {
 

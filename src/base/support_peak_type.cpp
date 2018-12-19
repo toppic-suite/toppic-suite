@@ -12,11 +12,14 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
+#include "xml/xml_dom_util.hpp"
 #include "base/support_peak_type.hpp"
-#include "base/xml_dom_util.hpp"
 
 namespace toppic {
+
+SupportPeakType::SupportPeakType(int id, const std::string &name): 
+    id_(id), 
+    name_(name) {}
 
 SupportPeakType::SupportPeakType(xercesc::DOMElement* element) {
   id_ = xml_dom_util::getIntChildValue(element, "id", 0);

@@ -13,17 +13,14 @@
 //limitations under the License.
 
 
-#include <iostream>
-#include <vector>
-#include <memory>
-#include <algorithm>
 #include <string>
+#include <algorithm>
 
-#include "base/ptm_base.hpp"
 #include "util/logger.hpp"
-#include "base/xml_dom.hpp"
-#include "base/xml_dom_document.hpp"
-#include "base/xml_dom_util.hpp"
+#include "xml/xml_dom.hpp"
+#include "xml/xml_dom_document.hpp"
+#include "xml/xml_dom_util.hpp"
+#include "base/ptm_base.hpp"
 
 namespace toppic {
 

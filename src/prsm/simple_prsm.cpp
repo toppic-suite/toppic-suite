@@ -22,9 +22,9 @@
 #include "util/logger.hpp"
 #include "seq/proteoform_factory.hpp"
 #include "seq/proteoform.hpp"
-#include "base/string_util.hpp"
-#include "base/xml_dom_document.hpp"
-#include "base/xml_dom_util.hpp"
+#include "util/string_util.hpp"
+#include "xml/xml_dom_document.hpp"
+#include "xml/xml_dom_util.hpp"
 
 #include "prsm/simple_prsm.hpp"
 

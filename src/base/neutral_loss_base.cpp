@@ -15,8 +15,8 @@
 
 #include <string>
 
+#include "xml/xml_dom_util.hpp"
 #include "base/neutral_loss_base.hpp"
-#include "base/xml_dom_util.hpp"
 
 namespace toppic {
 

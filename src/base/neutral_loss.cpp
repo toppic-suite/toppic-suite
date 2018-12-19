@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include "xml/xml_dom_util.hpp"
 #include "base/neutral_loss.hpp"
-#include "base/xml_dom_util.hpp"
 
 namespace toppic {
 

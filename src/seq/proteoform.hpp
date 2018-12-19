@@ -24,7 +24,7 @@
 #include "seq/fasta_index_reader.hpp"
 #include "seq/bp_spec.hpp"
 #include "seq/mass_shift.hpp"
-#include "base/segment.hpp"
+#include "seq/segment.hpp"
 #include "base/prot_mod.hpp"
 #include "seq/align_type.hpp"
 #include "base/ptm.hpp"

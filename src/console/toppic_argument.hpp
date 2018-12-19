@@ -28,8 +28,8 @@
 #include "boost/program_options.hpp" 
 
 #include "util/logger.hpp"
-#include "base/xml_dom_document.hpp"
-#include "base/string_util.hpp"
+#include "xml/xml_dom_document.hpp"
+#include "util/string_util.hpp"
 
 namespace toppic {
 

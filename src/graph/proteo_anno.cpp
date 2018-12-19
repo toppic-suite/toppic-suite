@@ -16,14 +16,15 @@
 #include <string>
 #include <vector>
 
-#include "base/xml_dom.hpp"
+#include "util/logger.hpp"
+#include "xml/xml_dom.hpp"
 #include "seq/mass_shift_type.hpp"
 #include "base/prot_mod_base.hpp"
 #include "base/prot_mod_util.hpp"
 #include "base/ptm_base.hpp"
 #include "base/residue_base.hpp"
 #include "base/residue_util.hpp"
-#include "base/xml_dom_document.hpp"
+#include "xml/xml_dom_document.hpp"
 #include "graph/proteo_anno.hpp"
 
 namespace toppic {

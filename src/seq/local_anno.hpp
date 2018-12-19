@@ -23,7 +23,7 @@
 
 #include "base/ptm.hpp"
 #include "base/ptm_base.hpp"
-#include "base/xml_dom_document.hpp"
+#include "xml/xml_dom_document.hpp"
 
 namespace toppic {
 

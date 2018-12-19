@@ -18,7 +18,7 @@
 
 #include <string>
 
-#include "base/string_util.hpp"
+#include "util/string_util.hpp"
 #include "seq/fasta_reader.hpp"
 #include "prsm/peak_ion_pair.hpp"
 #include "prsm/prsm.hpp"

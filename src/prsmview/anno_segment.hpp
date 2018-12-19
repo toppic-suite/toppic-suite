@@ -23,7 +23,7 @@
 
 #include "seq/mass_shift.hpp"
 #include "seq/mass_shift_type.hpp"
-#include "base/xml_dom_document.hpp"
+#include "xml/xml_dom_document.hpp"
 
 namespace toppic {
 

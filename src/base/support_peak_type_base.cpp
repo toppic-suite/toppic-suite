@@ -15,8 +15,8 @@
 
 #include <string>
 
+#include "xml/xml_dom_util.hpp"
 #include "base/support_peak_type_base.hpp"
-#include "base/xml_dom_util.hpp"
 
 namespace toppic {
 

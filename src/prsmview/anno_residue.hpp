@@ -19,7 +19,7 @@
 #include <string>
 #include <vector>
 
-#include "base/xml_dom_document.hpp"
+#include "xml/xml_dom_document.hpp"
 #include "base/residue.hpp"
 
 namespace toppic {

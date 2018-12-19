@@ -24,7 +24,7 @@
 
 #include "seq/proteoform.hpp"
 #include "base/activation.hpp"
-#include "base/thread_pool.hpp"
+#include "thread/thread_pool.hpp"
 
 #include "spec/deconv_ms.hpp"
 

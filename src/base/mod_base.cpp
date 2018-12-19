@@ -13,19 +13,15 @@
 //limitations under the License.
 
 
-#include <iostream>
-#include <vector>
-#include <memory>
-#include <algorithm>
 #include <string>
 
+#include "util/logger.hpp"
+#include "xml/xml_dom.hpp"
+#include "xml/xml_dom_document.hpp"
+#include "xml/xml_dom_util.hpp"
 #include "base/ptm_base.hpp"
 #include "base/mod_base.hpp"
 #include "base/residue_base.hpp"
-#include "util/logger.hpp"
-#include "base/xml_dom.hpp"
-#include "base/xml_dom_document.hpp"
-#include "base/xml_dom_util.hpp"
 
 namespace toppic {
 
@@ -61,7 +57,7 @@ void ModBase::initBase(const std::string &file_name) {
     }
     if (none_mod_ptr_ == nullptr || c57_mod_ptr_ == nullptr || c58_mod_ptr_ == nullptr) {
       LOG_ERROR("Modification configuration file is incomplete!");
-      exit(1);
+      exit(EXIT_FAILURE);
     }
   }
 }

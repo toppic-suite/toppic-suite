@@ -22,7 +22,7 @@
 #include "boost/algorithm/string.hpp"
 
 #include "util/logger.hpp"
-#include "base/string_util.hpp"
+#include "util/string_util.hpp"
 
 namespace toppic {
 

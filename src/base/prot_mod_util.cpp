@@ -15,12 +15,12 @@
 #include <string>
 
 #include "util/logger.hpp"
+#include "xml/xml_dom_util.hpp"
 #include "base/ptm_base.hpp"
 #include "base/mod_base.hpp"
+#include "base/trunc_util.hpp"
 #include "base/prot_mod_base.hpp"
 #include "base/prot_mod_util.hpp"
-#include "base/trunc_util.hpp"
-#include "base/xml_dom_util.hpp"
 
 namespace toppic {
 

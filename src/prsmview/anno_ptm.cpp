@@ -16,7 +16,7 @@
 #include <utility>
 #include <string>
 
-#include "base/string_util.hpp"
+#include "util/string_util.hpp"
 #include "prsmview/anno_ptm.hpp"
 
 namespace toppic {

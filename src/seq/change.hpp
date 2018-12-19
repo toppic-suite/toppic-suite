@@ -21,7 +21,7 @@
 
 #include "seq/mass_shift_type.hpp"
 #include "base/mod.hpp"
-#include "base/xml_dom_document.hpp"
+#include "xml/xml_dom_document.hpp"
 #include "seq/local_anno.hpp"
 
 namespace toppic {

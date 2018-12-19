@@ -15,7 +15,7 @@
 
 #include <string>
 
-#include "base/string_util.hpp"
+#include "util/string_util.hpp"
 #include "spec/extend_peak.hpp"
 
 namespace toppic {

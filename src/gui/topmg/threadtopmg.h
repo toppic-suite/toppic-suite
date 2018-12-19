@@ -22,9 +22,9 @@
 #include <vector>
 #include <ctime>
 
-#include "base/version.hpp"
+#include "util/version.hpp"
 #include "util/file_util.hpp"
-#include "base/string_util.hpp"
+#include "util/string_util.hpp"
 
 #include "spec/msalign_util.hpp"
 #include "spec/feature_util.hpp"

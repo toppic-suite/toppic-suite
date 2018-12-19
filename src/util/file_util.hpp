@@ -52,6 +52,8 @@ void copyFile(const std::string &file_name, const std::string &path,
 bool copyDir(boost::filesystem::path const & source,
              boost::filesystem::path const & destination);
 
+bool existDir(const std::string &dir);
+
 void delDir(const std::string &path);
 
 void delFile(const std::string &path);

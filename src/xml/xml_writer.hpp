@@ -20,7 +20,7 @@
 #include <fstream>
 #include <memory>
 
-#include "base/xml_dom_document.hpp"
+#include "xml/xml_dom_document.hpp"
 #include "util/logger.hpp"
 
 namespace toppic {

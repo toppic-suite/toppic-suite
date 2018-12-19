@@ -19,7 +19,7 @@
 
 #include "seq/db_block.hpp"
 #include "util/logger.hpp"
-#include "base/string_util.hpp"
+#include "util/string_util.hpp"
 #include "seq/fasta_reader.hpp"
 
 namespace toppic {

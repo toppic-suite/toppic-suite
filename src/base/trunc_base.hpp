@@ -17,6 +17,9 @@
 #define TOPPIC_BASE_TRUNC_BASE_HPP_
 
 #include <string>
+
+#include <xercesc/dom/DOMElement.hpp>
+
 #include "base/trunc.hpp"
 
 namespace toppic {

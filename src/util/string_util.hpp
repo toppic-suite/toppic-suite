@@ -22,6 +22,8 @@
 
 namespace toppic {
 
+typedef std::vector<std::pair<std::string, std::string> > StringPairVec;
+
 namespace string_util {
 
 std::string trim(const std::string & ori_s);

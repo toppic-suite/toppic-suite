@@ -16,6 +16,7 @@
 #include <algorithm>
 #include <vector>
 
+#include "util/logger.hpp"
 #include "util/file_util.hpp"
 #include "seq/proteoform_util.hpp"
 #include "prsm/prsm_reader.hpp"

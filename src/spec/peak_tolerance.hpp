@@ -19,7 +19,7 @@
 #include <memory>
 #include <string>
 
-#include "base/xml_dom_document.hpp"
+#include "xml/xml_dom_document.hpp"
 
 namespace toppic {
 

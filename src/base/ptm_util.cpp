@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <iostream>
 #include <fstream>
 #include <string>
 
-#include "base/string_util.hpp"
+#include "util/logger.hpp"
+#include "util/string_util.hpp"
 #include "base/ptm_base.hpp"
 #include "base/ptm_util.hpp"
 
@@ -27,8 +27,7 @@ namespace ptm_util {
 PtmPtrVec readPtmTxt(const std::string &file_name) {
   std::ifstream infile(file_name.c_str());
   if (!infile.is_open()) {
-    std::cerr << "Error: variable PTM file "
-        << file_name <<  " can not be opened" << std::endl;
+    LOG_ERROR("Variable PTM file " << file_name <<  " can not be opened!");
     exit(EXIT_FAILURE);
   }
 
@@ -42,15 +41,17 @@ PtmPtrVec readPtmTxt(const std::string &file_name) {
     try {
       std::vector<std::string> l = string_util::split(line, ',');
       if (l.size() != 5) throw line;
-
       if (l[2] == "*" && l[3] == "any") throw line;
 
-      ptm_vec.push_back(PtmBase::getPtmPtr(std::make_shared<Ptm>(l[0], l[0], std::stod(l[1]), std::stoi(l[4]))));
+      std::string name = l[0];
+      double mass = std::stod(l[1]);
+      int unimod_id = std::stoi(l[4]);
+      PtmPtr ptm_ptr = PtmBase::getPtmPtr(
+          std::make_shared<Ptm>(name, name, mass, unimod_id)); 
+      ptm_vec.push_back(ptm_ptr);
     } catch (char const* e) {
-      std::cerr << "Errors in the Variable PTM file: "
-          << file_name << std::endl
-          << "Please check the line" << std::endl
-          << "\t" << e << std::endl;
+      LOG_ERROR("Errors in the Variable PTM file: " << file_name);
+      LOG_ERROR("Errors in the line: " << line);
       exit(EXIT_FAILURE);
     }
   }
@@ -59,6 +60,6 @@ PtmPtrVec readPtmTxt(const std::string &file_name) {
   return ptm_vec;
 }
 
-}  // namespace ModUtil
+}  // namespace ptm_util
 
 }  // namespace toppic

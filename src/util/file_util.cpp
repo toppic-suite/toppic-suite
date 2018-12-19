@@ -151,6 +151,10 @@ void delDir(const std::string &path) {
     fs::remove_all(dir);
 }
 
+bool existDir(const std::string &dir) {
+  return fs::exists(dir); 
+}
+
 void delFile(const std::string &path) {
   fs::path dir(path);
 

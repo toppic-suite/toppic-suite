@@ -19,7 +19,7 @@
 #include "util/logger.hpp"
 #include "base/ptm_base.hpp"
 #include "seq/fasta_seq.hpp"
-#include "base/xml_dom_util.hpp"
+#include "xml/xml_dom_util.hpp"
 
 namespace toppic {
 
