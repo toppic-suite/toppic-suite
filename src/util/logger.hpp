@@ -13,16 +13,19 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_BASE_LOGGER_HPP_
-#define TOPPIC_BASE_LOGGER_HPP_
+#ifndef TOPPIC_UTIL_LOGGER_HPP_
+#define TOPPIC_UTIL_LOGGER_HPP_
 
-#include <string>
 #include <iostream>
-#include <fstream>
 
 namespace toppic {
 
+namespace logger {
+
 extern int log_level;
+void setLogLevel(int level); 
+
+}
 
 #define LOG_LEVEL_TRACE 1
 #define LOG_LEVEL_DEBUG 2
@@ -32,38 +35,39 @@ extern int log_level;
 
 #define LOG_TRACE(X)                    \
   {                                     \
-    if (log_level <= LOG_LEVEL_TRACE) { \
+    if (logger::log_level <= LOG_LEVEL_TRACE) { \
       std::cout << "LOG TRACE: " << __FILE__ << "[" << __LINE__ << "]: " << X << std::endl;     \
     }                                   \
   }
 
 #define LOG_DEBUG(X)                    \
   {                                     \
-    if (log_level <= LOG_LEVEL_DEBUG) { \
+    if (logger::log_level <= LOG_LEVEL_DEBUG) { \
       std::cout << "LOG DEBUG: " << __FILE__ << "[" << __LINE__ << "]: " << X << std::endl;     \
     }                                   \
   }
 
 #define LOG_INFO(X)                     \
   {                                     \
-    if (log_level <= LOG_LEVEL_INFO) {  \
+    if (logger::log_level <= LOG_LEVEL_INFO) {  \
       std::cout << "LOG INFO: " << __FILE__ << "[" << __LINE__ << "]: " << X << std::endl;      \
     }                                   \
   }
 
 #define LOG_WARN(X)                     \
   {                                     \
-    if (log_level <= LOG_LEVEL_WARN) {  \
+    if (logger::log_level <= LOG_LEVEL_WARN) {  \
       std::cout << "LOG WARN: " << __FILE__ << "[" << __LINE__ << "]: " << X << std::endl;      \
     }                                   \
   }
 
 #define LOG_ERROR(X)                    \
   {                                     \
-    if (log_level <= LOG_LEVEL_ERROR) { \
+    if (logger::log_level <= LOG_LEVEL_ERROR) { \
       std::cout << "LOG ERROR: " << __FILE__ << "[" << __LINE__ << "]: " << X << std::endl;     \
     }                                   \
   }
 }
+
 
 #endif

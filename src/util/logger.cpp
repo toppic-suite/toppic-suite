@@ -17,6 +17,12 @@
 
 namespace toppic {
 
+namespace logger {
+
 int log_level = 5;
+
+void setLogLevel(int level) {log_level = level;}
+
+}
 
 }

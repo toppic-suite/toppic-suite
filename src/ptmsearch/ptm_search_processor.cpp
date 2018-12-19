@@ -188,14 +188,14 @@ void PtmSearchProcessor::process(){
   // Combine results
   int prsm_top_num = mng_ptr_->thread_num_ * mng_ptr_->n_report_;
   for (int s = 2; s <= n_unknown_shift; s++) {
-    std::string end_str = "_" + std::to_string(s);
+    std::string end_str = "_" + string_util::convertToString(s);
     // Complete prsms
     std::string complete_output_ext = mng_ptr_->output_file_ext_ + "_" 
         + AlignType::COMPLETE->getName() + end_str;
     std::vector<std::string> complete_input_exts;
     for (int t = 0; t < mng_ptr_->thread_num_; t++) {
       std::string input_ext = mng_ptr_->output_file_ext_ + "_" 
-          + std::to_string(t) + "_" + AlignType::COMPLETE->getName() + end_str;
+          + string_util::convertToString(t) + "_" + AlignType::COMPLETE->getName() + end_str;
       complete_input_exts.push_back(input_ext);
     }
     PrsmStrCombinePtr combine_ptr
@@ -210,7 +210,7 @@ void PtmSearchProcessor::process(){
     std::vector<std::string> prefix_input_exts;
     for (int t = 0; t < mng_ptr_->thread_num_; t++) {
       std::string input_ext = mng_ptr_->output_file_ext_ + "_" 
-          + std::to_string(t) + "_" + AlignType::PREFIX->getName() + end_str;
+          + string_util::convertToString(t) + "_" + AlignType::PREFIX->getName() + end_str;
       prefix_input_exts.push_back(input_ext);
     }
     combine_ptr
@@ -225,7 +225,7 @@ void PtmSearchProcessor::process(){
     std::vector<std::string> suffix_input_exts;
     for (int t = 0; t < mng_ptr_->thread_num_; t++) {
       std::string input_ext = mng_ptr_->output_file_ext_ + "_" 
-          + std::to_string(t) + "_" + AlignType::SUFFIX->getName() + end_str;
+          + string_util::convertToString(t) + "_" + AlignType::SUFFIX->getName() + end_str;
       suffix_input_exts.push_back(input_ext);
     }
     combine_ptr
@@ -240,7 +240,7 @@ void PtmSearchProcessor::process(){
     std::vector<std::string> internal_input_exts;
     for (int t = 0; t < mng_ptr_->thread_num_; t++) {
       std::string input_ext = mng_ptr_->output_file_ext_ + "_" 
-          + std::to_string(t) + "_" + AlignType::INTERNAL->getName() + end_str;
+          + string_util::convertToString(t) + "_" + AlignType::INTERNAL->getName() + end_str;
       internal_input_exts.push_back(input_ext);
     }
     combine_ptr

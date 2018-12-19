@@ -13,12 +13,11 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_BASE_STRING_UTIL_HPP_
-#define TOPPIC_BASE_STRING_UTIL_HPP_
+#ifndef TOPPIC_UTIL_STRING_UTIL_HPP_
+#define TOPPIC_UTIL_STRING_UTIL_HPP_
 
 #include <string>
 #include <vector>
-#include <sstream>
 
 namespace toppic {
 
@@ -30,15 +29,17 @@ std::string trim(const std::string & ori_s);
 
 std::vector<std::string> split(const std::string & ori_s, char delim);
 
-std::string convertToString(double value);
-
-std::string convertToString(double value, int number);
-
-std::string convertToScientificStr(double value, int number);
+std::string convertToString(bool value);
 
 std::string convertToString(int value);
 
-std::string convertToString(bool value);
+std::string convertToString(size_t value);
+
+std::string convertToString(double value);
+
+std::string convertToString(double value, int precision);
+
+std::string convertToScientificStr(double value, int precision);
 
 std::string rmComment(const std::string &ori_s, const std::string & comment = "#");
 

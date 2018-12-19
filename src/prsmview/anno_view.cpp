@@ -22,6 +22,7 @@
 
 #include "boost/algorithm/string.hpp"
 
+#include "util/string_util.hpp"
 #include "base/residue_util.hpp"
 #include "xml/xml_dom_util.hpp"
 #include "seq/fasta_reader.hpp"
@@ -120,10 +121,10 @@ void writeProteinToXml(XmlWriterPtr xml_writer,
                        PrsmViewMngPtr mng_ptr,
                        bool detail, bool add_ms) {
   xml_writer->write_str("<protein>");
-  xml_writer->write_str("<sequence_id>" + std::to_string(prot_id) + "</sequence_id>");
+  xml_writer->write_str("<sequence_id>" + string_util::convertToString(prot_id) + "</sequence_id>");
   xml_writer->write_str("<sequence_name>" + prsm_ptrs[0]->getProteoformPtr()->getSeqName() + "</sequence_name>");
   xml_writer->write_str("<sequence_description>" + prsm_ptrs[0]->getProteoformPtr()->getSeqDesc() + "</sequence_description>");
-  xml_writer->write_str("<compatible_proteoform_number>" + std::to_string(species_ids.size()) + "</compatible_proteoform_number>");
+  xml_writer->write_str("<compatible_proteoform_number>" + string_util::convertToString(species_ids.size()) + "</compatible_proteoform_number>");
   for (size_t i = 0; i < species_ids.size(); i++) {
     PrsmPtrVec select_prsm_ptrs = prsm_util::selectClusterPrsms(prsm_ptrs, species_ids[i]);
     std::sort(select_prsm_ptrs.begin(), select_prsm_ptrs.end(), Prsm::cmpEValueInc);

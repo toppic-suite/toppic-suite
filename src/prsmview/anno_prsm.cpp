@@ -72,7 +72,7 @@ void addMsHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement* ms_element, PrsmP
   std::string spec_ids;
   std::string spec_scans;
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
-    spec_ids = spec_ids + std::to_string(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getId()) + " ";
+    spec_ids = spec_ids + string_util::convertToString(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getId()) + " ";
     spec_scans = spec_scans + deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getScansString() + " ";
   }
   boost::algorithm::trim(spec_ids);

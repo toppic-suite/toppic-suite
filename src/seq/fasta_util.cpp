@@ -79,7 +79,7 @@ void generateDbBlock(const std::string &db_file_name, int block_size) {
   std::string index_file_name = db_file_name + "_block_index";
   index_output.open(index_file_name.c_str(), std::ios::out);
   std::ofstream block_output;
-  std::string block_file_name = db_file_name + "_" + std::to_string(block_idx);
+  std::string block_file_name = db_file_name + "_" + string_util::convertToString(block_idx);
   block_output.open(block_file_name.c_str(), std::ios::out);
 
   FastaReader reader(db_file_name);
@@ -97,7 +97,7 @@ void generateDbBlock(const std::string &db_file_name, int block_size) {
       LOG_DEBUG("Database block " << block_idx << " size " << seq_size);
       index_output << block_idx << "\t" << seq_idx << std::endl;
       seq_size = 0;
-      block_file_name = db_file_name + "_" + std::to_string(block_idx);
+      block_file_name = db_file_name + "_" + string_util::convertToString(block_idx);
       block_output.open(block_file_name.c_str(), std::ios::out);
     }
     block_output << ">" << name << " " << desc << std::endl;
