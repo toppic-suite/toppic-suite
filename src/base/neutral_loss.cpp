@@ -12,12 +12,13 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-
 #include "base/neutral_loss.hpp"
 #include "base/xml_dom_util.hpp"
 
 namespace toppic {
+
+NeutralLoss::NeutralLoss(const std::string &name, double mass): 
+    name_(name), mass_(mass) { }
 
 NeutralLoss::NeutralLoss(xercesc::DOMElement* element) {
   name_ = xml_dom_util::getChildValue(element, "name", 0);

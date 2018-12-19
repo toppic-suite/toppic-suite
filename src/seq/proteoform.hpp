@@ -26,7 +26,7 @@
 #include "seq/mass_shift.hpp"
 #include "base/segment.hpp"
 #include "base/prot_mod.hpp"
-#include "prsm/align_type.hpp"
+#include "seq/align_type.hpp"
 #include "base/ptm.hpp"
 
 namespace toppic {

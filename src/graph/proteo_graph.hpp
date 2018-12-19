@@ -17,7 +17,7 @@
 #define PROT_PROTEO_GRAPH_HPP_
 
 #include "seq/fasta_seq.hpp"
-#include "base/proteoform.hpp"
+#include "seq/proteoform.hpp"
 #include "graph/dist.hpp"
 #include "graph/graph.hpp"
 

@@ -19,7 +19,7 @@
 #include <string>
 #include <vector>
 
-#include "base/proteoform.hpp"
+#include "seq/proteoform.hpp"
 #include "spec/extend_peak.hpp"
 #include "prsm/peak_ion_pair.hpp"
 #include "prsm/prsm.hpp"

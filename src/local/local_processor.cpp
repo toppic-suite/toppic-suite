@@ -26,7 +26,7 @@
 #include "seq/mass_shift.hpp"
 #include "base/prot_mod.hpp"
 #include "base/prot_mod_base.hpp"
-#include "base/proteoform_factory.hpp"
+#include "seq/proteoform_factory.hpp"
 
 #include "spec/msalign_reader.hpp"
 #include "spec/spectrum_set.hpp"

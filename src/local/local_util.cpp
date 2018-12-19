@@ -24,7 +24,7 @@
 #include "base/mod_util.hpp"
 #include "base/residue_base.hpp"
 #include "base/residue_util.hpp"
-#include "base/proteoform_factory.hpp"
+#include "seq/proteoform_factory.hpp"
 #include "base/mass_constant.hpp"
 
 #include "prsm/peak_ion_pair_util.hpp"

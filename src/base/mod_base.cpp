@@ -30,11 +30,8 @@
 namespace toppic {
 
 ModPtrVec ModBase::mod_ptr_vec_;
-
 ModPtr ModBase::none_mod_ptr_;
-
 ModPtr ModBase::c57_mod_ptr_;
-
 ModPtr ModBase::c58_mod_ptr_;
 
 void ModBase::initBase(const std::string &file_name) {
@@ -63,7 +60,8 @@ void ModBase::initBase(const std::string &file_name) {
       }
     }
     if (none_mod_ptr_ == nullptr || c57_mod_ptr_ == nullptr || c58_mod_ptr_ == nullptr) {
-      LOG_WARN("mod missing!");
+      LOG_ERROR("Modification configuration file is incomplete!");
+      exit(1);
     }
   }
 }

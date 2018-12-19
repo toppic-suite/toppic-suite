@@ -19,7 +19,7 @@
 #include <vector>
 #include <string>
 
-#include "prsm/change.hpp"
+#include "seq/change.hpp"
 
 namespace toppic {
 

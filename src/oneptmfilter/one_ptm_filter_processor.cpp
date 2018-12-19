@@ -18,8 +18,8 @@
 
 #include <boost/thread/thread.hpp>
 
-#include "base/proteoform.hpp"
-#include "base/proteoform_factory.hpp"
+#include "seq/proteoform.hpp"
+#include "seq/proteoform_factory.hpp"
 #include "util/file_util.hpp"
 #include "base/mod_util.hpp"
 

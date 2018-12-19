@@ -21,8 +21,6 @@
 #include "base/ptm.hpp"
 #include "base/trunc.hpp"
 #include "base/prot_mod.hpp"
-#include "base/xml_dom.hpp"
-#include "base/xml_dom_document.hpp"
 
 namespace toppic {
 

@@ -14,10 +14,10 @@
 #include <string>
 #include <vector>
 
-#include "base/proteoform.hpp"
+#include "seq/proteoform.hpp"
 #include "base/base_data.hpp"
 #include "seq/db_block.hpp"
-#include "base/proteoform_factory.hpp"
+#include "seq/proteoform_factory.hpp"
 #include "util/file_util.hpp"
 #include "base/mod_util.hpp"
 #include "base/thread_pool.hpp"

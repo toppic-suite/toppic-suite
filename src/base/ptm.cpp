@@ -13,19 +13,22 @@
 //limitations under the License.
 
 
-#include <iostream>
+#include <string>
 #include <vector>
 #include <memory>
-#include <algorithm>
-#include <string>
 
-#include "base/ptm.hpp"
-#include "base/xml_dom.hpp"
 #include "base/xml_dom_document.hpp"
 #include "base/xml_dom_util.hpp"
-#include "base/string_util.hpp"
+#include "base/ptm.hpp"
 
 namespace toppic {
+
+Ptm::Ptm(const std::string &name, const std::string &abbr_name,
+         double mono_mass, int unimod_id):
+    name_(name),
+    abbr_name_(abbr_name),
+    mono_mass_(mono_mass),
+    unimod_id_(unimod_id) {}
 
 Ptm::Ptm(xercesc::DOMElement* element) {
   name_ = xml_dom_util::getChildValue(element, "name", 0);
@@ -38,7 +41,7 @@ void Ptm::appendAbbrNameToXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* pare
   std::string element_name = Ptm::getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
   xml_doc->addElement(element, "abbreviation", abbr_name_.c_str());
-  xml_doc->addElement(element, "unimod", string_util::convertToString(unimod_id_).c_str());
+  xml_doc->addElement(element, "unimod", std::to_string(unimod_id_).c_str());
   parent->appendChild(element);
 }
 

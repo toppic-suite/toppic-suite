@@ -18,7 +18,7 @@
 
 #include <vector>
 
-#include "base/proteoform.hpp"
+#include "seq/proteoform.hpp"
 #include "spec/prm_peak.hpp"
 
 namespace toppic {

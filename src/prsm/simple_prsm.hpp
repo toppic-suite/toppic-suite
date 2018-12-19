@@ -21,7 +21,7 @@
 
 #include <xercesc/dom/DOM.hpp>
 
-#include "base/proteoform.hpp"
+#include "seq/proteoform.hpp"
 #include "base/xml_dom_document.hpp"
 #include "spec/ms_header.hpp"
 

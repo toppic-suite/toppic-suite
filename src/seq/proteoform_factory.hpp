@@ -20,7 +20,7 @@
 #include <string>
 
 #include "seq/mass_shift.hpp"
-#include "base/proteoform.hpp"
+#include "seq/proteoform.hpp"
 #include "seq/fasta_index_reader.hpp"
 
 namespace toppic {

@@ -22,7 +22,7 @@
 #include <unordered_map>
 #include <string>
 
-#include "base/proteoform.hpp"
+#include "seq/proteoform.hpp"
 #include "base/activation.hpp"
 #include "base/thread_pool.hpp"
 

@@ -19,13 +19,14 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include "base/xml_dom_document.hpp"
+
+#include <xercesc/dom/DOMElement.hpp>
 
 namespace toppic {
 
 class NeutralLoss {
  public:
-  NeutralLoss(const std::string &name, double mass): name_(name), mass_(mass) { }
+  NeutralLoss(const std::string &name, double mass);
 
   explicit NeutralLoss(xercesc::DOMElement* element);
 

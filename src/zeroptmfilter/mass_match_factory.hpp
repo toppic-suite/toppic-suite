@@ -18,7 +18,7 @@
 
 #include <cmath>
 
-#include "base/proteoform.hpp"
+#include "seq/proteoform.hpp"
 #include "base/base_data.hpp"
 #include "zeroptmfilter/mass_match.hpp"
 

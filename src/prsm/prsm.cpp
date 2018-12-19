@@ -18,7 +18,7 @@
 #include <string>
 
 #include "util/logger.hpp"
-#include "base/proteoform_factory.hpp"
+#include "seq/proteoform_factory.hpp"
 #include "base/string_util.hpp"
 #include "base/xml_dom_util.hpp"
 #include "spec/ms.hpp"

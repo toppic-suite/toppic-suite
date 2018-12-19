@@ -26,7 +26,7 @@
 #include "base/xml_dom_document.hpp"
 
 #include "prsm/prsm_para.hpp"
-#include "base/proteoform.hpp"
+#include "seq/proteoform.hpp"
 #include "base/base_data.hpp"
 #include "seq/fasta_reader.hpp"
 #include "util/file_util.hpp"

@@ -16,7 +16,7 @@
 
 #include "util/logger.hpp"
 #include "util/file_util.hpp"
-#include "base/proteoform.hpp"
+#include "seq/proteoform.hpp"
 #include "seq/fasta_reader.hpp"
 #include "base/thread_pool.hpp"
 #include "spec/msalign_reader.hpp"

@@ -19,7 +19,7 @@
 
 #include <vector>
 
-#include "base/proteoform.hpp"
+#include "seq/proteoform.hpp"
 #include "spec/rm_break_type.hpp"
 #include "spec/extend_peak.hpp"
 #include "spec/theo_peak.hpp"

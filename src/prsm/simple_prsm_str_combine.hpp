@@ -20,7 +20,7 @@
 #include <string>
 #include <map>
 
-#include "base/proteoform.hpp"
+#include "seq/proteoform.hpp"
 #include "seq/fasta_reader.hpp"
 #include "prsm/prsm.hpp"
 #include "prsm/prsm_para.hpp"

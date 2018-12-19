@@ -17,7 +17,7 @@
 #define PROT_PTM_SEARCH_PROCESSOR_HPP_
 
 #include "seq/fasta_index_reader.hpp"
-#include "base/proteoform.hpp"
+#include "seq/proteoform.hpp"
 #include "spec/spectrum_set.hpp"
 #include "prsm/simple_prsm.hpp"
 #include "prsm/prsm_xml_writer.hpp"

@@ -19,10 +19,12 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include "base/amino_acid.hpp"
-#include "base/xml_dom_document.hpp"
+
+#include <xercesc/dom/DOMElement.hpp>
 
 namespace toppic {
+
+class XmlDOMDocument;
 
 class Ptm;
 typedef std::shared_ptr<Ptm> PtmPtr;
@@ -30,11 +32,7 @@ typedef std::shared_ptr<Ptm> PtmPtr;
 class Ptm {
  public:
   Ptm(const std::string &name, const std::string &abbr_name,
-      double mono_mass, int unimod_id):
-      name_(name),
-      abbr_name_(abbr_name),
-      mono_mass_(mono_mass),
-      unimod_id_(unimod_id) {}
+      double mono_mass, int unimod_id);
 
   explicit Ptm(xercesc::DOMElement* element);
 
@@ -58,7 +56,7 @@ class Ptm {
     return a->getMonoMass() < b->getMonoMass();
   }
 
-  bool isSame(PtmPtr ptm_ptr) { return abbr_name_ == ptm_ptr->getAbbrName();}
+  bool isSame(PtmPtr ptm_ptr) {return abbr_name_ == ptm_ptr->getAbbrName();}
 
  private:
   /* Full name */
