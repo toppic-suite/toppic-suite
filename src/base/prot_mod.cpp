@@ -14,11 +14,11 @@
 
 
 #include "util/logger.hpp"
+#include "base/xml_dom_util.hpp"
 #include "base/ptm_base.hpp"
 #include "base/trunc_base.hpp"
 #include "base/mod_base.hpp"
 #include "base/prot_mod.hpp"
-#include "base/xml_dom_util.hpp"
 
 namespace toppic {
 

@@ -37,7 +37,7 @@ ResiduePtrVec geneResidueListWithMod(const ResiduePtrVec & residue_list,
 
 std::vector<double> getModMassVec(const ModPtrVec & var_mod_list);
 
-}  // namespace ModUtil
+}  // namespace mod_util
 
 }  // namespace toppic
 

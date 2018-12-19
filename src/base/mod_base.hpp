@@ -19,9 +19,8 @@
 #include <string>
 #include <vector>
 #include <memory>
+
 #include "base/mod.hpp"
-#include "base/xml_dom.hpp"
-#include "base/xml_dom_document.hpp"
 
 namespace toppic {
 
@@ -52,6 +51,7 @@ class ModBase {
   static ModPtr c57_mod_ptr_;
   //C58
   static ModPtr c58_mod_ptr_;
+
 };
 
 }

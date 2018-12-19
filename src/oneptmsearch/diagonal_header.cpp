@@ -18,7 +18,7 @@
 
 #include "base/prot_mod.hpp"
 #include "base/mod_base.hpp"
-#include "prsm/change.hpp"
+#include "seq/change.hpp"
 #include "prsm/base_algo.hpp"
 #include "oneptmsearch/diagonal_header.hpp"
 

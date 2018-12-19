@@ -27,7 +27,7 @@
 #include "base/mod_base.hpp"
 #include "base/prot_mod_base.hpp"
 #include "base/prot_mod_util.hpp"
-#include "base/proteoform_factory.hpp"
+#include "seq/proteoform_factory.hpp"
 
 namespace toppic {
 

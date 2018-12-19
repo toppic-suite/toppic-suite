@@ -16,7 +16,7 @@
 #ifndef PROT_EVALUE_PROCESSOR_HPP_
 #define PROT_EVALUE_PROCESSOR_HPP_
 
-#include "base/proteoform.hpp"
+#include "seq/proteoform.hpp"
 #include "prsm/prsm.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 #include "tdgf/tdgf_mng.hpp"

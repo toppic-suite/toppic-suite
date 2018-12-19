@@ -20,7 +20,7 @@
 #include <vector>
 #include <memory>
 
-#include <xercesc/dom/DOM.hpp>
+#include <xercesc/dom/DOMElement.hpp>
 
 namespace toppic {
 

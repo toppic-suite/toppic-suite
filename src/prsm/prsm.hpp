@@ -21,7 +21,7 @@
 #include <vector>
 
 #include "prsm/extreme_value.hpp"
-#include "base/proteoform.hpp"
+#include "seq/proteoform.hpp"
 #include "spec/deconv_ms.hpp"
 #include "spec/extend_ms.hpp"
 #include "spec/sp_para.hpp"

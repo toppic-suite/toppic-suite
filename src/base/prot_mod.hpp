@@ -16,12 +16,14 @@
 #ifndef TOPPIC_BASE_PROT_MOD_HPP_
 #define TOPPIC_BASE_PROT_MOD_HPP_
 
-#include "base/ptm_base.hpp"
+#include <xercesc/dom/DOM.hpp>
+
 #include "base/mod.hpp"
 #include "base/trunc.hpp"
-#include "base/xml_dom_document.hpp"
 
 namespace toppic {
+
+class XmlDOMDocument;
 
 class ProtMod {
  public:

@@ -19,8 +19,8 @@
 
 #include "util/logger.hpp"
 #include "util/file_util.hpp"
-#include "base/proteoform.hpp"
-#include "base/proteoform_factory.hpp"
+#include "seq/proteoform.hpp"
+#include "seq/proteoform_factory.hpp"
 #include "seq/db_block.hpp"
 #include "spec/msalign_reader.hpp"
 #include "spec/msalign_util.hpp"

@@ -18,11 +18,15 @@
 
 #include <string>
 #include <vector>
+#include <memory>
+
+#include <xercesc/dom/DOMElement.hpp>
 
 #include "base/residue.hpp"
-#include "base/xml_dom_document.hpp"
 
 namespace toppic {
+
+class XmlDOMDocument;
 
 class Mod;
 typedef std::shared_ptr<Mod> ModPtr;
@@ -53,4 +57,5 @@ class Mod {
 typedef std::vector<ModPtr> ModPtrVec;
 
 }  // namespace toppic
+
 #endif

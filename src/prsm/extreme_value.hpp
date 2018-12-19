@@ -54,6 +54,8 @@ class ExtremeValue {
 
   static std::string getXmlElementName() {return "extreme_value";}
 
+  static double getMaxDouble() {return 1e+300;}
+
   static ExtremeValuePtr getMaxEvaluePtr();
 
  private:

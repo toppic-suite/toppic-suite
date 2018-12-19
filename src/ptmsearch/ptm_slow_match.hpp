@@ -19,7 +19,7 @@
 #include <memory>
 #include <vector>
 
-#include "base/proteoform.hpp"
+#include "seq/proteoform.hpp"
 #include "spec/prm_peak.hpp"
 #include "spec/deconv_ms.hpp"
 #include "spec/spectrum_set.hpp"

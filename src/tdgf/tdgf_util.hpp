@@ -19,7 +19,7 @@
 #include <vector>
 #include <string>
 
-#include "base/proteoform.hpp"
+#include "seq/proteoform.hpp"
 #include "base/residue_freq.hpp"
 #include "tdgf/tdgf_mng.hpp"
 

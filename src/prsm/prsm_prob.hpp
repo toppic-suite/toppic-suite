@@ -20,9 +20,9 @@
 #include <string>
 #include <map>
 
-#include "base/proteoform.hpp"
+#include "seq/proteoform.hpp"
 #include "seq/fasta_reader.hpp"
-#include "base/proteoform_factory.hpp"
+#include "seq/proteoform_factory.hpp"
 #include "prsm/prsm.hpp"
 #include "prsm/prsm_para.hpp"
 #include "prsm/prsm_xml_writer.hpp"

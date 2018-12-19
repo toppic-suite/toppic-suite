@@ -21,7 +21,7 @@
 #include "base/residue_base.hpp"
 #include "base/prot_mod_base.hpp"
 #include "base/prot_mod_util.hpp"
-#include "base/proteoform_util.hpp"
+#include "seq/proteoform_util.hpp"
 
 namespace toppic {
 namespace proteoform_util {

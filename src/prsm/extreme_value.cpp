@@ -39,7 +39,7 @@ ExtremeValue::ExtremeValue(xercesc::DOMElement* element) {
 
 void ExtremeValue::init() {
   e_value_ = one_prot_prob_ * test_num_ * adjust_factor_;
-  if (one_prot_prob_ >= 1 || test_num_ == base_data::getMaxDouble()) {
+  if (one_prot_prob_ >= 1 || test_num_ == ExtremeValue::getMaxDouble()) {
     p_value_  = 1.0;
   } else {
     double n = std::max(test_num_ * adjust_factor_, 1.0);
@@ -71,7 +71,7 @@ void ExtremeValue::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* paren
 
 ExtremeValuePtr ExtremeValue::getMaxEvaluePtr() {
   ExtremeValuePtr evalue_ptr
-      = std::make_shared<ExtremeValue>(1.0, base_data::getMaxDouble(), 1.0);
+      = std::make_shared<ExtremeValue>(1.0, ExtremeValue::getMaxDouble(), 1.0);
   return evalue_ptr;
 }
 

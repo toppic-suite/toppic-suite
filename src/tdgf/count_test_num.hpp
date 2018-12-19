@@ -16,7 +16,7 @@
 #ifndef PROT_COUNT_TEST_NUM_HPP_
 #define PROT_COUNT_TEST_NUM_HPP_
 
-#include "base/proteoform.hpp"
+#include "seq/proteoform.hpp"
 #include "base/residue_freq.hpp"
 #include "tdgf/tdgf_mng.hpp"
 

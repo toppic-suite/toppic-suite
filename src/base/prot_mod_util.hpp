@@ -32,7 +32,7 @@ ProtModPtrVec readProtMod(const std::string &file_name);
 ProtModPtr findNME_Acetylation(const ProtModPtrVec &prot_mod_ptrs, 
                                const ResiduePtrVec &residues);
 
-}  // namespace toppic_mod_util
+}  // namespace prot_mod_util
 
 }  // namespace toppic
 #endif

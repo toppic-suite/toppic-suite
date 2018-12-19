@@ -16,7 +16,7 @@
 #ifndef PROT_MASS_ONE_PTM_FILTER_H_
 #define PROT_MASS_ONE_PTM_FILTER_H_
 
-#include "base/proteoform.hpp"
+#include "seq/proteoform.hpp"
 #include "spec/prm_ms.hpp"
 #include "prsm/simple_prsm.hpp"
 #include "zeroptmfilter/mass_match.hpp"

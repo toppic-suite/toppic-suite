@@ -20,7 +20,7 @@
 
 #include "boost/algorithm/string.hpp"
 
-#include "base/proteoform_factory.hpp"
+#include "seq/proteoform_factory.hpp"
 #include "spec/extend_ms_factory.hpp"
 #include "oneptmsearch/diagonal.hpp"
 #include "oneptmsearch/diagonal_header.hpp"

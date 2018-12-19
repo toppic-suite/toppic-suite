@@ -16,7 +16,7 @@
 #ifndef ZERO_PTM_FILTER_MASS_ZERO_PTM_FILTER_H_
 #define ZERO_PTM_FILTER_MASS_ZERO_PTM_FILTER_H_
 
-#include "base/proteoform.hpp"
+#include "seq/proteoform.hpp"
 #include "spec/extend_peak.hpp"
 #include "spec/extend_ms.hpp"
 #include "prsm/simple_prsm.hpp"

@@ -19,9 +19,8 @@
 #include <string>
 #include <vector>
 #include <memory>
+
 #include "base/ptm.hpp"
-#include "base/xml_dom.hpp"
-#include "base/xml_dom_document.hpp"
 
 namespace toppic {
 

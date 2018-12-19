@@ -25,7 +25,7 @@
 #include "base/residue_util.hpp"
 #include "base/xml_dom_util.hpp"
 #include "seq/fasta_reader.hpp"
-#include "base/proteoform_factory.hpp"
+#include "seq/proteoform_factory.hpp"
 #include "spec/peak.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
 #include "prsm/prsm_util.hpp"

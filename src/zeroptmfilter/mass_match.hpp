@@ -20,7 +20,7 @@
 #include <utility>
 #include <vector>
 
-#include "base/proteoform.hpp"
+#include "seq/proteoform.hpp"
 #include "base/base_data.hpp"
 
 namespace toppic {

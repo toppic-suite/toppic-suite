@@ -20,8 +20,8 @@
 #include <vector>
 
 #include "util/logger.hpp"
-#include "base/proteoform_factory.hpp"
-#include "base/proteoform.hpp"
+#include "seq/proteoform_factory.hpp"
+#include "seq/proteoform.hpp"
 #include "base/string_util.hpp"
 #include "base/xml_dom_document.hpp"
 #include "base/xml_dom_util.hpp"

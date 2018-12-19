@@ -23,7 +23,7 @@
 #include "seq/mass_shift_type.hpp"
 #include "base/residue_util.hpp"
 #include "base/xml_dom_util.hpp"
-#include "base/proteoform_factory.hpp"
+#include "seq/proteoform_factory.hpp"
 #include "spec/peak.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
 #include "prsmview/anno_cleavage.hpp"

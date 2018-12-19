@@ -18,7 +18,7 @@
 #include <utility>
 #include <vector>
 
-#include "base/proteoform_util.hpp"
+#include "seq/proteoform_util.hpp"
 #include "spec/prm_ms.hpp"
 #include "zeroptmfilter/filter_protein.hpp"
 #include "zeroptmfilter/mass_match_factory.hpp"

@@ -18,15 +18,15 @@
 #include <vector>
 
 #include "util/logger.hpp"
-#include "base/mod_base.hpp"
-#include "base/residue_base.hpp"
-#include "base/mod_util.hpp"
-#include "base/ptm_base.hpp"
-#include "base/amino_acid_base.hpp"
 #include "base/string_util.hpp"
 #include "base/xml_dom.hpp"
 #include "base/xml_dom_document.hpp"
 #include "base/xml_dom_util.hpp"
+#include "base/amino_acid_base.hpp"
+#include "base/ptm_base.hpp"
+#include "base/residue_base.hpp"
+#include "base/mod_base.hpp"
+#include "base/mod_util.hpp"
 
 namespace toppic {
 

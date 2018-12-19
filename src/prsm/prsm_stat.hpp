@@ -19,7 +19,7 @@
 #include <string>
 
 #include "base/string_util.hpp"
-#include "base/proteoform.hpp"
+#include "seq/proteoform.hpp"
 #include "seq/fasta_reader.hpp"
 #include "prsm/prsm_para.hpp"
 #include "prsm/prsm.hpp"

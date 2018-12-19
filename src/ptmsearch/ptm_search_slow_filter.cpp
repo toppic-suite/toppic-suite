@@ -16,7 +16,7 @@
 #include <string>
 
 #include "base/prot_mod_base.hpp"
-#include "base/proteoform_factory.hpp"
+#include "seq/proteoform_factory.hpp"
 #include "ptmsearch/ptm_search_slow_filter.hpp"
 
 namespace toppic {
