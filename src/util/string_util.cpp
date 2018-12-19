@@ -13,8 +13,10 @@
 //limitations under the License.
 
 
-#include <iomanip>
 #include <string>
+#include <sstream>
+
+#include <iomanip>
 #include <vector>
 #include <functional>
 #include <algorithm>
@@ -47,6 +49,21 @@ std::vector<std::string> split(const std::string &s, char delim) {
   }
   return elems;
 }
+
+std::string convertToString(bool value) {
+  std::stringstream stream;
+  stream << value;
+  return stream.str();
+}
+
+std::string convertToString(int value) {
+  return string_util::convertToString(value);
+}
+
+std::string convertToString(size_t value) {
+  return string_util::convertToString(value);
+}
+
 
 std::string convertToString(double value) {
   std::stringstream stream;
@@ -88,17 +105,6 @@ std::string convertToScientificStr(double value, int number) {
   return stream.str();
 }
 
-std::string convertToString(int value) {
-  std::stringstream stream;
-  stream << value;
-  return stream.str();
-}
-
-std::string convertToString(bool value) {
-  std::stringstream stream;
-  stream << value;
-  return stream.str();
-}
 
 std::string rmComment(const std::string &ori_s, const std::string &comment) {
   std::string s = ori_s;

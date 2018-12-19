@@ -129,22 +129,22 @@ std::vector<std::string> SimplePrsm::toStrVec() {
   std::vector<std::string> str_vec;
   str_vec.push_back("<simple_prsm>");
   str_vec.push_back("<file_name>" + file_name_ + "</file_name>");
-  str_vec.push_back("<spectrum_id>" + std::to_string(getSpectrumId()) + "</spectrum_id>");
+  str_vec.push_back("<spectrum_id>" + string_util::convertToString(getSpectrumId()) + "</spectrum_id>");
   str_vec.push_back("<spectrum_scan>" + getSpectrumScan() + "</spectrum_scan>");
-  str_vec.push_back("<precursor_id>" + std::to_string(getPrecursorId()) + "</precursor_id>");
-  str_vec.push_back("<precursor_mass>" + std::to_string(getPrecMass()) + "</precursor_mass>");
-  str_vec.push_back("<spectrum_number>" + std::to_string(getSpectrumNum()) + "</spectrum_number>");
+  str_vec.push_back("<precursor_id>" + string_util::convertToString(getPrecursorId()) + "</precursor_id>");
+  str_vec.push_back("<precursor_mass>" + string_util::convertToString(getPrecMass()) + "</precursor_mass>");
+  str_vec.push_back("<spectrum_number>" + string_util::convertToString(getSpectrumNum()) + "</spectrum_number>");
   str_vec.push_back("<sequence_name>" + getSeqName() + "</sequence_name>");
   str_vec.push_back("<sequence_desc>" + getSeqDesc() + "</sequence_desc>");
-  str_vec.push_back("<proteoform_mass>" + std::to_string(getProteoformMass()) + "</proteoform_mass>");
-  str_vec.push_back("<score>" + std::to_string(getScore()) + "</score>");
+  str_vec.push_back("<proteoform_mass>" + string_util::convertToString(getProteoformMass()) + "</proteoform_mass>");
+  str_vec.push_back("<score>" + string_util::convertToString(getScore()) + "</score>");
 
   if (n_trunc_shifts_.size() == 0) {
     str_vec.push_back("<n_trunc_shift_list/>");
   } else {
     str_vec.push_back("<n_trunc_shift_list>");
     for (size_t i = 0; i < n_trunc_shifts_.size(); i++) {
-      str_vec.push_back("<shift>" + std::to_string(n_trunc_shifts_[i]) + "</shift>");
+      str_vec.push_back("<shift>" + string_util::convertToString(n_trunc_shifts_[i]) + "</shift>");
     }
     str_vec.push_back("</n_trunc_shift_list>");
   }
@@ -154,7 +154,7 @@ std::vector<std::string> SimplePrsm::toStrVec() {
   } else {
     str_vec.push_back("<c_trunc_shift_list>");
     for (size_t j = 0; j < c_trunc_shifts_.size(); j++) {
-      str_vec.push_back("<shift>" + std::to_string(c_trunc_shifts_[j]) + "</shift>");
+      str_vec.push_back("<shift>" + string_util::convertToString(c_trunc_shifts_[j]) + "</shift>");
     }
     str_vec.push_back("</c_trunc_shift_list>");
   }

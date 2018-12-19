@@ -25,7 +25,7 @@ ThreadPool<T>::ThreadPool(int threads, std::string file_name) :
       for (int i = 0; i < threads; i++) {
         ThreadPtr thread_ptr = std::make_shared<boost::thread>(&ThreadPool::Invoke, this);
         threadPool.emplace_back(thread_ptr);
-        std::string thread_file_name = file_name + "_" + std::to_string(i);
+        std::string thread_file_name = file_name + "_" + string_util::convertToString(i);
         std::shared_ptr<T> writer_ptr = std::make_shared<T>(thread_file_name);
         std::pair<boost::thread::id, std::shared_ptr<T>> id_writer(thread_ptr->get_id(), writer_ptr);
         writerPool.push_back(id_writer);

@@ -46,7 +46,7 @@ void CompPValueLookupTable::initTable() {
 
   input_.open(
       mng_ptr_->prsm_para_ptr_->getResourceDir() + file_util::getFileSeparator() + "p_value_table"
-      + file_util::getFileSeparator() + "ppm" + std::to_string(ppo) + "_ptm0.txt",
+      + file_util::getFileSeparator() + "ppm" + string_util::convertToString(ppo) + "_ptm0.txt",
       std::ios::in);
 
   while (std::getline(input_, line)) {
@@ -59,7 +59,7 @@ void CompPValueLookupTable::initTable() {
 
   input_.open(
       mng_ptr_->prsm_para_ptr_->getResourceDir() + file_util::getFileSeparator() + "p_value_table"
-      + file_util::getFileSeparator() + "ppm" + std::to_string(ppo) + "_ptm1.txt",
+      + file_util::getFileSeparator() + "ppm" + string_util::convertToString(ppo) + "_ptm1.txt",
       std::ios::in);
 
   while (std::getline(input_, line)) {
@@ -72,7 +72,7 @@ void CompPValueLookupTable::initTable() {
 
   input_.open(
       mng_ptr_->prsm_para_ptr_->getResourceDir() + file_util::getFileSeparator() + "p_value_table"
-      + file_util::getFileSeparator() + "ppm" + std::to_string(ppo) + "_ptm2.txt",
+      + file_util::getFileSeparator() + "ppm" + string_util::convertToString(ppo) + "_ptm2.txt",
       std::ios::in);
 
   while (std::getline(input_, line)) {

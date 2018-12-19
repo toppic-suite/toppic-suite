@@ -34,7 +34,7 @@ PrsmStrCombine::PrsmStrCombine(const std::string &spec_file_name,
   spec_file_name_ = spec_file_name;
   top_num_ = top_num;
   for (int i = 0; i < in_num; i ++) {
-    std::string ext = in_file_ext + "_" + std::to_string(i);
+    std::string ext = in_file_ext + "_" + string_util::convertToString(i);
     input_file_exts_.push_back(ext);
   }
 }

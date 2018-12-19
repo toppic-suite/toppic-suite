@@ -77,12 +77,12 @@ void AnnoSegment::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent
     std::string occu;
 
     if (occurences_.size() == 1) {
-      occu = occurences_[0].second + std::to_string(occurences_[0].first);
+      occu = occurences_[0].second + string_util::convertToString(occurences_[0].first);
     } else if (occurences_.size() > 1) {
-      occu = occurences_[0].second + std::to_string(occurences_[0].first);
+      occu = occurences_[0].second + string_util::convertToString(occurences_[0].first);
       occu += " - ";
       occu += occurences_[occurences_.size() - 1].second
-          + std::to_string(occurences_[occurences_.size() - 1].first);
+          + string_util::convertToString(occurences_[occurences_.size() - 1].first);
     }
 
     xml_doc->addElement(element, "occurence", occu.c_str());
@@ -104,12 +104,12 @@ void AnnoSegment::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent
     std::string occu;
 
     if (occurences_.size() == 1) {
-      occu = occurences_[0].second + std::to_string(occurences_[0].first);
+      occu = occurences_[0].second + string_util::convertToString(occurences_[0].first);
     } else if (occurences_.size() > 1) {
-      occu = occurences_[0].second + std::to_string(occurences_[0].first);
+      occu = occurences_[0].second + string_util::convertToString(occurences_[0].first);
       occu += " - ";
       occu += occurences_[occurences_.size() - 1].second
-          + std::to_string(occurences_[occurences_.size() - 1].first);
+          + string_util::convertToString(occurences_[occurences_.size() - 1].first);
     }
 
     xml_doc->addElement(element, "occurence", occu.c_str());

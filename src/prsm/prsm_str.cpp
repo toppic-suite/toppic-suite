@@ -125,13 +125,13 @@ void PrsmStr::setFileName(const std::string & fname) {
 
 void PrsmStr::setSpectrumId(int id) {
   int i = getXmlLineIndex(str_vec_, "spectrum_id");
-  str_vec_[i] = "<spectrum_id>" + std::to_string(id) + "</spectrum_id>";
+  str_vec_[i] = "<spectrum_id>" + string_util::convertToString(id) + "</spectrum_id>";
   spectrum_id_ = id;
 }
 
 void PrsmStr::setPrecFeatureId(int id) {
   int i = getXmlLineIndex(str_vec_, "precursor_feature_id");
-  str_vec_[i] = "<precursor_feature_id>" + std::to_string(id) + "</precursor_feature_id>";
+  str_vec_[i] = "<precursor_feature_id>" + string_util::convertToString(id) + "</precursor_feature_id>";
   precursor_feature_id_ = id;
 }
 
@@ -143,19 +143,19 @@ void PrsmStr::setPrecFeatureInte(double inte) {
 
 void PrsmStr::setPrecursorId(int id) {
   int i = getXmlLineIndex(str_vec_, "precursor_id");
-  str_vec_[i] = "<precursor_id>" + std::to_string(id) + "</precursor_id>";
+  str_vec_[i] = "<precursor_id>" + string_util::convertToString(id) + "</precursor_id>";
   precursor_id_ = id;
 }
 
 void PrsmStr::setClusterId(int id) {
   int i = getXmlLineIndex(str_vec_, "proteo_cluster_id");
-  str_vec_[i] = "<proteo_cluster_id>" + std::to_string(id) + "</proteo_cluster_id>";
+  str_vec_[i] = "<proteo_cluster_id>" + string_util::convertToString(id) + "</proteo_cluster_id>";
   cluster_id_ = id;
 }
 
 void PrsmStr::setProtId(int id) {
   int i = getXmlLineIndex(str_vec_, "prot_id");
-  str_vec_[i] = "<prot_id>" + std::to_string(id) + "</prot_id>";
+  str_vec_[i] = "<prot_id>" + string_util::convertToString(id) + "</prot_id>";
   prot_id_ = id;
 }
 

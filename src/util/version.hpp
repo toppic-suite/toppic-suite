@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_BASE_VERSION_HPP_
-#define TOPPIC_BASE_VERSION_HPP_
+#ifndef TOPPIC_UTIL_VERSION_HPP_
+#define TOPPIC_UTIL_VERSION_HPP_
 
 #include <string>
 

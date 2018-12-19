@@ -20,6 +20,7 @@
 
 #include "util/logger.hpp"
 #include "util/file_util.hpp"
+#include "util/string_util.hpp"
 #include "util/version.hpp"
 #include "spec/deconv_ms.hpp"
 #include "spec/msalign_writer.hpp"
@@ -69,7 +70,7 @@ void DeconvProcess::outputParameter(std::ostream &output, DeconvParaPtr para_ptr
 }
 
 std::string DeconvProcess::updateMsg(MsHeaderPtr header_ptr, int scan, int total_scan_num) {
-  std::string percentage = std::to_string(scan * 100 / total_scan_num);
+  std::string percentage = string_util::convertToString(scan * 100 / total_scan_num);
   std::string msg = "Processing spectrum " + header_ptr->getTitle() + "...";
   while (msg.length() < 40) {
     msg += " ";
