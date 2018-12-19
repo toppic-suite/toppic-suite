@@ -18,10 +18,8 @@
 
 #include <string>
 #include <memory>
-#include <map>
 
 #include "base/residue.hpp"
-#include "util/logger.hpp"
 
 namespace toppic {
 

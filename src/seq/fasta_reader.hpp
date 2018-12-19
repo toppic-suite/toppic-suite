@@ -22,7 +22,7 @@
 #include <vector>
 
 #include "seq/fasta_seq.hpp"
-#include "base/string_util.hpp"
+#include "util/string_util.hpp"
 
 namespace toppic {
 

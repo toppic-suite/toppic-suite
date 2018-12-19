@@ -25,7 +25,7 @@
 #include <QThread>
 
 #include "util/file_util.hpp"
-#include "base/string_util.hpp"
+#include "util/string_util.hpp"
 #include "console/topfd_argument.hpp"
 
 #include "feature/topfd_process.hpp"

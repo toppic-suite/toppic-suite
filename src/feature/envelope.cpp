@@ -22,7 +22,7 @@
 
 #include "util/logger.hpp"
 #include "base/mass_constant.hpp"
-#include "base/string_util.hpp"
+#include "util/string_util.hpp"
 #include "spec/peak.hpp"
 #include "feature/envelope.hpp"
 

@@ -19,9 +19,9 @@
 
 #include <boost/filesystem.hpp>
 
-#include "base/xml_dom_document.hpp"
-#include "base/xml_dom.hpp"
-#include "base/xml_dom_util.hpp"
+#include "xml/xml_dom_document.hpp"
+#include "xml/xml_dom.hpp"
+#include "xml/xml_dom_util.hpp"
 #include "util/file_util.hpp"
 #include "spec/msalign_reader.hpp"
 #include "prsm/simple_prsm_xml_writer.hpp"

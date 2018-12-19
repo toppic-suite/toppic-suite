@@ -20,7 +20,7 @@
 
 #include "util/logger.hpp"
 #include "util/file_util.hpp"
-#include "base/version.hpp"
+#include "util/version.hpp"
 #include "spec/deconv_ms.hpp"
 #include "spec/msalign_writer.hpp"
 #include "feature/deconv_process.hpp"

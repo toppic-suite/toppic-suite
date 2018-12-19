@@ -16,17 +16,17 @@
 #ifndef TOPPIC_BASE_SUPPORT_PEAK_TYPE_HPP_
 #define TOPPIC_BASE_SUPPORT_PEAK_TYPE_HPP_
 
-#include <memory>
 #include <string>
+#include <memory>
 #include <vector>
 
-#include "base/xml_dom_document.hpp"
+#include <xercesc/dom/DOMElement.hpp>
 
 namespace toppic {
 
 class SupportPeakType {
  public:
-  SupportPeakType(int id, const std::string &name): id_(id), name_(name) {}
+  SupportPeakType(int id, const std::string &name);
 
   explicit SupportPeakType(xercesc::DOMElement* element);
 
@@ -43,7 +43,6 @@ class SupportPeakType {
 };
 
 typedef std::shared_ptr<SupportPeakType> SPTypePtr;
-
 typedef std::vector<SPTypePtr> SPTypePtrVec;
 
 }  // namespace toppic

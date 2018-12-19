@@ -18,7 +18,6 @@
 #include "util/logger.hpp"
 #include "base/amino_acid_base.hpp"
 #include "base/ptm_base.hpp"
-#include "seq/fasta_seq.hpp"
 #include "base/residue_base.hpp"
 #include "base/residue_util.hpp"
 
@@ -28,9 +27,13 @@ namespace residue_util {
 
 ResiduePtrVec convertStrToResiduePtrVec(const std::string &seq) {
   ResiduePtrVec residue_ptr_vec;
-  std::string seq2 = FastaSeq::rmChar(seq);
-  for (size_t i = 0; i < seq2.length(); i++) {
-    AminoAcidPtr acid_ptr = AminoAcidBase::getAminoAcidPtrByOneLetter(seq2.substr(i, 1));
+//  std::string seq2 = FastaSeq::rmChar(seq);
+  for (size_t i = 0; i < seq.length(); i++) {
+    AminoAcidPtr acid_ptr = AminoAcidBase::getAminoAcidPtrByOneLetter(seq.substr(i, 1));
+    if (acid_ptr == nullptr) {
+      LOG_ERROR("Sequence " << seq << " contain invalid letters: " << seq.substr(i,1));
+      exit(EXIT_FAILURE);
+    }
     PtmPtr ptm_ptr = PtmBase::getEmptyPtmPtr();
     ResiduePtr residue_ptr = ResidueBase::getBaseResiduePtr(acid_ptr, ptm_ptr);
     residue_ptr_vec.push_back(residue_ptr);

@@ -13,21 +13,14 @@
 //limitations under the License.
 
 
-#include <string>
-
-#include "util/string_util.hpp"
-#include "spec/peak.hpp"
+#include "base/residue.hpp"
+#include "base/residue_freq.hpp"
 
 namespace toppic {
 
-void Peak::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
-  std::string element_name = Peak::getXmlElementName();
-  xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
-  std::string str = string_util::convertToString(getPosition());
-  xml_doc->addElement(element, "position", str.c_str());
-  str = string_util::convertToString(getIntensity());
-  xml_doc->addElement(element, "intensity", str.c_str());
-  parent->appendChild(element);
-}
+ResidueFreq::ResidueFreq(AminoAcidPtr acid_ptr, 
+                         PtmPtr ptm_ptr, double freq):
+    Residue(acid_ptr, ptm_ptr),
+    freq_(freq) {}
 
 }  // namespace toppic

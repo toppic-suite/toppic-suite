@@ -16,8 +16,8 @@
 #include <string>
 #include <vector>
 
-#include "base/string_util.hpp"
-#include "base/xml_dom_util.hpp"
+#include "util/string_util.hpp"
+#include "xml/xml_dom_util.hpp"
 #include "base/ptm_base.hpp"
 #include "seq/local_anno.hpp"
 

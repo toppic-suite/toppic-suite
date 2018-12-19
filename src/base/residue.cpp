@@ -15,16 +15,20 @@
 
 #include <string>
 
-#include <util/logger.hpp>
-
+#include "util/logger.hpp"
+#include "util/string_util.hpp"
+#include "xml/xml_dom_util.hpp"
 #include "base/amino_acid_base.hpp"
 #include "base/ptm_base.hpp"
 #include "base/residue.hpp"
-#include "util/file_util.hpp"
-#include "base/string_util.hpp"
-#include "base/xml_dom_util.hpp"
 
 namespace toppic {
+
+Residue::Residue(AminoAcidPtr acid_ptr, PtmPtr ptm_ptr):
+    acid_ptr_(acid_ptr),
+    ptm_ptr_(ptm_ptr) {
+      mass_ = acid_ptr_->getMonoMass() + ptm_ptr_->getMonoMass();
+    }
 
 Residue::Residue(xercesc::DOMElement* element) { 
   std::string acid_element_name = AminoAcid::getXmlElementName();
@@ -36,6 +40,11 @@ Residue::Residue(xercesc::DOMElement* element) {
       = xml_dom_util::getChildElement(element, ptm_element_name.c_str(), 0);
   ptm_ptr_ = PtmBase::getPtmPtrFromXml(ptm_element);  
   mass_ = acid_ptr_->getMonoMass() + ptm_ptr_->getMonoMass();
+}
+
+bool Residue::isSame(ResiduePtr residue_ptr) {
+  return acid_ptr_ == residue_ptr->getAminoAcidPtr()
+      && ptm_ptr_ == residue_ptr->getPtmPtr();
 }
 
 std::string Residue::toString(const std::string &delim_bgn, 

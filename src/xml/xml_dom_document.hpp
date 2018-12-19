@@ -27,7 +27,7 @@
 #include <xercesc/util/PlatformUtils.hpp>
 #include <xercesc/framework/MemBufInputSource.hpp>
 
-#include "base/xml_dom.hpp"
+#include "xml/xml_dom.hpp"
 
 namespace toppic {
 

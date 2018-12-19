@@ -16,7 +16,7 @@
 #ifndef PROT_ANNO_PRSM_HPP_
 #define PROT_ANNO_PRSM_HPP_
 
-#include "base/xml_dom_util.hpp"
+#include "xml/xml_dom_util.hpp"
 #include "prsm/prsm.hpp"
 #include "prsmview/prsm_view_mng.hpp"
 

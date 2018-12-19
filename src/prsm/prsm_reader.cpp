@@ -19,7 +19,7 @@
 #include "htslib/faidx.h"
 
 #include "util/logger.hpp"
-#include "base/string_util.hpp"
+#include "util/string_util.hpp"
 #include "prsm/prsm_reader.hpp"
 
 namespace toppic {

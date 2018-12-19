@@ -16,7 +16,7 @@
 #include <cstddef>
 #include <limits>
 
-#include "base/string_util.hpp"
+#include "util/string_util.hpp"
 #include "feature/match_env.hpp" 
 
 namespace toppic {

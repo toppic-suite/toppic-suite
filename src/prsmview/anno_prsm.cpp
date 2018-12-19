@@ -18,8 +18,9 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include "util/logger.hpp"
 #include "base/residue_util.hpp"
-#include "base/xml_dom_util.hpp"
+#include "xml/xml_dom_util.hpp"
 #include "spec/peak.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
 #include "prsmview/anno_residue.hpp"

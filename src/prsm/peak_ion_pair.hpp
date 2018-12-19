@@ -18,7 +18,7 @@
 
 #include <vector>
 
-#include "base/xml_dom_document.hpp"
+#include "xml/xml_dom_document.hpp"
 #include "spec/ms_header.hpp"
 #include "spec/extend_peak.hpp"
 #include "spec/theo_peak.hpp"

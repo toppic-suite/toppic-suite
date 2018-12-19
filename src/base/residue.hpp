@@ -17,14 +17,11 @@
 #define TOPPIC_BASE_RESIDUE_HPP_
 
 #include <string>
-#include <memory>
-#include <map>
-#include <utility>
 #include <vector>
+#include <memory>
 
 #include "base/amino_acid.hpp"
 #include "base/ptm.hpp"
-#include "util/logger.hpp"
 
 namespace toppic {
 
@@ -33,31 +30,17 @@ typedef std::shared_ptr<Residue> ResiduePtr;
 
 class Residue {
  public:
-  Residue(AminoAcidPtr acid_ptr, PtmPtr ptm_ptr):
-      acid_ptr_(acid_ptr),
-      ptm_ptr_(ptm_ptr) {
-        mass_ = acid_ptr_->getMonoMass() + ptm_ptr_->getMonoMass();
-      }
+  Residue(AminoAcidPtr acid_ptr, PtmPtr ptm_ptr);
 
   explicit Residue(xercesc::DOMElement* element);
-
   /** Get amino acid. */
   AminoAcidPtr getAminoAcidPtr() {return acid_ptr_; }
-
   /** Get residue mass. */
   double getMass() { return mass_; }
-
   /** Get post-translational modification. */
   PtmPtr getPtmPtr() { return ptm_ptr_; }
-
-  /**
-   * Checks if the residue contains the same amino acid and ptm.
-   */
-  bool isSame(ResiduePtr residue_ptr) {
-    return acid_ptr_ == residue_ptr->getAminoAcidPtr()
-        && ptm_ptr_ == residue_ptr->getPtmPtr();
-  }
-
+  /** Checks if the residue contains the same amino acid and ptm.  */
+  bool isSame(ResiduePtr residue_ptr);
   /** Get string representation */
   std::string toString(const std::string &delim_bgn, const std::string &delim_end);
 
@@ -80,10 +63,7 @@ class Residue {
 };
 
 typedef std::vector<ResiduePtr> ResiduePtrVec;
-
 typedef std::vector<ResiduePtrVec> ResiduePtrVec2D;
-
-typedef std::vector<std::pair<std::string, std::string> > StringPairVec;
 
 }  // namespace toppic
 

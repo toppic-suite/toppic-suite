@@ -17,6 +17,7 @@
 #define TOPPIC_BASE_RESIDUE_FREQ_HPP_
 
 #include <vector>
+#include <memory>
 
 #include "base/residue.hpp"
 
@@ -24,9 +25,7 @@ namespace toppic {
 
 class ResidueFreq: public Residue {
  public:
-  ResidueFreq(AminoAcidPtr acid_ptr, PtmPtr ptm_ptr, double freq):
-      Residue(acid_ptr, ptm_ptr),
-      freq_(freq) {}
+  ResidueFreq(AminoAcidPtr acid_ptr, PtmPtr ptm_ptr, double freq);
 
   double getFreq() {return freq_;}
 

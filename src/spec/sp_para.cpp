@@ -15,8 +15,8 @@
 #include <string>
 
 #include "base/activation_base.hpp"
-#include "base/string_util.hpp"
-#include "base/xml_dom_util.hpp"
+#include "util/string_util.hpp"
+#include "xml/xml_dom_util.hpp"
 #include "spec/sp_para.hpp"
 
 namespace toppic {

@@ -17,13 +17,10 @@
 #define TOPPIC_BASE_RESIDUE_UTIL_HPP_
 
 #include <string>
-#include <vector>
-#include <memory>
-#include <map>
 
-#include "base/prot_mod.hpp"
+#include "util/string_util.hpp"
+#include "base/mod.hpp"
 #include "base/residue.hpp"
-#include "util/logger.hpp"
 
 namespace toppic {
 

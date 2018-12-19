@@ -15,6 +15,7 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include "util/logger.hpp"
 #include "base/activation_base.hpp"
 #include "base/mass_constant.hpp"
 #include "base/mod_util.hpp"

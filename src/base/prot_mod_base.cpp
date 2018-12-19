@@ -13,9 +13,10 @@
 //limitations under the License.
 
 #include <string>
+
 #include "util/logger.hpp"
+#include "xml/xml_dom_util.hpp"
 #include "base/prot_mod_base.hpp"
-#include "base/xml_dom_util.hpp"
 
 namespace toppic {
 

@@ -22,8 +22,8 @@
 #include <memory>
 #include <map>
 
-#include "base/xml_dom.hpp"
-#include "base/xml_dom_document.hpp"
+#include "xml/xml_dom.hpp"
+#include "xml/xml_dom_document.hpp"
 
 #include "prsm/prsm_para.hpp"
 #include "seq/proteoform.hpp"

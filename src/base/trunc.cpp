@@ -14,9 +14,9 @@
 
 
 #include "util/logger.hpp"
-#include "base/trunc.hpp"
+#include "xml/xml_dom_util.hpp"
 #include "base/residue_util.hpp"
-#include "base/xml_dom_util.hpp"
+#include "base/trunc.hpp"
 
 namespace toppic {
 

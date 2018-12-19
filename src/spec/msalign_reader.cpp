@@ -19,7 +19,7 @@
 #include "boost/algorithm/string.hpp"
 
 #include "base/activation_base.hpp"
-#include "base/string_util.hpp"
+#include "util/string_util.hpp"
 #include "spec/msalign_reader.hpp"
 
 namespace toppic {

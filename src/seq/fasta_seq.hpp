@@ -21,8 +21,9 @@
 #include <vector>
 #include <utility>
 
+#include "util/string_util.hpp"
 #include "base/residue.hpp"
-#include "base/xml_dom_document.hpp"
+#include "xml/xml_dom_document.hpp"
 
 namespace toppic {
 

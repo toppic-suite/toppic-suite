@@ -19,7 +19,7 @@
 #include "boost/algorithm/string.hpp"
 
 #include "util/file_util.hpp"
-#include "base/xml_dom_util.hpp"
+#include "xml/xml_dom_util.hpp"
 #include "console/topquant_argument.hpp"
 
 

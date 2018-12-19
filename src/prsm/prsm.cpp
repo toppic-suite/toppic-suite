@@ -19,8 +19,8 @@
 
 #include "util/logger.hpp"
 #include "seq/proteoform_factory.hpp"
-#include "base/string_util.hpp"
-#include "base/xml_dom_util.hpp"
+#include "util/string_util.hpp"
+#include "xml/xml_dom_util.hpp"
 #include "spec/ms.hpp"
 #include "spec/extend_ms_factory.hpp"
 #include "spec/msalign_reader.hpp"

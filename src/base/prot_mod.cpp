@@ -14,7 +14,7 @@
 
 
 #include "util/logger.hpp"
-#include "base/xml_dom_util.hpp"
+#include "xml/xml_dom_util.hpp"
 #include "base/ptm_base.hpp"
 #include "base/trunc_base.hpp"
 #include "base/mod_base.hpp"

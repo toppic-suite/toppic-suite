@@ -17,7 +17,7 @@
 #include <algorithm>
 #include <vector>
 
-#include "base/version.hpp"
+#include "util/version.hpp"
 #include "seq/fasta_reader.hpp"
 #include "seq/fasta_util.hpp"
 #include "base/base_data.hpp"

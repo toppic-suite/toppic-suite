@@ -16,6 +16,7 @@
 #include <iomanip>
 #include <string>
 
+#include "util/logger.hpp"
 #include "util/file_util.hpp"
 #include "prsm/simple_prsm_reader.hpp"
 #include "prsm/simple_prsm_table_writer.hpp"

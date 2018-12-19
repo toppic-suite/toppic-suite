@@ -16,9 +16,9 @@
 #include <string>
 
 #include "util/logger.hpp"
+#include "xml/xml_dom_util.hpp"
 #include "base/mod.hpp"
 #include "base/residue_base.hpp"
-#include "base/xml_dom_util.hpp"
 
 namespace toppic {
 

@@ -19,7 +19,7 @@
 #include <boost/filesystem.hpp>
 
 #include "util/logger.hpp"
-#include "base/xml_dom_util.hpp"
+#include "xml/xml_dom_util.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 
 namespace toppic {

@@ -22,7 +22,7 @@
 #include <set>
 
 #include "base/activation.hpp"
-#include "base/xml_dom_document.hpp"
+#include "xml/xml_dom_document.hpp"
 #include "spec/peak_tolerance.hpp"
 
 namespace toppic {

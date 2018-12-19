@@ -21,14 +21,15 @@
 #include <cmath>
 
 #include "util/logger.hpp"
+#include "util/string_util.hpp"
 #include "seq/mass_shift_type.hpp"
 #include "base/mod_base.hpp"
 #include "base/prot_mod_base.hpp"
-#include "base/string_util.hpp"
+#include "util/string_util.hpp"
 #include "seq/fasta_index_reader.hpp"
 #include "seq/proteoform.hpp"
 #include "seq/proteoform_factory.hpp"
-#include "base/xml_dom_util.hpp"
+#include "xml/xml_dom_util.hpp"
 
 namespace toppic {
 

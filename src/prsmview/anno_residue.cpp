@@ -15,7 +15,7 @@
 
 #include <string>
 
-#include "base/string_util.hpp"
+#include "util/string_util.hpp"
 #include "prsmview/anno_residue.hpp"
 
 namespace toppic {

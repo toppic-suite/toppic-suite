@@ -12,16 +12,15 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <cmath>
 #include <string>
+#include <cmath>
 #include <algorithm>
-#include <vector>
 
 #include "util/logger.hpp"
-#include "base/string_util.hpp"
-#include "base/xml_dom.hpp"
-#include "base/xml_dom_document.hpp"
-#include "base/xml_dom_util.hpp"
+#include "util/string_util.hpp"
+#include "xml/xml_dom.hpp"
+#include "xml/xml_dom_document.hpp"
+#include "xml/xml_dom_util.hpp"
 #include "base/amino_acid_base.hpp"
 #include "base/ptm_base.hpp"
 #include "base/residue_base.hpp"

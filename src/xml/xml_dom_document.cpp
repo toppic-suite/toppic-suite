@@ -21,8 +21,8 @@
 
 
 #include "util/logger.hpp"
-#include "base/xml_dom.hpp"
-#include "base/xml_dom_document.hpp"
+#include "xml/xml_dom.hpp"
+#include "xml/xml_dom_document.hpp"
 
 namespace toppic {
 

@@ -17,8 +17,12 @@
 #define TOPPIC_BASE_TRUNC_HPP_
 
 #include <string>
+#include <memory>
+#include <vector>
+
+#include <xercesc/dom/DOMElement.hpp>
+
 #include "base/residue.hpp"
-#include "base/xml_dom_document.hpp"
 
 namespace toppic {
 

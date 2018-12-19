@@ -16,8 +16,8 @@
 #ifndef TOPPIC_BASE_TRUNC_UTIL_HPP_
 #define TOPPIC_BASE_TRUNC_UTIL_HPP_
 
-#include "base/trunc.hpp"
 #include "base/residue.hpp"
+#include "base/trunc.hpp"
 
 namespace toppic {
 

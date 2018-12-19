@@ -26,7 +26,7 @@
 #include "base/residue_util.hpp"
 #include "base/neutral_loss.hpp"
 #include "prsm/extreme_value.hpp"
-#include "base/thread_pool.hpp"
+#include "thread/thread_pool.hpp"
 
 #include "spec/msalign_reader.hpp"
 #include "spec/msalign_util.hpp"

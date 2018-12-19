@@ -23,7 +23,7 @@
 #include "boost/algorithm/string.hpp"
 
 #include "base/residue_util.hpp"
-#include "base/xml_dom_util.hpp"
+#include "xml/xml_dom_util.hpp"
 #include "seq/fasta_reader.hpp"
 #include "seq/proteoform_factory.hpp"
 #include "spec/peak.hpp"

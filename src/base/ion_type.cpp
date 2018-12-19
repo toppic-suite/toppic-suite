@@ -15,11 +15,11 @@
 
 #include <string>
 
+#include "util/string_util.hpp"
+#include "xml/xml_dom_document.hpp"
+#include "xml/xml_dom_util.hpp"
 #include "base/mass_constant.hpp"
 #include "base/ion_type.hpp"
-#include "base/string_util.hpp"
-#include "base/xml_dom_document.hpp"
-#include "base/xml_dom_util.hpp"
 
 namespace toppic {
 

@@ -16,8 +16,8 @@
 #ifndef TOPPIC_BASE_SUPPORT_PEAK_TYPE_BASE_HPP_
 #define TOPPIC_BASE_SUPPORT_PEAK_TYPE_BASE_HPP_
 
-#include <memory>
 #include <string>
+#include <memory>
 #include <vector>
 
 #include "base/support_peak_type.hpp"
@@ -47,4 +47,4 @@ class SPTypeBase {
 
 } /* namespace toppic */
 
-#endif /* SUPPORT_PEAK_TYPE_HPP_ */
+#endif /* SUPPORT_PEAK_TYPE_BASE_HPP_ */
