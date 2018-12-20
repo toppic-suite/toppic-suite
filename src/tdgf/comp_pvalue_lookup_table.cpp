@@ -17,10 +17,9 @@
 #include <algorithm>
 #include <vector>
 
-#include <boost/algorithm/string.hpp>
-
 #include "util/logger.hpp"
 #include "util/file_util.hpp"
+#include "util/str_util.hpp"
 #include "tdgf/comp_pvalue_lookup_table.hpp"
 
 namespace toppic {
@@ -46,11 +45,11 @@ void CompPValueLookupTable::initTable() {
 
   input_.open(
       mng_ptr_->prsm_para_ptr_->getResourceDir() + file_util::getFileSeparator() + "p_value_table"
-      + file_util::getFileSeparator() + "ppm" + string_util::convertToString(ppo) + "_ptm0.txt",
+      + file_util::getFileSeparator() + "ppm" + str_util::toString(ppo) + "_ptm0.txt",
       std::ios::in);
 
   while (std::getline(input_, line)) {
-    boost::split(strs, line, boost::is_any_of(" \t"));
+    strs = str_util::split(line, " \t");
     ptm0_[getPeakIndex(std::stoi(strs[0]))][getFragIndex(std::stoi(strs[1]))] =
         std::stod(strs[2]);
   }
@@ -59,11 +58,11 @@ void CompPValueLookupTable::initTable() {
 
   input_.open(
       mng_ptr_->prsm_para_ptr_->getResourceDir() + file_util::getFileSeparator() + "p_value_table"
-      + file_util::getFileSeparator() + "ppm" + string_util::convertToString(ppo) + "_ptm1.txt",
+      + file_util::getFileSeparator() + "ppm" + str_util::toString(ppo) + "_ptm1.txt",
       std::ios::in);
 
   while (std::getline(input_, line)) {
-    boost::split(strs, line, boost::is_any_of(" \t"));
+    strs = str_util::split(line, " \t");
     ptm1_[getPeakIndex(std::stoi(strs[0]))][getFragIndex(std::stoi(strs[1]))] =
         std::stod(strs[2]);
   }
@@ -72,11 +71,11 @@ void CompPValueLookupTable::initTable() {
 
   input_.open(
       mng_ptr_->prsm_para_ptr_->getResourceDir() + file_util::getFileSeparator() + "p_value_table"
-      + file_util::getFileSeparator() + "ppm" + string_util::convertToString(ppo) + "_ptm2.txt",
+      + file_util::getFileSeparator() + "ppm" + str_util::toString(ppo) + "_ptm2.txt",
       std::ios::in);
 
   while (std::getline(input_, line)) {
-    boost::split(strs, line, boost::is_any_of(" \t"));
+    strs = str_util::split(line, " \t");
     ptm2_[getPeakIndex(std::stoi(strs[0]))][getFragIndex(std::stoi(strs[1]))] =
         std::stod(strs[2]);
   }

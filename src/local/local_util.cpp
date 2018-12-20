@@ -17,7 +17,6 @@
 #include <string>
 #include <vector>
 
-#include <boost/algorithm/string.hpp>
 
 #include "base/amino_acid_base.hpp"
 #include "base/activation_base.hpp"

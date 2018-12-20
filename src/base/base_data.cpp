@@ -44,7 +44,7 @@ void init(const std::string & resource_dir) {
 
   std::string separator = file_util::getFileSeparator();
   std::string base_data_dir = resource_dir + separator + base_data::getBaseDataDirName();
-  if (!file_util::existDir(base_data_dir)) {
+  if (!file_util::exists(base_data_dir)) {
     LOG_ERROR("The directory " << base_data_dir << " does not exist!");
     exit (EXIT_FAILURE);
   }

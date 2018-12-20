@@ -21,7 +21,7 @@
 
 #include "base/activation_base.hpp"
 #include "util/logger.hpp"
-#include "util/string_util.hpp"
+#include "util/str_util.hpp"
 #include "xml/xml_dom_util.hpp"
 #include "spec/peak_util.hpp"
 #include "spec/ms_header.hpp"
@@ -116,7 +116,7 @@ void MsHeader::setScans(const std::string &s) {
     scans_.push_back(-1);
     return;
   }
-  std::vector<std::string> strs = string_util::split(s, ' ');
+  std::vector<std::string> strs = str_util::split(s, " ");
   for (size_t i = 0; i < strs.size(); i++) {
     scans_.push_back(std::stoi(strs[i]));
   }
@@ -127,28 +127,28 @@ xercesc::DOMElement* MsHeader::getHeaderXml(XmlDOMDocument* xml_doc) {
   int precison = 4;
   xercesc::DOMElement* element = xml_doc->createElement("ms_header");
   xml_doc->addElement(element, "file_name", file_name_.c_str());
-  std::string str = string_util::convertToString(id_);
+  std::string str = str_util::toString(id_);
   xml_doc->addElement(element, "id", str.c_str());
-  str = string_util::convertToString(prec_id_);
+  str = str_util::toString(prec_id_);
   xml_doc->addElement(element, "prec_id", str.c_str());
   xml_doc->addElement(element, "title", title_.c_str());
-  str = string_util::convertToString(level_);
+  str = str_util::toString(level_);
   xml_doc->addElement(element, "level", str.c_str());
   str = getScansString();
   xml_doc->addElement(element, "scans", str.c_str());
   xercesc::DOMElement* scans = xml_doc->createElement("scan_list");
   for (size_t i = 0; i < scans_.size(); i++) {
-    str = string_util::convertToString(scans_[i]);
+    str = str_util::toString(scans_[i]);
     xml_doc->addElement(scans, "scan", str.c_str());
   }
   element->appendChild(scans);
-  str = string_util::convertToString(retention_time_);
+  str = str_util::toString(retention_time_);
   xml_doc->addElement(element, "retention_time", str.c_str());
-  str = string_util::convertToString(prec_sp_mz_);
+  str = str_util::toString(prec_sp_mz_);
   xml_doc->addElement(element, "prec_sp_mz", str.c_str());
-  str = string_util::convertToString(prec_mono_mz_, precison);
+  str = str_util::toString(prec_mono_mz_, precison);
   xml_doc->addElement(element, "prec_mono_mz", str.c_str());
-  str = string_util::convertToString(prec_charge_);
+  str = str_util::toString(prec_charge_);
   xml_doc->addElement(element, "prec_charge", str.c_str());
   activation_ptr_->appendNameToXml(xml_doc, element);
   return element;

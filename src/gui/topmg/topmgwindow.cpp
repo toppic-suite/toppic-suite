@@ -24,9 +24,6 @@
 #include <QToolTip>
 #include <QDesktopServices>
 
-#include <boost/filesystem.hpp>
-namespace fs = boost::filesystem;
-
 #include "topmgwindow.h"
 #include "ui_topmgwindow.h"
 #include "threadtopmg.h"
@@ -247,8 +244,8 @@ void topmgWindow::on_startButton_clicked() {
 void topmgWindow::on_outputButton_clicked() {
   std::vector<std::string> spec_file_lst = this->getSpecFileList();
   if (spec_file_lst.size() > 0) {
-    fs::path full_path(spec_file_lst[0].c_str());
-    QString outPath = full_path.remove_filename().string().c_str();
+    std::string dir = toppic::file_util::directory(spec_file_lst[0]);
+    QString outPath = dir.c_str();
     QDesktopServices::openUrl(QUrl(outPath, QUrl::TolerantMode));
   }
 }

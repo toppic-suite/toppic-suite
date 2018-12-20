@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_UTIL_STRING_UTIL_HPP_
-#define TOPPIC_UTIL_STRING_UTIL_HPP_
+#ifndef TOPPIC_UTIL_STR_UTIL_HPP_
+#define TOPPIC_UTIL_STR_UTIL_HPP_
 
 #include <string>
 #include <vector>
@@ -23,31 +23,31 @@ namespace toppic {
 
 typedef std::vector<std::pair<std::string, std::string> > StringPairVec;
 
-namespace string_util {
+namespace str_util {
 
-std::string trim(const std::string & ori_s);
+void trim(std::string &ori_s);
 
-std::vector<std::string> split(const std::string & ori_s, char delim);
+std::vector<std::string> split(const std::string &ori_s, const std::string &delim);
 
-std::string convertToString(bool value);
+std::string toString(bool value);
 
-std::string convertToString(int value);
+std::string toString(int value);
 
-std::string convertToString(size_t value);
+std::string toString(size_t value);
 
-std::string convertToString(double value);
+std::string toString(double value);
 
-std::string convertToString(double value, int precision);
+std::string toString(double value, int precision);
 
-std::string convertToScientificStr(double value, int precision);
+std::string toScientificStr(double value, int precision);
 
 std::string rmComment(const std::string &ori_s, const std::string & comment = "#");
 
-double convertScientificToDouble(std::string str);
+double scientificToDouble(const std::string &str);
 
 bool endsWith(const std::string &str, const std::string &suffix);
 
-}  // namespace string_util
+}  // namespace str_util
 
 }  // namespace toppic
 

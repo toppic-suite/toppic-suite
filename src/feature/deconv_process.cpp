@@ -16,11 +16,9 @@
 #include <iomanip>
 #include <chrono>
 
-#include <boost/filesystem.hpp>
-
 #include "util/logger.hpp"
 #include "util/file_util.hpp"
-#include "util/string_util.hpp"
+#include "util/str_util.hpp"
 #include "util/version.hpp"
 #include "spec/deconv_ms.hpp"
 #include "spec/msalign_writer.hpp"
@@ -70,7 +68,7 @@ void DeconvProcess::outputParameter(std::ostream &output, DeconvParaPtr para_ptr
 }
 
 std::string DeconvProcess::updateMsg(MsHeaderPtr header_ptr, int scan, int total_scan_num) {
-  std::string percentage = string_util::convertToString(scan * 100 / total_scan_num);
+  std::string percentage = str_util::toString(scan * 100 / total_scan_num);
   std::string msg = "Processing spectrum " + header_ptr->getTitle() + "...";
   while (msg.length() < 40) {
     msg += " ";
@@ -90,12 +88,12 @@ void DeconvProcess::process() {
   ms1_msalign_name = file_util::basename(file_name) + "_ms1.msalign";
   ms2_msalign_name = file_util::basename(file_name) + "_ms2.msalign";
 
-  if (boost::filesystem::exists(file_util::basename(file_name) + "_ms1.env")) {
-    boost::filesystem::remove(file_util::basename(file_name) + "_ms1.env"); 
+  if (file_util::exists(file_util::basename(file_name) + "_ms1.env")) {
+    file_util::delFile(file_util::basename(file_name) + "_ms1.env"); 
   }
 
-  if (boost::filesystem::exists(file_util::basename(file_name) + "_ms2.env")) {
-    boost::filesystem::remove(file_util::basename(file_name) + "_ms2.env"); 
+  if (file_util::exists(file_util::basename(file_name) + "_ms2.env")) {
+    file_util::delFile(file_util::basename(file_name) + "_ms2.env"); 
   }
 
   std::ofstream ms1_msalign_of(ms1_msalign_name, std::ofstream::out);

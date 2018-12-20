@@ -19,10 +19,10 @@
 void ThreadTopFD::run() {
   std::sort(spec_file_lst_.begin(), spec_file_lst_.end());
   for (size_t k = 0; k < spec_file_lst_.size(); k++) {
-    if (toppic::string_util::endsWith(spec_file_lst_[k], "mzML")
-        || toppic::string_util::endsWith(spec_file_lst_[k], "mzXML")
-        || toppic::string_util::endsWith(spec_file_lst_[k], "mzml")
-        || toppic::string_util::endsWith(spec_file_lst_[k], "mzxml")) {
+    if (toppic::str_util::endsWith(spec_file_lst_[k], "mzML")
+        || toppic::str_util::endsWith(spec_file_lst_[k], "mzXML")
+        || toppic::str_util::endsWith(spec_file_lst_[k], "mzml")
+        || toppic::str_util::endsWith(spec_file_lst_[k], "mzxml")) {
       arguments_["spectrumFileName"] = spec_file_lst_[k];
       toppic::TopFDProcess(arguments_);
     }

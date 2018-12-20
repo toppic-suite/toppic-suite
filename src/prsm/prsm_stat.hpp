@@ -18,7 +18,7 @@
 
 #include <string>
 
-#include "util/string_util.hpp"
+#include "util/str_util.hpp"
 #include "seq/proteoform.hpp"
 #include "seq/fasta_reader.hpp"
 #include "prsm/prsm_para.hpp"

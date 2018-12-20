@@ -16,7 +16,7 @@
 #include <string>
 #include <vector>
 
-#include "util/string_util.hpp"
+#include "util/str_util.hpp"
 #include "base/ion.hpp"
 
 namespace toppic {
@@ -31,7 +31,7 @@ Ion::Ion(int charge, int pos, int display_pos,
     neutral_loss_ptr_(neutral_loss_ptr) {}
 
 std::string Ion::getDisplayName() {
-  return ion_type_ptr_->getName() + string_util::convertToString(display_pos_);
+  return ion_type_ptr_->getName() + str_util::toString(display_pos_);
 }
 
 } /* namespace toppic */

@@ -15,7 +15,7 @@
 
 #include <string>
 
-#include "util/string_util.hpp"
+#include "util/str_util.hpp"
 #include "xml/xml_dom_util.hpp"
 #include "spec/env_peak.hpp"
 
@@ -36,11 +36,11 @@ void EnvPeak::appendXml(XmlDOMDocument* xml_doc,
                         xercesc::DOMElement* parent) {
   std::string element_name = EnvPeak::getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
-  std::string str = string_util::convertToString(getPosition());
+  std::string str = str_util::toString(getPosition());
   xml_doc->addElement(element, "position", str.c_str());
-  str = string_util::convertToString(getIntensity());
+  str = str_util::toString(getIntensity());
   xml_doc->addElement(element, "intensity", str.c_str());
-  str = string_util::convertToString(idx_);
+  str = str_util::toString(idx_);
   xml_doc->addElement(element, "index", str.c_str());
   parent->appendChild(element);
 }

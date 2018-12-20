@@ -21,7 +21,7 @@
 #include <vector>
 #include <utility>
 
-#include "util/string_util.hpp"
+#include "util/str_util.hpp"
 #include "base/residue.hpp"
 #include "xml/xml_dom_document.hpp"
 

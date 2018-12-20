@@ -57,7 +57,7 @@ ion_type_base.cpp:#include "base/ion_type_base.hpp"
 ion_type_base.hpp:#include <string>
 ion_type_base.hpp:#include "base/ion_type.hpp"
 ion_type.cpp:#include <string>
-ion_type.cpp:#include "util/string_util.hpp"
+ion_type.cpp:#include "util/str_util.hpp"
 ion_type.cpp:#include "xml/xml_dom_document.hpp"
 ion_type.cpp:#include "xml/xml_dom_util.hpp"
 ion_type.cpp:#include "base/mass_constant.hpp"
@@ -92,7 +92,7 @@ mod_util.cpp:#include <string>
 mod_util.cpp:#include <cmath>
 mod_util.cpp:#include <algorithm>
 mod_util.cpp:#include "util/logger.hpp"
-mod_util.cpp:#include "util/string_util.hpp"
+mod_util.cpp:#include "util/str_util.hpp"
 mod_util.cpp:#include "xml/xml_dom.hpp"
 mod_util.cpp:#include "xml/xml_dom_document.hpp"
 mod_util.cpp:#include "xml/xml_dom_util.hpp"
@@ -173,7 +173,7 @@ ptm.hpp:#include <xercesc/dom/DOMElement.hpp>
 ptm_util.cpp:#include <fstream>
 ptm_util.cpp:#include <string>
 ptm_util.cpp:#include "util/logger.hpp"
-ptm_util.cpp:#include "util/string_util.hpp"
+ptm_util.cpp:#include "util/str_util.hpp"
 ptm_util.cpp:#include "base/ptm_base.hpp"
 ptm_util.cpp:#include "base/ptm_util.hpp"
 ptm_util.hpp:#include <string>
@@ -195,7 +195,7 @@ residue.cpp:#include "xml/xml_dom_util.hpp"
 residue.cpp:#include "base/amino_acid_base.hpp"
 residue.cpp:#include "base/ptm_base.hpp"
 residue.cpp:#include "base/residue.hpp"
-residue.cpp:#include "util/string_util.hpp"
+residue.cpp:#include "util/str_util.hpp"
 residue_freq.cpp:#include "base/residue.hpp"
 residue_freq.cpp:#include "base/residue_freq.hpp"
 residue_freq.hpp:#include <vector>
@@ -213,7 +213,7 @@ residue_util.cpp:#include "base/ptm_base.hpp"
 residue_util.cpp:#include "base/residue_base.hpp"
 residue_util.cpp:#include "base/residue_util.hpp"
 residue_util.hpp:#include <string>
-residue_util.hpp:#include "util/string_util.hpp"
+residue_util.hpp:#include "util/str_util.hpp"
 residue_util.hpp:#include "base/mod.hpp"
 residue_util.hpp:#include "base/residue.hpp"
 support_peak_type_base.cpp:#include <string>

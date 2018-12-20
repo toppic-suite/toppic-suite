@@ -17,8 +17,6 @@
 #include <fstream>
 #include <string>
 
-#include <boost/algorithm/string.hpp>
-
 #include "seq/proteoform.hpp"
 #include "util/file_util.hpp"
 #include "spec/rm_break_type.hpp"
@@ -230,14 +228,14 @@ void PrsmCoverage::compOneCoverage(std::ofstream &file, PrsmPtr prsm_ptr,
   int peak_num = 0;
   DeconvMsPtrVec deconv_ms_ptr_vec = prsm_ptr->getDeconvMsPtrVec();
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
-    spec_ids = spec_ids + string_util::convertToString(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getId()) + " ";
+    spec_ids = spec_ids + str_util::toString(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getId()) + " ";
     spec_activations = spec_activations + deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getActivationPtr()->getName() + " ";
     spec_scans = spec_scans + deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getScansString() + " ";
     peak_num += deconv_ms_ptr_vec[i]->size();
   }
-  boost::algorithm::trim(spec_ids);
-  boost::algorithm::trim(spec_activations);
-  boost::algorithm::trim(spec_scans);
+  str_util::trim(spec_ids);
+  str_util::trim(spec_activations);
+  str_util::trim(spec_scans);
   file << prsm_para_ptr_->getSpectrumFileName() << "\t"
       << prsm_ptr->getPrsmId() << "\t"
       << spec_ids << "\t"
@@ -274,14 +272,14 @@ void PrsmCoverage::compTwoCoverage(std::ofstream &file, PrsmPtr prsm_ptr,
   int peak_num = 0;
   DeconvMsPtrVec deconv_ms_ptr_vec = prsm_ptr->getDeconvMsPtrVec();
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
-    spec_ids = spec_ids + string_util::convertToString(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getId()) + " ";
+    spec_ids = spec_ids + str_util::toString(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getId()) + " ";
     spec_activations = spec_activations + deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getActivationPtr()->getName() + " ";
     spec_scans = spec_scans + deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getScansString() + " ";
     peak_num += deconv_ms_ptr_vec[i]->size();
   }
-  boost::algorithm::trim(spec_ids);
-  boost::algorithm::trim(spec_activations);
-  boost::algorithm::trim(spec_scans);
+  str_util::trim(spec_ids);
+  str_util::trim(spec_activations);
+  str_util::trim(spec_scans);
 
   file << prsm_para_ptr_->getSpectrumFileName() << "\t"
       << prsm_ptr->getPrsmId() << "\t"

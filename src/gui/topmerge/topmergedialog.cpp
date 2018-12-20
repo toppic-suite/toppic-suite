@@ -23,8 +23,6 @@
 #include <QCloseEvent>
 #include <QDesktopServices>
 
-#include <boost/filesystem.hpp>
-
 #include "util/file_util.hpp"
 #include "base/base_data.hpp"
 
@@ -32,7 +30,6 @@
 #include "ui_topmergedialog.h"
 #include "threadtopmerge.h"
 
-namespace fs = boost::filesystem;
 
 TopMergeDialog::TopMergeDialog(QWidget *parent) :
     QMainWindow(parent),

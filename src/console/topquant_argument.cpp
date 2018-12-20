@@ -16,8 +16,6 @@
 #include <string>
 #include <algorithm>
 
-#include "boost/algorithm/string.hpp"
-
 #include "util/file_util.hpp"
 #include "xml/xml_dom_util.hpp"
 #include "console/topquant_argument.hpp"
@@ -172,8 +170,8 @@ bool Argument::validateArguments() {
     return false;
   }
 
-  if (!string_util::endsWith(arguments_["oriDatabaseFileName"], ".fasta") &&
-      !string_util::endsWith(arguments_["oriDatabaseFileName"], ".fa")) {
+  if (!str_util::endsWith(arguments_["oriDatabaseFileName"], ".fasta") &&
+      !str_util::endsWith(arguments_["oriDatabaseFileName"], ".fa")) {
     LOG_ERROR("Database file " << arguments_["oriDatabaseFileName"] << " is not a fasta file!");
     return false;
   }

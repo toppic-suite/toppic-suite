@@ -15,7 +15,7 @@
 #include <string>
 
 #include "base/mod_base.hpp"
-#include "util/string_util.hpp"
+#include "util/str_util.hpp"
 #include "xml/xml_dom_util.hpp"
 #include "seq/change.hpp"
 
@@ -50,12 +50,12 @@ Change::Change(xercesc::DOMElement* element) {
 void Change::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   std::string element_name = Change::getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
-  std::string str = string_util::convertToString(left_bp_pos_);
+  std::string str = str_util::toString(left_bp_pos_);
   xml_doc->addElement(element, "left_bp_pos", str.c_str());
-  str = string_util::convertToString(right_bp_pos_);
+  str = str_util::toString(right_bp_pos_);
   xml_doc->addElement(element, "right_bp_pos", str.c_str());
   type_ptr_->appendXml(xml_doc, element);
-  str = string_util::convertToString(mass_);
+  str = str_util::toString(mass_);
   xml_doc->addElement(element, "mass", str.c_str());
   if (mod_ptr_ != nullptr) {
     mod_ptr_->appendToXml(xml_doc, element);

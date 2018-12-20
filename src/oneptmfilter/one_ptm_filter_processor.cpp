@@ -54,7 +54,7 @@ void OnePtmFilterProcessor::process() {
   int thread_num = mng_ptr_->thread_num_;
   std::vector<std::ofstream *> output_vec;
   for (int i = 0; i < thread_num; i++) {
-    output_vec.push_back(new std::ofstream(sp_file_name + "_" + string_util::convertToString(i)));
+    output_vec.push_back(new std::ofstream(sp_file_name + "_" + str_util::toString(i)));
   }
 
   std::vector<SpectrumSetPtr> spec_set_vec = ms_reader.getNextSpectrumSet(prsm_para_ptr->getSpParaPtr());
@@ -130,7 +130,7 @@ void OnePtmFilterProcessor::process() {
   file_util::cleanTempFiles(sp_file_name, mng_ptr_->output_file_ext_ + "_" + internal + end_str);
 
   for (int t = 0; t < thread_num; t++) {
-    std::string t_str = string_util::convertToString(t);
+    std::string t_str = str_util::toString(t);
     file_util::delFile(sp_file_name + "_" + t_str);
   }
 
@@ -153,7 +153,7 @@ std::function<void()> geneTask(const ProteoformPtrVec & raw_forms,
                                    prsm_para_ptr->getSpParaPtr()->getPeakTolerancePtr(),
                                    prsm_para_ptr->getSpParaPtr()->getActivationPtr(),
                                    prsm_para_ptr->getSpParaPtr()->getSkipList());
-    MsAlignReader reader(prsm_para_ptr->getSpectrumFileName() + "_" + string_util::convertToString(idx),
+    MsAlignReader reader(prsm_para_ptr->getSpectrumFileName() + "_" + str_util::toString(idx),
                          group_spec_num,
                          prsm_para_ptr->getSpParaPtr()->getActivationPtr(),
                          prsm_para_ptr->getSpParaPtr()->getSkipList());
@@ -166,13 +166,13 @@ std::function<void()> geneTask(const ProteoformPtrVec & raw_forms,
     std::string internal = AlignType::INTERNAL->getName();
 
     SimplePrsmXmlWriter comp_writer(output_file_name + "_" + complete + "_" 
-                                    + block_str + "_" + string_util::convertToString(idx));
+                                    + block_str + "_" + str_util::toString(idx));
     SimplePrsmXmlWriter pref_writer(output_file_name + "_" + prefix + "_" 
-                                    + block_str + "_" + string_util::convertToString(idx));
+                                    + block_str + "_" + str_util::toString(idx));
     SimplePrsmXmlWriter suff_writer(output_file_name + "_" + suffix + "_" 
-                                    + block_str + "_" + string_util::convertToString(idx));
+                                    + block_str + "_" + str_util::toString(idx));
     SimplePrsmXmlWriter internal_writer(output_file_name + "_" + internal + "_" 
-                                        + block_str + "_" + string_util::convertToString(idx));
+                                        + block_str + "_" + str_util::toString(idx));
 
     std::vector<SpectrumSetPtr> spec_set_vec = reader.getNextSpectrumSet(sp_para_ptr);
 
@@ -228,11 +228,11 @@ void OnePtmFilterProcessor::processBlock(DbBlockPtr block_ptr, const std::vector
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
   int spectrum_num = msalign_util::getSpNum(prsm_para_ptr->getSpectrumFileName());
   std::string db_block_file_name = prsm_para_ptr->getSearchDbFileName()
-      + "_" + string_util::convertToString(block_ptr->getBlockIdx());
+      + "_" + str_util::toString(block_ptr->getBlockIdx());
   ProteoformPtrVec raw_forms
       = proteoform_factory::readFastaToProteoformPtrVec(db_block_file_name,
                                                         prsm_para_ptr->getFixModPtrVec());
-  std::string block_str = string_util::convertToString(block_ptr->getBlockIdx());
+  std::string block_str = str_util::toString(block_ptr->getBlockIdx());
 
   std::vector<std::shared_ptr<boost::thread> > thread_vec;
   for (int i = 1; i < mng_ptr_->thread_num_; i++) {

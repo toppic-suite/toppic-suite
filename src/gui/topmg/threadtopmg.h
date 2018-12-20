@@ -24,7 +24,7 @@
 
 #include "util/version.hpp"
 #include "util/file_util.hpp"
-#include "util/string_util.hpp"
+#include "util/str_util.hpp"
 
 #include "spec/msalign_util.hpp"
 #include "spec/feature_util.hpp"

@@ -16,7 +16,7 @@
 #include <string>
 
 #include "util/logger.hpp"
-#include "util/string_util.hpp"
+#include "util/str_util.hpp"
 #include "base/ptm_base.hpp"
 #include "base/ptm_util.hpp"
 
@@ -36,10 +36,10 @@ PtmPtrVec readPtmTxt(const std::string &file_name) {
   std::string line;
   while (std::getline(infile, line)) {
     if (line[0] == '#') continue;
-    line = string_util::rmComment(line);
+    line = str_util::rmComment(line);
     if (line == "") continue;
     try {
-      std::vector<std::string> l = string_util::split(line, ',');
+      std::vector<std::string> l = str_util::split(line, ",");
       if (l.size() != 5) throw line;
       if (l[2] == "*" && l[3] == "any") throw line;
 

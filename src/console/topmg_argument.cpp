@@ -23,11 +23,10 @@
 #include <map>
 
 #include "boost/thread/thread.hpp"
-#include "boost/algorithm/string.hpp"
 
 #include "util/file_util.hpp"
 #include "xml/xml_dom_util.hpp"
-#include "util/string_util.hpp"
+#include "util/str_util.hpp"
 
 #include "console/topmg_argument.hpp"
 
@@ -400,8 +399,8 @@ bool Argument::validateArguments() {
     return false;
   }
 
-  if (!string_util::endsWith(arguments_["oriDatabaseFileName"], ".fasta") &&
-      !string_util::endsWith(arguments_["oriDatabaseFileName"], ".fa")) {
+  if (!str_util::endsWith(arguments_["oriDatabaseFileName"], ".fasta") &&
+      !str_util::endsWith(arguments_["oriDatabaseFileName"], ".fa")) {
     LOG_ERROR("Database file " << arguments_["oriDatabaseFileName"] << " is not a fasta file!");
     return false;
   }
@@ -417,7 +416,7 @@ bool Argument::validateArguments() {
       return false;
     }
 
-    if (!string_util::endsWith(spec_file_list_[k], ".msalign")) {
+    if (!str_util::endsWith(spec_file_list_[k], ".msalign")) {
       LOG_ERROR("Spectrum file " << spec_file_list_[k] << " is not a msalign file!");
       return false;
     }
@@ -427,7 +426,7 @@ bool Argument::validateArguments() {
       return false;
     }
 
-    if (string_util::endsWith(spec_file_list_[k], "_ms1.msalign")) {
+    if (str_util::endsWith(spec_file_list_[k], "_ms1.msalign")) {
       std::cerr << "Warning: Please make sure " << spec_file_list_[k] << " is the ms2 spectral file." << std::endl;
     }
   }
@@ -463,8 +462,7 @@ bool Argument::validateArguments() {
   }
 
   std::string allow_mod = arguments_["allowProtMod"];
-  std::vector<std::string> strs;
-  boost::split(strs, allow_mod, boost::is_any_of(","));
+  std::vector<std::string> strs = str_util::split(allow_mod, ",");
   for (size_t i = 0; i < strs.size(); i++) {
     if (strs[i] != "NONE" && strs[i] != "M_ACETYLATION" && strs[i] != "NME" && strs[i] != "NME_ACETYLATION") {
       LOG_ERROR("N-Terminal Variable PTM can only be NONE, M_ACETYLATION, NME or NME_ACETYLATION.");

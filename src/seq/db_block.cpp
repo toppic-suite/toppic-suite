@@ -19,7 +19,7 @@
 
 #include "seq/db_block.hpp"
 #include "util/logger.hpp"
-#include "util/string_util.hpp"
+#include "util/str_util.hpp"
 #include "seq/fasta_reader.hpp"
 
 namespace toppic {
@@ -36,7 +36,7 @@ DbBlockPtrVec DbBlock::readDbBlockIndex(const std::string &db_file_name) {
   std::string line;
   std::vector<std::string> strs;
   while (std::getline(input, line)) {
-    strs = string_util::split(line, '\t');
+    strs = str_util::split(line, "\t");
     int block_index = std::stoi(strs[0]);
     int seq_index = std::stoi(strs[1]);
     LOG_DEBUG("block " << block_index << " seq " << seq_index);

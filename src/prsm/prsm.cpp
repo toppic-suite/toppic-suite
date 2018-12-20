@@ -19,7 +19,7 @@
 
 #include "util/logger.hpp"
 #include "seq/proteoform_factory.hpp"
-#include "util/string_util.hpp"
+#include "util/str_util.hpp"
 #include "xml/xml_dom_util.hpp"
 #include "spec/ms.hpp"
 #include "spec/extend_ms_factory.hpp"
@@ -102,32 +102,32 @@ xercesc::DOMElement* Prsm::toXmlElement(XmlDOMDocument* xml_doc) {
   std::string element_name = Prsm::getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
   xml_doc->addElement(element, "file_name", file_name_.c_str());
-  std::string str = string_util::convertToString(prsm_id_);
+  std::string str = str_util::toString(prsm_id_);
   xml_doc->addElement(element, "prsm_id", str.c_str());
-  str = string_util::convertToString(spectrum_id_);
+  str = str_util::toString(spectrum_id_);
   xml_doc->addElement(element, "spectrum_id", str.c_str());
   xml_doc->addElement(element, "spectrum_scan", spectrum_scan_.c_str());
-  str = string_util::convertToString(precursor_id_);
+  str = str_util::toString(precursor_id_);
   xml_doc->addElement(element, "precursor_id", str.c_str());
-  str = string_util::convertToString(prec_feature_id_);
+  str = str_util::toString(prec_feature_id_);
   xml_doc->addElement(element, "precursor_feature_id", str.c_str());
-  str = string_util::convertToString(prec_feature_inte_);
+  str = str_util::toString(prec_feature_inte_);
   xml_doc->addElement(element, "precursor_feature_inte", str.c_str());
-  str = string_util::convertToString(spectrum_num_);
+  str = str_util::toString(spectrum_num_);
   xml_doc->addElement(element, "spectrum_number", str.c_str());
-  str = string_util::convertToString(ori_prec_mass_);
+  str = str_util::toString(ori_prec_mass_);
   xml_doc->addElement(element, "ori_prec_mass", str.c_str());
-  str = string_util::convertToString(adjusted_prec_mass_);
+  str = str_util::toString(adjusted_prec_mass_);
   xml_doc->addElement(element, "adjusted_prec_mass", str.c_str());
-  str = string_util::convertToString(fdr_);
+  str = str_util::toString(fdr_);
   xml_doc->addElement(element, "fdr", str.c_str());
-  str = string_util::convertToString(proteoform_fdr_);
+  str = str_util::toString(proteoform_fdr_);
   xml_doc->addElement(element, "proteoform_fdr", str.c_str());
-  str = string_util::convertToString(match_peak_num_);
+  str = str_util::toString(match_peak_num_);
   xml_doc->addElement(element, "match_peak_num", str.c_str());
-  str = string_util::convertToString(match_fragment_num_);
+  str = str_util::toString(match_fragment_num_);
   xml_doc->addElement(element, "match_fragment_num", str.c_str());
-  str = string_util::convertToString(getNormMatchFragNum());
+  str = str_util::toString(getNormMatchFragNum());
   xml_doc->addElement(element, "norm_match_fragment_num", str.c_str());
   proteoform_ptr_->appendXml(xml_doc, element);
   if (extreme_value_ptr_ != nullptr) {

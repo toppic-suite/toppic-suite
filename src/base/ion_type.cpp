@@ -15,7 +15,7 @@
 
 #include <string>
 
-#include "util/string_util.hpp"
+#include "util/str_util.hpp"
 #include "xml/xml_dom_document.hpp"
 #include "xml/xml_dom_util.hpp"
 #include "base/mass_constant.hpp"

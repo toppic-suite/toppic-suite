@@ -39,15 +39,16 @@ FastaSeqPtr FastaReader::getNextSeq() {
 
   // get the letters of sequence
   std::string ori_seq;
-  ori_name_ = string_util::trim(ori_name_);
+  str_util::trim(ori_name_);
   std::string prot_name = ori_name_.substr(1, ori_name_.size() - 1);
   std::string line;
   while (std::getline(input_, line)) {
     if (line.length() >= 1 && line.substr(0, 1) == ">") {
-      ori_name_ = string_util::trim(line);
+      str_util::trim(line);
+      ori_name_ = line;
       return std::make_shared<FastaSeq>(prot_name, ori_seq);
     }
-    line = string_util::trim(line);
+    str_util::trim(line);
     ori_seq = ori_seq + line;
     if (ori_seq.size() >= 1000000) {
       LOG_ERROR("Protein sequences are too long! Incorrect fasta file!");

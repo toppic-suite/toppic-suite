@@ -19,7 +19,7 @@
 #include <xercesc/framework/MemBufInputSource.hpp>
 
 #include "util/logger.hpp"
-#include "util/string_util.hpp"
+#include "util/str_util.hpp"
 #include "prsm/simple_prsm_reader.hpp"
 
 namespace toppic {
@@ -32,7 +32,7 @@ std::vector<std::string> SimplePrsmReader::readOnePrsmLines() {
   std::string line;
   std::vector<std::string> line_list;
   while (std::getline(input_, line)) {
-    line = string_util::trim(line);
+    str_util::trim(line);
     if (line ==  "<simple_prsm>") {
       line_list.push_back(line);
     } else if (line == "</simple_prsm>") {

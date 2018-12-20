@@ -17,12 +17,10 @@
 #include <algorithm>
 #include <vector>
 
-#include <boost/filesystem.hpp>
-
+#include "util/file_util.hpp"
 #include "xml/xml_dom_document.hpp"
 #include "xml/xml_dom.hpp"
 #include "xml/xml_dom_util.hpp"
-#include "util/file_util.hpp"
 #include "spec/msalign_reader.hpp"
 #include "prsm/simple_prsm_xml_writer.hpp"
 
@@ -36,8 +34,7 @@ SimplePrsmXmlWriter::SimplePrsmXmlWriter(const std::string &file_name) {
   doc_ = new XmlDOMDocument(impl->createDoc("simple_prsm_list"));
   serializer_ = impl->createSerializer();
 
-  boost::filesystem::path p(file_name);
-  file_name_ = p.stem().string() + ".msalign";
+  file_name_ = file_util::basename(file_name) + ".msalign";
 }
 
 SimplePrsmXmlWriter::~SimplePrsmXmlWriter() {

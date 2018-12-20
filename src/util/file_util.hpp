@@ -32,17 +32,17 @@ namespace toppic {
 
 namespace file_util {
 
-std::string getFileSeparator();
-
 std::string getExecutiveDir(const std::string &argv_0);
 
-inline std::string getResourceDirName() {return "toppic_resources";}
+std::string getFileSeparator();
 
 std::string basename(const std::string &s);
 
 std::string directory(const std::string &s);
 
 std::string absoluteDir(const std::string &s);
+
+std::string absoluteName(const std::string &s);
 
 void createFolder(const std::string &folder_name);
 
@@ -52,18 +52,27 @@ void copyFile(const std::string &file_name, const std::string &path,
 bool copyDir(boost::filesystem::path const & source,
              boost::filesystem::path const & destination);
 
-bool existDir(const std::string &dir);
+bool exists(const std::string &path);
 
 void delDir(const std::string &path);
 
 void delFile(const std::string &path);
 
+void cleanPrefix(const std::string & ref_name, 
+                 const std::string & prefix);
+
+void cleanTempFiles(const std::string & ref_name, 
+                    const std::string & ext_prefix);
+
+// TO DO 
+
+inline std::string getResourceDirName() {return "toppic_resources";}
+
+
 void cleanTopmgDir(const std::string &fa_path, const std::string & sp_path);
 
 void cleanToppicDir(const std::string &fa_path, const std::string & sp_path);
 
-void cleanTempFiles(const std::string & sp_path, 
-                    const std::string & ext_prefix);
 
 }  // namespace file_util
 

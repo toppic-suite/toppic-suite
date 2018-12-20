@@ -18,8 +18,6 @@
 #include <utility>
 #include <limits>
 
-#include "boost/algorithm/string.hpp"
-
 #include "seq/proteoform_factory.hpp"
 #include "spec/extend_ms_factory.hpp"
 #include "oneptmsearch/diagonal.hpp"

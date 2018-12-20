@@ -19,7 +19,7 @@
 #include <string>
 
 #include "util/file_util.hpp"
-#include "util/string_util.hpp"
+#include "util/str_util.hpp"
 #include "util/logger.hpp"
 #include "base/base_data.hpp"
 #include "feature/deconv_process.hpp"
@@ -42,7 +42,7 @@ int TopFDProcess(std::map<std::string, std::string> arguments) {
 
     time_t end = time(0);
     std::cout << "Runing time: "
-        << string_util::convertToString(static_cast<int>(difftime(end, start)))
+        << str_util::toString(static_cast<int>(difftime(end, start)))
         << " seconds." << std::endl;
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
