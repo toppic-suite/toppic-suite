@@ -26,6 +26,10 @@ namespace toppic {
 
 namespace residue_util {
 
+bool isValidResidue(char c);
+
+char replaceResidueLetter(char c);
+
 ResiduePtrVec convertStrToResiduePtrVec(const std::string &seq);
 
 ResiduePtrVec convertStrToResiduePtrVec(const std::string &seq, 

@@ -1,3 +1,4 @@
 /util/    String utilities, file utilities, and etc
 /xml/     Functions for handling xml files   
 /base/    Reading and storing amino acids, ptms, residues and etc 
+/seq/     Fasta sequences and proteoforms

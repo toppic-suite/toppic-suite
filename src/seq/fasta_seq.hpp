@@ -13,16 +13,13 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_BASE_FASTA_SEQ_HPP_
-#define TOPPIC_BASE_FASTA_SEQ_HPP_
+#ifndef TOPPIC_SEQ_FASTA_SEQ_HPP_
+#define TOPPIC_SEQ_FASTA_SEQ_HPP_
 
-#include <memory>
 #include <string>
-#include <vector>
-#include <utility>
+#include <memory>
 
 #include "util/str_util.hpp"
-#include "base/residue.hpp"
 #include "xml/xml_dom_document.hpp"
 
 namespace toppic {
@@ -46,17 +43,15 @@ class FastaSeq {
 
   static std::string getXmlElementName() {return "fasta_seq";}
 
-  void appendNameDescToXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
+  void appendNameDescToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
-  static std::string getNameFromXml(xercesc::DOMElement* element);
+  static std::string getNameFromXml(XmlDOMElement* element);
 
-  static std::string getDescFromXml(xercesc::DOMElement* element);
+  static std::string getDescFromXml(XmlDOMElement* element);
 
   static std::string getString(const std::pair<std::string, std::string> &str_pair);
 
   static std::string getString(const StringPairVec &str_pair_vec);
-
-  static std::string rmChar(const std::string &ori_seq);
 
  private:
   std::string name_;

@@ -17,8 +17,9 @@
 #include <cmath>
 
 #include "base/residue_util.hpp"
-#include "base/mod_base.hpp"
+#include "base/ptm_base.hpp"
 #include "base/residue_base.hpp"
+#include "base/mod_base.hpp"
 #include "base/prot_mod_base.hpp"
 #include "base/prot_mod_util.hpp"
 #include "seq/proteoform_util.hpp"

@@ -13,15 +13,16 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_BASE_CHANGE_HPP_
-#define TOPPIC_BASE_CHANGE_HPP_
+#ifndef TOPPIC_SEQ_CHANGE_HPP_
+#define TOPPIC_SEQ_CHANGE_HPP_
 
 #include <string>
 #include <vector>
+#include <memory>
 
-#include "seq/mass_shift_type.hpp"
-#include "base/mod.hpp"
 #include "xml/xml_dom_document.hpp"
+#include "base/mod.hpp"
+#include "seq/mass_shift_type.hpp"
 #include "seq/local_anno.hpp"
 
 namespace toppic {
@@ -33,13 +34,9 @@ class Change {
  public:
   Change(int left_bp_pos, int right_bp_pos,
          MassShiftTypePtr type_ptr,
-         double mass, ModPtr mod_ptr):
-      left_bp_pos_(left_bp_pos),
-      right_bp_pos_(right_bp_pos),
-      type_ptr_(type_ptr),
-      mass_(mass), mod_ptr_(mod_ptr) {}
+         double mass, ModPtr mod_ptr);
 
-  explicit Change(xercesc::DOMElement* change_element);
+  explicit Change(XmlDOMElement* change_element);
 
   int getLeftBpPos() {return left_bp_pos_;}
 
@@ -61,7 +58,7 @@ class Change {
 
   void setLocalAnno(LocalAnnoPtr p);
 
-  void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
+  void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
   static std::string getXmlElementName() {return "change";}
 

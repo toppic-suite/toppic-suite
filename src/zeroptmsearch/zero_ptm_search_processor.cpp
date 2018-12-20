@@ -38,7 +38,7 @@ PrsmPtrVec ZeroPtmSearchProcessor::zeroPtmSearchOneSpec(SpectrumSetPtr spec_set_
                                                         const SimplePrsmPtrVec &simple_prsm_ptr_vec,
                                                         FastaIndexReaderPtr reader_ptr,
                                                         ZeroPtmSearchMngPtr mng_ptr,
-                                                        AlignTypePtr type_ptr) {
+                                                        ProteoformTypePtr type_ptr) {
   ModPtrVec fix_mod_list = mng_ptr->prsm_para_ptr_->getFixModPtrVec();
   ProtModPtrVec prot_mod_ptr_vec = mng_ptr->prsm_para_ptr_->getProtModPtrVec();
   ExtendMsPtrVec ms_three_vec = spec_set_ptr->getMsThreePtrVec();
@@ -51,7 +51,7 @@ PrsmPtrVec ZeroPtmSearchProcessor::zeroPtmSearchOneSpec(SpectrumSetPtr spec_set_
     std::string seq_desc = simple_prsm_ptr_vec[i]->getSeqDesc();
     ProteoformPtr proteo_ptr = proteoform_factory::readFastaToProteoformPtr(reader_ptr, seq_name,
                                                                             seq_desc, fix_mod_list);
-    if (type_ptr == AlignType::COMPLETE || type_ptr == AlignType::PREFIX) {
+    if (type_ptr == ProteoformType::COMPLETE || type_ptr == ProteoformType::PREFIX) {
       ProteoformPtrVec mod_form_ptr_vec
           = proteoform_factory::geneProtModProteoform(proteo_ptr, prot_mod_ptr_vec);
       proteoform_ptr_vec.insert(proteoform_ptr_vec.end(), mod_form_ptr_vec.begin(),
@@ -86,10 +86,10 @@ void ZeroPtmSearchProcessor::process() {
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
   std::string input_file_name = file_util::basename(sp_file_name) + "." + mng_ptr_->input_file_ext_;
-  SimplePrsmReader comp_prsm_reader(input_file_name + "_" + AlignType::COMPLETE->getName());
-  SimplePrsmReader pref_prsm_reader(input_file_name + "_" + AlignType::PREFIX->getName());
-  SimplePrsmReader suff_prsm_reader(input_file_name + "_" + AlignType::SUFFIX->getName());
-  SimplePrsmReader internal_prsm_reader(input_file_name + "_" + AlignType::INTERNAL->getName());
+  SimplePrsmReader comp_prsm_reader(input_file_name + "_" + ProteoformType::COMPLETE->getName());
+  SimplePrsmReader pref_prsm_reader(input_file_name + "_" + ProteoformType::PREFIX->getName());
+  SimplePrsmReader suff_prsm_reader(input_file_name + "_" + ProteoformType::SUFFIX->getName());
+  SimplePrsmReader internal_prsm_reader(input_file_name + "_" + ProteoformType::INTERNAL->getName());
   SimplePrsmPtr comp_prsm_ptr = comp_prsm_reader.readOnePrsm();
   SimplePrsmPtr pref_prsm_ptr = pref_prsm_reader.readOnePrsm();
   SimplePrsmPtr suff_prsm_ptr = suff_prsm_reader.readOnePrsm();
@@ -97,10 +97,10 @@ void ZeroPtmSearchProcessor::process() {
 
   std::string output_file_name = file_util::basename(prsm_para_ptr->getSpectrumFileName())
       + "." + mng_ptr_->output_file_ext_;
-  PrsmXmlWriter comp_writer(output_file_name + "_" + AlignType::COMPLETE->getName());
-  PrsmXmlWriter pref_writer(output_file_name + "_" + AlignType::PREFIX->getName());
-  PrsmXmlWriter suff_writer(output_file_name + "_" + AlignType::SUFFIX->getName());
-  PrsmXmlWriter internal_writer(output_file_name + "_" + AlignType::INTERNAL->getName());
+  PrsmXmlWriter comp_writer(output_file_name + "_" + ProteoformType::COMPLETE->getName());
+  PrsmXmlWriter pref_writer(output_file_name + "_" + ProteoformType::PREFIX->getName());
+  PrsmXmlWriter suff_writer(output_file_name + "_" + ProteoformType::SUFFIX->getName());
+  PrsmXmlWriter internal_writer(output_file_name + "_" + ProteoformType::INTERNAL->getName());
 
   // init variables
   std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
@@ -131,7 +131,7 @@ void ZeroPtmSearchProcessor::process() {
         // LOG_DEBUG("start processing one spectrum.");
         for (size_t k = 0; k < spec_set_vec.size(); k++) {
           PrsmPtrVec prsms = zeroPtmSearchOneSpec(spec_set_vec[k], comp_selected_prsm_ptrs, reader_ptr,
-                                                  mng_ptr_, AlignType::COMPLETE);
+                                                  mng_ptr_, ProteoformType::COMPLETE);
           comp_writer.writeVector(prsms);
         }
       }
@@ -147,7 +147,7 @@ void ZeroPtmSearchProcessor::process() {
         // LOG_DEBUG("start processing one spectrum.");
         for (size_t k = 0; k < spec_set_vec.size(); k++) {
           PrsmPtrVec prsms = zeroPtmSearchOneSpec(spec_set_vec[k], pref_selected_prsm_ptrs, reader_ptr,
-                                                  mng_ptr_, AlignType::PREFIX);
+                                                  mng_ptr_, ProteoformType::PREFIX);
           pref_writer.writeVector(prsms);
         }
       }
@@ -163,7 +163,7 @@ void ZeroPtmSearchProcessor::process() {
         // LOG_DEBUG("start processing one spectrum.");
         for (size_t k = 0; k < spec_set_vec.size(); k++) {
           PrsmPtrVec prsms = zeroPtmSearchOneSpec(spec_set_vec[k], suff_selected_prsm_ptrs, reader_ptr,
-                                                  mng_ptr_, AlignType::SUFFIX);
+                                                  mng_ptr_, ProteoformType::SUFFIX);
           suff_writer.writeVector(prsms);
         }
       }
@@ -179,7 +179,7 @@ void ZeroPtmSearchProcessor::process() {
         // LOG_DEBUG("start processing one spectrum.");
         for (size_t k = 0; k < spec_set_vec.size(); k++) {
           PrsmPtrVec prsms = zeroPtmSearchOneSpec(spec_set_vec[k], internal_selected_prsm_ptrs, reader_ptr,
-                                                  mng_ptr_, AlignType::INTERNAL);
+                                                  mng_ptr_, ProteoformType::INTERNAL);
           internal_writer.writeVector(prsms);
         }
       }

@@ -13,30 +13,15 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_SEQ_FASTA_UTIL_HPP_
-#define TOPPIC_SEQ_FASTA_UTIL_HPP_
-
-#include <string>
-
+#include "seq/segment.hpp"
 
 namespace toppic {
 
-namespace fasta_util {
-
-void generateShuffleDb(const std::string &file_name,
-                       const std::string &target_decoy_file_name);
-
-void dbSimplePreprocess(const std::string &ori_db_file_name,
-                        const std::string &db_file_name);
-
-void dbPreprocess(const std::string &ori_db_file_name,
-                  const std::string &db_file_name,
-                  bool decoy, int block_size);
-
-int countProteinNum(const std::string &fasta_file);
-
-}  // namespace fasta_util
+Segment::Segment(int left_bp_pos, int right_bp_pos, 
+                 double n_shift, double c_shift):
+    left_bp_pos_(left_bp_pos),
+    right_bp_pos_(right_bp_pos),
+    pep_n_term_shift_(n_shift),
+    pep_c_term_shift_(c_shift) {}
 
 }  // namespace toppic
-
-#endif

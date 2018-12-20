@@ -32,7 +32,7 @@ class PtmSearchSlowFilter {
                       SimplePrsmPtrVec simple_prsm_ptrs,
                       CompShiftLowMem comp_shift,
                       PtmSearchMngPtr mng_ptr);
-  PrsmPtrVec getPrsms(int shift_num, AlignTypePtr type_ptr);
+  PrsmPtrVec getPrsms(int shift_num, ProteoformTypePtr type_ptr);
 
  private:
   PtmSlowMatchPtrVec complete_prefix_slow_match_ptrs_;

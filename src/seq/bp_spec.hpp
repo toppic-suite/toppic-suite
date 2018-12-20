@@ -13,9 +13,10 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_BASE_BP_SPEC_HPP_
-#define TOPPIC_BASE_BP_SPEC_HPP_
+#ifndef TOPPIC_SEQ_BP_SPEC_HPP_
+#define TOPPIC_SEQ_BP_SPEC_HPP_
 
+#include <memory>
 #include <vector>
 
 #include "seq/break_point.hpp"

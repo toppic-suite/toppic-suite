@@ -32,7 +32,7 @@ class OnePtmSearchProcessor {
                                  const SimplePrsmPtrVec &simple_prsm_ptr_vec,
                                  FastaIndexReaderPtr reader_ptr,
                                  PtmSearchMngPtr mng_ptr,
-                                 AlignTypePtr type_ptr);
+                                 ProteoformTypePtr type_ptr);
 
   PtmSearchMngPtr mng_ptr_;
 };

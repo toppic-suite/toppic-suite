@@ -23,7 +23,18 @@
 
 namespace toppic {
 
-LocalAnno::LocalAnno(xercesc::DOMElement* element) {
+LocalAnno:: LocalAnno(int left_pos, int right_pos, double conf,
+                      const std::vector<double> & scr_vec,
+                      double raw_scr,
+                      PtmPtr p):
+    left_pos_(left_pos),
+    right_pos_(right_pos),
+    conf_(conf),
+    scr_vec_(scr_vec),
+    raw_scr_(raw_scr),
+    ptm_ptr_(p) {}
+
+LocalAnno::LocalAnno(XmlDOMElement* element) {
   conf_ = xml_dom_util::getDoubleChildValue(element, "confidence", 0);
   std::string scr_str = xml_dom_util::getChildValue(element, "score_list", 0);
 
@@ -38,15 +49,15 @@ LocalAnno::LocalAnno(xercesc::DOMElement* element) {
   if (ptm_count == 0) {
     ptm_ptr_ = nullptr;
   } else {
-    xercesc::DOMElement* ptm_element
+    XmlDOMElement* ptm_element
         = xml_dom_util::getChildElement(element, ptm_element_name.c_str(), 0);
     ptm_ptr_ = PtmBase::getPtmPtrFromXml(ptm_element);
   }
 }
 
-void LocalAnno::appendToXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
+void LocalAnno::appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
   std::string element_name = getXmlElementName();
-  xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
+  XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
   std::string str = str_util::toString(conf_, 4);
   xml_doc->addElement(element, "confidence", str.c_str());
 

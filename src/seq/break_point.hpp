@@ -13,9 +13,10 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_BASE_BREAK_POINT_HPP_
-#define TOPPIC_BASE_BREAK_POINT_HPP_
+#ifndef TOPPIC_SEQ_BREAK_POINT_HPP_
+#define TOPPIC_SEQ_BREAK_POINT_HPP_
 
+#include <memory>
 #include <vector>
 
 #include "base/ion_type.hpp"
@@ -24,19 +25,15 @@ namespace toppic {
 
 class BreakPoint {
  public:
-  BreakPoint(double prm, double srm): prm_(prm), srm_(srm) {}
+  BreakPoint(double prm, double srm);
 
   double getPrm() {return prm_;}
 
   double getSrm() {return srm_;}
 
-  double getNTermMass(IonTypePtr ion_type_ptr) {
-    return prm_ + ion_type_ptr->getShift();
-  }
+  double getNTermMass(IonTypePtr ion_type_ptr);
 
-  double getCTermMass(IonTypePtr ion_type_ptr) {
-    return srm_ + ion_type_ptr->getShift();
-  }
+  double getCTermMass(IonTypePtr ion_type_ptr);
 
  private:
   double prm_;

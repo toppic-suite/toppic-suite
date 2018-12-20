@@ -12,15 +12,36 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include "seq/align_type.hpp"
+
+#ifndef TOPPIC_SEQ_PROTEOFORM_TYPE_HPP_
+#define TOPPIC_SEQ_PROTEOFORM_TYPE_HPP_
+
+#include <string>
+#include <memory>
 
 namespace toppic {
 
-AlignTypePtr AlignType::COMPLETE = std::make_shared<AlignType>("complete", 0);
+class ProteoformType;
+typedef std::shared_ptr<ProteoformType> ProteoformTypePtr;
 
-AlignTypePtr AlignType::PREFIX = std::make_shared<AlignType>("prefix", 1);
+class ProteoformType {
+ public:
+  static ProteoformTypePtr COMPLETE;
+  static ProteoformTypePtr PREFIX;
+  static ProteoformTypePtr SUFFIX;
+  static ProteoformTypePtr INTERNAL;
 
-AlignTypePtr AlignType::SUFFIX = std::make_shared<AlignType>("suffix", 2);
+  ProteoformType(const std::string &name, int id): name_(name), id_(id) {}
 
-AlignTypePtr AlignType::INTERNAL = std::make_shared<AlignType>("internal", 3);
+  std::string getName() {return name_;}
+
+  int getId() {return id_;}
+
+ private:
+  std::string name_;
+  int id_;
+};
+
 }  // namespace toppic
+
+#endif

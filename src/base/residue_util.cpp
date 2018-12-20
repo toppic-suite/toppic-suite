@@ -25,9 +25,48 @@ namespace toppic {
 
 namespace residue_util {
 
-ResiduePtrVec convertStrToResiduePtrVec(const std::string &seq) {
+bool isValidResidue(char c) {
+  if (c < 'A' || c > 'Z') {
+    LOG_INFO("Found unknown amino acid " << c << " in protein sequences!");
+    return false;
+  }
+  else {
+    return true;
+  }
+}
+
+char replaceResidueLetter(char c) {
+  char r = c;
+  if (c == 'B') {
+    r = 'D';
+  } else if (c == 'Z') {
+    r = 'E';
+  } else if (c == 'X') {
+    r = 'A';
+  } else if (c == 'J') {
+    r = 'I';
+  }
+  LOG_INFO("Found unknown amino acid " << c << " in protein sequences!");
+  return r;
+}
+
+// process protein sequences and remove unknown letters 
+std::string rmUnknownResidues(const std::string &ori_seq) {
+  std::string seq = "";
+  for (size_t i = 0; i < ori_seq.length(); i++) {
+    char c = ori_seq.at(i);
+    if (!isValidResidue(c)) {
+      continue;
+    }
+    char r = replaceResidueLetter(c);
+    seq = seq + r;
+  }
+  return seq;
+}
+
+ResiduePtrVec convertStrToResiduePtrVec(const std::string &ori_seq) {
+  std::string seq = rmUnknownResidues(ori_seq);
   ResiduePtrVec residue_ptr_vec;
-//  std::string seq2 = FastaSeq::rmChar(seq);
   for (size_t i = 0; i < seq.length(); i++) {
     AminoAcidPtr acid_ptr = AminoAcidBase::getAminoAcidPtrByOneLetter(seq.substr(i, 1));
     if (acid_ptr == nullptr) {

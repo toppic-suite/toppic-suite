@@ -124,15 +124,12 @@ void copyFile(const std::string &file_name,
     return;
   }
 
-  if (fs::exists(to_path)) {
-    if (over_write) {
-      fs::remove(to_path);
-    } else {
-      return;
-    }
+  if (over_write) {
+    fs::copy_file(from_path, to_path, fs::copy_option::overwrite_if_exists);
   }
-
-  fs::copy(from_path, to_path);
+  else {
+    fs::copy_file(from_path, to_path, fs::copy_option::fail_if_exists);
+  }
 }
 
 bool copyDir(const std::string &src_name,

@@ -13,34 +13,26 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_BASE_LOCAL_ANNO_HPP_
-#define TOPPIC_BASE_LOCAL_ANNO_HPP_
+#ifndef TOPPIC_SEQ_LOCAL_ANNO_HPP_
+#define TOPPIC_SEQ_LOCAL_ANNO_HPP_
 
+#include <string>
+#include <memory>
 #include <vector>
 #include <algorithm>
-#include <numeric>
-#include <string>
 
 #include "base/ptm.hpp"
-#include "base/ptm_base.hpp"
 #include "xml/xml_dom_document.hpp"
 
 namespace toppic {
 
 class LocalAnno {
  public:
-  explicit LocalAnno(xercesc::DOMElement* element);
+  explicit LocalAnno(XmlDOMElement* element);
 
   LocalAnno(int left_pos, int right_pos, double conf,
             const std::vector<double> & scr_vec,
-            double raw_scr,
-            PtmPtr p):
-      left_pos_(left_pos),
-      right_pos_(right_pos),
-      conf_(conf),
-      scr_vec_(scr_vec),
-      raw_scr_(raw_scr),
-      ptm_ptr_(p) {}
+            double raw_scr, PtmPtr p);
 
   int getLeftBpPos() {return left_pos_;}
 
@@ -64,7 +56,7 @@ class LocalAnno {
 
   static std::string getXmlElementName() {return "localization_annotation";}
 
-  void appendToXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
+  void appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
  private:
   // left and right position filtered by thredshould

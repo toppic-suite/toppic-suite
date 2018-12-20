@@ -13,35 +13,20 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_BASE_ALIGN_TYPE_HPP_
-#define TOPPIC_BASE_ALIGN_TYPE_HPP_
-
-#include <string>
-#include <memory>
+#include "base/ion_type.hpp"
+#include "seq/break_point.hpp"
 
 namespace toppic {
 
-class AlignType;
-typedef std::shared_ptr<AlignType> AlignTypePtr;
+BreakPoint::BreakPoint(double prm, double srm): 
+    prm_(prm), srm_(srm) {}
 
-class AlignType {
- public:
-  static AlignTypePtr COMPLETE;
-  static AlignTypePtr PREFIX;
-  static AlignTypePtr SUFFIX;
-  static AlignTypePtr INTERNAL;
+double BreakPoint::getNTermMass(IonTypePtr ion_type_ptr) {
+  return prm_ + ion_type_ptr->getShift();
+}
 
-  AlignType(const std::string &name, int id): name_(name), id_(id) {}
-
-  std::string getName() {return name_;}
-
-  int getId() {return id_;}
-
- private:
-  std::string name_;
-  int id_;
-};
+double BreakPoint::getCTermMass(IonTypePtr ion_type_ptr) {
+  return srm_ + ion_type_ptr->getShift();
+}
 
 }  // namespace toppic
-
-#endif

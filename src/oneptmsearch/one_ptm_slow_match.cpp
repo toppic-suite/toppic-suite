@@ -24,7 +24,7 @@ namespace toppic {
 OnePtmSlowMatch::OnePtmSlowMatch(ProteoformPtr proteo_ptr,
                                  SpectrumSetPtr spectrum_set_ptr,
                                  SimplePrsmPtr simple_prsm_ptr,
-                                 AlignTypePtr align_type_ptr,
+                                 ProteoformTypePtr align_type_ptr,
                                  PtmSearchMngPtr mng_ptr) {
   proteo_ptr_ = proteo_ptr;
   deconv_ms_ptr_vec_ = spectrum_set_ptr->getDeconvMsPtrVec();
@@ -121,12 +121,12 @@ inline DiagonalHeaderPtrVec OnePtmSlowMatch::geneOnePtmNTermShiftHeaders() {
   DiagonalHeaderUtil::addCornerDiagonals(n_extend_header_ptrs, c_extend_header_ptrs, seq_mass, prec_mono_mass_);
 
   // if not complete alignment, find best shifts
-  if (align_type_ptr_ != AlignType::COMPLETE) {
-    if (align_type_ptr_ == AlignType::SUFFIX || align_type_ptr_ == AlignType::INTERNAL) {
+  if (align_type_ptr_ != ProteoformType::COMPLETE) {
+    if (align_type_ptr_ == ProteoformType::SUFFIX || align_type_ptr_ == ProteoformType::INTERNAL) {
       // add prefix masses
       addPrefixDiagonals(n_extend_header_ptrs);
     }
-    if (align_type_ptr_ == AlignType::PREFIX || align_type_ptr_ == AlignType::INTERNAL) {
+    if (align_type_ptr_ == ProteoformType::PREFIX || align_type_ptr_ == ProteoformType::INTERNAL) {
       addSuffixDiagonals(c_extend_header_ptrs);
     }
     addComplementDiagonals(n_extend_header_ptrs, c_extend_header_ptrs);

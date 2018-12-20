@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_BASE_MASS_SHIFT_TYPE_HPP_
-#define TOPPIC_BASE_MASS_SHIFT_TYPE_HPP_
+#ifndef TOPPIC_SEQ_MASS_SHIFT_TYPE_HPP_
+#define TOPPIC_SEQ_MASS_SHIFT_TYPE_HPP_
 
 #include <memory>
 #include <vector>
@@ -45,9 +45,9 @@ class MassShiftType {
 
   std::string getName() {return name_;}
 
-  void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
+  void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
-  static MassShiftTypePtr getChangeTypePtrFromXml(xercesc::DOMElement * element);
+  static MassShiftTypePtr getChangeTypePtrFromXml(XmlDOMElement * element);
 
   static std::string getXmlElementName() {return "mass_shift_type";}
 

@@ -13,22 +13,18 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_BASE_SEGMENT_HPP_
-#define TOPPIC_BASE_SEGMENT_HPP_
+#ifndef TOPPIC_SEQ_SEGMENT_HPP_
+#define TOPPIC_SEQ_SEGMENT_HPP_
 
+#include <memory>
 #include <vector>
-
-#include "base/trunc.hpp"
 
 namespace toppic {
 
 class Segment {
  public:
-  Segment(int left_bp_pos, int right_bp_pos, double n_shift, double c_shift):
-      left_bp_pos_(left_bp_pos),
-      right_bp_pos_(right_bp_pos),
-      pep_n_term_shift_(n_shift),
-      pep_c_term_shift_(c_shift) {}
+  Segment(int left_bp_pos, int right_bp_pos, 
+          double n_shift, double c_shift);
 
   int getLeftBpPos () {return left_bp_pos_;}
 

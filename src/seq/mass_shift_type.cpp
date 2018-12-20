@@ -14,8 +14,8 @@
 
 #include <string>
 
-#include "seq/mass_shift_type.hpp"
 #include "xml/xml_dom_util.hpp"
+#include "seq/mass_shift_type.hpp"
 
 namespace toppic {
 
@@ -29,14 +29,14 @@ const MassShiftTypePtr MassShiftType::VARIABLE         = std::make_shared<MassSh
 
 const MassShiftTypePtr MassShiftType::UNEXPECTED       = std::make_shared<MassShiftType>(5, "Unexpected");
 
-void MassShiftType::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
+void MassShiftType::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
   std::string element_name = MassShiftType::getXmlElementName();
-  xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
+  XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
   xml_doc->addElement(element, "name", name_.c_str());
   parent->appendChild(element);
 }
 
-MassShiftTypePtr MassShiftType::getChangeTypePtrFromXml(xercesc::DOMElement * element) {
+MassShiftTypePtr MassShiftType::getChangeTypePtrFromXml(XmlDOMElement * element) {
   std::string name = xml_dom_util::getChildValue(element, "name", 0);
   if (name == MassShiftType::INPUT->getName()) {
     return MassShiftType::INPUT;

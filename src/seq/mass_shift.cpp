@@ -14,32 +14,37 @@
 
 #include <string>
 
-#include "seq/mass_shift.hpp"
-#include "base/mod_base.hpp"
 #include "util/str_util.hpp"
 #include "xml/xml_dom_util.hpp"
+#include "seq/mass_shift.hpp"
 
 namespace toppic {
 
-MassShift::MassShift(xercesc::DOMElement* element) {
+MassShift::MassShift(int left_bp_pos, int right_bp_pos, MassShiftTypePtr type_ptr):
+    left_bp_pos_(left_bp_pos),
+    right_bp_pos_(right_bp_pos),
+    type_ptr_(type_ptr),
+    shift_(0.0) { }
+
+MassShift::MassShift(XmlDOMElement* element) {
   left_bp_pos_ = xml_dom_util::getIntChildValue(element, "shift_left_bp_pos", 0);
 
   right_bp_pos_ = xml_dom_util::getIntChildValue(element, "shift_right_bp_pos", 0);
 
   std::string ct_element_name = MassShiftType::getXmlElementName();
-  xercesc::DOMElement* ct_element
+  XmlDOMElement* ct_element
       = xml_dom_util::getChildElement(element, ct_element_name.c_str(), 0);
   type_ptr_ = MassShiftType::getChangeTypePtrFromXml(ct_element);
 
   shift_ = xml_dom_util::getDoubleChildValue(element, "shift", 0);
 
-  xercesc::DOMElement* change_list_element = xml_dom_util::getChildElement(element, "change_list", 0);
+  XmlDOMElement* change_list_element = xml_dom_util::getChildElement(element, "change_list", 0);
 
   std::string change_element_name = Change::getXmlElementName();
   int change_len = xml_dom_util::getChildCount(change_list_element, change_element_name.c_str());
 
   for (int i = 0; i < change_len; i++) {
-    xercesc::DOMElement* change_element
+    XmlDOMElement* change_element
         = xml_dom_util::getChildElement(change_list_element, change_element_name.c_str(), i);
     change_vec_.push_back(std::make_shared<Change>(change_element));
   }
@@ -80,9 +85,9 @@ std::string MassShift::getSeqStr() {
   return seq_str;
 }
 
-void MassShift::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
+void MassShift::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
   std::string element_name = getXmlElementName();
-  xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
+  XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
   std::string str = str_util::toString(left_bp_pos_);
   xml_doc->addElement(element, "shift_left_bp_pos", str.c_str());
   str = str_util::toString(right_bp_pos_);
@@ -92,7 +97,7 @@ void MassShift::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) 
   xml_doc->addElement(element, "shift", str.c_str());
 
   element_name = Change::getXmlElementName() + "_list";
-  xercesc::DOMElement* cl = xml_doc->createElement(element_name.c_str());
+  XmlDOMElement* cl = xml_doc->createElement(element_name.c_str());
   for (size_t i = 0; i < change_vec_.size(); i++) {
     change_vec_[i]->appendXml(xml_doc, cl);
   }
