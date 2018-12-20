@@ -15,6 +15,8 @@
 #include <string>
 
 #include "util/logger.hpp"
+#include "xml/xml_dom_parser.hpp"
+#include "xml/xml_dom_document.hpp"
 #include "xml/xml_dom_util.hpp"
 #include "base/prot_mod_base.hpp"
 
@@ -30,11 +32,11 @@ void ProtModBase::initBase(const std::string &file_name) {
   toppic::XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
     toppic::XmlDOMDocument doc(parser, file_name.c_str());
-    xercesc::DOMElement* parent = doc.getDocumentElement();
+    XmlDOMElement* parent = doc.getDocumentElement();
     std::string element_name = ProtMod::getXmlElementName();
     int mod_num = xml_dom_util::getChildCount(parent, element_name.c_str());
     for (int i = 0; i < mod_num; i++) {
-      xercesc::DOMElement* element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
+      XmlDOMElement* element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
       ProtModPtr prot_mod_ptr = std::make_shared<ProtMod>(element);
       //  LOG_DEBUG("ptm index " << i << " shift  " << prot_mod_ptr->getProtShift());
       prot_mod_ptr_vec_.push_back(prot_mod_ptr);
@@ -78,7 +80,7 @@ ProtModPtrVec ProtModBase::getProtModPtrByType(const std::string &type) {
   return prot_mods;
 }
 
-ProtModPtr ProtModBase::getProtModPtrFromXml(xercesc::DOMElement * element) {
+ProtModPtr ProtModBase::getProtModPtrFromXml(XmlDOMElement * element) {
   std::string name = ProtMod::getNameFromXml(element);
   ProtModPtr prot_mod_ptr = getProtModPtrByName(name);
   return prot_mod_ptr;

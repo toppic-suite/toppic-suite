@@ -13,10 +13,8 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_BASE_XML_DOM_ERR_HANDLER_HPP_
-#define TOPPIC_BASE_XML_DOM_ERR_HANDLER_HPP_
-
-#include <iostream>
+#ifndef TOPPIC_XML_XML_DOM_ERR_HANDLER_HPP_
+#define TOPPIC_XML_XML_DOM_ERR_HANDLER_HPP_
 
 #include <xercesc/sax/HandlerBase.hpp>
 

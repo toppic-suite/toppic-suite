@@ -15,6 +15,8 @@
 #include <string>
 
 #include "util/logger.hpp"
+#include "xml/xml_dom_parser.hpp"
+#include "xml/xml_dom_document.hpp"
 #include "xml/xml_dom_util.hpp"
 #include "base/ptm_base.hpp"
 #include "base/mod_base.hpp"
@@ -68,12 +70,12 @@ ProtModPtrVec readProtMod(const std::string &file_name) {
   ProtModPtrVec mod_ptr_vec;
   if (parser) {
     XmlDOMDocument doc(parser, file_name.c_str());
-    xercesc::DOMElement* parent = doc.getDocumentElement();
+    XmlDOMElement* parent = doc.getDocumentElement();
     std::string element_name = ProtMod::getXmlElementName();
     int mod_num = xml_dom_util::getChildCount(parent, element_name.c_str());
     LOG_DEBUG("mod num " << mod_num);
     for (int i = 0; i < mod_num; i++) {
-      xercesc::DOMElement* element
+      XmlDOMElement* element
           = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
       ProtModPtr ptr = ProtModBase::getProtModPtrFromXml(element);
       mod_ptr_vec.push_back(ptr);

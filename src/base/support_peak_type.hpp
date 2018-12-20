@@ -20,7 +20,7 @@
 #include <memory>
 #include <vector>
 
-#include <xercesc/dom/DOMElement.hpp>
+#include "xml/xml_dom_element.hpp"
 
 namespace toppic {
 
@@ -28,7 +28,7 @@ class SupportPeakType {
  public:
   SupportPeakType(int id, const std::string &name);
 
-  explicit SupportPeakType(xercesc::DOMElement* element);
+  explicit SupportPeakType(XmlDOMElement* element);
 
   int getId() {return id_;}
 

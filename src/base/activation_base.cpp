@@ -14,6 +14,8 @@
 
 #include <string>
 
+#include "xml/xml_dom_parser.hpp"
+#include "xml/xml_dom_document.hpp"
 #include "xml/xml_dom_util.hpp"
 #include "base/activation_base.hpp"
 
@@ -26,11 +28,11 @@ void ActivationBase::initBase(const std::string &file_name) {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
     XmlDOMDocument doc(parser, file_name.c_str());
-    xercesc::DOMElement* parent = doc.getDocumentElement();
+    XmlDOMElement* parent = doc.getDocumentElement();
     std::string element_name = Activation::getXmlElementName();
     int activation_num = xml_dom_util::getChildCount(parent, element_name.c_str());
     for (int i = 0; i < activation_num; i++) {
-      xercesc::DOMElement* element
+      XmlDOMElement* element
           = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
       ActivationPtr ptr = std::make_shared<Activation>(element);
       activation_ptr_vec_.push_back(ptr);
@@ -48,7 +50,7 @@ ActivationPtr ActivationBase::getActivationPtrByName(const std::string &name) {
   return ActivationPtr(nullptr);
 }
 
-ActivationPtr ActivationBase::getActivationPtrFromXml(xercesc::DOMElement * element) {
+ActivationPtr ActivationBase::getActivationPtrFromXml(XmlDOMElement * element) {
   std::string name = Activation::getNameFromXml(element);
   ActivationPtr activation_ptr = getActivationPtrByName(name);
   return activation_ptr;

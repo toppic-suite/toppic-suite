@@ -17,7 +17,6 @@
 #include <vector>
 
 #include "util/logger.hpp"
-#include "xml/xml_dom.hpp"
 #include "seq/mass_shift_type.hpp"
 #include "base/prot_mod_base.hpp"
 #include "base/prot_mod_util.hpp"

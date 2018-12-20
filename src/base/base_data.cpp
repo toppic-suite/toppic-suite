@@ -55,7 +55,7 @@ void init(const std::string & resource_dir) {
         = base_data_dir + separator + base_data::getBaseDataConfigFileName();
     LOG_DEBUG("config_file_name: " << config_file_name);
     XmlDOMDocument doc(parser, config_file_name.c_str());
-    xercesc::DOMElement* root = doc.getDocumentElement();
+    XmlDOMElement* root = doc.getDocumentElement();
     LOG_DEBUG("root " << root);
     std::string acid_file_name = xml_dom_util::getChildValue(root, "acid_list_file_name", 0);
     acid_file_name = base_data_dir + separator + acid_file_name;

@@ -15,6 +15,8 @@
 
 #include <string>
 
+#include "xml/xml_dom_parser.hpp"
+#include "xml/xml_dom_document.hpp"
 #include "xml/xml_dom_util.hpp"
 #include "base/support_peak_type_base.hpp"
 
@@ -28,11 +30,11 @@ void SPTypeBase::initBase(const std::string &file_name) {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
     XmlDOMDocument doc(parser, file_name.c_str());
-    xercesc::DOMElement* parent = doc.getDocumentElement();
+    XmlDOMElement* parent = doc.getDocumentElement();
     std::string element_name = SupportPeakType::getXmlElementName();
     int prm_peak_type_num = xml_dom_util::getChildCount(parent, element_name.c_str());
     for (int i = 0; i < prm_peak_type_num; i++) {
-      xercesc::DOMElement* element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
+      XmlDOMElement* element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
       SPTypePtr sp_type_ptr = std::make_shared<SupportPeakType>(element);
       sp_type_ptr_vec_.push_back(sp_type_ptr);
       if (sp_type_ptr->getName() == getName_N_TERM()) {

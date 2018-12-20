@@ -13,44 +13,35 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_XML_XML_WRITER_HPP_
-#define TOPPIC_XML_XML_WRITER_HPP_
+#ifndef TOPPIC_XML_XML_DOM_IMPL_HPP_
+#define TOPPIC_XML_XML_DOM_IMPL_HPP_
 
 #include <string>
-#include <fstream>
-#include <memory>
 
-#include "xml/xml_dom_document.hpp"
+#include <xercesc/dom/DOMDocument.hpp>
+#include <xercesc/dom/DOMLSSerializer.hpp>
+#include <xercesc/dom/DOMImplementation.hpp>
 
 namespace toppic {
 
-class XmlWriter {
+/* DOM Implementation */
+class XmlDOMImpl{
  public:
-  XmlWriter(const std::string &file_name,
-            const std::string &root);
-
-  ~XmlWriter();
-
-  XmlDOMDocument* getDoc(){return doc_;}
-
-  void write(xercesc::DOMElement* element);
-
-  void write_str(const std::string & str);
-
-  void close();
+  XmlDOMImpl();
+  ~XmlDOMImpl();
+  xercesc::DOMDocument* createDoc(const std::string &root);
+  xercesc::DOMLSSerializer* createSerializer();
 
  private:
-  xercesc::DOMLSSerializer * serializer_;
-
-  XmlDOMDocument * doc_;
-
-  std::ofstream file_;
-
-  std::string root_ = "";
+  xercesc::DOMImplementation* impl_;
 };
 
-typedef std::shared_ptr<XmlWriter> XmlWriterPtr;
+class XmlDOMImplFactory {
+ private:
+  static XmlDOMImpl* dom_impl_;
+ public:
+  static XmlDOMImpl* getXmlDOMImplInstance();
+};
 
-} /* namespace toppic */
-
-#endif /* XML_WRITER_HPP_ */
+}  // namespace toppic
+#endif

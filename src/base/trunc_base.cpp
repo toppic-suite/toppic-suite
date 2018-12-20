@@ -28,11 +28,11 @@ void TruncBase::initBase(const std::string &file_name) {
   toppic::XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
     toppic::XmlDOMDocument doc(parser, file_name.c_str());
-    xercesc::DOMElement* parent = doc.getDocumentElement();
+    XmlDOMElement* parent = doc.getDocumentElement();
     std::string element_name = Trunc::getXmlElementName();
     int trunc_num = xml_dom_util::getChildCount(parent, element_name.c_str());
     for (int i = 0; i < trunc_num; i++) {
-      xercesc::DOMElement* element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
+      XmlDOMElement* element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
       TruncPtr trunc_ptr = std::make_shared<Trunc>(element);
       trunc_ptr_vec_.push_back(trunc_ptr);
     }
@@ -49,7 +49,7 @@ TruncPtr TruncBase::getTruncPtrByName(const std::string &name) {
   return TruncPtr(nullptr);
 }
 
-TruncPtr TruncBase::getTruncPtrFromXml(xercesc::DOMElement * element) {
+TruncPtr TruncBase::getTruncPtrFromXml(XmlDOMElement * element) {
   std::string name = Trunc::getNameFromXml(element);
   TruncPtr trunc_ptr = getTruncPtrByName(name);
   return trunc_ptr;

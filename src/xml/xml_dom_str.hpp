@@ -13,60 +13,14 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_BASE_XML_DOM_HPP_
-#define TOPPIC_BASE_XML_DOM_HPP_
+#ifndef TOPPIC_XML_XML_DOM_STR_HPP_
+#define TOPPIC_XML_XML_DOM_STR_HPP_
 
 #include <string>
 
-#include <xercesc/parsers/XercesDOMParser.hpp>
-#include <xercesc/dom/DOM.hpp>
-#include <xercesc/util/PlatformUtils.hpp>
 #include <xercesc/util/XMLString.hpp>
-#include <xercesc/sax/HandlerBase.hpp>
-#include <xercesc/framework/MemBufInputSource.hpp>
 
 namespace toppic {
-
-// DOM parser
-class XmlDOMParser {
- public:
-  XmlDOMParser();
-  ~XmlDOMParser();
-
-  xercesc::DOMDocument* parse(const std::string &xml_file);
-
-  xercesc::DOMDocument* parse(const xercesc::MemBufInputSource &str_buf);
-
- private:
-  xercesc::XercesDOMParser* parser_;
-  xercesc::ErrorHandler*    err_handler_;
-};
-
-class XmlDOMParserFactory {
- private:
-  static XmlDOMParser* dom_parser_;
- public:
-  static XmlDOMParser* getXmlDOMParserInstance();
-};
-
-/* DOM Implementation */
-class XmlDOMImpl{
- public:
-  XmlDOMImpl();
-  ~XmlDOMImpl();
-  xercesc::DOMDocument* createDoc(const std::string &root);
-  xercesc::DOMLSSerializer* createSerializer();
-
- private:
-  xercesc::DOMImplementation* impl_;
-};
-
-class XmlDOMImplFactory {
- private:
-  static XmlDOMImpl* dom_impl_;
- public:
-  static XmlDOMImpl* getXmlDOMImplInstance();
-};
 
 class XStr {
  public:

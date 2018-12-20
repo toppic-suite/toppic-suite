@@ -31,7 +31,7 @@ class ResidueBase {
 
   static ResiduePtr getEmptyResiduePtr() {return empty_residue_ptr_;}
 
-  static ResiduePtr getResiduePtrFromXml(xercesc::DOMElement * element);
+  static ResiduePtr getResiduePtrFromXml(XmlDOMElement * element);
 
   static ResiduePtr getBaseResiduePtr(ResiduePtr residue_ptr);
 

@@ -16,6 +16,7 @@
 #include <string>
 
 #include "util/logger.hpp"
+#include "xml/xml_dom_document.hpp"
 #include "xml/xml_dom_util.hpp"
 #include "base/mod.hpp"
 #include "base/residue_base.hpp"
@@ -26,11 +27,11 @@ Mod::Mod(ResiduePtr ori_residue_ptr, ResiduePtr mod_residue_ptr):
     ori_residue_ptr_(ori_residue_ptr),
     mod_residue_ptr_(mod_residue_ptr) {}
 
-Mod::Mod(xercesc::DOMElement* element) {
-  xercesc::DOMElement* ori_residue_element
+Mod::Mod(XmlDOMElement* element) {
+  XmlDOMElement* ori_residue_element
       = xml_dom_util::getChildElement(element, "ori_residue", 0);
   ori_residue_ptr_ = ResidueBase::getResiduePtrFromXml(ori_residue_element);
-  xercesc::DOMElement* mod_residue_element
+  XmlDOMElement* mod_residue_element
       = xml_dom_util::getChildElement(element, "mod_residue", 0);
   mod_residue_ptr_ = ResidueBase::getResiduePtrFromXml(mod_residue_element);
 }
@@ -44,9 +45,9 @@ double Mod::getShift() {
   return mod_residue_ptr_->getMass() - ori_residue_ptr_->getMass();
 }
 
-void Mod::appendToXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
+void Mod::appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
   std::string element_name = Mod::getXmlElementName();
-  xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
+  XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
   ori_residue_ptr_->appendXml(xml_doc, element, "ori_residue");
   mod_residue_ptr_->appendXml(xml_doc, element, "mod_residue");
   parent->appendChild(element);

@@ -21,7 +21,7 @@ SupportPeakType::SupportPeakType(int id, const std::string &name):
     id_(id), 
     name_(name) {}
 
-SupportPeakType::SupportPeakType(xercesc::DOMElement* element) {
+SupportPeakType::SupportPeakType(XmlDOMElement* element) {
   id_ = xml_dom_util::getIntChildValue(element, "id", 0);
   name_ = xml_dom_util::getChildValue(element, "name", 0);
 }

@@ -13,14 +13,14 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_BASE_XML_DOM_UTIL_HPP_
-#define TOPPIC_BASE_XML_DOM_UTIL_HPP_
+#ifndef TOPPIC_XML_XML_DOM_UTIL_HPP_
+#define TOPPIC_XML_XML_DOM_UTIL_HPP_
 
-#include <iostream>
-#include <fstream>
 #include <string>
 
-#include "xml/xml_dom_document.hpp"
+#include <xercesc/dom/DOMElement.hpp>
+#include <xercesc/dom/DOMDocument.hpp>
+#include <xercesc/dom/DOMLSSerializer.hpp>
 
 namespace toppic {
 

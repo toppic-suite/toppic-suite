@@ -13,27 +13,14 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_BASE_ACTIVATION_BASE_HPP_
-#define TOPPIC_BASE_ACTIVATION_BASE_HPP_
+#ifndef TOPPIC_XML_XML_DOM_ELEMENT_HPP_
+#define TOPPIC_XML_XML_DOM_ELEMENT_HPP_
 
-#include <string>
-
-#include "base/activation.hpp"
+#include <xercesc/dom/DOMElement.hpp>
 
 namespace toppic {
 
-class ActivationBase {
- public:
-  static void initBase(const std::string &file_name);
-
-  static ActivationPtr getActivationPtrByName(const std::string &name);
-
-  static ActivationPtr getActivationPtrFromXml(XmlDOMElement * element);
-
- private:
-  static ActivationPtrVec activation_ptr_vec_;
-};
+typedef xercesc::DOMElement XmlDOMElement;
 
 }  // namespace toppic
-
 #endif

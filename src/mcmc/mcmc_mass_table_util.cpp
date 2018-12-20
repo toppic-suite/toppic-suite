@@ -17,6 +17,7 @@
 #include <string>
 #include <algorithm>
 #include <vector>
+#include <fstream>
 
 #include "base/residue_util.hpp"
 

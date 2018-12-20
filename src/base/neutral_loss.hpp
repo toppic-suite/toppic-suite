@@ -20,7 +20,7 @@
 #include <vector>
 #include <memory>
 
-#include <xercesc/dom/DOMElement.hpp>
+#include "xml/xml_dom_element.hpp"
 
 namespace toppic {
 
@@ -28,7 +28,7 @@ class NeutralLoss {
  public:
   NeutralLoss(const std::string &name, double mass);
 
-  explicit NeutralLoss(xercesc::DOMElement* element);
+  explicit NeutralLoss(XmlDOMElement* element);
 
   std::string getName() {return name_;}
 

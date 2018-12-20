@@ -13,25 +13,38 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_BASE_ACTIVATION_BASE_HPP_
-#define TOPPIC_BASE_ACTIVATION_BASE_HPP_
+#ifndef TOPPIC_XML_XML_DOM_PARSER_HPP_
+#define TOPPIC_XML_XML_DOM_PARSER_HPP_
 
 #include <string>
 
-#include "base/activation.hpp"
+#include <xercesc/parsers/XercesDOMParser.hpp>
+#include <xercesc/dom/DOMDocument.hpp>
+#include <xercesc/sax/HandlerBase.hpp>
+#include <xercesc/framework/MemBufInputSource.hpp>
 
 namespace toppic {
 
-class ActivationBase {
+// DOM parser
+class XmlDOMParser {
  public:
-  static void initBase(const std::string &file_name);
+  XmlDOMParser();
+  ~XmlDOMParser();
 
-  static ActivationPtr getActivationPtrByName(const std::string &name);
+  xercesc::DOMDocument* parse(const std::string &xml_file);
 
-  static ActivationPtr getActivationPtrFromXml(XmlDOMElement * element);
+  xercesc::DOMDocument* parse(const xercesc::MemBufInputSource &str_buf);
 
  private:
-  static ActivationPtrVec activation_ptr_vec_;
+  xercesc::XercesDOMParser* parser_;
+  xercesc::ErrorHandler*    err_handler_;
+};
+
+class XmlDOMParserFactory {
+ private:
+  static XmlDOMParser* dom_parser_;
+ public:
+  static XmlDOMParser* getXmlDOMParserInstance();
 };
 
 }  // namespace toppic

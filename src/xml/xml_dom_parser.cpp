@@ -13,26 +13,18 @@
 //limitations under the License.
 
 
-#include <iostream>
 #include <xercesc/util/PlatformUtils.hpp>
-#include <xercesc/util/XMLString.hpp>
-#include <xercesc/dom/DOM.hpp>
-#include <xercesc/util/OutOfMemoryException.hpp>
-#include <xercesc/framework/XMLFormatter.hpp>
-#include <xercesc/framework/LocalFileFormatTarget.hpp>
 #include <xercesc/dom/DOMDocument.hpp>
-#include <xercesc/dom/DOMImplementation.hpp>
-#include <xercesc/dom/DOMImplementationRegistry.hpp>
-#include <xercesc/dom/DOMLSSerializer.hpp>
-#include <xercesc/dom/DOMLSOutput.hpp>
+#include <xercesc/framework/MemBufInputSource.hpp>
 
-#include "xml/xml_dom.hpp"
 #include "xml/xml_dom_err_handler.hpp"
+#include "xml/xml_dom_parser.hpp"
+
+//#include <xercesc/util/OutOfMemoryException.hpp>
  
 namespace toppic {
 
 XmlDOMParser* XmlDOMParserFactory::dom_parser_ = nullptr;
-
 
 /* XmlDOMParser */
 XmlDOMParser::XmlDOMParser() : parser_(nullptr), err_handler_(nullptr) {
@@ -65,42 +57,6 @@ XmlDOMParser* XmlDOMParserFactory::getXmlDOMParserInstance() {
     dom_parser_ = new XmlDOMParser();
   }
   return dom_parser_;
-}
-
-/* XmlDOMImplenmation */
-XmlDOMImpl* XmlDOMImplFactory::dom_impl_ = nullptr;
-
-XmlDOMImpl::XmlDOMImpl() {
-  impl_ = xercesc::DOMImplementationRegistry::getDOMImplementation(X("Core"));
-}
-
-XmlDOMImpl::~XmlDOMImpl() {
-  if (impl_ != nullptr) {
-    delete impl_;
-  }
-}
-
-xercesc::DOMDocument* XmlDOMImpl::createDoc(const std::string &root) {
-  xercesc::DOMDocument* doc = impl_->createDocument(0, X(root.c_str()), 0);
-  return doc;
-}
-
-xercesc::DOMLSSerializer* XmlDOMImpl::createSerializer() {
-  xercesc::DOMLSSerializer* writer = impl_->createLSSerializer();
-  writer->getDomConfig()->setParameter(
-      xercesc::XMLUni::fgDOMWRTFormatPrettyPrint, true);
-  writer->getDomConfig()->setParameter(
-      xercesc::XMLUni::fgDOMWRTDiscardDefaultContent, true);
-  writer->setNewLine(X("\n"));
-  return writer;
-}
-
-/*XmlDOMImplFactory */
-XmlDOMImpl* XmlDOMImplFactory::getXmlDOMImplInstance() {
-  if (dom_impl_ == nullptr) {
-    dom_impl_ = new XmlDOMImpl();
-  }
-  return dom_impl_;
 }
 
 }

@@ -20,7 +20,7 @@
 #include <vector>
 #include <memory>
 
-#include <xercesc/dom/DOMElement.hpp>
+#include "xml/xml_dom_element.hpp"
 
 namespace toppic {
 
@@ -34,7 +34,7 @@ class Ptm {
   Ptm(const std::string &name, const std::string &abbr_name,
       double mono_mass, int unimod_id);
 
-  explicit Ptm(xercesc::DOMElement* element);
+  explicit Ptm(XmlDOMElement* element);
 
   const std::string& getName() {return name_;}
 
@@ -45,9 +45,9 @@ class Ptm {
 
   int getUnimodId() {return unimod_id_;}
 
-  void appendAbbrNameToXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
+  void appendAbbrNameToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
-  static std::string getAbbrNameFromXml(xercesc::DOMElement * element);
+  static std::string getAbbrNameFromXml(XmlDOMElement * element);
 
   static std::string getXmlElementName() {return "ptm";}
 

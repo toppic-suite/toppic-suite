@@ -18,7 +18,7 @@
 
 #include <string>
 
-#include <xercesc/dom/DOMElement.hpp>
+#include "xml/xml_dom_element.hpp"
 
 #include "base/trunc.hpp"
 
@@ -32,7 +32,7 @@ class TruncBase {
 
   static TruncPtr getTruncPtrByName(const std::string &name);
 
-  static TruncPtr getTruncPtrFromXml(xercesc::DOMElement * element);
+  static TruncPtr getTruncPtrFromXml(XmlDOMElement * element);
 
  private:
   static TruncPtrVec trunc_ptr_vec_;

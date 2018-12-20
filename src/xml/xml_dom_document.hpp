@@ -13,26 +13,19 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_BASE_XML_DOM_DOCUMENT_HPP_
-#define TOPPIC_BASE_XML_DOM_DOCUMENT_HPP_
+#ifndef TOPPIC_XML_XML_DOM_DOCUMENT_HPP_
+#define TOPPIC_XML_XML_DOM_DOCUMENT_HPP_
 
-#include <iostream>
-#include <fstream>
-#include <string>
-
-#include <xercesc/parsers/XercesDOMParser.hpp>
-#include <xercesc/dom/DOM.hpp>
-#include <xercesc/sax/HandlerBase.hpp>
-#include <xercesc/util/XMLString.hpp>
-#include <xercesc/util/PlatformUtils.hpp>
+#include <xercesc/dom/DOMDocument.hpp>
+#include <xercesc/dom/DOMImplementation.hpp>
 #include <xercesc/framework/MemBufInputSource.hpp>
 
-#include "xml/xml_dom.hpp"
+#include "xml/xml_dom_element.hpp"
+#include "xml/xml_dom_parser.hpp"
 
 namespace toppic {
 
 class XmlDOMDocument {
-
  public:
   XmlDOMDocument(XmlDOMParser* parser, const char* xml_file);
   XmlDOMDocument(XmlDOMParser* parser, const xercesc::MemBufInputSource &str_buf);
@@ -62,6 +55,7 @@ class XmlDOMDocument {
  private:
   xercesc::DOMDocument* doc_;
 };
+
 
 }
 

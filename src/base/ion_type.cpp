@@ -34,7 +34,7 @@ IonType::IonType(const std::string &name, bool n_term, double shift):
       }
     }
 
-IonType::IonType(xercesc::DOMElement* element) {
+IonType::IonType(XmlDOMElement* element) {
   name_ = xml_dom_util::getChildValue(element, "name", 0);
   n_term_ = xml_dom_util::getBoolChildValue(element, "n_term", 0);
   shift_ = xml_dom_util::getDoubleChildValue(element, "shift", 0);
@@ -45,8 +45,8 @@ IonType::IonType(xercesc::DOMElement* element) {
   }
 }
 
-void IonType::appendNameToXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
-  xercesc::DOMElement* element = xml_doc->createElement("ion_type");
+void IonType::appendNameToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
+  XmlDOMElement* element = xml_doc->createElement("ion_type");
   xml_doc->addElement(element, "name", name_.c_str());
   parent->appendChild(element);
 }
