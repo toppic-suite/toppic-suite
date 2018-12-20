@@ -16,8 +16,6 @@
 #ifndef TOPPIC_BASE_PROT_MOD_HPP_
 #define TOPPIC_BASE_PROT_MOD_HPP_
 
-#include <xercesc/dom/DOM.hpp>
-
 #include "base/mod.hpp"
 #include "base/trunc.hpp"
 
@@ -30,7 +28,7 @@ class ProtMod {
   ProtMod(const std::string &name, const std::string &type,
           TruncPtr trunc_ptr, ModPtr mod_ptr);
 
-  ProtMod(xercesc::DOMElement* element); 
+  ProtMod(XmlDOMElement* element); 
 
   const std::string& getName() { return name_;};
 
@@ -48,11 +46,11 @@ class ProtMod {
 
   bool isAcetylation();
 
-  void appendNameToXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+  void appendNameToXml(XmlDOMDocument* xml_doc,XmlDOMElement* parent);
 
   static std::string getXmlElementName() {return "prot_mod";}
 
-  static std::string getNameFromXml(xercesc::DOMElement * element);
+  static std::string getNameFromXml(XmlDOMElement * element);
 
  private:
   std::string name_;

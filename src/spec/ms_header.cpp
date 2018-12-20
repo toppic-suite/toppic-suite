@@ -19,10 +19,11 @@
 #include <string>
 #include <vector>
 
-#include "base/activation_base.hpp"
 #include "util/logger.hpp"
 #include "util/str_util.hpp"
+#include "xml/xml_dom_document.hpp"
 #include "xml/xml_dom_util.hpp"
+#include "base/activation_base.hpp"
 #include "spec/peak_util.hpp"
 #include "spec/ms_header.hpp"
 

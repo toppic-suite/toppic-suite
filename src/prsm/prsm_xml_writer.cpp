@@ -18,6 +18,7 @@
 
 #include "util/logger.hpp"
 #include "util/file_util.hpp"
+#include "xml/xml_dom_impl.hpp"
 #include "xml/xml_dom_util.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 

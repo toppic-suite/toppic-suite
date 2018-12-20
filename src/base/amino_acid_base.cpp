@@ -37,12 +37,12 @@ void AminoAcidBase::initBase(const std::string &file_name) {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
     XmlDOMDocument doc(parser, file_name.c_str());
-    xercesc::DOMElement* parent = doc.getDocumentElement();
+    XmlDOMElement* parent = doc.getDocumentElement();
     std::string element_name = AminoAcid::getXmlElementName();
     int acid_num = xml_dom_util::getChildCount(parent, element_name.c_str());
     LOG_DEBUG("acid num " << acid_num);
     for (int i = 0; i < acid_num; i++) {
-      xercesc::DOMElement* element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
+      XmlDOMElement* element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
       AminoAcidPtr ptr = std::make_shared<AminoAcid>(element);
       amino_acid_ptr_vec_.push_back(ptr);
 
@@ -82,7 +82,7 @@ bool AminoAcidBase::containsThreeLetter(const std::string &three_letter) {
   return getAminoAcidPtrByThreeLetter(three_letter).get() != nullptr;
 }
 
-AminoAcidPtr AminoAcidBase::getAminoAcidPtrFromXml(xercesc::DOMElement * element) {
+AminoAcidPtr AminoAcidBase::getAminoAcidPtrFromXml(XmlDOMElement * element) {
   std::string name = AminoAcid::getNameFromXml(element);
   AminoAcidPtr acid_ptr = getAminoAcidPtrByName(name);
   return acid_ptr;

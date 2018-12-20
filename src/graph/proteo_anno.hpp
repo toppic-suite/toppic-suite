@@ -22,7 +22,6 @@
 #include <memory>
 #include <map>
 
-#include "xml/xml_dom.hpp"
 #include "xml/xml_dom_document.hpp"
 
 #include "prsm/prsm_para.hpp"

@@ -20,7 +20,7 @@
 #include <string>
 #include <vector>
 
-#include <xercesc/dom/DOMElement.hpp>
+#include "xml/xml_dom_element.hpp"
 
 namespace toppic {
 
@@ -32,7 +32,7 @@ class AminoAcid {
             const std::string &three_letter, const std::string &composition,
             double mono_mass, double avg_mass);
 
-  explicit AminoAcid(xercesc::DOMElement* element);
+  explicit AminoAcid(XmlDOMElement* element);
 
   // Get amino acid composition
   std::string getComposition() {return composition_;}
@@ -49,9 +49,9 @@ class AminoAcid {
 
   static std::string getXmlElementName() {return "amino_acid";}
 
-  void appendNameToXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
+  void appendNameToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
-  static std::string getNameFromXml(xercesc::DOMElement * element);
+  static std::string getNameFromXml(XmlDOMElement * element);
 
  private:
   // Name of amino acid

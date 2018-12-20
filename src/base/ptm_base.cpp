@@ -17,7 +17,6 @@
 #include <algorithm>
 
 #include "util/logger.hpp"
-#include "xml/xml_dom.hpp"
 #include "xml/xml_dom_document.hpp"
 #include "xml/xml_dom_util.hpp"
 #include "base/ptm_base.hpp"
@@ -36,11 +35,11 @@ void PtmBase::initBase(const std::string &file_name) {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
     XmlDOMDocument doc(parser, file_name.c_str());
-    xercesc::DOMElement* parent = doc.getDocumentElement();
+    XmlDOMElement* parent = doc.getDocumentElement();
     std::string element_name = Ptm::getXmlElementName();
     int ptm_num = xml_dom_util::getChildCount(parent, element_name.c_str());
     for (int i = 0; i < ptm_num; i++) {
-      xercesc::DOMElement* element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
+      XmlDOMElement* element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
       PtmPtr ptm_ptr = std::make_shared<Ptm>(element);
       ptm_ptr_vec_.push_back(ptm_ptr);
       // check empty ptr
@@ -93,7 +92,7 @@ bool PtmBase::containsAbbrName(const std::string &abbr_name) {
   return getPtmPtrByAbbrName(abbr_name).get() != nullptr;
 }
 
-PtmPtr PtmBase::getPtmPtrFromXml(xercesc::DOMElement * element) {
+PtmPtr PtmBase::getPtmPtrFromXml(XmlDOMElement * element) {
   std::string abbr_name = Ptm::getAbbrNameFromXml(element);
   PtmPtr ptm_ptr = getPtmPtrByAbbrName(abbr_name);
   return ptm_ptr;

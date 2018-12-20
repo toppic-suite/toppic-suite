@@ -15,6 +15,8 @@
 
 #include <string>
 
+#include "xml/xml_dom_parser.hpp"
+#include "xml/xml_dom_document.hpp"
 #include "xml/xml_dom_util.hpp"
 #include "base/neutral_loss_base.hpp"
 
@@ -28,11 +30,11 @@ void NeutralLossBase::initBase(const std::string &file_name) {
   XmlDOMParser * parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
     toppic::XmlDOMDocument doc(parser, file_name.c_str());
-    xercesc::DOMElement* parent = doc.getDocumentElement();
+    XmlDOMElement* parent = doc.getDocumentElement();
     std::string element_name = NeutralLoss::getXmlElementName();
     int neutral_loss_num = xml_dom_util::getChildCount(parent, element_name.c_str());
     for (int i = 0; i < neutral_loss_num; i++) {
-      xercesc::DOMElement* element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
+      XmlDOMElement* element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
       NeutralLossPtr neutral_loss_ptr = std::make_shared<NeutralLoss>(element);
       neutral_loss_ptr_vec_.push_back(neutral_loss_ptr);
       if (neutral_loss_ptr->getName() == getName_NONE()) {

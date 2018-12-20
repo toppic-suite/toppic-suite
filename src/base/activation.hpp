@@ -30,7 +30,7 @@ class Activation {
   Activation(const std::string &name, IonTypePtr n_ion_type_ptr,
              IonTypePtr c_ion_type_ptr);
 
-  explicit Activation(xercesc::DOMElement * element);
+  explicit Activation(XmlDOMElement * element);
 
   std::string getName() {return name_;}
 
@@ -42,9 +42,9 @@ class Activation {
 
   IonTypePtr getCIonTypePtr() {return c_ion_type_ptr_;}
 
-  void appendNameToXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
+  void appendNameToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
-  static std::string getNameFromXml(xercesc::DOMElement * element);
+  static std::string getNameFromXml(XmlDOMElement * element);
 
   static std::string getXmlElementName() {return "activation";}
 

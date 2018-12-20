@@ -16,7 +16,6 @@
 #include <string>
 
 #include "util/logger.hpp"
-#include "xml/xml_dom.hpp"
 #include "xml/xml_dom_document.hpp"
 #include "xml/xml_dom_util.hpp"
 #include "base/ptm_base.hpp"
@@ -34,11 +33,11 @@ void ModBase::initBase(const std::string &file_name) {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
     XmlDOMDocument doc(parser, file_name.c_str());
-    xercesc::DOMElement* parent = doc.getDocumentElement();
+    XmlDOMElement* parent = doc.getDocumentElement();
     std::string element_name = Mod::getXmlElementName();
     int mod_num = xml_dom_util::getChildCount(parent, element_name.c_str());
     for (int i = 0; i < mod_num; i++) {
-      xercesc::DOMElement* element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
+      XmlDOMElement* element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
       ModPtr mod_ptr = std::make_shared<Mod>(element);
       mod_ptr_vec_.push_back(mod_ptr);
       // check empty ptr
@@ -77,7 +76,7 @@ ModPtr ModBase::getBaseModPtr(ResiduePtr ori_residue, ResiduePtr mod_residue) {
   return getBaseModPtr(mod_ptr);
 }
 
-ModPtr ModBase::getModPtrFromXml(xercesc::DOMElement * element) {
+ModPtr ModBase::getModPtrFromXml(XmlDOMElement * element) {
   ModPtr ptr = std::make_shared<Mod>(element);
   return getBaseModPtr(ptr);
 }

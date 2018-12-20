@@ -20,7 +20,7 @@
 #include <vector>
 #include <memory>
 
-#include <xercesc/dom/DOMElement.hpp>
+#include "xml/xml_dom_element.hpp"
 
 namespace toppic {
 
@@ -30,7 +30,7 @@ class IonType {
  public:
   IonType(const std::string &name, bool n_term, double shift);
 
-  explicit IonType(xercesc::DOMElement* element);
+  explicit IonType(XmlDOMElement* element);
 
   std::string getName() {return name_;}
 
@@ -40,7 +40,7 @@ class IonType {
 
   double getBYShift() {return b_y_shift_;}
 
-  void appendNameToXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
+  void appendNameToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
   static std::string getXmlElementName() {return "ion_type";}
 

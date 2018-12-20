@@ -50,7 +50,7 @@ class PtmBase {
    */
   static bool containsAbbrName(const std::string &abbr_name);
 
-  static PtmPtr getPtmPtrFromXml(xercesc::DOMElement * element);
+  static PtmPtr getPtmPtrFromXml(XmlDOMElement * element);
 
  private:
   static PtmPtrVec ptm_ptr_vec_;

@@ -30,7 +30,7 @@ AminoAcid::AminoAcid(const std::string &name, const std::string &one_letter,
     mono_mass_(mono_mass),
     average_mass_(avg_mass) {}
 
-AminoAcid::AminoAcid(xercesc::DOMElement* element) {
+AminoAcid::AminoAcid(XmlDOMElement* element) {
   name_ = xml_dom_util::getChildValue(element, "name", 0);
   one_letter_ = xml_dom_util::getChildValue(element, "one_letter", 0);
   three_letter_ = xml_dom_util::getChildValue(element, "three_letter", 0);
@@ -40,14 +40,14 @@ AminoAcid::AminoAcid(xercesc::DOMElement* element) {
 }
 
 
-void AminoAcid::appendNameToXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
+void AminoAcid::appendNameToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
   std::string element_name = AminoAcid::getXmlElementName();
-  xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
+  XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
   xml_doc->addElement(element, "name", name_.c_str());
   parent->appendChild(element);
 }
 
-std::string AminoAcid::getNameFromXml(xercesc::DOMElement * element) {
+std::string AminoAcid::getNameFromXml(XmlDOMElement * element) {
   std::string name = xml_dom_util::getChildValue(element, "name", 0);
   return name;
 }

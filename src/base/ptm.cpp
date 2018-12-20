@@ -29,22 +29,22 @@ Ptm::Ptm(const std::string &name, const std::string &abbr_name,
     mono_mass_(mono_mass),
     unimod_id_(unimod_id) {}
 
-Ptm::Ptm(xercesc::DOMElement* element) {
+Ptm::Ptm(XmlDOMElement* element) {
   name_ = xml_dom_util::getChildValue(element, "name", 0);
   abbr_name_ = xml_dom_util::getChildValue(element, "abbreviation", 0);
   mono_mass_ = xml_dom_util::getDoubleChildValue(element, "mono_mass", 0);
   unimod_id_ = xml_dom_util::getIntChildValue(element, "unimod", 0);
 }
 
-void Ptm::appendAbbrNameToXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
+void Ptm::appendAbbrNameToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
   std::string element_name = Ptm::getXmlElementName();
-  xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
+  XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
   xml_doc->addElement(element, "abbreviation", abbr_name_.c_str());
   xml_doc->addElement(element, "unimod", str_util::toString(unimod_id_).c_str());
   parent->appendChild(element);
 }
 
-std::string Ptm::getAbbrNameFromXml(xercesc::DOMElement * element) {
+std::string Ptm::getAbbrNameFromXml(XmlDOMElement * element) {
   std::string abbr_name = xml_dom_util::getChildValue(element, "abbreviation", 0);
   return abbr_name;
 }

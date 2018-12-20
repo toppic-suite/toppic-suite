@@ -13,13 +13,14 @@
 //limitations under the License.
 
 
+#include "util/logger.hpp"
 #include "xml/xml_dom_err_handler.hpp"
 
 namespace toppic {
 
 void XmlDOMErrorHandler::fatalError(const xercesc::SAXParseException &ex) {
-  std::cerr << "Fatal parsing error at line" << ex.getLineNumber() << "\n"; 
-  exit(EXIT_FAILURE);
+  LOG_ERROR("Fatal xml file parsing error at line " << ex.getLineNumber()); 
+  throw(ex);
 }
 
 }

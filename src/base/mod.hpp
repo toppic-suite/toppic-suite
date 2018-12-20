@@ -20,7 +20,7 @@
 #include <vector>
 #include <memory>
 
-#include <xercesc/dom/DOMElement.hpp>
+#include "xml/xml_dom_element.hpp"
 
 #include "base/residue.hpp"
 
@@ -35,7 +35,7 @@ class Mod {
  public:
   Mod(ResiduePtr ori_residue_ptr, ResiduePtr mod_residue_ptr);
 
-  explicit Mod(xercesc::DOMElement* element);
+  explicit Mod(XmlDOMElement* element);
 
   ResiduePtr getOriResiduePtr() { return ori_residue_ptr_;}
 
@@ -45,7 +45,7 @@ class Mod {
 
   double getShift();
 
-  void appendToXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
+  void appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
   static std::string getXmlElementName() {return "mod";}
 

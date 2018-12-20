@@ -32,7 +32,7 @@ class Residue {
  public:
   Residue(AminoAcidPtr acid_ptr, PtmPtr ptm_ptr);
 
-  explicit Residue(xercesc::DOMElement* element);
+  explicit Residue(XmlDOMElement* element);
   /** Get amino acid. */
   AminoAcidPtr getAminoAcidPtr() {return acid_ptr_; }
   /** Get residue mass. */
@@ -46,10 +46,10 @@ class Residue {
 
   std::string toString() {return toString("[", "]");}
 
-  void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent,
+  void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent,
                  const std::string &element_name);
 
-  void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
+  void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
   static std::string getXmlElementName() {return "residue";}
 

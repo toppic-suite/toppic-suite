@@ -14,11 +14,11 @@
 
 #include <string>
 #include <cmath>
+#include <fstream>
 #include <algorithm>
 
 #include "util/logger.hpp"
 #include "util/str_util.hpp"
-#include "xml/xml_dom.hpp"
 #include "xml/xml_dom_document.hpp"
 #include "xml/xml_dom_util.hpp"
 #include "base/amino_acid_base.hpp"
@@ -36,12 +36,12 @@ ModPtrVec readModXml(const std::string &file_name) {
   ModPtrVec mod_ptr_vec;
   if (parser) {
     XmlDOMDocument doc(parser, file_name.c_str());
-    xercesc::DOMElement* parent = doc.getDocumentElement();
+    XmlDOMElement* parent = doc.getDocumentElement();
     std::string element_name = Mod::getXmlElementName();
     int mod_num = xml_dom_util::getChildCount(parent, element_name.c_str());
     LOG_DEBUG("mod num " << mod_num);
     for (int i = 0; i < mod_num; i++) {
-      xercesc::DOMElement* element
+      XmlDOMElement* element
           = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
       ModPtr ptr = ModBase::getModPtrFromXml(element);
       mod_ptr_vec.push_back(ptr);
@@ -55,8 +55,7 @@ std::vector<ModPtrVec> readModTxt(const std::string &file_name) {
   std::vector<ModPtrVec> mod_ptr_vec2d(3);
   std::ifstream infile(file_name.c_str());
   if (!infile.is_open()) {
-    std::cerr << "Error: variable PTM file "
-        << file_name <<  "can not be opened" << std::endl;
+    LOG_ERROR("Variable PTM file " << file_name <<  "can not be opened!");
     exit(EXIT_FAILURE);
   }
   std::string line;

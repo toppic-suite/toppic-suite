@@ -54,7 +54,7 @@ class AminoAcidBase {
   // representation.
   static bool containsThreeLetter(const std::string &three_letter);
 
-  static AminoAcidPtr getAminoAcidPtrFromXml(xercesc::DOMElement * element);
+  static AminoAcidPtr getAminoAcidPtrFromXml(XmlDOMElement * element);
 
  private:
   static AminoAcidPtrVec amino_acid_ptr_vec_;

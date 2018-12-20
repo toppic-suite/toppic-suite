@@ -28,7 +28,7 @@ Activation::Activation(const std::string &name,
     n_ion_type_ptr_(n_ion_type_ptr),
     c_ion_type_ptr_(c_ion_type_ptr) {}
 
-Activation::Activation(xercesc::DOMElement * element) {
+Activation::Activation(XmlDOMElement * element) {
   name_ = xml_dom_util::getChildValue(element, "name", 0);
   std::string ion_type_name = xml_dom_util::getChildValue(element, "n_ion_type", 0);
   n_ion_type_ptr_ = IonTypeBase::getIonTypePtrByName(ion_type_name);
@@ -37,14 +37,14 @@ Activation::Activation(xercesc::DOMElement * element) {
 }
 
 void Activation::appendNameToXml(XmlDOMDocument* xml_doc,
-                                 xercesc::DOMElement* parent) {
+                                 XmlDOMElement* parent) {
   std::string element_name = Activation::getXmlElementName();
-  xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
+  XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
   xml_doc->addElement(element, "name", name_.c_str());
   parent->appendChild(element);
 }
 
-std::string Activation::getNameFromXml(xercesc::DOMElement * element) {
+std::string Activation::getNameFromXml(XmlDOMElement * element) {
   std::string name = xml_dom_util::getChildValue(element, "name", 0);
   return name;
 }

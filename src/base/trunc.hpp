@@ -20,7 +20,7 @@
 #include <memory>
 #include <vector>
 
-#include <xercesc/dom/DOMElement.hpp>
+#include "xml/xml_dom_element.hpp"
 
 #include "base/residue.hpp"
 
@@ -32,7 +32,7 @@ class Trunc {
         const std::string &trunc_residues,
         const std::string &allow_first_remain_residues_);
 
-  Trunc(xercesc::DOMElement* element); 
+  Trunc(XmlDOMElement* element); 
 
   const std::string& getName() {return name_;}
 
@@ -44,7 +44,7 @@ class Trunc {
 
   double getShift() {return shift_;}
 
-  static std::string getNameFromXml(xercesc::DOMElement * element);
+  static std::string getNameFromXml(XmlDOMElement * element);
 
   static std::string getXmlElementName() {return "truncation";}
 

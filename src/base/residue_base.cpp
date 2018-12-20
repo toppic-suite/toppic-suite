@@ -31,12 +31,12 @@ void ResidueBase::initBase(const std::string &file_name) {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   if (parser) {
     XmlDOMDocument doc(parser, file_name.c_str());
-    xercesc::DOMElement* parent = doc.getDocumentElement();
+    XmlDOMElement* parent = doc.getDocumentElement();
     std::string element_name = Residue::getXmlElementName();
     int residue_num = xml_dom_util::getChildCount(parent, element_name.c_str());
     LOG_DEBUG("residue num " << residue_num);
     for (int i = 0; i < residue_num; i++) {
-      xercesc::DOMElement* element
+      XmlDOMElement* element
           = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
       ResiduePtr residue_ptr = std::make_shared<Residue>(element);
       if (residue_ptr->getAminoAcidPtr() == AminoAcidBase::getEmptyAminoAcidPtr()
@@ -80,7 +80,7 @@ ResiduePtr ResidueBase::getBaseResiduePtr(AminoAcidPtr acid_ptr) {
   return getBaseResiduePtr(residue_ptr);
 }
 
-ResiduePtr ResidueBase::getResiduePtrFromXml(xercesc::DOMElement * element) {
+ResiduePtr ResidueBase::getResiduePtrFromXml(XmlDOMElement * element) {
   ResiduePtr ptr = std::make_shared<Residue>(element);
   return getBaseResiduePtr(ptr);
 }

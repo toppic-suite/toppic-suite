@@ -13,8 +13,10 @@
 //limitations under the License.
 
 
-#include "xml/xml_writer.hpp"
+#include "util/logger.hpp"
+#include "xml/xml_dom_impl.hpp"
 #include "xml/xml_dom_util.hpp"
+#include "xml/xml_writer.hpp"
 
 namespace toppic {
 

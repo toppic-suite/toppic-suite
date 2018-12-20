@@ -17,6 +17,7 @@
 
 #include "util/logger.hpp"
 #include "util/str_util.hpp"
+#include "xml/xml_dom_document.hpp"
 #include "xml/xml_dom_util.hpp"
 #include "base/amino_acid_base.hpp"
 #include "base/ptm_base.hpp"
@@ -30,13 +31,13 @@ Residue::Residue(AminoAcidPtr acid_ptr, PtmPtr ptm_ptr):
       mass_ = acid_ptr_->getMonoMass() + ptm_ptr_->getMonoMass();
     }
 
-Residue::Residue(xercesc::DOMElement* element) { 
+Residue::Residue(XmlDOMElement* element) { 
   std::string acid_element_name = AminoAcid::getXmlElementName();
-  xercesc::DOMElement* acid_element 
+  XmlDOMElement* acid_element 
       = xml_dom_util::getChildElement(element, acid_element_name.c_str(), 0);
   acid_ptr_ = AminoAcidBase::getAminoAcidPtrFromXml(acid_element);
   std::string ptm_element_name = Ptm::getXmlElementName();
-  xercesc::DOMElement* ptm_element 
+  XmlDOMElement* ptm_element 
       = xml_dom_util::getChildElement(element, ptm_element_name.c_str(), 0);
   ptm_ptr_ = PtmBase::getPtmPtrFromXml(ptm_element);  
   mass_ = acid_ptr_->getMonoMass() + ptm_ptr_->getMonoMass();
@@ -57,16 +58,16 @@ std::string Residue::toString(const std::string &delim_bgn,
   }
 }
 
-void Residue::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent,
+void Residue::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent,
                         const std::string & element_name) {
-  xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
+  XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
   std::string str = str_util::toString(mass_);
   acid_ptr_->appendNameToXml(xml_doc, element);
   ptm_ptr_->appendAbbrNameToXml(xml_doc, element);
   parent->appendChild(element);
 }
 
-void Residue::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
+void Residue::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
   std::string element_name = Residue::getXmlElementName();
   appendXml(xml_doc, parent, element_name);
 }

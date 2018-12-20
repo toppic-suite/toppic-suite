@@ -36,7 +36,7 @@ class ProtModBase {
 
   static ProtModPtr getProtModPtr_NONE() {return prot_mod_ptr_NONE_;}
 
-  static ProtModPtr getProtModPtrFromXml(xercesc::DOMElement * element);
+  static ProtModPtr getProtModPtrFromXml(XmlDOMElement * element);
 
   static std::string getType_NME() {return "NME";}
 

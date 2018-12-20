@@ -14,6 +14,7 @@
 
 
 //#include <iomanip>
+#include <fstream>
 
 #include "spec/ms_header.hpp"
 #include "feature/match_env.hpp"

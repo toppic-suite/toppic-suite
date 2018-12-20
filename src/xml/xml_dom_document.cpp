@@ -12,16 +12,11 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#include <string>
-#include <sstream>
-#include <exception>
-#include <algorithm>
-#include <iomanip>
-
+#include <xercesc/dom/DOMDocument.hpp>
+#include <xercesc/dom/DOMText.hpp>
 
 #include "util/logger.hpp"
-#include "xml/xml_dom.hpp"
+#include "xml/xml_dom_str.hpp"
 #include "xml/xml_dom_document.hpp"
 
 namespace toppic {
@@ -32,7 +27,8 @@ XmlDOMDocument::XmlDOMDocument(XmlDOMParser* parser,
     doc_ = parser->parse(xml_file);
   }
   catch (std::exception &e) {
-    std::cerr << "xml file " << xml_file << " contain errors" << std::endl;
+    LOG_ERROR("xml file " << xml_file << " contain errors!");
+    exit(EXIT_FAILURE);
   }
 }
 
@@ -41,7 +37,8 @@ XmlDOMDocument::XmlDOMDocument(XmlDOMParser* parser, const xercesc::MemBufInputS
     doc_ = parser->parse(str_buf);
   }
   catch (std::exception &e) {
-    std::cerr << "xml str buffer contain errors" << std::endl;
+    LOG_ERROR("xml str buffer contain errors!");
+    exit(EXIT_FAILURE);
   }
 }
 

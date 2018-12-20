@@ -16,6 +16,7 @@
 #include <map>
 #include <string>
 
+#include "util/logger.hpp"
 #include "util/file_util.hpp"
 #include "prsmview/transformer.hpp"
 #include "prsmview/anno_view.hpp"

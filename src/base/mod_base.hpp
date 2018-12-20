@@ -42,7 +42,7 @@ class ModBase {
 
   static bool isNoneModPtr(ModPtr mod_ptr) {return mod_ptr == none_mod_ptr_;}
 
-  static ModPtr getModPtrFromXml(xercesc::DOMElement * element);
+  static ModPtr getModPtrFromXml(XmlDOMElement * element);
 
  private:
   static ModPtrVec mod_ptr_vec_;

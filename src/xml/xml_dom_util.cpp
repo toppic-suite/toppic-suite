@@ -15,11 +15,17 @@
 
 #include <string>
 #include <sstream>
-#include <exception>
+#include <fstream>
 #include <algorithm>
+#include <exception>
+
+#include <xercesc/dom/DOMElement.hpp>
+#include <xercesc/dom/DOMNodeList.hpp>
+#include <xercesc/dom/DOMLSSerializer.hpp>
 
 #include "util/logger.hpp"
 #include "util/str_util.hpp"
+#include "xml/xml_dom_str.hpp"
 #include "xml/xml_dom_util.hpp"
 
 namespace toppic {

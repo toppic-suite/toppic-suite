@@ -14,6 +14,7 @@
 
 #include <string>
 #include <vector>
+#include <fstream>
 
 #include "util/logger.hpp"
 #include "feature/env_base.hpp"
