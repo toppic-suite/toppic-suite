@@ -122,7 +122,7 @@ bool Argument::parse(int argc, char* argv[]) {
     std::string argv_0(argv[0]);
     arguments_["executiveDir"] = file_util::getExecutiveDir(argv_0);
 
-    arguments_["resourceDir"] = arguments_["executiveDir"] + file_util::getFileSeparator() + file_util::getResourceDirName();
+    arguments_["resourceDir"] = file_util::getResourceDir(arguments_["executiveDir"]);
 
     if (vm.count("max-charge")) {
       arguments_["maxCharge"] = max_charge;
@@ -175,14 +175,13 @@ bool Argument::parse(int argc, char* argv[]) {
 }
 
 bool Argument::validateArguments() {
-  if (!boost::filesystem::exists(arguments_["resourceDir"])) {
-    boost::filesystem::path p(arguments_["executiveDir"]);
-    arguments_["resourceDir"]
-        = p.parent_path().string() + file_util::getFileSeparator() + "etc" + file_util::getFileSeparator() + file_util::getResourceDirName();
+  if (!file_util::exists(arguments_["resourceDir"])) {
+    LOG_ERROR("Resource direcotry " << arguments_["resourceDir"] << " does not exist!");
+    return false;
   }
 
   for (size_t k = 0; k < spec_file_list_.size(); k++) {
-    if (!boost::filesystem::exists(spec_file_list_[k])) {
+    if (!file_util::exists(spec_file_list_[k])) {
       LOG_ERROR(spec_file_list_[k] << " does not exist!");
       return false;
     }

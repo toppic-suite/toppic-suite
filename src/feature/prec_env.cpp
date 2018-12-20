@@ -13,6 +13,7 @@
 //limitations under the License.
 
 #include <vector>
+#include <algorithm>
 
 #include "util/logger.hpp"
 #include "feature/match_env.hpp"

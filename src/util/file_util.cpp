@@ -15,6 +15,16 @@
 
 #include <string>
 
+#ifndef BOOST_SYSTEM_NO_DEPRECATED
+#define BOOST_SYSTEM_NO_DEPRECATED 1
+#endif
+
+#define BOOST_NO_CXX11_SCOPED_ENUMS
+#include <boost/filesystem.hpp>
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/path.hpp>
+#undef BOOST_NO_CXX11_SCOPED_ENUMS
+
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
 #include <windows.h>
 #else
@@ -55,6 +65,23 @@ std::string getExecutiveDir(const std::string &argv_0) {
   fs::path full_path(file_name);
   std::string exe_dir = full_path.remove_filename().string();
   return exe_dir;
+}
+
+std::string getResourceDir(const std::string &exec_dir) {
+  std::string resource_dir = exec_dir + getFileSeparator() + getToppicResourceDirName();
+  if (exists(resource_dir)) {
+    return resource_dir;
+  }
+#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
+#else
+  std::string etc_dir = exec_dir + getFileSeparator() + getEtcDirName();
+  if (exists(etc_dir)) {
+    return etc_dir;
+  }
+  LOG_ERROR("The resource directory " << etc_dir << " does not exist!"); 
+#endif
+  LOG_ERROR("The resource directory " << resource_dir << " does not exist!"); 
+  exit(EXIT_FAILURE);
 }
 
 std::string basename(const std::string &s) {
@@ -108,8 +135,10 @@ void copyFile(const std::string &file_name,
   fs::copy(from_path, to_path);
 }
 
-bool copyDir(fs::path const & source,
-             fs::path const & destination) {
+bool copyDir(const std::string &src_name,
+             const std::string &des_name) {
+  fs::path source(src_name);
+  fs::path destination(des_name);
   try {
     if (!fs::exists(source) || !fs::is_directory(source)) {
       return false;
@@ -133,7 +162,7 @@ bool copyDir(fs::path const & source,
     try {
       fs::path current(file->path());
       if (fs::is_directory(current)) {
-        if (!copyDir(current, destination / current.filename())) {
+        if (!copyDir(current.string(), (destination / current.filename()).string())) {
           return false;
         }
       } else {
@@ -194,74 +223,6 @@ void cleanTempFiles(const std::string & ref_name,
   std::string ref_base = basename(absolute(ref_path).string());
   std::replace(ref_base.begin(), ref_base.end(), '\\', '/');
   cleanPrefix(ref_name, ref_base + "." + ext_prefix);
-}
-
-void cleanTopmgDir(const std::string &fa_name, const std::string & sp_name) {
-  fs::path fa(fa_name);
-  fs::path sp(sp_name);
-  std::string fa_base = absolute(fa).string();
-  std::replace(fa_base.begin(), fa_base.end(), '\\', '/');
-  std::string sp_base = basename(absolute(sp).string());
-  std::replace(sp_base.begin(), sp_base.end(), '\\', '/');
-
-  cleanPrefix(fa_name, fa_base + "_");
-  cleanPrefix(sp_name, sp_base + ".msalign_");
-  delFile(absolute(sp).string() + "_index");
-  delFile(sp_base + ".topmg_one_filter");
-  cleanPrefix(sp_name, sp_base + ".topmg_one_filter_");
-  delFile(sp_base + ".topmg_multi_filter");
-  cleanPrefix(sp_name, sp_base + ".topmg_multi_filter_");
-  delFile(sp_base + ".topmg_graph_filter");
-  cleanPrefix(sp_name, sp_base + ".topmg_graph_filter_");
-  delFile(sp_base + ".topmg_graph_align");
-  cleanPrefix(sp_name, sp_base + ".topmg_graph_align_");
-  delFile(sp_base + ".topmg_graph_post");
-  delFile(sp_base + ".topmg_graph");
-  delFile(sp_base + ".topmg_evalue");
-  cleanPrefix(sp_name, sp_base + ".toppic_evalue_");
-  delFile(sp_base + ".topmg_cluster");
-  delFile(sp_base + ".topmg_top");
-  delFile(sp_base + ".topmg_top_pre");
-  delFile(sp_base + ".topmg_prsm_cutoff");
-  delFile(sp_base + ".topmg_form_cutoff");
-  delFile(sp_base + "_topmg_proteoform.xml");
-  rename(sp_base + ".topmg_form_cutoff_form", 
-         sp_base + "_topmg_proteoform.xml");
-}
-
-void cleanToppicDir(const std::string &fa_name, const std::string & sp_name) {
-  fs::path fa(fa_name);
-  fs::path sp(sp_name);
-  std::string fa_base = absolute(fa).string();
-  std::replace(fa_base.begin(), fa_base.end(), '\\', '/');
-  std::string sp_base = basename(absolute(sp).string());
-  std::replace(sp_base.begin(), sp_base.end(), '\\', '/');
-
-  cleanPrefix(fa_name, fa_base + "_");
-  cleanPrefix(sp_name, sp_base + ".msalign_");
-  delFile(absolute(sp).string() + "_index");
-  cleanPrefix(sp_name, sp_base + ".toppic_zero_filter_");
-  delFile(sp_base + ".toppic_zero_ptm");
-  cleanPrefix(sp_name, sp_base + ".toppic_zero_ptm_");
-  cleanPrefix(sp_name, sp_base + ".toppic_one_filter_");
-  delFile(sp_base + ".toppic_one_ptm");
-  cleanPrefix(sp_name, sp_base + ".toppic_one_ptm_");
-  delFile(sp_base + ".toppic_multi_filter");
-  cleanPrefix(sp_name, sp_base + ".toppic_multi_filter_");
-  delFile(sp_base + ".toppic_multi_ptm");
-  cleanPrefix(sp_name, sp_base + ".toppic_multi_ptm_");
-  delFile(sp_base + ".toppic_combined");
-  delFile(sp_base + ".toppic_evalue");
-  cleanPrefix(sp_name, sp_base + ".toppic_evalue_");
-  delFile(sp_base + ".toppic_cluster");
-  delFile(sp_base + ".toppic_top");
-  delFile(sp_base + ".toppic_top_pre");
-  delFile(sp_base + ".toppic_prsm_cutoff");
-  delFile(sp_base + ".toppic_prsm_cutoff_local");
-  delFile(sp_base + ".toppic_form_cutoff");
-  delFile(sp_base + "_toppic_proteoform.xml");
-  rename(sp_base + ".toppic_form_cutoff_form",
-         sp_base + "_toppic_proteoform.xml");
 }
 
 }  // namespace file_util

@@ -18,16 +18,6 @@
 
 #include <string>
 
-#ifndef BOOST_SYSTEM_NO_DEPRECATED
-#define BOOST_SYSTEM_NO_DEPRECATED 1
-#endif
-
-#define BOOST_NO_CXX11_SCOPED_ENUMS
-#include <boost/filesystem.hpp>
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/path.hpp>
-#undef BOOST_NO_CXX11_SCOPED_ENUMS
-
 namespace toppic {
 
 namespace file_util {
@@ -49,8 +39,8 @@ void createFolder(const std::string &folder_name);
 void copyFile(const std::string &file_name, const std::string &path,
               bool over_write);
 
-bool copyDir(boost::filesystem::path const & source,
-             boost::filesystem::path const & destination);
+bool copyDir(const std::string &source, 
+             const std::string &destination);
 
 bool exists(const std::string &path);
 
@@ -58,21 +48,20 @@ void delDir(const std::string &path);
 
 void delFile(const std::string &path);
 
+void rename(const std::string &ori_name, 
+            const std::string &new_name);
+
 void cleanPrefix(const std::string & ref_name, 
                  const std::string & prefix);
 
 void cleanTempFiles(const std::string & ref_name, 
                     const std::string & ext_prefix);
 
-// TO DO 
+inline std::string getToppicResourceDirName() {return "toppic_resources";}
 
-inline std::string getResourceDirName() {return "toppic_resources";}
+inline std::string getEtcDirName() {return "../../etc/toppic";}
 
-
-void cleanTopmgDir(const std::string &fa_path, const std::string & sp_path);
-
-void cleanToppicDir(const std::string &fa_path, const std::string & sp_path);
-
+std::string getResourceDir(const std::string &exec_dir);
 
 }  // namespace file_util
 

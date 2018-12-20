@@ -32,8 +32,8 @@ void translate(std::map<std::string, std::string> &arguments,
   file_util::createFolder(html_dir + file_util::getFileSeparator() +"proteoforms");
   file_util::createFolder(html_dir + file_util::getFileSeparator() +"prsms");
   file_util::createFolder(html_dir + file_util::getFileSeparator() +"proteins");
-  boost::filesystem::path from_path(resource_dir + file_util::getFileSeparator() + "web");
-  boost::filesystem::path to_path(html_dir + file_util::getFileSeparator() + "resources");
+  std::string from_path(resource_dir + file_util::getFileSeparator() + "web");
+  std::string to_path(html_dir + file_util::getFileSeparator() + "resources");
   file_util::copyDir(from_path, to_path);
 
   LOG_DEBUG("trans start!XMLPlatformUtils::Initialize()");
