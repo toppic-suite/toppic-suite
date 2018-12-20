@@ -34,7 +34,7 @@ class ZeroPtmSearchProcessor {
                                   const SimplePrsmPtrVec &simple_prsm_ptr_vec,
                                   FastaIndexReaderPtr reader_ptr,
                                   ZeroPtmSearchMngPtr mng_ptr,
-                                  AlignTypePtr type_ptr);
+                                  ProteoformTypePtr type_ptr);
   ZeroPtmSearchMngPtr mng_ptr_;
 };
 

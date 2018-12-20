@@ -18,15 +18,15 @@
 #include <string>
 
 #include "util/logger.hpp"
-#include "seq/fasta_reader.hpp"
 #include "base/ptm_base.hpp"
 #include "base/residue_base.hpp"
 #include "base/residue_util.hpp"
-#include "seq/residue_seq.hpp"
 #include "base/trunc_util.hpp"
 #include "base/mod_base.hpp"
 #include "base/prot_mod_base.hpp"
 #include "base/prot_mod_util.hpp"
+#include "seq/residue_seq.hpp"
+#include "seq/fasta_reader.hpp"
 #include "seq/proteoform_factory.hpp"
 
 namespace toppic {

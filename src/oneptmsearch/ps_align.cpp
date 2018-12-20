@@ -23,7 +23,7 @@
 
 namespace toppic {
 
-void PSAlign::compute(AlignTypePtr align_type_ptr) {
+void PSAlign::compute(ProteoformTypePtr align_type_ptr) {
   dp(align_type_ptr);
   backtrace();
 }
@@ -126,13 +126,13 @@ void PSAlign::dpPrep() {
 }
 
 inline DPPairPtr PSAlign::getTruncPre(DPPairPtr cur_pair_ptr, int s,
-                                      AlignTypePtr align_type_ptr) {
+                                      ProteoformTypePtr align_type_ptr) {
   DPPairPtr trunc_prev_ptr;
   if (cur_pair_ptr == last_pair_ptr_) {
     double trunc_score = - std::numeric_limits<double>::max();
     for (size_t i = 0; i < segment_end_pair_ptrs_.size(); i++) {
       DPPairPtr prev_pair_ptr = segment_end_pair_ptrs_[i];
-      if (align_type_ptr == AlignType::COMPLETE || align_type_ptr == AlignType::SUFFIX) {
+      if (align_type_ptr == ProteoformType::COMPLETE || align_type_ptr == ProteoformType::SUFFIX) {
         if (prev_pair_ptr->getDiagonalHeader()->isProtCTermMatch()) {
           if (prev_pair_ptr->getScore(s) > trunc_score) {
             trunc_prev_ptr = prev_pair_ptr;
@@ -151,8 +151,8 @@ inline DPPairPtr PSAlign::getTruncPre(DPPairPtr cur_pair_ptr, int s,
   } else {
     // if cur_pair_ptr is the first in a diagonal
     if (cur_pair_ptr->getDiagOrder() == 0) {
-      if (align_type_ptr == AlignType::COMPLETE
-          || align_type_ptr == AlignType::PREFIX) {
+      if (align_type_ptr == ProteoformType::COMPLETE
+          || align_type_ptr == ProteoformType::PREFIX) {
         if (cur_pair_ptr->getDiagonalHeader()->isProtNTermMatch()) {
           trunc_prev_ptr = first_pair_ptr_;
         }
@@ -192,7 +192,7 @@ DPPairPtr PSAlign::getShiftPre(int p, int s) {
   return shift_prev;
 }
 
-void PSAlign::dp(AlignTypePtr align_type_ptr) {
+void PSAlign::dp(ProteoformTypePtr align_type_ptr) {
   dpPrep();
   for (size_t p = 1; p < dp_pair_ptrs_.size(); p++) {
     for (int s = 0; s <= para_ptr_->n_unknown_shift_; s++) {

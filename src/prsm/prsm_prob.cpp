@@ -31,7 +31,7 @@ void PrsmProb::process() {
 
   while (prsm_ptr != nullptr) {
     int shift_num = prsm_ptr->getProteoformPtr()->getMassShiftNum(MassShiftType::UNEXPECTED);
-    AlignTypePtr type_ptr = prsm_ptr->getProteoformPtr()->getAlignType();
+    ProteoformTypePtr type_ptr = prsm_ptr->getProteoformPtr()->getProteoformType();
     ExtremeValuePtr prob_ptr = prsm_ptr->getExtremeValuePtr();
     if (shift_num == 1) {
       prob_ptr->setOneProtProb(prob_ptr->getOneProtProb() * K1_);
@@ -39,11 +39,11 @@ void PrsmProb::process() {
     if (shift_num == 2) {
       prob_ptr->setOneProtProb(prob_ptr->getOneProtProb() * K2_);
     }
-    if (type_ptr == AlignType::PREFIX || type_ptr == AlignType::SUFFIX) {
+    if (type_ptr == ProteoformType::PREFIX || type_ptr == ProteoformType::SUFFIX) {
       prob_ptr->setOneProtProb(prob_ptr->getOneProtProb() * pref_);
     }
 
-    if (type_ptr == AlignType::INTERNAL) {
+    if (type_ptr == ProteoformType::INTERNAL) {
       prob_ptr->setOneProtProb(prob_ptr->getOneProtProb() * inte_);
     }
     all_writer.write(prsm_ptr);

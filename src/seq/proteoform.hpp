@@ -13,21 +13,21 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_BASE_PROTEOFORM_HPP_
-#define TOPPIC_BASE_PROTEOFORM_HPP_
+#ifndef TOPPIC_SEQ_PROTEOFORM_HPP_
+#define TOPPIC_SEQ_PROTEOFORM_HPP_
 
 #include <string>
 #include <vector>
 
+#include "base/ptm.hpp"
+#include "base/prot_mod.hpp"
 #include "base/residue_freq.hpp"
 #include "seq/fasta_seq.hpp"
 #include "seq/fasta_index_reader.hpp"
 #include "seq/bp_spec.hpp"
 #include "seq/mass_shift.hpp"
 #include "seq/segment.hpp"
-#include "base/prot_mod.hpp"
-#include "seq/align_type.hpp"
-#include "base/ptm.hpp"
+#include "seq/proteoform_type.hpp"
 
 namespace toppic {
 
@@ -43,7 +43,7 @@ class Proteoform {
              ResSeqPtr res_seq_ptr,
              const MassShiftPtrVec & mass_shift_ptr_vec);
 
-  Proteoform(xercesc::DOMElement* element, FastaIndexReaderPtr reader_ptr,
+  Proteoform(XmlDOMElement* element, FastaIndexReaderPtr reader_ptr,
              const ModPtrVec &fix_mod_list);
 
   FastaSeqPtr getFastaSeqPtr() {return fasta_seq_ptr_;}
@@ -82,7 +82,7 @@ class Proteoform {
 
   double getMass();
 
-  AlignTypePtr getAlignType();
+  ProteoformTypePtr getProteoformType();
 
   void addMassShiftPtrVec(const MassShiftPtrVec & shift_ptr_vec);
 
@@ -92,9 +92,9 @@ class Proteoform {
 
   std::string toString();
 
-  void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
+  void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
-  void parseXml(xercesc::DOMElement* element, ProteoformPtr db_proteoform);
+  void parseXml(XmlDOMElement* element, ProteoformPtr db_proteoform);
 
   static std::string getXmlElementName() {return "proteoform";}
 

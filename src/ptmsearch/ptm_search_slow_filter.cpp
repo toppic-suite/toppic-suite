@@ -43,7 +43,7 @@ PtmSearchSlowFilter::PtmSearchSlowFilter(SpectrumSetPtr spectrum_set_ptr,
       PtmSlowMatchPtr ptm_slow_match_ptr
           = std::make_shared<PtmSlowMatch>(mod_form_ptr_vec[j],
                                            spectrum_set_ptr,
-                                           AlignType::INTERNAL,
+                                           ProteoformType::INTERNAL,
                                            comp_shift, mng_ptr);
       complete_prefix_slow_match_ptrs_.push_back(ptm_slow_match_ptr);
     }
@@ -61,11 +61,11 @@ PtmSearchSlowFilter::PtmSearchSlowFilter(SpectrumSetPtr spectrum_set_ptr,
   for (size_t i = 0; i < complete_prefix_slow_match_ptrs_.size(); i++) {
     PrsmPtrVec comp_ptrs;
     // LOG_DEBUG("Compute complete prsm " << i);
-    complete_prefix_slow_match_ptrs_[i]->compute(AlignType::COMPLETE, comp_ptrs);
+    complete_prefix_slow_match_ptrs_[i]->compute(ProteoformType::COMPLETE, comp_ptrs);
     complete_prsm_2d_ptrs_.push_back(comp_ptrs);
     PrsmPtrVec prefix_ptrs;
     // LOG_DEBUG("Compute prefix prsm " << i);
-    complete_prefix_slow_match_ptrs_[i]->compute(AlignType::PREFIX, prefix_ptrs);
+    complete_prefix_slow_match_ptrs_[i]->compute(ProteoformType::PREFIX, prefix_ptrs);
     prefix_prsm_2d_ptrs_.push_back(prefix_ptrs);
     // LOG_DEBUG("compute prefi completed");
   }
@@ -74,36 +74,36 @@ PtmSearchSlowFilter::PtmSearchSlowFilter(SpectrumSetPtr spectrum_set_ptr,
   // compute suffix and internal prsms
   for (size_t i = 0; i < suffix_internal_slow_match_ptrs_.size(); i++) {
     PrsmPtrVec suffix_ptrs;
-    suffix_internal_slow_match_ptrs_[i]->compute(AlignType::SUFFIX, suffix_ptrs);
+    suffix_internal_slow_match_ptrs_[i]->compute(ProteoformType::SUFFIX, suffix_ptrs);
     suffix_prsm_2d_ptrs_.push_back(suffix_ptrs);
     PrsmPtrVec internal_ptrs;
-    suffix_internal_slow_match_ptrs_[i]->compute(AlignType::INTERNAL, internal_ptrs);
+    suffix_internal_slow_match_ptrs_[i]->compute(ProteoformType::INTERNAL, internal_ptrs);
     internal_prsm_2d_ptrs_.push_back(internal_ptrs);
   }
   // LOG_DEBUG("suffix internal completed");
 }
 
-PrsmPtrVec PtmSearchSlowFilter::getPrsms(int shift_num, AlignTypePtr type_ptr) {
+PrsmPtrVec PtmSearchSlowFilter::getPrsms(int shift_num, ProteoformTypePtr type_ptr) {
   PrsmPtrVec prsm_ptrs;
-  if (type_ptr == AlignType::COMPLETE) {
+  if (type_ptr == ProteoformType::COMPLETE) {
     for (size_t i = 0; i < complete_prsm_2d_ptrs_.size(); i++) {
       if (complete_prsm_2d_ptrs_[i][shift_num] != nullptr) {
         prsm_ptrs.push_back(complete_prsm_2d_ptrs_[i][shift_num]);
       }
     }
-  } else if (type_ptr == AlignType::PREFIX) {
+  } else if (type_ptr == ProteoformType::PREFIX) {
     for (size_t i = 0; i < prefix_prsm_2d_ptrs_.size(); i++) {
       if (prefix_prsm_2d_ptrs_[i][shift_num] != nullptr) {
         prsm_ptrs.push_back(prefix_prsm_2d_ptrs_[i][shift_num]);
       }
     }
-  } else if (type_ptr == AlignType::SUFFIX) {
+  } else if (type_ptr == ProteoformType::SUFFIX) {
     for (size_t i = 0; i < suffix_prsm_2d_ptrs_.size(); i++) {
       if (suffix_prsm_2d_ptrs_[i][shift_num] != nullptr) {
         prsm_ptrs.push_back(suffix_prsm_2d_ptrs_[i][shift_num]);
       }
     }
-  } else if (type_ptr == AlignType::INTERNAL) {
+  } else if (type_ptr == ProteoformType::INTERNAL) {
     for (size_t i = 0; i < internal_prsm_2d_ptrs_.size(); i++) {
       if (internal_prsm_2d_ptrs_[i][shift_num] != nullptr) {
         prsm_ptrs.push_back(internal_prsm_2d_ptrs_[i][shift_num]);

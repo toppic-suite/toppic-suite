@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TOPPIC_BASE_FASTA_SUB_SEQ_HPP_
-#define TOPPIC_BASE_FASTA_SUB_SEQ_HPP_
+#ifndef TOPPIC_SEQ_FASTA_SUB_SEQ_HPP_
+#define TOPPIC_SEQ_FASTA_SUB_SEQ_HPP_
 
 
 #include <string>
@@ -24,16 +24,17 @@ namespace toppic {
 
 class FastaSubSeq : public FastaSeq {
  public:
-  FastaSubSeq(const std::string &name_line, const std::string &ori_seq, int sub_seq_start);
+  FastaSubSeq(const std::string &name_line, 
+              const std::string &sub_seq, int sub_seq_start);
 
   FastaSubSeq(const std::string &name, const std::string &desc,
-              const std::string &ori_seq, int sub_seq_start);
+              const std::string &sub_seq, int sub_seq_start);
 
   int getSubSeqStart() {return sub_seq_start_;}
 
   int getSubSeqEnd() {return sub_seq_end_;}
 
-  bool is_n_term() {return sub_seq_start_ == 0;}
+  bool isNTerm() {return sub_seq_start_ == 0;}
 
   int getLen() {return length_;}
 

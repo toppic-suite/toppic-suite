@@ -19,19 +19,19 @@
 
 namespace toppic {
 
-FastaSubSeq::FastaSubSeq(const std::string &name_line, const std::string &ori_seq,
+FastaSubSeq::FastaSubSeq(const std::string &name_line, const std::string &sub_seq,
                          int sub_seq_start):
-    FastaSeq(name_line, ori_seq),
+    FastaSeq(name_line, sub_seq),
     sub_seq_start_(sub_seq_start) {
-      length_ = static_cast<int>(ori_seq.length());
+      length_ = static_cast<int>(sub_seq.length());
       sub_seq_end_ = sub_seq_start_ + length_ - 1;
     }
 
 FastaSubSeq::FastaSubSeq(const std::string &name, const std::string &desc,
-                         const std::string &ori_seq, int sub_seq_start):
-    FastaSeq(name, desc, ori_seq),
+                         const std::string &sub_seq, int sub_seq_start):
+    FastaSeq(name, desc, sub_seq),
     sub_seq_start_(sub_seq_start) {
-      length_ = static_cast<int>(ori_seq.length());
+      length_ = static_cast<int>(sub_seq.length());
       sub_seq_end_ = sub_seq_start_ + length_ - 1;
     }
 

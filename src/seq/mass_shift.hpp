@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_BASE_MASS_SHIFT_HPP_
-#define TOPPIC_BASE_MASS_SHIFT_HPP_
+#ifndef TOPPIC_SEQ_MASS_SHIFT_HPP_
+#define TOPPIC_SEQ_MASS_SHIFT_HPP_
 
 #include <memory>
 #include <vector>
@@ -28,13 +28,10 @@ typedef std::shared_ptr<MassShift> MassShiftPtr;
 
 class MassShift {
  public:
-  MassShift(int left_bp_pos, int right_bp_pos, MassShiftTypePtr type_ptr):
-      left_bp_pos_(left_bp_pos),
-      right_bp_pos_(right_bp_pos),
-      type_ptr_(type_ptr),
-      shift_(0.0) { }
+  MassShift(int left_bp_pos, int right_bp_pos, 
+            MassShiftTypePtr type_ptr);
 
-  explicit MassShift(xercesc::DOMElement* mass_shift_element);
+  explicit MassShift(XmlDOMElement* mass_shift_element);
 
   int getLeftBpPos() {return left_bp_pos_;}
 
@@ -58,7 +55,7 @@ class MassShift {
 
   static std::string getXmlElementName() {return "mass_shift";}
 
-  void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
+  void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
   static bool cmpPosInc(const MassShiftPtr & a, const MassShiftPtr & b);
 

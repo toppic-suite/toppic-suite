@@ -15,10 +15,9 @@
 
 #include <sstream>
 #include <string>
-#include <algorithm>
 
-#include "seq/residue_seq.hpp"
 #include "util/str_util.hpp"
+#include "seq/residue_seq.hpp"
 
 namespace toppic {
 

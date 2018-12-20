@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_BASE_DB_BLOCK_HPP_
-#define TOPPIC_BASE_DB_BLOCK_HPP_
+#ifndef TOPPIC_SEQ_DB_BLOCK_HPP_
+#define TOPPIC_SEQ_DB_BLOCK_HPP_
 
 #include <memory>
 #include <vector>
@@ -28,9 +28,7 @@ typedef std::vector<DbBlockPtr> DbBlockPtrVec;
 
 class DbBlock {
  public:
-  DbBlock(int block_index, int seq_index):
-      block_index_(block_index),
-      seq_index_(seq_index) {}
+  DbBlock(int block_index, int seq_index);
 
   int getBlockIdx() {return block_index_;}
 

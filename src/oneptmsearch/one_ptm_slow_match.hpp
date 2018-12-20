@@ -38,7 +38,7 @@ class OnePtmSlowMatch {
   OnePtmSlowMatch(ProteoformPtr proteo_ptr,
                   SpectrumSetPtr spectrum_set_ptr,
                   SimplePrsmPtr simple_prsm_ptr,
-                  AlignTypePtr align_type_ptr,
+                  ProteoformTypePtr align_type_ptr,
                   PtmSearchMngPtr mng_ptr);
 
   ProteoformPtr getProteoform(){return proteo_ptr_;};
@@ -54,7 +54,7 @@ class OnePtmSlowMatch {
   DeconvMsPtrVec deconv_ms_ptr_vec_;
   PrmMsPtrVec ms_six_ptr_vec_;
   ExtendMsPtrVec ms_three_ptr_vec_;
-  AlignTypePtr align_type_ptr_;
+  ProteoformTypePtr align_type_ptr_;
   SimplePrsmPtr simple_prsm_ptr_;
   PSAlignPtr ps_align_ptr_;
 

@@ -17,6 +17,7 @@
 #define PROT_COMP_PVALUE_LOOKUP_TABLE_HPP_
 
 #include <vector>
+#include <fstream>
 
 #include "tdgf/tdgf_mng.hpp"
 #include "tdgf/comp_prob_value.hpp"

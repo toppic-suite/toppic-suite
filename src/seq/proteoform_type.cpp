@@ -12,31 +12,15 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#ifndef TOPPIC_SEQ_FASTA_UTIL_HPP_
-#define TOPPIC_SEQ_FASTA_UTIL_HPP_
-
-#include <string>
-
+#include "seq/proteoform_type.hpp"
 
 namespace toppic {
 
-namespace fasta_util {
+ProteoformTypePtr ProteoformType::COMPLETE = std::make_shared<ProteoformType>("complete", 0);
 
-void generateShuffleDb(const std::string &file_name,
-                       const std::string &target_decoy_file_name);
+ProteoformTypePtr ProteoformType::PREFIX = std::make_shared<ProteoformType>("prefix", 1);
 
-void dbSimplePreprocess(const std::string &ori_db_file_name,
-                        const std::string &db_file_name);
+ProteoformTypePtr ProteoformType::SUFFIX = std::make_shared<ProteoformType>("suffix", 2);
 
-void dbPreprocess(const std::string &ori_db_file_name,
-                  const std::string &db_file_name,
-                  bool decoy, int block_size);
-
-int countProteinNum(const std::string &fasta_file);
-
-}  // namespace fasta_util
-
+ProteoformTypePtr ProteoformType::INTERNAL = std::make_shared<ProteoformType>("internal", 3);
 }  // namespace toppic
-
-#endif

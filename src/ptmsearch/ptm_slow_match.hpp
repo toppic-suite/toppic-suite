@@ -37,7 +37,7 @@ class PtmSlowMatch {
  public:
   PtmSlowMatch(ProteoformPtr proteo_ptr,
                SpectrumSetPtr spectrum_set_ptr,
-               AlignTypePtr align_type_ptr,
+               ProteoformTypePtr align_type_ptr,
                CompShiftLowMem comp_shift,
                PtmSearchMngPtr mng_ptr);
 
@@ -45,9 +45,9 @@ class PtmSlowMatch {
 
   void init();
 
-  PrsmPtr compute(AlignTypePtr align_type_ptr, int shift_num);
+  PrsmPtr compute(ProteoformTypePtr align_type_ptr, int shift_num);
 
-  void compute(AlignTypePtr type_ptr, PrsmPtrVec &prsm_ptrs);
+  void compute(ProteoformTypePtr type_ptr, PrsmPtrVec &prsm_ptrs);
 
  private:
   PtmSearchMngPtr mng_ptr_;
@@ -56,7 +56,7 @@ class PtmSlowMatch {
   DeconvMsPtrVec deconv_ms_ptr_vec_;
   PrmMsPtrVec ms_six_ptr_vec_;
   ExtendMsPtrVec ms_three_ptr_vec_;
-  AlignTypePtr align_type_ptr_;
+  ProteoformTypePtr align_type_ptr_;
   CompShiftLowMem comp_shift_;
   PSAlignPtr ps_align_ptr_;
 

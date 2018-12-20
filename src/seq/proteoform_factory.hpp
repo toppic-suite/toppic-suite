@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_BASE_PROTEOFORM_FACTORY_HPP_
-#define TOPPIC_BASE_PROTEOFORM_FACTORY_HPP_
+#ifndef TOPPIC_SEQ_PROTEOFORM_FACTORY_HPP_
+#define TOPPIC_SEQ_PROTEOFORM_FACTORY_HPP_
 
 
 #include <string>

@@ -13,13 +13,13 @@
 //limitations under the License.
 
 
-#include <utility>
 #include <string>
 
 #include "util/logger.hpp"
-#include "base/ptm_base.hpp"
-#include "seq/fasta_seq.hpp"
 #include "xml/xml_dom_util.hpp"
+#include "base/ptm_base.hpp"
+#include "base/residue_util.hpp"
+#include "seq/fasta_seq.hpp"
 
 namespace toppic {
 
@@ -43,32 +43,6 @@ FastaSeq::FastaSeq(const std::string &name,
       compAcidPtmPairVec();
     }
 
-/** process fasta string and remove unknown letters */
-std::string FastaSeq::rmChar(const std::string &ori_seq) {
-  std::string seq = "";
-  for (size_t i = 0; i < ori_seq.length(); i++) {
-    char c = ori_seq.at(i);
-    if (c < 'A' || c > 'Z') {
-      continue;
-    }
-    char r = c;
-    if (c == 'B') {
-      r = 'D';
-    } else if (c == 'Z') {
-      r = 'E';
-    } else if (c == 'X') {
-      r = 'A';
-    } else if (c == 'J') {
-      r = 'I';
-    }
-    seq = seq + r;
-  }
-  if (ori_seq != seq) {
-    LOG_INFO("Reading sequence. Unknown letter occurred.");
-  }
-  return seq;
-}
-
 void FastaSeq::compAcidPtmPairVec() {
   // LOG_DEBUG("start get acid ptm pair");
   size_t pos = 0;
@@ -85,21 +59,9 @@ void FastaSeq::compAcidPtmPairVec() {
       ptm_str = seq_.substr(pos+2, bracket_pos - pos - 2);
       pos = bracket_pos + 1;
     }
-    bool valid = true;
     char c = acid_one_letter.at(0);
-    if (c < 'A' || c > 'Z') {
-      valid = false;
-    }
-    if (c == 'B') {
-      acid_one_letter = "D";
-    } else if (c == 'Z') {
-      acid_one_letter = "E";
-    } else if (c == 'X') {
-      acid_one_letter = "A";
-    } else if (c == 'J') {
-      acid_one_letter = "I";
-    }
-    if (valid) {
+    if (residue_util::isValidResidue(c)) {
+      acid_one_letter = residue_util::replaceResidueLetter(c);
       std::pair<std::string, std::string> pair(acid_one_letter, ptm_str);
       // LOG_DEBUG("count " << count << " acid " << acid_one_letter << " ptm " << ptm_str);
       count++;
@@ -126,20 +88,20 @@ std::string FastaSeq::getString(const StringPairVec &str_pair_vec) {
   return result;
 }
 
-void FastaSeq::appendNameDescToXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
+void FastaSeq::appendNameDescToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
   std::string element_name = FastaSeq::getXmlElementName();
-  xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
+  XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
   xml_doc->addElement(element, "seq_name", name_.c_str());
   xml_doc->addElement(element, "seq_desc", desc_.c_str());
   parent->appendChild(element);
 }
 
-std::string FastaSeq::getNameFromXml(xercesc::DOMElement * element) {
+std::string FastaSeq::getNameFromXml(XmlDOMElement * element) {
   std::string name = xml_dom_util::getChildValue(element, "seq_name", 0);
   return name;
 }
 
-std::string FastaSeq::getDescFromXml(xercesc::DOMElement * element) {
+std::string FastaSeq::getDescFromXml(XmlDOMElement * element) {
   std::string desc = xml_dom_util::getChildValue(element, "seq_desc", 0);
   return desc;
 }

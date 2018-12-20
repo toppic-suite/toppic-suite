@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_BASE_RESIDUE_SEQ_HPP_
-#define TOPPIC_BASE_RESIDUE_SEQ_HPP_
+#ifndef TOPPIC_SEQ_RESIDUE_SEQ_HPP_
+#define TOPPIC_SEQ_RESIDUE_SEQ_HPP_
 
 #include <string>
 #include <vector>
@@ -61,7 +61,7 @@ class ResidueSeq {
 
   static std::string getXmlElementName() {return "residue_seq";}
 
-  //void appendXml(XmlDOMDocument* xml_doc,xercesc::DOMElement* parent);
+  //void appendXml(XmlDOMDocument* xml_doc,XmlDOMElement* parent);
 
  private:
   /** residue list */

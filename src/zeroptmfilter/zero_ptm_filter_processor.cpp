@@ -78,10 +78,10 @@ void ZeroPtmFilterProcessor::process() {
 
   std::cout << "Non PTM filtering - combining blocks started." << std::endl;
 
-  std::string complete = AlignType::COMPLETE->getName();
-  std::string prefix = AlignType::PREFIX->getName();
-  std::string suffix = AlignType::SUFFIX->getName();
-  std::string internal = AlignType::INTERNAL->getName();
+  std::string complete = ProteoformType::COMPLETE->getName();
+  std::string prefix = ProteoformType::PREFIX->getName();
+  std::string suffix = ProteoformType::SUFFIX->getName();
+  std::string internal = ProteoformType::INTERNAL->getName();
 
   int block_num = db_block_ptr_vec.size();
 
@@ -144,10 +144,10 @@ std::function<void()> geneTask(const ProteoformPtrVec & raw_forms,
     std::string output_file_name = file_util::basename(prsm_para_ptr->getSpectrumFileName())
         + "." + mng_ptr->output_file_ext_;
 
-    std::string complete = AlignType::COMPLETE->getName();
-    std::string prefix = AlignType::PREFIX->getName();
-    std::string suffix = AlignType::SUFFIX->getName();
-    std::string internal = AlignType::INTERNAL->getName();
+    std::string complete = ProteoformType::COMPLETE->getName();
+    std::string prefix = ProteoformType::PREFIX->getName();
+    std::string suffix = ProteoformType::SUFFIX->getName();
+    std::string internal = ProteoformType::INTERNAL->getName();
 
     SimplePrsmXmlWriter comp_writer(output_file_name + "_" + complete + "_" 
                                     + block_str + "_" + str_util::toString(idx));
@@ -215,10 +215,10 @@ void ZeroPtmFilterProcessor::processBlock(DbBlockPtr block_ptr) {
   std::cout << std::flush << "Non PTM filtering - processing " << spectrum_num
       << " of " << spectrum_num << " spectra." << std::endl;
 
-  std::string complete = AlignType::COMPLETE->getName();
-  std::string prefix = AlignType::PREFIX->getName();
-  std::string suffix = AlignType::SUFFIX->getName();
-  std::string internal = AlignType::INTERNAL->getName();
+  std::string complete = ProteoformType::COMPLETE->getName();
+  std::string prefix = ProteoformType::PREFIX->getName();
+  std::string suffix = ProteoformType::SUFFIX->getName();
+  std::string internal = ProteoformType::INTERNAL->getName();
 
   SimplePrsmStrCombine comp_combine(sp_file_name,
                                     mng_ptr_->output_file_ext_ + "_" + complete + "_" + block_str,

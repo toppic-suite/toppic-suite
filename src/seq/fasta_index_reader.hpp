@@ -13,18 +13,15 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_BASE_FASTA_INDEX_READER_HPP_
-#define TOPPIC_BASE_FASTA_INDEX_READER_HPP_
+#ifndef TOPPIC_SEQ_FASTA_INDEX_READER_HPP_
+#define TOPPIC_SEQ_FASTA_INDEX_READER_HPP_
 
-#include <iostream>
-#include <fstream>
 #include <string>
-#include <vector>
 
 #include "htslib/faidx.h"
+
 #include "seq/fasta_seq.hpp"
 #include "seq/fasta_sub_seq.hpp"
-#include "util/str_util.hpp"
 
 namespace toppic {
 

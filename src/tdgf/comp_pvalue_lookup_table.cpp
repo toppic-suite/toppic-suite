@@ -172,7 +172,7 @@ void CompPValueLookupTable::process(const DeconvMsPtrVec &deconv_ms_ptr_vec, Prs
       prot_prob = compProb(peak_num, match_frag_num, unexpected_shift_num);
     }
 
-    AlignTypePtr type_ptr = prsm_ptrs[i]->getProteoformPtr()->getAlignType();
+    ProteoformTypePtr type_ptr = prsm_ptrs[i]->getProteoformPtr()->getProteoformType();
 
     double cand_num = test_num_ptr_->compCandNum(type_ptr, unexpected_shift_num,
                                                  refine_prec_mass, tolerance);

@@ -12,12 +12,9 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <algorithm>
-#include <cmath>
-#include <memory>
 #include <string>
-#include <vector>
-#include <functional>
+#include <cmath>
+#include <algorithm>
 
 #include "util/logger.hpp"
 #include "seq/bp_spec.hpp"

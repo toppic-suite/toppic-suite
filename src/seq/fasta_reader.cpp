@@ -22,8 +22,8 @@ namespace toppic {
 FastaReader::FastaReader(const std::string &file_name) {
   input_.open(file_name.c_str(), std::ios::in);
   if (!input_.is_open()) {
-    LOG_ERROR("fasta file  " << file_name << " does not exist.");
-    throw "fasta file does not exist.";
+    LOG_ERROR("Fasta file  " << file_name << " does not exist.");
+    exit(EXIT_FAILURE);
   }
   std::getline(input_, ori_name_);
 
@@ -36,7 +36,6 @@ FastaSeqPtr FastaReader::getNextSeq() {
   if (!input_.is_open()) {
     return FastaSeqPtr(nullptr);
   }
-
   // get the letters of sequence
   std::string ori_seq;
   str_util::trim(ori_name_);
@@ -51,8 +50,8 @@ FastaSeqPtr FastaReader::getNextSeq() {
     str_util::trim(line);
     ori_seq = ori_seq + line;
     if (ori_seq.size() >= 1000000) {
-      LOG_ERROR("Protein sequences are too long! Incorrect fasta file!");
-      throw("fasta file error");
+      LOG_ERROR("Protein sequences are too long! Incorrect fasta file format!");
+      exit(EXIT_FAILURE);
     }
   }
   input_.close();

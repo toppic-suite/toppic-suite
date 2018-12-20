@@ -13,10 +13,15 @@
 //limitations under the License.
 
 #include <string>
+#include <algorithm>
 #include <random>
+
+#include "htslib/faidx.h"
 
 #include "util/logger.hpp"
 #include "util/str_util.hpp"
+#include "util/file_util.hpp"
+#include "seq/fasta_reader.hpp"
 #include "seq/fasta_util.hpp"
 
 namespace toppic {
@@ -124,10 +129,8 @@ void dbPreprocess(const std::string &ori_db_file_name,
   if (decoy) {
     generateShuffleDb(standard_db_file_name, db_file_name);
   } else {
-    boost::filesystem::path ori_path(standard_db_file_name);
-    boost::filesystem::path db_path(db_file_name);
-    boost::filesystem::copy_file(ori_path, db_path,
-                                 boost::filesystem::copy_option::overwrite_if_exists);
+    bool over_write = true;
+    file_util::copyFile(standard_db_file_name, db_file_name, over_write);
   }
   generateDbBlock(db_file_name, block_size);
   fai_build(db_file_name.c_str());

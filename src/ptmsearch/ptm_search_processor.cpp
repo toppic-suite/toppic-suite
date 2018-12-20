@@ -36,16 +36,16 @@ template <int N>
 PrsmXmlWriterSet<N>::PrsmXmlWriterSet(const std::string & output_file_name){
   for (int s = 2; s <= N; s++) {
     std::string end_str = "_" + str_util::toString(s);
-    std::string file_name = output_file_name + "_" + AlignType::COMPLETE->getName() + end_str;
+    std::string file_name = output_file_name + "_" + ProteoformType::COMPLETE->getName() + end_str;
     PrsmXmlWriterPtr complete_writer_ptr = std::make_shared<PrsmXmlWriter>(file_name);
     complete_writer_ptrs_.push_back(complete_writer_ptr);
-    file_name = output_file_name + "_" + AlignType::PREFIX->getName() + end_str;
+    file_name = output_file_name + "_" + ProteoformType::PREFIX->getName() + end_str;
     PrsmXmlWriterPtr prefix_writer_ptr = std::make_shared<PrsmXmlWriter>(file_name);
     prefix_writer_ptrs_.push_back(prefix_writer_ptr);
-    file_name = output_file_name + "_" + AlignType::SUFFIX->getName() + end_str;
+    file_name = output_file_name + "_" + ProteoformType::SUFFIX->getName() + end_str;
     PrsmXmlWriterPtr suffix_writer_ptr = std::make_shared<PrsmXmlWriter>(file_name);
     suffix_writer_ptrs_.push_back(suffix_writer_ptr);
-    file_name = output_file_name + "_" + AlignType::INTERNAL->getName() + end_str;
+    file_name = output_file_name + "_" + ProteoformType::INTERNAL->getName() + end_str;
     PrsmXmlWriterPtr internal_writer_ptr = std::make_shared<PrsmXmlWriter>(file_name);
     internal_writer_ptrs_.push_back(internal_writer_ptr);
   }
@@ -93,27 +93,27 @@ std::function<void()> geneTask(SpectrumSetPtr spectrum_set_ptr,
     boost::thread::id thread_id = boost::this_thread::get_id();
     std::shared_ptr<PrsmXmlWriterSet<N>> writer_ptr = pool_ptr->getWriter(thread_id); 
     for (int s = 2; s <= N; s++) {
-      PrsmPtrVec complete_prsm_ptrs = slow_filter_ptr->getPrsms(s-2, AlignType::COMPLETE);
+      PrsmPtrVec complete_prsm_ptrs = slow_filter_ptr->getPrsms(s-2, ProteoformType::COMPLETE);
       std::sort(complete_prsm_ptrs.begin(), complete_prsm_ptrs.end(), 
                 Prsm::cmpMatchFragDecStartPosInc);
       PrsmPtrVec sele_complete_prsm_ptrs;
       seleTopPrsms(complete_prsm_ptrs, sele_complete_prsm_ptrs, mng_ptr->n_report_);
       writer_ptr->complete_writer_ptrs_[s-2]->writeVector(sele_complete_prsm_ptrs);
 
-      PrsmPtrVec prefix_prsm_ptrs = slow_filter_ptr->getPrsms(s-2, AlignType::PREFIX);
+      PrsmPtrVec prefix_prsm_ptrs = slow_filter_ptr->getPrsms(s-2, ProteoformType::PREFIX);
       std::sort(prefix_prsm_ptrs.begin(), prefix_prsm_ptrs.end(), 
                 Prsm::cmpMatchFragDecStartPosInc);
       PrsmPtrVec sele_prefix_prsm_ptrs;
       seleTopPrsms(prefix_prsm_ptrs, sele_prefix_prsm_ptrs, mng_ptr->n_report_);
       writer_ptr->prefix_writer_ptrs_[s-2]->writeVector(sele_prefix_prsm_ptrs);
 
-      PrsmPtrVec suffix_prsm_ptrs = slow_filter_ptr->getPrsms(s-2, AlignType::SUFFIX);
+      PrsmPtrVec suffix_prsm_ptrs = slow_filter_ptr->getPrsms(s-2, ProteoformType::SUFFIX);
       std::sort(suffix_prsm_ptrs.begin(), suffix_prsm_ptrs.end(), Prsm::cmpMatchFragmentDec);
       PrsmPtrVec sele_suffix_prsm_ptrs;
       seleTopPrsms(suffix_prsm_ptrs, sele_suffix_prsm_ptrs, mng_ptr->n_report_);
       writer_ptr->suffix_writer_ptrs_[s-2]->writeVector(sele_suffix_prsm_ptrs);
 
-      PrsmPtrVec internal_prsm_ptrs = slow_filter_ptr->getPrsms(s-2, AlignType::INTERNAL);
+      PrsmPtrVec internal_prsm_ptrs = slow_filter_ptr->getPrsms(s-2, ProteoformType::INTERNAL);
       std::sort(internal_prsm_ptrs.begin(), internal_prsm_ptrs.end(), Prsm::cmpMatchFragmentDec);
       PrsmPtrVec sele_internal_prsm_ptrs;
       seleTopPrsms(internal_prsm_ptrs, sele_internal_prsm_ptrs, mng_ptr->n_report_);
@@ -191,11 +191,11 @@ void PtmSearchProcessor::process(){
     std::string end_str = "_" + str_util::toString(s);
     // Complete prsms
     std::string complete_output_ext = mng_ptr_->output_file_ext_ + "_" 
-        + AlignType::COMPLETE->getName() + end_str;
+        + ProteoformType::COMPLETE->getName() + end_str;
     std::vector<std::string> complete_input_exts;
     for (int t = 0; t < mng_ptr_->thread_num_; t++) {
       std::string input_ext = mng_ptr_->output_file_ext_ + "_" 
-          + str_util::toString(t) + "_" + AlignType::COMPLETE->getName() + end_str;
+          + str_util::toString(t) + "_" + ProteoformType::COMPLETE->getName() + end_str;
       complete_input_exts.push_back(input_ext);
     }
     PrsmStrCombinePtr combine_ptr
@@ -206,11 +206,11 @@ void PtmSearchProcessor::process(){
 
     // Prefix prsms
     std::string prefix_output_ext = mng_ptr_->output_file_ext_ + "_" 
-        + AlignType::PREFIX->getName() + end_str;
+        + ProteoformType::PREFIX->getName() + end_str;
     std::vector<std::string> prefix_input_exts;
     for (int t = 0; t < mng_ptr_->thread_num_; t++) {
       std::string input_ext = mng_ptr_->output_file_ext_ + "_" 
-          + str_util::toString(t) + "_" + AlignType::PREFIX->getName() + end_str;
+          + str_util::toString(t) + "_" + ProteoformType::PREFIX->getName() + end_str;
       prefix_input_exts.push_back(input_ext);
     }
     combine_ptr
@@ -221,11 +221,11 @@ void PtmSearchProcessor::process(){
 
     // Suffix prsms
     std::string suffix_output_ext = mng_ptr_->output_file_ext_ + "_" 
-        + AlignType::SUFFIX->getName() + end_str;
+        + ProteoformType::SUFFIX->getName() + end_str;
     std::vector<std::string> suffix_input_exts;
     for (int t = 0; t < mng_ptr_->thread_num_; t++) {
       std::string input_ext = mng_ptr_->output_file_ext_ + "_" 
-          + str_util::toString(t) + "_" + AlignType::SUFFIX->getName() + end_str;
+          + str_util::toString(t) + "_" + ProteoformType::SUFFIX->getName() + end_str;
       suffix_input_exts.push_back(input_ext);
     }
     combine_ptr
@@ -236,11 +236,11 @@ void PtmSearchProcessor::process(){
 
     // internal prsms
     std::string internal_output_ext = mng_ptr_->output_file_ext_ + "_" 
-        + AlignType::INTERNAL->getName() + end_str;
+        + ProteoformType::INTERNAL->getName() + end_str;
     std::vector<std::string> internal_input_exts;
     for (int t = 0; t < mng_ptr_->thread_num_; t++) {
       std::string input_ext = mng_ptr_->output_file_ext_ + "_" 
-          + str_util::toString(t) + "_" + AlignType::INTERNAL->getName() + end_str;
+          + str_util::toString(t) + "_" + ProteoformType::INTERNAL->getName() + end_str;
       internal_input_exts.push_back(input_ext);
     }
     combine_ptr

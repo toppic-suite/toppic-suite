@@ -14,18 +14,26 @@
 
 #include <string>
 
-#include "base/mod_base.hpp"
 #include "util/str_util.hpp"
 #include "xml/xml_dom_util.hpp"
+#include "base/mod_base.hpp"
 #include "seq/change.hpp"
 
 namespace toppic {
 
-Change::Change(xercesc::DOMElement* element) {
+Change::Change(int left_bp_pos, int right_bp_pos,
+               MassShiftTypePtr type_ptr,
+               double mass, ModPtr mod_ptr):
+    left_bp_pos_(left_bp_pos),
+    right_bp_pos_(right_bp_pos),
+    type_ptr_(type_ptr),
+    mass_(mass), mod_ptr_(mod_ptr) {}
+
+Change::Change(XmlDOMElement* element) {
   left_bp_pos_ = xml_dom_util::getIntChildValue(element, "left_bp_pos", 0);
   right_bp_pos_ = xml_dom_util::getIntChildValue(element, "right_bp_pos", 0);
   std::string ct_element_name = MassShiftType::getXmlElementName();
-  xercesc::DOMElement* ct_element
+  XmlDOMElement* ct_element
       = xml_dom_util::getChildElement(element, ct_element_name.c_str(), 0);
   type_ptr_ = MassShiftType::getChangeTypePtrFromXml(ct_element);
   mass_ = xml_dom_util::getDoubleChildValue(element, "mass", 0);
@@ -33,7 +41,7 @@ Change::Change(xercesc::DOMElement* element) {
 
   int mod_count = xml_dom_util::getChildCount(element, mod_element_name.c_str());
   if (mod_count != 0) {
-    xercesc::DOMElement* mod_element
+    XmlDOMElement* mod_element
         = xml_dom_util::getChildElement(element, mod_element_name.c_str(), 0);
     mod_ptr_ = ModBase::getModPtrFromXml(mod_element);
   }
@@ -41,15 +49,15 @@ Change::Change(xercesc::DOMElement* element) {
   std::string local_element_name = LocalAnno::getXmlElementName();;
   int local_count = xml_dom_util::getChildCount(element, local_element_name.c_str());
   if (local_count != 0) {
-    xercesc::DOMElement * local_element
+    XmlDOMElement * local_element
         = xml_dom_util::getChildElement(element, local_element_name.c_str(), 0);
     local_anno_ptr_ = std::make_shared<LocalAnno>(local_element);
   }
 }
 
-void Change::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
+void Change::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
   std::string element_name = Change::getXmlElementName();
-  xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
+  XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
   std::string str = str_util::toString(left_bp_pos_);
   xml_doc->addElement(element, "left_bp_pos", str.c_str());
   str = str_util::toString(right_bp_pos_);
