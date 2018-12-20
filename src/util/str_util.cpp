@@ -113,7 +113,8 @@ double scientificToDouble(const std::string &str) {
     std::string s = "Unable to format ";
     s += str;
     s += " as a number!";
-    throw (s);
+    LOG_ERROR("Can not convert " << s << " to double!");
+    exit(EXIT_FAILURE);
   }
 
   return (d);

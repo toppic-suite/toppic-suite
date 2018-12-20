@@ -159,13 +159,13 @@ bool Argument::parse(int argc, char* argv[]) {
 }
 
 bool Argument::validateArguments() {
-  if (!boost::filesystem::exists(arguments_["resourceDir"])) {
+  if (!file_util::exists(arguments_["resourceDir"])) {
     boost::filesystem::path p(arguments_["executiveDir"]);
     arguments_["resourceDir"]
         = p.parent_path().string() + file_util::getFileSeparator() + "etc" + file_util::getFileSeparator() + file_util::getResourceDirName(); 
   }
 
-  if (!boost::filesystem::exists(arguments_["oriDatabaseFileName"])) {
+  if (!file_util::exists(arguments_["oriDatabaseFileName"])) {
     LOG_ERROR("Database file " << arguments_["databaseFileName"] << " does not exist!");
     return false;
   }
@@ -182,7 +182,7 @@ bool Argument::validateArguments() {
   }
 
   for (size_t k = 0; k < spec_file_list_.size(); k++) {
-    if (!boost::filesystem::exists(spec_file_list_[k])) {
+    if (!file_util::exists(spec_file_list_[k])) {
       LOG_ERROR(spec_file_list_[k] << " does not exist!");
       return false;
     }
