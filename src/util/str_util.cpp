@@ -18,54 +18,42 @@
 
 #include <iomanip>
 #include <vector>
-#include <functional>
-#include <algorithm>
 
 #include "boost/algorithm/string.hpp"
 
 #include "util/logger.hpp"
-#include "util/string_util.hpp"
+#include "util/str_util.hpp"
 
 namespace toppic {
 
-namespace string_util {
+namespace str_util {
 
-std::string trim(const std::string &ori_s) {
-  std::string s = ori_s;
-  s.erase(s.begin(), std::find_if(s.begin(), s.end(),
-                                  std::not1(std::ptr_fun<int, int>(std::isspace))));
-  s.erase(std::find_if(s.rbegin(), s.rend(),
-                       std::not1(std::ptr_fun<int, int>(std::isspace))).base(),
-          s.end());
-  return s;
+void trim(std::string &s) {
+  str_util::trim(s);
 }
 
-std::vector<std::string> split(const std::string &s, char delim) {
-  std::stringstream ss(s);
-  std::string item;
-  std::vector<std::string> elems;
-  while (std::getline(ss, item, delim)) {
-    elems.push_back(item);
-  }
-  return elems;
+std::vector<std::string> split(const std::string &s, const std::string &delim) {
+  std::vector<std::string> strs;
+  boost::split(strs, s, boost::is_any_of(delim));
+  return strs;
 }
 
-std::string convertToString(bool value) {
+std::string toString(bool value) {
   std::stringstream stream;
   stream << value;
   return stream.str();
 }
 
-std::string convertToString(int value) {
-  return string_util::convertToString(value);
+std::string toString(int value) {
+  return str_util::toString(value);
 }
 
-std::string convertToString(size_t value) {
-  return string_util::convertToString(value);
+std::string toString(size_t value) {
+  return str_util::toString(value);
 }
 
 
-std::string convertToString(double value) {
+std::string toString(double value) {
   std::stringstream stream;
 
   if (value < 1 && value > -1 && value !=0) {
@@ -77,7 +65,7 @@ std::string convertToString(double value) {
   return stream.str();
 }
 
-std::string convertToString(double value, int number) {
+std::string toString(double value, int number) {
   std::stringstream stream;
   if (value == 0) {
     stream << std::fixed << std::setprecision(0);
@@ -94,7 +82,7 @@ std::string convertToString(double value, int number) {
   return stream.str();
 }
 
-std::string convertToScientificStr(double value, int number) {
+std::string toScientificStr(double value, int number) {
   std::stringstream stream;
   if (value == 0) {
     stream << std::fixed << std::setprecision(0);
@@ -117,7 +105,7 @@ std::string rmComment(const std::string &ori_s, const std::string &comment) {
   return s;
 }
 
-double convertScientificToDouble(std::string str) {
+double scientificToDouble(const std::string &str) {
   std::stringstream ss(str);
   double d = 0;
   ss >> d;
@@ -136,7 +124,7 @@ bool endsWith(const std::string &str, const std::string &suffix) {
       str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
 }
 
-} // namespace string_util
+} // namespace str_util
 
 }  // namespace toppic
 

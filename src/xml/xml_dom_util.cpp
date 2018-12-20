@@ -19,7 +19,7 @@
 #include <algorithm>
 
 #include "util/logger.hpp"
-#include "util/string_util.hpp"
+#include "util/str_util.hpp"
 #include "xml/xml_dom_util.hpp"
 
 namespace toppic {
@@ -69,7 +69,7 @@ double getScientificChildValue(xercesc::DOMElement* parent,
                                const char* child_tag, int i) {
   std::string value = getChildValue(parent, child_tag, i);
   //LOG_DEBUG("tag " << child_tag << "double value " << value);
-  return string_util::convertScientificToDouble(value);
+  return str_util::scientificToDouble(value);
 }
 
 double getDoubleChildValue(xercesc::DOMElement* parent, 

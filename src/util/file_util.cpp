@@ -13,10 +13,7 @@
 //limitations under the License.
 
 
-#include <iostream>
-#include <sstream>
 #include <string>
-#include <algorithm>
 
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
 #include <windows.h>
@@ -74,6 +71,12 @@ std::string absoluteDir(const std::string &s) {
   return parent_dir;
 }
 
+std::string absoluteName(const std::string &s) {
+  fs::path path(s);
+  std::string absolute_name = absolute(path).string();
+  return absolute_name;
+}
+
 std::string directory(const std::string &s) {
   fs::path path(s);
   std::string parent_dir = path.parent_path().string();
@@ -81,32 +84,32 @@ std::string directory(const std::string &s) {
 }
 
 void createFolder(const std::string &folder_name) {
-  boost::filesystem::path path(folder_name);
-  boost::filesystem::create_directories(path);
+  fs::path path(folder_name);
+  fs::create_directories(path);
 }
 
 void copyFile(const std::string &file_name,
-                        const std::string &to_file, bool over_write) {
-  boost::filesystem::path from_path(file_name);
-  boost::filesystem::path to_path(to_file);
-  if (!boost::filesystem::exists(from_path)) {
+              const std::string &to_file, bool over_write) {
+  fs::path from_path(file_name);
+  fs::path to_path(to_file);
+  if (!fs::exists(from_path)) {
     LOG_ERROR("source file " << file_name << " does not exist!");
     return;
   }
 
-  if (boost::filesystem::exists(to_path)) {
+  if (fs::exists(to_path)) {
     if (over_write) {
-      boost::filesystem::remove(to_path);
+      fs::remove(to_path);
     } else {
       return;
     }
   }
 
-  boost::filesystem::copy(from_path, to_path);
+  fs::copy(from_path, to_path);
 }
 
-bool copyDir(boost::filesystem::path const & source,
-                       boost::filesystem::path const & destination) {
+bool copyDir(fs::path const & source,
+             fs::path const & destination) {
   try {
     if (!fs::exists(source) || !fs::is_directory(source)) {
       return false;
@@ -144,116 +147,122 @@ bool copyDir(boost::filesystem::path const & source,
   return true;
 }
 
+bool exists(const std::string &path) {
+  return fs::exists(path); 
+}
+
 void delDir(const std::string &path) {
   fs::path dir(path);
-
   if (fs::exists(dir))
     fs::remove_all(dir);
 }
 
-bool existDir(const std::string &dir) {
-  return fs::exists(dir); 
-}
-
 void delFile(const std::string &path) {
-  fs::path dir(path);
-
-  if (fs::exists(dir))
-    fs::remove(dir);
+  fs::path file(path);
+  if (fs::exists(file))
+    fs::remove(file);
 }
 
-void clean_prefix(const fs::path & sp, const std::string & prefix) {
+void rename(const std::string &ori_name, 
+            const std::string &new_name) {
+  fs::path ori_path(ori_name); 
+  fs::path new_path(new_name);
+  fs::rename(ori_path, new_path);
+
+}
+
+void cleanPrefix(const std::string & ref_name, 
+                 const std::string & prefix) {
+  fs::path ref_path(ref_name);
+  fs::path ref_dir = absolute(ref_path).parent_path(); 
   fs::directory_iterator end_iter;
-  for (fs::directory_iterator dir_iter(absolute(sp).parent_path());
+  for (fs::directory_iterator dir_iter(ref_dir); 
        dir_iter != end_iter ; ++dir_iter) {
-    std::string filename = dir_iter->path().string();
-    std::replace(filename.begin(), filename.end(), '\\', '/');
-    if (filename.compare(0, prefix.length(), prefix) == 0) {
+    std::string file_name = dir_iter->path().string();
+    std::replace(file_name.begin(), file_name.end(), '\\', '/');
+    if (file_name.compare(0, prefix.length(), prefix) == 0) {
       if (!fs::is_directory(fs::status(dir_iter->path())))
         fs::remove(dir_iter->path());
     }
   }
 }
 
-void cleanTopmgDir(const std::string &fa_path, const std::string & sp_path) {
-  fs::path fa(fa_path);
-  fs::path sp(sp_path);
+void cleanTempFiles(const std::string & ref_name, 
+                    const std::string & ext_prefix) {
+
+  fs::path ref_path(ref_name);
+  std::string ref_base = basename(absolute(ref_path).string());
+  std::replace(ref_base.begin(), ref_base.end(), '\\', '/');
+  cleanPrefix(ref_name, ref_base + "." + ext_prefix);
+}
+
+void cleanTopmgDir(const std::string &fa_name, const std::string & sp_name) {
+  fs::path fa(fa_name);
+  fs::path sp(sp_name);
   std::string fa_base = absolute(fa).string();
   std::replace(fa_base.begin(), fa_base.end(), '\\', '/');
   std::string sp_base = basename(absolute(sp).string());
   std::replace(sp_base.begin(), sp_base.end(), '\\', '/');
 
-  clean_prefix(fa, fa_base + "_");
-  clean_prefix(sp, sp_base + ".msalign_");
+  cleanPrefix(fa_name, fa_base + "_");
+  cleanPrefix(sp_name, sp_base + ".msalign_");
   delFile(absolute(sp).string() + "_index");
   delFile(sp_base + ".topmg_one_filter");
-  clean_prefix(sp, sp_base + ".topmg_one_filter_");
+  cleanPrefix(sp_name, sp_base + ".topmg_one_filter_");
   delFile(sp_base + ".topmg_multi_filter");
-  clean_prefix(sp, sp_base + ".topmg_multi_filter_");
+  cleanPrefix(sp_name, sp_base + ".topmg_multi_filter_");
   delFile(sp_base + ".topmg_graph_filter");
-  clean_prefix(sp, sp_base + ".topmg_graph_filter_");
+  cleanPrefix(sp_name, sp_base + ".topmg_graph_filter_");
   delFile(sp_base + ".topmg_graph_align");
-  clean_prefix(sp, sp_base + ".topmg_graph_align_");
+  cleanPrefix(sp_name, sp_base + ".topmg_graph_align_");
   delFile(sp_base + ".topmg_graph_post");
   delFile(sp_base + ".topmg_graph");
   delFile(sp_base + ".topmg_evalue");
-  clean_prefix(sp, sp_base + ".toppic_evalue_");
+  cleanPrefix(sp_name, sp_base + ".toppic_evalue_");
   delFile(sp_base + ".topmg_cluster");
   delFile(sp_base + ".topmg_top");
   delFile(sp_base + ".topmg_top_pre");
   delFile(sp_base + ".topmg_prsm_cutoff");
   delFile(sp_base + ".topmg_form_cutoff");
-  //delFile(sp_base + ".topmg_form_cutoff_form");
   delFile(sp_base + "_topmg_proteoform.xml");
-  fs::path form_path(sp_base + ".topmg_form_cutoff_form");
-  fs::rename(form_path, sp_base + "_topmg_proteoform.xml");
+  rename(sp_base + ".topmg_form_cutoff_form", 
+         sp_base + "_topmg_proteoform.xml");
 }
 
-void cleanToppicDir(const std::string &fa_path, const std::string & sp_path) {
-  fs::path fa(fa_path);
-  fs::path sp(sp_path);
+void cleanToppicDir(const std::string &fa_name, const std::string & sp_name) {
+  fs::path fa(fa_name);
+  fs::path sp(sp_name);
   std::string fa_base = absolute(fa).string();
   std::replace(fa_base.begin(), fa_base.end(), '\\', '/');
   std::string sp_base = basename(absolute(sp).string());
   std::replace(sp_base.begin(), sp_base.end(), '\\', '/');
 
-  clean_prefix(fa, fa_base + "_");
-  clean_prefix(sp, sp_base + ".msalign_");
+  cleanPrefix(fa_name, fa_base + "_");
+  cleanPrefix(sp_name, sp_base + ".msalign_");
   delFile(absolute(sp).string() + "_index");
-  clean_prefix(sp, sp_base + ".toppic_zero_filter_");
+  cleanPrefix(sp_name, sp_base + ".toppic_zero_filter_");
   delFile(sp_base + ".toppic_zero_ptm");
-  clean_prefix(sp, sp_base + ".toppic_zero_ptm_");
-  clean_prefix(sp, sp_base + ".toppic_one_filter_");
+  cleanPrefix(sp_name, sp_base + ".toppic_zero_ptm_");
+  cleanPrefix(sp_name, sp_base + ".toppic_one_filter_");
   delFile(sp_base + ".toppic_one_ptm");
-  clean_prefix(sp, sp_base + ".toppic_one_ptm_");
+  cleanPrefix(sp_name, sp_base + ".toppic_one_ptm_");
   delFile(sp_base + ".toppic_multi_filter");
-  clean_prefix(sp, sp_base + ".toppic_multi_filter_");
+  cleanPrefix(sp_name, sp_base + ".toppic_multi_filter_");
   delFile(sp_base + ".toppic_multi_ptm");
-  clean_prefix(sp, sp_base + ".toppic_multi_ptm_");
+  cleanPrefix(sp_name, sp_base + ".toppic_multi_ptm_");
   delFile(sp_base + ".toppic_combined");
   delFile(sp_base + ".toppic_evalue");
-  clean_prefix(sp, sp_base + ".toppic_evalue_");
+  cleanPrefix(sp_name, sp_base + ".toppic_evalue_");
   delFile(sp_base + ".toppic_cluster");
   delFile(sp_base + ".toppic_top");
   delFile(sp_base + ".toppic_top_pre");
   delFile(sp_base + ".toppic_prsm_cutoff");
   delFile(sp_base + ".toppic_prsm_cutoff_local");
   delFile(sp_base + ".toppic_form_cutoff");
-  //delFile(sp_base + ".toppic_form_cutoff_form");
   delFile(sp_base + "_toppic_proteoform.xml");
-  fs::path form_path(sp_base + ".toppic_form_cutoff_form");
-  fs::rename(form_path, sp_base + "_toppic_proteoform.xml");
+  rename(sp_base + ".toppic_form_cutoff_form",
+         sp_base + "_toppic_proteoform.xml");
 }
-
-void cleanTempFiles(const std::string & sp_path, 
-                    const std::string & ext_prefix) {
-
-  fs::path sp(sp_path);
-  std::string sp_base = basename(absolute(sp).string());
-  std::replace(sp_base.begin(), sp_base.end(), '\\', '/');
-  clean_prefix(sp, sp_base + "." + ext_prefix);
-}
-
 
 }  // namespace file_util
 

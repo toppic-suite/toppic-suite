@@ -16,7 +16,7 @@
 
 #include "seq/mass_shift.hpp"
 #include "base/mod_base.hpp"
-#include "util/string_util.hpp"
+#include "util/str_util.hpp"
 #include "xml/xml_dom_util.hpp"
 
 namespace toppic {
@@ -67,7 +67,7 @@ std::string MassShift::getSeqStr() {
     if (change_vec_[0]->getLocalAnno() != nullptr) {
       seq_str = change_vec_[0]->getLocalAnno()->getPtmPtr()->getAbbrName();
     } else {
-      seq_str = string_util::convertToString(shift_, 5);
+      seq_str = str_util::toString(shift_, 5);
     }
   } else {
     for (size_t i = 0; i < change_vec_.size(); i++) {
@@ -83,12 +83,12 @@ std::string MassShift::getSeqStr() {
 void MassShift::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   std::string element_name = getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
-  std::string str = string_util::convertToString(left_bp_pos_);
+  std::string str = str_util::toString(left_bp_pos_);
   xml_doc->addElement(element, "shift_left_bp_pos", str.c_str());
-  str = string_util::convertToString(right_bp_pos_);
+  str = str_util::toString(right_bp_pos_);
   xml_doc->addElement(element, "shift_right_bp_pos", str.c_str());
   type_ptr_->appendXml(xml_doc, element);
-  str = string_util::convertToString(shift_);
+  str = str_util::toString(shift_);
   xml_doc->addElement(element, "shift", str.c_str());
 
   element_name = Change::getXmlElementName() + "_list";

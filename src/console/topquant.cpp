@@ -19,7 +19,7 @@
 
 #include "base/base_data.hpp"
 #include "util/file_util.hpp"
-#include "util/string_util.hpp"
+#include "util/str_util.hpp"
 #include "seq/fasta_util.hpp"
 
 #include "prsm/prsm_reader.hpp"

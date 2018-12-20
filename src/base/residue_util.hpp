@@ -18,7 +18,7 @@
 
 #include <string>
 
-#include "util/string_util.hpp"
+#include "util/str_util.hpp"
 #include "base/mod.hpp"
 #include "base/residue.hpp"
 

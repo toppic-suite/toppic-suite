@@ -16,9 +16,8 @@
 #include <string>
 #include <vector>
 
-#include <boost/filesystem.hpp>
-
 #include "util/logger.hpp"
+#include "util/file_util.hpp"
 #include "xml/xml_dom_util.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 
@@ -30,8 +29,7 @@ PrsmXmlWriter::PrsmXmlWriter(const std::string &file_name) {
   file_ << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << std::endl;
   file_ << "<prsm_list>" << std::endl;
 
-  boost::filesystem::path p(file_name);
-  file_name_ = p.stem().string() + ".msalign";
+  file_name_ = file_util::basename(file_name) + ".msalign";
 }
 
 void PrsmXmlWriter::close() {

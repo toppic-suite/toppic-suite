@@ -21,8 +21,6 @@
 #include <vector>
 
 
-#include <boost/algorithm/string.hpp>
-
 #include "util/file_util.hpp"
 #include "spec/msalign_reader.hpp"
 #include "spec/extend_ms_factory.hpp"
@@ -116,17 +114,17 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   int peak_num = 0;
   DeconvMsPtrVec deconv_ms_ptr_vec = prsm_ptr->getDeconvMsPtrVec();
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
-    spec_ids = spec_ids + string_util::convertToString(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getId()) + " ";
+    spec_ids = spec_ids + str_util::toString(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getId()) + " ";
     spec_activations = spec_activations + deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getActivationPtr()->getName() + " ";
     spec_scans = spec_scans + deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getScansString() + " ";
     peak_num += deconv_ms_ptr_vec[i]->size();
-    retention_time = retention_time + string_util::convertToString(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getRetentionTime(), 2) + " ";
+    retention_time = retention_time + str_util::toString(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getRetentionTime(), 2) + " ";
   }
 
-  boost::algorithm::trim(spec_ids);
-  boost::algorithm::trim(spec_activations);
-  boost::algorithm::trim(spec_scans);
-  boost::algorithm::trim(retention_time);
+  str_util::trim(spec_ids);
+  str_util::trim(spec_activations);
+  str_util::trim(spec_scans);
+  str_util::trim(retention_time);
 
   if (deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getRetentionTime() <= 0.0) retention_time = "-";
 

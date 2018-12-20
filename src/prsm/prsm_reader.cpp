@@ -19,7 +19,7 @@
 #include "htslib/faidx.h"
 
 #include "util/logger.hpp"
-#include "util/string_util.hpp"
+#include "util/str_util.hpp"
 #include "prsm/prsm_reader.hpp"
 
 namespace toppic {
@@ -32,7 +32,7 @@ std::vector<std::string> PrsmReader::readOnePrsmLines() {
   std::string line;
   std::vector<std::string> line_list;
   while (std::getline(input_, line)) {
-    line = string_util::trim(line);
+    str_util::trim(line);
     // LOG_DEBUG("line " << line);
     if (line ==  "<prsm>") {
       line_list.push_back(line);

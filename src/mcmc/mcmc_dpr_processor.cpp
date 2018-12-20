@@ -18,8 +18,6 @@
 #include <vector>
 #include <map>
 
-#include <boost/algorithm/string.hpp>
-
 #include "base/ptm_util.hpp"
 #include "base/mod_util.hpp"
 #include "util/file_util.hpp"
@@ -140,7 +138,7 @@ void DprProcessor::process() {
   PrsmReaderPtr prsm_reader = std::make_shared<PrsmReader>(input_file_name);
 
   PrsmXmlWriterPtr prsm_writer
-      = std::make_shared<PrsmXmlWriter>(output_file_name + "_" + string_util::convertToString(mng_ptr_->thread_num_));
+      = std::make_shared<PrsmXmlWriter>(output_file_name + "_" + str_util::toString(mng_ptr_->thread_num_));
 
   pool_ptr_ = std::make_shared<ThreadPool<PrsmXmlWriter> >(mng_ptr_->thread_num_ , output_file_name);
 
@@ -193,7 +191,7 @@ void DprProcessor::process() {
   int prsm_top_num = INT_MAX; 
   std::vector<std::string> input_exts;
   for (int t = 0; t < mng_ptr_->thread_num_; t++) {
-    input_exts.push_back(mng_ptr_->output_file_ext_ + "_" + string_util::convertToString(t));
+    input_exts.push_back(mng_ptr_->output_file_ext_ + "_" + str_util::toString(t));
   }
   PrsmStrCombinePtr combine_ptr
       = std::make_shared<PrsmStrCombine>(sp_file_name, input_exts, 

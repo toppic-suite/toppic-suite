@@ -20,7 +20,7 @@
 
 #include "base/base_data.hpp"
 #include "prsm/extreme_value.hpp"
-#include "util/string_util.hpp"
+#include "util/str_util.hpp"
 #include "xml/xml_dom_util.hpp"
 
 namespace toppic {
@@ -56,15 +56,15 @@ void ExtremeValue::init() {
 void ExtremeValue::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   std::string element_name = getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
-  std::string str = string_util::convertToScientificStr(one_prot_prob_, 4);
+  std::string str = str_util::toScientificStr(one_prot_prob_, 4);
   xml_doc->addElement(element, "one_protein_probability", str.c_str());
-  str = string_util::convertToScientificStr(test_num_, 4);
+  str = str_util::toScientificStr(test_num_, 4);
   xml_doc->addElement(element, "test_number", str.c_str());
-  str = string_util::convertToString(adjust_factor_);
+  str = str_util::toString(adjust_factor_);
   xml_doc->addElement(element, "adjust_factor", str.c_str());
-  str = string_util::convertToScientificStr(p_value_, 4);
+  str = str_util::toScientificStr(p_value_, 4);
   xml_doc->addElement(element, "p_value", str.c_str());
-  str = string_util::convertToScientificStr(e_value_, 4);
+  str = str_util::toScientificStr(e_value_, 4);
   xml_doc->addElement(element, "e_value", str.c_str());
   parent->appendChild(element);
 }

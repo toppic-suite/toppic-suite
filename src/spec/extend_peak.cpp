@@ -15,7 +15,7 @@
 
 #include <string>
 
-#include "util/string_util.hpp"
+#include "util/str_util.hpp"
 #include "spec/extend_peak.hpp"
 
 namespace toppic {
@@ -24,17 +24,17 @@ void ExtendPeak::appendXml(XmlDOMDocument* xml_doc,
                            xercesc::DOMElement* parent) {
   std::string element_name = ExtendPeak::getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
-  std::string str = string_util::convertToString(getPosition());
+  std::string str = str_util::toString(getPosition());
   xml_doc->addElement(element, "position", str.c_str());
-  str = string_util::convertToString(getIntensity());
+  str = str_util::toString(getIntensity());
   xml_doc->addElement(element, "intensity", str.c_str());
-  str = string_util::convertToString(mono_mass_);
+  str = str_util::toString(mono_mass_);
   xml_doc->addElement(element, "mono_mass", str.c_str());
-  str = string_util::convertToString(score_);
+  str = str_util::toString(score_);
   xml_doc->addElement(element, "score", str.c_str());
-  str = string_util::convertToString(orig_tolerance_);
+  str = str_util::toString(orig_tolerance_);
   xml_doc->addElement(element, "orig_tolerance", str.c_str());
-  str = string_util::convertToString(reverse_tolerance_);
+  str = str_util::toString(reverse_tolerance_);
   xml_doc->addElement(element, "reverse_tolerance", str.c_str());
   base_peak_ptr_->appendXml(xml_doc, element);
   parent->appendChild(element);

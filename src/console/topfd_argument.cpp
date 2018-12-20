@@ -16,8 +16,6 @@
 #include <string>
 #include <algorithm>
 
-#include "boost/algorithm/string.hpp"
-
 #include "util/file_util.hpp"
 #include "xml/xml_dom_util.hpp"
 #include "console/topfd_argument.hpp"

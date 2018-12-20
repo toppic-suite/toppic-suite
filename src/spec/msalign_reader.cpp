@@ -16,10 +16,8 @@
 #include <vector>
 #include <string>
 
-#include "boost/algorithm/string.hpp"
-
 #include "base/activation_base.hpp"
-#include "util/string_util.hpp"
+#include "util/str_util.hpp"
 #include "spec/msalign_reader.hpp"
 
 namespace toppic {
@@ -28,7 +26,7 @@ std::vector<std::string> MsAlignReader::readOneSpectrum() {
   std::string line;
   std::vector<std::string> line_list;
   while (std::getline(input_, line)) {
-    line = string_util::trim(line);
+    str_util::trim(line);
     if (line == "BEGIN IONS") {
       line_list.push_back(line);
     } else if (line == "END IONS") {
@@ -72,7 +70,7 @@ void MsAlignReader::readNext() {
   for (size_t i = 1; i < spectrum_str_vec_.size() - 1; i++) {
     std::string letter = spectrum_str_vec_[i].substr(0, 1);
     if (letter >= "A" && letter <= "Z") {
-      strs = string_util::split(spectrum_str_vec_[i], '=');
+      strs = str_util::split(spectrum_str_vec_[i], "=");
       if (strs[0] == "ID") {
         id = std::stoi(strs[1]);
       }
@@ -160,7 +158,7 @@ void MsAlignReader::readNext() {
   for (size_t i = 1; i < spectrum_str_vec_.size() - 1; i++) {
     std::string letter = spectrum_str_vec_[i].substr(0, 1);
     if (letter >= "0" && letter <= "9") {
-      boost::split(strs, spectrum_str_vec_[i], boost::is_any_of("\t "));
+      strs = str_util::split(spectrum_str_vec_[i], "\t ");
       double mass = std::stod(strs[0]);
       double inte = std::stod(strs[1]);
       int charge = std::stoi(strs[2]);

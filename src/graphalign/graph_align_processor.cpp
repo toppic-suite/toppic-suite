@@ -50,7 +50,7 @@ std::function<void()> geneTask(FastaIndexReaderPtr reader_ptr,
     std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
 
     std::string input_file_name
-        = file_util::basename(sp_file_name) + "." + mng_ptr->input_file_ext_ + "_" + string_util::convertToString(idx);
+        = file_util::basename(sp_file_name) + "." + mng_ptr->input_file_ext_ + "_" + str_util::toString(idx);
     SimplePrsmReader simple_prsm_reader(input_file_name);
     SimplePrsmStrPtr prsm_ptr = simple_prsm_reader.readOnePrsmStr();
     int group_spec_num = prsm_para_ptr->getGroupSpecNum();
@@ -64,7 +64,7 @@ std::function<void()> geneTask(FastaIndexReaderPtr reader_ptr,
                                 sp_para_ptr);
 
     PrsmXmlWriterPtr writer_ptr
-        = std::make_shared<PrsmXmlWriter>(file_util::basename(sp_file_name) + "." + mng_ptr->output_file_ext_ + "_" + string_util::convertToString(idx));
+        = std::make_shared<PrsmXmlWriter>(file_util::basename(sp_file_name) + "." + mng_ptr->output_file_ext_ + "_" + str_util::toString(idx));
     SpectrumSetPtr spec_set_ptr = sp_reader.getNextSpectrumSet(sp_para_ptr)[0];
     ProteoAnnoPtr proteo_anno_ptr
         = std::make_shared<ProteoAnno>(prsm_para_ptr->getFixModPtrVec(),
@@ -186,7 +186,7 @@ void GraphAlignProcessor::process() {
 
   std::vector<std::shared_ptr<SimplePrsmXmlWriter> > simple_prsm_writer_vec;
   for (int i = 0; i < mng_ptr_->thread_num_; i++) {
-    simple_prsm_writer_vec.push_back(std::make_shared<SimplePrsmXmlWriter>(input_file_name + "_" + string_util::convertToString(i)));
+    simple_prsm_writer_vec.push_back(std::make_shared<SimplePrsmXmlWriter>(input_file_name + "_" + str_util::toString(i)));
   }
 
   int cnt = 0;
@@ -244,7 +244,7 @@ void GraphAlignProcessor::process() {
   // combine result files
   std::vector<std::string> input_exts;
   for (int i = 0; i < mng_ptr_->thread_num_; i++) {
-    std::string fname = mng_ptr_->output_file_ext_ + "_" + string_util::convertToString(i);
+    std::string fname = mng_ptr_->output_file_ext_ + "_" + str_util::toString(i);
     input_exts.push_back(fname);
   }
 
@@ -258,8 +258,8 @@ void GraphAlignProcessor::process() {
 
   // remove temporary files
   for (int t = 0; t < mng_ptr_->thread_num_; t++) {
-    file_util::cleanTempFiles(sp_file_name, mng_ptr_->input_file_ext_ + "_" + string_util::convertToString(t));
-    file_util::cleanTempFiles(sp_file_name, mng_ptr_->output_file_ext_ + "_" + string_util::convertToString(t));
+    file_util::cleanTempFiles(sp_file_name, mng_ptr_->input_file_ext_ + "_" + str_util::toString(t));
+    file_util::cleanTempFiles(sp_file_name, mng_ptr_->output_file_ext_ + "_" + str_util::toString(t));
   }
 }
 }  // namespace toppic

@@ -17,7 +17,7 @@
 #include <algorithm>
 
 #include "util/logger.hpp"
-#include "util/string_util.hpp"
+#include "util/str_util.hpp"
 #include "base/activation_base.hpp"
 #include "pwiz/data/msdata/SpectrumInfo.hpp"
 #include "pwiz/data/common/cv.hpp"
@@ -105,7 +105,7 @@ int RawMsReader::readNext() {
     header_ptr_->setMsLevel(ms_level);
     header_ptr_->setPrecCharge(prec_charge);
     header_ptr_->setFileName(file_name_);
-    header_ptr_->setTitle("Scan_" + string_util::convertToString(spec_info.scanNumber));
+    header_ptr_->setTitle("Scan_" + str_util::toString(spec_info.scanNumber));
     // here is average mz
     header_ptr_->setPrecSpMz(prec_mz);
     header_ptr_->setRetentionTime(spec_info.retentionTime);
@@ -141,7 +141,7 @@ int RawMsReader::readNext() {
     header_ptr_->setMsLevel(ms_level);
     header_ptr_->setPrecCharge(0);
     header_ptr_->setFileName(file_name_);
-    header_ptr_->setTitle("Scan_" + string_util::convertToString(spec_info.scanNumber));
+    header_ptr_->setTitle("Scan_" + str_util::toString(spec_info.scanNumber));
     header_ptr_->setRetentionTime(spec_info.retentionTime);
   }
   return 1;

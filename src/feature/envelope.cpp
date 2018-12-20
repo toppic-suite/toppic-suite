@@ -18,11 +18,9 @@
 #include <functional>
 #include <numeric>
 
-#include "boost/algorithm/string.hpp"
-
 #include "util/logger.hpp"
 #include "base/mass_constant.hpp"
-#include "util/string_util.hpp"
+#include "util/str_util.hpp"
 #include "spec/peak.hpp"
 #include "feature/envelope.hpp"
 
@@ -40,13 +38,14 @@ Envelope::Envelope(Envelope &env):
 
 Envelope::Envelope(int num, std::vector<std::string> &line_list) {
   charge_ = 1;
-  std::vector<std::string> words;
+  //boost::split(words, line_list[0], boost::is_any_of(" "));
+  std::vector<std::string> words = str_util::split(line_list[0], " ");
   // LOG_DEBUG("line list size " << line_list.size() << " num " << num);
-  boost::split(words, line_list[0], boost::is_any_of(" "));
   mono_mz_ = std::stod(words[7]);
   peaks_.resize(num);
   for (int i = 0; i < num; i++) {
-    boost::split(words, line_list[i+1], boost::is_any_of(" "));
+    //boost::split(words, line_list[i+1], boost::is_any_of(" "));
+    words = str_util::split(line_list[i+1], " ");
     double mz = std::stod(words[0]);
     double inte = std::stod(words[1]) / 100;
     EnvPeakPtr peak_ptr = std::make_shared<EnvPeak>(mz, inte);
@@ -254,11 +253,11 @@ std::vector<double> Envelope::getIntensities() {
 void Envelope::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   std::string element_name = Envelope::getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
-  std::string str = string_util::convertToString(refer_idx_);
+  std::string str = str_util::toString(refer_idx_);
   xml_doc->addElement(element, "refer_idx", str.c_str());
-  str = string_util::convertToString(charge_);
+  str = str_util::toString(charge_);
   xml_doc->addElement(element, "charge", str.c_str());
-  str = string_util::convertToString(mono_mz_);
+  str = str_util::toString(mono_mz_);
   xml_doc->addElement(element, "mono_mz", str.c_str());
   for (size_t i = 0; i < peaks_.size(); i++) {
     peaks_[i]->appendXml(xml_doc, element);

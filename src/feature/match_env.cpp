@@ -16,7 +16,7 @@
 #include <cstddef>
 #include <limits>
 
-#include "util/string_util.hpp"
+#include "util/str_util.hpp"
 #include "feature/match_env.hpp" 
 
 namespace toppic {
@@ -171,11 +171,11 @@ double MatchEnv::calcShareInteAccu(int id_x, double inte_sum) {
 void MatchEnv::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   std::string element_name = MatchEnv::getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
-  std::string str = string_util::convertToString(id_);
+  std::string str = str_util::toString(id_);
   xml_doc->addElement(element, "id", str.c_str());
-  str = string_util::convertToString(mass_group_);
+  str = str_util::toString(mass_group_);
   xml_doc->addElement(element, "mass_group", str.c_str());
-  str = string_util::convertToString(score_);
+  str = str_util::toString(score_);
   xml_doc->addElement(element, "score", str.c_str());
   theo_env_ptr_->appendXml(xml_doc, element);
   real_env_ptr_->appendXml(xml_doc, element);

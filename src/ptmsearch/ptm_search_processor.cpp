@@ -35,7 +35,7 @@ namespace toppic {
 template <int N>
 PrsmXmlWriterSet<N>::PrsmXmlWriterSet(const std::string & output_file_name){
   for (int s = 2; s <= N; s++) {
-    std::string end_str = "_" + string_util::convertToString(s);
+    std::string end_str = "_" + str_util::toString(s);
     std::string file_name = output_file_name + "_" + AlignType::COMPLETE->getName() + end_str;
     PrsmXmlWriterPtr complete_writer_ptr = std::make_shared<PrsmXmlWriter>(file_name);
     complete_writer_ptrs_.push_back(complete_writer_ptr);
@@ -188,14 +188,14 @@ void PtmSearchProcessor::process(){
   // Combine results
   int prsm_top_num = mng_ptr_->thread_num_ * mng_ptr_->n_report_;
   for (int s = 2; s <= n_unknown_shift; s++) {
-    std::string end_str = "_" + string_util::convertToString(s);
+    std::string end_str = "_" + str_util::toString(s);
     // Complete prsms
     std::string complete_output_ext = mng_ptr_->output_file_ext_ + "_" 
         + AlignType::COMPLETE->getName() + end_str;
     std::vector<std::string> complete_input_exts;
     for (int t = 0; t < mng_ptr_->thread_num_; t++) {
       std::string input_ext = mng_ptr_->output_file_ext_ + "_" 
-          + string_util::convertToString(t) + "_" + AlignType::COMPLETE->getName() + end_str;
+          + str_util::toString(t) + "_" + AlignType::COMPLETE->getName() + end_str;
       complete_input_exts.push_back(input_ext);
     }
     PrsmStrCombinePtr combine_ptr
@@ -210,7 +210,7 @@ void PtmSearchProcessor::process(){
     std::vector<std::string> prefix_input_exts;
     for (int t = 0; t < mng_ptr_->thread_num_; t++) {
       std::string input_ext = mng_ptr_->output_file_ext_ + "_" 
-          + string_util::convertToString(t) + "_" + AlignType::PREFIX->getName() + end_str;
+          + str_util::toString(t) + "_" + AlignType::PREFIX->getName() + end_str;
       prefix_input_exts.push_back(input_ext);
     }
     combine_ptr
@@ -225,7 +225,7 @@ void PtmSearchProcessor::process(){
     std::vector<std::string> suffix_input_exts;
     for (int t = 0; t < mng_ptr_->thread_num_; t++) {
       std::string input_ext = mng_ptr_->output_file_ext_ + "_" 
-          + string_util::convertToString(t) + "_" + AlignType::SUFFIX->getName() + end_str;
+          + str_util::toString(t) + "_" + AlignType::SUFFIX->getName() + end_str;
       suffix_input_exts.push_back(input_ext);
     }
     combine_ptr
@@ -240,7 +240,7 @@ void PtmSearchProcessor::process(){
     std::vector<std::string> internal_input_exts;
     for (int t = 0; t < mng_ptr_->thread_num_; t++) {
       std::string input_ext = mng_ptr_->output_file_ext_ + "_" 
-          + string_util::convertToString(t) + "_" + AlignType::INTERNAL->getName() + end_str;
+          + str_util::toString(t) + "_" + AlignType::INTERNAL->getName() + end_str;
       internal_input_exts.push_back(input_ext);
     }
     combine_ptr

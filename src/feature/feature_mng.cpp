@@ -14,9 +14,8 @@
 
 #include <fstream>
 
-#include <boost/algorithm/string.hpp>
-
 #include "util/logger.hpp"
+#include "util/str_util.hpp"
 #include "feature/feature_mng.hpp" 
 
 namespace toppic {
@@ -34,8 +33,8 @@ FeatureMng::FeatureMng(const std::string & resource_dir) {
     std::ifstream infile(env_rescore_para_file_name_);
     std::string line;
     while (std::getline(infile, line)) {
-      std::vector<std::string> strs;
-      boost::split(strs, line, boost::is_any_of("\t"));
+      //boost::split(strs, line, boost::is_any_of("\t"));
+      std::vector<std::string> strs = str_util::split(line, "\t");
       std::vector<double> scr;
       for (size_t i = 0; i < strs.size(); i++) {
         scr.push_back(std::stod(strs[i]));

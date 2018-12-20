@@ -14,7 +14,7 @@
 
 
 #include "util/logger.hpp"
-#include "util/string_util.hpp"
+#include "util/str_util.hpp"
 #include "spec/peak.hpp"
 #include "feature/raw_ms_util.hpp"
 #include "feature/real_env.hpp" 
@@ -130,15 +130,15 @@ bool RealEnv::testPeakShare(RealEnvPtr a, RealEnvPtr  b) {
 void RealEnv::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   std::string element_name = RealEnv::getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
-  std::string str = string_util::convertToString(refer_idx_);
+  std::string str = str_util::toString(refer_idx_);
   xml_doc->addElement(element, "refer_idx", str.c_str());
-  str = string_util::convertToString(charge_);
+  str = str_util::toString(charge_);
   xml_doc->addElement(element, "charge", str.c_str());
-  str = string_util::convertToString(mono_mz_);
+  str = str_util::toString(mono_mz_);
   xml_doc->addElement(element, "mono_mz", str.c_str());
-  str = string_util::convertToString(miss_peak_num_);
+  str = str_util::toString(miss_peak_num_);
   xml_doc->addElement(element, "miss_peak_num", str.c_str());
-  str = string_util::convertToString(max_consecutive_peak_num_);
+  str = str_util::toString(max_consecutive_peak_num_);
   xml_doc->addElement(element, "max_consecutive_peak_num", str.c_str());
   for (size_t i = 0; i < peaks_.size(); i++) {
     peaks_[i]->appendXml(xml_doc, element);

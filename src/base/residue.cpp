@@ -16,7 +16,7 @@
 #include <string>
 
 #include "util/logger.hpp"
-#include "util/string_util.hpp"
+#include "util/str_util.hpp"
 #include "xml/xml_dom_util.hpp"
 #include "base/amino_acid_base.hpp"
 #include "base/ptm_base.hpp"
@@ -60,7 +60,7 @@ std::string Residue::toString(const std::string &delim_bgn,
 void Residue::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent,
                         const std::string & element_name) {
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
-  std::string str = string_util::convertToString(mass_);
+  std::string str = str_util::toString(mass_);
   acid_ptr_->appendNameToXml(xml_doc, element);
   ptm_ptr_->appendAbbrNameToXml(xml_doc, element);
   parent->appendChild(element);

@@ -21,11 +21,11 @@
 #include <cmath>
 
 #include "util/logger.hpp"
-#include "util/string_util.hpp"
+#include "util/str_util.hpp"
 #include "seq/mass_shift_type.hpp"
 #include "base/mod_base.hpp"
 #include "base/prot_mod_base.hpp"
-#include "util/string_util.hpp"
+#include "util/str_util.hpp"
 #include "seq/fasta_index_reader.hpp"
 #include "seq/proteoform.hpp"
 #include "seq/proteoform_factory.hpp"
@@ -309,17 +309,17 @@ void Proteoform::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent)
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
   fasta_seq_ptr_->appendNameDescToXml(xml_doc, element);
   prot_mod_ptr_->appendNameToXml(xml_doc, element);
-  std::string str = string_util::convertToString(start_pos_);
+  std::string str = str_util::toString(start_pos_);
   xml_doc->addElement(element, "start_pos", str.c_str());
-  str = string_util::convertToString(end_pos_);
+  str = str_util::toString(end_pos_);
   xml_doc->addElement(element, "end_pos", str.c_str());
-  str = string_util::convertToString(proteo_cluster_id_);
+  str = str_util::toString(proteo_cluster_id_);
   xml_doc->addElement(element, "proteo_cluster_id", str.c_str());
-  str = string_util::convertToString(prot_id_);
+  str = str_util::toString(prot_id_);
   xml_doc->addElement(element, "prot_id", str.c_str());
-  str = string_util::convertToString(variable_ptm_num_);
+  str = str_util::toString(variable_ptm_num_);
   xml_doc->addElement(element, "variable_ptm_num", str.c_str());
-  str = string_util::convertToString(getMassShiftNum(MassShiftType::UNEXPECTED));
+  str = str_util::toString(getMassShiftNum(MassShiftType::UNEXPECTED));
   xml_doc->addElement(element, "unexpected_ptm_num", str.c_str());
 
   element_name = MassShift::getXmlElementName() + "_list";
@@ -353,7 +353,7 @@ std::string Proteoform::getMIScore() {
       if (scr == 100) scr = 99.9;
       if (scr == 0) continue;
 
-      mi_score_ = mi_score_ + acid_letter + string_util::convertToString(j + 1) + ":";
+      mi_score_ = mi_score_ + acid_letter + str_util::toString(j + 1) + ":";
       std::stringstream ss;
       ss << std::fixed << std::setprecision(1) << scr;
       mi_score_ = mi_score_ + ss.str() + "%";

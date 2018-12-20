@@ -15,7 +15,7 @@
 
 #include <string>
 
-#include "util/string_util.hpp"
+#include "util/str_util.hpp"
 #include "xml/xml_dom_util.hpp"
 #include "spec/peak_tolerance.hpp"
 
@@ -39,11 +39,11 @@ void PeakTolerance::appendXml(XmlDOMDocument* xml_doc,
                               xercesc::DOMElement* parent) {
   std::string element_name = PeakTolerance::getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
-  std::string str = string_util::convertToString(ppo_);
+  std::string str = str_util::toString(ppo_);
   xml_doc->addElement(element, "ppo", str.c_str());
-  str = string_util::convertToString(use_min_tolerance_);
+  str = str_util::toString(use_min_tolerance_);
   xml_doc->addElement(element, "use_min_tolerance", str.c_str());
-  str = string_util::convertToString(min_tolerance_);
+  str = str_util::toString(min_tolerance_);
   xml_doc->addElement(element, "min_tolerance", str.c_str());
   parent->appendChild(element);
 }

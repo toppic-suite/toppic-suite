@@ -18,9 +18,7 @@
 #include <string>
 #include <algorithm>
 
-#include <boost/algorithm/string.hpp>
-
-#include "util/string_util.hpp"
+#include "util/str_util.hpp"
 #include "base/residue_util.hpp"
 #include "xml/xml_dom_util.hpp"
 #include "seq/mass_shift_type.hpp"
@@ -37,10 +35,10 @@ namespace toppic {
 
 void addSummary(XmlDOMDocument* xml_doc, xercesc::DOMElement *prot_element,
                 ProteoformPtr proteoform_ptr, PrsmViewMngPtr mng_ptr) {
-  std::string str = string_util::convertToString(proteoform_ptr->getProtId());
+  std::string str = str_util::toString(proteoform_ptr->getProtId());
   xml_doc->addElement(prot_element, "sequence_id", str.c_str());
 
-  str = string_util::convertToString(proteoform_ptr->getProteoClusterId());
+  str = str_util::toString(proteoform_ptr->getProteoClusterId());
   xml_doc->addElement(prot_element, "proteoform_id", str.c_str());
 
   str = proteoform_ptr->getSeqName();
@@ -50,26 +48,26 @@ void addSummary(XmlDOMDocument* xml_doc, xercesc::DOMElement *prot_element,
   xml_doc->addElement(prot_element, "sequence_description", str.c_str());
 
   double mass = proteoform_ptr->getMass();
-  str = string_util::convertToString(mass, mng_ptr->precise_point_num_);
+  str = str_util::toString(mass, mng_ptr->precise_point_num_);
   xml_doc->addElement(prot_element, "proteoform_mass", str.c_str());
 
-  str = string_util::convertToString(proteoform_ptr->getProtModPtr()->isAcetylation());
+  str = str_util::toString(proteoform_ptr->getProtModPtr()->isAcetylation());
   xml_doc->addElement(prot_element, "n_acetylation", str.c_str());
 
   int unexpected_change_number = proteoform_ptr->getMassShiftNum(MassShiftType::UNEXPECTED);
-  str = string_util::convertToString(unexpected_change_number);
+  str = str_util::toString(unexpected_change_number);
   xml_doc->addElement(prot_element, "unexpected_change_number", str.c_str());
 }
 
 void addAnnoHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement *anno_element,
                    ProteoformPtr proteoform_ptr) {
-  std::string str = string_util::convertToString(proteoform_ptr->getFastaSeqPtr()->getAcidPtmPairLen());
+  std::string str = str_util::toString(proteoform_ptr->getFastaSeqPtr()->getAcidPtmPairLen());
   xml_doc->addElement(anno_element, "protein_length", str.c_str());
 
-  str = string_util::convertToString(proteoform_ptr->getStartPos());
+  str = str_util::toString(proteoform_ptr->getStartPos());
   xml_doc->addElement(anno_element, "first_residue_position", str.c_str());
 
-  str = string_util::convertToString(proteoform_ptr->getEndPos());
+  str = str_util::toString(proteoform_ptr->getEndPos());
   xml_doc->addElement(anno_element, "last_residue_position", str.c_str());
 }
 

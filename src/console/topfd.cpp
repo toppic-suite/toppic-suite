@@ -18,7 +18,7 @@
 #include <algorithm>
 
 #include "util/file_util.hpp"
-#include "util/string_util.hpp"
+#include "util/str_util.hpp"
 #include "console/topfd_argument.hpp"
 
 #include "feature/topfd_process.hpp"
@@ -40,10 +40,10 @@ int main(int argc, char* argv[]) {
   std::vector<std::string> spec_file_lst = argu_processor.getSpecFileList();
 
   for (size_t k = 0; k < spec_file_lst.size(); k++) {
-    if (toppic::string_util::endsWith(spec_file_lst[k], "mzML")
-        || toppic::string_util::endsWith(spec_file_lst[k], "mzXML")
-        || toppic::string_util::endsWith(spec_file_lst[k], "mzml")
-        || toppic::string_util::endsWith(spec_file_lst[k], "mzxml")) {
+    if (toppic::str_util::endsWith(spec_file_lst[k], "mzML")
+        || toppic::str_util::endsWith(spec_file_lst[k], "mzXML")
+        || toppic::str_util::endsWith(spec_file_lst[k], "mzml")
+        || toppic::str_util::endsWith(spec_file_lst[k], "mzxml")) {
       arguments["spectrumFileName"] = spec_file_lst[k];
       if (toppic::TopFDProcess(arguments) != 0) {
         return 1;

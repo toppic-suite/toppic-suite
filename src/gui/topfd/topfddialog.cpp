@@ -23,9 +23,6 @@
 #include <QCloseEvent>
 #include <QDesktopServices>
 
-#include <boost/filesystem.hpp>
-namespace fs = boost::filesystem;
-
 #include "util/file_util.hpp"
 #include "base/base_data.hpp"
 #include "feature/deconv_para.hpp"
@@ -268,8 +265,8 @@ void TopFDDialog::on_outputButton_clicked() {
   if (spec_file_lst_.size() > 0) {
     sp_file_name = spec_file_lst_[0];
   }
-  fs::path full_path(sp_file_name.c_str());
-  QString outPath = full_path.remove_filename().string().c_str();
+  std::string dir = toppic::file_util::directory(sp_file_name);
+  QString outPath = sp_file_name.c_str();
   QDesktopServices::openUrl(QUrl(outPath, QUrl::TolerantMode));
 }
 

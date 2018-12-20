@@ -16,7 +16,7 @@
 #include <utility>
 #include <string>
 
-#include "util/string_util.hpp"
+#include "util/str_util.hpp"
 #include "prsmview/anno_segment.hpp"
 
 namespace toppic {
@@ -40,8 +40,8 @@ std::string AnnoSegment::getResidueAnno() {
 
       score_[i] = std::floor(score_[i] * 1000) / 10;
 
-      anno_ += "Site: " + occurences_[i].second + string_util::convertToString(occurences_[i].first) + " ";
-      anno_ += "Confidence: " + string_util::convertToString(score_[i], 1) + "%\n";
+      anno_ += "Site: " + occurences_[i].second + str_util::toString(occurences_[i].first) + " ";
+      anno_ += "Confidence: " + str_util::toString(score_[i], 1) + "%\n";
     }
   }
   return anno_;
@@ -55,15 +55,15 @@ void AnnoSegment::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent
     } else {
       element = xml_doc->createElement("unexpected_change");
     }
-    std::string str = string_util::convertToString(left_pos_);
+    std::string str = str_util::toString(left_pos_);
     xml_doc->addElement(element, "left_position", str.c_str());
 
-    str = string_util::convertToString(right_pos_);
+    str = str_util::toString(right_pos_);
     xml_doc->addElement(element, "right_position", str.c_str());
 
     xml_doc->addElement(element, "match_seq", match_seq_.c_str());
 
-    str = string_util::convertToString(color_);
+    str = str_util::toString(color_);
     xml_doc->addElement(element, "unexpected_change_color", str.c_str());
 
     xml_doc->addElement(element, "segment_type", segment_type_.c_str());
@@ -77,26 +77,26 @@ void AnnoSegment::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent
     std::string occu;
 
     if (occurences_.size() == 1) {
-      occu = occurences_[0].second + string_util::convertToString(occurences_[0].first);
+      occu = occurences_[0].second + str_util::toString(occurences_[0].first);
     } else if (occurences_.size() > 1) {
-      occu = occurences_[0].second + string_util::convertToString(occurences_[0].first);
+      occu = occurences_[0].second + str_util::toString(occurences_[0].first);
       occu += " - ";
       occu += occurences_[occurences_.size() - 1].second
-          + string_util::convertToString(occurences_[occurences_.size() - 1].first);
+          + str_util::toString(occurences_[occurences_.size() - 1].first);
     }
 
     xml_doc->addElement(element, "occurence", occu.c_str());
   } else {
     element = xml_doc->createElement("variable_change");
-    std::string str = string_util::convertToString(left_pos_);
+    std::string str = str_util::toString(left_pos_);
     xml_doc->addElement(element, "left_position", str.c_str());
 
-    str = string_util::convertToString(right_pos_);
+    str = str_util::toString(right_pos_);
     xml_doc->addElement(element, "right_position", str.c_str());
 
     xml_doc->addElement(element, "match_seq", match_seq_.c_str());
 
-    str = string_util::convertToString(color_);
+    str = str_util::toString(color_);
     xml_doc->addElement(element, "unexpected_change_color", str.c_str());
 
     xml_doc->addElement(element, "segment_type", segment_type_.c_str());
@@ -104,12 +104,12 @@ void AnnoSegment::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent
     std::string occu;
 
     if (occurences_.size() == 1) {
-      occu = occurences_[0].second + string_util::convertToString(occurences_[0].first);
+      occu = occurences_[0].second + str_util::toString(occurences_[0].first);
     } else if (occurences_.size() > 1) {
-      occu = occurences_[0].second + string_util::convertToString(occurences_[0].first);
+      occu = occurences_[0].second + str_util::toString(occurences_[0].first);
       occu += " - ";
       occu += occurences_[occurences_.size() - 1].second
-          + string_util::convertToString(occurences_[occurences_.size() - 1].first);
+          + str_util::toString(occurences_[occurences_.size() - 1].first);
     }
 
     xml_doc->addElement(element, "occurence", occu.c_str());

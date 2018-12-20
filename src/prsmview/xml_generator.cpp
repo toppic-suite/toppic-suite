@@ -82,7 +82,7 @@ void XmlGenerator::outputPrsms() {
         prsm_ptr->setRefineMsVec(extend_ms_ptr_vec);
         std::string file_name = mng_ptr_->xml_path_+ file_util::getFileSeparator() +
             "prsms" + file_util::getFileSeparator() + "prsm" +
-            string_util::convertToString(prsm_ptr->getPrsmId()) + ".xml";
+            str_util::toString(prsm_ptr->getPrsmId()) + ".xml";
         XmlWriter writer(file_name, "");
         writer.write(geneAnnoPrsm(writer.getDoc(), prsm_ptr, mng_ptr_));
         writer.close();
@@ -91,7 +91,7 @@ void XmlGenerator::outputPrsms() {
         file_info.push_back(file_name);
         file_info.push_back(mng_ptr_->resource_dir_ + file_util::getFileSeparator() + "xsl" + file_util::getFileSeparator() + "prsm.xsl");
         file_info.push_back(mng_ptr_->html_path_+ file_util::getFileSeparator() + "prsms" + file_util::getFileSeparator()
-                            + "prsm" + string_util::convertToString(prsm_ptr->getPrsmId()) + ".html");
+                            + "prsm" + str_util::toString(prsm_ptr->getPrsmId()) + ".html");
         anno_view_ptr_->file_list_.push_back(file_info); 
 
         cnt++;
@@ -123,7 +123,7 @@ void XmlGenerator::outputProteoforms(){
   for (size_t i = 0; i < cluster_ids_.size(); i++) {
     cnt++;
     std::cout << std::flush << "Generating xml files - processing " << cnt << " proteoforms.\r";
-    std::string input_file_name = file_util::basename(spectrum_file_name) + ".proteoform_" + string_util::convertToString(cluster_ids_[i]);
+    std::string input_file_name = file_util::basename(spectrum_file_name) + ".proteoform_" + str_util::toString(cluster_ids_[i]);
     PrsmPtrVec select_prsm_ptrs = PrsmReader::readAllPrsms(input_file_name, db_file_name, fix_mod_ptr_vec);
     for (size_t k = 0; k < select_prsm_ptrs.size(); k++) {
       select_prsm_ptrs[k]->setDeconvMsPtrVec(deconv_ms_vec2d_[spec_id_extend_ms_map_[select_prsm_ptrs[k]->getSpectrumId()]]);
@@ -131,7 +131,7 @@ void XmlGenerator::outputProteoforms(){
     }
     if (select_prsm_ptrs.size() > 0) {
       std::string file_name = mng_ptr_->xml_path_+ file_util::getFileSeparator() + "proteoforms" 
-          + file_util::getFileSeparator() + "proteoform" + string_util::convertToString(cluster_ids_[i]) + ".xml";
+          + file_util::getFileSeparator() + "proteoform" + str_util::toString(cluster_ids_[i]) + ".xml";
       XmlWriter writer(file_name, "");
       std::sort(select_prsm_ptrs.begin(), select_prsm_ptrs.end(), Prsm::cmpEValueInc);
       writer.write(proteoformToXml(writer.getDoc(), select_prsm_ptrs, mng_ptr_));
@@ -142,7 +142,7 @@ void XmlGenerator::outputProteoforms(){
       file_info.push_back(file_name);
       file_info.push_back(mng_ptr_->resource_dir_ + file_util::getFileSeparator() + "xsl" + file_util::getFileSeparator() + "proteoform.xsl");
       file_info.push_back(mng_ptr_->html_path_+ file_util::getFileSeparator()+ "proteoforms" + file_util::getFileSeparator() 
-                          + "proteoform"+string_util::convertToString(cluster_ids_[i])+".html");
+                          + "proteoform"+str_util::toString(cluster_ids_[i])+".html");
       anno_view_ptr_->file_list_.push_back(file_info);
     }
   }
@@ -159,7 +159,7 @@ void XmlGenerator::outputProteins() {
     cnt++;
     std::cout << std::flush << "Generating xml files - processing " << std::ceil(cnt / 3.0) << " proteins.\r";
     int prot_id = prot_ids_[i]; 
-    std::string input_file_name = file_util::basename(spectrum_file_name) + ".prot_" + string_util::convertToString(prot_id);
+    std::string input_file_name = file_util::basename(spectrum_file_name) + ".prot_" + str_util::toString(prot_id);
     PrsmPtrVec prsm_ptrs = PrsmReader::readAllPrsms(input_file_name, db_file_name, fix_mod_ptr_vec);
     for (size_t k = 0; k < prsm_ptrs.size(); k++) {
       prsm_ptrs[k]->setDeconvMsPtrVec(deconv_ms_vec2d_[spec_id_extend_ms_map_[prsm_ptrs[k]->getSpectrumId()]]);
@@ -168,7 +168,7 @@ void XmlGenerator::outputProteins() {
     std::vector<int> cluster = prsm_util::getClusterIds(prsm_ptrs);
     if (!cluster.empty()) {
       std::string file_name = mng_ptr_->xml_path_ + file_util::getFileSeparator() + "proteins" 
-          + file_util::getFileSeparator() + "protein" + string_util::convertToString(prot_id) + ".xml";
+          + file_util::getFileSeparator() + "protein" + str_util::toString(prot_id) + ".xml";
       XmlWriterPtr writer = std::make_shared<XmlWriter>(file_name, "");
       writeProteinToXml(writer, prsm_ptrs, prot_id, cluster, mng_ptr_, true, false);
       writer->close();
@@ -176,7 +176,7 @@ void XmlGenerator::outputProteins() {
       file_info.push_back(file_name);
       file_info.push_back(mng_ptr_->resource_dir_ + file_util::getFileSeparator() + "xsl" + file_util::getFileSeparator() + "protein.xsl");
       file_info.push_back(mng_ptr_->html_path_+ file_util::getFileSeparator() + "proteins" + file_util::getFileSeparator() 
-                          + "protein"+string_util::convertToString(prot_id)+".html");
+                          + "protein"+str_util::toString(prot_id)+".html");
       anno_view_ptr_->file_list_.push_back(file_info);
     }
   }
@@ -192,7 +192,7 @@ void XmlGenerator::outputAllProteins() {
   for (size_t i = 0; i < prot_ids_.size(); i++) {
     cnt++;
     std::cout << std::flush << "Generating xml files - processing " << std::ceil(cnt / 3.0) << " proteins.\r";
-    std::string input_file_name = file_util::basename(spectrum_file_name) + ".prot_" + string_util::convertToString(prot_ids_[i]);
+    std::string input_file_name = file_util::basename(spectrum_file_name) + ".prot_" + str_util::toString(prot_ids_[i]);
     PrsmPtrVec prsm_ptrs = PrsmReader::readAllPrsms(input_file_name, db_file_name, fix_mod_ptr_vec);
     for (size_t k = 0; k < prsm_ptrs.size(); k++) {
       prsm_ptrs[k]->setDeconvMsPtrVec(deconv_ms_vec2d_[spec_id_extend_ms_map_[prsm_ptrs[k]->getSpectrumId()]]);
@@ -211,7 +211,7 @@ void XmlGenerator::outputAllProteins() {
     cnt++;
     std::cout << std::flush << "Generating xml files - processing " << std::ceil(cnt / 3.0) << " proteins.\r";
     int prot_id = best_prsm_vec[i]->getProteoformPtr()->getProtId();
-    std::string input_file_name = file_util::basename(spectrum_file_name) + ".prot_" + string_util::convertToString(prot_id);
+    std::string input_file_name = file_util::basename(spectrum_file_name) + ".prot_" + str_util::toString(prot_id);
     PrsmPtrVec prsm_ptrs = PrsmReader::readAllPrsms(input_file_name, db_file_name, fix_mod_ptr_vec);
     std::vector<int> cluster = prsm_util::getClusterIds(prsm_ptrs);
     if (!cluster.empty()) {
@@ -259,7 +259,7 @@ void XmlGenerator::splitBySpeciesId() {
     for (size_t i = 0; i < sub_cluster_ids_.size(); i++) {
       cluster_id_map[sub_cluster_ids_[i]] = i;
       std::string file_name = file_util::basename(spectrum_file_name) 
-          + ".proteoform_" + string_util::convertToString(sub_cluster_ids_[i]);
+          + ".proteoform_" + str_util::toString(sub_cluster_ids_[i]);
       PrsmXmlWriterPtr writer_ptr = std::make_shared<toppic::PrsmXmlWriter>(file_name);
       prsm_writer_vec.push_back(writer_ptr);
     }
@@ -308,7 +308,7 @@ void XmlGenerator::splitByProtId() {
     for (size_t i = 0; i < sub_prot_ids_.size(); i++) {
       prot_id_map[sub_prot_ids_[i]] = i;
       std::string file_name = file_util::basename(spectrum_file_name) 
-          + ".prot_" + string_util::convertToString(sub_prot_ids_[i]);
+          + ".prot_" + str_util::toString(sub_prot_ids_[i]);
       PrsmXmlWriterPtr writer_ptr = std::make_shared<toppic::PrsmXmlWriter>(file_name);
       prsm_writer_vec.push_back(writer_ptr);
     }

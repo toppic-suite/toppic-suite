@@ -18,7 +18,7 @@
 #include <algorithm>
 
 #include "seq/residue_seq.hpp"
-#include "util/string_util.hpp"
+#include "util/str_util.hpp"
 
 namespace toppic {
 
