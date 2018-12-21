@@ -16,9 +16,6 @@
 #ifndef TOPPIC_SEQ_PROTEOFORM_HPP_
 #define TOPPIC_SEQ_PROTEOFORM_HPP_
 
-#include <string>
-#include <vector>
-
 #include "base/ptm.hpp"
 #include "base/prot_mod.hpp"
 #include "base/residue_freq.hpp"

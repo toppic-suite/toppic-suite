@@ -17,7 +17,7 @@
 
 #include "util/logger.hpp"
 #include "spec/theo_peak.hpp"
-#include "spec/theo_peak_util.hpp"
+#include "prsm/theo_peak_util.hpp"
 #include "prsm/base_algo.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
 

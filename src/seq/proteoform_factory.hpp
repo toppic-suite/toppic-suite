@@ -16,9 +16,6 @@
 #ifndef TOPPIC_SEQ_PROTEOFORM_FACTORY_HPP_
 #define TOPPIC_SEQ_PROTEOFORM_FACTORY_HPP_
 
-
-#include <string>
-
 #include "seq/mass_shift.hpp"
 #include "seq/proteoform.hpp"
 #include "seq/fasta_index_reader.hpp"

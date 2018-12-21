@@ -1,4 +1,8 @@
+/base/    Reading and storing amino acids, ptms, residues and etc 
+/boost/   Some code from Boost version used by pwiz
+/pwiz/    Some code from ProteoWizard version for reading mzML and mzXML files
+/seq/     Fasta sequences and proteoforms
+/spec/    Various peaks and spectrum classes
+/suffix/  Suffix tree used in the manuscript Deng et al, Bioinformatics 31, 532-538
 /util/    String utilities, file utilities, and etc
 /xml/     Functions for handling xml files   
-/base/    Reading and storing amino acids, ptms, residues and etc 
-/seq/     Fasta sequences and proteoforms

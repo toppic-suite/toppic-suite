@@ -12,11 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef PROT_SPEC_THEO_PEAK_HPP_
 #define PROT_SPEC_THEO_PEAK_HPP_
-
-#include <vector>
 
 #include "base/ion.hpp"
 #include "spec/peak.hpp"
@@ -28,10 +25,7 @@ typedef std::shared_ptr<TheoPeak> TheoPeakPtr;
 
 class TheoPeak : public Peak {
  public:
-  TheoPeak(IonPtr ion_ptr, double unmod_mass, double shift):
-    Peak(unmod_mass + shift, 1.0),
-    ion_ptr_(ion_ptr),
-    shift_(shift) {}
+  TheoPeak(IonPtr ion_ptr, double unmod_mass, double shift);
 
   IonPtr getIonPtr() {return ion_ptr_;}
 

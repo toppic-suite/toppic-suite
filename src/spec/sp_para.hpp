@@ -21,11 +21,13 @@
 #include <vector>
 #include <set>
 
+#include "xml/xml_dom_element.hpp"
 #include "base/activation.hpp"
-#include "xml/xml_dom_document.hpp"
 #include "spec/peak_tolerance.hpp"
 
 namespace toppic {
+
+class XmlDOMDocument;
 
 class SpPara {
  public:
@@ -33,14 +35,7 @@ class SpPara {
          const std::vector<double> &ext_offsets,
          PeakTolerancePtr peak_tolerance_ptr,
          ActivationPtr activation_ptr,
-         const std::set<std::string> & skip_list):
-      min_peak_num_(min_peak_num),
-      min_mass_(min_mass),
-      extend_min_mass_(min_extend_mass),
-      ext_offsets_(ext_offsets),
-      peak_tolerance_ptr_(peak_tolerance_ptr),
-      activation_ptr_(activation_ptr),
-      skip_list_(skip_list) {}
+         const std::set<std::string> & skip_list);
 
   explicit SpPara(xercesc::DOMElement* element);
 
@@ -53,8 +48,7 @@ class SpPara {
   PeakTolerancePtr getPeakTolerancePtr() {return peak_tolerance_ptr_;}
 
   void setPeakTolerancePtr(PeakTolerancePtr peak_tolerance_ptr) {
-    peak_tolerance_ptr_ = peak_tolerance_ptr;
-  }
+    peak_tolerance_ptr_ = peak_tolerance_ptr;}
 
   ActivationPtr getActivationPtr() {return activation_ptr_;}
 

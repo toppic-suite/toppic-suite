@@ -12,11 +12,9 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#include <string>
-
 #include "util/str_util.hpp"
 #include "xml/xml_dom_util.hpp"
+#include "xml/xml_dom_document.hpp"
 #include "spec/env_peak.hpp"
 
 namespace toppic {
@@ -25,6 +23,23 @@ EnvPeak::EnvPeak(double mz, double intensity):
     Peak(mz, intensity) {
       idx_ = EnvPeak::getNonExistPeakIdx();
     }
+
+EnvPeak::EnvPeak(double mz, double intensity, int idx):
+      Peak(mz, intensity),
+      idx_(idx) {}
+
+EnvPeak::EnvPeak(EnvPeakPtr peak_ptr):
+      Peak(peak_ptr->getPosition(), peak_ptr->getIntensity()),
+      idx_(peak_ptr->getIdx()) {}
+
+
+bool EnvPeak::cmpPosInc(const EnvPeakPtr &a, const EnvPeakPtr &b) {
+  return a->getPosition() < b->getPosition();
+}
+
+bool EnvPeak::cmpInteInc(const EnvPeakPtr &a, const EnvPeakPtr &b) {
+  return a->getIntensity() < b->getIntensity();
+}
 
 EnvPeak::EnvPeak(xercesc::DOMElement* element):
     Peak(xml_dom_util::getDoubleChildValue(element, "position", 0),

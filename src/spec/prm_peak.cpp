@@ -13,15 +13,32 @@
 //limitations under the License.
 
 
-#include <algorithm>
-#include <iostream>
-
 #include "util/logger.hpp"
 #include "base/support_peak_type_base.hpp"
-#include "base/base_data.hpp"
 #include "spec/prm_peak.hpp"
 
 namespace toppic {
+
+PrmPeak::PrmPeak(int spec_id, DeconvPeakPtr base_peak_ptr,
+          BasePeakTypePtr base_type,
+          double mono_mass, double score,
+          double strict_tolerance,
+          double n_strict_c_relax_tolerance,
+          double n_relax_c_strict_tolerance):
+      Peak(mono_mass, base_peak_ptr->getIntensity()),
+      spec_id_(spec_id),
+      base_peak_ptr_(base_peak_ptr),
+      base_type_(base_type),
+      mono_mass_(mono_mass),
+      score_(score),
+      strict_tolerance_(strict_tolerance),
+      n_strict_c_relax_tolerance_(n_strict_c_relax_tolerance),
+      n_relax_c_strict_tolerance_(n_relax_c_strict_tolerance) {}
+
+void PrmPeak::setMonoMass(double m) {
+  mono_mass_ = m;
+  setPosition(m);
+}
 
 void PrmPeak::addNghbEdge(DeconvPeakPtr deconv_peak_ptr, double offset,
                           SPTypePtr peak_type_ptr, double score) {

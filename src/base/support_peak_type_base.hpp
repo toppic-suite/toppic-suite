@@ -16,10 +16,6 @@
 #ifndef TOPPIC_BASE_SUPPORT_PEAK_TYPE_BASE_HPP_
 #define TOPPIC_BASE_SUPPORT_PEAK_TYPE_BASE_HPP_
 
-#include <string>
-#include <memory>
-#include <vector>
-
 #include "base/support_peak_type.hpp"
 
 namespace toppic {

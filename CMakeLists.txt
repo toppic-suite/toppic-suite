@@ -144,11 +144,11 @@ add_executable(topmg_gui ${TOPMG_GUI_SRCS} ${TOPMG_GUI_QRC} ${TOPMG_PROCESS_SRCS
     ${ZERO_PTM_FILTER} ${DIAG_FILTER_SRCS} ${ONE_PTM_FILTER_SRCS} ${ZERO_PTM_SRCS} ${GRAPH_SRCS}
     ${GRAPH_ALIGN_SRCS} ${TDGF_SRCS} ${MCMC_SRCS} ${ONE_PTM_SEARCH_SRCS} ${PRSM_VIEW_SRCS})
 
-add_executable(topfd ${TOPFD_MAIN_SRCS} ${TOPFD_ARGU_SRCS} ${HTS_SRCS}
-  ${UTIL_SRCS} ${XML_SRCS} ${BASE_SRCS} ${SEQ_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS} ${PWIZ_SRC})
+add_executable(topfd ${TOPFD_MAIN_SRCS} ${TOPFD_ARGU_SRCS} ${UTIL_SRCS} ${XML_SRCS} 
+  ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS} ${PWIZ_SRC})
 
-add_executable(topfd_gui ${TOPFD_GUI_SRCS} ${TOPFD_GUI_QRC} ${HTS_SRCS}
-  ${UTIL_SRCS} ${XML_SRCS} ${BASE_SRCS} ${SEQ_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS} ${PWIZ_SRC})
+add_executable(topfd_gui ${TOPFD_GUI_SRCS} ${TOPFD_GUI_QRC} ${UTIL_SRCS} ${XML_SRCS} 
+  ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS} ${PWIZ_SRC})
 
 #add_executable(topquant ${TOPQUANT_MAIN_SRCS} ${TOPQUANT_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS})
 
@@ -159,6 +159,11 @@ add_executable(topfd_gui ${TOPFD_GUI_SRCS} ${TOPFD_GUI_QRC} ${HTS_SRCS}
 #add_executable(toppic_match_peak ${TOPPIC_MATCH_PEAK_SRCS} ${TOPPIC_ARGU_SRCS} ${HTS_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PRSM_SRCS} ${PRSM_VIEW_SRCS})
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    target_link_libraries(topfd xerces-c
+        boost_program_options-mt boost_filesystem-mt
+        boost_system-mt boost_thread-mt
+        boost_iostreams-mt boost_chrono-mt pthread z Ws2_32)
+
     target_link_libraries(toppic xalan-c xalanMsg xerces-c
         boost_filesystem-mt boost_system-mt 
         boost_program_options-mt boost_thread-mt pthread z Ws2_32)
@@ -167,23 +172,18 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
         boost_filesystem-mt boost_system-mt
         boost_program_options-mt boost_thread-mt pthread z Ws2_32)
 
-    target_link_libraries(topfd xalan-c xalanMsg xerces-c
-        boost_program_options-mt boost_filesystem-mt
-        boost_system-mt boost_thread-mt
-        boost_iostreams-mt boost_chrono-mt pthread z Ws2_32)
-
 #   target_link_libraries(topmerge xalan-c xerces-c boost_program_options-mt
 #        boost_filesystem-mt boost_system-mt boost_thread-mt pthread z Ws2_32)
 
     # for Qt
     SET(QTOPTION -Wl,-subsystem,windows)
+    target_link_libraries(topfd_gui ${QTOPTION} Qt5Widgets Qt5Core Qt5Gui
+        xerces-c boost_filesystem-mt boost_system-mt boost_thread-mt 
+		boost_iostreams-mt boost_chrono-mt pthread z Ws2_32)
+
     target_link_libraries(toppic_gui ${QTOPTION} Qt5Widgets Qt5Core Qt5Gui xalan-c xalanMsg xerces-c
         boost_filesystem-mt boost_system-mt 
         boost_program_options-mt boost_thread-mt pthread z Ws2_32)
-
-    target_link_libraries(topfd_gui ${QTOPTION} Qt5Widgets Qt5Core Qt5Gui
-        xalan-c xerces-c boost_filesystem-mt boost_system-mt boost_thread-mt 
-		boost_iostreams-mt boost_chrono-mt pthread z Ws2_32)
 
     target_link_libraries(topmg_gui ${QTOPTION} Qt5Widgets Qt5Core Qt5Gui xalan-c xalanMsg xerces-c
         boost_filesystem-mt boost_system-mt
@@ -199,12 +199,15 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows") 
 
+# xerces-c boost_system, boost_thread boost_iostreams boost_chrono pthread z are required by
+# ProteoWizard
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-    target_link_libraries(topfd xalan-c xerces-c boost_program_options
-        boost_filesystem boost_system boost_thread boost_iostreams boost_chrono pthread z)
+    target_link_libraries(topfd xerces-c boost_program_options
+        boost_filesystem boost_system boost_thread boost_iostreams boost_chrono
+        pthread z)
 
     target_link_libraries(topfd_gui Qt5Widgets Qt5Core Qt5Gui
-        xalan-c xerces-c boost_filesystem boost_system boost_thread boost_iostreams boost_chrono pthread z)
+        xerces-c boost_filesystem boost_system boost_thread boost_iostreams boost_chrono pthread z)
 
     target_link_libraries(toppic xalan-c xerces-c boost_program_options
         boost_filesystem boost_system boost_thread pthread z)

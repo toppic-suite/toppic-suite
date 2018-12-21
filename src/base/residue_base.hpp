@@ -16,9 +16,6 @@
 #ifndef TOPPIC_BASE_RESIDUE_BASE_HPP_
 #define TOPPIC_BASE_RESIDUE_BASE_HPP_
 
-#include <string>
-#include <memory>
-
 #include "base/residue.hpp"
 
 namespace toppic {

@@ -12,7 +12,7 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
+#include "base/mass_constant.hpp"
 #include "graph/spec_graph_reader.hpp"
 
 namespace toppic {

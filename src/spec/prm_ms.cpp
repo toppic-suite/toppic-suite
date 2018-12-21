@@ -12,12 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#include <algorithm>
 #include <cmath>
-#include <iostream>
-#include <utility>
-#include <vector>
+#include <algorithm>
 
 #include "util/logger.hpp"
 #include "spec/prm_peak_factory.hpp"

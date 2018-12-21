@@ -13,10 +13,9 @@
 //limitations under the License.
 
 
-#include <string>
-
 #include "util/logger.hpp"
 #include "xml/xml_dom_util.hpp"
+#include "xml/xml_dom_document.hpp"
 #include "base/ptm_base.hpp"
 #include "base/residue_util.hpp"
 #include "seq/fasta_seq.hpp"

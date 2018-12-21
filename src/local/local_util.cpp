@@ -28,7 +28,7 @@
 
 #include "prsm/peak_ion_pair_util.hpp"
 
-#include "spec/theo_peak_util.hpp"
+#include "prsm/theo_peak_util.hpp"
 #include "spec/extend_ms.hpp"
 
 #include "local/local_mng.hpp"

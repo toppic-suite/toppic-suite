@@ -17,6 +17,7 @@
 #include <algorithm>
 
 #include "util/logger.hpp"
+#include "base/mass_constant.hpp"
 #include "feature/match_env_refine.hpp"
 
 namespace toppic {

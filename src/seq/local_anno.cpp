@@ -15,6 +15,7 @@
 
 #include <string>
 #include <vector>
+#include <algorithm>
 
 #include "util/str_util.hpp"
 #include "xml/xml_dom_util.hpp"
@@ -53,6 +54,10 @@ LocalAnno::LocalAnno(XmlDOMElement* element) {
         = xml_dom_util::getChildElement(element, ptm_element_name.c_str(), 0);
     ptm_ptr_ = PtmBase::getPtmPtrFromXml(ptm_element);
   }
+}
+
+double LocalAnno::getScr() {
+  return std::accumulate(scr_vec_.begin(), scr_vec_.end(), 0.0);
 }
 
 void LocalAnno::appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {

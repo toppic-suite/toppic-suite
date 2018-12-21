@@ -12,26 +12,13 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#ifndef TOPPIC_BASE_ACTIVATION_BASE_HPP_
-#define TOPPIC_BASE_ACTIVATION_BASE_HPP_
-
-#include "base/activation.hpp"
+#include "spec/theo_peak.hpp"
 
 namespace toppic {
 
-class ActivationBase {
- public:
-  static void initBase(const std::string &file_name);
+TheoPeak::TheoPeak(IonPtr ion_ptr, double unmod_mass, double shift):
+    Peak(unmod_mass + shift, 1.0),
+    ion_ptr_(ion_ptr),
+    shift_(shift) {}
 
-  static ActivationPtr getActivationPtrByName(const std::string &name);
-
-  static ActivationPtr getActivationPtrFromXml(XmlDOMElement * element);
-
- private:
-  static ActivationPtrVec activation_ptr_vec_;
-};
-
-}  // namespace toppic
-
-#endif
+} /* namespace toppic */

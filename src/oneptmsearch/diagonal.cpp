@@ -14,11 +14,12 @@
 
 
 #include <limits>
+#include <cmath>
 #include <vector>
 
 #include "util/logger.hpp"
 #include "base/neutral_loss_base.hpp"
-#include "spec/theo_peak_util.hpp"
+#include "prsm/theo_peak_util.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
 #include "oneptmsearch/diagonal.hpp"
 

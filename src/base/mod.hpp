@@ -16,12 +16,7 @@
 #ifndef TOPPIC_BASE_MOD_HPP_
 #define TOPPIC_BASE_MOD_HPP_
 
-#include <string>
-#include <vector>
-#include <memory>
-
 #include "xml/xml_dom_element.hpp"
-
 #include "base/residue.hpp"
 
 namespace toppic {

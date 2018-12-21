@@ -16,16 +16,14 @@
 #ifndef TOPPIC_SEQ_CHANGE_HPP_
 #define TOPPIC_SEQ_CHANGE_HPP_
 
-#include <string>
-#include <vector>
-#include <memory>
-
-#include "xml/xml_dom_document.hpp"
+#include "xml/xml_dom_element.hpp"
 #include "base/mod.hpp"
 #include "seq/mass_shift_type.hpp"
 #include "seq/local_anno.hpp"
 
 namespace toppic {
+
+class XmlDOMDocument;
 
 class Change;
 typedef std::shared_ptr<Change> ChangePtr;

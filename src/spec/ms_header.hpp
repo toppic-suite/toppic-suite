@@ -16,8 +16,6 @@
 #ifndef PROT_SPEC_MS_HEADER_HPP_
 #define PROT_SPEC_MS_HEADER_HPP_
 
-#include <cmath>
-
 #include "base/activation.hpp"
 
 namespace toppic {
@@ -68,13 +66,7 @@ class MsHeader {
 
   int getPrecCharge() {return prec_charge_;}
 
-  double getPrecMonoMz() {
-    if (std::isnan(prec_mono_mz_)) {
-      return 0.0; 
-    } else {
-      return prec_mono_mz_;
-    }
-  }
+  double getPrecMonoMz();
 
   double getRetentionTime() {return retention_time_;}
 

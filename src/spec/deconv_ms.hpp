@@ -16,8 +16,8 @@
 #ifndef PROT_SPEC_DECONV_MS_HPP_
 #define PROT_SPEC_DECONV_MS_HPP_
 
-#include "spec/ms.hpp"
 #include "spec/deconv_peak.hpp"
+#include "spec/ms.hpp"
 
 namespace toppic {
 

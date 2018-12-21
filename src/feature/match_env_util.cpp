@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "util/logger.hpp"
+#include "base/mass_constant.hpp"
 #include "feature/raw_ms_util.hpp"
 #include "feature/match_env_util.hpp"
 

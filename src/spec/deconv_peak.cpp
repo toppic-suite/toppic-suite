@@ -17,9 +17,23 @@
 
 #include "util/str_util.hpp"
 #include "xml/xml_dom_util.hpp"
+#include "xml/xml_dom_document.hpp"
 #include "spec/deconv_peak.hpp"
 
 namespace toppic {
+
+DeconvPeak::DeconvPeak(int id, double mono_mass, double intensity, int charge):
+    Peak(mono_mass, intensity),
+    id_(id),
+    charge_(charge),
+    score_(1.0) {}
+
+DeconvPeak::DeconvPeak(int id, double mono_mass, double intensity, 
+                       int charge, double score):
+    Peak(mono_mass, intensity),
+    id_(id),
+    charge_(charge),
+    score_(score) {}
 
 DeconvPeak::DeconvPeak(xercesc::DOMElement* element):
     Peak(xml_dom_util::getDoubleChildValue(element, "position", 0),

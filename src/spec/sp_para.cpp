@@ -12,14 +12,26 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <string>
-
-#include "base/activation_base.hpp"
 #include "util/str_util.hpp"
+#include "base/activation_base.hpp"
 #include "xml/xml_dom_util.hpp"
+#include "xml/xml_dom_document.hpp"
 #include "spec/sp_para.hpp"
 
 namespace toppic {
+
+SpPara::SpPara(int min_peak_num, double min_mass, double min_extend_mass,
+               const std::vector<double> &ext_offsets,
+               PeakTolerancePtr peak_tolerance_ptr,
+               ActivationPtr activation_ptr,
+               const std::set<std::string> & skip_list):
+    min_peak_num_(min_peak_num),
+    min_mass_(min_mass),
+    extend_min_mass_(min_extend_mass),
+    ext_offsets_(ext_offsets),
+    peak_tolerance_ptr_(peak_tolerance_ptr),
+    activation_ptr_(activation_ptr),
+    skip_list_(skip_list) {}
 
 SpPara::SpPara(xercesc::DOMElement* element) {
   min_peak_num_ = xml_dom_util::getIntChildValue(element, "min_peak_num", 0);

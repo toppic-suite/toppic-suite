@@ -16,10 +16,6 @@
 #ifndef PROT_SPEC_EXTEND_MS_HPP_
 #define PROT_SPEC_EXTEND_MS_HPP_
 
-#include <vector>
-#include <memory>
-#include <utility>
-
 #include "spec/extend_peak.hpp"
 #include "spec/ms.hpp"
 

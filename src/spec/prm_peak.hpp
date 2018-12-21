@@ -16,9 +16,6 @@
 #ifndef PROT_SPEC_PRM_PEAK_HPP_
 #define PROT_SPEC_PRM_PEAK_HPP_
 
-#include <memory>
-#include <vector>
-
 #include "spec/deconv_peak.hpp"
 #include "spec/support_peak.hpp"
 #include "spec/base_peak_type.hpp"
@@ -36,16 +33,7 @@ class PrmPeak : public Peak {
           double mono_mass, double score,
           double strict_tolerance = 0.0,
           double n_strict_c_relax_tolerance = 0.0,
-          double n_relax_c_strict_tolerance = 0.0):
-      Peak(mono_mass, base_peak_ptr->getIntensity()),
-      spec_id_(spec_id),
-      base_peak_ptr_(base_peak_ptr),
-      base_type_(base_type),
-      mono_mass_(mono_mass),
-      score_(score),
-      strict_tolerance_(strict_tolerance),
-      n_strict_c_relax_tolerance_(n_strict_c_relax_tolerance),
-      n_relax_c_strict_tolerance_(n_relax_c_strict_tolerance) {}
+          double n_relax_c_strict_tolerance = 0.0);
 
   void addNghbEdge(DeconvPeakPtr deconv_peak_ptr, double offset,
                    SPTypePtr peak_type, double score);
@@ -56,10 +44,7 @@ class PrmPeak : public Peak {
 
   double getMonoMass() {return mono_mass_;}
 
-  void setMonoMass(double m) {
-    mono_mass_ = m;
-    setPosition(m);
-  }
+  void setMonoMass(double m);
 
   double getScore() {return score_;}
 
@@ -90,8 +75,7 @@ class PrmPeak : public Peak {
   void setPeakId(int peak_id) {peak_id_ = peak_id;}
 
   static bool cmpPosInc(const PrmPeakPtr &a, const PrmPeakPtr &b) {
-    return a->getPosition() < b->getPosition();
-  }
+    return a->getPosition() < b->getPosition();}
 
  private:
   int spec_id_;

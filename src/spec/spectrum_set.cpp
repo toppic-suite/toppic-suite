@@ -12,9 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <numeric>
-#include <functional>
-
 #include "util/logger.hpp"
 #include "spec/extend_ms_factory.hpp"
 #include "spec/prm_ms_factory.hpp"
@@ -61,6 +58,11 @@ PrmMsPtrVec SpectrumSet::getSuffixMsTwoPtrVec(SpParaPtr sp_para_ptr,
                                               const std::vector<double> & mod_mass) {
   return prm_ms_factory::geneSuffixMsTwoPtrVec(deconv_ms_ptr_vec_, sp_para_ptr,
                                                prec_mono_mass_, mod_mass);
+}
+
+PrmMsPtrVec SpectrumSet::getMsShiftSixPtrVec(double shift) {
+  return prm_ms_factory::geneShiftMsSixPtrVec(deconv_ms_ptr_vec_, sp_para_ptr_,
+                                              prec_mono_mass_, -shift);
 }
 
 bool SpectrumSet::checkValid(SpParaPtr sp_para_ptr) {

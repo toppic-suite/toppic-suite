@@ -16,8 +16,6 @@
 #ifndef TOPPIC_BASE_TRUNC_BASE_HPP_
 #define TOPPIC_BASE_TRUNC_BASE_HPP_
 
-#include <string>
-
 #include "xml/xml_dom_element.hpp"
 
 #include "base/trunc.hpp"

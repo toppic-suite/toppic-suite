@@ -12,11 +12,10 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <numeric>
 #include <algorithm>
-#include <vector>
 
 #include "util/logger.hpp"
+#include "base/mass_constant.hpp"
 #include "spec/base_peak_type.hpp"
 #include "spec/prm_ms_factory.hpp"
 

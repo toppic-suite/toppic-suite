@@ -15,6 +15,7 @@
 #include <string>
 
 #include "xml/xml_dom_util.hpp"
+#include "xml/xml_dom_document.hpp"
 #include "seq/mass_shift_type.hpp"
 
 namespace toppic {

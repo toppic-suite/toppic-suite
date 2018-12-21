@@ -16,8 +16,6 @@
 #ifndef TOPPIC_SEQ_PROTEOFORM_UTIL_HPP_
 #define TOPPIC_SEQ_PROTEOFORM_UTIL_HPP_
 
-#include <vector>
-
 #include "seq/proteoform.hpp"
 
 namespace toppic {

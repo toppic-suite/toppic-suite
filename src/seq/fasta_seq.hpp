@@ -16,13 +16,14 @@
 #ifndef TOPPIC_SEQ_FASTA_SEQ_HPP_
 #define TOPPIC_SEQ_FASTA_SEQ_HPP_
 
-#include <string>
 #include <memory>
 
 #include "util/str_util.hpp"
-#include "xml/xml_dom_document.hpp"
+#include "xml/xml_dom_element.hpp"
 
 namespace toppic {
+
+class XmlDOMDocument;
 
 class FastaSeq {
  public:

@@ -21,6 +21,7 @@
 #include "util/logger.hpp"
 #include "base/mass_constant.hpp"
 #include "util/str_util.hpp"
+#include "xml/xml_dom_document.hpp"
 #include "spec/peak.hpp"
 #include "feature/envelope.hpp"
 

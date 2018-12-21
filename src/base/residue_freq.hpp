@@ -16,9 +16,6 @@
 #ifndef TOPPIC_BASE_RESIDUE_FREQ_HPP_
 #define TOPPIC_BASE_RESIDUE_FREQ_HPP_
 
-#include <vector>
-#include <memory>
-
 #include "base/residue.hpp"
 
 namespace toppic {

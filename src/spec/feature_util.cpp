@@ -14,8 +14,6 @@
 
 #include <fstream>
 #include <iostream>
-#include <string>
-#include <vector>
 
 #include "util/str_util.hpp"
 

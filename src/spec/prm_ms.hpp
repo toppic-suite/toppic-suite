@@ -16,13 +16,9 @@
 #ifndef PROT_SPEC_PRM_MS_HPP_
 #define PROT_SPEC_PRM_MS_HPP_
 
-#include <memory>
-#include <vector>
-#include <utility>
-
 #include "spec/prm_peak.hpp"
-#include "spec/ms.hpp"
 #include "spec/peak_tolerance.hpp"
+#include "spec/ms.hpp"
 
 namespace toppic {
 

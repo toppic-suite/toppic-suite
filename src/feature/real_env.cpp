@@ -15,6 +15,7 @@
 
 #include "util/logger.hpp"
 #include "util/str_util.hpp"
+#include "xml/xml_dom_document.hpp"
 #include "spec/peak.hpp"
 #include "feature/raw_ms_util.hpp"
 #include "feature/real_env.hpp" 

@@ -16,9 +16,6 @@
 #ifndef PROT_SPEC_RAW_MS_HPP_
 #define PROT_SPEC_RAW_MS_HPP_
 
-#include <memory>
-#include <vector>
-
 #include "spec/peak.hpp"
 #include "spec/ms.hpp"
 
