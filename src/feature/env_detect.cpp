@@ -16,7 +16,7 @@
 
 #include "util/logger.hpp"
 #include "base/mass_constant.hpp"
-#include "feature/raw_ms_util.hpp"
+#include "spec/raw_ms_util.hpp"
 #include "feature/env_detect.hpp"
 
 namespace toppic {

@@ -18,7 +18,7 @@
 
 #include <vector>
 
-#include "feature/envelope.hpp"
+#include "deconv/env/envelope.hpp"
 
 namespace toppic {
 

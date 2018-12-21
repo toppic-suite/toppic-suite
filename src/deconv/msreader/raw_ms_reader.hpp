@@ -13,11 +13,10 @@
 //limitations under the License.
 
 
-#ifndef PROT_FEATURE_RAW_MS_READER_HPP_
-#define PROT_FEATURE_RAW_MS_READER_HPP_
+#ifndef TOPPIC_DECONV_MSREADER_RAW_MS_READER_HPP_
+#define TOPPIC_DECONV_MSREADER_RAW_MS_READER_HPP_
 
 #include <memory>
-#include <vector>
 #include <string>
 
 #include "pwiz/data/msdata/DefaultReaderList.hpp"

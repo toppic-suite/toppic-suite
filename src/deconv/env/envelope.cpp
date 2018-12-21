@@ -12,18 +12,17 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <string>
+//#include <functional>
+//#include <numeric>
+
+#include <cmath>
 #include <algorithm>
-#include <vector>
-#include <functional>
-#include <numeric>
 
 #include "util/logger.hpp"
-#include "base/mass_constant.hpp"
 #include "util/str_util.hpp"
 #include "xml/xml_dom_document.hpp"
-#include "spec/peak.hpp"
-#include "feature/envelope.hpp"
+#include "base/mass_constant.hpp"
+#include "deconv/env/envelope.hpp"
 
 namespace toppic {
 
@@ -65,6 +64,10 @@ Envelope::Envelope(int refer_idx, int charge, double mono_mz,
         peaks_.push_back(peak_ptr);
       }
     }
+
+int Envelope::getLabel(int i) {
+  return (int)std::round((peaks_[i]->getPosition() - mono_mz_) * charge_);
+}
 
 EnvelopePtr Envelope::convertToTheo(double mass_diff, int new_charge) {
   double new_mono_mz = (mono_mz_ + mass_diff) / new_charge;

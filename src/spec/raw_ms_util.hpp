@@ -13,12 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_FEATURE_RAW_MS_UTIL_HPP_
-#define PROT_FEATURE_RAW_MS_UTIL_HPP_
-
-#include <cstddef>
-#include <vector>
-#include <cmath>
+#ifndef TOPPIC_SPEC_RAW_MS_UTIL_HPP_
+#define TOPPIC_SPEC_RAW_MS_UTIL_HPP_
 
 #include "spec/peak.hpp"
 

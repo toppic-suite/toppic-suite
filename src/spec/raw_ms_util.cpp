@@ -13,15 +13,10 @@
 //limitations under the License.
 
 
-#ifndef PROT_SPEC_PEAK_LIST_HPP_
-#define PROT_SPEC_PEAK_LIST_HPP_
-
-#include <cstddef>
-#include <vector>
 #include <cmath>
 
 #include "util/logger.hpp"
-#include "feature/raw_ms_util.hpp"
+#include "spec/raw_ms_util.hpp"
 
 namespace toppic {
 
@@ -89,4 +84,3 @@ PeakPtrVec rmPeaks(const PeakPtrVec &ptr_list, std::vector<bool> &keep) {
 
 }  // namespace toppic
 
-#endif
