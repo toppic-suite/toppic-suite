@@ -15,10 +15,6 @@
 #ifndef TOPPIC_SEQ_MASS_SHIFT_HPP_
 #define TOPPIC_SEQ_MASS_SHIFT_HPP_
 
-#include <memory>
-#include <vector>
-#include <string>
-
 #include "seq/change.hpp"
 
 namespace toppic {

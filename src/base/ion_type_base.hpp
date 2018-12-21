@@ -16,9 +16,6 @@
 #ifndef TOPPIC_BASE_ION_TYPE_BASE_HPP_
 #define TOPPIC_BASE_ION_TYPE_BASE_HPP_
 
-
-#include <string>
-
 #include "base/ion_type.hpp"
 
 namespace toppic {

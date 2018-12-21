@@ -12,24 +12,15 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#ifndef PROT_SPEC_PEAK_UTIL_HPP_
-#define PROT_SPEC_PEAK_UTIL_HPP_
-
-#include "base/mass_constant.hpp"
+#include "spec/support_peak.hpp"
 
 namespace toppic {
 
-namespace peak_util {
+SupportPeak::SupportPeak(DeconvPeakPtr deconv_peak_ptr, double offset,
+                         double score, SPTypePtr peak_type_ptr): 
+    deconv_peak_ptr_(deconv_peak_ptr),
+    offset_(offset),
+    score_(score),
+    peak_type_ptr_(peak_type_ptr) {}
 
-inline double compPeakMass(double mono_mz, int charge) {
-  return mono_mz * charge - charge * mass_constant::getProtonMass();
-}
-
-inline double compMonoMz(double mono_mass, int charge) {
-  return mono_mass / charge + mass_constant::getProtonMass();
-}
-
-}  // namespace peak_util
-}  // namespace toppic
-#endif
+} /* namespace toppic */

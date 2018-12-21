@@ -16,8 +16,6 @@
 #ifndef TOPPIC_BASE_PROT_MOD_UTIL_HPP_
 #define TOPPIC_BASE_PROT_MOD_UTIL_HPP_
 
-#include <string>
-
 #include "base/prot_mod.hpp"
 #include "base/residue.hpp"
 

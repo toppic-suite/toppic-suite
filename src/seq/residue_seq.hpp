@@ -16,9 +16,6 @@
 #ifndef TOPPIC_SEQ_RESIDUE_SEQ_HPP_
 #define TOPPIC_SEQ_RESIDUE_SEQ_HPP_
 
-#include <string>
-#include <vector>
-
 #include "base/mass_constant.hpp"
 #include "base/residue.hpp"
 

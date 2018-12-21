@@ -15,10 +15,8 @@
 #ifndef PROT_FEATURE_MSALIGN_WRITER_HPP_
 #define PROT_FEATURE_MSALIGN_WRITER_HPP_
 
-#include <iostream>
 #include <fstream>
 
-#include "spec/ms_header.hpp"
 #include "spec/deconv_ms.hpp"
 
 namespace toppic {

@@ -12,13 +12,24 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#include <string>
-
 #include "util/str_util.hpp"
+#include "xml/xml_dom_document.hpp"
+#include "base/mass_constant.hpp"
 #include "spec/peak.hpp"
 
 namespace toppic {
+
+Peak::Peak(double position, double intensity): 
+      position_(position), 
+      intensity_(intensity) {}
+
+double Peak::compPeakMass(double mono_mz, int charge) {
+  return mono_mz * charge - charge * mass_constant::getProtonMass();
+}
+
+double Peak::compMonoMz(double mono_mass, int charge) {
+    return mono_mass / charge + mass_constant::getProtonMass();
+}
 
 void Peak::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   std::string element_name = Peak::getXmlElementName();

@@ -16,11 +16,7 @@
 #ifndef PROT_SPEC_MSALIGN_READER_HPP_
 #define PROT_SPEC_MSALIGN_READER_HPP_
 
-#include <vector>
-#include <string>
-#include <iostream>
 #include <fstream>
-#include <memory>
 #include <set>
 
 #include "util/logger.hpp"
@@ -33,18 +29,7 @@ class MsAlignReader {
  public:
   MsAlignReader(const std::string &file_name, int group_spec_num,
                 ActivationPtr act_ptr, const std::set<std::string> skip_list,
-                int peak_num_limit = 500):
-      file_name_(file_name),
-      group_spec_num_(group_spec_num),
-      activation_ptr_(act_ptr),
-      skip_list_(skip_list),
-      peak_num_limit_(peak_num_limit) {
-        input_.open(file_name.c_str(), std::ios::in);
-        if (!input_.is_open()) {
-          LOG_ERROR("msalign file  " << file_name << " does not exist.");
-          throw "msalign file does not exist.";
-        }
-      }
+                int peak_num_limit = 500);
 
   std::vector<std::string> readOneSpectrum();
 

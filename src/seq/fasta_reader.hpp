@@ -17,7 +17,6 @@
 #define TOPPIC_SEQ_FASTA_READER_HPP_
 
 #include <fstream>
-#include <string>
 
 #include "seq/fasta_seq.hpp"
 

@@ -13,14 +13,29 @@
 //limitations under the License.
 
 #include <cmath>
-#include <vector>
-#include <string>
+#include <sstream>
 
-#include "base/activation_base.hpp"
 #include "util/str_util.hpp"
+#include "base/mass_constant.hpp"
+#include "base/activation_base.hpp"
 #include "spec/msalign_reader.hpp"
 
 namespace toppic {
+
+MsAlignReader::MsAlignReader(const std::string &file_name, int group_spec_num,
+                             ActivationPtr act_ptr, const std::set<std::string> skip_list,
+                             int peak_num_limit):
+    file_name_(file_name),
+    group_spec_num_(group_spec_num),
+    activation_ptr_(act_ptr),
+    skip_list_(skip_list),
+    peak_num_limit_(peak_num_limit) {
+      input_.open(file_name.c_str(), std::ios::in);
+      if (!input_.is_open()) {
+        LOG_ERROR("msalign file  " << file_name << " does not exist.");
+        exit(EXIT_FAILURE);
+      }
+    }
 
 std::vector<std::string> MsAlignReader::readOneSpectrum() {
   std::string line;

@@ -16,9 +16,6 @@
 #ifndef TOPPIC_SEQ_BP_SPEC_HPP_
 #define TOPPIC_SEQ_BP_SPEC_HPP_
 
-#include <memory>
-#include <vector>
-
 #include "seq/break_point.hpp"
 #include "seq/residue_seq.hpp"
 

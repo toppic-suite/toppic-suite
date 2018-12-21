@@ -16,11 +16,6 @@
 #ifndef TOPPIC_SEQ_LOCAL_ANNO_HPP_
 #define TOPPIC_SEQ_LOCAL_ANNO_HPP_
 
-#include <string>
-#include <memory>
-#include <vector>
-#include <algorithm>
-
 #include "base/ptm.hpp"
 #include "xml/xml_dom_document.hpp"
 
@@ -42,7 +37,7 @@ class LocalAnno {
   // get the score vector containing score for each site
   std::vector<double> getScrVec() {return scr_vec_;}
 
-  double getScr() {return std::accumulate(scr_vec_.begin(), scr_vec_.end(), 0.0);}
+  double getScr();
 
   PtmPtr getPtmPtr() {return ptm_ptr_;}
 

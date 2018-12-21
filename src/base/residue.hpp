@@ -16,10 +16,6 @@
 #ifndef TOPPIC_BASE_RESIDUE_HPP_
 #define TOPPIC_BASE_RESIDUE_HPP_
 
-#include <string>
-#include <vector>
-#include <memory>
-
 #include "base/amino_acid.hpp"
 #include "base/ptm.hpp"
 

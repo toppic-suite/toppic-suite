@@ -13,13 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_SPEC_REAL_ENV_PEAK_HPP_
-#define PROT_SPEC_REAL_ENV_PEAK_HPP_
-
-
-#include <memory>
-#include <vector>
-#include <string>
+#ifndef PROT_SPEC_ENV_PEAK_HPP_
+#define PROT_SPEC_ENV_PEAK_HPP_
 
 #include "spec/peak.hpp"
 
@@ -32,13 +27,9 @@ class EnvPeak : public Peak {
  public:
   EnvPeak(double mz, double intensity);
 
-  EnvPeak(double mz, double intensity, int idx):
-      Peak(mz, intensity),
-      idx_(idx) {}
+  EnvPeak(double mz, double intensity, int idx);
 
-  EnvPeak(EnvPeakPtr peak_ptr):
-      Peak(peak_ptr->getPosition(), peak_ptr->getIntensity()),
-      idx_(peak_ptr->getIdx()) {}
+  EnvPeak(EnvPeakPtr peak_ptr);
 
   EnvPeak(xercesc::DOMElement* element);
 
@@ -52,13 +43,9 @@ class EnvPeak : public Peak {
 
   static int getNonExistPeakIdx() {return -1;}
 
-  static bool cmpPosInc(const EnvPeakPtr &a, const EnvPeakPtr &b) {
-    return a->getPosition() < b->getPosition();
-  }
+  static bool cmpPosInc(const EnvPeakPtr &a, const EnvPeakPtr &b);
 
-  static bool cmpInteInc(const EnvPeakPtr &a, const EnvPeakPtr &b) {
-    return a->getIntensity() < b->getIntensity();
-  }
+  static bool cmpInteInc(const EnvPeakPtr &a, const EnvPeakPtr &b);
 
   static std::string getXmlElementName() {return "env_peak";}
 

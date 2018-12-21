@@ -18,7 +18,6 @@
 
 #include <string>
 
-
 namespace toppic {
 
 namespace fasta_util {

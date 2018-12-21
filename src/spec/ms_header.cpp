@@ -13,21 +13,27 @@
 //limitations under the License.
 
 
-#include <sstream>
 #include <cmath>
-#include <utility>
-#include <string>
-#include <vector>
+#include <sstream>
 
 #include "util/logger.hpp"
 #include "util/str_util.hpp"
 #include "xml/xml_dom_document.hpp"
 #include "xml/xml_dom_util.hpp"
 #include "base/activation_base.hpp"
-#include "spec/peak_util.hpp"
+#include "base/mass_constant.hpp"
+#include "spec/peak.hpp"
 #include "spec/ms_header.hpp"
 
 namespace toppic {
+
+double MsHeader::getPrecMonoMz() {
+  if (std::isnan(prec_mono_mz_)) {
+    return 0.0; 
+  } else {
+    return prec_mono_mz_;
+  }
+}
 
 MsHeader::MsHeader(xercesc::DOMElement* element) {
   file_name_ = xml_dom_util::getChildValue(element, "file_name", 0);
@@ -57,7 +63,7 @@ double MsHeader::getPrecMonoMass() {
     LOG_WARN("monoisotopic mass is not initialized");
     return 0.0;
   } else {
-    return peak_util::compPeakMass(prec_mono_mz_, prec_charge_);
+    return Peak::compPeakMass(prec_mono_mz_, prec_charge_);
   }
 }
 
@@ -66,7 +72,7 @@ double MsHeader::getPrecSpMass() {
     LOG_WARN("precursor spectrum mass is not initialized");
     return 0.0;
   } else {
-    return peak_util::compPeakMass(prec_sp_mz_, prec_charge_);
+    return Peak::compPeakMass(prec_sp_mz_, prec_charge_);
   }
 }
 
@@ -75,7 +81,7 @@ double MsHeader::getPrecMonoMassMinusWater() {
     LOG_WARN("monoisotopic mass is not initialized");
     return 0.0;
   } else {
-    return peak_util::compPeakMass(prec_mono_mz_, prec_charge_)
+    return Peak::compPeakMass(prec_mono_mz_, prec_charge_)
         - mass_constant::getWaterMass();
   }
 }
@@ -161,7 +167,7 @@ void MsHeader::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
 
 MsHeaderPtr MsHeader::geneMsHeaderPtr(MsHeaderPtr ori_ptr, double new_prec_mass) {
   MsHeaderPtr new_header_ptr = std::make_shared<MsHeader>(*ori_ptr.get());
-  double mono_mz = peak_util::compMonoMz(new_prec_mass, ori_ptr->getPrecCharge());
+  double mono_mz = Peak::compMonoMz(new_prec_mass, ori_ptr->getPrecCharge());
   new_header_ptr->setPrecMonoMz(mono_mz);
   return new_header_ptr;
 }

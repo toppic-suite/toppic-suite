@@ -16,8 +16,6 @@
 #ifndef TOPPIC_BASE_PTM_UTIL_HPP_
 #define TOPPIC_BASE_PTM_UTIL_HPP_
 
-#include <string>
-
 #include "base/ptm.hpp"
 
 namespace toppic {

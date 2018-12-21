@@ -16,8 +16,6 @@
 #ifndef TOPPIC_BASE_PROT_MOD_BASE_HPP_
 #define TOPPIC_BASE_PROT_MOD_BASE_HPP_
 
-#include <string>
-
 #include "base/ptm.hpp"
 #include "base/trunc.hpp"
 #include "base/prot_mod.hpp"

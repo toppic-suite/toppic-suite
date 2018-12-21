@@ -16,13 +16,9 @@
 #ifndef PROT_SPEC_SPECTRUM_SET_HPP_
 #define PROT_SPEC_SPECTRUM_SET_HPP_
 
-#include <memory>
-#include <vector>
-
 #include "spec/deconv_ms.hpp"
 #include "spec/extend_ms.hpp"
 #include "spec/prm_ms.hpp"
-#include "spec/prm_ms_factory.hpp"
 #include "spec/sp_para.hpp"
 
 namespace toppic {
@@ -55,10 +51,7 @@ class SpectrumSet {
 
   PrmMsPtrVec getMsSixPtrVec() {return prm_ms_six_ptr_vec_;}
 
-  PrmMsPtrVec getMsShiftSixPtrVec(double shift) {
-    return prm_ms_factory::geneShiftMsSixPtrVec(deconv_ms_ptr_vec_, sp_para_ptr_,
-                                                prec_mono_mass_, -shift);
-  }
+  PrmMsPtrVec getMsShiftSixPtrVec(double shift);
 
  private:
   DeconvMsPtrVec deconv_ms_ptr_vec_;

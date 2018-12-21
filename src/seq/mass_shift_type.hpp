@@ -20,9 +20,11 @@
 #include <vector>
 #include <string>
 
-#include "xml/xml_dom_document.hpp"
+#include "xml/xml_dom_element.hpp"
 
 namespace toppic {
+
+class XmlDOMDocument;
 
 class MassShiftType;
 typedef std::shared_ptr<MassShiftType> MassShiftTypePtr;

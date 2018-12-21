@@ -16,9 +16,19 @@
 #include <string>
 
 #include "util/str_util.hpp"
+#include "xml/xml_dom_document.hpp"
 #include "spec/extend_peak.hpp"
 
 namespace toppic {
+
+ExtendPeak::ExtendPeak(DeconvPeakPtr base_peak_ptr, 
+                       double mono_mass, double score):
+    Peak(mono_mass, 1.0),
+    base_peak_ptr_(base_peak_ptr),
+    mono_mass_(mono_mass),
+    score_(score),
+    orig_tolerance_(0.0),
+    reverse_tolerance_(0.0) {}
 
 void ExtendPeak::appendXml(XmlDOMDocument* xml_doc,
                            xercesc::DOMElement* parent) {

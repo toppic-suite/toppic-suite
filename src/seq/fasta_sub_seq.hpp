@@ -15,9 +15,6 @@
 #ifndef TOPPIC_SEQ_FASTA_SUB_SEQ_HPP_
 #define TOPPIC_SEQ_FASTA_SUB_SEQ_HPP_
 
-
-#include <string>
-
 #include "seq/fasta_seq.hpp"
 
 namespace toppic {

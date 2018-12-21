@@ -16,10 +16,6 @@
 #ifndef TOPPIC_BASE_NEUTRAL_LOSS_BASE_HPP_
 #define TOPPIC_BASE_NEUTRAL_LOSS_BASE_HPP_
 
-#include <string>
-#include <vector>
-#include <memory>
-
 #include "base/neutral_loss.hpp"
 
 namespace toppic {

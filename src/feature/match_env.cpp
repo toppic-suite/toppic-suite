@@ -17,6 +17,7 @@
 #include <limits>
 
 #include "util/str_util.hpp"
+#include "xml/xml_dom_document.hpp"
 #include "feature/match_env.hpp" 
 
 namespace toppic {

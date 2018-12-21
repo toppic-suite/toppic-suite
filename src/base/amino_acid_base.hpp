@@ -16,7 +16,6 @@
 #ifndef TOPPIC_BASE_AMINO_ACID_BASE_HPP_
 #define TOPPIC_BASE_AMINO_ACID_BASE_HPP_
 
-#include <string>
 #include <unordered_map>
 
 #include "base/amino_acid.hpp"

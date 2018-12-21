@@ -13,12 +13,14 @@
 //limitations under the License.
 
 
+#include <cmath>
 #include <limits>
 #include <vector>
 
 #include "util/logger.hpp"
 #include "base/base_data.hpp"
 #include "spec/deconv_ms_util.hpp"
+#include "spec/prm_ms_factory.hpp"
 #include "tdgf/comp_pvalue_array.hpp"
 
 namespace toppic {

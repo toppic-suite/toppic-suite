@@ -12,11 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef PROT_SPEC_MS_HPP_
 #define PROT_SPEC_MS_HPP_
-
-#include <sstream>
 
 #include "spec/ms_header.hpp"
 
@@ -27,22 +24,11 @@ class Ms {
  public:
   Ms() {};
 
-  Ms(MsHeaderPtr header_ptr) {header_ptr_ = header_ptr;}
+  Ms(MsHeaderPtr header_ptr):header_ptr_(header_ptr) {}
 
-  Ms(MsHeaderPtr header_ptr, const std::vector<T> &peak_ptr_list) {
-    header_ptr_ = header_ptr;
-    peak_ptr_list_ = peak_ptr_list;
-  }
-
-  std::string toString() {
-    std::string header_str = header_ptr_->toString();
-    std::stringstream tmp;
-    for (size_t i = 0; i < peak_ptr_list_.size(); i++) {
-      tmp << i << " " << peak_ptr_list_[i]->getPosition() 
-          << " " << peak_ptr_list_[i]->getIntensity() << "\n";
-    }
-    return header_str + tmp.str();
-  }
+  Ms(MsHeaderPtr header_ptr, const std::vector<T> &peak_ptr_list): 
+    header_ptr_(header_ptr),
+    peak_ptr_list_(peak_ptr_list) {}
 
   MsHeaderPtr getMsHeaderPtr() {return header_ptr_;}
 

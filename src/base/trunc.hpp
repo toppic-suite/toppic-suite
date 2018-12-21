@@ -16,10 +16,6 @@
 #ifndef TOPPIC_BASE_TRUNC_HPP_
 #define TOPPIC_BASE_TRUNC_HPP_
 
-#include <string>
-#include <memory>
-#include <vector>
-
 #include "xml/xml_dom_element.hpp"
 
 #include "base/residue.hpp"

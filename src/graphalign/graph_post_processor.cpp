@@ -18,6 +18,7 @@
 #include <string>
 #include <vector>
 
+#include "base/ptm_base.hpp"
 #include "base/ptm_util.hpp"
 #include "base/prot_mod_base.hpp"
 #include "util/file_util.hpp"

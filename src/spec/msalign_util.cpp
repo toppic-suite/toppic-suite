@@ -14,7 +14,6 @@
 
 
 #include "util/logger.hpp"
-
 #include "spec/msalign_util.hpp"
 #include "spec/msalign_reader.hpp"
 

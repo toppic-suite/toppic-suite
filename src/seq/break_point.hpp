@@ -16,9 +16,6 @@
 #ifndef TOPPIC_SEQ_BREAK_POINT_HPP_
 #define TOPPIC_SEQ_BREAK_POINT_HPP_
 
-#include <memory>
-#include <vector>
-
 #include "base/ion_type.hpp"
 
 namespace toppic {

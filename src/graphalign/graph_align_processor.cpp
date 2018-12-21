@@ -91,7 +91,7 @@ std::function<void()> geneTask(FastaIndexReaderPtr reader_ptr,
             std::vector<FastaSubSeqPtr> seq_ptr_vec = reader_ptr->readFastaSubSeqVec(seq_name, seq_desc);
             for (size_t j = 0; j < seq_ptr_vec.size(); j++) {
               for (size_t k = 0; k < spec_ptr_vec.size(); k++) {
-                proteo_anno_ptr->anno(seq_ptr_vec[j]->getRawSeq(), seq_ptr_vec[j]->is_n_term());
+                proteo_anno_ptr->anno(seq_ptr_vec[j]->getRawSeq(), seq_ptr_vec[j]->isNTerm());
                 MassGraphPtr graph_ptr = getMassGraphPtr(proteo_anno_ptr, mng_ptr->convert_ratio_);
                 ProteoGraphPtr proteo_ptr = std::make_shared<ProteoGraph>(seq_ptr_vec[j],
                                                                           prsm_para_ptr->getFixModPtrVec(),

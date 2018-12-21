@@ -12,14 +12,22 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#include <string>
-
 #include "util/str_util.hpp"
 #include "xml/xml_dom_util.hpp"
+#include "xml/xml_dom_document.hpp"
 #include "spec/peak_tolerance.hpp"
 
 namespace toppic {
+
+PeakTolerance::PeakTolerance(double ppo, bool use_min_tolerance,
+                             double min_tolerance):
+    ppo_(ppo), 
+    use_min_tolerance_(use_min_tolerance),
+    min_tolerance_(min_tolerance) {}
+
+double PeakTolerance::compRelaxErrorTole(double m1, double m2) {
+  return compStrictErrorTole(m1 + m2);
+}
 
 PeakTolerance::PeakTolerance(xercesc::DOMElement* element) {
   ppo_ = xml_dom_util::getDoubleChildValue(element, "ppo", 0);

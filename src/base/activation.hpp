@@ -16,9 +16,6 @@
 #ifndef TOPPIC_BASE_ACTIVATION_HPP_
 #define TOPPIC_BASE_ACTIVATION_HPP_
 
-#include <string>
-#include <vector>
-
 #include "base/ion_type.hpp"
 
 namespace toppic {

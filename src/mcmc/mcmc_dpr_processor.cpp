@@ -29,7 +29,7 @@
 #include "spec/msalign_reader.hpp"
 #include "spec/msalign_util.hpp"
 #include "spec/theo_peak.hpp"
-#include "spec/theo_peak_util.hpp"
+#include "prsm/theo_peak_util.hpp"
 #include "spec/extend_ms_factory.hpp"
 
 #include "prsm/base_algo.hpp"
