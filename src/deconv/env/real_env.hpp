@@ -16,12 +16,8 @@
 #ifndef PROT_FEATURE_REAL_ENVELOPE_HPP_
 #define PROT_FEATURE_REAL_ENVELOPE_HPP_
 
-#include <memory>
-#include <vector>
-#include <string>
-
 #include "spec/peak.hpp"
-#include "feature/envelope.hpp" 
+#include "deconv/env/envelope.hpp" 
 
 namespace toppic {
 

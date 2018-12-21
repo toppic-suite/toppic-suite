@@ -19,7 +19,7 @@
 #include <memory>
 #include <vector>
 
-#include "feature/envelope.hpp"
+#include "deconv/env/envelope.hpp"
 #include "feature/match_env.hpp"
 #include "feature/feature_mng.hpp"
 #include "feature/deconv_data.hpp"

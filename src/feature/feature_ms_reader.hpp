@@ -20,7 +20,7 @@
 #include <vector>
 
 #include "spec/raw_ms.hpp"
-#include "feature/raw_ms_reader.hpp"
+#include "deconv/msreader/raw_ms_reader.hpp"
 
 namespace toppic {
 

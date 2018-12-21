@@ -16,11 +16,6 @@
 #ifndef PROT_FEATURE_ENVELOPE_HPP_
 #define PROT_FEATURE_ENVELOPE_HPP_
 
-#include <memory>
-#include <vector>
-#include <string>
-#include <cmath>
-
 #include "spec/env_peak.hpp"
 
 namespace toppic {
@@ -75,7 +70,7 @@ class Envelope {
 
   int getCharge() {return charge_;}
 
-  int getLabel(int i) {return (int)std::round((peaks_[i]->getPosition() - mono_mz_) * charge_);}
+  int getLabel(int i);
 
   double getIntensity(int i) {return peaks_[i]->getIntensity();}
 

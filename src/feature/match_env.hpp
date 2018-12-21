@@ -21,8 +21,8 @@
 
 #include "spec/ms_header.hpp"
 #include "feature/feature_mng.hpp" 
-#include "feature/envelope.hpp" 
-#include "feature/real_env.hpp" 
+#include "deconv/env/envelope.hpp" 
+#include "deconv/env/real_env.hpp" 
 
 namespace toppic {
 

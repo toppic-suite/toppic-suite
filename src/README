@@ -1,5 +1,6 @@
-/base/    Reading and storing amino acids, ptms, residues and etc 
+/base/    Store and search store amino acids, ptms, residues and etc 
 /boost/   Some code from Boost version used by pwiz
+/htslib/  Create fasta indexes and read fasta files
 /pwiz/    Some code from ProteoWizard version for reading mzML and mzXML files
 /seq/     Fasta sequences and proteoforms
 /spec/    Various peaks and spectrum classes
