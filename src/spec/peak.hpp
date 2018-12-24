@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef PROT_SPEC_PEAK_HPP_
 #define PROT_SPEC_PEAK_HPP_
 

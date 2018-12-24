@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_FEATURE_REAL_ENVELOPE_HPP_
-#define PROT_FEATURE_REAL_ENVELOPE_HPP_
+#ifndef TOPPIC_DECONV_ENV_REAL_ENVELOPE_HPP_
+#define TOPPIC_DECONV_ENV_REAL_ENVELOPE_HPP_
 
 #include "spec/peak.hpp"
 #include "deconv/env/envelope.hpp" 
@@ -27,7 +27,7 @@ typedef std::shared_ptr<RealEnv> RealEnvPtr;
 
 class RealEnv : public Envelope {
  public:
-  RealEnv(std::vector<PeakPtr> &peak_list, EnvelopePtr theo_env, 
+  RealEnv(const PeakPtrVec &peak_list, EnvelopePtr theo_env, 
           double tolerance, double min_inte);
 
   int getMissPeakNum() {return miss_peak_num_;}
@@ -57,7 +57,7 @@ class RealEnv : public Envelope {
   // maximum number of consecutive peaks 
   int max_consecutive_peak_num_;
 
-  void mapPeakList(std::vector<PeakPtr> &peak_list, EnvelopePtr theo_env, 
+  void mapPeakList(const PeakPtrVec &peak_list, EnvelopePtr theo_env, 
                    double tolerance, double min_min);
 
   void remvDuplMatch(EnvelopePtr theo_env);

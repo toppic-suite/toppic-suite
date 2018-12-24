@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_FEATURE_ENVELOPE_HPP_
-#define PROT_FEATURE_ENVELOPE_HPP_
+#ifndef TOPPIC_DECONV_ENV_ENVELOPE_HPP_
+#define TOPPIC_DECONV_ENV_ENVELOPE_HPP_
 
 #include "spec/env_peak.hpp"
 

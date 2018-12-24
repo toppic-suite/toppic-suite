@@ -1,5 +1,6 @@
 /base/    Store and search store amino acids, ptms, residues and etc 
 /boost/   Some code from Boost version used by pwiz
+/deconv/  Spectral deconvolution and feature detection
 /htslib/  Create fasta indexes and read fasta files
 /pwiz/    Some code from ProteoWizard version for reading mzML and mzXML files
 /seq/     Fasta sequences and proteoforms

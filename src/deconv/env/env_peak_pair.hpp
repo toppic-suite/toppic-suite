@@ -13,35 +13,36 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_DECONV_MSREADER_RAW_MS_READER_HPP_
-#define TOPPIC_DECONV_MSREADER_RAW_MS_READER_HPP_
+#ifndef TOPPIC_DECONV_ENV_ENV_PEAK_PAIR_HPP_
+#define TOPPIC_DECONV_ENV_ENV_PEAK_PAIR_HPP_
 
-#include "spec/raw_ms.hpp"
-#include "deconv/msreader/pw_ms_reader.hpp"
+#include "deconv/env/match_env.hpp"
 
 namespace toppic {
 
-class RawMsReader {
+class EnvPeakPair;
+typedef std::shared_ptr<EnvPeakPair> EnvPeakPairPtr;
+
+class EnvPeakPair {
  public:
-  RawMsReader(const std::string & file_name);
+  EnvPeakPair(MatchEnvPtr env_ptr, int pos_idx);
 
-  RawMsPtr getNextMs(double prec_win_size, int max_charge);
+  EnvPeakPair(EnvPeakPairPtr pair_ptr);
 
-  void refinePrecChrg(RawMsPtr ms_one, RawMsPtr ms_two, 
-                      double prec_win_size, int max_charge);
+  double getTheoIntensity();
 
-  int getInputSpNum() {return reader_ptr_->getInputSpNum();}
+  double getPeakScore(double intensity_sum, double tolerance);
+
+  MatchEnvPtr getMatchEnvPtr() {return env_ptr_;}
+  int getPosIdx() { return pos_idx_;}
 
  private:
-  PwMsReaderPtr reader_ptr_;
-  RawMsPtr ms_one_; 
-
-  bool do_refine_prec_mass_ = true;
-
+  MatchEnvPtr env_ptr_;
+  int pos_idx_;
 };
 
-typedef std::shared_ptr<RawMsReader> RawMsReaderPtr;
+typedef std::vector<EnvPeakPairPtr> EnvPeakPairPtrVec;
+typedef std::vector<EnvPeakPairPtrVec> EnvPeakPairPtr2D;
 
 }
-
 #endif

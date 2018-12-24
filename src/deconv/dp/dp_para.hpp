@@ -12,36 +12,31 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#ifndef TOPPIC_DECONV_DP_DP_PARA_HPP_
+#define TOPPIC_DECONV_DP_DP_PARA_HPP_
 
-#ifndef TOPPIC_DECONV_MSREADER_RAW_MS_READER_HPP_
-#define TOPPIC_DECONV_MSREADER_RAW_MS_READER_HPP_
-
-#include "spec/raw_ms.hpp"
-#include "deconv/msreader/pw_ms_reader.hpp"
+#include <memory>
+#include <vector>
 
 namespace toppic {
 
-class RawMsReader {
+class DpPara {
  public:
-  RawMsReader(const std::string & file_name);
+  // DP algorithm
+  // Check double increasing when two envelopes overlap 
+  bool check_double_increase_ = true;
+  std::vector<std::vector<bool>> coexist_table_;
 
-  RawMsPtr getNextMs(double prec_win_size, int max_charge);
-
-  void refinePrecChrg(RawMsPtr ms_one, RawMsPtr ms_two, 
-                      double prec_win_size, int max_charge);
-
-  int getInputSpNum() {return reader_ptr_->getInputSpNum();}
-
- private:
-  PwMsReaderPtr reader_ptr_;
-  RawMsPtr ms_one_; 
-
-  bool do_refine_prec_mass_ = true;
-
+  // maximum number of envelopes sharing one peak 
+  int max_env_num_per_peak_ = 2;
+  // used in dpB to specify the number of output envelopes 
+  int dp_env_num_ = 300;
+  // maximum number of vertices per window 
+  int max_env_num_per_vertex_ = 10;
 };
 
-typedef std::shared_ptr<RawMsReader> RawMsReaderPtr;
+typedef std::shared_ptr<DpPara> DpParaPtr;
 
-}
+} /* namespace */
 
-#endif
+#endif 
