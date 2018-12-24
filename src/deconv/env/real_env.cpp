@@ -22,7 +22,7 @@
 
 namespace toppic {
 
-RealEnv::RealEnv(std::vector<PeakPtr> &peak_list, EnvelopePtr theo_env, 
+RealEnv::RealEnv(const PeakPtrVec &peak_list, EnvelopePtr theo_env, 
                  double tolerance, double min_inte) {
   // copy 
   refer_idx_ = theo_env->getReferIdx();
@@ -40,7 +40,7 @@ RealEnv::RealEnv(std::vector<PeakPtr> &peak_list, EnvelopePtr theo_env,
 }
 
 // map peaks in theo_env to the peaks in sp 
-void RealEnv::mapPeakList(std::vector<PeakPtr> &peak_list, EnvelopePtr theo_env, 
+void RealEnv::mapPeakList(const PeakPtrVec &peak_list, EnvelopePtr theo_env, 
                           double tolerance, double min_inte) {
   int peak_num = theo_env->getPeakNum();
   peaks_.clear();

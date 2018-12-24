@@ -12,136 +12,67 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include "pwiz/data/msdata/SpectrumInfo.hpp"
-#include "pwiz/data/common/cv.hpp"
-#include "pwiz/data/common/ParamTypes.hpp"
 
 #include "util/logger.hpp"
-#include "util/str_util.hpp"
-#include "base/activation_base.hpp"
-#include "deconv/msreader/raw_ms_reader.hpp"
+#include "deconv/env/real_env.hpp"
+#include "deconv/env/prec_env.hpp"
+#include "deconv/msreader/raw_ms_reader.hpp" 
 
 namespace toppic {
 
-RawMsReader::RawMsReader(const std::string & file_name):
-    file_name_(file_name),
-    input_sp_id_(0),
-    output_sp_id_(0) {
-      msd_ptr_ = std::make_shared<pwiz::msdata::MSDataFile>(file_name, &readers_);
-      spec_list_ptr_ =  msd_ptr_->run.spectrumListPtr;
-      input_sp_num_ = spec_list_ptr_->size();
-    }
-
-int RawMsReader::readNext() {
-  peak_list_.clear();
-  header_ptr_ = nullptr;
-
-  if (input_sp_id_ >= input_sp_num_) {
-    return -1;
-  }
-
-  pwiz::msdata::SpectrumPtr cur_spec_ptr = nullptr;
-  // read m/z and intensity values from the spectra
-  bool get_binary_data = true;
-  while (cur_spec_ptr == nullptr) {
-    cur_spec_ptr = spec_list_ptr_->spectrum(input_sp_id_, get_binary_data);
-    input_sp_id_++;
-    if (input_sp_id_ >= input_sp_num_ + 1) {
-      LOG_ERROR("Only " << input_sp_num_  << " spectra in the input data!");
-      return -1;
-    }
-  }
-
-  std::vector<pwiz::msdata::MZIntensityPair> pairs;
-  cur_spec_ptr->getMZIntensityPairs(pairs);
-  LOG_DEBUG("mz pair size " << pairs.size());
-  // make sure the peak list is already sorted
-  std::sort(pairs.begin(), pairs.end(),
-            [](const pwiz::msdata::MZIntensityPair &a, const pwiz::msdata::MZIntensityPair& b) {
-            return a.mz < b.mz;
-            });
-
-  pwiz::msdata::SpectrumInfo spec_info(*cur_spec_ptr);
-  peak_list_.empty();
-  for (size_t i = 0; i < pairs.size(); i++) {
-    if (pairs[i].intensity > 0.0) {
-      PeakPtr peak_ptr = std::make_shared<Peak>(pairs[i].mz, pairs[i].intensity);
-      peak_list_.push_back(peak_ptr);
-    }
-  }
-  int ms_level = spec_info.msLevel;
-  LOG_DEBUG("ms_level " << ms_level);
-  if (ms_level == 2) {
-    double prec_mz;
-    if (spec_info.precursors.size() == 0) {
-      prec_mz = 0;
-    } else {
-      prec_mz = spec_info.precursors[0].mz;
-    }
-
-    if (prec_mz < 0) {
-      prec_mz = 0;
-    }
-
-    int prec_charge;
-    if (spec_info.precursors.size() == 0) {
-      prec_charge = 1;
-    } else {
-      prec_charge = static_cast<int>(spec_info.precursors[0].charge);
-    }
-
-    if (prec_charge  < 0) {
-      prec_charge = 1;
-    }
-
-    LOG_DEBUG("prec mz " << prec_mz << " scan number " << spec_info.scanNumber);
-    header_ptr_ = std::make_shared<MsHeader>();
-    header_ptr_->setId(ms2_cnt);
-    ms2_cnt++;
-    header_ptr_->setScan(spec_info.scanNumber);
-    header_ptr_->setMsLevel(ms_level);
-    header_ptr_->setPrecCharge(prec_charge);
-    header_ptr_->setFileName(file_name_);
-    header_ptr_->setTitle("Scan_" + str_util::toString(spec_info.scanNumber));
-    // here is average mz
-    header_ptr_->setPrecSpMz(prec_mz);
-    header_ptr_->setRetentionTime(spec_info.retentionTime);
-
-    std::string ac_name;
-    if (cur_spec_ptr->precursors.size() != 0) {
-      std::vector<pwiz::data::CVParam> cv_list = cur_spec_ptr->precursors[0].activation.cvParams;
-      for (size_t i = 0; i < cv_list.size(); i++) {
-        LOG_DEBUG("cv list " << i << " " << cv_list[i].cvid << " " << cv_list[i].value);
-        if (cv_list[i].cvid == pwiz::cv::MS_CID) {
-          ac_name = "CID";
-          break;
-        } else if (cv_list[i].cvid == pwiz::cv::MS_HCD) {
-          ac_name = "HCD";
-          break;
-        } else if (cv_list[i].cvid == pwiz::cv::MS_ETD) {
-          ac_name = "ETD";
-          break;
-        }
-      }
-    }
-    if (ac_name == "") {
-      LOG_WARN("No activation information is available in reading the spectrum with scan " << spec_info.scanNumber);
-    }
-    LOG_DEBUG("ac name " << ac_name);
-    ActivationPtr activation_ptr = ActivationBase::getActivationPtrByName(ac_name);
-    header_ptr_->setActivationPtr(activation_ptr);
-  } else {
-    header_ptr_ = std::make_shared<MsHeader>();
-    header_ptr_->setId(ms1_cnt);
-    ms1_cnt++;
-    header_ptr_->setScan(spec_info.scanNumber);
-    header_ptr_->setMsLevel(ms_level);
-    header_ptr_->setPrecCharge(0);
-    header_ptr_->setFileName(file_name_);
-    header_ptr_->setTitle("Scan_" + str_util::toString(spec_info.scanNumber));
-    header_ptr_->setRetentionTime(spec_info.retentionTime);
-  }
-  return 1;
+RawMsReader::RawMsReader(const std::string & file_name) {
+  reader_ptr_ = std::make_shared<PwMsReader>(file_name);
 }
 
-}  // namespace toppic
+RawMsPtr RawMsReader::getNextMs(double prec_win_size, int max_charge) {
+  reader_ptr_->readNext();
+  PeakPtrVec peak_list = reader_ptr_->getPeakList();
+  MsHeaderPtr header_ptr = reader_ptr_->getHeaderPtr();
+  if (header_ptr == nullptr) {
+    return nullptr;
+  }
+  RawMsPtr ms_ptr = std::make_shared<Ms<PeakPtr> >(header_ptr, peak_list);
+
+  // update ms_1 
+  if (header_ptr->getMsLevel() == 1) {
+    ms_one_ = ms_ptr;
+  }
+  if (header_ptr->getMsLevel() == 2 && ms_one_ != nullptr) {
+    header_ptr->setMsOneId(ms_one_->getMsHeaderPtr()->getId());
+    header_ptr->setMsOneScan(ms_one_->getMsHeaderPtr()->getFirstScanNum());
+  }
+  if (do_refine_prec_mass_ && header_ptr->getMsLevel() == 2 && ms_one_ != nullptr) {
+    refinePrecChrg(ms_one_, ms_ptr, prec_win_size, max_charge);
+  } else {
+    if (header_ptr->getPrecSpMz() != 0.0) {
+      header_ptr->setPrecMonoMz(header_ptr->getPrecSpMz());
+    }
+  }
+  return ms_ptr;
+}
+
+// refine precursor charge and mz 
+void RawMsReader::refinePrecChrg(RawMsPtr ms_one, RawMsPtr ms_two, 
+                                     double prec_win_size, int max_charge) {
+  MsHeaderPtr header_two = ms_two->getMsHeaderPtr();
+  double prec_avg_mz = header_two->getPrecSpMz();
+  int prec_charge = header_two->getPrecCharge();
+
+  PeakPtrVec peak_list = ms_one->getPeakPtrVec();
+  LOG_DEBUG("start refine precursor " << " peak num " << peak_list.size());
+  RealEnvPtr env_ptr = prec_env::deconv(prec_win_size, peak_list, prec_avg_mz, 
+                                       prec_charge, max_charge);
+  if (env_ptr != nullptr) {
+    header_two->setPrecMonoMz(env_ptr->getMonoMz());
+    header_two->setPrecCharge(env_ptr->getCharge());
+    header_two->setPrecInte(env_ptr->compIntensitySum());
+    LOG_DEBUG("prec mz " << env_ptr->getMonoMz() << " prec charge " << env_ptr->getCharge());
+  } else {
+    header_two->setPrecMonoMz(0);
+    header_two->setPrecCharge(0);
+    header_two->setPrecInte(0);
+    LOG_DEBUG("EMPTY ENVELOPE POINTER");
+  }
+}
+
+}

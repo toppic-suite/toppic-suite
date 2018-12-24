@@ -25,9 +25,9 @@
 
 #include "util/file_util.hpp"
 #include "base/base_data.hpp"
-#include "feature/deconv_para.hpp"
-#include "feature/deconv_process.hpp"
-#include "feature/feature_detect.hpp"
+#include "deconv/deconv/deconv_para.hpp"
+#include "deconv/deconv/deconv_process.hpp"
+#include "deconv/feature/feature_detect.hpp"
 
 #include "topfddialog.h"
 #include "ui_topfddialog.h"

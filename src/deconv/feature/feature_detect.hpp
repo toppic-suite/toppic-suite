@@ -13,35 +13,18 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_DECONV_MSREADER_RAW_MS_READER_HPP_
-#define TOPPIC_DECONV_MSREADER_RAW_MS_READER_HPP_
+#ifndef TOPPIC_DECONV_FEATURE_FEATURE_DETECTION_HPP_
+#define TOPPIC_DECONV_FEATURE_FEATURE_DETECTION_HPP_
 
-#include "spec/raw_ms.hpp"
-#include "deconv/msreader/pw_ms_reader.hpp"
+#include <string>
 
 namespace toppic {
 
-class RawMsReader {
- public:
-  RawMsReader(const std::string & file_name);
-
-  RawMsPtr getNextMs(double prec_win_size, int max_charge);
-
-  void refinePrecChrg(RawMsPtr ms_one, RawMsPtr ms_two, 
-                      double prec_win_size, int max_charge);
-
-  int getInputSpNum() {return reader_ptr_->getInputSpNum();}
-
- private:
-  PwMsReaderPtr reader_ptr_;
-  RawMsPtr ms_one_; 
-
-  bool do_refine_prec_mass_ = true;
-
+namespace feature_detect {
+void process(std::string &sp_file_name, bool miss_level_one, 
+             std::string &argu_str);
 };
 
-typedef std::shared_ptr<RawMsReader> RawMsReaderPtr;
-
-}
+} /* namespace_prot */
 
 #endif

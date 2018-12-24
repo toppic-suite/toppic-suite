@@ -27,8 +27,7 @@
 #include "util/file_util.hpp"
 #include "util/str_util.hpp"
 #include "console/topfd_argument.hpp"
-
-#include "feature/topfd_process.hpp"
+#include "console/topfd_process.hpp"
 
 namespace Ui {
 class ThreadTopFD;

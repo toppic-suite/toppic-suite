@@ -13,35 +13,28 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_DECONV_MSREADER_RAW_MS_READER_HPP_
-#define TOPPIC_DECONV_MSREADER_RAW_MS_READER_HPP_
+#ifndef TOPPIC_DECONV_DP_DP_B_HPP_
+#define TOPPIC_DECONV_DP_DP_B_HPP_
 
-#include "spec/raw_ms.hpp"
-#include "deconv/msreader/pw_ms_reader.hpp"
+#include "deconv/dp/dp.hpp"
+#include "deconv/dp/vertex_b.hpp"
 
 namespace toppic {
 
-class RawMsReader {
+class DpB : public Dp {
  public:
-  RawMsReader(const std::string & file_name);
+  DpB(DeconvDataPtr data_ptr, MatchEnvPtr2D &win_envs_, 
+      DpParaPtr dp_para_ptr, double score_error_tolerance);
 
-  RawMsPtr getNextMs(double prec_win_size, int max_charge);
+  void initGraph();
 
-  void refinePrecChrg(RawMsPtr ms_one, RawMsPtr ms_two, 
-                      double prec_win_size, int max_charge);
+  void dp();
 
-  int getInputSpNum() {return reader_ptr_->getInputSpNum();}
+  void backtrace();
 
  private:
-  PwMsReaderPtr reader_ptr_;
-  RawMsPtr ms_one_; 
-
-  bool do_refine_prec_mass_ = true;
-
+  VertexBPtr2D vertices_; 
 };
 
-typedef std::shared_ptr<RawMsReader> RawMsReaderPtr;
-
 }
-
 #endif

@@ -13,34 +13,23 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_DECONV_MSREADER_RAW_MS_READER_HPP_
-#define TOPPIC_DECONV_MSREADER_RAW_MS_READER_HPP_
+#ifndef TOPPIC_DECONV_ENV_ENV_FILTER_HPP_
+#define TOPPIC_DECONV_ENV_ENV_FILTER_HPP_
 
-#include "spec/raw_ms.hpp"
-#include "deconv/msreader/pw_ms_reader.hpp"
+#include "deconv/env/env_para.hpp"
+#include "deconv/env/match_env.hpp"
 
 namespace toppic {
 
-class RawMsReader {
+class EnvFilter {
  public:
-  RawMsReader(const std::string & file_name);
+  static void filter(MatchEnvPtr2D &match_envs, const PeakPtrVec &peak_list,
+                     EnvParaPtr env_para_ptr);
+  
+  static void multipleMassFilter(MatchEnvPtr2D &match_env, EnvParaPtr env_para_ptr);
 
-  RawMsPtr getNextMs(double prec_win_size, int max_charge);
-
-  void refinePrecChrg(RawMsPtr ms_one, RawMsPtr ms_two, 
-                      double prec_win_size, int max_charge);
-
-  int getInputSpNum() {return reader_ptr_->getInputSpNum();}
-
- private:
-  PwMsReaderPtr reader_ptr_;
-  RawMsPtr ms_one_; 
-
-  bool do_refine_prec_mass_ = true;
-
+  static bool testRealEnvValid(MatchEnvPtr env, EnvParaPtr env_para_ptr);
 };
-
-typedef std::shared_ptr<RawMsReader> RawMsReaderPtr;
 
 }
 

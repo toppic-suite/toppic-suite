@@ -63,9 +63,6 @@ file(GLOB PRSM_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/prsm/*.cpp)
 # suffix tree
 file(GLOB SUFFIX_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/suffix/*.cpp)
 
-# feature detection for topfd
-file(GLOB FEATURE_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/feature/*.cpp)
-
 # functions for toppic
 file(GLOB ZERO_PTM_FILTER  ${CMAKE_CURRENT_SOURCE_DIR}/src/zeroptmfilter/*.cpp)
 file(GLOB ZERO_PTM_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/zeroptmsearch/*.cpp)
@@ -87,6 +84,7 @@ file(GLOB MCMC_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/mcmc/*.cpp)
 
 # topfd_main
 file(GLOB_RECURSE DECONV_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/deconv/*.cpp)
+file(GLOB TOPFD_PROC_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd_process.cpp)
 file(GLOB TOPFD_ARGU_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd_argument.cpp)
 file(GLOB TOPFD_MAIN_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd.cpp)
 file(GLOB TOPFD_TRAIN_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd_train.cpp)
@@ -124,11 +122,11 @@ file(GLOB TOPMERGE_ARGU_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmerge_
 file(GLOB TOPQUANT_MAIN_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topquant.cpp)
 file(GLOB TOPQUANT_ARGU_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topquant_argument.cpp)
 
-add_executable(topfd ${TOPFD_MAIN_SRCS} ${DECONV_SRCS} ${TOPFD_ARGU_SRCS} ${UTIL_SRCS} ${XML_SRCS} 
-  ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS} ${PWIZ_SRC})
+add_executable(topfd ${TOPFD_MAIN_SRCS} ${DECONV_SRCS} ${TOPFD_PROC_SRCS} ${TOPFD_ARGU_SRCS} 
+	${UTIL_SRCS} ${XML_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PWIZ_SRC})
 
-add_executable(topfd_gui ${TOPFD_GUI_SRCS} ${TOPFD_GUI_QRC} ${DECONV_SRCS} ${UTIL_SRCS} ${XML_SRCS} 
-  ${BASE_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS} ${PWIZ_SRC})
+add_executable(topfd_gui ${TOPFD_GUI_SRCS} ${TOPFD_GUI_QRC} ${TOPFD_PROC_SRCS} ${DECONV_SRCS} 
+	${UTIL_SRCS} ${XML_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PWIZ_SRC})
 
 add_executable(toppic ${TOPPIC_MAIN_SRCS} ${TOPPIC_PROCESS_SRCS}
   ${TOPPIC_ARGU_SRCS} ${HTS_SRCS} ${UTIL_SRCS} ${XML_SRCS} ${BASE_SRCS}

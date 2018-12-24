@@ -13,35 +13,31 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_DECONV_MSREADER_RAW_MS_READER_HPP_
-#define TOPPIC_DECONV_MSREADER_RAW_MS_READER_HPP_
+#ifndef TOPPIC_DECONV_DP_DP_HPP_
+#define TOPPIC_DECONV_DP_DP_HPP_
 
-#include "spec/raw_ms.hpp"
-#include "deconv/msreader/pw_ms_reader.hpp"
+#include "deconv/spec/deconv_data.hpp"
+#include "deconv/dp/dp_para.hpp"
+#include "deconv/env/match_env.hpp"
 
 namespace toppic {
 
-class RawMsReader {
+class Dp {
  public:
-  RawMsReader(const std::string & file_name);
+  Dp(DeconvDataPtr data_ptr, MatchEnvPtr2D &win_envs, 
+     DpParaPtr dp_para_ptr, double score_error_tolerance);
+  void addEnv(MatchEnvPtrVec &result, MatchEnvPtrVec &prev_env);
 
-  RawMsPtr getNextMs(double prec_win_size, int max_charge);
+  MatchEnvPtrVec getResult() {return results_;}
 
-  void refinePrecChrg(RawMsPtr ms_one, RawMsPtr ms_two, 
-                      double prec_win_size, int max_charge);
-
-  int getInputSpNum() {return reader_ptr_->getInputSpNum();}
-
- private:
-  PwMsReaderPtr reader_ptr_;
-  RawMsPtr ms_one_; 
-
-  bool do_refine_prec_mass_ = true;
-
+ protected:
+  DeconvDataPtr data_ptr_;
+  DpParaPtr dp_para_ptr_;
+  double score_error_tolerance_;
+  int win_num_;
+  MatchEnvPtr2D win_envs_;
+  MatchEnvPtrVec results_;
 };
 
-typedef std::shared_ptr<RawMsReader> RawMsReaderPtr;
-
 }
-
 #endif
