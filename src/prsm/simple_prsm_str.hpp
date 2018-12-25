@@ -12,9 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#ifndef PROT_PRSM_SIMPLE_PRSM_STR_HPP_
-#define PROT_PRSM_SIMPLE_PRSM_STR_HPP_
+#ifndef TOPPIC_PRSM_SIMPLE_PRSM_STR_HPP_
+#define TOPPIC_PRSM_SIMPLE_PRSM_STR_HPP_
 
 #include <memory>
 #include <vector>
@@ -42,13 +41,7 @@ class SimplePrsmStr {
 
   double getScore() {return score_;}
 
-  static bool cmpScoreDec(const SimplePrsmStrPtr &a, const SimplePrsmStrPtr &b) {
-    if (a->getScore() == b->getScore()) {
-      return a->getSeqName() < b->getSeqName();
-    } else {
-      return a->getScore() > b->getScore();
-    }
-  }
+  static bool cmpScoreDec(const SimplePrsmStrPtr &a, const SimplePrsmStrPtr &b);
 
  private:
   std::vector<std::string> str_vec_;

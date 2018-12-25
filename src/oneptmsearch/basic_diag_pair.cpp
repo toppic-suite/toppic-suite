@@ -16,7 +16,7 @@
 #include <algorithm>
 #include <vector>
 
-#include "prsm/base_algo.hpp"
+#include "prsm/prsm_algo.hpp"
 #include "oneptmsearch/basic_diag_pair.hpp"
 
 namespace toppic {
@@ -72,7 +72,7 @@ inline BasicDiagPairPtrVec compDiagPair(const PrmPeakPtrVec &prm_peaks,
       }
     }
     // LOG_DEBUG("start increase  peak " << peak.get());
-    if (base_algo::increaseIJ(i, j, deviation, peak->getNRelaxCStrictTolerance(),
+    if (prsm_algo::increaseIJ(i, j, deviation, peak->getNRelaxCStrictTolerance(),
                               real_masses, seq_masses)) {
       i++;
     } else {

@@ -12,12 +12,12 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#include <vector>
 #include <algorithm>
 
-#include "seq/bp_spec.hpp"
 #include "common/base/neutral_loss_base.hpp"
+#include "seq/bp_spec.hpp"
+#include "seq/proteoform.hpp"
+#include "spec/theo_peak.hpp"
 #include "prsm/theo_peak_util.hpp"
 
 namespace toppic {

@@ -13,9 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_PRSM_PEAK_ION_PAIR_UTIL_HPP_
-#define PROT_PRSM_PEAK_ION_PAIR_UTIL_HPP_
-
+#ifndef TOPPIC_PRSM_PEAK_ION_PAIR_UTIL_HPP_
+#define TOPPIC_PRSM_PEAK_ION_PAIR_UTIL_HPP_
 
 #include <vector>
 
@@ -24,7 +23,6 @@
 #include "spec/extend_peak.hpp"
 #include "spec/theo_peak.hpp"
 #include "spec/extend_ms.hpp"
-#include "spec/theo_peak.hpp"
 #include "prsm/peak_ion_pair.hpp"
 
 

@@ -12,13 +12,11 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <vector>
 #include <algorithm>
 
 #include "common/util/logger.hpp"
-#include "spec/theo_peak.hpp"
 #include "prsm/theo_peak_util.hpp"
-#include "prsm/base_algo.hpp"
+#include "prsm/prsm_algo.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
 
 namespace toppic {
@@ -97,7 +95,7 @@ PeakIonPairPtrVec findPairs(ExtendMsPtr ms_three_ptr,
         pair_ptrs.push_back(pair_ptr);
       }
     }
-    if (base_algo::increaseIJ(i, j, deviation, err, ms_masses, theo_masses)) {
+    if (prsm_algo::increaseIJ(i, j, deviation, err, ms_masses, theo_masses)) {
       i++;
     } else {
       j++;

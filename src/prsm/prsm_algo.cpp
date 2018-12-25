@@ -12,17 +12,15 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include <cmath>
 #include <limits>
-#include <vector>
 
 #include "common/util/logger.hpp"
-#include "prsm/base_algo.hpp"
+#include "prsm/prsm_algo.hpp"
 
 namespace toppic {
 
-namespace base_algo {
+namespace prsm_algo {
 
 // if we need to increase i, return true, otherwise, return false
 bool increaseIJ(size_t i, size_t j, double deviation,
@@ -70,7 +68,7 @@ std::vector<double> compMsMassPpos(const std::vector<double> &ms_masses,
       min_distances[i] = d;
     }
     double tolerance = ms_masses[i] * ppo;
-    if (base_algo::increaseIJ(i, j, d,  tolerance, ms_masses, theo_masses)) {
+    if (prsm_algo::increaseIJ(i, j, d,  tolerance, ms_masses, theo_masses)) {
       i++;
     } else {
       j++;
@@ -104,7 +102,7 @@ std::vector<double> compTheoMassPpos(const std::vector<double> &ms_masses,
       min_distances[j] = d;
     }
     double tolerance = ms_masses[i] * ppo;
-    if (base_algo::increaseIJ(i, j, d, tolerance, ms_masses, theo_masses)) {
+    if (prsm_algo::increaseIJ(i, j, d, tolerance, ms_masses, theo_masses)) {
       i++;
     } else {
       j++;
@@ -172,6 +170,6 @@ int getLastResPos(double c_term_shift, const std::vector<double> &prm_masses) {
   return best_pos - 1;
 }
 
-}  // namespace base_algo
+}  // namespace prsm_algo
 
 }  // namespace toppic

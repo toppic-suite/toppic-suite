@@ -1,10 +1,11 @@
-/base/    Store and search store amino acids, ptms, residues and etc 
-/boost/   Some code from Boost version used by pwiz
-/deconv/  Spectral deconvolution and feature detection
-/htslib/  Create fasta indexes and read fasta files
-/pwiz/    Some code from ProteoWizard version for reading mzML and mzXML files
-/seq/     Fasta sequences and proteoforms
-/spec/    Various peaks and spectrum classes
-/suffix/  Suffix tree used in the manuscript Deng et al, Bioinformatics 31, 532-538
-/util/    String utilities, file utilities, and etc
-/xml/     Functions for handling xml files   
+/boost/ 	Some code from Boost version used by pwiz
+/common/base/   Store and search store amino acids, ptms, residues and etc 
+/common/util/  	String utilities, file utilities, and etc
+/common/xml/   	Functions for handling xml files   
+/deconv/  	Spectral deconvolution and feature detection
+/htslib/  	Create fasta indexes and read fasta files
+/prsm/		proteoform spectrum matches and related functions
+/pwiz/    	Some code from ProteoWizard version for reading mzML and mzXML files
+/seq/     	Fasta sequences and proteoforms
+/spec/    	Various peaks and spectrum classes
+/suffix/  	Suffix tree used in the manuscript Deng et al, Bioinformatics 31, 532-538

@@ -24,17 +24,6 @@
 
 namespace toppic {
 
-bool MassShiftStr::cmpPosInc(const std::shared_ptr<MassShiftStr> &a,
-                             const std::shared_ptr<MassShiftStr> &b) {
-  if (a->left_pos_ < b->left_pos_) {
-    return true;
-  } else if (a->left_pos_ > b->left_pos_) {
-    return false;
-  } else {
-    return a->right_pos_ < b->right_pos_;
-  }
-}
-
 PrsmStr::PrsmStr(const std::vector<std::string> &str_vec) {
   str_vec_ = str_vec;
   std::string line = prsm_util::getXmlLine(str_vec_, "<spectrum_id>");
@@ -103,6 +92,19 @@ int getXmlLineIndex(const std::vector<std::string> &str_vec,
     }
   }
   return -1;
+}
+
+bool PrsmStr::cmpSpectrumIdIncPrecursorIdInc(const PrsmStrPtr &a, const PrsmStrPtr &b) {
+  if (a->getSpectrumId() < b->getSpectrumId()) {
+    return true;
+  } else if (a->getSpectrumId() > b->getSpectrumId()) {
+    return false;
+  } else {
+    if (a->getPrecursorId() < b->getPrecursorId()) {
+      return true;
+    }
+    return false;
+  }
 }
 
 void PrsmStr::setFdr(double fdr) {

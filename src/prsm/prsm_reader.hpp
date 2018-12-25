@@ -12,16 +12,13 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#ifndef TOPPIC_PRSM_PRSM_READER_HPP_
+#define TOPPIC_PRSM_PRSM_READER_HPP_
 
-#ifndef PROT_PRSM_PRSM_READER_HPP_
-#define PROT_PRSM_PRSM_READER_HPP_
-
-#include <iostream>
 #include <fstream>
-#include <string>
-#include <vector>
 
-#include "common/xml/xml_dom_document.hpp"
+#include "common/base/mod.hpp"
+#include "seq/fasta_index_reader.hpp"
 #include "prsm/prsm.hpp"
 #include "prsm/prsm_str.hpp"
 
@@ -58,4 +55,4 @@ typedef std::vector<PrsmReaderPtr> PrsmReaderPtrVec;
 
 } /* namespace toppic */
 
-#endif /* PROT_PRSM_READER_HPP_ */
+#endif /* TOPPIC_PRSM_READER_HPP_ */

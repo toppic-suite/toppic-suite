@@ -12,40 +12,28 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_PRSM_SIMPLE_PRSM_XML_WRITER_HPP_
-#define TOPPIC_PRSM_SIMPLE_PRSM_XML_WRITER_HPP_
-
-#include "prsm/simple_prsm.hpp"
-#include "prsm/simple_prsm_str.hpp"
+#include "prsm/mass_shift_str.hpp"
 
 namespace toppic {
 
-class SimplePrsmXmlWriter {
- public:
-  SimplePrsmXmlWriter();
+MassShiftStr::MassShiftStr(double mass_shift, int left_pos, 
+                           int right_pos):
+    mass_shift_(mass_shift),
+    left_pos_(left_pos),
+    right_pos_(right_pos) {}
 
-  explicit SimplePrsmXmlWriter(const std::string &file_name);
 
-  ~SimplePrsmXmlWriter();
+bool MassShiftStr::cmpPosInc(const std::shared_ptr<MassShiftStr> &a,
+                             const std::shared_ptr<MassShiftStr> &b) {
+  if (a->left_pos_ < b->left_pos_) {
+    return true;
+  } else if (a->left_pos_ > b->left_pos_) {
+    return false;
+  } else {
+    return a->right_pos_ < b->right_pos_;
+  }
+}
 
-  void close();
-
-  void write(SimplePrsmStrPtr prsm_str_ptr);
-
-  void write(const SimplePrsmPtrVec &simple_prsm_ptrs);
-
-  void write(SimplePrsmPtr simple_prsm_ptrs);
-
- private:
-  std::ofstream file_;
-
-  xercesc::DOMLSSerializer* serializer_;
-
-  XmlDOMDocument* doc_;
-
-  std::string file_name_;
-};
 
 }  // namespace toppic
 
-#endif /* SIMPLE_PRSM_WRITER_HPP_ */

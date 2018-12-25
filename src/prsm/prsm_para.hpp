@@ -12,17 +12,13 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#ifndef TOPPIC_PRSM_PRSM_PARA_HPP_
+#define TOPPIC_PRSM_PRSM_PARA_HPP_
 
-#ifndef PROT_PRSM_PRSM_PARA_HPP_
-#define PROT_PRSM_PRSM_PARA_HPP_
-
-#include <string>
 #include <map>
 
 #include "common/base/mod.hpp"
 #include "common/base/prot_mod.hpp"
-#include "common/base/activation.hpp"
-#include "spec/peak_tolerance.hpp"
 #include "spec/sp_para.hpp"
 
 namespace toppic {

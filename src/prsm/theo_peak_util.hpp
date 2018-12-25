@@ -12,12 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#ifndef PROT_SPEC_THEO_PEAK_UTIL_HPP_
-#define PROT_SPEC_THEO_PEAK_UTIL_HPP_
-
-
-#include <vector>
+#ifndef TOPPIC_PRSM_THEO_PEAK_UTIL_HPP_
+#define TOPPIC_PRSM_THEO_PEAK_UTIL_HPP_
 
 #include "common/base/activation.hpp"
 #include "seq/bp_spec.hpp"

@@ -12,9 +12,7 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include <iomanip>
-#include <string>
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
@@ -22,6 +20,13 @@
 #include "prsm/simple_prsm_table_writer.hpp"
 
 namespace toppic {
+
+SimplePrsmTableWriter::SimplePrsmTableWriter(PrsmParaPtr prsm_para_ptr,
+                                             const std::string &input_file_ext,
+                                             const std::string &output_file_ext):
+    prsm_para_ptr_(prsm_para_ptr),
+    input_file_ext_(input_file_ext),
+    output_file_ext_(output_file_ext) {}
 
 void SimplePrsmTableWriter::write() {
   std::string spectrum_file_name  = prsm_para_ptr_->getSpectrumFileName();

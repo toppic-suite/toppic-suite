@@ -12,10 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#include <string>
-#include <vector>
-
 #include <xercesc/framework/MemBufInputSource.hpp>
 
 #include "common/util/logger.hpp"
@@ -76,7 +72,7 @@ SimplePrsmPtr SimplePrsmReader::readOnePrsm() {
   SimplePrsmPtr ptr;
   if (parser) {
     XmlDOMDocument doc(parser, prsm_buf);
-    xercesc::DOMElement* root = doc.getDocumentElement();
+    XmlDOMElement* root = doc.getDocumentElement();
     ptr = std::make_shared<SimplePrsm>(root);
   }
   // LOG_DEBUG("simple prsm spectrum id " << ptr->getSpectrumId() << " seq name " << ptr->getSeqName());

@@ -12,19 +12,10 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#ifndef TOPPIC_PRSM_PRSM_SAMPLE_MERGE_HPP_
+#define TOPPIC_PRSM_PRSM_SAMPLE_MERGE_HPP_
 
-#ifndef PROT_PRSM_PRSM_SAMPLE_MERGE_HPP_
-#define PROT_PRSM_PRSM_SAMPLE_MERGE_HPP_
-
-#include <map>
-#include <string>
-#include <vector>
-
-#include "seq/proteoform.hpp"
-#include "seq/fasta_reader.hpp"
 #include "prsm/prsm.hpp"
-#include "prsm/prsm_xml_writer.hpp"
-#include "prsm/prsm_str.hpp"
 
 namespace toppic {
 
@@ -34,12 +25,7 @@ class PrsmSampleMerge {
                   const std::vector<std::string> &input_file_names,
                   const std::string &output_file_name,
                   const std::string &fix_mod,
-                  double error_tole):
-      db_file_name_(db_file_name),
-      input_file_names_(input_file_names),
-      output_file_name_(output_file_name),
-      fix_mod_(fix_mod),
-      error_tole_(error_tole) {}
+                  double error_tole);
 
   void process();
 

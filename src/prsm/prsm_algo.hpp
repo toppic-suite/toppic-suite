@@ -12,16 +12,14 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#ifndef TOPPIC_PRSM_PRSM_ALGO_HPP_
+#define TOPPIC_PRSM_PRSM_ALGO_HPP_
 
-#ifndef TOPPIC_BASE_ALGORITHM_HPP_
-#define TOPPIC_BASE_ALGORITHM_HPP_
-
-#include <cstddef>
 #include <vector>
 
 namespace toppic {
 
-namespace base_algo {
+namespace prsm_algo {
 
 // used in find matched mass pairs
 bool increaseIJ(size_t i, size_t j, double deviation, double tolerance,
@@ -46,7 +44,7 @@ int getFirstResPos(double n_term_shift, const std::vector<double> &prm_masses);
 // on its c term shift
 int getLastResPos(double c_term_shift, const std::vector<double> &prm_masses);
 
-}  // namespace base_algo
+}  // namespace prsm_algo
 
 }  // namespace toppic
 
