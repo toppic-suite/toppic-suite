@@ -12,13 +12,10 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef PROT_PRSM_SIMPLE_TABLE_WRITER_HPP_
-#define PROT_PRSM_SIMPLE_TABLE_WRITER_HPP_
-
-#include <string>
+#ifndef TOPPIC_PRSM_SIMPLE_TABLE_WRITER_HPP_
+#define TOPPIC_PRSM_SIMPLE_TABLE_WRITER_HPP_
 
 #include "prsm/prsm_para.hpp"
-#include "prsm/simple_prsm.hpp"
 
 namespace toppic {
 
@@ -26,11 +23,7 @@ class SimplePrsmTableWriter {
  public:
   SimplePrsmTableWriter(PrsmParaPtr prsm_para_ptr,
                         const std::string &input_file_ext,
-                        const std::string &output_file_ext):
-    prsm_para_ptr_(prsm_para_ptr),
-    input_file_ext_(input_file_ext),
-    output_file_ext_(output_file_ext) {}
-
+                        const std::string &output_file_ext);
   void write();
 
  private:

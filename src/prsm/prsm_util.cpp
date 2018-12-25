@@ -13,21 +13,15 @@
 //limitations under the License.
 
 #include <set>
-#include <vector>
-#include <string>
 #include <algorithm>
 
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
-
 #include "spec/extend_ms_factory.hpp"
 #include "spec/msalign_reader.hpp"
-
-#include "prsm/prsm_para.hpp"
-#include "prsm/prsm_util.hpp"
-#include "prsm/prsm_str.hpp"
-#include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_reader.hpp"
+#include "prsm/prsm_xml_writer.hpp"
+#include "prsm/prsm_util.hpp"
 
 namespace toppic {
 

@@ -12,23 +12,24 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include <iomanip>
-#include <ctime>
-#include <map>
-#include <string>
-#include <algorithm>
-#include <vector>
-
 
 #include "common/util/file_util.hpp"
 #include "spec/msalign_reader.hpp"
 #include "spec/extend_ms_factory.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_table_writer.hpp"
-#include "console/toppic_argument.hpp"
 
 namespace toppic {
+
+PrsmTableWriter::PrsmTableWriter(PrsmParaPtr prsm_para_ptr, 
+                                 std::string argu_str,
+                                 const std::string &input_file_ext, 
+                                 const std::string &output_file_ext):
+    prsm_para_ptr_(prsm_para_ptr),
+    input_file_ext_(input_file_ext),
+    argu_str_(argu_str),
+    output_file_ext_(output_file_ext) {}
 
 void PrsmTableWriter::write() {
   std::string spectrum_file_name  = prsm_para_ptr_->getSpectrumFileName();

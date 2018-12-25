@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include <map>
 #include <set>
 #include <string>
@@ -20,11 +19,11 @@
 #include <vector>
 
 #include "common/util/file_util.hpp"
-#include "seq/fasta_reader.hpp"
-#include "seq/fasta_util.hpp"
+#include "seq/fasta_index_reader.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_util.hpp"
 #include "prsm/prsm_cluster.hpp"
+#include "prsm/prsm_xml_writer.hpp"
 #include "prsmview/anno_prsm.hpp"
 #include "prsmview/anno_view.hpp"
 #include "prsmview/xml_generator.hpp"

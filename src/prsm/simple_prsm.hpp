@@ -12,20 +12,16 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#ifndef TOPPIC_PRSM_SIMPLE_PRSM_HPP_
+#define TOPPIC_PRSM_SIMPLE_PRSM_HPP_
 
-#ifndef PROT_PRSM_SIMPLE_PRSM_HPP_
-#define PROT_PRSM_SIMPLE_PRSM_HPP_
-
-#include <string>
-#include <vector>
-
-#include <xercesc/dom/DOM.hpp>
-
+#include "common/xml/xml_dom_element.hpp"
 #include "seq/proteoform.hpp"
-#include "common/xml/xml_dom_document.hpp"
 #include "spec/ms_header.hpp"
 
 namespace toppic {
+
+class XmlDOMDocument;
 
 class SimplePrsm;
 typedef std::shared_ptr<SimplePrsm>   SimplePrsmPtr;
@@ -42,7 +38,7 @@ class SimplePrsm {
              const std::string & seq_desc,
              int score);
 
-  explicit SimplePrsm(xercesc::DOMElement* element);
+  explicit SimplePrsm(XmlDOMElement* element);
 
   std::string getFileName () {return file_name_;}
 
@@ -76,51 +72,19 @@ class SimplePrsm {
 
   void setCTruncShifts(const std::vector<double> &c_term_shifts);
 
-  xercesc::DOMElement* toXml(XmlDOMDocument* xml_doc);
+  XmlDOMElement* toXml(XmlDOMDocument* xml_doc);
 
   std::vector<std::string> toStrVec();
 
   static std::string getXmlElementName() {return "simple_prsm";}
 
-  static bool cmpScoreDec(const SimplePrsmPtr a, const SimplePrsmPtr b) {
-    if (a->getScore() == b->getScore()) {
-      return a->getSeqName() < b->getSeqName();
-    } else {
-      return a->getScore() > b->getScore();
-    }
-  }
+  static bool cmpScoreDec(const SimplePrsmPtr a, const SimplePrsmPtr b);
 
-  static bool cmpIdInc(const SimplePrsmPtr a, const SimplePrsmPtr b) {
-    if (a->getSpectrumId() == b->getSpectrumId()) {
-      return a->getSeqName() < b->getSeqName();
-    } else {
-      return a->getSpectrumId() < b->getSpectrumId();
-    }
-  }
+  static bool cmpIdInc(const SimplePrsmPtr a, const SimplePrsmPtr b);
 
-  static bool cmpIdIncScoreDec(const SimplePrsmPtr a, const SimplePrsmPtr b) {
-    if (a->getSpectrumId() < b->getSpectrumId()) {
-      return true;
-    } else if (a->getSpectrumId() > b->getSpectrumId()) {
-      return false;
-    } else {
-      if (a->getScore() == b->getScore()) {
-        return a->getSeqName() < b->getSeqName();
-      } else {
-        return a->getScore() > b->getScore();
-      }
-    }
-  }
+  static bool cmpIdIncScoreDec(const SimplePrsmPtr a, const SimplePrsmPtr b);
 
-  static bool cmpNameIncScoreDec(const SimplePrsmPtr a, const SimplePrsmPtr b) {
-    if (a->getSeqName() < b->getSeqName()) {
-      return true;
-    } else if (a->getSeqName() > b->getSeqName()) {
-      return false;
-    } else {
-      return a->getScore() > b->getScore();
-    }
-  }
+  static bool cmpNameIncScoreDec(const SimplePrsmPtr a, const SimplePrsmPtr b);
 
  private:
   std::string file_name_;

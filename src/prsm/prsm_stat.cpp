@@ -12,15 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#include <iostream>
-#include <fstream>
-#include <iomanip>
-#include <string>
-#include <vector>
-
-#include "common/base/amino_acid_base.hpp"
 #include "common/util/file_util.hpp"
+#include "common/base/amino_acid_base.hpp"
 #include "spec/peak.hpp"
 #include "spec/extend_ms_factory.hpp"
 #include "spec/msalign_reader.hpp"

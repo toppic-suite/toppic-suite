@@ -32,7 +32,7 @@
 #include "prsm/theo_peak_util.hpp"
 #include "spec/extend_ms_factory.hpp"
 
-#include "prsm/base_algo.hpp"
+#include "prsm/prsm_algo.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_str_combine.hpp"
 #include "prsm/peak_ion_pair_util.hpp"

@@ -12,15 +12,11 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#ifndef TOPPIC_PRSM_PRSM_STAT_HPP_
+#define TOPPIC_PRSM_PRSM_STAT_HPP_
 
-#ifndef PROT_PRSM_PRSM_STAT_HPP_
-#define PROT_PRSM_PRSM_STAT_HPP_
+#include <fstream>
 
-#include <string>
-
-#include "common/util/str_util.hpp"
-#include "seq/proteoform.hpp"
-#include "seq/fasta_reader.hpp"
 #include "prsm/prsm_para.hpp"
 #include "prsm/prsm.hpp"
 

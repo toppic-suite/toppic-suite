@@ -12,25 +12,29 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include <cmath>
-#include <limits>
-#include <string>
-#include <algorithm>
 
-#include "common/base/base_data.hpp"
-#include "prsm/extreme_value.hpp"
 #include "common/util/str_util.hpp"
+#include "common/xml/xml_dom_document.hpp"
 #include "common/xml/xml_dom_util.hpp"
+#include "prsm/extreme_value.hpp"
 
 namespace toppic {
+
+ExtremeValue::ExtremeValue(double one_prot_prob, double test_num, 
+                           double adjust_factor):
+    one_prot_prob_(one_prot_prob),
+    test_num_(test_num),
+    adjust_factor_(adjust_factor) {
+      init();
+    }
 
 void ExtremeValue::setOneProtProb(double one_prot_prob) {
   one_prot_prob_ = one_prot_prob;
   init();
 }
 
-ExtremeValue::ExtremeValue(xercesc::DOMElement* element) {
+ExtremeValue::ExtremeValue(XmlDOMElement* element) {
   one_prot_prob_ = xml_dom_util::getScientificChildValue(element, "one_protein_probability", 0);
   test_num_ = xml_dom_util::getScientificChildValue(element, "test_number", 0);
   adjust_factor_ = xml_dom_util::getDoubleChildValue(element, "adjust_factor", 0);
@@ -53,9 +57,9 @@ void ExtremeValue::init() {
   }
 }
 
-void ExtremeValue::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
+void ExtremeValue::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
   std::string element_name = getXmlElementName();
-  xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
+  XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
   std::string str = str_util::toScientificStr(one_prot_prob_, 4);
   xml_doc->addElement(element, "one_protein_probability", str.c_str());
   str = str_util::toScientificStr(test_num_, 4);

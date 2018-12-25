@@ -12,19 +12,17 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#ifndef PROT_PRSM_PRSM_HPP_
-#define PROT_PRSM_PRSM_HPP_
-
+#ifndef TOPPIC_PRSM_PRSM_HPP_
+#define TOPPIC_PRSM_PRSM_HPP_
 
 #include <string>
 #include <vector>
 
-#include "prsm/extreme_value.hpp"
 #include "seq/proteoform.hpp"
 #include "spec/deconv_ms.hpp"
 #include "spec/extend_ms.hpp"
 #include "spec/sp_para.hpp"
+#include "prsm/extreme_value.hpp"
 
 namespace toppic {
 
@@ -34,22 +32,9 @@ typedef std::shared_ptr<Prsm> PrsmPtr;
 class Prsm {
  public:
   Prsm(ProteoformPtr proteoform_ptr, const DeconvMsPtrVec &deconv_ms_ptr_vec,
-       double adjusted_prec_mass, SpParaPtr sp_para_ptr):
-      adjusted_prec_mass_(adjusted_prec_mass),
-      proteoform_ptr_(proteoform_ptr),
-      deconv_ms_ptr_vec_(deconv_ms_ptr_vec) {
-        MsHeaderPtr header_ptr = deconv_ms_ptr_vec[0]->getMsHeaderPtr();
-        spectrum_id_ = header_ptr->getId();
-        spectrum_scan_ = header_ptr->getScansString();
-        precursor_id_ = header_ptr->getPrecId();
-        prec_feature_id_ = header_ptr->getFeatureId();
-        prec_feature_inte_ = header_ptr->getFeatureInte();
-        spectrum_num_ = deconv_ms_ptr_vec.size();
-        ori_prec_mass_ = header_ptr->getPrecMonoMass();
-        init(sp_para_ptr);
-      }
+       double adjusted_prec_mass, SpParaPtr sp_para_ptr);
 
-  Prsm(xercesc::DOMElement* element, FastaIndexReaderPtr reader_ptr,
+  Prsm(XmlDOMElement* element, FastaIndexReaderPtr reader_ptr,
        const ModPtrVec &fix_mod_list);
 
   Prsm(const Prsm &obj);
@@ -116,10 +101,7 @@ class Prsm {
 
   void setProteoformPtr(ProteoformPtr proteoform) {proteoform_ptr_ = proteoform;}
 
-  void setProteoformPtr(ProteoformPtr proteoform, SpParaPtr sp_para_ptr) {
-    proteoform_ptr_ = proteoform;
-    init(sp_para_ptr);
-  }
+  void setProteoformPtr(ProteoformPtr proteoform, SpParaPtr sp_para_ptr);
 
   void setExtremeValuePtr(ExtremeValuePtr ev_ptr) {extreme_value_ptr_ = ev_ptr;}
 
@@ -130,29 +112,19 @@ class Prsm {
   void setDeconvMsPtrVec(DeconvMsPtrVec ms_vec) {deconv_ms_ptr_vec_ = ms_vec;}
 
   void setRefineMsVec(ExtendMsPtrVec refine_ms_three_vec) {
-    refine_ms_three_vec_ = refine_ms_three_vec;
-  }
+    refine_ms_three_vec_ = refine_ms_three_vec;}
 
   // comparion
   static bool cmpEValueInc(const PrsmPtr &a, const PrsmPtr &b) {
-    return a->getEValue() < b->getEValue();
-  }
+    return a->getEValue() < b->getEValue();}
 
   static bool cmpEValueDec(const PrsmPtr &a, const PrsmPtr &b) {
-    return a->getEValue() > b->getEValue();
-  }
+    return a->getEValue() > b->getEValue();}
 
   static bool cmpMatchFragmentDec(const PrsmPtr &a, const PrsmPtr &b) {
-    return a->getMatchFragNum() > b->getMatchFragNum();
-  }
+    return a->getMatchFragNum() > b->getMatchFragNum();}
 
-  static bool cmpNormMatchFragmentDec(const PrsmPtr &a, const PrsmPtr &b) {
-    if (a->getNormMatchFragNum() == b->getNormMatchFragNum()) {
-      return a->getProteoformPtr()->getVariablePtmNum() < b->getProteoformPtr()->getVariablePtmNum();
-    } else {
-      return a->getNormMatchFragNum() > b->getNormMatchFragNum();
-    }
-  }
+  static bool cmpNormMatchFragmentDec(const PrsmPtr &a, const PrsmPtr &b);
 
   static bool cmpMatchFragmentDecMatchPeakDec(const PrsmPtr &a, const PrsmPtr &b);
 
@@ -169,11 +141,11 @@ class Prsm {
   static bool cmpSpectrumIdIncEvalueInc(const PrsmPtr &a, const PrsmPtr &b);
 
   // other functions
-  xercesc::DOMElement* toXmlElement(XmlDOMDocument* xml_doc);
+  XmlDOMElement* toXmlElement(XmlDOMDocument* xml_doc);
 
-  void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
+  void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
-  void parseXml(xercesc::DOMElement *element);
+  void parseXml(XmlDOMElement *element);
 
   static std::string getXmlElementName() {return "prsm";}
 

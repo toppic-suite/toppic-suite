@@ -12,31 +12,28 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#ifndef TOPPIC_BASE_EXTREME_VALUE_HPP_
-#define TOPPIC_BASE_EXTREME_VALUE_HPP_
+#ifndef TOPPIC_PRSM_EXTREME_VALUE_HPP_
+#define TOPPIC_PRSM_EXTREME_VALUE_HPP_
 
 #include <memory>
 #include <vector>
 #include <string>
 
-#include "common/xml/xml_dom_document.hpp"
+#include "common/xml/xml_dom_element.hpp"
 
 namespace toppic {
+
+class XmlDOMDocument;
 
 class ExtremeValue;
 typedef std::shared_ptr<ExtremeValue> ExtremeValuePtr;
 
 class ExtremeValue {
  public:
-  ExtremeValue(double one_prot_prob, double test_num, double adjust_factor):
-      one_prot_prob_(one_prot_prob),
-      test_num_(test_num),
-      adjust_factor_(adjust_factor) {
-        init();
-      }
+  ExtremeValue(double one_prot_prob, double test_num, 
+               double adjust_factor);
 
-  explicit ExtremeValue(xercesc::DOMElement* element);
+  explicit ExtremeValue(XmlDOMElement* element);
 
   double getPValue() {return p_value_;}
 
@@ -50,7 +47,7 @@ class ExtremeValue {
 
   void setOneProtProb(double one_prot_prob);
 
-  void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
+  void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
   static std::string getXmlElementName() {return "extreme_value";}
 

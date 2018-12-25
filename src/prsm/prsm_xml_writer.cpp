@@ -12,10 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#include <string>
-#include <vector>
-
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "common/xml/xml_dom_impl.hpp"
@@ -59,7 +55,7 @@ void PrsmXmlWriter::write(PrsmPtr prsm_ptr) {
     if (prsm_ptr->getFileName() == "") {
       prsm_ptr->setFileName(file_name_);
     }
-    xercesc::DOMElement* element = prsm_ptr->toXmlElement(&doc);
+    XmlDOMElement* element = prsm_ptr->toXmlElement(&doc);
     // LOG_DEBUG("Element generated");
     std::string str = xml_dom_util::writeToString(serializer, element);
     // LOG_DEBUG("String generated");

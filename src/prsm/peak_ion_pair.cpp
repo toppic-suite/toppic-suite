@@ -12,19 +12,24 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include <string>
 
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
-#include "spec/theo_peak.hpp"
+#include "common/xml/xml_dom_document.hpp"
 #include "prsm/peak_ion_pair.hpp"
 
 namespace toppic {
 
+PeakIonPair::PeakIonPair(MsHeaderPtr ms_header_ptr, ExtendPeakPtr real_peak_ptr,
+                         TheoPeakPtr theo_peak_ptr): 
+    ms_header_ptr_(ms_header_ptr),
+    real_peak_ptr_(real_peak_ptr),
+    theo_peak_ptr_(theo_peak_ptr) {}
+
 void PeakIonPair::appendRealPeakToXml(XmlDOMDocument* xml_doc, 
-                                      xercesc::DOMElement* parent) {
-  xercesc::DOMElement* element = xml_doc->createElement("matched_peak");
+                                      XmlDOMElement* parent) {
+  XmlDOMElement* element = xml_doc->createElement("matched_peak");
   std::string str = theo_peak_ptr_->getIonPtr()->getIonTypePtr()->getName();
   xml_doc->addElement(element, "ion_type", str.c_str());
   str = str_util::toString(theo_peak_ptr_->getIonPtr()->getPos());
@@ -41,9 +46,9 @@ void PeakIonPair::appendRealPeakToXml(XmlDOMDocument* xml_doc,
 }
 
 void PeakIonPair::appendTheoPeakToXml(XmlDOMDocument* xml_doc, 
-                                      xercesc::DOMElement* parent) {
+                                      XmlDOMElement* parent) {
   int precison = 4;
-  xercesc::DOMElement* element = xml_doc->createElement("matched_ion");
+  XmlDOMElement* element = xml_doc->createElement("matched_ion");
   std::string str 
       = theo_peak_ptr_->getIonPtr()->getIonTypePtr()->getName();
   xml_doc->addElement(element, "ion_type", str.c_str());

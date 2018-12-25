@@ -13,16 +13,38 @@
 //limitations under the License.
 
 #include <set>
-#include <string>
 #include <algorithm>
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
-#include "prsm/simple_prsm_str_combine.hpp"
 #include "prsm/simple_prsm_reader.hpp"
-#include "prsm/simple_prsm_str.hpp"
+#include "prsm/simple_prsm_xml_writer.hpp"
+#include "prsm/simple_prsm_str_combine.hpp"
 
 namespace toppic {
+
+SimplePrsmStrCombine::SimplePrsmStrCombine(const std::string &spec_file_name,
+                                           const std::vector<std::string> &in_file_exts,
+                                           const std::string &out_file_ext,
+                                           int top_num):
+    spec_file_name_(spec_file_name),
+    input_file_exts_(in_file_exts),
+    output_file_ext_(out_file_ext),
+    top_num_(top_num) {}
+
+SimplePrsmStrCombine::SimplePrsmStrCombine(const std::string &spec_file_name,
+                                           const std::string &in_file_ext,
+                                           int in_num,
+                                           const std::string &out_file_ext,
+                                           int top_num):
+    spec_file_name_(spec_file_name),
+    output_file_ext_(out_file_ext),
+    top_num_(top_num) {
+      for (int i = 0; i < in_num; i ++) {
+        std::string ext = in_file_ext + "_" + str_util::toString(i);
+        input_file_exts_.push_back(ext);
+      }
+    }
 
 void SimplePrsmStrCombine::process() {
   size_t input_num = input_file_exts_.size();

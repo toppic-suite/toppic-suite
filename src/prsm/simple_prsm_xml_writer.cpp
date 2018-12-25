@@ -12,11 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <string>
-#include <iostream>
-#include <algorithm>
-#include <vector>
-
 #include "common/util/file_util.hpp"
 #include "common/xml/xml_dom_document.hpp"
 #include "common/xml/xml_dom_util.hpp"
@@ -64,7 +59,7 @@ void SimplePrsmXmlWriter::write(SimplePrsmPtr simple_prsm_ptr) {
   if (simple_prsm_ptr->getFileName() == "") {
     simple_prsm_ptr->setFileName(file_name_);
   }
-  xercesc::DOMElement * element = simple_prsm_ptr->toXml(doc_);
+  XmlDOMElement * element = simple_prsm_ptr->toXml(doc_);
   std::string str = xml_dom_util::writeToString(serializer_, element);
   xml_dom_util::writeToStreamByRemovingDoubleLF(file_, str);
   element->release();

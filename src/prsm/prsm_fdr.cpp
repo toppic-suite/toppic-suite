@@ -18,9 +18,19 @@
 #include "common/util/file_util.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_str.hpp"
+#include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_fdr.hpp"
 
 namespace toppic {
+
+PrsmFdr::PrsmFdr(const std::string &db_file_name,
+                 const std::string &spec_file_name,
+                 const std::string &input_file_ext,
+                 const std::string &output_file_ext): 
+    db_file_name_(db_file_name),
+    spec_file_name_(spec_file_name),
+    input_file_ext_(input_file_ext),
+    output_file_ext_(output_file_ext) {}
 
 inline PrsmStrPtrVec2D getGroups(PrsmStrPtrVec &prsm_ptrs) {
   PrsmStrPtrVec2D results;

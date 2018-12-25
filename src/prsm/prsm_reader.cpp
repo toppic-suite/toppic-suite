@@ -12,11 +12,7 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <string>
-#include <vector>
-
 #include "xercesc/framework/MemBufInputSource.hpp"
-#include "htslib/faidx.h"
 
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
@@ -78,7 +74,7 @@ PrsmPtr PrsmReader::readOnePrsm(FastaIndexReaderPtr reader_ptr,
   PrsmPtr ptr;
   if (parser) {
     XmlDOMDocument doc(parser, prsm_buf);
-    xercesc::DOMElement* root = doc.getDocumentElement();
+    XmlDOMElement* root = doc.getDocumentElement();
     ptr = std::make_shared<Prsm>(root, reader_ptr, fix_mod_list);
   }
   return ptr;

@@ -12,20 +12,10 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#include <iostream>
-#include <cmath>
-#include <algorithm>
-#include <string>
-#include <vector>
-
 #include "common/util/logger.hpp"
-#include "seq/proteoform_factory.hpp"
-#include "seq/proteoform.hpp"
 #include "common/util/str_util.hpp"
 #include "common/xml/xml_dom_document.hpp"
 #include "common/xml/xml_dom_util.hpp"
-
 #include "prsm/simple_prsm.hpp"
 
 namespace toppic {
@@ -58,7 +48,7 @@ SimplePrsm::SimplePrsm(MsHeaderPtr header_ptr, int spectrum_num,
       prot_mass_ = header_ptr->getPrecMonoMass();
     }
 
-SimplePrsm::SimplePrsm(xercesc::DOMElement* element) {
+SimplePrsm::SimplePrsm(XmlDOMElement* element) {
   file_name_ = xml_dom_util::getChildValue(element, "file_name", 0);
   spectrum_id_ = xml_dom_util::getIntChildValue(element, "spectrum_id", 0);
   spectrum_scan_ = xml_dom_util::getChildValue(element, "spectrum_scan", 0);
@@ -70,7 +60,7 @@ SimplePrsm::SimplePrsm(xercesc::DOMElement* element) {
   prot_mass_ = xml_dom_util::getDoubleChildValue(element, "proteoform_mass", 0);
   score_ = xml_dom_util::getDoubleChildValue(element, "score", 0);
   // n trunc shifts
-  xercesc::DOMElement* n_shift_list_element
+  XmlDOMElement* n_shift_list_element
       = xml_dom_util::getChildElement(element, "n_trunc_shift_list", 0);
   int n_shift_num = xml_dom_util::getChildCount(n_shift_list_element, "shift");
   // LOG_DEBUG("n shift _num " << n_shift_num);
@@ -79,7 +69,7 @@ SimplePrsm::SimplePrsm(xercesc::DOMElement* element) {
     n_trunc_shifts_.push_back(shift);
   }
   // c trunc shifts
-  xercesc::DOMElement* c_shift_list_element
+  XmlDOMElement* c_shift_list_element
       = xml_dom_util::getChildElement(element, "c_trunc_shift_list", 0);
   int c_shift_num = xml_dom_util::getChildCount(c_shift_list_element, "shift");
   // LOG_DEBUG("c shift _num " << c_shift_num);
@@ -89,9 +79,9 @@ SimplePrsm::SimplePrsm(xercesc::DOMElement* element) {
   }
 }
 
-xercesc::DOMElement* SimplePrsm::toXml(XmlDOMDocument* xml_doc) {
+XmlDOMElement* SimplePrsm::toXml(XmlDOMDocument* xml_doc) {
   std::string element_name = SimplePrsm::getXmlElementName();
-  xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
+  XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
   xml_doc->addElement(element, "file_name", file_name_.c_str());
   std::string str = str_util::toString(spectrum_id_);
   xml_doc->addElement(element, "spectrum_id", str.c_str());
@@ -109,14 +99,14 @@ xercesc::DOMElement* SimplePrsm::toXml(XmlDOMDocument* xml_doc) {
   str = str_util::toString(score_);
   xml_doc->addElement(element, "score", str.c_str());
 
-  xercesc::DOMElement* n_shift_list = xml_doc->createElement("n_trunc_shift_list");
+  XmlDOMElement* n_shift_list = xml_doc->createElement("n_trunc_shift_list");
   for (size_t i = 0; i < n_trunc_shifts_.size(); i++) {
     str = str_util::toString(n_trunc_shifts_[i]);
     xml_doc->addElement(n_shift_list, "shift", str.c_str());
   }
   element->appendChild(n_shift_list);
 
-  xercesc::DOMElement* c_shift_list = xml_doc->createElement("c_trunc_shift_list");
+  XmlDOMElement* c_shift_list = xml_doc->createElement("c_trunc_shift_list");
   for (size_t i = 0; i < c_trunc_shifts_.size(); i++) {
     str = str_util::toString(c_trunc_shifts_[i]);
     xml_doc->addElement(c_shift_list, "shift", str.c_str());
@@ -167,6 +157,46 @@ void SimplePrsm::setCTruncShifts(const std::vector<double> &c_term_shifts) {
   for (size_t i = 0; i < c_term_shifts.size(); i++) {
     double shift = prec_mass_ - (prot_mass_ + c_term_shifts[i]);
     c_trunc_shifts_.push_back(shift);
+  }
+}
+
+bool SimplePrsm::cmpScoreDec(const SimplePrsmPtr a, const SimplePrsmPtr b) {
+  if (a->getScore() == b->getScore()) {
+    return a->getSeqName() < b->getSeqName();
+  } else {
+    return a->getScore() > b->getScore();
+  }
+}
+
+bool SimplePrsm::cmpIdInc(const SimplePrsmPtr a, const SimplePrsmPtr b) {
+  if (a->getSpectrumId() == b->getSpectrumId()) {
+    return a->getSeqName() < b->getSeqName();
+  } else {
+    return a->getSpectrumId() < b->getSpectrumId();
+  }
+}
+
+bool SimplePrsm::cmpIdIncScoreDec(const SimplePrsmPtr a, const SimplePrsmPtr b) {
+  if (a->getSpectrumId() < b->getSpectrumId()) {
+    return true;
+  } else if (a->getSpectrumId() > b->getSpectrumId()) {
+    return false;
+  } else {
+    if (a->getScore() == b->getScore()) {
+      return a->getSeqName() < b->getSeqName();
+    } else {
+      return a->getScore() > b->getScore();
+    }
+  }
+}
+
+bool SimplePrsm::cmpNameIncScoreDec(const SimplePrsmPtr a, const SimplePrsmPtr b) {
+  if (a->getSeqName() < b->getSeqName()) {
+    return true;
+  } else if (a->getSeqName() > b->getSeqName()) {
+    return false;
+  } else {
+    return a->getScore() > b->getScore();
   }
 }
 

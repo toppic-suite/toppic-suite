@@ -13,17 +13,19 @@
 //limitations under the License.
 
 
-#ifndef PROT_PRSM_PEAK_ION_PAIR_HPP_
-#define PROT_PRSM_PEAK_ION_PAIR_HPP_
+#ifndef TOPPIC_PRSM_PEAK_ION_PAIR_HPP_
+#define TOPPIC_PRSM_PEAK_ION_PAIR_HPP_
 
 #include <vector>
 
-#include "common/xml/xml_dom_document.hpp"
+#include "common/xml/xml_dom_element.hpp"
 #include "spec/ms_header.hpp"
 #include "spec/extend_peak.hpp"
 #include "spec/theo_peak.hpp"
 
 namespace toppic {
+
+class XmlDOMDocument;
 
 class PeakIonPair;
 typedef std::shared_ptr<PeakIonPair> PeakIonPairPtr;
@@ -31,10 +33,7 @@ typedef std::shared_ptr<PeakIonPair> PeakIonPairPtr;
 class PeakIonPair {
  public:
   PeakIonPair(MsHeaderPtr ms_header_ptr, ExtendPeakPtr real_peak_ptr,
-              TheoPeakPtr theo_peak_ptr): 
-      ms_header_ptr_(ms_header_ptr),
-      real_peak_ptr_(real_peak_ptr),
-      theo_peak_ptr_(theo_peak_ptr) {}
+              TheoPeakPtr theo_peak_ptr);
 
   MsHeaderPtr getMsHeaderPtr() {return ms_header_ptr_;}
 
@@ -45,10 +44,10 @@ class PeakIonPair {
   void setId(int id) {id_ = id;}
 
   void appendRealPeakToXml(XmlDOMDocument* xml_doc, 
-                           xercesc::DOMElement* parent);
+                           XmlDOMElement* parent);
 
   void appendTheoPeakToXml(XmlDOMDocument* xml_doc, 
-                           xercesc::DOMElement* parent);
+                           XmlDOMElement* parent);
 
   static bool cmpRealPeakPosInc(const PeakIonPairPtr &a, const PeakIonPairPtr &b);
 

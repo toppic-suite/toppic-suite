@@ -12,16 +12,11 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#ifndef TOPPIC_PRSM_PRSM_XML_WRITER_HPP_
+#define TOPPIC_PRSM_PRSM_XML_WRITER_HPP_
 
-#ifndef PROT_PRSM_PRSM_XML_WRITER_HPP_
-#define PROT_PRSM_PRSM_XML_WRITER_HPP_
-
-#include <iostream>
 #include <fstream>
-#include <string>
-#include <vector>
 
-#include "common/xml/xml_dom_document.hpp"
 #include "prsm/prsm.hpp"
 #include "prsm/prsm_str.hpp"
 
@@ -46,7 +41,6 @@ class PrsmXmlWriter {
   void writeVector3D(const PrsmPtrVec3D &prsm_ptrs);
 
  private:
-  // XmlDOMDocument* doc_;
   std::ofstream file_;
 
   std::string file_name_;
