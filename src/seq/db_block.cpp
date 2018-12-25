@@ -16,8 +16,8 @@
 #include <fstream>
 #include <string>
 
-#include "util/logger.hpp"
-#include "util/str_util.hpp"
+#include "common/util/logger.hpp"
+#include "common/util/str_util.hpp"
 #include "seq/db_block.hpp"
 
 namespace toppic {

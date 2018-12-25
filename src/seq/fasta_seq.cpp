@@ -13,11 +13,11 @@
 //limitations under the License.
 
 
-#include "util/logger.hpp"
-#include "xml/xml_dom_util.hpp"
-#include "xml/xml_dom_document.hpp"
-#include "base/ptm_base.hpp"
-#include "base/residue_util.hpp"
+#include "common/util/logger.hpp"
+#include "common/xml/xml_dom_util.hpp"
+#include "common/xml/xml_dom_document.hpp"
+#include "common/base/ptm_base.hpp"
+#include "common/base/residue_util.hpp"
 #include "seq/fasta_seq.hpp"
 
 namespace toppic {

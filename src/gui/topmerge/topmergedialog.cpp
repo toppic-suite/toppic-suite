@@ -23,8 +23,8 @@
 #include <QCloseEvent>
 #include <QDesktopServices>
 
-#include "util/file_util.hpp"
-#include "base/base_data.hpp"
+#include "common/util/file_util.hpp"
+#include "common/base/base_data.hpp"
 
 #include "topmergedialog.h"
 #include "ui_topmergedialog.h"

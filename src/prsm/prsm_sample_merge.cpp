@@ -16,9 +16,9 @@
 #include <algorithm>
 #include <vector>
 
-#include "util/file_util.hpp"
+#include "common/util/file_util.hpp"
 #include "seq/proteoform_util.hpp"
-#include "base/mod_util.hpp"
+#include "common/base/mod_util.hpp"
 #include "seq/fasta_index_reader.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_sample_merge.hpp"

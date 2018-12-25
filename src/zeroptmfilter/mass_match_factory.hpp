@@ -19,7 +19,7 @@
 #include <cmath>
 
 #include "seq/proteoform.hpp"
-#include "base/base_data.hpp"
+#include "common/base/base_data.hpp"
 #include "zeroptmfilter/mass_match.hpp"
 
 namespace toppic {

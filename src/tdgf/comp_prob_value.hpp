@@ -18,7 +18,7 @@
 
 #include <vector>
 
-#include "base/residue_freq.hpp"
+#include "common/base/residue_freq.hpp"
 #include "spec/prm_peak.hpp"
 #include "spec/base_peak_type.hpp"
 #include "prsm/prsm.hpp"

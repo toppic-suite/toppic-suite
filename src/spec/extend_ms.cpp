@@ -17,7 +17,7 @@
 #include <algorithm>
 #include <vector>
 
-#include "base/mass_constant.hpp"
+#include "common/base/mass_constant.hpp"
 #include "spec/extend_ms.hpp"
 
 namespace toppic {

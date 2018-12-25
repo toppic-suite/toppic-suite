@@ -21,7 +21,7 @@
 #include <vector>
 
 #include "seq/proteoform.hpp"
-#include "base/base_data.hpp"
+#include "common/base/base_data.hpp"
 
 namespace toppic {
 

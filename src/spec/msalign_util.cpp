@@ -13,7 +13,7 @@
 //limitations under the License.
 
 
-#include "util/logger.hpp"
+#include "common/util/logger.hpp"
 #include "spec/msalign_util.hpp"
 #include "spec/msalign_reader.hpp"
 

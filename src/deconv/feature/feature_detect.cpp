@@ -16,9 +16,9 @@
 #include <cmath>
 #include <algorithm>
 
-#include "util/logger.hpp"
-#include "util/file_util.hpp"
-#include "util/time_util.hpp"
+#include "common/util/logger.hpp"
+#include "common/util/file_util.hpp"
+#include "common/util/time_util.hpp"
 #include "spec/msalign_reader.hpp"
 #include "spec/msalign_writer.hpp"
 #include "deconv/feature/feature.hpp"

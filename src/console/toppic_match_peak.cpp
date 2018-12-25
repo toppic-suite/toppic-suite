@@ -19,8 +19,8 @@
 #include <string>
 #include <vector>
 
-#include "util/version.hpp"
-#include "base/base_data.hpp"
+#include "common/util/version.hpp"
+#include "common/base/base_data.hpp"
 #include "prsm/prsm_coverage.hpp"
 
 #include "console/toppic_argument.hpp"

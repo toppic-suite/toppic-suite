@@ -22,7 +22,7 @@
 #include <xercesc/dom/DOM.hpp>
 
 #include "seq/proteoform.hpp"
-#include "xml/xml_dom_document.hpp"
+#include "common/xml/xml_dom_document.hpp"
 #include "spec/ms_header.hpp"
 
 namespace toppic {

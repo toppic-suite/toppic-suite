@@ -18,10 +18,10 @@
 #include <string>
 #include <algorithm>
 
-#include "base/base_data.hpp"
+#include "common/base/base_data.hpp"
 #include "prsm/extreme_value.hpp"
-#include "util/str_util.hpp"
-#include "xml/xml_dom_util.hpp"
+#include "common/util/str_util.hpp"
+#include "common/xml/xml_dom_util.hpp"
 
 namespace toppic {
 

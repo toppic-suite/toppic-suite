@@ -13,7 +13,7 @@
 //limitations under the License.
 
 
-#include "base/ion_type.hpp"
+#include "common/base/ion_type.hpp"
 #include "seq/break_point.hpp"
 
 namespace toppic {

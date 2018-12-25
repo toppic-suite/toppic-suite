@@ -16,8 +16,8 @@
 #ifndef TOPPIC_SEQ_RESIDUE_SEQ_HPP_
 #define TOPPIC_SEQ_RESIDUE_SEQ_HPP_
 
-#include "base/mass_constant.hpp"
-#include "base/residue.hpp"
+#include "common/base/mass_constant.hpp"
+#include "common/base/residue.hpp"
 
 namespace toppic {
 

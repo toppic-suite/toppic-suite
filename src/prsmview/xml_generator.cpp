@@ -19,7 +19,7 @@
 #include <algorithm>
 #include <vector>
 
-#include "util/file_util.hpp"
+#include "common/util/file_util.hpp"
 #include "seq/fasta_reader.hpp"
 #include "seq/fasta_util.hpp"
 #include "prsm/prsm_reader.hpp"

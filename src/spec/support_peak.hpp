@@ -16,7 +16,7 @@
 #ifndef PROT_SPEC_SUPPORT_PEAK_HPP_
 #define PROT_SPEC_SUPPORT_PEAK_HPP_
 
-#include "base/support_peak_type.hpp"
+#include "common/base/support_peak_type.hpp"
 #include "spec/deconv_peak.hpp"
 
 namespace toppic {

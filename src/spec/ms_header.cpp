@@ -16,12 +16,12 @@
 #include <cmath>
 #include <sstream>
 
-#include "util/logger.hpp"
-#include "util/str_util.hpp"
-#include "xml/xml_dom_document.hpp"
-#include "xml/xml_dom_util.hpp"
-#include "base/activation_base.hpp"
-#include "base/mass_constant.hpp"
+#include "common/util/logger.hpp"
+#include "common/util/str_util.hpp"
+#include "common/xml/xml_dom_document.hpp"
+#include "common/xml/xml_dom_util.hpp"
+#include "common/base/activation_base.hpp"
+#include "common/base/mass_constant.hpp"
 #include "spec/peak.hpp"
 #include "spec/ms_header.hpp"
 

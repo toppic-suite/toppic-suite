@@ -15,10 +15,10 @@
 #include <cmath>
 #include <algorithm>
 
-#include "util/logger.hpp"
-#include "util/str_util.hpp"
-#include "xml/xml_dom_document.hpp"
-#include "base/mass_constant.hpp"
+#include "common/util/logger.hpp"
+#include "common/util/str_util.hpp"
+#include "common/xml/xml_dom_document.hpp"
+#include "common/base/mass_constant.hpp"
 #include "deconv/env/envelope.hpp"
 
 namespace toppic {

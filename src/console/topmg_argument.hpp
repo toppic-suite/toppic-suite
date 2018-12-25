@@ -25,9 +25,9 @@
 
 #include <boost/program_options.hpp>
 
-#include "util/logger.hpp"
-#include "xml/xml_dom_document.hpp"
-#include "util/str_util.hpp"
+#include "common/util/logger.hpp"
+#include "common/xml/xml_dom_document.hpp"
+#include "common/util/str_util.hpp"
 
 namespace toppic {
 

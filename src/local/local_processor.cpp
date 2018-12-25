@@ -17,15 +17,15 @@
 #include <vector>
 #include <functional>
 
-#include "base/ptm.hpp"
-#include "base/ptm_util.hpp"
-#include "base/mod_util.hpp"
-#include "base/residue_base.hpp"
-#include "base/residue_util.hpp"
+#include "common/base/ptm.hpp"
+#include "common/base/ptm_util.hpp"
+#include "common/base/mod_util.hpp"
+#include "common/base/residue_base.hpp"
+#include "common/base/residue_util.hpp"
 #include "seq/local_anno.hpp"
 #include "seq/mass_shift.hpp"
-#include "base/prot_mod.hpp"
-#include "base/prot_mod_base.hpp"
+#include "common/base/prot_mod.hpp"
+#include "common/base/prot_mod_base.hpp"
 #include "seq/proteoform_factory.hpp"
 
 #include "spec/msalign_reader.hpp"

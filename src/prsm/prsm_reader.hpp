@@ -21,7 +21,7 @@
 #include <string>
 #include <vector>
 
-#include "xml/xml_dom_document.hpp"
+#include "common/xml/xml_dom_document.hpp"
 #include "prsm/prsm.hpp"
 #include "prsm/prsm_str.hpp"
 

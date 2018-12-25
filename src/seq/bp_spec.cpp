@@ -16,7 +16,7 @@
 #include <cmath>
 #include <algorithm>
 
-#include "util/logger.hpp"
+#include "common/util/logger.hpp"
 #include "seq/bp_spec.hpp"
 
 namespace toppic {

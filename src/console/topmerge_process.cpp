@@ -18,9 +18,9 @@
 #include <vector>
 #include <ctime>
 
-#include "base/base_data.hpp"
-#include "util/file_util.hpp"
-#include "util/str_util.hpp"
+#include "common/base/base_data.hpp"
+#include "common/util/file_util.hpp"
+#include "common/util/str_util.hpp"
 #include "seq/fasta_util.hpp"
 
 #include "prsm/prsm_reader.hpp"

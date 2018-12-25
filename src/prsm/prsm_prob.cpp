@@ -15,7 +15,7 @@
 
 #include <string>
 
-#include "util/file_util.hpp"
+#include "common/util/file_util.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_prob.hpp"
 

@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include "util/logger.hpp"
-#include "base/mass_constant.hpp"
+#include "common/util/logger.hpp"
+#include "common/base/mass_constant.hpp"
 #include "spec/raw_ms_util.hpp"
 #include "deconv/env/env_base.hpp"
 #include "deconv/env/env_detect.hpp"

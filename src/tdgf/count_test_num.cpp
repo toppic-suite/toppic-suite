@@ -15,11 +15,11 @@
 
 #include <cmath>
 
-#include "util/logger.hpp"
+#include "common/util/logger.hpp"
 #include "seq/fasta_reader.hpp"
-#include "base/mod_util.hpp"
-#include "base/residue_base.hpp"
-#include "base/residue_util.hpp"
+#include "common/base/mod_util.hpp"
+#include "common/base/residue_base.hpp"
+#include "common/base/residue_util.hpp"
 #include "seq/proteoform_factory.hpp"
 #include "tdgf/tdgf_util.hpp"
 #include "tdgf/count_test_num.hpp"

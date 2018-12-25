@@ -14,8 +14,8 @@
 
 #include <algorithm>
 
-#include "util/logger.hpp"
-#include "base/mass_constant.hpp"
+#include "common/util/logger.hpp"
+#include "common/base/mass_constant.hpp"
 #include "spec/base_peak_type.hpp"
 #include "spec/prm_ms_factory.hpp"
 

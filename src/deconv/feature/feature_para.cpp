@@ -13,7 +13,7 @@
 //limitations under the License.
 
 
-#include "base/mass_constant.hpp"
+#include "common/base/mass_constant.hpp"
 #include "deconv/feature/feature_para.hpp"
 
 namespace toppic {

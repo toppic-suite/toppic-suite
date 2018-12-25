@@ -23,9 +23,9 @@
 #include <vector>
 #include <ctime>
 
-#include "util/version.hpp"
-#include "util/file_util.hpp"
-#include "util/str_util.hpp"
+#include "common/util/version.hpp"
+#include "common/util/file_util.hpp"
+#include "common/util/str_util.hpp"
 
 #include "spec/msalign_util.hpp"
 #include "spec/feature_util.hpp"

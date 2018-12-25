@@ -16,10 +16,10 @@
 #include <algorithm>
 #include <vector>
 
-#include "util/logger.hpp"
+#include "common/util/logger.hpp"
 #include "seq/proteoform.hpp"
 #include "seq/proteoform_factory.hpp"
-#include "base/activation.hpp"
+#include "common/base/activation.hpp"
 #include "spec/extend_ms_factory.hpp"
 #include "spec/theo_peak.hpp"
 #include "prsm/theo_peak_util.hpp"

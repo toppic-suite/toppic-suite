@@ -12,7 +12,7 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include "base/ion_type_base.hpp"
+#include "common/base/ion_type_base.hpp"
 #include "spec/prm_peak_factory.hpp"
 
 namespace toppic {

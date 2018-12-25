@@ -12,9 +12,9 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include "util/str_util.hpp"
-#include "xml/xml_dom_document.hpp"
-#include "base/mass_constant.hpp"
+#include "common/util/str_util.hpp"
+#include "common/xml/xml_dom_document.hpp"
+#include "common/base/mass_constant.hpp"
 #include "spec/peak.hpp"
 
 namespace toppic {

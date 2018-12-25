@@ -12,7 +12,7 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include "util/logger.hpp"
+#include "common/util/logger.hpp"
 #include "spec/baseline_util.hpp"
 #include "deconv/spec/deconv_data_util.hpp"
 #include "deconv/env/match_env_util.hpp"

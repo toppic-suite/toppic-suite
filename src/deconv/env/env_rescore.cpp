@@ -14,7 +14,7 @@
 
 #include <algorithm>
 
-#include "base/mass_constant.hpp"
+#include "common/base/mass_constant.hpp"
 #include "deconv/env/env_rescore.hpp"
 
 namespace toppic {

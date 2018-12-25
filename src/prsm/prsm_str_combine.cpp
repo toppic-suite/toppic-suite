@@ -17,8 +17,8 @@
 #include <algorithm>
 #include <vector>
 
-#include "util/logger.hpp"
-#include "util/file_util.hpp"
+#include "common/util/logger.hpp"
+#include "common/util/file_util.hpp"
 #include "prsm/prsm_str_combine.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_str.hpp"

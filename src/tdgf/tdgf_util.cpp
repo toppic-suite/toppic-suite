@@ -16,7 +16,7 @@
 #include <vector>
 #include <string>
 
-#include "base/residue_util.hpp"
+#include "common/base/residue_util.hpp"
 #include "tdgf/tdgf_util.hpp"
 
 namespace toppic {

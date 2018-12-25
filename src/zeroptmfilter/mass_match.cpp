@@ -18,10 +18,10 @@
 #include <utility>
 #include <vector>
 
-#include "util/logger.hpp"
-#include "base/prot_mod.hpp"
-#include "base/prot_mod_util.hpp"
-#include "base/mass_constant.hpp"
+#include "common/util/logger.hpp"
+#include "common/base/prot_mod.hpp"
+#include "common/base/prot_mod_util.hpp"
+#include "common/base/mass_constant.hpp"
 #include "zeroptmfilter/filter_protein.hpp"
 #include "zeroptmfilter/mass_match.hpp"
 

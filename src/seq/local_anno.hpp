@@ -16,8 +16,8 @@
 #ifndef TOPPIC_SEQ_LOCAL_ANNO_HPP_
 #define TOPPIC_SEQ_LOCAL_ANNO_HPP_
 
-#include "base/ptm.hpp"
-#include "xml/xml_dom_document.hpp"
+#include "common/base/ptm.hpp"
+#include "common/xml/xml_dom_document.hpp"
 
 namespace toppic {
 

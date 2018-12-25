@@ -16,7 +16,7 @@
 #ifndef PROT_SPEC_MS_HEADER_HPP_
 #define PROT_SPEC_MS_HEADER_HPP_
 
-#include "base/activation.hpp"
+#include "common/base/activation.hpp"
 
 namespace toppic {
 

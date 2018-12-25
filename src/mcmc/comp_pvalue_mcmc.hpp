@@ -21,7 +21,7 @@
 #include <vector>
 #include <algorithm>
 
-#include "base/activation.hpp"
+#include "common/base/activation.hpp"
 
 #include "prsm/prsm.hpp"
 

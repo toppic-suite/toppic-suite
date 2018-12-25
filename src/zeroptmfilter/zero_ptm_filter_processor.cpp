@@ -18,7 +18,7 @@
 
 #include "seq/proteoform.hpp"
 #include "seq/proteoform_factory.hpp"
-#include "util/file_util.hpp"
+#include "common/util/file_util.hpp"
 #include "thread/thread_pool.hpp"
 
 #include "spec/msalign_reader.hpp"

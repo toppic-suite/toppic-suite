@@ -20,8 +20,8 @@
 
 #include "seq/proteoform.hpp"
 #include "seq/proteoform_factory.hpp"
-#include "util/file_util.hpp"
-#include "base/mod_util.hpp"
+#include "common/util/file_util.hpp"
+#include "common/base/mod_util.hpp"
 
 #include "spec/msalign_util.hpp"
 #include "spec/spectrum_set.hpp"
