@@ -16,7 +16,7 @@
 #include <algorithm>
 #include <vector>
 
-#include "util/logger.hpp"
+#include "common/util/logger.hpp"
 
 #include "node.hpp"
 #include "edge.hpp"

@@ -16,10 +16,10 @@
 #include <string>
 #include <vector>
 
-#include "util/logger.hpp"
-#include "util/file_util.hpp"
-#include "xml/xml_dom_impl.hpp"
-#include "xml/xml_dom_util.hpp"
+#include "common/util/logger.hpp"
+#include "common/util/file_util.hpp"
+#include "common/xml/xml_dom_impl.hpp"
+#include "common/xml/xml_dom_util.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 
 namespace toppic {

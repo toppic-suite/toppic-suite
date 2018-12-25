@@ -15,7 +15,7 @@
 #include <fstream>
 #include <iostream>
 
-#include "util/str_util.hpp"
+#include "common/util/str_util.hpp"
 
 #include "spec/feature_util.hpp"
 

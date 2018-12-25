@@ -15,8 +15,8 @@
 #include <limits>
 #include <cmath>
 
-#include "util/str_util.hpp"
-#include "xml/xml_dom_document.hpp"
+#include "common/util/str_util.hpp"
+#include "common/xml/xml_dom_document.hpp"
 #include "deconv/env/match_env.hpp" 
 
 namespace toppic {

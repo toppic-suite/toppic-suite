@@ -17,8 +17,8 @@
 #include <string>
 #include <algorithm>
 
-#include "util/logger.hpp"
-#include "util/str_util.hpp"
+#include "common/util/logger.hpp"
+#include "common/util/str_util.hpp"
 
 #include "spec/extend_ms_factory.hpp"
 #include "spec/msalign_reader.hpp"

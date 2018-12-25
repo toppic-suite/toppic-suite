@@ -18,13 +18,13 @@
 #include <vector>
 
 
-#include "base/amino_acid_base.hpp"
-#include "base/activation_base.hpp"
-#include "base/mod_util.hpp"
-#include "base/residue_base.hpp"
-#include "base/residue_util.hpp"
+#include "common/base/amino_acid_base.hpp"
+#include "common/base/activation_base.hpp"
+#include "common/base/mod_util.hpp"
+#include "common/base/residue_base.hpp"
+#include "common/base/residue_util.hpp"
 #include "seq/proteoform_factory.hpp"
-#include "base/mass_constant.hpp"
+#include "common/base/mass_constant.hpp"
 
 #include "prsm/peak_ion_pair_util.hpp"
 

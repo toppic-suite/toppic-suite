@@ -17,9 +17,9 @@
 #include <algorithm>
 #include <vector>
 
-#include "util/logger.hpp"
-#include "util/file_util.hpp"
-#include "util/str_util.hpp"
+#include "common/util/logger.hpp"
+#include "common/util/file_util.hpp"
+#include "common/util/str_util.hpp"
 #include "tdgf/comp_pvalue_lookup_table.hpp"
 
 namespace toppic {

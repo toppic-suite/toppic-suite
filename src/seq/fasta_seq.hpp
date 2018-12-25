@@ -18,8 +18,8 @@
 
 #include <memory>
 
-#include "util/str_util.hpp"
-#include "xml/xml_dom_element.hpp"
+#include "common/util/str_util.hpp"
+#include "common/xml/xml_dom_element.hpp"
 
 namespace toppic {
 

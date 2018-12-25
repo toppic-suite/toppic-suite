@@ -25,10 +25,10 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/graphviz.hpp>
 
-#include "base/ptm_base.hpp"
-#include "base/residue.hpp"
+#include "common/base/ptm_base.hpp"
+#include "common/base/residue.hpp"
 #include "seq/change.hpp"
-#include "util/logger.hpp"
+#include "common/util/logger.hpp"
 
 namespace toppic {
 

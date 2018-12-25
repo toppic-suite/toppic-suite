@@ -14,8 +14,8 @@
 
 #include <climits>
 
-#include "util/logger.hpp"
-#include "util/file_util.hpp"
+#include "common/util/logger.hpp"
+#include "common/util/file_util.hpp"
 #include "seq/proteoform.hpp"
 #include "seq/fasta_reader.hpp"
 #include "thread/thread_pool.hpp"

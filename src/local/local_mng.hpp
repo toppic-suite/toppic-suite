@@ -23,9 +23,9 @@
 
 #include "prsm/prsm_para.hpp"
 #include "seq/proteoform.hpp"
-#include "base/base_data.hpp"
+#include "common/base/base_data.hpp"
 #include "seq/fasta_reader.hpp"
-#include "util/file_util.hpp"
+#include "common/util/file_util.hpp"
 
 namespace toppic {
 

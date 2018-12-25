@@ -12,10 +12,10 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include "util/str_util.hpp"
-#include "base/activation_base.hpp"
-#include "xml/xml_dom_util.hpp"
-#include "xml/xml_dom_document.hpp"
+#include "common/util/str_util.hpp"
+#include "common/base/activation_base.hpp"
+#include "common/xml/xml_dom_util.hpp"
+#include "common/xml/xml_dom_document.hpp"
 #include "spec/sp_para.hpp"
 
 namespace toppic {

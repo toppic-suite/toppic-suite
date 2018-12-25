@@ -18,9 +18,9 @@
 
 #include "htslib/faidx.h"
 
-#include "util/logger.hpp"
-#include "util/str_util.hpp"
-#include "util/file_util.hpp"
+#include "common/util/logger.hpp"
+#include "common/util/str_util.hpp"
+#include "common/util/file_util.hpp"
 #include "seq/fasta_reader.hpp"
 #include "seq/fasta_util.hpp"
 

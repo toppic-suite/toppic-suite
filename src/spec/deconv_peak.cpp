@@ -15,9 +15,9 @@
 
 #include <string>
 
-#include "util/str_util.hpp"
-#include "xml/xml_dom_util.hpp"
-#include "xml/xml_dom_document.hpp"
+#include "common/util/str_util.hpp"
+#include "common/xml/xml_dom_util.hpp"
+#include "common/xml/xml_dom_document.hpp"
 #include "spec/deconv_peak.hpp"
 
 namespace toppic {

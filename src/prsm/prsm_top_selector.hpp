@@ -19,7 +19,7 @@
 #include <map>
 #include <string>
 
-#include "util/str_util.hpp"
+#include "common/util/str_util.hpp"
 #include "seq/proteoform.hpp"
 #include "seq/fasta_reader.hpp"
 #include "prsm/prsm.hpp"

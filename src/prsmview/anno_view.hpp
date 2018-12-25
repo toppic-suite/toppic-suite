@@ -22,7 +22,7 @@
 
 #include "prsm/extreme_value.hpp"
 #include "seq/proteoform.hpp"
-#include "xml/xml_writer.hpp"
+#include "common/xml/xml_writer.hpp"
 #include "spec/deconv_peak.hpp"
 #include "spec/extend_peak.hpp"
 #include "spec/sp_para.hpp"

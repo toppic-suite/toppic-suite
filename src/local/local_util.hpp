@@ -18,10 +18,10 @@
 
 #include <vector>
 
-#include "base/amino_acid_base.hpp"
-#include "base/ptm.hpp"
+#include "common/base/amino_acid_base.hpp"
+#include "common/base/ptm.hpp"
 #include "seq/mass_shift.hpp"
-#include "base/ptm.hpp"
+#include "common/base/ptm.hpp"
 
 #include "prsm/prsm.hpp"
 #include "prsm/peak_ion_pair_util.hpp"

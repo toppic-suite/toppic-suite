@@ -14,9 +14,9 @@
 
 #include <cmath>
 
-#include "util/logger.hpp"
-#include "util/str_util.hpp"
-#include "xml/xml_dom_document.hpp"
+#include "common/util/logger.hpp"
+#include "common/util/str_util.hpp"
+#include "common/xml/xml_dom_document.hpp"
 #include "spec/raw_ms_util.hpp"
 #include "deconv/env/real_env.hpp" 
 

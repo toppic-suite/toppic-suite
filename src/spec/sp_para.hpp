@@ -21,8 +21,8 @@
 #include <vector>
 #include <set>
 
-#include "xml/xml_dom_element.hpp"
-#include "base/activation.hpp"
+#include "common/xml/xml_dom_element.hpp"
+#include "common/base/activation.hpp"
 #include "spec/peak_tolerance.hpp"
 
 namespace toppic {

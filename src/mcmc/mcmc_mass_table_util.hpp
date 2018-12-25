@@ -20,7 +20,7 @@
 #include <map>
 #include <string>
 
-#include "base/residue.hpp"
+#include "common/base/residue.hpp"
 
 #include "spec/sp_para.hpp"
 

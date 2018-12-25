@@ -19,8 +19,8 @@
 #include <string>
 #include <vector>
 
-#include "base/amino_acid_base.hpp"
-#include "util/file_util.hpp"
+#include "common/base/amino_acid_base.hpp"
+#include "common/util/file_util.hpp"
 #include "spec/peak.hpp"
 #include "spec/extend_ms_factory.hpp"
 #include "spec/msalign_reader.hpp"

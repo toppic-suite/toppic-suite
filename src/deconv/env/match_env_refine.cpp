@@ -15,8 +15,8 @@
 #include <limits>
 #include <cmath>
 
-#include "util/logger.hpp"
-#include "base/mass_constant.hpp"
+#include "common/util/logger.hpp"
+#include "common/base/mass_constant.hpp"
 #include "deconv/env/env_base.hpp"
 #include "deconv/env/match_env_refine.hpp"
 

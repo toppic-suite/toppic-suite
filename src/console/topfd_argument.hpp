@@ -23,7 +23,7 @@
 
 #include <boost/program_options.hpp> 
 
-#include "xml/xml_dom_document.hpp"
+#include "common/xml/xml_dom_document.hpp"
 
 namespace toppic {
 

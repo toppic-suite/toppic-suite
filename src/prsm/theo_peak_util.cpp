@@ -17,7 +17,7 @@
 #include <algorithm>
 
 #include "seq/bp_spec.hpp"
-#include "base/neutral_loss_base.hpp"
+#include "common/base/neutral_loss_base.hpp"
 #include "prsm/theo_peak_util.hpp"
 
 namespace toppic {

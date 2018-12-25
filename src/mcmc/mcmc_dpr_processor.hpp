@@ -23,7 +23,7 @@
 #include <string>
 
 #include "seq/proteoform.hpp"
-#include "base/activation.hpp"
+#include "common/base/activation.hpp"
 #include "thread/thread_pool.hpp"
 
 #include "spec/deconv_ms.hpp"

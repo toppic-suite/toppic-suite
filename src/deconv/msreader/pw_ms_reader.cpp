@@ -16,9 +16,9 @@
 #include "pwiz/data/common/cv.hpp"
 #include "pwiz/data/common/ParamTypes.hpp"
 
-#include "util/logger.hpp"
-#include "util/str_util.hpp"
-#include "base/activation_base.hpp"
+#include "common/util/logger.hpp"
+#include "common/util/str_util.hpp"
+#include "common/base/activation_base.hpp"
 #include "deconv/msreader/pw_ms_reader.hpp"
 
 namespace toppic {

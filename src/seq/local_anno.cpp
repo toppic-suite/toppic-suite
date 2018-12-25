@@ -17,9 +17,9 @@
 #include <vector>
 #include <algorithm>
 
-#include "util/str_util.hpp"
-#include "xml/xml_dom_util.hpp"
-#include "base/ptm_base.hpp"
+#include "common/util/str_util.hpp"
+#include "common/xml/xml_dom_util.hpp"
+#include "common/base/ptm_base.hpp"
 #include "seq/local_anno.hpp"
 
 namespace toppic {

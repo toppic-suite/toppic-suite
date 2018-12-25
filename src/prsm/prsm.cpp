@@ -17,10 +17,10 @@
 #include <algorithm>
 #include <string>
 
-#include "util/logger.hpp"
+#include "common/util/logger.hpp"
 #include "seq/proteoform_factory.hpp"
-#include "util/str_util.hpp"
-#include "xml/xml_dom_util.hpp"
+#include "common/util/str_util.hpp"
+#include "common/xml/xml_dom_util.hpp"
 #include "spec/ms.hpp"
 #include "spec/extend_ms_factory.hpp"
 #include "spec/msalign_reader.hpp"

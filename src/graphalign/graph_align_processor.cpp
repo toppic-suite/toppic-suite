@@ -23,8 +23,8 @@
 #include <sys/wait.h>
 #endif
 
-#include "util/file_util.hpp"
-#include "base/mod_util.hpp"
+#include "common/util/file_util.hpp"
+#include "common/base/mod_util.hpp"
 #include "spec/msalign_util.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_reader.hpp"

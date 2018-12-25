@@ -19,9 +19,9 @@
 #include <string>
 #include <map>
 
-#include "base/mod.hpp"
-#include "base/prot_mod.hpp"
-#include "base/activation.hpp"
+#include "common/base/mod.hpp"
+#include "common/base/prot_mod.hpp"
+#include "common/base/activation.hpp"
 #include "spec/peak_tolerance.hpp"
 #include "spec/sp_para.hpp"
 

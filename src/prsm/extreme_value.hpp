@@ -20,7 +20,7 @@
 #include <vector>
 #include <string>
 
-#include "xml/xml_dom_document.hpp"
+#include "common/xml/xml_dom_document.hpp"
 
 namespace toppic {
 

@@ -19,7 +19,7 @@
 #include <iostream>
 #include <fstream>
 
-#include "xml/xml_dom_document.hpp"
+#include "common/xml/xml_dom_document.hpp"
 #include "prsm/prsm.hpp"
 #include "prsm/simple_prsm.hpp"
 #include "prsm/simple_prsm_str.hpp"

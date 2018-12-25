@@ -15,11 +15,11 @@
 #include <vector>
 
 #include "seq/proteoform.hpp"
-#include "base/base_data.hpp"
+#include "common/base/base_data.hpp"
 #include "seq/db_block.hpp"
 #include "seq/proteoform_factory.hpp"
-#include "util/file_util.hpp"
-#include "base/mod_util.hpp"
+#include "common/util/file_util.hpp"
+#include "common/base/mod_util.hpp"
 #include "thread/thread_pool.hpp"
 #include "spec/msalign_util.hpp"
 #include "prsm/simple_prsm_xml_writer.hpp"

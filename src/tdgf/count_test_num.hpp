@@ -17,7 +17,7 @@
 #define PROT_COUNT_TEST_NUM_HPP_
 
 #include "seq/proteoform.hpp"
-#include "base/residue_freq.hpp"
+#include "common/base/residue_freq.hpp"
 #include "tdgf/tdgf_mng.hpp"
 
 namespace toppic {

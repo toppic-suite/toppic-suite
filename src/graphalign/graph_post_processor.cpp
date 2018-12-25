@@ -18,10 +18,10 @@
 #include <string>
 #include <vector>
 
-#include "base/ptm_base.hpp"
-#include "base/ptm_util.hpp"
-#include "base/prot_mod_base.hpp"
-#include "util/file_util.hpp"
+#include "common/base/ptm_base.hpp"
+#include "common/base/ptm_util.hpp"
+#include "common/base/prot_mod_base.hpp"
+#include "common/util/file_util.hpp"
 #include "seq/mass_shift.hpp"
 
 #include "spec/extend_ms_factory.hpp"

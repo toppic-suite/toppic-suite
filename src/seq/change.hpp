@@ -16,8 +16,8 @@
 #ifndef TOPPIC_SEQ_CHANGE_HPP_
 #define TOPPIC_SEQ_CHANGE_HPP_
 
-#include "xml/xml_dom_element.hpp"
-#include "base/mod.hpp"
+#include "common/xml/xml_dom_element.hpp"
+#include "common/base/mod.hpp"
 #include "seq/mass_shift_type.hpp"
 #include "seq/local_anno.hpp"
 

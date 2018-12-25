@@ -12,10 +12,10 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include "util/logger.hpp"
-#include "util/file_util.hpp"
-#include "util/str_util.hpp"
-#include "base/base_data.hpp"
+#include "common/util/logger.hpp"
+#include "common/util/file_util.hpp"
+#include "common/util/str_util.hpp"
+#include "common/base/base_data.hpp"
 #include "deconv/deconv/deconv_process.hpp"
 #include "deconv/feature/feature_detect.hpp"
 

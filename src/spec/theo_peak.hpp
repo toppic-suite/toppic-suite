@@ -15,7 +15,7 @@
 #ifndef PROT_SPEC_THEO_PEAK_HPP_
 #define PROT_SPEC_THEO_PEAK_HPP_
 
-#include "base/ion.hpp"
+#include "common/base/ion.hpp"
 #include "spec/peak.hpp"
 
 namespace toppic {

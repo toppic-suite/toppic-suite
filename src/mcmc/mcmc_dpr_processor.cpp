@@ -18,11 +18,11 @@
 #include <vector>
 #include <map>
 
-#include "base/ptm_util.hpp"
-#include "base/mod_util.hpp"
-#include "util/file_util.hpp"
-#include "base/residue_util.hpp"
-#include "base/neutral_loss.hpp"
+#include "common/base/ptm_util.hpp"
+#include "common/base/mod_util.hpp"
+#include "common/util/file_util.hpp"
+#include "common/base/residue_util.hpp"
+#include "common/base/neutral_loss.hpp"
 #include "prsm/extreme_value.hpp"
 #include "thread/thread_pool.hpp"
 

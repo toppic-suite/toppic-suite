@@ -14,9 +14,9 @@
 
 #include <string>
 
-#include "util/str_util.hpp"
-#include "xml/xml_dom_util.hpp"
-#include "base/mod_base.hpp"
+#include "common/util/str_util.hpp"
+#include "common/xml/xml_dom_util.hpp"
+#include "common/base/mod_base.hpp"
 #include "seq/change.hpp"
 
 namespace toppic {

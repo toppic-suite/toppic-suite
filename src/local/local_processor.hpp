@@ -18,7 +18,7 @@
 
 #include <vector>
 
-#include "base/ptm.hpp"
+#include "common/base/ptm.hpp"
 #include "seq/local_anno.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_reader.hpp"

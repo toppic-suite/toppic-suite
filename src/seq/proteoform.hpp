@@ -16,9 +16,9 @@
 #ifndef TOPPIC_SEQ_PROTEOFORM_HPP_
 #define TOPPIC_SEQ_PROTEOFORM_HPP_
 
-#include "base/ptm.hpp"
-#include "base/prot_mod.hpp"
-#include "base/residue_freq.hpp"
+#include "common/base/ptm.hpp"
+#include "common/base/prot_mod.hpp"
+#include "common/base/residue_freq.hpp"
 #include "seq/fasta_seq.hpp"
 #include "seq/fasta_index_reader.hpp"
 #include "seq/bp_spec.hpp"

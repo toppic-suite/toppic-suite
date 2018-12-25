@@ -16,7 +16,7 @@
 #ifndef PROT_ANNO_PROTEOFORM_HPP_
 #define PROT_ANNO_PROTEOFORM_HPP_
 
-#include "xml/xml_dom_util.hpp"
+#include "common/xml/xml_dom_util.hpp"
 #include "seq/proteoform.hpp"
 #include "prsm/prsm.hpp"
 #include "prsmview/prsm_view_mng.hpp"

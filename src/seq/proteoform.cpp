@@ -20,12 +20,12 @@
 #include <vector>
 #include <cmath>
 
-#include "util/logger.hpp"
-#include "util/str_util.hpp"
-#include "xml/xml_dom_util.hpp"
-#include "base/ptm_base.hpp"
-#include "base/mod_base.hpp"
-#include "base/prot_mod_base.hpp"
+#include "common/util/logger.hpp"
+#include "common/util/str_util.hpp"
+#include "common/xml/xml_dom_util.hpp"
+#include "common/base/ptm_base.hpp"
+#include "common/base/mod_base.hpp"
+#include "common/base/prot_mod_base.hpp"
 #include "seq/mass_shift_type.hpp"
 #include "seq/fasta_index_reader.hpp"
 #include "seq/proteoform.hpp"

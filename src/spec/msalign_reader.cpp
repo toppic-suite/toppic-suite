@@ -15,9 +15,9 @@
 #include <cmath>
 #include <sstream>
 
-#include "util/str_util.hpp"
-#include "base/mass_constant.hpp"
-#include "base/activation_base.hpp"
+#include "common/util/str_util.hpp"
+#include "common/base/mass_constant.hpp"
+#include "common/base/activation_base.hpp"
 #include "spec/msalign_reader.hpp"
 
 namespace toppic {

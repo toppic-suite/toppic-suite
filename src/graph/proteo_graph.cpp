@@ -15,13 +15,13 @@
 #include <set>
 #include <vector>
 
-#include "util/logger.hpp"
+#include "common/util/logger.hpp"
 #include "seq/mass_shift_type.hpp"
 #include "seq/fasta_reader.hpp"
 #include "seq/residue_seq.hpp"
-#include "base/mod_base.hpp"
-#include "base/prot_mod_base.hpp"
-#include "base/residue_util.hpp"
+#include "common/base/mod_base.hpp"
+#include "common/base/prot_mod_base.hpp"
+#include "common/base/residue_util.hpp"
 #include "seq/proteoform_util.hpp"
 
 #include "graph/proteo_graph.hpp"

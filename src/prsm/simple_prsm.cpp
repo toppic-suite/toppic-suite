@@ -19,12 +19,12 @@
 #include <string>
 #include <vector>
 
-#include "util/logger.hpp"
+#include "common/util/logger.hpp"
 #include "seq/proteoform_factory.hpp"
 #include "seq/proteoform.hpp"
-#include "util/str_util.hpp"
-#include "xml/xml_dom_document.hpp"
-#include "xml/xml_dom_util.hpp"
+#include "common/util/str_util.hpp"
+#include "common/xml/xml_dom_document.hpp"
+#include "common/xml/xml_dom_util.hpp"
 
 #include "prsm/simple_prsm.hpp"
 

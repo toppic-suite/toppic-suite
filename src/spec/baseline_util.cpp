@@ -15,7 +15,7 @@
 #include <memory>
 #include <cmath>
 
-#include "util/logger.hpp"
+#include "common/util/logger.hpp"
 #include "spec/baseline_util.hpp"
 
 namespace toppic {

@@ -19,7 +19,7 @@
 #include <vector>
 #include <fstream>
 
-#include "base/residue_util.hpp"
+#include "common/base/residue_util.hpp"
 
 #include "mcmc/mcmc_mass_table_util.hpp"
 

@@ -16,8 +16,8 @@
 #include <cmath>
 #include <vector>
 
-#include "base/prot_mod.hpp"
-#include "base/mod_base.hpp"
+#include "common/base/prot_mod.hpp"
+#include "common/base/mod_base.hpp"
 #include "seq/change.hpp"
 #include "prsm/base_algo.hpp"
 #include "oneptmsearch/diagonal_header.hpp"

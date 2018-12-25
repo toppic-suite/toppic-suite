@@ -16,8 +16,8 @@
 #include <string>
 #include <algorithm>
 
-#include "util/logger.hpp"
-#include "util/file_util.hpp"
+#include "common/util/logger.hpp"
+#include "common/util/file_util.hpp"
 #include "prsm/simple_prsm_str_combine.hpp"
 #include "prsm/simple_prsm_reader.hpp"
 #include "prsm/simple_prsm_str.hpp"

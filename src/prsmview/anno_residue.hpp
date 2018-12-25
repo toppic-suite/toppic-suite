@@ -19,8 +19,8 @@
 #include <string>
 #include <vector>
 
-#include "xml/xml_dom_document.hpp"
-#include "base/residue.hpp"
+#include "common/xml/xml_dom_document.hpp"
+#include "common/base/residue.hpp"
 
 namespace toppic {
 

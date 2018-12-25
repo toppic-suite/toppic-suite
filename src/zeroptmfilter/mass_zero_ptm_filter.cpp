@@ -18,7 +18,7 @@
 #include <utility>
 #include <vector>
 
-#include "util/logger.hpp"
+#include "common/util/logger.hpp"
 #include "seq/proteoform_util.hpp"
 #include "zeroptmfilter/filter_protein.hpp"
 #include "zeroptmfilter/mass_match_factory.hpp"

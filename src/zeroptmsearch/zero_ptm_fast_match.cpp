@@ -15,8 +15,8 @@
 #include <algorithm>
 #include <vector>
 
-#include "util/logger.hpp"
-#include "base/base_data.hpp"
+#include "common/util/logger.hpp"
+#include "common/base/base_data.hpp"
 #include "zeroptmsearch/zero_ptm_fast_match.hpp"
 
 namespace toppic {

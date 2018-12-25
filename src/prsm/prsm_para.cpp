@@ -14,12 +14,12 @@
 
 #include <fstream>
 
-#include "util/logger.hpp"
-#include "util/str_util.hpp"
-#include "base/activation_base.hpp"
-#include "base/mass_constant.hpp"
-#include "base/mod_util.hpp"
-#include "base/prot_mod_base.hpp"
+#include "common/util/logger.hpp"
+#include "common/util/str_util.hpp"
+#include "common/base/activation_base.hpp"
+#include "common/base/mass_constant.hpp"
+#include "common/base/mod_util.hpp"
+#include "common/base/prot_mod_base.hpp"
 #include "prsm/prsm_para.hpp"
 
 namespace toppic {

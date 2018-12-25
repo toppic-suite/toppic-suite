@@ -13,9 +13,9 @@
 //limitations under the License.
 
 
-#include "base/prot_mod.hpp"
+#include "common/base/prot_mod.hpp"
 #include "seq/fasta_reader.hpp"
-#include "util/file_util.hpp"
+#include "common/util/file_util.hpp"
 #include "thread/thread_pool.hpp"
 #include "spec/deconv_ms.hpp"
 #include "spec/spectrum_set.hpp"

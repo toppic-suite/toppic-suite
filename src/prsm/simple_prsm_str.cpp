@@ -15,7 +15,7 @@
 #include <string>
 #include <vector>
 
-#include "util/logger.hpp"
+#include "common/util/logger.hpp"
 #include "prsm/prsm_util.hpp"
 #include "prsm/simple_prsm_str.hpp"
 

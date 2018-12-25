@@ -18,7 +18,7 @@
 #include <vector>
 #include <set>
 
-#include "util/logger.hpp"
+#include "common/util/logger.hpp"
 #include "graph/spec_graph.hpp"
 
 namespace toppic {

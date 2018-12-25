@@ -16,8 +16,8 @@
 #include <string>
 #include <algorithm>
 
-#include "util/file_util.hpp"
-#include "xml/xml_dom_util.hpp"
+#include "common/util/file_util.hpp"
+#include "common/xml/xml_dom_util.hpp"
 #include "console/topmerge_argument.hpp"
 
 

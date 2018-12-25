@@ -20,9 +20,9 @@
 #include <algorithm>
 #include <vector>
 
-#include "util/str_util.hpp"
-#include "base/residue_util.hpp"
-#include "xml/xml_dom_util.hpp"
+#include "common/util/str_util.hpp"
+#include "common/base/residue_util.hpp"
+#include "common/xml/xml_dom_util.hpp"
 #include "seq/fasta_reader.hpp"
 #include "seq/proteoform_factory.hpp"
 #include "spec/peak.hpp"

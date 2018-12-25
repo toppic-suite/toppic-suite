@@ -12,11 +12,11 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include "util/logger.hpp"
-#include "util/version.hpp"
-#include "util/time_util.hpp"
-#include "util/str_util.hpp"
-#include "util/file_util.hpp"
+#include "common/util/logger.hpp"
+#include "common/util/version.hpp"
+#include "common/util/time_util.hpp"
+#include "common/util/str_util.hpp"
+#include "common/util/file_util.hpp"
 #include "spec/msalign_writer.hpp"
 #include "deconv/env/env_base.hpp"
 #include "deconv/env/match_env_util.hpp"

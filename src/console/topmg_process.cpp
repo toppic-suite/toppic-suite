@@ -17,11 +17,11 @@
 #include <algorithm>
 #include <vector>
 
-#include "util/version.hpp"
+#include "common/util/version.hpp"
 #include "seq/fasta_reader.hpp"
 #include "seq/fasta_util.hpp"
-#include "base/base_data.hpp"
-#include "util/file_util.hpp"
+#include "common/base/base_data.hpp"
+#include "common/util/file_util.hpp"
 
 #include "spec/msalign_reader.hpp"
 #include "spec/msalign_util.hpp"
