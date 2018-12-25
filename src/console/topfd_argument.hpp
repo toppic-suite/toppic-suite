@@ -13,22 +13,17 @@
 //limitations under the License.
 
 
-#ifndef PROT_DECONV_ARGUMENT_HPP_
-#define PROT_DECONV_ARGUMENT_HPP_
+#ifndef TOPPIC_CONSOLE_TOPFD_ARGUMENT_HPP_
+#define TOPPIC_CONSOLE_TOPFD_ARGUMENT_HPP_
 
-#include <map>
-#include <iostream>
-#include <fstream>
-#include <algorithm>
 #include <memory>
 #include <vector>
 #include <string>
+#include <map>
 
-#include "boost/program_options.hpp" 
+#include <boost/program_options.hpp> 
 
-#include "util/logger.hpp"
 #include "xml/xml_dom_document.hpp"
-#include "util/str_util.hpp"
 
 namespace toppic {
 
@@ -57,4 +52,4 @@ class Argument {
 
 }  // namespace toppic
 
-#endif /* ARGUMENT_HPP_ */
+#endif 

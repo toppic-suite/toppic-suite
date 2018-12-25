@@ -43,10 +43,10 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 message(STATUS "cmake cxx flags " ${CMAKE_CXX_FLAGS})
 
 # pwiz
-file(GLOB PWIZ_SRC ${CMAKE_CURRENT_SOURCE_DIR}/src/pwiz/utility/minimxml/*.cpp
-                   ${CMAKE_CURRENT_SOURCE_DIR}/src/pwiz/utility/misc/*.cpp
-                   ${CMAKE_CURRENT_SOURCE_DIR}/src/pwiz/data/common/*.cpp
-                   ${CMAKE_CURRENT_SOURCE_DIR}/src/pwiz/data/msdata/*.cpp)
+file(GLOB PWIZ_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/pwiz/utility/minimxml/*.cpp
+                    ${CMAKE_CURRENT_SOURCE_DIR}/src/pwiz/utility/misc/*.cpp
+                    ${CMAKE_CURRENT_SOURCE_DIR}/src/pwiz/data/common/*.cpp
+                    ${CMAKE_CURRENT_SOURCE_DIR}/src/pwiz/data/msdata/*.cpp)
 
 # hts
 file(GLOB HTS_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/htslib/*.c)
@@ -82,12 +82,13 @@ file(GLOB GRAPH_ALIGN_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/graphalign/*.cpp)
 # MCMC for topmg
 file(GLOB MCMC_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/mcmc/*.cpp)
 
-# topfd_main
+# Deconvoluation
 file(GLOB_RECURSE DECONV_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/deconv/*.cpp)
+
+# topfd_main
 file(GLOB TOPFD_PROC_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd_process.cpp)
-file(GLOB TOPFD_ARGU_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd_argument.cpp)
-file(GLOB TOPFD_MAIN_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd.cpp)
-file(GLOB TOPFD_TRAIN_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd_train.cpp)
+file(GLOB TOPFD_CONSOLE_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd_argument.cpp
+                               ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd.cpp)
 
 # toppic_main
 file(GLOB TOPPIC_ARGU_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_argument.cpp)
@@ -101,8 +102,8 @@ file(GLOB TOPMG_PROCESS_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmg_pro
 file(GLOB TOPMG_MAIN_SRC ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmg.cpp)
 
 # GUI
-file(GLOB TOPFD_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topfd/*.cpp)
-file(GLOB TOPFD_GUI_QRC   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topfd/*.qrc)
+file(GLOB TOPFD_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topfd/*.cpp
+                           ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topfd/*.qrc)
 file(GLOB TOPPIC_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/toppic/*.cpp)
 file(GLOB TOPPIC_GUI_QRC   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/toppic/*.qrc)
 file(GLOB TOPMG_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topmg/*.cpp)
@@ -122,11 +123,11 @@ file(GLOB TOPMERGE_ARGU_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmerge_
 file(GLOB TOPQUANT_MAIN_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topquant.cpp)
 file(GLOB TOPQUANT_ARGU_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topquant_argument.cpp)
 
-add_executable(topfd ${TOPFD_MAIN_SRCS} ${DECONV_SRCS} ${TOPFD_PROC_SRCS} ${TOPFD_ARGU_SRCS} 
-	${UTIL_SRCS} ${XML_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PWIZ_SRC})
+add_executable(topfd ${TOPFD_CONSOLE_SRCS} ${TOPFD_PROC_SRCS} ${DECONV_SRCS}  
+	${SPEC_SRCS} ${PWIZ_SRCS} ${UTIL_SRCS} ${XML_SRCS} ${BASE_SRCS})
 
-add_executable(topfd_gui ${TOPFD_GUI_SRCS} ${TOPFD_GUI_QRC} ${TOPFD_PROC_SRCS} ${DECONV_SRCS} 
-	${UTIL_SRCS} ${XML_SRCS} ${BASE_SRCS} ${SPEC_SRCS} ${PWIZ_SRC})
+add_executable(topfd_gui ${TOPFD_GUI_SRCS} ${TOPFD_PROC_SRCS} ${DECONV_SRCS} 
+	${SPEC_SRCS} ${PWIZ_SRCS} ${UTIL_SRCS} ${XML_SRCS} ${BASE_SRCS})
 
 add_executable(toppic ${TOPPIC_MAIN_SRCS} ${TOPPIC_PROCESS_SRCS}
   ${TOPPIC_ARGU_SRCS} ${HTS_SRCS} ${UTIL_SRCS} ${XML_SRCS} ${BASE_SRCS}
