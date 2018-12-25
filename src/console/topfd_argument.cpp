@@ -12,12 +12,10 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <iomanip>
-#include <string>
-#include <algorithm>
+#include <iostream>
 
+#include "util/logger.hpp"
 #include "util/file_util.hpp"
-#include "xml/xml_dom_util.hpp"
 #include "console/topfd_argument.hpp"
 
 namespace toppic {
