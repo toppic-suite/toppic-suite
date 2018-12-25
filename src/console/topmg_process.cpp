@@ -18,10 +18,11 @@
 #include <vector>
 
 #include "common/util/version.hpp"
+#include "common/util/file_util.hpp"
+#include "common/base/base_data.hpp"
+
 #include "seq/fasta_reader.hpp"
 #include "seq/fasta_util.hpp"
-#include "common/base/base_data.hpp"
-#include "common/util/file_util.hpp"
 
 #include "spec/msalign_reader.hpp"
 #include "spec/msalign_util.hpp"
@@ -43,9 +44,6 @@
 #include "prsm/simple_prsm_util.hpp"
 #include "prsm/simple_prsm.hpp"
 #include "prsm/simple_prsm_str_combine.hpp"
-
-#include "zeroptmfilter/zero_ptm_filter_mng.hpp"
-#include "zeroptmfilter/zero_ptm_filter_processor.hpp"
 
 #include "oneptmfilter/one_ptm_filter_mng.hpp"
 #include "oneptmfilter/one_ptm_filter_processor.hpp"
