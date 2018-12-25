@@ -15,6 +15,8 @@
 #ifndef TOPPIC_PRSM_SIMPLE_PRSM_XML_WRITER_HPP_
 #define TOPPIC_PRSM_SIMPLE_PRSM_XML_WRITER_HPP_
 
+#include <fstream>
+
 #include "prsm/simple_prsm.hpp"
 #include "prsm/simple_prsm_str.hpp"
 
@@ -45,6 +47,9 @@ class SimplePrsmXmlWriter {
 
   std::string file_name_;
 };
+
+typedef std::shared_ptr<SimplePrsmXmlWriter>   SimplePrsmXmlWriterPtr;
+typedef std::vector<SimplePrsmXmlWriterPtr>    SimplePrsmXmlWriterPtrVec;
 
 }  // namespace toppic
 

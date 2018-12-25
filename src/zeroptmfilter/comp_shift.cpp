@@ -324,35 +324,6 @@ void CompShift::compRevScores(const std::vector<std::pair<int, int>> &suff_mass_
   }
 }
 
-/*
-   void CompShift::compRevScores(const std::vector<std::pair<int,int>> &mass_errors,
-   std::vector<short> &rev_scores) {
-   int begin_index;
-   int end_index;
-   int m;
-   for(size_t i = 0; i < mass_errors.size(); i++){
-   m = mass_errors[i].first - mass_constant::getWaterMass() * scale_;
-//LOG_DEBUG("REV_SP MASS " << m);
-int left = m-mass_errors[i].second;
-//LOG_DEBUG("LEFT " << left);
-if(left < 0){
-left=0;
-}
-int right = m + mass_errors[i].second;
-//LOG_DEBUG("RIGHT " << right);
-if (right < 0 || right >= col_num_) {
-continue;
-}
-begin_index = rev_col_index_begins_[left];
-end_index= rev_col_index_ends_[right];
-//LOG_DEBUG("begin index " << begin_index << " end index " << end_index);
-for(int j=begin_index;j<=end_index;j++){
-rev_scores[rev_col_indexes_[j]]++;
-//LOG_DEBUG("REV ROW INDEX " << rev_col_indexes_[j] << " rev score " << rev_scores[rev_col_indexes_[j]]);
-}
-}
-}
-*/
 
 void CompShift::compZeroPtmConvolution(const std::vector<std::pair<int, int>> &pref_mass_errors,
                                        const std::vector<std::pair<int, int>> &suff_mass_errors,
@@ -575,5 +546,35 @@ inline void CompShift::findTopDiagScores(std::vector<short> &scores, int num) {
   addResults(top_diag_prots_, diag_scores, threshold, num);
   // LOG_DEBUG("top diag size " << top_diag_prots_.size());
 }
+
+/*
+   void CompShift::compRevScores(const std::vector<std::pair<int,int>> &mass_errors,
+   std::vector<short> &rev_scores) {
+   int begin_index;
+   int end_index;
+   int m;
+   for(size_t i = 0; i < mass_errors.size(); i++){
+   m = mass_errors[i].first - mass_constant::getWaterMass() * scale_;
+//LOG_DEBUG("REV_SP MASS " << m);
+int left = m-mass_errors[i].second;
+//LOG_DEBUG("LEFT " << left);
+if(left < 0){
+left=0;
+}
+int right = m + mass_errors[i].second;
+//LOG_DEBUG("RIGHT " << right);
+if (right < 0 || right >= col_num_) {
+continue;
+}
+begin_index = rev_col_index_begins_[left];
+end_index= rev_col_index_ends_[right];
+//LOG_DEBUG("begin index " << begin_index << " end index " << end_index);
+for(int j=begin_index;j<=end_index;j++){
+rev_scores[rev_col_indexes_[j]]++;
+//LOG_DEBUG("REV ROW INDEX " << rev_col_indexes_[j] << " rev score " << rev_scores[rev_col_indexes_[j]]);
+}
+}
+}
+*/
 
 } /* namespace toppic */

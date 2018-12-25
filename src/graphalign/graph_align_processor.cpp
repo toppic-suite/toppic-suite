@@ -18,7 +18,7 @@
 #include <vector>
 
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
-#include "thread/thread_pool.hpp"
+#include "common/thread/simple_thread_pool.hpp"
 #else
 #include <sys/wait.h>
 #endif
@@ -32,6 +32,7 @@
 #include "prsm/simple_prsm_reader.hpp"
 #include "prsm/simple_prsm_util.hpp"
 #include "prsm/simple_prsm_xml_writer.hpp"
+#include "prsm/simple_prsm_xml_writer_util.hpp"
 #include "graph/proteo_graph_reader.hpp"
 #include "graph/spec_graph_reader.hpp"
 #include "graphalign/graph_align.hpp"
@@ -184,10 +185,8 @@ void GraphAlignProcessor::process() {
   graph_filter_writer->write(selected_prsm_ptrs); 
   graph_filter_writer->close();
 
-  std::vector<std::shared_ptr<SimplePrsmXmlWriter> > simple_prsm_writer_vec;
-  for (int i = 0; i < mng_ptr_->thread_num_; i++) {
-    simple_prsm_writer_vec.push_back(std::make_shared<SimplePrsmXmlWriter>(input_file_name + "_" + str_util::toString(i)));
-  }
+  SimplePrsmXmlWriterPtrVec simple_prsm_writer_vec = 
+      simple_prsm_xml_writer_util::geneWriterPtrVec(input_file_name, mng_ptr_->thread_num_);
 
   int cnt = 0;
   simple_prsm_reader
@@ -200,9 +199,7 @@ void GraphAlignProcessor::process() {
     prsm_ptr = simple_prsm_reader->readOnePrsm();
   }
   simple_prsm_reader->close();
-  for (size_t i = 0; i < simple_prsm_writer_vec.size(); i++) {
-    simple_prsm_writer_vec[i]->close();
-  }
+  simple_prsm_xml_writer_util::closeWriterPtrVec(simple_prsm_writer_vec);
 
   FastaIndexReaderPtr reader_ptr = std::make_shared<FastaIndexReader>(db_file_name);
 
