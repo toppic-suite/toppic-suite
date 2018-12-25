@@ -16,10 +16,10 @@
 #include <algorithm>
 #include <vector>
 
+#include "common/util/file_util.hpp"
+#include "common/thread/simple_thread_pool.hpp"
 #include "seq/proteoform.hpp"
 #include "seq/proteoform_factory.hpp"
-#include "common/util/file_util.hpp"
-#include "thread/thread_pool.hpp"
 
 #include "spec/msalign_reader.hpp"
 #include "spec/msalign_writer.hpp"
@@ -199,17 +199,18 @@ void ZeroPtmFilterProcessor::processBlock(DbBlockPtr block_ptr) {
                                                         prsm_para_ptr->getFixModPtrVec());
   std::string block_str = str_util::toString(block_ptr->getBlockIdx());
 
-  std::vector<ThreadPtr> thread_vec;
+  ToppicThreadPtrVec thread_ptr_vec;
   for (int i = 1; i < mng_ptr_->thread_num_; i++) {
     ThreadPtr thread_ptr = std::make_shared<boost::thread>(geneTask(raw_forms, block_str, mng_ptr_, i));
-    thread_vec.push_back(thread_ptr);
+    ToppicThreadPtr toppic_thread_ptr = std::make_shared<ToppicThread>(i, thread_ptr);
+    thread_ptr_vec.push_back(toppic_thread_ptr);
   }
 
   std::function<void()> task = geneTask(raw_forms, block_str, mng_ptr_, 0);
   task();
 
-  for (size_t i = 0; i < thread_vec.size(); i++) {
-    if (thread_vec[i]->joinable()) thread_vec[i]->join();
+  for (size_t i = 0; i < thread_ptr_vec.size(); i++) {
+    if (thread_ptr_vec[i]->getThreadPtr()->joinable()) thread_ptr_vec[i]->getThreadPtr()->join();
   }
 
   std::cout << std::flush << "Non PTM filtering - processing " << spectrum_num
