@@ -1,27 +1,27 @@
-//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
+// Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
-//Licensed under the Apache License, Version 2.0 (the "License");
-//you may not use this file except in compliance with the License.
-//You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
 //    http://www.apache.org/licenses/LICENSE-2.0
 //
-//Unless required by applicable law or agreed to in writing, software
-//distributed under the License is distributed on an "AS IS" BASIS,
-//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//See the License for the specific language governing permissions and
-//limitations under the License.
-
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #ifndef PROT_SPEC_MSALIGN_READER_HPP_
 #define PROT_SPEC_MSALIGN_READER_HPP_
 
-#include <vector>
-#include <string>
-#include <iostream>
+#include <climits>
 #include <fstream>
+#include <iostream>
 #include <memory>
 #include <set>
+#include <string>
+#include <vector>
 
 #include "base/logger.hpp"
 #include "spec/deconv_ms.hpp"
@@ -33,18 +33,18 @@ class MsAlignReader {
  public:
   MsAlignReader(const std::string &file_name, int group_spec_num,
                 ActivationPtr act_ptr, const std::set<std::string> skip_list,
-                int peak_num_limit = 500):
-      file_name_(file_name),
-      group_spec_num_(group_spec_num),
-      activation_ptr_(act_ptr),
-      skip_list_(skip_list),
-      peak_num_limit_(peak_num_limit) {
-        input_.open(file_name.c_str(), std::ios::in);
-        if (!input_.is_open()) {
-          LOG_ERROR("msalign file  " << file_name << " does not exist.");
-          throw "msalign file does not exist.";
-        }
-      }
+                int peak_num_limit = std::numeric_limits<int>::max())
+      : file_name_(file_name),
+        group_spec_num_(group_spec_num),
+        activation_ptr_(act_ptr),
+        skip_list_(skip_list),
+        peak_num_limit_(peak_num_limit) {
+    input_.open(file_name.c_str(), std::ios::in);
+    if (!input_.is_open()) {
+      LOG_ERROR("msalign file  " << file_name << " does not exist.");
+      throw "msalign file does not exist.";
+    }
+  }
 
   std::vector<std::string> readOneSpectrum();
 
@@ -71,7 +71,7 @@ class MsAlignReader {
 
   std::set<std::string> skip_list_;
 
-  int peak_num_limit_;
+  int peak_num_limit_ = std::numeric_limits<int>::max();
 
   void readNext();
 };
