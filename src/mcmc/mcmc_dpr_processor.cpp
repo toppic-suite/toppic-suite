@@ -149,10 +149,10 @@ void DprProcessor::process() {
   PrsmPtr prsm_ptr = prsm_reader->readOnePrsm(fasta_reader_ptr, prsm_para_ptr->getFixModPtrVec());
 
   // no multi-spec support now
-  MsAlignReaderPtr sp_reader_ptr = std::make_shared<MsAlignReader>(sp_file_name,
-                                                                   1,  // prsm_para_ptr->getGroupSpecNum()
-                                                                   sp_para_ptr_->getActivationPtr(),
-                                                                   sp_para_ptr_->getSkipList());
+  MsAlignReaderPtr sp_reader_ptr = std::make_shared<MsAlignReader>(
+      sp_file_name,
+      1,  // prsm_para_ptr->getGroupSpecNum()
+      sp_para_ptr_->getActivationPtr(), sp_para_ptr_->getSkipList(), 500);
 
   int spectrum_num = msalign_util::getSpNum(sp_file_name);
 
