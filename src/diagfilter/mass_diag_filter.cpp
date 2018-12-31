@@ -19,9 +19,9 @@
 
 #include "spec/prm_ms.hpp"
 #include "prsm/simple_prsm_util.hpp"
-#include "zeroptmfilter/filter_protein.hpp"
-#include "zeroptmfilter/mass_match_factory.hpp"
-#include "zeroptmfilter/mass_match_util.hpp"
+#include "filter/massmatch/filter_protein.hpp"
+#include "filter/massmatch/mass_match_factory.hpp"
+#include "filter/massmatch/mass_match_util.hpp"
 #include "diagfilter/mass_diag_filter.hpp"
 
 namespace toppic {

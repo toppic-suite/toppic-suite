@@ -3,6 +3,7 @@
 /common/util/  	String utilities, file utilities, and etc
 /common/xml/   	Functions for handling xml files   
 /deconv/  	Spectral deconvolution and feature detection
+/filter/	Various filtering methods
 /htslib/  	Create fasta indexes and read fasta files
 /prsm/		proteoform spectrum matches and related functions
 /pwiz/    	Some code from ProteoWizard version for reading mzML and mzXML files

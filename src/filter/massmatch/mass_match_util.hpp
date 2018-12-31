@@ -12,15 +12,11 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#ifndef TOPPIC_FILTER_MASS_MATCH_MASS_MATCH_UTIL_HPP_
+#define TOPPIC_FILTER_MASS_MATCH_MASS_MATCH_UTIL_HPP_
 
-#ifndef ZERO_PTM_FILTER_MASS_MATCH_UTIL_HPP_
-#define ZERO_PTM_FILTER_MASS_MATCH_UTIL_HPP_
-
-#include <vector>
-#include <cmath>
-
-#include "zeroptmfilter/filter_protein.hpp"
-#include "zeroptmfilter/mass_match.hpp"
+#include "filter/massmatch/filter_protein.hpp"
+#include "filter/massmatch/mass_match.hpp"
 
 namespace toppic {
 

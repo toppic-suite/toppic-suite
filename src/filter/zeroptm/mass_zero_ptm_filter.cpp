@@ -12,18 +12,12 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#include <algorithm>
-#include <iostream>
-#include <utility>
-#include <vector>
-
 #include "common/util/logger.hpp"
 #include "seq/proteoform_util.hpp"
-#include "zeroptmfilter/filter_protein.hpp"
-#include "zeroptmfilter/mass_match_factory.hpp"
-#include "zeroptmfilter/mass_match_util.hpp"
-#include "zeroptmfilter/mass_zero_ptm_filter.hpp"
+#include "filter/massmatch/filter_protein.hpp"
+#include "filter/massmatch/mass_match_factory.hpp"
+#include "filter/massmatch/mass_match_util.hpp"
+#include "filter/zeroptm/mass_zero_ptm_filter.hpp"
 
 namespace toppic {
 
@@ -45,7 +39,7 @@ MassZeroPtmFilter::MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
   diag_index_ptr_ = MassMatchFactory::getPrmDiagMassMatchPtr(proteo_ptrs,
                                                              mng_ptr->max_proteoform_mass_,
                                                              mng_ptr->filter_scale_);
-  LOG_DEBUG("iag index");
+  LOG_DEBUG("diag index");
   std::vector<std::vector<double> > rev_shift_2d;
   std::vector<double> shift_1d(1, 0);
   for (size_t i = 0; i < proteo_ptrs.size(); i++) {

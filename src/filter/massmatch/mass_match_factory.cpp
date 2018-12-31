@@ -12,17 +12,10 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#include <iostream>
 #include <algorithm>
-#include <functional>
-#include <vector>
 
 #include "common/util/logger.hpp"
-#include "common/base/prot_mod.hpp"
-#include "common/base/prot_mod_util.hpp"
-#include "common/base/mass_constant.hpp"
-#include "zeroptmfilter/mass_match_factory.hpp"
+#include "filter/massmatch/mass_match_factory.hpp"
 
 namespace toppic {
 

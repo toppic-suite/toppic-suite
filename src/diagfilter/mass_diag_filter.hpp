@@ -20,7 +20,7 @@
 #include "seq/proteoform.hpp"
 #include "spec/prm_ms.hpp"
 #include "prsm/simple_prsm.hpp"
-#include "zeroptmfilter/mass_match.hpp"
+#include "filter/massmatch/mass_match.hpp"
 #include "diagfilter/diag_filter_mng.hpp"
 
 namespace toppic {

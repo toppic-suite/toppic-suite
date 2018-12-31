@@ -12,15 +12,17 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include <algorithm>
-#include <utility>
-#include <vector>
 
 #include "common/util/logger.hpp"
-#include "zeroptmfilter/filter_protein.hpp"
+#include "filter/massmatch/filter_protein.hpp"
 
 namespace toppic {
+
+FilterProtein::FilterProtein(int protein_id, int score):
+    protein_id_(protein_id),
+    score_(score) {
+    }
 
 inline bool cmpScore(const std::pair<int, int> &a, const std::pair<int, int> &b) {
   return a.second > b.second;

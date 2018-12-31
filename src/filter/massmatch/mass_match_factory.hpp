@@ -12,15 +12,11 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#ifndef ZERO_PTM_FILTER_MASS_MATCH_FACTORY_HPP_
-#define ZERO_PTM_FILTER_MASS_MATCH_FACTORY_HPP_
-
-#include <cmath>
+#ifndef TOPPIC_FILTER_MASS_MATCH_MASS_MATCH_FACTORY_HPP_
+#define TOPPIC_FILTER_MASS_MATCH_MASS_MATCH_FACTORY_HPP_
 
 #include "seq/proteoform.hpp"
-#include "common/base/base_data.hpp"
-#include "zeroptmfilter/mass_match.hpp"
+#include "filter/massmatch/mass_match.hpp"
 
 namespace toppic {
 
