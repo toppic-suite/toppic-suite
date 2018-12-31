@@ -12,32 +12,32 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef PROT_DIAG_FILTER_PROCESSOR_HPP_
-#define PROT_DIAG_FILTER_PROCESSOR_HPP_
+#ifndef TOPPIC_FILTER_DIAG_MASS_DIAG_FILTER_H_
+#define TOPPIC_FILTER_DIAG_MASS_DIAG_FILTER_H_
 
-#include "seq/db_block.hpp"
+#include "seq/proteoform.hpp"
+#include "spec/prm_ms.hpp"
 #include "prsm/simple_prsm.hpp"
-#include "diagfilter/diag_filter_mng.hpp"
-#include "diagfilter/mass_diag_filter.hpp"
+#include "filter/massmatch/mass_match.hpp"
+#include "filter/diag/diag_filter_mng.hpp"
 
 namespace toppic {
 
-class DiagFilterProcessor {
+class MassDiagFilter {
  public:
-  DiagFilterProcessor(DiagFilterMngPtr mng_ptr): mng_ptr_(mng_ptr) {};
+  MassDiagFilter(const ProteoformPtrVec &proteo_ptrs, DiagFilterMngPtr mng_ptr);
 
-  void process();
+  SimplePrsmPtrVec getBestMatch(const PrmMsPtrVec &ms_ptr_vec);
 
  private:
   DiagFilterMngPtr mng_ptr_;
+  ProteoformPtrVec proteo_ptrs_;
+  MassMatchPtr index_ptr_;
 
-  void processBlock(DbBlockPtr block_ptr, int total_block_num,
-                    const std::vector<double> & mod_mass_list);
-
+  SimplePrsmPtrVec compute(const PrmMsPtrVec &ms_ptr_vec);
 };
 
-typedef std::shared_ptr<DiagFilterProcessor> DiagFilterProcessorPtr;
+typedef std::shared_ptr<MassDiagFilter> MassDiagFilterPtr;
+} /* namespace toppic */
 
-}  // namespace toppic
-
-#endif /* PROT_DIAG_FILTER_PROCESSOR_HPP_ */
+#endif /* PROT_DIAG_FILTER_H_ */

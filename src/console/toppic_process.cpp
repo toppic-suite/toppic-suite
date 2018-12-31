@@ -50,8 +50,8 @@
 #include "oneptmsearch/ptm_search_mng.hpp"
 #include "oneptmsearch/one_ptm_search_processor.hpp"
 
-#include "diagfilter/diag_filter_mng.hpp"
-#include "diagfilter/diag_filter_processor.hpp"
+#include "filter/diag/diag_filter_mng.hpp"
+#include "filter/diag/diag_filter_processor.hpp"
 
 #include "ptmsearch/ptm_search_processor.hpp"
 

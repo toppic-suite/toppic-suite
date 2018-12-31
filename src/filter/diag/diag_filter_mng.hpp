@@ -12,10 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef PROT_DIAG_FILTER_MNG_HPP_
-#define PROT_DIAG_FILTER_MNG_HPP_
-
-#include <string>
+#ifndef TOPPIC_FILTER_DIAG_DIAG_FILTER_MNG_HPP_
+#define TOPPIC_FILTER_DIAG_DIAG_FILTER_MNG_HPP_
 
 #include "prsm/prsm_para.hpp"
 
@@ -28,13 +26,7 @@ class DiagFilterMng {
                 int thread_num,
                 const std::string &output_file_ext,
                 const std::string & residueModFileName = "",
-                int var_num = 0):
-      prsm_para_ptr_(prsm_para_ptr),
-      filter_result_num_(filtering_result_num),
-      thread_num_(thread_num),
-      output_file_ext_(output_file_ext),
-      residueModFileName_(residueModFileName),
-      var_num_(var_num) {}
+                int var_num = 0);
 
   PrsmParaPtr prsm_para_ptr_;
 
