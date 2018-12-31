@@ -48,8 +48,8 @@
 #include "filter/oneptm/one_ptm_filter_mng.hpp"
 #include "filter/oneptm/one_ptm_filter_processor.hpp"
 
-#include "diagfilter/diag_filter_mng.hpp"
-#include "diagfilter/diag_filter_processor.hpp"
+#include "filter/diag/diag_filter_mng.hpp"
+#include "filter/diag/diag_filter_processor.hpp"
 
 #include "graph/graph.hpp"
 #include "graph/proteo_graph.hpp"
