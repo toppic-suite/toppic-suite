@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_ANNO_PTM_HPP_
-#define PROT_ANNO_PTM_HPP_
+#ifndef TOPPIC_PRSM_VIEW_ANNO_PTM_HPP_
+#define TOPPIC_PRSM_VIEW_ANNO_PTM_HPP_
 
 #include <utility>
 #include <string>

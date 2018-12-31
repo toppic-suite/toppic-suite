@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef PROT_GUI_TOPMGWINDOW_H
-#define PROT_GUI_TOPMGWINDOW_H
+#ifndef TOPPIC_GUI_TOPMGWINDOW_H
+#define TOPPIC_GUI_TOPMGWINDOW_H
 
 #include <QMainWindow>
 #include <QMouseEvent>
@@ -114,4 +114,4 @@ class topmgWindow : public QMainWindow {
   bool ableToAdd(QString spfile);
 };
 
-#endif  // PROT_GUI_TOPMGWINDOW_H
+#endif  // TOPPIC_GUI_TOPMGWINDOW_H

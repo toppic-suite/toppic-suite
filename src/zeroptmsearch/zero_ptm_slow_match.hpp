@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef ZERO_PTM_SLOW_MATCH_HPP_
-#define ZERO_PTM_SLOW_MATCH_HPP_
+#ifndef TOPPIC_ZERO_PTM_SEARCH_ZERO_PTM_SLOW_MATCH_HPP_
+#define TOPPIC_ZERO_PTM_SEARCH_ZERO_PTM_SLOW_MATCH_HPP_
 
 #include "spec/deconv_peak.hpp"
 #include "spec/theo_peak.hpp"

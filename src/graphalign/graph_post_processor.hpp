@@ -13,8 +13,8 @@
 // limitations under the License.
 
 
-#ifndef PROT_GRAPH_POST_PROCESSOR_HPP_
-#define PROT_GRAPH_POST_PROCESSOR_HPP_
+#ifndef TOPPIC_GRAPH_ALIGN_GRAPH_POST_PROCESSOR_HPP_
+#define TOPPIC_GRAPH_ALIGN_GRAPH_POST_PROCESSOR_HPP_
 
 #include <unordered_map>
 #include <string>

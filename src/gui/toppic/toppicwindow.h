@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef PROT_GUI_TOPPICWINDOW_H
-#define PROT_GUI_TOPPICWINDOW_H
+#ifndef TOPPIC_GUI_TOPPICWINDOW_H
+#define TOPPIC_GUI_TOPPICWINDOW_H
 
 #include <vector>
 #include <map>
@@ -122,4 +122,4 @@ class toppicWindow : public QMainWindow {
   bool ableToAdd(QString spfile);
 };
 
-#endif  // PROT_GUI_TOPPICWINDOW_H
+#endif  // TOPPIC_GUI_TOPPICWINDOW_H

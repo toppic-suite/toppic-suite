@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_GRAPH_ALIGN_HPP_
-#define PROT_GRAPH_ALIGN_HPP_
+#ifndef TOPPIC_GRAPH_ALIGN_GRAPH_ALIGN_HPP_
+#define TOPPIC_GRAPH_ALIGN_GRAPH_ALIGN_HPP_
 
 #include "prsm/prsm.hpp"
 #include "oneptmsearch/diagonal_header.hpp"

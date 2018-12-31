@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef PROT_GUI_THREADTOPPIC_H
-#define PROT_GUI_THREADTOPPIC_H
+#ifndef TOPPIC_GUI_THREADTOPPIC_H
+#define TOPPIC_GUI_THREADTOPPIC_H
 
 
 #include <iostream>
@@ -62,4 +62,4 @@ class threadtoppic : public QThread {
   std::vector<std::string> spec_file_lst_;
 };
 
-#endif  // PROT_GUI_THREADTOPPIC_H
+#endif  // TOPPIC_GUI_THREADTOPPIC_H

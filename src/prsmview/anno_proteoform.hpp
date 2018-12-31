@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_ANNO_PROTEOFORM_HPP_
-#define PROT_ANNO_PROTEOFORM_HPP_
+#ifndef TOPPIC_PRSM_VIEW_ANNO_PROTEOFORM_HPP_
+#define TOPPIC_PRSM_VIEW_ANNO_PROTEOFORM_HPP_
 
 #include "common/xml/xml_dom_util.hpp"
 #include "seq/proteoform.hpp"
@@ -28,4 +28,4 @@ xercesc::DOMElement* geneAnnoProteoform(XmlDOMDocument* xml_doc, PrsmPtr prsm_pt
 
 }
 
-#endif /* PROT_ANNO_PROTEOFORM_HPP_ */
+#endif /* TOPPIC_PRSM_VIEW_ANNO_PROTEOFORM_HPP_ */

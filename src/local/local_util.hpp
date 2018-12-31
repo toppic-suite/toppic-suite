@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_LOCAL_UTIL_HPP_
-#define PROT_LOCAL_UTIL_HPP_
+#ifndef TOPPIC_LOCAL_UTIL_HPP_
+#define TOPPIC_LOCAL_UTIL_HPP_
 
 #include <vector>
 

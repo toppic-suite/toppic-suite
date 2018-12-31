@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_PS_ALIGN_HPP_
-#define PROT_PS_ALIGN_HPP_
+#ifndef TOPPIC_ONE_PTM_SEARCH_PS_ALIGN_HPP_
+#define TOPPIC_ONE_PTM_SEARCH_PS_ALIGN_HPP_
 
 #include <vector>
 

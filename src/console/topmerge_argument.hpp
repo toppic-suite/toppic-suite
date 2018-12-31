@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef PROT_TOPMERGE_ARGUMENT_HPP_
-#define PROT_TOPMERGE_ARGUMENT_HPP_
+#ifndef TOPPIC_TOPMERGE_ARGUMENT_HPP_
+#define TOPPIC_TOPMERGE_ARGUMENT_HPP_
 
 #include <map>
 #include <iostream>

@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef ZERO_PTM_FAST_MATCH_HPP_
-#define ZERO_PTM_FAST_MATCH_HPP_
+#ifndef TOPPIC_ZERO_PTM_SEARCH_ZERO_PTM_FAST_MATCH_HPP_
+#define TOPPIC_ZERO_PTM_SEARCH_ZERO_PTM_FAST_MATCH_HPP_
 
 #include <vector>
 

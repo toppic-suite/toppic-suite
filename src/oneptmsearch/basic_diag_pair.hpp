@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_BASIC_DIAG_PAIR_HPP_
-#define PROT_BASIC_DIAG_PAIR_HPP_
+#ifndef TOPPIC_ONE_PTM_SEARCH_BASIC_DIAG_PAIR_HPP_
+#define TOPPIC_ONE_PTM_SEARCH_BASIC_DIAG_PAIR_HPP_
 
 #include <memory>
 #include <vector>

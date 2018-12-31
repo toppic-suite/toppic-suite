@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_PTM_SEARCH_PAIR_HPP_
-#define PROT_PTM_SEARCH_PAIR_HPP_
+#ifndef TOPPIC_ONE_PTM_SEARCH_PTM_SEARCH_PAIR_HPP_
+#define TOPPIC_ONE_PTM_SEARCH_PTM_SEARCH_PAIR_HPP_
 
 #include <memory>
 

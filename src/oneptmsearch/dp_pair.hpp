@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_DP_PAIR_HPP_
-#define PROT_DP_PAIR_HPP_
+#ifndef TOPPIC_ONE_PTM_SEARCH_DP_PAIR_HPP_
+#define TOPPIC_ONE_PTM_SEARCH_DP_PAIR_HPP_
 
 #include "oneptmsearch/pair.hpp"
 #include "oneptmsearch/diagonal_header.hpp"

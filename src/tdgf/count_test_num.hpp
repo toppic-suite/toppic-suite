@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_COUNT_TEST_NUM_HPP_
-#define PROT_COUNT_TEST_NUM_HPP_
+#ifndef TOPPIC_TDGF_COUNT_TEST_NUM_HPP_
+#define TOPPIC_TDGF_COUNT_TEST_NUM_HPP_
 
 #include "seq/proteoform.hpp"
 #include "common/base/residue_freq.hpp"
