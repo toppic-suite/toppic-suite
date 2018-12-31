@@ -9,6 +9,8 @@ SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../bin)
 
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/../lib)
 
+SET(CMAKE_INSTALL_PREFIX $ENV{HOME}/toppic)
+
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++11 -O3 -DWITHOUT_MZ5 -fPIC")
 #SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -std=c++11 -O2 -pg -fPIC")
 message(STATUS "system name " ${CMAKE_SYSTEM_NAME})
@@ -247,6 +249,10 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 #    target_link_libraries(topfd_train xalan-c xerces-c boost_program_options
 #        boost_filesystem boost_system boost_thread boost_iostreams boost_chrono pthread z)
+
+#file(MAKE_DIRECTORY ${CMAKE_INSTALL_PREFIX}/usr/bin)
+install (TARGETS topfd toppic topmg DESTINATION ${CMAKE_INSTALL_PREFIX}/usr/bin/)
+install (DIRECTORY toppic_resources/ DESTINATION ${CMAKE_INSTALL_PREFIX}/etc/toppic)
 
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 
 
