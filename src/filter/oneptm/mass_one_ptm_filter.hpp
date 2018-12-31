@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef PROT_MASS_ONE_PTM_FILTER_H_
 #define PROT_MASS_ONE_PTM_FILTER_H_
 
@@ -20,7 +19,7 @@
 #include "spec/prm_ms.hpp"
 #include "prsm/simple_prsm.hpp"
 #include "filter/massmatch/mass_match.hpp"
-#include "oneptmfilter/one_ptm_filter_mng.hpp"
+#include "filter/oneptm/one_ptm_filter_mng.hpp"
 
 namespace toppic {
 

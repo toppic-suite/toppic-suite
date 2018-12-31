@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef PROT_SPEC_SPECTRUM_SET_HPP_
 #define PROT_SPEC_SPECTRUM_SET_HPP_
 
@@ -25,6 +24,7 @@ namespace toppic {
 
 class SpectrumSet;
 typedef std::shared_ptr<SpectrumSet> SpectrumSetPtr;
+typedef std::vector<SpectrumSetPtr> SpectrumSetPtrVec;
 
 class SpectrumSet {
  public:

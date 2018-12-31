@@ -12,11 +12,10 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef PROT_ONE_PTM_FILTER_MNG_HPP_
 #define PROT_ONE_PTM_FILTER_MNG_HPP_
 
-#include <string>
+#include <atomic>
 
 #include "prsm/prsm_para.hpp"
 
@@ -28,12 +27,7 @@ class OnePtmFilterMng {
                   const std::string & output_file_ext,
                   int thread_num,
                   const std::string & residueModFileName = "",
-                  int var_num = 0):
-      prsm_para_ptr_(prsm_para_ptr),
-      output_file_ext_(output_file_ext),
-      thread_num_(thread_num),
-      residueModFileName_(residueModFileName),
-      var_num_(var_num) {}
+                  int var_num = 0);
 
   PrsmParaPtr prsm_para_ptr_;
 
@@ -54,6 +48,9 @@ class OnePtmFilterMng {
   std::string residueModFileName_;
 
   int var_num_;
+
+  std::atomic<int> cnt_;
+  int n_spec_block_ = 0;
 };
 
 typedef std::shared_ptr<OnePtmFilterMng> OnePtmFilterMngPtr;

@@ -45,8 +45,8 @@
 #include "prsm/simple_prsm.hpp"
 #include "prsm/simple_prsm_str_combine.hpp"
 
-#include "oneptmfilter/one_ptm_filter_mng.hpp"
-#include "oneptmfilter/one_ptm_filter_processor.hpp"
+#include "filter/oneptm/one_ptm_filter_mng.hpp"
+#include "filter/oneptm/one_ptm_filter_processor.hpp"
 
 #include "diagfilter/diag_filter_mng.hpp"
 #include "diagfilter/diag_filter_processor.hpp"
