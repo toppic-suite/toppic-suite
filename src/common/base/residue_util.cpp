@@ -46,7 +46,9 @@ char replaceResidueLetter(char c) {
   } else if (c == 'J') {
     r = 'I';
   }
-  LOG_INFO("Found unknown amino acid " << c << " in protein sequences!");
+  if (r != c) {
+    LOG_INFO("Found unknown amino acid " << c << " in protein sequences!");
+  }
   return r;
 }
 
