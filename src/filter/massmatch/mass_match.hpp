@@ -12,16 +12,11 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#ifndef TOPPIC_FILTER_MASS_MATCH_MATCH_MATCH_HPP_
+#define TOPPIC_FILTER_MASS_MATCH_MATCH_MATCH_HPP_
 
-#ifndef ZERO_PTM_FILTER_MASS_MATCH_HPP_
-#define ZERO_PTM_FILTER_MASS_MATCH_HPP_
-
-#include <cmath>
-#include <utility>
+#include <memory>
 #include <vector>
-
-#include "seq/proteoform.hpp"
-#include "common/base/base_data.hpp"
 
 namespace toppic {
 
@@ -46,11 +41,11 @@ class MassMatch {
 
   static int getPrecursorMatchScore() {return 10000;}
 
-  std::vector<int>& getProteoRowBegins() {return proteo_row_begins_;}
+  const std::vector<int>& getProteoRowBegins() {return proteo_row_begins_;}
 
-  std::vector<int>& getProteoRowEnds() {return proteo_row_ends_;}
+  const std::vector<int>& getProteoRowEnds() {return proteo_row_ends_;}
 
-  std::vector<double>& getTruncShifts() {return trunc_shifts_;}
+  const std::vector<double>& getTruncShifts() {return trunc_shifts_;}
 
  private:
   double scale_;

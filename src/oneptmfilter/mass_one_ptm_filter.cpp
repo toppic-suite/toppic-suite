@@ -20,9 +20,9 @@
 
 #include "seq/proteoform_util.hpp"
 #include "spec/prm_ms.hpp"
-#include "zeroptmfilter/filter_protein.hpp"
-#include "zeroptmfilter/mass_match_factory.hpp"
-#include "zeroptmfilter/mass_match_util.hpp"
+#include "filter/massmatch/filter_protein.hpp"
+#include "filter/massmatch/mass_match_factory.hpp"
+#include "filter/massmatch/mass_match_util.hpp"
 #include "oneptmfilter/mass_one_ptm_filter.hpp"
 
 namespace toppic {

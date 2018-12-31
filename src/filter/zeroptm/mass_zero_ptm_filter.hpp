@@ -12,16 +12,13 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#ifndef TOPPIC_FILTER_ZERO_PTM_MASS_ZERO_PTM_FILTER_HPP_
+#define TOPPIC_FILTER_ZERO_PTM_MASS_ZERO_PTM_FILTER_HPP_
 
-#ifndef ZERO_PTM_FILTER_MASS_ZERO_PTM_FILTER_H_
-#define ZERO_PTM_FILTER_MASS_ZERO_PTM_FILTER_H_
-
-#include "seq/proteoform.hpp"
-#include "spec/extend_peak.hpp"
 #include "spec/extend_ms.hpp"
 #include "prsm/simple_prsm.hpp"
-#include "zeroptmfilter/zero_ptm_filter_mng.hpp"
-#include "zeroptmfilter/mass_match.hpp"
+#include "filter/massmatch/mass_match.hpp"
+#include "filter/zeroptm/zero_ptm_filter_mng.hpp"
 
 namespace toppic {
 

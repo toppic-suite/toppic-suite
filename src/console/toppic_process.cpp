@@ -40,8 +40,8 @@
 #include "prsm/prsm_form_filter.hpp"
 #include "prsm/prsm_util.hpp"
 
-#include "zeroptmfilter/zero_ptm_filter_mng.hpp"
-#include "zeroptmfilter/zero_ptm_filter_processor.hpp"
+#include "filter/zeroptm/zero_ptm_filter_mng.hpp"
+#include "filter/zeroptm/zero_ptm_filter_processor.hpp"
 #include "zeroptmsearch/zero_ptm_search_mng.hpp"
 #include "zeroptmsearch/zero_ptm_search_processor.hpp"
 

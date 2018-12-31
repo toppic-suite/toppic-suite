@@ -12,10 +12,10 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#ifndef TOPPIC_FILTER_ZERO_PTM_ZERO_PTM_FILTER_MNG_HPP_
+#define TOPPIC_FILTER_ZERO_PTM_ZERO_PTM_FILTER_MNG_HPP_
 
-
-#ifndef PROT_ZERO_PTM_FILTER_MNG_HPP_
-#define PROT_ZERO_PTM_FILTER_MNG_HPP_
+#include <atomic>
 
 #include "prsm/prsm_para.hpp"
 
@@ -25,10 +25,7 @@ class ZeroPtmFilterMng {
  public:
   ZeroPtmFilterMng(PrsmParaPtr prsm_para_ptr,
                    int thread_num,
-                   const std::string & output_file_ext):
-      prsm_para_ptr_(prsm_para_ptr),
-      thread_num_(thread_num),
-      output_file_ext_(output_file_ext) {}
+                   const std::string & output_file_ext);
 
   PrsmParaPtr prsm_para_ptr_;
 
@@ -43,11 +40,14 @@ class ZeroPtmFilterMng {
 
   int thread_num_ = 1;
 
+  std::atomic<int> cnt_;
+  int n_spec_block_ = 0;
+
   std::string output_file_ext_;
 };
 
 typedef std::shared_ptr<ZeroPtmFilterMng> ZeroPtmFilterMngPtr;
 
-} /* namespace tools */
+} 
 
-#endif /* ZERO_PTM_FILTER_MNG_HPP_ */
+#endif 

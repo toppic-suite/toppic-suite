@@ -12,13 +12,11 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#ifndef ZERO_PTM_FILTER_PROCESSOR_HPP_
-#define ZERO_PTM_FILTER_PROCESSOR_HPP_
+#ifndef TOPPIC_FILTER_ZERO_PTM_ZERO_PTM_FILTER_PROCESSOR_HPP_
+#define TOPPIC_FILTER_ZERO_PTM_ZERO_PTM_FILTER_PROCESSOR_HPP_
 
 #include "seq/db_block.hpp"
-#include "prsm/simple_prsm.hpp"
-#include "zeroptmfilter/zero_ptm_filter_mng.hpp"
+#include "filter/zeroptm/zero_ptm_filter_mng.hpp"
 
 namespace toppic {
 
@@ -30,7 +28,9 @@ class ZeroPtmFilterProcessor {
  private:
   ZeroPtmFilterMngPtr mng_ptr_;
 
-  void processBlock(DbBlockPtr block_ptr);
+  //void processBlock(DbBlockPtr block_ptr);
+
+  void combineBlockResults();
 };
 
 typedef std::shared_ptr<ZeroPtmFilterProcessor> ZeroPtmFilterProcessorPtr;

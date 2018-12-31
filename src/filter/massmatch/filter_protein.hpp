@@ -12,9 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#ifndef PROT_FILTER_PROTEIN_HPP_
-#define PROT_FILTER_PROTEIN_HPP_
+#ifndef TOPPIC_FILTER_MASS_MATCH_FILTER_PROTEIN_HPP_
+#define TOPPIC_FILTER_MASS_MATCH_FILTER_PROTEIN_HPP_
 
 #include <memory>
 #include <vector>
@@ -27,10 +26,7 @@ typedef std::vector<FilterProteinPtr> FilterProteinPtrVec;
 
 class FilterProtein {
  public:
-  FilterProtein(int protein_id, int score):
-      protein_id_(protein_id),
-      score_(score) {
-      }
+  FilterProtein(int protein_id, int score);
   int getProteinId() {return protein_id_;}
   int getScore() {return score_;}
   std::vector<double> getNTermShifts() {return n_term_shifts_;}
