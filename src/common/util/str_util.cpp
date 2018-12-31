@@ -29,7 +29,7 @@ namespace toppic {
 namespace str_util {
 
 void trim(std::string &s) {
-  str_util::trim(s);
+  boost::algorithm::trim(s);
 }
 
 std::vector<std::string> split(const std::string &s, const std::string &delim) {
@@ -45,11 +45,11 @@ std::string toString(bool value) {
 }
 
 std::string toString(int value) {
-  return str_util::toString(value);
+  return std::to_string(value);
 }
 
 std::string toString(size_t value) {
-  return str_util::toString(value);
+  return std::to_string(value);
 }
 
 

@@ -54,9 +54,9 @@ std::string DeconvProcess::getParameterStr(DeconvParaPtr para_ptr, const std::st
   output << prefix << std::setw(40) << std::left 
       << "Error tolerance: " << para_ptr->tolerance_ << " m/z" << std::endl;
   output << prefix << std::setw(40) << std::left 
-      << "MS1 Signal/noise ratio: " << para_ptr->ms_one_sn_ratio_ << std::endl;
+      << "MS1 signal/noise ratio: " << para_ptr->ms_one_sn_ratio_ << std::endl;
   output << prefix << std::setw(40) << std::left 
-      << "MS/MS Signal/noise ratio: " << para_ptr->ms_two_sn_ratio_ << std::endl;
+      << "MS/MS signal/noise ratio: " << para_ptr->ms_two_sn_ratio_ << std::endl;
   output << prefix << std::setw(40) << std::left 
       << "Precursor window size: " << para_ptr->prec_window_ << " m/z" << std::endl;
   //output << prefix << std::setw(40) << std::left 
@@ -141,6 +141,7 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr, RawMsReaderPtr reader_p
       deconv_ptr->setData(peak_list);
       deconv_ptr->run();
       MatchEnvPtrVec result_envs = deconv_ptr->getResult();
+      LOG_DEBUG("result num " << result_envs.size());
       DeconvMsPtr ms_ptr = match_env_util::getDeconvMsPtr(header_ptr, result_envs);
       msalign_writer::write(ms1_msalign_of, ms_ptr);
       if (para_ptr_->output_match_env_) {

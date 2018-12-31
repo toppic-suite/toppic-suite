@@ -15,6 +15,7 @@
 
 #include <ctime>
 
+#include "common/util/logger.hpp"
 #include "common/util/time_util.hpp"
 
 namespace toppic {
@@ -27,6 +28,8 @@ void addTimeStamp(std::string &para_str) {
   std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&cur_time));
   std::string time_str = buf;
 
+  LOG_DEBUG(para_str);
+  LOG_DEBUG(TIME_STAMP_STR);
   size_t pos = para_str.find(TIME_STAMP_STR);
   para_str.replace(pos, TIME_STAMP_STR.length(), time_str);
 }

@@ -51,13 +51,13 @@ void readHeaders(const std::string & file_name, MsHeaderPtrVec &header_ptr_vec) 
                           std::set<std::string>());
 
   DeconvMsPtr ms_ptr;
-  // LOG_DEBUG("Start search");
+  LOG_DEBUG("Start search");
   while ((ms_ptr = sp_reader.getNextMs()) != nullptr) {
     header_ptr_vec.push_back(ms_ptr->getMsHeaderPtr());
-    // std::cout << std::flush <<  "reading spectrum " << header_ptr_vec.size() << "\r";
+    std::cout << std::flush <<  "reading spectrum " << header_ptr_vec.size() << "\r";
   }
   sp_reader.close();
-  // std::cout << std::endl;
+  std::cout << std::endl;
 }
 
 void outputHeaders(const MsHeaderPtrVec &header_ptr_vec) {
@@ -270,7 +270,7 @@ void setFeatures(MsHeaderPtr2D &header_groups, const FeaturePtrVec &features) {
 void writeMSFT(const std::string & input_file_name,
                const std::string & output_file_name,
                const MsHeaderPtrVec &header_ptrs,
-               std::string &argu_str) {
+               std::string argu_str) {
   int sp_num_in_group = 1;
   MsAlignReader sp_reader(input_file_name, sp_num_in_group, nullptr, std::set<std::string>());
   std::ofstream of(output_file_name, std::ofstream::out);
@@ -318,12 +318,13 @@ void writeMSFT(const std::string & input_file_name,
 
 void process(std::string &sp_file_name, bool missing_level_one, 
              std::string &argu_str) {
+  //logger::setLogLevel(2);
   FeatureParaPtr para_ptr = std::make_shared<FeaturePara>();
   std::string base_name = file_util::basename(sp_file_name);
   // read ms1 deconvoluted spectra
   std::string ms1_file_name = base_name + "_ms1.msalign";
   DeconvMsPtrVec ms1_ptr_vec;
-  if (missing_level_one) readSpectra(ms1_file_name, ms1_ptr_vec);
+  if (!missing_level_one) readSpectra(ms1_file_name, ms1_ptr_vec);
   // read ms2 deconvoluted header
   LOG_DEBUG("start reading ms2");
   std::string ms2_file_name = base_name + "_ms2.msalign";

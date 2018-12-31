@@ -61,7 +61,7 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
     }
     mng_ptr->cnt_++;
     double perc = mng_ptr->cnt_ * 100.0 / mng_ptr->n_spec_block_;
-    std::cout << std::flush << "Non PTM filtering - processing " << std::setprecision(3) <<  perc << "%.\r";
+    std::cout << std::flush << "Non PTM filtering - processing " << std::setprecision(3) <<  perc << "%.    \r";
     spec_set_vec = reader.getNextSpectrumSet(sp_para_ptr);
   }
   reader.close();
@@ -88,7 +88,6 @@ void ZeroPtmFilterProcessor::process() {
   std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
   DbBlockPtrVec db_block_ptr_vec = DbBlock::readDbBlockIndex(db_file_name);
 
-  std::cout << "Non PTM filtering started " << std::endl;
   // cnt_ is thread_safe 
   mng_ptr_->cnt_ = 0;
   int spec_num = msalign_util::getSpNum(prsm_para_ptr->getSpectrumFileName());
@@ -96,6 +95,8 @@ void ZeroPtmFilterProcessor::process() {
   mng_ptr_->n_spec_block_ = spec_num * db_block_ptr_vec.size();
   SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(mng_ptr_->thread_num_);
   int block_num = db_block_ptr_vec.size();
+  //logger::setLogLevel(2);
+  LOG_DEBUG("thread num " << mng_ptr_->thread_num_);
   for (int i = 0; i < block_num; i++) {
     while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ * 2) {
       boost::this_thread::sleep(boost::posix_time::milliseconds(100));
@@ -103,8 +104,7 @@ void ZeroPtmFilterProcessor::process() {
     pool_ptr->Enqueue(geneTask(db_block_ptr_vec[i], mng_ptr_));
   }
   pool_ptr->ShutDown();
-  std::cout << "Non PTM filtering finished. " << std::endl;
-
+  std::cout << std::endl;
   std::cout << "Non PTM filtering - combining blocks started." << std::endl;
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
   std::string input_pref = mng_ptr_->output_file_ext_;

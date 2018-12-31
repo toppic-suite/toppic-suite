@@ -145,7 +145,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
 
     // Filter steps requires a large amount of memory. 
     // We use only one thread to reduce the memory requirement.
-    int filter_thread_num = 1;
+    //int filter_thread_num = 1;
 
     bool use_gf = true;
     if (arguments["useLookupTable"] == "true") {
@@ -169,7 +169,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
 
     std::cout << "Non PTM filtering - started." << std::endl;
     ZeroPtmFilterMngPtr zero_filter_mng_ptr
-        = std::make_shared<ZeroPtmFilterMng>(prsm_para_ptr, filter_thread_num, "toppic_zero_filter");
+        = std::make_shared<ZeroPtmFilterMng>(prsm_para_ptr, thread_num, "toppic_zero_filter");
     ZeroPtmFilterProcessorPtr zero_filter_processor
         = std::make_shared<ZeroPtmFilterProcessor>(zero_filter_mng_ptr);
     zero_filter_processor->process();
@@ -193,7 +193,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     if (ptm_num >= 1) {
       std::cout << "One PTM filtering - started." << std::endl;
       OnePtmFilterMngPtr one_ptm_filter_mng_ptr
-          = std::make_shared<OnePtmFilterMng>(prsm_para_ptr, "toppic_one_filter", filter_thread_num);
+          = std::make_shared<OnePtmFilterMng>(prsm_para_ptr, "toppic_one_filter", thread_num);
       OnePtmFilterProcessorPtr one_filter_processor
           = std::make_shared<OnePtmFilterProcessor>(one_ptm_filter_mng_ptr);
       one_filter_processor->process();

@@ -26,7 +26,6 @@ int TopFDProcess(std::map<std::string, std::string> arguments) {
     time_t start = time(0);
 
     base_data::init(arguments["resourceDir"]);
-
     DeconvParaPtr para_ptr = std::make_shared<DeconvPara>(arguments);
     LOG_DEBUG("deconv para");
     DeconvProcess process(para_ptr);

@@ -45,7 +45,7 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
                        prsm_para_ptr->getSpParaPtr()->getActivationPtr(),
                        prsm_para_ptr->getSpParaPtr()->getSkipList());
   std::string output_file_name = file_util::basename(prsm_para_ptr->getSpectrumFileName())
-      + "." + mng_ptr->output_file_ext_;
+      + "." + mng_ptr->output_file_ext_ + "_" + block_str;
   SimplePrsmXmlWriterSet writers(output_file_name);
 
   SpectrumSetPtrVec spec_set_vec = reader.getNextSpectrumSet(sp_para_ptr);
@@ -79,7 +79,7 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
     }
     mng_ptr->cnt_++;
     double perc = mng_ptr->cnt_ * 100.0 / mng_ptr->n_spec_block_;
-    std::cout << std::flush << "Non PTM filtering - processing " << std::setprecision(3) <<  perc << "%.\r";
+    std::cout << std::flush << "One PTM filtering - processing " << std::setprecision(3) <<  perc << "%.     \r";
     spec_set_vec = reader.getNextSpectrumSet(sp_para_ptr);
   }
   reader.close();
@@ -112,7 +112,6 @@ void OnePtmFilterProcessor::process() {
     mod_mass_list = mod_util::getModMassVec(mod_util::readModTxt(mng_ptr_->residueModFileName_)[2]);
   }
 
-  std::cout << "One PTM filtering started " << std::endl;
   // cnt_ is thread_safe 
   mng_ptr_->cnt_ = 0;
   int spec_num = msalign_util::getSpNum(prsm_para_ptr->getSpectrumFileName());
@@ -127,7 +126,7 @@ void OnePtmFilterProcessor::process() {
     pool_ptr->Enqueue(geneTask(db_block_ptr_vec[i], mod_mass_list, mng_ptr_));
   }
   pool_ptr->ShutDown();
-  std::cout << "One PTM filtering finished. " << std::endl;
+  std::cout << std::endl;
 
   std::cout << "One PTM filtering - combining blocks started." << std::endl;
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();

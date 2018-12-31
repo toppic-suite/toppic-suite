@@ -82,6 +82,7 @@ void MsAlignReader::readNext() {
   int feature_id = -1;
   double feature_inte = -1;
   std::vector<std::string> strs;
+
   for (size_t i = 1; i < spectrum_str_vec_.size() - 1; i++) {
     std::string letter = spectrum_str_vec_[i].substr(0, 1);
     if (letter >= "A" && letter <= "Z") {
@@ -187,6 +188,7 @@ void MsAlignReader::readNext() {
   deconv_ms_ptr_ = std::make_shared<Ms<DeconvPeakPtr> >(header_ptr, peak_ptr_list);
 
   current_++;
+
 }
 
 DeconvMsPtr MsAlignReader::getNextMs() {
