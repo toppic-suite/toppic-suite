@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef PROT_SPEC_SPECTRUM_SET_HPP_
-#define PROT_SPEC_SPECTRUM_SET_HPP_
+#ifndef TOPPIC_SPEC_SPECTRUM_SET_HPP_
+#define TOPPIC_SPEC_SPECTRUM_SET_HPP_
 
 #include "spec/deconv_ms.hpp"
 #include "spec/extend_ms.hpp"

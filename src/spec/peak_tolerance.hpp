@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_SPEC_PEAK_TOLERANCE_HPP_
-#define PROT_SPEC_PEAK_TOLERANCE_HPP_
+#ifndef TOPPIC_SPEC_PEAK_TOLERANCE_HPP_
+#define TOPPIC_SPEC_PEAK_TOLERANCE_HPP_
 
 #include <string>
 #include <memory>

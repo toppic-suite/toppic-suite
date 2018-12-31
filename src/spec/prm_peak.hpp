@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_SPEC_PRM_PEAK_HPP_
-#define PROT_SPEC_PRM_PEAK_HPP_
+#ifndef TOPPIC_SPEC_PRM_PEAK_HPP_
+#define TOPPIC_SPEC_PRM_PEAK_HPP_
 
 #include "spec/deconv_peak.hpp"
 #include "spec/support_peak.hpp"

@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_SPEC_MSALIGN_READER_HPP_
-#define PROT_SPEC_MSALIGN_READER_HPP_
+#ifndef TOPPIC_SPEC_MSALIGN_READER_HPP_
+#define TOPPIC_SPEC_MSALIGN_READER_HPP_
 
 #include <fstream>
 #include <set>

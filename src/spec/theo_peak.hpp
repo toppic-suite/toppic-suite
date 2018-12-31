@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef PROT_SPEC_THEO_PEAK_HPP_
-#define PROT_SPEC_THEO_PEAK_HPP_
+#ifndef TOPPIC_SPEC_THEO_PEAK_HPP_
+#define TOPPIC_SPEC_THEO_PEAK_HPP_
 
 #include "common/base/ion.hpp"
 #include "spec/peak.hpp"

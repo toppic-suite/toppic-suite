@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_SPEC_PRM_PEAK_FACTORY_HPP_
-#define PROT_SPEC_PRM_PEAK_FACTORY_HPP_
+#ifndef TOPPIC_SPEC_PRM_PEAK_FACTORY_HPP_
+#define TOPPIC_SPEC_PRM_PEAK_FACTORY_HPP_
 
 #include "spec/peak_tolerance.hpp"
 #include "spec/prm_peak.hpp"
