@@ -12,29 +12,27 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_FILTER_ZERO_PTM_ZERO_PTM_FILTER_PROCESSOR_HPP_
-#define TOPPIC_FILTER_ZERO_PTM_ZERO_PTM_FILTER_PROCESSOR_HPP_
+#ifndef ONE_PTM_FILTER_PROCESSOR_HPP_
+#define ONE_PTM_FILTER_PROCESSOR_HPP_
 
 #include "seq/db_block.hpp"
-#include "filter/zeroptm/zero_ptm_filter_mng.hpp"
+#include "filter/oneptm/one_ptm_filter_mng.hpp"
 
 namespace toppic {
 
-class ZeroPtmFilterProcessor {
+class OnePtmFilterProcessor {
  public:
-  explicit ZeroPtmFilterProcessor(ZeroPtmFilterMngPtr mng_ptr): mng_ptr_(mng_ptr) {}
+  explicit OnePtmFilterProcessor(OnePtmFilterMngPtr mng_ptr): mng_ptr_(mng_ptr) {}
   void process();
 
  private:
-  ZeroPtmFilterMngPtr mng_ptr_;
+  OnePtmFilterMngPtr mng_ptr_;
 
-  //void processBlock(DbBlockPtr block_ptr);
-
-  //void combineBlockResults();
+  void processBlock(DbBlockPtr block_ptr, const std::vector<double> & mod_mass_list);
 };
 
-typedef std::shared_ptr<ZeroPtmFilterProcessor> ZeroPtmFilterProcessorPtr;
+typedef std::shared_ptr<OnePtmFilterProcessor> OnePtmFilterProcessorPtr;
 
-} /* namespace toppic */
+}  // namespace toppic
 
-#endif /* ZERO_PTM_FILTER_PROCESSOR_HPP_ */
+#endif /* PTM_FAST_FILTER_PROCESSOR_HPP_ */

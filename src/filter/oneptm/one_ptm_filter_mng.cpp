@@ -12,31 +12,20 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#ifndef ONE_PTM_FILTER_PROCESSOR_HPP_
-#define ONE_PTM_FILTER_PROCESSOR_HPP_
-
-#include <vector>
-
-#include "seq/db_block.hpp"
-#include "prsm/simple_prsm.hpp"
-#include "oneptmfilter/one_ptm_filter_mng.hpp"
+#include "filter/oneptm/one_ptm_filter_mng.hpp"
 
 namespace toppic {
 
-class OnePtmFilterProcessor {
- public:
-  explicit OnePtmFilterProcessor(OnePtmFilterMngPtr mng_ptr): mng_ptr_(mng_ptr) {}
-  void process();
-
- private:
-  OnePtmFilterMngPtr mng_ptr_;
-
-  void processBlock(DbBlockPtr block_ptr, const std::vector<double> & mod_mass_list);
-};
-
-typedef std::shared_ptr<OnePtmFilterProcessor> OnePtmFilterProcessorPtr;
+OnePtmFilterMng::OnePtmFilterMng(PrsmParaPtr prsm_para_ptr,
+                                 const std::string & output_file_ext,
+                                 int thread_num,
+                                 const std::string & residueModFileName,
+                                 int var_num):
+    prsm_para_ptr_(prsm_para_ptr),
+    output_file_ext_(output_file_ext),
+    thread_num_(thread_num),
+    residueModFileName_(residueModFileName),
+    var_num_(var_num) {}
 
 }  // namespace toppic
 
-#endif /* PTM_FAST_FILTER_PROCESSOR_HPP_ */

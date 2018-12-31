@@ -33,7 +33,21 @@ class SimplePrsmStrCombine {
                        int in_num,
                        const std::string &out_file_ext,
                        int top_num);
+
+  SimplePrsmStrCombine(const std::string &spec_file_name,
+                       const std::string &in_file_pref,
+                       const std::string &in_file_suff,
+                       int in_num,
+                       const std::string &out_file_ext,
+                       int top_num);
   void process();
+
+  static void combineBlockResults(std::string &sp_file_name, 
+                                  std::string &input_pref,
+                                  int block_num, 
+                                  int comp_num, 
+                                  int pref_suff_num,
+                                  int inte_num);
 
  private:
   std::string spec_file_name_;

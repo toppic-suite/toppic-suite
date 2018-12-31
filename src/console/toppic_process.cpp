@@ -45,8 +45,8 @@
 #include "zeroptmsearch/zero_ptm_search_mng.hpp"
 #include "zeroptmsearch/zero_ptm_search_processor.hpp"
 
-#include "oneptmfilter/one_ptm_filter_mng.hpp"
-#include "oneptmfilter/one_ptm_filter_processor.hpp"
+#include "filter/oneptm/one_ptm_filter_mng.hpp"
+#include "filter/oneptm/one_ptm_filter_processor.hpp"
 #include "oneptmsearch/ptm_search_mng.hpp"
 #include "oneptmsearch/one_ptm_search_processor.hpp"
 

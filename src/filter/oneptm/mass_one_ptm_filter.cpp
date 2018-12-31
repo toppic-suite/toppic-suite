@@ -12,18 +12,12 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#include <algorithm>
-#include <iostream>
-#include <utility>
-#include <vector>
-
 #include "seq/proteoform_util.hpp"
 #include "spec/prm_ms.hpp"
 #include "filter/massmatch/filter_protein.hpp"
 #include "filter/massmatch/mass_match_factory.hpp"
 #include "filter/massmatch/mass_match_util.hpp"
-#include "oneptmfilter/mass_one_ptm_filter.hpp"
+#include "filter/oneptm/mass_one_ptm_filter.hpp"
 
 namespace toppic {
 
