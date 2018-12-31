@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_XML_GENERATOR_HPP_
-#define PROT_XML_GENERATOR_HPP_
+#ifndef TOPPIC_PRSM_VIEW_XML_GENERATOR_HPP_
+#define TOPPIC_PRSM_VIEW_XML_GENERATOR_HPP_
 
 #include <map>
 #include <string>
@@ -83,4 +83,4 @@ typedef std::shared_ptr<XmlGenerator> XmlGeneratorPtr;
 
 }  // namespace toppic
 
-#endif /* PROT_XML_GENERATOR_HPP_ */
+#endif /* TOPPIC_PRSM_VIEW_XML_GENERATOR_HPP_ */

@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_SPEC_GRAPH_HPP_
-#define PROT_SPEC_GRAPH_HPP_
+#ifndef TOPPIC_GRAPH_SPEC_GRAPH_HPP_
+#define TOPPIC_GRAPH_SPEC_GRAPH_HPP_
 
 #include <vector>
 

@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_TOPPIC_ARGUMENT_HPP_
-#define PROT_TOPPIC_ARGUMENT_HPP_
+#ifndef TOPPIC_TOPPIC_ARGUMENT_HPP_
+#define TOPPIC_TOPPIC_ARGUMENT_HPP_
 
 #include <map>
 #include <iostream>

@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef PROT_COMP_PVALUE_MCMC_HPP_
-#define PROT_COMP_PVALUE_MCMC_HPP_
+#ifndef TOPPIC_COMP_PVALUE_MCMC_HPP_
+#define TOPPIC_COMP_PVALUE_MCMC_HPP_
 
 #include <random>
 #include <map>

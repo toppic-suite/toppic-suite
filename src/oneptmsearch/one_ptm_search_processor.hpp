@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_ONE_PTM_SEARCH_HPP_
-#define PROT_ONE_PTM_SEARCH_HPP_
+#ifndef TOPPIC_ONE_PTM_SEARCH_ONE_PTM_SEARCH_HPP_
+#define TOPPIC_ONE_PTM_SEARCH_ONE_PTM_SEARCH_HPP_
 
 #include "spec/spectrum_set.hpp"
 #include "prsm/prsm.hpp"

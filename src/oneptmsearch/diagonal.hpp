@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_DIAGONAL_HPP_
-#define PROT_DIAGONAL_HPP_
+#ifndef TOPPIC_ONE_PTM_SEARCH_DIAGONAL_HPP_
+#define TOPPIC_ONE_PTM_SEARCH_DIAGONAL_HPP_
 
 #include <memory>
 #include <vector>

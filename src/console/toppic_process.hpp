@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef PROT_TOPPIC_PROCESS_HPP
-#define PROT_TOPPIC_PROCESS_HPP
+#ifndef TOPPIC_TOPPIC_PROCESS_HPP
+#define TOPPIC_TOPPIC_PROCESS_HPP
 
 #include <string>
 #include <map>

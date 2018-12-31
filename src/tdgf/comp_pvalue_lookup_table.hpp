@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_COMP_PVALUE_LOOKUP_TABLE_HPP_
-#define PROT_COMP_PVALUE_LOOKUP_TABLE_HPP_
+#ifndef TOPPIC_TDGF_COMP_PVALUE_LOOKUP_TABLE_HPP_
+#define TOPPIC_TDGF_COMP_PVALUE_LOOKUP_TABLE_HPP_
 
 #include <vector>
 #include <fstream>

@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_DIST_HPP_
-#define PROT_DIST_HPP_
+#ifndef TOPPIC_GRAPH_DIST_HPP_
+#define TOPPIC_GRAPH_DIST_HPP_
 
 #include <utility>
 #include <set>

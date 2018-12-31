@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_COMP_PROB_VALUE_HPP_
-#define PROT_COMP_PROB_VALUE_HPP_
+#ifndef TOPPIC_TDGF_COMP_PROB_VALUE_HPP_
+#define TOPPIC_TDGF_COMP_PROB_VALUE_HPP_
 
 #include <vector>
 

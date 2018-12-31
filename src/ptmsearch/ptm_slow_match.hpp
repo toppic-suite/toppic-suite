@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_PTM_SLOW_MATCH_HPP_
-#define PROT_PTM_SLOW_MATCH_HPP_
+#ifndef TOPPIC_PTM_SEARCH_PTM_SLOW_MATCH_HPP_
+#define TOPPIC_PTM_SEARCH_PTM_SLOW_MATCH_HPP_
 
 #include <memory>
 #include <vector>

@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_PTM_SEARCH_SLOW_FILTER_HPP_
-#define PROT_PTM_SEARCH_SLOW_FILTER_HPP_
+#ifndef TOPPIC_PTM_SEARCH_PTM_SEARCH_SLOW_FILTER_HPP_
+#define TOPPIC_PTM_SEARCH_PTM_SEARCH_SLOW_FILTER_HPP_
 
 #include <memory>
 

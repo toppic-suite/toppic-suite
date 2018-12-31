@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_ANNO_RESIDUE_HPP_
-#define PROT_ANNO_RESIDUE_HPP_
+#ifndef TOPPIC_PRSM_VIEW_ANNO_RESIDUE_HPP_
+#define TOPPIC_PRSM_VIEW_ANNO_RESIDUE_HPP_
 
 #include <string>
 #include <vector>
@@ -75,4 +75,4 @@ typedef std::vector<AnnoResiduePtr> AnnoResiduePtrVec;
 
 }  // namespace toppic
 
-#endif /* PROT_ANNO_RESIDUE_HPP_ */
+#endif /* TOPPIC_PRSM_VIEW_ANNO_RESIDUE_HPP_ */

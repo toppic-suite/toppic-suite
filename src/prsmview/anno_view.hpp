@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_ANNO_VIEW_HPP_
-#define PROT_ANNO_VIEW_HPP_
+#ifndef TOPPIC_PRSM_VIEW_ANNO_VIEW_HPP_
+#define TOPPIC_PRSM_VIEW_ANNO_VIEW_HPP_
 
 #include <map>
 #include <string>
@@ -61,4 +61,4 @@ void writeProteinToXml(XmlWriterPtr xml_writer,
 
 }  // namespace toppic
 
-#endif /* PROT_ANNO_VIEW_HPP_ */
+#endif /* TOPPIC_PRSM_VIEW_ANNO_VIEW_HPP_ */

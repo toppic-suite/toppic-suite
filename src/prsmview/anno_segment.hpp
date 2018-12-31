@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_ANNO_SEGMENT_HPP_
-#define PROT_ANNO_SEGMENT_HPP_
+#ifndef TOPPIC_PRSM_VIEW_ANNO_SEGMENT_HPP_
+#define TOPPIC_PRSM_VIEW_ANNO_SEGMENT_HPP_
 
 
 #include <utility>

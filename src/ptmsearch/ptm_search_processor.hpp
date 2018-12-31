@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_PTM_SEARCH_PROCESSOR_HPP_
-#define PROT_PTM_SEARCH_PROCESSOR_HPP_
+#ifndef TOPPIC_PTM_SEARCH_PTM_SEARCH_PROCESSOR_HPP_
+#define TOPPIC_PTM_SEARCH_PTM_SEARCH_PROCESSOR_HPP_
 
 #include "seq/fasta_index_reader.hpp"
 #include "seq/proteoform.hpp"

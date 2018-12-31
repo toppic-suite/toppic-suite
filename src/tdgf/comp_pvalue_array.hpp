@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_COMP_PVALUE_ARRAY_HPP_
-#define PROT_COMP_PVALUE_ARRAY_HPP_
+#ifndef TOPPIC_TDGF_COMP_PVALUE_ARRAY_HPP_
+#define TOPPIC_TDGF_COMP_PVALUE_ARRAY_HPP_
 
 #include "spec/spectrum_set.hpp"
 #include "tdgf/tdgf_mng.hpp"

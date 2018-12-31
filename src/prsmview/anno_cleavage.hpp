@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_ANNO_CLEAVAGE_HPP_
-#define PROT_ANNO_CLEAVAGE_HPP_
+#ifndef TOPPIC_PRSM_VIEW_ANNO_CLEAVAGE_HPP_
+#define TOPPIC_PRSM_VIEW_ANNO_CLEAVAGE_HPP_
 
 #include <string>
 #include <vector>
@@ -81,4 +81,4 @@ typedef std::vector<AnnoCleavagePtr> AnnoCleavagePtrVec;
 AnnoCleavagePtrVec getProteoCleavage(PrsmPtr prsm_ptr, double min_mass);
 } /* namespace toppic */
 
-#endif /* PROT_ANNO_CLEAVAGE_HPP_ */
+#endif /* TOPPIC_PRSM_VIEW_ANNO_CLEAVAGE_HPP_ */

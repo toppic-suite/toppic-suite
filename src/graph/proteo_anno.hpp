@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_PROTEO_ANNO_HPP_
-#define PROT_PROTEO_ANNO_HPP_
+#ifndef TOPPIC_GRAPH_PROTEO_ANNO_HPP_
+#define TOPPIC_GRAPH_PROTEO_ANNO_HPP_
 
 #include <iostream>
 #include <string>

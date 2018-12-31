@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_GUI_THREADTOPFD_H
-#define PROT_GUI_THREADTOPFD_H
+#ifndef TOPPIC_GUI_THREADTOPFD_H
+#define TOPPIC_GUI_THREADTOPFD_H
 
 #include <map>
 #include <string>

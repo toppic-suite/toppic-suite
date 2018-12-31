@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_EVALUE_PROCESSOR_HPP_
-#define PROT_EVALUE_PROCESSOR_HPP_
+#ifndef TOPPIC_TDGF_EVALUE_PROCESSOR_HPP_
+#define TOPPIC_TDGF_EVALUE_PROCESSOR_HPP_
 
 #include "seq/proteoform.hpp"
 #include "prsm/prsm.hpp"

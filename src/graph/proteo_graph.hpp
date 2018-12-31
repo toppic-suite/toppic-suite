@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_PROTEO_GRAPH_HPP_
-#define PROT_PROTEO_GRAPH_HPP_
+#ifndef TOPPIC_GRAPH_PROTEO_GRAPH_HPP_
+#define TOPPIC_GRAPH_PROTEO_GRAPH_HPP_
 
 #include "seq/fasta_seq.hpp"
 #include "seq/proteoform.hpp"

@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef PROT_TOPMERGE_PROCESS_HPP
-#define PROT_TOPMERGE_PROCESS_HPP
+#ifndef TOPPIC_TOPMERGE_PROCESS_HPP
+#define TOPPIC_TOPMERGE_PROCESS_HPP
 
 #include <string>
 #include <map>

@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_PS_ALIGN_PARA_HPP_
-#define PROT_PS_ALIGN_PARA_HPP_
+#ifndef TOPPIC_ONE_PTM_SEARCH_PS_ALIGN_PARA_HPP_
+#define TOPPIC_ONE_PTM_SEARCH_PS_ALIGN_PARA_HPP_
 
 #include "prsm/prsm_para.hpp"
 

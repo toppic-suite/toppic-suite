@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_PROTEO_GRAPH_READER_HPP_
-#define PROT_PROTEO_GRAPH_READER_HPP_
+#ifndef TOPPIC_GRAPH_PROTEO_GRAPH_READER_HPP_
+#define TOPPIC_GRAPH_PROTEO_GRAPH_READER_HPP_
 
 #include <string>
 

@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef PROT_MCMC_MASS_TABLE_UTIL_HPP_
-#define PROT_MCMC_MASS_TABLE_UTIL_HPP_
+#ifndef TOPPIC_MCMC_MASS_TABLE_UTIL_HPP_
+#define TOPPIC_MCMC_MASS_TABLE_UTIL_HPP_
 
 #include <vector>
 #include <set>

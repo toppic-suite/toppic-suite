@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_TDGF_UTIL_HPP_
-#define PROT_TDGF_UTIL_HPP_
+#ifndef TOPPIC_TDGF_TDGF_UTIL_HPP_
+#define TOPPIC_TDGF_TDGF_UTIL_HPP_
 
 #include <vector>
 #include <string>

@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_MCMC_MNG_HPP_
-#define PROT_MCMC_MNG_HPP_
+#ifndef TOPPIC_MCMC_MNG_HPP_
+#define TOPPIC_MCMC_MNG_HPP_
 
 #include <cmath>
 
