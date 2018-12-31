@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef PROT_MASS_ONE_PTM_FILTER_H_
-#define PROT_MASS_ONE_PTM_FILTER_H_
+#ifndef TOPPIC_FILTER_ONE_PTM_MASS_ONE_PTM_FILTER_H_
+#define TOPPIC_FILTER_ONE_PTM_MASS_ONE_PTM_FILTER_H_
 
 #include "seq/proteoform.hpp"
 #include "spec/prm_ms.hpp"

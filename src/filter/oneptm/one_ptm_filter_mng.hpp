@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef PROT_ONE_PTM_FILTER_MNG_HPP_
-#define PROT_ONE_PTM_FILTER_MNG_HPP_
+#ifndef TOPPIC_FILTER_ONE_PTM_ONE_PTM_FILTER_MNG_HPP_
+#define TOPPIC_FILTER_ONE_PTM_ONE_PTM_FILTER_MNG_HPP_
 
 #include <atomic>
 

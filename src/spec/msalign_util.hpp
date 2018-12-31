@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_SPEC_MSALIGN_UTIL_HPP_
-#define PROT_SPEC_MSALIGN_UTIL_HPP_
+#ifndef TOPPIC_SPEC_MSALIGN_UTIL_HPP_
+#define TOPPIC_SPEC_MSALIGN_UTIL_HPP_
 
 #include "spec/sp_para.hpp"
 #include "spec/msalign_reader.hpp"

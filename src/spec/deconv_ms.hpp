@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_SPEC_DECONV_MS_HPP_
-#define PROT_SPEC_DECONV_MS_HPP_
+#ifndef TOPPIC_SPEC_DECONV_MS_HPP_
+#define TOPPIC_SPEC_DECONV_MS_HPP_
 
 #include "spec/deconv_peak.hpp"
 #include "spec/ms.hpp"

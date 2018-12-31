@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_SPEC_EXTEND_MS_FACTORY_HPP_
-#define PROT_SPEC_EXTEND_MS_FACTORY_HPP_
+#ifndef TOPPIC_SPEC_EXTEND_MS_FACTORY_HPP_
+#define TOPPIC_SPEC_EXTEND_MS_FACTORY_HPP_
 
 #include "spec/deconv_ms.hpp"
 #include "spec/extend_ms.hpp"
