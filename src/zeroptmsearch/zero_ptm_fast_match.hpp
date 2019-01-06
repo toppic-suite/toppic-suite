@@ -13,15 +13,15 @@
 //limitations under the License.
 
 
-#ifndef ZERO_PTM_FAST_MATCH_HPP_
-#define ZERO_PTM_FAST_MATCH_HPP_
+#ifndef TOPPIC_ZERO_PTM_SEARCH_ZERO_PTM_FAST_MATCH_HPP_
+#define TOPPIC_ZERO_PTM_SEARCH_ZERO_PTM_FAST_MATCH_HPP_
 
 #include <vector>
 
-#include "base/proteoform.hpp"
+#include "seq/proteoform.hpp"
 #include "spec/extend_ms.hpp"
 
-namespace prot {
+namespace toppic {
 
 class ZeroPtmFastMatch;
 typedef std::shared_ptr<ZeroPtmFastMatch> ZpFastMatchPtr;
@@ -47,7 +47,7 @@ class ZeroPtmFastMatch {
     return a->getScore() > b->getScore();
   }
 
-  static ZpFastMatchPtrVec filter(AlignTypePtr align_type_ptr,
+  static ZpFastMatchPtrVec filter(ProteoformTypePtr align_type_ptr,
                                   const ExtendMsPtrVec &ms_ptr_ptr,
                                   const ProteoformPtrVec &proteo_ptrs,
                                   int report_num, double ppo);
@@ -59,6 +59,6 @@ class ZeroPtmFastMatch {
   int end_;
 };
 
-}  // namespace prot
+}  // namespace toppic
 #endif
 

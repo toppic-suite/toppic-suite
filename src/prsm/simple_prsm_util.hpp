@@ -12,13 +12,12 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#ifndef PROT_PRSM_SIMPLE_PRSM_UTIL_HPP_
-#define PROT_PRSM_SIMPLE_PRSM_UTIL_HPP_
+#ifndef TOPPIC_PRSM_SIMPLE_PRSM_UTIL_HPP_
+#define TOPPIC_PRSM_SIMPLE_PRSM_UTIL_HPP_
 
 #include "prsm/simple_prsm.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace simple_prsm_util {
 
@@ -26,6 +25,6 @@ SimplePrsmPtrVec getUniqueMatches(SimplePrsmPtrVec match_ptrs);
 
 }  // namesapce simple_prsm_util
 
-}  // namespace prot
+}  // namespace toppic
 
-#endif /* PROT_PRSM_SIMPLE_PRSM_UTIL_HPP_ */
+#endif /* TOPPIC_PRSM_SIMPLE_PRSM_UTIL_HPP_ */

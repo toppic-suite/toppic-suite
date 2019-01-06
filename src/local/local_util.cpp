@@ -17,24 +17,24 @@
 #include <string>
 #include <vector>
 
-#include <boost/algorithm/string.hpp>
 
-#include "base/amino_acid_base.hpp"
-#include "base/activation_base.hpp"
-#include "base/mod_util.hpp"
-#include "base/residue_util.hpp"
-#include "base/proteoform_factory.hpp"
-#include "base/mass_constant.hpp"
+#include "common/base/amino_acid_base.hpp"
+#include "common/base/activation_base.hpp"
+#include "common/base/mod_util.hpp"
+#include "common/base/residue_base.hpp"
+#include "common/base/residue_util.hpp"
+#include "seq/proteoform_factory.hpp"
+#include "common/base/mass_constant.hpp"
 
 #include "prsm/peak_ion_pair_util.hpp"
 
-#include "spec/theo_peak_util.hpp"
+#include "prsm/theo_peak_util.hpp"
 #include "spec/extend_ms.hpp"
 
 #include "local/local_mng.hpp"
 #include "local/local_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace local_util {
 
@@ -279,4 +279,4 @@ int compMatchFragNum(ProteoformPtr proteoform_ptr, const ExtendMsPtrVec &ms_ptr_
 
 }  // namespace local_util
 
-}  // namespace prot
+}  // namespace toppic

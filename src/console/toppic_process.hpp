@@ -12,14 +12,14 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef PROT_TOPPIC_PROCESS_HPP
-#define PROT_TOPPIC_PROCESS_HPP
+#ifndef TOPPIC_TOPPIC_PROCESS_HPP
+#define TOPPIC_TOPPIC_PROCESS_HPP
 
 #include <string>
 #include <map>
 #include <vector>
 
-namespace prot {
+namespace toppic {
 
 int TopPICProgress(std::map<std::string, std::string> & arguments);
 
@@ -32,6 +32,6 @@ int TopPIC_post(std::map<std::string, std::string> & arguments);
 int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
                               const std::vector<std::string> & spec_file_lst);
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

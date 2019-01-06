@@ -13,14 +13,14 @@
 //limitations under the License.
 
 
-#ifndef PROT_ONE_PTM_SEARCH_HPP_
-#define PROT_ONE_PTM_SEARCH_HPP_
+#ifndef TOPPIC_ONE_PTM_SEARCH_ONE_PTM_SEARCH_HPP_
+#define TOPPIC_ONE_PTM_SEARCH_ONE_PTM_SEARCH_HPP_
 
 #include "spec/spectrum_set.hpp"
 #include "prsm/prsm.hpp"
 #include "oneptmsearch/ptm_search_mng.hpp"
 
-namespace prot {
+namespace toppic {
 
 class OnePtmSearchProcessor {
  public:
@@ -32,13 +32,13 @@ class OnePtmSearchProcessor {
                                  const SimplePrsmPtrVec &simple_prsm_ptr_vec,
                                  FastaIndexReaderPtr reader_ptr,
                                  PtmSearchMngPtr mng_ptr,
-                                 AlignTypePtr type_ptr);
+                                 ProteoformTypePtr type_ptr);
 
   PtmSearchMngPtr mng_ptr_;
 };
 
 typedef std::shared_ptr<OnePtmSearchProcessor> OnePtmSearchProcessorPtr;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

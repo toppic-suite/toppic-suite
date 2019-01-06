@@ -12,20 +12,16 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#ifndef TOPPIC_PRSM_PRSM_PARA_HPP_
+#define TOPPIC_PRSM_PRSM_PARA_HPP_
 
-#ifndef PROT_PRSM_PRSM_PARA_HPP_
-#define PROT_PRSM_PRSM_PARA_HPP_
-
-#include <string>
 #include <map>
 
-#include "base/mod.hpp"
-#include "base/prot_mod.hpp"
-#include "base/activation.hpp"
-#include "spec/peak_tolerance.hpp"
+#include "common/base/mod.hpp"
+#include "common/base/prot_mod.hpp"
 #include "spec/sp_para.hpp"
 
-namespace prot {
+namespace toppic {
 
 class PrsmPara {
  public:
@@ -72,6 +68,6 @@ class PrsmPara {
 
 typedef std::shared_ptr<PrsmPara> PrsmParaPtr;
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* PRSM_PARA_HPP_ */

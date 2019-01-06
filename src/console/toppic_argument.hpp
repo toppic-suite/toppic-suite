@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_TOPPIC_ARGUMENT_HPP_
-#define PROT_TOPPIC_ARGUMENT_HPP_
+#ifndef TOPPIC_TOPPIC_ARGUMENT_HPP_
+#define TOPPIC_TOPPIC_ARGUMENT_HPP_
 
 #include <map>
 #include <iostream>
@@ -27,11 +27,11 @@
 
 #include "boost/program_options.hpp" 
 
-#include "base/logger.hpp"
-#include "base/xml_dom_document.hpp"
-#include "base/string_util.hpp"
+#include "common/util/logger.hpp"
+#include "common/xml/xml_dom_document.hpp"
+#include "common/util/str_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 class Argument {
  public:
@@ -60,6 +60,6 @@ class Argument {
   std::vector<std::string> spec_file_list_;
 };
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif /* ARGUMENT_HPP_ */

@@ -13,32 +13,29 @@
 //limitations under the License.
 
 
-#ifndef PROT_SPEC_PEAK_TOLERANCE_HPP_
-#define PROT_SPEC_PEAK_TOLERANCE_HPP_
+#ifndef TOPPIC_SPEC_PEAK_TOLERANCE_HPP_
+#define TOPPIC_SPEC_PEAK_TOLERANCE_HPP_
 
-#include <memory>
 #include <string>
+#include <memory>
 
-#include "base/xml_dom_document.hpp"
+#include "common/xml/xml_dom_element.hpp"
 
-namespace prot {
+namespace toppic {
+
+class XmlDOMDocument;
 
 class PeakTolerance {
  public:
   PeakTolerance(double ppo, bool use_min_tolerance,
-                double min_tolerance):
-      ppo_(ppo), 
-      use_min_tolerance_(use_min_tolerance),
-      min_tolerance_(min_tolerance) {}
+                double min_tolerance);
 
   explicit PeakTolerance(xercesc::DOMElement* element);
 
   double compStrictErrorTole(double mass);
 
   // consider zero ptm relaxed error
-  double compRelaxErrorTole(double m1, double m2) {
-    return compStrictErrorTole(m1 + m2);
-  }
+  double compRelaxErrorTole(double m1, double m2);
 
   double getPpo() {return ppo_;}
 
@@ -49,12 +46,10 @@ class PeakTolerance {
   void setPpo(double ppo) {ppo_ = ppo;}
 
   void setUseMinTolerance(bool use_min_tolerance) {
-    use_min_tolerance_ = use_min_tolerance;
-  }
+    use_min_tolerance_ = use_min_tolerance;}
 
   void setMinTolerance(double min_tolerance) {
-    min_tolerance_ = min_tolerance;
-  }
+    min_tolerance_ = min_tolerance;}
 
   void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
@@ -69,6 +64,6 @@ class PeakTolerance {
 
 typedef std::shared_ptr<PeakTolerance> PeakTolerancePtr;
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif    

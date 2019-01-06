@@ -12,14 +12,14 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef PROT_TOPMG_PROCESS_HPP
-#define PROT_TOPMG_PROCESS_HPP
+#ifndef TOPPIC_TOPMG_PROCESS_HPP
+#define TOPPIC_TOPMG_PROCESS_HPP
 
 #include <string>
 #include <map>
 #include <vector>
 
-namespace prot {
+namespace toppic {
 
 int TopMG_identify(std::map<std::string, std::string> & arguments);
 
@@ -30,7 +30,7 @@ int TopMGProcess(std::map<std::string, std::string> & arguments);
 int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
                              const std::vector<std::string> & spec_file_lst);
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif
 

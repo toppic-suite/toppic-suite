@@ -12,32 +12,20 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#ifndef TOPPIC_PRSM_PRSM_TOP_SELECTOR_HPP_
+#define TOPPIC_PRSM_PRSM_TOP_SELECTOR_HPP_
 
-#ifndef PROT_PRSM_PRSM_TOP_SELECTOR_HPP_
-#define PROT_PRSM_PRSM_TOP_SELECTOR_HPP_
-
-#include <map>
+#include <memory>
 #include <string>
 
-#include "base/string_util.hpp"
-#include "base/proteoform.hpp"
-#include "base/fasta_reader.hpp"
-#include "prsm/prsm.hpp"
-#include "prsm/prsm_xml_writer.hpp"
-
-namespace prot {
+namespace toppic {
 
 class PrsmTopSelector {
  public:
   PrsmTopSelector(const std::string &db_file_name,
                   const std::string &spec_file_name,
                   const std::string &in_file_ext, 
-                  const std::string &out_file_ext, int n_top): 
-      spec_file_name_(spec_file_name), 
-      db_file_name_(db_file_name),
-      input_file_ext_(in_file_ext),
-      output_file_ext_(out_file_ext),
-      n_top_(n_top) {}
+                  const std::string &out_file_ext, int n_top);
 
   void process();
  private:
@@ -54,6 +42,6 @@ class PrsmTopSelector {
 
 typedef std::shared_ptr<PrsmTopSelector> PrsmTopSelectorPtr;
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* PRSM_SELECTOR_HPP_ */

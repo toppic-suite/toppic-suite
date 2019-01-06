@@ -13,19 +13,19 @@
 //limitations under the License.
 
 
-#ifndef PROT_ANNO_PROTEOFORM_HPP_
-#define PROT_ANNO_PROTEOFORM_HPP_
+#ifndef TOPPIC_PRSM_VIEW_ANNO_PROTEOFORM_HPP_
+#define TOPPIC_PRSM_VIEW_ANNO_PROTEOFORM_HPP_
 
-#include "base/xml_dom_util.hpp"
-#include "base/proteoform.hpp"
+#include "common/xml/xml_dom_util.hpp"
+#include "seq/proteoform.hpp"
 #include "prsm/prsm.hpp"
 #include "prsmview/prsm_view_mng.hpp"
 
-namespace prot {
+namespace toppic {
 
 xercesc::DOMElement* geneAnnoProteoform(XmlDOMDocument* xml_doc, PrsmPtr prsm_ptr,
                                         PrsmViewMngPtr mng_ptr);
 
 }
 
-#endif /* PROT_ANNO_PROTEOFORM_HPP_ */
+#endif /* TOPPIC_PRSM_VIEW_ANNO_PROTEOFORM_HPP_ */

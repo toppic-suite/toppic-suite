@@ -18,10 +18,10 @@
 #include <vector>
 #include <set>
 
-#include "base/logger.hpp"
+#include "common/util/logger.hpp"
 #include "graph/spec_graph.hpp"
 
-namespace prot {
+namespace toppic {
 
 SpecGraph::SpecGraph(SpectrumSetPtr spec_set_ptr, PrmPeakPtrVec peak_vec,
                      MassGraphPtr graph_ptr, double convert_ratio) {
@@ -71,4 +71,4 @@ void SpecGraph::compSpecDistances(double convert_ratio) {
   std::copy(dist_set.begin(), dist_set.end(), std::back_inserter(dist_));
 }
 
-}  // namespace prot
+}  // namespace toppic

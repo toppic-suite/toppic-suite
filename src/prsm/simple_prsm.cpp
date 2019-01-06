@@ -12,23 +12,13 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#include <iostream>
-#include <cmath>
-#include <algorithm>
-#include <string>
-#include <vector>
-
-#include "base/logger.hpp"
-#include "base/proteoform_factory.hpp"
-#include "base/proteoform.hpp"
-#include "base/string_util.hpp"
-#include "base/xml_dom_document.hpp"
-#include "base/xml_dom_util.hpp"
-
+#include "common/util/logger.hpp"
+#include "common/util/str_util.hpp"
+#include "common/xml/xml_dom_document.hpp"
+#include "common/xml/xml_dom_util.hpp"
 #include "prsm/simple_prsm.hpp"
 
-namespace prot {
+namespace toppic {
 
 SimplePrsm::SimplePrsm(MsHeaderPtr header_ptr, int spectrum_num,
                        ProteoformPtr proteo_ptr, int score):
@@ -58,7 +48,7 @@ SimplePrsm::SimplePrsm(MsHeaderPtr header_ptr, int spectrum_num,
       prot_mass_ = header_ptr->getPrecMonoMass();
     }
 
-SimplePrsm::SimplePrsm(xercesc::DOMElement* element) {
+SimplePrsm::SimplePrsm(XmlDOMElement* element) {
   file_name_ = xml_dom_util::getChildValue(element, "file_name", 0);
   spectrum_id_ = xml_dom_util::getIntChildValue(element, "spectrum_id", 0);
   spectrum_scan_ = xml_dom_util::getChildValue(element, "spectrum_scan", 0);
@@ -70,7 +60,7 @@ SimplePrsm::SimplePrsm(xercesc::DOMElement* element) {
   prot_mass_ = xml_dom_util::getDoubleChildValue(element, "proteoform_mass", 0);
   score_ = xml_dom_util::getDoubleChildValue(element, "score", 0);
   // n trunc shifts
-  xercesc::DOMElement* n_shift_list_element
+  XmlDOMElement* n_shift_list_element
       = xml_dom_util::getChildElement(element, "n_trunc_shift_list", 0);
   int n_shift_num = xml_dom_util::getChildCount(n_shift_list_element, "shift");
   // LOG_DEBUG("n shift _num " << n_shift_num);
@@ -79,7 +69,7 @@ SimplePrsm::SimplePrsm(xercesc::DOMElement* element) {
     n_trunc_shifts_.push_back(shift);
   }
   // c trunc shifts
-  xercesc::DOMElement* c_shift_list_element
+  XmlDOMElement* c_shift_list_element
       = xml_dom_util::getChildElement(element, "c_trunc_shift_list", 0);
   int c_shift_num = xml_dom_util::getChildCount(c_shift_list_element, "shift");
   // LOG_DEBUG("c shift _num " << c_shift_num);
@@ -89,36 +79,36 @@ SimplePrsm::SimplePrsm(xercesc::DOMElement* element) {
   }
 }
 
-xercesc::DOMElement* SimplePrsm::toXml(XmlDOMDocument* xml_doc) {
+XmlDOMElement* SimplePrsm::toXml(XmlDOMDocument* xml_doc) {
   std::string element_name = SimplePrsm::getXmlElementName();
-  xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
+  XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
   xml_doc->addElement(element, "file_name", file_name_.c_str());
-  std::string str = string_util::convertToString(spectrum_id_);
+  std::string str = str_util::toString(spectrum_id_);
   xml_doc->addElement(element, "spectrum_id", str.c_str());
   xml_doc->addElement(element, "spectrum_scan", spectrum_scan_.c_str());
-  str = string_util::convertToString(precursor_id_);
+  str = str_util::toString(precursor_id_);
   xml_doc->addElement(element, "precursor_id", str.c_str());
-  str = string_util::convertToString(prec_mass_);
+  str = str_util::toString(prec_mass_);
   xml_doc->addElement(element, "precursor_mass", str.c_str());
-  str = string_util::convertToString(spectrum_num_);
+  str = str_util::toString(spectrum_num_);
   xml_doc->addElement(element, "spectrum_number", str.c_str());
   xml_doc->addElement(element, "sequence_name", seq_name_.c_str());
   xml_doc->addElement(element, "sequence_desc", seq_desc_.c_str());
-  str = string_util::convertToString(prot_mass_);
+  str = str_util::toString(prot_mass_);
   xml_doc->addElement(element, "proteoform_mass", str.c_str());
-  str = string_util::convertToString(score_);
+  str = str_util::toString(score_);
   xml_doc->addElement(element, "score", str.c_str());
 
-  xercesc::DOMElement* n_shift_list = xml_doc->createElement("n_trunc_shift_list");
+  XmlDOMElement* n_shift_list = xml_doc->createElement("n_trunc_shift_list");
   for (size_t i = 0; i < n_trunc_shifts_.size(); i++) {
-    str = string_util::convertToString(n_trunc_shifts_[i]);
+    str = str_util::toString(n_trunc_shifts_[i]);
     xml_doc->addElement(n_shift_list, "shift", str.c_str());
   }
   element->appendChild(n_shift_list);
 
-  xercesc::DOMElement* c_shift_list = xml_doc->createElement("c_trunc_shift_list");
+  XmlDOMElement* c_shift_list = xml_doc->createElement("c_trunc_shift_list");
   for (size_t i = 0; i < c_trunc_shifts_.size(); i++) {
-    str = string_util::convertToString(c_trunc_shifts_[i]);
+    str = str_util::toString(c_trunc_shifts_[i]);
     xml_doc->addElement(c_shift_list, "shift", str.c_str());
   }
   element->appendChild(c_shift_list);
@@ -129,22 +119,22 @@ std::vector<std::string> SimplePrsm::toStrVec() {
   std::vector<std::string> str_vec;
   str_vec.push_back("<simple_prsm>");
   str_vec.push_back("<file_name>" + file_name_ + "</file_name>");
-  str_vec.push_back("<spectrum_id>" + std::to_string(getSpectrumId()) + "</spectrum_id>");
+  str_vec.push_back("<spectrum_id>" + str_util::toString(getSpectrumId()) + "</spectrum_id>");
   str_vec.push_back("<spectrum_scan>" + getSpectrumScan() + "</spectrum_scan>");
-  str_vec.push_back("<precursor_id>" + std::to_string(getPrecursorId()) + "</precursor_id>");
-  str_vec.push_back("<precursor_mass>" + std::to_string(getPrecMass()) + "</precursor_mass>");
-  str_vec.push_back("<spectrum_number>" + std::to_string(getSpectrumNum()) + "</spectrum_number>");
+  str_vec.push_back("<precursor_id>" + str_util::toString(getPrecursorId()) + "</precursor_id>");
+  str_vec.push_back("<precursor_mass>" + str_util::toString(getPrecMass()) + "</precursor_mass>");
+  str_vec.push_back("<spectrum_number>" + str_util::toString(getSpectrumNum()) + "</spectrum_number>");
   str_vec.push_back("<sequence_name>" + getSeqName() + "</sequence_name>");
   str_vec.push_back("<sequence_desc>" + getSeqDesc() + "</sequence_desc>");
-  str_vec.push_back("<proteoform_mass>" + std::to_string(getProteoformMass()) + "</proteoform_mass>");
-  str_vec.push_back("<score>" + std::to_string(getScore()) + "</score>");
+  str_vec.push_back("<proteoform_mass>" + str_util::toString(getProteoformMass()) + "</proteoform_mass>");
+  str_vec.push_back("<score>" + str_util::toString(getScore()) + "</score>");
 
   if (n_trunc_shifts_.size() == 0) {
     str_vec.push_back("<n_trunc_shift_list/>");
   } else {
     str_vec.push_back("<n_trunc_shift_list>");
     for (size_t i = 0; i < n_trunc_shifts_.size(); i++) {
-      str_vec.push_back("<shift>" + std::to_string(n_trunc_shifts_[i]) + "</shift>");
+      str_vec.push_back("<shift>" + str_util::toString(n_trunc_shifts_[i]) + "</shift>");
     }
     str_vec.push_back("</n_trunc_shift_list>");
   }
@@ -154,7 +144,7 @@ std::vector<std::string> SimplePrsm::toStrVec() {
   } else {
     str_vec.push_back("<c_trunc_shift_list>");
     for (size_t j = 0; j < c_trunc_shifts_.size(); j++) {
-      str_vec.push_back("<shift>" + std::to_string(c_trunc_shifts_[j]) + "</shift>");
+      str_vec.push_back("<shift>" + str_util::toString(c_trunc_shifts_[j]) + "</shift>");
     }
     str_vec.push_back("</c_trunc_shift_list>");
   }
@@ -170,4 +160,44 @@ void SimplePrsm::setCTruncShifts(const std::vector<double> &c_term_shifts) {
   }
 }
 
-} /* namespace prot */
+bool SimplePrsm::cmpScoreDec(const SimplePrsmPtr a, const SimplePrsmPtr b) {
+  if (a->getScore() == b->getScore()) {
+    return a->getSeqName() < b->getSeqName();
+  } else {
+    return a->getScore() > b->getScore();
+  }
+}
+
+bool SimplePrsm::cmpIdInc(const SimplePrsmPtr a, const SimplePrsmPtr b) {
+  if (a->getSpectrumId() == b->getSpectrumId()) {
+    return a->getSeqName() < b->getSeqName();
+  } else {
+    return a->getSpectrumId() < b->getSpectrumId();
+  }
+}
+
+bool SimplePrsm::cmpIdIncScoreDec(const SimplePrsmPtr a, const SimplePrsmPtr b) {
+  if (a->getSpectrumId() < b->getSpectrumId()) {
+    return true;
+  } else if (a->getSpectrumId() > b->getSpectrumId()) {
+    return false;
+  } else {
+    if (a->getScore() == b->getScore()) {
+      return a->getSeqName() < b->getSeqName();
+    } else {
+      return a->getScore() > b->getScore();
+    }
+  }
+}
+
+bool SimplePrsm::cmpNameIncScoreDec(const SimplePrsmPtr a, const SimplePrsmPtr b) {
+  if (a->getSeqName() < b->getSeqName()) {
+    return true;
+  } else if (a->getSeqName() > b->getSeqName()) {
+    return false;
+  } else {
+    return a->getScore() > b->getScore();
+  }
+}
+
+} /* namespace toppic */

@@ -15,10 +15,10 @@
 
 #include <cmath>
 
-#include "base/logger.hpp"
+#include "common/util/logger.hpp"
 #include "ptmsearch/comp_shift_low_mem.hpp"
 
-namespace prot {
+namespace toppic {
 
 std::vector<std::vector<int>> CompShiftLowMem::findBestShift(
     const std::vector<int> &a,const std::vector<int> &b){
@@ -223,4 +223,4 @@ inline int CompShiftLowMem::checkD(std::vector<std::vector<int>> &ans,int d,
   }
 }
 
-} /* namespace prot */
+} /* namespace toppic */

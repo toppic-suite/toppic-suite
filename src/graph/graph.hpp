@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_GRAPH_HPP_
-#define PROT_GRAPH_HPP_
+#ifndef TOPPIC_GRAPH_GRAPH_HPP_
+#define TOPPIC_GRAPH_GRAPH_HPP_
 
 #include <iostream>
 #include <string>
@@ -25,12 +25,12 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/graphviz.hpp>
 
-#include "base/ptm_base.hpp"
-#include "base/residue.hpp"
-#include "base/change.hpp"
-#include "base/logger.hpp"
+#include "common/base/ptm_base.hpp"
+#include "common/base/residue.hpp"
+#include "seq/change.hpp"
+#include "common/util/logger.hpp"
 
-namespace prot {
+namespace toppic {
 
 struct EdgeInfo {
   ResiduePtr res_ptr_;
@@ -80,6 +80,6 @@ typedef boost::graph_traits<MassGraph>::vertex_descriptor Vertex;
 
 typedef boost::graph_traits<MassGraph>::edge_descriptor Edge;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

@@ -12,21 +12,21 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef PROT_MCMC_MASS_TABLE_UTIL_HPP_
-#define PROT_MCMC_MASS_TABLE_UTIL_HPP_
+#ifndef TOPPIC_MCMC_MASS_TABLE_UTIL_HPP_
+#define TOPPIC_MCMC_MASS_TABLE_UTIL_HPP_
 
 #include <vector>
 #include <set>
 #include <map>
 #include <string>
 
-#include "base/residue.hpp"
+#include "common/base/residue.hpp"
 
 #include "spec/sp_para.hpp"
 
 #include "mcmc/mcmc_mng.hpp"
 
-namespace prot {
+namespace toppic {
 namespace mass_table_util {
 
 std::map<int, std::vector<std::string> > readMassTable(MCMCMngPtr mng_ptr);
@@ -36,6 +36,6 @@ std::map<int, std::vector<std::string> > geneMassTable(MCMCMngPtr mng_ptr);
 std::map<int, std::vector<std::string> > geneMassTableFixMod(MCMCMngPtr mng_ptr);
 
 }  // namespace mass_table_util
-}  // namespace prot
+}  // namespace toppic
 
 #endif

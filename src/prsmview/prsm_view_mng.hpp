@@ -13,15 +13,15 @@
 //limitations under the License.
 
 
-#ifndef PROT_PRSM_VIEW_MNG_HPP_
-#define PROT_PRSM_VIEW_MNG_HPP_
+#ifndef TOPPIC_PRSM_VIEW_PRSM_VIEW_MNG_HPP_
+#define TOPPIC_PRSM_VIEW_PRSM_VIEW_MNG_HPP_
 
 #include <string>
 
-#include "base/file_util.hpp"
+#include "common/util/file_util.hpp"
 #include "prsm/prsm_para.hpp"
 
-namespace prot {
+namespace toppic {
 
 class PrsmViewMng {
  public:
@@ -53,7 +53,7 @@ class PrsmViewMng {
 
 typedef std::shared_ptr<PrsmViewMng> PrsmViewMngPtr;
 
-} /* namespace prot */
+} /* namespace toppic */
 
 
-#endif /* PROT_PRSM_VIEW_MNG_HPP_ */
+#endif /* TOPPIC_PRSM_VIEW_PRSM_VIEW_MNG_HPP_ */

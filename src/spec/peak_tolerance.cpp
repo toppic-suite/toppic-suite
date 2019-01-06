@@ -12,14 +12,22 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#include <string>
-
-#include "base/string_util.hpp"
-#include "base/xml_dom_util.hpp"
+#include "common/util/str_util.hpp"
+#include "common/xml/xml_dom_util.hpp"
+#include "common/xml/xml_dom_document.hpp"
 #include "spec/peak_tolerance.hpp"
 
-namespace prot {
+namespace toppic {
+
+PeakTolerance::PeakTolerance(double ppo, bool use_min_tolerance,
+                             double min_tolerance):
+    ppo_(ppo), 
+    use_min_tolerance_(use_min_tolerance),
+    min_tolerance_(min_tolerance) {}
+
+double PeakTolerance::compRelaxErrorTole(double m1, double m2) {
+  return compStrictErrorTole(m1 + m2);
+}
 
 PeakTolerance::PeakTolerance(xercesc::DOMElement* element) {
   ppo_ = xml_dom_util::getDoubleChildValue(element, "ppo", 0);
@@ -39,13 +47,13 @@ void PeakTolerance::appendXml(XmlDOMDocument* xml_doc,
                               xercesc::DOMElement* parent) {
   std::string element_name = PeakTolerance::getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
-  std::string str = string_util::convertToString(ppo_);
+  std::string str = str_util::toString(ppo_);
   xml_doc->addElement(element, "ppo", str.c_str());
-  str = string_util::convertToString(use_min_tolerance_);
+  str = str_util::toString(use_min_tolerance_);
   xml_doc->addElement(element, "use_min_tolerance", str.c_str());
-  str = string_util::convertToString(min_tolerance_);
+  str = str_util::toString(min_tolerance_);
   xml_doc->addElement(element, "min_tolerance", str.c_str());
   parent->appendChild(element);
 }
 
-} /* namespace prot */
+} /* namespace toppic */

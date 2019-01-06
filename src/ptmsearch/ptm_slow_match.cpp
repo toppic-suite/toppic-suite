@@ -19,11 +19,11 @@
 #include "oneptmsearch/diagonal_header_util.hpp"
 #include "ptmsearch/ptm_slow_match.hpp"
 
-namespace prot {
+namespace toppic {
 
 PtmSlowMatch::PtmSlowMatch(ProteoformPtr proteo_ptr,
                            SpectrumSetPtr spectrum_set_ptr,
-                           AlignTypePtr align_type_ptr,
+                           ProteoformTypePtr align_type_ptr,
                            CompShiftLowMem comp_shift,
                            PtmSearchMngPtr mng_ptr) {
   proteo_ptr_ = proteo_ptr;
@@ -132,14 +132,14 @@ DiagonalHeaderPtrVec PtmSlowMatch::geneNTermShiftHeaders() {
 
   DiagonalHeaderPtrVec header_ptrs;
   // if not complete alignment, find best shifts
-  if (align_type_ptr_ != AlignType::COMPLETE) {
+  if (align_type_ptr_ != ProteoformType::COMPLETE) {
     DiagonalHeaderPtrVec common_header_ptrs = getNTermShiftListCommonHeaders();
 
-    if (align_type_ptr_ == AlignType::SUFFIX || align_type_ptr_ == AlignType::INTERNAL) {
+    if (align_type_ptr_ == ProteoformType::SUFFIX || align_type_ptr_ == ProteoformType::INTERNAL) {
       // add prefix masses
       addPrefixDiagonals(common_header_ptrs, n_extend_header_ptrs);
     }
-    if (align_type_ptr_ == AlignType::PREFIX || align_type_ptr_ == AlignType::INTERNAL) {
+    if (align_type_ptr_ == ProteoformType::PREFIX || align_type_ptr_ == ProteoformType::INTERNAL) {
       addSuffixDiagonals(common_header_ptrs, c_extend_header_ptrs);
     }
     // add original headers for ps alignment
@@ -176,7 +176,7 @@ void PtmSlowMatch::init() {
                                             diagonal_ptrs, mng_ptr_->align_para_ptr_);
 }
 
-void PtmSlowMatch::compute(AlignTypePtr type_ptr, PrsmPtrVec &prsm_ptrs) {
+void PtmSlowMatch::compute(ProteoformTypePtr type_ptr, PrsmPtrVec &prsm_ptrs) {
   ps_align_ptr_->compute(type_ptr);
   for (int s = 2; s <= mng_ptr_->align_para_ptr_->getUnknownShiftNum(); s++) {
     PrsmPtr prsm_ptr = ps_align_ptr_->geneResult(s, proteo_ptr_, deconv_ms_ptr_vec_,
@@ -185,10 +185,10 @@ void PtmSlowMatch::compute(AlignTypePtr type_ptr, PrsmPtrVec &prsm_ptrs) {
   }
 }
 
-PrsmPtr PtmSlowMatch::compute(AlignTypePtr align_type_ptr, int shift_num) {
+PrsmPtr PtmSlowMatch::compute(ProteoformTypePtr align_type_ptr, int shift_num) {
   ps_align_ptr_->compute(align_type_ptr_);
   return ps_align_ptr_->geneResult(shift_num, proteo_ptr_, deconv_ms_ptr_vec_,
                                    ms_three_ptr_vec_, mng_ptr_->prsm_para_ptr_);
 }
 
-} /* namespace prot */
+} /* namespace toppic */

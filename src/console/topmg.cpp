@@ -22,9 +22,9 @@
 #include "console/topmg_process.hpp"
 
 int main(int argc, char* argv[]) {
-  // prot::log_level = 2;
+  // toppic::log_level = 2;
   std::cout << std::setprecision(10);
-  prot::Argument argu_processor;
+  toppic::Argument argu_processor;
   bool success = argu_processor.parse(argc, argv);
   if (!success) {
     return 1;
@@ -35,5 +35,5 @@ int main(int argc, char* argv[]) {
 
   std::sort(spec_file_lst.begin(), spec_file_lst.end());
 
-  return prot::TopMGProgress_multi_file(arguments, spec_file_lst);
+  return toppic::TopMGProgress_multi_file(arguments, spec_file_lst);
 }

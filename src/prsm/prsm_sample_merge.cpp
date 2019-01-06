@@ -12,18 +12,26 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <string>
 #include <algorithm>
-#include <vector>
 
-#include "base/file_util.hpp"
-#include "base/proteoform_util.hpp"
-#include "base/mod_util.hpp"
-#include "base/fasta_index_reader.hpp"
+#include "common/base/mod_util.hpp"
+#include "seq/fasta_index_reader.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_sample_merge.hpp"
 
-namespace prot {
+namespace toppic {
+
+PrsmSampleMerge::PrsmSampleMerge(const std::string &db_file_name,
+                                 const std::vector<std::string> &input_file_names,
+                                 const std::string &output_file_name,
+                                 const std::string &fix_mod,
+                                 double error_tole):
+    db_file_name_(db_file_name),
+    input_file_names_(input_file_names),
+    output_file_name_(output_file_name),
+    fix_mod_(fix_mod),
+    error_tole_(error_tole) {}
+
 
 void PrsmSampleMerge::getPrsmClusters(PrsmStrPtrVec& prsm_ptrs,
                                       PrsmStrPtrVec2D& clusters) {
@@ -143,6 +151,6 @@ void PrsmSampleMerge::process() {
   outputTable(clusters, table_prsms, sample_num);
 }
 
-}  // namespace prot
+}  // namespace toppic
 
 

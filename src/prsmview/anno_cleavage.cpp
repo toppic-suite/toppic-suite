@@ -18,26 +18,26 @@
 #include "prsm/peak_ion_pair_util.hpp"
 #include "prsmview/anno_cleavage.hpp"
 
-namespace prot {
+namespace toppic {
 
 void AnnoCleavage::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   xercesc::DOMElement* element = xml_doc->createElement("cleavage");
-  std::string str = string_util::convertToString(pos_);
+  std::string str = str_util::toString(pos_);
   xml_doc->addElement(element, "position", str.c_str());
 
   str = type_;
   xml_doc->addElement(element, "cleavage_type", str.c_str());
 
-  str = string_util::convertToString(is_unexpected_change_);
+  str = str_util::toString(is_unexpected_change_);
   xml_doc->addElement(element, "is_unexpected_change", str.c_str());
 
-  str = string_util::convertToString(unexpected_change_color_);
+  str = str_util::toString(unexpected_change_color_);
   xml_doc->addElement(element, "unexpected_change_color", str.c_str());
 
-  str = string_util::convertToString(exist_n_ion_);
+  str = str_util::toString(exist_n_ion_);
   xml_doc->addElement(element, "exist_n_ion", str.c_str());
 
-  str = string_util::convertToString(exist_c_ion_);
+  str = str_util::toString(exist_c_ion_);
   xml_doc->addElement(element, "exist_c_ion", str.c_str());
 
   xercesc::DOMElement* peaks = xml_doc->createElement("matched_peaks");
@@ -82,4 +82,4 @@ AnnoCleavagePtrVec getProteoCleavage(PrsmPtr prsm_ptr, double min_mass) {
 }
 
 
-} /* namespace prot */
+} /* namespace toppic */

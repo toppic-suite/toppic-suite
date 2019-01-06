@@ -13,18 +13,18 @@
 //limitations under the License.
 
 
-#ifndef PROT_ANNO_CLEAVAGE_HPP_
-#define PROT_ANNO_CLEAVAGE_HPP_
+#ifndef TOPPIC_PRSM_VIEW_ANNO_CLEAVAGE_HPP_
+#define TOPPIC_PRSM_VIEW_ANNO_CLEAVAGE_HPP_
 
 #include <string>
 #include <vector>
 
-#include "base/proteoform.hpp"
+#include "seq/proteoform.hpp"
 #include "spec/extend_peak.hpp"
 #include "prsm/peak_ion_pair.hpp"
 #include "prsm/prsm.hpp"
 
-namespace prot {
+namespace toppic {
 
 #define CLEAVAGE_TYPE_NORMAL "normal"
 #define CLEAVAGE_TYPE_N_TRUNCATION "n_truncation"
@@ -79,6 +79,6 @@ typedef std::shared_ptr<AnnoCleavage> AnnoCleavagePtr;
 typedef std::vector<AnnoCleavagePtr> AnnoCleavagePtrVec;
 
 AnnoCleavagePtrVec getProteoCleavage(PrsmPtr prsm_ptr, double min_mass);
-} /* namespace prot */
+} /* namespace toppic */
 
-#endif /* PROT_ANNO_CLEAVAGE_HPP_ */
+#endif /* TOPPIC_PRSM_VIEW_ANNO_CLEAVAGE_HPP_ */

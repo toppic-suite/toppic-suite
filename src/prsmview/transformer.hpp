@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_TRANSFORMER_HPP_
-#define PROT_TRANSFORMER_HPP_
+#ifndef TOPPIC_PRSM_VIEW_TRANSFORMER_HPP_
+#define TOPPIC_PRSM_VIEW_TRANSFORMER_HPP_
 
 #include <memory>
 #include <map>
@@ -23,11 +23,11 @@
 #include <xalanc/Include/PlatformDefinitions.hpp>
 #include <xalanc/XalanTransformer/XalanTransformer.hpp>
 
-namespace prot {
+namespace toppic {
 
 void translate(std::map<std::string, std::string> &arguments,
                const std::string & fname_suffix);
 
 }
 
-#endif /* PROT_TRANSFORMER_HPP_ */
+#endif /* TOPPIC_PRSM_VIEW_TRANSFORMER_HPP_ */

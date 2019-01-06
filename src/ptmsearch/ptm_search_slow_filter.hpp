@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_PTM_SEARCH_SLOW_FILTER_HPP_
-#define PROT_PTM_SEARCH_SLOW_FILTER_HPP_
+#ifndef TOPPIC_PTM_SEARCH_PTM_SEARCH_SLOW_FILTER_HPP_
+#define TOPPIC_PTM_SEARCH_PTM_SEARCH_SLOW_FILTER_HPP_
 
 #include <memory>
 
@@ -24,7 +24,7 @@
 #include "ptmsearch/ptm_slow_match.hpp"
 #include "ptmsearch/comp_shift_low_mem.hpp"
 
-namespace prot {
+namespace toppic {
 
 class PtmSearchSlowFilter {
  public:
@@ -32,7 +32,7 @@ class PtmSearchSlowFilter {
                       SimplePrsmPtrVec simple_prsm_ptrs,
                       CompShiftLowMem comp_shift,
                       PtmSearchMngPtr mng_ptr);
-  PrsmPtrVec getPrsms(int shift_num, AlignTypePtr type_ptr);
+  PrsmPtrVec getPrsms(int shift_num, ProteoformTypePtr type_ptr);
 
  private:
   PtmSlowMatchPtrVec complete_prefix_slow_match_ptrs_;
@@ -45,6 +45,6 @@ class PtmSearchSlowFilter {
 
 typedef std::shared_ptr<PtmSearchSlowFilter> PtmSearchSlowFilterPtr;
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* PTM_SEARCH_SLOW_FILTER_HPP_ */

@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef PROT_MCMC_DPR_PROCESSOR_HPP_
-#define PROT_MCMC_DPR_PROCESSOR_HPP_
+#ifndef TOPPIC_MCMC_DPR_PROCESSOR_HPP_
+#define TOPPIC_MCMC_DPR_PROCESSOR_HPP_
 
 
 #include <random>
@@ -22,20 +22,21 @@
 #include <unordered_map>
 #include <string>
 
-#include "base/proteoform.hpp"
-#include "base/activation.hpp"
-#include "base/thread_pool.hpp"
+#include "seq/proteoform.hpp"
+#include "common/base/activation.hpp"
+#include "common/thread/simple_thread_pool.hpp"
 
 #include "spec/deconv_ms.hpp"
 
 #include "prsm/prsm.hpp"
+#include "prsm/prsm_xml_writer.hpp"
 
 #include "tdgf/count_test_num.hpp"
 #include "tdgf/comp_pvalue_lookup_table.hpp"
 
 #include "mcmc/mcmc_mng.hpp"
 
-namespace prot {
+namespace toppic {
 
 class DprProcessor {
  public:
@@ -69,11 +70,13 @@ class DprProcessor {
 
   std::map<int, std::vector<std::string> > mass_table_;
 
-  std::shared_ptr<ThreadPool<PrsmXmlWriter> > pool_ptr_;
+  PrsmXmlWriterPtrVec writer_ptr_vec_;
+
+  std::shared_ptr<SimpleThreadPool> pool_ptr_;
 };
 
 typedef std::shared_ptr<DprProcessor> DprProcessorPtr;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

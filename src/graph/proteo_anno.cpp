@@ -16,17 +16,17 @@
 #include <string>
 #include <vector>
 
-#include "base/xml_dom.hpp"
-#include "base/mass_shift_type.hpp"
-#include "base/prot_mod_base.hpp"
-#include "base/prot_mod_util.hpp"
-#include "base/ptm_base.hpp"
-#include "base/residue_base.hpp"
-#include "base/residue_util.hpp"
-#include "base/xml_dom_document.hpp"
+#include "common/util/logger.hpp"
+#include "seq/mass_shift_type.hpp"
+#include "common/base/prot_mod_base.hpp"
+#include "common/base/prot_mod_util.hpp"
+#include "common/base/ptm_base.hpp"
+#include "common/base/residue_base.hpp"
+#include "common/base/residue_util.hpp"
+#include "common/xml/xml_dom_document.hpp"
 #include "graph/proteo_anno.hpp"
 
-namespace prot {
+namespace toppic {
 
 ProteoAnno::ProteoAnno(const ModPtrVec &fix_mod_ptr_vec,
                        const ProtModPtrVec &prot_mod_ptr_vec,
@@ -130,4 +130,4 @@ void ProteoAnno::anno(const std::string &seq, bool is_complete) {
   }
   LOG_DEBUG("variable mod complete");
 }
-}  // namespace prot
+}  // namespace toppic

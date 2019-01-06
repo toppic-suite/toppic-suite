@@ -19,13 +19,13 @@
 #include <string>
 #include <vector>
 
-#include "base/version.hpp"
-#include "base/base_data.hpp"
+#include "common/util/version.hpp"
+#include "common/base/base_data.hpp"
 #include "prsm/prsm_coverage.hpp"
 
 #include "console/toppic_argument.hpp"
 
-namespace prot {
+namespace toppic {
 
 int outputMatchPeaks(std::map<std::string, std::string> arguments) {
   try {
@@ -63,14 +63,14 @@ int outputMatchPeaks(std::map<std::string, std::string> arguments) {
 }
 
 int main(int argc, char* argv[]) {
-  // prot::log_level = 2;
+  // toppic::log_level = 2;
   std::cout << std::setprecision(10);
-  prot::Argument argu_processor;
+  toppic::Argument argu_processor;
   bool success = argu_processor.parse(argc, argv);
   if (!success) {
     return 1;
   }
   std::map<std::string, std::string> arguments = argu_processor.getArguments();
-  prot::outputMatchPeaks(arguments);
+  toppic::outputMatchPeaks(arguments);
   return 0;
 }

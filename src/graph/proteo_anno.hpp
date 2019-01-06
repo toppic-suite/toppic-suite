@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_PROTEO_ANNO_HPP_
-#define PROT_PROTEO_ANNO_HPP_
+#ifndef TOPPIC_GRAPH_PROTEO_ANNO_HPP_
+#define TOPPIC_GRAPH_PROTEO_ANNO_HPP_
 
 #include <iostream>
 #include <string>
@@ -22,16 +22,15 @@
 #include <memory>
 #include <map>
 
-#include "base/xml_dom.hpp"
-#include "base/xml_dom_document.hpp"
+#include "common/xml/xml_dom_document.hpp"
 
 #include "prsm/prsm_para.hpp"
-#include "base/proteoform.hpp"
-#include "base/base_data.hpp"
-#include "base/fasta_reader.hpp"
-#include "base/file_util.hpp"
+#include "seq/proteoform.hpp"
+#include "common/base/base_data.hpp"
+#include "seq/fasta_reader.hpp"
+#include "common/util/file_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 class ProteoAnno {
  public:
@@ -71,6 +70,6 @@ class ProteoAnno {
 
 typedef std::shared_ptr<ProteoAnno> ProteoAnnoPtr;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

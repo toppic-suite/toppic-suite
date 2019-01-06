@@ -23,14 +23,11 @@
 #include <QCloseEvent>
 #include <QDesktopServices>
 
-#include <boost/filesystem.hpp>
-namespace fs = boost::filesystem;
-
-#include "base/file_util.hpp"
-#include "base/base_data.hpp"
-#include "feature/deconv_para.hpp"
-#include "feature/deconv_process.hpp"
-#include "feature/feature_detect.hpp"
+#include "common/util/file_util.hpp"
+#include "common/base/base_data.hpp"
+#include "deconv/deconv/deconv_para.hpp"
+#include "deconv/deconv/deconv_process.hpp"
+#include "deconv/feature/feature_detect.hpp"
 
 #include "topfddialog.h"
 #include "ui_topfddialog.h"
@@ -268,16 +265,16 @@ void TopFDDialog::on_outputButton_clicked() {
   if (spec_file_lst_.size() > 0) {
     sp_file_name = spec_file_lst_[0];
   }
-  fs::path full_path(sp_file_name.c_str());
-  QString outPath = full_path.remove_filename().string().c_str();
+  std::string dir = toppic::file_util::directory(sp_file_name);
+  QString outPath = sp_file_name.c_str();
   QDesktopServices::openUrl(QUrl(outPath, QUrl::TolerantMode));
 }
 
 std::map<std::string, std::string> TopFDDialog::getArguments() {
   QString path = QCoreApplication::applicationFilePath();
-  std::string exe_dir = prot::file_util::getExecutiveDir(path.toStdString());
+  std::string exe_dir = toppic::file_util::getExecutiveDir(path.toStdString());
   arguments_["executiveDir"] = exe_dir;
-  arguments_["resourceDir"] = arguments_["executiveDir"] + prot::file_util::getFileSeparator() + prot::file_util::getResourceDirName();
+  arguments_["resourceDir"] = toppic::file_util::getResourceDir(exe_dir);
   arguments_["maxCharge"] = ui->maxChargeEdit->text().toStdString();
   arguments_["maxMass"] = ui->maxMassEdit->text().toStdString();
   arguments_["mzError"] = ui->mzErrorEdit->text().toStdString();

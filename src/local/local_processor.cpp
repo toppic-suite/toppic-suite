@@ -17,15 +17,16 @@
 #include <vector>
 #include <functional>
 
-#include "base/ptm.hpp"
-#include "base/ptm_util.hpp"
-#include "base/mod_util.hpp"
-#include "base/residue_util.hpp"
-#include "base/local_anno.hpp"
-#include "base/mass_shift.hpp"
-#include "base/prot_mod.hpp"
-#include "base/prot_mod_base.hpp"
-#include "base/proteoform_factory.hpp"
+#include "common/base/ptm.hpp"
+#include "common/base/ptm_util.hpp"
+#include "common/base/mod_util.hpp"
+#include "common/base/residue_base.hpp"
+#include "common/base/residue_util.hpp"
+#include "seq/local_anno.hpp"
+#include "seq/mass_shift.hpp"
+#include "common/base/prot_mod.hpp"
+#include "common/base/prot_mod_base.hpp"
+#include "seq/proteoform_factory.hpp"
 
 #include "spec/msalign_reader.hpp"
 #include "spec/spectrum_set.hpp"
@@ -39,7 +40,7 @@
 #include "local_processor.hpp"
 #include "local_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 void LocalProcessor::init() {
   ptm_vec_ = ptm_util::readPtmTxt(mng_ptr_->residueModFileName_);
@@ -223,7 +224,7 @@ ProteoformPtr LocalProcessor::processOneKnownPtm(PrsmPtr prsm) {
 
       one_shift_proteoform
           = std::make_shared<Proteoform>(ori_prot_form->getFastaSeqPtr(),
-                                         prot::ProtModBase::getProtModPtr_NONE(),
+                                         toppic::ProtModBase::getProtModPtr_NONE(),
                                          ori_prot_form->getStartPos(),
                                          ori_prot_form->getEndPos(),
                                          ori_prot_form->getResSeqPtr(),
@@ -1141,5 +1142,5 @@ ProteoformPtr LocalProcessor::compSplitPoint(ProteoformPtr proteoform, int h,
   return proteoform;
 }
 
-}  // namespace prot
+}  // namespace toppic
 

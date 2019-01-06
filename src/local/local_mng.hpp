@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_LOCAL_MNG_HPP_
-#define PROT_LOCAL_MNG_HPP_
+#ifndef TOPPIC_LOCAL_MNG_HPP_
+#define TOPPIC_LOCAL_MNG_HPP_
 
 
 #include <string>
@@ -22,12 +22,12 @@
 #include <utility>
 
 #include "prsm/prsm_para.hpp"
-#include "base/proteoform.hpp"
-#include "base/base_data.hpp"
-#include "base/fasta_reader.hpp"
-#include "base/file_util.hpp"
+#include "seq/proteoform.hpp"
+#include "common/base/base_data.hpp"
+#include "seq/fasta_reader.hpp"
+#include "common/util/file_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 const int LEFT_SUP_LIMIT = 10;
 
@@ -78,6 +78,6 @@ class LocalMng {
 
 typedef std::shared_ptr<LocalMng> LocalMngPtr;
 
-}  // namespace prot
+}  // namespace toppic
 
-#endif /* PROT_LOCAL_MNG_HPP_ */
+#endif /* TOPPIC_LOCAL_MNG_HPP_ */

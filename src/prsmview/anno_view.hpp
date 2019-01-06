@@ -13,16 +13,16 @@
 //limitations under the License.
 
 
-#ifndef PROT_ANNO_VIEW_HPP_
-#define PROT_ANNO_VIEW_HPP_
+#ifndef TOPPIC_PRSM_VIEW_ANNO_VIEW_HPP_
+#define TOPPIC_PRSM_VIEW_ANNO_VIEW_HPP_
 
 #include <map>
 #include <string>
 #include <vector>
 
-#include "base/extreme_value.hpp"
-#include "base/proteoform.hpp"
-#include "base/xml_writer.hpp"
+#include "prsm/extreme_value.hpp"
+#include "seq/proteoform.hpp"
+#include "common/xml/xml_writer.hpp"
 #include "spec/deconv_peak.hpp"
 #include "spec/extend_peak.hpp"
 #include "spec/sp_para.hpp"
@@ -31,7 +31,7 @@
 #include "prsmview/anno_cleavage.hpp"
 #include "prsmview/prsm_view_mng.hpp"
 
-namespace prot {
+namespace toppic {
 
 class AnnoView {
  public:
@@ -59,6 +59,6 @@ void writeProteinToXml(XmlWriterPtr xml_writer,
                        const std::vector<int> &species_ids,
                        PrsmViewMngPtr mng_ptr, bool detail = true, bool add_ms = true);
 
-}  // namespace prot
+}  // namespace toppic
 
-#endif /* PROT_ANNO_VIEW_HPP_ */
+#endif /* TOPPIC_PRSM_VIEW_ANNO_VIEW_HPP_ */

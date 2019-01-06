@@ -12,14 +12,11 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <string>
-#include <vector>
-
-#include "base/logger.hpp"
+#include "common/util/logger.hpp"
 #include "prsm/prsm_util.hpp"
 #include "prsm/simple_prsm_str.hpp"
 
-namespace prot {
+namespace toppic {
 
 SimplePrsmStr::SimplePrsmStr(const std::vector<std::string> &str_vec) {
   str_vec_ = str_vec;
@@ -35,4 +32,13 @@ SimplePrsmStr::SimplePrsmStr(const std::vector<std::string> &str_vec) {
   seq_desc_ = prsm_util::getValueStr(line);
 }
 
-}  // namespace prot
+bool SimplePrsmStr::cmpScoreDec(const SimplePrsmStrPtr &a, 
+                                const SimplePrsmStrPtr &b) {
+  if (a->getScore() == b->getScore()) {
+    return a->getSeqName() < b->getSeqName();
+  } else {
+    return a->getScore() > b->getScore();
+  }
+}
+
+}  // namespace toppic

@@ -13,24 +13,18 @@
 //limitations under the License.
 
 
-#ifndef PROT_SPEC_SUPPORT_PEAK_HPP_
-#define PROT_SPEC_SUPPORT_PEAK_HPP_
+#ifndef TOPPIC_SPEC_SUPPORT_PEAK_HPP_
+#define TOPPIC_SPEC_SUPPORT_PEAK_HPP_
 
-#include <vector>
-
-#include "base/support_peak_type.hpp"
+#include "common/base/support_peak_type.hpp"
 #include "spec/deconv_peak.hpp"
 
-namespace prot {
+namespace toppic {
 
 class SupportPeak {
  public:
   SupportPeak(DeconvPeakPtr deconv_peak_ptr, double offset,
-              double score, SPTypePtr peak_type_ptr): 
-      deconv_peak_ptr_(deconv_peak_ptr),
-      offset_(offset),
-      score_(score),
-      peak_type_ptr_(peak_type_ptr) {}
+              double score, SPTypePtr peak_type_ptr);
 
   SPTypePtr getPeakTypePtr() {return peak_type_ptr_;}
 
@@ -52,6 +46,6 @@ class SupportPeak {
 typedef std::shared_ptr<SupportPeak> SupportPeakPtr;
 typedef std::vector<SupportPeakPtr> SupportPeakPtrVec;
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* SUPPORT_PEAK_HPP_ */

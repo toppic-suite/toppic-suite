@@ -13,11 +13,10 @@
 //limitations under the License.
 
 #include <algorithm>
-#include <vector>
 
 #include "spec/extend_ms_factory.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace extend_ms_factory {
 
@@ -59,7 +58,7 @@ ExtendMsPtr geneMsThreePtr(DeconvMsPtr deconv_ms_ptr, SpParaPtr sp_para_ptr,
     }
   }
 
-  std::sort(list_filtered.begin(), list_filtered.end(), ExtendPeak::cmpPosIncrease);
+  std::sort(list_filtered.begin(), list_filtered.end(), ExtendPeak::cmpPosInc);
 
   // set error tolerance
   PeakTolerancePtr peak_tole_ptr = sp_para_ptr->getPeakTolerancePtr();
@@ -84,4 +83,4 @@ ExtendMsPtrVec geneMsThreePtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
 
 }  // namespace extend_ms_factory
 
-}  // namespace prot
+}  // namespace toppic

@@ -13,13 +13,13 @@
 //limitations under the License.
 
 
-#ifndef PROT_SPEC_BASE_PEAK_TYPE_HPP_
-#define PROT_SPEC_BASE_PEAK_TYPE_HPP_
+#ifndef TOPPIC_SPEC_BASE_PEAK_TYPE_HPP_
+#define TOPPIC_SPEC_BASE_PEAK_TYPE_HPP_
 
 #include <memory>
 #include <string>
 
-namespace prot {
+namespace toppic {
 
 class BasePeakType;
 typedef std::shared_ptr<BasePeakType> BasePeakTypePtr;

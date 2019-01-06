@@ -18,13 +18,13 @@
 #include <vector>
 
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
-#include "base/thread_pool.hpp"
+#include "common/thread/simple_thread_pool.hpp"
 #else
 #include <sys/wait.h>
 #endif
 
-#include "base/file_util.hpp"
-#include "base/mod_util.hpp"
+#include "common/util/file_util.hpp"
+#include "common/base/mod_util.hpp"
 #include "spec/msalign_util.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_reader.hpp"
@@ -32,12 +32,13 @@
 #include "prsm/simple_prsm_reader.hpp"
 #include "prsm/simple_prsm_util.hpp"
 #include "prsm/simple_prsm_xml_writer.hpp"
+#include "prsm/simple_prsm_xml_writer_util.hpp"
 #include "graph/proteo_graph_reader.hpp"
 #include "graph/spec_graph_reader.hpp"
 #include "graphalign/graph_align.hpp"
 #include "graphalign/graph_align_processor.hpp"
 
-namespace prot {
+namespace toppic {
 
 std::function<void()> geneTask(FastaIndexReaderPtr reader_ptr,
                                GraphAlignMngPtr mng_ptr,
@@ -50,7 +51,7 @@ std::function<void()> geneTask(FastaIndexReaderPtr reader_ptr,
     std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
 
     std::string input_file_name
-        = file_util::basename(sp_file_name) + "." + mng_ptr->input_file_ext_ + "_" + std::to_string(idx);
+        = file_util::basename(sp_file_name) + "." + mng_ptr->input_file_ext_ + "_" + str_util::toString(idx);
     SimplePrsmReader simple_prsm_reader(input_file_name);
     SimplePrsmStrPtr prsm_ptr = simple_prsm_reader.readOnePrsmStr();
     int group_spec_num = prsm_para_ptr->getGroupSpecNum();
@@ -64,7 +65,7 @@ std::function<void()> geneTask(FastaIndexReaderPtr reader_ptr,
                                 sp_para_ptr);
 
     PrsmXmlWriterPtr writer_ptr
-        = std::make_shared<PrsmXmlWriter>(file_util::basename(sp_file_name) + "." + mng_ptr->output_file_ext_ + "_" + std::to_string(idx));
+        = std::make_shared<PrsmXmlWriter>(file_util::basename(sp_file_name) + "." + mng_ptr->output_file_ext_ + "_" + str_util::toString(idx));
     SpectrumSetPtr spec_set_ptr = sp_reader.getNextSpectrumSet(sp_para_ptr)[0];
     ProteoAnnoPtr proteo_anno_ptr
         = std::make_shared<ProteoAnno>(prsm_para_ptr->getFixModPtrVec(),
@@ -91,7 +92,7 @@ std::function<void()> geneTask(FastaIndexReaderPtr reader_ptr,
             std::vector<FastaSubSeqPtr> seq_ptr_vec = reader_ptr->readFastaSubSeqVec(seq_name, seq_desc);
             for (size_t j = 0; j < seq_ptr_vec.size(); j++) {
               for (size_t k = 0; k < spec_ptr_vec.size(); k++) {
-                proteo_anno_ptr->anno(seq_ptr_vec[j]->getRawSeq(), seq_ptr_vec[j]->is_n_term());
+                proteo_anno_ptr->anno(seq_ptr_vec[j]->getRawSeq(), seq_ptr_vec[j]->isNTerm());
                 MassGraphPtr graph_ptr = getMassGraphPtr(proteo_anno_ptr, mng_ptr->convert_ratio_);
                 ProteoGraphPtr proteo_ptr = std::make_shared<ProteoGraph>(seq_ptr_vec[j],
                                                                           prsm_para_ptr->getFixModPtrVec(),
@@ -161,7 +162,7 @@ void GraphAlignProcessor::process() {
   std::string input_file_name
       = file_util::basename(sp_file_name) + "." + mng_ptr_->input_file_ext_;
 
-  SimplePrsmReaderPtr simple_prsm_reader = std::make_shared<prot::SimplePrsmReader>(input_file_name);
+  SimplePrsmReaderPtr simple_prsm_reader = std::make_shared<toppic::SimplePrsmReader>(input_file_name);
   std::shared_ptr<SimplePrsmXmlWriter> graph_filter_writer
       = std::make_shared<SimplePrsmXmlWriter>(file_util::basename(sp_file_name) + ".topmg_graph");
   SimplePrsmPtr prsm_ptr = simple_prsm_reader->readOnePrsm();
@@ -184,14 +185,12 @@ void GraphAlignProcessor::process() {
   graph_filter_writer->write(selected_prsm_ptrs); 
   graph_filter_writer->close();
 
-  std::vector<std::shared_ptr<SimplePrsmXmlWriter> > simple_prsm_writer_vec;
-  for (int i = 0; i < mng_ptr_->thread_num_; i++) {
-    simple_prsm_writer_vec.push_back(std::make_shared<SimplePrsmXmlWriter>(input_file_name + "_" + std::to_string(i)));
-  }
+  SimplePrsmXmlWriterPtrVec simple_prsm_writer_vec = 
+      simple_prsm_xml_writer_util::geneWriterPtrVec(input_file_name, mng_ptr_->thread_num_);
 
   int cnt = 0;
   simple_prsm_reader
-      = std::make_shared<prot::SimplePrsmReader>(file_util::basename(sp_file_name) + ".topmg_graph");
+      = std::make_shared<toppic::SimplePrsmReader>(file_util::basename(sp_file_name) + ".topmg_graph");
   prsm_ptr = simple_prsm_reader->readOnePrsm();
   while (prsm_ptr != nullptr) {
     cnt = cnt % mng_ptr_->thread_num_;
@@ -200,9 +199,7 @@ void GraphAlignProcessor::process() {
     prsm_ptr = simple_prsm_reader->readOnePrsm();
   }
   simple_prsm_reader->close();
-  for (size_t i = 0; i < simple_prsm_writer_vec.size(); i++) {
-    simple_prsm_writer_vec[i]->close();
-  }
+  simple_prsm_xml_writer_util::closeWriterPtrVec(simple_prsm_writer_vec);
 
   FastaIndexReaderPtr reader_ptr = std::make_shared<FastaIndexReader>(db_file_name);
 
@@ -244,7 +241,7 @@ void GraphAlignProcessor::process() {
   // combine result files
   std::vector<std::string> input_exts;
   for (int i = 0; i < mng_ptr_->thread_num_; i++) {
-    std::string fname = mng_ptr_->output_file_ext_ + "_" + std::to_string(i);
+    std::string fname = mng_ptr_->output_file_ext_ + "_" + str_util::toString(i);
     input_exts.push_back(fname);
   }
 
@@ -258,9 +255,9 @@ void GraphAlignProcessor::process() {
 
   // remove temporary files
   for (int t = 0; t < mng_ptr_->thread_num_; t++) {
-    file_util::cleanTempFiles(sp_file_name, mng_ptr_->input_file_ext_ + "_" + std::to_string(t));
-    file_util::cleanTempFiles(sp_file_name, mng_ptr_->output_file_ext_ + "_" + std::to_string(t));
+    file_util::cleanTempFiles(sp_file_name, mng_ptr_->input_file_ext_ + "_" + str_util::toString(t));
+    file_util::cleanTempFiles(sp_file_name, mng_ptr_->output_file_ext_ + "_" + str_util::toString(t));
   }
 }
-}  // namespace prot
+}  // namespace toppic
 

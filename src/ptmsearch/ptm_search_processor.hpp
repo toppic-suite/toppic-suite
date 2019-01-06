@@ -13,29 +13,18 @@
 //limitations under the License.
 
 
-#ifndef PROT_PTM_SEARCH_PROCESSOR_HPP_
-#define PROT_PTM_SEARCH_PROCESSOR_HPP_
+#ifndef TOPPIC_PTM_SEARCH_PTM_SEARCH_PROCESSOR_HPP_
+#define TOPPIC_PTM_SEARCH_PTM_SEARCH_PROCESSOR_HPP_
 
-#include "base/fasta_index_reader.hpp"
-#include "base/proteoform.hpp"
+#include "seq/fasta_index_reader.hpp"
+#include "seq/proteoform.hpp"
 #include "spec/spectrum_set.hpp"
 #include "prsm/simple_prsm.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 #include "oneptmsearch/ptm_search_mng.hpp"
 #include "ptmsearch/comp_shift_low_mem.hpp"
 
-namespace prot {
-
-template <int N>
-class PrsmXmlWriterSet {
- public:
-  PrsmXmlWriterSet(const std::string & output_file_name);
-  std::vector<PrsmXmlWriterPtr> complete_writer_ptrs_;
-  std::vector<PrsmXmlWriterPtr> prefix_writer_ptrs_;
-  std::vector<PrsmXmlWriterPtr> suffix_writer_ptrs_;
-  std::vector<PrsmXmlWriterPtr> internal_writer_ptrs_;
-  void close();
-};
+namespace toppic {
 
 class PtmSearchProcessor {
  public:
@@ -55,6 +44,6 @@ class PtmSearchProcessor {
 
 typedef std::shared_ptr<PtmSearchProcessor> PtmSearchProcessorPtr;
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* PTM_PROCESSOR_HPP_ */

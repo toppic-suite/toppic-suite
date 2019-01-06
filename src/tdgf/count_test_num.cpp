@@ -15,17 +15,17 @@
 
 #include <cmath>
 
-#include "base/logger.hpp"
-#include "base/fasta_reader.hpp"
-#include "base/mod_util.hpp"
-#include "base/residue_base.hpp"
-#include "base/residue_util.hpp"
-#include "base/proteoform_factory.hpp"
+#include "common/util/logger.hpp"
+#include "seq/fasta_reader.hpp"
+#include "common/base/mod_util.hpp"
+#include "common/base/residue_base.hpp"
+#include "common/base/residue_util.hpp"
+#include "seq/proteoform_factory.hpp"
 #include "tdgf/tdgf_util.hpp"
 #include "tdgf/count_test_num.hpp"
 #include "tdgf/comp_prob_value.hpp"
 
-namespace prot {
+namespace toppic {
 
 CountTestNum::CountTestNum(TdgfMngPtr mng_ptr) {
   convert_ratio_ = mng_ptr->convert_ratio_;
@@ -141,7 +141,7 @@ inline void CountTestNum::initInternalMassCnt() {
   }
 }
 
-double CountTestNum::compCandNum(AlignTypePtr type_ptr, int index, 
+double CountTestNum::compCandNum(ProteoformTypePtr type_ptr, int index, 
                                  double ori_mass, double ori_tolerance) {
   double cand_num = 0;
   if (index == 0) {
@@ -149,9 +149,9 @@ double CountTestNum::compCandNum(AlignTypePtr type_ptr, int index,
   } else if (index >= 1){ // with shifts
     cand_num = compPtmRestrictCandNum(type_ptr, index, ori_mass);
     // multiple adjustment 
-    if (type_ptr == AlignType::PREFIX || type_ptr == AlignType::SUFFIX) {
+    if (type_ptr == ProteoformType::PREFIX || type_ptr == ProteoformType::SUFFIX) {
       cand_num = cand_num * PREFIX_SUFFIX_ADJUST();
-    } else if (type_ptr == AlignType::INTERNAL) {
+    } else if (type_ptr == ProteoformType::INTERNAL) {
       cand_num = cand_num * INTERNAL_ADJUST();
     }
   }
@@ -162,7 +162,7 @@ double CountTestNum::compCandNum(AlignTypePtr type_ptr, int index,
   return cand_num;
 }
 
-double CountTestNum::compNonPtmCandNum(AlignTypePtr type_ptr,
+double CountTestNum::compNonPtmCandNum(ProteoformTypePtr type_ptr,
                                        double ori_mass, double ori_tolerance) {
   int low = std::floor((ori_mass - ori_tolerance) * convert_ratio_);
   int high = std::ceil((ori_mass + ori_tolerance) * convert_ratio_);
@@ -171,19 +171,19 @@ double CountTestNum::compNonPtmCandNum(AlignTypePtr type_ptr,
   return cand_num;
 }
 
-double CountTestNum::compPtmCandNum(AlignTypePtr type_ptr) {
+double CountTestNum::compPtmCandNum(ProteoformTypePtr type_ptr) {
   double cand_num = 0;
-  if (type_ptr == AlignType::COMPLETE) {
+  if (type_ptr == ProteoformType::COMPLETE) {
     cand_num = mod_proteo_lens_.size();
-  } else if (type_ptr == AlignType::PREFIX) {
+  } else if (type_ptr == ProteoformType::PREFIX) {
     for (size_t i = 0; i < raw_proteo_lens_.size(); i++) {
       cand_num += mod_proteo_lens_[i];
     }
-  } else if (type_ptr == AlignType::SUFFIX) {
+  } else if (type_ptr == ProteoformType::SUFFIX) {
     for (size_t i = 0; i < raw_proteo_lens_.size(); i++) {
       cand_num += raw_proteo_lens_[i];
     }
-  } else if (type_ptr == AlignType::INTERNAL) {
+  } else if (type_ptr == ProteoformType::INTERNAL) {
     for (size_t i = 0; i < raw_proteo_lens_.size(); i++) {
       cand_num = cand_num + raw_proteo_lens_[i] * raw_proteo_lens_[i];
     }
@@ -191,7 +191,7 @@ double CountTestNum::compPtmCandNum(AlignTypePtr type_ptr) {
   return cand_num;
 }
 
-double CountTestNum::compPtmRestrictCandNum(AlignTypePtr type_ptr,
+double CountTestNum::compPtmRestrictCandNum(ProteoformTypePtr type_ptr,
                                             int shift_num, double ori_mass) {
   double shift = max_ptm_mass_ * shift_num;
   int low = std::floor((ori_mass - shift) * convert_ratio_);
@@ -200,15 +200,15 @@ double CountTestNum::compPtmRestrictCandNum(AlignTypePtr type_ptr,
   return cand_num;
 }
 
-double CountTestNum::compSeqNum(AlignTypePtr type_ptr, int low, int high) {
+double CountTestNum::compSeqNum(ProteoformTypePtr type_ptr, int low, int high) {
   double candNum = 0;
-  if (type_ptr == AlignType::COMPLETE) {
+  if (type_ptr == ProteoformType::COMPLETE) {
     candNum = compMassNum(comp_mass_cnts_, low, high);
-  } else if (type_ptr == AlignType::PREFIX) {
+  } else if (type_ptr == ProteoformType::PREFIX) {
     candNum = compMassNum(pref_mass_cnts_, low, high);
-  } else if (type_ptr == AlignType::SUFFIX) {
+  } else if (type_ptr == ProteoformType::SUFFIX) {
     candNum = compMassNum(suff_mass_cnts_, low, high);
-  } else if (type_ptr == AlignType::INTERNAL) {
+  } else if (type_ptr == ProteoformType::INTERNAL) {
     candNum = compMassNum(internal_mass_cnts_, low, high);
   }
   return candNum;
@@ -231,4 +231,4 @@ double CountTestNum::compMassNum(double *cnts, int low, int high) {
   return cnt;
 }
 
-}  // namespace prot
+}  // namespace toppic

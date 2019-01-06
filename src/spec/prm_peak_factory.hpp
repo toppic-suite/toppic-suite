@@ -13,13 +13,13 @@
 //limitations under the License.
 
 
-#ifndef PROT_SPEC_PRM_PEAK_FACTORY_HPP_
-#define PROT_SPEC_PRM_PEAK_FACTORY_HPP_
+#ifndef TOPPIC_SPEC_PRM_PEAK_FACTORY_HPP_
+#define TOPPIC_SPEC_PRM_PEAK_FACTORY_HPP_
 
 #include "spec/peak_tolerance.hpp"
 #include "spec/prm_peak.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace prm_peak_factory {
 
@@ -30,6 +30,6 @@ PrmPeakPtr getPrecPeakPtr(int spec_id, double prec_mono_mass,
                           PeakTolerancePtr tole_ptr, double score);
 }  // namespace prm_peak_factory
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

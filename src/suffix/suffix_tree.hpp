@@ -24,7 +24,7 @@
 #include "protein_db.hpp"
 #include "suffix_position.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace suffix {
 
@@ -85,5 +85,5 @@ typedef std::shared_ptr<SuffixTree> SuffixTreePtr;
 
 }  // namespace suffix
 
-}  // namespace prot
+}  // namespace toppic
 #endif

@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_DIST_HPP_
-#define PROT_DIST_HPP_
+#ifndef TOPPIC_GRAPH_DIST_HPP_
+#define TOPPIC_GRAPH_DIST_HPP_
 
 #include <utility>
 #include <set>
@@ -22,7 +22,7 @@
 
 #include "graph/graph.hpp"
 
-namespace prot {
+namespace toppic {
 
 class Dist{
  public:
@@ -58,6 +58,6 @@ void addToDistVec(MassGraphPtr graph_ptr,
                   int node_num, int mod_num, DistVec & dist_vec,
                   int gap);
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

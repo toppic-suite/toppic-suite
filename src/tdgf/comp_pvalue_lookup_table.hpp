@@ -13,16 +13,17 @@
 //limitations under the License.
 
 
-#ifndef PROT_COMP_PVALUE_LOOKUP_TABLE_HPP_
-#define PROT_COMP_PVALUE_LOOKUP_TABLE_HPP_
+#ifndef TOPPIC_TDGF_COMP_PVALUE_LOOKUP_TABLE_HPP_
+#define TOPPIC_TDGF_COMP_PVALUE_LOOKUP_TABLE_HPP_
 
 #include <vector>
+#include <fstream>
 
 #include "tdgf/tdgf_mng.hpp"
 #include "tdgf/comp_prob_value.hpp"
 #include "tdgf/count_test_num.hpp"
 
-namespace prot {
+namespace toppic {
 
 class CompPValueLookupTable {
  public:
@@ -63,6 +64,6 @@ std::vector<int> getFourIndex(int peak_num, int frag_num);
 
 int getPeakNumFromIndex(int idx);
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

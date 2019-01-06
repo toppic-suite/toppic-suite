@@ -13,20 +13,27 @@
 //limitations under the License.
 
 
-#include <sstream>
 #include <cmath>
-#include <utility>
-#include <string>
-#include <vector>
+#include <sstream>
 
-#include "base/activation_base.hpp"
-#include "base/logger.hpp"
-#include "base/string_util.hpp"
-#include "base/xml_dom_util.hpp"
-#include "spec/peak_util.hpp"
+#include "common/util/logger.hpp"
+#include "common/util/str_util.hpp"
+#include "common/xml/xml_dom_document.hpp"
+#include "common/xml/xml_dom_util.hpp"
+#include "common/base/activation_base.hpp"
+#include "common/base/mass_constant.hpp"
+#include "spec/peak.hpp"
 #include "spec/ms_header.hpp"
 
-namespace prot {
+namespace toppic {
+
+double MsHeader::getPrecMonoMz() {
+  if (std::isnan(prec_mono_mz_)) {
+    return 0.0; 
+  } else {
+    return prec_mono_mz_;
+  }
+}
 
 MsHeader::MsHeader(xercesc::DOMElement* element) {
   file_name_ = xml_dom_util::getChildValue(element, "file_name", 0);
@@ -56,7 +63,7 @@ double MsHeader::getPrecMonoMass() {
     LOG_WARN("monoisotopic mass is not initialized");
     return 0.0;
   } else {
-    return peak_util::compPeakMass(prec_mono_mz_, prec_charge_);
+    return Peak::compPeakMass(prec_mono_mz_, prec_charge_);
   }
 }
 
@@ -65,7 +72,7 @@ double MsHeader::getPrecSpMass() {
     LOG_WARN("precursor spectrum mass is not initialized");
     return 0.0;
   } else {
-    return peak_util::compPeakMass(prec_sp_mz_, prec_charge_);
+    return Peak::compPeakMass(prec_sp_mz_, prec_charge_);
   }
 }
 
@@ -74,7 +81,7 @@ double MsHeader::getPrecMonoMassMinusWater() {
     LOG_WARN("monoisotopic mass is not initialized");
     return 0.0;
   } else {
-    return peak_util::compPeakMass(prec_mono_mz_, prec_charge_)
+    return Peak::compPeakMass(prec_mono_mz_, prec_charge_)
         - mass_constant::getWaterMass();
   }
 }
@@ -116,7 +123,7 @@ void MsHeader::setScans(const std::string &s) {
     scans_.push_back(-1);
     return;
   }
-  std::vector<std::string> strs = string_util::split(s, ' ');
+  std::vector<std::string> strs = str_util::split(s, " ");
   for (size_t i = 0; i < strs.size(); i++) {
     scans_.push_back(std::stoi(strs[i]));
   }
@@ -127,28 +134,28 @@ xercesc::DOMElement* MsHeader::getHeaderXml(XmlDOMDocument* xml_doc) {
   int precison = 4;
   xercesc::DOMElement* element = xml_doc->createElement("ms_header");
   xml_doc->addElement(element, "file_name", file_name_.c_str());
-  std::string str = string_util::convertToString(id_);
+  std::string str = str_util::toString(id_);
   xml_doc->addElement(element, "id", str.c_str());
-  str = string_util::convertToString(prec_id_);
+  str = str_util::toString(prec_id_);
   xml_doc->addElement(element, "prec_id", str.c_str());
   xml_doc->addElement(element, "title", title_.c_str());
-  str = string_util::convertToString(level_);
+  str = str_util::toString(level_);
   xml_doc->addElement(element, "level", str.c_str());
   str = getScansString();
   xml_doc->addElement(element, "scans", str.c_str());
   xercesc::DOMElement* scans = xml_doc->createElement("scan_list");
   for (size_t i = 0; i < scans_.size(); i++) {
-    str = string_util::convertToString(scans_[i]);
+    str = str_util::toString(scans_[i]);
     xml_doc->addElement(scans, "scan", str.c_str());
   }
   element->appendChild(scans);
-  str = string_util::convertToString(retention_time_);
+  str = str_util::toString(retention_time_);
   xml_doc->addElement(element, "retention_time", str.c_str());
-  str = string_util::convertToString(prec_sp_mz_);
+  str = str_util::toString(prec_sp_mz_);
   xml_doc->addElement(element, "prec_sp_mz", str.c_str());
-  str = string_util::convertToString(prec_mono_mz_, precison);
+  str = str_util::toString(prec_mono_mz_, precison);
   xml_doc->addElement(element, "prec_mono_mz", str.c_str());
-  str = string_util::convertToString(prec_charge_);
+  str = str_util::toString(prec_charge_);
   xml_doc->addElement(element, "prec_charge", str.c_str());
   activation_ptr_->appendNameToXml(xml_doc, element);
   return element;
@@ -160,7 +167,7 @@ void MsHeader::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
 
 MsHeaderPtr MsHeader::geneMsHeaderPtr(MsHeaderPtr ori_ptr, double new_prec_mass) {
   MsHeaderPtr new_header_ptr = std::make_shared<MsHeader>(*ori_ptr.get());
-  double mono_mz = peak_util::compMonoMz(new_prec_mass, ori_ptr->getPrecCharge());
+  double mono_mz = Peak::compMonoMz(new_prec_mass, ori_ptr->getPrecCharge());
   new_header_ptr->setPrecMonoMz(mono_mz);
   return new_header_ptr;
 }
@@ -169,4 +176,4 @@ bool MsHeader::cmpPrecInteDec(const MsHeaderPtr &a, const MsHeaderPtr &b) {
   return a->getPrecInte() > b->getPrecInte();
 }
 
-}  // namespace prot
+}  // namespace toppic

@@ -12,18 +12,18 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#ifndef PROT_SPEC_PEAK_HPP_
-#define PROT_SPEC_PEAK_HPP_
+#ifndef TOPPIC_SPEC_PEAK_HPP_
+#define TOPPIC_SPEC_PEAK_HPP_
 
 #include <memory>
 #include <vector>
 #include <string>
 
-#include "base/mass_constant.hpp"
-#include "base/xml_dom_document.hpp"
+#include "common/xml/xml_dom_element.hpp"
 
-namespace prot {
+namespace toppic {
+
+class XmlDOMDocument;
 
 class Peak;
 
@@ -32,9 +32,7 @@ typedef std::vector<PeakPtr> PeakPtrVec;
 
 class Peak {
  public:
-  Peak(double position, double intensity):
-      position_(position),
-      intensity_(intensity) {}
+  Peak(double position, double intensity);
 
   double getIntensity() {return intensity_;}
 
@@ -52,17 +50,12 @@ class Peak {
 
   static std::string getXmlElementName() {return "peak";}
 
-  static double compPeakMass(double mono_mz, int charge) {
-    return mono_mz * charge - charge * mass_constant::getProtonMass();
-  }
+  static double compPeakMass(double mono_mz, int charge);
 
-  static double compMonoMz(double mono_mass, int charge) {
-    return mono_mass / charge + mass_constant::getProtonMass();
-  }
+  static double compMonoMz(double mono_mass, int charge);
 
   static bool cmpInteDec(const PeakPtr &a, const PeakPtr &b) { 
-    return a->getIntensity() > b->getIntensity();
-  }
+    return a->getIntensity() > b->getIntensity();}
 
 private:
   double position_;
@@ -70,5 +63,5 @@ private:
 };
 
 
-}  // namespace prot
+}  // namespace toppic
 #endif

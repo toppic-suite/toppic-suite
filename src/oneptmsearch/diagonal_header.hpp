@@ -13,15 +13,15 @@
 //limitations under the License.
 
 
-#ifndef PROT_DIAGONAL_HEADER_HPP_
-#define PROT_DIAGONAL_HEADER_HPP_
+#ifndef TOPPIC_ONE_PTM_SEARCH_DIAGONAL_HEADER_HPP_
+#define TOPPIC_ONE_PTM_SEARCH_DIAGONAL_HEADER_HPP_
 
 #include <vector>
 
-#include "base/proteoform.hpp"
+#include "seq/proteoform.hpp"
 #include "spec/prm_peak.hpp"
 
-namespace prot {
+namespace toppic {
 
 class DiagonalHeader;
 
@@ -170,6 +170,6 @@ MassShiftPtrVec getDiagonalMassChanges(const DiagonalHeaderPtrVec &header_ptrs,
                                        int first_res_pos, int last_res_pos,
                                        const MassShiftTypePtrVec & type_ptrs);
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* DIAGONAL_HEADER_HPP_ */

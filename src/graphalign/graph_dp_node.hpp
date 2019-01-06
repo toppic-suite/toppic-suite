@@ -13,13 +13,13 @@
 //limitations under the License.
 
 
-#ifndef PROT_GRAPH_DP_NODE_HPP_
-#define PROT_GRAPH_DP_NODE_HPP_
+#ifndef TOPPIC_GRAPH_ALIGN_GRAPH_DP_NODE_HPP_
+#define TOPPIC_GRAPH_ALIGN_GRAPH_DP_NODE_HPP_
 
 #include <memory>
 #include <vector>
 
-namespace prot {
+namespace toppic {
 
 #define GRAPH_ALIGN_TYPE_NULL -1
 #define GRAPH_ALIGN_TYPE_VARIABLE 0 
@@ -78,6 +78,6 @@ class GraphDpNode {
 };
 
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* GRAPH_DP_NODE_HPP_ */

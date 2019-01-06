@@ -15,7 +15,7 @@
 
 #include "node.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace suffix {
 
@@ -56,4 +56,4 @@ int Node::getCharacterIndex(char ch) {
 
 }  // namespace suffix
 
-}  // namespace prot
+}  // namespace toppic

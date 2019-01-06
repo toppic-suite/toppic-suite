@@ -13,13 +13,13 @@
 //limitations under the License.
 
 
-#ifndef PROT_ONE_PTM_SLOW_MATCH_HPP_
-#define PROT_ONE_PTM_SLOW_MATCH_HPP_
+#ifndef TOPPIC_ONE_PTM_SEARCH_ONE_PTM_SLOW_MATCH_HPP_
+#define TOPPIC_ONE_PTM_SEARCH_ONE_PTM_SLOW_MATCH_HPP_
 
 #include <memory>
 #include <vector>
 
-#include "base/proteoform.hpp"
+#include "seq/proteoform.hpp"
 #include "spec/prm_peak.hpp"
 #include "spec/deconv_ms.hpp"
 #include "spec/spectrum_set.hpp"
@@ -31,14 +31,14 @@
 #include "oneptmsearch/basic_diag_pair.hpp"
 #include "oneptmsearch/ps_align.hpp"
 
-namespace prot {
+namespace toppic {
 
 class OnePtmSlowMatch {
  public:
   OnePtmSlowMatch(ProteoformPtr proteo_ptr,
                   SpectrumSetPtr spectrum_set_ptr,
                   SimplePrsmPtr simple_prsm_ptr,
-                  AlignTypePtr align_type_ptr,
+                  ProteoformTypePtr align_type_ptr,
                   PtmSearchMngPtr mng_ptr);
 
   ProteoformPtr getProteoform(){return proteo_ptr_;};
@@ -54,7 +54,7 @@ class OnePtmSlowMatch {
   DeconvMsPtrVec deconv_ms_ptr_vec_;
   PrmMsPtrVec ms_six_ptr_vec_;
   ExtendMsPtrVec ms_three_ptr_vec_;
-  AlignTypePtr align_type_ptr_;
+  ProteoformTypePtr align_type_ptr_;
   SimplePrsmPtr simple_prsm_ptr_;
   PSAlignPtr ps_align_ptr_;
 
@@ -71,6 +71,6 @@ class OnePtmSlowMatch {
 typedef std::shared_ptr<OnePtmSlowMatch> OnePtmSlowMatchPtr;
 typedef std::vector<OnePtmSlowMatchPtr> OnePtmSlowMatchPtrVec;
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif 

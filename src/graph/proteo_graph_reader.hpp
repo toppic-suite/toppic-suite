@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_PROTEO_GRAPH_READER_HPP_
-#define PROT_PROTEO_GRAPH_READER_HPP_
+#ifndef TOPPIC_GRAPH_PROTEO_GRAPH_READER_HPP_
+#define TOPPIC_GRAPH_PROTEO_GRAPH_READER_HPP_
 
 #include <string>
 
@@ -22,7 +22,7 @@
 #include "graph/proteo_anno.hpp"
 #include "graph/proteo_graph.hpp"
 
-namespace prot {
+namespace toppic {
 
 class ProteoGraphReader {
  public:
@@ -56,6 +56,6 @@ class ProteoGraphReader {
 
 MassGraphPtr getMassGraphPtr(ProteoAnnoPtr proteo_anno_ptr, double convert_ratio);
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* PROTEO_GRAPH_READER_HPP_ */

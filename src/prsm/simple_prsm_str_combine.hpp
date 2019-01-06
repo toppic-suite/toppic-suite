@@ -12,48 +12,42 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#ifndef TOPPIC_PRSM_SIMPLE_PRSM_STR_COMBINE_HPP_
+#define TOPPIC_PRSM_SIMPLE_PRSM_STR_COMBINE_HPP_
 
-#ifndef PROT_PRSM_SIMPLE_PRSM_STR_COMBINE_HPP_
-#define PROT_PRSM_SIMPLE_PRSM_STR_COMBINE_HPP_
-
+#include <memory>
 #include <vector>
 #include <string>
-#include <map>
 
-#include "base/proteoform.hpp"
-#include "base/fasta_reader.hpp"
-#include "prsm/prsm.hpp"
-#include "prsm/prsm_para.hpp"
-#include "prsm/simple_prsm_xml_writer.hpp"
-
-namespace prot {
+namespace toppic {
 
 class SimplePrsmStrCombine {
  public:
   SimplePrsmStrCombine(const std::string &spec_file_name,
                        const std::vector<std::string> &in_file_exts,
                        const std::string &out_file_ext,
-                       int top_num):
-      spec_file_name_(spec_file_name),
-      input_file_exts_(in_file_exts),
-      output_file_ext_(out_file_ext),
-      top_num_(top_num) {}
+                       int top_num);
 
   SimplePrsmStrCombine(const std::string &spec_file_name,
                        const std::string &in_file_ext,
                        int in_num,
                        const std::string &out_file_ext,
-                       int top_num):
-      spec_file_name_(spec_file_name),
-      output_file_ext_(out_file_ext),
-      top_num_(top_num) {
-        for (int i = 0; i < in_num; i ++) {
-          std::string ext = in_file_ext + "_" + std::to_string(i);
-          input_file_exts_.push_back(ext);
-        }
-      }
+                       int top_num);
 
+  SimplePrsmStrCombine(const std::string &spec_file_name,
+                       const std::string &in_file_pref,
+                       const std::string &in_file_suff,
+                       int in_num,
+                       const std::string &out_file_ext,
+                       int top_num);
   void process();
+
+  static void combineBlockResults(std::string &sp_file_name, 
+                                  std::string &input_pref,
+                                  int block_num, 
+                                  int comp_num, 
+                                  int pref_suff_num,
+                                  int inte_num);
 
  private:
   std::string spec_file_name_;
@@ -63,6 +57,6 @@ class SimplePrsmStrCombine {
 };
 
 typedef std::shared_ptr<SimplePrsmStrCombine> SimplePrsmStrCombinePtr;
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif

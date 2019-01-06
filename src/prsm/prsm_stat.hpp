@@ -12,19 +12,15 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#ifndef TOPPIC_PRSM_PRSM_STAT_HPP_
+#define TOPPIC_PRSM_PRSM_STAT_HPP_
 
-#ifndef PROT_PRSM_PRSM_STAT_HPP_
-#define PROT_PRSM_PRSM_STAT_HPP_
+#include <fstream>
 
-#include <string>
-
-#include "base/string_util.hpp"
-#include "base/proteoform.hpp"
-#include "base/fasta_reader.hpp"
 #include "prsm/prsm_para.hpp"
 #include "prsm/prsm.hpp"
 
-namespace prot {
+namespace toppic {
 
 class PrsmStat {
  public:
@@ -46,6 +42,6 @@ class PrsmStat {
 typedef std::shared_ptr<PrsmStat> PrsmStatPtr;
 
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* PRSM_STAT_HPP_ */

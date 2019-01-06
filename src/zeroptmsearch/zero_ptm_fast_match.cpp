@@ -15,11 +15,11 @@
 #include <algorithm>
 #include <vector>
 
-#include "base/logger.hpp"
-#include "base/base_data.hpp"
+#include "common/util/logger.hpp"
+#include "common/base/base_data.hpp"
 #include "zeroptmsearch/zero_ptm_fast_match.hpp"
 
-namespace prot {
+namespace toppic {
 
 /*
  * in the computing of diagonal score in fast filtering, we allow to use n
@@ -206,19 +206,19 @@ ZpFastMatchPtr computeInternalMatch(const ExtendMsPtrVec &ms_ptr_vec,
   return std::make_shared<ZeroPtmFastMatch>(proteo_ptr, best_score, best_bgn, best_end-1);
 }
 
-ZpFastMatchPtrVec ZeroPtmFastMatch::filter(AlignTypePtr align_type_ptr,
+ZpFastMatchPtrVec ZeroPtmFastMatch::filter(ProteoformTypePtr align_type_ptr,
                                            const ExtendMsPtrVec &ms_ptr_vec,
                                            const ProteoformPtrVec &proteo_ptrs,
                                            int report_num, double ppo) {
   ZpFastMatchPtrVec match_vec;
   for (size_t i = 0; i < proteo_ptrs.size(); i++) {
-    if (align_type_ptr == AlignType::COMPLETE) {
+    if (align_type_ptr == ProteoformType::COMPLETE) {
       match_vec.push_back(computeCompMatch(ms_ptr_vec, proteo_ptrs[i], ppo));
-    } else if (align_type_ptr == AlignType::PREFIX) {
+    } else if (align_type_ptr == ProteoformType::PREFIX) {
       match_vec.push_back(computePrefixMatch(ms_ptr_vec, proteo_ptrs[i], ppo));
-    } else if (align_type_ptr == AlignType::SUFFIX) {
+    } else if (align_type_ptr == ProteoformType::SUFFIX) {
       match_vec.push_back(computeSuffixMatch(ms_ptr_vec, proteo_ptrs[i], ppo));
-    } else if (align_type_ptr == AlignType::INTERNAL) {
+    } else if (align_type_ptr == ProteoformType::INTERNAL) {
       match_vec.push_back(computeInternalMatch(ms_ptr_vec, proteo_ptrs[i], ppo));
     }
   }
@@ -242,4 +242,4 @@ ZpFastMatchPtrVec ZeroPtmFastMatch::filter(AlignTypePtr align_type_ptr,
   return report_vec;
 }
 
-}  // namespace prot
+}  // namespace toppic

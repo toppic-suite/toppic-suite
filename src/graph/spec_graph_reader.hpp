@@ -13,13 +13,13 @@
 //limitations under the License.
 
 
-#ifndef PROT_SPEC_GRAPH_READER_HPP_
-#define PROT_SPEC_GRAPH_READER_HPP_
+#ifndef TOPPIC_GRAPH_SPEC_GRAPH_READER_HPP_
+#define TOPPIC_GRAPH_SPEC_GRAPH_READER_HPP_
 
 #include "spec/msalign_reader.hpp"
 #include "graph/spec_graph.hpp"
 
-namespace prot {
+namespace toppic {
 
 class SpecGraphReader {
  public:
@@ -40,6 +40,6 @@ class SpecGraphReader {
   MassGraphPtr getMassGraphPtr(const PrmPeakPtrVec &peak_vec);
 };
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif /* SPEC_GRAPH_READER_HPP_ */

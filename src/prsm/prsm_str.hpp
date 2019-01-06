@@ -12,30 +12,15 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#ifndef TOPPIC_PRSM_PRSM_STR_HPP_
+#define TOPPIC_PRSM_PRSM_STR_HPP_
 
-#ifndef PROT_PRSM_PRSM_STR_HPP_
-#define PROT_PRSM_PRSM_STR_HPP_
-
-#include <memory>
 #include <vector>
 #include <string>
 
-namespace prot {
+#include "prsm/mass_shift_str.hpp"
 
-class MassShiftStr {
- public:
-  MassShiftStr(double mass_shift, int left_pos, int right_pos):
-      mass_shift_(mass_shift),
-      left_pos_(left_pos),
-      right_pos_(right_pos) {}
-
-  double mass_shift_;
-  int left_pos_, right_pos_;
-  static bool cmpPosInc(const std::shared_ptr<MassShiftStr> &a,
-                        const std::shared_ptr<MassShiftStr> &b);
-};
-
-typedef std::shared_ptr<MassShiftStr> MassShiftStrPtr;
+namespace toppic {
 
 class PrsmStr;
 typedef std::shared_ptr<PrsmStr> PrsmStrPtr;
@@ -113,33 +98,18 @@ class PrsmStr {
   void setSampleId(int sample_id) {sample_id_ = sample_id;}
 
   static bool cmpEValueInc(const PrsmStrPtr &a, const PrsmStrPtr &b) {
-    return a->getEValue() < b->getEValue();
-  }
+    return a->getEValue() < b->getEValue();}
 
   static bool cmpMatchFragmentDec(const PrsmStrPtr &a, const PrsmStrPtr &b) {
-    return a->getMatchFragNum() > b->getMatchFragNum();
-  }
+    return a->getMatchFragNum() > b->getMatchFragNum();}
 
   static bool cmpNormMatchFragmentDec(const PrsmStrPtr &a, const PrsmStrPtr &b) {
-    return a->getNormMatchFragNum() > b->getNormMatchFragNum();
-  }
+    return a->getNormMatchFragNum() > b->getNormMatchFragNum();}
 
   static bool cmpSpectrumIdInc(const PrsmStrPtr &a, const PrsmStrPtr &b) {
-    return a->getSpectrumId() < b->getSpectrumId();
-  }
+    return a->getSpectrumId() < b->getSpectrumId();}
 
-  static bool cmpSpectrumIdIncPrecursorIdInc(const PrsmStrPtr &a, const PrsmStrPtr &b) {
-    if (a->getSpectrumId() < b->getSpectrumId()) {
-      return true;
-    } else if (a->getSpectrumId() > b->getSpectrumId()) {
-      return false;
-    } else {
-      if (a->getPrecursorId() < b->getPrecursorId()) {
-        return true;
-      }
-      return false;
-    }
-  }
+  static bool cmpSpectrumIdIncPrecursorIdInc(const PrsmStrPtr &a, const PrsmStrPtr &b);
 
   static bool isSameSeqAndMass(const PrsmStrPtr &a, const PrsmStrPtr &b, double ppo);
 
@@ -196,6 +166,6 @@ class PrsmStr {
 typedef std::vector<PrsmStrPtr> PrsmStrPtrVec;
 typedef std::vector<PrsmStrPtrVec> PrsmStrPtrVec2D;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

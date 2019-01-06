@@ -17,11 +17,12 @@
 #include <algorithm>
 #include <vector>
 
-#include "base/version.hpp"
-#include "base/fasta_reader.hpp"
-#include "base/fasta_util.hpp"
-#include "base/base_data.hpp"
-#include "base/file_util.hpp"
+#include "common/util/version.hpp"
+#include "common/util/file_util.hpp"
+#include "common/base/base_data.hpp"
+
+#include "seq/fasta_reader.hpp"
+#include "seq/fasta_util.hpp"
 
 #include "spec/msalign_reader.hpp"
 #include "spec/msalign_util.hpp"
@@ -44,14 +45,11 @@
 #include "prsm/simple_prsm.hpp"
 #include "prsm/simple_prsm_str_combine.hpp"
 
-#include "zeroptmfilter/zero_ptm_filter_mng.hpp"
-#include "zeroptmfilter/zero_ptm_filter_processor.hpp"
+#include "filter/oneptm/one_ptm_filter_mng.hpp"
+#include "filter/oneptm/one_ptm_filter_processor.hpp"
 
-#include "oneptmfilter/one_ptm_filter_mng.hpp"
-#include "oneptmfilter/one_ptm_filter_processor.hpp"
-
-#include "diagfilter/diag_filter_mng.hpp"
-#include "diagfilter/diag_filter_processor.hpp"
+#include "filter/diag/diag_filter_mng.hpp"
+#include "filter/diag/diag_filter_processor.hpp"
 
 #include "graph/graph.hpp"
 #include "graph/proteo_graph.hpp"
@@ -68,7 +66,41 @@
 #include "console/topmg_argument.hpp"
 #include "console/topmg_process.hpp"
 
-namespace prot {
+namespace toppic {
+
+void cleanTopmgDir(const std::string &fa_name, const std::string & sp_name) {
+  std::string fa_base = file_util::absoluteName(fa_name); 
+  std::replace(fa_base.begin(), fa_base.end(), '\\', '/');
+  std::string abs_sp_name = file_util::absoluteName(sp_name);
+  std::string sp_base = file_util::basename(abs_sp_name); 
+  std::replace(sp_base.begin(), sp_base.end(), '\\', '/');
+
+  file_util::cleanPrefix(fa_name, fa_base + "_");
+  file_util::cleanPrefix(sp_name, sp_base + ".msalign_");
+  file_util::delFile(abs_sp_name + "_index");
+  file_util::delFile(sp_base + ".topmg_one_filter");
+  file_util::cleanPrefix(sp_name, sp_base + ".topmg_one_filter_");
+  file_util::delFile(sp_base + ".topmg_multi_filter");
+  file_util::cleanPrefix(sp_name, sp_base + ".topmg_multi_filter_");
+  file_util::delFile(sp_base + ".topmg_graph_filter");
+  file_util::cleanPrefix(sp_name, sp_base + ".topmg_graph_filter_");
+  file_util::delFile(sp_base + ".topmg_graph_align");
+  file_util::cleanPrefix(sp_name, sp_base + ".topmg_graph_align_");
+  file_util::delFile(sp_base + ".topmg_graph_post");
+  file_util::delFile(sp_base + ".topmg_graph");
+  file_util::delFile(sp_base + ".topmg_evalue");
+  file_util::cleanPrefix(sp_name, sp_base + ".toppic_evalue_");
+  file_util::delFile(sp_base + ".topmg_cluster");
+  file_util::delFile(sp_base + ".topmg_top");
+  file_util::delFile(sp_base + ".topmg_top_pre");
+  file_util::delFile(sp_base + ".topmg_prsm_cutoff");
+  file_util::delFile(sp_base + ".topmg_form_cutoff");
+  file_util::delFile(sp_base + "_topmg_proteoform.xml");
+  file_util::rename(sp_base + ".topmg_form_cutoff_form", 
+                    sp_base + "_topmg_proteoform.xml");
+  file_util::delDir(sp_base + "_topmg_proteoform_cutoff_xml");
+  file_util::delDir(sp_base + "_topmg_prsm_cutoff_xml");
+}
 
 int TopMG_identify(std::map<std::string, std::string> & arguments) {
   try {
@@ -93,7 +125,7 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
     std::string feature_file_name = sp_file_name.substr(0, sp_file_name.length() - 12) + ".feature";
 
     if (arguments["useFeatureFile"] == "true") {
-      if (!boost::filesystem::exists(feature_file_name)) {
+      if (!file_util::exists(feature_file_name)) {
         LOG_ERROR("TopFD feature file does not exist!. Please use -x option in command line or select 'Missing MS1 feature file in GUI'.");
         return 1;
       }
@@ -366,14 +398,14 @@ int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
   std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
   std::string combined_start_time = buf;
 
-  std::cout << "TopMG " << prot::version_number << std::endl;
+  std::cout << "TopMG " << toppic::version_number << std::endl;
 
   for (size_t k = 0; k < spec_file_lst.size(); k++) {
     std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
     std::string start_time = buf;
     arguments["startTime"] = start_time;
     arguments["spectrumFileName"] = spec_file_lst[k];
-    if (prot::TopMGProcess(arguments) != 0) {
+    if (toppic::TopMGProcess(arguments) != 0) {
       return 1;
     }
   }
@@ -382,26 +414,26 @@ int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
     std::cout << "Merging files - started." << std::endl;
     int N = 1000000;
     // merge msalign files
-    prot::msalign_util::mergeMsalignFiles(spec_file_lst, N, base_name + "_ms2.msalign");
+    toppic::msalign_util::mergeMsalignFiles(spec_file_lst, N, base_name + "_ms2.msalign");
     // merge feature files
     std::vector<std::string> feature_file_lst(spec_file_lst.size());
     for (size_t i = 0; i < spec_file_lst.size(); i++) {
       std::string sp_file_name = spec_file_lst[i];
       feature_file_lst[i] = sp_file_name.substr(0, sp_file_name.length() - 12) + ".feature";
     }
-    prot::feature_util::mergeFeatureFiles(feature_file_lst, N, base_name + ".feature");
+    toppic::feature_util::mergeFeatureFiles(feature_file_lst, N, base_name + ".feature");
     // merge EVALUE files
     std::vector<std::string> prsm_file_lst(spec_file_lst.size());
     for (size_t i = 0; i < spec_file_lst.size(); i++) {
-      prsm_file_lst[i] = prot::file_util::basename(spec_file_lst[i]) + ".topmg_evalue"; 
+      prsm_file_lst[i] = toppic::file_util::basename(spec_file_lst[i]) + ".topmg_evalue"; 
     }
-    prot::prsm_util::mergePrsmFiles(prsm_file_lst, N, base_name + "_ms2.topmg_evalue");
+    toppic::prsm_util::mergePrsmFiles(prsm_file_lst, N, base_name + "_ms2.topmg_evalue");
     std::cout << "Merging files - finished." << std::endl;
 
     std::string sp_file_name = base_name + "_ms2.msalign";
     arguments["spectrumFileName"] = sp_file_name;
     arguments["startTime"] = combined_start_time;
-    prot::TopMG_post(arguments);
+    toppic::TopMG_post(arguments);
   }
 
   if (arguments["keepTempFiles"] != "true") {
@@ -410,16 +442,12 @@ int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
 
     for (size_t k = 0; k < spec_file_lst.size(); k++) {
       std::string sp_file_name = spec_file_lst[k];
-      prot::file_util::delDir(prot::file_util::basename(sp_file_name) + "_topmg_proteoform_cutoff_xml");
-      prot::file_util::delDir(prot::file_util::basename(sp_file_name) + "_topmg_prsm_cutoff_xml");
-      prot::file_util::cleanTopmgDir(ori_db_file_name, sp_file_name);
+      cleanTopmgDir(ori_db_file_name, sp_file_name);
     }
 
     if (spec_file_lst.size() > 1 && arguments["combinedOutputName"] != "") {
       std::string sp_file_name = base_name + "_ms2.msalign";
-      prot::file_util::delDir(prot::file_util::basename(sp_file_name) + "_topmg_proteoform_cutoff_xml");
-      prot::file_util::delDir(prot::file_util::basename(sp_file_name) + "_topmg_prsm_cutoff_xml");
-      prot::file_util::cleanTopmgDir(ori_db_file_name, sp_file_name);
+      cleanTopmgDir(ori_db_file_name, sp_file_name);
     }
     std::cout << "Deleting temporary files - finished." << std::endl; 
   }
@@ -428,4 +456,4 @@ int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
   return 0; 
 }
 
-}  // namespace prot
+}  // namespace toppic

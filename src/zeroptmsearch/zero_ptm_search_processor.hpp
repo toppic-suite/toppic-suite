@@ -12,17 +12,14 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#ifndef PROT_ZERO_PTM_SEARCH_HPP_
-#define PROT_ZERO_PTM_SEARCH_HPP_
-
-#include <array>
+#ifndef TOPPIC_ZERO_PTM_SEARCH_ZERO_PTM_SEARCH_HPP_
+#define TOPPIC_ZERO_PTM_SEARCH_ZERO_PTM_SEARCH_HPP_
 
 #include "spec/spectrum_set.hpp"
-#include "prsm/prsm.hpp"
+#include "prsm/simple_prsm.hpp"
 #include "zeroptmsearch/zero_ptm_search_mng.hpp"
 
-namespace prot {
+namespace toppic {
 
 class ZeroPtmSearchProcessor {
  public:
@@ -34,12 +31,12 @@ class ZeroPtmSearchProcessor {
                                   const SimplePrsmPtrVec &simple_prsm_ptr_vec,
                                   FastaIndexReaderPtr reader_ptr,
                                   ZeroPtmSearchMngPtr mng_ptr,
-                                  AlignTypePtr type_ptr);
+                                  ProteoformTypePtr type_ptr);
   ZeroPtmSearchMngPtr mng_ptr_;
 };
 
 typedef std::shared_ptr<ZeroPtmSearchProcessor> ZeroPtmSearchProcessorPtr;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

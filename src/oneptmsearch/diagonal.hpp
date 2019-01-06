@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_DIAGONAL_HPP_
-#define PROT_DIAGONAL_HPP_
+#ifndef TOPPIC_ONE_PTM_SEARCH_DIAGONAL_HPP_
+#define TOPPIC_ONE_PTM_SEARCH_DIAGONAL_HPP_
 
 #include <memory>
 #include <vector>
@@ -24,7 +24,7 @@
 #include "prsm/peak_ion_pair.hpp"
 #include "oneptmsearch/diagonal_header.hpp"
 
-namespace prot {
+namespace toppic {
 
 template <class T>
 class Diagonal {
@@ -76,6 +76,6 @@ int getNewBgn(const PeakIonPairPtrVec& pair_ptrs);
 
 int getNewEnd(const PeakIonPairPtrVec& pair_ptrs);
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* DIAGONAL_HPP_ */

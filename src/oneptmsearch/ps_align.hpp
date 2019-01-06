@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_PS_ALIGN_HPP_
-#define PROT_PS_ALIGN_HPP_
+#ifndef TOPPIC_ONE_PTM_SEARCH_PS_ALIGN_HPP_
+#define TOPPIC_ONE_PTM_SEARCH_PS_ALIGN_HPP_
 
 #include <vector>
 
@@ -23,7 +23,7 @@
 #include "oneptmsearch/dp_pair.hpp"
 #include "oneptmsearch/basic_diag_pair.hpp"
 
-namespace prot {
+namespace toppic {
 
 class PSAlign {
  public:
@@ -38,11 +38,11 @@ class PSAlign {
         initDPPair();
       }
 
-  void compute(AlignTypePtr type_ptr);
+  void compute(ProteoformTypePtr type_ptr);
 
   void initDPPair();
 
-  void dp(AlignTypePtr type_ptr);
+  void dp(ProteoformTypePtr type_ptr);
 
   void backtrace();
 
@@ -86,7 +86,7 @@ class PSAlign {
 
   void dpPrep();
 
-  DPPairPtr getTruncPre(DPPairPtr cur_pair_ptr, int s, AlignTypePtr type_ptr);
+  DPPairPtr getTruncPre(DPPairPtr cur_pair_ptr, int s, ProteoformTypePtr type_ptr);
 
   DPPairPtr getShiftPre(int p, int s);
 };
@@ -94,6 +94,6 @@ class PSAlign {
 typedef std::shared_ptr<PSAlign> PSAlignPtr;
 typedef std::vector<PSAlignPtr> PSAlignPtrVec;
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* PS_ALIGN_HPP_ */

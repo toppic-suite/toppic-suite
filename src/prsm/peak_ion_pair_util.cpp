@@ -12,16 +12,14 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <vector>
 #include <algorithm>
 
-#include "base/logger.hpp"
-#include "base/base_algo.hpp"
-#include "spec/theo_peak.hpp"
-#include "spec/theo_peak_util.hpp"
+#include "common/util/logger.hpp"
+#include "prsm/theo_peak_util.hpp"
+#include "prsm/prsm_algo.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace peak_ion_pair_util {
 
@@ -97,7 +95,7 @@ PeakIonPairPtrVec findPairs(ExtendMsPtr ms_three_ptr,
         pair_ptrs.push_back(pair_ptr);
       }
     }
-    if (base_algo::increaseIJ(i, j, deviation, err, ms_masses, theo_masses)) {
+    if (prsm_algo::increaseIJ(i, j, deviation, err, ms_masses, theo_masses)) {
       i++;
     } else {
       j++;
@@ -160,4 +158,4 @@ double compMatchPeakNum(PeakIonPairPtrVec &pairs) {
 
 }  // namespace peak_ion_pair_util
 
-}  // namespace prot
+}  // namespace toppic

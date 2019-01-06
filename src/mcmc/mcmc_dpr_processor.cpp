@@ -18,27 +18,26 @@
 #include <vector>
 #include <map>
 
-#include <boost/algorithm/string.hpp>
-
-#include "base/ptm_util.hpp"
-#include "base/mod_util.hpp"
-#include "base/file_util.hpp"
-#include "base/residue_util.hpp"
-#include "base/neutral_loss.hpp"
-#include "base/base_algo.hpp"
-#include "base/extreme_value.hpp"
-#include "base/thread_pool.hpp"
+#include "common/base/ptm_util.hpp"
+#include "common/base/mod_util.hpp"
+#include "common/util/file_util.hpp"
+#include "common/base/residue_util.hpp"
+#include "common/base/neutral_loss.hpp"
+#include "prsm/extreme_value.hpp"
+#include "common/thread/simple_thread_pool.hpp"
 
 #include "spec/msalign_reader.hpp"
 #include "spec/msalign_util.hpp"
 #include "spec/theo_peak.hpp"
-#include "spec/theo_peak_util.hpp"
+#include "prsm/theo_peak_util.hpp"
 #include "spec/extend_ms_factory.hpp"
 
+#include "prsm/prsm_algo.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_str_combine.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
 #include "prsm/prsm_xml_writer.hpp"
+#include "prsm/prsm_xml_writer_util.hpp"
 
 #include "tdgf/tdgf_mng.hpp"
 #include "tdgf/count_test_num.hpp"
@@ -47,7 +46,7 @@
 #include "mcmc/comp_pvalue_mcmc.hpp"
 #include "mcmc/mcmc_mass_table_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 void DprProcessor::init() {
   std::string var_mod_file_name = mng_ptr_->residue_mod_file_;
@@ -140,9 +139,11 @@ void DprProcessor::process() {
   PrsmReaderPtr prsm_reader = std::make_shared<PrsmReader>(input_file_name);
 
   PrsmXmlWriterPtr prsm_writer
-      = std::make_shared<PrsmXmlWriter>(output_file_name + "_" + std::to_string(mng_ptr_->thread_num_));
+      = std::make_shared<PrsmXmlWriter>(output_file_name + "_" + str_util::toString(mng_ptr_->thread_num_));
 
-  pool_ptr_ = std::make_shared<ThreadPool<PrsmXmlWriter> >(mng_ptr_->thread_num_ , output_file_name);
+  writer_ptr_vec_ = prsm_xml_writer_util::geneWriterPtrVec(output_file_name, mng_ptr_->thread_num_);
+
+  pool_ptr_ = std::make_shared<SimpleThreadPool>(mng_ptr_->thread_num_);
 
   FastaIndexReaderPtr fasta_reader_ptr = std::make_shared<FastaIndexReader>(db_file_name);
 
@@ -187,13 +188,13 @@ void DprProcessor::process() {
   sp_reader_ptr->close();
   prsm_reader->close();
   prsm_writer->close();
-
+  prsm_xml_writer_util::closeWriterPtrVec(writer_ptr_vec_);
 
   // combine results
   int prsm_top_num = INT_MAX; 
   std::vector<std::string> input_exts;
   for (int t = 0; t < mng_ptr_->thread_num_; t++) {
-    input_exts.push_back(mng_ptr_->output_file_ext_ + "_" + std::to_string(t));
+    input_exts.push_back(mng_ptr_->output_file_ext_ + "_" + str_util::toString(t));
   }
   PrsmStrCombinePtr combine_ptr
       = std::make_shared<PrsmStrCombine>(sp_file_name, input_exts, 
@@ -212,10 +213,11 @@ std::function<void()> geneTask(SpectrumSetPtr spec_set_ptr,
                                const std::map<int, std::vector<std::string> > & mass_table,
                                CountTestNumPtr test_num_ptr,
                                const std::vector<std::vector<double> > & ptm_mass_vec2d,
-                               std::shared_ptr<ThreadPool<PrsmXmlWriter> > pool_ptr) {
-  return [spec_set_ptr, prsm_ptr, mng_ptr, ptm_residue_map, mass_table, test_num_ptr, ptm_mass_vec2d, pool_ptr]() {
+                               SimpleThreadPoolPtr pool_ptr,
+                               PrsmXmlWriterPtrVec writer_ptr_vec) {
+  return [spec_set_ptr, prsm_ptr, mng_ptr, ptm_residue_map, mass_table, test_num_ptr, ptm_mass_vec2d, pool_ptr, writer_ptr_vec]() {
     CompPValueMCMCPtr comp_mcmc_ptr
-        = std::make_shared<prot::CompPValueMCMC>(mng_ptr, ptm_residue_map, mass_table);
+        = std::make_shared<toppic::CompPValueMCMC>(mng_ptr, ptm_residue_map, mass_table);
     DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
     ExtendMsPtrVec refine_ms_ptr_vec
         = extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec,
@@ -244,7 +246,7 @@ std::function<void()> geneTask(SpectrumSetPtr spec_set_ptr,
 
     double cand_num = 0;
 
-    AlignTypePtr type_ptr = prsm_ptr->getProteoformPtr()->getAlignType();
+    ProteoformTypePtr type_ptr = prsm_ptr->getProteoformPtr()->getProteoformType();
 
     int unexpect_shift_num = prsm_ptr->getProteoformPtr()->getMassShiftNum(MassShiftType::UNEXPECTED);
 
@@ -269,9 +271,8 @@ std::function<void()> geneTask(SpectrumSetPtr spec_set_ptr,
     prsm_ptr->setExtremeValuePtr(evalue);
 
     boost::thread::id thread_id = boost::this_thread::get_id();
-    PrsmXmlWriterPtr writer_ptr = pool_ptr->getWriter(thread_id);
-
-    writer_ptr->write(prsm_ptr);
+    int writer_id = pool_ptr->getId(thread_id);
+    writer_ptr_vec[writer_id]->write(prsm_ptr);
   };
 }
 
@@ -288,7 +289,8 @@ void DprProcessor::processOnePrsm(PrsmPtr prsm_ptr, SpectrumSetPtr spec_set_ptr,
   }
   pool_ptr_->Enqueue(geneTask(spec_set_ptr, prsm_ptr, mng_ptr_,
                               ptm_residue_map_, mass_table_,
-                              test_num_ptr_, ptm_mass_vec2d_, pool_ptr_));
+                              test_num_ptr_, ptm_mass_vec2d_, pool_ptr_,
+                              writer_ptr_vec_));
 }
 
-}  // namespace prot
+}  // namespace toppic

@@ -13,12 +13,12 @@
 //limitations under the License.
 
 
-#ifndef PROT_SPEC_DECONV_MS_FACTORY_HPP_
-#define PROT_SPEC_DECONV_MS_FACTORY_HPP_
+#ifndef TOPPIC_SPEC_DECONV_MS_FACTORY_HPP_
+#define TOPPIC_SPEC_DECONV_MS_FACTORY_HPP_
 
 #include "spec/deconv_ms.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace deconv_ms_util {
 
@@ -26,6 +26,6 @@ DeconvMsPtrVec  getRefineMsPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, doubl
 
 }  // namespace deconv_ms_util
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

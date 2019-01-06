@@ -18,10 +18,10 @@
 #include <vector>
 #include <ctime>
 
-#include "base/base_data.hpp"
-#include "base/file_util.hpp"
-#include "base/string_util.hpp"
-#include "base/fasta_util.hpp"
+#include "common/base/base_data.hpp"
+#include "common/util/file_util.hpp"
+#include "common/util/str_util.hpp"
+#include "seq/fasta_util.hpp"
 
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_sample_merge.hpp"
@@ -30,7 +30,7 @@
 #include "console/topmerge_argument.hpp"
 #include "console/topmerge_process.hpp"
 
-namespace prot {
+namespace toppic {
 
 int topMergeProcess(std::map<std::string, std::string> &arguments,
                     std::vector<std::string> &proteo_file_list) {

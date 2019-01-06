@@ -12,34 +12,20 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#ifndef TOPPIC_PRSM_PRSM_TABLE_WRITER_HPP_
+#define TOPPIC_PRSM_PRSM_TABLE_WRITER_HPP_
 
-#ifndef PROT_PRSM_PRSM_TABLE_WRITER_HPP_
-#define PROT_PRSM_PRSM_TABLE_WRITER_HPP_
-
-#include <iostream>
-#include <fstream>
-#include <memory>
-#include <string>
-#include <map>
-
-#include "base/string_util.hpp"
-#include "base/proteoform.hpp"
-#include "base/fasta_reader.hpp"
-#include "prsm/prsm_para.hpp"
 #include "prsm/prsm.hpp"
+#include "prsm/prsm_para.hpp"
 
-namespace prot {
+namespace toppic {
 
 class PrsmTableWriter {
  public:
   PrsmTableWriter(PrsmParaPtr prsm_para_ptr, 
                   std::string argu_str,
                   const std::string &input_file_ext, 
-                  const std::string &output_file_ext):
-      prsm_para_ptr_(prsm_para_ptr),
-      input_file_ext_(input_file_ext),
-      argu_str_(argu_str),
-      output_file_ext_(output_file_ext) {}
+                  const std::string &output_file_ext);
 
   void write();
 
@@ -57,6 +43,6 @@ class PrsmTableWriter {
 
 typedef std::shared_ptr<PrsmTableWriter> PrsmTableWriterPtr;
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* TABLE_WRITER_HPP_ */

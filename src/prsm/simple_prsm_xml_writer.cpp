@@ -12,21 +12,14 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <string>
-#include <iostream>
-#include <algorithm>
-#include <vector>
-
-#include <boost/filesystem.hpp>
-
-#include "base/xml_dom_document.hpp"
-#include "base/xml_dom.hpp"
-#include "base/xml_dom_util.hpp"
-#include "base/file_util.hpp"
+#include "common/util/file_util.hpp"
+#include "common/xml/xml_dom_document.hpp"
+#include "common/xml/xml_dom_util.hpp"
+#include "common/xml/xml_dom_impl.hpp"
 #include "spec/msalign_reader.hpp"
 #include "prsm/simple_prsm_xml_writer.hpp"
 
-namespace prot {
+namespace toppic {
 
 SimplePrsmXmlWriter::SimplePrsmXmlWriter(const std::string &file_name) {
   file_.open(file_name.c_str());
@@ -36,8 +29,7 @@ SimplePrsmXmlWriter::SimplePrsmXmlWriter(const std::string &file_name) {
   doc_ = new XmlDOMDocument(impl->createDoc("simple_prsm_list"));
   serializer_ = impl->createSerializer();
 
-  boost::filesystem::path p(file_name);
-  file_name_ = p.stem().string() + ".msalign";
+  file_name_ = file_util::basename(file_name) + ".msalign";
 }
 
 SimplePrsmXmlWriter::~SimplePrsmXmlWriter() {
@@ -67,10 +59,10 @@ void SimplePrsmXmlWriter::write(SimplePrsmPtr simple_prsm_ptr) {
   if (simple_prsm_ptr->getFileName() == "") {
     simple_prsm_ptr->setFileName(file_name_);
   }
-  xercesc::DOMElement * element = simple_prsm_ptr->toXml(doc_);
+  XmlDOMElement * element = simple_prsm_ptr->toXml(doc_);
   std::string str = xml_dom_util::writeToString(serializer_, element);
   xml_dom_util::writeToStreamByRemovingDoubleLF(file_, str);
   element->release();
 }
 
-}  // namespace prot
+}  // namespace toppic

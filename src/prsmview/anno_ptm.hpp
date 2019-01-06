@@ -13,18 +13,18 @@
 //limitations under the License.
 
 
-#ifndef PROT_ANNO_PTM_HPP_
-#define PROT_ANNO_PTM_HPP_
+#ifndef TOPPIC_PRSM_VIEW_ANNO_PTM_HPP_
+#define TOPPIC_PRSM_VIEW_ANNO_PTM_HPP_
 
 #include <utility>
 #include <string>
 #include <vector>
 
-#include "base/ptm.hpp"
-#include "base/mass_shift_type.hpp"
-#include "base/xml_dom_document.hpp"
+#include "common/base/ptm.hpp"
+#include "seq/mass_shift_type.hpp"
+#include "common/xml/xml_dom_document.hpp"
 
-namespace prot {
+namespace toppic {
 
 class AnnoPtm;
 typedef std::shared_ptr<AnnoPtm> AnnoPtmPtr;
@@ -53,7 +53,7 @@ class AnnoPtm {
   std::vector<std::pair<int, std::string> > occurences_;
 };
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif
 

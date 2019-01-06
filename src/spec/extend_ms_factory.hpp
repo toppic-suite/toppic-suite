@@ -13,14 +13,14 @@
 //limitations under the License.
 
 
-#ifndef PROT_SPEC_EXTEND_MS_FACTORY_HPP_
-#define PROT_SPEC_EXTEND_MS_FACTORY_HPP_
+#ifndef TOPPIC_SPEC_EXTEND_MS_FACTORY_HPP_
+#define TOPPIC_SPEC_EXTEND_MS_FACTORY_HPP_
 
 #include "spec/deconv_ms.hpp"
 #include "spec/extend_ms.hpp"
 #include "spec/sp_para.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace extend_ms_factory {
 
@@ -32,6 +32,6 @@ ExtendMsPtrVec geneMsThreePtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
 
 }  // namespace extend_ms_factory
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif 

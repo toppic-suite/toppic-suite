@@ -13,20 +13,17 @@
 //limitations under the License.
 
 
-#ifndef PROT_SPEC_RAW_MS_HPP_
-#define PROT_SPEC_RAW_MS_HPP_
-
-#include <memory>
-#include <vector>
+#ifndef TOPPIC_SPEC_RAW_MS_HPP_
+#define TOPPIC_SPEC_RAW_MS_HPP_
 
 #include "spec/peak.hpp"
 #include "spec/ms.hpp"
 
-namespace prot {
+namespace toppic {
 
 typedef std::shared_ptr<Ms<PeakPtr>> RawMsPtr;
 typedef std::vector<RawMsPtr> RawMsPtrVec;
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif 

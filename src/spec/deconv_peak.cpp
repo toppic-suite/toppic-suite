@@ -15,11 +15,25 @@
 
 #include <string>
 
-#include "base/string_util.hpp"
-#include "base/xml_dom_util.hpp"
+#include "common/util/str_util.hpp"
+#include "common/xml/xml_dom_util.hpp"
+#include "common/xml/xml_dom_document.hpp"
 #include "spec/deconv_peak.hpp"
 
-namespace prot {
+namespace toppic {
+
+DeconvPeak::DeconvPeak(int id, double mono_mass, double intensity, int charge):
+    Peak(mono_mass, intensity),
+    id_(id),
+    charge_(charge),
+    score_(1.0) {}
+
+DeconvPeak::DeconvPeak(int id, double mono_mass, double intensity, 
+                       int charge, double score):
+    Peak(mono_mass, intensity),
+    id_(id),
+    charge_(charge),
+    score_(score) {}
 
 DeconvPeak::DeconvPeak(xercesc::DOMElement* element):
     Peak(xml_dom_util::getDoubleChildValue(element, "position", 0),
@@ -32,18 +46,18 @@ DeconvPeak::DeconvPeak(xercesc::DOMElement* element):
 void DeconvPeak::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   std::string element_name = DeconvPeak::getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
-  std::string str = string_util::convertToString(getPosition());
+  std::string str = str_util::toString(getPosition());
   xml_doc->addElement(element, "position", str.c_str());
-  str = string_util::convertToString(getIntensity());
+  str = str_util::toString(getIntensity());
   xml_doc->addElement(element, "intensity", str.c_str());
-  str = string_util::convertToString(id_);
+  str = str_util::toString(id_);
   xml_doc->addElement(element, "id", str.c_str());
-  str = string_util::convertToString(charge_);
+  str = str_util::toString(charge_);
   xml_doc->addElement(element, "charge", str.c_str());
-  str = string_util::convertToString(score_);
+  str = str_util::toString(score_);
   xml_doc->addElement(element, "score", str.c_str());
   parent->appendChild(element);
 }
 
-}  // namespace prot
+}  // namespace toppic
 

@@ -13,15 +13,15 @@
 //limitations under the License.
 
 
-#ifndef PROT_GRAPH_ALIGN_MNG_HPP_
-#define PROT_GRAPH_ALIGN_MNG_HPP_
+#ifndef TOPPIC_GRAPH_ALIGN_GRAPH_ALIGN_MNG_HPP_
+#define TOPPIC_GRAPH_ALIGN_GRAPH_ALIGN_MNG_HPP_
 
 #include <cmath>
 #include <string>
 
 #include "prsm/prsm_para.hpp"
 
-namespace prot {
+namespace toppic {
 
 class GraphAlignMng {
  public:
@@ -90,6 +90,6 @@ class GraphAlignMng {
 
 typedef std::shared_ptr<GraphAlignMng> GraphAlignMngPtr;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

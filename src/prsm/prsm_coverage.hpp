@@ -12,27 +12,22 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#ifndef PROT_PRSM_PRSM_COVERAGE_HPP_
-#define PROT_PRSM_PRSM_COVERAGE_HPP_
+#ifndef TOPPIC_PRSM_PRSM_COVERAGE_HPP_
+#define TOPPIC_PRSM_PRSM_COVERAGE_HPP_
 
 #include <string>
 
-#include "base/string_util.hpp"
-#include "base/fasta_reader.hpp"
 #include "prsm/peak_ion_pair.hpp"
 #include "prsm/prsm.hpp"
 #include "prsm/prsm_para.hpp"
 
-namespace prot {
+namespace toppic {
 
 class PrsmCoverage {
  public:
-  PrsmCoverage(PrsmParaPtr prsm_para_ptr, const std::string &input_file_ext,
-               const std::string &output_file_ext):
-      prsm_para_ptr_(prsm_para_ptr), 
-      input_file_ext_(input_file_ext),
-      output_file_ext_(output_file_ext){}
+  PrsmCoverage(PrsmParaPtr prsm_para_ptr, 
+               const std::string &input_file_ext,
+               const std::string &output_file_ext);
 
   void processSingleCoverage();
   void processCombineCoverage();
@@ -61,7 +56,7 @@ class PrsmCoverage {
 
 typedef std::shared_ptr<PrsmCoverage> PrsmCoveragePtr;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif
 

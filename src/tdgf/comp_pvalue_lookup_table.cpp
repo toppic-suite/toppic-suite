@@ -17,13 +17,12 @@
 #include <algorithm>
 #include <vector>
 
-#include <boost/algorithm/string.hpp>
-
-#include "base/logger.hpp"
-#include "base/file_util.hpp"
+#include "common/util/logger.hpp"
+#include "common/util/file_util.hpp"
+#include "common/util/str_util.hpp"
 #include "tdgf/comp_pvalue_lookup_table.hpp"
 
-namespace prot {
+namespace toppic {
 
 CompPValueLookupTable::CompPValueLookupTable(TdgfMngPtr mng_ptr) {
   mng_ptr_ = mng_ptr;
@@ -46,11 +45,11 @@ void CompPValueLookupTable::initTable() {
 
   input_.open(
       mng_ptr_->prsm_para_ptr_->getResourceDir() + file_util::getFileSeparator() + "p_value_table"
-      + file_util::getFileSeparator() + "ppm" + std::to_string(ppo) + "_ptm0.txt",
+      + file_util::getFileSeparator() + "ppm" + str_util::toString(ppo) + "_ptm0.txt",
       std::ios::in);
 
   while (std::getline(input_, line)) {
-    boost::split(strs, line, boost::is_any_of(" \t"));
+    strs = str_util::split(line, " \t");
     ptm0_[getPeakIndex(std::stoi(strs[0]))][getFragIndex(std::stoi(strs[1]))] =
         std::stod(strs[2]);
   }
@@ -59,11 +58,11 @@ void CompPValueLookupTable::initTable() {
 
   input_.open(
       mng_ptr_->prsm_para_ptr_->getResourceDir() + file_util::getFileSeparator() + "p_value_table"
-      + file_util::getFileSeparator() + "ppm" + std::to_string(ppo) + "_ptm1.txt",
+      + file_util::getFileSeparator() + "ppm" + str_util::toString(ppo) + "_ptm1.txt",
       std::ios::in);
 
   while (std::getline(input_, line)) {
-    boost::split(strs, line, boost::is_any_of(" \t"));
+    strs = str_util::split(line, " \t");
     ptm1_[getPeakIndex(std::stoi(strs[0]))][getFragIndex(std::stoi(strs[1]))] =
         std::stod(strs[2]);
   }
@@ -72,11 +71,11 @@ void CompPValueLookupTable::initTable() {
 
   input_.open(
       mng_ptr_->prsm_para_ptr_->getResourceDir() + file_util::getFileSeparator() + "p_value_table"
-      + file_util::getFileSeparator() + "ppm" + std::to_string(ppo) + "_ptm2.txt",
+      + file_util::getFileSeparator() + "ppm" + str_util::toString(ppo) + "_ptm2.txt",
       std::ios::in);
 
   while (std::getline(input_, line)) {
-    boost::split(strs, line, boost::is_any_of(" \t"));
+    strs = str_util::split(line, " \t");
     ptm2_[getPeakIndex(std::stoi(strs[0]))][getFragIndex(std::stoi(strs[1]))] =
         std::stod(strs[2]);
   }
@@ -173,7 +172,7 @@ void CompPValueLookupTable::process(const DeconvMsPtrVec &deconv_ms_ptr_vec, Prs
       prot_prob = compProb(peak_num, match_frag_num, unexpected_shift_num);
     }
 
-    AlignTypePtr type_ptr = prsm_ptrs[i]->getProteoformPtr()->getAlignType();
+    ProteoformTypePtr type_ptr = prsm_ptrs[i]->getProteoformPtr()->getProteoformType();
 
     double cand_num = test_num_ptr_->compCandNum(type_ptr, unexpected_shift_num,
                                                  refine_prec_mass, tolerance);
@@ -338,4 +337,4 @@ int getPeakNumFromIndex(int idx) {
   }
 }
 
-}  // namespace prot
+}  // namespace toppic

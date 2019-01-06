@@ -15,7 +15,7 @@
 
 #include "spec/rm_break_type.hpp"
 
-namespace prot {
+namespace toppic {
 
 const RmBreakTypePtr RmBreakType::NONE   = std::make_shared<RmBreakType>("NONE");
 
@@ -25,4 +25,4 @@ const RmBreakTypePtr RmBreakType::C_TERM = std::make_shared<RmBreakType>("C_term
 
 const RmBreakTypePtr RmBreakType::BOTH   = std::make_shared<RmBreakType>("Both");
 
-}  // namespace prot
+}  // namespace toppic
