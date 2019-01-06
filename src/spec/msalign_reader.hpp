@@ -12,39 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef PROT_SPEC_MSALIGN_READER_HPP_
-#define PROT_SPEC_MSALIGN_READER_HPP_
+#ifndef TOPPIC_SPEC_MSALIGN_READER_HPP_
+#define TOPPIC_SPEC_MSALIGN_READER_HPP_
 
-#include <climits>
 #include <fstream>
-#include <iostream>
-#include <memory>
 #include <set>
 #include <string>
 #include <vector>
 
-#include "base/logger.hpp"
+#include "common/util/logger.hpp"
 #include "spec/deconv_ms.hpp"
 #include "spec/spectrum_set.hpp"
 
-namespace prot {
+namespace toppic {
 
 class MsAlignReader {
  public:
   MsAlignReader(const std::string &file_name, int group_spec_num,
                 ActivationPtr act_ptr, const std::set<std::string> skip_list,
-                int peak_num_limit = std::numeric_limits<int>::max())
-      : file_name_(file_name),
-        group_spec_num_(group_spec_num),
-        activation_ptr_(act_ptr),
-        skip_list_(skip_list),
-        peak_num_limit_(peak_num_limit) {
-    input_.open(file_name.c_str(), std::ios::in);
-    if (!input_.is_open()) {
-      LOG_ERROR("msalign file  " << file_name << " does not exist.");
-      throw "msalign file does not exist.";
-    }
-  }
+                int peak_num_limit = std::numeric_limits<int>::max());
 
   std::vector<std::string> readOneSpectrum();
 
@@ -78,5 +64,5 @@ class MsAlignReader {
 
 typedef std::shared_ptr<MsAlignReader> MsAlignReaderPtr;
 
-}  // namespace prot
+}  // namespace toppic
 #endif

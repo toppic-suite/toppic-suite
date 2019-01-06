@@ -21,7 +21,7 @@
 #include "suffix/suffix_tree.hpp"
 
 
-using namespace prot::suffix;
+using namespace toppic::suffix;
 
 TEST_CASE("suffix tree") {
   std::ofstream test_file;

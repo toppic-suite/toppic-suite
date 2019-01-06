@@ -13,15 +13,15 @@
 // limitations under the License.
 
 
-#ifndef PROT_GRAPH_POST_PROCESSOR_HPP_
-#define PROT_GRAPH_POST_PROCESSOR_HPP_
+#ifndef TOPPIC_GRAPH_ALIGN_GRAPH_POST_PROCESSOR_HPP_
+#define TOPPIC_GRAPH_ALIGN_GRAPH_POST_PROCESSOR_HPP_
 
 #include <unordered_map>
 #include <string>
 
 #include "graphalign/graph_align_mng.hpp"
 
-namespace prot {
+namespace toppic {
 
 class GraphPostProcessor {
  public:
@@ -48,6 +48,6 @@ class GraphPostProcessor {
 
 typedef std::shared_ptr<GraphPostProcessor> GraphPostProcessorPtr;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

@@ -12,15 +12,23 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <string>
 #include <algorithm>
 
-#include "base/file_util.hpp"
-#include "prsm/prsm.hpp"
+#include "common/util/file_util.hpp"
 #include "prsm/prsm_reader.hpp"
+#include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_form_filter.hpp"
 
-namespace prot {
+namespace toppic {
+
+PrsmFormFilter::PrsmFormFilter(const std::string &db_file_name,
+                               const std::string &spec_file_name,
+                               const std::string &input_file_ext,
+                               const std::string &output_file_ext):
+    db_file_name_(db_file_name),
+    spec_file_name_(spec_file_name),
+    input_file_ext_(input_file_ext),
+    output_file_ext_(output_file_ext) {}
 
 void PrsmFormFilter::process() {
   std::string base_name = file_util::basename(spec_file_name_);
@@ -57,4 +65,4 @@ void PrsmFormFilter::process() {
   writer.close();
 }
 
-} /* namespace prot */
+} /* namespace toppic */

@@ -12,17 +12,13 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <string>
-#include <vector>
-
 #include "xercesc/framework/MemBufInputSource.hpp"
-#include "htslib/faidx.h"
 
-#include "base/logger.hpp"
-#include "base/string_util.hpp"
+#include "common/util/logger.hpp"
+#include "common/util/str_util.hpp"
 #include "prsm/prsm_reader.hpp"
 
-namespace prot {
+namespace toppic {
 
 PrsmReader::PrsmReader(const std::string &file_name) {
   input_.open(file_name.c_str(), std::ios::in);
@@ -32,7 +28,7 @@ std::vector<std::string> PrsmReader::readOnePrsmLines() {
   std::string line;
   std::vector<std::string> line_list;
   while (std::getline(input_, line)) {
-    line = string_util::trim(line);
+    str_util::trim(line);
     // LOG_DEBUG("line " << line);
     if (line ==  "<prsm>") {
       line_list.push_back(line);
@@ -78,7 +74,7 @@ PrsmPtr PrsmReader::readOnePrsm(FastaIndexReaderPtr reader_ptr,
   PrsmPtr ptr;
   if (parser) {
     XmlDOMDocument doc(parser, prsm_buf);
-    xercesc::DOMElement* root = doc.getDocumentElement();
+    XmlDOMElement* root = doc.getDocumentElement();
     ptr = std::make_shared<Prsm>(root, reader_ptr, fix_mod_list);
   }
   return ptr;
@@ -134,4 +130,4 @@ PrsmPtrVec PrsmReader::readAllPrsms(const std::string &prsm_file_name,
   return prsm_ptrs;
 }
 
-}  // namespace prot
+}  // namespace toppic

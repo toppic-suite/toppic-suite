@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef PROT_COMP_PVALUE_MCMC_HPP_
-#define PROT_COMP_PVALUE_MCMC_HPP_
+#ifndef TOPPIC_COMP_PVALUE_MCMC_HPP_
+#define TOPPIC_COMP_PVALUE_MCMC_HPP_
 
 #include <random>
 #include <map>
@@ -21,13 +21,13 @@
 #include <vector>
 #include <algorithm>
 
-#include "base/activation.hpp"
+#include "common/base/activation.hpp"
 
 #include "prsm/prsm.hpp"
 
 #include "mcmc_mng.hpp"
 
-namespace prot {
+namespace toppic {
 
 class CompPValueMCMC{
  public:
@@ -115,6 +115,6 @@ class CompPValueMCMC{
 
 typedef std::shared_ptr<CompPValueMCMC> CompPValueMCMCPtr;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

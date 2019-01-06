@@ -13,17 +13,17 @@
 //limitations under the License.
 
 
-#ifndef PROT_TDGF_UTIL_HPP_
-#define PROT_TDGF_UTIL_HPP_
+#ifndef TOPPIC_TDGF_TDGF_UTIL_HPP_
+#define TOPPIC_TDGF_TDGF_UTIL_HPP_
 
 #include <vector>
 #include <string>
 
-#include "base/proteoform.hpp"
-#include "base/residue_freq.hpp"
+#include "seq/proteoform.hpp"
+#include "common/base/residue_freq.hpp"
 #include "tdgf/tdgf_mng.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace tdgf_util {
 
@@ -41,6 +41,6 @@ int computeAvgLength(const ResFreqPtrVec &residue_ptrs, double convert_ratio);
 
 }  // namespace tdgf_util
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

@@ -18,10 +18,11 @@
 #include <string>
 #include <vector>
 
-#include "base/ptm_util.hpp"
-#include "base/prot_mod_base.hpp"
-#include "base/file_util.hpp"
-#include "base/mass_shift.hpp"
+#include "common/base/ptm_base.hpp"
+#include "common/base/ptm_util.hpp"
+#include "common/base/prot_mod_base.hpp"
+#include "common/util/file_util.hpp"
+#include "seq/mass_shift.hpp"
 
 #include "spec/extend_ms_factory.hpp"
 #include "spec/msalign_util.hpp"
@@ -34,7 +35,7 @@
 #include "graphalign/graph_align_mng.hpp"
 #include "graphalign/graph_post_processor.hpp"
 
-namespace prot {
+namespace toppic {
 
 std::vector<double> mass_split(double mass, const std::vector<PtmPtr> & ptm_vec) {
   std::vector<double> mass_vec(ptm_vec.size());
@@ -57,7 +58,7 @@ void GraphPostProcessor::geneMassPtmMap() {
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   std::string var_mod_file_name = mng_ptr_->var_mod_file_name_;
 
-  std::vector<PtmPtr> ptm_vec = prot::ptm_util::readPtmTxt(var_mod_file_name);
+  std::vector<PtmPtr> ptm_vec = toppic::ptm_util::readPtmTxt(var_mod_file_name);
 
   ProtModPtrVec prot_mod_vec = prsm_para_ptr->getProtModPtrVec();
   for (size_t i = 0; i < prot_mod_vec.size(); i++) {
@@ -182,7 +183,7 @@ void GraphPostProcessor::process() {
           }
 
           MassShiftPtr shfit_ptr
-              = std::make_shared<prot::MassShift>(shift_vec[k]->getLeftBpPos(),
+              = std::make_shared<toppic::MassShift>(shift_vec[k]->getLeftBpPos(),
                                                   shift_vec[k]->getRightBpPos(),
                                                   shift_vec[k]->getTypePtr());
 
@@ -278,4 +279,4 @@ void GraphPostProcessor::process() {
   std::cout << std::endl;
 }
 
-}  // namespace prot
+}  // namespace toppic

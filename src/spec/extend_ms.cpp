@@ -14,14 +14,13 @@
 
 
 #include <cmath>
-#include <utility>
 #include <algorithm>
 #include <vector>
 
-#include "base/mass_constant.hpp"
+#include "common/base/mass_constant.hpp"
 #include "spec/extend_ms.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace extend_ms {
 
@@ -84,4 +83,4 @@ std::vector<std::pair<double, double> > getExtendMassToleranceList(ExtendMsPtr e
 
 }  // namespace extend_ms
 
-}  // namespace prot
+}  // namespace toppic

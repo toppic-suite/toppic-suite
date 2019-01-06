@@ -17,10 +17,10 @@
 #include <string>
 #include <algorithm>
 
-#include "base/base_data.hpp"
-#include "base/file_util.hpp"
-#include "base/string_util.hpp"
-#include "base/fasta_util.hpp"
+#include "common/base/base_data.hpp"
+#include "common/util/file_util.hpp"
+#include "common/util/str_util.hpp"
+#include "seq/fasta_util.hpp"
 
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_stat.hpp"
@@ -29,7 +29,7 @@
 
 #include "console/topquant_argument.hpp"
 
-using namespace prot;
+using namespace toppic;
 
 void writeCurSeq(std::vector<PrsmPtr> & prsm_vec,
                  const std::vector<std::string> & spec_file_lst,
@@ -117,7 +117,7 @@ int main(int argc, char* argv[]) {
   std::vector<PrsmPtr> prsm_vec;
 
   for (size_t k = 0; k < spec_file_lst.size(); k++) {
-    std::string input_file_name = prot::file_util::basename(spec_file_lst[k]) + ".FORM_RESULT";
+    std::string input_file_name = toppic::file_util::basename(spec_file_lst[k]) + ".FORM_RESULT";
     PrsmReader prsm_reader(input_file_name);
     PrsmPtr prsm_ptr = prsm_reader.readOnePrsm(seq_reader, fix_mod_ptr_vec);
     while (prsm_ptr != nullptr) {

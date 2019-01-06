@@ -15,13 +15,11 @@
 #ifndef PROT_FEATURE_MSALIGN_WRITER_HPP_
 #define PROT_FEATURE_MSALIGN_WRITER_HPP_
 
-#include <iostream>
 #include <fstream>
 
-#include "spec/ms_header.hpp"
 #include "spec/deconv_ms.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace msalign_writer {
 
@@ -29,5 +27,5 @@ void write(std::ofstream &file, DeconvMsPtr ms_ptr);
 
 }  // namespace msalign_writer
 
-}  // namespace prot
+}  // namespace toppic
 #endif

@@ -12,15 +12,14 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <numeric>
 #include <algorithm>
-#include <vector>
 
-#include "base/logger.hpp"
+#include "common/util/logger.hpp"
+#include "common/base/mass_constant.hpp"
 #include "spec/base_peak_type.hpp"
 #include "spec/prm_ms_factory.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace prm_ms_factory {
 
@@ -282,4 +281,4 @@ PrmMsPtrVec geneShiftMsSixPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
 }
 
 }  // namespace prm_ms_factory
-}  // namespace prot
+}  // namespace toppic

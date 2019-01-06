@@ -13,34 +13,22 @@
 //limitations under the License.
 
 
-#ifndef PROT_SPEC_DECONV_PEAK_HPP_
-#define PROT_SPEC_DECONV_PEAK_HPP_
-
-
-#include <memory>
-#include <vector>
-#include <string>
+#ifndef TOPPIC_SPEC_DECONV_PEAK_HPP_
+#define TOPPIC_SPEC_DECONV_PEAK_HPP_
 
 #include "spec/peak.hpp"
 
-namespace prot {
+namespace toppic {
 
 class DeconvPeak;
 typedef std::shared_ptr<DeconvPeak> DeconvPeakPtr;
 
 class DeconvPeak : public Peak {
  public:
-  DeconvPeak(int id, double mono_mass, double intensity, int charge):
-      Peak(mono_mass, intensity),
-      id_(id),
-      charge_(charge),
-      score_(1.0) {}
+  DeconvPeak(int id, double mono_mass, double intensity, int charge);
 
-  DeconvPeak(int id, double mono_mass, double intensity, int charge, double score):
-      Peak(mono_mass, intensity),
-      id_(id),
-      charge_(charge),
-      score_(score) {}
+  DeconvPeak(int id, double mono_mass, double intensity, 
+             int charge, double score);
 
   explicit DeconvPeak(xercesc::DOMElement* element);
 
@@ -58,9 +46,8 @@ class DeconvPeak : public Peak {
 
   void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
-  static bool cmpPosIncreasep(const DeconvPeakPtr &a, const DeconvPeakPtr &b) {
-    return a->getPosition() < b->getPosition();
-  }
+  static bool cmpPosInc(const DeconvPeakPtr &a, const DeconvPeakPtr &b) {
+    return a->getPosition() < b->getPosition();}
 
   static std::string getXmlElementName() {return "deconv_peak";}
 
@@ -72,5 +59,5 @@ class DeconvPeak : public Peak {
 
 typedef std::vector<DeconvPeakPtr> DeconvPeakPtrVec;
 
-}  // namespace prot
+}  // namespace toppic
 #endif

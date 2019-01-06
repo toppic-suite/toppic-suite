@@ -15,18 +15,18 @@
 #include <set>
 #include <vector>
 
-#include "base/logger.hpp"
-#include "base/mass_shift_type.hpp"
-#include "base/fasta_reader.hpp"
-#include "base/residue_seq.hpp"
-#include "base/mod_base.hpp"
-#include "base/prot_mod_base.hpp"
-#include "base/residue_util.hpp"
-#include "base/proteoform_util.hpp"
+#include "common/util/logger.hpp"
+#include "seq/mass_shift_type.hpp"
+#include "seq/fasta_reader.hpp"
+#include "seq/residue_seq.hpp"
+#include "common/base/mod_base.hpp"
+#include "common/base/prot_mod_base.hpp"
+#include "common/base/residue_util.hpp"
+#include "seq/proteoform_util.hpp"
 
 #include "graph/proteo_graph.hpp"
 
-namespace prot {
+namespace toppic {
 
 ProteoGraph::ProteoGraph(FastaSubSeqPtr fasta_seq_ptr, ModPtrVec fix_mod_ptr_vec,
                          MassGraphPtr graph_ptr, bool is_nme,
@@ -136,5 +136,5 @@ void ProteoGraph::compDistances(int max_mod_num, int max_ptm_sum_mass) {
   }
 }
 
-}  // namespace prot
+}  // namespace toppic
 

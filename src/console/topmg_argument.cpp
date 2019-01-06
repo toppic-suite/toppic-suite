@@ -23,15 +23,14 @@
 #include <map>
 
 #include "boost/thread/thread.hpp"
-#include "boost/algorithm/string.hpp"
 
-#include "base/file_util.hpp"
-#include "base/xml_dom_util.hpp"
-#include "base/string_util.hpp"
+#include "common/util/file_util.hpp"
+#include "common/xml/xml_dom_util.hpp"
+#include "common/util/str_util.hpp"
 
 #include "console/topmg_argument.hpp"
 
-namespace prot {
+namespace toppic {
 
 Argument::Argument() {
   initArguments();
@@ -278,7 +277,7 @@ bool Argument::parse(int argc, char* argv[]) {
     }
     LOG_DEBUG("Executive Dir " << arguments_["executiveDir"]);
 
-    arguments_["resourceDir"] = arguments_["executiveDir"] + file_util::getFileSeparator() + file_util::getResourceDirName();
+    arguments_["resourceDir"] = file_util::getResourceDir(arguments_["executiveDir"]);
 
     arguments_["oriDatabaseFileName"] = database_file_name;
 
@@ -389,19 +388,18 @@ bool Argument::parse(int argc, char* argv[]) {
 }
 
 bool Argument::validateArguments() {
-  if (!boost::filesystem::exists(arguments_["resourceDir"])) {
-    boost::filesystem::path p(arguments_["executiveDir"]);
-    arguments_["resourceDir"]
-        = p.parent_path().string() + file_util::getFileSeparator() + "etc" + file_util::getFileSeparator() + file_util::getResourceDirName();
+  if (!file_util::exists(arguments_["resourceDir"])) {
+    LOG_ERROR("Resource direcotry " << arguments_["resourceDir"] << " does not exist!");
+    return false;
   }
 
-  if (!boost::filesystem::exists(arguments_["oriDatabaseFileName"])) {
+  if (!file_util::exists(arguments_["oriDatabaseFileName"])) {
     LOG_ERROR("Database file " << arguments_["databaseFileName"] << " does not exist!");
     return false;
   }
 
-  if (!string_util::endsWith(arguments_["oriDatabaseFileName"], ".fasta") &&
-      !string_util::endsWith(arguments_["oriDatabaseFileName"], ".fa")) {
+  if (!str_util::endsWith(arguments_["oriDatabaseFileName"], ".fasta") &&
+      !str_util::endsWith(arguments_["oriDatabaseFileName"], ".fa")) {
     LOG_ERROR("Database file " << arguments_["oriDatabaseFileName"] << " is not a fasta file!");
     return false;
   }
@@ -412,12 +410,12 @@ bool Argument::validateArguments() {
   }
 
   for (size_t k = 0; k < spec_file_list_.size(); k++) {
-    if (!boost::filesystem::exists(spec_file_list_[k])) {
+    if (!file_util::exists(spec_file_list_[k])) {
       LOG_ERROR("Spectrum file " << spec_file_list_[k] << " does not exist!");
       return false;
     }
 
-    if (!string_util::endsWith(spec_file_list_[k], ".msalign")) {
+    if (!str_util::endsWith(spec_file_list_[k], ".msalign")) {
       LOG_ERROR("Spectrum file " << spec_file_list_[k] << " is not a msalign file!");
       return false;
     }
@@ -427,18 +425,18 @@ bool Argument::validateArguments() {
       return false;
     }
 
-    if (string_util::endsWith(spec_file_list_[k], "_ms1.msalign")) {
+    if (str_util::endsWith(spec_file_list_[k], "_ms1.msalign")) {
       std::cerr << "Warning: Please make sure " << spec_file_list_[k] << " is the ms2 spectral file." << std::endl;
     }
   }
 
-  if (!boost::filesystem::exists(arguments_["varModFileName"])) {
+  if (!file_util::exists(arguments_["varModFileName"])) {
     LOG_ERROR("Modification file " << arguments_["varModFileName"] << " does not exist!");
     return false;
   }
 
   if (arguments_["skipList"] != "") {
-    if (!boost::filesystem::exists(arguments_["skipList"])) {
+    if (!file_util::exists(arguments_["skipList"])) {
       LOG_ERROR("Skip list " << arguments_["skipList"] << " does not exist!");
       return false;
     }
@@ -463,8 +461,7 @@ bool Argument::validateArguments() {
   }
 
   std::string allow_mod = arguments_["allowProtMod"];
-  std::vector<std::string> strs;
-  boost::split(strs, allow_mod, boost::is_any_of(","));
+  std::vector<std::string> strs = str_util::split(allow_mod, ",");
   for (size_t i = 0; i < strs.size(); i++) {
     if (strs[i] != "NONE" && strs[i] != "M_ACETYLATION" && strs[i] != "NME" && strs[i] != "NME_ACETYLATION") {
       LOG_ERROR("N-Terminal Variable PTM can only be NONE, M_ACETYLATION, NME or NME_ACETYLATION.");
@@ -550,4 +547,4 @@ bool Argument::validateArguments() {
   }
   return true;
 }
-} /* namespace prot */
+} /* namespace toppic */

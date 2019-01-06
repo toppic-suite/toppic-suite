@@ -12,17 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#include <iostream>
-#include <fstream>
-#include <iomanip>
-#include <string>
-#include <vector>
-
-#include <boost/algorithm/string.hpp>
-
-#include "base/amino_acid_base.hpp"
-#include "base/file_util.hpp"
+#include "common/util/file_util.hpp"
+#include "common/base/amino_acid_base.hpp"
 #include "spec/peak.hpp"
 #include "spec/extend_ms_factory.hpp"
 #include "spec/msalign_reader.hpp"
@@ -31,7 +22,7 @@
 #include "prsm/peak_ion_pair_util.hpp"
 #include "prsm/prsm_stat.hpp"
 
-namespace prot {
+namespace toppic {
 
 PrsmStat::PrsmStat(PrsmParaPtr prsm_para_ptr,
                    const std::string &input_file_ext,
@@ -92,14 +83,14 @@ void PrsmStat::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   int peak_num = 0;
   DeconvMsPtrVec deconv_ms_ptr_vec = prsm_ptr->getDeconvMsPtrVec();
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
-    spec_ids = spec_ids + std::to_string(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getId()) + " ";
+    spec_ids = spec_ids + str_util::toString(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getId()) + " ";
     spec_activations = spec_activations + deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getActivationPtr()->getName() + " ";
     spec_scans = spec_scans + deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getScansString() + " ";
     peak_num += deconv_ms_ptr_vec[i]->size();
   }
-  boost::algorithm::trim(spec_ids);
-  boost::algorithm::trim(spec_activations);
-  boost::algorithm::trim(spec_scans);
+  str_util::trim(spec_ids);
+  str_util::trim(spec_activations);
+  str_util::trim(spec_scans);
   file << prsm_para_ptr_->getSpectrumFileName() << "\t"
       << prsm_ptr->getPrsmId() << "\t"
       << spec_ids << "\t"
@@ -358,4 +349,4 @@ void PrsmStat::process() {
   file.close();
 }
 
-}  // namespace prot
+}  // namespace toppic

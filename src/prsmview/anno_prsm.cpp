@@ -16,31 +16,30 @@
 #include <set>
 #include <string>
 
-#include <boost/algorithm/string.hpp>
-
-#include "base/residue_util.hpp"
-#include "base/xml_dom_util.hpp"
+#include "common/util/logger.hpp"
+#include "common/base/residue_util.hpp"
+#include "common/xml/xml_dom_util.hpp"
 #include "spec/peak.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
 #include "prsmview/anno_residue.hpp"
 #include "prsmview/anno_prsm.hpp"
 #include "prsmview/anno_proteoform.hpp"
 
-namespace prot {
+namespace toppic {
 
 void addPrsmHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement* element,
                    PrsmPtr prsm_ptr, PrsmViewMngPtr mng_ptr) {
-  std::string str = string_util::convertToString(prsm_ptr->getPrsmId());
+  std::string str = str_util::toString(prsm_ptr->getPrsmId());
   xml_doc->addElement(element, "prsm_id", str.c_str());
   if (prsm_ptr->getExtremeValuePtr().get() != nullptr) {
-    str = string_util::convertToString(prsm_ptr->getExtremeValuePtr()->getPValue(), mng_ptr->decimal_point_num_);
+    str = str_util::toString(prsm_ptr->getExtremeValuePtr()->getPValue(), mng_ptr->decimal_point_num_);
     xml_doc->addElement(element, "p_value", str.c_str());
   } else {
     xml_doc->addElement(element, "p_value", "N/A");
   }
 
   if (prsm_ptr->getExtremeValuePtr().get() != nullptr) {
-    str = string_util::convertToString(prsm_ptr->getExtremeValuePtr()->getEValue(), mng_ptr->decimal_point_num_);
+    str = str_util::toString(prsm_ptr->getExtremeValuePtr()->getEValue(), mng_ptr->decimal_point_num_);
     xml_doc->addElement(element, "e_value", str.c_str());
   } else {
     xml_doc->addElement(element, "e_value", "N/A");
@@ -49,17 +48,17 @@ void addPrsmHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement* element,
   double fdr = prsm_ptr->getFdr();
 
   if (fdr >= 0) {
-    str = string_util::convertToString(prsm_ptr->getFdr(), mng_ptr->decimal_point_num_);
+    str = str_util::toString(prsm_ptr->getFdr(), mng_ptr->decimal_point_num_);
     xml_doc->addElement(element, "fdr", str.c_str());
   } else {
     xml_doc->addElement(element, "fdr", "N/A");
   }
 
-  str = string_util::convertToString(static_cast<int>(prsm_ptr->getMatchFragNum()));
+  str = str_util::toString(static_cast<int>(prsm_ptr->getMatchFragNum()));
 
   xml_doc->addElement(element, "matched_fragment_number", str.c_str());
 
-  str = string_util::convertToString(static_cast<int>(prsm_ptr->getMatchPeakNum()));
+  str = str_util::toString(static_cast<int>(prsm_ptr->getMatchPeakNum()));
 
   xml_doc->addElement(element, "matched_peak_number", str.c_str());
 }
@@ -71,11 +70,11 @@ void addMsHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement* ms_element, PrsmP
   std::string spec_ids;
   std::string spec_scans;
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
-    spec_ids = spec_ids + std::to_string(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getId()) + " ";
+    spec_ids = spec_ids + str_util::toString(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getId()) + " ";
     spec_scans = spec_scans + deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getScansString() + " ";
   }
-  boost::algorithm::trim(spec_ids);
-  boost::algorithm::trim(spec_scans);
+  str_util::trim(spec_ids);
+  str_util::trim(spec_scans);
   xml_doc->addElement(ms_header_element, "ids", spec_ids.c_str());
   xml_doc->addElement(ms_header_element, "spectrum_file_name", prsm_ptr->getFileName().c_str());
   xml_doc->addElement(ms_header_element, "scans", spec_scans.c_str());
@@ -83,20 +82,20 @@ void addMsHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement* ms_element, PrsmP
   int pos = 4;
 
   double precursor_mass = prsm_ptr->getOriPrecMass();
-  std::string str = string_util::convertToString(precursor_mass, pos);
+  std::string str = str_util::toString(precursor_mass, pos);
   xml_doc->addElement(ms_header_element, "precursor_mono_mass", str.c_str());
 
   int precursor_charge = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecCharge();
-  str = string_util::convertToString(precursor_charge);
+  str = str_util::toString(precursor_charge);
   xml_doc->addElement(ms_header_element, "precursor_charge", str.c_str());
 
   double precursor_mz = Peak::compMonoMz(precursor_mass, precursor_charge);
-  str = string_util::convertToString(precursor_mz, pos);
+  str = str_util::toString(precursor_mz, pos);
   xml_doc->addElement(ms_header_element, "precursor_mz", str.c_str());
 
   double precursor_inte = prsm_ptr->getPrecFeatureInte();
   if (precursor_inte > 0) {
-    str = string_util::convertToScientificStr(precursor_inte, pos);
+    str = str_util::toScientificStr(precursor_inte, pos);
     xml_doc->addElement(ms_header_element, "precursor_inte", str.c_str());
   }
 }
@@ -118,26 +117,26 @@ void addMsPeaks(XmlDOMDocument *xml_doc, xercesc::DOMElement* ms_element,
     for (size_t i = 0; i < deconv_ms_ptr_vec[s]->size(); i++) {
       xercesc::DOMElement* peak_element = xml_doc->createElement("peak");
       peaks->appendChild(peak_element);
-      std::string str = string_util::convertToString(deconv_ms_ptr_vec[s]->getMsHeaderPtr()->getId());
+      std::string str = str_util::toString(deconv_ms_ptr_vec[s]->getMsHeaderPtr()->getId());
       xml_doc->addElement(peak_element, "spec_id", str.c_str());
 
       DeconvPeakPtr peak_ptr = deconv_ms_ptr_vec[s]->getPeakPtr(i);
-      str = string_util::convertToString(peak_ptr->getId());
+      str = str_util::toString(peak_ptr->getId());
       xml_doc->addElement(peak_element, "peak_id", str.c_str());
 
       double mass = peak_ptr->getPosition();
       int charge = peak_ptr->getCharge();
-      str = string_util::convertToString(mass, mng_ptr->precise_point_num_);
+      str = str_util::toString(mass, mng_ptr->precise_point_num_);
       xml_doc->addElement(peak_element, "monoisotopic_mass", str.c_str());
 
       double mz = Peak::compMonoMz(mass, charge);
-      str = string_util::convertToString(mz, mng_ptr->precise_point_num_);
+      str = str_util::toString(mz, mng_ptr->precise_point_num_);
       xml_doc->addElement(peak_element, "monoisotopic_mz", str.c_str());
 
-      str = string_util::convertToString(peak_ptr->getIntensity(), mng_ptr->decimal_point_num_);
+      str = str_util::toString(peak_ptr->getIntensity(), mng_ptr->decimal_point_num_);
       xml_doc->addElement(peak_element, "intensity", str.c_str());
 
-      str = string_util::convertToString(charge);
+      str = str_util::toString(charge);
       xml_doc->addElement(peak_element, "charge", str.c_str());
 
       int spec_id = deconv_ms_ptr_vec[s]->getMsHeaderPtr()->getId();
@@ -145,7 +144,7 @@ void addMsPeaks(XmlDOMDocument *xml_doc, xercesc::DOMElement* ms_element,
           = peak_ion_pair_util::getMatchedPairs(pair_ptrs, spec_id, peak_ptr->getId());
       if (selected_pair_ptrs.size() > 0) {
         int match_ions_number = selected_pair_ptrs.size();
-        str = string_util::convertToString(match_ions_number);
+        str = str_util::toString(match_ions_number);
         xml_doc->addElement(peak_element, "matched_ions_num", str.c_str());
 
         xercesc::DOMElement* mi_element = xml_doc->createElement("matched_ions");
@@ -182,4 +181,4 @@ xercesc::DOMElement* geneAnnoPrsm(XmlDOMDocument* xml_doc, PrsmPtr prsm_ptr,
   return prsm_element;
 }
 
-}  // namespace prot
+}  // namespace toppic

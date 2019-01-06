@@ -16,10 +16,10 @@
 #include <utility>
 #include <string>
 
-#include "base/string_util.hpp"
+#include "common/util/str_util.hpp"
 #include "prsmview/anno_ptm.hpp"
 
-namespace prot {
+namespace toppic {
 
 AnnoPtm::AnnoPtm(PtmPtr ptm_ptr, MassShiftTypePtr type_ptr) {
   ptm_ptr_ = ptm_ptr;
@@ -39,7 +39,7 @@ void AnnoPtm::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
 
   for (size_t i = 0; i < occurences_.size(); i++) {
     xercesc::DOMElement* position_element = xml_doc->createElement("occurence");
-    std::string str = string_util::convertToString(occurences_[i].first);
+    std::string str = str_util::toString(occurences_[i].first);
     xml_doc->addElement(position_element, "position", str.c_str());
     xml_doc->addElement(position_element, "acid_letter", occurences_[i].second.c_str());
     element->appendChild(position_element);
@@ -58,4 +58,4 @@ AnnoPtmPtr AnnoPtm::findPtm(const AnnoPtmPtrVec &ptm_ptrs, PtmPtr ptm_ptr,
   return nullptr;
 }
 
-}  // namespace prot
+}  // namespace toppic

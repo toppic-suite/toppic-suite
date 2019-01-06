@@ -13,22 +13,35 @@
 //limitations under the License.
 
 #include <cmath>
-#include <vector>
-#include <string>
+#include <sstream>
 
-#include "boost/algorithm/string.hpp"
-
-#include "base/activation_base.hpp"
-#include "base/string_util.hpp"
+#include "common/util/str_util.hpp"
+#include "common/base/mass_constant.hpp"
+#include "common/base/activation_base.hpp"
 #include "spec/msalign_reader.hpp"
 
-namespace prot {
+namespace toppic {
+
+MsAlignReader::MsAlignReader(const std::string &file_name, int group_spec_num,
+                             ActivationPtr act_ptr, const std::set<std::string> skip_list,
+                             int peak_num_limit):
+    file_name_(file_name),
+    group_spec_num_(group_spec_num),
+    activation_ptr_(act_ptr),
+    skip_list_(skip_list),
+    peak_num_limit_(peak_num_limit) {
+      input_.open(file_name.c_str(), std::ios::in);
+      if (!input_.is_open()) {
+        LOG_ERROR("msalign file  " << file_name << " does not exist.");
+        exit(EXIT_FAILURE);
+      }
+    }
 
 std::vector<std::string> MsAlignReader::readOneSpectrum() {
   std::string line;
   std::vector<std::string> line_list;
   while (std::getline(input_, line)) {
-    line = string_util::trim(line);
+    str_util::trim(line);
     if (line == "BEGIN IONS") {
       line_list.push_back(line);
     } else if (line == "END IONS") {
@@ -69,10 +82,11 @@ void MsAlignReader::readNext() {
   int feature_id = -1;
   double feature_inte = -1;
   std::vector<std::string> strs;
+
   for (size_t i = 1; i < spectrum_str_vec_.size() - 1; i++) {
     std::string letter = spectrum_str_vec_[i].substr(0, 1);
     if (letter >= "A" && letter <= "Z") {
-      strs = string_util::split(spectrum_str_vec_[i], '=');
+      strs = str_util::split(spectrum_str_vec_[i], "=");
       if (strs[0] == "ID") {
         id = std::stoi(strs[1]);
       }
@@ -160,7 +174,7 @@ void MsAlignReader::readNext() {
   for (size_t i = 1; i < spectrum_str_vec_.size() - 1; i++) {
     std::string letter = spectrum_str_vec_[i].substr(0, 1);
     if (letter >= "0" && letter <= "9") {
-      boost::split(strs, spectrum_str_vec_[i], boost::is_any_of("\t "));
+      strs = str_util::split(spectrum_str_vec_[i], "\t ");
       double mass = std::stod(strs[0]);
       double inte = std::stod(strs[1]);
       int charge = std::stoi(strs[2]);
@@ -174,6 +188,7 @@ void MsAlignReader::readNext() {
   deconv_ms_ptr_ = std::make_shared<Ms<DeconvPeakPtr> >(header_ptr, peak_ptr_list);
 
   current_++;
+
 }
 
 DeconvMsPtr MsAlignReader::getNextMs() {
@@ -229,4 +244,4 @@ void MsAlignReader::close() {
   input_.close();
 }
 
-}  // namespace prot
+}  // namespace toppic

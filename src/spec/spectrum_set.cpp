@@ -12,15 +12,12 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <numeric>
-#include <functional>
-
-#include "base/logger.hpp"
+#include "common/util/logger.hpp"
 #include "spec/extend_ms_factory.hpp"
 #include "spec/prm_ms_factory.hpp"
 #include "spec/spectrum_set.hpp"
 
-namespace prot {
+namespace toppic {
 
 SpectrumSet::SpectrumSet(DeconvMsPtrVec deconv_ms_ptr_vec,
                          SpParaPtr sp_para_ptr,
@@ -63,6 +60,11 @@ PrmMsPtrVec SpectrumSet::getSuffixMsTwoPtrVec(SpParaPtr sp_para_ptr,
                                                prec_mono_mass_, mod_mass);
 }
 
+PrmMsPtrVec SpectrumSet::getMsShiftSixPtrVec(double shift) {
+  return prm_ms_factory::geneShiftMsSixPtrVec(deconv_ms_ptr_vec_, sp_para_ptr_,
+                                              prec_mono_mass_, -shift);
+}
+
 bool SpectrumSet::checkValid(SpParaPtr sp_para_ptr) {
   if (prec_mono_mass_ < sp_para_ptr->getMinMass()) {
     return false;
@@ -84,4 +86,4 @@ bool SpectrumSet::checkValid(SpParaPtr sp_para_ptr) {
   return true;
 }
 
-}  // namespace prot
+}  // namespace toppic

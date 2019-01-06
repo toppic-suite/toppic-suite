@@ -17,7 +17,7 @@
 
 #include "graphalign/graph_dp_node.hpp"
 
-namespace prot {
+namespace toppic {
 
 GraphDpNode::GraphDpNode(int first_idx, int second_idx, 
                          double node_score, int n_unknown_shifts, 
@@ -54,4 +54,4 @@ void GraphDpNode::updateBestShiftNode(int s, int m, double score,
   best_shift_node_ptrs_[s][m] = best_node_ptr;
 }
 
-} /* namespace prot */
+} /* namespace toppic */

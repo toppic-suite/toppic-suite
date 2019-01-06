@@ -13,20 +13,20 @@
 //limitations under the License.
 
 
-#ifndef PROT_LOCAL_PROCESSOR_HPP_
-#define PROT_LOCAL_PROCESSOR_HPP_
+#ifndef TOPPIC_LOCAL_PROCESSOR_HPP_
+#define TOPPIC_LOCAL_PROCESSOR_HPP_
 
 #include <vector>
 
-#include "base/ptm.hpp"
-#include "base/local_anno.hpp"
+#include "common/base/ptm.hpp"
+#include "seq/local_anno.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "spec/theo_peak.hpp"
 #include "tdgf/tdgf_mng.hpp"
 #include "local_mng.hpp"
 
-namespace prot {
+namespace toppic {
 
 class LocalProcessor {
  public:
@@ -112,6 +112,6 @@ class LocalProcessor {
 
 typedef std::shared_ptr<LocalProcessor> LocalProcessorPtr;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

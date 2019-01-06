@@ -13,13 +13,13 @@
 //limitations under the License.
 
 
-#ifndef PROT_GRAPH_ALIGN_PROCESSOR_HPP_
-#define PROT_GRAPH_ALIGN_PROCESSOR_HPP_
+#ifndef TOPPIC_GRAPH_ALIGN_GRAPH_ALIGN_PROCESSOR_HPP_
+#define TOPPIC_GRAPH_ALIGN_GRAPH_ALIGN_PROCESSOR_HPP_
 
 #include "graph/graph.hpp"
 #include "graphalign/graph_align_mng.hpp"
 
-namespace prot {
+namespace toppic {
 
 class GraphAlignProcessor {
  public:
@@ -31,7 +31,7 @@ class GraphAlignProcessor {
 
 typedef std::shared_ptr<GraphAlignProcessor> GraphAlignProcessorPtr;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif
 

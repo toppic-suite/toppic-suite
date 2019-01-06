@@ -16,14 +16,14 @@
 #include <algorithm>
 #include <vector>
 
-#include "base/logger.hpp"
+#include "common/util/logger.hpp"
 
 #include "node.hpp"
 #include "edge.hpp"
 #include "suffix.hpp"
 #include "suffix_tree.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace suffix {
 
@@ -176,4 +176,4 @@ EdgePtr SuffixTree::findMatchEdge(std::string target) {
 
 }  // namespace suffix
 
-}  // namespace prot
+}  // namespace toppic

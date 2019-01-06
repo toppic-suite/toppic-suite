@@ -17,7 +17,7 @@
 
 #include "spec/msalign_writer.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace msalign_writer {
 
@@ -64,4 +64,4 @@ void write(std::ofstream &file, DeconvMsPtr ms_ptr) {
 
 }  // namespace msalign_writer
 
-}  // namespace prot
+}  // namespace toppic

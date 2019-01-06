@@ -13,15 +13,15 @@
 //limitations under the License.
 
 
-#ifndef PROT_TDGF_MNG_HPP_
-#define PROT_TDGF_MNG_HPP_
+#ifndef TOPPIC_TDGF_TDGF_MNG_HPP_
+#define TOPPIC_TDGF_TDGF_MNG_HPP_
 
 
 #include <string>
 
 #include "prsm/prsm_para.hpp"
 
-namespace prot {
+namespace toppic {
 
 class TdgfMng {
  public:
@@ -76,6 +76,6 @@ class TdgfMng {
 
 typedef std::shared_ptr<TdgfMng> TdgfMngPtr;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

@@ -13,24 +13,19 @@
 //limitations under the License.
 
 
-#ifndef PROT_DECONV_ARGUMENT_HPP_
-#define PROT_DECONV_ARGUMENT_HPP_
+#ifndef TOPPIC_CONSOLE_TOPFD_ARGUMENT_HPP_
+#define TOPPIC_CONSOLE_TOPFD_ARGUMENT_HPP_
 
-#include <map>
-#include <iostream>
-#include <fstream>
-#include <algorithm>
 #include <memory>
 #include <vector>
 #include <string>
+#include <map>
 
-#include "boost/program_options.hpp" 
+#include <boost/program_options.hpp> 
 
-#include "base/logger.hpp"
-#include "base/xml_dom_document.hpp"
-#include "base/string_util.hpp"
+#include "common/xml/xml_dom_document.hpp"
 
-namespace prot {
+namespace toppic {
 
 class Argument {
  public:
@@ -55,6 +50,6 @@ class Argument {
   std::vector<std::string> spec_file_list_;
 };
 
-}  // namespace prot
+}  // namespace toppic
 
-#endif /* ARGUMENT_HPP_ */
+#endif 

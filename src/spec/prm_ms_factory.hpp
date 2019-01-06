@@ -13,14 +13,14 @@
 //limitations under the License.
 
 
-#ifndef PROT_SPEC_PRM_MS_FACTORY_HPP_
-#define PROT_SPEC_PRM_MS_FACTORY_HPP_
+#ifndef TOPPIC_SPEC_PRM_MS_FACTORY_HPP_
+#define TOPPIC_SPEC_PRM_MS_FACTORY_HPP_
 
 #include "spec/sp_para.hpp"
 #include "spec/deconv_ms.hpp"
 #include "spec/prm_ms.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace prm_ms_factory {
 
@@ -43,6 +43,6 @@ PrmMsPtrVec geneShiftMsSixPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec,
                                  double prec_mono_mass, double shift);
 }  // namespace prm_ms_factory
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif /* PRM_PEAK_HPP_ */

@@ -13,13 +13,13 @@
 //limitations under the License.
 
 
-#ifndef PROT_PTM_SLOW_MATCH_HPP_
-#define PROT_PTM_SLOW_MATCH_HPP_
+#ifndef TOPPIC_PTM_SEARCH_PTM_SLOW_MATCH_HPP_
+#define TOPPIC_PTM_SEARCH_PTM_SLOW_MATCH_HPP_
 
 #include <memory>
 #include <vector>
 
-#include "base/proteoform.hpp"
+#include "seq/proteoform.hpp"
 #include "spec/prm_peak.hpp"
 #include "spec/deconv_ms.hpp"
 #include "spec/spectrum_set.hpp"
@@ -31,13 +31,13 @@
 
 #include "ptmsearch/comp_shift_low_mem.hpp"
 
-namespace prot {
+namespace toppic {
 
 class PtmSlowMatch {
  public:
   PtmSlowMatch(ProteoformPtr proteo_ptr,
                SpectrumSetPtr spectrum_set_ptr,
-               AlignTypePtr align_type_ptr,
+               ProteoformTypePtr align_type_ptr,
                CompShiftLowMem comp_shift,
                PtmSearchMngPtr mng_ptr);
 
@@ -45,9 +45,9 @@ class PtmSlowMatch {
 
   void init();
 
-  PrsmPtr compute(AlignTypePtr align_type_ptr, int shift_num);
+  PrsmPtr compute(ProteoformTypePtr align_type_ptr, int shift_num);
 
-  void compute(AlignTypePtr type_ptr, PrsmPtrVec &prsm_ptrs);
+  void compute(ProteoformTypePtr type_ptr, PrsmPtrVec &prsm_ptrs);
 
  private:
   PtmSearchMngPtr mng_ptr_;
@@ -56,7 +56,7 @@ class PtmSlowMatch {
   DeconvMsPtrVec deconv_ms_ptr_vec_;
   PrmMsPtrVec ms_six_ptr_vec_;
   ExtendMsPtrVec ms_three_ptr_vec_;
-  AlignTypePtr align_type_ptr_;
+  ProteoformTypePtr align_type_ptr_;
   CompShiftLowMem comp_shift_;
   PSAlignPtr ps_align_ptr_;
 
@@ -74,6 +74,6 @@ class PtmSlowMatch {
 typedef std::shared_ptr<PtmSlowMatch> PtmSlowMatchPtr;
 typedef std::vector<PtmSlowMatchPtr> PtmSlowMatchPtrVec;
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif

@@ -12,22 +12,12 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#ifndef TOPPIC_PRSM_PRSM_PROB_HPP_
+#define TOPPIC_PRSM_PRSM_PROB_HPP_
 
-#ifndef PROT_PRSM_PRSM_PROB_HPP_
-#define PROT_PRSM_PRSM_PROB_HPP_
+#include "common/base/mod.hpp"
 
-#include <vector>
-#include <string>
-#include <map>
-
-#include "base/proteoform.hpp"
-#include "base/fasta_reader.hpp"
-#include "base/proteoform_factory.hpp"
-#include "prsm/prsm.hpp"
-#include "prsm/prsm_para.hpp"
-#include "prsm/prsm_xml_writer.hpp"
-
-namespace prot {
+namespace toppic {
 
 class PrsmProb {
  public:
@@ -37,16 +27,7 @@ class PrsmProb {
            const std::string &in_file_ext,
            const std::string &out_file_ext,
            double K1, double K2,
-           double pref, double inte):
-      db_file_name_(db_file_name),
-      spec_file_name_(spec_file_name),
-      fix_mod_ptr_vec_(fix_mod_ptr_vec),
-      input_file_ext_(in_file_ext),
-      output_file_ext_(out_file_ext),
-      K1_(K1),
-      K2_(K2),
-      pref_(pref),
-      inte_(inte) {}
+           double pref, double inte);
 
   void process();
 
@@ -63,6 +44,6 @@ class PrsmProb {
 };
 
 typedef std::shared_ptr<PrsmProb> PrsmProbPtr;
-} /* namespace prot */
+} /* namespace toppic */
 
-#endif /* PROT_PRSM_PROB_HPP_ */
+#endif /* TOPPIC_PRSM_PROB_HPP_ */

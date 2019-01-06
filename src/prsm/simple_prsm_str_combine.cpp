@@ -13,15 +13,53 @@
 //limitations under the License.
 
 #include <set>
-#include <string>
 #include <algorithm>
 
-#include "base/file_util.hpp"
-#include "prsm/simple_prsm_str_combine.hpp"
+#include "common/util/logger.hpp"
+#include "common/util/file_util.hpp"
 #include "prsm/simple_prsm_reader.hpp"
-#include "prsm/simple_prsm_str.hpp"
+#include "prsm/simple_prsm_xml_writer.hpp"
+#include "prsm/simple_prsm_str_combine.hpp"
 
-namespace prot {
+namespace toppic {
+
+SimplePrsmStrCombine::SimplePrsmStrCombine(const std::string &spec_file_name,
+                                           const std::vector<std::string> &in_file_exts,
+                                           const std::string &out_file_ext,
+                                           int top_num):
+    spec_file_name_(spec_file_name),
+    input_file_exts_(in_file_exts),
+    output_file_ext_(out_file_ext),
+    top_num_(top_num) {}
+
+SimplePrsmStrCombine::SimplePrsmStrCombine(const std::string &spec_file_name,
+                                           const std::string &in_file_ext,
+                                           int in_num,
+                                           const std::string &out_file_ext,
+                                           int top_num):
+    spec_file_name_(spec_file_name),
+    output_file_ext_(out_file_ext),
+    top_num_(top_num) {
+      for (int i = 0; i < in_num; i ++) {
+        std::string ext = in_file_ext + "_" + str_util::toString(i);
+        input_file_exts_.push_back(ext);
+      }
+    }
+
+SimplePrsmStrCombine::SimplePrsmStrCombine(const std::string &spec_file_name,
+                                           const std::string &in_file_pref,
+                                           const std::string &in_file_suff,
+                                           int in_num,
+                                           const std::string &out_file_ext,
+                                           int top_num):
+    spec_file_name_(spec_file_name),
+    output_file_ext_(out_file_ext),
+    top_num_(top_num) {
+      for (int i = 0; i < in_num; i ++) {
+        std::string ext = in_file_pref + "_" + str_util::toString(i) + "_" + in_file_suff;
+        input_file_exts_.push_back(ext);
+      }
+    }
 
 void SimplePrsmStrCombine::process() {
   size_t input_num = input_file_exts_.size();
@@ -83,4 +121,55 @@ void SimplePrsmStrCombine::process() {
   writer.close();
 }
 
-} /* namespace prot */
+void SimplePrsmStrCombine::combineBlockResults(std::string &sp_file_name, 
+                                               std::string &input_pref,
+                                               int block_num, 
+                                               int comp_num, 
+                                               int pref_suff_num,
+                                               int inte_num) {
+
+  std::string complete = ProteoformType::COMPLETE->getName();
+  std::string prefix = ProteoformType::PREFIX->getName();
+  std::string suffix = ProteoformType::SUFFIX->getName();
+  std::string internal = ProteoformType::INTERNAL->getName();
+
+  SimplePrsmStrCombine comp_combine(sp_file_name, 
+                                    input_pref,
+                                    complete,
+                                    block_num, 
+                                    input_pref + "_" + complete,
+                                    comp_num);
+  comp_combine.process();
+
+  SimplePrsmStrCombine pref_combine(sp_file_name, 
+                                    input_pref,
+                                    prefix,
+                                    block_num, 
+                                    input_pref + "_" + prefix,
+                                    pref_suff_num);
+  pref_combine.process();
+
+  SimplePrsmStrCombine suff_combine(sp_file_name, 
+                                    input_pref,
+                                    suffix,
+                                    block_num, 
+                                    input_pref + "_" + suffix,
+                                    pref_suff_num);
+  suff_combine.process();
+
+  SimplePrsmStrCombine internal_combine(sp_file_name, 
+                                        input_pref, 
+                                        internal,
+                                        block_num, 
+                                        input_pref + "_" + internal,
+                                        inte_num);
+  internal_combine.process();
+
+  // remove tempory files
+  for (int i = 0; i < block_num; i++) {
+    std::string file_pref = input_pref + "_" + std::to_string(i) + "_";
+    file_util::cleanTempFiles(sp_file_name, file_pref);
+  }
+}
+
+} /* namespace toppic */

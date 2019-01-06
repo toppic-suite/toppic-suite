@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef PROT_GUI_TOPMERGE_DIALOG_H
-#define PROT_GUI_TOPMERGE_DIALOG_H
+#ifndef TOPPIC_GUI_TOPMERGE_DIALOG_H
+#define TOPPIC_GUI_TOPMERGE_DIALOG_H
 
 #include <map>
 #include <string>

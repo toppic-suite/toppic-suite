@@ -12,19 +12,14 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#ifndef PROT_PRSM_PRSM_UTIL_HPP_
-#define PROT_PRSM_PRSM_UTIL_HPP_
-
-#include <memory>
-#include <vector>
-#include <string>
+#ifndef TOPPIC_PRSM_PRSM_UTIL_HPP_
+#define TOPPIC_PRSM_PRSM_UTIL_HPP_
 
 #include "prsm/prsm.hpp"
 #include "prsm/prsm_str.hpp"
 #include "prsm/prsm_para.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace prsm_util {
 
@@ -53,6 +48,6 @@ void mergePrsmFiles(const std::vector<std::string> & prsm_file_lst, int N,
 
 }  // namespace prsm_util
 
-}  // namespace prot
+}  // namespace toppic
 #endif
 

@@ -14,15 +14,16 @@
 
 
 #include <limits>
+#include <cmath>
 #include <vector>
 
-#include "base/logger.hpp"
-#include "base/neutral_loss_base.hpp"
-#include "spec/theo_peak_util.hpp"
+#include "common/util/logger.hpp"
+#include "common/base/neutral_loss_base.hpp"
+#include "prsm/theo_peak_util.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
 #include "oneptmsearch/diagonal.hpp"
 
-namespace prot {
+namespace toppic {
 
 inline TheoPeakPtrVec getDiagonalTheoPeak(ProteoformPtr proteo_ptr,
                                           ActivationPtr activation_ptr,
@@ -184,7 +185,7 @@ DiagonalHeaderPtrVec refineHeadersBgnEnd(ProteoformPtr proteo_ptr,
     }
     if (pair_ptrs.size() < 1) {
       int pair_size = pair_ptrs.size();
-      LOG_TRACE("Empty Segment is found "+string_util::convertToString(pair_size));
+      LOG_TRACE("Empty Segment is found "+ str_util::toString(pair_size));
       if (i == 0) {
         int new_bgn = first_res_pos;
         int new_end = first_res_pos;
@@ -239,7 +240,7 @@ DiagonalHeaderPtrVec2D refineHeadersBgnEnd(ProteoformPtr proteo_ptr,
       index++;
       if (pair_ptrs.size() < 1) {
         int pair_size = pair_ptrs.size();
-        LOG_TRACE("Empty Segment is found "+ string_util::convertToString(pair_size));
+        LOG_TRACE("Empty Segment is found "+ str_util::toString(pair_size));
         if (header_ptrs_2d[i][j] == first_header) {
           int new_bgn = first_res_pos;
           int new_end = first_res_pos;
@@ -288,4 +289,4 @@ int getNewEnd(const PeakIonPairPtrVec &pair_ptrs) {
   return new_end;
 }
 
-}  // namespace prot
+}  // namespace toppic

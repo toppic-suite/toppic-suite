@@ -22,7 +22,7 @@
 
 #include "protein_db.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace suffix {
 
@@ -36,5 +36,5 @@ class DatabaseFileHandler {
 
 }  // namespace suffix
 
-}  // namespace prot
+}  // namespace toppic
 #endif

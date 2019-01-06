@@ -16,14 +16,12 @@
 #include <string>
 #include <algorithm>
 
-#include "boost/algorithm/string.hpp"
-
-#include "base/file_util.hpp"
-#include "base/xml_dom_util.hpp"
+#include "common/util/file_util.hpp"
+#include "common/xml/xml_dom_util.hpp"
 #include "console/topmerge_argument.hpp"
 
 
-namespace prot {
+namespace toppic {
 
 Argument::Argument() {
   initArguments();
@@ -138,19 +136,19 @@ bool Argument::parse(int argc, char* argv[]) {
 }
 
 bool Argument::validateArguments() {
-  if (!boost::filesystem::exists(arguments_["resourceDir"])) {
+  if (!file_util::exists(arguments_["resourceDir"])) {
     boost::filesystem::path p(arguments_["executiveDir"]);
     arguments_["resourceDir"]
         = p.parent_path().string() + file_util::getFileSeparator() + "etc" + file_util::getFileSeparator() + file_util::getResourceDirName(); 
   }
 
-  if (!boost::filesystem::exists(arguments_["databaseFileName"])) {
+  if (!file_util::exists(arguments_["databaseFileName"])) {
     LOG_ERROR("Database file " << arguments_["databaseFileName"] << " does not exist!");
     return false;
   }
 
-  if (!string_util::endsWith(arguments_["databaseFileName"], ".fasta") &&
-      !string_util::endsWith(arguments_["databaseFileName"], ".fa")) {
+  if (!str_util::endsWith(arguments_["databaseFileName"], ".fasta") &&
+      !str_util::endsWith(arguments_["databaseFileName"], ".fa")) {
     LOG_ERROR("Database file " << arguments_["databaseFileName"] << " is not a fasta file!");
     return false;
   }
@@ -160,7 +158,7 @@ bool Argument::validateArguments() {
     return false;
   }
   for (size_t k = 0; k < proteoform_file_list_.size(); k++) {
-    if (!boost::filesystem::exists(proteoform_file_list_[k])) {
+    if (!file_util::exists(proteoform_file_list_[k])) {
       LOG_ERROR(proteoform_file_list_[k] << " does not exist!");
       return false;
     }
@@ -169,4 +167,4 @@ bool Argument::validateArguments() {
   return true;
 }
 
-}  // namespace prot
+}  // namespace toppic

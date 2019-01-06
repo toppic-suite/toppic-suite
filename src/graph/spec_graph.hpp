@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_SPEC_GRAPH_HPP_
-#define PROT_SPEC_GRAPH_HPP_
+#ifndef TOPPIC_GRAPH_SPEC_GRAPH_HPP_
+#define TOPPIC_GRAPH_SPEC_GRAPH_HPP_
 
 #include <vector>
 
@@ -23,7 +23,7 @@
 #include "graph/dist.hpp"
 #include "graph/graph.hpp"
 
-namespace prot {
+namespace toppic {
 
 class SpecGraph {
  public:
@@ -67,6 +67,6 @@ class SpecGraph {
 typedef std::shared_ptr<SpecGraph> SpecGraphPtr;
 typedef std::vector<SpecGraphPtr> SpecGraphPtrVec;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif /* SPEC_GRAPH_HPP_ */

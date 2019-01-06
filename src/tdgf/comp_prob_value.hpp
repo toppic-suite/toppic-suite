@@ -13,17 +13,17 @@
 //limitations under the License.
 
 
-#ifndef PROT_COMP_PROB_VALUE_HPP_
-#define PROT_COMP_PROB_VALUE_HPP_
+#ifndef TOPPIC_TDGF_COMP_PROB_VALUE_HPP_
+#define TOPPIC_TDGF_COMP_PROB_VALUE_HPP_
 
 #include <vector>
 
-#include "base/residue_freq.hpp"
+#include "common/base/residue_freq.hpp"
 #include "spec/prm_peak.hpp"
 #include "spec/base_peak_type.hpp"
 #include "prsm/prsm.hpp"
 
-namespace prot {
+namespace toppic {
 
 class ProbPeak {
  public:

@@ -12,10 +12,10 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
+#include "common/base/mass_constant.hpp"
 #include "graph/spec_graph_reader.hpp"
 
-namespace prot {
+namespace toppic {
 
 SpecGraphReader::SpecGraphReader(const std::string &sp_file_name,
                                  int group_sp_num,

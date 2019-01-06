@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_GRAPH_ALIGN_HPP_
-#define PROT_GRAPH_ALIGN_HPP_
+#ifndef TOPPIC_GRAPH_ALIGN_GRAPH_ALIGN_HPP_
+#define TOPPIC_GRAPH_ALIGN_GRAPH_ALIGN_HPP_
 
 #include "prsm/prsm.hpp"
 #include "oneptmsearch/diagonal_header.hpp"
@@ -25,7 +25,7 @@
 #include "graphalign/graph_result_node.hpp"
 #include "graphalign/graph_align_mng.hpp"
 
-namespace prot {
+namespace toppic {
 
 typedef std::vector<std::vector<std::vector<std::vector<std::pair<int, int>>>>> ConsistentPairs;
 
@@ -99,7 +99,7 @@ class GraphAlign {
 
 typedef std::shared_ptr<GraphAlign> GraphAlignPtr;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif
 

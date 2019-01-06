@@ -13,14 +13,12 @@
 //limitations under the License.
 
 
-#ifndef PROT_SPEC_MS_HEADER_HPP_
-#define PROT_SPEC_MS_HEADER_HPP_
+#ifndef TOPPIC_SPEC_MS_HEADER_HPP_
+#define TOPPIC_SPEC_MS_HEADER_HPP_
 
-#include <cmath>
+#include "common/base/activation.hpp"
 
-#include "base/activation.hpp"
-
-namespace prot {
+namespace toppic {
 
 class MsHeader;
 typedef std::shared_ptr<MsHeader> MsHeaderPtr;
@@ -68,13 +66,7 @@ class MsHeader {
 
   int getPrecCharge() {return prec_charge_;}
 
-  double getPrecMonoMz() {
-    if (std::isnan(prec_mono_mz_)) {
-      return 0.0; 
-    } else {
-      return prec_mono_mz_;
-    }
-  }
+  double getPrecMonoMz();
 
   double getRetentionTime() {return retention_time_;}
 

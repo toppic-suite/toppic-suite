@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef PROT_GUI_THREADTOPMG_H
-#define PROT_GUI_THREADTOPMG_H
+#ifndef TOPPIC_GUI_THREADTOPMG_H
+#define TOPPIC_GUI_THREADTOPMG_H
 
 #include <iostream>
 #include <iomanip>
@@ -22,9 +22,9 @@
 #include <vector>
 #include <ctime>
 
-#include "base/version.hpp"
-#include "base/file_util.hpp"
-#include "base/string_util.hpp"
+#include "common/util/version.hpp"
+#include "common/util/file_util.hpp"
+#include "common/util/str_util.hpp"
 
 #include "spec/msalign_util.hpp"
 #include "spec/feature_util.hpp"
@@ -61,4 +61,4 @@ class threadtopmg : public QThread {
   std::vector<std::string> spec_file_lst_;
 };
 
-#endif  // PROT_GUI_THREADTOPMG_H
+#endif  // TOPPIC_GUI_THREADTOPMG_H

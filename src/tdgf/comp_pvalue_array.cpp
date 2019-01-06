@@ -13,15 +13,17 @@
 //limitations under the License.
 
 
+#include <cmath>
 #include <limits>
 #include <vector>
 
-#include "base/logger.hpp"
-#include "base/base_data.hpp"
+#include "common/util/logger.hpp"
+#include "common/base/base_data.hpp"
 #include "spec/deconv_ms_util.hpp"
+#include "spec/prm_ms_factory.hpp"
 #include "tdgf/comp_pvalue_array.hpp"
 
-namespace prot {
+namespace toppic {
 
 CompPValueArray::CompPValueArray(CountTestNumPtr test_num_ptr, TdgfMngPtr mng_ptr) {
   mng_ptr_ = mng_ptr;
@@ -59,7 +61,7 @@ void CompPValueArray::compMultiExtremeValues(const PrmMsPtrVec &ms_six_ptr_vec,
     double prec_mass = ms_six_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMassMinusWater();
     // LOG_DEBUG("prsm " << i << " prsm size " << prsm_ptrs.size());
     int unexpect_shift_num = prsm_ptrs[i]->getProteoformPtr()->getMassShiftNum(MassShiftType::UNEXPECTED);
-    AlignTypePtr type_ptr = prsm_ptrs[i]->getProteoformPtr()->getAlignType();
+    ProteoformTypePtr type_ptr = prsm_ptrs[i]->getProteoformPtr()->getProteoformType();
 
     if (unexpect_shift_num == 0) {
       // in ZERO PTM searching, +/-1 Da was allowed.
@@ -95,10 +97,10 @@ void CompPValueArray::compMultiExtremeValues(const PrmMsPtrVec &ms_six_ptr_vec,
     // LOG_DEBUG("candidate number " << cand_num);
     if (cand_num == 0.0) {
       LOG_WARN("Zero candidate number");
-      cand_num = base_data::getMaxDouble();
+      cand_num = ExtremeValue::getMaxDouble();
     }
 
-    if (type_ptr == AlignType::COMPLETE || type_ptr == AlignType::PREFIX) {
+    if (type_ptr == ProteoformType::COMPLETE || type_ptr == ProteoformType::PREFIX) {
       ExtremeValuePtr ev_ptr = std::make_shared<ExtremeValue>(prot_probs[i], cand_num, 1);
       prsm_ptrs[i]->setExtremeValuePtr(ev_ptr);
     } else {
@@ -140,4 +142,4 @@ void CompPValueArray::process(SpectrumSetPtr spec_set_ptr, PrsmPtrVec &prsm_ptrs
   }
 }
 
-}  // namespace prot
+}  // namespace toppic

@@ -12,32 +12,20 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#ifndef TOPPIC_PRSM_PRSM_STR_COMBINE_HPP_
+#define TOPPIC_PRSM_PRSM_STR_COMBINE_HPP_
 
-#ifndef PROT_PRSM_PRSM_STR_COMBINE_HPP_
-#define PROT_PRSM_PRSM_STR_COMBINE_HPP_
-
-#include <vector>
+#include <memory>
 #include <string>
-#include <map>
 
-#include "base/proteoform.hpp"
-#include "base/fasta_reader.hpp"
-#include "prsm/prsm.hpp"
-#include "prsm/prsm_para.hpp"
-#include "prsm/prsm_xml_writer.hpp"
-
-namespace prot {
+namespace toppic {
 
 class PrsmStrCombine {
  public:
   PrsmStrCombine(const std::string &spec_file_name, 
                  const std::vector<std::string> &in_file_exts,
                  const std::string &out_file_ext,
-                 int top_num):
-      spec_file_name_(spec_file_name),
-      input_file_exts_(in_file_exts),
-      output_file_ext_(out_file_ext),
-      top_num_(top_num) {}
+                 int top_num);
 
   PrsmStrCombine(const std::string &spec_file_name,
                  const std::string &in_file_ext,
@@ -57,6 +45,6 @@ class PrsmStrCombine {
 };
 
 typedef std::shared_ptr<PrsmStrCombine> PrsmStrCombinePtr;
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif

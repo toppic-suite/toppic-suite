@@ -13,13 +13,13 @@
 //limitations under the License.
 
 
-#ifndef PROT_GRAPH_RESULT_NODE_HPP_
-#define PROT_GRAPH_RESULT_NODE_HPP_
+#ifndef TOPPIC_GRAPH_ALIGN_GRAPH_RESULT_NODE_HPP_
+#define TOPPIC_GRAPH_ALIGN_GRAPH_RESULT_NODE_HPP_
 
 #include <memory>
 #include <vector>
 
-namespace prot {
+namespace toppic {
 
 class GraphResultNode { 
  public:
@@ -50,6 +50,6 @@ typedef std::vector<GraphResultNodePtr> GraphResultNodePtrVec;
 typedef std::vector<GraphResultNodePtrVec> GraphResultNodePtrVec2D;
 typedef std::vector<GraphResultNodePtrVec2D> GraphResultNodePtrVec3D;
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* GRAPH_RESULT_NODE_HPP_ */

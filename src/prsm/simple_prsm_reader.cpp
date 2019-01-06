@@ -12,17 +12,13 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#include <string>
-#include <vector>
-
 #include <xercesc/framework/MemBufInputSource.hpp>
 
-#include "base/logger.hpp"
-#include "base/string_util.hpp"
+#include "common/util/logger.hpp"
+#include "common/util/str_util.hpp"
 #include "prsm/simple_prsm_reader.hpp"
 
-namespace prot {
+namespace toppic {
 
 SimplePrsmReader::SimplePrsmReader(const std::string &file_name) {
   input_.open(file_name.c_str(), std::ios::in);
@@ -32,7 +28,7 @@ std::vector<std::string> SimplePrsmReader::readOnePrsmLines() {
   std::string line;
   std::vector<std::string> line_list;
   while (std::getline(input_, line)) {
-    line = string_util::trim(line);
+    str_util::trim(line);
     if (line ==  "<simple_prsm>") {
       line_list.push_back(line);
     } else if (line == "</simple_prsm>") {
@@ -76,7 +72,7 @@ SimplePrsmPtr SimplePrsmReader::readOnePrsm() {
   SimplePrsmPtr ptr;
   if (parser) {
     XmlDOMDocument doc(parser, prsm_buf);
-    xercesc::DOMElement* root = doc.getDocumentElement();
+    XmlDOMElement* root = doc.getDocumentElement();
     ptr = std::make_shared<SimplePrsm>(root);
   }
   // LOG_DEBUG("simple prsm spectrum id " << ptr->getSpectrumId() << " seq name " << ptr->getSeqName());
@@ -99,4 +95,4 @@ SimplePrsmPtrVec SimplePrsmReader::readSimplePrsms(const std::string &file_name)
   return result_ptrs;
 }
 
-} /* namespace prot */
+} /* namespace toppic */

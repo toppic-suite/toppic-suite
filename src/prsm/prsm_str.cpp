@@ -18,22 +18,11 @@
 #include <vector>
 #include <algorithm>
 
-#include "base/logger.hpp"
+#include "common/util/logger.hpp"
 #include "prsm/prsm_util.hpp"
 #include "prsm/prsm_str.hpp"
 
-namespace prot {
-
-bool MassShiftStr::cmpPosInc(const std::shared_ptr<MassShiftStr> &a,
-                             const std::shared_ptr<MassShiftStr> &b) {
-  if (a->left_pos_ < b->left_pos_) {
-    return true;
-  } else if (a->left_pos_ > b->left_pos_) {
-    return false;
-  } else {
-    return a->right_pos_ < b->right_pos_;
-  }
-}
+namespace toppic {
 
 PrsmStr::PrsmStr(const std::vector<std::string> &str_vec) {
   str_vec_ = str_vec;
@@ -63,7 +52,7 @@ PrsmStr::PrsmStr(const std::vector<std::string> &str_vec) {
   } else {
     std::string str = prsm_util::getValueStr(line);
     LOG_DEBUG("e value string " << str);
-    e_value_ = string_util::convertScientificToDouble(str);
+    e_value_ = str_util::scientificToDouble(str);
     LOG_DEBUG("e value value " << e_value_);
   }
   line = prsm_util::getXmlLine(str_vec_, "<fdr>");
@@ -105,15 +94,28 @@ int getXmlLineIndex(const std::vector<std::string> &str_vec,
   return -1;
 }
 
+bool PrsmStr::cmpSpectrumIdIncPrecursorIdInc(const PrsmStrPtr &a, const PrsmStrPtr &b) {
+  if (a->getSpectrumId() < b->getSpectrumId()) {
+    return true;
+  } else if (a->getSpectrumId() > b->getSpectrumId()) {
+    return false;
+  } else {
+    if (a->getPrecursorId() < b->getPrecursorId()) {
+      return true;
+    }
+    return false;
+  }
+}
+
 void PrsmStr::setFdr(double fdr) {
   int i = getXmlLineIndex(str_vec_, "fdr");
-  str_vec_[i] = "<fdr>" + string_util::convertToString(fdr) + "</fdr>";
+  str_vec_[i] = "<fdr>" + str_util::toString(fdr) + "</fdr>";
   fdr_ = fdr;
 }
 
 void PrsmStr::setProteoformFdr(double proteoform_fdr) {
   int i = getXmlLineIndex(str_vec_, "proteoform_fdr");
-  str_vec_[i] = "<proteoform_fdr>" + string_util::convertToString(proteoform_fdr) + "</proteoform_fdr>";
+  str_vec_[i] = "<proteoform_fdr>" + str_util::toString(proteoform_fdr) + "</proteoform_fdr>";
   proteoform_fdr_ = proteoform_fdr;
 }
 
@@ -125,37 +127,37 @@ void PrsmStr::setFileName(const std::string & fname) {
 
 void PrsmStr::setSpectrumId(int id) {
   int i = getXmlLineIndex(str_vec_, "spectrum_id");
-  str_vec_[i] = "<spectrum_id>" + std::to_string(id) + "</spectrum_id>";
+  str_vec_[i] = "<spectrum_id>" + str_util::toString(id) + "</spectrum_id>";
   spectrum_id_ = id;
 }
 
 void PrsmStr::setPrecFeatureId(int id) {
   int i = getXmlLineIndex(str_vec_, "precursor_feature_id");
-  str_vec_[i] = "<precursor_feature_id>" + std::to_string(id) + "</precursor_feature_id>";
+  str_vec_[i] = "<precursor_feature_id>" + str_util::toString(id) + "</precursor_feature_id>";
   precursor_feature_id_ = id;
 }
 
 void PrsmStr::setPrecFeatureInte(double inte) {
   int i = getXmlLineIndex(str_vec_, "precursor_feature_inte");
-  str_vec_[i] = "<precursor_feature_inte>" + string_util::convertToString(inte) + "</precursor_feature_inte>";
+  str_vec_[i] = "<precursor_feature_inte>" + str_util::toString(inte) + "</precursor_feature_inte>";
   precursor_feature_inte_ = inte;
 }
 
 void PrsmStr::setPrecursorId(int id) {
   int i = getXmlLineIndex(str_vec_, "precursor_id");
-  str_vec_[i] = "<precursor_id>" + std::to_string(id) + "</precursor_id>";
+  str_vec_[i] = "<precursor_id>" + str_util::toString(id) + "</precursor_id>";
   precursor_id_ = id;
 }
 
 void PrsmStr::setClusterId(int id) {
   int i = getXmlLineIndex(str_vec_, "proteo_cluster_id");
-  str_vec_[i] = "<proteo_cluster_id>" + std::to_string(id) + "</proteo_cluster_id>";
+  str_vec_[i] = "<proteo_cluster_id>" + str_util::toString(id) + "</proteo_cluster_id>";
   cluster_id_ = id;
 }
 
 void PrsmStr::setProtId(int id) {
   int i = getXmlLineIndex(str_vec_, "prot_id");
-  str_vec_[i] = "<prot_id>" + std::to_string(id) + "</prot_id>";
+  str_vec_[i] = "<prot_id>" + str_util::toString(id) + "</prot_id>";
   prot_id_ = id;
 }
 
@@ -203,4 +205,4 @@ bool PrsmStr::isStrictCompatiablePtmSpecies(const PrsmStrPtr & a, const PrsmStrP
   return true;
 }
 
-}  // namespace prot
+}  // namespace toppic

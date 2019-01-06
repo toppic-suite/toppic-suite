@@ -13,13 +13,13 @@
 //limitations under the License.
 
 
-#ifndef PROT_COMP_SHIFT_LOW_MEM_HPP_
-#define PROT_COMP_SHIFT_LOW_MEM_HPP_
+#ifndef TOPPIC_PTM_SEARCH_COMP_SHIFT_LOW_MEM_HPP_
+#define TOPPIC_PTM_SEARCH_COMP_SHIFT_LOW_MEM_HPP_
 
 #include <memory>
 #include <vector>
 
-namespace prot {
+namespace toppic {
 
 class CompShiftLowMem {
  public:
@@ -59,6 +59,6 @@ class CompShiftLowMem {
 };
 
 typedef std::shared_ptr<CompShiftLowMem> CompShiftLowMemPtr;
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* COMP_SHIFT_LOW_MEM_HPP_ */

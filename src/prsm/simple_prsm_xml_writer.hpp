@@ -12,16 +12,15 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#ifndef TOPPIC_PRSM_SIMPLE_PRSM_XML_WRITER_HPP_
+#define TOPPIC_PRSM_SIMPLE_PRSM_XML_WRITER_HPP_
 
-#ifndef PROT_PRSM_SIMPLE_PRSM_XML_WRITER_HPP_
-#define PROT_PRSM_SIMPLE_PRSM_XML_WRITER_HPP_
-
-#include <string>
+#include <fstream>
 
 #include "prsm/simple_prsm.hpp"
 #include "prsm/simple_prsm_str.hpp"
 
-namespace prot {
+namespace toppic {
 
 class SimplePrsmXmlWriter {
  public:
@@ -49,6 +48,9 @@ class SimplePrsmXmlWriter {
   std::string file_name_;
 };
 
-}  // namespace prot
+typedef std::shared_ptr<SimplePrsmXmlWriter>   SimplePrsmXmlWriterPtr;
+typedef std::vector<SimplePrsmXmlWriterPtr>    SimplePrsmXmlWriterPtrVec;
+
+}  // namespace toppic
 
 #endif /* SIMPLE_PRSM_WRITER_HPP_ */

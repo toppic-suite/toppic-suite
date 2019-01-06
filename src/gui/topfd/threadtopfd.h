@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_GUI_THREADTOPFD_H
-#define PROT_GUI_THREADTOPFD_H
+#ifndef TOPPIC_GUI_THREADTOPFD_H
+#define TOPPIC_GUI_THREADTOPFD_H
 
 #include <map>
 #include <string>
@@ -24,11 +24,10 @@
 
 #include <QThread>
 
-#include "base/file_util.hpp"
-#include "base/string_util.hpp"
+#include "common/util/file_util.hpp"
+#include "common/util/str_util.hpp"
 #include "console/topfd_argument.hpp"
-
-#include "feature/topfd_process.hpp"
+#include "console/topfd_process.hpp"
 
 namespace Ui {
 class ThreadTopFD;

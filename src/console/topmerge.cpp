@@ -20,10 +20,10 @@
 #include "console/topmerge_argument.hpp"
 #include "console/topmerge_process.hpp"
 
-using namespace prot;
+using namespace toppic;
 
 int main(int argc, char* argv[]) {
-  //prot::log_level = 2;
+  //toppic::log_level = 2;
   LOG_DEBUG("Parsing start!");
   Argument argu_processor;
   bool success = argu_processor.parse(argc, argv);

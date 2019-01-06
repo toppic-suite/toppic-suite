@@ -13,19 +13,19 @@
 //limitations under the License.
 
 
-#ifndef PROT_ANNO_SEGMENT_HPP_
-#define PROT_ANNO_SEGMENT_HPP_
+#ifndef TOPPIC_PRSM_VIEW_ANNO_SEGMENT_HPP_
+#define TOPPIC_PRSM_VIEW_ANNO_SEGMENT_HPP_
 
 
 #include <utility>
 #include <string>
 #include <vector>
 
-#include "base/mass_shift.hpp"
-#include "base/mass_shift_type.hpp"
-#include "base/xml_dom_document.hpp"
+#include "seq/mass_shift.hpp"
+#include "seq/mass_shift_type.hpp"
+#include "common/xml/xml_dom_document.hpp"
 
-namespace prot {
+namespace toppic {
 
 class AnnoSegment {
  public:
@@ -85,7 +85,7 @@ typedef std::shared_ptr<AnnoSegment> AnnoSegmentPtr;
 
 typedef std::vector<AnnoSegmentPtr> AnnoSegmentPtrVec;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif
 

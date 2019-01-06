@@ -13,18 +13,14 @@
 //limitations under the License.
 
 
-#ifndef PROT_SPEC_PRM_MS_HPP_
-#define PROT_SPEC_PRM_MS_HPP_
-
-#include <memory>
-#include <vector>
-#include <utility>
+#ifndef TOPPIC_SPEC_PRM_MS_HPP_
+#define TOPPIC_SPEC_PRM_MS_HPP_
 
 #include "spec/prm_peak.hpp"
-#include "spec/ms.hpp"
 #include "spec/peak_tolerance.hpp"
+#include "spec/ms.hpp"
 
-namespace prot {
+namespace toppic {
 
 typedef std::shared_ptr<Ms<PrmPeakPtr> > PrmMsPtr;
 
@@ -40,6 +36,6 @@ PrmPeakPtrVec getPrmPeakPtrs(const PrmMsPtrVec &prm_ms_ptr_vec, PeakTolerancePtr
 
 }  // namespace prm_ms
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

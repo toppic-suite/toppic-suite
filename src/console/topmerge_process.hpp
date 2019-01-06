@@ -12,18 +12,18 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef PROT_TOPMERGE_PROCESS_HPP
-#define PROT_TOPMERGE_PROCESS_HPP
+#ifndef TOPPIC_TOPMERGE_PROCESS_HPP
+#define TOPPIC_TOPMERGE_PROCESS_HPP
 
 #include <string>
 #include <map>
 #include <vector>
 
-namespace prot {
+namespace toppic {
 
 int topMergeProcess(std::map<std::string, std::string> &arguments,
                     std::vector<std::string> &proteo_file_list);
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

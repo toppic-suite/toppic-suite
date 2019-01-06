@@ -19,7 +19,7 @@
 
 #include "oneptmsearch/diagonal_header_util.hpp"
 
-namespace prot {
+namespace toppic {
 // get the header corresponding to the top left corner in the spectral grid
 DiagonalHeaderPtr DiagonalHeaderUtil::getTopLeftCornerHeader() {
   double shift = 0;
@@ -69,5 +69,5 @@ bool DiagonalHeaderUtil::isExistHeader(const DiagonalHeaderPtrVec &header_ptrs, 
   }
   return false;
 }
-}  // namespace prot
+}  // namespace toppic
 

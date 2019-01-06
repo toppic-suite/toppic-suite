@@ -13,15 +13,16 @@
 //limitations under the License.
 
 
-#ifndef PROT_ANNO_RESIDUE_HPP_
-#define PROT_ANNO_RESIDUE_HPP_
+#ifndef TOPPIC_PRSM_VIEW_ANNO_RESIDUE_HPP_
+#define TOPPIC_PRSM_VIEW_ANNO_RESIDUE_HPP_
 
 #include <string>
 #include <vector>
 
-#include "base/residue.hpp"
+#include "common/xml/xml_dom_document.hpp"
+#include "common/base/residue.hpp"
 
-namespace prot {
+namespace toppic {
 
 const std::string ANNO_RESIDUE_TYPE_NORMAL         = "normal";
 
@@ -72,6 +73,6 @@ class AnnoResidue : public Residue {
 typedef std::shared_ptr<AnnoResidue> AnnoResiduePtr;
 typedef std::vector<AnnoResiduePtr> AnnoResiduePtrVec;
 
-}  // namespace prot
+}  // namespace toppic
 
-#endif /* PROT_ANNO_RESIDUE_HPP_ */
+#endif /* TOPPIC_PRSM_VIEW_ANNO_RESIDUE_HPP_ */

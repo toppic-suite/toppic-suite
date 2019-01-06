@@ -12,18 +12,14 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#include <algorithm>
 #include <cmath>
-#include <iostream>
-#include <utility>
-#include <vector>
+#include <algorithm>
 
-#include "base/logger.hpp"
+#include "common/util/logger.hpp"
 #include "spec/prm_peak_factory.hpp"
 #include "spec/prm_ms.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace prm_ms {
 
@@ -104,4 +100,4 @@ PrmPeakPtrVec getPrmPeakPtrs(const PrmMsPtrVec &prm_ms_ptr_vec,
 
 }  // namespace prm_ms 
 
-}  // namespace prot
+}  // namespace toppic

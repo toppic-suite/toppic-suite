@@ -14,14 +14,12 @@
 
 #include <fstream>
 #include <iostream>
-#include <string>
-#include <vector>
 
-#include <boost/algorithm/string.hpp>
+#include "common/util/str_util.hpp"
 
 #include "spec/feature_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace feature_util {
 
@@ -38,8 +36,8 @@ void mergeFeatureFiles(const std::vector<std::string> & feature_file_lst,
         continue;
       }
 
-      std::vector<std::string> strs;
-      boost::split(strs, line, boost::is_any_of("\t "));
+      //boost::split(strs, line, boost::is_any_of("\t "));
+      std::vector<std::string> strs = str_util::split(line, "\t ");
       outfile << N * i + std::stoi(strs[0]) << "\t";
       outfile << strs[1] << "\t";
       outfile << N * i + std::stoi(strs[2]) << "\t";
@@ -55,4 +53,4 @@ void mergeFeatureFiles(const std::vector<std::string> & feature_file_lst,
 
 }  // namespace feature_util
 
-}  // namespace prot
+}  // namespace toppic

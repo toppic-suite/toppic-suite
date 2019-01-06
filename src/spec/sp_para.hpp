@@ -13,19 +13,21 @@
 //limitations under the License.
 
 
-#ifndef PROT_SPEC_SP_PARA_HPP_
-#define PROT_SPEC_SP_PARA_HPP_
+#ifndef TOPPIC_SPEC_SP_PARA_HPP_
+#define TOPPIC_SPEC_SP_PARA_HPP_
 
 #include <string>
 #include <memory>
 #include <vector>
 #include <set>
 
-#include "base/activation.hpp"
-#include "base/xml_dom_document.hpp"
+#include "common/xml/xml_dom_element.hpp"
+#include "common/base/activation.hpp"
 #include "spec/peak_tolerance.hpp"
 
-namespace prot {
+namespace toppic {
+
+class XmlDOMDocument;
 
 class SpPara {
  public:
@@ -33,14 +35,7 @@ class SpPara {
          const std::vector<double> &ext_offsets,
          PeakTolerancePtr peak_tolerance_ptr,
          ActivationPtr activation_ptr,
-         const std::set<std::string> & skip_list):
-      min_peak_num_(min_peak_num),
-      min_mass_(min_mass),
-      extend_min_mass_(min_extend_mass),
-      ext_offsets_(ext_offsets),
-      peak_tolerance_ptr_(peak_tolerance_ptr),
-      activation_ptr_(activation_ptr),
-      skip_list_(skip_list) {}
+         const std::set<std::string> & skip_list);
 
   explicit SpPara(xercesc::DOMElement* element);
 
@@ -53,8 +48,7 @@ class SpPara {
   PeakTolerancePtr getPeakTolerancePtr() {return peak_tolerance_ptr_;}
 
   void setPeakTolerancePtr(PeakTolerancePtr peak_tolerance_ptr) {
-    peak_tolerance_ptr_ = peak_tolerance_ptr;
-  }
+    peak_tolerance_ptr_ = peak_tolerance_ptr;}
 
   ActivationPtr getActivationPtr() {return activation_ptr_;}
 
@@ -92,6 +86,6 @@ class SpPara {
 
 typedef std::shared_ptr<SpPara> SpParaPtr;
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* SP_PARA_HPP_ */

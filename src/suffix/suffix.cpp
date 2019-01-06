@@ -16,7 +16,7 @@
 #include "edge.hpp"
 #include "suffix.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace suffix {
 
@@ -39,5 +39,5 @@ void Suffix::canonize() {
 
 }  // namespace suffix
 
-}  // namespace prot
+}  // namespace toppic
 

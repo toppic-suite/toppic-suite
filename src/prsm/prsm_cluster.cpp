@@ -12,16 +12,28 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <string>
 #include <algorithm>
-#include <vector>
 
-#include "base/file_util.hpp"
-#include "base/proteoform_util.hpp"
+#include "common/util/logger.hpp"
+#include "common/util/file_util.hpp"
 #include "prsm/prsm_reader.hpp"
+#include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_cluster.hpp"
 
-namespace prot {
+namespace toppic {
+
+PrsmCluster::PrsmCluster(const std::string &db_file_name,
+                         const std::string &spec_file_name,
+                         const std::string &input_file_ext,
+                         const ModPtrVec &fix_mod_ptr_vec,
+                         const std::string &output_file_ext,
+                         double ppo):
+    db_file_name_(db_file_name),
+    spec_file_name_(spec_file_name),
+    input_file_ext_(input_file_ext),
+    fix_mod_ptr_vec_(fix_mod_ptr_vec),
+    output_file_ext_(output_file_ext),
+    ppo_(ppo) {}
 
 std::vector<PrsmStrPtrVec> PrsmCluster::groupProteins(const PrsmStrPtrVec &prsm_ptrs) {
   // get max shift number
@@ -142,6 +154,6 @@ void PrsmCluster::process() {
   writer.close();
 }
 
-}  // namespace prot
+}  // namespace toppic
 
 

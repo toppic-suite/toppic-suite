@@ -16,13 +16,13 @@
 #include <cmath>
 #include <vector>
 
-#include "base/prot_mod.hpp"
-#include "base/mod_base.hpp"
-#include "base/change.hpp"
-#include "base/base_algo.hpp"
+#include "common/base/prot_mod.hpp"
+#include "common/base/mod_base.hpp"
+#include "seq/change.hpp"
+#include "prsm/prsm_algo.hpp"
 #include "oneptmsearch/diagonal_header.hpp"
 
-namespace prot {
+namespace toppic {
 
 DiagonalHeaderPtr DiagonalHeader::clone() {
   DiagonalHeaderPtr cloned
@@ -57,10 +57,10 @@ void DiagonalHeader::initHeader(double c_shift, ProteoformPtr proteo_ptr,
   prot_C_term_shift_ = c_shift;
   std::vector<double> prm_masses = proteo_ptr->getBpSpecPtr()->getPrmMasses();
 
-  trunc_first_res_pos_ = base_algo::getFirstResPos(prot_N_term_shift_,
+  trunc_first_res_pos_ = prsm_algo::getFirstResPos(prot_N_term_shift_,
                                                    prm_masses);
 
-  trunc_last_res_pos_ = base_algo::getLastResPos(prot_C_term_shift_, prm_masses);
+  trunc_last_res_pos_ = prsm_algo::getLastResPos(prot_C_term_shift_, prm_masses);
   pep_N_term_shift_ = prot_N_term_shift_ + prm_masses[trunc_first_res_pos_];
   pep_C_term_shift_ = prot_C_term_shift_ + prm_masses[prm_masses.size() - 1]
       - prm_masses[trunc_last_res_pos_ + 1];
@@ -178,4 +178,4 @@ MassShiftPtrVec getDiagonalMassChanges(const DiagonalHeaderPtrVec &header_ptrs,
   return shift_list;
 }
 
-}  // namespace prot
+}  // namespace toppic

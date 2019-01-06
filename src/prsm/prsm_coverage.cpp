@@ -12,15 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#include <iostream>
-#include <fstream>
-#include <string>
-
-#include <boost/algorithm/string.hpp>
-
-#include "base/proteoform.hpp"
-#include "base/file_util.hpp"
+#include "common/util/file_util.hpp"
+#include "seq/proteoform.hpp"
 #include "spec/rm_break_type.hpp"
 #include "spec/msalign_reader.hpp"
 #include "spec/msalign_util.hpp"
@@ -29,7 +22,14 @@
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_coverage.hpp"
 
-namespace prot {
+namespace toppic {
+
+PrsmCoverage::PrsmCoverage(PrsmParaPtr prsm_para_ptr, 
+                           const std::string &input_file_ext,
+                           const std::string &output_file_ext):
+    prsm_para_ptr_(prsm_para_ptr), 
+    input_file_ext_(input_file_ext),
+    output_file_ext_(output_file_ext){}
 
 void PrsmCoverage::processSingleCoverage() {
   std::string sp_file_name = prsm_para_ptr_->getSpectrumFileName();
@@ -230,14 +230,14 @@ void PrsmCoverage::compOneCoverage(std::ofstream &file, PrsmPtr prsm_ptr,
   int peak_num = 0;
   DeconvMsPtrVec deconv_ms_ptr_vec = prsm_ptr->getDeconvMsPtrVec();
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
-    spec_ids = spec_ids + std::to_string(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getId()) + " ";
+    spec_ids = spec_ids + str_util::toString(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getId()) + " ";
     spec_activations = spec_activations + deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getActivationPtr()->getName() + " ";
     spec_scans = spec_scans + deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getScansString() + " ";
     peak_num += deconv_ms_ptr_vec[i]->size();
   }
-  boost::algorithm::trim(spec_ids);
-  boost::algorithm::trim(spec_activations);
-  boost::algorithm::trim(spec_scans);
+  str_util::trim(spec_ids);
+  str_util::trim(spec_activations);
+  str_util::trim(spec_scans);
   file << prsm_para_ptr_->getSpectrumFileName() << "\t"
       << prsm_ptr->getPrsmId() << "\t"
       << spec_ids << "\t"
@@ -274,14 +274,14 @@ void PrsmCoverage::compTwoCoverage(std::ofstream &file, PrsmPtr prsm_ptr,
   int peak_num = 0;
   DeconvMsPtrVec deconv_ms_ptr_vec = prsm_ptr->getDeconvMsPtrVec();
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
-    spec_ids = spec_ids + std::to_string(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getId()) + " ";
+    spec_ids = spec_ids + str_util::toString(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getId()) + " ";
     spec_activations = spec_activations + deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getActivationPtr()->getName() + " ";
     spec_scans = spec_scans + deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getScansString() + " ";
     peak_num += deconv_ms_ptr_vec[i]->size();
   }
-  boost::algorithm::trim(spec_ids);
-  boost::algorithm::trim(spec_activations);
-  boost::algorithm::trim(spec_scans);
+  str_util::trim(spec_ids);
+  str_util::trim(spec_activations);
+  str_util::trim(spec_scans);
 
   file << prsm_para_ptr_->getSpectrumFileName() << "\t"
       << prsm_ptr->getPrsmId() << "\t"
@@ -378,5 +378,5 @@ void PrsmCoverage::processTwoPrsms(std::ofstream &file, PrsmPtr prsm_ptr_1, Prsm
     compTwoCoverage(file, prsm_ptr_2, pair_ptrs_21, pair_ptrs_22, pair_ptrs_2, prsm_para_ptr);
   }
 }
-}  // namespace prot
+}  // namespace toppic
 

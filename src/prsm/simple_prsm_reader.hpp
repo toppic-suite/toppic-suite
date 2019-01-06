@@ -12,19 +12,15 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#ifndef TOPPIC_PRSM_SIMPLE_PRSM_READER_HPP_
+#define TOPPIC_PRSM_SIMPLE_PRSM_READER_HPP_
 
-#ifndef PROT_PRSM_SIMPLE_PRSM_READER_HPP_
-#define PROT_PRSM_SIMPLE_PRSM_READER_HPP_
-
-#include <iostream>
 #include <fstream>
 
-#include "base/xml_dom_document.hpp"
-#include "prsm/prsm.hpp"
 #include "prsm/simple_prsm.hpp"
 #include "prsm/simple_prsm_str.hpp"
 
-namespace prot {
+namespace toppic {
 
 class SimplePrsmReader {
  public:
@@ -47,6 +43,6 @@ class SimplePrsmReader {
 typedef std::shared_ptr<SimplePrsmReader> SimplePrsmReaderPtr;
 typedef std::vector<SimplePrsmReaderPtr> SimplePrsmReaderPtrVec;
 
-} /* namespace prot */
+} /* namespace toppic */
 
-#endif /* PROT_SIMPLE_PRSM_READER_HPP_ */
+#endif /* TOPPIC_SIMPLE_PRSM_READER_HPP_ */

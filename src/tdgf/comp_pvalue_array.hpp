@@ -13,15 +13,15 @@
 //limitations under the License.
 
 
-#ifndef PROT_COMP_PVALUE_ARRAY_HPP_
-#define PROT_COMP_PVALUE_ARRAY_HPP_
+#ifndef TOPPIC_TDGF_COMP_PVALUE_ARRAY_HPP_
+#define TOPPIC_TDGF_COMP_PVALUE_ARRAY_HPP_
 
 #include "spec/spectrum_set.hpp"
 #include "tdgf/tdgf_mng.hpp"
 #include "tdgf/comp_prob_value.hpp"
 #include "tdgf/count_test_num.hpp"
 
-namespace prot {
+namespace toppic {
 
 class CompPValueArray {
  public:
@@ -49,6 +49,6 @@ class CompPValueArray {
 
 typedef std::shared_ptr<CompPValueArray> CompPValueArrayPtr;
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

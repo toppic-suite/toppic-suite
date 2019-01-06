@@ -13,17 +13,13 @@
 //limitations under the License.
 
 
-#ifndef PROT_SPEC_EXTEND_MS_HPP_
-#define PROT_SPEC_EXTEND_MS_HPP_
-
-#include <vector>
-#include <memory>
-#include <utility>
+#ifndef TOPPIC_SPEC_EXTEND_MS_HPP_
+#define TOPPIC_SPEC_EXTEND_MS_HPP_
 
 #include "spec/extend_peak.hpp"
 #include "spec/ms.hpp"
 
-namespace prot {
+namespace toppic {
 
 typedef std::shared_ptr<Ms<ExtendPeakPtr> > ExtendMsPtr;
 
@@ -40,6 +36,6 @@ std::vector<std::pair<double, double> > getExtendMassToleranceList(ExtendMsPtr e
 
 }  // namespace extend_ms
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

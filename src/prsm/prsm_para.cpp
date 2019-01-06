@@ -12,16 +12,17 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include <fstream>
 
-#include <boost/algorithm/string.hpp>
-
-#include "base/activation_base.hpp"
-#include "base/mass_constant.hpp"
-#include "base/mod_util.hpp"
-#include "base/prot_mod_base.hpp"
+#include "common/util/logger.hpp"
+#include "common/util/str_util.hpp"
+#include "common/base/activation_base.hpp"
+#include "common/base/mass_constant.hpp"
+#include "common/base/mod_util.hpp"
+#include "common/base/prot_mod_base.hpp"
 #include "prsm/prsm_para.hpp"
 
-namespace prot {
+namespace toppic {
 
 PrsmPara::PrsmPara(std::map<std::string, std::string> &arguments) {
   search_db_file_name_ = arguments["databaseFileName"];
@@ -37,8 +38,8 @@ PrsmPara::PrsmPara(std::map<std::string, std::string> &arguments) {
   fix_mod_list_ = mod_util::geneFixedModList(arguments["fixedMod"]);
 
   std::string prot_mod_str = arguments["allowProtMod"];
-  std::vector<std::string> strs;
-  boost::split(strs, prot_mod_str, boost::is_any_of(","));
+  //boost::split(strs, prot_mod_str, boost::is_any_of(","));
+  std::vector<std::string> strs = str_util::split(prot_mod_str, ",");
   for (size_t i = 0; i < strs.size(); i++) {
     ProtModPtrVec mods = ProtModBase::getProtModPtrByType(strs[i]);
     LOG_DEBUG("prot mod type " << strs[i] << " num " << mods.size());
@@ -76,8 +77,8 @@ PrsmPara::PrsmPara(std::map<std::string, std::string> &arguments) {
     std::ifstream infile(arguments["skipList"]);
     std::string line;
     while (std::getline(infile, line)) {
-      std::vector<std::string> strs; 
-      boost::split(strs, line, boost::is_any_of(" "));
+      //boost::split(strs, line, boost::is_any_of(" "));
+      std::vector<std::string> strs = str_util::split(line, " "); 
       for (size_t i = 0; i < strs.size(); i++) {
         skip_list.insert(strs[i]);
       }
@@ -90,4 +91,4 @@ PrsmPara::PrsmPara(std::map<std::string, std::string> &arguments) {
                                           activation_ptr, skip_list);
 }
 
-} /* namespace prot */
+} /* namespace toppic */

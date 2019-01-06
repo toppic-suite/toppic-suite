@@ -12,26 +12,20 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#ifndef TOPPIC_SPEC_THEO_PEAK_HPP_
+#define TOPPIC_SPEC_THEO_PEAK_HPP_
 
-#ifndef PROT_SPEC_THEO_PEAK_HPP_
-#define PROT_SPEC_THEO_PEAK_HPP_
-
-#include <vector>
-
-#include "base/ion.hpp"
+#include "common/base/ion.hpp"
 #include "spec/peak.hpp"
 
-namespace prot {
+namespace toppic {
 
 class TheoPeak;
 typedef std::shared_ptr<TheoPeak> TheoPeakPtr;
 
 class TheoPeak : public Peak {
  public:
-  TheoPeak(IonPtr ion_ptr, double unmod_mass, double shift):
-    Peak(unmod_mass + shift, 1.0),
-    ion_ptr_(ion_ptr),
-    shift_(shift) {}
+  TheoPeak(IonPtr ion_ptr, double unmod_mass, double shift);
 
   IonPtr getIonPtr() {return ion_ptr_;}
 
@@ -50,6 +44,6 @@ class TheoPeak : public Peak {
 
 typedef std::vector<TheoPeakPtr> TheoPeakPtrVec;
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* THEO_PEAK_HPP_ */

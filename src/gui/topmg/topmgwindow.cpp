@@ -24,9 +24,6 @@
 #include <QToolTip>
 #include <QDesktopServices>
 
-#include <boost/filesystem.hpp>
-namespace fs = boost::filesystem;
-
 #include "topmgwindow.h"
 #include "ui_topmgwindow.h"
 #include "threadtopmg.h"
@@ -247,17 +244,17 @@ void topmgWindow::on_startButton_clicked() {
 void topmgWindow::on_outputButton_clicked() {
   std::vector<std::string> spec_file_lst = this->getSpecFileList();
   if (spec_file_lst.size() > 0) {
-    fs::path full_path(spec_file_lst[0].c_str());
-    QString outPath = full_path.remove_filename().string().c_str();
+    std::string dir = toppic::file_util::directory(spec_file_lst[0]);
+    QString outPath = dir.c_str();
     QDesktopServices::openUrl(QUrl(outPath, QUrl::TolerantMode));
   }
 }
 
 std::map<std::string, std::string> topmgWindow::getArguments() {
   QString path = QCoreApplication::applicationFilePath();
-  std::string exe_dir = prot::file_util::getExecutiveDir(path.toStdString());
+  std::string exe_dir = toppic::file_util::getExecutiveDir(path.toStdString());
   arguments_["executiveDir"] = exe_dir;
-  arguments_["resourceDir"] = arguments_["executiveDir"] + prot::file_util::getFileSeparator() + prot::file_util::getResourceDirName();
+  arguments_["resourceDir"] = toppic::file_util::getResourceDir(exe_dir);
   arguments_["oriDatabaseFileName"] = ui->databaseFileEdit->text().toStdString();
   arguments_["combinedOutputName"] = ui->combinedOutputEdit->text().trimmed().toStdString();
   arguments_["databaseBlockSize"] = "1000000";

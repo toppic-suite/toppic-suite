@@ -14,11 +14,11 @@
 
 #include <climits>
 
-#include "base/logger.hpp"
-#include "base/file_util.hpp"
-#include "base/proteoform.hpp"
-#include "base/fasta_reader.hpp"
-#include "base/thread_pool.hpp"
+#include "common/util/logger.hpp"
+#include "common/util/file_util.hpp"
+#include "seq/proteoform.hpp"
+#include "seq/fasta_reader.hpp"
+#include "common/thread/simple_thread_pool.hpp"
 #include "spec/msalign_reader.hpp"
 #include "spec/msalign_util.hpp"
 #include "spec/spectrum_set.hpp"
@@ -26,10 +26,11 @@
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_str_combine.hpp"
 #include "prsm/prsm_xml_writer.hpp"
+#include "prsm/prsm_xml_writer_util.hpp"
 #include "tdgf/evalue_processor.hpp"
 
 
-namespace prot {
+namespace toppic {
 
 void EValueProcessor::init() {
   test_num_ptr_ = std::make_shared<CountTestNum>(mng_ptr_);
@@ -45,12 +46,14 @@ void EValueProcessor::init() {
 
 }
 
-std::function<void()> geneTask(SpectrumSetPtr spec_set_ptr, const PrsmPtrVec & sele_prsm_ptrs,
+std::function<void()> geneTask(SpectrumSetPtr spec_set_ptr, 
+                               const PrsmPtrVec & sele_prsm_ptrs,
                                double ppo, bool is_separate,
                                TdgfMngPtr mng_ptr, CountTestNumPtr test_num_ptr,
-                               std::shared_ptr<ThreadPool<PrsmXmlWriter>> pool_ptr) {
+                               SimpleThreadPoolPtr pool_ptr,
+                               PrsmXmlWriterPtrVec writer_ptr_vec) {
 
-  return [spec_set_ptr, sele_prsm_ptrs, ppo, is_separate, mng_ptr, test_num_ptr, pool_ptr]() {
+  return [spec_set_ptr, sele_prsm_ptrs, ppo, is_separate, mng_ptr, test_num_ptr, pool_ptr, writer_ptr_vec]() {
     PrsmPtrVec prsm_vec; // copy sele_prsm_ptrs
     for (size_t i = 0; i < sele_prsm_ptrs.size(); i++) {
       prsm_vec.push_back(std::make_shared<Prsm>(*sele_prsm_ptrs[i].get()));
@@ -70,9 +73,9 @@ std::function<void()> geneTask(SpectrumSetPtr spec_set_ptr, const PrsmPtrVec & s
     }
 
     boost::thread::id thread_id = boost::this_thread::get_id();
-    PrsmXmlWriterPtr writer_ptr = pool_ptr->getWriter(thread_id);
+    int writer_id = pool_ptr->getId(thread_id);
     for (size_t i = 0; i < prsm_vec.size(); i++) {
-      writer_ptr->write(prsm_vec[i]);
+      writer_ptr_vec[writer_id]->write(prsm_vec[i]);
     }
   };
 }
@@ -101,8 +104,10 @@ void EValueProcessor::process(bool is_separate) {
                           sp_para_ptr->getActivationPtr(),
                           sp_para_ptr->getSkipList());
 
-  std::shared_ptr<ThreadPool<PrsmXmlWriter>> pool_ptr 
-      = std::make_shared<ThreadPool<PrsmXmlWriter>>(mng_ptr_->thread_num_ , output_file_name);
+  PrsmXmlWriterPtrVec writer_ptr_vec = 
+      prsm_xml_writer_util::geneWriterPtrVec(output_file_name, mng_ptr_->thread_num_);
+
+  SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(mng_ptr_->thread_num_);
 
   int cnt = 0;
   SpectrumSetPtr spec_set_ptr;
@@ -123,7 +128,7 @@ void EValueProcessor::process(bool is_separate) {
           boost::this_thread::sleep(boost::posix_time::milliseconds(100));
         }
         pool_ptr->Enqueue(geneTask(spec_set_ptr, selected_prsm_ptrs, ppo, is_separate,
-                                   mng_ptr_, test_num_ptr_, pool_ptr));
+                                   mng_ptr_, test_num_ptr_, pool_ptr, writer_ptr_vec));
       }
     }
 
@@ -134,13 +139,14 @@ void EValueProcessor::process(bool is_separate) {
   std::cout << std::endl;
   sp_reader.close();
   prsm_reader.close();
+  prsm_xml_writer_util::closeWriterPtrVec(writer_ptr_vec);
   writer.close();
 
   if (mng_ptr_->use_gf_) {
     int prsm_top_num = INT_MAX; 
     std::vector<std::string> input_exts;
     for (int t = 0; t < mng_ptr_->thread_num_; t++) {
-      input_exts.push_back(mng_ptr_->output_file_ext_ + "_" + std::to_string(t));
+      input_exts.push_back(mng_ptr_->output_file_ext_ + "_" + str_util::toString(t));
     }
     PrsmStrCombinePtr combine_ptr
         = std::make_shared<PrsmStrCombine>(sp_file_name, input_exts, 

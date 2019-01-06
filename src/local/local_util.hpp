@@ -13,22 +13,22 @@
 //limitations under the License.
 
 
-#ifndef PROT_LOCAL_UTIL_HPP_
-#define PROT_LOCAL_UTIL_HPP_
+#ifndef TOPPIC_LOCAL_UTIL_HPP_
+#define TOPPIC_LOCAL_UTIL_HPP_
 
 #include <vector>
 
-#include "base/amino_acid_base.hpp"
-#include "base/ptm.hpp"
-#include "base/mass_shift.hpp"
-#include "base/ptm.hpp"
+#include "common/base/amino_acid_base.hpp"
+#include "common/base/ptm.hpp"
+#include "seq/mass_shift.hpp"
+#include "common/base/ptm.hpp"
 
 #include "prsm/prsm.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
 
 #include "local/local_mng.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace local_util {
 
@@ -69,6 +69,6 @@ int compMatchFragNum(ProteoformPtr proteoform_ptr, const ExtendMsPtrVec &ms_ptr_
 
 }  // namespace local_util
 
-}  // namespace prot
+}  // namespace toppic
 
 #endif

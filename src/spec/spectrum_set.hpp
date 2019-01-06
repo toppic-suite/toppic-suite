@@ -12,23 +12,19 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#ifndef PROT_SPEC_SPECTRUM_SET_HPP_
-#define PROT_SPEC_SPECTRUM_SET_HPP_
-
-#include <memory>
-#include <vector>
+#ifndef TOPPIC_SPEC_SPECTRUM_SET_HPP_
+#define TOPPIC_SPEC_SPECTRUM_SET_HPP_
 
 #include "spec/deconv_ms.hpp"
 #include "spec/extend_ms.hpp"
 #include "spec/prm_ms.hpp"
-#include "spec/prm_ms_factory.hpp"
 #include "spec/sp_para.hpp"
 
-namespace prot {
+namespace toppic {
 
 class SpectrumSet;
 typedef std::shared_ptr<SpectrumSet> SpectrumSetPtr;
+typedef std::vector<SpectrumSetPtr> SpectrumSetPtrVec;
 
 class SpectrumSet {
  public:
@@ -55,10 +51,7 @@ class SpectrumSet {
 
   PrmMsPtrVec getMsSixPtrVec() {return prm_ms_six_ptr_vec_;}
 
-  PrmMsPtrVec getMsShiftSixPtrVec(double shift) {
-    return prm_ms_factory::geneShiftMsSixPtrVec(deconv_ms_ptr_vec_, sp_para_ptr_,
-                                                prec_mono_mass_, -shift);
-  }
+  PrmMsPtrVec getMsShiftSixPtrVec(double shift);
 
  private:
   DeconvMsPtrVec deconv_ms_ptr_vec_;
@@ -80,6 +73,6 @@ class SpectrumSet {
   bool checkValid(SpParaPtr sp_para_ptr);
 };
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* SPECTRUM_SET_HPP_ */

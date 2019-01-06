@@ -17,14 +17,13 @@
 #include <string>
 #include <algorithm>
 #include <vector>
+#include <fstream>
 
-#include <boost/algorithm/string.hpp>
-
-#include "base/residue_util.hpp"
+#include "common/base/residue_util.hpp"
 
 #include "mcmc/mcmc_mass_table_util.hpp"
 
-namespace prot {
+namespace toppic {
 namespace mass_table_util {
 
 std::map<int, std::vector<std::string> > readMassTable(MCMCMngPtr mng_ptr) {
@@ -35,8 +34,8 @@ std::map<int, std::vector<std::string> > readMassTable(MCMCMngPtr mng_ptr) {
   std::ifstream infile(mass_table_file);
   std::string line;
   while (std::getline(infile, line)) {
-    std::vector<std::string> strs;
-    boost::split(strs, line, boost::is_any_of("\t"));
+    //boost::split(strs, line, boost::is_any_of("\t"));
+    std::vector<std::string> strs = str_util::split(line, "\t");
     int m = std::stoi(strs[0]);
     for (size_t i = 1; i < strs.size(); i++) {
       mass_table[m].push_back(strs[i]);
@@ -124,4 +123,4 @@ std::map<int, std::vector<std::string> > geneMassTableFixMod(MCMCMngPtr mng_ptr)
 }
 
 }  // namespace mass_table_util
-}  // namespace prot
+}  // namespace toppic

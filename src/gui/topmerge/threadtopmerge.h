@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef PROT_GUI_THREADTOPMERGE_H
-#define PROT_GUI_THREADTOPMERGE_H
+#ifndef TOPPIC_GUI_THREADTOPMERGE_H
+#define TOPPIC_GUI_THREADTOPMERGE_H
 
 #include <map>
 #include <string>

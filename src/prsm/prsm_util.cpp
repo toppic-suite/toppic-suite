@@ -13,24 +13,17 @@
 //limitations under the License.
 
 #include <set>
-#include <vector>
-#include <string>
 #include <algorithm>
 
-#include <boost/algorithm/string.hpp>
-
-#include "base/logger.hpp"
-
+#include "common/util/logger.hpp"
+#include "common/util/str_util.hpp"
 #include "spec/extend_ms_factory.hpp"
 #include "spec/msalign_reader.hpp"
-
-#include "prsm/prsm_para.hpp"
-#include "prsm/prsm_util.hpp"
-#include "prsm/prsm_str.hpp"
-#include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_reader.hpp"
+#include "prsm/prsm_xml_writer.hpp"
+#include "prsm/prsm_util.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace prsm_util {
 
@@ -171,8 +164,8 @@ void addFeatureIDToPrsms(PrsmStrPtrVec &prsm_ptrs, const std::string & feature_f
     if (line[0] == '#' || line == "" || line[0] == 'I') {
       continue;
     }
-    std::vector<std::string> strs;
-    boost::split(strs, line, boost::is_any_of("\t "));
+    // boost::split(strs, line, boost::is_any_of("\t "));
+    std::vector<std::string> strs = str_util::split(line, "\t ");
     feature_spec_ids.push_back(std::stoi(strs[0]));
     feature_ids.push_back(std::stoi(strs[6]));
     feature_intens.push_back(std::stod(strs[7]));
@@ -212,4 +205,4 @@ void mergePrsmFiles(const std::vector<std::string> & prsm_file_lst, int N,
 
 }  // namespace prsm_util
 
-}  // namespace prot
+}  // namespace toppic

@@ -16,7 +16,7 @@
 
 #include "dist.hpp"
 
-namespace prot {
+namespace toppic {
 
 int getVecIndex(int v1, int v2, int gap) {
   int index = (gap + 1) * v1 + (v2 - v1);
@@ -46,4 +46,4 @@ void addToDistVec(MassGraphPtr graph_ptr, const std::vector<std::vector<std::set
   std::copy(dist_set.begin(), dist_set.end(), std::back_inserter(dist_vec));
 }
 
-}  // namespace prot
+}  // namespace toppic

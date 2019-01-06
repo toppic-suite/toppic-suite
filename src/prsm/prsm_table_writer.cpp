@@ -12,25 +12,24 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include <iomanip>
-#include <ctime>
-#include <map>
-#include <string>
-#include <algorithm>
-#include <vector>
 
-
-#include <boost/algorithm/string.hpp>
-
-#include "base/file_util.hpp"
+#include "common/util/file_util.hpp"
 #include "spec/msalign_reader.hpp"
 #include "spec/extend_ms_factory.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_table_writer.hpp"
-#include "console/toppic_argument.hpp"
 
-namespace prot {
+namespace toppic {
+
+PrsmTableWriter::PrsmTableWriter(PrsmParaPtr prsm_para_ptr, 
+                                 std::string argu_str,
+                                 const std::string &input_file_ext, 
+                                 const std::string &output_file_ext):
+    prsm_para_ptr_(prsm_para_ptr),
+    input_file_ext_(input_file_ext),
+    argu_str_(argu_str),
+    output_file_ext_(output_file_ext) {}
 
 void PrsmTableWriter::write() {
   std::string spectrum_file_name  = prsm_para_ptr_->getSpectrumFileName();
@@ -116,17 +115,17 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   int peak_num = 0;
   DeconvMsPtrVec deconv_ms_ptr_vec = prsm_ptr->getDeconvMsPtrVec();
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
-    spec_ids = spec_ids + std::to_string(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getId()) + " ";
+    spec_ids = spec_ids + str_util::toString(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getId()) + " ";
     spec_activations = spec_activations + deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getActivationPtr()->getName() + " ";
     spec_scans = spec_scans + deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getScansString() + " ";
     peak_num += deconv_ms_ptr_vec[i]->size();
-    retention_time = retention_time + string_util::convertToString(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getRetentionTime(), 2) + " ";
+    retention_time = retention_time + str_util::toString(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getRetentionTime(), 2) + " ";
   }
 
-  boost::algorithm::trim(spec_ids);
-  boost::algorithm::trim(spec_activations);
-  boost::algorithm::trim(spec_scans);
-  boost::algorithm::trim(retention_time);
+  str_util::trim(spec_ids);
+  str_util::trim(spec_activations);
+  str_util::trim(spec_scans);
+  str_util::trim(retention_time);
 
   if (deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getRetentionTime() <= 0.0) retention_time = "-";
 
@@ -178,4 +177,4 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   }
 }
 
-}  // namespace prot
+}  // namespace toppic

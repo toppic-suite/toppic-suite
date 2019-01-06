@@ -21,7 +21,7 @@
 #include "edge.hpp"
 #include "suffix_tree.hpp"
 
-namespace prot {
+namespace toppic {
 
 namespace suffix {
 
@@ -70,5 +70,5 @@ class Node {
 
 }  // namespace suffix
 
-}  // namespace prot
+}  // namespace toppic
 #endif

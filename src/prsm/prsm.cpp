@@ -12,30 +12,38 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#include <vector>
 #include <algorithm>
-#include <string>
 
-#include "base/logger.hpp"
-#include "base/proteoform_factory.hpp"
-#include "base/string_util.hpp"
-#include "base/xml_dom_util.hpp"
-#include "spec/ms.hpp"
+#include "common/util/logger.hpp"
+#include "common/util/str_util.hpp"
+#include "common/xml/xml_dom_util.hpp"
 #include "spec/extend_ms_factory.hpp"
-#include "spec/msalign_reader.hpp"
-#include "spec/spectrum_set.hpp"
-#include "prsm/peak_ion_pair.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
 #include "prsm/prsm.hpp"
 
-namespace prot {
+namespace toppic {
 
-Prsm::Prsm(xercesc::DOMElement* element, FastaIndexReaderPtr reader_ptr,
+Prsm::Prsm(ProteoformPtr proteoform_ptr, const DeconvMsPtrVec &deconv_ms_ptr_vec,
+           double adjusted_prec_mass, SpParaPtr sp_para_ptr):
+    adjusted_prec_mass_(adjusted_prec_mass),
+    proteoform_ptr_(proteoform_ptr),
+    deconv_ms_ptr_vec_(deconv_ms_ptr_vec) {
+      MsHeaderPtr header_ptr = deconv_ms_ptr_vec[0]->getMsHeaderPtr();
+      spectrum_id_ = header_ptr->getId();
+      spectrum_scan_ = header_ptr->getScansString();
+      precursor_id_ = header_ptr->getPrecId();
+      prec_feature_id_ = header_ptr->getFeatureId();
+      prec_feature_inte_ = header_ptr->getFeatureInte();
+      spectrum_num_ = deconv_ms_ptr_vec.size();
+      ori_prec_mass_ = header_ptr->getPrecMonoMass();
+      init(sp_para_ptr);
+    }
+
+Prsm::Prsm(XmlDOMElement* element, FastaIndexReaderPtr reader_ptr,
            const ModPtrVec &fix_mod_list) {
   parseXml(element);
   std::string form_elem_name = Proteoform::getXmlElementName();
-  xercesc::DOMElement* form_element
+  XmlDOMElement* form_element
       = xml_dom_util::getChildElement(element, form_elem_name.c_str(), 0);
   proteoform_ptr_ = std::make_shared<Proteoform>(form_element, reader_ptr, fix_mod_list);
 }
@@ -98,36 +106,36 @@ void Prsm::initScores(SpParaPtr sp_para_ptr) {
   }
 }
 
-xercesc::DOMElement* Prsm::toXmlElement(XmlDOMDocument* xml_doc) {
+XmlDOMElement* Prsm::toXmlElement(XmlDOMDocument* xml_doc) {
   std::string element_name = Prsm::getXmlElementName();
-  xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());
+  XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
   xml_doc->addElement(element, "file_name", file_name_.c_str());
-  std::string str = string_util::convertToString(prsm_id_);
+  std::string str = str_util::toString(prsm_id_);
   xml_doc->addElement(element, "prsm_id", str.c_str());
-  str = string_util::convertToString(spectrum_id_);
+  str = str_util::toString(spectrum_id_);
   xml_doc->addElement(element, "spectrum_id", str.c_str());
   xml_doc->addElement(element, "spectrum_scan", spectrum_scan_.c_str());
-  str = string_util::convertToString(precursor_id_);
+  str = str_util::toString(precursor_id_);
   xml_doc->addElement(element, "precursor_id", str.c_str());
-  str = string_util::convertToString(prec_feature_id_);
+  str = str_util::toString(prec_feature_id_);
   xml_doc->addElement(element, "precursor_feature_id", str.c_str());
-  str = string_util::convertToString(prec_feature_inte_);
+  str = str_util::toString(prec_feature_inte_);
   xml_doc->addElement(element, "precursor_feature_inte", str.c_str());
-  str = string_util::convertToString(spectrum_num_);
+  str = str_util::toString(spectrum_num_);
   xml_doc->addElement(element, "spectrum_number", str.c_str());
-  str = string_util::convertToString(ori_prec_mass_);
+  str = str_util::toString(ori_prec_mass_);
   xml_doc->addElement(element, "ori_prec_mass", str.c_str());
-  str = string_util::convertToString(adjusted_prec_mass_);
+  str = str_util::toString(adjusted_prec_mass_);
   xml_doc->addElement(element, "adjusted_prec_mass", str.c_str());
-  str = string_util::convertToString(fdr_);
+  str = str_util::toString(fdr_);
   xml_doc->addElement(element, "fdr", str.c_str());
-  str = string_util::convertToString(proteoform_fdr_);
+  str = str_util::toString(proteoform_fdr_);
   xml_doc->addElement(element, "proteoform_fdr", str.c_str());
-  str = string_util::convertToString(match_peak_num_);
+  str = str_util::toString(match_peak_num_);
   xml_doc->addElement(element, "match_peak_num", str.c_str());
-  str = string_util::convertToString(match_fragment_num_);
+  str = str_util::toString(match_fragment_num_);
   xml_doc->addElement(element, "match_fragment_num", str.c_str());
-  str = string_util::convertToString(getNormMatchFragNum());
+  str = str_util::toString(getNormMatchFragNum());
   xml_doc->addElement(element, "norm_match_fragment_num", str.c_str());
   proteoform_ptr_->appendXml(xml_doc, element);
   if (extreme_value_ptr_ != nullptr) {
@@ -136,12 +144,12 @@ xercesc::DOMElement* Prsm::toXmlElement(XmlDOMDocument* xml_doc) {
   return element;
 }
 
-void Prsm::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
-  xercesc::DOMElement* element = toXmlElement(xml_doc);
+void Prsm::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
+  XmlDOMElement* element = toXmlElement(xml_doc);
   parent->appendChild(element);
 }
 
-void Prsm::parseXml(xercesc::DOMElement *element) {
+void Prsm::parseXml(XmlDOMElement *element) {
   file_name_ = xml_dom_util::getChildValue(element, "file_name", 0);
   prsm_id_ = xml_dom_util::getIntChildValue(element, "prsm_id", 0);
   spectrum_id_ = xml_dom_util::getIntChildValue(element, "spectrum_id", 0);
@@ -159,7 +167,7 @@ void Prsm::parseXml(xercesc::DOMElement *element) {
 
   int prob_count = xml_dom_util::getChildCount(element, "extreme_value");
   if (prob_count != 0) {
-    xercesc::DOMElement* prob_element
+    XmlDOMElement* prob_element
         = xml_dom_util::getChildElement(element, "extreme_value", 0);
     extreme_value_ptr_ = std::make_shared<ExtremeValue>(prob_element);
   }
@@ -282,4 +290,17 @@ bool Prsm::cmpSpectrumIdIncEvalueInc(const PrsmPtr &a, const PrsmPtr &b) {
   }
 }
 
-}  // namespace prot
+bool Prsm::cmpNormMatchFragmentDec(const PrsmPtr &a, const PrsmPtr &b) {
+  if (a->getNormMatchFragNum() == b->getNormMatchFragNum()) {
+    return a->getProteoformPtr()->getVariablePtmNum() < b->getProteoformPtr()->getVariablePtmNum();
+  } else {
+    return a->getNormMatchFragNum() > b->getNormMatchFragNum();
+  }
+}
+
+void Prsm::setProteoformPtr(ProteoformPtr proteoform, SpParaPtr sp_para_ptr) {
+  proteoform_ptr_ = proteoform;
+  init(sp_para_ptr);
+}
+
+}  // namespace toppic

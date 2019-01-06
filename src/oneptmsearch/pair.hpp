@@ -13,12 +13,12 @@
 //limitations under the License.
 
 
-#ifndef PROT_PTM_SEARCH_PAIR_HPP_
-#define PROT_PTM_SEARCH_PAIR_HPP_
+#ifndef TOPPIC_ONE_PTM_SEARCH_PTM_SEARCH_PAIR_HPP_
+#define TOPPIC_ONE_PTM_SEARCH_PTM_SEARCH_PAIR_HPP_
 
 #include <memory>
 
-namespace prot {
+namespace toppic {
 
 class Pair;
 
@@ -50,6 +50,6 @@ class Pair {
 };
 
 
-} /* namespace prot */
+} /* namespace toppic */
 
 #endif /* PAIR_HPP_ */

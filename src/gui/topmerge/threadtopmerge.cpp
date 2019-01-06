@@ -19,5 +19,5 @@
 
 void ThreadTopMerge::run() {
   std::sort(proteoform_file_lst_.begin(), proteoform_file_lst_.end());
-  prot::topMergeProcess(arguments_, proteoform_file_lst_);
+  toppic::topMergeProcess(arguments_, proteoform_file_lst_);
 }
