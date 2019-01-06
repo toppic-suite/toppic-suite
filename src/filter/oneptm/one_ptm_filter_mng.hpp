@@ -32,7 +32,7 @@ class OnePtmFilterMng {
   PrsmParaPtr prsm_para_ptr_;
 
   // parameters for fast filteration
-  int max_proteoform_mass_ = 20000;
+  int max_proteoform_mass_ = 50000;
 
   // Candidate protein number for each spectrum
   unsigned int comp_num_ = 10;
