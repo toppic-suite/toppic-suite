@@ -36,9 +36,9 @@ int main(int argc, char* argv[]) {
 
   std::map<std::string, std::string> arguments = argu_processor.getArguments();
 
-  std::vector<std::string> proteo_file_list = argu_processor.getProteoformFileList();
+  std::vector<std::string> input_file_list = argu_processor.getProteoformFileList();
 
-  topMergeProcess(arguments, proteo_file_list);
+  topMergeProcess(arguments, input_file_list);
 
   return 0;
 }

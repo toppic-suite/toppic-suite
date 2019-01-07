@@ -337,6 +337,7 @@ void FeatureSampleMerge::process() {
     std::string input_file_name = input_file_names_[k];
     FeaturePrsmReader reader(input_file_name);
     FeaturePrsmPtrVec features = reader.readAllFeatures();
+    reader.close();
     std::sort(features.begin(), features.end(), Feature::cmpRetentInc);
     for (size_t i = 0; i < features.size(); i++) {
       features[i]->setSampleId(k);
