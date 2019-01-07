@@ -12,37 +12,19 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#ifndef TOPPIC_DECONV_FEATURE_FEATURE_DETECTION_3_HPP_
+#define TOPPIC_DECONV_FEATURE_FEATURE_DETECTION_3_HPP_
 
-#ifndef TOPPIC_DECONV_FEATURE_FEATURE_PARA_HPP_
-#define TOPPIC_DECONV_FEATURE_FEATURE_PARA_HPP_
-
-#include <vector>
-#include "spec/peak_tolerance.hpp"
+#include <string>
 
 namespace toppic {
 
-class FeaturePara {
- public:
-  FeaturePara();
+namespace feature_detect_3 {
 
-  std::vector<double> getExtMasses(double mass);
-
-  std::vector<double> getExtOffsets() {return ext_offsets_;}
-
-  PeakTolerancePtr peak_tolerance_ptr_;
-
-  std::vector<double> ext_offsets_;
-
-  double extend_min_mass_ = 5000;
-
-  int intv_width_ = 500;
-
-  int feature_num_ = 20000;
-
+void process(std::string &sp_file_name, bool miss_level_one, 
+             std::string &argu_str);
 };
 
-typedef std::shared_ptr<FeaturePara> FeatureParaPtr;
+}
 
-} /* namespace */
-
-#endif 
+#endif
