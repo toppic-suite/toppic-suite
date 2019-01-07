@@ -34,6 +34,8 @@ class PrsmStr {
   std::string getFileName() {return file_name_;}
 
   int getSpectrumId() {return spectrum_id_;}
+  
+  int getSpectrumScan() {return spectrum_scan_;}
 
   std::string getSeqName() {return seq_name_;}
 
@@ -66,6 +68,8 @@ class PrsmStr {
   double getFdr() {return fdr_;}
 
   double getProteoformFdr() {return proteoform_fdr_;}
+
+  double getOriPrecMass() {return ori_prec_mass_;}
 
   double getAdjustedPrecMass() {return adjusted_prec_mass_;}
 
@@ -122,6 +126,8 @@ class PrsmStr {
 
   int spectrum_id_;
 
+  int spectrum_scan_;
+
   std::string seq_name_;
 
   std::string seq_desc_;
@@ -143,6 +149,8 @@ class PrsmStr {
   int proteoform_end_pos_;
 
   double precursor_feature_inte_;
+
+  double ori_prec_mass_;
 
   double adjusted_prec_mass_;
 

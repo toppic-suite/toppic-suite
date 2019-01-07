@@ -30,12 +30,16 @@ PrsmStr::PrsmStr(const std::vector<std::string> &str_vec) {
   file_name_ = prsm_util::getValueStr(line);
   line = prsm_util::getXmlLine(str_vec_, "<spectrum_id>");
   spectrum_id_ = std::stoi(prsm_util::getValueStr(line));
+  line = prsm_util::getXmlLine(str_vec_, "<spectrum_scan>");
+  spectrum_scan_ = std::stoi(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<precursor_id>");
   precursor_id_ = std::stoi(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<precursor_feature_id>");
   precursor_feature_id_ = std::stoi(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<precursor_feature_inte>");
   precursor_feature_inte_ = std::stod(prsm_util::getValueStr(line));
+  line = prsm_util::getXmlLine(str_vec_, "<ori_prec_mass>");
+  ori_prec_mass_ = std::stod(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<adjusted_prec_mass>");
   adjusted_prec_mass_ = std::stod(prsm_util::getValueStr(line));
   line = prsm_util::getXmlLine(str_vec_, "<seq_name>");

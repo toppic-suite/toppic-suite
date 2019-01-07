@@ -22,7 +22,7 @@ namespace prm_peak_factory {
 PrmPeakPtr getZeroPeakPtr(int spec_id, double prec_mono_mass,
                           PeakTolerancePtr tole_ptr, double score) {
   // zero_peak
-  DeconvPeakPtr zero_peak_ptr = std::make_shared<DeconvPeak>(-1, 0, 0, 0);
+  DeconvPeakPtr zero_peak_ptr = std::make_shared<DeconvPeak>(spec_id, -1, 0, 0, 0);
   PrmPeakPtr prm_peak_ptr = std::make_shared<PrmPeak>(spec_id, zero_peak_ptr,
                                                       BasePeakType::ORIGINAL, 0, score);
   // set tolerance
@@ -37,7 +37,7 @@ PrmPeakPtr getPrecPeakPtr(int spec_id, double prec_mono_mass,
   // prec_peak
   double prec_peak_shift = IonTypeBase::getIonTypePtr_PREC()->getShift();
   double prec_peak_mass = prec_mono_mass - prec_peak_shift;
-  DeconvPeakPtr prec_peak_ptr = std::make_shared<DeconvPeak>(-1, prec_peak_mass, 0, 0);
+  DeconvPeakPtr prec_peak_ptr = std::make_shared<DeconvPeak>(spec_id, -1, prec_peak_mass, 0, 0);
   PrmPeakPtr prm_peak_ptr
       = std::make_shared<PrmPeak>(spec_id, prec_peak_ptr,
                                   BasePeakType::ORIGINAL, prec_peak_mass, score);

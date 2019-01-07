@@ -178,7 +178,7 @@ void MsAlignReader::readNext() {
       double mass = std::stod(strs[0]);
       double inte = std::stod(strs[1]);
       int charge = std::stoi(strs[2]);
-      DeconvPeakPtr peak_ptr = std::make_shared<DeconvPeak>(idx, mass, inte, charge);
+      DeconvPeakPtr peak_ptr = std::make_shared<DeconvPeak>(id, idx, mass, inte, charge);
       peak_ptr_list.push_back(peak_ptr);
       idx++;
       if (static_cast<int>(peak_ptr_list.size()) >= peak_num_limit_) break;

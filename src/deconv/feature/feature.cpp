@@ -25,4 +25,19 @@ Feature::Feature(int id, double mono_mass, double inte,
     scan_end_(scan_end) {
     }
 
+
+Feature::Feature(int id, double mono_mass, double inte,
+                 double retent_begin, double retent_end,
+                 int scan_begin, int scan_end,
+                 int min_charge, int max_charge): 
+    id_(id),
+    mono_mass_(mono_mass),
+    intensity_(inte),
+    retent_begin_(retent_begin),
+    retent_end_(retent_end),
+    scan_begin_(scan_begin),
+    scan_end_(scan_end),
+    min_charge_(min_charge),
+    max_charge_(max_charge) {
+    }
 }
