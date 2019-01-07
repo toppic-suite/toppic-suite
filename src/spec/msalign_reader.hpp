@@ -15,6 +15,7 @@
 #ifndef TOPPIC_SPEC_MSALIGN_READER_HPP_
 #define TOPPIC_SPEC_MSALIGN_READER_HPP_
 
+#include <limits>
 #include <fstream>
 #include <set>
 #include <string>

@@ -12,35 +12,31 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#ifndef TOPPIC_DECONV_FEATURE_FEATURE_PRSM_READER_HPP_
+#define TOPPIC_DECONV_FEATURE_FEATURE_PRSM_READER_HPP_
 
-#ifndef TOPPIC_DECONV_FEATURE_FEATURE_PARA_HPP_
-#define TOPPIC_DECONV_FEATURE_FEATURE_PARA_HPP_
+#include <fstream>
 
-#include <vector>
-#include "spec/peak_tolerance.hpp"
+#include "deconv/feature/feature_prsm.hpp"
 
 namespace toppic {
 
-class FeaturePara {
+class FeaturePrsmReader {
  public:
-  FeaturePara();
+  FeaturePrsmReader(const std::string &file_name);
 
-  std::vector<double> getExtMasses(double mass);
+  void close();
 
-  std::vector<double> getExtOffsets() {return ext_offsets_;}
+  FeaturePrsmPtr readOneFeature(); 
 
-  PeakTolerancePtr peak_tolerance_ptr_;
+  FeaturePrsmPtrVec readAllFeatures();
 
-  std::vector<double> ext_offsets_;
-
-  double extend_min_mass_ = 5000;
-
-  int intv_width_ = 500;
-
+ private:
+  std::string file_name_;
+  std::ifstream input_;
 };
 
-typedef std::shared_ptr<FeaturePara> FeatureParaPtr;
+typedef std::shared_ptr<FeaturePrsmReader> FeaturePrsmReaderPtr;
 
-} /* namespace */
-
-#endif 
+}  // namespace toppic
+#endif

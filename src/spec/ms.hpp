@@ -37,6 +37,8 @@ class Ms {
   size_t size() {return peak_ptr_list_.size();}
 
   T getPeakPtr(int i) {return peak_ptr_list_[i];}
+
+  void setPeakPtrNull(int i) {peak_ptr_list_[i] = nullptr;}
   
   std::vector<T> getPeakPtrVec() {return peak_ptr_list_;}
 

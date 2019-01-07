@@ -25,14 +25,17 @@ typedef std::shared_ptr<DeconvPeak> DeconvPeakPtr;
 
 class DeconvPeak : public Peak {
  public:
-  DeconvPeak(int id, double mono_mass, double intensity, int charge);
+  DeconvPeak(int sp_id, int id, double mono_mass, 
+             double intensity, int charge);
 
-  DeconvPeak(int id, double mono_mass, double intensity, 
-             int charge, double score);
+  DeconvPeak(int sp_id, int id, double mono_mass, 
+             double intensity, int charge, double score);
 
   explicit DeconvPeak(xercesc::DOMElement* element);
 
   int getCharge() {return charge_;}
+
+  int getSpId() {return sp_id_;}
 
   int getId() {return id_;}
 
@@ -52,12 +55,14 @@ class DeconvPeak : public Peak {
   static std::string getXmlElementName() {return "deconv_peak";}
 
  private:
+  int sp_id_;
   int id_;
   int charge_;
   double score_ = 1.0;
 };
 
 typedef std::vector<DeconvPeakPtr> DeconvPeakPtrVec;
+typedef std::vector<DeconvPeakPtrVec> DeconvPeakPtrVec2D;
 
 }  // namespace toppic
 #endif

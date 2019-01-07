@@ -21,10 +21,20 @@
 
 namespace toppic {
 
+class Feature;
+typedef std::shared_ptr<Feature> FeaturePtr;
+
 class Feature {
  public:
+  Feature() {}
+
   Feature(int id, double mono_mass, double inte,
-          int scan_begin, int scan_end); 
+          int scan_begin, int scan_end);
+
+  Feature(int id, double mono_mass, double inte,
+          double retent_begin, double retent_end,
+          int scan_begin, int scan_end,
+          int min_charge, int max_charge);
 
   int getId() {return id_;}
 
@@ -32,20 +42,61 @@ class Feature {
 
   double getIntensity() {return intensity_;}
 
+  double getRetentBegin() {return retent_begin_;}
+
+  double getRetentEnd() {return retent_end_;}
+
+  double getRetentMiddle() {return (retent_begin_ + retent_end_)/2;}
+
+  double getAlignRetentBegin() {return align_retent_begin_;}
+
+  double getAlignRetentEnd() {return align_retent_end_;}
+
+  double getAlignRetentMiddle() {return (align_retent_begin_ + align_retent_end_)/2;}
+
   int getScanBegin() {return scan_begin_;}
 
   int getScanEnd() {return scan_end_;}
 
+  int getMinCharge() {return min_charge_;}
 
- private:
+  int getMaxCharge() {return max_charge_;}
+
+  int getSampleId() {return sample_id_;}
+
+  void setSampleId(int sample_id) {sample_id_ = sample_id;}
+
+  void setAlignRetentBegin(double begin) {align_retent_begin_ = begin;}
+
+  void setAlignRetentEnd(double end) {align_retent_end_ = end;}
+
+  static bool cmpMassInc(const FeaturePtr &a, const FeaturePtr &b) { 
+    return a->getMonoMass() < b->getMonoMass();
+  }
+
+  static bool cmpInteDec(const FeaturePtr &a, const FeaturePtr &b) { 
+    return a->getIntensity() > b->getIntensity();
+  }
+
+  static bool cmpRetentInc(const FeaturePtr &a, const FeaturePtr &b) { 
+    return a->getRetentMiddle() < b->getRetentMiddle();
+  }
+
+ protected:
+  int sample_id_;
   int id_;
   double mono_mass_;
   double intensity_;
+  double retent_begin_;
+  double retent_end_;
+  double align_retent_begin_;
+  double align_retent_end_;
   int scan_begin_;
   int scan_end_;
+  int min_charge_;
+  int max_charge_;
 };
 
-typedef std::shared_ptr<Feature> FeaturePtr;
 typedef std::vector<FeaturePtr> FeaturePtrVec;
 
 }
