@@ -26,6 +26,7 @@
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_sample_merge.hpp"
 #include "prsm/prsm_stat.hpp"
+#include "deconv/feature/feature_sample_merge.hpp"
 
 #include "console/topmerge_argument.hpp"
 #include "console/topmerge_process.hpp"
@@ -33,7 +34,7 @@
 namespace toppic {
 
 int topMergeProcess(std::map<std::string, std::string> &arguments,
-                    std::vector<std::string> &proteo_file_list) {
+                    std::vector<std::string> &input_file_list) {
 
   Argument::outputArguments(std::cout, arguments);
   std::string resource_dir = arguments["resourceDir"];
@@ -45,19 +46,17 @@ int topMergeProcess(std::map<std::string, std::string> &arguments,
 
   double error_tole = std::stod(arguments["errorTolerance"]);
 
-  std::string base_path = file_util::absoluteDir(proteo_file_list[0]);
+  std::string base_path = file_util::absoluteDir(input_file_list[0]);
   std::string output_file_name = base_path + file_util::getFileSeparator() 
       + arguments["mergedOutputFileName"];
   LOG_DEBUG("Output file name " << output_file_name);
   std::string fixed_mod = arguments["fixedMod"];
 
   std::cout << "Merging files - started." << std::endl;
-  PrsmSampleMergePtr merge_ptr 
-      = std::make_shared<PrsmSampleMerge>(db_file_name, 
-                                          proteo_file_list,
-                                          output_file_name,
-                                          fixed_mod,
-                                          error_tole);
+  FeatureSampleMergePtr merge_ptr 
+      = std::make_shared<FeatureSampleMerge>(input_file_list,
+                                             output_file_name,
+                                             error_tole);
   merge_ptr->process();
   merge_ptr = nullptr;
   std::cout << "Merging files - finished." << std::endl;

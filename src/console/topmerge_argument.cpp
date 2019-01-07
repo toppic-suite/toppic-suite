@@ -30,7 +30,7 @@ Argument::Argument() {
 void Argument::initArguments() {
   arguments_["databaseFileName"] = "";
   arguments_["fixedMod"] = "";
-  arguments_["errorTolerance"] = "1.2";
+  arguments_["errorTolerance"] = "0.000015";
   arguments_["mergedOutputFileName"] = "sample_merged.csv";
 }
 
