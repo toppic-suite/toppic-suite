@@ -16,16 +16,16 @@
 #ifndef TOPPIC_DECONV_ENV_PREC_ENV_HPP_
 #define TOPPIC_DECONV_ENV_PREC_ENV_HPP_
 
-#include "deconv/env/real_env.hpp"
+#include "deconv/env/match_env.hpp"
 
 namespace toppic {
 
 namespace prec_env {
 
-RealEnvPtr deconv(double prec_win_size, PeakPtrVec &peak_list, 
+MatchEnvPtr deconv(double prec_win_size, PeakPtrVec &peak_list, 
                   double prec_mz, int prec_charge, int argu_max_charge);
 
-}  // namespace PrecEnv
+}  // namespace prec_env
 
 }  // namespace toppic
 

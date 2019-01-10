@@ -134,28 +134,33 @@ int compRank(int idx, int charge, MatchEnvPtr2D &match_envs,
              const PeakPtrVec &peak_list, EnvParaPtr env_para_ptr)  {
   int rank = 0;
   int peak_idx = match_envs[idx][charge - 1]->getRealEnvPtr()->getReferPeakIdx();
+  //LOG_ERROR("peak_idx " << peak_idx << " match peak num " << real_env->getMatchPeakNum());
+  if (peak_idx < 0) {
+    return rank;
+  }
   double score = match_envs[idx][charge - 1]->getScore();
   // check left 
   int p = peak_idx - 1;
-  while (p >= 0
-         && (peak_list[peak_idx]->getPosition() - peak_list[p]->getPosition()) * charge 
-         < env_para_ptr->rank_peak_distance_) {
+  for (p = peak_idx - 1; p >= 0; p--) {
+    double pos_dist = peak_list[peak_idx]->getPosition() - peak_list[p]->getPosition();  
+    if (pos_dist * charge >= env_para_ptr->rank_peak_distance_) {
+      break;
+    }
     if (match_envs[p][charge - 1] != nullptr
         && match_envs[p][charge - 1]->getScore() > score) {
       rank++;
     }
-    p--;
   }
   // check right 
-  p = peak_idx + 1;
-  while (p < (int)match_envs.size()
-         && (peak_list[p]->getPosition() - peak_list[peak_idx]->getPosition()) * charge 
-         < env_para_ptr->rank_peak_distance_) {
+  for (p = peak_idx+1; p < (int)match_envs.size(); p++) {
+    double pos_dist = peak_list[p]->getPosition() - peak_list[peak_idx]->getPosition();
+    if (pos_dist * charge >= env_para_ptr->rank_peak_distance_) {
+      break;
+    }
     if (match_envs[p][charge - 1] != nullptr
         && match_envs[p][charge - 1]->getScore() > score) {
       rank++;
     }
-    p++;
   }
   return rank;
 }
