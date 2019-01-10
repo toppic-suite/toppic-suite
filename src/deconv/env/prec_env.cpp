@@ -164,7 +164,7 @@ MatchEnvPtr findBest(MatchEnvPtr2D &env_ptrs) {
   return best_env;
 }
 
-RealEnvPtr deconv(double prec_win_size, PeakPtrVec &peak_list,
+MatchEnvPtr deconv(double prec_win_size, PeakPtrVec &peak_list,
                   double prec_mz, int prec_charge, int argu_max_charge) {
   LOG_DEBUG("Prec: " << prec_mz << " charge: " << prec_charge);
   if (prec_mz <= 0) {
@@ -184,11 +184,14 @@ RealEnvPtr deconv(double prec_win_size, PeakPtrVec &peak_list,
                                           peak_num, max_charge, min_inte);
   LOG_DEBUG("Do filtering...");
   MatchEnvPtr env_ptr = findBest(match_envs);
+  return env_ptr;
+  /*
   if (env_ptr != nullptr) {
-    return env_ptr->getRealEnvPtr();
+    return env_ptr;->getRealEnvPtr();
   } else {
     return nullptr;
   }
+  */
 }
 
 }

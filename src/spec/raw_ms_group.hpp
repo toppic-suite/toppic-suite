@@ -22,6 +22,7 @@
 namespace toppic {
 
 class RawMsGroup {
+ public:
   RawMsGroup(RawMsPtr ms1_ptr, RawMsPtrVec ms_ptr_vec_);
 
   RawMsPtr getMsOnePtr() {return ms1_ptr_;}

@@ -53,16 +53,17 @@ RawMsPtr RawMsReader::getNextMs(double prec_win_size, int max_charge) {
 
 // refine precursor charge and mz 
 void RawMsReader::refinePrecChrg(RawMsPtr ms_one, RawMsPtr ms_two, 
-                                     double prec_win_size, int max_charge) {
+                                 double prec_win_size, int max_charge) {
   MsHeaderPtr header_two = ms_two->getMsHeaderPtr();
   double prec_avg_mz = header_two->getPrecSpMz();
   int prec_charge = header_two->getPrecCharge();
 
   PeakPtrVec peak_list = ms_one->getPeakPtrVec();
   LOG_DEBUG("start refine precursor " << " peak num " << peak_list.size());
-  RealEnvPtr env_ptr = prec_env::deconv(prec_win_size, peak_list, prec_avg_mz, 
-                                        prec_charge, max_charge);
-  if (env_ptr != nullptr) {
+  MatchEnvPtr match_env_ptr = prec_env::deconv(prec_win_size, peak_list, prec_avg_mz, 
+                                               prec_charge, max_charge);
+  if (match_env_ptr != nullptr) {
+    RealEnvPtr env_ptr = match_env_ptr->getRealEnvPtr(); 
     header_two->setPrecMonoMz(env_ptr->getMonoMz());
     header_two->setPrecCharge(env_ptr->getCharge());
     header_two->setPrecInte(env_ptr->compIntensitySum());
