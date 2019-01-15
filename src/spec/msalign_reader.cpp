@@ -22,6 +22,19 @@
 
 namespace toppic {
 
+
+MsAlignReader::MsAlignReader(const std::string &file_name):
+    file_name_(file_name) {
+      input_.open(file_name.c_str(), std::ios::in);
+      if (!input_.is_open()) {
+        LOG_ERROR("msalign file  " << file_name << " does not exist.");
+        exit(EXIT_FAILURE);
+      }
+      group_spec_num_ = 1;
+      activation_ptr_ = nullptr;
+      peak_num_limit_ = std::numeric_limits<int>::max();
+    }
+      
 MsAlignReader::MsAlignReader(const std::string &file_name, int group_spec_num,
                              ActivationPtr act_ptr, const std::set<std::string> skip_list,
                              int peak_num_limit):

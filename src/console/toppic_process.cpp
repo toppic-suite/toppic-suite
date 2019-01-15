@@ -124,7 +124,8 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     std::string db_file_name = arguments["databaseFileName"];
     std::string sp_file_name = arguments["spectrumFileName"];
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
-    std::string feature_file_name = sp_file_name.substr(0, sp_file_name.length() - 12) + ".feature";
+    //std::string feature_file_name = sp_file_name.substr(0, sp_file_name.length() - 12) + ".feature";
+    std::string feature_file_name = file_util::basename(sp_file_name) + ".feature";
 
     if (arguments["useFeatureFile"] == "true") {
       if (!file_util::exists(feature_file_name)) {
