@@ -26,7 +26,7 @@
 #include "prsm/prsm_reader.hpp"
 #include "deconv/feature/feature.hpp"
 #include "deconv/feature/feature_para.hpp"
-#include "deconv/feature/feature_detect_2.hpp"
+#include "deconv/feature/feature_detect_3.hpp"
 
 namespace toppic {
 
@@ -385,10 +385,10 @@ void readHeaders(const std::string & file_name, MsHeaderPtrVec &header_ptr_vec) 
   LOG_DEBUG("Start search");
   while ((ms_ptr = sp_reader.getNextMs()) != nullptr) {
     header_ptr_vec.push_back(ms_ptr->getMsHeaderPtr());
-    std::cout << std::flush <<  "reading spectrum " << header_ptr_vec.size() << "\r";
+    //std::cout << std::flush <<  "reading spectrum " << header_ptr_vec.size() << "\r";
   }
   sp_reader.close();
-  std::cout << std::endl;
+  //std::cout << std::endl;
 }
 
 inline bool isMatch(FeaturePtr feature_ptr, MsHeaderPtr header, FeatureParaPtr para_ptr) {
@@ -400,12 +400,13 @@ inline bool isMatch(FeaturePtr feature_ptr, MsHeaderPtr header, FeatureParaPtr p
     return false;
   }
   double prec_mass = header->getPrecMonoMass();
-
   std::vector<double> ext_masses = para_ptr->getExtMasses(prec_mass);
+
+  double feature_mass = feature_ptr->getMonoMass();
 
   double min_diff = std::numeric_limits<double>::max();
   for (size_t j = 0; j < ext_masses.size(); j++) {
-    double mass_diff = std::abs(ext_masses[j] - prec_mass);
+    double mass_diff = std::abs(ext_masses[j] - feature_mass);
     if (mass_diff < min_diff) {
       min_diff = mass_diff;
     }
@@ -436,6 +437,12 @@ void addMsHeaderFeatures(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtrVec &header_ptr
     FeaturePtr ft_ptr = getMatchedFeaturePtr(features, header, para_ptr);
     if (ft_ptr != nullptr) {
       header->setFeatureId(ft_ptr->getId());
+      header->setFeatureInte(ft_ptr->getIntensity());
+      /*  
+      LOG_ERROR("matched ptrs scan id " << header->getId() << " precursor mass " 
+                << header->getPrecMonoMass() << " feature id " << ft_ptr->getId() 
+                << " feature mass " << ft_ptr->getMonoMass()); 
+                */
     }
     else {
       int sp_id = header->getMsOneId();
@@ -450,6 +457,10 @@ void addMsHeaderFeatures(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtrVec &header_ptr
         features.push_back(feature_ptr);
         removePeaks(ms1_ptr_vec, matched_peaks);
         header->setFeatureId(feat_id);
+        header->setFeatureInte(feature_ptr->getIntensity());
+      }
+      else {
+        LOG_INFO("Cannot find features in LC/MS!");
       }
     }
   }

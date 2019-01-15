@@ -73,25 +73,27 @@ int PwMsReader::readNext() {
   LOG_DEBUG("ms_level " << ms_level);
   if (ms_level == 2) {
     double prec_mz;
+    int prec_charge;
+    double prec_inte;
     if (spec_info.precursors.size() == 0) {
       prec_mz = 0;
-    } else {
+      prec_charge = 1;
+      prec_inte = 0.0;
+    } 
+    else {
       prec_mz = spec_info.precursors[0].mz;
+      prec_charge = static_cast<int>(spec_info.precursors[0].charge);
+      prec_inte = spec_info.precursors[0].intensity;
     }
 
     if (prec_mz < 0) {
       prec_mz = 0;
     }
-
-    int prec_charge;
-    if (spec_info.precursors.size() == 0) {
-      prec_charge = 1;
-    } else {
-      prec_charge = static_cast<int>(spec_info.precursors[0].charge);
-    }
-
     if (prec_charge  < 0) {
       prec_charge = 1;
+    }
+    if (prec_inte < 0) {
+      prec_inte = 0.0;
     }
 
     LOG_DEBUG("prec mz " << prec_mz << " scan number " << spec_info.scanNumber);
@@ -101,6 +103,7 @@ int PwMsReader::readNext() {
     header_ptr_->setScan(spec_info.scanNumber);
     header_ptr_->setMsLevel(ms_level);
     header_ptr_->setPrecCharge(prec_charge);
+    header_ptr_->setPrecInte(prec_inte);
     header_ptr_->setFileName(file_name_);
     header_ptr_->setTitle("Scan_" + str_util::toString(spec_info.scanNumber));
     // here is average mz

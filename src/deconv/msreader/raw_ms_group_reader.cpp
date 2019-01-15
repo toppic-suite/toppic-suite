@@ -106,7 +106,7 @@ MatchEnvPtr refinePrecChrg(RawMsPtr ms_one, RawMsPtr ms_two,
     header_two->setPrecMonoMz(0);
     header_two->setPrecCharge(0);
     header_two->setPrecInte(0);
-    LOG_DEBUG("EMPTY ENVELOPE POINTER");
+    LOG_INFO("EMPTY ENVELOPE POINTER");
   }
   return match_env_ptr;
 }
