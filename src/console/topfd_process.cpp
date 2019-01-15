@@ -17,7 +17,7 @@
 #include "common/util/str_util.hpp"
 #include "common/base/base_data.hpp"
 #include "deconv/deconv/deconv_process_2.hpp"
-#include "deconv/feature/feature_detect.hpp"
+#include "deconv/feature/feature_detect_3.hpp"
 
 namespace toppic {
 
@@ -31,12 +31,11 @@ int TopFDProcess(std::map<std::string, std::string> arguments) {
     DeconvProcess2 process(para_ptr);
     LOG_DEBUG("init process");
     process.process();
-    /*
-    std::string argu_str = DeconvProcess::getParameterStr(para_ptr, "#");
+
+    std::string argu_str = DeconvProcess2::getParameterStr(para_ptr, "#");
     std::string sp_file_name = para_ptr->getDataFileName();
-    feature_detect::process(sp_file_name, para_ptr->missing_level_one_,
-                            argu_str);
-                            */
+    feature_detect_3::process(sp_file_name, para_ptr->missing_level_one_,
+                              argu_str);
 
     time_t end = time(0);
     std::cout << "Runing time: "

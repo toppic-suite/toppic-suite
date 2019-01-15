@@ -15,6 +15,7 @@
 
 #include <iomanip>
 
+#include "common/util/logger.hpp"
 #include "spec/msalign_writer.hpp"
 
 namespace toppic {
