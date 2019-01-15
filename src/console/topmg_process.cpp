@@ -122,7 +122,8 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
     std::string var_mod_file_name = arguments["varModFileName"];
 
-    std::string feature_file_name = sp_file_name.substr(0, sp_file_name.length() - 12) + ".feature";
+    //std::string feature_file_name = sp_file_name.substr(0, sp_file_name.length() - 12) + ".feature";
+    std::string feature_file_name = file_util::basename(sp_file_name) + ".feature";
 
     if (arguments["useFeatureFile"] == "true") {
       if (!file_util::exists(feature_file_name)) {
