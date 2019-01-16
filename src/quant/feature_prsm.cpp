@@ -13,7 +13,7 @@
 //limitations under the License.
 
 #include "common/util/str_util.hpp"
-#include "deconv/feature/feature_prsm.hpp"
+#include "quant/feature_prsm.hpp"
 
 namespace toppic {
 
