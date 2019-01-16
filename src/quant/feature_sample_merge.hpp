@@ -12,22 +12,10 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_DECONV_FEATURE_FEATURE_SAMPLE_MERGE_HPP_
-#define TOPPIC_DECONV_FEATURE_FEATURE_SAMPLE_MERGE_HPP_
+#ifndef TOPPIC_QUANT_FEATURE_SAMPLE_MERGE_HPP_
+#define TOPPIC_QUANT_FEATURE_SAMPLE_MERGE_HPP_
 
-/*  
-#include <map>
-#include <string>
-#include <vector>
-
-#include "base/proteoform.hpp"
-#include "base/fasta_reader.hpp"
-#include "prsm/prsm.hpp"
-#include "prsm/prsm_xml_writer.hpp"
-#include "prsm/prsm_str.hpp"
-*/
-
-#include "deconv/feature/feature_prsm.hpp"
+#include "quant/feature_prsm.hpp"
 
 namespace toppic {
 

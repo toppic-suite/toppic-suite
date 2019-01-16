@@ -16,8 +16,8 @@
 #include <algorithm>
 
 #include "common/util/logger.hpp"
-#include "deconv/feature/feature_prsm_reader.hpp"
-#include "deconv/feature/feature_sample_merge.hpp"
+#include "quant/feature_prsm_reader.hpp"
+#include "quant/feature_sample_merge.hpp"
 
 namespace toppic {
 

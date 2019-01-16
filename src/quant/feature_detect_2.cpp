@@ -14,7 +14,6 @@
 
 #include <cmath>
 #include <algorithm>
-
 #include "common/util/file_util.hpp"
 #include "common/base/mod_util.hpp"
 #include "seq/fasta_util.hpp"
@@ -486,5 +485,6 @@ void process(std::string &sp_file_name, bool missing_level_one,
 }
 
 }  // namespace feature_detect_2
+*/
 
 }  // namespace toppic 

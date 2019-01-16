@@ -12,12 +12,12 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_DECONV_FEATURE_FEATURE_PRSM_READER_HPP_
-#define TOPPIC_DECONV_FEATURE_FEATURE_PRSM_READER_HPP_
+#ifndef TOPPIC_QUANT_FEATURE_PRSM_READER_HPP_
+#define TOPPIC_QUANT_FEATURE_PRSM_READER_HPP_
 
 #include <fstream>
 
-#include "deconv/feature/feature_prsm.hpp"
+#include "quant/feature_prsm.hpp"
 
 namespace toppic {
 

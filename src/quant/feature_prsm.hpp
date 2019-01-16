@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_DECONV_FEATURE_FEATURE_PRSM_HPP_
-#define TOPPIC_DECONV_FEATURE_FEATURE_PRSM_HPP_
+#ifndef TOPPIC_QUANT_FEATURE_PRSM_HPP_
+#define TOPPIC_QUANT_FEATURE_PRSM_HPP_
 
 #include "deconv/feature/feature.hpp"
 
