@@ -36,6 +36,8 @@ class Feature {
           int scan_begin, int scan_end,
           int min_charge, int max_charge);
 
+  Feature(std::string line);
+
   int getId() {return id_;}
 
   double getMonoMass() {return mono_mass_;}

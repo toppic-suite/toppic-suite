@@ -12,14 +12,14 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_DECONV_FEATURE_FEATURE_DETECTION_2_HPP_
-#define TOPPIC_DECONV_FEATURE_FEATURE_DETECTION_2_HPP_
+#ifndef TOPPIC_QUANT_TOPQUANT_PROCESS_HPP_
+#define TOPPIC_QUANT_TOPQUANT_PROCESS_HPP_
 
 #include <string>
 
 namespace toppic {
 
-namespace feature_detect_2 {
+namespace topquant_process {
 void process(std::string &sp_file_name, bool miss_level_one, 
              std::string &argu_str);
 };

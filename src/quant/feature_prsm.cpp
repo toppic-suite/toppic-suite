@@ -17,18 +17,10 @@
 
 namespace toppic {
 
-FeaturePrsm::FeaturePrsm(std::string line) {
+FeaturePrsm::FeaturePrsm(std::string line):
+    Feature(line) {
   std::vector<std::string> strs;
   strs = str_util::split(line, "\t");
-  id_ = std::stoi(strs[0]);
-  mono_mass_ = std::stod(strs[1]);
-  intensity_ = std::stod(strs[2]);
-  retent_begin_ = std::stod(strs[3]);
-  retent_end_ = std::stod(strs[4]);
-  scan_begin_ = std::stoi(strs[5]);
-  scan_end_ = std::stoi(strs[6]);
-  min_charge_ = std::stoi(strs[7]);
-  max_charge_ = std::stoi(strs[8]);
   if (strs.size() > 9) {
     prot_name_ = strs[9];
     prot_desc_ = strs[10];

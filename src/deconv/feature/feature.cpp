@@ -12,6 +12,7 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include "common/util/str_util.hpp"
 #include "deconv/feature/feature.hpp"
 
 namespace toppic {
@@ -40,4 +41,19 @@ Feature::Feature(int id, double mono_mass, double inte,
     min_charge_(min_charge),
     max_charge_(max_charge) {
     }
+
+Feature::Feature(std::string line) {
+  std::vector<std::string> strs;
+  strs = str_util::split(line, "\t");
+  id_ = std::stoi(strs[0]);
+  mono_mass_ = std::stod(strs[1]);
+  intensity_ = std::stod(strs[2]);
+  retent_begin_ = std::stod(strs[3]);
+  retent_end_ = std::stod(strs[4]);
+  scan_begin_ = std::stoi(strs[5]);
+  scan_end_ = std::stoi(strs[6]);
+  min_charge_ = std::stoi(strs[7]);
+  max_charge_ = std::stoi(strs[8]);
+}
+
 }
