@@ -24,11 +24,11 @@
 #include "prsm/prsm_reader.hpp"
 #include "deconv/feature/feature.hpp"
 #include "deconv/feature/feature_para.hpp"
-#include "deconv/feature/feature_detect_2.hpp"
+#include "quant/topquant_process.hpp"
 
 namespace toppic {
 
-namespace feature_detect_2 {
+namespace topquant_process {
 
 void readSpectra(const std::string &file_name, DeconvMsPtrVec &ms_ptr_vec) {
   int sp_num_in_group = 1;
@@ -304,34 +304,6 @@ int findSpId(DeconvMsPtrVec &ms1_ptr_vec, int scan) {
 
 void findFeatures(DeconvMsPtrVec &ms1_ptr_vec, FeatureParaPtr para_ptr,
                   FeaturePtrVec &features, PrsmStrPtrVec &prsms) {
-  //get all peaks
-  DeconvPeakPtrVec all_peaks;
-  for (size_t i = 0; i < ms1_ptr_vec.size(); i++) {
-    DeconvPeakPtrVec peaks = ms1_ptr_vec[i]->getPeakPtrVec();
-    all_peaks.insert(std::end(all_peaks), std::begin(peaks), std::end(peaks));
-  }
-  //sort all peaks by intensities
-  std::sort(all_peaks.begin(), all_peaks.end(), Peak::cmpInteDec);
-
-  int feat_id = 0;
-  size_t peak_idx = 0;
-  while (features.size() < 20000 && peak_idx < all_peaks.size()) {
-    DeconvPeakPtr best_peak = all_peaks[peak_idx];
-    if (peakExists(ms1_ptr_vec, best_peak)) {
-      //std::cout << "Find feature " << feat_id << " peak intensity " << best_peak->getIntensity() << std::endl; 
-      int sp_id = best_peak->getSpId();
-      double prec_mass = best_peak->getPosition();
-      DeconvPeakPtrVec matched_peaks;
-      FeaturePtr feature_ptr = getFeature(sp_id, prec_mass, feat_id, ms1_ptr_vec,
-                                          matched_peaks, para_ptr);
-      if (feature_ptr != nullptr) {
-        features.push_back(feature_ptr);
-        removePeaks(ms1_ptr_vec, matched_peaks);
-        feat_id++;
-      }
-    }
-    peak_idx++;
-  }
 
   for (size_t i = 0; i < prsms.size(); i++) {
     PrsmStrPtr prsm = prsms[i];
@@ -352,22 +324,6 @@ void findFeatures(DeconvMsPtrVec &ms1_ptr_vec, FeatureParaPtr para_ptr,
         features.push_back(feature_ptr);
         removePeaks(ms1_ptr_vec, matched_peaks);
       }
-      /* 
-      else {
-        double feat_inte = prsm->getPrecFeatureInte();
-        double retent_begin = ms1_ptr_vec[sp_id]->getMsHeaderPtr()->getRetentionTime();
-        double retent_end = retention_begin;
-        int ms1_scan_begin = ms1_ptr_vec[sp_id]->getMsHeaderPtr()->getFirstScanNum();
-        int ms1_scan_end = ms1_scan_begin;
-        FeaturePtr feature_ptr = std::make_shared<Feature>(feat_id, prec_mass, 
-                                                           feat_inte,
-                                                           retent_begin,
-                                                           retent_end,
-                                                           ms1_scan_begin,
-                                                           ms1_scan_end, min_charge,
-                                                           max_charge);
-      }
-      */
       feat_id++;
     }
   }
@@ -464,13 +420,15 @@ void matchPrsms(FeaturePtrVec &features, PrsmStrPtrVec &matched_prsms,
 void process(std::string &sp_file_name, bool missing_level_one, 
              std::string &argu_str) {
   //logger::setLogLevel(2);
+  /*
   FeatureParaPtr para_ptr = std::make_shared<FeaturePara>();
-  std::string base_name = file_util::basename(sp_file_name);
   // read ms1 deconvoluted spectra
   std::string ms1_file_name = base_name + "_ms1.msalign";
   DeconvMsPtrVec ms1_ptr_vec;
   if (!missing_level_one) readSpectra(ms1_file_name, ms1_ptr_vec);
+  */
   FeaturePtrVec features;
+  std::string base_name = file_util::basename(sp_file_name);
   std::string prsm_file_name = base_name + "_ms2_toppic_proteoform.xml";
   PrsmStrPtrVec prsms = readPrsms(prsm_file_name);
   std::cout << "start finding feature" << std::endl;
