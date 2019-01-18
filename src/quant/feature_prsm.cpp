@@ -35,5 +35,15 @@ FeaturePrsm::FeaturePrsm(std::string line):
   }
 }
 
+void addPrsmInfo(PrsmPtr prsm) {
+  prot_name_ = prsm->getSeqName();
+  prot_desc_ = prsm->getSeqDesc();
+  first_residue_ = prsm->getProteoformStartPos();
+  last_residue_ = prsm->getProteoformEndPos();
+  proteoform_ = prsm->getProteinMatchSeq();
+  ms2_scan_ = prsm->getSpectrumScan();
+  prec_mass_ = prsm->getOriPrecMass(); 
+}
+
 }
 
