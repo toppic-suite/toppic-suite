@@ -328,6 +328,35 @@ void setAlignTime(FeaturePrsmPtrVec &features,
   }
 }
 
+
+PrsmStrPtrVec readPrsms(std::string &prsm_file_name) {
+  std::string ori_db_file_name = "uniprot_zebrafish.fasta";
+  std::string db_file_name = ori_db_file_name + "_target";
+  fasta_util::dbSimplePreprocess(ori_db_file_name, db_file_name);
+  std::string fixed_mod = "C57";
+
+  FastaIndexReaderPtr seq_reader = std::make_shared<FastaIndexReader>(db_file_name);
+  ModPtrVec fix_mod_ptr_vec = mod_util::geneFixedModList(fixed_mod);
+  PrsmStrPtrVec prsms = PrsmReader::readAllPrsmStrsMatchSeq(prsm_file_name,
+                                                            seq_reader,
+                                                            fix_mod_ptr_vec);
+  return prsms;
+}
+
+void matchPrsms(FeaturePtrVec &features, PrsmStrPtrVec &prsms) {
+  for (size_t i = 0; i < prsms.size(); i++) {
+    PrsmStrPtr prsm = prsms[i];
+    int id = prsms[i]->getPrecFeatureId();
+    if (id < 0) {
+      LOG_ERROR("Prsm file does not contain feature information!");
+      exit(EXIT_ERROR);
+    }
+    else {
+
+    }
+  }
+}
+
 void FeatureSampleMerge::process() {
   LOG_DEBUG("start process ");
   FeaturePrsmPtrVec2D features_2d; 
@@ -335,9 +364,15 @@ void FeatureSampleMerge::process() {
   size_t sample_num = input_file_names_.size();
   for (size_t k = 0; k < sample_num; k++) {
     std::string input_file_name = input_file_names_[k];
-    FeaturePrsmReader reader(input_file_name);
+    std::string base_name = file_util::basename(input_file_name);
+    FeaturePrsmReader reader(base_name + "_ms1.feature");
     FeaturePrsmPtrVec features = reader.readAllFeatures();
     reader.close();
+
+    std::string prsm_file_name = base_name + "_ms2_toppic_proteoform.xml";
+    PrsmStrPtrVec prsms = readPrsms(prsm_file_name);
+    matchPrsms(features, prsms);
+
     std::sort(features.begin(), features.end(), Feature::cmpRetentInc);
     for (size_t i = 0; i < features.size(); i++) {
       features[i]->setSampleId(k);

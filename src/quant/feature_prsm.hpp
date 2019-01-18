@@ -27,6 +27,8 @@ class FeaturePrsm : public Feature {
  public:
   FeaturePrsm(std::string line);
 
+  void addPrsmInfo(PrsmPtr prsm);
+
   std::string getProtName() {return prot_name_;}
 
   std::string getProtDesc() {return prot_desc_;}
