@@ -12,22 +12,11 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#include <map>
-#include <string>
-#include <vector>
-#include <ctime>
-
-#include "common/base/base_data.hpp"
+#include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
-#include "common/util/str_util.hpp"
+#include "common/base/base_data.hpp"
 #include "seq/fasta_util.hpp"
-
-#include "prsm/prsm_reader.hpp"
-#include "prsm/prsm_sample_merge.hpp"
-#include "prsm/prsm_stat.hpp"
-#include "deconv/feature/feature_sample_merge.hpp"
-
+#include "merge/feature_sample_merge.hpp"
 #include "console/topmerge_argument.hpp"
 #include "console/topmerge_process.hpp"
 
@@ -56,6 +45,8 @@ int topMergeProcess(std::map<std::string, std::string> &arguments,
   FeatureSampleMergePtr merge_ptr 
       = std::make_shared<FeatureSampleMerge>(input_file_list,
                                              output_file_name,
+                                             db_file_name, 
+                                             fixed_mod, 
                                              error_tole);
   merge_ptr->process();
   merge_ptr = nullptr;

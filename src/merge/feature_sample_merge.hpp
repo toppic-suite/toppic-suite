@@ -12,10 +12,10 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_QUANT_FEATURE_SAMPLE_MERGE_HPP_
-#define TOPPIC_QUANT_FEATURE_SAMPLE_MERGE_HPP_
+#ifndef TOPPIC_MERGE_FEATURE_SAMPLE_MERGE_HPP_
+#define TOPPIC_MERGE_FEATURE_SAMPLE_MERGE_HPP_
 
-#include "quant/feature_prsm.hpp"
+#include "merge/feature_prsm.hpp"
 
 namespace toppic {
 
@@ -23,6 +23,8 @@ class FeatureSampleMerge {
  public:
   FeatureSampleMerge(const std::vector<std::string> &input_file_names,
                      const std::string &output_file_name,
+                     const std::string &db_file_name,
+                     const std::string &fix_mod_str, 
                      double ppm);
 
   void process();
@@ -34,6 +36,8 @@ class FeatureSampleMerge {
  private:
   std::vector<std::string> input_file_names_;
   std::string output_file_name_;
+  std::string db_file_name_;
+  std::string fix_mod_str_;
   double ppm_;
 };
 

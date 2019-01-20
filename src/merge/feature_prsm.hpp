@@ -13,9 +13,10 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_QUANT_FEATURE_PRSM_HPP_
-#define TOPPIC_QUANT_FEATURE_PRSM_HPP_
+#ifndef TOPPIC_MERGE_FEATURE_PRSM_HPP_
+#define TOPPIC_MERGE_FEATURE_PRSM_HPP_
 
+#include "prsm/prsm_str.hpp"
 #include "deconv/feature/feature.hpp"
 
 namespace toppic {
@@ -27,7 +28,7 @@ class FeaturePrsm : public Feature {
  public:
   FeaturePrsm(std::string line);
 
-  void addPrsmInfo(PrsmPtr prsm);
+  void addPrsmInfo(PrsmStrPtr prsm);
 
   std::string getProtName() {return prot_name_;}
 
