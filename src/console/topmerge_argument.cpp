@@ -13,13 +13,12 @@
 //limitations under the License.
 
 #include <iomanip>
-#include <string>
-#include <algorithm>
 
+#include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
+#include "common/util/str_util.hpp"
 #include "common/xml/xml_dom_util.hpp"
 #include "console/topmerge_argument.hpp"
-
 
 namespace toppic {
 
@@ -30,7 +29,7 @@ Argument::Argument() {
 void Argument::initArguments() {
   arguments_["databaseFileName"] = "";
   arguments_["fixedMod"] = "";
-  arguments_["errorTolerance"] = "0.000015";
+  arguments_["errorTolerance"] = "1.2";
   arguments_["mergedOutputFileName"] = "sample_merged.csv";
 }
 
@@ -43,7 +42,7 @@ void Argument::outputArguments(std::ostream &output, std::map<std::string, std::
     output << std::setw(44) << std::left << "Fixed modifications: " << "\t" << arguments["fixedMod"] << std::endl;
   }
   output << std::setw(44) << std::left << "Error tolerance: " << "\t" << arguments["errorTolerance"] << " Dalton " << std::endl;
-  output << std::setw(44) << std::left << "Merged output file name: " << "\t" << arguments["mergedOutputFileName"] << std::endl;
+  output << std::setw(44) << std::left << "Output file name: " << "\t" << arguments["mergedOutputFileName"] << std::endl;
   output << "******************** Parameters ********************" << std::endl;
 }
 
@@ -55,9 +54,9 @@ void Argument::showUsage(boost::program_options::options_description &desc) {
 bool Argument::parse(int argc, char* argv[]) {
   std::string fixed_mod = "";
   std::string error_tole = "1.2";
-  std::string merged_output_name = "merged.tsv";
   std::string database_file_name = "";
   std::vector<std::string> proteoform_file_names;
+  std::string merged_output_name = "sample_merged.csv";
 
   /** Define and parse the program options*/
   try {
@@ -104,10 +103,9 @@ bool Argument::parse(int argc, char* argv[]) {
       return false;
     }
     std::string argv_0 (argv[0]);
-
     arguments_["executiveDir"] = file_util::getExecutiveDir(argv_0);
     LOG_DEBUG("Executive Dir " << arguments_["executiveDir"]);
-    arguments_["resourceDir"] = arguments_["executiveDir"] + file_util::getFileSeparator() + file_util::getResourceDirName();
+    arguments_["resourceDir"] = file_util::getResourceDir(arguments_["executiveDir"]);
 
     arguments_["databaseFileName"] = database_file_name;
 
@@ -137,9 +135,8 @@ bool Argument::parse(int argc, char* argv[]) {
 
 bool Argument::validateArguments() {
   if (!file_util::exists(arguments_["resourceDir"])) {
-    boost::filesystem::path p(arguments_["executiveDir"]);
-    arguments_["resourceDir"]
-        = p.parent_path().string() + file_util::getFileSeparator() + "etc" + file_util::getFileSeparator() + file_util::getResourceDirName(); 
+    LOG_ERROR("Resource direcotry " << arguments_["resourceDir"] << " does not exist!");
+    return false;
   }
 
   if (!file_util::exists(arguments_["databaseFileName"])) {

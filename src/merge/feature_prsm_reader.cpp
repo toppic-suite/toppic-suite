@@ -14,7 +14,7 @@
 
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
-#include "quant/feature_prsm_reader.hpp"
+#include "merge/feature_prsm_reader.hpp"
 
 namespace toppic {
 

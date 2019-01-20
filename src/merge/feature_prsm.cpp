@@ -13,7 +13,7 @@
 //limitations under the License.
 
 #include "common/util/str_util.hpp"
-#include "quant/feature_prsm.hpp"
+#include "merge/feature_prsm.hpp"
 
 namespace toppic {
 
@@ -35,7 +35,7 @@ FeaturePrsm::FeaturePrsm(std::string line):
   }
 }
 
-void addPrsmInfo(PrsmPtr prsm) {
+void FeaturePrsm::addPrsmInfo(PrsmStrPtr prsm) {
   prot_name_ = prsm->getSeqName();
   prot_desc_ = prsm->getSeqDesc();
   first_residue_ = prsm->getProteoformStartPos();

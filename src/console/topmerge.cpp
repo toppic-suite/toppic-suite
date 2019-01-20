@@ -12,11 +12,7 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <map>
-#include <iostream>
-#include <string>
-#include <algorithm>
-
+#include "common/util/logger.hpp"
 #include "console/topmerge_argument.hpp"
 #include "console/topmerge_process.hpp"
 
