@@ -21,11 +21,11 @@
 #include "deconv/env/env_base.hpp"
 #include "deconv/env/match_env_util.hpp"
 #include "deconv/env/match_env_writer.hpp"
-#include "deconv/deconv/deconv_process_3.hpp"
+#include "deconv/deconv/deconv_process_2.hpp"
 
 namespace toppic {
 
-void DeconvProcess3::copyParameters(EnvParaPtr env_para_ptr) {
+void DeconvProcess2::copyParameters(EnvParaPtr env_para_ptr) {
   env_para_ptr->max_charge_ = para_ptr_->max_charge_;
   env_para_ptr->max_mass_ = para_ptr_->max_mass_;
   env_para_ptr->setTolerance(para_ptr_->tolerance_);
@@ -37,7 +37,7 @@ void DeconvProcess3::copyParameters(EnvParaPtr env_para_ptr) {
   env_para_ptr->do_final_filtering_ = para_ptr_->do_final_filtering_;
 }
 
-std::string DeconvProcess3::getParameterStr(DeconvParaPtr para_ptr, const std::string & prefix) {
+std::string DeconvProcess2::getParameterStr(DeconvParaPtr para_ptr, const std::string & prefix) {
   std::stringstream output;
   output << prefix << "TopFD " << version_number << std::endl;
   // TIME_STAMP_STR is replaced later
@@ -65,7 +65,7 @@ std::string DeconvProcess3::getParameterStr(DeconvParaPtr para_ptr, const std::s
   return output.str();
 }
 
-std::string DeconvProcess3::updateMsg(MsHeaderPtr header_ptr, int scan, int total_scan_num) {
+std::string DeconvProcess2::updateMsg(MsHeaderPtr header_ptr, int scan, int total_scan_num) {
   std::string percentage = str_util::toString(scan * 100 / total_scan_num);
   std::string msg = "Processing spectrum " + header_ptr->getTitle() + "...";
   while (msg.length() < 40) {
@@ -75,7 +75,7 @@ std::string DeconvProcess3::updateMsg(MsHeaderPtr header_ptr, int scan, int tota
   return msg;
 }
 
-void DeconvProcess3::process() {
+void DeconvProcess2::process() {
   EnvBase::initBase(para_ptr_->resource_dir_);
   EnvParaPtr env_para_ptr = std::make_shared<EnvPara>();
   DpParaPtr dp_para_ptr = std::make_shared<DpPara>();
@@ -122,7 +122,7 @@ void DeconvProcess3::process() {
 }
 
 
-void DeconvProcess3::processSpMissingLevelOne(DeconvOneSpPtr deconv_ptr, RawMsGroupReaderPtr reader_ptr,
+void DeconvProcess2::processSpMissingLevelOne(DeconvOneSpPtr deconv_ptr, RawMsGroupReaderPtr reader_ptr,
                                               std::ofstream & ms2_msalign_of) {
   // reader_ptr
   int total_scan_num = reader_ptr->getInputSpNum();
@@ -154,7 +154,7 @@ void DeconvProcess3::processSpMissingLevelOne(DeconvOneSpPtr deconv_ptr, RawMsGr
   }
 }
 
-void DeconvProcess3::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
+void DeconvProcess2::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
                                  MatchEnvPtrVec &prec_envs, std::ofstream &ms1_msalign_of) { 
   PeakPtrVec peak_list = ms_ptr->getPeakPtrVec();
   LOG_DEBUG("peak list size " << peak_list.size());
@@ -175,7 +175,7 @@ void DeconvProcess3::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   }
 }
 
-void DeconvProcess3::deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
+void DeconvProcess2::deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
                                  std::ofstream &ms2_msalign_of) { 
   PeakPtrVec peak_list = ms_ptr->getPeakPtrVec();
   LOG_DEBUG("peak list size " << peak_list.size());
@@ -197,7 +197,7 @@ void DeconvProcess3::deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
 }
 
 
-void DeconvProcess3::processSp(DeconvOneSpPtr deconv_ptr, RawMsGroupReaderPtr reader_ptr,
+void DeconvProcess2::processSp(DeconvOneSpPtr deconv_ptr, RawMsGroupReaderPtr reader_ptr,
                               std::ofstream & ms1_msalign_of, std::ofstream & ms2_msalign_of) {
   // reader_ptr
   int total_scan_num = reader_ptr->getInputSpNum();
