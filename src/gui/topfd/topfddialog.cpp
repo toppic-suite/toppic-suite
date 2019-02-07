@@ -53,11 +53,13 @@ TopFDDialog::TopFDDialog(QWidget *parent) :
       QRegExpValidator *validator3 = new QRegExpValidator(rx3, this);
       ui->windowSizeEdit->setValidator(validator3);
       QFont font;
+      font.setPointSize(12);
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
       font.setFamily(QStringLiteral("Courier New"));
 #else
       font.setFamily(QStringLiteral("Monospace"));
 #endif
+      QApplication::setFont(font);
       ui->outputTextBrowser->setFont(font);
       thread_ = new ThreadTopFD(this);
       showInfo = "";

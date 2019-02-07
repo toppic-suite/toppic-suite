@@ -56,6 +56,8 @@ toppicWindow::toppicWindow(QWidget *parent) :
       font.setFamily(QStringLiteral("Monospace"));
       fontTable.setFamily(QStringLiteral("Monospace"));
 #endif
+      font.setPointSize(12);
+      QApplication::setFont(font);
       ui->outputTextBrowser->setFont(font);
       thread_ = new threadtoppic(this);
       showInfo = "";

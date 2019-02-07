@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 #include <algorithm>
 #include <unordered_map>
 #include <string>
@@ -21,6 +20,7 @@
 #include "common/base/ptm_base.hpp"
 #include "common/base/ptm_util.hpp"
 #include "common/base/prot_mod_base.hpp"
+#include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "seq/mass_shift.hpp"
 

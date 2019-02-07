@@ -36,23 +36,39 @@ MsalignCombine::MsalignCombine(const std::string &spec_file_name,
       }
     }
 
+inline int getCurMsIndex(DeconvMsPtrVec &ms_ptrs) {
+  int index = -1;
+  int scan_num = std::numeric_limits<int>::max();
+  for (size_t i = 0; i < ms_ptrs.size(); i++) {
+    if (ms_ptrs[i] != nullptr) {
+      if (ms_ptrs[i]->getMsHeaderPtr()->getFirstScanNum() < scan_num) {
+        scan_num = ms_ptrs[i]->getMsHeaderPtr()->getFirstScanNum();
+        index = i;
+      }
+    }
+  }
+  return index;
+}
+
 void MsalignCombine::process() {
-  /*
   size_t input_num = input_file_exts_.size();
   std::string base_name = file_util::basename(spec_file_name_);
   // open files
-  MsalignReaderPtrVec reader_ptrs;
-  DeconvMsPtrVec ms_str_ptrs;
+  MsAlignReaderPtrVec reader_ptrs;
+  DeconvMsPtrVec ms_ptrs;
   for (size_t i = 0; i < input_num; i++) {
     std::string input_file_name = base_name + "." + input_file_exts_[i];
-    MsalignReaderPtr reader_ptr
-        = std::make_shared<MsalignReader>(input_file_name);
+    MsAlignReaderPtr reader_ptr
+        = std::make_shared<MsAlignReader>(input_file_name);
     LOG_DEBUG("input file name " << input_file_name);
-    DeconvMsPtr ms_ptr = reader_ptr->readOnePrsmStr();
+    DeconvMsPtr ms_ptr = reader_ptr->getNextMs();
     reader_ptrs.push_back(reader_ptr);
-    prsm_str_ptrs.push_back(str_ptr);
+    ms_ptrs.push_back(ms_ptr);
   }
-  SimplePrsmXmlWriter writer(base_name + "." + output_file_ext_);
+
+  std::string output_filename = base_name + "." + output_file_ext_;
+  std::ofstream out_stream; 
+  out_stream.open(output_filename.c_str());
 
   // combine
   int spec_id = 0;
@@ -60,41 +76,25 @@ void MsalignCombine::process() {
   while (!finish) {
     // LOG_DEBUG("spec id " << spec_id << " input num " << input_num);
     finish = true;
-    SimplePrsmStrPtrVec cur_str_ptrs;
-    for (size_t i = 0; i < input_num; i++) {
-      if (prsm_str_ptrs[i] != nullptr) {
-        finish = false;
-        while (prsm_str_ptrs[i]!= nullptr &&
-               prsm_str_ptrs[i]->getSpectrumId() == spec_id) {
-          cur_str_ptrs.push_back(prsm_str_ptrs[i]);
-          prsm_str_ptrs[i] = reader_ptrs[i]->readOnePrsmStr();
-        }
-      }
+    int cur_ms_idx = getCurMsIndex(ms_ptrs);
+    if (cur_ms_idx < 0) {
+      finish = true;
+      break;
     }
-    // LOG_DEBUG("finish " << finish);
-
-    if (cur_str_ptrs.size() > 0) {
-      std::sort(cur_str_ptrs.begin(), cur_str_ptrs.end(), SimplePrsmStr::cmpScoreDec);
-      int count = 0;
-      std::set<std::string> name_set;
-      for (size_t i = 0; i < cur_str_ptrs.size(); i++) {
-        if (count >= top_num_) break;
-        if (name_set.find(cur_str_ptrs[i]->getSeqName()) == name_set.end()) {
-          count++;
-          name_set.insert(cur_str_ptrs[i]->getSeqName());
-          writer.write(cur_str_ptrs[i]);
-        }
-      }
+    else { 
+      DeconvMsPtr cur_ms_ptr = ms_ptrs[cur_ms_idx];
+      cur_ms_ptr->getMsHeaderPtr()->setId(spec_id);
+      spec_id++;
+      msalign_writer::write(out_stream, cur_ms_ptr);
+      ms_ptrs[cur_ms_idx] = reader_ptrs[cur_ms_idx]->getNextMs();
     }
-    spec_id++;
   }
 
   // close files
   for (size_t i = 0; i < input_num; i++) {
     reader_ptrs[i]->close();
   }
-  writer.close();
-  */
+  out_stream.close();
 }
 
 } /* namespace toppic */

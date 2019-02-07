@@ -59,7 +59,7 @@ void mergeMsalignFiles(const std::vector<std::string> & spec_file_lst,
 
   for (size_t i = 0; i < spec_file_lst.size(); i++) {
     MsAlignReader sp_reader(spec_file_lst[i], 1, nullptr, std::set<std::string>());
-    std::vector<std::string> ms_lines = sp_reader.readOneSpectrum();
+    std::vector<std::string> ms_lines = sp_reader.readOneStrSpectrum();
     while (ms_lines.size() > 0) {
       for (size_t k = 0; k< ms_lines.size(); k++) {
         if (ms_lines[k].substr(0, 3) == "ID=") {
@@ -71,7 +71,7 @@ void mergeMsalignFiles(const std::vector<std::string> & spec_file_lst,
         }
       }
       outfile << std::endl;
-      ms_lines = sp_reader.readOneSpectrum();
+      ms_lines = sp_reader.readOneStrSpectrum();
     }
     sp_reader.close();
   }

@@ -14,6 +14,7 @@
 
 #include <iomanip>
 
+#include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "spec/msalign_reader.hpp"
 #include "spec/extend_ms_factory.hpp"

@@ -13,8 +13,10 @@
 //limitations under the License.
 
 #include <cmath>
+#include <iostream>
 #include <algorithm>
 
+#include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/time_util.hpp"
 #include "common/base/mod_util.hpp"
@@ -99,7 +101,7 @@ void getMatchedPeaks(DeconvMsPtrVec &ms1_ptr_vec, double prec_mass,
                      FeatureParaPtr para_ptr) {
   if (ms1_ptr_vec.size() == 0) return;
   double error_tole = para_ptr->peak_tolerance_ptr_->compStrictErrorTole(prec_mass);
-  std::vector<double> ext_masses = para_ptr->getExtMasses(prec_mass);
+  std::vector<double> ext_masses = para_ptr->getExtendMasses(prec_mass);
   for (int i = ms1_id_begin; i <= ms1_id_end; i++) {
     DeconvMsPtr ms1_ptr = ms1_ptr_vec[i];
     for (size_t j = 0; j < ms1_ptr->size(); j++) {
@@ -121,7 +123,7 @@ void getMatchedPeaks(DeconvMsPtrVec &ms1_ptr_vec, double prec_mass,
 bool containPrecursor(DeconvMsPtr ms1_ptr, double prec_mass, FeatureParaPtr para_ptr) {
   if (ms1_ptr == nullptr) return false;
   // double prec_chrg = best_ptr->getPrecCharge();
-  std::vector<double> ext_masses = para_ptr->getExtMasses(prec_mass);
+  std::vector<double> ext_masses = para_ptr->getExtendMasses(prec_mass);
 
   double min_diff = std::numeric_limits<double>::max();
   for (size_t i = 0; i < ms1_ptr->size(); i++) {
@@ -196,7 +198,7 @@ double getFeatureInte(DeconvPeakPtrVec &matched_peaks) {
 
 double getFeatureMass(double best_peak_mass, DeconvPeakPtrVec &matched_peaks,
                       FeatureParaPtr para_ptr) {
-  std::vector<double> offsets = para_ptr->getExtOffsets();
+  std::vector<double> offsets = para_ptr->getExtendOffsets();
   size_t offset_num = offsets.size();
   DeconvPeakPtrVec2D offset_peaks;
   for (size_t i = 0; i < offsets.size(); i++) {
@@ -334,49 +336,6 @@ void findMs1Features(DeconvMsPtrVec &ms1_ptr_vec, FeatureParaPtr para_ptr,
   }
 }
 
-/*
-  for (size_t i = 0; i < prsms.size(); i++) {
-    PrsmStrPtr prsm = prsms[i];
-    int id = findBestFeature(features, prsm, para_ptr);
-    // if not found 
-    if (id <  0) {
-      int sp_scan  = prsm->getSpectrumScan();
-      int sp_id = findSpId(ms1_ptr_vec, sp_scan);
-      if (sp_id < 0) {
-        LOG_ERROR("Cannot find sp id!");
-        continue;
-      }
-      double prec_mass = prsm->getOriPrecMass();
-      DeconvPeakPtrVec matched_peaks;
-      FeaturePtr feature_ptr = getFeature(sp_id, prec_mass, feat_id, ms1_ptr_vec,
-                                          matched_peaks, para_ptr);
-      if (feature_ptr != nullptr) {
-        features.push_back(feature_ptr);
-        removePeaks(ms1_ptr_vec, matched_peaks);
-      }
-      */
-      /* 
-      else {
-        double feat_inte = prsm->getPrecFeatureInte();
-        double retent_begin = ms1_ptr_vec[sp_id]->getMsHeaderPtr()->getRetentionTime();
-        double retent_end = retention_begin;
-        int ms1_scan_begin = ms1_ptr_vec[sp_id]->getMsHeaderPtr()->getFirstScanNum();
-        int ms1_scan_end = ms1_scan_begin;
-        FeaturePtr feature_ptr = std::make_shared<Feature>(feat_id, prec_mass, 
-                                                           feat_inte,
-                                                           retent_begin,
-                                                           retent_end,
-                                                           ms1_scan_begin,
-                                                           ms1_scan_end, min_charge,
-                                                           max_charge);
-      }
-      */
-/*
-      feat_id++;
-    }
-  }
-  */
-
 void readHeaders(const std::string & file_name, MsHeaderPtrVec &header_ptr_vec) {
   int sp_num_in_group = 1;
   MsAlignReader sp_reader(file_name, sp_num_in_group, nullptr,
@@ -400,13 +359,13 @@ inline bool isMatch(FeaturePtr feature_ptr, MsHeaderPtr header, FeatureParaPtr p
     return false;
   }
   double prec_mass = header->getPrecMonoMass();
-  std::vector<double> ext_masses = para_ptr->getExtMasses(prec_mass);
+  std::vector<double> search_masses = para_ptr->getSearchMasses(prec_mass);
 
   double feature_mass = feature_ptr->getMonoMass();
 
   double min_diff = std::numeric_limits<double>::max();
-  for (size_t j = 0; j < ext_masses.size(); j++) {
-    double mass_diff = std::abs(ext_masses[j] - feature_mass);
+  for (size_t j = 0; j < search_masses.size(); j++) {
+    double mass_diff = std::abs(search_masses[j] - feature_mass);
     if (mass_diff < min_diff) {
       min_diff = mass_diff;
     }
@@ -438,29 +397,26 @@ void addMsHeaderFeatures(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtrVec &header_ptr
     if (ft_ptr != nullptr) {
       header->setFeatureId(ft_ptr->getId());
       header->setFeatureInte(ft_ptr->getIntensity());
-      /*  
-      LOG_ERROR("matched ptrs scan id " << header->getId() << " precursor mass " 
-                << header->getPrecMonoMass() << " feature id " << ft_ptr->getId() 
-                << " feature mass " << ft_ptr->getMonoMass()); 
-                */
     }
     else {
       int sp_id = header->getMsOneId();
       double prec_mass = header->getPrecMonoMass();
-      int feat_id = static_cast<int>(features.size());
-      DeconvPeakPtrVec matched_peaks;
-      FeaturePtr feature_ptr = getFeature(sp_id, prec_mass, feat_id, ms1_ptr_vec,
-                                          matched_peaks, para_ptr);
-      // if we find a feature in ms1.msalign
-      // it is possible that some ms headers do not have matched features. 
-      if (feature_ptr != nullptr) {
-        features.push_back(feature_ptr);
-        removePeaks(ms1_ptr_vec, matched_peaks);
-        header->setFeatureId(feat_id);
-        header->setFeatureInte(feature_ptr->getIntensity());
-      }
-      else {
-        LOG_INFO("Cannot find features in LC/MS!");
+      if (prec_mass > 0) {
+        int feat_id = static_cast<int>(features.size());
+        DeconvPeakPtrVec matched_peaks;
+        FeaturePtr feature_ptr = getFeature(sp_id, prec_mass, feat_id, ms1_ptr_vec,
+                                            matched_peaks, para_ptr);
+        // if we find a feature in ms1.msalign
+        // it is possible that some ms headers do not have matched features. 
+        if (feature_ptr != nullptr) {
+          features.push_back(feature_ptr);
+          removePeaks(ms1_ptr_vec, matched_peaks);
+          header->setFeatureId(feat_id);
+          header->setFeatureInte(feature_ptr->getIntensity());
+        }
+        else {
+          LOG_ERROR("Cannot find features in LC/MS! Spectrum id: " << sp_id);
+        }
       }
     }
   }
@@ -494,7 +450,7 @@ void writeMs2Feature(const std::string & output_file_name,
          << header->getFeatureInte() << std::endl;
     } 
     else {
-      of << "-" << "\t" << "-" << std::endl;
+      of << "-1" << "\t" << "-1" << std::endl;
     }
   }
   of.close();
@@ -528,96 +484,9 @@ void process(std::string &sp_file_name, bool missing_level_one,
   output_file_name = base_name + "_ms2.feature";
   writeMs2Feature(output_file_name, header_ptr_vec, argu_str);
 
-  /*
-  std::string prsm_file_name = base_name + "_ms2_toppic_proteoform.xml";
-  PrsmStrPtrVec prsms = readPrsms(prsm_file_name);
-  std::cout << "start finding feature" << std::endl;
-  findFeatures(ms1_ptr_vec, para_ptr, features, prsms);
-  std::cout << "end finding feature" << std::endl;
-
-  PrsmStrPtrVec matched_prsms(features.size());
-  matchPrsms(features, matched_prsms, prsms, para_ptr);
-
-  */
 }
 
 }  // namespace 
 
 }  // namespace toppic 
-
-
-/*
-
-int findBestFeature(FeaturePtrVec &features, PrsmStrPtr prsm, FeatureParaPtr para_ptr) {
-  double mass = prsm->getOriPrecMass();
-  double error_tole = para_ptr->peak_tolerance_ptr_->compStrictErrorTole(mass);
-  int spec_scan = prsm->getSpectrumScan(); 
-  int best_feature_id = -1;
-  double best_error = std::numeric_limits<double>::max();
-  std::vector<double> ext_offsets = para_ptr->getExtOffsets();
-  for (size_t i = 0; i < features.size(); i++) {
-    int feat_scan_begin = features[i]->getScanBegin();
-    int feat_scan_end = features[i]->getScanEnd();
-    if (spec_scan < feat_scan_begin || spec_scan > feat_scan_end + 10) {
-      continue;
-    }
-    for (size_t k = 0; k < ext_offsets.size(); k++) {
-      double mass_diff = std::abs(mass + ext_offsets[k] - features[i]->getMonoMass());
-      if (mass_diff <= error_tole) {
-        double cur_error = mass_diff + std::abs(ext_offsets[k]);
-        if (cur_error < best_error) {
-          best_feature_id = i;
-          best_error = cur_error;
-        }
-      }
-    }
-  }
-  return best_feature_id;
-}
-
-int findSpId(DeconvMsPtrVec &ms1_ptr_vec, int scan) {
-  for (size_t i = 0; i < ms1_ptr_vec.size() -1; i++) {
-    if (scan > ms1_ptr_vec[i]->getMsHeaderPtr()->getFirstScanNum()
-        && scan < ms1_ptr_vec[i+1]->getMsHeaderPtr()->getFirstScanNum()) {
-      return ms1_ptr_vec[i]->getMsHeaderPtr()->getId();
-    }
-  }
-  return -1;
-}
-*/
-
-/*
-PrsmStrPtrVec readPrsms(std::string &prsm_file_name) {
-  std::string ori_db_file_name = "uniprot_zebrafish.fasta";
-  std::string db_file_name = ori_db_file_name + "_target";
-  fasta_util::dbSimplePreprocess(ori_db_file_name, db_file_name);
-  std::string fixed_mod = "C57";
-
-  FastaIndexReaderPtr seq_reader = std::make_shared<FastaIndexReader>(db_file_name);
-  ModPtrVec fix_mod_ptr_vec = mod_util::geneFixedModList(fixed_mod);
-  PrsmStrPtrVec prsms = PrsmReader::readAllPrsmStrsMatchSeq(prsm_file_name,
-                                                            seq_reader,
-                                                            fix_mod_ptr_vec);
-  return prsms;
-}
-*/
-
-/*
-void matchPrsms(FeaturePtrVec &features, PrsmStrPtrVec &matched_prsms, 
-                PrsmStrPtrVec &prsms, FeatureParaPtr para_ptr) {
-  for (size_t i = 0; i < prsms.size(); i++) {
-    PrsmStrPtr prsm = prsms[i];
-    int id = findBestFeature(features, prsm, para_ptr);
-    if (id >= 0) {
-      if (matched_prsms[id] == nullptr || matched_prsms[id]->getEValue() > prsm->getEValue()) {
-        matched_prsms[id] = prsm;
-      }
-    }
-    else {
-      LOG_ERROR("Prsm not matched: mass " << prsm->getAdjustedPrecMass() << " scan " 
-                << prsm->getSpectrumScan() << " inte " << prsm->getPrecFeatureInte());
-    }
-  }
-}
-*/
 

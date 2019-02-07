@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <vector>
 
+#include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "seq/fasta_index_reader.hpp"
 #include "prsm/prsm_reader.hpp"

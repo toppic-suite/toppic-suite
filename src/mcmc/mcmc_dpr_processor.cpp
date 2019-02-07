@@ -21,6 +21,7 @@
 #include "common/base/ptm_util.hpp"
 #include "common/base/mod_util.hpp"
 #include "common/util/file_util.hpp"
+#include "common/util/logger.hpp"
 #include "common/base/residue_util.hpp"
 #include "common/base/neutral_loss.hpp"
 #include "prsm/extreme_value.hpp"

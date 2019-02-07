@@ -17,11 +17,9 @@
 
 #include <limits>
 #include <fstream>
-#include <set>
 #include <string>
 #include <vector>
 
-#include "common/util/logger.hpp"
 #include "spec/deconv_ms.hpp"
 #include "spec/spectrum_set.hpp"
 
@@ -35,7 +33,7 @@ class MsAlignReader {
                 ActivationPtr act_ptr, const std::set<std::string> skip_list,
                 int peak_num_limit = std::numeric_limits<int>::max());
 
-  std::vector<std::string> readOneSpectrum();
+  std::vector<std::string> readOneStrSpectrum();
 
   DeconvMsPtr getNextMs();
 
@@ -66,6 +64,7 @@ class MsAlignReader {
 };
 
 typedef std::shared_ptr<MsAlignReader> MsAlignReaderPtr;
+typedef std::vector<MsAlignReaderPtr>  MsAlignReaderPtrVec;
 
 }  // namespace toppic
 #endif

@@ -17,6 +17,7 @@
 #include <vector>
 #include <functional>
 
+#include "common/util/logger.hpp"
 #include "common/base/ptm.hpp"
 #include "common/base/ptm_util.hpp"
 #include "common/base/mod_util.hpp"

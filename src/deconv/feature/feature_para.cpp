@@ -28,18 +28,34 @@ FeaturePara::FeaturePara() {
   // extend sp parameter 
   double IM = mass_constant::getIsotopeMass();
   // the set of offsets used to expand the monoisotopic mass list 
-  std::vector<double> offsets {{0, -IM, IM, -2 * IM, 2 * IM}};
-  ext_offsets_ = offsets;
+  std::vector<double> offsets_1 {{0, -IM, IM, -2 * IM, 2 * IM, -3*IM, 3*IM}};
+  search_offsets_ = offsets_1;
+  std::vector<double> offsets_2 {{0, -IM, IM, -2 * IM, 2 * IM}};
+  extend_offsets_ = offsets_2;
 }
 
-std::vector<double> FeaturePara::getExtMasses(double mass) {
+std::vector<double> FeaturePara::getExtendMasses(double mass) {
   std::vector<double> result;
   if (mass < extend_min_mass_) {
     result.push_back(mass);
   }
   else {
-    for (size_t i = 0; i < ext_offsets_.size(); i++) {
-      double new_mass = mass + ext_offsets_[i];
+    for (size_t i = 0; i < extend_offsets_.size(); i++) {
+      double new_mass = mass + extend_offsets_[i];
+      result.push_back(new_mass);
+    }
+  }
+  return result;
+}
+
+std::vector<double> FeaturePara::getSearchMasses(double mass) {
+  std::vector<double> result;
+  if (mass < extend_min_mass_) {
+    result.push_back(mass);
+  }
+  else {
+    for (size_t i = 0; i < search_offsets_.size(); i++) {
+      double new_mass = mass + search_offsets_[i];
       result.push_back(new_mass);
     }
   }

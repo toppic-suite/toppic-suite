@@ -14,6 +14,7 @@
 
 #include <iomanip>
 
+#include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "common/thread/simple_thread_pool.hpp"
 #include "seq/proteoform.hpp"
