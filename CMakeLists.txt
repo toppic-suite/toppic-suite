@@ -241,7 +241,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 #        boost_filesystem boost_system boost_thread boost_iostreams boost_chrono pthread z)
 
 #file(MAKE_DIRECTORY ${CMAKE_INSTALL_PREFIX}/usr/bin)
-install (TARGETS topfd toppic topmg DESTINATION ${CMAKE_INSTALL_PREFIX}/usr/bin/)
+install (TARGETS topfd toppic topmg topmerge DESTINATION ${CMAKE_INSTALL_PREFIX}/usr/bin/)
 install (DIRECTORY toppic_resources/ DESTINATION ${CMAKE_INSTALL_PREFIX}/etc/toppic)
 
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 

@@ -12,9 +12,9 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#include "common/base/prot_mod.hpp"
+#include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
+#include "common/base/prot_mod.hpp"
 #include "common/thread/simple_thread_pool.hpp"
 #include "seq/fasta_reader.hpp"
 #include "spec/deconv_ms.hpp"

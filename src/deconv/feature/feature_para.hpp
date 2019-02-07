@@ -25,13 +25,23 @@ class FeaturePara {
  public:
   FeaturePara();
 
-  std::vector<double> getExtMasses(double mass);
+  std::vector<double> getExtendMasses(double mass);
 
-  std::vector<double> getExtOffsets() {return ext_offsets_;}
+  std::vector<double> getExtendOffsets() {return extend_offsets_;}
+
+  std::vector<double> getSearchMasses(double mass);
+
+  std::vector<double> getSearchOffsets() {return search_offsets_;}
 
   PeakTolerancePtr peak_tolerance_ptr_;
 
-  std::vector<double> ext_offsets_;
+  // extend_offset is -2, -1, 0, 1, 2. We use it to search matched masses 
+  // when a reference mass is given to find a feature. 
+  std::vector<double> extend_offsets_;
+
+  // search offset is  -3, -2, -1, 0, 1, 2, 3. We use it to search the precursor 
+  // mass of an MS/MS spectrum to find a matched feature.
+  std::vector<double> search_offsets_;
 
   double extend_min_mass_ = 5000;
 

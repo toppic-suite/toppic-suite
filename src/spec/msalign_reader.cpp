@@ -15,6 +15,7 @@
 #include <cmath>
 #include <sstream>
 
+#include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
 #include "common/base/mass_constant.hpp"
 #include "common/base/activation_base.hpp"
@@ -50,7 +51,7 @@ MsAlignReader::MsAlignReader(const std::string &file_name, int group_spec_num,
       }
     }
 
-std::vector<std::string> MsAlignReader::readOneSpectrum() {
+std::vector<std::string> MsAlignReader::readOneStrSpectrum() {
   std::string line;
   std::vector<std::string> line_list;
   while (std::getline(input_, line)) {
@@ -75,7 +76,7 @@ std::vector<std::string> MsAlignReader::readOneSpectrum() {
 
 void MsAlignReader::readNext() {
   deconv_ms_ptr_ = nullptr;
-  spectrum_str_vec_ = readOneSpectrum();
+  spectrum_str_vec_ = readOneStrSpectrum();
   if (spectrum_str_vec_.size() == 0) {
     input_.close();
     return;

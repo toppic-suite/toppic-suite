@@ -72,7 +72,7 @@ void outputHeaders(const MsHeaderPtrVec &header_ptr_vec) {
 
 bool isConsistent(MsHeaderPtr a, MsHeaderPtr b, FeatureParaPtr para_ptr) {
   double min_diff = std::numeric_limits<double>::max();
-  std::vector<double> ext_masses = para_ptr->getExtMasses(a->getPrecMonoMass());
+  std::vector<double> ext_masses = para_ptr->getExtendMasses(a->getPrecMonoMass());
   for (size_t i = 0; i < ext_masses.size(); i++) {
     double mass_diff = std::abs(ext_masses[i] - b->getPrecMonoMass());
     if (mass_diff < min_diff) {
@@ -91,7 +91,7 @@ bool containPrecursor(DeconvMsPtr ms1_ptr, MsHeaderPtr best_ptr, FeatureParaPtr 
   if (ms1_ptr == nullptr) return false;
   double prec_mass = best_ptr->getPrecMonoMass();
   // double prec_chrg = best_ptr->getPrecCharge();
-  std::vector<double> ext_masses = para_ptr->getExtMasses(prec_mass);
+  std::vector<double> ext_masses = para_ptr->getExtendMasses(prec_mass);
 
   double min_diff = std::numeric_limits<double>::max();
   for (size_t i = 0; i < ms1_ptr->size(); i++) {
@@ -146,7 +146,7 @@ double getFeatureIntensity(const DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtr best_p
   double sum = 0;
   double prec_mass = best_ptr->getPrecMonoMass();
   double error_tole = para_ptr->peak_tolerance_ptr_->compStrictErrorTole(prec_mass);
-  std::vector<double> ext_masses = para_ptr->getExtMasses(prec_mass);
+  std::vector<double> ext_masses = para_ptr->getExtendMasses(prec_mass);
   for (int i = ms1_id_begin; i <= ms1_id_end; i++) {
     DeconvMsPtr ms1_ptr = ms1_ptr_vec[i];
     for (size_t j = 0; j < ms1_ptr->size(); j++) {

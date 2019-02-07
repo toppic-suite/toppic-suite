@@ -36,7 +36,7 @@ PrsmFeatureCluster::PrsmFeatureCluster(const std::string &db_file_name,
     fix_mod_ptr_vec_(fix_mod_ptr_vec),
     prec_error_tole_(prec_error_tole),
     prsm_para_ptr_(prsm_para_ptr) {
-      feature_file_name_ = spec_file_name.substr(0, spec_file_name.length() - 12) + ".feature";
+      feature_file_name_ = file_util::basename(spec_file_name) + ".feature";
     }
 
 void PrsmFeatureCluster::setProtId(PrsmStrPtrVec& prsm_ptrs) {

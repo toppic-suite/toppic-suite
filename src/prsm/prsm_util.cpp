@@ -159,6 +159,7 @@ void addFeatureIDToPrsms(PrsmStrPtrVec &prsm_ptrs, const std::string & feature_f
   std::vector<int> feature_ids;
   std::vector<double> feature_intens;
   std::ifstream infile(feature_file_name);
+  LOG_DEBUG("Feature file name " << feature_file_name);
   std::string line;
   while (std::getline(infile, line)) {
     if (line[0] == '#' || line == "" || line[0] == 'I') {
@@ -166,6 +167,7 @@ void addFeatureIDToPrsms(PrsmStrPtrVec &prsm_ptrs, const std::string & feature_f
     }
     // boost::split(strs, line, boost::is_any_of("\t "));
     std::vector<std::string> strs = str_util::split(line, "\t ");
+    //LOG_DEBUG("Line " << line << " str num " << strs.size());
     feature_spec_ids.push_back(std::stoi(strs[0]));
     feature_ids.push_back(std::stoi(strs[6]));
     feature_intens.push_back(std::stod(strs[7]));
@@ -179,8 +181,13 @@ void addFeatureIDToPrsms(PrsmStrPtrVec &prsm_ptrs, const std::string & feature_f
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     int spec_id = prsm_ptrs[i]->getSpectrumId();
     while (feature_spec_ids[k] != spec_id) {k++;}
-    prsm_ptrs[i]->setPrecFeatureId(feature_ids[k]);
-    prsm_ptrs[i]->setPrecFeatureInte(feature_intens[k]);
+    if (feature_ids[k] >= 0) {
+      prsm_ptrs[i]->setPrecFeatureId(feature_ids[k]);
+      prsm_ptrs[i]->setPrecFeatureInte(feature_intens[k]);
+    }
+    else {
+      LOG_ERROR("Spectrum " << spec_id << " does not have a feature!");
+    }
   }
 }
 

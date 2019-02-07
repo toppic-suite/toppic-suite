@@ -11,7 +11,10 @@
 //WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //See the License for the specific language governing permissions and
 //limitations under the License.
+//
 
+
+#include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "seq/proteoform.hpp"
 #include "spec/rm_break_type.hpp"
