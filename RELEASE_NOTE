@@ -16,7 +16,7 @@ Version 1.1.1 (Nov, 2017)
 Version 1.1.0 (Nov, 2017)
     * Added TopFD
     * Added a GUI wrapper for TopPIC
-    * Added a filtration method based on proteoform-level FDR
+    * Added a filtering method based on proteoform-level FDR
     * Added proteoform identification using LC/MS features 
 
 Version 1.0.0 (May, 2016)
@@ -32,7 +32,7 @@ Version 0.9.1 (Dec, 2014)
 
 Version 0.9.0 (Dec, 2014)
 
-    * Added indexes are used to reduce memory usage.
+    * Added indexes to reduce memory usage.
 
 Version 0.8.4 (Nov, 2014)
 
@@ -44,4 +44,4 @@ version 0.8.1 (Sep, 2014)
 
 version 0.8.0 (Sep, 2014)
 
-    * Completed the comparison between c++ and java implementation.
+    * Completed a runnable version of TopPIC.
