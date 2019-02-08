@@ -64,7 +64,7 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
     double perc = mng_ptr->cnt_ * 100.0 / mng_ptr->n_spec_block_;
     std::stringstream msg;
     msg << std::flush << "Non PTM filtering - processing " << std::setprecision(3) <<  perc << "%.    \r";
-    std::cout << msg;
+    std::cout << msg.str();
     spec_set_vec = reader.getNextSpectrumSet(sp_para_ptr);
   }
   reader.close();

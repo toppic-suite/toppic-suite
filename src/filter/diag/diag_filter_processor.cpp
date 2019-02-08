@@ -131,8 +131,10 @@ void DiagFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num
         }
       }
     }
-    std::cout << std::flush << "Multiple filtering - processing " << cnt
+    std::stringstream msg;
+    msg << std::flush << "Multiple PTM filtering - processing " << cnt
         << " of " << spectrum_num << " spectra.\r";
+    std::cout << msg.str();
     spec_set_ptr = reader.getNextSpectrumSet(sp_para_ptr)[0];
   }
   pool_ptr->ShutDown();
