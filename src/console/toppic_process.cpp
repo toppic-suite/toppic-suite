@@ -448,9 +448,9 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
 }
 
 int TopPICProgress(std::map<std::string, std::string> & arguments) {
-  //if (TopPIC_identify(arguments) != 0) {
-  //  return 1;
-  //}
+  if (TopPIC_identify(arguments) != 0) {
+    return 1;
+  }
 
   return TopPIC_post(arguments);
 }
