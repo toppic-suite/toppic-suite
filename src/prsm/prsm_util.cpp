@@ -167,6 +167,9 @@ void addFeatureIDToPrsms(PrsmStrPtrVec &prsm_ptrs, const std::string & feature_f
     }
     // boost::split(strs, line, boost::is_any_of("\t "));
     std::vector<std::string> strs = str_util::split(line, "\t ");
+    if (strs[6] == "-") {
+      continue;
+    }
     //LOG_DEBUG("Line " << line << " str num " << strs.size());
     feature_spec_ids.push_back(std::stoi(strs[0]));
     feature_ids.push_back(std::stoi(strs[6]));
