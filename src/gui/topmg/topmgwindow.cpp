@@ -52,7 +52,7 @@ topmgWindow::topmgWindow(QWidget *parent) :
       font.setFamily(QStringLiteral("Monospace"));
       fontTable.setFamily(QStringLiteral("Monospace"));
 #endif
-      font.setPointSize(12);
+      font.setPixelSize(12);
       QApplication::setFont(font);
       ui->outputTextBrowser->setFont(font);
       thread_ = new threadtopmg(this);
@@ -60,7 +60,7 @@ topmgWindow::topmgWindow(QWidget *parent) :
       setToolTip("");
       setToolTipDuration(100);
 
-      fontTable.setPointSize(9);
+      fontTable.setPixelSize(9);
       ui->listWidget->setFont(fontTable);
 
       on_clearButton_clicked();

@@ -46,7 +46,7 @@ TopMergeDialog::TopMergeDialog(QWidget *parent) :
 #else
       font.setFamily(QStringLiteral("Monospace"));
 #endif
-      font.setPointSize(12);
+      font.setPixelSize(12);
       QApplication::setFont(font);
       ui->outputTextBrowser->setFont(font);
       thread_ = new ThreadTopMerge(this);
