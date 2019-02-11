@@ -45,11 +45,6 @@
       <height>271</height>
      </rect>
     </property>
-    <property name="font">
-     <font>
-      <pointsize>12</pointsize>
-     </font>
-    </property>
     <property name="html">
      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
@@ -67,22 +62,12 @@ p, li { white-space: pre-wrap; }
       <height>55</height>
      </rect>
     </property>
-    <property name="font">
-     <font>
-      <pointsize>12</pointsize>
-     </font>
-    </property>
     <layout class="QHBoxLayout" name="horizontalLayout_7">
      <property name="spacing">
       <number>30</number>
      </property>
      <item>
       <widget class="QPushButton" name="exitButton">
-       <property name="font">
-        <font>
-         <pointsize>12</pointsize>
-        </font>
-       </property>
        <property name="text">
         <string>Exit</string>
        </property>
@@ -90,11 +75,6 @@ p, li { white-space: pre-wrap; }
      </item>
      <item>
       <widget class="QPushButton" name="clearButton">
-       <property name="font">
-        <font>
-         <pointsize>12</pointsize>
-        </font>
-       </property>
        <property name="text">
         <string>Clear Input Files</string>
        </property>
@@ -102,11 +82,6 @@ p, li { white-space: pre-wrap; }
      </item>
      <item>
       <widget class="QPushButton" name="defaultButton">
-       <property name="font">
-        <font>
-         <pointsize>12</pointsize>
-        </font>
-       </property>
        <property name="text">
         <string>Default Parameters</string>
        </property>
@@ -129,11 +104,6 @@ p, li { white-space: pre-wrap; }
       <widget class="QPushButton" name="startButton">
        <property name="enabled">
         <bool>true</bool>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>12</pointsize>
-        </font>
        </property>
        <property name="acceptDrops">
         <bool>false</bool>
@@ -165,11 +135,6 @@ p, li { white-space: pre-wrap; }
       <width>881</width>
       <height>361</height>
      </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>12</pointsize>
-     </font>
     </property>
     <property name="currentIndex">
      <number>0</number>
@@ -245,19 +210,9 @@ p, li { white-space: pre-wrap; }
         <height>33</height>
        </rect>
       </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
         <widget class="QLabel" name="label_2">
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
          <property name="text">
           <string>Spectrum files: </string>
          </property>
@@ -310,19 +265,9 @@ p, li { white-space: pre-wrap; }
         <height>33</height>
        </rect>
       </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
       <layout class="QHBoxLayout" name="horizontalLayout_17">
        <item>
         <widget class="QLabel" name="label_18">
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
          <property name="text">
           <string>Variable PTM file:</string>
          </property>
@@ -333,11 +278,6 @@ p, li { white-space: pre-wrap; }
          <property name="enabled">
           <bool>true</bool>
          </property>
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
          <property name="readOnly">
           <bool>true</bool>
          </property>
@@ -347,11 +287,6 @@ p, li { white-space: pre-wrap; }
         <widget class="QPushButton" name="modFileButton">
          <property name="enabled">
           <bool>true</bool>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
          </property>
          <property name="text">
           <string>Select</string>
@@ -374,19 +309,9 @@ p, li { white-space: pre-wrap; }
         <height>33</height>
        </rect>
       </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
       <layout class="QHBoxLayout" name="horizontalLayout_4">
        <item>
         <widget class="QLabel" name="label_4">
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
          <property name="text">
           <string>Fixed modifications:</string>
          </property>
@@ -394,11 +319,6 @@ p, li { white-space: pre-wrap; }
        </item>
        <item>
         <widget class="QComboBox" name="fixedModComboBox">
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
          <item>
           <property name="text">
            <string>NONE</string>
@@ -426,11 +346,6 @@ p, li { white-space: pre-wrap; }
          <property name="enabled">
           <bool>false</bool>
          </property>
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
          <property name="readOnly">
           <bool>true</bool>
          </property>
@@ -446,11 +361,6 @@ p, li { white-space: pre-wrap; }
            <width>85</width>
            <height>16777215</height>
           </size>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
          </property>
          <property name="text">
           <string>File</string>
@@ -468,19 +378,9 @@ p, li { white-space: pre-wrap; }
         <height>33</height>
        </rect>
       </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
       <layout class="QHBoxLayout" name="horizontalLayout_21">
        <item>
         <widget class="QCheckBox" name="decoyCheckBox">
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
          <property name="text">
           <string>Decoy database</string>
          </property>
@@ -488,11 +388,6 @@ p, li { white-space: pre-wrap; }
        </item>
        <item>
         <widget class="QCheckBox" name="topfdFeatureCheckBox">
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
          <property name="text">
           <string>Missing MS1 feature file</string>
          </property>
@@ -509,19 +404,9 @@ p, li { white-space: pre-wrap; }
         <height>33</height>
        </rect>
       </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
       <layout class="QHBoxLayout" name="horizontalLayout_11">
        <item>
         <widget class="QLabel" name="label_9">
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
          <property name="text">
           <string>Error tolerance (PPM):</string>
          </property>
@@ -544,11 +429,6 @@ p, li { white-space: pre-wrap; }
         <width>861</width>
         <height>111</height>
        </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
       </property>
       <property name="styleSheet">
        <string notr="true">QGroupBox {
@@ -574,11 +454,6 @@ QGroupBox::title {
          <width>151</width>
          <height>41</height>
         </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>12</pointsize>
-        </font>
        </property>
        <property name="text">
         <string>Spectrum level:</string>
@@ -621,11 +496,6 @@ QGroupBox::title {
         <layout class="QVBoxLayout" name="verticalLayout">
          <item>
           <widget class="QComboBox" name="cutoffSpectralTypeComboBox">
-           <property name="font">
-            <font>
-             <pointsize>12</pointsize>
-            </font>
-           </property>
            <property name="editable">
             <bool>false</bool>
            </property>
@@ -643,11 +513,6 @@ QGroupBox::title {
          </item>
          <item>
           <widget class="QLineEdit" name="cutoffSpectralValueEdit">
-           <property name="font">
-            <font>
-             <pointsize>12</pointsize>
-            </font>
-           </property>
            <property name="text">
             <string>0.01</string>
            </property>
@@ -667,11 +532,6 @@ QGroupBox::title {
          <width>171</width>
          <height>31</height>
         </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>12</pointsize>
-        </font>
        </property>
        <property name="text">
         <string>Proteoform level:</string>
@@ -714,11 +574,6 @@ QGroupBox::title {
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <item>
           <widget class="QComboBox" name="cutoffProteoformTypeComboBox">
-           <property name="font">
-            <font>
-             <pointsize>12</pointsize>
-            </font>
-           </property>
            <property name="editable">
             <bool>false</bool>
            </property>
@@ -736,11 +591,6 @@ QGroupBox::title {
          </item>
          <item>
           <widget class="QLineEdit" name="cutoffProteoformValueEdit">
-           <property name="font">
-            <font>
-             <pointsize>12</pointsize>
-            </font>
-           </property>
            <property name="text">
             <string>0.01</string>
            </property>
@@ -767,22 +617,12 @@ QGroupBox::title {
         <height>33</height>
        </rect>
       </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
       <layout class="QHBoxLayout" name="horizontalLayout_3">
        <property name="sizeConstraint">
         <enum>QLayout::SetDefaultConstraint</enum>
        </property>
        <item>
         <widget class="QLabel" name="label_3">
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
          <property name="text">
           <string>Activation:</string>
          </property>
@@ -795,11 +635,6 @@ QGroupBox::title {
            <width>110</width>
            <height>16777215</height>
           </size>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
          </property>
          <item>
           <property name="text">
@@ -839,19 +674,9 @@ QGroupBox::title {
         <height>33</height>
        </rect>
       </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
       <layout class="QHBoxLayout" name="horizontalLayout_22">
        <item>
         <widget class="QLabel" name="label_23">
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
          <property name="text">
           <string>Thread number:</string>
          </property>
@@ -864,11 +689,6 @@ QGroupBox::title {
            <width>110</width>
            <height>16777215</height>
           </size>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
          </property>
          <property name="text">
           <string>1</string>
@@ -889,19 +709,9 @@ QGroupBox::title {
         <height>33</height>
        </rect>
       </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
       <layout class="QHBoxLayout" name="horizontalLayout_10">
        <item>
         <widget class="QLabel" name="label_8">
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
          <property name="text">
           <string>Maximum mass shift (Da):</string>
          </property>
@@ -914,11 +724,6 @@ QGroupBox::title {
            <width>110</width>
            <height>16777215</height>
           </size>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
          </property>
          <property name="text">
           <string>500</string>
@@ -939,19 +744,9 @@ QGroupBox::title {
         <height>33</height>
        </rect>
       </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
       <layout class="QHBoxLayout" name="horizontalLayout_9">
        <item>
         <widget class="QLabel" name="label_12">
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
          <property name="text">
           <string>Maximum number of variable PTMs:</string>
          </property>
@@ -959,11 +754,6 @@ QGroupBox::title {
        </item>
        <item>
         <widget class="QComboBox" name="numModComboBox">
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
          <property name="editable">
           <bool>false</bool>
          </property>
@@ -1033,11 +823,6 @@ QGroupBox::title {
         <height>91</height>
        </rect>
       </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
       <property name="styleSheet">
        <string notr="true">QGroupBox {
     border: 1px solid gray;
@@ -1063,21 +848,11 @@ QGroupBox::title {
          <height>70</height>
         </rect>
        </property>
-       <property name="font">
-        <font>
-         <pointsize>12</pointsize>
-        </font>
-       </property>
        <layout class="QGridLayout" name="gridLayout">
         <item row="0" column="0">
          <widget class="QCheckBox" name="NONECheckBox">
           <property name="enabled">
            <bool>true</bool>
-          </property>
-          <property name="font">
-           <font>
-            <pointsize>12</pointsize>
-           </font>
           </property>
           <property name="text">
            <string>NONE</string>
@@ -1092,11 +867,6 @@ QGroupBox::title {
         </item>
         <item row="1" column="0">
          <widget class="QCheckBox" name="NMECheckBox">
-          <property name="font">
-           <font>
-            <pointsize>12</pointsize>
-           </font>
-          </property>
           <property name="text">
            <string>NME</string>
           </property>
@@ -1107,11 +877,6 @@ QGroupBox::title {
         </item>
         <item row="0" column="1">
          <widget class="QCheckBox" name="NMEACCheckBox">
-          <property name="font">
-           <font>
-            <pointsize>12</pointsize>
-           </font>
-          </property>
           <property name="text">
            <string>NME_ACETYLATION</string>
           </property>
@@ -1122,11 +887,6 @@ QGroupBox::title {
         </item>
         <item row="1" column="1">
          <widget class="QCheckBox" name="MACCheckBox">
-          <property name="font">
-           <font>
-            <pointsize>12</pointsize>
-           </font>
-          </property>
           <property name="text">
            <string>M_ACETYLATION</string>
           </property>
@@ -1147,19 +907,9 @@ QGroupBox::title {
         <height>33</height>
        </rect>
       </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
       <layout class="QHBoxLayout" name="horizontalLayout_18">
        <item>
         <widget class="QLabel" name="label_19">
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
          <property name="text">
           <string>Skip list:</string>
          </property>
@@ -1170,11 +920,6 @@ QGroupBox::title {
          <property name="enabled">
           <bool>true</bool>
          </property>
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
          <property name="readOnly">
           <bool>true</bool>
          </property>
@@ -1184,11 +929,6 @@ QGroupBox::title {
         <widget class="QPushButton" name="skipListButton">
          <property name="enabled">
           <bool>true</bool>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
          </property>
          <property name="text">
           <string>File</string>
@@ -1206,19 +946,9 @@ QGroupBox::title {
         <height>33</height>
        </rect>
       </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
       <layout class="QHBoxLayout" name="horizontalLayout_12">
        <item>
         <widget class="QLabel" name="label_14">
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
          <property name="text">
           <string>Maximum number of unknown mass shifts:</string>
          </property>
@@ -1226,11 +956,6 @@ QGroupBox::title {
        </item>
        <item>
         <widget class="QComboBox" name="numUnknownShiftComboBox">
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
          <property name="editable">
           <bool>false</bool>
          </property>
@@ -1264,11 +989,6 @@ QGroupBox::title {
         <width>361</width>
         <height>33</height>
        </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_23">
        <item>
