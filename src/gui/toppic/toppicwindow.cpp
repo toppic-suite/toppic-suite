@@ -53,8 +53,8 @@ toppicWindow::toppicWindow(QWidget *parent) :
       QFont font;
       QFont fontTable;
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
-      font.setFamily(QStringLiteral("Courier New"));
-      fontTable.setFamily(QStringLiteral("Courier New"));
+      font.setFamily(QStringLiteral("Calibri"));
+      fontTable.setFamily(QStringLiteral("Calibri"));
 #else
       font.setFamily(QStringLiteral("Monospace"));
       fontTable.setFamily(QStringLiteral("Monospace"));
