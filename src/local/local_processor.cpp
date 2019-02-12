@@ -620,6 +620,9 @@ void LocalProcessor::getCtermTruncRange(ProteoformPtr proteoform, const ExtendMs
       min++;
       break;
     }
+    if (ori_end + 1 + min <= 0) {
+      break;
+    }
   }
 }
 
@@ -888,6 +891,9 @@ double LocalProcessor::dpTwoPtmScr(ProteoformPtr proteoform, int h,
                                    const ExtendMsPtrVec & extend_ms_ptr_vec,
                                    double prec_mass, double mass1, double mass2, PtmPtr ptm1, PtmPtr ptm2) {
   int g = proteoform->getLen();
+  if (g <= 0) {
+    return 0;
+  }
   double scr = 0.0;
   int count = 0;
 
