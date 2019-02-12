@@ -57,7 +57,7 @@ TopFDDialog::TopFDDialog(QWidget *parent) :
       ui->windowSizeEdit->setValidator(validator3);
       QFont font;
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
-      font.setFamily(QStringLiteral("Courier New"));
+      font.setFamily(QStringLiteral("Calibri"));
 #else
       font.setFamily(QStringLiteral("Monospace"));
 #endif
