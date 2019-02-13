@@ -25,6 +25,7 @@ int main(int argc, char *argv[]) {
   QFont font("Calibri");
   font.setPointSize(12);
   QApplication::setFont(font);
+  QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
   QApplication a(argc, argv);
 
