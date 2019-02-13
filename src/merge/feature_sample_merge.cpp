@@ -366,7 +366,7 @@ void FeatureSampleMerge::process() {
     std::string input_file_name = input_file_names_[k];
     std::string base_name = file_util::basename(input_file_name);
     if (str_util::endsWith(base_name, "_ms1")) {
-      base_name = base_name.substr(0, base_name.size() - 3);
+      base_name = base_name.substr(0, base_name.size() - 4);
     }
     else {
       LOG_ERROR("The file name " << input_file_name << " does not end with _ms1.feature!");
