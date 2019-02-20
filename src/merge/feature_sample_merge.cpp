@@ -48,7 +48,13 @@ void matchPrsms(FeaturePrsmPtrVec &features, PrsmStrPtrVec &prsms) {
       exit(EXIT_FAILURE);
     }
     else {
-      features[id]->addPrsmInfo(prsm);
+      // features are not sorted by their ids
+      for (size_t j = 0; j < features.size(); j++) {
+        if (features[j]->getId() == id) {
+          features[j]->addPrsmInfo(prsm);
+          break;
+        }
+      }
     }
   }
 }
@@ -297,6 +303,7 @@ void getFeatureTable(FeaturePrsmPtrVec& all_features, FeaturePrsmPtrVec2D& featu
       continue;
     }
     int cur_sample = all_features[i]->getSampleId();
+
     FeaturePrsmPtrVec cur_row(sample_size);
     for (size_t j = 0; j < sample_size; j++) {
       if ((int)j == cur_sample) {
@@ -362,11 +369,13 @@ void FeatureSampleMerge::process() {
   FeaturePrsmPtrVec2D features_2d; 
   FeaturePrsmPtrVec all_features; 
   size_t sample_num = input_file_names_.size();
+
   for (size_t k = 0; k < sample_num; k++) {
     std::string input_file_name = input_file_names_[k];
     std::string base_name = file_util::basename(input_file_name);
     if (str_util::endsWith(base_name, "_ms1")) {
       base_name = base_name.substr(0, base_name.size() - 4);
+      LOG_DEBUG("base name " << base_name);
     }
     else {
       LOG_ERROR("The file name " << input_file_name << " does not end with _ms1.feature!");
@@ -374,6 +383,7 @@ void FeatureSampleMerge::process() {
     FeaturePrsmReader reader(base_name + "_ms1.feature");
     FeaturePrsmPtrVec features = reader.readAllFeatures();
     reader.close();
+    LOG_DEBUG("feature number " << features.size());
 
     std::string prsm_file_name = base_name + "_ms2_toppic_proteoform.xml";
     FastaIndexReaderPtr seq_reader = std::make_shared<FastaIndexReader>(db_file_name_);
@@ -381,6 +391,7 @@ void FeatureSampleMerge::process() {
     PrsmStrPtrVec prsms = PrsmReader::readAllPrsmStrsMatchSeq(prsm_file_name,
                                                               seq_reader,
                                                               fix_mod_ptr_vec);
+    LOG_DEBUG("prsm number " << prsms.size());
     matchPrsms(features, prsms);
     std::sort(features.begin(), features.end(), Feature::cmpRetentInc);
     for (size_t i = 0; i < features.size(); i++) {

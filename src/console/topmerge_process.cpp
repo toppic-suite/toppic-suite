@@ -41,13 +41,17 @@ int topMergeProcess(std::map<std::string, std::string> &arguments,
   LOG_DEBUG("Output file name " << output_file_name);
   std::string fixed_mod = arguments["fixedMod"];
 
+  double ppm = 0.000015;
+  // we need to decide if we use ppm or error tolerance as the arguments of
+  // topmerge. 
+
   std::cout << "Merging files - started." << std::endl;
   FeatureSampleMergePtr merge_ptr 
       = std::make_shared<FeatureSampleMerge>(input_file_list,
                                              output_file_name,
                                              db_file_name, 
                                              fixed_mod, 
-                                             error_tole);
+                                             ppm);
   merge_ptr->process();
   merge_ptr = nullptr;
   std::cout << "Merging files - finished." << std::endl;
