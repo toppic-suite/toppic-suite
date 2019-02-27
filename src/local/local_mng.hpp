@@ -33,7 +33,7 @@ const int LEFT_SUP_LIMIT = 10;
 
 const int RIGHT_SUP_LIMIT = 10;
 
-const int DESC_MATCH_LIMIT = 15;
+const int DESC_MATCH_LIMIT = 5;
 
 class LocalMng {
  public:
@@ -74,6 +74,8 @@ class LocalMng {
   double min_ptm_mass_;
 
   double p1_, p2_;
+
+  double desc_ratio_ = 0.67;
 };
 
 typedef std::shared_ptr<LocalMng> LocalMngPtr;

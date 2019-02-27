@@ -146,7 +146,8 @@ PrsmPtr LocalProcessor::processOnePtm(PrsmPtr prsm) {
     int new_num_match_ion = local_util::compMatchFragNum(one_known_proteoform,
                                                          prsm->getRefineMsPtrVec(),
                                                          mng_ptr_->min_mass_);
-    if (new_num_match_ion > ori_num_match_ion - DESC_MATCH_LIMIT) {
+    if (new_num_match_ion > ori_num_match_ion - DESC_MATCH_LIMIT 
+        && new_num_match_ion > ori_num_match_ion * mng_ptr_->desc_ratio_) {
       prsm->setProteoformPtr(one_known_proteoform, mng_ptr_->prsm_para_ptr_->getSpParaPtr());
       return prsm;
     }
@@ -158,7 +159,8 @@ PrsmPtr LocalProcessor::processOnePtm(PrsmPtr prsm) {
     double new_num_match_ion = local_util::compMatchFragNum(two_known_prsm,
                                                             prsm->getRefineMsPtrVec(),
                                                             mng_ptr_->min_mass_);
-    if (new_num_match_ion > ori_num_match_ion - DESC_MATCH_LIMIT) {
+    if (new_num_match_ion > ori_num_match_ion - DESC_MATCH_LIMIT
+        && new_num_match_ion > ori_num_match_ion * mng_ptr_->desc_ratio_) {
       prsm->setProteoformPtr(two_known_prsm, mng_ptr_->prsm_para_ptr_->getSpParaPtr());
       return prsm;
     }
@@ -751,7 +753,8 @@ PrsmPtr LocalProcessor::processTwoPtm(PrsmPtr prsm) {
     int new_num_match_ion = local_util::compMatchFragNum(two_known_prsm,
                                                          prsm->getRefineMsPtrVec(),
                                                          mng_ptr_->min_mass_);
-    if (new_num_match_ion > ori_num_match_ion - DESC_MATCH_LIMIT) {
+    if (new_num_match_ion > ori_num_match_ion - DESC_MATCH_LIMIT
+        && new_num_match_ion > ori_num_match_ion * mng_ptr_->desc_ratio_) {
       prsm->setProteoformPtr(two_known_prsm, mng_ptr_->prsm_para_ptr_->getSpParaPtr());
       return prsm;
     }
@@ -763,7 +766,8 @@ PrsmPtr LocalProcessor::processTwoPtm(PrsmPtr prsm) {
     double new_num_match_ion = local_util::compMatchFragNum(one_known_prsm,
                                                             prsm->getRefineMsPtrVec(),
                                                             mng_ptr_->min_mass_);
-    if (new_num_match_ion > ori_num_match_ion - DESC_MATCH_LIMIT) {
+    if (new_num_match_ion > ori_num_match_ion - DESC_MATCH_LIMIT
+        && new_num_match_ion > ori_num_match_ion * mng_ptr_->desc_ratio_) {
       prsm->setProteoformPtr(one_known_prsm, mng_ptr_->prsm_para_ptr_->getSpParaPtr());
       return prsm;
     }
