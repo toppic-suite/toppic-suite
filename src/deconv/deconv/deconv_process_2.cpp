@@ -186,6 +186,7 @@ void DeconvProcess2::deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   if (max_frag_mass == 0.0) {
     max_frag_mass = header_ptr->getPrecSpMass();
   }
+  deconv_ptr->setMsLevel(header_ptr->getMsLevel());
   deconv_ptr->setData(peak_list, max_frag_mass, header_ptr->getPrecCharge());
   deconv_ptr->run();
   MatchEnvPtrVec result_envs = deconv_ptr->getResult();
