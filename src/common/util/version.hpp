@@ -20,7 +20,7 @@
 
 namespace toppic {
 
-const std::string version_number = "1.2.2";
+const std::string version_number = "1.3.0";
 
 }  // namespace toppic
 
