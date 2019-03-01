@@ -130,7 +130,7 @@ void PtmSearchProcessor::process(){
   PrsmXmlWriterSetPtrVec writer_set_ptr_vec;
   for (int i = 0; i < mng_ptr_->thread_num_; i++) { 
     std::string writer_file_name = output_file_name + "_" + str_util::toString(i);
-    PrsmXmlWriterSetPtr writer_set_ptr = std::make_shared<PrsmXmlWriterSet>(output_file_name, n_unknown_shift);
+    PrsmXmlWriterSetPtr writer_set_ptr = std::make_shared<PrsmXmlWriterSet>(writer_file_name, n_unknown_shift);
     writer_set_ptr_vec.push_back(writer_set_ptr);
   }
   SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(mng_ptr_->thread_num_);
