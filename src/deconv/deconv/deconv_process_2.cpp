@@ -147,7 +147,7 @@ void DeconvProcess2::processSpMissingLevelOne(DeconvOneSpPtr deconv_ptr, RawMsGr
       DeconvMsPtr ms_ptr = match_env_util::getDeconvMsPtr(header_ptr, result_envs);
       msalign_writer::write(ms2_msalign_of, ms_ptr);
       if (para_ptr_->output_match_env_) {
-        match_env_writer::write(file_util::basename(para_ptr_->getDataFileName()) + "_ms2.env", header_ptr, result_envs);
+        match_env_writer::write(file_util::basename(para_ptr_->getDataFileName()) + "_spectrum_" + std::to_string(header_ptr->getId()) + "_ms2.env", header_ptr, result_envs, peak_list);
       }
       count2++;
     }
@@ -171,12 +171,12 @@ void DeconvProcess2::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   DeconvMsPtr deconv_ms_ptr = match_env_util::getDeconvMsPtr(header_ptr, prec_envs);
   msalign_writer::write(ms1_msalign_of, deconv_ms_ptr);
   if (para_ptr_->output_match_env_) {
-    match_env_writer::write(file_util::basename(para_ptr_->getDataFileName()) + "_ms1.env", header_ptr, prec_envs);
+    match_env_writer::write(file_util::basename(para_ptr_->getDataFileName()) + "_ms1.env", header_ptr, prec_envs, peak_list);
   }
 }
 
 void DeconvProcess2::deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
-                                 std::ofstream &ms2_msalign_of) { 
+                                 std::ofstream &ms2_msalign_of, int i) { 
   PeakPtrVec peak_list = ms_ptr->getPeakPtrVec();
   LOG_DEBUG("peak list size " << peak_list.size());
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
@@ -193,7 +193,7 @@ void DeconvProcess2::deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   DeconvMsPtr deconv_ms_ptr = match_env_util::getDeconvMsPtr(header_ptr, result_envs);
   msalign_writer::write(ms2_msalign_of, deconv_ms_ptr);
   if (para_ptr_->output_match_env_) {
-    match_env_writer::write(file_util::basename(para_ptr_->getDataFileName()) + "_ms2.env", header_ptr, result_envs);
+    match_env_writer::write(file_util::basename(para_ptr_->getDataFileName()) + "_spectrum_" + std::to_string(header_ptr->getId()) + "_ms2.env", header_ptr, result_envs, peak_list);
   }
 }
 
@@ -221,7 +221,7 @@ void DeconvProcess2::processSp(DeconvOneSpPtr deconv_ptr, RawMsGroupReaderPtr re
     RawMsPtrVec ms_two_ptr_vec = ms_group_ptr->getMsTwoPtrVec();
     for (size_t i = 0; i < ms_two_ptr_vec.size(); i++) {
       RawMsPtr ms_two_ptr = ms_two_ptr_vec[i];
-      deconvMsTwo(ms_two_ptr, deconv_ptr, ms2_msalign_of);
+      deconvMsTwo(ms_two_ptr, deconv_ptr, ms2_msalign_of, i);
       count2++;
     }
     //auto proc_end = std::chrono::high_resolution_clock::now();

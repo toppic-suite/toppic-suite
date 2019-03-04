@@ -16,6 +16,8 @@
 #include <algorithm>
 #include <vector>
 #include <functional>
+#include <cmath>
+#include <numeric>
 
 #include "common/util/logger.hpp"
 #include "common/base/ptm.hpp"

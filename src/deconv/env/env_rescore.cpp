@@ -13,6 +13,7 @@
 //limitations under the License.
 
 #include <algorithm>
+#include <cmath>
 
 #include "common/base/mass_constant.hpp"
 #include "deconv/env/env_rescore.hpp"

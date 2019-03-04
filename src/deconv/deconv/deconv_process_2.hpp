@@ -48,7 +48,7 @@ class DeconvProcess2 {
                    MatchEnvPtrVec &prec_envs, std::ofstream &ms1_msalign_of); 
 
   void deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
-                   std::ofstream &ms2_msalign_of); 
+                   std::ofstream &ms2_msalign_of, int i); 
 };
 
 }

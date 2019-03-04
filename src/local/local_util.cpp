@@ -16,6 +16,7 @@
 #include <utility>
 #include <string>
 #include <vector>
+#include <numeric>
 
 
 #include "common/base/amino_acid_base.hpp"

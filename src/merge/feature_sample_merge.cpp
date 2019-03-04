@@ -14,6 +14,7 @@
 
 #include <iomanip>
 #include <algorithm>
+#include <cmath>
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"

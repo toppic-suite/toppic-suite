@@ -14,6 +14,7 @@
 
 #include <algorithm>
 #include <string>
+#include <cmath>
 
 #include "htslib/faidx.h"
 

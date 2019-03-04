@@ -13,6 +13,7 @@
 //limitations under the License.
 
 #include <algorithm>
+#include <cmath>
 
 #include "common/util/logger.hpp"
 #include "deconv/env/match_env.hpp"

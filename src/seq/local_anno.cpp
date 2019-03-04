@@ -16,6 +16,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <numeric>
 
 #include "common/util/str_util.hpp"
 #include "common/xml/xml_dom_util.hpp"
