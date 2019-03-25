@@ -52,6 +52,7 @@ int getSpNum(const std::string &spectrum_file_name) {
   return sp_num;
 }
 
+/*
 void mergeMsalignFiles(const std::vector<std::string> & spec_file_lst,
                        int N, const std::string & output_file) {
   std::ofstream outfile; 
@@ -78,6 +79,7 @@ void mergeMsalignFiles(const std::vector<std::string> & spec_file_lst,
 
   outfile.close();
 }
+*/
 
 } // namespace msalign_util
 
