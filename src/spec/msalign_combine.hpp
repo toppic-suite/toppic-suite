@@ -23,17 +23,15 @@ namespace toppic {
 
 class MsalignCombine {
  public:
-  MsalignCombine(const std::string &spec_file_name,
-                 const std::string &in_file_ext,
-                 int in_num,
-                 const std::string &out_file_ext);
+  MsalignCombine(const std::vector<std::string> &spec_file_names,
+                 const std::string &output_file_name);
 
   void process();
 
  private:
-  std::string spec_file_name_;
-  std::vector<std::string> input_file_exts_;
-  std::string output_file_ext_;
+  std::vector<std::string> spec_file_names_;
+  std::string output_file_name_;
+  int MAX_SPEC_NUM_PER_FILE = 100000;
 };
 
 typedef std::shared_ptr<MsalignCombine> MsalignCombinePtr;

@@ -24,35 +24,59 @@
 
 namespace toppic {
 
-MsalignCombine::MsalignCombine(const std::string &spec_file_name,
-                               const std::string &in_file_ext,
-                               int in_num,
-                               const std::string &out_file_ext):
-    spec_file_name_(spec_file_name),
-    output_file_ext_(out_file_ext) {
-      for (int i = 0; i < in_num; i ++) {
-        std::string ext = in_file_ext + "_" + str_util::toString(i);
-        input_file_exts_.push_back(ext);
-      }
+MsalignCombine::MsalignCombine(const std::vector<std::string> &spec_file_names,
+                               const std::string &output_file_name):
+    spec_file_names_(spec_file_names),
+    output_file_name_(output_file_name) {
     }
 
-inline int getCurMsIndex(DeconvMsPtrVec &ms_ptrs) {
-  int index = -1;
-  int scan_num = std::numeric_limits<int>::max();
-  for (size_t i = 0; i < ms_ptrs.size(); i++) {
-    if (ms_ptrs[i] != nullptr) {
-      if (ms_ptrs[i]->getMsHeaderPtr()->getFirstScanNum() < scan_num) {
-        scan_num = ms_ptrs[i]->getMsHeaderPtr()->getFirstScanNum();
-        index = i;
+void mergeMsAlignFiles(const std::vector<std::string> & spec_file_lst,
+                       int MAX_SPEC_NUM, const std::string & output_file) {
+  std::ofstream outfile; 
+  outfile.open(output_file.c_str());
+
+  for (size_t i = 0; i < spec_file_lst.size(); i++) {
+    MsAlignReader sp_reader(spec_file_lst[i], 1, nullptr, std::set<std::string>());
+    std::vector<std::string> ms_lines = sp_reader.readOneStrSpectrum();
+    while (ms_lines.size() > 0) {
+      for (size_t k = 0; k< ms_lines.size(); k++) {
+        if (ms_lines[k].substr(0, 3) == "ID=") {
+          outfile << "ID=" << (MAX_SPEC_NUM * i + std::stoi(ms_lines[k].substr(3))) << std::endl;
+        } else if (ms_lines[k].substr(0, 10) == "MS_ONE_ID=") {
+          outfile << "MS_ONE_ID=" << (MAX_SPEC_NUM * i + std::stoi(ms_lines[k].substr(10))) << std::endl;
+        } else {
+          outfile << ms_lines[k] << std::endl;
+        }
       }
+      outfile << std::endl;
+      ms_lines = sp_reader.readOneStrSpectrum();
     }
+    sp_reader.close();
   }
-  return index;
+
+  outfile.close();
 }
 
 void MsalignCombine::process() {
-  size_t input_num = input_file_exts_.size();
-  std::string base_name = file_util::basename(spec_file_name_);
+  std::vector<std::string> ms1_file_names;
+  std::vector<std::string> ms2_file_names;
+  for (size_t i = 0; i < spec_file_names_.size(); i++) { 
+    std::string base_name = file_util::basename(spec_file_names_[i]);
+    std::string ms1_name = base_name + "_ms1.msalign";
+    ms1_file_names.push_back(ms1_name);
+    std::string ms2_name = base_name + "_ms2.msalign";
+    ms2_file_names.push_back(ms2_name);
+  }
+  
+  std::string ms1_output_name = output_file_name_ + "_ms1.msalign";
+  std::string ms2_output_name = output_file_name_ + "_ms2.msalign";
+
+  mergeMsAlignFiles(ms1_file_names, MAX_SPEC_NUM_PER_FILE, ms1_output_name); 
+  mergeMsAlignFiles(ms2_file_names, MAX_SPEC_NUM_PER_FILE, ms2_output_name); 
+}
+
+/*
+
   // open files
   MsAlignReaderPtrVec reader_ptrs;
   DeconvMsPtrVec ms_ptrs;
@@ -96,5 +120,22 @@ void MsalignCombine::process() {
   }
   out_stream.close();
 }
+*/
+
+/*
+inline int getCurMsIndex(DeconvMsPtrVec &ms_ptrs) {
+  int index = -1;
+  int scan_num = std::numeric_limits<int>::max();
+  for (size_t i = 0; i < ms_ptrs.size(); i++) {
+    if (ms_ptrs[i] != nullptr) {
+      if (ms_ptrs[i]->getMsHeaderPtr()->getFirstScanNum() < scan_num) {
+        scan_num = ms_ptrs[i]->getMsHeaderPtr()->getFirstScanNum();
+        index = i;
+      }
+    }
+  }
+  return index;
+}
+*/
 
 } /* namespace toppic */

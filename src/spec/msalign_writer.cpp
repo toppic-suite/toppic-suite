@@ -26,6 +26,7 @@ void write(std::ofstream &file, DeconvMsPtr ms_ptr) {
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
   file << std::fixed;
   file << "BEGIN IONS" << std::endl;
+  file << "FILE_NAME=" << header_ptr->getFileName() << std::endl;
   file << "ID=" << header_ptr->getId() << std::endl;
   file << "SCANS=" << header_ptr->getScansString() << std::endl;
   file << "RETENTION_TIME=" << std::setprecision(2)
