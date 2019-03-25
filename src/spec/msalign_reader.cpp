@@ -81,6 +81,7 @@ void MsAlignReader::readNext() {
     input_.close();
     return;
   }
+  std::string ms_file_name = "";
   int id = -1;
   int prec_id = 0;
   std::string scans;
@@ -105,7 +106,9 @@ void MsAlignReader::readNext() {
         id = std::stoi(strs[1]);
       }
 
-      if (strs[0] == "PRECURSOR_ID") {
+      if (strs[0] == "FILE_NAME") {
+        ms_file_name = strs[1];
+      } else if (strs[0] == "PRECURSOR_ID") {
         prec_id = std::stoi(strs[1]);
       } else if (strs[0] == "SCANS") {
         scans = strs[1];
@@ -140,7 +143,7 @@ void MsAlignReader::readNext() {
   }
 
   MsHeaderPtr header_ptr = std::make_shared<MsHeader>();
-  header_ptr->setFileName(file_name_);
+  header_ptr->setFileName(ms_file_name);
   header_ptr->setId(id);
   header_ptr->setPrecId(prec_id);
 
