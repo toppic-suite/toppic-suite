@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_SPEC_MSALIGN_COMBINE_HPP_
-#define TOPPIC_SPEC_MSALIGN_COMBINE_HPP_
+#ifndef TOPPIC_SPEC_MSALIGN_FRAC_COMBINE_HPP_
+#define TOPPIC_SPEC_MSALIGN_FRAC_COMBINE_HPP_
 
 #include <memory>
 #include <vector>
@@ -21,10 +21,10 @@
 
 namespace toppic {
 
-class MsalignCombine {
+class MsalignFracCombine {
  public:
-  MsalignCombine(const std::vector<std::string> &spec_file_names,
-                 const std::string &output_file_name);
+  MsalignFracCombine(const std::vector<std::string> &spec_file_names,
+                     const std::string &output_file_name);
 
   void process();
 
