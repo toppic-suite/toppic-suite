@@ -31,10 +31,10 @@ class MsalignFracCombine {
  private:
   std::vector<std::string> spec_file_names_;
   std::string output_file_name_;
-  int MAX_SPEC_NUM_PER_FILE = 100000;
+  int MAX_SPEC_NUM_PER_FILE = 1000000;
 };
 
-typedef std::shared_ptr<MsalignCombine> MsalignCombinePtr;
+typedef std::shared_ptr<MsalignFracCombine> MsalignFracCombinePtr;
 } /* namespace toppic */
 
 #endif
