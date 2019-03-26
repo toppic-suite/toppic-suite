@@ -17,6 +17,7 @@
 
 #include "common/util/file_util.hpp"
 #include "common/util/str_util.hpp"
+#include "spec/msalign_frac_combine.hpp"
 #include "console/topfd_argument.hpp"
 #include "console/topfd_process.hpp"
 
@@ -48,5 +49,9 @@ int main(int argc, char* argv[]) {
     }
   }
 
+  if (spec_file_lst.size() > 1) {
+    toppic::MsalignFracCombine msalign_combine(spec_file_lst, "spectrum_combined");
+    msalign_combine.process();
+  }
   return 0;
 }
