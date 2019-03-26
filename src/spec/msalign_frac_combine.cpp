@@ -20,12 +20,13 @@
 #include "common/util/str_util.hpp"
 #include "spec/msalign_reader.hpp"
 #include "spec/msalign_writer.hpp"
-#include "spec/msalign_combine.hpp"
+#include "spec/msalign_frac_combine.hpp"
 
 namespace toppic {
 
-MsalignCombine::MsalignCombine(const std::vector<std::string> &spec_file_names,
-                               const std::string &output_file_name):
+MsalignFracCombine::MsalignFracCombine(
+    const std::vector<std::string> &spec_file_names,
+    const std::string &output_file_name):
     spec_file_names_(spec_file_names),
     output_file_name_(output_file_name) {
     }
@@ -41,9 +42,11 @@ void mergeMsAlignFiles(const std::vector<std::string> & spec_file_lst,
     while (ms_lines.size() > 0) {
       for (size_t k = 0; k< ms_lines.size(); k++) {
         if (ms_lines[k].substr(0, 3) == "ID=") {
-          outfile << "ID=" << (MAX_SPEC_NUM * i + std::stoi(ms_lines[k].substr(3))) << std::endl;
+          outfile << "ID=" << (MAX_SPEC_NUM * i + std::stoi(ms_lines[k].substr(3))) 
+              << std::endl;
         } else if (ms_lines[k].substr(0, 10) == "MS_ONE_ID=") {
-          outfile << "MS_ONE_ID=" << (MAX_SPEC_NUM * i + std::stoi(ms_lines[k].substr(10))) << std::endl;
+          outfile << "MS_ONE_ID=" 
+              << (MAX_SPEC_NUM * i + std::stoi(ms_lines[k].substr(10))) << std::endl;
         } else {
           outfile << ms_lines[k] << std::endl;
         }
