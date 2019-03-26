@@ -60,7 +60,7 @@ void mergeMsAlignFiles(const std::vector<std::string> & spec_file_lst,
   outfile.close();
 }
 
-void MsalignCombine::process() {
+void MsalignFracCombine::process() {
   std::vector<std::string> ms1_file_names;
   std::vector<std::string> ms2_file_names;
   for (size_t i = 0; i < spec_file_names_.size(); i++) { 
