@@ -48,8 +48,9 @@ void MsAlignWriter::write(DeconvMsPtr ms_ptr) {
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
   output_ << std::fixed;
   output_ << "BEGIN IONS" << std::endl;
-  output_ << "FILE_NAME=" << header_ptr->getFileName() << std::endl;
   output_ << "ID=" << header_ptr->getId() << std::endl;
+  output_ << "FRACTION_ID=" << header_ptr->getFractionId() << std::endl;
+  output_ << "FILE_NAME=" << header_ptr->getFileName() << std::endl;
   output_ << "SCANS=" << header_ptr->getScansString() << std::endl;
   output_ << "RETENTION_TIME=" << std::setprecision(2)
       << header_ptr->getRetentionTime() << std::endl;

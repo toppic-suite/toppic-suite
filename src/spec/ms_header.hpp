@@ -50,9 +50,11 @@ class MsHeader {
 
   double getFeatureInte() {return feature_inte_;}
 
-  std::string getFileName() {return file_name_;}
-
   int getId() {return id_;}
+
+  int getFractionId() {return fraction_id_;}
+
+  std::string getFileName() {return file_name_;}
 
   int getMsLevel() {return level_;}
 
@@ -84,6 +86,8 @@ class MsHeader {
   void setFileName(const std::string &file_name) {file_name_ = file_name;}
 
   void setId(int id) {id_ = id;}
+
+  void setFractionId(int fraction_id) {fraction_id_ = fraction_id;}
 
   void setTitle(const std::string &title) {title_ = title;}
 
@@ -124,14 +128,18 @@ class MsHeader {
   static bool cmpPrecInteDec(const MsHeaderPtr &a, const MsHeaderPtr &b);
 
  private:
-  // data set name 
-  std::string file_name_;
-  // A data set may contain several spectra with the same id, but different
-  // precursor id 
   int id_ = -1;
+
+  // a data set may have multiple fractions
+  int fraction_id_ = -1;
+
+  // mass spec data file name 
+  std::string file_name_;
+
   // one spectrum may have several possible precursor mass */
+  // precursor id 
   int prec_id_ = -1;
-  
+
   std::string title_;
   // a list of scans for merged spectra 
   std::vector<int> scans_;
