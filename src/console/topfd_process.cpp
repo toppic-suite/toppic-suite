@@ -32,7 +32,7 @@ int TopFDProcess(std::map<std::string, std::string> arguments) {
     LOG_DEBUG("init process");
     process.process();
 
-    std::string argu_str = DeconvProcess2::getParameterStr(para_ptr, "#");
+    std::string argu_str = para_ptr->getParameterStr("#");
     std::string sp_file_name = para_ptr->getDataFileName();
     feature_detect_3::process(sp_file_name, para_ptr->missing_level_one_,
                               argu_str);

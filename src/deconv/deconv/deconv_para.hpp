@@ -30,6 +30,12 @@ class DeconvPara {
 
   std::string getDataFileName() {return data_file_name_;}
 
+  int getFractionId() {return fraction_id_;}
+
+  std::string getParameterStr(const std::string & prefix);
+
+  int fraction_id_;
+
   std::string data_file_name_;
 
   std::string resource_dir_;

@@ -36,8 +36,6 @@ class DeconvProcess2 {
   void processSpMissingLevelOne(DeconvOneSpPtr deconv_ptr, RawMsGroupReaderPtr reader_ptr, 
                                 MsAlignWriterPtr ms2_writer_ptr);
 
-  static std::string getParameterStr(DeconvParaPtr para_ptr, const std::string & prefix = "");
-
  private:
   DeconvParaPtr para_ptr_;
 
