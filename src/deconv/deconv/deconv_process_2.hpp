@@ -16,6 +16,7 @@
 #ifndef TOPPIC_DECONV_DECONV_DECONV_PROCESS_2_HPP_
 #define TOPPIC_DECONV_DECONV_DECONV_PROCESS_2_HPP_
 
+#include "spec/msalign_writer.hpp"
 #include "deconv/msreader/raw_ms_group_reader.hpp"
 #include "deconv/env/env_para.hpp"
 #include "deconv/deconv/deconv_para.hpp"
@@ -30,10 +31,10 @@ class DeconvProcess2 {
   void process();
 
   void processSp(DeconvOneSpPtr deconv_ptr, RawMsGroupReaderPtr reader_ptr, 
-                 std::ofstream & ms1_msalign_of, std::ofstream & ms2_msalign_of);
+                 MsAlignWriterPtr ms1_writer_ptr, MsAlignWriterPtr ms2_writer_ptr);
 
   void processSpMissingLevelOne(DeconvOneSpPtr deconv_ptr, RawMsGroupReaderPtr reader_ptr, 
-                                std::ofstream & ms2_msalign_of);
+                                MsAlignWriterPtr ms2_writer_ptr);
 
   static std::string getParameterStr(DeconvParaPtr para_ptr, const std::string & prefix = "");
 
@@ -45,10 +46,10 @@ class DeconvProcess2 {
   std::string updateMsg(MsHeaderPtr header_ptr, int scan, int total_scan_num);
 
   void deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
-                   MatchEnvPtrVec &prec_envs, std::ofstream &ms1_msalign_of); 
+                   MatchEnvPtrVec &prec_envs, MsAlignWriterPtr ms1_writer_ptr); 
 
   void deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
-                   std::ofstream &ms2_msalign_of); 
+                   MsAlignWriterPtr ms2_writer_ptr); 
 };
 
 }

@@ -29,6 +29,8 @@ class MsAlignReader {
  public:
   MsAlignReader(const std::string &file_name);
 
+  ~MsAlignReader();
+
   MsAlignReader(const std::string &file_name, int group_spec_num,
                 ActivationPtr act_ptr, const std::set<std::string> skip_list,
                 int peak_num_limit = std::numeric_limits<int>::max());

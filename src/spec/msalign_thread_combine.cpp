@@ -67,8 +67,7 @@ void MsalignThreadCombine::process() {
   }
 
   std::string output_filename = base_name + "." + output_file_ext_;
-  std::ofstream out_stream; 
-  out_stream.open(output_filename.c_str());
+  MsAlignWriterPtr writer = std::make_shared<MsAlignWriter>(output_filename); 
 
   // combine
   int spec_id = 0;
@@ -85,7 +84,7 @@ void MsalignThreadCombine::process() {
       DeconvMsPtr cur_ms_ptr = ms_ptrs[cur_ms_idx];
       cur_ms_ptr->getMsHeaderPtr()->setId(spec_id);
       spec_id++;
-      msalign_writer::write(out_stream, cur_ms_ptr);
+      writer->write(cur_ms_ptr);
       ms_ptrs[cur_ms_idx] = reader_ptrs[cur_ms_idx]->getNextMs();
     }
   }
@@ -94,7 +93,7 @@ void MsalignThreadCombine::process() {
   for (size_t i = 0; i < input_num; i++) {
     reader_ptrs[i]->close();
   }
-  out_stream.close();
+  writer->close();
 }
 
 } /* namespace toppic */

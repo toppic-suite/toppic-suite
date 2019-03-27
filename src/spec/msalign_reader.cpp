@@ -35,6 +35,12 @@ MsAlignReader::MsAlignReader(const std::string &file_name):
       activation_ptr_ = nullptr;
       peak_num_limit_ = std::numeric_limits<int>::max();
     }
+
+MsAlignReader::~MsAlignReader() {
+  if (input_.is_open()) {
+    input_.close();
+  }
+}
       
 MsAlignReader::MsAlignReader(const std::string &file_name, int group_spec_num,
                              ActivationPtr act_ptr, const std::set<std::string> skip_list,
