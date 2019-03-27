@@ -89,6 +89,7 @@ void MsAlignReader::readNext() {
   }
   std::string ms_file_name = "";
   int id = -1;
+  int fraction_id = -1;
   int prec_id = 0;
   std::string scans;
   double retention_time = -1;
@@ -110,9 +111,9 @@ void MsAlignReader::readNext() {
       strs = str_util::split(spectrum_str_vec_[i], "=");
       if (strs[0] == "ID") {
         id = std::stoi(strs[1]);
-      }
-
-      if (strs[0] == "FILE_NAME") {
+      } else if (strs[0] == "FRACTION_ID") {
+        fraction_id = std::stoi(strs[1]);
+      } else if (strs[0] == "FILE_NAME") {
         ms_file_name = strs[1];
       } else if (strs[0] == "PRECURSOR_ID") {
         prec_id = std::stoi(strs[1]);
@@ -149,6 +150,7 @@ void MsAlignReader::readNext() {
   }
 
   MsHeaderPtr header_ptr = std::make_shared<MsHeader>();
+  header_ptr->setFractionId(fraction_id);
   header_ptr->setFileName(ms_file_name);
   header_ptr->setId(id);
   header_ptr->setPrecId(prec_id);
