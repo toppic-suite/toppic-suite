@@ -17,6 +17,7 @@
 
 #include "common/util/file_util.hpp"
 #include "common/util/str_util.hpp"
+#include "common/util/time_util.hpp"
 #include "spec/msalign_frac_combine.hpp"
 #include "console/topfd_argument.hpp"
 #include "console/topfd_process.hpp"
@@ -51,8 +52,11 @@ int main(int argc, char* argv[]) {
   }
 
   if (spec_file_lst.size() > 1) {
+    std::string para_str = "";
+    //std::string para_str = para_ptr->getParameterStr("#");
+    //toppic::time_util::addTimeStamp(para_str);
     toppic::MsAlignFracCombine msalign_combine(spec_file_lst, "spectrum_combined");
-    msalign_combine.process();
+    msalign_combine.process(para_str);
   }
   return 0;
 }

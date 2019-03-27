@@ -33,10 +33,12 @@ MsAlignFracCombine::MsAlignFracCombine(
     output_file_name_(output_file_name) {
     }
 
-void MsAlignFracCombine::mergeFiles(const std::vector<std::string> & spec_file_lst,
-                                    const std::string & output_file) {
+void MsAlignFracCombine::mergeFiles(const std::vector<std::string> &spec_file_lst,
+                                    const std::string &output_file, 
+                                    const std::string &para_str) {
   std::ofstream outfile; 
-  outfile.open(output_file.c_str());
+  outfile.open(output_file);
+  outfile << para_str;
 
   for (size_t i = 0; i < spec_file_lst.size(); i++) {
     MsAlignReader sp_reader(spec_file_lst[i], 1, nullptr, std::set<std::string>());
@@ -62,7 +64,7 @@ void MsAlignFracCombine::mergeFiles(const std::vector<std::string> & spec_file_l
   outfile.close();
 }
 
-void MsAlignFracCombine::process() {
+void MsAlignFracCombine::process(std::string &para_str) {
   std::vector<std::string> ms1_file_names;
   std::vector<std::string> ms2_file_names;
   for (size_t i = 0; i < spec_file_names_.size(); i++) { 
@@ -76,71 +78,8 @@ void MsAlignFracCombine::process() {
   std::string ms1_output_name = output_file_name_ + "_ms1.msalign";
   std::string ms2_output_name = output_file_name_ + "_ms2.msalign";
 
-  mergeFiles(ms1_file_names, ms1_output_name); 
-  mergeFiles(ms2_file_names, ms2_output_name); 
+  mergeFiles(ms1_file_names, ms1_output_name, para_str); 
+  mergeFiles(ms2_file_names, ms2_output_name, para_str); 
 }
-
-/*
-
-  // open files
-  MsAlignReaderPtrVec reader_ptrs;
-  DeconvMsPtrVec ms_ptrs;
-  for (size_t i = 0; i < input_num; i++) {
-    std::string input_file_name = base_name + "." + input_file_exts_[i];
-    MsAlignReaderPtr reader_ptr
-        = std::make_shared<MsAlignReader>(input_file_name);
-    LOG_DEBUG("input file name " << input_file_name);
-    DeconvMsPtr ms_ptr = reader_ptr->getNextMs();
-    reader_ptrs.push_back(reader_ptr);
-    ms_ptrs.push_back(ms_ptr);
-  }
-
-  std::string output_filename = base_name + "." + output_file_ext_;
-  std::ofstream out_stream; 
-  out_stream.open(output_filename.c_str());
-
-  // combine
-  int spec_id = 0;
-  bool finish = false;
-  while (!finish) {
-    // LOG_DEBUG("spec id " << spec_id << " input num " << input_num);
-    finish = true;
-    int cur_ms_idx = getCurMsIndex(ms_ptrs);
-    if (cur_ms_idx < 0) {
-      finish = true;
-      break;
-    }
-    else { 
-      DeconvMsPtr cur_ms_ptr = ms_ptrs[cur_ms_idx];
-      cur_ms_ptr->getMsHeaderPtr()->setId(spec_id);
-      spec_id++;
-      msalign_writer::write(out_stream, cur_ms_ptr);
-      ms_ptrs[cur_ms_idx] = reader_ptrs[cur_ms_idx]->getNextMs();
-    }
-  }
-
-  // close files
-  for (size_t i = 0; i < input_num; i++) {
-    reader_ptrs[i]->close();
-  }
-  out_stream.close();
-}
-*/
-
-/*
-inline int getCurMsIndex(DeconvMsPtrVec &ms_ptrs) {
-  int index = -1;
-  int scan_num = std::numeric_limits<int>::max();
-  for (size_t i = 0; i < ms_ptrs.size(); i++) {
-    if (ms_ptrs[i] != nullptr) {
-      if (ms_ptrs[i]->getMsHeaderPtr()->getFirstScanNum() < scan_num) {
-        scan_num = ms_ptrs[i]->getMsHeaderPtr()->getFirstScanNum();
-        index = i;
-      }
-    }
-  }
-  return index;
-}
-*/
 
 } /* namespace toppic */
