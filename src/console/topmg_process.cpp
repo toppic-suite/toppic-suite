@@ -25,6 +25,7 @@
 #include "seq/fasta_util.hpp"
 
 #include "spec/msalign_reader.hpp"
+#include "spec/msalign_frac_combine.hpp"
 #include "spec/msalign_util.hpp"
 #include "spec/feature_util.hpp"
 
@@ -413,10 +414,10 @@ int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
 
   if (spec_file_lst.size() > 1 && arguments["combinedOutputName"] != "") {
     std::cout << "Merging files - started." << std::endl;
-    int N = 1000000;
     // merge msalign files
-    toppic::msalign_util::mergeMsalignFiles(spec_file_lst, N, base_name + "_ms2.msalign");
+    toppic::MsAlignFracCombine::mergeFiles(spec_file_lst, base_name + "_ms2.msalign");
     // merge feature files
+    int N = 1000000;
     std::vector<std::string> feature_file_lst(spec_file_lst.size());
     for (size_t i = 0; i < spec_file_lst.size(); i++) {
       std::string sp_file_name = spec_file_lst[i];

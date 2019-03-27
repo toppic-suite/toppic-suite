@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
   }
 
   if (spec_file_lst.size() > 1) {
-    toppic::MsalignFracCombine msalign_combine(spec_file_lst, "spectrum_combined");
+    toppic::MsAlignFracCombine msalign_combine(spec_file_lst, "spectrum_combined");
     msalign_combine.process();
   }
   return 0;
