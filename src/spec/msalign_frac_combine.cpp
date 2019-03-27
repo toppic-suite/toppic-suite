@@ -24,15 +24,17 @@
 
 namespace toppic {
 
-MsalignFracCombine::MsalignFracCombine(
+int MsAlignFracCombine::MAX_SPEC_NUM_PER_FILE = 1000000;
+
+MsAlignFracCombine::MsAlignFracCombine(
     const std::vector<std::string> &spec_file_names,
     const std::string &output_file_name):
     spec_file_names_(spec_file_names),
     output_file_name_(output_file_name) {
     }
 
-void mergeMsAlignFiles(const std::vector<std::string> & spec_file_lst,
-                       int MAX_SPEC_NUM, const std::string & output_file) {
+void MsAlignFracCombine::mergeFiles(const std::vector<std::string> & spec_file_lst,
+                                    const std::string & output_file) {
   std::ofstream outfile; 
   outfile.open(output_file.c_str());
 
@@ -42,11 +44,11 @@ void mergeMsAlignFiles(const std::vector<std::string> & spec_file_lst,
     while (ms_lines.size() > 0) {
       for (size_t k = 0; k< ms_lines.size(); k++) {
         if (ms_lines[k].substr(0, 3) == "ID=") {
-          outfile << "ID=" << (MAX_SPEC_NUM * i + std::stoi(ms_lines[k].substr(3))) 
+          outfile << "ID=" << (MAX_SPEC_NUM_PER_FILE * i + std::stoi(ms_lines[k].substr(3))) 
               << std::endl;
         } else if (ms_lines[k].substr(0, 10) == "MS_ONE_ID=") {
           outfile << "MS_ONE_ID=" 
-              << (MAX_SPEC_NUM * i + std::stoi(ms_lines[k].substr(10))) << std::endl;
+              << (MAX_SPEC_NUM_PER_FILE * i + std::stoi(ms_lines[k].substr(10))) << std::endl;
         } else {
           outfile << ms_lines[k] << std::endl;
         }
@@ -60,7 +62,7 @@ void mergeMsAlignFiles(const std::vector<std::string> & spec_file_lst,
   outfile.close();
 }
 
-void MsalignFracCombine::process() {
+void MsAlignFracCombine::process() {
   std::vector<std::string> ms1_file_names;
   std::vector<std::string> ms2_file_names;
   for (size_t i = 0; i < spec_file_names_.size(); i++) { 
@@ -74,8 +76,8 @@ void MsalignFracCombine::process() {
   std::string ms1_output_name = output_file_name_ + "_ms1.msalign";
   std::string ms2_output_name = output_file_name_ + "_ms2.msalign";
 
-  mergeMsAlignFiles(ms1_file_names, MAX_SPEC_NUM_PER_FILE, ms1_output_name); 
-  mergeMsAlignFiles(ms2_file_names, MAX_SPEC_NUM_PER_FILE, ms2_output_name); 
+  mergeFiles(ms1_file_names, ms1_output_name); 
+  mergeFiles(ms2_file_names, ms2_output_name); 
 }
 
 /*

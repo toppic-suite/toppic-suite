@@ -21,20 +21,23 @@
 
 namespace toppic {
 
-class MsalignFracCombine {
+class MsAlignFracCombine {
  public:
-  MsalignFracCombine(const std::vector<std::string> &spec_file_names,
+  MsAlignFracCombine(const std::vector<std::string> &spec_file_names,
                      const std::string &output_file_name);
 
   void process();
 
+  static void mergeFiles(const std::vector<std::string> & spec_file_lst,
+                         const std::string & output_file);
+
  private:
   std::vector<std::string> spec_file_names_;
   std::string output_file_name_;
-  int MAX_SPEC_NUM_PER_FILE = 1000000;
-};
+  static int MAX_SPEC_NUM_PER_FILE;
+  };
 
-typedef std::shared_ptr<MsalignFracCombine> MsalignFracCombinePtr;
+typedef std::shared_ptr<MsAlignFracCombine> MsAlignFracCombinePtr;
 } /* namespace toppic */
 
 #endif
