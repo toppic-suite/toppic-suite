@@ -27,7 +27,6 @@ Argument::Argument() {
 void Argument::initArguments() {
   arguments_["executiveDir"] = "";
   arguments_["resourceDir"] = "";
-  arguments_["spectrumFileName"] = "";
   arguments_["refinePrecMass"]="true";
   arguments_["missingLevelOne"] = "false";
   arguments_["maxCharge"] = "30";

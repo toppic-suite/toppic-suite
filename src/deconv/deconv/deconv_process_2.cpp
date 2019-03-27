@@ -37,34 +37,6 @@ void DeconvProcess2::copyParameters(EnvParaPtr env_para_ptr) {
   env_para_ptr->do_final_filtering_ = para_ptr_->do_final_filtering_;
 }
 
-std::string DeconvProcess2::getParameterStr(DeconvParaPtr para_ptr, const std::string & prefix) {
-  std::stringstream output;
-  output << prefix << "TopFD " << version_number << std::endl;
-  // TIME_STAMP_STR is replaced later
-  output << prefix << "Timestamp: " << time_util::TIME_STAMP_STR << std::endl;
-  output << prefix << "********************** Parameters **********************" << std::endl;
-  output << prefix << std::setw(40) << std::left 
-      << "Input file: " << para_ptr->data_file_name_ << std::endl;
-  output << prefix << std::setw(40) << std::left 
-      << "Data type: " << "centroid" << std::endl;
-  output << prefix << std::setw(40) << std::left 
-      << "Maximum charge: " << para_ptr->max_charge_ << std::endl;
-  output << prefix << std::setw(40) << std::left 
-      << "Maximum monoisotopic mass: " << para_ptr->max_mass_ << " Dalton" << std::endl;
-  output << prefix << std::setw(40) << std::left 
-      << "Error tolerance: " << para_ptr->tolerance_ << " m/z" << std::endl;
-  output << prefix << std::setw(40) << std::left 
-      << "MS1 signal/noise ratio: " << para_ptr->ms_one_sn_ratio_ << std::endl;
-  output << prefix << std::setw(40) << std::left 
-      << "MS/MS signal/noise ratio: " << para_ptr->ms_two_sn_ratio_ << std::endl;
-  output << prefix << std::setw(40) << std::left 
-      << "Precursor window size: " << para_ptr->prec_window_ << " m/z" << std::endl;
-  //output << prefix << std::setw(40) << std::left 
-  //    << "Do final filtering: " << para_ptr->do_final_filtering_ << std::endl;
-  output << prefix << "********************** Parameters **********************" << std::endl;
-  return output.str();
-}
-
 std::string DeconvProcess2::updateMsg(MsHeaderPtr header_ptr, int scan, int total_scan_num) {
   std::string percentage = str_util::toString(scan * 100 / total_scan_num);
   std::string msg = "Processing spectrum " + header_ptr->getTitle() + "...";
@@ -80,7 +52,7 @@ void DeconvProcess2::process() {
   EnvParaPtr env_para_ptr = std::make_shared<EnvPara>();
   DpParaPtr dp_para_ptr = std::make_shared<DpPara>();
   copyParameters(env_para_ptr);
-  std::string para_str = getParameterStr(para_ptr_);
+  std::string para_str = para_ptr_->getParameterStr("");
   time_util::addTimeStamp(para_str);
   std::cout << para_str;
 
@@ -100,14 +72,15 @@ void DeconvProcess2::process() {
 
   MsAlignWriterPtr ms1_writer_ptr = std::make_shared<MsAlignWriter>(ms1_msalign_name);
   MsAlignWriterPtr ms2_writer_ptr = std::make_shared<MsAlignWriter>(ms2_msalign_name);
-  para_str = getParameterStr(para_ptr_, "#");
+  para_str = para_ptr_->getParameterStr("#");
   time_util::addTimeStamp(para_str);
   ms1_writer_ptr->writePara(para_str);
   ms2_writer_ptr->writePara(para_str);
 
   DeconvOneSpPtr deconv_ptr = std::make_shared<DeconvOneSp>(env_para_ptr, dp_para_ptr);
 
-  RawMsGroupReaderPtr reader_ptr = std::make_shared<RawMsGroupReader>(file_name, para_ptr_->missing_level_one_);
+  RawMsGroupReaderPtr reader_ptr = std::make_shared<RawMsGroupReader>(file_name, para_ptr_->missing_level_one_,
+                                                                      para_ptr_->fraction_id_);
   if (para_ptr_->missing_level_one_) {
     processSpMissingLevelOne(deconv_ptr, reader_ptr, ms2_writer_ptr);
   }

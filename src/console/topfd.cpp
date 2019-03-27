@@ -43,6 +43,7 @@ int main(int argc, char* argv[]) {
         || toppic::str_util::endsWith(spec_file_lst[k], "mzml")
         || toppic::str_util::endsWith(spec_file_lst[k], "mzxml")) {
       arguments["spectrumFileName"] = spec_file_lst[k];
+      arguments["fractionId"] = std::to_string(k);
       if (toppic::TopFDProcess(arguments) != 0) {
         return 1;
       }
