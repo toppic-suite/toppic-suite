@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef PROT_FEATURE_MSALIGN_WRITER_HPP_
-#define PROT_FEATURE_MSALIGN_WRITER_HPP_
+#ifndef PROT_SPEC_MSALIGN_WRITER_HPP_
+#define PROT_SPEC_MSALIGN_WRITER_HPP_
 
 #include <fstream>
 
@@ -21,11 +21,27 @@
 
 namespace toppic {
 
-namespace msalign_writer {
+class MsAlignWriter {
+ public:
+  MsAlignWriter(const std::string &file_name);
 
-void write(std::ofstream &file, DeconvMsPtr ms_ptr);
+  ~MsAlignWriter();
 
-}  // namespace msalign_writer
+  void write(DeconvMsPtr ms_ptr);
+
+  void writePara(const std::string &para_str);
+
+  void close();
+
+ private:
+  std::string file_name_;
+  std::ofstream output_;
+
+};
+
+typedef std::shared_ptr<MsAlignWriter> MsAlignWriterPtr;
+typedef std::vector<MsAlignWriterPtr>  MsAlignWriterPtrVec;
 
 }  // namespace toppic
+
 #endif
