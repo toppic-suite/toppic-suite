@@ -35,6 +35,7 @@ void jsonConvert(const std::string &xml_file_name,
 
   const auto json_str = xml2json( oss.str().data() );
   std::ofstream output(json_file_name);
+  output << "prsm_data =" << std::endl;
   output << json_str << std::endl;
   output.close();
 }
@@ -44,15 +45,15 @@ void jsonTranslate(std::map<std::string, std::string> &arguments,
                    const std::string &fname_suffix) {
   std::string spectrum_file_name_ = arguments["spectrumFileName"];
   std::string xml_dir = file_util::basename(spectrum_file_name_) + "_" + fname_suffix + "_xml";
-  std::string html_dir = file_util::basename(spectrum_file_name_) + "_" + fname_suffix + "_json";
+  std::string html_dir = file_util::basename(spectrum_file_name_) + "_" + fname_suffix + "_html";
   std::string resource_dir = arguments["resourceDir"];
 
   file_util::createFolder(html_dir + file_util::getFileSeparator() +"proteoforms");
   file_util::createFolder(html_dir + file_util::getFileSeparator() +"prsms");
   file_util::createFolder(html_dir + file_util::getFileSeparator() +"proteins");
-  std::string from_path(resource_dir + file_util::getFileSeparator() + "web");
-  std::string to_path(html_dir + file_util::getFileSeparator() + "resources");
-  file_util::copyDir(from_path, to_path);
+  //std::string from_path(resource_dir + file_util::getFileSeparator() + "web");
+  //std::string to_path(html_dir + file_util::getFileSeparator() + "resources");
+  //file_util::copyDir(from_path, to_path);
 
   std::string xml_file_list = xml_dir + file_util::getFileSeparator() + "files.xml";
   std::vector<std::vector<std::string>> anno_view = readViewXmlFiles(xml_file_list);
@@ -60,7 +61,8 @@ void jsonTranslate(std::map<std::string, std::string> &arguments,
   for (size_t i = 0; i < anno_view.size(); i++) {
     std::cout << "Converting xml files to html files - processing " << i + 1 << " of " << anno_view.size() << " files.\r";
     std::string xml_file_name = anno_view[i][0];
-    std::string json_file_name = anno_view[i][2];
+    std::string html_file_name = anno_view[i][2];
+    std::string json_file_name = html_file_name.substr(0, html_file_name.length()-4) + "js";
 
     LOG_DEBUG("xml in " << xml_file_name << " json out " << json_file_name);
 
