@@ -264,7 +264,7 @@ std::string xml2json(const char *xml_str)
     }
 
     rapidjson::StringBuffer buffer;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
     js_doc.Accept(writer);
     delete xml_doc;
     return buffer.GetString();
