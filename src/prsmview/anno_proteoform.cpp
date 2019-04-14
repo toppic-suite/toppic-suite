@@ -314,4 +314,66 @@ xercesc::DOMElement* geneAnnoProteoform(XmlDOMDocument* xml_doc,
   return prot_element;
 }
 
+xercesc::DOMElement* geneAnnoProteoform2(XmlDOMDocument* xml_doc,
+                                         PrsmPtr prsm_ptr,
+                                         PrsmViewMngPtr mng_ptr) {
+  ProteoformPtr proteoform_ptr = prsm_ptr->getProteoformPtr();
+  xercesc::DOMElement* prot_element = xml_doc->createElement("annotated_protein");
+  addSummary(xml_doc, prot_element, proteoform_ptr, mng_ptr);
+  xercesc::DOMElement* anno_element = xml_doc->createElement("annotation");
+  prot_element->appendChild(anno_element);
+  addAnnoHeader(xml_doc, anno_element, proteoform_ptr);
+
+  AnnoCleavagePtrVec cleavage_ptrs = getProteoCleavage(prsm_ptr, mng_ptr->min_mass_);
+
+  // obtain residue_ptrs
+  AnnoResiduePtrVec res_ptrs = getAnnoResidues(proteoform_ptr, mng_ptr);
+
+  addTruncationAnno(proteoform_ptr, cleavage_ptrs, res_ptrs);
+
+  AnnoPtmPtrVec anno_ptm_ptrs;
+
+  MassShiftPtrVec shift_ptrs = proteoform_ptr->getMassShiftPtrVec(MassShiftType::FIXED);
+  addKnownPtms(proteoform_ptr, shift_ptrs, anno_ptm_ptrs, res_ptrs);
+
+  shift_ptrs = proteoform_ptr->getMassShiftPtrVec(MassShiftType::PROTEIN_VARIABLE);
+  addKnownPtms(proteoform_ptr, shift_ptrs, anno_ptm_ptrs, res_ptrs);
+
+  /*
+  MassShiftPtrVec var_shift_ptrs = proteoform_ptr->getMassShiftPtrVec(MassShiftType::VARIABLE);
+
+  shift_ptrs = proteoform_ptr->getMassShiftPtrVec(MassShiftType::UNEXPECTED);
+  shift_ptrs.insert(shift_ptrs.end(), var_shift_ptrs.begin(), var_shift_ptrs.end());
+  std::sort(shift_ptrs.begin(), shift_ptrs.end(), MassShift::cmpPosInc);
+
+  AnnoSegmentPtrVec segment_ptrs = getSegments(proteoform_ptr, shift_ptrs,
+                                               cleavage_ptrs, res_ptrs);
+
+  // remove EMPTY_CHANGES
+  // this step may be removed
+  AnnoSegmentPtrVec selected_segment_ptrs = removeEmptySegment(segment_ptrs);
+  // LOG_DEBUG("unexpected completed");
+  */
+
+  for (size_t i = 0; i < res_ptrs.size(); i++) {
+    res_ptrs[i]->appendViewXml(xml_doc, anno_element);
+  }
+
+  for (size_t i = 0; i < cleavage_ptrs.size(); i++) {
+    cleavage_ptrs[i]->appendXml(xml_doc, anno_element);
+  }
+
+  /*
+  for (size_t i = 0; i < selected_segment_ptrs.size(); i++) {
+    selected_segment_ptrs[i]->appendXml(xml_doc, anno_element);
+  }
+  */
+
+  for (size_t i = 0; i < anno_ptm_ptrs.size(); i++) {
+    anno_ptm_ptrs[i]->appendXml(xml_doc, anno_element);
+  }
+
+  return prot_element;
+}
+
 }  // namespace toppic
