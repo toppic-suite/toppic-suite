@@ -153,7 +153,8 @@ inline void CompProbValue::setMassErr(const PrmPeakPtrVec2D &peak_ptr_2d, bool s
 
   for (size_t spec_id = 0; spec_id < peak_ptr_2d.size(); spec_id++) {
     // skip mass 0 and precursor mass 
-    for (size_t peak_id = 1; peak_id < peak_ptr_2d[spec_id].size()-1; peak_id++) {
+    int peak_num = peak_ptr_2d[spec_id].size();
+    for (int peak_id = 1; peak_id < peak_num-1; peak_id++) {
       ProbPeak cur_peak(peak_ptr_2d[spec_id][peak_id], spec_id, height_, strict, convert_ratio_);
       prob_peaks_.push_back(cur_peak);
     }
