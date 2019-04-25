@@ -71,6 +71,9 @@ int PwMsReader::readNext() {
   }
   int ms_level = spec_info.msLevel;
   LOG_DEBUG("ms_level " << ms_level);
+  if (spec_info.scanNumber == 0) {
+    spec_info.scanNumber = spec_info.index + 1;
+  }
   if (ms_level == 2) {
     double prec_mz;
     int prec_charge;
