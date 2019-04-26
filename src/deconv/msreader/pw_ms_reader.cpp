@@ -71,6 +71,7 @@ int PwMsReader::readNext() {
   }
   int ms_level = spec_info.msLevel;
   LOG_DEBUG("ms_level " << ms_level);
+  // For agilent data, scan numbers are missing.
   if (spec_info.scanNumber == 0) {
     spec_info.scanNumber = spec_info.index + 1;
   }
