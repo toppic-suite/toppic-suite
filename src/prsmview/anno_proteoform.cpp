@@ -75,40 +75,14 @@ AnnoResiduePtrVec getAnnoResidues(ProteoformPtr proteoform_ptr, PrsmViewMngPtr m
   AnnoResiduePtrVec res_ptrs;
   StringPairVec acid_ptm_pairs = proteoform_ptr->getFastaSeqPtr()->getAcidPtmPairVec();
   ModPtrVec fix_mod_list = mng_ptr->prsm_para_ptr_->getFixModPtrVec();
-  ResiduePtrVec fasta_residues = residue_util::convertStrToResiduePtrVec(acid_ptm_pairs, fix_mod_list);
+  ResiduePtrVec fasta_residues 
+      = residue_util::convertStrToResiduePtrVec(acid_ptm_pairs, fix_mod_list);
 
   int prot_len = fasta_residues.size();
   for (int i = 0; i < prot_len; i++) {
     res_ptrs.push_back(std::make_shared<AnnoResidue>(fasta_residues[i], i));
   }
   return res_ptrs;
-}
-
-void addTruncationAnno(ProteoformPtr proteoform_ptr, AnnoCleavagePtrVec &cleavage_ptrs,
-                       AnnoResiduePtrVec res_ptrs) {
-  // add information for N-terminal truncation
-  int start_pos = proteoform_ptr->getStartPos();
-  for (int i =0; i < start_pos; i++) {
-    cleavage_ptrs[i]->setType(CLEAVAGE_TYPE_N_TRUNCATION);
-    res_ptrs[i]->setType(ANNO_RESIDUE_TYPE_N_TRUNCATION);
-  }
-
-  if (start_pos > 0) {
-    cleavage_ptrs[start_pos]->setType(CLEAVAGE_TYPE_SEQ_START);
-  }
-  // LOG_DEBUG("n-trunc completed");
-
-  // add information for C-terminal truncation
-  int prot_len = proteoform_ptr->getFastaSeqPtr()->getAcidPtmPairLen();
-  int end_pos = proteoform_ptr->getEndPos();
-  if (end_pos < prot_len - 1) {
-    cleavage_ptrs[end_pos + 1]->setType(CLEAVAGE_TYPE_SEQ_END);
-  }
-
-  for (int i = end_pos + 1; i < prot_len; i++) {
-    cleavage_ptrs[i+1]->setType(CLEAVAGE_TYPE_C_TRUNCATION);
-    res_ptrs[i]->setType(ANNO_RESIDUE_TYPE_C_TRUNCATION);
-  }
 }
 
 // addKnownPtms for fixed and protein variable PTMs
@@ -264,83 +238,32 @@ xercesc::DOMElement* geneAnnoProteoform(XmlDOMDocument* xml_doc,
   addAnnoHeader(xml_doc, anno_element, proteoform_ptr);
   // LOG_DEBUG("summary completed");
 
-  AnnoCleavagePtrVec cleavage_ptrs = getProteoCleavage(prsm_ptr, mng_ptr->min_mass_);
-  // LOG_DEBUG("cleavage completed");
-
   // obtain residue_ptrs
   AnnoResiduePtrVec res_ptrs = getAnnoResidues(proteoform_ptr, mng_ptr);
+  for (size_t i = 0; i < res_ptrs.size(); i++) {
+    res_ptrs[i]->appendViewXml(xml_doc, anno_element);
+  }
   // LOG_DEBUG("residue completed");
 
-  addTruncationAnno(proteoform_ptr, cleavage_ptrs, res_ptrs);
-
-  AnnoPtmPtrVec anno_ptm_ptrs;
-
-  MassShiftPtrVec shift_ptrs = proteoform_ptr->getMassShiftPtrVec(MassShiftType::FIXED);
-  addKnownPtms(proteoform_ptr, shift_ptrs, anno_ptm_ptrs, res_ptrs);
-
-  shift_ptrs = proteoform_ptr->getMassShiftPtrVec(MassShiftType::PROTEIN_VARIABLE);
-  addKnownPtms(proteoform_ptr, shift_ptrs, anno_ptm_ptrs, res_ptrs);
-
-  MassShiftPtrVec var_shift_ptrs = proteoform_ptr->getMassShiftPtrVec(MassShiftType::VARIABLE);
-
-  shift_ptrs = proteoform_ptr->getMassShiftPtrVec(MassShiftType::UNEXPECTED);
-  shift_ptrs.insert(shift_ptrs.end(), var_shift_ptrs.begin(), var_shift_ptrs.end());
-  std::sort(shift_ptrs.begin(), shift_ptrs.end(), MassShift::cmpPosInc);
-
-  AnnoSegmentPtrVec segment_ptrs = getSegments(proteoform_ptr, shift_ptrs,
-                                               cleavage_ptrs, res_ptrs);
-
-  // remove EMPTY_CHANGES
-  // this step may be removed
-  AnnoSegmentPtrVec selected_segment_ptrs = removeEmptySegment(segment_ptrs);
-  // LOG_DEBUG("unexpected completed");
-
-  for (size_t i = 0; i < res_ptrs.size(); i++) {
-    res_ptrs[i]->appendViewXml(xml_doc, anno_element);
-  }
-
-  for (size_t i = 0; i < cleavage_ptrs.size(); i++) {
-    cleavage_ptrs[i]->appendXml(xml_doc, anno_element);
-  }
-
-  for (size_t i = 0; i < selected_segment_ptrs.size(); i++) {
-    selected_segment_ptrs[i]->appendXml(xml_doc, anno_element);
-  }
-
-  for (size_t i = 0; i < anno_ptm_ptrs.size(); i++) {
-    anno_ptm_ptrs[i]->appendXml(xml_doc, anno_element);
-  }
-
-  return prot_element;
-}
-
-xercesc::DOMElement* geneAnnoProteoform2(XmlDOMDocument* xml_doc,
-                                         PrsmPtr prsm_ptr,
-                                         PrsmViewMngPtr mng_ptr) {
-  ProteoformPtr proteoform_ptr = prsm_ptr->getProteoformPtr();
-  xercesc::DOMElement* prot_element = xml_doc->createElement("annotated_protein");
-  addSummary(xml_doc, prot_element, proteoform_ptr, mng_ptr);
-  xercesc::DOMElement* anno_element = xml_doc->createElement("annotation");
-  prot_element->appendChild(anno_element);
-  addAnnoHeader(xml_doc, anno_element, proteoform_ptr);
-
   AnnoCleavagePtrVec cleavage_ptrs = getProteoCleavage(prsm_ptr, mng_ptr->min_mass_);
-
-  // obtain residue_ptrs
-  AnnoResiduePtrVec res_ptrs = getAnnoResidues(proteoform_ptr, mng_ptr);
-
-  addTruncationAnno(proteoform_ptr, cleavage_ptrs, res_ptrs);
+  for (size_t i = 0; i < cleavage_ptrs.size(); i++) {
+    cleavage_ptrs[i]->appendXml(xml_doc, anno_element);
+  }
+  // LOG_DEBUG("cleavage completed");
 
   AnnoPtmPtrVec anno_ptm_ptrs;
-
   MassShiftPtrVec shift_ptrs = proteoform_ptr->getMassShiftPtrVec(MassShiftType::FIXED);
   addKnownPtms(proteoform_ptr, shift_ptrs, anno_ptm_ptrs, res_ptrs);
 
+  /*
   shift_ptrs = proteoform_ptr->getMassShiftPtrVec(MassShiftType::PROTEIN_VARIABLE);
   addKnownPtms(proteoform_ptr, shift_ptrs, anno_ptm_ptrs, res_ptrs);
 
-  /*
   MassShiftPtrVec var_shift_ptrs = proteoform_ptr->getMassShiftPtrVec(MassShiftType::VARIABLE);
+
+  for (size_t i = 0; i < anno_ptm_ptrs.size(); i++) {
+    anno_ptm_ptrs[i]->appendXml(xml_doc, anno_element);
+  }
 
   shift_ptrs = proteoform_ptr->getMassShiftPtrVec(MassShiftType::UNEXPECTED);
   shift_ptrs.insert(shift_ptrs.end(), var_shift_ptrs.begin(), var_shift_ptrs.end());
@@ -353,26 +276,12 @@ xercesc::DOMElement* geneAnnoProteoform2(XmlDOMDocument* xml_doc,
   // this step may be removed
   AnnoSegmentPtrVec selected_segment_ptrs = removeEmptySegment(segment_ptrs);
   // LOG_DEBUG("unexpected completed");
-  */
 
-  for (size_t i = 0; i < res_ptrs.size(); i++) {
-    res_ptrs[i]->appendViewXml(xml_doc, anno_element);
-  }
 
-  for (size_t i = 0; i < cleavage_ptrs.size(); i++) {
-    cleavage_ptrs[i]->appendXml(xml_doc, anno_element);
-  }
-
-  /*
   for (size_t i = 0; i < selected_segment_ptrs.size(); i++) {
     selected_segment_ptrs[i]->appendXml(xml_doc, anno_element);
   }
   */
-
-  for (size_t i = 0; i < anno_ptm_ptrs.size(); i++) {
-    anno_ptm_ptrs[i]->appendXml(xml_doc, anno_element);
-  }
-
   return prot_element;
 }
 

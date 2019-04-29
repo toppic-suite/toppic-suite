@@ -24,50 +24,15 @@
 
 namespace toppic {
 
-const std::string ANNO_RESIDUE_TYPE_NORMAL         = "normal";
-
-const std::string ANNO_RESIDUE_TYPE_N_TRUNCATION   = "n_truncation";
-
-const std::string ANNO_RESIDUE_TYPE_C_TRUNCATION   = "c_truncation";
-
-const std::string ANNO_RESIDUE_TYPE_KNOWN_CHANGE   = "known_change";
-
-const std::string ANNO_RESIDUE_TYPE_UNKNOWN_CHANGE = "unknown_change";
-
 class AnnoResidue : public Residue {
  public:
-  AnnoResidue(ResiduePtr residue_ptr, int pos):
-      Residue(residue_ptr->getAminoAcidPtr(), residue_ptr->getPtmPtr()),
-      pos_(pos),
-      type_(ANNO_RESIDUE_TYPE_NORMAL),
-      is_unexpected_change_(false),
-      unexpected_change_color_(0) {}
-
-  void setType(const std::string &type) {type_ = type;}
-
-  void setUnexpectedChange(bool u) {is_unexpected_change_ = u;}
-
-  void setUnexpectedChangeColor(int color) {unexpected_change_color_ = color;}
-
-  void setPossiblePosColor(int c) {possible_pos_color_ = c;}
-
-  void setAnno(std::string s) {anno_ = s;}
+  AnnoResidue(ResiduePtr residue_ptr, int pos);
 
   void appendViewXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
  private:
   //residues position
   int pos_ = 0;
-  //residues type
-  std::string type_ = ANNO_RESIDUE_TYPE_NORMAL;
-  //is expected
-  bool is_unexpected_change_ = false;
-  //unexpected change color
-  int unexpected_change_color_ = 0;
-  //possible postion for known ptms
-  int possible_pos_color_ = 0;
-  // all possible positions with score
-  std::string anno_;
 };
 
 typedef std::shared_ptr<AnnoResidue> AnnoResiduePtr;
