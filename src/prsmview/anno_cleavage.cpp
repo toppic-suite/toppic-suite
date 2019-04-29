@@ -28,12 +28,6 @@ void AnnoCleavage::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* paren
   str = type_;
   xml_doc->addElement(element, "cleavage_type", str.c_str());
 
-  str = str_util::toString(is_unexpected_change_);
-  xml_doc->addElement(element, "is_unexpected_change", str.c_str());
-
-  str = str_util::toString(unexpected_change_color_);
-  xml_doc->addElement(element, "unexpected_change_color", str.c_str());
-
   str = str_util::toString(exist_n_ion_);
   xml_doc->addElement(element, "exist_n_ion", str.c_str());
 

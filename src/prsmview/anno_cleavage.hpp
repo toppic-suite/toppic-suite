@@ -51,10 +51,6 @@ class AnnoCleavage {
 
   void setType(const std::string &type) {type_ = type;}
 
-  void setUnexpectedChange(bool u) {is_unexpected_change_ = u;}
-
-  void setUnexpectedChangeColor(int color) {unexpected_change_color_ = color;}
-
   std::string getType() {return type_;}
 
   void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
@@ -67,10 +63,6 @@ class AnnoCleavage {
   bool exist_n_ion_;
 
   bool exist_c_ion_;
-
-  bool is_unexpected_change_;
-
-  int unexpected_change_color_;
 
   std::string type_;
 };

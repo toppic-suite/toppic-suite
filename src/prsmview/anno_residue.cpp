@@ -20,6 +20,10 @@
 
 namespace toppic {
 
+AnnoResidue::AnnoResidue(ResiduePtr residue_ptr, int pos):
+    Residue(residue_ptr->getAminoAcidPtr(), residue_ptr->getPtmPtr()),
+    pos_(pos) {}
+
 void AnnoResidue::appendViewXml(XmlDOMDocument* xml_doc,
                                 xercesc::DOMElement* parent) {
   xercesc::DOMElement* element = xml_doc->createElement("residue");
