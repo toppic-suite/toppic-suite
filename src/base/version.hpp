@@ -20,7 +20,7 @@
 
 namespace prot {
 
-const std::string version_number = "1.2.3";
+const std::string version_number = "1.2.4";
 
 }  // namespace prot
 
