@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_PRSM_VIEW_ANNO_PTM_HPP_
 #define TOPPIC_PRSM_VIEW_ANNO_PTM_HPP_
 
@@ -20,9 +19,10 @@
 #include <string>
 #include <vector>
 
+#include "common/xml/xml_dom_document.hpp"
 #include "common/base/ptm.hpp"
 #include "seq/mass_shift_type.hpp"
-#include "common/xml/xml_dom_document.hpp"
+#include "prsmview/anno_ptm_position.hpp"
 
 namespace toppic {
 
@@ -40,7 +40,7 @@ class AnnoPtm {
 
   void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
-  void addOccurence(int pos, const std::string &acid_letter);
+  void addOccurence(int left_pos, int right_pos, std::string anno);
 
   static AnnoPtmPtr findPtm(const AnnoPtmPtrVec &ptm_ptrs, PtmPtr ptm_ptr,
                             MassShiftTypePtr type_ptr);
@@ -50,7 +50,7 @@ class AnnoPtm {
 
   MassShiftTypePtr type_ptr_;
 
-  std::vector<std::pair<int, std::string> > occurences_;
+  AnnoPtmPositionPtrVec occurences_;
 };
 
 }  // namespace toppic

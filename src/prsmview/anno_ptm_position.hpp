@@ -12,36 +12,41 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#ifndef TOPPIC_PRSM_VIEW_ANNO_PTM_POSITION_HPP_
+#define TOPPIC_PRSM_VIEW_ANNO_PTM_POSITION_HPP_
 
-#ifndef TOPPIC_PRSM_VIEW_ANNO_RESIDUE_HPP_
-#define TOPPIC_PRSM_VIEW_ANNO_RESIDUE_HPP_
-
+#include <memory>
 #include <string>
 #include <vector>
 
 #include "common/xml/xml_dom_document.hpp"
-#include "common/base/residue.hpp"
-#include "seq/proteoform.hpp"
 
 namespace toppic {
 
-class AnnoResidue;
-typedef std::shared_ptr<AnnoResidue> AnnoResiduePtr;
-typedef std::vector<AnnoResiduePtr> AnnoResiduePtrVec;
-
-class AnnoResidue : public Residue {
+class AnnoPtmPosition {
  public:
-  AnnoResidue(ResiduePtr residue_ptr, int pos);
+  AnnoPtmPosition(int left_pos, int right_pos, std::string anno);
 
-  void appendViewXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
+  int getLeftPos() {return left_pos_;}
 
-  static AnnoResiduePtrVec getAnnoResidues(ProteoformPtr proteoform_ptr);
+  int getRightPos() {return right_pos_;}
+
+  std::string getAnno() {return anno_;}
+
+  void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
  private:
-  //residues position
-  int pos_ = 0;
+  int left_pos_;
+  
+  int right_pos_;
+
+  std::string anno_;
 };
+
+typedef std::shared_ptr<AnnoPtmPosition> AnnoPtmPositionPtr;
+typedef std::vector<AnnoPtmPositionPtr> AnnoPtmPositionPtrVec;
 
 }  // namespace toppic
 
-#endif /* TOPPIC_PRSM_VIEW_ANNO_RESIDUE_HPP_ */
+#endif
+

@@ -65,14 +65,14 @@ void MassShift::setChangePtr(ChangePtr change) {
   }
 }
 
-std::string MassShift::getSeqStr() {
+std::string MassShift::getAnnoStr() {
   std::string seq_str;
 
   if (getTypePtr() == MassShiftType::UNEXPECTED) {
     if (change_vec_[0]->getLocalAnno() != nullptr) {
       seq_str = change_vec_[0]->getLocalAnno()->getPtmPtr()->getAbbrName();
     } else {
-      seq_str = str_util::toString(shift_, 5);
+      seq_str = str_util::toString(shift_, 4);
     }
   } else {
     for (size_t i = 0; i < change_vec_.size(); i++) {

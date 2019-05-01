@@ -20,13 +20,17 @@
 
 namespace toppic {
 
+AnnoCleavage::AnnoCleavage(int pos, const PeakIonPairPtrVec &pairs, 
+                           bool exist_n_ion, bool exist_c_ion):
+    pos_(pos),
+    pairs_(pairs),
+    exist_n_ion_(exist_n_ion),
+    exist_c_ion_(exist_c_ion) {}
+
 void AnnoCleavage::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   xercesc::DOMElement* element = xml_doc->createElement("cleavage");
   std::string str = str_util::toString(pos_);
   xml_doc->addElement(element, "position", str.c_str());
-
-  str = type_;
-  xml_doc->addElement(element, "cleavage_type", str.c_str());
 
   str = str_util::toString(exist_n_ion_);
   xml_doc->addElement(element, "exist_n_ion", str.c_str());
@@ -42,7 +46,7 @@ void AnnoCleavage::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* paren
   parent->appendChild(element);
 }
 
-AnnoCleavagePtrVec getProteoCleavage(PrsmPtr prsm_ptr, double min_mass) {
+AnnoCleavagePtrVec AnnoCleavage::getProteoCleavage(PrsmPtr prsm_ptr, double min_mass) {
   AnnoCleavagePtrVec cleavages;
   ProteoformPtr proteo_ptr = prsm_ptr->getProteoformPtr();
   ExtendMsPtrVec refine_ms_ptr_vec = prsm_ptr->getRefineMsPtrVec();
