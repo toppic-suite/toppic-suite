@@ -39,8 +39,7 @@ xercesc::DOMElement* AnnoView::geneFileList(XmlDOMDocument* xml_doc) {
   for (size_t i = 0; i < file_list_.size(); i++) {
     xercesc::DOMElement* file = xml_doc->createElement("file");
     xml_doc->addElement(file, "xml", file_list_[i][0].c_str());
-    xml_doc->addElement(file, "xsl", file_list_[i][1].c_str());
-    xml_doc->addElement(file, "html", file_list_[i][2].c_str());
+    xml_doc->addElement(file, "json", file_list_[i][1].c_str());
     element->appendChild(file);
   }
   return element;
@@ -58,8 +57,7 @@ std::vector<std::vector<std::string>> readViewXmlFiles(const std::string &file_n
         xercesc::DOMElement* file_element = xml_dom_util::getChildElement(root, "file", i);
         std::vector<std::string> file_info;
         file_info.push_back(xml_dom_util::getChildValue(file_element, "xml", 0));
-        file_info.push_back(xml_dom_util::getChildValue(file_element, "xsl", 0));
-        file_info.push_back(xml_dom_util::getChildValue(file_element, "html", 0));
+        file_info.push_back(xml_dom_util::getChildValue(file_element, "json", 0));
         file_list.push_back(file_info);
       }
     }
@@ -68,8 +66,10 @@ std::vector<std::vector<std::string>> readViewXmlFiles(const std::string &file_n
   return file_list;
 }
 
-xercesc::DOMElement* proteoformToXml(XmlDOMDocument* xml_doc, const PrsmPtrVec &prsm_ptrs,
-                                     PrsmViewMngPtr mng_ptr, bool detail, bool add_ms) {
+xercesc::DOMElement* geneXmlForProteoform(XmlDOMDocument* xml_doc, 
+                                          const PrsmPtrVec &prsm_ptrs,
+                                          PrsmViewMngPtr mng_ptr, 
+                                          bool detail, bool add_ms) {
   xercesc::DOMElement* proteoform_element = xml_doc->createElement("compatible_proteoform");
   std::string str = str_util::toString(prsm_ptrs[0]->getProteoformPtr()->getProtId());
   xml_doc->addElement(proteoform_element, "sequence_id", str.c_str());
@@ -88,12 +88,12 @@ xercesc::DOMElement* proteoformToXml(XmlDOMDocument* xml_doc, const PrsmPtrVec &
   return proteoform_element;
 }
 
-xercesc::DOMElement* proteinToXml(XmlDOMDocument* xml_doc,
-                                  const PrsmPtrVec &prsm_ptrs,
-                                  int prot_id,
-                                  const std::vector<int> &cluster_ids,
-                                  PrsmViewMngPtr mng_ptr,
-                                  bool detail, bool add_ms) {
+xercesc::DOMElement* geneXmlForProtein(XmlDOMDocument* xml_doc,
+                                       const PrsmPtrVec &prsm_ptrs,
+                                       int prot_id,
+                                       const std::vector<int> &cluster_ids,
+                                       PrsmViewMngPtr mng_ptr,
+                                       bool detail, bool add_ms) {
   xercesc::DOMElement* prot_element = xml_doc->createElement("protein");
   std::string str = str_util::toString(prot_id);
   xml_doc->addElement(prot_element, "sequence_id", str.c_str());
@@ -107,11 +107,13 @@ xercesc::DOMElement* proteinToXml(XmlDOMDocument* xml_doc,
   for (size_t i = 0; i < cluster_ids.size(); i++) {
     PrsmPtrVec select_prsm_ptrs = prsm_util::selectClusterPrsms(prsm_ptrs, cluster_ids[i]);
     std::sort(select_prsm_ptrs.begin(), select_prsm_ptrs.end(), Prsm::cmpEValueInc);
-    prot_element->appendChild(proteoformToXml(xml_doc, select_prsm_ptrs, mng_ptr, detail, add_ms));
+    prot_element->appendChild(geneXmlForProteoform(xml_doc, select_prsm_ptrs, 
+                                                   mng_ptr, detail, add_ms));
   }
   return prot_element;
 }
 
+/*
 void writeProteinToXml(XmlWriterPtr xml_writer,
                        const PrsmPtrVec &prsm_ptrs,
                        int prot_id,
@@ -120,9 +122,14 @@ void writeProteinToXml(XmlWriterPtr xml_writer,
                        bool detail, bool add_ms) {
   xml_writer->write_str("<protein>");
   xml_writer->write_str("<sequence_id>" + str_util::toString(prot_id) + "</sequence_id>");
-  xml_writer->write_str("<sequence_name>" + prsm_ptrs[0]->getProteoformPtr()->getSeqName() + "</sequence_name>");
-  xml_writer->write_str("<sequence_description>" + prsm_ptrs[0]->getProteoformPtr()->getSeqDesc() + "</sequence_description>");
-  xml_writer->write_str("<compatible_proteoform_number>" + str_util::toString(species_ids.size()) + "</compatible_proteoform_number>");
+  xml_writer->write_str("<sequence_name>" 
+                        + prsm_ptrs[0]->getProteoformPtr()->getSeqName() + "</sequence_name>");
+  xml_writer->write_str("<sequence_description>" 
+                        + prsm_ptrs[0]->getProteoformPtr()->getSeqDesc() 
+                        + "</sequence_description>");
+  xml_writer->write_str("<compatible_proteoform_number>" 
+                        + str_util::toString(species_ids.size()) 
+                        + "</compatible_proteoform_number>");
   for (size_t i = 0; i < species_ids.size(); i++) {
     PrsmPtrVec select_prsm_ptrs = prsm_util::selectClusterPrsms(prsm_ptrs, species_ids[i]);
     std::sort(select_prsm_ptrs.begin(), select_prsm_ptrs.end(), Prsm::cmpEValueInc);
@@ -130,5 +137,6 @@ void writeProteinToXml(XmlWriterPtr xml_writer,
   }
   xml_writer->write_str("</protein>");
 }
+*/
 
 }  // namespace toppic

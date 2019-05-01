@@ -32,14 +32,16 @@ void addPrsmHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement* element,
   std::string str = str_util::toString(prsm_ptr->getPrsmId());
   xml_doc->addElement(element, "prsm_id", str.c_str());
   if (prsm_ptr->getExtremeValuePtr().get() != nullptr) {
-    str = str_util::toString(prsm_ptr->getExtremeValuePtr()->getPValue(), mng_ptr->decimal_point_num_);
+    str = str_util::toString(prsm_ptr->getExtremeValuePtr()->getPValue(), 
+                             mng_ptr->decimal_point_num_);
     xml_doc->addElement(element, "p_value", str.c_str());
   } else {
     xml_doc->addElement(element, "p_value", "N/A");
   }
 
   if (prsm_ptr->getExtremeValuePtr().get() != nullptr) {
-    str = str_util::toString(prsm_ptr->getExtremeValuePtr()->getEValue(), mng_ptr->decimal_point_num_);
+    str = str_util::toString(prsm_ptr->getExtremeValuePtr()->getEValue(), 
+                             mng_ptr->decimal_point_num_);
     xml_doc->addElement(element, "e_value", str.c_str());
   } else {
     xml_doc->addElement(element, "e_value", "N/A");
@@ -63,7 +65,8 @@ void addPrsmHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement* element,
   xml_doc->addElement(element, "matched_peak_number", str.c_str());
 }
 
-void addMsHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement* ms_element, PrsmPtr prsm_ptr) {
+void addMsHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement* ms_element, 
+                 PrsmPtr prsm_ptr, PrsmViewMngPtr mng_ptr) {
   xercesc::DOMElement* ms_header_element = xml_doc->createElement("ms_header");
   ms_element->appendChild(ms_header_element);
   DeconvMsPtrVec deconv_ms_ptr_vec = prsm_ptr->getDeconvMsPtrVec();
@@ -79,7 +82,7 @@ void addMsHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement* ms_element, PrsmP
   xml_doc->addElement(ms_header_element, "spectrum_file_name", prsm_ptr->getFileName().c_str());
   xml_doc->addElement(ms_header_element, "scans", spec_scans.c_str());
 
-  int pos = 4;
+  int pos = mng_ptr->precise_point_num_;
 
   double precursor_mass = prsm_ptr->getOriPrecMass();
   std::string str = str_util::toString(precursor_mass, pos);
@@ -164,7 +167,7 @@ xercesc::DOMElement* geneAnnoPrsm(XmlDOMDocument* xml_doc, PrsmPtr prsm_ptr,
 
   if (detail) {
     xercesc::DOMElement* ms_element = xml_doc->createElement("ms");
-    addMsHeader(xml_doc, ms_element, prsm_ptr);
+    addMsHeader(xml_doc, ms_element, prsm_ptr, mng_ptr);
 
     if (add_ms_peaks) {
       // add ms peaks

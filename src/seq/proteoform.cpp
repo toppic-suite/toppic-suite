@@ -245,7 +245,7 @@ void updateMatchSeq(const MassShiftPtrVec & shifts,
 
     int right_pos = shifts[i]->getRightBpPos();
     right_strings[right_pos] +=  ")";
-    right_strings[right_pos] = right_strings[right_pos] + "[" + shifts[i]->getSeqStr() + "]";
+    right_strings[right_pos] = right_strings[right_pos] + "[" + shifts[i]->getAnnoStr() + "]";
   }
 }
 

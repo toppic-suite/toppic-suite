@@ -51,19 +51,15 @@ void jsonTranslate(std::map<std::string, std::string> &arguments,
   file_util::createFolder(html_dir + file_util::getFileSeparator() +"proteoforms");
   file_util::createFolder(html_dir + file_util::getFileSeparator() +"prsms");
   file_util::createFolder(html_dir + file_util::getFileSeparator() +"proteins");
-  //std::string from_path(resource_dir + file_util::getFileSeparator() + "web");
-  //std::string to_path(html_dir + file_util::getFileSeparator() + "resources");
-  //file_util::copyDir(from_path, to_path);
 
   std::string xml_file_list = xml_dir + file_util::getFileSeparator() + "files.xml";
   std::vector<std::vector<std::string>> anno_view = readViewXmlFiles(xml_file_list);
 
   for (size_t i = 0; i < anno_view.size(); i++) {
-    std::cout << "Converting xml files to html files - processing " << i + 1 << " of " << anno_view.size() << " files.\r";
+    std::cout << "Converting xml files to html files - processing " 
+        << i + 1 << " of " << anno_view.size() << " files.\r";
     std::string xml_file_name = anno_view[i][0];
-    std::string html_file_name = anno_view[i][2];
-    std::string json_file_name = html_file_name.substr(0, html_file_name.length()-4) + "js";
-
+    std::string json_file_name = anno_view[i][1];
     LOG_DEBUG("xml in " << xml_file_name << " json out " << json_file_name);
 
     jsonConvert(xml_file_name, json_file_name);

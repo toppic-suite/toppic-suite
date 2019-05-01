@@ -26,22 +26,14 @@
 
 namespace toppic {
 
-#define CLEAVAGE_TYPE_NORMAL "normal"
-#define CLEAVAGE_TYPE_N_TRUNCATION "n_truncation"
-#define CLEAVAGE_TYPE_C_TRUNCATION "c_truncation"
-#define CLEAVAGE_TYPE_SEQ_START "seq_start"
-#define CLEAVAGE_TYPE_SEQ_END "seq_end"
+class AnnoCleavage;
+typedef std::shared_ptr<AnnoCleavage> AnnoCleavagePtr;
+typedef std::vector<AnnoCleavagePtr> AnnoCleavagePtrVec;
 
 class AnnoCleavage {
  public:
-  AnnoCleavage(int pos, const PeakIonPairPtrVec &pairs, bool exist_n_ion, bool exist_c_ion):
-      pos_(pos),
-      pairs_(pairs),
-      exist_n_ion_(exist_n_ion),
-      exist_c_ion_(exist_c_ion),
-      is_unexpected_change_(false),
-      unexpected_change_color_(0),
-      type_(CLEAVAGE_TYPE_NORMAL) {}
+  AnnoCleavage(int pos, const PeakIonPairPtrVec &pairs, 
+               bool exist_n_ion, bool exist_c_ion);
 
   void setPairs(PeakIonPairPtrVec pairs) {pairs_ = pairs;}
 
@@ -49,11 +41,9 @@ class AnnoCleavage {
 
   void setExistCIon(bool c) {exist_c_ion_ = c;}
 
-  void setType(const std::string &type) {type_ = type;}
-
-  std::string getType() {return type_;}
-
   void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
+
+  static AnnoCleavagePtrVec getProteoCleavage(PrsmPtr prsm_ptr, double min_mass);
 
  private:
   int pos_;
@@ -64,13 +54,9 @@ class AnnoCleavage {
 
   bool exist_c_ion_;
 
-  std::string type_;
 };
 
-typedef std::shared_ptr<AnnoCleavage> AnnoCleavagePtr;
-typedef std::vector<AnnoCleavagePtr> AnnoCleavagePtrVec;
 
-AnnoCleavagePtrVec getProteoCleavage(PrsmPtr prsm_ptr, double min_mass);
 } /* namespace toppic */
 
 #endif /* TOPPIC_PRSM_VIEW_ANNO_CLEAVAGE_HPP_ */

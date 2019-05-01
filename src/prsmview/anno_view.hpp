@@ -20,12 +20,12 @@
 #include <string>
 #include <vector>
 
-#include "prsm/extreme_value.hpp"
-#include "seq/proteoform.hpp"
 #include "common/xml/xml_writer.hpp"
+#include "seq/proteoform.hpp"
 #include "spec/deconv_peak.hpp"
 #include "spec/extend_peak.hpp"
 #include "spec/sp_para.hpp"
+#include "prsm/extreme_value.hpp"
 #include "prsm/prsm.hpp"
 #include "prsmview/anno_residue.hpp"
 #include "prsmview/anno_cleavage.hpp"
@@ -41,23 +41,30 @@ class AnnoView {
 
 typedef std::shared_ptr<AnnoView> AnnoViewPtr;
 
-
 std::vector<std::vector<std::string>> readViewXmlFiles(const std::string &file_name);
 
-xercesc::DOMElement* proteoformToXml(XmlDOMDocument* xml_doc, const PrsmPtrVec &prsm_ptrs,
-                                     PrsmViewMngPtr mng_ptr, bool detail = true, bool add_ms = true);
+xercesc::DOMElement* geneXmlForProteoform(XmlDOMDocument* xml_doc, 
+                                          const PrsmPtrVec &prsm_ptrs,
+                                          PrsmViewMngPtr mng_ptr, 
+                                          bool detail = true, 
+                                          bool add_ms = true);
 
-xercesc::DOMElement* proteinToXml(XmlDOMDocument* xml_doc,
-                                  const PrsmPtrVec &prsm_ptrs,
-                                  int prot_id,
-                                  const std::vector<int> &cluster_ids,
-                                  PrsmViewMngPtr mng_ptr, bool detail = true, bool add_ms = true);
-
+xercesc::DOMElement* geneXmlForProtein(XmlDOMDocument* xml_doc,
+                                       const PrsmPtrVec &prsm_ptrs,
+                                       int prot_id,
+                                       const std::vector<int> &cluster_ids,
+                                       PrsmViewMngPtr mng_ptr, 
+                                       bool detail = true, 
+                                       bool add_ms = true);
+/*
 void writeProteinToXml(XmlWriterPtr xml_writer,
                        const PrsmPtrVec &prsm_ptrs,
                        int prot_id,
                        const std::vector<int> &species_ids,
-                       PrsmViewMngPtr mng_ptr, bool detail = true, bool add_ms = true);
+                       PrsmViewMngPtr mng_ptr, 
+                       bool detail = true, 
+                       bool add_ms = true);
+                       */
 
 }  // namespace toppic
 
