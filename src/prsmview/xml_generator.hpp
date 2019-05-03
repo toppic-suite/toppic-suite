@@ -28,7 +28,8 @@
 #include "spec/msalign_reader.hpp"
 #include "prsm/prsm.hpp"
 #include "prsmview/prsm_view_mng.hpp"
-#include "prsmview/anno_view.hpp"
+#include "prsmview/anno_file_list.hpp"
+#include "prsmview/anno_xml_util.hpp"
 
 namespace toppic {
 
@@ -52,7 +53,7 @@ class XmlGenerator {
 
   void outputFileList();
 
-  void splitBySpeciesId();
+  void splitByProteoformId();
 
   void splitByProtId();
 
@@ -62,7 +63,7 @@ class XmlGenerator {
 
   PrsmViewMngPtr mng_ptr_;
 
-  AnnoViewPtr anno_view_ptr_;
+  AnnoFileListPtr anno_file_list_ptr_;
 
   FastaIndexReaderPtr fasta_reader_ptr_;
 

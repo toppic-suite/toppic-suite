@@ -22,7 +22,7 @@
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "xml2json/xml2json.hpp"
-#include "prsmview/anno_view.hpp"
+#include "prsmview/anno_file_list.hpp"
 #include "prsmview/json_transformer.hpp"
 
 namespace toppic {
@@ -45,21 +45,22 @@ void jsonTranslate(std::map<std::string, std::string> &arguments,
                    const std::string &fname_suffix) {
   std::string spectrum_file_name_ = arguments["spectrumFileName"];
   std::string xml_dir = file_util::basename(spectrum_file_name_) + "_" + fname_suffix + "_xml";
-  std::string html_dir = file_util::basename(spectrum_file_name_) + "_" + fname_suffix + "_html";
+  std::string json_dir = file_util::basename(spectrum_file_name_) + "_" + fname_suffix + "_html"
+      + file_util::getFileSeparator() + "data_js";
   std::string resource_dir = arguments["resourceDir"];
 
-  file_util::createFolder(html_dir + file_util::getFileSeparator() +"proteoforms");
-  file_util::createFolder(html_dir + file_util::getFileSeparator() +"prsms");
-  file_util::createFolder(html_dir + file_util::getFileSeparator() +"proteins");
+  file_util::createFolder(json_dir + file_util::getFileSeparator() +"proteoforms");
+  file_util::createFolder(json_dir + file_util::getFileSeparator() +"prsms");
+  file_util::createFolder(json_dir + file_util::getFileSeparator() +"proteins");
 
   std::string xml_file_list = xml_dir + file_util::getFileSeparator() + "files.xml";
-  std::vector<std::vector<std::string>> anno_view = readViewXmlFiles(xml_file_list);
+  std::vector<std::vector<std::string>> anno_file_list = AnnoFileList::readFromXml(xml_file_list);
 
-  for (size_t i = 0; i < anno_view.size(); i++) {
+  for (size_t i = 0; i < anno_file_list.size(); i++) {
     std::cout << "Converting xml files to html files - processing " 
-        << i + 1 << " of " << anno_view.size() << " files.\r";
-    std::string xml_file_name = anno_view[i][0];
-    std::string json_file_name = anno_view[i][1];
+        << i + 1 << " of " << anno_file_list.size() << " files.\r";
+    std::string xml_file_name = anno_file_list[i][0];
+    std::string json_file_name = anno_file_list[i][1];
     LOG_DEBUG("xml in " << xml_file_name << " json out " << json_file_name);
 
     jsonConvert(xml_file_name, json_file_name);
