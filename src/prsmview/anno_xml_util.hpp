@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_PRSM_VIEW_ANNO_VIEW_HPP_
-#define TOPPIC_PRSM_VIEW_ANNO_VIEW_HPP_
+#ifndef TOPPIC_PRSM_VIEW_ANNO_XML_UTIL_HPP_
+#define TOPPIC_PRSM_VIEW_ANNO_XML_UTIL_HPP_
 
 #include <map>
 #include <string>
@@ -33,30 +33,15 @@
 
 namespace toppic {
 
-class AnnoView {
- public:
-  std::vector<std::vector<std::string>> file_list_;
-  xercesc::DOMElement* geneFileList(XmlDOMDocument* xml_doc);
-};
+namespace anno_xml_util {
 
-typedef std::shared_ptr<AnnoView> AnnoViewPtr;
-
-std::vector<std::vector<std::string>> readViewXmlFiles(const std::string &file_name);
-
+// proteoform
 xercesc::DOMElement* geneXmlForProteoform(XmlDOMDocument* xml_doc, 
                                           const PrsmPtrVec &prsm_ptrs,
                                           PrsmViewMngPtr mng_ptr, 
                                           bool detail = true, 
                                           bool add_ms = true);
-
-xercesc::DOMElement* geneXmlForProtein(XmlDOMDocument* xml_doc,
-                                       const PrsmPtrVec &prsm_ptrs,
-                                       int prot_id,
-                                       const std::vector<int> &cluster_ids,
-                                       PrsmViewMngPtr mng_ptr, 
-                                       bool detail = true, 
-                                       bool add_ms = true);
-/*
+// single protein
 void writeProteinToXml(XmlWriterPtr xml_writer,
                        const PrsmPtrVec &prsm_ptrs,
                        int prot_id,
@@ -64,8 +49,17 @@ void writeProteinToXml(XmlWriterPtr xml_writer,
                        PrsmViewMngPtr mng_ptr, 
                        bool detail = true, 
                        bool add_ms = true);
-                       */
+
+// protein list
+xercesc::DOMElement* geneXmlForProteinList(XmlDOMDocument* xml_doc,
+                                           const PrsmPtrVec &prsm_ptrs,
+                                           int prot_id,
+                                           const std::vector<int> &cluster_ids,
+                                           PrsmViewMngPtr mng_ptr, 
+                                           bool detail = true, 
+                                           bool add_ms = true);
+}  // namespace anno_xml_util
 
 }  // namespace toppic
 
-#endif /* TOPPIC_PRSM_VIEW_ANNO_VIEW_HPP_ */
+#endif /* TOPPIC_PRSM_VIEW_ANNO_XML_UTIL_HPP_ */
