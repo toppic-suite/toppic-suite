@@ -12,26 +12,18 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <limits>
-#include <set>
-#include <string>
 #include <algorithm>
 
-#include "common/xml/xml_dom_util.hpp"
-#include "common/util/str_util.hpp"
 #include "common/base/ptm_base.hpp"
-#include "common/base/residue_util.hpp"
-#include "seq/mass_shift_type.hpp"
-#include "seq/proteoform_factory.hpp"
-#include "spec/peak.hpp"
-#include "prsm/peak_ion_pair_util.hpp"
 #include "prsmview/anno_cleavage.hpp"
-#include "prsmview/anno_residue.hpp"
 #include "prsmview/anno_ptm.hpp"
 #include "prsmview/anno_mass_shift.hpp"
-#include "prsmview/prsm_view_mng.hpp"
+#include "prsmview/anno_residue.hpp"
+#include "prsmview/anno_proteoform.hpp"
 
 namespace toppic {
+
+namespace anno_proteoform {
 
 void addSummary(XmlDOMDocument* xml_doc, xercesc::DOMElement *prot_element,
                 ProteoformPtr proteoform_ptr, PrsmViewMngPtr mng_ptr) {
@@ -272,6 +264,8 @@ xercesc::DOMElement* geneAnnoProteoform(XmlDOMDocument* xml_doc,
   }
   */
   return prot_element;
+}
+
 }
 
 }  // namespace toppic

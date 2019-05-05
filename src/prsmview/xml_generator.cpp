@@ -85,7 +85,7 @@ void XmlGenerator::outputPrsms() {
             "prsms" + file_util::getFileSeparator() + "prsm" +
             str_util::toString(prsm_ptr->getPrsmId()) + ".xml";
         XmlWriter writer(file_name, "");
-        writer.write(geneAnnoPrsm(writer.getDoc(), prsm_ptr, mng_ptr_));
+        writer.write(anno_prsm::geneAnnoPrsm(writer.getDoc(), prsm_ptr, mng_ptr_));
         writer.close();
 
         std::vector<std::string> file_info;

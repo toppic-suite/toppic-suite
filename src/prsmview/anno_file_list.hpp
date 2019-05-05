@@ -12,24 +12,14 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_PRSM_VIEW_ANNO_FILE_LIST_HPP_
 #define TOPPIC_PRSM_VIEW_ANNO_FILE_LIST_HPP_
 
-#include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
-#include "common/xml/xml_writer.hpp"
-#include "seq/proteoform.hpp"
-#include "spec/deconv_peak.hpp"
-#include "spec/extend_peak.hpp"
-#include "spec/sp_para.hpp"
-#include "prsm/extreme_value.hpp"
-#include "prsm/prsm.hpp"
-#include "prsmview/anno_residue.hpp"
-#include "prsmview/anno_cleavage.hpp"
-#include "prsmview/prsm_view_mng.hpp"
+#include "common/xml/xml_dom_document.hpp"
 
 namespace toppic {
 
