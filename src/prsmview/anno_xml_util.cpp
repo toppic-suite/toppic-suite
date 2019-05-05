@@ -53,7 +53,8 @@ xercesc::DOMElement* geneXmlForProteoform(XmlDOMDocument* xml_doc,
   str = str_util::toString(count);
   xml_doc->addElement(proteoform_element, "prsm_number", str.c_str());
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
-    proteoform_element->appendChild(geneAnnoPrsm(xml_doc, prsm_ptrs[i], mng_ptr, detail, add_ms));
+    proteoform_element->appendChild(
+        anno_prsm::geneAnnoPrsm(xml_doc, prsm_ptrs[i], mng_ptr, detail, add_ms));
   }
   return proteoform_element;
 }

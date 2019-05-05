@@ -12,20 +12,14 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#include <set>
-#include <string>
-
 #include "common/util/logger.hpp"
-#include "common/base/residue_util.hpp"
-#include "common/xml/xml_dom_util.hpp"
-#include "spec/peak.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
-#include "prsmview/anno_residue.hpp"
-#include "prsmview/anno_prsm.hpp"
 #include "prsmview/anno_proteoform.hpp"
+#include "prsmview/anno_prsm.hpp"
 
 namespace toppic {
+
+namespace anno_prsm {
 
 void addPrsmHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement* element,
                    PrsmPtr prsm_ptr, PrsmViewMngPtr mng_ptr) {
@@ -177,11 +171,13 @@ xercesc::DOMElement* geneAnnoPrsm(XmlDOMDocument* xml_doc, PrsmPtr prsm_ptr,
     prsm_element->appendChild(ms_element);
 
     // proteoform to view
-    xercesc::DOMElement* prot_element = geneAnnoProteoform(xml_doc, prsm_ptr, mng_ptr);
+    xercesc::DOMElement* prot_element 
+        = anno_proteoform::geneAnnoProteoform(xml_doc, prsm_ptr, mng_ptr);
     prsm_element->appendChild(prot_element);
     LOG_DEBUG("proteoform view completed");
   }
   return prsm_element;
 }
 
+}
 }  // namespace toppic

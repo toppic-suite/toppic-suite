@@ -15,10 +15,6 @@
 #ifndef TOPPIC_PRSM_VIEW_ANNO_PTM_HPP_
 #define TOPPIC_PRSM_VIEW_ANNO_PTM_HPP_
 
-#include <utility>
-#include <string>
-#include <vector>
-
 #include "common/xml/xml_dom_document.hpp"
 #include "common/base/ptm.hpp"
 #include "seq/mass_shift_type.hpp"

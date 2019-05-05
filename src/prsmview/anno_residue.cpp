@@ -12,9 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#include <string>
-
 #include "common/base/residue_util.hpp"
 #include "common/util/str_util.hpp"
 #include "prsmview/anno_residue.hpp"
