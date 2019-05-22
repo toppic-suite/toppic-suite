@@ -135,9 +135,12 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr, FeatureMsReaderPtr read
     LOG_DEBUG("set data....");
     deconv_ptr->setMsLevel(header_ptr->getMsLevel());
     if (header_ptr->getMsLevel() == 1) {
-      deconv_ptr->setData(peak_list);
-      deconv_ptr->run();
-      MatchEnvPtrVec result_envs = deconv_ptr->getResult();
+      MatchEnvPtrVec result_envs; 
+      if (peak_list.size() > 0) {
+        deconv_ptr->setData(peak_list);
+        deconv_ptr->run();
+        result_envs = deconv_ptr->getResult();
+      }
       DeconvMsPtr ms_ptr = match_env_util::getDeconvMsPtr(header_ptr, result_envs);
       msalign_writer::write(ms1_msalign_of, ms_ptr);
       if (para_ptr_->output_match_env_) {
@@ -150,17 +153,22 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr, FeatureMsReaderPtr read
         double prec_mz = FeatureMng::getDefaultMaxMass()/FeatureMng::getDefaultMaxCharge();
         header_ptr->setPrecMonoMz(prec_mz);
         header_ptr->setPrecSpMz(prec_mz);
-        deconv_ptr->setData(peak_list, FeatureMng::getDefaultMaxMass(),
-                            FeatureMng::getDefaultMaxCharge());
-      } else {
-        double max_frag_mass = header_ptr->getPrecMonoMass();
-        if (max_frag_mass == 0.0) {
-          max_frag_mass = header_ptr->getPrecSpMass();
-        }
-        deconv_ptr->setData(peak_list, max_frag_mass, header_ptr->getPrecCharge());
       }
-      deconv_ptr->run();
-      MatchEnvPtrVec result_envs = deconv_ptr->getResult();
+      MatchEnvPtrVec result_envs; 
+      if (peak_list.size() > 0) {
+        if (para_ptr_->missing_level_one_) {
+          deconv_ptr->setData(peak_list, FeatureMng::getDefaultMaxMass(),
+                              FeatureMng::getDefaultMaxCharge());
+        } else {
+          double max_frag_mass = header_ptr->getPrecMonoMass();
+          if (max_frag_mass == 0.0) {
+            max_frag_mass = header_ptr->getPrecSpMass();
+          }
+          deconv_ptr->setData(peak_list, max_frag_mass, header_ptr->getPrecCharge());
+        }
+        deconv_ptr->run();
+        result_envs = deconv_ptr->getResult();
+      }
       DeconvMsPtr ms_ptr = match_env_util::getDeconvMsPtr(header_ptr, result_envs);
       msalign_writer::write(ms2_msalign_of, ms_ptr);
       if (para_ptr_->output_match_env_) {

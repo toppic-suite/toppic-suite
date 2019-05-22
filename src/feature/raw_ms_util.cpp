@@ -28,6 +28,10 @@ namespace prot {
 namespace raw_ms_util {
 
 double findMaxPos(const PeakPtrVec &ptr_list) {
+  if (ptr_list.size() == 0) {
+    LOG_ERROR("The spectrum has no peaks!");
+    exit(EXIT_FAILURE);
+  }
   return ptr_list[ptr_list.size() -1]->getPosition();
 }
 
