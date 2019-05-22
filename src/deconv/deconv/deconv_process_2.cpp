@@ -111,10 +111,13 @@ void DeconvProcess2::processSpMissingLevelOne(DeconvOneSpPtr deconv_ptr, RawMsGr
       double prec_mz = EnvPara::getDefaultMaxMass()/EnvPara::getDefaultMaxCharge();
       header_ptr->setPrecMonoMz(prec_mz);
       header_ptr->setPrecSpMz(prec_mz);
-      deconv_ptr->setData(peak_list, EnvPara::getDefaultMaxMass(),
-                          EnvPara::getDefaultMaxCharge());
-      deconv_ptr->run();
-      MatchEnvPtrVec result_envs = deconv_ptr->getResult();
+      MatchEnvPtrVec result_envs; 
+      if (peak_list.size() > 0) {
+        deconv_ptr->setData(peak_list, EnvPara::getDefaultMaxMass(),
+                            EnvPara::getDefaultMaxCharge());
+        deconv_ptr->run();
+        result_envs = deconv_ptr->getResult();
+      }
       DeconvMsPtr ms_ptr = match_env_util::getDeconvMsPtr(header_ptr, result_envs);
       ms2_writer_ptr->write(ms_ptr);
       if (para_ptr_->output_match_env_) {
@@ -132,11 +135,14 @@ void DeconvProcess2::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
   LOG_DEBUG("ms level " << header_ptr->getMsLevel() );
   // int scan_num_ = header_ptr->getFirstScanNum();
-  LOG_DEBUG("set data....");
-  deconv_ptr->setMsLevel(header_ptr->getMsLevel());
-  deconv_ptr->setData(peak_list);
-  deconv_ptr->run();
-  MatchEnvPtrVec result_envs = deconv_ptr->getResult();
+  MatchEnvPtrVec result_envs;
+  if (peak_list.size() > 0) {
+    LOG_DEBUG("set data....");
+    deconv_ptr->setMsLevel(header_ptr->getMsLevel());
+    deconv_ptr->setData(peak_list);
+    deconv_ptr->run();
+    result_envs = deconv_ptr->getResult();
+  }
   prec_envs.insert(prec_envs.end(), result_envs.begin(), result_envs.end());
   LOG_DEBUG("result num " << result_envs.size());
   DeconvMsPtr deconv_ms_ptr = match_env_util::getDeconvMsPtr(header_ptr, prec_envs);
