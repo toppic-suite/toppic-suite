@@ -12,6 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include <iostream>
+
 #include "common/util/file_util.hpp"
 #include "common/base/mod_util.hpp"
 #include "common/base/base_data.hpp"

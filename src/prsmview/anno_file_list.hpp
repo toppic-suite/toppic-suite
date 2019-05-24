@@ -12,22 +12,29 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#ifndef TOPPIC_PRSM_VIEW_TRANSFORMER_HPP_
-#define TOPPIC_PRSM_VIEW_TRANSFORMER_HPP_
+#ifndef TOPPIC_PRSM_VIEW_ANNO_FILE_LIST_HPP_
+#define TOPPIC_PRSM_VIEW_ANNO_FILE_LIST_HPP_
 
 #include <memory>
-#include <map>
 #include <string>
-#include <xercesc/util/PlatformUtils.hpp>
-#include <xalanc/Include/PlatformDefinitions.hpp>
-#include <xalanc/XalanTransformer/XalanTransformer.hpp>
+#include <vector>
+
+#include "common/xml/xml_dom_document.hpp"
 
 namespace toppic {
 
-void translate(std::map<std::string, std::string> &arguments,
-               const std::string & fname_suffix);
+class AnnoFileList {
+ public:
+  std::vector<std::vector<std::string>> file_list_;
 
-}
+  xercesc::DOMElement* geneFileList(XmlDOMDocument* xml_doc);
 
-#endif /* TOPPIC_PRSM_VIEW_TRANSFORMER_HPP_ */
+  static std::vector<std::vector<std::string>> readFromXml(const std::string &file_name);
+};
+
+typedef std::shared_ptr<AnnoFileList> AnnoFileListPtr;
+
+
+}  // namespace toppic
+
+#endif /* TOPPIC_PRSM_VIEW_ANNO_FILE_LIST_HPP_ */
