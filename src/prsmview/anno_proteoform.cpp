@@ -99,6 +99,7 @@ void addAnnoVarPtms(ProteoformPtr proteoform_ptr, MassShiftPtrVec & shift_ptrs,
         continue;
       }
       int left_db_bp = change_ptrs[j]->getLeftBpPos() + start_pos;
+      int right_db_bp = change_ptrs[j]->getRightBpPos() + start_pos;
       AnnoPtmPtr existing_ptr
           = AnnoPtm::findPtm(var_ptm_ptrs, ptm_ptr, change_ptrs[j]->getTypePtr());
       if (existing_ptr == nullptr) {
@@ -107,8 +108,7 @@ void addAnnoVarPtms(ProteoformPtr proteoform_ptr, MassShiftPtrVec & shift_ptrs,
       }
 
       StringPairVec acid_ptm_pairs = proteoform_ptr->getFastaSeqPtr()->getAcidPtmPairVec();
-      std::string acid_letter = acid_ptm_pairs[left_db_bp].first;
-      existing_ptr->addOccurence(left_db_bp, left_db_bp + 1, acid_letter);
+      existing_ptr->addOccurence(left_db_bp, right_db_bp, "");
     }
   }
 }
