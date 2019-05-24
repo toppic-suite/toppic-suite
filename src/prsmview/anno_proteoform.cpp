@@ -87,6 +87,33 @@ void addAnnoPtms(ProteoformPtr proteoform_ptr, MassShiftPtrVec & shift_ptrs,
   }
 }
 
+void addAnnoVarPtms(ProteoformPtr proteoform_ptr, MassShiftPtrVec & shift_ptrs,
+                    AnnoPtmPtrVec &var_ptm_ptrs) {
+  std::sort(shift_ptrs.begin(), shift_ptrs.end(), MassShift::cmpPosInc);
+  int start_pos = proteoform_ptr->getStartPos();
+  for (size_t i = 0; i < shift_ptrs.size(); i++) {
+    ChangePtrVec change_ptrs = shift_ptrs[i]->getChangePtrVec(); 
+    for (size_t j = 0; j < change_ptrs.size(); j++) {
+      PtmPtr ptm_ptr = change_ptrs[j]->getModPtr()->getModResiduePtr()->getPtmPtr();
+      if (PtmBase::isEmptyPtmPtr(ptm_ptr)) {
+        continue;
+      }
+      int left_db_bp = change_ptrs[j]->getLeftBpPos() + start_pos;
+      AnnoPtmPtr existing_ptr
+          = AnnoPtm::findPtm(var_ptm_ptrs, ptm_ptr, change_ptrs[j]->getTypePtr());
+      if (existing_ptr == nullptr) {
+        existing_ptr = std::make_shared<AnnoPtm>(ptm_ptr, change_ptrs[j]->getTypePtr());
+        var_ptm_ptrs.push_back(existing_ptr);
+      }
+
+      StringPairVec acid_ptm_pairs = proteoform_ptr->getFastaSeqPtr()->getAcidPtmPairVec();
+      std::string acid_letter = acid_ptm_pairs[left_db_bp].first;
+      existing_ptr->addOccurence(left_db_bp, left_db_bp + 1, acid_letter);
+    }
+  }
+}
+
+
 void addAnnoMassShifts(ProteoformPtr proteoform_ptr, MassShiftPtrVec & shift_ptrs,
                        AnnoMassShiftPtrVec &anno_shift_ptrs) {
   std::sort(shift_ptrs.begin(), shift_ptrs.end(), MassShift::cmpPosInc);
@@ -220,22 +247,35 @@ xercesc::DOMElement* geneAnnoProteoform(XmlDOMDocument* xml_doc,
   }
   // LOG_DEBUG("cleavage completed");
 
-  AnnoPtmPtrVec anno_ptm_ptrs;
+  // Fixed PTMs
+  AnnoPtmPtrVec anno_fixed_ptm_ptrs;
   MassShiftPtrVec fixed_shift_ptrs 
       = proteoform_ptr->getMassShiftPtrVec(MassShiftType::FIXED);
-  addAnnoPtms(proteoform_ptr, fixed_shift_ptrs, anno_ptm_ptrs);
+  addAnnoPtms(proteoform_ptr, fixed_shift_ptrs, anno_fixed_ptm_ptrs);
+  for (size_t i = 0; i < anno_fixed_ptm_ptrs.size(); i++) {
+    anno_fixed_ptm_ptrs[i]->appendXml(xml_doc, anno_element);
+  }
 
+  // protein N-terminal variable PTMs
+  AnnoPtmPtrVec anno_prot_var_ptm_ptrs;
   MassShiftPtrVec prot_var_shift_ptrs 
       = proteoform_ptr->getMassShiftPtrVec(MassShiftType::PROTEIN_VARIABLE);
-  addAnnoPtms(proteoform_ptr, prot_var_shift_ptrs, anno_ptm_ptrs);
-
-  for (size_t i = 0; i < anno_ptm_ptrs.size(); i++) {
-    anno_ptm_ptrs[i]->appendXml(xml_doc, anno_element);
+  addAnnoPtms(proteoform_ptr, prot_var_shift_ptrs, anno_prot_var_ptm_ptrs);
+  for (size_t i = 0; i < anno_prot_var_ptm_ptrs.size(); i++) {
+    anno_prot_var_ptm_ptrs[i]->appendXml(xml_doc, anno_element);
   }
   // LOG_DEBUG("Fixed PTM and protein vairable PTM finished!)
 
+  // variable PTMs
+  AnnoPtmPtrVec anno_var_ptm_ptrs;
   MassShiftPtrVec var_shift_ptrs 
       = proteoform_ptr->getMassShiftPtrVec(MassShiftType::VARIABLE);
+  addAnnoVarPtms(proteoform_ptr, var_shift_ptrs, anno_var_ptm_ptrs); 
+  for (size_t i = 0; i < anno_var_ptm_ptrs.size(); i++) {
+    anno_var_ptm_ptrs[i]->appendXml(xml_doc, anno_element);
+  }
+
+  // Bariable and unexpected mass shifts
   MassShiftPtrVec unexpected_shift_ptrs 
       = proteoform_ptr->getMassShiftPtrVec(MassShiftType::UNEXPECTED);
   unexpected_shift_ptrs.insert(unexpected_shift_ptrs.end(), 
