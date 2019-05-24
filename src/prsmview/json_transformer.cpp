@@ -45,10 +45,15 @@ void jsonTranslate(std::map<std::string, std::string> &arguments,
                    const std::string &fname_suffix) {
   std::string spectrum_file_name_ = arguments["spectrumFileName"];
   std::string xml_dir = file_util::basename(spectrum_file_name_) + "_" + fname_suffix + "_xml";
-  std::string json_dir = file_util::basename(spectrum_file_name_) + "_" + fname_suffix + "_html"
-      + file_util::getFileSeparator() + "data_js";
+  std::string html_dir = file_util::basename(spectrum_file_name_) + "_" + fname_suffix + "_html";
+  std::string json_dir = html_dir + file_util::getFileSeparator() + "data_js";
   std::string resource_dir = arguments["resourceDir"];
 
+  // copy resources 
+  std::string from_path(resource_dir + file_util::getFileSeparator() + "web2");
+  file_util::copyDir(from_path, html_dir);
+
+  // data js files
   file_util::createFolder(json_dir + file_util::getFileSeparator() +"proteoforms");
   file_util::createFolder(json_dir + file_util::getFileSeparator() +"prsms");
   file_util::createFolder(json_dir + file_util::getFileSeparator() +"proteins");

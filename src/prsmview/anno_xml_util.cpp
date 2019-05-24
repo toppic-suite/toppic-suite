@@ -12,23 +12,9 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#include <set>
-#include <utility>
-#include <limits>
-#include <string>
 #include <algorithm>
-#include <vector>
 
-#include "common/util/str_util.hpp"
-#include "common/base/residue_util.hpp"
-#include "common/xml/xml_dom_util.hpp"
-#include "seq/fasta_reader.hpp"
-#include "seq/proteoform_factory.hpp"
-#include "spec/peak.hpp"
-#include "prsm/peak_ion_pair_util.hpp"
 #include "prsm/prsm_util.hpp"
-#include "prsmview/anno_residue.hpp"
 #include "prsmview/anno_prsm.hpp"
 #include "prsmview/anno_xml_util.hpp"
 
