@@ -401,9 +401,9 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     xml_gene = nullptr;
     std::cout << "Generating PrSM xml files - finished." << std::endl;
 
-    std::cout << "Converting PrSM xml files to html files - started." << std::endl;
+    std::cout << "Converting PrSM xml files to json files - started." << std::endl;
     jsonTranslate(arguments, "toppic_prsm_cutoff");
-    std::cout << "Converting PrSM xml files to html files - finished." << std::endl;
+    std::cout << "Converting PrSM xml files to json files - finished." << std::endl;
 
     cutoff_type = (arguments["cutoffProteoformType"] == "FDR") ? "FORMFDR": "EVALUE";
     std::cout << "PrSM filtering by " << cutoff_type << " - started." << std::endl;
