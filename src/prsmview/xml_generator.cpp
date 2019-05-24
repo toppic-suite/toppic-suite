@@ -17,6 +17,7 @@
 #include <string>
 #include <algorithm>
 #include <vector>
+#include <cmath>
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
