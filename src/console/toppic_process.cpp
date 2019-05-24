@@ -63,7 +63,7 @@
 #include "local/local_processor.hpp"
 
 #include "prsmview/xml_generator.hpp"
-#include "prsmview/transformer.hpp"
+#include "prsmview/json_transformer.hpp"
 
 #include "console/toppic_argument.hpp"
 
@@ -401,9 +401,9 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     xml_gene = nullptr;
     std::cout << "Generating PrSM xml files - finished." << std::endl;
 
-    std::cout << "Converting PrSM xml files to html files - started." << std::endl;
-    translate(arguments, "toppic_prsm_cutoff");
-    std::cout << "Converting PrSM xml files to html files - finished." << std::endl;
+    std::cout << "Converting PrSM xml files to json files - started." << std::endl;
+    jsonTranslate(arguments, "toppic_prsm_cutoff");
+    std::cout << "Converting PrSM xml files to json files - finished." << std::endl;
 
     cutoff_type = (arguments["cutoffProteoformType"] == "FDR") ? "FORMFDR": "EVALUE";
     std::cout << "PrSM filtering by " << cutoff_type << " - started." << std::endl;
@@ -438,7 +438,7 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     std::cout << "Generating proteoform xml files - finished." << std::endl;
 
     std::cout << "Converting proteoform xml files to html files - started." << std::endl;
-    translate(arguments, "toppic_proteoform_cutoff");
+    jsonTranslate(arguments, "toppic_proteoform_cutoff");
     std::cout << "Converting proteoform xml files to html files - finished." << std::endl;
 
   } catch (const char* e) {

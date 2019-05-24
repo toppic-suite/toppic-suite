@@ -16,16 +16,18 @@
 #ifndef TOPPIC_PRSM_VIEW_ANNO_PRSM_HPP_
 #define TOPPIC_PRSM_VIEW_ANNO_PRSM_HPP_
 
-#include "common/xml/xml_dom_util.hpp"
+#include "common/xml/xml_dom_document.hpp"
 #include "prsm/prsm.hpp"
 #include "prsmview/prsm_view_mng.hpp"
 
 namespace toppic{
 
+namespace anno_prsm {
+
 xercesc::DOMElement* geneAnnoPrsm(XmlDOMDocument* xml_doc, PrsmPtr prsm_ptr,
                                   PrsmViewMngPtr mng_ptr, bool detail = true,
                                   bool add_ms_peaks = true);
-
 }
 
+}
 #endif /* TOPPIC_PRSM_VIEW_ANNO_PRSM_HPP_ */

@@ -114,7 +114,7 @@ ResiduePtrVec convertStrToResiduePtrVec(const StringPairVec &string_pair_vec) {
 }
 
 ResiduePtrVec convertStrToResiduePtrVec(const StringPairVec &string_pair_vec,
-                                                     const ModPtrVec &fix_mod_ptr_vec) {
+                                        const ModPtrVec &fix_mod_ptr_vec) {
   ResiduePtrVec residue_ptrs = convertStrToResiduePtrVec(string_pair_vec);
   applyFixedMod(residue_ptrs, fix_mod_ptr_vec);
   return residue_ptrs;

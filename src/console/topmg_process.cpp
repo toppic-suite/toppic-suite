@@ -62,7 +62,7 @@
 #include "mcmc/mcmc_dpr_processor.hpp"
 
 #include "prsmview/xml_generator.hpp"
-#include "prsmview/transformer.hpp"
+#include "prsmview/json_transformer.hpp"
 
 #include "console/topmg_argument.hpp"
 #include "console/topmg_process.hpp"
@@ -336,7 +336,7 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
     std::cout << "Generating PrSM xml files - finished." << std::endl;
 
     std::cout << "Converting PrSM xml files to html files - started." << std::endl;
-    translate(arguments, "topmg_prsm_cutoff");
+    jsonTranslate(arguments, "topmg_prsm_cutoff");
     std::cout << "Converting PrSM xml files to html files - finished." << std::endl;
 
     cutoff_type = (arguments["cutoffProteoformType"] == "FDR") ? "FORMFDR": "EVALUE";
@@ -371,7 +371,7 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
     std::cout << "Generating proteoform xml files - finished." << std::endl;
 
     std::cout << "Converting proteoform xml files to html files - started." << std::endl;
-    translate(arguments, "topmg_proteoform_cutoff");
+    jsonTranslate(arguments, "topmg_proteoform_cutoff");
     std::cout << "Converting proteoform xml files to html files - finished." << std::endl;
 
   } catch (const char* e) {

@@ -13,6 +13,7 @@
 //limitations under the License.
 
 #include <iomanip>
+#include <iostream>
 
 #include "common/util/file_util.hpp"
 #include "common/thread/simple_thread_pool.hpp"
