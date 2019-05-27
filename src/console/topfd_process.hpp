@@ -20,7 +20,19 @@
 
 namespace toppic {
 
-int TopFDProcess(std::map<std::string, std::string> arguments);
+namespace topfd_process {
+
+std::string geneArgumentStr(std::map<std::string, std::string> arguments, 
+                            const std::string & prefix);
+
+int processOneFile(std::map<std::string, std::string> arguments, 
+                   const std::string &argument_str,
+                   const std::string &spec_file_name, int frac_id);
+
+int process(std::map<std::string, std::string> arguments, 
+            std::vector<std::string> spec_file_lst); 
+
+}
 
 }
 

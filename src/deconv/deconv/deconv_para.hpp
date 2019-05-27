@@ -24,7 +24,9 @@ namespace toppic {
 
 class DeconvPara {
  public:
-  DeconvPara(std::map<std::string, std::string> &arguments);
+  DeconvPara(std::map<std::string, std::string> &arguments, 
+             const std::string &argument_str,
+             const std::string &spec_file_name, int frac_id); 
 
   void setDataFileName(const std::string & file_name) {data_file_name_ = file_name;}
 
@@ -32,7 +34,7 @@ class DeconvPara {
 
   int getFractionId() {return fraction_id_;}
 
-  std::string getParameterStr(const std::string & prefix);
+  std::string getArgumentStr() {return argument_str_;}
 
   int fraction_id_;
 
@@ -63,6 +65,8 @@ class DeconvPara {
   bool do_final_filtering_ = true;
 
   bool output_match_env_ = false;
+
+  std::string argument_str_;
 };
 
 typedef std::shared_ptr<DeconvPara> DeconvParaPtr;

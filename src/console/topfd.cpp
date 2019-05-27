@@ -19,6 +19,7 @@
 #include "common/util/str_util.hpp"
 #include "common/util/time_util.hpp"
 #include "spec/msalign_frac_combine.hpp"
+#include "deconv/deconv/deconv_para.hpp"
 #include "console/topfd_argument.hpp"
 #include "console/topfd_process.hpp"
 
@@ -38,25 +39,7 @@ int main(int argc, char* argv[]) {
 
   std::vector<std::string> spec_file_lst = argu_processor.getSpecFileList();
 
-  for (size_t k = 0; k < spec_file_lst.size(); k++) {
-    if (toppic::str_util::endsWith(spec_file_lst[k], "mzML")
-        || toppic::str_util::endsWith(spec_file_lst[k], "mzXML")
-        || toppic::str_util::endsWith(spec_file_lst[k], "mzml")
-        || toppic::str_util::endsWith(spec_file_lst[k], "mzxml")) {
-      arguments["spectrumFileName"] = spec_file_lst[k];
-      arguments["fractionId"] = std::to_string(k);
-      if (toppic::TopFDProcess(arguments) != 0) {
-        return 1;
-      }
-    }
-  }
+  int result = toppic::topfd_process::process(arguments, spec_file_lst);
 
-  if (spec_file_lst.size() > 1) {
-    std::string para_str = "";
-    //std::string para_str = para_ptr->getParameterStr("#");
-    //toppic::time_util::addTimeStamp(para_str);
-    toppic::MsAlignFracCombine msalign_combine(spec_file_lst, "spectrum_combined");
-    msalign_combine.process(para_str);
-  }
-  return 0;
+  return result;
 }
