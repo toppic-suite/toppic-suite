@@ -20,6 +20,7 @@
 #include "common/util/str_util.hpp"
 #include "deconv/feature/frac_feature_reader.hpp"
 #include "deconv/feature/frac_feature_writer.hpp"
+#include "deconv/feature/frac_feature_cluster.hpp"
 #include "deconv/feature/frac_feature_merge.hpp"
 
 namespace toppic {
@@ -27,13 +28,11 @@ namespace toppic {
 namespace frac_feature_merge {
 
 void mergeFiles(const std::vector<std::string> &spec_file_lst,
-                const std::string &output_file, 
+                const std::string &output_file_name, 
                 int max_num_per_file,
                 const std::string &para_str) {
-  std::ofstream outfile; 
-  outfile.open(output_file);
-  frac_feature_writer::writeHeader(outfile);
 
+  FracFeaturePtrVec all_features;
   for (size_t i = 0; i < spec_file_lst.size(); i++) {
     FracFeatureReader ft_reader(spec_file_lst[i]); 
     FracFeaturePtrVec features = ft_reader.readAllFeatures();
@@ -41,11 +40,16 @@ void mergeFiles(const std::vector<std::string> &spec_file_lst,
     for (size_t j = 0; j < features.size(); j++) {
       int feature_id = features[j]->getId() + i * max_num_per_file;
       features[j]->setId(feature_id);
-      frac_feature_writer::writeOneFeature(outfile, features[j]);
+      //frac_feature_writer::writeOneFeature(outfile, features[j]);
     }
+    all_features.insert(features.begin(), features.end(), all_features.end());
   }
 
-  outfile.close();
+  double mass_tolerance = 0.2;
+  double time_tolerance = 600;
+  frac_feature_cluster::cluster(all_features, mass_tolerance, time_tolerance);
+
+  frac_feature_writer::writeFeatures(output_file_name, all_features);
 }
 
 }
