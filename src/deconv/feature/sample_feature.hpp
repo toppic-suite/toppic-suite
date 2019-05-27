@@ -13,39 +13,26 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_DECONV_FEATURE_FRAC_FEATURE_HPP_
-#define TOPPIC_DECONV_FEATURE_FRAC_FEATURE_HPP_
+#ifndef TOPPIC_DECONV_FEATURE_SAMPLE_FEATURE_HPP_
+#define TOPPIC_DECONV_FEATURE_SAMPLE_FEATURE_HPP_
 
 #include <memory>
 #include <vector>
 
+#include "deconv/feature/frac_feature.hpp"
+
 namespace toppic {
 
-class FracFeature;
-typedef std::shared_ptr<FracFeature> FracFeaturePtr;
-typedef std::vector<FracFeaturePtr> FracFeaturePtrVec;
+class SampleFeature;
+typedef std::shared_ptr<SampleFeature> SampleFeaturePtr;
 
-class FracFeature {
+class SampleFeature {
  public:
-  FracFeature() {}
+  SampleFeature() {}
 
-  FracFeature(int id, int fraction_id, 
-              const std::string &file_name,
-              double mono_mass, double inte,
-              double retent_begin, double retent_end,
-              int scan_begin, int scan_end,
-              int min_charge, int max_charge);
-
-  FracFeature(std::string line);
-
-  static void writeFeatures(const std::string &output_file_name,
-                            const FracFeaturePtrVec &features);
+  int getSampleId() {return sample_id_;}
 
   int getId() {return id_;}
-
-  int getFracId() {return frac_id_;}
-
-  std::string getFileName() {return file_name_;}
 
   double getMonoMass() {return mono_mass_;}
 
@@ -57,40 +44,37 @@ class FracFeature {
 
   double getRetentMiddle() {return (retent_begin_ + retent_end_)/2;}
 
-  int getScanBegin() {return scan_begin_;}
-
-  int getScanEnd() {return scan_end_;}
-
   int getMinCharge() {return min_charge_;}
 
   int getMaxCharge() {return max_charge_;}
 
-  static bool cmpMassInc(const FracFeaturePtr &a, const FracFeaturePtr &b) { 
+  void setSampleId(int sample_id) {sample_id_ = sample_id;}
+
+  static bool cmpMassInc(const SampleFeaturePtr &a, const SampleFeaturePtr &b) { 
     return a->getMonoMass() < b->getMonoMass();
   }
 
-  static bool cmpInteDec(const FracFeaturePtr &a, const FracFeaturePtr &b) { 
+  static bool cmpInteDec(const SampleFeaturePtr &a, const SampleFeaturePtr &b) { 
     return a->getIntensity() > b->getIntensity();
   }
 
-  static bool cmpRetentInc(const FracFeaturePtr &a, const FracFeaturePtr &b) { 
+  static bool cmpRetentInc(const SampleFeaturePtr &a, const SampleFeaturePtr &b) { 
     return a->getRetentMiddle() < b->getRetentMiddle();
   }
 
  protected:
+  int sample_id_;
   int id_;
-  int frac_id_;
-  std::string file_name_;
   double mono_mass_;
   double intensity_;
   double retent_begin_;
   double retent_end_;
-  int scan_begin_;
-  int scan_end_;
   int min_charge_;
   int max_charge_;
+  FracFeaturePtrVec frac_features_;
 };
 
+typedef std::vector<SampleFeaturePtr> SampleFeaturePtrVec;
 
 }
 #endif

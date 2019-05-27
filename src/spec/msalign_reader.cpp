@@ -269,4 +269,22 @@ void MsAlignReader::close() {
   input_.close();
 }
 
+void MsAlignReader::readMsOneSpectra(const std::string &file_name, 
+                                     DeconvMsPtrVec &ms_ptr_vec) {
+  std::cout << std::flush << "Reading spectrum started." <<  std::endl;
+  int sp_num_in_group = 1;
+  MsAlignReader sp_reader(file_name, sp_num_in_group,
+                          nullptr, std::set<std::string>());
+
+  DeconvMsPtr ms_ptr;
+  //LOG_DEBUG("Start search");
+  while ((ms_ptr = sp_reader.getNextMs())!= nullptr) {
+    ms_ptr->getMsHeaderPtr()->setMsLevel(1);
+    ms_ptr_vec.push_back(ms_ptr);
+    //std::cout << std::flush <<  "reading spectrum " << ms_ptr_vec.size() << "\r";
+  }
+  sp_reader.close();
+  std::cout << std::flush << "Reading spectrum finished." <<  std::endl;
+}
+
 }  // namespace toppic

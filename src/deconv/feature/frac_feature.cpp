@@ -19,12 +19,15 @@
 
 namespace toppic {
 
-FracFeature::FracFeature(int id, int fraction_id, double mono_mass, double inte,
+FracFeature::FracFeature(int id, int frac_id, 
+                         const std::string &file_name,
+                         double mono_mass, double inte,
                          double retent_begin, double retent_end,
                          int scan_begin, int scan_end,
                          int min_charge, int max_charge): 
     id_(id),
-    fraction_id_(fraction_id),
+    frac_id_(frac_id),
+    file_name_(file_name),
     mono_mass_(mono_mass),
     intensity_(inte),
     retent_begin_(retent_begin),
@@ -39,15 +42,16 @@ FracFeature::FracFeature(std::string line) {
   std::vector<std::string> strs;
   strs = str_util::split(line, "\t");
   id_ = std::stoi(strs[0]);
-  fraction_id_ = std::stoi(strs[1]);
-  mono_mass_ = std::stod(strs[2]);
-  intensity_ = std::stod(strs[3]);
-  retent_begin_ = std::stod(strs[4]);
-  retent_end_ = std::stod(strs[5]);
-  scan_begin_ = std::stoi(strs[6]);
-  scan_end_ = std::stoi(strs[7]);
-  min_charge_ = std::stoi(strs[8]);
-  max_charge_ = std::stoi(strs[9]);
+  frac_id_ = std::stoi(strs[1]);
+  file_name_ = strs[2];
+  mono_mass_ = std::stod(strs[3]);
+  intensity_ = std::stod(strs[4]);
+  retent_begin_ = std::stod(strs[5]);
+  retent_end_ = std::stod(strs[6]);
+  scan_begin_ = std::stoi(strs[7]);
+  scan_end_ = std::stoi(strs[8]);
+  min_charge_ = std::stoi(strs[9]);
+  max_charge_ = std::stoi(strs[10]);
 }
 
 void FracFeature::writeFeatures(const std::string &output_file_name,
@@ -56,6 +60,7 @@ void FracFeature::writeFeatures(const std::string &output_file_name,
   of.precision(16);
   of << "ID" << "\t"
       << "Fraction ID" << "\t"
+      << "File name" << "\t"
       << "Mass" << "\t"
       << "Intensity" << "\t"
       << "Time begin" << "\t"
@@ -68,7 +73,8 @@ void FracFeature::writeFeatures(const std::string &output_file_name,
   for (size_t i = 0; i < features.size(); i++) {
     FracFeaturePtr feature = features[i];
     of << feature->getId() << "\t"
-        << feature->getFractionId() << "\t"
+        << feature->getFracId() << "\t"
+        << feature->getFileName() << "\t"
         << feature->getMonoMass() << "\t"
         << feature->getIntensity() << "\t"
         << feature->getRetentBegin() << "\t"

@@ -43,6 +43,8 @@ class MsAlignReader {
 
   void close();
 
+  static void readMsOneSpectra(const std::string &file_name, DeconvMsPtrVec &ms_ptr_vec); 
+
  private:
   std::string file_name_;
 
