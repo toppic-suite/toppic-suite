@@ -22,7 +22,7 @@
 #include "common/base/base_data.hpp"
 #include "spec/msalign_frac_combine.hpp"
 #include "deconv/deconv/deconv_process_2.hpp"
-#include "deconv/feature/feature_detect_3.hpp"
+#include "deconv/feature/frac_feature_detect.hpp"
 
 namespace toppic {
 
@@ -73,8 +73,8 @@ int processOneFile(std::map<std::string, std::string> arguments,
 
     std::string argu_str = para_ptr->getArgumentStr();
     std::string sp_file_name = para_ptr->getDataFileName();
-    feature_detect_3::process(sp_file_name, para_ptr->missing_level_one_,
-                              argu_str);
+    frac_feature_detect::process(frac_id, sp_file_name, 
+                                 para_ptr->missing_level_one_, argu_str);
 
     time_t end = time(0);
     std::cout << "Runing time: "

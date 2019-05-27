@@ -18,7 +18,10 @@
 
 namespace toppic {
 
-FeaturePara::FeaturePara() {
+FeaturePara::FeaturePara(int frac_id, const std::string &file_name): 
+  frac_id_(frac_id),
+  file_name_(file_name) {
+
   double ppo = 0.000015;
   bool use_min_tolerance = true;
   double min_tolerance = 0.01;

@@ -26,61 +26,13 @@
 #include "spec/msalign_reader.hpp"
 #include "prsm/prsm_str.hpp"
 #include "prsm/prsm_reader.hpp"
-#include "deconv/feature/feature.hpp"
+#include "deconv/feature/frac_feature.hpp"
 #include "deconv/feature/feature_para.hpp"
-#include "deconv/feature/feature_detect_3.hpp"
+#include "deconv/feature/frac_feature_detect.hpp"
 
 namespace toppic {
 
-namespace feature_detect_3 {
-
-void writeMs1Features(const std::string &output_file_name,
-                      const FeaturePtrVec &features) {
-  std::ofstream of(output_file_name, std::ofstream::out);
-  of.precision(16);
-  of << "ID" << "\t"
-      << "Mass" << "\t"
-      << "Intensity" << "\t"
-      << "Time begin" << "\t"
-      << "Time end" << "\t"
-      << "First scan" << "\t"
-      << "Last scan" << "\t"
-      << "Minimum charge state" << "\t"
-      << "Maximum charge state" 
-      << std::endl;
-  for (size_t i = 0; i < features.size(); i++) {
-    FeaturePtr feature = features[i];
-    of << feature->getId() << "\t"
-        << feature->getMonoMass() << "\t"
-        << feature->getIntensity() << "\t"
-        << feature->getRetentBegin() << "\t"
-        << feature->getRetentEnd() << "\t"
-        << feature->getScanBegin() << "\t"
-        << feature->getScanEnd() << "\t"
-        << feature->getMinCharge() << "\t"
-        << feature->getMaxCharge() << "\t"
-        << std::endl;
-  }
-  of.close();
-}
-
-void readSpectra(const std::string &file_name, DeconvMsPtrVec &ms_ptr_vec) {
-  std::cout << std::flush << "Reading spectrum started." <<  std::endl;
-  int sp_num_in_group = 1;
-  MsAlignReader sp_reader(file_name, sp_num_in_group,
-                          nullptr, std::set<std::string>());
-
-  DeconvMsPtr ms_ptr;
-  //LOG_DEBUG("Start search");
-  while ((ms_ptr = sp_reader.getNextMs())!= nullptr) {
-    ms_ptr->getMsHeaderPtr()->setMsLevel(1);
-    ms_ptr_vec.push_back(ms_ptr);
-    //std::cout << std::flush <<  "reading spectrum " << ms_ptr_vec.size() << "\r";
-  }
-  sp_reader.close();
-  std::cout << std::flush << "Reading spectrum finished." <<  std::endl;
-}
-
+namespace frac_feature_detect {
 
 bool peakExists (DeconvMsPtrVec &ms1_ptr_vec, DeconvPeakPtr peak) {
   int sp_id = peak->getSpId();
@@ -93,7 +45,6 @@ bool peakExists (DeconvMsPtrVec &ms1_ptr_vec, DeconvPeakPtr peak) {
     return true;
   }
 }
-
 
 void getMatchedPeaks(DeconvMsPtrVec &ms1_ptr_vec, double prec_mass,
                      DeconvPeakPtrVec &matched_peaks, 
@@ -118,7 +69,6 @@ void getMatchedPeaks(DeconvMsPtrVec &ms1_ptr_vec, double prec_mass,
     }
   }
 }
-
 
 bool containPrecursor(DeconvMsPtr ms1_ptr, double prec_mass, FeatureParaPtr para_ptr) {
   if (ms1_ptr == nullptr) return false;
@@ -267,9 +217,9 @@ int getMaxCharge (DeconvPeakPtrVec &matched_peaks) {
   return max_charge;
 }
 
-FeaturePtr getFeature(int sp_id, double prec_mass, int feat_id, 
-                      DeconvMsPtrVec &ms1_ptr_vec,
-                      DeconvPeakPtrVec &matched_peaks, FeatureParaPtr para_ptr) {
+FracFeaturePtr getFeature(int sp_id, double prec_mass, int feat_id, 
+                          DeconvMsPtrVec &ms1_ptr_vec,
+                          DeconvPeakPtrVec &matched_peaks, FeatureParaPtr para_ptr) {
   int ms1_id_begin = getMs1IdBegin(ms1_ptr_vec, sp_id, prec_mass, para_ptr);
   int ms1_id_end = getMs1IdEnd(ms1_ptr_vec, sp_id, prec_mass, para_ptr);
   getMatchedPeaks(ms1_ptr_vec, prec_mass, matched_peaks,
@@ -285,13 +235,16 @@ FeaturePtr getFeature(int sp_id, double prec_mass, int feat_id,
   double retent_end = ms1_ptr_vec[ms1_id_end]->getMsHeaderPtr()->getRetentionTime();
   int ms1_scan_begin = ms1_ptr_vec[ms1_id_begin]->getMsHeaderPtr()->getFirstScanNum();
   int ms1_scan_end = ms1_ptr_vec[ms1_id_end]->getMsHeaderPtr()->getFirstScanNum();
-  FeaturePtr feature_ptr = std::make_shared<Feature>(feat_id, feat_mass,
-                                                     feat_inte,
-                                                     retent_begin,
-                                                     retent_end,
-                                                     ms1_scan_begin,
-                                                     ms1_scan_end, min_charge,
-                                                     max_charge);
+  FracFeaturePtr feature_ptr = std::make_shared<FracFeature>(feat_id, 
+                                                             para_ptr->frac_id_,
+                                                             para_ptr->file_name_,
+                                                             feat_mass,
+                                                             feat_inte,
+                                                             retent_begin,
+                                                             retent_end,
+                                                             ms1_scan_begin,
+                                                             ms1_scan_end, min_charge,
+                                                             max_charge);
   return feature_ptr;
 }
 
@@ -304,8 +257,8 @@ void removePeaks (DeconvMsPtrVec &ms1_ptr_vec, DeconvPeakPtrVec &matched_peaks) 
   }
 }
 
-void findMs1Features(DeconvMsPtrVec &ms1_ptr_vec, FeatureParaPtr para_ptr,
-                     FeaturePtrVec &features) {
+void findMsOneFeatures(DeconvMsPtrVec &ms1_ptr_vec, FeatureParaPtr para_ptr,
+                       FracFeaturePtrVec &features) {
   //get all peaks
   DeconvPeakPtrVec all_peaks;
   for (size_t i = 0; i < ms1_ptr_vec.size(); i++) {
@@ -324,8 +277,8 @@ void findMs1Features(DeconvMsPtrVec &ms1_ptr_vec, FeatureParaPtr para_ptr,
       int sp_id = best_peak->getSpId();
       double prec_mass = best_peak->getPosition();
       DeconvPeakPtrVec matched_peaks;
-      FeaturePtr feature_ptr = getFeature(sp_id, prec_mass, feat_id, ms1_ptr_vec,
-                                          matched_peaks, para_ptr);
+      FracFeaturePtr feature_ptr = getFeature(sp_id, prec_mass, feat_id, ms1_ptr_vec,
+                                              matched_peaks, para_ptr);
       if (feature_ptr != nullptr) {
         features.push_back(feature_ptr);
         removePeaks(ms1_ptr_vec, matched_peaks);
@@ -350,7 +303,7 @@ void readHeaders(const std::string & file_name, MsHeaderPtrVec &header_ptr_vec) 
   //std::cout << std::endl;
 }
 
-inline bool isMatch(FeaturePtr feature_ptr, MsHeaderPtr header, FeatureParaPtr para_ptr) {
+inline bool isMatch(FracFeaturePtr feature_ptr, MsHeaderPtr header, FeatureParaPtr para_ptr) {
   int ms1_scan = header->getMsOneScan();
   if (ms1_scan < feature_ptr->getScanBegin()) {
     return false;
@@ -377,8 +330,9 @@ inline bool isMatch(FeaturePtr feature_ptr, MsHeaderPtr header, FeatureParaPtr p
   return false;
 }
 
-inline FeaturePtr getMatchedFeaturePtr(FeaturePtrVec &features, MsHeaderPtr header,
-                                       FeatureParaPtr para_ptr) {
+inline FracFeaturePtr getMatchedFeaturePtr(FracFeaturePtrVec &features, 
+                                           MsHeaderPtr header,
+                                           FeatureParaPtr para_ptr) {
   for (size_t i = 0; i < features.size(); i++) {
     if (isMatch(features[i], header, para_ptr)) {
       return features[i];
@@ -388,12 +342,12 @@ inline FeaturePtr getMatchedFeaturePtr(FeaturePtrVec &features, MsHeaderPtr head
 }
 
 void addMsHeaderFeatures(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtrVec &header_ptr_vec, 
-                         FeaturePtrVec &features, FeatureParaPtr para_ptr) {
+                         FracFeaturePtrVec &features, FeatureParaPtr para_ptr) {
   MsHeaderPtrVec sorted_ptrs = header_ptr_vec;
   std::sort(sorted_ptrs.begin(), sorted_ptrs.end(), MsHeader::cmpPrecInteDec);
   for (size_t i = 0; i < sorted_ptrs.size(); i++) {
     MsHeaderPtr header = sorted_ptrs[i];
-    FeaturePtr ft_ptr = getMatchedFeaturePtr(features, header, para_ptr);
+    FracFeaturePtr ft_ptr = getMatchedFeaturePtr(features, header, para_ptr);
     if (ft_ptr != nullptr) {
       header->setFeatureId(ft_ptr->getId());
       header->setFeatureInte(ft_ptr->getIntensity());
@@ -404,8 +358,8 @@ void addMsHeaderFeatures(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtrVec &header_ptr
       if (prec_mass > 0) {
         int feat_id = static_cast<int>(features.size());
         DeconvPeakPtrVec matched_peaks;
-        FeaturePtr feature_ptr = getFeature(sp_id, prec_mass, feat_id, ms1_ptr_vec,
-                                            matched_peaks, para_ptr);
+        FracFeaturePtr feature_ptr = getFeature(sp_id, prec_mass, feat_id, ms1_ptr_vec,
+                                                matched_peaks, para_ptr);
         // if we find a feature in ms1.msalign
         // it is possible that some ms headers do not have matched features. 
         if (feature_ptr != nullptr) {
@@ -456,18 +410,18 @@ void writeMs2Feature(const std::string & output_file_name,
   of.close();
 }
 
-void process(std::string &sp_file_name, bool missing_level_one, 
-             std::string &argu_str) {
+void process(int frac_id, std::string &sp_file_name, 
+             bool missing_level_one, std::string &argu_str) {
   //logger::setLogLevel(2);
-  FeatureParaPtr para_ptr = std::make_shared<FeaturePara>();
+  FeatureParaPtr para_ptr = std::make_shared<FeaturePara>(frac_id, sp_file_name);
   std::string base_name = file_util::basename(sp_file_name);
   // read ms1 deconvoluted spectra
   std::string ms1_file_name = base_name + "_ms1.msalign";
   DeconvMsPtrVec ms1_ptr_vec;
-  FeaturePtrVec features;
+  FracFeaturePtrVec features;
   if (!missing_level_one) {
-    readSpectra(ms1_file_name, ms1_ptr_vec);
-    findMs1Features(ms1_ptr_vec, para_ptr, features);
+    MsAlignReader::readMsOneSpectra(ms1_file_name, ms1_ptr_vec);
+    findMsOneFeatures(ms1_ptr_vec, para_ptr, features);
   }
 
   LOG_DEBUG("start reading ms2");
@@ -477,9 +431,9 @@ void process(std::string &sp_file_name, bool missing_level_one,
   addMsHeaderFeatures(ms1_ptr_vec, header_ptr_vec, 
                       features, para_ptr);
 
-  std::sort(features.begin(), features.end(), Feature::cmpMassInc);
+  std::sort(features.begin(), features.end(), FracFeature::cmpMassInc);
   std::string output_file_name = base_name + "_ms1.feature";
-  writeMs1Features(output_file_name, features);
+  FracFeature::writeFeatures(output_file_name, features);
 
   output_file_name = base_name + "_ms2.feature";
   writeMs2Feature(output_file_name, header_ptr_vec, argu_str);

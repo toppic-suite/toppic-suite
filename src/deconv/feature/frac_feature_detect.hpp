@@ -12,17 +12,17 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_DECONV_FEATURE_FEATURE_DETECTION_3_HPP_
-#define TOPPIC_DECONV_FEATURE_FEATURE_DETECTION_3_HPP_
+#ifndef TOPPIC_DECONV_FEATURE_FRAC_FEATURE_DETECT_HPP_
+#define TOPPIC_DECONV_FEATURE_FRAC_FEATURE_DETECT_HPP_
 
 #include <string>
 
 namespace toppic {
 
-namespace feature_detect_3 {
+namespace frac_feature_detect {
 
-void process(std::string &sp_file_name, bool miss_level_one, 
-             std::string &argu_str);
+void process(int frac_id, std::string &sp_file_name, 
+             bool miss_level_one, std::string &argu_str);
 };
 
 }

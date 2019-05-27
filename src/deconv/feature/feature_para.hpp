@@ -23,7 +23,7 @@ namespace toppic {
 
 class FeaturePara {
  public:
-  FeaturePara();
+  FeaturePara(int frac_id, const std::string &file_name);
 
   std::vector<double> getExtendMasses(double mass);
 
@@ -48,6 +48,10 @@ class FeaturePara {
   int intv_width_ = 500;
 
   int feature_num_ = 20000;
+
+  int frac_id_;
+
+  std::string file_name_;
 
 };
 
