@@ -68,6 +68,10 @@ class FracFeature {
 
   void setId(int id) {id_ = id;}
 
+  void setSampleFeatureId(int id) {sample_feature_id_ = id;}
+
+  void setSampleFeatureInte(double inte) {sample_feature_inte_ = inte;}
+
   static bool cmpMassInc(const FracFeaturePtr &a, const FracFeaturePtr &b) { 
     return a->getMonoMass() < b->getMonoMass();
   }
@@ -96,6 +100,7 @@ class FracFeature {
   double sample_feature_inte_ = 0;
 };
 
+typedef std::vector<FracFeaturePtrVec> FracFeaturePtrVec2D;
 
 }
 #endif
