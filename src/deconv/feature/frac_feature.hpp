@@ -38,9 +38,6 @@ class FracFeature {
 
   FracFeature(std::string line);
 
-  static void writeFeatures(const std::string &output_file_name,
-                            const FracFeaturePtrVec &features);
-
   int getId() {return id_;}
 
   int getFracId() {return frac_id_;}
@@ -64,6 +61,12 @@ class FracFeature {
   int getMinCharge() {return min_charge_;}
 
   int getMaxCharge() {return max_charge_;}
+
+  int getSampleFeatureId() {return sample_feature_id_;}
+
+  double getSampleFeatureInte() {return sample_feature_inte_;}
+
+  void setId(int id) {id_ = id;}
 
   static bool cmpMassInc(const FracFeaturePtr &a, const FracFeaturePtr &b) { 
     return a->getMonoMass() < b->getMonoMass();
@@ -89,6 +92,8 @@ class FracFeature {
   int scan_end_;
   int min_charge_;
   int max_charge_;
+  int sample_feature_id_ = -1;
+  double sample_feature_inte_ = 0;
 };
 
 

@@ -12,31 +12,29 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_DECONV_FEATURE_FEATURE_READER_HPP_
-#define TOPPIC_DECONV_FEATURE_FEATURE_READER_HPP_
+#ifndef TOPPIC_DECONV_FEATURE_MSALIGN_FEATURE_MERGE_HPP_
+#define TOPPIC_DECONV_FEATURE_MSALIGN_FEATURE_MERGE_HPP_
 
-#include <fstream>
-
-#include "deconv/feature/feature.hpp"
+#include <memory>
+#include <vector>
+#include <string>
 
 namespace toppic {
 
-class FeatureReader {
+class MsAlignFeatureMerge {
  public:
-  FeatureReader(const std::string &file_name);
+  MsAlignFeatureMerge(const std::vector<std::string> &spec_file_names,
+                      const std::string &output_file_name);
 
-  void close();
-
-  FeaturePtr readOneFeature(); 
-
-  FeaturePtrVec readAllFeatures();
+  void process(std::string &para_str);
 
  private:
-  std::string file_name_;
-  std::ifstream input_;
+  std::vector<std::string> spec_file_names_;
+  std::string output_file_name_;
+  static int MAX_NUM_PER_FILE;
 };
 
-typedef std::shared_ptr<FeatureReader> FeatureReaderPtr;
+typedef std::shared_ptr<MsAlignFeatureMerge> MsAlignFeatureMergePtr;
+} /* namespace toppic */
 
-}  // namespace toppic
 #endif

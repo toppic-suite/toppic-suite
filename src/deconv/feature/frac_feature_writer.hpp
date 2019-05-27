@@ -12,33 +12,29 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_SPEC_MSALIGN_FRAC_COMBINE_HPP_
-#define TOPPIC_SPEC_MSALIGN_FRAC_COMBINE_HPP_
+#ifndef TOPPIC_DECONV_FEATURE_FRAC_FEATURE_WRITER_HPP_
+#define TOPPIC_DECONV_FEATURE_FRAC_FEATURE_WRITER_HPP_
 
 #include <memory>
 #include <vector>
 #include <string>
+#include <fstream>
+
+#include "deconv/feature/frac_feature.hpp"
 
 namespace toppic {
 
-class MsAlignFracCombine {
- public:
-  MsAlignFracCombine(const std::vector<std::string> &spec_file_names,
-                     const std::string &output_file_name);
+namespace frac_feature_writer {
 
-  void process(std::string &para_str);
+void writeFeatures(const std::string &output_file_name,
+                   const FracFeaturePtrVec &features);
 
-  static void mergeFiles(const std::vector<std::string> &spec_file_lst,
-                         const std::string &output_file, 
-                         const std::string &para_str = "");
+void writeHeader(std::ofstream &of); 
 
- private:
-  std::vector<std::string> spec_file_names_;
-  std::string output_file_name_;
-  static int MAX_SPEC_NUM_PER_FILE;
-  };
+void writeOneFeature(std::ofstream &of, FracFeaturePtr feature);
 
-typedef std::shared_ptr<MsAlignFracCombine> MsAlignFracCombinePtr;
+}
+
 } /* namespace toppic */
 
 #endif
