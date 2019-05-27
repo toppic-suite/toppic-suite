@@ -20,9 +20,9 @@
 #include "common/util/file_util.hpp"
 #include "common/util/str_util.hpp"
 #include "common/base/base_data.hpp"
-#include "spec/msalign_frac_combine.hpp"
 #include "deconv/deconv/deconv_process_2.hpp"
 #include "deconv/feature/frac_feature_detect.hpp"
+#include "deconv/feature/msalign_feature_merge.hpp"
 
 namespace toppic {
 
@@ -91,6 +91,7 @@ int processOneFile(std::map<std::string, std::string> arguments,
 int process(std::map<std::string, std::string> arguments, 
             std::vector<std::string> spec_file_lst) {
   std::string argument_str = geneArgumentStr(arguments, "#");
+  /*
   for (size_t k = 0; k < spec_file_lst.size(); k++) {
     if (str_util::endsWith(spec_file_lst[k], "mzML")
         || str_util::endsWith(spec_file_lst[k], "mzXML")
@@ -102,12 +103,13 @@ int process(std::map<std::string, std::string> arguments,
       }
     }
   }
+  */
 
-  if (spec_file_lst.size() > 1) {
-    time_util::addTimeStamp(argument_str);
-    MsAlignFracCombine msalign_combine(spec_file_lst, "spectrum_combined");
-    msalign_combine.process(argument_str);
-  }
+  time_util::addTimeStamp(argument_str);
+  std::cout << "Merging files started." << std::endl;
+  MsAlignFeatureMerge file_merge(spec_file_lst, "spectrum_combined");
+  file_merge.process(argument_str);
+  std::cout << "Merging files ended." << std::endl;
   return 0;
 }
 

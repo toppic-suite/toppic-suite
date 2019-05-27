@@ -52,40 +52,9 @@ FracFeature::FracFeature(std::string line) {
   scan_end_ = std::stoi(strs[8]);
   min_charge_ = std::stoi(strs[9]);
   max_charge_ = std::stoi(strs[10]);
+  sample_feature_id_ = std::stoi(strs[11]);
+  sample_feature_inte_ = std::stod(strs[12]);
 }
 
-void FracFeature::writeFeatures(const std::string &output_file_name,
-                                const FracFeaturePtrVec &features) {
-  std::ofstream of(output_file_name);
-  of.precision(16);
-  of << "ID" << "\t"
-      << "Fraction ID" << "\t"
-      << "File name" << "\t"
-      << "Mass" << "\t"
-      << "Intensity" << "\t"
-      << "Time begin" << "\t"
-      << "Time end" << "\t"
-      << "First scan" << "\t"
-      << "Last scan" << "\t"
-      << "Minimum charge state" << "\t"
-      << "Maximum charge state" 
-      << std::endl;
-  for (size_t i = 0; i < features.size(); i++) {
-    FracFeaturePtr feature = features[i];
-    of << feature->getId() << "\t"
-        << feature->getFracId() << "\t"
-        << feature->getFileName() << "\t"
-        << feature->getMonoMass() << "\t"
-        << feature->getIntensity() << "\t"
-        << feature->getRetentBegin() << "\t"
-        << feature->getRetentEnd() << "\t"
-        << feature->getScanBegin() << "\t"
-        << feature->getScanEnd() << "\t"
-        << feature->getMinCharge() << "\t"
-        << feature->getMaxCharge() << "\t"
-        << std::endl;
-  }
-  of.close();
-}
 
 }

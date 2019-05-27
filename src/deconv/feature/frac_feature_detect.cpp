@@ -29,6 +29,7 @@
 #include "deconv/feature/frac_feature.hpp"
 #include "deconv/feature/feature_para.hpp"
 #include "deconv/feature/frac_feature_detect.hpp"
+#include "deconv/feature/frac_feature_writer.hpp"
 
 namespace toppic {
 
@@ -369,7 +370,7 @@ void addMsHeaderFeatures(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtrVec &header_ptr
           header->setFeatureInte(feature_ptr->getIntensity());
         }
         else {
-          LOG_ERROR("Cannot find features in LC/MS! Spectrum id: " << sp_id);
+          LOG_WARN("Cannot find features in LC/MS! Spectrum id: " << sp_id);
         }
       }
     }
@@ -389,8 +390,8 @@ void writeMs2Feature(const std::string & output_file_name,
       << "MS_ONE_SCAN" << "\t"
       << "PRECURSOR_MASS" << "\t"
       << "PRECURSOR_INTENSITY" << "\t"
-      << "FEATURE_ID" << "\t"
-      << "FEATURE_INTENSITY" << std::endl;
+      << "FRACTION_FEATURE_ID" << "\t"
+      << "FRACTION_FEATURE_INTENSITY" << std::endl;
   for (size_t i = 0; i < ms2_header_ptrs.size(); i++) {
     MsHeaderPtr header = ms2_header_ptrs[i];
     of << header->getId() << "\t"
@@ -433,7 +434,7 @@ void process(int frac_id, std::string &sp_file_name,
 
   std::sort(features.begin(), features.end(), FracFeature::cmpMassInc);
   std::string output_file_name = base_name + "_ms1.feature";
-  FracFeature::writeFeatures(output_file_name, features);
+  frac_feature_writer::writeFeatures(output_file_name, features);
 
   output_file_name = base_name + "_ms2.feature";
   writeMs2Feature(output_file_name, header_ptr_vec, argu_str);
