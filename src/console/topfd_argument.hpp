@@ -45,6 +45,8 @@ class Argument {
 
   void showUsage(boost::program_options::options_description &desc);
 
+ private:
+
   std::map<std::string,std::string> arguments_;
 
   std::vector<std::string> spec_file_list_;

@@ -25,10 +25,12 @@
 
 namespace toppic {
 
-DeconvPara::DeconvPara(std::map<std::string, std::string> &arguments) {
-  data_file_name_ = arguments["spectrumFileName"];
+DeconvPara::DeconvPara(std::map<std::string, std::string> &arguments, 
+                       const std::string &argument_str, 
+                       const std::string &spec_file_name, int frac_id) { 
+  data_file_name_ = spec_file_name; 
 
-  fraction_id_ = std::stoi(arguments["fractionId"]);
+  fraction_id_ = frac_id;
   
   resource_dir_ = arguments["resourceDir"];
 
@@ -53,33 +55,8 @@ DeconvPara::DeconvPara(std::map<std::string, std::string> &arguments) {
   do_final_filtering_ = (arguments["doFinalFiltering"] == "true");
   
   output_match_env_ = (arguments["outputMatchEnv"] == "true");
-}
 
-std::string DeconvPara::getParameterStr(const std::string & prefix) {
-  std::stringstream output;
-  output << prefix << "TopFD " << version_number << std::endl;
-  // TIME_STAMP_STR is replaced later
-  output << prefix << "Timestamp: " << time_util::TIME_STAMP_STR << std::endl;
-  output << prefix << "********************** Parameters **********************" << std::endl;
-  // output << prefix << std::setw(40) << std::left << "Input file: " << data_file_name_ << std::endl;
-  output << prefix << std::setw(40) << std::left 
-      << "Data type: " << "centroid" << std::endl;
-  output << prefix << std::setw(40) << std::left 
-      << "Maximum charge: " << max_charge_ << std::endl;
-  output << prefix << std::setw(40) << std::left 
-      << "Maximum monoisotopic mass: " << max_mass_ << " Dalton" << std::endl;
-  output << prefix << std::setw(40) << std::left 
-      << "Error tolerance: " << tolerance_ << " m/z" << std::endl;
-  output << prefix << std::setw(40) << std::left 
-      << "MS1 signal/noise ratio: " << ms_one_sn_ratio_ << std::endl;
-  output << prefix << std::setw(40) << std::left 
-      << "MS/MS signal/noise ratio: " << ms_two_sn_ratio_ << std::endl;
-  output << prefix << std::setw(40) << std::left 
-      << "Precursor window size: " << prec_window_ << " m/z" << std::endl;
-  //output << prefix << std::setw(40) << std::left 
-  //    << "Do final filtering: " << para_ptr->do_final_filtering_ << std::endl;
-  output << prefix << "********************** Parameters **********************" << std::endl;
-  return output.str();
+  argument_str_ = argument_str;
 }
 
 }  // namespace toppic
