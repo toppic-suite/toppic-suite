@@ -48,7 +48,7 @@ class MsHeader {
   // get functions 
   ActivationPtr getActivationPtr() {return activation_ptr_;}
 
-  double getFeatureInte() {return feature_inte_;}
+ // double getFeatureInte() {return feature_inte_;}
 
   int getId() {return id_;}
 
@@ -78,7 +78,7 @@ class MsHeader {
 
   double getPrecInte() {return prec_inte_;}
 
-  int getFeatureId() {return feature_id_;}
+  //int getFeatureId() {return feature_id_;}
 
   // set function 
   void setActivationPtr(ActivationPtr acti_ptr) {activation_ptr_ = acti_ptr;}
