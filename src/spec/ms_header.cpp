@@ -27,14 +27,6 @@
 
 namespace toppic {
 
-double MsHeader::getPrecMonoMz() {
-  if (std::isnan(prec_mono_mz_)) {
-    return 0.0; 
-  } else {
-    return prec_mono_mz_;
-  }
-}
-
 MsHeader::MsHeader(xercesc::DOMElement* element) {
   file_name_ = xml_dom_util::getChildValue(element, "file_name", 0);
   id_ = xml_dom_util::getIntChildValue(element, "id", 0);
@@ -75,6 +67,15 @@ double MsHeader::getPrecSpMass() {
     return Peak::compPeakMass(prec_sp_mz_, prec_charge_);
   }
 }
+
+double MsHeader::getPrecMonoMz() {
+  if (std::isnan(prec_mono_mz_)) {
+    return 0.0; 
+  } else {
+    return prec_mono_mz_;
+  }
+}
+
 
 double MsHeader::getPrecMonoMassMinusWater() {
   if (prec_mono_mz_ < 0 || std::isnan(prec_mono_mz_)) {
