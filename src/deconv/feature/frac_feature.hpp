@@ -84,6 +84,8 @@ class FracFeature {
     return a->getRetentMiddle() < b->getRetentMiddle();
   }
 
+  static bool cmpFracIncInteDec(const FracFeaturePtr &a, const FracFeaturePtr &b);
+
  protected:
   int id_;
   int frac_id_;
