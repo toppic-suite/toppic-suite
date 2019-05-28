@@ -70,6 +70,7 @@ void cluster(FracFeaturePtrVec &features, double mass_tolerance,
              double time_tolerance) {
   std::sort(features.begin(), features.end(), FracFeature::cmpInteDec);
   setSampleFeatureId(features, mass_tolerance, time_tolerance);
+  std::sort(features.begin(), features.end(), FracFeature::cmpFracIncInteDec);
 }
 
 }

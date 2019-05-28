@@ -56,5 +56,20 @@ FracFeature::FracFeature(std::string line) {
   sample_feature_inte_ = std::stod(strs[12]);
 }
 
+bool FracFeature::cmpFracIncInteDec(const FracFeaturePtr &a, 
+                                    const FracFeaturePtr &b) { 
+  if (a->getFracId() < b->getFracId()) {
+    return true;
+  }
+  else if (a->getFracId() > b->getFracId()) {
+    return false;
+  }
+  else if (a->getIntensity() > b->getIntensity()) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
 
 }
