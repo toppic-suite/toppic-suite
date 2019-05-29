@@ -350,8 +350,10 @@ void addMsHeaderFeatures(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtrVec &header_ptr
     MsHeaderPtr header = sorted_ptrs[i];
     FracFeaturePtr ft_ptr = getMatchedFeaturePtr(features, header, para_ptr);
     if (ft_ptr != nullptr) {
+      /*
       header->setFeatureId(ft_ptr->getId());
       header->setFeatureInte(ft_ptr->getIntensity());
+      */
     }
     else {
       int sp_id = header->getMsOneId();
@@ -366,8 +368,10 @@ void addMsHeaderFeatures(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtrVec &header_ptr
         if (feature_ptr != nullptr) {
           features.push_back(feature_ptr);
           removePeaks(ms1_ptr_vec, matched_peaks);
+          /*
           header->setFeatureId(feat_id);
           header->setFeatureInte(feature_ptr->getIntensity());
+          */
         }
         else {
           LOG_WARN("Cannot find features in LC/MS! Spectrum id: " << sp_id);
@@ -400,6 +404,7 @@ void writeMs2Feature(const std::string & output_file_name,
         << header->getMsOneScan() << "\t"
         << header->getPrecMonoMass() << "\t"
         << header->getPrecInte() << "\t";
+    /*
     if (header->getFeatureId() >= 0) {
       of << header->getFeatureId() << "\t"
          << header->getFeatureInte() << std::endl;
@@ -407,6 +412,7 @@ void writeMs2Feature(const std::string & output_file_name,
     else {
       of << "-1" << "\t" << "-1" << std::endl;
     }
+    */
   }
   of.close();
 }

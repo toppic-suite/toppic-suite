@@ -101,8 +101,8 @@ void MsAlignReader::readNext() {
   double prec_mass = -1;
   int prec_charge = -1;
   double prec_inte = -1;
-  int feature_id = -1;
-  double feature_inte = -1;
+  //int feature_id = -1;
+  //double feature_inte = -1;
   std::vector<std::string> strs;
 
   for (size_t i = 1; i < spectrum_str_vec_.size() - 1; i++) {
@@ -137,11 +137,14 @@ void MsAlignReader::readNext() {
         prec_charge = std::stoi(strs[1]);
       } else if (strs[0] == "PRECURSOR_INTENSITY") {
         prec_inte = std::stod(strs[1]);
-      } else if (strs[0] == "FEATURE_ID") {
+      } 
+      /*
+      else if (strs[0] == "FEATURE_ID") {
         feature_id = std::stoi(strs[1]);
       } else if (strs[0] == "FEATURE_INTENSITY") {
         feature_inte = std::stod(strs[1]);
       }
+      */
     }
   }
   if (id < 0 || prec_charge < 0 || prec_mass < 0) {
@@ -190,9 +193,9 @@ void MsAlignReader::readNext() {
 
   header_ptr->setPrecInte(prec_inte);
 
-  header_ptr->setFeatureId(feature_id);
+  //header_ptr->setFeatureId(feature_id);
 
-  header_ptr->setFeatureInte(feature_inte);
+  //header_ptr->setFeatureInte(feature_inte);
 
   std::vector<DeconvPeakPtr> peak_ptr_list;
   int idx = 0;
