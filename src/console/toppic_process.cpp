@@ -26,9 +26,7 @@
 #include "common/util/version.hpp"
 
 #include "spec/msalign_reader.hpp"
-#include "spec/msalign_frac_combine.hpp"
 #include "spec/msalign_util.hpp"
-#include "spec/feature_util.hpp"
 
 #include "prsm/prsm_para.hpp"
 #include "prsm/prsm_str_combine.hpp"
@@ -480,6 +478,7 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
     }
   }
 
+  /*
   if (spec_file_lst.size() > 1 && arguments["combinedOutputName"] != "") {
     std::cout << "Merging files - started." << std::endl;
     // merge msalign files
@@ -505,6 +504,7 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
     arguments["startTime"] = combined_start_time;
     toppic::TopPIC_post(arguments);
   }
+  */
 
   if (arguments["keepTempFiles"] != "true") {
     std::cout << "Deleting temporary files - started." << std::endl;

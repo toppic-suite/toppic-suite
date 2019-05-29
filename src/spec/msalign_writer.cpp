@@ -68,11 +68,13 @@ void MsAlignWriter::write(DeconvMsPtr ms_ptr) {
         << header_ptr->getPrecMonoMass() << std::endl;
     output_ << "PRECURSOR_INTENSITY=" << std::setprecision(2) 
         <<  header_ptr->getPrecInte() << std::endl;
+    /*
     if (header_ptr->getFeatureId() >= 0) {
       output_ << "FEATURE_ID=" << header_ptr->getFeatureId() << std::endl;
       output_ << "FEATURE_INTENSITY=" << std::setprecision(2) 
           << header_ptr->getFeatureInte() << std::endl;
     }
+    */
   }
 
   for (size_t i = 0; i < ms_ptr->size(); i++) {

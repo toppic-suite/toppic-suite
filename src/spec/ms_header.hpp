@@ -113,9 +113,9 @@ class MsHeader {
 
   void setPrecInte(double inte) {prec_inte_ = inte;}
 
-  void setFeatureId(int feature_id) {feature_id_ = feature_id;}
+  //void setFeatureId(int feature_id) {feature_id_ = feature_id;}
 
-  void setFeatureInte(double feature_inte) {feature_inte_ = feature_inte;}
+  //void setFeatureInte(double feature_inte) {feature_inte_ = feature_inte;}
 
   xercesc::DOMElement* getHeaderXml(XmlDOMDocument* xml_doc);
 
@@ -161,10 +161,12 @@ class MsHeader {
   int prec_charge_ = -1;
   // precursor intensity 
   double prec_inte_ = 0;
+  /*
   // feature id
   int feature_id_ = -1;
   // feature inte
   double feature_inte_ = -1;
+  */
 };
 
 typedef std::vector<MsHeaderPtr> MsHeaderPtrVec;
