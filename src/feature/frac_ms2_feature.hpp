@@ -13,14 +13,14 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_DECONV_FEATURE_FRAC_MS2_FEATURE_HPP_
-#define TOPPIC_DECONV_FEATURE_FRAC_MS2_FEATURE_HPP_
+#ifndef TOPPIC_FEATURE_FRAC_MS2_FEATURE_HPP_
+#define TOPPIC_FEATURE_FRAC_MS2_FEATURE_HPP_
 
 #include <memory>
 #include <vector>
 
 #include "spec/ms_header.hpp"
-#include "deconv/feature/frac_feature.hpp"
+#include "feature/frac_feature.hpp"
 
 namespace toppic {
 

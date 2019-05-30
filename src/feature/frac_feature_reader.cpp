@@ -14,11 +14,11 @@
 
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
-#include "deconv/feature/frac_ms2_feature_reader.hpp"
+#include "feature/frac_feature_reader.hpp"
 
 namespace toppic {
 
-FracMs2FeatureReader::FracMs2FeatureReader(const std::string &file_name):
+FracFeatureReader::FracFeatureReader(const std::string &file_name):
     file_name_(file_name) {
       input_.open(file_name.c_str(), std::ios::in);
       if (!input_.is_open()) {
@@ -30,22 +30,22 @@ FracMs2FeatureReader::FracMs2FeatureReader(const std::string &file_name):
       std::getline(input_, line);
     }
 
-FracMs2FeatureReader::~FracMs2FeatureReader() {
+FracFeatureReader::~FracFeatureReader() {
   if (input_.is_open()) {
     input_.close();
   }
 }
 
-void FracMs2FeatureReader::close() {
+void FracFeatureReader::close() {
   input_.close();
 }
 
-FracMs2FeaturePtr FracMs2FeatureReader::readOneFeature() {
+FracFeaturePtr FracFeatureReader::readOneFeature() {
   std::string line; 
   if (std::getline(input_, line)) {
     str_util::trim(line);
     //std::cout << "line " << line << std::endl;
-    FracMs2FeaturePtr feature = std::make_shared<FracMs2Feature>(line);
+    FracFeaturePtr feature = std::make_shared<FracFeature>(line);
     //std::cout << "feature created " << std::endl;
     return feature;
   }
@@ -55,9 +55,9 @@ FracMs2FeaturePtr FracMs2FeatureReader::readOneFeature() {
 }
 
 
-FracMs2FeaturePtrVec FracMs2FeatureReader::readAllFeatures() {
-  FracMs2FeaturePtrVec all_features;
-  FracMs2FeaturePtr feature;
+FracFeaturePtrVec FracFeatureReader::readAllFeatures() {
+  FracFeaturePtrVec all_features;
+  FracFeaturePtr feature;
   while ((feature = readOneFeature()) != nullptr) {
     all_features.push_back(feature);
   }

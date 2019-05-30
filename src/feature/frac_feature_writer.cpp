@@ -18,65 +18,54 @@
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/str_util.hpp"
-#include "deconv/feature/frac_ms2_feature_writer.hpp"
+#include "feature/frac_feature_writer.hpp"
 
 namespace toppic {
 
-namespace frac_ms2_feature_writer {
-
-  int id_;
-  int frac_id_;
-  std::string file_name_;
-  std::string scans_;
-  int ms_one_id_;
-  std::string ms_one_scans_;
-  double prec_mass_;
-  double prec_inte_;
-  int frac_feature_id_;
-  double frac_feature_inte_;
-  int sample_feature_id_;
-  double sample_feature_inte_;
+namespace frac_feature_writer {
 
 void writeHeader(std::ofstream &of) {
   of.precision(16);
   of << "ID" << "\t"
       << "Fraction_ID" << "\t"
       << "File_name" << "\t"
-      << "Scans" << "\t"
-      << "MS_one_ID" << "\t"
-      << "MS_one_scans" << "\t"
-      << "Precursor_mass" << "\t"
-      << "Precursor_intensity" << "\t"
-      << "Fraction_feature_ID" << "\t"
-      << "Fraction_feature_intensity" << "\t"
-      << "Sample_feature_ID" << "\t"
+      << "Mass" << "\t"
+      << "Intensity" << "\t"
+      << "Time_begin" << "\t"
+      << "Time_end" << "\t"
+      << "First_scan" << "\t"
+      << "Last_scan" << "\t"
+      << "Minimum_charge_state" << "\t"
+      << "Maximum_charge_state" << "\t"
+      << "Sample_feature_Id" << "\t"
       << "Sample_feature_intensity"
       << std::endl;
 }
 
-void writeOneFeature(std::ofstream &of, FracMs2FeaturePtr feature) {
+void writeOneFeature(std::ofstream &of, FracFeaturePtr feature) {
   of << feature->getId() << "\t"
       << feature->getFracId() << "\t"
       << feature->getFileName() << "\t"
-      << feature->getScans() << "\t"
-      << feature->getMsOneId() << "\t"
-      << feature->getMsOneScan() << "\t"
-      << feature->getPrecMass() << "\t"
-      << feature->getPrecInte() << "\t"
-      << feature->getFracFeatureId() << "\t"
-      << feature->getFracFeatureInte() << "\t"
+      << feature->getMonoMass() << "\t"
+      << feature->getIntensity() << "\t"
+      << feature->getRetentBegin() << "\t"
+      << feature->getRetentEnd() << "\t"
+      << feature->getScanBegin() << "\t"
+      << feature->getScanEnd() << "\t"
+      << feature->getMinCharge() << "\t"
+      << feature->getMaxCharge() << "\t"
       << feature->getSampleFeatureId() << "\t"
       << feature->getSampleFeatureInte() 
       << std::endl;
 }
 
 void writeFeatures(const std::string &output_file_name,
-                   const FracMs2FeaturePtrVec &features) {
+                   const FracFeaturePtrVec &features) {
   std::ofstream of(output_file_name);
   writeHeader(of);
 
   for (size_t i = 0; i < features.size(); i++) {
-    FracMs2FeaturePtr feature = features[i];
+    FracFeaturePtr feature = features[i];
     writeOneFeature(of, feature);
   }
   of.close();

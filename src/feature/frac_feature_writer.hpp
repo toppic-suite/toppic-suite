@@ -12,15 +12,15 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_DECONV_FEATURE_FRAC_FEATURE_WRITER_HPP_
-#define TOPPIC_DECONV_FEATURE_FRAC_FEATURE_WRITER_HPP_
+#ifndef TOPPIC_FEATURE_FRAC_FEATURE_WRITER_HPP_
+#define TOPPIC_FEATURE_FRAC_FEATURE_WRITER_HPP_
 
 #include <memory>
 #include <vector>
 #include <string>
 #include <fstream>
 
-#include "deconv/feature/frac_feature.hpp"
+#include "feature/frac_feature.hpp"
 
 namespace toppic {
 

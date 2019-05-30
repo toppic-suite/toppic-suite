@@ -24,14 +24,12 @@
 #include "seq/fasta_index_reader.hpp"
 #include "spec/deconv_ms.hpp"
 #include "spec/msalign_reader.hpp"
-#include "prsm/prsm_str.hpp"
-#include "prsm/prsm_reader.hpp"
-#include "deconv/feature/feature_para.hpp"
-#include "deconv/feature/frac_feature.hpp"
-#include "deconv/feature/frac_feature_detect.hpp"
-#include "deconv/feature/frac_feature_writer.hpp"
-#include "deconv/feature/frac_ms2_feature.hpp"
-#include "deconv/feature/frac_ms2_feature_writer.hpp"
+#include "feature/feature_para.hpp"
+#include "feature/frac_feature.hpp"
+#include "feature/frac_feature_detect.hpp"
+#include "feature/frac_feature_writer.hpp"
+#include "feature/frac_ms2_feature.hpp"
+#include "feature/frac_ms2_feature_writer.hpp"
 
 namespace toppic {
 

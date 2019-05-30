@@ -12,19 +12,29 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_DECONV_FEATURE_FRAC_FEATURE_DETECT_HPP_
-#define TOPPIC_DECONV_FEATURE_FRAC_FEATURE_DETECT_HPP_
+#ifndef TOPPIC_FEATURE_FRAC_MS2_FEATURE_WRITER_HPP_
+#define TOPPIC_FEATURE_FRAC_MS2_FEATURE_WRITER_HPP_
 
+#include <memory>
+#include <vector>
 #include <string>
+#include <fstream>
+
+#include "feature/frac_ms2_feature.hpp"
 
 namespace toppic {
 
-namespace frac_feature_detect {
+namespace frac_ms2_feature_writer {
 
-void process(int frac_id, std::string &sp_file_name, 
-             bool miss_level_one, std::string &argu_str);
-};
+void writeFeatures(const std::string &output_file_name,
+                   const FracMs2FeaturePtrVec &features);
+
+void writeHeader(std::ofstream &of); 
+
+void writeOneFeature(std::ofstream &of, FracMs2FeaturePtr feature);
 
 }
+
+} /* namespace toppic */
 
 #endif

@@ -12,27 +12,23 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_DECONV_FEATURE_FRAC_MS2_FEATURE_WRITER_HPP_
-#define TOPPIC_DECONV_FEATURE_FRAC_MS2_FEATURE_WRITER_HPP_
+#ifndef TOPPIC_FEATURE_FRAC_FEATURE_MERGE_HPP_
+#define TOPPIC_FEATURE_FRAC_FEATURE_MERGE_HPP_
 
 #include <memory>
 #include <vector>
 #include <string>
-#include <fstream>
-
-#include "deconv/feature/frac_ms2_feature.hpp"
 
 namespace toppic {
 
-namespace frac_ms2_feature_writer {
+namespace frac_feature_merge {
 
-void writeFeatures(const std::string &output_file_name,
-                   const FracMs2FeaturePtrVec &features);
-
-void writeHeader(std::ofstream &of); 
-
-void writeOneFeature(std::ofstream &of, FracMs2FeaturePtr feature);
-
+void mergeFiles(const std::vector<std::string> &feature_file_lst,
+                const std::string &feature_output_file, 
+                const std::vector<std::string> &ms2_feature_file_lst,
+                const std::string &ms2_feature_output_file,
+                int max_num_per_file,
+                const std::string &para_str);
 }
 
 } /* namespace toppic */

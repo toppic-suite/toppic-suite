@@ -15,8 +15,8 @@
 #include <algorithm>
 
 #include "common/util/file_util.hpp"
-#include "deconv/feature/frac_feature.hpp"
-#include "deconv/feature/frac_feature_cluster.hpp"
+#include "feature/frac_feature.hpp"
+#include "feature/frac_feature_cluster.hpp"
 
 namespace toppic {
 

@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_DECONV_FEATURE_FEATURE_PARA_HPP_
-#define TOPPIC_DECONV_FEATURE_FEATURE_PARA_HPP_
+#ifndef TOPPIC_FEATURE_FEATURE_PARA_HPP_
+#define TOPPIC_FEATURE_FEATURE_PARA_HPP_
 
 #include <vector>
 #include "spec/peak_tolerance.hpp"

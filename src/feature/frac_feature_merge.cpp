@@ -19,13 +19,13 @@
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/str_util.hpp"
-#include "deconv/feature/frac_feature_reader.hpp"
-#include "deconv/feature/frac_feature_writer.hpp"
-#include "deconv/feature/frac_feature_cluster.hpp"
-#include "deconv/feature/frac_ms2_feature.hpp"
-#include "deconv/feature/frac_ms2_feature_reader.hpp"
-#include "deconv/feature/frac_ms2_feature_writer.hpp"
-#include "deconv/feature/frac_feature_merge.hpp"
+#include "feature/frac_feature_reader.hpp"
+#include "feature/frac_feature_writer.hpp"
+#include "feature/frac_feature_cluster.hpp"
+#include "feature/frac_ms2_feature.hpp"
+#include "feature/frac_ms2_feature_reader.hpp"
+#include "feature/frac_ms2_feature_writer.hpp"
+#include "feature/frac_feature_merge.hpp"
 
 namespace toppic {
 

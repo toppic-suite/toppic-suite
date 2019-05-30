@@ -12,29 +12,20 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_DECONV_FEATURE_MSALIGN_FEATURE_MERGE_HPP_
-#define TOPPIC_DECONV_FEATURE_MSALIGN_FEATURE_MERGE_HPP_
+#ifndef TOPPIC_FEATURE_FRAC_FEATURE_CLUSTER_HPP_
+#define TOPPIC_FEATURE_FRAC_FEATURE_CLUSTER_HPP_
 
-#include <memory>
-#include <vector>
-#include <string>
+#include "feature/frac_feature.hpp"
 
 namespace toppic {
 
-class MsAlignFeatureMerge {
- public:
-  MsAlignFeatureMerge(const std::vector<std::string> &spec_file_names,
-                      const std::string &output_file_name);
+namespace frac_feature_cluster {
 
-  void process(std::string &para_str);
+void cluster(FracFeaturePtrVec &features, double mass_tolerance, 
+             double time_tolerance);
 
- private:
-  std::vector<std::string> spec_file_names_;
-  std::string output_file_name_;
-  static int MAX_NUM_PER_FILE;
-};
+}
 
-typedef std::shared_ptr<MsAlignFeatureMerge> MsAlignFeatureMergePtr;
-} /* namespace toppic */
+}  // namespace toppic
 
 #endif
