@@ -15,7 +15,7 @@
 #include <fstream>
 
 #include "common/util/str_util.hpp"
-#include "deconv/feature/frac_feature.hpp"
+#include "feature/frac_feature.hpp"
 
 namespace toppic {
 

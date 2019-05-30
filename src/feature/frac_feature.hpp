@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_DECONV_FEATURE_FRAC_FEATURE_HPP_
-#define TOPPIC_DECONV_FEATURE_FRAC_FEATURE_HPP_
+#ifndef TOPPIC_FEATURE_FRAC_FEATURE_HPP_
+#define TOPPIC_FEATURE_FRAC_FEATURE_HPP_
 
 #include <memory>
 #include <vector>

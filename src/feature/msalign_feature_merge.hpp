@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_DECONV_FEATURE_FRAC_FEATURE_MERGE_HPP_
-#define TOPPIC_DECONV_FEATURE_FRAC_FEATURE_MERGE_HPP_
+#ifndef TOPPIC_FEATURE_MSALIGN_FEATURE_MERGE_HPP_
+#define TOPPIC_FEATURE_MSALIGN_FEATURE_MERGE_HPP_
 
 #include <memory>
 #include <vector>
@@ -21,16 +21,20 @@
 
 namespace toppic {
 
-namespace frac_feature_merge {
+class MsAlignFeatureMerge {
+ public:
+  MsAlignFeatureMerge(const std::vector<std::string> &spec_file_names,
+                      const std::string &output_file_name);
 
-void mergeFiles(const std::vector<std::string> &feature_file_lst,
-                const std::string &feature_output_file, 
-                const std::vector<std::string> &ms2_feature_file_lst,
-                const std::string &ms2_feature_output_file,
-                int max_num_per_file,
-                const std::string &para_str);
-}
+  void process(std::string &para_str);
 
+ private:
+  std::vector<std::string> spec_file_names_;
+  std::string output_file_name_;
+  static int MAX_NUM_PER_FILE;
+};
+
+typedef std::shared_ptr<MsAlignFeatureMerge> MsAlignFeatureMergePtr;
 } /* namespace toppic */
 
 #endif

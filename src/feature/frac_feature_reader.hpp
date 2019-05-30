@@ -12,20 +12,33 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_DECONV_FEATURE_FRAC_FEATURE_CLUSTER_HPP_
-#define TOPPIC_DECONV_FEATURE_FRAC_FEATURE_CLUSTER_HPP_
+#ifndef TOPPIC_FEATURE_FRAC_FEATURE_READER_HPP_
+#define TOPPIC_FEATURE_FRAC_FEATURE_READER_HPP_
 
-#include "deconv/feature/frac_feature.hpp"
+#include <fstream>
+
+#include "feature/frac_feature.hpp"
 
 namespace toppic {
 
-namespace frac_feature_cluster {
+class FracFeatureReader {
+ public:
+  FracFeatureReader(const std::string &file_name);
 
-void cluster(FracFeaturePtrVec &features, double mass_tolerance, 
-             double time_tolerance);
+  ~FracFeatureReader();
 
-}
+  void close();
+
+  FracFeaturePtr readOneFeature(); 
+
+  FracFeaturePtrVec readAllFeatures();
+
+ private:
+  std::string file_name_;
+  std::ifstream input_;
+};
+
+typedef std::shared_ptr<FracFeatureReader> FracFeatureReaderPtr;
 
 }  // namespace toppic
-
 #endif

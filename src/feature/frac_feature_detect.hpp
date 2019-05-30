@@ -12,8 +12,19 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include "deconv/feature/sample_feature.hpp"
+#ifndef TOPPIC_FEATURE_FRAC_FEATURE_DETECT_HPP_
+#define TOPPIC_FEATURE_FRAC_FEATURE_DETECT_HPP_
+
+#include <string>
 
 namespace toppic {
 
+namespace frac_feature_detect {
+
+void process(int frac_id, std::string &sp_file_name, 
+             bool miss_level_one, std::string &argu_str);
+};
+
 }
+
+#endif

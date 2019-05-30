@@ -12,33 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_DECONV_FEATURE_FRAC_MS2_FEATURE_READER_HPP_
-#define TOPPIC_DECONV_FEATURE_FRAC_MS2_FEATURE_READER_HPP_
-
-#include <fstream>
-
-#include "deconv/feature/frac_ms2_feature.hpp"
+#include "feature/sample_feature.hpp"
 
 namespace toppic {
 
-class FracMs2FeatureReader {
- public:
-  FracMs2FeatureReader(const std::string &file_name);
-
-  ~FracMs2FeatureReader();
-
-  void close();
-
-  FracMs2FeaturePtr readOneFeature(); 
-
-  FracMs2FeaturePtrVec readAllFeatures();
-
- private:
-  std::string file_name_;
-  std::ifstream input_;
-};
-
-typedef std::shared_ptr<FracMs2FeatureReader> FracMs2FeatureReaderPtr;
-
-}  // namespace toppic
-#endif
+}

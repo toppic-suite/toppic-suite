@@ -19,8 +19,8 @@
 #include "common/util/file_util.hpp"
 #include "common/util/str_util.hpp"
 #include "spec/msalign_frac_merge.hpp"
-#include "deconv/feature/frac_feature_merge.hpp"
-#include "deconv/feature/msalign_feature_merge.hpp"
+#include "feature/frac_feature_merge.hpp"
+#include "feature/msalign_feature_merge.hpp"
 
 namespace toppic {
 
