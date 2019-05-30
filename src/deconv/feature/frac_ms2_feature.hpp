@@ -66,6 +66,12 @@ class FracMs2Feature {
 
   double getSampleFeatureInte() {return sample_feature_inte_;}
 
+  void setId(int id) {id_ = id;}
+
+  void setMsOneId(int id) {ms_one_id_ = id;}
+
+  void setFracFeatureId(int id) {frac_feature_id_ = id;}
+
   void setSampleFeatureId(int id) {sample_feature_id_ = id;}
 
   void setSampleFeatureInte(double inte) {sample_feature_inte_ = inte;}

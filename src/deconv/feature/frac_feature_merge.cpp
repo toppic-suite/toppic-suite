@@ -47,7 +47,7 @@ void mergeFiles(const std::vector<std::string> &feature_file_lst,
       features[j]->setId(feature_id);
       //frac_feature_writer::writeOneFeature(outfile, features[j]);
     }
-    all_features.insert(features.begin(), features.end(), all_features.end());
+    all_features.insert(all_features.end(), features.begin(), features.end());
   }
 
   double mass_tolerance = 0.2;
@@ -66,12 +66,17 @@ void mergeFiles(const std::vector<std::string> &feature_file_lst,
     FracMs2FeaturePtrVec ms2_features = ft_reader.readAllFeatures();
     for (size_t j = 0; j < ms2_features.size(); j++) {
       FracMs2FeaturePtr ms2_feature = ms2_features[j];
-      int frac_feature_id = ms2_feature->getFracFeatureId();
+      int id = ms2_feature->getId() + i * max_num_per_file;
+      ms2_feature->setId(id);
+      int ms_one_id = ms2_feature->getMsOneId() + i * max_num_per_file;
+      ms2_feature->setMsOneId(ms_one_id);
+      int frac_feature_id = ms2_feature->getFracFeatureId()+ i * max_num_per_file;
+      ms2_feature->setFracFeatureId(frac_feature_id);
       FracFeaturePtr ms1_feature = feature_map.find(frac_feature_id)->second;
       ms2_feature->setSampleFeatureId(ms1_feature->getSampleFeatureId());
       ms2_feature->setSampleFeatureInte(ms1_feature->getSampleFeatureInte());
     }
-    all_ms2_features.insert(ms2_features.begin(), ms2_features.end(), all_ms2_features.end());
+    all_ms2_features.insert(all_ms2_features.end(), ms2_features.begin(), ms2_features.end());
   }
 
   frac_ms2_feature_writer::writeFeatures(ms2_feature_output_file_name, all_ms2_features);
