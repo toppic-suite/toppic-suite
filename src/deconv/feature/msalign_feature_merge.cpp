@@ -37,6 +37,7 @@ void MsAlignFeatureMerge::process(std::string &para_str) {
   std::vector<std::string> ms1_file_names;
   std::vector<std::string> ms2_file_names;
   std::vector<std::string> ms1_feature_names;
+  std::vector<std::string> ms2_feature_names;
   for (size_t i = 0; i < spec_file_names_.size(); i++) { 
     std::string base_name = file_util::basename(spec_file_names_[i]);
     std::string ms1_name = base_name + "_ms1.msalign";
@@ -45,17 +46,21 @@ void MsAlignFeatureMerge::process(std::string &para_str) {
     ms2_file_names.push_back(ms2_name);
     std::string ms1_feature = base_name + "_ms1.feature";
     ms1_feature_names.push_back(ms1_feature);
+    std::string ms2_feature = base_name + "_ms2.feature";
+    ms2_feature_names.push_back(ms2_feature);
   }
   
   std::string ms1_spec_output_name = output_file_name_ + "_ms1.msalign";
   std::string ms2_spec_output_name = output_file_name_ + "_ms2.msalign";
   std::string ms1_feature_output_name = output_file_name_ + "_ms1.feature";
+  std::string ms2_feature_output_name = output_file_name_ + "_ms2.feature";
 
   msalign_frac_merge::mergeFiles(ms1_file_names, ms1_spec_output_name, 
                                  MAX_NUM_PER_FILE, para_str); 
   msalign_frac_merge::mergeFiles(ms2_file_names, ms2_spec_output_name, 
                                  MAX_NUM_PER_FILE, para_str); 
   frac_feature_merge::mergeFiles(ms1_feature_names, ms1_feature_output_name, 
+                                 ms2_feature_names, ms2_feature_output_name,
                                  MAX_NUM_PER_FILE, para_str); 
 }
 

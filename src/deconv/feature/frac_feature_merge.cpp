@@ -13,6 +13,7 @@
 //limitations under the License.
 
 #include <set>
+#include <map>
 #include <algorithm>
 
 #include "common/util/logger.hpp"
@@ -21,20 +22,24 @@
 #include "deconv/feature/frac_feature_reader.hpp"
 #include "deconv/feature/frac_feature_writer.hpp"
 #include "deconv/feature/frac_feature_cluster.hpp"
+#include "deconv/feature/frac_ms2_feature.hpp"
+#include "deconv/feature/frac_ms2_feature_reader.hpp"
+#include "deconv/feature/frac_ms2_feature_writer.hpp"
 #include "deconv/feature/frac_feature_merge.hpp"
 
 namespace toppic {
 
 namespace frac_feature_merge {
 
-void mergeFiles(const std::vector<std::string> &spec_file_lst,
-                const std::string &output_file_name, 
-                int max_num_per_file,
+void mergeFiles(const std::vector<std::string> &feature_file_lst,
+                const std::string &feature_output_file_name, 
+                const std::vector<std::string> &ms2_feature_file_lst,
+                const std::string &ms2_feature_output_file_name,
+                int max_num_per_file, 
                 const std::string &para_str) {
-
   FracFeaturePtrVec all_features;
-  for (size_t i = 0; i < spec_file_lst.size(); i++) {
-    FracFeatureReader ft_reader(spec_file_lst[i]); 
+  for (size_t i = 0; i < feature_file_lst.size(); i++) {
+    FracFeatureReader ft_reader(feature_file_lst[i]); 
     FracFeaturePtrVec features = ft_reader.readAllFeatures();
     ft_reader.close();
     for (size_t j = 0; j < features.size(); j++) {
@@ -48,8 +53,28 @@ void mergeFiles(const std::vector<std::string> &spec_file_lst,
   double mass_tolerance = 0.2;
   double time_tolerance = 600;
   frac_feature_cluster::cluster(all_features, mass_tolerance, time_tolerance);
+  frac_feature_writer::writeFeatures(feature_output_file_name, all_features);
 
-  frac_feature_writer::writeFeatures(output_file_name, all_features);
+  std::map<int,FracFeaturePtr> feature_map;
+  for (size_t i = 0; i < all_features.size(); i++) {
+    feature_map[all_features[i]->getId()] =  all_features[i];
+  }
+
+  FracMs2FeaturePtrVec all_ms2_features;
+  for (size_t i = 0; i < ms2_feature_file_lst.size(); i++) {
+    FracMs2FeatureReader ft_reader(ms2_feature_file_lst[i]);
+    FracMs2FeaturePtrVec ms2_features = ft_reader.readAllFeatures();
+    for (size_t j = 0; j < ms2_features.size(); j++) {
+      FracMs2FeaturePtr ms2_feature = ms2_features[j];
+      int frac_feature_id = ms2_feature->getFracFeatureId();
+      FracFeaturePtr ms1_feature = feature_map.find(frac_feature_id)->second;
+      ms2_feature->setSampleFeatureId(ms1_feature->getSampleFeatureId());
+      ms2_feature->setSampleFeatureInte(ms1_feature->getSampleFeatureInte());
+    }
+    all_ms2_features.insert(ms2_features.begin(), ms2_features.end(), all_ms2_features.end());
+  }
+
+  frac_ms2_feature_writer::writeFeatures(ms2_feature_output_file_name, all_ms2_features);
 }
 
 }

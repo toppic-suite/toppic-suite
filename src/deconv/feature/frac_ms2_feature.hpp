@@ -19,6 +19,9 @@
 #include <memory>
 #include <vector>
 
+#include "spec/ms_header.hpp"
+#include "deconv/feature/frac_feature.hpp"
+
 namespace toppic {
 
 class FracMs2Feature;
@@ -27,17 +30,17 @@ typedef std::vector<FracMs2FeaturePtr> FracMs2FeaturePtrVec;
 
 class FracMs2Feature {
  public:
-  FracMs2Feature() {}
-
   FracMs2Feature(int id, int frac_id, 
                  const std::string &file_name,
                  std::string &scans,
-                 int ms_one_id, std::string &ms_one_scans,
+                 int ms_one_id, int ms_one_scan, 
                  double prec_mass, double prec_inte,
                  int frac_feature_id, double frac_feature_inte,
                  int sample_feature_id, double sample_feature_inte);
 
   FracMs2Feature(std::string line);
+
+  FracMs2Feature(MsHeaderPtr header, FracFeaturePtr feature);
 
   int getId() {return id_;}
 
@@ -49,15 +52,23 @@ class FracMs2Feature {
 
   int getMsOneId() {return ms_one_id_;}
 
-  std::string getMsOneScans() {return ms_one_scans_;}
+  int getMsOneScan() {return ms_one_scan_;}
 
   double getPrecMass() {return prec_mass_;}
 
-  double getPrecInte() 
+  double getPrecInte() {return prec_inte_;}
+
+  int getFracFeatureId() {return frac_feature_id_;}
+
+  double getFracFeatureInte() {return frac_feature_inte_;}
 
   int getSampleFeatureId() {return sample_feature_id_;}
 
   double getSampleFeatureInte() {return sample_feature_inte_;}
+
+  void setSampleFeatureId(int id) {sample_feature_id_ = id;}
+
+  void setSampleFeatureInte(double inte) {sample_feature_inte_ = inte;}
 
  protected:
   int id_;
@@ -65,7 +76,7 @@ class FracMs2Feature {
   std::string file_name_;
   std::string scans_;
   int ms_one_id_;
-  std::string ms_one_scans_;
+  int ms_one_scan_;
   double prec_mass_;
   double prec_inte_;
   int frac_feature_id_;
