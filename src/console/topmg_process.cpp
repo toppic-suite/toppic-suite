@@ -25,12 +25,11 @@
 #include "seq/fasta_util.hpp"
 
 #include "spec/msalign_reader.hpp"
-#include "spec/msalign_frac_combine.hpp"
+#include "spec/msalign_frac_merge.hpp"
 #include "spec/msalign_util.hpp"
-#include "spec/feature_util.hpp"
 
 #include "prsm/prsm_para.hpp"
-#include "prsm/prsm_str_combine.hpp"
+#include "prsm/prsm_str_merge.hpp"
 #include "prsm/prsm_form_filter.hpp"
 #include "prsm/prsm_top_selector.hpp"
 #include "prsm/prsm_cutoff_selector.hpp"
@@ -44,7 +43,7 @@
 #include "prsm/simple_prsm_xml_writer.hpp"
 #include "prsm/simple_prsm_util.hpp"
 #include "prsm/simple_prsm.hpp"
-#include "prsm/simple_prsm_str_combine.hpp"
+#include "prsm/simple_prsm_str_merge.hpp"
 
 #include "filter/oneptm/one_ptm_filter_mng.hpp"
 #include "filter/oneptm/one_ptm_filter_processor.hpp"
@@ -190,12 +189,12 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
     }
 
     std::cout << "Combining filtering results - started." << std::endl;
-    SimplePrsmStrCombinePtr asf_filter_combiner
-        = std::make_shared<SimplePrsmStrCombine>(sp_file_name, 
-                                                 input_exts,
-                                                 "topmg_graph_filter", 20 * input_exts.size());
-    asf_filter_combiner->process();
-    asf_filter_combiner = nullptr;
+    SimplePrsmStrMergePtr asf_filter_merger
+        = std::make_shared<SimplePrsmStrMerge>(sp_file_name, 
+                                               input_exts,
+                                               "topmg_graph_filter", 20 * input_exts.size());
+    asf_filter_merger->process();
+    asf_filter_merger = nullptr;
     std::cout << "Combining filtering results - finished." << std::endl;
 
     int max_mod_num = std::stoi(arguments["varPtmNumber"]);
@@ -412,6 +411,7 @@ int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
     }
   }
 
+  /*
   if (spec_file_lst.size() > 1 && arguments["combinedOutputName"] != "") {
     std::cout << "Merging files - started." << std::endl;
     // merge msalign files
@@ -437,6 +437,7 @@ int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
     arguments["startTime"] = combined_start_time;
     toppic::TopMG_post(arguments);
   }
+  */
 
   if (arguments["keepTempFiles"] != "true") {
     std::cout << "Deleting temporary files - started." << std::endl;
@@ -447,11 +448,13 @@ int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
       cleanTopmgDir(ori_db_file_name, sp_file_name);
     }
 
+    /*
     if (spec_file_lst.size() > 1 && arguments["combinedOutputName"] != "") {
       std::string sp_file_name = base_name + "_ms2.msalign";
       cleanTopmgDir(ori_db_file_name, sp_file_name);
     }
     std::cout << "Deleting temporary files - finished." << std::endl; 
+    */
   }
 
   std::cout << "TopMG finished." << std::endl << std::flush;

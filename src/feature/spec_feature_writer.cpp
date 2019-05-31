@@ -18,11 +18,11 @@
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/str_util.hpp"
-#include "feature/frac_ms2_feature_writer.hpp"
+#include "feature/spec_feature_writer.hpp"
 
 namespace toppic {
 
-namespace frac_ms2_feature_writer {
+namespace spec_feature_writer {
 
   int id_;
   int frac_id_;
@@ -39,7 +39,7 @@ namespace frac_ms2_feature_writer {
 
 void writeHeader(std::ofstream &of) {
   of.precision(16);
-  of << "ID" << "\t"
+  of << "Spec_ID" << "\t"
       << "Fraction_ID" << "\t"
       << "File_name" << "\t"
       << "Scans" << "\t"
@@ -54,8 +54,8 @@ void writeHeader(std::ofstream &of) {
       << std::endl;
 }
 
-void writeOneFeature(std::ofstream &of, FracMs2FeaturePtr feature) {
-  of << feature->getId() << "\t"
+void writeOneFeature(std::ofstream &of, SpecFeaturePtr feature) {
+  of << feature->getSpecId() << "\t"
       << feature->getFracId() << "\t"
       << feature->getFileName() << "\t"
       << feature->getScans() << "\t"
@@ -71,12 +71,12 @@ void writeOneFeature(std::ofstream &of, FracMs2FeaturePtr feature) {
 }
 
 void writeFeatures(const std::string &output_file_name,
-                   const FracMs2FeaturePtrVec &features) {
+                   const SpecFeaturePtrVec &features) {
   std::ofstream of(output_file_name);
   writeHeader(of);
 
   for (size_t i = 0; i < features.size(); i++) {
-    FracMs2FeaturePtr feature = features[i];
+    SpecFeaturePtr feature = features[i];
     writeOneFeature(of, feature);
   }
   of.close();

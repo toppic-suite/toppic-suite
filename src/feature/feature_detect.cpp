@@ -26,14 +26,14 @@
 #include "spec/msalign_reader.hpp"
 #include "feature/feature_para.hpp"
 #include "feature/frac_feature.hpp"
-#include "feature/frac_feature_detect.hpp"
 #include "feature/frac_feature_writer.hpp"
-#include "feature/frac_ms2_feature.hpp"
-#include "feature/frac_ms2_feature_writer.hpp"
+#include "feature/spec_feature.hpp"
+#include "feature/spec_feature_writer.hpp"
+#include "feature/feature_detect.hpp"
 
 namespace toppic {
 
-namespace frac_feature_detect {
+namespace feature_detect {
 
 bool peakExists (DeconvMsPtrVec &ms1_ptr_vec, DeconvPeakPtr peak) {
   int sp_id = peak->getSpId();
@@ -344,14 +344,14 @@ inline FracFeaturePtr getMatchedFeaturePtr(FracFeaturePtrVec &features,
 
 void getMs2Features(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtrVec &header_ptr_vec, 
                     FracFeaturePtrVec &features, FeatureParaPtr para_ptr, 
-                    FracMs2FeaturePtrVec &ms2_features) {
+                    SpecFeaturePtrVec &ms2_features) {
   MsHeaderPtrVec sorted_ptrs = header_ptr_vec;
   std::sort(sorted_ptrs.begin(), sorted_ptrs.end(), MsHeader::cmpPrecInteDec);
   for (size_t i = 0; i < sorted_ptrs.size(); i++) {
     MsHeaderPtr header = sorted_ptrs[i];
     FracFeaturePtr ft_ptr = getMatchedFeaturePtr(features, header, para_ptr);
     if (ft_ptr != nullptr) {
-      FracMs2FeaturePtr ms2_feature = std::make_shared<FracMs2Feature>(header, ft_ptr);
+      SpecFeaturePtr ms2_feature = std::make_shared<SpecFeature>(header, ft_ptr);
       ms2_features.push_back(ms2_feature);
     }
     else {
@@ -368,7 +368,7 @@ void getMs2Features(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtrVec &header_ptr_vec,
           features.push_back(feature_ptr);
           removePeaks(ms1_ptr_vec, matched_peaks);
 
-          FracMs2FeaturePtr ms2_feature = std::make_shared<FracMs2Feature>(header, feature_ptr);
+          SpecFeaturePtr ms2_feature = std::make_shared<SpecFeature>(header, feature_ptr);
           ms2_features.push_back(ms2_feature);
         }
         else {
@@ -437,15 +437,15 @@ void process(int frac_id, std::string &sp_file_name,
   std::string ms2_file_name = base_name + "_ms2.msalign";
   MsHeaderPtrVec header_ptr_vec;
   readHeaders(ms2_file_name, header_ptr_vec);
-  FracMs2FeaturePtrVec ms2_features;
+  SpecFeaturePtrVec ms2_features;
   getMs2Features(ms1_ptr_vec, header_ptr_vec, features, para_ptr, ms2_features);
 
   std::sort(features.begin(), features.end(), FracFeature::cmpMassInc);
-  std::string output_file_name = base_name + "_ms1.feature";
+  std::string output_file_name = base_name + "_frac.feature";
   frac_feature_writer::writeFeatures(output_file_name, features);
 
-  output_file_name = base_name + "_ms2.feature";
-  frac_ms2_feature_writer::writeFeatures(output_file_name, ms2_features); 
+  output_file_name = base_name + "_spec.feature";
+  spec_feature_writer::writeFeatures(output_file_name, ms2_features); 
 
 }
 

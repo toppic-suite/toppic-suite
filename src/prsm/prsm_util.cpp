@@ -20,8 +20,8 @@
 #include "common/util/str_util.hpp"
 #include "spec/extend_ms_factory.hpp"
 #include "spec/msalign_reader.hpp"
-#include "feature/frac_ms2_feature.hpp"
-#include "feature/frac_ms2_feature_reader.hpp"
+#include "feature/spec_feature.hpp"
+#include "feature/spec_feature_reader.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_util.hpp"
@@ -158,13 +158,13 @@ void addSpectrumPtrsToPrsms(PrsmPtrVec &prsm_ptrs, PrsmParaPtr prsm_para_ptr) {
 
 void addFeatureIDToPrsms(PrsmStrPtrVec &prsm_ptrs, const std::string & feature_file_name) {
   // read TopFD featuers
-  FracMs2FeatureReader ft_reader(feature_file_name); 
-  FracMs2FeaturePtrVec ms2_features = ft_reader.readAllFeatures();
+  SpecFeatureReader ft_reader(feature_file_name); 
+  SpecFeaturePtrVec ms2_features = ft_reader.readAllFeatures();
   ft_reader.close();
 
-  std::map<int,FracMs2FeaturePtr> feature_map;
+  std::map<int,SpecFeaturePtr> feature_map;
   for (size_t i = 0; i < ms2_features.size(); i++) {
-    feature_map[ms2_features[i]->getId()] =  ms2_features[i];
+    feature_map[ms2_features[i]->getSpecId()] =  ms2_features[i];
   }
 
   // make sure prsms sorted by spectrum id
@@ -172,7 +172,7 @@ void addFeatureIDToPrsms(PrsmStrPtrVec &prsm_ptrs, const std::string & feature_f
 
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     int spec_id = prsm_ptrs[i]->getSpectrumId();
-    FracMs2FeaturePtr feature = feature_map.find(spec_id)->second;
+    SpecFeaturePtr feature = feature_map.find(spec_id)->second;
     if (feature != nullptr) {
       prsm_ptrs[i]->setPrecFeatureId(feature->getSampleFeatureId());
       prsm_ptrs[i]->setPrecFeatureInte(feature->getSampleFeatureInte());

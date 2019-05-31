@@ -21,7 +21,7 @@
 #include "spec/spectrum_set.hpp"
 #include "spec/msalign_util.hpp"
 #include "prsm/prsm_reader.hpp"
-#include "prsm/prsm_str_combine.hpp"
+#include "prsm/prsm_str_merge.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_xml_writer_set.hpp"
 #include "prsm/simple_prsm.hpp"
@@ -180,11 +180,11 @@ void PtmSearchProcessor::process(){
           + str_util::toString(t) + "_" + ProteoformType::COMPLETE->getName() + end_str;
       complete_input_exts.push_back(input_ext);
     }
-    PrsmStrCombinePtr combine_ptr
-        = std::make_shared<PrsmStrCombine>(sp_file_name, complete_input_exts, 
-                                           complete_output_ext, prsm_top_num);
-    combine_ptr->process();
-    combine_ptr = nullptr;
+    PrsmStrMergePtr merge_ptr
+        = std::make_shared<PrsmStrMerge>(sp_file_name, complete_input_exts, 
+                                         complete_output_ext, prsm_top_num);
+    merge_ptr->process();
+    merge_ptr = nullptr;
 
     // Prefix prsms
     std::string prefix_output_ext = mng_ptr_->output_file_ext_ + "_" 
@@ -195,11 +195,11 @@ void PtmSearchProcessor::process(){
           + str_util::toString(t) + "_" + ProteoformType::PREFIX->getName() + end_str;
       prefix_input_exts.push_back(input_ext);
     }
-    combine_ptr
-        = std::make_shared<PrsmStrCombine>(sp_file_name, prefix_input_exts, 
+    merge_ptr
+        = std::make_shared<PrsmStrMerge>(sp_file_name, prefix_input_exts, 
                                            prefix_output_ext, prsm_top_num);
-    combine_ptr->process();
-    combine_ptr = nullptr;
+    merge_ptr->process();
+    merge_ptr = nullptr;
 
     // Suffix prsms
     std::string suffix_output_ext = mng_ptr_->output_file_ext_ + "_" 
@@ -210,11 +210,11 @@ void PtmSearchProcessor::process(){
           + str_util::toString(t) + "_" + ProteoformType::SUFFIX->getName() + end_str;
       suffix_input_exts.push_back(input_ext);
     }
-    combine_ptr
-        = std::make_shared<PrsmStrCombine>(sp_file_name, suffix_input_exts, 
-                                           suffix_output_ext, prsm_top_num);
-    combine_ptr->process();
-    combine_ptr = nullptr;
+    merge_ptr
+        = std::make_shared<PrsmStrMerge>(sp_file_name, suffix_input_exts, 
+                                         suffix_output_ext, prsm_top_num);
+    merge_ptr->process();
+    merge_ptr = nullptr;
 
     // internal prsms
     std::string internal_output_ext = mng_ptr_->output_file_ext_ + "_" 
@@ -225,11 +225,11 @@ void PtmSearchProcessor::process(){
           + str_util::toString(t) + "_" + ProteoformType::INTERNAL->getName() + end_str;
       internal_input_exts.push_back(input_ext);
     }
-    combine_ptr
-        = std::make_shared<PrsmStrCombine>(sp_file_name, internal_input_exts, 
-                                           internal_output_ext, prsm_top_num);
-    combine_ptr->process();
-    combine_ptr = nullptr;
+    merge_ptr
+        = std::make_shared<PrsmStrMerge>(sp_file_name, internal_input_exts, 
+                                         internal_output_ext, prsm_top_num);
+    merge_ptr->process();
+    merge_ptr = nullptr;
 
     //remove temporary files
     for (int t = 0; t < mng_ptr_->thread_num_; t++) {

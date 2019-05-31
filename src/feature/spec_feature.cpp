@@ -15,18 +15,18 @@
 #include <fstream>
 
 #include "common/util/str_util.hpp"
-#include "feature/frac_ms2_feature.hpp"
+#include "feature/spec_feature.hpp"
 
 namespace toppic {
 
-FracMs2Feature::FracMs2Feature(int id, int frac_id, 
-                 const std::string &file_name,
-                 std::string &scans,
-                 int ms_one_id, int ms_one_scan, 
-                 double prec_mass, double prec_inte,
-                 int frac_feature_id, double frac_feature_inte,
-                 int sample_feature_id, double sample_feature_inte): 
-    id_(id),
+SpecFeature::SpecFeature(int spec_id, int frac_id, 
+                         const std::string &file_name,
+                         std::string &scans,
+                         int ms_one_id, int ms_one_scan, 
+                         double prec_mass, double prec_inte,
+                         int frac_feature_id, double frac_feature_inte,
+                         int sample_feature_id, double sample_feature_inte): 
+    spec_id_(spec_id),
     frac_id_(frac_id),
     file_name_(file_name),
     scans_(scans),
@@ -40,10 +40,10 @@ FracMs2Feature::FracMs2Feature(int id, int frac_id,
     sample_feature_inte_(sample_feature_inte) {
     }
 
-FracMs2Feature::FracMs2Feature(std::string line) {
+SpecFeature::SpecFeature(std::string line) {
   std::vector<std::string> strs;
   strs = str_util::split(line, "\t");
-  id_ = std::stoi(strs[0]);
+  spec_id_ = std::stoi(strs[0]);
   frac_id_ = std::stoi(strs[1]);
   file_name_ = strs[2];
   scans_ = strs[3];
@@ -57,8 +57,8 @@ FracMs2Feature::FracMs2Feature(std::string line) {
   sample_feature_inte_ = std::stod(strs[11]);
 }
 
-FracMs2Feature::FracMs2Feature(MsHeaderPtr header, FracFeaturePtr feature) {
-  id_ = header->getId();
+SpecFeature::SpecFeature(MsHeaderPtr header, FracFeaturePtr feature) {
+  spec_id_ = header->getId();
   frac_id_ = header->getFractionId();
   file_name_ = header->getFileName();
   scans_ = header->getScansString();

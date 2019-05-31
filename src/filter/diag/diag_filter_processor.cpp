@@ -24,7 +24,7 @@
 #include "spec/msalign_util.hpp"
 #include "prsm/simple_prsm_xml_writer.hpp"
 #include "prsm/simple_prsm_xml_writer_util.hpp"
-#include "prsm/simple_prsm_str_combine.hpp"
+#include "prsm/simple_prsm_str_merge.hpp"
 #include "filter/diag/mass_diag_filter.hpp"
 #include "filter/diag/diag_filter_processor.hpp"
 
@@ -64,12 +64,12 @@ void DiagFilterProcessor::process() {
 
   std::string sp_file_name = mng_ptr_->prsm_para_ptr_->getSpectrumFileName();
   int block_num = db_block_ptr_vec.size();
-  SimplePrsmStrCombinePtr combine_ptr
-      = std::make_shared<SimplePrsmStrCombine>(sp_file_name, mng_ptr_->output_file_ext_,
-                                               block_num, mng_ptr_->output_file_ext_,
-                                               mng_ptr_->filter_result_num_);
-  combine_ptr->process();
-  combine_ptr = nullptr;
+  SimplePrsmStrMergePtr merge_ptr
+      = std::make_shared<SimplePrsmStrMerge>(sp_file_name, mng_ptr_->output_file_ext_,
+                                             block_num, mng_ptr_->output_file_ext_,
+                                             mng_ptr_->filter_result_num_);
+  merge_ptr->process();
+  merge_ptr = nullptr;
   //Remove temporary files
   file_util::cleanTempFiles(sp_file_name, mng_ptr_->output_file_ext_ + "_");
 
@@ -153,11 +153,11 @@ void DiagFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num
     input_exts.push_back(fname);
   }
 
-  SimplePrsmStrCombinePtr combine_ptr
-      = std::make_shared<SimplePrsmStrCombine>(mng_ptr_->prsm_para_ptr_->getSpectrumFileName(),
-                                               input_exts, cur_output_ext, INT_MAX);
-  combine_ptr->process();
-  combine_ptr = nullptr;
+  SimplePrsmStrMergePtr merge_ptr
+      = std::make_shared<SimplePrsmStrMerge>(mng_ptr_->prsm_para_ptr_->getSpectrumFileName(),
+                                             input_exts, cur_output_ext, INT_MAX);
+  merge_ptr->process();
+  merge_ptr = nullptr;
   
   //Remove temporary files
   file_util::cleanTempFiles(sp_file_name, cur_output_ext + "_");

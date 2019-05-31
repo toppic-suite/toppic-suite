@@ -12,19 +12,33 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_FEATURE_FRAC_FEATURE_DETECT_HPP_
-#define TOPPIC_FEATURE_FRAC_FEATURE_DETECT_HPP_
+#ifndef TOPPIC_FEATURE_SPEC_FEATURE_READER_HPP_
+#define TOPPIC_FEATURE_SPEC_FEATURE_READER_HPP_
 
-#include <string>
+#include <fstream>
+
+#include "feature/spec_feature.hpp"
 
 namespace toppic {
 
-namespace frac_feature_detect {
+class SpecFeatureReader {
+ public:
+  SpecFeatureReader(const std::string &file_name);
 
-void process(int frac_id, std::string &sp_file_name, 
-             bool miss_level_one, std::string &argu_str);
+  ~SpecFeatureReader();
+
+  void close();
+
+  SpecFeaturePtr readOneFeature(); 
+
+  SpecFeaturePtrVec readAllFeatures();
+
+ private:
+  std::string file_name_;
+  std::ifstream input_;
 };
 
-}
+typedef std::shared_ptr<SpecFeatureReader> SpecFeatureReaderPtr;
 
+}  // namespace toppic
 #endif

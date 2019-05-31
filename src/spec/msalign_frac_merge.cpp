@@ -24,12 +24,39 @@
 
 namespace toppic {
 
-namespace msalign_frac_merge {
+int MsAlignFracMerge::MAX_SPEC_NUM_PER_FILE = 1000000;
 
-void mergeFiles(const std::vector<std::string> &spec_file_lst,
-                const std::string &output_file, 
-                int max_num_per_file,
-                const std::string &para_str) {
+MsAlignFracMerge::MsAlignFracMerge(
+    const std::vector<std::string> &spec_file_names,
+    const std::string &output_file_name):
+    spec_file_names_(spec_file_names),
+    output_file_name_(output_file_name) {
+    }
+
+void MsAlignFracMerge::process(std::string &para_str) {
+  std::vector<std::string> ms1_file_names;
+  std::vector<std::string> ms2_file_names;
+  for (size_t i = 0; i < spec_file_names_.size(); i++) { 
+    std::string base_name = file_util::basename(spec_file_names_[i]);
+    std::string ms1_name = base_name + "_ms1.msalign";
+    ms1_file_names.push_back(ms1_name);
+    std::string ms2_name = base_name + "_ms2.msalign";
+    ms2_file_names.push_back(ms2_name);
+  }
+  
+  std::string ms1_spec_output_name = output_file_name_ + "_ms1.msalign";
+  std::string ms2_spec_output_name = output_file_name_ + "_ms2.msalign";
+
+  mergeFiles(ms1_file_names, ms1_spec_output_name, 
+             MAX_SPEC_NUM_PER_FILE, para_str); 
+  mergeFiles(ms2_file_names, ms2_spec_output_name, 
+             MAX_SPEC_NUM_PER_FILE, para_str); 
+}
+
+void MsAlignFracMerge::mergeFiles(const std::vector<std::string> &spec_file_lst,
+                                  const std::string &output_file, 
+                                  int max_num_per_file,
+                                  const std::string &para_str) {
   std::ofstream outfile; 
   outfile.open(output_file);
   outfile << para_str;
@@ -56,8 +83,6 @@ void mergeFiles(const std::vector<std::string> &spec_file_lst,
   }
 
   outfile.close();
-}
-
 }
 
 } /* namespace toppic */

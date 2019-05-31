@@ -29,7 +29,7 @@
 #include "spec/msalign_util.hpp"
 
 #include "prsm/prsm_para.hpp"
-#include "prsm/prsm_str_combine.hpp"
+#include "prsm/prsm_str_merge.hpp"
 #include "prsm/prsm_top_selector.hpp"
 #include "prsm/prsm_cutoff_selector.hpp"
 #include "prsm/prsm_cluster.hpp"
@@ -244,13 +244,13 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
       input_exts.push_back("toppic_multi_ptm_internal_2");
     }
 
-    std::cout << "Combining PrSMs - started." << std::endl;
+    std::cout << "Merging PrSMs - started." << std::endl;
     int prsm_top_num = (ptm_num + 1) * 4;
-    PrsmStrCombinePtr combine_ptr
-        = std::make_shared<PrsmStrCombine>(sp_file_name, input_exts, "toppic_combined", prsm_top_num);
-    combine_ptr->process();
-    combine_ptr = nullptr;
-    std::cout << "Combining PrSMs - finished." << std::endl;
+    PrsmStrMergePtr merge_ptr
+        = std::make_shared<PrsmStrMerge>(sp_file_name, input_exts, "toppic_combined", prsm_top_num);
+    merge_ptr->process();
+    merge_ptr = nullptr;
+    std::cout << "Merging PrSMs - finished." << std::endl;
     
     std::cout << "E-value computation - started." << std::endl;
     bool variable_ptm = false;

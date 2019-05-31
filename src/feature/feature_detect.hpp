@@ -12,25 +12,19 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_FEATURE_FRAC_FEATURE_MERGE_HPP_
-#define TOPPIC_FEATURE_FRAC_FEATURE_MERGE_HPP_
+#ifndef TOPPIC_FEATURE_FEATURE_DETECT_HPP_
+#define TOPPIC_FEATURE_FEATURE_DETECT_HPP_
 
-#include <memory>
-#include <vector>
 #include <string>
 
 namespace toppic {
 
-namespace frac_feature_merge {
+namespace feature_detect {
 
-void mergeFiles(const std::vector<std::string> &feature_file_lst,
-                const std::string &feature_output_file, 
-                const std::vector<std::string> &ms2_feature_file_lst,
-                const std::string &ms2_feature_output_file,
-                int max_num_per_file,
-                const std::string &para_str);
+void process(int frac_id, std::string &sp_file_name, 
+             bool miss_level_one, std::string &argu_str);
+};
+
 }
-
-} /* namespace toppic */
 
 #endif

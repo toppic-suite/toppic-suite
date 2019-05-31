@@ -25,7 +25,7 @@
 #include "spec/spectrum_set.hpp"
 
 #include "prsm/simple_prsm_xml_writer_set.hpp"
-#include "prsm/simple_prsm_str_combine.hpp"
+#include "prsm/simple_prsm_str_merge.hpp"
 
 #include "filter/zeroptm/zero_ptm_filter_processor.hpp"
 #include "filter/zeroptm/mass_zero_ptm_filter.hpp"
@@ -111,8 +111,8 @@ void ZeroPtmFilterProcessor::process() {
   std::cout << "Non PTM filtering - combining blocks started." << std::endl;
   std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
   std::string input_pref = mng_ptr_->output_file_ext_;
-  SimplePrsmStrCombine::combineBlockResults(sp_file_name, input_pref, block_num,  
-                                            mng_ptr_->comp_num_, mng_ptr_->pref_suff_num_, mng_ptr_->inte_num_ );
+  SimplePrsmStrMerge::mergeBlockResults(sp_file_name, input_pref, block_num,  
+                                        mng_ptr_->comp_num_, mng_ptr_->pref_suff_num_, mng_ptr_->inte_num_ );
   std::cout << "Non PTM filtering - combining blocks finished." << std::endl;
 }
 

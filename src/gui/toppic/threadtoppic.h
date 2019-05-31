@@ -28,7 +28,6 @@
 #include "common/util/str_util.hpp"
 
 #include "spec/msalign_util.hpp"
-#include "spec/feature_util.hpp"
 
 #include "prsm/prsm_util.hpp"
 

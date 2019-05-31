@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_FEATURE_MSALIGN_FEATURE_MERGE_HPP_
-#define TOPPIC_FEATURE_MSALIGN_FEATURE_MERGE_HPP_
+#ifndef TOPPIC_SPEC_MSALIGN_THREAD_MERGE_HPP_
+#define TOPPIC_SPEC_MSALIGN_THREAD_MERGE_HPP_
 
 #include <memory>
 #include <vector>
@@ -21,20 +21,22 @@
 
 namespace toppic {
 
-class MsAlignFeatureMerge {
+class MsalignThreadMerge {
  public:
-  MsAlignFeatureMerge(const std::vector<std::string> &spec_file_names,
-                      const std::string &output_file_name);
+  MsalignThreadMerge(const std::string &spec_file_name,
+                     const std::string &in_file_ext,
+                     int in_num,
+                     const std::string &out_file_ext);
 
-  void process(std::string &para_str);
+  void process();
 
  private:
-  std::vector<std::string> spec_file_names_;
-  std::string output_file_name_;
-  static int MAX_NUM_PER_FILE;
+  std::string spec_file_name_;
+  std::vector<std::string> input_file_exts_;
+  std::string output_file_ext_;
 };
 
-typedef std::shared_ptr<MsAlignFeatureMerge> MsAlignFeatureMergePtr;
+typedef std::shared_ptr<MsalignThreadMerge> MsalignThreadMergePtr;
 } /* namespace toppic */
 
 #endif

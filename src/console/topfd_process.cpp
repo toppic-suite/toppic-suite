@@ -20,8 +20,9 @@
 #include "common/util/file_util.hpp"
 #include "common/util/str_util.hpp"
 #include "common/base/base_data.hpp"
-#include "feature/frac_feature_detect.hpp"
-#include "feature/msalign_feature_merge.hpp"
+#include "spec/msalign_frac_merge.hpp"
+#include "feature/feature_detect.hpp"
+#include "feature/feature_merge.hpp"
 #include "deconv/deconv/deconv_process_2.hpp"
 
 namespace toppic {
@@ -73,8 +74,8 @@ int processOneFile(std::map<std::string, std::string> arguments,
 
     std::string argu_str = para_ptr->getArgumentStr();
     std::string sp_file_name = para_ptr->getDataFileName();
-    frac_feature_detect::process(frac_id, sp_file_name, 
-                                 para_ptr->missing_level_one_, argu_str);
+    feature_detect::process(frac_id, sp_file_name, 
+                            para_ptr->missing_level_one_, argu_str);
 
     time_t end = time(0);
     std::cout << "Runing time: "
@@ -105,8 +106,12 @@ int process(std::map<std::string, std::string> arguments,
 
   time_util::addTimeStamp(argument_str);
   std::cout << "Merging files started." << std::endl;
-  MsAlignFeatureMerge file_merge(spec_file_lst, "spectrum_combined");
-  file_merge.process(argument_str);
+  MsAlignFracMergePtr msalign_merger = std::make_shared<MsAlignFracMerge>(spec_file_lst, "spectrum_combined");
+  msalign_merger->process(argument_str);
+  msalign_merger = nullptr;
+  FeatureMergePtr feature_merger = std::make_shared<FeatureMerge>(spec_file_lst, "spectrum_combined");
+  feature_merger->process(argument_str);
+  feature_merger = nullptr;
   std::cout << "Merging files ended." << std::endl;
   return 0;
 }

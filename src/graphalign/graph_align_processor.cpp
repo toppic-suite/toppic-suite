@@ -28,7 +28,7 @@
 #include "spec/msalign_util.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_reader.hpp"
-#include "prsm/prsm_str_combine.hpp"
+#include "prsm/prsm_str_merge.hpp"
 #include "prsm/simple_prsm_reader.hpp"
 #include "prsm/simple_prsm_util.hpp"
 #include "prsm/simple_prsm_xml_writer.hpp"
@@ -246,12 +246,12 @@ void GraphAlignProcessor::process() {
   }
 
   int top_num = (mng_ptr_->n_unknown_shift_ + 1) * 4;
-  PrsmStrCombinePtr combine_ptr
-      = std::make_shared<PrsmStrCombine>(sp_file_name, input_exts,
-                                         mng_ptr_->output_file_ext_, top_num);
+  PrsmStrMergePtr merge_ptr
+      = std::make_shared<PrsmStrMerge>(sp_file_name, input_exts,
+                                       mng_ptr_->output_file_ext_, top_num);
   bool normalization = true;
-  combine_ptr->process(normalization);
-  combine_ptr = nullptr;
+  merge_ptr->process(normalization);
+  merge_ptr = nullptr;
 
   // remove temporary files
   for (int t = 0; t < mng_ptr_->thread_num_; t++) {
