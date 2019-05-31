@@ -444,7 +444,7 @@ void process(int frac_id, std::string &sp_file_name,
   std::string output_file_name = base_name + "_frac.feature";
   frac_feature_writer::writeFeatures(output_file_name, features);
 
-  output_file_name = base_name + "_spec.feature";
+  output_file_name = base_name + "_ms2.feature";
   spec_feature_writer::writeFeatures(output_file_name, ms2_features); 
 
 }
