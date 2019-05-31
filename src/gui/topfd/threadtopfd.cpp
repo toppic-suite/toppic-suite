@@ -12,19 +12,9 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <algorithm>
-
-#include "threadtopfd.h"
+#include "console/topfd_process.hpp"
+#include "gui/topfd/threadtopfd.h"
 
 void ThreadTopFD::run() {
-  std::sort(spec_file_lst_.begin(), spec_file_lst_.end());
-  for (size_t k = 0; k < spec_file_lst_.size(); k++) {
-    if (toppic::str_util::endsWith(spec_file_lst_[k], "mzML")
-        || toppic::str_util::endsWith(spec_file_lst_[k], "mzXML")
-        || toppic::str_util::endsWith(spec_file_lst_[k], "mzml")
-        || toppic::str_util::endsWith(spec_file_lst_[k], "mzxml")) {
-      arguments_["spectrumFileName"] = spec_file_lst_[k];
-      toppic::TopFDProcess(arguments_);
-    }
-  }
+  toppic::topfd_process::process(arguments_, spec_file_lst_);
 }

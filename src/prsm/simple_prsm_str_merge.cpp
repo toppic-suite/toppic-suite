@@ -19,24 +19,24 @@
 #include "common/util/file_util.hpp"
 #include "prsm/simple_prsm_reader.hpp"
 #include "prsm/simple_prsm_xml_writer.hpp"
-#include "prsm/simple_prsm_str_combine.hpp"
+#include "prsm/simple_prsm_str_merge.hpp"
 
 namespace toppic {
 
-SimplePrsmStrCombine::SimplePrsmStrCombine(const std::string &spec_file_name,
-                                           const std::vector<std::string> &in_file_exts,
-                                           const std::string &out_file_ext,
-                                           int top_num):
+SimplePrsmStrMerge::SimplePrsmStrMerge(const std::string &spec_file_name,
+                                       const std::vector<std::string> &in_file_exts,
+                                       const std::string &out_file_ext,
+                                       int top_num):
     spec_file_name_(spec_file_name),
     input_file_exts_(in_file_exts),
     output_file_ext_(out_file_ext),
     top_num_(top_num) {}
 
-SimplePrsmStrCombine::SimplePrsmStrCombine(const std::string &spec_file_name,
-                                           const std::string &in_file_ext,
-                                           int in_num,
-                                           const std::string &out_file_ext,
-                                           int top_num):
+SimplePrsmStrMerge::SimplePrsmStrMerge(const std::string &spec_file_name,
+                                       const std::string &in_file_ext,
+                                       int in_num,
+                                       const std::string &out_file_ext,
+                                       int top_num):
     spec_file_name_(spec_file_name),
     output_file_ext_(out_file_ext),
     top_num_(top_num) {
@@ -46,12 +46,12 @@ SimplePrsmStrCombine::SimplePrsmStrCombine(const std::string &spec_file_name,
       }
     }
 
-SimplePrsmStrCombine::SimplePrsmStrCombine(const std::string &spec_file_name,
-                                           const std::string &in_file_pref,
-                                           const std::string &in_file_suff,
-                                           int in_num,
-                                           const std::string &out_file_ext,
-                                           int top_num):
+SimplePrsmStrMerge::SimplePrsmStrMerge(const std::string &spec_file_name,
+                                       const std::string &in_file_pref,
+                                       const std::string &in_file_suff,
+                                       int in_num,
+                                       const std::string &out_file_ext,
+                                       int top_num):
     spec_file_name_(spec_file_name),
     output_file_ext_(out_file_ext),
     top_num_(top_num) {
@@ -61,7 +61,7 @@ SimplePrsmStrCombine::SimplePrsmStrCombine(const std::string &spec_file_name,
       }
     }
 
-void SimplePrsmStrCombine::process() {
+void SimplePrsmStrMerge::process() {
   size_t input_num = input_file_exts_.size();
   std::string base_name = file_util::basename(spec_file_name_);
   // open files
@@ -121,49 +121,49 @@ void SimplePrsmStrCombine::process() {
   writer.close();
 }
 
-void SimplePrsmStrCombine::combineBlockResults(std::string &sp_file_name, 
-                                               std::string &input_pref,
-                                               int block_num, 
-                                               int comp_num, 
-                                               int pref_suff_num,
-                                               int inte_num) {
+void SimplePrsmStrMerge::mergeBlockResults(std::string &sp_file_name, 
+                                           std::string &input_pref,
+                                           int block_num, 
+                                           int comp_num, 
+                                           int pref_suff_num,
+                                           int inte_num) {
 
   std::string complete = ProteoformType::COMPLETE->getName();
   std::string prefix = ProteoformType::PREFIX->getName();
   std::string suffix = ProteoformType::SUFFIX->getName();
   std::string internal = ProteoformType::INTERNAL->getName();
 
-  SimplePrsmStrCombine comp_combine(sp_file_name, 
-                                    input_pref,
-                                    complete,
-                                    block_num, 
-                                    input_pref + "_" + complete,
-                                    comp_num);
-  comp_combine.process();
+  SimplePrsmStrMerge comp_merge(sp_file_name, 
+                                input_pref,
+                                complete,
+                                block_num, 
+                                input_pref + "_" + complete,
+                                comp_num);
+  comp_merge.process();
 
-  SimplePrsmStrCombine pref_combine(sp_file_name, 
-                                    input_pref,
-                                    prefix,
-                                    block_num, 
-                                    input_pref + "_" + prefix,
-                                    pref_suff_num);
-  pref_combine.process();
+  SimplePrsmStrMerge pref_merge(sp_file_name, 
+                                input_pref,
+                                prefix,
+                                block_num, 
+                                input_pref + "_" + prefix,
+                                pref_suff_num);
+  pref_merge.process();
 
-  SimplePrsmStrCombine suff_combine(sp_file_name, 
-                                    input_pref,
-                                    suffix,
-                                    block_num, 
-                                    input_pref + "_" + suffix,
-                                    pref_suff_num);
-  suff_combine.process();
+  SimplePrsmStrMerge suff_merge(sp_file_name, 
+                                input_pref,
+                                suffix,
+                                block_num, 
+                                input_pref + "_" + suffix,
+                                pref_suff_num);
+  suff_merge.process();
 
-  SimplePrsmStrCombine internal_combine(sp_file_name, 
-                                        input_pref, 
-                                        internal,
-                                        block_num, 
-                                        input_pref + "_" + internal,
-                                        inte_num);
-  internal_combine.process();
+  SimplePrsmStrMerge internal_merge(sp_file_name, 
+                                    input_pref, 
+                                    internal,
+                                    block_num, 
+                                    input_pref + "_" + internal,
+                                    inte_num);
+  internal_merge.process();
 
   // remove tempory files
   for (int i = 0; i < block_num; i++) {

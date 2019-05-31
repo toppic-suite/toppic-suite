@@ -16,6 +16,7 @@
 #define TOPPIC_CONSOLE_TOPFD_PROCESS_HPP_
 
 #include <string>
+#include <vector>
 #include <map>
 
 namespace toppic {

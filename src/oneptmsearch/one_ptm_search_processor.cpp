@@ -25,7 +25,7 @@
 #include "prsm/simple_prsm.hpp"
 #include "prsm/simple_prsm_reader.hpp"
 #include "prsm/prsm_xml_writer.hpp"
-#include "prsm/prsm_str_combine.hpp"
+#include "prsm/prsm_str_merge.hpp"
 #include "oneptmsearch/one_ptm_slow_match.hpp"
 #include "oneptmsearch/one_ptm_search_processor.hpp"
 

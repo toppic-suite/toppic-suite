@@ -20,14 +20,14 @@
 #include "common/util/str_util.hpp"
 #include "spec/msalign_reader.hpp"
 #include "spec/msalign_writer.hpp"
-#include "spec/msalign_thread_combine.hpp"
+#include "spec/msalign_thread_merge.hpp"
 
 namespace toppic {
 
-MsalignThreadCombine::MsalignThreadCombine(const std::string &spec_file_name,
-                                           const std::string &in_file_ext,
-                                           int in_num,
-                                           const std::string &out_file_ext):
+MsalignThreadMerge::MsalignThreadMerge(const std::string &spec_file_name,
+                                       const std::string &in_file_ext,
+                                       int in_num,
+                                       const std::string &out_file_ext):
     spec_file_name_(spec_file_name),
     output_file_ext_(out_file_ext) {
       for (int i = 0; i < in_num; i ++) {
@@ -50,7 +50,7 @@ inline int getCurMsIndex(DeconvMsPtrVec &ms_ptrs) {
   return index;
 }
 
-void MsalignThreadCombine::process() {
+void MsalignThreadMerge::process() {
   size_t input_num = input_file_exts_.size();
   std::string base_name = file_util::basename(spec_file_name_);
   // open files

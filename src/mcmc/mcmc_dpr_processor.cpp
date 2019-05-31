@@ -35,7 +35,7 @@
 
 #include "prsm/prsm_algo.hpp"
 #include "prsm/prsm_reader.hpp"
-#include "prsm/prsm_str_combine.hpp"
+#include "prsm/prsm_str_merge.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_xml_writer_util.hpp"
@@ -197,11 +197,11 @@ void DprProcessor::process() {
   for (int t = 0; t < mng_ptr_->thread_num_; t++) {
     input_exts.push_back(mng_ptr_->output_file_ext_ + "_" + str_util::toString(t));
   }
-  PrsmStrCombinePtr combine_ptr
-      = std::make_shared<PrsmStrCombine>(sp_file_name, input_exts, 
-                                         mng_ptr_->output_file_ext_, prsm_top_num);
-  combine_ptr->process();
-  combine_ptr = nullptr;
+  PrsmStrMergePtr merge_ptr
+      = std::make_shared<PrsmStrMerge>(sp_file_name, input_exts, 
+                                       mng_ptr_->output_file_ext_, prsm_top_num);
+  merge_ptr->process();
+  merge_ptr = nullptr;
 
   // remove tempory files
   file_util::cleanTempFiles(sp_file_name, mng_ptr_->output_file_ext_ + "_");

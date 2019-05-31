@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_SPEC_MSALIGN_FRAC_MERGE_HPP_
-#define TOPPIC_SPEC_MSALIGN_FRAC_MERGE_HPP_
+#ifndef TOPPIC_FEATURE_FEATURE_MERGE_HPP_
+#define TOPPIC_FEATURE_FEATURE_MERGE_HPP_
 
 #include <memory>
 #include <vector>
@@ -21,27 +21,28 @@
 
 namespace toppic {
 
-class MsAlignFracMerge {
+class FeatureMerge {
  public:
-  MsAlignFracMerge(const std::vector<std::string> &spec_file_names,
-                   const std::string &output_file_name);
+  FeatureMerge(const std::vector<std::string> &spec_file_names,
+               const std::string &output_file_name);
 
   void process(std::string &para_str);
 
-  static void mergeFiles(const std::vector<std::string> &spec_file_lst,
-                         const std::string &output_file, 
-                         int max_num_per_file,
+  static void mergeFiles(const std::vector<std::string> &feature_file_lst,
+                         const std::string &feature_output_file, 
+                         const std::vector<std::string> &ms2_feature_file_lst,
+                         const std::string &ms2_feature_output_file,
+                         int max_spec_num_per_file,
+                         int max_feature_num_per_file,
                          const std::string &para_str);
-
-  static int getMaxSpecNumPerFile() {return MAX_SPEC_NUM_PER_FILE;}
 
  private:
   std::vector<std::string> spec_file_names_;
   std::string output_file_name_;
-  static int MAX_SPEC_NUM_PER_FILE;
+  static int MAX_FEATURE_NUM_PER_FILE;
 };
 
-typedef std::shared_ptr<MsAlignFracMerge> MsAlignFracMergePtr;
+typedef std::shared_ptr<FeatureMerge> FeatureMergePtr;
 
 } /* namespace toppic */
 
