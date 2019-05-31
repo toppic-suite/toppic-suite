@@ -25,6 +25,7 @@ SimplePrsm::SimplePrsm(MsHeaderPtr header_ptr, int spectrum_num,
     spectrum_num_(spectrum_num),
     score_(score) {
       spectrum_id_ = header_ptr->getId();
+      file_name_ = header_ptr->getFileName();
       spectrum_scan_ = header_ptr->getScansString();
       precursor_id_ = header_ptr->getPrecId();
       prec_mass_ = header_ptr->getPrecMonoMass();
