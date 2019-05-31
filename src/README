@@ -4,6 +4,7 @@
 /common/xml/   	Functions for handling xml files   
 /console/	      Main functions for topfd, toppic, and topmg
 /deconv/  	    Spectral deconvolution and feature detection
+/feature/       Spectrum, fraction, and sample-level features
 /filter/	      Various filtering methods
 /graph/		      Mass graphs
 /graphalign/	  Graph alignment algorithms
