@@ -46,12 +46,12 @@ void FeatureMerge::process(std::string &para_str) {
     std::string base_name = file_util::basename(spec_file_names_[i]);
     std::string frac_feature = base_name + "_frac.feature";
     frac_feature_names.push_back(frac_feature);
-    std::string spec_feature = base_name + "_spec.feature";
+    std::string spec_feature = base_name + "_ms2.feature";
     spec_feature_names.push_back(spec_feature);
   }
   
   std::string frac_feature_output_name = output_file_name_ + "_frac.feature";
-  std::string spec_feature_output_name = output_file_name_ + "_spec.feature";
+  std::string spec_feature_output_name = output_file_name_ + "_ms2.feature";
 
   mergeFiles(frac_feature_names, frac_feature_output_name, 
              spec_feature_names, spec_feature_output_name,
