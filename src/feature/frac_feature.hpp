@@ -48,11 +48,11 @@ class FracFeature {
 
   double getIntensity() {return intensity_;}
 
-  double getRetentBegin() {return retent_begin_;}
+  double getTimeBegin() {return retent_begin_;}
 
-  double getRetentEnd() {return retent_end_;}
+  double getTimeEnd() {return retent_end_;}
 
-  double getRetentMiddle() {return (retent_begin_ + retent_end_)/2;}
+  double getTimeMiddle() {return (retent_begin_ + retent_end_)/2;}
 
   int getScanBegin() {return scan_begin_;}
 
@@ -80,8 +80,8 @@ class FracFeature {
     return a->getIntensity() > b->getIntensity();
   }
 
-  static bool cmpRetentInc(const FracFeaturePtr &a, const FracFeaturePtr &b) { 
-    return a->getRetentMiddle() < b->getRetentMiddle();
+  static bool cmpTimeInc(const FracFeaturePtr &a, const FracFeaturePtr &b) { 
+    return a->getTimeMiddle() < b->getTimeMiddle();
   }
 
   static bool cmpFracIncInteDec(const FracFeaturePtr &a, const FracFeaturePtr &b);

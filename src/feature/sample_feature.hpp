@@ -12,11 +12,11 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_FEATURE_SAMPLE_FEATURE_HPP_
 #define TOPPIC_FEATURE_SAMPLE_FEATURE_HPP_
 
 #include <memory>
+#include <string>
 #include <vector>
 
 #include "feature/frac_feature.hpp"
@@ -30,6 +30,10 @@ class SampleFeature {
  public:
   SampleFeature() {}
 
+  SampleFeature(const std::string &line);
+
+  SampleFeature(FracFeaturePtrVec &frac_features, int id);
+
   int getSampleId() {return sample_id_;}
 
   int getId() {return id_;}
@@ -38,15 +42,19 @@ class SampleFeature {
 
   double getIntensity() {return intensity_;}
 
-  double getRetentBegin() {return retent_begin_;}
+  double getTimeBegin() {return time_begin_;}
 
-  double getRetentEnd() {return retent_end_;}
+  double getTimeEnd() {return time_end_;}
 
-  double getRetentMiddle() {return (retent_begin_ + retent_end_)/2;}
+  double getTimeMiddle() {return (time_begin_ + time_end_)/2;}
 
   int getMinCharge() {return min_charge_;}
 
   int getMaxCharge() {return max_charge_;}
+
+  int getMinFracId() {return min_frac_id_;}
+
+  int getMaxFracId() {return max_frac_id_;}
 
   void setSampleId(int sample_id) {sample_id_ = sample_id;}
 
@@ -58,20 +66,22 @@ class SampleFeature {
     return a->getIntensity() > b->getIntensity();
   }
 
-  static bool cmpRetentInc(const SampleFeaturePtr &a, const SampleFeaturePtr &b) { 
-    return a->getRetentMiddle() < b->getRetentMiddle();
+  static bool cmpTimeInc(const SampleFeaturePtr &a, const SampleFeaturePtr &b) { 
+    return a->getTimeMiddle() < b->getTimeMiddle();
   }
 
  protected:
-  int sample_id_;
+  int sample_id_ = -1;
   int id_;
   double mono_mass_;
   double intensity_;
-  double retent_begin_;
-  double retent_end_;
+  double time_begin_;
+  double time_end_;
   int min_charge_;
   int max_charge_;
-  FracFeaturePtrVec frac_features_;
+  int min_frac_id_;
+  int max_frac_id_;
+  //FracFeaturePtrVec frac_features_;
 };
 
 typedef std::vector<SampleFeaturePtr> SampleFeaturePtrVec;

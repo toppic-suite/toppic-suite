@@ -12,8 +12,42 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include "common/util/logger.hpp"
+#include "common/util/str_util.hpp"
 #include "feature/sample_feature.hpp"
 
 namespace toppic {
+
+SampleFeature::SampleFeature(const std::string &line) {
+  std::vector<std::string> strs;
+  strs = str_util::split(line, "\t");
+  sample_id_ = std::stoi(strs[0]);
+  id_ = std::stoi(strs[1]);
+  mono_mass_ = std::stod(strs[2]);
+  intensity_ = std::stod(strs[3]);
+  time_begin_ = std::stod(strs[4]);
+  time_end_ = std::stod(strs[5]);
+  min_charge_ = std::stoi(strs[6]);
+  max_charge_ = std::stoi(strs[7]);
+  min_frac_id_ = std::stoi(strs[8]);
+  max_frac_id_ = std::stoi(strs[9]);
+}
+
+SampleFeature::SampleFeature(FracFeaturePtrVec &frac_features, int id) {
+  if (frac_features.size() == 0) {
+    LOG_ERROR("Fraction feature size is 0!");
+    exit(EXIT_FAILURE);  
+  }
+  id_ = id;
+  FracFeaturePtr first_ft = frac_features[0];
+  mono_mass_ = first_ft->getMonoMass();
+  intensity_ = first_ft->getIntensity();
+  time_begin_ = first_ft->getTimeBegin();
+  time_end_ = first_ft->getTimeEnd();
+  min_charge_ = first_ft->getMinCharge();
+  max_charge_ = first_ft->getMaxCharge();
+  min_frac_id_ = first_ft->getFracId();
+  max_frac_id_ = first_ft->getFracId();
+}
 
 }

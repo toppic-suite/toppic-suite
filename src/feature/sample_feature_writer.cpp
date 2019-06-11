@@ -18,54 +18,49 @@
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/str_util.hpp"
-#include "feature/frac_feature_writer.hpp"
+#include "feature/sample_feature_writer.hpp"
 
 namespace toppic {
 
-namespace frac_feature_writer {
+namespace sample_feature_writer {
 
 void writeHeader(std::ofstream &of) {
   of.precision(16);
-  of << "ID" << "\t"
-      << "Fraction_ID" << "\t"
+  of << "Sample_ID" << "\t"
+      << "ID" << "\t"
       << "File_name" << "\t"
       << "Mass" << "\t"
       << "Intensity" << "\t"
       << "Time_begin" << "\t"
       << "Time_end" << "\t"
-      << "First_scan" << "\t"
-      << "Last_scan" << "\t"
       << "Minimum_charge_state" << "\t"
       << "Maximum_charge_state" << "\t"
-      << "Sample_feature_Id" << "\t"
-      << "Sample_feature_intensity"
+      << "Minimum_fraction_id" << "\t"
+      << "Maximum_fraction_id"
       << std::endl;
 }
 
-void writeOneFeature(std::ofstream &of, FracFeaturePtr feature) {
-  of << feature->getId() << "\t"
-      << feature->getFracId() << "\t"
-      << feature->getFileName() << "\t"
+void writeOneFeature(std::ofstream &of, SampleFeaturePtr feature) {
+  of << feature->getSampleId() << "\t"
+      << feature->getId() << "\t"
       << feature->getMonoMass() << "\t"
       << feature->getIntensity() << "\t"
       << feature->getTimeBegin() << "\t"
       << feature->getTimeEnd() << "\t"
-      << feature->getScanBegin() << "\t"
-      << feature->getScanEnd() << "\t"
       << feature->getMinCharge() << "\t"
       << feature->getMaxCharge() << "\t"
-      << feature->getSampleFeatureId() << "\t"
-      << feature->getSampleFeatureInte() 
+      << feature->getMinFracId() << "\t"
+      << feature->getMaxFracId() 
       << std::endl;
 }
 
 void writeFeatures(const std::string &output_file_name,
-                   const FracFeaturePtrVec &features) {
+                   const SampleFeaturePtrVec &features) {
   std::ofstream of(output_file_name);
   writeHeader(of);
 
   for (size_t i = 0; i < features.size(); i++) {
-    FracFeaturePtr feature = features[i];
+    SampleFeaturePtr feature = features[i];
     writeOneFeature(of, feature);
   }
   of.close();
