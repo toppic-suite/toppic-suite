@@ -28,7 +28,7 @@ bool matchFeature(FracFeaturePtr a, FracFeaturePtr b,
   if (std::abs(mass_diff) > mass_tolerance) {
     return false;
   }
-  double retent_diff = a->getRetentMiddle() - b->getRetentMiddle();
+  double retent_diff = a->getTimeMiddle() - b->getTimeMiddle();
   if (std::abs(retent_diff) > time_tolerance) {
     return false;
   }
