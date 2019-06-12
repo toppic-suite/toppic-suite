@@ -35,10 +35,9 @@ bool matchFeature(FracFeaturePtr a, FracFeaturePtr b,
   return true;
 }
 
-void setSampleFeatureId(FracFeaturePtrVec& features, 
-                        double mass_tolerance, double time_tolerance) {
-  std::vector<FracFeaturePtrVec> clusters; 
-  std::vector<double> cluster_intes;
+void getClusters(FracFeaturePtrVec& features, 
+                 FracFeaturePtrVec2D& clusters,
+                 double mass_tolerance, double time_tolerance) {
   for (size_t i = 0; i < features.size(); i++) {
     bool is_found = false;
     FracFeaturePtr cur_ptr = features[i];
@@ -47,7 +46,6 @@ void setSampleFeatureId(FracFeaturePtrVec& features,
       if (matchFeature(cur_ptr, ref_ptr, mass_tolerance, time_tolerance)) {
           is_found = true;
           clusters[j].push_back(cur_ptr);
-          cluster_intes[j] += cur_ptr->getIntensity();
           break;
       }
     }
@@ -55,21 +53,14 @@ void setSampleFeatureId(FracFeaturePtrVec& features,
       FracFeaturePtrVec new_clusters;
       new_clusters.push_back(cur_ptr); 
       clusters.push_back(new_clusters);
-      cluster_intes.push_back(cur_ptr->getIntensity());
-    }
-  }
-  for (size_t i = 0; i < clusters.size(); i++) {
-    for (size_t j = 0; j < clusters[i].size(); j++) {
-      clusters[i][j]->setSampleFeatureId(i);
-      clusters[i][j]->setSampleFeatureInte(cluster_intes[i]);
     }
   }
 }
 
-void cluster(FracFeaturePtrVec &features, double mass_tolerance, 
-             double time_tolerance) {
+void cluster(FracFeaturePtrVec &features, FracFeaturePtrVec2D &clusters,
+             double mass_tolerance, double time_tolerance) {
   std::sort(features.begin(), features.end(), FracFeature::cmpInteDec);
-  setSampleFeatureId(features, mass_tolerance, time_tolerance);
+  getClusters(features, clusters, mass_tolerance, time_tolerance);
   std::sort(features.begin(), features.end(), FracFeature::cmpFracIncInteDec);
 }
 

@@ -21,8 +21,8 @@ namespace toppic {
 
 namespace frac_feature_cluster {
 
-void cluster(FracFeaturePtrVec &features, double mass_tolerance, 
-             double time_tolerance);
+void cluster(FracFeaturePtrVec &features, FracFeaturePtrVec2D &clusters,
+             double mass_tolerance, double time_tolerance);
 
 }
 

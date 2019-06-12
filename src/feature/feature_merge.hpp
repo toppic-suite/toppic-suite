@@ -32,6 +32,7 @@ class FeatureMerge {
                          const std::string &feature_output_file, 
                          const std::vector<std::string> &ms2_feature_file_lst,
                          const std::string &ms2_feature_output_file,
+                         const std::string &sample_feature_output_file_name,
                          int max_spec_num_per_file,
                          int max_feature_num_per_file,
                          const std::string &para_str);
