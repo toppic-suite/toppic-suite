@@ -18,20 +18,20 @@
 namespace toppic {
 
 FeaturePrsm::FeaturePrsm(std::string line):
-    Feature(line) {
+    SampleFeature(line) {
   std::vector<std::string> strs;
   strs = str_util::split(line, "\t");
-  if (strs.size() > 9) {
-    prot_name_ = strs[9];
-    prot_desc_ = strs[10];
-    first_residue_ = std::stoi(strs[11]) - 1;
-    last_residue_ = std::stoi(strs[12]) - 1;
-    proteoform_ = strs[13];
-    ms2_scan_ = std::stoi(strs[14]);
-    prec_mass_ = std::stod(strs[15]);
+  if (strs.size() > 10) {
+    prot_name_ = strs[10];
+    prot_desc_ = strs[11];
+    first_residue_ = std::stoi(strs[12]) - 1;
+    last_residue_ = std::stoi(strs[13]) - 1;
+    proteoform_ = strs[14];
+    ms2_id_ = std::stoi(strs[15]);
+    prec_mass_ = std::stod(strs[16]);
   }
   else {
-    ms2_scan_ = 0;
+    ms2_id_ = -1;
   }
 }
 
@@ -41,7 +41,7 @@ void FeaturePrsm::addPrsmInfo(PrsmStrPtr prsm) {
   first_residue_ = prsm->getProteoformStartPos();
   last_residue_ = prsm->getProteoformEndPos();
   proteoform_ = prsm->getProteinMatchSeq();
-  ms2_scan_ = prsm->getSpectrumScan();
+  ms2_id_ = prsm->getSpectrumId();
   prec_mass_ = prsm->getOriPrecMass(); 
 }
 

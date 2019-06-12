@@ -13,18 +13,18 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_MERGE_FEATURE_PRSM_HPP_
-#define TOPPIC_MERGE_FEATURE_PRSM_HPP_
+#ifndef TOPPIC_QUANT_FEATURE_PRSM_HPP_
+#define TOPPIC_QUANT_FEATURE_PRSM_HPP_
 
 #include "prsm/prsm_str.hpp"
-#include "deconv/feature/feature.hpp"
+#include "feature/sample_feature.hpp"
 
 namespace toppic {
 
 class FeaturePrsm;
 typedef std::shared_ptr<FeaturePrsm> FeaturePrsmPtr;
 
-class FeaturePrsm : public Feature {
+class FeaturePrsm : public SampleFeature {
  public:
   FeaturePrsm(std::string line);
 
@@ -40,9 +40,19 @@ class FeaturePrsm : public Feature {
 
   std::string getProteoform() {return proteoform_;}
 
-  int getMs2Scan() {return ms2_scan_;}
+  int getMs2Id() {return ms2_id_;}
 
   double getPrecMass() {return prec_mass_;}
+
+  double getAlignTimeBegin() {return align_time_begin_;}
+
+  double getAlignTimeEnd() {return align_time_end_;}
+
+  double getAlignTimeMiddle() {return (align_time_begin_ + align_time_end_)/2;}
+
+  void setAlignTimeBegin(double time_begin) {align_time_begin_ = time_begin;}
+
+  void setAlignTimeEnd(double time_end) {align_time_end_ = time_end;}
 
   static bool cmpMassInc(const FeaturePrsmPtr &a, const FeaturePrsmPtr &b) { 
     return a->getMonoMass() < b->getMonoMass();}
@@ -56,8 +66,10 @@ class FeaturePrsm : public Feature {
   int first_residue_;
   int last_residue_;
   std::string proteoform_;
-  int ms2_scan_;
+  int ms2_id_;
   double prec_mass_;
+  double align_time_begin_;
+  double align_time_end_;
 };
 
 typedef std::vector<FeaturePrsmPtr> FeaturePrsmPtrVec;

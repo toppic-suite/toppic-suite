@@ -28,7 +28,6 @@ void writeHeader(std::ofstream &of) {
   of.precision(16);
   of << "Sample_ID" << "\t"
       << "ID" << "\t"
-      << "File_name" << "\t"
       << "Mass" << "\t"
       << "Intensity" << "\t"
       << "Time_begin" << "\t"
