@@ -48,6 +48,28 @@ SampleFeature::SampleFeature(FracFeaturePtrVec &frac_features, int id) {
   max_charge_ = first_ft->getMaxCharge();
   min_frac_id_ = first_ft->getFracId();
   max_frac_id_ = first_ft->getFracId();
+  for (size_t i = 1; i < frac_features.size(); i++) {
+    FracFeaturePtr cur_ft = frac_features[i];
+    intensity_ = intensity_+ cur_ft->getIntensity();
+    if (cur_ft->getTimeBegin() < time_begin_) {
+      time_begin_ = cur_ft->getTimeBegin();
+    }
+    if (cur_ft->getTimeEnd() > time_end_) {
+      time_end_ = cur_ft->getTimeEnd();
+    }
+    if (cur_ft->getMinCharge() < min_charge_) {
+      min_charge_ = cur_ft->getMinCharge();
+    }
+    if (cur_ft->getMaxCharge() > max_charge_) {
+      max_charge_ = cur_ft->getMaxCharge();
+    }
+    if (cur_ft->getFracId() < min_frac_id_) {
+      min_frac_id_ = cur_ft->getFracId();
+    }
+    if (cur_ft->getFracId() > max_frac_id_) {
+      max_frac_id_ = cur_ft->getFracId();
+    }
+  }
 }
 
 }
