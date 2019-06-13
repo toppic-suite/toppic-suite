@@ -34,7 +34,8 @@ class FracFeature {
               double mono_mass, double inte,
               double retent_begin, double retent_end,
               int scan_begin, int scan_end,
-              int min_charge, int max_charge);
+              int min_charge, int max_charge, 
+              int env_num);
 
   FracFeature(std::string line);
 
@@ -61,6 +62,8 @@ class FracFeature {
   int getMinCharge() {return min_charge_;}
 
   int getMaxCharge() {return max_charge_;}
+
+  int getEnvNum() {return env_num_;}
 
   int getSampleFeatureId() {return sample_feature_id_;}
 
@@ -98,6 +101,7 @@ class FracFeature {
   int scan_end_;
   int min_charge_;
   int max_charge_;
+  int env_num_ = 0;
   int sample_feature_id_ = -1;
   double sample_feature_inte_ = 0;
 };

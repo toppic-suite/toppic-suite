@@ -24,7 +24,8 @@ FracFeature::FracFeature(int id, int frac_id,
                          double mono_mass, double inte,
                          double retent_begin, double retent_end,
                          int scan_begin, int scan_end,
-                         int min_charge, int max_charge): 
+                         int min_charge, int max_charge, 
+                         int env_num): 
     id_(id),
     frac_id_(frac_id),
     file_name_(file_name),
@@ -35,7 +36,8 @@ FracFeature::FracFeature(int id, int frac_id,
     scan_begin_(scan_begin),
     scan_end_(scan_end),
     min_charge_(min_charge),
-    max_charge_(max_charge) {
+    max_charge_(max_charge),
+    env_num_(env_num) {
     }
 
 FracFeature::FracFeature(std::string line) {
@@ -52,8 +54,9 @@ FracFeature::FracFeature(std::string line) {
   scan_end_ = std::stoi(strs[8]);
   min_charge_ = std::stoi(strs[9]);
   max_charge_ = std::stoi(strs[10]);
-  sample_feature_id_ = std::stoi(strs[11]);
-  sample_feature_inte_ = std::stod(strs[12]);
+  env_num_ = std::stoi(strs[11]);
+  sample_feature_id_ = std::stoi(strs[12]);
+  sample_feature_inte_ = std::stod(strs[13]);
 }
 
 bool FracFeature::cmpFracIncInteDec(const FracFeaturePtr &a, 
