@@ -33,6 +33,9 @@ void writeHeader(std::ofstream &of);
 
 void writeOneFeature(std::ofstream &of, FracFeaturePtr feature);
 
+
+void writeBatMassFeatures(const std::string &output_file_name,
+                          const FracFeaturePtrVec &features);
 }
 
 } /* namespace toppic */

@@ -48,7 +48,6 @@ std::string DeconvProcess2::updateMsg(MsHeaderPtr header_ptr, int scan, int tota
 }
 
 void DeconvProcess2::process() {
-  EnvBase::initBase(para_ptr_->resource_dir_);
   EnvParaPtr env_para_ptr = std::make_shared<EnvPara>();
   DpParaPtr dp_para_ptr = std::make_shared<DpPara>();
   copyParameters(env_para_ptr);

@@ -48,6 +48,8 @@ class Envelope {
 
   EnvelopePtr getSubEnv(int n_back, int n_forw);
 
+  EnvelopePtr getSubEnv(double min_inte);
+
   EnvelopePtr addZero(int num);
 
   EnvelopePtr getSubEnv(double percent_bound, double absolute_min_inte,
@@ -63,6 +65,10 @@ class Envelope {
   double getAvgMz();
 
   double getAvgMass();
+
+  double getMinMz() {return peaks_[0]->getPosition();}
+
+  double getMaxMz() {return peaks_[peaks_.size()-1]->getPosition();}
 
   int getHighestPeakIdx();
 

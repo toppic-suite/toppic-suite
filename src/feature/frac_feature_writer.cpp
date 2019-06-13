@@ -18,6 +18,9 @@
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/str_util.hpp"
+#include "spec/peak.hpp"
+#include "deconv/env/envelope.hpp"
+#include "deconv/env/env_base.hpp"
 #include "feature/frac_feature_writer.hpp"
 
 namespace toppic {
@@ -67,6 +70,56 @@ void writeFeatures(const std::string &output_file_name,
   for (size_t i = 0; i < features.size(); i++) {
     FracFeaturePtr feature = features[i];
     writeOneFeature(of, feature);
+  }
+  of.close();
+}
+
+void writeBatMassFeatures(const std::string &output_file_name,
+                          const FracFeaturePtrVec &features) {
+  std::ofstream of(output_file_name);
+  std::string delimit = ",";
+  of << "ID" << delimit
+      << "Fraction_ID" << delimit
+      << "Mass" << delimit
+      << "MonoMz" << delimit
+      << "Charge" << delimit
+      << "Intensity" << delimit
+      << "mzLo" << delimit
+      << "mzHi" << delimit
+      << "rtLo" << delimit
+      << "rtHi" << delimit
+      << "color" << delimit
+      << "opacity" << delimit
+      << "Sample_feature_Id" << delimit
+      << "Sample_feature_intensity"
+      << std::endl;
+  for (size_t i = 0; i < features.size(); i++) {
+    FracFeaturePtr feature = features[i];
+    int min_charge = feature->getMinCharge();
+    int max_charge = feature->getMaxCharge();
+    for (int j = min_charge; j <= max_charge; j++) {
+      double mono_mass = feature->getMonoMass(); 
+      double mono_mz = Peak::compMonoMz(mono_mass, j);
+      EnvelopePtr ref_env = EnvBase::getStaticEnvByMonoMass(mono_mass);
+      EnvelopePtr theo_env = ref_env->distrToTheoMono(mono_mz, j);
+      double min_inte = 0.03;
+      EnvelopePtr filtered_env = theo_env->getSubEnv(min_inte); 
+      of << feature->getId() << delimit
+          << feature->getFracId() << delimit
+          << feature->getMonoMass() << delimit
+          << mono_mz << delimit
+          << j << delimit
+          << feature->getIntensity() << delimit
+          << filtered_env->getMinMz() << delimit
+          << filtered_env->getMaxMz() << delimit
+          << (feature->getTimeBegin()/60) << delimit
+          << (feature->getTimeEnd()/60) << delimit
+          << "#FF0000" << delimit
+          << "0.1" << delimit
+          << feature->getSampleFeatureId() << delimit
+          << feature->getSampleFeatureInte() 
+          << std::endl;
+    }
   }
   of.close();
 }
