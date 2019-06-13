@@ -39,6 +39,7 @@ void Argument::initArguments() {
   arguments_["precWindow"] = "3.0";
   arguments_["doFinalFiltering"] = "true";
   arguments_["outputMatchEnv"] = "false";
+  arguments_["sampleName"] = "sample";
 }
 
 void Argument::showUsage(boost::program_options::options_description &desc) {
@@ -53,6 +54,7 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string ms_two_sn_ratio = "";
   std::string ms_one_sn_ratio = "";
   std::string prec_window = "";
+  std::string sample_name = "";
 
   // Define and parse the program options
   try {
@@ -67,13 +69,14 @@ bool Argument::parse(int argc, char* argv[]) {
          "<a positive number>. Set the maximum monoisotopic mass of precursor and fragment ions. The default value is 100000 Dalton.")
         ("mz-error,e", po::value<std::string> (&mz_error),
          "<a positive number>. Set the error tolerance of m/z values of spectral peaks. The default value is 0.02 m/z.")
-        ("ms-two-sn-ratio,s", po::value<std::string> (&ms_two_sn_ratio),
-         "<a positive number>. Set the signal/noise ratio for MS/MS spectra. The default value is 1.")
         ("ms-one-sn-ratio,r", po::value<std::string> (&ms_one_sn_ratio),
          "<a positive number>. Set the signal/noise ratio for MS1 spectra. The default value is 3.")
+        ("ms-two-sn-ratio,t", po::value<std::string> (&ms_two_sn_ratio),
+         "<a positive number>. Set the signal/noise ratio for MS/MS spectra. The default value is 1.")
         ("precursor-window,w", po::value<std::string> (&prec_window),
          "<a positive number>. Set the precursor window size. The default value is 3.0 m/z.")
-        ("missing-level-one,n","The input spectrum file does not contain MS1 spectra.")
+        ("missing-level-one,o","The input spectrum file does not contain MS1 spectra.")
+        ("sample-name,n", po::value<std::string> (&sample_name), "Specify the name of the sample.")
         ;
     po::options_description desc("Options");
 
@@ -82,12 +85,13 @@ bool Argument::parse(int argc, char* argv[]) {
         ("max-charge,c", po::value<std::string> (&max_charge), "")
         ("max-mass,m", po::value<std::string> (&max_mass), "")
         ("mz-error,e", po::value<std::string> (&mz_error), "")
-        ("ms-two-sn-ratio,s", po::value<std::string> (&ms_two_sn_ratio), "")
         ("ms-one-sn-ratio,r", po::value<std::string> (&ms_one_sn_ratio), "")
+        ("ms-two-sn-ratio,t", po::value<std::string> (&ms_two_sn_ratio), "")
         ("precursor-window,w", po::value<std::string> (&prec_window), "")
-        ("missing-level-one,n", "")
+        ("missing-level-one,o", "")
         ("multiple-mass,u", "Output multiple masses for one envelope.")
         ("keep,k", "Report monoisotopic masses extracted from low quality isotopic envelopes.")
+        ("sample-name,n", po::value<std::string> (&sample_name), "Specify the name of the sample.")
         ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), "Spectrum file name with its path.")
         ;
 
@@ -155,6 +159,10 @@ bool Argument::parse(int argc, char* argv[]) {
 
     if (vm.count("precursor-window")) {
       arguments_["precWindow"] = prec_window;
+    }
+
+    if (vm.count("sample-name")) {
+      arguments_["sampleName"] = sample_name;
     }
 
     if (vm.count("spectrum-file-name")) {
