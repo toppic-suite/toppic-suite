@@ -38,7 +38,8 @@ Envelope::Envelope(int num, std::vector<std::string> &line_list) {
   //boost::split(words, line_list[0], boost::is_any_of(" "));
   std::vector<std::string> words = str_util::split(line_list[0], " ");
   // LOG_DEBUG("line list size " << line_list.size() << " num " << num);
-  mono_mz_ = std::stod(words[7]);
+  // mono_mz in the theo_envelope file are not consistent with peak intensities
+  //mono_mz_ = std::stod(words[7]);
   peaks_.resize(num);
   for (int i = 0; i < num; i++) {
     //boost::split(words, line_list[i+1], boost::is_any_of(" "));
@@ -49,6 +50,7 @@ Envelope::Envelope(int num, std::vector<std::string> &line_list) {
     peaks_[i] = peak_ptr;
   }
   refer_idx_ = getHighestPeakIdx();
+  mono_mz_ = peaks_[0]->getPosition();
 }
 
 Envelope::Envelope(int refer_idx, int charge, double mono_mz,
@@ -151,6 +153,24 @@ EnvelopePtr Envelope::getSubEnv(double percent_bound, double absolute_min_inte,
                                       max_back_peak_num, max_forw_peak_num);
   return getSubEnv(bounds[0], bounds[1]);
 }
+
+EnvelopePtr Envelope::getSubEnv(double min_inte) {
+  size_t left = refer_idx_;
+  size_t right = refer_idx_;
+  for (size_t i = 0; i < peaks_.size(); i++) {
+    if (peaks_[i]->getIntensity() >= min_inte) {
+      if (i < left) {
+        left = i;
+      }
+      if (i > right) {
+        right = i;
+      }
+    }
+  }
+
+  return getSubEnv(refer_idx_ - left, right - refer_idx_); 
+}
+
 
 // Compute the bound of highest peaks with intensity 85%.
 std::vector<int> Envelope::calcBound(double percent_bound, double absolute_min_inte,
