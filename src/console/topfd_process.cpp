@@ -105,11 +105,12 @@ int process(std::map<std::string, std::string> arguments,
   }
 
   time_util::addTimeStamp(argument_str);
+  std::string sample_name = arguments["sampleName"];
   std::cout << "Merging files started." << std::endl;
-  MsAlignFracMergePtr msalign_merger = std::make_shared<MsAlignFracMerge>(spec_file_lst, "spectrum_combined");
+  MsAlignFracMergePtr msalign_merger = std::make_shared<MsAlignFracMerge>(spec_file_lst, sample_name);
   msalign_merger->process(argument_str);
   msalign_merger = nullptr;
-  FeatureMergePtr feature_merger = std::make_shared<FeatureMerge>(spec_file_lst, "spectrum_combined");
+  FeatureMergePtr feature_merger = std::make_shared<FeatureMerge>(spec_file_lst, sample_name);
   feature_merger->process(argument_str);
   feature_merger = nullptr;
   std::cout << "Merging files ended." << std::endl;
