@@ -40,6 +40,7 @@ void writeHeader(std::ofstream &of) {
       << "Last_scan" << "\t"
       << "Minimum_charge_state" << "\t"
       << "Maximum_charge_state" << "\t"
+      << "Envelope_num" << "\t"
       << "Sample_feature_Id" << "\t"
       << "Sample_feature_intensity"
       << std::endl;
@@ -57,6 +58,7 @@ void writeOneFeature(std::ofstream &of, FracFeaturePtr feature) {
       << feature->getScanEnd() << "\t"
       << feature->getMinCharge() << "\t"
       << feature->getMaxCharge() << "\t"
+      << feature->getEnvNum() << "\t"
       << feature->getSampleFeatureId() << "\t"
       << feature->getSampleFeatureInte() 
       << std::endl;
@@ -80,6 +82,7 @@ void writeBatMassFeatures(const std::string &output_file_name,
   std::string delimit = ",";
   of << "ID" << delimit
       << "Fraction_ID" << delimit
+      << "Envelope_num" << delimit
       << "Mass" << delimit
       << "MonoMz" << delimit
       << "Charge" << delimit
@@ -106,6 +109,7 @@ void writeBatMassFeatures(const std::string &output_file_name,
       EnvelopePtr filtered_env = theo_env->getSubEnv(min_inte); 
       of << feature->getId() << delimit
           << feature->getFracId() << delimit
+          << feature->getEnvNum() << delimit
           << feature->getMonoMass() << delimit
           << mono_mz << delimit
           << j << delimit

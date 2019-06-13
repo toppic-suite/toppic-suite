@@ -245,7 +245,8 @@ FracFeaturePtr getFeature(int sp_id, double prec_mass, int feat_id,
                                                              retent_end,
                                                              ms1_scan_begin,
                                                              ms1_scan_end, min_charge,
-                                                             max_charge);
+                                                             max_charge, 
+                                                             matched_peaks.size());
   return feature_ptr;
 }
 
@@ -270,8 +271,7 @@ void findMsOneFeatures(DeconvMsPtrVec &ms1_ptr_vec, FeatureParaPtr para_ptr,
   std::sort(all_peaks.begin(), all_peaks.end(), Peak::cmpInteDec);
   int feat_id = 0;
   size_t peak_idx = 0;
-  while (static_cast<int>(features.size()) < para_ptr->feature_num_ 
-         && peak_idx < all_peaks.size()) {
+  while (feat_id < para_ptr->feature_num_ && peak_idx < all_peaks.size()) {
     DeconvPeakPtr best_peak = all_peaks[peak_idx];
     if (peakExists(ms1_ptr_vec, best_peak)) {
       //std::cout << "Find feature " << feat_id << " peak intensity " << best_peak->getIntensity() << std::endl; 
@@ -281,9 +281,12 @@ void findMsOneFeatures(DeconvMsPtrVec &ms1_ptr_vec, FeatureParaPtr para_ptr,
       FracFeaturePtr feature_ptr = getFeature(sp_id, prec_mass, feat_id, ms1_ptr_vec,
                                               matched_peaks, para_ptr);
       if (feature_ptr != nullptr) {
-        features.push_back(feature_ptr);
         removePeaks(ms1_ptr_vec, matched_peaks);
-        feat_id++;
+        // check if the feature has at least 2 envelopes
+        if (feature_ptr->getEnvNum() > 1) {
+          features.push_back(feature_ptr);
+          feat_id++;
+        }
       }
     }
     peak_idx++;
@@ -379,46 +382,6 @@ void getMs2Features(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtrVec &header_ptr_vec,
   }
 }
 
-/*
-void writeMs2Feature(const std::string & output_file_name,
-                     const MsHeaderPtrVec &ms2_header_ptrs,
-                     std::string argu_str) {
-  std::ofstream of(output_file_name, std::ofstream::out);
-  of.precision(16);
-  time_util::addTimeStamp(argu_str);
-  of << argu_str;
-  of << "ID" << "\t"
-      << "SCANS" << "\t"
-      << "MS_ONE_ID" << "\t"
-      << "MS_ONE_SCAN" << "\t"
-      << "PRECURSOR_MASS" << "\t"
-      << "PRECURSOR_INTENSITY" << "\t"
-      << "FRACTION_FEATURE_ID" << "\t"
-      << "FRACTION_FEATURE_INTENSITY" << std::endl;
-  for (size_t i = 0; i < ms2_header_ptrs.size(); i++) {
-    MsHeaderPtr header = ms2_header_ptrs[i];
-    of << header->getId() << "\t"
-        << header->getScansString() << "\t"
-        << header->getMsOneId() << "\t"
-        << header->getMsOneScan() << "\t"
-        << header->getPrecMonoMass() << "\t"
-        << header->getPrecInte() << "\t";
-        */
-    /*
-    if (header->getFeatureId() >= 0) {
-      of << header->getFeatureId() << "\t"
-         << header->getFeatureInte() << std::endl;
-    } 
-    else {
-      of << "-1" << "\t" << "-1" << std::endl;
-    }
-    */
-/*
-  }
-  of.close();
-}
-*/
-
 void process(int frac_id, std::string &sp_file_name, 
              bool missing_level_one, std::string &argu_str) {
   //logger::setLogLevel(2);
@@ -440,7 +403,7 @@ void process(int frac_id, std::string &sp_file_name,
   SpecFeaturePtrVec ms2_features;
   getMs2Features(ms1_ptr_vec, header_ptr_vec, features, para_ptr, ms2_features);
 
-  std::sort(features.begin(), features.end(), FracFeature::cmpMassInc);
+  //std::sort(features.begin(), features.end(), FracFeature::cmpMassInc);
   std::string output_file_name = base_name + "_frac.feature";
   frac_feature_writer::writeFeatures(output_file_name, features);
   std::string batmass_file_name = base_name + "_frac.mzrt.csv";
