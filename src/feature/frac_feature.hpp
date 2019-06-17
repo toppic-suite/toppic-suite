@@ -19,6 +19,8 @@
 #include <memory>
 #include <vector>
 
+#include "feature/single_charge_feature.hpp"
+
 namespace toppic {
 
 class FracFeature;
@@ -39,6 +41,10 @@ class FracFeature {
 
   FracFeature(std::string line);
 
+  FracFeature(XmlDOMElement* element);
+
+  XmlDOMElement* toXmlElement(XmlDOMDocument* xml_doc);
+
   int getId() {return id_;}
 
   int getFracId() {return frac_id_;}
@@ -49,11 +55,11 @@ class FracFeature {
 
   double getIntensity() {return intensity_;}
 
-  double getTimeBegin() {return retent_begin_;}
+  double getTimeBegin() {return time_begin_;}
 
-  double getTimeEnd() {return retent_end_;}
+  double getTimeEnd() {return time_end_;}
 
-  double getTimeMiddle() {return (retent_begin_ + retent_end_)/2;}
+  double getTimeMiddle() {return (time_begin_ + time_end_)/2;}
 
   int getScanBegin() {return scan_begin_;}
 
@@ -89,14 +95,17 @@ class FracFeature {
 
   static bool cmpFracIncInteDec(const FracFeaturePtr &a, const FracFeaturePtr &b);
 
+  static std::string getXmlElementName() {return "frac_feature";}
+
+
  protected:
   int id_;
   int frac_id_;
   std::string file_name_;
   double mono_mass_;
   double intensity_;
-  double retent_begin_;
-  double retent_end_;
+  double time_begin_;
+  double time_end_;
   int scan_begin_;
   int scan_end_;
   int min_charge_;
@@ -104,6 +113,7 @@ class FracFeature {
   int env_num_ = 0;
   int sample_feature_id_ = -1;
   double sample_feature_inte_ = 0;
+  SingleChargeFeaturePtrVec single_features_;
 };
 
 typedef std::vector<FracFeaturePtrVec> FracFeaturePtrVec2D;
