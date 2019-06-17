@@ -23,6 +23,7 @@
 #include "spec/msalign_frac_merge.hpp"
 #include "feature/feature_detect.hpp"
 #include "feature/feature_merge.hpp"
+#include "deconv/env/env_base.hpp"
 #include "deconv/deconv/deconv_process_2.hpp"
 
 namespace toppic {
@@ -92,6 +93,7 @@ int processOneFile(std::map<std::string, std::string> arguments,
 int process(std::map<std::string, std::string> arguments, 
             std::vector<std::string> spec_file_lst) {
   std::string argument_str = geneArgumentStr(arguments, "#");
+  EnvBase::initBase(arguments["resourceDir"]);
   for (size_t k = 0; k < spec_file_lst.size(); k++) {
     if (str_util::endsWith(spec_file_lst[k], "mzML")
         || str_util::endsWith(spec_file_lst[k], "mzXML")

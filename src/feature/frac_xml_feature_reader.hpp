@@ -12,35 +12,34 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_FEATURE_FRAC_FEATURE_WRITER_HPP_
-#define TOPPIC_FEATURE_FRAC_FEATURE_WRITER_HPP_
+#ifndef TOPPIC_FEATURE_FRAC_XML_FEATURE_READER_HPP_
+#define TOPPIC_FEATURE_FRAC_XML_FEATURE_READER_HPP_
 
-#include <memory>
-#include <vector>
-#include <string>
 #include <fstream>
 
 #include "feature/frac_feature.hpp"
 
 namespace toppic {
 
-namespace frac_feature_writer {
+class FracXmlFeatureReader {
+ public:
+  FracXmlFeatureReader(const std::string &file_name);
 
-void writeFeatures(const std::string &output_file_name,
-                   const FracFeaturePtrVec &features);
+  ~FracXmlFeatureReader();
 
-void writeHeader(std::ofstream &of); 
+  void close();
 
-void writeOneFeature(std::ofstream &of, FracFeaturePtr feature);
+  FracFeaturePtr readOneFeature(); 
 
+  FracFeaturePtrVec readAllFeatures();
 
-void writeBatMassFeatures(const std::string &output_file_name,
-                          const FracFeaturePtrVec &features);
+ private:
+  std::string file_name_;
+  std::ifstream input_;
+};
 
-void writeXmlFeatures(const std::string &output_file_name,
-                      const FracFeaturePtrVec &features);
-}
+typedef std::shared_ptr<FracXmlFeatureReader> FracXmlFeatureReaderPtr;
 
-} /* namespace toppic */
+}  // namespace toppic
 
 #endif

@@ -18,6 +18,8 @@
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/str_util.hpp"
+#include "common/xml/xml_dom_impl.hpp"
+#include "common/xml/xml_dom_util.hpp"
 #include "spec/peak.hpp"
 #include "deconv/env/envelope.hpp"
 #include "deconv/env/env_base.hpp"
@@ -107,6 +109,13 @@ void writeBatMassFeatures(const std::string &output_file_name,
       EnvelopePtr theo_env = ref_env->distrToTheoMono(mono_mz, j);
       double min_inte = 0.03;
       EnvelopePtr filtered_env = theo_env->getSubEnv(min_inte); 
+      //margin for envelopes
+      double margin = 0.1; 
+      double min_mz = filtered_env->getMinMz() - margin;
+      if (min_mz < 0.0)  {
+        min_mz = 0.0;
+      }
+      double max_mz = filtered_env->getMaxMz() + margin;
       of << feature->getId() << delimit
           << feature->getFracId() << delimit
           << feature->getEnvNum() << delimit
@@ -114,8 +123,8 @@ void writeBatMassFeatures(const std::string &output_file_name,
           << mono_mz << delimit
           << j << delimit
           << feature->getIntensity() << delimit
-          << filtered_env->getMinMz() << delimit
-          << filtered_env->getMaxMz() << delimit
+          << min_mz << delimit
+          << max_mz << delimit
           << (feature->getTimeBegin()/60) << delimit
           << (feature->getTimeEnd()/60) << delimit
           << "#FF0000" << delimit
@@ -126,6 +135,31 @@ void writeBatMassFeatures(const std::string &output_file_name,
     }
   }
   of.close();
+}
+
+void writeXmlFeatures(const std::string &output_file_name,
+                      const FracFeaturePtrVec &features) {
+  std::ofstream file;
+  file.open(output_file_name.c_str());
+  LOG_DEBUG("file_name " << output_file_name);
+  file << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << std::endl;
+  file << "<frac_feature_list>" << std::endl;
+
+  for (size_t i = 0; i < features.size(); i++) {
+    XmlDOMImpl* impl = XmlDOMImplFactory::getXmlDOMImplInstance();
+    xercesc::DOMLSSerializer* serializer = impl->createSerializer();
+    XmlDOMDocument doc(impl->createDoc("frac_feature_list"));
+    XmlDOMElement* element = features[i]->toXmlElement(&doc);
+    // LOG_DEBUG("Element generated");
+    std::string str = xml_dom_util::writeToString(serializer, element);
+    // LOG_DEBUG("String generated");
+    xml_dom_util::writeToStreamByRemovingDoubleLF(file, str);
+    element->release();
+    serializer->release();
+  }
+
+  file << "</frac_feature_list>" << std::endl;
+  file.close();
 }
 
 }

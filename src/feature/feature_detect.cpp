@@ -406,6 +406,8 @@ void process(int frac_id, std::string &sp_file_name,
   //std::sort(features.begin(), features.end(), FracFeature::cmpMassInc);
   std::string output_file_name = base_name + "_frac.feature";
   frac_feature_writer::writeFeatures(output_file_name, features);
+  output_file_name = base_name + "_frac_xml.feature";
+  frac_feature_writer::writeXmlFeatures(output_file_name, features);
   std::string batmass_file_name = base_name + "_frac.mzrt.csv";
   frac_feature_writer::writeBatMassFeatures(batmass_file_name, features);
 

@@ -197,6 +197,8 @@ void DeconvProcess2::processSp(DeconvOneSpPtr deconv_ptr, RawMsGroupReaderPtr re
     RawMsPtrVec ms_two_ptr_vec = ms_group_ptr->getMsTwoPtrVec();
     for (size_t i = 0; i < ms_two_ptr_vec.size(); i++) {
       RawMsPtr ms_two_ptr = ms_two_ptr_vec[i];
+      msg = updateMsg(ms_two_ptr->getMsHeaderPtr(), count1 + count2 + 1, total_scan_num);
+      std::cout << "\r" << msg << std::flush;
       deconvMsTwo(ms_two_ptr, deconv_ptr, ms2_writer_ptr);
       count2++;
     }
