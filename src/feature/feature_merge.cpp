@@ -24,6 +24,7 @@
 #include "feature/spec_feature_reader.hpp"
 #include "feature/spec_feature_writer.hpp"
 #include "feature/frac_feature_reader.hpp"
+#include "feature/frac_xml_feature_reader.hpp"
 #include "feature/frac_feature_writer.hpp"
 #include "feature/frac_feature_cluster.hpp"
 #include "feature/sample_feature.hpp"
@@ -43,20 +44,24 @@ FeatureMerge::FeatureMerge(
 
 void FeatureMerge::process(std::string &para_str) {
   std::vector<std::string> frac_feature_names;
+  std::vector<std::string> frac_xml_feature_names;
   std::vector<std::string> spec_feature_names;
   for (size_t i = 0; i < spec_file_names_.size(); i++) { 
     std::string base_name = file_util::basename(spec_file_names_[i]);
     std::string frac_feature = base_name + "_frac.feature";
     frac_feature_names.push_back(frac_feature);
+    std::string frac_xml_feature = base_name + "_frac_xml.feature";
+    frac_xml_feature_names.push_back(frac_xml_feature);
     std::string spec_feature = base_name + "_ms2.feature";
     spec_feature_names.push_back(spec_feature);
   }
   
   std::string sample_feature_output_name = output_file_name_ + "_sample.feature";
+  std::string frac_xml_feature_output_name = output_file_name_ + "_frac_xml.feature";
   std::string frac_feature_output_name = output_file_name_ + "_frac.feature";
   std::string spec_feature_output_name = output_file_name_ + "_ms2.feature";
 
-  mergeFiles(frac_feature_names, frac_feature_output_name, 
+  mergeFiles(frac_xml_feature_names, frac_xml_feature_output_name, 
              spec_feature_names, spec_feature_output_name,
              sample_feature_output_name,
              MsAlignFracMerge::getMaxSpecNumPerFile(), 
@@ -64,8 +69,8 @@ void FeatureMerge::process(std::string &para_str) {
              para_str); 
 }
 
-void FeatureMerge::mergeFiles(const std::vector<std::string> &frac_feature_file_lst,
-                              const std::string &frac_feature_output_file_name, 
+void FeatureMerge::mergeFiles(const std::vector<std::string> &frac_xml_feature_file_lst,
+                              const std::string &frac_xml_feature_output_file_name, 
                               const std::vector<std::string> &spec_feature_file_lst,
                               const std::string &spec_feature_output_file_name,
                               const std::string &sample_feature_output_file_name,
@@ -73,8 +78,8 @@ void FeatureMerge::mergeFiles(const std::vector<std::string> &frac_feature_file_
                               int max_feature_num_per_file, 
                               const std::string &para_str) {
   FracFeaturePtrVec all_frac_features;
-  for (size_t i = 0; i < frac_feature_file_lst.size(); i++) {
-    FracFeatureReader ft_reader(frac_feature_file_lst[i]); 
+  for (size_t i = 0; i < frac_xml_feature_file_lst.size(); i++) {
+    FracXmlFeatureReader ft_reader(frac_xml_feature_file_lst[i]); 
     FracFeaturePtrVec features = ft_reader.readAllFeatures();
     ft_reader.close();
     for (size_t j = 0; j < features.size(); j++) {
@@ -107,7 +112,7 @@ void FeatureMerge::mergeFiles(const std::vector<std::string> &frac_feature_file_
       clusters[i][j]->setSampleFeatureInte(sample_feature_inte);
     }
   }
-  frac_feature_writer::writeFeatures(frac_feature_output_file_name, all_frac_features);
+  frac_feature_writer::writeXmlFeatures(frac_xml_feature_output_file_name, all_frac_features);
 
   //spec features
   std::map<int,FracFeaturePtr> feature_map;

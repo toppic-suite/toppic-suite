@@ -100,13 +100,15 @@ void writeBatMassFeatures(const std::string &output_file_name,
       << std::endl;
   for (size_t i = 0; i < features.size(); i++) {
     FracFeaturePtr feature = features[i];
-    int min_charge = feature->getMinCharge();
-    int max_charge = feature->getMaxCharge();
-    for (int j = min_charge; j <= max_charge; j++) {
-      double mono_mass = feature->getMonoMass(); 
-      double mono_mz = Peak::compMonoMz(mono_mass, j);
+    double mono_mass = feature->getMonoMass(); 
+    SingleChargeFeaturePtrVec single_features = feature->getSingleFeatures();
+
+    for (size_t j = 0; j < single_features.size(); j++) {
+      SingleChargeFeaturePtr single_feature = single_features[j];
+      int charge = single_feature->getCharge();
+      double mono_mz = Peak::compMonoMz(mono_mass, charge);
       EnvelopePtr ref_env = EnvBase::getStaticEnvByMonoMass(mono_mass);
-      EnvelopePtr theo_env = ref_env->distrToTheoMono(mono_mz, j);
+      EnvelopePtr theo_env = ref_env->distrToTheoMono(mono_mz, charge);
       double min_inte = 0.03;
       EnvelopePtr filtered_env = theo_env->getSubEnv(min_inte); 
       //margin for envelopes
@@ -118,15 +120,15 @@ void writeBatMassFeatures(const std::string &output_file_name,
       double max_mz = filtered_env->getMaxMz() + margin;
       of << feature->getId() << delimit
           << feature->getFracId() << delimit
-          << feature->getEnvNum() << delimit
+          << single_feature->getEnvNum() << delimit
           << feature->getMonoMass() << delimit
           << mono_mz << delimit
-          << j << delimit
-          << feature->getIntensity() << delimit
+          << charge << delimit
+          << single_feature->getIntensity() << delimit
           << min_mz << delimit
           << max_mz << delimit
-          << (feature->getTimeBegin()/60) << delimit
-          << (feature->getTimeEnd()/60) << delimit
+          << (single_feature->getTimeBegin()/60) << delimit
+          << (single_feature->getTimeEnd()/60) << delimit
           << "#FF0000" << delimit
           << "0.1" << delimit
           << feature->getSampleFeatureId() << delimit

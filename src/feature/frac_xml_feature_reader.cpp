@@ -40,20 +40,52 @@ void FracXmlFeatureReader::close() {
   input_.close();
 }
 
-FracFeaturePtr FracXmlFeatureReader::readOneFeature() {
-  std::string line; 
-  if (std::getline(input_, line)) {
+std::vector<std::string> FracXmlFeatureReader::readOneFeatureLines() {
+  std::string line;
+  std::vector<std::string> line_list;
+  while (std::getline(input_, line)) {
     str_util::trim(line);
-    //std::cout << "line " << line << std::endl;
-    FracFeaturePtr feature = std::make_shared<FracFeature>(line);
-    //std::cout << "feature created " << std::endl;
-    return feature;
+    // LOG_DEBUG("line " << line);
+    if (line ==  "<frac_feature>") {
+      line_list.push_back(line);
+    } else if (line == "</frac_feature>") {
+      if (line_list.size() != 0) {
+        line_list.push_back(line);
+      }
+      return line_list;
+    } else if (line == "") {
+      continue;
+    } else {
+      if (line_list.size() > 0) {
+        line_list.push_back(line);
+      }
+    }
   }
-  else {
-    return nullptr;
-  }
+  return line_list;
 }
 
+FracFeaturePtr FracXmlFeatureReader::readOneFeature() {
+  std::vector<std::string> ft_str_vec = readOneFeatureLines();
+  if (ft_str_vec.size() == 0) {
+    return FracFeaturePtr(nullptr);
+  }
+  std::string ft_str = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+  for (size_t i = 0; i < ft_str_vec.size(); i++) {
+    ft_str += ft_str_vec[i];
+  }
+  // LOG_DEBUG("prsm str " << prsm_str);
+  xercesc::MemBufInputSource ft_buf(
+      (const XMLByte*)ft_str.c_str(), ft_str.size(), "feature_str (in memory)");
+
+  XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
+  FracFeaturePtr ptr;
+  if (parser) {
+    XmlDOMDocument doc(parser, ft_buf);
+    XmlDOMElement* root = doc.getDocumentElement();
+    ptr = std::make_shared<FracFeature>(root);
+  }
+  return ptr;
+}
 
 FracFeaturePtrVec FracXmlFeatureReader::readAllFeatures() {
   FracFeaturePtrVec all_features;
