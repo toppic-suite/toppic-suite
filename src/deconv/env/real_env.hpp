@@ -68,6 +68,7 @@ class RealEnv : public Envelope {
 };
 
 typedef std::vector<RealEnvPtr> RealEnvPtrVec;
+typedef std::vector<RealEnvPtrVec> RealEnvPtrVec2D;
 
 }
 

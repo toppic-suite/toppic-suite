@@ -119,6 +119,13 @@ class FracFeature {
   int sample_feature_id_ = -1;
   double sample_feature_inte_ = 0;
   SingleChargeFeaturePtrVec single_features_;
+
+  // promex feature variables
+  double rep_mass_;
+  int rep_charge_;
+  int rep_scan_;
+  double rep_mz_;
+  double score_ = 0.0;
 };
 
 typedef std::vector<FracFeaturePtrVec> FracFeaturePtrVec2D;
