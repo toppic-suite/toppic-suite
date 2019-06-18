@@ -75,11 +75,16 @@ class FracFeature {
 
   double getSampleFeatureInte() {return sample_feature_inte_;}
 
+  SingleChargeFeaturePtrVec getSingleFeatures() {return single_features_;}
+
   void setId(int id) {id_ = id;}
 
   void setSampleFeatureId(int id) {sample_feature_id_ = id;}
 
   void setSampleFeatureInte(double inte) {sample_feature_inte_ = inte;}
+
+  void setSingleFeatures(SingleChargeFeaturePtrVec &single_features) {
+    single_features_ = single_features;}
 
   static bool cmpMassInc(const FracFeaturePtr &a, const FracFeaturePtr &b) { 
     return a->getMonoMass() < b->getMonoMass();

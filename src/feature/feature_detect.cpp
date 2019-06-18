@@ -26,6 +26,7 @@
 #include "spec/msalign_reader.hpp"
 #include "feature/feature_para.hpp"
 #include "feature/frac_feature.hpp"
+#include "feature/single_charge_feature.hpp"
 #include "feature/frac_feature_writer.hpp"
 #include "feature/spec_feature.hpp"
 #include "feature/spec_feature_writer.hpp"
@@ -71,7 +72,7 @@ void getMatchedPeaks(DeconvMsPtrVec &ms1_ptr_vec, double prec_mass,
   }
 }
 
-bool containPrecursor(DeconvMsPtr ms1_ptr, double prec_mass, FeatureParaPtr para_ptr) {
+bool containPrecursor(DeconvMsPtr ms1_ptr, double prec_mass, int charge, FeatureParaPtr para_ptr) {
   if (ms1_ptr == nullptr) return false;
   // double prec_chrg = best_ptr->getPrecCharge();
   std::vector<double> ext_masses = para_ptr->getExtendMasses(prec_mass);
@@ -82,14 +83,15 @@ bool containPrecursor(DeconvMsPtr ms1_ptr, double prec_mass, FeatureParaPtr para
     // if (peak->getCharge() == prec_chrg) {
     // do not test charge
     if (peak != nullptr) {
-      for (size_t j = 0; j < ext_masses.size(); j++) {
-        double mass_diff = std::abs(ext_masses[j] - peak->getPosition());
-        if (mass_diff < min_diff) {
-          min_diff = mass_diff;
+      if (charge < 0 || peak->getCharge() == charge) {
+        for (size_t j = 0; j < ext_masses.size(); j++) {
+          double mass_diff = std::abs(ext_masses[j] - peak->getPosition());
+          if (mass_diff < min_diff) {
+            min_diff = mass_diff;
+          }
         }
       }
     }
-    //}
   }
 
   double error_tole = para_ptr->peak_tolerance_ptr_->compStrictErrorTole(prec_mass);
@@ -105,7 +107,7 @@ int getMs1IdBegin(const DeconvMsPtrVec &ms1_ptr_vec, int sp_id, double prec_mass
   int result_id = sp_id;
   int miss_num = 0;
   while (cur_id > 0) {
-    if (containPrecursor(ms1_ptr_vec[cur_id], prec_mass, para_ptr)) {
+    if (containPrecursor(ms1_ptr_vec[cur_id], prec_mass, -1, para_ptr)) {
       miss_num = 0;
       result_id = cur_id;
     } else {
@@ -125,7 +127,7 @@ int getMs1IdEnd(const DeconvMsPtrVec &ms1_ptr_vec, int sp_id, double prec_mass,
   int result_id = sp_id;
   int miss_num = 0;
   while (cur_id < static_cast<int>(ms1_ptr_vec.size()) ) {
-    if (containPrecursor(ms1_ptr_vec[cur_id], prec_mass, para_ptr)) {
+    if (containPrecursor(ms1_ptr_vec[cur_id], prec_mass, -1, para_ptr)) {
       miss_num = 0;
       result_id = cur_id;
     } else {
@@ -138,6 +140,25 @@ int getMs1IdEnd(const DeconvMsPtrVec &ms1_ptr_vec, int sp_id, double prec_mass,
   }
   return result_id;
 }
+
+std::pair<int,int> getSingleMs1Range(const DeconvMsPtrVec &ms1_ptr_vec, double prec_mass, 
+                                     int charge, int begin_id, int end_id, FeatureParaPtr para_ptr) {
+  int begin = end_id;
+  int end = begin_id;
+  for (int i = begin_id; i <= end_id; i++) {
+    if (containPrecursor(ms1_ptr_vec[i], prec_mass, charge, para_ptr)) {
+      if (i < begin) {
+        begin = i;
+      }
+      if (i > end) {
+        end = i;
+      }
+    }
+  }
+  std::pair<int,int> result(begin, end); 
+  return result;
+}
+
 
 double getFeatureInte(DeconvPeakPtrVec &matched_peaks) {
   double inte = 0;
@@ -218,6 +239,16 @@ int getMaxCharge (DeconvPeakPtrVec &matched_peaks) {
   return max_charge;
 }
 
+DeconvPeakPtrVec getPeaksWithCharge(DeconvPeakPtrVec &matched_peaks, int charge) {
+  DeconvPeakPtrVec peaks; 
+  for (size_t i = 0; i < matched_peaks.size(); i++) {
+    if (matched_peaks[i]->getCharge() == charge) {
+      peaks.push_back(matched_peaks[i]);
+    }
+  }
+  return peaks;
+}
+
 FracFeaturePtr getFeature(int sp_id, double prec_mass, int feat_id, 
                           DeconvMsPtrVec &ms1_ptr_vec,
                           DeconvPeakPtrVec &matched_peaks, FeatureParaPtr para_ptr) {
@@ -232,8 +263,8 @@ FracFeaturePtr getFeature(int sp_id, double prec_mass, int feat_id,
   double feat_mass = getFeatureMass(prec_mass, matched_peaks, para_ptr);
   int min_charge = getMinCharge(matched_peaks);
   int max_charge = getMaxCharge(matched_peaks);
-  double retent_begin = ms1_ptr_vec[ms1_id_begin]->getMsHeaderPtr()->getRetentionTime();
-  double retent_end = ms1_ptr_vec[ms1_id_end]->getMsHeaderPtr()->getRetentionTime();
+  double ms1_time_begin = ms1_ptr_vec[ms1_id_begin]->getMsHeaderPtr()->getRetentionTime();
+  double ms1_time_end = ms1_ptr_vec[ms1_id_end]->getMsHeaderPtr()->getRetentionTime();
   int ms1_scan_begin = ms1_ptr_vec[ms1_id_begin]->getMsHeaderPtr()->getFirstScanNum();
   int ms1_scan_end = ms1_ptr_vec[ms1_id_end]->getMsHeaderPtr()->getFirstScanNum();
   FracFeaturePtr feature_ptr = std::make_shared<FracFeature>(feat_id, 
@@ -241,12 +272,36 @@ FracFeaturePtr getFeature(int sp_id, double prec_mass, int feat_id,
                                                              para_ptr->file_name_,
                                                              feat_mass,
                                                              feat_inte,
-                                                             retent_begin,
-                                                             retent_end,
+                                                             ms1_time_begin,
+                                                             ms1_time_end,
                                                              ms1_scan_begin,
-                                                             ms1_scan_end, min_charge,
+                                                             ms1_scan_end, 
+                                                             min_charge,
                                                              max_charge, 
                                                              matched_peaks.size());
+  SingleChargeFeaturePtrVec single_features;
+  for (int charge = min_charge; charge <= max_charge; charge++) {
+    DeconvPeakPtrVec peaks = getPeaksWithCharge(matched_peaks, charge);
+    if (peaks.size() > 0) {
+      std::pair<int, int> range = getSingleMs1Range(ms1_ptr_vec, prec_mass, charge, ms1_id_begin, 
+                                                    ms1_id_end, para_ptr);
+      int id_begin = range.first;
+      int id_end = range.second;
+      //LOG_ERROR("Id begin" << id_begin << " Id end " << id_end);
+      double time_begin = ms1_ptr_vec[id_begin]->getMsHeaderPtr()->getRetentionTime();
+      double time_end = ms1_ptr_vec[id_end]->getMsHeaderPtr()->getRetentionTime();
+      int scan_begin = ms1_ptr_vec[id_begin]->getMsHeaderPtr()->getFirstScanNum();
+      int scan_end = ms1_ptr_vec[id_end]->getMsHeaderPtr()->getFirstScanNum();
+      double inte = getFeatureInte(peaks);
+      int peak_num = peaks.size();
+      SingleChargeFeaturePtr single_feature = std::make_shared<SingleChargeFeature>(charge,
+                                                                                    time_begin, time_end,
+                                                                                    scan_begin, scan_end,
+                                                                                    inte, peak_num);
+      single_features.push_back(single_feature);
+    }
+  }
+  feature_ptr->setSingleFeatures(single_features);
   return feature_ptr;
 }
 

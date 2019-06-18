@@ -29,6 +29,8 @@ class FracXmlFeatureReader {
 
   void close();
 
+  std::vector<std::string> readOneFeatureLines();
+
   FracFeaturePtr readOneFeature(); 
 
   FracFeaturePtrVec readAllFeatures();
