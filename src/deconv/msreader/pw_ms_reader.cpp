@@ -32,25 +32,15 @@ PwMsReader::PwMsReader(const std::string & file_name):
       input_sp_num_ = spec_list_ptr_->size();
     }
 
-int PwMsReader::readNext() {
-  peak_list_.clear();
-  header_ptr_ = nullptr;
 
-  if (input_sp_id_ >= input_sp_num_) {
-    return -1;
-  }
-
+bool PwMsReader::readOneMs(int sp_id, PeakPtrVec &peak_list, MsHeaderPtr header_ptr) {
   pwiz::msdata::SpectrumPtr cur_spec_ptr = nullptr;
   // read m/z and intensity values from the spectra
   bool get_binary_data = true;
-  while (cur_spec_ptr == nullptr) {
-    cur_spec_ptr = spec_list_ptr_->spectrum(input_sp_id_, get_binary_data);
-    input_sp_id_++;
-    if (input_sp_id_ >= input_sp_num_ + 1) {
-      LOG_ERROR("Only " << input_sp_num_  << " spectra in the input data!");
-      return -1;
-    }
-  }
+ 
+  cur_spec_ptr = spec_list_ptr_->spectrum(sp_id, get_binary_data);
+  if (cur_spec_ptr == nullptr) {return false;}
+
 
   std::vector<pwiz::msdata::MZIntensityPair> pairs;
   cur_spec_ptr->getMZIntensityPairs(pairs);
@@ -62,11 +52,11 @@ int PwMsReader::readNext() {
             });
 
   pwiz::msdata::SpectrumInfo spec_info(*cur_spec_ptr);
-  peak_list_.empty();
+  peak_list.empty();
   for (size_t i = 0; i < pairs.size(); i++) {
     if (pairs[i].intensity > 0.0) {
       PeakPtr peak_ptr = std::make_shared<Peak>(pairs[i].mz, pairs[i].intensity);
-      peak_list_.push_back(peak_ptr);
+      peak_list.push_back(peak_ptr);
     }
   }
   int ms_level = spec_info.msLevel;
@@ -101,18 +91,18 @@ int PwMsReader::readNext() {
     }
 
     LOG_DEBUG("prec mz " << prec_mz << " scan number " << spec_info.scanNumber);
-    header_ptr_ = std::make_shared<MsHeader>();
-    header_ptr_->setId(ms2_cnt);
+    header_ptr = std::make_shared<MsHeader>();
+    header_ptr->setId(ms2_cnt);
     ms2_cnt++;
-    header_ptr_->setScan(spec_info.scanNumber);
-    header_ptr_->setMsLevel(ms_level);
-    header_ptr_->setPrecCharge(prec_charge);
-    header_ptr_->setPrecInte(prec_inte);
-    header_ptr_->setFileName(file_name_);
-    header_ptr_->setTitle("Scan_" + str_util::toString(spec_info.scanNumber));
+    header_ptr->setScan(spec_info.scanNumber);
+    header_ptr->setMsLevel(ms_level);
+    header_ptr->setPrecCharge(prec_charge);
+    header_ptr->setPrecInte(prec_inte);
+    header_ptr->setFileName(file_name_);
+    header_ptr->setTitle("Scan_" + str_util::toString(spec_info.scanNumber));
     // here is average mz
-    header_ptr_->setPrecSpMz(prec_mz);
-    header_ptr_->setRetentionTime(spec_info.retentionTime);
+    header_ptr->setPrecSpMz(prec_mz);
+    header_ptr->setRetentionTime(spec_info.retentionTime);
 
     std::string ac_name;
     if (cur_spec_ptr->precursors.size() != 0) {
@@ -136,17 +126,33 @@ int PwMsReader::readNext() {
     }
     LOG_DEBUG("ac name " << ac_name);
     ActivationPtr activation_ptr = ActivationBase::getActivationPtrByName(ac_name);
-    header_ptr_->setActivationPtr(activation_ptr);
+    header_ptr->setActivationPtr(activation_ptr);
   } else {
-    header_ptr_ = std::make_shared<MsHeader>();
-    header_ptr_->setId(ms1_cnt);
+    header_ptr = std::make_shared<MsHeader>();
+    header_ptr->setId(ms1_cnt);
     ms1_cnt++;
-    header_ptr_->setScan(spec_info.scanNumber);
-    header_ptr_->setMsLevel(ms_level);
-    header_ptr_->setPrecCharge(0);
-    header_ptr_->setFileName(file_name_);
-    header_ptr_->setTitle("Scan_" + str_util::toString(spec_info.scanNumber));
-    header_ptr_->setRetentionTime(spec_info.retentionTime);
+    header_ptr->setScan(spec_info.scanNumber);
+    header_ptr->setMsLevel(ms_level);
+    header_ptr->setPrecCharge(0);
+    header_ptr->setFileName(file_name_);
+    header_ptr->setTitle("Scan_" + str_util::toString(spec_info.scanNumber));
+    header_ptr->setRetentionTime(spec_info.retentionTime);
+  }
+  return true;
+}
+
+int PwMsReader::readNext() {
+  peak_list_.clear();
+  header_ptr_ = nullptr;
+
+  int found = false;
+  while (!found) {
+    if (input_sp_id_ >= input_sp_num_) {
+      LOG_DEBUG("Only " << input_sp_num_  << " spectra in the input data!");
+      return -1;
+    }
+    found = readOneMs(input_sp_id_, peak_list_, header_ptr_); 
+    input_sp_id_++;
   }
   return 1;
 }
