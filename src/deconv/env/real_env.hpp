@@ -30,6 +30,8 @@ class RealEnv : public Envelope {
   RealEnv(const PeakPtrVec &peak_list, EnvelopePtr theo_env, 
           double tolerance, double min_inte);
 
+  int getSpId() {return sp_id_;}
+
   int getMissPeakNum() {return miss_peak_num_;}
 
   int getMatchPeakNum() {return getPeakNum() - miss_peak_num_;}
@@ -49,6 +51,7 @@ class RealEnv : public Envelope {
   static std::string getXmlElementName() {return "real_env";}
 
  private:
+  int sp_id_;
   // peak index in the spectrum 
   // if peak_idx[i] == NO_EXIST_PEAK, it does not exist 
   // std::vector<int> peak_idxes_;
