@@ -31,15 +31,15 @@ std::vector<double> diff(MatchEnvPtr env, MatchEnvPtr2D &match_envs) {
     for (size_t j = 0; j < match_envs[i].size(); j++) {
       if (match_envs[i][j] != nullptr) {
         sum.push_back(match_envs[i][j]->getRealEnvPtr()->compIntensitySum()); 
-        temp = std::abs(env->getRealEnvPtr()->getMonoMass()
-                        - match_envs[i][j]->getRealEnvPtr()->getMonoMass());
+        temp = std::abs(env->getRealEnvPtr()->getMonoNeutralMass()
+                        - match_envs[i][j]->getRealEnvPtr()->getMonoNeutralMass());
         if (std::abs(temp - mass_constant::getWaterMass()) < 0.01) {
           res++;
         } else if (std::abs(temp - mass_constant::getAmmoniaMass()) < 0.01) {
           res++;
         }
-        if (std::abs(env->getRealEnvPtr()->getMonoMass()
-                     - match_envs[i][j]->getRealEnvPtr()->getMonoMass()) < 0.01) {
+        if (std::abs(env->getRealEnvPtr()->getMonoNeutralMass()
+                     - match_envs[i][j]->getRealEnvPtr()->getMonoNeutralMass()) < 0.01) {
           res2++;
         }
       }

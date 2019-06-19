@@ -19,10 +19,12 @@
 #include <memory>
 #include <vector>
 
+#include "spec/raw_ms.hpp"
 #include "deconv/env/envelope.hpp"
 #include "deconv/env/real_env.hpp"
 #include "deconv/env/match_env.hpp"
 
+#include "feature/savitzky_golay.hpp"
 #include "feature/frac_feature.hpp"
 
 namespace toppic {
@@ -38,7 +40,7 @@ class PeakCluster:public FracFeature {
 
   void clearScores();
 
-  void updateScore(bool check_pvalue);
+  void updateScore(RawMsPtrVec spec_list, bool check_pvalue);
 
  private:
   // promex feature variables
@@ -46,7 +48,7 @@ class PeakCluster:public FracFeature {
   int max_ms1_id_;
   double rep_mass_;
   int rep_charge_;
-  int rep_scan_;
+  int rep_ms1_id_;
   double rep_mz_;
   double score_ = 0.0;
 
@@ -58,7 +60,7 @@ class PeakCluster:public FracFeature {
   RealEnvPtrVec2D real_envs_;  
   EnvelopePtr theo_env_;
 
-  std::vector<double> rep_summed_peaks_;
+  std::vector<double> rep_summed_intensities_;
 
   // one for even charge, one for odd charge
   std::vector<int> best_charges_;
@@ -72,9 +74,16 @@ class PeakCluster:public FracFeature {
   std::vector<double> best_inte_scores_;
   std::vector<double> xic_corr_between_best_charges_;
 
+  static int even_charge_idx_;
+  static int odd_charge_idx_;
+  static double win_size_;
+
+  bool init_score_;
+
+  SavitzkyGolayPtr smoother_;
+
   // do not know the meaning
   int flag_;
-  bool init_score_;
 
 };
 

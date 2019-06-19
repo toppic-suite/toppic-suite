@@ -30,6 +30,13 @@ int getNearPeakIdx(const PeakPtrVec  &ptr_list, double pos, double tolerance);
 
 PeakPtrVec rmPeaks(const PeakPtrVec &ptr_list, std::vector<bool> &keep);
 
+PeakPtrVec getPeaksInWindow(const PeakPtrVec &ptr_list, double center, 
+                            double win_size);
+
+double getHighestPeakInte(const PeakPtrVec &ptr_list); 
+
+double getMedianPeakInte(PeakPtrVec ptr_list);
+
 }  // namespace raw_ms_util
 
 }  // namespace toppic
