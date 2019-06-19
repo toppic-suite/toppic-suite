@@ -106,7 +106,7 @@ void writeBatMassFeatures(const std::string &output_file_name,
     for (size_t j = 0; j < single_features.size(); j++) {
       SingleChargeFeaturePtr single_feature = single_features[j];
       int charge = single_feature->getCharge();
-      double mono_mz = Peak::compMonoMz(mono_mass, charge);
+      double mono_mz = Peak::compMz(mono_mass, charge);
       EnvelopePtr ref_env = EnvBase::getStaticEnvByMonoMass(mono_mass);
       EnvelopePtr theo_env = ref_env->distrToTheoMono(mono_mz, charge);
       double min_inte = 0.03;

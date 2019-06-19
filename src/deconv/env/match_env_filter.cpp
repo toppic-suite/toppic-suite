@@ -29,7 +29,7 @@ MatchEnvPtrVec MatchEnvFilter::filter(MatchEnvPtrVec &ori_envs, double prec_mass
   int high_mass_num = (int) ((prec_mass - env_para_ptr->low_high_dividor_)
                          / env_para_ptr->aa_avg_mass_ * env_para_ptr->peak_density_);
   for (size_t i = 0; i < ori_envs.size(); i++) {
-    if (ori_envs[i]->getRealEnvPtr()->getMonoMass() <= env_para_ptr->low_high_dividor_) {
+    if (ori_envs[i]->getRealEnvPtr()->getMonoNeutralMass() <= env_para_ptr->low_high_dividor_) {
       if ((int)low_mass_envs.size() < low_mass_num) {
         low_mass_envs.push_back(ori_envs[i]);
       }

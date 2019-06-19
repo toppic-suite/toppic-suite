@@ -36,8 +36,8 @@ void write_env(std::ofstream &file, MsHeaderPtr header, MatchEnvPtr match_env) {
   file << "REAL_PEAK_NUM=" << (real_env->getPeakNum() - real_env->getMissPeakNum()) << std::endl;
   file << "THEO_MONO_MZ=" << theo_env->getMonoMz() << std::endl;
   file << "REAL_MONO_MZ=" << real_env->getMonoMz() << std::endl;
-  file << "THEO_MONO_MASS=" << theo_env->getMonoMass() << std::endl;
-  file << "REAL_MONO_MASS=" << real_env->getMonoMass() << std::endl;
+  file << "THEO_MONO_MASS=" << theo_env->getMonoNeutralMass() << std::endl;
+  file << "REAL_MONO_MASS=" << real_env->getMonoNeutralMass() << std::endl;
   file << "THEO_INTE_SUM=" << theo_env->compIntensitySum() << std::endl;
   file << "REAL_INTE_SUM=" << real_env->compIntensitySum() << std::endl;
 

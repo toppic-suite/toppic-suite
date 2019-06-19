@@ -41,7 +41,7 @@ class DeconvPeak : public Peak {
 
   double getMonoMass() {return getPosition();}
 
-  double getMonoMz() {return compMonoMz(getMonoMass(), charge_);}
+  double getMonoMz() {return compMz(getMonoMass(), charge_);}
 
   double getScore() {return score_;}
 

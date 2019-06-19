@@ -50,9 +50,9 @@ class Peak {
 
   static std::string getXmlElementName() {return "peak";}
 
-  static double compPeakMass(double mono_mz, int charge);
+  static double compPeakNeutralMass(double mono_mz, int charge);
 
-  static double compMonoMz(double mono_mass, int charge);
+  static double compMz(double neutral_mass, int charge);
 
   static bool cmpInteDec(const PeakPtr &a, const PeakPtr &b) { 
     return a->getIntensity() > b->getIntensity();}

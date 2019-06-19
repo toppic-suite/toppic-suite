@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include <cmath>
+#include <algorithm>
 
 #include "common/util/logger.hpp"
 #include "spec/raw_ms_util.hpp"
@@ -82,6 +82,46 @@ PeakPtrVec rmPeaks(const PeakPtrVec &ptr_list, std::vector<bool> &keep) {
     }
   }
   return new_list;
+}
+
+// Removes a list of peaks.
+PeakPtrVec getPeaksInWindow(const PeakPtrVec &ptr_list, double center, 
+                            double win_size) {
+  double start = center - win_size/2;
+  double end = center + win_size/2;
+  PeakPtrVec new_list;
+  for (size_t i = 0; i < ptr_list.size(); i++) {
+    double pos = ptr_list[i]->getPosition();
+    if (pos >= start && pos <=end) { 
+      new_list.push_back(ptr_list[i]);
+    }
+  }
+  return new_list;
+}
+
+double getHighestPeakInte(const PeakPtrVec &ptr_list) {
+  double inte = 0;
+  for (size_t i = 0; i < ptr_list.size(); i++) {
+    if (ptr_list[i]->getIntensity() > inte) {
+      inte = ptr_list[i]->getIntensity();
+    }
+  }
+  return inte;
+}
+
+double getMedianPeakInte(PeakPtrVec ptr_list) {
+  if (ptr_list.size() == 0) {
+    return 0.0;
+  }
+  std::sort(ptr_list.begin(), ptr_list.end(), Peak::cmpInteDec); 
+  int median_pos; 
+  if (ptr_list.size() %2 == 0) {
+    median_pos = ptr_list.size()/2 - 1;
+  }
+  else {
+    median_pos = ptr_list.size()/2;
+  }
+  return ptr_list[median_pos]->getIntensity();
 }
 
 }  // namespace raw_ms_util

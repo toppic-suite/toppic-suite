@@ -271,6 +271,14 @@ std::vector<double> Envelope::getIntensities() {
   return intensities;
 }
 
+double Envelope::getIntensitySum() {
+  double sum = 0.0;
+  for (size_t i = 0; i < peaks_.size(); i++) {
+    sum += peaks_[i]->getIntensity();
+  }
+  return sum;
+}
+
 void Envelope::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
   std::string element_name = Envelope::getXmlElementName();
   xercesc::DOMElement* element = xml_doc->createElement(element_name.c_str());

@@ -23,12 +23,12 @@ Peak::Peak(double position, double intensity):
       position_(position), 
       intensity_(intensity) {}
 
-double Peak::compPeakMass(double mono_mz, int charge) {
+double Peak::compPeakNeutralMass(double mono_mz, int charge) {
   return mono_mz * charge - charge * mass_constant::getProtonMass();
 }
 
-double Peak::compMonoMz(double mono_mass, int charge) {
-    return mono_mass / charge + mass_constant::getProtonMass();
+double Peak::compMz(double neutral_mass, int charge) {
+    return neutral_mass / charge + mass_constant::getProtonMass();
 }
 
 void Peak::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {

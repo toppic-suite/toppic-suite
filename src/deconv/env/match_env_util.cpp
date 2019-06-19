@@ -27,7 +27,7 @@ namespace match_env_util {
 std::vector<double> getMassList(const MatchEnvPtrVec &envs) {
   std::vector<double> masses(envs.size());
   for (size_t i = 0; i < envs.size(); i++) {
-    masses[i] = envs[i]->getRealEnvPtr()->getMonoMass();
+    masses[i] = envs[i]->getRealEnvPtr()->getMonoNeutralMass();
   }
   return masses;
 }
@@ -43,7 +43,7 @@ std::vector<int> getChargeList(const MatchEnvPtrVec &envs) {
 std::vector<double> getChargeOneMassList(const MatchEnvPtrVec &envs) {
   std::vector<double> masses(envs.size());
   for (size_t i = 0; i < envs.size(); i++) {
-    masses[i] = envs[i]->getRealEnvPtr()->getMonoMass() + mass_constant::getProtonMass();
+    masses[i] = envs[i]->getRealEnvPtr()->getMonoNeutralMass() + mass_constant::getProtonMass();
   }
   return masses;
 }
@@ -170,7 +170,7 @@ MatchEnvPtrVec addMultipleMass(MatchEnvPtrVec &envs, MatchEnvPtr2D &candidates,
         continue;
       }
       mass_envs.push_back(charge_envs[j]);
-      double mono_mass = charge_envs[j]->getRealEnvPtr()->getMonoMass();
+      double mono_mass = charge_envs[j]->getRealEnvPtr()->getMonoNeutralMass();
       RealEnvPtr real_env_ptr = charge_envs[j]->getRealEnvPtr();
       int refer_idx = real_env_ptr->getReferIdx();
       if (mono_mass >= multi_min_mass) {
@@ -201,7 +201,7 @@ DeconvMsPtr getDeconvMsPtr(MsHeaderPtr header_ptr, MatchEnvPtrVec &envs) {
   for (size_t i = 0; i < envs.size(); i++) {
     EnvelopePtr theo_env = envs[i]->getTheoEnvPtr();
     RealEnvPtr real_env = envs[i]->getRealEnvPtr();
-    double pos = real_env->getMonoMass();
+    double pos = real_env->getMonoNeutralMass();
     double inte = theo_env->compIntensitySum();
     int charge = theo_env->getCharge();
     double score = envs[i]->getScore();

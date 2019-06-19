@@ -80,7 +80,9 @@ class Envelope {
 
   double getIntensity(int i) {return peaks_[i]->getIntensity();}
 
-  double getMonoMass() {return Peak::compPeakMass(mono_mz_, charge_);}
+  double getIntensitySum();
+
+  double getMonoNeutralMass() {return Peak::compPeakNeutralMass(mono_mz_, charge_);}
 
   double getMonoMz() {return mono_mz_;}
 
@@ -98,6 +100,8 @@ class Envelope {
   double getReferIntensity() {return peaks_[refer_idx_]->getIntensity();}
 
   double getReferMz() {return peaks_[refer_idx_]->getPosition();}
+
+  double getRefNeutralMass() {return Peak::compPeakNeutralMass(getReferMz(), charge_);}
 
   void setIntensity(int i, double intensity) {peaks_[i]->setIntensity(intensity);}
 
