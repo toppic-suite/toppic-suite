@@ -47,6 +47,8 @@ class DeconvPeak : public Peak {
 
   void setId(int id) {id_ = id;}
 
+  void setSpId(int sp_id) {sp_id_ = sp_id;}
+
   void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
   static bool cmpPosInc(const DeconvPeakPtr &a, const DeconvPeakPtr &b) {

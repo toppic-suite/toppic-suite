@@ -19,11 +19,15 @@
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/time_util.hpp"
+#include "common/base/mass_constant.hpp"
 #include "common/base/mod_util.hpp"
 #include "seq/fasta_util.hpp"
 #include "seq/fasta_index_reader.hpp"
 #include "spec/deconv_ms.hpp"
 #include "spec/msalign_reader.hpp"
+#include "deconv/env/env_base.hpp"
+#include "deconv/env/env_para.hpp"
+#include "deconv/env/match_env.hpp"
 #include "feature/feature_para.hpp"
 #include "feature/frac_feature.hpp"
 #include "feature/single_charge_feature.hpp"
@@ -63,6 +67,7 @@ void getMatchedPeaks(DeconvMsPtrVec &ms1_ptr_vec, double prec_mass,
         for (size_t k = 0; k < ext_masses.size(); k++) {
           double mass_diff = std::abs(ext_masses[k] - peak->getPosition());
           if (mass_diff <= error_tole) {
+            peak->setSpId(i);
             matched_peaks.push_back(peak);
             break;
           }
@@ -314,6 +319,37 @@ void removePeaks (DeconvMsPtrVec &ms1_ptr_vec, DeconvPeakPtrVec &matched_peaks) 
   }
 }
 
+MatchEnvPtr getMatchEnv(const PeakPtrVec &peak_list, double mono_neutral_mass, int charge,
+                        EnvParaPtr env_para_ptr) {
+
+  EnvelopePtr ref_env = EnvBase::getStaticEnvByMonoMass(mono_neutral_mass);
+  if (ref_env == nullptr) {
+    LOG_ERROR("reference envelope is null");
+    exit(EXIT_FAILURE);
+  }
+  double new_mono_charge_mass = mono_neutral_mass + charge * mass_constant::getIsotopeMass();
+  // original envelope has charge 1
+  double ori_mono_charge_mass = ref_env->getMonoNeutralMass() + mass_constant::getIsotopeMass();
+  double mass_diff = new_mono_charge_mass - ori_mono_charge_mass;
+  EnvelopePtr theo_env = ref_env->convertToTheo(mass_diff, charge); 
+
+  int mass_group = env_para_ptr->getMassGroup(mono_neutral_mass);
+  // LOG_DEBUG("theo env raw complete");
+
+  // get the highest 85%--95% peaks
+  double percentage = env_para_ptr->getPercentBound(mass_group);
+  // include all possible peaks;
+  double min_inte = 0.0;
+  int max_back_peak_num = 1000;
+  int max_forw_peak_num = 1000;
+  theo_env = theo_env->getSubEnv(percentage, min_inte, max_back_peak_num, max_forw_peak_num); 
+
+  RealEnvPtr real_env = std::make_shared<RealEnv>(peak_list, theo_env, env_para_ptr->getMzTolerance(),
+                                                  min_inte);
+  MatchEnvPtr match_env = std::make_shared<MatchEnv>(mass_group, theo_env, real_env);
+  return match_env;
+}
+
 void findMsOneFeatures(DeconvMsPtrVec &ms1_ptr_vec, FeatureParaPtr para_ptr,
                        FracFeaturePtrVec &features) {
   //get all peaks
@@ -330,19 +366,24 @@ void findMsOneFeatures(DeconvMsPtrVec &ms1_ptr_vec, FeatureParaPtr para_ptr,
     DeconvPeakPtr best_peak = all_peaks[peak_idx];
     if (peakExists(ms1_ptr_vec, best_peak)) {
       //std::cout << "Find feature " << feat_id << " peak intensity " << best_peak->getIntensity() << std::endl; 
-      int sp_id = best_peak->getSpId();
+      int ref_sp_id = best_peak->getSpId();
       double prec_mass = best_peak->getPosition();
       DeconvPeakPtrVec matched_peaks;
-      FracFeaturePtr feature_ptr = getFeature(sp_id, prec_mass, feat_id, ms1_ptr_vec,
+      FracFeaturePtr feature_ptr = getFeature(ref_sp_id, prec_mass, feat_id, ms1_ptr_vec,
                                               matched_peaks, para_ptr);
       if (feature_ptr != nullptr) {
-        removePeaks(ms1_ptr_vec, matched_peaks);
-        // check if the feature has at least 2 envelopes
-        if (feature_ptr->getEnvNum() > 1) {
-          features.push_back(feature_ptr);
-          feat_id++;
-        }
+        LOG_ERROR("Empty feature!");
+        exit(EXIT_FAILURE);
       }
+      // check if the feature has at least 2 envelopes
+      if (feature_ptr->getEnvNum() > 1) {
+        //double ref_mono_mass = feature_ptr->getMonoMass();
+        //double ref_charge = best_peak->getCharge();
+
+        features.push_back(feature_ptr);
+        feat_id++;
+      }
+      removePeaks(ms1_ptr_vec, matched_peaks);
     }
     peak_idx++;
   }

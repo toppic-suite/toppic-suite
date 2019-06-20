@@ -69,7 +69,8 @@ int Envelope::getLabel(int i) {
 }
 
 EnvelopePtr Envelope::convertToTheo(double mass_diff, int new_charge) {
-  double new_mono_mz = (mono_mz_ + mass_diff) / new_charge;
+  int ori_charge = 1;
+  double new_mono_mz = (mono_mz_ * ori_charge + mass_diff) / new_charge;
   EnvPeakPtrVec new_peaks(peaks_.size());
   for (size_t i = 0; i < peaks_.size(); i++) {
     double new_mz = (peaks_[i]->getPosition() + mass_diff) / new_charge;
@@ -81,13 +82,15 @@ EnvelopePtr Envelope::convertToTheo(double mass_diff, int new_charge) {
 
 // Convert a theoretical distribution to a theoretical envelope
 EnvelopePtr Envelope::distrToTheoBase(double new_base_mz, int new_charge) {
-  double mass_diff = new_base_mz * new_charge - peaks_[refer_idx_]->getPosition();
+  int ori_charge = 1;
+  double mass_diff = new_base_mz * new_charge - peaks_[refer_idx_]->getPosition() * ori_charge;
   return convertToTheo(mass_diff, new_charge);
 }
 
 // Convert a theoretical distribution to a theoretical envelope based on the
 EnvelopePtr Envelope::distrToTheoMono(double new_mono_mz, int new_charge) {
-  double mass_diff = new_mono_mz * new_charge - mono_mz_;
+  int ori_charge = 1;
+  double mass_diff = new_mono_mz * new_charge - mono_mz_ * ori_charge;
   return convertToTheo(mass_diff, new_charge);
 }
 
