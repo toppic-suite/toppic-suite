@@ -42,6 +42,18 @@ class PeakCluster:public FracFeature {
 
   void updateScore(RawMsPtrVec spec_list, bool check_pvalue);
 
+  double getInteDistr(int i) {return inte_distr_[i];}
+
+  double getSumDistScore(int i) {return sum_dist_scores_[i];}
+  double getSumCorrScore(int i) {return sum_corr_scores_[i];}
+  double getSumInteScore(int i) {return sum_inte_scores_[i];}
+
+  double getBestDistScore(int i) {return best_dist_scores_[i];}
+  double getBestCorrScore(int i) {return best_corr_scores_[i];}
+  double getBestInteScore(int i) {return best_inte_scores_[i];}
+
+  double getXicCorrBetweenCharges(int i) {return xic_corr_between_best_charges_[i];}
+
  private:
   // promex feature variables
   int min_ms1_id_;
@@ -64,9 +76,9 @@ class PeakCluster:public FracFeature {
 
   // one for even charge, one for odd charge
   std::vector<int> best_charges_;
-  std::vector<double> env_dist_scores_;
-  std::vector<double> env_corr_scores_;
-  std::vector<double> env_inte_scores_;
+  std::vector<double> sum_dist_scores_;
+  std::vector<double> sum_corr_scores_;
+  std::vector<double> sum_inte_scores_;
 
   std::vector<double> inte_distr_;
   std::vector<double> best_corr_scores_;
@@ -84,8 +96,9 @@ class PeakCluster:public FracFeature {
 
   // do not know the meaning
   int flag_;
-
 };
+
+typedef std::shared_ptr<PeakCluster> PeakClusterPtr;
 
 }
 #endif

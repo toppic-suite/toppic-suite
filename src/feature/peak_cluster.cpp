@@ -14,8 +14,12 @@
 
 #include <cmath>
 
+#include <boost/math/distributions/poisson.hpp>
+#include <boost/math/distributions/normal.hpp>
+
 #include "common/util/logger.hpp"
 #include "spec/peak.hpp"
+#include "spec/env_peak.hpp"
 #include "spec/raw_ms_util.hpp"
 #include "feature/peak_cluster.hpp"
 
@@ -91,6 +95,75 @@ double getPearsonCorr(std::vector<double> &v1, std::vector<double> &v2) {
   return cov < 0 ? 0 : cov / std::sqrt(s1 * s2);
 }
 
+double getPoissonPValue(PeakPtrVec &win_peaks, double win_size, 
+                        std::vector<double> &env_peak_intensities) {
+  double win_high_inte = raw_ms_util::getHighestPeakInte(win_peaks);
+  double inte_thresh = win_high_inte  * 0.1;
+  int match_peak_num = 0;
+  for (size_t i = 0; i < env_peak_intensities.size(); i++) {
+    if (env_peak_intensities[i] > inte_thresh) {
+      match_peak_num++;
+    }
+  }
+  int inte_peak_num = 0;
+  for (size_t i = 0; i < win_peaks.size(); i++) {
+    if (win_peaks[i]->getIntensity() > inte_thresh) {
+      inte_peak_num++;
+    }
+  }
+  int possible_peak_num = std::ceil(win_size * 100);
+
+  double n = possible_peak_num;
+  double k = env_peak_intensities.size();
+  double n1 = inte_peak_num;
+  double k1 = match_peak_num;
+  double lambda = n1 / n * k;
+
+  boost::math::poisson_distribution<> pd(lambda); 
+
+  double pvalue = 1.0 - boost::math::cdf(pd, k1);
+  return pvalue;
+}
+
+double compRankSumPValue(double n, double n1, double r1) {
+  double n2 = n - n1;
+  double u1 = n1 * n2 + n1 * (n1 + 1) * 0.5 - r1;
+
+  double mean_u = 0.5 * (n1 * n2);
+  double log_sig_u = 0.5 * (std::log(n1) + std::log(n2) + std::log(n1 + n2 + 1) - std::log(12));
+  double sig_u = std::exp(log_sig_u);
+  //boost::math::policies::policy<boost::math::policies::digits10<5>> pol();
+  boost::math::normal_distribution<> nd(mean_u, sig_u);
+  double p_value = boost::math::cdf(nd, u1);
+  p_value = std::min(p_value, 1-p_value);
+  return std::abs(p_value);
+}
+
+double getRankSumPValue(PeakPtrVec &win_peaks, std::vector<double> &env_peak_intensities) {
+  int rank_sum = 0;
+  int match_peak_num = 0;
+
+  std::sort(win_peaks.begin(), win_peaks.end(), Peak::cmpInteDec);
+
+  for (size_t i = 0; i < env_peak_intensities.size(); i++) {
+    double peak_inte = env_peak_intensities[i];
+    if (peak_inte > 0.0) {
+      int rank = win_peaks.size();
+      for (size_t j = 0; j < win_peaks.size(); j++) {
+        if (peak_inte >= win_peaks[i]->getIntensity()) {
+          rank = j+1;
+          break;
+        }
+      }
+      rank_sum += rank;
+      match_peak_num++; 
+    }
+  }
+  int peak_num = win_peaks.size();
+  double pvalue = compRankSumPValue(peak_num, match_peak_num, rank_sum);
+  return pvalue;
+}
+
 PeakCluster::PeakCluster(MatchEnvPtr match_env) {
   theo_env_ = match_env->getTheoEnvPtr();
   rep_mass_ = theo_env_->getMonoNeutralMass();
@@ -144,9 +217,9 @@ void PeakCluster::clearScores() {
   best_dist_scores_.resize(2, 1.0);
 
   best_charges_.resize(2, 0);
-  env_dist_scores_.resize(2, 1.0);
-  env_corr_scores_.resize(2, 0.0);
-  env_inte_scores_.resize(2, 0.0);
+  sum_dist_scores_.resize(2, 1.0);
+  sum_corr_scores_.resize(2, 0.0);
+  sum_inte_scores_.resize(2, 0.0);
   xic_corr_between_best_charges_.resize(2, 0.0);
 }
 
@@ -233,15 +306,12 @@ void PeakCluster::updateScore(RawMsPtrVec spec_list, bool check_pvalue) {
 
       bool level_one_env = true;
       bool level_two_env = true;
-      /*
-      if (pValueCheck)
-      {
-        var poissonPValue = localWin.GetPoissonTestPValue(envelope.Peaks, TheoreticalEnvelope.Size);
-        var rankSumPValue = localWin.GetRankSumTestPValue(envelope.Peaks, TheoreticalEnvelope.Size);
-        levelOneEnvelope = (rankSumPValue < 0.01 && poissonPValue < 0.01);
+      if (check_pvalue) {
+        double poisson_pvalue = getPoissonPValue(win_peaks, win_size_, real_intensities);
+        double rank_sum_pvalue = getRankSumPValue(win_peaks, real_intensities);
+        level_one_env = (rank_sum_pvalue < 0.01 && poisson_pvalue < 0.01);
         //levelTwoEnvelope = (rankSumPValue < 0.05 || poissonPValue < 0.05);
       }
-      */
       if (level_one_env ) {
         if (new_bc_dist < best_dist_scores_[charge_idx]) {
           best_dist_scores_[charge_idx] = new_bc_dist;
@@ -280,15 +350,15 @@ void PeakCluster::updateScore(RawMsPtrVec spec_list, bool check_pvalue) {
       }
 
       double bc_dist = getBcDistance(theo_intensities, summed_intensities);
-      env_dist_scores_[charge_idx] = std::min(env_dist_scores_[charge_idx], bc_dist);
+      sum_dist_scores_[charge_idx] = std::min(sum_dist_scores_[charge_idx], bc_dist);
       double pc = getPearsonCorr(theo_intensities, summed_intensities);
-      env_corr_scores_[charge_idx] = std::max(env_corr_scores_[charge_idx], pc);
+      sum_corr_scores_[charge_idx] = std::max(sum_corr_scores_[charge_idx], pc);
 
       if (best_charges_[charge_idx] < 1 || bc_dist < best_charge_dists[charge_idx]) {
         best_charges_[charge_idx] = charge;
         best_charge_dists[charge_idx] = bc_dist;
         if (summed_win_high_inte > 0.0) {
-          env_inte_scores_[charge_idx] = summed_iso_high_inte/summed_win_high_inte;
+          sum_inte_scores_[charge_idx] = summed_iso_high_inte/summed_win_high_inte;
         }
       }
 
