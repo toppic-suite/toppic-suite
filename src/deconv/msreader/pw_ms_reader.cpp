@@ -33,7 +33,7 @@ PwMsReader::PwMsReader(const std::string & file_name):
     }
 
 
-bool PwMsReader::readOneMs(int sp_id, PeakPtrVec &peak_list, MsHeaderPtr header_ptr) {
+bool PwMsReader::readOneMs(int sp_id, PeakPtrVec &peak_list, MsHeaderPtr &header_ptr) {
   pwiz::msdata::SpectrumPtr cur_spec_ptr = nullptr;
   // read m/z and intensity values from the spectra
   bool get_binary_data = true;

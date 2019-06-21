@@ -50,7 +50,7 @@ bool InvertMatrix(const boost::numeric::ublas::matrix<double>& input,
     if( res != 0 ) return false;
 
     // create identity matrix of "inverse"
-    inverse.assign(identity_matrix<double>(A.size1()));
+    inverse = identity_matrix<double>(A.size1());
 
     // backsubstitute to get the inverse
     lu_substitute(A, pm, inverse);

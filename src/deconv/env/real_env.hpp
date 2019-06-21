@@ -42,6 +42,8 @@ class RealEnv : public Envelope {
 
   int getReferPeakIdx() {return peaks_[refer_idx_]->getIdx();}
 
+  void setSpId(int sp_id) {sp_id_ = sp_id;}
+
   static bool testPeakShare(RealEnvPtr a, RealEnvPtr b);
 
   bool isExist(int i);

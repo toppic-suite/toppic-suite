@@ -106,6 +106,7 @@ int process(std::map<std::string, std::string> arguments,
     }
   }
 
+  /*
   time_util::addTimeStamp(argument_str);
   std::string sample_name = arguments["sampleName"];
   std::cout << "Merging files started." << std::endl;
@@ -116,6 +117,7 @@ int process(std::map<std::string, std::string> arguments,
   feature_merger->process(argument_str);
   feature_merger = nullptr;
   std::cout << "Merging files ended." << std::endl;
+  */
   return 0;
 }
 

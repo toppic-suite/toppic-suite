@@ -24,21 +24,21 @@ void getFilterMatrix(int poly_order, int filter_len, ublas::matrix<double> &mat)
   // filter_len is always an odd number
   int m = (filter_len - 1) /2;
   ublas::matrix<double> a(filter_len, poly_order + 1);
-  mat.resize(filter_len, poly_order + 1);
   for (int i = -m; i <= m; i++) {
-    for (int j = 0; j < poly_order; j++) {
+    for (int j = 0; j <= poly_order; j++) {
       double di = i;
       double dj = j;
-      mat(i,j) = std::pow(di,dj);
+      a(i + m,j) = std::pow(di,dj);
     }
   }
   ublas::matrix<double> a_t = ublas::trans(a); 
   ublas::matrix<double> f = ublas::prod(a_t, a);
   ublas::matrix<double> f_inv;
+
   matrix_inverse::InvertMatrix(f, f_inv);
 
   ublas::matrix<double> a_f_inv = ublas::prod(a, f_inv);
-  mat = ublas::prod(a_f_inv, a_t); 
+  mat = ublas::prod(a_f_inv, a_t);
 }
 
 bool isEmpty(std::vector<double> &values) {
