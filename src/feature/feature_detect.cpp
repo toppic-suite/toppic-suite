@@ -23,11 +23,13 @@
 #include "common/base/mod_util.hpp"
 #include "seq/fasta_util.hpp"
 #include "seq/fasta_index_reader.hpp"
+#include "spec/peak.hpp"
 #include "spec/deconv_ms.hpp"
 #include "spec/msalign_reader.hpp"
 #include "deconv/env/env_base.hpp"
 #include "deconv/env/env_para.hpp"
 #include "deconv/env/match_env.hpp"
+#include "deconv/msreader/raw_ms_reader.hpp"
 #include "feature/feature_para.hpp"
 #include "feature/frac_feature.hpp"
 #include "feature/single_charge_feature.hpp"
@@ -35,6 +37,7 @@
 #include "feature/spec_feature.hpp"
 #include "feature/spec_feature_writer.hpp"
 #include "feature/feature_detect.hpp"
+#include "feature/peak_cluster.hpp"
 
 namespace toppic {
 
@@ -277,6 +280,8 @@ FracFeaturePtr getFeature(int sp_id, double prec_mass, int feat_id,
                                                              para_ptr->file_name_,
                                                              feat_mass,
                                                              feat_inte,
+                                                             ms1_id_begin,
+                                                             ms1_id_end,
                                                              ms1_time_begin,
                                                              ms1_time_end,
                                                              ms1_scan_begin,
@@ -350,8 +355,9 @@ MatchEnvPtr getMatchEnv(const PeakPtrVec &peak_list, double mono_neutral_mass, i
   return match_env;
 }
 
-void findMsOneFeatures(DeconvMsPtrVec &ms1_ptr_vec, FeatureParaPtr para_ptr,
-                       FracFeaturePtrVec &features) {
+void findMsOneFeatures(DeconvMsPtrVec &ms1_ptr_vec, PeakPtrVec2D & raw_peaks, 
+                       FeatureParaPtr para_ptr, FracFeaturePtrVec &features,
+                       EnvParaPtr env_para_ptr) {
   //get all peaks
   DeconvPeakPtrVec all_peaks;
   for (size_t i = 0; i < ms1_ptr_vec.size(); i++) {
@@ -377,8 +383,23 @@ void findMsOneFeatures(DeconvMsPtrVec &ms1_ptr_vec, FeatureParaPtr para_ptr,
       }
       // check if the feature has at least 2 envelopes
       if (feature_ptr->getEnvNum() > 1) {
-        //double ref_mono_mass = feature_ptr->getMonoMass();
-        //double ref_charge = best_peak->getCharge();
+        double ref_mono_mass = feature_ptr->getMonoMass();
+        double ref_charge = best_peak->getCharge();
+        int sp_id = best_peak->getSpId();
+        MatchEnvPtr match_env = getMatchEnv(raw_peaks[sp_id], ref_mono_mass, ref_charge, env_para_ptr); 
+        PeakClusterPtr peak_cluster = std::make_shared<PeakCluster>(match_env->getTheoEnvPtr());
+        RealEnvPtrVec real_envs; 
+        for (size_t i = 0; i < matched_peaks.size(); i++) {
+          ref_charge = matched_peaks[i]->getCharge();
+          sp_id = matched_peaks[i]->getSpId();
+          match_env = getMatchEnv(raw_peaks[sp_id], ref_mono_mass, ref_charge, env_para_ptr);
+          real_envs.push_back(match_env->getRealEnvPtr());
+        }
+        peak_cluster->addEnvelopes(feature_ptr, real_envs); 
+        bool check_pvalue = true;
+        peak_cluster->updateScore(raw_peaks, check_pvalue);
+        double promex_score = para_ptr->peak_cluster_score_ptr_->getScore(peak_cluster);
+        feature_ptr->setPromexScore(promex_score);
 
         features.push_back(feature_ptr);
         feat_id++;
@@ -478,18 +499,24 @@ void getMs2Features(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtrVec &header_ptr_vec,
   }
 }
 
-void process(int frac_id, std::string &sp_file_name, 
+void process(int frac_id, std::string &sp_file_name, std::string &resource_dir,
              bool missing_level_one, std::string &argu_str) {
   //logger::setLogLevel(2);
-  FeatureParaPtr para_ptr = std::make_shared<FeaturePara>(frac_id, sp_file_name);
+  FeatureParaPtr para_ptr = std::make_shared<FeaturePara>(frac_id, sp_file_name, resource_dir);
+  EnvParaPtr env_para_ptr = std::make_shared<EnvPara>();
   std::string base_name = file_util::basename(sp_file_name);
   // read ms1 deconvoluted spectra
-  std::string ms1_file_name = base_name + "_ms1.msalign";
   DeconvMsPtrVec ms1_ptr_vec;
   FracFeaturePtrVec features;
   if (!missing_level_one) {
+    std::string ms1_file_name = base_name + "_ms1.msalign";
     MsAlignReader::readMsOneSpectra(ms1_file_name, ms1_ptr_vec);
-    findMsOneFeatures(ms1_ptr_vec, para_ptr, features);
+    std::string mzml_file_name = base_name + ".mzml"; 
+    PeakPtrVec2D raw_peaks; 
+    RawMsReaderPtr raw_reader_ptr = std::make_shared<RawMsReader>(mzml_file_name);
+    raw_reader_ptr->getMs1Peaks(raw_peaks);
+    raw_reader_ptr = nullptr;
+    findMsOneFeatures(ms1_ptr_vec, raw_peaks, para_ptr, features, env_para_ptr);
   }
 
   LOG_DEBUG("start reading ms2");

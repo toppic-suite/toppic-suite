@@ -29,11 +29,12 @@ typedef std::vector<FracFeaturePtr> FracFeaturePtrVec;
 
 class FracFeature {
  public:
-  FracFeature() {}
+  FracFeature() {};
 
   FracFeature(int id, int fraction_id, 
               const std::string &file_name,
               double mono_mass, double inte,
+              int min_ms1_id, int max_ms1_id,
               double retent_begin, double retent_end,
               int scan_begin, int scan_end,
               int min_charge, int max_charge, 
@@ -55,6 +56,10 @@ class FracFeature {
 
   double getIntensity() {return intensity_;}
 
+  int getMinMs1Id() {return min_ms1_id_;}
+
+  int getMaxMs1Id() {return max_ms1_id_;}
+
   double getTimeBegin() {return time_begin_;}
 
   double getTimeEnd() {return time_end_;}
@@ -75,9 +80,13 @@ class FracFeature {
 
   double getSampleFeatureInte() {return sample_feature_inte_;}
 
+  double getPromexScore() {return promex_score_;}
+
   SingleChargeFeaturePtrVec getSingleFeatures() {return single_features_;}
 
   void setId(int id) {id_ = id;}
+
+  void setPromexScore(double score) {promex_score_ = score;}
 
   void setSampleFeatureId(int id) {sample_feature_id_ = id;}
 
@@ -109,6 +118,10 @@ class FracFeature {
   std::string file_name_;
   double mono_mass_;
   double intensity_;
+  // ms1 ids are used for promex score
+  int min_ms1_id_;
+  int max_ms1_id_;
+
   double time_begin_;
   double time_end_;
   int scan_begin_;
@@ -119,6 +132,9 @@ class FracFeature {
   int sample_feature_id_ = -1;
   double sample_feature_inte_ = 0;
   SingleChargeFeaturePtrVec single_features_;
+
+  // used for promex_score
+  double promex_score_;
 };
 
 typedef std::vector<FracFeaturePtrVec> FracFeaturePtrVec2D;

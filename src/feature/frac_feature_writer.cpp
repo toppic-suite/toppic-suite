@@ -95,8 +95,7 @@ void writeBatMassFeatures(const std::string &output_file_name,
       << "rtHi" << delimit
       << "color" << delimit
       << "opacity" << delimit
-      << "Sample_feature_Id" << delimit
-      << "Sample_feature_intensity"
+      << "promex_score" 
       << std::endl;
   for (size_t i = 0; i < features.size(); i++) {
     FracFeaturePtr feature = features[i];
@@ -131,8 +130,7 @@ void writeBatMassFeatures(const std::string &output_file_name,
           << (single_feature->getTimeEnd()/60) << delimit
           << "#FF0000" << delimit
           << "0.1" << delimit
-          << feature->getSampleFeatureId() << delimit
-          << feature->getSampleFeatureInte() 
+          << feature->getPromexScore()
           << std::endl;
     }
   }

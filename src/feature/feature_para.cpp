@@ -13,12 +13,14 @@
 //limitations under the License.
 
 
+#include "common/util/file_util.hpp"
 #include "common/base/mass_constant.hpp"
 #include "feature/feature_para.hpp"
 
 namespace toppic {
 
-FeaturePara::FeaturePara(int frac_id, const std::string &file_name): 
+FeaturePara::FeaturePara(int frac_id, const std::string &file_name, 
+                         std::string &resource_dir): 
   frac_id_(frac_id),
   file_name_(file_name) {
 
@@ -35,6 +37,11 @@ FeaturePara::FeaturePara(int frac_id, const std::string &file_name):
   search_offsets_ = offsets_1;
   std::vector<double> offsets_2 {{0, -IM, IM, -2 * IM, 2 * IM}};
   extend_offsets_ = offsets_2;
+
+  //peak_cluster_score
+  double threshold = 0;
+  std::string dir = resource_dir + file_util::getFileSeparator() + "promex"; 
+  peak_cluster_score_ptr_ = std::make_shared<PeakClusterScore>(dir, threshold);
 }
 
 std::vector<double> FeaturePara::getExtendMasses(double mass) {

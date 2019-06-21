@@ -18,12 +18,14 @@
 
 #include <vector>
 #include "spec/peak_tolerance.hpp"
+#include "feature/peak_cluster_score.hpp"
 
 namespace toppic {
 
 class FeaturePara {
  public:
-  FeaturePara(int frac_id, const std::string &file_name);
+  FeaturePara(int frac_id, const std::string &file_name, 
+              std::string &resourse_dir); 
 
   std::vector<double> getExtendMasses(double mass);
 
@@ -42,6 +44,8 @@ class FeaturePara {
   // search offset is  -3, -2, -1, 0, 1, 2, 3. We use it to search the precursor 
   // mass of an MS/MS spectrum to find a matched feature.
   std::vector<double> search_offsets_;
+
+  PeakClusterScorePtr peak_cluster_score_ptr_;
 
   double extend_min_mass_ = 5000;
 

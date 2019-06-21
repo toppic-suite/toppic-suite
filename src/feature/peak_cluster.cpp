@@ -164,8 +164,8 @@ double getRankSumPValue(PeakPtrVec &win_peaks, std::vector<double> &env_peak_int
   return pvalue;
 }
 
-PeakCluster::PeakCluster(MatchEnvPtr match_env) {
-  theo_env_ = match_env->getTheoEnvPtr();
+PeakCluster::PeakCluster(EnvelopePtr theo_env) {
+  theo_env_ = theo_env;
   rep_mass_ = theo_env_->getMonoNeutralMass();
   rep_charge_ = theo_env_->getCharge();
 
@@ -179,21 +179,20 @@ PeakCluster::PeakCluster(MatchEnvPtr match_env) {
   smoother_ = std::make_shared<SavitzkyGolay>(9, 2);
 }
 
-void PeakCluster::addEnvelopes(int min_charge, int max_charge, 
-                               int min_ms1_id, int max_ms1_id, 
-                               int scan_begin, int scan_end,
+void PeakCluster::addEnvelopes(FracFeaturePtr feature_ptr, 
                                RealEnvPtrVec envs) {
-  int row_num = max_charge - min_charge + 1;
-  int col_num = max_ms1_id - min_ms1_id + 1;
+
+  int row_num = feature_ptr->getMaxCharge() - feature_ptr->getMinCharge() + 1;
+  int col_num = feature_ptr->getMaxMs1Id() - feature_ptr->getMinMs1Id() + 1;
   
-  min_charge_ = min_charge;
-  max_charge_ = max_charge;
+  min_charge_ = feature_ptr->getMinCharge();
+  max_charge_ = feature_ptr->getMaxCharge();
 
-  min_ms1_id_ = min_ms1_id;
-  max_ms1_id_ = max_ms1_id;
+  min_ms1_id_ = feature_ptr->getMinMs1Id();
+  max_ms1_id_ = feature_ptr->getMaxMs1Id();
 
-  scan_begin_ = scan_begin;
-  scan_end_ = scan_end;
+  scan_begin_ = feature_ptr->getScanBegin();
+  scan_end_ = feature_ptr->getScanEnd();
 
   real_envs_.resize(row_num);
 
@@ -203,7 +202,7 @@ void PeakCluster::addEnvelopes(int min_charge, int max_charge,
 
   for (size_t i = 0; i < envs.size(); i++) {
     int row = envs[i]->getCharge() - min_charge_;
-    int col = envs[i]->getSpId() - min_ms1_id;
+    int col = envs[i]->getSpId() - min_ms1_id_;
     if (row >= 0 && row < row_num && col >= 0 && col < col_num) {
       real_envs_[row][col] = envs[i];
     }
@@ -223,7 +222,7 @@ void PeakCluster::clearScores() {
   xic_corr_between_best_charges_.resize(2, 0.0);
 }
 
-void PeakCluster::updateScore(RawMsPtrVec spec_list, bool check_pvalue) {
+void PeakCluster::updateScore(PeakPtrVec2D &raw_peaks, bool check_pvalue) {
   int row_num = max_charge_ - min_charge_ + 1;
   int col_num = max_ms1_id_ - min_ms1_id_ + 1;
   int ref_idx = theo_env_->getReferIdx(); 
@@ -281,7 +280,7 @@ void PeakCluster::updateScore(RawMsPtrVec spec_list, bool check_pvalue) {
       }
 
       int ms1_id = min_ms1_id_ + j;
-      PeakPtrVec all_peaks = spec_list[ms1_id]->getPeakPtrVec();
+      PeakPtrVec all_peaks = raw_peaks[ms1_id];
       PeakPtrVec win_peaks = raw_ms_util::getPeaksInWindow(all_peaks, ref_mz, win_size_);
       double win_high_inte = raw_ms_util::getHighestPeakInte(win_peaks);
       double win_median_inte = raw_ms_util::getMedianPeakInte(win_peaks);

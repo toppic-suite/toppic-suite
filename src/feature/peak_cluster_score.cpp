@@ -16,6 +16,7 @@
 
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
+#include "common/util/file_util.hpp"
 #include "feature/peak_cluster_score.hpp"
 
 namespace toppic {
@@ -52,18 +53,19 @@ PeakClusterScore::PeakClusterScore(std::string &dir, double thresh) {
     mass_bins_[idx] = m;
     idx++;
   }
+  std::string full_dir = dir + file_util::getFileSeparator();
 
-  loadTable(dir + "DistScore.tsv", dist_score_table_, row_num_, col_num_);
-  loadTable(dir + "CorrScore.tsv", corr_score_table_, row_num_, col_num_);
-  loadTable(dir + "IntScore.tsv", inte_score_table_, row_num_, col_num_);
+  loadTable(full_dir + "DistScore.tsv", dist_score_table_, row_num_, col_num_);
+  loadTable(full_dir + "CorrScore.tsv", corr_score_table_, row_num_, col_num_);
+  loadTable(full_dir + "IntScore.tsv", inte_score_table_, row_num_, col_num_);
 
-  loadTable(dir + "SummedDistScore.tsv", dist_sum_score_table_, row_num_, col_num_);
-  loadTable(dir + "SummedCorrScore.tsv", corr_sum_score_table_, row_num_, col_num_);
-  loadTable(dir + "SummedIntScore.tsv", inte_sum_score_table_, row_num_, col_num_);
+  loadTable(full_dir + "SummedDistScore.tsv", dist_sum_score_table_, row_num_, col_num_);
+  loadTable(full_dir + "SummedCorrScore.tsv", corr_sum_score_table_, row_num_, col_num_);
+  loadTable(full_dir + "SummedIntScore.tsv", inte_sum_score_table_, row_num_, col_num_);
 
-  loadTable(dir + "AbuScore.tsv", inte_distr_score_table_, row_num_, col_num_);
-  loadTable(dir + "XicCorrScore1.tsv", xic_score_table_1_, row_num_, col_num_);
-  loadTable(dir + "XicCorrScore2.tsv", xic_score_table_2_, row_num_, col_num_);
+  loadTable(full_dir + "AbuScore.tsv", inte_distr_score_table_, row_num_, col_num_);
+  loadTable(full_dir + "XicCorrScore1.tsv", xic_score_table_1_, row_num_, col_num_);
+  loadTable(full_dir + "XicCorrScore2.tsv", xic_score_table_2_, row_num_, col_num_);
 }
 
 double PeakClusterScore::getScore(PeakClusterPtr pc) {

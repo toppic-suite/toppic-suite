@@ -62,6 +62,7 @@ private:
   double intensity_;
 };
 
+typedef std::vector<PeakPtrVec> PeakPtrVec2D;
 
 }  // namespace toppic
 #endif
