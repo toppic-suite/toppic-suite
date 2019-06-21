@@ -51,6 +51,20 @@ RawMsPtr RawMsReader::getNextMs(double prec_win_size, int max_charge) {
   return ms_ptr;
 }
 
+void RawMsReader::getMs1Peaks(PeakPtrVec2D &raw_peaks) {
+  while (true) {
+    reader_ptr_->readNext();
+    MsHeaderPtr header_ptr = reader_ptr_->getHeaderPtr();
+    if (header_ptr == nullptr) {
+      break;
+    }
+    if (header_ptr->getMsLevel() == 1) {
+      PeakPtrVec peak_list = reader_ptr_->getPeakList();
+      raw_peaks.push_back(peak_list);
+    }
+  }
+}
+
 // refine precursor charge and mz 
 void RawMsReader::refinePrecChrg(RawMsPtr ms_one, RawMsPtr ms_two, 
                                  double prec_win_size, int max_charge) {

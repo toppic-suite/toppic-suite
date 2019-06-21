@@ -27,6 +27,8 @@ class RawMsReader {
 
   RawMsPtr getNextMs(double prec_win_size, int max_charge);
 
+  void getMs1Peaks(PeakPtrVec2D &raw_peaks);
+
   void refinePrecChrg(RawMsPtr ms_one, RawMsPtr ms_two, 
                       double prec_win_size, int max_charge);
 

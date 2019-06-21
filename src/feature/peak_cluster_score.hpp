@@ -52,5 +52,7 @@ class PeakClusterScore {
   double score_thresh_;
 };
 
+typedef std::shared_ptr<PeakClusterScore> PeakClusterScorePtr;
+
 }
 #endif

@@ -75,7 +75,7 @@ int processOneFile(std::map<std::string, std::string> arguments,
 
     std::string argu_str = para_ptr->getArgumentStr();
     std::string sp_file_name = para_ptr->getDataFileName();
-    feature_detect::process(frac_id, sp_file_name, 
+    feature_detect::process(frac_id, sp_file_name, arguments["resourceDir"], 
                             para_ptr->missing_level_one_, argu_str);
 
     time_t end = time(0);

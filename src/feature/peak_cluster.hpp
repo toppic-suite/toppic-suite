@@ -22,25 +22,22 @@
 #include "spec/raw_ms.hpp"
 #include "deconv/env/envelope.hpp"
 #include "deconv/env/real_env.hpp"
-#include "deconv/env/match_env.hpp"
 
-#include "feature/savitzky_golay.hpp"
 #include "feature/frac_feature.hpp"
+#include "feature/savitzky_golay.hpp"
 
 namespace toppic {
 
 class PeakCluster:public FracFeature {
  public:
-  PeakCluster(MatchEnvPtr match_env);
+  PeakCluster(EnvelopePtr theo_env);
 
-  void addEnvelopes(int min_charge, int max_charge, 
-                    int min_ms1_id, int max_ms1_id, 
-                    int min_scan_num, int max_scan_num,
+  void addEnvelopes(FracFeaturePtr feature_ptr, 
                     RealEnvPtrVec envs);
 
   void clearScores();
 
-  void updateScore(RawMsPtrVec spec_list, bool check_pvalue);
+  void updateScore(PeakPtrVec2D &raw_peaks, bool check_pvalue);
 
   double getInteDistr(int i) {return inte_distr_[i];}
 
