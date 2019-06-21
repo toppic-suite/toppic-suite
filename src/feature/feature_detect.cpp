@@ -324,7 +324,7 @@ void removePeaks (DeconvMsPtrVec &ms1_ptr_vec, DeconvPeakPtrVec &matched_peaks) 
   }
 }
 
-MatchEnvPtr getMatchEnv(const PeakPtrVec &peak_list, double mono_neutral_mass, int charge,
+MatchEnvPtr getMatchEnv(const PeakPtrVec &peak_list, int sp_id, double mono_neutral_mass, int charge,
                         EnvParaPtr env_para_ptr) {
 
   EnvelopePtr ref_env = EnvBase::getStaticEnvByMonoMass(mono_neutral_mass);
@@ -351,6 +351,11 @@ MatchEnvPtr getMatchEnv(const PeakPtrVec &peak_list, double mono_neutral_mass, i
 
   RealEnvPtr real_env = std::make_shared<RealEnv>(peak_list, theo_env, env_para_ptr->getMzTolerance(),
                                                   min_inte);
+  if (real_env == nullptr) {
+    LOG_ERROR("real env is null");
+  }
+  real_env->setSpId(sp_id);
+  //LOG_DEBUG("theo peak_num " << theo_env->getPeakNum() << " real peak num " << real_env->getPeakNum());
   MatchEnvPtr match_env = std::make_shared<MatchEnv>(mass_group, theo_env, real_env);
   return match_env;
 }
@@ -375,9 +380,10 @@ void findMsOneFeatures(DeconvMsPtrVec &ms1_ptr_vec, PeakPtrVec2D & raw_peaks,
       int ref_sp_id = best_peak->getSpId();
       double prec_mass = best_peak->getPosition();
       DeconvPeakPtrVec matched_peaks;
+      LOG_ERROR("feature id " << feat_id);
       FracFeaturePtr feature_ptr = getFeature(ref_sp_id, prec_mass, feat_id, ms1_ptr_vec,
                                               matched_peaks, para_ptr);
-      if (feature_ptr != nullptr) {
+      if (feature_ptr == nullptr) {
         LOG_ERROR("Empty feature!");
         exit(EXIT_FAILURE);
       }
@@ -386,19 +392,26 @@ void findMsOneFeatures(DeconvMsPtrVec &ms1_ptr_vec, PeakPtrVec2D & raw_peaks,
         double ref_mono_mass = feature_ptr->getMonoMass();
         double ref_charge = best_peak->getCharge();
         int sp_id = best_peak->getSpId();
-        MatchEnvPtr match_env = getMatchEnv(raw_peaks[sp_id], ref_mono_mass, ref_charge, env_para_ptr); 
+        MatchEnvPtr match_env = getMatchEnv(raw_peaks[sp_id], sp_id, ref_mono_mass, ref_charge, env_para_ptr); 
+        if (match_env == nullptr) {
+          LOG_ERROR("matche env is null");
+        }
         PeakClusterPtr peak_cluster = std::make_shared<PeakCluster>(match_env->getTheoEnvPtr());
         RealEnvPtrVec real_envs; 
         for (size_t i = 0; i < matched_peaks.size(); i++) {
           ref_charge = matched_peaks[i]->getCharge();
           sp_id = matched_peaks[i]->getSpId();
-          match_env = getMatchEnv(raw_peaks[sp_id], ref_mono_mass, ref_charge, env_para_ptr);
+          match_env = getMatchEnv(raw_peaks[sp_id], sp_id, ref_mono_mass, ref_charge, env_para_ptr);
           real_envs.push_back(match_env->getRealEnvPtr());
         }
+        LOG_ERROR("get real envs done");
         peak_cluster->addEnvelopes(feature_ptr, real_envs); 
+        LOG_ERROR("add real envs done");
         bool check_pvalue = true;
         peak_cluster->updateScore(raw_peaks, check_pvalue);
+        LOG_ERROR("update score done");
         double promex_score = para_ptr->peak_cluster_score_ptr_->getScore(peak_cluster);
+        LOG_ERROR("get promex score done");
         feature_ptr->setPromexScore(promex_score);
 
         features.push_back(feature_ptr);
@@ -511,9 +524,8 @@ void process(int frac_id, std::string &sp_file_name, std::string &resource_dir,
   if (!missing_level_one) {
     std::string ms1_file_name = base_name + "_ms1.msalign";
     MsAlignReader::readMsOneSpectra(ms1_file_name, ms1_ptr_vec);
-    std::string mzml_file_name = base_name + ".mzml"; 
     PeakPtrVec2D raw_peaks; 
-    RawMsReaderPtr raw_reader_ptr = std::make_shared<RawMsReader>(mzml_file_name);
+    RawMsReaderPtr raw_reader_ptr = std::make_shared<RawMsReader>(sp_file_name);
     raw_reader_ptr->getMs1Peaks(raw_peaks);
     raw_reader_ptr = nullptr;
     findMsOneFeatures(ms1_ptr_vec, raw_peaks, para_ptr, features, env_para_ptr);
