@@ -33,6 +33,19 @@ SampleFeature::SampleFeature(const std::string &line) {
   max_frac_id_ = std::stoi(strs[9]);
 }
 
+SampleFeature::SampleFeature(FracFeaturePtr frac_feature, int id) {
+  id_ = id;
+  FracFeaturePtr first_ft = frac_feature;
+  mono_mass_ = first_ft->getMonoMass();
+  intensity_ = first_ft->getIntensity();
+  time_begin_ = first_ft->getTimeBegin();
+  time_end_ = first_ft->getTimeEnd();
+  min_charge_ = first_ft->getMinCharge();
+  max_charge_ = first_ft->getMaxCharge();
+  min_frac_id_ = first_ft->getFracId();
+  max_frac_id_ = first_ft->getFracId();
+}
+
 SampleFeature::SampleFeature(FracFeaturePtrVec &frac_features, int id) {
   if (frac_features.size() == 0) {
     LOG_ERROR("Fraction feature size is 0!");

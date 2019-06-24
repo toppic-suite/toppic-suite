@@ -21,7 +21,7 @@
 #include "common/util/str_util.hpp"
 #include "common/base/base_data.hpp"
 #include "spec/msalign_frac_merge.hpp"
-#include "feature/feature_detect.hpp"
+#include "feature_detect/feature_detect.hpp"
 #include "feature/feature_merge.hpp"
 #include "deconv/env/env_base.hpp"
 #include "deconv/deconv/deconv_process_2.hpp"

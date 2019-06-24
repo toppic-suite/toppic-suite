@@ -53,6 +53,8 @@ class Prsm {
 
   double getPrecFeatureInte() {return prec_feature_inte_;}
 
+  double getFracFeatureScore() {return frac_feature_score_;}
+
   double getOriPrecMass() {return ori_prec_mass_;}
 
   double getAdjustedPrecMass() {return adjusted_prec_mass_;}
@@ -96,6 +98,8 @@ class Prsm {
   void setPrecFeatureId(int prec_feature_id) {prec_feature_id_ = prec_feature_id;}
 
   void setPrecFeatureInte(double prec_feature_inte) {prec_feature_inte_ = prec_feature_inte;}
+
+  void setFracFeatureScore(double score) {frac_feature_score_ = score;}
 
   void setOriPrecMass(double prec_mass) {ori_prec_mass_ = prec_mass;}
 
@@ -165,6 +169,8 @@ class Prsm {
   int prec_feature_id_ = -1;
 
   double prec_feature_inte_ = -1;
+
+  double frac_feature_score_ = -1000;
 
   double ori_prec_mass_;
   /* adjusted precursor mass */

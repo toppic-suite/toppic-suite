@@ -19,6 +19,7 @@
 
 namespace toppic {
 
+/*
 SpecFeature::SpecFeature(int spec_id, int frac_id, 
                          const std::string &file_name,
                          std::string &scans,
@@ -39,6 +40,7 @@ SpecFeature::SpecFeature(int spec_id, int frac_id,
     sample_feature_id_(sample_feature_id),
     sample_feature_inte_(sample_feature_inte) {
     }
+    */
 
 SpecFeature::SpecFeature(std::string line) {
   std::vector<std::string> strs;
@@ -53,8 +55,9 @@ SpecFeature::SpecFeature(std::string line) {
   prec_inte_ = std::stod(strs[7]);
   frac_feature_id_ = std::stoi(strs[8]);
   frac_feature_inte_ = std::stod(strs[9]);
-  sample_feature_id_ = std::stoi(strs[10]);
-  sample_feature_inte_ = std::stod(strs[11]);
+  frac_feature_score_ = std::stod(strs[10]);
+  sample_feature_id_ = std::stoi(strs[11]);
+  sample_feature_inte_ = std::stod(strs[12]);
 }
 
 SpecFeature::SpecFeature(MsHeaderPtr header, FracFeaturePtr feature) {
@@ -68,6 +71,7 @@ SpecFeature::SpecFeature(MsHeaderPtr header, FracFeaturePtr feature) {
   prec_inte_ = header->getPrecInte();
   frac_feature_id_ = feature->getId();
   frac_feature_inte_ = feature->getIntensity();
+  frac_feature_score_ = feature->getPromexScore();
   sample_feature_id_ = feature->getSampleFeatureId();
   sample_feature_inte_ = feature->getSampleFeatureInte();
 }

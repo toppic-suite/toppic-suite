@@ -30,6 +30,7 @@ typedef std::vector<SpecFeaturePtr> SpecFeaturePtrVec;
 
 class SpecFeature {
  public:
+  /*
   SpecFeature(int spec_id, int frac_id, 
               const std::string &file_name,
               std::string &scans,
@@ -37,6 +38,7 @@ class SpecFeature {
               double prec_mass, double prec_inte,
               int frac_feature_id, double frac_feature_inte,
               int sample_feature_id, double sample_feature_inte);
+              */
 
   SpecFeature(std::string line);
 
@@ -62,6 +64,8 @@ class SpecFeature {
 
   double getFracFeatureInte() {return frac_feature_inte_;}
 
+  double getFracFeatureScore() {return frac_feature_score_;}
+
   int getSampleFeatureId() {return sample_feature_id_;}
 
   double getSampleFeatureInte() {return sample_feature_inte_;}
@@ -76,6 +80,10 @@ class SpecFeature {
 
   void setSampleFeatureInte(double inte) {sample_feature_inte_ = inte;}
 
+  static bool cmpSpecIdInc(const SpecFeaturePtr &a, const SpecFeaturePtr &b) { 
+    return a->getSpecId() < b->getSpecId();
+  }
+
  protected:
   int spec_id_;
   int frac_id_;
@@ -87,6 +95,7 @@ class SpecFeature {
   double prec_inte_;
   int frac_feature_id_;
   double frac_feature_inte_;
+  double frac_feature_score_;
   int sample_feature_id_;
   double sample_feature_inte_;
 };

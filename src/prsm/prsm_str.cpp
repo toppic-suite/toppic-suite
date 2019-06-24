@@ -147,6 +147,12 @@ void PrsmStr::setPrecFeatureInte(double inte) {
   precursor_feature_inte_ = inte;
 }
 
+void PrsmStr::setFracFeatureScore(double score) {
+  int i = getXmlLineIndex(str_vec_, "frac_feature_score");
+  str_vec_[i] = "<frac_feature_score>" + str_util::toString(score) + "</frac_feature_score>";
+}
+
+
 void PrsmStr::setPrecursorId(int id) {
   int i = getXmlLineIndex(str_vec_, "precursor_id");
   str_vec_[i] = "<precursor_id>" + str_util::toString(id) + "</precursor_id>";
