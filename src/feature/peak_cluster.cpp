@@ -131,7 +131,7 @@ double compRankSumPValue(double n1, double n2, double r1) {
   double mean_u = 0.5 * (n1 * n2);
   double log_sig_u = 0.5 * (std::log(n1) + std::log(n2) + std::log(n1 + n2 + 1) - std::log(12));
   double sig_u = std::exp(log_sig_u);
-  LOG_ERROR("log sig u " << log_sig_u << " sig u " << sig_u << " n1 " << n1 << " n2 " << n2 << " r1 " << r1);
+  LOG_DEBUG("log sig u " << log_sig_u << " sig u " << sig_u << " n1 " << n1 << " n2 " << n2 << " r1 " << r1);
   // all peaks are matched
   if (sig_u == 0.0) {
     return 0.0;
@@ -176,12 +176,10 @@ PeakCluster::PeakCluster(EnvelopePtr theo_env) {
   rep_summed_intensities_.resize(peak_num, 0.0);
 
   clearScores();
-  LOG_ERROR("pc 3");
 
   flag_ = 0;
   init_score_ = false;
   smoother_ = std::make_shared<SavitzkyGolay>(9, 2);
-  LOG_ERROR("pc 4");
 }
 
 void PeakCluster::addEnvelopes(FracFeaturePtr feature_ptr, 
@@ -198,7 +196,7 @@ void PeakCluster::addEnvelopes(FracFeaturePtr feature_ptr,
 
   scan_begin_ = feature_ptr->getScanBegin();
   scan_end_ = feature_ptr->getScanEnd();
-  LOG_ERROR("add env row " << row_num << " col " << col_num);
+  LOG_DEBUG("add env row " << row_num << " col " << col_num);
 
   real_envs_.resize(row_num);
 
@@ -232,8 +230,6 @@ void PeakCluster::updateScore(PeakPtrVec2D &raw_peaks, bool check_pvalue) {
   int row_num = max_charge_ - min_charge_ + 1;
   int col_num = max_ms1_id_ - min_ms1_id_ + 1;
   int ref_idx = theo_env_->getReferIdx(); 
-
-  LOG_ERROR("updata score " << row_num << " col " << col_num);
 
   clearScores();
 
@@ -279,7 +275,6 @@ void PeakCluster::updateScore(PeakPtrVec2D &raw_peaks, bool check_pvalue) {
     double summed_win_high_inte = 0.0;
 
     for (int j = 0; j < col_num; j++) {
-      LOG_ERROR("s5  j " << j);
       RealEnvPtr env = real_envs_[i][j];
       if (env == nullptr) continue;
       
@@ -289,7 +284,6 @@ void PeakCluster::updateScore(PeakPtrVec2D &raw_peaks, bool check_pvalue) {
       }
 
       int ms1_id = min_ms1_id_ + j;
-      LOG_ERROR("min_ms1 " << min_ms1_id_);
       PeakPtrVec all_peaks = raw_peaks[ms1_id];
       PeakPtrVec win_peaks = raw_ms_util::getPeaksInWindow(all_peaks, ref_mz, win_size_);
       double win_high_inte = raw_ms_util::getHighestPeakInte(win_peaks);
@@ -301,35 +295,26 @@ void PeakCluster::updateScore(PeakPtrVec2D &raw_peaks, bool check_pvalue) {
       }
       double env_inte_sum = env->getIntensitySum();
       inte_distr_[charge_idx] += env_inte_sum; 
-      LOG_ERROR("s6");
 
       std::vector<double> real_intensities = env->getIntensities();
-      LOG_ERROR("s6.1");
 
       double new_bc_dist = getBcDistance(theo_intensities, real_intensities);
-      LOG_ERROR("s6.2");
       double new_corr = getPearsonCorr(theo_intensities, real_intensities);
-      LOG_ERROR("s6.3 dist " << new_bc_dist << " corr " << new_corr);
 
       bool good_env = (new_bc_dist < 0.07 || new_corr > 0.7);
       if (good_env) {
-        LOG_ERROR("xic_start " << xic_start_idx << " j " << j << " charge idx " << charge_idx);
         xic2[charge_idx][xic_start_idx + j] += env_inte_sum;
         charge_xic[i][xic_start_idx+j] = env_inte_sum;
       }
-      LOG_ERROR("s6.4");
 
       bool level_one_env = true;
       bool level_two_env = true;
       if (check_pvalue) {
         double poisson_pvalue = getPoissonPValue(win_peaks, win_size_, real_intensities);
-        LOG_ERROR("s6.5");
         double rank_sum_pvalue = getRankSumPValue(win_peaks, real_intensities);
-        LOG_ERROR("s6.6");
         level_one_env = (rank_sum_pvalue < 0.01 && poisson_pvalue < 0.01);
         //levelTwoEnvelope = (rankSumPValue < 0.05 || poissonPValue < 0.05);
       }
-      LOG_ERROR("s7");
       if (level_one_env ) {
         if (new_bc_dist < best_dist_scores_[charge_idx]) {
           best_dist_scores_[charge_idx] = new_bc_dist;
@@ -346,7 +331,6 @@ void PeakCluster::updateScore(PeakPtrVec2D &raw_peaks, bool check_pvalue) {
           rep_env = env;
         }
       }
-      LOG_ERROR("s8");
       if (level_two_env) {
         if (new_bc_dist < tmp_best_dist_scores[charge_idx]) {
           tmp_best_dist_scores[charge_idx] = new_bc_dist;
@@ -364,7 +348,6 @@ void PeakCluster::updateScore(PeakPtrVec2D &raw_peaks, bool check_pvalue) {
         }
       }
 
-      LOG_ERROR("s9");
       double bc_dist = getBcDistance(theo_intensities, summed_intensities);
       sum_dist_scores_[charge_idx] = std::min(sum_dist_scores_[charge_idx], bc_dist);
       double pc = getPearsonCorr(theo_intensities, summed_intensities);
@@ -384,7 +367,6 @@ void PeakCluster::updateScore(PeakPtrVec2D &raw_peaks, bool check_pvalue) {
       }
     }
   }
-  LOG_ERROR("s10");
 
   // when good envelope is observed at only even charge...
   if (best_corr_scores_[0] > 0.7 && best_corr_scores_[1] < 0.5) {
@@ -402,7 +384,6 @@ void PeakCluster::updateScore(PeakPtrVec2D &raw_peaks, bool check_pvalue) {
     best_dist_scores_[idx] = tmp_best_dist_scores[idx];
   }
 
-  LOG_ERROR("s11");
 
   // normalize intensities
   double s = inte_distr_[0] + inte_distr_[1];
@@ -412,23 +393,17 @@ void PeakCluster::updateScore(PeakPtrVec2D &raw_peaks, bool check_pvalue) {
   }
 
   if (col_num > 1) {
-    LOG_ERROR("s11.1");
     int even_best_charge = best_charges_[even_charge_idx_] - min_charge_;
     int odd_best_charge = best_charges_[odd_charge_idx_] - min_charge_;
     if (even_best_charge >= 0 && odd_best_charge >= 0) {
-      LOG_ERROR("s11.2");
       std::vector<double> v1 = smoother_->smooth(charge_xic[even_best_charge]);
       std::vector<double> v2 = smoother_->smooth(charge_xic[odd_best_charge]);
       xic_corr_between_best_charges_[0] = getPearsonCorr(v1, v2); 
-      LOG_ERROR("s11.3");
       v1 = smoother_->smooth(xic2[even_charge_idx_]);
       v2 = smoother_->smooth(xic2[odd_charge_idx_]);
       xic_corr_between_best_charges_[1] = getPearsonCorr(v1, v2);
     }
   }
-
-
-  LOG_ERROR("s12");
 
   if (rep_env == nullptr && rep_env_2 != nullptr) {
     rep_env = rep_env_2;
@@ -438,8 +413,6 @@ void PeakCluster::updateScore(PeakPtrVec2D &raw_peaks, bool check_pvalue) {
     rep_mz_ = rep_env->getMonoMz();
     rep_ms1_id_ = rep_env->getSpId();
   }
-
-  LOG_ERROR("s13");
 
   init_score_ = true;
 }
