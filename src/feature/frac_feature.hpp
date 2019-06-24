@@ -82,11 +82,15 @@ class FracFeature {
 
   double getPromexScore() {return promex_score_;}
 
+  bool hasMs2Spec() {return has_ms2_spec_;}
+
   SingleChargeFeaturePtrVec getSingleFeatures() {return single_features_;}
 
   void setId(int id) {id_ = id;}
 
   void setPromexScore(double score) {promex_score_ = score;}
+
+  void setHasMs2Spec(bool has_ms2_spec) {has_ms2_spec_ = has_ms2_spec;}
 
   void setSampleFeatureId(int id) {sample_feature_id_ = id;}
 
@@ -135,6 +139,7 @@ class FracFeature {
 
   // used for promex_score
   double promex_score_;
+  bool has_ms2_spec_ = false;
 };
 
 typedef std::vector<FracFeaturePtrVec> FracFeaturePtrVec2D;

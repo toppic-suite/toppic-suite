@@ -86,7 +86,7 @@ void addMsHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement* ms_element,
   str = str_util::toString(precursor_charge);
   xml_doc->addElement(ms_header_element, "precursor_charge", str.c_str());
 
-  double precursor_mz = Peak::compMonoMz(precursor_mass, precursor_charge);
+  double precursor_mz = Peak::compMz(precursor_mass, precursor_charge);
   str = str_util::toString(precursor_mz, pos);
   xml_doc->addElement(ms_header_element, "precursor_mz", str.c_str());
 
@@ -126,7 +126,7 @@ void addMsPeaks(XmlDOMDocument *xml_doc, xercesc::DOMElement* ms_element,
       str = str_util::toString(mass, mng_ptr->precise_point_num_);
       xml_doc->addElement(peak_element, "monoisotopic_mass", str.c_str());
 
-      double mz = Peak::compMonoMz(mass, charge);
+      double mz = Peak::compMz(mass, charge);
       str = str_util::toString(mz, mng_ptr->precise_point_num_);
       xml_doc->addElement(peak_element, "monoisotopic_mz", str.c_str());
 

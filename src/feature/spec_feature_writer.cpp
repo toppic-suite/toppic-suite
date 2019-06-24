@@ -49,6 +49,7 @@ void writeHeader(std::ofstream &of) {
       << "Precursor_intensity" << "\t"
       << "Fraction_feature_ID" << "\t"
       << "Fraction_feature_intensity" << "\t"
+      << "Fraction_feature_score" << "\t"
       << "Sample_feature_ID" << "\t"
       << "Sample_feature_intensity"
       << std::endl;
@@ -65,6 +66,7 @@ void writeOneFeature(std::ofstream &of, SpecFeaturePtr feature) {
       << feature->getPrecInte() << "\t"
       << feature->getFracFeatureId() << "\t"
       << feature->getFracFeatureInte() << "\t"
+      << feature->getFracFeatureScore() << "\t"
       << feature->getSampleFeatureId() << "\t"
       << feature->getSampleFeatureInte() 
       << std::endl;

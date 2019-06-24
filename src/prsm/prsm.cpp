@@ -121,6 +121,8 @@ XmlDOMElement* Prsm::toXmlElement(XmlDOMDocument* xml_doc) {
   xml_doc->addElement(element, "precursor_feature_id", str.c_str());
   str = str_util::toString(prec_feature_inte_);
   xml_doc->addElement(element, "precursor_feature_inte", str.c_str());
+  str = str_util::toString(frac_feature_score_);
+  xml_doc->addElement(element, "frac_feature_score", str.c_str());
   str = str_util::toString(spectrum_num_);
   xml_doc->addElement(element, "spectrum_number", str.c_str());
   str = str_util::toString(ori_prec_mass_);
@@ -157,6 +159,7 @@ void Prsm::parseXml(XmlDOMElement *element) {
   precursor_id_ = xml_dom_util::getIntChildValue(element, "precursor_id", 0);
   prec_feature_id_ = xml_dom_util::getIntChildValue(element, "precursor_feature_id", 0);
   prec_feature_inte_ = xml_dom_util::getDoubleChildValue(element, "precursor_feature_inte", 0);
+  frac_feature_score_ = xml_dom_util::getDoubleChildValue(element, "frac_feature_score", 0);
   spectrum_num_ = xml_dom_util::getIntChildValue(element, "spectrum_number", 0);
   ori_prec_mass_ = xml_dom_util::getDoubleChildValue(element, "ori_prec_mass", 0);
   adjusted_prec_mass_ = xml_dom_util::getDoubleChildValue(element, "adjusted_prec_mass", 0);

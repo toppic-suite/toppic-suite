@@ -36,8 +36,10 @@
 #include "feature/frac_feature_writer.hpp"
 #include "feature/spec_feature.hpp"
 #include "feature/spec_feature_writer.hpp"
-#include "feature/feature_detect.hpp"
 #include "feature/peak_cluster.hpp"
+#include "feature/sample_feature.hpp"
+#include "feature/sample_feature_writer.hpp"
+#include "feature_detect/feature_detect.hpp"
 
 namespace toppic {
 
@@ -485,6 +487,7 @@ void getMs2Features(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtrVec &header_ptr_vec,
     if (ft_ptr != nullptr) {
       SpecFeaturePtr ms2_feature = std::make_shared<SpecFeature>(header, ft_ptr);
       ms2_features.push_back(ms2_feature);
+      ft_ptr->setHasMs2Spec(true);
     }
     else {
       int sp_id = header->getMsOneId();
@@ -497,6 +500,8 @@ void getMs2Features(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtrVec &header_ptr_vec,
         // if we find a feature in ms1.msalign
         // it is possible that some ms headers do not have matched features. 
         if (feature_ptr != nullptr) {
+          feature_ptr->setHasMs2Spec(true);
+          feature_ptr->setPromexScore(-1000);
           features.push_back(feature_ptr);
           removePeaks(ms1_ptr_vec, matched_peaks);
 
@@ -508,6 +513,32 @@ void getMs2Features(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtrVec &header_ptr_vec,
         }
       }
     }
+  }
+  std::sort(ms2_features.begin(), ms2_features.end(), SpecFeature::cmpSpecIdInc);
+}
+
+void getSampleFeatures(SampleFeaturePtrVec &sample_features, FracFeaturePtrVec &frac_features,
+                       SpecFeaturePtrVec &spec_features) {
+  //sample features;
+  for (size_t i = 0; i < frac_features.size(); i++) {
+    SampleFeaturePtr sample_feature = std::make_shared<SampleFeature>(frac_features[i], frac_features[i]->getId());
+    sample_features.push_back(sample_feature);
+    frac_features[i]->setSampleFeatureId(frac_features[i]->getId());
+    frac_features[i]->setSampleFeatureInte(frac_features[i]->getIntensity());
+  }
+
+  //spec features
+  std::map<int,FracFeaturePtr> feature_map;
+  for (size_t i = 0; i < frac_features.size(); i++) {
+    feature_map[frac_features[i]->getId()] =  frac_features[i];
+  }
+
+  for (size_t j = 0; j < spec_features.size(); j++) {
+    SpecFeaturePtr spec_feature = spec_features[j];
+    int frac_feature_id = spec_feature->getFracFeatureId(); 
+    FracFeaturePtr frac_feature = feature_map.find(frac_feature_id)->second;
+    spec_feature->setSampleFeatureId(frac_feature->getSampleFeatureId());
+    spec_feature->setSampleFeatureInte(frac_feature->getSampleFeatureInte());
   }
 }
 
@@ -537,17 +568,35 @@ void process(int frac_id, std::string &sp_file_name, std::string &resource_dir,
   SpecFeaturePtrVec ms2_features;
   getMs2Features(ms1_ptr_vec, header_ptr_vec, features, para_ptr, ms2_features);
 
+  // remove frac_features with low scores
+  FracFeaturePtrVec sele_features; 
+  int cnt_1 = 0;
+  int cnt_2 = 0;
+  for (size_t i = 0; i < features.size(); i++) {
+    if (features[i]->getPromexScore() > 0.0 or features[i]->hasMs2Spec()) {
+      cnt_1++;
+      if (features[i]->getPromexScore() > 0.0) cnt_2++;
+      sele_features.push_back(features[i]);
+    }
+  }
+  LOG_DEBUG("count 1 " << cnt_1 << " count 2 " << cnt_2);
+
   //std::sort(features.begin(), features.end(), FracFeature::cmpMassInc);
+  //std::string output_file_name = base_name + "_frac.feature";
+  //frac_feature_writer::writeFeatures(output_file_name, sele_features);
+
+  SampleFeaturePtrVec sample_features;
+  getSampleFeatures(sample_features, sele_features, ms2_features);
+
   std::string output_file_name = base_name + "_frac.feature";
-  frac_feature_writer::writeFeatures(output_file_name, features);
-  output_file_name = base_name + "_frac_xml.feature";
-  frac_feature_writer::writeXmlFeatures(output_file_name, features);
+  frac_feature_writer::writeXmlFeatures(output_file_name, sele_features);
   std::string batmass_file_name = base_name + "_frac.mzrt.csv";
-  frac_feature_writer::writeBatMassFeatures(batmass_file_name, features);
+  frac_feature_writer::writeBatMassFeatures(batmass_file_name, sele_features);
+  std::string sample_feature_file_name = base_name + "_sample.feature";
+  sample_feature_writer::writeFeatures(sample_feature_file_name, sample_features);
 
   output_file_name = base_name + "_ms2.feature";
   spec_feature_writer::writeFeatures(output_file_name, ms2_features); 
-
 }
 
 }  // namespace 

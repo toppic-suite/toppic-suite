@@ -93,6 +93,8 @@ class PrsmStr {
 
   void setPrecFeatureInte(double inte);
 
+  void setFracFeatureScore(double score);
+
   void setFdr(double fdr);
 
   void setProteoformFdr(double proteoform_fdr);

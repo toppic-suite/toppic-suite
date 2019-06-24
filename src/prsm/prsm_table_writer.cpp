@@ -13,6 +13,7 @@
 //limitations under the License.
 
 #include <iomanip>
+#include <sstream>
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
@@ -52,6 +53,7 @@ void PrsmTableWriter::write() {
       << "Adjusted precursor mass" << ","
       << "Proteoform ID" << ","
       << "Feature intensity" << ","
+      << "Feature score" << ","
       << "Protein accession" << ","
       << "Protein description" << ","
       << "First residue" << ","
@@ -145,10 +147,15 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
       << prsm_ptr->getProteoformPtr()->getProteoClusterId() << ",";
 
   if (prsm_ptr->getPrecFeatureInte() > 0) {
-    file << prsm_ptr->getPrecFeatureInte() << ",";
+    std::ostringstream str_stream;
+    str_stream << std::scientific << std::setprecision(1);
+    str_stream << prsm_ptr->getPrecFeatureInte();
+    file << std::scientific << str_stream.str() << ",";
   } else {
     file << "-" << ",";
   }
+
+  file << prsm_ptr->getFracFeatureScore() << ",";
 
   file << prsm_ptr->getProteoformPtr()->getSeqName() << ","
       << "\"" << prsm_ptr->getProteoformPtr()->getSeqDesc() << "\"" << ","

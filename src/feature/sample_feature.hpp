@@ -32,6 +32,8 @@ class SampleFeature {
 
   SampleFeature(const std::string &line);
 
+  SampleFeature(FracFeaturePtr frac_feature, int id);
+
   SampleFeature(FracFeaturePtrVec &frac_features, int id);
 
   int getSampleId() {return sample_id_;}
@@ -71,7 +73,7 @@ class SampleFeature {
   }
 
  protected:
-  int sample_id_ = -1;
+  int sample_id_ = 0;
   int id_;
   double mono_mass_;
   double intensity_;

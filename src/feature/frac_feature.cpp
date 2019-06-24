@@ -107,6 +107,7 @@ FracFeature::FracFeature(XmlDOMElement* element) {
   min_charge_ = xml_dom_util::getIntChildValue(element, "min_charge", 0);
   max_charge_ = xml_dom_util::getIntChildValue(element, "max_charge", 0);
   env_num_ = xml_dom_util::getIntChildValue(element, "envelope_num", 0);
+  promex_score_ = xml_dom_util::getDoubleChildValue(element, "promex_score", 0);
   sample_feature_id_ = xml_dom_util::getIntChildValue(element, "sample_feature_id", 0);
   sample_feature_inte_ = xml_dom_util::getDoubleChildValue(element, "sample_feature_inte", 0);
 
@@ -151,6 +152,8 @@ XmlDOMElement* FracFeature::toXmlElement(XmlDOMDocument* xml_doc) {
   xml_doc->addElement(element, "max_charge", str.c_str());
   str = str_util::toString(env_num_);
   xml_doc->addElement(element, "envelope_num", str.c_str());
+  str = str_util::toString(promex_score_);
+  xml_doc->addElement(element, "promex_score", str.c_str());
   str = str_util::toString(sample_feature_id_);
   xml_doc->addElement(element, "sample_feature_id", str.c_str());
   str = str_util::toString(sample_feature_inte_);
