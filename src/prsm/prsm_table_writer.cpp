@@ -150,7 +150,7 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
     std::ostringstream str_stream;
     str_stream << std::scientific << std::setprecision(1);
     str_stream << prsm_ptr->getPrecFeatureInte();
-    file << std::scientific << str_stream.str() << ",";
+    file << str_stream.str() << ",";
   } else {
     file << "-" << ",";
   }

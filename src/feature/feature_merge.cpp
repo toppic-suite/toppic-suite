@@ -43,22 +43,22 @@ FeatureMerge::FeatureMerge(
     }
 
 void FeatureMerge::process(std::string &para_str) {
-  std::vector<std::string> frac_feature_names;
+  //std::vector<std::string> frac_feature_names;
   std::vector<std::string> frac_xml_feature_names;
   std::vector<std::string> spec_feature_names;
   for (size_t i = 0; i < spec_file_names_.size(); i++) { 
     std::string base_name = file_util::basename(spec_file_names_[i]);
-    std::string frac_feature = base_name + "_frac.feature";
-    frac_feature_names.push_back(frac_feature);
-    std::string frac_xml_feature = base_name + "_frac_xml.feature";
+    //std::string frac_feature = base_name + "_frac.feature";
+    //frac_feature_names.push_back(frac_feature);
+    std::string frac_xml_feature = base_name + "_frac.feature";
     frac_xml_feature_names.push_back(frac_xml_feature);
     std::string spec_feature = base_name + "_ms2.feature";
     spec_feature_names.push_back(spec_feature);
   }
   
   std::string sample_feature_output_name = output_file_name_ + "_sample.feature";
-  std::string frac_xml_feature_output_name = output_file_name_ + "_frac_xml.feature";
-  std::string frac_feature_output_name = output_file_name_ + "_frac.feature";
+  std::string frac_xml_feature_output_name = output_file_name_ + "_frac.feature";
+  //std::string frac_feature_output_name = output_file_name_ + "_frac.feature";
   std::string spec_feature_output_name = output_file_name_ + "_ms2.feature";
 
   mergeFiles(frac_xml_feature_names, frac_xml_feature_output_name, 
