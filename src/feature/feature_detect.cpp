@@ -380,7 +380,7 @@ void findMsOneFeatures(DeconvMsPtrVec &ms1_ptr_vec, PeakPtrVec2D & raw_peaks,
       int ref_sp_id = best_peak->getSpId();
       double prec_mass = best_peak->getPosition();
       DeconvPeakPtrVec matched_peaks;
-      LOG_ERROR("feature id " << feat_id);
+      LOG_DEBUG("feature id " << feat_id);
       FracFeaturePtr feature_ptr = getFeature(ref_sp_id, prec_mass, feat_id, ms1_ptr_vec,
                                               matched_peaks, para_ptr);
       if (feature_ptr == nullptr) {
@@ -388,7 +388,7 @@ void findMsOneFeatures(DeconvMsPtrVec &ms1_ptr_vec, PeakPtrVec2D & raw_peaks,
         exit(EXIT_FAILURE);
       }
       // check if the feature has at least 2 envelopes
-      if (feature_ptr->getEnvNum() > 1) {
+      //if (feature_ptr->getEnvNum() > 1) {
         double ref_mono_mass = feature_ptr->getMonoMass();
         double ref_charge = best_peak->getCharge();
         int sp_id = best_peak->getSpId();
@@ -404,19 +404,18 @@ void findMsOneFeatures(DeconvMsPtrVec &ms1_ptr_vec, PeakPtrVec2D & raw_peaks,
           match_env = getMatchEnv(raw_peaks[sp_id], sp_id, ref_mono_mass, ref_charge, env_para_ptr);
           real_envs.push_back(match_env->getRealEnvPtr());
         }
-        LOG_ERROR("get real envs done");
+        LOG_DEBUG("get real envs done");
         peak_cluster->addEnvelopes(feature_ptr, real_envs); 
-        LOG_ERROR("add real envs done");
+        LOG_DEBUG("add real envs done");
         bool check_pvalue = true;
         peak_cluster->updateScore(raw_peaks, check_pvalue);
-        LOG_ERROR("update score done");
+        LOG_DEBUG("update score done");
         double promex_score = para_ptr->peak_cluster_score_ptr_->getScore(peak_cluster);
-        LOG_ERROR("get promex score done");
+        LOG_DEBUG("get promex score done");
         feature_ptr->setPromexScore(promex_score);
-
         features.push_back(feature_ptr);
         feat_id++;
-      }
+      //}
       removePeaks(ms1_ptr_vec, matched_peaks);
     }
     peak_idx++;
@@ -505,7 +504,7 @@ void getMs2Features(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtrVec &header_ptr_vec,
           ms2_features.push_back(ms2_feature);
         }
         else {
-          LOG_WARN("Cannot find features in LC/MS! Spectrum id: " << sp_id);
+          LOG_ERROR("Cannot find features in LC/MS! Spectrum id: " << sp_id);
         }
       }
     }
