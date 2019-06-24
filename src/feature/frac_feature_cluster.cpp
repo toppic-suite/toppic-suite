@@ -32,6 +32,9 @@ bool matchFeature(FracFeaturePtr a, FracFeaturePtr b,
   if (std::abs(retent_diff) > time_tolerance) {
     return false;
   }
+  if (a->getFracId() == b->getFracId()) {
+    return false;
+  }
   return true;
 }
 
@@ -42,11 +45,16 @@ void getClusters(FracFeaturePtrVec& features,
     bool is_found = false;
     FracFeaturePtr cur_ptr = features[i];
     for (size_t j = 0; j < clusters.size(); j++) {
-      FracFeaturePtr ref_ptr = clusters[j][0];
-      if (matchFeature(cur_ptr, ref_ptr, mass_tolerance, time_tolerance)) {
+      for (size_t k = 0; k < clusters[j].size(); k++) {
+        FracFeaturePtr ref_ptr = clusters[j][k];
+        if (matchFeature(cur_ptr, ref_ptr, mass_tolerance, time_tolerance)) {
           is_found = true;
-          clusters[j].push_back(cur_ptr);
           break;
+        }
+      }
+      if (is_found) {
+        clusters[j].push_back(cur_ptr);
+        break;
       }
     }
     if (!is_found) {

@@ -71,7 +71,7 @@ int processOneFile(std::map<std::string, std::string> arguments,
     LOG_DEBUG("deconv para");
     DeconvProcess2 process(para_ptr);
     LOG_DEBUG("init process");
-    //process.process();
+    process.process();
 
     std::string argu_str = para_ptr->getArgumentStr();
     std::string sp_file_name = para_ptr->getDataFileName();
@@ -106,7 +106,6 @@ int process(std::map<std::string, std::string> arguments,
     }
   }
 
-  /*
   time_util::addTimeStamp(argument_str);
   std::string sample_name = arguments["sampleName"];
   std::cout << "Merging files started." << std::endl;
@@ -117,7 +116,6 @@ int process(std::map<std::string, std::string> arguments,
   feature_merger->process(argument_str);
   feature_merger = nullptr;
   std::cout << "Merging files ended." << std::endl;
-  */
   return 0;
 }
 
