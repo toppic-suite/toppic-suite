@@ -21,11 +21,12 @@
 #include "deconv/env/env_base.hpp"
 #include "deconv/env/match_env_util.hpp"
 #include "deconv/env/match_env_writer.hpp"
-#include "deconv/deconv/deconv_process_2.hpp"
+#include "deconv/msreader/raw_ms_writer.hpp"
+#include "deconv/deconv/deconv_process.hpp"
 
 namespace toppic {
 
-void DeconvProcess2::copyParameters(EnvParaPtr env_para_ptr) {
+void DeconvProcess::copyParameters(EnvParaPtr env_para_ptr) {
   env_para_ptr->max_charge_ = para_ptr_->max_charge_;
   env_para_ptr->max_mass_ = para_ptr_->max_mass_;
   env_para_ptr->setTolerance(para_ptr_->tolerance_);
@@ -37,7 +38,7 @@ void DeconvProcess2::copyParameters(EnvParaPtr env_para_ptr) {
   env_para_ptr->do_final_filtering_ = para_ptr_->do_final_filtering_;
 }
 
-std::string DeconvProcess2::updateMsg(MsHeaderPtr header_ptr, int scan, int total_scan_num) {
+std::string DeconvProcess::updateMsg(MsHeaderPtr header_ptr, int scan, int total_scan_num) {
   std::string percentage = str_util::toString(scan * 100 / total_scan_num);
   std::string msg = "Processing spectrum " + header_ptr->getTitle() + "...";
   while (msg.length() < 40) {
@@ -47,7 +48,7 @@ std::string DeconvProcess2::updateMsg(MsHeaderPtr header_ptr, int scan, int tota
   return msg;
 }
 
-void DeconvProcess2::process() {
+void DeconvProcess::process() {
   EnvParaPtr env_para_ptr = std::make_shared<EnvPara>();
   DpParaPtr dp_para_ptr = std::make_shared<DpPara>();
   copyParameters(env_para_ptr);
@@ -67,6 +68,14 @@ void DeconvProcess2::process() {
 
   if (file_util::exists(file_util::basename(file_name) + "_ms2.env")) {
     file_util::delFile(file_util::basename(file_name) + "_ms2.env"); 
+  }
+
+  if (para_ptr_->output_json_files_)  {
+    std::string json_dir =  file_util::basename(para_ptr_->getDataFileName()) 
+        + "_ms2_toppic_prsm_cutoff_html"  
+        + file_util::getFileSeparator() + "data_js"
+        + file_util::getFileSeparator() + "spectrum";
+    file_util::createFolder(json_dir);
   }
 
   MsAlignWriterPtr ms1_writer_ptr = std::make_shared<MsAlignWriter>(ms1_msalign_name);
@@ -92,8 +101,8 @@ void DeconvProcess2::process() {
 }
 
 
-void DeconvProcess2::processSpMissingLevelOne(DeconvOneSpPtr deconv_ptr, RawMsGroupReaderPtr reader_ptr,
-                                              MsAlignWriterPtr ms2_writer_ptr) {
+void DeconvProcess::processSpMissingLevelOne(DeconvOneSpPtr deconv_ptr, RawMsGroupReaderPtr reader_ptr,
+                                             MsAlignWriterPtr ms2_writer_ptr) {
   // reader_ptr
   int total_scan_num = reader_ptr->getInputSpNum();
   RawMsGroupPtr ms_group_ptr;
@@ -122,13 +131,24 @@ void DeconvProcess2::processSpMissingLevelOne(DeconvOneSpPtr deconv_ptr, RawMsGr
       if (para_ptr_->output_match_env_) {
         match_env_writer::write(file_util::basename(para_ptr_->getDataFileName()) + "_ms2.env", header_ptr, result_envs);
       }
+      if (para_ptr_->output_json_files_) {
+        std::string json_dir = file_util::basename(para_ptr_->getDataFileName()) 
+            + "_ms2_toppic_prsm_cutoff_html"  
+            + file_util::getFileSeparator() + "data_js"
+            + file_util::getFileSeparator() + "spectrum";
+        std::string json_file_name = json_dir + file_util::getFileSeparator() + "spectrum" 
+            + std::to_string(header_ptr->getId())
+            + ".js";
+        raw_ms_writer::write(json_file_name, ms_two_ptr_vec[i]);    
+      }
       count2++;
     }
   }
 }
 
-void DeconvProcess2::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
-                                 MatchEnvPtrVec &prec_envs, MsAlignWriterPtr ms1_writer_ptr) { 
+void DeconvProcess::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
+                                MatchEnvPtrVec &prec_envs, MsAlignWriterPtr ms1_writer_ptr) { 
+  /*
   PeakPtrVec peak_list = ms_ptr->getPeakPtrVec();
   LOG_DEBUG("peak list size " << peak_list.size());
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
@@ -149,10 +169,12 @@ void DeconvProcess2::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   if (para_ptr_->output_match_env_) {
     match_env_writer::write(file_util::basename(para_ptr_->getDataFileName()) + "_ms1.env", header_ptr, prec_envs);
   }
+  */
 }
 
-void DeconvProcess2::deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
-                                 MsAlignWriterPtr ms2_writer_ptr) { 
+void DeconvProcess::deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
+                                MsAlignWriterPtr ms2_writer_ptr) { 
+  /*
   PeakPtrVec peak_list = ms_ptr->getPeakPtrVec();
   LOG_DEBUG("peak list size " << peak_list.size());
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
@@ -171,11 +193,22 @@ void DeconvProcess2::deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   if (para_ptr_->output_match_env_) {
     match_env_writer::write(file_util::basename(para_ptr_->getDataFileName()) + "_ms2.env", header_ptr, result_envs);
   }
+  */
+  if (para_ptr_->output_json_files_) {
+    std::string json_dir = file_util::basename(para_ptr_->getDataFileName()) 
+        + "_ms2_toppic_prsm_cutoff_html"  
+        + file_util::getFileSeparator() + "data_js"
+        + file_util::getFileSeparator() + "spectrum";
+    std::string json_file_name = json_dir + file_util::getFileSeparator() + "spectrum" 
+        + std::to_string(ms_ptr->getMsHeaderPtr()->getId())
+        + ".js";
+    raw_ms_writer::write(json_file_name, ms_ptr);    
+  }
 }
 
 
-void DeconvProcess2::processSp(DeconvOneSpPtr deconv_ptr, RawMsGroupReaderPtr reader_ptr,
-                               MsAlignWriterPtr ms1_writer_ptr, MsAlignWriterPtr ms2_writer_ptr) {
+void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr, RawMsGroupReaderPtr reader_ptr,
+                              MsAlignWriterPtr ms1_writer_ptr, MsAlignWriterPtr ms2_writer_ptr) {
   // reader_ptr
   int total_scan_num = reader_ptr->getInputSpNum();
   RawMsGroupPtr ms_group_ptr;
