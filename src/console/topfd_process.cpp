@@ -24,7 +24,7 @@
 #include "feature_detect/feature_detect.hpp"
 #include "feature/feature_merge.hpp"
 #include "deconv/env/env_base.hpp"
-#include "deconv/deconv/deconv_process_2.hpp"
+#include "deconv/deconv/deconv_process.hpp"
 
 namespace toppic {
 
@@ -69,14 +69,14 @@ int processOneFile(std::map<std::string, std::string> arguments,
     DeconvParaPtr para_ptr = std::make_shared<DeconvPara>(arguments, argument_str, 
                                                           spec_file_name, frac_id);
     LOG_DEBUG("deconv para");
-    DeconvProcess2 process(para_ptr);
+    DeconvProcess process(para_ptr);
     LOG_DEBUG("init process");
     process.process();
 
     std::string argu_str = para_ptr->getArgumentStr();
     std::string sp_file_name = para_ptr->getDataFileName();
-    feature_detect::process(frac_id, sp_file_name, arguments["resourceDir"], 
-                            para_ptr->missing_level_one_, argu_str);
+    //feature_detect::process(frac_id, sp_file_name, arguments["resourceDir"], 
+    //                        para_ptr->missing_level_one_, argu_str);
 
     time_t end = time(0);
     std::cout << "Runing time: "
@@ -106,6 +106,7 @@ int process(std::map<std::string, std::string> arguments,
     }
   }
 
+  /*
   time_util::addTimeStamp(argument_str);
   std::string sample_name = arguments["sampleName"];
   std::cout << "Merging files started." << std::endl;
@@ -116,6 +117,7 @@ int process(std::map<std::string, std::string> arguments,
   feature_merger->process(argument_str);
   feature_merger = nullptr;
   std::cout << "Merging files ended." << std::endl;
+  */
   return 0;
 }
 

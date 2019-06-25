@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_DECONV_DECONV_DECONV_PROCESS_2_HPP_
-#define TOPPIC_DECONV_DECONV_DECONV_PROCESS_2_HPP_
+#ifndef TOPPIC_DECONV_DECONV_DECONV_PROCESS_HPP_
+#define TOPPIC_DECONV_DECONV_DECONV_PROCESS_HPP_
 
 #include "spec/msalign_writer.hpp"
 #include "deconv/msreader/raw_ms_group_reader.hpp"
@@ -24,9 +24,9 @@
 
 namespace toppic {
 
-class DeconvProcess2 {
+class DeconvProcess {
  public:
-  DeconvProcess2(DeconvParaPtr para_ptr) {para_ptr_ = para_ptr;}
+  DeconvProcess(DeconvParaPtr para_ptr) {para_ptr_ = para_ptr;}
 
   void process();
 

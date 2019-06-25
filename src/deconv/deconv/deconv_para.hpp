@@ -66,6 +66,8 @@ class DeconvPara {
 
   bool output_match_env_ = false;
 
+  bool output_json_files_ = true;
+
   std::string argument_str_;
 };
 
