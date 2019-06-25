@@ -17,12 +17,13 @@
 #define TOPPIC_DECONV_MSREADER_RAW_MS_WRITER_HPP_
 
 #include "spec/raw_ms.hpp"
+#include "deconv/env/match_env.hpp"
 
 namespace toppic {
 
 namespace raw_ms_writer {
 
-  void write(std::string &file_name, RawMsPtr ms_ptr);
+  void write(std::string &file_name, RawMsPtr ms_ptr, MatchEnvPtrVec &env);
 }
 
 }

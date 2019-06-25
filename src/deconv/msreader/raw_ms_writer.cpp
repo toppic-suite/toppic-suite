@@ -25,7 +25,7 @@ namespace toppic {
 
 namespace raw_ms_writer {
 
-void write(std::string &file_name, RawMsPtr ms_ptr) {
+void write(std::string &file_name, RawMsPtr ms_ptr, MatchEnvPtrVec &envs) {
 
   rapidjson::Document doc;
 
@@ -40,14 +40,33 @@ void write(std::string &file_name, RawMsPtr ms_ptr) {
 
   PeakPtrVec raw_peaks = ms_ptr->getPeakPtrVec();
   for (size_t i = 0; i < raw_peaks.size(); i++) {
-    rapidjson::Value object(rapidjson::kObjectType);
-    object.AddMember("peak_id", i, allocator);
-    object.AddMember("mz", raw_peaks[i]->getPosition(), allocator);
-    object.AddMember("intensity", raw_peaks[i]->getIntensity(), allocator);
-    peaks.PushBack(object, allocator);
+    rapidjson::Value peak(rapidjson::kObjectType);
+    peak.AddMember("peak_id", i, allocator);
+    peak.AddMember("mz", raw_peaks[i]->getPosition(), allocator);
+    peak.AddMember("intensity", raw_peaks[i]->getIntensity(), allocator);
+    peaks.PushBack(peak, allocator);
   }
 
   doc.AddMember("peaks", peaks, allocator);
+
+  rapidjson::Value envelopes(rapidjson::kArrayType);
+  for (size_t i = 0; i < envs.size(); i++) {
+    rapidjson::Value env(rapidjson::kObjectType);
+    EnvelopePtr theo_env = envs[i]->getTheoEnvPtr();
+    env.AddMember("mono_mass", theo_env->getMonoNeutralMass(), allocator);
+    env.AddMember("charge", theo_env->getCharge(), allocator);
+
+    rapidjson::Value env_peaks(rapidjson::kArrayType);
+    for (int k = 0; k < theo_env->getPeakNum(); k++) {
+      rapidjson::Value peak(rapidjson::kObjectType);
+      peak.AddMember("mz", theo_env->getMz(k), allocator);
+      peak.AddMember("intensity", theo_env->getIntensity(k), allocator);
+      env_peaks.PushBack(peak, allocator);
+    }
+    env.AddMember("env_peaks", env_peaks, allocator);
+    envelopes.PushBack(env, allocator);
+  }
+  doc.AddMember("envelopes", envelopes, allocator);
 
   // Convert JSON document to string
   rapidjson::StringBuffer buffer;

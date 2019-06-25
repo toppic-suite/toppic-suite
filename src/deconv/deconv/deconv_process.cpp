@@ -139,7 +139,7 @@ void DeconvProcess::processSpMissingLevelOne(DeconvOneSpPtr deconv_ptr, RawMsGro
         std::string json_file_name = json_dir + file_util::getFileSeparator() + "spectrum" 
             + std::to_string(header_ptr->getId())
             + ".js";
-        raw_ms_writer::write(json_file_name, ms_two_ptr_vec[i]);    
+        raw_ms_writer::write(json_file_name, ms_two_ptr_vec[i], result_envs);    
       }
       count2++;
     }
@@ -174,7 +174,6 @@ void DeconvProcess::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
 
 void DeconvProcess::deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
                                 MsAlignWriterPtr ms2_writer_ptr) { 
-  /*
   PeakPtrVec peak_list = ms_ptr->getPeakPtrVec();
   LOG_DEBUG("peak list size " << peak_list.size());
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
@@ -193,7 +192,6 @@ void DeconvProcess::deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   if (para_ptr_->output_match_env_) {
     match_env_writer::write(file_util::basename(para_ptr_->getDataFileName()) + "_ms2.env", header_ptr, result_envs);
   }
-  */
   if (para_ptr_->output_json_files_) {
     std::string json_dir = file_util::basename(para_ptr_->getDataFileName()) 
         + "_ms2_toppic_prsm_cutoff_html"  
@@ -202,7 +200,7 @@ void DeconvProcess::deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
     std::string json_file_name = json_dir + file_util::getFileSeparator() + "spectrum" 
         + std::to_string(ms_ptr->getMsHeaderPtr()->getId())
         + ".js";
-    raw_ms_writer::write(json_file_name, ms_ptr);    
+    raw_ms_writer::write(json_file_name, ms_ptr, result_envs);    
   }
 }
 
