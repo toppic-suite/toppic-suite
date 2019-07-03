@@ -115,6 +115,12 @@ void createFolder(const std::string &folder_name) {
   fs::create_directories(path);
 }
 
+void createLink(const std::string &a, const std::string &b) {
+  fs::path path_a(a);
+  fs::path path_b(b);
+  fs::create_symlink(path_a, path_b);
+}
+
 void copyFile(const std::string &file_name,
               const std::string &to_file, bool over_write) {
   fs::path from_path(file_name);

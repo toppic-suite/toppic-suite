@@ -26,6 +26,8 @@
 
 namespace toppic {
 
+std::string spec_data_suffix = "_ms2_json";
+
 void DeconvProcess::copyParameters(EnvParaPtr env_para_ptr) {
   env_para_ptr->max_charge_ = para_ptr_->max_charge_;
   env_para_ptr->max_mass_ = para_ptr_->max_mass_;
@@ -72,9 +74,7 @@ void DeconvProcess::process() {
 
   if (para_ptr_->output_json_files_)  {
     std::string json_dir =  file_util::basename(para_ptr_->getDataFileName()) 
-        + "_ms2_toppic_prsm_cutoff_html"  
-        + file_util::getFileSeparator() + "data_js"
-        + file_util::getFileSeparator() + "spectrum";
+      + spec_data_suffix;
     file_util::createFolder(json_dir);
   }
 
@@ -133,9 +133,7 @@ void DeconvProcess::processSpMissingLevelOne(DeconvOneSpPtr deconv_ptr, RawMsGro
       }
       if (para_ptr_->output_json_files_) {
         std::string json_dir = file_util::basename(para_ptr_->getDataFileName()) 
-            + "_ms2_toppic_prsm_cutoff_html"  
-            + file_util::getFileSeparator() + "data_js"
-            + file_util::getFileSeparator() + "spectrum";
+            + spec_data_suffix; 
         std::string json_file_name = json_dir + file_util::getFileSeparator() + "spectrum" 
             + std::to_string(header_ptr->getId())
             + ".js";
@@ -148,7 +146,6 @@ void DeconvProcess::processSpMissingLevelOne(DeconvOneSpPtr deconv_ptr, RawMsGro
 
 void DeconvProcess::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
                                 MatchEnvPtrVec &prec_envs, MsAlignWriterPtr ms1_writer_ptr) { 
-  /*
   PeakPtrVec peak_list = ms_ptr->getPeakPtrVec();
   LOG_DEBUG("peak list size " << peak_list.size());
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
@@ -169,7 +166,6 @@ void DeconvProcess::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   if (para_ptr_->output_match_env_) {
     match_env_writer::write(file_util::basename(para_ptr_->getDataFileName()) + "_ms1.env", header_ptr, prec_envs);
   }
-  */
 }
 
 void DeconvProcess::deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
@@ -194,9 +190,7 @@ void DeconvProcess::deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   }
   if (para_ptr_->output_json_files_) {
     std::string json_dir = file_util::basename(para_ptr_->getDataFileName()) 
-        + "_ms2_toppic_prsm_cutoff_html"  
-        + file_util::getFileSeparator() + "data_js"
-        + file_util::getFileSeparator() + "spectrum";
+        + spec_data_suffix;
     std::string json_file_name = json_dir + file_util::getFileSeparator() + "spectrum" 
         + std::to_string(ms_ptr->getMsHeaderPtr()->getId())
         + ".js";
