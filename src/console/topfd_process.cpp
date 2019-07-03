@@ -67,7 +67,7 @@ int processOneFile(std::map<std::string, std::string> arguments,
 
     base_data::init(arguments["resourceDir"]);
     DeconvParaPtr para_ptr = std::make_shared<DeconvPara>(arguments, argument_str, 
-                                                          spec_file_name, frac_id);
+        spec_file_name, frac_id);
     LOG_DEBUG("deconv para");
     DeconvProcess process(para_ptr);
     LOG_DEBUG("init process");
@@ -75,13 +75,13 @@ int processOneFile(std::map<std::string, std::string> arguments,
 
     std::string argu_str = para_ptr->getArgumentStr();
     std::string sp_file_name = para_ptr->getDataFileName();
-    //feature_detect::process(frac_id, sp_file_name, arguments["resourceDir"], 
-    //                        para_ptr->missing_level_one_, argu_str);
+    feature_detect::process(frac_id, sp_file_name, arguments["resourceDir"], 
+        para_ptr->missing_level_one_, argu_str);
 
     time_t end = time(0);
     std::cout << "Runing time: "
-        << str_util::toString(static_cast<int>(difftime(end, start)))
-        << " seconds." << std::endl;
+      << str_util::toString(static_cast<int>(difftime(end, start)))
+      << " seconds." << std::endl;
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
@@ -106,18 +106,18 @@ int process(std::map<std::string, std::string> arguments,
     }
   }
 
-  /*
-  time_util::addTimeStamp(argument_str);
-  std::string sample_name = arguments["sampleName"];
-  std::cout << "Merging files started." << std::endl;
-  MsAlignFracMergePtr msalign_merger = std::make_shared<MsAlignFracMerge>(spec_file_lst, sample_name);
-  msalign_merger->process(argument_str);
-  msalign_merger = nullptr;
-  FeatureMergePtr feature_merger = std::make_shared<FeatureMerge>(spec_file_lst, sample_name);
-  feature_merger->process(argument_str);
-  feature_merger = nullptr;
-  std::cout << "Merging files ended." << std::endl;
-  */
+  if (spec_file_lst.size() > 1) {
+    time_util::addTimeStamp(argument_str);
+    std::string sample_name = arguments["sampleName"];
+    std::cout << "Merging files started." << std::endl;
+    MsAlignFracMergePtr msalign_merger = std::make_shared<MsAlignFracMerge>(spec_file_lst, sample_name);
+    msalign_merger->process(argument_str);
+    msalign_merger = nullptr;
+    FeatureMergePtr feature_merger = std::make_shared<FeatureMerge>(spec_file_lst, sample_name);
+    feature_merger->process(argument_str);
+    feature_merger = nullptr;
+    std::cout << "Merging files ended." << std::endl;
+  }
   return 0;
 }
 

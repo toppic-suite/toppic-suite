@@ -44,8 +44,9 @@ void jsonConvert(const std::string &xml_file_name,
 void jsonTranslate(std::map<std::string, std::string> &arguments,
                    const std::string &fname_suffix) {
   std::string spectrum_file_name_ = arguments["spectrumFileName"];
-  std::string xml_dir = file_util::basename(spectrum_file_name_) + "_" + fname_suffix + "_xml";
-  std::string html_dir = file_util::basename(spectrum_file_name_) + "_" + fname_suffix + "_html";
+  std::string base_name = file_util::basename(spectrum_file_name_);
+  std::string xml_dir = base_name + "_" + fname_suffix + "_xml";
+  std::string html_dir = base_name + "_" + fname_suffix + "_html";
   std::string json_dir = html_dir + file_util::getFileSeparator() + "data_js";
   std::string resource_dir = arguments["resourceDir"];
 
@@ -57,6 +58,11 @@ void jsonTranslate(std::map<std::string, std::string> &arguments,
   file_util::createFolder(json_dir + file_util::getFileSeparator() +"proteoforms");
   file_util::createFolder(json_dir + file_util::getFileSeparator() +"prsms");
   file_util::createFolder(json_dir + file_util::getFileSeparator() +"proteins");
+  std::string spec_data_dir = ".." + file_util::getFileSeparator()
+                              + ".." + file_util::getFileSeparator()
+                              + base_name + "_json";
+
+  file_util::createLink(spec_data_dir, json_dir + file_util::getFileSeparator() +"spectrum");
 
   std::string xml_file_list = xml_dir + file_util::getFileSeparator() + "files.xml";
   std::vector<std::vector<std::string>> anno_file_list = AnnoFileList::readFromXml(xml_file_list);

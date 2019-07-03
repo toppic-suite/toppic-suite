@@ -42,6 +42,8 @@ void copyFile(const std::string &file_name, const std::string &path,
 bool copyDir(const std::string &source, 
              const std::string &destination);
 
+void createLink(const std::string &a, const std::string &b);
+
 bool exists(const std::string &path);
 
 void delDir(const std::string &path);
