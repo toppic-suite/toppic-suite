@@ -62,7 +62,9 @@ void jsonTranslate(std::map<std::string, std::string> &arguments,
                               + ".." + file_util::getFileSeparator()
                               + base_name + "_json";
 
-  file_util::createLink(spec_data_dir, json_dir + file_util::getFileSeparator() +"spectrum");
+  std::string json_spec_dir = json_dir + file_util::getFileSeparator() +"spectrum";
+  file_util::delFile(json_spec_dir);
+  file_util::createLink(spec_data_dir, json_spec_dir);
 
   std::string xml_file_list = xml_dir + file_util::getFileSeparator() + "files.xml";
   std::vector<std::vector<std::string>> anno_file_list = AnnoFileList::readFromXml(xml_file_list);
