@@ -14,29 +14,37 @@
 
 #include <string>
 
+#include "common/util/logger.hpp"
 #include "common/xml/xml_dom_parser.hpp"
 #include "common/xml/xml_dom_document.hpp"
 #include "common/xml/xml_dom_util.hpp"
+#include "common/base/activation_data.hpp"
 #include "common/base/activation_base.hpp"
 
 namespace toppic {
 
 ActivationPtrVec ActivationBase::activation_ptr_vec_;
 
-// initialize activation database using an xml file
-void ActivationBase::initBase(const std::string &file_name) {
+// initialize activation database 
+void ActivationBase::initBase() {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
-  if (parser) {
-    XmlDOMDocument doc(parser, file_name.c_str());
-    XmlDOMElement* parent = doc.getDocumentElement();
-    std::string element_name = Activation::getXmlElementName();
-    int activation_num = xml_dom_util::getChildCount(parent, element_name.c_str());
-    for (int i = 0; i < activation_num; i++) {
-      XmlDOMElement* element
-          = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
-      ActivationPtr ptr = std::make_shared<Activation>(element);
-      activation_ptr_vec_.push_back(ptr);
-    }
+  if (!parser) {
+    LOG_ERROR("Error in parsing activation data!");
+    exit(EXIT_FAILURE);
+  }
+
+  xercesc::MemBufInputSource mem_str((const XMLByte*)activation_base_data.c_str(), 
+                                     activation_base_data.length(), 
+                                     "activation_data");
+  XmlDOMDocument doc(parser, mem_str);
+  XmlDOMElement* parent = doc.getDocumentElement();
+  std::string element_name = Activation::getXmlElementName();
+  int activation_num = xml_dom_util::getChildCount(parent, element_name.c_str());
+  for (int i = 0; i < activation_num; i++) {
+    XmlDOMElement* element
+        = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
+    ActivationPtr ptr = std::make_shared<Activation>(element);
+    activation_ptr_vec_.push_back(ptr);
   }
 }
 
