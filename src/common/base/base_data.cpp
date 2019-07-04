@@ -57,10 +57,12 @@ void init(const std::string & resource_dir) {
     XmlDOMDocument doc(parser, config_file_name.c_str());
     XmlDOMElement* root = doc.getDocumentElement();
     LOG_DEBUG("root " << root);
+    /* 
     std::string acid_file_name = xml_dom_util::getChildValue(root, "acid_list_file_name", 0);
     acid_file_name = base_data_dir + separator + acid_file_name;
     LOG_DEBUG("acid file name: " << acid_file_name);
-    AminoAcidBase::initBase(acid_file_name);
+    */
+    AminoAcidBase::initBase();
     LOG_DEBUG("acid initialized ");
 
     std::string ptm_file_name = xml_dom_util::getChildValue(root, "ptm_list_file_name", 0);

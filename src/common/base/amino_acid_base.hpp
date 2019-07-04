@@ -24,7 +24,7 @@ namespace toppic {
 
 class AminoAcidBase {
  public:
-  static void initBase(const std::string &file_name);
+  static void initBase();
 
   static const AminoAcidPtrVec& getBaseAminoAcidPtrVec() {return amino_acid_ptr_vec_;}
 

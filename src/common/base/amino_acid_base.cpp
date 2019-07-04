@@ -14,10 +14,13 @@
 
 #include <string>
 
+#include "xercesc/framework/MemBufInputSource.hpp"
+
 #include "common/util/logger.hpp"
 #include "common/xml/xml_dom_document.hpp"
 #include "common/xml/xml_dom_util.hpp"
 #include "common/base/amino_acid_base.hpp"
+#include "common/base/amino_acid_data.hpp"
 
 namespace toppic {
 
@@ -31,32 +34,37 @@ std::unordered_map<std::string, AminoAcidPtr> AminoAcidBase::amino_acid_three_le
 
 std::unordered_map<std::string, AminoAcidPtr> AminoAcidBase::amino_acid_name_map_;
 
-
-// class functions
-void AminoAcidBase::initBase(const std::string &file_name) {
+void AminoAcidBase::initBase() {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
-  if (parser) {
-    XmlDOMDocument doc(parser, file_name.c_str());
-    XmlDOMElement* parent = doc.getDocumentElement();
-    std::string element_name = AminoAcid::getXmlElementName();
-    int acid_num = xml_dom_util::getChildCount(parent, element_name.c_str());
-    LOG_DEBUG("acid num " << acid_num);
-    for (int i = 0; i < acid_num; i++) {
-      XmlDOMElement* element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
-      AminoAcidPtr ptr = std::make_shared<AminoAcid>(element);
-      amino_acid_ptr_vec_.push_back(ptr);
+  if (!parser) {
+    LOG_ERROR("Error in parsing amino acid data!");
+    exit(EXIT_FAILURE);
+  }
 
-      amino_acid_one_letter_map_[ptr->getOneLetter()]     = ptr;
-      amino_acid_three_letter_map_[ptr->getThreeLetter()] = ptr;
-      amino_acid_name_map_[ptr->getName()]                = ptr;
+  xercesc::MemBufInputSource mem_str((const XMLByte*)amino_acid_base_data.c_str(), 
+                                     amino_acid_base_data.length(), 
+                                     "amino_acid_data");
+  XmlDOMDocument doc(parser,mem_str);
+  XmlDOMElement* parent = doc.getDocumentElement();
+  std::string element_name = AminoAcid::getXmlElementName();
+  int acid_num = xml_dom_util::getChildCount(parent, element_name.c_str());
+  LOG_DEBUG("acid num " << acid_num);
+  for (int i = 0; i < acid_num; i++) {
+    XmlDOMElement* element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
+    AminoAcidPtr ptr = std::make_shared<AminoAcid>(element);
+    amino_acid_ptr_vec_.push_back(ptr);
 
-      // check if it is an empty acid
-      if (ptr->getMonoMass() == 0.0) {
-        empty_amino_acid_ptr_ = ptr;
-      }
+    amino_acid_one_letter_map_[ptr->getOneLetter()]     = ptr;
+    amino_acid_three_letter_map_[ptr->getThreeLetter()] = ptr;
+    amino_acid_name_map_[ptr->getName()]                = ptr;
+
+    // check if it is an empty acid
+    if (ptr->getMonoMass() == 0.0) {
+      empty_amino_acid_ptr_ = ptr;
     }
   }
 }
+
 
 AminoAcidPtr AminoAcidBase::getAminoAcidPtrByName(const std::string &name) {
   return amino_acid_name_map_[name];
