@@ -12,26 +12,38 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#ifndef TOPPIC_COMMON_BASE_ACTIVATION_DATA_HPP_
+#define TOPPIC_COMMON_BASE_ACTIVATION_DATA_HPP_
 
-#ifndef TOPPIC_COMMON_BASE_ACTIVATION_BASE_HPP_
-#define TOPPIC_COMMON_BASE_ACTIVATION_BASE_HPP_
-
-#include "common/base/activation.hpp"
+# include <string>
 
 namespace toppic {
 
-class ActivationBase {
- public:
-  static void initBase();
+std::string activation_base_data = R"(
+<activation_list>
+<activation>
+	<name>CID</name>
+	<n_ion_type>B</n_ion_type>
+	<c_ion_type>Y</c_ion_type>
+</activation>
+<activation>
+	<name>HCD</name>
+	<n_ion_type>B</n_ion_type>
+	<c_ion_type>Y</c_ion_type>
+</activation>
+<activation>
+	<name>ETD</name>
+	<n_ion_type>C</n_ion_type>
+	<c_ion_type>Z_DOT</c_ion_type>
+</activation>
+<activation>
+	<name>UVPD</name>
+	<n_ion_type>A</n_ion_type>
+	<c_ion_type>Y</c_ion_type>
+</activation>
+</activation_list>
+)";
 
-  static ActivationPtr getActivationPtrByName(const std::string &name);
-
-  static ActivationPtr getActivationPtrFromXml(XmlDOMElement * element);
-
- private:
-  static ActivationPtrVec activation_ptr_vec_;
-};
-
-}  // namespace toppic
+} 
 
 #endif

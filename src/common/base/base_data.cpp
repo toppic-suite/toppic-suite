@@ -111,11 +111,13 @@ void init(const std::string & resource_dir) {
     NeutralLossBase::initBase(neutral_loss_file_name);
     LOG_DEBUG("neutral loss initialized ");
 
+    /* 
     std::string activation_file_name
         = xml_dom_util::getChildValue(root, "activation_list_file_name", 0);
     activation_file_name = base_data_dir + separator + activation_file_name;
     LOG_DEBUG("activation file name: " << activation_file_name);
-    ActivationBase::initBase(activation_file_name);
+    */
+    ActivationBase::initBase();
     LOG_DEBUG("activation initialized ");
 
     std::string sp_type_file_name
