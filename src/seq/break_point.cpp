@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include "common/base/ion_type.hpp"
 #include "seq/break_point.hpp"
 
