@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_SEQ_BREAK_POINT_HPP_
 #define TOPPIC_SEQ_BREAK_POINT_HPP_
 
