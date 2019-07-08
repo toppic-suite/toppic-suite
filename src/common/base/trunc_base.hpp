@@ -24,7 +24,7 @@ namespace toppic {
 
 class TruncBase {
  public:
-  static void initBase(const std::string &file_name);
+  static void initBase();
 
   static const TruncPtrVec& getBaseTruncPtrVec() {return trunc_ptr_vec_;}
 

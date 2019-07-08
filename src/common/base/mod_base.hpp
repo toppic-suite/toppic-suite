@@ -22,7 +22,7 @@ namespace toppic {
 
 class ModBase {
  public:
-  static void initBase(const std::string &file_name);
+  static void initBase();
 
   static const ModPtrVec& getBaseModPtrVec() {return mod_ptr_vec_;}
 

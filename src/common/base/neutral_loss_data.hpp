@@ -12,33 +12,30 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#ifndef TOPPIC_COMMON_BASE_NEUTRAL_LOSS_DATA_HPP_
+#define TOPPIC_COMMON_BASE_NEUTRAL_LOSS_DATA_HPP_
 
-#ifndef TOPPIC_COMMON_BASE_ION_TYPE_BASE_HPP_
-#define TOPPIC_COMMON_BASE_ION_TYPE_BASE_HPP_
-
-#include "common/base/ion_type.hpp"
+# include <string>
 
 namespace toppic {
 
-class IonTypeBase {
- public:
-  static void initBase();
+std::string neutral_loss_base_data = R"(
+<neutral_loss_list>
+<neutral_loss>
+	<name>NONE</name>
+	<mass>0</mass>
+</neutral_loss>
+<neutral_loss>
+	<name>Water</name>
+	<mass>18.0106</mass>
+</neutral_loss>
+<neutral_loss>
+	<name>Ammonia</name>
+	<mass>17.0265</mass>
+</neutral_loss>
+</neutral_loss_list>
+)";
 
-  static IonTypePtr getIonTypePtrByName(const std::string &name);
-
-  static IonTypePtr getIonTypePtr_PREC() {return ion_type_ptr_PREC_;}
-
-  static IonTypePtr getIonTypePtr_B() {return ion_type_ptr_B_;}
-
- private:
-  static IonTypePtrVec ion_type_ptr_vec_;
-  static IonTypePtr ion_type_ptr_B_;
-  static IonTypePtr ion_type_ptr_PREC_;
-
-  static std::string getName_B() {return "B";}
-  static std::string getName_PREC() {return "PREC";}
-};
-
-}  // namespace toppic
+} 
 
 #endif

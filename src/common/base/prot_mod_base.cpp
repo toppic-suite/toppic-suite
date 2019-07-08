@@ -18,6 +18,7 @@
 #include "common/xml/xml_dom_parser.hpp"
 #include "common/xml/xml_dom_document.hpp"
 #include "common/xml/xml_dom_util.hpp"
+#include "common/base/prot_mod_data.hpp"
 #include "common/base/prot_mod_base.hpp"
 
 namespace toppic {
@@ -28,33 +29,39 @@ ProtModPtr ProtModBase::prot_mod_ptr_M_ACETYLATION_;
 //  ProtModPtr ProtModBase::prot_mod_ptr_NME_;
 //  ProtModPtr ProtModBase::prot_mod_ptr_NME_ACETYLATION_;
 
-void ProtModBase::initBase(const std::string &file_name) {
+void ProtModBase::initBase() {
   toppic::XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
-  if (parser) {
-    toppic::XmlDOMDocument doc(parser, file_name.c_str());
-    XmlDOMElement* parent = doc.getDocumentElement();
-    std::string element_name = ProtMod::getXmlElementName();
-    int mod_num = xml_dom_util::getChildCount(parent, element_name.c_str());
-    for (int i = 0; i < mod_num; i++) {
-      XmlDOMElement* element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
-      ProtModPtr prot_mod_ptr = std::make_shared<ProtMod>(element);
-      //  LOG_DEBUG("ptm index " << i << " shift  " << prot_mod_ptr->getProtShift());
-      prot_mod_ptr_vec_.push_back(prot_mod_ptr);
-      if (prot_mod_ptr->getName() == getName_NONE()) {
-        prot_mod_ptr_NONE_ = prot_mod_ptr;
-      }
-      if (prot_mod_ptr->getName() == getName_M_ACETYLATION()) {
-        prot_mod_ptr_M_ACETYLATION_ = prot_mod_ptr;
-      }
-      /*
-      if (prot_mod_ptr->getName() == getName_NME()) {
-        prot_mod_ptr_NME_ = prot_mod_ptr;
-      }
-      if (prot_mod_ptr->getName() == getName_NME_ACETYLATION()) {
-        prot_mod_ptr_NME_ACETYLATION_ = prot_mod_ptr;
-      }
-      */
+  if (!parser) {
+    LOG_ERROR("Error in parsing protein modification data!");
+    exit(EXIT_FAILURE);
+  }
+
+  xercesc::MemBufInputSource mem_str((const XMLByte*)prot_mod_base_data.c_str(), 
+                                     prot_mod_base_data.length(), 
+                                     "prot_mod_data");
+  XmlDOMDocument doc(parser, mem_str);
+  XmlDOMElement* parent = doc.getDocumentElement();
+  std::string element_name = ProtMod::getXmlElementName();
+  int mod_num = xml_dom_util::getChildCount(parent, element_name.c_str());
+  for (int i = 0; i < mod_num; i++) {
+    XmlDOMElement* element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
+    ProtModPtr prot_mod_ptr = std::make_shared<ProtMod>(element);
+    //  LOG_DEBUG("ptm index " << i << " shift  " << prot_mod_ptr->getProtShift());
+    prot_mod_ptr_vec_.push_back(prot_mod_ptr);
+    if (prot_mod_ptr->getName() == getName_NONE()) {
+      prot_mod_ptr_NONE_ = prot_mod_ptr;
     }
+    if (prot_mod_ptr->getName() == getName_M_ACETYLATION()) {
+      prot_mod_ptr_M_ACETYLATION_ = prot_mod_ptr;
+    }
+    /*
+       if (prot_mod_ptr->getName() == getName_NME()) {
+       prot_mod_ptr_NME_ = prot_mod_ptr;
+       }
+       if (prot_mod_ptr->getName() == getName_NME_ACETYLATION()) {
+       prot_mod_ptr_NME_ACETYLATION_ = prot_mod_ptr;
+       }
+     */
   }
 }
 
