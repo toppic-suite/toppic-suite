@@ -12,33 +12,30 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#ifndef TOPPIC_COMMON_BASE_TRUNC_DATA_HPP_
+#define TOPPIC_COMMON_BASE_TRUNC_DATA_HPP_
 
-#ifndef TOPPIC_COMMON_BASE_ION_TYPE_BASE_HPP_
-#define TOPPIC_COMMON_BASE_ION_TYPE_BASE_HPP_
-
-#include "common/base/ion_type.hpp"
+# include <string>
 
 namespace toppic {
 
-class IonTypeBase {
- public:
-  static void initBase();
+std::string trunc_base_data = R"(
+<truncation_list>
+<truncation>
+	<name>NONE</name>
+	<trunc_len>0</trunc_len>
+	<trunc_residues></trunc_residues>
+  <allow_first_remain_residues></allow_first_remain_residues>
+</truncation>
+<truncation>
+	<name>NME</name>
+	<trunc_len>1</trunc_len>
+	<trunc_residues>M</trunc_residues>
+  <allow_first_remain_residues>ACGPSTV</allow_first_remain_residues>
+</truncation>
+</truncation_list>
+)";
 
-  static IonTypePtr getIonTypePtrByName(const std::string &name);
-
-  static IonTypePtr getIonTypePtr_PREC() {return ion_type_ptr_PREC_;}
-
-  static IonTypePtr getIonTypePtr_B() {return ion_type_ptr_B_;}
-
- private:
-  static IonTypePtrVec ion_type_ptr_vec_;
-  static IonTypePtr ion_type_ptr_B_;
-  static IonTypePtr ion_type_ptr_PREC_;
-
-  static std::string getName_B() {return "B";}
-  static std::string getName_PREC() {return "PREC";}
-};
-
-}  // namespace toppic
+} 
 
 #endif

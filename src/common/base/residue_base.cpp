@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include <string>
 
 #include "common/util/logger.hpp"
@@ -20,6 +19,7 @@
 #include "common/xml/xml_dom_util.hpp"
 #include "common/base/amino_acid_base.hpp"
 #include "common/base/ptm_base.hpp"
+#include "common/base/residue_data.hpp"
 #include "common/base/residue_base.hpp"
 
 namespace toppic {
@@ -27,24 +27,30 @@ namespace toppic {
 ResiduePtrVec ResidueBase::residue_ptr_vec_;
 ResiduePtr ResidueBase::empty_residue_ptr_;
 
-void ResidueBase::initBase(const std::string &file_name) {
+void ResidueBase::initBase() {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
-  if (parser) {
-    XmlDOMDocument doc(parser, file_name.c_str());
-    XmlDOMElement* parent = doc.getDocumentElement();
-    std::string element_name = Residue::getXmlElementName();
-    int residue_num = xml_dom_util::getChildCount(parent, element_name.c_str());
-    LOG_DEBUG("residue num " << residue_num);
-    for (int i = 0; i < residue_num; i++) {
-      XmlDOMElement* element
-          = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
-      ResiduePtr residue_ptr = std::make_shared<Residue>(element);
-      if (residue_ptr->getAminoAcidPtr() == AminoAcidBase::getEmptyAminoAcidPtr()
-          && residue_ptr->getPtmPtr() == PtmBase::getEmptyPtmPtr()) {
-        empty_residue_ptr_ = residue_ptr;
-      }
-      residue_ptr_vec_.push_back(residue_ptr);
+  if (!parser) {
+    LOG_ERROR("Error in parsing residue data!");
+    exit(EXIT_FAILURE);
+  }
+
+  xercesc::MemBufInputSource mem_str((const XMLByte*)residue_base_data.c_str(), 
+                                     residue_base_data.length(), 
+                                     "residue_data");
+  XmlDOMDocument doc(parser, mem_str);
+  XmlDOMElement* parent = doc.getDocumentElement();
+  std::string element_name = Residue::getXmlElementName();
+  int residue_num = xml_dom_util::getChildCount(parent, element_name.c_str());
+  LOG_DEBUG("residue num " << residue_num);
+  for (int i = 0; i < residue_num; i++) {
+    XmlDOMElement* element
+      = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
+    ResiduePtr residue_ptr = std::make_shared<Residue>(element);
+    if (residue_ptr->getAminoAcidPtr() == AminoAcidBase::getEmptyAminoAcidPtr()
+        && residue_ptr->getPtmPtr() == PtmBase::getEmptyPtmPtr()) {
+      empty_residue_ptr_ = residue_ptr;
     }
+    residue_ptr_vec_.push_back(residue_ptr);
   }
 }
 

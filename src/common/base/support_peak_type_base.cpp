@@ -12,12 +12,13 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include <string>
 
+#include "common/util/logger.hpp"
 #include "common/xml/xml_dom_parser.hpp"
 #include "common/xml/xml_dom_document.hpp"
 #include "common/xml/xml_dom_util.hpp"
+#include "common/base/support_peak_type_data.hpp"
 #include "common/base/support_peak_type_base.hpp"
 
 namespace toppic {
@@ -26,20 +27,25 @@ SPTypePtrVec SPTypeBase::sp_type_ptr_vec_;
 
 SPTypePtr SPTypeBase::sp_type_ptr_N_TERM_;
 
-void SPTypeBase::initBase(const std::string &file_name) {
+void SPTypeBase::initBase() {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
-  if (parser) {
-    XmlDOMDocument doc(parser, file_name.c_str());
-    XmlDOMElement* parent = doc.getDocumentElement();
-    std::string element_name = SupportPeakType::getXmlElementName();
-    int prm_peak_type_num = xml_dom_util::getChildCount(parent, element_name.c_str());
-    for (int i = 0; i < prm_peak_type_num; i++) {
-      XmlDOMElement* element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
-      SPTypePtr sp_type_ptr = std::make_shared<SupportPeakType>(element);
-      sp_type_ptr_vec_.push_back(sp_type_ptr);
-      if (sp_type_ptr->getName() == getName_N_TERM()) {
-        sp_type_ptr_N_TERM_ = sp_type_ptr;
-      }
+  if (!parser) {
+    LOG_ERROR("Error in parsing support peak type data!");
+    exit(EXIT_FAILURE);
+  }
+  xercesc::MemBufInputSource mem_str((const XMLByte*)sp_type_base_data.c_str(), 
+                                     sp_type_base_data.length(), 
+                                     "support_peak_type_data");
+  XmlDOMDocument doc(parser, mem_str);
+  XmlDOMElement* parent = doc.getDocumentElement();
+  std::string element_name = SupportPeakType::getXmlElementName();
+  int prm_peak_type_num = xml_dom_util::getChildCount(parent, element_name.c_str());
+  for (int i = 0; i < prm_peak_type_num; i++) {
+    XmlDOMElement* element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
+    SPTypePtr sp_type_ptr = std::make_shared<SupportPeakType>(element);
+    sp_type_ptr_vec_.push_back(sp_type_ptr);
+    if (sp_type_ptr->getName() == getName_N_TERM()) {
+      sp_type_ptr_N_TERM_ = sp_type_ptr;
     }
   }
 }

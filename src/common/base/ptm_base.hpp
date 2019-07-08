@@ -22,7 +22,7 @@ namespace toppic {
 
 class PtmBase {
  public:
-  static void initBase(const std::string &file_name);
+  static void initBase();
 
   static const PtmPtrVec& getBasePtmPtrVec() {return ptm_ptr_vec_;}
 

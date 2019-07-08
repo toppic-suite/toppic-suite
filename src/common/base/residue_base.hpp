@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_COMMON_BASE_RESIDUE_BASE_HPP_
 #define TOPPIC_COMMON_BASE_RESIDUE_BASE_HPP_
 
@@ -22,7 +21,7 @@ namespace toppic {
 
 class ResidueBase {
  public:
-  static void initBase(const std::string &file_name);
+  static void initBase();
 
   static const ResiduePtrVec& getBaseResiduePtrVec() {return residue_ptr_vec_;}
 

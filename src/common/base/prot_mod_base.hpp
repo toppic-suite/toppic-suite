@@ -24,7 +24,7 @@ namespace toppic {
 
 class ProtModBase {
  public:
-  static void initBase(const std::string &file_name);
+  static void initBase();
 
   static const ProtModPtrVec& getBaseProtModPtrVec() {return prot_mod_ptr_vec_;}
 

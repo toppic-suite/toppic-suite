@@ -19,8 +19,9 @@
 #include "common/xml/xml_dom_document.hpp"
 #include "common/xml/xml_dom_util.hpp"
 #include "common/base/ptm_base.hpp"
-#include "common/base/mod_base.hpp"
 #include "common/base/residue_base.hpp"
+#include "common/base/mod_data.hpp"
+#include "common/base/mod_base.hpp"
 
 namespace toppic {
 
@@ -29,35 +30,41 @@ ModPtr ModBase::none_mod_ptr_;
 ModPtr ModBase::c57_mod_ptr_;
 ModPtr ModBase::c58_mod_ptr_;
 
-void ModBase::initBase(const std::string &file_name) {
+void ModBase::initBase() {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
-  if (parser) {
-    XmlDOMDocument doc(parser, file_name.c_str());
-    XmlDOMElement* parent = doc.getDocumentElement();
-    std::string element_name = Mod::getXmlElementName();
-    int mod_num = xml_dom_util::getChildCount(parent, element_name.c_str());
-    for (int i = 0; i < mod_num; i++) {
-      XmlDOMElement* element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
-      ModPtr mod_ptr = std::make_shared<Mod>(element);
-      mod_ptr_vec_.push_back(mod_ptr);
-      // check empty ptr
-      if (mod_ptr->getOriResiduePtr() == ResidueBase::getEmptyResiduePtr()
-          && mod_ptr->getModResiduePtr() ==ResidueBase::getEmptyResiduePtr()) {
-        none_mod_ptr_ = mod_ptr;
-      }
-      if (mod_ptr->getModResiduePtr()->getAminoAcidPtr()->getOneLetter() == "C"
-          && mod_ptr->getModResiduePtr()->getPtmPtr() == PtmBase::getPtmPtr_C57()) {
-        c57_mod_ptr_ = mod_ptr;
-      }
-      if (mod_ptr->getModResiduePtr()->getAminoAcidPtr()->getOneLetter() == "C"
-          && mod_ptr->getModResiduePtr()->getPtmPtr() == PtmBase::getPtmPtr_C58()) {
-        c58_mod_ptr_ = mod_ptr;
-      }
+  if (!parser) {
+    LOG_ERROR("Error in parsing modification data!");
+    exit(EXIT_FAILURE);
+  }
+
+  xercesc::MemBufInputSource mem_str((const XMLByte*)mod_base_data.c_str(), 
+                                     mod_base_data.length(), 
+                                     "modification_data");
+  XmlDOMDocument doc(parser, mem_str);
+  XmlDOMElement* parent = doc.getDocumentElement();
+  std::string element_name = Mod::getXmlElementName();
+  int mod_num = xml_dom_util::getChildCount(parent, element_name.c_str());
+  for (int i = 0; i < mod_num; i++) {
+    XmlDOMElement* element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
+    ModPtr mod_ptr = std::make_shared<Mod>(element);
+    mod_ptr_vec_.push_back(mod_ptr);
+    // check empty ptr
+    if (mod_ptr->getOriResiduePtr() == ResidueBase::getEmptyResiduePtr()
+        && mod_ptr->getModResiduePtr() ==ResidueBase::getEmptyResiduePtr()) {
+      none_mod_ptr_ = mod_ptr;
     }
-    if (none_mod_ptr_ == nullptr || c57_mod_ptr_ == nullptr || c58_mod_ptr_ == nullptr) {
-      LOG_ERROR("Modification configuration file is incomplete!");
-      exit(EXIT_FAILURE);
+    if (mod_ptr->getModResiduePtr()->getAminoAcidPtr()->getOneLetter() == "C"
+        && mod_ptr->getModResiduePtr()->getPtmPtr() == PtmBase::getPtmPtr_C57()) {
+      c57_mod_ptr_ = mod_ptr;
     }
+    if (mod_ptr->getModResiduePtr()->getAminoAcidPtr()->getOneLetter() == "C"
+        && mod_ptr->getModResiduePtr()->getPtmPtr() == PtmBase::getPtmPtr_C58()) {
+      c58_mod_ptr_ = mod_ptr;
+    }
+  }
+  if (none_mod_ptr_ == nullptr || c57_mod_ptr_ == nullptr || c58_mod_ptr_ == nullptr) {
+    LOG_ERROR("Modification configuration file is incomplete!");
+    exit(EXIT_FAILURE);
   }
 }
 

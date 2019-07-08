@@ -12,30 +12,35 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include <string>
 
 #include "common/util/logger.hpp"
 #include "common/xml/xml_dom_document.hpp"
 #include "common/xml/xml_dom_util.hpp"
+#include "common/base/trunc_data.hpp"
 #include "common/base/trunc_base.hpp"
 
 namespace toppic {
 
 TruncPtrVec TruncBase::trunc_ptr_vec_;
 
-void TruncBase::initBase(const std::string &file_name) {
-  toppic::XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
-  if (parser) {
-    toppic::XmlDOMDocument doc(parser, file_name.c_str());
-    XmlDOMElement* parent = doc.getDocumentElement();
-    std::string element_name = Trunc::getXmlElementName();
-    int trunc_num = xml_dom_util::getChildCount(parent, element_name.c_str());
-    for (int i = 0; i < trunc_num; i++) {
-      XmlDOMElement* element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
-      TruncPtr trunc_ptr = std::make_shared<Trunc>(element);
-      trunc_ptr_vec_.push_back(trunc_ptr);
-    }
+void TruncBase::initBase() {
+  XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
+  if (!parser) {
+    LOG_ERROR("Error in parsing truncation data!");
+    exit(EXIT_FAILURE);
+  }
+  xercesc::MemBufInputSource mem_str((const XMLByte*)trunc_base_data.c_str(), 
+                                     trunc_base_data.length(), 
+                                     "truncation_data");
+  XmlDOMDocument doc(parser, mem_str);
+  XmlDOMElement* parent = doc.getDocumentElement();
+  std::string element_name = Trunc::getXmlElementName();
+  int trunc_num = xml_dom_util::getChildCount(parent, element_name.c_str());
+  for (int i = 0; i < trunc_num; i++) {
+    XmlDOMElement* element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
+    TruncPtr trunc_ptr = std::make_shared<Trunc>(element);
+    trunc_ptr_vec_.push_back(trunc_ptr);
   }
 }
 

@@ -22,7 +22,7 @@ namespace toppic {
 
 class NeutralLossBase {
  public:
-  static void initBase(const std::string &file_name);
+  static void initBase();
 
   static NeutralLossPtrVec getBaseNeutralLossPtrVec() {
     return neutral_loss_ptr_vec_;
