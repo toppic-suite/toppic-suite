@@ -99,6 +99,11 @@ file(GLOB TOPFD_PROC_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd_proces
 file(GLOB TOPFD_CONSOLE_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd_argument.cpp
                                ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd.cpp)
 
+# topfd single_main
+file(GLOB TOPFD_SINGLE_PROC_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd_single_process.cpp)
+file(GLOB TOPFD_SINGLE_CONSOLE_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd_single_argument.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd_single.cpp)
+
 # toppic_main
 file(GLOB TOPPIC_PROC_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_process.cpp
 			     ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_argument.cpp)
@@ -130,6 +135,10 @@ file(GLOB UNIT_TEST_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/*.cpp)
 add_executable(topfd 
 	${TOPFD_CONSOLE_SRCS} ${TOPFD_PROC_SRCS} ${DECONV_SRCS} ${SPEC_SRCS} 
   ${FEATURE_SRCS} ${PWIZ_SRCS} ${COMMON_SRCS} ${FEATURE_DETECT_SRCS})
+
+add_executable(topfd_single 
+	${TOPFD_SINGLE_CONSOLE_SRCS} ${TOPFD_SINGLE_PROC_SRCS} ${DECONV_SRCS} ${SPEC_SRCS} 
+	${PWIZ_SRCS} ${COMMON_SRCS}) 
 
 add_executable(topfd_gui 
 	${TOPFD_GUI_SRCS} ${TOPFD_PROC_SRCS} ${DECONV_SRCS} ${SPEC_SRCS} 
@@ -177,6 +186,11 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
         boost_system-mt boost_thread-mt
         boost_iostreams-mt boost_chrono-mt pthread z Ws2_32)
 
+    target_link_libraries(topfd_single xerces-c
+        boost_program_options-mt boost_filesystem-mt
+        boost_system-mt boost_thread-mt
+        boost_iostreams-mt boost_chrono-mt pthread z Ws2_32)
+
     target_link_libraries(toppic xalan-c xalanMsg xerces-c
         boost_filesystem-mt boost_system-mt 
         boost_program_options-mt boost_thread-mt pthread z Ws2_32)
@@ -218,6 +232,10 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
     target_link_libraries(topfd_gui Qt5Widgets Qt5Core Qt5Gui
         xerces-c boost_filesystem boost_system boost_thread boost_iostreams boost_chrono pthread z)
+
+    target_link_libraries(topfd_single xerces-c boost_program_options
+        boost_filesystem boost_system boost_thread boost_iostreams boost_chrono
+        pthread z)
 
     target_link_libraries(toppic xalan-c xerces-c boost_program_options
         boost_filesystem boost_system boost_thread pthread z)
