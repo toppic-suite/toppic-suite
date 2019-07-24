@@ -43,6 +43,9 @@ void addSpectrumPtrsToPrsms(PrsmPtrVec &prsm_ptrs, PrsmParaPtr prsm_para_ptr);
 
 void addFeatureIDToPrsms(PrsmStrPtrVec &prsm_ptrs, const std::string & feature_file_name);
 
+void removePrsmsWithoutFeature(PrsmStrPtrVec &prsm_ptrs, 
+                               PrsmStrPtrVec &filtered_prsm_ptrs);
+
 void mergePrsmFiles(const std::vector<std::string> & prsm_file_lst, int N,
                     const std::string & output_file);
 
