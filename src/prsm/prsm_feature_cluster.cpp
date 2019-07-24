@@ -112,15 +112,18 @@ void PrsmFeatureCluster::process() {
                                                                 fix_mod_ptr_vec_);
 
   prsm_util::addFeatureIDToPrsms(prsm_ptrs, feature_file_name_);
+  // remove prsms without feature
+  PrsmStrPtrVec filtered_prsm_ptrs;
+  prsm_util::removePrsmsWithoutFeature(prsm_ptrs, filtered_prsm_ptrs);
 
-  std::sort(prsm_ptrs.begin(), prsm_ptrs.end(), PrsmStr::cmpEValueInc);
-  setProtId(prsm_ptrs);
-  setProteoClusterId(prsm_ptrs);
-  std::sort(prsm_ptrs.begin(), prsm_ptrs.end(), PrsmStr::cmpSpectrumIdIncPrecursorIdInc);
+  std::sort(filtered_prsm_ptrs.begin(), filtered_prsm_ptrs.end(), PrsmStr::cmpEValueInc);
+  setProtId(filtered_prsm_ptrs);
+  setProteoClusterId(filtered_prsm_ptrs);
+  std::sort(filtered_prsm_ptrs.begin(), filtered_prsm_ptrs.end(), PrsmStr::cmpSpectrumIdIncPrecursorIdInc);
   // output
   std::string output_file_name = base_name + "." + output_file_ext_;
   PrsmXmlWriter writer(output_file_name);
-  writer.writeVector(prsm_ptrs);
+  writer.writeVector(filtered_prsm_ptrs);
   writer.close();
 }
 

@@ -172,18 +172,29 @@ void addFeatureIDToPrsms(PrsmStrPtrVec &prsm_ptrs, const std::string & feature_f
 
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     int spec_id = prsm_ptrs[i]->getSpectrumId();
-    SpecFeaturePtr feature = feature_map.find(spec_id)->second;
-    if (feature != nullptr) {
-      prsm_ptrs[i]->setPrecFeatureId(feature->getSampleFeatureId());
-      prsm_ptrs[i]->setPrecFeatureInte(feature->getSampleFeatureInte());
-      prsm_ptrs[i]->setFracFeatureScore(feature->getFracFeatureScore());
-    }
-    else {
-      LOG_ERROR("Spectrum " << spec_id << " does not have a feature!");
+    if (feature_map.find(spec_id) != feature_map.end()) { 
+      SpecFeaturePtr feature = feature_map.find(spec_id)->second;
+      if (feature != nullptr) {
+        prsm_ptrs[i]->setPrecFeatureId(feature->getSampleFeatureId());
+        prsm_ptrs[i]->setPrecFeatureInte(feature->getSampleFeatureInte());
+        prsm_ptrs[i]->setFracFeatureScore(feature->getFracFeatureScore());
+      }
+      else {
+        LOG_ERROR("Spectrum " << spec_id << " does not have a feature!");
+      }
     }
   }
-
 }
+
+void removePrsmsWithoutFeature(PrsmStrPtrVec &prsm_ptrs, 
+                               PrsmStrPtrVec &filtered_prsm_ptrs) {
+  for (size_t i = 0; i < prsm_ptrs.size(); i++) {
+    if (prsm_ptrs[i]->getPrecFeatureId() >=0) {
+      filtered_prsm_ptrs.push_back(prsm_ptrs[i]);
+    }
+  }
+}
+
 
 void mergePrsmFiles(const std::vector<std::string> & prsm_file_lst, int N, 
                     const std::string & output_file) {
