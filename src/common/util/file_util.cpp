@@ -115,12 +115,12 @@ void createFolder(const std::string &folder_name) {
   fs::create_directories(path);
 }
 
-void createLink(const std::string &a, const std::string &b) {
-  fs::path path_a(a);
-  fs::path path_b(b);
+void createLink(const std::string &a_link, const std::string &a_dir, const std::string &b) {
 #if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
-  copyDir(a, b);
+  copyDir(a_dir, b);
 #else
+  fs::path path_a(a_link);
+  fs::path path_b(b);
   fs::create_symlink(path_a, path_b);
 #endif
 }
