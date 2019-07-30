@@ -570,6 +570,9 @@ void process(int frac_id, std::string &sp_file_name, std::string &resource_dir,
 
   // remove frac_features with low scores
   FracFeaturePtrVec sele_features; 
+  // test if we can keep all features
+  sele_features = features;
+  /*
   int cnt_1 = 0;
   int cnt_2 = 0;
   for (size_t i = 0; i < features.size(); i++) {
@@ -580,6 +583,7 @@ void process(int frac_id, std::string &sp_file_name, std::string &resource_dir,
     }
   }
   LOG_DEBUG("count 1 " << cnt_1 << " count 2 " << cnt_2);
+  */
 
   //std::sort(features.begin(), features.end(), FracFeature::cmpMassInc);
   //std::string output_file_name = base_name + "_frac.feature";
