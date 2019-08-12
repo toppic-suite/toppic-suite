@@ -27,6 +27,8 @@ int countSpNum(const std::string &spectrum_file, SpParaPtr sp_para_ptr);
 
 void geneSpIndex(const std::string &spectrum_file_name, SpParaPtr sp_para_ptr);
 
+void geneSpIndex(const std::string &spectrum_file_name);
+
 int getSpNum(const std::string &spectrum_file_name);
 
 void mergeMsalignFiles(const std::vector<std::string> & spec_file_lst, int N,

@@ -22,6 +22,27 @@ namespace prot {
 
 namespace msalign_util {
 
+int countSpNum(const std::string &spectrum_file_name) {
+  std::set<std::string> skip_list;
+  MsAlignReader reader(spectrum_file_name, 1, nullptr, skip_list);
+  int cnt = 0;
+  DeconvMsPtr deconv_ms_ptr;
+  while ((deconv_ms_ptr = reader.getNextMs()) != nullptr) {
+    cnt++;
+  }
+  reader.close();
+  return cnt;
+}
+
+void geneSpIndex(const std::string &spectrum_file_name) {
+  int sp_num = countSpNum(spectrum_file_name); 
+  std::ofstream index_output;
+  std::string index_file_name = spectrum_file_name + "_index";
+  index_output.open(index_file_name.c_str(), std::ios::out);
+  index_output << sp_num << std::endl;
+  index_output.close();
+}
+
 int countSpNum(const std::string &spectrum_file_name, SpParaPtr sp_para_ptr) {
   MsAlignReader reader(spectrum_file_name, 1, nullptr, sp_para_ptr->getSkipList());
   int cnt = 0;
