@@ -446,6 +446,8 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
     int N = 1000000;
     // merge msalign files
     prot::msalign_util::mergeMsalignFiles(spec_file_lst, N, base_name + "_ms2.msalign");
+    prot::msalign_util::geneSpIndex(base_name + "_ms2.msalign");
+
     // merge feature files
     std::vector<std::string> feature_file_lst(spec_file_lst.size());
     for (size_t i = 0; i < spec_file_lst.size(); i++) {
