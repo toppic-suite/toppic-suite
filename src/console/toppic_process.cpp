@@ -114,9 +114,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     arguments["startTime"] = buf;
     Argument::outputArguments(std::cout, arguments);
 
-    std::string resource_dir = arguments["resourceDir"];
-
-    base_data::init(resource_dir);
+    base_data::init();
 
     LOG_DEBUG("Init base data completed");
 
@@ -277,7 +275,7 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
   try {
     std::string resource_dir = arguments["resourceDir"];
 
-    base_data::init(resource_dir);
+    base_data::init();
     LOG_DEBUG("Init base data completed");
 
     std::string db_file_name = arguments["databaseFileName"];
