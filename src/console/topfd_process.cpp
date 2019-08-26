@@ -65,7 +65,7 @@ int processOneFile(std::map<std::string, std::string> arguments,
   try {
     time_t start = time(0);
 
-    base_data::init(arguments["resourceDir"]);
+    base_data::init();
     DeconvParaPtr para_ptr = std::make_shared<DeconvPara>(arguments, argument_str, 
         spec_file_name, frac_id);
     LOG_DEBUG("deconv para");

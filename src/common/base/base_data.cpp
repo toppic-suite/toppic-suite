@@ -12,13 +12,7 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <string>
-
 #include "common/util/logger.hpp"
-#include "common/util/file_util.hpp"
-
-#include "common/xml/xml_dom_document.hpp"
-#include "common/xml/xml_dom_util.hpp"
 
 #include "common/base/amino_acid_base.hpp"
 #include "common/base/ptm_base.hpp"
@@ -38,7 +32,7 @@ namespace base_data {
 
 bool base_data_init_ = false;
 
-void init(const std::string & resource_dir) {
+void init() {
   // base data only need to be init once
   if (base_data_init_) { 
     return; 

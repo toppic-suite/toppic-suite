@@ -16,17 +16,11 @@
 #ifndef TOPPIC_COMMON_BASE_BASE_DATA_HPP_
 #define TOPPIC_COMMON_BASE_BASE_DATA_HPP_
 
-#include <string>
-
 namespace toppic {
 
 namespace base_data {
 
-inline std::string getBaseDataDirName() {return "base_data";}
-
-inline std::string getBaseDataConfigFileName() {return "base_data_config.xml";}
-
-void init(const std::string & resource_dir);
+void init();
 
 extern bool base_data_init_;
 
