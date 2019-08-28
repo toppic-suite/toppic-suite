@@ -25,6 +25,7 @@
 #include "feature/feature_merge.hpp"
 #include "deconv/env/env_base.hpp"
 #include "deconv/deconv/deconv_process.hpp"
+#include "deconv/deconv/deconv_json_merge.hpp"
 
 namespace toppic {
 
@@ -91,7 +92,7 @@ int processOneFile(std::map<std::string, std::string> arguments,
 }
 
 
-int moveFiles(std::string &spec_file_name) {
+void moveFiles(std::string &spec_file_name, bool combined) {
   std::string base_name = file_util::basename(spec_file_name);
   std::string file_dir =  base_name + "_file";
   file_util::createFolder(file_dir);
@@ -99,11 +100,12 @@ int moveFiles(std::string &spec_file_name) {
   file_util::moveFile(file_name, file_dir);
   file_name = base_name + "_frac.feature";
   file_util::moveFile(file_name, file_dir);
-  file_name = base_name + "_frac.mzrt.csv";
-  file_util::moveFile(file_name, file_dir);
   file_name = base_name + "_sample.feature";
   file_util::moveFile(file_name, file_dir);
-  return 0;
+  if (!combined) {
+    file_name = base_name + "_frac.mzrt.csv";
+    file_util::moveFile(file_name, file_dir);
+  }
 }
 
 int process(std::map<std::string, std::string> arguments, 
@@ -129,6 +131,9 @@ int process(std::map<std::string, std::string> arguments,
     MsAlignFracMergePtr msalign_merger = std::make_shared<MsAlignFracMerge>(spec_file_lst, sample_name);
     msalign_merger->process(argument_str);
     msalign_merger = nullptr;
+    DeconvJsonMergePtr json_merger = std::make_shared<DeconvJsonMerge>(spec_file_lst, sample_name);
+    json_merger->process();
+    json_merger = nullptr;
     FeatureMergePtr feature_merger = std::make_shared<FeatureMerge>(spec_file_lst, sample_name);
     feature_merger->process(argument_str);
     feature_merger = nullptr;
@@ -141,16 +146,15 @@ int process(std::map<std::string, std::string> arguments,
         || str_util::endsWith(spec_file_lst[k], "mzXML")
         || str_util::endsWith(spec_file_lst[k], "mzml")
         || str_util::endsWith(spec_file_lst[k], "mzxml")) {
-      int result = moveFiles(spec_file_lst[k]); 
-      if (result != 0) {
-        return 1;
-      }
+      bool combined = false;
+      moveFiles(spec_file_lst[k], combined); 
     }
   }
 
   if (spec_file_lst.size() > 1) {
-    // std::string sample_name = arguments["sampleName"];
-    // moveSampleFiles(sample_name);
+    std::string sample_name = arguments["sampleName"];
+    bool combined = true;
+    moveFiles(sample_name, combined);
   }
 
   return 0;
