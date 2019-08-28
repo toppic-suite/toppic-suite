@@ -42,6 +42,10 @@ void copyFile(const std::string &file_name, const std::string &path,
 bool copyDir(const std::string &source, 
              const std::string &destination);
 
+bool copyJsonDir(const std::string &src_name,
+                 const std::string &des_name,
+                 int id_base);
+
 void createLink(const std::string &a_link, 
 		const std::string &a_dir,
 		const std::string &b);
