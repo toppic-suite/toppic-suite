@@ -90,6 +90,22 @@ int processOneFile(std::map<std::string, std::string> arguments,
   return 0;
 }
 
+
+int moveFiles(std::string &spec_file_name) {
+  std::string base_name = file_util::basename(spec_file_name);
+  std::string file_dir =  base_name + "_file";
+  file_util::createFolder(file_dir);
+  std::string file_name = base_name + "_ms1.msalign";
+  file_util::moveFile(file_name, file_dir);
+  file_name = base_name + "_frac.feature";
+  file_util::moveFile(file_name, file_dir);
+  file_name = base_name + "_frac.mzrt.csv";
+  file_util::moveFile(file_name, file_dir);
+  file_name = base_name + "_sample.feature";
+  file_util::moveFile(file_name, file_dir);
+  return 0;
+}
+
 int process(std::map<std::string, std::string> arguments, 
             std::vector<std::string> spec_file_lst) {
   std::string argument_str = geneArgumentStr(arguments, "#");
@@ -118,6 +134,25 @@ int process(std::map<std::string, std::string> arguments,
     feature_merger = nullptr;
     std::cout << "Merging files ended." << std::endl;
   }
+
+
+  for (size_t k = 0; k < spec_file_lst.size(); k++) {
+    if (str_util::endsWith(spec_file_lst[k], "mzML")
+        || str_util::endsWith(spec_file_lst[k], "mzXML")
+        || str_util::endsWith(spec_file_lst[k], "mzml")
+        || str_util::endsWith(spec_file_lst[k], "mzxml")) {
+      int result = moveFiles(spec_file_lst[k]); 
+      if (result != 0) {
+        return 1;
+      }
+    }
+  }
+
+  if (spec_file_lst.size() > 1) {
+    // std::string sample_name = arguments["sampleName"];
+    // moveSampleFiles(sample_name);
+  }
+
   return 0;
 }
 

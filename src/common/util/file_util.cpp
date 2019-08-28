@@ -207,6 +207,13 @@ void rename(const std::string &ori_name,
 
 }
 
+void moveFile(std::string &file_name, std::string &folder_name) {
+  std::string new_file_name = folder_name + getFileSeparator() + file_name;
+  bool over_write = true;
+  copyFile(file_name, new_file_name, over_write); 
+  delFile(file_name);
+}
+
 void cleanPrefix(const std::string & ref_name, 
                  const std::string & prefix) {
   fs::path ref_path(ref_name);
