@@ -61,14 +61,6 @@ void jsonTranslate(std::map<std::string, std::string> &arguments,
   file_util::createFolder(json_dir + file_util::getFileSeparator() +"proteoforms");
   file_util::createFolder(json_dir + file_util::getFileSeparator() +"prsms");
   file_util::createFolder(json_dir + file_util::getFileSeparator() +"proteins");
-  std::string spec_data_link = ".." + file_util::getFileSeparator()
-                              + ".." + file_util::getFileSeparator()
-                              + base_name + "_json";
-  std::string spec_data_dir = base_name + "_json";
-
-  std::string json_spec_dir = json_dir + file_util::getFileSeparator() +"spectrum";
-  file_util::delFile(json_spec_dir);
-  file_util::createLink(spec_data_link, spec_data_dir, json_spec_dir);
 
   std::string xml_file_list = xml_dir + file_util::getFileSeparator() + "files.xml";
   std::vector<std::vector<std::string>> anno_file_list = AnnoFileList::readFromXml(xml_file_list);
