@@ -27,6 +27,8 @@
 
 namespace toppic {
 
+std::string html_suffix = "_html";
+
 void jsonConvert(const std::string &xml_file_name, 
                  const std::string &json_file_name) {
   std::ifstream input(xml_file_name);
@@ -46,7 +48,8 @@ void jsonTranslate(std::map<std::string, std::string> &arguments,
   std::string spectrum_file_name_ = arguments["spectrumFileName"];
   std::string base_name = file_util::basename(spectrum_file_name_);
   std::string xml_dir = base_name + "_" + fname_suffix + "_xml";
-  std::string html_dir = base_name + "_" + fname_suffix + "_html";
+  std::string base_name_short = base_name.substr(0, base_name.length() - 4);
+  std::string html_dir = base_name_short + html_suffix + file_util::getFileSeparator() + fname_suffix;
   std::string json_dir = html_dir + file_util::getFileSeparator() + "data_js";
   std::string resource_dir = arguments["resourceDir"];
 
