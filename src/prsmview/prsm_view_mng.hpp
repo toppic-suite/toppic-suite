@@ -18,6 +18,7 @@
 
 #include <string>
 
+#include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "prsm/prsm_para.hpp"
 
@@ -30,8 +31,11 @@ class PrsmViewMng {
               const std::string & fname_suffix):
       prsm_para_ptr_(prsm_para_ptr) {
         std::string spectrum_file_name = prsm_para_ptr_->getSpectrumFileName();
-        xml_path_ = file_util::basename(spectrum_file_name) + "_" + fname_suffix + "_xml";
-        html_path_ = file_util::basename(spectrum_file_name) + "_" + fname_suffix + "_html";
+        std::string base_name = file_util::basename(spectrum_file_name);
+        xml_path_ = base_name + "_" + fname_suffix + "_xml";
+        html_path_ = base_name.substr(0, base_name.length() - 4) + "_html" 
+            + file_util::getFileSeparator() + fname_suffix;
+        LOG_ERROR("html path " << html_path_);
         resource_dir_ = resource_dir;
         min_mass_ = prsm_para_ptr_->getSpParaPtr()->getMinMass();
       }
