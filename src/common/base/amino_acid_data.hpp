@@ -35,8 +35,8 @@ std::string amino_acid_base_data = R"(
 	<one_letter>A</one_letter>
 	<three_letter>Ala</three_letter>
 	<composition>C3H5ON</composition>
-	<mono_mass>71.03711</mono_mass>
-	<average_mass>71.0788</average_mass>
+	<mono_mass>71.0371137847766</mono_mass>
+	<average_mass>71.0780195989256</average_mass>
 	<frequency>0.0828</frequency>
 </amino_acid>
 <amino_acid>
@@ -44,8 +44,8 @@ std::string amino_acid_base_data = R"(
 	<one_letter>R</one_letter>
 	<three_letter>Arg</three_letter>
 	<composition>C6H12ON4</composition>
-	<mono_mass>156.10111</mono_mass>
-	<average_mass>156.1875</average_mass>
+	<mono_mass>156.101111023854</mono_mass>
+	<average_mass>156.185922202113</average_mass>
 	<frequency>0.0554</frequency>
 </amino_acid>
 <amino_acid>
