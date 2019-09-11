@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_COMMON_BASE_NEUTRAL_LOSS_HPP_
 #define TOPPIC_COMMON_BASE_NEUTRAL_LOSS_HPP_
 

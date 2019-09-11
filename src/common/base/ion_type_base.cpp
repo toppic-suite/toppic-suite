@@ -62,6 +62,7 @@ IonTypePtr IonTypeBase::getIonTypePtrByName(const std::string &name) {
       return ion_type_ptr_vec_[i];
     }
   }
+  LOG_ERROR("Ion type " << name << " cannot be found!");
   return IonTypePtr(nullptr);
 }
 

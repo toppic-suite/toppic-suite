@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_COMMON_BASE_SUPPORT_PEAK_TYPE_BASE_HPP_
 #define TOPPIC_COMMON_BASE_SUPPORT_PEAK_TYPE_BASE_HPP_
 
@@ -41,6 +40,6 @@ class SPTypeBase {
   static SPTypePtr sp_type_ptr_N_TERM_;
 };
 
-} /* namespace toppic */
+} // namespace toppic 
 
-#endif /* SUPPORT_PEAK_TYPE_BASE_HPP_ */
+#endif 

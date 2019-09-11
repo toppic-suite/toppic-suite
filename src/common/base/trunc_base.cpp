@@ -51,6 +51,7 @@ TruncPtr TruncBase::getTruncPtrByName(const std::string &name) {
       return trunc_ptr_vec_[i];
     }
   }
+  LOG_ERROR("Truncation " << name << " cannot be found!");
   return TruncPtr(nullptr);
 }
 

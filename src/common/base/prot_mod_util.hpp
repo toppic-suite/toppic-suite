@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_COMMON_BASE_PROT_MOD_UTIL_HPP_
 #define TOPPIC_COMMON_BASE_PROT_MOD_UTIL_HPP_
 
@@ -25,12 +24,8 @@ namespace prot_mod_util {
 
 bool allowMod(ProtModPtr prot_mod_ptr, const ResiduePtrVec &residues);
 
-ProtModPtrVec readProtMod(const std::string &file_name);
-
-ProtModPtr findNME_Acetylation(const ProtModPtrVec &prot_mod_ptrs, 
-                               const ResiduePtrVec &residues);
-
 }  // namespace prot_mod_util
 
 }  // namespace toppic
+
 #endif

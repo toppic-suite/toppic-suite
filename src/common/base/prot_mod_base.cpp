@@ -26,8 +26,6 @@ namespace toppic {
 ProtModPtrVec ProtModBase::prot_mod_ptr_vec_;
 ProtModPtr ProtModBase::prot_mod_ptr_NONE_;
 ProtModPtr ProtModBase::prot_mod_ptr_M_ACETYLATION_;
-//  ProtModPtr ProtModBase::prot_mod_ptr_NME_;
-//  ProtModPtr ProtModBase::prot_mod_ptr_NME_ACETYLATION_;
 
 void ProtModBase::initBase() {
   toppic::XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
@@ -46,22 +44,13 @@ void ProtModBase::initBase() {
   for (int i = 0; i < mod_num; i++) {
     XmlDOMElement* element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
     ProtModPtr prot_mod_ptr = std::make_shared<ProtMod>(element);
-    //  LOG_DEBUG("ptm index " << i << " shift  " << prot_mod_ptr->getProtShift());
     prot_mod_ptr_vec_.push_back(prot_mod_ptr);
-    if (prot_mod_ptr->getName() == getName_NONE()) {
+    if (prot_mod_ptr->getType() == getType_NONE()) {
       prot_mod_ptr_NONE_ = prot_mod_ptr;
     }
-    if (prot_mod_ptr->getName() == getName_M_ACETYLATION()) {
+    if (prot_mod_ptr->getType() == getType_M_ACETYLATION()) {
       prot_mod_ptr_M_ACETYLATION_ = prot_mod_ptr;
     }
-    /*
-       if (prot_mod_ptr->getName() == getName_NME()) {
-       prot_mod_ptr_NME_ = prot_mod_ptr;
-       }
-       if (prot_mod_ptr->getName() == getName_NME_ACETYLATION()) {
-       prot_mod_ptr_NME_ACETYLATION_ = prot_mod_ptr;
-       }
-     */
   }
 }
 
@@ -72,7 +61,7 @@ ProtModPtr ProtModBase::getProtModPtrByName(const std::string &name) {
       return prot_mod_ptr_vec_[i];
     }
   }
-  LOG_WARN("prot mod nullptr");
+  LOG_ERROR("Protein modification " << name << " cannot be found!");
   return ProtModPtr(nullptr);
 }
 

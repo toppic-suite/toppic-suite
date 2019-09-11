@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include "common/base/residue.hpp"
 #include "common/base/residue_freq.hpp"
 

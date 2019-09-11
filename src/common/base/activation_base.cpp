@@ -55,6 +55,7 @@ ActivationPtr ActivationBase::getActivationPtrByName(const std::string &name) {
       return activation_ptr_vec_[i];
     }
   }
+  LOG_ERROR("Activition type " << name << " is not found!");
   return ActivationPtr(nullptr);
 }
 
