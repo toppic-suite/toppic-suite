@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_COMMON_BASE_RESIDUE_FREQ_HPP_
 #define TOPPIC_COMMON_BASE_RESIDUE_FREQ_HPP_
 
@@ -34,4 +33,5 @@ typedef std::shared_ptr<ResidueFreq> ResFreqPtr;
 typedef std::vector<ResFreqPtr> ResFreqPtrVec;
 
 }  // namespace toppic
+
 #endif

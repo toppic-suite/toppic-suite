@@ -15,13 +15,9 @@
 #include <string>
 
 #include "common/util/logger.hpp"
-#include "common/xml/xml_dom_parser.hpp"
-#include "common/xml/xml_dom_document.hpp"
-#include "common/xml/xml_dom_util.hpp"
-#include "common/base/ptm_base.hpp"
 #include "common/base/mod_base.hpp"
-#include "common/base/trunc_util.hpp"
 #include "common/base/prot_mod_base.hpp"
+#include "common/base/trunc_util.hpp"
 #include "common/base/prot_mod_util.hpp"
 
 namespace toppic {
@@ -29,9 +25,13 @@ namespace toppic {
 namespace prot_mod_util {
 
 bool allowMod(ProtModPtr prot_mod_ptr, const ResiduePtrVec &residues) {
+  // Case 1. no protein modification
   if (prot_mod_ptr == ProtModBase::getProtModPtr_NONE()) {
     return true;
-  } else if (prot_mod_ptr == ProtModBase::getProtModPtr_M_ACETYLATION()) {
+  } 
+  
+  // Case 2. N-terminal methionine acetylation
+  if (prot_mod_ptr == ProtModBase::getProtModPtr_M_ACETYLATION()) {
     int mod_pos = prot_mod_ptr->getModPos();
     if (mod_pos >= static_cast<int>(residues.size())) {
       // LOG_DEBUG("pos false");
@@ -43,59 +43,25 @@ bool allowMod(ProtModPtr prot_mod_ptr, const ResiduePtrVec &residues) {
       return false;
     }
     return true;
-  } else {
-    // check trunc
-    if (!trunc_util::isValidTrunc(prot_mod_ptr->getTruncPtr(), residues)) {
+  } 
+
+  // Case 3. NME and NME acetylation
+  // check truncation
+  if (!trunc_util::isValidTrunc(prot_mod_ptr->getTruncPtr(), residues)) {
+    return false;
+  }
+  ModPtr mod_ptr = prot_mod_ptr->getModPtr();
+  if (mod_ptr != ModBase::getNoneModPtr()) {
+    // if NME_acetylation
+    int mod_pos = prot_mod_ptr->getModPos();
+    if (mod_pos >= static_cast<int>(residues.size())) {
       return false;
     }
-    ModPtr mod_ptr = prot_mod_ptr->getModPtr();
-    if (mod_ptr != ModBase::getNoneModPtr()) {
-      // if NME_acetylation
-      int mod_pos = prot_mod_ptr->getModPos();
-      if (mod_pos >= static_cast<int>(residues.size())) {
-        // LOG_DEBUG("pos false");
-        return false;
-      }
-      if (residues[mod_pos] != mod_ptr->getOriResiduePtr()) {
-        // LOG_DEBUG("mod false");
-        return false;
-      }
-    }
-    return true;
-  }
-}
-
-ProtModPtrVec readProtMod(const std::string &file_name) {
-  XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
-  ProtModPtrVec mod_ptr_vec;
-  if (parser) {
-    XmlDOMDocument doc(parser, file_name.c_str());
-    XmlDOMElement* parent = doc.getDocumentElement();
-    std::string element_name = ProtMod::getXmlElementName();
-    int mod_num = xml_dom_util::getChildCount(parent, element_name.c_str());
-    LOG_DEBUG("mod num " << mod_num);
-    for (int i = 0; i < mod_num; i++) {
-      XmlDOMElement* element
-          = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
-      ProtModPtr ptr = ProtModBase::getProtModPtrFromXml(element);
-      mod_ptr_vec.push_back(ptr);
+    if (residues[mod_pos] != mod_ptr->getOriResiduePtr()) {
+      return false;
     }
   }
-  return mod_ptr_vec;
-}
-
-ProtModPtr findNME_Acetylation(const ProtModPtrVec &prot_mod_ptrs,
-                               const ResiduePtrVec &residues) {
-  for (size_t i = 0; i < prot_mod_ptrs.size(); i++) {
-    PtmPtr ptm_ptr = prot_mod_ptrs[i]->getModPtr()->getModResiduePtr()->getPtmPtr();
-    // LOG_DEBUG("ptm ptr " << ptm_ptr->getAbbrName() <<
-    //          " equal " << (ptm_ptr == PtmBase::getPtmPtr_Acetylation()));
-    if (ptm_ptr == PtmBase::getPtmPtr_Acetylation() &&
-        allowMod(prot_mod_ptrs[i], residues)) {
-      return prot_mod_ptrs[i];
-    }
-  }
-  return nullptr;
+  return true;
 }
 
 } // namespace toppic_mod_util

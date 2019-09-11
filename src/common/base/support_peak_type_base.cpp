@@ -57,6 +57,7 @@ SPTypePtr SPTypeBase::getSPTypePtrByName(const std::string &name) {
       return sp_type_ptr_vec_[i];
     }
   }
+  LOG_ERROR("Support peak type " << name << " cannot be found!");
   return SPTypePtr(nullptr);
 }
 
@@ -67,6 +68,7 @@ SPTypePtr SPTypeBase::getSPTypePtrById(int id) {
       return sp_type_ptr_vec_[i];
     }
   }
+  LOG_ERROR("Support peak id " << id << " cannot be found!");
   return SPTypePtr(nullptr);
 }
 

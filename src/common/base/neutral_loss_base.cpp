@@ -58,6 +58,7 @@ NeutralLossPtr NeutralLossBase::getNeutralLossPtrByName(const std::string &name)
       return neutral_loss_ptr_vec_[i];
     }
   }
+  LOG_ERROR("Neutral loss " << name << " cannot be found!");
   return NeutralLossPtr(nullptr);
 }
 

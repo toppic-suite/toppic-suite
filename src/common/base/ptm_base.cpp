@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include <string>
 #include <algorithm>
 
@@ -67,7 +66,7 @@ void PtmBase::initBase() {
   }
   if (empty_ptm_ptr_ == nullptr || acetylation_ptr_ == nullptr
       || c57_ptr_ == nullptr || c58_ptr_ == nullptr) {
-    LOG_WARN("ptm missing!");
+    LOG_ERROR("There are some PTMs missing in initialization!");
   }
   std::sort(ptm_ptr_vec_.begin(), ptm_ptr_vec_.end(), Ptm::cmpMassInc);
 }

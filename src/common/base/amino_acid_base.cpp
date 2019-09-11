@@ -50,7 +50,8 @@ void AminoAcidBase::initBase() {
   int acid_num = xml_dom_util::getChildCount(parent, element_name.c_str());
   LOG_DEBUG("acid num " << acid_num);
   for (int i = 0; i < acid_num; i++) {
-    XmlDOMElement* element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
+    XmlDOMElement* element 
+        = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
     AminoAcidPtr ptr = std::make_shared<AminoAcid>(element);
     amino_acid_ptr_vec_.push_back(ptr);
 
@@ -67,15 +68,27 @@ void AminoAcidBase::initBase() {
 
 
 AminoAcidPtr AminoAcidBase::getAminoAcidPtrByName(const std::string &name) {
-  return amino_acid_name_map_[name];
+  AminoAcidPtr amino_acid_ptr = amino_acid_name_map_[name];
+  if (amino_acid_ptr == nullptr) {
+    LOG_ERROR("Amino acid " << name << " cannot be found!");
+  }
+  return amino_acid_ptr;
 }
 
 AminoAcidPtr AminoAcidBase::getAminoAcidPtrByOneLetter(const std::string &one_letter) {
-  return amino_acid_one_letter_map_[one_letter];
+  AminoAcidPtr amino_acid_ptr = amino_acid_one_letter_map_[one_letter];
+  if (amino_acid_ptr == nullptr) {
+    LOG_ERROR("Amino acid " << one_letter << " cannot be found!");
+  }
+  return amino_acid_ptr;
 }
 
 AminoAcidPtr AminoAcidBase::getAminoAcidPtrByThreeLetter(const std::string &three_letter) {
-  return amino_acid_three_letter_map_[three_letter];
+  AminoAcidPtr amino_acid_ptr = amino_acid_three_letter_map_[three_letter];
+  if (amino_acid_ptr == nullptr) {
+    LOG_ERROR("Amino acid " << three_letter << " cannot be found!");
+  }
+  return amino_acid_ptr;
 }
 
 bool AminoAcidBase::containsName(const std::string &name) {
