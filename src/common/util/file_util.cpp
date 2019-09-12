@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include <string>
 
 #ifndef BOOST_SYSTEM_NO_DEPRECATED
@@ -130,7 +129,7 @@ void copyFile(const std::string &file_name,
   fs::path from_path(file_name);
   fs::path to_path(to_file);
   if (!fs::exists(from_path)) {
-    LOG_ERROR("source file " << file_name << " does not exist!");
+    LOG_ERROR("The source file " << file_name << " does not exist!");
     return;
   }
 
@@ -148,17 +147,17 @@ bool copyDir(const std::string &src_name,
   fs::path destination(des_name);
   try {
     if (!fs::exists(source) || !fs::is_directory(source)) {
-      LOG_ERROR(source.string() << " does not exist!");
+      LOG_ERROR("The source folder " << source.string() << " does not exist!");
       return false;
     }
     if (fs::exists(destination)) {
-      LOG_ERROR(destination.string() 
+      LOG_ERROR("The destination folder " << destination.string() 
           << " already exists. Fail to create the destination directory.");
       return false;
     }
 
     if (!fs::create_directory(destination)) {
-      LOG_ERROR("Unable to create destination directory"
+      LOG_ERROR("Unable to create the destination folder "
                 << destination.string());
       return false;
     }
@@ -193,7 +192,7 @@ bool copyJsonDir(const std::string &src_name,
   fs::path destination(des_name);
   try {
     if (!fs::exists(source) || !fs::is_directory(source)) {
-      LOG_ERROR(source.string() << " does not exist!");
+      LOG_ERROR("The source folder " << source.string() << " does not exist!");
       return false;
     }
   }
