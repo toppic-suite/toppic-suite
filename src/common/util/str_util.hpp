@@ -20,6 +20,7 @@
 
 namespace toppic {
 
+typedef std::pair<std::string, std::string> StringPair;
 typedef std::vector<std::pair<std::string, std::string> > StringPairVec;
 
 namespace str_util {

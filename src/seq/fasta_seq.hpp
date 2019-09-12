@@ -24,12 +24,18 @@ namespace toppic {
 
 class XmlDOMDocument;
 
+class FastaSeq;
+
+typedef std::shared_ptr<FastaSeq> FastaSeqPtr;
+
 class FastaSeq {
  public:
   FastaSeq(const std::string &name_line, const std::string &ori_seq);
 
   FastaSeq(const std::string &name, const std::string &desc,
            const std::string &ori_seq);
+
+  FastaSeq(FastaSeqPtr seq_ptr, int start, int len);
 
   std::string getName() {return name_;}
 
@@ -41,17 +47,13 @@ class FastaSeq {
 
   int getAcidPtmPairLen() {return acid_ptm_pair_vec_.size();}
 
-  static std::string getXmlElementName() {return "fasta_seq";}
-
   void appendNameDescToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
+
+  static std::string getXmlElementName() {return "fasta_seq";}
 
   static std::string getNameFromXml(XmlDOMElement* element);
 
   static std::string getDescFromXml(XmlDOMElement* element);
-
-  static std::string getString(const std::pair<std::string, std::string> &str_pair);
-
-  static std::string getString(const StringPairVec &str_pair_vec);
 
  private:
   std::string name_;
@@ -63,9 +65,9 @@ class FastaSeq {
   StringPairVec acid_ptm_pair_vec_;
 
   void compAcidPtmPairVec();
-};
 
-typedef std::shared_ptr<FastaSeq> FastaSeqPtr;
+  void compRawSeq();
+};
 
 }  // namespace toppic
 

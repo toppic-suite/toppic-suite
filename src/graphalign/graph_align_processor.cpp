@@ -25,6 +25,7 @@
 
 #include "common/util/file_util.hpp"
 #include "common/base/mod_util.hpp"
+#include "seq/fasta_sub_util.hpp"
 #include "spec/msalign_util.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_reader.hpp"
@@ -89,7 +90,11 @@ std::function<void()> geneTask(FastaIndexReaderPtr reader_ptr,
           for (size_t i = 0; i < selected_prsm_ptrs.size(); i++) {
             std::string seq_name = selected_prsm_ptrs[i]->getSeqName();
             std::string seq_desc = selected_prsm_ptrs[i]->getSeqDesc();
-            std::vector<FastaSubSeqPtr> seq_ptr_vec = reader_ptr->readFastaSubSeqVec(seq_name, seq_desc);
+            //std::vector<FastaSubSeqPtr> seq_ptr_vec 
+            //= reader_ptr->readFastaSubSeqVec(seq_name, seq_desc);
+            FastaSeqPtr seq_ptr = reader_ptr->readFastaSeq(seq_name, seq_desc);
+            std::vector<FastaSubSeqPtr> seq_ptr_vec = fasta_sub_util::breakSeq(seq_ptr);
+
             for (size_t j = 0; j < seq_ptr_vec.size(); j++) {
               for (size_t k = 0; k < spec_ptr_vec.size(); k++) {
                 proteo_anno_ptr->anno(seq_ptr_vec[j]->getRawSeq(), seq_ptr_vec[j]->isNTerm());

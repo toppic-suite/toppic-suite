@@ -41,4 +41,5 @@ class DbBlock {
 };
 
 }  // namespace toppic
+
 #endif

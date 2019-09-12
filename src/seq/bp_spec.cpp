@@ -48,7 +48,7 @@ void BpSpec::initBreakPoints(const ResSeqPtr &res_seq_ptr) {
   break_point_ptr_vec_.push_back(last_ptr);
 }
 
-/* Get neutral ion masses for a specific ion type */
+// Get neutral ion masses for a specific ion type 
 std::vector<double> BpSpec::getBreakPointMasses(IonTypePtr ion_type_ptr) {
   std::vector<double> bp_mass_vec;
   if (ion_type_ptr->isNTerm()) {
@@ -117,4 +117,4 @@ std::vector<int> BpSpec::getScaledSrmMasses(double scale) {
   return result;
 }
 
-} /* namespace toppic */
+} // namespace toppic 

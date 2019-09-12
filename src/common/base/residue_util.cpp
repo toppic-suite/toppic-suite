@@ -27,7 +27,7 @@ namespace residue_util {
 
 bool isValidResidue(char c) {
   if (c < 'A' || c > 'Z') {
-    LOG_INFO("Found unknown amino acid " << c << " in protein sequences!");
+    LOG_WARN("Found unknown amino acid " << c << " in protein sequences!");
     return false;
   }
   else {
@@ -47,7 +47,7 @@ char replaceResidueLetter(char c) {
     r = 'I';
   }
   if (r != c) {
-    LOG_INFO("Found unknown amino acid " << c << " in protein sequences!");
+    LOG_WARN("Found non standard amino acid " << c << " in protein sequences!");
   }
   return r;
 }

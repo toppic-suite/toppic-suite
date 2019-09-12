@@ -26,8 +26,6 @@ FastaSeq::FastaSeq(const std::string &name_line,
   int space_pos = name_line.find(" ");
   name_ = name_line.substr(0, space_pos);
   desc_ = name_line.substr(space_pos + 1);
-  // rmChar is moved to getAcidPtmPairVec
-  // seq_ = rmChar(ori_seq);
   seq_ = ori_seq;
   compAcidPtmPairVec();
 }
@@ -41,8 +39,18 @@ FastaSeq::FastaSeq(const std::string &name,
       compAcidPtmPairVec();
     }
 
+// This function need to be tested
+FastaSeq::FastaSeq(FastaSeqPtr seq_ptr, int start, int len) {
+  name_ = seq_ptr->getName();
+  desc_ = seq_ptr->getDesc();
+  StringPairVec str_pair_vec = seq_ptr->getAcidPtmPairVec();
+  acid_ptm_pair_vec_.insert(acid_ptm_pair_vec_.begin(), 
+                            str_pair_vec.begin() + start, 
+                            str_pair_vec.begin() + start + len); 
+  compRawSeq();
+}
+
 void FastaSeq::compAcidPtmPairVec() {
-  // LOG_DEBUG("start get acid ptm pair");
   size_t pos = 0;
   int count = 0;
   while (pos < seq_.length()) {
@@ -52,7 +60,6 @@ void FastaSeq::compAcidPtmPairVec() {
       ptm_str = PtmBase::getEmptyPtmPtr()->getAbbrName();
       pos = pos + 1;
     } else {
-      // LOG_DEBUG("next letter " << seq_.at(pos+1) << " " << (seq_.at(pos+1) == '['));
       int bracket_pos = seq_.find_first_of("]", pos+1);
       ptm_str = seq_.substr(pos+2, bracket_pos - pos - 2);
       pos = bracket_pos + 1;
@@ -61,29 +68,21 @@ void FastaSeq::compAcidPtmPairVec() {
     if (residue_util::isValidResidue(c)) {
       acid_one_letter = residue_util::replaceResidueLetter(c);
       std::pair<std::string, std::string> pair(acid_one_letter, ptm_str);
-      // LOG_DEBUG("count " << count << " acid " << acid_one_letter << " ptm " << ptm_str);
       count++;
       acid_ptm_pair_vec_.push_back(pair);
     }
+    else {
+      LOG_WARN("The residue " << acid_one_letter << " is invalid!");
+    }
   }
-  // LOG_DEBUG("end get acid ptm pair " );
 }
 
-std::string FastaSeq::getString(const std::pair<std::string, std::string> &str_pair) {
-  std::string result = str_pair.first;
-  std::string ptm_str = str_pair.second;
-  if (ptm_str != PtmBase::getEmptyPtmPtr()->getAbbrName()) {
-    result = result + "[" + ptm_str + "]";
+void FastaSeq::compRawSeq() {
+  for (size_t i = 0; i < acid_ptm_pair_vec_.size(); i++) {
+    std::string amino_str = acid_ptm_pair_vec_[i].first;
+    std::string ptm_str = acid_ptm_pair_vec_[i].second;
+    seq_ = seq_ + amino_str + "[" + ptm_str + "]";
   }
-  return result;
-}
-
-std::string FastaSeq::getString(const StringPairVec &str_pair_vec) {
-  std::string result;
-  for (size_t i = 0; i < str_pair_vec.size(); i++) {
-    result = result + getString(str_pair_vec[i]);
-  }
-  return result;
 }
 
 void FastaSeq::appendNameDescToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {

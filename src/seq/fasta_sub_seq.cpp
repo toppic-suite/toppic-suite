@@ -18,20 +18,12 @@
 
 namespace toppic {
 
-FastaSubSeq::FastaSubSeq(const std::string &name_line, const std::string &sub_seq,
-                         int sub_seq_start):
-    FastaSeq(name_line, sub_seq),
-    sub_seq_start_(sub_seq_start) {
-      length_ = static_cast<int>(sub_seq.length());
-      sub_seq_end_ = sub_seq_start_ + length_ - 1;
-    }
-
-FastaSubSeq::FastaSubSeq(const std::string &name, const std::string &desc,
-                         const std::string &sub_seq, int sub_seq_start):
-    FastaSeq(name, desc, sub_seq),
-    sub_seq_start_(sub_seq_start) {
-      length_ = static_cast<int>(sub_seq.length());
-      sub_seq_end_ = sub_seq_start_ + length_ - 1;
-    }
-
+FastaSubSeq::FastaSubSeq(FastaSeqPtr seq_ptr, 
+                         int sub_seq_start, 
+                         int sub_seq_len):
+  FastaSeq(seq_ptr, sub_seq_start, sub_seq_len) {
+    sub_seq_start_ = sub_seq_start;
+    length_ = sub_seq_len; 
+    sub_seq_end_ = sub_seq_start_ + length_ - 1;
+  }
 }  // namespace toppic

@@ -33,9 +33,6 @@ class FastaIndexReader {
   FastaSeqPtr readFastaSeq(const std::string &name,
                            const std::string &desc);
 
-  std::vector<FastaSubSeqPtr> readFastaSubSeqVec(const std::string & name,
-                                                 const std::string & desc);
-
  private:
   faidx_t *fai_;
 };

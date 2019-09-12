@@ -41,7 +41,6 @@ DbBlockPtrVec DbBlock::readDbBlockIndex(const std::string &db_file_name) {
     strs = str_util::split(line, "\t");
     int block_index = std::stoi(strs[0]);
     int seq_index = std::stoi(strs[1]);
-    LOG_DEBUG("block " << block_index << " seq " << seq_index);
     DbBlockPtr ptr = std::make_shared<DbBlock>(block_index, seq_index);
     db_block_ptr_vec.push_back(ptr);
   }

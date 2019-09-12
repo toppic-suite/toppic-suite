@@ -12,34 +12,19 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_SEQ_FASTA_READER_HPP_
-#define TOPPIC_SEQ_FASTA_READER_HPP_
+#ifndef TOPPIC_SEQ_FASTA_SUB_UTIL_HPP_
+#define TOPPIC_SEQ_FASTA_SUB_UTIL_HPP_
 
-#include <fstream>
-
-#include "seq/fasta_seq.hpp"
+#include "seq/fasta_sub_seq.hpp"
 
 namespace toppic {
 
-class FastaReader {
- public:
-  FastaReader(const std::string &file_name);
+namespace fasta_sub_util {
 
-  ~FastaReader();
+std::vector<FastaSubSeqPtr> breakSeq(FastaSeqPtr seq_ptr);
 
-  // Read FASTA file and return next protein
-  // name and sequence. 
-  FastaSeqPtr getNextSeq();
+}  // namespace fasta_sub_util
 
-  void close();
-
- private:
-  std::ifstream input_;
-  std::string ori_name_;
-};
-
-typedef std::shared_ptr<FastaReader> FastaReaderPtr;
-
-}  //namepace prot
+}  // namespace toppic
 
 #endif
