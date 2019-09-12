@@ -37,7 +37,7 @@ class Proteoform {
              ProtModPtr prot_mod_ptr,
              int start_pos, int end_pos,
              ResSeqPtr res_seq_ptr,
-             const MassShiftPtrVec & mass_shift_ptr_vec);
+             const MassShiftPtrVec &mass_shift_ptr_vec);
 
   Proteoform(XmlDOMElement* element, FastaIndexReaderPtr reader_ptr,
              const ModPtrVec &fix_mod_list);
@@ -114,11 +114,11 @@ class Proteoform {
   int start_pos_;
   int end_pos_;
 
-  /* residue_seq starts from start_pos_ and ends at end_pos_, and contains
-   * fixed and variable modifications */
+  // residue_seq starts from start_pos_ and ends at end_pos_, and contains
+  // fixed and variable modifications 
   ResSeqPtr residue_seq_ptr_;
 
-  /* bp_spec is generated from residue_seq */
+  // bp_spec is generated from residue_seq 
   BpSpecPtr bp_spec_ptr_;
 
   int proteo_cluster_id_ = -1;
