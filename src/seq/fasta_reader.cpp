@@ -32,6 +32,12 @@ FastaReader::FastaReader(const std::string &file_name) {
   }
 }
 
+FastaReader::~FastaReader() {
+  if (input_.is_open()) {
+    input_.close();
+  }
+}
+
 FastaSeqPtr FastaReader::getNextSeq() {
   if (!input_.is_open()) {
     return FastaSeqPtr(nullptr);

@@ -21,12 +21,30 @@
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
 #include "common/util/file_util.hpp"
+#include "common/base/ptm_base.hpp"
 #include "seq/fasta_reader.hpp"
 #include "seq/fasta_util.hpp"
 
 namespace toppic {
 
 namespace fasta_util {
+
+std::string getString(const StringPair &str_pair) {
+  std::string result = str_pair.first;
+  std::string ptm_str = str_pair.second;
+  if (ptm_str != PtmBase::getEmptyPtmPtr()->getAbbrName()) {
+    result = result + "[" + ptm_str + "]";
+  }
+  return result;
+}
+
+std::string getString(const StringPairVec &str_pair_vec) {
+  std::string result;
+  for (size_t i = 0; i < str_pair_vec.size(); i++) {
+    result = result + getString(str_pair_vec[i]);
+  }
+  return result;
+}
 
 void generateShuffleDb(const std::string &file_name,
                        const std::string &target_decoy_file_name) {
@@ -46,7 +64,7 @@ void generateShuffleDb(const std::string &file_name,
     std::string decoy_seq;
     if (str_pair_vec.size() > 2) {
       std::shuffle(str_pair_vec.begin() + 2, str_pair_vec.end(), r);
-      decoy_seq = FastaSeq::getString(str_pair_vec);
+      decoy_seq = getString(str_pair_vec);
     } else {
       decoy_seq = seq;
     }

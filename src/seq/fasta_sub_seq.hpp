@@ -21,11 +21,7 @@ namespace toppic {
 
 class FastaSubSeq : public FastaSeq {
  public:
-  FastaSubSeq(const std::string &name_line, 
-              const std::string &sub_seq, int sub_seq_start);
-
-  FastaSubSeq(const std::string &name, const std::string &desc,
-              const std::string &sub_seq, int sub_seq_start);
+  FastaSubSeq(FastaSeqPtr seq_ptr, int sub_seq_start, int sub_seq_len);
 
   int getSubSeqStart() {return sub_seq_start_;}
 
