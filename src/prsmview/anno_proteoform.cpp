@@ -69,7 +69,7 @@ void addAnnoPtms(ProteoformPtr proteoform_ptr, MassShiftPtrVec & shift_ptrs,
   std::sort(shift_ptrs.begin(), shift_ptrs.end(), MassShift::cmpPosInc);
   int start_pos = proteoform_ptr->getStartPos();
   for (size_t i = 0; i < shift_ptrs.size(); i++) {
-    PtmPtr ptm_ptr = shift_ptrs[i]->getChangePtrVec()[0]->getModPtr()->getModResiduePtr()->getPtmPtr();
+    PtmPtr ptm_ptr = shift_ptrs[i]->getAlterationPtrVec()[0]->getModPtr()->getModResiduePtr()->getPtmPtr();
     if (PtmBase::isEmptyPtmPtr(ptm_ptr)) {
       continue;
     }
@@ -92,18 +92,18 @@ void addAnnoVarPtms(ProteoformPtr proteoform_ptr, MassShiftPtrVec & shift_ptrs,
   std::sort(shift_ptrs.begin(), shift_ptrs.end(), MassShift::cmpPosInc);
   int start_pos = proteoform_ptr->getStartPos();
   for (size_t i = 0; i < shift_ptrs.size(); i++) {
-    ChangePtrVec change_ptrs = shift_ptrs[i]->getChangePtrVec(); 
-    for (size_t j = 0; j < change_ptrs.size(); j++) {
-      PtmPtr ptm_ptr = change_ptrs[j]->getModPtr()->getModResiduePtr()->getPtmPtr();
+    AlterationPtrVec alter_ptrs = shift_ptrs[i]->getAlterationPtrVec(); 
+    for (size_t j = 0; j < alter_ptrs.size(); j++) {
+      PtmPtr ptm_ptr = alter_ptrs[j]->getModPtr()->getModResiduePtr()->getPtmPtr();
       if (PtmBase::isEmptyPtmPtr(ptm_ptr)) {
         continue;
       }
-      int left_db_bp = change_ptrs[j]->getLeftBpPos() + start_pos;
-      int right_db_bp = change_ptrs[j]->getRightBpPos() + start_pos;
+      int left_db_bp = alter_ptrs[j]->getLeftBpPos() + start_pos;
+      int right_db_bp = alter_ptrs[j]->getRightBpPos() + start_pos;
       AnnoPtmPtr existing_ptr
-          = AnnoPtm::findPtm(var_ptm_ptrs, ptm_ptr, change_ptrs[j]->getTypePtr());
+          = AnnoPtm::findPtm(var_ptm_ptrs, ptm_ptr, alter_ptrs[j]->getTypePtr());
       if (existing_ptr == nullptr) {
-        existing_ptr = std::make_shared<AnnoPtm>(ptm_ptr, change_ptrs[j]->getTypePtr());
+        existing_ptr = std::make_shared<AnnoPtm>(ptm_ptr, alter_ptrs[j]->getTypePtr());
         var_ptm_ptrs.push_back(existing_ptr);
       }
 

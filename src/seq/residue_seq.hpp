@@ -29,26 +29,20 @@ class ResidueSeq {
  public:
   explicit ResidueSeq(const ResiduePtrVec &residues);
 
-  /**
-   * Returns a sub-peptide of the original peptide.
-   **/
+  // Returns a sub-peptide of the original peptide.
   ResSeqPtr getSubResidueSeq(int bgn, int end);
 
-  /** Gets length */
   int getLen() {return residues_.size();}
 
-  /** Gets residue at position i */
   ResiduePtr getResiduePtr(int i) {return residues_[i];}
 
-  /** Gets all residues */
   const ResiduePtrVec& getResidues() {return residues_;}
 
-  /** Gets sequence molecular mass */
+  // Gets sequence molecular mass 
   double getSeqMass() {
     return residue_mass_sum_ + mass_constant::getWaterMass();
   }
 
-  /** Gets the sum of residue masses */
   double getResMassSum() {return residue_mass_sum_;}
 
   std::string toString();
@@ -57,12 +51,10 @@ class ResidueSeq {
 
   static std::string getXmlElementName() {return "residue_seq";}
 
-  //void appendXml(XmlDOMDocument* xml_doc,XmlDOMElement* parent);
-
  private:
-  /** residue list */
+  // residue list 
   ResiduePtrVec residues_;
-  /** the sum of residue mass */
+  // the sum of residue mass 
   double residue_mass_sum_;
 
   static ResSeqPtr getEmptyResidueSeq();

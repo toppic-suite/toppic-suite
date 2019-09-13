@@ -71,7 +71,7 @@ TheoPeakPtrVec geneProteoformTheoPeak(ProteoformPtr proteoform_ptr,
   BpSpecPtr bp_ptr = proteoform_ptr->getBpSpecPtr();
 
   TheoPeakPtrVec all_peaks;
-  SegmentPtrVec segments = proteoform_ptr->getSegmentPtrVec();
+  SeqSegmentPtrVec segments = proteoform_ptr->getSeqSegmentPtrVec();
   for (size_t i = 0; i < segments.size(); i++) {
     NeutralLossPtr neutral_loss_ptr
         = NeutralLossBase::getNeutralLossPtr_NONE();

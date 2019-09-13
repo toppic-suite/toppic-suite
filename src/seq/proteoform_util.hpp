@@ -50,7 +50,7 @@ std::vector<std::vector<double> > getNTermAcet2D(const ProteoformPtrVec & db_for
 ProteoformPtr geneDbProteoformPtr(FastaSubSeqPtr fasta_seq_ptr, 
                                   ModPtrVec fix_mod_list, int start_pos);
 
-}  // namespace toppiceoform_util
+}  // namespace proteoform_util
 
 }  // namespace toppic
 

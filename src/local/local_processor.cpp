@@ -268,19 +268,19 @@ ProteoformPtr LocalProcessor::processOneKnownPtm(PrsmPtr prsm) {
   LocalAnnoPtr anno = std::make_shared<LocalAnno>(bgn, end, conf, scr_vec,
                                                   raw_scr * theta_, ptm_vec[0]);
 
-  ChangePtr change = std::make_shared<Change>(anno->getLeftBpPos(),
-                                              anno->getRightBpPos() + 1,
-                                              MassShiftType::UNEXPECTED, shift_mass,
-                                              std::make_shared<Mod>(ResidueBase::getEmptyResiduePtr(),
-                                                                    ResidueBase::getEmptyResiduePtr()));
+  AlterationPtr alter = std::make_shared<Alteration>(anno->getLeftBpPos(),
+                                                     anno->getRightBpPos() + 1,
+                                                     MassShiftType::UNEXPECTED, shift_mass,
+                                                     std::make_shared<Mod>(ResidueBase::getEmptyResiduePtr(),
+                                                                           ResidueBase::getEmptyResiduePtr()));
 
-  change->setLocalAnno(anno);
+  alter->setLocalAnno(anno);
 
-  MassShiftPtr mass_shift = std::make_shared<MassShift>(change->getLeftBpPos(),
-                                                        change->getRightBpPos(),
+  MassShiftPtr mass_shift = std::make_shared<MassShift>(alter->getLeftBpPos(),
+                                                        alter->getRightBpPos(),
                                                         MassShiftType::UNEXPECTED);
 
-  mass_shift->setChangePtr(change);
+  mass_shift->setAlterationPtr(alter);
 
   MassShiftPtrVec mass_shift_vec = one_shift_proteoform->getMassShiftPtrVec();
 
@@ -737,10 +737,10 @@ ProteoformPtr LocalProcessor::processTwoKnownPtm(PrsmPtr prsm) {
 
   std::vector<double> empty_scr_vec;
   LocalAnnoPtr anno1 = std::make_shared<LocalAnno>(0, 0, 0, empty_scr_vec, raw_scr, ptm1);
-  two_shift_proteoform->getMassShiftPtrVec(MassShiftType::UNEXPECTED)[0]->getChangePtr(0)->setLocalAnno(anno1);
+  two_shift_proteoform->getMassShiftPtrVec(MassShiftType::UNEXPECTED)[0]->getAlterationPtr(0)->setLocalAnno(anno1);
 
   LocalAnnoPtr anno2 = std::make_shared<LocalAnno>(0, 0, 0, empty_scr_vec, raw_scr, ptm2);
-  two_shift_proteoform->getMassShiftPtrVec(MassShiftType::UNEXPECTED)[1]->getChangePtr(0)->setLocalAnno(anno2);
+  two_shift_proteoform->getMassShiftPtrVec(MassShiftType::UNEXPECTED)[1]->getAlterationPtr(0)->setLocalAnno(anno2);
 
   return compSplitPoint(two_shift_proteoform, prsm->getMatchPeakNum(),
                         extend_ms_ptr_vec, prsm->getAdjustedPrecMass());
@@ -970,8 +970,8 @@ ProteoformPtr LocalProcessor::compSplitPoint(ProteoformPtr proteoform, int h,
   double mass1 = shift_ptr1->getMassShift();
   double mass2 = shift_ptr2->getMassShift();
 
-  PtmPtr ptm1 = shift_ptr1->getChangePtr(0)->getLocalAnno()->getPtmPtr();
-  PtmPtr ptm2 = shift_ptr2->getChangePtr(0)->getLocalAnno()->getPtmPtr();
+  PtmPtr ptm1 = shift_ptr1->getAlterationPtr(0)->getLocalAnno()->getPtmPtr();
+  PtmPtr ptm2 = shift_ptr2->getAlterationPtr(0)->getLocalAnno()->getPtmPtr();
 
   local_util::ptmMassAdjust(mass1, mass2, ptm1, ptm2);
 
@@ -1116,7 +1116,7 @@ ProteoformPtr LocalProcessor::compSplitPoint(ProteoformPtr proteoform, int h,
     return nullptr;
   } else {
     LocalAnnoPtr anno1 = std::make_shared<LocalAnno>(bgn, end, conf, ptm_scr, 0, ptm1);
-    shift_ptr1->getChangePtr(0)->setLocalAnno(anno1);
+    shift_ptr1->getAlterationPtr(0)->setLocalAnno(anno1);
     shift_ptr1->setLeftBpPos(anno1->getLeftBpPos());
     shift_ptr1->setRightBpPos(anno1->getRightBpPos() + 1);
   }
@@ -1147,7 +1147,7 @@ ProteoformPtr LocalProcessor::compSplitPoint(ProteoformPtr proteoform, int h,
     return nullptr;
   } else {
     LocalAnnoPtr anno2 = std::make_shared<LocalAnno>(split_point + bgn + 1, split_point + end + 1, conf, ptm_scr, 0, ptm2);
-    shift_ptr2->getChangePtr(0)->setLocalAnno(anno2);
+    shift_ptr2->getAlterationPtr(0)->setLocalAnno(anno2);
     shift_ptr2->setLeftBpPos(anno2->getLeftBpPos());
     shift_ptr2->setRightBpPos(anno2->getRightBpPos() + 1);
   }

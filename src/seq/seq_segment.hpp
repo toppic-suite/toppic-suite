@@ -12,18 +12,18 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_SEQ_SEGMENT_HPP_
-#define TOPPIC_SEQ_SEGMENT_HPP_
+#ifndef TOPPIC_SEQ_SEQ_SEGMENT_HPP_
+#define TOPPIC_SEQ_SEQ_SEGMENT_HPP_
 
 #include <memory>
 #include <vector>
 
 namespace toppic {
 
-class Segment {
+class SeqSegment {
  public:
-  Segment(int left_bp_pos, int right_bp_pos, 
-          double n_shift, double c_shift);
+  SeqSegment(int left_bp_pos, int right_bp_pos, 
+             double n_shift, double c_shift);
 
   int getLeftBpPos () {return left_bp_pos_;}
 
@@ -41,8 +41,9 @@ class Segment {
   double pep_c_term_shift_;
 };
 
-typedef std::shared_ptr<Segment> SegmentPtr;
-typedef std::vector<SegmentPtr> SegmentPtrVec;
+typedef std::shared_ptr<SeqSegment> SeqSegmentPtr;
+typedef std::vector<SeqSegmentPtr> SeqSegmentPtrVec;
 
 }  // namespace toppic
+
 #endif

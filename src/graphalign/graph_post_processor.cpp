@@ -182,29 +182,29 @@ void GraphPostProcessor::process() {
             }
           }
 
-          MassShiftPtr shfit_ptr
+          MassShiftPtr shift_ptr
               = std::make_shared<toppic::MassShift>(shift_vec[k]->getLeftBpPos(),
                                                   shift_vec[k]->getRightBpPos(),
                                                   shift_vec[k]->getTypePtr());
 
           std::vector<double> mass_vec = mass_split(shift_vec[k]->getMassShift(), ptm_vec);
 
-          ChangePtr change_ptr = shift_vec[k]->getChangePtr(0);
+          AlterationPtr alter_ptr = shift_vec[k]->getAlterationPtr(0);
 
-          AminoAcidPtr acid_ptr = change_ptr->getModPtr()->getModResiduePtr()->getAminoAcidPtr();
+          AminoAcidPtr acid_ptr = alter_ptr->getModPtr()->getModResiduePtr()->getAminoAcidPtr();
 
           for (size_t i = 0; i < ptm_vec.size(); i++) {
             ResiduePtr mod_res = std::make_shared<Residue>(acid_ptr, ptm_vec[i]);
-            ModPtr mod = std::make_shared<Mod>(change_ptr->getModPtr()->getOriResiduePtr(), mod_res);
-            ChangePtr c = std::make_shared<Change>(change_ptr->getLeftBpPos(),
-                                                   change_ptr->getRightBpPos(),
-                                                   change_ptr->getTypePtr(),
+            ModPtr mod = std::make_shared<Mod>(alter_ptr->getModPtr()->getOriResiduePtr(), mod_res);
+            AlterationPtr c = std::make_shared<Alteration>(alter_ptr->getLeftBpPos(),
+                                                   alter_ptr->getRightBpPos(),
+                                                   alter_ptr->getTypePtr(),
                                                    mass_vec[i],
                                                    mod);
-            shfit_ptr->setChangePtr(c);
+            shift_ptr->setAlterationPtr(c);
           }
 
-          shift_vec[k] = shfit_ptr;
+          shift_vec[k] = shift_ptr;
         }
 
         ProtModPtr prot_mod = prsm_ptr->getProteoformPtr()->getProtModPtr();

@@ -100,7 +100,7 @@ void ProteoGraph::compDistances(int max_mod_num, int max_ptm_sum_mass) {
         if (target(*ei, *g_p) == v2) {
           MassGraph::edge_descriptor e = *ei;
           int d =(*g_p)[e].int_mass_;
-          int change = (*g_p)[e].change_type_;
+          int change = (*g_p)[e].alter_type_;
           for (int k = 0; k < var_ptm_in_gap_ + 1; k++) {
             if (k == max_mod_num &&
                 (change == MassShiftType::PROTEIN_VARIABLE->getId()

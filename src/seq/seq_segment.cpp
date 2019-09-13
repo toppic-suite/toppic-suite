@@ -12,12 +12,12 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include "seq/segment.hpp"
+#include "seq/seq_segment.hpp"
 
 namespace toppic {
 
-Segment::Segment(int left_bp_pos, int right_bp_pos, 
-                 double n_shift, double c_shift):
+SeqSegment::SeqSegment(int left_bp_pos, int right_bp_pos, 
+                       double n_shift, double c_shift):
     left_bp_pos_(left_bp_pos),
     right_bp_pos_(right_bp_pos),
     pep_n_term_shift_(n_shift),

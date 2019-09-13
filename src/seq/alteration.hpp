@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_SEQ_CHANGE_HPP_
-#define TOPPIC_SEQ_CHANGE_HPP_
+#ifndef TOPPIC_SEQ_ALTERATION_HPP_
+#define TOPPIC_SEQ_ALTERATION_HPP_
 
 #include "common/xml/xml_dom_element.hpp"
 #include "common/base/mod.hpp"
@@ -24,16 +24,16 @@ namespace toppic {
 
 class XmlDOMDocument;
 
-class Change;
-typedef std::shared_ptr<Change> ChangePtr;
+class Alteration;
+typedef std::shared_ptr<Alteration> AlterationPtr;
 
-class Change {
+class Alteration {
  public:
-  Change(int left_bp_pos, int right_bp_pos,
-         MassShiftTypePtr type_ptr,
-         double mass, ModPtr mod_ptr);
+  Alteration(int left_bp_pos, int right_bp_pos,
+             MassShiftTypePtr type_ptr,
+             double mass, ModPtr mod_ptr);
 
-  explicit Change(XmlDOMElement* change_element);
+  explicit Alteration(XmlDOMElement* change_element);
 
   int getLeftBpPos() {return left_bp_pos_;}
 
@@ -59,7 +59,7 @@ class Change {
 
   static std::string getXmlElementName() {return "change";}
 
-  static ChangePtr geneChangePtr(ChangePtr ori_change_ptr, int start_pos);
+  static AlterationPtr geneAlterationPtr(AlterationPtr ori_alter_ptr, int start_pos);
 
  protected:
   // left and right positions are based on break point positions
@@ -76,7 +76,7 @@ class Change {
   LocalAnnoPtr local_anno_ptr_;
 };
 
-typedef std::vector<ChangePtr> ChangePtrVec;
+typedef std::vector<AlterationPtr> AlterationPtrVec;
 
 }  // namespace toppic
 

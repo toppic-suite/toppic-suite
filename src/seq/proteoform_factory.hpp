@@ -25,7 +25,7 @@ namespace proteoform_factory {
 
 ProteoformPtr geneDbProteoformPtr(FastaSeqPtr seq_ptr, ModPtrVec fix_mod_list);
 
-/* generate a proteoform with protein mod */
+// Generate a proteoform with protein N-terminal modification 
 ProteoformPtr geneProtModProteoform(ProteoformPtr db_form_ptr,
                                     ProtModPtr prot_mod_ptr);
 
@@ -34,10 +34,9 @@ ProteoformPtrVec geneProtModProteoform(ProteoformPtr db_form_ptr,
 
 ProteoformPtrVec2D gene2DProtModProteoform(const ProteoformPtrVec &db_form_ptrs,
                                            const ProtModPtrVec &prot_mod_ptrs);
-/*
- * get subproteoform. local_start and local_end are relatively to
- * the start position in the original proteoform
- */
+
+// Get subproteoform. local_start and local_end are relatively to
+// the start position in the original proteoform
 ProteoformPtr geneSubProteoform(ProteoformPtr proteoform_ptr,
                                 int local_start, int local_end);
 
@@ -45,7 +44,7 @@ ProteoformPtr geneProteoform(ProteoformPtr proteoform, int start_pos, int end_po
                              const MassShiftPtrVec & mass_shift_vec,
                              const ModPtrVec & mod_ptr_vec);
 
-/* generate a proteoform vector with protein mod */
+// generate a proteoform vector with protein mod 
 ProteoformPtrVec geneProtModProteoform(const ProteoformPtrVec &ori_forms,
                                        const ProtModPtrVec &prot_mods);
 
@@ -57,8 +56,8 @@ ProteoformPtr readFastaToProteoformPtr(FastaIndexReaderPtr reader_ptr,
                                        const std::string &seq_desc,
                                        const ModPtrVec &fix_mod_list);
 
-}  // namespace toppiceoform_factory 
+}  // namespace proteoform_factory 
 
 }  // namespace toppic
 
-#endif /* PROTEOFORM_HPP_ */
+#endif
