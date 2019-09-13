@@ -20,15 +20,20 @@
 
 namespace toppic {
 
-const MassShiftTypePtr MassShiftType::INPUT            = std::make_shared<MassShiftType>(1, "Input");
+const MassShiftTypePtr MassShiftType::INPUT 
+    = std::make_shared<MassShiftType>(1, "Input");
 
-const MassShiftTypePtr MassShiftType::FIXED            = std::make_shared<MassShiftType>(2, "Fixed");
+const MassShiftTypePtr MassShiftType::FIXED 
+    = std::make_shared<MassShiftType>(2, "Fixed");
 
-const MassShiftTypePtr MassShiftType::PROTEIN_VARIABLE = std::make_shared<MassShiftType>(3, "Protein variable");
+const MassShiftTypePtr MassShiftType::PROTEIN_VARIABLE 
+    = std::make_shared<MassShiftType>(3, "Protein variable");
 
-const MassShiftTypePtr MassShiftType::VARIABLE         = std::make_shared<MassShiftType>(4, "Variable");
+const MassShiftTypePtr MassShiftType::VARIABLE 
+    = std::make_shared<MassShiftType>(4, "Variable");
 
-const MassShiftTypePtr MassShiftType::UNEXPECTED       = std::make_shared<MassShiftType>(5, "Unexpected");
+const MassShiftTypePtr MassShiftType::UNEXPECTED
+    = std::make_shared<MassShiftType>(5, "Unexpected");
 
 void MassShiftType::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
   std::string element_name = MassShiftType::getXmlElementName();
@@ -37,7 +42,7 @@ void MassShiftType::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
   parent->appendChild(element);
 }
 
-MassShiftTypePtr MassShiftType::getChangeTypePtrFromXml(XmlDOMElement * element) {
+MassShiftTypePtr MassShiftType::getTypePtrFromXml(XmlDOMElement * element) {
   std::string name = xml_dom_util::getChildValue(element, "name", 0);
   if (name == MassShiftType::INPUT->getName()) {
     return MassShiftType::INPUT;

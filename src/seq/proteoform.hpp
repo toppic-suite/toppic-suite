@@ -22,7 +22,7 @@
 #include "seq/fasta_index_reader.hpp"
 #include "seq/bp_spec.hpp"
 #include "seq/mass_shift.hpp"
-#include "seq/segment.hpp"
+#include "seq/seq_segment.hpp"
 #include "seq/proteoform_type.hpp"
 
 namespace toppic {
@@ -62,11 +62,11 @@ class Proteoform {
 
   int getMassShiftNum() {return static_cast<int>(mass_shift_list_.size());}
 
-  int getMassShiftNum(MassShiftTypePtr ct_ptr);
+  int getMassShiftNum(MassShiftTypePtr type_ptr);
 
   MassShiftPtrVec getMassShiftPtrVec() {return mass_shift_list_;}
 
-  MassShiftPtrVec getMassShiftPtrVec(MassShiftTypePtr ct_ptr);
+  MassShiftPtrVec getMassShiftPtrVec(MassShiftTypePtr type_ptr);
 
   int getProteoClusterId() {return proteo_cluster_id_;}
 
@@ -82,11 +82,9 @@ class Proteoform {
 
   void addMassShiftPtrVec(const MassShiftPtrVec & shift_ptr_vec);
 
-  SegmentPtrVec getSegmentPtrVec();
+  SeqSegmentPtrVec getSeqSegmentPtrVec();
 
   std::string getProteinMatchSeq();
-
-  std::string toString();
 
   void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
@@ -97,12 +95,10 @@ class Proteoform {
   void setVariablePtmNum(int n) {variable_ptm_num_ = n;}
 
   int getVariablePtmNum() {return variable_ptm_num_;}
+  
+  PtmPtrVec getPtmVec(MassShiftTypePtr type);
 
   std::string getMIScore();
-
-  PtmPtrVec getPtmVec();
-
-  PtmPtrVec getPtmVec(MassShiftTypePtr type);
 
  private:
   FastaSeqPtr fasta_seq_ptr_;
@@ -129,8 +125,6 @@ class Proteoform {
 
   // Number of variable ptms is used for the test of the mass graph approach
   int variable_ptm_num_ = 0;
-
-  std::string mi_score_ = "";
 };
 
 typedef std::vector<ProteoformPtr> ProteoformPtrVec;

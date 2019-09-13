@@ -233,7 +233,7 @@ MassShiftPtrVec copyMassShiftVec(const MassShiftPtrVec & mass_shift_vec) {
                                       mass_shift_vec[k]->getRightBpPos(),
                                       mass_shift_vec[k]->getTypePtr());
 
-    mass_shift->setChangePtr(mass_shift_vec[k]->getChangePtr(0));
+    mass_shift->setAlterationPtr(mass_shift_vec[k]->getAlterationPtr(0));
 
     new_mass_shift_vec.push_back(mass_shift);
   }
@@ -249,15 +249,16 @@ double compMassShift(const MassShiftPtrVec & mass_shift_vec) {
 }
 
 MassShiftPtr geneMassShift(MassShiftPtr shift, double mass, MassShiftTypePtr type) {
-  ChangePtr change = std::make_shared<Change>(shift->getLeftBpPos(),
-                                              shift->getRightBpPos(),
-                                              type, mass,
-                                              std::make_shared<Mod>(ResidueBase::getEmptyResiduePtr(),
-                                                                    ResidueBase::getEmptyResiduePtr()));
+  ModPtr mod_ptr = std::make_shared<Mod>(ResidueBase::getEmptyResiduePtr(),
+                                         ResidueBase::getEmptyResiduePtr());
+  AlterationPtr alter = std::make_shared<Alteration>(shift->getLeftBpPos(),
+                                                     shift->getRightBpPos(),
+                                                     type, mass,
+                                                     mod_ptr);
   MassShiftPtr mass_shift = std::make_shared<MassShift>(shift->getLeftBpPos(),
                                                         shift->getRightBpPos(),
                                                         type);
-  mass_shift->setChangePtr(change);
+  mass_shift->setAlterationPtr(alter);
   return mass_shift;
 }
 

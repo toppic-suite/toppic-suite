@@ -28,39 +28,40 @@ MassShift::MassShift(int left_bp_pos, int right_bp_pos, MassShiftTypePtr type_pt
 
 MassShift::MassShift(XmlDOMElement* element) {
   left_bp_pos_ = xml_dom_util::getIntChildValue(element, "shift_left_bp_pos", 0);
-
   right_bp_pos_ = xml_dom_util::getIntChildValue(element, "shift_right_bp_pos", 0);
 
-  std::string ct_element_name = MassShiftType::getXmlElementName();
-  XmlDOMElement* ct_element
-      = xml_dom_util::getChildElement(element, ct_element_name.c_str(), 0);
-  type_ptr_ = MassShiftType::getChangeTypePtrFromXml(ct_element);
+  std::string type_element_name = MassShiftType::getXmlElementName();
+  XmlDOMElement* type_element
+      = xml_dom_util::getChildElement(element, type_element_name.c_str(), 0);
+  type_ptr_ = MassShiftType::getTypePtrFromXml(type_element);
 
   shift_ = xml_dom_util::getDoubleChildValue(element, "shift", 0);
 
-  XmlDOMElement* change_list_element = xml_dom_util::getChildElement(element, "change_list", 0);
+  std::string alter_element_name = Alteration::getXmlElementName();
+  std::string alter_element_list = alter_element_name + "_list";
+  XmlDOMElement* alter_list_element 
+      = xml_dom_util::getChildElement(element, alter_element_list.c_str(), 0);
 
-  std::string change_element_name = Change::getXmlElementName();
-  int change_len = xml_dom_util::getChildCount(change_list_element, change_element_name.c_str());
-
-  for (int i = 0; i < change_len; i++) {
-    XmlDOMElement* change_element
-        = xml_dom_util::getChildElement(change_list_element, change_element_name.c_str(), i);
-    change_vec_.push_back(std::make_shared<Change>(change_element));
+  int alter_len = xml_dom_util::getChildCount(alter_list_element, 
+                                              alter_element_name.c_str());
+  for (int i = 0; i < alter_len; i++) {
+    XmlDOMElement* alter_element
+        = xml_dom_util::getChildElement(alter_list_element, alter_element_name.c_str(), i);
+    alter_vec_.push_back(std::make_shared<Alteration>(alter_element));
   }
 }
 
-void MassShift::setChangePtr(ChangePtr change) {
-  shift_ += change->getMass();
-  change_vec_.push_back(change);
-  left_bp_pos_ = change_vec_[0]->getLeftBpPos();
-  right_bp_pos_ = change_vec_[0]->getRightBpPos();
-  for (size_t k = 0; k < change_vec_.size(); k++) {
-    if (change_vec_[k]->getLeftBpPos() < left_bp_pos_) {
-      left_bp_pos_ = change_vec_[k]->getLeftBpPos();
+void MassShift::setAlterationPtr(AlterationPtr alter) {
+  shift_ += alter->getMass();
+  alter_vec_.push_back(alter);
+  left_bp_pos_ = alter_vec_[0]->getLeftBpPos();
+  right_bp_pos_ = alter_vec_[0]->getRightBpPos();
+  for (size_t k = 0; k < alter_vec_.size(); k++) {
+    if (alter_vec_[k]->getLeftBpPos() < left_bp_pos_) {
+      left_bp_pos_ = alter_vec_[k]->getLeftBpPos();
     }
-    if (change_vec_[k]->getRightBpPos() > right_bp_pos_) {
-      right_bp_pos_ = change_vec_[k]->getRightBpPos();
+    if (alter_vec_[k]->getRightBpPos() > right_bp_pos_) {
+      right_bp_pos_ = alter_vec_[k]->getRightBpPos();
     }
   }
 }
@@ -69,14 +70,14 @@ std::string MassShift::getAnnoStr() {
   std::string seq_str;
 
   if (getTypePtr() == MassShiftType::UNEXPECTED) {
-    if (change_vec_[0]->getLocalAnno() != nullptr) {
-      seq_str = change_vec_[0]->getLocalAnno()->getPtmPtr()->getAbbrName();
+    if (alter_vec_[0]->getLocalAnno() != nullptr) {
+      seq_str = alter_vec_[0]->getLocalAnno()->getPtmPtr()->getAbbrName();
     } else {
       seq_str = str_util::toString(shift_, 4);
     }
   } else {
-    for (size_t i = 0; i < change_vec_.size(); i++) {
-      seq_str += change_vec_[i]->getModPtr()->getModResiduePtr()->getPtmPtr()->getAbbrName();
+    for (size_t i = 0; i < alter_vec_.size(); i++) {
+      seq_str += alter_vec_[i]->getModPtr()->getModResiduePtr()->getPtmPtr()->getAbbrName();
       seq_str += ";";
     }
     seq_str.pop_back();
@@ -96,10 +97,10 @@ void MassShift::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
   str = str_util::toString(shift_);
   xml_doc->addElement(element, "shift", str.c_str());
 
-  element_name = Change::getXmlElementName() + "_list";
+  element_name = Alteration::getXmlElementName() + "_list";
   XmlDOMElement* cl = xml_doc->createElement(element_name.c_str());
-  for (size_t i = 0; i < change_vec_.size(); i++) {
-    change_vec_[i]->appendXml(xml_doc, cl);
+  for (size_t i = 0; i < alter_vec_.size(); i++) {
+    alter_vec_[i]->appendXml(xml_doc, cl);
   }
   element->appendChild(cl);
   parent->appendChild(element);

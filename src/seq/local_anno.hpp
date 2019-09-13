@@ -53,7 +53,7 @@ class LocalAnno {
   void appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
  private:
-  // left and right position filtered by thredshould
+  // left and right position filtered by threshold
   int left_pos_, right_pos_;
   // confidence score
   double conf_;

@@ -15,7 +15,7 @@
 #ifndef TOPPIC_SEQ_MASS_SHIFT_HPP_
 #define TOPPIC_SEQ_MASS_SHIFT_HPP_
 
-#include "seq/change.hpp"
+#include "seq/alteration.hpp"
 
 namespace toppic {
 
@@ -37,11 +37,11 @@ class MassShift {
 
   void setRightBpPos(int p) {right_bp_pos_ = p;}
 
-  std::vector<ChangePtr> getChangePtrVec() {return change_vec_;}
+  std::vector<AlterationPtr> getAlterationPtrVec() {return alter_vec_;}
 
-  ChangePtr getChangePtr(size_t idx) {return change_vec_[idx];}
+  AlterationPtr getAlterationPtr(size_t idx) {return alter_vec_[idx];}
 
-  void setChangePtr(ChangePtr change);
+  void setAlterationPtr(AlterationPtr alter_ptr);
 
   MassShiftTypePtr getTypePtr() {return type_ptr_;}
 
@@ -64,7 +64,7 @@ class MassShift {
 
   double shift_;
 
-  std::vector<ChangePtr> change_vec_;
+  std::vector<AlterationPtr> alter_vec_;
 };
 
 typedef std::vector<MassShiftPtr> MassShiftPtrVec;

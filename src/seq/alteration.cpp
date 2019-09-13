@@ -17,25 +17,25 @@
 #include "common/util/str_util.hpp"
 #include "common/xml/xml_dom_util.hpp"
 #include "common/base/mod_base.hpp"
-#include "seq/change.hpp"
+#include "seq/alteration.hpp"
 
 namespace toppic {
 
-Change::Change(int left_bp_pos, int right_bp_pos,
-               MassShiftTypePtr type_ptr,
-               double mass, ModPtr mod_ptr):
+Alteration::Alteration(int left_bp_pos, int right_bp_pos,
+                       MassShiftTypePtr type_ptr,
+                       double mass, ModPtr mod_ptr):
     left_bp_pos_(left_bp_pos),
     right_bp_pos_(right_bp_pos),
     type_ptr_(type_ptr),
     mass_(mass), mod_ptr_(mod_ptr) {}
 
-Change::Change(XmlDOMElement* element) {
+Alteration::Alteration(XmlDOMElement* element) {
   left_bp_pos_ = xml_dom_util::getIntChildValue(element, "left_bp_pos", 0);
   right_bp_pos_ = xml_dom_util::getIntChildValue(element, "right_bp_pos", 0);
-  std::string ct_element_name = MassShiftType::getXmlElementName();
-  XmlDOMElement* ct_element
-      = xml_dom_util::getChildElement(element, ct_element_name.c_str(), 0);
-  type_ptr_ = MassShiftType::getChangeTypePtrFromXml(ct_element);
+  std::string type_element_name = MassShiftType::getXmlElementName();
+  XmlDOMElement* type_element
+      = xml_dom_util::getChildElement(element, type_element_name.c_str(), 0);
+  type_ptr_ = MassShiftType::getTypePtrFromXml(type_element);
   mass_ = xml_dom_util::getDoubleChildValue(element, "mass", 0);
   std::string mod_element_name = Mod::getXmlElementName();
 
@@ -55,8 +55,8 @@ Change::Change(XmlDOMElement* element) {
   }
 }
 
-void Change::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
-  std::string element_name = Change::getXmlElementName();
+void Alteration::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
+  std::string element_name = Alteration::getXmlElementName();
   XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
   std::string str = str_util::toString(left_bp_pos_);
   xml_doc->addElement(element, "left_bp_pos", str.c_str());
@@ -74,17 +74,18 @@ void Change::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
   parent->appendChild(element);
 }
 
-ChangePtr Change::geneChangePtr(ChangePtr ori_ptr, int start_pos) {
+AlterationPtr Alteration::geneAlterationPtr(AlterationPtr ori_ptr, int start_pos) {
   int left_bp_pos = ori_ptr->left_bp_pos_ - start_pos;
   int right_bp_pos = ori_ptr->right_bp_pos_ - start_pos;
   MassShiftTypePtr type_ptr = ori_ptr->type_ptr_;
   double mass = ori_ptr->getMass();
   ModPtr mod_ptr = ori_ptr->mod_ptr_;
-  ChangePtr change_ptr = std::make_shared<Change>(left_bp_pos, right_bp_pos, type_ptr, mass, mod_ptr);
+  AlterationPtr change_ptr = std::make_shared<Alteration>(left_bp_pos, right_bp_pos, 
+                                                  type_ptr, mass, mod_ptr);
   return change_ptr;
 }
 
-void Change::setLocalAnno(LocalAnnoPtr p) {
+void Alteration::setLocalAnno(LocalAnnoPtr p) {
   local_anno_ptr_ = p;
   if (p != nullptr) {
     left_bp_pos_ = p->getLeftBpPos();

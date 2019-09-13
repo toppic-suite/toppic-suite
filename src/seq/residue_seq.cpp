@@ -20,8 +20,9 @@
 
 namespace toppic {
 
-ResidueSeq::ResidueSeq(const ResiduePtrVec &residues): residues_(residues) {
-  /* get residue mass sum */
+ResidueSeq::ResidueSeq(const ResiduePtrVec &residues): 
+    residues_(residues) {
+  // get residue mass sum 
   residue_mass_sum_ = 0;
   for (size_t i = 0; i < residues_.size(); i++) {
     residue_mass_sum_ += residues_[i]->getMass();

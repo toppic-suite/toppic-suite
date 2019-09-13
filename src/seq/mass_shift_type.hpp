@@ -48,7 +48,7 @@ class MassShiftType {
 
   void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
-  static MassShiftTypePtr getChangeTypePtrFromXml(XmlDOMElement * element);
+  static MassShiftTypePtr getTypePtrFromXml(XmlDOMElement * element);
 
   static std::string getXmlElementName() {return "mass_shift_type";}
 

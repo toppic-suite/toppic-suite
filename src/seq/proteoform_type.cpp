@@ -23,4 +23,5 @@ ProteoformTypePtr ProteoformType::PREFIX = std::make_shared<ProteoformType>("pre
 ProteoformTypePtr ProteoformType::SUFFIX = std::make_shared<ProteoformType>("suffix", 2);
 
 ProteoformTypePtr ProteoformType::INTERNAL = std::make_shared<ProteoformType>("internal", 3);
+
 }  // namespace toppic
