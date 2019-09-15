@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_SPEC_BASE_PEAK_TYPE_HPP_
 #define TOPPIC_SPEC_BASE_PEAK_TYPE_HPP_
 
@@ -37,8 +36,7 @@ class BasePeakType {
   std::string name_;
 };
 
-
-}
+} // namespace toppic
 
 #endif
 

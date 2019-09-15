@@ -43,6 +43,6 @@ class MsAlignFracMerge {
 
 typedef std::shared_ptr<MsAlignFracMerge> MsAlignFracMergePtr;
 
-} /* namespace toppic */
+} // namespace toppic 
 
 #endif

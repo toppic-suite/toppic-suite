@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_SPEC_BASELINE_UTIL_HPP_
 #define TOPPIC_SPEC_BASELINE_UTIL_HPP_
 
@@ -27,4 +26,5 @@ double getBaseLine(const std::vector<double> &inte);
 }  // namespace deconv_util 
 
 }  // namespace toppic
+
 #endif

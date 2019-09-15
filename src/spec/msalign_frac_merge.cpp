@@ -85,4 +85,4 @@ void MsAlignFracMerge::mergeFiles(const std::vector<std::string> &spec_file_lst,
   outfile.close();
 }
 
-} /* namespace toppic */
+} // namespace toppic 

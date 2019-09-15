@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include <memory>
 #include <vector>
 
@@ -24,7 +23,8 @@ namespace toppic {
 
 namespace deconv_ms_util {
 
-DeconvMsPtrVec getRefineMsPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, double new_prec_mass) {
+DeconvMsPtrVec getRefineMsPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, 
+                                 double new_prec_mass) {
   DeconvMsPtrVec result_ptrs;
   for (size_t m = 0; m < deconv_ms_ptr_vec.size(); m++) {
     DeconvMsPtr deconv_ms_ptr = deconv_ms_ptr_vec[m];
@@ -35,7 +35,6 @@ DeconvMsPtrVec getRefineMsPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, double
       DeconvPeakPtr ori_peak_ptr = deconv_ms_ptr->getPeakPtr(p);
       // * is a dereference operator
       DeconvPeakPtr new_peak_ptr = std::make_shared<DeconvPeak>(*ori_peak_ptr.get());
-      // new_peak_ptr->setPosition(new_peak_ptr->getPosition() * (1 + calibration));
       peak_ptr_list.push_back(new_peak_ptr);
     }
     DeconvMsPtr ms_ptr = std::make_shared<Ms<DeconvPeakPtr> >(header_ptr, peak_ptr_list);
