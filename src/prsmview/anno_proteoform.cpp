@@ -46,7 +46,7 @@ void addSummary(XmlDOMDocument* xml_doc, xercesc::DOMElement *prot_element,
   str = str_util::toString(proteoform_ptr->getProtModPtr()->isAcetylation());
   xml_doc->addElement(prot_element, "n_acetylation", str.c_str());
 
-  int unexpected_change_number = proteoform_ptr->getMassShiftNum(MassShiftType::UNEXPECTED);
+  int unexpected_change_number = proteoform_ptr->getMassShiftNum(AlterType::UNEXPECTED);
   str = str_util::toString(unexpected_change_number);
   xml_doc->addElement(prot_element, "unexpected_shift_number", str.c_str());
 }
@@ -69,7 +69,7 @@ void addAnnoPtms(ProteoformPtr proteoform_ptr, MassShiftPtrVec & shift_ptrs,
   std::sort(shift_ptrs.begin(), shift_ptrs.end(), MassShift::cmpPosInc);
   int start_pos = proteoform_ptr->getStartPos();
   for (size_t i = 0; i < shift_ptrs.size(); i++) {
-    PtmPtr ptm_ptr = shift_ptrs[i]->getAlterationPtrVec()[0]->getModPtr()->getModResiduePtr()->getPtmPtr();
+    PtmPtr ptm_ptr = shift_ptrs[i]->getAlterPtrVec()[0]->getModPtr()->getModResiduePtr()->getPtmPtr();
     if (PtmBase::isEmptyPtmPtr(ptm_ptr)) {
       continue;
     }
@@ -92,7 +92,7 @@ void addAnnoVarPtms(ProteoformPtr proteoform_ptr, MassShiftPtrVec & shift_ptrs,
   std::sort(shift_ptrs.begin(), shift_ptrs.end(), MassShift::cmpPosInc);
   int start_pos = proteoform_ptr->getStartPos();
   for (size_t i = 0; i < shift_ptrs.size(); i++) {
-    AlterationPtrVec alter_ptrs = shift_ptrs[i]->getAlterationPtrVec(); 
+    AlterPtrVec alter_ptrs = shift_ptrs[i]->getAlterPtrVec(); 
     for (size_t j = 0; j < alter_ptrs.size(); j++) {
       PtmPtr ptm_ptr = alter_ptrs[j]->getModPtr()->getModResiduePtr()->getPtmPtr();
       if (PtmBase::isEmptyPtmPtr(ptm_ptr)) {
@@ -122,7 +122,7 @@ void addAnnoMassShifts(ProteoformPtr proteoform_ptr, MassShiftPtrVec & shift_ptr
     int left_db_bp = shift_ptrs[i]->getLeftBpPos() + start_pos;
     int right_db_bp = shift_ptrs[i]->getRightBpPos() + start_pos;
     std::string anno_str = shift_ptrs[i]->getAnnoStr();
-    MassShiftTypePtr type_ptr = shift_ptrs[i]->getTypePtr();
+    AlterTypePtr type_ptr = shift_ptrs[i]->getTypePtr();
     AnnoMassShiftPtr anno_shift_ptr 
         = std::make_shared<AnnoMassShift>(i, left_db_bp, right_db_bp, anno_str, type_ptr);
     anno_shift_ptrs.push_back(anno_shift_ptr);
@@ -185,7 +185,7 @@ void addMod(ProteoformPtr proteoform_ptr, int left_db_bp, int right_db_bp,
     anno = segment_ptr->getResidueAnno();
   }
 
-  segment_ptr->setMassShiftType(shift_ptr->getTypePtr());
+  segment_ptr->setAlterType(shift_ptr->getTypePtr());
 
   segment_ptrs.push_back(segment_ptr);
   last_right = this_right;
@@ -250,7 +250,7 @@ xercesc::DOMElement* geneAnnoProteoform(XmlDOMDocument* xml_doc,
   // Fixed PTMs
   AnnoPtmPtrVec anno_fixed_ptm_ptrs;
   MassShiftPtrVec fixed_shift_ptrs 
-      = proteoform_ptr->getMassShiftPtrVec(MassShiftType::FIXED);
+      = proteoform_ptr->getMassShiftPtrVec(AlterType::FIXED);
   addAnnoPtms(proteoform_ptr, fixed_shift_ptrs, anno_fixed_ptm_ptrs);
   for (size_t i = 0; i < anno_fixed_ptm_ptrs.size(); i++) {
     anno_fixed_ptm_ptrs[i]->appendXml(xml_doc, anno_element);
@@ -259,7 +259,7 @@ xercesc::DOMElement* geneAnnoProteoform(XmlDOMDocument* xml_doc,
   // protein N-terminal variable PTMs
   AnnoPtmPtrVec anno_prot_var_ptm_ptrs;
   MassShiftPtrVec prot_var_shift_ptrs 
-      = proteoform_ptr->getMassShiftPtrVec(MassShiftType::PROTEIN_VARIABLE);
+      = proteoform_ptr->getMassShiftPtrVec(AlterType::PROTEIN_VARIABLE);
   addAnnoPtms(proteoform_ptr, prot_var_shift_ptrs, anno_prot_var_ptm_ptrs);
   for (size_t i = 0; i < anno_prot_var_ptm_ptrs.size(); i++) {
     anno_prot_var_ptm_ptrs[i]->appendXml(xml_doc, anno_element);
@@ -269,7 +269,7 @@ xercesc::DOMElement* geneAnnoProteoform(XmlDOMDocument* xml_doc,
   // variable PTMs
   AnnoPtmPtrVec anno_var_ptm_ptrs;
   MassShiftPtrVec var_shift_ptrs 
-      = proteoform_ptr->getMassShiftPtrVec(MassShiftType::VARIABLE);
+      = proteoform_ptr->getMassShiftPtrVec(AlterType::VARIABLE);
   addAnnoVarPtms(proteoform_ptr, var_shift_ptrs, anno_var_ptm_ptrs); 
   for (size_t i = 0; i < anno_var_ptm_ptrs.size(); i++) {
     anno_var_ptm_ptrs[i]->appendXml(xml_doc, anno_element);
@@ -277,7 +277,7 @@ xercesc::DOMElement* geneAnnoProteoform(XmlDOMDocument* xml_doc,
 
   // Bariable and unexpected mass shifts
   MassShiftPtrVec unexpected_shift_ptrs 
-      = proteoform_ptr->getMassShiftPtrVec(MassShiftType::UNEXPECTED);
+      = proteoform_ptr->getMassShiftPtrVec(AlterType::UNEXPECTED);
   unexpected_shift_ptrs.insert(unexpected_shift_ptrs.end(), 
                                var_shift_ptrs.begin(), var_shift_ptrs.end());
   std::sort(unexpected_shift_ptrs.begin(), unexpected_shift_ptrs.end(), MassShift::cmpPosInc);

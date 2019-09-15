@@ -12,28 +12,28 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_SEQ_ALTERATION_HPP_
-#define TOPPIC_SEQ_ALTERATION_HPP_
+#ifndef TOPPIC_SEQ_ALTER_HPP_
+#define TOPPIC_SEQ_ALTER_HPP_
 
 #include "common/xml/xml_dom_element.hpp"
 #include "common/base/mod.hpp"
-#include "seq/mass_shift_type.hpp"
+#include "seq/alter_type.hpp"
 #include "seq/local_anno.hpp"
 
 namespace toppic {
 
 class XmlDOMDocument;
 
-class Alteration;
-typedef std::shared_ptr<Alteration> AlterationPtr;
+class Alter;
+typedef std::shared_ptr<Alter> AlterPtr;
 
-class Alteration {
+class Alter {
  public:
-  Alteration(int left_bp_pos, int right_bp_pos,
-             MassShiftTypePtr type_ptr,
-             double mass, ModPtr mod_ptr);
+  Alter(int left_bp_pos, int right_bp_pos,
+        AlterTypePtr type_ptr,
+        double mass, ModPtr mod_ptr);
 
-  explicit Alteration(XmlDOMElement* change_element);
+  explicit Alter(XmlDOMElement* change_element);
 
   int getLeftBpPos() {return left_bp_pos_;}
 
@@ -43,7 +43,7 @@ class Alteration {
 
   void setRightBpPos(int p) {right_bp_pos_ = p;}
 
-  MassShiftTypePtr getTypePtr() {return type_ptr_;}
+  AlterTypePtr getTypePtr() {return type_ptr_;}
 
   double getMass() {return mass_;}
 
@@ -57,9 +57,9 @@ class Alteration {
 
   void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
-  static std::string getXmlElementName() {return "change";}
+  static std::string getXmlElementName() {return "alteration";}
 
-  static AlterationPtr geneAlterationPtr(AlterationPtr ori_alter_ptr, int start_pos);
+  static AlterPtr geneAlterPtr(AlterPtr ori_alter_ptr, int start_pos);
 
  protected:
   // left and right positions are based on break point positions
@@ -67,7 +67,7 @@ class Alteration {
 
   int right_bp_pos_;
 
-  MassShiftTypePtr type_ptr_;
+  AlterTypePtr type_ptr_;
 
   double mass_;
 
@@ -76,7 +76,7 @@ class Alteration {
   LocalAnnoPtr local_anno_ptr_;
 };
 
-typedef std::vector<AlterationPtr> AlterationPtrVec;
+typedef std::vector<AlterPtr> AlterPtrVec;
 
 }  // namespace toppic
 

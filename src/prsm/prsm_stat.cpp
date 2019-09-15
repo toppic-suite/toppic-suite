@@ -106,7 +106,7 @@ void PrsmStat::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
       << prsm_ptr->getProteoformPtr()->getStartPos() << "\t"
       << prsm_ptr->getProteoformPtr()->getEndPos() << "\t"
       << prsm_ptr->getProteoformPtr()->getProteinMatchSeq() << "\t"
-      << prsm_ptr->getProteoformPtr()->getMassShiftNum(MassShiftType::UNEXPECTED) << "\t"
+      << prsm_ptr->getProteoformPtr()->getMassShiftNum(AlterType::UNEXPECTED) << "\t"
       << prsm_ptr->getMatchPeakNum() << "\t"
       << prsm_ptr->getMatchFragNum() << "\t"
       << prsm_ptr->getPValue() << "\t"

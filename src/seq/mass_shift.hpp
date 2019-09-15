@@ -15,7 +15,7 @@
 #ifndef TOPPIC_SEQ_MASS_SHIFT_HPP_
 #define TOPPIC_SEQ_MASS_SHIFT_HPP_
 
-#include "seq/alteration.hpp"
+#include "seq/alter.hpp"
 
 namespace toppic {
 
@@ -24,8 +24,9 @@ typedef std::shared_ptr<MassShift> MassShiftPtr;
 
 class MassShift {
  public:
-  MassShift(int left_bp_pos, int right_bp_pos, 
-            MassShiftTypePtr type_ptr);
+  explicit MassShift(AlterPtr alter_ptr);  
+
+  explicit MassShift(MassShiftPtr shift_ptr, int start);
 
   explicit MassShift(XmlDOMElement* mass_shift_element);
 
@@ -37,13 +38,13 @@ class MassShift {
 
   void setRightBpPos(int p) {right_bp_pos_ = p;}
 
-  std::vector<AlterationPtr> getAlterationPtrVec() {return alter_vec_;}
+  std::vector<AlterPtr> getAlterPtrVec() {return alter_vec_;}
 
-  AlterationPtr getAlterationPtr(size_t idx) {return alter_vec_[idx];}
+  AlterPtr getAlterPtr(size_t idx) {return alter_vec_[idx];}
 
-  void setAlterationPtr(AlterationPtr alter_ptr);
+  void setAlterPtrVec(AlterPtrVec alter_vec) {alter_vec_ = alter_vec;}
 
-  MassShiftTypePtr getTypePtr() {return type_ptr_;}
+  AlterTypePtr getTypePtr(); 
 
   double getMassShift() {return shift_;}
 
@@ -60,11 +61,9 @@ class MassShift {
 
   int right_bp_pos_;
 
-  MassShiftTypePtr type_ptr_;
-
   double shift_;
 
-  std::vector<AlterationPtr> alter_vec_;
+  std::vector<AlterPtr> alter_vec_;
 };
 
 typedef std::vector<MassShiftPtr> MassShiftPtrVec;

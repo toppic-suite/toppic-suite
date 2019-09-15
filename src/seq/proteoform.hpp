@@ -62,11 +62,11 @@ class Proteoform {
 
   int getMassShiftNum() {return static_cast<int>(mass_shift_list_.size());}
 
-  int getMassShiftNum(MassShiftTypePtr type_ptr);
+  int getMassShiftNum(AlterTypePtr type_ptr);
 
   MassShiftPtrVec getMassShiftPtrVec() {return mass_shift_list_;}
 
-  MassShiftPtrVec getMassShiftPtrVec(MassShiftTypePtr type_ptr);
+  MassShiftPtrVec getMassShiftPtrVec(AlterTypePtr type_ptr);
 
   int getProteoClusterId() {return proteo_cluster_id_;}
 
@@ -96,7 +96,7 @@ class Proteoform {
 
   int getVariablePtmNum() {return variable_ptm_num_;}
   
-  PtmPtrVec getPtmVec(MassShiftTypePtr type);
+  PtmPtrVec getPtmVec(AlterTypePtr type);
 
   std::string getMIScore();
 

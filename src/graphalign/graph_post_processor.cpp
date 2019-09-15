@@ -169,7 +169,7 @@ void GraphPostProcessor::process() {
         std::sort(pair_vec.begin(), pair_vec.end(), PeakIonPair::cmpTheoPeakPosInc);
 
         MassShiftPtrVec shift_vec
-            = prsm_ptr->getProteoformPtr()->getMassShiftPtrVec(MassShiftType::VARIABLE);
+            = prsm_ptr->getProteoformPtr()->getMassShiftPtrVec(AlterType::VARIABLE);
 
         for (size_t k = 0; k < shift_vec.size(); k++) {
           int mass = std::ceil(shift_vec[k]->getMassShift() * mng_ptr_->convert_ratio_);
@@ -182,28 +182,27 @@ void GraphPostProcessor::process() {
             }
           }
 
-          MassShiftPtr shift_ptr
-              = std::make_shared<toppic::MassShift>(shift_vec[k]->getLeftBpPos(),
-                                                  shift_vec[k]->getRightBpPos(),
-                                                  shift_vec[k]->getTypePtr());
+          MassShiftPtr shift_ptr = std::make_shared<toppic::MassShift>(shift_vec[k], 0);
 
           std::vector<double> mass_vec = mass_split(shift_vec[k]->getMassShift(), ptm_vec);
 
-          AlterationPtr alter_ptr = shift_vec[k]->getAlterationPtr(0);
+          AlterPtr alter_ptr = shift_vec[k]->getAlterPtr(0);
 
           AminoAcidPtr acid_ptr = alter_ptr->getModPtr()->getModResiduePtr()->getAminoAcidPtr();
 
+          AlterPtrVec alter_vec;
           for (size_t i = 0; i < ptm_vec.size(); i++) {
             ResiduePtr mod_res = std::make_shared<Residue>(acid_ptr, ptm_vec[i]);
             ModPtr mod = std::make_shared<Mod>(alter_ptr->getModPtr()->getOriResiduePtr(), mod_res);
-            AlterationPtr c = std::make_shared<Alteration>(alter_ptr->getLeftBpPos(),
+            AlterPtr a = std::make_shared<Alter>(alter_ptr->getLeftBpPos(),
                                                    alter_ptr->getRightBpPos(),
                                                    alter_ptr->getTypePtr(),
                                                    mass_vec[i],
                                                    mod);
-            shift_ptr->setAlterationPtr(c);
+            alter_vec.push_back(a);
           }
 
+          shift_ptr->setAlterPtrVec(alter_vec);
           shift_vec[k] = shift_ptr;
         }
 
@@ -214,7 +213,7 @@ void GraphPostProcessor::process() {
         }
 
         MassShiftPtrVec unknown_shift_vec
-            = prsm_ptr->getProteoformPtr()->getMassShiftPtrVec(MassShiftType::UNEXPECTED);
+            = prsm_ptr->getProteoformPtr()->getMassShiftPtrVec(AlterType::UNEXPECTED);
 
         for (size_t k = 0; k < unknown_shift_vec.size(); k++) {
           if (unknown_shift_vec[k]->getRightBpPos() == unknown_shift_vec[k]->getLeftBpPos()) {
@@ -245,7 +244,7 @@ void GraphPostProcessor::process() {
         std::sort(shift_vec.begin(), shift_vec.end(), MassShift::cmpPosInc);
 
         MassShiftPtrVec fix_shift_vec
-            = prsm_ptr->getProteoformPtr()->getMassShiftPtrVec(MassShiftType::FIXED);
+            = prsm_ptr->getProteoformPtr()->getMassShiftPtrVec(AlterType::FIXED);
 
         fix_shift_vec.insert(fix_shift_vec.end(), shift_vec.begin(), shift_vec.end());
 

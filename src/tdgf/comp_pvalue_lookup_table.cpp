@@ -147,7 +147,7 @@ void CompPValueLookupTable::process(const DeconvMsPtrVec &deconv_ms_ptr_vec, Prs
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     double refine_prec_mass = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMassMinusWater();
     int match_frag_num = prsm_ptrs[i]->getMatchFragNum();
-    int unexpected_shift_num = prsm_ptrs[i]->getProteoformPtr()->getMassShiftNum(MassShiftType::UNEXPECTED);
+    int unexpected_shift_num = prsm_ptrs[i]->getProteoformPtr()->getMassShiftNum(AlterType::UNEXPECTED);
     if (unexpected_shift_num == 0) {
       // in ZERO PTM searching, +/-1 Da was allowed.
       // We need to adjust the prec mass for candidate number computation
@@ -220,7 +220,7 @@ bool CompPValueLookupTable::inTable(const DeconvMsPtrVec &deconv_ms_ptr_vec,
     
     if (match_frag_num <= 5 || match_frag_num >= 100) continue;
 
-    int unexpected_shift_num = prsm_ptrs[i]->getProteoformPtr()->getMassShiftNum(MassShiftType::UNEXPECTED);
+    int unexpected_shift_num = prsm_ptrs[i]->getProteoformPtr()->getMassShiftNum(AlterType::UNEXPECTED);
 
     if (!inTable(peak_num, match_frag_num, unexpected_shift_num)) return false;
   }

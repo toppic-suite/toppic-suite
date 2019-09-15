@@ -164,11 +164,11 @@ DiagonalHeaderPtr geneDiagonalHeaderPtr(int bgn, int end, DiagonalHeaderPtr diag
 
 MassShiftPtrVec getDiagonalMassChanges(const DiagonalHeaderPtrVec &diag_ptrs,
                                        int first_res_pos, int last_res_pos,
-                                       MassShiftTypePtr type_ptr);
+                                       AlterTypePtr type_ptr);
 
 MassShiftPtrVec getDiagonalMassChanges(const DiagonalHeaderPtrVec &header_ptrs,
                                        int first_res_pos, int last_res_pos,
-                                       const MassShiftTypePtrVec & type_ptrs);
+                                       const AlterTypePtrVec & type_ptrs);
 
 } /* namespace toppic */
 

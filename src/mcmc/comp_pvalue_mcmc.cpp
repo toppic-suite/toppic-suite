@@ -122,7 +122,7 @@ double CompPValueMCMC::compOneProbMCMC(PrsmPtr prsm_ptr, ActivationPtr act,
 
   pep_mass_ = residue_util::compResiduePtrVecMass(prot_form->getResSeqPtr()->getResidues());
 
-  ptm_vec_ = prot_form->getPtmVec(MassShiftType::VARIABLE);
+  ptm_vec_ = prot_form->getPtmVec(AlterType::VARIABLE);
 
   ptm_mass_vec_.resize(ptm_vec_.size());
 
@@ -130,7 +130,7 @@ double CompPValueMCMC::compOneProbMCMC(PrsmPtr prsm_ptr, ActivationPtr act,
     ptm_mass_vec_[i] = ptm_vec_[i]->getMonoMass();
   }
 
-  MassShiftPtrVec unknown_shift_vec = prot_form->getMassShiftPtrVec(MassShiftType::UNEXPECTED);
+  MassShiftPtrVec unknown_shift_vec = prot_form->getMassShiftPtrVec(AlterType::UNEXPECTED);
 
   if (unknown_shift_vec.size() > 0) {
     for (size_t k = 0; k < unknown_shift_vec.size(); k++) {

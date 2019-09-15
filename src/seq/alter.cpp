@@ -17,25 +17,25 @@
 #include "common/util/str_util.hpp"
 #include "common/xml/xml_dom_util.hpp"
 #include "common/base/mod_base.hpp"
-#include "seq/alteration.hpp"
+#include "seq/alter.hpp"
 
 namespace toppic {
 
-Alteration::Alteration(int left_bp_pos, int right_bp_pos,
-                       MassShiftTypePtr type_ptr,
-                       double mass, ModPtr mod_ptr):
+Alter::Alter(int left_bp_pos, int right_bp_pos,
+             AlterTypePtr type_ptr,
+             double mass, ModPtr mod_ptr):
     left_bp_pos_(left_bp_pos),
     right_bp_pos_(right_bp_pos),
     type_ptr_(type_ptr),
     mass_(mass), mod_ptr_(mod_ptr) {}
 
-Alteration::Alteration(XmlDOMElement* element) {
+Alter::Alter(XmlDOMElement* element) {
   left_bp_pos_ = xml_dom_util::getIntChildValue(element, "left_bp_pos", 0);
   right_bp_pos_ = xml_dom_util::getIntChildValue(element, "right_bp_pos", 0);
-  std::string type_element_name = MassShiftType::getXmlElementName();
+  std::string type_element_name = AlterType::getXmlElementName();
   XmlDOMElement* type_element
       = xml_dom_util::getChildElement(element, type_element_name.c_str(), 0);
-  type_ptr_ = MassShiftType::getTypePtrFromXml(type_element);
+  type_ptr_ = AlterType::getTypePtrFromXml(type_element);
   mass_ = xml_dom_util::getDoubleChildValue(element, "mass", 0);
   std::string mod_element_name = Mod::getXmlElementName();
 
@@ -55,8 +55,8 @@ Alteration::Alteration(XmlDOMElement* element) {
   }
 }
 
-void Alteration::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
-  std::string element_name = Alteration::getXmlElementName();
+void Alter::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
+  std::string element_name = Alter::getXmlElementName();
   XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
   std::string str = str_util::toString(left_bp_pos_);
   xml_doc->addElement(element, "left_bp_pos", str.c_str());
@@ -74,18 +74,18 @@ void Alteration::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
   parent->appendChild(element);
 }
 
-AlterationPtr Alteration::geneAlterationPtr(AlterationPtr ori_ptr, int start_pos) {
+AlterPtr Alter::geneAlterPtr(AlterPtr ori_ptr, int start_pos) {
   int left_bp_pos = ori_ptr->left_bp_pos_ - start_pos;
   int right_bp_pos = ori_ptr->right_bp_pos_ - start_pos;
-  MassShiftTypePtr type_ptr = ori_ptr->type_ptr_;
+  AlterTypePtr type_ptr = ori_ptr->type_ptr_;
   double mass = ori_ptr->getMass();
   ModPtr mod_ptr = ori_ptr->mod_ptr_;
-  AlterationPtr change_ptr = std::make_shared<Alteration>(left_bp_pos, right_bp_pos, 
-                                                  type_ptr, mass, mod_ptr);
-  return change_ptr;
+  AlterPtr alter_ptr = std::make_shared<Alter>(left_bp_pos, right_bp_pos, 
+                                               type_ptr, mass, mod_ptr);
+  return alter_ptr;
 }
 
-void Alteration::setLocalAnno(LocalAnnoPtr p) {
+void Alter::setLocalAnno(LocalAnnoPtr p) {
   local_anno_ptr_ = p;
   if (p != nullptr) {
     left_bp_pos_ = p->getLeftBpPos();
