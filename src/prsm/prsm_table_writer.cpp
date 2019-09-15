@@ -114,7 +114,7 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   std::string spec_activations;
   std::string spec_scans;
   std::string retention_time;
-  int ptm_num = prsm_ptr->getProteoformPtr()->getMassShiftNum(MassShiftType::UNEXPECTED);
+  int ptm_num = prsm_ptr->getProteoformPtr()->getMassShiftNum(AlterType::UNEXPECTED);
   int peak_num = 0;
   DeconvMsPtrVec deconv_ms_ptr_vec = prsm_ptr->getDeconvMsPtrVec();
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {

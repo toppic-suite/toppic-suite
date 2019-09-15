@@ -17,13 +17,13 @@
 #include <vector>
 
 #include "common/util/logger.hpp"
-#include "seq/mass_shift_type.hpp"
 #include "common/base/prot_mod_base.hpp"
 #include "common/base/prot_mod_util.hpp"
 #include "common/base/ptm_base.hpp"
 #include "common/base/residue_base.hpp"
 #include "common/base/residue_util.hpp"
 #include "common/xml/xml_dom_document.hpp"
+#include "seq/alter_type.hpp"
 #include "graph/proteo_anno.hpp"
 
 namespace toppic {
@@ -59,9 +59,9 @@ void ProteoAnno::anno(const std::string &seq, bool is_complete) {
     ResiduePtr res_ptr = residue_ptr_vec[i];
     cur_res_vec.push_back(res_ptr);
     if (PtmBase::isEmptyPtmPtr(res_ptr->getPtmPtr())) {
-      cur_shift_vec.push_back(MassShiftType::INPUT->getId());
+      cur_shift_vec.push_back(AlterType::INPUT->getId());
     } else {
-      cur_shift_vec.push_back(MassShiftType::FIXED->getId());
+      cur_shift_vec.push_back(AlterType::FIXED->getId());
     }
     res_vec_2d_.push_back(cur_res_vec);
     shift_vec_2d_.push_back(cur_shift_vec);
@@ -88,18 +88,18 @@ void ProteoAnno::anno(const std::string &seq, bool is_complete) {
         throw("Residue not found");
       }
       res_vec_2d_[0].push_back(empty_residue_ptr);
-      shift_vec_2d_[0].push_back(MassShiftType::PROTEIN_VARIABLE->getId());
+      shift_vec_2d_[0].push_back(AlterType::PROTEIN_VARIABLE->getId());
     } else if (is_complete && mod_ptr->getType() == ProtModBase::getType_M_ACETYLATION()) {
       ResiduePtr mut_residue_ptr = mod_ptr->getModPtr()->getModResiduePtr();
       res_vec_2d_[0].push_back(mut_residue_ptr);
-      shift_vec_2d_[0].push_back(MassShiftType::PROTEIN_VARIABLE->getId());
+      shift_vec_2d_[0].push_back(AlterType::PROTEIN_VARIABLE->getId());
     } else if (is_complete && mod_ptr->getType() == ProtModBase::getType_NME_ACETYLATION()) {
       LOG_DEBUG("NME_ACETYLATION");
       // add acetylation to the second residue
       is_nme_ = true;
       ResiduePtr mut_residue_ptr = mod_ptr->getModPtr()->getModResiduePtr();
       res_vec_2d_[1].push_back(mut_residue_ptr);
-      shift_vec_2d_[1].push_back(MassShiftType::PROTEIN_VARIABLE->getId());
+      shift_vec_2d_[1].push_back(AlterType::PROTEIN_VARIABLE->getId());
     }
     LOG_DEBUG("round complete");
   }
@@ -123,7 +123,7 @@ void ProteoAnno::anno(const std::string &seq, bool is_complete) {
         }
         if (!found) {
           res_vec_2d_[i].push_back(mod_res_vec[j]);
-          shift_vec_2d_[i].push_back(MassShiftType::VARIABLE->getId());
+          shift_vec_2d_[i].push_back(AlterType::VARIABLE->getId());
         }
       }
     }

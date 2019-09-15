@@ -55,13 +55,13 @@ void fillTableS(std::vector<std::vector<double> > & b_table,
 std::vector<double> geneNTheoMass(ProteoformPtr proteoform, ExtendMsPtr extend_ms_ptr_vec,
                                   double min_mass);
 
-MassShiftPtrVec massShiftFilter(const MassShiftPtrVec & mass_shift_vec, MassShiftTypePtr type);
+MassShiftPtrVec massShiftFilter(const MassShiftPtrVec & mass_shift_vec, AlterTypePtr type);
 
 MassShiftPtrVec copyMassShiftVec(const MassShiftPtrVec & mass_shift_vec);
 
 double compMassShift(const MassShiftPtrVec & mass_shift_vec);
 
-MassShiftPtr geneMassShift(MassShiftPtr shift, double mass, MassShiftTypePtr type);
+MassShiftPtr geneMassShift(MassShiftPtr shift, double mass, AlterTypePtr type);
 
 void normalize(std::vector<double> & scr);
 

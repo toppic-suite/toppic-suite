@@ -55,9 +55,9 @@ MassGraphPtr getMassGraphPtr(ProteoAnnoPtr proteo_anno_ptr, double convert_ratio
     v2 = vertex(i + 1, *graph_ptr.get());
     ResiduePtrVec res_ptr_vec = proteo_anno_ptr->getResiduePtrVec(i);
     std::vector<int> change_vec = proteo_anno_ptr->getChangeVec(i);
-    if (std::find(change_vec.begin(), change_vec.end(), MassShiftType::FIXED->getId()) != change_vec.end()) {
+    if (std::find(change_vec.begin(), change_vec.end(), AlterType::FIXED->getId()) != change_vec.end()) {
       for (size_t j = 0; j < res_ptr_vec.size(); j++) {
-        if (change_vec[j] == MassShiftType::FIXED->getId()) {
+        if (change_vec[j] == AlterType::FIXED->getId()) {
           EdgeInfo edge_info(res_ptr_vec[j], change_vec[j], convert_ratio);
           add_edge(v1, v2, edge_info , *graph_ptr.get());
         }

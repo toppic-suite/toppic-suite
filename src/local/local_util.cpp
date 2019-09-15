@@ -215,7 +215,7 @@ std::vector<double> geneNTheoMass(ProteoformPtr proteoform, ExtendMsPtr extend_m
 }
 
 MassShiftPtrVec massShiftFilter(const MassShiftPtrVec & mass_shift_vec,
-                                MassShiftTypePtr type) {
+                                AlterTypePtr type) {
   MassShiftPtrVec res;
   for (size_t k = 0; k < mass_shift_vec.size(); k++) {
     if (mass_shift_vec[k]->getTypePtr() != type) {
@@ -228,13 +228,7 @@ MassShiftPtrVec massShiftFilter(const MassShiftPtrVec & mass_shift_vec,
 MassShiftPtrVec copyMassShiftVec(const MassShiftPtrVec & mass_shift_vec) {
   MassShiftPtrVec new_mass_shift_vec;
   for (size_t k = 0; k < mass_shift_vec.size(); k++) {
-    MassShiftPtr mass_shift
-        = std::make_shared<MassShift>(mass_shift_vec[k]->getLeftBpPos(),
-                                      mass_shift_vec[k]->getRightBpPos(),
-                                      mass_shift_vec[k]->getTypePtr());
-
-    mass_shift->setAlterationPtr(mass_shift_vec[k]->getAlterationPtr(0));
-
+    MassShiftPtr mass_shift = std::make_shared<MassShift>(mass_shift_vec[k], 0);
     new_mass_shift_vec.push_back(mass_shift);
   }
   return new_mass_shift_vec;
@@ -248,17 +242,14 @@ double compMassShift(const MassShiftPtrVec & mass_shift_vec) {
   return mass;
 }
 
-MassShiftPtr geneMassShift(MassShiftPtr shift, double mass, MassShiftTypePtr type) {
+MassShiftPtr geneMassShift(MassShiftPtr shift, double mass, AlterTypePtr type) {
   ModPtr mod_ptr = std::make_shared<Mod>(ResidueBase::getEmptyResiduePtr(),
                                          ResidueBase::getEmptyResiduePtr());
-  AlterationPtr alter = std::make_shared<Alteration>(shift->getLeftBpPos(),
+  AlterPtr alter = std::make_shared<Alter>(shift->getLeftBpPos(),
                                                      shift->getRightBpPos(),
                                                      type, mass,
                                                      mod_ptr);
-  MassShiftPtr mass_shift = std::make_shared<MassShift>(shift->getLeftBpPos(),
-                                                        shift->getRightBpPos(),
-                                                        type);
-  mass_shift->setAlterationPtr(alter);
+  MassShiftPtr mass_shift = std::make_shared<MassShift>(alter);
   return mass_shift;
 }
 

@@ -19,7 +19,7 @@
 #include <vector>
 
 #include "common/xml/xml_dom_document.hpp"
-#include "seq/mass_shift_type.hpp"
+#include "seq/alter_type.hpp"
 
 namespace toppic {
 
@@ -27,7 +27,7 @@ class AnnoMassShift {
  public:
   AnnoMassShift(int id, int left_pos, int right_pos, 
                 const std::string & anno_str, 
-                MassShiftTypePtr & mass_shift_type);
+                AlterTypePtr & mass_shift_type);
 
   void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
@@ -40,7 +40,7 @@ class AnnoMassShift {
 
   std::string anno_str_;
 
-  MassShiftTypePtr mass_shift_type_;
+  AlterTypePtr mass_shift_type_;
 };
 
 typedef std::shared_ptr<AnnoMassShift> AnnoMassShiftPtr;

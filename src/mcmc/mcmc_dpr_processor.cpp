@@ -249,7 +249,7 @@ std::function<void()> geneTask(SpectrumSetPtr spec_set_ptr,
 
     ProteoformTypePtr type_ptr = prsm_ptr->getProteoformPtr()->getProteoformType();
 
-    int unexpect_shift_num = prsm_ptr->getProteoformPtr()->getMassShiftNum(MassShiftType::UNEXPECTED);
+    int unexpect_shift_num = prsm_ptr->getProteoformPtr()->getMassShiftNum(AlterType::UNEXPECTED);
 
     if (prsm_ptr->getProteoformPtr()->getVariablePtmNum() == 0) {
       cand_num = test_num_ptr->compCandNum(type_ptr, unexpect_shift_num,

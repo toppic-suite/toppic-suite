@@ -17,7 +17,7 @@
 
 #include "common/xml/xml_dom_document.hpp"
 #include "common/base/ptm.hpp"
-#include "seq/mass_shift_type.hpp"
+#include "seq/alter_type.hpp"
 #include "prsmview/anno_ptm_position.hpp"
 
 namespace toppic {
@@ -28,23 +28,23 @@ typedef std::vector<AnnoPtmPtr> AnnoPtmPtrVec;
 
 class AnnoPtm {
  public:
-  AnnoPtm(PtmPtr ptm_ptr, MassShiftTypePtr type_ptr);
+  AnnoPtm(PtmPtr ptm_ptr, AlterTypePtr type_ptr);
 
   PtmPtr getPtmPtr() {return ptm_ptr_;}
 
-  MassShiftTypePtr getTypePtr() {return type_ptr_;}
+  AlterTypePtr getTypePtr() {return type_ptr_;}
 
   void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
   void addOccurence(int left_pos, int right_pos, std::string anno);
 
   static AnnoPtmPtr findPtm(const AnnoPtmPtrVec &ptm_ptrs, PtmPtr ptm_ptr,
-                            MassShiftTypePtr type_ptr);
+                            AlterTypePtr type_ptr);
 
  private:
   PtmPtr ptm_ptr_;
 
-  MassShiftTypePtr type_ptr_;
+  AlterTypePtr type_ptr_;
 
   AnnoPtmPositionPtrVec occurences_;
 };

@@ -27,8 +27,8 @@
 
 #include "common/base/ptm_base.hpp"
 #include "common/base/residue.hpp"
-#include "seq/alteration.hpp"
 #include "common/util/logger.hpp"
+#include "seq/alter.hpp"
 
 namespace toppic {
 

@@ -539,7 +539,7 @@ PrsmPtr GraphAlign::geneResult(int s, int m) {
 
   DiagonalHeaderPtrVec refined_headers;
 
-  MassShiftTypePtrVec shift_types;
+  AlterTypePtrVec shift_types;
 
   for (size_t i = 0; i < refined_headers_2d.size(); i++) {
     for (size_t j = 0; j < refined_headers_2d[i].size(); j++) {
@@ -547,9 +547,9 @@ PrsmPtr GraphAlign::geneResult(int s, int m) {
       if (i == 0 && j == 0) {
         shift_types.push_back(nullptr);
       } else if (j == 0)  {
-        shift_types.push_back(MassShiftType::UNEXPECTED);
+        shift_types.push_back(AlterType::UNEXPECTED);
       } else {
-        shift_types.push_back(MassShiftType::VARIABLE);
+        shift_types.push_back(AlterType::VARIABLE);
       }
       LOG_DEBUG("i " << i << " j " << j << " type " << shift_types[shift_types.size()-1]);
     }
@@ -570,7 +570,7 @@ PrsmPtr GraphAlign::geneResult(int s) {
     PrsmPtr cur_prsm_ptr = geneResult(s, m);
     if (cur_prsm_ptr != nullptr) {
       MassShiftPtrVec shift_vec
-          = cur_prsm_ptr->getProteoformPtr()->getMassShiftPtrVec(MassShiftType::UNEXPECTED);
+          = cur_prsm_ptr->getProteoformPtr()->getMassShiftPtrVec(AlterType::UNEXPECTED);
       bool valid = true;
       for (size_t i = 0; i < shift_vec.size(); i++) {
         if (std::abs(shift_vec[i]->getMassShift()) > mng_ptr_->max_ptm_mass_) {

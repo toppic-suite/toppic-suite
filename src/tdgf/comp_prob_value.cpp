@@ -554,8 +554,8 @@ int getMaxScore(const PrsmPtrVec &prsm_ptrs) {
 int getMaxShift(PrsmPtrVec prsm_ptrs) {
   int shift = 0;
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
-    if (prsm_ptrs[i]->getProteoformPtr()->getMassShiftNum(MassShiftType::UNEXPECTED) > shift) {
-      shift = prsm_ptrs[i]->getProteoformPtr()->getMassShiftNum(MassShiftType::UNEXPECTED);
+    if (prsm_ptrs[i]->getProteoformPtr()->getMassShiftNum(AlterType::UNEXPECTED) > shift) {
+      shift = prsm_ptrs[i]->getProteoformPtr()->getMassShiftNum(AlterType::UNEXPECTED);
     }
   }
   return shift;
@@ -576,7 +576,7 @@ void CompProbValue::compProbArray(CompProbValuePtr comp_prob_ptr,
                          strict, prob_prec_mass, tole_ptr);
   results.clear();
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
-    int shift_num = prsm_ptrs[i]->getProteoformPtr()->getMassShiftNum(MassShiftType::UNEXPECTED);
+    int shift_num = prsm_ptrs[i]->getProteoformPtr()->getMassShiftNum(AlterType::UNEXPECTED);
     int score = prsm_ptrs[i]->getMatchFragNum();
     results.push_back(comp_prob_ptr->getCondProb(shift_num, score));
   }

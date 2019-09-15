@@ -16,7 +16,7 @@
 
 namespace toppic {
 
-AnnoPtm::AnnoPtm(PtmPtr ptm_ptr, MassShiftTypePtr type_ptr) {
+AnnoPtm::AnnoPtm(PtmPtr ptm_ptr, AlterTypePtr type_ptr) {
   ptm_ptr_ = ptm_ptr;
   type_ptr_ = type_ptr;
 }
@@ -40,7 +40,7 @@ void AnnoPtm::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {
 }
 
 AnnoPtmPtr AnnoPtm::findPtm(const AnnoPtmPtrVec &ptm_ptrs, PtmPtr ptm_ptr,
-                            MassShiftTypePtr type_ptr) {
+                            AlterTypePtr type_ptr) {
   for (size_t i = 0; i < ptm_ptrs.size(); i++) {
     if ((ptm_ptrs[i]->getTypePtr() == type_ptr) &&
         (ptm_ptrs[i]->getPtmPtr() == ptm_ptr)) {

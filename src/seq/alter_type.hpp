@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_SEQ_MASS_SHIFT_TYPE_HPP_
-#define TOPPIC_SEQ_MASS_SHIFT_TYPE_HPP_
+#ifndef TOPPIC_SEQ_ALTER_TYPE_HPP_
+#define TOPPIC_SEQ_ALTER_TYPE_HPP_
 
 #include <memory>
 #include <vector>
@@ -25,22 +25,22 @@ namespace toppic {
 
 class XmlDOMDocument;
 
-class MassShiftType;
-typedef std::shared_ptr<MassShiftType> MassShiftTypePtr;
+class AlterType;
+typedef std::shared_ptr<AlterType> AlterTypePtr;
 
-class MassShiftType {
+class AlterType {
  public:
-  static const MassShiftTypePtr INPUT;
+  static const AlterTypePtr INPUT;
 
-  static const MassShiftTypePtr FIXED;
+  static const AlterTypePtr FIXED;
 
-  static const MassShiftTypePtr PROTEIN_VARIABLE;
+  static const AlterTypePtr PROTEIN_VARIABLE;
 
-  static const MassShiftTypePtr VARIABLE;
+  static const AlterTypePtr VARIABLE;
 
-  static const MassShiftTypePtr UNEXPECTED;
+  static const AlterTypePtr UNEXPECTED;
 
-  MassShiftType(int id, std::string name): id_(id), name_(name) {}
+  AlterType(int id, std::string name): id_(id), name_(name) {}
 
   int getId() {return id_;}
 
@@ -48,16 +48,16 @@ class MassShiftType {
 
   void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
-  static MassShiftTypePtr getTypePtrFromXml(XmlDOMElement * element);
+  static AlterTypePtr getTypePtrFromXml(XmlDOMElement * element);
 
-  static std::string getXmlElementName() {return "mass_shift_type";}
+  static std::string getXmlElementName() {return "alter_type";}
 
  private:
   int id_;
   std::string name_;
 };
 
-typedef std::vector<MassShiftTypePtr> MassShiftTypePtrVec;
+typedef std::vector<AlterTypePtr> AlterTypePtrVec;
 
 }  // namespace toppic
 

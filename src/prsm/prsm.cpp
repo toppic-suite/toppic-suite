@@ -207,7 +207,7 @@ double Prsm::getOneProtProb() {
 double Prsm::getNormMatchFragNum() {
   int var_change_num = proteoform_ptr_->getVariablePtmNum();
 
-  int unexp_change_num = proteoform_ptr_->getMassShiftNum(MassShiftType::UNEXPECTED);
+  int unexp_change_num = proteoform_ptr_->getMassShiftNum(AlterType::UNEXPECTED);
 
   int start_pos = proteoform_ptr_->getStartPos();
 
