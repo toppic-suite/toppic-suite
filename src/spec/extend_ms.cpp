@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include <cmath>
 #include <algorithm>
 #include <vector>
@@ -24,6 +23,11 @@ namespace toppic {
 
 namespace extend_ms {
 
+typedef std::pair<int, int> IntPair;
+typedef std::vector<std::pair<int, int>> IntPairVec;
+typedef std::pair<double, double> DoublePair;
+typedef std::vector<std::pair<double, double>> DoublePairVec;
+
 std::vector<double> getExtendMassVec(ExtendMsPtr extend_ms_ptr) {
   std::vector<double> masses;
   ExtendPeakPtrVec peak_ptr_list = extend_ms_ptr->getPeakPtrVec();
@@ -33,12 +37,12 @@ std::vector<double> getExtendMassVec(ExtendMsPtr extend_ms_ptr) {
   return masses;
 }
 
-inline bool massErrorUp(const std::pair<int, int> &a, const std::pair<int, int> b) {
+inline bool massErrorUp(const IntPair &a, const IntPair b) {
   return a.first < b.first;
 }
 
-std::vector<std::pair<int, int>> getExtendIntMassErrorList(const ExtendMsPtrVec &ext_ms_ptr_vec,
-                                                           bool pref, double scale) {
+IntPairVec getExtendIntMassErrorList(const ExtendMsPtrVec &ext_ms_ptr_vec,
+                                     bool pref, double scale) {
   std::vector<std::pair<int, int>> mass_errors;
   for (size_t i = 0; i < ext_ms_ptr_vec.size(); i++) {
     ExtendMsPtr ext_ms_ptr = ext_ms_ptr_vec[i];
@@ -50,11 +54,14 @@ std::vector<std::pair<int, int>> getExtendIntMassErrorList(const ExtendMsPtrVec 
           + mass_constant::getWaterMass();
     }
 
-    std::pair<int, int> last_mass_error(-1, 0);
+    IntPair last_mass_error(-1, 0);
     for (size_t j = 0; j < ext_ms_ptr->size(); j++) {
-      int m = static_cast<int>(std::round((ext_ms_ptr->getPeakPtr(j)->getPosition() - shift) * scale));
-      int e = static_cast<int>(std::ceil(ext_ms_ptr->getPeakPtr(j)->getOrigTolerance() * scale));
-      std::pair<int, int> cur_m_e(m, e);
+      double double_m = (ext_ms_ptr->getPeakPtr(j)->getPosition() - shift) * scale;
+      int m = static_cast<int>(std::round(double_m));
+      double double_e = (ext_ms_ptr->getPeakPtr(j)->getOrigTolerance() * scale);
+      int e = static_cast<int>(std::ceil(double_e));
+
+      IntPair cur_m_e(m, e);
       if (cur_m_e.first != last_mass_error.first) {
         mass_errors.push_back(cur_m_e);
         last_mass_error = cur_m_e;
@@ -70,8 +77,8 @@ std::vector<std::pair<int, int>> getExtendIntMassErrorList(const ExtendMsPtrVec 
   return mass_errors;
 }
 
-std::vector<std::pair<double, double> > getExtendMassToleranceList(ExtendMsPtr extend_ms_ptr) {
-  std::vector<std::pair<double, double> > mass_tole_list(extend_ms_ptr->getPeakPtrVec().size());
+DoublePairVec getExtendMassToleranceList(ExtendMsPtr extend_ms_ptr) {
+  DoublePairVec  mass_tole_list(extend_ms_ptr->getPeakPtrVec().size());
 
   for (size_t j = 0; j < extend_ms_ptr->getPeakPtrVec().size(); j++) {
     mass_tole_list[j] = std::make_pair(extend_ms_ptr->getPeakPtr(j)->getMonoMass(),

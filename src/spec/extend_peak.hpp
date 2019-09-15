@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef PROT_EXTEND_PEAK_HPP_
 #define PROT_EXTEND_PEAK_HPP_
 
@@ -62,8 +61,6 @@ class ExtendPeak : public Peak {
 
 typedef std::vector<ExtendPeakPtr> ExtendPeakPtrVec;
 
+} // namespace toppic 
 
-
-} /* namespace toppic */
-
-#endif /* EXTEND_PEAK_HPP_ */
+#endif 

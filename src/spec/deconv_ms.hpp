@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_SPEC_DECONV_MS_HPP_
 #define TOPPIC_SPEC_DECONV_MS_HPP_
 

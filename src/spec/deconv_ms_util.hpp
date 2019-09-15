@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_SPEC_DECONV_MS_FACTORY_HPP_
 #define TOPPIC_SPEC_DECONV_MS_FACTORY_HPP_
 
@@ -22,7 +21,8 @@ namespace toppic {
 
 namespace deconv_ms_util {
 
-DeconvMsPtrVec  getRefineMsPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, double new_prec_mass);
+DeconvMsPtrVec  getRefineMsPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, 
+                                  double new_prec_mass);
 
 }  // namespace deconv_ms_util
 
