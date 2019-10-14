@@ -64,6 +64,9 @@ file(GLOB PRSM_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/prsm/*.cpp)
 # suffix tree
 file(GLOB SUFFIX_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/suffix/*.cpp)
 
+# test
+file(GLOB TEST_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/*.cpp)
+
 # classes for toppic
 file(GLOB_RECURSE FILTER_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/*.cpp)
 
@@ -156,6 +159,12 @@ add_executable(toppic_gui
 	${ONE_PTM_SEARCH_SRCS} ${PTM_SRCS} 
   ${TDGF_SRCS} ${LOCAL_SRCS} ${PRSM_VIEW_SRCS} ${ENV_SRCS})
 
+add_executable(toppic_test 
+  ${TEST_SRCS} ${HTS_SRCS} ${COMMON_SRCS} 
+  ${SEQ_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS} ${PRSM_SRCS} ${FILTER_SRCS}  
+	${ZERO_PTM_SRCS} ${ONE_PTM_SEARCH_SRCS} ${PTM_SRCS} 
+  ${TDGF_SRCS} ${LOCAL_SRCS} ${PRSM_VIEW_SRCS} ${ENV_SRCS})
+
 add_executable(topmg 
 	${TOPMG_CONSOLE_SRCS} ${TOPMG_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS} 
   ${SEQ_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS} ${PRSM_SRCS} ${TOPMG_FILTER_SRCS} 
@@ -241,6 +250,9 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
         boost_filesystem boost_system boost_thread pthread z)
 
     target_link_libraries(toppic_gui Qt5Widgets Qt5Core Qt5Gui xalan-c xerces-c boost_program_options
+        boost_filesystem boost_system boost_thread pthread z)
+
+    target_link_libraries(toppic_test xalan-c xerces-c boost_program_options
         boost_filesystem boost_system boost_thread pthread z)
 
     target_link_libraries(topmg xalan-c xerces-c boost_program_options

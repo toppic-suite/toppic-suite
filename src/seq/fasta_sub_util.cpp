@@ -18,8 +18,12 @@ namespace toppic {
 
 namespace fasta_sub_util {
 
-std::vector<FastaSubSeqPtr> breakSeq(FastaSeqPtr seq_ptr) {
+FastaSubSeqPtrVec breakSeq(FastaSeqPtr seq_ptr) {
   int N = 2000;
+  return breakSeq(seq_ptr, N);
+}
+
+FastaSubSeqPtrVec breakSeq(FastaSeqPtr seq_ptr, int N) {
   std::vector<FastaSubSeqPtr> fasta_seq_vec;
   int seq_len = seq_ptr->getAcidPtmPairLen();
   if (seq_len < N) {

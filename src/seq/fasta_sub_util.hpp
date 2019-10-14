@@ -21,7 +21,9 @@ namespace toppic {
 
 namespace fasta_sub_util {
 
-std::vector<FastaSubSeqPtr> breakSeq(FastaSeqPtr seq_ptr);
+FastaSubSeqPtrVec breakSeq(FastaSeqPtr seq_ptr);
+
+FastaSubSeqPtrVec breakSeq(FastaSeqPtr seq_ptr, int N);
 
 }  // namespace fasta_sub_util
 
