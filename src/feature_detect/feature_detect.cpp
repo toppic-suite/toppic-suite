@@ -509,7 +509,7 @@ void getMs2Features(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtrVec &header_ptr_vec,
           ms2_features.push_back(ms2_feature);
         }
         else {
-          LOG_ERROR("Cannot find features in LC/MS! Spectrum id: " << sp_id);
+          LOG_WARN("Cannot find features in LC/MS! Spectrum id: " << sp_id);
         }
       }
     }
@@ -550,7 +550,7 @@ void process(int frac_id, std::string &sp_file_name, std::string &resource_dir,
   std::string base_name = file_util::basename(sp_file_name);
   // read ms1 deconvoluted spectra
   DeconvMsPtrVec ms1_ptr_vec;
-  FracFeaturePtrVec features;
+  FracFeaturePtrVec ms1_features;
   if (!missing_level_one) {
     std::string ms1_file_name = base_name + "_ms1.msalign";
     MsAlignReader::readMsOneSpectra(ms1_file_name, ms1_ptr_vec);
@@ -558,7 +558,7 @@ void process(int frac_id, std::string &sp_file_name, std::string &resource_dir,
     RawMsReaderPtr raw_reader_ptr = std::make_shared<RawMsReader>(sp_file_name);
     raw_reader_ptr->getMs1Peaks(raw_peaks);
     raw_reader_ptr = nullptr;
-    findMsOneFeatures(ms1_ptr_vec, raw_peaks, para_ptr, features, env_para_ptr);
+    findMsOneFeatures(ms1_ptr_vec, raw_peaks, para_ptr, ms1_features, env_para_ptr);
   }
 
   LOG_DEBUG("start reading ms2");
@@ -566,36 +566,15 @@ void process(int frac_id, std::string &sp_file_name, std::string &resource_dir,
   MsHeaderPtrVec header_ptr_vec;
   readHeaders(ms2_file_name, header_ptr_vec);
   SpecFeaturePtrVec ms2_features;
-  getMs2Features(ms1_ptr_vec, header_ptr_vec, features, para_ptr, ms2_features);
-
-  // remove frac_features with low scores
-  FracFeaturePtrVec sele_features; 
-  // test if we can keep all features
-  sele_features = features;
-  /*
-  int cnt_1 = 0;
-  int cnt_2 = 0;
-  for (size_t i = 0; i < features.size(); i++) {
-    if (features[i]->getPromexScore() > 0.0 or features[i]->hasMs2Spec()) {
-      cnt_1++;
-      if (features[i]->getPromexScore() > 0.0) cnt_2++;
-      sele_features.push_back(features[i]);
-    }
-  }
-  LOG_DEBUG("count 1 " << cnt_1 << " count 2 " << cnt_2);
-  */
-
-  //std::sort(features.begin(), features.end(), FracFeature::cmpMassInc);
-  //std::string output_file_name = base_name + "_frac.feature";
-  //frac_feature_writer::writeFeatures(output_file_name, sele_features);
+  getMs2Features(ms1_ptr_vec, header_ptr_vec, ms1_features, para_ptr, ms2_features);
 
   SampleFeaturePtrVec sample_features;
-  getSampleFeatures(sample_features, sele_features, ms2_features);
+  getSampleFeatures(sample_features, ms1_features, ms2_features);
 
   std::string output_file_name = base_name + "_frac.feature";
-  frac_feature_writer::writeXmlFeatures(output_file_name, sele_features);
+  frac_feature_writer::writeXmlFeatures(output_file_name, ms1_features);
   std::string batmass_file_name = base_name + "_frac.mzrt.csv";
-  frac_feature_writer::writeBatMassFeatures(batmass_file_name, sele_features);
+  frac_feature_writer::writeBatMassFeatures(batmass_file_name, ms1_features);
   std::string sample_feature_file_name = base_name + "_sample.feature";
   sample_feature_writer::writeFeatures(sample_feature_file_name, sample_features);
 
