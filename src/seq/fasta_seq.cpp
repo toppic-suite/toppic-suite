@@ -80,8 +80,11 @@ void FastaSeq::compAcidPtmPairVec() {
 void FastaSeq::compRawSeq() {
   for (size_t i = 0; i < acid_ptm_pair_vec_.size(); i++) {
     std::string amino_str = acid_ptm_pair_vec_[i].first;
+    seq_ = seq_ + amino_str; 
     std::string ptm_str = acid_ptm_pair_vec_[i].second;
-    seq_ = seq_ + amino_str + "[" + ptm_str + "]";
+    if (ptm_str != PtmBase::getEmptyPtmPtr()->getAbbrName()) {
+      seq_ = seq_ + "[" + ptm_str + "]";
+    }
   }
 }
 
