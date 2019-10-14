@@ -92,7 +92,7 @@ int processOneFile(std::map<std::string, std::string> arguments,
 }
 
 
-void moveFiles(std::string &spec_file_name, bool move_mzrt, bool move_sample_feature) {
+void moveFiles(std::string &spec_file_name, bool move_mzrt) {
   std::string base_name = file_util::basename(spec_file_name);
   std::string file_dir =  base_name + "_file";
   file_util::createFolder(file_dir);
@@ -104,10 +104,12 @@ void moveFiles(std::string &spec_file_name, bool move_mzrt, bool move_sample_fea
     file_name = base_name + "_frac.mzrt.csv";
     file_util::moveFile(file_name, file_dir);
   }
+  /*
   if (move_sample_feature) {
-    file_name = base_name + "_sample.feature";
+    file_name = base_name + "_ms1.feature";
     file_util::moveFile(file_name, file_dir);
   }
+  */
 }
 
 int process(std::map<std::string, std::string> arguments, 
@@ -149,19 +151,14 @@ int process(std::map<std::string, std::string> arguments,
         || str_util::endsWith(spec_file_lst[k], "mzml")
         || str_util::endsWith(spec_file_lst[k], "mzxml")) {
       bool move_mzrt = true;
-      bool move_sample_feature = true;
-      if (spec_file_lst.size() == 1) {
-        move_sample_feature = false;
-      }
-      moveFiles(spec_file_lst[k], move_mzrt, move_sample_feature); 
+      moveFiles(spec_file_lst[k], move_mzrt); 
     }
   }
 
   if (spec_file_lst.size() > 1) {
     std::string sample_name = arguments["sampleName"];
     bool move_mzrt = false;
-    bool move_sample_feature = false;
-    moveFiles(sample_name, move_mzrt, move_sample_feature);
+    moveFiles(sample_name, move_mzrt);
   }
 
   return 0;

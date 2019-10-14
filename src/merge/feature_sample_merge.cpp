@@ -374,14 +374,14 @@ void FeatureSampleMerge::process() {
   for (size_t k = 0; k < sample_num; k++) {
     std::string input_file_name = input_file_names_[k];
     std::string base_name = file_util::basename(input_file_name);
-    if (str_util::endsWith(base_name, "_sample")) {
-      base_name = base_name.substr(0, base_name.size() - 7);
+    if (str_util::endsWith(base_name, "_ms1")) {
+      base_name = base_name.substr(0, base_name.size() - 4);
       LOG_DEBUG("base name " << base_name);
     }
     else {
-      LOG_ERROR("The file name " << input_file_name << " does not end with _sample.feature!");
+      LOG_ERROR("The file name " << input_file_name << " does not end with _ms1.feature!");
     }
-    FeaturePrsmReader reader(base_name + "_sample.feature");
+    FeaturePrsmReader reader(base_name + "_ms1.feature");
     FeaturePrsmPtrVec features = reader.readAllFeatures();
     reader.close();
     LOG_DEBUG("feature number " << features.size());
