@@ -63,18 +63,24 @@ void addMsHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement* ms_element,
                  PrsmPtr prsm_ptr, PrsmViewMngPtr mng_ptr) {
   xercesc::DOMElement* ms_header_element = xml_doc->createElement("ms_header");
   ms_element->appendChild(ms_header_element);
-  DeconvMsPtrVec deconv_ms_ptr_vec = prsm_ptr->getDeconvMsPtrVec();
-  std::string spec_ids;
-  std::string spec_scans;
-  for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
-    spec_ids = spec_ids + str_util::toString(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getId()) + " ";
-    spec_scans = spec_scans + deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getScansString() + " ";
-  }
-  str_util::trim(spec_ids);
-  str_util::trim(spec_scans);
-  xml_doc->addElement(ms_header_element, "ids", spec_ids.c_str());
   xml_doc->addElement(ms_header_element, "spectrum_file_name", prsm_ptr->getFileName().c_str());
-  xml_doc->addElement(ms_header_element, "scans", spec_scans.c_str());
+  DeconvMsPtrVec deconv_ms_ptr_vec = prsm_ptr->getDeconvMsPtrVec();
+  std::string ms1_ids, ms2_ids;
+  std::string ms1_scans, ms2_scans;
+  for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
+    ms1_ids = ms1_ids + str_util::toString(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getMsOneId()) + " ";
+    ms1_scans = ms1_scans + str_util::toString(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getMsOneScan()) + " ";
+    ms2_ids = ms2_ids + str_util::toString(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getId()) + " ";
+    ms2_scans = ms2_scans + deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getScansString() + " ";
+  }
+  str_util::trim(ms1_ids);
+  str_util::trim(ms1_scans);
+  str_util::trim(ms2_ids);
+  str_util::trim(ms2_scans);
+  xml_doc->addElement(ms_header_element, "ms1_ids", ms1_ids.c_str());
+  xml_doc->addElement(ms_header_element, "ms1_scans", ms1_scans.c_str());
+  xml_doc->addElement(ms_header_element, "ids", ms2_ids.c_str());
+  xml_doc->addElement(ms_header_element, "scans", ms2_scans.c_str());
 
   int pos = mng_ptr->precise_point_num_;
 
@@ -160,15 +166,15 @@ xercesc::DOMElement* geneAnnoPrsm(XmlDOMDocument* xml_doc, PrsmPtr prsm_ptr,
   addPrsmHeader(xml_doc, prsm_element, prsm_ptr, mng_ptr);
 
   if (detail) {
-    xercesc::DOMElement* ms_element = xml_doc->createElement("ms");
-    addMsHeader(xml_doc, ms_element, prsm_ptr, mng_ptr);
+    xercesc::DOMElement* ms2_element = xml_doc->createElement("ms");
+    addMsHeader(xml_doc, ms2_element, prsm_ptr, mng_ptr);
 
     if (add_ms_peaks) {
       // add ms peaks
-      addMsPeaks(xml_doc, ms_element, prsm_ptr, mng_ptr);
+      addMsPeaks(xml_doc, ms2_element, prsm_ptr, mng_ptr);
     }
 
-    prsm_element->appendChild(ms_element);
+    prsm_element->appendChild(ms2_element);
 
     // proteoform to view
     xercesc::DOMElement* prot_element 
