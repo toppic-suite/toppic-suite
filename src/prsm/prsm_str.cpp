@@ -77,8 +77,8 @@ PrsmStr::PrsmStr(const std::vector<std::string> &str_vec) {
   variable_ptm_num_ = std::stoi(prsm_util::getValueStr(line));
 
   std::vector<std::string> mass_lines = prsm_util::getXmlLineVec(str_vec_, "<shift>");
-  std::vector<std::string> left_pos_lines = prsm_util::getXmlLineVec(str_vec_, "<shift_left_bp_pos>");
-  std::vector<std::string> right_pos_lines = prsm_util::getXmlLineVec(str_vec_, "<shift_right_bp_pos>");
+  std::vector<std::string> left_pos_lines = prsm_util::getXmlLineVec(str_vec_, "<left_bp_pos>");
+  std::vector<std::string> right_pos_lines = prsm_util::getXmlLineVec(str_vec_, "<right_bp_pos>");
 
   for (size_t i = 0; i < mass_lines.size(); i++) {
     mass_shift_vec_.push_back(std::make_shared<MassShiftStr>(std::stod(prsm_util::getValueStr(mass_lines[i])),
