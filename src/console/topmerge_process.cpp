@@ -26,8 +26,7 @@ int topMergeProcess(std::map<std::string, std::string> &arguments,
                     std::vector<std::string> &input_file_list) {
 
   Argument::outputArguments(std::cout, arguments);
-  std::string resource_dir = arguments["resourceDir"];
-  base_data::init(resource_dir);
+  base_data::init();
 
   std::string ori_db_file_name = arguments["databaseFileName"];
   std::string db_file_name = ori_db_file_name + "_target";
