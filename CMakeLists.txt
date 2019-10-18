@@ -176,7 +176,7 @@ add_executable(topmg_gui
   ${SEQ_SRCS} ${SPEC_SRCS} ${FEATURE_SRCS} ${PRSM_SRCS}
 	${TOPMG_FILTER_SRCS} ${ONE_PTM_SEARCH_SRCS} 
 	${GRAPH_SRCS} ${GRAPH_ALIGN_SRCS} ${TDGF_SRCS} 
-	${MCMC_SRCS} ${PRSM_VIEW_SRCS})
+  ${MCMC_SRCS} ${PRSM_VIEW_SRCS} ${ENV_SRCS})
 
 add_executable(topmerge 
 	${TOPMERGE_CONSOLE_SRCS} ${TOPMERGE_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS}
@@ -200,15 +200,15 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
         boost_system-mt boost_thread-mt
         boost_iostreams-mt boost_chrono-mt pthread z Ws2_32)
 
-    target_link_libraries(toppic xalan-c xalanMsg xerces-c
+    target_link_libraries(toppic xerces-c
         boost_filesystem-mt boost_system-mt 
         boost_program_options-mt boost_thread-mt pthread z Ws2_32)
 
-    target_link_libraries(topmg xalan-c xalanMsg xerces-c
+    target_link_libraries(topmg xerces-c
         boost_filesystem-mt boost_system-mt
         boost_program_options-mt boost_thread-mt pthread z Ws2_32)
 
-   target_link_libraries(topmerge xalan-c xerces-c boost_program_options-mt
+   target_link_libraries(topmerge xerces-c boost_program_options-mt
         boost_filesystem-mt boost_system-mt boost_thread-mt pthread z Ws2_32)
 
     # for Qt
@@ -217,15 +217,15 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
         xerces-c boost_filesystem-mt boost_system-mt boost_thread-mt 
 		boost_iostreams-mt boost_chrono-mt pthread z Ws2_32)
 
-    target_link_libraries(toppic_gui ${QTOPTION} Qt5Widgets Qt5Core Qt5Gui xalan-c xalanMsg xerces-c
+    target_link_libraries(toppic_gui ${QTOPTION} Qt5Widgets Qt5Core Qt5Gui xerces-c
         boost_filesystem-mt boost_system-mt 
         boost_program_options-mt boost_thread-mt pthread z Ws2_32)
 
-    target_link_libraries(topmg_gui ${QTOPTION} Qt5Widgets Qt5Core Qt5Gui xalan-c xalanMsg xerces-c
+    target_link_libraries(topmg_gui ${QTOPTION} Qt5Widgets Qt5Core Qt5Gui xerces-c
         boost_filesystem-mt boost_system-mt
         boost_program_options-mt boost_thread-mt pthread z Ws2_32)
 
-#    target_link_libraries(topmerge_gui ${QTOPTION} Qt5Widgets Qt5Core Qt5Gui xalan-c xalanMsg xerces-c
+#    target_link_libraries(topmerge_gui ${QTOPTION} Qt5Widgets Qt5Core Qt5Gui xerces-c
 #        boost_filesystem-mt boost_system-mt 
 #        boost_program_options-mt boost_thread-mt pthread z Ws2_32)
 
@@ -246,31 +246,31 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
         boost_filesystem boost_system boost_thread boost_iostreams boost_chrono
         pthread z)
 
-    target_link_libraries(toppic xalan-c xerces-c boost_program_options
+    target_link_libraries(toppic xerces-c boost_program_options
         boost_filesystem boost_system boost_thread pthread z)
 
-    target_link_libraries(toppic_gui Qt5Widgets Qt5Core Qt5Gui xalan-c xerces-c boost_program_options
+    target_link_libraries(toppic_gui Qt5Widgets Qt5Core Qt5Gui xerces-c boost_program_options
         boost_filesystem boost_system boost_thread pthread z)
 
-    target_link_libraries(toppic_test xalan-c xerces-c boost_program_options
+    target_link_libraries(toppic_test xerces-c boost_program_options
         boost_filesystem boost_system boost_thread pthread z)
 
-    target_link_libraries(topmg xalan-c xerces-c boost_program_options
+    target_link_libraries(topmg xerces-c boost_program_options
         boost_filesystem boost_system boost_thread pthread z)
 
-    target_link_libraries(topmg_gui Qt5Widgets Qt5Core Qt5Gui xalan-c xerces-c boost_program_options
+    target_link_libraries(topmg_gui Qt5Widgets Qt5Core Qt5Gui xerces-c boost_program_options
         boost_filesystem boost_system boost_thread pthread z)
 
-    target_link_libraries(topmerge xalan-c xerces-c boost_program_options
+    target_link_libraries(topmerge xerces-c boost_program_options
 	boost_filesystem boost_system boost_thread pthread z)
 
 #    target_link_libraries(topmerge_gui Qt5Widgets Qt5Core Qt5Gui
-#        xalan-c xerces-c boost_program_options boost_filesystem boost_system boost_thread boost_iostreams pthread z)
+#        xerces-c boost_program_options boost_filesystem boost_system boost_thread boost_iostreams pthread z)
 
-#    target_link_libraries(toppic_match_peak xalan-c xerces-c boost_program_options
+#    target_link_libraries(toppic_match_peak xerces-c boost_program_options
 #        boost_filesystem boost_system boost_thread pthread z)
 
-#    target_link_libraries(topfd_train xalan-c xerces-c boost_program_options
+#    target_link_libraries(topfd_train xerces-c boost_program_options
 #        boost_filesystem boost_system boost_thread boost_iostreams boost_chrono pthread z)
 
 #file(MAKE_DIRECTORY ${CMAKE_INSTALL_PREFIX}/usr/bin)
