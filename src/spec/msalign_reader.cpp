@@ -274,7 +274,6 @@ void MsAlignReader::close() {
 
 void MsAlignReader::readMsOneSpectra(const std::string &file_name, 
                                      DeconvMsPtrVec &ms_ptr_vec) {
-  std::cout << std::flush << "Reading spectrum started." <<  std::endl;
   int sp_num_in_group = 1;
   MsAlignReader sp_reader(file_name, sp_num_in_group,
                           nullptr, std::set<std::string>());
@@ -287,7 +286,6 @@ void MsAlignReader::readMsOneSpectra(const std::string &file_name,
     //std::cout << std::flush <<  "reading spectrum " << ms_ptr_vec.size() << "\r";
   }
   sp_reader.close();
-  std::cout << std::flush << "Reading spectrum finished." <<  std::endl;
 }
 
 }  // namespace toppic

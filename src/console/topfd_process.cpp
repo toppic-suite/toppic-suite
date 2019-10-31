@@ -65,19 +65,23 @@ int processOneFile(std::map<std::string, std::string> arguments,
                    const std::string &spec_file_name, int frac_id) {
   try {
     time_t start = time(0);
-
     base_data::init();
     DeconvParaPtr para_ptr = std::make_shared<DeconvPara>(arguments, argument_str, 
         spec_file_name, frac_id);
-    LOG_DEBUG("deconv para");
+    std::string para_str = para_ptr->getArgumentStr();
+    time_util::addTimeStamp(para_str);
+    std::cout << para_str;
+    std::cout << "Deconvolution started." << std::endl;
     DeconvProcess process(para_ptr);
-    LOG_DEBUG("init process");
     process.process();
+    std::cout << "Deconvolution finished." << std::endl;
 
+    std::cout << "Feature detection started." << std::endl;
     std::string argu_str = para_ptr->getArgumentStr();
     std::string sp_file_name = para_ptr->getDataFileName();
     feature_detect::process(frac_id, sp_file_name, arguments["resourceDir"], 
         para_ptr->missing_level_one_, argu_str);
+    std::cout << "Feature detection finished." << std::endl;
 
     time_t end = time(0);
     std::cout << "Runing time: "

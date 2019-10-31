@@ -57,9 +57,9 @@ void DeconvProcess::process() {
   EnvParaPtr env_para_ptr = std::make_shared<EnvPara>();
   DpParaPtr dp_para_ptr = std::make_shared<DpPara>();
   copyParameters(env_para_ptr);
-  std::string para_str = para_ptr_->getArgumentStr();
-  time_util::addTimeStamp(para_str);
-  std::cout << para_str;
+  //std::string para_str = para_ptr_->getArgumentStr();
+  //time_util::addTimeStamp(para_str);
+  //std::cout << para_str;
 
   std::string file_name = para_ptr_->getDataFileName();
   // writer
@@ -89,7 +89,7 @@ void DeconvProcess::process() {
 
   MsAlignWriterPtr ms1_writer_ptr = std::make_shared<MsAlignWriter>(ms1_msalign_name);
   MsAlignWriterPtr ms2_writer_ptr = std::make_shared<MsAlignWriter>(ms2_msalign_name);
-  para_str = para_ptr_->getArgumentStr();
+  std::string para_str = para_ptr_->getArgumentStr();
   time_util::addTimeStamp(para_str);
   ms1_writer_ptr->writePara(para_str);
   ms2_writer_ptr->writePara(para_str);
@@ -257,7 +257,7 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr, RawMsGroupReaderPtr rea
     //auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end-start);
     //std::cout << std::endl << "Read file " << duration.count() << std::endl;
   }
-  std::cout << std::endl << "Deconvolution finished." << std::endl;
+  std::cout << std::endl;
 }
 
 }  // namespace toppic
