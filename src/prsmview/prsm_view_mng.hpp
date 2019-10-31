@@ -35,7 +35,7 @@ class PrsmViewMng {
         xml_path_ = base_name + "_" + fname_suffix + "_xml";
         html_path_ = base_name.substr(0, base_name.length() - 4) + "_html" 
             + file_util::getFileSeparator() + fname_suffix;
-        LOG_ERROR("html path " << html_path_);
+        LOG_DEBUG("html path " << html_path_);
         resource_dir_ = resource_dir;
         min_mass_ = prsm_para_ptr_->getSpParaPtr()->getMinMass();
       }
