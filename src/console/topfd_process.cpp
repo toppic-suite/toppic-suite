@@ -14,7 +14,6 @@
 //
 #include <iomanip>
 
-#include "common/util/version.hpp"
 #include "common/util/logger.hpp"
 #include "common/util/time_util.hpp"
 #include "common/util/file_util.hpp"
@@ -26,72 +25,36 @@
 #include "deconv/env/env_base.hpp"
 #include "deconv/deconv/deconv_process.hpp"
 #include "deconv/deconv/deconv_json_merge.hpp"
+#include "console/topfd_argument.hpp"
 
 namespace toppic {
 
 namespace topfd_process {
 
-std::string geneArgumentStr(std::map<std::string, std::string> arguments, 
-                            const std::string & prefix) {
-  std::stringstream output;
-  output << prefix << "TopFD " << version_number << std::endl;
-  // TIME_STAMP_STR is replaced later
-  output << prefix << "Timestamp: " << time_util::TIME_STAMP_STR << std::endl;
-  output << prefix << "###################### Parameters ######################" << std::endl;
-  output << prefix << std::setw(40) << std::left 
-      << "Data type: " << "centroid" << std::endl;
-  output << prefix << std::setw(40) << std::left 
-      << "Maximum charge: " << arguments["maxCharge"] << std::endl;
-  output << prefix << std::setw(40) << std::left 
-      << "Maximum monoisotopic mass: " << arguments["maxMass"] << " Dalton" << std::endl;
-  output << prefix << std::setw(40) << std::left 
-      << "Error tolerance: " << arguments["mzError"] << " m/z" << std::endl;
-  output << prefix << std::setw(40) << std::left 
-      << "MS1 signal/noise ratio: " << arguments["msOneSnRatio"] << std::endl;
-  output << prefix << std::setw(40) << std::left 
-      << "MS/MS signal/noise ratio: " << arguments["msTwoSnRatio"] << std::endl;
-  output << prefix << std::setw(40) << std::left 
-      << "Precursor window size: " << arguments["precWindow"] << " m/z" << std::endl;
-  //output << prefix << std::setw(40) << std::left 
-  //    << "Do final filtering: " << para_ptr->do_final_filtering_ << std::endl;
-  output << prefix << "###################### Parameters ######################" << std::endl;
-  return output.str();
-}
-
-
-
 int processOneFile(std::map<std::string, std::string> arguments, 
-                   const std::string &argument_str, 
-                   const std::string &spec_file_name, int frac_id) {
+                   std::string argu_str, 
+                   const std::string &spec_file_name, 
+                   int frac_id) {
   try {
-    time_t start = time(0);
-    base_data::init();
-    DeconvParaPtr para_ptr = std::make_shared<DeconvPara>(arguments, argument_str, 
-        spec_file_name, frac_id);
-    std::string para_str = para_ptr->getArgumentStr();
-    time_util::addTimeStamp(para_str);
-    std::cout << para_str;
+    std::cout << "Processing " << spec_file_name << " started." << std::endl;
     std::cout << "Deconvolution started." << std::endl;
-    DeconvProcess process(para_ptr);
-    process.process();
+    DeconvParaPtr para_ptr = std::make_shared<DeconvPara>(arguments, argu_str);
+    DeconvProcess processor(para_ptr, argu_str, spec_file_name, frac_id);
+    processor.process();
     std::cout << "Deconvolution finished." << std::endl;
 
     std::cout << "Feature detection started." << std::endl;
-    std::string argu_str = para_ptr->getArgumentStr();
-    std::string sp_file_name = para_ptr->getDataFileName();
-    feature_detect::process(frac_id, sp_file_name, arguments["resourceDir"], 
-        para_ptr->missing_level_one_, argu_str);
+    std::string resource_dir = arguments["resourceDir"];
+    bool missing_level_one = (arguments["missingLevelOne"] == "true");
+    feature_detect::process(frac_id, spec_file_name, resource_dir,
+                            missing_level_one, argu_str);
     std::cout << "Feature detection finished." << std::endl;
+    std::cout << "Processing " << spec_file_name << " finished." << std::endl;
 
-    time_t end = time(0);
-    std::cout << "Runing time: "
-      << str_util::toString(static_cast<int>(difftime(end, start)))
-      << " seconds." << std::endl;
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
   }
-  std::cout << "TopFD finished." << std::endl << std::flush;
   return 0;
 }
 
@@ -118,8 +81,14 @@ void moveFiles(std::string &spec_file_name, bool move_mzrt) {
 
 int process(std::map<std::string, std::string> arguments, 
             std::vector<std::string> spec_file_lst) {
-  std::string argument_str = geneArgumentStr(arguments, "#");
-  EnvBase::initBase(arguments["resourceDir"]);
+  base_data::init();
+  std::string print_str = Argument::geneArgumentStr(arguments, "");
+  time_util::addTimeStamp(print_str);
+  std::cout << print_str;
+
+  std::string argument_str = Argument::geneArgumentStr(arguments, "#");
+  std::string resource_dir = arguments["resourceDir"];
+  EnvBase::initBase(resource_dir);
   for (size_t k = 0; k < spec_file_lst.size(); k++) {
     if (str_util::endsWith(spec_file_lst[k], "mzML")
         || str_util::endsWith(spec_file_lst[k], "mzXML")
@@ -145,7 +114,7 @@ int process(std::map<std::string, std::string> arguments,
     FeatureMergePtr feature_merger = std::make_shared<FeatureMerge>(spec_file_lst, sample_name);
     feature_merger->process(argument_str);
     feature_merger = nullptr;
-    std::cout << "Merging files ended." << std::endl;
+    std::cout << "Merging files finished." << std::endl;
   }
 
 
@@ -165,6 +134,7 @@ int process(std::map<std::string, std::string> arguments,
     moveFiles(sample_name, move_mzrt);
   }
 
+  std::cout << "TopFD finished." << std::endl << std::flush;
   return 0;
 }
 

@@ -464,7 +464,7 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
   std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
   std::string combined_start_time = buf;
 
-  std::cout << "TopPIC " << toppic::version_number << std::endl;
+  std::cout << "TopPIC " << toppic::Version::getVersion() << std::endl;
 
   for (size_t k = 0; k < spec_file_lst.size(); k++) {
     std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));

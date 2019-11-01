@@ -26,12 +26,7 @@
 namespace toppic {
 
 DeconvPara::DeconvPara(std::map<std::string, std::string> &arguments, 
-                       const std::string &argument_str, 
-                       const std::string &spec_file_name, int frac_id) { 
-  data_file_name_ = spec_file_name; 
-
-  fraction_id_ = frac_id;
-  
+                       const std::string &argument_str) { 
   resource_dir_ = arguments["resourceDir"];
 
   missing_level_one_ = (arguments["missingLevelOne"] == "true");
