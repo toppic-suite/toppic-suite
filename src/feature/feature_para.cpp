@@ -20,7 +20,7 @@
 namespace toppic {
 
 FeaturePara::FeaturePara(int frac_id, const std::string &file_name, 
-                         std::string &resource_dir): 
+                         const std::string &resource_dir): 
   frac_id_(frac_id),
   file_name_(file_name) {
 

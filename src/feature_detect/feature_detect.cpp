@@ -542,7 +542,7 @@ void getSampleFeatures(SampleFeaturePtrVec &sample_features, FracFeaturePtrVec &
   }
 }
 
-void process(int frac_id, std::string &sp_file_name, std::string &resource_dir,
+void process(int frac_id, const std::string &sp_file_name, const std::string &resource_dir,
              bool missing_level_one, std::string &argu_str) {
   //logger::setLogLevel(2);
   FeatureParaPtr para_ptr = std::make_shared<FeaturePara>(frac_id, sp_file_name, resource_dir);

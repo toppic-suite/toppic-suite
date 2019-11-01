@@ -19,7 +19,10 @@
 
 namespace toppic {
 
-const std::string version_number = "1.3.0";
+class Version {
+ public:
+  static std::string getVersion() {return "1.3.0";}
+};
 
 }  // namespace toppic
 

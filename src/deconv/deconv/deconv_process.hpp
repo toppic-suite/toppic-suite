@@ -26,7 +26,8 @@ namespace toppic {
 
 class DeconvProcess {
  public:
-  DeconvProcess(DeconvParaPtr para_ptr) {para_ptr_ = para_ptr;}
+  DeconvProcess(DeconvParaPtr para_ptr, const std::string &argu_str,
+                const std::string &spec_file_name, int frac_id);
 
   void process();
 
@@ -38,6 +39,11 @@ class DeconvProcess {
 
  private:
   DeconvParaPtr para_ptr_;
+  std::string argu_str_;
+  std::string spec_file_name_;
+  std::string base_name_;
+
+  int frac_id_;
 
   void copyParameters(EnvParaPtr env_para_ptr);
 
