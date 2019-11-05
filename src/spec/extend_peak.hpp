@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -11,6 +11,7 @@
 //WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //See the License for the specific language governing permissions and
 //limitations under the License.
+
 
 #ifndef PROT_EXTEND_PEAK_HPP_
 #define PROT_EXTEND_PEAK_HPP_
@@ -61,6 +62,8 @@ class ExtendPeak : public Peak {
 
 typedef std::vector<ExtendPeakPtr> ExtendPeakPtrVec;
 
-} // namespace toppic 
 
-#endif 
+
+} /* namespace toppic */
+
+#endif /* EXTEND_PEAK_HPP_ */

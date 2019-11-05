@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -12,9 +12,9 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <cmath>
 #include <iomanip>
 #include <algorithm>
+#include <cmath>
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
@@ -64,15 +64,15 @@ void matchPrsms(FeaturePrsmPtrVec &features, PrsmStrPtrVec &prsms) {
 void normalizeTime(FeaturePrsmPtrVec &features) {
   double max_time = 1;
   for (size_t i = 0; i < features.size(); i++) {
-    if (features[i]->getTimeEnd() > max_time) {
-      max_time = features[i]->getTimeEnd();
+    if (features[i]->getRetentEnd() > max_time) {
+      max_time = features[i]->getRetentEnd();
     }
   } 
   for (size_t i = 0; i < features.size(); i++) {
-    double time_begin = features[i]->getTimeBegin()/max_time;
-    features[i]->setAlignTimeBegin(time_begin);
-    double time_end = features[i]->getTimeEnd()/max_time;
-    features[i]->setAlignTimeEnd(time_end);
+    double time_begin = features[i]->getRetentBegin()/max_time;
+    features[i]->setAlignRetentBegin(time_begin);
+    double time_end = features[i]->getRetentEnd()/max_time;
+    features[i]->setAlignRetentEnd(time_end);
   }
 }
 
@@ -93,7 +93,7 @@ typedef std::vector<CellPtrVec> CellPtrVec2D;
 
 
 inline FeaturePrsmPtrVec getTopFeatures(FeaturePrsmPtrVec &features) {
-  std::sort(features.begin(), features.end(), FeaturePrsm::cmpInteDec);
+  std::sort(features.begin(), features.end(), Feature::cmpInteDec);
   FeaturePrsmPtrVec::const_iterator first = features.begin();
   FeaturePrsmPtrVec::const_iterator last = features.begin() + 1000;
   FeaturePrsmPtrVec result(first, last);
@@ -128,10 +128,10 @@ bool isMatch(FeaturePrsmPtr a, FeaturePrsmPtrVec &second, size_t b_index, double
   if (erro_tole < 0.01) {
     erro_tole = 0.01;
   }
-  double b_time = second[b_index]->getAlignTimeMiddle();
+  double b_time = second[b_index]->getAlignRetentMiddle();
   for (size_t i = b_index; i >= 1; i--) {
     double mass = second[i]->getMonoMass();
-    double time = second[i]->getAlignTimeMiddle();
+    double time = second[i]->getAlignRetentMiddle();
     if (b_time - time > 0.02) {
       break;
     }
@@ -142,7 +142,7 @@ bool isMatch(FeaturePrsmPtr a, FeaturePrsmPtrVec &second, size_t b_index, double
   }
   for (size_t i = b_index; i < second.size(); i++) {
     double mass = second[i]->getMonoMass();
-    double time = second[i]->getAlignTimeMiddle();
+    double time = second[i]->getAlignRetentMiddle();
     if (time - b_time > 0.02) {
       break;
     }
@@ -158,9 +158,9 @@ bool isMatch(FeaturePrsmPtr a, FeaturePrsmPtrVec &second, size_t b_index, double
 void sampleAlignTime(FeaturePrsmPtrVec &first, FeaturePrsmPtrVec &second, 
                      double ppm, std::vector<std::pair<double,double>> &time_pairs) {
   FeaturePrsmPtrVec a = getTopFeatures(first);
-  std::sort(a.begin(), a.end(), FeaturePrsm::cmpTimeInc);
+  std::sort(a.begin(), a.end(), Feature::cmpRetentInc);
   FeaturePrsmPtrVec b = getTopFeatures(second);
-  std::sort(b.begin(), b.end(), FeaturePrsm::cmpTimeInc);
+  std::sort(b.begin(), b.end(), Feature::cmpRetentInc);
   size_t a_size = a.size();
   size_t b_size = b.size();
   LOG_DEBUG("a size " << a_size << " b size " << b_size);
@@ -199,8 +199,8 @@ void sampleAlignTime(FeaturePrsmPtrVec &first, FeaturePrsmPtrVec &second,
   std::pair<double,double> last_pair(1,1);
   time_pairs.push_back(last_pair);
   while (i > 0 && j > 0) {
-    double a_time = first[i-1]->getAlignTimeMiddle();
-    double b_time = second[i-1]->getAlignTimeMiddle();
+    double a_time = first[i-1]->getAlignRetentMiddle();
+    double b_time = second[i-1]->getAlignRetentMiddle();
     std::pair<double, double>time_pair(a_time,b_time);
     time_pairs.push_back(time_pair);
     int pre = cell_2d[i][j]->pre_;
@@ -243,10 +243,10 @@ double findAlignTime(double time, std::vector<std::pair<double,double>> &time_pa
 void setAlignTime(FeaturePrsmPtrVec &features, 
                   std::vector<std::pair<double,double>> &time_pairs) {
   for (size_t i = 0; i < features.size(); i++) {
-    double time_begin = findAlignTime(features[i]->getAlignTimeBegin(), time_pairs);
-    features[i]->setAlignTimeBegin(time_begin);
-    double time_end = findAlignTime(features[i]->getAlignTimeEnd(), time_pairs);
-    features[i]->setAlignTimeEnd(time_end);
+    double time_begin = findAlignTime(features[i]->getAlignRetentBegin(), time_pairs);
+    features[i]->setAlignRetentBegin(time_begin);
+    double time_end = findAlignTime(features[i]->getAlignRetentEnd(), time_pairs);
+    features[i]->setAlignRetentEnd(time_end);
   }
 }
 
@@ -257,7 +257,7 @@ FeaturePrsmPtr findMatchFeature(FeaturePrsmPtr feature, FeaturePrsmPtrVec &featu
   if (erro_tole < 0.01) {
     erro_tole = 0.01;
   }
-  double cur_time = feature->getAlignTimeMiddle();
+  double cur_time = feature->getAlignRetentMiddle();
   for (size_t i = 0; i < features.size(); i++) {
     if (features[i] == nullptr) {
       continue;
@@ -267,7 +267,7 @@ FeaturePrsmPtr findMatchFeature(FeaturePrsmPtr feature, FeaturePrsmPtrVec &featu
       continue;
     }
 
-    double time = features[i]->getAlignTimeMiddle();
+    double time = features[i]->getAlignRetentMiddle();
     if (abs(time-cur_time) < 0.02) {
       FeaturePrsmPtr result = features[i];
       features[i] = nullptr;
@@ -333,7 +333,7 @@ void FeatureSampleMerge::outputTable(FeaturePrsmPtrVec2D &table,
 
   for (int i = 0; i < sample_num; i++) {
     file << input_file_names_[i] << " Abundance" << ","
-        << input_file_names_[i] << " Spectrum id" << ","
+        << input_file_names_[i] << " Scan" << ","
         << input_file_names_[i] << " Retention time begin" << ","
         << input_file_names_[i] << " Retention time end" << ",";
   }
@@ -354,9 +354,9 @@ void FeatureSampleMerge::outputTable(FeaturePrsmPtrVec2D &table,
       }
       else {
         file <<  std::setprecision(3) << std::scientific << sample_feature->getIntensity() << ","
-            << std::fixed << sample_feature->getMs2Id() << ","
-            << sample_feature->getTimeBegin() << ","
-            << sample_feature->getTimeEnd() << ",";
+            << std::fixed << sample_feature->getMs2Scan() << ","
+            << sample_feature->getRetentBegin() << ","
+            << sample_feature->getRetentEnd() << ",";
       }
     }
     file << std::endl;
@@ -394,7 +394,7 @@ void FeatureSampleMerge::process() {
                                                               fix_mod_ptr_vec);
     LOG_DEBUG("prsm number " << prsms.size());
     matchPrsms(features, prsms);
-    std::sort(features.begin(), features.end(), FeaturePrsm::cmpTimeInc);
+    std::sort(features.begin(), features.end(), Feature::cmpRetentInc);
     for (size_t i = 0; i < features.size(); i++) {
       features[i]->setSampleId(k);
     }
@@ -407,9 +407,9 @@ void FeatureSampleMerge::process() {
     features_2d.push_back(features);
     all_features.insert(all_features.end(), features.begin(), features.end());
   }
-  std::sort(all_features.begin(), all_features.end(), FeaturePrsm::cmpInteDec);
+  std::sort(all_features.begin(), all_features.end(), Feature::cmpInteDec);
   for (size_t k = 0; k < sample_num; k++) {
-    std::sort(features_2d[k].begin(), features_2d[k].end(), FeaturePrsm::cmpInteDec);
+    std::sort(features_2d[k].begin(), features_2d[k].end(), Feature::cmpInteDec);
   }
   FeaturePrsmPtrVec2D table; 
   FeaturePrsmPtrVec examples; 

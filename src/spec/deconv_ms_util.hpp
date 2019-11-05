@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -12,6 +12,7 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+
 #ifndef TOPPIC_SPEC_DECONV_MS_FACTORY_HPP_
 #define TOPPIC_SPEC_DECONV_MS_FACTORY_HPP_
 
@@ -21,8 +22,7 @@ namespace toppic {
 
 namespace deconv_ms_util {
 
-DeconvMsPtrVec  getRefineMsPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, 
-                                  double new_prec_mass);
+DeconvMsPtrVec  getRefineMsPtrVec(const DeconvMsPtrVec &deconv_ms_ptr_vec, double new_prec_mass);
 
 }  // namespace deconv_ms_util
 

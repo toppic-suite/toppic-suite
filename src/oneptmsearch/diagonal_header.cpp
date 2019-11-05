@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 
 #include "common/base/prot_mod.hpp"
 #include "common/base/mod_base.hpp"
-#include "seq/alter.hpp"
+#include "seq/change.hpp"
 #include "prsm/prsm_algo.hpp"
 #include "oneptmsearch/diagonal_header.hpp"
 
@@ -80,37 +80,46 @@ void DiagonalHeader::initHeader(double c_shift, ProteoformPtr proteo_ptr,
 
 MassShiftPtrVec getDiagonalMassChanges(const DiagonalHeaderPtrVec &header_ptrs,
                                        int first_res_pos, int last_res_pos,
-                                       AlterTypePtr type_ptr) {
+                                       MassShiftTypePtr type_ptr) {
   MassShiftPtrVec shift_list;
   ModPtr none_ptr = ModBase::getNoneModPtr();
   if (!header_ptrs[0]->isPepNTermMatch() && !header_ptrs[0]->isProtNTermMatch()) {
-    AlterPtr alter_ptr
-        = std::make_shared<Alter>(0, header_ptrs[0]->getMatchFirstBpPos()-first_res_pos,
-                                       type_ptr, header_ptrs[0]->getPepNTermShift(), none_ptr);
-    MassShiftPtr shift = std::make_shared<MassShift>(alter_ptr);
+    ChangePtr c
+        = std::make_shared<Change>(0, header_ptrs[0]->getMatchFirstBpPos()-first_res_pos,
+                                   type_ptr, header_ptrs[0]->getPepNTermShift(), none_ptr);
+    MassShiftPtr shift
+        = std::make_shared<MassShift>(c->getLeftBpPos(), c->getRightBpPos(), c->getTypePtr());
+    shift->setChangePtr(c);
     shift_list.push_back(shift);
   }
 
   for (size_t i = 0; i < header_ptrs.size() - 1; i++) {
-    AlterPtr alter_ptr
-        = std::make_shared<Alter>(header_ptrs[i]->getMatchLastBpPos() - first_res_pos,
-                                       header_ptrs[i + 1]->getMatchFirstBpPos() - first_res_pos,
-                                       type_ptr,
-                                       header_ptrs[i + 1]->getProtNTermShift() 
-                                         - header_ptrs[i]->getProtNTermShift(),
-                                       none_ptr);
-    MassShiftPtr shift = std::make_shared<MassShift>(alter_ptr);
+    ChangePtr change_ptr
+        = std::make_shared<Change>(header_ptrs[i]->getMatchLastBpPos() - first_res_pos,
+                                   header_ptrs[i + 1]->getMatchFirstBpPos() - first_res_pos,
+                                   type_ptr,
+                                   header_ptrs[i + 1]->getProtNTermShift() - header_ptrs[i]->getProtNTermShift(),
+                                   none_ptr);
+    MassShiftPtr shift
+        = std::make_shared<MassShift>(change_ptr->getLeftBpPos(),
+                                      change_ptr->getRightBpPos(),
+                                      change_ptr->getTypePtr());
+    shift->setChangePtr(change_ptr);
     shift_list.push_back(shift);
   }
 
   DiagonalHeaderPtr last_header_ptr = header_ptrs[header_ptrs.size() - 1];
   if (!last_header_ptr->isPepCTermMatch() && !last_header_ptr->isProtCTermMatch()) {
-    AlterPtr alter_ptr
-        = std::make_shared<Alter>(last_header_ptr->getMatchLastBpPos() - first_res_pos,
-                                       (last_res_pos + 1) - first_res_pos,
-                                       type_ptr, last_header_ptr->getPepCTermShift(),
-                                       none_ptr);
-    MassShiftPtr shift = std::make_shared<MassShift>(alter_ptr);
+    ChangePtr change_ptr
+        = std::make_shared<Change>(last_header_ptr->getMatchLastBpPos() - first_res_pos,
+                                   (last_res_pos + 1) - first_res_pos,
+                                   type_ptr, last_header_ptr->getPepCTermShift(),
+                                   none_ptr);
+    MassShiftPtr shift
+        = std::make_shared<MassShift>(change_ptr->getLeftBpPos(),
+                                      change_ptr->getRightBpPos(),
+                                      change_ptr->getTypePtr());
+    shift->setChangePtr(change_ptr);
     shift_list.push_back(shift);
   }
   return shift_list;
@@ -118,41 +127,52 @@ MassShiftPtrVec getDiagonalMassChanges(const DiagonalHeaderPtrVec &header_ptrs,
 
 MassShiftPtrVec getDiagonalMassChanges(const DiagonalHeaderPtrVec &header_ptrs,
                                        int first_res_pos, int last_res_pos,
-                                       const AlterTypePtrVec & types) {
+                                       const MassShiftTypePtrVec & types) {
   MassShiftPtrVec shift_list;
   ModPtr none_ptr = ModBase::getNoneModPtr();
   if (!header_ptrs[0]->isPepNTermMatch() && !header_ptrs[0]->isProtNTermMatch()) {
-    AlterPtr alter_ptr
-        = std::make_shared<Alter>(0, header_ptrs[0]->getMatchFirstBpPos() - first_res_pos,
-                                       types[0],
-                                       header_ptrs[0]->getPepNTermShift(), none_ptr);
+    ChangePtr change_ptr
+        = std::make_shared<Change>(0, header_ptrs[0]->getMatchFirstBpPos() - first_res_pos,
+                                   types[0],
+                                   header_ptrs[0]->getPepNTermShift(), none_ptr);
 
-    MassShiftPtr shift = std::make_shared<MassShift>(alter_ptr);
+    MassShiftPtr shift
+        = std::make_shared<MassShift>(change_ptr->getLeftBpPos(),
+                                      change_ptr->getRightBpPos(),
+                                      change_ptr->getTypePtr());
+    shift->setChangePtr(change_ptr);
     shift_list.push_back(shift);
   }
 
   for (size_t i = 0; i < header_ptrs.size() - 1; i++) {
-    AlterPtr alter_ptr
-        = std::make_shared<Alter>(header_ptrs[i]->getMatchLastBpPos() - first_res_pos,
-                                       header_ptrs[i + 1]->getMatchFirstBpPos() - first_res_pos,
-                                       types[i + 1],
-                                       header_ptrs[i + 1]->getProtNTermShift() 
-                                       - header_ptrs[i]->getProtNTermShift(),
-                                       none_ptr);
-    MassShiftPtr shift = std::make_shared<MassShift>(alter_ptr);
+    ChangePtr change_ptr
+        = std::make_shared<Change>(header_ptrs[i]->getMatchLastBpPos() - first_res_pos,
+                                   header_ptrs[i + 1]->getMatchFirstBpPos() - first_res_pos,
+                                   types[i + 1],
+                                   header_ptrs[i + 1]->getProtNTermShift() - header_ptrs[i]->getProtNTermShift(),
+                                   none_ptr);
+    MassShiftPtr shift
+        = std::make_shared<MassShift>(change_ptr->getLeftBpPos(),
+                                      change_ptr->getRightBpPos(),
+                                      change_ptr->getTypePtr());
+    shift->setChangePtr(change_ptr);
     shift_list.push_back(shift);
   }
 
   DiagonalHeaderPtr last_header_ptr = header_ptrs[header_ptrs.size() - 1];
 
   if (!last_header_ptr->isPepCTermMatch() && !last_header_ptr->isProtCTermMatch()) {
-    AlterPtr alter_ptr
-        = std::make_shared<Alter>(last_header_ptr->getMatchLastBpPos() - first_res_pos,
-                                       (last_res_pos + 1) - first_res_pos,
-                                       AlterType::UNEXPECTED,
-                                       last_header_ptr->getPepCTermShift(),
-                                       none_ptr);
-    MassShiftPtr shift = std::make_shared<MassShift>(alter_ptr);
+    ChangePtr change_ptr
+        = std::make_shared<Change>(last_header_ptr->getMatchLastBpPos() - first_res_pos,
+                                   (last_res_pos + 1) - first_res_pos,
+                                   MassShiftType::UNEXPECTED,
+                                   last_header_ptr->getPepCTermShift(),
+                                   none_ptr);
+    MassShiftPtr shift
+        = std::make_shared<MassShift>(change_ptr->getLeftBpPos(),
+                                      change_ptr->getRightBpPos(),
+                                      change_ptr->getTypePtr());
+    shift->setChangePtr(change_ptr);
     shift_list.push_back(shift);
   }
   return shift_list;

@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -12,9 +12,19 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include "console/topfd_process.hpp"
-#include "gui/topfd/threadtopfd.h"
+#include <algorithm>
+
+#include "threadtopfd.h"
 
 void ThreadTopFD::run() {
-  toppic::topfd_process::process(arguments_, spec_file_lst_);
+  std::sort(spec_file_lst_.begin(), spec_file_lst_.end());
+  for (size_t k = 0; k < spec_file_lst_.size(); k++) {
+    if (toppic::str_util::endsWith(spec_file_lst_[k], "mzML")
+        || toppic::str_util::endsWith(spec_file_lst_[k], "mzXML")
+        || toppic::str_util::endsWith(spec_file_lst_[k], "mzml")
+        || toppic::str_util::endsWith(spec_file_lst_[k], "mzxml")) {
+      arguments_["spectrumFileName"] = spec_file_lst_[k];
+      toppic::TopFDProcess(arguments_);
+    }
+  }
 }

@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 #include <string>
 #include <vector>
 #include <numeric>
+
 
 #include "common/base/amino_acid_base.hpp"
 #include "common/base/activation_base.hpp"
@@ -215,7 +216,7 @@ std::vector<double> geneNTheoMass(ProteoformPtr proteoform, ExtendMsPtr extend_m
 }
 
 MassShiftPtrVec massShiftFilter(const MassShiftPtrVec & mass_shift_vec,
-                                AlterTypePtr type) {
+                                MassShiftTypePtr type) {
   MassShiftPtrVec res;
   for (size_t k = 0; k < mass_shift_vec.size(); k++) {
     if (mass_shift_vec[k]->getTypePtr() != type) {
@@ -228,7 +229,13 @@ MassShiftPtrVec massShiftFilter(const MassShiftPtrVec & mass_shift_vec,
 MassShiftPtrVec copyMassShiftVec(const MassShiftPtrVec & mass_shift_vec) {
   MassShiftPtrVec new_mass_shift_vec;
   for (size_t k = 0; k < mass_shift_vec.size(); k++) {
-    MassShiftPtr mass_shift = std::make_shared<MassShift>(mass_shift_vec[k], 0);
+    MassShiftPtr mass_shift
+        = std::make_shared<MassShift>(mass_shift_vec[k]->getLeftBpPos(),
+                                      mass_shift_vec[k]->getRightBpPos(),
+                                      mass_shift_vec[k]->getTypePtr());
+
+    mass_shift->setChangePtr(mass_shift_vec[k]->getChangePtr(0));
+
     new_mass_shift_vec.push_back(mass_shift);
   }
   return new_mass_shift_vec;
@@ -242,14 +249,16 @@ double compMassShift(const MassShiftPtrVec & mass_shift_vec) {
   return mass;
 }
 
-MassShiftPtr geneMassShift(MassShiftPtr shift, double mass, AlterTypePtr type) {
-  ModPtr mod_ptr = std::make_shared<Mod>(ResidueBase::getEmptyResiduePtr(),
-                                         ResidueBase::getEmptyResiduePtr());
-  AlterPtr alter = std::make_shared<Alter>(shift->getLeftBpPos(),
-                                                     shift->getRightBpPos(),
-                                                     type, mass,
-                                                     mod_ptr);
-  MassShiftPtr mass_shift = std::make_shared<MassShift>(alter);
+MassShiftPtr geneMassShift(MassShiftPtr shift, double mass, MassShiftTypePtr type) {
+  ChangePtr change = std::make_shared<Change>(shift->getLeftBpPos(),
+                                              shift->getRightBpPos(),
+                                              type, mass,
+                                              std::make_shared<Mod>(ResidueBase::getEmptyResiduePtr(),
+                                                                    ResidueBase::getEmptyResiduePtr()));
+  MassShiftPtr mass_shift = std::make_shared<MassShift>(shift->getLeftBpPos(),
+                                                        shift->getRightBpPos(),
+                                                        type);
+  mass_shift->setChangePtr(change);
   return mass_shift;
 }
 

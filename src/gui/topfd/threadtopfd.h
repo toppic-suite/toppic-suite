@@ -24,6 +24,10 @@
 
 #include <QThread>
 
+#include "common/util/file_util.hpp"
+#include "common/util/str_util.hpp"
+#include "console/topfd_argument.hpp"
+#include "console/topfd_process.hpp"
 
 namespace Ui {
 class ThreadTopFD;

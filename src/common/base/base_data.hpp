@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -16,11 +16,17 @@
 #ifndef TOPPIC_COMMON_BASE_BASE_DATA_HPP_
 #define TOPPIC_COMMON_BASE_BASE_DATA_HPP_
 
+#include <string>
+
 namespace toppic {
 
 namespace base_data {
 
-void init();
+inline std::string getBaseDataDirName() {return "base_data";}
+
+inline std::string getBaseDataConfigFileName() {return "base_data_config.xml";}
+
+void init(const std::string & resource_dir);
 
 extern bool base_data_init_;
 

@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -26,11 +26,14 @@ int topMergeProcess(std::map<std::string, std::string> &arguments,
                     std::vector<std::string> &input_file_list) {
 
   Argument::outputArguments(std::cout, arguments);
-  base_data::init();
+  std::string resource_dir = arguments["resourceDir"];
+  base_data::init(resource_dir);
 
   std::string ori_db_file_name = arguments["databaseFileName"];
   std::string db_file_name = ori_db_file_name + "_target";
   fasta_util::dbSimplePreprocess(ori_db_file_name, db_file_name);
+
+  double error_tole = std::stod(arguments["errorTolerance"]);
 
   std::string base_path = file_util::absoluteDir(input_file_list[0]);
   std::string output_file_name = base_path + file_util::getFileSeparator() 

@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -50,9 +50,9 @@ class Peak {
 
   static std::string getXmlElementName() {return "peak";}
 
-  static double compPeakNeutralMass(double mono_mz, int charge);
+  static double compPeakMass(double mono_mz, int charge);
 
-  static double compMz(double neutral_mass, int charge);
+  static double compMonoMz(double mono_mass, int charge);
 
   static bool cmpInteDec(const PeakPtr &a, const PeakPtr &b) { 
     return a->getIntensity() > b->getIntensity();}
@@ -62,7 +62,6 @@ private:
   double intensity_;
 };
 
-typedef std::vector<PeakPtrVec> PeakPtrVec2D;
 
 }  // namespace toppic
 #endif

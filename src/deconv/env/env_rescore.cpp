@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <cmath>
 #include <algorithm>
+#include <cmath>
 
 #include "common/base/mass_constant.hpp"
 #include "deconv/env/env_rescore.hpp"
@@ -31,15 +31,15 @@ std::vector<double> diff(MatchEnvPtr env, MatchEnvPtr2D &match_envs) {
     for (size_t j = 0; j < match_envs[i].size(); j++) {
       if (match_envs[i][j] != nullptr) {
         sum.push_back(match_envs[i][j]->getRealEnvPtr()->compIntensitySum()); 
-        temp = std::abs(env->getRealEnvPtr()->getMonoNeutralMass()
-                        - match_envs[i][j]->getRealEnvPtr()->getMonoNeutralMass());
+        temp = std::abs(env->getRealEnvPtr()->getMonoMass()
+                        - match_envs[i][j]->getRealEnvPtr()->getMonoMass());
         if (std::abs(temp - mass_constant::getWaterMass()) < 0.01) {
           res++;
         } else if (std::abs(temp - mass_constant::getAmmoniaMass()) < 0.01) {
           res++;
         }
-        if (std::abs(env->getRealEnvPtr()->getMonoNeutralMass()
-                     - match_envs[i][j]->getRealEnvPtr()->getMonoNeutralMass()) < 0.01) {
+        if (std::abs(env->getRealEnvPtr()->getMonoMass()
+                     - match_envs[i][j]->getRealEnvPtr()->getMonoMass()) < 0.01) {
           res2++;
         }
       }

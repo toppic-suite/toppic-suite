@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -48,13 +48,11 @@ class MsHeader {
   // get functions 
   ActivationPtr getActivationPtr() {return activation_ptr_;}
 
- // double getFeatureInte() {return feature_inte_;}
-
-  int getId() {return id_;}
-
-  int getFractionId() {return fraction_id_;}
+  double getFeatureInte() {return feature_inte_;}
 
   std::string getFileName() {return file_name_;}
+
+  int getId() {return id_;}
 
   int getMsLevel() {return level_;}
 
@@ -78,7 +76,7 @@ class MsHeader {
 
   double getPrecInte() {return prec_inte_;}
 
-  //int getFeatureId() {return feature_id_;}
+  int getFeatureId() {return feature_id_;}
 
   // set function 
   void setActivationPtr(ActivationPtr acti_ptr) {activation_ptr_ = acti_ptr;}
@@ -86,8 +84,6 @@ class MsHeader {
   void setFileName(const std::string &file_name) {file_name_ = file_name;}
 
   void setId(int id) {id_ = id;}
-
-  void setFractionId(int fraction_id) {fraction_id_ = fraction_id;}
 
   void setTitle(const std::string &title) {title_ = title;}
 
@@ -113,9 +109,9 @@ class MsHeader {
 
   void setPrecInte(double inte) {prec_inte_ = inte;}
 
-  //void setFeatureId(int feature_id) {feature_id_ = feature_id;}
+  void setFeatureId(int feature_id) {feature_id_ = feature_id;}
 
-  //void setFeatureInte(double feature_inte) {feature_inte_ = feature_inte;}
+  void setFeatureInte(double feature_inte) {feature_inte_ = feature_inte;}
 
   xercesc::DOMElement* getHeaderXml(XmlDOMDocument* xml_doc);
 
@@ -128,18 +124,14 @@ class MsHeader {
   static bool cmpPrecInteDec(const MsHeaderPtr &a, const MsHeaderPtr &b);
 
  private:
-  int id_ = -1;
-
-  // a data set may have multiple fractions
-  int fraction_id_ = -1;
-
-  // mass spec data file name 
+  // data set name 
   std::string file_name_;
-
-  // one spectrum may have several possible precursor mass */
+  // A data set may contain several spectra with the same id, but different
   // precursor id 
+  int id_ = -1;
+  // one spectrum may have several possible precursor mass */
   int prec_id_ = -1;
-
+  
   std::string title_;
   // a list of scans for merged spectra 
   std::vector<int> scans_;
@@ -161,12 +153,10 @@ class MsHeader {
   int prec_charge_ = -1;
   // precursor intensity 
   double prec_inte_ = 0;
-  /*
   // feature id
   int feature_id_ = -1;
   // feature inte
   double feature_inte_ = -1;
-  */
 };
 
 typedef std::vector<MsHeaderPtr> MsHeaderPtrVec;

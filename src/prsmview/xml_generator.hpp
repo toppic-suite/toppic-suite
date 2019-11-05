@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -28,8 +28,7 @@
 #include "spec/msalign_reader.hpp"
 #include "prsm/prsm.hpp"
 #include "prsmview/prsm_view_mng.hpp"
-#include "prsmview/anno_file_list.hpp"
-#include "prsmview/anno_xml_util.hpp"
+#include "prsmview/anno_view.hpp"
 
 namespace toppic {
 
@@ -53,7 +52,7 @@ class XmlGenerator {
 
   void outputFileList();
 
-  void splitByProteoformId();
+  void splitBySpeciesId();
 
   void splitByProtId();
 
@@ -63,7 +62,7 @@ class XmlGenerator {
 
   PrsmViewMngPtr mng_ptr_;
 
-  AnnoFileListPtr anno_file_list_ptr_;
+  AnnoViewPtr anno_view_ptr_;
 
   FastaIndexReaderPtr fasta_reader_ptr_;
 

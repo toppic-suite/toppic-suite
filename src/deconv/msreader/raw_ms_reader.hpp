@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -26,8 +26,6 @@ class RawMsReader {
   RawMsReader(const std::string & file_name);
 
   RawMsPtr getNextMs(double prec_win_size, int max_charge);
-
-  void getMs1Peaks(PeakPtrVec2D &raw_peaks);
 
   void refinePrecChrg(RawMsPtr ms_one, RawMsPtr ms_two, 
                       double prec_win_size, int max_charge);

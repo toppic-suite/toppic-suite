@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -12,15 +12,13 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include "common/base/residue_util.hpp"
+
+#include <string>
+
 #include "common/util/str_util.hpp"
 #include "prsmview/anno_residue.hpp"
 
 namespace toppic {
-
-AnnoResidue::AnnoResidue(ResiduePtr residue_ptr, int pos):
-    Residue(residue_ptr->getAminoAcidPtr(), residue_ptr->getPtmPtr()),
-    pos_(pos) {}
 
 void AnnoResidue::appendViewXml(XmlDOMDocument* xml_doc,
                                 xercesc::DOMElement* parent) {
@@ -31,23 +29,21 @@ void AnnoResidue::appendViewXml(XmlDOMDocument* xml_doc,
   str = getAminoAcidPtr()->getOneLetter();
   xml_doc->addElement(element, "acid", str.c_str());
 
+  str = type_;
+  xml_doc->addElement(element, "residue_type", str.c_str());
+
+  str = str_util::toString(is_unexpected_change_);
+  xml_doc->addElement(element, "is_unexpected_change", str.c_str());
+
+  str = str_util::toString(unexpected_change_color_);
+  xml_doc->addElement(element, "unexpected_change_color", str.c_str());
+
+  str = str_util::toString(possible_pos_color_);
+  xml_doc->addElement(element, "possible_pos_color", str.c_str());
+  xml_doc->addElement(element, "anno", anno_.c_str());
+
   parent->appendChild(element);
 }
-
-AnnoResiduePtrVec AnnoResidue::getAnnoResidues(ProteoformPtr proteoform_ptr) {
-  StringPairVec acid_ptm_pairs 
-      = proteoform_ptr->getFastaSeqPtr()->getAcidPtmPairVec();
-  ResiduePtrVec fasta_residues 
-      = residue_util::convertStrToResiduePtrVec(acid_ptm_pairs);
-
-  AnnoResiduePtrVec res_ptrs;
-  int prot_len = fasta_residues.size();
-  for (int i = 0; i < prot_len; i++) {
-    res_ptrs.push_back(std::make_shared<AnnoResidue>(fasta_residues[i], i));
-  }
-  return res_ptrs;
-}
-
 
 }  // namespace toppic
 

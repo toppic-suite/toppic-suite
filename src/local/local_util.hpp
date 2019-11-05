@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -55,13 +55,13 @@ void fillTableS(std::vector<std::vector<double> > & b_table,
 std::vector<double> geneNTheoMass(ProteoformPtr proteoform, ExtendMsPtr extend_ms_ptr_vec,
                                   double min_mass);
 
-MassShiftPtrVec massShiftFilter(const MassShiftPtrVec & mass_shift_vec, AlterTypePtr type);
+MassShiftPtrVec massShiftFilter(const MassShiftPtrVec & mass_shift_vec, MassShiftTypePtr type);
 
 MassShiftPtrVec copyMassShiftVec(const MassShiftPtrVec & mass_shift_vec);
 
 double compMassShift(const MassShiftPtrVec & mass_shift_vec);
 
-MassShiftPtr geneMassShift(MassShiftPtr shift, double mass, AlterTypePtr type);
+MassShiftPtr geneMassShift(MassShiftPtr shift, double mass, MassShiftTypePtr type);
 
 void normalize(std::vector<double> & scr);
 

@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -12,9 +12,9 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <cmath>
 #include <algorithm>
 #include <string>
+#include <cmath>
 
 #include "htslib/faidx.h"
 
@@ -28,7 +28,7 @@
 #include "prsm/simple_prsm.hpp"
 #include "prsm/simple_prsm_reader.hpp"
 #include "prsm/prsm_xml_writer.hpp"
-#include "prsm/prsm_str_merge.hpp"
+#include "prsm/prsm_str_combine.hpp"
 #include "zeroptmsearch/zero_ptm_fast_match.hpp"
 #include "zeroptmsearch/zero_ptm_slow_match.hpp"
 #include "zeroptmsearch/zero_ptm_search_processor.hpp"

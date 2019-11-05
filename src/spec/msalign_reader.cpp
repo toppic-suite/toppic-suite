@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -35,12 +35,6 @@ MsAlignReader::MsAlignReader(const std::string &file_name):
       activation_ptr_ = nullptr;
       peak_num_limit_ = std::numeric_limits<int>::max();
     }
-
-MsAlignReader::~MsAlignReader() {
-  if (input_.is_open()) {
-    input_.close();
-  }
-}
       
 MsAlignReader::MsAlignReader(const std::string &file_name, int group_spec_num,
                              ActivationPtr act_ptr, const std::set<std::string> skip_list,
@@ -87,9 +81,7 @@ void MsAlignReader::readNext() {
     input_.close();
     return;
   }
-  std::string ms_file_name = "";
   int id = -1;
-  int fraction_id = -1;
   int prec_id = 0;
   std::string scans;
   double retention_time = -1;
@@ -101,8 +93,8 @@ void MsAlignReader::readNext() {
   double prec_mass = -1;
   int prec_charge = -1;
   double prec_inte = -1;
-  //int feature_id = -1;
-  //double feature_inte = -1;
+  int feature_id = -1;
+  double feature_inte = -1;
   std::vector<std::string> strs;
 
   for (size_t i = 1; i < spectrum_str_vec_.size() - 1; i++) {
@@ -111,11 +103,9 @@ void MsAlignReader::readNext() {
       strs = str_util::split(spectrum_str_vec_[i], "=");
       if (strs[0] == "ID") {
         id = std::stoi(strs[1]);
-      } else if (strs[0] == "FRACTION_ID") {
-        fraction_id = std::stoi(strs[1]);
-      } else if (strs[0] == "FILE_NAME") {
-        ms_file_name = strs[1];
-      } else if (strs[0] == "PRECURSOR_ID") {
+      }
+
+      if (strs[0] == "PRECURSOR_ID") {
         prec_id = std::stoi(strs[1]);
       } else if (strs[0] == "SCANS") {
         scans = strs[1];
@@ -137,14 +127,11 @@ void MsAlignReader::readNext() {
         prec_charge = std::stoi(strs[1]);
       } else if (strs[0] == "PRECURSOR_INTENSITY") {
         prec_inte = std::stod(strs[1]);
-      } 
-      /*
-      else if (strs[0] == "FEATURE_ID") {
+      } else if (strs[0] == "FEATURE_ID") {
         feature_id = std::stoi(strs[1]);
       } else if (strs[0] == "FEATURE_INTENSITY") {
         feature_inte = std::stod(strs[1]);
       }
-      */
     }
   }
   if (id < 0 || prec_charge < 0 || prec_mass < 0) {
@@ -153,8 +140,7 @@ void MsAlignReader::readNext() {
   }
 
   MsHeaderPtr header_ptr = std::make_shared<MsHeader>();
-  header_ptr->setFractionId(fraction_id);
-  header_ptr->setFileName(ms_file_name);
+  header_ptr->setFileName(file_name_);
   header_ptr->setId(id);
   header_ptr->setPrecId(prec_id);
 
@@ -193,9 +179,9 @@ void MsAlignReader::readNext() {
 
   header_ptr->setPrecInte(prec_inte);
 
-  //header_ptr->setFeatureId(feature_id);
+  header_ptr->setFeatureId(feature_id);
 
-  //header_ptr->setFeatureInte(feature_inte);
+  header_ptr->setFeatureInte(feature_inte);
 
   std::vector<DeconvPeakPtr> peak_ptr_list;
   int idx = 0;
@@ -270,22 +256,6 @@ std::vector<SpectrumSetPtr> MsAlignReader::getNextSpectrumSet(SpParaPtr sp_para_
 
 void MsAlignReader::close() {
   input_.close();
-}
-
-void MsAlignReader::readMsOneSpectra(const std::string &file_name, 
-                                     DeconvMsPtrVec &ms_ptr_vec) {
-  int sp_num_in_group = 1;
-  MsAlignReader sp_reader(file_name, sp_num_in_group,
-                          nullptr, std::set<std::string>());
-
-  DeconvMsPtr ms_ptr;
-  //LOG_DEBUG("Start search");
-  while ((ms_ptr = sp_reader.getNextMs())!= nullptr) {
-    ms_ptr->getMsHeaderPtr()->setMsLevel(1);
-    ms_ptr_vec.push_back(ms_ptr);
-    //std::cout << std::flush <<  "reading spectrum " << ms_ptr_vec.size() << "\r";
-  }
-  sp_reader.close();
 }
 
 }  // namespace toppic

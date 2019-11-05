@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -27,9 +27,10 @@
 
 #include "spec/msalign_reader.hpp"
 #include "spec/msalign_util.hpp"
+#include "spec/feature_util.hpp"
 
 #include "prsm/prsm_para.hpp"
-#include "prsm/prsm_str_merge.hpp"
+#include "prsm/prsm_str_combine.hpp"
 #include "prsm/prsm_top_selector.hpp"
 #include "prsm/prsm_cutoff_selector.hpp"
 #include "prsm/prsm_cluster.hpp"
@@ -61,7 +62,7 @@
 #include "local/local_processor.hpp"
 
 #include "prsmview/xml_generator.hpp"
-#include "prsmview/json_transformer.hpp"
+#include "prsmview/transformer.hpp"
 
 #include "console/toppic_argument.hpp"
 
@@ -114,7 +115,9 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     arguments["startTime"] = buf;
     Argument::outputArguments(std::cout, arguments);
 
-    base_data::init();
+    std::string resource_dir = arguments["resourceDir"];
+
+    base_data::init(resource_dir);
 
     LOG_DEBUG("Init base data completed");
 
@@ -242,13 +245,13 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
       input_exts.push_back("toppic_multi_ptm_internal_2");
     }
 
-    std::cout << "Merging PrSMs - started." << std::endl;
+    std::cout << "Combining PrSMs - started." << std::endl;
     int prsm_top_num = (ptm_num + 1) * 4;
-    PrsmStrMergePtr merge_ptr
-        = std::make_shared<PrsmStrMerge>(sp_file_name, input_exts, "toppic_combined", prsm_top_num);
-    merge_ptr->process();
-    merge_ptr = nullptr;
-    std::cout << "Merging PrSMs - finished." << std::endl;
+    PrsmStrCombinePtr combine_ptr
+        = std::make_shared<PrsmStrCombine>(sp_file_name, input_exts, "toppic_combined", prsm_top_num);
+    combine_ptr->process();
+    combine_ptr = nullptr;
+    std::cout << "Combining PrSMs - finished." << std::endl;
     
     std::cout << "E-value computation - started." << std::endl;
     bool variable_ptm = false;
@@ -275,7 +278,7 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
   try {
     std::string resource_dir = arguments["resourceDir"];
 
-    base_data::init();
+    base_data::init(resource_dir);
     LOG_DEBUG("Init base data completed");
 
     std::string db_file_name = arguments["databaseFileName"];
@@ -397,9 +400,9 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     xml_gene = nullptr;
     std::cout << "Generating PrSM xml files - finished." << std::endl;
 
-    std::cout << "Converting PrSM xml files to json files - started." << std::endl;
-    jsonTranslate(arguments, "toppic_prsm_cutoff");
-    std::cout << "Converting PrSM xml files to json files - finished." << std::endl;
+    std::cout << "Converting PrSM xml files to html files - started." << std::endl;
+    translate(arguments, "toppic_prsm_cutoff");
+    std::cout << "Converting PrSM xml files to html files - finished." << std::endl;
 
     cutoff_type = (arguments["cutoffProteoformType"] == "FDR") ? "FORMFDR": "EVALUE";
     std::cout << "PrSM filtering by " << cutoff_type << " - started." << std::endl;
@@ -434,7 +437,7 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     std::cout << "Generating proteoform xml files - finished." << std::endl;
 
     std::cout << "Converting proteoform xml files to html files - started." << std::endl;
-    jsonTranslate(arguments, "toppic_proteoform_cutoff");
+    translate(arguments, "toppic_proteoform_cutoff");
     std::cout << "Converting proteoform xml files to html files - finished." << std::endl;
 
   } catch (const char* e) {
@@ -464,7 +467,7 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
   std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
   std::string combined_start_time = buf;
 
-  std::cout << "TopPIC " << toppic::Version::getVersion() << std::endl;
+  std::cout << "TopPIC " << toppic::version_number << std::endl;
 
   for (size_t k = 0; k < spec_file_lst.size(); k++) {
     std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
@@ -476,13 +479,12 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
     }
   }
 
-  /*
   if (spec_file_lst.size() > 1 && arguments["combinedOutputName"] != "") {
     std::cout << "Merging files - started." << std::endl;
-    // merge msalign files
-    toppic::MsAlignFracCombine::mergeFiles(spec_file_lst, base_name + "_ms2.msalign");
-    // merge feature files
     int N = 1000000;
+    // merge msalign files
+    toppic::msalign_util::mergeMsalignFiles(spec_file_lst, N, base_name + "_ms2.msalign");
+    // merge feature files
     std::vector<std::string> feature_file_lst(spec_file_lst.size());
     for (size_t i = 0; i < spec_file_lst.size(); i++) {
       std::string sp_file_name = spec_file_lst[i];
@@ -502,7 +504,6 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
     arguments["startTime"] = combined_start_time;
     toppic::TopPIC_post(arguments);
   }
-  */
 
   if (arguments["keepTempFiles"] != "true") {
     std::cout << "Deleting temporary files - started." << std::endl;
@@ -513,12 +514,10 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
       cleanToppicDir(ori_db_file_name, sp_file_name);
     }
 
-    /*
     if (spec_file_lst.size() > 1 && arguments["combinedOutputName"] != "") {
       std::string sp_file_name = base_name + "_ms2.msalign";
       cleanToppicDir(ori_db_file_name, sp_file_name);
     }
-    */
 
     std::cout << "Deleting temporary files - finished." << std::endl; 
   }

@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -77,8 +77,8 @@ PrsmStr::PrsmStr(const std::vector<std::string> &str_vec) {
   variable_ptm_num_ = std::stoi(prsm_util::getValueStr(line));
 
   std::vector<std::string> mass_lines = prsm_util::getXmlLineVec(str_vec_, "<shift>");
-  std::vector<std::string> left_pos_lines = prsm_util::getXmlLineVec(str_vec_, "<left_bp_pos>");
-  std::vector<std::string> right_pos_lines = prsm_util::getXmlLineVec(str_vec_, "<right_bp_pos>");
+  std::vector<std::string> left_pos_lines = prsm_util::getXmlLineVec(str_vec_, "<shift_left_bp_pos>");
+  std::vector<std::string> right_pos_lines = prsm_util::getXmlLineVec(str_vec_, "<shift_right_bp_pos>");
 
   for (size_t i = 0; i < mass_lines.size(); i++) {
     mass_shift_vec_.push_back(std::make_shared<MassShiftStr>(std::stod(prsm_util::getValueStr(mass_lines[i])),
@@ -146,12 +146,6 @@ void PrsmStr::setPrecFeatureInte(double inte) {
   str_vec_[i] = "<precursor_feature_inte>" + str_util::toString(inte) + "</precursor_feature_inte>";
   precursor_feature_inte_ = inte;
 }
-
-void PrsmStr::setFracFeatureScore(double score) {
-  int i = getXmlLineIndex(str_vec_, "frac_feature_score");
-  str_vec_[i] = "<frac_feature_score>" + str_util::toString(score) + "</frac_feature_score>";
-}
-
 
 void PrsmStr::setPrecursorId(int id) {
   int i = getXmlLineIndex(str_vec_, "precursor_id");

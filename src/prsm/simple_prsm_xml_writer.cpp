@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -56,11 +56,9 @@ void SimplePrsmXmlWriter::write(const SimplePrsmPtrVec &simple_prsm_ptrs) {
 }
 
 void SimplePrsmXmlWriter::write(SimplePrsmPtr simple_prsm_ptr) {
-  /*
   if (simple_prsm_ptr->getFileName() == "") {
     simple_prsm_ptr->setFileName(file_name_);
   }
-  */
   XmlDOMElement * element = simple_prsm_ptr->toXml(doc_);
   std::string str = xml_dom_util::writeToString(serializer_, element);
   xml_dom_util::writeToStreamByRemovingDoubleLF(file_, str);

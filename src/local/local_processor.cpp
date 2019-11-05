@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -105,7 +105,7 @@ void LocalProcessor::process() {
             = extend_ms_factory::geneMsThreePtrVec(deconv_ms_ptr_vec, sp_para_ptr, new_prec_mass);
         prsm_ptr->setRefineMsVec(extend_ms_ptr_vec);
 
-        if (prsm_ptr->getProteoformPtr()->getMassShiftNum(AlterType::UNEXPECTED) > 0) {
+        if (prsm_ptr->getProteoformPtr()->getMassShiftNum(MassShiftType::UNEXPECTED) > 0) {
           prsm_ptr = processOnePrsm(prsm_ptr);
         }
 
@@ -124,9 +124,9 @@ void LocalProcessor::process() {
 }
 
 PrsmPtr LocalProcessor::processOnePrsm(PrsmPtr prsm) {
-  int mass_shift_num = prsm->getProteoformPtr()->getMassShiftNum(AlterType::UNEXPECTED);
+  int mass_shift_num = prsm->getProteoformPtr()->getMassShiftNum(MassShiftType::UNEXPECTED);
   if (mass_shift_num == 1) {
-    double mass = prsm->getProteoformPtr()->getMassShiftPtrVec(AlterType::UNEXPECTED)[0]->getMassShift();
+    double mass = prsm->getProteoformPtr()->getMassShiftPtrVec(MassShiftType::UNEXPECTED)[0]->getMassShift();
 
     // if the mass shift is between [-1, 1], we don't characterize it
     if (std::abs(mass) <= 1 + prsm->getAdjustedPrecMass() * ppo_) return prsm;
@@ -180,15 +180,15 @@ ProteoformPtr LocalProcessor::processOneKnownPtm(PrsmPtr prsm) {
   MassShiftPtrVec ori_mass_shift_vec = ori_prot_form->getMassShiftPtrVec();
 
   MassShiftPtrVec unexpected_shift_vec
-      = ori_prot_form->getMassShiftPtrVec(AlterType::UNEXPECTED);
+      = ori_prot_form->getMassShiftPtrVec(MassShiftType::UNEXPECTED);
 
   MassShiftPtrVec expected_shift_vec = local_util::massShiftFilter(ori_mass_shift_vec,
-                                                                   AlterType::UNEXPECTED);
+                                                                   MassShiftType::UNEXPECTED);
 
   double shift_mass = local_util::compMassShift(unexpected_shift_vec);
 
   MassShiftPtr unexpected_shift = local_util::geneMassShift(unexpected_shift_vec[0], shift_mass,
-                                                            AlterType::UNEXPECTED);
+                                                            MassShiftType::UNEXPECTED);
 
   expected_shift_vec.push_back(unexpected_shift);
 
@@ -211,9 +211,9 @@ ProteoformPtr LocalProcessor::processOneKnownPtm(PrsmPtr prsm) {
     if (one_shift_proteoform->getProtModPtr()->getType() == ProtModBase::getType_NME_ACETYLATION()
         || one_shift_proteoform->getProtModPtr()->getType() == ProtModBase::getType_M_ACETYLATION()) {
       expected_shift_vec = local_util::massShiftFilter(ori_mass_shift_vec,
-                                                       AlterType::UNEXPECTED);
+                                                       MassShiftType::UNEXPECTED);
       for (size_t k = 0; k < expected_shift_vec.size(); k++) {
-        if (expected_shift_vec[k]->getTypePtr() == AlterType::PROTEIN_VARIABLE) {
+        if (expected_shift_vec[k]->getTypePtr() == MassShiftType::PROTEIN_VARIABLE) {
           shift_mass += expected_shift_vec[k]->getMassShift();
           expected_shift_vec.erase(expected_shift_vec.begin() + k);
           break;
@@ -221,7 +221,7 @@ ProteoformPtr LocalProcessor::processOneKnownPtm(PrsmPtr prsm) {
       }
 
       unexpected_shift = local_util::geneMassShift(unexpected_shift_vec[0], shift_mass,
-                                                   AlterType::UNEXPECTED);
+                                                   MassShiftType::UNEXPECTED);
 
       expected_shift_vec.push_back(unexpected_shift);
 
@@ -268,20 +268,24 @@ ProteoformPtr LocalProcessor::processOneKnownPtm(PrsmPtr prsm) {
   LocalAnnoPtr anno = std::make_shared<LocalAnno>(bgn, end, conf, scr_vec,
                                                   raw_scr * theta_, ptm_vec[0]);
 
-  AlterPtr alter = std::make_shared<Alter>(anno->getLeftBpPos(),
-                                                     anno->getRightBpPos() + 1,
-                                                     AlterType::UNEXPECTED, shift_mass,
-                                                     std::make_shared<Mod>(ResidueBase::getEmptyResiduePtr(),
-                                                                           ResidueBase::getEmptyResiduePtr()));
+  ChangePtr change = std::make_shared<Change>(anno->getLeftBpPos(),
+                                              anno->getRightBpPos() + 1,
+                                              MassShiftType::UNEXPECTED, shift_mass,
+                                              std::make_shared<Mod>(ResidueBase::getEmptyResiduePtr(),
+                                                                    ResidueBase::getEmptyResiduePtr()));
 
-  alter->setLocalAnno(anno);
+  change->setLocalAnno(anno);
 
-  MassShiftPtr mass_shift = std::make_shared<MassShift>(alter);
+  MassShiftPtr mass_shift = std::make_shared<MassShift>(change->getLeftBpPos(),
+                                                        change->getRightBpPos(),
+                                                        MassShiftType::UNEXPECTED);
+
+  mass_shift->setChangePtr(change);
 
   MassShiftPtrVec mass_shift_vec = one_shift_proteoform->getMassShiftPtrVec();
 
   for (size_t k = 0; k < mass_shift_vec.size(); k++) {
-    if (mass_shift_vec[k]->getTypePtr() == AlterType::UNEXPECTED) {
+    if (mass_shift_vec[k]->getTypePtr() == MassShiftType::UNEXPECTED) {
       mass_shift_vec[k] = mass_shift;
       break;
     }
@@ -305,8 +309,8 @@ ProteoformPtr LocalProcessor::onePtmTermAdjust(ProteoformPtr proteoform, const E
   getNtermTruncRange(proteoform, extend_ms_ptr_vec, n_trunc_min, n_trunc_max);
   getCtermTruncRange(proteoform, extend_ms_ptr_vec, c_trunc_min, c_trunc_max);
 
-  MassShiftPtr mass_shift_ptr = proteoform->getMassShiftPtrVec(AlterType::UNEXPECTED)[0];
-  MassShiftPtrVec ori_fix_mass_shift_vec = proteoform->getMassShiftPtrVec(AlterType::FIXED);
+  MassShiftPtr mass_shift_ptr = proteoform->getMassShiftPtrVec(MassShiftType::UNEXPECTED)[0];
+  MassShiftPtrVec ori_fix_mass_shift_vec = proteoform->getMassShiftPtrVec(MassShiftType::FIXED);
 
   double ori_mass = mass_shift_ptr->getMassShift();
   shift_mass = ori_mass;
@@ -342,7 +346,7 @@ ProteoformPtr LocalProcessor::onePtmTermAdjust(ProteoformPtr proteoform, const E
       if (std::abs(shift_mass) < mass_constant::getIsotopeMass() + err) {
         MassShiftPtrVec fix_mass_shift_vec = local_util::copyMassShiftVec(ori_fix_mass_shift_vec);
         mass_shift_ptr = local_util::geneMassShift(mass_shift_ptr, shift_mass,
-                                                   AlterType::UNEXPECTED);
+                                                   MassShiftType::UNEXPECTED);
         std::sort(fix_mass_shift_vec.begin(), fix_mass_shift_vec.end(), MassShift::cmpPosInc);
         return proteoform_factory::geneProteoform(proteoform,
                                                   ori_start + i,
@@ -357,7 +361,7 @@ ProteoformPtr LocalProcessor::onePtmTermAdjust(ProteoformPtr proteoform, const E
       ptm_known_vec.push_back(ptm_vec_tmp.size() > 0);
 
       mass_shift_ptr = local_util::geneMassShift(mass_shift_ptr, shift_mass,
-                                                 AlterType::UNEXPECTED);
+                                                 MassShiftType::UNEXPECTED);
 
       MassShiftPtrVec new_mass_shift_vec = local_util::copyMassShiftVec(ori_fix_mass_shift_vec);
       new_mass_shift_vec.push_back(mass_shift_ptr);
@@ -402,7 +406,7 @@ ProteoformPtr LocalProcessor::onePtmTermAdjust(ProteoformPtr proteoform, const E
   }
 
   mass_shift_ptr = local_util::geneMassShift(mass_shift_ptr, shift_mass,
-                                             AlterType::UNEXPECTED);
+                                             MassShiftType::UNEXPECTED);
 
   MassShiftPtrVec new_mass_shift_vec = local_util::copyMassShiftVec(ori_fix_mass_shift_vec);
  
@@ -426,10 +430,10 @@ ProteoformPtr LocalProcessor::twoPtmTermAdjust(ProteoformPtr proteoform, int num
   MassShiftPtrVec ori_mass_shift_vec = proteoform->getMassShiftPtrVec();
 
   MassShiftPtrVec ori_fix_mass_shift_vec
-      = local_util::massShiftFilter(ori_mass_shift_vec, AlterType::UNEXPECTED);
+      = local_util::massShiftFilter(ori_mass_shift_vec, MassShiftType::UNEXPECTED);
 
-  MassShiftPtr mass_shift1 = proteoform->getMassShiftPtrVec(AlterType::UNEXPECTED)[0];
-  MassShiftPtr mass_shift2 = proteoform->getMassShiftPtrVec(AlterType::UNEXPECTED)[1];
+  MassShiftPtr mass_shift1 = proteoform->getMassShiftPtrVec(MassShiftType::UNEXPECTED)[0];
+  MassShiftPtr mass_shift2 = proteoform->getMassShiftPtrVec(MassShiftType::UNEXPECTED)[1];
 
   double err = prec_mass * ppo_;
 
@@ -478,8 +482,8 @@ ProteoformPtr LocalProcessor::twoPtmTermAdjust(ProteoformPtr proteoform, int num
       ptm1_known_vec.push_back(local_util::getPtmPtrVecByMass(mass1, err, ptm_vec_).size() > 0);
       ptm2_known_vec.push_back(local_util::getPtmPtrVecByMass(mass2, err, ptm_vec_).size() > 0);
 
-      mass_shift1 = local_util::geneMassShift(mass_shift1, mass1, AlterType::UNEXPECTED);
-      mass_shift2 = local_util::geneMassShift(mass_shift2, mass2, AlterType::UNEXPECTED);
+      mass_shift1 = local_util::geneMassShift(mass_shift1, mass1, MassShiftType::UNEXPECTED);
+      mass_shift2 = local_util::geneMassShift(mass_shift2, mass2, MassShiftType::UNEXPECTED);
 
       MassShiftPtrVec new_mass_shift_vec = local_util::copyMassShiftVec(ori_fix_mass_shift_vec);
       new_mass_shift_vec.push_back(mass_shift1);
@@ -526,8 +530,8 @@ ProteoformPtr LocalProcessor::twoPtmTermAdjust(ProteoformPtr proteoform, int num
     mass2 = ori_mass2 + residue_util::compResiduePtrVecMass(c_seq, mng_ptr_->prsm_para_ptr_->getFixModPtrVec());
   }
 
-  mass_shift1 = local_util::geneMassShift(mass_shift1, mass1, AlterType::UNEXPECTED);
-  mass_shift2 = local_util::geneMassShift(mass_shift2, mass2, AlterType::UNEXPECTED);
+  mass_shift1 = local_util::geneMassShift(mass_shift1, mass1, MassShiftType::UNEXPECTED);
+  mass_shift2 = local_util::geneMassShift(mass_shift2, mass2, MassShiftType::UNEXPECTED);
 
   MassShiftPtrVec new_mass_shift_vec = local_util::copyMassShiftVec(ori_fix_mass_shift_vec);
   new_mass_shift_vec.push_back(mass_shift1);
@@ -545,7 +549,7 @@ ProteoformPtr LocalProcessor::twoPtmTermAdjust(ProteoformPtr proteoform, int num
 void LocalProcessor::getNtermTruncRange(ProteoformPtr proteoform, const ExtendMsPtrVec & extend_ms_ptr_vec,
                                         int & min, int & max) {
   int left_sup, tmp;
-  MassShiftPtr mass_shift_ptr = proteoform->getMassShiftPtrVec(AlterType::UNEXPECTED)[0];
+  MassShiftPtr mass_shift_ptr = proteoform->getMassShiftPtrVec(MassShiftType::UNEXPECTED)[0];
   local_util::compSupPeakNum(proteoform, extend_ms_ptr_vec, mass_shift_ptr, mng_ptr_->min_mass_, left_sup, tmp);
 
   if (left_sup > LEFT_SUP_LIMIT) {
@@ -583,7 +587,7 @@ void LocalProcessor::getNtermTruncRange(ProteoformPtr proteoform, const ExtendMs
 
 void LocalProcessor::getCtermTruncRange(ProteoformPtr proteoform, const ExtendMsPtrVec & extend_ms_ptr_vec,
                                         int & min, int & max) {
-  MassShiftPtrVec mass_shift_vec = proteoform->getMassShiftPtrVec(AlterType::UNEXPECTED);
+  MassShiftPtrVec mass_shift_vec = proteoform->getMassShiftPtrVec(MassShiftType::UNEXPECTED);
   MassShiftPtr mass_shift_ptr = mass_shift_vec[mass_shift_vec.size() - 1];
 
   int right_sup, tmp;
@@ -633,24 +637,24 @@ ProteoformPtr LocalProcessor::processTwoKnownPtm(PrsmPtr prsm) {
   MassShiftPtrVec ori_mass_shift_vec = ori_prot_form->getMassShiftPtrVec();
 
   MassShiftPtrVec unexpected_shift_vec
-      = ori_prot_form->getMassShiftPtrVec(AlterType::UNEXPECTED);
+      = ori_prot_form->getMassShiftPtrVec(MassShiftType::UNEXPECTED);
 
   MassShiftPtrVec expected_shift_vec = local_util::massShiftFilter(ori_mass_shift_vec,
-                                                                   AlterType::UNEXPECTED);
+                                                                   MassShiftType::UNEXPECTED);
 
   MassShiftPtr unexpected_shift1 = local_util::geneMassShift(unexpected_shift_vec[0],
                                                              unexpected_shift_vec[0]->getMassShift(),
-                                                             AlterType::UNEXPECTED);
+                                                             MassShiftType::UNEXPECTED);
 
   MassShiftPtr unexpected_shift2;
 
   if (unexpected_shift_vec.size() == 2) {
     unexpected_shift2 = local_util::geneMassShift(unexpected_shift_vec[1],
                                                   unexpected_shift_vec[1]->getMassShift(),
-                                                  AlterType::UNEXPECTED);
+                                                  MassShiftType::UNEXPECTED);
   } else {
     unexpected_shift2 = local_util::geneMassShift(unexpected_shift_vec[0],
-                                                  0.0, AlterType::UNEXPECTED);
+                                                  0.0, MassShiftType::UNEXPECTED);
   }
 
   double shift_mass1 = unexpected_shift1->getMassShift();
@@ -680,9 +684,9 @@ ProteoformPtr LocalProcessor::processTwoKnownPtm(PrsmPtr prsm) {
     if (two_shift_proteoform->getProtModPtr()->getType() == ProtModBase::getType_NME_ACETYLATION()
         || two_shift_proteoform->getProtModPtr()->getType() == ProtModBase::getType_M_ACETYLATION()) {
       MassShiftPtrVec expected_shift_vec = local_util::massShiftFilter(ori_mass_shift_vec,
-                                                                       AlterType::UNEXPECTED);
+                                                                       MassShiftType::UNEXPECTED);
       for (size_t k = 0; k < expected_shift_vec.size(); k++) {
-        if (expected_shift_vec[k]->getTypePtr() == AlterType::PROTEIN_VARIABLE) {
+        if (expected_shift_vec[k]->getTypePtr() == MassShiftType::PROTEIN_VARIABLE) {
           shift_mass1 += expected_shift_vec[k]->getMassShift();
           expected_shift_vec.erase(expected_shift_vec.begin() + k);
           break;
@@ -690,7 +694,7 @@ ProteoformPtr LocalProcessor::processTwoKnownPtm(PrsmPtr prsm) {
       }
 
       unexpected_shift1 = local_util::geneMassShift(unexpected_shift1, shift_mass1,
-                                                    AlterType::UNEXPECTED);
+                                                    MassShiftType::UNEXPECTED);
 
       expected_shift_vec.push_back(unexpected_shift1);
 
@@ -733,10 +737,10 @@ ProteoformPtr LocalProcessor::processTwoKnownPtm(PrsmPtr prsm) {
 
   std::vector<double> empty_scr_vec;
   LocalAnnoPtr anno1 = std::make_shared<LocalAnno>(0, 0, 0, empty_scr_vec, raw_scr, ptm1);
-  two_shift_proteoform->getMassShiftPtrVec(AlterType::UNEXPECTED)[0]->getAlterPtr(0)->setLocalAnno(anno1);
+  two_shift_proteoform->getMassShiftPtrVec(MassShiftType::UNEXPECTED)[0]->getChangePtr(0)->setLocalAnno(anno1);
 
   LocalAnnoPtr anno2 = std::make_shared<LocalAnno>(0, 0, 0, empty_scr_vec, raw_scr, ptm2);
-  two_shift_proteoform->getMassShiftPtrVec(AlterType::UNEXPECTED)[1]->getAlterPtr(0)->setLocalAnno(anno2);
+  two_shift_proteoform->getMassShiftPtrVec(MassShiftType::UNEXPECTED)[1]->getChangePtr(0)->setLocalAnno(anno2);
 
   return compSplitPoint(two_shift_proteoform, prsm->getMatchPeakNum(),
                         extend_ms_ptr_vec, prsm->getAdjustedPrecMass());
@@ -779,7 +783,7 @@ PrsmPtr LocalProcessor::processTwoPtm(PrsmPtr prsm) {
 bool LocalProcessor::modifiable(ProteoformPtr proteoform_ptr, int i, PtmPtr ptm_ptr) {
   if (ptm_ptr == nullptr) return true;
 
-  MassShiftPtrVec fixed_shift_vec = proteoform_ptr->getMassShiftPtrVec(AlterType::FIXED);
+  MassShiftPtrVec fixed_shift_vec = proteoform_ptr->getMassShiftPtrVec(MassShiftType::FIXED);
 
   for (size_t k = 0; k < fixed_shift_vec.size(); k++) {
     if (fixed_shift_vec[k]->getLeftBpPos() <= i && i < fixed_shift_vec[k]->getRightBpPos()) {
@@ -817,7 +821,7 @@ void LocalProcessor::compOnePtmScr(ProteoformPtr proteoform,
                                    PtmPtrVec & ptm_vec) {
   raw_scr = 0.0;
 
-  MassShiftPtr mass_shift = proteoform->getMassShiftPtrVec(AlterType::UNEXPECTED)[0];
+  MassShiftPtr mass_shift = proteoform->getMassShiftPtrVec(MassShiftType::UNEXPECTED)[0];
 
   if (ptm_vec.size() == 0) ptm_vec.push_back(nullptr);
 
@@ -864,13 +868,13 @@ void LocalProcessor::compTwoPtmScr(ProteoformPtr proteoform, int num_match,
                                    const ExtendMsPtrVec & extend_ms_ptr_vec, double prec_mass,
                                    double & raw_scr, PtmPairVec & ptm_pair_vec) {
   MassShiftPtrVec ori_mass_shift_vec = proteoform->getMassShiftPtrVec();
-  double shift_mass1 = proteoform->getMassShiftPtrVec(AlterType::UNEXPECTED)[0]->getMassShift();
-  double shift_mass2 = proteoform->getMassShiftPtrVec(AlterType::UNEXPECTED)[1]->getMassShift();
+  double shift_mass1 = proteoform->getMassShiftPtrVec(MassShiftType::UNEXPECTED)[0]->getMassShift();
+  double shift_mass2 = proteoform->getMassShiftPtrVec(MassShiftType::UNEXPECTED)[1]->getMassShift();
   ProteoformPtr no_shift_proteoform
       = proteoform_factory::geneProteoform(proteoform,
                                            proteoform->getStartPos(),
                                            proteoform->getEndPos(),
-                                           local_util::massShiftFilter(ori_mass_shift_vec, AlterType::UNEXPECTED),
+                                           local_util::massShiftFilter(ori_mass_shift_vec, MassShiftType::UNEXPECTED),
                                            mng_ptr_->prsm_para_ptr_->getFixModPtrVec());
 
   std::vector<double> scr_vec;
@@ -960,22 +964,22 @@ ProteoformPtr LocalProcessor::compSplitPoint(ProteoformPtr proteoform, int h,
                                              double prec_mass) {
   MassShiftPtrVec ori_mass_shift_vec = proteoform->getMassShiftPtrVec();
 
-  MassShiftPtr shift_ptr1 = proteoform->getMassShiftPtrVec(AlterType::UNEXPECTED)[0];
-  MassShiftPtr shift_ptr2 = proteoform->getMassShiftPtrVec(AlterType::UNEXPECTED)[1];
+  MassShiftPtr shift_ptr1 = proteoform->getMassShiftPtrVec(MassShiftType::UNEXPECTED)[0];
+  MassShiftPtr shift_ptr2 = proteoform->getMassShiftPtrVec(MassShiftType::UNEXPECTED)[1];
 
   double mass1 = shift_ptr1->getMassShift();
   double mass2 = shift_ptr2->getMassShift();
 
-  PtmPtr ptm1 = shift_ptr1->getAlterPtr(0)->getLocalAnno()->getPtmPtr();
-  PtmPtr ptm2 = shift_ptr2->getAlterPtr(0)->getLocalAnno()->getPtmPtr();
+  PtmPtr ptm1 = shift_ptr1->getChangePtr(0)->getLocalAnno()->getPtmPtr();
+  PtmPtr ptm2 = shift_ptr2->getChangePtr(0)->getLocalAnno()->getPtmPtr();
 
   local_util::ptmMassAdjust(mass1, mass2, ptm1, ptm2);
 
-  shift_ptr1 = local_util::geneMassShift(shift_ptr1, mass1, AlterType::UNEXPECTED);
+  shift_ptr1 = local_util::geneMassShift(shift_ptr1, mass1, MassShiftType::UNEXPECTED);
 
-  shift_ptr2 = local_util::geneMassShift(shift_ptr2, mass2, AlterType::UNEXPECTED);
+  shift_ptr2 = local_util::geneMassShift(shift_ptr2, mass2, MassShiftType::UNEXPECTED);
 
-  MassShiftPtrVec expected_shift_vec = local_util::massShiftFilter(ori_mass_shift_vec, AlterType::UNEXPECTED);
+  MassShiftPtrVec expected_shift_vec = local_util::massShiftFilter(ori_mass_shift_vec, MassShiftType::UNEXPECTED);
 
   expected_shift_vec.push_back(shift_ptr1);
 
@@ -1001,7 +1005,7 @@ ProteoformPtr LocalProcessor::compSplitPoint(ProteoformPtr proteoform, int h,
       = proteoform_factory::geneProteoform(proteoform,
                                            proteoform->getStartPos(),
                                            proteoform->getEndPos(),
-                                           local_util::massShiftFilter(ori_mass_shift_vec, AlterType::UNEXPECTED),
+                                           local_util::massShiftFilter(ori_mass_shift_vec, MassShiftType::UNEXPECTED),
                                            mng_ptr_->prsm_para_ptr_->getFixModPtrVec());
 
   std::vector<double> split_scr_vec;
@@ -1112,7 +1116,7 @@ ProteoformPtr LocalProcessor::compSplitPoint(ProteoformPtr proteoform, int h,
     return nullptr;
   } else {
     LocalAnnoPtr anno1 = std::make_shared<LocalAnno>(bgn, end, conf, ptm_scr, 0, ptm1);
-    shift_ptr1->getAlterPtr(0)->setLocalAnno(anno1);
+    shift_ptr1->getChangePtr(0)->setLocalAnno(anno1);
     shift_ptr1->setLeftBpPos(anno1->getLeftBpPos());
     shift_ptr1->setRightBpPos(anno1->getRightBpPos() + 1);
   }
@@ -1143,7 +1147,7 @@ ProteoformPtr LocalProcessor::compSplitPoint(ProteoformPtr proteoform, int h,
     return nullptr;
   } else {
     LocalAnnoPtr anno2 = std::make_shared<LocalAnno>(split_point + bgn + 1, split_point + end + 1, conf, ptm_scr, 0, ptm2);
-    shift_ptr2->getAlterPtr(0)->setLocalAnno(anno2);
+    shift_ptr2->getChangePtr(0)->setLocalAnno(anno2);
     shift_ptr2->setLeftBpPos(anno2->getLeftBpPos());
     shift_ptr2->setRightBpPos(anno2->getRightBpPos() + 1);
   }

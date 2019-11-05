@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -47,10 +47,8 @@ PrsmPara::PrsmPara(std::map<std::string, std::string> &arguments) {
   }
 
   std::string activation_name = arguments["activation"];
-  ActivationPtr activation_ptr; 
-  if (activation_name != "FILE") {
-    activation_ptr = ActivationBase::getActivationPtrByName(activation_name);
-  }
+  ActivationPtr activation_ptr 
+      = ActivationBase::getActivationPtrByName(activation_name);
 
   double ppo = std::stod(arguments["errorTolerance"])*0.000001;
   bool use_min_tolerance = true;

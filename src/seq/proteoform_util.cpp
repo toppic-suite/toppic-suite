@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -51,10 +51,9 @@ ResFreqPtrVec compNTermResidueFreq(const ProteoformPtrVec &prot_mod_forms) {
   }
   ResFreqPtrVec res_freq_list;
   for (size_t i = 0; i < residue_list.size(); i++) {
-    ResFreqPtr res_freq_ptr 
-        = std::make_shared<ResidueFreq>(residue_list[i]->getAminoAcidPtr(),
-                                        residue_list[i]->getPtmPtr(),
-                                        counts[i] / sum);
+    ResFreqPtr res_freq_ptr = std::make_shared<ResidueFreq>(residue_list[i]->getAminoAcidPtr(),
+                                                            residue_list[i]->getPtmPtr(),
+                                                            counts[i] / sum);
     res_freq_list.push_back(res_freq_ptr);
   }
   return res_freq_list;
@@ -81,10 +80,9 @@ ResFreqPtrVec compResidueFreq(const ResiduePtrVec &residue_list,
   }
   ResFreqPtrVec res_freq_list;
   for (size_t i = 0; i < residue_list.size(); i++) {
-    ResFreqPtr res_freq_ptr 
-        = std::make_shared<ResidueFreq>(residue_list[i]->getAminoAcidPtr(),
-                                        residue_list[i]->getPtmPtr(),
-                                        counts[i] / sum);
+    ResFreqPtr res_freq_ptr = std::make_shared<ResidueFreq>(residue_list[i]->getAminoAcidPtr(),
+                                                            residue_list[i]->getPtmPtr(),
+                                                            counts[i] / sum);
     res_freq_list.push_back(res_freq_ptr);
   }
   return res_freq_list;
@@ -130,8 +128,7 @@ bool isStrictCompatiablePtmSpecies(ProteoformPtr a, ProteoformPtr b, double ppo)
   for (int i = 0; i < a->getMassShiftNum(); i++) {
     MassShiftPtr ac = a_shift_vec[i];
     MassShiftPtr bc = b_shift_vec[i];
-    if (ac->getRightBpPos() <= bc->getLeftBpPos() 
-        || bc->getRightBpPos() <= ac->getLeftBpPos()) {
+    if (ac->getRightBpPos() <= bc->getLeftBpPos() || bc->getRightBpPos() <= ac->getLeftBpPos()) {
       return false;
     }
     if (std::abs(ac->getMassShift()-bc->getMassShift()) > shift_tolerance) {
@@ -141,8 +138,7 @@ bool isStrictCompatiablePtmSpecies(ProteoformPtr a, ProteoformPtr b, double ppo)
   return true;
 }
 
-ProteoformPtrVec2D divideProteoIntoBlocks(const ProteoformPtrVec &proteo_ptrs, 
-                                          int db_block_size) {
+ProteoformPtrVec2D divideProteoIntoBlocks(const ProteoformPtrVec &proteo_ptrs, int db_block_size) {
   size_t start_idx = 0;
   size_t proteo_idx = 0;
   int block_len = 0;
@@ -164,7 +160,7 @@ ProteoformPtrVec2D divideProteoIntoBlocks(const ProteoformPtrVec &proteo_ptrs,
       block_len = 0;
     }
   }
-  // last block 
+  /* last block */
   if (start_idx < proteo_ptrs.size()) {
     ProteoformPtrVec proteo_in_block;
     for (size_t i = start_idx; i < proteo_ptrs.size(); i++) {
@@ -181,6 +177,7 @@ std::vector<double> getNTermShift(ProteoformPtr db_form_ptr,
   for (size_t i = 0; i < prot_mod_ptrs.size(); i++) {
     ResSeqPtr db_res_seq_ptr = db_form_ptr->getResSeqPtr();
     bool valid = prot_mod_util::allowMod(prot_mod_ptrs[i], db_res_seq_ptr->getResidues());
+    // LOG_DEBUG("valid " << valid << " shift " << prot_mod_ptrs[i]->getProtShift());
     if (valid) {
       shifts.push_back(prot_mod_ptrs[i]->getProtShift());
     }
@@ -225,26 +222,25 @@ std::vector<std::vector<double> > getNTermAcet2D(const ProteoformPtrVec & db_for
   return shifts_2d;
 }
 
-ProteoformPtr geneDbProteoformPtr(FastaSubSeqPtr fasta_seq_ptr, 
-                                  ModPtrVec fix_mod_list, int start_pos) {
+ProteoformPtr geneDbProteoformPtr(FastaSubSeqPtr fasta_seq_ptr, ModPtrVec fix_mod_list, int start_pos) {
   if (fasta_seq_ptr == nullptr) {
     return nullptr;
   }
   ProtModPtr none_prot_mod_ptr = ProtModBase::getProtModPtr_NONE();
-  ResiduePtrVec residue_ptrs 
-      = residue_util::convertStrToResiduePtrVec(fasta_seq_ptr->getAcidPtmPairVec());
+  ResiduePtrVec residue_ptrs = residue_util::convertStrToResiduePtrVec(fasta_seq_ptr->getAcidPtmPairVec());
   int end_pos = start_pos + static_cast<int>(residue_ptrs.size()) - 1;
 
   MassShiftPtrVec shift_list;
   // add input ptms;
   for (size_t i = 0; i < residue_ptrs.size(); i++) {
     if (residue_ptrs[i]->getPtmPtr() != PtmBase::getEmptyPtmPtr()) {
-      ResiduePtr ori_residue 
-          = ResidueBase::getBaseResiduePtr(residue_ptrs[i]->getAminoAcidPtr());
+      ResiduePtr ori_residue = ResidueBase::getBaseResiduePtr(residue_ptrs[i]->getAminoAcidPtr());
       ModPtr mod_ptr = ModBase::getBaseModPtr(ori_residue, residue_ptrs[i]);
-      AlterPtr alter_ptr = std::make_shared<Alter>(i, i + 1, AlterType::INPUT, 
-                                                   mod_ptr->getShift(), mod_ptr);
-      MassShiftPtr shift_ptr = std::make_shared<MassShift>(alter_ptr); 
+      ChangePtr change_ptr
+          = std::make_shared<Change>(i, i + 1, MassShiftType::INPUT, mod_ptr->getShift(), mod_ptr);
+      MassShiftPtr shift_ptr
+          = std::make_shared<MassShift>(i, i + 1, change_ptr->getTypePtr());
+      shift_ptr->setChangePtr(change_ptr);
       shift_list.push_back(shift_ptr);
     }
   }
@@ -254,10 +250,11 @@ ProteoformPtr geneDbProteoformPtr(FastaSubSeqPtr fasta_seq_ptr,
     for (size_t j = 0; j < fix_mod_list.size(); j++) {
       if (residue_ptrs[i] == fix_mod_list[j]->getOriResiduePtr()) {
         residue_ptrs[i] = fix_mod_list[j]->getModResiduePtr();
-        AlterPtr alter_ptr = std::make_shared<Alter>(i, i + 1, AlterType::FIXED, 
-                                                     fix_mod_list[j]->getShift(), 
-                                                     fix_mod_list[j]);
-        MassShiftPtr shift_ptr = std::make_shared<MassShift>(alter_ptr); 
+        ChangePtr change_ptr
+            = std::make_shared<Change>(i, i + 1, MassShiftType::FIXED, fix_mod_list[j]->getShift(), fix_mod_list[j]);
+        MassShiftPtr shift_ptr
+            = std::make_shared<MassShift>(i, i + 1, change_ptr->getTypePtr());
+        shift_ptr->setChangePtr(change_ptr);
         shift_list.push_back(shift_ptr);
         break;
       }

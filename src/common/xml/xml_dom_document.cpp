@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -22,24 +22,22 @@
 namespace toppic {
 
 XmlDOMDocument::XmlDOMDocument(XmlDOMParser* parser, 
-                               const char* xml_file) 
-    : doc_(NULL) {
+                               const char* xml_file) : doc_(NULL) {
   try {
     doc_ = parser->parse(xml_file);
   }
   catch (std::exception &e) {
-    LOG_ERROR("The xml file " << xml_file << " contains errors!");
+    LOG_ERROR("xml file " << xml_file << " contain errors!");
     exit(EXIT_FAILURE);
   }
 }
 
-XmlDOMDocument::XmlDOMDocument(XmlDOMParser* parser, 
-                               const xercesc::MemBufInputSource &str_buf) {
+XmlDOMDocument::XmlDOMDocument(XmlDOMParser* parser, const xercesc::MemBufInputSource &str_buf) {
   try {
     doc_ = parser->parse(str_buf);
   }
   catch (std::exception &e) {
-    LOG_ERROR("Xml str buffer contain errors!");
+    LOG_ERROR("xml str buffer contain errors!");
     exit(EXIT_FAILURE);
   }
 }
@@ -60,13 +58,14 @@ XmlDOMDocument::~XmlDOMDocument() {
   }
 }
 
-void XmlDOMDocument::addElement(xercesc::DOMElement* element) {
+void XmlDOMDocument::addElement(xercesc::DOMElement* element){
     doc_->appendChild(element);
 }
 
 void XmlDOMDocument::addElement(xercesc::DOMElement* parent,xercesc::DOMElement* child){
     parent->appendChild(child);
 }
+
 
 xercesc::DOMElement* XmlDOMDocument::createElement(const char* tag) {
   xercesc::DOMElement* element = doc_->createElement(X(tag));

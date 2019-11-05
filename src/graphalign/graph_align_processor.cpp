@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -25,11 +25,10 @@
 
 #include "common/util/file_util.hpp"
 #include "common/base/mod_util.hpp"
-#include "seq/fasta_sub_util.hpp"
 #include "spec/msalign_util.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_reader.hpp"
-#include "prsm/prsm_str_merge.hpp"
+#include "prsm/prsm_str_combine.hpp"
 #include "prsm/simple_prsm_reader.hpp"
 #include "prsm/simple_prsm_util.hpp"
 #include "prsm/simple_prsm_xml_writer.hpp"
@@ -90,11 +89,7 @@ std::function<void()> geneTask(FastaIndexReaderPtr reader_ptr,
           for (size_t i = 0; i < selected_prsm_ptrs.size(); i++) {
             std::string seq_name = selected_prsm_ptrs[i]->getSeqName();
             std::string seq_desc = selected_prsm_ptrs[i]->getSeqDesc();
-            //std::vector<FastaSubSeqPtr> seq_ptr_vec 
-            //= reader_ptr->readFastaSubSeqVec(seq_name, seq_desc);
-            FastaSeqPtr seq_ptr = reader_ptr->readFastaSeq(seq_name, seq_desc);
-            std::vector<FastaSubSeqPtr> seq_ptr_vec = fasta_sub_util::breakSeq(seq_ptr);
-
+            std::vector<FastaSubSeqPtr> seq_ptr_vec = reader_ptr->readFastaSubSeqVec(seq_name, seq_desc);
             for (size_t j = 0; j < seq_ptr_vec.size(); j++) {
               for (size_t k = 0; k < spec_ptr_vec.size(); k++) {
                 proteo_anno_ptr->anno(seq_ptr_vec[j]->getRawSeq(), seq_ptr_vec[j]->isNTerm());
@@ -251,12 +246,12 @@ void GraphAlignProcessor::process() {
   }
 
   int top_num = (mng_ptr_->n_unknown_shift_ + 1) * 4;
-  PrsmStrMergePtr merge_ptr
-      = std::make_shared<PrsmStrMerge>(sp_file_name, input_exts,
-                                       mng_ptr_->output_file_ext_, top_num);
+  PrsmStrCombinePtr combine_ptr
+      = std::make_shared<PrsmStrCombine>(sp_file_name, input_exts,
+                                         mng_ptr_->output_file_ext_, top_num);
   bool normalization = true;
-  merge_ptr->process(normalization);
-  merge_ptr = nullptr;
+  combine_ptr->process(normalization);
+  combine_ptr = nullptr;
 
   // remove temporary files
   for (int t = 0; t < mng_ptr_->thread_num_; t++) {

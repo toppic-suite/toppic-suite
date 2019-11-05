@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef PROT_SPEC_MSALIGN_WRITER_HPP_
-#define PROT_SPEC_MSALIGN_WRITER_HPP_
+#ifndef PROT_FEATURE_MSALIGN_WRITER_HPP_
+#define PROT_FEATURE_MSALIGN_WRITER_HPP_
 
 #include <fstream>
 
@@ -21,27 +21,11 @@
 
 namespace toppic {
 
-class MsAlignWriter {
- public:
-  MsAlignWriter(const std::string &file_name);
+namespace msalign_writer {
 
-  ~MsAlignWriter();
+void write(std::ofstream &file, DeconvMsPtr ms_ptr);
 
-  void write(DeconvMsPtr ms_ptr);
-
-  void writePara(const std::string &para_str);
-
-  void close();
-
- private:
-  std::string file_name_;
-  std::ofstream output_;
-
-};
-
-typedef std::shared_ptr<MsAlignWriter> MsAlignWriterPtr;
-typedef std::vector<MsAlignWriterPtr>  MsAlignWriterPtrVec;
+}  // namespace msalign_writer
 
 }  // namespace toppic
-
 #endif

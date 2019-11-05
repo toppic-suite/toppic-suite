@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -34,6 +34,9 @@ class MatchEnv {
   void compScr(EnvParaPtr env_para_ptr);
 
   static bool cmpScoreDec(const MatchEnvPtr &a, const MatchEnvPtr &b) { 
+    return a->getPredictionScore() > b->getPredictionScore();}
+
+  static bool cmpScoreDec_topfd(const MatchEnvPtr &a, const MatchEnvPtr &b) { 
     return a->getScore() > b->getScore();}
 
   double calcPeakScr(int id_x, double inte_sum, double tolerance);
@@ -47,8 +50,12 @@ class MatchEnv {
   EnvelopePtr getTheoEnvPtr() {return theo_env_ptr_;}
 
   double getScore() {return score_;}
+  
+  double getPredictionScore() {return prediction_score_;}
 
   void setScore(double score) {score_ = score;}
+  
+  void setPredictionScore(double score) {prediction_score_ = score;}
 
   void setId(int id) {id_ = id;}
 
@@ -63,6 +70,7 @@ class MatchEnv {
   // we divide envelopes into several groups based on monoisotopic  masses  
   int mass_group_;
   double score_;
+  double prediction_score_;
   EnvelopePtr theo_env_ptr_;
   RealEnvPtr real_env_ptr_;
 

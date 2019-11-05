@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
 //limitations under the License.
 
 #include <iomanip>
-#include <sstream>
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
@@ -53,7 +52,6 @@ void PrsmTableWriter::write() {
       << "Adjusted precursor mass" << ","
       << "Proteoform ID" << ","
       << "Feature intensity" << ","
-      << "Feature score" << ","
       << "Protein accession" << ","
       << "Protein description" << ","
       << "First residue" << ","
@@ -114,7 +112,7 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
   std::string spec_activations;
   std::string spec_scans;
   std::string retention_time;
-  int ptm_num = prsm_ptr->getProteoformPtr()->getMassShiftNum(AlterType::UNEXPECTED);
+  int ptm_num = prsm_ptr->getProteoformPtr()->getMassShiftNum(MassShiftType::UNEXPECTED);
   int peak_num = 0;
   DeconvMsPtrVec deconv_ms_ptr_vec = prsm_ptr->getDeconvMsPtrVec();
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
@@ -147,15 +145,10 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
       << prsm_ptr->getProteoformPtr()->getProteoClusterId() << ",";
 
   if (prsm_ptr->getPrecFeatureInte() > 0) {
-    std::ostringstream str_stream;
-    str_stream << std::scientific << std::setprecision(1);
-    str_stream << prsm_ptr->getPrecFeatureInte();
-    file << str_stream.str() << ",";
+    file << prsm_ptr->getPrecFeatureInte() << ",";
   } else {
     file << "-" << ",";
   }
-
-  file << prsm_ptr->getFracFeatureScore() << ",";
 
   file << prsm_ptr->getProteoformPtr()->getSeqName() << ","
       << "\"" << prsm_ptr->getProteoformPtr()->getSeqDesc() << "\"" << ","

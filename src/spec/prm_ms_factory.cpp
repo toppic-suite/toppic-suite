@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -12,8 +12,9 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <numeric>
 #include <algorithm>
+#include <numeric>
+#include <cmath>
 
 #include "common/util/logger.hpp"
 #include "common/base/mass_constant.hpp"

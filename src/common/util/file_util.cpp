@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -11,6 +11,7 @@
 //WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //See the License for the specific language governing permissions and
 //limitations under the License.
+
 
 #include <string>
 
@@ -114,22 +115,12 @@ void createFolder(const std::string &folder_name) {
   fs::create_directories(path);
 }
 
-void createLink(const std::string &a_link, const std::string &a_dir, const std::string &b) {
-#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
-  copyDir(a_dir, b);
-#else
-  fs::path path_a(a_link);
-  fs::path path_b(b);
-  fs::create_symlink(path_a, path_b);
-#endif
-}
-
 void copyFile(const std::string &file_name,
               const std::string &to_file, bool over_write) {
   fs::path from_path(file_name);
   fs::path to_path(to_file);
   if (!fs::exists(from_path)) {
-    LOG_ERROR("The source file " << file_name << " does not exist!");
+    LOG_ERROR("source file " << file_name << " does not exist!");
     return;
   }
 
@@ -147,23 +138,20 @@ bool copyDir(const std::string &src_name,
   fs::path destination(des_name);
   try {
     if (!fs::exists(source) || !fs::is_directory(source)) {
-      LOG_ERROR("The source folder " << source.string() << " does not exist!");
       return false;
     }
     if (fs::exists(destination)) {
-      LOG_ERROR("The destination folder " << destination.string() 
-          << " already exists. Fail to create the destination directory.");
       return false;
     }
 
     if (!fs::create_directory(destination)) {
-      LOG_ERROR("Unable to create the destination folder "
-                << destination.string());
+      std::cerr << "Unable to create destination directory"
+          << destination.string() << std::endl;
       return false;
     }
   }
   catch(fs::filesystem_error const & e) {
-    LOG_ERROR(e.what());
+    std::cerr << e.what() << std::endl;
     return false;
   }
 
@@ -179,41 +167,7 @@ bool copyDir(const std::string &src_name,
       }
     }
     catch(fs::filesystem_error const & e) {
-      LOG_ERROR(e.what());
-    }
-  }
-  return true;
-}
-
-bool copyJsonDir(const std::string &src_name,
-                 const std::string &des_name,
-                 int id_base) {
-  fs::path source(src_name);
-  fs::path destination(des_name);
-  try {
-    if (!fs::exists(source) || !fs::is_directory(source)) {
-      LOG_ERROR("The source folder " << source.string() << " does not exist!");
-      return false;
-    }
-  }
-  catch(fs::filesystem_error const & e) {
-    LOG_ERROR(e.what());
-    return false;
-  }
-
-  for (fs::directory_iterator file(source); file != fs::directory_iterator(); ++file) {
-    try {
-      fs::path current(file->path());
-      std::string file_name = current.filename().string();
-      std::string id_str = file_name.substr(8, file_name.length() - 3 - 8);
-      //LOG_ERROR(file_name << " " << id_str);
-      int new_id = std::stoi(id_str) + id_base;
-      std::string new_name = "spectrum" + std::to_string(new_id) + ".js";
-      fs::path des_file(des_name + getFileSeparator() + new_name);
-      fs::copy_file(current, des_file);
-    }
-    catch(fs::filesystem_error const & e) {
-      LOG_ERROR(e.what());
+      std:: cerr << e.what() << std::endl;
     }
   }
   return true;
@@ -241,13 +195,6 @@ void rename(const std::string &ori_name,
   fs::path new_path(new_name);
   fs::rename(ori_path, new_path);
 
-}
-
-void moveFile(std::string &file_name, std::string &folder_name) {
-  std::string new_file_name = folder_name + getFileSeparator() + file_name;
-  bool over_write = true;
-  copyFile(file_name, new_file_name, over_write); 
-  delFile(file_name);
 }
 
 void cleanPrefix(const std::string & ref_name, 

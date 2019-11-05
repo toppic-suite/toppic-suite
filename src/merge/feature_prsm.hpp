@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -13,18 +13,18 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_QUANT_FEATURE_PRSM_HPP_
-#define TOPPIC_QUANT_FEATURE_PRSM_HPP_
+#ifndef TOPPIC_MERGE_FEATURE_PRSM_HPP_
+#define TOPPIC_MERGE_FEATURE_PRSM_HPP_
 
 #include "prsm/prsm_str.hpp"
-#include "feature/sample_feature.hpp"
+#include "deconv/feature/feature.hpp"
 
 namespace toppic {
 
 class FeaturePrsm;
 typedef std::shared_ptr<FeaturePrsm> FeaturePrsmPtr;
 
-class FeaturePrsm : public SampleFeature {
+class FeaturePrsm : public Feature {
  public:
   FeaturePrsm(std::string line);
 
@@ -40,19 +40,9 @@ class FeaturePrsm : public SampleFeature {
 
   std::string getProteoform() {return proteoform_;}
 
-  int getMs2Id() {return ms2_id_;}
+  int getMs2Scan() {return ms2_scan_;}
 
   double getPrecMass() {return prec_mass_;}
-
-  double getAlignTimeBegin() {return align_time_begin_;}
-
-  double getAlignTimeEnd() {return align_time_end_;}
-
-  double getAlignTimeMiddle() {return (align_time_begin_ + align_time_end_)/2;}
-
-  void setAlignTimeBegin(double time_begin) {align_time_begin_ = time_begin;}
-
-  void setAlignTimeEnd(double time_end) {align_time_end_ = time_end;}
 
   static bool cmpMassInc(const FeaturePrsmPtr &a, const FeaturePrsmPtr &b) { 
     return a->getMonoMass() < b->getMonoMass();}
@@ -66,10 +56,8 @@ class FeaturePrsm : public SampleFeature {
   int first_residue_;
   int last_residue_;
   std::string proteoform_;
-  int ms2_id_;
+  int ms2_scan_;
   double prec_mass_;
-  double align_time_begin_;
-  double align_time_end_;
 };
 
 typedef std::vector<FeaturePrsmPtr> FeaturePrsmPtrVec;

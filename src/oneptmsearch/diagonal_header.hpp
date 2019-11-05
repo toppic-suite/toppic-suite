@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -164,11 +164,11 @@ DiagonalHeaderPtr geneDiagonalHeaderPtr(int bgn, int end, DiagonalHeaderPtr diag
 
 MassShiftPtrVec getDiagonalMassChanges(const DiagonalHeaderPtrVec &diag_ptrs,
                                        int first_res_pos, int last_res_pos,
-                                       AlterTypePtr type_ptr);
+                                       MassShiftTypePtr type_ptr);
 
 MassShiftPtrVec getDiagonalMassChanges(const DiagonalHeaderPtrVec &header_ptrs,
                                        int first_res_pos, int last_res_pos,
-                                       const AlterTypePtrVec & type_ptrs);
+                                       const MassShiftTypePtrVec & type_ptrs);
 
 } /* namespace toppic */
 

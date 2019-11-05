@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -48,8 +48,6 @@ class Envelope {
 
   EnvelopePtr getSubEnv(int n_back, int n_forw);
 
-  EnvelopePtr getSubEnv(double min_inte);
-
   EnvelopePtr addZero(int num);
 
   EnvelopePtr getSubEnv(double percent_bound, double absolute_min_inte,
@@ -66,10 +64,6 @@ class Envelope {
 
   double getAvgMass();
 
-  double getMinMz() {return peaks_[0]->getPosition();}
-
-  double getMaxMz() {return peaks_[peaks_.size()-1]->getPosition();}
-
   int getHighestPeakIdx();
 
   std::vector<double> getIntensities();
@@ -80,9 +74,7 @@ class Envelope {
 
   double getIntensity(int i) {return peaks_[i]->getIntensity();}
 
-  double getIntensitySum();
-
-  double getMonoNeutralMass() {return Peak::compPeakNeutralMass(mono_mz_, charge_);}
+  double getMonoMass() {return Peak::compPeakMass(mono_mz_, charge_);}
 
   double getMonoMz() {return mono_mz_;}
 
@@ -100,8 +92,6 @@ class Envelope {
   double getReferIntensity() {return peaks_[refer_idx_]->getIntensity();}
 
   double getReferMz() {return peaks_[refer_idx_]->getPosition();}
-
-  double getRefNeutralMass() {return Peak::compPeakNeutralMass(getReferMz(), charge_);}
 
   void setIntensity(int i, double intensity) {peaks_[i]->setIntensity(intensity);}
 

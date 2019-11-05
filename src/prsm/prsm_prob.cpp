@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ void PrsmProb::process() {
   PrsmXmlWriter all_writer(file_util::basename(spec_file_name_) + "." + output_file_ext_);
 
   while (prsm_ptr != nullptr) {
-    int shift_num = prsm_ptr->getProteoformPtr()->getMassShiftNum(AlterType::UNEXPECTED);
+    int shift_num = prsm_ptr->getProteoformPtr()->getMassShiftNum(MassShiftType::UNEXPECTED);
     ProteoformTypePtr type_ptr = prsm_ptr->getProteoformPtr()->getProteoformType();
     ExtremeValuePtr prob_ptr = prsm_ptr->getExtremeValuePtr();
     if (shift_num == 1) {

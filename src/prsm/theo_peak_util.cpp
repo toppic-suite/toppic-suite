@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -71,7 +71,7 @@ TheoPeakPtrVec geneProteoformTheoPeak(ProteoformPtr proteoform_ptr,
   BpSpecPtr bp_ptr = proteoform_ptr->getBpSpecPtr();
 
   TheoPeakPtrVec all_peaks;
-  SeqSegmentPtrVec segments = proteoform_ptr->getSeqSegmentPtrVec();
+  SegmentPtrVec segments = proteoform_ptr->getSegmentPtrVec();
   for (size_t i = 0; i < segments.size(); i++) {
     NeutralLossPtr neutral_loss_ptr
         = NeutralLossBase::getNeutralLossPtr_NONE();

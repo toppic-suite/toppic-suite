@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -36,9 +36,6 @@ class Argument {
   std::map<std::string,std::string> getArguments(){ return arguments_;}
 
   std::vector<std::string> getSpecFileList() { return spec_file_list_;};
-
-  static std::string geneArgumentStr(std::map<std::string,std::string> &arguments,
-                                     const std::string &prefix); 
  private:
   void initArguments();
 
@@ -47,8 +44,6 @@ class Argument {
   bool validateArguments();
 
   void showUsage(boost::program_options::options_description &desc);
-
- private:
 
   std::map<std::string,std::string> arguments_;
 

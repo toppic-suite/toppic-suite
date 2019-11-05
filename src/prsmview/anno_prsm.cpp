@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -12,30 +12,34 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+
+#include <set>
+#include <string>
+
 #include "common/util/logger.hpp"
+#include "common/base/residue_util.hpp"
+#include "common/xml/xml_dom_util.hpp"
+#include "spec/peak.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
-#include "prsmview/anno_proteoform.hpp"
+#include "prsmview/anno_residue.hpp"
 #include "prsmview/anno_prsm.hpp"
+#include "prsmview/anno_proteoform.hpp"
 
 namespace toppic {
-
-namespace anno_prsm {
 
 void addPrsmHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement* element,
                    PrsmPtr prsm_ptr, PrsmViewMngPtr mng_ptr) {
   std::string str = str_util::toString(prsm_ptr->getPrsmId());
   xml_doc->addElement(element, "prsm_id", str.c_str());
   if (prsm_ptr->getExtremeValuePtr().get() != nullptr) {
-    str = str_util::toString(prsm_ptr->getExtremeValuePtr()->getPValue(), 
-                             mng_ptr->decimal_point_num_);
+    str = str_util::toString(prsm_ptr->getExtremeValuePtr()->getPValue(), mng_ptr->decimal_point_num_);
     xml_doc->addElement(element, "p_value", str.c_str());
   } else {
     xml_doc->addElement(element, "p_value", "N/A");
   }
 
   if (prsm_ptr->getExtremeValuePtr().get() != nullptr) {
-    str = str_util::toString(prsm_ptr->getExtremeValuePtr()->getEValue(), 
-                             mng_ptr->decimal_point_num_);
+    str = str_util::toString(prsm_ptr->getExtremeValuePtr()->getEValue(), mng_ptr->decimal_point_num_);
     xml_doc->addElement(element, "e_value", str.c_str());
   } else {
     xml_doc->addElement(element, "e_value", "N/A");
@@ -59,30 +63,23 @@ void addPrsmHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement* element,
   xml_doc->addElement(element, "matched_peak_number", str.c_str());
 }
 
-void addMsHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement* ms_element, 
-                 PrsmPtr prsm_ptr, PrsmViewMngPtr mng_ptr) {
+void addMsHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement* ms_element, PrsmPtr prsm_ptr) {
   xercesc::DOMElement* ms_header_element = xml_doc->createElement("ms_header");
   ms_element->appendChild(ms_header_element);
-  xml_doc->addElement(ms_header_element, "spectrum_file_name", prsm_ptr->getFileName().c_str());
   DeconvMsPtrVec deconv_ms_ptr_vec = prsm_ptr->getDeconvMsPtrVec();
-  std::string ms1_ids, ms2_ids;
-  std::string ms1_scans, ms2_scans;
+  std::string spec_ids;
+  std::string spec_scans;
   for (size_t i = 0; i < deconv_ms_ptr_vec.size(); i++) {
-    ms1_ids = ms1_ids + str_util::toString(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getMsOneId()) + " ";
-    ms1_scans = ms1_scans + str_util::toString(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getMsOneScan()) + " ";
-    ms2_ids = ms2_ids + str_util::toString(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getId()) + " ";
-    ms2_scans = ms2_scans + deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getScansString() + " ";
+    spec_ids = spec_ids + str_util::toString(deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getId()) + " ";
+    spec_scans = spec_scans + deconv_ms_ptr_vec[i]->getMsHeaderPtr()->getScansString() + " ";
   }
-  str_util::trim(ms1_ids);
-  str_util::trim(ms1_scans);
-  str_util::trim(ms2_ids);
-  str_util::trim(ms2_scans);
-  xml_doc->addElement(ms_header_element, "ms1_ids", ms1_ids.c_str());
-  xml_doc->addElement(ms_header_element, "ms1_scans", ms1_scans.c_str());
-  xml_doc->addElement(ms_header_element, "ids", ms2_ids.c_str());
-  xml_doc->addElement(ms_header_element, "scans", ms2_scans.c_str());
+  str_util::trim(spec_ids);
+  str_util::trim(spec_scans);
+  xml_doc->addElement(ms_header_element, "ids", spec_ids.c_str());
+  xml_doc->addElement(ms_header_element, "spectrum_file_name", prsm_ptr->getFileName().c_str());
+  xml_doc->addElement(ms_header_element, "scans", spec_scans.c_str());
 
-  int pos = mng_ptr->precise_point_num_;
+  int pos = 4;
 
   double precursor_mass = prsm_ptr->getOriPrecMass();
   std::string str = str_util::toString(precursor_mass, pos);
@@ -92,7 +89,7 @@ void addMsHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement* ms_element,
   str = str_util::toString(precursor_charge);
   xml_doc->addElement(ms_header_element, "precursor_charge", str.c_str());
 
-  double precursor_mz = Peak::compMz(precursor_mass, precursor_charge);
+  double precursor_mz = Peak::compMonoMz(precursor_mass, precursor_charge);
   str = str_util::toString(precursor_mz, pos);
   xml_doc->addElement(ms_header_element, "precursor_mz", str.c_str());
 
@@ -132,7 +129,7 @@ void addMsPeaks(XmlDOMDocument *xml_doc, xercesc::DOMElement* ms_element,
       str = str_util::toString(mass, mng_ptr->precise_point_num_);
       xml_doc->addElement(peak_element, "monoisotopic_mass", str.c_str());
 
-      double mz = Peak::compMz(mass, charge);
+      double mz = Peak::compMonoMz(mass, charge);
       str = str_util::toString(mz, mng_ptr->precise_point_num_);
       xml_doc->addElement(peak_element, "monoisotopic_mz", str.c_str());
 
@@ -166,24 +163,22 @@ xercesc::DOMElement* geneAnnoPrsm(XmlDOMDocument* xml_doc, PrsmPtr prsm_ptr,
   addPrsmHeader(xml_doc, prsm_element, prsm_ptr, mng_ptr);
 
   if (detail) {
-    xercesc::DOMElement* ms2_element = xml_doc->createElement("ms");
-    addMsHeader(xml_doc, ms2_element, prsm_ptr, mng_ptr);
+    xercesc::DOMElement* ms_element = xml_doc->createElement("ms");
+    addMsHeader(xml_doc, ms_element, prsm_ptr);
 
     if (add_ms_peaks) {
       // add ms peaks
-      addMsPeaks(xml_doc, ms2_element, prsm_ptr, mng_ptr);
+      addMsPeaks(xml_doc, ms_element, prsm_ptr, mng_ptr);
     }
 
-    prsm_element->appendChild(ms2_element);
+    prsm_element->appendChild(ms_element);
 
     // proteoform to view
-    xercesc::DOMElement* prot_element 
-        = anno_proteoform::geneAnnoProteoform(xml_doc, prsm_ptr, mng_ptr);
+    xercesc::DOMElement* prot_element = geneAnnoProteoform(xml_doc, prsm_ptr, mng_ptr);
     prsm_element->appendChild(prot_element);
     LOG_DEBUG("proteoform view completed");
   }
   return prsm_element;
 }
 
-}
 }  // namespace toppic

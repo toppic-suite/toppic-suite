@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ void BpSpec::initBreakPoints(const ResSeqPtr &res_seq_ptr) {
   break_point_ptr_vec_.push_back(last_ptr);
 }
 
-// Get neutral ion masses for a specific ion type 
+/* Get neutral ion masses for a specific ion type */
 std::vector<double> BpSpec::getBreakPointMasses(IonTypePtr ion_type_ptr) {
   std::vector<double> bp_mass_vec;
   if (ion_type_ptr->isNTerm()) {
@@ -117,4 +117,4 @@ std::vector<int> BpSpec::getScaledSrmMasses(double scale) {
   return result;
 }
 
-} // namespace toppic 
+} /* namespace toppic */

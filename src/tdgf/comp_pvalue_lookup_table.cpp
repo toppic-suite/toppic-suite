@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -12,10 +12,11 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <cmath>
+
 #include <string>
 #include <algorithm>
 #include <vector>
+#include <cmath>
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
@@ -112,10 +113,10 @@ double CompPValueLookupTable::compProb(int peak_num, int match_frag_num,
     p22 = ptm2_[x2][y2];
   }
 
-  p11 = std::log(p11);
-  p12 = std::log(p12);
-  p21 = std::log(p21);
-  p22 = std::log(p22);
+  p11 = log(p11);
+  p12 = log(p12);
+  p21 = log(p21);
+  p22 = log(p22);
 
   x1 = getPeakNumFromIndex(idx[0]);
   x2 = getPeakNumFromIndex(idx[1]);
@@ -128,7 +129,7 @@ double CompPValueLookupTable::compProb(int peak_num, int match_frag_num,
          + (peak_num - x1) * (match_frag_num - y1) * p22)
       / ((x2 - x1) * (y2 - y1));
 
-  res = std::exp(res);
+  res = exp(res);
 
   LOG_DEBUG("prob " << res);
 
@@ -147,7 +148,7 @@ void CompPValueLookupTable::process(const DeconvMsPtrVec &deconv_ms_ptr_vec, Prs
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     double refine_prec_mass = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecMonoMassMinusWater();
     int match_frag_num = prsm_ptrs[i]->getMatchFragNum();
-    int unexpected_shift_num = prsm_ptrs[i]->getProteoformPtr()->getMassShiftNum(AlterType::UNEXPECTED);
+    int unexpected_shift_num = prsm_ptrs[i]->getProteoformPtr()->getMassShiftNum(MassShiftType::UNEXPECTED);
     if (unexpected_shift_num == 0) {
       // in ZERO PTM searching, +/-1 Da was allowed.
       // We need to adjust the prec mass for candidate number computation
@@ -220,7 +221,7 @@ bool CompPValueLookupTable::inTable(const DeconvMsPtrVec &deconv_ms_ptr_vec,
     
     if (match_frag_num <= 5 || match_frag_num >= 100) continue;
 
-    int unexpected_shift_num = prsm_ptrs[i]->getProteoformPtr()->getMassShiftNum(AlterType::UNEXPECTED);
+    int unexpected_shift_num = prsm_ptrs[i]->getProteoformPtr()->getMassShiftNum(MassShiftType::UNEXPECTED);
 
     if (!inTable(peak_num, match_frag_num, unexpected_shift_num)) return false;
   }

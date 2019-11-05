@@ -1,4 +1,4 @@
-// Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+// Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,7 +21,11 @@ namespace toppic {
 
 class FastaSubSeq : public FastaSeq {
  public:
-  FastaSubSeq(FastaSeqPtr seq_ptr, int sub_seq_start, int sub_seq_len);
+  FastaSubSeq(const std::string &name_line, 
+              const std::string &sub_seq, int sub_seq_start);
+
+  FastaSubSeq(const std::string &name, const std::string &desc,
+              const std::string &sub_seq, int sub_seq_start);
 
   int getSubSeqStart() {return sub_seq_start_;}
 
@@ -40,7 +44,6 @@ class FastaSubSeq : public FastaSeq {
 };
 
 typedef std::shared_ptr<FastaSubSeq> FastaSubSeqPtr;
-typedef std::vector<FastaSubSeqPtr> FastaSubSeqPtrVec;
 
 }  // namespace toppic
 

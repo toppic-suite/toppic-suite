@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -12,10 +12,11 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <numeric>
+
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <numeric>
 
 #include "common/util/str_util.hpp"
 #include "common/xml/xml_dom_util.hpp"

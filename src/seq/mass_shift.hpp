@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 #ifndef TOPPIC_SEQ_MASS_SHIFT_HPP_
 #define TOPPIC_SEQ_MASS_SHIFT_HPP_
 
-#include "seq/alter.hpp"
+#include "seq/change.hpp"
 
 namespace toppic {
 
@@ -24,9 +24,8 @@ typedef std::shared_ptr<MassShift> MassShiftPtr;
 
 class MassShift {
  public:
-  explicit MassShift(AlterPtr alter_ptr);  
-
-  explicit MassShift(MassShiftPtr shift_ptr, int start);
+  MassShift(int left_bp_pos, int right_bp_pos, 
+            MassShiftTypePtr type_ptr);
 
   explicit MassShift(XmlDOMElement* mass_shift_element);
 
@@ -38,17 +37,17 @@ class MassShift {
 
   void setRightBpPos(int p) {right_bp_pos_ = p;}
 
-  std::vector<AlterPtr> getAlterPtrVec() {return alter_vec_;}
+  std::vector<ChangePtr> getChangePtrVec() {return change_vec_;}
 
-  AlterPtr getAlterPtr(size_t idx) {return alter_vec_[idx];}
+  ChangePtr getChangePtr(size_t idx) {return change_vec_[idx];}
 
-  void setAlterPtrVec(AlterPtrVec alter_vec) {alter_vec_ = alter_vec;}
+  void setChangePtr(ChangePtr change);
 
-  AlterTypePtr getTypePtr(); 
+  MassShiftTypePtr getTypePtr() {return type_ptr_;}
 
   double getMassShift() {return shift_;}
 
-  std::string getAnnoStr();
+  std::string getSeqStr();
 
   static std::string getXmlElementName() {return "mass_shift";}
 
@@ -61,9 +60,11 @@ class MassShift {
 
   int right_bp_pos_;
 
+  MassShiftTypePtr type_ptr_;
+
   double shift_;
 
-  std::vector<AlterPtr> alter_vec_;
+  std::vector<ChangePtr> change_vec_;
 };
 
 typedef std::vector<MassShiftPtr> MassShiftPtrVec;

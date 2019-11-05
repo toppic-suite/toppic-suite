@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -23,7 +23,8 @@ namespace toppic {
 
 class MatchEnvFilter {
  public:
-  static MatchEnvPtrVec filter(MatchEnvPtrVec &ori_envs, double prec_mass, EnvParaPtr env_para_ptr);
+  static MatchEnvPtrVec filter(MatchEnvPtrVec &ori_envs, double prec_mass, EnvParaPtr env_para_ptr, int ms_level_);
+  static MatchEnvPtrVec filter_using_cnn(MatchEnvPtrVec &ori_envs, PeakPtrVec &peak_list);
 };
 
 }

@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -14,14 +14,11 @@
 
 #include <set>
 #include <algorithm>
-#include <map>
 
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
 #include "spec/extend_ms_factory.hpp"
 #include "spec/msalign_reader.hpp"
-#include "feature/spec_feature.hpp"
-#include "feature/spec_feature_reader.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_util.hpp"
@@ -158,43 +155,44 @@ void addSpectrumPtrsToPrsms(PrsmPtrVec &prsm_ptrs, PrsmParaPtr prsm_para_ptr) {
 
 void addFeatureIDToPrsms(PrsmStrPtrVec &prsm_ptrs, const std::string & feature_file_name) {
   // read TopFD featuers
-  SpecFeatureReader ft_reader(feature_file_name); 
-  SpecFeaturePtrVec ms2_features = ft_reader.readAllFeatures();
-  ft_reader.close();
-
-  std::map<int,SpecFeaturePtr> feature_map;
-  for (size_t i = 0; i < ms2_features.size(); i++) {
-    feature_map[ms2_features[i]->getSpecId()] =  ms2_features[i];
+  std::vector<int> feature_spec_ids;
+  std::vector<int> feature_ids;
+  std::vector<double> feature_intens;
+  std::ifstream infile(feature_file_name);
+  LOG_DEBUG("Feature file name " << feature_file_name);
+  std::string line;
+  while (std::getline(infile, line)) {
+    if (line[0] == '#' || line == "" || line[0] == 'I') {
+      continue;
+    }
+    // boost::split(strs, line, boost::is_any_of("\t "));
+    std::vector<std::string> strs = str_util::split(line, "\t ");
+    if (strs[6] == "-") {
+      continue;
+    }
+    //LOG_DEBUG("Line " << line << " str num " << strs.size());
+    feature_spec_ids.push_back(std::stoi(strs[0]));
+    feature_ids.push_back(std::stoi(strs[6]));
+    feature_intens.push_back(std::stod(strs[7]));
   }
+  infile.close();
 
   // make sure prsms sorted by spectrum id
   std::sort(prsm_ptrs.begin(), prsm_ptrs.end(), PrsmStr::cmpSpectrumIdInc);
 
+  size_t k = 0;
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
     int spec_id = prsm_ptrs[i]->getSpectrumId();
-    if (feature_map.find(spec_id) != feature_map.end()) { 
-      SpecFeaturePtr feature = feature_map.find(spec_id)->second;
-      if (feature != nullptr) {
-        prsm_ptrs[i]->setPrecFeatureId(feature->getSampleFeatureId());
-        prsm_ptrs[i]->setPrecFeatureInte(feature->getSampleFeatureInte());
-        prsm_ptrs[i]->setFracFeatureScore(feature->getFracFeatureScore());
-      }
-      else {
-        LOG_ERROR("Spectrum " << spec_id << " does not have a feature!");
-      }
+    while (feature_spec_ids[k] != spec_id) {k++;}
+    if (feature_ids[k] >= 0) {
+      prsm_ptrs[i]->setPrecFeatureId(feature_ids[k]);
+      prsm_ptrs[i]->setPrecFeatureInte(feature_intens[k]);
+    }
+    else {
+      LOG_ERROR("Spectrum " << spec_id << " does not have a feature!");
     }
   }
 }
-
-void removePrsmsWithoutFeature(PrsmStrPtrVec &prsm_ptrs, 
-                               PrsmStrPtrVec &filtered_prsm_ptrs) {
-  for (size_t i = 0; i < prsm_ptrs.size(); i++) {
-    if (prsm_ptrs[i]->getPrecFeatureId() >=0) {
-      filtered_prsm_ptrs.push_back(prsm_ptrs[i]);
-    }
-  }
-}
-
 
 void mergePrsmFiles(const std::vector<std::string> & prsm_file_lst, int N, 
                     const std::string & output_file) {

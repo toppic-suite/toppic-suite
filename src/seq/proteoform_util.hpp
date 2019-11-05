@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -11,6 +11,7 @@
 //WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //See the License for the specific language governing permissions and
 //limitations under the License.
+
 
 #ifndef TOPPIC_SEQ_PROTEOFORM_UTIL_HPP_
 #define TOPPIC_SEQ_PROTEOFORM_UTIL_HPP_
@@ -47,10 +48,9 @@ std::vector<double> getNTermAcets(ProteoformPtr db_form_ptr,
 std::vector<std::vector<double> > getNTermAcet2D(const ProteoformPtrVec & db_form_ptr_vec,
                                                  const ProtModPtrVec & prot_mod_ptrs);
 
-ProteoformPtr geneDbProteoformPtr(FastaSubSeqPtr fasta_seq_ptr, 
-                                  ModPtrVec fix_mod_list, int start_pos);
+ProteoformPtr geneDbProteoformPtr(FastaSubSeqPtr fasta_seq_ptr, ModPtrVec fix_mod_list, int start_pos);
 
-}  // namespace proteoform_util
+}  // namespace toppiceoform_util
 
 }  // namespace toppic
 

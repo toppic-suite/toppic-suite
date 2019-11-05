@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -29,12 +29,6 @@ FastaReader::FastaReader(const std::string &file_name) {
 
   while (ori_name_.length() <= 1) {
     std::getline(input_, ori_name_);
-  }
-}
-
-FastaReader::~FastaReader() {
-  if (input_.is_open()) {
-    input_.close();
   }
 }
 

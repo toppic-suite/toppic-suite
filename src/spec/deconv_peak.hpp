@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -11,6 +11,7 @@
 //WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //See the License for the specific language governing permissions and
 //limitations under the License.
+
 
 #ifndef TOPPIC_SPEC_DECONV_PEAK_HPP_
 #define TOPPIC_SPEC_DECONV_PEAK_HPP_
@@ -40,13 +41,11 @@ class DeconvPeak : public Peak {
 
   double getMonoMass() {return getPosition();}
 
-  double getMonoMz() {return compMz(getMonoMass(), charge_);}
+  double getMonoMz() {return compMonoMz(getMonoMass(), charge_);}
 
   double getScore() {return score_;}
 
   void setId(int id) {id_ = id;}
-
-  void setSpId(int sp_id) {sp_id_ = sp_id;}
 
   void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
@@ -66,5 +65,4 @@ typedef std::vector<DeconvPeakPtr> DeconvPeakPtrVec;
 typedef std::vector<DeconvPeakPtrVec> DeconvPeakPtrVec2D;
 
 }  // namespace toppic
-
 #endif

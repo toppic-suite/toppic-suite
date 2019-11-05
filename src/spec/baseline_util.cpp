@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -53,19 +53,20 @@ IntvDensPtrVec getDensity(const std::vector<double> &inte, double max_inte) {
   } else if (max_inte < 100) {
     intv_width = max_inte / 100;
   }
-  int total_num = static_cast<int>(inte.size());
+  size_t total_num = inte.size();
   int intv_num = static_cast<int>(std::round(max_inte / intv_width)) + 1;
   IntvDensPtrVec dens(intv_num);
   for (int i = 0; i < intv_num; i++) {
     double bgn = i * intv_width;
     double end = (i + 1) * intv_width;
     int num = 0;
-    for (int j = 0; j < total_num; j++) {
+    for (size_t j = 0; j < total_num; j++) {
       if (inte[j] > bgn && inte[j] <= end) {
         num++;
       }
     }
-    IntvDensPtr cur_den = std::make_shared<IntvDens>(bgn, end, num, num / total_num);
+    IntvDensPtr cur_den
+        = std::make_shared<IntvDens>(bgn, end, num, num / static_cast<float>(total_num));
     dens[i] = cur_den;
   }
   return dens;
@@ -106,8 +107,11 @@ double getBaseLine(const std::vector<double> &inte) {
   int max_pos;
   IntvDensPtrVec dens;
   do {    
+    // LOG_DEBUG("get density");
     dens = getDensity(inte, max_inte);
+    // LOG_DEBUG("get max pos ");
     max_pos = getMaxPos(dens);
+    //LOG_DEBUG("max pos " << max_pos << " inte " << dens[max_pos]->getBgn());
     if (max_pos == 0) {
       max_inte = dens[max_pos]->getEnd();
     }

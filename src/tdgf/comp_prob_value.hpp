@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -52,15 +52,14 @@ class CompProbValue {
 
   void compute(const ResFreqPtrVec &n_term_residue_ptrs, 
                const PrmPeakPtrVec2D &peak_ptr_2d, 
-               int thresh, int shift_num, bool strict, 
-               double prob_prec_mass, PeakTolerancePtr tole_ptr);
+               int thresh, int shift_num, bool strict);
   // main function to get probabilities
   double getCondProb(int shift, int thresh);
   double getCondProbOneValue(int shift, int value);
 
   static void compProbArray(CompProbValuePtr comp_prob_ptr, const ResFreqPtrVec &n_term_residue_ptrs, 
-                            const PrmPeakPtrVec2D &peak_ptr_2d, const PrsmPtrVec &prsm_ptrs, bool strict,
-                            double prob_prec_mass, PeakTolerancePtr tole_ptr, std::vector<double> &results);
+                            const PrmPeakPtrVec2D &peak_ptr_2d, const PrsmPtrVec &prsm_ptrs, bool strict, 
+                            std::vector<double> &results);
 
  private:
   static int const ORI_PAGE_LEN = 5000;
@@ -124,8 +123,7 @@ class CompProbValue {
 
   // computation
   void clearVar();
-  void setMassErr(const PrmPeakPtrVec2D &peak_ptr_2d, bool strict, 
-                  double prec_mass, PeakTolerancePtr tole_ptr);
+  void setMassErr(const PrmPeakPtrVec2D &peak_ptr_2d, bool strict);
 
   void updatePosScores(const std::vector<ProbPeak> &prob_peaks, 
                        int spectrum_id);

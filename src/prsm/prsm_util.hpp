@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -42,9 +42,6 @@ std::vector<int> getClusterIds(const PrsmPtrVec &prsm_ptrs);
 void addSpectrumPtrsToPrsms(PrsmPtrVec &prsm_ptrs, PrsmParaPtr prsm_para_ptr);
 
 void addFeatureIDToPrsms(PrsmStrPtrVec &prsm_ptrs, const std::string & feature_file_name);
-
-void removePrsmsWithoutFeature(PrsmStrPtrVec &prsm_ptrs, 
-                               PrsmStrPtrVec &filtered_prsm_ptrs);
 
 void mergePrsmFiles(const std::vector<std::string> & prsm_file_lst, int N,
                     const std::string & output_file);

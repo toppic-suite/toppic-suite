@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -37,7 +37,6 @@ class PwMsReader {
   PeakPtrVec getPeakList() {return peak_list_;}
   MsHeaderPtr getHeaderPtr() {return header_ptr_;}
   int getInputSpNum() {return input_sp_num_;}
-  bool readOneMs(int sp_id, PeakPtrVec &peak_list, MsHeaderPtr &header_ptr);
 
  private:
   std::string file_name_;

@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -17,10 +17,6 @@
 
 #include "common/util/file_util.hpp"
 #include "common/util/str_util.hpp"
-#include "common/util/time_util.hpp"
-#include "spec/msalign_frac_merge.hpp"
-#include "feature/feature_merge.hpp"
-#include "deconv/deconv/deconv_para.hpp"
 #include "console/topfd_argument.hpp"
 #include "console/topfd_process.hpp"
 
@@ -40,7 +36,17 @@ int main(int argc, char* argv[]) {
 
   std::vector<std::string> spec_file_lst = argu_processor.getSpecFileList();
 
-  int result = toppic::topfd_process::process(arguments, spec_file_lst);
+  for (size_t k = 0; k < spec_file_lst.size(); k++) {
+    if (toppic::str_util::endsWith(spec_file_lst[k], "mzML")
+        || toppic::str_util::endsWith(spec_file_lst[k], "mzXML")
+        || toppic::str_util::endsWith(spec_file_lst[k], "mzml")
+        || toppic::str_util::endsWith(spec_file_lst[k], "mzxml")) {
+      arguments["spectrumFileName"] = spec_file_lst[k];
+      if (toppic::TopFDProcess(arguments) != 0) {
+        return 1;
+      }
+    }
+  }
 
-  return result;
+  return 0;
 }

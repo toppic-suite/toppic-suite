@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -41,6 +41,7 @@ DbBlockPtrVec DbBlock::readDbBlockIndex(const std::string &db_file_name) {
     strs = str_util::split(line, "\t");
     int block_index = std::stoi(strs[0]);
     int seq_index = std::stoi(strs[1]);
+    LOG_DEBUG("block " << block_index << " seq " << seq_index);
     DbBlockPtr ptr = std::make_shared<DbBlock>(block_index, seq_index);
     db_block_ptr_vec.push_back(ptr);
   }

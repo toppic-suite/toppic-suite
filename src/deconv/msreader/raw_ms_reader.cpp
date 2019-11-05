@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -49,20 +49,6 @@ RawMsPtr RawMsReader::getNextMs(double prec_win_size, int max_charge) {
     }
   }
   return ms_ptr;
-}
-
-void RawMsReader::getMs1Peaks(PeakPtrVec2D &raw_peaks) {
-  while (true) {
-    reader_ptr_->readNext();
-    MsHeaderPtr header_ptr = reader_ptr_->getHeaderPtr();
-    if (header_ptr == nullptr) {
-      break;
-    }
-    if (header_ptr->getMsLevel() == 1) {
-      PeakPtrVec peak_list = reader_ptr_->getPeakList();
-      raw_peaks.push_back(peak_list);
-    }
-  }
 }
 
 // refine precursor charge and mz 

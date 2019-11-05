@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -38,8 +38,7 @@ Envelope::Envelope(int num, std::vector<std::string> &line_list) {
   //boost::split(words, line_list[0], boost::is_any_of(" "));
   std::vector<std::string> words = str_util::split(line_list[0], " ");
   // LOG_DEBUG("line list size " << line_list.size() << " num " << num);
-  // mono_mz in the theo_envelope file are not consistent with peak intensities
-  //mono_mz_ = std::stod(words[7]);
+  mono_mz_ = std::stod(words[7]);
   peaks_.resize(num);
   for (int i = 0; i < num; i++) {
     //boost::split(words, line_list[i+1], boost::is_any_of(" "));
@@ -50,7 +49,6 @@ Envelope::Envelope(int num, std::vector<std::string> &line_list) {
     peaks_[i] = peak_ptr;
   }
   refer_idx_ = getHighestPeakIdx();
-  mono_mz_ = peaks_[0]->getPosition();
 }
 
 Envelope::Envelope(int refer_idx, int charge, double mono_mz,
@@ -69,8 +67,7 @@ int Envelope::getLabel(int i) {
 }
 
 EnvelopePtr Envelope::convertToTheo(double mass_diff, int new_charge) {
-  int ori_charge = 1;
-  double new_mono_mz = (mono_mz_ * ori_charge + mass_diff) / new_charge;
+  double new_mono_mz = (mono_mz_ + mass_diff) / new_charge;
   EnvPeakPtrVec new_peaks(peaks_.size());
   for (size_t i = 0; i < peaks_.size(); i++) {
     double new_mz = (peaks_[i]->getPosition() + mass_diff) / new_charge;
@@ -82,15 +79,13 @@ EnvelopePtr Envelope::convertToTheo(double mass_diff, int new_charge) {
 
 // Convert a theoretical distribution to a theoretical envelope
 EnvelopePtr Envelope::distrToTheoBase(double new_base_mz, int new_charge) {
-  int ori_charge = 1;
-  double mass_diff = new_base_mz * new_charge - peaks_[refer_idx_]->getPosition() * ori_charge;
+  double mass_diff = new_base_mz * new_charge - peaks_[refer_idx_]->getPosition();
   return convertToTheo(mass_diff, new_charge);
 }
 
 // Convert a theoretical distribution to a theoretical envelope based on the
 EnvelopePtr Envelope::distrToTheoMono(double new_mono_mz, int new_charge) {
-  int ori_charge = 1;
-  double mass_diff = new_mono_mz * new_charge - mono_mz_ * ori_charge;
+  double mass_diff = new_mono_mz * new_charge - mono_mz_;
   return convertToTheo(mass_diff, new_charge);
 }
 
@@ -156,24 +151,6 @@ EnvelopePtr Envelope::getSubEnv(double percent_bound, double absolute_min_inte,
                                       max_back_peak_num, max_forw_peak_num);
   return getSubEnv(bounds[0], bounds[1]);
 }
-
-EnvelopePtr Envelope::getSubEnv(double min_inte) {
-  size_t left = refer_idx_;
-  size_t right = refer_idx_;
-  for (size_t i = 0; i < peaks_.size(); i++) {
-    if (peaks_[i]->getIntensity() >= min_inte) {
-      if (i < left) {
-        left = i;
-      }
-      if (i > right) {
-        right = i;
-      }
-    }
-  }
-
-  return getSubEnv(refer_idx_ - left, right - refer_idx_); 
-}
-
 
 // Compute the bound of highest peaks with intensity 85%.
 std::vector<int> Envelope::calcBound(double percent_bound, double absolute_min_inte,
@@ -272,14 +249,6 @@ std::vector<double> Envelope::getIntensities() {
     intensities.push_back(peaks_[i]->getIntensity());
   }
   return intensities;
-}
-
-double Envelope::getIntensitySum() {
-  double sum = 0.0;
-  for (size_t i = 0; i < peaks_.size(); i++) {
-    sum += peaks_[i]->getIntensity();
-  }
-  return sum;
 }
 
 void Envelope::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {

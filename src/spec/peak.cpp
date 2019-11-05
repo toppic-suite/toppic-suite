@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -23,12 +23,12 @@ Peak::Peak(double position, double intensity):
       position_(position), 
       intensity_(intensity) {}
 
-double Peak::compPeakNeutralMass(double mono_mz, int charge) {
+double Peak::compPeakMass(double mono_mz, int charge) {
   return mono_mz * charge - charge * mass_constant::getProtonMass();
 }
 
-double Peak::compMz(double neutral_mass, int charge) {
-    return neutral_mass / charge + mass_constant::getProtonMass();
+double Peak::compMonoMz(double mono_mass, int charge) {
+    return mono_mass / charge + mass_constant::getProtonMass();
 }
 
 void Peak::appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent) {

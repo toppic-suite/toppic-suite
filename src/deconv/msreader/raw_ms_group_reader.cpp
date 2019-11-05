@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -20,12 +20,9 @@
 
 namespace toppic {
 
-RawMsGroupReader::RawMsGroupReader(const std::string & file_name, 
-                                   bool missing_level_one,
-                                   int fraction_id) {
+RawMsGroupReader::RawMsGroupReader(const std::string & file_name, bool missing_level_one) {
   reader_ptr_ = std::make_shared<PwMsReader>(file_name);
   missing_level_one_ = missing_level_one;
-  fraction_id_ = fraction_id;
   if (!missing_level_one_) {
     ms_one_ptr_ = readNextRawMs();
     if (ms_one_ptr_ == nullptr) {
@@ -46,7 +43,6 @@ RawMsPtr RawMsGroupReader::readNextRawMs() {
   if (header_ptr == nullptr) {
     return nullptr;
   }
-  header_ptr->setFractionId(fraction_id_);
   RawMsPtr ms_ptr = std::make_shared<Ms<PeakPtr> >(header_ptr, peak_list);
   return ms_ptr;
 }

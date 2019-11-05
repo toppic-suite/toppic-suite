@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -29,13 +29,6 @@ int searchPos(const PeakPtrVec &ptr_list, double pos);
 int getNearPeakIdx(const PeakPtrVec  &ptr_list, double pos, double tolerance);
 
 PeakPtrVec rmPeaks(const PeakPtrVec &ptr_list, std::vector<bool> &keep);
-
-PeakPtrVec getPeaksInWindow(const PeakPtrVec &ptr_list, double center, 
-                            double win_size);
-
-double getHighestPeakInte(const PeakPtrVec &ptr_list); 
-
-double getMedianPeakInte(PeakPtrVec ptr_list);
 
 }  // namespace raw_ms_util
 

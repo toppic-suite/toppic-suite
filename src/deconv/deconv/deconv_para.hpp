@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -24,8 +24,13 @@ namespace toppic {
 
 class DeconvPara {
  public:
-  DeconvPara(std::map<std::string, std::string> &arguments, 
-             const std::string &argument_str); 
+  DeconvPara(std::map<std::string, std::string> &arguments);
+
+  void setDataFileName(const std::string & file_name) {data_file_name_ = file_name;}
+
+  std::string getDataFileName() {return data_file_name_;}
+
+  std::string data_file_name_;
 
   std::string resource_dir_;
 
@@ -52,10 +57,6 @@ class DeconvPara {
   bool do_final_filtering_ = true;
 
   bool output_match_env_ = false;
-
-  bool output_json_files_ = true;
-
-  std::string argument_str_;
 };
 
 typedef std::shared_ptr<DeconvPara> DeconvParaPtr;

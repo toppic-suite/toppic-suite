@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@
 
 #include "prsm/prsm_algo.hpp"
 #include "prsm/prsm_reader.hpp"
-#include "prsm/prsm_str_merge.hpp"
+#include "prsm/prsm_str_combine.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_xml_writer_util.hpp"
@@ -197,11 +197,11 @@ void DprProcessor::process() {
   for (int t = 0; t < mng_ptr_->thread_num_; t++) {
     input_exts.push_back(mng_ptr_->output_file_ext_ + "_" + str_util::toString(t));
   }
-  PrsmStrMergePtr merge_ptr
-      = std::make_shared<PrsmStrMerge>(sp_file_name, input_exts, 
-                                       mng_ptr_->output_file_ext_, prsm_top_num);
-  merge_ptr->process();
-  merge_ptr = nullptr;
+  PrsmStrCombinePtr combine_ptr
+      = std::make_shared<PrsmStrCombine>(sp_file_name, input_exts, 
+                                         mng_ptr_->output_file_ext_, prsm_top_num);
+  combine_ptr->process();
+  combine_ptr = nullptr;
 
   // remove tempory files
   file_util::cleanTempFiles(sp_file_name, mng_ptr_->output_file_ext_ + "_");
@@ -249,7 +249,7 @@ std::function<void()> geneTask(SpectrumSetPtr spec_set_ptr,
 
     ProteoformTypePtr type_ptr = prsm_ptr->getProteoformPtr()->getProteoformType();
 
-    int unexpect_shift_num = prsm_ptr->getProteoformPtr()->getMassShiftNum(AlterType::UNEXPECTED);
+    int unexpect_shift_num = prsm_ptr->getProteoformPtr()->getMassShiftNum(MassShiftType::UNEXPECTED);
 
     if (prsm_ptr->getProteoformPtr()->getVariablePtmNum() == 0) {
       cand_num = test_num_ptr->compCandNum(type_ptr, unexpect_shift_num,

@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -20,11 +20,11 @@ namespace toppic {
 
 namespace match_env_writer {
 
-void write_env(std::ofstream &file, MsHeaderPtr header, MatchEnvPtr match_env); 
+void write_env(std::ofstream &file, MsHeaderPtr header, MatchEnvPtr match_env, PeakPtrVec &peak_list, int peakId, double min_inte); 
 
-void write_env_vec(std::ofstream &file, MsHeaderPtr header, const MatchEnvPtrVec & envs); 
+void write_env_vec(std::ofstream &file, MsHeaderPtr header, const MatchEnvPtrVec & envs, PeakPtrVec &peak_list); 
 
-void write(const std::string & file, MsHeaderPtr header, const MatchEnvPtrVec & envs); 
+void write(const std::string & file, MsHeaderPtr header, const MatchEnvPtrVec & envs, PeakPtrVec &peak_list); 
 
 
 }  // namespace msalign_writer

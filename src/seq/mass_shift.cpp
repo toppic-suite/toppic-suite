@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -14,70 +14,69 @@
 
 #include <string>
 
-#include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
 #include "common/xml/xml_dom_util.hpp"
 #include "seq/mass_shift.hpp"
 
 namespace toppic {
 
-MassShift::MassShift(AlterPtr alter_ptr) {
-  shift_ = alter_ptr->getMass();
-  alter_vec_.push_back(alter_ptr);
-  left_bp_pos_ = alter_vec_[0]->getLeftBpPos();
-  right_bp_pos_ = alter_vec_[0]->getRightBpPos();
-}
-
-MassShift::MassShift(MassShiftPtr shift_ptr, int start) {
-  shift_ = shift_ptr->getMassShift();
-  left_bp_pos_ = shift_ptr->getLeftBpPos() - start;
-  right_bp_pos_ = shift_ptr->getRightBpPos() - start;
-  AlterPtrVec alter_ptrs = shift_ptr->getAlterPtrVec();
-  for (size_t k = 0; k < alter_ptrs.size(); k++) {
-    AlterPtr alter_ptr = Alter::geneAlterPtr(alter_ptrs[k], start); 
-    alter_vec_.push_back(alter_ptr);
-  }
-}
-
-AlterTypePtr MassShift::getTypePtr() {
-  if (alter_vec_.size() == 0) {
-    LOG_ERROR("Alter vector is empty!");
-    exit(EXIT_FAILURE);
-  } 
-  return alter_vec_[0]->getTypePtr();
-} 
+MassShift::MassShift(int left_bp_pos, int right_bp_pos, MassShiftTypePtr type_ptr):
+    left_bp_pos_(left_bp_pos),
+    right_bp_pos_(right_bp_pos),
+    type_ptr_(type_ptr),
+    shift_(0.0) { }
 
 MassShift::MassShift(XmlDOMElement* element) {
-  left_bp_pos_ = xml_dom_util::getIntChildValue(element, "left_bp_pos", 0);
-  right_bp_pos_ = xml_dom_util::getIntChildValue(element, "right_bp_pos", 0);
+  left_bp_pos_ = xml_dom_util::getIntChildValue(element, "shift_left_bp_pos", 0);
+
+  right_bp_pos_ = xml_dom_util::getIntChildValue(element, "shift_right_bp_pos", 0);
+
+  std::string ct_element_name = MassShiftType::getXmlElementName();
+  XmlDOMElement* ct_element
+      = xml_dom_util::getChildElement(element, ct_element_name.c_str(), 0);
+  type_ptr_ = MassShiftType::getChangeTypePtrFromXml(ct_element);
 
   shift_ = xml_dom_util::getDoubleChildValue(element, "shift", 0);
 
-  std::string alter_element_name = Alter::getXmlElementName();
-  std::string alter_element_list = alter_element_name + "_list";
-  XmlDOMElement* alter_list_element 
-      = xml_dom_util::getChildElement(element, alter_element_list.c_str(), 0);
+  XmlDOMElement* change_list_element = xml_dom_util::getChildElement(element, "change_list", 0);
 
-  int alter_len = xml_dom_util::getChildCount(alter_list_element, 
-                                              alter_element_name.c_str());
-  for (int i = 0; i < alter_len; i++) {
-    XmlDOMElement* alter_element
-        = xml_dom_util::getChildElement(alter_list_element, alter_element_name.c_str(), i);
-    alter_vec_.push_back(std::make_shared<Alter>(alter_element));
+  std::string change_element_name = Change::getXmlElementName();
+  int change_len = xml_dom_util::getChildCount(change_list_element, change_element_name.c_str());
+
+  for (int i = 0; i < change_len; i++) {
+    XmlDOMElement* change_element
+        = xml_dom_util::getChildElement(change_list_element, change_element_name.c_str(), i);
+    change_vec_.push_back(std::make_shared<Change>(change_element));
   }
 }
 
-std::string MassShift::getAnnoStr() {
+void MassShift::setChangePtr(ChangePtr change) {
+  shift_ += change->getMass();
+  change_vec_.push_back(change);
+  left_bp_pos_ = change_vec_[0]->getLeftBpPos();
+  right_bp_pos_ = change_vec_[0]->getRightBpPos();
+  for (size_t k = 0; k < change_vec_.size(); k++) {
+    if (change_vec_[k]->getLeftBpPos() < left_bp_pos_) {
+      left_bp_pos_ = change_vec_[k]->getLeftBpPos();
+    }
+    if (change_vec_[k]->getRightBpPos() > right_bp_pos_) {
+      right_bp_pos_ = change_vec_[k]->getRightBpPos();
+    }
+  }
+}
+
+std::string MassShift::getSeqStr() {
   std::string seq_str;
-  if (getTypePtr() == AlterType::UNEXPECTED) {
-    if (alter_vec_[0]->getLocalAnno() != nullptr) {
-      seq_str = alter_vec_[0]->getLocalAnno()->getPtmPtr()->getAbbrName();
+
+  if (getTypePtr() == MassShiftType::UNEXPECTED) {
+    if (change_vec_[0]->getLocalAnno() != nullptr) {
+      seq_str = change_vec_[0]->getLocalAnno()->getPtmPtr()->getAbbrName();
     } else {
-      seq_str = str_util::toString(shift_, 4);
+      seq_str = str_util::toString(shift_, 5);
     }
   } else {
-    for (size_t i = 0; i < alter_vec_.size(); i++) {
-      seq_str += alter_vec_[i]->getModPtr()->getModResiduePtr()->getPtmPtr()->getAbbrName();
+    for (size_t i = 0; i < change_vec_.size(); i++) {
+      seq_str += change_vec_[i]->getModPtr()->getModResiduePtr()->getPtmPtr()->getAbbrName();
       seq_str += ";";
     }
     seq_str.pop_back();
@@ -90,16 +89,17 @@ void MassShift::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
   std::string element_name = getXmlElementName();
   XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
   std::string str = str_util::toString(left_bp_pos_);
-  xml_doc->addElement(element, "left_bp_pos", str.c_str());
+  xml_doc->addElement(element, "shift_left_bp_pos", str.c_str());
   str = str_util::toString(right_bp_pos_);
-  xml_doc->addElement(element, "right_bp_pos", str.c_str());
+  xml_doc->addElement(element, "shift_right_bp_pos", str.c_str());
+  type_ptr_->appendXml(xml_doc, element);
   str = str_util::toString(shift_);
   xml_doc->addElement(element, "shift", str.c_str());
 
-  element_name = Alter::getXmlElementName() + "_list";
+  element_name = Change::getXmlElementName() + "_list";
   XmlDOMElement* cl = xml_doc->createElement(element_name.c_str());
-  for (size_t i = 0; i < alter_vec_.size(); i++) {
-    alter_vec_[i]->appendXml(xml_doc, cl);
+  for (size_t i = 0; i < change_vec_.size(); i++) {
+    change_vec_[i]->appendXml(xml_doc, cl);
   }
   element->appendChild(cl);
   parent->appendChild(element);

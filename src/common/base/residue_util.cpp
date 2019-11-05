@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ namespace residue_util {
 
 bool isValidResidue(char c) {
   if (c < 'A' || c > 'Z') {
-    LOG_WARN("Found unknown amino acid " << c << " in protein sequences!");
+    LOG_INFO("Found unknown amino acid " << c << " in protein sequences!");
     return false;
   }
   else {
@@ -47,7 +47,7 @@ char replaceResidueLetter(char c) {
     r = 'I';
   }
   if (r != c) {
-    LOG_WARN("Found non standard amino acid " << c << " in protein sequences!");
+    LOG_INFO("Found unknown amino acid " << c << " in protein sequences!");
   }
   return r;
 }
@@ -114,7 +114,7 @@ ResiduePtrVec convertStrToResiduePtrVec(const StringPairVec &string_pair_vec) {
 }
 
 ResiduePtrVec convertStrToResiduePtrVec(const StringPairVec &string_pair_vec,
-                                        const ModPtrVec &fix_mod_ptr_vec) {
+                                                     const ModPtrVec &fix_mod_ptr_vec) {
   ResiduePtrVec residue_ptrs = convertStrToResiduePtrVec(string_pair_vec);
   applyFixedMod(residue_ptrs, fix_mod_ptr_vec);
   return residue_ptrs;

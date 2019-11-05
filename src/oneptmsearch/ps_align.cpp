@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -318,7 +318,7 @@ PrsmPtr PSAlign::geneResult(int shift_num, ProteoformPtr proteo_ptr,
   }
 
   MassShiftPtrVec shifts = getDiagonalMassChanges(refined_header_ptrs, first_pos,
-                                                  last_pos, AlterType::UNEXPECTED);
+                                                  last_pos, MassShiftType::UNEXPECTED);
   sub_proteo_ptr->addMassShiftPtrVec(shifts);
 
   return std::make_shared<Prsm>(sub_proteo_ptr, deconv_ms_ptr_vec, refine_prec_mass,

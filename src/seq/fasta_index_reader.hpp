@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -11,6 +11,7 @@
 //WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //See the License for the specific language governing permissions and
 //limitations under the License.
+
 
 #ifndef TOPPIC_SEQ_FASTA_INDEX_READER_HPP_
 #define TOPPIC_SEQ_FASTA_INDEX_READER_HPP_
@@ -32,6 +33,9 @@ class FastaIndexReader {
 
   FastaSeqPtr readFastaSeq(const std::string &name,
                            const std::string &desc);
+
+  std::vector<FastaSubSeqPtr> readFastaSubSeqVec(const std::string & name,
+                                                 const std::string & desc);
 
  private:
   faidx_t *fai_;

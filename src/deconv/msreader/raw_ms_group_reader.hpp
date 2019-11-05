@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -24,8 +24,7 @@ namespace toppic {
 
 class RawMsGroupReader {
  public:
-  RawMsGroupReader(const std::string & file_name, bool missing_level_one, 
-                   int fraction_id);
+  RawMsGroupReader(const std::string & file_name, bool missing_level_one);
 
   RawMsPtr readNextRawMs();
 
@@ -40,7 +39,6 @@ class RawMsGroupReader {
  private:
   PwMsReaderPtr reader_ptr_;
   RawMsPtr ms_one_ptr_; 
-  int fraction_id_;
 
   bool do_refine_prec_mass_ = true;
   bool missing_level_one_ = false;

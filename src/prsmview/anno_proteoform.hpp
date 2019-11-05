@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -12,20 +12,19 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+
 #ifndef TOPPIC_PRSM_VIEW_ANNO_PROTEOFORM_HPP_
 #define TOPPIC_PRSM_VIEW_ANNO_PROTEOFORM_HPP_
 
-#include "common/xml/xml_dom_document.hpp"
+#include "common/xml/xml_dom_util.hpp"
+#include "seq/proteoform.hpp"
 #include "prsm/prsm.hpp"
 #include "prsmview/prsm_view_mng.hpp"
 
 namespace toppic {
 
-namespace anno_proteoform {
-
 xercesc::DOMElement* geneAnnoProteoform(XmlDOMDocument* xml_doc, PrsmPtr prsm_ptr,
                                         PrsmViewMngPtr mng_ptr);
-}
 
 }
 

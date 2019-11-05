@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -539,7 +539,7 @@ PrsmPtr GraphAlign::geneResult(int s, int m) {
 
   DiagonalHeaderPtrVec refined_headers;
 
-  AlterTypePtrVec shift_types;
+  MassShiftTypePtrVec shift_types;
 
   for (size_t i = 0; i < refined_headers_2d.size(); i++) {
     for (size_t j = 0; j < refined_headers_2d[i].size(); j++) {
@@ -547,9 +547,9 @@ PrsmPtr GraphAlign::geneResult(int s, int m) {
       if (i == 0 && j == 0) {
         shift_types.push_back(nullptr);
       } else if (j == 0)  {
-        shift_types.push_back(AlterType::UNEXPECTED);
+        shift_types.push_back(MassShiftType::UNEXPECTED);
       } else {
-        shift_types.push_back(AlterType::VARIABLE);
+        shift_types.push_back(MassShiftType::VARIABLE);
       }
       LOG_DEBUG("i " << i << " j " << j << " type " << shift_types[shift_types.size()-1]);
     }
@@ -570,7 +570,7 @@ PrsmPtr GraphAlign::geneResult(int s) {
     PrsmPtr cur_prsm_ptr = geneResult(s, m);
     if (cur_prsm_ptr != nullptr) {
       MassShiftPtrVec shift_vec
-          = cur_prsm_ptr->getProteoformPtr()->getMassShiftPtrVec(AlterType::UNEXPECTED);
+          = cur_prsm_ptr->getProteoformPtr()->getMassShiftPtrVec(MassShiftType::UNEXPECTED);
       bool valid = true;
       for (size_t i = 0; i < shift_vec.size(); i++) {
         if (std::abs(shift_vec[i]->getMassShift()) > mng_ptr_->max_ptm_mass_) {

@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -30,8 +30,6 @@ class RealEnv : public Envelope {
   RealEnv(const PeakPtrVec &peak_list, EnvelopePtr theo_env, 
           double tolerance, double min_inte);
 
-  int getSpId() {return sp_id_;}
-
   int getMissPeakNum() {return miss_peak_num_;}
 
   int getMatchPeakNum() {return getPeakNum() - miss_peak_num_;}
@@ -42,8 +40,6 @@ class RealEnv : public Envelope {
 
   int getReferPeakIdx() {return peaks_[refer_idx_]->getIdx();}
 
-  void setSpId(int sp_id) {sp_id_ = sp_id;}
-
   static bool testPeakShare(RealEnvPtr a, RealEnvPtr b);
 
   bool isExist(int i);
@@ -53,7 +49,6 @@ class RealEnv : public Envelope {
   static std::string getXmlElementName() {return "real_env";}
 
  private:
-  int sp_id_;
   // peak index in the spectrum 
   // if peak_idx[i] == NO_EXIST_PEAK, it does not exist 
   // std::vector<int> peak_idxes_;
@@ -73,7 +68,6 @@ class RealEnv : public Envelope {
 };
 
 typedef std::vector<RealEnvPtr> RealEnvPtrVec;
-typedef std::vector<RealEnvPtrVec> RealEnvPtrVec2D;
 
 }
 

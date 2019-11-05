@@ -1,4 +1,4 @@
-// Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+// Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,8 +29,6 @@ class MsAlignReader {
  public:
   MsAlignReader(const std::string &file_name);
 
-  ~MsAlignReader();
-
   MsAlignReader(const std::string &file_name, int group_spec_num,
                 ActivationPtr act_ptr, const std::set<std::string> skip_list,
                 int peak_num_limit = std::numeric_limits<int>::max());
@@ -42,8 +40,6 @@ class MsAlignReader {
   std::vector<SpectrumSetPtr> getNextSpectrumSet(SpParaPtr sp_para_ptr);
 
   void close();
-
-  static void readMsOneSpectra(const std::string &file_name, DeconvMsPtrVec &ms_ptr_vec); 
 
  private:
   std::string file_name_;

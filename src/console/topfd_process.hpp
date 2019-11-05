@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -16,24 +16,11 @@
 #define TOPPIC_CONSOLE_TOPFD_PROCESS_HPP_
 
 #include <string>
-#include <vector>
 #include <map>
 
 namespace toppic {
 
-namespace topfd_process {
-
-std::string geneArgumentStr(std::map<std::string, std::string> arguments, 
-                            const std::string & prefix);
-
-int processOneFile(std::map<std::string, std::string> arguments, 
-                   const std::string &argument_str,
-                   const std::string &spec_file_name, int frac_id);
-
-int process(std::map<std::string, std::string> arguments, 
-            std::vector<std::string> spec_file_lst); 
-
-}
+int TopFDProcess(std::map<std::string, std::string> arguments);
 
 }
 

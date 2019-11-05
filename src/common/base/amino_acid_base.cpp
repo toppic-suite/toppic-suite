@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -14,13 +14,10 @@
 
 #include <string>
 
-#include "xercesc/framework/MemBufInputSource.hpp"
-
 #include "common/util/logger.hpp"
 #include "common/xml/xml_dom_document.hpp"
 #include "common/xml/xml_dom_util.hpp"
 #include "common/base/amino_acid_base.hpp"
-#include "common/base/amino_acid_data.hpp"
 
 namespace toppic {
 
@@ -34,61 +31,43 @@ std::unordered_map<std::string, AminoAcidPtr> AminoAcidBase::amino_acid_three_le
 
 std::unordered_map<std::string, AminoAcidPtr> AminoAcidBase::amino_acid_name_map_;
 
-void AminoAcidBase::initBase() {
+
+// class functions
+void AminoAcidBase::initBase(const std::string &file_name) {
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
-  if (!parser) {
-    LOG_ERROR("Error in parsing amino acid data!");
-    exit(EXIT_FAILURE);
-  }
+  if (parser) {
+    XmlDOMDocument doc(parser, file_name.c_str());
+    XmlDOMElement* parent = doc.getDocumentElement();
+    std::string element_name = AminoAcid::getXmlElementName();
+    int acid_num = xml_dom_util::getChildCount(parent, element_name.c_str());
+    LOG_DEBUG("acid num " << acid_num);
+    for (int i = 0; i < acid_num; i++) {
+      XmlDOMElement* element = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
+      AminoAcidPtr ptr = std::make_shared<AminoAcid>(element);
+      amino_acid_ptr_vec_.push_back(ptr);
 
-  xercesc::MemBufInputSource mem_str((const XMLByte*)amino_acid_base_data.c_str(), 
-                                     amino_acid_base_data.length(), 
-                                     "amino_acid_data");
-  XmlDOMDocument doc(parser,mem_str);
-  XmlDOMElement* parent = doc.getDocumentElement();
-  std::string element_name = AminoAcid::getXmlElementName();
-  int acid_num = xml_dom_util::getChildCount(parent, element_name.c_str());
-  LOG_DEBUG("acid num " << acid_num);
-  for (int i = 0; i < acid_num; i++) {
-    XmlDOMElement* element 
-        = xml_dom_util::getChildElement(parent, element_name.c_str(), i);
-    AminoAcidPtr ptr = std::make_shared<AminoAcid>(element);
-    amino_acid_ptr_vec_.push_back(ptr);
+      amino_acid_one_letter_map_[ptr->getOneLetter()]     = ptr;
+      amino_acid_three_letter_map_[ptr->getThreeLetter()] = ptr;
+      amino_acid_name_map_[ptr->getName()]                = ptr;
 
-    amino_acid_one_letter_map_[ptr->getOneLetter()]     = ptr;
-    amino_acid_three_letter_map_[ptr->getThreeLetter()] = ptr;
-    amino_acid_name_map_[ptr->getName()]                = ptr;
-
-    // check if it is an empty acid
-    if (ptr->getMonoMass() == 0.0) {
-      empty_amino_acid_ptr_ = ptr;
+      // check if it is an empty acid
+      if (ptr->getMonoMass() == 0.0) {
+        empty_amino_acid_ptr_ = ptr;
+      }
     }
   }
 }
 
-
 AminoAcidPtr AminoAcidBase::getAminoAcidPtrByName(const std::string &name) {
-  AminoAcidPtr amino_acid_ptr = amino_acid_name_map_[name];
-  if (amino_acid_ptr == nullptr) {
-    LOG_ERROR("Amino acid " << name << " cannot be found!");
-  }
-  return amino_acid_ptr;
+  return amino_acid_name_map_[name];
 }
 
 AminoAcidPtr AminoAcidBase::getAminoAcidPtrByOneLetter(const std::string &one_letter) {
-  AminoAcidPtr amino_acid_ptr = amino_acid_one_letter_map_[one_letter];
-  if (amino_acid_ptr == nullptr) {
-    LOG_ERROR("Amino acid " << one_letter << " cannot be found!");
-  }
-  return amino_acid_ptr;
+  return amino_acid_one_letter_map_[one_letter];
 }
 
 AminoAcidPtr AminoAcidBase::getAminoAcidPtrByThreeLetter(const std::string &three_letter) {
-  AminoAcidPtr amino_acid_ptr = amino_acid_three_letter_map_[three_letter];
-  if (amino_acid_ptr == nullptr) {
-    LOG_ERROR("Amino acid " << three_letter << " cannot be found!");
-  }
-  return amino_acid_ptr;
+  return amino_acid_three_letter_map_[three_letter];
 }
 
 bool AminoAcidBase::containsName(const std::string &name) {

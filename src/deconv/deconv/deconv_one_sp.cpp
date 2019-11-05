@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -100,15 +100,20 @@ MatchEnvPtrVec DeconvOneSp::postprocess(MatchEnvPtrVec  &dp_envs) {
   if (!env_para_ptr_->output_multiple_mass_) {
     match_env_refine::mzRefine(dp_envs);
   }
+ 
+ /// Obtain Prediction Score for MS/MS envelopes
+  if (ms_level_ > 1) 
+    result_envs_ = MatchEnvFilter::filter_using_cnn(dp_envs, peak_list);
 
   // filtering 
   if (env_para_ptr_->do_final_filtering_) {
     result_envs_ = MatchEnvFilter::filter(dp_envs, data_ptr_->getMaxMass(),
-                                          env_para_ptr_);
+                                          env_para_ptr_, ms_level_);
   }
   else {
     result_envs_ = dp_envs;
   }
+  
   if (env_para_ptr_->keep_unused_peaks_) {
     match_env_util::addLowMassPeak(result_envs_, peak_list, env_para_ptr_->getMzTolerance());
   }

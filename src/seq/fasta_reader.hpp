@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -12,6 +12,7 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+
 #ifndef TOPPIC_SEQ_FASTA_READER_HPP_
 #define TOPPIC_SEQ_FASTA_READER_HPP_
 
@@ -24,8 +25,6 @@ namespace toppic {
 class FastaReader {
  public:
   FastaReader(const std::string &file_name);
-
-  ~FastaReader();
 
   // Read FASTA file and return next protein
   // name and sequence. 

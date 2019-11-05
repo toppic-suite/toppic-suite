@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -112,18 +112,15 @@ void PrsmFeatureCluster::process() {
                                                                 fix_mod_ptr_vec_);
 
   prsm_util::addFeatureIDToPrsms(prsm_ptrs, feature_file_name_);
-  // remove prsms without feature
-  PrsmStrPtrVec filtered_prsm_ptrs;
-  prsm_util::removePrsmsWithoutFeature(prsm_ptrs, filtered_prsm_ptrs);
 
-  std::sort(filtered_prsm_ptrs.begin(), filtered_prsm_ptrs.end(), PrsmStr::cmpEValueInc);
-  setProtId(filtered_prsm_ptrs);
-  setProteoClusterId(filtered_prsm_ptrs);
-  std::sort(filtered_prsm_ptrs.begin(), filtered_prsm_ptrs.end(), PrsmStr::cmpSpectrumIdIncPrecursorIdInc);
+  std::sort(prsm_ptrs.begin(), prsm_ptrs.end(), PrsmStr::cmpEValueInc);
+  setProtId(prsm_ptrs);
+  setProteoClusterId(prsm_ptrs);
+  std::sort(prsm_ptrs.begin(), prsm_ptrs.end(), PrsmStr::cmpSpectrumIdIncPrecursorIdInc);
   // output
   std::string output_file_name = base_name + "." + output_file_ext_;
   PrsmXmlWriter writer(output_file_name);
-  writer.writeVector(filtered_prsm_ptrs);
+  writer.writeVector(prsm_ptrs);
   writer.close();
 }
 

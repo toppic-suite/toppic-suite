@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -12,13 +12,17 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+
 #ifndef TOPPIC_PRSM_VIEW_ANNO_PTM_HPP_
 #define TOPPIC_PRSM_VIEW_ANNO_PTM_HPP_
 
-#include "common/xml/xml_dom_document.hpp"
+#include <utility>
+#include <string>
+#include <vector>
+
 #include "common/base/ptm.hpp"
-#include "seq/alter_type.hpp"
-#include "prsmview/anno_ptm_position.hpp"
+#include "seq/mass_shift_type.hpp"
+#include "common/xml/xml_dom_document.hpp"
 
 namespace toppic {
 
@@ -28,25 +32,25 @@ typedef std::vector<AnnoPtmPtr> AnnoPtmPtrVec;
 
 class AnnoPtm {
  public:
-  AnnoPtm(PtmPtr ptm_ptr, AlterTypePtr type_ptr);
+  AnnoPtm(PtmPtr ptm_ptr, MassShiftTypePtr type_ptr);
 
   PtmPtr getPtmPtr() {return ptm_ptr_;}
 
-  AlterTypePtr getTypePtr() {return type_ptr_;}
+  MassShiftTypePtr getTypePtr() {return type_ptr_;}
 
   void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
-  void addOccurence(int left_pos, int right_pos, std::string anno);
+  void addOccurence(int pos, const std::string &acid_letter);
 
   static AnnoPtmPtr findPtm(const AnnoPtmPtrVec &ptm_ptrs, PtmPtr ptm_ptr,
-                            AlterTypePtr type_ptr);
+                            MassShiftTypePtr type_ptr);
 
  private:
   PtmPtr ptm_ptr_;
 
-  AlterTypePtr type_ptr_;
+  MassShiftTypePtr type_ptr_;
 
-  AnnoPtmPositionPtrVec occurences_;
+  std::vector<std::pair<int, std::string> > occurences_;
 };
 
 }  // namespace toppic

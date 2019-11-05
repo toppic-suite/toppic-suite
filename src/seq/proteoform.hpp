@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -12,6 +12,7 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+
 #ifndef TOPPIC_SEQ_PROTEOFORM_HPP_
 #define TOPPIC_SEQ_PROTEOFORM_HPP_
 
@@ -22,7 +23,7 @@
 #include "seq/fasta_index_reader.hpp"
 #include "seq/bp_spec.hpp"
 #include "seq/mass_shift.hpp"
-#include "seq/seq_segment.hpp"
+#include "seq/segment.hpp"
 #include "seq/proteoform_type.hpp"
 
 namespace toppic {
@@ -37,7 +38,7 @@ class Proteoform {
              ProtModPtr prot_mod_ptr,
              int start_pos, int end_pos,
              ResSeqPtr res_seq_ptr,
-             const MassShiftPtrVec &mass_shift_ptr_vec);
+             const MassShiftPtrVec & mass_shift_ptr_vec);
 
   Proteoform(XmlDOMElement* element, FastaIndexReaderPtr reader_ptr,
              const ModPtrVec &fix_mod_list);
@@ -62,11 +63,11 @@ class Proteoform {
 
   int getMassShiftNum() {return static_cast<int>(mass_shift_list_.size());}
 
-  int getMassShiftNum(AlterTypePtr type_ptr);
+  int getMassShiftNum(MassShiftTypePtr ct_ptr);
 
   MassShiftPtrVec getMassShiftPtrVec() {return mass_shift_list_;}
 
-  MassShiftPtrVec getMassShiftPtrVec(AlterTypePtr type_ptr);
+  MassShiftPtrVec getMassShiftPtrVec(MassShiftTypePtr ct_ptr);
 
   int getProteoClusterId() {return proteo_cluster_id_;}
 
@@ -82,9 +83,11 @@ class Proteoform {
 
   void addMassShiftPtrVec(const MassShiftPtrVec & shift_ptr_vec);
 
-  SeqSegmentPtrVec getSeqSegmentPtrVec();
+  SegmentPtrVec getSegmentPtrVec();
 
   std::string getProteinMatchSeq();
+
+  std::string toString();
 
   void appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
@@ -95,10 +98,12 @@ class Proteoform {
   void setVariablePtmNum(int n) {variable_ptm_num_ = n;}
 
   int getVariablePtmNum() {return variable_ptm_num_;}
-  
-  PtmPtrVec getPtmVec(AlterTypePtr type);
 
   std::string getMIScore();
+
+  PtmPtrVec getPtmVec();
+
+  PtmPtrVec getPtmVec(MassShiftTypePtr type);
 
  private:
   FastaSeqPtr fasta_seq_ptr_;
@@ -110,11 +115,11 @@ class Proteoform {
   int start_pos_;
   int end_pos_;
 
-  // residue_seq starts from start_pos_ and ends at end_pos_, and contains
-  // fixed and variable modifications 
+  /* residue_seq starts from start_pos_ and ends at end_pos_, and contains
+   * fixed and variable modifications */
   ResSeqPtr residue_seq_ptr_;
 
-  // bp_spec is generated from residue_seq 
+  /* bp_spec is generated from residue_seq */
   BpSpecPtr bp_spec_ptr_;
 
   int proteo_cluster_id_ = -1;
@@ -125,6 +130,8 @@ class Proteoform {
 
   // Number of variable ptms is used for the test of the mass graph approach
   int variable_ptm_num_ = 0;
+
+  std::string mi_score_ = "";
 };
 
 typedef std::vector<ProteoformPtr> ProteoformPtrVec;

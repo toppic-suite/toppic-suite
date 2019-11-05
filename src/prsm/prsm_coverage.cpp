@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -255,7 +255,7 @@ void PrsmCoverage::compOneCoverage(std::ofstream &file, PrsmPtr prsm_ptr,
       << prsm_ptr->getProteoformPtr()->getStartPos() << "\t"
       << prsm_ptr->getProteoformPtr()->getEndPos() << "\t"
       << prsm_ptr->getProteoformPtr()->getProteinMatchSeq() << "\t"
-      << prsm_ptr->getProteoformPtr()->getMassShiftNum(AlterType::UNEXPECTED) << "\t"
+      << prsm_ptr->getProteoformPtr()->getMassShiftNum(MassShiftType::UNEXPECTED) << "\t"
       << prsm_ptr->getMatchPeakNum() << "\t"
       << prsm_ptr->getMatchFragNum() << "\t"
       << prsm_ptr->getPValue() << "\t"
@@ -300,7 +300,7 @@ void PrsmCoverage::compTwoCoverage(std::ofstream &file, PrsmPtr prsm_ptr,
       << prsm_ptr->getProteoformPtr()->getStartPos() << "\t"
       << prsm_ptr->getProteoformPtr()->getEndPos() << "\t"
       << prsm_ptr->getProteoformPtr()->getProteinMatchSeq() << "\t"
-      << prsm_ptr->getProteoformPtr()->getMassShiftNum(AlterType::UNEXPECTED) << "\t"
+      << prsm_ptr->getProteoformPtr()->getMassShiftNum(MassShiftType::UNEXPECTED) << "\t"
       << prsm_ptr->getMatchPeakNum() << "\t"
       << prsm_ptr->getMatchFragNum() << "\t"
       << prsm_ptr->getPValue() << "\t"

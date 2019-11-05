@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -12,6 +12,7 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+
 #ifndef TOPPIC_SEQ_FASTA_SEQ_HPP_
 #define TOPPIC_SEQ_FASTA_SEQ_HPP_
 
@@ -24,18 +25,12 @@ namespace toppic {
 
 class XmlDOMDocument;
 
-class FastaSeq;
-
-typedef std::shared_ptr<FastaSeq> FastaSeqPtr;
-
 class FastaSeq {
  public:
   FastaSeq(const std::string &name_line, const std::string &ori_seq);
 
   FastaSeq(const std::string &name, const std::string &desc,
            const std::string &ori_seq);
-
-  FastaSeq(FastaSeqPtr seq_ptr, int start, int len);
 
   std::string getName() {return name_;}
 
@@ -47,13 +42,17 @@ class FastaSeq {
 
   int getAcidPtmPairLen() {return acid_ptm_pair_vec_.size();}
 
-  void appendNameDescToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
-
   static std::string getXmlElementName() {return "fasta_seq";}
+
+  void appendNameDescToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent);
 
   static std::string getNameFromXml(XmlDOMElement* element);
 
   static std::string getDescFromXml(XmlDOMElement* element);
+
+  static std::string getString(const std::pair<std::string, std::string> &str_pair);
+
+  static std::string getString(const StringPairVec &str_pair_vec);
 
  private:
   std::string name_;
@@ -65,9 +64,9 @@ class FastaSeq {
   StringPairVec acid_ptm_pair_vec_;
 
   void compAcidPtmPairVec();
-
-  void compRawSeq();
 };
+
+typedef std::shared_ptr<FastaSeq> FastaSeqPtr;
 
 }  // namespace toppic
 

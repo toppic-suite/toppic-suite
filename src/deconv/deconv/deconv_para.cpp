@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -14,19 +14,14 @@
 
 #include <map>
 #include <string>
-#include <sstream>
-#include <iomanip>
 
-#include "common/util/version.hpp"
-#include "common/util/str_util.hpp"
-#include "common/util/file_util.hpp"
-#include "common/util/time_util.hpp"
 #include "deconv/deconv/deconv_para.hpp"
 
 namespace toppic {
 
-DeconvPara::DeconvPara(std::map<std::string, std::string> &arguments, 
-                       const std::string &argument_str) { 
+DeconvPara::DeconvPara(std::map<std::string, std::string> &arguments) {
+  data_file_name_ = arguments["spectrumFileName"];
+  
   resource_dir_ = arguments["resourceDir"];
 
   missing_level_one_ = (arguments["missingLevelOne"] == "true");
@@ -50,8 +45,6 @@ DeconvPara::DeconvPara(std::map<std::string, std::string> &arguments,
   do_final_filtering_ = (arguments["doFinalFiltering"] == "true");
   
   output_match_env_ = (arguments["outputMatchEnv"] == "true");
-
-  argument_str_ = argument_str;
 }
 
 }  // namespace toppic

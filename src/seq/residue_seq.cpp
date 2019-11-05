@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -12,6 +12,7 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+
 #include <sstream>
 #include <string>
 
@@ -20,9 +21,8 @@
 
 namespace toppic {
 
-ResidueSeq::ResidueSeq(const ResiduePtrVec &residues): 
-    residues_(residues) {
-  // get residue mass sum 
+ResidueSeq::ResidueSeq(const ResiduePtrVec &residues): residues_(residues) {
+  /* get residue mass sum */
   residue_mass_sum_ = 0;
   for (size_t i = 0; i < residues_.size(); i++) {
     residue_mass_sum_ += residues_[i]->getMass();

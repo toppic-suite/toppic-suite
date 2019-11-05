@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ SimplePrsm::SimplePrsm(MsHeaderPtr header_ptr, int spectrum_num,
     spectrum_num_(spectrum_num),
     score_(score) {
       spectrum_id_ = header_ptr->getId();
-      file_name_ = header_ptr->getFileName();
       spectrum_scan_ = header_ptr->getScansString();
       precursor_id_ = header_ptr->getPrecId();
       prec_mass_ = header_ptr->getPrecMonoMass();

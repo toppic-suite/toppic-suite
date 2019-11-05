@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
 #include <vector>
 
 #include "common/util/logger.hpp"
+#include "seq/mass_shift_type.hpp"
+#include "seq/fasta_reader.hpp"
+#include "seq/residue_seq.hpp"
 #include "common/base/mod_base.hpp"
 #include "common/base/prot_mod_base.hpp"
 #include "common/base/residue_util.hpp"
-#include "seq/alter_type.hpp"
-#include "seq/fasta_reader.hpp"
-#include "seq/residue_seq.hpp"
 #include "seq/proteoform_util.hpp"
 
 #include "graph/proteo_graph.hpp"
@@ -100,19 +100,19 @@ void ProteoGraph::compDistances(int max_mod_num, int max_ptm_sum_mass) {
         if (target(*ei, *g_p) == v2) {
           MassGraph::edge_descriptor e = *ei;
           int d =(*g_p)[e].int_mass_;
-          int change = (*g_p)[e].alter_type_;
+          int change = (*g_p)[e].change_type_;
           for (int k = 0; k < var_ptm_in_gap_ + 1; k++) {
             if (k == max_mod_num &&
-                (change == AlterType::PROTEIN_VARIABLE->getId()
-                 || change == AlterType::VARIABLE->getId())) {
+                (change == MassShiftType::PROTEIN_VARIABLE->getId()
+                 || change == MassShiftType::VARIABLE->getId())) {
               continue;
             }
             for (std::set<int>::iterator it=dist_vecs[pre_index][k].begin();
                  it != dist_vecs[pre_index][k].end(); it++) {
               int new_d = d + *it;
               if (std::abs(new_d - seq_masses_[index]) <= max_ptm_sum_mass) {
-                if (change == AlterType::PROTEIN_VARIABLE->getId()
-                    || change == AlterType::VARIABLE->getId()) {
+                if (change == MassShiftType::PROTEIN_VARIABLE->getId()
+                    || change == MassShiftType::VARIABLE->getId()) {
                   dist_vecs[index][k+1].insert(new_d);
                 } else {
                   dist_vecs[index][k].insert(new_d);

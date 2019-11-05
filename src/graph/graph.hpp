@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2018, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -27,30 +27,30 @@
 
 #include "common/base/ptm_base.hpp"
 #include "common/base/residue.hpp"
+#include "seq/change.hpp"
 #include "common/util/logger.hpp"
-#include "seq/alter.hpp"
 
 namespace toppic {
 
 struct EdgeInfo {
   ResiduePtr res_ptr_;
 
-  int alter_type_;
+  int change_type_;
 
   int int_mass_;
 
-  EdgeInfo():res_ptr_(nullptr), alter_type_(-1), int_mass_(0) {}
+  EdgeInfo():res_ptr_(nullptr), change_type_(-1), int_mass_(0) {}
 
-  EdgeInfo(ResiduePtr res_ptr, int alter_type, double convert_ratio):
+  EdgeInfo(ResiduePtr res_ptr, int change_type, double convert_ratio):
       res_ptr_(res_ptr),
-      alter_type_(alter_type) {
+      change_type_(change_type) {
         int_mass_ = static_cast<int>(std::round(res_ptr->getMass() * convert_ratio));
         LOG_DEBUG("int mass " << int_mass_
                   << " res mass " << res_ptr->getMass()
                   << " convert_ratio " << convert_ratio);
       }
 
-  EdgeInfo(double mass, double convert_ratio):res_ptr_(nullptr), alter_type_(-1) {
+  EdgeInfo(double mass, double convert_ratio):res_ptr_(nullptr), change_type_(-1) {
     int_mass_ = static_cast<int>(std::round(mass * convert_ratio));
   }
 };
