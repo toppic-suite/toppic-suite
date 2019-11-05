@@ -14,6 +14,8 @@
 
 #include <fstream>
 #include <vector>
+#include <iomanip>
+#include <limits>
 
 #include "deconv/env/match_env.hpp"
 #include "deconv/env/match_env_writer.hpp"
@@ -68,6 +70,7 @@ void write_env(std::ofstream &file, MsHeaderPtr header, MatchEnvPtr match_env, P
 }
 
 void write_env_vec(std::ofstream &file, MsHeaderPtr header, const MatchEnvPtrVec & envs, PeakPtrVec &peak_list) {
+	file << std::setprecision(std::numeric_limits<double>::digits10 + 1);
 	std::vector<double> intes;
 	for (size_t i = 0; i < peak_list.size(); i++) {
 	  intes.push_back(peak_list[i]->getIntensity());
