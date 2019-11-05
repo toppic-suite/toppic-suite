@@ -28,6 +28,7 @@ MsAlignWriter::MsAlignWriter(const std::string &file_name) {
       }
       output_.precision(16);
     }
+
 MsAlignWriter::~MsAlignWriter() {
   if (output_.is_open()) {
     output_.close();

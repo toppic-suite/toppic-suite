@@ -31,15 +31,14 @@ namespace toppic {
 
 namespace topfd_process {
 
-int processOneFile(std::map<std::string, std::string> arguments, 
+void processOneFile(std::map<std::string, std::string> arguments, 
                    std::string argu_str, 
                    const std::string &spec_file_name, 
                    int frac_id) {
   try {
     std::cout << "Processing " << spec_file_name << " started." << std::endl;
     std::cout << "Deconvolution started." << std::endl;
-    DeconvParaPtr para_ptr = std::make_shared<DeconvPara>(arguments, argu_str);
-    DeconvProcess processor(para_ptr, argu_str, spec_file_name, frac_id);
+    DeconvProcess processor(arguments, argu_str, spec_file_name, frac_id);
     processor.process();
     std::cout << "Deconvolution finished." << std::endl;
 
@@ -54,10 +53,9 @@ int processOneFile(std::map<std::string, std::string> arguments,
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
+    exit(EXIT_FAILURE);
   }
-  return 0;
 }
-
 
 void moveFiles(std::string &spec_file_name, bool move_mzrt) {
   std::string base_name = file_util::basename(spec_file_name);
@@ -79,6 +77,18 @@ void moveFiles(std::string &spec_file_name, bool move_mzrt) {
   */
 }
 
+bool isValidFile(std::string &file_name) {
+  if (str_util::endsWith(file_name, "mzML")
+      || str_util::endsWith(file_name, "mzXML")
+      || str_util::endsWith(file_name, "mzml")
+      || str_util::endsWith(file_name, "mzxml")) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
 int process(std::map<std::string, std::string> arguments, 
             std::vector<std::string> spec_file_lst) {
   base_data::init();
@@ -90,14 +100,8 @@ int process(std::map<std::string, std::string> arguments,
   std::string resource_dir = arguments["resourceDir"];
   EnvBase::initBase(resource_dir);
   for (size_t k = 0; k < spec_file_lst.size(); k++) {
-    if (str_util::endsWith(spec_file_lst[k], "mzML")
-        || str_util::endsWith(spec_file_lst[k], "mzXML")
-        || str_util::endsWith(spec_file_lst[k], "mzml")
-        || str_util::endsWith(spec_file_lst[k], "mzxml")) {
-      int result = processOneFile(arguments, argument_str, spec_file_lst[k], k);
-      if (result != 0) {
-        return 1;
-      }
+    if (isValidFile(spec_file_lst[k])) {
+      processOneFile(arguments, argument_str, spec_file_lst[k], k);
     }
   }
 
@@ -117,12 +121,8 @@ int process(std::map<std::string, std::string> arguments,
     std::cout << "Merging files finished." << std::endl;
   }
 
-
   for (size_t k = 0; k < spec_file_lst.size(); k++) {
-    if (str_util::endsWith(spec_file_lst[k], "mzML")
-        || str_util::endsWith(spec_file_lst[k], "mzXML")
-        || str_util::endsWith(spec_file_lst[k], "mzml")
-        || str_util::endsWith(spec_file_lst[k], "mzxml")) {
+    if (isValidFile(spec_file_lst[k])) {
       bool move_mzrt = true;
       moveFiles(spec_file_lst[k], move_mzrt); 
     }

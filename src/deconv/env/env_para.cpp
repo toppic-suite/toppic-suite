@@ -17,6 +17,19 @@
 
 namespace toppic {
 
+EnvPara::EnvPara(std::map<std::string, std::string> &arguments) { 
+  max_charge_ = std::stoi(arguments["maxCharge"]);
+  max_mass_ = std::stod(arguments["maxMass"]);
+  double tolerance = std::stod(arguments["mzError"]);
+  setTolerance(tolerance);
+  ms_two_sn_ratio_ = std::stod(arguments["msTwoSnRatio"]);
+  ms_one_sn_ratio_ = std::stod(arguments["msOneSnRatio"]);
+  keep_unused_peaks_ = (arguments["keepUnusedPeaks"] == "true");
+  output_multiple_mass_ = (arguments["outMultipleMass"] == "true");
+  prec_deconv_interval_ = std::stod(arguments["precWindow"]);
+  do_final_filtering_ = (arguments["doFinalFiltering"] == "true");
+}
+
 void EnvPara::setMinInte(double min_inte, int ms_level) {
   min_inte_ = min_inte;
   if (ms_level == 1) {

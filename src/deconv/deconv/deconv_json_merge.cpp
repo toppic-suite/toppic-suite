@@ -36,10 +36,12 @@ void DeconvJsonMerge::process() {
   std::vector<std::string> ms2_folder_names;
   for (size_t i = 0; i < spec_file_names_.size(); i++) { 
     std::string base_name = file_util::basename(spec_file_names_[i]);
-    std::string ms1_folder = base_name + "_html" + file_util::getFileSeparator()
+    std::string ms1_folder = base_name + "_html" 
+        + file_util::getFileSeparator()
         + "shared_data_js" + file_util::getFileSeparator() + "ms1_json";
     ms1_folder_names.push_back(ms1_folder);
-    std::string ms2_folder = base_name + "_html" + file_util::getFileSeparator()
+    std::string ms2_folder = base_name + "_html" 
+        + file_util::getFileSeparator()
         + "shared_data_js" + file_util::getFileSeparator() + "ms2_json";
     ms2_folder_names.push_back(ms2_folder);
   }
@@ -58,7 +60,9 @@ void DeconvJsonMerge::process() {
 void DeconvJsonMerge::mergeFiles(const std::vector<std::string> &spec_folder_list,
                                  const std::string &output_folder, 
                                  int max_num_per_file) {
-
+  if (file_util::exists(output_folder)) {
+    file_util::delDir(output_folder);
+  }
   file_util::createFolder(output_folder);
   for (size_t i = 0; i < spec_folder_list.size(); i++) {
     int id_base = max_num_per_file * i;
