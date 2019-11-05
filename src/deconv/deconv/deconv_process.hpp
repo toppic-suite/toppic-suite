@@ -19,15 +19,18 @@
 #include "spec/msalign_writer.hpp"
 #include "deconv/msreader/raw_ms_group_reader.hpp"
 #include "deconv/env/env_para.hpp"
-#include "deconv/deconv/deconv_para.hpp"
 #include "deconv/deconv/deconv_one_sp.hpp"
 
 namespace toppic {
 
 class DeconvProcess {
  public:
-  DeconvProcess(DeconvParaPtr para_ptr, const std::string &argu_str,
-                const std::string &spec_file_name, int frac_id);
+  DeconvProcess(std::map<std::string,std::string> arguments,
+                const std::string &argu_str,
+                const std::string &spec_file_name, 
+                int frac_id);
+
+  void prepareFileFolder();
 
   void process();
 
@@ -38,14 +41,22 @@ class DeconvProcess {
                                 MsAlignWriterPtr ms2_writer_ptr);
 
  private:
-  DeconvParaPtr para_ptr_;
+  EnvParaPtr env_para_ptr_;
+  DpParaPtr dp_para_ptr_;
   std::string argu_str_;
-  std::string spec_file_name_;
-  std::string base_name_;
+  bool missing_level_one_;
+  bool output_match_env_ = false;
+  bool output_json_files_ = true;
 
+  std::string spec_file_name_;
   int frac_id_;
 
-  void copyParameters(EnvParaPtr env_para_ptr);
+  std::string base_name_;
+  std::string ms1_env_name_;
+  std::string ms2_env_name_;
+  std::string html_dir_;
+  std::string ms1_json_dir_;
+  std::string ms2_json_dir_; 
 
   std::string updateMsg(MsHeaderPtr header_ptr, int scan, int total_scan_num);
 

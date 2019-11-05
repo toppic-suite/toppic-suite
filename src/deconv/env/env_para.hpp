@@ -18,12 +18,16 @@
 
 #include <memory>
 #include <vector>
+#include <string>
+#include <map>
 
 namespace toppic {
 
 class EnvPara {
  public:
   EnvPara() {};
+
+  EnvPara(std::map<std::string, std::string> &arguments); 
 
   int getMassGroup(double base_mass);
 
