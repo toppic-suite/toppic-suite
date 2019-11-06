@@ -37,9 +37,9 @@ void Argument::initArguments() {
   arguments_["mzError"] = "0.02";
   arguments_["msTwoSnRatio"] = "1.0";
   arguments_["msOneSnRatio"] = "3.0";
+  arguments_["precWindow"] = "3.0";
   arguments_["keepUnusedPeaks"] = "false";
   arguments_["outMultipleMass"] = "false";
-  arguments_["precWindow"] = "3.0";
   arguments_["doFinalFiltering"] = "true";
   arguments_["outputMatchEnv"] = "false";
   arguments_["mergeFiles"] = "false";
@@ -200,33 +200,6 @@ bool Argument::validateArguments() {
     }
   }
   return true;
-}
-
-std::string Argument::geneArgumentStr(std::map<std::string,std::string> &arguments,
-                                      const std::string & prefix) {
-  std::stringstream output;
-  output << prefix << "TopFD " << Version::getVersion() << std::endl;
-  // TIME_STAMP_STR is replaced later
-  output << prefix << "Timestamp: " << time_util::TIME_STAMP_STR << std::endl;
-  output << prefix << "###################### Parameters ######################" << std::endl;
-  output << prefix << std::setw(40) << std::left 
-      << "Data type: " << "Centroid" << std::endl;
-  output << prefix << std::setw(40) << std::left 
-      << "Maximum charge: " << arguments["maxCharge"] << std::endl;
-  output << prefix << std::setw(40) << std::left 
-      << "Maximum monoisotopic mass: " << arguments["maxMass"] << " Dalton" << std::endl;
-  output << prefix << std::setw(40) << std::left 
-      << "Error tolerance: " << arguments["mzError"] << " m/z" << std::endl;
-  output << prefix << std::setw(40) << std::left 
-      << "MS1 signal/noise ratio: " << arguments["msOneSnRatio"] << std::endl;
-  output << prefix << std::setw(40) << std::left 
-      << "MS/MS signal/noise ratio: " << arguments["msTwoSnRatio"] << std::endl;
-  output << prefix << std::setw(40) << std::left 
-      << "Precursor window size: " << arguments["precWindow"] << " m/z" << std::endl;
-  //output << prefix << std::setw(40) << std::left 
-  //    << "Do final filtering: " << para_ptr->do_final_filtering_ << std::endl;
-  output << prefix << "###################### Parameters ######################" << std::endl;
-  return output.str();
 }
 
 }  // namespace toppic

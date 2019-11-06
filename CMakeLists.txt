@@ -98,9 +98,10 @@ file(GLOB FEATURE_DETECT_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/feature_detect/*.c
 file(GLOB MERGE_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/merge/*.cpp)
 
 # topfd_main
-file(GLOB TOPFD_PROC_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd_process.cpp)
-file(GLOB TOPFD_CONSOLE_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd_argument.cpp
-                               ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd.cpp)
+file(GLOB TOPFD_PROC_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd_process.cpp
+                            ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd_util.cpp)
+file(GLOB TOPFD_CONSOLE_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd_argument.cpp
+                             ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd.cpp)
 
 # topfd single_main
 file(GLOB TOPFD_SINGLE_PROC_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd_single_process.cpp)
