@@ -30,7 +30,6 @@
 #include "deconv/env/env_para.hpp"
 #include "deconv/env/match_env.hpp"
 #include "deconv/msreader/raw_ms_reader.hpp"
-#include "feature/feature_para.hpp"
 #include "feature/frac_feature.hpp"
 #include "feature/single_charge_feature.hpp"
 #include "feature/frac_feature_writer.hpp"
@@ -39,6 +38,7 @@
 #include "feature/peak_cluster.hpp"
 #include "feature/sample_feature.hpp"
 #include "feature/sample_feature_writer.hpp"
+#include "feature_detect/feature_para.hpp"
 #include "feature_detect/feature_detect.hpp"
 
 namespace toppic {
@@ -542,10 +542,11 @@ void getSampleFeatures(SampleFeaturePtrVec &sample_features, FracFeaturePtrVec &
   }
 }
 
-void process(int frac_id, const std::string &sp_file_name, const std::string &resource_dir,
-             bool missing_level_one, std::string &argu_str) {
+void process(int frac_id, const std::string &sp_file_name, 
+             bool missing_level_one, const std::string &resource_dir) { 
   //logger::setLogLevel(2);
-  FeatureParaPtr para_ptr = std::make_shared<FeaturePara>(frac_id, sp_file_name, resource_dir);
+  FeatureParaPtr para_ptr 
+      = std::make_shared<FeaturePara>(frac_id, sp_file_name, resource_dir);
   EnvParaPtr env_para_ptr = std::make_shared<EnvPara>();
   std::string base_name = file_util::basename(sp_file_name);
   // read ms1 deconvoluted spectra

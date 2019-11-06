@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_FEATURE_FEATURE_PARA_HPP_
-#define TOPPIC_FEATURE_FEATURE_PARA_HPP_
+#ifndef TOPPIC_FEATURE_DETECT_FEATURE_PARA_HPP_
+#define TOPPIC_FEATURE_DETECT_FEATURE_PARA_HPP_
 
 #include <vector>
 #include "spec/peak_tolerance.hpp"
@@ -25,7 +25,7 @@ namespace toppic {
 class FeaturePara {
  public:
   FeaturePara(int frac_id, const std::string &file_name, 
-              const std::string &resourse_dir); 
+              const std::string &resource_dir); 
 
   std::vector<double> getExtendMasses(double mass);
 

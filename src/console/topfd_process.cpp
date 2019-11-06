@@ -45,11 +45,10 @@ void processOneFile(std::map<std::string, std::string> arguments,
     std::cout << "Feature detection started." << std::endl;
     std::string resource_dir = arguments["resourceDir"];
     bool missing_level_one = (arguments["missingLevelOne"] == "true");
-    feature_detect::process(frac_id, spec_file_name, resource_dir,
-                            missing_level_one, argu_str);
+    feature_detect::process(frac_id, spec_file_name,
+                            missing_level_one, resource_dir);
     std::cout << "Feature detection finished." << std::endl;
     std::cout << "Processing " << spec_file_name << " finished." << std::endl;
-
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
@@ -89,6 +88,27 @@ bool isValidFile(std::string &file_name) {
   }
 }
 
+void mergeFiles(std::map<std::string, std::string> &arguments,
+                std::vector<std::string> &spec_file_lst,
+                std::string argument_str) {
+  time_util::addTimeStamp(argument_str);
+  std::string merged_file_name = arguments["mergedFileName"];
+  std::cout << "Merging files started." << std::endl;
+  MsAlignFracMergePtr msalign_merger 
+      = std::make_shared<MsAlignFracMerge>(spec_file_lst, merged_file_name);
+  msalign_merger->process(argument_str);
+  msalign_merger = nullptr;
+  DeconvJsonMergePtr json_merger 
+      = std::make_shared<DeconvJsonMerge>(spec_file_lst, merged_file_name);
+  json_merger->process();
+  json_merger = nullptr;
+  FeatureMergePtr feature_merger 
+      = std::make_shared<FeatureMerge>(spec_file_lst, merged_file_name);
+  feature_merger->process(argument_str);
+  feature_merger = nullptr;
+  std::cout << "Merging files finished." << std::endl;
+}
+
 int process(std::map<std::string, std::string> arguments, 
             std::vector<std::string> spec_file_lst) {
   base_data::init();
@@ -105,22 +125,12 @@ int process(std::map<std::string, std::string> arguments,
     }
   }
 
-  if (spec_file_lst.size() > 1) {
-    time_util::addTimeStamp(argument_str);
-    std::string sample_name = arguments["sampleName"];
-    std::cout << "Merging files started." << std::endl;
-    MsAlignFracMergePtr msalign_merger = std::make_shared<MsAlignFracMerge>(spec_file_lst, sample_name);
-    msalign_merger->process(argument_str);
-    msalign_merger = nullptr;
-    DeconvJsonMergePtr json_merger = std::make_shared<DeconvJsonMerge>(spec_file_lst, sample_name);
-    json_merger->process();
-    json_merger = nullptr;
-    FeatureMergePtr feature_merger = std::make_shared<FeatureMerge>(spec_file_lst, sample_name);
-    feature_merger->process(argument_str);
-    feature_merger = nullptr;
-    std::cout << "Merging files finished." << std::endl;
+  // merge files
+  if (arguments["mergeFiles"] == "true") {
+    mergeFiles(arguments, spec_file_lst, argument_str);
   }
 
+  // Move some files to the folder basename_file
   for (size_t k = 0; k < spec_file_lst.size(); k++) {
     if (isValidFile(spec_file_lst[k])) {
       bool move_mzrt = true;
@@ -128,10 +138,10 @@ int process(std::map<std::string, std::string> arguments,
     }
   }
 
-  if (spec_file_lst.size() > 1) {
-    std::string sample_name = arguments["sampleName"];
+  if (arguments["mergeFiles"] == "true") {
+    std::string merged_file_name = arguments["mergedFileName"];
     bool move_mzrt = false;
-    moveFiles(sample_name, move_mzrt);
+    moveFiles(merged_file_name, move_mzrt);
   }
 
   std::cout << "TopFD finished." << std::endl << std::flush;
