@@ -42,7 +42,8 @@ void Argument::initArguments() {
   arguments_["precWindow"] = "3.0";
   arguments_["doFinalFiltering"] = "true";
   arguments_["outputMatchEnv"] = "false";
-  arguments_["sampleName"] = "sample1";
+  arguments_["mergeFiles"] = "false";
+  arguments_["mergedFileName"] = "";
 }
 
 void Argument::showUsage(boost::program_options::options_description &desc) {
@@ -57,7 +58,7 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string ms_two_sn_ratio = "";
   std::string ms_one_sn_ratio = "";
   std::string prec_window = "";
-  std::string sample_name = "";
+  std::string merged_file_name = "";
 
   // Define and parse the program options
   try {
@@ -79,7 +80,8 @@ bool Argument::parse(int argc, char* argv[]) {
         ("precursor-window,w", po::value<std::string> (&prec_window),
          "<a positive number>. Set the precursor window size. The default value is 3.0 m/z.")
         ("missing-level-one,o","The input spectrum file does not contain MS1 spectra.")
-        ("sample-name,n", po::value<std::string> (&sample_name), "Specify the name of the sample.")
+        ("merged-file-name,f", po::value<std::string> (&merged_file_name), 
+         "Merge deconvoluted files and specify the name of the merged file.")
         ;
     po::options_description desc("Options");
 
@@ -94,8 +96,10 @@ bool Argument::parse(int argc, char* argv[]) {
         ("missing-level-one,o", "")
         ("multiple-mass,u", "Output multiple masses for one envelope.")
         ("keep,k", "Report monoisotopic masses extracted from low quality isotopic envelopes.")
-        ("sample-name,n", po::value<std::string> (&sample_name), "Specify the name of the sample.")
-        ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), "Spectrum file name with its path.")
+        ("merged-file-name,f", po::value<std::string> (&merged_file_name), 
+         "Merge deconvoluted files and specify the name of the merged file.")
+        ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), 
+         "Spectrum file name with its path.")
         ;
 
     po::positional_options_description positional_options;
@@ -164,8 +168,9 @@ bool Argument::parse(int argc, char* argv[]) {
       arguments_["precWindow"] = prec_window;
     }
 
-    if (vm.count("sample-name")) {
-      arguments_["sampleName"] = sample_name;
+    if (vm.count("merged-file-name")) {
+      arguments_["mergeFiles"] = "true";
+      arguments_["mergedFileName"] = merged_file_name;
     }
 
     if (vm.count("spectrum-file-name")) {
