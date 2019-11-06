@@ -25,7 +25,7 @@
 #include "deconv/env/env_base.hpp"
 #include "deconv/deconv/deconv_process.hpp"
 #include "deconv/deconv/deconv_json_merge.hpp"
-#include "console/topfd_argument.hpp"
+#include "console/topfd_util.hpp"
 
 namespace toppic {
 
@@ -112,11 +112,11 @@ void mergeFiles(std::map<std::string, std::string> &arguments,
 int process(std::map<std::string, std::string> arguments, 
             std::vector<std::string> spec_file_lst) {
   base_data::init();
-  std::string print_str = Argument::geneArgumentStr(arguments, "");
+  std::string print_str = topfd_util::geneArgumentStr(arguments, "");
   time_util::addTimeStamp(print_str);
   std::cout << print_str;
 
-  std::string argument_str = Argument::geneArgumentStr(arguments, "#");
+  std::string argument_str = topfd_util::geneArgumentStr(arguments, "#");
   std::string resource_dir = arguments["resourceDir"];
   EnvBase::initBase(resource_dir);
   for (size_t k = 0; k < spec_file_lst.size(); k++) {

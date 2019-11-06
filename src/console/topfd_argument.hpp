@@ -37,8 +37,6 @@ class Argument {
 
   std::vector<std::string> getSpecFileList() { return spec_file_list_;};
 
-  static std::string geneArgumentStr(std::map<std::string,std::string> &arguments,
-                                     const std::string &prefix); 
  private:
   void initArguments();
 
