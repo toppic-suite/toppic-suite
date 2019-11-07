@@ -20,8 +20,8 @@
 #include <vector>
 
 #include "spec/raw_ms.hpp"
-#include "deconv/env/envelope.hpp"
-#include "deconv/env/real_env.hpp"
+#include "topfd/env/envelope.hpp"
+#include "topfd/env/real_env.hpp"
 
 #include "feature/frac_feature.hpp"
 #include "feature/savitzky_golay.hpp"
