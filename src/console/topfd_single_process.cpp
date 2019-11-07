@@ -27,7 +27,7 @@
 #include "deconv/env/env_base.hpp"
 #include "deconv/env/match_env_util.hpp"
 #include "deconv/msreader/raw_ms_writer.hpp"
-#include "deconv/deconv/deconv_process.hpp"
+#include "topfd/deconv/deconv_process.hpp"
 
 namespace toppic {
 
