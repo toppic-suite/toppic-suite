@@ -12,16 +12,18 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <map>
-#include <string>
+//#include <map>
+//#include <string>
 
-#include "common/util/file_util.hpp"
-#include "common/util/str_util.hpp"
-#include "common/util/time_util.hpp"
-#include "spec/msalign_frac_merge.hpp"
-#include "feature/feature_merge.hpp"
+//#include "common/util/file_util.hpp"
+//#include "common/util/str_util.hpp"
+//#include "common/util/time_util.hpp"
+//#include "spec/msalign_frac_merge.hpp"
+//#include "feature/feature_merge.hpp"
+
+#include "topfd/common/topfd_para.hpp"
+#include "topfd/common/topfd_process.hpp"
 #include "console/topfd_argument.hpp"
-#include "console/topfd_process.hpp"
 
 int main(int argc, char* argv[]) {
   toppic::Argument argu_processor;
@@ -31,15 +33,12 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  std::map<std::string, std::string> arguments = argu_processor.getArguments();
-
-  std::string exe_dir = toppic::file_util::getExecutiveDir(argv[0]);
-
-  arguments["executiveDir"] = exe_dir;
+  toppic::TopfdParaPtr topfd_para_ptr = argu_processor.getTopfdParaPtr();
 
   std::vector<std::string> spec_file_lst = argu_processor.getSpecFileList();
 
-  int result = toppic::topfd_process::process(arguments, spec_file_lst);
+  int result = toppic::topfd_process::process(topfd_para_ptr, spec_file_lst);
 
   return result;
 }
+
