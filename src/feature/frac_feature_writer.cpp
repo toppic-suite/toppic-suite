@@ -21,8 +21,8 @@
 #include "common/xml/xml_dom_impl.hpp"
 #include "common/xml/xml_dom_util.hpp"
 #include "spec/peak.hpp"
-#include "deconv/env/envelope.hpp"
-#include "deconv/env/env_base.hpp"
+#include "topfd/env/envelope.hpp"
+#include "topfd/env/env_base.hpp"
 #include "feature/frac_feature_writer.hpp"
 
 namespace toppic {
