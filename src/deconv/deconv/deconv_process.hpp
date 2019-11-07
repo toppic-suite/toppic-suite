@@ -17,6 +17,7 @@
 #define TOPPIC_DECONV_DECONV_DECONV_PROCESS_HPP_
 
 #include "spec/msalign_writer.hpp"
+#include "topfd/common/topfd_para.hpp"
 #include "deconv/msreader/raw_ms_group_reader.hpp"
 #include "deconv/env/env_para.hpp"
 #include "deconv/deconv/deconv_one_sp.hpp"
@@ -25,8 +26,7 @@ namespace toppic {
 
 class DeconvProcess {
  public:
-  DeconvProcess(std::map<std::string,std::string> arguments,
-                const std::string &argu_str,
+  DeconvProcess(TopfdParaPtr topfd_para_ptr, 
                 const std::string &spec_file_name, 
                 int frac_id);
 
@@ -43,10 +43,12 @@ class DeconvProcess {
  private:
   EnvParaPtr env_para_ptr_;
   DpParaPtr dp_para_ptr_;
-  std::string argu_str_;
-  bool missing_level_one_;
-  bool output_match_env_ = false;
-  bool output_json_files_ = true;
+  TopfdParaPtr topfd_para_ptr_;
+
+  //std::string argu_str_;
+  //bool missing_level_one_;
+  //bool output_match_env_ = false;
+  //bool output_json_files_ = true;
 
   std::string spec_file_name_;
   int frac_id_;

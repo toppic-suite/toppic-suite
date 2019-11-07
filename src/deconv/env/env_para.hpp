@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #ifndef TOPPIC_DECONV_ENV_ENV_PARA_HPP_
 #define TOPPIC_DECONV_ENV_ENV_PARA_HPP_
 
@@ -21,13 +20,15 @@
 #include <string>
 #include <map>
 
+#include "topfd/common/topfd_para.hpp"
+
 namespace toppic {
 
 class EnvPara {
  public:
   EnvPara() {};
 
-  EnvPara(std::map<std::string, std::string> &arguments); 
+  EnvPara(TopfdParaPtr topfd_para_ptr); 
 
   int getMassGroup(double base_mass);
 

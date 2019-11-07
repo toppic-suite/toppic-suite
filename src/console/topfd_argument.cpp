@@ -24,26 +24,7 @@
 namespace toppic {
 
 Argument::Argument() {
-  initArguments();
-}
-
-void Argument::initArguments() {
-  arguments_["executiveDir"] = "";
-  arguments_["resourceDir"] = "";
-  arguments_["refinePrecMass"]="true";
-  arguments_["missingLevelOne"] = "false";
-  arguments_["maxCharge"] = "30";
-  arguments_["maxMass"] = "100000";
-  arguments_["mzError"] = "0.02";
-  arguments_["msTwoSnRatio"] = "1.0";
-  arguments_["msOneSnRatio"] = "3.0";
-  arguments_["precWindow"] = "3.0";
-  arguments_["keepUnusedPeaks"] = "false";
-  arguments_["outMultipleMass"] = "false";
-  arguments_["doFinalFiltering"] = "true";
-  arguments_["outputMatchEnv"] = "false";
-  arguments_["mergeFiles"] = "false";
-  arguments_["mergedFileName"] = "";
+  topfd_para_ptr_ = std::make_shared<TopfdPara>();
 }
 
 void Argument::showUsage(boost::program_options::options_description &desc) {
@@ -128,49 +109,49 @@ bool Argument::parse(int argc, char* argv[]) {
 
     // get the execution directory
     std::string argv_0(argv[0]);
-    arguments_["executiveDir"] = file_util::getExecutiveDir(argv_0);
+    std::string exec_dir = file_util::getExecutiveDir(argv_0);
 
-    arguments_["resourceDir"] = file_util::getResourceDir(arguments_["executiveDir"]);
+    topfd_para_ptr_->resource_dir_ = file_util::getResourceDir(exec_dir);
 
     if (vm.count("max-charge")) {
-      arguments_["maxCharge"] = max_charge;
+      topfd_para_ptr_->max_charge_ = std::stoi(max_charge);
     }
 
     if (vm.count("keep")) {
-      arguments_["keepUnusedPeaks"] = "true";
+      topfd_para_ptr_->keep_unused_peaks_ = true;
     }
 
     if (vm.count("max-mass")) {
-      arguments_["maxMass"] = max_mass;
+      topfd_para_ptr_->max_mass_ = std::stod(max_mass);
     }
 
     if (vm.count("mz-error")) {
-      arguments_["mzError"] = mz_error;
+      topfd_para_ptr_->mz_error_ = std::stod(mz_error);
     }
 
     if (vm.count("ms-two-sn-ratio")) {
-      arguments_["msTwoSnRatio"] = ms_two_sn_ratio;
+      topfd_para_ptr_->ms_two_sn_ratio_ = std::stod(ms_two_sn_ratio);
     }
 
     if (vm.count("ms-one-sn-ratio")) {
-      arguments_["msOneSnRatio"] = ms_one_sn_ratio;
+      topfd_para_ptr_->ms_one_sn_ratio_ = std::stod(ms_one_sn_ratio);
     }
 
     if (vm.count("missing-level-one")) {
-      arguments_["missingLevelOne"] = "true";
+      topfd_para_ptr_->missing_level_one_ = true;
     }
 
     if (vm.count("multiple-mass")) {
-      arguments_["outMultipleMass"] = "true";
+      topfd_para_ptr_->output_multiple_mass_ = true;
     }
 
     if (vm.count("precursor-window")) {
-      arguments_["precWindow"] = prec_window;
+      topfd_para_ptr_->prec_window_ = std::stod(prec_window);
     }
 
     if (vm.count("merged-file-name")) {
-      arguments_["mergeFiles"] = "true";
-      arguments_["mergedFileName"] = merged_file_name;
+      topfd_para_ptr_->merge_files_ = true;
+      topfd_para_ptr_->merged_file_name_ = merged_file_name;
     }
 
     if (vm.count("spectrum-file-name")) {
@@ -188,8 +169,8 @@ bool Argument::parse(int argc, char* argv[]) {
 }
 
 bool Argument::validateArguments() {
-  if (!file_util::exists(arguments_["resourceDir"])) {
-    LOG_ERROR("Resource direcotry " << arguments_["resourceDir"] << " does not exist!");
+  if (!file_util::exists(topfd_para_ptr_->resource_dir_)) {
+    LOG_ERROR("Resource direcotry " << topfd_para_ptr_->resource_dir_ << " does not exist!");
     return false;
   }
 

@@ -16,13 +16,12 @@
 #ifndef TOPPIC_CONSOLE_TOPFD_ARGUMENT_HPP_
 #define TOPPIC_CONSOLE_TOPFD_ARGUMENT_HPP_
 
-#include <memory>
 #include <vector>
 #include <string>
-#include <map>
 
 #include <boost/program_options.hpp> 
 
+#include "topfd/common/topfd_para.hpp"
 #include "common/xml/xml_dom_document.hpp"
 
 namespace toppic {
@@ -33,7 +32,8 @@ class Argument {
 
   bool parse(int argc, char* argv[]);
 
-  std::map<std::string,std::string> getArguments(){ return arguments_;}
+  //std::map<std::string,std::string> getArguments(){ return arguments_;}
+  TopfdParaPtr getTopfdParaPtr() {return topfd_para_ptr_;}
 
   std::vector<std::string> getSpecFileList() { return spec_file_list_;};
 
@@ -47,10 +47,11 @@ class Argument {
   void showUsage(boost::program_options::options_description &desc);
 
  private:
-
-  std::map<std::string,std::string> arguments_;
+  TopfdParaPtr topfd_para_ptr_;
 
   std::vector<std::string> spec_file_list_;
+
+  //std::map<std::string,std::string> arguments_;
 };
 
 }  // namespace toppic

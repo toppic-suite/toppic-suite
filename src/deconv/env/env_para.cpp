@@ -17,17 +17,17 @@
 
 namespace toppic {
 
-EnvPara::EnvPara(std::map<std::string, std::string> &arguments) { 
-  max_charge_ = std::stoi(arguments["maxCharge"]);
-  max_mass_ = std::stod(arguments["maxMass"]);
-  double tolerance = std::stod(arguments["mzError"]);
+EnvPara::EnvPara(TopfdParaPtr topfd_para_ptr) { 
+  max_charge_ = topfd_para_ptr->max_charge_; 
+  max_mass_ = topfd_para_ptr->max_mass_; 
+  double tolerance = topfd_para_ptr->mz_error_;
   setTolerance(tolerance);
-  ms_two_sn_ratio_ = std::stod(arguments["msTwoSnRatio"]);
-  ms_one_sn_ratio_ = std::stod(arguments["msOneSnRatio"]);
-  keep_unused_peaks_ = (arguments["keepUnusedPeaks"] == "true");
-  output_multiple_mass_ = (arguments["outMultipleMass"] == "true");
-  prec_deconv_interval_ = std::stod(arguments["precWindow"]);
-  do_final_filtering_ = (arguments["doFinalFiltering"] == "true");
+  ms_two_sn_ratio_ = topfd_para_ptr->ms_two_sn_ratio_;
+  ms_one_sn_ratio_ = topfd_para_ptr->ms_one_sn_ratio_;
+  keep_unused_peaks_ = topfd_para_ptr->keep_unused_peaks_;
+  output_multiple_mass_ = topfd_para_ptr->output_multiple_mass_;
+  prec_deconv_interval_ = topfd_para_ptr->prec_window_; 
+  do_final_filtering_ = topfd_para_ptr->do_final_filtering_;
 }
 
 void EnvPara::setMinInte(double min_inte, int ms_level) {

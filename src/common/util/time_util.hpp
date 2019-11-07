@@ -21,9 +21,11 @@ namespace toppic {
 
 namespace time_util {
 
-const std::string TIME_STAMP_STR = "TIME_STAMP_STR";
+std::string getTimeStr();
 
-void addTimeStamp(std::string &para_str);
+//const std::string TIME_STAMP_STR = "TIME_STAMP_STR";
+
+//void addTimeStamp(std::string &para_str);
 
 }  // namespace time_util
 

@@ -18,6 +18,7 @@
 #include "common/util/str_util.hpp"
 #include "common/util/file_util.hpp"
 #include "spec/msalign_writer.hpp"
+#include "topfd/common/topfd_para.hpp"
 #include "deconv/env/env_base.hpp"
 #include "deconv/env/match_env_util.hpp"
 #include "deconv/env/match_env_writer.hpp"
@@ -26,16 +27,12 @@
 
 namespace toppic {
 
-DeconvProcess::DeconvProcess(std::map<std::string,std::string> arguments,
-                             const std::string &argu_str,
+DeconvProcess::DeconvProcess(TopfdParaPtr topfd_para_ptr, 
                              const std::string &spec_file_name, 
                              int frac_id) {
-  env_para_ptr_ = std::make_shared<EnvPara>(arguments);
+  topfd_para_ptr_ = topfd_para_ptr;
+  env_para_ptr_ = std::make_shared<EnvPara>(topfd_para_ptr);
   dp_para_ptr_ = std::make_shared<DpPara>();
-  argu_str_ = argu_str;
-
-  missing_level_one_ = (arguments["missingLevelOne"] == "true");
-  output_match_env_ = (arguments["outputMatchEnv"] == "true");
 
   spec_file_name_ = spec_file_name;
   frac_id_ = frac_id; 
@@ -91,18 +88,18 @@ void DeconvProcess::process() {
   MsAlignWriterPtr ms1_writer_ptr = std::make_shared<MsAlignWriter>(ms1_msalign_name);
   MsAlignWriterPtr ms2_writer_ptr = std::make_shared<MsAlignWriter>(ms2_msalign_name);
 
-  time_util::addTimeStamp(argu_str_);
-  ms1_writer_ptr->writePara(argu_str_);
-  ms2_writer_ptr->writePara(argu_str_);
+  std::string para_str = topfd_para_ptr_->getParaStr("#");
+  ms1_writer_ptr->writePara(para_str);
+  ms2_writer_ptr->writePara(para_str);
 
   // reader
   RawMsGroupReaderPtr reader_ptr = std::make_shared<RawMsGroupReader>(spec_file_name_, 
-                                                                      missing_level_one_,
+                                                                      topfd_para_ptr_->missing_level_one_,
                                                                       frac_id_);
   // processor
   DeconvOneSpPtr deconv_ptr = std::make_shared<DeconvOneSp>(env_para_ptr_, dp_para_ptr_);
 
-  if (missing_level_one_) {
+  if (topfd_para_ptr_->missing_level_one_) {
     processSpMissingLevelOne(deconv_ptr, reader_ptr, ms2_writer_ptr);
   }
   else {
@@ -139,10 +136,10 @@ void DeconvProcess::processSpMissingLevelOne(DeconvOneSpPtr deconv_ptr,
       }
       DeconvMsPtr ms_ptr = match_env_util::getDeconvMsPtr(header_ptr, result_envs);
       ms2_writer_ptr->write(ms_ptr);
-      if (output_match_env_) {
+      if (topfd_para_ptr_->output_match_env_) {
         match_env_writer::write(ms2_env_name_, header_ptr, result_envs);
       }
-      if (output_json_files_) {
+      if (topfd_para_ptr_->output_json_files_) {
         std::string json_file_name = ms2_json_dir_ 
             + file_util::getFileSeparator() 
             + "spectrum" + std::to_string(header_ptr->getId()) + ".js";
@@ -172,11 +169,11 @@ void DeconvProcess::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   LOG_DEBUG("result num " << prec_envs.size());
   DeconvMsPtr deconv_ms_ptr = match_env_util::getDeconvMsPtr(header_ptr, prec_envs);
   ms1_writer_ptr->write(deconv_ms_ptr);
-  if (output_match_env_) {
+  if (topfd_para_ptr_->output_match_env_) {
     match_env_writer::write(ms1_env_name_, header_ptr, prec_envs);
   }
 
-  if (output_json_files_) {
+  if (topfd_para_ptr_->output_json_files_) {
     std::string json_file_name = ms1_json_dir_ 
         + file_util::getFileSeparator() 
         + "spectrum" + std::to_string(header_ptr->getId()) + ".js";
@@ -201,10 +198,10 @@ void DeconvProcess::deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   MatchEnvPtrVec result_envs = deconv_ptr->getResult();
   DeconvMsPtr deconv_ms_ptr = match_env_util::getDeconvMsPtr(header_ptr, result_envs);
   ms2_writer_ptr->write(deconv_ms_ptr);
-  if (output_match_env_) {
+  if (topfd_para_ptr_->output_match_env_) {
     match_env_writer::write(ms2_env_name_, header_ptr, result_envs);
   }
-  if (output_json_files_) {
+  if (topfd_para_ptr_->output_json_files_) {
     std::string json_file_name = ms2_json_dir_ 
         + file_util::getFileSeparator() 
         + "spectrum" + std::to_string(ms_ptr->getMsHeaderPtr()->getId()) + ".js";
