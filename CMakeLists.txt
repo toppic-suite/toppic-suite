@@ -91,15 +91,13 @@ file(GLOB GRAPH_ALIGN_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/graphalign/*.cpp)
 file(GLOB MCMC_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/mcmc/*.cpp)
 
 # Deconvoluation
-file(GLOB_RECURSE DECONV_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/deconv/*.cpp)
+file(GLOB_RECURSE TOPFD_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/topfd/*.cpp)
 file(GLOB FEATURE_DETECT_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/feature_detect/*.cpp)
 
 # Merge
 file(GLOB MERGE_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/merge/*.cpp)
 
 # topfd_main
-file(GLOB TOPFD_PROC_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/topfd/common/topfd_process.cpp
-                            ${CMAKE_CURRENT_SOURCE_DIR}/src/topfd/common/topfd_para.cpp)
 file(GLOB TOPFD_CONSOLE_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd_argument.cpp
                              ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd.cpp)
 
@@ -137,7 +135,7 @@ file(GLOB TOPMERGE_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topmerge/*.cpp
 file(GLOB UNIT_TEST_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/*.cpp)
 
 add_executable(topfd 
-	${TOPFD_CONSOLE_SRCS} ${TOPFD_PROC_SRCS} ${DECONV_SRCS} ${SPEC_SRCS} 
+	${TOPFD_CONSOLE_SRCS} ${TOPFD_SRCS} ${SPEC_SRCS} 
   ${FEATURE_SRCS} ${PWIZ_SRCS} ${COMMON_SRCS} ${FEATURE_DETECT_SRCS})
 
 add_executable(topfd_single 
