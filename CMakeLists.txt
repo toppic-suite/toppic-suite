@@ -60,31 +60,25 @@ file(GLOB HTS_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/ext/htslib/*.c)
 file(GLOB_RECURSE COMMON_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/common/*.cpp)
 file(GLOB SEQ_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/seq/*.cpp)
 file(GLOB SPEC_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/spec/*.cpp)
+file(GLOB ENV_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/topfd/env/*.cpp)
 file(GLOB FEATURE_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/feature/*.cpp)
 file(GLOB PRSM_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/prsm/*.cpp)
-
-# suffix tree
-file(GLOB SUFFIX_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/suffix/*.cpp)
-
-# test
-file(GLOB TEST_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/*.cpp)
 
 # classes for toppic
 file(GLOB_RECURSE FILTER_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/*.cpp)
 
-file(GLOB ZERO_PTM_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/zeroptmsearch/*.cpp)
-file(GLOB ONE_PTM_SEARCH_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/oneptmsearch/*.cpp)
-file(GLOB PTM_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/ptmsearch/*.cpp)
+file(GLOB ZERO_PTM_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/search/zeroptmsearch/*.cpp)
+file(GLOB ONE_PTM_SEARCH_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/search/oneptmsearch/*.cpp)
+file(GLOB PTM_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/search/ptmsearch/*.cpp)
 
 file(GLOB TDGF_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/tdgf/*.cpp)
 file(GLOB PRSM_VIEW_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/prsmview/*.cpp)
 file(GLOB LOCAL_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/local/*.cpp)
-file(GLOB ENV_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/topfd/env/*.cpp)
 
 # classes for topmg
 file(GLOB TOPMG_FILTER_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/massmatch/*.cpp
-	                     ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/oneptm/*.cpp
-			     ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/diag/*.cpp)
+                             ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/oneptm/*.cpp
+                             ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/diag/*.cpp)
 # mass graph for topmg
 file(GLOB GRAPH_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/graph/*.cpp)
 file(GLOB GRAPH_ALIGN_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/graphalign/*.cpp)
