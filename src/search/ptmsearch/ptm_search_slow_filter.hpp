@@ -18,7 +18,7 @@
 
 #include <memory>
 
-#include "spec/spectrum_set.hpp"
+#include "ms/spec/spectrum_set.hpp"
 #include "prsm/simple_prsm.hpp"
 #include "search/oneptmsearch/ptm_search_mng.hpp"
 #include "search/ptmsearch/ptm_slow_match.hpp"

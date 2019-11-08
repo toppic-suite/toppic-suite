@@ -18,8 +18,8 @@
 
 #include <vector>
 
-#include "spec/prm_peak.hpp"
-#include "spec/spectrum_set.hpp"
+#include "ms/spec/prm_peak.hpp"
+#include "ms/spec/spectrum_set.hpp"
 #include "search/graph/dist.hpp"
 #include "search/graph/graph.hpp"
 

@@ -18,7 +18,7 @@
 
 #include "seq/fasta_index_reader.hpp"
 #include "seq/proteoform.hpp"
-#include "spec/spectrum_set.hpp"
+#include "ms/spec/spectrum_set.hpp"
 #include "prsm/simple_prsm.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 #include "search/oneptmsearch/ptm_search_mng.hpp"

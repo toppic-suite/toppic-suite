@@ -15,7 +15,7 @@
 #ifndef TOPPIC_FILTER_ZERO_PTM_MASS_ZERO_PTM_FILTER_HPP_
 #define TOPPIC_FILTER_ZERO_PTM_MASS_ZERO_PTM_FILTER_HPP_
 
-#include "spec/extend_ms.hpp"
+#include "ms/spec/extend_ms.hpp"
 #include "prsm/simple_prsm.hpp"
 #include "filter/massmatch/mass_match.hpp"
 #include "filter/zeroptm/zero_ptm_filter_mng.hpp"

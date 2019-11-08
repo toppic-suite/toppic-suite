@@ -21,7 +21,7 @@
 #include "seq/proteoform.hpp"
 #include "seq/db_block.hpp"
 #include "seq/proteoform_factory.hpp"
-#include "spec/msalign_util.hpp"
+#include "ms/spec/msalign_util.hpp"
 #include "prsm/simple_prsm_xml_writer.hpp"
 #include "prsm/simple_prsm_xml_writer_util.hpp"
 #include "prsm/simple_prsm_str_merge.hpp"

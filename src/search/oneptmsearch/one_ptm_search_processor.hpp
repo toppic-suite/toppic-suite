@@ -16,7 +16,7 @@
 #ifndef TOPPIC_SEARCH_ONE_PTM_SEARCH_ONE_PTM_SEARCH_HPP_
 #define TOPPIC_SEARCH_ONE_PTM_SEARCH_ONE_PTM_SEARCH_HPP_
 
-#include "spec/spectrum_set.hpp"
+#include "ms/spec/spectrum_set.hpp"
 #include "prsm/prsm.hpp"
 #include "search/oneptmsearch/ptm_search_mng.hpp"
 

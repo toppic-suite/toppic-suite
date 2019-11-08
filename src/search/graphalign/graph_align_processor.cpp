@@ -26,7 +26,7 @@
 #include "common/util/file_util.hpp"
 #include "common/base/mod_util.hpp"
 #include "seq/fasta_sub_util.hpp"
-#include "spec/msalign_util.hpp"
+#include "ms/spec/msalign_util.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_str_merge.hpp"

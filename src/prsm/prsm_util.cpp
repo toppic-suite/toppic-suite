@@ -18,10 +18,10 @@
 
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
-#include "spec/extend_ms_factory.hpp"
-#include "spec/msalign_reader.hpp"
-#include "feature/spec_feature.hpp"
-#include "feature/spec_feature_reader.hpp"
+#include "ms/spec/extend_ms_factory.hpp"
+#include "ms/spec/msalign_reader.hpp"
+#include "ms/feature/spec_feature.hpp"
+#include "ms/feature/spec_feature_reader.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_util.hpp"
@@ -133,7 +133,7 @@ void addSpectrumPtrsToPrsms(PrsmPtrVec &prsm_ptrs, PrsmParaPtr prsm_para_ptr) {
       DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
       int spectrum_id = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getId();
       int prec_id = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecId();
-      LOG_DEBUG("spectrum id " << spectrum_id);
+      LOG_DEBUG("ms/spectrum id " << spectrum_id);
       for (size_t i = start_prsm; i < prsm_ptrs.size(); i++) {
         if (isMatchMs(prsm_ptrs[i], deconv_ms_ptr_vec[0]->getMsHeaderPtr())) {
           prsm_ptrs[i]->setDeconvMsPtrVec(deconv_ms_ptr_vec);

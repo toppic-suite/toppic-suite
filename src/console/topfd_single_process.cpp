@@ -21,10 +21,10 @@
 #include "common/util/str_util.hpp"
 #include "common/base/base_data.hpp"
 #include "common/base/mass_constant.hpp"
-#include "spec/msalign_frac_merge.hpp"
-#include "env/env_base.hpp"
-#include "env/match_env_util.hpp"
-#include "feature/feature_merge.hpp"
+#include "ms/spec/msalign_frac_merge.hpp"
+#include "ms/env/env_base.hpp"
+#include "ms/env/match_env_util.hpp"
+#include "ms/feature/feature_merge.hpp"
 #include "topfd/msreader/raw_ms_writer.hpp"
 #include "topfd/deconv/deconv_process.hpp"
 #include "topfd/feature_detect/feature_detect.hpp"
@@ -132,7 +132,7 @@ int processOneFile(std::map<std::string, std::string> arguments,
     std::string json_dir =  file_util::basename(spec_file_name) + spec_data_suffix;
     file_util::createFolder(json_dir);
 
-    std::string json_file_name = json_dir + file_util::getFileSeparator() + "spectrum" 
+    std::string json_file_name = json_dir + file_util::getFileSeparator() + "ms/spectrum" 
         + std::to_string(header_ptr->getId())
         + ".js";
     raw_ms_writer::write(json_file_name, raw_ms_ptr, result_envs);    

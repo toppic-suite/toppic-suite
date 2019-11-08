@@ -59,9 +59,9 @@ file(GLOB HTS_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/ext/htslib/*.c)
 # common
 file(GLOB_RECURSE COMMON_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/common/*.cpp)
 file(GLOB SEQ_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/seq/*.cpp)
-file(GLOB SPEC_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/spec/*.cpp)
-file(GLOB ENV_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/env/*.cpp)
-file(GLOB FEATURE_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/feature/*.cpp)
+file(GLOB SPEC_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/ms/spec/*.cpp)
+file(GLOB ENV_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/ms/env/*.cpp)
+file(GLOB FEATURE_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/ms/feature/*.cpp)
 file(GLOB PRSM_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/prsm/*.cpp)
 
 # classes for topfd 

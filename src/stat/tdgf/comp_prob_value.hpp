@@ -19,8 +19,8 @@
 #include <vector>
 
 #include "common/base/residue_freq.hpp"
-#include "spec/prm_peak.hpp"
-#include "spec/base_peak_type.hpp"
+#include "ms/spec/prm_peak.hpp"
+#include "ms/spec/base_peak_type.hpp"
 #include "prsm/prsm.hpp"
 
 namespace toppic {

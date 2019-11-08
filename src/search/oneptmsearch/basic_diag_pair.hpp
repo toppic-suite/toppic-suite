@@ -18,7 +18,7 @@
 
 #include <memory>
 #include <vector>
-#include "spec/prm_peak.hpp"
+#include "ms/spec/prm_peak.hpp"
 #include "search/oneptmsearch/pair.hpp"
 #include "search/oneptmsearch/diagonal.hpp"
 #include "search/oneptmsearch/diagonal_header.hpp"

@@ -36,7 +36,7 @@ void Argument::initArguments() {
   arguments_["oriDatabaseFileName"]="";
   arguments_["databaseFileName"] = "";
   arguments_["databaseBlockSize"] = "1000000";
-  arguments_["spectrumFileName"] = "";
+  arguments_["ms/spectrumFileName"] = "";
   arguments_["combinedOutputName"] = "";
   arguments_["activation"] = "FILE";
   arguments_["searchType"] = "TARGET";
@@ -68,7 +68,7 @@ void Argument::outputArguments(std::ostream &output,
                                std::map<std::string, std::string> arguments) {
   output << "********************** Parameters **********************" << std::endl;
   output << std::setw(44) << std::left << "Protein database file: " << "\t" << arguments["oriDatabaseFileName"] << std::endl;
-  output << std::setw(44) << std::left << "Spectrum file: " << "\t" << arguments["spectrumFileName"] << std::endl;
+  output << std::setw(44) << std::left << "Spectrum file: " << "\t" << arguments["ms/spectrumFileName"] << std::endl;
 
   if (arguments["skipList"] != "") {
     output << std::setw(44) << std::left << "Skip list: " << "\t" << arguments["skipList"] << std::endl;
@@ -119,7 +119,7 @@ std::string Argument::outputCsvArguments(std::map<std::string, std::string> argu
   std::stringstream output;
   output << "********************** Parameters **********************" << std::endl;
   output << "Protein database file:," << arguments["oriDatabaseFileName"] << std::endl;
-  output << "Spectrum file:," << arguments["spectrumFileName"] << std::endl;
+  output << "Spectrum file:," << arguments["ms/spectrumFileName"] << std::endl;
   if (arguments["skipList"] != "") {
     output << "Skip list:," << arguments["skipList"] << std::endl;
   }
@@ -212,8 +212,8 @@ bool Argument::parse(int argc, char* argv[]) {
         ("max-shift,m", po::value<std::string> (&max_ptm_mass), "Maximum value of the mass shift (in Dalton) of an unexpected modification. Default value: 500.")
         ("min-shift,M", po::value<std::string> (&min_ptm_mass), "Minimum value of the mass shift (in Dalton) of an unexpected modification. Default value: -500.")
         ("num-shift,p", po::value<std::string> (&ptm_num), "<0|1|2>. Maximum number of unexpected modifications in a proteoform spectrum-match. Default value: 1.")
-        ("spectrum-cutoff-type,t", po::value<std::string> (&cutoff_spectral_type), "<EVALUE|FDR>. Spectrum-level cutoff type for filtering identified proteoform spectrum-matches. Default value: EVALUE.")
-        ("spectrum-cutoff-value,v", po::value<std::string> (&cutoff_spectral_value), "<a positive number>. Spectrum-level cutoff value for filtering identified proteoform spectrum-matches. Default value: 0.01.")
+        ("ms/spectrum-cutoff-type,t", po::value<std::string> (&cutoff_spectral_type), "<EVALUE|FDR>. Spectrum-level cutoff type for filtering identified proteoform spectrum-matches. Default value: EVALUE.")
+        ("ms/spectrum-cutoff-value,v", po::value<std::string> (&cutoff_spectral_value), "<a positive number>. Spectrum-level cutoff value for filtering identified proteoform spectrum-matches. Default value: 0.01.")
         ("proteoform-cutoff-type,T", po::value<std::string> (&cutoff_proteoform_type), "<EVALUE|FDR>. Proteoform-level cutoff type for filtering identified proteoform spectrum-matches. Default value: EVALUE.")
         ("proteoform-cutoff-value,V", po::value<std::string> (&cutoff_proteoform_value), "<a positive number>. Proteoform-level cutoff value for filtering identified proteoform spectrum-matches. Default value: 0.01.")
         ("lookup-table,b", "Use a lookup table method for computing p-values and E-values.")
@@ -239,8 +239,8 @@ bool Argument::parse(int argc, char* argv[]) {
         ("max-shift,m", po::value<std::string> (&max_ptm_mass), "")
         ("min-shift,M", po::value<std::string> (&min_ptm_mass), "")
         ("num-shift,p", po::value<std::string> (&ptm_num), "")
-        ("spectrum-cutoff-type,t", po::value<std::string> (&cutoff_spectral_type), "")
-        ("spectrum-cutoff-value,v", po::value<std::string> (&cutoff_spectral_value), "")
+        ("ms/spectrum-cutoff-type,t", po::value<std::string> (&cutoff_spectral_type), "")
+        ("ms/spectrum-cutoff-value,v", po::value<std::string> (&cutoff_spectral_value), "")
         ("proteoform-cutoff-type,T", po::value<std::string> (&cutoff_proteoform_type), "")
         ("proteoform-cutoff-value,V", po::value<std::string> (&cutoff_proteoform_value), "")
         ("filtering-result-number", po::value<std::string>(&filtering_result_num), "Filtering result number. Default value: 20.")
@@ -254,11 +254,11 @@ bool Argument::parse(int argc, char* argv[]) {
         ("combined-file-name,c", po::value<std::string>(&combined_output_name) , "")
         ("skip-list,l", po::value<std::string>(&skip_list) , "")
         ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name with its path.")
-        ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), "Spectrum file name with its path.");
+        ("ms/spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), "Spectrum file name with its path.");
 
     po::positional_options_description positional_options;
     positional_options.add("database-file-name", 1);
-    positional_options.add("spectrum-file-name", -1);
+    positional_options.add("ms/spectrum-file-name", -1);
 
     po::variables_map vm;
     try {
@@ -292,8 +292,8 @@ bool Argument::parse(int argc, char* argv[]) {
 
     arguments_["oriDatabaseFileName"] = database_file_name;
 
-    if (vm.count("spectrum-file-name")) {
-      spec_file_list_ = vm["spectrum-file-name"].as<std::vector<std::string> >(); 
+    if (vm.count("ms/spectrum-file-name")) {
+      spec_file_list_ = vm["ms/spectrum-file-name"].as<std::vector<std::string> >(); 
     }
 
     if (vm.count("combined-file-name")) {
@@ -338,11 +338,11 @@ bool Argument::parse(int argc, char* argv[]) {
       arguments_["minPtmMass"] = min_ptm_mass;
     }
 
-    if (vm.count("spectrum-cutoff-type")) {
+    if (vm.count("ms/spectrum-cutoff-type")) {
       arguments_["cutoffSpectralType"] = cutoff_spectral_type;
     }
 
-    if (vm.count("spectrum-cutoff-value")) {
+    if (vm.count("ms/spectrum-cutoff-value")) {
       arguments_["cutoffSpectralValue"] = cutoff_spectral_value;
     }
 

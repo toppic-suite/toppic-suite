@@ -19,7 +19,7 @@
 #include <vector>
 
 #include "seq/proteoform.hpp"
-#include "spec/extend_ms.hpp"
+#include "ms/spec/extend_ms.hpp"
 
 namespace toppic {
 

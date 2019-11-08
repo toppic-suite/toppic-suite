@@ -20,8 +20,8 @@
 #include "common/util/logger.hpp"
 #include "common/base/base_data.hpp"
 #include "common/base/mass_constant.hpp"
-#include "spec/deconv_ms_util.hpp"
-#include "spec/prm_ms_factory.hpp"
+#include "ms/spec/deconv_ms_util.hpp"
+#include "ms/spec/prm_ms_factory.hpp"
 #include "stat/tdgf/comp_pvalue_array.hpp"
 
 namespace toppic {

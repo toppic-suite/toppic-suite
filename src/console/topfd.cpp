@@ -18,8 +18,8 @@
 //#include "common/util/file_util.hpp"
 //#include "common/util/str_util.hpp"
 //#include "common/util/time_util.hpp"
-//#include "spec/msalign_frac_merge.hpp"
-//#include "feature/feature_merge.hpp"
+//#include "ms/spec/msalign_frac_merge.hpp"
+//#include "ms/feature/feature_merge.hpp"
 
 #include "topfd/common/topfd_para.hpp"
 #include "topfd/common/topfd_process.hpp"

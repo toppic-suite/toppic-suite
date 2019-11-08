@@ -384,7 +384,7 @@ void FeatureSampleMerge::process() {
     FeaturePrsmReader reader(base_name + "_ms1.feature");
     FeaturePrsmPtrVec features = reader.readAllFeatures();
     reader.close();
-    LOG_DEBUG("feature number " << features.size());
+    LOG_DEBUG("ms/feature number " << features.size());
 
     std::string prsm_file_name = base_name + "_ms2_toppic_proteoform.xml";
     FastaIndexReaderPtr seq_reader = std::make_shared<FastaIndexReader>(db_file_name_);

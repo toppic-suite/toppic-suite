@@ -24,7 +24,7 @@
 #include "pwiz/utility/misc/Std.hpp"
 #include "pwiz/utility/misc/Filesystem.hpp"
 
-#include "spec/raw_ms.hpp"
+#include "ms/spec/raw_ms.hpp"
 
 namespace toppic {
 

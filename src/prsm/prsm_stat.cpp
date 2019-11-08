@@ -14,9 +14,9 @@
 
 #include "common/util/file_util.hpp"
 #include "common/base/amino_acid_base.hpp"
-#include "spec/peak.hpp"
-#include "spec/extend_ms_factory.hpp"
-#include "spec/msalign_reader.hpp"
+#include "ms/spec/peak.hpp"
+#include "ms/spec/extend_ms_factory.hpp"
+#include "ms/spec/msalign_reader.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/peak_ion_pair.hpp"
 #include "prsm/peak_ion_pair_util.hpp"

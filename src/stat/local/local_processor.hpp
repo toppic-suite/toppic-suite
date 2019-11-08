@@ -22,7 +22,7 @@
 #include "seq/local_anno.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_reader.hpp"
-#include "spec/theo_peak.hpp"
+#include "ms/spec/theo_peak.hpp"
 #include "stat/tdgf/tdgf_mng.hpp"
 #include "stat/local/local_mng.hpp"
 

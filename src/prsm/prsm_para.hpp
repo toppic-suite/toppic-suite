@@ -19,7 +19,7 @@
 
 #include "common/base/mod.hpp"
 #include "common/base/prot_mod.hpp"
-#include "spec/sp_para.hpp"
+#include "ms/spec/sp_para.hpp"
 
 namespace toppic {
 

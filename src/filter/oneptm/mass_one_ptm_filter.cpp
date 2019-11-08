@@ -13,7 +13,7 @@
 //limitations under the License.
 
 #include "seq/proteoform_util.hpp"
-#include "spec/prm_ms.hpp"
+#include "ms/spec/prm_ms.hpp"
 #include "filter/massmatch/filter_protein.hpp"
 #include "filter/massmatch/mass_match_factory.hpp"
 #include "filter/massmatch/mass_match_util.hpp"

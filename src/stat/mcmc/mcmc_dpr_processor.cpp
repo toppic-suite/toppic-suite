@@ -27,11 +27,11 @@
 #include "prsm/extreme_value.hpp"
 #include "common/thread/simple_thread_pool.hpp"
 
-#include "spec/msalign_reader.hpp"
-#include "spec/msalign_util.hpp"
-#include "spec/theo_peak.hpp"
+#include "ms/spec/msalign_reader.hpp"
+#include "ms/spec/msalign_util.hpp"
+#include "ms/spec/theo_peak.hpp"
 #include "prsm/theo_peak_util.hpp"
-#include "spec/extend_ms_factory.hpp"
+#include "ms/spec/extend_ms_factory.hpp"
 
 #include "prsm/prsm_algo.hpp"
 #include "prsm/prsm_reader.hpp"

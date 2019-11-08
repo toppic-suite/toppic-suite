@@ -17,8 +17,8 @@
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
-#include "spec/msalign_reader.hpp"
-#include "spec/extend_ms_factory.hpp"
+#include "ms/spec/msalign_reader.hpp"
+#include "ms/spec/extend_ms_factory.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_table_writer.hpp"
 

@@ -24,8 +24,8 @@
 #include "common/base/base_data.hpp"
 #include "common/util/version.hpp"
 
-#include "spec/msalign_reader.hpp"
-#include "spec/msalign_util.hpp"
+#include "ms/spec/msalign_reader.hpp"
+#include "ms/spec/msalign_util.hpp"
 
 #include "prsm/prsm_para.hpp"
 #include "prsm/prsm_str_merge.hpp"
@@ -117,7 +117,7 @@ int TopPIC_identify(std::map<std::string, std::string> & arguments) {
     LOG_DEBUG("Init base data completed");
 
     std::string db_file_name = arguments["databaseFileName"];
-    std::string sp_file_name = arguments["spectrumFileName"];
+    std::string sp_file_name = arguments["ms/spectrumFileName"];
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
     //std::string feature_file_name = sp_file_name.substr(0, sp_file_name.length() - 12) + ".feature";
     std::string feature_file_name = file_util::basename(sp_file_name) + ".feature";
@@ -277,7 +277,7 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     LOG_DEBUG("Init base data completed");
 
     std::string db_file_name = arguments["databaseFileName"];
-    std::string sp_file_name = arguments["spectrumFileName"];
+    std::string sp_file_name = arguments["ms/spectrumFileName"];
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
 
     double max_ptm_mass = std::stod(arguments["maxPtmMass"]);
@@ -468,7 +468,7 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
     std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
     std::string start_time = buf;
     arguments["startTime"] = start_time;
-    arguments["spectrumFileName"] = spec_file_lst[k];
+    arguments["ms/spectrumFileName"] = spec_file_lst[k];
     if (toppic::TopPICProgress(arguments) != 0) {
       return 1;
     }
@@ -496,7 +496,7 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
     std::cout << "Merging files - finished." << std::endl;
 
     std::string sp_file_name = base_name + "_ms2.msalign";
-    arguments["spectrumFileName"] = sp_file_name;
+    arguments["ms/spectrumFileName"] = sp_file_name;
     arguments["startTime"] = combined_start_time;
     toppic::TopPIC_post(arguments);
   }

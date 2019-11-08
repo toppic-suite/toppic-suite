@@ -85,7 +85,7 @@ void TopFDDialog::closeEvent(QCloseEvent *event) {
 void TopFDDialog::initArguments() {
   arguments_["executiveDir"] = "";
   arguments_["resourceDir"] = "";
-  arguments_["spectrumFileName"] = "";
+  arguments_["ms/spectrumFileName"] = "";
   arguments_["refinePrecMass"]="true";
   arguments_["missingLevelOne"] = "false";
   arguments_["maxCharge"] = "30";

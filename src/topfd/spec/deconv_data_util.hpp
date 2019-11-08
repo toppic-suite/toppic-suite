@@ -16,7 +16,7 @@
 #ifndef TOPPIC_TOPFD_SPEC_DECONV_DATA_UTIL_HPP_
 #define TOPPIC_TOPFD_SPEC_DECONV_DATA_UTIL_HPP_
 
-#include "spec/peak.hpp"
+#include "ms/spec/peak.hpp"
 #include "topfd/spec/deconv_data.hpp"
 
 namespace toppic {

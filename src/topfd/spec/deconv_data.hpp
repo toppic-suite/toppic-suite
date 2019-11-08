@@ -19,7 +19,7 @@
 #include <memory>
 #include <vector>
 
-#include "spec/peak.hpp"
+#include "ms/spec/peak.hpp"
 
 namespace toppic {
 
