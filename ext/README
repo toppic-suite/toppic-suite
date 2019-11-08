@@ -1,0 +1,4 @@
+/boost/ 	      Some code from Boost used by pwiz
+/htslib/  	    Library for creating fasta indexes and reading fasta files
+/pwiz/    	    Some code from ProteoWizard version for reading mzML and mzXML files
+/xml2json/     	Xml2json header only library
