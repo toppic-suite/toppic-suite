@@ -13,18 +13,20 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_TOPFD_ENV_CHARGE_CMP_HPP_
-#define TOPPIC_TOPFD_ENV_CHARGE_CMP_HPP_
+#ifndef TOPPIC_TOPFD_ENV_PREC_ENV_HPP_
+#define TOPPIC_TOPFD_ENV_PREC_ENV_HPP_
 
-#include "spec/peak.hpp"
-#include "topfd/env/match_env.hpp"
+#include "env/match_env.hpp"
 
 namespace toppic {
 
-namespace charge_cmp {
-  int comp(const PeakPtrVec &peak_list, MatchEnvPtr a, MatchEnvPtr b, double tolerance);
-};
+namespace prec_env {
 
-}
+MatchEnvPtr deconv(double prec_win_size, PeakPtrVec &peak_list, 
+                  double prec_mz, int prec_charge, int argu_max_charge);
+
+}  // namespace prec_env
+
+}  // namespace toppic
 
 #endif

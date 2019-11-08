@@ -19,7 +19,7 @@
 #include "spec/msalign_writer.hpp"
 #include "topfd/common/topfd_para.hpp"
 #include "topfd/msreader/raw_ms_group_reader.hpp"
-#include "topfd/env/env_para.hpp"
+#include "env/env_para.hpp"
 #include "topfd/deconv/deconv_one_sp.hpp"
 
 namespace toppic {

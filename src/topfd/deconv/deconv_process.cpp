@@ -19,9 +19,9 @@
 #include "common/util/file_util.hpp"
 #include "spec/msalign_writer.hpp"
 #include "topfd/common/topfd_para.hpp"
-#include "topfd/env/env_base.hpp"
-#include "topfd/env/match_env_util.hpp"
-#include "topfd/env/match_env_writer.hpp"
+#include "env/env_base.hpp"
+#include "env/match_env_util.hpp"
+#include "env/match_env_writer.hpp"
 #include "topfd/msreader/raw_ms_writer.hpp"
 #include "topfd/deconv/deconv_process.hpp"
 

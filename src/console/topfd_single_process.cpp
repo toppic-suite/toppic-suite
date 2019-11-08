@@ -22,12 +22,12 @@
 #include "common/base/base_data.hpp"
 #include "common/base/mass_constant.hpp"
 #include "spec/msalign_frac_merge.hpp"
-#include "feature_detect/feature_detect.hpp"
+#include "env/env_base.hpp"
+#include "env/match_env_util.hpp"
 #include "feature/feature_merge.hpp"
-#include "deconv/env/env_base.hpp"
-#include "deconv/env/match_env_util.hpp"
-#include "deconv/msreader/raw_ms_writer.hpp"
+#include "topfd/msreader/raw_ms_writer.hpp"
 #include "topfd/deconv/deconv_process.hpp"
+#include "topfd/feature_detect/feature_detect.hpp"
 
 namespace toppic {
 

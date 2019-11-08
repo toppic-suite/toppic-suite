@@ -13,20 +13,24 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_TOPFD_ENV_ENV_RESCORE_HPP_
-#define TOPPIC_TOPFD_ENV_ENV_RESCORE_HPP_
+#ifndef TOPPIC_TOPFD_ENV_ENV_FILTER_HPP_
+#define TOPPIC_TOPFD_ENV_ENV_FILTER_HPP_
 
-#include <vector>
-
-#include "topfd/env/match_env.hpp"
+#include "env/env_para.hpp"
+#include "env/match_env.hpp"
 
 namespace toppic {
 
-namespace env_rescore {
+class EnvFilter {
+ public:
+  static void filter(MatchEnvPtr2D &match_envs, const PeakPtrVec &peak_list,
+                     EnvParaPtr env_para_ptr);
+  
+  static void multipleMassFilter(MatchEnvPtr2D &match_env, EnvParaPtr env_para_ptr);
 
-void rescore(MatchEnvPtr2D &match_envs, const std::vector<std::vector<double> > &para);
+  static bool testRealEnvValid(MatchEnvPtr env, EnvParaPtr env_para_ptr);
+};
 
-}  // namespace EnvRescore
+}
 
-}  // namespace toppic
 #endif

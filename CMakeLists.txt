@@ -60,9 +60,25 @@ file(GLOB HTS_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/ext/htslib/*.c)
 file(GLOB_RECURSE COMMON_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/common/*.cpp)
 file(GLOB SEQ_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/seq/*.cpp)
 file(GLOB SPEC_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/spec/*.cpp)
-file(GLOB ENV_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/topfd/env/*.cpp)
+file(GLOB ENV_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/env/*.cpp)
 file(GLOB FEATURE_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/feature/*.cpp)
 file(GLOB PRSM_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/prsm/*.cpp)
+
+# classes for topfd 
+file(GLOB_RECURSE TOPFD_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/topfd/*.cpp)
+
+# topfd console 
+file(GLOB TOPFD_CONSOLE_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd_argument.cpp
+                             ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd.cpp)
+# topfd gui
+file(GLOB TOPFD_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topfd/*.cpp
+                           ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topfd/*.qrc)
+
+# topfd_single console main
+file(GLOB TOPFD_SINGLE_PROC_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd_single_process.cpp)
+file(GLOB TOPFD_SINGLE_CONSOLE_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd_single_argument.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd_single.cpp)
+
 
 # classes for toppic
 file(GLOB_RECURSE FILTER_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/*.cpp)
@@ -86,20 +102,8 @@ file(GLOB GRAPH_ALIGN_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/graphalign/*.cpp)
 # MCMC for topmg
 file(GLOB MCMC_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/mcmc/*.cpp)
 
-# Deconvoluation
-file(GLOB_RECURSE TOPFD_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/topfd/*.cpp)
-
 # Merge
 file(GLOB MERGE_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/merge/*.cpp)
-
-# topfd_main
-file(GLOB TOPFD_CONSOLE_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd_argument.cpp
-                             ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd.cpp)
-
-# topfd single_main
-file(GLOB TOPFD_SINGLE_PROC_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd_single_process.cpp)
-file(GLOB TOPFD_SINGLE_CONSOLE_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd_single_argument.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd_single.cpp)
 
 # toppic_main
 file(GLOB TOPPIC_PROC_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_process.cpp
@@ -117,8 +121,6 @@ file(GLOB TOPMERGE_PROC_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmerge_pr
 file(GLOB TOPMERGE_CONSOLE_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmerge.cpp)
 
 # GUI
-file(GLOB TOPFD_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topfd/*.cpp
-                           ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topfd/*.qrc)
 file(GLOB TOPPIC_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/toppic/*.cpp
 			    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/toppic/*.qrc)
 file(GLOB TOPMG_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topmg/*.cpp
@@ -130,16 +132,16 @@ file(GLOB TOPMERGE_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topmerge/*.cpp
 file(GLOB UNIT_TEST_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/*.cpp)
 
 add_executable(topfd 
-	${TOPFD_CONSOLE_SRCS} ${TOPFD_SRCS} ${SPEC_SRCS} 
+  ${TOPFD_CONSOLE_SRCS} ${TOPFD_SRCS} ${SPEC_SRCS} ${ENV_SRCS} 
   ${FEATURE_SRCS} ${PWIZ_SRCS} ${COMMON_SRCS})
 
 add_executable(topfd_single 
-	${TOPFD_SINGLE_CONSOLE_SRCS} ${TOPFD_SINGLE_PROC_SRCS} ${DECONV_SRCS} ${SPEC_SRCS} 
-	${PWIZ_SRCS} ${COMMON_SRCS}) 
+	${TOPFD_SINGLE_CONSOLE_SRCS} ${TOPFD_SINGLE_PROC_SRCS} ${DECONV_SRCS}
+  ${SPEC_SRCS} ${ENV_SRCS} ${PWIZ_SRCS} ${COMMON_SRCS}) 
 
 add_executable(topfd_gui 
 	${TOPFD_GUI_SRCS} ${TOPFD_PROC_SRCS} ${DECONV_SRCS} ${SPEC_SRCS} 
-  ${FEATURE_SRCS} ${PWIZ_SRCS} ${COMMON_SRCS} ${FEATURE_DETECT_SRCS})
+  ${ENV_SRCS} ${FEATURE_SRCS} ${PWIZ_SRCS} ${COMMON_SRCS} ${FEATURE_DETECT_SRCS})
 
 add_executable(toppic 
 	${TOPPIC_CONSOLE_SRCS} ${TOPPIC_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS} 

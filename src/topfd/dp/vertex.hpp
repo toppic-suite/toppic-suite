@@ -17,8 +17,8 @@
 #define TOPPIC_TOPFD_DP_VERTEX_HPP_
 
 #include "topfd/dp/dp_para.hpp"
-#include "topfd/env/match_env.hpp"
-#include "topfd/env/env_peak_pair.hpp"
+#include "env/match_env.hpp"
+#include "env/env_peak_pair.hpp"
 
 namespace toppic {
 

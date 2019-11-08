@@ -13,20 +13,20 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_TOPFD_ENV_PREC_ENV_HPP_
-#define TOPPIC_TOPFD_ENV_PREC_ENV_HPP_
-
-#include "topfd/env/match_env.hpp"
+#include "spec/ms_header.hpp"
+#include "env/match_env.hpp"
 
 namespace toppic {
 
-namespace prec_env {
+namespace match_env_writer {
 
-MatchEnvPtr deconv(double prec_win_size, PeakPtrVec &peak_list, 
-                  double prec_mz, int prec_charge, int argu_max_charge);
+void write_env(std::ofstream &file, MsHeaderPtr header, MatchEnvPtr match_env); 
 
-}  // namespace prec_env
+void write_env_vec(std::ofstream &file, MsHeaderPtr header, const MatchEnvPtrVec & envs); 
+
+void write(const std::string & file, MsHeaderPtr header, const MatchEnvPtrVec & envs); 
+
+
+}  // namespace msalign_writer
 
 }  // namespace toppic
-
-#endif

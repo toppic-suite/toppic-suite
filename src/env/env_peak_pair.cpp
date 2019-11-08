@@ -13,19 +13,27 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_TOPFD_ENV_MATCH_ENV_FILTER_HPP_
-#define TOPPIC_TOPFD_ENV_MATCH_ENV_FILTER_HPP_
-
-#include "topfd/env/env_para.hpp"
-#include "topfd/env/match_env.hpp"
+#include "env/env_peak_pair.hpp"
 
 namespace toppic {
 
-class MatchEnvFilter {
- public:
-  static MatchEnvPtrVec filter(MatchEnvPtrVec &ori_envs, double prec_mass, EnvParaPtr env_para_ptr);
-};
+EnvPeakPair::EnvPeakPair(MatchEnvPtr env_ptr, int pos_idx) {
+  env_ptr_ = env_ptr;
+  pos_idx_ = pos_idx;
+}
+
+EnvPeakPair::EnvPeakPair(EnvPeakPairPtr pair_ptr) {
+  env_ptr_ = pair_ptr->getMatchEnvPtr();
+  pos_idx_ = pair_ptr->getPosIdx();
+}
+
+double EnvPeakPair::getTheoIntensity() {
+  return env_ptr_->getTheoEnvPtr()->getIntensity(pos_idx_);
 
 }
 
-#endif
+double EnvPeakPair::getPeakScore(double intensity_sum, double tolerance) {
+  return env_ptr_->calcPeakScr(pos_idx_, intensity_sum, tolerance);
+}
+
+}
