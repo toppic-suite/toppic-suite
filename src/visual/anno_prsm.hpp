@@ -13,12 +13,12 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_PRSM_VIEW_ANNO_PRSM_HPP_
-#define TOPPIC_PRSM_VIEW_ANNO_PRSM_HPP_
+#ifndef TOPPIC_VISUAL_ANNO_PRSM_HPP_
+#define TOPPIC_VISUAL_ANNO_PRSM_HPP_
 
 #include "common/xml/xml_dom_document.hpp"
 #include "prsm/prsm.hpp"
-#include "prsmview/prsm_view_mng.hpp"
+#include "visual/prsm_view_mng.hpp"
 
 namespace toppic{
 
@@ -30,4 +30,4 @@ xercesc::DOMElement* geneAnnoPrsm(XmlDOMDocument* xml_doc, PrsmPtr prsm_ptr,
 }
 
 }
-#endif /* TOPPIC_PRSM_VIEW_ANNO_PRSM_HPP_ */
+#endif /* TOPPIC_VISUAL_ANNO_PRSM_HPP_ */

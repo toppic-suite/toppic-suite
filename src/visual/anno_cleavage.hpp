@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_PRSM_VIEW_ANNO_CLEAVAGE_HPP_
-#define TOPPIC_PRSM_VIEW_ANNO_CLEAVAGE_HPP_
+#ifndef TOPPIC_VISUAL_ANNO_CLEAVAGE_HPP_
+#define TOPPIC_VISUAL_ANNO_CLEAVAGE_HPP_
 
 #include <string>
 #include <vector>
@@ -57,4 +57,4 @@ class AnnoCleavage {
 
 } /* namespace toppic */
 
-#endif /* TOPPIC_PRSM_VIEW_ANNO_CLEAVAGE_HPP_ */
+#endif /* TOPPIC_VISUAL_ANNO_CLEAVAGE_HPP_ */

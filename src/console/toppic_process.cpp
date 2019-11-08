@@ -58,8 +58,8 @@
 #include "stat/local/local_mng.hpp"
 #include "stat/local/local_processor.hpp"
 
-#include "prsmview/xml_generator.hpp"
-#include "prsmview/json_transformer.hpp"
+#include "visual/xml_generator.hpp"
+#include "visual/json_transformer.hpp"
 
 #include "console/toppic_argument.hpp"
 

@@ -22,8 +22,8 @@
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "xml2json/xml2json.hpp"
-#include "prsmview/anno_file_list.hpp"
-#include "prsmview/json_transformer.hpp"
+#include "visual/anno_file_list.hpp"
+#include "visual/json_transformer.hpp"
 
 namespace toppic {
 

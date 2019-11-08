@@ -14,8 +14,8 @@
 
 #include "common/util/logger.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
-#include "prsmview/anno_proteoform.hpp"
-#include "prsmview/anno_prsm.hpp"
+#include "visual/anno_proteoform.hpp"
+#include "visual/anno_prsm.hpp"
 
 namespace toppic {
 

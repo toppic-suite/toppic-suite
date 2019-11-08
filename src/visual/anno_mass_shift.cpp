@@ -13,7 +13,7 @@
 //limitations under the License.
 
 #include "common/util/str_util.hpp"
-#include "prsmview/anno_mass_shift.hpp"
+#include "visual/anno_mass_shift.hpp"
 
 namespace toppic {
 

@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_PRSM_VIEW_XML_GENERATOR_HPP_
-#define TOPPIC_PRSM_VIEW_XML_GENERATOR_HPP_
+#ifndef TOPPIC_VISUAL_XML_GENERATOR_HPP_
+#define TOPPIC_VISUAL_XML_GENERATOR_HPP_
 
 #include <map>
 #include <string>
@@ -27,9 +27,9 @@
 #include "common/xml/xml_writer.hpp"
 #include "ms/spec/msalign_reader.hpp"
 #include "prsm/prsm.hpp"
-#include "prsmview/prsm_view_mng.hpp"
-#include "prsmview/anno_file_list.hpp"
-#include "prsmview/anno_xml_util.hpp"
+#include "visual/prsm_view_mng.hpp"
+#include "visual/anno_file_list.hpp"
+#include "visual/anno_xml_util.hpp"
 
 namespace toppic {
 
@@ -84,4 +84,4 @@ typedef std::shared_ptr<XmlGenerator> XmlGeneratorPtr;
 
 }  // namespace toppic
 
-#endif /* TOPPIC_PRSM_VIEW_XML_GENERATOR_HPP_ */
+#endif /* TOPPIC_VISUAL_XML_GENERATOR_HPP_ */

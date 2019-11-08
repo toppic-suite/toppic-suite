@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_PRSM_VIEW_PRSM_VIEW_MNG_HPP_
-#define TOPPIC_PRSM_VIEW_PRSM_VIEW_MNG_HPP_
+#ifndef TOPPIC_VISUAL_PRSM_VIEW_MNG_HPP_
+#define TOPPIC_VISUAL_PRSM_VIEW_MNG_HPP_
 
 #include <string>
 
@@ -60,4 +60,4 @@ typedef std::shared_ptr<PrsmViewMng> PrsmViewMngPtr;
 } /* namespace toppic */
 
 
-#endif /* TOPPIC_PRSM_VIEW_PRSM_VIEW_MNG_HPP_ */
+#endif /* TOPPIC_VISUAL_PRSM_VIEW_MNG_HPP_ */

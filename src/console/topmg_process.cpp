@@ -60,8 +60,8 @@
 #include "stat/mcmc/mcmc_mng.hpp"
 #include "stat/mcmc/mcmc_dpr_processor.hpp"
 
-#include "prsmview/xml_generator.hpp"
-#include "prsmview/json_transformer.hpp"
+#include "visual/xml_generator.hpp"
+#include "visual/json_transformer.hpp"
 
 #include "console/topmg_argument.hpp"
 #include "console/topmg_process.hpp"

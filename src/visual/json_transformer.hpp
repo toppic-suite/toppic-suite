@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_PRSM_VIEW_JSON_TRANSFORMER_HPP_
-#define TOPPIC_PRSM_VIEW_JSON_TRANSFORMER_HPP_
+#ifndef TOPPIC_VISUAL_JSON_TRANSFORMER_HPP_
+#define TOPPIC_VISUAL_JSON_TRANSFORMER_HPP_
 
 #include <string>
 
@@ -28,4 +28,4 @@ void jsonTranslate(std::map<std::string, std::string> &arguments,
 
 }
 
-#endif /* TOPPIC_PRSM_VIEW_TRANSFORMER_HPP_ */
+#endif /* TOPPIC_VISUAL_TRANSFORMER_HPP_ */
