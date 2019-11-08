@@ -18,11 +18,11 @@
 #include "common/util/str_util.hpp"
 #include "common/base/base_data.hpp"
 #include "spec/msalign_frac_merge.hpp"
-#include "feature_detect/feature_detect.hpp"
 #include "feature/feature_merge.hpp"
 #include "topfd/env/env_base.hpp"
 #include "topfd/deconv/deconv_process.hpp"
 #include "topfd/deconv/deconv_json_merge.hpp"
+#include "topfd/feature_detect/feature_detect.hpp"
 #include "topfd/common/topfd_para.hpp"
 
 namespace toppic {

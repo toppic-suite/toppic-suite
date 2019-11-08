@@ -12,9 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#ifndef TOPPIC_FEATURE_DETECT_FEATURE_PARA_HPP_
-#define TOPPIC_FEATURE_DETECT_FEATURE_PARA_HPP_
+#ifndef TOPPIC_TOPFD_FEATURE_DETECT_FEATURE_PARA_HPP_
+#define TOPPIC_TOPFD_FEATURE_DETECT_FEATURE_PARA_HPP_
 
 #include <vector>
 #include "spec/peak_tolerance.hpp"
