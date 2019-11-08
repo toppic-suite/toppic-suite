@@ -12,7 +12,6 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
 #include <iostream>
 #include <iomanip>
 #include <map>
@@ -41,18 +40,18 @@
 
 #include "filter/zeroptm/zero_ptm_filter_mng.hpp"
 #include "filter/zeroptm/zero_ptm_filter_processor.hpp"
-#include "zeroptmsearch/zero_ptm_search_mng.hpp"
-#include "zeroptmsearch/zero_ptm_search_processor.hpp"
+#include "search/zeroptmsearch/zero_ptm_search_mng.hpp"
+#include "search/zeroptmsearch/zero_ptm_search_processor.hpp"
 
 #include "filter/oneptm/one_ptm_filter_mng.hpp"
 #include "filter/oneptm/one_ptm_filter_processor.hpp"
-#include "oneptmsearch/ptm_search_mng.hpp"
-#include "oneptmsearch/one_ptm_search_processor.hpp"
+#include "search/oneptmsearch/ptm_search_mng.hpp"
+#include "search/oneptmsearch/one_ptm_search_processor.hpp"
 
 #include "filter/diag/diag_filter_mng.hpp"
 #include "filter/diag/diag_filter_processor.hpp"
 
-#include "ptmsearch/ptm_search_processor.hpp"
+#include "search/ptmsearch/ptm_search_processor.hpp"
 
 #include "tdgf/tdgf_mng.hpp"
 #include "tdgf/evalue_processor.hpp"
