@@ -77,7 +77,7 @@ file(GLOB PTM_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/ptmsearch/*.cpp)
 file(GLOB TDGF_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/tdgf/*.cpp)
 file(GLOB PRSM_VIEW_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/prsmview/*.cpp)
 file(GLOB LOCAL_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/local/*.cpp)
-file(GLOB ENV_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/deconv/env/*.cpp)
+file(GLOB ENV_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/topfd/env/*.cpp)
 
 # classes for topmg
 file(GLOB TOPMG_FILTER_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/massmatch/*.cpp
