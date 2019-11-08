@@ -24,6 +24,7 @@
 
 #include <QThread>
 
+#include "topfd/common/topfd_para.hpp"
 
 namespace Ui {
 class ThreadTopFD;
@@ -39,14 +40,14 @@ class ThreadTopFD : public QThread {
 
   void run();
 
-  void setPar(std::map<std::string, std::string> arguments,
+  void setPar(toppic::TopfdParaPtr para_ptr, 
               const std::vector<std::string> & spec_file_lst) {
-    arguments_ = arguments;
+    para_ptr_ = para_ptr;
     spec_file_lst_ = spec_file_lst;
   }
 
  private:
-  std::map<std::string, std::string> arguments_;
+  toppic::TopfdParaPtr para_ptr_;
 
   std::vector<std::string> spec_file_lst_;
 };

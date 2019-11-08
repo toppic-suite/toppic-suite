@@ -20,6 +20,7 @@
 
 #include <QMainWindow>
 
+#include "topfd/common/topfd_para.hpp"
 #include "threadtopfd.h"
 
 namespace Ui {
@@ -53,15 +54,17 @@ private:
 
   int percentage_;
 
-  std::map<std::string, std::string> arguments_;
+  //std::map<std::string, std::string> arguments_;
+  toppic::TopfdParaPtr para_ptr_;
 
   std::vector<std::string> spec_file_lst_;
 
   Ui::TopFDDialog *ui;
 
-  void initArguments();
+  //void initArguments();
 
-  std::map<std::string, std::string> getArguments();
+  //std::map<std::string, std::string> getArguments();
+  toppic::TopfdParaPtr getParaPtr();
 
   std::vector<std::string> getSpecFileList();
 

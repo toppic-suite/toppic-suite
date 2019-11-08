@@ -33,7 +33,7 @@
 TopFDDialog::TopFDDialog(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::TopFDDialog) {
-      initArguments();
+      para_ptr_ = std::make_shared<toppic::TopfdPara>();
       ui->setupUi(this);
       lastDir_ = ".";
       percentage_ = 0;
@@ -80,24 +80,6 @@ void TopFDDialog::closeEvent(QCloseEvent *event) {
   thread_->wait();
   event->accept();
   return;
-}
-
-void TopFDDialog::initArguments() {
-  arguments_["executiveDir"] = "";
-  arguments_["resourceDir"] = "";
-  arguments_["ms/spectrumFileName"] = "";
-  arguments_["refinePrecMass"]="true";
-  arguments_["missingLevelOne"] = "false";
-  arguments_["maxCharge"] = "30";
-  arguments_["maxMass"] = "100000";
-  arguments_["mzError"] = "0.02";
-  arguments_["msTwoSnRatio"] = "1.0";
-  arguments_["msOneSnRatio"] = "3.0";
-  arguments_["keepUnusedPeaks"] = "false";
-  arguments_["outMultipleMass"] = "false";
-  arguments_["precWindow"] = "3.0";
-  arguments_["doFinalFiltering"] = "true";
-  arguments_["outputMatchEnv"] = "false";
 }
 
 void TopFDDialog::on_clearButton_clicked() {
@@ -189,9 +171,9 @@ void TopFDDialog::on_startButton_clicked() {
   }
   lockDialog();
   ui->outputTextBrowser->setText(showInfo);
-  std::map<std::string, std::string> argument = this->getArguments();
+  toppic::TopfdParaPtr para_ptr = this->getParaPtr();
   std::vector<std::string> spec_file_lst = this->getSpecFileList();
-  thread_->setPar(argument, spec_file_lst);
+  thread_->setPar(para_ptr, spec_file_lst);
   thread_->start();
 
   std::string info;
@@ -269,18 +251,17 @@ void TopFDDialog::on_outputButton_clicked() {
   QDesktopServices::openUrl(QUrl(outPath, QUrl::TolerantMode));
 }
 
-std::map<std::string, std::string> TopFDDialog::getArguments() {
+toppic::TopfdParaPtr TopFDDialog::getParaPtr() {
   QString path = QCoreApplication::applicationFilePath();
   std::string exe_dir = toppic::file_util::getExecutiveDir(path.toStdString());
-  arguments_["executiveDir"] = exe_dir;
-  arguments_["resourceDir"] = toppic::file_util::getResourceDir(exe_dir);
-  arguments_["maxCharge"] = ui->maxChargeEdit->text().toStdString();
-  arguments_["maxMass"] = ui->maxMassEdit->text().toStdString();
-  arguments_["mzError"] = ui->mzErrorEdit->text().toStdString();
-  arguments_["msOneSnRatio"] = ui->ms1snRatioEdit->text().toStdString();
-  arguments_["msTwoSnRatio"] = ui->ms2snRatioEdit->text().toStdString();
-  arguments_["precWindow"] = ui->windowSizeEdit->text().toStdString();
-  return arguments_;
+  para_ptr_->resource_dir_ = toppic::file_util::getResourceDir(exe_dir);
+  para_ptr_->max_charge_ = std::stoi(ui->maxChargeEdit->text().toStdString());
+  para_ptr_->max_mass_ = std::stod(ui->maxMassEdit->text().toStdString());
+  para_ptr_->mz_error_ = std::stod(ui->mzErrorEdit->text().toStdString());
+  para_ptr_->ms_one_sn_ratio_ = std::stod(ui->ms1snRatioEdit->text().toStdString());
+  para_ptr_->ms_two_sn_ratio_ = std::stod(ui->ms2snRatioEdit->text().toStdString());
+  para_ptr_->prec_window_ = std::stod(ui->windowSizeEdit->text().toStdString());
+  return para_ptr_;
 }
 
 void TopFDDialog::lockDialog() {

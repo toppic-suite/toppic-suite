@@ -27,7 +27,7 @@
 #include "common/util/file_util.hpp"
 #include "common/util/str_util.hpp"
 
-#include "spec/msalign_util.hpp"
+#include "ms/spec/msalign_util.hpp"
 
 #include "prsm/prsm_util.hpp"
 
