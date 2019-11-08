@@ -13,20 +13,20 @@
 //limitations under the License.
 
 
-#include "spec/ms_header.hpp"
-#include "topfd/env/match_env.hpp"
+#ifndef TOPPIC_TOPFD_ENV_ENV_RESCORE_HPP_
+#define TOPPIC_TOPFD_ENV_ENV_RESCORE_HPP_
+
+#include <vector>
+
+#include "env/match_env.hpp"
 
 namespace toppic {
 
-namespace match_env_writer {
+namespace env_rescore {
 
-void write_env(std::ofstream &file, MsHeaderPtr header, MatchEnvPtr match_env); 
+void rescore(MatchEnvPtr2D &match_envs, const std::vector<std::vector<double> > &para);
 
-void write_env_vec(std::ofstream &file, MsHeaderPtr header, const MatchEnvPtrVec & envs); 
-
-void write(const std::string & file, MsHeaderPtr header, const MatchEnvPtrVec & envs); 
-
-
-}  // namespace msalign_writer
+}  // namespace EnvRescore
 
 }  // namespace toppic
+#endif

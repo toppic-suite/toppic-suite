@@ -20,8 +20,8 @@
 
 #include "seq/proteoform_factory.hpp"
 #include "spec/extend_ms_factory.hpp"
-#include "oneptmsearch/diagonal.hpp"
-#include "oneptmsearch/diagonal_header.hpp"
+#include "search/oneptmsearch/diagonal.hpp"
+#include "search/oneptmsearch/diagonal_header.hpp"
 #include "graph/graph.hpp"
 #include "graphalign/graph_align_processor.hpp"
 #include "graphalign/graph_align.hpp"

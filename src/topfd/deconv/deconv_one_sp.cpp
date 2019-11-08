@@ -15,17 +15,17 @@
 #include "common/util/logger.hpp"
 #include "spec/baseline_util.hpp"
 #include "topfd/spec/deconv_data_util.hpp"
-#include "topfd/env/match_env_util.hpp"
-#include "topfd/env/match_env_refine.hpp"
-#include "topfd/env/match_env_filter.hpp"
-#include "topfd/env/env_detect.hpp"
-#include "topfd/env/env_filter.hpp"
-#include "topfd/env/env_assign.hpp"
+#include "env/match_env_util.hpp"
+#include "env/match_env_refine.hpp"
+#include "env/match_env_filter.hpp"
+#include "env/env_detect.hpp"
+#include "env/env_filter.hpp"
+#include "env/env_assign.hpp"
 #include "topfd/dp/co_table.hpp"
 #include "topfd/dp/dp_a.hpp"
 #include "topfd/deconv/deconv_one_sp.hpp"
 
-//#include "topfd/env/env_rescore.hpp"
+//#include "env/env_rescore.hpp"
 
 namespace toppic {
 

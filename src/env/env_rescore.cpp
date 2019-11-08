@@ -16,7 +16,7 @@
 #include <algorithm>
 
 #include "common/base/mass_constant.hpp"
-#include "topfd/env/env_rescore.hpp"
+#include "env/env_rescore.hpp"
 
 namespace toppic {
 

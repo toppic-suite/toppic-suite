@@ -16,9 +16,9 @@
 #ifndef TOPPIC_TOPFD_ENV_ENV_DETECT_HPP_
 #define TOPPIC_TOPFD_ENV_ENV_DETECT_HPP_
 
-#include "topfd/env/env_para.hpp"
-#include "topfd/env/envelope.hpp"
-#include "topfd/env/match_env.hpp"
+#include "env/env_para.hpp"
+#include "env/envelope.hpp"
+#include "env/match_env.hpp"
 
 namespace toppic {
 

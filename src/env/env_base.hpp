@@ -16,7 +16,7 @@
 #ifndef TOPPIC_TOPFD_ENV_ENVELOPE_BASE_HPP_
 #define TOPPIC_TOPFD_ENV_ENVELOPE_BASE_HPP_
 
-#include "topfd/env/envelope.hpp"
+#include "env/envelope.hpp"
 
 namespace toppic {
 

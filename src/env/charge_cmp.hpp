@@ -13,22 +13,16 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_TOPFD_ENV_ENV_FILTER_HPP_
-#define TOPPIC_TOPFD_ENV_ENV_FILTER_HPP_
+#ifndef TOPPIC_TOPFD_ENV_CHARGE_CMP_HPP_
+#define TOPPIC_TOPFD_ENV_CHARGE_CMP_HPP_
 
-#include "topfd/env/env_para.hpp"
-#include "topfd/env/match_env.hpp"
+#include "spec/peak.hpp"
+#include "env/match_env.hpp"
 
 namespace toppic {
 
-class EnvFilter {
- public:
-  static void filter(MatchEnvPtr2D &match_envs, const PeakPtrVec &peak_list,
-                     EnvParaPtr env_para_ptr);
-  
-  static void multipleMassFilter(MatchEnvPtr2D &match_env, EnvParaPtr env_para_ptr);
-
-  static bool testRealEnvValid(MatchEnvPtr env, EnvParaPtr env_para_ptr);
+namespace charge_cmp {
+  int comp(const PeakPtrVec &peak_list, MatchEnvPtr a, MatchEnvPtr b, double tolerance);
 };
 
 }
