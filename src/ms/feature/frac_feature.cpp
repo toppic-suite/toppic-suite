@@ -151,7 +151,7 @@ XmlDOMElement* FracFeature::toXmlElement(XmlDOMDocument* xml_doc) {
   str = str_util::toString(max_charge_);
   xml_doc->addElement(element, "max_charge", str.c_str());
   str = str_util::toString(env_num_);
-  xml_doc->addElement(element, "ms/envelope_num", str.c_str());
+  xml_doc->addElement(element, "envelope_num", str.c_str());
   str = str_util::toString(promex_score_);
   xml_doc->addElement(element, "promex_score", str.c_str());
   str = str_util::toString(sample_feature_id_);
