@@ -15,7 +15,7 @@
 
 #include "common/util/file_util.hpp"
 #include "common/base/mass_constant.hpp"
-#include "feature_detect/feature_para.hpp"
+#include "topfd/feature_detect/feature_para.hpp"
 
 namespace toppic {
 

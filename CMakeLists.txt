@@ -92,7 +92,6 @@ file(GLOB MCMC_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/mcmc/*.cpp)
 
 # Deconvoluation
 file(GLOB_RECURSE TOPFD_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/topfd/*.cpp)
-file(GLOB FEATURE_DETECT_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/feature_detect/*.cpp)
 
 # Merge
 file(GLOB MERGE_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/merge/*.cpp)
@@ -136,7 +135,7 @@ file(GLOB UNIT_TEST_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/*.cpp)
 
 add_executable(topfd 
 	${TOPFD_CONSOLE_SRCS} ${TOPFD_SRCS} ${SPEC_SRCS} 
-  ${FEATURE_SRCS} ${PWIZ_SRCS} ${COMMON_SRCS} ${FEATURE_DETECT_SRCS})
+  ${FEATURE_SRCS} ${PWIZ_SRCS} ${COMMON_SRCS})
 
 add_executable(topfd_single 
 	${TOPFD_SINGLE_CONSOLE_SRCS} ${TOPFD_SINGLE_PROC_SRCS} ${DECONV_SRCS} ${SPEC_SRCS} 

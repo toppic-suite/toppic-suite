@@ -38,8 +38,8 @@
 #include "feature/peak_cluster.hpp"
 #include "feature/sample_feature.hpp"
 #include "feature/sample_feature_writer.hpp"
-#include "feature_detect/feature_para.hpp"
-#include "feature_detect/feature_detect.hpp"
+#include "topfd/feature_detect/feature_para.hpp"
+#include "topfd/feature_detect/feature_detect.hpp"
 
 namespace toppic {
 
