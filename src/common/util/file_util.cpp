@@ -208,7 +208,7 @@ bool copyJsonDir(const std::string &src_name,
       std::string id_str = file_name.substr(8, file_name.length() - 3 - 8);
       //LOG_ERROR(file_name << " " << id_str);
       int new_id = std::stoi(id_str) + id_base;
-      std::string new_name = "ms/spectrum" + std::to_string(new_id) + ".js";
+      std::string new_name = "spectrum" + std::to_string(new_id) + ".js";
       fs::path des_file(des_name + getFileSeparator() + new_name);
       fs::copy_file(current, des_file);
     }

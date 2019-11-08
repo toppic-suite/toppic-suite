@@ -113,8 +113,8 @@ XmlDOMElement* Prsm::toXmlElement(XmlDOMDocument* xml_doc) {
   std::string str = str_util::toString(prsm_id_);
   xml_doc->addElement(element, "prsm_id", str.c_str());
   str = str_util::toString(spectrum_id_);
-  xml_doc->addElement(element, "ms/spectrum_id", str.c_str());
-  xml_doc->addElement(element, "ms/spectrum_scan", spectrum_scan_.c_str());
+  xml_doc->addElement(element, "spectrum_id", str.c_str());
+  xml_doc->addElement(element, "spectrum_scan", spectrum_scan_.c_str());
   str = str_util::toString(precursor_id_);
   xml_doc->addElement(element, "precursor_id", str.c_str());
   str = str_util::toString(prec_feature_id_);
@@ -124,7 +124,7 @@ XmlDOMElement* Prsm::toXmlElement(XmlDOMDocument* xml_doc) {
   str = str_util::toString(frac_feature_score_);
   xml_doc->addElement(element, "frac_feature_score", str.c_str());
   str = str_util::toString(spectrum_num_);
-  xml_doc->addElement(element, "ms/spectrum_number", str.c_str());
+  xml_doc->addElement(element, "spectrum_number", str.c_str());
   str = str_util::toString(ori_prec_mass_);
   xml_doc->addElement(element, "ori_prec_mass", str.c_str());
   str = str_util::toString(adjusted_prec_mass_);

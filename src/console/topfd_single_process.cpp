@@ -132,7 +132,7 @@ int processOneFile(std::map<std::string, std::string> arguments,
     std::string json_dir =  file_util::basename(spec_file_name) + spec_data_suffix;
     file_util::createFolder(json_dir);
 
-    std::string json_file_name = json_dir + file_util::getFileSeparator() + "ms/spectrum" 
+    std::string json_file_name = json_dir + file_util::getFileSeparator() + "spectrum" 
         + std::to_string(header_ptr->getId())
         + ".js";
     raw_ms_writer::write(json_file_name, raw_ms_ptr, result_envs);    

@@ -50,7 +50,7 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
   std::vector<SpectrumSetPtr> spec_set_vec = reader.getNextSpectrumSet(sp_para_ptr);
   while (spec_set_vec[0] != nullptr) {
     for (size_t k = 0; k < spec_set_vec.size(); k++) {
-      LOG_DEBUG("ms/spec set ptr valid " << spec_set_vec[k]->isValid());
+      LOG_DEBUG("spec set ptr valid " << spec_set_vec[k]->isValid());
       if (spec_set_vec[k]->isValid()) {
         ExtendMsPtrVec ms_ptr_vec = spec_set_vec[k]->getMsThreePtrVec();
         filter_ptr->computeBestMatch(ms_ptr_vec);
