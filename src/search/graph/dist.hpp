@@ -13,14 +13,14 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_GRAPH_DIST_HPP_
-#define TOPPIC_GRAPH_DIST_HPP_
+#ifndef TOPPIC_SEARCH_GRAPH_DIST_HPP_
+#define TOPPIC_SEARCH_GRAPH_DIST_HPP_
 
 #include <utility>
 #include <set>
 #include <vector>
 
-#include "graph/graph.hpp"
+#include "search/graph/graph.hpp"
 
 namespace toppic {
 

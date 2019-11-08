@@ -13,13 +13,13 @@
 // limitations under the License.
 
 
-#ifndef TOPPIC_GRAPH_ALIGN_GRAPH_POST_PROCESSOR_HPP_
-#define TOPPIC_GRAPH_ALIGN_GRAPH_POST_PROCESSOR_HPP_
+#ifndef TOPPIC_SEARCH_GRAPH_ALIGN_GRAPH_POST_PROCESSOR_HPP_
+#define TOPPIC_SEARCH_GRAPH_ALIGN_GRAPH_POST_PROCESSOR_HPP_
 
 #include <unordered_map>
 #include <string>
 
-#include "graphalign/graph_align_mng.hpp"
+#include "search/graphalign/graph_align_mng.hpp"
 
 namespace toppic {
 

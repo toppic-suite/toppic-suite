@@ -13,15 +13,15 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_GRAPH_SPEC_GRAPH_HPP_
-#define TOPPIC_GRAPH_SPEC_GRAPH_HPP_
+#ifndef TOPPIC_SEARCH_GRAPH_SPEC_GRAPH_HPP_
+#define TOPPIC_SEARCH_GRAPH_SPEC_GRAPH_HPP_
 
 #include <vector>
 
 #include "spec/prm_peak.hpp"
 #include "spec/spectrum_set.hpp"
-#include "graph/dist.hpp"
-#include "graph/graph.hpp"
+#include "search/graph/dist.hpp"
+#include "search/graph/graph.hpp"
 
 namespace toppic {
 

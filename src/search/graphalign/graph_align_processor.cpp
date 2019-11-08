@@ -34,10 +34,10 @@
 #include "prsm/simple_prsm_util.hpp"
 #include "prsm/simple_prsm_xml_writer.hpp"
 #include "prsm/simple_prsm_xml_writer_util.hpp"
-#include "graph/proteo_graph_reader.hpp"
-#include "graph/spec_graph_reader.hpp"
-#include "graphalign/graph_align.hpp"
-#include "graphalign/graph_align_processor.hpp"
+#include "search/graph/proteo_graph_reader.hpp"
+#include "search/graph/spec_graph_reader.hpp"
+#include "search/graphalign/graph_align.hpp"
+#include "search/graphalign/graph_align_processor.hpp"
 
 namespace toppic {
 

@@ -13,11 +13,11 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_GRAPH_ALIGN_GRAPH_ALIGN_PROCESSOR_HPP_
-#define TOPPIC_GRAPH_ALIGN_GRAPH_ALIGN_PROCESSOR_HPP_
+#ifndef TOPPIC_SEARCH_GRAPH_ALIGN_GRAPH_ALIGN_PROCESSOR_HPP_
+#define TOPPIC_SEARCH_GRAPH_ALIGN_GRAPH_ALIGN_PROCESSOR_HPP_
 
-#include "graph/graph.hpp"
-#include "graphalign/graph_align_mng.hpp"
+#include "search/graph/graph.hpp"
+#include "search/graphalign/graph_align_mng.hpp"
 
 namespace toppic {
 

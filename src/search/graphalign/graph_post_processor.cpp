@@ -32,8 +32,8 @@
 #include "prsm/peak_ion_pair_util.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 
-#include "graphalign/graph_align_mng.hpp"
-#include "graphalign/graph_post_processor.hpp"
+#include "search/graphalign/graph_align_mng.hpp"
+#include "search/graphalign/graph_post_processor.hpp"
 
 namespace toppic {
 

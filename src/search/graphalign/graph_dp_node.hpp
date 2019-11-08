@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_GRAPH_ALIGN_GRAPH_DP_NODE_HPP_
-#define TOPPIC_GRAPH_ALIGN_GRAPH_DP_NODE_HPP_
+#ifndef TOPPIC_SEARCH_GRAPH_ALIGN_GRAPH_DP_NODE_HPP_
+#define TOPPIC_SEARCH_GRAPH_ALIGN_GRAPH_DP_NODE_HPP_
 
 #include <memory>
 #include <vector>

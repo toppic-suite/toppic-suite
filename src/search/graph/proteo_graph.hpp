@@ -13,13 +13,13 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_GRAPH_PROTEO_GRAPH_HPP_
-#define TOPPIC_GRAPH_PROTEO_GRAPH_HPP_
+#ifndef TOPPIC_SEARCH_GRAPH_PROTEO_GRAPH_HPP_
+#define TOPPIC_SEARCH_GRAPH_PROTEO_GRAPH_HPP_
 
 #include "seq/fasta_seq.hpp"
 #include "seq/proteoform.hpp"
-#include "graph/dist.hpp"
-#include "graph/graph.hpp"
+#include "search/graph/dist.hpp"
+#include "search/graph/graph.hpp"
 
 namespace toppic {
 

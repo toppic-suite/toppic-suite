@@ -79,7 +79,6 @@ file(GLOB TOPFD_SINGLE_PROC_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd
 file(GLOB TOPFD_SINGLE_CONSOLE_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd_single_argument.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/console/topfd_single.cpp)
 
-
 # classes for toppic
 file(GLOB_RECURSE FILTER_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/*.cpp)
 
@@ -88,43 +87,46 @@ file(GLOB ONE_PTM_SEARCH_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/search/oneptmsear
 file(GLOB PTM_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/search/ptmsearch/*.cpp)
 
 file(GLOB TDGF_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/tdgf/*.cpp)
-file(GLOB PRSM_VIEW_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/prsmview/*.cpp)
 file(GLOB LOCAL_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/local/*.cpp)
+file(GLOB PRSM_VIEW_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/prsmview/*.cpp)
+
+# toppic console main
+file(GLOB TOPPIC_PROC_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_process.cpp
+			     ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_argument.cpp)
+file(GLOB TOPPIC_CONSOLE_SRCS	${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic.cpp)
+
+# toppic gui main
+file(GLOB TOPPIC_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/toppic/*.cpp
+			    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/toppic/*.qrc)
 
 # classes for topmg
 file(GLOB TOPMG_FILTER_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/massmatch/*.cpp
                              ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/oneptm/*.cpp
                              ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/diag/*.cpp)
-# mass graph for topmg
-file(GLOB GRAPH_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/graph/*.cpp)
-file(GLOB GRAPH_ALIGN_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/graphalign/*.cpp)
 
-# MCMC for topmg
+file(GLOB GRAPH_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/search/graph/*.cpp)
+file(GLOB GRAPH_ALIGN_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/search/graphalign/*.cpp)
+
 file(GLOB MCMC_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/mcmc/*.cpp)
 
-# Merge
-file(GLOB MERGE_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/merge/*.cpp)
-
-# toppic_main
-file(GLOB TOPPIC_PROC_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_process.cpp
-			     ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_argument.cpp)
-file(GLOB TOPPIC_CONSOLE_SRCS	${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic.cpp)
-
-# topmg_main
+# topmg console main
 file(GLOB TOPMG_PROC_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmg_process.cpp
 			    ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmg_argument.cpp)
 file(GLOB TOPMG_CONSOLE_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmg.cpp)
 
-# merge main
+# topmg gui main
+file(GLOB TOPMG_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topmg/*.cpp
+			   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topmg/*.qrc)
+
+# topmerge classes
+file(GLOB MERGE_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/merge/*.cpp)
+
+# topmerge console main
 file(GLOB TOPMERGE_PROC_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmerge_process.cpp
 			     ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmerge_argument.cpp)
 file(GLOB TOPMERGE_CONSOLE_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmerge.cpp)
 
-# GUI
-file(GLOB TOPPIC_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/toppic/*.cpp
-			    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/toppic/*.qrc)
-file(GLOB TOPMG_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topmg/*.cpp
-			   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topmg/*.qrc)
+# topmerge gui main 
 file(GLOB TOPMERGE_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topmerge/*.cpp
 			      ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topmerge/*.qrc)
 

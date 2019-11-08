@@ -13,7 +13,7 @@
 //limitations under the License.
 
 #include "common/base/mass_constant.hpp"
-#include "graph/spec_graph_reader.hpp"
+#include "search/graph/spec_graph_reader.hpp"
 
 namespace toppic {
 
@@ -85,7 +85,7 @@ SpecGraphPtrVec SpecGraphReader::getNextSpecGraphPtrVec(SpectrumSetPtr spec_set_
       PrmMsPtrVec ms_six_vec = adjusted_spec_set_ptr->getMsSixPtrVec();
       PrmPeakPtrVec peak_vec = prm_ms::getPrmPeakPtrs(ms_six_vec, sp_para_ptr_->getPeakTolerancePtr());
       MassGraphPtr graph_ptr = getMassGraphPtr(peak_vec); 
-      LOG_DEBUG("graph complete");
+      LOG_DEBUG("search/graph complete");
       SpecGraphPtr spec_graph_ptr
           = std::make_shared<SpecGraph>(adjusted_spec_set_ptr, peak_vec, graph_ptr, convert_ratio_);
       graph_ptr_vec.push_back(spec_graph_ptr);

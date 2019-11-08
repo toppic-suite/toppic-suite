@@ -22,9 +22,9 @@
 #include "spec/extend_ms_factory.hpp"
 #include "search/oneptmsearch/diagonal.hpp"
 #include "search/oneptmsearch/diagonal_header.hpp"
-#include "graph/graph.hpp"
-#include "graphalign/graph_align_processor.hpp"
-#include "graphalign/graph_align.hpp"
+#include "search/graph/graph.hpp"
+#include "search/graphalign/graph_align_processor.hpp"
+#include "search/graphalign/graph_align.hpp"
 
 namespace toppic {
 

@@ -24,7 +24,7 @@
 #include "seq/residue_seq.hpp"
 #include "seq/proteoform_util.hpp"
 
-#include "graph/proteo_graph.hpp"
+#include "search/graph/proteo_graph.hpp"
 
 namespace toppic {
 

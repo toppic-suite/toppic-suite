@@ -13,14 +13,14 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_GRAPH_PROTEO_GRAPH_READER_HPP_
-#define TOPPIC_GRAPH_PROTEO_GRAPH_READER_HPP_
+#ifndef TOPPIC_SEARCH_GRAPH_PROTEO_GRAPH_READER_HPP_
+#define TOPPIC_SEARCH_GRAPH_PROTEO_GRAPH_READER_HPP_
 
 #include <string>
 
-#include "graph/graph.hpp"
-#include "graph/proteo_anno.hpp"
-#include "graph/proteo_graph.hpp"
+#include "search/graph/graph.hpp"
+#include "search/graph/proteo_anno.hpp"
+#include "search/graph/proteo_graph.hpp"
 
 namespace toppic {
 

@@ -15,7 +15,7 @@
 
 #include <limits>
 
-#include "graphalign/graph_dp_node.hpp"
+#include "search/graphalign/graph_dp_node.hpp"
 
 namespace toppic {
 
