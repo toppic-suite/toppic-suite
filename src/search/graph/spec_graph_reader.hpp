@@ -13,11 +13,11 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_GRAPH_SPEC_GRAPH_READER_HPP_
-#define TOPPIC_GRAPH_SPEC_GRAPH_READER_HPP_
+#ifndef TOPPIC_SEARCH_GRAPH_SPEC_GRAPH_READER_HPP_
+#define TOPPIC_SEARCH_GRAPH_SPEC_GRAPH_READER_HPP_
 
 #include "spec/msalign_reader.hpp"
-#include "graph/spec_graph.hpp"
+#include "search/graph/spec_graph.hpp"
 
 namespace toppic {
 

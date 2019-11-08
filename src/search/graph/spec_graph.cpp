@@ -19,7 +19,7 @@
 #include <set>
 
 #include "common/util/logger.hpp"
-#include "graph/spec_graph.hpp"
+#include "search/graph/spec_graph.hpp"
 
 namespace toppic {
 

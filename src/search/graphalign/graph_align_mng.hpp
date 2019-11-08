@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_GRAPH_ALIGN_GRAPH_ALIGN_MNG_HPP_
-#define TOPPIC_GRAPH_ALIGN_GRAPH_ALIGN_MNG_HPP_
+#ifndef TOPPIC_SEARCH_GRAPH_ALIGN_GRAPH_ALIGN_MNG_HPP_
+#define TOPPIC_SEARCH_GRAPH_ALIGN_GRAPH_ALIGN_MNG_HPP_
 
 #include <cmath>
 #include <string>

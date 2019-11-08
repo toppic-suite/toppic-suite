@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_GRAPH_GRAPH_HPP_
-#define TOPPIC_GRAPH_GRAPH_HPP_
+#ifndef TOPPIC_SEARCH_GRAPH_GRAPH_HPP_
+#define TOPPIC_SEARCH_GRAPH_GRAPH_HPP_
 
 #include <iostream>
 #include <string>

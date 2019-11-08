@@ -14,7 +14,7 @@
 
 #include <algorithm>
 
-#include "dist.hpp"
+#include "search/graph/dist.hpp"
 
 namespace toppic {
 

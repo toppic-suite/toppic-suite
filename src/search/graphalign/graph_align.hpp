@@ -13,17 +13,17 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_GRAPH_ALIGN_GRAPH_ALIGN_HPP_
-#define TOPPIC_GRAPH_ALIGN_GRAPH_ALIGN_HPP_
+#ifndef TOPPIC_SEARCH_GRAPH_ALIGN_GRAPH_ALIGN_HPP_
+#define TOPPIC_SEARCH_GRAPH_ALIGN_GRAPH_ALIGN_HPP_
 
 #include "prsm/prsm.hpp"
 #include "search/oneptmsearch/diagonal_header.hpp"
-#include "graph/graph.hpp"
-#include "graph/proteo_graph.hpp"
-#include "graph/spec_graph.hpp"
-#include "graphalign/graph_dp_node.hpp"
-#include "graphalign/graph_result_node.hpp"
-#include "graphalign/graph_align_mng.hpp"
+#include "search/graph/graph.hpp"
+#include "search/graph/proteo_graph.hpp"
+#include "search/graph/spec_graph.hpp"
+#include "search/graphalign/graph_dp_node.hpp"
+#include "search/graphalign/graph_result_node.hpp"
+#include "search/graphalign/graph_align_mng.hpp"
 
 namespace toppic {
 

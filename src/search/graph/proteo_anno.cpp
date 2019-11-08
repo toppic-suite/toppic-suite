@@ -24,7 +24,7 @@
 #include "common/base/residue_util.hpp"
 #include "common/xml/xml_dom_document.hpp"
 #include "seq/alter_type.hpp"
-#include "graph/proteo_anno.hpp"
+#include "search/graph/proteo_anno.hpp"
 
 namespace toppic {
 

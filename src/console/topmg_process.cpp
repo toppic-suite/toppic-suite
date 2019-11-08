@@ -51,11 +51,11 @@
 #include "filter/diag/diag_filter_mng.hpp"
 #include "filter/diag/diag_filter_processor.hpp"
 
-#include "graph/graph.hpp"
-#include "graph/proteo_graph.hpp"
-#include "graphalign/graph_align_mng.hpp"
-#include "graphalign/graph_align_processor.hpp"
-#include "graphalign/graph_post_processor.hpp"
+#include "search/graph/graph.hpp"
+#include "search/graph/proteo_graph.hpp"
+#include "search/graphalign/graph_align_mng.hpp"
+#include "search/graphalign/graph_align_processor.hpp"
+#include "search/graphalign/graph_post_processor.hpp"
 
 #include "mcmc/mcmc_mng.hpp"
 #include "mcmc/mcmc_dpr_processor.hpp"
