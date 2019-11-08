@@ -12,13 +12,13 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_PRSM_VIEW_ANNO_PTM_HPP_
-#define TOPPIC_PRSM_VIEW_ANNO_PTM_HPP_
+#ifndef TOPPIC_VISUAL_ANNO_PTM_HPP_
+#define TOPPIC_VISUAL_ANNO_PTM_HPP_
 
 #include "common/xml/xml_dom_document.hpp"
 #include "common/base/ptm.hpp"
 #include "seq/alter_type.hpp"
-#include "prsmview/anno_ptm_position.hpp"
+#include "visual/anno_ptm_position.hpp"
 
 namespace toppic {
 

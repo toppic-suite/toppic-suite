@@ -12,39 +12,40 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_PRSM_VIEW_ANNO_PTM_POSITION_HPP_
-#define TOPPIC_PRSM_VIEW_ANNO_PTM_POSITION_HPP_
+#ifndef TOPPIC_VISUAL_ANNO_MASS_SHIFT_HPP_
+#define TOPPIC_VISUAL_ANNO_MASS_SHIFT_HPP_
 
-#include <memory>
 #include <string>
 #include <vector>
 
 #include "common/xml/xml_dom_document.hpp"
+#include "seq/alter_type.hpp"
 
 namespace toppic {
 
-class AnnoPtmPosition {
+class AnnoMassShift {
  public:
-  AnnoPtmPosition(int left_pos, int right_pos, std::string anno);
-
-  int getLeftPos() {return left_pos_;}
-
-  int getRightPos() {return right_pos_;}
-
-  std::string getAnno() {return anno_;}
+  AnnoMassShift(int id, int left_pos, int right_pos, 
+                const std::string & anno_str, 
+                AlterTypePtr & mass_shift_type);
 
   void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
 
  private:
+  int id_;
+
   int left_pos_;
-  
+
   int right_pos_;
 
-  std::string anno_;
+  std::string anno_str_;
+
+  AlterTypePtr mass_shift_type_;
 };
 
-typedef std::shared_ptr<AnnoPtmPosition> AnnoPtmPositionPtr;
-typedef std::vector<AnnoPtmPositionPtr> AnnoPtmPositionPtrVec;
+typedef std::shared_ptr<AnnoMassShift> AnnoMassShiftPtr;
+
+typedef std::vector<AnnoMassShiftPtr> AnnoMassShiftPtrVec;
 
 }  // namespace toppic
 

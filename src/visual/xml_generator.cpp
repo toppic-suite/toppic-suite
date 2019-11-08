@@ -27,10 +27,10 @@
 #include "prsm/prsm_util.hpp"
 #include "prsm/prsm_cluster.hpp"
 #include "prsm/prsm_xml_writer.hpp"
-#include "prsmview/anno_prsm.hpp"
-#include "prsmview/anno_file_list.hpp"
-#include "prsmview/anno_xml_util.hpp"
-#include "prsmview/xml_generator.hpp"
+#include "visual/anno_prsm.hpp"
+#include "visual/anno_file_list.hpp"
+#include "visual/anno_xml_util.hpp"
+#include "visual/xml_generator.hpp"
 
 namespace toppic {
 

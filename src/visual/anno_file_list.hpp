@@ -12,32 +12,29 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_PRSM_VIEW_ANNO_RESIDUE_HPP_
-#define TOPPIC_PRSM_VIEW_ANNO_RESIDUE_HPP_
+#ifndef TOPPIC_VISUAL_ANNO_FILE_LIST_HPP_
+#define TOPPIC_VISUAL_ANNO_FILE_LIST_HPP_
+
+#include <memory>
+#include <string>
+#include <vector>
 
 #include "common/xml/xml_dom_document.hpp"
-#include "common/base/residue.hpp"
-#include "seq/proteoform.hpp"
 
 namespace toppic {
 
-class AnnoResidue;
-typedef std::shared_ptr<AnnoResidue> AnnoResiduePtr;
-typedef std::vector<AnnoResiduePtr> AnnoResiduePtrVec;
-
-class AnnoResidue : public Residue {
+class AnnoFileList {
  public:
-  AnnoResidue(ResiduePtr residue_ptr, int pos);
+  std::vector<std::vector<std::string>> file_list_;
 
-  void appendViewXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
+  xercesc::DOMElement* geneFileList(XmlDOMDocument* xml_doc);
 
-  static AnnoResiduePtrVec getAnnoResidues(ProteoformPtr proteoform_ptr);
-
- private:
-  //residues position
-  int pos_ = 0;
+  static std::vector<std::vector<std::string>> readFromXml(const std::string &file_name);
 };
+
+typedef std::shared_ptr<AnnoFileList> AnnoFileListPtr;
+
 
 }  // namespace toppic
 
-#endif /* TOPPIC_PRSM_VIEW_ANNO_RESIDUE_HPP_ */
+#endif /* TOPPIC_VISUAL_ANNO_FILE_LIST_HPP_ */

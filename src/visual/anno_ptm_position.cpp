@@ -13,7 +13,7 @@
 //limitations under the License.
 
 #include "common/util/str_util.hpp"
-#include "prsmview/anno_ptm_position.hpp"
+#include "visual/anno_ptm_position.hpp"
 
 namespace toppic {
 

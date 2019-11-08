@@ -12,42 +12,32 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_PRSM_VIEW_ANNO_MASS_SHIFT_HPP_
-#define TOPPIC_PRSM_VIEW_ANNO_MASS_SHIFT_HPP_
-
-#include <string>
-#include <vector>
+#ifndef TOPPIC_VISUAL_ANNO_RESIDUE_HPP_
+#define TOPPIC_VISUAL_ANNO_RESIDUE_HPP_
 
 #include "common/xml/xml_dom_document.hpp"
-#include "seq/alter_type.hpp"
+#include "common/base/residue.hpp"
+#include "seq/proteoform.hpp"
 
 namespace toppic {
 
-class AnnoMassShift {
- public:
-  AnnoMassShift(int id, int left_pos, int right_pos, 
-                const std::string & anno_str, 
-                AlterTypePtr & mass_shift_type);
+class AnnoResidue;
+typedef std::shared_ptr<AnnoResidue> AnnoResiduePtr;
+typedef std::vector<AnnoResiduePtr> AnnoResiduePtrVec;
 
-  void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
+class AnnoResidue : public Residue {
+ public:
+  AnnoResidue(ResiduePtr residue_ptr, int pos);
+
+  void appendViewXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
+
+  static AnnoResiduePtrVec getAnnoResidues(ProteoformPtr proteoform_ptr);
 
  private:
-  int id_;
-
-  int left_pos_;
-
-  int right_pos_;
-
-  std::string anno_str_;
-
-  AlterTypePtr mass_shift_type_;
+  //residues position
+  int pos_ = 0;
 };
-
-typedef std::shared_ptr<AnnoMassShift> AnnoMassShiftPtr;
-
-typedef std::vector<AnnoMassShiftPtr> AnnoMassShiftPtrVec;
 
 }  // namespace toppic
 
-#endif
-
+#endif /* TOPPIC_VISUAL_ANNO_RESIDUE_HPP_ */

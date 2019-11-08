@@ -14,7 +14,7 @@
 
 #include "common/base/residue_util.hpp"
 #include "common/util/str_util.hpp"
-#include "prsmview/anno_residue.hpp"
+#include "visual/anno_residue.hpp"
 
 namespace toppic {
 

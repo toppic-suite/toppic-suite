@@ -13,7 +13,7 @@
 //limitations under the License.
 
 #include "common/xml/xml_dom_util.hpp"
-#include "prsmview/anno_file_list.hpp"
+#include "visual/anno_file_list.hpp"
 
 namespace toppic {
 

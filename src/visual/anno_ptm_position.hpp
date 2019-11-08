@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_PRSM_VIEW_ANNO_FILE_LIST_HPP_
-#define TOPPIC_PRSM_VIEW_ANNO_FILE_LIST_HPP_
+#ifndef TOPPIC_VISUAL_ANNO_PTM_POSITION_HPP_
+#define TOPPIC_VISUAL_ANNO_PTM_POSITION_HPP_
 
 #include <memory>
 #include <string>
@@ -23,18 +23,30 @@
 
 namespace toppic {
 
-class AnnoFileList {
+class AnnoPtmPosition {
  public:
-  std::vector<std::vector<std::string>> file_list_;
+  AnnoPtmPosition(int left_pos, int right_pos, std::string anno);
 
-  xercesc::DOMElement* geneFileList(XmlDOMDocument* xml_doc);
+  int getLeftPos() {return left_pos_;}
 
-  static std::vector<std::vector<std::string>> readFromXml(const std::string &file_name);
+  int getRightPos() {return right_pos_;}
+
+  std::string getAnno() {return anno_;}
+
+  void appendXml(XmlDOMDocument* xml_doc, xercesc::DOMElement* parent);
+
+ private:
+  int left_pos_;
+  
+  int right_pos_;
+
+  std::string anno_;
 };
 
-typedef std::shared_ptr<AnnoFileList> AnnoFileListPtr;
-
+typedef std::shared_ptr<AnnoPtmPosition> AnnoPtmPositionPtr;
+typedef std::vector<AnnoPtmPositionPtr> AnnoPtmPositionPtrVec;
 
 }  // namespace toppic
 
-#endif /* TOPPIC_PRSM_VIEW_ANNO_FILE_LIST_HPP_ */
+#endif
+

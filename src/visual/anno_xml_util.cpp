@@ -15,8 +15,8 @@
 #include <algorithm>
 
 #include "prsm/prsm_util.hpp"
-#include "prsmview/anno_prsm.hpp"
-#include "prsmview/anno_xml_util.hpp"
+#include "visual/anno_prsm.hpp"
+#include "visual/anno_xml_util.hpp"
 
 namespace toppic {
 

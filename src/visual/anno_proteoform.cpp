@@ -15,11 +15,11 @@
 #include <algorithm>
 
 #include "common/base/ptm_base.hpp"
-#include "prsmview/anno_cleavage.hpp"
-#include "prsmview/anno_ptm.hpp"
-#include "prsmview/anno_mass_shift.hpp"
-#include "prsmview/anno_residue.hpp"
-#include "prsmview/anno_proteoform.hpp"
+#include "visual/anno_cleavage.hpp"
+#include "visual/anno_ptm.hpp"
+#include "visual/anno_mass_shift.hpp"
+#include "visual/anno_residue.hpp"
+#include "visual/anno_proteoform.hpp"
 
 namespace toppic {
 

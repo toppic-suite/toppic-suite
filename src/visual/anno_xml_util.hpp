@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_PRSM_VIEW_ANNO_XML_UTIL_HPP_
-#define TOPPIC_PRSM_VIEW_ANNO_XML_UTIL_HPP_
+#ifndef TOPPIC_VISUAL_ANNO_XML_UTIL_HPP_
+#define TOPPIC_VISUAL_ANNO_XML_UTIL_HPP_
 
 #include <map>
 #include <string>
@@ -22,7 +22,7 @@
 #include "common/xml/xml_dom_document.hpp"
 #include "common/xml/xml_writer.hpp"
 #include "prsm/prsm.hpp"
-#include "prsmview/prsm_view_mng.hpp"
+#include "visual/prsm_view_mng.hpp"
 
 namespace toppic {
 
@@ -55,4 +55,4 @@ xercesc::DOMElement* geneXmlForProteinList(XmlDOMDocument* xml_doc,
 
 }  // namespace toppic
 
-#endif /* TOPPIC_PRSM_VIEW_ANNO_XML_UTIL_HPP_ */
+#endif /* TOPPIC_VISUAL_ANNO_XML_UTIL_HPP_ */
