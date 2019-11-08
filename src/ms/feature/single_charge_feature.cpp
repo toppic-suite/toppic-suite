@@ -58,7 +58,7 @@ void SingleChargeFeature::appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement *pa
   str = str_util::toString(intensity_);
   xml_doc->addElement(element, "intensity", str.c_str());
   str = str_util::toString(env_num_);
-  xml_doc->addElement(element, "ms/envelope_num", str.c_str());
+  xml_doc->addElement(element, "envelope_num", str.c_str());
   parent->appendChild(element);
 }
 
