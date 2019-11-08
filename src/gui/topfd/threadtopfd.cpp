@@ -12,9 +12,10 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include "console/topfd_process.hpp"
+#include "topfd/common/topfd_para.hpp"
+#include "topfd/common/topfd_process.hpp"
 #include "gui/topfd/threadtopfd.h"
 
 void ThreadTopFD::run() {
-  toppic::topfd_process::process(arguments_, spec_file_lst_);
+  toppic::topfd_process::process(para_ptr_, spec_file_lst_);
 }
