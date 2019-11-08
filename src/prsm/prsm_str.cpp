@@ -130,7 +130,7 @@ void PrsmStr::setFileName(const std::string & fname) {
 }
 
 void PrsmStr::setSpectrumId(int id) {
-  int i = getXmlLineIndex(str_vec_, "ms/spectrum_id");
+  int i = getXmlLineIndex(str_vec_, "spectrum_id");
   str_vec_[i] = "<spectrum_id>" + str_util::toString(id) + "</spectrum_id>";
   spectrum_id_ = id;
 }

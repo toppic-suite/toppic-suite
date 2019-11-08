@@ -72,11 +72,11 @@ bool Argument::parse(int argc, char* argv[]) {
         ("mz-error,e", po::value<std::string> (&mz_error), "")
         ("ms-two-sn-ratio,t", po::value<std::string> (&ms_two_sn_ratio), "")
         ("keep,k", "Report monoisotopic masses extracted from low quality isotopic envelopes.")
-        ("ms/spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), "Spectrum file name with its path.")
+        ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), "Spectrum file name with its path.")
         ;
 
     po::positional_options_description positional_options;
-    positional_options.add("ms/spectrum-file-name", -1);
+    positional_options.add("spectrum-file-name", -1);
 
     po::variables_map vm;
     try {
@@ -125,8 +125,8 @@ bool Argument::parse(int argc, char* argv[]) {
       arguments_["msTwoSnRatio"] = ms_two_sn_ratio;
     }
 
-    if (vm.count("ms/spectrum-file-name")) {
-      spec_file_list_ = vm["ms/spectrum-file-name"].as<std::vector<std::string> >(); 
+    if (vm.count("spectrum-file-name")) {
+      spec_file_list_ = vm["spectrum-file-name"].as<std::vector<std::string> >(); 
     }
 
   }

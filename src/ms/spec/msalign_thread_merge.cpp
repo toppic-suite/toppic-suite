@@ -73,7 +73,7 @@ void MsalignThreadMerge::process() {
   int spec_id = 0;
   bool finish = false;
   while (!finish) {
-    // LOG_DEBUG("ms/spec id " << spec_id << " input num " << input_num);
+    // LOG_DEBUG("spec id " << spec_id << " input num " << input_num);
     finish = true;
     int cur_ms_idx = getCurMsIndex(ms_ptrs);
     if (cur_ms_idx < 0) {

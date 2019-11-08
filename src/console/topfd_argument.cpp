@@ -79,12 +79,12 @@ bool Argument::parse(int argc, char* argv[]) {
         ("keep,k", "Report monoisotopic masses extracted from low quality isotopic envelopes.")
         ("merged-file-name,f", po::value<std::string> (&merged_file_name), 
          "Merge deconvoluted files and specify the name of the merged file.")
-        ("ms/spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), 
+        ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), 
          "Spectrum file name with its path.")
         ;
 
     po::positional_options_description positional_options;
-    positional_options.add("ms/spectrum-file-name", -1);
+    positional_options.add("spectrum-file-name", -1);
 
     po::variables_map vm;
     try {
@@ -154,8 +154,8 @@ bool Argument::parse(int argc, char* argv[]) {
       topfd_para_ptr_->merged_file_name_ = merged_file_name;
     }
 
-    if (vm.count("ms/spectrum-file-name")) {
-      spec_file_list_ = vm["ms/spectrum-file-name"].as<std::vector<std::string> >(); 
+    if (vm.count("spectrum-file-name")) {
+      spec_file_list_ = vm["spectrum-file-name"].as<std::vector<std::string> >(); 
     }
 
   }
