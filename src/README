@@ -1,21 +1,17 @@
 /common/base/   Amino acids, ptms, residues and etc 
 /common/util/  	String utilities, file utilities, and etc
 /common/xml/   	Functions for handling xml files   
-/console/	      Main functions for topfd, toppic, and topmg
-/feature/       Spectrum, fraction, and sample-level features
-/filter/	      Various filtering methods
-/graph/		      Mass graphs
-/graphalign/	  Graph alignment algorithms
-/gui/		        GUI for topfd, toppic, and topmg
-/local/		      Charaterization and localization of mass shifts
+/console/	      Main functions for topfd, toppic, topmg, and topmerge
+/filter/	      Various protein sequence filtering methods
+/gui/		        GUI for topfd, toppic, topmg, and topmerge
 /merge/         Merging proteoform identifications from several samples
-/mcmc/		      An Markov chain Monte Carlo method for E-value estimation
-/oneptmsearch/	Search algorithm allowing one unknown mass shift in a proteoform spectrum match
+/ms/            Mass spectra, envelops, and features
 /prsm/		      Proteoform spectrum matches and related functions
-/ptmsearch/	    Search algorithm allowing two unknown mass shifts in a proteoform spectrum match
-/ptmview/	      Functions for visualization of proteoform spectrum matches
+/search/        Various database search algorithms
 /seq/     	    Fasta sequences and proteoforms
 /spec/    	    Various peaks and spectrum classes
+/stat/local/		Charaterization and localization of mass shifts
+/stat/mcmc/		  An Markov chain Monte Carlo method for E-value estimation
+/stat/tdgf/		  A generation function method for E-value estimation
 /suffix/  	    Suffix tree used in the manuscript Deng et al, Bioinformatics 31, 532-538
-/tdgf/		      A generation function method for E-value estimation
-/zeroptmsearch/	Search algorithm allowing no unknown mass shifts
+/visual/	      Functions for visualization of proteoform spectrum matches
