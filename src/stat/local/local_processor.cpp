@@ -40,8 +40,8 @@
 #include "prsm/peak_ion_pair.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
 
-#include "local_processor.hpp"
-#include "local_util.hpp"
+#include "stat/local/local_processor.hpp"
+#include "stat/local/local_util.hpp"
 
 namespace toppic {
 

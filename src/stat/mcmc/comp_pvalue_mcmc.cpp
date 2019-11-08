@@ -19,7 +19,7 @@
 #include "common/base/residue_util.hpp"
 #include "prsm/prsm_algo.hpp"
 
-#include "mcmc/comp_pvalue_mcmc.hpp"
+#include "stat/mcmc/comp_pvalue_mcmc.hpp"
 
 namespace toppic {
 

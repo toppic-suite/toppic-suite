@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_LOCAL_MNG_HPP_
-#define TOPPIC_LOCAL_MNG_HPP_
+#ifndef TOPPIC_STAT_LOCAL_MNG_HPP_
+#define TOPPIC_STAT_LOCAL_MNG_HPP_
 
 
 #include <string>
@@ -82,4 +82,4 @@ typedef std::shared_ptr<LocalMng> LocalMngPtr;
 
 }  // namespace toppic
 
-#endif /* TOPPIC_LOCAL_MNG_HPP_ */
+#endif /* TOPPIC_STAT_LOCAL_MNG_HPP_ */

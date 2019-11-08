@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_TDGF_TDGF_MNG_HPP_
-#define TOPPIC_TDGF_TDGF_MNG_HPP_
+#ifndef TOPPIC_STAT_TDGF_TDGF_MNG_HPP_
+#define TOPPIC_STAT_TDGF_TDGF_MNG_HPP_
 
 
 #include <string>

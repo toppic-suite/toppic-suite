@@ -27,7 +27,7 @@
 #include "prsm/prsm_str_merge.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_xml_writer_util.hpp"
-#include "tdgf/evalue_processor.hpp"
+#include "stat/tdgf/evalue_processor.hpp"
 
 
 namespace toppic {

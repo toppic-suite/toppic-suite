@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_LOCAL_UTIL_HPP_
-#define TOPPIC_LOCAL_UTIL_HPP_
+#ifndef TOPPIC_STAT_LOCAL_UTIL_HPP_
+#define TOPPIC_STAT_LOCAL_UTIL_HPP_
 
 #include <vector>
 
@@ -26,7 +26,7 @@
 #include "prsm/prsm.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
 
-#include "local/local_mng.hpp"
+#include "stat/local/local_mng.hpp"
 
 namespace toppic {
 

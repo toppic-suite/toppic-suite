@@ -21,7 +21,7 @@
 
 #include "common/base/residue_util.hpp"
 
-#include "mcmc/mcmc_mass_table_util.hpp"
+#include "stat/mcmc/mcmc_mass_table_util.hpp"
 
 namespace toppic {
 namespace mass_table_util {

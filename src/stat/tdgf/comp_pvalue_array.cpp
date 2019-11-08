@@ -22,7 +22,7 @@
 #include "common/base/mass_constant.hpp"
 #include "spec/deconv_ms_util.hpp"
 #include "spec/prm_ms_factory.hpp"
-#include "tdgf/comp_pvalue_array.hpp"
+#include "stat/tdgf/comp_pvalue_array.hpp"
 
 namespace toppic {
 

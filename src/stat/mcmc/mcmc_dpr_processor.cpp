@@ -40,12 +40,12 @@
 #include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_xml_writer_util.hpp"
 
-#include "tdgf/tdgf_mng.hpp"
-#include "tdgf/count_test_num.hpp"
+#include "stat/tdgf/tdgf_mng.hpp"
+#include "stat/tdgf/count_test_num.hpp"
 
-#include "mcmc/mcmc_dpr_processor.hpp"
-#include "mcmc/comp_pvalue_mcmc.hpp"
-#include "mcmc/mcmc_mass_table_util.hpp"
+#include "stat/mcmc/mcmc_dpr_processor.hpp"
+#include "stat/mcmc/comp_pvalue_mcmc.hpp"
+#include "stat/mcmc/mcmc_mass_table_util.hpp"
 
 namespace toppic {
 

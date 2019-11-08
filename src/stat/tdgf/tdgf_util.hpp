@@ -13,15 +13,15 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_TDGF_TDGF_UTIL_HPP_
-#define TOPPIC_TDGF_TDGF_UTIL_HPP_
+#ifndef TOPPIC_STAT_TDGF_TDGF_UTIL_HPP_
+#define TOPPIC_STAT_TDGF_TDGF_UTIL_HPP_
 
 #include <vector>
 #include <string>
 
 #include "seq/proteoform.hpp"
 #include "common/base/residue_freq.hpp"
-#include "tdgf/tdgf_mng.hpp"
+#include "stat/tdgf/tdgf_mng.hpp"
 
 namespace toppic {
 

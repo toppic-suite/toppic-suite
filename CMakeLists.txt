@@ -86,8 +86,8 @@ file(GLOB ZERO_PTM_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/search/zeroptmsearch/*.
 file(GLOB ONE_PTM_SEARCH_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/search/oneptmsearch/*.cpp)
 file(GLOB PTM_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/search/ptmsearch/*.cpp)
 
-file(GLOB TDGF_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/tdgf/*.cpp)
-file(GLOB LOCAL_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/local/*.cpp)
+file(GLOB TDGF_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/stat/tdgf/*.cpp)
+file(GLOB LOCAL_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/stat/local/*.cpp)
 file(GLOB PRSM_VIEW_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/prsmview/*.cpp)
 
 # toppic console main
@@ -107,7 +107,7 @@ file(GLOB TOPMG_FILTER_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/massmatch/*.
 file(GLOB GRAPH_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/search/graph/*.cpp)
 file(GLOB GRAPH_ALIGN_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/search/graphalign/*.cpp)
 
-file(GLOB MCMC_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/mcmc/*.cpp)
+file(GLOB MCMC_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/stat/mcmc/*.cpp)
 
 # topmg console main
 file(GLOB TOPMG_PROC_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmg_process.cpp
