@@ -17,7 +17,7 @@
 #include <string>
 
 #include "common/base/residue_util.hpp"
-#include "tdgf/tdgf_util.hpp"
+#include "stat/tdgf/tdgf_util.hpp"
 
 namespace toppic {
 

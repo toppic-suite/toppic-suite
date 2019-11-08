@@ -18,7 +18,7 @@
 
 #include "common/util/logger.hpp"
 #include "spec/prm_peak_factory.hpp"
-#include "tdgf/comp_prob_value.hpp"
+#include "stat/tdgf/comp_prob_value.hpp"
 
 namespace toppic {
 

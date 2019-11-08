@@ -20,7 +20,7 @@
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/str_util.hpp"
-#include "tdgf/comp_pvalue_lookup_table.hpp"
+#include "stat/tdgf/comp_pvalue_lookup_table.hpp"
 
 namespace toppic {
 

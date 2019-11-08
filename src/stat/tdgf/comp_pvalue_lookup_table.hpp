@@ -13,15 +13,15 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_TDGF_COMP_PVALUE_LOOKUP_TABLE_HPP_
-#define TOPPIC_TDGF_COMP_PVALUE_LOOKUP_TABLE_HPP_
+#ifndef TOPPIC_STAT_TDGF_COMP_PVALUE_LOOKUP_TABLE_HPP_
+#define TOPPIC_STAT_TDGF_COMP_PVALUE_LOOKUP_TABLE_HPP_
 
 #include <vector>
 #include <fstream>
 
-#include "tdgf/tdgf_mng.hpp"
-#include "tdgf/comp_prob_value.hpp"
-#include "tdgf/count_test_num.hpp"
+#include "stat/tdgf/tdgf_mng.hpp"
+#include "stat/tdgf/comp_prob_value.hpp"
+#include "stat/tdgf/count_test_num.hpp"
 
 namespace toppic {
 

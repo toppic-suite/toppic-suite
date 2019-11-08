@@ -57,8 +57,8 @@
 #include "search/graphalign/graph_align_processor.hpp"
 #include "search/graphalign/graph_post_processor.hpp"
 
-#include "mcmc/mcmc_mng.hpp"
-#include "mcmc/mcmc_dpr_processor.hpp"
+#include "stat/mcmc/mcmc_mng.hpp"
+#include "stat/mcmc/mcmc_dpr_processor.hpp"
 
 #include "prsmview/xml_generator.hpp"
 #include "prsmview/json_transformer.hpp"

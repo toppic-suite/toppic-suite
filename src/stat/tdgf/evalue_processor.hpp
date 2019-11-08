@@ -13,15 +13,15 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_TDGF_EVALUE_PROCESSOR_HPP_
-#define TOPPIC_TDGF_EVALUE_PROCESSOR_HPP_
+#ifndef TOPPIC_STAT_TDGF_EVALUE_PROCESSOR_HPP_
+#define TOPPIC_STAT_TDGF_EVALUE_PROCESSOR_HPP_
 
 #include "seq/proteoform.hpp"
 #include "prsm/prsm.hpp"
 #include "prsm/prsm_xml_writer.hpp"
-#include "tdgf/tdgf_mng.hpp"
-#include "tdgf/comp_pvalue_array.hpp"
-#include "tdgf/comp_pvalue_lookup_table.hpp"
+#include "stat/tdgf/tdgf_mng.hpp"
+#include "stat/tdgf/comp_pvalue_array.hpp"
+#include "stat/tdgf/comp_pvalue_lookup_table.hpp"
 
 namespace toppic {
 

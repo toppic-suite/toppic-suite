@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_COMP_PVALUE_MCMC_HPP_
-#define TOPPIC_COMP_PVALUE_MCMC_HPP_
+#ifndef TOPPIC_STAT_MCMC_COMP_PVALUE_MCMC_HPP_
+#define TOPPIC_STAT_MCMC_COMP_PVALUE_MCMC_HPP_
 
 #include <random>
 #include <map>
@@ -22,10 +22,8 @@
 #include <algorithm>
 
 #include "common/base/activation.hpp"
-
 #include "prsm/prsm.hpp"
-
-#include "mcmc_mng.hpp"
+#include "stat/mcmc/mcmc_mng.hpp"
 
 namespace toppic {
 

@@ -21,9 +21,9 @@
 #include "common/base/residue_base.hpp"
 #include "common/base/residue_util.hpp"
 #include "seq/proteoform_factory.hpp"
-#include "tdgf/tdgf_util.hpp"
-#include "tdgf/count_test_num.hpp"
-#include "tdgf/comp_prob_value.hpp"
+#include "stat/tdgf/tdgf_util.hpp"
+#include "stat/tdgf/count_test_num.hpp"
+#include "stat/tdgf/comp_prob_value.hpp"
 
 namespace toppic {
 

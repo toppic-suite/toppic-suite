@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_MCMC_MASS_TABLE_UTIL_HPP_
-#define TOPPIC_MCMC_MASS_TABLE_UTIL_HPP_
+#ifndef TOPPIC_STAT_MCMC_MASS_TABLE_UTIL_HPP_
+#define TOPPIC_STAT_MCMC_MASS_TABLE_UTIL_HPP_
 
 #include <vector>
 #include <set>
@@ -24,7 +24,7 @@
 
 #include "spec/sp_para.hpp"
 
-#include "mcmc/mcmc_mng.hpp"
+#include "stat/mcmc/mcmc_mng.hpp"
 
 namespace toppic {
 namespace mass_table_util {

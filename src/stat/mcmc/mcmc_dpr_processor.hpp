@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_MCMC_DPR_PROCESSOR_HPP_
-#define TOPPIC_MCMC_DPR_PROCESSOR_HPP_
+#ifndef TOPPIC_STAT_MCMC_DPR_PROCESSOR_HPP_
+#define TOPPIC_STAT_MCMC_DPR_PROCESSOR_HPP_
 
 
 #include <random>
@@ -31,10 +31,10 @@
 #include "prsm/prsm.hpp"
 #include "prsm/prsm_xml_writer.hpp"
 
-#include "tdgf/count_test_num.hpp"
-#include "tdgf/comp_pvalue_lookup_table.hpp"
+#include "stat/tdgf/count_test_num.hpp"
+#include "stat/tdgf/comp_pvalue_lookup_table.hpp"
 
-#include "mcmc/mcmc_mng.hpp"
+#include "stat/mcmc/mcmc_mng.hpp"
 
 namespace toppic {
 

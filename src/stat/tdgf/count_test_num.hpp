@@ -13,12 +13,12 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_TDGF_COUNT_TEST_NUM_HPP_
-#define TOPPIC_TDGF_COUNT_TEST_NUM_HPP_
+#ifndef TOPPIC_STAT_TDGF_COUNT_TEST_NUM_HPP_
+#define TOPPIC_STAT_TDGF_COUNT_TEST_NUM_HPP_
 
 #include "seq/proteoform.hpp"
 #include "common/base/residue_freq.hpp"
-#include "tdgf/tdgf_mng.hpp"
+#include "stat/tdgf/tdgf_mng.hpp"
 
 namespace toppic {
 

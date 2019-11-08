@@ -31,8 +31,8 @@
 #include "prsm/theo_peak_util.hpp"
 #include "spec/extend_ms.hpp"
 
-#include "local/local_mng.hpp"
-#include "local/local_util.hpp"
+#include "stat/local/local_mng.hpp"
+#include "stat/local/local_util.hpp"
 
 namespace toppic {
 

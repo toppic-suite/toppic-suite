@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_LOCAL_PROCESSOR_HPP_
-#define TOPPIC_LOCAL_PROCESSOR_HPP_
+#ifndef TOPPIC_STAT_LOCAL_PROCESSOR_HPP_
+#define TOPPIC_STAT_LOCAL_PROCESSOR_HPP_
 
 #include <vector>
 
@@ -23,8 +23,8 @@
 #include "prsm/prsm_xml_writer.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "spec/theo_peak.hpp"
-#include "tdgf/tdgf_mng.hpp"
-#include "local_mng.hpp"
+#include "stat/tdgf/tdgf_mng.hpp"
+#include "stat/local/local_mng.hpp"
 
 namespace toppic {
 

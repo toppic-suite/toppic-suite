@@ -50,14 +50,13 @@
 
 #include "filter/diag/diag_filter_mng.hpp"
 #include "filter/diag/diag_filter_processor.hpp"
-
 #include "search/ptmsearch/ptm_search_processor.hpp"
 
-#include "tdgf/tdgf_mng.hpp"
-#include "tdgf/evalue_processor.hpp"
+#include "stat/tdgf/tdgf_mng.hpp"
+#include "stat/tdgf/evalue_processor.hpp"
 
-#include "local/local_mng.hpp"
-#include "local/local_processor.hpp"
+#include "stat/local/local_mng.hpp"
+#include "stat/local/local_processor.hpp"
 
 #include "prsmview/xml_generator.hpp"
 #include "prsmview/json_transformer.hpp"
