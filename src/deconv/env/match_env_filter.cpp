@@ -32,7 +32,7 @@ namespace toppic {
 		MatchEnvPtrVec low_mass_envs;
 		MatchEnvPtrVec high_mass_envs;
 		if (ms_level_ > 1) 
-			std::sort(ori_envs.begin(), ori_envs.end(), MatchEnv::cmpScoreDec);
+		 	std::sort(ori_envs.begin(), ori_envs.end(), MatchEnv::cmpScoreDec);
 		else
 			std::sort(ori_envs.begin(), ori_envs.end(), MatchEnv::cmpScoreDec_topfd);
 		
@@ -55,25 +55,24 @@ namespace toppic {
 		result.insert(std::end(result), std::begin(low_mass_envs), std::end(low_mass_envs));
 		result.insert(std::end(result), std::begin(high_mass_envs), std::end(high_mass_envs));
 		if (ms_level_ > 1) 
-			std::sort(ori_envs.begin(), ori_envs.end(), MatchEnv::cmpScoreDec);
+			std::sort(result.begin(), result.end(), MatchEnv::cmpScoreDec);
 		else
-			std::sort(ori_envs.begin(), ori_envs.end(), MatchEnv::cmpScoreDec_topfd);
+			std::sort(result.begin(), result.end(), MatchEnv::cmpScoreDec_topfd);
 		
 		return result;
 	}
 	
 	MatchEnvPtrVec MatchEnvFilter::filter_using_cnn(MatchEnvPtrVec &ori_envs, PeakPtrVec &peak_list) {
-		
 		// Compute baseline intensity
 		std::vector<double> intes;
 		for (size_t i = 0; i < peak_list.size(); i++) {
 			intes.push_back(peak_list[i]->getIntensity());
 		}
 		double baseline_intensity = baseline_util::getBaseLine(intes);
-		std::sort(ori_envs.begin(), ori_envs.end(), MatchEnv::cmpScoreDec);
-		
+		std::sort(ori_envs.begin(), ori_envs.end(), MatchEnv::cmpScoreDec_topfd);
+				
 		// Load model and initialize the tensor for evaluation
-		const auto model = fdeep::load_model("/data/abbash/TopFD_Variants/proteomics_cpp_Deep/my_model.json");
+		const auto model = fdeep::load_model("/data/abbash/TopFD_Variants/Version_1_TopFd/proteomics_cpp_Deep_v2/toppic_resources/my_model.json");
 		std::vector<fdeep::tensor5> tensors;
 
 		// Compute prediction Score
@@ -90,9 +89,7 @@ namespace toppic {
 			std::vector<double> theo_mass;
 			std::vector<double> theo_intes;
 			for (int i = 0; i < theo_env->getPeakNum(); i++) {
-				double temp_mz = theo_env->getMz(i);
-				temp_mz = round(temp_mz * 1000)/1000;
-				theo_mass.push_back(temp_mz);
+				theo_mass.push_back(theo_env->getMz(i));
 				theo_intes.push_back(theo_env->getIntensity(i));
 			}
 
@@ -108,7 +105,6 @@ namespace toppic {
 			std::vector<double> peak_intes;
 			for (size_t k = 0; k < peak_list.size(); k++) {
 				double temp_mz = peak_list[k]->getPosition();
-				temp_mz = round(temp_mz * 1000)/1000;
 				if (temp_mz >= real_mono_mz - 5 && temp_mz <= real_mono_mz + 5) {
 					if ((temp_mz >= min_theo_mass - 0.1) && (temp_mz <= max_theo_mass + 0.1)){
 						peak_mass.push_back(temp_mz);
@@ -135,7 +131,7 @@ namespace toppic {
 
 			// min theoretical mass for computing the bin index in the matrix
 			double min_mz = theo_mono_mz - 0.1;
-			min_mz = floor(min_mz * 100)/100;
+			//min_mz = floor(min_mz * 100)/100;
 			
 			// Extract feature, compute bin index and populate the matrix
 			for (size_t k = 0; k < theo_mass.size(); k++) {
@@ -182,10 +178,21 @@ namespace toppic {
 			/// Note: Case where we have already added an experimental peak with the noise!
 			for (size_t exp_id = 0; exp_id < peak_mass.size(); exp_id++) {
 				double exp_peak = peak_mass[exp_id];
-      			int bin_index = int((exp_peak - min_mz) * 100);	
-      			if ((bin_index > -1) && (bin_index < 300))
-					if (matrix[bin_index][1] == 0)
-        				matrix[bin_index][1] = (peak_intes[exp_id] / max_inte);
+      			int bin_index = int((exp_peak - min_mz) * 100);
+				// Evaluate Peak Condition
+      			bool peak_condition = 0;
+	  			for (int i = 0; i < 3; i++) {
+					// to accomodate +2 and -2 bins - reason tolerance of 0.02
+       				if ((bin_index + i < 300) && (bin_index - i > -1) && (matrix[bin_index][1] == 0))
+        				if ((matrix[bin_index - i][1] == 0) && (matrix[bin_index + i][1] == 0))
+          					peak_condition = 1;
+        				else{
+          					peak_condition = 0;
+							break;
+						}
+				}
+	  			if (peak_condition == 1)
+        			matrix[bin_index][1] = (peak_intes[exp_id] / max_inte);
 			}
 
 			// Initilize a tensor5 element and copy the values into tensor5
@@ -201,8 +208,8 @@ namespace toppic {
 			ori_envs[i]->setPredictionScore(pred_score);
 			
 			// Print Stats
-			/*
-			std::cout << std::endl << "***********************************************" << std::endl;
+			
+			/*std::cout << std::endl << std::endl << "***********************************************" << std::endl;
 			std::cout << std::setprecision(17);
 			
 			std::cout << "Experimental Peak: ";
@@ -215,45 +222,16 @@ namespace toppic {
 				std::cout <<  theo_mass[id] << ", ";
 			std::cout << std::endl;	
 
-			std::cout << "Theo Mass: " << theo_mono_mass << std::endl;
+			std::cout << "Monoisotopic MZ: " << real_mono_mz << std::endl;
+			std::cout << "Monoisotopic Mass: " << theo_mono_mass << std::endl;
 			std::cout << "Pred Score: " << pred_score << std::endl;
-			std::cout << "**** Matrix "****" << std::endl;
+			std::cout << "**** Matrix ****" << std::endl;
 			for (int i = 0; i < matrix.size(); i++) {
 			   for (int j = 0; j < matrix[i].size(); j++)
 				   std::cout << matrix[i][j] << " ";
 			   std::cout << std::endl;
 		   }*/
 		}
-		
-		// Initialize and save filtered match_envs
-		MatchEnvPtrVec result;
-		for (size_t i = 0; i < ori_envs.size(); i++) {
-			result.push_back(ori_envs[i]);
-		}
-		return result;
+		return ori_envs;
 	}
 }
-
-
-/*
-int bin_index_arr [] = {19, 28, 37, 46, 55, 64, 65, 74, 83};
-float theo_peak_intensity_arr [] = {0, 0.551055750438194, 0.845421891738609, 1.000000000000000, 0.970464194107775, 0, 0.803257224077691, 0.582225303001659, 0.376671964673729};
-float exp_peak_intensity_arr [] = {0.2469058, 0.264200175977855, 0.869659690568380, 0.950917582148283, 1.136074760247670, 0.791989039893759, 0.791989039893759, 0.497627566440976, 0.291054303405428};
-int charge_arr [] = {0, 11, 11, 11, 11, 0, 11, 11, 11};
-float mass_diff_arr [] = {0, -0.001999999999953, 0.002000000000066, 0.000000000000000, 0.000000000000000, 0, 0.000999999999976, 0.000000000000000, 0.000999999999976};
-float inte_diff_arr [] = {0, 0.286855574460338, -0.024237798829771, 0.049082417851717, -0.165610566139900, 0, 0.011268184183932, 0.084597736560683, 0.085617661268301};
-float log_theo_inte_arr [] = {0, 2.631913324299760, 2.631913324299760, 2.631913324299760, 2.631913324299760, 0, 2.631913324299760, 2.631913324299760, 2.631913324299760};
-float log_base_inte_arr [] = {0, 1.698970004336010, 1.698970004336010, 1.698970004336010, 1.698970004336010, 0, 1.698970004336010, 1.698970004336010, 1.698970004336010};
-
-for (size_t k = 0; k < 9; k++) {
-	int bin_index = bin_index_arr[k];
-	if (bin_index < 300 && bin_index >= 0 ){
-		matrix[bin_index][0] = theo_peak_intensity_arr[k];
-		matrix[bin_index][1] = exp_peak_intensity_arr[k];
-		matrix[bin_index][2] = charge_arr[k];
-		matrix[bin_index][3] = mass_diff_arr[k];
-		matrix[bin_index][4] = inte_diff_arr[k];
-		matrix[bin_index][5] = log_theo_inte_arr[k];
-		matrix[bin_index][6] = log_base_inte_arr[k];
-	}
-} */
