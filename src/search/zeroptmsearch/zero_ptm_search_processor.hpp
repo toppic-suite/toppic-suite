@@ -15,7 +15,7 @@
 #ifndef TOPPIC_SEARCH_ZERO_PTM_SEARCH_ZERO_PTM_SEARCH_HPP_
 #define TOPPIC_SEARCH_ZERO_PTM_SEARCH_ZERO_PTM_SEARCH_HPP_
 
-#include "spec/spectrum_set.hpp"
+#include "ms/spec/spectrum_set.hpp"
 #include "prsm/simple_prsm.hpp"
 #include "search/zeroptmsearch/zero_ptm_search_mng.hpp"
 

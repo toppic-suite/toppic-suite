@@ -16,8 +16,8 @@
 #ifndef TOPPIC_SEARCH_ZERO_PTM_SEARCH_ZERO_PTM_SLOW_MATCH_HPP_
 #define TOPPIC_SEARCH_ZERO_PTM_SEARCH_ZERO_PTM_SLOW_MATCH_HPP_
 
-#include "spec/deconv_peak.hpp"
-#include "spec/theo_peak.hpp"
+#include "ms/spec/deconv_peak.hpp"
+#include "ms/spec/theo_peak.hpp"
 #include "prsm/prsm.hpp"
 #include "search/zeroptmsearch/zero_ptm_search_mng.hpp"
 #include "search/zeroptmsearch/zero_ptm_fast_match.hpp"

@@ -14,7 +14,7 @@
 
 #include <algorithm>
 
-#include "spec/prm_ms.hpp"
+#include "ms/spec/prm_ms.hpp"
 #include "prsm/simple_prsm_util.hpp"
 #include "filter/massmatch/filter_protein.hpp"
 #include "filter/massmatch/mass_match_factory.hpp"

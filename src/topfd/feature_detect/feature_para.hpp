@@ -16,8 +16,8 @@
 #define TOPPIC_TOPFD_FEATURE_DETECT_FEATURE_PARA_HPP_
 
 #include <vector>
-#include "spec/peak_tolerance.hpp"
-#include "feature/peak_cluster_score.hpp"
+#include "ms/spec/peak_tolerance.hpp"
+#include "ms/feature/peak_cluster_score.hpp"
 
 namespace toppic {
 

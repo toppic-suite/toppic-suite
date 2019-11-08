@@ -21,8 +21,8 @@
 #include "seq/proteoform.hpp"
 #include "seq/proteoform_factory.hpp"
 
-#include "spec/msalign_util.hpp"
-#include "spec/spectrum_set.hpp"
+#include "ms/spec/msalign_util.hpp"
+#include "ms/spec/spectrum_set.hpp"
 
 #include "prsm/simple_prsm_xml_writer_set.hpp"
 #include "prsm/simple_prsm_str_merge.hpp"

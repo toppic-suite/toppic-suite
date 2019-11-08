@@ -19,10 +19,10 @@
 #include <vector>
 
 #include "seq/proteoform.hpp"
-#include "spec/rm_break_type.hpp"
-#include "spec/extend_peak.hpp"
-#include "spec/theo_peak.hpp"
-#include "spec/extend_ms.hpp"
+#include "ms/spec/rm_break_type.hpp"
+#include "ms/spec/extend_peak.hpp"
+#include "ms/spec/theo_peak.hpp"
+#include "ms/spec/extend_ms.hpp"
 #include "prsm/peak_ion_pair.hpp"
 
 

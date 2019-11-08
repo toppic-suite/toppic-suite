@@ -19,9 +19,9 @@
 #include <vector>
 
 #include "common/xml/xml_dom_element.hpp"
-#include "spec/ms_header.hpp"
-#include "spec/extend_peak.hpp"
-#include "spec/theo_peak.hpp"
+#include "ms/spec/ms_header.hpp"
+#include "ms/spec/extend_peak.hpp"
+#include "ms/spec/theo_peak.hpp"
 
 namespace toppic {
 

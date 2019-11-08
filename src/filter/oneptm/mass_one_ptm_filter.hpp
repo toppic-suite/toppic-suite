@@ -16,7 +16,7 @@
 #define TOPPIC_FILTER_ONE_PTM_MASS_ONE_PTM_FILTER_H_
 
 #include "seq/proteoform.hpp"
-#include "spec/prm_ms.hpp"
+#include "ms/spec/prm_ms.hpp"
 #include "prsm/simple_prsm.hpp"
 #include "filter/massmatch/mass_match.hpp"
 #include "filter/oneptm/one_ptm_filter_mng.hpp"

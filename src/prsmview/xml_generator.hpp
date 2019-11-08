@@ -25,7 +25,7 @@
 #include "seq/proteoform.hpp"
 #include "seq/fasta_reader.hpp"
 #include "common/xml/xml_writer.hpp"
-#include "spec/msalign_reader.hpp"
+#include "ms/spec/msalign_reader.hpp"
 #include "prsm/prsm.hpp"
 #include "prsmview/prsm_view_mng.hpp"
 #include "prsmview/anno_file_list.hpp"

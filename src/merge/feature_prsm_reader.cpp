@@ -40,7 +40,7 @@ FeaturePrsmPtr FeaturePrsmReader::readOneFeature() {
     str_util::trim(line);
     //std::cout << "line " << line << std::endl;
     FeaturePrsmPtr feature = std::make_shared<FeaturePrsm>(line);
-    //std::cout << "feature created " << std::endl;
+    //std::cout << "ms/feature created " << std::endl;
     return feature;
   }
   else {

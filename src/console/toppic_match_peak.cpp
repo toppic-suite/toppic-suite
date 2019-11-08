@@ -40,7 +40,7 @@ int outputMatchPeaks(std::map<std::string, std::string> arguments) {
     LOG_DEBUG("Init base data completed");
 
     std::string db_file_name = arguments["databaseFileName"];
-    std::string sp_file_name = arguments["spectrumFileName"];
+    std::string sp_file_name = arguments["ms/spectrumFileName"];
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
 
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);

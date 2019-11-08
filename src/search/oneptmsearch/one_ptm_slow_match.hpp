@@ -20,9 +20,9 @@
 #include <vector>
 
 #include "seq/proteoform.hpp"
-#include "spec/prm_peak.hpp"
-#include "spec/deconv_ms.hpp"
-#include "spec/spectrum_set.hpp"
+#include "ms/spec/prm_peak.hpp"
+#include "ms/spec/deconv_ms.hpp"
+#include "ms/spec/spectrum_set.hpp"
 #include "prsm/prsm.hpp"
 #include "prsm/simple_prsm.hpp"
 #include "search/oneptmsearch/diagonal_header.hpp"

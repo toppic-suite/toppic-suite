@@ -73,7 +73,7 @@ void topmgWindow::initArguments() {
   arguments_["oriDatabaseFileName"]="";
   arguments_["databaseFileName"] = "";
   arguments_["databaseBlockSize"] = "1000000";
-  arguments_["spectrumFileName"] = "";
+  arguments_["ms/spectrumFileName"] = "";
   arguments_["combinedOutputName"] = "";
   arguments_["activation"] = "FILE";
   arguments_["searchType"] = "TARGET";
@@ -549,7 +549,7 @@ void topmgWindow::showArguments() {
                                         "\noriDatabaseFileName:" + arguments_["oriDatabaseFileName"] +
                                         "\ndatabaseFileName:" + arguments_["databaseFileName"] +
                                         "\ndatabaseBlockSize:" + arguments_["databaseBlockSize"] +
-                                        "\nspectrumFileName:" + arguments_["spectrumFileName"] +
+                                        "\nspectrumFileName:" + arguments_["ms/spectrumFileName"] +
                                         "\ncombinedOutputName:" + arguments_["combinedOutputName"] +
                                         "\nactivation:" + arguments_["activation"] +
                                         "\nsearchType:" + arguments_["searchType"] +

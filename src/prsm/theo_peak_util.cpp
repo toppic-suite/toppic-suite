@@ -17,7 +17,7 @@
 #include "common/base/neutral_loss_base.hpp"
 #include "seq/bp_spec.hpp"
 #include "seq/proteoform.hpp"
-#include "spec/theo_peak.hpp"
+#include "ms/spec/theo_peak.hpp"
 #include "prsm/theo_peak_util.hpp"
 
 namespace toppic {

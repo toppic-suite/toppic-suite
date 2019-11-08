@@ -16,7 +16,7 @@
 #ifndef TOPPIC_STAT_TDGF_COMP_PVALUE_ARRAY_HPP_
 #define TOPPIC_STAT_TDGF_COMP_PVALUE_ARRAY_HPP_
 
-#include "spec/spectrum_set.hpp"
+#include "ms/spec/spectrum_set.hpp"
 #include "stat/tdgf/tdgf_mng.hpp"
 #include "stat/tdgf/comp_prob_value.hpp"
 #include "stat/tdgf/count_test_num.hpp"

@@ -14,7 +14,7 @@
 
 
 #include "common/util/logger.hpp"
-#include "spec/raw_ms_util.hpp"
+#include "ms/spec/raw_ms_util.hpp"
 #include "topfd/spec/deconv_data_util.hpp"
 
 namespace toppic {

@@ -17,7 +17,7 @@
 #include "common/util/logger.hpp"
 #include "common/util/str_util.hpp"
 #include "common/xml/xml_dom_util.hpp"
-#include "spec/extend_ms_factory.hpp"
+#include "ms/spec/extend_ms_factory.hpp"
 #include "prsm/peak_ion_pair_util.hpp"
 #include "prsm/prsm.hpp"
 
@@ -113,8 +113,8 @@ XmlDOMElement* Prsm::toXmlElement(XmlDOMDocument* xml_doc) {
   std::string str = str_util::toString(prsm_id_);
   xml_doc->addElement(element, "prsm_id", str.c_str());
   str = str_util::toString(spectrum_id_);
-  xml_doc->addElement(element, "spectrum_id", str.c_str());
-  xml_doc->addElement(element, "spectrum_scan", spectrum_scan_.c_str());
+  xml_doc->addElement(element, "ms/spectrum_id", str.c_str());
+  xml_doc->addElement(element, "ms/spectrum_scan", spectrum_scan_.c_str());
   str = str_util::toString(precursor_id_);
   xml_doc->addElement(element, "precursor_id", str.c_str());
   str = str_util::toString(prec_feature_id_);
@@ -124,7 +124,7 @@ XmlDOMElement* Prsm::toXmlElement(XmlDOMDocument* xml_doc) {
   str = str_util::toString(frac_feature_score_);
   xml_doc->addElement(element, "frac_feature_score", str.c_str());
   str = str_util::toString(spectrum_num_);
-  xml_doc->addElement(element, "spectrum_number", str.c_str());
+  xml_doc->addElement(element, "ms/spectrum_number", str.c_str());
   str = str_util::toString(ori_prec_mass_);
   xml_doc->addElement(element, "ori_prec_mass", str.c_str());
   str = str_util::toString(adjusted_prec_mass_);
@@ -154,13 +154,13 @@ void Prsm::appendXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
 void Prsm::parseXml(XmlDOMElement *element) {
   file_name_ = xml_dom_util::getChildValue(element, "file_name", 0);
   prsm_id_ = xml_dom_util::getIntChildValue(element, "prsm_id", 0);
-  spectrum_id_ = xml_dom_util::getIntChildValue(element, "spectrum_id", 0);
-  spectrum_scan_ = xml_dom_util::getChildValue(element, "spectrum_scan", 0);
+  spectrum_id_ = xml_dom_util::getIntChildValue(element, "ms/spectrum_id", 0);
+  spectrum_scan_ = xml_dom_util::getChildValue(element, "ms/spectrum_scan", 0);
   precursor_id_ = xml_dom_util::getIntChildValue(element, "precursor_id", 0);
   prec_feature_id_ = xml_dom_util::getIntChildValue(element, "precursor_feature_id", 0);
   prec_feature_inte_ = xml_dom_util::getDoubleChildValue(element, "precursor_feature_inte", 0);
   frac_feature_score_ = xml_dom_util::getDoubleChildValue(element, "frac_feature_score", 0);
-  spectrum_num_ = xml_dom_util::getIntChildValue(element, "spectrum_number", 0);
+  spectrum_num_ = xml_dom_util::getIntChildValue(element, "ms/spectrum_number", 0);
   ori_prec_mass_ = xml_dom_util::getDoubleChildValue(element, "ori_prec_mass", 0);
   adjusted_prec_mass_ = xml_dom_util::getDoubleChildValue(element, "adjusted_prec_mass", 0);
   fdr_ = xml_dom_util::getDoubleChildValue(element, "fdr", 0);

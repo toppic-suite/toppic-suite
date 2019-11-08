@@ -19,8 +19,8 @@
 #include <memory>
 #include <vector>
 
-#include "spec/theo_peak.hpp"
-#include "spec/extend_ms.hpp"
+#include "ms/spec/theo_peak.hpp"
+#include "ms/spec/extend_ms.hpp"
 #include "prsm/peak_ion_pair.hpp"
 #include "search/oneptmsearch/diagonal_header.hpp"
 

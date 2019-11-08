@@ -31,10 +31,10 @@
 #include "common/base/prot_mod_base.hpp"
 #include "seq/proteoform_factory.hpp"
 
-#include "spec/msalign_reader.hpp"
-#include "spec/spectrum_set.hpp"
-#include "spec/extend_ms_factory.hpp"
-#include "spec/msalign_util.hpp"
+#include "ms/spec/msalign_reader.hpp"
+#include "ms/spec/spectrum_set.hpp"
+#include "ms/spec/extend_ms_factory.hpp"
+#include "ms/spec/msalign_util.hpp"
 
 #include "prsm/prsm.hpp"
 #include "prsm/peak_ion_pair.hpp"

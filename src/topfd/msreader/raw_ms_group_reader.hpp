@@ -16,9 +16,9 @@
 #ifndef TOPPIC_TOPFD_MSREADER_RAW_MS_GROUP_READER_HPP_
 #define TOPPIC_TOPFD_MSREADER_RAW_MS_GROUP_READER_HPP_
 
-#include "spec/raw_ms_group.hpp"
+#include "ms/spec/raw_ms_group.hpp"
 #include "topfd/msreader/pw_ms_reader.hpp"
-#include "env/match_env.hpp"
+#include "ms/env/match_env.hpp"
 
 namespace toppic {
 

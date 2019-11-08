@@ -63,7 +63,7 @@ void addMsHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement* ms_element,
                  PrsmPtr prsm_ptr, PrsmViewMngPtr mng_ptr) {
   xercesc::DOMElement* ms_header_element = xml_doc->createElement("ms_header");
   ms_element->appendChild(ms_header_element);
-  xml_doc->addElement(ms_header_element, "spectrum_file_name", prsm_ptr->getFileName().c_str());
+  xml_doc->addElement(ms_header_element, "ms/spectrum_file_name", prsm_ptr->getFileName().c_str());
   DeconvMsPtrVec deconv_ms_ptr_vec = prsm_ptr->getDeconvMsPtrVec();
   std::string ms1_ids, ms2_ids;
   std::string ms1_scans, ms2_scans;
@@ -121,7 +121,7 @@ void addMsPeaks(XmlDOMDocument *xml_doc, xercesc::DOMElement* ms_element,
       xercesc::DOMElement* peak_element = xml_doc->createElement("peak");
       peaks->appendChild(peak_element);
       std::string str = str_util::toString(deconv_ms_ptr_vec[s]->getMsHeaderPtr()->getId());
-      xml_doc->addElement(peak_element, "spec_id", str.c_str());
+      xml_doc->addElement(peak_element, "ms/spec_id", str.c_str());
 
       DeconvPeakPtr peak_ptr = deconv_ms_ptr_vec[s]->getPeakPtr(i);
       str = str_util::toString(peak_ptr->getId());

@@ -17,7 +17,7 @@
 #define TOPPIC_QUANT_FEATURE_PRSM_HPP_
 
 #include "prsm/prsm_str.hpp"
-#include "feature/sample_feature.hpp"
+#include "ms/feature/sample_feature.hpp"
 
 namespace toppic {
 

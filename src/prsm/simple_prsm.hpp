@@ -17,7 +17,7 @@
 
 #include "common/xml/xml_dom_element.hpp"
 #include "seq/proteoform.hpp"
-#include "spec/ms_header.hpp"
+#include "ms/spec/ms_header.hpp"
 
 namespace toppic {
 
