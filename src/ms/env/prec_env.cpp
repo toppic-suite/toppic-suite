@@ -133,7 +133,7 @@ MatchEnvPtr2D initMatchEnv(EnvParaPtr env_para_ptr, PeakPtrVec &peak_list,
         } else {
           env_ptr  = EnvDetect::detectEnv(peak_list, idx, charge, max_mass, env_para_ptr);
         }
-        // LOG_DEBUG("ms/env detection complete");
+        // LOG_DEBUG("env detection complete");
         if (env_ptr != nullptr) {
           // LOG_DEBUG("FILTER REAL ENVELOPE!!!");
           if (!EnvFilter::testRealEnvValid(env_ptr, env_para_ptr)) {

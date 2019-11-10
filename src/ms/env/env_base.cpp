@@ -28,8 +28,8 @@ EnvBase::EnvBase(std::string file_name, int entry_num, double mass_interval):
       std::ifstream input;
       input.open(file_name.c_str(), std::ios::in);
       if (!input.is_open()) {
-        LOG_ERROR("ms/env file  " << file_name << " does not exist.");
-        throw "ms/env file does not exist.";
+        LOG_ERROR("env file  " << file_name << " does not exist.");
+        throw "env file does not exist.";
       }
       LOG_DEBUG("start reading");
       for (int i = 0; i < entry_num_; i++) {

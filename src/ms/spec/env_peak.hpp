@@ -46,7 +46,7 @@ class EnvPeak : public Peak {
 
   static bool cmpInteInc(const EnvPeakPtr &a, const EnvPeakPtr &b);
 
-  static std::string getXmlElementName() {return "ms/env_peak";}
+  static std::string getXmlElementName() {return "env_peak";}
 
  private:
   int idx_;
