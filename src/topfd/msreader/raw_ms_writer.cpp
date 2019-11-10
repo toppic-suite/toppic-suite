@@ -63,10 +63,10 @@ void write(std::string &file_name, RawMsPtr ms_ptr, MatchEnvPtrVec &envs) {
       peak.AddMember("intensity", theo_env->getIntensity(k), allocator);
       env_peaks.PushBack(peak, allocator);
     }
-    env.AddMember("ms/env_peaks", env_peaks, allocator);
+    env.AddMember("env_peaks", env_peaks, allocator);
     envelopes.PushBack(env, allocator);
   }
-  doc.AddMember("ms/envelopes", envelopes, allocator);
+  doc.AddMember("envelopes", envelopes, allocator);
 
   // Convert JSON document to string
   rapidjson::StringBuffer buffer;
@@ -74,7 +74,7 @@ void write(std::string &file_name, RawMsPtr ms_ptr, MatchEnvPtrVec &envs) {
   doc.Accept(writer);
   std::ofstream output;
   output.open(file_name.c_str());
-  output << "ms/spectrum_data =" << std::endl;
+  output << "spectrum_data =" << std::endl;
   output << buffer.GetString();
   output.close();
 }

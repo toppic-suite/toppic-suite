@@ -82,7 +82,7 @@ void SimplePrsmStrMerge::process() {
   int spec_id = 0;
   bool finish = false;
   while (!finish) {
-    // LOG_DEBUG("ms/spec id " << spec_id << " input num " << input_num);
+    // LOG_DEBUG("spec id " << spec_id << " input num " << input_num);
     finish = true;
     SimplePrsmStrPtrVec cur_str_ptrs;
     for (size_t i = 0; i < input_num; i++) {

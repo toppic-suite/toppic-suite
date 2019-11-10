@@ -102,7 +102,7 @@ void PrsmStrMerge::process(bool norm) {
       }
     }
     spec_id++;
-    LOG_DEBUG("ms/spec id " << spec_id);
+    LOG_DEBUG("spec id " << spec_id);
   }
 
   // close files
