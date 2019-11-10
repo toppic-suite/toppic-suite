@@ -46,7 +46,7 @@ SpecFeaturePtr SpecFeatureReader::readOneFeature() {
     str_util::trim(line);
     //std::cout << "line " << line << std::endl;
     SpecFeaturePtr feature = std::make_shared<SpecFeature>(line);
-    //std::cout << "ms/feature created " << std::endl;
+    //std::cout << "feature created " << std::endl;
     return feature;
   }
   else {

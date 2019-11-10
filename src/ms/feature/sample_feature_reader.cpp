@@ -46,7 +46,7 @@ SampleFeaturePtr SampleFeatureReader::readOneFeature() {
     str_util::trim(line);
     //std::cout << "line " << line << std::endl;
     SampleFeaturePtr feature = std::make_shared<SampleFeature>(line);
-    //std::cout << "ms/feature created " << std::endl;
+    //std::cout << "feature created " << std::endl;
     return feature;
   }
   else {

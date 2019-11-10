@@ -29,7 +29,6 @@
 #include "ms/env/env_base.hpp"
 #include "ms/env/env_para.hpp"
 #include "ms/env/match_env.hpp"
-#include "topfd/msreader/raw_ms_reader.hpp"
 #include "ms/feature/frac_feature.hpp"
 #include "ms/feature/single_charge_feature.hpp"
 #include "ms/feature/frac_feature_writer.hpp"
@@ -38,6 +37,7 @@
 #include "ms/feature/peak_cluster.hpp"
 #include "ms/feature/sample_feature.hpp"
 #include "ms/feature/sample_feature_writer.hpp"
+#include "topfd/msreader/raw_ms_reader.hpp"
 #include "topfd/feature_detect/feature_para.hpp"
 #include "topfd/feature_detect/feature_detect.hpp"
 
@@ -382,7 +382,7 @@ void findMsOneFeatures(DeconvMsPtrVec &ms1_ptr_vec, PeakPtrVec2D & raw_peaks,
       int ref_sp_id = best_peak->getSpId();
       double prec_mass = best_peak->getPosition();
       DeconvPeakPtrVec matched_peaks;
-      LOG_DEBUG("ms/feature id " << feat_id);
+      LOG_DEBUG("feature id " << feat_id);
       FracFeaturePtr feature_ptr = getFeature(ref_sp_id, prec_mass, feat_id, ms1_ptr_vec,
                                               matched_peaks, para_ptr);
       if (feature_ptr == nullptr) {
