@@ -39,7 +39,7 @@ SingleChargeFeature::SingleChargeFeature(XmlDOMElement* element) {
   scan_begin_ = xml_dom_util::getIntChildValue(element, "scan_begin", 0);
   scan_end_ = xml_dom_util::getIntChildValue(element, "scan_end", 0);
   intensity_ = xml_dom_util::getDoubleChildValue(element, "intensity", 0);
-  env_num_ = xml_dom_util::getIntChildValue(element, "ms/envelope_num", 0);
+  env_num_ = xml_dom_util::getIntChildValue(element, "envelope_num", 0);
 }
 
 void SingleChargeFeature::appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement *parent) {
