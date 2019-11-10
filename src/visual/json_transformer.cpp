@@ -45,7 +45,7 @@ void jsonConvert(const std::string &xml_file_name,
 
 void jsonTranslate(std::map<std::string, std::string> &arguments,
                    const std::string &fname_suffix) {
-  std::string spectrum_file_name_ = arguments["ms/spectrumFileName"];
+  std::string spectrum_file_name_ = arguments["spectrumFileName"];
   std::string base_name = file_util::basename(spectrum_file_name_);
   std::string xml_dir = base_name + "_" + fname_suffix + "_xml";
   std::string base_name_short = base_name.substr(0, base_name.length() - 4);

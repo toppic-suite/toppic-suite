@@ -18,10 +18,10 @@
 #include "common/util/str_util.hpp"
 #include "common/util/file_util.hpp"
 #include "ms/spec/msalign_writer.hpp"
-#include "topfd/common/topfd_para.hpp"
 #include "ms/env/env_base.hpp"
 #include "ms/env/match_env_util.hpp"
 #include "ms/env/match_env_writer.hpp"
+#include "topfd/common/topfd_para.hpp"
 #include "topfd/msreader/raw_ms_writer.hpp"
 #include "topfd/deconv/deconv_process.hpp"
 
@@ -142,7 +142,7 @@ void DeconvProcess::processSpMissingLevelOne(DeconvOneSpPtr deconv_ptr,
       if (topfd_para_ptr_->output_json_files_) {
         std::string json_file_name = ms2_json_dir_ 
             + file_util::getFileSeparator() 
-            + "ms/spectrum" + std::to_string(header_ptr->getId()) + ".js";
+            + "spectrum" + std::to_string(header_ptr->getId()) + ".js";
         raw_ms_writer::write(json_file_name, ms_two_ptr_vec[i], result_envs);    
       }
       count2++;
@@ -176,7 +176,7 @@ void DeconvProcess::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   if (topfd_para_ptr_->output_json_files_) {
     std::string json_file_name = ms1_json_dir_ 
         + file_util::getFileSeparator() 
-        + "ms/spectrum" + std::to_string(header_ptr->getId()) + ".js";
+        + "spectrum" + std::to_string(header_ptr->getId()) + ".js";
     raw_ms_writer::write(json_file_name, ms_ptr, prec_envs);    
   }
 }
@@ -204,7 +204,7 @@ void DeconvProcess::deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   if (topfd_para_ptr_->output_json_files_) {
     std::string json_file_name = ms2_json_dir_ 
         + file_util::getFileSeparator() 
-        + "ms/spectrum" + std::to_string(ms_ptr->getMsHeaderPtr()->getId()) + ".js";
+        + "spectrum" + std::to_string(ms_ptr->getMsHeaderPtr()->getId()) + ".js";
     raw_ms_writer::write(json_file_name, ms_ptr, result_envs);    
   }
 }

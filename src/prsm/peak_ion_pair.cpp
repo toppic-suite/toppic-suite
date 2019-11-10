@@ -37,7 +37,7 @@ void PeakIonPair::appendRealPeakToXml(XmlDOMDocument* xml_doc,
   str = str_util::toString(theo_peak_ptr_->getIonPtr()->getDisplayPos());
   xml_doc->addElement(element, "ion_display_position", str.c_str());
   str = str_util::toString(ms_header_ptr_->getId());
-  xml_doc->addElement(element, "ms/spec_id", str.c_str());
+  xml_doc->addElement(element, "spec_id", str.c_str());
   str = str_util::toString(real_peak_ptr_->getBasePeakPtr()->getId());
   xml_doc->addElement(element, "peak_id", str.c_str());
   str = str_util::toString(real_peak_ptr_->getBasePeakPtr()->getCharge());

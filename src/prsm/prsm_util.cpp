@@ -133,7 +133,7 @@ void addSpectrumPtrsToPrsms(PrsmPtrVec &prsm_ptrs, PrsmParaPtr prsm_para_ptr) {
       DeconvMsPtrVec deconv_ms_ptr_vec = spec_set_ptr->getDeconvMsPtrVec();
       int spectrum_id = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getId();
       int prec_id = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecId();
-      LOG_DEBUG("ms/spectrum id " << spectrum_id);
+      LOG_DEBUG("spectrum id " << spectrum_id);
       for (size_t i = start_prsm; i < prsm_ptrs.size(); i++) {
         if (isMatchMs(prsm_ptrs[i], deconv_ms_ptr_vec[0]->getMsHeaderPtr())) {
           prsm_ptrs[i]->setDeconvMsPtrVec(deconv_ms_ptr_vec);

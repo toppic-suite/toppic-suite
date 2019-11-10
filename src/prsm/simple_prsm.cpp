@@ -51,11 +51,11 @@ SimplePrsm::SimplePrsm(MsHeaderPtr header_ptr, int spectrum_num,
 
 SimplePrsm::SimplePrsm(XmlDOMElement* element) {
   file_name_ = xml_dom_util::getChildValue(element, "file_name", 0);
-  spectrum_id_ = xml_dom_util::getIntChildValue(element, "ms/spectrum_id", 0);
-  spectrum_scan_ = xml_dom_util::getChildValue(element, "ms/spectrum_scan", 0);
+  spectrum_id_ = xml_dom_util::getIntChildValue(element, "spectrum_id", 0);
+  spectrum_scan_ = xml_dom_util::getChildValue(element, "spectrum_scan", 0);
   precursor_id_ = xml_dom_util::getIntChildValue(element, "precursor_id", 0);
   prec_mass_ = xml_dom_util::getDoubleChildValue(element, "precursor_mass", 0);
-  spectrum_num_ = xml_dom_util::getDoubleChildValue(element, "ms/spectrum_number", 0);
+  spectrum_num_ = xml_dom_util::getDoubleChildValue(element, "spectrum_number", 0);
   seq_name_ = xml_dom_util::getChildValue(element, "sequence_name", 0);
   seq_desc_ = xml_dom_util::getChildValue(element, "sequence_desc", 0);
   prot_mass_ = xml_dom_util::getDoubleChildValue(element, "proteoform_mass", 0);
@@ -85,14 +85,14 @@ XmlDOMElement* SimplePrsm::toXml(XmlDOMDocument* xml_doc) {
   XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
   xml_doc->addElement(element, "file_name", file_name_.c_str());
   std::string str = str_util::toString(spectrum_id_);
-  xml_doc->addElement(element, "ms/spectrum_id", str.c_str());
-  xml_doc->addElement(element, "ms/spectrum_scan", spectrum_scan_.c_str());
+  xml_doc->addElement(element, "spectrum_id", str.c_str());
+  xml_doc->addElement(element, "spectrum_scan", spectrum_scan_.c_str());
   str = str_util::toString(precursor_id_);
   xml_doc->addElement(element, "precursor_id", str.c_str());
   str = str_util::toString(prec_mass_);
   xml_doc->addElement(element, "precursor_mass", str.c_str());
   str = str_util::toString(spectrum_num_);
-  xml_doc->addElement(element, "ms/spectrum_number", str.c_str());
+  xml_doc->addElement(element, "spectrum_number", str.c_str());
   xml_doc->addElement(element, "sequence_name", seq_name_.c_str());
   xml_doc->addElement(element, "sequence_desc", seq_desc_.c_str());
   str = str_util::toString(prot_mass_);
