@@ -75,7 +75,7 @@ FracFeaturePtr FracXmlFeatureReader::readOneFeature() {
   }
   // LOG_DEBUG("prsm str " << prsm_str);
   xercesc::MemBufInputSource ft_buf(
-      (const XMLByte*)ft_str.c_str(), ft_str.size(), "ms/feature_str (in memory)");
+      (const XMLByte*)ft_str.c_str(), ft_str.size(), "feature_str (in memory)");
 
   XmlDOMParser* parser = XmlDOMParserFactory::getXmlDOMParserInstance();
   FracFeaturePtr ptr;
