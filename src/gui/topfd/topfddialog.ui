@@ -41,8 +41,8 @@
      <rect>
       <x>30</x>
       <y>20</y>
-      <width>374</width>
-      <height>39</height>
+      <width>429</width>
+      <height>50</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout">
@@ -99,7 +99,7 @@
       <x>30</x>
       <y>200</y>
       <width>291</width>
-      <height>36</height>
+      <height>44</height>
      </rect>
     </property>
     <layout class="QHBoxLayout">
@@ -154,13 +154,19 @@
      <rect>
       <x>30</x>
       <y>240</y>
-      <width>300</width>
-      <height>36</height>
+      <width>291</width>
+      <height>44</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
       <widget class="QLabel" name="label_3">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="minimumSize">
         <size>
          <width>0</width>
@@ -198,8 +204,8 @@
      <rect>
       <x>570</x>
       <y>240</y>
-      <width>191</width>
-      <height>36</height>
+      <width>194</width>
+      <height>44</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_4">
@@ -243,7 +249,7 @@
       <x>340</x>
       <y>200</y>
       <width>211</width>
-      <height>36</height>
+      <height>44</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_5">
@@ -287,7 +293,7 @@
       <x>560</x>
       <y>20</y>
       <width>331</width>
-      <height>34</height>
+      <height>42</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_6">
@@ -315,7 +321,7 @@
       <x>30</x>
       <y>570</y>
       <width>861</width>
-      <height>41</height>
+      <height>50</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_7">
@@ -386,7 +392,7 @@
       <x>570</x>
       <y>200</y>
       <width>321</width>
-      <height>36</height>
+      <height>44</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0">
@@ -446,8 +452,8 @@ p, li { white-space: pre-wrap; }
      <rect>
       <x>340</x>
       <y>240</y>
-      <width>224</width>
-      <height>36</height>
+      <width>211</width>
+      <height>44</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_8">
@@ -502,7 +508,7 @@ p, li { white-space: pre-wrap; }
       <x>210</x>
       <y>280</y>
       <width>681</width>
-      <height>36</height>
+      <height>44</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_9">
@@ -514,9 +520,9 @@ p, li { white-space: pre-wrap; }
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="filenameLineEdit">
+      <widget class="QLineEdit" name="mergedFilenameLineEdit">
        <property name="text">
-        <string>merged</string>
+        <string>sample1</string>
        </property>
       </widget>
      </item>

@@ -14,7 +14,14 @@
 
 #include "topfd/common/topfd_para.hpp"
 #include "topfd/common/topfd_process.hpp"
-#include "gui/topfd/threadtopfd.h"
+#include "gui/topfd/threadtopfd.hpp"
+
+void ThreadTopFD::setPar(toppic::TopfdParaPtr para_ptr, 
+                         const std::vector<std::string> & spec_file_lst) {
+  para_ptr_ = para_ptr;
+  spec_file_lst_ = spec_file_lst;
+}
+
 
 void ThreadTopFD::run() {
   toppic::topfd_process::process(para_ptr_, spec_file_lst_);

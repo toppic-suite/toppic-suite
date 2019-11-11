@@ -149,15 +149,16 @@ bool Argument::parse(int argc, char* argv[]) {
       topfd_para_ptr_->prec_window_ = std::stod(prec_window);
     }
 
-    if (vm.count("merged-file-name")) {
-      topfd_para_ptr_->merge_files_ = true;
-      topfd_para_ptr_->merged_file_name_ = merged_file_name;
-    }
-
     if (vm.count("spectrum-file-name")) {
       spec_file_list_ = vm["spectrum-file-name"].as<std::vector<std::string> >(); 
     }
 
+    if (vm.count("merged-file-name")) {
+      if (spec_file_list_.size() > 1) {
+        topfd_para_ptr_->merge_files_ = true;
+        topfd_para_ptr_->merged_file_name_ = merged_file_name;
+      }
+    }
   }
   catch(std::exception& e) {
     std::cerr << "Unhandled Exception in parsing command line "
