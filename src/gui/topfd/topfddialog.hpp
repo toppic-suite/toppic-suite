@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_GUI_TOPFDDIALOG_H
-#define TOPPIC_GUI_TOPFDDIALOG_H
+#ifndef TOPPIC_GUI_TOPFD_TOPFDDIALOG_HPP
+#define TOPPIC_GUI_TOPFD_TOPFDDIALOG_HPP
 
 #include <map>
 #include <string>
@@ -21,7 +21,7 @@
 #include <QMainWindow>
 
 #include "topfd/common/topfd_para.hpp"
-#include "threadtopfd.h"
+#include "gui/topfd/threadtopfd.hpp"
 
 namespace Ui {
 class TopFDDialog;

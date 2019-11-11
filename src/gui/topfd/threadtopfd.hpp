@@ -12,9 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-
-#ifndef TOPPIC_GUI_THREADTOPFD_H
-#define TOPPIC_GUI_THREADTOPFD_H
+#ifndef TOPPIC_GUI_TOPFD_THREADTOPFD_HPP
+#define TOPPIC_GUI_TOPFD_THREADTOPFD_HPP
 
 #include <map>
 #include <string>
@@ -41,10 +40,7 @@ class ThreadTopFD : public QThread {
   void run();
 
   void setPar(toppic::TopfdParaPtr para_ptr, 
-              const std::vector<std::string> & spec_file_lst) {
-    para_ptr_ = para_ptr;
-    spec_file_lst_ = spec_file_lst;
-  }
+              const std::vector<std::string> & spec_file_lst); 
 
  private:
   toppic::TopfdParaPtr para_ptr_;
