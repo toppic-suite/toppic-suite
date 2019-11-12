@@ -125,7 +125,7 @@
        </property>
       </widget>
      </item>
-     <item>
+     <item alignment="Qt::AlignRight">
       <widget class="QLineEdit" name="maxChargeEdit">
        <property name="enabled">
         <bool>true</bool>
@@ -178,7 +178,7 @@
        </property>
       </widget>
      </item>
-     <item>
+     <item alignment="Qt::AlignRight">
       <widget class="QLineEdit" name="maxMassEdit">
        <property name="minimumSize">
         <size>
@@ -266,7 +266,7 @@
        </property>
       </widget>
      </item>
-     <item>
+     <item alignment="Qt::AlignRight">
       <widget class="QLineEdit" name="ms1snRatioEdit">
        <property name="minimumSize">
         <size>
@@ -409,7 +409,7 @@
        </property>
       </widget>
      </item>
-     <item>
+     <item alignment="Qt::AlignRight">
       <widget class="QLineEdit" name="windowSizeEdit">
        <property name="minimumSize">
         <size>
@@ -464,7 +464,7 @@ p, li { white-space: pre-wrap; }
        </property>
       </widget>
      </item>
-     <item>
+     <item alignment="Qt::AlignRight">
       <widget class="QLineEdit" name="ms2snRatioEdit">
        <property name="maximumSize">
         <size>
