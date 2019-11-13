@@ -19,7 +19,7 @@
 using namespace toppic;
 
 int main(int argc, char* argv[]) {
-  //toppic::log_level = 2;
+  toppic::logger::log_level = 2;
   LOG_DEBUG("Parsing start!");
   Argument argu_processor;
   bool success = argu_processor.parse(argc, argv);

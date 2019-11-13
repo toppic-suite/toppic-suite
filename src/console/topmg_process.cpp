@@ -68,38 +68,43 @@
 
 namespace toppic {
 
-void cleanTopmgDir(const std::string &fa_name, const std::string & sp_name) {
+void cleanTopmgDir(const std::string &fa_name, 
+                   const std::string & sp_name,
+                   bool keep_temp_files) {
   std::string fa_base = file_util::absoluteName(fa_name); 
   std::replace(fa_base.begin(), fa_base.end(), '\\', '/');
   std::string abs_sp_name = file_util::absoluteName(sp_name);
   std::string sp_base = file_util::basename(abs_sp_name); 
   std::replace(sp_base.begin(), sp_base.end(), '\\', '/');
 
-  file_util::cleanPrefix(fa_name, fa_base + "_");
-  file_util::cleanPrefix(sp_name, sp_base + ".msalign_");
-  file_util::delFile(abs_sp_name + "_index");
-  file_util::delFile(sp_base + ".topmg_one_filter");
-  file_util::cleanPrefix(sp_name, sp_base + ".topmg_one_filter_");
-  file_util::delFile(sp_base + ".topmg_multi_filter");
-  file_util::cleanPrefix(sp_name, sp_base + ".topmg_multi_filter_");
-  file_util::delFile(sp_base + ".topmg_graph_filter");
-  file_util::cleanPrefix(sp_name, sp_base + ".topmg_graph_filter_");
-  file_util::delFile(sp_base + ".topmg_graph_align");
-  file_util::cleanPrefix(sp_name, sp_base + ".topmg_graph_align_");
-  file_util::delFile(sp_base + ".topmg_graph_post");
-  file_util::delFile(sp_base + ".topmg_graph");
-  file_util::delFile(sp_base + ".topmg_evalue");
-  file_util::cleanPrefix(sp_name, sp_base + ".toppic_evalue_");
-  file_util::delFile(sp_base + ".topmg_cluster");
-  file_util::delFile(sp_base + ".topmg_top");
-  file_util::delFile(sp_base + ".topmg_top_pre");
-  file_util::delFile(sp_base + ".topmg_prsm_cutoff");
-  file_util::delFile(sp_base + ".topmg_form_cutoff");
-  file_util::delFile(sp_base + "_topmg_proteoform.xml");
   file_util::rename(sp_base + ".topmg_form_cutoff_form", 
                     sp_base + "_topmg_proteoform.xml");
-  file_util::delDir(sp_base + "_topmg_proteoform_cutoff_xml");
-  file_util::delDir(sp_base + "_topmg_prsm_cutoff_xml");
+
+  if (!keep_temp_files) {
+    file_util::cleanPrefix(fa_name, fa_base + "_");
+    file_util::cleanPrefix(sp_name, sp_base + ".msalign_");
+    file_util::delFile(abs_sp_name + "_index");
+    file_util::delFile(sp_base + ".topmg_one_filter");
+    file_util::cleanPrefix(sp_name, sp_base + ".topmg_one_filter_");
+    file_util::delFile(sp_base + ".topmg_multi_filter");
+    file_util::cleanPrefix(sp_name, sp_base + ".topmg_multi_filter_");
+    file_util::delFile(sp_base + ".topmg_graph_filter");
+    file_util::cleanPrefix(sp_name, sp_base + ".topmg_graph_filter_");
+    file_util::delFile(sp_base + ".topmg_graph_align");
+    file_util::cleanPrefix(sp_name, sp_base + ".topmg_graph_align_");
+    file_util::delFile(sp_base + ".topmg_graph_post");
+    file_util::delFile(sp_base + ".topmg_graph");
+    file_util::delFile(sp_base + ".topmg_evalue");
+    file_util::cleanPrefix(sp_name, sp_base + ".toppic_evalue_");
+    file_util::delFile(sp_base + ".topmg_cluster");
+    file_util::delFile(sp_base + ".topmg_top");
+    file_util::delFile(sp_base + ".topmg_top_pre");
+    file_util::delFile(sp_base + ".topmg_prsm_cutoff");
+    file_util::delFile(sp_base + ".topmg_form_cutoff");
+    file_util::delFile(sp_base + "_topmg_proteoform.xml");
+    file_util::delDir(sp_base + "_topmg_proteoform_cutoff_xml");
+    file_util::delDir(sp_base + "_topmg_prsm_cutoff_xml");
+  }
 }
 
 int TopMG_identify(std::map<std::string, std::string> & arguments) {
@@ -437,23 +442,22 @@ int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
   }
   */
 
-  if (arguments["keepTempFiles"] != "true") {
-    std::cout << "Deleting temporary files - started." << std::endl;
-    std::string ori_db_file_name = arguments["oriDatabaseFileName"];
+  bool keep_temp_files = (arguments["keepTempFiles"] == "true");
+  std::cout << "Deleting temporary files - started." << std::endl;
+  std::string ori_db_file_name = arguments["oriDatabaseFileName"];
 
-    for (size_t k = 0; k < spec_file_lst.size(); k++) {
-      std::string sp_file_name = spec_file_lst[k];
-      cleanTopmgDir(ori_db_file_name, sp_file_name);
-    }
-
-    /*
-    if (spec_file_lst.size() > 1 && arguments["combinedOutputName"] != "") {
-      std::string sp_file_name = base_name + "_ms2.msalign";
-      cleanTopmgDir(ori_db_file_name, sp_file_name);
-    }
-    std::cout << "Deleting temporary files - finished." << std::endl; 
-    */
+  for (size_t k = 0; k < spec_file_lst.size(); k++) {
+    std::string sp_file_name = spec_file_lst[k];
+    cleanTopmgDir(ori_db_file_name, sp_file_name, keep_temp_files);
   }
+
+  /*
+     if (spec_file_lst.size() > 1 && arguments["combinedOutputName"] != "") {
+     std::string sp_file_name = base_name + "_ms2.msalign";
+     cleanTopmgDir(ori_db_file_name, sp_file_name);
+     }
+     std::cout << "Deleting temporary files - finished." << std::endl; 
+     */
 
   std::cout << "TopMG finished." << std::endl << std::flush;
   return 0; 
