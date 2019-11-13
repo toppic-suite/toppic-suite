@@ -387,6 +387,7 @@ void FeatureSampleMerge::process() {
     LOG_DEBUG("feature number " << features.size());
 
     std::string prsm_file_name = base_name + "_ms2_toppic_proteoform.xml";
+    LOG_DEBUG("prsm file name " << prsm_file_name);
     FastaIndexReaderPtr seq_reader = std::make_shared<FastaIndexReader>(db_file_name_);
     ModPtrVec fix_mod_ptr_vec = mod_util::geneFixedModList(fix_mod_str_);
     PrsmStrPtrVec prsms = PrsmReader::readAllPrsmStrsMatchSeq(prsm_file_name,
@@ -407,13 +408,16 @@ void FeatureSampleMerge::process() {
     features_2d.push_back(features);
     all_features.insert(all_features.end(), features.begin(), features.end());
   }
+  LOG_DEBUG("step 4 feature size " << all_features.size()); 
   std::sort(all_features.begin(), all_features.end(), FeaturePrsm::cmpInteDec);
   for (size_t k = 0; k < sample_num; k++) {
     std::sort(features_2d[k].begin(), features_2d[k].end(), FeaturePrsm::cmpInteDec);
+    LOG_DEBUG("step 5 sample feature size " << k << " size " << features_2d[k].size()); 
   }
   FeaturePrsmPtrVec2D table; 
   FeaturePrsmPtrVec examples; 
   getFeatureTable(all_features, features_2d, table, examples, ppm_);
+  LOG_DEBUG("step 6 table size " << table.size()); 
   outputTable(table, examples, sample_num);
 }
 

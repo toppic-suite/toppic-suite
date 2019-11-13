@@ -65,40 +65,44 @@
 
 namespace toppic {
 
-void cleanToppicDir(const std::string &fa_name, const std::string & sp_name) {
+void cleanToppicDir(const std::string &fa_name, 
+                    const std::string & sp_name,
+                    bool keep_temp_files) {
   std::string fa_base = file_util::absoluteName(fa_name);
   std::replace(fa_base.begin(), fa_base.end(), '\\', '/');
   std::string abs_sp_name = file_util::absoluteName(sp_name);
   std::string sp_base = file_util::basename(abs_sp_name);
   std::replace(sp_base.begin(), sp_base.end(), '\\', '/');
 
-  file_util::cleanPrefix(fa_name, fa_base + "_");
-  file_util::cleanPrefix(sp_name, sp_base + ".msalign_");
-  file_util::delFile(abs_sp_name + "_index");
-  file_util::cleanPrefix(sp_name, sp_base + ".toppic_zero_filter_");
-  file_util::delFile(sp_base + ".toppic_zero_ptm");
-  file_util::cleanPrefix(sp_name, sp_base + ".toppic_zero_ptm_");
-  file_util::cleanPrefix(sp_name, sp_base + ".toppic_one_filter_");
-  file_util::delFile(sp_base + ".toppic_one_ptm");
-  file_util::cleanPrefix(sp_name, sp_base + ".toppic_one_ptm_");
-  file_util::delFile(sp_base + ".toppic_multi_filter");
-  file_util::cleanPrefix(sp_name, sp_base + ".toppic_multi_filter_");
-  file_util::delFile(sp_base + ".toppic_multi_ptm");
-  file_util::cleanPrefix(sp_name, sp_base + ".toppic_multi_ptm_");
-  file_util::delFile(sp_base + ".toppic_combined");
-  file_util::delFile(sp_base + ".toppic_evalue");
-  file_util::cleanPrefix(sp_name, sp_base + ".toppic_evalue_");
-  file_util::delFile(sp_base + ".toppic_cluster");
-  file_util::delFile(sp_base + ".toppic_top");
-  file_util::delFile(sp_base + ".toppic_top_pre");
-  file_util::delFile(sp_base + ".toppic_prsm_cutoff");
-  file_util::delFile(sp_base + ".toppic_prsm_cutoff_local");
-  file_util::delFile(sp_base + ".toppic_form_cutoff");
-  file_util::delFile(sp_base + "_toppic_proteoform.xml");
   file_util::rename(sp_base + ".toppic_form_cutoff_form",
                     sp_base + "_toppic_proteoform.xml");
-  file_util::delDir(sp_base + "_toppic_proteoform_cutoff_xml");
-  file_util::delDir(sp_base + "_toppic_prsm_cutoff_xml");
+  if (!keep_temp_files) {
+    file_util::cleanPrefix(fa_name, fa_base + "_");
+    file_util::cleanPrefix(sp_name, sp_base + ".msalign_");
+    file_util::delFile(abs_sp_name + "_index");
+    file_util::cleanPrefix(sp_name, sp_base + ".toppic_zero_filter_");
+    file_util::delFile(sp_base + ".toppic_zero_ptm");
+    file_util::cleanPrefix(sp_name, sp_base + ".toppic_zero_ptm_");
+    file_util::cleanPrefix(sp_name, sp_base + ".toppic_one_filter_");
+    file_util::delFile(sp_base + ".toppic_one_ptm");
+    file_util::cleanPrefix(sp_name, sp_base + ".toppic_one_ptm_");
+    file_util::delFile(sp_base + ".toppic_multi_filter");
+    file_util::cleanPrefix(sp_name, sp_base + ".toppic_multi_filter_");
+    file_util::delFile(sp_base + ".toppic_multi_ptm");
+    file_util::cleanPrefix(sp_name, sp_base + ".toppic_multi_ptm_");
+    file_util::delFile(sp_base + ".toppic_combined");
+    file_util::delFile(sp_base + ".toppic_evalue");
+    file_util::cleanPrefix(sp_name, sp_base + ".toppic_evalue_");
+    file_util::delFile(sp_base + ".toppic_cluster");
+    file_util::delFile(sp_base + ".toppic_top");
+    file_util::delFile(sp_base + ".toppic_top_pre");
+    file_util::delFile(sp_base + ".toppic_prsm_cutoff");
+    file_util::delFile(sp_base + ".toppic_prsm_cutoff_local");
+    file_util::delFile(sp_base + ".toppic_form_cutoff");
+    file_util::delFile(sp_base + "_toppic_proteoform.xml");
+    file_util::delDir(sp_base + "_toppic_proteoform_cutoff_xml");
+    file_util::delDir(sp_base + "_toppic_prsm_cutoff_xml");
+  }
 }
 
 
@@ -502,24 +506,24 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
   }
   */
 
-  if (arguments["keepTempFiles"] != "true") {
-    std::cout << "Deleting temporary files - started." << std::endl;
-    std::string ori_db_file_name = arguments["oriDatabaseFileName"];
+  bool keep_temp_files = (arguments["keepTempFiles"] == "true"); 
 
-    for (size_t k = 0; k < spec_file_lst.size(); k++) {
-      std::string sp_file_name = spec_file_lst[k];
-      cleanToppicDir(ori_db_file_name, sp_file_name);
-    }
+  std::cout << "Deleting temporary files - started." << std::endl;
+  std::string ori_db_file_name = arguments["oriDatabaseFileName"];
 
-    /*
-    if (spec_file_lst.size() > 1 && arguments["combinedOutputName"] != "") {
-      std::string sp_file_name = base_name + "_ms2.msalign";
-      cleanToppicDir(ori_db_file_name, sp_file_name);
-    }
-    */
-
-    std::cout << "Deleting temporary files - finished." << std::endl; 
+  for (size_t k = 0; k < spec_file_lst.size(); k++) {
+    std::string sp_file_name = spec_file_lst[k];
+    cleanToppicDir(ori_db_file_name, sp_file_name, keep_temp_files);
   }
+
+  /*
+     if (spec_file_lst.size() > 1 && arguments["combinedOutputName"] != "") {
+     std::string sp_file_name = base_name + "_ms2.msalign";
+     cleanToppicDir(ori_db_file_name, sp_file_name);
+     }
+     */
+
+  std::cout << "Deleting temporary files - finished." << std::endl; 
 
   std::cout << "TopPIC finished." << std::endl << std::flush;
 
