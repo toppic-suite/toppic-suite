@@ -95,6 +95,12 @@ file(GLOB TOPPIC_PROC_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_proc
 			     ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_argument.cpp)
 file(GLOB TOPPIC_CONSOLE_SRCS	${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic.cpp)
 
+file(GLOB TOPPIC_MULTI_PROC_SRCS
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_multi_process.cpp
+			     ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_argument.cpp)
+file(GLOB TOPPIC_MULTI_CONSOLE_SRCS
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_multi_frac.cpp)
+
 # toppic gui main
 file(GLOB TOPPIC_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/toppic/*.cpp
 			    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/toppic/*.qrc)
@@ -147,6 +153,12 @@ add_executable(topfd_gui
 
 add_executable(toppic 
 	${TOPPIC_CONSOLE_SRCS} ${TOPPIC_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS} 
+  ${SEQ_SRCS} ${SPEC_SRCS} ${ENV_SRCS} ${FEATURE_SRCS} ${PRSM_SRCS} ${FILTER_SRCS}  
+	${ZERO_PTM_SRCS} ${ONE_PTM_SEARCH_SRCS} ${PTM_SRCS} 
+  ${TDGF_SRCS} ${LOCAL_SRCS} ${VISUAL_SRCS})
+
+add_executable(toppic_multi 
+  ${TOPPIC_MULTI_CONSOLE_SRCS} ${TOPPIC_MULTI_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS} 
   ${SEQ_SRCS} ${SPEC_SRCS} ${ENV_SRCS} ${FEATURE_SRCS} ${PRSM_SRCS} ${FILTER_SRCS}  
 	${ZERO_PTM_SRCS} ${ONE_PTM_SEARCH_SRCS} ${PTM_SRCS} 
   ${TDGF_SRCS} ${LOCAL_SRCS} ${VISUAL_SRCS})
@@ -245,6 +257,9 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
         pthread z)
 
     target_link_libraries(toppic xerces-c boost_program_options
+        boost_filesystem boost_system boost_thread pthread z)
+
+    target_link_libraries(toppic_multi xerces-c boost_program_options
         boost_filesystem boost_system boost_thread pthread z)
 
     target_link_libraries(toppic_gui Qt5Widgets Qt5Core Qt5Gui xerces-c boost_program_options
