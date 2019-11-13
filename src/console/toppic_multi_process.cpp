@@ -32,7 +32,7 @@
 #include "prsm/prsm_str_merge.hpp"
 #include "prsm/prsm_top_selector.hpp"
 #include "prsm/prsm_cutoff_selector.hpp"
-#include "prsm/prsm_cluster.hpp"
+#include "prsm/prsm_simple_cluster.hpp"
 #include "prsm/prsm_table_writer.hpp"
 #include "prsm/prsm_fdr.hpp"
 #include "prsm/prsm_feature_cluster.hpp"
@@ -83,14 +83,19 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
     LOG_DEBUG("prsm para inited");
 
+    std::time_t start = time(nullptr);
+    char buf[50];
+    std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
+    std::string start_time = buf;
+    arguments["startTime"] = start_time;
+
+    /*
     std::cout << "Finding PrSM clusters - started." << std::endl;
-    double ppo;
-    std::istringstream(arguments["errorTolerance"]) >> ppo;
-    ppo = ppo / 1000000.0;
-    PrsmClusterPtr prsm_clusters
-        = std::make_shared<PrsmCluster>(db_file_name, sp_file_name,
-                                        "toppic_top_pre", prsm_para_ptr->getFixModPtrVec(),
-                                        "toppic_cluster", ppo);
+    double tolerance = 1.2; 
+    PrsmSimpleClusterPtr prsm_clusters
+        = std::make_shared<PrsmSimpleCluster>(db_file_name, sp_file_name,
+                                              "toppic_top_pre", 
+                                              "toppic_cluster", tolerance);
     prsm_clusters->process();
     prsm_clusters = nullptr;
     std::cout << "Finding PrSM clusters - finished." << std::endl;
@@ -122,12 +127,6 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
 
     std::string suffix = "toppic_prsm_cutoff";
 
-    std::time_t end = time(nullptr);
-    char buf[50];
-    std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&end));
-    arguments["endTime"] = buf;
-
-    std::string argu_str = Argument::outputCsvArguments(arguments);
 
     std::cout << "Outputting PrSM table - started." << std::endl;
     PrsmTableWriterPtr table_out
@@ -153,6 +152,13 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     form_filter->process();
     form_filter = nullptr;
     std::cout << "Selecting top PrSMs for proteoforms - finished." << std::endl;
+    */
+
+    std::time_t end = time(nullptr);
+    std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&end));
+    arguments["endTime"] = buf;
+
+    std::string argu_str = Argument::outputCsvArguments(arguments);
 
     std::cout << "Outputting proteoform table - started." << std::endl;
     PrsmTableWriterPtr form_out
@@ -188,14 +194,11 @@ int TopPICMultiProcess(std::map<std::string, std::string> & arguments,
 
   std::cout << "Merging files - started." << std::endl;
   // merge msalign files
-  /*
   MsAlignFracMerge merger_processor(base_file_lst, output_name);
-  std::string para_str = "#";
+  std::string para_str = "";
   merger_processor.process(para_str);
-  */
 
   // merge EVALUE files
-  /*
   std::vector<std::string> prsm_file_lst(spec_file_lst.size());
   for (size_t i = 0; i < spec_file_lst.size(); i++) {
     prsm_file_lst[i] = file_util::basename(spec_file_lst[i]) + ".toppic_top_pre"; 
@@ -204,12 +207,11 @@ int TopPICMultiProcess(std::map<std::string, std::string> & arguments,
   int N = 1000000;
   prsm_util::mergePrsmFiles(prsm_file_lst, N, output_name + "_ms2.toppic_top_pre");
   std::cout << "Merging files - finished." << std::endl;
-  */
 
   std::string sp_file_name = output_name + "_ms2.msalign";
   arguments["spectrumFileName"] = sp_file_name;
   std::cout << "sp file name " << sp_file_name << std::endl;
-  //toppic::TopPIC_post(arguments);
+  toppic::TopPIC_post(arguments);
 
   std::cout << "TopPIC Multi fraction finished." << std::endl << std::flush;
 

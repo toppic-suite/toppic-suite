@@ -119,6 +119,8 @@ class PrsmStr {
 
   static bool isSameSeqAndMass(const PrsmStrPtr &a, const PrsmStrPtr &b, double ppo);
 
+  static bool isSimpleMatch(const PrsmStrPtr &a, const PrsmStrPtr &b, double ppo);
+
   static bool isStrictCompatiablePtmSpecies(const PrsmStrPtr & a, const PrsmStrPtr & b, double ppo);
 
  private:

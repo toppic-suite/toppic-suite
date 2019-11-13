@@ -188,6 +188,16 @@ bool PrsmStr::isSameSeqAndMass(const PrsmStrPtr &a, const PrsmStrPtr &b, double 
   return true;
 }
 
+bool PrsmStr::isSimpleMatch(const PrsmStrPtr &a, const PrsmStrPtr &b, double tolerance) {
+  if (a->getSeqName() != b->getSeqName()) {
+    return false;
+  }
+  if (std::abs(a->getAdjustedPrecMass() - b->getAdjustedPrecMass()) > tolerance) {
+    return false;
+  }
+  return true;
+}
+
 bool PrsmStr::isStrictCompatiablePtmSpecies(const PrsmStrPtr & a, const PrsmStrPtr & b, double ppo) {
   if (!isSameSeqAndMass(a, b, ppo)) {
     return false;
