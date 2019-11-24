@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>920</width>
-    <height>620</height>
+    <height>610</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -19,13 +19,13 @@
   <property name="minimumSize">
    <size>
     <width>920</width>
-    <height>620</height>
+    <height>610</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>920</width>
-    <height>620</height>
+    <height>610</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -40,7 +40,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>20</y>
+      <y>10</y>
       <width>429</width>
       <height>50</height>
      </rect>
@@ -291,7 +291,7 @@
     <property name="geometry">
      <rect>
       <x>560</x>
-      <y>20</y>
+      <y>10</y>
       <width>331</width>
       <height>42</height>
      </rect>
@@ -319,7 +319,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>570</y>
+      <y>550</y>
       <width>861</width>
       <height>50</height>
      </rect>
@@ -434,7 +434,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>320</y>
+      <y>300</y>
       <width>861</width>
       <height>241</height>
      </rect>
@@ -488,45 +488,6 @@ p, li { white-space: pre-wrap; }
       <height>131</height>
      </rect>
     </property>
-   </widget>
-   <widget class="QCheckBox" name="mergeCheckBox">
-    <property name="geometry">
-     <rect>
-      <x>30</x>
-      <y>280</y>
-      <width>134</width>
-      <height>32</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Merge files</string>
-    </property>
-   </widget>
-   <widget class="QWidget" name="horizontalLayoutWidget_10">
-    <property name="geometry">
-     <rect>
-      <x>210</x>
-      <y>280</y>
-      <width>681</width>
-      <height>44</height>
-     </rect>
-    </property>
-    <layout class="QHBoxLayout" name="horizontalLayout_9">
-     <item>
-      <widget class="QLabel" name="label_8">
-       <property name="text">
-        <string>Merged file name:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="mergedFilenameLineEdit">
-       <property name="text">
-        <string>sample1</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
    </widget>
   </widget>
  </widget>
