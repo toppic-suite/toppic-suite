@@ -61,11 +61,9 @@ bool Argument::parse(int argc, char* argv[]) {
         ("precursor-window,w", po::value<std::string> (&prec_window),
          "<a positive number>. Set the precursor window size. The default value is 3.0 m/z.")
         ("missing-level-one,o","The input spectrum file does not contain MS1 spectra.")
-        ("merged-file-name,f", po::value<std::string> (&merged_file_name), 
-         "Merge deconvoluted files and specify the name of the merged file.")
         ;
-    po::options_description desc("Options");
 
+    po::options_description desc("Options");
     desc.add_options() 
         ("help,h", "Print this help message.") 
         ("max-charge,c", po::value<std::string> (&max_charge), "")
