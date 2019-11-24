@@ -61,8 +61,8 @@ TopFDDialog::TopFDDialog(QWidget *parent) :
       thread_ = new ThreadTopFD(this);
       showInfo = "";
       TopFDDialog::on_defaultButton_clicked();
-      ui->mergeCheckBox->setEnabled(false);
-      ui->mergedFilenameLineEdit->setEnabled(false);
+      //ui->mergeCheckBox->setEnabled(false);
+      //ui->mergedFilenameLineEdit->setEnabled(false);
     }
 
 TopFDDialog::~TopFDDialog() {
@@ -106,8 +106,8 @@ void TopFDDialog::on_defaultButton_clicked() {
   ui->ms2snRatioEdit->setText("1.0");
   ui->windowSizeEdit->setText("3.0");
   ui->missLevelOneCheckBox->setChecked(false);
-  ui->mergeCheckBox->setChecked(false);
-  ui->mergedFilenameLineEdit->setText("sample1");
+  //ui->mergeCheckBox->setChecked(false);
+  //ui->mergedFilenameLineEdit->setText("sample1");
   ui->outputTextBrowser->clear();
   ui->outputTextBrowser->setText("Click the Start button to process the spectrum files.");
 }
@@ -132,8 +132,8 @@ void TopFDDialog::on_addButton_clicked() {
     if (ableToAdd(spfile)) {
       ui->listWidget->addItem(new QListWidgetItem(spfile));
       if (ui->listWidget->count() > 1) {
-        ui->mergeCheckBox->setEnabled(true);
-        ui->mergedFilenameLineEdit->setEnabled(true);
+        //ui->mergeCheckBox->setEnabled(true);
+        //ui->mergedFilenameLineEdit->setEnabled(true);
       }
     }
   }
@@ -170,9 +170,9 @@ void TopFDDialog::on_delButton_clicked() {
   ui->listWidget->removeItemWidget(delItem);
   delete delItem;
   if (ui->listWidget->count() < 2) {
-    ui->mergeCheckBox->setEnabled(false);
-    ui->mergeCheckBox->setChecked(false);
-    ui->mergedFilenameLineEdit->setEnabled(false);
+    //ui->mergeCheckBox->setEnabled(false);
+    //ui->mergeCheckBox->setChecked(false);
+    //ui->mergedFilenameLineEdit->setEnabled(false);
   }
 }
 
@@ -275,8 +275,9 @@ toppic::TopfdParaPtr TopFDDialog::getParaPtr() {
   para_ptr_->ms_two_sn_ratio_ = std::stod(ui->ms2snRatioEdit->text().toStdString());
   para_ptr_->prec_window_ = std::stod(ui->windowSizeEdit->text().toStdString());
   para_ptr_->missing_level_one_ = ui->missLevelOneCheckBox->isChecked(); 
-  para_ptr_->merge_files_ = ui->mergeCheckBox->isChecked();
-  para_ptr_->merged_file_name_ = ui->mergedFilenameLineEdit->text().toStdString();
+  para_ptr_->merge_files_ = false;
+  //para_ptr_->merge_files_ = ui->mergeCheckBox->isChecked();
+  //para_ptr_->merged_file_name_ = ui->mergedFilenameLineEdit->text().toStdString();
   return para_ptr_;
 }
 
@@ -294,8 +295,8 @@ void TopFDDialog::lockDialog() {
   ui->missLevelOneCheckBox->setEnabled(false);
   ui->windowSizeEdit->setEnabled(false);
   ui->outputButton->setEnabled(false);
-  ui->mergeCheckBox->setEnabled(false);
-  ui->mergedFilenameLineEdit->setEnabled(false);
+  //ui->mergeCheckBox->setEnabled(false);
+  //ui->mergedFilenameLineEdit->setEnabled(false);
 }
 
 void TopFDDialog::unlockDialog() {
@@ -314,8 +315,8 @@ void TopFDDialog::unlockDialog() {
   ui->outputButton->setEnabled(true);
   ui->outputButton->setDefault(true);
   if (ui->listWidget->count() >= 2) {
-    ui->mergeCheckBox->setEnabled(false);
-    ui->mergedFilenameLineEdit->setEnabled(false);
+    //ui->mergeCheckBox->setEnabled(false);
+    //ui->mergedFilenameLineEdit->setEnabled(false);
   }
 }
 
@@ -362,6 +363,7 @@ bool TopFDDialog::checkError() {
     return true;
   }
 
+  /*
   if (ui->mergeCheckBox->isChecked() &&
       ui->mergedFilenameLineEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
@@ -369,6 +371,7 @@ bool TopFDDialog::checkError() {
                          QMessageBox::Yes);
     return true;
   }
+  */
 
   return false;
 }
