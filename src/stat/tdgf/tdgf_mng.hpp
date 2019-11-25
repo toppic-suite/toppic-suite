@@ -44,7 +44,7 @@ class TdgfMng {
   PrsmParaPtr prsm_para_ptr_;
 
   /** Prsm filter */
-  double comp_evalue_min_match_frag_num_ = 5.0;
+  double comp_evalue_min_match_frag_num_ = 4.0;
 
   bool use_gf_ = false;
 

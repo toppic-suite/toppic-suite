@@ -199,7 +199,7 @@ std::string residue_base_data = R"(
   </residue>
   <residue>
     <amino_acid>
-      <name>Pyrrolysine</name>
+	    <name>Ornithine</name>
     </amino_acid>
     <ptm>
       <abbreviation>No PTM</abbreviation>
