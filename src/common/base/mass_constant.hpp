@@ -22,19 +22,19 @@ namespace mass_constant {
 /**
  * Returns the mass of an ammonia (NH3).
  */
-inline double getAmmoniaMass() {return 17.026549101073; }
+inline double getAmmoniaMass() {/* from IUPAC */ return 17.02654910098; }
 
 /**
  * Returns the mass difference between two isotopic peaks.
  * The value is from the paper of the deconvolution tool Thrash.
  * We also double checked with the averagine molecule C494 H776 N136 O148 S4
  */
-inline double getIsotopeMass() { /* from Thrash paper */ return 1.00235; }
+inline double getIsotopeMass() {/* from Thrash paper */ return 1.00235; }
 
 /**
  * Returns the mass of an oxygen molecular.
  */
-inline double getOxygenMass() {return 15.9949146195616; }
+inline double getOxygenMass() {/* from IUPAC */ return 15.9949146191; }
 
 /**
  * Returns the mass of a proton. 
@@ -44,13 +44,13 @@ inline double getProtonMass() {/* from wikipedia */ return 1.007276466879; }
 /**
  * Returns the mass of a water molecule (H2O).
  */
-inline double getWaterMass() {return 18.0105646837036; }
+inline double getWaterMass() {/* from IUPAC */ return 18.01056468362; }
 
 /**
  * Returns the shift between the mass of a neutral y ion 
  * and its corresponding suffix residue mass. 
  */
-inline double getYIonShift() {return 18.0105646837036; }
+inline double getYIonShift() {/* from IUPAC */ return 18.01056468362; }
 
 }  // namespace mass_constant
 

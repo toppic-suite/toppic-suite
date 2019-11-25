@@ -19,6 +19,11 @@
 
 namespace toppic {
 
+// Monoisotopic masses are computed using the IUPAC 
+// atomic weight (version 2017). Average masses are 
+// obtained from 
+// https://proteomicsresource.washington.edu/protocols06/masses.php 
+
 std::string amino_acid_base_data = R"(
 <amino_acid_list>
 <amino_acid>
@@ -35,8 +40,8 @@ std::string amino_acid_base_data = R"(
 	<one_letter>A</one_letter>
 	<three_letter>Ala</three_letter>
 	<composition>C3H5ON</composition>
-	<mono_mass>71.0371137847766</mono_mass>
-	<average_mass>71.0780195989256</average_mass>
+	<mono_mass>71.0371137846</mono_mass>
+	<average_mass>71.0779</average_mass>
 	<frequency>0.0828</frequency>
 </amino_acid>
 <amino_acid>
@@ -44,8 +49,8 @@ std::string amino_acid_base_data = R"(
 	<one_letter>R</one_letter>
 	<three_letter>Arg</three_letter>
 	<composition>C6H12ON4</composition>
-	<mono_mass>156.101111023854</mono_mass>
-	<average_mass>156.185922202113</average_mass>
+	<mono_mass>156.10111102302</mono_mass>
+	<average_mass>156.18568</average_mass>
 	<frequency>0.0554</frequency>
 </amino_acid>
 <amino_acid>
@@ -53,8 +58,8 @@ std::string amino_acid_base_data = R"(
 	<one_letter>N</one_letter>
 	<three_letter>Asn</three_letter>
 	<composition>C4H6O2N2</composition>
-	<mono_mass>114.042927441269</mono_mass>
-	<average_mass>114.102804388734</average_mass>
+	<mono_mass>114.04292744016</mono_mass>
+	<average_mass>114.10264</average_mass>
 	<frequency>0.0404</frequency>
 </amino_acid>
 <amino_acid>
@@ -62,8 +67,8 @@ std::string amino_acid_base_data = R"(
 	<one_letter>D</one_letter>
 	<three_letter>Asp</three_letter>
 	<composition>C4H5O3N</composition>
-	<mono_mass>115.026943023899</mono_mass>
-	<average_mass>115.087565350242</average_mass>
+	<mono_mass>115.02694302280</mono_mass>
+	<average_mass>115.0874</average_mass>
 	<frequency>0.0545</frequency>
 </amino_acid>
 <amino_acid>
@@ -71,8 +76,8 @@ std::string amino_acid_base_data = R"(
 	<one_letter>C</one_letter>
 	<three_letter>Cys</three_letter>
 	<composition>C3H5ONS</composition>
-	<mono_mass>103.009184786276</mono_mass>
-	<average_mass>103.142806835338</average_mass>
+	<mono_mass>103.0091849595</mono_mass>
+	<average_mass>103.1429</average_mass>
 	<frequency>0.0136</frequency>
 </amino_acid>
 <amino_acid>
@@ -80,8 +85,8 @@ std::string amino_acid_base_data = R"(
 	<one_letter>E</one_letter>
 	<three_letter>Glu</three_letter>
 	<composition>C5H7O3N</composition>
-	<mono_mass>129.042593088041</mono_mass>
-	<average_mass>129.1141827548</average_mass>
+	<mono_mass>129.04259308732</mono_mass>
+	<average_mass>129.11398</average_mass>
 	<frequency>0.0394</frequency>
 </amino_acid>
 <amino_acid>
@@ -89,8 +94,8 @@ std::string amino_acid_base_data = R"(
 	<one_letter>Q</one_letter>
 	<three_letter>Gln</three_letter>
 	<composition>C5H8O2N2</composition>
-	<mono_mass>128.058577505411</mono_mass>
-	<average_mass>128.129421793293</average_mass>
+	<mono_mass>128.05857750468</mono_mass>
+	<average_mass>128.12922</average_mass>
 	<frequency>0.0677</frequency>
 </amino_acid>
 <amino_acid>
@@ -98,8 +103,8 @@ std::string amino_acid_base_data = R"(
 	<one_letter>G</one_letter>
 	<three_letter>Gly</three_letter>
 	<composition>C2H3ON</composition>
-	<mono_mass>57.0214637206346</mono_mass>
-	<average_mass>57.0514021943674</average_mass>
+	<mono_mass>57.02146372008</mono_mass>
+	<average_mass>57.05132</average_mass>
 	<frequency>0.0709</frequency>
 </amino_acid>
 <amino_acid>
@@ -107,8 +112,8 @@ std::string amino_acid_base_data = R"(
 	<one_letter>H</one_letter>
 	<three_letter>His</three_letter>
 	<composition>C6H7ON3</composition>
-	<mono_mass>137.058911858638</mono_mass>
-	<average_mass>137.139515220756</average_mass>
+	<mono_mass>137.05891185752</mono_mass>
+	<average_mass>137.13928</average_mass>
 	<frequency>0.0227</frequency>
 </amino_acid>
 <amino_acid>
@@ -116,8 +121,8 @@ std::string amino_acid_base_data = R"(
 	<one_letter>I</one_letter>
 	<three_letter>Ile</three_letter>
 	<composition>C6H11ON</composition>
-	<mono_mass>113.084063977202</mono_mass>
-	<average_mass>113.157871812599</average_mass>
+	<mono_mass>113.08406397816</mono_mass>
+	<average_mass>113.15764</average_mass>
 	<frequency>0.0599</frequency>
 </amino_acid>
 <amino_acid>
@@ -125,8 +130,8 @@ std::string amino_acid_base_data = R"(
 	<one_letter>L</one_letter>
 	<three_letter>Leu</three_letter>
 	<composition>C6H11ON</composition>
-	<mono_mass>113.084063977202</mono_mass>
-	<average_mass>113.157871812599</average_mass>
+	<mono_mass>113.08406397816</mono_mass>
+	<average_mass>113.15764</average_mass>
 	<frequency>0.0967</frequency>
 </amino_acid>
 <amino_acid>
@@ -134,8 +139,8 @@ std::string amino_acid_base_data = R"(
 	<one_letter>K</one_letter>
 	<three_letter>Lys</three_letter>
 	<composition>C6H12ON2</composition>
-	<mono_mass>128.094963014133</mono_mass>
-	<average_mass>128.172515778368</average_mass>
+	<mono_mass>128.09496301426</mono_mass>
+	<average_mass>128.17228</average_mass>
 	<frequency>0.0586</frequency>
 </amino_acid>
 <amino_acid>
@@ -143,8 +148,8 @@ std::string amino_acid_base_data = R"(
 	<one_letter>M</one_letter>
 	<three_letter>Met</three_letter>
 	<composition>C5H9ONS</composition>
-	<mono_mass>131.04048491456</mono_mass>
-	<average_mass>131.196041644455</average_mass>
+	<mono_mass>131.04048508854</mono_mass>
+	<average_mass>131.19606</average_mass>
 	<frequency>0.0243</frequency>
 </amino_acid>
 <amino_acid>
@@ -152,8 +157,8 @@ std::string amino_acid_base_data = R"(
 	<one_letter>F</one_letter>
 	<three_letter>Phe</three_letter>
 	<composition>C9H9ON</composition>
-	<mono_mass>147.06841391306</mono_mass>
-	<average_mass>147.1741979951</average_mass>
+	<mono_mass>147.06841391364</mono_mass>
+	<average_mass>147.17386</average_mass>
 	<frequency>0.0386</frequency>
 </amino_acid>
 <amino_acid>
@@ -161,8 +166,8 @@ std::string amino_acid_base_data = R"(
 	<one_letter>P</one_letter>
 	<three_letter>Pro</three_letter>
 	<composition>C5H7ON</composition>
-	<mono_mass>97.0527638489186</mono_mass>
-	<average_mass>97.1153729002482</average_mass>
+	<mono_mass>97.05276384912</mono_mass>
+	<average_mass>97.11518</average_mass>
 	<frequency>0.0468</frequency>
 </amino_acid>
 <amino_acid>
@@ -170,8 +175,8 @@ std::string amino_acid_base_data = R"(
 	<one_letter>S</one_letter>
 	<three_letter>Ser</three_letter>
 	<composition>C3H5O2N</composition>
-	<mono_mass>87.0320284043381</mono_mass>
-	<average_mass>87.0774245262015</average_mass>
+	<mono_mass>87.03202840370</mono_mass>
+	<average_mass>87.0773</average_mass>
 	<frequency>0.0649</frequency>
 </amino_acid>
 <amino_acid>
@@ -179,8 +184,8 @@ std::string amino_acid_base_data = R"(
 	<one_letter>T</one_letter>
 	<three_letter>Thr</three_letter>
 	<composition>C4H7O2N</composition>
-	<mono_mass>101.04767846848</mono_mass>
-	<average_mass>101.104041930759</average_mass>
+	<mono_mass>101.04767846822</mono_mass>
+	<average_mass>101.10388</average_mass>
 	<frequency>0.0532</frequency>
 </amino_acid>
 <amino_acid>
@@ -188,8 +193,8 @@ std::string amino_acid_base_data = R"(
 	<one_letter>W</one_letter>
 	<three_letter>Trp</three_letter>
 	<composition>C11H10ON2</composition>
-	<mono_mass>186.079312949991</mono_mass>
-	<average_mass>186.210313754397</average_mass>
+	<mono_mass>186.07931295010</mono_mass>
+	<average_mass>186.2099</average_mass>
 	<frequency>0.0108</frequency>
 </amino_acid>
 <amino_acid>
@@ -197,8 +202,8 @@ std::string amino_acid_base_data = R"(
 	<one_letter>Y</one_letter>
 	<three_letter>Tyr</three_letter>
 	<composition>C9H9NO2</composition>
-	<mono_mass>163.063328532622</mono_mass>
-	<average_mass>163.173602922376</average_mass>
+	<mono_mass>163.06332853274</mono_mass>
+	<average_mass>163.17326</average_mass>
 	<frequency>0.0291</frequency>
 </amino_acid>
 <amino_acid>
@@ -206,8 +211,8 @@ std::string amino_acid_base_data = R"(
 	<one_letter>V</one_letter>
 	<three_letter>Val</three_letter>
 	<composition>C5H9NO</composition>
-	<mono_mass>99.0684139130606</mono_mass>
-	<average_mass>99.1312544080417</average_mass>
+	<mono_mass>99.06841391364</mono_mass>
+	<average_mass>99.13106</average_mass>
 	<frequency>0.0688</frequency>
 </amino_acid>
 <amino_acid>
@@ -215,17 +220,17 @@ std::string amino_acid_base_data = R"(
 	<one_letter>U</one_letter>
 	<three_letter>Sec</three_letter>
     <composition>C3H5NOSe</composition>
-	<mono_mass>150.953635105776</mono_mass>
-	<average_mass>150.037407858863</average_mass>
+	<mono_mass>150.9536363846</mono_mass>
+	<average_mass>150.0379</average_mass>
 	<frequency>0</frequency>
 </amino_acid>
 <amino_acid>
-	<name>Pyrrolysine</name>
+	<name>Ornithine</name>
 	<one_letter>O</one_letter>
-	<three_letter>Pyl</three_letter>
-    <composition>C12H19N3O2</composition>
-	<mono_mass>237.147726863052</mono_mass>
-	<average_mass>237.298624575381</average_mass>
+	<three_letter>Orn</three_letter>
+    <composition>C5H12N2O2</composition>
+	<mono_mass>132.08987763372</mono_mass>
+	<average_mass>132.16098</average_mass>
 	<frequency>0</frequency>
 </amino_acid>
 </amino_acid_list>
