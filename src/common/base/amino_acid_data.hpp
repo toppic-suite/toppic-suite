@@ -139,7 +139,7 @@ std::string amino_acid_base_data = R"(
 	<one_letter>K</one_letter>
 	<three_letter>Lys</three_letter>
 	<composition>C6H12ON2</composition>
-	<mono_mass>128.09496301426</mono_mass>
+	<mono_mass>128.09496301462</mono_mass>
 	<average_mass>128.17228</average_mass>
 	<frequency>0.0586</frequency>
 </amino_acid>
