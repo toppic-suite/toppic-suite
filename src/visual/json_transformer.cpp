@@ -53,6 +53,12 @@ void jsonTranslate(std::map<std::string, std::string> &arguments,
   std::string json_dir = html_dir + file_util::getFileSeparator() + "data_js";
   std::string resource_dir = arguments["resourceDir"];
 
+  // check if the html dir exists 
+  if (file_util::exists(html_dir)) {
+    LOG_WARN("The html directory " << html_dir << " exists!");
+    file_util::delDir(html_dir);
+  }
+
   // copy resources 
   std::string from_path(resource_dir + file_util::getFileSeparator() + "web2");
   file_util::copyDir(from_path, html_dir);
