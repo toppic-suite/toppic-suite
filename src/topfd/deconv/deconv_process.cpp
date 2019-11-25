@@ -43,7 +43,8 @@ DeconvProcess::DeconvProcess(TopfdParaPtr topfd_para_ptr,
 std::string DeconvProcess::updateMsg(MsHeaderPtr header_ptr, int scan, 
                                      int total_scan_num) {
   std::string percentage = str_util::toString(scan * 100 / total_scan_num);
-  std::string msg = "Processing spectrum " + header_ptr->getTitle() + "...";
+  std::string msg = "Processing spectrum scan " 
+      + std::to_string(header_ptr->getFirstScanNum()) + " ...";
   while (msg.length() < 40) {
     msg += " ";
   }
