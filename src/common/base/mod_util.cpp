@@ -60,23 +60,38 @@ std::vector<ModPtrVec> readModTxt(const std::string &file_name) {
   }
   std::string line;
   while (std::getline(infile, line)) {
+    if (line.size() == 0) continue;
     if (line[0] == '#') continue;
     line = str_util::rmComment(line);
     if (line == "") continue;
     try {
       std::vector<std::string> l = str_util::split(line, ",");
-      if (l.size() != 5) throw line;
+      if (l.size() != 5) throw "The number of commas is not 4.";
 
-      if (l[2] == "*" && l[3] == "any") throw line;
-
+      if (l[2] == "*" && l[3] == "any") throw "* and any cannot be used for the same modification.";
       if (l[2] == "*") l[2] = "ARNDCEQGHILKMFPSTWYV";
 
-      PtmPtr p = std::make_shared<Ptm>(l[0], l[0], std::stod(l[1]), std::stoi(l[4]));
-
+      double mass;
+      int unimod_id;
+      try {
+        mass = std::stod(l[1]);
+      }
+      catch(std::invalid_argument& e){
+        throw "Error in PTM mass.";
+      }
+      try {
+        unimod_id = std::stoi(l[4]);
+      }
+      catch(std::invalid_argument& e){
+        throw "Error in UniModId";
+      }
+      PtmPtr p = std::make_shared<Ptm>(l[0], l[0], mass, unimod_id);
       p = PtmBase::getPtmPtr(p);
 
       for (size_t i = 0; i < l[2].length(); i++) {
-        AminoAcidPtr a = AminoAcidBase::getAminoAcidPtrByOneLetter(l[2].substr(i, 1));
+        std::string aa = l[2].substr(i, 1);
+        AminoAcidPtr a = AminoAcidBase::getAminoAcidPtrByOneLetter(aa);
+        if (a == nullptr) throw "Error in the list of residues.";
         ResiduePtr ori_residue_ptr 
             = ResidueBase::getBaseResiduePtr(
                 std::make_shared<Residue>(a, PtmBase::getEmptyPtmPtr()));
@@ -93,14 +108,15 @@ std::vector<ModPtrVec> readModTxt(const std::string &file_name) {
           mod_ptr_vec2d[1].push_back(m);
           mod_ptr_vec2d[2].push_back(m);
         } else {
-          throw line;
+          throw "Error in Position.";
         }
       }
     } catch (char const* e) {
-      std::cerr << "Errors in the Variable PTM file: "
+      std::cout << "Errors in the Variable PTM file: "
           << file_name << std::endl
           << "Please check the line" << std::endl
-          << "\t" << e << std::endl;
+          << "\t" << line << std::endl
+          << "Error message: " << e << std::endl;
       exit(EXIT_FAILURE);
     }
   }
@@ -109,16 +125,22 @@ std::vector<ModPtrVec> readModTxt(const std::string &file_name) {
 }
 
 ModPtrVec geneFixedModList(const std::string &str) {
-  if (str == "" || str == "C57" || str == "C58") {
-    ModPtrVec mod_ptr_vec;
-    if (str == "C57") {
-      mod_ptr_vec.push_back(ModBase::getC57ModPtr());
-    } else if (str == "C58") {
-      mod_ptr_vec.push_back(ModBase::getC58ModPtr());
+  try {
+    if (str == "" || str == "C57" || str == "C58") {
+      ModPtrVec mod_ptr_vec;
+      if (str == "C57") {
+        mod_ptr_vec.push_back(ModBase::getC57ModPtr());
+      } else if (str == "C58") {
+        mod_ptr_vec.push_back(ModBase::getC58ModPtr());
+      }
+      return mod_ptr_vec;
+    } else {
+      return readModTxt(str)[2];
     }
-    return mod_ptr_vec;
-  } else {
-    return readModTxt(str)[2];
+  } catch (const char* e) {
+    std::cout << "[Exception]" << std::endl;
+    std::cout << e << std::endl;
+    exit(EXIT_FAILURE);
   }
 }
 
