@@ -19,10 +19,12 @@
 #include <vector>
 #include <ctime>
 
+#include "common/base/base_data.hpp"
+#include "common/base/mod_util.hpp"
+#include "common/util/version.hpp"
+
 #include "seq/fasta_reader.hpp"
 #include "seq/fasta_util.hpp"
-#include "common/base/base_data.hpp"
-#include "common/util/version.hpp"
 
 #include "ms/spec/msalign_reader.hpp"
 #include "ms/spec/msalign_util.hpp"
@@ -105,6 +107,25 @@ void cleanToppicDir(const std::string &fa_name,
   }
 }
 
+// protein filtering + database searching + E-value computation
+int TopPIC_testModFile(std::map<std::string, std::string> & arguments) {
+  try {
+    base_data::init();
+    LOG_DEBUG("Init base data completed");
+
+    // Test arguments
+    PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
+
+    if (arguments["residueModFileName"] != "") {
+      mod_util::readModTxt(arguments["residueModFileName"]);
+    }
+  } catch (const char* e) {
+    std::cout << "[Exception]" << std::endl;
+    std::cout << e << std::endl;
+    exit(EXIT_FAILURE);
+  }
+  return 0;
+}
 
 // protein filtering + database searching + E-value computation
 int TopPIC_identify(std::map<std::string, std::string> & arguments) {
@@ -447,11 +468,10 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
 }
 
 int TopPICProgress(std::map<std::string, std::string> & arguments) {
-  if (TopPIC_identify(arguments) != 0) {
-    return 1;
-  }
-
-  return TopPIC_post(arguments);
+  TopPIC_testModFile(arguments);
+  TopPIC_identify(arguments); 
+  TopPIC_post(arguments);
+  return 0;
 }
 
 int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
