@@ -101,7 +101,6 @@ void cleanToppicDir(const std::string &fa_name,
     file_util::delFile(sp_base + ".toppic_prsm_cutoff");
     file_util::delFile(sp_base + ".toppic_prsm_cutoff_local");
     file_util::delFile(sp_base + ".toppic_form_cutoff");
-    file_util::delFile(sp_base + "_toppic_proteoform.xml");
     file_util::delDir(sp_base + "_toppic_proteoform_cutoff_xml");
     file_util::delDir(sp_base + "_toppic_prsm_cutoff_xml");
   }
