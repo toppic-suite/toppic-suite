@@ -58,9 +58,9 @@ void getClusters(FracFeaturePtrVec& features,
       }
     }
     if (!is_found) {
-      FracFeaturePtrVec new_clusters;
-      new_clusters.push_back(cur_ptr); 
-      clusters.push_back(new_clusters);
+      FracFeaturePtrVec new_cluster;
+      new_cluster.push_back(cur_ptr); 
+      clusters.push_back(new_cluster);
     }
   }
 }
@@ -69,6 +69,16 @@ void cluster(FracFeaturePtrVec &features, FracFeaturePtrVec2D &clusters,
              double mass_tolerance, double time_tolerance) {
   std::sort(features.begin(), features.end(), FracFeature::cmpInteDec);
   getClusters(features, clusters, mass_tolerance, time_tolerance);
+  std::sort(features.begin(), features.end(), FracFeature::cmpFracIncInteDec);
+}
+
+void simpleCluster(FracFeaturePtrVec &features, FracFeaturePtrVec2D &clusters) {
+  std::sort(features.begin(), features.end(), FracFeature::cmpInteDec);
+  for (size_t i = 0; i < features.size(); i++) {
+    FracFeaturePtrVec new_cluster;
+    new_cluster.push_back(features[i]);
+    clusters.push_back(new_cluster);
+  }
   std::sort(features.begin(), features.end(), FracFeature::cmpFracIncInteDec);
 }
 

@@ -30,7 +30,6 @@ class MsAlignFracMerge {
 
   static void mergeFiles(const std::vector<std::string> &spec_file_lst,
                          const std::string &output_file, 
-                         int max_num_per_file,
                          const std::string &para_str);
 
   static int getMaxSpecNumPerFile() {return MAX_SPEC_NUM_PER_FILE;}
