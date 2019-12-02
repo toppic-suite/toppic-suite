@@ -572,7 +572,7 @@ void process(int frac_id, const std::string &sp_file_name,
   SampleFeaturePtrVec sample_features;
   getSampleFeatures(sample_features, frac_features, ms2_features);
 
-  std::string output_file_name = base_name + "_frac.feature";
+  std::string output_file_name = base_name + "_feature.xml";
   frac_feature_writer::writeXmlFeatures(output_file_name, frac_features);
   std::string batmass_file_name = base_name + "_frac.mzrt.csv";
   frac_feature_writer::writeBatMassFeatures(batmass_file_name, frac_features);
