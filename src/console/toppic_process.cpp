@@ -29,6 +29,7 @@
 #include "ms/spec/msalign_reader.hpp"
 #include "ms/spec/msalign_util.hpp"
 #include "ms/spec/msalign_frac_merge.hpp"
+#include "ms/spec/deconv_json_merge.hpp"
 #include "ms/feature/feature_merge.hpp"
 
 #include "prsm/prsm_para.hpp"
@@ -41,8 +42,6 @@
 #include "prsm/prsm_feature_cluster.hpp"
 #include "prsm/prsm_form_filter.hpp"
 #include "prsm/prsm_util.hpp"
-
-#include "topfd/deconv/deconv_json_merge.hpp"
 
 #include "filter/zeroptm/zero_ptm_filter_mng.hpp"
 #include "filter/zeroptm/zero_ptm_filter_processor.hpp"

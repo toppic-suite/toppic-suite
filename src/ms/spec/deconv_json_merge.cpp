@@ -12,13 +12,9 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-//#include <set>
-//#include <algorithm>
-
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
-#include "topfd/deconv/deconv_json_merge.hpp"
-//#include "common/util/str_util.hpp"
+#include "ms/spec/deconv_json_merge.hpp"
 
 namespace toppic {
 

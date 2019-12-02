@@ -90,9 +90,6 @@ file(GLOB TDGF_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/stat/tdgf/*.cpp)
 file(GLOB LOCAL_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/stat/local/*.cpp)
 file(GLOB VISUAL_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/visual/*.cpp)
 
-file(GLOB MERGE_SRCS
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/topfd/deconv/deconv_json_merge.cpp)
-
 # toppic console main
 file(GLOB TOPPIC_PROC_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_process.cpp
 			     ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_argument.cpp)
@@ -158,13 +155,13 @@ add_executable(toppic
 	${TOPPIC_CONSOLE_SRCS} ${TOPPIC_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS} 
   ${SEQ_SRCS} ${SPEC_SRCS} ${ENV_SRCS} ${FEATURE_SRCS} ${PRSM_SRCS} ${FILTER_SRCS}  
 	${ZERO_PTM_SRCS} ${ONE_PTM_SEARCH_SRCS} ${PTM_SRCS} 
-  ${TDGF_SRCS} ${LOCAL_SRCS} ${VISUAL_SRCS} ${MERGE_SRCS})
+  ${TDGF_SRCS} ${LOCAL_SRCS} ${VISUAL_SRCS})
 
 add_executable(toppic_multi 
   ${TOPPIC_MULTI_CONSOLE_SRCS} ${TOPPIC_MULTI_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS} 
   ${SEQ_SRCS} ${SPEC_SRCS} ${ENV_SRCS} ${FEATURE_SRCS} ${PRSM_SRCS} ${FILTER_SRCS}  
 	${ZERO_PTM_SRCS} ${ONE_PTM_SEARCH_SRCS} ${PTM_SRCS} 
-  ${TDGF_SRCS} ${LOCAL_SRCS} ${VISUAL_SRCS} ${MERGE_SRCS})
+  ${TDGF_SRCS} ${LOCAL_SRCS} ${VISUAL_SRCS})
 
 add_executable(toppic_gui 
 	${TOPPIC_GUI_SRCS} ${TOPPIC_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS} 

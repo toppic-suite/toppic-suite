@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_TOPFD_DECONV_JSON_MERGE_HPP_
-#define TOPPIC_TOPFD_DECONV_JSON_MERGE_HPP_
+#ifndef TOPPIC_MS_SPEC_DECONV_JSON_MERGE_HPP_
+#define TOPPIC_MS_SPEC_DECONV_JSON_MERGE_HPP_
 
 #include <memory>
 #include <vector>
