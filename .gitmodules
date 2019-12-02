@@ -1,0 +1,4 @@
+[submodule "toppic_resources/topview"]
+	path = toppic_resources/topview
+	url = https://github.iu.edu/skankara/TopView/
+	branch = ver_1.0
