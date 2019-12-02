@@ -52,7 +52,7 @@ MsHeader::MsHeader(xercesc::DOMElement* element) {
 
 double MsHeader::getPrecMonoMass() {
   if (prec_mono_mz_ < 0 || std::isnan(prec_mono_mz_)) {
-    LOG_WARN("monoisotopic mass is not initialized");
+    LOG_INFO("id " << id_ << " monoisotopic mass is not initialized");
     return 0.0;
   } else {
     return Peak::compPeakNeutralMass(prec_mono_mz_, prec_charge_);
@@ -61,7 +61,7 @@ double MsHeader::getPrecMonoMass() {
 
 double MsHeader::getPrecSpMass() {
   if (prec_sp_mz_ < 0) {
-    LOG_WARN("precursor spectrum mass is not initialized");
+    LOG_WARN("id " << id_ << " precursor spectrum mass is not initialized");
     return 0.0;
   } else {
     return Peak::compPeakNeutralMass(prec_sp_mz_, prec_charge_);

@@ -148,8 +148,10 @@ void MsAlignReader::readNext() {
     }
   }
   if (id < 0 || prec_charge < 0 || prec_mass < 0) {
-    LOG_WARN("Input file format error: sp id " << id << " prec_chrg "
-             << prec_charge << " prec mass " << prec_mass);
+    if (level == 2) {
+      LOG_WARN("Input file format error: sp id " << id << " prec_chrg "
+               << prec_charge << " prec mass " << prec_mass);
+    }
   }
 
   MsHeaderPtr header_ptr = std::make_shared<MsHeader>();

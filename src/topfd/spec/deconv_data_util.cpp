@@ -39,11 +39,11 @@ DeconvDataPtr getDataPtr(PeakPtrVec &peak_list, double spec_max_mass,
                          int spec_max_charge, double para_max_mass, 
                          int para_max_charge, double window_size) {
   if (spec_max_charge < 1) {
-    LOG_WARN("Max charge < 1");
+    LOG_INFO("Max charge < 1");
     spec_max_charge = para_max_charge;
   }
   if (spec_max_mass <= 0) {
-    LOG_WARN("Max mass <= 0");
+    LOG_INFO("Max mass <= 0");
     spec_max_mass = para_max_mass;
   }
   if (spec_max_mass > para_max_mass) {
