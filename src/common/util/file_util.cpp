@@ -155,7 +155,6 @@ bool copyDir(const std::string &src_name,
           << " already exists. Fail to create the destination directory.");
       return false;
     }
-
     if (!fs::create_directory(destination)) {
       LOG_ERROR("Unable to create the destination folder "
                 << destination.string());

@@ -51,7 +51,7 @@ void jsonTranslate(std::map<std::string, std::string> &arguments,
   std::string base_name_short = base_name.substr(0, base_name.length() - 4);
   std::string html_dir = base_name_short + html_suffix + file_util::getFileSeparator() + fname_suffix;
   std::string json_dir = html_dir + file_util::getFileSeparator() + "data_js";
-  std::string resource_dir = arguments["resourceDir"];
+  //std::string resource_dir = arguments["resourceDir"];
 
   // check if the html dir exists 
   if (file_util::exists(html_dir)) {
@@ -60,8 +60,8 @@ void jsonTranslate(std::map<std::string, std::string> &arguments,
   }
 
   // copy resources 
-  std::string from_path(resource_dir + file_util::getFileSeparator() + "web2");
-  file_util::copyDir(from_path, html_dir);
+  //std::string from_path(resource_dir + file_util::getFileSeparator() + "topview");
+  //file_util::copyDir(from_path, html_dir);
 
   // data js files
   file_util::createFolder(json_dir + file_util::getFileSeparator() +"proteoforms");

@@ -67,6 +67,22 @@
 
 namespace toppic {
 
+void copyTopView(std::map<std::string, std::string> &arguments) {
+  std::string spectrum_file_name = arguments["spectrumFileName"];
+  std::string base_name = file_util::basename(spectrum_file_name);
+  std::string base_name_short = base_name.substr(0, base_name.length() - 4);
+  std::string topview_dir = base_name_short + "_html" +  file_util::getFileSeparator() + "topview";
+  if (file_util::exists(topview_dir)) {
+    LOG_WARN("The TopView directory " << topview_dir << " exists!");
+    file_util::delDir(topview_dir);
+  }
+
+  std::string resource_dir = arguments["resourceDir"];
+  // copy resources 
+  std::string from_path(resource_dir + file_util::getFileSeparator() + "topview");
+  file_util::copyDir(from_path, topview_dir);
+}
+
 void cleanToppicDir(const std::string &fa_name, 
                     const std::string & sp_name,
                     bool keep_temp_files) {
@@ -412,6 +428,8 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     table_out->write();
     table_out = nullptr;
     std::cout << "Outputting PrSM table - finished." << std::endl;
+
+    copyTopView(arguments);
 
     std::cout << "Generating PrSM xml files - started." << std::endl;
     XmlGeneratorPtr xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, suffix, "toppic_prsm_cutoff");

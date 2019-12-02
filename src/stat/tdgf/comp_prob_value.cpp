@@ -303,7 +303,7 @@ void CompProbValue::compPrecProbs() {
     prob += results_[0][last_peak_index][i];
   }
   if (prob == 0 && prec_mass_minus_water >= 1000) {
-    LOG_WARN("Precursor probability is zero!"); 
+    LOG_INFO("Precursor probability is zero!"); 
   }
   prec_probs_.push_back(prob);
 

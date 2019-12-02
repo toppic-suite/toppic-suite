@@ -371,6 +371,10 @@ void XmlGenerator::removeTempFiles() {
 
 void XmlGenerator::process() {
   LOG_DEBUG("process start");
+  if (file_util::exists(mng_ptr_->xml_path_)) {
+    LOG_WARN("The xml directory " << mng_ptr_->xml_path_ << " exists!");
+    file_util::delDir(mng_ptr_->xml_path_);
+  }
   file_util::createFolder(mng_ptr_->xml_path_ + file_util::getFileSeparator() + "proteoforms");
   file_util::createFolder(mng_ptr_->xml_path_ + file_util::getFileSeparator() + "prsms");
   file_util::createFolder(mng_ptr_->xml_path_ + file_util::getFileSeparator() + "proteins");

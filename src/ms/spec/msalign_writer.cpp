@@ -55,11 +55,12 @@ void MsAlignWriter::write(DeconvMsPtr ms_ptr) {
   output_ << "SCANS=" << header_ptr->getScansString() << std::endl;
   output_ << "RETENTION_TIME=" << std::setprecision(2)
       << header_ptr->getRetentionTime() << std::endl;
-  if (header_ptr->getActivationPtr() != nullptr) {
-    output_ << "ACTIVATION=" << header_ptr->getActivationPtr()->getName() << std::endl;
-  }
+  output_ << "LEVEL=" << header_ptr->getMsLevel() << std::endl;
 
   if (header_ptr->getMsLevel() > 1) {
+    if (header_ptr->getActivationPtr() != nullptr) {
+      output_ << "ACTIVATION=" << header_ptr->getActivationPtr()->getName() << std::endl;
+    }
     output_ << "MS_ONE_ID=" << header_ptr->getMsOneId() << std::endl;
     output_ << "MS_ONE_SCAN=" << header_ptr->getMsOneScan() << std::endl;
     output_ << "PRECURSOR_MZ=" << std::setprecision(5) 
