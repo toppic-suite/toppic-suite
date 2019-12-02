@@ -47,7 +47,8 @@ void FeatureMerge::process(std::string &para_str) {
   std::vector<std::string> frac_xml_feature_names;
   std::vector<std::string> spec_feature_names;
   for (size_t i = 0; i < spec_file_names_.size(); i++) { 
-    std::string base_name = file_util::basename(spec_file_names_[i]);
+    std::string file_name = file_util::basename(spec_file_names_[i]);
+    std::string base_name = file_name.substr(0, file_name.length() - 4);
     //std::string frac_feature = base_name + "_frac.feature";
     //frac_feature_names.push_back(frac_feature);
     std::string frac_xml_feature = base_name + "_frac.feature";
@@ -90,10 +91,11 @@ void FeatureMerge::mergeFiles(const std::vector<std::string> &frac_xml_feature_f
     all_frac_features.insert(all_frac_features.end(), features.begin(), features.end());
   }
 
-  double mass_tolerance = 0.2;
-  double time_tolerance = 600;
   FracFeaturePtrVec2D clusters;
-  frac_feature_cluster::cluster(all_frac_features, clusters, mass_tolerance, time_tolerance);
+  //double mass_tolerance = 0.2;
+  //double time_tolerance = 600;
+  //frac_feature_cluster::cluster(all_frac_features, clusters, mass_tolerance, time_tolerance);
+  frac_feature_cluster::simpleCluster(all_frac_features, clusters);
   
   //sample features;
   SampleFeaturePtrVec sample_features;
