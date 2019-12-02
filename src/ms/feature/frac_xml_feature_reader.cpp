@@ -73,7 +73,6 @@ FracFeaturePtr FracXmlFeatureReader::readOneFeature() {
   for (size_t i = 0; i < ft_str_vec.size(); i++) {
     ft_str += ft_str_vec[i];
   }
-  // LOG_DEBUG("prsm str " << prsm_str);
   xercesc::MemBufInputSource ft_buf(
       (const XMLByte*)ft_str.c_str(), ft_str.size(), "feature_str (in memory)");
 

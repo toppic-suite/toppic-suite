@@ -59,8 +59,8 @@ void moveFiles(std::string &spec_file_name, bool move_mzrt) {
   file_util::createFolder(file_dir);
   std::string file_name = base_name + "_ms1.msalign";
   file_util::moveFile(file_name, file_dir);
-  file_name = base_name + "_frac.feature";
-  file_util::moveFile(file_name, file_dir);
+  //file_name = base_name + "_feature.xml";
+  //file_util::moveFile(file_name, file_dir);
   if (move_mzrt) {
     file_name = base_name + "_frac.mzrt.csv";
     file_util::moveFile(file_name, file_dir);

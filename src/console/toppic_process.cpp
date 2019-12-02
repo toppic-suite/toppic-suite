@@ -28,6 +28,8 @@
 
 #include "ms/spec/msalign_reader.hpp"
 #include "ms/spec/msalign_util.hpp"
+#include "ms/spec/msalign_frac_merge.hpp"
+#include "ms/feature/feature_merge.hpp"
 
 #include "prsm/prsm_para.hpp"
 #include "prsm/prsm_str_merge.hpp"
@@ -39,6 +41,8 @@
 #include "prsm/prsm_feature_cluster.hpp"
 #include "prsm/prsm_form_filter.hpp"
 #include "prsm/prsm_util.hpp"
+
+#include "topfd/deconv/deconv_json_merge.hpp"
 
 #include "filter/zeroptm/zero_ptm_filter_mng.hpp"
 #include "filter/zeroptm/zero_ptm_filter_processor.hpp"
@@ -503,6 +507,8 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
   std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
   std::string combined_start_time = buf;
 
+  xercesc::XMLPlatformUtils::Initialize(); 
+
   std::cout << "TopPIC " << toppic::Version::getVersion() << std::endl;
 
   for (size_t k = 0; k < spec_file_lst.size(); k++) {
@@ -515,25 +521,27 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
     }
   }
 
-  /*
   if (spec_file_lst.size() > 1 && arguments["combinedOutputName"] != "") {
-    std::cout << "Merging files - started." << std::endl;
-    // merge msalign files
-    toppic::MsAlignFracCombine::mergeFiles(spec_file_lst, base_name + "_ms2.msalign");
-    // merge feature files
-    int N = 1000000;
-    std::vector<std::string> feature_file_lst(spec_file_lst.size());
-    for (size_t i = 0; i < spec_file_lst.size(); i++) {
-      std::string sp_file_name = spec_file_lst[i];
-      feature_file_lst[i] = sp_file_name.substr(0, sp_file_name.length() - 12) + ".feature";
-    }
-    toppic::feature_util::mergeFeatureFiles(feature_file_lst, N, base_name + ".feature");
+    std::string merged_file_name = arguments["combinedOutputName"]; 
+    std::string para_str = "";
+    std::cout << "Merging files started." << std::endl;
+    toppic::MsAlignFracMerge::mergeFiles(spec_file_lst, merged_file_name + "_ms2.msalign", para_str);
+    toppic::DeconvJsonMergePtr json_merger 
+        = std::make_shared<toppic::DeconvJsonMerge>(spec_file_lst, merged_file_name);
+    json_merger->process();
+    json_merger = nullptr;
+    toppic::FeatureMergePtr feature_merger 
+        = std::make_shared<toppic::FeatureMerge>(spec_file_lst, merged_file_name);
+    feature_merger->process(para_str);
+    feature_merger = nullptr;
+
     // merge EVALUE files
     std::vector<std::string> prsm_file_lst(spec_file_lst.size());
     for (size_t i = 0; i < spec_file_lst.size(); i++) {
       prsm_file_lst[i] = toppic::file_util::basename(spec_file_lst[i]) + ".toppic_evalue"; 
     }
-    toppic::prsm_util::mergePrsmFiles(prsm_file_lst, N, base_name + "_ms2.toppic_evalue");
+    int N = 1000000;
+    toppic::prsm_util::mergePrsmFiles(prsm_file_lst, N , base_name + "_ms2.toppic_evalue");
     std::cout << "Merging files - finished." << std::endl;
 
     std::string sp_file_name = base_name + "_ms2.msalign";
@@ -541,7 +549,6 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
     arguments["startTime"] = combined_start_time;
     toppic::TopPIC_post(arguments);
   }
-  */
 
   bool keep_temp_files = (arguments["keepTempFiles"] == "true"); 
 
@@ -553,13 +560,10 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
     cleanToppicDir(ori_db_file_name, sp_file_name, keep_temp_files);
   }
 
-  /*
-     if (spec_file_lst.size() > 1 && arguments["combinedOutputName"] != "") {
-     std::string sp_file_name = base_name + "_ms2.msalign";
-     cleanToppicDir(ori_db_file_name, sp_file_name);
-     }
-     */
-
+  if (spec_file_lst.size() > 1 && arguments["combinedOutputName"] != "") {
+    std::string sp_file_name = base_name + "_ms2.msalign";
+    cleanToppicDir(ori_db_file_name, sp_file_name, keep_temp_files);
+  }
   std::cout << "Deleting temporary files - finished." << std::endl; 
 
   std::cout << "TopPIC finished." << std::endl << std::flush;
