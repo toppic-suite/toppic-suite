@@ -471,7 +471,7 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     std::cout << "Outputting proteoform table - finished." << std::endl;
 
     std::cout << "Generating proteoform xml files - started." << std::endl;
-    xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, suffix, "toppic_proteoform_cutoff");
+    xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, "toppic_form_cutoff", "toppic_proteoform_cutoff");
     xml_gene->process();
     xml_gene = nullptr;
     std::cout << "Generating proteoform xml files - finished." << std::endl;
