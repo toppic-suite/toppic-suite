@@ -18,8 +18,9 @@
 #include <vector>
 
 #include "common/util/version.hpp"
-#include "common/util/file_util.hpp"
 #include "common/base/base_data.hpp"
+#include "common/util/file_util.hpp"
+#include "common/base/mod_util.hpp"
 
 #include "seq/fasta_reader.hpp"
 #include "seq/fasta_util.hpp"
@@ -121,6 +122,25 @@ void cleanTopmgDir(const std::string &fa_name,
     file_util::delDir(sp_base + "_topmg_proteoform_cutoff_xml");
     file_util::delDir(sp_base + "_topmg_prsm_cutoff_xml");
   }
+}
+
+int TopMG_testModFile(std::map<std::string, std::string> & arguments) {
+  try {
+    base_data::init();
+    LOG_DEBUG("Init base data completed");
+
+    // Test arguments
+    PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
+
+    if (arguments["varModFileName"] != "") {
+      mod_util::readModTxt(arguments["varModFileName"]);
+    }
+  } catch (const char* e) {
+    std::cout << "[Exception]" << std::endl;
+    std::cout << e << std::endl;
+    exit(EXIT_FAILURE);
+  }
+  return 0;
 }
 
 int TopMG_identify(std::map<std::string, std::string> & arguments) {
@@ -250,7 +270,6 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
   }
-
   return 0;
 }
 
@@ -421,6 +440,9 @@ int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
   std::string combined_start_time = buf;
 
   std::cout << "TopMG " << toppic::Version::getVersion() << std::endl;
+
+  xercesc::XMLPlatformUtils::Initialize(); 
+  TopMG_testModFile(arguments);
 
   for (size_t k = 0; k < spec_file_lst.size(); k++) {
     std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));

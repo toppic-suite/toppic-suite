@@ -46,7 +46,7 @@ void Argument::initArguments() {
   arguments_["searchType"] = "TARGET";
   arguments_["fixedMod"] = "";
   arguments_["ptmNumber"] = "0";
-  arguments_["errorTolerance"] = "15";
+  arguments_["massErrorTolerance"] = "15";
   arguments_["cutoffSpectralType"] = "EVALUE";
   arguments_["cutoffSpectralValue"] = "0.01";
   arguments_["cutoffProteoformType"] = "EVALUE";
@@ -83,13 +83,25 @@ void Argument::outputArguments(std::ostream &output, std::map<std::string, std::
 
   if (arguments["fixedMod"] == "") {
     output << std::setw(50) << std::left << "Fixed modifications: " << "\t" << "None" << std::endl;
-  } else {
-    output << std::setw(50) << std::left << "Fixed modifications: " << "\t" << arguments["fixedMod"] << std::endl;
+  } 
+  else if (arguments["fixedMod"] == "C57") {
+    output << std::setw(50) << std::left << "Fixed modifications: " << "\t" << "C57:carbamidomethylation on cysteine" << std::endl;
+  }
+  else if (arguments["fixedMod"] == "C58") {
+    output << std::setw(50) << std::left << "Fixed modifications: " << "\t" << "C58:carboxymethylation on cysteine" << std::endl;
+  }
+  else {
+    output << std::setw(50) << std::left << "Fixed modifications:," << arguments["fixedMod"] << std::endl;
   }
 
-  output << std::setw(50) << std::left << "Use TopFD feature file: " << "\t" << arguments["useFeatureFile"] << std::endl;
+  if (arguments["useFeatureFile"] == "true") {
+    output << std::setw(50) << std::left << "Use TopFD feature file: " << "\t" << "True" << std::endl;
+  }
+  else {
+    output << std::setw(50) << std::left << "Use TopFD feature file: " << "\t" << "False" << std::endl;
+  }
 
-  output << std::setw(50) << std::left << "Error tolerance: " << "\t" << arguments["errorTolerance"] << " ppm" << std::endl;
+  output << std::setw(50) << std::left << "Error tolerance: " << "\t" << arguments["massErrorTolerance"] << " ppm" << std::endl;
   output << std::setw(50) << std::left << "Spectrum-level cutoff type: " << "\t" << arguments["cutoffSpectralType"] << std::endl;
   output << std::setw(50) << std::left << "Spectrum-level cutoff value: " << "\t" << arguments["cutoffSpectralValue"] << std::endl;
   output << std::setw(50) << std::left << "Proteoform-level cutoff type: " << "\t" << arguments["cutoffProteoformType"] << std::endl;
@@ -125,14 +137,26 @@ std::string Argument::outputCsvArguments(std::map<std::string, std::string> argu
   output << "Search type:" << comma << arguments["searchType"] << std::endl;
 
   if (arguments["fixedMod"] == "") {
-    output << std::left << "Fixed modifications:" << comma << "None" << std::endl;
-  } else {
+    output << "Fixed modifications:" << comma << "None" << std::endl;
+  } 
+  else if (arguments["fixedMod"] == "C57") {
+    output << "Fixed modifications:" << comma << "C57:carbamidomethylation on cysteine" << std::endl;
+  }
+  else if (arguments["fixedMod"] == "C58") {
+    output << "Fixed modifications:" << comma << "C58:carboxymethylation on cysteine" << std::endl;
+  }
+  else {
     output << "Fixed modifications:" << comma << arguments["fixedMod"] << std::endl;
   }
 
-  output << "Use TopFD feature file:" << comma << arguments["useFeatureFile"] << std::endl;
+  if (arguments["useFeatureFile"] == "true") {
+    output << "Use TopFD feature file:" << comma << "True" << std::endl;
+  }
+  else {
+    output << "Use TopFD feature file:" << comma << "False" << std::endl;
+  }
 
-  output << "Error tolerance:" << comma << arguments["errorTolerance"] << " ppm" << std::endl;
+  output << "Error tolerance:" << comma << arguments["massErrorTolerance"] << " ppm" << std::endl;
   output << "Spectrum-level cutoff type:" << comma << arguments["cutoffSpectralType"] << std::endl;
   output << "Spectrum-level cutoff value:" << comma << arguments["cutoffSpectralValue"] << std::endl;
   output << "Proteoform-level cutoff type:" << comma << arguments["cutoffProteoformType"] << std::endl;
@@ -197,23 +221,24 @@ bool Argument::parse(int argc, char* argv[]) {
          "<a list of allowed N-terminal forms>. N-terminal forms of proteins. Four N-terminal forms can be selected: NONE, NME, NME_ACETYLATION, and M_ACETYLATION. NONE stands for no modifications, NME for N-terminal methionine excision, NME_ACETYLATION for N-terminal acetylation after the initiator methionine is removed, and M_ACETYLATION for N-terminal methionine acetylation. When multiple forms are allowed, they are separated by commas. Default value: NONE,NME,NME_ACETYLATION,M_ACETYLATION.")
         ("decoy,d", "Use a decoy protein database to estimate false discovery rates.")
         ("error-tolerance,e", po::value<std::string> (&error_tole), "<a positive integer>. Error tolerance for precursor and fragment masses in PPM. Default value: 15.")
-        ("max-shift,m", po::value<std::string> (&max_ptm_mass), "<a positive number>. Maximum absolute value of the mass shift (in Dalton). Default value: 500.")
+        ("max-shift,M", po::value<std::string> (&max_ptm_mass), "<a positive number>. Maximum absolute value of the mass shift (in Dalton). Default value: 500.")
         ("spectrum-cutoff-type,t", po::value<std::string> (&cutoff_spectral_type), "<EVALUE|FDR>. Spectrum-level cutoff type for filtering identified proteoform spectrum-matches. Default value: EVALUE.")
         ("spectrum-cutoff-value,v", po::value<std::string> (&cutoff_spectral_value), "<a positive number>. Spectrum-level cutoff value for filtering identified proteoform spectrum-matches. Default value: 0.01.")
         ("proteoform-cutoff-type,T", po::value<std::string> (&cutoff_proteoform_type), "<EVALUE|FDR>. Proteoform-level cutoff type for filtering identified proteoform spectrum-matches. Default value: EVALUE.")
         ("proteoform-cutoff-value,V", po::value<std::string> (&cutoff_proteoform_value), "<a positive number>. Proteoform-level cutoff value for filtering identified proteoform spectrum-matches. Default value: 0.01.")
-        ("mod-file-name,i", po::value<std::string>(&var_mod_file_name), "<a common modification file>. Specify a text file containing the information of common PTMs for constructing proteoform graphs.")
+        ("mod-file-name,i", po::value<std::string>(&var_mod_file_name), "<a modification file>. Specify a text file containing the information of common PTMs for constructing proteoform graphs.")
         ("thread-number,u", po::value<std::string> (&thread_number), "<a positive integer>. Number of threads used in the computation. Default value: 1.")
         ("no-topfd-feature,x", "No TopFD feature file for proteoform identification.")
-        ("skip-list,l", po::value<std::string>(&skip_list) , "<a text file with its path>. The scans in this file will be skipped.")
         ("proteo-graph-gap,j", po::value<std::string> (&proteo_graph_gap), "<a positive number>. Gap in constructing proteoform graph. Default value: 40.")
         ("var-ptm-in-gap,G", po::value<std::string>(&var_ptm_in_gap) , "<a positive number>. Maximum number of variable PTMs in a proteform graph gap. Default value: 5.")
-        ("use-asf-diagonal,D", "Use the ASF-DIAGONAL method for protein filtering.")
-        ("var-ptm,P", po::value<std::string>(&var_ptm_num) , "<a positive number>. Maximum number of variable PTMs. Default value: 5.")
-        ("num-shift,p", po::value<std::string> (&ptm_num), "<0|1|2>. Maximum number of unexpected modifications in a proteoform spectrum-match. Default value: 0.")
-        ("combined-file-name, c", po::value<std::string>(&combined_output_name) , "Specify a file name for the combined spectrum data file and analysis results.")
+        ("use-asf-diagonal,D", "Use the ASF-DIAGONAL method for protein sequence filtering.")
+        ("var-ptm,p", po::value<std::string>(&var_ptm_num) , "<a positive number>. Maximum number of variable PTMs. Default value: 5.")
+        ("num-shift,s", po::value<std::string> (&ptm_num), "<0|1|2>. Maximum number of unexpected modifications in a proteoform spectrum-match. Default value: 0.")
+        ("combined-file-name,c", po::value<std::string>(&combined_output_name) , "Specify a file name for the combined spectrum data file and analysis results.")
         ("keep-temp-files,k", "Keep temporary files.");
-
+    
+//("skip-list,l", po::value<std::string>(&skip_list) , "<a text file with its path>. The scans in this file will be skipped.")
+//
     po::options_description desc("Options");
 
     desc.add_options()
@@ -223,7 +248,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("n-terminal-form,n", po::value<std::string> (&allow_mod), "")
         ("decoy,d", "")
         ("error-tolerance,e", po::value<std::string> (&error_tole), "")
-        ("max-shift,m", po::value<std::string> (&max_ptm_mass), "")
+        ("max-shift,M", po::value<std::string> (&max_ptm_mass), "")
         ("spectrum-cutoff-type,t", po::value<std::string> (&cutoff_spectral_type), "")
         ("spectrum-cutoff-value,v", po::value<std::string> (&cutoff_spectral_value), "")
         ("proteoform-cutoff-type,T", po::value<std::string> (&cutoff_proteoform_type), "")
@@ -239,8 +264,8 @@ bool Argument::parse(int argc, char* argv[]) {
         ("proteo-graph-gap,j", po::value<std::string> (&proteo_graph_gap), "")
         ("var-ptm-in-gap,G", po::value<std::string>(&var_ptm_in_gap) , "")
         ("use-asf-diagonal,D", "")
-        ("var-ptm,P", po::value<std::string>(&var_ptm_num) , "")
-        ("num-shift,p", po::value<std::string> (&ptm_num), "")
+        ("var-ptm,p", po::value<std::string>(&var_ptm_num) , "")
+        ("num-shift,s", po::value<std::string> (&ptm_num), "")
         ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name with its path.")
         ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), "Spectrum file name with its path.");
 
@@ -312,7 +337,7 @@ bool Argument::parse(int argc, char* argv[]) {
     }
 
     if (vm.count("error-tolerance")) {
-      arguments_["errorTolerance"] = error_tole;
+      arguments_["massErrorTolerance"] = error_tole;
     }
 
     if (vm.count("max-shift")) {
