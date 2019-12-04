@@ -44,6 +44,7 @@ toppicWindow::toppicWindow(QWidget *parent) :
       ui->miscoreThresholdEdit->setValidator(validator2);
       ui->threadNumberEdit->setValidator(new QIntValidator(0, 2147483647, this));
       ui->errorToleranceEdit->setValidator(new QIntValidator(0, 2147483647, this));
+      ui->formErrorToleranceEdit->setValidator(new QDoubleValidator(0, 2147483647, 4, this));
       QRegExp rx3("^-?\\d{1,8}\\.\\d{0,2}$");
       QRegExpValidator *validator3 = new QRegExpValidator(rx3, this);
       ui->minModEdit->setValidator(validator3);
@@ -85,7 +86,8 @@ void toppicWindow::initArguments() {
   arguments_["searchType"] = "TARGET";
   arguments_["fixedMod"] = "";
   arguments_["ptmNumber"] = "1";
-  arguments_["errorTolerance"] = "15";
+  arguments_["massErrorTolerance"] = "15";
+  arguments_["proteoformErrorTolerance"] = "1.2";
   arguments_["cutoffSpectralType"] = "EVALUE";
   arguments_["cutoffSpectralValue"] = "0.01";
   arguments_["cutoffProteoformType"] = "EVALUE";
@@ -120,6 +122,7 @@ void toppicWindow::on_defaultButton_clicked() {
   ui->combinedOutputEdit->setText("");
   ui->fixedModFileEdit->clear();
   ui->errorToleranceEdit->setText("15");
+  ui->formErrorToleranceEdit->setText("1.2");
   ui->maxModEdit->setText("500");
   ui->minModEdit->setText("-500");
   ui->cutoffSpectralValueEdit->setText("0.01");
@@ -279,7 +282,8 @@ std::map<std::string, std::string> toppicWindow::getArguments() {
     arguments_["fixedMod"] = ui->fixedModFileEdit->text().toStdString();
   }
   arguments_["ptmNumber"] = ui->numModComboBox->currentText().toStdString();
-  arguments_["errorTolerance"] = ui->errorToleranceEdit->text().toStdString();
+  arguments_["massErrorTolerance"] = ui->errorToleranceEdit->text().toStdString();
+  arguments_["proteoformErrorTolerance"] = ui->formErrorToleranceEdit->text().toStdString();
   arguments_["cutoffSpectralType"] = ui->cutoffSpectralTypeComboBox->currentText().toStdString();
   arguments_["cutoffSpectralValue"] = ui->cutoffSpectralValueEdit->text().toStdString();
   arguments_["cutoffProteoformType"] = ui->cutoffProteoformTypeComboBox->currentText().toStdString();
@@ -390,6 +394,7 @@ void toppicWindow::lockDialog() {
   ui->fixedModFileEdit->setEnabled(false);
   ui->fixedModFileButton->setEnabled(false);
   ui->errorToleranceEdit->setEnabled(false);
+  ui->formErrorToleranceEdit->setEnabled(false);
   ui->maxModEdit->setEnabled(false);
   ui->minModEdit->setEnabled(false);
   ui->cutoffSpectralValueEdit->setEnabled(false);
@@ -427,6 +432,7 @@ void toppicWindow::unlockDialog() {
   }
   ui->fixedModFileEdit->setEnabled(true);
   ui->errorToleranceEdit->setEnabled(true);
+  ui->formErrorToleranceEdit->setEnabled(true);
   ui->maxModEdit->setEnabled(true);
   ui->minModEdit->setEnabled(true);
   ui->cutoffSpectralValueEdit->setEnabled(true);
@@ -495,6 +501,7 @@ bool toppicWindow::checkError() {
                          QMessageBox::Yes);
     return true;
   }
+
   if (ui->fixedModFileEdit->text().isEmpty() && ui->fixedModComboBox->currentIndex() == 3) {
     QMessageBox::warning(this, tr("Warning"),
                          tr("Please select a fixed modification file!"),
@@ -503,7 +510,13 @@ bool toppicWindow::checkError() {
   }
   if (ui->errorToleranceEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
-                         tr("Error tolerance is empty!"),
+                         tr("Mass error tolerance is empty!"),
+                         QMessageBox::Yes);
+    return true;
+  }
+  if (ui->formErrorToleranceEdit->text().isEmpty()) {
+    QMessageBox::warning(this, tr("Warning"),
+                         tr("Proteoform error tolerance is empty!"),
                          QMessageBox::Yes);
     return true;
   }
@@ -572,7 +585,7 @@ void toppicWindow::showArguments() {
                                         "\nsearchType:" + arguments_["searchType"] +
                                         "\nfixedMod:" + arguments_["fixedMod"] +
                                         "\nptmNumber:" + arguments_["ptmNumber"] +
-                                        "\nerrorTolerance:" + arguments_["errorTolerance"] +
+                                        "\nmassErrorTolerance:" + arguments_["massErrorTolerance"] +
                                         "\ncutoffSpectralType:" + arguments_["cutoffSpectralType"] +
                                         "\ncutoffSpectralValue:" + arguments_["cutoffSpectralValue"] +
                                         "\ncutoffProteoformType:" + arguments_["cutoffProteoformType"] +
