@@ -101,7 +101,7 @@ void Argument::outputArguments(std::ostream &output,
 
   output << std::setw(44) << std::left << "Maximum number of unexpected modifications: " << "\t" << arguments["ptmNumber"] << std::endl;
   output << std::setw(44) << std::left << "Error tolerance for matching masses: " << "\t" << arguments["massErrorTolerance"] << " ppm" << std::endl;
-  output << std::setw(44) << std::left << "Error tolerance for identifying proteoforms: " << "\t" << arguments["proteoformErrorTolerance"] 
+  output << std::setw(44) << std::left << "Error tolerance for identifying PrSM clusters: " << "\t" << arguments["proteoformErrorTolerance"] 
       << " Da" << std::endl;
   output << std::setw(44) << std::left << "Spectrum-level cutoff type: " << "\t" << arguments["cutoffSpectralType"] << std::endl;
   output << std::setw(44) << std::left << "Spectrum-level cutoff value: " << "\t" << arguments["cutoffSpectralValue"] << std::endl;
@@ -165,7 +165,7 @@ std::string Argument::outputCsvArguments(std::map<std::string, std::string> argu
 
   output << "Maximum number of unexpected modifications:," << arguments["ptmNumber"] << std::endl;
   output << "Error tolerance for matching masses:," << arguments["massErrorTolerance"] << " ppm" << std::endl;
-  output << "Error tolerance for identifying proteoforms:," << arguments["proteoformErrorTolerance"] << " Da" << std::endl;
+  output << "Error tolerance for identifying PrSM clusters:," << arguments["proteoformErrorTolerance"] << " Da" << std::endl;
   output << "Spectrum-level cutoff type:,"  << arguments["cutoffSpectralType"] << std::endl;
   output << "Spectrum-level cutoff value:," << arguments["cutoffSpectralValue"] << std::endl;
   output << "Proteoform-level cutoff type:," << arguments["cutoffProteoformType"] << std::endl;
@@ -556,28 +556,26 @@ bool Argument::validateArguments() {
   }
 
   std::string mass_error_tole_value = arguments_["massErrorTolerance"];
-  LOG_ERROR("mass tole value " << mass_error_tole_value);
   try {
     double tole = std::stoi(mass_error_tole_value);
     if (tole <= 0) {
-      LOG_ERROR("Mass error tolerance " << mass_error_tole_value << " error! The value should be positive.");
+      LOG_ERROR("Mass error tolerance: " << mass_error_tole_value << " error! The value should be positive.");
       return false;
     }
   } catch (int e) {
-    LOG_ERROR("Mass error tolerance value " << mass_error_tole_value << " should be a number.");
+    LOG_ERROR("Mass error tolerance: " << mass_error_tole_value << " should be a number.");
     return false;
   }
 
   std::string form_error_tole_value = arguments_["proteoformErrorTolerance"];
-  LOG_ERROR("form tole value " << form_error_tole_value);
   try {
     double tole = std::stod(form_error_tole_value);
     if (tole <= 0) {
-      LOG_ERROR("Proteoform error tolerance " << form_error_tole_value << " error! The value should be positive.");
+      LOG_ERROR("PrSM clustering error tolerance: " << form_error_tole_value << " error! The value should be positive.");
       return false;
     }
   } catch (int e) {
-    LOG_ERROR("Proteoform error tolerance value " << form_error_tole_value << " should be a number.");
+    LOG_ERROR("PrSM clustering error tolerance: " << form_error_tole_value << " should be a number.");
     return false;
   }
 
