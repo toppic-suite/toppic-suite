@@ -42,7 +42,8 @@ void Argument::initArguments() {
   arguments_["searchType"] = "TARGET";
   arguments_["fixedMod"] = "";
   arguments_["ptmNumber"] = "1";
-  arguments_["errorTolerance"] = "15";
+  arguments_["massErrorTolerance"] = "15";
+  arguments_["proteoformErrorTolerance"] = "1.2";
   arguments_["cutoffSpectralType"] = "EVALUE";
   arguments_["cutoffSpectralValue"] = "0.01";
   arguments_["cutoffProteoformType"] = "EVALUE";
@@ -99,7 +100,9 @@ void Argument::outputArguments(std::ostream &output,
   }
 
   output << std::setw(44) << std::left << "Maximum number of unexpected modifications: " << "\t" << arguments["ptmNumber"] << std::endl;
-  output << std::setw(44) << std::left << "Error tolerance: " << "\t" << arguments["errorTolerance"] << " ppm" << std::endl;
+  output << std::setw(44) << std::left << "Error tolerance for matching masses: " << "\t" << arguments["massErrorTolerance"] << " ppm" << std::endl;
+  output << std::setw(44) << std::left << "Error tolerance for identifying proteoforms: " << "\t" << arguments["proteoformErrorTolerance"] 
+      << " Da" << std::endl;
   output << std::setw(44) << std::left << "Spectrum-level cutoff type: " << "\t" << arguments["cutoffSpectralType"] << std::endl;
   output << std::setw(44) << std::left << "Spectrum-level cutoff value: " << "\t" << arguments["cutoffSpectralValue"] << std::endl;
   output << std::setw(44) << std::left << "Proteoform-level cutoff type: " << "\t" << arguments["cutoffProteoformType"] << std::endl;
@@ -161,7 +164,8 @@ std::string Argument::outputCsvArguments(std::map<std::string, std::string> argu
   }
 
   output << "Maximum number of unexpected modifications:," << arguments["ptmNumber"] << std::endl;
-  output << "Error tolerance:," << arguments["errorTolerance"] << " ppm" << std::endl;
+  output << "Error tolerance for matching masses:," << arguments["massErrorTolerance"] << " ppm" << std::endl;
+  output << "Error tolerance for identifying proteoforms:," << arguments["proteoformErrorTolerance"] << " Da" << std::endl;
   output << "Spectrum-level cutoff type:,"  << arguments["cutoffSpectralType"] << std::endl;
   output << "Spectrum-level cutoff value:," << arguments["cutoffSpectralValue"] << std::endl;
   output << "Proteoform-level cutoff type:," << arguments["cutoffProteoformType"] << std::endl;
@@ -202,7 +206,8 @@ bool Argument::parse(int argc, char* argv[]) {
   std::string fixed_mod = "";
   std::string allow_mod = "";
   std::string ptm_num = "";
-  std::string error_tole = "";
+  std::string mass_error_tole = "";
+  std::string form_error_tole = "";
   std::string max_ptm_mass = "";
   std::string min_ptm_mass = "";
   std::string cutoff_spectral_type = "";
@@ -232,7 +237,8 @@ bool Argument::parse(int argc, char* argv[]) {
         ("n-terminal-form,n", po::value<std::string> (&allow_mod), 
          "<a list of allowed N-terminal forms>. N-terminal forms of proteins. Four N-terminal forms can be selected: NONE, NME, NME_ACETYLATION, and M_ACETYLATION. NONE stands for no modifications, NME for N-terminal methionine excision, NME_ACETYLATION for N-terminal acetylation after the initiator methionine is removed, and M_ACETYLATION for N-terminal methionine acetylation. When multiple forms are allowed, they are separated by commas. Default value: NONE,NME,NME_ACETYLATION,M_ACETYLATION.")
         ("decoy,d", "Use a decoy protein database to estimate false discovery rates.")
-        ("error-tolerance,e", po::value<std::string> (&error_tole), "<a positive integer>. Error tolerance for precursor and fragment masses in PPM. Default value: 15.")
+        ("mass-error-tolerance,e", po::value<std::string> (&mass_error_tole), "<a positive integer>. Error tolerance for precursor and fragment masses in PPM. Default value: 15.")
+        ("proteoform-error-tolerance,p", po::value<std::string> (&form_error_tole), "<a positive number>. Error tolerance for identifying proteoforms in Dalton. Default value: 1.2 Dalton.")
         ("max-shift,M", po::value<std::string> (&max_ptm_mass), "Maximum value of the mass shift of an unexpected modification. Default value: 500 Dalton.")
         ("min-shift,m", po::value<std::string> (&min_ptm_mass), "Minimum value of the mass shift of an unexpected modification. Default value: -500 Dalton.")
         ("num-shift,s", po::value<std::string> (&ptm_num), "<0|1|2>. Maximum number of unexpected modifications in a proteoform-spectrum-match. Default value: 1.")
@@ -258,7 +264,8 @@ bool Argument::parse(int argc, char* argv[]) {
         ("fixed-mod,f", po::value<std::string> (&fixed_mod), "")
         ("n-terminal-form,n", po::value<std::string> (&allow_mod), "")
         ("decoy,d", "")
-        ("error-tolerance,e", po::value<std::string> (&error_tole), "")
+        ("mass-error-tolerance,e", po::value<std::string> (&mass_error_tole), "")
+        ("proteoform-error-tolerance,p", po::value<std::string> (&form_error_tole), "")
         ("max-shift,M", po::value<std::string> (&max_ptm_mass), "")
         ("min-shift,m", po::value<std::string> (&min_ptm_mass), "")
         ("num-shift,s", po::value<std::string> (&ptm_num), "")
@@ -349,8 +356,12 @@ bool Argument::parse(int argc, char* argv[]) {
       arguments_["ptmNumber"] = ptm_num;
     }
 
-    if (vm.count("error-tolerance")) {
-      arguments_["errorTolerance"] = error_tole;
+    if (vm.count("mass-error-tolerance")) {
+      arguments_["massErrorTolerance"] = mass_error_tole;
+    }
+
+    if (vm.count("proteoform-error-tolerance")) {
+      arguments_["proteoformErrorTolerance"] = form_error_tole;
     }
 
     if (vm.count("max-shift")) {
@@ -543,6 +554,33 @@ bool Argument::validateArguments() {
     LOG_ERROR("Maximum ptm mass " << max_ptm_mass << " should be a number.");
     return false;
   }
+
+  std::string mass_error_tole_value = arguments_["massErrorTolerance"];
+  LOG_ERROR("mass tole value " << mass_error_tole_value);
+  try {
+    double tole = std::stoi(mass_error_tole_value);
+    if (tole <= 0) {
+      LOG_ERROR("Mass error tolerance " << mass_error_tole_value << " error! The value should be positive.");
+      return false;
+    }
+  } catch (int e) {
+    LOG_ERROR("Mass error tolerance value " << mass_error_tole_value << " should be a number.");
+    return false;
+  }
+
+  std::string form_error_tole_value = arguments_["proteoformErrorTolerance"];
+  LOG_ERROR("form tole value " << form_error_tole_value);
+  try {
+    double tole = std::stod(form_error_tole_value);
+    if (tole <= 0) {
+      LOG_ERROR("Proteoform error tolerance " << form_error_tole_value << " error! The value should be positive.");
+      return false;
+    }
+  } catch (int e) {
+    LOG_ERROR("Proteoform error tolerance value " << form_error_tole_value << " should be a number.");
+    return false;
+  }
+
 
   std::string cutoff_spectral_value = arguments_["cutoffSpectralValue"];
   try {

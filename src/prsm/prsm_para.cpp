@@ -31,7 +31,7 @@ PrsmPara::PrsmPara(std::map<std::string, std::string> &arguments) {
 
   resource_dir_ = arguments["resourceDir"];
 
-  errorTolerance_=std::stoi(arguments["errorTolerance"]);
+  ppm_ = std::stoi(arguments["massErrorTolerance"]);
 
   group_spec_num_ = std::stoi(arguments["groupSpectrumNumber"]);
 
@@ -52,7 +52,7 @@ PrsmPara::PrsmPara(std::map<std::string, std::string> &arguments) {
     activation_ptr = ActivationBase::getActivationPtrByName(activation_name);
   }
 
-  double ppo = std::stod(arguments["errorTolerance"])*0.000001;
+  double ppo = ppm_ *0.000001;
   bool use_min_tolerance = true;
   double min_tolerance = 0.01;
   PeakTolerancePtr peak_tolerance_ptr

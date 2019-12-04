@@ -33,7 +33,7 @@ class PrsmPara {
 
   std::string getResourceDir() {return resource_dir_;}
 
-  int getErrorTolerance() {return errorTolerance_;}
+  int getPPM() {return ppm_;}
 
   int getGroupSpecNum() {return group_spec_num_;}
 
@@ -52,7 +52,7 @@ class PrsmPara {
 
   std::string resource_dir_;
 
-  int errorTolerance_;
+  int ppm_;
 
   ModPtrVec fix_mod_list_;
 

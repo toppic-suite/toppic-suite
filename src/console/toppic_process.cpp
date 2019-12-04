@@ -344,7 +344,8 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     LOG_DEBUG("prsm para inited");
 
     std::cout << "Finding PrSM clusters - started." << std::endl;
-    double proteoform_error_tole = 1.2;
+    double form_error_tole = std::stod(arguments["proteoformErrorTolerance"]);
+    LOG_ERROR("form error tole " << form_error_tole);
     if (arguments["useFeatureFile"] == "true") {
       // TopFD msalign file with feature ID
       ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();
@@ -354,7 +355,7 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
                                                  "toppic_top",
                                                  "toppic_cluster",
                                                  fix_mod_list,
-                                                 proteoform_error_tole,
+                                                 form_error_tole,
                                                  prsm_para_ptr);
       prsm_clusters->process();
       prsm_clusters = nullptr;
@@ -362,7 +363,7 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
       PrsmSimpleClusterPtr prsm_clusters
           = std::make_shared<PrsmSimpleCluster>(db_file_name, sp_file_name,
                                                 "toppic_top", prsm_para_ptr->getFixModPtrVec(),
-                                                "toppic_cluster", proteoform_error_tole);
+                                                "toppic_cluster", form_error_tole);
       prsm_clusters->process();
       prsm_clusters = nullptr;
     }
