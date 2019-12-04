@@ -125,7 +125,7 @@ void cleanToppicDir(const std::string &fa_name,
   }
 }
 
-// protein filtering + database searching + E-value computation
+// Test modification files. 
 int TopPIC_testModFile(std::map<std::string, std::string> & arguments) {
   try {
     base_data::init();
@@ -135,7 +135,6 @@ int TopPIC_testModFile(std::map<std::string, std::string> & arguments) {
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
 
     if (arguments["residueModFileName"] != "") {
-      LOG_ERROR("read file");
       mod_util::readModTxt(arguments["residueModFileName"]);
     }
   } catch (const char* e) {
@@ -345,7 +344,7 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
 
     std::cout << "Finding PrSM clusters - started." << std::endl;
     double form_error_tole = std::stod(arguments["proteoformErrorTolerance"]);
-    LOG_ERROR("form error tole " << form_error_tole);
+    LOG_DEBUG("form error tole " << form_error_tole);
     if (arguments["useFeatureFile"] == "true") {
       // TopFD msalign file with feature ID
       ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();
@@ -498,10 +497,9 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
   std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
   std::string combined_start_time = buf;
 
-  xercesc::XMLPlatformUtils::Initialize(); 
-
   std::cout << "TopPIC " << toppic::Version::getVersion() << std::endl;
 
+  xercesc::XMLPlatformUtils::Initialize(); 
   TopPIC_testModFile(arguments);
 
   for (size_t k = 0; k < spec_file_lst.size(); k++) {

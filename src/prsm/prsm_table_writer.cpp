@@ -161,7 +161,7 @@ void PrsmTableWriter::writePrsm(std::ofstream &file, PrsmPtr prsm_ptr) {
       << "\"" << prsm_ptr->getProteoformPtr()->getSeqDesc() << "\"" << ","
       << (prsm_ptr->getProteoformPtr()->getStartPos() + 1) << ","
       << (prsm_ptr->getProteoformPtr()->getEndPos() + 1) << ","
-      << prsm_ptr->getProteoformPtr()->getProteinMatchSeq() << ","
+      << "\"" << prsm_ptr->getProteoformPtr()->getProteinMatchSeq() << "\","
       << ptm_num << ","
       << prsm_ptr->getProteoformPtr()->getMIScore() << ","
       << prsm_ptr->getProteoformPtr()->getVariablePtmNum() << ","
