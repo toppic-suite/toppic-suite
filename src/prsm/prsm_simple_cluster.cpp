@@ -25,19 +25,20 @@ namespace toppic {
 PrsmSimpleCluster::PrsmSimpleCluster(const std::string &db_file_name,
                                      const std::string &spec_file_name,
                                      const std::string &input_file_ext,
+                                     const ModPtrVec &fix_mod_ptr_vec,
                                      const std::string &output_file_ext,
-                                     double tolerance):
+                                     double error_tole):
     db_file_name_(db_file_name),
     spec_file_name_(spec_file_name),
     input_file_ext_(input_file_ext),
+    fix_mod_ptr_vec_(fix_mod_ptr_vec),
     output_file_ext_(output_file_ext),
-    tolerance_(tolerance) {}
+    error_tole_(error_tole) {}
 
-void PrsmSimpleCluster::setProtId(PrsmStrPtrVec& prsm_ptrs) {
-  std::vector<PrsmStrPtrVec> proteins;
+PrsmStrPtrVec2D PrsmSimpleCluster::setProtId(PrsmStrPtrVec& prsm_ptrs) {
+  PrsmStrPtrVec2D proteins;
   std::vector<std::string> protein_names;
   for (size_t i = 0; i < prsm_ptrs.size(); i++) {
-    std::cout << "i" << i << " out of " << prsm_ptrs.size() << std::endl;
     std::string name = prsm_ptrs[i]->getSeqName();
     bool is_found = false;
     for (size_t j = 0; j < protein_names.size(); j++) {
@@ -60,25 +61,32 @@ void PrsmSimpleCluster::setProtId(PrsmStrPtrVec& prsm_ptrs) {
       proteins[i][j]->setProtId(i);
     }
   }
+  return proteins;
 }
 
-void PrsmSimpleCluster::setClusterId(PrsmStrPtrVec& prsm_ptrs, double tolerance) {
-  std::vector<PrsmStrPtrVec> clusters;
-  for (size_t j = 0; j < prsm_ptrs.size(); j++) {
-    std::cout << "j" << j << " out of " << prsm_ptrs.size() << std::endl;
-    bool is_found = false;
-    for (size_t m = 0; m < clusters.size(); m++) {
-      if (PrsmStr::isSimpleMatch(prsm_ptrs[j], clusters[m][0], tolerance)) {
-        clusters[m].push_back(prsm_ptrs[j]);
-        is_found = true;
-        break;
+void PrsmSimpleCluster::setClusterId(PrsmStrPtrVec2D & proteins) {
+  PrsmStrPtrVec2D clusters; 
+
+  for (size_t i = 0; i < proteins.size(); i++) {
+    PrsmStrPtrVec2D protein_clusters;
+    for (size_t j = 0; j < proteins[i].size(); j++) {
+      bool is_found = false;
+      PrsmStrPtr cur_prsm = proteins[i][j];
+      for (size_t m = 0; m < protein_clusters.size(); m++) {
+        PrsmStrPtr ref_prsm = protein_clusters[m][0]; 
+        if (PrsmStr::isSimpleMatch(cur_prsm, ref_prsm, error_tole_)) {
+          protein_clusters[m].push_back(cur_prsm);
+          is_found = true;
+          break;
+        }
+      }
+      if (!is_found) {
+        PrsmStrPtrVec new_clusters;
+        new_clusters.push_back(cur_prsm);
+        protein_clusters.push_back(new_clusters);
       }
     }
-    if (!is_found) {
-      PrsmStrPtrVec new_clusters;
-      new_clusters.push_back(prsm_ptrs[j]);
-      clusters.push_back(new_clusters);
-    }
+    clusters.insert(std::end(clusters), std::begin(protein_clusters), std::end(protein_clusters));
   }
 
   for (size_t i = 0; i < clusters.size(); i++) {
@@ -95,8 +103,8 @@ void PrsmSimpleCluster::process() {
   PrsmStrPtrVec prsm_ptrs = PrsmReader::readAllPrsmStrs(input_file_name);
   LOG_DEBUG("Reading prsm strings finished");
   sort(prsm_ptrs.begin(), prsm_ptrs.end(), PrsmStr::cmpEValueInc);
-  setProtId(prsm_ptrs);
-  setClusterId(prsm_ptrs, tolerance_);
+  PrsmStrPtrVec2D protein_prsms = setProtId(prsm_ptrs);
+  setClusterId(protein_prsms);
   sort(prsm_ptrs.begin(), prsm_ptrs.end(), PrsmStr::cmpSpectrumIdIncPrecursorIdInc);
   // output
   std::string output_file_name = base_name + "." + output_file_ext_;

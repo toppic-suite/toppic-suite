@@ -14,6 +14,7 @@
 
 #include <algorithm>
 
+#include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "prsm/prsm_reader.hpp"
 #include "prsm/prsm_util.hpp"
@@ -82,11 +83,14 @@ void PrsmFeatureCluster::setProteoClusterId(PrsmStrPtrVec& prsm_ptrs) {
         }
         if (std::abs(cur_ptr->getAdjustedPrecMass() - ref_ptr->getAdjustedPrecMass()) <= prec_error_tole_) {
           clusters[j].push_back(cur_ptr);
+          //LOG_DEBUG("Proteoform merging by mass!");
           is_found = true;
           break;
         }
-      } else if (cur_ptr->getProteinMatchSeq() == ref_ptr->getProteinMatchSeq()) {
+      } 
+      else if (cur_ptr->getProteinMatchSeq() == ref_ptr->getProteinMatchSeq()) {
         clusters[j].push_back(cur_ptr);
+        //LOG_DEBUG("Proteoform merging by sequence!");
         is_found = true;
         break;
       }
