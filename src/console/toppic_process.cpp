@@ -35,11 +35,11 @@
 #include "prsm/prsm_para.hpp"
 #include "prsm/prsm_str_merge.hpp"
 #include "prsm/prsm_top_selector.hpp"
+#include "prsm/prsm_simple_cluster.hpp"
+#include "prsm/prsm_feature_cluster.hpp"
 #include "prsm/prsm_cutoff_selector.hpp"
-#include "prsm/prsm_cluster.hpp"
 #include "prsm/prsm_table_writer.hpp"
 #include "prsm/prsm_fdr.hpp"
-#include "prsm/prsm_feature_cluster.hpp"
 #include "prsm/prsm_form_filter.hpp"
 #include "prsm/prsm_util.hpp"
 
@@ -344,9 +344,9 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
     LOG_DEBUG("prsm para inited");
 
     std::cout << "Finding PrSM clusters - started." << std::endl;
+    double proteoform_error_tole = 1.2;
     if (arguments["useFeatureFile"] == "true") {
       // TopFD msalign file with feature ID
-      double prec_error_tole = 1.2;
       ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();
       PrsmFeatureClusterPtr prsm_clusters
           = std::make_shared<PrsmFeatureCluster>(db_file_name,
@@ -354,18 +354,15 @@ int TopPIC_post(std::map<std::string, std::string> & arguments) {
                                                  "toppic_top",
                                                  "toppic_cluster",
                                                  fix_mod_list,
-                                                 prec_error_tole,
+                                                 proteoform_error_tole,
                                                  prsm_para_ptr);
       prsm_clusters->process();
       prsm_clusters = nullptr;
     } else {
-      double ppo;
-      std::istringstream(arguments["errorTolerance"]) >> ppo;
-      ppo = ppo / 1000000.0;
-      PrsmClusterPtr prsm_clusters
-          = std::make_shared<PrsmCluster>(db_file_name, sp_file_name,
-                                          "toppic_top", prsm_para_ptr->getFixModPtrVec(),
-                                          "toppic_cluster", ppo);
+      PrsmSimpleClusterPtr prsm_clusters
+          = std::make_shared<PrsmSimpleCluster>(db_file_name, sp_file_name,
+                                                "toppic_top", prsm_para_ptr->getFixModPtrVec(),
+                                                "toppic_cluster", proteoform_error_tole);
       prsm_clusters->process();
       prsm_clusters = nullptr;
     }

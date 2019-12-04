@@ -27,8 +27,9 @@ class PrsmSimpleCluster {
   PrsmSimpleCluster(const std::string &db_file_name,
                     const std::string &spec_file_name,
                     const std::string &input_file_ext,
+                    const ModPtrVec &fix_mod_ptr_vec,
                     const std::string &output_file_ext,
-                    double tolerance);
+                    double error_tole);
 
   void process();
 
@@ -36,12 +37,14 @@ class PrsmSimpleCluster {
   std::string db_file_name_;
   std::string spec_file_name_;
   std::string input_file_ext_;
+  ModPtrVec fix_mod_ptr_vec_;
   std::string output_file_ext_;
-  double tolerance_;
+  ResiduePtrVec residue_ptr_vec_;
+  double error_tole_;
 
-  void setProtId(PrsmStrPtrVec& prsm_ptrs);
+  PrsmStrPtrVec2D setProtId(PrsmStrPtrVec& prsm_ptrs);
 
-  void setClusterId(PrsmStrPtrVec& prsm_ptrs, double ppo);
+  void setClusterId(PrsmStrPtrVec2D& protein_prsms);
 };
 
 typedef std::shared_ptr<PrsmSimpleCluster> PrsmSimpleClusterPtr;
