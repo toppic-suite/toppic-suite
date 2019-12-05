@@ -34,7 +34,7 @@
 #include "prsm/prsm_form_filter.hpp"
 #include "prsm/prsm_top_selector.hpp"
 #include "prsm/prsm_cutoff_selector.hpp"
-#include "prsm/prsm_cluster.hpp"
+#include "prsm/prsm_simple_cluster.hpp"
 #include "prsm/prsm_feature_cluster.hpp"
 #include "prsm/prsm_fdr.hpp"
 #include "prsm/prsm_form_filter.hpp"
@@ -113,9 +113,9 @@ void cleanTopmgDir(const std::string &fa_name,
     file_util::delFile(sp_base + ".topmg_graph");
     file_util::delFile(sp_base + ".topmg_evalue");
     file_util::cleanPrefix(sp_name, sp_base + ".toppic_evalue_");
-    file_util::delFile(sp_base + ".topmg_cluster");
     file_util::delFile(sp_base + ".topmg_top");
-    file_util::delFile(sp_base + ".topmg_top_pre");
+    file_util::delFile(sp_base + ".topmg_cluster");
+    file_util::delFile(sp_base + ".topmg_cluster_fdr");
     file_util::delFile(sp_base + ".topmg_prsm_cutoff");
     file_util::delFile(sp_base + ".topmg_form_cutoff");
     file_util::delFile(sp_base + "_topmg_proteoform.xml");
@@ -266,6 +266,15 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
     processor->process();    
     processor = nullptr;
     std::cout << "E-value computation using MCMC - finished." << std::endl;
+
+    int n_top = std::stoi(arguments["numOfTopPrsms"]);
+
+    std::cout << "Top PrSM selecting - started" << std::endl;
+    PrsmTopSelectorPtr selector
+        = std::make_shared<PrsmTopSelector>(db_file_name, sp_file_name, "topmg_cluster", "topmg_top", n_top);
+    selector->process();
+    selector = nullptr;
+    std::cout << "Top PrSM selecting - finished." << std::endl;
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
@@ -286,66 +295,50 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
     std::string var_mod_file_name = arguments["varModFileName"];
 
-    int n_top = std::stoi(arguments["numOfTopPrsms"]);
 
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
 
     std::cout << "Finding PrSM clusters - started." << std::endl;
+    double form_error_tole = 1.2;
     if (arguments["useFeatureFile"] == "true") {
       // TopFD msalign file with feature ID
-      double prec_error_tole = 1.2;
       ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();
       PrsmFeatureClusterPtr prsm_clusters
           = std::make_shared<PrsmFeatureCluster>(db_file_name,
                                                  sp_file_name,
-                                                 "topmg_evalue",
+                                                 "topmg_top",
                                                  "topmg_cluster",
                                                  fix_mod_list,
-                                                 prec_error_tole,
+                                                 form_error_tole,
                                                  prsm_para_ptr);
       prsm_clusters->process();
       prsm_clusters = nullptr;
     } else {
-      double ppo;
-      std::istringstream(arguments["errorTolerance"]) >> ppo;
-      ppo = ppo / 1000000.0;
-      PrsmClusterPtr prsm_clusters
-          = std::make_shared<PrsmCluster>(db_file_name, sp_file_name,
-                                          "topmg_evalue", prsm_para_ptr->getFixModPtrVec(),
-                                          "topmg_cluster", ppo);
+      PrsmSimpleClusterPtr prsm_clusters
+          = std::make_shared<PrsmSimpleCluster>(db_file_name, sp_file_name,
+                                                "topmg_top", prsm_para_ptr->getFixModPtrVec(),
+                                                "topmg_cluster", form_error_tole);
       prsm_clusters->process();
       prsm_clusters = nullptr;
     }
     std::cout << "Finding PrSM clusters - finished." << std::endl;
 
-    if (arguments["searchType"] == "TARGET") {
-      std::cout << "Top PrSM selecting - started" << std::endl;
-      PrsmTopSelectorPtr selector
-          = std::make_shared<PrsmTopSelector>(db_file_name, sp_file_name, "topmg_cluster", "topmg_top", n_top);
-      selector->process();
-      selector = nullptr;
-      std::cout << "Top PrSM selecting - finished." << std::endl;
-    } else {
-      std::cout << "Top PrSM selecting - started " << std::endl;
-      PrsmTopSelectorPtr selector
-          = std::make_shared<PrsmTopSelector>(db_file_name, sp_file_name,
-                                              "topmg_cluster", "topmg_top_pre", n_top);
-      selector->process();
-      selector = nullptr;
-      std::cout << "Top PrSM selecting - finished." << std::endl;
+    std::string cur_suffix = "topmg_cluster";
 
+    if (arguments["searchType"] == "TARGET+DECOY") {
       std::cout << "FDR computation - started. " << std::endl;
-      PrsmFdrPtr fdr = std::make_shared<PrsmFdr>(db_file_name, sp_file_name, "topmg_top_pre", "topmg_top");
+      PrsmFdrPtr fdr = std::make_shared<PrsmFdr>(db_file_name, sp_file_name, "topmg_cluster", "topmg_cluster_fdr");
       fdr->process();
       fdr = nullptr;
       std::cout << "FDR computation - finished." << std::endl;
+      cur_suffix = "topmg_cluster_fdr";
     }
 
     std::string cutoff_type = arguments["cutoffSpectralType"];
     std::cout << "PrSM filtering by " << cutoff_type << " - started." << std::endl;
     double cutoff_value = std::stod(arguments["cutoffSpectralValue"]);
     PrsmCutoffSelectorPtr cutoff_selector
-        = std::make_shared<PrsmCutoffSelector>(db_file_name, sp_file_name, "topmg_top",
+        = std::make_shared<PrsmCutoffSelector>(db_file_name, sp_file_name, cur_suffix,
                                                "topmg_prsm_cutoff", cutoff_type, cutoff_value);
     cutoff_selector->process();
     cutoff_selector = nullptr;
@@ -366,10 +359,8 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
     std::cout << "Outputting PrSM table - finished." << std::endl;
 
     std::cout << "Generating PrSM xml files - started." << std::endl;
-    XmlGeneratorPtr xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, "topmg_prsm_cutoff", "topmg_prsm_cutoff");
-
     copyTopView(arguments);
-
+    XmlGeneratorPtr xml_gene = std::make_shared<XmlGenerator>(prsm_para_ptr, resource_dir, "topmg_prsm_cutoff", "topmg_prsm_cutoff");
     xml_gene->process();
     xml_gene = nullptr;
     std::cout << "Generating PrSM xml files - finished." << std::endl;
@@ -381,7 +372,7 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
     cutoff_type = (arguments["cutoffProteoformType"] == "FDR") ? "FORMFDR": "EVALUE";
     std::cout << "PrSM filtering by " << cutoff_type << " - started." << std::endl;
     std::istringstream(arguments["cutoffProteoformValue"]) >> cutoff_value;
-    cutoff_selector = std::make_shared<PrsmCutoffSelector>(db_file_name, sp_file_name, "topmg_top",
+    cutoff_selector = std::make_shared<PrsmCutoffSelector>(db_file_name, sp_file_name, cur_suffix,
                                                            "topmg_form_cutoff", cutoff_type, cutoff_value);
     cutoff_selector->process();
     cutoff_selector = nullptr;
