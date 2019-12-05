@@ -43,11 +43,10 @@
 
 namespace toppic {
 
-std::function<void()> geneTask(FastaIndexReaderPtr reader_ptr,
-                               GraphAlignMngPtr mng_ptr,
+std::function<void()> geneTask(GraphAlignMngPtr mng_ptr,
                                ModPtrVec var_mod_ptr_vec,
                                int spectrum_num, int idx) {
-  return [reader_ptr, mng_ptr, var_mod_ptr_vec, spectrum_num, idx]() {
+  return [mng_ptr, var_mod_ptr_vec, spectrum_num, idx]() {
     PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
     SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
     std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
@@ -55,6 +54,7 @@ std::function<void()> geneTask(FastaIndexReaderPtr reader_ptr,
 
     std::string input_file_name
         = file_util::basename(sp_file_name) + "." + mng_ptr->input_file_ext_ + "_" + str_util::toString(idx);
+    FastaIndexReaderPtr reader_ptr = std::make_shared<FastaIndexReader>(db_file_name);
     SimplePrsmReader simple_prsm_reader(input_file_name);
     SimplePrsmStrPtr prsm_ptr = simple_prsm_reader.readOnePrsmStr();
     int group_spec_num = prsm_para_ptr->getGroupSpecNum();
@@ -208,12 +208,11 @@ void GraphAlignProcessor::process() {
   simple_prsm_reader->close();
   simple_prsm_xml_writer_util::closeWriterPtrVec(simple_prsm_writer_vec);
 
-  FastaIndexReaderPtr reader_ptr = std::make_shared<FastaIndexReader>(db_file_name);
 
 //#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
   std::vector<ThreadPtr> thread_vec;
   for (int i = 0; i < mng_ptr_->thread_num_; i++) {
-    ThreadPtr thread_ptr = std::make_shared<boost::thread>(geneTask(reader_ptr, mng_ptr_, var_mod_ptr_vec, spectrum_num, i));
+    ThreadPtr thread_ptr = std::make_shared<boost::thread>(geneTask(mng_ptr_, var_mod_ptr_vec, spectrum_num, i));
     thread_vec.push_back(thread_ptr);
   }
 
