@@ -17,12 +17,12 @@
 #include "common/base/base_data.hpp"
 #include "seq/fasta_util.hpp"
 #include "merge/feature_sample_merge.hpp"
-#include "console/topmerge_argument.hpp"
-#include "console/topmerge_process.hpp"
+#include "console/topdiff_argument.hpp"
+#include "console/topdiff_process.hpp"
 
 namespace toppic {
 
-int topMergeProcess(std::map<std::string, std::string> &arguments,
+int topDiffProcess(std::map<std::string, std::string> &arguments,
                     std::vector<std::string> &input_file_list) {
 
   Argument::outputArguments(std::cout, arguments);
@@ -38,20 +38,20 @@ int topMergeProcess(std::map<std::string, std::string> &arguments,
   LOG_DEBUG("Output file name " << output_file_name);
   std::string fixed_mod = arguments["fixedMod"];
 
-  double ppm = 0.000015;
-  // we need to decide if we use ppm or error tolerance as the arguments of
-  // topmerge. 
+  double error_tole = std::stod(arguments["errorTolerance"]);
+  std::string tool_name = arguments["toolName"];
 
-  std::cout << "Merging files - started." << std::endl;
+  std::cout << "TopDiff - started." << std::endl;
   FeatureSampleMergePtr merge_ptr 
       = std::make_shared<FeatureSampleMerge>(input_file_list,
                                              output_file_name,
                                              db_file_name, 
                                              fixed_mod, 
-                                             ppm);
+                                             tool_name,
+                                             error_tole);
   merge_ptr->process();
   merge_ptr = nullptr;
-  std::cout << "Merging files - finished." << std::endl;
+  std::cout << "TopDiff - finished." << std::endl;
   return 0;
 }
 

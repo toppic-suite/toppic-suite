@@ -118,16 +118,17 @@ file(GLOB TOPMG_CONSOLE_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmg.cpp
 file(GLOB TOPMG_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topmg/*.cpp
 			   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topmg/*.qrc)
 
-# topmerge classes
-#file(GLOB MERGE_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/merge/*.cpp)
+# topdiff classes
+file(GLOB DIFF_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/merge/*.cpp)
 
-# topmerge console main
-file(GLOB TOPMERGE_PROC_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmerge_process.cpp
-			     ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmerge_argument.cpp)
-file(GLOB TOPMERGE_CONSOLE_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmerge.cpp)
+# topdiff console main
+file(GLOB TOPDIFF_PROC_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdiff_process.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdiff_argument.cpp)
+file(GLOB TOPDIFF_CONSOLE_SRCS
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdiff.cpp)
 
-# topmerge gui main 
-file(GLOB TOPMERGE_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topmerge/*.cpp
+# topdiff gui main 
+file(GLOB TOPDIFF_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topmerge/*.cpp
 			      ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topmerge/*.qrc)
 
 # unit test using catch
@@ -171,10 +172,9 @@ add_executable(topmg_gui
 	${GRAPH_SRCS} ${GRAPH_ALIGN_SRCS} ${TDGF_SRCS} 
   ${MCMC_SRCS} ${VISUAL_SRCS})
 
-add_executable(topmerge 
-	${TOPMERGE_CONSOLE_SRCS} ${TOPMERGE_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS}
-  ${SEQ_SRCS} ${SPEC_SRCS} ${PRSM_SRCS} ${FEATURE_SRCS} ${MERGE_SRCS}
-  ${ENV_SRCS})
+add_executable(topdiff 
+  ${TOPDIFF_CONSOLE_SRCS} ${TOPDIFF_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS}
+  ${SEQ_SRCS} ${SPEC_SRCS} ${ENV_SRCS} ${FEATURE_SRCS} ${PRSM_SRCS} ${DIFF_SRCS})
 
 #add_executable(toppic_test 
 #  ${TEST_SRCS} ${HTS_SRCS} ${COMMON_SRCS} 
@@ -208,7 +208,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
         boost_filesystem-mt boost_system-mt
         boost_program_options-mt boost_thread-mt pthread z Ws2_32)
 
-   target_link_libraries(topmerge xerces-c boost_program_options-mt
+   target_link_libraries(topdiff xerces-c boost_program_options-mt
         boost_filesystem-mt boost_system-mt boost_thread-mt pthread z Ws2_32)
 
     # for Qt
@@ -258,7 +258,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     target_link_libraries(topmg_gui Qt5Widgets Qt5Core Qt5Gui xerces-c boost_program_options
         boost_filesystem boost_system boost_thread pthread z)
 
-    target_link_libraries(topmerge xerces-c boost_program_options
+    target_link_libraries(topdiff xerces-c boost_program_options
 	      boost_filesystem boost_system boost_thread pthread z)
 
 #    target_link_libraries(toppic_test xerces-c boost_program_options
@@ -274,7 +274,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 #        boost_filesystem boost_system boost_thread boost_iostreams boost_chrono pthread z)
 
 #file(MAKE_DIRECTORY ${CMAKE_INSTALL_PREFIX}/usr/bin)
-install (TARGETS topfd toppic topmg topmerge DESTINATION ${CMAKE_INSTALL_PREFIX}/usr/bin/)
+install (TARGETS topfd toppic topmg topdiff DESTINATION ${CMAKE_INSTALL_PREFIX}/usr/bin/)
 install (DIRECTORY toppic_resources/ DESTINATION ${CMAKE_INSTALL_PREFIX}/etc/toppic)
 
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux") 

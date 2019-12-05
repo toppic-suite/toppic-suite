@@ -13,13 +13,13 @@
 //limitations under the License.
 
 #include "common/util/logger.hpp"
-#include "console/topmerge_argument.hpp"
-#include "console/topmerge_process.hpp"
+#include "console/topdiff_argument.hpp"
+#include "console/topdiff_process.hpp"
 
 using namespace toppic;
 
 int main(int argc, char* argv[]) {
-  toppic::logger::log_level = 2;
+  toppic::logger::log_level = 4;
   LOG_DEBUG("Parsing start!");
   Argument argu_processor;
   bool success = argu_processor.parse(argc, argv);
@@ -32,9 +32,9 @@ int main(int argc, char* argv[]) {
 
   std::map<std::string, std::string> arguments = argu_processor.getArguments();
 
-  std::vector<std::string> input_file_list = argu_processor.getProteoformFileList();
+  std::vector<std::string> input_file_list = argu_processor.getSpectrumFileList();
 
-  topMergeProcess(arguments, input_file_list);
+  topDiffProcess(arguments, input_file_list);
 
   return 0;
 }
