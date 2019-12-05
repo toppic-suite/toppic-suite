@@ -17,11 +17,13 @@
 #include <string>
 #include <vector>
 
-#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
+//#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
+//#include "common/thread/simple_thread_pool.hpp"
+//#else
+//#include <sys/wait.h>
+//#endif
+
 #include "common/thread/simple_thread_pool.hpp"
-#else
-#include <sys/wait.h>
-#endif
 
 #include "common/util/file_util.hpp"
 #include "common/base/mod_util.hpp"
@@ -208,7 +210,7 @@ void GraphAlignProcessor::process() {
 
   FastaIndexReaderPtr reader_ptr = std::make_shared<FastaIndexReader>(db_file_name);
 
-#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
+//#if defined (_WIN32) || defined (_WIN64) || defined (__MINGW32__) || defined (__MINGW64__)
   std::vector<ThreadPtr> thread_vec;
   for (int i = 0; i < mng_ptr_->thread_num_; i++) {
     ThreadPtr thread_ptr = std::make_shared<boost::thread>(geneTask(reader_ptr, mng_ptr_, var_mod_ptr_vec, spectrum_num, i));
@@ -218,6 +220,7 @@ void GraphAlignProcessor::process() {
   for (size_t i = 0; i < thread_vec.size(); i++) {
     if (thread_vec[i]->joinable()) thread_vec[i]->join();
   }
+  /*
 #else
   int n = mng_ptr_->thread_num_;
 
@@ -240,6 +243,7 @@ void GraphAlignProcessor::process() {
     --n;
   }
 #endif
+*/
   std::cout << std::flush << "Mass graph alignment - processing " << spectrum_num
       << " of " << spectrum_num << " spectra." << std::endl;
 
