@@ -72,6 +72,7 @@ void FastaSeq::compAcidPtmPairVec() {
       acid_ptm_pair_vec_.push_back(pair);
     }
     else {
+      LOG_WARN("In sequence " << seq_);
       LOG_WARN("The residue " << acid_one_letter << " is invalid!");
     }
   }
