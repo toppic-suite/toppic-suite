@@ -516,29 +516,29 @@ int TopPICProgress_multi_file(std::map<std::string, std::string> & arguments,
     std::string merged_file_name = arguments["combinedOutputName"]; 
     std::string para_str = "";
     std::cout << "Merging files started." << std::endl;
-    toppic::MsAlignFracMerge::mergeFiles(spec_file_lst, merged_file_name + "_ms2.msalign", para_str);
-    toppic::DeconvJsonMergePtr json_merger 
-        = std::make_shared<toppic::DeconvJsonMerge>(spec_file_lst, merged_file_name);
+    MsAlignFracMerge::mergeFiles(spec_file_lst, merged_file_name + "_ms2.msalign", para_str);
+    DeconvJsonMergePtr json_merger 
+        = std::make_shared<DeconvJsonMerge>(spec_file_lst, merged_file_name);
     json_merger->process();
     json_merger = nullptr;
-    toppic::FeatureMergePtr feature_merger 
-        = std::make_shared<toppic::FeatureMerge>(spec_file_lst, merged_file_name);
+    FeatureMergePtr feature_merger 
+        = std::make_shared<FeatureMerge>(spec_file_lst, merged_file_name);
     feature_merger->process(para_str);
     feature_merger = nullptr;
 
     // merge TOP files
     std::vector<std::string> prsm_file_lst(spec_file_lst.size());
     for (size_t i = 0; i < spec_file_lst.size(); i++) {
-      prsm_file_lst[i] = toppic::file_util::basename(spec_file_lst[i]) + ".toppic_top"; 
+      prsm_file_lst[i] = file_util::basename(spec_file_lst[i]) + ".toppic_top"; 
     }
     int N = 1000000;
-    toppic::prsm_util::mergePrsmFiles(prsm_file_lst, N , base_name + "_ms2.toppic_top");
+    prsm_util::mergePrsmFiles(prsm_file_lst, N , base_name + "_ms2.toppic_top");
     std::cout << "Merging files - finished." << std::endl;
 
     std::string sp_file_name = base_name + "_ms2.msalign";
     arguments["spectrumFileName"] = sp_file_name;
     arguments["startTime"] = combined_start_time;
-    toppic::TopPIC_post(arguments);
+    TopPIC_post(arguments);
   }
 
   bool keep_temp_files = (arguments["keepTempFiles"] == "true"); 

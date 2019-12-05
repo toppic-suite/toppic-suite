@@ -28,6 +28,8 @@
 #include "ms/spec/msalign_reader.hpp"
 #include "ms/spec/msalign_frac_merge.hpp"
 #include "ms/spec/msalign_util.hpp"
+#include "ms/spec/deconv_json_merge.hpp"
+#include "ms/feature/feature_merge.hpp"
 
 #include "prsm/prsm_para.hpp"
 #include "prsm/prsm_str_merge.hpp"
@@ -112,13 +114,12 @@ void cleanTopmgDir(const std::string &fa_name,
     file_util::delFile(sp_base + ".topmg_graph_post");
     file_util::delFile(sp_base + ".topmg_graph");
     file_util::delFile(sp_base + ".topmg_evalue");
-    file_util::cleanPrefix(sp_name, sp_base + ".toppic_evalue_");
+    file_util::cleanPrefix(sp_name, sp_base + ".topmg_evalue_");
     file_util::delFile(sp_base + ".topmg_top");
     file_util::delFile(sp_base + ".topmg_cluster");
     file_util::delFile(sp_base + ".topmg_cluster_fdr");
     file_util::delFile(sp_base + ".topmg_prsm_cutoff");
     file_util::delFile(sp_base + ".topmg_form_cutoff");
-    file_util::delFile(sp_base + "_topmg_proteoform.xml");
     file_util::delDir(sp_base + "_topmg_proteoform_cutoff_xml");
     file_util::delDir(sp_base + "_topmg_prsm_cutoff_xml");
   }
@@ -271,7 +272,7 @@ int TopMG_identify(std::map<std::string, std::string> & arguments) {
 
     std::cout << "Top PrSM selecting - started" << std::endl;
     PrsmTopSelectorPtr selector
-        = std::make_shared<PrsmTopSelector>(db_file_name, sp_file_name, "topmg_cluster", "topmg_top", n_top);
+        = std::make_shared<PrsmTopSelector>(db_file_name, sp_file_name, "topmg_evalue", "topmg_top", n_top);
     selector->process();
     selector = nullptr;
     std::cout << "Top PrSM selecting - finished." << std::endl;
@@ -287,7 +288,6 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
     std::string resource_dir = arguments["resourceDir"];
 
     base_data::init();
-
     LOG_DEBUG("Initialization completed");
 
     std::string db_file_name = arguments["databaseFileName"];
@@ -295,11 +295,11 @@ int TopMG_post(std::map<std::string, std::string> & arguments) {
     std::string ori_db_file_name = arguments["oriDatabaseFileName"];
     std::string var_mod_file_name = arguments["varModFileName"];
 
-
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
+    msalign_util::geneSpIndex(sp_file_name, prsm_para_ptr->getSpParaPtr());
 
     std::cout << "Finding PrSM clusters - started." << std::endl;
-    double form_error_tole = 1.2;
+    double form_error_tole = std::stod(arguments["proteoformErrorTolerance"]);
     if (arguments["useFeatureFile"] == "true") {
       // TopFD msalign file with feature ID
       ModPtrVec fix_mod_list = prsm_para_ptr->getFixModPtrVec();
@@ -430,7 +430,7 @@ int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
   std::strftime(buf, 50, "%a %b %d %H:%M:%S %Y", std::localtime(&start));
   std::string combined_start_time = buf;
 
-  std::cout << "TopMG " << toppic::Version::getVersion() << std::endl;
+  std::cout << "TopMG " << Version::getVersion() << std::endl;
 
   xercesc::XMLPlatformUtils::Initialize(); 
   TopMG_testModFile(arguments);
@@ -440,38 +440,39 @@ int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
     std::string start_time = buf;
     arguments["startTime"] = start_time;
     arguments["spectrumFileName"] = spec_file_lst[k];
-    if (toppic::TopMGProcess(arguments) != 0) {
+    if (TopMGProcess(arguments) != 0) {
       return 1;
     }
   }
 
-  /*
   if (spec_file_lst.size() > 1 && arguments["combinedOutputName"] != "") {
-    std::cout << "Merging files - started." << std::endl;
-    // merge msalign files
-    toppic::MsAlignFracCombine::mergeFiles(spec_file_lst, base_name + "_ms2.msalign");
-    // merge feature files
-    int N = 1000000;
-    std::vector<std::string> feature_file_lst(spec_file_lst.size());
-    for (size_t i = 0; i < spec_file_lst.size(); i++) {
-      std::string sp_file_name = spec_file_lst[i];
-      feature_file_lst[i] = sp_file_name.substr(0, sp_file_name.length() - 12) + ".feature";
-    }
-    toppic::feature_util::mergeFeatureFiles(feature_file_lst, N, base_name + ".feature");
-    // merge EVALUE files
+    std::string merged_file_name = arguments["combinedOutputName"]; 
+    std::string para_str = "";
+    std::cout << "Merging files started." << std::endl;
+    MsAlignFracMerge::mergeFiles(spec_file_lst, merged_file_name + "_ms2.msalign", para_str);
+    DeconvJsonMergePtr json_merger 
+        = std::make_shared<DeconvJsonMerge>(spec_file_lst, merged_file_name);
+    json_merger->process();
+    json_merger = nullptr;
+    FeatureMergePtr feature_merger 
+        = std::make_shared<FeatureMerge>(spec_file_lst, merged_file_name);
+    feature_merger->process(para_str);
+    feature_merger = nullptr;
+
+    // merge TOP files
     std::vector<std::string> prsm_file_lst(spec_file_lst.size());
     for (size_t i = 0; i < spec_file_lst.size(); i++) {
-      prsm_file_lst[i] = toppic::file_util::basename(spec_file_lst[i]) + ".topmg_evalue"; 
+      prsm_file_lst[i] = file_util::basename(spec_file_lst[i]) + ".topmg_top"; 
     }
-    toppic::prsm_util::mergePrsmFiles(prsm_file_lst, N, base_name + "_ms2.topmg_evalue");
+    int N = 1000000;
+    prsm_util::mergePrsmFiles(prsm_file_lst, N , base_name + "_ms2.topmg_top");
     std::cout << "Merging files - finished." << std::endl;
 
     std::string sp_file_name = base_name + "_ms2.msalign";
     arguments["spectrumFileName"] = sp_file_name;
     arguments["startTime"] = combined_start_time;
-    toppic::TopMG_post(arguments);
+    TopMG_post(arguments);
   }
-  */
 
   bool keep_temp_files = (arguments["keepTempFiles"] == "true");
   std::cout << "Deleting temporary files - started." << std::endl;
@@ -482,13 +483,11 @@ int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
     cleanTopmgDir(ori_db_file_name, sp_file_name, keep_temp_files);
   }
 
-  /*
-     if (spec_file_lst.size() > 1 && arguments["combinedOutputName"] != "") {
-     std::string sp_file_name = base_name + "_ms2.msalign";
-     cleanTopmgDir(ori_db_file_name, sp_file_name);
-     }
-     std::cout << "Deleting temporary files - finished." << std::endl; 
-     */
+  if (spec_file_lst.size() > 1 && arguments["combinedOutputName"] != "") {
+    std::string sp_file_name = base_name + "_ms2.msalign";
+    cleanTopmgDir(ori_db_file_name, sp_file_name, keep_temp_files);
+  }
+  std::cout << "Deleting temporary files - finished." << std::endl; 
 
   std::cout << "TopMG finished." << std::endl << std::flush;
   return 0; 
