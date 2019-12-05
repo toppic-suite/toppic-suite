@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_TOPMERGE_PROCESS_HPP
-#define TOPPIC_TOPMERGE_PROCESS_HPP
+#ifndef TOPPIC_TOPDIFF_PROCESS_HPP
+#define TOPPIC_TOPDIFF_PROCESS_HPP
 
 #include <string>
 #include <map>
@@ -21,8 +21,8 @@
 
 namespace toppic {
 
-int topMergeProcess(std::map<std::string, std::string> &arguments,
-                    std::vector<std::string> &proteo_file_list);
+int topDiffProcess(std::map<std::string, std::string> &arguments,
+                   std::vector<std::string> &proteo_file_list);
 
 }  // namespace toppic
 

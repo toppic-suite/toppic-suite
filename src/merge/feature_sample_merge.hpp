@@ -25,7 +25,8 @@ class FeatureSampleMerge {
                      const std::string &output_file_name,
                      const std::string &db_file_name,
                      const std::string &fix_mod_str, 
-                     double ppm);
+                     const std::string &tool_name,
+                     double error_tole);
 
   void process();
 
@@ -38,7 +39,8 @@ class FeatureSampleMerge {
   std::string output_file_name_;
   std::string db_file_name_;
   std::string fix_mod_str_;
-  double ppm_;
+  std::string tool_name_;
+  double error_tole_;
 };
 
 typedef std::shared_ptr<FeatureSampleMerge> FeatureSampleMergePtr;

@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_TOPMERGE_ARGUMENT_HPP_
-#define TOPPIC_TOPMERGE_ARGUMENT_HPP_
+#ifndef TOPPIC_TOPDIFF_ARGUMENT_HPP_
+#define TOPPIC_TOPDIFF_ARGUMENT_HPP_
 
 #include <map>
 #include <iostream>
@@ -36,7 +36,7 @@ class Argument {
 
   std::map<std::string,std::string> getArguments(){ return arguments_;}
 
-  std::vector<std::string> getProteoformFileList() { return proteoform_file_list_;};
+  std::vector<std::string> getSpectrumFileList() { return spectrum_file_list_;};
 
  private:
   void initArguments();
@@ -47,9 +47,9 @@ class Argument {
 
   std::map<std::string, std::string> arguments_;
 
-  std::vector<std::string> proteoform_file_list_;
+  std::vector<std::string> spectrum_file_list_;
 };
 
 }  // namespace toppic
 
-#endif /* ARGUMENT_HPP_ */
+#endif 
