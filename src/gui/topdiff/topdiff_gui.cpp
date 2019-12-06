@@ -18,7 +18,7 @@
 #include <QFontDatabase>
 #include <QDesktopWidget>
 
-#include "topmergedialog.h"
+#include "gui/topdiff/topdiffdialog.h"
 
 int main(int argc, char *argv[]) {
   // make sure we are using the c locale
@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
 #endif
   QApplication a(argc, argv);
 
-  TopMergeDialog td;
+  TopDiffDialog td;
 
   QDesktopWidget *desk = QApplication::desktop();
 

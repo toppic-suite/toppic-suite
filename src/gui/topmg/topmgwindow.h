@@ -40,7 +40,7 @@ class topmgWindow : public QMainWindow {
   
   void on_modFileButton_clicked();
   
-  void on_skipListButton_clicked();
+  //void on_skipListButton_clicked();
 
   void on_clearButton_clicked();
 

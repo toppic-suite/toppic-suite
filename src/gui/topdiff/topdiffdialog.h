@@ -12,26 +12,26 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_GUI_TOPMERGE_DIALOG_H
-#define TOPPIC_GUI_TOPMERGE_DIALOG_H
+#ifndef TOPPIC_GUI_TOPDIFF_DIALOG_H
+#define TOPPIC_GUI_TOPDIFF_DIALOG_H
 
 #include <map>
 #include <string>
 
 #include <QMainWindow>
 
-#include "threadtopmerge.h"
+#include "threadtopdiff.h"
 
 namespace Ui {
-class TopMergeDialog;
+class TopDiffDialog;
 }
 
-class TopMergeDialog : public QMainWindow {
+class TopDiffDialog : public QMainWindow {
   Q_OBJECT
 
 public:
-  explicit TopMergeDialog(QWidget *parent = 0);
-  ~TopMergeDialog();
+  explicit TopDiffDialog(QWidget *parent = 0);
+  ~TopDiffDialog();
 
 private slots:
   void on_clearButton_clicked();
@@ -61,15 +61,15 @@ private:
 
   std::map<std::string, std::string> arguments_;
 
-  std::vector<std::string> proteo_file_lst_;
+  std::vector<std::string> spec_file_lst_;
 
-  Ui::TopMergeDialog *ui;
+  Ui::TopDiffDialog *ui;
 
   void initArguments();
 
   std::map<std::string, std::string> getArguments();
 
-  std::vector<std::string> getProteoFileList();
+  std::vector<std::string> getSpecFileList();
 
   void lockDialog();
 
@@ -83,7 +83,7 @@ private:
 
   void sleep(int wait);
 
-  ThreadTopMerge* thread_;
+  ThreadTopDiff* thread_;
 
   QString showInfo;
 

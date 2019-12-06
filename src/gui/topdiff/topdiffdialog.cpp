@@ -26,14 +26,14 @@
 #include "common/util/file_util.hpp"
 #include "common/base/base_data.hpp"
 
-#include "topmergedialog.h"
-#include "ui_topmergedialog.h"
-#include "threadtopmerge.h"
+#include "gui/topdiff/topdiffdialog.h"
+#include "gui/topdiff/ui_topdiffdialog.h"
+#include "gui/topdiff/threadtopdiff.h"
 
 
-TopMergeDialog::TopMergeDialog(QWidget *parent) :
+TopDiffDialog::TopDiffDialog(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::TopMergeDialog) {
+    ui(new Ui::TopDiffDialog) {
       initArguments();
       ui->setupUi(this);
       lastDir_ = ".";
@@ -46,18 +46,18 @@ TopMergeDialog::TopMergeDialog(QWidget *parent) :
       font.setPixelSize(12);
       QApplication::setFont(font);
       ui->outputTextBrowser->setFont(font);
-      thread_ = new ThreadTopMerge(this);
+      thread_ = new ThreadTopDiff(this);
       showInfo = "";
-      TopMergeDialog::on_defaultButton_clicked();
+      TopDiffDialog::on_defaultButton_clicked();
     }
 
-TopMergeDialog::~TopMergeDialog() {
+TopDiffDialog::~TopDiffDialog() {
   thread_->terminate();
   thread_->wait();
   delete ui;
 }
 
-void TopMergeDialog::on_databaseFileButton_clicked() {
+void TopDiffDialog::on_databaseFileButton_clicked() {
   QString s = QFileDialog::getOpenFileName(
       this,
       "Select a protein database file",
@@ -67,7 +67,7 @@ void TopMergeDialog::on_databaseFileButton_clicked() {
   ui->databaseFileEdit->setText(s);
 }
 
-void TopMergeDialog::on_fixedModFileButton_clicked() {
+void TopDiffDialog::on_fixedModFileButton_clicked() {
   QString s = QFileDialog::getOpenFileName(
       this,
       "Select a fixed modification file",
@@ -77,7 +77,7 @@ void TopMergeDialog::on_fixedModFileButton_clicked() {
   ui->fixedModFileEdit->setText(s);
 }
 
-void TopMergeDialog::on_fixedModComboBox_currentIndexChanged(int index) {
+void TopDiffDialog::on_fixedModComboBox_currentIndexChanged(int index) {
   if (index == 3) {
     ui->fixedModFileEdit->setEnabled(true);
     ui->fixedModFileButton->setEnabled(true);
@@ -88,7 +88,7 @@ void TopMergeDialog::on_fixedModComboBox_currentIndexChanged(int index) {
 }
 
 
-void TopMergeDialog::closeEvent(QCloseEvent *event) {
+void TopDiffDialog::closeEvent(QCloseEvent *event) {
   if (thread_->isRunning()) {
     if (!continueToClose()) {
       event->ignore();
@@ -101,45 +101,47 @@ void TopMergeDialog::closeEvent(QCloseEvent *event) {
   return;
 }
 
-void TopMergeDialog::initArguments() {
+void TopDiffDialog::initArguments() {
   arguments_["executiveDir"] = "";
   arguments_["resourceDir"] = "";
   arguments_["databaseFileName"] = "";
   arguments_["fixedMod"] = "";
   arguments_["errorTolerance"] = "1.2";
-  arguments_["mergedOutputFileName"] = "sample_merged.csv";
+  arguments_["toolName"] = "toppic";
+  arguments_["mergedOutputFileName"] = "sample_diff.csv";
 }
 
-void TopMergeDialog::on_clearButton_clicked() {
+void TopDiffDialog::on_clearButton_clicked() {
   ui->databaseFileEdit->clear();
   ui->listWidget->clear();
-  ui->outputTextBrowser->setText("Click the Start button to merge identification files.");
+  ui->outputTextBrowser->setText("Click the Start button to process the data.");
   ui->outputButton->setEnabled(false);
 }
 
-void TopMergeDialog::on_defaultButton_clicked() {
+void TopDiffDialog::on_defaultButton_clicked() {
   ui->fixedModFileEdit->clear();
   ui->fixedModComboBox->setCurrentIndex(0);
   on_fixedModComboBox_currentIndexChanged(0);
+  ui->toolComboBox->setCurrentIndex(0);
   ui->precErrorEdit->setText("1.2");
-  ui->outputEdit->setText("sample_merged.csv");
-  ui->outputTextBrowser->setText("Click the Start button to merge identification files.");
+  ui->outputEdit->setText("sample_diff.csv");
+  ui->outputTextBrowser->setText("Click the Start button to process the data.");
 }
 
-std::vector<std::string> TopMergeDialog::getProteoFileList() {
-  proteo_file_lst_.clear();
+std::vector<std::string> TopDiffDialog::getSpecFileList() {
+  spec_file_lst_.clear();
   for (int i = 0; i < ui->listWidget->count(); i++) {
-    proteo_file_lst_.push_back(ui->listWidget->item(i)->text().toStdString());
+    spec_file_lst_.push_back(ui->listWidget->item(i)->text().toStdString());
   }
-  return proteo_file_lst_;
+  return spec_file_lst_;
 }
 
-void TopMergeDialog::on_addButton_clicked() {
+void TopDiffDialog::on_addButton_clicked() {
   QStringList idfiles = QFileDialog::getOpenFileNames(
       this,
-      "Select identification files",
+      "Select spectrum files",
       lastDir_,
-      "Identification files(*.xml)");
+      "Spectrum files(*ms2.msalign)");
   for (int i = 0; i < idfiles.size(); i++) {
     QString idfile = idfiles.at(i);
     updatedir(idfile);
@@ -149,12 +151,12 @@ void TopMergeDialog::on_addButton_clicked() {
   }
 }
 
-void TopMergeDialog::updatedir(QString s) {
+void TopDiffDialog::updatedir(QString s) {
   if (!s.isEmpty()) {
     lastDir_ = s;
   }
 }
-bool TopMergeDialog::ableToAdd(QString idfile) {
+bool TopDiffDialog::ableToAdd(QString idfile) {
   bool able = true;
   if (idfile != "") {
     if (idfile.toStdString().length() > 200) {
@@ -175,13 +177,13 @@ bool TopMergeDialog::ableToAdd(QString idfile) {
   return able;
 }
 
-void TopMergeDialog::on_delButton_clicked() {
+void TopDiffDialog::on_delButton_clicked() {
   QListWidgetItem *delItem = ui->listWidget->currentItem();
   ui->listWidget->removeItemWidget(delItem);
   delete delItem;
 }
 
-void TopMergeDialog::on_startButton_clicked() {
+void TopDiffDialog::on_startButton_clicked() {
   std::stringstream buffer;
   std::streambuf *oldbuf = std::cout.rdbuf(buffer.rdbuf());
   if (checkError()) {
@@ -190,8 +192,8 @@ void TopMergeDialog::on_startButton_clicked() {
   lockDialog();
   ui->outputTextBrowser->setText(showInfo);
   std::map<std::string, std::string> argument = this->getArguments();
-  std::vector<std::string> proteo_file_lst = this->getProteoFileList();
-  thread_->setPar(argument, proteo_file_lst);
+  std::vector<std::string> spec_file_lst = this->getSpecFileList();
+  thread_->setPar(argument, spec_file_lst);
   thread_->start();
 
   std::string info;
@@ -242,14 +244,14 @@ void TopMergeDialog::on_startButton_clicked() {
   std::cout.rdbuf(oldbuf);
 }
 
-void TopMergeDialog::on_exitButton_clicked() {
+void TopDiffDialog::on_exitButton_clicked() {
   close();
 }
 
-bool TopMergeDialog::continueToClose() {
+bool TopDiffDialog::continueToClose() {
   if (QMessageBox::question(this,
                             tr("Quit"),
-                            tr("TopMerge is still running. Are you sure you want to quit?"),
+                            tr("TopDiff is still running. Are you sure you want to quit?"),
                             QMessageBox::Yes | QMessageBox::No,
                             QMessageBox::No)
       == QMessageBox::Yes) {
@@ -259,21 +261,21 @@ bool TopMergeDialog::continueToClose() {
   }
 }
 
-void TopMergeDialog::on_outputButton_clicked() {
-  std::string proteo_file_name = "";
-  if (proteo_file_lst_.size() > 0) {
-    proteo_file_name = proteo_file_lst_[0];
+void TopDiffDialog::on_outputButton_clicked() {
+  std::string spec_file_name = "";
+  if (spec_file_lst_.size() > 0) {
+    spec_file_name = spec_file_lst_[0];
   }
-  fs::path full_path(proteo_file_name.c_str());
-  QString outPath = full_path.remove_filename().string().c_str();
+  std::string dir = toppic::file_util::directory(spec_file_name);
+  QString outPath = spec_file_name.c_str();
   QDesktopServices::openUrl(QUrl(outPath, QUrl::TolerantMode));
 }
 
-std::map<std::string, std::string> TopMergeDialog::getArguments() {
+std::map<std::string, std::string> TopDiffDialog::getArguments() {
   QString path = QCoreApplication::applicationFilePath();
   std::string exe_dir = toppic::file_util::getExecutiveDir(path.toStdString());
   arguments_["executiveDir"] = exe_dir;
-  arguments_["resourceDir"] = arguments_["executiveDir"] + toppic::file_util::getFileSeparator() + toppic::file_util::getResourceDirName();
+  arguments_["resourceDir"] = toppic::file_util::getResourceDir(exe_dir);
   arguments_["databaseFileName"] = ui->databaseFileEdit->text().toStdString();
 
   arguments_["fixedMod"] = ui->fixedModComboBox->currentText().toStdString();
@@ -283,12 +285,13 @@ std::map<std::string, std::string> TopMergeDialog::getArguments() {
   if (ui->fixedModComboBox->currentIndex() == 3) {
     arguments_["fixedMod"] = ui->fixedModFileEdit->text().toStdString();
   }
+  arguments_["toolName"] = ui->toolComboBox->currentText().toStdString();
   arguments_["errorTolerance"] = ui->precErrorEdit->text().toStdString();
   arguments_["mergedOutputFileName"] = ui->outputEdit->text().trimmed().toStdString();
   return arguments_;
 }
 
-void TopMergeDialog::lockDialog() {
+void TopDiffDialog::lockDialog() {
   ui->addButton->setEnabled(false);
   ui->delButton->setEnabled(false);
   ui->clearButton->setEnabled(false);
@@ -302,10 +305,11 @@ void TopMergeDialog::lockDialog() {
   ui->fixedModComboBox->setEnabled(false);
   ui->fixedModFileEdit->setEnabled(false);
   ui->fixedModFileButton->setEnabled(false);
+  ui->toolComboBox->setEnabled(false);
   ui->precErrorEdit->setEnabled(false);
 }
 
-void TopMergeDialog::unlockDialog() {
+void TopDiffDialog::unlockDialog() {
   ui->addButton->setEnabled(true);
   ui->delButton->setEnabled(true);
   ui->clearButton->setEnabled(true);
@@ -321,9 +325,10 @@ void TopMergeDialog::unlockDialog() {
   ui->outputEdit->setEnabled(true);
   ui->fixedModComboBox->setEnabled(true);
   on_fixedModComboBox_currentIndexChanged(ui->fixedModComboBox->currentIndex());
+  ui->toolComboBox->setEnabled(true);
 }
 
-bool TopMergeDialog::checkError() {
+bool TopDiffDialog::checkError() {
   if (ui->databaseFileEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
                          tr("Database file is empty!"),
@@ -333,21 +338,21 @@ bool TopMergeDialog::checkError() {
 
   if (ui->listWidget->count() == 0) {
     QMessageBox::warning(this, tr("Warning"),
-                         tr("Identification file is empty!"),
+                         tr("Spectrum files are not selected!"),
                          QMessageBox::Yes);
     return true;
   }
 
   if (ui->precErrorEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
-                         tr("Precursor error tolerance is empty!"),
+                         tr("Error tolerance is empty!"),
                          QMessageBox::Yes);
     return true;
   }
 
   if (ui->outputEdit->text().isEmpty()) {
     QMessageBox::warning(this, tr("Warning"),
-                         tr("Merged output filename is empty!"),
+                         tr("Output filename is empty!"),
                          QMessageBox::Yes);
     return true;
   }
@@ -355,7 +360,7 @@ bool TopMergeDialog::checkError() {
   return false;
 }
 
-void TopMergeDialog::updateMsg(std::string msg) {
+void TopDiffDialog::updateMsg(std::string msg) {
   showInfo = msg.c_str();
   ui->outputTextBrowser->setText(showInfo);
   QTextCursor cursor = ui->outputTextBrowser->textCursor();
@@ -363,7 +368,7 @@ void TopMergeDialog::updateMsg(std::string msg) {
   ui->outputTextBrowser->setTextCursor(cursor);
 }
 
-void TopMergeDialog::sleep(int wait) {
+void TopDiffDialog::sleep(int wait) {
   QElapsedTimer t;
   t.start();
   while (t.elapsed() < wait) {
