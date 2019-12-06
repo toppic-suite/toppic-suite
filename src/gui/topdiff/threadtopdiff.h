@@ -13,8 +13,8 @@
 //limitations under the License.
 
 
-#ifndef TOPPIC_GUI_THREADTOPMERGE_H
-#define TOPPIC_GUI_THREADTOPMERGE_H
+#ifndef TOPPIC_GUI_THREADTOPDIFF_H
+#define TOPPIC_GUI_THREADTOPDIFF_H
 
 #include <map>
 #include <string>
@@ -25,29 +25,29 @@
 #include <QThread>
 
 namespace Ui {
-class ThreadTopMerge;
+class ThreadTopDiff;
 }
 
-class ThreadTopMerge : public QThread {
+class ThreadTopDiff : public QThread {
   Q_OBJECT
 
  public:
-  explicit ThreadTopMerge(QObject* par) : QThread(par) {}
+  explicit ThreadTopDiff(QObject* par) : QThread(par) {}
 
-  ~ThreadTopMerge() {}
+  ~ThreadTopDiff() {}
 
   void run();
 
   void setPar(std::map<std::string, std::string> arguments,
-              const std::vector<std::string> & proteoform_file_lst) {
+              const std::vector<std::string> & spec_file_lst) {
     arguments_ = arguments;
-    proteoform_file_lst_ = proteoform_file_lst;
+    spec_file_lst_ = spec_file_lst;
   }
 
  private:
   std::map<std::string, std::string> arguments_;
 
-  std::vector<std::string> proteoform_file_lst_;
+  std::vector<std::string> spec_file_lst_;
 };
 
 #endif

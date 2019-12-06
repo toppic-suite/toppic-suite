@@ -109,7 +109,7 @@ void topmgWindow::on_clearButton_clicked() {
   ui->listWidget->clear();
   ui->combinedOutputEdit->clear();
   ui->combinedOutputEdit->setEnabled(false);
-  ui->skipListEdit->clear();
+  //ui->skipListEdit->clear();
   ui->outputTextBrowser->setText("Click the Start button to process the spectrum files.");
 }
 
@@ -174,6 +174,7 @@ void topmgWindow::on_modFileButton_clicked() {
   ui->modFileEdit->setText(s);
 }
 
+/*
 void topmgWindow::on_skipListButton_clicked() {
   QString s = QFileDialog::getOpenFileName(
       this,
@@ -183,6 +184,7 @@ void topmgWindow::on_skipListButton_clicked() {
   updatedir(s);
   ui->skipListEdit->setText(s);
 }
+*/
 
 void topmgWindow::on_startButton_clicked() {
   std::stringstream buffer;
@@ -308,7 +310,7 @@ std::map<std::string, std::string> topmgWindow::getArguments() {
   arguments_["filteringResultNumber"] = "20";  // default
   arguments_["useGf"] = "false";  // default
   arguments_["groupSpectrumNumber"] = "1";  // default
-  arguments_["skipList"] = ui->skipListEdit->text().toStdString();
+  //arguments_["skipList"] = ui->skipListEdit->text().toStdString();
   arguments_["proteoGraphGap"] = "40";  // default
   arguments_["useAsfDiag"] = "false";  // default
   arguments_["varPtmNumber"] = ui->numModComboBox->currentText().toStdString();
@@ -402,7 +404,7 @@ void topmgWindow::lockDialog() {
   ui->cutoffProteoformValueEdit->setEnabled(false);
   ui->modFileEdit->setEnabled(false);
   ui->threadNumberEdit->setEnabled(false);
-  ui->skipListEdit->setEnabled(false);
+  //ui->skipListEdit->setEnabled(false);
   ui->fixedModComboBox->setEnabled(false);
   ui->activationComboBox->setEnabled(false);
   ui->cutoffSpectralTypeComboBox->setEnabled(false);
@@ -438,7 +440,7 @@ void topmgWindow::unlockDialog() {
   ui->cutoffProteoformValueEdit->setEnabled(true);
   ui->modFileEdit->setEnabled(true);
   ui->threadNumberEdit->setEnabled(true);
-  ui->skipListEdit->setEnabled(true);
+  //ui->skipListEdit->setEnabled(true);
   ui->fixedModComboBox->setEnabled(true);
   on_fixedModComboBox_currentIndexChanged(ui->fixedModComboBox->currentIndex());
   ui->activationComboBox->setEnabled(true);

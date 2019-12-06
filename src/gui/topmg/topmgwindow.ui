@@ -137,7 +137,7 @@ p, li { white-space: pre-wrap; }
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="tab_4">
      <attribute name="title">
@@ -430,19 +430,6 @@ p, li { white-space: pre-wrap; }
         <height>111</height>
        </rect>
       </property>
-      <property name="styleSheet">
-       <string notr="true">QGroupBox {
-    border: 1px solid gray;
-    border-radius: 5px;
-    margin-top: 0.5em;
-}
-
-QGroupBox::title {
-    subcontrol-origin: margin;
-    left: 10px;
-    padding: 0 3px 0 3px;
-}</string>
-      </property>
       <property name="title">
        <string>Cutoff settings</string>
       </property>
@@ -467,19 +454,6 @@ QGroupBox::title {
          <width>191</width>
          <height>91</height>
         </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QGroupBox {
-    border: 1px solid gray;
-    border-radius: 3px;
-    margin-top: 0.5em;
-}
-
-QGroupBox::title {
-    subcontrol-origin: margin;
-    left: 10px;
-    padding: 0 3px 0 3px;
-}</string>
        </property>
        <property name="title">
         <string/>
@@ -545,19 +519,6 @@ QGroupBox::title {
          <width>191</width>
          <height>91</height>
         </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QGroupBox {
-    border: 1px solid gray;
-    border-radius: 3px;
-    margin-top: 0.5em;
-}
-
-QGroupBox::title {
-    subcontrol-origin: margin;
-    left: 10px;
-    padding: 0 3px 0 3px;
-}</string>
        </property>
        <property name="title">
         <string/>
@@ -844,23 +805,10 @@ QGroupBox::title {
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>60</y>
+        <y>70</y>
         <width>361</width>
         <height>91</height>
        </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QGroupBox {
-    border: 1px solid gray;
-    border-radius: 5px;
-    margin-top: 0.5em;
-}
-
-QGroupBox::title {
-    subcontrol-origin: margin;
-    left: 10px;
-    padding: 0 3px 0 3px;
-}</string>
       </property>
       <property name="title">
        <string>N-terminal forms</string>
@@ -923,45 +871,6 @@ QGroupBox::title {
         </item>
        </layout>
       </widget>
-     </widget>
-     <widget class="QWidget" name="horizontalLayoutWidget_18">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>210</y>
-        <width>831</width>
-        <height>33</height>
-       </rect>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_18">
-       <item>
-        <widget class="QLabel" name="label_19">
-         <property name="text">
-          <string>Skip list:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="skipListEdit">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="skipListButton">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="text">
-          <string>File</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
      </widget>
      <widget class="QWidget" name="horizontalLayoutWidget_12">
       <property name="geometry">

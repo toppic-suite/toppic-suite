@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>TopMergeDialog</class>
- <widget class="QMainWindow" name="TopMergeDialog">
+ <class>TopDiffDialog</class>
+ <widget class="QMainWindow" name="TopDiffDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>920</width>
-    <height>700</height>
+    <height>710</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -19,13 +19,13 @@
   <property name="minimumSize">
    <size>
     <width>920</width>
-    <height>700</height>
+    <height>710</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>920</width>
-    <height>700</height>
+    <height>710</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -41,15 +41,15 @@
      <rect>
       <x>40</x>
       <y>50</y>
-      <width>375</width>
-      <height>34</height>
+      <width>406</width>
+      <height>39</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QLabel" name="label">
        <property name="text">
-        <string>Identificaton files: </string>
+        <string>Spectrum files: </string>
        </property>
       </widget>
      </item>
@@ -97,9 +97,9 @@
     <property name="geometry">
      <rect>
       <x>40</x>
-      <y>330</y>
-      <width>441</width>
-      <height>34</height>
+      <y>360</y>
+      <width>481</width>
+      <height>36</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_4">
@@ -212,17 +212,17 @@
     <property name="geometry">
      <rect>
       <x>40</x>
-      <y>420</y>
+      <y>450</y>
       <width>861</width>
-      <height>231</height>
+      <height>201</height>
      </rect>
     </property>
     <property name="html">
      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:14pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Cantarell'; font-size:11pt;&quot;&gt;Click the Start button to merge identification files.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Cantarell';&quot;&gt;Click the Start button to merge identification files.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
    <widget class="QListWidget" name="listWidget">
@@ -231,7 +231,7 @@ p, li { white-space: pre-wrap; }
       <x>40</x>
       <y>100</y>
       <width>861</width>
-      <height>181</height>
+      <height>171</height>
      </rect>
     </property>
    </widget>
@@ -241,7 +241,7 @@ p, li { white-space: pre-wrap; }
       <x>40</x>
       <y>10</y>
       <width>851</width>
-      <height>34</height>
+      <height>39</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -287,24 +287,14 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>40</x>
-      <y>290</y>
+      <y>280</y>
       <width>861</width>
       <height>31</height>
      </rect>
     </property>
-    <property name="font">
-     <font>
-      <pointsize>12</pointsize>
-     </font>
-    </property>
     <layout class="QHBoxLayout" name="horizontalLayout_5">
      <item>
       <widget class="QLabel" name="label_5">
-       <property name="font">
-        <font>
-         <pointsize>12</pointsize>
-        </font>
-       </property>
        <property name="text">
         <string>Fixed modifications:</string>
        </property>
@@ -312,11 +302,6 @@ p, li { white-space: pre-wrap; }
      </item>
      <item>
       <widget class="QComboBox" name="fixedModComboBox">
-       <property name="font">
-        <font>
-         <pointsize>12</pointsize>
-        </font>
-       </property>
        <item>
         <property name="text">
          <string>NONE</string>
@@ -344,11 +329,6 @@ p, li { white-space: pre-wrap; }
        <property name="enabled">
         <bool>false</bool>
        </property>
-       <property name="font">
-        <font>
-         <pointsize>12</pointsize>
-        </font>
-       </property>
        <property name="readOnly">
         <bool>true</bool>
        </property>
@@ -365,11 +345,6 @@ p, li { white-space: pre-wrap; }
          <height>16777215</height>
         </size>
        </property>
-       <property name="font">
-        <font>
-         <pointsize>12</pointsize>
-        </font>
-       </property>
        <property name="text">
         <string>File</string>
        </property>
@@ -381,24 +356,60 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>40</x>
-      <y>370</y>
+      <y>400</y>
       <width>701</width>
-      <height>34</height>
+      <height>36</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_6">
      <item>
       <widget class="QLabel" name="label_3">
        <property name="text">
-        <string>Merged output filename:</string>
+        <string>Output filename:</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QLineEdit" name="outputEdit">
        <property name="text">
-        <string>sample_merged.csv</string>
+        <string>sample_diff.csv</string>
        </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget_8">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>320</y>
+      <width>451</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_8">
+     <item>
+      <widget class="QLabel" name="label_6">
+       <property name="text">
+        <string>Database search tool:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="toolComboBox">
+       <property name="currentText">
+        <string>toppic</string>
+       </property>
+       <item>
+        <property name="text">
+         <string>toppic</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>topmg</string>
+        </property>
+       </item>
       </widget>
      </item>
     </layout>

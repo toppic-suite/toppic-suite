@@ -12,12 +12,12 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <algorithm>
+//#include <algorithm>
 
-#include "console/topmerge_process.hpp"
-#include "gui/topmerge/threadtopmerge.h"
+#include "console/topdiff_process.hpp"
+#include "gui/topdiff/threadtopdiff.h"
 
-void ThreadTopMerge::run() {
-  std::sort(proteoform_file_lst_.begin(), proteoform_file_lst_.end());
-  toppic::topMergeProcess(arguments_, proteoform_file_lst_);
+void ThreadTopDiff::run() {
+  //std::sort(spec_file_lst_.begin(), spec_file_lst_.end());
+  toppic::topDiffProcess(arguments_, spec_file_lst_);
 }
