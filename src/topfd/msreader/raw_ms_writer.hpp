@@ -23,7 +23,7 @@ namespace toppic {
 
 namespace raw_ms_writer {
 
-  void write(std::string &file_name, RawMsPtr ms_ptr, MatchEnvPtrVec &env);
+  void write(std::string &file_name, int ms_level, RawMsPtr ms_ptr, MatchEnvPtrVec &env);
 }
 
 }

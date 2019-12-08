@@ -68,10 +68,10 @@ void DeconvProcess::prepareFileFolder() {
   //json file names
   html_dir_ =  base_name_ + "_html";
   ms1_json_dir_ = html_dir_ 
-      + file_util::getFileSeparator() + "shared_data_js" 
+      + file_util::getFileSeparator() + "topfd" 
       + file_util::getFileSeparator() + "ms1_json";
   ms2_json_dir_ = html_dir_ 
-      + file_util::getFileSeparator() + "shared_data_js" 
+      + file_util::getFileSeparator() + "topfd" 
       + file_util::getFileSeparator() + "ms2_json";
   if (file_util::exists(html_dir_)) {
     file_util::delDir(html_dir_);
@@ -144,7 +144,8 @@ void DeconvProcess::processSpMissingLevelOne(DeconvOneSpPtr deconv_ptr,
         std::string json_file_name = ms2_json_dir_ 
             + file_util::getFileSeparator() 
             + "spectrum" + std::to_string(header_ptr->getId()) + ".js";
-        raw_ms_writer::write(json_file_name, ms_two_ptr_vec[i], result_envs);    
+        int ms_level = 2;
+        raw_ms_writer::write(json_file_name, ms_level, ms_two_ptr_vec[i], result_envs);    
       }
       count2++;
     }
@@ -178,7 +179,8 @@ void DeconvProcess::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
     std::string json_file_name = ms1_json_dir_ 
         + file_util::getFileSeparator() 
         + "spectrum" + std::to_string(header_ptr->getId()) + ".js";
-    raw_ms_writer::write(json_file_name, ms_ptr, prec_envs);    
+    int ms_level = 1;
+    raw_ms_writer::write(json_file_name, ms_level, ms_ptr, prec_envs);    
   }
 }
 
@@ -206,7 +208,8 @@ void DeconvProcess::deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
     std::string json_file_name = ms2_json_dir_ 
         + file_util::getFileSeparator() 
         + "spectrum" + std::to_string(ms_ptr->getMsHeaderPtr()->getId()) + ".js";
-    raw_ms_writer::write(json_file_name, ms_ptr, result_envs);    
+    int ms_level = 2;
+    raw_ms_writer::write(json_file_name, ms_level, ms_ptr, result_envs);    
   }
 }
 
