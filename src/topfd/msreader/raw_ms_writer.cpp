@@ -25,7 +25,8 @@ namespace toppic {
 
 namespace raw_ms_writer {
 
-void write(std::string &file_name, RawMsPtr ms_ptr, MatchEnvPtrVec &envs) {
+void write(std::string &file_name, int ms_level, 
+           RawMsPtr ms_ptr, MatchEnvPtrVec &envs) {
 
   rapidjson::Document doc;
 
@@ -74,7 +75,12 @@ void write(std::string &file_name, RawMsPtr ms_ptr, MatchEnvPtrVec &envs) {
   doc.Accept(writer);
   std::ofstream output;
   output.open(file_name.c_str());
-  output << "spectrum_data =" << std::endl;
+  if (ms_level == 1) {
+    output << "ms1_data =" << std::endl;
+  }
+  else {
+    output << "ms2_data =" << std::endl;
+  }
   output << buffer.GetString();
   output.close();
 }
