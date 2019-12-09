@@ -29,7 +29,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>TopMerge</string>
+   <string>Topdiff</string>
   </property>
   <property name="windowIcon">
    <iconset resource="icon.qrc">
