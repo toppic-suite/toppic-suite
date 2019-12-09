@@ -144,8 +144,7 @@ void DeconvProcess::processSpMissingLevelOne(DeconvOneSpPtr deconv_ptr,
         std::string json_file_name = ms2_json_dir_ 
             + file_util::getFileSeparator() 
             + "spectrum" + std::to_string(header_ptr->getId()) + ".js";
-        int ms_level = 2;
-        raw_ms_writer::write(json_file_name, ms_level, ms_two_ptr_vec[i], result_envs);    
+        raw_ms_writer::write(json_file_name, ms_two_ptr_vec[i], result_envs);    
       }
       count2++;
     }
@@ -179,8 +178,7 @@ void DeconvProcess::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
     std::string json_file_name = ms1_json_dir_ 
         + file_util::getFileSeparator() 
         + "spectrum" + std::to_string(header_ptr->getId()) + ".js";
-    int ms_level = 1;
-    raw_ms_writer::write(json_file_name, ms_level, ms_ptr, prec_envs);    
+    raw_ms_writer::write(json_file_name, ms_ptr, prec_envs);    
   }
 }
 
@@ -208,8 +206,7 @@ void DeconvProcess::deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
     std::string json_file_name = ms2_json_dir_ 
         + file_util::getFileSeparator() 
         + "spectrum" + std::to_string(ms_ptr->getMsHeaderPtr()->getId()) + ".js";
-    int ms_level = 2;
-    raw_ms_writer::write(json_file_name, ms_level, ms_ptr, result_envs);    
+    raw_ms_writer::write(json_file_name, ms_ptr, result_envs);    
   }
 }
 
