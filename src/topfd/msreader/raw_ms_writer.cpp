@@ -25,8 +25,7 @@ namespace toppic {
 
 namespace raw_ms_writer {
 
-void write(std::string &file_name, int ms_level, 
-           RawMsPtr ms_ptr, MatchEnvPtrVec &envs) {
+void write(std::string &file_name, RawMsPtr ms_ptr, MatchEnvPtrVec &envs) {
 
   rapidjson::Document doc;
 
@@ -35,6 +34,13 @@ void write(std::string &file_name, int ms_level,
   
   // must pass an allocator when the object may need to allocate memory
   rapidjson::Document::AllocatorType& allocator = doc.GetAllocator();
+
+  MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
+  int ms_level = header_ptr->getMsLevel();
+  int scan_num = header_ptr->getFirstScanNum();
+  double retention_time = header_ptr->getRetentionTime();
+  doc.AddMember("scan", scan_num, allocator);
+  doc.AddMember("retention_time", retention_time, allocator);
   
   // create a rapidjson array type with similar syntax to std::vector
   rapidjson::Value peaks(rapidjson::kArrayType);
