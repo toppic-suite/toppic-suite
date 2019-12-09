@@ -35,20 +35,20 @@ void DeconvJsonMerge::process() {
     std::string base_name = file_name.substr(0, file_name.length() - 4);
     std::string ms1_folder = base_name + "_html" 
         + file_util::getFileSeparator()
-        + "shared_data_js" + file_util::getFileSeparator() + "ms1_json";
+        + "topfd" + file_util::getFileSeparator() + "ms1_json";
     ms1_folder_names.push_back(ms1_folder);
     std::string ms2_folder = base_name + "_html" 
         + file_util::getFileSeparator()
-        + "shared_data_js" + file_util::getFileSeparator() + "ms2_json";
+        + "topfd" + file_util::getFileSeparator() + "ms2_json";
     ms2_folder_names.push_back(ms2_folder);
   }
   
   std::string ms1_output_folder = output_file_name_ + "_html" 
       + file_util::getFileSeparator() 
-      + "shared_data_js" + file_util::getFileSeparator() + "ms1_json";
+      + "topfd" + file_util::getFileSeparator() + "ms1_json";
   std::string ms2_output_folder = output_file_name_ + "_html" 
       + file_util::getFileSeparator() 
-      + "shared_data_js" + file_util::getFileSeparator() + "ms2_json";
+      + "topfd" + file_util::getFileSeparator() + "ms2_json";
 
   mergeFiles(ms1_folder_names, ms1_output_folder, 
              MAX_SPEC_NUM_PER_FILE); 
