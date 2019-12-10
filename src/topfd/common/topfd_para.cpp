@@ -27,19 +27,20 @@ std::string TopfdPara::getParaStr(const std::string &prefix) {
   output << prefix << "Timestamp: " << time_util::getTimeStr() << std::endl;
   output << prefix << "###################### Parameters ######################" << std::endl;
   output << prefix << std::setw(40) << std::left 
-      << "Data type: " << "Centroid" << std::endl;
+      << "Data type: " << "\t" << "Centroid" << std::endl;
   output << prefix << std::setw(40) << std::left 
-      << "Maximum charge: " << max_charge_ << std::endl;
+      << "Maximum charge: " << "\t" << max_charge_ << std::endl;
   output << prefix << std::setw(40) << std::left 
-      << "Maximum monoisotopic mass: " << max_mass_ << " Dalton" << std::endl;
+      << "Maximum monoisotopic mass: " << 
+      "\t" << max_mass_ << " Dalton" << std::endl;
   output << prefix << std::setw(40) << std::left 
-      << "Error tolerance: " << mz_error_ << " m/z" << std::endl;
+      << "Error tolerance: " << "\t" << mz_error_ << " m/z" << std::endl;
   output << prefix << std::setw(40) << std::left 
-      << "MS1 signal/noise ratio: " << ms_one_sn_ratio_ << std::endl;
+      << "MS1 signal/noise ratio: " << "\t" << ms_one_sn_ratio_ << std::endl;
   output << prefix << std::setw(40) << std::left 
-      << "MS/MS signal/noise ratio: " << ms_two_sn_ratio_ << std::endl;
+      << "MS/MS signal/noise ratio: " << "\t" << ms_two_sn_ratio_ << std::endl;
   output << prefix << std::setw(40) << std::left 
-      << "Precursor window size: " << prec_window_ << " m/z" << std::endl;
+      << "Precursor window size: " << "\t" << prec_window_ << " m/z" << std::endl;
   //output << prefix << std::setw(40) << std::left 
   //    << "Do final filtering: " << para_ptr->do_final_filtering_ << std::endl;
   output << prefix << "###################### Parameters ######################" << std::endl;
