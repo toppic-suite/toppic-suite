@@ -138,9 +138,9 @@ add_executable(topfd
   ${TOPFD_CONSOLE_SRCS} ${TOPFD_SRCS} ${SPEC_SRCS} ${ENV_SRCS} 
   ${FEATURE_SRCS} ${PWIZ_SRCS} ${COMMON_SRCS})
 
-add_executable(topfd_single 
-  ${TOPFD_SINGLE_CONSOLE_SRCS} ${TOPFD_SINGLE_PROC_SRCS} ${TOPFD_SRCS}
-  ${SPEC_SRCS} ${ENV_SRCS} ${PWIZ_SRCS} ${COMMON_SRCS}) 
+#add_executable(topfd_single 
+#  ${TOPFD_SINGLE_CONSOLE_SRCS} ${TOPFD_SINGLE_PROC_SRCS} ${TOPFD_SRCS}
+#  ${SPEC_SRCS} ${ENV_SRCS} ${PWIZ_SRCS} ${COMMON_SRCS}) 
 
 add_executable(topfd_gui 
   ${TOPFD_GUI_SRCS} ${TOPFD_SRCS} ${SPEC_SRCS} ${ENV_SRCS} 
@@ -197,10 +197,10 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
         boost_system-mt boost_thread-mt
         boost_iostreams-mt boost_chrono-mt pthread z Ws2_32)
 
-    target_link_libraries(topfd_single xerces-c
-        boost_program_options-mt boost_filesystem-mt
-        boost_system-mt boost_thread-mt
-        boost_iostreams-mt boost_chrono-mt pthread z Ws2_32)
+      #   target_link_libraries(topfd_single xerces-c
+      #  boost_program_options-mt boost_filesystem-mt
+      #  boost_system-mt boost_thread-mt
+      #  boost_iostreams-mt boost_chrono-mt pthread z Ws2_32)
 
     target_link_libraries(toppic xerces-c
         boost_filesystem-mt boost_system-mt 
@@ -244,9 +244,9 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     target_link_libraries(topfd_gui Qt5Widgets Qt5Core Qt5Gui
         xerces-c boost_filesystem boost_system boost_thread boost_iostreams boost_chrono pthread z)
 
-    target_link_libraries(topfd_single xerces-c boost_program_options
-        boost_filesystem boost_system boost_thread boost_iostreams boost_chrono
-        pthread z)
+      #target_link_libraries(topfd_single xerces-c boost_program_options
+      #  boost_filesystem boost_system boost_thread boost_iostreams boost_chrono
+      #  pthread z)
 
     target_link_libraries(toppic xerces-c boost_program_options
         boost_filesystem boost_system boost_thread pthread z)
