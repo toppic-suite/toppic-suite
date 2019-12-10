@@ -260,7 +260,7 @@ void TopFDDialog::on_outputButton_clicked() {
     sp_file_name = spec_file_lst_[0];
   }
   std::string dir = toppic::file_util::directory(sp_file_name);
-  QString outPath = sp_file_name.c_str();
+  QString outPath = dir.c_str();
   QDesktopServices::openUrl(QUrl(outPath, QUrl::TolerantMode));
 }
 
