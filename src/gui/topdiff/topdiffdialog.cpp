@@ -267,7 +267,7 @@ void TopDiffDialog::on_outputButton_clicked() {
     spec_file_name = spec_file_lst_[0];
   }
   std::string dir = toppic::file_util::directory(spec_file_name);
-  QString outPath = spec_file_name.c_str();
+  QString outPath = dir.c_str();
   QDesktopServices::openUrl(QUrl(outPath, QUrl::TolerantMode));
 }
 
