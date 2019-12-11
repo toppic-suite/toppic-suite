@@ -422,7 +422,7 @@ int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
                              const std::vector<std::string> & spec_file_lst) {
 
   std::string base_path = file_util::absoluteDir(spec_file_lst[0]);
-  std::string base_name = base_path + file_util::getFileSeparator() 
+  std::string full_combined_name = base_path + file_util::getFileSeparator() 
       +  arguments["combinedOutputName"];
 
   std::time_t start = time(nullptr);
@@ -446,29 +446,36 @@ int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
   }
 
   if (spec_file_lst.size() > 1 && arguments["combinedOutputName"] != "") {
-    std::string merged_file_name = arguments["combinedOutputName"]; 
     std::string para_str = "";
     std::cout << "Merging files started." << std::endl;
-    MsAlignFracMerge::mergeFiles(spec_file_lst, merged_file_name + "_ms2.msalign", para_str);
+    std::cout << "Merging msalign files started." << std::endl;
+    MsAlignFracMerge::mergeFiles(spec_file_lst, full_combined_name + "_ms2.msalign", para_str);
+    std::cout << "Merging msalign files finished." << std::endl;
+    std::cout << "Merging json files started." << std::endl;
     DeconvJsonMergePtr json_merger 
-        = std::make_shared<DeconvJsonMerge>(spec_file_lst, merged_file_name);
+        = std::make_shared<DeconvJsonMerge>(spec_file_lst, full_combined_name);
     json_merger->process();
     json_merger = nullptr;
+    std::cout << "Merging json files finished." << std::endl;
+    std::cout << "Merging feature files started." << std::endl;
     FeatureMergePtr feature_merger 
-        = std::make_shared<FeatureMerge>(spec_file_lst, merged_file_name);
+        = std::make_shared<FeatureMerge>(spec_file_lst, full_combined_name);
     feature_merger->process(para_str);
     feature_merger = nullptr;
+    std::cout << "Merging feature files finished." << std::endl;
 
     // merge TOP files
+    std::cout << "Merging identification files started." << std::endl;
     std::vector<std::string> prsm_file_lst(spec_file_lst.size());
     for (size_t i = 0; i < spec_file_lst.size(); i++) {
       prsm_file_lst[i] = file_util::basename(spec_file_lst[i]) + ".topmg_top"; 
     }
     int N = 1000000;
-    prsm_util::mergePrsmFiles(prsm_file_lst, N , base_name + "_ms2.topmg_top");
+    prsm_util::mergePrsmFiles(prsm_file_lst, N , full_combined_name + "_ms2.topmg_top");
+    std::cout << "Merging identification files finished." << std::endl;
     std::cout << "Merging files - finished." << std::endl;
 
-    std::string sp_file_name = base_name + "_ms2.msalign";
+    std::string sp_file_name = full_combined_name + "_ms2.msalign";
     arguments["spectrumFileName"] = sp_file_name;
     arguments["startTime"] = combined_start_time;
     TopMG_post(arguments);
@@ -484,7 +491,7 @@ int TopMGProgress_multi_file(std::map<std::string, std::string> & arguments,
   }
 
   if (spec_file_lst.size() > 1 && arguments["combinedOutputName"] != "") {
-    std::string sp_file_name = base_name + "_ms2.msalign";
+    std::string sp_file_name = full_combined_name + "_ms2.msalign";
     cleanTopmgDir(ori_db_file_name, sp_file_name, keep_temp_files);
   }
   std::cout << "Deleting temporary files - finished." << std::endl; 
