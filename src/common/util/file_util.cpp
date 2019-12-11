@@ -209,12 +209,14 @@ bool copyJsonDir(const std::string &src_name,
       int new_id = std::stoi(id_str) + id_base;
       std::string new_name = "spectrum" + std::to_string(new_id) + ".js";
       fs::path des_file(des_name + getFileSeparator() + new_name);
+      std::cout << "Copying file: "<< current << "\r";
       fs::copy_file(current, des_file);
     }
     catch(fs::filesystem_error const & e) {
       LOG_ERROR(e.what());
     }
   }
+  std::cout << "\n";
   return true;
 }
 
