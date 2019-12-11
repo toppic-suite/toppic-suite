@@ -23,19 +23,19 @@ namespace toppic {
 
 std::string TopfdPara::getParaStr(const std::string &prefix) {
   std::stringstream output;
-  int gap = 50;
+  int gap = 45;
   output << prefix << "TopFD " << Version::getVersion() << std::endl;
   output << prefix << "Timestamp: " << time_util::getTimeStr() << std::endl;
   output << prefix << "###################### Parameters ######################" << std::endl;
   output << prefix << std::setw(gap) << std::left 
-      << "Spectral data type:       " << "\t" << "Centroid" << std::endl;
+      << "Spectral data type:       " << "\t"  << "Centroid" << std::endl;
   output << prefix << std::setw(gap) << std::left 
-      << "Maximum charge:           " << "\t" << max_charge_ << std::endl;
+      << "Maximum charge:           "  << "\t" << max_charge_ << std::endl;
   output << prefix << std::setw(gap) << std::left 
       << "Maximum monoisotopic mass:" << 
       "\t" << max_mass_ << " Dalton" << std::endl;
   output << prefix << std::setw(gap) << std::left 
-      << "Error tolerance: " << "\t" << mz_error_ << " m/z" << std::endl;
+      << "Peak error tolerance: " << "\t" << mz_error_ << " m/z" << std::endl;
   output << prefix << std::setw(gap) << std::left 
       << "MS1 signal/noise ratio: " << "\t" << ms_one_sn_ratio_ << std::endl;
   output << prefix << std::setw(gap) << std::left 
