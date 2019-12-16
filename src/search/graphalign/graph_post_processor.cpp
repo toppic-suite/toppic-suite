@@ -173,8 +173,8 @@ void GraphPostProcessor::process() {
 
         for (size_t k = 0; k < shift_vec.size(); k++) {
           int mass = std::ceil(shift_vec[k]->getMassShift() * mng_ptr_->convert_ratio_);
-          PtmPtrVec ptm_vec;
           int err = std::abs(mass - mass_ptm_map_.begin()->first);
+          PtmPtrVec ptm_vec = mass_ptm_map_.begin()->second;
           for (auto it = mass_ptm_map_.begin(); it != mass_ptm_map_.end(); it++) {
             if (std::abs(mass - it->first) < err) {
               err = std::abs(mass - it->first);
