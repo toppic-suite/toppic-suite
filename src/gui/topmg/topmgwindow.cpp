@@ -205,8 +205,12 @@ void topmgWindow::on_startButton_clicked() {
   std::string processed_lines = ""; 
   std::string current_line = "";
   unsigned cursor_pos = 0;
+  bool finish = false;
 
   while (true) {
+    if (thread_->isFinished()) {
+      finish = true;
+    }
     // Here is the infomation been shown in the infoBox.
     info = buffer.str();
     std::string new_info = info.substr(processed_len);
@@ -237,7 +241,7 @@ void topmgWindow::on_startButton_clicked() {
       }
       updateMsg(processed_lines + current_line);
     }
-    if (thread_->isFinished()) {
+    if (finish) {
       break;
     }
     sleep(100);
