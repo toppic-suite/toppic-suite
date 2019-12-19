@@ -40,7 +40,7 @@ void addSummary(XmlDOMDocument* xml_doc, xercesc::DOMElement *prot_element,
   xml_doc->addElement(prot_element, "sequence_description", str.c_str());
 
   double mass = proteoform_ptr->getMass();
-  str = str_util::toString(mass, mng_ptr->precise_point_num_);
+  str = str_util::fixedToString(mass, mng_ptr->precise_point_num_);
   xml_doc->addElement(prot_element, "proteoform_mass", str.c_str());
 
   str = str_util::toString(proteoform_ptr->getProtModPtr()->isAcetylation());

@@ -158,6 +158,20 @@ void DeconvProcess::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
   LOG_DEBUG("ms level " << header_ptr->getMsLevel() );
   // int scan_num_ = header_ptr->getFirstScanNum();
+  //remove precursor peaks
+  std::vector<double> intensities;
+  for (size_t i = 0; i < peak_list.size(); i++) {
+    intensities.push_back(peak_list[i]->getIntensity());
+  }
+  for (size_t i = 0; i < prec_envs.size(); i++) {
+    RealEnvPtr env_ptr = prec_envs[i]->getRealEnvPtr();
+    for (int p = 0; p < env_ptr->getPeakNum(); p++) {
+      if (env_ptr->isExist(p)) {
+        int idx = env_ptr->getPeakIdx(p);
+        peak_list[idx]->setIntensity(0);
+      }
+    }
+  }
   MatchEnvPtrVec result_envs;
   if (peak_list.size() > 0) {
     LOG_DEBUG("set data....");
@@ -174,6 +188,10 @@ void DeconvProcess::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
     match_env_writer::write(ms1_env_name_, header_ptr, prec_envs);
   }
 
+  // add back precursor peaks
+  for (size_t i = 0; i < peak_list.size(); i++) {
+    peak_list[i]->setIntensity(intensities[i]);
+  }
   if (topfd_para_ptr_->output_json_files_) {
     std::string json_file_name = ms1_json_dir_ 
         + file_util::getFileSeparator() 

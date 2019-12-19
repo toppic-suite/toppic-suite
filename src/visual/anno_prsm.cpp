@@ -26,16 +26,16 @@ void addPrsmHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement* element,
   std::string str = str_util::toString(prsm_ptr->getPrsmId());
   xml_doc->addElement(element, "prsm_id", str.c_str());
   if (prsm_ptr->getExtremeValuePtr().get() != nullptr) {
-    str = str_util::toString(prsm_ptr->getExtremeValuePtr()->getPValue(), 
-                             mng_ptr->decimal_point_num_);
+    str = str_util::evalueToString(prsm_ptr->getExtremeValuePtr()->getPValue(), 
+                                   mng_ptr->decimal_point_num_);
     xml_doc->addElement(element, "p_value", str.c_str());
   } else {
     xml_doc->addElement(element, "p_value", "N/A");
   }
 
   if (prsm_ptr->getExtremeValuePtr().get() != nullptr) {
-    str = str_util::toString(prsm_ptr->getExtremeValuePtr()->getEValue(), 
-                             mng_ptr->decimal_point_num_);
+    str = str_util::evalueToString(prsm_ptr->getExtremeValuePtr()->getEValue(), 
+                                   mng_ptr->decimal_point_num_);
     xml_doc->addElement(element, "e_value", str.c_str());
   } else {
     xml_doc->addElement(element, "e_value", "N/A");
@@ -44,7 +44,7 @@ void addPrsmHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement* element,
   double fdr = prsm_ptr->getFdr();
 
   if (fdr >= 0) {
-    str = str_util::toString(prsm_ptr->getFdr(), mng_ptr->decimal_point_num_);
+    str = str_util::evalueToString(prsm_ptr->getFdr(), mng_ptr->decimal_point_num_);
     xml_doc->addElement(element, "fdr", str.c_str());
   } else {
     xml_doc->addElement(element, "fdr", "N/A");
@@ -85,7 +85,7 @@ void addMsHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement* ms_element,
   int pos = mng_ptr->precise_point_num_;
 
   double precursor_mass = prsm_ptr->getOriPrecMass();
-  std::string str = str_util::toString(precursor_mass, pos);
+  std::string str = str_util::fixedToString(precursor_mass, pos);
   xml_doc->addElement(ms_header_element, "precursor_mono_mass", str.c_str());
 
   int precursor_charge = deconv_ms_ptr_vec[0]->getMsHeaderPtr()->getPrecCharge();
@@ -93,7 +93,7 @@ void addMsHeader(XmlDOMDocument* xml_doc, xercesc::DOMElement* ms_element,
   xml_doc->addElement(ms_header_element, "precursor_charge", str.c_str());
 
   double precursor_mz = Peak::compMz(precursor_mass, precursor_charge);
-  str = str_util::toString(precursor_mz, pos);
+  str = str_util::fixedToString(precursor_mz, pos);
   xml_doc->addElement(ms_header_element, "precursor_mz", str.c_str());
 
   double precursor_inte = prsm_ptr->getPrecFeatureInte();
@@ -129,14 +129,14 @@ void addMsPeaks(XmlDOMDocument *xml_doc, xercesc::DOMElement* ms_element,
 
       double mass = peak_ptr->getPosition();
       int charge = peak_ptr->getCharge();
-      str = str_util::toString(mass, mng_ptr->precise_point_num_);
+      str = str_util::fixedToString(mass, mng_ptr->precise_point_num_);
       xml_doc->addElement(peak_element, "monoisotopic_mass", str.c_str());
 
       double mz = Peak::compMz(mass, charge);
-      str = str_util::toString(mz, mng_ptr->precise_point_num_);
+      str = str_util::fixedToString(mz, mng_ptr->precise_point_num_);
       xml_doc->addElement(peak_element, "monoisotopic_mz", str.c_str());
 
-      str = str_util::toString(peak_ptr->getIntensity(), mng_ptr->decimal_point_num_);
+      str = str_util::fixedToString(peak_ptr->getIntensity(), mng_ptr->decimal_point_num_);
       xml_doc->addElement(peak_element, "intensity", str.c_str());
 
       str = str_util::toString(charge);

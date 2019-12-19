@@ -125,15 +125,6 @@ void RawMsGroupReader::obtainPrecEnvs(RawMsGroupPtr ms_group_ptr,
     MatchEnvPtr match_env_ptr = refinePrecChrg(ms_one_ptr, ms_two_ptr, prec_win_size, max_charge);
     if (match_env_ptr != nullptr) {
       env_ptr_vec.push_back(match_env_ptr);
-      //remove precursor peaks
-      RealEnvPtr env_ptr = match_env_ptr->getRealEnvPtr();
-      PeakPtrVec peaks = ms_one_ptr->getPeakPtrVec();
-      for (int p = 0; p < env_ptr->getPeakNum(); p++) {
-        if (env_ptr->isExist(p)) {
-          int idx = env_ptr->getPeakIdx(p);
-          peaks[idx]->setIntensity(0);
-        }
-      }
     }
   }
 }

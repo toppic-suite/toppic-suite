@@ -19,6 +19,7 @@
 #include "xml2json/rapidjson/stringbuffer.h"
 
 #include "common/util/logger.hpp"
+#include "common/util/str_util.hpp"
 #include "topfd/msreader/raw_ms_writer.hpp" 
 
 namespace toppic {
@@ -48,9 +49,13 @@ void write(std::string &file_name, RawMsPtr ms_ptr, MatchEnvPtrVec &envs) {
   PeakPtrVec raw_peaks = ms_ptr->getPeakPtrVec();
   for (size_t i = 0; i < raw_peaks.size(); i++) {
     rapidjson::Value peak(rapidjson::kObjectType);
-    peak.AddMember("peak_id", i, allocator);
-    peak.AddMember("mz", raw_peaks[i]->getPosition(), allocator);
-    peak.AddMember("intensity", raw_peaks[i]->getIntensity(), allocator);
+    //peak.AddMember("peak_id", i, allocator);
+    std::string pos_str = str_util::fixedToString(raw_peaks[i]->getPosition(), 4); 
+    rapidjson::Value pos(pos_str.c_str(), allocator);
+    peak.AddMember("mz", pos, allocator);
+    std::string inte_str = str_util::toScientificStr(raw_peaks[i]->getIntensity(), 4); 
+    rapidjson::Value inte(inte_str.c_str(), allocator);
+    peak.AddMember("intensity", inte, allocator);
     peaks.PushBack(peak, allocator);
   }
 

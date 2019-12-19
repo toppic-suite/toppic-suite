@@ -54,7 +54,7 @@ void PeakIonPair::appendTheoPeakToXml(XmlDOMDocument* xml_doc,
   xml_doc->addElement(element, "ion_type", str.c_str());
   str = str_util::toString(theo_peak_ptr_->getShift());
   xml_doc->addElement(element, "match_shift", str.c_str()); 
-  str = str_util::toString(theo_peak_ptr_->getModMass(), precison);
+  str = str_util::fixedToString(theo_peak_ptr_->getModMass(), precison);
   xml_doc->addElement(element, "theoretical_mass", str.c_str()); 
   str = str_util::toString(theo_peak_ptr_->getIonPtr()->getPos());
   xml_doc->addElement(element, "ion_position", str.c_str());
@@ -71,9 +71,9 @@ void PeakIonPair::appendTheoPeakToXml(XmlDOMDocument* xml_doc,
   str = str_util::toString(theo_peak_ptr_->getIonPtr()->getPos());
   xml_doc->addElement(element, "ion_left_position", str.c_str());
   double error = real_peak_ptr_->getMonoMass() - theo_peak_ptr_->getModMass();
-  str = str_util::toString(error, precison);
+  str = str_util::fixedToString(error, precison);
   xml_doc->addElement(element, "mass_error", str.c_str()); 
-  str = str_util::toString(error * 1000000 / real_peak_ptr_->getMonoMass(), precison - 2);
+  str = str_util::fixedToString(error * 1000000 / real_peak_ptr_->getMonoMass(), precison - 2);
   xml_doc->addElement(element, "ppm", str.c_str()); 
   parent->appendChild(element);
 }

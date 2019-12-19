@@ -37,7 +37,11 @@ std::string toString(size_t value);
 
 std::string toString(double value);
 
-std::string toString(double value, int precision);
+std::string evalueToString(double value, int precision);
+
+std::string confToString(double value, int precision);
+
+std::string fixedToString(double value, int precision);
 
 std::string toScientificStr(double value, int precision);
 
