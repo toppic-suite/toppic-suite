@@ -154,7 +154,7 @@ xercesc::DOMElement* MsHeader::getHeaderXml(XmlDOMDocument* xml_doc) {
   xml_doc->addElement(element, "retention_time", str.c_str());
   str = str_util::toString(prec_sp_mz_);
   xml_doc->addElement(element, "prec_sp_mz", str.c_str());
-  str = str_util::toString(prec_mono_mz_, precison);
+  str = str_util::fixedToString(prec_mono_mz_, precison);
   xml_doc->addElement(element, "prec_mono_mz", str.c_str());
   str = str_util::toString(prec_charge_);
   xml_doc->addElement(element, "prec_charge", str.c_str());

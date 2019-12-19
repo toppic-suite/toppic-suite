@@ -64,7 +64,7 @@ std::string toString(double value) {
   return stream.str();
 }
 
-std::string toString(double value, int number) {
+std::string evalueToString(double value, int number) {
   std::stringstream stream;
   if (value == 0) {
     stream << std::fixed << std::setprecision(0);
@@ -81,12 +81,43 @@ std::string toString(double value, int number) {
   return stream.str();
 }
 
+std::string confToString(double value, int number) {
+  std::stringstream stream;
+  if (value == 0) {
+    stream << std::fixed << std::setprecision(0);
+  } else if (value < 0.01 && value > -0.01 && value != 0) {
+    if (number > 2) {
+      stream << std::scientific << std::setprecision(2);
+    } else {
+      stream << std::scientific << std::setprecision(number);
+    }
+  } else {
+    stream << std::fixed << std::setprecision(number);
+  }
+  stream << value;
+  return stream.str();
+}
+
+
+std::string fixedToString(double value, int number) {
+  std::stringstream stream;
+  if (value == 0) {
+    stream << std::fixed << std::setprecision(0);
+  } 
+  else { 
+    stream << std::fixed << std::setprecision(number);
+  }
+  stream << value;
+  return stream.str();
+}
+
+
 std::string toScientificStr(double value, int number) {
   std::stringstream stream;
   if (value == 0) {
     stream << std::fixed << std::setprecision(0);
   } else {
-    stream << std::scientific << std::setprecision(std::min(2, number));
+    stream << std::scientific << std::setprecision(number);
   }
   stream << value;
   return stream.str();

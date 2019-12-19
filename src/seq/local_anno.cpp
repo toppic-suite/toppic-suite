@@ -63,12 +63,12 @@ double LocalAnno::getScr() {
 void LocalAnno::appendToXml(XmlDOMDocument* xml_doc, XmlDOMElement* parent) {
   std::string element_name = getXmlElementName();
   XmlDOMElement* element = xml_doc->createElement(element_name.c_str());
-  std::string str = str_util::toString(conf_, 4);
+  std::string str = str_util::confToString(conf_, 4);
   xml_doc->addElement(element, "confidence", str.c_str());
 
-  str = str_util::toString(scr_vec_[0], 4);
+  str = str_util::confToString(scr_vec_[0], 4);
   for (size_t i = 1; i < scr_vec_.size(); i++) {
-    str = str + " " + str_util::toString(scr_vec_[i], 4);
+    str = str + " " + str_util::confToString(scr_vec_[i], 4);
   }
 
   xml_doc->addElement(element, "score_list", str.c_str());

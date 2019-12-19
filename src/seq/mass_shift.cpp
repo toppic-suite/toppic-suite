@@ -73,7 +73,7 @@ std::string MassShift::getAnnoStr() {
     if (alter_vec_[0]->getLocalAnno() != nullptr) {
       seq_str = alter_vec_[0]->getLocalAnno()->getPtmPtr()->getAbbrName();
     } else {
-      seq_str = str_util::toString(shift_, 4);
+      seq_str = str_util::fixedToString(shift_, 4);
     }
   } else {
     for (size_t i = 0; i < alter_vec_.size(); i++) {
