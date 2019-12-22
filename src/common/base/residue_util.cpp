@@ -47,7 +47,7 @@ char replaceResidueLetter(char c) {
     r = 'I';
   }
   if (r != c) {
-    LOG_WARN("Found non standard amino acid " << c << " in protein sequences!");
+    LOG_INFO("Found non standard amino acid " << c << " in protein sequences!");
   }
   return r;
 }
