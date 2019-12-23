@@ -605,7 +605,19 @@ bool Argument::validateArguments() {
     LOG_ERROR("PrSM clustering error tolerance: " << form_error_tole_value << " should be a number.");
     return false;
   }
-
+  
+  std::string ptm_num = arguments_["varPtmNumber"];
+  try {
+    double ptm_n = std::stod(ptm_num);
+    if (ptm_n <= 0.0) {
+      LOG_ERROR("Maximum PTM sites " << ptm_num << " error! The value should be positive.");
+      return false;
+    }
+  }
+  catch (int e) {
+    LOG_ERROR("Maximum ptm sites " << ptm_num << " should be a number.");
+    return false;
+  }
   return true;
 }
 } /* namespace toppic */
