@@ -1,0 +1,62 @@
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Help</title>
+<script type="text/javascript" src="resources/js_lib/popper.min.js"></script>
+<script type="text/javascript" src="resources/js_lib/jQuery_3_4.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.18/datatables.min.css"/>
+<script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.18/datatables.min.js"></script>
+<link rel="stylesheet" type="text/css" href="resources/css_lib/bootstrap.min.css">
+<script src="resources/js_lib/Bootstrap/bootstrap.min.js" ></script>
+<style>
+@media (min-width: 1200px) {
+    .container{
+        max-width: 800px;
+    }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h2>Instructions to interact</h2>
+	<br>
+  <div class="panel panel-default">
+    <div class="panel-heading"><h4>Input Data : </h4></div>
+    <div class="panel-body">
+		<ul>
+		  	<li>Please enter Peak & intensity with space seperated list or tab seperated list</li>
+		 	<li>Please enter Mass & intensity with space seperated list or tab seperated list</li>
+			<li>Please enter protein sequence</li>
+		</ul> 
+	</div>
+	<div class="panel-heading"><h4>C and N Terminus : </h4></div>
+    <div class="panel-body">
+		<ul>
+		  	<li>select any of "a","b","c" as N Terminus</li>
+		 	<li>select any of "x","y","z","z&deg;" as C Terminus</li>
+		</ul> 
+	</div>
+	<div class="panel-heading"><h4>Way to change Mass Shift : </h4></div>
+    <div class="panel-body">
+		<ul>
+		  	<li>Add Fixed Ptm by clicking <i class="fa fa-plus" ></i>, provide "acid" on the left box and "mass shift" on the right box and click on submit</li>
+		 	<li>Remove Fixed Ptm by clicking <i class="fa fa-remove" ></i></li>
+			<li>Change the mass shift of individual acids by clicking on the acid and entering the mass shift in the box provided and click on "ok"</li>
+		</ul> 
+	</div>
+	<div class="panel-heading"><h4>Interacting with the spectrum graph : </h4></div>
+    <div class="panel-body">
+		<ul>
+		  	<li>Scroll down to view the graph</li>
+			<li>X-Axis represent the Mass and Y-Axis represent Intensity</li>
+		 	<li>The vertical lines indicate the peak list entered and the circles represent the distribution calculated</li>
+			<li>Zoom the X-Axis by keeping the mouse on X-Axis and scrolling</li>
+			<li>Zoom the Y-Axis by keeping the mouse above X-Axis line and scrolling</li>
+			<li>Drag the X-Axis by draging the graph at any part</li>
+		</ul> 
+	</div>
+  </div>
+</div>
+</body>
+</html>
