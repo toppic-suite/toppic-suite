@@ -1,0 +1,301 @@
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>spectrum</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" type="text/css" href="../css/lib/jquery.dataTables.css"/>
+<link rel="stylesheet" type="text/css" href="../css/lib/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="../css/lib/nav_bar.css">
+<link rel="stylesheet" type="text/css" href="css/spectrum.css">
+<link rel="stylesheet" type="text/css" href="css/modal.css">
+<link rel="stylesheet" type="text/css" href="css/svg.css">
+
+<script type="text/javascript" src="../js/lib/popper.min.js"></script>
+<script type="text/javascript" src="../js/lib/jQuery_3_4.js"></script>
+<script type="text/javascript" src="../js/lib/jquery.dataTables.js"></script>
+<script src="../js/lib/d3/d3.js"></script>
+<script src="../js/lib/bootstrap/bootstrap.min.js" ></script>
+<script src="js/UI_helpers/helper.js" ></script>
+<script src="js/UI_helpers/seqofexecution.js" ></script>
+<script src="js/UI_helpers/onclickandeventhandler.js" ></script>
+<script src="js/UI_helpers/getmasstableofselectedions.js" ></script>
+<script src="js/UI_helpers/constants.js" ></script>
+
+<script src="../js/spectrum_graph/invokespectrum.js" ></script>
+<script src="../js/spectrum_graph/spectrumgraph.js" ></script>
+<script src="../js/spectrum_graph/spectrumparameters.js" ></script>
+<script src="../js/spectrum_graph/spectrumdownload.js" ></script>
+
+<script src="js/distribution_calc/emassanddistribution.js" ></script>
+<script src="js/distribution_calc/isotopes.js" ></script>
+<script src="js/distribution_calc/aminoaciddistribution.js" ></script>
+<script src="js/distribution_calc/molecularformulae.js" ></script>
+
+<script src="js/sequence_svg/coordinates_util.js" ></script>
+<script src="js/sequence_svg/drawsvg.js" ></script>
+
+<script src="js/matched_peaks/matchedpeaks.js" ></script>
+<script src="js/matched_peaks/calculateprefixandsuffixmass.js" ></script>
+
+<script src="js/mass_shift/utilfunctions.js" ></script>
+<script src="js/mass_shift/massshift.js" ></script>
+<script src="js/mass_shift/commonFixedPtms.js" ></script>
+<!--V2 changes-->
+
+<script src="js/ion_fragmentation/iontabledata.js" ></script>
+
+<!--Save Image-->
+<script src="js/download/FileSaver.js" ></script>
+<script src="js/download/saveImage.js" ></script>
+
+<!--Set Data to HTML-->
+<script src="js/UI_helpers/setvaluestohtml.js" ></script>
+
+<!--draw nav bar-->
+<script src="../visual/js/util/navBar.js" ></script>
+
+
+
+<script>
+ $(document).ready(function(){
+	var peakAndIntensityList = JSON.parse(window.localStorage.getItem('peakAndIntensityList'));
+	var massAndIntensityList = JSON.parse(window.localStorage.getItem('massAndIntensityList'));
+	var sequence = JSON.parse(window.localStorage.getItem('sequence'));
+	var l_fixedPtmList = JSON.parse(window.localStorage.getItem('fixedPtmList'));
+
+	if(peakAndIntensityList != null && massAndIntensityList != null
+		&& sequence != null)
+	{	
+		let SetValuesToHtmlObj = new SetValuesToHtml(peakAndIntensityList,massAndIntensityList,sequence,l_fixedPtmList);
+		SetValuesToHtmlObj.setDataToPeakAndIntensity();
+		SetValuesToHtmlObj.setDataToMassAndIntensity();
+		SetValuesToHtmlObj.setDataToSequence();
+		SetValuesToHtmlObj.setFixedMasses();
+	}
+	onLoadOfHTML();
+	localStorage.clear();
+});
+</script>
+<style>
+</style>
+</head>
+<body>
+	<div id="nav-bar"></div>
+<br></br><br></br><br>
+<div class="container">
+	<div class="flex-rectangle">
+		<div class="row">
+			<div class="col-md-4 col-lg-4">
+				<h5>Peaks <img src="images/info.png" id="peakintensityinfo" alt="nfo"></h5>
+				<textarea id="peakdata" class="form-control col-xs-12" rows="10" cols="50"></textarea>
+			</div>
+			<div class="col-md-3 col-lg-3">
+				<h5>Masses & intensities <img src="images/info.png" id="massintensityinfo" alt="info"></h5>
+				<textarea id="data" class="form-control col-xs-12" rows="10" cols="50"></textarea>
+			</div>
+			<div class="col-md-3 col-lg-3">
+				<h5>Ion types <img src="images/info.png" id="ionfragmentinfo" alt="info"></h5>
+				<table class="table table-sm table-bordered ionfragments">
+				<tbody>
+					<tr>
+						<td><div class="custom-control custom-checkbox">
+							<input type="checkbox" class="custom-control-input" name="nterminus" value="-27.9949" id="a">
+							<label class="custom-control-label" for="a">a</label>
+							</div></td>
+						<td><div class="custom-control custom-checkbox">
+							<input type="checkbox" class="custom-control-input" name="nterminus" value="-46.0149" id="a1">
+							<label class="custom-control-label" for="a1" >a-H<sub>2</sub>O</label>
+							</div></td>
+						<td><div class="custom-control custom-checkbox">
+							<input type="checkbox" class="custom-control-input" name="nterminus" value="-45.02542" id="a2">
+							<label class="custom-control-label" for="a2" >a-NH<sub>3</sub></label>
+							</div></td>	
+					</tr>
+					<tr>
+						<td><div class="custom-control custom-checkbox">
+							<input type="checkbox" class="custom-control-input" name="nterminus" value="0" id="b" checked>
+							<label class="custom-control-label" for="b" >b</label>
+							</div></td>
+						<td><div class="custom-control custom-checkbox">
+							<input type="checkbox" class="custom-control-input" name="nterminus" value="-18.02" id="b1">
+							<label class="custom-control-label" for="b1" >b-H<sub>2</sub>O</label>
+							</div></td>
+						<td><div class="custom-control custom-checkbox" >
+							<input type="checkbox" class="custom-control-input" name="nterminus" value="-17.03052" id="b2">
+							<label class="custom-control-label" for="b2" >b-NH<sub>3</sub></label>
+							</div></td>
+					</tr>
+					<tr>
+						<td><div class="custom-control custom-checkbox">
+							<input type="checkbox" class="custom-control-input" name="nterminus"  value="17.0266" id="c">
+							<label class="custom-control-label" for="c">c</label>
+							</div></td>
+						<td><div class="custom-control custom-checkbox">
+							<input type="checkbox" class="custom-control-input" name="nterminus"  value="-0.9934" id="c1">
+							<label class="custom-control-label" for="c1" >c-H<sub>2</sub>O</label>
+							</div></td>
+						<td><div class="custom-control custom-checkbox">
+							<input type="checkbox" class="custom-control-input"  name="nterminus"value="-0.00392" id="c2">
+							<label class="custom-control-label" for="c2" >c-NH<sub>3</sub></label>
+							</div></td>
+					</tr>
+					<tr>
+						<td><div class="custom-control custom-checkbox">
+							<input type="checkbox" class="custom-control-input" name="cterminus" value="43.99" id="x">
+							<label class="custom-control-label" for="x" >x</label>
+							</div></td>
+						<td><div class="custom-control custom-checkbox">
+							<input type="checkbox" class="custom-control-input" name="cterminus" value="25.97" id="x1">
+							<label class="custom-control-label" for="x1" >x-H<sub>2</sub>O</label>
+							</div></td>
+						<td><div class="custom-control custom-checkbox">
+							<input type="checkbox" class="custom-control-input" name="cterminus" value="26.95948" id="x2">
+							<label class="custom-control-label" for="x2" >x-NH<sub>3</sub></label>
+							</div></td>
+					</tr>
+					<tr>
+						<td><div class="custom-control custom-checkbox">
+							<input type="checkbox" class="custom-control-input" name="cterminus" value="18.0106" id="y" checked>
+							<label class="custom-control-label" for="y" >y</label>
+							</div></td>
+						<td><div class="custom-control custom-checkbox">
+							<input type="checkbox" class="custom-control-input" name="cterminus" value="0" id="y1">
+							<label class="custom-control-label" for="y1" >y-H<sub>2</sub>O</label>
+							</div></td>
+						<td><div class="custom-control custom-checkbox">
+							<input type="checkbox" class="custom-control-input" name="cterminus" value="0.98008" id="y2">
+							<label class="custom-control-label" for="y2" >y-NH<sub>3</sub></label>
+							</div></td>
+					</tr>
+					<tr>
+						<td><div class="custom-control custom-checkbox">
+							<input type="checkbox" class="custom-control-input" name="cterminus" value="0.984" id="z">
+							<label class="custom-control-label" for="z" >z</label>
+							</div></td>
+						<td><div class="custom-control custom-checkbox">
+							<input type="checkbox" class="custom-control-input" name="cterminus" value="-17.026" id="z1">
+							<label class="custom-control-label" for="z1" >z-H<sub>2</sub>O</label>
+							</div></td>
+						<td><div class="custom-control custom-checkbox">
+							<input type="checkbox" class="custom-control-input" name="cterminus" value="-16.04652" id="z2">
+							<label class="custom-control-label" for="z2" >z-NH<sub>3</sub></label>
+							</div></td>
+					</tr>
+					<tr>
+						<td><div class="custom-control custom-checkbox">
+								<input type="checkbox" class="custom-control-input" name="cterminus" value="1.9919" id="z_">
+								<label class="custom-control-label" for="z_">z&deg;</label>
+							</div></td>
+						<td><div class="custom-control custom-checkbox">
+								<input type="checkbox" class="custom-control-input" name="cterminus" value="-16.018664" id="z_1">
+								<label class="custom-control-label" for="z_1" >z&deg;-H<sub>2</sub>O</label>
+							</div></td>
+						<td><div class="custom-control custom-checkbox">
+								<input type="checkbox" class="custom-control-input" name="cterminus" value="-15.03862" id="z_2">
+								<label class="custom-control-label" for="z_2" >z&deg;-NH<sub>3</sub></label>
+							</div></td>	
+						</tr>
+				</tbody>
+				</table>
+			</div>
+			<div class="col-md-2 col-lg-2">
+					<h5>Fixed PTMs <img src="images/info.png" id="fixedptminfo" alt="info"></h5>
+				<div class="fixedptmslist">
+				<select class="browser-default custom-select" id="dropdownMenuLink">
+				</select>	
+				<button type="button" class="btn btn-default btn-sm addnewrow">
+						<i class="fa fa-plus" ></i>
+				</button>
+					<form class="form-inline mr-auto">
+						<div id = "fixedptmslist" > 
+							<br>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<h5>&nbsp;&nbsp;&nbsp;Protein sequence <img src="images/info.png" id="sequenceinfo" alt="info"></h5>
+		</div>
+		<div class="row">
+			<div class="col-8">
+					<textarea id="sequencedata" class="form-control col-xs-8"></textarea>
+			</div>
+			<div class="col-4">
+				<form class="form-inline float-sm-right error_input">
+					<select class = "form-control error_dropdown" id="error_dropdown">
+					<option value="masserror">Mass error</option>
+					<option value="ppmerror">PPM error</option>
+					</select>&nbsp;&nbsp;
+					<input class="form-control" type="text" id="errorval" /> &nbsp;&nbsp;
+					<h6><text  class="form-group" id="errorunit">Da&nbsp;&nbsp;</text></h6>
+					<button id="submit" type="button" class="btn btn-primary form-group">submit</button>
+				</form>
+			</div>
+		</div>
+	</div> 
+	<br>
+		<div class="row">
+			<div class="col-6">
+				<h6 id="totalseqmass_h6" style="display:none"><text>Molecular Mass:&nbsp;</text><text id="totalmass">0</text></h6>
+			</div>
+			<div class="col-6">
+					<div class="dropdown dropleft float-right">
+					<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" id="svg_download" style="display:none">
+					  Download
+					</button>
+					<div class="dropdown-menu">
+					  <a class="dropdown-item" href="#!" id="seq_download_png">Download as PNG</a>
+					  <a class="dropdown-item" href="#!" id="seq_download_svg">Download as SVG</a>
+					</div>
+				  </div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="rounded mx-auto d-block" >
+				<svg id = "seqsvg" style="background-color:white;display:none"></svg>
+			</div>	
+		</div>
+	<div class="row">
+		
+	</div>
+	<div class="row">
+		<svg id = "spectrum" height="250" width = "1000" style="background-color:white;display:none"></svg>
+	</div>
+	<div class="row" id="peakCount" style="display:none">
+		<div class="col-2 pull-left" >
+			<a id="all_peak_count" href="#!" onclick="showAllPeaks();">All Peaks</a>
+		</div>
+		<div class="col-2 pull-left" >
+			<a id="matched_peak_count" href="#!" onclick="showMatchedPeaks();">Matched Peaks</a>
+		</div>
+		<div class="col-3 pull-left" >
+			<a id="unmatched_peak_count" href="#!" onclick="showNonMatchedPeaks();">Non Matched Peaks</a>
+		</div>
+		<div class="col-5 pull-right" >
+			<button type="button" class="btn btn-primary float-right" id="hide_table">Hide Table</button>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-12" >
+			<div id="divtableContainer" >
+			</div>
+		</div>
+	</div>
+	<br>
+	<div class="row">
+			<h4 id="h_fragmentedtable" style="display:none">Theoritical Fragment Masses</h4>
+		<div class="col-12" >
+			<div id="divselectediontablecontainer" >
+			</div>
+		</div>
+	</div>
+</div>
+<br>
+<footer class="page-footer font-small blue">
+	<div class="footer-copyright text-center py-3">© 2019 Copyright: The Trustees of 
+		<a href="https://www.iu.edu/" target="#">Indiana University</a>
+	</div>
+</footer>
+</body>
+</html>

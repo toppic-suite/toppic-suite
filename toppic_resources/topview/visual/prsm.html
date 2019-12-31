@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Protein-Spectrum-Match for Spectrum</title>
+<link rel="stylesheet" type="text/css" href="../css/lib/jquery.dataTables.css">
+<link rel="stylesheet" type="text/css" href="../css/lib/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="../css/lib/nav_bar.css">
+<link rel="stylesheet" type="text/css" href="css/prsm.css">
+<script src="../js/lib/popper.min.js"></script>
+<script src="../js/lib/jQuery_3_4.js"></script>
+<script src="../js/lib/bootstrap/bootstrap.min.js"></script>
+<script src="../js/lib/jQuery-ui_1_11_4.min.js"></script>
+<script src="../js/lib/d3/d3.js"></script>
+<script src="../js/lib/canvas-toBlob.js"></script>
+<script src="../js/lib/jquery.dataTables.js"></script>
+<script src="js/util/coordinates_util.js"></script>
+<script src="js/util/prsmDataUtil.js"></script>
+<script src="js/util/drawSvg.js"></script>
+<script src="js/util/navBar.js"></script>
+<script src="../js/lib/download/FileSaver.js"></script>
+<script src="../js/lib/download/saveImage.js"></script>
+<script src="js/prsm/prsmtohtml.js"></script>
+<script src="js/prsm/buttons.js"></script>
+<script src="js/prsm/peakData.js"></script>
+<script src="../js/spectrum_graph/invokespectrum.js"></script>
+<script src="../js/spectrum_graph/spectrumparameters.js"></script>
+<script src="../js/spectrum_graph/spectrumgraph.js"></script>
+<script src="../js/spectrum_graph/spectrumdownload.js"></script>
+<script src="js/topview/topview.js"></script>
+<script id = "spectrum_script" src="" ></script>
+
+<script>
+$(document).ready(function(){
+	var x = location.href;
+	let l_split = x.split(/[?#]+/)[1];
+	let pathAndVal = l_split.split("&");
+	let folderpath = pathAndVal[0].split("=")[1];
+	/* get the proteoform Id number by splitting url with "?" and "="  */
+	let prsm_seq_num = pathAndVal[1].split("=")[1];
+	var head= document.getElementsByTagName('head')[0];
+	var script= document.createElement('script');
+	/* get the proteoform Id number by splitting url with "?","=","#"  */
+	var file_name = "../data/"+folderpath+"/prsms/prsm" + prsm_seq_num+".js";
+	script.type= 'text/javascript';
+	script.src= file_name;
+	var loadprsm = false ;
+	/* Add data file as script to the html */
+	head.appendChild(script);
+	/* SVG Id of the HTML */
+	var id = "l_svg" ;
+	var script_prsm = document.createElement('script');
+	script_prsm.type= 'text/javascript';
+	script_prsm.src = "js/prsm/prsm.js" ;
+	var spec_id = null ;
+	/* Call the functions onload of the data */
+	script.onload = function () {
+		/* Loading prsm.js after data is loaded to fix no data issue in Data table */
+		head.appendChild(script_prsm);
+		
+		BuildUrl(folderpath);
+		loadDatafromJson2Html();
+		para =new parameters();
+		let prsm = prsm_data.prsm ;
+		/* spec_id = prsm.ms.ms_header.ids ; */
+		
+		[para,id] = buildSvg(para,prsm,id);
+		
+		/*	Color the background of occurence of mass shift */
+		massShiftBackgroundColor(para,prsm,id);
+		/*	Get the amount of skipped acid and write the amount 
+		* 	of skipped acid at the start and end of the sequence 
+		*/
+		skippedAcidNotification(para,prsm,id) ;
+		//buildResidueAcids(para,prsm,id);
+		if(para.show_num)
+		{
+			/*	Get the numerical count at the start and end of 
+			* 	each row of sequence */
+			getNumValues(para,prsm,id);
+		}
+		
+		/*	Determine the start and end position of the sequence */
+		drawAnnoOfStartEndPosition(para,prsm,id) ;
+		/*	Draw Annotations */
+		annotations(para,prsm,id);
+		/*	Get the position of the fixed ptms and color them to red */
+		addColorToFixedPtms(para,prsm,id);
+		/* 	Onclick actions to save open pop up window and to save SVG as PNG/SVG */
+		buttonsAndAlerts(para,prsm,id); 
+		/* 	Get occurence ptms */
+		occurence_ptm(prsm);
+		/* Get Unknown Ptms */
+		getUnknownPtms(prsm);
+		/* Create peaks data into table content */
+		createTableElements();
+		/* New Changes */
+		
+		//Getting Ms1 Ids
+		let ms1_ids = prsm_data.prsm.ms.ms_header.ms1_ids ;
+		let ms1_id_1 = ms1_ids.split(" ")[0];
+		let ms1_id_2 = ms1_ids.split(" ")[1];
+		//Getting Ms1 Scan Ids
+		let ms1_scans = prsm_data.prsm.ms.ms_header.ms1_scans ;
+		let ms1_scan_1 = ms1_scans.split(" ")[0];
+		let ms1_scan_2 = ms1_scans.split(" ")[1];
+
+		let ms2_ids = prsm_data.prsm.ms.ms_header.ids;
+		console.log("ms1_id : ",ms2_ids);
+		let ms2_id_1 = ms2_ids.split(" ")[0];
+		let ms2_id_2 = ms2_ids.split(" ")[1];
+		let specDatapath = folderpath.split("/")[0];
+		//var file_name = "../topfd/ms2_json/spectrum"+spec_id+".js";
+		var ms1_filename = "../../topfd/ms1_json/spectrum"+ms1_id_1+".js";
+		var file_name = "../../topfd/ms2_json/spectrum"+ms2_id_1+".js";
+		console.log("file_name : ", file_name);
+		/* document.getElementById("spectrum_script").src = file_name; */
+		var body= document.getElementsByTagName('body')[0];
+		var script1= document.createElement('script');
+		var script2 = document.createElement('script');
+		script2.src = ms1_filename;	
+		script1.src = file_name ;
+		body.append(script1);
+		body.append(script2);
+		script1.onload = function(){
+			script2.onload = function(){
+				buttons();
+				getDataFromPRSMtoSpectralView();
+				$( "#spectrumpop" ).draggable({
+					appendTo: "body"
+					});
+			}
+		//var spectrumGraph = addSpectrum();
+		}
+		
+	}
+})
+</script>
+</head>
+<body>
+	<div id="nav-bar"></div>
+		<br></br><br></br>
+<div class="container bodycontainer">
+<p style="font-size:15px;">
+<a id="allprotein_url" href="proteins.html">All proteins</a> /
+      <a id ="protien_url" href = "#"></a> / 
+      <a id="proteoform_url" href="#"></a>
+</p>
+<div class="row">
+	<div class="col-10">
+			<h2 id = "Protein-Spectrum-Match-Id-SpecId" ></h2>
+	</div>
+	<div class="col-2">
+		<button id="topview" type="button" class="btn btn-primary btn-sm"
+      onclick="onclickTopView()">Inspection</button>
+	</div>
+</div>
+
+
+<table id = "_width_table" class="table table-borderless" style="font-size:15px">
+<tr>
+<td>File name:</td><td colspan="4" id = 'File_name' ></td>																
+</tr>
+<tr>
+<td>PrSM ID:</td><td id = "PrSM_ID"></td><td>Scan(s):</td><td id = "Scan"></td><td>Precursor charge:</td><td id = "Precursor_charge"></td>
+</tr>
+<tr>
+<td>Precursor m/z:</td><td><a id = "precursormz" data-toggle="modal" data-target="#spectrumpop"></a></td>
+<td>Precursor mass:</td><td id = "Precursor_mass"></td>
+<td>Proteoform mass:</td><td id = "Proteoform_mass"></td>
+</tr>
+<tr>
+<td># matched peaks:</td><td id = "matched_peaks">28</td><td># matched fragment ions:</td><td id = "matched_fragment_ions">25</td><td># unexpected modifications:</td><td id = "unexpected_modifications">#</td>
+</tr>
+<tr>
+<td>E-value:</td><td id = "E_value">1.63e-021</td><td>P-value:</td><td id = "P_value">1.63e-021</td><td>Q-value (Spectral FDR):</td><td id = "Q_value">0</td>
+</tr>
+</table>
+<div id="alignment" >
+<svg id = "l_svg" ></svg>
+<table>
+<tr>
+	<td width = "85%">
+		<div id="ptm_abbreviation" style="font-size:16px;">
+		<!-- Data will be retrieved form Fixed_PTM()   -->
+		</div>
+	<td>
+	<td width = "15%" align = "right">
+		<button id = "saveImage" class="btn btn-primary btn-sm" data-toggle="modal"
+      data-target="#myModal" style="width:80%" > Save PrSM</button>
+	</td>
+</tr>
+<tr> 
+	<td>
+		<div id="ptm_unexpectedmodification"  style="display: none; font-size:16px;">
+		<!-- Data will be retrieved form Fixed_PTM()   -->
+		</div>
+	<td>
+</tr>
+</table>
+</div>
+<svg id = "ms1svg" style = "background-color:white;display: none;"></svg>
+<table>
+<tr>
+	<td width = "70%">
+		<div class = "peaks" style="font-size:16px;">
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a id = "all_peak_count" href="#spectrum" onclick="showAllPeaks();"  >All peaks </a>
+		&nbsp;&nbsp;<a id = "matched_peak_count" href="#spectrum" onclick="showMatchedPeaks();">Matched peaks </a>
+		&nbsp;&nbsp;<a id = "not_matched_peak_count" href="#spectrum" onclick="showNotMatchedPeaks();">Not matched peaks </a>
+		</div>
+	<td>
+	<td width = "15%" align = "right">
+		<a id = "a_spectrum_help" href="#!">
+			<button type ="button" id = "spectrum_help" class="btn btn-primary btn-sm" style = "display:none;width:80%" data-toggle="modal" data-target="#spectrumHelp">Help</button>
+		</a>
+	</td>
+	<!-- <td width = "15%" align = "right">
+		<a id = "a_download_spectrum" href="#!"><button type ="button"  id = "download_spectrum" class="btn btn-primary btn-sm" style = "display: none;width:80%" >Save Spectrum</button></a>
+	</td> -->
+	
+	<td width = "15%" align = "right">
+		<a id = "a_show_spectrum" href="#!"><button type ="button"  id = "show_spectrum" class="btn btn-primary btn-sm" style="width:80%">Show Spectrum</button></a>
+	</td>
+</tr>
+</table>
+<table id="spectrum" class="display" >
+<thead>
+<tr role="row">
+	<th width="25">Scan</th><th width="25">Peak</th><th width="90">Mono mass</th><th width="90">Mono m/z</th><th width="80" style="vertical-align:middle">Intensity</th><th width="75" style="vertical-align:middle">Charge</th><th width="103">Theoretical mass</th><th width="50" style="vertical-align:middle">Ion</th><th width="70" style="vertical-align:middle">Pos</th><th width="95">Mass error</th><th width="80">PPM error</th>
+</tr>
+</thead>
+</table>
+<p style="font-size:15px;">
+<a id = "allprotein_url_end" href="proteins.html">All proteins</a> /
+      <a id = "protien_url_end" href = ""></a> / 
+       <a id= "proteoform_url_end" href=""></a>
+</p>
+</div>
+<div class="container">
+<div class="modal" id="myModal" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header ">
+       <!-- Your first column here -->
+       	<h5 class="modal-title ml-auto"> Save Image</h5>
+      	<button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+       <div class="modal-header modal2-header pb-0">
+       		<table class="table table-sm table_modal">
+       			<tr>
+			      <td>Amino acids/row:</td>
+			      <td><input id="row-size" type="text" size="9" ></td>
+			      <td>Letter width:</td>
+			      <td><input id="letter-width" type="text" size="9"></td>
+			      <td>Row height:</td>
+			      <td><input id="row-height" type="text" size="9"></td>
+			      <td>Gap b/w blocks:</td>
+			      <td><input id="block-width" type="text" size="9"></td>
+			    </tr>
+			    <tr>
+			    	<td>Gap b/w num and seq:</td>
+			    	<td><input id="num-width" type="text" size="9" ></td>
+			    	<td>Show numbers:</td>
+			    	<td>
+			    		<input type="radio" name="show-num" id = "show-num" >Yes
+			    		<input type="radio" name="show-num" id = "show-num" >No
+			    	</td>
+			    	<td>Show skipping information:</td>
+			    	<td>
+			    		<input type="radio" name="show-skipped-lines" id= "show-skipped-lines">Yes
+			    		<input type="radio" name="show-skipped-lines" id= "show-skipped-lines">No
+			    	</td>
+					<!--since white background is applied by default
+					<td>White b/g: <input type="radio" name="svg_background" id = "svg_background" >Yes
+			    		<input type="radio" name="svg_background" id = "svg_background" >No
+					</td>
+					-->
+					<td></td>
+			    	<td>
+			    		 <button type = "button" class="btn btn-primary btn-sm "  id =
+                 "resize" style="width:77%" >Redraw</button>
+			    	</td>
+			    	
+			    </tr>
+       		</table>
+       	</div>
+      <div class="modal-body">
+        <svg id = "l_popup_svg" class="l_popup_svg" style="background-color:white"></svg>
+      </div>
+      <div class="modal-footer">
+			<button class="btn btn-primary btn-sm custom "  id="help" data-toggle="modal" data-target="#helpModal">Help</button>
+      		<button type="button" class="btn btn-primary btn-sm custom " id = "download_PNG" >Save as PNG</button>
+      		<button type="button" class="btn btn-primary btn-sm custom " id = "download_SVG" >Save as SVG</button>
+         <button type="button" class="btn btn-primary btn-sm custom " data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="helpModal" role="dialog">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+    	<div class="modal-header ">
+      	<button type="button" class="close" data-dismiss="modal">&times;</button>
+      	</div>
+  		 <div class="modal-body">
+  		 	<ul>
+			  <li>Show skipping information: When the protein sequence is not a whole
+        sequence, the option will add additional lines with information about
+        the number of amino acids not included in the image.</li>
+        <li>White b/g: it will add a white background to the image.</li>
+			</ul> 
+  		 </div> 
+    </div>
+  </div>
+</div>
+<div class="modal" id="spectrumHelp" role="dialog">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+    	<div class="modal-header ">
+      	<button type="button" class="close" data-dismiss="modal">&times;</button>
+      	</div>
+  		 <div class="modal-body">
+  		 	<ul>
+          <li><b>Drag:</b> Press the left mouse button and drag.</li>
+          <li><b>Zoom in/out of the m/z value:</b> Place the mouse cursor below the
+          x-axis and use the mouse wheel to zoom in or out. </li>
+          <li><b>Zoom in/out of the intensity:</b> Place the mouse cursor above the
+          x-axis and use the mouse wheel to zoom in or out. </li>
+			</ul> 
+  		 </div> 
+    </div>
+  </div>
+</div>
+<div class="modal" id="spectrumpop" role="dialog">
+		<div class="modal-dialog modal-sm" role="document">
+		  <div class="modal-content">
+			  <div class="modal-header ">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				</div>
+				 <div class="modal-body">
+					 <svg id="popupspectrum" style="background-color:white" ></svg>
+				 </div> 
+		  </div>
+		</div>
+	  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<html>
+<head>
+<title>Proteoform</title>
+<link rel="stylesheet" type="text/css" href="../css/lib/jquery.dataTables.css">
+<link rel="stylesheet" type="text/css" href="../css/lib/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="../css/lib/nav_bar.css">
+<link rel="stylesheet" type="text/css" href="css/prsm.css">
+<script src="../js/lib/jQuery_3_4.js"></script>
+<script src="../js/lib/jquery.dataTables.js"></script>
+<script src="js/proteoform/proteoform.js"></script>
+<script src="js/util/navBar.js"></script>
+<script>
+$(document).ready(function(){
+	/* Get the URL from browser */
+	let x = location.href;
+	let l_split = x.split("?")[1];
+	let pathAndVal = l_split.split("&");
+	let folderpath = pathAndVal[0].split("=")[1];
+	/* get the proteoform Id number by splitting url with "?" and "="  */
+	let proteoform_id = pathAndVal[1].split("=")[1];
+	var head= document.getElementsByTagName('head')[0];
+	var script= document.createElement('script');
+	/* get the proteoform Id number by splitting url with ? and =  */
+	var file_name = "../data/"+folderpath+ "/proteoforms/proteoform" + proteoform_id+".js";
+	script.type= 'text/javascript';
+	script.src= file_name;
+	/* include the proteoform data_file  */
+	head.appendChild(script);
+	script.onload = function () {
+		/* Invoke the below functions only after loading the datafile */
+		proteoformUrl(folderpath);
+		createTableData(folderpath);
+	}
+})
+</script>
+</head>
+<body>
+	<div id="nav-bar"></div>
+		<br></br><br></br>
+<div class="container bodycontainer">
+<p style="font-size:15px;">
+<a id="allprotein_url_start" href="proteins.html">All proteins</a> /
+	  <a id = "protein_url_start" href="#"></a>
+</p>
+<h2 id = "proteoform_header"></h2>
+<p id = "prsm_count" style="font-size:16px;"></p>
+<table id = "proteoform_data" class="table table-hover table-bordered table-striped table-nonfluid">
+<tr>
+<th>Scan</th><th>Protein</th><th>E-value</th><th># all peaks</th><th># matched peaks</th><th># matched fragment ions</th><th>Link</th>
+</tr>
+</table>
+<p style="font-size:15px;">
+<a id="allprotein_url_end" href="proteins.html">All proteins</a> /
+		<a id = "protein_url_end" href="#"></a>
+</p>
+</div>
+</body>
+<script>
+/* proteoform_Url();
+createTable_data(); */
+</script>
+</html>

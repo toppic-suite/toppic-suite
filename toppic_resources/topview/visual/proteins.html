@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<meta charset="ISO-8859-1">
+<title>Protein identifications</title>
+<link rel="stylesheet" type="text/css" href="../css/lib/jquery.dataTables.css"/>
+<link rel="stylesheet" type="text/css" href="../css/lib/bootstrap.min.css"/>
+<link rel="stylesheet" type="text/css" href="../css/lib/nav_bar.css"/>
+<link rel="stylesheet" type="text/css" href="css/proteins.css"/>
+<link rel="stylesheet" type="text/css" href="css/prsm.css"/>
+<script type="text/javascript" src="../js/lib/jQuery_3_4.js"></script>
+<script type="text/javascript" src="../js/lib/jquery.dataTables.js"></script>
+<script type="text/javascript" src="js/proteins/allProteins.js"></script>
+<script src="js/util/navBar.js"></script>
+<script>
+$(document).ready(function(){
+  $(".card-row").css('display','none');
+  var x = location.href;
+  //var n = x.search("?");
+  /* get the folder by splitting url with "?","=","#"  */
+  var l_split = x.split(/[?#]+/);
+  if(l_split.length != 2)
+  {
+	$(".card-row").css('display','block');
+	$(".card").hover(function() {
+		$(this).css('cursor','pointer');
+	});
+	$(".card-body").click(function(){
+		let folder = $(this).attr("id");
+		console.log("folder : ", folder);
+		let url = "proteins.html?folder=../../"+folder+"/data_js";
+		window.open(url);
+	})
+  }
+  else{
+	let folderName = l_split[1].split("=")[1];
+	let finalPath = folderName;
+	var head= document.getElementsByTagName('head')[0];
+	var script= document.createElement('script');
+	var file_name = finalPath+"/proteins.js";
+	script.type= 'text/javascript';
+	script.src= file_name;
+	head.appendChild(script);
+	script.onload = function () {
+		allProteins(folderName);
+	}
+  }
+  
+})
+</script>
+<body>
+	<div id="nav-bar"></div>
+	<br></br>
+  <br></br>
+	 <div class="container-ori text-light">
+		<div id="cards-up"  class="card-row">
+			<div class="card-title-container">
+				<h4 class="card-title">View TopPIC Results</h4>
+			</div>
+				<div class="row justify-content-center">
+						<div class="cards-container">
+								<div class="card" >
+								  <div class="card-body" id="toppic_prsm_cutoff">
+									<p class="card-text">TopPIC identifications with  <br> a spectral level cutoff</p>
+								  </div>
+								</div>
+								<div class="card">
+									<div class="card-body" id="toppic_proteoform_cutoff">
+										<p class="card-text">TopPIC identifications with  <br> 
+										a proteoform level cutoff</p>
+									</div>
+								</div>
+						</div>
+				</div>
+			</div>
+		</div>
+		<div class="container-ori text-light">
+			<div id="cards-bottom" class="card-row" >
+				<div class="card-title-container">
+				<h4 class="card-title">View TopMG Results</h4>
+				</div>
+				<div class="row justify-content-center">
+						<div class="cards-container">
+								<div class="card">
+								  <div class="card-body" id="topmg_prsm_cutoff">
+									<p class="card-text">TopMG identifications with  <br>  a spectral level cutoff</p>
+								  </div>
+								</div>
+								<div class="card">
+									<div class="card-body" id="topmg_proteoform_cutoff">
+										<p class="card-text">TopMG identifications with <br> 
+										a proteoform level cutoff</p>
+									</div>
+								</div>
+						</div>
+				</div>
+			</div>
+		</div>
+	<!--<div class="row justify-content-center text-light">
+		<div class="card-columns" style="display:none">
+			<div class="card">
+				<div class="card-body text-center" id="toppic_prsm_cutoff">
+				<p class="card-text">ToPPIC identification with a spectral level cutoff</p>
+				</div>
+			</div>
+			<div class="card">
+				<div class="card-body text-center" id="toppic_proteoform_cutoff">
+					<p class="card-text">ToPPIC identification with a proteoform level</p>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row justify-content-center text-light">
+		<div class="card-columns" style="display:none">
+			<div class="card">
+				<div class="card-body text-center" id="topmg_prsm_cutoff">
+				<p class="card-text">ToPMG identification with a spectral level cutoff</p>
+				</div>
+			</div>
+			<div class="card">
+				<div class="card-body text-center" id="topmg_proteoform_cutoff">
+					<p class="card-text">ToPMG identification with a proteoform level</p>
+				</div>
+			</div>
+		</div>
+	</div>-->
+
+<div class="container"></div>
+<footer class="page-footer font-small blue">
+  <div class="footer-copyright text-center py-3">Copyright: The Trustees of 
+		<a href="https://www.iu.edu/" target="#">Indiana University</a>, 2019.
+	</div>
+</footer>
+</body>
+</head>
+</html>

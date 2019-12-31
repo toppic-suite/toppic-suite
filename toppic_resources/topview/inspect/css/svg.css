@@ -1,0 +1,52 @@
+/**
+*CSS to add rectangular block for the input layout
+*/
+.flex-rectangle{
+    width: 100%;
+    background: #E5E5E5;
+}
+.flex-rectangle{
+	border: 2px solid #cccccc;
+	border-radius: 6px;
+	margin-bottom:0px;
+	padding:1%;
+}
+
+/**
+*CSS to arrange io fragmentation blocks
+*/
+.ionfragments td{
+	text-align: left !important;
+	width:10% !important;
+}
+.ionfragments {
+	 border-radius: 6px !important;
+	 border:2px solid white;
+}
+.custom-control{
+	position: relative;
+    display: block;
+    min-height: 1.5rem;
+    padding-left: 2rem;
+}
+.ionfragments.table-bordered > tbody > tr > td{
+    border:1px solid white;
+}
+
+/**
+*CSS to set info image size
+*/
+#sequenceinfo,#fixedptminfo,
+#ionfragmentinfo,#massintensityinfo,#peakintensityinfo{
+	width: 15px;
+	height: 15px;
+}
+/**
+*Setting footer color to black
+*/
+.page-footer{
+	padding: 1rem;
+}
+.footer-copyright{
+	color: black;
+}

@@ -1,0 +1,43 @@
+/**
+*CSS to set the width of the Navigation bar
+*/
+.navbar {
+	padding-top: 1rem !important;
+    padding-right: 1rem !important;
+    padding-bottom: 1rem !important;
+    padding-left: 1rem !important;
+}
+/**
+*Increasing the container width
+*/
+@media (min-width: 1200px) {
+    .navcontainer {
+        max-width: 1200px;
+		margin: auto;
+		display:flex;
+    }
+}
+.navbar-collapse{
+	margin: auto;
+}
+mark{
+    background-color: aliceblue !important;
+}
+.navbar li {
+    list-style-type:none;
+    float:left;
+    margin:0 10px 0px 10px;
+}
+.navbar-right{
+	margin: 0px 0px 0px 430px;
+}
+.navtab{
+    color: #fff !important;
+    align-content: center !important;
+    padding-top: 0.4rem;
+}
+#tooltip_imagename {
+    transform: translateX(-35%)!important;
+  }
+
+
