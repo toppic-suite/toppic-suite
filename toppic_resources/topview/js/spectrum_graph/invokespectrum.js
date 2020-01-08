@@ -46,9 +46,27 @@ addSpectrum = function(id,peakList,envelopeList,monoMZ){
 	})
 	peakData.peak_list = peakList ;
 	
-	peakData.envelope_list = envelopeList ;
+	peakData.envelope_list = sortEnvelopes(envelopeList);
 	id = "#"+id;
 	let spectrumgraph = new SpectrumGraph(id,specParameters,peakData);
 	return spectrumgraph;
 }
 
+/**
+ * Sorting envelopes based on intensity to show top 200 envelops with high intensitites
+ */
+sortEnvelopes = function(envelopeList)
+{
+	envelopeList.forEach(function(envelope){
+		// ...env_peak converts arguments into list as sort function is not allowed on arguments
+		envelope.env_peaks.forEach(function(...env_peak){
+			env_peak.sort(function(x,y){
+				return d3.descending(x.intensity, y.intensity);
+			})
+		})
+	})
+	envelopeList.sort(function(x,y){
+	 	return d3.descending(x.env_peaks[0].intensity, y.env_peaks[0].intensity);
+	})
+	return envelopeList ;
+}

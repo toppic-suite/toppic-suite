@@ -26,7 +26,7 @@ SpectrumParameters = function(peakdata) {
 
 
   /*	Colors for the envelope circles	*/
-  this.spectrumColorArray = ["red","orange","blue","green"]
+  this.spectrumColorArray = ["red","orange","blue","green"];
   /*	Radius factor and setting min and max radius	*/
   this.mzRadius = 0.05;
   this.minRadius = 2;
@@ -41,7 +41,12 @@ SpectrumParameters = function(peakdata) {
 	this.xTicks = 10;
   this.yTicks = 5 ;
   //Height/size of the tick
-	this.ticklength = 7 ;
+  this.ticklength = 7 ;
+  
+  //Limiting the peaks and envelopes to 500
+  this.ranges=[0,0,0,0,0,0];
+  this.limits=[0,0,0,0,0];
+  this.bufferPercent = 0.01; //10 percent
 
   this.initScale = function(currminMz, currmaxMz, dataMaxInte,dataMinInte,minMzData,maxMzData,currentMaxIntensity) {
     this.dataMinMz = minMzData;
@@ -65,6 +70,7 @@ SpectrumParameters = function(peakdata) {
     //dataMaxInte = dataMaxInte + 0.25*dataMaxInte ;
     currentMaxIntensity = currentMaxIntensity + 0.25*currentMaxIntensity ;
       this.yScale = this.specHeight/currentMaxIntensity;
+    this.setLimits();
   }
   this.setColorToEnvelops = function(envelopes){
       envelopes.sort(function(x,y){
@@ -118,16 +124,16 @@ SpectrumParameters = function(peakdata) {
 		return this.tickWidthList ;
   }
   this.getTickWidth = function(){
-  let tempDiff = this.maxMz - this.minMz;
-  let tickWidth = parseInt(this.tickWidthList[0]) ;
-	for(let i = 0; i < this.tickWidthList.length; i++)
-	{
-		if(tempDiff/this.xTicks <= parseFloat(this.tickWidthList[i]) && tempDiff/this.xTicks > parseFloat(this.tickWidthList[i+1]))
-		{
-			tickWidth = parseFloat(this.tickWidthList[i]);
-			break ;
-		}
-  }
+    let tempDiff = this.maxMz - this.minMz;
+    let tickWidth = parseInt(this.tickWidthList[0]) ;
+    for(let i = 0; i < this.tickWidthList.length; i++)
+    {
+      if(tempDiff/this.xTicks <= parseFloat(this.tickWidthList[i]) && tempDiff/this.xTicks > parseFloat(this.tickWidthList[i+1]))
+      {
+        tickWidth = parseFloat(this.tickWidthList[i]);
+        break ;
+      }
+    }
 	  return 	tickWidth ;
   }
   this.getTickHeight = function(){
@@ -153,6 +159,7 @@ SpectrumParameters = function(peakdata) {
       this.minMz = this.centerMz - mouseSpecX / this.xScale; 
       this.maxMz = this.centerMz + (this.specWidth - mouseSpecX) / this.xScale;
     }
+    this.setLimits();
   }
 
   this.yZoom = function (ratio) {
@@ -180,5 +187,38 @@ SpectrumParameters = function(peakdata) {
     this.minMz = this.minMz - mzDist; 
     this.maxMz = this.maxMz - mzDist;
     this.centerMz = this.centerMz - mzDist;
+    this.onDragLimits(mzDist);
+  }
+  this.setLimits = function(){
+    let avg = (this.maxMz - this.minMz)/this.limits.length ;
+    avg = avg + (this.bufferPercent*avg);
+    for(let i=0; i<this.ranges.length;i++)
+    {
+      this.ranges[i] = this.minMz + (i*avg) ;
+    }
+  }
+  this.onDragLimits = function(mzDist){
+    let tempRanges = this.ranges ;
+    let avg = (this.maxMz - this.minMz)/this.limits.length ;
+    avg = avg + (avg*this.bufferPercent);
+    if(mzDist < 0)
+    {
+      if(tempRanges[0] < (this.minMz-avg)) tempRanges.shift();
+      if(tempRanges[(tempRanges.length-1)] < (this.maxMz))
+      {
+        let tempVal = tempRanges[(tempRanges.length-1)]+avg;
+        tempRanges.push(tempVal);
+      }
+    }
+    else
+    {
+      if(tempRanges[0] > this.minMz)
+      {
+        let tempVal = tempRanges[0]-avg;
+        tempRanges.unshift(tempVal);
+      }
+      if(tempRanges[(tempRanges.length-1)] > (this.maxMz+avg)) tempRanges.pop();
+    }
+    this.ranges = tempRanges;
   }
 }

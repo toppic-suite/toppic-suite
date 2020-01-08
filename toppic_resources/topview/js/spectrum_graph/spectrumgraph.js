@@ -1,5 +1,7 @@
 var currentMinXTickVal = 0 ;
 var currentMaxXTickVal = 0 ;
+const circlesPerRange = 100;
+const peaksPerRange = 100;
 SpectrumGraph = function(svgId,spectrumParameters,peakData){
 	this.svg = d3.select("body").select(svgId);
 
@@ -176,10 +178,21 @@ drawPeaks = function(svg,spectrumParameters,peakdata){
     				.attr("id", "peaks");
       let max = 0 ;
 	  var len = peakdata.peak_list.length;
+	  let limits=[0,0,0,0,0,0,0,0];
 	  for(let i =0;i<len;i++)
 	  {
 		let peak = peakdata.peak_list[i];
-		if(peak.mz >= spectrumParameters.minMz && peak.mz <= spectrumParameters.maxMz)
+		let inLimit = false;
+		for(let j=0;j<(spectrumParameters.ranges.length-1);j++)
+		{
+			if(peak.mz > spectrumParameters.ranges[j] && peak.mz < spectrumParameters.ranges[j+1])
+			{
+				limits[j] = limits[j]+1;
+				if(limits[j] <= peaksPerRange) inLimit = true;
+				break;
+			}
+		}
+		if(peak.mz >= spectrumParameters.minMz && peak.mz <= spectrumParameters.maxMz && inLimit == true)
 		{
 			peaks.append("line")
 		  .attr("x1",function(d,i){
@@ -214,13 +227,22 @@ addCircles = function(svg,spectrumParameters,peakData){
 	let circles = svg.append("g").attr("id", "circles");
 	let minPercentage = 0.5;
 	let maxIntensity = spectrumParameters.dataMaxInte ;
-	let max = 0 ;
+	let limits=[0,0,0,0,0,0,0,0];
 	peakData.envelope_list.forEach(function(envelope_list,i){
 		envelope_list.env_peaks.forEach(function(env_peaks,index){
 			//Show only envelopes with minimum of 0.5% 
 			let percentInte = env_peaks.intensity/maxIntensity * 100 ;
-			
-			if(env_peaks.mz > spectrumParameters.minMz && env_peaks.mz <= spectrumParameters.maxMz && percentInte >= minPercentage)
+			let inLimit = false;
+			for(let i=0;i<(spectrumParameters.ranges.length-1);i++)
+			{
+				if(env_peaks.mz > spectrumParameters.ranges[i] && env_peaks.mz < spectrumParameters.ranges[i+1])
+				{
+					limits[i] = limits[i]+1;
+					if(limits[i] <= circlesPerRange) inLimit = true;
+					break;
+				}
+			}
+			if(env_peaks.mz > spectrumParameters.minMz && env_peaks.mz <= spectrumParameters.maxMz && percentInte >= minPercentage && inLimit == true)
 			{
 				circles.append("circle")
 				.attr("id","circles")
@@ -250,7 +272,6 @@ addCircles = function(svg,spectrumParameters,peakData){
 	})
 }
 addLabels = function(svg, spectrumParameters){
-
 	svg.append("text").attr("id","label")
 						.attr("transform","translate(" + (spectrumParameters.svgWidth/2) + "," + (spectrumParameters.svgHeight-spectrumParameters.padding.head) + ")")
 					.attr("fill","black")
