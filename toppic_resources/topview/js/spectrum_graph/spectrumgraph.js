@@ -176,7 +176,6 @@ addDatatoAxis = function(svg,spectrumParameters){
 drawPeaks = function(svg,spectrumParameters,peakdata){
 	let peaks = svg.append("g")
     				.attr("id", "peaks");
-      let max = 0 ;
 	  var len = peakdata.peak_list.length;
 	  let limits=[0,0,0,0,0,0,0,0];
 	  for(let i =0;i<len;i++)
@@ -215,11 +214,6 @@ drawPeaks = function(svg,spectrumParameters,peakdata){
 			.on("mouseout",function(d,i){
 				onPeakMouseOut(this);
 			});
-			if(max == 200)
-			{
-				break;
-			}
-			max = max+1;
 		}
 	  }
 }
