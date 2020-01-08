@@ -44,7 +44,9 @@ class ZeroPtmFilterMng {
 
   std::string output_file_ext_;
 
-  boost::mutex mutex;
+  boost::mutex mutex_;
+
+  std::vector<int> cnts_;
 };
 
 typedef std::shared_ptr<ZeroPtmFilterMng> ZeroPtmFilterMngPtr;

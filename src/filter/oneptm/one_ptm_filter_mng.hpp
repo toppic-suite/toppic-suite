@@ -51,7 +51,9 @@ class OnePtmFilterMng {
 
   int n_spec_block_ = 0;
 
-  boost::mutex mutex;
+  boost::mutex mutex_;
+
+  std::vector<int> cnts_;
 };
 
 typedef std::shared_ptr<OnePtmFilterMng> OnePtmFilterMngPtr;
