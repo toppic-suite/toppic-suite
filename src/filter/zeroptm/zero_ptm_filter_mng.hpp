@@ -15,7 +15,7 @@
 #ifndef TOPPIC_FILTER_ZERO_PTM_ZERO_PTM_FILTER_MNG_HPP_
 #define TOPPIC_FILTER_ZERO_PTM_ZERO_PTM_FILTER_MNG_HPP_
 
-#include <atomic>
+#include <boost/thread.hpp>
 
 #include "prsm/prsm_para.hpp"
 
@@ -40,10 +40,11 @@ class ZeroPtmFilterMng {
 
   int thread_num_ = 1;
 
-  std::atomic<int> cnt_;
   int n_spec_block_ = 0;
 
   std::string output_file_ext_;
+
+  boost::mutex mutex;
 };
 
 typedef std::shared_ptr<ZeroPtmFilterMng> ZeroPtmFilterMngPtr;
