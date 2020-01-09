@@ -49,6 +49,7 @@ class iontabledata{
 				let temp_Obj = {ionType:ionType,mass:value}
                 ions.push(temp_Obj);
 		   });
+
 		return ions;
 	}
 	/**
@@ -63,6 +64,7 @@ class iontabledata{
 				let temp_Obj = {ionType:ionType,mass:value}
                 ions.push(temp_Obj);
 		   });
+
 		return ions;
 	}
 }

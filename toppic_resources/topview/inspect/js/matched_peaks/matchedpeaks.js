@@ -118,7 +118,7 @@ class MatchedPeaks {
 			{
 				let matchedInd = "N";
 				let peak = MatchedPeaksObj.matchedPeakAttributes(monoMassList[i],peakId,"","","","",matchedInd);
-			   	matchedAndUnmatchedList.push(peak);
+			  matchedAndUnmatchedList.push(peak);
 			}
 		})
 		return matchedAndUnmatchedList ;
@@ -134,6 +134,7 @@ class MatchedPeaks {
 		for(let i = 0; i < len; i++)
 		{
 			let distributionList = {};
+      /*
 			if(matchedUnMatchedList[i].matchedInd == "Y")
 			{
 				if(this.CONST_A == matchedUnMatchedList[i].ion[0] || this.CONST_B == matchedUnMatchedList[i].ion[0] 
@@ -158,11 +159,12 @@ class MatchedPeaks {
 			}
 			else
 			{
+      */
 				distributionList.mono_mass = matchedUnMatchedList[i].mass;
 				distributionList.charge = matchedUnMatchedList[i].charge;
 				distributionList.env_peaks = molecularFormObj.emass(distributionList.mono_mass,distributionList.charge,peakDataList);
 				totalDistribution.push(distributionList);
-			}
+			//}
 		}
 		if(totalDistribution.length != 0)
 		{

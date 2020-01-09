@@ -50,6 +50,7 @@ class MolecularFormulae{
 				totDistributionList[k].mass = totDistributionList[k].mass + (IsotopicMass[0].mass * atomCountList[i].count) ;
 			}
 		}
+		console.log("totDistributionList 1 :", totDistributionList);
 		totDistributionList = this.getMZwithHighInte(totDistributionList,charge,massError,peakDataList);
 		totDistributionList = this.getNormalizedIntensity(totDistributionList,peakDataList);
 		return totDistributionList ;
@@ -183,6 +184,14 @@ class MolecularFormulae{
 		let intensity = 0;
 		let count = 0 ;
 		let distributionInte = 0;
+		let maxinte = 0;
+		let mininte = 100;
+
+		let peakMaxinte = 0;
+		let peakMininte = 10000000;
+
+		let maxMz = 0;
+		let minMz = 10000000;
 		for(let i=0;i<len;i++)
 		{
 			for(let j=0;j<peakListLen;j++)
@@ -190,23 +199,54 @@ class MolecularFormulae{
 				if((totDistributionList[i].mz - peakDataList[j].mz) <= this.toleraceMassDiff
 					&& (totDistributionList[i].mz - peakDataList[j].mz) >= 0-this.toleraceMassDiff )
 				{
-					intensity = intensity + peakDataList[j].intensity;
-					distributionInte = distributionInte + totDistributionList[i].intensity;
+					if(maxMz < totDistributionList[i].mz){
+						maxMz = totDistributionList[i].mz;
+					}
+					if(minMz > totDistributionList[i].mz){
+						minMz = totDistributionList[i].mz;
+					}
 					count = count + 1;
+				}
+			}
+		}
+		maxMz = maxMz + this.toleraceMassDiff;
+		minMz = minMz - this.toleraceMassDiff;
+		for(let i=0;i<len;i++)
+		{
+			if(minMz <= totDistributionList[i].mz &&  totDistributionList[i].mz <= maxMz)
+			{
+				if(maxinte < totDistributionList[i].intensity){
+					maxinte = totDistributionList[i].intensity;
+				}
+				if(mininte > totDistributionList[i].intensity){
+					mininte = totDistributionList[i].intensity;
+				}
+			}
+		}
+		for(let j=0;j<peakListLen;j++)
+		{
+			if(peakDataList[j].mz >= minMz && peakDataList[j].mz <= maxMz)
+			{
+				if(peakMaxinte < peakDataList[j].intensity){
+					peakMaxinte = peakDataList[j].intensity;
+				}
+				if(peakMininte > peakDataList[j].intensity){
+					peakMininte = peakDataList[j].intensity;
 				}
 			}
 		}
 		if(count !=0 )
 		{
-			let avg = intensity/count ;
-			let distributionAvgInte = distributionInte/count;
+			let avg ;
+			let distributionAvgInte;
+
+			avg = (peakMaxinte + peakMininte)/2;
+			distributionAvgInte = (maxinte+mininte)/2;
 			for(let i=0;i<len;i++)
 			{
-				let tempIntensity = (avg * totDistributionList[i].intensity)/distributionAvgInte ;
-				totDistributionList[i].intensity = tempIntensity ;
+				totDistributionList[i].intensity = (avg * totDistributionList[i].intensity)/distributionAvgInte ;
 			}
 		}
-		
 		return totDistributionList ;
 	}
 }

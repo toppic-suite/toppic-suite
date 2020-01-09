@@ -21,7 +21,7 @@
 }
 .card{
     background-color: #428bca !important ;
-	padding: 50px 30px;
+	padding: 35px 25px;
 	margin: 0px 10px 0px 10px;
 }	
 .card:hover{
@@ -39,8 +39,8 @@
 }
 
 .card-row{
-	margin: 0px auto 50px auto;
-	padding: 20px 30px 50px 30px;
+	margin: 0px auto 30px auto;
+	padding: 20px 30px 45px 30px;
 	border-width:1px;
 	border-style: solid;
 	border-color: #D5D5D5;

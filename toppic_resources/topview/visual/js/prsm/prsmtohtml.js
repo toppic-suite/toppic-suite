@@ -37,6 +37,8 @@ function loadDatafromJson2Html(){
 function createTableElements(){
 	var table = document.getElementById('spectrum');
 	var tbdy = document.createElement('tbody');
+	var ionArray = []; //contains the ion types used in the data
+
 
 	let l_scans = prsm_data.prsm.ms.ms_header.scans.split(" ") ;
 	let l_specIds = prsm_data.prsm.ms.ms_header.ids.split(" ") ;
@@ -45,6 +47,18 @@ function createTableElements(){
 	let l_matched_peak_count = 0;
 	prsm_data.prsm.ms.peaks.peak.forEach(function(peak,i){
 		/*	Check if peak contain matched_ions_num attribute	*/
+
+		//for each peak, get the ion type and store it in ionArray to determine which ion type to be checked in Inspect
+		if (parseInt(peak.matched_ions_num)>0){
+			let ion = peak.matched_ions.matched_ion.ion_type;
+			if (ionArray.length < 1){
+				ionArray.push(ion);
+			}			
+			else if (ionArray.indexOf(ion) < 0) {
+				ionArray.push(ion);
+			}
+		}
+		
 		if(peak.hasOwnProperty('matched_ions_num') && parseInt(peak.matched_ions_num)>1)
 		{
 			peak.matched_ions.matched_ion.forEach(function(matched_ion,i){
@@ -57,6 +71,10 @@ function createTableElements(){
 			loop_matched_ions(peak,i) ;
 		}
 	})
+	
+	//after looping through the prsm files, store the ion type data to local storage
+	window.localStorage.setItem('ionType', ionArray);
+	
 	function loop_matched_ions(peak,i){
 		/*	Create row for each peak value object in the table	*/
 		var tr = document.createElement('tr');
@@ -158,6 +176,7 @@ function createTableElements(){
 	document.getElementById("not_matched_peak_count").innerHTML = "Not Matched peaks (" + l_not_matched_peak_count + ")" ;
 	
 	table.appendChild(tbdy);
+
 }
 /*	Get occurence of "Variable" and "Fixed", convert the data to HTML */
 function occurence_ptm(prsm)
@@ -278,7 +297,8 @@ function getVariablePtm(ptm)
 	if(Array.isArray(ptm.occurence))
 	{
 		ptm.occurence.forEach(function(occurence,i){
-			variable_ptm = variable_ptm + occurence.left_pos + "-" + occurence.right_pos ;
+      let left = parseInt(occurence.left_pos) + 1;
+			variable_ptm = variable_ptm + left + "-" + occurence.right_pos ;
 			if(ptm.occurence.length-1 > i )
 			{
 				variable_ptm = variable_ptm + ";" ;
@@ -287,7 +307,8 @@ function getVariablePtm(ptm)
 	}
 	else
 	{
-		variable_ptm = variable_ptm + ptm.occurence.left_pos + "-" + ptm.occurence.right_pos ;
+    let left = parseInt(ptm.occurence.left_pos) + 1;
+		variable_ptm = variable_ptm + left + "-" + ptm.occurence.right_pos ;
 	}
 	variable_ptm = ptm.ptm.abbreviation + variable_ptm ;
 	return variable_ptm ;
@@ -300,7 +321,8 @@ function getFixedPtm(ptm)
 	if(Array.isArray(ptm.occurence))
 	{
 		ptm.occurence.forEach(function(occurence,i){
-			fixed_ptm = fixed_ptm + occurence.left_pos + "-" + occurence.right_pos ;
+			//fixed_ptm = fixed_ptm + occurence.left_pos + "-" + occurence.right_pos ;
+      fixed_ptm = fixed_ptm + occurence.right_pos;
 			if(ptm.occurence.length-1 > i )
 			{
 				fixed_ptm = fixed_ptm + ";" ;
@@ -309,9 +331,11 @@ function getFixedPtm(ptm)
 	}
 	else
 	{
-		fixed_ptm = fixed_ptm + ptm.occurence.left_pos + "-" + ptm.occurence.right_pos ;
+		//fixed_ptm = fixed_ptm + ptm.occurence.left_pos + "-" + ptm.occurence.right_pos ;
+    fixed_ptm = fixed_ptm + occurence.right_pos;
 	}
 	fixed_ptm = ptm.ptm.abbreviation + fixed_ptm ;
+  console.log('fixed_ptm', fixed_ptm);
 	return fixed_ptm ;
 }
 /*	Create buttons to save the svg as png/svg and to redraw the svg with given dimensions*/
@@ -351,35 +375,27 @@ function buttonsAndAlerts(para,prsm,id)
 		document.getElementById("num-width").value = para.numerical_width ;
 		document.getElementsByName("show-num")[0].checked = para.show_num ;
 		document.getElementsByName("show-skipped-lines")[0].checked = para.show_skipped_lines ;
-		
-		/*if(para.svgBackground_color == "none")
-		{
-			document.getElementsByName("svg_background")[0].checked = false ;
-		}
-		else
-		{
-			document.getElementsByName("svg_background")[0].checked = true ;
-		}*/
-		
+
+    $("#myModal").draggable({
+      appendTo: "body"
+    });
 	});
+
 	/*	Download the svg as ".svg" image	*/
 	d3.select('#download_SVG').on("click",function(){
-			let svg_element = d3.selectAll("#"+id).node();
-			svg2svg(svg_element);
+			popupnamewindow("svg",id);
 		});
 	/*	Download svg as PNG Image	*/
 	d3.select('#download_PNG').on("click", function(){
-		let l_svgContainer = d3.select("#"+id);
-		let svgString = getSVGString(l_svgContainer.node());
-		let svg_element = document.getElementById('l_popup_svg');
-		let bBox = svg_element.getBBox();
-		let width = bBox.width;
-		let height = bBox.height ;
-		svgString2Image( svgString, 2*width, 2*height, 'png', save ); 
-		function save( dataBlob, filesize ){
-			saveAs( dataBlob, 'PRSM.png' ); 
-		}
+		popupnamewindow("png",id);
 	})	;
+
+  d3.select('#image_help').on("click",function(){
+    $("#helpModal").draggable({
+      appendTo: "#myModal"
+    });
+  });
+
 	/*	On Click action to resize the svg with user dimensions	*/
 	d3.select('#resize').on("click", function(){
 		d3.selectAll("."+id+"_g").remove();
@@ -446,4 +462,58 @@ function buttonsAndAlerts(para,prsm,id)
 		/*	Color the background of occurence of mass shift */
 		massShiftBackgroundColor(para,prsm,id);
 	});	
+}
+function popupnamewindow(type,id){
+	console.log("in popup");
+	d3.selectAll("#tooltip_imagename").remove() ;
+	var div = d3.select("body").append("div")
+	.attr("class", "tooltip")
+	.attr("id","tooltip_imagename")
+	.style("opacity", 1);
+
+	div.transition()
+	.duration(200)
+	.style("opacity", .9);
+	div.html(
+			'<input type="text" placeholder="Image Name" id="imagename" />'+
+			'<button id="saveimage" style = "none" type="button">save</button>'
+			)
+	.style("left", (d3.event.pageX - 30) + "px")             
+	.style("top", (d3.event.pageY - 60) + "px")
+	// .style("transform","translateX(-35%)!important")
+	.attr("box-sizing","border")
+	.attr("display","inline-block")
+	.attr("min-width","1.5em")
+	.attr("padding","2px")
+	.attr("margin-left","0px")
+	.attr("text-align","center")
+	.attr("text-decoration","none")
+	.attr("border","1px solid #111111")
+	.attr("background-color","white");
+
+	$("#saveimage").click(function(){
+		let imagename = $("#imagename").val();
+		if( imagename == null || imagename == "")
+		{
+			imagename = "spectrum";
+		}
+		if(type == "svg"){
+			d3.selectAll("#tooltip_imagename").remove() ;
+			let svg_element = d3.selectAll("#"+id).node();
+			svg2svg(svg_element,imagename);
+		}
+		if(type == "png"){
+			d3.selectAll("#tooltip_imagename").remove() ;
+			let l_svgContainer = d3.select("#"+id);
+			let svgString = getSVGString(l_svgContainer.node());
+			let svg_element = document.getElementById('l_popup_svg');
+			let bBox = svg_element.getBBox();
+			let width = bBox.width;
+			let height = bBox.height ;
+			svgString2Image( svgString, 2*width, 2*height, 'png', save ); 
+			function save( dataBlob, filesize ){
+				saveAs( dataBlob, imagename ); 
+			}
+		}
+	})
 }

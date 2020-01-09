@@ -54,7 +54,6 @@ function buildSvg(parameters,prsm,id)
 									.attr("height",height)
 									.attr("font-family","'FreeMono',Miltonian,monospace")
 									.attr("font-size","16px");
-	return [parameters,id] ;
 }
 function drawAcidonSVG(parameters,prsm,id)
 {

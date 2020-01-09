@@ -156,6 +156,7 @@ class SeqOfExecution
 			let matchedPeaks = [];
 			let massShift = parseFloat(ion.mass);
 			let ionType = ion.ionType;
+
 			/**
 			 * Get claculated suffix mass list
 			 */
@@ -192,7 +193,7 @@ class SeqOfExecution
 			/**
 			 * Call addSpectrum function in invokeSpectrum function to draw graph 
 			 */
-			addSpectrum("spectrum",peakDataList,distributionList,null);
+			ms2_graph = addSpectrum("spectrum",peakDataList,distributionList,null);
 			$("#"+Constants.SPECTRUMDOWNLOADID).show();
 		}
 		/**
@@ -468,7 +469,7 @@ class SeqOfExecution
 			/** 
 			 * Call addSpectrum function in invokeSpectrum function to draw graph 
 			 */
-			addSpectrum("spectrum",peakDataList,distributionList,null);
+			ms2_graph = addSpectrum("spectrum",peakDataList,distributionList,null);
 			$("#"+Constants.SPECTRUMDOWNLOADID).show();
 			/**
 			 * Display All-peaks/matched/non-matched buttons on click of submit
