@@ -7,6 +7,8 @@ class MassShifts {
 	 */
 	getSequenceFromUI(){
 		var seq = $(this.SEQUENCEDATA_ID).val().trim();
+		seq = seq.toUpperCase();//set the sequence to be upper case automatically -- for user convenience
+		
 		let massShiftList = [] ;
 		[seq,massShiftList]= this.getMassShiftList(seq);
 		/**

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-<meta charset="ISO-8859-1">
+<meta charset="utf-8">
 <title>Protein identifications</title>
 <link rel="stylesheet" type="text/css" href="../css/lib/jquery.dataTables.css"/>
 <link rel="stylesheet" type="text/css" href="../css/lib/bootstrap.min.css"/>
@@ -28,7 +28,8 @@ $(document).ready(function(){
 		let folder = $(this).attr("id");
 		console.log("folder : ", folder);
 		let url = "proteins.html?folder=../../"+folder+"/data_js";
-		window.open(url);
+		window.open(url, "_self");
+		console.log("folder opened");
 	})
   }
   else{
@@ -95,39 +96,10 @@ $(document).ready(function(){
 				</div>
 			</div>
 		</div>
-	<!--<div class="row justify-content-center text-light">
-		<div class="card-columns" style="display:none">
-			<div class="card">
-				<div class="card-body text-center" id="toppic_prsm_cutoff">
-				<p class="card-text">ToPPIC identification with a spectral level cutoff</p>
-				</div>
-			</div>
-			<div class="card">
-				<div class="card-body text-center" id="toppic_proteoform_cutoff">
-					<p class="card-text">ToPPIC identification with a proteoform level</p>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="row justify-content-center text-light">
-		<div class="card-columns" style="display:none">
-			<div class="card">
-				<div class="card-body text-center" id="topmg_prsm_cutoff">
-				<p class="card-text">ToPMG identification with a spectral level cutoff</p>
-				</div>
-			</div>
-			<div class="card">
-				<div class="card-body text-center" id="topmg_proteoform_cutoff">
-					<p class="card-text">ToPMG identification with a proteoform level</p>
-				</div>
-			</div>
-		</div>
-	</div>-->
-
 <div class="container"></div>
 <footer class="page-footer font-small blue">
-  <div class="footer-copyright text-center py-3">Copyright: The Trustees of 
-		<a href="https://www.iu.edu/" target="#">Indiana University</a>, 2019.
+	<div class="footer-copyright text-center py-3">© 2019 Copyright: The Trustees of 
+		<a href="https://www.iu.edu/" target="#">Indiana University</a>
 	</div>
 </footer>
 </body>

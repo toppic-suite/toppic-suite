@@ -15,6 +15,7 @@ function onclickTopView(){
 
     window.open("../inspect/spectrum.html");
 }
+
 function getDataFromPRSMtoSpectralView(){
     let peakdata = new PeakData();
     let peakAndIntensity = [];
@@ -24,13 +25,20 @@ function getDataFromPRSMtoSpectralView(){
     })
     return peakAndIntensity;
 }
+
 function getMassAndIntensityData(){
-    let massAndIntensityList = [];
-    prsm_data.prsm.ms.peaks.peak.forEach(function(eachPeak,i){
-        let tempObj = eachPeak.monoisotopic_mass + " "+eachPeak.intensity+ " "+eachPeak.charge;
-        massAndIntensityList.push(tempObj);
-    })
-   return massAndIntensityList;
+  let massAndIntensityList = [];
+  let ms2_ids = prsm_data.prsm.ms.ms_header.ids;
+  let ms2_id_list = ms2_ids.split(" ");
+  let ms2_id_1 = ms2_id_list[0];
+
+  prsm_data.prsm.ms.peaks.peak.forEach(function(eachPeak,i){
+    if (eachPeak.spec_id == ms2_id_1) {
+      let tempObj = eachPeak.monoisotopic_mass + " "+eachPeak.intensity+ " "+eachPeak.charge;
+      massAndIntensityList.push(tempObj);
+    }
+  })
+  return massAndIntensityList;
 }
 function getSequence(){
     let sequence = [];

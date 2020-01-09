@@ -92,21 +92,22 @@ class UIHelper{
         tbody.setAttribute("id","tableContainertbody");
         let tr = document.createElement("tr");
         tr.setAttribute("role","row");
-        let ColCount = 9;
+        let ColCount = 10;
         // Create table header
         for(let i = 0;i < ColCount;i++)
         {
             let th = document.createElement("th");
             th.setAttribute("class","th-sm");
             if(i == 0) th.innerHTML = "Id";
-            if(i == 1) th.innerHTML = "Mono Mass";
-            if(i == 2) th.innerHTML = "Intensity";
-            if(i == 3) th.innerHTML = "Charge";
-            if(i == 4) th.innerHTML = "Theoretical Mass";
-            if(i == 5) th.innerHTML = "Ion";
-            if(i == 6) th.innerHTML = "Pos";
-            if(i == 7) th.innerHTML = "Mass Error";
-            if(i == 8) th.innerHTML = "PPM Error";
+            if(i == 1) th.innerHTML = "Mono mass";
+            if(i == 2) th.innerHTML = "Charge";
+            if(i == 3) th.innerHTML = "Mono m/z";
+            if(i == 4) th.innerHTML = "Intensity";
+            if(i == 5) th.innerHTML = "Theoretical mass";
+            if(i == 6) th.innerHTML = "Ion";
+            if(i == 7) th.innerHTML = "Pos";
+            if(i == 8) th.innerHTML = "Mass error";
+            if(i == 9) th.innerHTML = "PPM error";
             tr.appendChild(th);
         }
         thead.appendChild(tr);
@@ -135,13 +136,21 @@ class UIHelper{
                     td.innerHTML = matchedPeaks[i].peakId;
                     td.style.fontWeight = "bold";
                 }else if(j == 1) td.innerHTML = matchedPeaks[i].mass ;
-                else if(j == 2) td.innerHTML = matchedPeaks[i].intensity ;
-                else if(j == 3) td.innerHTML = matchedPeaks[i].charge;
-                else if(j == 4) td.innerHTML = matchedPeaks[i].thMass;
-                else if(j == 5) td.innerHTML = matchedPeaks[i].ion;
-                else if(j == 6) td.innerHTML = matchedPeaks[i].position;
-                else if(j == 7) td.innerHTML = matchedPeaks[i].massError;
-                else if(j == 8) td.innerHTML = matchedPeaks[i].PPMerror;
+                else if(j == 2) td.innerHTML = matchedPeaks[i].charge;
+                else if(j == 3) {
+                  let mz = matchedPeaks[i].mass / matchedPeaks[i].charge + 1.007276466879;
+                  let a = document.createElement('a');
+                  a.href="#!"
+                  a.className = "peakRows"
+                  a.innerHTML = mz.toFixed(4); 
+                  td.appendChild(a);
+                }
+                else if(j == 4) td.innerHTML = matchedPeaks[i].intensity ;
+                else if(j == 5) td.innerHTML = matchedPeaks[i].thMass;
+                else if(j == 6) td.innerHTML = matchedPeaks[i].ion;
+                else if(j == 7) td.innerHTML = matchedPeaks[i].position;
+                else if(j == 8) td.innerHTML = matchedPeaks[i].massError;
+                else if(j == 9) td.innerHTML = matchedPeaks[i].PPMerror;
                 tr.appendChild(td);
             }
             tr.setAttribute("role","row");
@@ -160,6 +169,12 @@ class UIHelper{
             tr.setAttribute("class",classname);
             dataContainer_tbody.append(tr);
         }
+
+      $(".peakRows").click(function() {
+        /*	get Mono M/z value till 3 decimal values	*/
+        let peak_value = parseFloat(this.innerHTML).toFixed(3) ;
+        ms2_graph.redraw(peak_value);
+      });
     }
     // Function to diaplsy matched count and un-matched count
     showPeakCounts()

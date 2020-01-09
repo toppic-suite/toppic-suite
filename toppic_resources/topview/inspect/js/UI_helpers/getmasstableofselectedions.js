@@ -41,7 +41,7 @@ class GetMassTableOfSelectedIons{
          * Create Acid Column Header
          */
         th1.setAttribute("class","th-sm");
-        th1.innerHTML = "Acid";
+        th1.innerHTML = "Amino acid";
         tr.appendChild(th0);
         tr.appendChild(th1);
         /**

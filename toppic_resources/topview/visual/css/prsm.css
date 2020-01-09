@@ -11,6 +11,11 @@ div.container {
 	border-top: none !important;
 }
 
+td { 
+white-space: nowrap; 
+max-width:150px;
+}
+
 .table-bold td,
 .table-bold th {
 	font-weight:bold;
@@ -154,4 +159,10 @@ svg.l_popup_svg{
   display: inline-block !important;
   border-bottom: 1px dotted black !important; */
 /* }  */
+.help-window{
+	 margin-top:40%!important;
+}
+#save-image-modal{
+	margin-top:20%;
+}
 

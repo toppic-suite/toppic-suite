@@ -15,8 +15,8 @@ PeakData = function() {
         {
             mz = parseFloat(json_data.peaks[i].mz);
             intensity = parseFloat(json_data.peaks[i].intensity);
-            peak = {mz:mz, intensity:intensity}
-            peakList[i] = peak
+            peak = {mz:mz, intensity:intensity};
+            peakList[i] = peak;
         }
         peakList.sort(function(x,y){
             return d3.ascending(x.mz, y.mz);
@@ -50,4 +50,5 @@ PeakData = function() {
         }
         return envelopList;
     }
-    }
+
+}
