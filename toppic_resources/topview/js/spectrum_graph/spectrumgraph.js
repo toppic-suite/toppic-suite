@@ -1,3 +1,5 @@
+const circlesPerRange = 100;
+const peaksPerRange = 100;
 SpectrumGraph = function(svgId,spectrumParameters,peakData){
 	this.svg = d3.select("body").select(svgId);
   this.id = svgId;
@@ -183,13 +185,22 @@ addDatatoAxis = function(svg,spectrumParameters){
 drawPeaks = function(svg,spectrumParameters,peakdata){
 	let peaks = svg.append("g")
     				.attr("id", "peaks");
-      let max = 0 ;
 	  var len = peakdata.peak_list.length;
-
+	  let limits=[0,0,0,0,0,0,0,0];
 	  for(let i =0;i<len;i++)
 	  {
 		let peak = peakdata.peak_list[i];
-		if(peak.mz >= spectrumParameters.minMz && peak.mz <= spectrumParameters.maxMz)
+		let inLimit = false;
+		for(let j=0;j<(spectrumParameters.ranges.length-1);j++)
+		{
+			if(peak.mz > spectrumParameters.ranges[j] && peak.mz < spectrumParameters.ranges[j+1])
+			{
+				limits[j] = limits[j]+1;
+				if(limits[j] <= peaksPerRange) inLimit = true;
+				break;
+			}
+		}
+		if(peak.mz >= spectrumParameters.minMz && peak.mz <= spectrumParameters.maxMz && inLimit == true)
 		{
 			peaks.append("line")
 		  .attr("x1",function(d,i){
@@ -212,11 +223,6 @@ drawPeaks = function(svg,spectrumParameters,peakdata){
 			.on("mouseout",function(d,i){
 				onPeakMouseOut(this);
 			});
-			if(max == 200)
-			{
-				break;
-			}
-			max = max+1;
 		}
 	  }
 }
@@ -224,45 +230,48 @@ addCircles = function(svg,spectrumParameters,peakData){
 	let circles = svg.append("g").attr("id", "circles");
 	let minPercentage = 0.5;
 	let maxIntensity = spectrumParameters.dataMaxInte ;
-	let max = 0 ;
+	let limits=[0,0,0,0,0,0,0,0];
 	peakData.envelope_list.forEach(function(envelope_list,i){
-		// console.log(i);
-		// if(i<=200)
-		// {
-		// 	console.log("inside : ", i);
-			envelope_list.env_peaks.forEach(function(env_peaks,index){
-				//Show only envelopes with minimum of 0.5% 
-				let percentInte = env_peaks.intensity/maxIntensity * 100 ;
-				
-				if(env_peaks.mz > spectrumParameters.minMz && env_peaks.mz <= spectrumParameters.maxMz && percentInte >= minPercentage)
+		envelope_list.env_peaks.forEach(function(env_peaks,index){
+			//Show only envelopes with minimum of 0.5% 
+			let percentInte = env_peaks.intensity/maxIntensity * 100 ;
+			let inLimit = false;
+			for(let i=0;i<(spectrumParameters.ranges.length-1);i++)
+			{
+				if(env_peaks.mz > spectrumParameters.ranges[i] && env_peaks.mz < spectrumParameters.ranges[i+1])
 				{
-					circles.append("circle")
-					.attr("id","circles")
-					.attr("cx",function(d,i){
-						return spectrumParameters.getPeakXPos(env_peaks.mz);
-					})
-					.attr("cy",function(d,i){
-						let cy = spectrumParameters.getPeakYPos(env_peaks.intensity);
-						if(cy < spectrumParameters.padding.head) return spectrumParameters.padding.head ;
-						else return cy ;
-					})
-					.attr("r",function(d,i){
-						return spectrumParameters.getCircleSize();
-					})
-					.style("fill","white")
-					.style("opacity", "0.6")
-					.style("stroke",envelope_list.color)
-					.style("stroke-width","2")
-					.on("mouseover",function(d,i){
-						onMouseOverCircle(this,svg,envelope_list,spectrumParameters);
-					})
-					.on("mouseout",function(d,i){
-						onCircleMouseOut(this);
-					});
-					
+					limits[i] = limits[i]+1;
+					if(limits[i] <= circlesPerRange) inLimit = true;
+					break;
 				}
-			})
-		// }
+			}
+			if(env_peaks.mz > spectrumParameters.minMz && env_peaks.mz <= spectrumParameters.maxMz && percentInte >= minPercentage && inLimit == true)
+			{
+				circles.append("circle")
+				.attr("id","circles")
+				.attr("cx",function(d,i){
+					return spectrumParameters.getPeakXPos(env_peaks.mz);
+				})
+				.attr("cy",function(d,i){
+					let cy = spectrumParameters.getPeakYPos(env_peaks.intensity);
+					if(cy < spectrumParameters.padding.head) return spectrumParameters.padding.head ;
+					else return cy ;
+				})
+				.attr("r",function(d,i){
+					return spectrumParameters.getCircleSize();
+				})
+				.style("fill","white")
+				.style("opacity", "0.6")
+				.style("stroke",envelope_list.color)
+				.style("stroke-width","2")
+				.on("mouseover",function(d,i){
+					onMouseOverCircle(this,svg,envelope_list,spectrumParameters);
+				})
+				.on("mouseout",function(d,i){
+					onCircleMouseOut(this);
+				});
+			}
+		})
 	})
 }
 addLabels = function(svg, spectrumParameters){
