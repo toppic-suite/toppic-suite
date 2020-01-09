@@ -23,6 +23,9 @@ function allProteins(folderName)
 	/*create header with protein count*/
 	div.appendChild(h2);
 	div.appendChild(br);
+
+	//Creating ordered list
+	let ol = document.createElement('ol');
 	/*get the best prsm for each protein and form unique links for all the proteins*/
 	if(Array.isArray(l_proteins.protein_list.proteins.protein))
 	{
@@ -32,7 +35,7 @@ function allProteins(folderName)
 				let br1 = document.createElement('br');
 				div_temp.appendChild(p);
 				div_temp.appendChild(br1);
-				div.appendChild(div_temp);
+				ol.appendChild(div_temp);
 			})
 	}
 	else
@@ -43,14 +46,14 @@ function allProteins(folderName)
 			let br1 = document.createElement('br');
 			div_temp.appendChild(p);
 			div_temp.appendChild(br1);
-			div.appendChild(div_temp);
+			ol.appendChild(div_temp);
 	}
-	
+	div.appendChild(ol);
 }
 /*convert the json protein data into HTML and create links for each protein to navigate*/
 function proteinToHtml(protein,folderName)
 {
-	let div  = document.createElement('div');
+	let div  = document.createElement('li');
 	let id = "p"+ protein.sequence_id ;
 	div.setAttribute("id",id);
 	let p = document.createElement('p');
@@ -138,4 +141,3 @@ function proteoformMultirow(proteoform, best_e_value, prsm_id)
 	
 	return [l_best_e_value,l_prsm_id] ;
 }
-
