@@ -228,7 +228,7 @@ drawPeaks = function(svg,spectrumParameters,peakdata){
 }
 addCircles = function(svg,spectrumParameters,peakData){
 	let circles = svg.append("g").attr("id", "circles");
-	let minPercentage = 0.5;
+	let minPercentage = 0.0;
 	let maxIntensity = spectrumParameters.dataMaxInte ;
 	let limits=[0,0,0,0,0,0,0,0];
 	peakData.envelope_list.forEach(function(envelope_list,i){
