@@ -128,7 +128,7 @@ $(document).ready(function(){
         let ms2_envelope_list = peak_data.getEnvelopeData(ms2_data);
         console.log("peak list: ", ms2_peak_list.length);
         /*	get Mono M/z value till 3 decimal values	*/
-        ms2_graph = addSpectrum("ms1svg", ms2_peak_list, ms2_envelope_list, null);
+        ms2_graph = addSpectrum("ms2svg", ms2_peak_list, ms2_envelope_list, null);
 
         let ms1_peak_list = peak_data.getPeakData(ms1_data);
         let ms1_envelope_list = peak_data.getEnvelopeData(ms1_data);

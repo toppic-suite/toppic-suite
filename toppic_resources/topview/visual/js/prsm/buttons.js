@@ -2,7 +2,7 @@
 function buttons(){
 	/*	Invocation on click of Mono M/z at the table	*/
 	$( ".peakRows" ).click(function() {
-		document.getElementById("ms1svg").style.display = "block";
+		document.getElementById("ms2svg").style.display = "block";
 		document.getElementById("spectrum_help").style.display = "block";
 		/*	get Mono M/z value till 3 decimal values	*/
 		let peak_value = parseFloat(this.innerHTML).toFixed(3) ;
@@ -49,7 +49,7 @@ function buttons(){
 		 
 		 if($.trim($(this).text()) === 'Show Spectrum')
 		 {
-			 document.getElementById("ms1svg").style.display = "block";
+			 document.getElementById("ms2svg").style.display = "block";
 			 document.getElementById("spectrum_help").style.display = "block";
 			 //document.getElementById("a_show_spectrum").href = "#"; 
 			 $(this).text('Hide Spectrum');
@@ -57,7 +57,7 @@ function buttons(){
 		 else
 		 {
 			 $(this).text('Show Spectrum'); 
-			 document.getElementById("ms1svg").style.display = "none";
+			 document.getElementById("ms2svg").style.display = "none";
 			 document.getElementById("spectrum_help").style.display = "none";
 			 //document.getElementById("download_spectrum").style.display = "none";
 			 //document.getElementById("spectrum_help").style.display = "none";
