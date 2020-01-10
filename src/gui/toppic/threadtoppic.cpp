@@ -16,8 +16,24 @@
 
 #include "threadtoppic.h"
 
+void handle_eptr(std::exception_ptr eptr) {
+  try {
+    if (eptr) {
+      std::rethrow_exception(eptr);
+    }
+  } catch(const std::exception& e) {
+    std::cout << "Caught exception: " << e.what() << std::endl;
+  }
+}
+
 void threadtoppic::run() {
   std::sort(spec_file_lst_.begin(), spec_file_lst_.end());
 
-  toppic::TopPICProgress_multi_file(arguments_, spec_file_lst_);
+  try {
+    toppic::TopPICProgress_multi_file(arguments_, spec_file_lst_);
+  }
+  catch (...) {
+    std::exception_ptr eptr = std::current_exception();
+    handle_eptr(eptr);
+  }
 }
