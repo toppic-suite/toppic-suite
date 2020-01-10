@@ -195,16 +195,18 @@ bool copyJsonDir(const std::string &src_name,
       return false;
     }
 
-    for (fs::directory_iterator file(source); file != fs::directory_iterator(); ++file) {
-      fs::path current(file->path());
-      std::string file_name = current.filename().string();
-      std::string id_str = file_name.substr(8, file_name.length() - 3 - 8);
-      //LOG_ERROR(file_name << " " << id_str);
-      int new_id = std::stoi(id_str) + id_base;
-      std::string new_name = "spectrum" + std::to_string(new_id) + ".js";
-      fs::path des_file(des_name + getFileSeparator() + new_name);
-      std::cout << "Copying file: "<< current << "\r";
-      fs::copy_file(current, des_file);
+    for (const auto& source_file : fs::directory_iterator(source)) {
+      if (fs::is_regular_file(source_file)) {
+        fs::path current(source_file.path());
+        std::string file_name = current.filename().string();
+        std::string id_str = file_name.substr(8, file_name.length() - 3 - 8);
+        //LOG_ERROR(file_name << " " << id_str);
+        int new_id = std::stoi(id_str) + id_base;
+        std::string new_name = "spectrum" + std::to_string(new_id) + ".js";
+        fs::path des_file(des_name + getFileSeparator() + new_name);
+        std::cout << "Copying file: "<< current << "\r";
+        fs::copy_file(current, des_file);
+      }
     }
   }
   catch(fs::filesystem_error const & e) {
