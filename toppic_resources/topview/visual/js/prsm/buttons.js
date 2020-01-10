@@ -1,50 +1,82 @@
 /*	On-click Actions to show spectrum graph	*/
 function buttons(){
-	let peakdata = new PeakData();
-	let peakList = peakdata.getPeakData(ms2_data);
-	let envelopList = peakdata.getEnvelopeData(ms2_data);
-	let ms1peakList = peakdata.getPeakData(ms1_data);
-	let ms1envelopList = peakdata.getEnvelopeData(ms1_data);
 	/*	Invocation on click of Mono M/z at the table	*/
 	$( ".peakRows" ).click(function() {
-		document.getElementById("ms2svg").style.display = "block";
-		document.getElementById("show_spectrum").innerHTML = "Hide Spectrum";
-		// document.getElementById("download_spectrum").style.display = "block";
+		document.getElementById("ms1svg").style.display = "block";
 		document.getElementById("spectrum_help").style.display = "block";
 		/*	get Mono M/z value till 3 decimal values	*/
-		this.peakValue = parseFloat(this.innerHTML).toFixed(3) ;
-		var spectrumGraph = addSpectrum("ms2svg",peakList,envelopList,this.peakValue);
-		//var spectrumGraph = addSpectrum(this.peakValue);
+		let peak_value = parseFloat(this.innerHTML).toFixed(3) ;
+    ms2_graph.redraw(peak_value);
 	});
 	/*	Invocation on click of show spectrum button		*/
-	$("#show_spectrum").click(function() {
+  /*
+	$("#show_ms1_spectrum" ).click(function() {
+		$("#show_ms2_spectrum" ).text("Show Ms2");
+
+		let peak_data = new PeakData();
+    let ms1_peak_list = peak_data.getPeakData(ms1_data);
+		let ms1_envelope_list = peak_data.getEnvelopeData(ms1_data);
+		ms1_graph = addSpectrum("ms1svg", ms1_peak_list,
+		  								ms1_envelope_list,null);
+		  
+		 if($.trim($(this).text()) === 'Show Ms1')
+		 {
+			 document.getElementById("ms1svg").style.display = "block";
+			 document.getElementById("spectrum_help").style.display = "block";
+			 //document.getElementById("a_show_spectrum").href = "#"; 
+			 $(this).text('Hide Ms1');
+		 }
+		 else
+		 {
+			 $(this).text('Show Ms1'); 
+			 document.getElementById("ms1svg").style.display = "none";
+			 document.getElementById("spectrum_help").style.display = "none";
+			 //document.getElementById("download_spectrum").style.display = "none";
+			 //document.getElementById("spectrum_help").style.display = "none";
+		 }
+	});
+  */
+	$("#show_ms2_spectrum" ).click(function() {
+		//$("#show_ms1_spectrum" ).text("Show Ms1");
+
+    /*
+		let peak_data = new PeakData();
+    let ms1_peak_list = peak_data.getPeakData(ms2_data);
+		let ms1_envelope_list = peak_data.getEnvelopeData(ms2_data);
+		ms1_graph = addSpectrum("ms1svg", ms1_peak_list,
+		  								ms1_envelope_list,null);
+                      */
+		 
 		 if($.trim($(this).text()) === 'Show Spectrum')
 		 {
-			 document.getElementById("ms2svg").style.display = "block";
-			//  document.getElementById("download_spectrum").style.display = "block";
+			 document.getElementById("ms1svg").style.display = "block";
 			 document.getElementById("spectrum_help").style.display = "block";
-			 document.getElementById("a_show_spectrum").href = "#"; 
+			 //document.getElementById("a_show_spectrum").href = "#"; 
 			 $(this).text('Hide Spectrum');
 		 }
 		 else
 		 {
 			 $(this).text('Show Spectrum'); 
-			 document.getElementById("ms2svg").style.display = "none";
-			//  document.getElementById("a_show_spectrum").href = "#";
-			 document.getElementById("download_spectrum").style.display = "none";
-			document.getElementById("spectrum_help").style.display = "none";
+			 document.getElementById("ms1svg").style.display = "none";
+			 document.getElementById("spectrum_help").style.display = "none";
+			 //document.getElementById("download_spectrum").style.display = "none";
+			 //document.getElementById("spectrum_help").style.display = "none";
 		 }
-		 this.peakValue = null ;
-		 var spectrumGraph = addSpectrum("ms2svg",peakList,envelopList,null);
-		 //var spectrumGraph = addSpectrum(this.peakValue);
-	});
-	$("#download_spectrum").click(function(){
-		let svg_element = d3.selectAll("#ms2svg").node();
-			svg2svg(svg_element);
 	});
 	
+
 	$("#precursormz").click(function(){
-		let value = $(this).html();
-		var spectrumGraph = addSpectrum("popupspectrum",ms1peakList,ms1envelopList,value);
+		let prec_mz = $("#precursormz").html();
+    ms1_graph.redraw(prec_mz);
+    $("#spectrumpop").draggable({
+      appendTo: "body"
+    });
 	});
+
+	$("#spectrum_help").click(function(){
+    $("#spectrumHelp").draggable({
+      appendTo: "body"
+    });
+	});
+
 }

@@ -1,7 +1,7 @@
 <html>
 <head>
 <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>spectrum</title>
+<title>Visual inspection</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" type="text/css" href="../css/lib/jquery.dataTables.css"/>
 <link rel="stylesheet" type="text/css" href="../css/lib/bootstrap.min.css">
@@ -12,6 +12,7 @@
 
 <script type="text/javascript" src="../js/lib/popper.min.js"></script>
 <script type="text/javascript" src="../js/lib/jQuery_3_4.js"></script>
+<script type="text/javascript" src="../js/lib/jQuery-ui_1_11_4.min.js"></script>
 <script type="text/javascript" src="../js/lib/jquery.dataTables.js"></script>
 <script src="../js/lib/d3/d3.js"></script>
 <script src="../js/lib/bootstrap/bootstrap.min.js" ></script>
@@ -20,6 +21,7 @@
 <script src="js/UI_helpers/onclickandeventhandler.js" ></script>
 <script src="js/UI_helpers/getmasstableofselectedions.js" ></script>
 <script src="js/UI_helpers/constants.js" ></script>
+<script src="js/UI_helpers/parseData.js" ></script>
 
 <script src="../js/spectrum_graph/invokespectrum.js" ></script>
 <script src="../js/spectrum_graph/spectrumgraph.js" ></script>
@@ -51,18 +53,29 @@
 <!--Set Data to HTML-->
 <script src="js/UI_helpers/setvaluestohtml.js" ></script>
 
+<!--check checkboxes that has ions in the data-->
+<script src="js/UI_helpers/checkIonCheckbox.js" ></script>
+
 <!--draw nav bar-->
 <script src="../visual/js/util/navBar.js" ></script>
 
 
 
 <script>
+ // define global variable ms2_graph
+ var ms2_graph; 
+
  $(document).ready(function(){
-	var peakAndIntensityList = JSON.parse(window.localStorage.getItem('peakAndIntensityList'));
+	/*var peakAndIntensityList = JSON.parse(window.localStorage.getItem('peakAndIntensityList'));
 	var massAndIntensityList = JSON.parse(window.localStorage.getItem('massAndIntensityList'));
 	var sequence = JSON.parse(window.localStorage.getItem('sequence'));
 	var l_fixedPtmList = JSON.parse(window.localStorage.getItem('fixedPtmList'));
-
+	*/
+	var peakAndIntensityList = parsePeakMass('peakAndIntensityList');
+	var massAndIntensityList = parsePeakMass('massAndIntensityList');
+	var sequence = parseSeq('sequence');
+	var l_fixedPtmList = parsePTM('fixedPtmList');
+	
 	if(peakAndIntensityList != null && massAndIntensityList != null
 		&& sequence != null)
 	{	
@@ -72,8 +85,21 @@
 		SetValuesToHtmlObj.setDataToSequence();
 		SetValuesToHtmlObj.setFixedMasses();
 	}
+
+	//set the checkbox based on the ion type used in the data, which is stored in local storage
+	let ionType = window.localStorage.getItem('ionType'); 
+	setIonCheckbox(ionType);
+
 	onLoadOfHTML();
-	localStorage.clear();
+  localStorage.clear();
+  
+  //ion type data needs to be preserved because it is recorded only once when the prsm.html opens. 
+  //Without this line it is going to break when the user tries to open inspect window again after closing.
+  localStorage.setItem('ionType', ionType); 
+  
+  $("#helpModal").draggable({
+    appendTo: "body"
+  });
 });
 </script>
 <style>
@@ -85,16 +111,22 @@
 <div class="container">
 	<div class="flex-rectangle">
 		<div class="row">
-			<div class="col-md-4 col-lg-4">
-				<h5>Peaks <img src="images/info.png" id="peakintensityinfo" alt="nfo"></h5>
+			<div class="col-md-3 col-lg-3">
+				<!--<h5>Peaks <img src="images/info.png" id="peakintensityinfo"
+            alt="nfo"></h5>-->
+				<h5>Peaks</h5>
 				<textarea id="peakdata" class="form-control col-xs-12" rows="10" cols="50"></textarea>
 			</div>
 			<div class="col-md-3 col-lg-3">
-				<h5>Masses & intensities <img src="images/info.png" id="massintensityinfo" alt="info"></h5>
+				<!--<h5>Masses & intensities <img src="images/info.png"
+            id="massintensityinfo" alt="info"></h5> -->
+        <h5>Masses & intensities </h5>
 				<textarea id="data" class="form-control col-xs-12" rows="10" cols="50"></textarea>
 			</div>
 			<div class="col-md-3 col-lg-3">
-				<h5>Ion types <img src="images/info.png" id="ionfragmentinfo" alt="info"></h5>
+				<!--<h5>Ion types <img src="images/info.png" id="ionfragmentinfo"
+            alt="info"></h5> -->
+        <h5>Ion types</h5>
 				<table class="table table-sm table-bordered ionfragments">
 				<tbody>
 					<tr>
@@ -113,7 +145,7 @@
 					</tr>
 					<tr>
 						<td><div class="custom-control custom-checkbox">
-							<input type="checkbox" class="custom-control-input" name="nterminus" value="0" id="b" checked>
+							<input type="checkbox" class="custom-control-input" name="nterminus" value="0" id="b">
 							<label class="custom-control-label" for="b" >b</label>
 							</div></td>
 						<td><div class="custom-control custom-checkbox">
@@ -155,7 +187,7 @@
 					</tr>
 					<tr>
 						<td><div class="custom-control custom-checkbox">
-							<input type="checkbox" class="custom-control-input" name="cterminus" value="18.0106" id="y" checked>
+							<input type="checkbox" class="custom-control-input" name="cterminus" value="18.0106" id="y">
 							<label class="custom-control-label" for="y" >y</label>
 							</div></td>
 						<td><div class="custom-control custom-checkbox">
@@ -198,8 +230,10 @@
 				</tbody>
 				</table>
 			</div>
-			<div class="col-md-2 col-lg-2">
-					<h5>Fixed PTMs <img src="images/info.png" id="fixedptminfo" alt="info"></h5>
+			<div class="col-md-3 col-lg-3">
+					<!--<h5>Fixed PTMs <img src="images/info.png" id="fixedptminfo"
+              alt="info"></h5>-->
+          <h5>Fixed PTMs</h5>
 				<div class="fixedptmslist">
 				<select class="browser-default custom-select" id="dropdownMenuLink">
 				</select>	
@@ -215,29 +249,49 @@
 			</div>
 		</div>
 		<div class="row">
-			<h5>&nbsp;&nbsp;&nbsp;Protein sequence <img src="images/info.png" id="sequenceinfo" alt="info"></h5>
+			<!--<h5>&nbsp;&nbsp;&nbsp;Protein sequence <img src="images/info.png"
+          id="sequenceinfo" alt="info"></h5>-->
+			<h5>&nbsp;&nbsp;&nbsp;Protein sequence</h5>
 		</div>
 		<div class="row">
-			<div class="col-8">
+			<div class="col-md-9 col-lg-9">
 					<textarea id="sequencedata" class="form-control col-xs-8"></textarea>
 			</div>
-			<div class="col-4">
-				<form class="form-inline float-sm-right error_input">
-					<select class = "form-control error_dropdown" id="error_dropdown">
-					<option value="masserror">Mass error</option>
-					<option value="ppmerror">PPM error</option>
-					</select>&nbsp;&nbsp;
-					<input class="form-control" type="text" id="errorval" /> &nbsp;&nbsp;
-					<h6><text  class="form-group" id="errorunit">Da&nbsp;&nbsp;</text></h6>
-					<button id="submit" type="button" class="btn btn-primary form-group">submit</button>
-				</form>
+			<div class="col-md-3 col-lg-3">
+        <!--<form class="form-inline float-sm-right error_input"> -->
+        <table>
+          <tr>
+            <td>
+              <select class = "form-control error_dropdown" id="error_dropdown">
+                <option value="masserror">Mass error</option>
+                <option value="ppmerror">PPM error</option>
+              </select>&nbsp;&nbsp;
+            </td>
+            <td>
+              <input class="form-control" type="text" id="errorval" /> &nbsp;&nbsp;
+            </td>
+            <td>
+              <h6><text  class="form-group" id="errorunit">Da&nbsp;&nbsp;</text></h6>
+            </td>
+            <tr>
+            <tr>
+            <td>
+              <button id="help" type="button" style="width:80%"
+                      data-toggle="modal" data-target="#helpModal" class="btn btn-primary btn-sm">Help</button>
+            </td>
+            <td colspan=2>
+              <button id="submit" type="button" style="width:80%" class="btn btn-primary btn-sm">Submit</button>
+            </td>
+          </tr>
+        </table>
+          <!--</form> -->
 			</div>
 		</div>
 	</div> 
 	<br>
 		<div class="row">
 			<div class="col-6">
-				<h6 id="totalseqmass_h6" style="display:none"><text>Molecular Mass:&nbsp;</text><text id="totalmass">0</text></h6>
+				<h6 id="totalseqmass_h6" style="display:none"><text>Protein molecular mass:&nbsp;</text><text id="totalmass">0</text></h6>
 			</div>
 			<div class="col-6">
 					<div class="dropdown dropleft float-right">
@@ -284,18 +338,76 @@
 	</div>
 	<br>
 	<div class="row">
-			<h4 id="h_fragmentedtable" style="display:none">Theoritical Fragment Masses</h4>
+			<h4 id="h_fragmentedtable" style="display:none">Theoretical fragment masses</h4>
 		<div class="col-12" >
 			<div id="divselectediontablecontainer" >
 			</div>
 		</div>
 	</div>
 </div>
-<br>
+
+
 <footer class="page-footer font-small blue">
 	<div class="footer-copyright text-center py-3">© 2019 Copyright: The Trustees of 
 		<a href="https://www.iu.edu/" target="#">Indiana University</a>
 	</div>
 </footer>
+
+<div class="modal" id="helpModal" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content" id ="help-window">
+      <div class="modal-header ">
+        <h2>Help</h2>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body" >
+        <h4>Peaks</h4>
+        <p>The text area contains a list of peaks, each of which is represented
+        by an m/z value and an intensity separated by a space. 
+        The user can copy, paste, and edit the list as text. 
+        </p>
+        <h4>Masses and intensities</h4>
+        <p>The text area contains a list of deconvoluted masses, each of which
+        is represented a monoisotopic mass, an intensity, and a charge state
+        separated by spaces.  
+        The user can copy, paste, and edit the list as text. 
+        If the intensity is unknown, a default value 1 can be used. For example, 
+        the user can add a monoisotopic mass 10000 Da with charge state 10 by inserting 
+        a line "10000 1 10" into the text. 
+        </p>
+        <h4>Fixed PTMs</h4>
+        <p>To add a fixed PTM, select "C:57.0271464" or "C:58.005479" and click the
+        "+" button.
+        </p>
+        <h4>Protein sequence</h4>
+        <p>The text area contains a protein sequence, which the user can edit 
+        as text. A mass shift or modification on the protein is represented by a
+        number enclosed by brackets. For example, 
+        the user can insert
+        "[79.9663]" into a sequence 'MPRSLKKGPF' to obtained a modified protein
+        "MPRS[79.9663]LKKGPF", 
+        which has a phosphorylation site on the 4th amino acid. 
+        </p>
+        <p>After the user click the "Submit" button, an annotated protein
+        sequence will be shown. Alternatively, the user can click the amino
+        acids in the annotated protein sequence to add mass shifts. 
+        </p>
+      </div> 
+    </div>
+  </div>
+</div>
+<div class="modal" id="errorAlertModal" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header ">
+        <h2>Error!</h2>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body" >
+        <h4>Invalid amino acid in the protein sequence.</h4>
+      </div> 
+    </div>
+  </div>
+</div>
 </body>
 </html>
