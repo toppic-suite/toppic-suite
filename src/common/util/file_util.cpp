@@ -187,21 +187,15 @@ bool copyDir(const std::string &src_name,
 bool copyJsonDir(const std::string &src_name,
                  const std::string &des_name,
                  int id_base) {
-  fs::path source(src_name);
-  fs::path destination(des_name);
   try {
+    fs::path source(src_name);
+    fs::path destination(des_name);
     if (!fs::exists(source) || !fs::is_directory(source)) {
       LOG_ERROR("The source folder " << source.string() << " does not exist!");
       return false;
     }
-  }
-  catch(fs::filesystem_error const & e) {
-    LOG_ERROR(e.what());
-    return false;
-  }
 
-  for (fs::directory_iterator file(source); file != fs::directory_iterator(); ++file) {
-    try {
+    for (fs::directory_iterator file(source); file != fs::directory_iterator(); ++file) {
       fs::path current(file->path());
       std::string file_name = current.filename().string();
       std::string id_str = file_name.substr(8, file_name.length() - 3 - 8);
@@ -212,9 +206,10 @@ bool copyJsonDir(const std::string &src_name,
       std::cout << "Copying file: "<< current << "\r";
       fs::copy_file(current, des_file);
     }
-    catch(fs::filesystem_error const & e) {
-      LOG_ERROR(e.what());
-    }
+  }
+  catch(fs::filesystem_error const & e) {
+    LOG_ERROR(e.what());
+    return false;
   }
   std::cout << "\n";
   return true;
