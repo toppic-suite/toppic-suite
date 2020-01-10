@@ -1,37 +1,50 @@
+<<<<<<< HEAD
 var currentMinXTickVal = 0 ;
 var currentMaxXTickVal = 0 ;
+=======
+>>>>>>> release_1.3.1
 const circlesPerRange = 100;
 const peaksPerRange = 100;
 SpectrumGraph = function(svgId,spectrumParameters,peakData){
 	this.svg = d3.select("body").select(svgId);
+  this.id = svgId;
+  this.para = spectrumParameters;
+  this.data = peakData;
+  let graph = this;
+
+  this.redraw = function (mono_mz) {
+    console.log("id", this.id);
+    this.para = compSpectrumParameters(this.data.peak_list, this.data.envelope_list, mono_mz);
+	  drawSpectrum(this.id, this.para, this.data);
+  }
 
   this.zoomed = function () {
     let transform = d3.event.transform;
-    let distance = transform.x - spectrumParameters.specX;
-	let ratio = transform.k / spectrumParameters.specScale;
-    spectrumParameters.specX = transform.x;
-    spectrumParameters.specScale = transform.k;
+    //let distance = transform.x - spectrumParameters.specX;
+    let distance = transform.x - graph.para.specX;
+	  let ratio = transform.k / graph.para.specScale;
+    graph.para.specX = transform.x;
+    graph.para.specScale = transform.k;
     let mousePos = d3.mouse(this);
-    if (ratio == 1) 
-    {
-      	spectrumParameters.drag(distance);
+    if (ratio == 1) {
+      graph.para.drag(distance);
     }
-    else 
-    {
-		spectrumParameters.zoom(mousePos[0], mousePos[1], ratio);
+    else {
+		  graph.para.zoom(mousePos[0], mousePos[1], ratio);
     }
-	drawSpectrum(svgId,spectrumParameters,peakData);
+	  drawSpectrum(graph.id, graph.para, graph.data);
   }
 
   this.zoom = d3.zoom()
     .on("zoom", this.zoomed);
-	this.svg.attr("viewBox", "0 0 "+spectrumParameters.svgWidth+" "+spectrumParameters.svgHeight)
+
+	this.svg.attr("viewBox", "0 0 "+ graph.para.svgWidth+" "+ graph.para.svgHeight)
 					.attr("width", "100%")
 					.attr("height", "100%")
 					.call(this.zoom);
 	this.svg.call(this.zoom.transform, d3.zoomIdentity);
 												
-  drawSpectrum(svgId,spectrumParameters, peakData);
+  drawSpectrum(this.id, this.para, this.data); 
 }
 
 drawTicks = function(svg,spectrumParameters,spectrumgraph){
@@ -159,6 +172,7 @@ addDatatoAxis = function(svg,spectrumParameters){
 		if(data <= 1 && data != 0) data = data.toFixed(1);
 		tickHeight = i*tickHeight * spectrumParameters.dataMaxInte /100;
 		tickHeight = parseFloat(spectrumParameters.getPeakYPos(tickHeight)) ;
+
 		let y =  tickHeight;
 		if(y < spectrumParameters.padding.head ) y =  -1000;
 		if(!isNaN(y))

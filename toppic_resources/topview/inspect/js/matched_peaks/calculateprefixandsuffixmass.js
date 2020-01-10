@@ -1,5 +1,6 @@
 calculatePrefixAndSuffixMass = function(){
 	const WATER = "H2O";
+	let protSequence = '';
 	
 	this.getPrefixMassList = function(sequence,massShiftList,massShift_in){
 		let seqln = sequence.length;
@@ -12,28 +13,41 @@ calculatePrefixAndSuffixMass = function(){
 			for(let i=0;i<seqln;i++)
 			{
 				// Get Calculated AminoAcidDistribution from aminoAcidDistributuion.js 
-				let AcidMass = getAminoAcidDistribution(sequence[i])[0].mass;
-				if(i == 0)
-				{
-					// Add 1 to i as the seq start from 0 but the peak id starts from 1
-					if(shiftListln != 0)
+				//evaluate the return value for the case when the user enters wrong character by mistake
+				let AcidMass;
+				
+				try{
+					AcidMass = getAminoAcidDistribution(sequence[i])[0].mass;
+
+					if(i == 0)
 					{
-						AcidMass = this.addMassShift(i,massShiftList,AcidMass);
+						// Add 1 to i as the seq start from 0 but the peak id starts from 1
+						if(shiftListln != 0)
+						{
+							AcidMass = this.addMassShift(i,massShiftList,AcidMass);
+						}
+						let tempObj = {position:(i+1),mass:AcidMass} ;
+						prefixMassList[i] = tempObj;
 					}
-					let tempObj = {position:(i+1),mass:AcidMass} ;
-					prefixMassList[i] = tempObj;
-				}
-				else
-				{
-					let mass = prefixMassList[i-1].mass + AcidMass;
-					if(shiftListln != 0)
+					else
 					{
-						mass = this.addMassShift(i,massShiftList,mass);
+						let mass = prefixMassList[i-1].mass + AcidMass;
+						if(shiftListln != 0)
+						{
+							mass = this.addMassShift(i,massShiftList,mass);
+						}
+						// Add 1 to i as the seq start from 0 but the peak id starts from 1
+						let tempObj = {position:(i+1),mass:mass};
+						prefixMassList[i] = tempObj;
 					}
-					// Add 1 to i as the seq start from 0 but the peak id starts from 1
-					let tempObj = {position:(i+1),mass:mass};
-					prefixMassList[i] = tempObj;
 				}
+				catch(error){
+					//invalid character entered for protein sequence
+					//window.alert("Error! Invalid amino acid in the sequence.")
+					$('#errorAlertModal').modal('show');
+					break;
+				}
+
 			}
 			// Adding Mass Shift based on selection of Ion
 			// let utilFunctionsObj = new utilFunctions();
@@ -42,6 +56,8 @@ calculatePrefixAndSuffixMass = function(){
 			{
 				prefixMassList[j].mass = prefixMassList[j].mass + massShift_in;
 			}
+		
+			
 			return prefixMassList;
 		}
 		return emptyMassList;
@@ -109,6 +125,7 @@ calculatePrefixAndSuffixMass = function(){
 			mass = mass + massShiftList[j].mass;
 		}
 		mass = mass + this.addWaterMass();
+
 		return mass ;
 	}
 	// Function to add mass shift

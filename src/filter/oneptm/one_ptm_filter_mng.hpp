@@ -15,7 +15,7 @@
 #ifndef TOPPIC_FILTER_ONE_PTM_ONE_PTM_FILTER_MNG_HPP_
 #define TOPPIC_FILTER_ONE_PTM_ONE_PTM_FILTER_MNG_HPP_
 
-#include <atomic>
+#include <boost/thread.hpp>
 
 #include "prsm/prsm_para.hpp"
 
@@ -49,8 +49,11 @@ class OnePtmFilterMng {
 
   int var_num_;
 
-  std::atomic<int> cnt_;
   int n_spec_block_ = 0;
+
+  boost::mutex mutex_;
+
+  std::vector<int> cnts_;
 };
 
 typedef std::shared_ptr<OnePtmFilterMng> OnePtmFilterMngPtr;

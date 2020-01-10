@@ -14,11 +14,13 @@ class commonFixedPtms {
 			option.innerHTML = value;
 			dropDownMenuLink.appendChild(option);
 		})
-		let value = "other";
+    /*
+		let value = "Other";
 		let option = document.createElement("option");
 		option.setAttribute("value",value);
 		option.innerHTML = value;
 		dropDownMenuLink.appendChild(option);
+    */
 		$('.addnewrow').click(function(){
 			let fixedptm = document.getElementById("dropdownMenuLink").value
 			if(fixedptm != "fixed_ptm")

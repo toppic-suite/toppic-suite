@@ -7,19 +7,21 @@ class SetValuesToHtml{
     }
     setDataToPeakAndIntensity(){
         let peakdata = $("#peakdata");
-        peakdata.val(this.peakAndIntensityList[0]);
+        peakdata.val(this.peakAndIntensityList);
+        /*peakdata.val(this.peakAndIntensityList[0]);
         for(let i=1;i<this.peakAndIntensityList.length;i++)
         {
             peakdata.val( peakdata.val() + "\n" + this.peakAndIntensityList[i]);
-        }
+        }*/
     }
     setDataToMassAndIntensity(){
         let massdata = $("#data");
-        massdata.val(this.massAndIntensityList[0]);
+        massdata.val(this.massAndIntensityList);
+        /*massdata.val(this.massAndIntensityList[0]);
         for(let i=1;i<this.massAndIntensityList.length;i++)
         {
             massdata.val( massdata.val()+"\n"+this.massAndIntensityList[i]);
-        }
+        }*/
     }
     setDataToSequence(){
         $("#sequencedata").val(this.sequence);

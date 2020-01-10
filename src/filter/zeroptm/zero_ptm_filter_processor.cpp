@@ -33,8 +33,8 @@
 namespace toppic {
 
 inline void filterBlock(const ProteoformPtrVec & raw_forms,
-                        const std::string & block_str,
-                        ZeroPtmFilterMngPtr mng_ptr) {
+                        int block_idx, ZeroPtmFilterMngPtr mng_ptr) { 
+  std::string block_str = str_util::toString(block_idx);
   int group_spec_num = mng_ptr->prsm_para_ptr_->getGroupSpecNum();
   MassZeroPtmFilterPtr filter_ptr = std::make_shared<MassZeroPtmFilter>(raw_forms, mng_ptr);
   PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
@@ -60,29 +60,35 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
         writers.getInternalWriterPtr()->write(filter_ptr->getInternalMatchPtrs());
       }
     }
-    mng_ptr->cnt_++;
-    double perc = mng_ptr->cnt_ * 100.0 / mng_ptr->n_spec_block_;
+    mng_ptr->cnts_[block_idx] = mng_ptr->cnts_[block_idx] + 1;
+    int cnt_sum = 0;
+    for (size_t i = 0; i < mng_ptr->cnts_.size(); i++) {
+      cnt_sum = cnt_sum + mng_ptr->cnts_[i];
+    }
+    double perc = cnt_sum * 100.0 / mng_ptr->n_spec_block_;
     std::stringstream msg;
     msg << std::flush << "Non PTM filtering - processing " << std::setprecision(3) <<  perc << "%.    \r";
+    mng_ptr->mutex_.lock();
     std::cout << msg.str();
+    mng_ptr->mutex_.unlock();
     spec_set_vec = reader.getNextSpectrumSet(sp_para_ptr);
   }
   reader.close();
   writers.close();
 }
 
-std::function<void()> geneTask(DbBlockPtr block_ptr, 
+std::function<void()> geneTask(int block_idx, 
                                ZeroPtmFilterMngPtr mng_ptr) {
-  return[block_ptr, mng_ptr] () {
+  return[block_idx, mng_ptr] () {
     PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
     std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
     std::string db_block_file_name = prsm_para_ptr->getSearchDbFileName()
-        + "_" + str_util::toString(block_ptr->getBlockIdx());
+        + "_" + str_util::toString(block_idx);
     ProteoformPtrVec raw_forms
         = proteoform_factory::readFastaToProteoformPtrVec(db_block_file_name,
                                                           prsm_para_ptr->getFixModPtrVec());
-    std::string block_str = str_util::toString(block_ptr->getBlockIdx());
-    filterBlock(raw_forms, block_str, mng_ptr);
+
+    filterBlock(raw_forms, block_idx, mng_ptr);
   };
 }
 
@@ -91,20 +97,19 @@ void ZeroPtmFilterProcessor::process() {
   std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
   DbBlockPtrVec db_block_ptr_vec = DbBlock::readDbBlockIndex(db_file_name);
 
-  // cnt_ is thread_safe 
-  mng_ptr_->cnt_ = 0;
   int spec_num = msalign_util::getSpNum(prsm_para_ptr->getSpectrumFileName());
   // n_spec_block = spec_num * block_num
   mng_ptr_->n_spec_block_ = spec_num * db_block_ptr_vec.size();
   SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(mng_ptr_->thread_num_);
   int block_num = db_block_ptr_vec.size();
+  mng_ptr_->cnts_.resize(block_num, 0);
   //logger::setLogLevel(2);
   LOG_DEBUG("thread num " << mng_ptr_->thread_num_);
   for (int i = 0; i < block_num; i++) {
     while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ * 2) {
       boost::this_thread::sleep(boost::posix_time::milliseconds(100));
     }
-    pool_ptr->Enqueue(geneTask(db_block_ptr_vec[i], mng_ptr_));
+    pool_ptr->Enqueue(geneTask(db_block_ptr_vec[i]->getBlockIdx(), mng_ptr_));
   }
   pool_ptr->ShutDown();
   std::cout << std::endl;
