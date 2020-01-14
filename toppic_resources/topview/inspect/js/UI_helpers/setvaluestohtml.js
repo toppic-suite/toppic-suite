@@ -1,9 +1,10 @@
 class SetValuesToHtml{
-    constructor(peakAndIntensityList,massAndIntensityList,sequence,l_fixedPtmList){
+    constructor(peakAndIntensityList,massAndIntensityList,sequence,l_fixedPtmList,unknownMassShiftList){
         this.peakAndIntensityList = peakAndIntensityList;
         this.massAndIntensityList = massAndIntensityList;
         this.sequence = sequence;
         this.fixedPtmList = l_fixedPtmList;
+        this.unknownMassShiftList = unknownMassShiftList ;
     }
     setDataToPeakAndIntensity(){
         let peakdata = $("#peakdata");
@@ -24,7 +25,9 @@ class SetValuesToHtml{
         }*/
     }
     setDataToSequence(){
-        $("#sequencedata").val(this.sequence);
+        let MassShiftsObj = new MassShifts();
+        let modSequence = MassShiftsObj.formSequence(this.sequence,this.unknownMassShiftList);
+        $("#sequencedata").val(modSequence);
     }
     setFixedMasses(){
         if(this.fixedPtmList.length !=0)
@@ -43,8 +46,10 @@ class SetValuesToHtml{
                     }
                 }
             }
-        }
-        
+        } 
+    }
+    setUnknowMasses(){
+
     }
     
 }

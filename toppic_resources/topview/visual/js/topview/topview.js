@@ -7,11 +7,14 @@ function onclickTopView(){
     let massAndIntensityList = getMassAndIntensityData();
     let sequence = getSequence();
     let fixedPtmList = getFixedPTMMassList();
+    let unknownMassShiftList = getUnknownMassList();
+    console.log("unknownMassShiftList : ", unknownMassShiftList);
 
     window.localStorage.setItem('peakAndIntensityList',  JSON.stringify(peakAndIntensityList));
     window.localStorage.setItem('massAndIntensityList',  JSON.stringify(massAndIntensityList));
     window.localStorage.setItem('sequence',  JSON.stringify(sequence));
     window.localStorage.setItem('fixedPtmList', JSON.stringify(fixedPtmList));
+    window.localStorage.setItem('unknownMassShiftList', JSON.stringify(unknownMassShiftList));
 
     window.open("../inspect/spectrum.html");
 }
@@ -82,4 +85,31 @@ function getFixedPTMMassList()
         }
     }
     return fixedPTMList;
+}
+function getUnknownMassList()
+{
+    let unknownMassShiftList = [];
+    let l_prsm = prsm_data;
+    if(l_prsm.prsm.annotated_protein.annotation.hasOwnProperty('mass_shift'))
+	{
+        let mass_shift = l_prsm.prsm.annotated_protein.annotation.mass_shift ;
+			if(Array.isArray(mass_shift))
+			{
+				let len = mass_shift.length;
+				mass_shift.forEach(function(each_mass_shift, i){
+                    // Removing -1 as the sequece in inspect elements takes from 0
+                    let position = parseInt(each_mass_shift.left_position) - 1 ;
+                    let mass = parseFloat(each_mass_shift.anno);
+					unknownMassShiftList.push({"position":position,"mass":mass})
+				})
+			}
+			else if(mass_shift.shift_type == "unexpected")
+			{
+                 // Removing -1 as the sequece in inspect elements takes from 0
+                let position = parseInt(mass_shift.left_position) - 1;
+                let mass = parseFloat(mass_shift.anno);
+                unknownMassShiftList.push({"position":position,"mass":mass})
+			}
+    }
+    return unknownMassShiftList;
 }
