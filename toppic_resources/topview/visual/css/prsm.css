@@ -165,4 +165,7 @@ svg.l_popup_svg{
 #save-image-modal{
 	margin-top:20%;
 }
+.prsmgraphdownload .dropdown-menu{
+  min-width:7.7rem !important;
+}
 

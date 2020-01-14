@@ -3,6 +3,7 @@
 <head>
 <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Protein-Spectrum-Match for Spectrum</title>
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous"></head>
 <link rel="stylesheet" type="text/css" href="../css/lib/jquery.dataTables.css">
 <link rel="stylesheet" type="text/css" href="../css/lib/bootstrap.min.css">
 <link rel="stylesheet" type="text/css" href="../css/lib/nav_bar.css">
@@ -128,7 +129,7 @@ $(document).ready(function(){
         let ms2_envelope_list = peak_data.getEnvelopeData(ms2_data);
         console.log("peak list: ", ms2_peak_list.length);
         /*	get Mono M/z value till 3 decimal values	*/
-        ms2_graph = addSpectrum("ms2svg", ms2_peak_list, ms2_envelope_list, null);
+        ms2_graph = addSpectrum("ms1svg", ms2_peak_list, ms2_envelope_list, null);
 
         let ms1_peak_list = peak_data.getPeakData(ms1_data);
         let ms1_envelope_list = peak_data.getEnvelopeData(ms1_data);
@@ -211,10 +212,10 @@ $(document).ready(function(){
 </tr>
 </table>
 </div>
-<svg id = "ms2svg" style = "background-color:white;display: none;"></svg>
+<svg id = "ms1svg" style = "background-color:white;display: none;"></svg>
 <table>
 <tr>
-	<td width = "70%">
+	<td width = "55%">
 		<div class = "peaks" style="font-size:16px;">
 		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a id = "all_peak_count" href="#spectrum" onclick="showAllPeaks();"  >All peaks </a>
 		&nbsp;&nbsp;<a id = "matched_peak_count" href="#spectrum" onclick="showMatchedPeaks();">Matched peaks </a>
@@ -225,6 +226,21 @@ $(document).ready(function(){
 		<a id = "a_spectrum_help" href="#!">
 			<button type ="button" id = "spectrum_help" class="btn btn-primary btn-sm" style = "display:none;width:80%" data-toggle="modal" data-target="#spectrumHelp">Help</button>
 		</a>
+	</td>
+	<td width = "15%" align = "right">
+		<div class="prsmgraphdownload dropdown dropup">
+			<button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" id="graph_download" style="display:none">
+				Download
+			</button>
+			<div class="dropdown-menu">
+			<a class="dropdown-item" href="#!" id="graph_download_png">
+				<i class="fas fa-download"></i><span>&nbsp;&nbsp;PNG</span>
+			</a>
+			<a class="dropdown-item" href="#!" id="graph_download_svg">
+				<i class="fas fa-download"></i><span>&nbsp;&nbsp;SVG</span>
+			</a>
+			</div>
+	  </div>
 	</td>
 	<td width = "15%" align = "right">
 		<a id = "a_show_spectrum" href="#!"><button type ="button"  id = "show_ms2_spectrum" class="btn btn-primary btn-sm" style="width:80%">Show Spectrum</button></a>
@@ -318,8 +334,8 @@ $(document).ready(function(){
       </div>
       <div class="modal-footer">
 			<button class="btn btn-primary btn-sm custom "  id="image_help" data-toggle="modal" data-target="#helpModal">Help</button>
-      		<button type="button" class="btn btn-primary btn-sm custom " id = "download_PNG" >Save as PNG</button>
-      		<button type="button" class="btn btn-primary btn-sm custom " id = "download_SVG" >Save as SVG</button>
+      		<button type="button" class="btn btn-primary btn-sm custom " id = "download_PNG" ><i class="fas fa-download"></i><span>&nbsp;&nbsp;PNG</span></button>
+      		<button type="button" class="btn btn-primary btn-sm custom " id = "download_SVG" ><i class="fas fa-download"></i><span>&nbsp;&nbsp;SVG</span></button>
          <button type="button" class="btn btn-primary btn-sm custom " data-dismiss="modal">Close</button>
       </div>
     </div>
@@ -372,6 +388,10 @@ $(document).ready(function(){
 				 <div class="modal-body">
 					 <svg id="popupspectrum" style="background-color:white" ></svg>
 				 </div> 
+				 <div class="modal-footer">
+					  <button type="button" class="btn btn-primary btn-sm custom " id = "download_popup_png" ><i class="fas fa-download"></i><span>&nbsp;&nbsp;PNG</span></button>
+					  <button type="button" class="btn btn-primary btn-sm custom " id = "download_popup_svg" ><i class="fas fa-download"></i><span>&nbsp;&nbsp;SVG</span></button>
+			  </div>
 		  </div>
 		</div>
 	  </div>
