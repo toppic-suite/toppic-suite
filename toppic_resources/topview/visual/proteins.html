@@ -13,6 +13,14 @@
 <script src="js/util/navBar.js"></script>
 <script>
 $(document).ready(function(){
+
+	var vendor = navigator.vendor.split(" ")[0];
+	if(vendor.trim() != "Google")
+	{
+		alert("Looks like you are not using Chrome, this application supports only Chrome");
+	}
+		
+	  
   $(".card-row").css('display','none');
   var x = location.href;
   //var n = x.search("?");
