@@ -75,11 +75,12 @@
 	var massAndIntensityList = parsePeakMass('massAndIntensityList');
 	var sequence = parseSeq('sequence');
 	var l_fixedPtmList = parsePTM('fixedPtmList');
-	
+	let unknownMassShiftList = JSON.parse(window.localStorage.getItem('unknownMassShiftList'));
+	console.log("unknownMassShiftList : ", unknownMassShiftList);
 	if(peakAndIntensityList != null && massAndIntensityList != null
 		&& sequence != null)
 	{	
-		let SetValuesToHtmlObj = new SetValuesToHtml(peakAndIntensityList,massAndIntensityList,sequence,l_fixedPtmList);
+		let SetValuesToHtmlObj = new SetValuesToHtml(peakAndIntensityList,massAndIntensityList,sequence,l_fixedPtmList,unknownMassShiftList);
 		SetValuesToHtmlObj.setDataToPeakAndIntensity();
 		SetValuesToHtmlObj.setDataToMassAndIntensity();
 		SetValuesToHtmlObj.setDataToSequence();
