@@ -228,7 +228,7 @@ drawPeaks = function(svg,spectrumParameters,peakdata){
 }
 addCircles = function(svg,spectrumParameters,peakData){
 	let circles = svg.append("g").attr("id", "circles");
-	let minPercentage = 0;
+	let minPercentage = 0.5;
 	let maxIntensity = spectrumParameters.dataMaxInte ;
 	let limits=[0,0,0,0,0,0,0,0];
 	peakData.envelope_list.forEach(function(envelope_list,i){
@@ -275,6 +275,7 @@ addCircles = function(svg,spectrumParameters,peakData){
 	})
 }
 addLabels = function(svg, spectrumParameters){
+
 	svg.append("text").attr("id","label")
 						.attr("transform","translate(" + (spectrumParameters.svgWidth/2) + "," + (spectrumParameters.svgHeight-spectrumParameters.padding.head) + ")")
 					.attr("fill","black")
@@ -371,7 +372,7 @@ function drawSpectrum(svgId, spectrumParameters, peakData){
 		drawPeaks(svg, spectrumParameters, peakData);
 		addCircles(svg,spectrumParameters,peakData);
 		addLabels(svg, spectrumParameters);
-		SpectrumDownload.addDownloadRect(svgId, spectrumParameters);
+		//SpectrumDownload.addDownloadRect(svgId, spectrumParameters);
 	// }
 //   addDownloadRect(svgId, spectrumParameters);
 }
