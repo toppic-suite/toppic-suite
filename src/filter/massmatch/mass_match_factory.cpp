@@ -106,13 +106,8 @@ inline MassMatchPtr getMassMatchPtr(const ProteoformPtrVec &proteo_ptrs,
 
   LOG_DEBUG("pos 2d ver 1 complete");
   MassMatchPtr index_ptr = std::make_shared<MassMatch>(mass_2d, real_shift_2d, pos_2d,
-                                                       max_proteoform_mass, scale);
-
-
-//to test serialization
-  index_ptr->serializeMassMatch();
-  //mMatch.serializeMassMatch(index_ptr);
-
+                                                       max_proteoform_mass, scale, prm);
+ 
   return index_ptr;
 }
 

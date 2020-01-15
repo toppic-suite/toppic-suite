@@ -17,10 +17,14 @@
 #include <fstream>
 
 #include "common/util/logger.hpp"
+#include "common/util/file_util.hpp"
+
 #include "filter/massmatch/mass_match.hpp"
 
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
+
+#include "console/toppic_argument.hpp"
 
 namespace toppic {
 
@@ -48,31 +52,60 @@ MassMatch::MassMatch(std::vector<std::vector<int>> &mass_2d,
   initIndexes(mass_2d, real_shift_2d, pos_2d);
 
 }
+MassMatch::MassMatch(std::vector<std::vector<int>> &mass_2d,
+                     std::vector<std::vector<double>> &real_shift_2d,
+                     std::vector<std::vector<int>> &pos_2d,
+                     double max_proteoform_mass, double scale, bool prm) {
+  scale_ = scale;
+  LOG_DEBUG("Scale: " << scale_);
+  LOG_DEBUG("Proteoform number: " << mass_2d.size());
 
-void MassMatch::serializeMassMatch(){
-    std::string fileName = std::to_string(this->proteo_num_);
-    //this->proteo_num_vec_.push_back(fileName);
-    std::cout << fileName << std::endl;
+  col_num_ = max_proteoform_mass * scale_;
+  proteo_num_ = real_shift_2d.size();
+  LOG_DEBUG("column number: " << col_num_);
 
-    std::ofstream ofs(fileName + ".txt");
+  LOG_DEBUG("start init");
+  initProteoformBeginEnds(real_shift_2d);
+  LOG_DEBUG("row number: " << row_num_);
 
-    boost::archive::text_oarchive oa(ofs);
-        
-    oa << this;//how to get the object that is calling this method, like this? self?
+  LOG_DEBUG("init indexes");
+  initIndexes(mass_2d, real_shift_2d, pos_2d);
+  prm_ = prm;
 }
+//serialize MassMatch object that calls this method
+void MassMatch::serializeMassMatch(){
 
-void MassMatch::deserializeMassMatch(){
-  //for (size_t v = 0; v < proteo_num_vec_.size(); v++){
+  //currently, file name is idx_ + prm + row number + column number
+  //std::string fileName = "idx_" + std::to_string(this->getPrm()) + std::to_string(this->getRowNum()) + std::to_string(this->getColNum());
+  std::string fileName = this->getFileName() + ".txt";
+  std::string dirName = this -> getDirName();
+  std::ofstream newFile(fileName);
 
-  //}
-  std::string fileName = std::to_string(this -> proteo_num_);
-  try{
-    std::ifstream ifs(fileName + ".txt");
-    boost::archive::text_iarchive ia(ifs);
-    ia >> *this;
-  }catch(std::exception &e){
-    LOG_ERROR("ERROR: Cannot load the file. This match data has not been stored");
+  if(newFile.is_open()){
+    boost::archive::text_oarchive oa(newFile);
+    oa << this;
   }
+
+  newFile.close();
+
+  //file_util::moveFile(fileName, dirName);
+}
+//deserialize MassMatch object that calles this method
+//void MassMatch::deserializeMassMatch(MassMatch **m){
+  void MassMatch::deserializeMassMatch(MassMatch *m){
+  std::string fileName = this->getFileName() + ".txt";
+
+  std::ifstream fileToRead(fileName);
+
+  if (fileToRead.is_open()) {
+    boost::archive::text_iarchive ia(fileToRead);
+    ia >> m;
+    //std::cout << "correct val: " << *m->getColNum() <<std::endl;
+  } 
+  else{}
+
+  fileToRead.close();
+  ;
 }
 
 void MassMatch::initProteoformBeginEnds(std::vector<std::vector<double>> &shift_2d) {
