@@ -19,10 +19,13 @@
 #include "filter/massmatch/mass_match_util.hpp"
 #include "filter/zeroptm/mass_zero_ptm_filter.hpp"
 
+#include "boost/filesystem.hpp"
+#include "common/util/file_util.hpp"
+
 namespace toppic {
 
 MassZeroPtmFilter::MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
-                                     ZeroPtmFilterMngPtr mng_ptr) {
+                                     ZeroPtmFilterMngPtr mng_ptr) {                            
   mng_ptr_ = mng_ptr;
   proteo_ptrs_ = proteo_ptrs;
   LOG_DEBUG("get shifts");
@@ -31,30 +34,116 @@ MassZeroPtmFilter::MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
   std::vector<std::vector<double> > n_term_acet_2d
       = proteoform_util::getNTermAcet2D(proteo_ptrs, mng_ptr->prsm_para_ptr_->getProtModPtrVec());
   LOG_DEBUG("get shifts complete");
-  // N-terminal indexes
-  term_index_ptr_ = MassMatchFactory::getPrmTermMassMatchPtr(proteo_ptrs, shift_2d,
-                                                             mng_ptr->max_proteoform_mass_,
-                                                             mng_ptr->filter_scale_);
-  // Prm indexes
-  diag_index_ptr_ = MassMatchFactory::getPrmDiagMassMatchPtr(proteo_ptrs,
-                                                             mng_ptr->max_proteoform_mass_,
-                                                             mng_ptr->filter_scale_);
-  LOG_DEBUG("diag index");
-  std::vector<std::vector<double> > rev_shift_2d;
-  std::vector<double> shift_1d(1, 0);
-  for (size_t i = 0; i < proteo_ptrs.size(); i++) {
-    rev_shift_2d.push_back(shift_1d);
-  }
-  // C-terminal indexes
-  rev_term_index_ptr_ = MassMatchFactory::getSrmTermMassMatchPtr(proteo_ptrs, rev_shift_2d,
-                                                                 n_term_acet_2d,
-                                                                 mng_ptr->max_proteoform_mass_,
-                                                                 mng_ptr->filter_scale_);
 
-  // To generate SRM indexes, n terminal acetylation shifts are added into the SRM list. 
-  rev_diag_index_ptr_ = MassMatchFactory::getSrmDiagMassMatchPtr(proteo_ptrs, n_term_acet_2d,
-                                                                 mng_ptr->max_proteoform_mass_,
-                                                                 mng_ptr->filter_scale_);
+  //check if the index file folder exists, and the files can be found
+  std::string folderName = file_util::basename(mng_ptr_->prsm_para_ptr_->getSpectrumFileName());
+  folderName = folderName + "_index";
+  
+  if (boost::filesystem::exists("term_index.txt")){
+    std::cout << "loading from index files..." << std::endl;
+    //the index file folder already exists, so run deserialization
+    //MassMatch g;
+    
+    
+    term_index_ptr_ = std::make_shared<MassMatch>();
+    diag_index_ptr_ = std::make_shared<MassMatch>();
+    rev_term_index_ptr_ = std::make_shared<MassMatch>();
+    rev_diag_index_ptr_ = std::make_shared<MassMatch>();
+  
+
+    MassMatch *t_ptr_;
+    MassMatch *d_ptr_;
+    MassMatch *rev_t_ptr_;
+    MassMatch *rev_d_ptr_;
+
+    MassMatch a, b, c, d;
+
+    t_ptr_ = &a;
+    d_ptr_ = &b;
+    rev_t_ptr_ = &c;
+    rev_d_ptr_ = &d;
+
+    term_index_ptr_->setfileName("term_index");
+    diag_index_ptr_->setfileName("diag_index");
+    rev_term_index_ptr_->setfileName("rev_term_index");
+    rev_diag_index_ptr_->setfileName("rev_diag_index");
+
+    term_index_ptr_->setDirName(folderName);
+    diag_index_ptr_->setDirName(folderName);
+    rev_term_index_ptr_->setDirName(folderName);
+    rev_diag_index_ptr_->setDirName(folderName);
+
+/*
+    term_index_ptr_->deserializeMassMatch(&t_ptr_);
+    diag_index_ptr_->deserializeMassMatch(&d_ptr_);
+    rev_term_index_ptr_->deserializeMassMatch(&rev_t_ptr_);
+    rev_diag_index_ptr_->deserializeMassMatch(&rev_d_ptr_);
+*/
+    term_index_ptr_->deserializeMassMatch(term_index_ptr_.get());
+    diag_index_ptr_->deserializeMassMatch(diag_index_ptr_.get());
+    rev_term_index_ptr_->deserializeMassMatch(rev_term_index_ptr_.get());
+    rev_diag_index_ptr_->deserializeMassMatch(rev_diag_index_ptr_.get());
+
+/*
+    term_index_ptr_.get() = *t_ptr_;
+    diag_index_ptr_.get() = *d_ptr_;
+    rev_term_index_ptr_.get() = *rev_t_ptr_;
+    rev_diag_index_ptr_.get() = *rev_d_ptr_;
+*/
+  }
+  else{
+    //it is the first time running this data. Run serialization after initializing the pointers.
+    
+    //file_util::createFolder(folderName);
+
+    // N-terminal indexes
+    term_index_ptr_ = MassMatchFactory::getPrmTermMassMatchPtr(proteo_ptrs, shift_2d,
+                                                              mng_ptr->max_proteoform_mass_,
+                                                              mng_ptr->filter_scale_);
+    // Prm indexes
+    diag_index_ptr_ = MassMatchFactory::getPrmDiagMassMatchPtr(proteo_ptrs,
+                                                              mng_ptr->max_proteoform_mass_,
+                                                              mng_ptr->filter_scale_);
+    LOG_DEBUG("diag index");
+    std::vector<std::vector<double> > rev_shift_2d;
+    std::vector<double> shift_1d(1, 0);
+    for (size_t i = 0; i < proteo_ptrs.size(); i++) {
+      rev_shift_2d.push_back(shift_1d);
+    }
+    // C-terminal indexes
+    rev_term_index_ptr_ = MassMatchFactory::getSrmTermMassMatchPtr(proteo_ptrs, rev_shift_2d,
+                                                                  n_term_acet_2d,
+                                                                  mng_ptr->max_proteoform_mass_,
+                                                                  mng_ptr->filter_scale_);
+
+    // To generate SRM indexes, n terminal acetylation shifts are added into the SRM list. 
+    rev_diag_index_ptr_ = MassMatchFactory::getSrmDiagMassMatchPtr(proteo_ptrs, n_term_acet_2d,
+                                                                  mng_ptr->max_proteoform_mass_,
+                                                                  mng_ptr->filter_scale_);
+    term_index_ptr_->setfileName("term_index");
+    diag_index_ptr_->setfileName("diag_index");
+    rev_term_index_ptr_->setfileName("rev_term_index");
+    rev_diag_index_ptr_->setfileName("rev_diag_index");
+
+    term_index_ptr_->setDirName(folderName);
+    diag_index_ptr_->setDirName(folderName);
+    rev_term_index_ptr_->setDirName(folderName);
+    rev_diag_index_ptr_->setDirName(folderName);
+    
+    term_index_ptr_->serializeMassMatch();
+    diag_index_ptr_->serializeMassMatch();
+    rev_term_index_ptr_->serializeMassMatch();
+    rev_diag_index_ptr_->serializeMassMatch();
+  }
+
+  //if corresponding index file is not found, go through the function. If not, load from the file.
+  /*
+  MassMatch *test_ptr;
+  MassMatch g;
+  test_ptr = &g;
+  test_ptr->deserializeMassMatch(&test_ptr);
+  std::cout << "returned val: " << test_ptr->getColNum() << std::endl;
+*/
 }
 
 void MassZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec) {
