@@ -13,9 +13,14 @@
 //limitations under the License.
 
 #include <cmath>
+#include <iostream>
+#include <fstream>
 
 #include "common/util/logger.hpp"
 #include "filter/massmatch/mass_match.hpp"
+
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
 
 namespace toppic {
 
@@ -41,6 +46,33 @@ MassMatch::MassMatch(std::vector<std::vector<int>> &mass_2d,
 
   LOG_DEBUG("init indexes");
   initIndexes(mass_2d, real_shift_2d, pos_2d);
+
+}
+
+void MassMatch::serializeMassMatch(){
+    std::string fileName = std::to_string(this->proteo_num_);
+    //this->proteo_num_vec_.push_back(fileName);
+    std::cout << fileName << std::endl;
+
+    std::ofstream ofs(fileName + ".txt");
+
+    boost::archive::text_oarchive oa(ofs);
+        
+    oa << this;//how to get the object that is calling this method, like this? self?
+}
+
+void MassMatch::deserializeMassMatch(){
+  //for (size_t v = 0; v < proteo_num_vec_.size(); v++){
+
+  //}
+  std::string fileName = std::to_string(this -> proteo_num_);
+  try{
+    std::ifstream ifs(fileName + ".txt");
+    boost::archive::text_iarchive ia(ifs);
+    ia >> *this;
+  }catch(std::exception &e){
+    LOG_ERROR("ERROR: Cannot load the file. This match data has not been stored");
+  }
 }
 
 void MassMatch::initProteoformBeginEnds(std::vector<std::vector<double>> &shift_2d) {

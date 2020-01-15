@@ -18,6 +18,9 @@
 #include <memory>
 #include <vector>
 
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+
 namespace toppic {
 
 class MassMatch {
@@ -37,6 +40,10 @@ class MassMatch {
                        const std::pair<int, int> &prec_minus_water_mass_error,
                        std::vector<short> &scores);
 
+  void serializeMassMatch();
+
+  void deserializeMassMatch();
+
   int getRowNum() {return row_num_;}
 
   static int getPrecursorMatchScore() {return 10000;}
@@ -46,8 +53,21 @@ class MassMatch {
   const std::vector<int>& getProteoRowEnds() {return proteo_row_ends_;}
 
   const std::vector<double>& getTruncShifts() {return trunc_shifts_;}
+  
+  //std::vector<int> proteo_num_vec_; //output file names vector
 
  private:
+ //for serialization
+  friend class boost::serialization::access;
+
+  template<class Archive>
+  void serialize(Archive & ar, const unsigned int version){
+      ar & scale_;
+      ar & proteo_num_;
+      ar & col_num_; 
+      ar & row_num_;
+  }
+
   double scale_;
 
   int proteo_num_;
@@ -83,8 +103,7 @@ class MassMatch {
                        std::vector<std::vector<int>> &pos_2d,
                        std::vector<int> &col_index_pnts);
 };
-
-typedef std::shared_ptr<MassMatch> MassMatchPtr;
+    typedef std::shared_ptr<MassMatch> MassMatchPtr;
 
 } /* namespace toppic */
 
