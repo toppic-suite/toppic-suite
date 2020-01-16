@@ -62,9 +62,9 @@
 
 
 <script>
- // define global variable ms2_graph
+ // define global variable ms2_graph and precursorMass
  var ms2_graph; 
-
+ var precursorMass ;
  $(document).ready(function(){
 	/*var peakAndIntensityList = JSON.parse(window.localStorage.getItem('peakAndIntensityList'));
 	var massAndIntensityList = JSON.parse(window.localStorage.getItem('massAndIntensityList'));
@@ -75,24 +75,25 @@
 	var massAndIntensityList = parsePeakMass('massAndIntensityList');
 	var sequence = parseSeq('sequence');
 	var l_fixedPtmList = parsePTM('fixedPtmList');
-	let unknownMassShiftList = JSON.parse(window.localStorage.getItem('unknownMassShiftList'));
-	console.log("unknownMassShiftList : ", unknownMassShiftList);
+	let unknownMassShiftList = parseUnknowmassList('unknownMassShiftList');
+	precursorMass = parseFloat(JSON.parse(window.localStorage.getItem('precursorMass')));
 	if(peakAndIntensityList != null && massAndIntensityList != null
-		&& sequence != null)
+		&& sequence != null && precursorMass != null)
 	{	
-		let SetValuesToHtmlObj = new SetValuesToHtml(peakAndIntensityList,massAndIntensityList,sequence,l_fixedPtmList,unknownMassShiftList);
+		let SetValuesToHtmlObj = new SetValuesToHtml(peakAndIntensityList,massAndIntensityList,sequence,l_fixedPtmList,unknownMassShiftList,precursorMass);
 		SetValuesToHtmlObj.setDataToPeakAndIntensity();
 		SetValuesToHtmlObj.setDataToMassAndIntensity();
 		SetValuesToHtmlObj.setDataToSequence();
 		SetValuesToHtmlObj.setFixedMasses();
+		SetValuesToHtmlObj.setPrecursorMass();
 	}
 
 	//set the checkbox based on the ion type used in the data, which is stored in local storage
 	let ionType = window.localStorage.getItem('ionType'); 
 	setIonCheckbox(ionType);
 
-	onLoadOfHTML();
-  localStorage.clear();
+	onLoadOfHTML(precursorMass);
+  	localStorage.clear();
   
   //ion type data needs to be preserved because it is recorded only once when the prsm.html opens. 
   //Without this line it is going to break when the user tries to open inspect window again after closing.
@@ -291,12 +292,18 @@
 	</div> 
 	<br>
 		<div class="row">
-			<div class="col-6">
+			<div class="col-3">
+				<h6 id="precursormass_h6" style="display:block"><text>Precursor mass:&nbsp;</text><text id="precursormass">0</text></h6>
+			</div>
+			<div class="col-3">
 				<h6 id="totalseqmass_h6" style="display:none"><text>Protein molecular mass:&nbsp;</text><text id="totalmass">0</text></h6>
 			</div>
-			<div class="col-6">
+			<div class="col-3">
+				<h6 id="massvariation_h6" style="display:none"><text>Mass variation:&nbsp;</text><text id="massvariation">0</text></h6>
+			</div>
+			<div class="col-3">
 					<div class="dropdown dropleft float-right">
-					<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" id="svg_download" style="display:none">
+					<button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" id="svg_download" style="display:none">
 					  Download
 					</button>
 					<div class="dropdown-menu">
@@ -328,7 +335,7 @@
 			<a id="unmatched_peak_count" href="#!" onclick="showNonMatchedPeaks();">Non Matched Peaks</a>
 		</div>
 		<div class="col-5 pull-right" >
-			<button type="button" class="btn btn-primary float-right" id="hide_table">Hide Table</button>
+			<button type="button" class="btn btn-primary btn-sm float-right" id="hide_table">Hide Table</button>
 		</div>
 	</div>
 	<div class="row">
