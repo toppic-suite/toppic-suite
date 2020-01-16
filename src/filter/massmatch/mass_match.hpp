@@ -24,7 +24,6 @@
 
 namespace toppic {
 
-
 class MassMatch {
  public:
   MassMatch(){};
@@ -50,7 +49,7 @@ class MassMatch {
   void serializeMassMatch();
 
   //void deserializeMassMatch(MassMatch **m);
-  void deserializeMassMatch(MassMatch *m);
+  void deserializeMassMatch(MassMatch **m);
 
   int getProtNum() {return proteo_num_;}
 
@@ -86,7 +85,7 @@ class MassMatch {
       ar & proteo_num_;
       ar & col_num_; 
       ar & row_num_;
-    /*
+    
       ar & proteo_row_begins_;
       ar & proteo_row_ends_;
       ar & row_proteo_ids_;
@@ -95,7 +94,7 @@ class MassMatch {
       ar & col_index_begins_;
       ar & col_index_ends_;
       ar & col_indexes_;
-      */
+      
   }
 
   double scale_;
