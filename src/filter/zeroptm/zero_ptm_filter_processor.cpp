@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
                         int block_idx, ZeroPtmFilterMngPtr mng_ptr) { 
   std::string block_str = str_util::toString(block_idx);
   int group_spec_num = mng_ptr->prsm_para_ptr_->getGroupSpecNum();
-  MassZeroPtmFilterPtr filter_ptr = std::make_shared<MassZeroPtmFilter>(raw_forms, mng_ptr);
+  MassZeroPtmFilterPtr filter_ptr = std::make_shared<MassZeroPtmFilter>(raw_forms, mng_ptr, block_str);
   PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
   MsAlignReader reader(prsm_para_ptr->getSpectrumFileName(),
@@ -94,7 +94,26 @@ std::function<void()> geneTask(int block_idx,
     filterBlock(raw_forms, block_idx, mng_ptr);
   };
 }
+/*
+void ZeroPtmFilterProcessor::mergeIndexFiles(int block_size){
+  //output index files have name of "term_index0", "term_index1"...
+  //merge the files with same names (and different number), based on the number to keep the order of data
+  std::vector<std::string> file_name_vec{"term_index", "diag_index", "rev_term_index", "rev_diag_index"};
+  for (size_t f = 0; f < file_name_vec.size(); f++){
+    std::ofstream targetFile(file_name_vec[f] + ".txt");
 
+    for (int i = 0; i< block_size; i++){
+      std::string fileName = file_name_vec[f] + std::to_string(i) + ".txt";
+      std::ifstream mergeFile(fileName);
+
+      targetFile << mergeFile.rdbuf();
+
+      remove((fileName).c_str());
+      //if ( != 0){perror("Index file deletion failed.");}
+    }
+  }
+}
+*/
 void ZeroPtmFilterProcessor::process() {
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   std::string db_file_name = prsm_para_ptr->getSearchDbFileName();

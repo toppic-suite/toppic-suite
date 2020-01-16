@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ namespace toppic {
 class MassZeroPtmFilter {
  public:
   MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs, ZeroPtmFilterMngPtr
-                    mng_ptr);
+                    mng_ptr, std::string block_str);
   void computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec);
 
   SimplePrsmPtrVec getCompMatchPtrs() {return comp_match_ptrs_;}
@@ -46,6 +46,8 @@ class MassZeroPtmFilter {
   SimplePrsmPtrVec pref_match_ptrs_;
   SimplePrsmPtrVec suff_match_ptrs_;
   SimplePrsmPtrVec internal_match_ptrs_;
+
+  std::string block_str; //which db_block it is. Used when merging the output files by order.
 };
 
 typedef std::shared_ptr<MassZeroPtmFilter> MassZeroPtmFilterPtr;

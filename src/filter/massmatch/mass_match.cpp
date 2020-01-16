@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -87,7 +87,6 @@ void MassMatch::serializeMassMatch(){
 
   newFile.close();
 
-  //file_util::moveFile(fileName, dirName);
 }
 //deserialize MassMatch object that calles this method
   void MassMatch::deserializeMassMatch(MassMatch **m){
