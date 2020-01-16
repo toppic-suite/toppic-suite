@@ -215,6 +215,8 @@ class SeqOfExecution
 			 */
 			let totalMass = calculatePrefixAndSuffixMassObj.getTotalSeqMass(sequence,completeShiftList);
 			UIHelperObj.setTotalSeqMass(totalMass);
+			//Set Mass Difference, precursorMass is a global variable form spectrum.html
+			UIHelperObj.setMassDifference(precursorMass,totalMass);
 		}	
 		/**
 		 * Do the below function when mono mass list entered is not empty
@@ -465,6 +467,9 @@ class SeqOfExecution
 			 */
 			let totalMass = calculatePrefixAndSuffixMassObj.getTotalSeqMass(sequence,massShiftList);
 			UIHelperObj.setTotalSeqMass(totalMass);
+			//Set Mass Difference, precursorMass is a global variable
+			UIHelperObj.setMassDifference(precursorMass,totalMass);
+
 			$("#"+Constants.SPECTRUMGRAPHID).show();
 			/** 
 			 * Call addSpectrum function in invokeSpectrum function to draw graph 
@@ -554,28 +559,6 @@ class SeqOfExecution
 				saveAs( dataBlob, 'seq.png' ); 
 			}
 		})
-		// /**
-		//  * On click action to download spectrum graph SVG in .svg format
-		//  */
-		// $("#"+Constants.SPECDOWNLOADSVG).click(function(){
-		// 	let name = "spectrum.svg"
-		// 	let svg_element = d3.selectAll("#"+Constants.SPECTRUMGRAPHID).node();
-		// 	svg2svg(svg_element,name);
-		// })
-		// /**
-		//  * On click action to download spectrum graph PNG in .png format
-		//  */
-		// $("#"+Constants.SPECDOWNLOADPNG).click(function(){
-		// 	let l_svgContainer = d3.select("#"+Constants.SPECTRUMGRAPHID);
-		// 	let svgString = getSVGString(l_svgContainer.node());
-		// 	let svg_element = document.getElementById(Constants.SPECTRUMGRAPHID);
-		// 	let bBox = svg_element.getBBox();
-		// 	let width = bBox.width;
-		// 	let height = bBox.height ;
-		// 	svgString2Image( svgString, 2*width, 2*height, 'png', save ); 
-		// 	function save( dataBlob, filesize ){
-		// 		saveAs( dataBlob, 'spectrum.png' ); 
-		// 	}
-		// })
+		
 	}	
 }

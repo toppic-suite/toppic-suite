@@ -149,3 +149,6 @@ button.close {
 #errorAlertModal{
 	margin-top: 20%;
 }
+#divtableContainer a{
+  color: #428bca !important ;
+}

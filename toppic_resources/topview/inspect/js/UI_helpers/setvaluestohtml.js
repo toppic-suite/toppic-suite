@@ -1,10 +1,11 @@
 class SetValuesToHtml{
-    constructor(peakAndIntensityList,massAndIntensityList,sequence,l_fixedPtmList,unknownMassShiftList){
+    constructor(peakAndIntensityList,massAndIntensityList,sequence,l_fixedPtmList,unknownMassShiftList,precursorMass){
         this.peakAndIntensityList = peakAndIntensityList;
         this.massAndIntensityList = massAndIntensityList;
         this.sequence = sequence;
         this.fixedPtmList = l_fixedPtmList;
         this.unknownMassShiftList = unknownMassShiftList ;
+        this.precursorMass = precursorMass ;
     }
     setDataToPeakAndIntensity(){
         let peakdata = $("#peakdata");
@@ -48,8 +49,9 @@ class SetValuesToHtml{
             }
         } 
     }
-    setUnknowMasses(){
-
+    setPrecursorMass()
+    {
+        document.getElementById("precursormass").innerHTML = this.precursorMass;
     }
     
 }

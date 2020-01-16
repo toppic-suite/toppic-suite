@@ -8,6 +8,7 @@ function onclickTopView(){
     let sequence = getSequence();
     let fixedPtmList = getFixedPTMMassList();
     let unknownMassShiftList = getUnknownMassList();
+    let precursorMass = prsm_data.prsm.ms.ms_header.precursor_mono_mass;
     console.log("unknownMassShiftList : ", unknownMassShiftList);
 
     window.localStorage.setItem('peakAndIntensityList',  JSON.stringify(peakAndIntensityList));
@@ -15,6 +16,7 @@ function onclickTopView(){
     window.localStorage.setItem('sequence',  JSON.stringify(sequence));
     window.localStorage.setItem('fixedPtmList', JSON.stringify(fixedPtmList));
     window.localStorage.setItem('unknownMassShiftList', JSON.stringify(unknownMassShiftList));
+    window.localStorage.setItem('precursorMass', JSON.stringify(precursorMass));
 
     window.open("../inspect/spectrum.html");
 }

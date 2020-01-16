@@ -1,4 +1,4 @@
-onLoadOfHTML = function()
+onLoadOfHTML = function(precursorMass)
 {
     let massErrorthVal = 0.1 ;
     let ppmErrorthVal = 15 ;
@@ -47,6 +47,7 @@ onLoadOfHTML = function()
         let executionObj = new SeqOfExecution();
         executionObj.sequenceOfExecution(errorType,errorVal,"");
         document.getElementById("totalseqmass_h6").style.display = "block";
+        document.getElementById("massvariation_h6").style.display = "block";
     })
     /**
      * On Click action to hide and show the table of calculate theoretical
