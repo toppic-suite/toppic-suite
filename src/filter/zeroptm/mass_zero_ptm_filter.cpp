@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -25,9 +25,11 @@
 namespace toppic {
 
 MassZeroPtmFilter::MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
-                                     ZeroPtmFilterMngPtr mng_ptr) {                            
+                                     ZeroPtmFilterMngPtr mng_ptr, std::string block_str) {                            
   mng_ptr_ = mng_ptr;
   proteo_ptrs_ = proteo_ptrs;
+  block_str = block_str;
+
   LOG_DEBUG("get shifts");
   std::vector<std::vector<double> > shift_2d
       = proteoform_util::getNTermShift2D(proteo_ptrs, mng_ptr->prsm_para_ptr_->getProtModPtrVec());
@@ -40,7 +42,7 @@ MassZeroPtmFilter::MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
   folderName = folderName + "_index";
   
   if (boost::filesystem::exists("term_index.txt")){
-    //std::cout << "loading from index files..." << std::endl;
+    std::cout << "loading from index files..." << std::endl;
     
     term_index_ptr_ = std::make_shared<MassMatch>();
     diag_index_ptr_ = std::make_shared<MassMatch>();
@@ -52,10 +54,10 @@ MassZeroPtmFilter::MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
     MassMatch *rev_t_ptr_ = rev_term_index_ptr_.get();
     MassMatch *rev_d_ptr_ = rev_diag_index_ptr_.get();
 
-    term_index_ptr_->setfileName("term_index");
-    diag_index_ptr_->setfileName("diag_index");
-    rev_term_index_ptr_->setfileName("rev_term_index");
-    rev_diag_index_ptr_->setfileName("rev_diag_index");
+    term_index_ptr_->setfileName("term_index" + block_str);
+    diag_index_ptr_->setfileName("diag_index" + block_str);
+    rev_term_index_ptr_->setfileName("rev_term_index" + block_str);
+    rev_diag_index_ptr_->setfileName("rev_diag_index" + block_str);
 
     term_index_ptr_->setDirName(folderName);
     diag_index_ptr_->setDirName(folderName);
@@ -77,7 +79,7 @@ MassZeroPtmFilter::MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
     free(rev_t_ptr_);
     free(rev_d_ptr_);
 
-    //std::cout << "loading finished" << std::endl;
+    std::cout << "loading finished" << std::endl;
   }
   else{
     //it is the first time running this data. Run serialization after initializing the pointers.
@@ -107,10 +109,10 @@ MassZeroPtmFilter::MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
     rev_diag_index_ptr_ = MassMatchFactory::getSrmDiagMassMatchPtr(proteo_ptrs, n_term_acet_2d,
                                                                   mng_ptr->max_proteoform_mass_,
                                                                   mng_ptr->filter_scale_);
-    term_index_ptr_->setfileName("term_index");
-    diag_index_ptr_->setfileName("diag_index");
-    rev_term_index_ptr_->setfileName("rev_term_index");
-    rev_diag_index_ptr_->setfileName("rev_diag_index");
+    term_index_ptr_->setfileName("term_index" + block_str);
+    diag_index_ptr_->setfileName("diag_index" + block_str);
+    rev_term_index_ptr_->setfileName("rev_term_index" + block_str);
+    rev_diag_index_ptr_->setfileName("rev_diag_index" + block_str);
 
     term_index_ptr_->setDirName(folderName);
     diag_index_ptr_->setDirName(folderName);
