@@ -40,28 +40,17 @@ MassZeroPtmFilter::MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
   folderName = folderName + "_index";
   
   if (boost::filesystem::exists("term_index.txt")){
-    std::cout << "loading from index files..." << std::endl;
-    //the index file folder already exists, so run deserialization
-    //MassMatch g;
-    
+    //std::cout << "loading from index files..." << std::endl;
     
     term_index_ptr_ = std::make_shared<MassMatch>();
     diag_index_ptr_ = std::make_shared<MassMatch>();
     rev_term_index_ptr_ = std::make_shared<MassMatch>();
     rev_diag_index_ptr_ = std::make_shared<MassMatch>();
-  
 
-    MassMatch *t_ptr_;
-    MassMatch *d_ptr_;
-    MassMatch *rev_t_ptr_;
-    MassMatch *rev_d_ptr_;
-
-    MassMatch a, b, c, d;
-
-    t_ptr_ = &a;
-    d_ptr_ = &b;
-    rev_t_ptr_ = &c;
-    rev_d_ptr_ = &d;
+    MassMatch *t_ptr_ = term_index_ptr_.get();
+    MassMatch *d_ptr_ = diag_index_ptr_.get();
+    MassMatch *rev_t_ptr_ = rev_term_index_ptr_.get();
+    MassMatch *rev_d_ptr_ = rev_diag_index_ptr_.get();
 
     term_index_ptr_->setfileName("term_index");
     diag_index_ptr_->setfileName("diag_index");
@@ -73,23 +62,22 @@ MassZeroPtmFilter::MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
     rev_term_index_ptr_->setDirName(folderName);
     rev_diag_index_ptr_->setDirName(folderName);
 
-/*
     term_index_ptr_->deserializeMassMatch(&t_ptr_);
     diag_index_ptr_->deserializeMassMatch(&d_ptr_);
     rev_term_index_ptr_->deserializeMassMatch(&rev_t_ptr_);
     rev_diag_index_ptr_->deserializeMassMatch(&rev_d_ptr_);
-*/
-    term_index_ptr_->deserializeMassMatch(term_index_ptr_.get());
-    diag_index_ptr_->deserializeMassMatch(diag_index_ptr_.get());
-    rev_term_index_ptr_->deserializeMassMatch(rev_term_index_ptr_.get());
-    rev_diag_index_ptr_->deserializeMassMatch(rev_diag_index_ptr_.get());
 
-/*
-    term_index_ptr_.get() = *t_ptr_;
-    diag_index_ptr_.get() = *d_ptr_;
-    rev_term_index_ptr_.get() = *rev_t_ptr_;
-    rev_diag_index_ptr_.get() = *rev_d_ptr_;
-*/
+    *term_index_ptr_ = *t_ptr_;
+    *diag_index_ptr_ = *d_ptr_;
+    *rev_term_index_ptr_ = *rev_t_ptr_;
+    *rev_diag_index_ptr_ = *rev_d_ptr_;
+
+    free(t_ptr_);
+    free(d_ptr_);
+    free(rev_t_ptr_);
+    free(rev_d_ptr_);
+
+    //std::cout << "loading finished" << std::endl;
   }
   else{
     //it is the first time running this data. Run serialization after initializing the pointers.
@@ -112,10 +100,9 @@ MassZeroPtmFilter::MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
     }
     // C-terminal indexes
     rev_term_index_ptr_ = MassMatchFactory::getSrmTermMassMatchPtr(proteo_ptrs, rev_shift_2d,
-                                                                  n_term_acet_2d,
-                                                                  mng_ptr->max_proteoform_mass_,
-                                                                  mng_ptr->filter_scale_);
-
+                                                                 n_term_acet_2d,
+                                                                 mng_ptr->max_proteoform_mass_,
+                                                                 mng_ptr->filter_scale_);
     // To generate SRM indexes, n terminal acetylation shifts are added into the SRM list. 
     rev_diag_index_ptr_ = MassMatchFactory::getSrmDiagMassMatchPtr(proteo_ptrs, n_term_acet_2d,
                                                                   mng_ptr->max_proteoform_mass_,
@@ -135,18 +122,10 @@ MassZeroPtmFilter::MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
     rev_term_index_ptr_->serializeMassMatch();
     rev_diag_index_ptr_->serializeMassMatch();
   }
-
-  //if corresponding index file is not found, go through the function. If not, load from the file.
-  /*
-  MassMatch *test_ptr;
-  MassMatch g;
-  test_ptr = &g;
-  test_ptr->deserializeMassMatch(&test_ptr);
-  std::cout << "returned val: " << test_ptr->getColNum() << std::endl;
-*/
 }
 
 void MassZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec) {
+
   PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
   bool pref = true;
   std::vector<std::pair<int, int> > pref_mass_errors

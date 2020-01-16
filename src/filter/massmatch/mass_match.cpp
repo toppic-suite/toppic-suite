@@ -26,6 +26,8 @@
 
 #include "console/toppic_argument.hpp"
 
+
+
 namespace toppic {
 
 /* mass_2d[i]: a vector containing prefix residue masses of the ith proteoform 
@@ -74,9 +76,6 @@ MassMatch::MassMatch(std::vector<std::vector<int>> &mass_2d,
 }
 //serialize MassMatch object that calls this method
 void MassMatch::serializeMassMatch(){
-
-  //currently, file name is idx_ + prm + row number + column number
-  //std::string fileName = "idx_" + std::to_string(this->getPrm()) + std::to_string(this->getRowNum()) + std::to_string(this->getColNum());
   std::string fileName = this->getFileName() + ".txt";
   std::string dirName = this -> getDirName();
   std::ofstream newFile(fileName);
@@ -91,21 +90,19 @@ void MassMatch::serializeMassMatch(){
   //file_util::moveFile(fileName, dirName);
 }
 //deserialize MassMatch object that calles this method
-//void MassMatch::deserializeMassMatch(MassMatch **m){
-  void MassMatch::deserializeMassMatch(MassMatch *m){
+  void MassMatch::deserializeMassMatch(MassMatch **m){
   std::string fileName = this->getFileName() + ".txt";
 
   std::ifstream fileToRead(fileName);
 
-  if (fileToRead.is_open()) {
+  //if (fileToRead.is_open()) {
+
     boost::archive::text_iarchive ia(fileToRead);
-    ia >> m;
-    //std::cout << "correct val: " << *m->getColNum() <<std::endl;
-  } 
-  else{}
+    ia >> *m;
+ // } 
+  //else{}
 
   fileToRead.close();
-  ;
 }
 
 void MassMatch::initProteoformBeginEnds(std::vector<std::vector<double>> &shift_2d) {
