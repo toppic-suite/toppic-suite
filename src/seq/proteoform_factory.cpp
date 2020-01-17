@@ -217,6 +217,7 @@ ProteoformPtrVec readFastaToProteoformPtrVec(const std::string &file_name,
   ProteoformPtrVec list;
   FastaSeqPtr seq_ptr = reader.getNextSeq();
   int count = 0;
+
   while (seq_ptr != nullptr) {
     ProteoformPtr proteo_ptr = geneDbProteoformPtr(seq_ptr, fix_mod_list);
     list.push_back(proteo_ptr);

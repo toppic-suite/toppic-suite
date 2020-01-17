@@ -74,8 +74,9 @@ MassMatch::MassMatch(std::vector<std::vector<int>> &mass_2d,
   initIndexes(mass_2d, real_shift_2d, pos_2d);
   prm_ = prm;
 }
-void MassMatch::serializeMassMatch(std::string fName, std::string block_str, std::string dirName){
-  std::string fileName = fName + block_str;
+void MassMatch::serializeMassMatch(){
+  std::string fileName = this->getFileName();
+
   std::ofstream newFile(fileName);
 
   if(newFile.is_open()){

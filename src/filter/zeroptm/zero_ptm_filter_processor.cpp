@@ -30,13 +30,15 @@
 #include "filter/zeroptm/zero_ptm_filter_processor.hpp"
 #include "filter/zeroptm/mass_zero_ptm_filter.hpp"
 
+#include "filter/zeroptm/mass_zero_ptm_index_file.hpp"
+
 namespace toppic {
 
 inline void filterBlock(const ProteoformPtrVec & raw_forms,
                         int block_idx, ZeroPtmFilterMngPtr mng_ptr) { 
   std::string block_str = str_util::toString(block_idx);
   int group_spec_num = mng_ptr->prsm_para_ptr_->getGroupSpecNum();
-  MassZeroPtmFilterPtr filter_ptr = std::make_shared<MassZeroPtmFilter>(raw_forms, mng_ptr, block_str);
+  MassZeroPtmFilterPtr filter_ptr = std::make_shared<MassZeroPtmFilter>(raw_forms, mng_ptr);
   PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
   MsAlignReader reader(prsm_para_ptr->getSpectrumFileName(),
@@ -84,9 +86,13 @@ std::function<void()> geneTask(int block_idx,
                                ZeroPtmFilterMngPtr mng_ptr) {
   return[block_idx, mng_ptr] () {
     PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
-    std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
+    //std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
     std::string db_block_file_name = prsm_para_ptr->getSearchDbFileName()
         + "_" + str_util::toString(block_idx);
+
+    std::cout << db_block_file_name << std::endl;
+    std::cout << prsm_para_ptr->getFixModPtrVec()[0] << std::endl;
+
     ProteoformPtrVec raw_forms
         = proteoform_factory::readFastaToProteoformPtrVec(db_block_file_name,
                                                           prsm_para_ptr->getFixModPtrVec());
@@ -94,6 +100,7 @@ std::function<void()> geneTask(int block_idx,
     filterBlock(raw_forms, block_idx, mng_ptr);
   };
 }
+
 /*
 void ZeroPtmFilterProcessor::mergeIndexFiles(int block_size){
   //output index files have name of "term_index0", "term_index1"...
@@ -114,6 +121,7 @@ void ZeroPtmFilterProcessor::mergeIndexFiles(int block_size){
   }
 }
 */
+
 void ZeroPtmFilterProcessor::process() {
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
@@ -142,6 +150,53 @@ void ZeroPtmFilterProcessor::process() {
   SimplePrsmStrMerge::mergeBlockResults(sp_file_name, input_pref, block_num,  
                                         mng_ptr_->comp_num_, mng_ptr_->pref_suff_num_, mng_ptr_->inte_num_ );
   std::cout << "Non PTM filtering - combining blocks finished." << std::endl;
+}
+
+//below functions are used for generating index files
+
+inline void createIndexFiles(const ProteoformPtrVec & raw_forms,
+                        int block_idx, ZeroPtmFilterMngPtr mng_ptr) {  
+    std::cout << "Generating Non PTM index files --- started" << std::endl;
+    std::string block_str = str_util::toString(block_idx);
+    std::vector<std::string> file_vec{"term_index" + block_str, "diag_index" + block_str, 
+    "rev_term_index" + block_str, "rev_diag_index" + block_str};
+    MassZeroPtmIndexPtr filter_ptr = std::make_shared<MassZeroPtmIndex>(raw_forms, mng_ptr, file_vec);
+    std::cout << "Generating Non PTM index files --- finished" << std::endl;
+}
+
+std::function<void()> geneIndexTask(int block_idx, 
+                               ZeroPtmFilterMngPtr mng_ptr) {
+  return[block_idx, mng_ptr] () {
+    PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
+    std::string db_block_file_name = prsm_para_ptr->getSearchDbFileName()
+        + "_" + str_util::toString(block_idx);
+    ProteoformPtrVec raw_forms
+        = proteoform_factory::readFastaToProteoformPtrVec(db_block_file_name,
+                                                          prsm_para_ptr->getFixModPtrVec());
+    createIndexFiles(raw_forms, block_idx, mng_ptr);
+  };
+}
+void ZeroPtmFilterProcessor::index_process(){
+  //for generating index files
+  PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
+  std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
+  DbBlockPtrVec db_block_ptr_vec = DbBlock::readDbBlockIndex(db_file_name);
+
+  // n_spec_block = spec_num * block_num
+
+  SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(mng_ptr_->thread_num_);
+  int block_num = db_block_ptr_vec.size();
+
+  //logger::setLogLevel(2);
+
+  for (int i = 0; i < block_num; i++) {
+    while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ * 2) {
+      boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+    }
+    pool_ptr->Enqueue(geneIndexTask(db_block_ptr_vec[i]->getBlockIdx(), mng_ptr_));
+  }
+  pool_ptr->ShutDown();
+  std::cout << std::endl;
 }
 
 }  // namespace toppic
