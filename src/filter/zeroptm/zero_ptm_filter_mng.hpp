@@ -23,6 +23,7 @@ namespace toppic {
 
 class ZeroPtmFilterMng {
  public:
+  ZeroPtmFilterMng(){};
   ZeroPtmFilterMng(PrsmParaPtr prsm_para_ptr,
                    int thread_num,
                    const std::string & output_file_ext);

@@ -23,13 +23,18 @@
 #include "seq/db_block.hpp"
 #include "seq/proteoform.hpp"
 #include "seq/proteoform_factory.hpp"
-#include "prsm/prsm_para.hpp"
 #include "seq/proteoform_util.hpp"
 
+#include "prsm/prsm_para.hpp"
+
 #include "filter/zeroptm/zero_ptm_filter_mng.hpp"
-#include "filter/oneptm/one_ptm_filter_mng.hpp"
-#include "filter/diag/diag_filter_mng.hpp"
 #include "filter/zeroptm/mass_zero_ptm_filter.hpp"
+
+#include "filter/oneptm/one_ptm_filter_mng.hpp"
+#include "filter/oneptm/mass_one_ptm_filter.hpp"
+
+#include "filter/diag/diag_filter_mng.hpp"
+#include "filter/diag/mass_diag_filter.hpp"
 
 #include "filter/massmatch/mass_match.hpp"
 #include "filter/massmatch/mass_match_factory.hpp"
@@ -59,31 +64,85 @@ void TopIndexProcess(std::map<std::string, std::string> &arguments){
 
     fasta_util::dbPreprocess(ori_db_file_name, db_file_name, decoy, db_block_size);
     
-    ZeroPtmFilterMngPtr zero_filter_mng_ptr
-        = std::make_shared<ZeroPtmFilterMng>(prsm_para_ptr, thread_num, "toppic_zero_filter");
+    process(prsm_para_ptr, thread_num);
 
-    //OnePtmFilterMngPtr one_ptm_filter_mng_ptr
-        //= std::make_shared<OnePtmFilterMng>(prsm_para_ptr, "toppic_one_filter", thread_num);
 
-   // DiagFilterMngPtr diag_filter_mng_ptr
-       // = std::make_shared<DiagFilterMng>(prsm_para_ptr, filter_result_num, thread_num, "toppic_multi_filter");
+    //ZeroPtmFilterMngPtr zero_ptm_index_ptr = std::make_shared<ZeroPtmFilterMng>(prsm_para_ptr);
 
-   // process(zero_filter_mng_ptr, thread_num);
-    
+   // OnePtmFilterMngPtr one_ptm_filter_index_ptr = std::make_shared<OnePtmFilterMng>(prsm_para_ptr);
+
+    //DiagFilterMngPtr diag_filter_index_ptr = std::make_shared<DiagFilterMng>(prsm_para_ptr);
+
+    //
+    //process<OnePtmFilterMngPtr>(one_ptm_filter_index_ptr, thread_num);
+    //process<DiagFilterMngPtr>(diag_filter_index_ptr, thread_num);
+
     //process(one_ptm_filter_mng_ptr, thread_num);
     //process(diag_filter_mng_ptr, thread_num);
 
-
 }
-/*
-void createIndexFiles(ProteoformPtrVec &raw_forms, int block_idx, ZeroPtmFilterMngPtr mng_ptr){
-    std::string block_str = str_util::toString(block_idx);
-    MassZeroPtmFilterPtr filter_ptr = std::make_shared<MassZeroPtmFilter>(raw_forms, mng_ptr, block_str);
-    //the pointers containing data are stored inside filter_ptr
 
-    std::string folderName = mng_ptr->prsm_para_ptr_->getOriDbName();
+void createIndexPtr(ProteoformPtrVec &proteo_ptrs, int block_idx, PrsmParaPtr prsm_para_ptr){
+    std::string block_str = str_util::toString(block_idx);
+    std::string folderName = prsm_para_ptr->getOriDbName();
+
+    ZeroPtmFilterMngPtr zero_ptm_ptr = std::make_shared<ZeroPtmFilterMng>();
+    ZeroPtmFilterMngPtr
+
     folderName = folderName + "_index";
 
+    std::vector<std::vector<double> > shift_2d
+      = proteoform_util::getNTermShift2D(proteo_ptrs, prsm_para_ptr->getProtModPtrVec());
+
+    std::vector<std::vector<double> > n_term_acet_2d
+      = proteoform_util::getNTermAcet2D(proteo_ptrs, prsm_para_ptr->getProtModPtrVec());
+
+    MassMatchPtr t_ptr = MassMatchFactory::getPrmTermMassMatchPtr(proteo_ptrs, shift_2d,
+                                                             zero_ptm_ptr->max_proteoform_mass_,
+                                                             zero_ptm_ptr->filter_scale_);
+
+    MassMatchPtr d_ptr = MassMatchFactory::getPrmDiagMassMatchPtr(proteo_ptrs,
+                                                             zero_ptm_ptr->max_proteoform_mass_,
+                                                             zero_ptm_ptr->filter_scale_);
+
+    std::vector<std::vector<double> > rev_shift_2d;
+    std::vector<double> shift_1d(1, 0);
+    for (size_t i = 0; i < proteo_ptrs.size(); i++) {
+        rev_shift_2d.push_back(shift_1d);
+    }
+
+    MassMatchPtr rev_t_ptr = MassMatchFactory::getSrmTermMassMatchPtr(proteo_ptrs, rev_shift_2d,
+                                                                 n_term_acet_2d,
+                                                                 zero_ptm_ptr->max_proteoform_mass_,
+                                                                 zero_ptm_ptr->filter_scale_);
+
+    MassMatchPtr rev_d_ptr = MassMatchFactory::getSrmDiagMassMatchPtr(proteo_ptrs, n_term_acet_2d,
+                                                                 zero_ptm_ptr->max_proteoform_mass_,
+                                                                 zero_ptm_ptr->filter_scale_);                                                        
+        
+    //t_ptr->serializeMassMatch("term_index", block_str, folderName);
+    //d_ptr->serializeMassMatch("diag_index", block_str, folderName);
+    //rev_t_ptr->serializeMassMatch("rev_term_index", block_str, folderName);
+    //rev_d_ptr->serializeMassMatch("rev_diag_index", block_str, folderName);
+}
+/*
+void createIndexPtr(ProteoformPtrVec &raw_forms, int block_idx, OnePtmFilterMngPtr mng_ptr){
+    std::string block_str = str_util::toString(block_idx);
+    MassOnePtmFilterPtr filter_ptr = std::make_shared<OnePtmFilter>(raw_forms, mng_ptr, block_str);
+    std::string folderName = mng_ptr->prsm_para_ptr_->getOriDbName();
+    folderName = folderName + "_index";
+    //createIndexFiles<MassOnePtmFilterPtr>(block_str, folderName, filter_ptr);
+}
+
+void createIndexPtr(ProteoformPtrVec &raw_forms, int block_idx, DiagFilterMngPtr mng_ptr){
+    std::string block_str = str_util::toString(block_idx);
+    MassDiagFilterPtr filter_ptr = std::make_shared<MassDiagFilter>(raw_forms, mng_ptr, block_str);
+    std::string folderName = mng_ptr->prsm_para_ptr_->getOriDbName();
+    folderName = folderName + "_index";
+    createIndexFiles<MassDiagFilterPtr>(block_str, folderName, filter_ptr);
+}
+
+void createIndexFiles(str::string block_idx, ZeroPtmFilterMngPtr mng_ptr){
     term_index_ptr ->setfileName("term_index" + block_str);
     diag_index_ptr->setfileName("diag_index" + block_str);
     rev_term_index_ptr->setfileName("rev_term_index" + block_str);
@@ -100,7 +159,7 @@ void createIndexFiles(ProteoformPtrVec &raw_forms, int block_idx, ZeroPtmFilterM
     rev_diag_index_ptr->serializeMassMatch();
 }
 
-std::function<void()> geneTask(int block_idx, ZeroPtmFilterMngPtr mng_ptr){
+std::function<void()> geneTask(int block_idx, DiagFilterMngPtr mng_ptr){
     return[block_idx, mng_ptr](){
 
     std::string db_block_file_name = mng_ptr->prsm_para_ptr_->getSearchDbFileName()
@@ -109,13 +168,38 @@ std::function<void()> geneTask(int block_idx, ZeroPtmFilterMngPtr mng_ptr){
     ProteoformPtrVec raw_forms 
         = proteoform_factory::readFastaToProteoformPtrVec(db_block_file_name, mng_ptr->prsm_para_ptr_->getFixModPtrVec());
 
-    createIndexFiles(raw_forms, block_idx, mng_ptr);
+    createIndexPtr(raw_forms, block_idx, mng_ptr);
+    };
+}
+std::function<void()> geneTask(int block_idx, OnePtmFilterMngPtr mng_ptr){
+    return[block_idx, mng_ptr](){
+
+    std::string db_block_file_name = mng_ptr->prsm_para_ptr_->getSearchDbFileName()
+        + "_" + str_util::toString(block_idx);    
+
+    ProteoformPtrVec raw_forms 
+        = proteoform_factory::readFastaToProteoformPtrVec(db_block_file_name, mng_ptr->prsm_para_ptr_->getFixModPtrVec());
+
+    createIndexPtr(raw_forms, block_idx, mng_ptr);
+    };
+}
+*/
+std::function<void()> geneTask(int block_idx, PrsmParaPtr prsm_para_ptr){
+    return[block_idx, prsm_para_ptr](){
+
+    std::string db_block_file_name = prsm_para_ptr->getSearchDbFileName()
+        + "_" + str_util::toString(block_idx);    
+
+    ProteoformPtrVec raw_forms 
+        = proteoform_factory::readFastaToProteoformPtrVec(db_block_file_name, prsm_para_ptr->getFixModPtrVec());
+
+    createIndexPtr(raw_forms, block_idx, prsm_para_ptr);
     };
 }
 
-void process(ZeroPtmFilterMngPtr zero_ptr, int thread_num){
+void process(PrsmParaPtr prsm_para_ptr, int thread_num){
 
-    std::string db_file_name = zero_ptr->prsm_para_ptr_->getSearchDbFileName();
+    std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
     DbBlockPtrVec db_block_ptr_vec = DbBlock::readDbBlockIndex(db_file_name);
 
     int block_num = db_block_ptr_vec.size();
@@ -126,8 +210,9 @@ void process(ZeroPtmFilterMngPtr zero_ptr, int thread_num){
         while (pool_ptr->getQueueSize() >= thread_num * 2) {
         boost::this_thread::sleep(boost::posix_time::milliseconds(100));
         }
-        pool_ptr->Enqueue(geneTask(db_block_ptr_vec[i]->getBlockIdx(), zero_ptr));
+        pool_ptr->Enqueue(geneTask(db_block_ptr_vec[i]->getBlockIdx(), prsm_para_ptr));
   }
   pool_ptr->ShutDown();
-}*/
+}
+
 }

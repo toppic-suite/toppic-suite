@@ -23,6 +23,7 @@ namespace toppic {
 
 class OnePtmFilterMng {
  public:
+  OnePtmFilterMng(PrsmParaPtr prsm_para_ptr){prsm_para_ptr_ = prsm_para_ptr;}
   OnePtmFilterMng(PrsmParaPtr prsm_para_ptr,
                   const std::string & output_file_ext,
                   int thread_num,

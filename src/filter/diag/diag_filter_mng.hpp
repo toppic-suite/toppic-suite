@@ -21,6 +21,7 @@ namespace toppic {
 
 class DiagFilterMng {
  public:
+  DiagFilterMng(PrsmParaPtr prsm_para_ptr){prsm_para_ptr_ = prsm_para_ptr;}
   DiagFilterMng(PrsmParaPtr prsm_para_ptr,
                 int filtering_result_num,
                 int thread_num,
