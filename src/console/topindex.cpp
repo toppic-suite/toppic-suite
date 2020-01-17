@@ -20,6 +20,8 @@
 #include "console/topindex_argument.hpp"
 #include "console/topindex_process.hpp"
 
+using namespace toppic;
+
 int main(int argc, char* argv[]) {
   //toppic::log_level = 3;
   std::cout << std::setprecision(10);
@@ -34,7 +36,7 @@ int main(int argc, char* argv[]) {
 
   std::map<std::string, std::string> arguments = argu_processor.getArguments();
 
-  toppic::TopIndexProcess(arguments);
+  TopIndexProcess(arguments);
 
   return 0;
 }

@@ -47,6 +47,8 @@ class ZeroPtmFilterMng {
   boost::mutex mutex_;
 
   std::vector<int> cnts_;
+
+  std::vector<std::string> file_names{"toppic_zero_ptm_complete", "toppic_zero_ptm_prefix", "toppic_zero_ptm_suffix", "toppic_zero_ptm_internal"};
 };
 
 typedef std::shared_ptr<ZeroPtmFilterMng> ZeroPtmFilterMngPtr;

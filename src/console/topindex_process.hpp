@@ -21,13 +21,18 @@
 
 #include "common/base/mod.hpp"
 #include "seq/proteoform.hpp"
-namespace toppic {
 
+#include "filter/zeroptm/zero_ptm_filter_mng.hpp"
+#include "filter/oneptm/one_ptm_filter_mng.hpp"
+#include "filter/diag/diag_filter_mng.hpp"
+
+namespace toppic {
     void TopIndexProcess(std::map<std::string, std::string> & arguments);
-    void process(PrsmParaPtr prsm_para_ptr, ZeroPtmFilterProcessorPtr zero_ptr, 
-            OnePtmFilterProcessorPtr one_ptr, DiagFilterProcessorPtr diag_ptr, 
-            int thread_num);
-    void createIndexFiles(ProteoformPtrVec raw_forms, int block_idx);
+    void process(ZeroPtmFilterMngPtr zero_ptr, int thread_num);
+    void process(OnePtmFilterMngPtr one_ptm_filter_mng_ptr, int thread_num);
+    void process(DiagFilterMngPtr diag_filter_mng_ptr, int thread_num);
+    
+    void createIndexFiles(ProteoformPtrVec &raw_forms, int block_idx, ZeroPtmFilterMngPtr mng_ptr);
 }  // namespace toppic
 
 #endif
