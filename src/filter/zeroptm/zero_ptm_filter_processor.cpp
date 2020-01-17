@@ -158,8 +158,11 @@ inline void createIndexFiles(const ProteoformPtrVec & raw_forms,
                         int block_idx, ZeroPtmFilterMngPtr mng_ptr) {  
     std::cout << "Generating Non PTM index files --- started" << std::endl;
     std::string block_str = str_util::toString(block_idx);
-    std::vector<std::string> file_vec{"term_index" + block_str, "diag_index" + block_str, 
-    "rev_term_index" + block_str, "rev_diag_index" + block_str};
+
+    //index file names
+    std::vector<std::string> file_vec{"zero_ptm_term_index" + block_str, "zero_ptm_diag_index" + block_str, 
+    "zero_ptm_rev_term_index" + block_str, "zero_ptm_rev_diag_index" + block_str};
+
     MassZeroPtmIndexPtr filter_ptr = std::make_shared<MassZeroPtmIndex>(raw_forms, mng_ptr, file_vec);
     std::cout << "Generating Non PTM index files --- finished" << std::endl;
 }

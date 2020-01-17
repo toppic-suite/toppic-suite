@@ -29,6 +29,7 @@
 
 #include "filter/oneptm/one_ptm_filter_processor.hpp"
 #include "filter/oneptm/mass_one_ptm_filter.hpp"
+#include "filter/oneptm/mass_one_ptm_index_file.hpp"
 
 namespace toppic {
 
@@ -121,7 +122,6 @@ void OnePtmFilterProcessor::process() {
   if (mng_ptr_->residueModFileName_ != "") {
     mod_mass_list = mod_util::getModMassVec(mod_util::readModTxt(mng_ptr_->residueModFileName_)[2]);
   }
-
   int spec_num = msalign_util::getSpNum(prsm_para_ptr->getSpectrumFileName());
   // n_spec_block = spec_num * block_num
   mng_ptr_->n_spec_block_ = spec_num * db_block_ptr_vec.size();
@@ -144,5 +144,59 @@ void OnePtmFilterProcessor::process() {
                                         mng_ptr_->comp_num_, mng_ptr_->pref_suff_num_, mng_ptr_->inte_num_ );
   std::cout << "One PTM filtering - combining blocks finished." << std::endl;
 }
+//below functions are used for generating index files
 
+inline void createIndexFiles(const ProteoformPtrVec & raw_forms,
+                        int block_idx, 
+                        OnePtmFilterMngPtr mng_ptr,
+                        const std::vector<double> & mod_mass_list) {
+
+    std::cout << "Generating One PTM index files --- started" << std::endl;
+    std::string block_str = str_util::toString(block_idx);
+
+    //index file names
+    std::vector<std::string> file_vec{"one_ptm_term_index" + block_str, "one_ptm_diag_index" + block_str, 
+    "one_ptm_rev_term_index" + block_str, "one_ptm_rev_diag_index" + block_str};
+
+    MassOnePtmIndexPtr filter_ptr = std::make_shared<MassOnePtmIndex>(raw_forms, mng_ptr, file_vec);
+    std::cout << "Generating One PTM index files --- finished" << std::endl;
+}
+
+std::function<void()> geneIndexTask(int block_idx, 
+                               const std::vector<double> &mod_mass_list, 
+                               OnePtmFilterMngPtr mng_ptr) {
+  return[block_idx, mod_mass_list, mng_ptr] () {
+    PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
+
+    std::string db_block_file_name = prsm_para_ptr->getSearchDbFileName()
+        + "_" + str_util::toString(block_idx);
+    ProteoformPtrVec raw_forms
+        = proteoform_factory::readFastaToProteoformPtrVec(db_block_file_name,
+                                                          prsm_para_ptr->getFixModPtrVec());
+    createIndexFiles(raw_forms, block_idx, mng_ptr, mod_mass_list);
+  };
+}
+void OnePtmFilterProcessor::index_process(){
+  //for generating index files
+  PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
+  std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
+  DbBlockPtrVec db_block_ptr_vec = DbBlock::readDbBlockIndex(db_file_name);
+
+  std::vector<double> mod_mass_list;
+  if (mng_ptr_->residueModFileName_ != "") {
+    mod_mass_list = mod_util::getModMassVec(mod_util::readModTxt(mng_ptr_->residueModFileName_)[2]);
+  }
+
+  SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(mng_ptr_->thread_num_);
+  int block_num = db_block_ptr_vec.size();
+
+  for (int i = 0; i < block_num; i++) {
+    while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ * 2) {
+      boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+    }
+    pool_ptr->Enqueue(geneIndexTask(db_block_ptr_vec[i]->getBlockIdx(), mod_mass_list, mng_ptr_));
+  }
+  pool_ptr->ShutDown();
+  std::cout << std::endl;
+}
 } /* namespace toppic */
