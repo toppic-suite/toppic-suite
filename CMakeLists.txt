@@ -128,11 +128,11 @@ file(GLOB TOPDIFF_CONSOLE_SRCS
         ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topdiff.cpp)
 
 # topdiff gui main 
-file(GLOB TOPINDEX_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topdiff/*.cpp
+file(GLOB TOPDIFF_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topdiff/*.cpp
 			      ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topdiff/*.qrc)
 
 # topindex classes
-file(GLOB TOPINDEX_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/merge/*.cpp)
+file(GLOB TOPINDEX_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/*.cpp)
 
 # topindex console main
 file(GLOB TOPINDEX_PROC_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topindex_process.cpp
@@ -195,7 +195,8 @@ add_executable(topdiff_gui ${TOPDIFF_GUI_SRCS} ${TOPDIFF_GUI_QRC}
 
 add_executable(topindex 
   ${TOPINDEX_CONSOLE_SRCS} ${TOPINDEX_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS}
-  ${SEQ_SRCS} ${SPEC_SRCS} ${ENV_SRCS} ${FEATURE_SRCS} ${PRSM_SRCS} ${TOPIDEX_SRCS})
+  ${SEQ_SRCS} ${SPEC_SRCS} ${ENV_SRCS} ${FEATURE_SRCS} ${PRSM_SRCS} ${FILTER_SRCS} 
+  ${ZERO_PTM_SRCS} ${ONE_PTM_SEARCH_SRCS} ${PTM_SRCS} ${TOPIDEX_SRCS})
 
 add_executable(topindex_gui ${TOPINDEX_GUI_SRCS} ${TOPINDEX_GUI_QRC}
   ${TOPINDEX_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS} 
@@ -236,7 +237,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
         boost_filesystem-mt boost_system-mt boost_thread-mt pthread z Ws2_32)
 
    target_link_libraries(topindex xerces-c boost_program_options-mt
-        boost_filesystem-mt boost_system-mt boost_thread-mt pthread z Ws2_32)
+	boost_serialization-mt boost_filesystem-mt boost_system-mt boost_thread-mt pthread z Ws2_32)
 
     # for Qt
     SET(QTOPTION -Wl,-subsystem,windows)
@@ -258,7 +259,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
         boost_program_options-mt boost_thread-mt pthread z Ws2_32)
 
     target_link_libraries(topindex_gui ${QTOPTION} Qt5Widgets Qt5Core Qt5Gui xerces-c
-        boost_filesystem-mt boost_system-mt 
+        boost_filesystem-mt boost_system-mt boost_serialization-mt 
         boost_program_options-mt boost_thread-mt pthread z Ws2_32)
 
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows") 
@@ -296,10 +297,10 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
         xerces-c boost_program_options boost_filesystem boost_system boost_thread boost_iostreams pthread z)
 
     target_link_libraries(topindex xerces-c boost_program_options
-	      boost_filesystem boost_system boost_thread pthread z)
+	      boost_filesystem boost_system boost_serialization boost_thread pthread z)
 
     target_link_libraries(topindex_gui Qt5Widgets Qt5Core Qt5Gui
-        xerces-c boost_program_options boost_filesystem boost_system boost_thread boost_iostreams pthread z)
+        xerces-c boost_program_options boost_filesystem boost_serialization boost_system boost_thread boost_iostreams pthread z)
 
 #    target_link_libraries(toppic_test xerces-c boost_program_options
 #  boost_filesystem boost_system boost_thread pthread z)

@@ -33,50 +33,7 @@
 
 namespace toppic {
     void TopIndexProcess(std::map<std::string, std::string> & arguments);
-    /*
-    template <class T>
-    T process(T ptr, int thread_num){
-        std::string db_file_name = ptr->prsm_para_ptr_->getSearchDbFileName();
-        DbBlockPtrVec db_block_ptr_vec = DbBlock::readDbBlockIndex(db_file_name);
-
-        int block_num = db_block_ptr_vec.size();
-
-        SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(thread_num);
-        
-        for (int i = 0; i < block_num; i++) {
-            while (pool_ptr->getQueueSize() >= thread_num * 2) {
-            boost::this_thread::sleep(boost::posix_time::milliseconds(100));
-            }
-            pool_ptr->Enqueue(geneTask(db_block_ptr_vec[i]->getBlockIdx(), ptr));
-    }
-        pool_ptr->ShutDown();
-    };
-
-    template <class T>
-    T createIndexFiles(std::string block_str, std::string folderName, T filter_ptr){
-        filter_ptr->term_index_ptr_ ->setfileName("term_index" + block_str);
-        filter_ptr->diag_index_ptr_->setfileName("diag_index" + block_str);
-        filter_ptr->rev_term_index_ptr_->setfileName("rev_term_index" + block_str);
-        filter_ptr->rev_diag_index_ptr_->setfileName("rev_diag_index" + block_str);
-
-        filter_ptr->term_index_ptr_->setDirName(folderName);
-        filter_ptr->diag_index_ptr_->setDirName(folderName);
-        filter_ptr->rev_term_index_ptr_->setDirName(folderName);
-        filter_ptr->rev_diag_index_ptr_->setDirName(folderName);
-        
-        filter_ptr->term_index_ptr_->serializeMassMatch();
-        filter_ptr->diag_index_ptr_->serializeMassMatch();
-        filter_ptr->rev_term_index_ptr_->serializeMassMatch();
-        filter_ptr->rev_diag_index_ptr_->serializeMassMatch();
-    };
-    */
-    void process(PrsmParaPtr prsm_para_ptr, int thread_num);
-    //void process(OnePtmFilterMngPtr one_ptm_filter_mng_ptr, int thread_num);
-    //void process(DiagFilterMngPtr diag_filter_mng_ptr, int thread_num);
-    
-    //void createIndexFiles(ProteoformPtrVec &raw_forms, int block_idx, ZeroPtmFilterMngPtr mng_ptr);
-
-
+    void index_process();
 }  // namespace toppic
 
 #endif

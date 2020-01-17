@@ -12,8 +12,8 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#ifndef TOPPIC_FILTER_ZERO_PTM_MASS_ZERO_PTM_FILTER_HPP_
-#define TOPPIC_FILTER_ZERO_PTM_MASS_ZERO_PTM_FILTER_HPP_
+#ifndef TOPPIC_FILTER_ZERO_PTM_MASS_ZERO_PTM_INDEX_FILE_HPP_
+#define TOPPIC_FILTER_ZERO_PTM_MASS_ZERO_PTM_INDEX_FILE_HPP_
 
 #include "ms/spec/extend_ms.hpp"
 #include "prsm/simple_prsm.hpp"
@@ -22,21 +22,10 @@
 
 namespace toppic {
 
-class MassZeroPtmFilter {
+class MassZeroPtmIndex {
  public:
-  MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs, ZeroPtmFilterMngPtr
-                    mng_ptr);
-  void computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec);
-
-  SimplePrsmPtrVec getCompMatchPtrs() {return comp_match_ptrs_;}
-  SimplePrsmPtrVec getPrefMatchPtrs() {return pref_match_ptrs_;}
-  SimplePrsmPtrVec getSuffMatchPtrs() {return suff_match_ptrs_;}
-  SimplePrsmPtrVec getInternalMatchPtrs() {return internal_match_ptrs_;}
-
-  MassMatchPtr getDiagIndexPtr() {return diag_index_ptr_;}
-  MassMatchPtr getRevDiagIndexPtr() {return rev_diag_index_ptr_;}
-  MassMatchPtr getTermIndexPtr() {return term_index_ptr_;}
-  MassMatchPtr getRevTermIndexPtr() {return rev_term_index_ptr_;}
+  MassZeroPtmIndex(const ProteoformPtrVec &proteo_ptrs, ZeroPtmFilterMngPtr
+                    mng_ptr, std::vector<std::string> file_vec);
 
  private:
   ZeroPtmFilterMngPtr mng_ptr_;
@@ -55,7 +44,7 @@ class MassZeroPtmFilter {
   std::string block_str; //which db_block it is. Used when merging the output files by order.
 };
 
-typedef std::shared_ptr<MassZeroPtmFilter> MassZeroPtmFilterPtr;
+typedef std::shared_ptr<MassZeroPtmIndex> MassZeroPtmIndexPtr;
 } /* namespace toppic */
 
 #endif /* ZERO_PTM_FILTER_H_ */

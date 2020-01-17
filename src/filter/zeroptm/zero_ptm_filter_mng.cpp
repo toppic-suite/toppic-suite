@@ -23,5 +23,5 @@ ZeroPtmFilterMng::ZeroPtmFilterMng(PrsmParaPtr prsm_para_ptr,
     thread_num_(thread_num),
     output_file_ext_(output_file_ext) {}
 
-} 
 
+} 

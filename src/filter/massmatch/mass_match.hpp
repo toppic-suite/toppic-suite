@@ -47,7 +47,7 @@ class MassMatch {
                        std::vector<short> &scores);
 
   //void serializeMassMatch();
-  void serializeMassMatch(std::string fName, std::string block_str, std::string dirName);
+  void serializeMassMatch();
   //void deserializeMassMatch(MassMatch **m);
   void deserializeMassMatch(MassMatch **m);
 

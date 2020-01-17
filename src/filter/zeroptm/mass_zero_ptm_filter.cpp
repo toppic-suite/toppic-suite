@@ -56,7 +56,6 @@ MassZeroPtmFilter::MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
                                                                  mng_ptr->max_proteoform_mass_,
                                                                  mng_ptr->filter_scale_);
 }
-
 void MassZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec) {
   PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
   bool pref = true;
@@ -148,5 +147,8 @@ void MassZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec) {
                                                                 proteo_ptrs_[id], score));
   }
 }
+
+
+
 
 } /* namespace toppic */
