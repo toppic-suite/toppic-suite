@@ -16,4 +16,6 @@ class Constants{
     static SEQDOWNLOADSVG = "seq_download_svg";
     static DIVTABLECONTAINER = "divtableContainer";
     static TABLEHEIGHT = "400px";
+    static GRAPHDOWNLOADPNG = "graph_download_png";
+    static GRAPHDOWNLOADSVG = "graph_download_svg";
 }

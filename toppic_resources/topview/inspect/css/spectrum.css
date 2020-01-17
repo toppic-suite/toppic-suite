@@ -79,10 +79,9 @@ textarea {
 #dropdownMenuLink {
 	width: 75% !important;
 }
-.dropdown-menu{
-	width: 80% !important;
+.seqvisualization .dropdown-menu{
+	width: 100% !important;
 }
-
 /**
 *CCC to set error selection block to the right most 
 */
@@ -151,4 +150,27 @@ button.close {
 }
 #divtableContainer a{
   color: #428bca !important ;
+}
+.prsmgraphdownload .dropdown-menu{
+  min-width:6.0rem !important;
+}
+.prsmgraphdownload .dropdown-item{
+  padding-right: 1rem !important;
+  padding-left: 1rem !important;
+}
+.prsmgraphdownload a{
+  color: #428bca !important;
+}
+.prsmgraphdownload button{
+  margin: 1px !important;
+}
+.seqvisualization .dropdown-menu{
+  min-width:6.0rem !important;
+}
+.seqvisualization .dropdown-item{
+  padding-right: 1rem !important;
+  padding-left: 1rem !important;
+}
+.seqvisualization a{
+color: #428bca !important;
 }
