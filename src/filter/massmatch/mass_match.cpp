@@ -74,6 +74,19 @@ MassMatch::MassMatch(std::vector<std::vector<int>> &mass_2d,
   initIndexes(mass_2d, real_shift_2d, pos_2d);
   prm_ = prm;
 }
+void MassMatch::serializeMassMatch(std::string fName, std::string block_str, std::string dirName){
+  std::string fileName = fName + block_str;
+  std::ofstream newFile(fileName);
+
+  if(newFile.is_open()){
+    boost::archive::text_oarchive oa(newFile);
+    oa << this;
+  }
+
+  newFile.close();
+
+}
+/*
 //serialize MassMatch object that calls this method
 void MassMatch::serializeMassMatch(){
   std::string fileName = this->getFileName() + ".txt";
@@ -102,7 +115,7 @@ void MassMatch::serializeMassMatch(){
   //else{}
 
   fileToRead.close();
-}
+}*/
 
 void MassMatch::initProteoformBeginEnds(std::vector<std::vector<double>> &shift_2d) {
   // no need to init
