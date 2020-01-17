@@ -2,7 +2,7 @@
 <head>
 <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Visual inspection</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous"></head>
 <link rel="stylesheet" type="text/css" href="../css/lib/jquery.dataTables.css"/>
 <link rel="stylesheet" type="text/css" href="../css/lib/bootstrap.min.css">
 <link rel="stylesheet" type="text/css" href="../css/lib/nav_bar.css">
@@ -237,8 +237,8 @@
               alt="info"></h5>-->
           <h5>Fixed PTMs</h5>
 				<div class="fixedptmslist">
-				<select class="browser-default custom-select" id="dropdownMenuLink">
-				</select>	
+					<select class="browser-default custom-select" id="dropdownMenuLink">
+					</select>	
 				<button type="button" class="btn btn-default btn-sm addnewrow">
 						<i class="fa fa-plus" ></i>
 				</button>
@@ -301,14 +301,14 @@
 			<div class="col-3">
 				<h6 id="massvariation_h6" style="display:none"><text>Mass variation:&nbsp;</text><text id="massvariation">0</text></h6>
 			</div>
-			<div class="col-3">
+			<div class="col-3 seqvisualization">
 					<div class="dropdown dropleft float-right">
-					<button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" id="svg_download" style="display:none">
-					  Download
-					</button>
+						<button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" id="svg_download" style="display:none">
+						Download
+						</button>
 					<div class="dropdown-menu">
-					  <a class="dropdown-item" href="#!" id="seq_download_png">Download as PNG</a>
-					  <a class="dropdown-item" href="#!" id="seq_download_svg">Download as SVG</a>
+					  <a class="dropdown-item" href="#!" id="seq_download_png"><i class="fas fa-download"></i><span>&nbsp;&nbsp;PNG</span></a>
+					  <a class="dropdown-item" href="#!" id="seq_download_svg"><i class="fas fa-download"></i><span>&nbsp;&nbsp;SVG</span></a>
 					</div>
 				  </div>
 			</div>
@@ -318,9 +318,6 @@
 				<svg id = "seqsvg" style="background-color:white;display:none"></svg>
 			</div>	
 		</div>
-	<div class="row">
-		
-	</div>
 	<div class="row">
 		<svg id = "spectrum" height="250" width = "1000" style="background-color:white;display:none"></svg>
 	</div>
@@ -334,7 +331,20 @@
 		<div class="col-3 pull-left" >
 			<a id="unmatched_peak_count" href="#!" onclick="showNonMatchedPeaks();">Non Matched Peaks</a>
 		</div>
-		<div class="col-5 pull-right" >
+		<div class="col-5 prsmgraphdownload" >
+			<div class="dropup">
+				<button type="button" class="btn btn-primary btn-sm dropdown-toggle float-right" data-toggle="dropdown" id="graph_download">
+					Download
+				</button>
+				<div class="dropdown-menu">
+					<a class="dropdown-item" href="#!" id="graph_download_png">
+						<i class="fas fa-download"></i><span>&nbsp;&nbsp;PNG</span>
+					</a>
+					<a class="dropdown-item" href="#!" id="graph_download_svg">
+						<i class="fas fa-download"></i><span>&nbsp;&nbsp;SVG</span>
+					</a>
+				</div>
+			</div>
 			<button type="button" class="btn btn-primary btn-sm float-right" id="hide_table">Hide Table</button>
 		</div>
 	</div>

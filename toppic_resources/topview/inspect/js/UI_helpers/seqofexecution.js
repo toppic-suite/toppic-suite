@@ -539,26 +539,34 @@ class SeqOfExecution
 		/**
 		 * On click action to download sequence SVG in .svg format
 		 */
-		$("#"+Constants.SEQDOWNLOADSVG).click(function(){
-			let name = "seq.svg"
-			let svg_element = d3.selectAll("#"+Constants.SEQSVGID).node();
-			svg2svg(svg_element,name);
+		d3.select("#"+Constants.SEQDOWNLOADSVG).on("click",function(){
+			x = d3.event.pageX;
+			y = d3.event.pageY - 40;
+			//function in prsmtohtml
+			popupnamewindow("svg","seq",Constants.SEQSVGID,x,y)
 		})
 		/**
-		 * On click action to download sequence SVG in .png format
+		 * On click action to download sequence svg in .svg format
 		 */
-		$("#"+Constants.SEQDOWNLOADPNG).click(function(){
-			let l_svgContainer = d3.select("#"+Constants.SEQSVGID);
-			let svgString = getSVGString(l_svgContainer.node());
-			let svg_element = document.getElementById(Constants.SEQSVGID);
-			let bBox = svg_element.getBBox();
-			let width = bBox.width;
-			let height = bBox.height ;
-			svgString2Image( svgString, 2*width, 2*height, 'png', save ); 
-			function save( dataBlob, filesize ){
-				saveAs( dataBlob, 'seq.png' ); 
-			}
+		d3.select("#"+Constants.SEQDOWNLOADPNG).on("click",function(){
+			x = d3.event.pageX;
+			y = d3.event.pageY ;
+			//function in prsmtohtml
+			popupnamewindow("png","seq", Constants.SEQSVGID,x,y)
 		})
-		
+
+		d3.select("#"+Constants.GRAPHDOWNLOADSVG).on("click",function(){
+			x = d3.event.pageX;
+			y = d3.event.pageY + 40;
+			//function in prsmtohtml
+			popupnamewindow("svg","graph", Constants.SPECTRUMGRAPHID,x,y)
+		})
+
+		d3.select("#"+Constants.GRAPHDOWNLOADPNG).on("click",function(){
+			x = d3.event.pageX;
+			y = d3.event.pageY + 80;
+			//function in prsmtohtml
+			popupnamewindow("png","graph", Constants.SPECTRUMGRAPHID,x,y)
+		})
 	}	
 }

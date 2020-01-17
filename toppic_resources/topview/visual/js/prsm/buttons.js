@@ -72,6 +72,7 @@ function buttons(){
 	d3.select("#graph_download_png").on("click",function(){
 		x = d3.event.pageX;
 		y = d3.event.pageY + 80;
+		//function in prsmtohtml
 		popupnamewindow("png", "ms1svg",x,y)
 	})
 	d3.select("#graph_download_svg").on("click",function(){
