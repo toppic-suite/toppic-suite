@@ -47,6 +47,10 @@ class PrsmPara {
 
   bool doLocaliztion() {return localization_;}
 
+  std::string getIndexDir() {return index_file_dir_;}
+
+  void setIndexDir(std::string dir) {index_file_dir_ = dir;}
+
  private:
   std::string search_db_file_name_;
 
@@ -65,6 +69,8 @@ class PrsmPara {
   int group_spec_num_;
 
   bool localization_;
+
+  std::string index_file_dir_;
 
   /** spectrum parameters */
   SpParaPtr sp_para_ptr_;
