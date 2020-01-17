@@ -43,6 +43,8 @@ class DiagFilterMng {
   std::string residueModFileName_;
 
   int var_num_;
+
+    std::vector<std::string> file_names{"toppic_multi_ptm_complete", "toppic_multi_ptm_prefix", "toppic_multi_ptm_suffix", "toppic_multi_ptm_internal"};
 };
 
 typedef std::shared_ptr<DiagFilterMng> DiagFilterMngPtr;

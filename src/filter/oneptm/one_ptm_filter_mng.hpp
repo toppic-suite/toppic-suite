@@ -54,6 +54,8 @@ class OnePtmFilterMng {
   boost::mutex mutex_;
 
   std::vector<int> cnts_;
+
+  std::vector<std::string> file_names{"toppic_one_ptm_complete", "toppic_one_ptm_prefix", "toppic_one_ptm_suffix", "toppic_one_ptm_internal"};
 };
 
 typedef std::shared_ptr<OnePtmFilterMng> OnePtmFilterMngPtr;

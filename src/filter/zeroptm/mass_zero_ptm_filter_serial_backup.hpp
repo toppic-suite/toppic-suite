@@ -33,11 +33,6 @@ class MassZeroPtmFilter {
   SimplePrsmPtrVec getSuffMatchPtrs() {return suff_match_ptrs_;}
   SimplePrsmPtrVec getInternalMatchPtrs() {return internal_match_ptrs_;}
 
-  MassMatchPtr getDiagIndexPtr() {return diag_index_ptr_;}
-  MassMatchPtr getRevDiagIndexPtr() {return rev_diag_index_ptr_;}
-  MassMatchPtr getTermIndexPtr() {return term_index_ptr_;}
-  MassMatchPtr getRevTermIndexPtr() {return rev_term_index_ptr_;}
-
  private:
   ZeroPtmFilterMngPtr mng_ptr_;
   ProteoformPtrVec proteo_ptrs_;

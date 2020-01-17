@@ -29,6 +29,8 @@ class PrsmPara {
 
   std::string getSearchDbFileName() {return search_db_file_name_;}
 
+  std::string getOriDbName(){return ori_db_name_;}
+  
   std::string getSpectrumFileName() {return spec_file_name_;}
 
   std::string getResourceDir() {return resource_dir_;}
@@ -47,6 +49,8 @@ class PrsmPara {
 
  private:
   std::string search_db_file_name_;
+
+  std::string ori_db_name_;
 
   std::string spec_file_name_;
 
