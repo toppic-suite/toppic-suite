@@ -27,6 +27,7 @@
 #include "prsm/simple_prsm_str_merge.hpp"
 #include "filter/diag/mass_diag_filter.hpp"
 #include "filter/diag/diag_filter_processor.hpp"
+#include "filter/diag/mass_diag_index_file.hpp"
 
 namespace toppic {
 
@@ -161,6 +162,58 @@ void DiagFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num
   
   //Remove temporary files
   file_util::cleanTempFiles(sp_file_name, cur_output_ext + "_");
+}
+//below are used for index file generation
+/*
+std::function<void()> geneIndexTask(MassDiagFilterPtr filter_ptr,
+                               const PrmMsPtrVec & ms_ptr_vec,
+                               SimpleThreadPoolPtr  pool_ptr, 
+                               SimplePrsmXmlWriterPtrVec &writer_ptr_vec) {
+  return [filter_ptr, ms_ptr_vec, pool_ptr, writer_ptr_vec]() {
+    SimplePrsmPtrVec match_ptrs = filter_ptr->getBestMatch(ms_ptr_vec);
+    boost::thread::id thread_id = boost::this_thread::get_id();
+    int writer_id = pool_ptr->getId(thread_id);
+    writer_ptr_vec[writer_id]->write(match_ptrs);
+  };
+}*/
+
+void DiagFilterProcessor::index_process() {
+  std::string db_file_name = mng_ptr_->prsm_para_ptr_->getSearchDbFileName();
+  DbBlockPtrVec db_block_ptr_vec = DbBlock::readDbBlockIndex(db_file_name);
+
+  std::vector<double> mod_mass_list;
+  if (mng_ptr_->residueModFileName_ != "") {
+    mod_mass_list = mod_util::getModMassVec(mod_util::readModTxt(mng_ptr_->residueModFileName_)[2]);
+  }
+
+  SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(mng_ptr_->thread_num_);
+  int block_num = db_block_ptr_vec.size();
+  
+  for (size_t i = 0; i < db_block_ptr_vec.size(); i++) {
+    std::cout << "Generating Multi PTM index files --- started" << std::endl;
+    createIndexFiles(db_block_ptr_vec[i], db_block_ptr_vec.size(), mod_mass_list);
+    std::cout << "Generating Multi PTM index files --- finished" << std::endl;
+  }
+}
+
+void DiagFilterProcessor::createIndexFiles(DbBlockPtr block_ptr, int total_block_num,
+                                       const std::vector<double> & mod_mass_list) {
+  PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
+
+  std::string db_block_file_name = prsm_para_ptr->getSearchDbFileName()
+      + "_" + str_util::toString(block_ptr->getBlockIdx());
+
+  ProteoformPtrVec raw_forms
+      = proteoform_factory::readFastaToProteoformPtrVec(db_block_file_name,
+                                                        prsm_para_ptr->getFixModPtrVec());
+
+  std::string block_str = str_util::toString(block_ptr->getBlockIdx());
+
+  //index file names
+  //std::vector<std::string> file_vec{"multi_ptm_term_index" + block_str, "multi_ptm_diag_index" + block_str, 
+  //"multi_ptm_rev_term_index" + block_str, "multi_ptm_rev_diag_index" + block_str};
+
+  MassDiagIndexPtr filter_ptr = std::make_shared<MassDiagIndex>(raw_forms, mng_ptr_, block_str);
 }
 
 }  // namespace toppic

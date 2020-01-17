@@ -23,9 +23,14 @@
 #include "console/topindex_process.hpp"
 
 #include "common/base/base_data.hpp"
+#include "common/util/file_util.hpp"
 
 #include "filter/zeroptm/zero_ptm_filter_mng.hpp"
 #include "filter/zeroptm/zero_ptm_filter_processor.hpp"
+#include "filter/oneptm/one_ptm_filter_mng.hpp"
+#include "filter/oneptm/one_ptm_filter_processor.hpp"
+#include "filter/diag/diag_filter_mng.hpp"
+#include "filter/diag/diag_filter_processor.hpp"
 
 #include "seq/fasta_util.hpp"
 #include "seq/db_block.hpp"
@@ -46,12 +51,16 @@ void TopIndexProcess(std::map<std::string, std::string> &arguments){
 
     int db_block_size = std::stoi(arguments["databaseBlockSize"]);
     int thread_num = std::stoi(arguments["threadNumber"]);
-    //int filter_result_num = std::stoi(arguments["filteringResultNumber"]);
+    int filter_result_num = std::stoi(arguments["filteringResultNumber"]);
+
+    file_util::createFolder(ori_db_file_name + "_idx");
 
     bool decoy = false;
     if (arguments["searchType"] == "TARGET+DECOY") {
       decoy = true;
     }
+    
+    //create a folder for index files 
 
     fasta_util::dbPreprocess(ori_db_file_name, db_file_name, decoy, db_block_size);
 
@@ -60,8 +69,24 @@ void TopIndexProcess(std::map<std::string, std::string> &arguments){
     ZeroPtmFilterProcessorPtr zero_filter_processor
         = std::make_shared<ZeroPtmFilterProcessor>(zero_filter_mng_ptr);
 
-    zero_filter_processor->index_process();
-    //zero_filter_processor = nullptr;
+    //zero_filter_processor->index_process();
+    zero_filter_processor = nullptr;
+
+    OnePtmFilterMngPtr one_ptm_filter_mng_ptr
+        = std::make_shared<OnePtmFilterMng>(prsm_para_ptr, "toppic_one_filter", thread_num);
+    OnePtmFilterProcessorPtr one_filter_processor
+        = std::make_shared<OnePtmFilterProcessor>(one_ptm_filter_mng_ptr);
+    //one_filter_processor->index_process();
+    one_filter_processor = nullptr;
+
+    DiagFilterMngPtr diag_filter_mng_ptr
+        = std::make_shared<DiagFilterMng>(prsm_para_ptr, filter_result_num,
+                                            thread_num, "toppic_multi_filter");
+    DiagFilterProcessorPtr diag_filter_processor
+        = std::make_shared<DiagFilterProcessor>(diag_filter_mng_ptr);
+    diag_filter_processor->index_process();
+    diag_filter_processor = nullptr;
+    
 }
 
 }
