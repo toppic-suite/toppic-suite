@@ -61,6 +61,11 @@ MassZeroPtmIndex::MassZeroPtmIndex(const ProteoformPtrVec &proteo_ptrs,
   rev_term_index_ptr_->setfileName(file_vec[2]);
   rev_diag_index_ptr_->setfileName(file_vec[3]);
 
+  term_index_ptr_->setDirName(mng_ptr->prsm_para_ptr_->getIndexDir());
+  diag_index_ptr_->setDirName(mng_ptr->prsm_para_ptr_->getIndexDir());
+  rev_term_index_ptr_->setDirName(mng_ptr->prsm_para_ptr_->getIndexDir());
+  rev_diag_index_ptr_->setDirName(mng_ptr->prsm_para_ptr_->getIndexDir());
+
   term_index_ptr_->serializeMassMatch();
   diag_index_ptr_->serializeMassMatch();
   rev_term_index_ptr_->serializeMassMatch();

@@ -76,12 +76,17 @@ MassMatch::MassMatch(std::vector<std::vector<int>> &mass_2d,
 }
 void MassMatch::serializeMassMatch(){
   std::string fileName = this->getFileName();
+  std::string dirName = this->getDirName();
 
   std::ofstream newFile(fileName);
 
   if(newFile.is_open()){
     boost::archive::text_oarchive oa(newFile);
     oa << this;
+  }
+
+  if (dirName != ""){
+    file_util::moveFile(fileName, dirName);
   }
 
   newFile.close();
