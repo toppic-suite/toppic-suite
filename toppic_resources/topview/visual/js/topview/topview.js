@@ -2,6 +2,7 @@
  * On Click implimentation of topview button
  */
 function onclickTopView(){
+    window.open("../inspect/spectrum.html");
     //let url = "../Spectrum-Visualization/spectrum.html"+"?"+"prsmid=87/"+"specId=";
     let peakAndIntensityList = getDataFromPRSMtoSpectralView();
     let massAndIntensityList = getMassAndIntensityData();
@@ -17,8 +18,6 @@ function onclickTopView(){
     window.localStorage.setItem('fixedPtmList', JSON.stringify(fixedPtmList));
     window.localStorage.setItem('unknownMassShiftList', JSON.stringify(unknownMassShiftList));
     window.localStorage.setItem('precursorMass', JSON.stringify(precursorMass));
-
-    window.open("../inspect/spectrum.html");
 }
 
 function getDataFromPRSMtoSpectralView(){
