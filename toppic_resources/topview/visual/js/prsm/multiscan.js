@@ -5,6 +5,8 @@ class MultiScan{
     }
     //ms1_ms2_json this give ms1_json folder or ms2_json folder
     promiseLoadDataJS(scanidList,ms1_ms2_json){
+        let timeout = 700;
+        if(scanidList.length == 1 ) timeout = 200;
         return new Promise((resolve,reject) => {
             let scanListWithData = [];
             //get the list of lists with scan Id and value
@@ -32,7 +34,7 @@ class MultiScan{
             setTimeout(function(){
                 this.scanListWithData = scanListWithData ;
                 resolve(scanListWithData);
-            },1000)
+            },timeout)
         })
     }
     getUniqueScanIdList(MultiScanList){
@@ -105,5 +107,32 @@ function generateCorrespondingGraph(current_data,id,prec_mz){
     }
     else{
         spectrumgraph = addSpectrum(id, peak_list, envelope_list, prec_mz);
+    }
+}
+function getCurrentData(dataList,scanid){
+    let current_data;
+    let len = dataList.length;
+    for(let i=0;i<len;i++)
+    {
+        if(dataList[i].key == parseInt(scanid))
+        {
+            current_data = dataList[i].value;
+            break;
+        }
+    }
+    return current_data;
+}
+function activateCurrentnavbar(id,currentValue){
+    let childs = $("#"+id).children();
+    let len = childs.length;
+    for(let i=0;i<len;i++)
+    {
+        let grandchildValue = $(childs[i]).children().attr('value');
+        if(grandchildValue == currentValue)
+        {
+            $("#"+id+" .active").removeClass("active");
+            $(childs[i]).children().addClass("active");
+            break;
+        }
     }
 }
