@@ -35,6 +35,7 @@
 var ms2_ScansWithData = [];	
 var ms1_ScansWithData = [];
 var ms2_graph ;
+var ms1_graph;
 $(document).ready(function(){
 	var x = location.href;
 	let l_split = x.split(/[?#]+/)[1];
@@ -100,24 +101,24 @@ $(document).ready(function(){
 		/* Create peaks data into table content */
 		createTableElements();
 		
-		//Getting Ms1 Ids
 		
-		// let ms1_ids = prsm_data.prsm.ms.ms_header.ms1_ids ;
-		// let ms1_id_1 = ms1_ids.split(" ");
+		let MultiScanObj = new MultiScan();
+		//Getting Ms1 Ids
+		let ms1_ids = prsm_data.prsm.ms.ms_header.ms1_ids ;
+		let ms1_id_1 = ms1_ids.split(" ");
 		// //let ms1_id_2 = ms1_ids.split(" ")[1];
 		// //Getting Ms1 Scan Ids
-		// console.log("ms2_id_list: ",ms1_id_1);
-		// let ms1_uniqueList = MultiScanObj.getUniqueScanIdList(ms1_id_1);
-		// MultiScanObj.promiseLoadDataJS(uniqueList,"ms1_json").then(scanListWithData => {
-		// 	console.log("Finally didi it", scanListWithData);
-		// 	ms1_ScansWithData = scanListWithData;
-		// 	MultiScanObj.createNavEements(scanListWithData,"popupspectrum");
-		// 	console.log("ms2_ScansWithData : ", ms1_ScansWithData);
+		console.log("ms2_id_list: ",ms1_id_1);
+		let ms1_uniqueList = MultiScanObj.getUniqueScanIdList(ms1_id_1);
+		MultiScanObj.promiseLoadDataJS(ms1_uniqueList,"ms1_json").then(scanListWithData => {
+			console.log("Finally didi it", scanListWithData);
+			ms1_ScansWithData = scanListWithData;
+			MultiScanObj.createMs1NavEements(scanListWithData,"popupspectrum");
+			console.log("ms1_ScansWithData : ", ms1_ScansWithData);
 		// 	buttons();
-		// })
+		})
 		//let ms1_scan_2 = ms1_scans.split(" ")[1];
 
-		let MultiScanObj = new MultiScan();
 		let ms2_scanListWithData = [];
 		let ms2_ids = prsm_data.prsm.ms.ms_header.ids;
     	let ms2_id_list = ms2_ids.split(" ");
@@ -126,7 +127,7 @@ $(document).ready(function(){
 		MultiScanObj.promiseLoadDataJS(ms2_uniqueList,"ms2_json").then(scanListWithData => {
 			console.log("Finally didi it", scanListWithData);
 			ms2_ScansWithData = scanListWithData;
-			MultiScanObj.createNavEements(scanListWithData,"ms2svg");
+			MultiScanObj.createMs2NavEements(scanListWithData,"ms2svg");
 			console.log("ms2_ScansWithData : ", ms2_ScansWithData);
 			buttons();
 		})
@@ -237,7 +238,7 @@ $(document).ready(function(){
 </table>
 </div>
 <div class="row" id="ms2svg_div" style="display:none;">
-	<ul class="nav nav-tabs graph_nav" id="graph_nav">
+	<ul class="nav nav-tabs graph_nav" id="ms2_graph_nav">
 	</ul>
 	<svg id = "ms2svg" style = "background-color:white;display: none;"></svg>
 </div>
@@ -413,7 +414,9 @@ $(document).ready(function(){
 			  <div class="modal-header ">
 				<button type="button" class="close" data-dismiss="modal">&times;</button>
 				</div>
-				 <div class="modal-body">
+				 <div class="modal-body ms1_graph_nav">
+					<ul class="nav nav-tabs graph_nav" id="ms1_graph_nav">
+					</ul>
 					 <svg id="popupspectrum" style="background-color:white" ></svg>
 				 </div> 
 				 <div class="modal-footer">
