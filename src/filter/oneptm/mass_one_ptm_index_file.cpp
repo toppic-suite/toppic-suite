@@ -52,6 +52,13 @@ MassOnePtmIndex::MassOnePtmIndex(const ProteoformPtrVec &proteo_ptrs,
   rev_term_index_ptr_->setfileName(file_vec[2]);
   rev_diag_index_ptr_->setfileName(file_vec[3]);
 
+  std::string dirName = mng_ptr_->prsm_para_ptr_->getOriDbName() + "_idx";
+
+  term_index_ptr_->setDirName(dirName);
+  diag_index_ptr_->setDirName(dirName);
+  rev_term_index_ptr_->setDirName(dirName);
+  rev_diag_index_ptr_->setDirName(dirName);
+
   term_index_ptr_->serializeMassMatch();
   diag_index_ptr_->serializeMassMatch();
   rev_term_index_ptr_->serializeMassMatch();

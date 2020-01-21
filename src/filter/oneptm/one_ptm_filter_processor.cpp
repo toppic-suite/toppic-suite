@@ -151,7 +151,7 @@ inline void createIndexFiles(const ProteoformPtrVec & raw_forms,
                         OnePtmFilterMngPtr mng_ptr,
                         const std::vector<double> & mod_mass_list) {
 
-    std::cout << "Generating One PTM index files --- started" << std::endl;
+    
     std::string block_str = str_util::toString(block_idx);
 
     //index file names
@@ -159,7 +159,7 @@ inline void createIndexFiles(const ProteoformPtrVec & raw_forms,
     "one_ptm_rev_term_index" + block_str, "one_ptm_rev_diag_index" + block_str};
 
     MassOnePtmIndexPtr filter_ptr = std::make_shared<MassOnePtmIndex>(raw_forms, mng_ptr, file_vec);
-    std::cout << "Generating One PTM index files --- finished" << std::endl;
+    
 }
 
 std::function<void()> geneIndexTask(int block_idx, 
@@ -182,6 +182,8 @@ void OnePtmFilterProcessor::index_process(){
   std::string db_file_name = prsm_para_ptr->getSearchDbFileName();
   DbBlockPtrVec db_block_ptr_vec = DbBlock::readDbBlockIndex(db_file_name);
 
+  std::cout << "Generating One PTM index files --- started" << std::endl;
+
   std::vector<double> mod_mass_list;
   if (mng_ptr_->residueModFileName_ != "") {
     mod_mass_list = mod_util::getModMassVec(mod_util::readModTxt(mng_ptr_->residueModFileName_)[2]);
@@ -197,6 +199,7 @@ void OnePtmFilterProcessor::index_process(){
     pool_ptr->Enqueue(geneIndexTask(db_block_ptr_vec[i]->getBlockIdx(), mod_mass_list, mng_ptr_));
   }
   pool_ptr->ShutDown();
-  std::cout << std::endl;
+  std::cout << "Generating One PTM index files --- finished" << std::endl;
+  //std::cout << std::endl;
 }
 } /* namespace toppic */

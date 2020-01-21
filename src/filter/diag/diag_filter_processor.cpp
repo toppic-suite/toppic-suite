@@ -181,6 +181,8 @@ void DiagFilterProcessor::index_process() {
   std::string db_file_name = mng_ptr_->prsm_para_ptr_->getSearchDbFileName();
   DbBlockPtrVec db_block_ptr_vec = DbBlock::readDbBlockIndex(db_file_name);
 
+  std::cout << "Generating Multi PTM index files --- started" << std::endl;
+
   std::vector<double> mod_mass_list;
   if (mng_ptr_->residueModFileName_ != "") {
     mod_mass_list = mod_util::getModMassVec(mod_util::readModTxt(mng_ptr_->residueModFileName_)[2]);
@@ -190,10 +192,11 @@ void DiagFilterProcessor::index_process() {
   int block_num = db_block_ptr_vec.size();
   
   for (size_t i = 0; i < db_block_ptr_vec.size(); i++) {
-    std::cout << "Generating Multi PTM index files --- started" << std::endl;
+    
     createIndexFiles(db_block_ptr_vec[i], db_block_ptr_vec.size(), mod_mass_list);
-    std::cout << "Generating Multi PTM index files --- finished" << std::endl;
   }
+  pool_ptr->ShutDown();
+  std::cout << "Generating Multi PTM index files --- finished" << std::endl;
 }
 
 void DiagFilterProcessor::createIndexFiles(DbBlockPtr block_ptr, int total_block_num,

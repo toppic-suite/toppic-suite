@@ -33,6 +33,11 @@ MassDiagIndex::MassDiagIndex(const ProteoformPtrVec &proteo_ptrs,
                                                         mng_ptr->max_proteoform_mass_,
                                                         mng_ptr->filter_scale_);
   index_ptr_->setfileName("diag" + block_str);
+
+  std::string dirName = mng_ptr_->prsm_para_ptr_->getOriDbName() + "_idx";
+
+  index_ptr_->setDirName(dirName);
+
   index_ptr_->serializeMassMatch();
 }
 
