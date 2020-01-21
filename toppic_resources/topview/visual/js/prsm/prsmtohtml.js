@@ -42,8 +42,6 @@ function createTableElements(){
 
 	let l_scans = prsm_data.prsm.ms.ms_header.scans.split(" ") ;
 	let l_specIds = prsm_data.prsm.ms.ms_header.ids.split(" ") ;
-	console.log("l_scans : ", l_scans);
-	console.log("l_specIds : ", l_specIds);
 	let l_matched_peak_count = 0;
 	prsm_data.prsm.ms.peaks.peak.forEach(function(peak,i){
 		/*	Check if peak contain matched_ions_num attribute	*/
