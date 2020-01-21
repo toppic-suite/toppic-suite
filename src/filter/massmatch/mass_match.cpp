@@ -21,8 +21,13 @@
 
 #include "filter/massmatch/mass_match.hpp"
 
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
+//#include <boost/archive/text_oarchive.hpp>
+//#include <boost/archive/text_iarchive.hpp>
+
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+
+#include <boost/serialization/vector.hpp>
 
 #include "console/toppic_argument.hpp"
 
@@ -81,7 +86,7 @@ void MassMatch::serializeMassMatch(){
   std::ofstream newFile(fileName);
 
   if(newFile.is_open()){
-    boost::archive::text_oarchive oa(newFile);
+    boost::archive::binary_oarchive oa(newFile, std::ios::binary);
     oa << this;
   }
  
@@ -93,22 +98,27 @@ void MassMatch::serializeMassMatch(){
   newFile.close();
 
 }
-/*
+
 //deserialize MassMatch object that calles this method
   void MassMatch::deserializeMassMatch(MassMatch **m){
-  std::string fileName = this->getFileName() + ".txt";
+  std::string dirName = this->getDirName();
 
-  std::ifstream fileToRead(fileName);
+  std::string fileName = dirName + "/" + this->getFileName();
+
+  //std::string fileName = this->getFileName();
+
+  std::ifstream fileToRead(fileName, std::ios::binary);
 
   //if (fileToRead.is_open()) {
 
-    boost::archive::text_iarchive ia(fileToRead);
+    boost::archive::binary_iarchive ia(fileToRead);
+
     ia >> *m;
  // } 
   //else{}
 
   fileToRead.close();
-}*/
+}
 
 void MassMatch::initProteoformBeginEnds(std::vector<std::vector<double>> &shift_2d) {
   // no need to init

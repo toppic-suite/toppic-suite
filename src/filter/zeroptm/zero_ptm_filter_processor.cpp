@@ -38,7 +38,7 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
                         int block_idx, ZeroPtmFilterMngPtr mng_ptr) { 
   std::string block_str = str_util::toString(block_idx);
   int group_spec_num = mng_ptr->prsm_para_ptr_->getGroupSpecNum();
-  MassZeroPtmFilterPtr filter_ptr = std::make_shared<MassZeroPtmFilter>(raw_forms, mng_ptr);
+  MassZeroPtmFilterPtr filter_ptr = std::make_shared<MassZeroPtmFilter>(raw_forms, mng_ptr, block_str);
   PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
   MsAlignReader reader(prsm_para_ptr->getSpectrumFileName(),
@@ -89,9 +89,6 @@ std::function<void()> geneTask(int block_idx,
     //std::string sp_file_name = prsm_para_ptr->getSpectrumFileName();
     std::string db_block_file_name = prsm_para_ptr->getSearchDbFileName()
         + "_" + str_util::toString(block_idx);
-
-    std::cout << db_block_file_name << std::endl;
-    std::cout << prsm_para_ptr->getFixModPtrVec()[0] << std::endl;
 
     ProteoformPtrVec raw_forms
         = proteoform_factory::readFastaToProteoformPtrVec(db_block_file_name,
