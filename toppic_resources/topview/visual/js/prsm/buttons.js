@@ -58,7 +58,7 @@ function buttons(){
 			 document.getElementById("ms2svg_div").style.display = "block";
 			 //document.getElementById("a_show_spectrum").href = "#"; 
 			 let current_data = ms2_ScansWithData[0].value;
-			 generateCorrespondingGraph(current_data,"ms2svg");
+			 generateCorrespondingGraph(current_data,"ms2svg",null);
 			 $(this).text('Hide Spectrum');
 		 }
 		 else
@@ -100,7 +100,8 @@ function buttons(){
 
 	$("#precursormz").click(function(){
 		let prec_mz = $("#precursormz").html();
-		ms1_graph.redraw(prec_mz);
+		let current_data = ms1_ScansWithData[0].value;
+		generateCorrespondingGraph(current_data,"popupspectrum",prec_mz) 
 		$("#spectrumpop").draggable({
 		appendTo: "body"
     });
@@ -125,7 +126,7 @@ function buttons(){
 				break;
 			}
 		}
-		$(".active").removeClass("active");
+		$("#ms2_graph_nav .active").removeClass("active");
    		$(this).addClass("active");
 	})
 	$(".ms1_scanIds").click(function(){
@@ -141,7 +142,7 @@ function buttons(){
 				break;
 			}
 		}
-		$(".active").removeClass("active");
+		$("#ms1_graph_nav .active").removeClass("active");
    		$(this).addClass("active");
 	})
 	
