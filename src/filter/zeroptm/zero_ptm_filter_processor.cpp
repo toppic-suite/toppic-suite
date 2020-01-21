@@ -156,7 +156,7 @@ void ZeroPtmFilterProcessor::process() {
 
 inline void createIndexFiles(const ProteoformPtrVec & raw_forms,
                         int block_idx, ZeroPtmFilterMngPtr mng_ptr) {  
-    std::cout << "Generating Non PTM index files --- started" << std::endl;
+    
     std::string block_str = str_util::toString(block_idx);
 
     //index file names
@@ -164,7 +164,7 @@ inline void createIndexFiles(const ProteoformPtrVec & raw_forms,
     "zero_ptm_rev_term_index" + block_str, "zero_ptm_rev_diag_index" + block_str};
 
     MassZeroPtmIndexPtr filter_ptr = std::make_shared<MassZeroPtmIndex>(raw_forms, mng_ptr, file_vec);
-    std::cout << "Generating Non PTM index files --- finished" << std::endl;
+    
 }
 
 std::function<void()> geneIndexTask(int block_idx, 
@@ -191,7 +191,7 @@ void ZeroPtmFilterProcessor::index_process(){
   int block_num = db_block_ptr_vec.size();
 
   //logger::setLogLevel(2);
-
+  std::cout << "Generating Non PTM index files --- started" << std::endl;
   for (int i = 0; i < block_num; i++) {
     while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ * 2) {
       boost::this_thread::sleep(boost::posix_time::milliseconds(100));
@@ -199,7 +199,8 @@ void ZeroPtmFilterProcessor::index_process(){
     pool_ptr->Enqueue(geneIndexTask(db_block_ptr_vec[i]->getBlockIdx(), mng_ptr_));
   }
   pool_ptr->ShutDown();
-  std::cout << std::endl;
+  std::cout << "Generating Non PTM index files --- finished" << std::endl;
+  //std::cout << std::endl;
 }
 
 }  // namespace toppic

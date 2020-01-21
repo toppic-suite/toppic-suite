@@ -84,8 +84,9 @@ void MassMatch::serializeMassMatch(){
     boost::archive::text_oarchive oa(newFile);
     oa << this;
   }
-
+ 
   if (dirName != ""){
+
     file_util::moveFile(fileName, dirName);
   }
 
@@ -93,20 +94,6 @@ void MassMatch::serializeMassMatch(){
 
 }
 /*
-//serialize MassMatch object that calls this method
-void MassMatch::serializeMassMatch(){
-  std::string fileName = this->getFileName() + ".txt";
-  std::string dirName = this -> getDirName();
-  std::ofstream newFile(fileName);
-
-  if(newFile.is_open()){
-    boost::archive::text_oarchive oa(newFile);
-    oa << this;
-  }
-
-  newFile.close();
-
-}
 //deserialize MassMatch object that calles this method
   void MassMatch::deserializeMassMatch(MassMatch **m){
   std::string fileName = this->getFileName() + ".txt";
