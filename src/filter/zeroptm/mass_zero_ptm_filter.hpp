@@ -25,7 +25,7 @@ namespace toppic {
 class MassZeroPtmFilter {
  public:
   MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs, ZeroPtmFilterMngPtr
-                    mng_ptr);
+                    mng_ptr, std::string block_str);
   void computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec);
 
   SimplePrsmPtrVec getCompMatchPtrs() {return comp_match_ptrs_;}

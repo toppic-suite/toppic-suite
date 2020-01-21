@@ -13,7 +13,10 @@
 //limitations under the License.
 
 #include "common/util/logger.hpp"
+#include "common/util/file_util.hpp"
+
 #include "seq/proteoform_util.hpp"
+
 #include "filter/massmatch/filter_protein.hpp"
 #include "filter/massmatch/mass_match_factory.hpp"
 #include "filter/massmatch/mass_match_util.hpp"
@@ -22,39 +25,85 @@
 namespace toppic {
 
 MassZeroPtmFilter::MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
-                                     ZeroPtmFilterMngPtr mng_ptr) {
+                                     ZeroPtmFilterMngPtr mng_ptr, std::string block_str) {
   mng_ptr_ = mng_ptr;
   proteo_ptrs_ = proteo_ptrs;
-  LOG_DEBUG("get shifts");
-  std::vector<std::vector<double> > shift_2d
-      = proteoform_util::getNTermShift2D(proteo_ptrs, mng_ptr->prsm_para_ptr_->getProtModPtrVec());
-  std::vector<std::vector<double> > n_term_acet_2d
-      = proteoform_util::getNTermAcet2D(proteo_ptrs, mng_ptr->prsm_para_ptr_->getProtModPtrVec());
-  LOG_DEBUG("get shifts complete");
-  // N-terminal indexes
-  term_index_ptr_ = MassMatchFactory::getPrmTermMassMatchPtr(proteo_ptrs, shift_2d,
-                                                             mng_ptr->max_proteoform_mass_,
-                                                             mng_ptr->filter_scale_);
-  // Prm indexes
-  diag_index_ptr_ = MassMatchFactory::getPrmDiagMassMatchPtr(proteo_ptrs,
-                                                             mng_ptr->max_proteoform_mass_,
-                                                             mng_ptr->filter_scale_);
-  LOG_DEBUG("diag index");
-  std::vector<std::vector<double> > rev_shift_2d;
-  std::vector<double> shift_1d(1, 0);
-  for (size_t i = 0; i < proteo_ptrs.size(); i++) {
-    rev_shift_2d.push_back(shift_1d);
-  }
-  // C-terminal indexes
-  rev_term_index_ptr_ = MassMatchFactory::getSrmTermMassMatchPtr(proteo_ptrs, rev_shift_2d,
-                                                                 n_term_acet_2d,
-                                                                 mng_ptr->max_proteoform_mass_,
-                                                                 mng_ptr->filter_scale_);
 
-  // To generate SRM indexes, n terminal acetylation shifts are added into the SRM list. 
-  rev_diag_index_ptr_ = MassMatchFactory::getSrmDiagMassMatchPtr(proteo_ptrs, n_term_acet_2d,
-                                                                 mng_ptr->max_proteoform_mass_,
-                                                                 mng_ptr->filter_scale_);
+  //when index files are already generated, skip the steps below and use deserialization to get the data;
+  std::string indexDirName = mng_ptr_->prsm_para_ptr_->getOriDbName() + "_idx";
+  if (file_util::exists(indexDirName)){
+    //if exists
+    std::cout << "Loading index files - started" << std::endl;
+
+    term_index_ptr_ = std::make_shared<MassMatch>();
+    diag_index_ptr_ = std::make_shared<MassMatch>();
+    rev_term_index_ptr_ = std::make_shared<MassMatch>();
+    rev_diag_index_ptr_ = std::make_shared<MassMatch>();
+
+    MassMatch *t_ptr_ = term_index_ptr_.get();
+    MassMatch *d_ptr_ = diag_index_ptr_.get();
+    MassMatch *rev_t_ptr_ = rev_term_index_ptr_.get();
+    MassMatch *rev_d_ptr_ = rev_diag_index_ptr_.get();
+
+    term_index_ptr_->setfileName("zero_ptm_term_index" + block_str);
+    diag_index_ptr_->setfileName("zero_ptm_diag_index" + block_str);
+    rev_term_index_ptr_->setfileName("zero_ptm_rev_term_index" + block_str);
+    rev_diag_index_ptr_->setfileName("zero_ptm_rev_diag_index" + block_str);
+
+    term_index_ptr_->setDirName(indexDirName);
+    diag_index_ptr_->setDirName(indexDirName);
+    rev_term_index_ptr_->setDirName(indexDirName);
+    rev_diag_index_ptr_->setDirName(indexDirName);
+
+    term_index_ptr_->deserializeMassMatch(&t_ptr_);
+    diag_index_ptr_->deserializeMassMatch(&d_ptr_);
+    rev_term_index_ptr_->deserializeMassMatch(&rev_t_ptr_);
+    rev_diag_index_ptr_->deserializeMassMatch(&rev_d_ptr_);
+
+    *term_index_ptr_ = *t_ptr_;
+    *diag_index_ptr_ = *d_ptr_;
+    *rev_term_index_ptr_ = *rev_t_ptr_;
+    *rev_diag_index_ptr_ = *rev_d_ptr_;
+
+    free(t_ptr_);
+    free(d_ptr_);
+    free(rev_t_ptr_);
+    free(rev_d_ptr_);
+
+    std::cout << "Loading index files - finished" << std::endl;
+  }
+  else{
+    LOG_DEBUG("get shifts");
+    std::vector<std::vector<double> > shift_2d
+        = proteoform_util::getNTermShift2D(proteo_ptrs, mng_ptr->prsm_para_ptr_->getProtModPtrVec());
+    std::vector<std::vector<double> > n_term_acet_2d
+        = proteoform_util::getNTermAcet2D(proteo_ptrs, mng_ptr->prsm_para_ptr_->getProtModPtrVec());
+    LOG_DEBUG("get shifts complete");
+    // N-terminal indexes
+    term_index_ptr_ = MassMatchFactory::getPrmTermMassMatchPtr(proteo_ptrs, shift_2d,
+                                                              mng_ptr->max_proteoform_mass_,
+                                                              mng_ptr->filter_scale_);
+    // Prm indexes
+    diag_index_ptr_ = MassMatchFactory::getPrmDiagMassMatchPtr(proteo_ptrs,
+                                                              mng_ptr->max_proteoform_mass_,
+                                                              mng_ptr->filter_scale_);
+    LOG_DEBUG("diag index");
+    std::vector<std::vector<double> > rev_shift_2d;
+    std::vector<double> shift_1d(1, 0);
+    for (size_t i = 0; i < proteo_ptrs.size(); i++) {
+      rev_shift_2d.push_back(shift_1d);
+    }
+    // C-terminal indexes
+    rev_term_index_ptr_ = MassMatchFactory::getSrmTermMassMatchPtr(proteo_ptrs, rev_shift_2d,
+                                                                  n_term_acet_2d,
+                                                                  mng_ptr->max_proteoform_mass_,
+                                                                  mng_ptr->filter_scale_);
+
+    // To generate SRM indexes, n terminal acetylation shifts are added into the SRM list. 
+    rev_diag_index_ptr_ = MassMatchFactory::getSrmDiagMassMatchPtr(proteo_ptrs, n_term_acet_2d,
+                                                                  mng_ptr->max_proteoform_mass_,
+                                                                  mng_ptr->filter_scale_);
+  }
 }
 void MassZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec) {
   PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
