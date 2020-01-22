@@ -91,8 +91,7 @@ void MassMatch::serializeMassMatch(){
   }
  
   if (dirName != ""){
-
-    file_util::moveFile(fileName, dirName);
+    //file_util::moveFile(fileName, dirName);
   }
 
   newFile.close();

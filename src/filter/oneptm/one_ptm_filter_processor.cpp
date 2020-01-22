@@ -149,7 +149,7 @@ void OnePtmFilterProcessor::process() {
 inline void createIndexFiles(const ProteoformPtrVec & raw_forms,
                         int block_idx, 
                         OnePtmFilterMngPtr mng_ptr,
-                        const std::vector<double> & mod_mass_list) {
+                        const std::vector<double> & mod_mass_list, int block_num, int *current_num) {
 
     
     std::string block_str = str_util::toString(block_idx);
@@ -160,12 +160,18 @@ inline void createIndexFiles(const ProteoformPtrVec & raw_forms,
 
     MassOnePtmIndexPtr filter_ptr = std::make_shared<MassOnePtmIndex>(raw_forms, mng_ptr, file_vec);
     
+    mng_ptr->mutex_.lock();
+
+    std::cout << "One PTM index files - processing " << *current_num << " of " << block_num << " files." << std::endl;
+    *current_num = *current_num + 1;
+
+    mng_ptr->mutex_.unlock();
 }
 
 std::function<void()> geneIndexTask(int block_idx, 
                                const std::vector<double> &mod_mass_list, 
-                               OnePtmFilterMngPtr mng_ptr) {
-  return[block_idx, mod_mass_list, mng_ptr] () {
+                               OnePtmFilterMngPtr mng_ptr, int block_num, int *current_num) {
+  return[block_idx, mod_mass_list, mng_ptr, block_num, current_num] () {
     PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
 
     std::string db_block_file_name = prsm_para_ptr->getSearchDbFileName()
@@ -173,7 +179,7 @@ std::function<void()> geneIndexTask(int block_idx,
     ProteoformPtrVec raw_forms
         = proteoform_factory::readFastaToProteoformPtrVec(db_block_file_name,
                                                           prsm_para_ptr->getFixModPtrVec());
-    createIndexFiles(raw_forms, block_idx, mng_ptr, mod_mass_list);
+    createIndexFiles(raw_forms, block_idx, mng_ptr, mod_mass_list, block_num, current_num);
   };
 }
 void OnePtmFilterProcessor::index_process(){
@@ -191,12 +197,13 @@ void OnePtmFilterProcessor::index_process(){
 
   SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(mng_ptr_->thread_num_);
   int block_num = db_block_ptr_vec.size();
+  int current_num = 1; //show how many files have been processed. n in the message "n of 5 files processed"..
 
   for (int i = 0; i < block_num; i++) {
     while (pool_ptr->getQueueSize() >= mng_ptr_->thread_num_ * 2) {
       boost::this_thread::sleep(boost::posix_time::milliseconds(100));
     }
-    pool_ptr->Enqueue(geneIndexTask(db_block_ptr_vec[i]->getBlockIdx(), mod_mass_list, mng_ptr_));
+    pool_ptr->Enqueue(geneIndexTask(db_block_ptr_vec[i]->getBlockIdx(), mod_mass_list, mng_ptr_, block_num, &current_num));
   }
   pool_ptr->ShutDown();
   std::cout << "Generating One PTM index files --- finished" << std::endl;

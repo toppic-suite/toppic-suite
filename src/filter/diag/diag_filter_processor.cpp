@@ -191,17 +191,18 @@ void DiagFilterProcessor::index_process() {
 
   SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(mng_ptr_->thread_num_);
   int block_num = db_block_ptr_vec.size();
-  
+  int current_num = 1; //show how many files have been processed. n in the message "n of 5 files processed"..
+
   for (size_t i = 0; i < db_block_ptr_vec.size(); i++) {
     
-    createIndexFiles(db_block_ptr_vec[i], db_block_ptr_vec.size(), mod_mass_list);
+    createIndexFiles(db_block_ptr_vec[i], db_block_ptr_vec.size(), mod_mass_list, block_num, &current_num);
   }
   pool_ptr->ShutDown();
   std::cout << "Generating Multi PTM index files --- finished" << std::endl;
 }
 
 void DiagFilterProcessor::createIndexFiles(DbBlockPtr block_ptr, int total_block_num,
-                                       const std::vector<double> & mod_mass_list) {
+                                       const std::vector<double> & mod_mass_list, int block_num, int *current_num) {
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
 
   std::string db_block_file_name = prsm_para_ptr->getSearchDbFileName()
@@ -218,6 +219,14 @@ void DiagFilterProcessor::createIndexFiles(DbBlockPtr block_ptr, int total_block
   //"multi_ptm_rev_term_index" + block_str, "multi_ptm_rev_diag_index" + block_str};
 
   MassDiagIndexPtr filter_ptr = std::make_shared<MassDiagIndex>(raw_forms, mng_ptr_, block_str);
+  
+  mng_ptr_->mutex_.lock();
+
+    std::cout << "Multi PTM index files - processing " << *current_num << " of " << block_num << " files." << std::endl;
+    *current_num = *current_num + 1;
+
+    mng_ptr_->mutex_.unlock();
+
 }
 
 }  // namespace toppic
