@@ -1,12 +1,10 @@
 
 class MultiScan{
-
     constructor(){
     }
     //ms1_ms2_json this give ms1_json folder or ms2_json folder
     promiseLoadDataJS(scanidList,ms1_ms2_json){
-        let timeout = 700;
-        if(scanidList.length == 1 ) timeout = 200;
+        let timeoutVal = 2000;
         return new Promise((resolve,reject) => {
             let scanListWithData = [];
             //get the list of lists with scan Id and value
@@ -34,7 +32,7 @@ class MultiScan{
             setTimeout(function(){
                 this.scanListWithData = scanListWithData ;
                 resolve(scanListWithData);
-            },timeout)
+            },timeoutVal)
         })
     }
     getUniqueScanIdList(MultiScanList){

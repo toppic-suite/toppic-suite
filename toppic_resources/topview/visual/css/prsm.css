@@ -168,4 +168,22 @@ svg.l_popup_svg{
 .prsmgraphdownload .dropdown-menu{
   min-width:7.7rem !important;
 }
-
+#ms2svg_div .active{
+  background-color: #F8F8F8 !important;
+}
+#ms2svg_div .nav-link{
+  border: 0px !important;
+}
+#ms1_graph_nav .active{
+  background-color: #F8F8F8 !important;
+}
+#ms1_graph_nav .nav-link{
+  border: 0px !important;
+}
+#ms1_graph_nav a{
+	color: #428bca !important;
+}
+.modal{
+  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-size: 15px;
+}
