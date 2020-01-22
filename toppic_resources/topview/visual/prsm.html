@@ -61,15 +61,16 @@ $(document).ready(function(){
     prsm_script.src = "js/prsm/prsm.js" ;
     head.appendChild(prsm_script);
 		
+	let MultiScanObj = new MultiScan();
 		BuildUrl(folder_path);
 		loadDatafromJson2Html();
 		para = new parameters();
-    /* prsm_data is defined in prsm_data_script */
+    	/* prsm_data is defined in prsm_data_script */
 		let prsm = prsm_data.prsm ;
 		
-	  /* SVG Id of the HTML */
-	  let svg_id = "l_svg" ;
-    buildSvg(para,prsm,svg_id);
+	  	/* SVG Id of the HTML */
+	  	let svg_id = "l_svg" ;
+    	buildSvg(para,prsm,svg_id);
 		
 		/*	Color the background of occurence of mass shift */
 		massShiftBackgroundColor(para,prsm,svg_id);
@@ -100,9 +101,8 @@ $(document).ready(function(){
 		getUnknownPtms(prsm);
 		/* Create peaks data into table content */
 		createTableElements();
-		
-		
-		let MultiScanObj = new MultiScan();
+		buttons();
+
 		//Getting Ms1 Ids
 		let ms1_ids = prsm_data.prsm.ms.ms_header.ms1_ids ;
 		let ms1_id_1 = ms1_ids.split(" ");
@@ -112,6 +112,10 @@ $(document).ready(function(){
 		MultiScanObj.promiseLoadDataJS(ms1_uniqueList,"ms1_json").then(scanListWithData => {
 			ms1_ScansWithData = scanListWithData;
 			MultiScanObj.createMs1NavEements(scanListWithData,"popupspectrum");
+			let current_data = ms1_ScansWithData[0].value;
+			let prec_mz = prsm_data.prsm.ms.ms_header.precursor_mz;
+			generateCorrespondingGraph(current_data,"popupspectrum",prec_mz);
+			document.getElementById("popup_dataLoading").remove(); 
 		// 	buttons();
 		})
 		//let ms1_scan_2 = ms1_scans.split(" ")[1];
@@ -125,7 +129,8 @@ $(document).ready(function(){
 			MultiScanObj.createMs2NavEements(scanListWithData,"ms2svg");
 			let current_data = ms2_ScansWithData[0].value;
 			generateCorrespondingGraph(current_data,"ms2svg",null);
-			buttons();
+			document.getElementById("dataLoading").remove();
+			scanbuttons();
 		})
 	}
 })
@@ -197,7 +202,12 @@ $(document).ready(function(){
 <div class="row" id="ms2svg_div" style="display:none;">
 	<ul class="nav nav-tabs graph_nav" id="ms2_graph_nav">
 	</ul>
-	<svg id = "ms2svg" style = "background-color:white;display: none;"></svg>
+	<div class="text-center" id="dataLoading">
+		<div class="spinner-border "  role="status">
+			<span class="sr-only">Loading...</span>
+		</div><h3>&nbsp; Loading...</h3>
+	</div>
+	<svg id = "ms2svg" style = "background-color:#F8F8F8;display: none;"></svg>
 </div>
 <table>
 <tr>
@@ -374,7 +384,12 @@ $(document).ready(function(){
 				 <div class="modal-body ms1_graph_nav">
 					<ul class="nav nav-tabs graph_nav" id="ms1_graph_nav">
 					</ul>
-					 <svg id="popupspectrum" style="background-color:white" ></svg>
+					<div class="text-center" id="popup_dataLoading">
+						<div class="spinner-border "  role="status">
+							<span class="sr-only">Loading...</span>
+						</div><h3>&nbsp; Loading...</h3>
+					</div>
+					 <svg id="popupspectrum" style="background-color:#F8F8F8" ></svg>
 				 </div> 
 				 <div class="modal-footer">
 					  <button type="button" class="btn btn-primary btn-sm custom " id = "download_popup_png" ><i class="fas fa-download"></i><span>&nbsp;&nbsp;PNG</span></button>

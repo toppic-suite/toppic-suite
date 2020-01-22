@@ -38,7 +38,7 @@ function buttons(){
 	d3.select("#graph_download_svg").on("click",function(){
 		x = d3.event.pageX;
 		y = d3.event.pageY + 40;
-		popupnamewindow("png", "ms2svg",x,y)
+		popupnamewindow("svg", "ms2svg",x,y)
 	})
 	d3.select("#download_popup_png").on("click",function(){
 		x = d3.event.pageX;
@@ -48,13 +48,11 @@ function buttons(){
 	d3.select("#download_popup_svg").on("click",function(){
 		x = d3.event.pageX;
 		y = d3.event.pageY;
-		popupnamewindow("png", "popupspectrum",x,y)
+		popupnamewindow("svg", "popupspectrum",x,y)
 	})
 
 	$("#precursormz").click(function(){
 		let prec_mz = $("#precursormz").html();
-		let current_data = ms1_ScansWithData[0].value;
-		generateCorrespondingGraph(current_data,"popupspectrum",prec_mz) 
 		$("#spectrumpop").draggable({
 			appendTo: "body"
 		});
@@ -65,6 +63,23 @@ function buttons(){
 		appendTo: "body"
 		});
 	});
+	
+}
+function showSpectrun(){
+	$("#show_ms2_spectrum").text('Hide Spectrum');
+	document.getElementById("ms2svg").style.display = "block";
+	document.getElementById("spectrum_help").style.display = "block";
+	document.getElementById("graph_download").style.display = "block";
+	document.getElementById("ms2svg_div").style.display = "block";
+}
+function hideSpectrum(){
+	$("#show_ms2_spectrum").text('Show Spectrum'); 
+	document.getElementById("ms2svg").style.display = "none";
+	document.getElementById("spectrum_help").style.display = "none";
+	document.getElementById("graph_download").style.display = "none";
+	document.getElementById("ms2svg_div").style.display = "none";
+}
+function scanbuttons(){
 	//ms2_scanIds is the Id of the nav tabs for multiple navs
 	$(".ms2_scanIds").click(function(){
 		let value = this.getAttribute('value')
@@ -82,18 +97,4 @@ function buttons(){
 		$("#ms1_graph_nav .active").removeClass("active");
    		$(this).addClass("active");
 	})
-}
-function showSpectrun(){
-	$("#show_ms2_spectrum").text('Hide Spectrum');
-	document.getElementById("ms2svg").style.display = "block";
-	document.getElementById("spectrum_help").style.display = "block";
-	document.getElementById("graph_download").style.display = "block";
-	document.getElementById("ms2svg_div").style.display = "block";
-}
-function hideSpectrum(){
-	$("#show_ms2_spectrum").text('Show Spectrum'); 
-	document.getElementById("ms2svg").style.display = "none";
-	document.getElementById("spectrum_help").style.display = "none";
-	document.getElementById("graph_download").style.display = "none";
-	document.getElementById("ms2svg_div").style.display = "none";
 }
