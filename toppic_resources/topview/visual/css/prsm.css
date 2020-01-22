@@ -187,3 +187,7 @@ svg.l_popup_svg{
   font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
   font-size: 15px;
 }
+.filename p{
+  padding-left: 19px;
+  margin: 0px;
+}
