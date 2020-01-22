@@ -114,6 +114,7 @@ void MassMatch::serializeMassMatch(){
     boost::archive::binary_iarchive ia(fileToRead);
 
     ia >> *m;
+
  // } 
   //else{}
 

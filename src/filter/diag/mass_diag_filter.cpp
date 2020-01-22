@@ -13,9 +13,14 @@
 //limitations under the License.
 
 #include <algorithm>
+#include <iostream>
+
+#include "common/util/file_util.hpp"
 
 #include "ms/spec/prm_ms.hpp"
+
 #include "prsm/simple_prsm_util.hpp"
+
 #include "filter/massmatch/filter_protein.hpp"
 #include "filter/massmatch/mass_match_factory.hpp"
 #include "filter/massmatch/mass_match_util.hpp"
@@ -24,12 +29,34 @@
 namespace toppic {
 
 MassDiagFilter::MassDiagFilter(const ProteoformPtrVec &proteo_ptrs,
-                               DiagFilterMngPtr mng_ptr) {
+                               DiagFilterMngPtr mng_ptr, std::string block_str) {
   mng_ptr_ = mng_ptr;
   proteo_ptrs_ = proteo_ptrs;
-  index_ptr_ = MassMatchFactory::getPrmDiagMassMatchPtr(proteo_ptrs,
+
+  std::string indexDirName = mng_ptr_->prsm_para_ptr_->getOriDbName() + "_idx";
+
+  if (file_util::exists(indexDirName)){
+    std::cout << "Loading index files - started" << std::endl;
+
+    index_ptr_ = std::make_shared<MassMatch>();
+
+    MassMatch *idx_ptr_ = index_ptr_.get();
+    
+    index_ptr_->setfileName("diag" + block_str);
+    index_ptr_->setDirName(indexDirName);
+    index_ptr_->deserializeMassMatch(&idx_ptr_);
+
+    *index_ptr_ = *idx_ptr_;
+
+    free(idx_ptr_);
+
+    std::cout << "Loading index files - finished" << std::endl;
+  }
+  else{
+    index_ptr_ = MassMatchFactory::getPrmDiagMassMatchPtr(proteo_ptrs,
                                                         mng_ptr->max_proteoform_mass_,
                                                         mng_ptr->filter_scale_);
+  }
 }
 
 SimplePrsmPtrVec MassDiagFilter::getBestMatch(const PrmMsPtrVec &ms_ptr_vec) {

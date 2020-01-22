@@ -39,7 +39,7 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
                         OnePtmFilterMngPtr mng_ptr,
                         const std::vector<double> & mod_mass_list) {
   std::string block_str = str_util::toString(block_idx);
-  MassOnePtmFilterPtr filter_ptr = std::make_shared<MassOnePtmFilter>(raw_forms, mng_ptr);
+  MassOnePtmFilterPtr filter_ptr = std::make_shared<MassOnePtmFilter>(raw_forms, mng_ptr, block_str);
   int group_spec_num = mng_ptr->prsm_para_ptr_->getGroupSpecNum();
   PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();

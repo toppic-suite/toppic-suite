@@ -26,7 +26,7 @@ namespace toppic {
 class MassOnePtmFilter {
  public:
   MassOnePtmFilter(const ProteoformPtrVec &proteo_ptrs,
-                   OnePtmFilterMngPtr mng_ptr);
+                   OnePtmFilterMngPtr mng_ptr, std::string block_str);
   void computeBestMatch(const PrmMsPtrVec &prm_ms_ptr_vec,
                         const PrmMsPtrVec &srm_ms_ptr_vec);
 

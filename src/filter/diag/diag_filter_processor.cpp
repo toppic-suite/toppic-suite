@@ -57,7 +57,7 @@ void DiagFilterProcessor::process() {
   for (size_t i = 0; i < db_block_ptr_vec.size(); i++) {
     std::cout << "Multiple PTM filtering - block " << (i + 1) << " out of "
         << db_block_ptr_vec.size() << " started." << std::endl;
-    processBlock(db_block_ptr_vec[i], db_block_ptr_vec.size(), mod_mass_list);
+    processBlock(db_block_ptr_vec[i], db_block_ptr_vec.size(), mod_mass_list, i);
     std::cout << "Multiple PTM filtering - block " << (i + 1) << " finished. " << std::endl;
   }
 
@@ -78,14 +78,15 @@ void DiagFilterProcessor::process() {
 }
 
 void DiagFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num,
-                                       const std::vector<double> & mod_mass_list) {
+                                       const std::vector<double> & mod_mass_list, int block_idx) {
+  std::string block_number = str_util::toString(block_idx);
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   std::string db_block_file_name = prsm_para_ptr->getSearchDbFileName()
       + "_" + str_util::toString(block_ptr->getBlockIdx());
   ProteoformPtrVec raw_forms
       = proteoform_factory::readFastaToProteoformPtrVec(db_block_file_name,
                                                         prsm_para_ptr->getFixModPtrVec());
-  MassDiagFilterPtr filter_ptr = std::make_shared<MassDiagFilter>(raw_forms, mng_ptr_);
+  MassDiagFilterPtr filter_ptr = std::make_shared<MassDiagFilter>(raw_forms, mng_ptr_, block_number);
 
   int group_spec_num = mng_ptr_->prsm_para_ptr_->getGroupSpecNum();
   SpParaPtr sp_para_ptr =  mng_ptr_->prsm_para_ptr_->getSpParaPtr();

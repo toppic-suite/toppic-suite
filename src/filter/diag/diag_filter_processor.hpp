@@ -31,7 +31,7 @@ class DiagFilterProcessor {
   DiagFilterMngPtr mng_ptr_;
 
   void processBlock(DbBlockPtr block_ptr, int total_block_num,
-                    const std::vector<double> & mod_mass_list);
+                    const std::vector<double> & mod_mass_list, int block_num);
   void createIndexFiles(DbBlockPtr block_ptr, int total_block_num,
                     const std::vector<double> & mod_mass_list);
 };

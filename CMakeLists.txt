@@ -141,8 +141,8 @@ file(GLOB TOPINDEX_CONSOLE_SRCS
         		     ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topindex.cpp)
 
 # topindex gui main 
-#file(GLOB TOPINDEX_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topindex/*.cpp
-			      #${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topindex/*.qrc)
+file(GLOB TOPINDEX_GUI_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topindex/*.cpp
+			      ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/topindex/*.qrc)
 
 # unit test using catch
 file(GLOB UNIT_TEST_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/test/*.cpp)
@@ -198,9 +198,9 @@ add_executable(topindex
   ${SEQ_SRCS} ${SPEC_SRCS} ${ENV_SRCS} ${FEATURE_SRCS} ${PRSM_SRCS} ${FILTER_SRCS} 
   ${ZERO_PTM_SRCS} ${ONE_PTM_SEARCH_SRCS} ${PTM_SRCS} ${TOPIDEX_SRCS})
 
-add_executable(topindex_gui ${TOPINDEX_GUI_SRCS} ${TOPINDEX_GUI_QRC}
-  ${TOPINDEX_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS} 
-  ${SEQ_SRCS} ${SPEC_SRCS} ${ENV_SRCS} ${FEATURE_SRCS} ${PRSM_SRCS} ${TOPIDEX_SRCS})
+add_executable(topindex_gui ${TOPINDEX_GUI_SRCS} ${TOPINDEX_PROC_SRCS} ${HTS_SRCS} ${COMMON_SRCS} 
+  ${SEQ_SRCS} ${SPEC_SRCS} ${ENV_SRCS} ${FEATURE_SRCS} ${PRSM_SRCS} ${FILTER_SRCS} ${ZERO_PTM_SRCS} 
+  ${ONE_PTM_SEARCH_SRCS} ${PTM_SRCS}${TOPIDEX_SRCS})
 
 #add_executable(toppic_test 
 #  ${TEST_SRCS} ${HTS_SRCS} ${COMMON_SRCS} 

@@ -12,32 +12,13 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <iomanip>
-#include <map>
-#include <string>
-#include <vector>
+//#include <algorithm>
 
-#include "console/topindex_argument.hpp"
 #include "console/topindex_process.hpp"
+#include "gui/topindex/threadtopindex.h"
 
-using namespace toppic;
-
-int main(int argc, char* argv[]) {
-  
-  //toppic::log_level = 3;
-  std::cout << std::setprecision(10);
-
-  toppic::Argument argu_processor;
-
-  bool success = argu_processor.parse(argc, argv);
-
-  if (!success) {
-    return 1;
-  }
-
-  std::map<std::string, std::string> arguments = argu_processor.getArguments();
-
-  TopIndexProcess(arguments);
-
-  return 0;
+void ThreadTopIndex::run() {
+  //std::sort(spec_file_lst_.begin(), spec_file_lst_.end());
+  std::cout << "thread running" << std::endl;
+  toppic::TopIndexProcess(arguments_);
 }
