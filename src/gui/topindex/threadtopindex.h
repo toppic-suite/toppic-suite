@@ -12,32 +12,39 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
-#include <iomanip>
+
+#ifndef TOPPIC_GUI_THREADTOPINDEX_H
+#define TOPPIC_GUI_THREADTOPINDEX_H
+
 #include <map>
 #include <string>
+#include <iostream>
+#include <algorithm>
 #include <vector>
 
-#include "console/topindex_argument.hpp"
-#include "console/topindex_process.hpp"
+#include <QThread>
 
-using namespace toppic;
+namespace Ui {
+class ThreadTopIndex;
+}
 
-int main(int argc, char* argv[]) {
-  
-  //toppic::log_level = 3;
-  std::cout << std::setprecision(10);
+class ThreadTopIndex : public QThread {
+  Q_OBJECT
 
-  toppic::Argument argu_processor;
+ public:
+  explicit ThreadTopIndex(QObject* par) : QThread(par) {}
 
-  bool success = argu_processor.parse(argc, argv);
+  ~ThreadTopIndex() {}
 
-  if (!success) {
-    return 1;
+  void run();
+
+  void setPar(std::map<std::string, std::string> arguments) {
+    arguments_ = arguments;
   }
 
-  std::map<std::string, std::string> arguments = argu_processor.getArguments();
+ private:
+  std::map<std::string, std::string> arguments_;
+};
 
-  TopIndexProcess(arguments);
+#endif
 
-  return 0;
-}

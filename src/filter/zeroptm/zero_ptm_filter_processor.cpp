@@ -98,27 +98,6 @@ std::function<void()> geneTask(int block_idx,
   };
 }
 
-/*
-void ZeroPtmFilterProcessor::mergeIndexFiles(int block_size){
-  //output index files have name of "term_index0", "term_index1"...
-  //merge the files with same names (and different number), based on the number to keep the order of data
-  std::vector<std::string> file_name_vec{"term_index", "diag_index", "rev_term_index", "rev_diag_index"};
-  for (size_t f = 0; f < file_name_vec.size(); f++){
-    std::ofstream targetFile(file_name_vec[f] + ".txt");
-
-    for (int i = 0; i< block_size; i++){
-      std::string fileName = file_name_vec[f] + std::to_string(i) + ".txt";
-      std::ifstream mergeFile(fileName);
-
-      targetFile << mergeFile.rdbuf();
-
-      remove((fileName).c_str());
-      //if ( != 0){perror("Index file deletion failed.");}
-    }
-  }
-}
-*/
-
 void ZeroPtmFilterProcessor::process() {
   PrsmParaPtr prsm_para_ptr = mng_ptr_->prsm_para_ptr_;
   std::string db_file_name = prsm_para_ptr->getSearchDbFileName();

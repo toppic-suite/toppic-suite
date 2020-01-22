@@ -40,8 +40,8 @@
 namespace toppic{
 
 void TopIndexProcess(std::map<std::string, std::string> &arguments){
-    Argument::outputArguments(std::cout, arguments);
 
+    Argument::outputArguments(std::cout, arguments);
     base_data::init();
 
     PrsmParaPtr prsm_para_ptr = std::make_shared<PrsmPara>(arguments);
@@ -60,7 +60,6 @@ void TopIndexProcess(std::map<std::string, std::string> &arguments){
     if (arguments["searchType"] == "TARGET+DECOY") {
       decoy = true;
     }
-    
     //create a folder for index files 
 
     fasta_util::dbPreprocess(ori_db_file_name, db_file_name, decoy, db_block_size);
@@ -88,6 +87,7 @@ void TopIndexProcess(std::map<std::string, std::string> &arguments){
     diag_filter_processor->index_process();
     diag_filter_processor = nullptr;
     
+    std::cout << "TopIndex - finished." << std::endl;
 }
 
 }

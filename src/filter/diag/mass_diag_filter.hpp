@@ -25,7 +25,7 @@ namespace toppic {
 
 class MassDiagFilter {
  public:
-  MassDiagFilter(const ProteoformPtrVec &proteo_ptrs, DiagFilterMngPtr mng_ptr);
+  MassDiagFilter(const ProteoformPtrVec &proteo_ptrs, DiagFilterMngPtr mng_ptr, std::string block_str);
 
   SimplePrsmPtrVec getBestMatch(const PrmMsPtrVec &ms_ptr_vec);
 
