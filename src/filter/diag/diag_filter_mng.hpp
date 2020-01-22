@@ -15,6 +15,7 @@
 #ifndef TOPPIC_FILTER_DIAG_DIAG_FILTER_MNG_HPP_
 #define TOPPIC_FILTER_DIAG_DIAG_FILTER_MNG_HPP_
 
+#include <boost/thread.hpp>
 #include "prsm/prsm_para.hpp"
 
 namespace toppic {
@@ -42,6 +43,8 @@ class DiagFilterMng {
 
   std::string output_file_ext_;
   std::string residueModFileName_;
+
+  boost::mutex mutex_;
 
   int var_num_;
 
