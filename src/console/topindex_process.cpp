@@ -86,7 +86,14 @@ void TopIndexProcess(std::map<std::string, std::string> &arguments){
         = std::make_shared<DiagFilterProcessor>(diag_filter_mng_ptr);
     diag_filter_processor->index_process();
     diag_filter_processor = nullptr;
+
+    std::cout << "Deleting temporary files - started." << std::endl;
+
+    std::string fa_base = file_util::absoluteName(ori_db_file_name);
+    file_util::cleanPrefix(ori_db_file_name, fa_base + "_");
     
+    std::cout << "Deleting temporary files - finished." << std::endl; 
+
     std::cout << "TopIndex - finished." << std::endl;
 }
 

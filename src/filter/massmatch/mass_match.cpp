@@ -21,9 +21,6 @@
 
 #include "filter/massmatch/mass_match.hpp"
 
-//#include <boost/archive/text_oarchive.hpp>
-//#include <boost/archive/text_iarchive.hpp>
-
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 
@@ -88,14 +85,12 @@ void MassMatch::serializeMassMatch(){
   if(newFile.is_open()){
     boost::archive::binary_oarchive oa(newFile, std::ios::binary);
     oa << this;
+    newFile.close();
   }
  
   if (dirName != ""){
-    //file_util::moveFile(fileName, dirName);
+    file_util::moveFile(fileName, dirName);
   }
-
-  newFile.close();
-
 }
 
 //deserialize MassMatch object that calles this method
@@ -108,16 +103,16 @@ void MassMatch::serializeMassMatch(){
 
   std::ifstream fileToRead(fileName, std::ios::binary);
 
-  //if (fileToRead.is_open()) {
+  if (fileToRead.is_open()) {
 
     boost::archive::binary_iarchive ia(fileToRead);
 
     ia >> *m;
-
- // } 
+    fileToRead.close();
+  } 
   //else{}
 
-  fileToRead.close();
+  
 }
 
 void MassMatch::initProteoformBeginEnds(std::vector<std::vector<double>> &shift_2d) {
