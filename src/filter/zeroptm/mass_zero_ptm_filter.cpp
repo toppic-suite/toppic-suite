@@ -33,7 +33,6 @@ MassZeroPtmFilter::MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
   std::string indexDirName = mng_ptr_->prsm_para_ptr_->getOriDbName() + "_idx";
   if (file_util::exists(indexDirName)){
     //if exists
-    std::cout << "Loading index files - started" << std::endl;
 
     term_index_ptr_ = std::make_shared<MassMatch>();
     diag_index_ptr_ = std::make_shared<MassMatch>();
@@ -70,7 +69,7 @@ MassZeroPtmFilter::MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
     free(rev_t_ptr_);
     free(rev_d_ptr_);
 
-    std::cout << "Loading index files - finished" << std::endl;
+    
   }
   else{
     LOG_DEBUG("get shifts");

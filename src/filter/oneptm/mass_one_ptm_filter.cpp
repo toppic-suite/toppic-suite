@@ -36,7 +36,6 @@ MassOnePtmFilter::MassOnePtmFilter(const ProteoformPtrVec &proteo_ptrs,
 
   if (file_util::exists(indexDirName)){
     //if exists
-    std::cout << "Loading index files - started" << std::endl;
 
     term_index_ptr_ = std::make_shared<MassMatch>();
     diag_index_ptr_ = std::make_shared<MassMatch>();
@@ -73,7 +72,6 @@ MassOnePtmFilter::MassOnePtmFilter(const ProteoformPtrVec &proteo_ptrs,
     free(rev_t_ptr_);
     free(rev_d_ptr_);
 
-    std::cout << "Loading index files - finished" << std::endl;
   }
   else{
 
