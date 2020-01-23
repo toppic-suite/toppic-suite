@@ -230,7 +230,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
         boost_program_options-mt boost_thread-mt pthread z Ws2_32)
 
     target_link_libraries(topmg xerces-c
-        boost_filesystem-mt boost_system-mt
+        boost_filesystem-mt boost_system-mt boost_serialization-mt
         boost_program_options-mt boost_thread-mt pthread z Ws2_32)
 
    target_link_libraries(topdiff xerces-c boost_program_options-mt
@@ -251,7 +251,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
         boost_program_options-mt boost_thread-mt pthread z Ws2_32)
 
     target_link_libraries(topmg_gui ${QTOPTION} Qt5Widgets Qt5Core Qt5Gui xerces-c
-        boost_filesystem-mt boost_system-mt
+        boost_filesystem-mt boost_system-mt boost_serialization-mt
         boost_program_options-mt boost_thread-mt pthread z Ws2_32)
 
     target_link_libraries(topdiff_gui ${QTOPTION} Qt5Widgets Qt5Core Qt5Gui xerces-c
@@ -285,10 +285,10 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
         boost_filesystem boost_system boost_serialization boost_thread pthread z)
 
     target_link_libraries(topmg xerces-c boost_program_options
-        boost_filesystem boost_system boost_thread pthread z)
+        boost_filesystem boost_system boost_serialization boost_thread pthread z)
 
     target_link_libraries(topmg_gui Qt5Widgets Qt5Core Qt5Gui xerces-c boost_program_options
-        boost_filesystem boost_system boost_thread pthread z)
+        boost_filesystem boost_system boost_serialization boost_thread pthread z)
 
     target_link_libraries(topdiff xerces-c boost_program_options
 	      boost_filesystem boost_system boost_thread pthread z)
