@@ -36,7 +36,6 @@ MassDiagFilter::MassDiagFilter(const ProteoformPtrVec &proteo_ptrs,
   std::string indexDirName = mng_ptr_->prsm_para_ptr_->getOriDbName() + "_idx";
 
   if (file_util::exists(indexDirName)){
-    std::cout << "Loading index files - started" << std::endl;
 
     index_ptr_ = std::make_shared<MassMatch>();
 
@@ -50,7 +49,6 @@ MassDiagFilter::MassDiagFilter(const ProteoformPtrVec &proteo_ptrs,
 
     free(idx_ptr_);
 
-    std::cout << "Loading index files - finished" << std::endl;
   }
   else{
     index_ptr_ = MassMatchFactory::getPrmDiagMassMatchPtr(proteo_ptrs,

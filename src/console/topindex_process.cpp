@@ -90,6 +90,7 @@ void TopIndexProcess(std::map<std::string, std::string> &arguments){
     std::cout << "Deleting temporary files - started." << std::endl;
 
     std::string fa_base = file_util::absoluteName(ori_db_file_name);
+    std::replace(fa_base.begin(), fa_base.end(), '\\', '/');
     file_util::cleanPrefix(ori_db_file_name, fa_base + "_");
     
     std::cout << "Deleting temporary files - finished." << std::endl; 
