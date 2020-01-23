@@ -23,12 +23,15 @@
 #include "topfd/deconv/deconv_one_sp.hpp"
 
 namespace toppic {
+ 
 
 class DeconvProcess {
+
+
  public:
   DeconvProcess(TopfdParaPtr topfd_para_ptr, 
                 const std::string &spec_file_name, 
-                int frac_id);
+                int frac_id,  int thread_num, DeconvProcess *deconv);
 
   void prepareFileFolder();
 
@@ -39,11 +42,25 @@ class DeconvProcess {
 
   void processSpMissingLevelOne(DeconvOneSpPtr deconv_ptr, RawMsGroupReaderPtr reader_ptr, 
                                 MsAlignWriterPtr ms2_writer_ptr);
+  void getDeconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
+                MatchEnvPtrVec &prec_envs, MsAlignWriterPtr ms1_writer_ptr);
+
+  EnvParaPtr getEnvParaPtr(){
+      return env_para_ptr_;
+  }
+  void deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
+                   MatchEnvPtrVec &prec_envs, MsAlignWriterPtr ms1_writer_ptr); 
+
+  void deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
+                   MsAlignWriterPtr ms2_writer_ptr); 
 
  private:
+
   EnvParaPtr env_para_ptr_;
   DpParaPtr dp_para_ptr_;
   TopfdParaPtr topfd_para_ptr_;
+
+  DeconvProcess *deconv_instance_ptr;
 
   //std::string argu_str_;
   //bool missing_level_one_;
@@ -52,6 +69,7 @@ class DeconvProcess {
 
   std::string spec_file_name_;
   int frac_id_;
+  int thread_num;
 
   std::string base_name_;
   std::string ms1_env_name_;
@@ -62,12 +80,8 @@ class DeconvProcess {
 
   std::string updateMsg(MsHeaderPtr header_ptr, int scan, int total_scan_num);
 
-  void deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
-                   MatchEnvPtrVec &prec_envs, MsAlignWriterPtr ms1_writer_ptr); 
-
-  void deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
-                   MsAlignWriterPtr ms2_writer_ptr); 
+  
 };
-
+   
 }
 #endif
