@@ -11,7 +11,7 @@ mkdir toppic-linux-${1}/example_files
 cp ../bin/toppic toppic-linux-${1}
 cp ../bin/topfd toppic-linux-${1} 
 cp ../bin/topmg toppic-linux-${1} 
-cp ../bin/topmerge toppic-linux-${1} 
+cp ../bin/topdiff toppic-linux-${1} 
 cp ../LICENSE toppic-linux-${1}
 
 cp ./example_files/common_mods.txt toppic-linux-${1}/example_files
