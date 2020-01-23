@@ -25,9 +25,13 @@
 #include "topfd/dp/dp_a.hpp"
 #include "topfd/deconv/deconv_one_sp.hpp"
 
+#include <mutex>
+#include <iostream>
+
 //#include "ms/env/env_rescore.hpp"
 
 namespace toppic {
+  //std::mutex mu;
 
 void DeconvOneSp::setData(PeakPtrVec &peak_list) {
   data_ptr_ = deconv_data_util::getDataPtr(peak_list, env_para_ptr_->max_mass_,
@@ -48,6 +52,8 @@ void DeconvOneSp::run() {
 
   preprocess();
   LOG_DEBUG("preprocess complete");
+
+ 
   // envelope detection
   PeakPtrVec peak_list = data_ptr_->getPeakList();
   MatchEnvPtr2D cand_envs = EnvDetect::getCandidate(peak_list, 
@@ -78,6 +84,7 @@ void DeconvOneSp::run() {
   MatchEnvPtrVec dp_envs = dp.getResult();
 
   result_envs_ = postprocess(dp_envs);
+ // mu.unlock();
 }
 
 void DeconvOneSp::preprocess() {

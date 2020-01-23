@@ -41,6 +41,7 @@ class TopfdPara {
   bool output_match_env_ = false;
   bool output_json_files_ = true;
   bool merge_files_ = false;
+  std::string thread_number = "";
   std::string merged_file_name_ = "";
 };
 
