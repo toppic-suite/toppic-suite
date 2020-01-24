@@ -17,6 +17,8 @@ function parameters()
 	this.font_width = 9 ;//12px font with = 9pt
 	this.background_color = "#64E9EC";
 	this.svgBackground_color = "white" ;
+
+	return this;
 }	
 function getY(para, position) 
 {

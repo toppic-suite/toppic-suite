@@ -50,3 +50,17 @@
 .footer-copyright{
 	color: black;
 }
+#tooltip_pop #mass_shift{
+	width: 104;
+}
+#tooltip_pop select{
+	width: 70;
+}
+
+#tooltip_pop option{
+	width: 50;
+	height: 10;
+}
+#tooltip_pop option:hover{ 
+	background-color: #000 !important; 
+}
