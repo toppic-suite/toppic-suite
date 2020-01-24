@@ -97,12 +97,13 @@ function handleOnClick(d,i,id,seq,massShiftList,monoMassList){
 	   .attr("class", "tooltip")
 	   .attr("id","tooltip_pop")
 	   .style("opacity", 1);
-	
+	let colorsDropdown = addColorsToDropdown();
 	div.transition()
      .duration(200)
      .style("opacity", .9);
 	div.html(
-	        '<input list="browsers" name="myBrowser" type="text" id= "mass_shift" />'+
+			'<input list="browsers" name="myBrowser" type="text" id= "mass_shift" />'+
+			colorsDropdown +
 			'<button id="ok" style = "none" type="button">ok</button>'
 	        )
 	        .style("left", (d3.event.pageX - 30) + "px")             
@@ -113,13 +114,14 @@ function handleOnClick(d,i,id,seq,massShiftList,monoMassList){
 	
 	d3.select("#ok").on("click",function(){
 	let massShiftVal =  document.getElementById("mass_shift").value ;
+	let tooltipcolor =  document.getElementById("tooltip_color").value ;
 		d3.select("#tooltip_pop").remove() ;
 		massShiftVal = parseFloat(massShiftVal);
 		if(!isNaN(massShiftVal)){
 			let errorType = $(".error_dropdown").val();
 			let errorVal = parseFloat($("#errorval").val().trim());
 			let executionObj = new SeqOfExecution();
-			executionObj.onClickMassShift = {mass:massShiftVal,position:shiftPosition}
+			executionObj.onClickMassShift = {mass:massShiftVal,position:shiftPosition,color:tooltipcolor}
 			executionObj.onClickSequenceOfExecution(errorType,errorVal);
 		}
 	});
@@ -324,4 +326,55 @@ function MassShift(thisElem,MassShift,position)
 				//.attr("text-anchor","middle")
 				.attr("fill","black")
 			   .attr("font-size","11px");
+}
+function setBackGroundColorOnMassShift(position, color){
+	let para = parameters();
+	console.log("para",para);
+	let x,y;
+	x = getX(para,position);
+	y = getY(para, position);
+	rect_Backgroundcolor(x,y,"seqsvg",color)
+	console.log(x,y);
+}
+/* Code to color the background of a occurence acids */
+function rect_Backgroundcolor(x,y,id,color){
+	/*	font-size 16px is equal to 12pt	*/
+	let font_width = 12 ;
+	/*	to draw the rect color uniformly */
+	let font_height = 15 ;
+	let svgContainer = d3.select("#"+id+"_g");
+	svgContainer.append("rect")
+					.attr("x", x)
+					.attr("y", y-font_height)
+					.attr("width", font_width)
+					.attr("height", 20)
+					.attr("dy", "0em")
+					.style("fill", color)
+					.style("fill-opacity", ".4")
+					.style("stroke-width", "1.5px");
+}
+function addColorsToDropdown(){
+	let colors = ["red","green","yellow","white"]
+	let startStatement = "<select id=\"tooltip_color\" style=\"background-color:"+colors[0]+"\">";
+	let endStatement = "</select>";
+	let stringyfyingHTML = startStatement;
+	let len = colors.length;
+	for(let i=0;i<len;i++)
+	{
+		stringyfyingHTML += drawRectagleWithColors(colors[i],i);
+	}
+	stringyfyingHTML = stringyfyingHTML + endStatement;
+	console.log("stringyfyingHTML : ", stringyfyingHTML);
+	return stringyfyingHTML;
+}
+function drawRectagleWithColors(color,index){
+	let option = "<option value=\""+color +"\"style=\"width:80px;height:5px;border:1px solid #000;background-color:"+color+"\">";
+	if(index == 0)
+	{
+		option = "<option value=\""+color +"\"style=\"width:80px;height:5px;border:1px solid #000;background-color:"+color+"\""+"selected"+">";
+	}
+
+	//let div = "<div style=\"width:80px;height:5px;border:1px solid #000;background-color:"+color+"\"></div>";
+	let finalOption = option+color+"</option>"; 
+	return finalOption;
 }

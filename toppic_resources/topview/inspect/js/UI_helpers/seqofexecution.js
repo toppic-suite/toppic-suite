@@ -367,6 +367,8 @@ class SeqOfExecution
 		{
 			let tempPosition = this.onClickMassShift.position;
 			let tempMass = this.onClickMassShift.mass;
+			let color = this.onClickMassShift.color;
+			setBackGroundColorOnMassShift(tempPosition,color);
 			massShiftList = massShiftObj.appendtoMassShiftList(tempPosition,tempMass,massShiftList);
 		}
 		let seqToUI = massShiftObj.formSequence(sequence,massShiftList);
