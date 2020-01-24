@@ -17,7 +17,6 @@
 #include <map>
 #include <string>
 #include <vector>
-#include <ctime>
 
 #include "console/topindex_argument.hpp"
 #include "console/topindex_process.hpp"
@@ -98,4 +97,31 @@ void TopIndexProcess(std::map<std::string, std::string> &arguments){
     std::cout << "TopIndex - finished." << std::endl;
 }
 
+std::string gene_file_name(PrsmParaPtr prsm_para_ptr){
+    std::string fixed_mod = prsm_para_ptr->getFixedMod();
+    std::string error_tol = prsm_para_ptr->getErrorTolerance();
+    std::string decoy = search_type_map.find(prsm_para_ptr->getSearchType())->second;
+    std::string activation = prsm_para_ptr->getActivation();
+    std::string prot_mod = prsm_para_ptr->getProtMod();
+    
+    std::cout << fixed_mod << error_tol << decoy << activation << prot_mod << std::endl;
+
+    std::vector<std::string> prot_mod_vec;
+    std::stringstream sstream(prot_mod);
+    std::string final_prot_mod;
+
+    while(sstream.good()){
+        std::string substring;
+        getline(sstream, substring, ',');
+        prot_mod_vec.push_back(substring);
+    }
+    for (size_t i = 0; i < prot_mod_vec.size(); i++){
+        final_prot_mod = "_" + prot_mod_map.find(prot_mod_vec[i])->second;
+    }
+    std::string paraInfo =  fixed_mod + "_" + final_prot_mod + "_" + activation + "_" + error_tol + "_" + decoy;
+
+    std::cout << paraInfo << std::endl;
+    return paraInfo;
+    }
+    
 }

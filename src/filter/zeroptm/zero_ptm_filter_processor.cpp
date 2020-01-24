@@ -33,6 +33,8 @@
 #include "filter/zeroptm/mass_zero_ptm_index_file.hpp"
 #include "filter/zeroptm/zero_ptm_count_mng.hpp"
 
+#include "console/topindex_process.hpp"
+
 namespace toppic {
 
 inline void filterBlock(const ProteoformPtrVec & raw_forms,
@@ -132,14 +134,17 @@ void ZeroPtmFilterProcessor::process() {
 //below functions are used for generating index files
 
 inline void createIndexFiles(const ProteoformPtrVec & raw_forms,
-                        //int block_idx, ZeroPtmFilterMngPtr mng_ptr, ZeroPtmCountMng **f_ptr) { 
                           int block_idx, ZeroPtmFilterMngPtr mng_ptr, int block_num, int *current_num) {  
                         
     std::string block_str = str_util::toString(block_idx);
   
     //index file names
-    std::vector<std::string> file_vec{"zero_ptm_term_index" + block_str, "zero_ptm_diag_index" + block_str, 
-    "zero_ptm_rev_term_index" + block_str, "zero_ptm_rev_diag_index" + block_str};
+    //naming = fixed mod + n terminal + activation + error tolerance + decoy + block number
+    
+    std::string parameters = gene_file_name(mng_ptr->prsm_para_ptr_);
+
+    std::vector<std::string> file_vec{zero_ptm_file_vec[0] + parameters + block_str, zero_ptm_file_vec[1] + parameters + block_str, 
+    zero_ptm_file_vec[2] + parameters + block_str, zero_ptm_file_vec[3] + parameters + block_str};
 
     MassZeroPtmIndexPtr filter_ptr = std::make_shared<MassZeroPtmIndex>(raw_forms, mng_ptr, file_vec);
 

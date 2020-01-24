@@ -35,6 +35,16 @@ class PrsmPara {
 
   std::string getResourceDir() {return resource_dir_;}
 
+  std::string getActivation() {return activation_;}
+
+  std::string getFixedMod() {return fixed_mod_;}
+
+  std::string getErrorTolerance() {return error_tol_;}
+
+  std::string getProtMod() {return allow_prot_mod_;}
+
+  std::string getSearchType() {return decoy_;}
+
   int getPPM() {return ppm_;}
 
   int getGroupSpecNum() {return group_spec_num_;}
@@ -59,6 +69,16 @@ class PrsmPara {
   std::string spec_file_name_;
 
   std::string resource_dir_;
+
+  std::string activation_;
+
+  std::string fixed_mod_;
+
+  std::string error_tol_;
+
+  std::string allow_prot_mod_;
+
+  std::string decoy_;
 
   int ppm_;
 

@@ -19,7 +19,6 @@
 #include <map>
 #include <vector>
 
-
 #include "common/base/mod.hpp"
 #include "common/thread/simple_thread_pool.hpp"
 
@@ -31,9 +30,22 @@
 #include "filter/oneptm/one_ptm_filter_mng.hpp"
 #include "filter/diag/diag_filter_mng.hpp"
 
+#include "prsm/prsm_para.hpp"
+
 namespace toppic {
     void TopIndexProcess(std::map<std::string, std::string> & arguments);
     void index_process();
+    std::string gene_file_name(PrsmParaPtr prsm_para_ptr);
+
+    std::vector<std::string> zero_ptm_file_vec{"zero_ptm_term_index", "zero_ptm_diag_index", 
+    "zero_ptm_rev_term_index", "zero_ptm_rev_diag_index"};//file name vector
+
+    std::map<std::string, std::string> prot_mod_map = {
+        {"NONE", "N"}, {"NME", "NME"}, {"NME_ACETYLATION", "NMEA"}, {"M_ACETYLATION", "MA"}
+    };
+    std::map<std::string, std::string> search_type_map = {
+        {"TARGET", ""}, {"TARGET+DECOY", "decoy"}};
+
 }  // namespace toppic
 
 #endif

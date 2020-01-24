@@ -39,6 +39,16 @@ PrsmPara::PrsmPara(std::map<std::string, std::string> &arguments) {
 
   fix_mod_list_ = mod_util::geneFixedModList(arguments["fixedMod"]);
 
+  activation_ = arguments["activation"];
+
+  fixed_mod_ = arguments["fixedMod"];
+
+  error_tol_ = arguments["massErrorTolerance"];
+
+  allow_prot_mod_ = arguments["allowProtMod"];
+
+  decoy_ = arguments["searchType"];
+
   std::string prot_mod_str = arguments["allowProtMod"];
   //boost::split(strs, prot_mod_str, boost::is_any_of(","));
   std::vector<std::string> strs = str_util::split(prot_mod_str, ",");
