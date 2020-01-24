@@ -33,12 +33,12 @@
 namespace toppic {
   //std::mutex mu;
 
-void DeconvOneSp::setData(PeakPtrVec &peak_list) {
+void DeconvOneSp::setData(const PeakPtrVec &peak_list) {
   data_ptr_ = deconv_data_util::getDataPtr(peak_list, env_para_ptr_->max_mass_,
                                            env_para_ptr_->max_charge_, env_para_ptr_->window_size_);
 }
 
-void DeconvOneSp::setData(PeakPtrVec &peak_list, double spec_max_mass, int spec_max_charge) {
+void DeconvOneSp::setData(const PeakPtrVec &peak_list, double spec_max_mass, int spec_max_charge) {
   data_ptr_ = deconv_data_util::getDataPtr(peak_list, spec_max_mass, spec_max_charge, 
                                            env_para_ptr_->max_mass_, env_para_ptr_->max_charge_,
                                            env_para_ptr_->window_size_);
