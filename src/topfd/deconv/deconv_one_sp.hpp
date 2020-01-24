@@ -27,11 +27,11 @@ class DeconvOneSp {
   explicit DeconvOneSp(EnvParaPtr env_para_ptr, DpParaPtr dp_para_ptr): 
       env_para_ptr_(env_para_ptr), dp_para_ptr_(dp_para_ptr) {}
 
-  void setData(PeakPtrVec &peak_list);
+  void setData(const PeakPtrVec &peak_list);
 
   void setMsLevel(int level) {ms_level_ = level;}
 
-  void setData(PeakPtrVec &peak_list, double max_mass, int max_charge);
+  void setData(const PeakPtrVec &peak_list, double max_mass, int max_charge);
 
   MatchEnvPtrVec getResult() {return result_envs_;}
 
@@ -41,6 +41,8 @@ class DeconvOneSp {
 
   MatchEnvPtrVec postprocess(MatchEnvPtrVec  &dp_envs);
 
+  EnvParaPtr getEnvPara(){return env_para_ptr_;}
+  DpParaPtr getDpPara(){return dp_para_ptr_;}
 
  private:
   EnvParaPtr env_para_ptr_;

@@ -37,12 +37,11 @@ class DeconvProcess {
 
   void process();
 
-  void processSp(DeconvOneSpPtr deconv_ptr, RawMsGroupReaderPtr reader_ptr, 
-                 MsAlignWriterPtr ms1_writer_ptr, MsAlignWriterPtr ms2_writer_ptr);
+  void processSp(DeconvOneSpPtr deconv_ptr, RawMsGroupReaderPtr reader_ptr);
 
   void processSpMissingLevelOne(DeconvOneSpPtr deconv_ptr, RawMsGroupReaderPtr reader_ptr, 
                                 MsAlignWriterPtr ms2_writer_ptr);
-  void getDeconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
+  void getDeconvMsOne(RawMsPtr ms_ptr, DeconvOneSp* deconv_ptr, 
                 MatchEnvPtrVec &prec_envs, MsAlignWriterPtr ms1_writer_ptr);
 
   EnvParaPtr getEnvParaPtr(){
@@ -53,7 +52,8 @@ class DeconvProcess {
 
   void deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
                    MsAlignWriterPtr ms2_writer_ptr); 
-
+  std::string updateMsg(MsHeaderPtr header_ptr, int scan, int total_scan_num);
+  
  private:
 
   EnvParaPtr env_para_ptr_;
@@ -78,7 +78,7 @@ class DeconvProcess {
   std::string ms1_json_dir_;
   std::string ms2_json_dir_; 
 
-  std::string updateMsg(MsHeaderPtr header_ptr, int scan, int total_scan_num);
+  
 
   
 };

@@ -20,7 +20,7 @@
 
 namespace toppic {
 
-DeconvData::DeconvData(PeakPtrVec &peak_list, double max_mass, int max_charge,
+DeconvData::DeconvData(PeakPtrVec peak_list, double max_mass, int max_charge,
                        double win_size): 
     peak_list_(peak_list),
     max_mass_(max_mass),
