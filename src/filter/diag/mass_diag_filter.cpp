@@ -26,12 +26,15 @@
 #include "filter/massmatch/mass_match_util.hpp"
 #include "filter/diag/mass_diag_filter.hpp"
 
+#include "console/topindex_file_name.hpp"
+
 namespace toppic {
 
 MassDiagFilter::MassDiagFilter(const ProteoformPtrVec &proteo_ptrs,
                                DiagFilterMngPtr mng_ptr, std::string block_str) {
   mng_ptr_ = mng_ptr;
   proteo_ptrs_ = proteo_ptrs;
+  PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
 
   std::string indexDirName = mng_ptr_->prsm_para_ptr_->getOriDbName() + "_idx";
 
@@ -40,8 +43,11 @@ MassDiagFilter::MassDiagFilter(const ProteoformPtrVec &proteo_ptrs,
     index_ptr_ = std::make_shared<MassMatch>();
 
     MassMatch *idx_ptr_ = index_ptr_.get();
-    
-    index_ptr_->setfileName("diag" + block_str);
+
+    TopIndexFileName TopIndexFile;
+    std::string parameters = TopIndexFile.gene_file_name(prsm_para_ptr);
+
+    index_ptr_->setfileName(TopIndexFile.multi_ptm_file_vec[0] + parameters + block_str);
     index_ptr_->setDirName(indexDirName);
     index_ptr_->deserializeMassMatch(&idx_ptr_);
 

@@ -31,8 +31,9 @@
 #include "filter/oneptm/mass_one_ptm_filter.hpp"
 #include "filter/oneptm/mass_one_ptm_index_file.hpp"
 
-namespace toppic {
+#include "console/topindex_file_name.hpp"
 
+namespace toppic {
 
 inline void filterBlock(const ProteoformPtrVec & raw_forms,
                         int block_idx, 
@@ -153,11 +154,15 @@ inline void createIndexFiles(const ProteoformPtrVec & raw_forms,
 
     
     std::string block_str = str_util::toString(block_idx);
+    PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
 
-    //index file names
-    std::vector<std::string> file_vec{"one_ptm_term_index" + block_str, "one_ptm_diag_index" + block_str, 
-    "one_ptm_rev_term_index" + block_str, "one_ptm_rev_diag_index" + block_str};
+    TopIndexFileName TopIndexFile;
+    std::string parameters = TopIndexFile.gene_file_name(prsm_para_ptr);
 
+    std::vector<std::string> file_vec{TopIndexFile.one_ptm_file_vec[0] + parameters + block_str, 
+    TopIndexFile.one_ptm_file_vec[1] + parameters + block_str, 
+    TopIndexFile.one_ptm_file_vec[2] + parameters + block_str, TopIndexFile.one_ptm_file_vec[3] + parameters + block_str};
+    
     MassOnePtmIndexPtr filter_ptr = std::make_shared<MassOnePtmIndex>(raw_forms, mng_ptr, file_vec);
     
     mng_ptr->mutex_.lock();
