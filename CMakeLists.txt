@@ -136,7 +136,8 @@ file(GLOB TOPINDEX_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/filter/*.cpp)
 
 # topindex console main
 file(GLOB TOPINDEX_PROC_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topindex_process.cpp
-        		     ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topindex_argument.cpp)
+        		     ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topindex_argument.cpp					 
+					 ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topindex_file_name.cpp)
 file(GLOB TOPINDEX_CONSOLE_SRCS
         		     ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topindex.cpp)
 

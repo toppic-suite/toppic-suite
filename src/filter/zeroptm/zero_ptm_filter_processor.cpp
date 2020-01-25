@@ -33,7 +33,7 @@
 #include "filter/zeroptm/mass_zero_ptm_index_file.hpp"
 #include "filter/zeroptm/zero_ptm_count_mng.hpp"
 
-#include "console/topindex_process.hpp"
+#include "console/topindex_file_name.hpp"
 
 namespace toppic {
 
@@ -137,14 +137,16 @@ inline void createIndexFiles(const ProteoformPtrVec & raw_forms,
                           int block_idx, ZeroPtmFilterMngPtr mng_ptr, int block_num, int *current_num) {  
                         
     std::string block_str = str_util::toString(block_idx);
-  
+    PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
     //index file names
     //naming = fixed mod + n terminal + activation + error tolerance + decoy + block number
     
-    std::string parameters = gene_file_name(mng_ptr->prsm_para_ptr_);
+    TopIndexFileName TopIndexFile;
+    std::string parameters = TopIndexFile.gene_file_name(prsm_para_ptr);
 
-    std::vector<std::string> file_vec{zero_ptm_file_vec[0] + parameters + block_str, zero_ptm_file_vec[1] + parameters + block_str, 
-    zero_ptm_file_vec[2] + parameters + block_str, zero_ptm_file_vec[3] + parameters + block_str};
+    std::vector<std::string> file_vec{TopIndexFile.zero_ptm_file_vec[0] + parameters + block_str, 
+    TopIndexFile.zero_ptm_file_vec[1] + parameters + block_str, 
+    TopIndexFile.zero_ptm_file_vec[2] + parameters + block_str, TopIndexFile.zero_ptm_file_vec[3] + parameters + block_str};
 
     MassZeroPtmIndexPtr filter_ptr = std::make_shared<MassZeroPtmIndex>(raw_forms, mng_ptr, file_vec);
 

@@ -28,8 +28,6 @@
 
 #include "console/toppic_argument.hpp"
 
-
-
 namespace toppic {
 
 /* mass_2d[i]: a vector containing prefix residue masses of the ith proteoform 

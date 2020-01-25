@@ -25,12 +25,15 @@
 #include "filter/massmatch/mass_match_util.hpp"
 #include "filter/oneptm/mass_one_ptm_filter.hpp"
 
+#include "console/topindex_file_name.hpp"
+
 namespace toppic {
 
 MassOnePtmFilter::MassOnePtmFilter(const ProteoformPtrVec &proteo_ptrs,
                                    OnePtmFilterMngPtr mng_ptr, std::string block_str) {
   mng_ptr_ = mng_ptr;
   proteo_ptrs_ = proteo_ptrs;
+  PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
 
   std::string indexDirName = mng_ptr_->prsm_para_ptr_->getOriDbName() + "_idx";
 
@@ -47,10 +50,13 @@ MassOnePtmFilter::MassOnePtmFilter(const ProteoformPtrVec &proteo_ptrs,
     MassMatch *rev_t_ptr_ = rev_term_index_ptr_.get();
     MassMatch *rev_d_ptr_ = rev_diag_index_ptr_.get();
 
-    term_index_ptr_->setfileName("one_ptm_term_index" + block_str);
-    diag_index_ptr_->setfileName("one_ptm_diag_index" + block_str);
-    rev_term_index_ptr_->setfileName("one_ptm_rev_term_index" + block_str);
-    rev_diag_index_ptr_->setfileName("one_ptm_rev_diag_index" + block_str);
+    TopIndexFileName TopIndexFile;
+    std::string parameters = TopIndexFile.gene_file_name(prsm_para_ptr);
+
+    term_index_ptr_->setfileName(TopIndexFile.one_ptm_file_vec[0] + parameters + block_str);
+    diag_index_ptr_->setfileName(TopIndexFile.one_ptm_file_vec[1] + parameters + block_str);
+    rev_term_index_ptr_->setfileName(TopIndexFile.one_ptm_file_vec[2] + parameters + block_str);
+    rev_diag_index_ptr_->setfileName(TopIndexFile.one_ptm_file_vec[3] + parameters + block_str);
 
     term_index_ptr_->setDirName(indexDirName);
     diag_index_ptr_->setDirName(indexDirName);

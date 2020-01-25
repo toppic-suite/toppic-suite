@@ -214,10 +214,6 @@ void DiagFilterProcessor::createIndexFiles(DbBlockPtr block_ptr, int total_block
 
   std::string block_str = str_util::toString(block_ptr->getBlockIdx());
 
-  //index file names
-  //std::vector<std::string> file_vec{"multi_ptm_term_index" + block_str, "multi_ptm_diag_index" + block_str, 
-  //"multi_ptm_rev_term_index" + block_str, "multi_ptm_rev_diag_index" + block_str};
-
   MassDiagIndexPtr filter_ptr = std::make_shared<MassDiagIndex>(raw_forms, mng_ptr_, block_str);
   
   mng_ptr_->mutex_.lock();

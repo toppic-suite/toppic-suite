@@ -29,6 +29,8 @@ class ZeroPtmFilterMng {
 
   PrsmParaPtr prsm_para_ptr_;
 
+  PrsmParaPtr getPrsmPtr(){return prsm_para_ptr_;}
+
   /** parameters for fast filteration */
   int max_proteoform_mass_ = 100000;
 
