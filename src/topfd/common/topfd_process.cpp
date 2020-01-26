@@ -37,7 +37,9 @@ void processOneFile(TopfdParaPtr para_ptr,
 
     std::cout << "Processing " << spec_file_name << " started." << std::endl;
     std::cout << "Deconvolution started." << std::endl;
+
     DeconvProcess processor(para_ptr, spec_file_name, frac_id, thead_number, &processor);
+    
     processor.process();
     std::cout << "Deconvolution finished." << std::endl;
 

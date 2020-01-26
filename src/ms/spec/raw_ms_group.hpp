@@ -30,7 +30,7 @@ class RawMsGroup {
   RawMsPtrVec getMsTwoPtrVec() {return ms2_ptr_vec_;}
 
   int getTotalScanNum() {return total_scan_num_;}
-  int setTotalScanNum(int num) {total_scan_num_ = num;}
+  void setTotalScanNum(int num) {total_scan_num_ = num;}
 
  private:
   RawMsPtr ms1_ptr_;

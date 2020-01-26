@@ -37,7 +37,8 @@ class DeconvProcess {
 
   void process();
 
-  void processSp(DeconvOneSpPtr deconv_ptr, RawMsGroupReaderPtr reader_ptr);
+  void processSp(DeconvOneSpPtr deconv_ptr, RawMsGroupReaderPtr reader_ptr, MsAlignWriterPtr ms1_writer_ptr, 
+                              MsAlignWriterPtr ms2_writer_ptr);
 
   void processSpMissingLevelOne(DeconvOneSpPtr deconv_ptr, RawMsGroupReaderPtr reader_ptr, 
                                 MsAlignWriterPtr ms2_writer_ptr);
@@ -48,7 +49,7 @@ class DeconvProcess {
       return env_para_ptr_;
   }
   void deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
-                   MatchEnvPtrVec &prec_envs, MsAlignWriterPtr ms1_writer_ptr); 
+                   MatchEnvPtrVec prec_envs, MsAlignWriterPtr ms1_writer_ptr, PeakPtrVec peak_list); 
 
   void deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
                    MsAlignWriterPtr ms2_writer_ptr); 
