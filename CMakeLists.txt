@@ -92,7 +92,8 @@ file(GLOB VISUAL_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/visual/*.cpp)
 
 # toppic console main
 file(GLOB TOPPIC_PROC_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_process.cpp
-			     ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_argument.cpp)
+			     ${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic_argument.cpp
+				${CMAKE_CURRENT_SOURCE_DIR}/src/console/topindex_file_name.cpp)
 file(GLOB TOPPIC_CONSOLE_SRCS	${CMAKE_CURRENT_SOURCE_DIR}/src/console/toppic.cpp)
 
 # toppic gui main
@@ -111,7 +112,8 @@ file(GLOB MCMC_SRCS  ${CMAKE_CURRENT_SOURCE_DIR}/src/stat/mcmc/*.cpp)
 
 # topmg console main
 file(GLOB TOPMG_PROC_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmg_process.cpp
-			    ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmg_argument.cpp)
+			    ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmg_argument.cpp
+			${CMAKE_CURRENT_SOURCE_DIR}/src/console/topindex_file_name.cpp)
 file(GLOB TOPMG_CONSOLE_SRCS   ${CMAKE_CURRENT_SOURCE_DIR}/src/console/topmg.cpp)
 
 # topmg gui main

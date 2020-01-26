@@ -68,14 +68,14 @@ void TopIndexProcess(std::map<std::string, std::string> &arguments){
     ZeroPtmFilterProcessorPtr zero_filter_processor
         = std::make_shared<ZeroPtmFilterProcessor>(zero_filter_mng_ptr);
 
-    //zero_filter_processor->index_process();
+    zero_filter_processor->index_process();
     zero_filter_processor = nullptr;
 
     OnePtmFilterMngPtr one_ptm_filter_mng_ptr
         = std::make_shared<OnePtmFilterMng>(prsm_para_ptr, "toppic_one_filter", thread_num);
     OnePtmFilterProcessorPtr one_filter_processor
         = std::make_shared<OnePtmFilterProcessor>(one_ptm_filter_mng_ptr);
-    //one_filter_processor->index_process();
+    one_filter_processor->index_process();
     one_filter_processor = nullptr;
 
     DiagFilterMngPtr diag_filter_mng_ptr
