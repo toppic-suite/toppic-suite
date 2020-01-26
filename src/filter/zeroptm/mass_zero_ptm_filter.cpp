@@ -42,6 +42,7 @@ MassZeroPtmFilter::MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
 	
   if (file_util::exists(indexDirName) && file_util::exists(indexDirName + "/" + TopIndexFile.zero_ptm_file_vec[0] + parameters + block_str)){
     //if exists
+	
     term_index_ptr_ = std::make_shared<MassMatch>();
     diag_index_ptr_ = std::make_shared<MassMatch>();
     rev_term_index_ptr_ = std::make_shared<MassMatch>();

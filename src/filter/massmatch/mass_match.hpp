@@ -86,14 +86,14 @@ class MassMatch {
       ar & col_num_; 
       ar & row_num_;
     
-      //ar & proteo_row_begins_;
-      //ar & proteo_row_ends_;
-     // ar & row_proteo_ids_;
-      //ar & trunc_shifts_;
+      ar & proteo_row_begins_;
+      ar & proteo_row_ends_;
+      ar & row_proteo_ids_;
+      ar & trunc_shifts_;
 
-     // ar & col_index_begins_;
-      //ar & col_index_ends_;
-      //ar & col_indexes_;
+      ar & col_index_begins_;
+      ar & col_index_ends_;
+      ar & col_indexes_;
       
   }
 
