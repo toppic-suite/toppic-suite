@@ -42,7 +42,7 @@ std::string TopIndexFileName::gene_file_name(PrsmParaPtr prsm_para_ptr){
     for (size_t i = 0; i < prot_mod_vec.size(); i++){
         final_prot_mod = final_prot_mod + "_" + prot_mod_map.find(prot_mod_vec[i])->second;
     }
-    std::string paraInfo =  fixed_mod + final_prot_mod + "_" + activation + "_" + error_tol + "_" + decoy;
+    std::string paraInfo =  fixed_mod + "_" + final_prot_mod + "_" + activation + "_" + error_tol + "_" + decoy;
     
     return paraInfo;
     }

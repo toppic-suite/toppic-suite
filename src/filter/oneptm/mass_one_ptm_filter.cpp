@@ -36,8 +36,10 @@ MassOnePtmFilter::MassOnePtmFilter(const ProteoformPtrVec &proteo_ptrs,
   PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
 
   std::string indexDirName = mng_ptr_->prsm_para_ptr_->getOriDbName() + "_idx";
-
-  if (file_util::exists(indexDirName)){
+  TopIndexFileName TopIndexFile;
+  std::string parameters = TopIndexFile.gene_file_name(prsm_para_ptr);
+  
+  if (file_util::exists(indexDirName) && file_util::exists(indexDirName + "/" + TopIndexFile.one_ptm_file_vec[0] + parameters + block_str)){
     //if exists
 
     term_index_ptr_ = std::make_shared<MassMatch>();
@@ -50,8 +52,7 @@ MassOnePtmFilter::MassOnePtmFilter(const ProteoformPtrVec &proteo_ptrs,
     MassMatch *rev_t_ptr_ = rev_term_index_ptr_.get();
     MassMatch *rev_d_ptr_ = rev_diag_index_ptr_.get();
 
-    TopIndexFileName TopIndexFile;
-    std::string parameters = TopIndexFile.gene_file_name(prsm_para_ptr);
+    
 
     term_index_ptr_->setfileName(TopIndexFile.one_ptm_file_vec[0] + parameters + block_str);
     diag_index_ptr_->setfileName(TopIndexFile.one_ptm_file_vec[1] + parameters + block_str);

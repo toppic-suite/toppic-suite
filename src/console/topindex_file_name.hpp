@@ -39,6 +39,6 @@ class TopIndexFileName{
         {"NONE", "N"}, {"NME", "NME"}, {"NME_ACETYLATION", "NMEA"}, {"M_ACETYLATION", "MA"}
     };
     std::map<std::string, std::string> search_type_map = {
-        {"TARGET", ""}, {"TARGET+DECOY", "decoy"}};
+        {"TARGET", "no_decoy"}, {"TARGET+DECOY", "decoy"}};
     };
 }
