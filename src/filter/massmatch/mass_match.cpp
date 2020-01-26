@@ -97,7 +97,7 @@ void MassMatch::serializeMassMatch(){
 
   std::string fileName = dirName + "/" + this->getFileName();
 
-  //std::string fileName = this->getFileName();
+  std::cout << fileName << std::endl;
 
   std::ifstream fileToRead(fileName, std::ios::binary);
 
