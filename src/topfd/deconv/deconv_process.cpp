@@ -13,6 +13,7 @@
 //limitations under the License.
 
 #include "common/util/logger.hpp"
+#include "ms/spec/baseline_util.hpp"
 #include "common/util/version.hpp"
 #include "common/util/time_util.hpp"
 #include "common/util/str_util.hpp"
@@ -95,7 +96,16 @@ void DeconvProcess::prepareFileFolder() {
 
 void DeconvProcess::process() {
   // writer 
-  
+  std::string ms1_msalign_name, ms2_msalign_name;
+  ms1_msalign_name = base_name_ + "_ms1.msalign";
+  ms2_msalign_name = base_name_ + "_ms2.msalign";
+
+  MsAlignWriterPtr ms1_writer_ptr = std::make_shared<MsAlignWriter>(ms1_msalign_name);
+  MsAlignWriterPtr ms2_writer_ptr = std::make_shared<MsAlignWriter>(ms2_msalign_name);
+
+  std::string para_str = topfd_para_ptr_->getParaStr("#");
+  ms1_writer_ptr->writePara(para_str);
+  ms2_writer_ptr->writePara(para_str);
 
   // reader
   RawMsGroupReaderPtr reader_ptr = std::make_shared<RawMsGroupReader>(spec_file_name_, 
@@ -108,7 +118,7 @@ void DeconvProcess::process() {
     //processSpMissingLevelOne(deconv_ptr, reader_ptr, ms2_writer_ptr);
   }
   else {
-    processSp(deconv_ptr, reader_ptr);
+    processSp(deconv_ptr, reader_ptr, ms1_writer_ptr, ms2_writer_ptr);
   }
 }
 
@@ -156,65 +166,38 @@ void DeconvProcess::processSpMissingLevelOne(DeconvOneSpPtr deconv_ptr,
 }
 
 void DeconvProcess::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
-                                MatchEnvPtrVec &prec_envs, MsAlignWriterPtr ms1_writer_ptr) { 
-
-  PeakPtrVec peak_list = ms_ptr->getPeakPtrVec();
-
-  //this seems to be causing the problem
-
-  LOG_DEBUG("peak list size " << peak_list.size());
-  MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
-  LOG_DEBUG("ms level " << header_ptr->getMsLevel() );
-  // int scan_num_ = header_ptr->getFirstScanNum();
-  //remove precursor peaks
-  std::vector<double> intensities;
-
-  
-  for (size_t i = 0; i < peak_list.size(); i++) {
-    intensities.push_back(peak_list[i]->getIntensity());
-  }
-  for (size_t i = 0; i < prec_envs.size(); i++) {
-    RealEnvPtr env_ptr = prec_envs[i]->getRealEnvPtr();
-    for (int p = 0; p < env_ptr->getPeakNum(); p++) {
-      if (env_ptr->isExist(p)) {
-        int idx = env_ptr->getPeakIdx(p);
-        peak_list[idx]->setIntensity(0);
-      }
-    }
-  }
-  
+                                MatchEnvPtrVec prec_envs, MsAlignWriterPtr ms1_writer_ptr, PeakPtrVec peak_list) { 
   MatchEnvPtrVec result_envs;
+  MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
+
+  LOG_DEBUG("ms level " << header_ptr->getMsLevel());
 
   if (peak_list.size() > 0) {
     LOG_DEBUG("set data....");
     deconv_ptr->setMsLevel(header_ptr->getMsLevel());
-
     deconv_ptr->setData(peak_list);
-
     deconv_ptr->run();
     result_envs = deconv_ptr->getResult();
   }
+
   prec_envs.insert(prec_envs.end(), result_envs.begin(), result_envs.end());
   
   LOG_DEBUG("result num " << prec_envs.size());
 
-/*
   DeconvMsPtr deconv_ms_ptr = match_env_util::getDeconvMsPtr(header_ptr, prec_envs);
 
+//problem below
   ms1_writer_ptr->write(deconv_ms_ptr);
   if (topfd_para_ptr_->output_match_env_) {
     match_env_writer::write(ms1_env_name_, header_ptr, prec_envs);
   }
-  // add back precursor peaks
-  for (size_t i = 0; i < peak_list.size(); i++) {
-    peak_list[i]->setIntensity(intensities[i]);
-  }
+
   if (topfd_para_ptr_->output_json_files_) {
     std::string json_file_name = ms1_json_dir_ 
         + file_util::getFileSeparator() 
         + "spectrum" + std::to_string(header_ptr->getId()) + ".js";
     raw_ms_writer::write(json_file_name, ms_ptr, prec_envs);    
-  }*/
+  }
 }
 
 void DeconvProcess::deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
@@ -250,37 +233,32 @@ void DeconvProcess::deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
 }
 
 //DecovOne & Two
-std::function<void()> geneTask(RawMsGroupPtr ms_group_ptr, DeconvOneSpPtr deconv_ptr, 
+std::function<void()> geneTask(RawMsGroupPtr ms_group_ptr, DeconvOneSpPtr deconv_ptr, MatchEnvPtrVec prec_envs,
                                 MsAlignWriterPtr ms_writer_ptr, MsAlignWriterPtr ms2_writer_ptr, 
-                                DeconvProcess *deconv_instance_ptr, int **count1, int **count2){
-  return [ms_group_ptr, deconv_ptr, ms_writer_ptr, ms2_writer_ptr, deconv_instance_ptr, count1, count2]() {
+                                DeconvProcess *deconv_instance_ptr, int **count1, int **count2, PeakPtrVec peak_list, PeakPtrVec ori_peak_list){
+  return [ms_group_ptr, deconv_ptr, prec_envs,ms_writer_ptr, ms2_writer_ptr, deconv_instance_ptr, count1, count2, peak_list, ori_peak_list]() {
    
-   MatchEnvPtrVec prec_envs;
-
    RawMsPtr ms_one_ptr = ms_group_ptr->getMsOnePtr();                            
    RawMsPtrVec ms_two_ptr_vec = ms_group_ptr->getMsTwoPtrVec();
 
-   RawMsGroupReader::obtainPrecEnvs(ms_group_ptr, prec_envs, 
-                                     deconv_instance_ptr->getEnvParaPtr()->prec_deconv_interval_, 
-                                     deconv_instance_ptr->getEnvParaPtr()->max_charge_); 
-    
-   //DeconvOneSp deconv_obj(deconv_ptr->getEnvPara(), deconv_ptr->getDpPara());
-   //DeconvOneSp *deconv_ptr_copy = &deconv_obj;
-
-   deconv_instance_ptr->deconvMsOne(ms_one_ptr, deconv_ptr, prec_envs, ms_writer_ptr);
-
+   deconv_instance_ptr->deconvMsOne(ms_one_ptr, deconv_ptr, prec_envs, ms_writer_ptr, peak_list);
+   //std::cout << "deconvOne finished" << std::endl;
+  
    count_lock.lock();
    **count1 = **count1 + 1;
    //std::cout << "count :" << **count1 << std::endl; 
+   //std::cout << "cout : " << **count1 << " peak : " << peak_list[0] << std::endl; 
    count_lock.unlock();
-    /*
-    std::string msg = deconv_instance_ptr->updateMsg(ms_one_ptr->getMsHeaderPtr(), **count1, ms_group_ptr->getTotalScanNum());
 
+   //below line causes seg fault 
+   //std::string msg = deconv_instance_ptr->updateMsg(ms_one_ptr->getMsHeaderPtr(), **count1, ms_group_ptr->getTotalScanNum());
+    
+/*
     for (size_t i = 0; i < ms_two_ptr_vec.size(); i++) {
         RawMsPtr ms_two_ptr = ms_two_ptr_vec[i];
         msg = deconv_instance_ptr->updateMsg(ms_two_ptr->getMsHeaderPtr(), **count1 + **count2 + 1, ms_group_ptr->getTotalScanNum());
         std::cout << "\r" << msg << std::flush;
-        deconv_instance_ptr->deconvMsTwo(ms_two_ptr, deconv_ptr, ms2_writer_ptr);
+        deconv_instance_ptr->deconvMsTwo(ms_two_ptr, deconv_ptr, ms2_writer_ptr, ori_peak_list);
         **count2 = **count2 + 1;
     }
     */
@@ -288,20 +266,12 @@ std::function<void()> geneTask(RawMsGroupPtr ms_group_ptr, DeconvOneSpPtr deconv
 }
   
 void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr, 
-                              RawMsGroupReaderPtr reader_ptr) {
-
-  std::string ms1_msalign_name, ms2_msalign_name;
-
-  ms1_msalign_name = base_name_ + "_ms1.msalign";
-  ms2_msalign_name = base_name_ + "_ms2.msalign";
-
-  SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(thread_num);  
-
-  // reader_ptr
+                              RawMsGroupReaderPtr reader_ptr, MsAlignWriterPtr ms1_writer_ptr, MsAlignWriterPtr ms2_writer_ptr) {
+  
   int total_scan_num = reader_ptr->getInputSpNum();
 
   RawMsGroupPtr ms_group_ptr;
-  
+
   int count1 = 0;
   int count2 = 0;
 
@@ -314,27 +284,56 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr,
   ms_group_ptr = reader_ptr->getNextMsGroupPtr();
   ms_group_ptr->setTotalScanNum(total_scan_num);
 
+  SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(thread_num);  
+
+  MatchEnvPtrVec prec_envs;
+
+  RawMsGroupReader::obtainPrecEnvs(ms_group_ptr, prec_envs, 
+                                     env_para_ptr_->prec_deconv_interval_, 
+                                     env_para_ptr_->max_charge_); 
+
+  //process peak list here so that all thread have same peak list to start from
+  //one peak list for all threads that work on same spectrum
+  RawMsPtr ms_ptr = ms_group_ptr->getMsOnePtr();         
+  MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
+
+  PeakPtrVec peak_list = ms_ptr->getPeakPtrVec();//for deconvmsone
+  PeakPtrVec ori_peak_list = ms_ptr->getPeakPtrVec();//for deconvmstwo
+  
+  //msone peak intensity
+  
+  for (size_t i = 0; i < prec_envs.size(); i++) {
+    RealEnvPtr env_ptr = prec_envs[i]->getRealEnvPtr();
+    for (int p = 0; p < env_ptr->getPeakNum(); p++) {
+      if (env_ptr->isExist(p)) {
+        int idx = env_ptr->getPeakIdx(p);
+        peak_list[idx]->setIntensity(0);
+      }
+    }
+  }
+  if (env_para_ptr_->estimate_min_inte_) {
+    std::vector<double> intes;
+    for (size_t i = 0; i < peak_list.size(); i++) {
+      intes.push_back(peak_list[i]->getIntensity());
+    }
+    double min_inte = baseline_util::getBaseLine(intes);
+    env_para_ptr_->setMinInte(min_inte, header_ptr->getMsLevel());
+  }
+
+
   while (ms_group_ptr != nullptr) {
     while(pool_ptr->getQueueSize() >= thread_num * 2){
         boost::this_thread::sleep(boost::posix_time::milliseconds(100));
     }
-    MsAlignWriterPtr ms1_writer_ptr = std::make_shared<MsAlignWriter>(ms1_msalign_name);
-    MsAlignWriterPtr ms2_writer_ptr = std::make_shared<MsAlignWriter>(ms2_msalign_name);
-
-    std::string para_str = topfd_para_ptr_->getParaStr("#");
-
     DeconvOneSpPtr deconv_ptr_new = std::make_shared<DeconvOneSp>(deconv_ptr->getEnvPara(), deconv_ptr->getDpPara());
-    
-    ms1_writer_ptr->writePara(para_str);
-    ms2_writer_ptr->writePara(para_str);    
 
-    pool_ptr->Enqueue(geneTask(ms_group_ptr, deconv_ptr_new, ms1_writer_ptr, ms2_writer_ptr, deconv_instance_ptr, &count1_ptr, &count2_ptr));
+    pool_ptr->Enqueue(geneTask(ms_group_ptr, deconv_ptr_new, prec_envs, ms1_writer_ptr, ms2_writer_ptr, deconv_instance_ptr, &count1_ptr, &count2_ptr, peak_list, ori_peak_list));
     ms_group_ptr = reader_ptr->getNextMsGroupPtr();
   }
   pool_ptr->ShutDown();
 
-  //free(count1);
-  //free(count2);
+  free(count1_ptr);
+  free(count2_ptr);
 
     //auto proc_end = std::chrono::high_resolution_clock::now();
     //auto proc_duration = std::chrono::duration_cast<std::chrono::microseconds>(proc_end-proc_start);
@@ -348,7 +347,9 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr,
   
   
   std::cout << std::endl;
+
   }
-  
+
+
                                 
 }; // namespace toppic
