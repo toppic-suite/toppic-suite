@@ -14,6 +14,7 @@
 
 #include <algorithm>
 #include <iostream>
+//#include <chrono>
 
 #include "common/util/file_util.hpp"
 
@@ -41,6 +42,9 @@ MassDiagFilter::MassDiagFilter(const ProteoformPtrVec &proteo_ptrs,
 	
   std::string indexDirName = mng_ptr_->prsm_para_ptr_->getOriDbName() + "_idx";
 
+  //timer
+  //auto start = std::chrono::steady_clock::now();
+
   bool indexFilesExist = true;
 
   for (size_t t = 0; t < TopIndexFile.multi_ptm_file_vec.size(); t++){
@@ -65,13 +69,21 @@ MassDiagFilter::MassDiagFilter(const ProteoformPtrVec &proteo_ptrs,
     *index_ptr_ = *idx_ptr_;
 
     free(idx_ptr_);
+
+    //auto end = std::chrono::steady_clock::now();
+
     std::cout << "Loading index files -- finished" << std::endl;
     std::cout << std::flush; 
+
+    //std::cout << "With index, multi+ptm : " << std::chrono::duration_cast<std::chrono::seconds>(end-start).count() << " sec" << std::endl;
   }
   else{
     index_ptr_ = MassMatchFactory::getPrmDiagMassMatchPtr(proteo_ptrs,
                                                         mng_ptr->max_proteoform_mass_,
                                                         mng_ptr->filter_scale_);
+  //auto no_index_end = std::chrono::steady_clock::now();
+  //std::cout << "Without index, multi_ptm : " << std::chrono::duration_cast<std::chrono::seconds>(no_index_end-start).count() << " sec" << std::endl;
+                                                       
   }
 }
 

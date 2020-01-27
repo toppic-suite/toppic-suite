@@ -52,6 +52,8 @@ void TopIndexProcess(std::map<std::string, std::string> &arguments){
     int thread_num = std::stoi(arguments["threadNumber"]);
     int filter_result_num = std::stoi(arguments["filteringResultNumber"]);
 
+    std::cout << arguments["allowProtMod"] << std::endl;
+
     file_util::createFolder(ori_db_file_name + "_idx");
     //prsm_para_ptr->setIndexDir(ori_db_file_name + "_idx"); //this gives seg fault
 

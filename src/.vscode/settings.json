@@ -68,6 +68,7 @@
         "bit": "cpp",
         "shared_mutex": "cpp",
         "codecvt": "cpp",
-        "filesystem": "cpp"
+        "filesystem": "cpp",
+        "*.ipp": "cpp"
     }
 }
