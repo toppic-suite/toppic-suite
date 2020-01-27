@@ -39,9 +39,19 @@ MassOnePtmFilter::MassOnePtmFilter(const ProteoformPtrVec &proteo_ptrs,
   TopIndexFileName TopIndexFile;
   std::string parameters = TopIndexFile.gene_file_name(prsm_para_ptr);
   
-  if (file_util::exists(indexDirName) && file_util::exists(indexDirName + "/" + TopIndexFile.one_ptm_file_vec[0] + parameters + block_str)){
-    //if exists
+  //check if all index files for this ptm is present. if not, generate index files again.
 
+  bool indexFilesExist = true;
+
+  for (size_t t = 0; t < TopIndexFile.one_ptm_file_vec.size(); t++){
+    if (!file_util::exists(indexDirName + "/" + TopIndexFile.one_ptm_file_vec[t] + parameters + block_str)){
+      indexFilesExist = false;//if any of the index files for this ptm is missing
+      break; 
+    }
+  }
+
+  if (indexFilesExist){//if exists
+    std::cout << "Loading index files -- started" << std::endl;
     term_index_ptr_ = std::make_shared<MassMatch>();
     diag_index_ptr_ = std::make_shared<MassMatch>();
     rev_term_index_ptr_ = std::make_shared<MassMatch>();
@@ -51,8 +61,6 @@ MassOnePtmFilter::MassOnePtmFilter(const ProteoformPtrVec &proteo_ptrs,
     MassMatch *d_ptr_ = diag_index_ptr_.get();
     MassMatch *rev_t_ptr_ = rev_term_index_ptr_.get();
     MassMatch *rev_d_ptr_ = rev_diag_index_ptr_.get();
-
-    
 
     term_index_ptr_->setfileName(TopIndexFile.one_ptm_file_vec[0] + parameters + block_str);
     diag_index_ptr_->setfileName(TopIndexFile.one_ptm_file_vec[1] + parameters + block_str);
@@ -78,7 +86,8 @@ MassOnePtmFilter::MassOnePtmFilter(const ProteoformPtrVec &proteo_ptrs,
     free(d_ptr_);
     free(rev_t_ptr_);
     free(rev_d_ptr_);
-
+    std::cout << "Loading index files -- finished" << std::endl;
+    std::cout << std::flush; 
   }
   else{
 
