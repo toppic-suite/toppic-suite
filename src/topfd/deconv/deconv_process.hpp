@@ -37,7 +37,7 @@ class DeconvProcess {
 
   void process();
 
-  void processSp(DeconvOneSpPtr deconv_ptr, RawMsGroupReaderPtr reader_ptr, MsAlignWriterPtr ms1_writer_ptr, 
+  void processSp(DeconvOneSpPtr deconv_ptr, RawMsGroupReaderPtr reader_ptr, RawMsGroupReaderPtr reader_pl_ptr, MsAlignWriterPtr ms1_writer_ptr, 
                               MsAlignWriterPtr ms2_writer_ptr);
 
   void processSpMissingLevelOne(DeconvOneSpPtr deconv_ptr, RawMsGroupReaderPtr reader_ptr, 
@@ -55,6 +55,8 @@ class DeconvProcess {
                    MsAlignWriterPtr ms2_writer_ptr); 
   std::string updateMsg(MsHeaderPtr header_ptr, int scan, int total_scan_num);
   
+  PeakPtrVec peakCal(RawMsGroupReaderPtr reader_ptr_, MatchEnvPtrVec prev_envs);
+
  private:
 
   EnvParaPtr env_para_ptr_;
