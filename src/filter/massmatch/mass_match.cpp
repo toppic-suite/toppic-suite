@@ -74,7 +74,7 @@ MassMatch::MassMatch(std::vector<std::vector<int>> &mass_2d,
   initIndexes(mass_2d, real_shift_2d, pos_2d);
   prm_ = prm;
 }
-void MassMatch::serializeMassMatch(){
+void MassMatch::serializeMassMatch(MassMatch **m){
   std::string fileName = this->getFileName();
   std::string dirName = this->getDirName();
 
@@ -82,7 +82,7 @@ void MassMatch::serializeMassMatch(){
 
   if(newFile.is_open()){
     boost::archive::binary_oarchive oa(newFile, std::ios::binary);
-    oa << this;
+    oa << *m;
     newFile.close();
   }
  
@@ -103,8 +103,9 @@ void MassMatch::serializeMassMatch(){
   if (fileToRead.is_open()) {
 
     boost::archive::binary_iarchive ia(fileToRead);
-
+  
     ia >> *m;
+
     fileToRead.close();
   } 
   //else{}

@@ -68,9 +68,14 @@ MassZeroPtmIndex::MassZeroPtmIndex(const ProteoformPtrVec &proteo_ptrs,
   rev_term_index_ptr_->setDirName(dirName);
   rev_diag_index_ptr_->setDirName(dirName);
 
-  term_index_ptr_->serializeMassMatch();
-  diag_index_ptr_->serializeMassMatch();
-  rev_term_index_ptr_->serializeMassMatch();
-  rev_diag_index_ptr_->serializeMassMatch();                                                               
+  MassMatch *t_ptr = term_index_ptr_.get();
+  MassMatch *d_ptr = diag_index_ptr_.get();
+  MassMatch *r_term_ptr = rev_term_index_ptr_.get();
+  MassMatch *r_diag_ptr = rev_diag_index_ptr_.get();
+
+  term_index_ptr_->serializeMassMatch(&t_ptr);
+  diag_index_ptr_->serializeMassMatch(&d_ptr);
+  rev_term_index_ptr_->serializeMassMatch(&r_term_ptr);
+  rev_diag_index_ptr_->serializeMassMatch(&r_diag_ptr);                                                               
 }
 } /* namespace toppic */
