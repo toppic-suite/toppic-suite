@@ -37,8 +37,7 @@ MassZeroPtmFilter::MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
 
 	TopIndexFileName TopIndexFile;
   std::string parameters = TopIndexFile.gene_file_name(prsm_para_ptr);
-	
-  std::cout << parameters << std::endl;
+
   //timer
  // auto start = std::chrono::steady_clock::now();
 
@@ -50,8 +49,6 @@ MassZeroPtmFilter::MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
   for (size_t t = 0; t < TopIndexFile.zero_ptm_file_vec.size(); t++){
     if (!file_util::exists(indexDirName + "/" + TopIndexFile.zero_ptm_file_vec[t] + parameters + block_str)){
       indexFilesExist = false;//if any of the index files for this ptm is missing
-      std::cout << "file missing" << std::endl;
-      std::cout << (TopIndexFile.zero_ptm_file_vec[t] + parameters + block_str) << std::endl;
       break; 
     }
   }

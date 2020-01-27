@@ -78,7 +78,7 @@ void MassMatch::serializeMassMatch(MassMatch **m){
   std::string fileName = this->getFileName();
   std::string dirName = this->getDirName();
 
-  std::ofstream newFile(fileName);
+  std::ofstream newFile(fileName, std::ofstream::binary);
 
   if(newFile.is_open()){
     boost::archive::binary_oarchive oa(newFile, std::ios::binary);
@@ -98,11 +98,11 @@ void MassMatch::serializeMassMatch(MassMatch **m){
 
   //std::string fileName = this->getFileName();
 
-  std::ifstream fileToRead(fileName, std::ios::binary);
+  std::ifstream fileToRead(fileName, std::ifstream::binary);
 
   if (fileToRead.is_open()) {
 
-    boost::archive::binary_iarchive ia(fileToRead);
+    boost::archive::binary_iarchive ia(fileToRead, std::ios::binary);
   
     ia >> *m;
 
