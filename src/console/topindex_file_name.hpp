@@ -27,13 +27,13 @@ class TopIndexFileName{
     TopIndexFileName(){};
     std::string gene_file_name(PrsmParaPtr prsm_para_ptr);
 
-    std::vector<std::string> zero_ptm_file_vec{"zero_ptm_term_index_", "zero_ptm_diag_index_", 
-    "zero_ptm_rev_term_index_", "zero_ptm_rev_diag_index_"};//file name vector
+    std::vector<std::string> zero_ptm_file_vec{"zero_ptm_term_index", "zero_ptm_diag_index", 
+    "zero_ptm_rev_term_index", "zero_ptm_rev_diag_index"};//file name vector
 
-    std::vector<std::string> one_ptm_file_vec{"one_ptm_term_index_", "one_ptm_diag_index_", 
-    "one_ptm_rev_term_index_", "one_ptm_rev_diag_index_"};//file name vector
+    std::vector<std::string> one_ptm_file_vec{"one_ptm_term_index", "one_ptm_diag_index", 
+    "one_ptm_rev_term_index", "one_ptm_rev_diag_index"};//file name vector
 
-    std::vector<std::string> multi_ptm_file_vec{"multi_ptm_index_"};//file name vector
+    std::vector<std::string> multi_ptm_file_vec{"multi_ptm_index"};//file name vector
 
     std::map<std::string, std::string> prot_mod_map = {
         {"NONE", "N"}, {"NME", "NME"}, {"NME_ACETYLATION", "NMEA"}, {"M_ACETYLATION", "MA"}

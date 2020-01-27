@@ -32,17 +32,25 @@ MassZeroPtmFilter::MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
   proteo_ptrs_ = proteo_ptrs;
   PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
   
- std::string indexDirName = mng_ptr_->prsm_para_ptr_->getOriDbName() + "_idx";
- 
-  //when index files are already generated, skip the steps below and use deserialization to get the data;
+  std::string indexDirName = mng_ptr_->prsm_para_ptr_->getOriDbName() + "_idx";
+
 	TopIndexFileName TopIndexFile;
-    std::string parameters = TopIndexFile.gene_file_name(prsm_para_ptr);
+  std::string parameters = TopIndexFile.gene_file_name(prsm_para_ptr);
 	
-	std::cout << "file name :" << indexDirName + "/" + TopIndexFile.zero_ptm_file_vec[0] + parameters + block_str << std::endl;
-	
-  if (file_util::exists(indexDirName) && file_util::exists(indexDirName + "/" + TopIndexFile.zero_ptm_file_vec[0] + parameters + block_str)){
-    //if exists
-	
+  //check if all index files for this ptm is present. if not, generate index files again.
+
+  bool indexFilesExist = true;
+
+  for (size_t t = 0; t < TopIndexFile.zero_ptm_file_vec.size(); t++){
+    if (!file_util::exists(indexDirName + "/" + TopIndexFile.zero_ptm_file_vec[t] + parameters + block_str)){
+      indexFilesExist = false;//if any of the index files for this ptm is missing
+      break; 
+    }
+  }
+
+  if (indexFilesExist){
+    std::cout << "Loading index files -- started" << std::endl;
+
     term_index_ptr_ = std::make_shared<MassMatch>();
     diag_index_ptr_ = std::make_shared<MassMatch>();
     rev_term_index_ptr_ = std::make_shared<MassMatch>();
@@ -77,8 +85,10 @@ MassZeroPtmFilter::MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
     free(d_ptr_);
     free(rev_t_ptr_);
     free(rev_d_ptr_);
-
+    std::cout << "Loading index files -- finished";
+    std::cout << std::endl; 
   }
+  
   else{
     LOG_DEBUG("get shifts");
     std::vector<std::vector<double> > shift_2d

@@ -91,28 +91,23 @@ void MassMatch::serializeMassMatch(){
   }
 }
 
-//deserialize MassMatch object that calles this method
-  void MassMatch::deserializeMassMatch(MassMatch **m){
+ void MassMatch::deserializeMassMatch(MassMatch **m){
   std::string dirName = this->getDirName();
 
-  std::string fileName = this->getFileName();
-	//std::string fileName = dirName + "/" + this->getFileName();
-  std::cout << fileName << std::endl;
+  std::string fileName = dirName + "/" + this->getFileName();
 
-  //std::ifstream fileToRead(fileName, std::ios::binary);
-	std::ifstream fileToRead(fileName);
-	// Windows cannot find the file.  
+  //std::string fileName = this->getFileName();
+
+  std::ifstream fileToRead(fileName, std::ios::binary);
 
   if (fileToRead.is_open()) {
-	std::cout << "writing to the file" << std::endl;
-    boost::archive::binary_iarchive ia(fileToRead, std::ios::binary);
+
+    boost::archive::binary_iarchive ia(fileToRead);
 
     ia >> *m;
-
     fileToRead.close();
   } 
   //else{}
-
   
 }
 
