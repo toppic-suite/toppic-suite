@@ -99,7 +99,7 @@ void TopIndexDialog::initArguments() {
   arguments_["fixedMod"] = "";
   arguments_["ptmNumber"] = "1";
   arguments_["massErrorTolerance"] = "15";
-  arguments_["allowProtMod"] = "NONE,NME,NME_ACETYLATION,M_ACETYLATION";
+  arguments_["allowProtMod"] = "";
   arguments_["numOfTopPrsms"] = "1";
   arguments_["executiveDir"] = ".";
   arguments_["resourceDir"] = "";
@@ -256,8 +256,9 @@ std::map<std::string, std::string> TopIndexDialog::getArguments() {
     arguments_["fixedMod"] = ui->fixedModFileEdit->text().toStdString();
   }
   //arguments_["massErrorTolerance"] = ui->errorToleranceEdit_2->text().toStdString();
+
   if (ui->NONECheckBox->isChecked()) {
-    arguments_["allowProtMod"] = arguments_["allowProtMod"] + ",NONE";
+    arguments_["allowProtMod"] = arguments_["allowProtMod"] + "NONE";
   }
   if (ui->NMECheckBox->isChecked()) {
     arguments_["allowProtMod"] = arguments_["allowProtMod"] + ",NME";
@@ -269,6 +270,7 @@ std::map<std::string, std::string> TopIndexDialog::getArguments() {
   if (ui->MACCheckBox->isChecked()) {
     arguments_["allowProtMod"] = arguments_["allowProtMod"] + ",M_ACETYLATION";
   }
+  std::cout << "argument: " << arguments_["allowProtMod"] << std::endl;
     arguments_["threadNumber"] = ui->threadNumberEdit->text().toStdString();
   
 

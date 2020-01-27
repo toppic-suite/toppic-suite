@@ -13,6 +13,7 @@
 //limitations under the License.
 
 #include <iostream>
+//#include <chrono>
 
 #include "common/util/file_util.hpp"
 
@@ -39,6 +40,9 @@ MassOnePtmFilter::MassOnePtmFilter(const ProteoformPtrVec &proteo_ptrs,
   TopIndexFileName TopIndexFile;
   std::string parameters = TopIndexFile.gene_file_name(prsm_para_ptr);
   
+  //timer
+  //auto start = std::chrono::steady_clock::now();
+
   //check if all index files for this ptm is present. if not, generate index files again.
 
   bool indexFilesExist = true;
@@ -86,8 +90,13 @@ MassOnePtmFilter::MassOnePtmFilter(const ProteoformPtrVec &proteo_ptrs,
     free(d_ptr_);
     free(rev_t_ptr_);
     free(rev_d_ptr_);
+
+    //auto end = std::chrono::steady_clock::now();
+
     std::cout << "Loading index files -- finished" << std::endl;
     std::cout << std::flush; 
+
+    //std::cout << "With index, one_ptm : " << std::chrono::duration_cast<std::chrono::seconds>(end-start).count() << " sec" << std::endl;
   }
   else{
 
@@ -110,9 +119,11 @@ MassOnePtmFilter::MassOnePtmFilter(const ProteoformPtrVec &proteo_ptrs,
                                                                   mng_ptr->max_proteoform_mass_,
                                                                   mng_ptr->filter_scale_);
     rev_diag_index_ptr_ = MassMatchFactory::getSrmDiagMassMatchPtr(proteo_ptrs, n_term_acet_2d,
-                                                                  mng_ptr->max_proteoform_mass_,
-                                                                  mng_ptr->filter_scale_);
-  }
+                                                                  mng_ptr->max_proteoform_mass_,mng_ptr->filter_scale_);
+    //auto no_index_end = std::chrono::steady_clock::now();
+    //std::cout << "Without index, one_ptm : " << std::chrono::duration_cast<std::chrono::seconds>(no_index_end-start).count() << " sec" <<std::endl;
+                                                               
+  };
 }
 
 void MassOnePtmFilter::computeBestMatch(const PrmMsPtrVec &prm_ms_ptr_vec,

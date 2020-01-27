@@ -36,7 +36,7 @@ class TopIndexFileName{
     std::vector<std::string> multi_ptm_file_vec{"multi_ptm_index"};//file name vector
 
     std::map<std::string, std::string> prot_mod_map = {
-        {"NONE", "N"}, {"NME", "NME"}, {"NME_ACETYLATION", "NMEA"}, {"M_ACETYLATION", "MA"}
+        {"", ""}, {"NONE", "N"}, {"NME", "NME"}, {"NME_ACETYLATION", "NMEA"}, {"M_ACETYLATION", "MA"}
     };
     std::map<std::string, std::string> search_type_map = {
         {"TARGET", "no_decoy"}, {"TARGET+DECOY", "decoy"}};
