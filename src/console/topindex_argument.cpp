@@ -90,7 +90,7 @@ void Argument::outputArguments(std::ostream &output,
 
 
 void Argument::showUsage(boost::program_options::options_description &desc) {
-  std::cout << "Usage: toppic [options] database-file-name spectrum-file-name" << std::endl; 
+  std::cout << "Usage: topindex [options] database-file-name" << std::endl; 
   std::cout << desc << std::endl; 
 }
 

@@ -13,7 +13,6 @@
 //limitations under the License.
 
 #include <iostream>
-#include <fstream>
 
 #include "common/util/file_util.hpp"
 
@@ -40,19 +39,13 @@ MassOnePtmFilter::MassOnePtmFilter(const ProteoformPtrVec &proteo_ptrs,
   TopIndexFileName TopIndexFile;
   std::string parameters = TopIndexFile.gene_file_name(prsm_para_ptr);
 
-  bool indexFilesExist = false;
+ bool indexFilesExist = true;
 
-  std::string line;
-  std::ifstream pLog ("topindexPara.txt");
-  if (pLog.is_open())
-  {
-    while ( getline (pLog,line) )
-    {
-      if (line == parameters){
-        indexFilesExist = true;
-      }
+  for (size_t t = 0; t < TopIndexFile.one_ptm_file_vec.size(); t++){
+    if (!file_util::exists(indexDirName + "/" + TopIndexFile.one_ptm_file_vec[t] + parameters + block_str)){
+      indexFilesExist = false;//if any of the index files for this ptm is missing
+      break; 
     }
-    pLog.close();
   }
 
   if (indexFilesExist){//if exists
@@ -61,11 +54,6 @@ MassOnePtmFilter::MassOnePtmFilter(const ProteoformPtrVec &proteo_ptrs,
     diag_index_ptr_ = std::make_shared<MassMatch>();
     rev_term_index_ptr_ = std::make_shared<MassMatch>();
     rev_diag_index_ptr_ = std::make_shared<MassMatch>();
-
-    MassMatch *t_ptr_ = term_index_ptr_.get();
-    MassMatch *d_ptr_ = diag_index_ptr_.get();
-    MassMatch *rev_t_ptr_ = rev_term_index_ptr_.get();
-    MassMatch *rev_d_ptr_ = rev_diag_index_ptr_.get();
 
     term_index_ptr_->setfileName(TopIndexFile.one_ptm_file_vec[0] + parameters + block_str);
     diag_index_ptr_->setfileName(TopIndexFile.one_ptm_file_vec[1] + parameters + block_str);
@@ -77,20 +65,10 @@ MassOnePtmFilter::MassOnePtmFilter(const ProteoformPtrVec &proteo_ptrs,
     rev_term_index_ptr_->setDirName(indexDirName);
     rev_diag_index_ptr_->setDirName(indexDirName);
 
-    term_index_ptr_->deserializeMassMatch(&t_ptr_);
-    diag_index_ptr_->deserializeMassMatch(&d_ptr_);
-    rev_term_index_ptr_->deserializeMassMatch(&rev_t_ptr_);
-    rev_diag_index_ptr_->deserializeMassMatch(&rev_d_ptr_);
-
-    *term_index_ptr_ = *t_ptr_;
-    *diag_index_ptr_ = *d_ptr_;
-    *rev_term_index_ptr_ = *rev_t_ptr_;
-    *rev_diag_index_ptr_ = *rev_d_ptr_;
-
-    free(t_ptr_);
-    free(d_ptr_);
-    free(rev_t_ptr_);
-    free(rev_d_ptr_);
+    term_index_ptr_->deserializeMassMatch();
+    diag_index_ptr_->deserializeMassMatch();
+    rev_term_index_ptr_->deserializeMassMatch();
+    rev_diag_index_ptr_->deserializeMassMatch();
 
     std::cout << "Loading index files -- finished" << std::endl;
     std::cout << std::flush; 

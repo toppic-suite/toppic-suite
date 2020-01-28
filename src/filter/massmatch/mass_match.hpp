@@ -47,9 +47,9 @@ class MassMatch {
                        std::vector<short> &scores);
 
   //void serializeMassMatch();
-  void serializeMassMatch(MassMatch **m);
+  void serializeMassMatch();
   //void deserializeMassMatch(MassMatch **m);
-  void deserializeMassMatch(MassMatch **m);
+  void deserializeMassMatch();
 
   int getProtNum() {return proteo_num_;}
 
@@ -78,24 +78,6 @@ class MassMatch {
  private:
  //for serialization
   friend class boost::serialization::access;
-
-  template<class Archive>
-  void serialize(Archive & ar, const unsigned int version){
-      ar & scale_;
-      ar & proteo_num_;
-      ar & col_num_; 
-      ar & row_num_;
-    
-      ar & proteo_row_begins_;
-      ar & proteo_row_ends_;
-      ar & row_proteo_ids_;
-      ar & trunc_shifts_;
-
-      ar & col_index_begins_;
-      ar & col_index_ends_;
-      ar & col_indexes_;
-      
-  }
 
   double scale_;
 

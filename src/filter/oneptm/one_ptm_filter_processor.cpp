@@ -46,7 +46,7 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
   auto start = std::chrono::steady_clock::now();
   MassOnePtmFilterPtr filter_ptr = std::make_shared<MassOnePtmFilter>(raw_forms, mng_ptr, block_str);
   auto end = std::chrono::steady_clock::now();
-  //std::cout << "one_ptm process time: " << std::chrono::duration_cast<std::chrono::seconds>(end-start).count() << " sec" << std::endl;
+  std::cout << "one_ptm process time: " << std::chrono::duration_cast<std::chrono::seconds>(end-start).count() << " sec" << std::endl;
 
   
   int group_spec_num = mng_ptr->prsm_para_ptr_->getGroupSpecNum();
