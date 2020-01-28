@@ -31,7 +31,6 @@
 //#include "ms/env/env_rescore.hpp"
 
 namespace toppic {
-  //std::mutex mu;
 
 void DeconvOneSp::setData(const PeakPtrVec &peak_list) {
   data_ptr_ = deconv_data_util::getDataPtr(peak_list, env_para_ptr_->max_mass_,
@@ -101,6 +100,7 @@ void DeconvOneSp::preprocess() {
 
 MatchEnvPtrVec DeconvOneSp::postprocess(MatchEnvPtrVec  &dp_envs) {
   // assign intensity
+  
   PeakPtrVec peak_list = data_ptr_->getPeakList();
   match_env_util::assignIntensity(peak_list, dp_envs);
   // refinement
@@ -133,6 +133,7 @@ MatchEnvPtrVec DeconvOneSp::postprocess(MatchEnvPtrVec  &dp_envs) {
                                                  env_para_ptr_->multiple_min_mass_,
                                                  env_para_ptr_->multiple_min_charge_,
                                                  env_para_ptr_->multiple_min_ratio_);
+  
   }
 
   return result_envs_;
