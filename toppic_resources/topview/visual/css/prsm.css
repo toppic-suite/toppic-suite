@@ -2,8 +2,9 @@ div.container {
 	font-family : "Helvetica Neue",Helvetica,Arial,sans-serif;
   	font-size: 15px;
 	max-width: 1060px;
-	margin: 0 auto;
+  margin-top: 100px !important;
 }
+
 
 .table-borderless td,
 .table-borderless th {
@@ -41,6 +42,7 @@ white-space: nowrap;
 .btn{
   background-color:  #428bca !important;
   width: 80% !important;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 .btn-secondary{
 	background-color:  red !important;
@@ -193,4 +195,9 @@ svg.l_popup_svg{
 }
 #l_svg{
   /* box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); */
+}
+.footer-copyright
+{
+	background-color: #343a40!important;
+	color:white !important;
 }

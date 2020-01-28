@@ -327,36 +327,7 @@ function MassShift(thisElem,MassShift,position)
 				.attr("fill","black")
 			   .attr("font-size","11px");
 }
-function setBackGroundColorOnMassShift(position, color){
-	let para = parameters();
-	console.log("para",para);
-	let x,y;
-	x = getX(para,position);
-	y = getY(para, position);
-	rect_Backgroundcolor(x,y,"seqsvg",color)
-	console.log(x,y);
-}
-/* Code to color the background of a occurence acids */
-function rect_Backgroundcolor(x,y,id,color){
-	/*	font-size 16px is equal to 12pt	*/
-	let font_width = 12 ;
-	/*	to draw the rect color uniformly */
-	let font_height = 15 ;
-	let svgContainer = d3.select("#"+id+"_g");
-	
-	//Temporary Fix
-	
 
-	svgContainer.append("rect")
-					.attr("x", x)
-					.attr("y", y-font_height)
-					.attr("width", font_width)
-					.attr("height", 20)
-					.attr("dy", "0em")
-					.style("fill", color)
-					.style("fill-opacity", ".2")
-					// .style("stroke-width", "1.5px");
-}
 function addColorsToDropdown(){
 	let colors = ["red","green","yellow","blue","white"]
 	let startStatement = "<select id=\"tooltip_color\" style=\"background-color:"+colors[0]+"\">";
