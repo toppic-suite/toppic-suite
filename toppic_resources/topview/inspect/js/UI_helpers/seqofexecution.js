@@ -4,10 +4,12 @@
  * @function {onClickSequenceOfExecution} executes when user enters mass shift 
  * on any amino acid and click "OK" button.
  */
+let backGroundColorList_g = []
 class SeqOfExecution
 {
 	constructor(){
 		this.onClickMassShift = {};
+		this.massShiftList = [];
 	}
 	/**
 	 * Function executes all the functionalities one by one and displays all the 
@@ -93,6 +95,7 @@ class SeqOfExecution
 		 * Form sequence with mass shift embedded in []
 		 */
 		let seqToUI = massShiftObj.formSequence(sequence,completeShiftList);
+		this.massShiftList.completeShiftList;
 		/**
 		 * Write back to UI
 		 */
@@ -326,6 +329,7 @@ class SeqOfExecution
 	 * be considered when calculating matched peaks.
 	 */
 	onClickSequenceOfExecution(errorType,errorVal){
+		console.log("This.completeShiftList : ", this.massShiftList);
 		/**
 		 * unbind all the actions previously binded else each action will be 
 		 * binded multiple times.
@@ -334,6 +338,7 @@ class SeqOfExecution
 		$( "#"+Constants.SPECDOWNLOADSVG ).unbind();
 		$( "#"+Constants.SEQDOWNLOADPNG ).unbind();
 		$( "#"+Constants.SEQDOWNLOADSVG ).unbind();
+		$( ".rectBGColor").remove();
 		let massShiftList = [];
 		let sequence = "";
 		let massErrorthVal = null;
@@ -359,6 +364,8 @@ class SeqOfExecution
 		 */
 		let massShiftObj = new MassShifts();
 		[sequence,massShiftList] = massShiftObj.getSequenceFromUI();
+		let rectBGColorObj = new rectBGColor(backGroundColorList_g);
+		let bgColorList ;
 		/**
 		 * Check if mass shift is entered by clicking on the acid. If entered 
 		 * consider that mass shift and and append to the current mass shift list
@@ -368,9 +375,12 @@ class SeqOfExecution
 			let tempPosition = this.onClickMassShift.position;
 			let tempMass = this.onClickMassShift.mass;
 			let color = this.onClickMassShift.color;
-			setBackGroundColorOnMassShift(tempPosition,color);
-			massShiftList = massShiftObj.appendtoMassShiftList(tempPosition,tempMass,massShiftList);
+			bgColorList = rectBGColorObj.getMassListToColorBG(tempPosition,color);
+			massShiftList = massShiftObj.appendtoMassShiftList(tempPosition,tempMass,massShiftList,color);
 		}
+		//Add Background color to the massshifted elements
+		rectBGColorObj.setBackGroundColorOnMassShift(bgColorList);
+
 		let seqToUI = massShiftObj.formSequence(sequence,massShiftList);
 		massShiftObj.writeSeqToTextBox(seqToUI);
 		peakDataList = UIHelperObj.getPeakListFromUI();
