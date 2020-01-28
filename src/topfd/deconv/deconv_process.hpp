@@ -50,10 +50,10 @@ class DeconvProcess {
   EnvParaPtr getEnvParaPtr(){
       return env_para_ptr_;
   }
-  void deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
+  void deconvMsOne(RawMsPtr ms_ptr, DeconvOneSp *deconv_ptr, 
                    MatchEnvPtrVec prec_envs, MsAlignWriterPtr ms1_writer_ptr, std::vector<PeakPtrVec> *peak_list_vec_ptr); 
 
-  void deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
+  void deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSp *deconv_ptr, 
                    MsAlignWriterPtr ms2_writer_ptr); 
   std::string updateMsg(MsHeaderPtr header_ptr, int scan, int total_scan_num);
   
