@@ -255,7 +255,7 @@ std::map<std::string, std::string> TopIndexDialog::getArguments() {
   if (ui->fixedModComboBox->currentIndex() == 3) {
     arguments_["fixedMod"] = ui->fixedModFileEdit->text().toStdString();
   }
-  //arguments_["massErrorTolerance"] = ui->errorToleranceEdit_2->text().toStdString();
+  arguments_["massErrorTolerance"] = ui->errorToleranceEdit_2->text().toStdString();
 
   if (ui->NONECheckBox->isChecked()) {
     arguments_["allowProtMod"] = arguments_["allowProtMod"] + "NONE";
