@@ -43,9 +43,7 @@ MassDiagIndex::MassDiagIndex(const ProteoformPtrVec &proteo_ptrs,
 
   index_ptr_->setDirName(dirName);
 
-  MassMatch *idx_ptr = index_ptr_.get();
-
-  index_ptr_->serializeMassMatch(&idx_ptr);
+  index_ptr_->serializeMassMatch();
 
 }
 

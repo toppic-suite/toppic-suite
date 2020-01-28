@@ -42,36 +42,24 @@ MassDiagFilter::MassDiagFilter(const ProteoformPtrVec &proteo_ptrs,
 	
   std::string indexDirName = mng_ptr_->prsm_para_ptr_->getOriDbName() + "_idx";
 
-  bool indexFilesExist = false;
+  bool indexFilesExist = true;
 
-  std::string line;
-  std::ifstream pLog ("topindexPara.txt");
-  if (pLog.is_open())
-  {
-    while ( getline (pLog,line) )
-    {
-      if (line == parameters){
-        indexFilesExist = true;
-      }
+  for (size_t t = 0; t < TopIndexFile.multi_ptm_file_vec.size(); t++){
+    if (!file_util::exists(indexDirName + "/" + TopIndexFile.multi_ptm_file_vec[t] + parameters + block_str)){
+      indexFilesExist = false;//if any of the index files for this ptm is missing
+      break; 
     }
-    pLog.close();
   }
 
   if (indexFilesExist){ std::cout << "Loading index files -- started" << std::endl;
     index_ptr_ = std::make_shared<MassMatch>();
-
-    MassMatch *idx_ptr_ = index_ptr_.get();
 
     TopIndexFileName TopIndexFile;
     std::string parameters = TopIndexFile.gene_file_name(prsm_para_ptr);
 
     index_ptr_->setfileName(TopIndexFile.multi_ptm_file_vec[0] + parameters + block_str);
     index_ptr_->setDirName(indexDirName);
-    index_ptr_->deserializeMassMatch(&idx_ptr_);
-
-    *index_ptr_ = *idx_ptr_;
-
-    free(idx_ptr_);
+    index_ptr_->deserializeMassMatch();
 
     std::cout << "Loading index files -- finished" << std::endl;
     std::cout << std::flush; 
