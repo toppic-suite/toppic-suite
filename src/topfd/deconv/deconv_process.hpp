@@ -16,6 +16,8 @@
 #ifndef TOPPIC_TOPFD_DECONV_PROCESS_HPP_
 #define TOPPIC_TOPFD_DECONV_PROCESS_HPP_
 
+#include <map>
+
 #include "ms/spec/msalign_writer.hpp"
 #include "topfd/common/topfd_para.hpp"
 #include "topfd/msreader/raw_ms_group_reader.hpp"
@@ -49,13 +51,13 @@ class DeconvProcess {
       return env_para_ptr_;
   }
   void deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
-                   MatchEnvPtrVec prec_envs, MsAlignWriterPtr ms1_writer_ptr, PeakPtrVec peak_list); 
+                   MatchEnvPtrVec prec_envs, MsAlignWriterPtr ms1_writer_ptr, std::map<int,PeakPtrVec> peak_list_map); 
 
   void deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
                    MsAlignWriterPtr ms2_writer_ptr); 
   std::string updateMsg(MsHeaderPtr header_ptr, int scan, int total_scan_num);
   
-  PeakPtrVec peakCal(RawMsGroupReaderPtr reader_ptr_, MatchEnvPtrVec prev_envs);
+  std::map<int, PeakPtrVec> peakCal(RawMsGroupReaderPtr reader_ptr_, MatchEnvPtrVec prev_envs);
 
  private:
 
