@@ -14,6 +14,7 @@
 
 #include <iostream>
 #include <iomanip>
+#include <fstream>
 #include <map>
 #include <string>
 #include <vector>
@@ -35,6 +36,8 @@
 #include "seq/db_block.hpp"
 #include "seq/proteoform.hpp"
 #include "seq/proteoform_factory.hpp"
+
+#include "console/topindex_file_name.hpp"
 
 namespace toppic{
 
@@ -85,6 +88,15 @@ void TopIndexProcess(std::map<std::string, std::string> &arguments){
         = std::make_shared<DiagFilterProcessor>(diag_filter_mng_ptr);
     diag_filter_processor->index_process();
     diag_filter_processor = nullptr;
+
+    //write current parameter to a file so that it can be checked if the index file for that parameter exists
+    std::ofstream parameterLog;
+    TopIndexFileName TopIndexFile;
+    std::string parameterTopIndex = TopIndexFile.gene_file_name(prsm_para_ptr);
+ 
+    parameterLog.open ("topindexPara.txt", std::ios_base::app);
+    parameterLog << parameterTopIndex << "\n";
+    parameterLog.close();
 
     std::cout << "Deleting temporary files - started." << std::endl;
 

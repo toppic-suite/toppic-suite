@@ -46,6 +46,7 @@ MassDiagIndex::MassDiagIndex(const ProteoformPtrVec &proteo_ptrs,
   MassMatch *idx_ptr = index_ptr_.get();
 
   index_ptr_->serializeMassMatch(&idx_ptr);
+
 }
 
 } /* namespace toppic */

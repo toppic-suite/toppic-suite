@@ -253,7 +253,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	boost_serialization-mt
         boost_program_options-mt boost_thread-mt pthread z Ws2_32)
 
-    target_link_libraries(topmg_gui ${QTOPTION} Qt5Widgets Qt5Core Qt5Gui xerces-c
+    target_link_libraries(topmg_gui ${QTOPTION} Qt5Widgets Qt5Core QThread Qt5Gui xerces-c
         boost_filesystem-mt boost_system-mt boost_serialization-mt
         boost_program_options-mt boost_thread-mt pthread z Ws2_32)
 

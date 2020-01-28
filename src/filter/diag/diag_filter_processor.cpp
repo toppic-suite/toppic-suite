@@ -13,6 +13,7 @@
 //limitations under the License.
 
 #include <iostream>
+#include <chrono>
 
 #include "common/util/file_util.hpp"
 #include "common/base/mod_util.hpp"
@@ -86,7 +87,12 @@ void DiagFilterProcessor::processBlock(DbBlockPtr block_ptr, int total_block_num
   ProteoformPtrVec raw_forms
       = proteoform_factory::readFastaToProteoformPtrVec(db_block_file_name,
                                                         prsm_para_ptr->getFixModPtrVec());
+  //timer
+  auto start = std::chrono::steady_clock::now();
+
   MassDiagFilterPtr filter_ptr = std::make_shared<MassDiagFilter>(raw_forms, mng_ptr_, block_number);
+  auto end = std::chrono::steady_clock::now();
+  //std::cout << "multi_ptm process time: " << std::chrono::duration_cast<std::chrono::seconds>(end-start).count() << " sec" << std::endl;
 
   int group_spec_num = mng_ptr_->prsm_para_ptr_->getGroupSpecNum();
   SpParaPtr sp_para_ptr =  mng_ptr_->prsm_para_ptr_->getSpParaPtr();

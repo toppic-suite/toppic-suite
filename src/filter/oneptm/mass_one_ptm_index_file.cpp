@@ -68,5 +68,6 @@ MassOnePtmIndex::MassOnePtmIndex(const ProteoformPtrVec &proteo_ptrs,
   diag_index_ptr_->serializeMassMatch(&d_ptr);
   rev_term_index_ptr_->serializeMassMatch(&r_term_ptr);
   rev_diag_index_ptr_->serializeMassMatch(&r_diag_ptr);  
+  
 }
 } /* namespace toppic */

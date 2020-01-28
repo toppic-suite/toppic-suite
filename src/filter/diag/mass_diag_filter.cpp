@@ -14,7 +14,7 @@
 
 #include <algorithm>
 #include <iostream>
-//#include <chrono>
+#include <fstream>
 
 #include "common/util/file_util.hpp"
 
@@ -42,16 +42,19 @@ MassDiagFilter::MassDiagFilter(const ProteoformPtrVec &proteo_ptrs,
 	
   std::string indexDirName = mng_ptr_->prsm_para_ptr_->getOriDbName() + "_idx";
 
-  //timer
-  //auto start = std::chrono::steady_clock::now();
+  bool indexFilesExist = false;
 
-  bool indexFilesExist = true;
-
-  for (size_t t = 0; t < TopIndexFile.multi_ptm_file_vec.size(); t++){
-    if (!file_util::exists(indexDirName + "/" + TopIndexFile.multi_ptm_file_vec[t] + parameters + block_str)){
-      indexFilesExist = false;//if any of the index files for this ptm is missing
-      break; 
+  std::string line;
+  std::ifstream pLog ("topindexPara.txt");
+  if (pLog.is_open())
+  {
+    while ( getline (pLog,line) )
+    {
+      if (line == parameters){
+        indexFilesExist = true;
+      }
     }
+    pLog.close();
   }
 
   if (indexFilesExist){ std::cout << "Loading index files -- started" << std::endl;
@@ -70,20 +73,13 @@ MassDiagFilter::MassDiagFilter(const ProteoformPtrVec &proteo_ptrs,
 
     free(idx_ptr_);
 
-    //auto end = std::chrono::steady_clock::now();
-
     std::cout << "Loading index files -- finished" << std::endl;
     std::cout << std::flush; 
-
-    //std::cout << "With index, multi+ptm : " << std::chrono::duration_cast<std::chrono::seconds>(end-start).count() << " sec" << std::endl;
   }
   else{
     index_ptr_ = MassMatchFactory::getPrmDiagMassMatchPtr(proteo_ptrs,
                                                         mng_ptr->max_proteoform_mass_,
-                                                        mng_ptr->filter_scale_);
-  //auto no_index_end = std::chrono::steady_clock::now();
-  //std::cout << "Without index, multi_ptm : " << std::chrono::duration_cast<std::chrono::seconds>(no_index_end-start).count() << " sec" << std::endl;
-                                                       
+                                                        mng_ptr->filter_scale_);                                                  
   }
 }
 

@@ -11,7 +11,9 @@
 //WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //See the License for the specific language governing permissions and
 //limitations under the License.
-//#include <chrono>
+
+
+#include <fstream>
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
@@ -38,19 +40,24 @@ MassZeroPtmFilter::MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
 	TopIndexFileName TopIndexFile;
   std::string parameters = TopIndexFile.gene_file_name(prsm_para_ptr);
 
-  //timer
- // auto start = std::chrono::steady_clock::now();
-
+  
 
   //check if all index files for this ptm is present. if not, generate index files again.
 
-  bool indexFilesExist = true;
+  bool indexFilesExist = false;
 
-  for (size_t t = 0; t < TopIndexFile.zero_ptm_file_vec.size(); t++){
-    if (!file_util::exists(indexDirName + "/" + TopIndexFile.zero_ptm_file_vec[t] + parameters + block_str)){
-      indexFilesExist = false;//if any of the index files for this ptm is missing
-      break; 
+  std::string line;
+  std::ifstream pLog ("topindexPara.txt");
+  if (pLog.is_open())
+  {
+    while ( getline (pLog,line) )
+    {
+
+      if (line == parameters){
+        indexFilesExist = true;
+      }
     }
+    pLog.close();
   }
 
   if (indexFilesExist){
@@ -91,12 +98,8 @@ MassZeroPtmFilter::MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
     free(rev_t_ptr_);
     free(rev_d_ptr_);
 
-    //auto end = std::chrono::steady_clock::now();
-
     std::cout << "Loading index files -- finished";
     std::cout << std::endl; 
-
-    //std::cout << "With index, zero_ptm : " << std::chrono::duration_cast<std::chrono::seconds>(end-start).count() << " sec" << std::endl;
   }
   
   else{
@@ -130,10 +133,7 @@ MassZeroPtmFilter::MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
     rev_diag_index_ptr_ = MassMatchFactory::getSrmDiagMassMatchPtr(proteo_ptrs, n_term_acet_2d,
                                                                   mng_ptr->max_proteoform_mass_,
                                                                   mng_ptr->filter_scale_);
-  }
-  //auto no_index_end = std::chrono::steady_clock::now();
-  //std::cout << "Without index, zero_ptm : " << std::chrono::duration_cast<std::chrono::seconds>(no_index_end-start).count() << " sec"<<std::endl;
- 
+ }
 }
 void MassZeroPtmFilter::computeBestMatch(const ExtendMsPtrVec &ms_ptr_vec) {
   PeakTolerancePtr tole_ptr = mng_ptr_->prsm_para_ptr_->getSpParaPtr()->getPeakTolerancePtr();
