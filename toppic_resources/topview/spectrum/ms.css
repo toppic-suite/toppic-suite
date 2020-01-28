@@ -1,3 +1,26 @@
 .btn-primary{
     background-color: #428bca !important;
 }
+.row{
+    padding-left: 25px !important ;
+}
+.ms_scanids{
+    color: #525c65;
+    font-size: 16px;
+    font-family: "Open Sans", sans-serif;
+    line-height: 24px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+.ms1_spectrum, .ms2_spectrum{
+    border-color: #525c65 !important;
+    padding: 10px !important;
+    padding-top: 30px !important;
+    margin: 10px !important;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    /* display: none !important; */
+}
+.sumbit{
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}

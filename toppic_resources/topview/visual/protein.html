@@ -1,4 +1,7 @@
+
+<!DOCTYPE html>
 <html>
+<meta charset="utf-8">
 <head>
 <title>Protein</title>
 <link rel="stylesheet" type="text/css" href="../css/lib/jquery.dataTables.css">
@@ -32,7 +35,7 @@ $(document).ready(function(){
 	script.type= 'text/javascript';
 	script.src= file_name;
 	/* include the proteoform json data_file as script */
-	head.appendChild(script);
+	document.head.appendChild(script);
 	script.onload = function (data) {
 			/* invoke protein function to form HTML elements from protein.js */
 			protein(folderpath);

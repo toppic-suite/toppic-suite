@@ -1,46 +1,33 @@
-function getSpectrum(folderName)
-{
-	let scanId_1 = $("#scanid1").val();
-	let scanId_2 = $("#scanid2").val();
-	if(scanId_1 != null && scanId_2 == null)
-	{
-		scanId_2 = parseInt(scanId_1) + 1;
-	}else if(scanId_1 == null && scanId_2 != null){
-		scanId_1 = scanId_2 - 1; 
+class Spectrum{
+	constructor(folder,scanId,spectrumId,centerValue){
+		this.folder = folder ;
+		this.scanId = scanId ;
+		this.spectrumId = spectrumId;
+		this.centerValue = centerValue ;
 	}
-	console.log("scanId 1: ",scanId_1);
-	console.log("scanId 2: ",scanId_2);
-	
-	$("#ms1_spectrum").show();
-	var file_name1 = "../data/"+folderName+"/ms1_json/spectrum"+scanId_1+".js";
-	var body= document.getElementsByTagName('body')[0];
- 	var script1= document.createElement('script');
- 	script1.src = file_name1 ;
-    body.append(script1);
-    script1.onload = function(){
-		console.log("spectrum_data : ", ms1_data);
-        let peakList = getPeakData(ms1_data);
-        let envelopList = getEnvelopeData(ms1_data);
-		addSpectrum("ms1_spectrum",peakList,envelopList,null);
-		$("#ms2_spectrum").show();
-		var file_name2 = "../data/"+folderName+"/ms2_json/spectrum"+scanId_2+".js";
-		console.log("file_name2 : ", file_name2);
-		var body= document.getElementsByTagName('body')[0];
-		var script2= document.createElement('script');
-		script2.src = file_name2 ;
-		body.append(script2);
-		script2.onload = function(){
-			console.log("spectrum_data : ", ms2_data);
-			let peakList = getPeakData(ms2_data);
-			let envelopList = getEnvelopeData(ms2_data);
-			addSpectrum("ms2_spectrum",peakList,envelopList,null);
+	getSpectrum(){
+		console.log("this.scanId : "+ this.scanId);
+		let scanId = this.scanId;
+		let folder = this.folder;
+		let spectrumId = this.spectrumId;
+		$("."+this.spectrumId).show();
+		var file_name = "../../topfd/"+folder+"/spectrum"+scanId+".js";
+		let temp_script= document.createElement('script');
+		temp_script.src = file_name;
+		document.head.appendChild(temp_script);
+		temp_script.onload = function()
+		{
+			let ms_data;
+			if(folder == "ms1_json") ms_data = ms1_data ;
+			else ms_data = ms2_data;
+			let peakList = getPeakData(ms_data);
+        	let envelopList = getEnvelopeData(ms_data);
+			addSpectrum(spectrumId,peakList,envelopList,this.centerValue);
 		}
+
 	}
-	
-    
- 	/* document.getElementById("spectrum_script").src = file_name; */
- 	
 }
+
 function getPeakData(json_data){
     let peakList = [];
 	let i = json_data.peaks.length ;

@@ -13,6 +13,10 @@
 	max-width: 50%;
 	min-width: 50%;
 }
+.container_img{
+	background-image: url("../../images/bgroung.jpg");
+}
+
 .cards-container{
 	display:flex;
 	margin: auto;
@@ -33,7 +37,7 @@
 }
 
 .card-title{
-	color:black;
+	color:white;
 	text-align:center;
 	padding: 0px 0px 15px 0px;
 }
@@ -51,4 +55,9 @@
 }
 .allproteins h2{
 	padding-left: 20px !important;
+}
+.footer-copyright
+{
+	background-color: #343a40!important;
+	color:white !important;
 }

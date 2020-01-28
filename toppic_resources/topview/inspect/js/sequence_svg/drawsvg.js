@@ -343,6 +343,10 @@ function rect_Backgroundcolor(x,y,id,color){
 	/*	to draw the rect color uniformly */
 	let font_height = 15 ;
 	let svgContainer = d3.select("#"+id+"_g");
+	
+	//Temporary Fix
+	
+
 	svgContainer.append("rect")
 					.attr("x", x)
 					.attr("y", y-font_height)
@@ -350,11 +354,11 @@ function rect_Backgroundcolor(x,y,id,color){
 					.attr("height", 20)
 					.attr("dy", "0em")
 					.style("fill", color)
-					.style("fill-opacity", ".4")
-					.style("stroke-width", "1.5px");
+					.style("fill-opacity", ".2")
+					// .style("stroke-width", "1.5px");
 }
 function addColorsToDropdown(){
-	let colors = ["red","green","yellow","white"]
+	let colors = ["red","green","yellow","blue","white"]
 	let startStatement = "<select id=\"tooltip_color\" style=\"background-color:"+colors[0]+"\">";
 	let endStatement = "</select>";
 	let stringyfyingHTML = startStatement;
