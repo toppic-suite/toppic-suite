@@ -21,14 +21,27 @@
 <script src="../visual/js/util/navBar.js" ></script>
 <script>
 $(document).ready(function(){
-    var x = location.href;
-  /* get the folder by splitting url with "?","=","#"  */
-  var l_split = x.split(/[?#]+/);
-  let folderName = l_split[1].split("=")[1];
-  console.log("folderName : ",folderName);
-    $("#submit").click(function(){
-        getSpectrum(folderName);
+    let scanid = $("#ms1_scanid").val();
+    let centerValue = null;
+    let spectrumObj = new Spectrum("ms1_json",scanid,"ms1_spectrum",centerValue);
+    spectrumObj.getSpectrum();
+    scanid = $("#ms2_scanid").val();
+    let spectrumObj_1 = new Spectrum("ms2_json",scanid,"ms2_spectrum",centerValue);
+    spectrumObj_1.getSpectrum();
+
+    $("#ms1_submit").click(function(){
+        let scanid = $("#ms1_scanid").val();
+        let centerValue = null;
+        let spectrumObj = new Spectrum("ms1_json",scanid,"ms1_spectrum",centerValue);
+        spectrumObj.getSpectrum();
     })
+    $("#ms2_submit").click(function(){
+        let scanid = $("#ms2_scanid").val();
+        let centerValue = null;
+        let spectrumObj = new Spectrum("ms2_json",scanid,"ms2_spectrum",centerValue);
+        spectrumObj.getSpectrum();
+    })
+    
 })
 </script>
 </head>
@@ -38,19 +51,26 @@ $(document).ready(function(){
     <div class="container">
         <div class="row">
             <div class="form-inline">
-                <input class="form-control mr-1" id="scanid1" placeholder="ms1 id">
-                <input class="form-control mr-1" id="scanid2" placeholder="ms2 id">
-                <button class="btn btn-primary" id="submit" >submit</button>
+                <label for="ms1_scanid">Ms1 : &nbsp;</label>
+                <input class="form-control mr-1 ms_scanids" type="input" value="1" name="ms1_scanid" id="ms1_scanid">
+                <button class="btn btn-primary sumbit" id="ms1_submit" >submit</button>
             </div>
+        </div>
+        <div class="row ms1_spectrum" style="display:none">
+            <h5 id="ms1_head"></h5>
+            <svg id = "ms1_spectrum" height="250" width = "1000"></svg>
         </div>
         <br>
         <div class="row">
-            <h5 id="ms1_head"></h5>
-            <svg id = "ms1_spectrum" height="250" width = "1000" style="display:none"></svg>
+            <div class="form-inline">
+                <label for="ms2_scanid">Ms2 : &nbsp;</label>
+                <input class="form-control mr-1 ms_scanids" type="input" value="1" name="ms2_scanid" id="ms2_scanid">
+                <button class="btn btn-primary sumbit" id="ms2_submit" >submit</button>
+            </div>
         </div>
-        <div class="row">
+        <div class="row ms2_spectrum" style="display:none">
                 <h5 id="ms2_head"></h5>
-            <svg id = "ms2_spectrum" height="250" width = "1000" style="display:none"></svg>
+            <svg id = "ms2_spectrum" height="250" width = "1000" ></svg>
         </div>
     </div>   
 </body>
