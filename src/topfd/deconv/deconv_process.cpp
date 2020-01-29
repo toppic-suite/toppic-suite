@@ -173,16 +173,27 @@ void DeconvProcess::processSpMissingLevelOne(DeconvOneSpPtr deconv_ptr,
 }
 
 void DeconvProcess::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
-                                MatchEnvPtrVec prec_envs, MsAlignWriterPtr ms1_writer_ptr, std::vector<PeakPtrVec> *peak_list_vec_ptr) { 
-  MatchEnvPtrVec result_envs;
+                                MatchEnvPtrVec prec_envs, MsAlignWriterPtr ms1_writer_ptr) { 
+  PeakPtrVec peak_list = ms_ptr->getPeakPtrVec();
+  LOG_DEBUG("peak list size " << peak_list.size());
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
-  
-  //peak list is stored in the peak list vector in the order of id.
-  PeakPtrVec peak_list = (*peak_list_vec_ptr)[header_ptr->getId()];
-
-  //PeakPtrVec peak_list;
-  LOG_DEBUG("ms level " << header_ptr->getMsLevel());
-
+  LOG_DEBUG("ms level " << header_ptr->getMsLevel() );
+  // int scan_num_ = header_ptr->getFirstScanNum();
+  //remove precursor peaks
+  std::vector<double> intensities;
+  for (size_t i = 0; i < peak_list.size(); i++) {
+    intensities.push_back(peak_list[i]->getIntensity());
+  }
+  for (size_t i = 0; i < prec_envs.size(); i++) {
+    RealEnvPtr env_ptr = prec_envs[i]->getRealEnvPtr();
+    for (int p = 0; p < env_ptr->getPeakNum(); p++) {
+      if (env_ptr->isExist(p)) {
+        int idx = env_ptr->getPeakIdx(p);
+        peak_list[idx]->setIntensity(0);
+      }
+    }
+  }
+  MatchEnvPtrVec result_envs;
   if (peak_list.size() > 0) {
     LOG_DEBUG("set data....");
     deconv_ptr->setMsLevel(header_ptr->getMsLevel());
@@ -190,19 +201,18 @@ void DeconvProcess::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
     deconv_ptr->run();
     result_envs = deconv_ptr->getResult();
   }
-
   prec_envs.insert(prec_envs.end(), result_envs.begin(), result_envs.end());
-  
   LOG_DEBUG("result num " << prec_envs.size());
-
   DeconvMsPtr deconv_ms_ptr = match_env_util::getDeconvMsPtr(header_ptr, prec_envs);
-
 
   ms1_writer_ptr->write(deconv_ms_ptr);
   if (topfd_para_ptr_->output_match_env_) {
     match_env_writer::write(ms1_env_name_, header_ptr, prec_envs);
   }
-
+ // add back precursor peaks
+  for (size_t i = 0; i < peak_list.size(); i++) {
+    peak_list[i]->setIntensity(intensities[i]);
+  }
   if (topfd_para_ptr_->output_json_files_) {
     std::string json_file_name = ms1_json_dir_ 
         + file_util::getFileSeparator() 
@@ -246,8 +256,8 @@ void DeconvProcess::deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
 //DecovOne & Two
 std::function<void()> geneTask(RawMsGroupPtr ms_group_ptr, DeconvOneSpPtr deconv_ptr, MatchEnvPtrVec prec_envs,
                                 MsAlignWriterPtr ms_writer_ptr, MsAlignWriterPtr ms2_writer_ptr, 
-                                DeconvProcess *deconv_instance_ptr, int **count1, int **count2, std::vector<PeakPtrVec> *peak_list_vec_ptr, PeakPtrVec ori_peak_list, int total_scan_num){
-  return [ms_group_ptr, deconv_ptr, prec_envs,ms_writer_ptr, ms2_writer_ptr, deconv_instance_ptr, count1, count2, peak_list_vec_ptr, ori_peak_list, total_scan_num]() {
+                                DeconvProcess *deconv_instance_ptr, int **count1, int **count2, PeakPtrVec ori_peak_list, int total_scan_num){
+  return [ms_group_ptr, deconv_ptr, prec_envs,ms_writer_ptr, ms2_writer_ptr, deconv_instance_ptr, count1, count2, ori_peak_list, total_scan_num]() {
    
    RawMsPtr ms_one_ptr = ms_group_ptr->getMsOnePtr();                            
    RawMsPtrVec ms_two_ptr_vec = ms_group_ptr->getMsTwoPtrVec();
@@ -255,7 +265,7 @@ std::function<void()> geneTask(RawMsGroupPtr ms_group_ptr, DeconvOneSpPtr deconv
    std::string msg = deconv_instance_ptr->updateMsg(ms_one_ptr->getMsHeaderPtr(), **count1, total_scan_num);
    std::cout << "\r" << msg << std::flush;
 
-   deconv_instance_ptr->deconvMsOne(ms_one_ptr, deconv_ptr, prec_envs, ms_writer_ptr, peak_list_vec_ptr);
+   deconv_instance_ptr->deconvMsOne(ms_one_ptr, deconv_ptr, prec_envs, ms_writer_ptr);
    //std::cout << "deconvOne finished" << std::endl;
   
    count_lock.lock();
@@ -342,11 +352,6 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr,
                                      env_para_ptr_->max_charge_); 
 
 
-  std::vector<PeakPtrVec> peak_list_vec = peakCal(reader_pl_ptr, prec_envs);
-  std::vector<PeakPtrVec> *peak_list_vec_ptr;
-
-  peak_list_vec_ptr = &peak_list_vec;
-
   PeakPtrVec ori_peak_list = ms_ptr->getPeakPtrVec();//for deconvmstwo
 
   //generate writer ptr
@@ -375,8 +380,6 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr,
     std::shared_ptr<DpPara> dp_ptr_new = std::make_shared<DpPara>(*dp_ptr);
 
     DeconvOneSpPtr deconv_ptr_new = std::make_shared<DeconvOneSp>(env_ptr_new, dp_ptr_new);
-
-    //std::cout << deconv_ptr_new->getEnvPara() << " " << deconv_ptr->getEnvPara() << std::endl;
     
     MsAlignWriterPtr writer_ptr_1 = writer_vec_1[0];
     MsAlignWriterPtr writer_ptr_2 = writer_vec_2[0];
@@ -384,7 +387,7 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr,
     writer_vec_1.erase(writer_vec_1.begin());
     writer_vec_2.erase(writer_vec_2.begin());
 
-    pool_ptr->Enqueue(geneTask(ms_group_ptr, deconv_ptr_new, prec_envs, writer_ptr_1, writer_ptr_2, deconv_instance_ptr, &count1_ptr, &count2_ptr, peak_list_vec_ptr, ori_peak_list, total_scan_num));
+    pool_ptr->Enqueue(geneTask(ms_group_ptr, deconv_ptr_new, prec_envs, writer_ptr_1, writer_ptr_2, deconv_instance_ptr, &count1_ptr, &count2_ptr, ori_peak_list, total_scan_num));
     
     writer_vec_1.push_back(writer_ptr_1);
     writer_vec_2.push_back(writer_ptr_2);

@@ -51,7 +51,7 @@ class DeconvProcess {
       return env_para_ptr_;
   }
   void deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
-                   MatchEnvPtrVec prec_envs, MsAlignWriterPtr ms1_writer_ptr, std::vector<PeakPtrVec> *peak_list_vec_ptr); 
+                   MatchEnvPtrVec prec_envs, MsAlignWriterPtr ms1_writer_ptr); 
 
   void deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
                    MsAlignWriterPtr ms2_writer_ptr); 
