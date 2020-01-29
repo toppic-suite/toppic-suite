@@ -20,21 +20,25 @@
 #include "common/util/file_util.hpp"
 #include "common/thread/simple_thread_pool.hpp"
 
+#include "ms/spec/msalign_reader.hpp"
 #include "ms/spec/msalign_writer.hpp"
 #include "ms/env/env_base.hpp"
 #include "ms/env/match_env_util.hpp"
 #include "ms/env/match_env_writer.hpp"
+
 #include "topfd/common/topfd_para.hpp"
 #include "topfd/msreader/raw_ms_writer.hpp"
 #include "topfd/deconv/deconv_process.hpp"
 
 #include <mutex>
 #include <vector>
+#include <fstream>
+#include <string>
 
 namespace toppic {
 
 std::mutex count_lock;
-//std::mutex count2_lock;
+std::mutex vector_lock;
 
 DeconvProcess::DeconvProcess(TopfdParaPtr topfd_para_ptr, 
                              const std::string &spec_file_name, 
@@ -50,7 +54,77 @@ DeconvProcess::DeconvProcess(TopfdParaPtr topfd_para_ptr,
   prepareFileFolder();
 
 }
+//merge output files
+//add one entry from each file, check if ID number is in order, if not, check all files to find
+//the entry of next ID number
+/*
+void DeConvProcess::mergeMsFiles(int wrt_ptr_num, int scan_num, std::string msalign_num){
 
+std::vector<std::string>ms_name_vec;
+
+for (int i = 0; i < wrt_ptr_num; i++){
+  ms_name_vec.push_back(msalign_num + std::to_string(i) + ".ms");
+}
+
+std::ofstream msalign{"st_1_ms2_msalign.ms", std::ios_base::app};
+
+MsAlignReader file0(ms_name_vec[0], 1, nullptr, std::set<std::string>());
+MsAlignReader file1(ms_name_vec[1], 1, nullptr, std::set<std::string>());
+MsAlignReader file2(ms_name_vec[2], 1, nullptr, std::set<std::string>());
+MsAlignReader file3(ms_name_vec[3], 1, nullptr, std::set<std::string>());
+MsAlignReader file4(ms_name_vec[4], 1, nullptr, std::set<std::string>());
+MsAlignReader file5(ms_name_vec[5], 1, nullptr, std::set<std::string>());
+MsAlignReader file6(ms_name_vec[6], 1, nullptr, std::set<std::string>());
+MsAlignReader file7(ms_name_vec[7], 1, nullptr, std::set<std::string>());
+
+
+std::ifstream file0{ms_name_vec[0]};
+
+//std::vector<std::string> file0_lines = file0.readOneStrSpectrum();
+
+int line_num_0, line_num_1, line_num_2, line_num_3, line_num_4, line_num_5, line_num_6, line_num_7 = 0;
+bool copy = false;
+
+for (int j = 0; j < scan_num; j++){
+  std::string line;
+
+  while (std::getline(file0, line)) {
+    if (line.substr(0, 3) == "ID="){
+      std::string id_num = line.substr(3);
+
+      if (std::stoi(id_num) == j){//if it is the next spectrum
+        msalign << "BEGIN IONS" << "\n";
+        msalign << line << "\n";
+        copy = true;
+      }
+    }
+    else if (line == "END IONS"){
+      msalign << line << "\n";
+      copy = false;
+      break;
+    }
+    else if (copy == true){
+      msalign << line << "\n";
+    }
+   file0_lines = file0.readOneStrspectrum();
+  }
+}
+//open one file, check id and copy to the new file
+//finish reading and break the loop and go to the next loop (next file)
+}*/
+void DeconvProcess::writeMsalign(MsAlignWriterPtr ms_wtr_ptr, std::map<int, DeconvMsPtr> ms_ptr_map){
+  std::cout << "write msalign" << std::endl;
+  //std::cout << ms_ptr_list.size() << std::endl;
+  std::cout << ms_wtr_ptr << std::endl;
+
+
+  //sort map 
+  //iterate by int value
+  
+  for (int i = 0; i < ms_ptr_map.size(); i++){
+    ms_wtr_ptr->write(ms_ptr_list[i]);
+  }
+}
 
 std::string DeconvProcess::updateMsg(MsHeaderPtr header_ptr, int scan, 
                                      int total_scan_num) {
@@ -170,7 +244,7 @@ void DeconvProcess::processSpMissingLevelOne(DeconvOneSpPtr deconv_ptr,
 }
 
 void DeconvProcess::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
-                                MatchEnvPtrVec prec_envs, MsAlignWriterPtr ms1_writer_ptr) { 
+                                MatchEnvPtrVec prec_envs, MsAlignWriterPtr ms1_writer_ptr, std::map<int, DeconvMsPtr> *ms1_ptr_map_ptr) { 
   PeakPtrVec peak_list = ms_ptr->getPeakPtrVec();
   LOG_DEBUG("peak list size " << peak_list.size());
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
@@ -191,6 +265,7 @@ void DeconvProcess::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
     }
   }
   MatchEnvPtrVec result_envs;
+
   if (peak_list.size() > 0) {
     LOG_DEBUG("set data....");
     deconv_ptr->setMsLevel(header_ptr->getMsLevel());
@@ -203,7 +278,11 @@ void DeconvProcess::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
 
   DeconvMsPtr deconv_ms_ptr = match_env_util::getDeconvMsPtr(header_ptr, prec_envs);
 
-  ms1_writer_ptr->write(deconv_ms_ptr);
+  ms1_ptr_list_ptr->push_back(deconv_ms_ptr);
+  
+  int index = header_ptr->getId();
+  //(*ms1_ptr_vec_ptr)[index] = deconv_ms_ptr;
+  (*ms1_ptr_map_ptr).insert ( std::pair<int, DeconvMsPtr>(index,deconv_ms_ptr) );
   if (topfd_para_ptr_->output_match_env_) {
     match_env_writer::write(ms1_env_name_, header_ptr, prec_envs);
   }
@@ -221,7 +300,7 @@ void DeconvProcess::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
 }
 
 void DeconvProcess::deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
-                                MsAlignWriterPtr ms2_writer_ptr) { 
+                                MsAlignWriterPtr ms2_writer_ptr, std::map<int, DeconvMsPtr> *ms2_ptr_map_ptr) { 
 
   PeakPtrVec peak_list = ms_ptr->getPeakPtrVec();
   LOG_DEBUG("peak list size " << peak_list.size());
@@ -239,7 +318,11 @@ void DeconvProcess::deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
     MatchEnvPtrVec result_envs = deconv_ptr->getResult();
     DeconvMsPtr deconv_ms_ptr = match_env_util::getDeconvMsPtr(header_ptr, result_envs);
 
-    ms2_writer_ptr->write(deconv_ms_ptr);
+    int index = header_ptr->getId();
+    //(*ms2_ptr_vec_ptr)[index] = deconv_ms_ptr;
+    (*ms2_ptr_map_ptr).insert ( std::pair<int, DeconvMsPtr>(index,deconv_ms_ptr) );
+    ms2_ptr_list_ptr->write(deconv_ms_ptr);
+
     if (topfd_para_ptr_->output_match_env_) {
       match_env_writer::write(ms2_env_name_, header_ptr, result_envs);
     }
@@ -255,8 +338,8 @@ void DeconvProcess::deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
 //DecovOne & Two
 std::function<void()> geneTask(RawMsGroupPtr ms_group_ptr, DeconvOneSpPtr deconv_ptr, MatchEnvPtrVec prec_envs,
                                 MsAlignWriterPtr ms_writer_ptr, MsAlignWriterPtr ms2_writer_ptr, 
-                                DeconvProcess *deconv_instance_ptr, int **count1, int **count2, int total_scan_num){
-  return [ms_group_ptr, deconv_ptr, prec_envs, ms_writer_ptr, ms2_writer_ptr, deconv_instance_ptr, count1, count2, total_scan_num]() {
+                                DeconvProcess *deconv_instance_ptr, int **count1, int **count2, int total_scan_num, std::map<int, DeconvMsPtr> *ms1_ptr_map_ptr, std::map<int, DeconvMsPtr> *ms2_ptr_map_ptr){
+  return [ms_group_ptr, deconv_ptr, prec_envs, ms_writer_ptr, ms2_writer_ptr, deconv_instance_ptr, count1, count2, total_scan_num, ms1_ptr_map_ptr, ms2_ptr_map_ptr]() {
    
    RawMsPtr ms_one_ptr = ms_group_ptr->getMsOnePtr();                            
    RawMsPtrVec ms_two_ptr_vec = ms_group_ptr->getMsTwoPtrVec();
@@ -266,7 +349,7 @@ std::function<void()> geneTask(RawMsGroupPtr ms_group_ptr, DeconvOneSpPtr deconv
    std::stringstream msgStream;
    msgStream << std::flush << msg << "\r";
 
-   deconv_instance_ptr->deconvMsOne(ms_one_ptr, deconv_ptr, prec_envs, ms_writer_ptr);
+   deconv_instance_ptr->deconvMsOne(ms_one_ptr, deconv_ptr, prec_envs, ms_writer_ptr, ms1_ptr_map_ptr);
   
    count_lock.lock();
    
@@ -281,7 +364,7 @@ std::function<void()> geneTask(RawMsGroupPtr ms_group_ptr, DeconvOneSpPtr deconv
       
       msgStream << std::flush << msg << "\r";
       
-      deconv_instance_ptr->deconvMsTwo(ms_two_ptr, deconv_ptr, ms2_writer_ptr);
+      deconv_instance_ptr->deconvMsTwo(ms_two_ptr, deconv_ptr, ms2_writer_ptr, ms2_ptr_map_ptr);
 
       count_lock.lock();
 
@@ -313,8 +396,15 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr,
 
   SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(thread_num);  
 
-  
+  //generate vector that contains msalign writing information
 
+  std::map<int, DeconvMsPtr> ms1_ptr_map; 
+  std::map<int, DeconvMsPtr> *ms1_ptr_map_ptr;
+  ms1_ptr_map_ptr = &ms1_ptr_map;
+
+  std::map<int, DeconvMsPtr> ms2_ptr_map; 
+  std::map<int, DeconvMsPtr> *ms2_ptr_map_ptr;
+  ms2_ptr_map_ptr = &ms2_ptr_map;
 
   //generate writer ptr
 
@@ -322,11 +412,11 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr,
   std::vector<MsAlignWriterPtr> writer_vec_2;
 
   for (int i = 0; i < 8; i++){//change if 8 files are too small
-    MsAlignWriterPtr ms1_writer_ptr = std::make_shared<MsAlignWriter>("msalign_1_" + std::to_string(i) + ".ms");
-    MsAlignWriterPtr ms2_writer_ptr = std::make_shared<MsAlignWriter>("msalign_2_" + std::to_string(i) + ".ms");
+    MsAlignWriterPtr ms1_ptr_ = std::make_shared<MsAlignWriter>("msalign_1_" + std::to_string(i) + ".ms");
+    MsAlignWriterPtr ms2_ptr_ = std::make_shared<MsAlignWriter>("msalign_2_" + std::to_string(i) + ".ms");
   
-    writer_vec_1.push_back(ms1_writer_ptr);
-    writer_vec_2.push_back(ms2_writer_ptr);
+    writer_vec_1.push_back(ms1_ptr_);
+    writer_vec_2.push_back(ms2_ptr_);
   }
 
   while (ms_group_ptr != nullptr) {
@@ -353,7 +443,7 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr,
     writer_vec_1.erase(writer_vec_1.begin());
     writer_vec_2.erase(writer_vec_2.begin());
 
-    pool_ptr->Enqueue(geneTask(ms_group_ptr, deconv_ptr_new, prec_envs, writer_ptr_1, writer_ptr_2, deconv_instance_ptr, &count1_ptr, &count2_ptr, total_scan_num));
+    pool_ptr->Enqueue(geneTask(ms_group_ptr, deconv_ptr_new, prec_envs, writer_ptr_1, writer_ptr_2, deconv_instance_ptr, &count1_ptr, &count2_ptr, total_scan_num, ms1_ptr_map, ms2_ptr_map));
     
     writer_vec_1.push_back(writer_ptr_1);
     writer_vec_2.push_back(writer_ptr_2);
@@ -361,6 +451,9 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr,
     ms_group_ptr = reader_ptr->getNextMsGroupPtr();
   }
   pool_ptr->ShutDown();
+
+  writeMsalign(ms1_writer_ptr, ms1_ptr_map);
+  writeMsalign(ms2_writer_ptr, ms2_ptr_map);
 
     //auto proc_end = std::chrono::high_resolution_clock::now();
     //auto proc_duration = std::chrono::duration_cast<std::chrono::microseconds>(proc_end-proc_start);
@@ -376,7 +469,5 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr,
   std::cout << std::endl;
 
   }
-
-
-                                
+          
 }; // namespace toppic
