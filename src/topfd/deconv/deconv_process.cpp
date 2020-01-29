@@ -172,7 +172,7 @@ void DeconvProcess::processSpMissingLevelOne(DeconvOneSpPtr deconv_ptr,
   }
 }
 
-void DeconvProcess::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSp *deconv_ptr, 
+void DeconvProcess::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
                                 MatchEnvPtrVec prec_envs, MsAlignWriterPtr ms1_writer_ptr, std::vector<PeakPtrVec> *peak_list_vec_ptr) { 
   MatchEnvPtrVec result_envs;
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
@@ -186,7 +186,7 @@ void DeconvProcess::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSp *deconv_ptr,
   if (peak_list.size() > 0) {
     LOG_DEBUG("set data....");
     deconv_ptr->setMsLevel(header_ptr->getMsLevel());
-    //deconv_ptr->setData(peak_list);
+    deconv_ptr->setData(peak_list);
     deconv_ptr->run();
     result_envs = deconv_ptr->getResult();
   }
@@ -211,7 +211,7 @@ void DeconvProcess::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSp *deconv_ptr,
   }
 }
 
-void DeconvProcess::deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSp *deconv_ptr, 
+void DeconvProcess::deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
                                 MsAlignWriterPtr ms2_writer_ptr) { 
 
   PeakPtrVec peak_list = ms_ptr->getPeakPtrVec();
@@ -244,7 +244,7 @@ void DeconvProcess::deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSp *deconv_ptr,
 }
 
 //DecovOne & Two
-std::function<void()> geneTask(RawMsGroupPtr ms_group_ptr, DeconvOneSp *deconv_ptr, MatchEnvPtrVec prec_envs,
+std::function<void()> geneTask(RawMsGroupPtr ms_group_ptr, DeconvOneSpPtr deconv_ptr, MatchEnvPtrVec prec_envs,
                                 MsAlignWriterPtr ms_writer_ptr, MsAlignWriterPtr ms2_writer_ptr, 
                                 DeconvProcess *deconv_instance_ptr, int **count1, int **count2, std::vector<PeakPtrVec> *peak_list_vec_ptr, PeakPtrVec ori_peak_list, int total_scan_num){
   return [ms_group_ptr, deconv_ptr, prec_envs,ms_writer_ptr, ms2_writer_ptr, deconv_instance_ptr, count1, count2, peak_list_vec_ptr, ori_peak_list, total_scan_num]() {
@@ -368,9 +368,16 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr,
     while(pool_ptr->getQueueSize() >= thread_num * 2){
         boost::this_thread::sleep(boost::posix_time::milliseconds(100));
     }
-    DeconvOneSp deconv_new(deconv_ptr->getEnvPara(), deconv_ptr->getDpPara());
-    DeconvOneSp *deconv_ptr_new = &deconv_new;
+    EnvParaPtr env_ptr = deconv_ptr->getEnvPara();
+    DpParaPtr dp_ptr = deconv_ptr->getDpPara();
 
+    std::shared_ptr<EnvPara> env_ptr_new = std::make_shared<EnvPara>(*env_ptr);
+    std::shared_ptr<DpPara> dp_ptr_new = std::make_shared<DpPara>(*dp_ptr);
+
+    DeconvOneSpPtr deconv_ptr_new = std::make_shared<DeconvOneSp>(env_ptr_new, dp_ptr_new);
+
+    //std::cout << deconv_ptr_new->getEnvPara() << " " << deconv_ptr->getEnvPara() << std::endl;
+    
     MsAlignWriterPtr writer_ptr_1 = writer_vec_1[0];
     MsAlignWriterPtr writer_ptr_2 = writer_vec_2[0];
 
