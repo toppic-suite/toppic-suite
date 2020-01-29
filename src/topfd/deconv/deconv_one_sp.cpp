@@ -86,7 +86,7 @@ void DeconvOneSp::run() {
 }
 
 void DeconvOneSp::preprocess() {
-  /*if (env_para_ptr_->estimate_min_inte_) {
+  if (env_para_ptr_->estimate_min_inte_) {
     PeakPtrVec peak_list = data_ptr_->getPeakList();
     std::vector<double> intes;
     for (size_t i = 0; i < peak_list.size(); i++) {
@@ -94,7 +94,7 @@ void DeconvOneSp::preprocess() {
     }
     double min_inte = baseline_util::getBaseLine(intes);
     env_para_ptr_->setMinInte(min_inte, ms_level_);
-  }*/
+  }
   //moved to processSP
 }
 
