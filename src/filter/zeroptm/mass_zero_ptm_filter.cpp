@@ -40,7 +40,6 @@ MassZeroPtmFilter::MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
 	TopIndexFileName TopIndexFile;
   std::string parameters = TopIndexFile.gene_file_name(prsm_para_ptr);
 
-
   //check if all index files for this ptm is present. if not, generate index files again.
 
  bool indexFilesExist = true;

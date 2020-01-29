@@ -16,7 +16,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include <sstream>  
+#include <sstream> 
 
 #include "prsm/prsm_para.hpp"
 #include "console/topindex_file_name.hpp"
@@ -32,18 +32,38 @@ std::string TopIndexFileName::gene_file_name(PrsmParaPtr prsm_para_ptr){
 
     std::vector<std::string> prot_mod_vec;
     std::stringstream sstream(prot_mod);
-    std::string final_prot_mod;
+    std::string final_prot_mod = "";
 
     while(sstream.good()){
         std::string substring;
         getline(sstream, substring, ',');
         prot_mod_vec.push_back(substring);
     }
+   
     for (size_t i = 0; i < prot_mod_vec.size(); i++){
-        final_prot_mod = final_prot_mod + "_" + prot_mod_map.find(prot_mod_vec[i])->second;
+        std::string mod = prot_mod_map.find(prot_mod_vec[i])->second;
+        if (final_prot_mod != ""){
+           final_prot_mod = final_prot_mod + "_" + mod;     
+        }else{
+            final_prot_mod = final_prot_mod + mod;
+        }
     }
-    std::string paraInfo = fixed_mod + "_" + final_prot_mod + "_" + activation + "_" + error_tol + "_" + decoy;
-    
-    return paraInfo;
+
+    std::vector<std::string>para_vec;//to determine if "_" is needed in between
+    std::string paraInfo;
+
+    para_vec.push_back(fixed_mod);
+    para_vec.push_back(final_prot_mod);
+    para_vec.push_back(activation);
+    para_vec.push_back(error_tol);
+    para_vec.push_back(decoy);
+
+    for (size_t t = 0; t < para_vec.size(); t++){
+        if (para_vec[t] != ""){
+            //if the parameter is used
+            paraInfo = paraInfo + "_" + para_vec[t];
+        }
+    }
+    return paraInfo;   
     }
 }

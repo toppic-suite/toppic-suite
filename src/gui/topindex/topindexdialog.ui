@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>920</width>
-    <height>710</height>
+    <height>522</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -19,7 +19,7 @@
   <property name="minimumSize">
    <size>
     <width>920</width>
-    <height>710</height>
+    <height>510</height>
    </size>
   </property>
   <property name="maximumSize">
@@ -40,7 +40,7 @@
     <property name="geometry">
      <rect>
       <x>40</x>
-      <y>660</y>
+      <y>460</y>
       <width>861</width>
       <height>41</height>
      </rect>
@@ -111,7 +111,7 @@
     <property name="geometry">
      <rect>
       <x>40</x>
-      <y>440</y>
+      <y>240</y>
       <width>861</width>
       <height>211</height>
      </rect>
@@ -122,16 +122,6 @@
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Cantarell'; font-size:11pt;&quot;&gt;Click the Start button to generate index files.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-    </property>
-   </widget>
-   <widget class="QListWidget" name="listWidget">
-    <property name="geometry">
-     <rect>
-      <x>40</x>
-      <y>80</y>
-      <width>861</width>
-      <height>161</height>
-     </rect>
     </property>
    </widget>
    <widget class="QWidget" name="horizontalLayoutWidget_2">
@@ -186,8 +176,8 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>40</x>
-      <y>250</y>
-      <width>861</width>
+      <y>70</y>
+      <width>841</width>
       <height>31</height>
      </rect>
     </property>
@@ -265,9 +255,9 @@ p, li { white-space: pre-wrap; }
    <widget class="QCheckBox" name="decoyCheckBox">
     <property name="geometry">
      <rect>
-      <x>770</x>
+      <x>780</x>
       <y>30</y>
-      <width>119</width>
+      <width>101</width>
       <height>17</height>
      </rect>
     </property>
@@ -279,7 +269,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>460</x>
-      <y>300</y>
+      <y>120</y>
       <width>331</width>
       <height>33</height>
      </rect>
@@ -314,7 +304,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>460</x>
-      <y>330</y>
+      <y>150</y>
       <width>331</width>
       <height>31</height>
      </rect>
@@ -349,7 +339,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>460</x>
-      <y>360</y>
+      <y>180</y>
       <width>331</width>
       <height>33</height>
      </rect>
@@ -402,11 +392,11 @@ p, li { white-space: pre-wrap; }
      </item>
     </layout>
    </widget>
-   <widget class="QGroupBox" name="groupBox">
+   <widget class="QGroupBox" name="groupBox_2">
     <property name="geometry">
      <rect>
       <x>40</x>
-      <y>300</y>
+      <y>120</y>
       <width>341</width>
       <height>91</height>
      </rect>
@@ -414,7 +404,7 @@ p, li { white-space: pre-wrap; }
     <property name="title">
      <string>N-terminal forms</string>
     </property>
-    <widget class="QWidget" name="gridLayoutWidget">
+    <widget class="QWidget" name="gridLayoutWidget_2">
      <property name="geometry">
       <rect>
        <x>9</x>
@@ -423,9 +413,9 @@ p, li { white-space: pre-wrap; }
        <height>70</height>
       </rect>
      </property>
-     <layout class="QGridLayout" name="gridLayout">
+     <layout class="QGridLayout" name="gridLayout_2">
       <item row="0" column="0">
-       <widget class="QCheckBox" name="NONECheckBox">
+       <widget class="QCheckBox" name="NONECheckBox_2">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -441,7 +431,7 @@ p, li { white-space: pre-wrap; }
        </widget>
       </item>
       <item row="1" column="0">
-       <widget class="QCheckBox" name="NMECheckBox">
+       <widget class="QCheckBox" name="NMECheckBox_2">
         <property name="text">
          <string>NME</string>
         </property>
@@ -451,7 +441,7 @@ p, li { white-space: pre-wrap; }
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QCheckBox" name="NMEACCheckBox">
+       <widget class="QCheckBox" name="NMEACCheckBox_2">
         <property name="text">
          <string>NME_ACETYLATION</string>
         </property>
@@ -461,7 +451,7 @@ p, li { white-space: pre-wrap; }
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QCheckBox" name="MACCheckBox">
+       <widget class="QCheckBox" name="MACCheckBox_2">
         <property name="text">
          <string>M_ACETYLATION</string>
         </property>
