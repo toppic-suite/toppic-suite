@@ -112,7 +112,6 @@ void TopIndexDialog::initArguments() {
 
 void TopIndexDialog::on_clearButton_clicked() {
   ui->databaseFileEdit->clear();
-  ui->listWidget->clear();
   ui->outputTextBrowser->setText("Click the Start button to process the data.");
   ui->outputButton->setEnabled(false);
 }
