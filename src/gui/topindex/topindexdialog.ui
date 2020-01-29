@@ -32,14 +32,14 @@
    <string>TopIndex</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="../Downloads/gui/topindex/icon.qrc">
+   <iconset>
     <normaloff>:/icon/toppic.ico</normaloff>:/icon/toppic.ico</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QWidget" name="horizontalLayoutWidget_7">
     <property name="geometry">
      <rect>
-      <x>40</x>
+      <x>30</x>
       <y>460</y>
       <width>861</width>
       <height>41</height>
@@ -110,7 +110,7 @@
    <widget class="QTextBrowser" name="outputTextBrowser">
     <property name="geometry">
      <rect>
-      <x>40</x>
+      <x>30</x>
       <y>240</y>
       <width>861</width>
       <height>211</height>
@@ -120,14 +120,14 @@
      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Cantarell'; font-size:11pt;&quot;&gt;Click the Start button to generate index files.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Cantarell';&quot;&gt;Click the Start button to generate index files.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
    <widget class="QWidget" name="horizontalLayoutWidget_2">
     <property name="geometry">
      <rect>
-      <x>40</x>
+      <x>30</x>
       <y>20</y>
       <width>711</width>
       <height>39</height>
@@ -175,10 +175,10 @@ p, li { white-space: pre-wrap; }
    <widget class="QWidget" name="horizontalLayoutWidget_5">
     <property name="geometry">
      <rect>
-      <x>40</x>
+      <x>30</x>
       <y>70</y>
-      <width>841</width>
-      <height>31</height>
+      <width>861</width>
+      <height>32</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_5">
@@ -244,9 +244,9 @@ p, li { white-space: pre-wrap; }
    <widget class="QWidget" name="horizontalLayoutWidget_21">
     <property name="geometry">
      <rect>
-      <x>760</x>
+      <x>750</x>
       <y>20</y>
-      <width>121</width>
+      <width>151</width>
       <height>33</height>
      </rect>
     </property>
@@ -255,9 +255,9 @@ p, li { white-space: pre-wrap; }
    <widget class="QCheckBox" name="decoyCheckBox">
     <property name="geometry">
      <rect>
-      <x>780</x>
+      <x>760</x>
       <y>30</y>
-      <width>101</width>
+      <width>131</width>
       <height>17</height>
      </rect>
     </property>
@@ -268,7 +268,7 @@ p, li { white-space: pre-wrap; }
    <widget class="QWidget" name="horizontalLayoutWidget_22">
     <property name="geometry">
      <rect>
-      <x>460</x>
+      <x>560</x>
       <y>120</y>
       <width>331</width>
       <height>33</height>
@@ -303,7 +303,7 @@ p, li { white-space: pre-wrap; }
    <widget class="QWidget" name="horizontalLayoutWidget_14">
     <property name="geometry">
      <rect>
-      <x>460</x>
+      <x>560</x>
       <y>150</y>
       <width>331</width>
       <height>31</height>
@@ -338,7 +338,7 @@ p, li { white-space: pre-wrap; }
    <widget class="QWidget" name="horizontalLayoutWidget_3">
     <property name="geometry">
      <rect>
-      <x>460</x>
+      <x>560</x>
       <y>180</y>
       <width>331</width>
       <height>33</height>
@@ -392,30 +392,30 @@ p, li { white-space: pre-wrap; }
      </item>
     </layout>
    </widget>
-   <widget class="QGroupBox" name="groupBox_2">
+   <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
-      <x>40</x>
+      <x>30</x>
       <y>120</y>
-      <width>341</width>
+      <width>391</width>
       <height>91</height>
      </rect>
     </property>
     <property name="title">
      <string>N-terminal forms</string>
     </property>
-    <widget class="QWidget" name="gridLayoutWidget_2">
+    <widget class="QWidget" name="gridLayoutWidget">
      <property name="geometry">
       <rect>
        <x>9</x>
        <y>17</y>
-       <width>321</width>
+       <width>381</width>
        <height>70</height>
       </rect>
      </property>
-     <layout class="QGridLayout" name="gridLayout_2">
+     <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0">
-       <widget class="QCheckBox" name="NONECheckBox_2">
+       <widget class="QCheckBox" name="NONECheckBox">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -431,7 +431,7 @@ p, li { white-space: pre-wrap; }
        </widget>
       </item>
       <item row="1" column="0">
-       <widget class="QCheckBox" name="NMECheckBox_2">
+       <widget class="QCheckBox" name="NMECheckBox">
         <property name="text">
          <string>NME</string>
         </property>
@@ -441,7 +441,7 @@ p, li { white-space: pre-wrap; }
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QCheckBox" name="NMEACCheckBox_2">
+       <widget class="QCheckBox" name="NMEACCheckBox">
         <property name="text">
          <string>NME_ACETYLATION</string>
         </property>
@@ -451,7 +451,7 @@ p, li { white-space: pre-wrap; }
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QCheckBox" name="MACCheckBox_2">
+       <widget class="QCheckBox" name="MACCheckBox">
         <property name="text">
          <string>M_ACETYLATION</string>
         </property>
@@ -466,7 +466,7 @@ p, li { white-space: pre-wrap; }
   </widget>
  </widget>
  <resources>
-  <include location="../Downloads/gui/topindex/icon.qrc"/>
+  <include location="gui/topindex/icon.qrc"/>
  </resources>
  <connections/>
 </ui>
