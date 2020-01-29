@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -25,19 +25,16 @@
 #include "topfd/dp/dp_a.hpp"
 #include "topfd/deconv/deconv_one_sp.hpp"
 
-#include <mutex>
-#include <iostream>
-
 //#include "ms/env/env_rescore.hpp"
 
 namespace toppic {
 
-void DeconvOneSp::setData(const PeakPtrVec &peak_list) {
+void DeconvOneSp::setData(PeakPtrVec &peak_list) {
   data_ptr_ = deconv_data_util::getDataPtr(peak_list, env_para_ptr_->max_mass_,
                                            env_para_ptr_->max_charge_, env_para_ptr_->window_size_);
 }
 
-void DeconvOneSp::setData(const PeakPtrVec &peak_list, double spec_max_mass, int spec_max_charge) {
+void DeconvOneSp::setData(PeakPtrVec &peak_list, double spec_max_mass, int spec_max_charge) {
   data_ptr_ = deconv_data_util::getDataPtr(peak_list, spec_max_mass, spec_max_charge, 
                                            env_para_ptr_->max_mass_, env_para_ptr_->max_charge_,
                                            env_para_ptr_->window_size_);
@@ -51,8 +48,6 @@ void DeconvOneSp::run() {
 
   preprocess();
   LOG_DEBUG("preprocess complete");
-
- 
   // envelope detection
   PeakPtrVec peak_list = data_ptr_->getPeakList();
   MatchEnvPtr2D cand_envs = EnvDetect::getCandidate(peak_list, 
@@ -95,12 +90,10 @@ void DeconvOneSp::preprocess() {
     double min_inte = baseline_util::getBaseLine(intes);
     env_para_ptr_->setMinInte(min_inte, ms_level_);
   }
-  //moved to processSP
 }
 
 MatchEnvPtrVec DeconvOneSp::postprocess(MatchEnvPtrVec  &dp_envs) {
   // assign intensity
-  
   PeakPtrVec peak_list = data_ptr_->getPeakList();
   match_env_util::assignIntensity(peak_list, dp_envs);
   // refinement
@@ -133,7 +126,6 @@ MatchEnvPtrVec DeconvOneSp::postprocess(MatchEnvPtrVec  &dp_envs) {
                                                  env_para_ptr_->multiple_min_mass_,
                                                  env_para_ptr_->multiple_min_charge_,
                                                  env_para_ptr_->multiple_min_ratio_);
-  
   }
 
   return result_envs_;

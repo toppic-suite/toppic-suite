@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -27,11 +27,11 @@ class DeconvOneSp {
   explicit DeconvOneSp(EnvParaPtr env_para_ptr, DpParaPtr dp_para_ptr): 
       env_para_ptr_(env_para_ptr), dp_para_ptr_(dp_para_ptr) {}
 
-  void setData(const PeakPtrVec &peak_list);
+  void setData(PeakPtrVec &peak_list);
 
   void setMsLevel(int level) {ms_level_ = level;}
 
-  void setData(const PeakPtrVec &peak_list, double max_mass, int max_charge);
+  void setData(PeakPtrVec &peak_list, double max_mass, int max_charge);
 
   MatchEnvPtrVec getResult() {return result_envs_;}
 
