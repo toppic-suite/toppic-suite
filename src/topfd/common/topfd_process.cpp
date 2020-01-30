@@ -50,7 +50,7 @@ void processOneFile(TopfdParaPtr para_ptr,
     feature_detect::process(frac_id, 
                             spec_file_name,
                             para_ptr->missing_level_one_, 
-                            para_ptr->resource_dir_, thead_number);
+                            para_ptr->resource_dir_);
     std::cout << "Feature detection finished." << std::endl;
     auto end = std::chrono::steady_clock::now();
     std::cout << "feature detect time : " << std::chrono::duration_cast<std::chrono::seconds>(end-start).count() << std::endl;
