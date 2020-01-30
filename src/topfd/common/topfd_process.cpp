@@ -24,6 +24,7 @@
 #include "topfd/deconv/deconv_process.hpp"
 #include "topfd/feature_detect/feature_detect.hpp"
 #include "topfd/common/topfd_para.hpp"
+#include <chrono>
 
 namespace toppic {
 
@@ -43,12 +44,18 @@ void processOneFile(TopfdParaPtr para_ptr,
     processor.process();
     std::cout << "Deconvolution finished." << std::endl;
 
+    auto start = std::chrono::steady_clock::now();
+
     std::cout << "Feature detection started." << std::endl;
     feature_detect::process(frac_id, 
                             spec_file_name,
                             para_ptr->missing_level_one_, 
-                            para_ptr->resource_dir_);
+                            para_ptr->resource_dir_, thead_number);
     std::cout << "Feature detection finished." << std::endl;
+    auto end = std::chrono::steady_clock::now();
+    std::cout << "feature detect time : " << std::chrono::duration_cast<std::chrono::seconds>(end-start).count() << std::endl;
+
+
     std::cout << "Processing " << spec_file_name << " finished." << std::endl;
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;

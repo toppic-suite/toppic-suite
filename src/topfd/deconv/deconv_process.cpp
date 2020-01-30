@@ -32,13 +32,13 @@
 
 #include <mutex>
 #include <vector>
-#include <fstream>
-#include <string>
+#include <chrono>
 
 namespace toppic {
 
 std::mutex count_lock;
-std::mutex vector_lock;
+std::mutex ms1_map_lock;
+std::mutex ms2_map_lock;
 
 DeconvProcess::DeconvProcess(TopfdParaPtr topfd_para_ptr, 
                              const std::string &spec_file_name, 
@@ -185,13 +185,74 @@ void DeconvProcess::process() {
   DeconvOneSpPtr deconv_ptr = std::make_shared<DeconvOneSp>(env_para_ptr_, dp_para_ptr_);
 
   if (topfd_para_ptr_->missing_level_one_) {
-    //processSpMissingLevelOne(deconv_ptr, reader_ptr, ms2_writer_ptr);
+    processSpMissingLevelOne(deconv_ptr, reader_ptr, ms2_writer_ptr);
   }
   else {
     processSp(deconv_ptr, reader_ptr, reader_pl_ptr, ms1_writer_ptr, ms2_writer_ptr);
   }
 }
 
+void DeconvProcess::deconvMissingMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, std::map<int, DeconvMsPtr> *ms1_missing_map_ptr){
+  PeakPtrVec peak_list = ms_ptr->getPeakPtrVec();
+  MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
+
+  header_ptr->setPrecCharge(EnvPara::getDefaultMaxCharge());
+  double prec_mz = EnvPara::getDefaultMaxMass()/EnvPara::getDefaultMaxCharge();
+  header_ptr->setPrecMonoMz(prec_mz);
+  header_ptr->setPrecSpMz(prec_mz);
+  MatchEnvPtrVec result_envs; 
+
+  if (peak_list.size() > 0) {
+    deconv_ptr->setData(peak_list, EnvPara::getDefaultMaxMass(),
+                            EnvPara::getDefaultMaxCharge());
+    deconv_ptr->run();
+    result_envs = deconv_ptr->getResult();
+  }
+
+  DeconvMsPtr deconv_ms_ptr = match_env_util::getDeconvMsPtr(header_ptr, result_envs);
+
+  int index = header_ptr->getId();
+
+  ms2_map_lock.lock();
+  (*ms1_missing_map_ptr).insert ( std::pair<int, DeconvMsPtr>(index,deconv_ms_ptr) );
+  ms2_map_lock.unlock();
+  //ms2_writer_ptr->write(ms_ptr);
+
+  if (topfd_para_ptr_->output_match_env_) {
+    match_env_writer::write(ms2_env_name_, header_ptr, result_envs);
+  }
+
+  if (topfd_para_ptr_->output_json_files_) {
+    std::string json_file_name = ms2_json_dir_ 
+        + file_util::getFileSeparator() 
+        + "spectrum" + std::to_string(header_ptr->getId()) + ".js";
+    raw_ms_writer::write(json_file_name, ms_ptr, result_envs);    
+  }
+
+}
+std::function<void()> geneTaskMissingMs1(RawMsGroupPtr ms_group_ptr, DeconvOneSpPtr deconv_ptr,
+                                DeconvProcess *deconv_instance_ptr, int **count2, int total_scan_num, std::map<int, DeconvMsPtr> *ms1_missing_map_ptr){
+  return [ms_group_ptr, deconv_ptr, deconv_instance_ptr, count2, total_scan_num, ms1_missing_map_ptr]() {
+  
+  RawMsPtrVec ms_two_ptr_vec = ms_group_ptr->getMsTwoPtrVec();                           
+  
+  for (size_t i = 0; i < ms_two_ptr_vec.size(); i++) {
+      RawMsPtr ms_two_ptr = ms_two_ptr_vec[i];
+      std::string msg = deconv_instance_ptr->updateMsg(ms_two_ptr->getMsHeaderPtr(), **count2 + 1, total_scan_num);
+      std::stringstream msgStream;
+      msgStream << std::flush << msg << "\r";
+      
+      deconv_instance_ptr->deconvMissingMsOne(ms_two_ptr, deconv_ptr, ms1_missing_map_ptr);
+
+      count_lock.lock();
+
+      std::cout << msgStream.str();
+      **count2 = **count2 + 1;
+
+      count_lock.unlock();
+  }
+  };
+}
 
 void DeconvProcess::processSpMissingLevelOne(DeconvOneSpPtr deconv_ptr, 
                                              RawMsGroupReaderPtr reader_ptr,
@@ -199,44 +260,44 @@ void DeconvProcess::processSpMissingLevelOne(DeconvOneSpPtr deconv_ptr,
   // reader_ptr
   int total_scan_num = reader_ptr->getInputSpNum();
   RawMsGroupPtr ms_group_ptr;
-  int count2 = 0;
   ms_group_ptr = reader_ptr->getNextMsGroupPtr();
+
+  int count2 = 0;
+  int *count2_ptr;
+  count2_ptr = &count2;
+
+  std::map<int, DeconvMsPtr> ms1_missing_map; 
+  std::map<int, DeconvMsPtr> *ms1_missing_map_ptr;
+  ms1_missing_map_ptr = &ms1_missing_map;
+
+  SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(thread_num);  
+
   while (ms_group_ptr != nullptr) {
-    RawMsPtrVec ms_two_ptr_vec = ms_group_ptr->getMsTwoPtrVec();
-    for (size_t i = 0; i < ms_two_ptr_vec.size(); i++) {
-      PeakPtrVec peak_list = ms_two_ptr_vec[i]->getPeakPtrVec();
-      MsHeaderPtr header_ptr = ms_two_ptr_vec[i]->getMsHeaderPtr();
-      std::string msg = updateMsg(header_ptr, count2 + 1, total_scan_num);
-      std::cout << "\r" << msg << std::flush;
-      header_ptr->setPrecCharge(EnvPara::getDefaultMaxCharge());
-      double prec_mz = EnvPara::getDefaultMaxMass()/EnvPara::getDefaultMaxCharge();
-      header_ptr->setPrecMonoMz(prec_mz);
-      header_ptr->setPrecSpMz(prec_mz);
-      MatchEnvPtrVec result_envs; 
-      if (peak_list.size() > 0) {
-        deconv_ptr->setData(peak_list, EnvPara::getDefaultMaxMass(),
-                            EnvPara::getDefaultMaxCharge());
-        deconv_ptr->run();
-        result_envs = deconv_ptr->getResult();
-      }
-      DeconvMsPtr ms_ptr = match_env_util::getDeconvMsPtr(header_ptr, result_envs);
-      ms2_writer_ptr->write(ms_ptr);
-      if (topfd_para_ptr_->output_match_env_) {
-        match_env_writer::write(ms2_env_name_, header_ptr, result_envs);
-      }
-      if (topfd_para_ptr_->output_json_files_) {
-        std::string json_file_name = ms2_json_dir_ 
-            + file_util::getFileSeparator() 
-            + "spectrum" + std::to_string(header_ptr->getId()) + ".js";
-        raw_ms_writer::write(json_file_name, ms_two_ptr_vec[i], result_envs);    
-      }
-      count2++;
+    while(pool_ptr->getQueueSize() >= thread_num * 2){
+        boost::this_thread::sleep(boost::posix_time::milliseconds(100));
     }
+
+    //to generate a new deconOneSp object each time
+    EnvParaPtr env_ptr = deconv_ptr->getEnvPara();
+    DpParaPtr dp_ptr = deconv_ptr->getDpPara();
+
+    std::shared_ptr<EnvPara> env_ptr_new = std::make_shared<EnvPara>(*env_ptr);
+    std::shared_ptr<DpPara> dp_ptr_new = std::make_shared<DpPara>(*dp_ptr);
+
+    DeconvOneSpPtr deconv_ptr_new = std::make_shared<DeconvOneSp>(env_ptr_new, dp_ptr_new);
+    
+    pool_ptr->Enqueue(geneTaskMissingMs1(ms_group_ptr, deconv_ptr_new, deconv_instance_ptr, &count2_ptr, total_scan_num, ms1_missing_map_ptr));
+    ms_group_ptr = reader_ptr->getNextMsGroupPtr();
   }
+  pool_ptr->ShutDown();
+
+  writeMsalign(ms2_writer_ptr, ms1_missing_map);
+
+  std::cout << std::endl;
 }
 
 void DeconvProcess::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
-                                MatchEnvPtrVec prec_envs, MsAlignWriterPtr ms1_writer_ptr, std::map<int, DeconvMsPtr> *ms1_ptr_map_ptr) { 
+                                MatchEnvPtrVec prec_envs, std::map<int, DeconvMsPtr> *ms1_ptr_map_ptr) { 
   PeakPtrVec peak_list = ms_ptr->getPeakPtrVec();
   LOG_DEBUG("peak list size " << peak_list.size());
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
@@ -271,9 +332,10 @@ void DeconvProcess::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   DeconvMsPtr deconv_ms_ptr = match_env_util::getDeconvMsPtr(header_ptr, prec_envs);
   
   int index = header_ptr->getId();
-  //(*ms1_ptr_vec_ptr)[index] = deconv_ms_ptr;
+  
+  ms1_map_lock.lock();
   (*ms1_ptr_map_ptr).insert ( std::pair<int, DeconvMsPtr>(index,deconv_ms_ptr) );
-
+  ms1_map_lock.unlock();
   if (topfd_para_ptr_->output_match_env_) {
     match_env_writer::write(ms1_env_name_, header_ptr, prec_envs);
   }
@@ -290,8 +352,7 @@ void DeconvProcess::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   }
 }
 
-void DeconvProcess::deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
-                                MsAlignWriterPtr ms2_writer_ptr, std::map<int, DeconvMsPtr> *ms2_ptr_map_ptr) { 
+void DeconvProcess::deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, std::map<int, DeconvMsPtr> *ms2_ptr_map_ptr) { 
 
   PeakPtrVec peak_list = ms_ptr->getPeakPtrVec();
   LOG_DEBUG("peak list size " << peak_list.size());
@@ -310,10 +371,10 @@ void DeconvProcess::deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
     DeconvMsPtr deconv_ms_ptr = match_env_util::getDeconvMsPtr(header_ptr, result_envs);
 
     int index = header_ptr->getId();
-    //(*ms2_ptr_vec_ptr)[index] = deconv_ms_ptr;
+
+    ms2_map_lock.lock();
     (*ms2_ptr_map_ptr).insert ( std::pair<int, DeconvMsPtr>(index,deconv_ms_ptr) );
-    
-    //ms2_writer_ptr->write(deconv_ms_ptr);
+    ms2_map_lock.unlock();
 
     if (topfd_para_ptr_->output_match_env_) {
       match_env_writer::write(ms2_env_name_, header_ptr, result_envs);
@@ -329,9 +390,8 @@ void DeconvProcess::deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
 
 //DecovOne & Two
 std::function<void()> geneTask(RawMsGroupPtr ms_group_ptr, DeconvOneSpPtr deconv_ptr, MatchEnvPtrVec prec_envs,
-                                MsAlignWriterPtr ms_writer_ptr, MsAlignWriterPtr ms2_writer_ptr, 
                                 DeconvProcess *deconv_instance_ptr, int **count1, int **count2, int total_scan_num, std::map<int, DeconvMsPtr> *ms1_ptr_map_ptr, std::map<int, DeconvMsPtr> *ms2_ptr_map_ptr){
-  return [ms_group_ptr, deconv_ptr, prec_envs, ms_writer_ptr, ms2_writer_ptr, deconv_instance_ptr, count1, count2, total_scan_num, ms1_ptr_map_ptr, ms2_ptr_map_ptr]() {
+  return [ms_group_ptr, deconv_ptr, prec_envs, deconv_instance_ptr, count1, count2, total_scan_num, ms1_ptr_map_ptr, ms2_ptr_map_ptr]() {
    
    RawMsPtr ms_one_ptr = ms_group_ptr->getMsOnePtr();                            
    RawMsPtrVec ms_two_ptr_vec = ms_group_ptr->getMsTwoPtrVec();
@@ -341,7 +401,7 @@ std::function<void()> geneTask(RawMsGroupPtr ms_group_ptr, DeconvOneSpPtr deconv
    std::stringstream msgStream;
    msgStream << std::flush << msg << "\r";
 
-   deconv_instance_ptr->deconvMsOne(ms_one_ptr, deconv_ptr, prec_envs, ms_writer_ptr, ms1_ptr_map_ptr);
+   deconv_instance_ptr->deconvMsOne(ms_one_ptr, deconv_ptr, prec_envs,ms1_ptr_map_ptr);
   
    count_lock.lock();
    
@@ -356,7 +416,7 @@ std::function<void()> geneTask(RawMsGroupPtr ms_group_ptr, DeconvOneSpPtr deconv
       
       msgStream << std::flush << msg << "\r";
       
-      deconv_instance_ptr->deconvMsTwo(ms_two_ptr, deconv_ptr, ms2_writer_ptr, ms2_ptr_map_ptr);
+      deconv_instance_ptr->deconvMsTwo(ms_two_ptr, deconv_ptr, ms2_ptr_map_ptr);
 
       count_lock.lock();
 
@@ -370,6 +430,8 @@ std::function<void()> geneTask(RawMsGroupPtr ms_group_ptr, DeconvOneSpPtr deconv
 }
 void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr, 
                               RawMsGroupReaderPtr reader_ptr, RawMsGroupReaderPtr reader_pl_ptr, MsAlignWriterPtr ms1_writer_ptr, MsAlignWriterPtr ms2_writer_ptr) {
+
+  auto start = std::chrono::steady_clock::now();
 
   int total_scan_num = reader_ptr->getInputSpNum();
 
@@ -399,7 +461,7 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr,
   ms2_ptr_map_ptr = &ms2_ptr_map;
 
   //generate writer ptr
-
+/*
   std::vector<MsAlignWriterPtr> writer_vec_1;
   std::vector<MsAlignWriterPtr> writer_vec_2;
 
@@ -410,7 +472,7 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr,
     writer_vec_1.push_back(ms1_ptr_);
     writer_vec_2.push_back(ms2_ptr_);
   }
-
+*/
   while (ms_group_ptr != nullptr) {
     while(pool_ptr->getQueueSize() >= thread_num * 2){
         boost::this_thread::sleep(boost::posix_time::milliseconds(100));
@@ -428,25 +490,32 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr,
     std::shared_ptr<DpPara> dp_ptr_new = std::make_shared<DpPara>(*dp_ptr);
 
     DeconvOneSpPtr deconv_ptr_new = std::make_shared<DeconvOneSp>(env_ptr_new, dp_ptr_new);
-    
+    /*
     MsAlignWriterPtr writer_ptr_1 = writer_vec_1[0];
     MsAlignWriterPtr writer_ptr_2 = writer_vec_2[0];
 
     writer_vec_1.erase(writer_vec_1.begin());
     writer_vec_2.erase(writer_vec_2.begin());
-
-    pool_ptr->Enqueue(geneTask(ms_group_ptr, deconv_ptr_new, prec_envs, writer_ptr_1, writer_ptr_2, deconv_instance_ptr, &count1_ptr, &count2_ptr, total_scan_num, ms1_ptr_map_ptr, ms2_ptr_map_ptr));
+*/
+    pool_ptr->Enqueue(geneTask(ms_group_ptr, deconv_ptr_new, prec_envs, deconv_instance_ptr, &count1_ptr, &count2_ptr, total_scan_num, ms1_ptr_map_ptr, ms2_ptr_map_ptr));
     
-    writer_vec_1.push_back(writer_ptr_1);
-    writer_vec_2.push_back(writer_ptr_2);
+    //writer_vec_1.push_back(writer_ptr_1);
+   // writer_vec_2.push_back(writer_ptr_2);
 
     ms_group_ptr = reader_ptr->getNextMsGroupPtr();
   }
   pool_ptr->ShutDown();
 
+  auto deconv_end = std::chrono::steady_clock::now();
+
   writeMsalign(ms1_writer_ptr, ms1_ptr_map);
   writeMsalign(ms2_writer_ptr, ms2_ptr_map);
 
+  auto write_end = std::chrono::steady_clock::now();
+
+  std::cout << "deconv time : " << std::chrono::duration_cast<std::chrono::seconds>(deconv_end-start).count() << std::endl;
+  std::cout << "write time : " << std::chrono::duration_cast<std::chrono::seconds>(write_end-deconv_end).count() << std::endl;
+  std::cout << "total deconv time : " << std::chrono::duration_cast<std::chrono::seconds>(write_end-start).count() << std::endl;
     //auto proc_end = std::chrono::high_resolution_clock::now();
     //auto proc_duration = std::chrono::duration_cast<std::chrono::microseconds>(proc_end-proc_start);
     //std::cout << std::endl << "Process " << proc_duration.count() << std::endl;

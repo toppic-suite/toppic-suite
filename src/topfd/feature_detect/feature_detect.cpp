@@ -15,12 +15,14 @@
 #include <cmath>
 #include <iostream>
 #include <algorithm>
+#include <mutex>
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
 #include "common/util/time_util.hpp"
 #include "common/base/mass_constant.hpp"
 #include "common/base/mod_util.hpp"
+#include "common/thread/simple_thread_pool.hpp"
 #include "seq/fasta_util.hpp"
 #include "seq/fasta_index_reader.hpp"
 #include "ms/spec/peak.hpp"
@@ -44,6 +46,8 @@
 namespace toppic {
 
 namespace feature_detect {
+
+std::mutex feat_id_lock;
 
 bool peakExists (DeconvMsPtrVec &ms1_ptr_vec, DeconvPeakPtr peak) {
   int sp_id = peak->getSpId();
@@ -375,9 +379,12 @@ void findMsOneFeatures(DeconvMsPtrVec &ms1_ptr_vec, PeakPtrVec2D & raw_peaks,
   std::sort(all_peaks.begin(), all_peaks.end(), Peak::cmpInteDec);
   int feat_id = 0;
   size_t peak_idx = 0;
-  while (feat_id < para_ptr->feature_num_ && peak_idx < all_peaks.size()) {
+
+  while (feat_id < 100 && peak_idx < 100) {
     DeconvPeakPtr best_peak = all_peaks[peak_idx];
     if (peakExists(ms1_ptr_vec, best_peak)) {
+		std::cout << "peak_idx: " << peak_idx << std::endl;
+		std::cout << "feat_id : " << feat_id << std::endl; 
       //std::cout << "Find feature " << feat_id << " peak intensity " << best_peak->getIntensity() << std::endl; 
       int ref_sp_id = best_peak->getSpId();
       double prec_mass = best_peak->getPosition();
@@ -543,7 +550,7 @@ void getSampleFeatures(SampleFeaturePtrVec &sample_features, FracFeaturePtrVec &
 }
 
 void process(int frac_id, const std::string &sp_file_name, 
-             bool missing_level_one, const std::string &resource_dir) { 
+             bool missing_level_one, const std::string &resource_dir, int thread_num) { 
   //logger::setLogLevel(2);
   FeatureParaPtr para_ptr 
       = std::make_shared<FeaturePara>(frac_id, sp_file_name, resource_dir);
