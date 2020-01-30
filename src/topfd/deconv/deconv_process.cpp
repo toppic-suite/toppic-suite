@@ -36,7 +36,8 @@
 
 namespace toppic {
 
-std::mutex count_lock;
+std::mutex count1_lock;
+std::mutex count2_lock;
 std::mutex ms1_map_lock;
 std::mutex ms2_map_lock;
 
@@ -54,64 +55,7 @@ DeconvProcess::DeconvProcess(TopfdParaPtr topfd_para_ptr,
   prepareFileFolder();
 
 }
-//merge output files
-//add one entry from each file, check if ID number is in order, if not, check all files to find
-//the entry of next ID number
-/*
-void DeConvProcess::mergeMsFiles(int wrt_ptr_num, int scan_num, std::string msalign_num){
 
-std::vector<std::string>ms_name_vec;
-
-for (int i = 0; i < wrt_ptr_num; i++){
-  ms_name_vec.push_back(msalign_num + std::to_string(i) + ".ms");
-}
-
-std::ofstream msalign{"st_1_ms2_msalign.ms", std::ios_base::app};
-
-MsAlignReader file0(ms_name_vec[0], 1, nullptr, std::set<std::string>());
-MsAlignReader file1(ms_name_vec[1], 1, nullptr, std::set<std::string>());
-MsAlignReader file2(ms_name_vec[2], 1, nullptr, std::set<std::string>());
-MsAlignReader file3(ms_name_vec[3], 1, nullptr, std::set<std::string>());
-MsAlignReader file4(ms_name_vec[4], 1, nullptr, std::set<std::string>());
-MsAlignReader file5(ms_name_vec[5], 1, nullptr, std::set<std::string>());
-MsAlignReader file6(ms_name_vec[6], 1, nullptr, std::set<std::string>());
-MsAlignReader file7(ms_name_vec[7], 1, nullptr, std::set<std::string>());
-
-
-std::ifstream file0{ms_name_vec[0]};
-
-//std::vector<std::string> file0_lines = file0.readOneStrSpectrum();
-
-int line_num_0, line_num_1, line_num_2, line_num_3, line_num_4, line_num_5, line_num_6, line_num_7 = 0;
-bool copy = false;
-
-for (int j = 0; j < scan_num; j++){
-  std::string line;
-
-  while (std::getline(file0, line)) {
-    if (line.substr(0, 3) == "ID="){
-      std::string id_num = line.substr(3);
-
-      if (std::stoi(id_num) == j){//if it is the next spectrum
-        msalign << "BEGIN IONS" << "\n";
-        msalign << line << "\n";
-        copy = true;
-      }
-    }
-    else if (line == "END IONS"){
-      msalign << line << "\n";
-      copy = false;
-      break;
-    }
-    else if (copy == true){
-      msalign << line << "\n";
-    }
-   file0_lines = file0.readOneStrspectrum();
-  }
-}
-//open one file, check id and copy to the new file
-//finish reading and break the loop and go to the next loop (next file)
-}*/
 void DeconvProcess::writeMsalign(MsAlignWriterPtr ms_wtr_ptr, std::map<int, DeconvMsPtr> ms_ptr_map){
   for (int i = 0; i < ms_ptr_map.size(); i++){
     ms_wtr_ptr->write(ms_ptr_map[i]);
