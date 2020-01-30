@@ -113,16 +113,8 @@ for (int j = 0; j < scan_num; j++){
 //finish reading and break the loop and go to the next loop (next file)
 }*/
 void DeconvProcess::writeMsalign(MsAlignWriterPtr ms_wtr_ptr, std::map<int, DeconvMsPtr> ms_ptr_map){
-  std::cout << "write msalign" << std::endl;
-  //std::cout << ms_ptr_list.size() << std::endl;
-  std::cout << ms_wtr_ptr << std::endl;
-
-
-  //sort map 
-  //iterate by int value
-  
   for (int i = 0; i < ms_ptr_map.size(); i++){
-    ms_wtr_ptr->write(ms_ptr_list[i]);
+    ms_wtr_ptr->write(ms_ptr_map[i]);
   }
 }
 
@@ -277,12 +269,11 @@ void DeconvProcess::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   LOG_DEBUG("result num " << prec_envs.size());
 
   DeconvMsPtr deconv_ms_ptr = match_env_util::getDeconvMsPtr(header_ptr, prec_envs);
-
-  ms1_ptr_list_ptr->push_back(deconv_ms_ptr);
   
   int index = header_ptr->getId();
   //(*ms1_ptr_vec_ptr)[index] = deconv_ms_ptr;
   (*ms1_ptr_map_ptr).insert ( std::pair<int, DeconvMsPtr>(index,deconv_ms_ptr) );
+
   if (topfd_para_ptr_->output_match_env_) {
     match_env_writer::write(ms1_env_name_, header_ptr, prec_envs);
   }
@@ -321,7 +312,8 @@ void DeconvProcess::deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
     int index = header_ptr->getId();
     //(*ms2_ptr_vec_ptr)[index] = deconv_ms_ptr;
     (*ms2_ptr_map_ptr).insert ( std::pair<int, DeconvMsPtr>(index,deconv_ms_ptr) );
-    ms2_ptr_list_ptr->write(deconv_ms_ptr);
+    
+    //ms2_writer_ptr->write(deconv_ms_ptr);
 
     if (topfd_para_ptr_->output_match_env_) {
       match_env_writer::write(ms2_env_name_, header_ptr, result_envs);
@@ -443,7 +435,7 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr,
     writer_vec_1.erase(writer_vec_1.begin());
     writer_vec_2.erase(writer_vec_2.begin());
 
-    pool_ptr->Enqueue(geneTask(ms_group_ptr, deconv_ptr_new, prec_envs, writer_ptr_1, writer_ptr_2, deconv_instance_ptr, &count1_ptr, &count2_ptr, total_scan_num, ms1_ptr_map, ms2_ptr_map));
+    pool_ptr->Enqueue(geneTask(ms_group_ptr, deconv_ptr_new, prec_envs, writer_ptr_1, writer_ptr_2, deconv_instance_ptr, &count1_ptr, &count2_ptr, total_scan_num, ms1_ptr_map_ptr, ms2_ptr_map_ptr));
     
     writer_vec_1.push_back(writer_ptr_1);
     writer_vec_2.push_back(writer_ptr_2);
