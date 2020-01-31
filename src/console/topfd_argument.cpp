@@ -82,8 +82,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("merged-file-name,f", po::value<std::string> (&merged_file_name), 
          "Merge deconvoluted files and specify the name of the merged file.")
         ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), 
-         "Spectrum file name with its path.")
-        ;
+         "Spectrum file name with its path.");
 
     po::positional_options_description positional_options;
     positional_options.add("spectrum-file-name", -1);
@@ -162,7 +161,7 @@ bool Argument::parse(int argc, char* argv[]) {
       }
     }
      if (vm.count("thread-number")) {
-      topfd_para_ptr_->thread_number_ = std::stoi(thread_number);
+      topfd_para_ptr_->thread_number_ = thread_number;
     }
   }
   catch(std::exception& e) {
@@ -186,9 +185,9 @@ bool Argument::validateArguments() {
       return false;
     }
   }
-  int thread_number = topfd_para_ptr_->thread_number_;
+  std::string thread_number = topfd_para_ptr_->thread_number_;
   try {
-    int num = thread_number;
+    int num = std::stoi(thread_number.c_str());
     if (num <= 0) {
       LOG_ERROR("Thread number " << thread_number << " error! The value should be positive.");
       return false;
