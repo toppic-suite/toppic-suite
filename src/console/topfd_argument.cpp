@@ -162,7 +162,7 @@ bool Argument::parse(int argc, char* argv[]) {
       }
     }
      if (vm.count("thread-number")) {
-      topfd_para_ptr_->thread_number = thread_number;
+      topfd_para_ptr_->thread_number_ = std::stoi(thread_number);
     }
   }
   catch(std::exception& e) {
@@ -186,9 +186,9 @@ bool Argument::validateArguments() {
       return false;
     }
   }
-  std::string thread_number = topfd_para_ptr_->thread_number;
+  int thread_number = topfd_para_ptr_->thread_number_;
   try {
-    int num = std::stoi(thread_number.c_str());
+    int num = thread_number;
     if (num <= 0) {
       LOG_ERROR("Thread number " << thread_number << " error! The value should be positive.");
       return false;

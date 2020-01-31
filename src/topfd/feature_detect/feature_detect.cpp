@@ -589,9 +589,9 @@ auto ms2_end = std::chrono::steady_clock::now();
   sample_feature_writer::writeFeatures(sample_feature_file_name, sample_features);
   
 auto sample_end = std::chrono::steady_clock::now();
-std::cout << "ms1 time : " << std::chrono::duration_cast<std::chrono::seconds>(ms1_end-start).count() << std::endl;
-std::cout << "ms2 time : " << std::chrono::duration_cast<std::chrono::seconds>(ms2_end-ms1_end).count() << std::endl;
-std::cout << "sample time : " << std::chrono::duration_cast<std::chrono::seconds>(sample_end-ms2_end).count() << std::endl;
+//std::cout << "ms1 time : " << std::chrono::duration_cast<std::chrono::seconds>(ms1_end-start).count() << std::endl;
+//std::cout << "ms2 time : " << std::chrono::duration_cast<std::chrono::seconds>(ms2_end-ms1_end).count() << std::endl;
+//std::cout << "sample time : " << std::chrono::duration_cast<std::chrono::seconds>(sample_end-ms2_end).count() << std::endl;
 
   output_file_name = base_name + "_ms2.feature";
   spec_feature_writer::writeFeatures(output_file_name, ms2_features); 

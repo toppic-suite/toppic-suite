@@ -36,8 +36,7 @@
 
 namespace toppic {
 
-std::mutex count1_lock;
-std::mutex count2_lock;
+std::mutex count_lock;
 std::mutex ms1_map_lock;
 std::mutex ms2_map_lock;
 
@@ -65,6 +64,7 @@ void DeconvProcess::writeMsalign(MsAlignWriterPtr ms_wtr_ptr, std::map<int, Deco
 std::string DeconvProcess::updateMsg(MsHeaderPtr header_ptr, int scan, 
                                      int total_scan_num) {
   std::string percentage = str_util::toString(scan * 100 / total_scan_num);
+
   std::string msg = "Processing spectrum scan " 
       + std::to_string(header_ptr->getFirstScanNum()) + " ...";
   while (msg.length() < 40) {
@@ -334,39 +334,35 @@ void DeconvProcess::deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, std:
 
 //DecovOne & Two
 std::function<void()> geneTask(RawMsGroupPtr ms_group_ptr, DeconvOneSpPtr deconv_ptr, MatchEnvPtrVec prec_envs,
-                                DeconvProcess *deconv_instance_ptr, int **count1, int **count2, int total_scan_num, std::map<int, DeconvMsPtr> *ms1_ptr_map_ptr, std::map<int, DeconvMsPtr> *ms2_ptr_map_ptr){
-  return [ms_group_ptr, deconv_ptr, prec_envs, deconv_instance_ptr, count1, count2, total_scan_num, ms1_ptr_map_ptr, ms2_ptr_map_ptr]() {
+                                DeconvProcess *deconv_instance_ptr, int &count, int total_scan_num, std::map<int, DeconvMsPtr> *ms1_ptr_map_ptr, std::map<int, DeconvMsPtr> *ms2_ptr_map_ptr){
+  return [ms_group_ptr, deconv_ptr, prec_envs, deconv_instance_ptr, &count, total_scan_num, ms1_ptr_map_ptr, ms2_ptr_map_ptr]() {
    
    RawMsPtr ms_one_ptr = ms_group_ptr->getMsOnePtr();                            
    RawMsPtrVec ms_two_ptr_vec = ms_group_ptr->getMsTwoPtrVec();
 
-   std::string msg = deconv_instance_ptr->updateMsg(ms_one_ptr->getMsHeaderPtr(), **count1 + **count2 + 1, total_scan_num);
-   
-   std::stringstream msgStream;
-   msgStream << std::flush << msg << "\r";
-
    deconv_instance_ptr->deconvMsOne(ms_one_ptr, deconv_ptr, prec_envs,ms1_ptr_map_ptr);
-  
+
+   std::string msg = deconv_instance_ptr->updateMsg(ms_one_ptr->getMsHeaderPtr(), count + 1, total_scan_num);
+   std::stringstream msgStream;
+
    count_lock.lock();
-   
+
+   count = count + 1;
    std::cout << msgStream.str();
-   **count1 = **count1 + 1;
-   
    count_lock.unlock();
 
   for (size_t i = 0; i < ms_two_ptr_vec.size(); i++) {
       RawMsPtr ms_two_ptr = ms_two_ptr_vec[i];
-      msg = deconv_instance_ptr->updateMsg(ms_two_ptr->getMsHeaderPtr(), **count1 + **count2 + 1, total_scan_num);
       
+      msg = deconv_instance_ptr->updateMsg(ms_two_ptr->getMsHeaderPtr(), count + 1, total_scan_num);
+
       msgStream << std::flush << msg << "\r";
       
       deconv_instance_ptr->deconvMsTwo(ms_two_ptr, deconv_ptr, ms2_ptr_map_ptr);
 
       count_lock.lock();
-
+      count = count + 1;
       std::cout << msgStream.str();
-      **count2 = **count2 + 1;
-
       count_lock.unlock();
   }
     
@@ -386,12 +382,6 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr,
   int count1 = 0;
   int count2 = 0;
 
-  int *count1_ptr;
-  int *count2_ptr;
-
-  count1_ptr = &count1;
-  count2_ptr = &count2;
-
   SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(thread_num);  
 
   //generate vector that contains msalign writing information
@@ -404,19 +394,6 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr,
   std::map<int, DeconvMsPtr> *ms2_ptr_map_ptr;
   ms2_ptr_map_ptr = &ms2_ptr_map;
 
-  //generate writer ptr
-/*
-  std::vector<MsAlignWriterPtr> writer_vec_1;
-  std::vector<MsAlignWriterPtr> writer_vec_2;
-
-  for (int i = 0; i < 8; i++){//change if 8 files are too small
-    MsAlignWriterPtr ms1_ptr_ = std::make_shared<MsAlignWriter>("msalign_1_" + std::to_string(i) + ".ms");
-    MsAlignWriterPtr ms2_ptr_ = std::make_shared<MsAlignWriter>("msalign_2_" + std::to_string(i) + ".ms");
-  
-    writer_vec_1.push_back(ms1_ptr_);
-    writer_vec_2.push_back(ms2_ptr_);
-  }
-*/
   while (ms_group_ptr != nullptr) {
     while(pool_ptr->getQueueSize() >= thread_num * 2){
         boost::this_thread::sleep(boost::posix_time::milliseconds(100));
@@ -434,18 +411,9 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr,
     std::shared_ptr<DpPara> dp_ptr_new = std::make_shared<DpPara>(*dp_ptr);
 
     DeconvOneSpPtr deconv_ptr_new = std::make_shared<DeconvOneSp>(env_ptr_new, dp_ptr_new);
-    /*
-    MsAlignWriterPtr writer_ptr_1 = writer_vec_1[0];
-    MsAlignWriterPtr writer_ptr_2 = writer_vec_2[0];
 
-    writer_vec_1.erase(writer_vec_1.begin());
-    writer_vec_2.erase(writer_vec_2.begin());
-*/
-    pool_ptr->Enqueue(geneTask(ms_group_ptr, deconv_ptr_new, prec_envs, deconv_instance_ptr, &count1_ptr, &count2_ptr, total_scan_num, ms1_ptr_map_ptr, ms2_ptr_map_ptr));
+    pool_ptr->Enqueue(geneTask(ms_group_ptr, deconv_ptr_new, prec_envs, deconv_instance_ptr, count1, total_scan_num, ms1_ptr_map_ptr, ms2_ptr_map_ptr));
     
-    //writer_vec_1.push_back(writer_ptr_1);
-   // writer_vec_2.push_back(writer_ptr_2);
-
     ms_group_ptr = reader_ptr->getNextMsGroupPtr();
   }
   pool_ptr->ShutDown();
@@ -457,9 +425,10 @@ void DeconvProcess::processSp(DeconvOneSpPtr deconv_ptr,
 
   auto write_end = std::chrono::steady_clock::now();
 
-  std::cout << "deconv time : " << std::chrono::duration_cast<std::chrono::seconds>(deconv_end-start).count() << std::endl;
-  std::cout << "write time : " << std::chrono::duration_cast<std::chrono::seconds>(write_end-deconv_end).count() << std::endl;
-  std::cout << "total deconv time : " << std::chrono::duration_cast<std::chrono::seconds>(write_end-start).count() << std::endl;
+  //std::cout << "deconv time : " << std::chrono::duration_cast<std::chrono::seconds>(deconv_end-start).count() << std::endl;
+  //std::cout << "write time : " << std::chrono::duration_cast<std::chrono::seconds>(write_end-deconv_end).count() << std::endl;
+  //std::cout << "total deconv time : " << std::chrono::duration_cast<std::chrono::seconds>(write_end-start).count() << std::endl;
+  
     //auto proc_end = std::chrono::high_resolution_clock::now();
     //auto proc_duration = std::chrono::duration_cast<std::chrono::microseconds>(proc_end-proc_start);
     //std::cout << std::endl << "Process " << proc_duration.count() << std::endl;
