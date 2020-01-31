@@ -484,6 +484,9 @@ void getMs2Features(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtrVec &header_ptr_vec,
   for (size_t i = 0; i < sorted_ptrs.size(); i++) {
     MsHeaderPtr header = sorted_ptrs[i];
     FracFeaturePtr ft_ptr = getMatchedFeaturePtr(features, header, para_ptr);
+
+    
+
     if (ft_ptr != nullptr) {
       SpecFeaturePtr ms2_feature = std::make_shared<SpecFeature>(header, ft_ptr);
       ms2_features.push_back(ms2_feature);
@@ -494,9 +497,14 @@ void getMs2Features(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtrVec &header_ptr_vec,
       double prec_mass = header->getPrecMonoMass();
       if (prec_mass > 0) {
         int feat_id = static_cast<int>(features.size());
+
+        std::cout << "is feature_ptr the problem" << std::endl;
+
         DeconvPeakPtrVec matched_peaks;
         FracFeaturePtr feature_ptr = getFeature(sp_id, prec_mass, feat_id, ms1_ptr_vec,
                                                 matched_peaks, para_ptr);
+        std::cout << "no" << std::endl;
+
         // if we find a feature in ms1.msalign
         // it is possible that some ms headers do not have matched features. 
         if (feature_ptr != nullptr) {
@@ -561,16 +569,24 @@ void process(int frac_id, const std::string &sp_file_name,
     raw_reader_ptr = nullptr;
     findMsOneFeatures(ms1_ptr_vec, raw_peaks, para_ptr, frac_features, env_para_ptr);
   }
+  std::cout << "---missng level one so skip to here " << std::endl;
 
   LOG_DEBUG("start reading ms2");
   std::string ms2_file_name = base_name + "_ms2.msalign";
   MsHeaderPtrVec header_ptr_vec;
   readHeaders(ms2_file_name, header_ptr_vec);
+
+  std::cout << "---header read" << std::endl;
+
   SpecFeaturePtrVec ms2_features;
   getMs2Features(ms1_ptr_vec, header_ptr_vec, frac_features, para_ptr, ms2_features);
 
+  std::cout << "ms2 finished " << std::endl;
+
   SampleFeaturePtrVec sample_features;
   getSampleFeatures(sample_features, frac_features, ms2_features);
+
+  std::cout << "sample finished " << std::endl;
 
   std::string output_file_name = base_name + "_feature.xml";
   frac_feature_writer::writeXmlFeatures(output_file_name, frac_features);

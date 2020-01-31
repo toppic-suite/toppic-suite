@@ -157,7 +157,6 @@ void DeconvProcess::deconvMissingMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_pt
   ms2_map_lock.lock();
   (*ms1_missing_map_ptr).insert ( std::pair<int, DeconvMsPtr>(index,deconv_ms_ptr) );
   ms2_map_lock.unlock();
-  //ms2_writer_ptr->write(ms_ptr);
 
   if (topfd_para_ptr_->output_match_env_) {
     match_env_writer::write(ms2_env_name_, header_ptr, result_envs);
