@@ -45,37 +45,25 @@ MassZeroPtmFilter::MassZeroPtmFilter(const ProteoformPtrVec &proteo_ptrs,
  bool indexFilesExist = true;
 
   for (size_t t = 0; t < TopIndexFile.zero_ptm_file_vec.size(); t++){
-    if (!file_util::exists(indexDirName + "/" + TopIndexFile.zero_ptm_file_vec[t] + parameters + block_str)){
+    if (!file_util::exists(indexDirName + file_util::getFileSeparator() + TopIndexFile.zero_ptm_file_vec[t] + parameters + block_str)){
       indexFilesExist = false;//if any of the index files for this ptm is missing
       break; 
     }
   }
 
   if (indexFilesExist){
-    std::cout << "Loading index files -- started" << std::endl;
+    std::cout << "Loading index files                            " << std::endl;
 
     term_index_ptr_ = std::make_shared<MassMatch>();
     diag_index_ptr_ = std::make_shared<MassMatch>();
     rev_term_index_ptr_ = std::make_shared<MassMatch>();
     rev_diag_index_ptr_ = std::make_shared<MassMatch>();
 
-    term_index_ptr_->setfileName(TopIndexFile.zero_ptm_file_vec[0] + parameters + block_str);
-    diag_index_ptr_->setfileName(TopIndexFile.zero_ptm_file_vec[1] + parameters + block_str);
-    rev_term_index_ptr_->setfileName(TopIndexFile.zero_ptm_file_vec[2] + parameters + block_str);
-    rev_diag_index_ptr_->setfileName(TopIndexFile.zero_ptm_file_vec[3] + parameters + block_str);
+    term_index_ptr_->deserializeMassMatch(TopIndexFile.zero_ptm_file_vec[0] + parameters + block_str, indexDirName);
+    diag_index_ptr_->deserializeMassMatch(TopIndexFile.zero_ptm_file_vec[1] + parameters + block_str, indexDirName);
+    rev_term_index_ptr_->deserializeMassMatch(TopIndexFile.zero_ptm_file_vec[2] + parameters + block_str, indexDirName);
+    rev_diag_index_ptr_->deserializeMassMatch(TopIndexFile.zero_ptm_file_vec[3] + parameters + block_str, indexDirName);
 
-    term_index_ptr_->setDirName(indexDirName);
-    diag_index_ptr_->setDirName(indexDirName);
-    rev_term_index_ptr_->setDirName(indexDirName);
-    rev_diag_index_ptr_->setDirName(indexDirName);
-
-    term_index_ptr_->deserializeMassMatch();
-    diag_index_ptr_->deserializeMassMatch();
-    rev_term_index_ptr_->deserializeMassMatch();
-    rev_diag_index_ptr_->deserializeMassMatch();
-
-    std::cout << "Loading index files -- finished";
-    std::cout << std::endl; 
   }
   
   else{

@@ -56,22 +56,12 @@ MassZeroPtmIndex::MassZeroPtmIndex(const ProteoformPtrVec &proteo_ptrs,
                                                                  mng_ptr->max_proteoform_mass_,
                                                                  mng_ptr->filter_scale_);
 
-  term_index_ptr_->setfileName(file_vec[0]);
-  diag_index_ptr_->setfileName(file_vec[1]);
-  rev_term_index_ptr_->setfileName(file_vec[2]);
-  rev_diag_index_ptr_->setfileName(file_vec[3]);
-
   std::string dirName = mng_ptr_->prsm_para_ptr_->getOriDbName() + "_idx";
 
-  term_index_ptr_->setDirName(dirName);
-  diag_index_ptr_->setDirName(dirName);
-  rev_term_index_ptr_->setDirName(dirName);
-  rev_diag_index_ptr_->setDirName(dirName);
-
-  term_index_ptr_->serializeMassMatch();
-  diag_index_ptr_->serializeMassMatch();
-  rev_term_index_ptr_->serializeMassMatch();
-  rev_diag_index_ptr_->serializeMassMatch();     
+  term_index_ptr_->serializeMassMatch(file_vec[0], dirName);
+  diag_index_ptr_->serializeMassMatch(file_vec[1], dirName);
+  rev_term_index_ptr_->serializeMassMatch(file_vec[2], dirName);
+  rev_diag_index_ptr_->serializeMassMatch(file_vec[3], dirName);     
                                                        
 }
 } /* namespace toppic */

@@ -47,7 +47,7 @@ inline void filterBlock(const ProteoformPtrVec & raw_forms,
   auto start = std::chrono::steady_clock::now();
   MassZeroPtmFilterPtr filter_ptr = std::make_shared<MassZeroPtmFilter>(raw_forms, mng_ptr, block_str);
   auto end = std::chrono::steady_clock::now();
-  std::cout << "zero_ptm process time: " << std::chrono::duration_cast<std::chrono::seconds>(end-start).count() << " sec" << std::endl;
+  //std::cout << "zero_ptm process time: " << std::chrono::duration_cast<std::chrono::seconds>(end-start).count() << " sec" << std::endl;
 
   PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
   SpParaPtr sp_para_ptr = prsm_para_ptr->getSpParaPtr();
@@ -142,8 +142,7 @@ inline void createIndexFiles(const ProteoformPtrVec & raw_forms,
                         
     std::string block_str = str_util::toString(block_idx);
     PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
-    //index file names
-    //naming = fixed mod + n terminal + activation + error tolerance + decoy + block number
+    //index file names = fixed mod + n terminal + activation + error tolerance + decoy + block number
     
     TopIndexFileName TopIndexFile;
     std::string parameters = TopIndexFile.gene_file_name(prsm_para_ptr);
