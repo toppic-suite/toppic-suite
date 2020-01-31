@@ -45,24 +45,22 @@ MassDiagFilter::MassDiagFilter(const ProteoformPtrVec &proteo_ptrs,
   bool indexFilesExist = true;
 
   for (size_t t = 0; t < TopIndexFile.multi_ptm_file_vec.size(); t++){
-    if (!file_util::exists(indexDirName + "/" + TopIndexFile.multi_ptm_file_vec[t] + parameters + block_str)){
+    if (!file_util::exists(indexDirName + file_util::getFileSeparator() + TopIndexFile.multi_ptm_file_vec[t] + parameters + block_str)){
       indexFilesExist = false;//if any of the index files for this ptm is missing
       break; 
     }
   }
 
-  if (indexFilesExist){ std::cout << "Loading index files -- started" << std::endl;
+  if (indexFilesExist){ 
+    std::cout << "Loading index files                            " << std::endl;
     index_ptr_ = std::make_shared<MassMatch>();
 
     TopIndexFileName TopIndexFile;
     std::string parameters = TopIndexFile.gene_file_name(prsm_para_ptr);
+    std::string fileName = TopIndexFile.multi_ptm_file_vec[0] + parameters + block_str;
 
-    index_ptr_->setfileName(TopIndexFile.multi_ptm_file_vec[0] + parameters + block_str);
-    index_ptr_->setDirName(indexDirName);
-    index_ptr_->deserializeMassMatch();
+    index_ptr_->deserializeMassMatch(fileName, indexDirName);
 
-    std::cout << "Loading index files -- finished" << std::endl;
-    std::cout << std::flush; 
   }
   else{
     index_ptr_ = MassMatchFactory::getPrmDiagMassMatchPtr(proteo_ptrs,

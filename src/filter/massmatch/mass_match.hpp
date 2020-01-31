@@ -46,10 +46,10 @@ class MassMatch {
                        const std::pair<int, int> &prec_minus_water_mass_error,
                        std::vector<short> &scores);
 
-  //void serializeMassMatch();
-  void serializeMassMatch();
-  //void deserializeMassMatch(MassMatch **m);
-  void deserializeMassMatch();
+
+  void serializeMassMatch(std::string fileName, std::string dirName);
+
+  void deserializeMassMatch(std::string fileName, std::string dirName);
 
   int getProtNum() {return proteo_num_;}
 

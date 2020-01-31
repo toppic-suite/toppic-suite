@@ -74,11 +74,9 @@ MassMatch::MassMatch(std::vector<std::vector<int>> &mass_2d,
   initIndexes(mass_2d, real_shift_2d, pos_2d);
   prm_ = prm;
 }
-void MassMatch::serializeMassMatch(){
-  std::string fileName = this->getFileName();
-  std::string dirName = this->getDirName();
-
-  std::ofstream newFile(fileName, std::ofstream::binary);
+void MassMatch::serializeMassMatch(std::string fileName, std::string dirName){
+  std::string filePath = dirName + file_util::getFileSeparator() + fileName;
+  std::ofstream newFile(filePath, std::ofstream::binary);
 
   if(newFile.is_open()){
     boost::archive::binary_oarchive oa(newFile, std::ios::binary);
@@ -98,18 +96,12 @@ void MassMatch::serializeMassMatch(){
 
     newFile.close();
   }
- 
-  if (dirName != ""){
-    file_util::moveFile(fileName, dirName);
-  }
+
 }
 
- void MassMatch::deserializeMassMatch(){
-  std::string dirName = this->getDirName();
-
-  std::string fileName = dirName + "/" + this->getFileName();
-
-  std::ifstream fileToRead(fileName, std::ifstream::binary);
+ void MassMatch::deserializeMassMatch(std::string fileName, std::string dirName){
+  std::string filePath = dirName + file_util::getFileSeparator() + fileName;
+  std::ifstream fileToRead(filePath, std::ifstream::binary);
 
   if (fileToRead.is_open()) {
 

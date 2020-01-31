@@ -37,13 +37,10 @@ MassDiagIndex::MassDiagIndex(const ProteoformPtrVec &proteo_ptrs,
   TopIndexFileName TopIndexFile;  
   std::string parameters = TopIndexFile.gene_file_name(prsm_para_ptr);
 
-  index_ptr_->setfileName(TopIndexFile.multi_ptm_file_vec[0] + parameters + block_str);
-
   std::string dirName = mng_ptr_->prsm_para_ptr_->getOriDbName() + "_idx";
+  std::string fileName = TopIndexFile.multi_ptm_file_vec[0] + parameters + block_str;
 
-  index_ptr_->setDirName(dirName);
-
-  index_ptr_->serializeMassMatch();
+  index_ptr_->serializeMassMatch(fileName, dirName);
 
 }
 
