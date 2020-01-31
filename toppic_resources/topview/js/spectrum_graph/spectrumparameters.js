@@ -1,6 +1,6 @@
 /*	Get data from global variable spectrum_data and utilities to manupulate----
  * 	the data-------------------------------------------------------------------*/
-SpectrumParameters = function(peakdata) {
+SpectrumParameters = function() {
   /*assign the mono m/z value when clicked on mono m/z*/
   this.minMz ;
   this.maxMz ;

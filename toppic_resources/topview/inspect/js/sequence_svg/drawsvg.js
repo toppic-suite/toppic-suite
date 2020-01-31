@@ -329,7 +329,7 @@ function MassShift(thisElem,MassShift,position)
 }
 
 function addColorsToDropdown(){
-	let colors = ["red","green","yellow","blue","white"]
+	let colors = ["white","green","yellow","blue","red"]
 	let startStatement = "<select id=\"tooltip_color\" style=\"background-color:"+colors[0]+"\">";
 	let endStatement = "</select>";
 	let stringyfyingHTML = startStatement;
