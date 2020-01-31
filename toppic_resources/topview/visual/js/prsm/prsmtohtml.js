@@ -434,15 +434,6 @@ function buttonsAndAlerts(para,prsm,id)
 		{
 			para.show_skipped_lines = false ;
 		}
-		/*
-		if(document.getElementById("svg_background").checked)
-		{
-			para.svgBackground_color = "white" ;
-		}
-		else
-		{
-			para.svgBackground_color = "none" ;
-		}*/
 		/*	Redraw the svg with new dimension parameters*/
 		prsm = prsm_data.prsm ;
 		[para,id] = buildSvg(para,prsm,id);
@@ -467,7 +458,6 @@ function buttonsAndAlerts(para,prsm,id)
 	});	
 }
 function popupnamewindow(type,id,x,y){
-	console.log("in popup : ", id);
 	d3.selectAll("#tooltip_imagename").remove() ;
 	var div = d3.select("body").append("div")
 	.attr("class", "tooltip")
@@ -509,10 +499,9 @@ function popupnamewindow(type,id,x,y){
 			d3.selectAll("#tooltip_imagename").remove() ;
 			let l_svgContainer = d3.select("#"+id);
 			let svgString = getSVGString(l_svgContainer.node());
-			let svg_element = document.getElementById(id);
-			let bBox = svg_element.getBBox();
-			let width = bBox.width;
-			let height = bBox.height ;
+			let specParams =  new SpectrumParameters();
+			let width = specParams.svgWidth;
+			let height = specParams.svgHeight ;
 			svgString2Image( svgString, 2*width, 2*height, 'png', save ); 
 			function save( dataBlob, filesize ){
 				saveAs( dataBlob, imagename ); 
