@@ -49,12 +49,13 @@ class DeconvProcess {
       return env_para_ptr_;
   }
   void deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
-                   MatchEnvPtrVec prec_envs, std::map<int, DeconvMsPtr> *ms1_ptr_map_ptr); 
+                   MatchEnvPtrVec prec_envs, MsAlignWriterPtr ms1_writer_ptr, std::map<int, DeconvMsPtr> *ms1_ptr_map_ptr); 
 
-  void deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, std::map<int, DeconvMsPtr> *ms2_ptr_map_ptr); 
-
-  void deconvMissingMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, std::map<int, DeconvMsPtr> *ms1_missing_map_ptr);                  
+  void deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
+                   MsAlignWriterPtr ms2_writer_ptr, std::map<int, DeconvMsPtr> *ms2_ptr_map_ptr); 
                    
+  void deconvMissingMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, std::map<int, DeconvMsPtr> *ms1_missing_map_ptr);            
+
   std::string updateMsg(MsHeaderPtr header_ptr, int scan, int total_scan_num);
 
   void writeMsalign(MsAlignWriterPtr ms_wtr_ptr, std::map<int, DeconvMsPtr> ms_ptr_map_ptr);

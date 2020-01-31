@@ -15,7 +15,6 @@
 #include <cmath>
 #include <iostream>
 #include <algorithm>
-#include <chrono>
 
 #include "common/util/logger.hpp"
 #include "common/util/file_util.hpp"
@@ -376,12 +375,9 @@ void findMsOneFeatures(DeconvMsPtrVec &ms1_ptr_vec, PeakPtrVec2D & raw_peaks,
   std::sort(all_peaks.begin(), all_peaks.end(), Peak::cmpInteDec);
   int feat_id = 0;
   size_t peak_idx = 0;
-
-  while (feat_id < 100 && peak_idx < 100) {
+  while (feat_id < para_ptr->feature_num_ && peak_idx < all_peaks.size()) {
     DeconvPeakPtr best_peak = all_peaks[peak_idx];
     if (peakExists(ms1_ptr_vec, best_peak)) {
-		//std::cout << "peak_idx: " << peak_idx << std::endl;
-		//std::cout << "feat_id : " << feat_id << std::endl; 
       //std::cout << "Find feature " << feat_id << " peak intensity " << best_peak->getIntensity() << std::endl; 
       int ref_sp_id = best_peak->getSpId();
       double prec_mass = best_peak->getPosition();
@@ -549,7 +545,6 @@ void getSampleFeatures(SampleFeaturePtrVec &sample_features, FracFeaturePtrVec &
 void process(int frac_id, const std::string &sp_file_name, 
              bool missing_level_one, const std::string &resource_dir) { 
   //logger::setLogLevel(2);
-  auto start = std::chrono::steady_clock::now();
   FeatureParaPtr para_ptr 
       = std::make_shared<FeaturePara>(frac_id, sp_file_name, resource_dir);
   EnvParaPtr env_para_ptr = std::make_shared<EnvPara>();
@@ -566,8 +561,6 @@ void process(int frac_id, const std::string &sp_file_name,
     raw_reader_ptr = nullptr;
     findMsOneFeatures(ms1_ptr_vec, raw_peaks, para_ptr, frac_features, env_para_ptr);
   }
-  
-auto ms1_end = std::chrono::steady_clock::now();
 
   LOG_DEBUG("start reading ms2");
   std::string ms2_file_name = base_name + "_ms2.msalign";
@@ -575,8 +568,6 @@ auto ms1_end = std::chrono::steady_clock::now();
   readHeaders(ms2_file_name, header_ptr_vec);
   SpecFeaturePtrVec ms2_features;
   getMs2Features(ms1_ptr_vec, header_ptr_vec, frac_features, para_ptr, ms2_features);
-
-auto ms2_end = std::chrono::steady_clock::now();
 
   SampleFeaturePtrVec sample_features;
   getSampleFeatures(sample_features, frac_features, ms2_features);
@@ -587,11 +578,6 @@ auto ms2_end = std::chrono::steady_clock::now();
   frac_feature_writer::writeBatMassFeatures(batmass_file_name, frac_features);
   std::string sample_feature_file_name = base_name + "_ms1.feature";
   sample_feature_writer::writeFeatures(sample_feature_file_name, sample_features);
-  
-auto sample_end = std::chrono::steady_clock::now();
-//std::cout << "ms1 time : " << std::chrono::duration_cast<std::chrono::seconds>(ms1_end-start).count() << std::endl;
-//std::cout << "ms2 time : " << std::chrono::duration_cast<std::chrono::seconds>(ms2_end-ms1_end).count() << std::endl;
-//std::cout << "sample time : " << std::chrono::duration_cast<std::chrono::seconds>(sample_end-ms2_end).count() << std::endl;
 
   output_file_name = base_name + "_ms2.feature";
   spec_feature_writer::writeFeatures(output_file_name, ms2_features); 

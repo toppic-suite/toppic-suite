@@ -46,8 +46,8 @@ TopFDDialog::TopFDDialog(QWidget *parent) :
       QRegExpValidator *validator2 = new QRegExpValidator(rx2, this);
       ui->ms1snRatioEdit->setValidator(validator2);
       ui->ms2snRatioEdit->setValidator(validator2);
-      ui->threadNumberEdit->setValidator(new QIntValidator(0, 2147483647, this));
       QRegExp rx3("^\\d{1,4}\\.\\d{0,2}|10000$");
+      ui->threadNumberEdit->setValidator(new QIntValidator(0, 2147483647, this));
       QRegExpValidator *validator3 = new QRegExpValidator(rx3, this);
       ui->windowSizeEdit->setValidator(validator3);
       QFont font;
@@ -279,10 +279,9 @@ toppic::TopfdParaPtr TopFDDialog::getParaPtr() {
   para_ptr_->mz_error_ = std::stod(ui->mzErrorEdit->text().toStdString());
   para_ptr_->ms_one_sn_ratio_ = std::stod(ui->ms1snRatioEdit->text().toStdString());
   para_ptr_->ms_two_sn_ratio_ = std::stod(ui->ms2snRatioEdit->text().toStdString());
-  para_ptr_->thread_number_ = std::stoi(ui->threadNumberEdit->text().toStdString());
   para_ptr_->prec_window_ = std::stod(ui->windowSizeEdit->text().toStdString());
   para_ptr_->missing_level_one_ = ui->missLevelOneCheckBox->isChecked(); 
-  para_ptr_->merge_files_ = false;
+  para_ptr_->thread_number_ = ui->threadNumberEdit->text().toStdString();
   para_ptr_->merge_files_ = false;
   //para_ptr_->merge_files_ = ui->mergeCheckBox->isChecked();
   //para_ptr_->merged_file_name_ = ui->mergedFilenameLineEdit->text().toStdString();
