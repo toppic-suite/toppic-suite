@@ -498,13 +498,9 @@ void getMs2Features(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtrVec &header_ptr_vec,
       if (prec_mass > 0) {
         int feat_id = static_cast<int>(features.size());
 
-        std::cout << "is feature_ptr the problem" << std::endl;
-
         DeconvPeakPtrVec matched_peaks;
         FracFeaturePtr feature_ptr = getFeature(sp_id, prec_mass, feat_id, ms1_ptr_vec,
                                                 matched_peaks, para_ptr);
-        std::cout << "no" << std::endl;
-
         // if we find a feature in ms1.msalign
         // it is possible that some ms headers do not have matched features. 
         if (feature_ptr != nullptr) {

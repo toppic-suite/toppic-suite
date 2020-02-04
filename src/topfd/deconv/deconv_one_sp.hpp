@@ -41,8 +41,8 @@ class DeconvOneSp {
 
   MatchEnvPtrVec postprocess(MatchEnvPtrVec  &dp_envs);
 
-  EnvParaPtr getEnvPara(){return env_para_ptr_;}
-  DpParaPtr getDpPara(){return dp_para_ptr_;}
+  EnvParaPtr getEnvParaPtr(){return env_para_ptr_;}
+  DpParaPtr getDpParaPtr(){return dp_para_ptr_;}
 
  private:
   EnvParaPtr env_para_ptr_;
