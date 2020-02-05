@@ -102,36 +102,28 @@ $(document).ready(function(){
 		/* Create peaks data into table content */
 		createTableElements();
 		buttons();
+		let scanIds = prsm_data.prsm.ms.ms_header.scans.split(" ");
+		let specIds = prsm_data.prsm.ms.ms_header.ids.split(" ");
+		setDropDownItemsForInspectButton(scanIds,specIds);
+		onClickToInspect();
 
 		//Getting Ms1 Ids
 		let ms1_ids = prsm_data.prsm.ms.ms_header.ms1_ids ;
 		let ms1_id_1 = ms1_ids.split(" ");
-		// //let ms1_id_2 = ms1_ids.split(" ")[1];
-		// //Getting Ms1 Scan Ids
+		let scanIdList_1 = prsm_data.prsm.ms.ms_header.ms1_scans.split(" ");
+		scanIdList_1 = MultiScanObj.getUniqueScanIdList(scanIdList_1);
 		let ms1_uniqueList = MultiScanObj.getUniqueScanIdList(ms1_id_1);
-		MultiScanObj.promiseLoadDataJS(ms1_uniqueList,"ms1_json").then(scanListWithData => {
-			ms1_ScansWithData = scanListWithData;
-			MultiScanObj.createMs1NavEements(scanListWithData,"popupspectrum");
-			let current_data = ms1_ScansWithData[0].value;
-			let prec_mz = prsm_data.prsm.ms.ms_header.precursor_mz;
-			generateCorrespondingGraph(current_data,"popupspectrum",prec_mz);
-			document.getElementById("popup_dataLoading").remove(); 
-		// 	buttons();
-		})
-		//let ms1_scan_2 = ms1_scans.split(" ")[1];
+		MultiScanObj.promiseLoadDataJS(ms1_uniqueList,scanIdList_1,"ms1_json")
 
-		let ms2_scanListWithData = [];
 		let ms2_ids = prsm_data.prsm.ms.ms_header.ids;
-    	let ms2_id_list = ms2_ids.split(" ");
+		let ms2_id_list = ms2_ids.split(" ");
+		let scanIdList = prsm_data.prsm.ms.ms_header.scans.split(" ");
+		scanIdList = MultiScanObj.getUniqueScanIdList(scanIdList);
 		let ms2_uniqueList = MultiScanObj.getUniqueScanIdList(ms2_id_list);
-		MultiScanObj.promiseLoadDataJS(ms2_uniqueList,"ms2_json").then(scanListWithData => {
-			ms2_ScansWithData = scanListWithData;
-			MultiScanObj.createMs2NavEements(scanListWithData,"ms2svg");
-			let current_data = ms2_ScansWithData[0].value;
-			generateCorrespondingGraph(current_data,"ms2svg",null);
-			document.getElementById("dataLoading").remove();
-			scanbuttons();
-		})
+		MultiScanObj.promiseLoadDataJS(ms2_uniqueList,scanIdList,"ms2_json")
+		console.log("in main ms2_uniqueList : ", ms2_uniqueList);
+		
+		
 	}
 })
 
@@ -149,9 +141,17 @@ $(document).ready(function(){
 	<div class="col-10">
 			<h2 id = "Protein-Spectrum-Match-Id-SpecId" ></h2>
 	</div>
-	<div class="col-2">
-		<button id="topview" type="button" class="btn btn-primary btn-sm"
-      onclick="onclickTopView()">Inspect</button>
+	<div class="col-2" align = "right">
+		<div class="dropdown dropdownscanlist">
+			<button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" id="scanList">
+				Inspect
+			</button>
+			<div class="dropdown-menu">
+			</div>
+		</div>
+		  
+		<!-- <button id="topview" type="button" class="btn btn-primary btn-sm"
+      		onclick="onclickTopView()">Inspect</button> -->
 	</div>
 </div>
 

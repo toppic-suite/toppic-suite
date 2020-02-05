@@ -79,22 +79,3 @@ function hideSpectrum(){
 	document.getElementById("graph_download").style.display = "none";
 	document.getElementById("ms2svg_div").style.display = "none";
 }
-function scanbuttons(){
-	//ms2_scanIds is the Id of the nav tabs for multiple navs
-	$(".ms2_scanIds").click(function(){
-		let value = this.getAttribute('value')
-		let len = ms2_ScansWithData.length;
-		let currentData = getCurrentData(ms2_ScansWithData,value);
-		generateCorrespondingGraph(currentData,"ms2svg",null);
-		$("#ms2_graph_nav .active").removeClass("active");
-   		$(this).addClass("active");
-	})
-	$(".ms1_scanIds").click(function(){
-		let value = this.getAttribute('value')
-		let len = ms1_ScansWithData.length;
-		let currentData = getCurrentData(ms1_ScansWithData,value);
-		generateCorrespondingGraph(currentData,"popupspectrum",null);
-		$("#ms1_graph_nav .active").removeClass("active");
-   		$(this).addClass("active");
-	})
-}
