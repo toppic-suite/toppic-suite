@@ -201,3 +201,12 @@ svg.l_popup_svg{
 	background-color: #343a40!important;
 	color:white !important;
 }
+.dropdownscanlist .dropdown-menu {
+  min-width: 7.5rem !important;
+}
+.dropdown-toggle::after{
+  background-color: teal !important;
+}
+.btn:active {
+  outline-color: red !important;
+}
