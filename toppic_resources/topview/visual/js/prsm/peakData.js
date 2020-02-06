@@ -50,5 +50,21 @@ PeakData = function() {
         }
         return envelopList;
     }
+    this.getIonData = function(prsm_data,specId){
+        let ionData = [];
+        prsm_data.prsm.ms.peaks.peak.forEach(function(element){
+            let ion = "";
+            if(element.hasOwnProperty('matched_ions_num'))
+            {   
+                ion = element.matched_ions.matched_ion.ion_type + element.matched_ions.matched_ion.ion_position;
+            }
+            if(element.spec_id == specId)
+            {
+                ionDataTemp = {"mz":parseFloat(element.monoisotopic_mz),"intensity":parseFloat(element.intensity),"ion":ion};
+                ionData.push(ionDataTemp);
+            }
+        });
+        return ionData;
+    }
 
 }

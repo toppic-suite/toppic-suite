@@ -1,6 +1,11 @@
 /*	Get data from global variable spectrum_data and utilities to manupulate----
  * 	the data-------------------------------------------------------------------*/
 SpectrumParameters = function() {
+  /* Attributes to decide what to be shown on the graph */
+  this.showPeaks = "Y";
+  this.showCircles = "Y";
+  this.showIons = "Y";
+  
   /*assign the mono m/z value when clicked on mono m/z*/
   this.minMz ;
   this.maxMz ;

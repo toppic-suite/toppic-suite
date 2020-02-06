@@ -8,9 +8,9 @@ function buttons(){
 		let peak_value = parseFloat(this.innerHTML).toFixed(3) ;
 		console.log("ms2_ScansWithData in buttons: ", ms2_ScansWithData);
 		console.log("CurrentScanVal : ", CurrentScanVal);
-		let currentData = getCurrentData(ms2_ScansWithData,CurrentScanVal);
+		let [currentData,specId] = getCurrentData(ms2_ScansWithData,CurrentScanVal);
 		console.log("currentData : ", currentData);
-		generateCorrespondingGraph(currentData,"ms2svg",peak_value);
+		generateCorrespondingGraph(currentData,"ms2svg",peak_value,specId);
 		activateCurrentnavbar("ms2_graph_nav",CurrentScanVal)
 		showSpectrun();
 	});
