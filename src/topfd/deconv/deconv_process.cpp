@@ -22,6 +22,8 @@
 #include "ms/spec/msalign_reader.hpp"
 #include "ms/spec/msalign_writer.hpp"
 #include "ms/spec/baseline_util.hpp"
+#include "ms/spec/msalign_reader.hpp"
+
 #include "ms/env/env_base.hpp"
 #include "ms/env/match_env_util.hpp"
 #include "ms/env/match_env_writer.hpp"
@@ -225,6 +227,34 @@ void DeconvProcess::processSpMissingLevelOne(DeconvOneSpPtr deconv_ptr, RawMsGro
   std::cout << std::endl;
 }
 */
+
+//mergesort to combine all ms files
+//8 files->4 files->2 files->1 file
+
+std::vector<std::string> DeconvProcess::mergeSort(std::vector<std::string>, size_t start, size_t end){
+  //divide the vector into the two
+  //mergeSort() for the first half
+  //mergeSort() for the later half
+  //merge() the returned result  
+}
+
+//read the files into fstream or vector, then use recursion to merge the vector into a new result vector
+std::vector<std::string> DeconvProcess::mergeMsFiles(std::string fileName, int thread_num){
+  std::vector<std::vector<std::string>> ms_vector_vector; //vector containing ms vectors
+  for (int i = 0; i < thread_num; i++) { 
+    MsAlignReader sp_reader(fileName + str_util::toString(i) + ".ms");
+    std::vector<std::string> ms_vector = sp_reader.readOneStrSpectrum();
+    ms_vector_vector.push_back(ms_vector);
+  }
+  //combine two ms_vector each and run mergeSort
+  //write a function for combining vector.. which will be used in the mergesort as well
+  //for the first 8 files run only merge function.. then start merge sorting.
+  std::vector<std::string> combined_ms_vector;
+  combined_ms_vector.resize(ms_vector_vector[0].size() + ms_vector_vector[1].size());
+  std::set_union(ms_vector_vector[0].begin(), ms_vector_vector[0].end(), ms_vector_vector[1].begin(), ms_vector_vector[1].end(), combined_ms_vector.begin());
+
+}
+
 void DeconvProcess::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
                                 MatchEnvPtrVec prec_envs, MsAlignWriterPtrVec ms1_writer_ptr_vec, SimpleThreadPoolPtr pool_ptr) { 
   
