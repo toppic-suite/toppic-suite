@@ -61,7 +61,7 @@ class rectBGColor{
                         .attr("height", 20)
                         .attr("dy", "0em")
                         .style("fill", color)
-                        .style("fill-opacity", ".2")
+                        .style("fill-opacity", ".6")
                         // .style("stroke-width", "1.5px");
     }
 }
