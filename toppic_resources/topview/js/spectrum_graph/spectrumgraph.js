@@ -1,16 +1,16 @@
 const circlesPerRange = 100;
 const peaksPerRange = 100;
-SpectrumGraph = function(svgId,spectrumParameters,peakData){
+SpectrumGraph = function(svgId,spectrumParameters,peakData, ionData){
 	this.svg = d3.select("body").select(svgId);
   this.id = svgId;
   this.para = spectrumParameters;
   this.data = peakData;
+  this.ionData = ionData;
   let graph = this;
 
-  this.redraw = function (mono_mz) {
-    console.log("id", this.id);
+  this.redraw = function(mono_mz) {
     this.para = compSpectrumParameters(this.data.peak_list, this.data.envelope_list, mono_mz);
-	  drawSpectrum(this.id, this.para, this.data);
+	  drawSpectrum(this.id, this.para, this.data,this.ionData);
   }
 
   this.zoomed = function () {
@@ -27,7 +27,7 @@ SpectrumGraph = function(svgId,spectrumParameters,peakData){
     else {
 		  graph.para.zoom(mousePos[0], mousePos[1], ratio);
     }
-	  drawSpectrum(graph.id, graph.para, graph.data);
+	  drawSpectrum(graph.id, graph.para, graph.data, graph.ionData);
   }
 
   this.zoom = d3.zoom()
@@ -39,7 +39,7 @@ SpectrumGraph = function(svgId,spectrumParameters,peakData){
 					.call(this.zoom);
 	this.svg.call(this.zoom.transform, d3.zoomIdentity);
 												
-  drawSpectrum(this.id, this.para, this.data); 
+  drawSpectrum(this.id, this.para, this.data, this.ionData); 
 }
 
 drawTicks = function(svg,spectrumParameters,spectrumgraph){
@@ -274,6 +274,34 @@ addCircles = function(svg,spectrumParameters,peakData){
 		})
 	})
 }
+drawIons = function(svg,spectrumParameters,ionData){
+
+	let ions = svg.append("g").attr("id", "graph_ions");
+	let maxIntensity = spectrumParameters.dataMaxInte ;
+	let limits=[0,0,0,0,0,0,0,0];
+	ionData.forEach(function(element){
+		let percentInte = element.intensity/maxIntensity * 100 ;
+		let inLimit = false;
+		if(element.mz > spectrumParameters.minMz && element.mz <= spectrumParameters.maxMz)
+		{
+			ions.append("text")
+			.attr("id","graph_matched_ions")
+			.attr("x",spectrumParameters.getPeakXPos(element.mz))
+			.attr("y",function(d,i){
+				let y = spectrumParameters.getPeakYPos(element.intensity);
+				if(y <= spectrumParameters.padding.head) return spectrumParameters.padding.head ;
+				else return y ;
+			  })
+			.style("fill","black")
+			.style("opacity", "0.6")
+			//.style("stroke",envelope_list.color)
+			.style("stroke-width","2")
+			.text(element.ion);
+		}
+	})
+
+}
+
 addLabels = function(svg, spectrumParameters){
 
 	svg.append("text").attr("id","label")
@@ -352,7 +380,7 @@ onMouseOut = function(){
 	d3.selectAll("#MyTextMZIN").remove();
 	d3.selectAll("#MyTextMassCharge").remove();
 }
-function drawSpectrum(svgId, spectrumParameters, peakData){
+function drawSpectrum(svgId, spectrumParameters, peakData,ionData){
 	// if(spectrumParameters.minMz > -500 )
 	// {
 		let svg = d3.select("body").select(svgId);
@@ -362,6 +390,7 @@ function drawSpectrum(svgId, spectrumParameters, peakData){
 		svg.selectAll("#axisPoints").remove();
 		svg.selectAll("#axis").remove();
 		svg.selectAll("#circles").remove();
+		svg.selectAll("#graph_ions").remove();
 		svg.selectAll("#label").remove();
 	/*call onMouseOut everytime to fix onHover bug adding multiple data when mouseover and zoomed up*/
 	
@@ -369,8 +398,19 @@ function drawSpectrum(svgId, spectrumParameters, peakData){
 		drawTicks(svg, spectrumParameters, peakData);
 		drawAxis(svg,spectrumParameters);
 		addDatatoAxis(svg,spectrumParameters);
-		drawPeaks(svg, spectrumParameters, peakData);
-		addCircles(svg,spectrumParameters,peakData);
+
+		if(spectrumParameters.showPeaks == "Y")
+		{
+			drawPeaks(svg, spectrumParameters, peakData);
+		}
+		if(spectrumParameters.showCircles == "Y")
+		{
+			addCircles(svg,spectrumParameters,peakData);
+		}
+		if(spectrumParameters.showIons == "Y")
+		{
+			drawIons(svg,spectrumParameters,ionData);
+		}
 		addLabels(svg, spectrumParameters);
 		//SpectrumDownload.addDownloadRect(svgId, spectrumParameters);
 	// }

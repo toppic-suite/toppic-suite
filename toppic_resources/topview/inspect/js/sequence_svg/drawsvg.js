@@ -273,7 +273,7 @@ function drawAnnotation(position,charge,id,coordinates,x,y)
 function appendTooltip(charge)
 {
 	var div = d3.select("body").append("div")	
-								.attr("class", "tooltip")				
+								.attr("class", "tooltip annotation_tooltip")				
 								.style("opacity", 0); 
 		div.transition()		
 			.duration(10)		
@@ -284,7 +284,7 @@ function appendTooltip(charge)
 }
 function removeToolTip()
 {
-	d3.selectAll(".tooltip").remove();
+	d3.selectAll(".annotation_tooltip").remove();
 }
 
 /* Get the charge of the Ion */

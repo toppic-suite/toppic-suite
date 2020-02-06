@@ -1,15 +1,29 @@
 /*	Spectrum start point */
-addSpectrum = function(id,peakList,envelopeList,monoMZ){
-  let specParameters = compSpectrumParameters(peakList, envelopeList, monoMZ);
+addSpectrum = function(id,peakList,envelopeList,monoMZ, ionData, graphParams){
+  	let specParameters = compSpectrumParameters(peakList, envelopeList, monoMZ);
 	let peakData = {};
 	peakData.peak_list = peakList ;
 	peakData.envelope_list = sortEnvelopes(envelopeList) ;
 	id = "#"+id;
 	// console.log("peakData : ", peakData);
-	let spectrumgraph = new SpectrumGraph(id,specParameters,peakData);
+	specParameters.showPeaks = graphParams.showPeaks;
+	specParameters.showCircles = graphParams.showCircles;
+	specParameters.showIons = graphParams.showIons;
+	if(ionData == null)
+	{
+		specParameters.showIons = "N" ;
+	}
+
+	let spectrumgraph = new SpectrumGraph(id,specParameters,peakData,ionData);
 	return spectrumgraph;
 }
-
+function graphOptions(){
+    this.showPeaks = "Y";
+    this.showCircles = "Y";
+    this.showIons = "Y";
+    
+    return this;
+}
 compSpectrumParameters = function (peakList, envelopeList, monoMZ) {
 	let ratio = 1.000684;
 	let specParameters = new SpectrumParameters();

@@ -194,9 +194,9 @@ class SeqOfExecution
 			 */
 			$("#"+Constants.SPECTRUMGRAPHID).show();
 			/**
-			 * Call addSpectrum function in invokeSpectrum function to draw graph 
+			 * Call generateCorrespondingGraph which calls addSpectrum function in invokeSpectrum file to draw graph 
 			 */
-			ms2_graph = addSpectrum("spectrum",peakDataList,distributionList,null);
+			generateCorrespondingGraph(peakDataList,distributionList,null);
 			$("#"+Constants.SPECTRUMDOWNLOADID).show();
 		}
 		/**
@@ -484,9 +484,9 @@ class SeqOfExecution
 
 			$("#"+Constants.SPECTRUMGRAPHID).show();
 			/** 
-			 * Call addSpectrum function in invokeSpectrum function to draw graph 
+			 * Call generateCorrespondingGraph which calls addSpectrum function in invokeSpectrum file to draw graph 
 			 */
-			ms2_graph = addSpectrum("spectrum",peakDataList,distributionList,null);
+			generateCorrespondingGraph(peakDataList,distributionList,null);
 			$("#"+Constants.SPECTRUMDOWNLOADID).show();
 			/**
 			 * Display All-peaks/matched/non-matched buttons on click of submit

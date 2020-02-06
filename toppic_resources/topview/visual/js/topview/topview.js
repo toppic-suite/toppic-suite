@@ -2,9 +2,9 @@
 /**
  * On Click implimentation of topview button
  */
-function onclickTopView(scansWithData,scanId,specId){
-    
-    let currentSpectrumData = getCurrentData(scansWithData,scanId);
+function onclickTopView(scansWithData,scanId){
+    let currentSpectrumData;
+    [currentSpectrumData,specId] = getCurrentData(scansWithData,scanId);
     let peakAndIntensityList = getDataFromPRSMtoSpectralView(currentSpectrumData);
     let massAndIntensityList = getMassAndIntensityData(specId);
     let sequence = getSequence();
@@ -116,7 +116,6 @@ function getUnknownMassList()
     return unknownMassShiftList;
 }
 function setDropDownItemsForInspectButton(scanIdList,specIdList){
-    console.log("scanIdList : ", scanIdList);
     let dropdown_menu = $(".dropdownscanlist .dropdown-menu");
     let len = scanIdList.length;
     for(let i=0; i<len;i++)
@@ -138,7 +137,6 @@ function setDropDownItemsForInspectButton(scanIdList,specIdList){
 function onClickToInspect(){
     $(".dropdownscanlist .dropdown-item ").click(function(){
         let scanId = $(this).attr('value')
-        let specId = $(this).attr('specid')
-        onclickTopView(ms2_ScansWithData,scanId,specId);
+        onclickTopView(ms2_ScansWithData,scanId);
     });  
 }
