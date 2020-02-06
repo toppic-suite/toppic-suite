@@ -53,8 +53,25 @@ class DeconvProcess {
   //void deconvMissingMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, MsAlignWriterPtr ms2_writer_ptr);            
 
   std::string updateMsg(MsHeaderPtr header_ptr, int scan, int total_scan_num);
+
+  void mergeMsFiles(std::string filePrefix, int thread_num, int total_scan_number);
+
+  void readMsFile(std::string fileName, std::vector<std::string> *spec_data_array);
   
+  void mergeSort(std::vector<std::string> *spec_data_array, int start, int end);
+
+  void mergeSortedVec(std::vector<std::string> *spec_data_array, int start, int middle, int end);
+
+/*
+
+
+  std::vector<std::string> mergeMsData(std::string fileName, int thread_num);
+
+  std::vector<std::string> mergeSort(std::vector<std::string> ms_vec, int start, int end);
   
+  std::vector<std::vector<std::string>> mergeSortedVec(std::vector<std::vector<std::string>> vec_1, 
+                                                            std::vector<std::vector<std::string>> vec_2);
+ */
  private:
 
   EnvParaPtr env_para_ptr_;

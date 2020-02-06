@@ -34,7 +34,7 @@
 
 #include <mutex>
 #include <vector>
-
+#include <boost/filesystem.hpp>
 namespace toppic {
 
 std::mutex count_lock;
@@ -56,9 +56,9 @@ DeconvProcess::DeconvProcess(TopfdParaPtr topfd_para_ptr,
 
 }
 /*
-void DeconvProcess::writeMsalign(MsAlignWriterPtr ms_wtr_ptr, std::map<int, DeconvMsPtr> ms_ptr_map){
-  for (int i = 0; i < ms_ptr_map.size(); i++){
-    ms_wtr_ptr->write(ms_ptr_map[i]);
+void DeconvProcess::writeMsalign(MsAlignWriterPtr ms_wtr_ptr, std::vector<std::vector<std::string>> ms_data_vector){
+  for (int i = 0; i < ms_data_vector.size(); i++){
+    ms_wtr_ptr->write(ms_data_vector[i]);
   }
 }
 */
@@ -228,32 +228,177 @@ void DeconvProcess::processSpMissingLevelOne(DeconvOneSpPtr deconv_ptr, RawMsGro
 }
 */
 
-//mergesort to combine all ms files
-//8 files->4 files->2 files->1 file
-
-std::vector<std::string> DeconvProcess::mergeSort(std::vector<std::string>, size_t start, size_t end){
-  //divide the vector into the two
-  //mergeSort() for the first half
-  //mergeSort() for the later half
-  //merge() the returned result  
+/*
+std::vector<std::vector<std::string>> DeconvProcess::mergeSortedVec(std::vector<std::vector<std::string>> vec_1, 
+                                                            std::vector<std::vector<std::string>> vec_2){
+  std::vector<std::vector<std::string>> combined_vector;
+  combined_vector.resize(vec_1.size() + vec_2.size());
+  std::set_union(vec_1.begin(), vec_1.end(), vec_2.begin(), vec_2.end(), combined_vector.begin());
+  return combined_vector;
 }
+
+
 
 //read the files into fstream or vector, then use recursion to merge the vector into a new result vector
-std::vector<std::string> DeconvProcess::mergeMsFiles(std::string fileName, int thread_num){
-  std::vector<std::vector<std::string>> ms_vector_vector; //vector containing ms vectors
-  for (int i = 0; i < thread_num; i++) { 
-    MsAlignReader sp_reader(fileName + str_util::toString(i) + ".ms");
-    std::vector<std::string> ms_vector = sp_reader.readOneStrSpectrum();
-    ms_vector_vector.push_back(ms_vector);
+std::vector<std::string> DeconvProcess::mergeMsData(std::string fileName, int thread_num){
+  std::vector<std::vector<std::string>> combined_ms_vector;
+
+  for (int i = 0; i < thread_num; i++){//concatenate all ms files
+    MsAlignReader msfile(fileName + str_util::toString(i) + ".ms");
+    std::vector<std::vector<std::string>> sp_data_vec = readMsfile(msfile.getInput());
+    combined_ms_vector = merge(combined_ms_vector, sp_data_vec);
+    }
+  };
+
+  for (size_t t = 0; t < 50; t++){
+    std::cout << combined_ms_vector[t] << std:endl;
+  };
+
+  int combined_ms_vector_size = combined_ms_vector.size();
+
+  //mergeSort(combined_ms_vector, 0, combined_ms_vector_size - 1);
+}
+*/
+
+
+void DeconvProcess::mergeSortedVec(std::vector<std::string> *spec_data_array, int start, int middle, int end){
+  int i, j, k;
+  int first_array_size = middle - start + 1;
+  int second_array_size = end - middle;
+  /*
+  std::vector<std::string> *first_half;
+  std::vector<std::string> *second_half;
+
+  first_half = new std::vector<std::string>[first_array_size];
+  second_half = new std::vector<std::string>[second_array_size];
+
+  for (i = 0; i < first_array_size; i++){
+    first_half[i] = spec_data_array[start + i];
   }
-  //combine two ms_vector each and run mergeSort
-  //write a function for combining vector.. which will be used in the mergesort as well
-  //for the first 8 files run only merge function.. then start merge sorting.
-  std::vector<std::string> combined_ms_vector;
-  combined_ms_vector.resize(ms_vector_vector[0].size() + ms_vector_vector[1].size());
-  std::set_union(ms_vector_vector[0].begin(), ms_vector_vector[0].end(), ms_vector_vector[1].begin(), ms_vector_vector[1].end(), combined_ms_vector.begin());
+  for (j = 0; j < second_array_size; j++){
+    second_half[j] = spec_data_array[middle + 1 + j];
+  }
+
+  */
+  i = start;
+  j = middle + 1;
+  k = start;
+
+  while (i <= middle && j <= end){
+    std::string line_i = spec_data_array[i][1];
+    std::string line_j = spec_data_array[j][1];    //ID is in line 1 of each vector
+    
+    if (line_i.substr(0, 3) == "ID=" && line_j.substr(0,3) == "ID="){
+      int id_i = std::stoi(line_i.substr(3));
+      int id_j = std::stoi(line_j.substr(3));
+
+      //std::cout << "id i : " << id_i << ", id_j: " << id_j << std::endl;
+
+      if (id_i <= id_j){
+        spec_data_array[k] = spec_data_array[i];
+        i++;
+      }
+      else{
+        spec_data_array[k] = spec_data_array[j];
+        j++;
+      }
+      k++;
+    }
+    else{
+      LOG_ERROR("ms files are not correctly merged");
+      break;
+    }
+
+    while (i < middle){
+      spec_data_array[k] = spec_data_array[i];
+      i++;
+      k++;
+    }
+    while (j < end){
+      spec_data_array[k] = spec_data_array[j];
+      j++;
+      k++;
+    }
+  }
+}
+
+void DeconvProcess::mergeSort(std::vector<std::string> *spec_data_array, int start, int end){
+  
+  if (start < end){
+    int middle = static_cast<int>((start + end)/2);
+    //std::cout << middle << std::endl;
+
+    //mergeSort() for the first half
+    mergeSort(spec_data_array, start, middle);
+
+    //mergeSort() for the later half
+    mergeSort(spec_data_array, middle + 1, end);
+ 
+    //merge() the returned result  
+     mergeSortedVec(spec_data_array, start, middle, end);
+
+  }
+}
+
+void DeconvProcess::readMsFile(std::string fileName, std::vector<std::string> *spec_data_array) {
+  std::ifstream ms(fileName);
+  std::string line;
+  std::vector<std::string> line_list;//one spectra
+  int idx = 0;
+
+  while (std::getline(ms, line)) {
+    str_util::trim(line);
+    if (line == "BEGIN IONS") {
+      line_list.push_back(line);
+    } else if (line == "END IONS") {
+      if (line_list.size() != 0) {
+        line_list.push_back(line);
+      }
+      //combined_ms_vector.push_back(line_list);
+      spec_data_array[idx] = line_list;
+      line_list.clear();
+      idx++;
+    }else if (line == "" || line[0] == '#') {
+      continue;
+    } else {
+      if (line_list.size() > 0) {
+        line_list.push_back(line);
+      }
+    }
+  }
+}
+void DeconvProcess::mergeMsFiles(std::string filePrefix, int thread_num, int total_scan_number){
+  std::string combinedFileName = "combined_" + filePrefix + ".ms";
+
+  if (file_util::exists(combinedFileName)){
+    boost::filesystem::remove(combinedFileName);
+  }
+  std::ofstream combined_ms(combinedFileName, std::ios_base::binary | std::ios_base::app);
+
+  for (int i = 0; i < thread_num; i++){//concatenate all ms files
+    std::string fileName = filePrefix + str_util::toString(i) + ".ms";
+    std::ifstream msfile(fileName, std::ios_base::binary);
+
+    combined_ms.seekp(0, std::ios_base::end);
+    combined_ms << msfile.rdbuf();
+
+  };
+
+  std::vector<std::string> *spec_data_array;
+  spec_data_array = new std::vector<std::string>[total_scan_number];
+
+  readMsFile(combinedFileName, spec_data_array);
+
+  mergeSort(spec_data_array, 0, total_scan_number -1);
+
+  for (int t = 0; t < total_scan_number; t++){
+    for (size_t tk = 0; tk < spec_data_array[t].size(); tk++){
+      std::cout << spec_data_array[t][tk] << std::endl;
+    }
+  }
 
 }
+
 
 void DeconvProcess::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, 
                                 MatchEnvPtrVec prec_envs, MsAlignWriterPtrVec ms1_writer_ptr_vec, SimpleThreadPoolPtr pool_ptr) { 
@@ -420,7 +565,7 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr,
 
     std::string msg = updateMsg(ms_group_ptr->getMsOnePtr()->getMsHeaderPtr(), count + 1, total_scan_num);
     std::cout << "\r" << msg << std::flush;
-    count++;
+    count += 2;
     ms_group_ptr = reader_ptr->getNextMsGroupPtr();
   }
   pool_ptr->ShutDown();
@@ -435,7 +580,8 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr,
     //auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end-start);
     //std::cout << std::endl << "Read file " << duration.count() << std::endl;
   
-  
+  mergeMsFiles("msalign_1_", thread_num, total_scan_num);
+  //mergeMsFiles("msalign_2_", thread_num);
   std::cout << std::endl;
 
   }
