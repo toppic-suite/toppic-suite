@@ -78,7 +78,7 @@ function buildSvg(parameters,seq,id,massShiftList,monoMassList)
 				if( i == massShiftList[k].position )
 				{
 					MassShift(this,massShiftList[k].mass,i);
-					return "red" ;
+					//return "red" ;
 					break;
 				}
 				else if(i == massShiftList[k].position)
