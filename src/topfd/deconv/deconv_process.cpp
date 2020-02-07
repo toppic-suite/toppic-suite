@@ -38,8 +38,7 @@
 namespace toppic {
 
 std::mutex count_lock;
-std::mutex ms1_map_lock;
-std::mutex ms2_map_lock;
+
 
 DeconvProcess::DeconvProcess(TopfdParaPtr topfd_para_ptr, 
                              const std::string &spec_file_name, 
@@ -55,13 +54,18 @@ DeconvProcess::DeconvProcess(TopfdParaPtr topfd_para_ptr,
   prepareFileFolder();
 
 }
-/*
-void DeconvProcess::writeMsalign(MsAlignWriterPtr ms_wtr_ptr, std::vector<std::vector<std::string>> ms_data_vector){
-  for (int i = 0; i < ms_data_vector.size(); i++){
-    ms_wtr_ptr->write(ms_data_vector[i]);
+void DeconvProcess::writeMsalign(std::string filePrefix, std::vector<std::string> *spec_data_array, int spec_num){
+  std::string fileName = filePrefix + ".msalign";
+  std::ofstream msalign(fileName);
+  for (int i = 0; i < spec_num; i++){
+    for (size_t t = 0; t < spec_data_array[i].size(); t++){
+      msalign << spec_data_array[i][t] << "\n"; 
+    }
+    msalign << "\n";
   }
+  msalign.close();
 }
-*/
+
 std::string DeconvProcess::updateMsg(MsHeaderPtr header_ptr, int scan, 
                                      int total_scan_num) {
   std::string percentage = str_util::toString(scan * 100 / total_scan_num);
@@ -126,7 +130,10 @@ void DeconvProcess::process() {
     //processSpMissingLevelOne(deconv_ptr, reader_ptr, ms2_writer_ptr);
   }
   else {
-    processSp(reader_ptr, ms1_writer_ptr, ms2_writer_ptr);
+//practice merge sort
+    //practice();
+
+   processSp(reader_ptr, ms1_writer_ptr, ms2_writer_ptr);
   }
 }
 /*
@@ -265,7 +272,7 @@ void DeconvProcess::mergeSortedVec(std::vector<std::string> *spec_data_array, in
   int i, j, k;
   int first_array_size = middle - start + 1;
   int second_array_size = end - middle;
-  /*
+  
   std::vector<std::string> *first_half;
   std::vector<std::string> *second_half;
 
@@ -279,54 +286,65 @@ void DeconvProcess::mergeSortedVec(std::vector<std::string> *spec_data_array, in
     second_half[j] = spec_data_array[middle + 1 + j];
   }
 
-  */
-  i = start;
-  j = middle + 1;
+  i = 0;
+  j = 0;
   k = start;
 
-  while (i <= middle && j <= end){
-    std::string line_i = spec_data_array[i][1];
-    std::string line_j = spec_data_array[j][1];    //ID is in line 1 of each vector
-    
-    if (line_i.substr(0, 3) == "ID=" && line_j.substr(0,3) == "ID="){
-      int id_i = std::stoi(line_i.substr(3));
-      int id_j = std::stoi(line_j.substr(3));
+  while (i < first_array_size && j < second_array_size){
+    if (first_half[i].size() > 0 && second_half[i].size() > 0){
+      std::string line_i = first_half[i][1];
+      std::string line_j = second_half[j][1];    //ID is in line 1 of each vector
 
-      //std::cout << "id i : " << id_i << ", id_j: " << id_j << std::endl;
+      if (line_i.substr(0, 3) == "ID=" && line_j.substr(0,3) == "ID="){//should be always true
+        int id_i = std::stoi(line_i.substr(3));
+        int id_j = std::stoi(line_j.substr(3));
 
-      if (id_i <= id_j){
-        spec_data_array[k] = spec_data_array[i];
-        i++;
+        if (id_i <= id_j){
+          spec_data_array[k] = first_half[i];
+          i++;
+        }
+        else{
+          spec_data_array[k] = second_half[j];
+          j++;
+        }
+        k++;
       }
       else{
-        spec_data_array[k] = spec_data_array[j];
-        j++;
+        LOG_ERROR("ms files are not correctly merged");
+        break;
       }
-      k++;
     }
     else{
-      LOG_ERROR("ms files are not correctly merged");
+      /*
+      //LOG_ERROR("merge vector is empty!");
+      std::cout << "start : " << start << "end : " << end << std::endl;
+      std::cout << "first array size : " << first_array_size << "second array size: "<< second_array_size << std::endl;
+      std::cout << "i " << i << "j " << j <<std::endl;
+      */
       break;
     }
-
-    while (i < middle){
-      spec_data_array[k] = spec_data_array[i];
+  }
+  while (i < first_array_size){
+      spec_data_array[k] = first_half[i];
       i++;
       k++;
     }
-    while (j < end){
-      spec_data_array[k] = spec_data_array[j];
+    while (j < second_array_size){
+      spec_data_array[k] = second_half[j];
       j++;
       k++;
     }
-  }
+    delete[] first_half;
+    delete[] second_half;
+
+    first_half = nullptr;
+    second_half = nullptr;
 }
 
 void DeconvProcess::mergeSort(std::vector<std::string> *spec_data_array, int start, int end){
   
   if (start < end){
     int middle = static_cast<int>((start + end)/2);
-    //std::cout << middle << std::endl;
 
     //mergeSort() for the first half
     mergeSort(spec_data_array, start, middle);
@@ -345,7 +363,6 @@ void DeconvProcess::readMsFile(std::string fileName, std::vector<std::string> *s
   std::string line;
   std::vector<std::string> line_list;//one spectra
   int idx = 0;
-
   while (std::getline(ms, line)) {
     str_util::trim(line);
     if (line == "BEGIN IONS") {
@@ -366,8 +383,9 @@ void DeconvProcess::readMsFile(std::string fileName, std::vector<std::string> *s
       }
     }
   }
+
 }
-void DeconvProcess::mergeMsFiles(std::string filePrefix, int thread_num, int total_scan_number){
+void DeconvProcess::mergeMsFiles(std::string filePrefix, int thread_num, int spec_num){
   std::string combinedFileName = "combined_" + filePrefix + ".ms";
 
   if (file_util::exists(combinedFileName)){
@@ -376,7 +394,7 @@ void DeconvProcess::mergeMsFiles(std::string filePrefix, int thread_num, int tot
   std::ofstream combined_ms(combinedFileName, std::ios_base::binary | std::ios_base::app);
 
   for (int i = 0; i < thread_num; i++){//concatenate all ms files
-    std::string fileName = filePrefix + str_util::toString(i) + ".ms";
+    std::string fileName = filePrefix + "_" + str_util::toString(i) + ".ms";
     std::ifstream msfile(fileName, std::ios_base::binary);
 
     combined_ms.seekp(0, std::ios_base::end);
@@ -385,18 +403,16 @@ void DeconvProcess::mergeMsFiles(std::string filePrefix, int thread_num, int tot
   };
 
   std::vector<std::string> *spec_data_array;
-  spec_data_array = new std::vector<std::string>[total_scan_number];
+  spec_data_array = new std::vector<std::string>[spec_num];
 
   readMsFile(combinedFileName, spec_data_array);
 
-  mergeSort(spec_data_array, 0, total_scan_number -1);
+  mergeSort(spec_data_array, 0, spec_num-1);
 
-  for (int t = 0; t < total_scan_number; t++){
-    for (size_t tk = 0; tk < spec_data_array[t].size(); tk++){
-      std::cout << spec_data_array[t][tk] << std::endl;
-    }
-  }
+  writeMsalign(filePrefix, spec_data_array, spec_num);
 
+  delete[] spec_data_array;
+  spec_data_array = nullptr;
 }
 
 
@@ -408,6 +424,13 @@ void DeconvProcess::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
   LOG_DEBUG("ms level " << header_ptr->getMsLevel() );
   // int scan_num_ = header_ptr->getFirstScanNum();
+  
+  count_lock.lock();
+  if (header_ptr->getId() > ms1_spec_num){
+    ms1_spec_num = header_ptr->getId();
+  }
+  count_lock.unlock();
+
   //remove precursor peaks
   std::vector<double> intensities;
   for (size_t i = 0; i < peak_list.size(); i++) {
@@ -440,13 +463,7 @@ void DeconvProcess::deconvMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   int writer_id = pool_ptr->getId(thread_id);
 
   ms1_writer_ptr_vec[writer_id]->write(deconv_ms_ptr);
-/*
-  std::cout << "writer id" << ms1_writer_ptr_vec[writer_id] << std:: endl;
 
-  std::cout << "env name" << ms1_env_name_ << std::endl;
-  std::cout << "header" << header_ptr << std::endl;
-  std::cout << "size" << prec_envs.size() << std::endl;
-  */
   if (topfd_para_ptr_->output_match_env_) {
     match_env_writer::write(ms1_env_name_, header_ptr, prec_envs);
   }
@@ -473,6 +490,11 @@ void DeconvProcess::deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
   // int scan_num_ = header_ptr->getFirstScanNum();
   double max_frag_mass = header_ptr->getPrecMonoMass();
 
+  count_lock.lock();
+  if (header_ptr->getId() > ms2_spec_num){
+    ms2_spec_num = header_ptr->getId();
+  }
+  count_lock.unlock();
   if (max_frag_mass == 0.0) {
     max_frag_mass = header_ptr->getPrecSpMass();
   }
@@ -580,8 +602,9 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr,
     //auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end-start);
     //std::cout << std::endl << "Read file " << duration.count() << std::endl;
   
-  mergeMsFiles("msalign_1_", thread_num, total_scan_num);
-  //mergeMsFiles("msalign_2_", thread_num);
+  mergeMsFiles("msalign_1", thread_num, ms1_spec_num + 1);
+  mergeMsFiles("msalign_2", thread_num, ms2_spec_num + 1);//+1 because id started at 0
+
   std::cout << std::endl;
 
   }
