@@ -184,7 +184,7 @@ $(document).ready(function(){
 	<td>
 	<td width = "15%" align = "right">
 		<button id = "saveImage" class="btn btn-primary btn-sm" data-toggle="modal"
-      data-target="#myModal" style="width:80%" > Save PrSM</button>
+      data-target="#myModal" style="width:80%" >Save PrSM</button>
 	</td>
 </tr>
 <tr> 
@@ -221,18 +221,10 @@ $(document).ready(function(){
 		</a>
 	</td>
 	<td width = "15%" align = "right">
-		<div class="prsmgraphdownload dropdown dropup">
-			<button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" id="graph_download" style="display:none">
-				Download
+		<div class="prsmgraphdownload">
+			<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#ms2spectrumpop" id="graph_download" style="display:none">
+				Export Graph
 			</button>
-			<div class="dropdown-menu">
-				<a class="dropdown-item" href="#!" id="graph_download_png">
-					<i class="fas fa-download"></i><span>&nbsp;&nbsp;PNG</span>
-				</a>
-				<a class="dropdown-item" href="#!" id="graph_download_svg">
-					<i class="fas fa-download"></i><span>&nbsp;&nbsp;SVG</span>
-				</a>
-			</div>
 	  	</div>
 	</td>
 	<td width = "15%" align = "right">
@@ -241,26 +233,6 @@ $(document).ready(function(){
 </tr>
 </table>
 
-<!--
-<div class="row">
-	<div class = "col-md-8 peaks" style="font-size:16px;">
-		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a id = "all_peak_count" href="#spectrum" onclick="showAllPeaks();"  >All peaks </a>
-		&nbsp;&nbsp;<a id = "matched_peak_count" href="#spectrum" onclick="showMatchedPeaks();">Matched peaks </a>
-		&nbsp;&nbsp;<a id = "not_matched_peak_count" href="#spectrum" onclick="showNotMatchedPeaks();">Not matched peaks </a>
-	</div>
-	<div class="col-md-2">
-		<a id = "a_spectrum_help" href="#!">
-			<button type ="button" id = "spectrum_help" class="btn btn-primary btn-sm" style = "display:none;width:80%" data-toggle="modal" data-target="#spectrumHelp">Help</button>
-		</a>
-	</div>
-	<div class="col-md-2">
-		button type="button" class="btn btn-primary btn-sm"
-        id="show_ms1_spectrum">Show Ms1</button>
-		<button type="button" class="btn btn-primary btn-sm"
-      id="show_ms2_spectrum">Show spectrum</button>
-	</div>
-</div>
--->
 <table id="spectrum" class="display" >
 <thead>
 <tr role="row">
@@ -307,11 +279,6 @@ $(document).ready(function(){
 			    		<input type="radio" name="show-skipped-lines" id= "show-skipped-lines">Yes
 			    		<input type="radio" name="show-skipped-lines" id= "show-skipped-lines">No
 			    	</td>
-					<!--since white background is applied by default
-					<td>White b/g: <input type="radio" name="svg_background" id = "svg_background" >Yes
-			    		<input type="radio" name="svg_background" id = "svg_background" >No
-					</td>
-					-->
 					<td></td>
 			    	<td>
 			    		 <button type = "button" class="btn btn-primary btn-sm "  id =
@@ -393,6 +360,25 @@ $(document).ready(function(){
 		  </div>
 		</div>
 	  </div>
+</div>
+<div class="modal" id="ms2spectrumpop" role="dialog">
+	<div class="modal-dialog modal-sm" role="document">
+	  <div class="modal-content">
+		  <div class="modal-header ">
+			<button type="button" class="close" data-dismiss="modal">&times;</button>
+			</div>
+			 <div class="modal-body ms2_graph_nav">
+				<ul class="nav nav-tabs graph_nav" id="ms2_graph_popup_nav">
+				</ul>
+				 <svg id="popup_ms2_spectrum" style="background-color:#F8F8F8" ></svg>
+			 </div> 
+			 <div class="modal-footer">
+				  <button type="button" class="btn btn-primary btn-sm custom " id = "download_popupms2_png" ><i class="fas fa-download"></i><span>&nbsp;&nbsp;PNG</span></button>
+				  <button type="button" class="btn btn-primary btn-sm custom " id = "download_popupms2_svg" ><i class="fas fa-download"></i><span>&nbsp;&nbsp;SVG</span></button>
+		  </div>
+	  </div>
+	</div>
+  </div>
 </div>
 <footer class="page-footer font-small blue">
 	<div class="footer-copyright text-center py-3">© 2019 Copyright: The Trustees of 

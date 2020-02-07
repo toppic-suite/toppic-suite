@@ -46,7 +46,7 @@ class MultiScan{
                     else{
                         //Setting data to a global variable
                         ms2_ScansWithData = scanListWithData;
-                        MultiScanObj.createMs2NavEements(scanIdList,"ms2svg");
+                        MultiScanObj.createMs2NavEements(scanIdList,"ms2_graph_nav");
                         document.getElementById("dataLoading").remove();
                         generateCorrespondingGraph(current_data,"ms2svg",null,specId);
                     }
@@ -67,10 +67,12 @@ class MultiScan{
     }
     
     createMs2NavEements(scanidList,id){
-        let _ul = document.getElementById("ms2_graph_nav");
+        let _ul = document.getElementById(id);
         scanidList.forEach(function(element,i){
             let li = document.createElement("li");
             li.setAttribute("class","nav-item");
+            let li_id = id+"_"+element;
+            li.setAttribute("id",li_id);
             let a = document.createElement("a");
             a.setAttribute("class","nav-link ms2_scanIds");
             if(i == 0)
@@ -161,5 +163,23 @@ function scanbuttons(){
 		generateCorrespondingGraph(currentData,"popupspectrum",null,specId);
 		$("#ms1_graph_nav .active").removeClass("active");
    		$(this).addClass("active");
+    })
+    
+    //ms2_scanIds is the Id of the nav tabs for multiple navs
+	$(".ms2_scanIds").click(function(){
+        let value = this.getAttribute('value');
+        let [currentData,specId] = getCurrentData(ms2_ScansWithData,value);
+		generateCorrespondingGraph(currentData,"ms2svg",null,specId);
+		$("#ms2_graph_nav .active").removeClass("active");
+   		$(this).addClass("active");
 	})
+	$(".ms1_scanIds").click(function(){
+		let value = this.getAttribute('value');
+		let [currentData,specId] = getCurrentData(ms1_ScansWithData,value);
+		generateCorrespondingGraph(currentData,"popupspectrum",null,specId);
+		$("#ms1_graph_nav .active").removeClass("active");
+   		$(this).addClass("active");
+    })
+
+    
 }

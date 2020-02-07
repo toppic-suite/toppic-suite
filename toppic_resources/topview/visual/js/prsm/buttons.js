@@ -29,16 +29,16 @@ function buttons(){
 	let specParameters = new SpectrumParameters();
 	let spectrumDownload = new SpectrumDownload();
 	let x,y;
-	d3.select("#graph_download_png").on("click",function(){
+	d3.select("#download_popupms2_png").on("click",function(){
 		x = d3.event.pageX;
-		y = d3.event.pageY + 80;
+		y = d3.event.pageY;
 		//function in prsmtohtml
-		popupnamewindow("png", "ms2svg",x,y)
+		popupnamewindow("png", "popup_ms2_spectrum",x,y)
 	})
-	d3.select("#graph_download_svg").on("click",function(){
+	d3.select("#download_popupms2_svg").on("click",function(){
 		x = d3.event.pageX;
-		y = d3.event.pageY + 40;
-		popupnamewindow("svg", "ms2svg",x,y)
+		y = d3.event.pageY;
+		popupnamewindow("svg", "popup_ms2_spectrum",x,y)
 	})
 	d3.select("#download_popup_png").on("click",function(){
 		x = d3.event.pageX;
@@ -63,6 +63,21 @@ function buttons(){
 		appendTo: "body"
 		});
 	});
+	$("#graph_download").click(function(){
+		//let ms2svg = d3.select("#ms2svg");
+		$("#ms2_graph_popup_nav li").remove();
+		let scanIdList = prsm_data.prsm.ms.ms_header.scans.split(" ");
+		let MultiScanObj = new MultiScan();
+		MultiScanObj.createMs2NavEements(scanIdList,"ms2_graph_popup_nav");
+		console.log("ms2_ScansWithData : ", ms2_ScansWithData);
+		let [current_data,specId] = getCurrentData(ms2_ScansWithData,scanIdList[0]);
+		//ms2_graph.redraw(null,"popup_ms2_spectrum");
+		generateCorrespondingGraph(current_data,"popup_ms2_spectrum",null,specId);
+		$("#ms2spectrumpop").draggable({
+			appendTo: "body"
+		});
+		//scanbuttons();
+	})
 	
 }
 function showSpectrun(){
