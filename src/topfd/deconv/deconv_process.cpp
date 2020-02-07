@@ -38,7 +38,7 @@
 namespace toppic {
 
 std::mutex count_lock;
-
+std::mutex count_lock_missing_ms1;
 
 DeconvProcess::DeconvProcess(TopfdParaPtr topfd_para_ptr, 
                              const std::string &spec_file_name, 
@@ -115,17 +115,15 @@ void DeconvProcess::process() {
   RawMsGroupReaderPtr reader_ptr = std::make_shared<RawMsGroupReader>(spec_file_name_, 
                                                                       topfd_para_ptr_->missing_level_one_,
                                                                       frac_id_);
- 
   if (topfd_para_ptr_->missing_level_one_) {
-    //processSpMissingLevelOne(deconv_ptr, reader_ptr, ms2_writer_ptr);
+    processSpMissingLevelOne(reader_ptr);
   }
   else {
-
-   processSp(reader_ptr);
+    processSp(reader_ptr);
   }
 }
-/*
-void DeconvProcess::deconvMissingMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr){
+
+void DeconvProcess::deconvMissingMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, MsAlignWriterPtrVec ms_writer_ptr_vec, SimpleThreadPoolPtr pool_ptr){
   PeakPtrVec peak_list = ms_ptr->getPeakPtrVec();
   MsHeaderPtr header_ptr = ms_ptr->getMsHeaderPtr();
 
@@ -142,13 +140,18 @@ void DeconvProcess::deconvMissingMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_pt
     result_envs = deconv_ptr->getResult();
   }
 
+  count_lock.lock();
+  if (header_ptr->getId() > ms2_spec_num){
+    ms2_spec_num = header_ptr->getId();
+  }
+  count_lock.unlock();
+
   DeconvMsPtr deconv_ms_ptr = match_env_util::getDeconvMsPtr(header_ptr, result_envs);
 
-  int index = header_ptr->getId();
+  boost::thread::id thread_id = boost::this_thread::get_id();
+  int writer_id = pool_ptr->getId(thread_id);
 
-  ms2_map_lock.lock();
-  (*ms1_missing_map_ptr).insert ( std::pair<int, DeconvMsPtr>(index,deconv_ms_ptr) );
-  ms2_map_lock.unlock();
+  ms_writer_ptr_vec[writer_id]->write(deconv_ms_ptr);
 
   if (topfd_para_ptr_->output_match_env_) {
     match_env_writer::write(ms2_env_name_, header_ptr, result_envs);
@@ -162,67 +165,72 @@ void DeconvProcess::deconvMissingMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_pt
   }
 
 }
-std::function<void()> geneTaskMissingMsOne(RawMsGroupPtr ms_group_ptr, DeconvOneSpPtr deconv_ptr,
-                                DeconvProcess *deconv_instance_ptr, int **count2, int total_scan_num, std::map<int, DeconvMsPtr> *ms1_missing_map_ptr){
-  return [ms_group_ptr, deconv_ptr, deconv_instance_ptr, count2, total_scan_num, ms1_missing_map_ptr]() {
 
-    int thread_index = 
-    Writer1Ptr = vec_1[thread_index];
-    
-  
+std::function<void()> geneTaskMissingMsOne(RawMsGroupPtr ms_group_ptr, DeconvOneSpPtr deconv_ptr,
+                                DeconvProcess *deconv_process_ptr, MsAlignWriterPtrVec ms_writer_ptr_vec, SimpleThreadPoolPtr pool_ptr){
+  return [ms_group_ptr, deconv_ptr, deconv_process_ptr, ms_writer_ptr_vec, pool_ptr]() {
+
   RawMsPtrVec ms_two_ptr_vec = ms_group_ptr->getMsTwoPtrVec();                           
-  
+
   for (size_t i = 0; i < ms_two_ptr_vec.size(); i++) {
       RawMsPtr ms_two_ptr = ms_two_ptr_vec[i];
-      
-      std::string msg = deconv_instance_ptr->updateMsg(ms_two_ptr->getMsHeaderPtr(), **count2 + 1, total_scan_num);
-      std::stringstream msgStream;
-      msgStream << std::flush << msg << "\r";
-      
-      
-      deconv_instance_ptr->deconvMissingMsOne(ms_two_ptr, deconv_ptr, ms1_missing_map_ptr);
+      deconv_process_ptr->deconvMissingMsOne(ms_two_ptr, deconv_ptr, ms_writer_ptr_vec, pool_ptr);
   }
+
   };
 }
 
-void DeconvProcess::processSpMissingLevelOne(DeconvOneSpPtr deconv_ptr, RawMsGroupReaderPtr reader_ptr, MsAlignWriterPtr ms2_writer_ptr) {
+void DeconvProcess::processSpMissingLevelOne(RawMsGroupReaderPtr reader_ptr) {
   // reader_ptr
   int total_scan_num = reader_ptr->getInputSpNum();
   RawMsGroupPtr ms_group_ptr;
   ms_group_ptr = reader_ptr->getNextMsGroupPtr();
 
-  int count2 = 0;
-  int *count2_ptr;
-  count2_ptr = &count2;
+  int count = 0;
 
-  std::map<int, DeconvMsPtr> ms1_missing_map; 
-  std::map<int, DeconvMsPtr> *ms1_missing_map_ptr;
-  ms1_missing_map_ptr = &ms1_missing_map;
+  std::string ms_msalign_name;
+  ms_msalign_name = base_name_ + "_ms2.msalign";
 
   SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(thread_num);  
+
+  MsAlignWriterPtrVec ms_writer_ptr_vec;
+
+  for (int i = 0; i < thread_num; i++) { 
+    MsAlignWriterPtr ms_ptr = std::make_shared<MsAlignWriter>(ms_msalign_name + str_util::toString(i) + "_ms");
+
+    ms_writer_ptr_vec.push_back(ms_ptr);
+  }
 
   while (ms_group_ptr != nullptr) {
     while(pool_ptr->getQueueSize() >= thread_num * 2){
         boost::this_thread::sleep(boost::posix_time::milliseconds(100));
     }
 
-    //to generate a new deconOneSp object each time
-    EnvParaPtr env_ptr = deconv_ptr->getEnvPara();
-    DpParaPtr dp_ptr = deconv_ptr->getDpPara();
-
-    DeconvOneSpPtr deconv_ptr_new = std::make_shared<DeconvOneSp>(env_ptr_new, dp_ptr_new);
+    //it is creating a new shared pointer using the class constructor that takes shared pointer as input
+    //can create an class instance instead, but shared pointer is used in many functions in deconv. and envelope detection. 
+    EnvParaPtr env_ptr_new = std::make_shared<EnvPara>(env_para_ptr_);
+    DpParaPtr dp_ptr_new = std::make_shared<DpPara>(dp_para_ptr_);
     
-    pool_ptr->Enqueue(geneTaskMissingMs1(ms_group_ptr, deconv_ptr_new, &count2_ptr, total_scan_num, ms1_missing_map_ptr));
+    DeconvOneSpPtr deconv_ptr = std::make_shared<DeconvOneSp>(env_ptr_new, dp_ptr_new);
+    pool_ptr->Enqueue(geneTaskMissingMsOne(ms_group_ptr, deconv_ptr, deconv_process_ptr_, ms_writer_ptr_vec, pool_ptr));
+
+    RawMsPtrVec ms_two_ptr_vec = ms_group_ptr->getMsTwoPtrVec();
+
+    for (size_t t = 0; t < ms_two_ptr_vec.size(); t++){
+      RawMsPtr ms_two_ptr = ms_two_ptr_vec[t];
+      std::string msg = updateMsg(ms_two_ptr->getMsHeaderPtr(), count, total_scan_num);
+      std::cout << "\r" << msg << std::flush;
+      count += 2;
+    }
+
     ms_group_ptr = reader_ptr->getNextMsGroupPtr();
   }
   pool_ptr->ShutDown();
 
-  writeMsalign(ms2_writer_ptr, ms1_missing_map);
+  mergeMsFiles(ms_msalign_name, thread_num, ms2_spec_num + 1);
 
   std::cout << std::endl;
 }
-*/
-
 
 void DeconvProcess::mergeSortedVec(std::vector<std::string> *spec_data_array, int start, int middle, int end){
   int i, j, k;
@@ -357,11 +365,11 @@ void DeconvProcess::mergeMsFiles(std::string fileName, int thread_num, int spec_
 
   readMsFile(combinedFileName, spec_data_array);
 
-  std::cout << "fine until readMsFile" << std::endl;
+  //std::cout << "fine until readMsFile" << std::endl;
 
   mergeSort(spec_data_array, 0, spec_num-1);
 
-  std::cout << "fine until mergesort" << std::endl;
+  //std::cout << "fine until mergesort" << std::endl;
 
   writeMsalign(fileName, spec_data_array, spec_num);
 
@@ -449,6 +457,7 @@ void DeconvProcess::deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr,
     ms2_spec_num = header_ptr->getId();
   }
   count_lock.unlock();
+
   if (max_frag_mass == 0.0) {
     max_frag_mass = header_ptr->getPrecSpMass();
   }
@@ -541,7 +550,7 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
 
     pool_ptr->Enqueue(geneTask(ms_group_ptr, deconv_ptr, ms1_writer_ptr_vec, ms2_writer_ptr_vec, pool_ptr, deconv_process_ptr_));
 
-    std::string msg = updateMsg(ms_group_ptr->getMsOnePtr()->getMsHeaderPtr(), count + 1, total_scan_num);
+    std::string msg = updateMsg(ms_group_ptr->getMsOnePtr()->getMsHeaderPtr(), count, total_scan_num);
     std::cout << "\r" << msg << std::flush;
     count += 2;
     ms_group_ptr = reader_ptr->getNextMsGroupPtr();
@@ -560,7 +569,7 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
 
   mergeMsFiles(ms1_msalign_name, thread_num, ms1_spec_num + 1);
   mergeMsFiles(ms2_msalign_name, thread_num, ms2_spec_num + 1);//ms1(ms2)_spec_num +1 because id started at 0, so to count all spectrums, +1.
-  std::cout << ms1_spec_num << " " << ms2_spec_num << std::endl;
+  //std::cout << ms1_spec_num << " " << ms2_spec_num << std::endl;
   std::cout << std::endl;
 
   }

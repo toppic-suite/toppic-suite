@@ -39,8 +39,7 @@ class DeconvProcess {
 
   void processSp(RawMsGroupReaderPtr reader_ptr);
 
-  //void processSpMissingLevelOne(DeconvOneSpPtr deconv_ptr, RawMsGroupReaderPtr reader_ptr, 
-                                //MsAlignWriterPtr ms2_writer_ptr);
+  void processSpMissingLevelOne(RawMsGroupReaderPtr reader_ptr);
 
   EnvParaPtr getEnvParaPtr(){
       return env_para_ptr_;
@@ -49,7 +48,7 @@ class DeconvProcess {
 
   void deconvMsTwo(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, MsAlignWriterPtrVec ms2_writer_ptr_vec, SimpleThreadPoolPtr pool_ptr); 
                    
-  //void deconvMissingMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, MsAlignWriterPtr ms2_writer_ptr);            
+  void deconvMissingMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_ptr, MsAlignWriterPtrVec ms_writer_ptr_vec, SimpleThreadPoolPtr pool_ptr);            
 
   std::string updateMsg(MsHeaderPtr header_ptr, int scan, int total_scan_num);
 
