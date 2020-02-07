@@ -349,15 +349,19 @@ void DeconvProcess::mergeMsFiles(std::string fileName, int thread_num, int spec_
 
     combined_ms.seekp(0, std::ios_base::end);
     combined_ms << msfile.rdbuf();
-
   };
+  combined_ms.close();
 
   std::vector<std::string> *spec_data_array;
   spec_data_array = new std::vector<std::string>[spec_num];
 
   readMsFile(combinedFileName, spec_data_array);
 
+  std::cout << "fine until readMsFile" << std::endl;
+
   mergeSort(spec_data_array, 0, spec_num-1);
+
+  std::cout << "fine until mergesort" << std::endl;
 
   writeMsalign(fileName, spec_data_array, spec_num);
 
