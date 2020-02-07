@@ -37,8 +37,7 @@ class DeconvProcess {
 
   void process();
 
-  void processSp(RawMsGroupReaderPtr reader_ptr, MsAlignWriterPtr ms1_writer_ptr, 
-                              MsAlignWriterPtr ms2_writer_ptr);
+  void processSp(RawMsGroupReaderPtr reader_ptr);
 
   //void processSpMissingLevelOne(DeconvOneSpPtr deconv_ptr, RawMsGroupReaderPtr reader_ptr, 
                                 //MsAlignWriterPtr ms2_writer_ptr);
@@ -54,14 +53,15 @@ class DeconvProcess {
 
   std::string updateMsg(MsHeaderPtr header_ptr, int scan, int total_scan_num);
 
-  void mergeMsFiles(std::string filePrefix, int thread_num, int total_scan_number);
+  void mergeMsFiles(std::string filePrefix, int thread_num, int spec_num);
 
   void readMsFile(std::string fileName, std::vector<std::string> *spec_data_array);
   
   void mergeSort(std::vector<std::string> *spec_data_array, int start, int end);
 
   void mergeSortedVec(std::vector<std::string> *spec_data_array, int start, int middle, int end);
-  void writeMsalign(std::string filePrefix, std::vector<std::string> *spec_data_array, int total_scan_num);
+ 
+  void writeMsalign(std::string resultFileName, std::vector<std::string> *spec_data_array, int total_scan_num);
 
   int ms1_spec_num = 0;
   int ms2_spec_num = 0;
