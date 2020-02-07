@@ -49,17 +49,27 @@ void processOneFile(TopfdParaPtr para_ptr,
                             para_ptr->missing_level_one_, 
                             para_ptr->resource_dir_);
     std::cout << "Feature detection finished." << std::endl;
+    
     std::cout << "Processing " << spec_file_name << " finished." << std::endl;
 
     std::cout << "Deleting temporary files - started." << std::endl;
-    std::string base_name = file_util::basename(spec_file_name);
-    std::string fa_base = file_util::absoluteName(base_name);
-    std::replace(fa_base.begin(), fa_base.end(), '\\', '/');
-    
+    std::string base_name_ms1 = file_util::basename(spec_file_name) + "_ms1.msalign";
+    std::string base_name_ms2 = file_util::basename(spec_file_name) + "_ms2.msalign";
+    std::string base_name_concat = "concat_" + file_util::basename(spec_file_name);
+
+    std::string fa_base_ms1 = file_util::absoluteName(base_name_ms1);
+    std::string fa_base_ms2 = file_util::absoluteName(base_name_ms2);
+    std::string fa_base_concat = file_util::absoluteName(base_name_concat);
+
+    std::replace(fa_base_ms1.begin(), fa_base_ms1.end(), '\\', '/');
+    std::replace(fa_base_ms2.begin(), fa_base_ms2.end(), '\\', '/');
+    std::replace(fa_base_concat.begin(), fa_base_concat.end(), '\\', '/');
+
     for (int i = 0; i < thread_number; i++){
-      file_util::cleanPrefix(base_name, fa_base + std::to_string(i) + "_");
-      file_util::cleanTempFiles(base_name + "_ms1.msalign" + std::to_string(i), "_ms");
+      file_util::cleanPrefix(base_name_ms1 + std::to_string(i), fa_base_ms1 + std::to_string(i));
+      file_util::cleanPrefix(base_name_ms2 + std::to_string(i), fa_base_ms2 + std::to_string(i));
     }
+    file_util::cleanPrefix(base_name_concat, fa_base_concat);
     std::cout << "Deleting temporary files - finished." << std::endl; 
 
   } catch (const char* e) {

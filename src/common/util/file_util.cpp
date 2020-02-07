@@ -254,10 +254,18 @@ void cleanPrefix(const std::string & ref_name,
   fs::path ref_path(ref_name);
   fs::path ref_dir = absolute(ref_path).parent_path(); 
   fs::directory_iterator end_iter;
+
+  //std::cout << ref_dir << " " << ref_path << std::endl;
+
+
   for (fs::directory_iterator dir_iter(ref_dir); 
        dir_iter != end_iter ; ++dir_iter) {
     std::string file_name = dir_iter->path().string();
     std::replace(file_name.begin(), file_name.end(), '\\', '/');
+
+    //std::cout << file_name << std::endl;
+
+
     if (file_name.compare(0, prefix.length(), prefix) == 0) {
       if (!fs::is_directory(fs::status(dir_iter->path())))
         fs::remove(dir_iter->path());
