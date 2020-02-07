@@ -61,17 +61,11 @@ class DeconvProcess {
   void mergeSort(std::vector<std::string> *spec_data_array, int start, int end);
 
   void mergeSortedVec(std::vector<std::string> *spec_data_array, int start, int middle, int end);
+  void writeMsalign(std::string filePrefix, std::vector<std::string> *spec_data_array, int total_scan_num);
 
-/*
+  int ms1_spec_num = 0;
+  int ms2_spec_num = 0;
 
-
-  std::vector<std::string> mergeMsData(std::string fileName, int thread_num);
-
-  std::vector<std::string> mergeSort(std::vector<std::string> ms_vec, int start, int end);
-  
-  std::vector<std::vector<std::string>> mergeSortedVec(std::vector<std::vector<std::string>> vec_1, 
-                                                            std::vector<std::vector<std::string>> vec_2);
- */
  private:
 
   EnvParaPtr env_para_ptr_;
