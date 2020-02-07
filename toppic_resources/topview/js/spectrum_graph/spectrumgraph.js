@@ -8,9 +8,9 @@ SpectrumGraph = function(svgId,spectrumParameters,peakData, ionData){
   this.ionData = ionData;
   let graph = this;
 
-  this.redraw = function(mono_mz) {
+  this.redraw = function(mono_mz,id) {
     this.para = compSpectrumParameters(this.data.peak_list, this.data.envelope_list, mono_mz);
-	  drawSpectrum(this.id, this.para, this.data,this.ionData);
+		drawSpectrum(this.id, this.para, this.data,this.ionData);
   }
 
   this.zoomed = function () {

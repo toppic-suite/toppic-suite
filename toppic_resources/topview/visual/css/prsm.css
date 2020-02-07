@@ -140,6 +140,9 @@ svg.l_popup_svg{
 #spectrumpop .modal-sm{
   max-width: 70% !important;
 }
+#ms2spectrumpop .modal-sm{
+  max-width: 70% !important;
+}
 /* #tooltip_imagename {
   /* max-width: 350px !important; */
   /* If max-width does not work, try using width instead */
@@ -173,6 +176,15 @@ svg.l_popup_svg{
 #ms2svg_div .active{
   background-color: #F8F8F8 !important;
 }
+#ms2_graph_popup_nav .active{
+  background-color: #F8F8F8 !important;
+}
+#ms2_graph_popup_nav .nav-link{
+  border: 0px !important;
+}
+#ms2_graph_popup_nav a{
+	color: #428bca !important;
+}
 #ms2svg_div .nav-link{
   border: 0px !important;
 }
@@ -183,6 +195,15 @@ svg.l_popup_svg{
   border: 0px !important;
 }
 #ms1_graph_nav a{
+	color: #428bca !important;
+}
+#ms2_graph_nav .active{
+  background-color: #F8F8F8 !important;
+}
+#ms2_graph_nav .nav-link{
+  border: 0px !important;
+}
+#ms2_graph_nav a{
 	color: #428bca !important;
 }
 .modal{
