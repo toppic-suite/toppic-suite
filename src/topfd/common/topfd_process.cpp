@@ -33,12 +33,12 @@ void processOneFile(TopfdParaPtr para_ptr,
                     const std::string &spec_file_name, 
                    int frac_id) {
   try {
-    int thead_number = std::stoi(para_ptr->thread_number_);
+    int thread_number = std::stoi(para_ptr->thread_number_);
 
     std::cout << "Processing " << spec_file_name << " started." << std::endl;
     std::cout << "Deconvolution started." << std::endl;
 
-    DeconvProcess processor(para_ptr, spec_file_name, frac_id, thead_number, &processor);
+    DeconvProcess processor(para_ptr, spec_file_name, frac_id, thread_number, &processor);
     
     processor.process();
     std::cout << "Deconvolution finished." << std::endl;
@@ -50,6 +50,18 @@ void processOneFile(TopfdParaPtr para_ptr,
                             para_ptr->resource_dir_);
     std::cout << "Feature detection finished." << std::endl;
     std::cout << "Processing " << spec_file_name << " finished." << std::endl;
+
+    std::cout << "Deleting temporary files - started." << std::endl;
+    std::string base_name = file_util::basename(spec_file_name);
+    std::string fa_base = file_util::absoluteName(base_name);
+    std::replace(fa_base.begin(), fa_base.end(), '\\', '/');
+    
+    for (int i = 0; i < thread_number; i++){
+      file_util::cleanPrefix(base_name, fa_base + std::to_string(i) + "_");
+      file_util::cleanTempFiles(base_name + "_ms1.msalign" + std::to_string(i), "_ms");
+    }
+    std::cout << "Deleting temporary files - finished." << std::endl; 
+
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
     std::cout << e << std::endl;
@@ -138,6 +150,8 @@ int process(TopfdParaPtr para_ptr,  std::vector<std::string> spec_file_lst) {
     bool move_mzrt = false;
     moveFiles(para_ptr->merged_file_name_, move_mzrt);
   }
+
+  
 
   std::cout << "TopFD finished." << std::endl << std::flush;
   return 0;
