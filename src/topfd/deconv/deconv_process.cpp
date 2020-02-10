@@ -552,7 +552,11 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
 
     std::string msg = updateMsg(ms_group_ptr->getMsOnePtr()->getMsHeaderPtr(), count, total_scan_num);
     std::cout << "\r" << msg << std::flush;
-    count += 2;
+
+    //count is 1 scan from msalign1 + n scan from msalign2 vector
+    int parsedScan = 1 + static_cast<int>((ms_group_ptr->getMsTwoPtrVec()).size());
+
+    count += parsedScan;
     ms_group_ptr = reader_ptr->getNextMsGroupPtr();
   }
   pool_ptr->ShutDown();
