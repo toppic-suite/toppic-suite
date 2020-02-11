@@ -61,6 +61,8 @@ void getMatchedPeaks(DeconvMsPtrVec &ms1_ptr_vec, double prec_mass,
                      DeconvPeakPtrVec &matched_peaks, 
                      int ms1_id_begin, int ms1_id_end, 
                      FeatureParaPtr para_ptr) {
+  std::vector<double> mass_diff_vec;
+  std::vector<double> error_tole_vec;  
   if (ms1_ptr_vec.size() == 0) return;
   double error_tole = para_ptr->peak_tolerance_ptr_->compStrictErrorTole(prec_mass);
   std::vector<double> ext_masses = para_ptr->getExtendMasses(prec_mass);
@@ -76,8 +78,18 @@ void getMatchedPeaks(DeconvMsPtrVec &ms1_ptr_vec, double prec_mass,
             matched_peaks.push_back(peak);
             break;
           }
+          else{
+            mass_diff_vec.push_back(mass_diff);
+            error_tole_vec.push_back(error_tole);
+          }
         }
       }
+    }
+  }
+  if (matched_peaks.size() > 0){}
+  else{
+    for (int i = 0; i < 100; i++){
+      std::cout << "mass diff: " << mass_diff_vec[i] << ", error_tole : " << error_tole_vec[i] << std::endl;
     }
   }
 }
