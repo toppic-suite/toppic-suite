@@ -186,7 +186,7 @@ void DeconvProcess::processSpMissingLevelOne(RawMsGroupReaderPtr reader_ptr) {
   RawMsGroupPtr ms_group_ptr;
   ms_group_ptr = reader_ptr->getNextMsGroupPtr();
 
-  int count = 0;
+  int count = 1;
 
   std::string ms_msalign_name;
   ms_msalign_name = base_name_ + "_ms2.msalign";
@@ -220,7 +220,7 @@ void DeconvProcess::processSpMissingLevelOne(RawMsGroupReaderPtr reader_ptr) {
       RawMsPtr ms_two_ptr = ms_two_ptr_vec[t];
       std::string msg = updateMsg(ms_two_ptr->getMsHeaderPtr(), count, total_scan_num);
       std::cout << "\r" << msg << std::flush;
-      count += 2;
+      count += 1;
     }
 
     ms_group_ptr = reader_ptr->getNextMsGroupPtr();
@@ -516,7 +516,7 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
 
   ms_group_ptr = reader_ptr->getNextMsGroupPtr();
 
-  int count = 0;
+  int count = 1;
 
   std::string ms1_msalign_name, ms2_msalign_name;
   ms1_msalign_name = base_name_ + "_ms1.msalign";
