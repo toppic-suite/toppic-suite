@@ -25,9 +25,11 @@ class MultiScan{
                     temp_scanid = ms2_data.scan;
                     temp_value = ms2_data;
                 }
-                let temp_ms2DataObj = {"scanid":temp_scanid,"specId":element,"value":temp_value};
+                let temp_ms2DataObj = {"scanId":temp_scanid,"specId":element,"value":temp_value};
                 scanListWithData.push(temp_ms2DataObj);
                 count++;
+                // This comparison help to call the generate graph function after loading the data completely
+                // As data loading is an asynchronous process, we need to wait till all the data is loaded to execute the below functions
                 if(count == len)
                 {
                     let MultiScanObj = new MultiScan();
@@ -48,9 +50,15 @@ class MultiScan{
                         ms2_ScansWithData = scanListWithData;
                         MultiScanObj.createMs2NavEements(scanIdList,"ms2_graph_nav");
                         document.getElementById("dataLoading").remove();
-                        generateCorrespondingGraph(current_data,"ms2svg",null,specId);
+                        spectrumParams_global = createDummySpecParamsList(ms2_ScansWithData);
+                        console.log("spectrumParams_global : ", spectrumParams_global);
+                        createMultipleSvgs(ms2_ScansWithData);
+                        console.log("specId : ", specId);
+                        MultiScanObj.createMs2PopUpNavEements(scanIdList,"ms2_graph_popup_nav");
+                        createMultiplePopUpSvgs(ms2_ScansWithData);
+                        //generateCorrespondingGraph(current_data,"ms2svg",null,specId);
                     }
-                    scanbuttons();
+                    graphOnClickActions();
                 }
             }
         });
@@ -86,6 +94,28 @@ class MultiScan{
             _ul.appendChild(li);
          })
     }
+    createMs2PopUpNavEements(scanidList,id){
+        let _ul = document.getElementById(id);
+        scanidList.forEach(function(element,i){
+            let li = document.createElement("li");
+            li.setAttribute("class","nav-item");
+            let li_id = id+"_"+element;
+            li.setAttribute("id",li_id);
+            let a = document.createElement("a");
+            a.setAttribute("class","nav-link ms2_popup_scanIds");
+            let a_id = "ms2_popup_scanIds_"+element;
+            a.setAttribute("id",a_id);
+            if(i == 0)
+            {
+                a.setAttribute("class","nav-link ms2_popup_scanIds active");
+            }
+            a.setAttribute("href","#!");
+            a.setAttribute("value",element);
+            a.innerHTML = "Scan "+ element;
+            li.appendChild(a);
+            _ul.appendChild(li);
+         })
+    }
     createMs1NavEements(scanidList,id){
         let _ul = document.getElementById("ms1_graph_nav");
         scanidList.forEach(function(element,i){
@@ -105,27 +135,13 @@ class MultiScan{
          })
     }
 } 
-function generateCorrespondingGraph(current_data,id,prec_mz,specId){
-    let peak_data = new PeakData();
-    let peak_list = peak_data.getPeakData(current_data);
-    let envelope_list = peak_data.getEnvelopeData(current_data);
-    let ionData = peak_data.getIonData(prsm_data,specId);
-    let graphParams = graphOptions();
-    if(id == "ms2svg")
-    {
-        ms2_graph = addSpectrum(id, peak_list, envelope_list, prec_mz, ionData, graphParams);
-    }
-    else{
-        spectrumgraph = addSpectrum(id, peak_list, envelope_list, prec_mz, ionData, graphParams);
-    }
-}
-function getCurrentData(dataList,scanid){
+function getCurrentData(dataList,scanId){
     let current_data;
     let len = dataList.length;
     let specId;
     for(let i=0;i<len;i++)
     {
-        if(dataList[i].scanid == parseInt(scanid))
+        if(dataList[i].scanId == parseInt(scanId))
         {
             current_data = dataList[i].value;
             specId = dataList[i].specId;
@@ -147,39 +163,4 @@ function activateCurrentnavbar(id,currentValue){
             break;
         }
     }
-}
-function scanbuttons(){
-	//ms2_scanIds is the Id of the nav tabs for multiple navs
-	$(".ms2_scanIds").click(function(){
-        let value = this.getAttribute('value');
-        let [currentData,specId] = getCurrentData(ms2_ScansWithData,value);
-		generateCorrespondingGraph(currentData,"ms2svg",null,specId);
-		$("#ms2_graph_nav .active").removeClass("active");
-   		$(this).addClass("active");
-	})
-	$(".ms1_scanIds").click(function(){
-		let value = this.getAttribute('value');
-		let [currentData,specId] = getCurrentData(ms1_ScansWithData,value);
-		generateCorrespondingGraph(currentData,"popupspectrum",null,specId);
-		$("#ms1_graph_nav .active").removeClass("active");
-   		$(this).addClass("active");
-    })
-    
-    //ms2_scanIds is the Id of the nav tabs for multiple navs
-	$(".ms2_scanIds").click(function(){
-        let value = this.getAttribute('value');
-        let [currentData,specId] = getCurrentData(ms2_ScansWithData,value);
-		generateCorrespondingGraph(currentData,"ms2svg",null,specId);
-		$("#ms2_graph_nav .active").removeClass("active");
-   		$(this).addClass("active");
-	})
-	$(".ms1_scanIds").click(function(){
-		let value = this.getAttribute('value');
-		let [currentData,specId] = getCurrentData(ms1_ScansWithData,value);
-		generateCorrespondingGraph(currentData,"popupspectrum",null,specId);
-		$("#ms1_graph_nav .active").removeClass("active");
-   		$(this).addClass("active");
-    })
-
-    
 }

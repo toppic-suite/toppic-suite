@@ -28,6 +28,7 @@
 <script src="js/prsm/prsmtohtml.js"></script>
 <script src="js/prsm/buttons.js"></script>
 <script src="js/prsm/peakData.js"></script>
+<script src="js/prsm/generateSpectrumGraphs.js"></script>
 <script src="js/prsm/multiscan.js"></script>
 <script src="js/topview/topview.js"></script>
 
@@ -36,6 +37,7 @@ var ms2_ScansWithData = [];
 var ms1_ScansWithData = [];
 var ms2_graph ;
 var ms1_graph;
+var spectrumParams_global = [] ;
 $(document).ready(function(){
 	var x = location.href;
 	let l_split = x.split(/[?#]+/)[1];
@@ -204,7 +206,7 @@ $(document).ready(function(){
 			<span class="sr-only">Loading...</span>
 		</div><h3>&nbsp; Loading...</h3>
 	</div>
-	<svg id = "ms2svg" style = "background-color:#F8F8F8;display: none;"></svg>
+	 <!-- <svg id = "ms2svg" style = "background-color:#F8F8F8;display: none;"></svg> -->
 </div>
 <table>
 <tr>
@@ -367,10 +369,10 @@ $(document).ready(function(){
 		  <div class="modal-header ">
 			<button type="button" class="close" data-dismiss="modal">&times;</button>
 			</div>
-			 <div class="modal-body ms2_graph_nav">
+			 <div class="modal-body ms2_graph_popup_nav_div" id="ms2_graph_popup_nav_div">
 				<ul class="nav nav-tabs graph_nav" id="ms2_graph_popup_nav">
 				</ul>
-				 <svg id="popup_ms2_spectrum" style="background-color:#F8F8F8" ></svg>
+				 <!-- <svg id="popup_ms2_spectrum" style="background-color:#F8F8F8" ></svg> -->
 			 </div> 
 			 <div class="modal-footer">
 				  <button type="button" class="btn btn-primary btn-sm custom " id = "download_popupms2_png" ><i class="fas fa-download"></i><span>&nbsp;&nbsp;PNG</span></button>

@@ -231,3 +231,6 @@ svg.l_popup_svg{
 .btn:active {
   outline-color: red !important;
 }
+.ms2_svg_graph_class {
+  background-color: #F8F8F8!important;
+}

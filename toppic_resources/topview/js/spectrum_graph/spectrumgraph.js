@@ -10,9 +10,8 @@ SpectrumGraph = function(svgId,spectrumParameters,peakData, ionData){
 
   this.redraw = function(mono_mz,id) {
     this.para = compSpectrumParameters(this.data.peak_list, this.data.envelope_list, mono_mz);
-		drawSpectrum(this.id, this.para, this.data,this.ionData);
+	spectrumParameters = drawSpectrum(this.id, this.para, this.data,this.ionData);
   }
-
   this.zoomed = function () {
     let transform = d3.event.transform;
     //let distance = transform.x - spectrumParameters.specX;
@@ -27,7 +26,7 @@ SpectrumGraph = function(svgId,spectrumParameters,peakData, ionData){
     else {
 		  graph.para.zoom(mousePos[0], mousePos[1], ratio);
     }
-	  drawSpectrum(graph.id, graph.para, graph.data, graph.ionData);
+	spectrumParameters = drawSpectrum(graph.id, graph.para, graph.data, graph.ionData);
   }
 
   this.zoom = d3.zoom()
@@ -39,7 +38,8 @@ SpectrumGraph = function(svgId,spectrumParameters,peakData, ionData){
 					.call(this.zoom);
 	this.svg.call(this.zoom.transform, d3.zoomIdentity);
 												
-  drawSpectrum(this.id, this.para, this.data, this.ionData); 
+	spectrumParameters = drawSpectrum(this.id, this.para, this.data, this.ionData); 
+  return [spectrumParameters,this];
 }
 
 drawTicks = function(svg,spectrumParameters,spectrumgraph){
@@ -70,7 +70,8 @@ drawTicks = function(svg,spectrumParameters,spectrumgraph){
 							.attr("stroke-width","1")
 		}
 	}
-	this.addYTicks = svg.append("g").attr("id","ticks");
+	this.addYTicks = svg.append("g").attr("id","ticks")
+									.attr("class","ticks");
 	
 	for(let i=0; i <= spectrumParameters.yTicks ; i++)
 	{
@@ -415,4 +416,5 @@ function drawSpectrum(svgId, spectrumParameters, peakData,ionData){
 		//SpectrumDownload.addDownloadRect(svgId, spectrumParameters);
 	// }
 //   addDownloadRect(svgId, spectrumParameters);
+	return spectrumParameters;
 }
