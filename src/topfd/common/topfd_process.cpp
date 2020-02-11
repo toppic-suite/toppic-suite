@@ -43,15 +43,6 @@ void processOneFile(TopfdParaPtr para_ptr,
     processor.process();
     std::cout << "Deconvolution finished." << std::endl;
 
-    std::cout << "Feature detection started." << std::endl;
-    feature_detect::process(frac_id, 
-                            spec_file_name,
-                            para_ptr->missing_level_one_, 
-                            para_ptr->resource_dir_);
-    std::cout << "Feature detection finished." << std::endl;
-    
-    std::cout << "Processing " << spec_file_name << " finished." << std::endl;
-
     std::cout << "Deleting temporary files - started." << std::endl;
     std::string base_name_ms1 = file_util::basename(spec_file_name) + "_ms1.msalign";
     std::string base_name_ms2 = file_util::basename(spec_file_name) + "_ms2.msalign";
@@ -71,6 +62,15 @@ void processOneFile(TopfdParaPtr para_ptr,
     }
     file_util::cleanPrefix(base_name_concat, fa_base_concat);
     std::cout << "Deleting temporary files - finished." << std::endl; 
+
+    std::cout << "Feature detection started." << std::endl;
+    feature_detect::process(frac_id, 
+                            spec_file_name,
+                            para_ptr->missing_level_one_, 
+                            para_ptr->resource_dir_);
+    std::cout << "Feature detection finished." << std::endl;
+    
+    std::cout << "Processing " << spec_file_name << " finished." << std::endl;
 
   } catch (const char* e) {
     std::cout << "[Exception]" << std::endl;
