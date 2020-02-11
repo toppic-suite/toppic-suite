@@ -29,7 +29,6 @@ SpectrumParameters = function() {
   this.specScale = 1.0;
   this.specX = 0;
 
-
   /*	Colors for the envelope circles	*/
   this.spectrumColorArray = ["red","orange","blue","green"];
   /*	Radius factor and setting min and max radius	*/

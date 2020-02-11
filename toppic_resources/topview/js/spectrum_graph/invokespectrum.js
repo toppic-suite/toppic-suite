@@ -13,15 +13,20 @@ addSpectrum = function(id,peakList,envelopeList,monoMZ, ionData, graphParams){
 	{
 		specParameters.showIons = "N" ;
 	}
-
-	let spectrumgraph = new SpectrumGraph(id,specParameters,peakData,ionData);
-	return spectrumgraph;
+	let spectrumGraph;
+	
+	[spectrumParams_global,spectrumGraph] = new SpectrumGraph(id,specParameters,peakData,ionData);
+	// console.log("spectrumParameters : ", spectrumParams_global);
+	// console.log("SpectrumGraph : ", spectrumGraph);
+	// spectrumGraph.reDrawonPopUp(spectrumParams_global,"popup_ms2_spectrum");
+	// return [spectrumParams_global,spectrumGraph];
 }
 function graphOptions(){
     this.showPeaks = "Y";
     this.showCircles = "Y";
     this.showIons = "Y";
-    
+	this.scanid = "";
+	
     return this;
 }
 compSpectrumParameters = function (peakList, envelopeList, monoMZ) {
@@ -105,6 +110,9 @@ compSpectrumParameters = function (peakList, envelopeList, monoMZ) {
 
 
   return specParameters;
+}
+function reDrawOnPopUp(currminMz,currmaxMz,maxIntensity,minIntensity,minMzData,maxMzData,currentMaxIntensity){
+
 }
 /**
  * Sorting envelopes based on intensity to show top 200 envelops with high intensitites

@@ -8,6 +8,7 @@ PeakData = function() {
     this.maxMz;
     
     this.getPeakData = function(json_data){
+        console.log("json_data : ", json_data);
         let peakList = [];
         let i = json_data.peaks.length ;
         /*	Pass the data into peakmass and peakintensity ----------------------------*/
