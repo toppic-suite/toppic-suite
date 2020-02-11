@@ -573,7 +573,7 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
 
   mergeMsFiles(ms1_msalign_name, thread_num, ms1_spec_num + 1);
   mergeMsFiles(ms2_msalign_name, thread_num, ms2_spec_num + 1);//ms1(ms2)_spec_num +1 because id started at 0, so to count all spectrums, +1.
-  //std::cout << ms1_spec_num << " " << ms2_spec_num << std::endl;
+
   std::cout << std::endl;
 
   }
