@@ -245,9 +245,15 @@ void DeconvProcess::mergeSortedVec(std::vector<std::string> *spec_data_array, in
 
   for (i = 0; i < first_array_size; i++){
     first_half[i] = spec_data_array[start + i];
+    if (spec_data_array[start+i].size() < 1){
+      std::cout << "first array empty at " << i << std::endl;
+    }
   }
   for (j = 0; j < second_array_size; j++){
     second_half[j] = spec_data_array[middle + 1 + j];
+    if (spec_data_array[start+i].size() < 1){
+      std::cout << "second array empty at " << j << std::endl;
+    }
   }
 
   i = 0;
@@ -279,6 +285,7 @@ void DeconvProcess::mergeSortedVec(std::vector<std::string> *spec_data_array, in
       }
     }
     else{
+      std::cout << "something is wrong" << std::endl;
       break;
     }
   }
@@ -329,7 +336,6 @@ void DeconvProcess::readMsFile(std::string fileName, std::vector<std::string> *s
       if (line_list.size() != 0) {
         line_list.push_back(line);
       }
-      //combined_ms_vector.push_back(line_list);
       spec_data_array[idx] = line_list;
       line_list.clear();
       idx++;
@@ -365,11 +371,7 @@ void DeconvProcess::mergeMsFiles(std::string fileName, int thread_num, int spec_
 
   readMsFile(combinedFileName, spec_data_array);
 
-  //std::cout << "fine until readMsFile" << std::endl;
-
   mergeSort(spec_data_array, 0, spec_num-1);
-
-  //std::cout << "fine until mergesort" << std::endl;
 
   writeMsalign(fileName, spec_data_array, spec_num);
 
