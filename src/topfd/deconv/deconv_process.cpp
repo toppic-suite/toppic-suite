@@ -245,15 +245,9 @@ void DeconvProcess::mergeSortedVec(std::vector<std::string> *spec_data_array, in
 
   for (i = 0; i < first_array_size; i++){
     first_half[i] = spec_data_array[start + i];
-    if (spec_data_array[start+i].size() < 1){
-      std::cout << "first array empty at " << i << std::endl;
-    }
   }
   for (j = 0; j < second_array_size; j++){
     second_half[j] = spec_data_array[middle + 1 + j];
-    if (spec_data_array[start+i].size() < 1){
-      std::cout << "second array empty at " << j << std::endl;
-    }
   }
 
   i = 0;
@@ -261,7 +255,7 @@ void DeconvProcess::mergeSortedVec(std::vector<std::string> *spec_data_array, in
   k = start;
 
   while (i < first_array_size && j < second_array_size){
-    if (first_half[i].size() > 0 && second_half[i].size() > 0){
+    if (first_half[i].size() > 0 && second_half[j].size() > 0){
       std::string line_i = first_half[i][1];
       std::string line_j = second_half[j][1];    //ID is in line 1 of each vector
 
@@ -285,7 +279,7 @@ void DeconvProcess::mergeSortedVec(std::vector<std::string> *spec_data_array, in
       }
     }
     else{
-      std::cout << "something is wrong" << std::endl;
+      LOG_ERROR("empty vector for a spectrum");
       break;
     }
   }
