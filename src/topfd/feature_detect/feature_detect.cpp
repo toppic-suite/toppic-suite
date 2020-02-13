@@ -576,8 +576,8 @@ void process(int frac_id, const std::string &sp_file_name,
     raw_reader_ptr->getMs1Peaks(raw_peaks);
     raw_reader_ptr = nullptr;
     findMsOneFeatures(ms1_ptr_vec, raw_peaks, para_ptr, frac_features, env_para_ptr);
-  }
- 
+  
+  
   LOG_DEBUG("start reading ms2");
   std::string ms2_file_name = base_name + "_ms2.msalign";
   MsHeaderPtrVec header_ptr_vec;
@@ -586,12 +586,8 @@ void process(int frac_id, const std::string &sp_file_name,
   SpecFeaturePtrVec ms2_features;
   getMs2Features(ms1_ptr_vec, header_ptr_vec, frac_features, para_ptr, ms2_features);
 
-  //std::cout << "ms2 finished " << std::endl;
-
   SampleFeaturePtrVec sample_features;
   getSampleFeatures(sample_features, frac_features, ms2_features);
-
-  //std::cout << "sample finished " << std::endl;
 
   std::string output_file_name = base_name + "_feature.xml";
   frac_feature_writer::writeXmlFeatures(output_file_name, frac_features);
@@ -602,6 +598,7 @@ void process(int frac_id, const std::string &sp_file_name,
 
   output_file_name = base_name + "_ms2.feature";
   spec_feature_writer::writeFeatures(output_file_name, ms2_features); 
+  }
 }
 
 }  // namespace 
