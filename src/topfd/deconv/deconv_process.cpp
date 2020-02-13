@@ -323,14 +323,13 @@ void DeconvProcess::readMsFile(std::string fileName, std::vector<std::string> *s
   int idx = 0;
   while (std::getline(ms, line)) {
     str_util::trim(line);
-    //std::cout << line << std::endl;
+
     if (line == "BEGIN IONS") {
       line_list.push_back(line);
     } else if (line == "END IONS") {
       if (line_list.size() != 0) {
         line_list.push_back(line);
       }
-      std::cout << idx << std::endl;
       spec_data_array[idx] = line_list;
       line_list.clear();
       idx++;
