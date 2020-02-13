@@ -581,8 +581,7 @@ void process(int frac_id, const std::string &sp_file_name,
     raw_reader_ptr = nullptr;
     findMsOneFeatures(ms1_ptr_vec, raw_peaks, para_ptr, frac_features, env_para_ptr);
   }
-  //std::cout << "---missng level one so skip to here " << std::endl;
-
+ 
   LOG_DEBUG("start reading ms2");
   std::string ms2_file_name = base_name + "_ms2.msalign";
   MsHeaderPtrVec header_ptr_vec;
