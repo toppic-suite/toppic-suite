@@ -344,15 +344,15 @@ void DeconvProcess::readMsFile(std::string fileName, std::vector<std::string> *s
 
 }
 void DeconvProcess::mergeMsFiles(std::string fileName, int thread_num, int spec_num){
-  std::string combinedFileName = "concat_" + fileName + "_ms";
-
+  std::string combinedFileName = fileName + "_concat" + "_ms";
+  
   if (file_util::exists(combinedFileName)){
     boost::filesystem::remove(combinedFileName);
   }
   std::ofstream combined_ms(combinedFileName, std::ios_base::binary | std::ios_base::app);
 
   for (int i = 0; i < thread_num; i++){//concatenate all ms files
-    std::string msfileName = fileName + str_util::toString(i) + "_ms";
+    std::string msfileName = fileName + "_" + str_util::toString(i) + "_ms";
     std::ifstream msfile(msfileName, std::ios_base::binary);
 
     combined_ms.seekp(0, std::ios_base::end);
@@ -363,11 +363,18 @@ void DeconvProcess::mergeMsFiles(std::string fileName, int thread_num, int spec_
   std::vector<std::string> *spec_data_array;
   spec_data_array = new std::vector<std::string>[spec_num];
 
+  //below line causes seg falut in missing one
   readMsFile(combinedFileName, spec_data_array);
+
+  //std::cout << "crash after readmsfile" << std::endl;
 
   mergeSort(spec_data_array, 0, spec_num-1);
 
+  //std::cout << "crash after mergeSort" << std::endl;
+
   writeMsalign(fileName, spec_data_array, spec_num);
+
+  //std::cout << "crash after writeMsalign" << std::endl;
 
   delete[] spec_data_array;
   spec_data_array = nullptr;
@@ -513,10 +520,19 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
   ms_group_ptr = reader_ptr->getNextMsGroupPtr();
 
   int count = 1;
-
+  
+  //the base name below should exclude the file path 
   std::string ms1_msalign_name, ms2_msalign_name;
-  ms1_msalign_name = base_name_ + "_ms1.msalign";
-  ms2_msalign_name = base_name_ + "_ms2.msalign"; //names for msalign intermediate and final files
+
+  
+  //std::string base_path = file_util::absoluteDir(base_name_);
+  //std::string base_name = base_name_.filename().string(); //ex: st_2
+  //std::string output_prefix = base_path + 
+
+  //std::cout << "output prefix: " + output_prefix << std::endl;
+
+  ms1_msalign_name = file_util::basename(spec_file_name_) + "_ms1.msalign";
+  ms2_msalign_name = file_util::basename(spec_file_name_) + "_ms2.msalign"; //names for msalign intermediate and final files
 
   SimpleThreadPoolPtr pool_ptr = std::make_shared<SimpleThreadPool>(thread_num);  
   
@@ -526,8 +542,8 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
   MsAlignWriterPtrVec ms2_writer_ptr_vec;
 
   for (int i = 0; i < thread_num; i++) { 
-    MsAlignWriterPtr ms1_ptr = std::make_shared<MsAlignWriter>(ms1_msalign_name + str_util::toString(i) + "_ms");
-    MsAlignWriterPtr ms2_ptr = std::make_shared<MsAlignWriter>(ms2_msalign_name + str_util::toString(i) + "_ms");
+    MsAlignWriterPtr ms1_ptr = std::make_shared<MsAlignWriter>(ms1_msalign_name + "_" + str_util::toString(i) + "_ms");
+    MsAlignWriterPtr ms2_ptr = std::make_shared<MsAlignWriter>(ms2_msalign_name + "_" + str_util::toString(i) + "_ms");
 
     ms1_writer_ptr_vec.push_back(ms1_ptr);
     ms2_writer_ptr_vec.push_back(ms2_ptr);
@@ -555,7 +571,7 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
     count += parsedScan;
     ms_group_ptr = reader_ptr->getNextMsGroupPtr();
   }
-  pool_ptr->ShutDown();
+    pool_ptr->ShutDown();
 
     //auto proc_end = std::chrono::high_resolution_clock::now();
     ///auto proc_duration = std::chrono::duration_cast<std::chrono::microseconds>(proc_end-proc_start);
