@@ -519,7 +519,7 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
 
   ms_group_ptr = reader_ptr->getNextMsGroupPtr();
 
-  int count = 1;
+  int count = 2;
   
   //the base name below should exclude the file path 
   std::string ms1_msalign_name, ms2_msalign_name;
