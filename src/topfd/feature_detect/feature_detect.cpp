@@ -399,8 +399,7 @@ void findMsOneFeatures(DeconvMsPtrVec &ms1_ptr_vec, PeakPtrVec2D & raw_peaks,
                                               matched_peaks, para_ptr);
       if (feature_ptr == nullptr) {
         LOG_ERROR("Empty feature!");
-        continue;
-        //exit(EXIT_FAILURE);
+        exit(EXIT_FAILURE);
       }
       else{
         // check if the feature has at least 2 envelopes
@@ -500,9 +499,6 @@ void getMs2Features(DeconvMsPtrVec &ms1_ptr_vec, MsHeaderPtrVec &header_ptr_vec,
   for (size_t i = 0; i < sorted_ptrs.size(); i++) {
     MsHeaderPtr header = sorted_ptrs[i];
     FracFeaturePtr ft_ptr = getMatchedFeaturePtr(features, header, para_ptr);
-
-    
-
     if (ft_ptr != nullptr) {
       SpecFeaturePtr ms2_feature = std::make_shared<SpecFeature>(header, ft_ptr);
       ms2_features.push_back(ms2_feature);
@@ -586,8 +582,6 @@ void process(int frac_id, const std::string &sp_file_name,
   std::string ms2_file_name = base_name + "_ms2.msalign";
   MsHeaderPtrVec header_ptr_vec;
   readHeaders(ms2_file_name, header_ptr_vec);
-
-  //std::cout << "---header read" << std::endl;
 
   SpecFeaturePtrVec ms2_features;
   getMs2Features(ms1_ptr_vec, header_ptr_vec, frac_features, para_ptr, ms2_features);
