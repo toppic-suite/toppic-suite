@@ -163,7 +163,6 @@ void DeconvProcess::deconvMissingMsOne(RawMsPtr ms_ptr, DeconvOneSpPtr deconv_pt
         + "spectrum" + std::to_string(header_ptr->getId()) + ".js";
     raw_ms_writer::write(json_file_name, ms_ptr, result_envs);    
   }
-
 }
 
 std::function<void()> geneTaskMissingMsOne(RawMsGroupPtr ms_group_ptr, DeconvOneSpPtr deconv_ptr,
@@ -196,7 +195,7 @@ void DeconvProcess::processSpMissingLevelOne(RawMsGroupReaderPtr reader_ptr) {
   MsAlignWriterPtrVec ms_writer_ptr_vec;
 
   for (int i = 0; i < thread_num; i++) { 
-    MsAlignWriterPtr ms_ptr = std::make_shared<MsAlignWriter>(ms_msalign_name + str_util::toString(i) + "_ms");
+    MsAlignWriterPtr ms_ptr = std::make_shared<MsAlignWriter>(ms_msalign_name + "_" + str_util::toString(i) + "_ms");
 
     ms_writer_ptr_vec.push_back(ms_ptr);
   }
@@ -227,7 +226,7 @@ void DeconvProcess::processSpMissingLevelOne(RawMsGroupReaderPtr reader_ptr) {
   }
   pool_ptr->ShutDown();
 
-  mergeMsFiles(ms_msalign_name, thread_num, ms2_spec_num + 1);
+  mergeMsFiles(ms_msalign_name, thread_num, total_scan_num);
 
   std::cout << std::endl;
 }
@@ -324,15 +323,18 @@ void DeconvProcess::readMsFile(std::string fileName, std::vector<std::string> *s
   int idx = 0;
   while (std::getline(ms, line)) {
     str_util::trim(line);
+    //std::cout << line << std::endl;
     if (line == "BEGIN IONS") {
       line_list.push_back(line);
     } else if (line == "END IONS") {
       if (line_list.size() != 0) {
         line_list.push_back(line);
       }
+      std::cout << idx << std::endl;
       spec_data_array[idx] = line_list;
       line_list.clear();
       idx++;
+      
     }else if (line == "" || line[0] == '#') {
       continue;
     } else {
@@ -363,18 +365,11 @@ void DeconvProcess::mergeMsFiles(std::string fileName, int thread_num, int spec_
   std::vector<std::string> *spec_data_array;
   spec_data_array = new std::vector<std::string>[spec_num];
 
-  //below line causes seg falut in missing one
   readMsFile(combinedFileName, spec_data_array);
-
-  //std::cout << "crash after readmsfile" << std::endl;
 
   mergeSort(spec_data_array, 0, spec_num-1);
 
-  //std::cout << "crash after mergeSort" << std::endl;
-
   writeMsalign(fileName, spec_data_array, spec_num);
-
-  //std::cout << "crash after writeMsalign" << std::endl;
 
   delete[] spec_data_array;
   spec_data_array = nullptr;
@@ -513,7 +508,7 @@ std::function<void()> geneTask(RawMsGroupPtr ms_group_ptr, DeconvOneSpPtr deconv
 }
 void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
 
-  int total_scan_num = reader_ptr->getInputSpNum();
+  int total_scan_num = reader_ptr->getInputSpNum();//this is spectrum count, not same as scan ID count
 
   RawMsGroupPtr ms_group_ptr;
 
@@ -523,13 +518,6 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
   
   //the base name below should exclude the file path 
   std::string ms1_msalign_name, ms2_msalign_name;
-
-  
-  //std::string base_path = file_util::absoluteDir(base_name_);
-  //std::string base_name = base_name_.filename().string(); //ex: st_2
-  //std::string output_prefix = base_path + 
-
-  //std::cout << "output prefix: " + output_prefix << std::endl;
 
   ms1_msalign_name = file_util::basename(spec_file_name_) + "_ms1.msalign";
   ms2_msalign_name = file_util::basename(spec_file_name_) + "_ms2.msalign"; //names for msalign intermediate and final files
@@ -585,7 +573,7 @@ void DeconvProcess::processSp(RawMsGroupReaderPtr reader_ptr) {
 
   mergeMsFiles(ms1_msalign_name, thread_num, ms1_spec_num + 1);
   mergeMsFiles(ms2_msalign_name, thread_num, ms2_spec_num + 1);//ms1(ms2)_spec_num +1 because id started at 0, so to count all spectrums, +1.
-
+  
   std::cout << std::endl;
 
   }
