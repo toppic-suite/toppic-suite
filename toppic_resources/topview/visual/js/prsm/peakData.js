@@ -8,7 +8,6 @@ PeakData = function() {
     this.maxMz;
     
     this.getPeakData = function(json_data){
-        console.log("json_data : ", json_data);
         let peakList = [];
         let i = json_data.peaks.length ;
         /*	Pass the data into peakmass and peakintensity ----------------------------*/
@@ -51,18 +50,33 @@ PeakData = function() {
         }
         return envelopList;
     }
-    this.getIonData = function(prsm_data,specId){
+    this.getIonData = function(prsm_data,specId,json_data){
+        let envelopes =  json_data.envelopes;
+        console.log("envelopes : ", envelopes);
         let ionData = [];
+        let intensity ;
         prsm_data.prsm.ms.peaks.peak.forEach(function(element){
             let ion = "";
             if(element.hasOwnProperty('matched_ions_num'))
             {   
-                ion = element.matched_ions.matched_ion.ion_type + element.matched_ions.matched_ion.ion_position;
+                ion = element.matched_ions.matched_ion.ion_type + element.matched_ions.matched_ion.ion_display_position;
             }
             if(element.spec_id == specId)
             {
-                ionDataTemp = {"mz":parseFloat(element.monoisotopic_mz),"intensity":parseFloat(element.intensity),"ion":ion};
-                ionData.push(ionDataTemp);
+                for(let i=0;i<envelopes.length;i++)
+                {
+                    if(parseFloat(element.monoisotopic_mass).toFixed(3) == envelopes[i].mono_mass.toFixed(3))
+                    {
+                        
+                        intensity = envelopes[i].env_peaks.sort(function(x,y){
+                                        return d3.descending(x.intensity, y.intensity);
+                                    })[0].intensity; //envelopes[i].env_peaks[0].intensity;
+                        console.log("intensity : ", intensity);
+                        ionDataTemp = {"mz":parseFloat(element.monoisotopic_mz),"intensity":parseFloat(intensity),"ion":ion};
+                        ionData.push(ionDataTemp);
+                        break;
+                    }
+                }
             }
         });
         return ionData;

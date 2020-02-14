@@ -1,7 +1,6 @@
 /*	On-click Actions to show spectrum graph	*/
 function buttons(){
 	/*	Invocation on click of Mono M/z at the table	*/
-	
 	$("#show_ms2_spectrum" ).click(function() {
 		 
 		 if($.trim($(this).text()) === 'Show Spectrum')

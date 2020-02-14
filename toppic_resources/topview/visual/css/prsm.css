@@ -234,3 +234,15 @@ svg.l_popup_svg{
 .ms2_svg_graph_class {
   background-color: #F8F8F8!important;
 }
+
+#ms2spectrumpop td{
+  border-top: 10 !important;
+  border-bottom: 5 !important;
+}
+.td_popup_button {
+  padding-top: 20px !important;
+}
+.td_popup_variables{
+  padding-top: 25px !important;
+  padding-left: 20px !important;
+}
