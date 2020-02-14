@@ -2,9 +2,9 @@
  * 	the data-------------------------------------------------------------------*/
 SpectrumParameters = function() {
   /* Attributes to decide what to be shown on the graph */
-  this.showPeaks = "Y";
-  this.showCircles = "Y";
-  this.showIons = "Y";
+  this.showPeaks = true;
+  this.showCircles = true;
+  this.showIons = true;
   
   /*assign the mono m/z value when clicked on mono m/z*/
   this.minMz ;
@@ -18,6 +18,7 @@ SpectrumParameters = function() {
   this.dataMaxInte ;
   this.dataMinInte;
   this.maxInte;
+  this.fixedShiftRatio = 1.000684;
 
   this.svgWidth = 910;
   this.svgHeight = 220;

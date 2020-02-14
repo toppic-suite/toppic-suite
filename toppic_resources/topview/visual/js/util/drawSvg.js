@@ -287,7 +287,6 @@ function drawAnnotation(annotation,l_charge,id,coordinates,x,y)
 						}
 					})
 					.on("mouseover", function(){
-						console.log("in mouse over");
 						appendTooltip(l_charge);
 					})
 					.on("mouseout", function(d){

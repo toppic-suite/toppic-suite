@@ -7,39 +7,56 @@ SpectrumGraph = function(svgId,spectrumParameters,peakData, ionData){
   this.data = peakData;
   this.ionData = ionData;
   let graph = this;
+  let tempid = svgId.split("#")[1];
 
-  this.redraw = function(mono_mz,id) {
-    this.para = compSpectrumParameters(this.data.peak_list, this.data.envelope_list, mono_mz);
-	spectrumParameters = drawSpectrum(this.id, this.para, this.data,this.ionData);
-  }
+this.redraw = function(mono_mz,id) {
+     this.para = compSpectrumParameters(this.data.peak_list, this.data.envelope_list, mono_mz);
+ 	spectrumParameters = drawSpectrum(this.id, this.para, this.data,this.ionData);
+ 	correspondingSpecParams_g[tempid] = spectrumParameters;
+   }
+//   this.reDrawWithSpecParams = function(id,specParams){
+// 	  console.log(this.data);
+// 	  console.log(this.ionData);
+// 	  console.log(specParams);
+// 	  id = "#"+id;
+// 	spectrumParameters = drawSpectrum(id, specParams, this.data,this.ionData);
+//   }
   this.zoomed = function () {
     let transform = d3.event.transform;
     //let distance = transform.x - spectrumParameters.specX;
-    let distance = transform.x - graph.para.specX;
-	  let ratio = transform.k / graph.para.specScale;
-    graph.para.specX = transform.x;
-    graph.para.specScale = transform.k;
+    let distance = transform.x - spectrumParameters.specX;
+	  let ratio = transform.k / spectrumParameters.specScale;
+	  spectrumParameters.specX = transform.x;
+	  spectrumParameters.specScale = transform.k;
     let mousePos = d3.mouse(this);
     if (ratio == 1) {
-      graph.para.drag(distance);
+		spectrumParameters.drag(distance);
     }
     else {
-		  graph.para.zoom(mousePos[0], mousePos[1], ratio);
+		spectrumParameters.zoom(mousePos[0], mousePos[1], ratio);
     }
-	spectrumParameters = drawSpectrum(graph.id, graph.para, graph.data, graph.ionData);
+	spectrumParameters = drawSpectrum(svgId, spectrumParameters, peakData, ionData);
+	// console.log("transform.x : ", transform.x);
+	// console.log("transform.k : ", transform.k);
+	correspondingSpecParams_g[tempid] = spectrumParameters;
+ // console.log("correspondingSpecParams_g zoom : ", correspondingSpecParams_g);
   }
 
   this.zoom = d3.zoom()
     .on("zoom", this.zoomed);
 
-	this.svg.attr("viewBox", "0 0 "+ graph.para.svgWidth+" "+ graph.para.svgHeight)
+	this.svg.attr("viewBox", "0 0 "+ spectrumParameters.svgWidth+" "+ spectrumParameters.svgHeight)
 					.attr("width", "100%")
 					.attr("height", "100%")
 					.call(this.zoom);
 	this.svg.call(this.zoom.transform, d3.zoomIdentity);
-												
-	spectrumParameters = drawSpectrum(this.id, this.para, this.data, this.ionData); 
-  return [spectrumParameters,this];
+	
+	// console.log("this.para : ", this.para);
+	spectrumParameters = drawSpectrum(svgId, spectrumParameters, peakData, ionData); 
+	correspondingSpecParams_g[tempid] = spectrumParameters;
+  	// console.log("correspondingSpecParams_g zoom : ", correspondingSpecParams_g);
+
+  return graph;
 }
 
 drawTicks = function(svg,spectrumParameters,spectrumgraph){
@@ -287,7 +304,7 @@ drawIons = function(svg,spectrumParameters,ionData){
 		{
 			ions.append("text")
 			.attr("id","graph_matched_ions")
-			.attr("x",spectrumParameters.getPeakXPos(element.mz))
+			.attr("x",spectrumParameters.getPeakXPos((element.mz*spectrumParameters.fixedShiftRatio) + 0.1))
 			.attr("y",function(d,i){
 				let y = spectrumParameters.getPeakYPos(element.intensity);
 				if(y <= spectrumParameters.padding.head) return spectrumParameters.padding.head ;
@@ -382,6 +399,7 @@ onMouseOut = function(){
 	d3.selectAll("#MyTextMassCharge").remove();
 }
 function drawSpectrum(svgId, spectrumParameters, peakData,ionData){
+	console.log("spectrumParameters : ", spectrumParameters);
 	// if(spectrumParameters.minMz > -500 )
 	// {
 		let svg = d3.select("body").select(svgId);
@@ -400,15 +418,15 @@ function drawSpectrum(svgId, spectrumParameters, peakData,ionData){
 		drawAxis(svg,spectrumParameters);
 		addDatatoAxis(svg,spectrumParameters);
 
-		if(spectrumParameters.showPeaks == "Y")
+		if(spectrumParameters.showPeaks)
 		{
 			drawPeaks(svg, spectrumParameters, peakData);
 		}
-		if(spectrumParameters.showCircles == "Y")
+		if(spectrumParameters.showCircles)
 		{
 			addCircles(svg,spectrumParameters,peakData);
 		}
-		if(spectrumParameters.showIons == "Y")
+		if(spectrumParameters.showIons)
 		{
 			drawIons(svg,spectrumParameters,ionData);
 		}
@@ -416,5 +434,6 @@ function drawSpectrum(svgId, spectrumParameters, peakData,ionData){
 		//SpectrumDownload.addDownloadRect(svgId, spectrumParameters);
 	// }
 //   addDownloadRect(svgId, spectrumParameters);
+	
 	return spectrumParameters;
 }

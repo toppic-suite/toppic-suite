@@ -50,12 +50,10 @@ class MultiScan{
                         ms2_ScansWithData = scanListWithData;
                         MultiScanObj.createMs2NavEements(scanIdList,"ms2_graph_nav");
                         document.getElementById("dataLoading").remove();
-                        spectrumParams_global = createDummySpecParamsList(ms2_ScansWithData);
-                        console.log("spectrumParams_global : ", spectrumParams_global);
+                       // spectrumParams_global = createDummySpecParamsList(ms2_ScansWithData);
                         createMultipleSvgs(ms2_ScansWithData);
-                        console.log("specId : ", specId);
-                        MultiScanObj.createMs2PopUpNavEements(scanIdList,"ms2_graph_popup_nav");
-                        createMultiplePopUpSvgs(ms2_ScansWithData);
+                        //MultiScanObj.createMs2PopUpNavEements(scanIdList,"ms2_graph_popup_nav");
+                       // createMultiplePopUpSvgs(ms2_ScansWithData);
                         //generateCorrespondingGraph(current_data,"ms2svg",null,specId);
                     }
                     graphOnClickActions();

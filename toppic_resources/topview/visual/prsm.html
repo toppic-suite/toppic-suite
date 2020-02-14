@@ -38,6 +38,8 @@ var ms1_ScansWithData = [];
 var ms2_graph ;
 var ms1_graph;
 var spectrumParams_global = [] ;
+var correspondingSpecParams_g = [];
+
 $(document).ready(function(){
 	var x = location.href;
 	let l_split = x.split(/[?#]+/)[1];
@@ -367,17 +369,41 @@ $(document).ready(function(){
 	<div class="modal-dialog modal-sm" role="document">
 	  <div class="modal-content">
 		  <div class="modal-header ">
+			<table class="table table-sm table_modal">
+				<tbody>
+					<tr>
+						<div  >
+							<td class="td_popup_variables">Show Peaks: &nbsp;&nbsp;&nbsp;
+								<input type="radio" name="show_peaks" class = "show_peaks" >Yes
+								<input type="radio" name="show_peaks" class = "show_peaks" >No
+							</td>
+							<td class="td_popup_variables">Show Envelops: &nbsp;&nbsp;&nbsp;
+								<input type="radio" name="show_envelops" class = "show_envelops">Yes
+								 <input type="radio" name="show_envelops" class = "show_envelops">No
+							</td>
+							  <td class="td_popup_variables">Show Ions: &nbsp;&nbsp;&nbsp;
+								<input type="radio" name="show_ions" class = "show_ions">Yes
+								<input type="radio" name="show_ions" class = "show_ions">No
+							</td>
+						</div>
+						<td class="td_popup_button">
+							<button type = "button" class="btn btn-primary btn-sm "  id =
+			  					"ms2_popup_redraw"  >Redraw</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
 			<button type="button" class="close" data-dismiss="modal">&times;</button>
-			</div>
-			 <div class="modal-body ms2_graph_popup_nav_div" id="ms2_graph_popup_nav_div">
-				<ul class="nav nav-tabs graph_nav" id="ms2_graph_popup_nav">
-				</ul>
-				 <!-- <svg id="popup_ms2_spectrum" style="background-color:#F8F8F8" ></svg> -->
-			 </div> 
-			 <div class="modal-footer">
-				  <button type="button" class="btn btn-primary btn-sm custom " id = "download_popupms2_png" ><i class="fas fa-download"></i><span>&nbsp;&nbsp;PNG</span></button>
-				  <button type="button" class="btn btn-primary btn-sm custom " id = "download_popupms2_svg" ><i class="fas fa-download"></i><span>&nbsp;&nbsp;SVG</span></button>
-		  </div>
+		</div>
+		<div class="modal-body ms2_graph_popup_nav_div" id="ms2_graph_popup_nav_div">
+		<ul class="nav nav-tabs graph_nav" id="ms2_graph_popup_nav">
+		</ul>
+		<svg id="popup_ms2_spectrum" style="background-color:#F8F8F8" ></svg>
+		</div> 
+		<div class="modal-footer">
+			<button type="button" class="btn btn-primary btn-sm custom " id = "download_popupms2_png" ><i class="fas fa-download"></i><span>&nbsp;&nbsp;PNG</span></button>
+			<button type="button" class="btn btn-primary btn-sm custom " id = "download_popupms2_svg" ><i class="fas fa-download"></i><span>&nbsp;&nbsp;SVG</span></button>
+		</div>
 	  </div>
 	</div>
   </div>

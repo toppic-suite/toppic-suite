@@ -45,11 +45,11 @@ class rectBGColor{
     /* Code to color the background of a occurence acids */
     rect_Backgroundcolor(x,y,id,color){
         /*	font-size 16px is equal to 12pt	*/
-        let font_width = 12 ;
+        let font_width = 15 ;
         /*	to draw the rect color uniformly */
         let font_height = 15 ;
         let svgContainer = d3.select("#"+id);
-        
+        x = x-3;
         //Temporary Fix
         console.log("svgContainer : ", svgContainer);
     

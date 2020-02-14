@@ -17,26 +17,24 @@ function svgIds()
     return this;
 }
 function generateCorrespondingGraph(current_data,id,prec_mz,specId){
-    console.log("current_data : ", current_data );
     let peak_data = new PeakData();
     let peak_list = peak_data.getPeakData(current_data);
     let envelope_list = peak_data.getEnvelopeData(current_data);
-    let ionData = peak_data.getIonData(prsm_data,specId);
-    let graphParams = graphOptions();
-    graphParams.scanId = current_data.scanId;
     if(id != "popupspectrum")
     {
-        console.log("In graph");
-        ms2_graph = addSpectrum(id, peak_list, envelope_list, prec_mz, ionData, graphParams);
+        let ionData = peak_data.getIonData(prsm_data,specId,current_data);
+        console.log("ionData : ", ionData);
+        ms2_graph = new addSpectrum(id, peak_list, envelope_list, prec_mz, ionData);
+        // Setting correspoding Spectrum params of the graph to its respective graph svg Ids
     }
     else{
-        spectrumgraph = addSpectrum(id, peak_list, envelope_list, prec_mz, null , graphParams);
+        spectrumgraph = new addSpectrum(id, peak_list, envelope_list, prec_mz, null);
     }
+    console.log("correspondingSpecParams_g : ", correspondingSpecParams_g);
 }
+
 function createMultipleSvgs(current_data)
 {
-    //<svg id = "ms2svg" style = "background-color:#F8F8F8;display: none;"></svg>
-    console.log("current_data : ", current_data);
     let div = document.getElementById("ms2svg_div"); 
     current_data.forEach(function(element,i){
         let id = "ms2svg_"+element.scanId;
@@ -49,15 +47,28 @@ function createMultipleSvgs(current_data)
             svg.style.display = "none"; 
         }
         div.appendChild(svg);
-        console.log("id : ",id);
-        console.log("element.specId : ",element.specId);
         generateCorrespondingGraph(element.value,id,null,element.specId);
     });
 }
+
+function reDrawWithSpecParams(current_data,id,spectrumParameters,specId)
+{
+    let peak_data = new PeakData();
+    let peak_list = peak_data.getPeakData(current_data);
+    let envelope_list = peak_data.getEnvelopeData(current_data);
+    let ionData = peak_data.getIonData(prsm_data,specId,current_data);
+    peak_list.sort(function(x,y){
+		return d3.descending(x.intensity, y.intensity);
+	})
+    envelope_list = sortEnvelopes(envelope_list) ;
+    let svgId = "#"+id;
+    let peakData = {peak_list:peak_list, envelope_list:envelope_list};
+    new SpectrumGraph(svgId,spectrumParameters,peakData, ionData);
+}
+
 function createMultiplePopUpSvgs(current_data)
 {
     //<svg id = "ms2svg" style = "background-color:#F8F8F8;display: none;"></svg>
-    console.log("current_data : ", current_data);
     let div = document.getElementById("ms2_graph_popup_nav_div"); 
     current_data.forEach(function(element,i){
         let id = "ms2svg_popup_"+element.scanId;
@@ -70,8 +81,6 @@ function createMultiplePopUpSvgs(current_data)
             svg.style.display = "none"; 
         }
         div.appendChild(svg);
-        console.log("id : ",id);
-        console.log("element.specId : ",element.specId);
         generateCorrespondingGraph(element.value,id,null,element.specId);
     });
 }
@@ -101,12 +110,17 @@ function graphOnClickActions(){
         let currentGraphNode = $('.ms2_scanIds.active')[0].text;
         let scanId = currentGraphNode.split(" ")[1];
 		let [current_data,specId] = getCurrentData(ms2_ScansWithData,scanId);
-        let id = "ms2_popup_scanIds_"+scanId;
-        let element = document.getElementById(id);
-        console.log("element : ", element);
-        $(".ms2_popup_scanIds.active").removeClass("active");
-        element.classList.add("active");  
-        
+        //let id = "ms2_popup_scanIds_"+scanId;
+        //let element = document.getElementById(id);
+        //$(".ms2_popup_scanIds.active").removeClass("active");
+        //element.classList.add("active");  
+        let id = "ms2svg_"+scanId;
+        let specparams = correspondingSpecParams_g[id];
+        document.getElementsByName("show_peaks")[0].checked = specparams.showPeaks;
+        document.getElementsByName("show_envelops")[0].checked = specparams.showCircles;
+        document.getElementsByName("show_ions")[0].checked = specparams.showIons;
+        console.log("specparams : ", id, specparams);
+        reDrawWithSpecParams(current_data,"popup_ms2_spectrum",specparams,specId);
 		$("#ms2spectrumpop").draggable({
 			appendTo: "body"
 		});
@@ -116,7 +130,6 @@ function graphOnClickActions(){
 	$(".ms2_scanIds").click(function(){
         let value = this.getAttribute('value');
         let [currentData,specId] = getCurrentData(ms2_ScansWithData,value);
-        console.log("value : ", value);
         id = "ms2svg_"+value;
         showCorrespondingGraph(value);
 		$("#ms2_graph_nav .active").removeClass("active");
@@ -135,15 +148,27 @@ function graphOnClickActions(){
 		let CurrentScanVal = document.getElementById(parent_id).firstChild.innerHTML;
 		/*	get Mono M/z value till 3 decimal values	*/
 		let peak_value = parseFloat(this.innerHTML).toFixed(3) ;
-		console.log("ms2_ScansWithData in buttons: ", ms2_ScansWithData);
-		console.log("CurrentScanVal : ", CurrentScanVal);
 		let [currentData,specId] = getCurrentData(ms2_ScansWithData,CurrentScanVal);
-		console.log("currentData : ", currentData);
         let id = "ms2svg_"+CurrentScanVal;
         showCorrespondingGraph(CurrentScanVal);
 		generateCorrespondingGraph(currentData,id,peak_value,specId);
 		activateCurrentnavbar("ms2_graph_nav",CurrentScanVal)
 		showSpectrun();
     });
+
+    $("#ms2_popup_redraw").click(function(){
+		//$("#ms2_graph_popup_nav li").remove();
+        //let scanIdList = prsm_data.prsm.ms.ms_header.scans.split(" ");
+        let currentGraphNode = $('.ms2_scanIds.active')[0].text;
+        let scanId = currentGraphNode.split(" ")[1];
+		let [current_data,specId] = getCurrentData(ms2_ScansWithData,scanId);
+        let id = "ms2svg_"+scanId;
+        let specparams = correspondingSpecParams_g[id];
+        specparams.showPeaks =document.getElementsByName("show_peaks")[0].checked;
+        specparams.showCircles = document.getElementsByName("show_envelops")[0].checked ;
+        specparams.showIons = document.getElementsByName("show_ions")[0].checked ;
+        console.log("specparams : ", id, specparams);
+        reDrawWithSpecParams(current_data,"popup_ms2_spectrum",specparams,specId);
+    })
     
 }
