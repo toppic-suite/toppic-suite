@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -107,6 +107,7 @@ void toppicWindow::initArguments() {
   arguments_["threadNumber"] = "1";
   arguments_["useFeatureFile"] = "true";
   arguments_["skipList"] = "";
+  arguments_["geneHTMLFolder"] = "";
 }
 
 void toppicWindow::on_clearButton_clicked() {
@@ -145,6 +146,7 @@ void toppicWindow::on_defaultButton_clicked() {
   ui->decoyCheckBox->setChecked(false);
   ui->lookupTableCheckBox->setChecked(false);
   ui->topfdFeatureCheckBox->setChecked(false);
+  ui->skipHTMLCheckBox->setChecked(false);
 }
 
 void toppicWindow::updatedir(QString s) {
@@ -327,6 +329,11 @@ std::map<std::string, std::string> toppicWindow::getArguments() {
   } else {
     arguments_["useFeatureFile"] = "true";
   }
+  if (ui->skipHTMLCheckBox->isChecked()) {
+    arguments_["geneHTMLFolder"] = "false";
+  } else {
+    arguments_["geneHTMLFolder"] = "true";
+  }
   //showArguments();
   return arguments_;
 }
@@ -425,6 +432,7 @@ void toppicWindow::lockDialog() {
   ui->outputButton->setEnabled(false);
   ui->addButton->setEnabled(false);
   ui->delButton->setEnabled(false);
+  ui->skipHTMLCheckBox->setEnabled(false);
 }
 
 void toppicWindow::unlockDialog() {
@@ -465,6 +473,7 @@ void toppicWindow::unlockDialog() {
   ui->outputButton->setDefault(true);
   ui->addButton->setEnabled(true);
   ui->delButton->setEnabled(true);
+  ui->skipHTMLCheckBox->setEnabled(true);
 }
 
 bool toppicWindow::checkError() {

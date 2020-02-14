@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -61,6 +61,7 @@ bool Argument::parse(int argc, char* argv[]) {
         ("precursor-window,w", po::value<std::string> (&prec_window),
          "<a positive number>. Set the precursor window size. The default value is 3.0 m/z.")
         ("missing-level-one,o","The input spectrum file does not contain MS1 spectra.")
+        ("skip-html-folder,X","Skip the generation of html folder for topview.")
         ;
 
     po::options_description desc("Options");
@@ -79,6 +80,7 @@ bool Argument::parse(int argc, char* argv[]) {
          "Merge deconvoluted files and specify the name of the merged file.")
         ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), 
          "Spectrum file name with its path.")
+        ("skip-html-folder,X","Skip the generation of html folder for topview.")
         ;
 
     po::positional_options_description positional_options;
@@ -156,6 +158,9 @@ bool Argument::parse(int argc, char* argv[]) {
         topfd_para_ptr_->merge_files_ = true;
         topfd_para_ptr_->merged_file_name_ = merged_file_name;
       }
+    }
+    if (vm.count("skip-html-folder")) {
+      topfd_para_ptr_->gene_html_folder_ = false;
     }
   }
   catch(std::exception& e) {

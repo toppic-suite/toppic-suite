@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -12,40 +12,79 @@
 //See the License for the specific language governing permissions and
 //limitations under the License.
 
+#include <iostream>
+
+#include "common/util/file_util.hpp"
+
 #include "seq/proteoform_util.hpp"
+
 #include "ms/spec/prm_ms.hpp"
+
 #include "filter/massmatch/filter_protein.hpp"
 #include "filter/massmatch/mass_match_factory.hpp"
 #include "filter/massmatch/mass_match_util.hpp"
 #include "filter/oneptm/mass_one_ptm_filter.hpp"
 
+#include "console/topindex_file_name.hpp"
+
 namespace toppic {
 
 MassOnePtmFilter::MassOnePtmFilter(const ProteoformPtrVec &proteo_ptrs,
-                                   OnePtmFilterMngPtr mng_ptr) {
+                                   OnePtmFilterMngPtr mng_ptr, std::string block_str) {
   mng_ptr_ = mng_ptr;
   proteo_ptrs_ = proteo_ptrs;
-  std::vector<std::vector<double>> shift_2d
-      = proteoform_util::getNTermShift2D(proteo_ptrs, mng_ptr->prsm_para_ptr_->getProtModPtrVec());
-  std::vector<std::vector<double>> n_term_acet_2d
-      = proteoform_util::getNTermAcet2D(proteo_ptrs, mng_ptr->prsm_para_ptr_->getProtModPtrVec());
-  term_index_ptr_ = MassMatchFactory::getPrmTermMassMatchPtr(proteo_ptrs, shift_2d,
-                                                             mng_ptr->max_proteoform_mass_,
-                                                             mng_ptr->filter_scale_);
-  diag_index_ptr_ = MassMatchFactory::getPrmDiagMassMatchPtr(proteo_ptrs,
-                                                             mng_ptr->max_proteoform_mass_,
-                                                             mng_ptr->filter_scale_);
-  std::vector<std::vector<double>> rev_shift_2d;
-  std::vector<double> shift_1d(1, 0);
-  for (size_t i = 0; i < proteo_ptrs.size(); i++) {
-    rev_shift_2d.push_back(shift_1d);
+  PrsmParaPtr prsm_para_ptr = mng_ptr->prsm_para_ptr_;
+
+  std::string indexDirName = mng_ptr_->prsm_para_ptr_->getOriDbName() + "_idx";
+  TopIndexFileName TopIndexFile;
+  std::string parameters = TopIndexFile.gene_file_name(prsm_para_ptr);
+
+ bool indexFilesExist = true;
+
+  for (size_t t = 0; t < TopIndexFile.one_ptm_file_vec.size(); t++){
+    if (!file_util::exists(indexDirName + file_util::getFileSeparator() + TopIndexFile.one_ptm_file_vec[t] + parameters + block_str)){
+      indexFilesExist = false;//if any of the index files for this ptm is missing
+      break; 
+    }
   }
-  rev_term_index_ptr_ = MassMatchFactory::getSrmTermMassMatchPtr(proteo_ptrs, rev_shift_2d, n_term_acet_2d,
-                                                                 mng_ptr->max_proteoform_mass_,
-                                                                 mng_ptr->filter_scale_);
-  rev_diag_index_ptr_ = MassMatchFactory::getSrmDiagMassMatchPtr(proteo_ptrs, n_term_acet_2d,
-                                                                 mng_ptr->max_proteoform_mass_,
-                                                                 mng_ptr->filter_scale_);
+
+  if (indexFilesExist){//if exists
+    std::cout << "Loading index files                               " << std::endl;
+    term_index_ptr_ = std::make_shared<MassMatch>();
+    diag_index_ptr_ = std::make_shared<MassMatch>();
+    rev_term_index_ptr_ = std::make_shared<MassMatch>();
+    rev_diag_index_ptr_ = std::make_shared<MassMatch>();
+    
+   //complete file name is a ptm type from topindexfile vector + parameters + db block id (block_str)
+    term_index_ptr_->deserializeMassMatch(TopIndexFile.one_ptm_file_vec[0] + parameters + block_str, indexDirName);
+    diag_index_ptr_->deserializeMassMatch(TopIndexFile.one_ptm_file_vec[1] + parameters + block_str, indexDirName);
+    rev_term_index_ptr_->deserializeMassMatch(TopIndexFile.one_ptm_file_vec[2] + parameters + block_str, indexDirName);
+    rev_diag_index_ptr_->deserializeMassMatch(TopIndexFile.one_ptm_file_vec[3] + parameters + block_str, indexDirName);
+  }
+  else{
+
+    std::vector<std::vector<double>> shift_2d
+        = proteoform_util::getNTermShift2D(proteo_ptrs, mng_ptr->prsm_para_ptr_->getProtModPtrVec());
+    std::vector<std::vector<double>> n_term_acet_2d
+        = proteoform_util::getNTermAcet2D(proteo_ptrs, mng_ptr->prsm_para_ptr_->getProtModPtrVec());
+    term_index_ptr_ = MassMatchFactory::getPrmTermMassMatchPtr(proteo_ptrs, shift_2d,
+                                                              mng_ptr->max_proteoform_mass_,
+                                                              mng_ptr->filter_scale_);
+    diag_index_ptr_ = MassMatchFactory::getPrmDiagMassMatchPtr(proteo_ptrs,
+                                                              mng_ptr->max_proteoform_mass_,
+                                                              mng_ptr->filter_scale_);
+    std::vector<std::vector<double>> rev_shift_2d;
+    std::vector<double> shift_1d(1, 0);
+    for (size_t i = 0; i < proteo_ptrs.size(); i++) {
+      rev_shift_2d.push_back(shift_1d);
+    }
+    rev_term_index_ptr_ = MassMatchFactory::getSrmTermMassMatchPtr(proteo_ptrs, rev_shift_2d, n_term_acet_2d,
+                                                                  mng_ptr->max_proteoform_mass_,
+                                                                  mng_ptr->filter_scale_);
+    rev_diag_index_ptr_ = MassMatchFactory::getSrmDiagMassMatchPtr(proteo_ptrs, n_term_acet_2d,
+                                                                  mng_ptr->max_proteoform_mass_,mng_ptr->filter_scale_);
+                                                          
+  };
 }
 
 void MassOnePtmFilter::computeBestMatch(const PrmMsPtrVec &prm_ms_ptr_vec,

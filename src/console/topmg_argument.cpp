@@ -1,4 +1,4 @@
-//Copyright (c) 2014 - 2019, The Trustees of Indiana University.
+//Copyright (c) 2014 - 2020, The Trustees of Indiana University.
 //
 //Licensed under the Apache License, Version 2.0 (the "License");
 //you may not use this file except in compliance with the License.
@@ -68,6 +68,7 @@ void Argument::initArguments() {
   arguments_["useAsfDiag"] = "false";
   arguments_["varPtmNumber"] = "5";
   arguments_["varPtmNumInGap"] = "5";
+  arguments_["geneHTMLFolder"] = "true";
 }
 
 void Argument::outputArguments(std::ostream &output, std::map<std::string, std::string> arguments) {
@@ -241,7 +242,8 @@ bool Argument::parse(int argc, char* argv[]) {
         ("var-ptm,P", po::value<std::string>(&var_ptm_num) , "<a positive number>. Maximum number of variable PTMs. Default value: 5.")
         ("num-shift,s", po::value<std::string> (&ptm_num), "<0|1|2>. Maximum number of unexpected modifications in a proteoform spectrum-match. Default value: 0.")
         ("combined-file-name,c", po::value<std::string>(&combined_output_name) , "Specify a file name for the combined spectrum data file and analysis results.")
-        ("keep-temp-files,k", "Keep temporary files.");
+        ("keep-temp-files,k", "Keep temporary files.")
+        ("skip-html-folder,X", "Skip the generation of html folder for topview.");
     
 //("skip-list,l", po::value<std::string>(&skip_list) , "<a text file with its path>. The scans in this file will be skipped.")
 //
@@ -274,7 +276,8 @@ bool Argument::parse(int argc, char* argv[]) {
         ("var-ptm,P", po::value<std::string>(&var_ptm_num) , "")
         ("num-shift,s", po::value<std::string> (&ptm_num), "")
         ("database-file-name", po::value<std::string>(&database_file_name)->required(), "Database file name with its path.")
-        ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), "Spectrum file name with its path.");
+        ("spectrum-file-name", po::value<std::vector<std::string> >()->multitoken()->required(), "Spectrum file name with its path.")
+        ("skip-html-folder,X", "");
 
     po::positional_options_description positional_options;
     positional_options.add("database-file-name", 1);
@@ -413,6 +416,9 @@ bool Argument::parse(int argc, char* argv[]) {
 
     if (vm.count("var-ptm-in-gap")) {
       arguments_["varPtmNumInGap"] = var_ptm_in_gap;
+    }
+    if (vm.count("skip-html-folder")) {
+      arguments_["geneHTMLFolder"] = "false";
     }
   }
   catch(std::exception & e) {
